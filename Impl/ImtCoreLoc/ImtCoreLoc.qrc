@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="/Translations">
+		<file alias="ImtCore_en_US">Translations/ImtCore_en_US.qm</file>
+		<file alias="ImtCore_de_DE">Translations/ImtCore_de_DE.qm</file>
+		<file alias="ImtCore_ru_RU">Translations/ImtCore_ru_RU.qm</file>
+		<file alias="ImtCore_pl_PL">Translations/ImtCore_pl_PL.qm</file>
+	</qresource>
+</RCC>
