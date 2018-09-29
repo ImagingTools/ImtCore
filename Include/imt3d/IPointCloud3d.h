@@ -4,9 +4,11 @@
 // Qt includes
 #include <QtCore/QLinkedList>
 
+// ACF includes
+#include <i3d/CVector3d.h>
+
 // ImtCore includes
 #include <imt3d/IObject3d.h>
-#include <i3d/CVector3d.h>
 
 
 namespace imt3d
