@@ -5,12 +5,13 @@
 #include <iser/IObject.h>
 #include <i3d/CVector3d.h>
 
+// ImtCore includes
+#include <imt3d/imt3d.h>
+#include <imt3d/CCuboid.h>
+
 
 namespace imt3d
 {
-
-
-class Cuboid;
 
 
 /**
@@ -27,17 +28,17 @@ public:
 	/**
 		Get the center of the 3D-object.
 	*/
-	i3d::CVector3d GetCenter() const = 0;
+	virtual Point3d GetCenter() const = 0;
 
 	/**
 		Move object to position \c position.
 	*/
-	virtual void MoveCenterTo(const i3d::CVector3d& position) = 0;
+	virtual void MoveCenterTo(const Point3d& position) = 0;
 
 	/**
 		Get bounding cuboid of this object.
 	*/
-	virtual Cuboid GetBoundingCuboid() const = 0;
+	virtual CCuboid GetBoundingCuboid() const = 0;
 };
 
 
