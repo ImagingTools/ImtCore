@@ -6,11 +6,9 @@
 #include <icomp/TMakeComponentWrap.h>
 #include <ibase/TModelObserverCompWrap.h>
 
-// ImtCore includes
-
 
 /**
-	ImtCore UI package
+	ImagingTools core UI package
 */
 namespace ImtCoreGuiPck
 {

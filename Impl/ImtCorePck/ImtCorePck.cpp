@@ -9,13 +9,7 @@ namespace ImtCorePck
 {
 
 
-I_EXPORT_PACKAGE("ImtCorePck", "ImtCore's data model components", "ImtCore Vision Inspection Analyse");
-
-
-I_EXPORT_COMPONENT(
-			WorkflowManager,
-			"Workflow manager",
-			"Task Workflow Management");
+I_EXPORT_PACKAGE("ImtCorePck", "ImagingTools core component package", "Core Basics");
 
 
 } // namespace ImtCorePck

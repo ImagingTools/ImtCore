@@ -7,7 +7,6 @@
 
 
 // ImtCore includes
-#include <imtcore/CWorkflowManagerComp.h>
 
 
 /**
@@ -15,8 +14,6 @@
 */
 namespace ImtCorePck
 {
-
-typedef icomp::TModelCompWrap<imtcore::CWorkflowManagerComp> WorkflowManager;
 
 
 } // namespace ImtCorePck

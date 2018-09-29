@@ -5,7 +5,7 @@ include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liinsp -liipr -liproc -licalib
-LIBS += -limt
+#LIBS += -limtcore
 
 # Get build output directory of shadow build:
 ACFSLNDIRBUILD = $$(ACFSLNDIR_BUILD)
