@@ -6,6 +6,7 @@
 
 // Acf includes
 #include <istd/CChangeNotifier.h>
+#include <iser/CArchiveTag.h>
 
 // ImtCore includes
 #include <imt3d/IObject3d.h>
@@ -87,6 +88,39 @@ CCuboid CPointCloud3d::GetBoundingCuboid() const
 	}
 
 	return m_boundingCuboid;
+}
+
+bool CPointCloud3d::Serialize(iser::IArchive &archive)
+{
+	static iser::CArchiveTag pointCloudTag("PointCloud", "Point cloud", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag pointTag("Point", "Point", iser::CArchiveTag::TT_LEAF);
+
+	bool retVal = true;
+	int count = m_cloudPoints.count();
+	archive.BeginMultiTag(pointCloudTag, pointTag, count);
+
+	if (archive.IsStoring()){
+		for (CloudPoints::iterator pointIter = m_cloudPoints.begin(); pointIter != m_cloudPoints.end(); pointIter++){
+			retVal = retVal && archive.BeginTag(pointTag);
+			retVal = retVal && pointIter->Serialize(archive);
+			retVal = retVal && archive.EndTag(pointTag);
+		}
+	}
+	else{
+		i3d::CVector3d point;
+		for (int i = 0; i < count; ++i){
+			retVal = retVal && archive.BeginTag(pointTag);
+			retVal = retVal && point.Serialize(archive);
+			retVal = retVal && archive.EndTag(pointTag);
+			if (retVal){
+				m_cloudPoints.push_back(point);
+			}
+		}
+	}
+
+	archive.EndTag(pointCloudTag);
+
+	return retVal;
 }
 
 

@@ -278,9 +278,9 @@ inline double CCuboid::GetNear() const
 }
 
 
-inline void CCuboid::SetNear(double near)
+inline void CCuboid::SetNear(double nearValue)
 {
-	m_depthRange.SetMaxValue(near);
+	m_depthRange.SetMaxValue(nearValue);
 }
 
 
@@ -290,9 +290,9 @@ inline double CCuboid::GetFar() const
 }
 
 
-inline void CCuboid::SetFar(double far)
+inline void CCuboid::SetFar(double farValue)
 {
-	m_depthRange.SetMinValue(far);
+	m_depthRange.SetMinValue(farValue);
 }
 
 

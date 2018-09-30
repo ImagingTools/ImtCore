@@ -32,6 +32,9 @@ public:
 	virtual void MoveCenterTo(const i3d::CVector3d& position) Q_DECL_OVERRIDE;
 	virtual CCuboid GetBoundingCuboid() const Q_DECL_OVERRIDE;
 
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) Q_DECL_OVERRIDE;
+
 private:
 	void CalculateCloudCenterPoint();
 
