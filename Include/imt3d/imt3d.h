@@ -8,6 +8,7 @@
 #include <imath/imath.h>
 #include <i3d/CVector3d.h>
 
+
 /**
 	Contains the 3D primitives.
 	This package is system independent.
@@ -22,8 +23,7 @@ namespace imt3d
 {
 
 
-typedef i3d::CVector3d Point3d;
-typedef QLinkedList<Point3d> CloudPoints;
+typedef QLinkedList<i3d::CVector3d> CloudPoints;
 
 
 } // namespace imt3d

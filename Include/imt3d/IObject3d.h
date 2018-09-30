@@ -28,12 +28,12 @@ public:
 	/**
 		Get the center of the 3D-object.
 	*/
-	virtual Point3d GetCenter() const = 0;
+	virtual i3d::CVector3d GetCenter() const = 0;
 
 	/**
 		Move object to position \c position.
 	*/
-	virtual void MoveCenterTo(const Point3d& position) = 0;
+	virtual void MoveCenterTo(const i3d::CVector3d& position) = 0;
 
 	/**
 		Get bounding cuboid of this object.

@@ -23,7 +23,7 @@ CPointCloud3d::CPointCloud3d()
 }
 
 
-void CPointCloud3d::AddPoint(const Point3d &point)
+void CPointCloud3d::AddPoint(const i3d::CVector3d &point)
 {
 	istd::CChangeNotifier notifier(this);
 

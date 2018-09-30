@@ -25,42 +25,54 @@ public:
 			double near = 0.,
 			double far = 0.);
 
-	Point3d GetLeftBottomNear();
-	void SetLeftBottomNear(const Point3d& point);
-	Point3d GetRightBottomNear();
-	void SetRightBottomNear(const Point3d& point);
-	Point3d GetLeftTopNear();
-	void SetLeftTopNear(const Point3d& point);
-	Point3d GetRightTopNear();
-	void SetRightTopNear(const Point3d& point);
-	Point3d GetLeftBottomFar();
-	void SetLeftBottomFar(const Point3d& point);
-	Point3d GetRightBottomFar();
-	void SetRightBottomFar(const Point3d& point);
-	Point3d GetLeftTopFar();
-	void SetLeftTopFar(const Point3d& point);
-	Point3d GetRightTopFar();
-	void SetRightTopFar(const Point3d& point);
+	i3d::CVector3d GetLeftBottomNear();
+	void SetLeftBottomNear(const i3d::CVector3d& point);
+
+	i3d::CVector3d GetRightBottomNear();
+	void SetRightBottomNear(const i3d::CVector3d& point);
+
+	i3d::CVector3d GetLeftTopNear();
+	void SetLeftTopNear(const i3d::CVector3d& point);
+
+	i3d::CVector3d GetRightTopNear();
+	void SetRightTopNear(const i3d::CVector3d& point);
+
+	i3d::CVector3d GetLeftBottomFar();
+	void SetLeftBottomFar(const i3d::CVector3d& point);
+
+	i3d::CVector3d GetRightBottomFar();
+	void SetRightBottomFar(const i3d::CVector3d& point);
+
+	i3d::CVector3d GetLeftTopFar();
+	void SetLeftTopFar(const i3d::CVector3d& point);
+
+	i3d::CVector3d GetRightTopFar();
+	void SetRightTopFar(const i3d::CVector3d& point);
 
 	double GetLeft() const;
 	void SetLeft(double left);
+
 	double GetTop() const;
 	void SetTop(double top);
+
 	double GetRight() const;
 	void SetRight(double right);
+
 	double GetBottom() const;
 	void SetBottom(double bottom);
+
 	double GetNear() const;
 	void SetNear(double near);
+
 	double GetFar() const;
 	void SetFar(double far);
 
 	double GetWidth();
 	double GetHeight();
-	double GetDeep();
+	double GetDepth();
 
-	Point3d GetCenterPoint();
-	void ExpandToPoint(const Point3d& point);
+	i3d::CVector3d GetCenterPoint();
+	void ExpandToPoint(const i3d::CVector3d& point);
 	static CCuboid FromCloudPoints(const CloudPoints& cloudPoints);
 
 	const istd::CRange& GetHorizontalRange() const;
@@ -81,14 +93,16 @@ public:
 		Get empty cuboid with all values set to 0.
 	*/
 	static const imt3d::CCuboid& GetEmpty();
+
 	/**
 		Get invalid cuboid.
 	*/
 	static const imt3d::CCuboid& GetInvalid();
+
 private:
-	istd::CRange m_horizontal;
-	istd::CRange m_vertical;
-	istd::CRange m_deep;
+	istd::CRange m_horizontalRange;
+	istd::CRange m_verticalRange;
+	istd::CRange m_depthRange;
 
 	// static members
 	static imt3d::CCuboid s_empty;
@@ -98,340 +112,294 @@ private:
 
 // public methods
 
-CCuboid::CCuboid(double left, double right, double bottom, double top, double near, double far)
-	:m_horizontal(left, right),
-	  m_vertical(bottom, top),
-	  m_deep(far, near)
+inline i3d::CVector3d CCuboid::GetLeftBottomNear()
 {
+	return i3d::CVector3d(m_horizontalRange.GetMinValue(), m_verticalRange.GetMinValue(), m_depthRange.GetMaxValue());
 }
 
 
-inline Point3d CCuboid::GetLeftBottomNear()
+inline void CCuboid::SetLeftBottomNear(const i3d::CVector3d& point)
 {
-	return Point3d(m_horizontal.GetMinValue(), m_vertical.GetMinValue(), m_deep.GetMaxValue());
+	m_horizontalRange.SetMinValue(point.GetX());
+	m_verticalRange.SetMinValue(point.GetY());
+	m_depthRange.SetMaxValue(point.GetZ());
 }
 
 
-inline void CCuboid::SetLeftBottomNear(const Point3d& point)
+inline i3d::CVector3d CCuboid::GetRightBottomNear()
 {
-	m_horizontal.SetMinValue(point.GetX());
-	m_vertical.SetMinValue(point.GetY());
-	m_deep.SetMaxValue(point.GetZ());
+	return i3d::CVector3d(m_horizontalRange.GetMaxValue(), m_verticalRange.GetMinValue(), m_depthRange.GetMaxValue());
 }
 
 
-inline Point3d CCuboid::GetRightBottomNear()
+inline void CCuboid::SetRightBottomNear(const i3d::CVector3d& point)
 {
-	return Point3d(m_horizontal.GetMaxValue(), m_vertical.GetMinValue(), m_deep.GetMaxValue());
+	m_horizontalRange.SetMaxValue(point.GetX());
+	m_verticalRange.SetMinValue(point.GetY());
+	m_depthRange.SetMaxValue(point.GetZ());
 }
 
 
-inline void CCuboid::SetRightBottomNear(const Point3d& point)
+inline i3d::CVector3d CCuboid::GetLeftTopNear()
 {
-	m_horizontal.SetMaxValue(point.GetX());
-	m_vertical.SetMinValue(point.GetY());
-	m_deep.SetMaxValue(point.GetZ());
+	return i3d::CVector3d(m_horizontalRange.GetMinValue(), m_verticalRange.GetMaxValue(), m_depthRange.GetMaxValue());
 }
 
 
-inline Point3d CCuboid::GetLeftTopNear()
+inline void CCuboid::SetLeftTopNear(const i3d::CVector3d& point)
 {
-	return Point3d(m_horizontal.GetMinValue(), m_vertical.GetMaxValue(), m_deep.GetMaxValue());
+	m_horizontalRange.SetMinValue(point.GetX());
+	m_verticalRange.SetMaxValue(point.GetY());
+	m_depthRange.SetMaxValue(point.GetZ());
 }
 
 
-inline void CCuboid::SetLeftTopNear(const Point3d& point)
+inline i3d::CVector3d CCuboid::GetRightTopNear()
 {
-	m_horizontal.SetMinValue(point.GetX());
-	m_vertical.SetMaxValue(point.GetY());
-	m_deep.SetMaxValue(point.GetZ());
+	return i3d::CVector3d(m_horizontalRange.GetMaxValue(), m_verticalRange.GetMaxValue(), m_depthRange.GetMaxValue());
 }
 
 
-inline Point3d CCuboid::GetRightTopNear()
+inline void CCuboid::SetRightTopNear(const i3d::CVector3d& point)
 {
-	return Point3d(m_horizontal.GetMaxValue(), m_vertical.GetMaxValue(), m_deep.GetMaxValue());
+	m_horizontalRange.SetMaxValue(point.GetX());
+	m_verticalRange.SetMaxValue(point.GetY());
+	m_depthRange.SetMaxValue(point.GetZ());
 }
 
 
-inline void CCuboid::SetRightTopNear(const Point3d& point)
+inline i3d::CVector3d CCuboid::GetLeftBottomFar()
 {
-	m_horizontal.SetMaxValue(point.GetX());
-	m_vertical.SetMaxValue(point.GetY());
-	m_deep.SetMaxValue(point.GetZ());
+	return i3d::CVector3d(m_horizontalRange.GetMinValue(), m_verticalRange.GetMinValue(), m_depthRange.GetMinValue());
 }
 
 
-inline Point3d CCuboid::GetLeftBottomFar()
+inline void CCuboid::SetLeftBottomFar(const i3d::CVector3d& point)
 {
-	return Point3d(m_horizontal.GetMinValue(), m_vertical.GetMinValue(), m_deep.GetMinValue());
+	m_horizontalRange.SetMinValue(point.GetX());
+	m_verticalRange.SetMinValue(point.GetY());
+	m_depthRange.SetMinValue(point.GetZ());
 }
 
 
-inline void CCuboid::SetLeftBottomFar(const Point3d& point)
+inline i3d::CVector3d CCuboid::GetRightBottomFar()
 {
-	m_horizontal.SetMinValue(point.GetX());
-	m_vertical.SetMinValue(point.GetY());
-	m_deep.SetMinValue(point.GetZ());
+	return i3d::CVector3d(m_horizontalRange.GetMaxValue(), m_verticalRange.GetMinValue(), m_depthRange.GetMinValue());
 }
 
 
-inline Point3d CCuboid::GetRightBottomFar()
+inline void CCuboid::SetRightBottomFar(const i3d::CVector3d& point)
 {
-	return Point3d(m_horizontal.GetMaxValue(), m_vertical.GetMinValue(), m_deep.GetMinValue());
+	m_horizontalRange.SetMaxValue(point.GetX());
+	m_verticalRange.SetMinValue(point.GetY());
+	m_depthRange.SetMinValue(point.GetZ());
 }
 
 
-inline void CCuboid::SetRightBottomFar(const Point3d& point)
+inline i3d::CVector3d CCuboid::GetLeftTopFar()
 {
-	m_horizontal.SetMaxValue(point.GetX());
-	m_vertical.SetMinValue(point.GetY());
-	m_deep.SetMinValue(point.GetZ());
+	return i3d::CVector3d(m_horizontalRange.GetMinValue(), m_verticalRange.GetMaxValue(), m_depthRange.GetMinValue());
 }
 
 
-inline Point3d CCuboid::GetLeftTopFar()
+inline void CCuboid::SetLeftTopFar(const i3d::CVector3d& point)
 {
-	return Point3d(m_horizontal.GetMinValue(), m_vertical.GetMaxValue(), m_deep.GetMinValue());
+	m_horizontalRange.SetMinValue(point.GetX());
+	m_verticalRange.SetMaxValue(point.GetY());
+	m_depthRange.SetMinValue(point.GetZ());
 }
 
 
-inline void CCuboid::SetLeftTopFar(const Point3d& point)
+inline i3d::CVector3d CCuboid::GetRightTopFar()
 {
-	m_horizontal.SetMinValue(point.GetX());
-	m_vertical.SetMaxValue(point.GetY());
-	m_deep.SetMinValue(point.GetZ());
+	return i3d::CVector3d(m_horizontalRange.GetMaxValue(), m_verticalRange.GetMaxValue(), m_depthRange.GetMinValue());
 }
 
 
-inline Point3d CCuboid::GetRightTopFar()
+inline void CCuboid::SetRightTopFar(const i3d::CVector3d& point)
 {
-	return Point3d(m_horizontal.GetMaxValue(), m_vertical.GetMaxValue(), m_deep.GetMinValue());
+	m_horizontalRange.SetMaxValue(point.GetX());
+	m_verticalRange.SetMaxValue(point.GetY());
+	m_depthRange.SetMinValue(point.GetZ());
 }
 
 
-inline void CCuboid::SetRightTopFar(const Point3d& point)
+inline double CCuboid::GetLeft() const
 {
-	m_horizontal.SetMaxValue(point.GetX());
-	m_vertical.SetMaxValue(point.GetY());
-	m_deep.SetMinValue(point.GetZ());
+	return m_horizontalRange.GetMinValue();
 }
 
 
-double CCuboid::GetLeft() const
+inline void CCuboid::SetLeft(double left)
 {
-	return m_horizontal.GetMinValue();
+	m_horizontalRange.SetMinValue(left);
 }
 
 
-void CCuboid::SetLeft(double left)
+inline double CCuboid::GetTop() const
 {
-	m_horizontal.SetMinValue(left);
+	return m_verticalRange.GetMaxValue();
 }
 
 
-double CCuboid::GetTop() const
+inline void CCuboid::SetTop(double top)
 {
-	return m_vertical.GetMaxValue();
+	m_verticalRange.SetMaxValue(top);
 }
 
 
-void CCuboid::SetTop(double top)
+inline double CCuboid::GetRight() const
 {
-	m_vertical.SetMaxValue(top);
+	return m_horizontalRange.GetMaxValue();
 }
 
 
-double CCuboid::GetRight() const
+inline void CCuboid::SetRight(double right)
 {
-	return m_horizontal.GetMaxValue();
+	m_horizontalRange.SetMaxValue(right);
 }
 
 
-void CCuboid::SetRight(double right)
+inline double CCuboid::GetBottom() const
 {
-	m_horizontal.SetMaxValue(right);
+	return m_verticalRange.GetMinValue();
 }
 
 
-double CCuboid::GetBottom() const
+inline void CCuboid::SetBottom(double bottom)
 {
-	return m_vertical.GetMinValue();
+	m_verticalRange.SetMinValue(bottom);
 }
 
 
-void CCuboid::SetBottom(double bottom)
+inline double CCuboid::GetNear() const
 {
-	m_vertical.SetMinValue(bottom);
+	return m_depthRange.GetMaxValue();
 }
 
 
-double CCuboid::GetNear() const
+inline void CCuboid::SetNear(double near)
 {
-	return m_deep.GetMaxValue();
+	m_depthRange.SetMaxValue(near);
 }
 
 
-void CCuboid::SetNear(double near)
+inline double CCuboid::GetFar() const
 {
-	m_deep.SetMaxValue(near);
+	return m_depthRange.GetMinValue();
 }
 
 
-double CCuboid::GetFar() const
+inline void CCuboid::SetFar(double far)
 {
-	return m_deep.GetMinValue();
-}
-
-
-void CCuboid::SetFar(double far)
-{
-	m_deep.SetMinValue(far);
+	m_depthRange.SetMinValue(far);
 }
 
 
 inline double CCuboid::GetWidth()
 {
-	return m_horizontal.GetLength();
+	return m_horizontalRange.GetLength();
 }
 
 
 inline double CCuboid::GetHeight()
 {
-	return m_vertical.GetLength();
+	return m_verticalRange.GetLength();
 }
 
 
-inline double CCuboid::GetDeep()
+inline double CCuboid::GetDepth()
 {
-	return m_deep.GetLength();
-}
-
-Point3d CCuboid::GetCenterPoint()
-{
-	return Point3d((m_horizontal.GetMaxValue() - m_horizontal.GetMinValue())/ 2,
-					(m_vertical.GetMaxValue() - m_vertical.GetMinValue())/ 2,
-					(m_deep.GetMaxValue() - m_deep.GetMinValue())/ 2);
+	return m_depthRange.GetLength();
 }
 
 
-inline void CCuboid::ExpandToPoint(const Point3d& point)
+inline i3d::CVector3d CCuboid::GetCenterPoint()
 {
-	if ((point.GetX() > m_horizontal.GetMaxValue())){
-		m_horizontal.SetMaxValue(point.GetX());
-	} else if ((point.GetX() < m_horizontal.GetMinValue())){
-		m_horizontal.SetMinValue(point.GetX());
-	}
-	if ((point.GetY() > m_vertical.GetMaxValue())){
-		m_vertical.SetMaxValue(point.GetY());
-	} else if ((point.GetY() < m_vertical.GetMinValue())){
-		m_vertical.SetMinValue(point.GetY());
-	}
-	if ((point.GetZ() > m_deep.GetMaxValue())){
-		m_deep.SetMaxValue(point.GetZ());
-	} else if ((point.GetZ() < m_deep.GetMinValue())){
-		m_deep.SetMinValue(point.GetZ());
-	}
+	return i3d::CVector3d(
+				(m_horizontalRange.GetMaxValue() - m_horizontalRange.GetMinValue()) / 2,
+				(m_verticalRange.GetMaxValue() - m_verticalRange.GetMinValue()) / 2,
+				(m_depthRange.GetMaxValue() - m_depthRange.GetMinValue()) / 2);
 }
 
 
-
-CCuboid CCuboid::FromCloudPoints(const CloudPoints& cloudPoints)
+inline void CCuboid::ExpandToPoint(const i3d::CVector3d& point)
 {
-
-	if (cloudPoints.count() > 0){
-		double left = cloudPoints.first().GetX();
-		double right = cloudPoints.first().GetX();
-		double bottom = cloudPoints.first().GetY();
-		double top = cloudPoints.first().GetY();
-		double near = cloudPoints.first().GetZ();
-		double far = cloudPoints.first().GetZ();
-
-		for (CloudPoints::const_iterator pointIter = cloudPoints.constBegin(); pointIter != cloudPoints.constEnd(); pointIter++){
-			if ((pointIter->GetX() > right)){
-				right = pointIter->GetX();
-			} else if ((pointIter->GetX() < left)){
-				left = pointIter->GetX();
-			}
-			if ((pointIter->GetY() > top)){
-				top = pointIter->GetY();
-			} else if ((pointIter->GetY() < bottom)){
-				bottom = pointIter->GetY();
-			}
-			if ((pointIter->GetZ() > near)){
-				near = pointIter->GetZ();
-			} else if ((pointIter->GetZ() < far)){
-				far = pointIter->GetZ();
-			}
-		}
-
-		return CCuboid(left, right, bottom, top, near, far);
+	if ((point.GetX() > m_horizontalRange.GetMaxValue())){
+		m_horizontalRange.SetMaxValue(point.GetX());
+	} else if ((point.GetX() < m_horizontalRange.GetMinValue())){
+		m_horizontalRange.SetMinValue(point.GetX());
 	}
-	else{
-		return s_invalid;
+	if ((point.GetY() > m_verticalRange.GetMaxValue())){
+		m_verticalRange.SetMaxValue(point.GetY());
+	} else if ((point.GetY() < m_verticalRange.GetMinValue())){
+		m_verticalRange.SetMinValue(point.GetY());
 	}
-
-	return s_invalid;
+	if ((point.GetZ() > m_depthRange.GetMaxValue())){
+		m_depthRange.SetMaxValue(point.GetZ());
+	} else if ((point.GetZ() < m_depthRange.GetMinValue())){
+		m_depthRange.SetMinValue(point.GetZ());
+	}
 }
 
 
 inline const istd::CRange& CCuboid::GetHorizontalRange() const
 {
-	return m_horizontal;
+	return m_horizontalRange;
 }
 
 
 inline istd::CRange& CCuboid::GetHorizontalRangeRef()
 {
-	return m_horizontal;
+	return m_horizontalRange;
 }
 
 
 inline void CCuboid::SetHorizontalRange(const istd::CRange& range)
 {
-	m_horizontal = range;
+	m_horizontalRange = range;
 }
 
 
 inline const istd::CRange& CCuboid::GetVerticalRange() const
 {
-	return m_vertical;
+	return m_verticalRange;
 }
 
 
 inline istd::CRange& CCuboid::GetVerticalRangeRef()
 {
-	return m_vertical;
+	return m_verticalRange;
 }
 
 
 inline void CCuboid::SetVerticalRange(const istd::CRange& range)
 {
-	m_vertical = range;
+	m_verticalRange = range;
 }
 
 
 inline const istd::CRange& CCuboid::GetDeepRange() const
 {
-	return m_deep;
+	return m_depthRange;
 }
 
 
 inline istd::CRange& CCuboid::GetDeepRangeRef()
 {
-	return m_deep;
+	return m_depthRange;
 }
 
 
 inline void CCuboid::SetDeepRange(const istd::CRange& range)
 {
-	m_deep = range;
+	m_depthRange = range;
 }
 
 
 inline bool CCuboid::IsValid()
 {
-	return (m_horizontal.GetLength() > I_BIG_EPSILON) && (m_vertical.GetLength() > I_BIG_EPSILON) && (m_deep.GetLength() > I_BIG_EPSILON);
+	return (m_horizontalRange.GetLength() > I_BIG_EPSILON) && (m_verticalRange.GetLength() > I_BIG_EPSILON) && (m_depthRange.GetLength() > I_BIG_EPSILON);
 }
 
 
