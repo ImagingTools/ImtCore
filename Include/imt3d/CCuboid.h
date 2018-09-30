@@ -18,12 +18,12 @@ namespace imt3d
 class CCuboid
 {
 public:
-	CCuboid(double left = 0.,
-			double right = 0.,
-			double bottom = 0.,
-			double top = 0.,
-			double near = 0.,
-			double far = 0.);
+	CCuboid(double left = 0.0,
+			double right = 0.0,
+			double bottom = 0.0,
+			double top = 0.0,
+			double near = 0.0,
+			double far = 0.0);
 
 	i3d::CVector3d GetLeftBottomNear();
 	void SetLeftBottomNear(const i3d::CVector3d& point);
@@ -90,7 +90,7 @@ public:
 	bool IsValid();
 
 	/**
-		Get empty cuboid with all values set to 0.
+		Get empty cuboid with all values set to 0.0.
 	*/
 	static const imt3d::CCuboid& GetEmpty();
 
