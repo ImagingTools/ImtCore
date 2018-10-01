@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtCore/QLinkedList>
 
+// Acf includes
+#include <iimg/IRasterImage.h>
+
 // ImtCore includes
 #include <imt3d/imt3d.h>
 #include <imt3d/IPointCloud3d.h>
@@ -34,6 +37,16 @@ public:
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) Q_DECL_OVERRIDE;
+
+	// reimplemented (istd::IChangeable)
+	virtual bool CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode) Q_DECL_OVERRIDE;
+
+	// static methods
+	/*
+		image size will be adjusted to required size
+		\ todo think to make height (color value in index) scaleable
+	*/
+	static IPointCloud3d::PointCloudPtr FromImage(iimg::IRasterImage& image, istd::CIndex2d& size, double step = 0.05);
 
 private:
 	void CalculateCloudCenterPoint();

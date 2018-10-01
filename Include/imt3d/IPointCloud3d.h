@@ -6,6 +6,7 @@
 
 // Acf includes
 #include <i3d/CVector3d.h>
+#include <istd/TSmartPtr.h>
 
 // ImtCore includes
 #include <imt3d/imt3d.h>
@@ -22,7 +23,7 @@ namespace imt3d
 class IPointCloud3d: virtual public IObject3d
 {
 public:
-
+	typedef istd::TSmartPtr<IPointCloud3d> PointCloudPtr;
 
 	/**
 		Get the list of points.

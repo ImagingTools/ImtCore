@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QLinkedList>
+#include <QtCore/QDebug>
 
 // Acf includes
 #include <istd/CChangeNotifier.h>
@@ -119,6 +120,54 @@ bool CPointCloud3d::Serialize(iser::IArchive &archive)
 	}
 
 	archive.EndTag(pointCloudTag);
+
+	return retVal;
+}
+
+
+// reimplemented (istd::IChangeable)
+
+bool CPointCloud3d::CopyFrom(const istd::IChangeable &object, istd::IChangeable::CompatibilityMode /*mode*/)
+{
+	const CPointCloud3d* objectPtr = dynamic_cast<const CPointCloud3d*>(&object);
+	if (objectPtr != NULL){
+		m_cloudPoints = objectPtr->m_cloudPoints;
+	}
+
+	return false;
+}
+
+
+// static methods
+
+IPointCloud3d::PointCloudPtr CPointCloud3d::FromImage(iimg::IRasterImage &image, istd::CIndex2d& size, double step)
+{
+	IPointCloud3d::PointCloudPtr retVal(new imt3d::CPointCloud3d());
+	if (retVal.IsValid()){
+		imt3d::CPointCloud3d* pointCloudPtr = dynamic_cast<imt3d::CPointCloud3d*>(retVal.GetPtr());
+		if (pointCloudPtr != NULL){
+			istd::CIndex2d imageSize = image.GetImageSize();
+			int xSize = size.GetX();
+			int ySize = size.GetY();
+			for (int i = 0; i < xSize; ++i){
+				for (int j = 0; j < ySize; ++j){
+					// Calculate index in image
+					double xCoef = 1. * imageSize.GetX() / size.GetX();
+					double xIndex = xCoef * i;
+					double yCoef = 1. * imageSize.GetY() / size.GetY();
+					double yIndex = yCoef * j;
+					istd::CIndex2d positionIndex((int)xIndex, (int)yIndex);
+					icmm::CVarColor varColor = image.GetColorAt(positionIndex);
+					double value = 0.;
+					for (int n = 0; n < varColor.GetElementsCount(); ++n){
+						value += varColor.GetElement(n);
+					}
+					pointCloudPtr->AddPoint(i3d::CVector3d(step * j, value, step * i));
+					qDebug() << "new point(" << i << ", " << j << "): " << step * i << " " << step * j << " " << value;
+				}
+			}
+		}
+	}
 
 	return retVal;
 }
