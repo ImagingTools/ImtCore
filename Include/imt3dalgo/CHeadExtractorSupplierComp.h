@@ -17,26 +17,27 @@ namespace imt3dalgo
 
 
 	/**
-		Supplier of tetrahedral mesh object from 3d point cloud
+		Supplier segmenting object of interest on the scene. Sets it as output if it's head, otherwise output is NULL.
+		Input & output - 3D mesh objects
+
 
 		Algorithm:
-		- data preprocessing (if not possible on-the-fly, then would be separated to special Supplier
-		- Delaunay triangulation
-		- (If needed) Resulting mesh simplification to provide a coarser mesh
+		- Use range & (if available) other data thresholding to extract biggest connected object in front of the camera
+		- Use object topology (other features) to decide wheater it is head
 	*/
-	class CMeshSupplierComp :
+	class CHeadExtractorSupplierComp :
 		public iinsp::TSupplierCompWrap< imt3d::CMesh>,
 		virtual public imt3d::IObject3dProvider
 	{
 	public:
 		typedef iinsp::TSupplierCompWrap<imt3d::CMesh> BaseClass;
 
-		I_BEGIN_COMPONENT(CMeshSupplierComp);
+		I_BEGIN_COMPONENT(CHeadExtractorSupplierComp);
 		I_REGISTER_INTERFACE(imt3d::IObject3dProvider);
-		I_ASSIGN(m_pointCloudProviderCompPtr, "PointCloudProvider", "Provide input 3D point cloud", true, "PointCloudProvider");
+		I_ASSIGN(m_sceneMeshProviderCompPtr, "SceneMeshProvider", "Provide 3D mesh of input scene", true, "SceneMeshProvider");
 		I_END_COMPONENT;
 
-		CMeshSupplierComp();
+		CHeadExtractorSupplierComp();
 
 		// reimplemented (imt3d::IObject3dProvider)
 		virtual const imt3d::IObject3d* GetObject3d() const;
@@ -50,7 +51,7 @@ namespace imt3dalgo
 		virtual void OnComponentCreated();
 
 	private:
-		I_REF(imt3d::IObject3dProvider, m_pointCloudProviderCompPtr);
+		I_REF(imt3d::IObject3dProvider, m_sceneMeshProviderCompPtr);
 
 	};
 

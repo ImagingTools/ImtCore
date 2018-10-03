@@ -1,4 +1,4 @@
-#include <imt3d\CMesh.h>
+#include <imt3d/CMesh.h>
 
 namespace imt3d
 {
