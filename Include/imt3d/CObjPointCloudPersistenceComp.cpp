@@ -5,6 +5,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 
+// ACF includes
+#include <istd/CChangeGroup.h>
+
 // ImtCore includes
 #include <imt3d/CPointCloud3d.h>
 
@@ -49,6 +52,8 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
+	istd::CChangeGroup changeGroup(&data);
+
 	data.ResetData();
 
 	CPointCloud3d* documentPtr = dynamic_cast<CPointCloud3d*>(&data);

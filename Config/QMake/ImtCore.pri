@@ -3,5 +3,5 @@ INCLUDEPATH += $(IMTCOREDIR)/Impl
 INCLUDEPATH += $(IMTCOREDIR)/$$AUXINCLUDEDIR
 
 LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR
-LIBS += -limtcore -limtcoregui -lImtCoreLoc
+LIBS += -limt3d -lImtCoreLoc
 
