@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QFile>
+#include <QtCore/QTextStream>
 
 // ImtCore includes
 #include <imt3d/CPointCloud3d.h>
@@ -48,10 +49,49 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
+	data.ResetData();
+
 	CPointCloud3d* documentPtr = dynamic_cast<CPointCloud3d*>(&data);
 	if (documentPtr == NULL){
 		return OS_FAILED;
 	}
+
+	QFile file(filePath);
+	if (!file.open(QIODevice::ReadOnly)){
+		return OS_FAILED;
+	}
+
+	QTextStream stream(&file);
+
+	while (!stream.atEnd()){
+		QString line = stream.readLine();
+
+		QStringList components = line.split(" ", QString::SkipEmptyParts);
+		if (components.count() >= 4){
+
+			QString valueKey = components[0].simplified();
+			if (valueKey == "v"){
+				bool ok = false;
+				double x = components[1].toDouble(&ok);
+				if (!ok){
+					continue;
+				}
+
+				double y = components[2].toDouble(&ok);
+				if (!ok){
+					continue;
+				}
+				double z = components[3].toDouble(&ok);
+				if (!ok){
+					continue;
+				}
+
+				documentPtr->AddPoint(i3d::CVector3d(x, y, z));
+			}
+		}
+	}
+
+	file.close();
 
 	return OS_OK;
 }
@@ -63,6 +103,22 @@ int CObjPointCloudPersistenceComp::SaveToFile(const istd::IChangeable& data, con
 	if (documentPtr == NULL){
 		return OS_FAILED;
 	}
+
+	QFile file(filePath);
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+		return OS_FAILED;
+	}
+
+	QTextStream stream(&file);
+
+	const imt3d::CloudPoints& points = documentPtr->GetPoints();
+	for (imt3d::CloudPoints::ConstIterator iter = points.constBegin(); iter != points.constEnd(); ++iter){
+		QString textLine = QString("v %1 %2 %3").arg(iter->GetX()).arg(iter->GetY()).arg(iter->GetZ());
+
+		stream << textLine << "\n";
+	}
+	
+	file.close();
 
 	return OS_OK;
 }
