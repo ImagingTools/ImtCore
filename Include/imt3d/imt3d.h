@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QVector>
 #include <QtCore/QLinkedList>
 
 // ACF includes
@@ -23,8 +24,9 @@ namespace imt3d
 {
 
 
-typedef QLinkedList<i3d::CVector3d> CloudPoints;
+typedef QVector<i3d::CVector3d> CloudPoints;
 
 
 } // namespace imt3d
+
 
