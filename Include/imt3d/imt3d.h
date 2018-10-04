@@ -17,7 +17,6 @@
 	\li istd
 	\li iser
 	\li imath
-
 	\ingroup 3D
 */
 namespace imt3d
