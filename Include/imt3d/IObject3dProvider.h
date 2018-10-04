@@ -4,26 +4,28 @@
 // ACF includes
 #include <istd/IChangeable.h>
 
-// ImtCore includes
-#include <imt3d/IObject3d.h>
-
 
 namespace imt3d
 {
 
 
+class IObject3d;
+
+
 /**
-	3d object supplier 
+	Common interface for a 3D-object provider.
 */
 class IObject3dProvider : virtual public istd::IChangeable
 {
 public:
-		/**
-			Get access to produced 3d object.
-			\return	pointer to 3d object instance if it is accessible, or NULL.
-		*/
-		virtual const imt3d::IObject3d* GetObject3d() const = 0;
+	/**
+		Get access to produced 3d object.
+		\return	pointer to 3d object instance if it is accessible, or NULL.
+	*/
+	virtual const imt3d::IObject3d* GetObject3d() const = 0;
 };
 
 
 } // namespace imt3d
+
+
