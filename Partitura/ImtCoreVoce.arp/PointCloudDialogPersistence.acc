@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4713" Description="ACF"/>
+            <Version Id="1" Number="1996" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330497" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Point cloud persistence using selection dialog</Description>
+    <Keywords>3D Points Cloud Persistence Loader Save</Keywords>
+    <ElementsList>
+        <Element Id="FileDialogLoader" PackageId="FileGuiPck" ComponentId="FileDialogLoader">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Loaders" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ObjPointCloudPersistence</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StartupDirectory" Type="Reference" ExportId="StartupDirectory">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseNative" Type="Boolean" ExportId="UseNativeDialog">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ObjPointCloudPersistence" PackageId="ImtCorePck" ComponentId="ObjPointCloudPersistence">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="ifile::IFilePersistence" ComponentId="FileDialogLoader"/>
+        <Interface InterfaceId="ifile::IFilePersistenceInfo" ComponentId="FileDialogLoader"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>
