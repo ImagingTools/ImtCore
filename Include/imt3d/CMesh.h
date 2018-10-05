@@ -19,37 +19,37 @@ namespace imt3d
 class CMesh: virtual public IObject3d
 {
 public:
+	typedef imath::TVector<3, float> FloatVector3d;
+	typedef FloatVector3d Vertex;
+	typedef FloatVector3d Normal;
 
-	// still to be considered. 
-	// Each triangle needs pointers to neighboring triangles.. (I think)
-
-	typedef imath::TVector<3, float> Vector3d_f;
-
-	typedef Vector3d_f Vertex;
-	typedef Vector3d_f Normal;
-	typedef istd::TArray<int, 3> Triangle; // contains indices of the corresp Vertices
-	//typedef istd::TArray<Vertex*, 3> Triangle;
-
+	/**
+		Contains indices of the corresp Vertices
+	*/
+	typedef istd::TArray<int, 3> Triangle;
 
 	CMesh();
 
 	bool SaveToStlFile(const QString& filePath) const;
 	bool LoadFromStlFile(const QString& filePath);
 
-	// reimplemented from imt3d::IObject3d
+	// reimplemented (imt3d::IObject3d)
 	bool IsEmpty() const;
 	i3d::CVector3d GetCenter() const;
 	void MoveCenterTo(const i3d::CVector3d& position);
 	CCuboid GetBoundingCuboid() const;
 
-	// reimplemented iser::ISerializable
-	bool Serialize(iser::IArchive& archive);
-
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 private:
-	std::vector<Vertex> Vertices;
-	std::vector<Normal> Normals;
-	std::vector<Triangle> Triangles;
+	typedef std::vector<Vertex> Vertices;
+	typedef std::vector<Normal> Normals;
+	typedef std::vector<Triangle> Triangles;
+
+	Vertices m_vertices;
+	Normals m_normals;
+	Triangles m_triangles;
 };
 
 

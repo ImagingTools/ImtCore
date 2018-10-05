@@ -1,14 +1,15 @@
 #include <imt3d/CMesh.h>
 
-//STL includes
+
+// STL includes
 #include <array>
 
 
 namespace imt3d
 {
 
-// static attributes
 
+// static attributes
 static const istd::TIndex<3> indexZero(0);
 static const istd::TIndex<3> indexOne(1);
 static const istd::TIndex<3> indexTwo(2);
@@ -16,38 +17,39 @@ static const istd::TIndex<3> indexTwo(2);
 
 CMesh::CMesh()
 {
-	Vertices.clear();
-	Triangles.clear();
+	m_vertices.clear();
+	m_triangles.clear();
 }
 
 
 bool CMesh::SaveToStlFile(const QString& filePath) const
-{	
-	if (Vertices.size() < 1) 
+{
+	if (m_vertices.size() < 1){
 		return false;
+	}
 
 	std::FILE* file = std::fopen(filePath.toStdString().c_str(), "wb");
 	
 	if (file == NULL) {
 		return false;
 	}
+
 	std::array<uint8_t, 80> stlHeader = { 0 };
 	std::fwrite(stlHeader.data(), sizeof(stlHeader[0]), stlHeader.size(), file);
 
-	uint32_t trianglesCount = static_cast<uint32_t>(Triangles.size());
+	uint32_t trianglesCount = static_cast<uint32_t>(m_triangles.size());
 	std::fwrite(&trianglesCount, sizeof(trianglesCount), 1, file);
 
-	for (uint index = 0; index < trianglesCount; index++)
-	{
-		const Triangle& oneTriangle = Triangles[index];
-		//const vec3f& normal = (normals[tri[0]] + normals[tri[1]] + normals[tri[2]]) / 3.0f;
-		Normal normal; 
-		normal.Clear(); // sets to (0.0f, 0.0f, 0.0f);
+	for (uint index = 0; index < trianglesCount; index++){
+		const Triangle& oneTriangle = m_triangles[index];
+
+		Normal normal;
+		normal.Clear();
 		std::fwrite(&normal[0], sizeof(float), 3, file);
 
-		Vertex firstVert = Vertices[oneTriangle.GetAt(indexZero)];
-		Vertex secondVert = Vertices[oneTriangle.GetAt(indexOne)];
-		Vertex thirdVert = Vertices[oneTriangle.GetAt(indexTwo)];
+		Vertex firstVert = m_vertices[oneTriangle.GetAt(indexZero)];
+		Vertex secondVert = m_vertices[oneTriangle.GetAt(indexOne)];
+		Vertex thirdVert = m_vertices[oneTriangle.GetAt(indexTwo)];
 
 		std::fwrite(&firstVert[0], sizeof(float), 3, file);
 		std::fwrite(&secondVert[0], sizeof(float), 3, file);
@@ -65,8 +67,8 @@ bool CMesh::SaveToStlFile(const QString& filePath) const
 
 bool CMesh::LoadFromStlFile(const QString& filePath)
 {
-	Vertices.clear();
-	Triangles.clear();
+	m_vertices.clear();
+	m_triangles.clear();
 
 	std::FILE* file = std::fopen(filePath.toStdString().c_str(), "rb");
 	if (file == NULL) {
@@ -80,22 +82,22 @@ bool CMesh::LoadFromStlFile(const QString& filePath)
 	std::fread(&numTris, sizeof(numTris), 1, file);
 
 	for (uint32_t i = 0; i < numTris; ++i) {
-		// store indices of the vertices
+		// store indices of the m_vertices
 		Triangle oneTriangle;
 		oneTriangle.SetAt(indexZero, i * 3);
 		oneTriangle.SetAt(indexOne, i * 3 + 1);
 		oneTriangle.SetAt(indexTwo, i * 3 + 2);
 
-		Triangles.emplace_back(oneTriangle);
+		m_triangles.emplace_back(oneTriangle);
 
-		Vector3d_f normal;
+		FloatVector3d normal;
 		normal.Clear();
 
 		std::fread(&normal[0], sizeof(float), 3, file);
 
-		Vector3d_f firstVert;
-		Vector3d_f secondVert;
-		Vector3d_f thirdVert;
+		FloatVector3d firstVert;
+		FloatVector3d secondVert;
+		FloatVector3d thirdVert;
 
 		std::fread(&firstVert[0], sizeof(float), 3, file);
 		std::fread(&secondVert[0], sizeof(float), 3, file);
@@ -104,17 +106,15 @@ bool CMesh::LoadFromStlFile(const QString& filePath)
 		uint16_t attributes = 0;
 		std::fread(&attributes, sizeof(attributes), 1, file);
 
-		Vertices.push_back(firstVert);
-		Vertices.push_back(secondVert);
-		Vertices.push_back(thirdVert);
+		m_vertices.push_back(firstVert);
+		m_vertices.push_back(secondVert);
+		m_vertices.push_back(thirdVert);
 
-		Normals.push_back(normal);
+		m_normals.push_back(normal);
 	}
 
-	//if (convert) convertToIndexedFaceSet();
-	//normals = std::vector<vec3d>(verts.size());
-
 	std::fclose(file);
+
 	return true;
 }
 
@@ -123,7 +123,7 @@ bool CMesh::LoadFromStlFile(const QString& filePath)
 
 bool CMesh::IsEmpty() const
 {
-	bool nope = (Vertices.size() > 0);
+	bool nope = (m_vertices.size() > 0);
 	return nope;
 }
 
@@ -151,6 +151,7 @@ CCuboid CMesh::GetBoundingCuboid() const
 bool CMesh::Serialize(iser::IArchive& archive)
 {
 	Q_UNUSED(archive);
+
 	return false;
 }
 
