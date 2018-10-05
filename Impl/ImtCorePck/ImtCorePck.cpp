@@ -22,6 +22,11 @@ I_EXPORT_COMPONENT(
 			"OBJ-format based cloud point persistence",
 			"3D Points OBJ Persistence");
 
+I_EXPORT_COMPONENT(
+			StlMeshPersistence,
+			"STL-format mesh persistence",
+			"Mesh STL Persistence");
+
 
 } // namespace ImtCorePck
 
