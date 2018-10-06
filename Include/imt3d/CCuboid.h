@@ -87,7 +87,7 @@ public:
 	istd::CRange& GetDeepRangeRef();
 	void SetDeepRange(const istd::CRange& range);
 
-	bool IsValid();
+	bool IsValid() const;
 
 	/**
 		Get empty cuboid with all values set to 0.0.
@@ -397,7 +397,7 @@ inline void CCuboid::SetDeepRange(const istd::CRange& range)
 }
 
 
-inline bool CCuboid::IsValid()
+inline bool CCuboid::IsValid() const
 {
 	return (m_horizontalRange.GetLength() > I_BIG_EPSILON) && (m_verticalRange.GetLength() > I_BIG_EPSILON) && (m_depthRange.GetLength() > I_BIG_EPSILON);
 }

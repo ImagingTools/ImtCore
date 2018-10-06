@@ -84,7 +84,7 @@ void CPointCloud3d::MoveCenterTo(const i3d::CVector3d &position)
 }
 
 
-CCuboid CPointCloud3d::GetBoundingCuboid() const
+const CCuboid& CPointCloud3d::GetBoundingCuboid() const
 {
 	if (!IsEmpty() && !m_isCloudCuboidCalculationValid){
 		istd::CChangeNotifier notifier(const_cast<CPointCloud3d*>(this));

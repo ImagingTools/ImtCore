@@ -34,7 +34,7 @@ public:
 	virtual bool IsEmpty() const Q_DECL_OVERRIDE;
 	virtual i3d::CVector3d GetCenter() const Q_DECL_OVERRIDE;
 	virtual void MoveCenterTo(const i3d::CVector3d& position) Q_DECL_OVERRIDE;
-	virtual CCuboid GetBoundingCuboid() const Q_DECL_OVERRIDE;
+	virtual const CCuboid& GetBoundingCuboid() const Q_DECL_OVERRIDE;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) Q_DECL_OVERRIDE;

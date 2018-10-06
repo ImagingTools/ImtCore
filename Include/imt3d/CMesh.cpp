@@ -140,9 +140,9 @@ void CMesh::MoveCenterTo(const i3d::CVector3d& position)
 }
 
 
-CCuboid CMesh::GetBoundingCuboid() const
+const CCuboid& CMesh::GetBoundingCuboid() const
 {
-	return CCuboid::CCuboid();
+	return CCuboid::GetEmpty();
 }
 
 

@@ -37,7 +37,7 @@ public:
 	bool IsEmpty() const;
 	i3d::CVector3d GetCenter() const;
 	void MoveCenterTo(const i3d::CVector3d& position);
-	CCuboid GetBoundingCuboid() const;
+	const CCuboid& GetBoundingCuboid() const;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
