@@ -19,7 +19,7 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			ObjPointCloudPersistence,
-			"OBJ-format based cloud point persistence",
+			"OBJ-format-based point cloud persistence",
 			"3D Points OBJ Persistence");
 
 I_EXPORT_COMPONENT(
