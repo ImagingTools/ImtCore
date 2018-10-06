@@ -67,9 +67,9 @@ public:
 	double GetFar() const;
 	void SetFar(double far);
 
-	double GetWidth();
-	double GetHeight();
-	double GetDepth();
+	double GetWidth() const;
+	double GetHeight() const;
+	double GetDepth() const;
 
 	i3d::CVector3d GetCenterPoint();
 	void ExpandToPoint(const i3d::CVector3d& point);
@@ -296,19 +296,19 @@ inline void CCuboid::SetFar(double farValue)
 }
 
 
-inline double CCuboid::GetWidth()
+inline double CCuboid::GetWidth() const
 {
 	return m_horizontalRange.GetLength();
 }
 
 
-inline double CCuboid::GetHeight()
+inline double CCuboid::GetHeight() const
 {
 	return m_verticalRange.GetLength();
 }
 
 
-inline double CCuboid::GetDepth()
+inline double CCuboid::GetDepth() const
 {
 	return m_depthRange.GetLength();
 }
