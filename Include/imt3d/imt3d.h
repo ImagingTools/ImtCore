@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QVector>
+#include <QtCore/QPair>
 #include <QtCore/QLinkedList>
 
 // ACF includes

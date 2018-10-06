@@ -1,4 +1,4 @@
-#include <imt3d/CMesh.h>
+#include <imt3d/CMesh3d.h>
 
 
 // STL includes
@@ -15,14 +15,12 @@ static const istd::TIndex<3> indexOne(1);
 static const istd::TIndex<3> indexTwo(2);
 
 
-CMesh::CMesh()
+CMesh3d::CMesh3d()
 {
-	m_vertices.clear();
-	m_triangles.clear();
 }
 
 
-bool CMesh::SaveToStlFile(const QString& filePath) const
+bool CMesh3d::SaveToStlFile(const QString& filePath) const
 {
 	if (m_vertices.size() < 1){
 		return false;
@@ -47,9 +45,9 @@ bool CMesh::SaveToStlFile(const QString& filePath) const
 		normal.Clear();
 		std::fwrite(&normal[0], sizeof(float), 3, file);
 
-		Vertex firstVert = m_vertices[oneTriangle.GetAt(indexZero)];
-		Vertex secondVert = m_vertices[oneTriangle.GetAt(indexOne)];
-		Vertex thirdVert = m_vertices[oneTriangle.GetAt(indexTwo)];
+		Vertex firstVert = m_vertices[oneTriangle.GetElement(0)];
+		Vertex secondVert = m_vertices[oneTriangle.GetElement(1)];
+		Vertex thirdVert = m_vertices[oneTriangle.GetElement(2)];
 
 		std::fwrite(&firstVert[0], sizeof(float), 3, file);
 		std::fwrite(&secondVert[0], sizeof(float), 3, file);
@@ -65,7 +63,7 @@ bool CMesh::SaveToStlFile(const QString& filePath) const
 }
 
 
-bool CMesh::LoadFromStlFile(const QString& filePath)
+bool CMesh3d::LoadFromStlFile(const QString& filePath)
 {
 	m_vertices.clear();
 	m_triangles.clear();
@@ -84,11 +82,11 @@ bool CMesh::LoadFromStlFile(const QString& filePath)
 	for (uint32_t i = 0; i < numTris; ++i) {
 		// store indices of the m_vertices
 		Triangle oneTriangle;
-		oneTriangle.SetAt(indexZero, i * 3);
-		oneTriangle.SetAt(indexOne, i * 3 + 1);
-		oneTriangle.SetAt(indexTwo, i * 3 + 2);
+		oneTriangle.SetElement(0, i * 3);
+		oneTriangle.SetElement(1, i * 3 + 1);
+		oneTriangle.SetElement(2, i * 3 + 2);
 
-		m_triangles.emplace_back(oneTriangle);
+		m_triangles.push_back(oneTriangle);
 
 		FloatVector3d normal;
 		normal.Clear();
@@ -119,28 +117,55 @@ bool CMesh::LoadFromStlFile(const QString& filePath)
 }
 
 
+// reimplemented (imt3d::IMesh3d)
+const CMesh3d::MeshVertices& CMesh3d::GetVertices() const
+{
+	return m_vertices;
+}
+
+
+const CMesh3d::MeshEdgesPtr CMesh3d::GetEdges() const
+{
+	//TODO
+	return istd::TSmartPtr<MeshEdges>();
+}
+
+
+const CMesh3d::MeshIndexEdgesPtr CMesh3d::GetIndexEdges() const
+{
+	//TODO
+	return istd::TSmartPtr<MeshIndexEdges>();
+}
+
+
+const CMesh3d::MeshTriangles& CMesh3d::GetTriangles() const
+{
+	return m_triangles;
+}
+
+
 // reimplemented (imt3d::IObject3d)
 
-bool CMesh::IsEmpty() const
+bool CMesh3d::IsEmpty() const
 {
 	bool nope = (m_vertices.size() > 0);
 	return nope;
 }
 
 
-i3d::CVector3d CMesh::GetCenter() const
+i3d::CVector3d CMesh3d::GetCenter() const
 {
 	return i3d::CVector3d::GetZero();
 }
 
 
-void CMesh::MoveCenterTo(const i3d::CVector3d& position)
+void CMesh3d::MoveCenterTo(const i3d::CVector3d& position)
 {
 	Q_UNUSED(position);
 }
 
 
-const CCuboid& CMesh::GetBoundingCuboid() const
+const CCuboid& CMesh3d::GetBoundingCuboid() const
 {
 	return CCuboid::GetEmpty();
 }
@@ -148,7 +173,7 @@ const CCuboid& CMesh::GetBoundingCuboid() const
 
 // reimplemented (iser::ISerializable)
 
-bool CMesh::Serialize(iser::IArchive& archive)
+bool CMesh3d::Serialize(iser::IArchive& archive)
 {
 	Q_UNUSED(archive);
 

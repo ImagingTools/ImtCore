@@ -7,7 +7,7 @@
 // ImtCore includes
 #include <imt3d/IPointCloud3d.h>
 #include <imt3d/IObject3dProvider.h>
-#include <imt3d/CMesh.h>
+#include <imt3d/CMesh3d.h>
 
 
 namespace imt3dalgo
@@ -23,11 +23,11 @@ namespace imt3dalgo
 	- (If needed) Resulting mesh simplification to provide a coarser mesh
 */
 class CMeshSupplierComp:
-			public iinsp::TSupplierCompWrap< imt3d::CMesh>,
+			public iinsp::TSupplierCompWrap< imt3d::CMesh3d>,
 			virtual public imt3d::IObject3dProvider
 {
 public:
-	typedef iinsp::TSupplierCompWrap<imt3d::CMesh> BaseClass;
+	typedef iinsp::TSupplierCompWrap<imt3d::CMesh3d> BaseClass;
 
 	I_BEGIN_COMPONENT(CMeshSupplierComp);
 		I_REGISTER_INTERFACE(imt3d::IObject3dProvider);

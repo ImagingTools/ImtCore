@@ -5,7 +5,7 @@
 #include <QtCore/QFile>
 
 // ImtCore includes
-#include <imt3d/CMesh.h>
+#include <imt3d/CMesh3d.h>
 
 
 namespace imt3d
@@ -33,7 +33,7 @@ bool CStlMeshPersistenceComp::IsOperationSupported(
 	}
 
 	if (dataObjectPtr != NULL){
-		const CMesh* documentPtr = dynamic_cast<const CMesh*>(dataObjectPtr);
+		const CMesh3d* documentPtr = dynamic_cast<const CMesh3d*>(dataObjectPtr);
 		if (documentPtr == NULL){
 			return false;
 		}
@@ -48,7 +48,7 @@ int CStlMeshPersistenceComp::LoadFromFile(
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	CMesh* documentPtr = dynamic_cast<CMesh*>(&data);
+	CMesh3d* documentPtr = dynamic_cast<CMesh3d*>(&data);
 	if (documentPtr == NULL){
 		return OS_FAILED;
 	}
@@ -64,7 +64,7 @@ int CStlMeshPersistenceComp::LoadFromFile(
 
 int CStlMeshPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	const CMesh* documentPtr = dynamic_cast<const CMesh*>(&data);
+	const CMesh3d* documentPtr = dynamic_cast<const CMesh3d*>(&data);
 	if (documentPtr == NULL){
 		return OS_FAILED;
 	}

@@ -23,6 +23,11 @@ I_EXPORT_COMPONENT(
 			"3D Points OBJ Persistence");
 
 I_EXPORT_COMPONENT(
+			TetrahedralMesh3D,
+			"3D tetrahedral mesh",
+			"3D Mesh Triangle Tetrahedral");
+
+I_EXPORT_COMPONENT(
 			StlMeshPersistence,
 			"STL-format mesh persistence",
 			"Mesh STL Persistence");
