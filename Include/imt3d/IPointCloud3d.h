@@ -25,6 +25,8 @@ class IPointCloud3d: virtual public IObject3d
 public:
 	typedef istd::TSmartPtr<IPointCloud3d> PointCloudPtr;
 
+	virtual void CreateCloud(const CloudPoints& points) = 0;
+
 	/**
 		Get the list of points.
 	*/

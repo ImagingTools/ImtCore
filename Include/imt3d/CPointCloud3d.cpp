@@ -1,10 +1,6 @@
 #include <imt3d/CPointCloud3d.h>
 
 
-// Qt includes
-#include <QtCore/QLinkedList>
-#include <QtCore/QDebug>
-
 // Acf includes
 #include <istd/CChangeNotifier.h>
 #include <iser/CArchiveTag.h>
@@ -37,6 +33,16 @@ void CPointCloud3d::AddPoint(const i3d::CVector3d &point)
 
 // reimplemented (IPointCloud3d)
 
+void CPointCloud3d::CreateCloud(const imt3d::CloudPoints &points)
+{
+	m_isCloudCenterCalculationValid = false;
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_cloudPoints = points;
+}
+
+
 const CloudPoints& CPointCloud3d::GetPoints() const
 {
 	return m_cloudPoints;
@@ -53,9 +59,7 @@ bool CPointCloud3d::IsEmpty() const
 
 i3d::CVector3d CPointCloud3d::GetCenter() const
 {
-	if (!IsEmpty() && !m_isCloudCenterCalculationValid){
-		const_cast<CPointCloud3d*>(this)->CalculateCloudCenterPoint();
-	}
+	EnsureCenterCalculated();
 
 	return m_cloudCenter;
 }
@@ -163,7 +167,6 @@ IPointCloud3d::PointCloudPtr CPointCloud3d::FromImage(iimg::IRasterImage &image,
 						value += varColor.GetElement(n);
 					}
 					pointCloudPtr->AddPoint(i3d::CVector3d(step * j, value, step * i));
-					qDebug() << "new point(" << i << ", " << j << "): " << step * i << " " << step * j << " " << value;
 				}
 			}
 		}
@@ -175,24 +178,22 @@ IPointCloud3d::PointCloudPtr CPointCloud3d::FromImage(iimg::IRasterImage &image,
 
 // private methods
 
-void CPointCloud3d::CalculateCloudCenterPoint()
+void CPointCloud3d::EnsureCenterCalculated() const
 {
-	i3d::CVector3d tempVal;
+	if (!IsEmpty() && !m_isCloudCenterCalculationValid) {
+		i3d::CVector3d centerValue = i3d::CVector3d(0, 0, 0);
 
-	int pointsCount = m_cloudPoints.count();
-	for (CloudPoints::const_iterator pointIter = m_cloudPoints.constBegin(); pointIter != m_cloudPoints.constEnd(); pointIter++){
-		tempVal[0] = tempVal[0] + pointIter->GetX() / pointsCount;
-		tempVal[1] = tempVal[1] + pointIter->GetY() / pointsCount;
-		tempVal[2] = tempVal[2] + pointIter->GetZ() / pointsCount;
+		int pointsCount = m_cloudPoints.count();
+		for (CloudPoints::const_iterator pointIter = m_cloudPoints.constBegin(); pointIter != m_cloudPoints.constEnd(); pointIter++) {
+			centerValue[0] = centerValue[0] + pointIter->GetX() / pointsCount;
+			centerValue[1] = centerValue[1] + pointIter->GetY() / pointsCount;
+			centerValue[2] = centerValue[2] + pointIter->GetZ() / pointsCount;
+		}
+
+		m_cloudCenter = centerValue;
+
+		m_isCloudCenterCalculationValid = true;
 	}
-
-	if (tempVal != m_cloudCenter){
-		istd::CChangeNotifier notifier(this);
-
-		m_cloudCenter = tempVal;
-	}
-
-	m_isCloudCenterCalculationValid = true;
 }
 
 

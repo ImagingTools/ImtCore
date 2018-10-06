@@ -27,6 +27,7 @@ public:
 	void AddPoint(const i3d::CVector3d& point);
 
 	// reimplemented (IPointCloud3d)
+	virtual void CreateCloud(const imt3d::CloudPoints &points);
 	virtual const CloudPoints& GetPoints() const Q_DECL_OVERRIDE;
 
 	// reimplemented (IObject3d)
@@ -49,7 +50,7 @@ public:
 	static IPointCloud3d::PointCloudPtr FromImage(iimg::IRasterImage& image, istd::CIndex2d& size, double step = 0.05);
 
 private:
-	void CalculateCloudCenterPoint();
+	void EnsureCenterCalculated() const;
 
 private:
 	CloudPoints m_cloudPoints;
