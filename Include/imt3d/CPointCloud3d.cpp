@@ -2,6 +2,7 @@
 
 
 // Acf includes
+#include <istd/TRange.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/CArchiveTag.h>
 
@@ -181,18 +182,48 @@ IPointCloud3d::PointCloudPtr CPointCloud3d::FromImage(iimg::IRasterImage &image,
 void CPointCloud3d::EnsureCenterCalculated() const
 {
 	if (!IsEmpty() && !m_isCloudCenterCalculationValid) {
-		i3d::CVector3d centerValue = i3d::CVector3d(0, 0, 0);
+		istd::CRange xRange(qInf(), -qInf());
+		istd::CRange yRange(qInf(), -qInf());
+		istd::CRange zRange(qInf(), -qInf());
 
-		int pointsCount = m_cloudPoints.count();
-		for (CloudPoints::const_iterator pointIter = m_cloudPoints.constBegin(); pointIter != m_cloudPoints.constEnd(); pointIter++) {
-			centerValue[0] = centerValue[0] + pointIter->GetX() / pointsCount;
-			centerValue[1] = centerValue[1] + pointIter->GetY() / pointsCount;
-			centerValue[2] = centerValue[2] + pointIter->GetZ() / pointsCount;
+		for (CloudPoints::const_iterator pointIter = m_cloudPoints.constBegin(); pointIter != m_cloudPoints.constEnd(); pointIter++){
+			double x = pointIter->GetX();
+			double y = pointIter->GetY();
+			double z = pointIter->GetZ();
+
+			if (x < xRange.GetMinValue()) {
+				xRange.SetMinValue(x);
+			}
+
+			if (y < yRange.GetMinValue()) {
+				yRange.SetMinValue(y);
+			}
+
+			if (z < zRange.GetMinValue()) {
+				zRange.SetMinValue(z);
+			}
+
+			if (x > xRange.GetMaxValue()) {
+				xRange.SetMaxValue(x);
+			}
+
+			if (y > yRange.GetMaxValue()) {
+				yRange.SetMaxValue(y);
+			}
+
+			if (z > zRange.GetMaxValue()) {
+				zRange.SetMaxValue(z);
+			}
 		}
 
-		m_cloudCenter = centerValue;
+		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()) {
+			m_cloudCenter = i3d::CVector3d(
+						xRange.GetValueFromAlpha(0.5),
+						yRange.GetValueFromAlpha(0.5),
+						zRange.GetValueFromAlpha(0.5));
 
-		m_isCloudCenterCalculationValid = true;
+			m_isCloudCenterCalculationValid = true;
+		}
 	}
 }
 
