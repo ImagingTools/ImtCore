@@ -4,18 +4,19 @@
 // STL includes
 #include <array>
 
+// vertex element access
+static const int E_X = 0;
+static const int E_Y = 1;
+static const int E_Z = 2;
+
 
 namespace imt3d
 {
 
 
-// static attributes
-static const istd::TIndex<3> indexZero(0);
-static const istd::TIndex<3> indexOne(1);
-static const istd::TIndex<3> indexTwo(2);
-
-
-CMesh3d::CMesh3d()
+CMesh3d::CMesh3d():
+	m_isMeshCenterCalculationValid(false),
+	m_isMeshCuboidCalculationValid(false)
 {
 }
 
@@ -67,6 +68,9 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath)
 {
 	m_vertices.clear();
 	m_triangles.clear();
+
+	m_isMeshCenterCalculationValid = false;
+	m_isMeshCuboidCalculationValid = false;
 
 	std::FILE* file = std::fopen(filePath.toStdString().c_str(), "rb");
 	if (file == NULL) {
@@ -144,30 +148,42 @@ const CMesh3d::MeshTriangles& CMesh3d::GetTriangles() const
 }
 
 
+const CMesh3d::MeshNormals& CMesh3d::GetNormals() const
+{
+	return m_normals;
+}
+
+
 // reimplemented (imt3d::IObject3d)
 
 bool CMesh3d::IsEmpty() const
 {
 	bool nope = (m_vertices.size() > 0);
-	return nope;
+	return !nope;
 }
 
 
 i3d::CVector3d CMesh3d::GetCenter() const
 {
-	return i3d::CVector3d::GetZero();
+	EnsureCenterCalculated();
+
+	return m_meshCenter;
 }
 
 
 void CMesh3d::MoveCenterTo(const i3d::CVector3d& position)
 {
 	Q_UNUSED(position);
+	m_isMeshCenterCalculationValid = false;
+	m_isMeshCuboidCalculationValid = false;
 }
 
 
 const CCuboid& CMesh3d::GetBoundingCuboid() const
 {
-	return CCuboid::GetEmpty();
+	EnsureCuboidCalculated();
+
+	return m_meshCuboid;
 }
 
 
@@ -180,6 +196,86 @@ bool CMesh3d::Serialize(iser::IArchive& archive)
 	return false;
 }
 
+
+// private methods
+
+void CMesh3d::EnsureCenterCalculated() const
+{
+	if (!IsEmpty() && !m_isMeshCenterCalculationValid){
+
+		const CCuboid boundingCuboid = GetBoundingCuboid();
+
+		istd::CRange xRange(boundingCuboid.GetLeft(), boundingCuboid.GetRight());
+		istd::CRange yRange(boundingCuboid.GetBottom(), boundingCuboid.GetTop());
+		istd::CRange zRange(boundingCuboid.GetNear(), boundingCuboid.GetFar());
+
+		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()) {
+			m_meshCenter = i3d::CVector3d(
+				xRange.GetValueFromAlpha(0.5),
+				yRange.GetValueFromAlpha(0.5),
+				zRange.GetValueFromAlpha(0.5));
+
+			m_isMeshCenterCalculationValid = true;
+		}
+	}
+
+}
+
+
+
+void CMesh3d::EnsureCuboidCalculated() const
+{
+	if (!IsEmpty() && !m_isMeshCuboidCalculationValid) {
+		istd::CRange xRange(qInf(), -qInf());
+		istd::CRange yRange(qInf(), -qInf());
+		istd::CRange zRange(qInf(), -qInf());
+
+		for (MeshVertices::const_iterator itVertex = m_vertices.constBegin(); itVertex != m_vertices.constEnd(); itVertex++) {
+			double x = itVertex->GetElement(E_X);
+			double y = itVertex->GetElement(E_Y);
+			double z = itVertex->GetElement(E_Z);
+
+			if (x < xRange.GetMinValue()) {
+				xRange.SetMinValue(x);
+			}
+
+			if (y < yRange.GetMinValue()) {
+				yRange.SetMinValue(y);
+			}
+
+			if (z < zRange.GetMinValue()) {
+				zRange.SetMinValue(z);
+			}
+
+			if (x > xRange.GetMaxValue()) {
+				xRange.SetMaxValue(x);
+			}
+
+			if (y > yRange.GetMaxValue()) {
+				yRange.SetMaxValue(y);
+			}
+
+			if (z > zRange.GetMaxValue()) {
+				zRange.SetMaxValue(z);
+			}
+		}
+
+		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()) {
+
+			const double left = xRange.GetMinValue();
+			const double right = xRange.GetMaxValue();
+			const double bottom = yRange.GetMinValue();
+			const double top = yRange.GetMaxValue();
+			const double far = zRange.GetMinValue();
+			const double near = zRange.GetMaxValue();
+
+			m_meshCuboid = CCuboid(left, right, bottom, top, near, far);
+
+			m_isMeshCuboidCalculationValid = true;
+		}
+	}
+
+}
 
 } // namespace imt3d
 

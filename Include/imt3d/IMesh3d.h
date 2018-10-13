@@ -81,6 +81,10 @@ public:
 	*/
 	virtual const MeshTriangles& GetTriangles() const = 0;
 
+	/**
+		Get list of normals
+	*/
+	virtual const MeshNormals& GetNormals() const = 0;
 
 };
 

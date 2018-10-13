@@ -30,6 +30,7 @@ public:
 	virtual const MeshEdgesPtr GetEdges() const;
 	virtual const MeshIndexEdgesPtr GetIndexEdges() const;
 	virtual const MeshTriangles& GetTriangles() const;
+	virtual const CMesh3d::MeshNormals& GetNormals() const;
 
 	// reimplemented (imt3d::IObject3d)
 	bool IsEmpty() const;
@@ -42,9 +43,19 @@ public:
 
 private:
 
+	void EnsureCenterCalculated() const;
+	void EnsureCuboidCalculated() const;
+
+private:
+
 	MeshVertices m_vertices;
 	MeshNormals m_normals;
 	MeshTriangles m_triangles;
+
+	mutable i3d::CVector3d m_meshCenter;
+	mutable CCuboid m_meshCuboid;
+	mutable bool m_isMeshCuboidCalculationValid;
+	mutable bool m_isMeshCenterCalculationValid;
 };
 
 
