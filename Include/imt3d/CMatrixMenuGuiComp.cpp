@@ -163,8 +163,7 @@ void CMatrixMenuGuiComp::CreateItems(const iprm::ISelectionParam* selectionPtr)
 		m_menuItemModel.setItem(itemRow, itemCol, menuItem);
 
 		/* add corresponding page to stackedWidget*/
-		createOneMenuItem(itemsListPtr, itemIndex);
-
+		CreatePageItem(itemsListPtr, itemIndex);
 	}
 
 	if (m_menuItemModel.columnCount() > 0){
@@ -173,7 +172,7 @@ void CMatrixMenuGuiComp::CreateItems(const iprm::ISelectionParam* selectionPtr)
 }
 
 
-QWidget* CMatrixMenuGuiComp::createOneMenuItem(const iprm::IOptionsList* optionsPtr, const int index)
+QWidget* CMatrixMenuGuiComp::CreatePageItem(const iprm::IOptionsList* optionsPtr, const int index)
 {
 	if (optionsPtr == nullptr) {
 		return nullptr;

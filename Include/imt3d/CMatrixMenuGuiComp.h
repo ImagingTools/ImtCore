@@ -36,7 +36,7 @@ public:
 
 	I_BEGIN_COMPONENT(CMatrixMenuGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
-		//I_ASSIGN(m_pagesWidgetCompPtr, "PageUiContainer", "UI component containing all application pages", true, "PageUiContainer");
+//		I_ASSIGN(m_pagesWidgetCompPtr, "PageUiContainer", "UI component containing all application pages", true, "PageUiContainer");
 		I_ASSIGN(m_pageModelCompPtr, "PageModel", "Data model describing the used pages", true, "PageModel");
 		I_ASSIGN(m_commandsProviderCompPtr, "Commands", "Provider of the commands showed in the main tool bar", false, "Commands");
 		I_ASSIGN_TO(m_commandsProviderModelCompPtr, m_commandsProviderCompPtr, false);
@@ -64,9 +64,8 @@ private Q_SLOTS:
 
 private:
 	void CreateItems(const iprm::ISelectionParam* selectionPtr);
-	QWidget* createOneMenuItem(const iprm::IOptionsList* optionsPtr, const int index);
+	QWidget* CreatePageItem(const iprm::IOptionsList* optionsPtr, const int index);
 	void GetMenuLayout(int& rows, int& columns, const int count);
-	
 	void UpdateCommands();
 
 private:
