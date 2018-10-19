@@ -50,6 +50,7 @@ void CMatrixMenuGuiComp::OnGuiCreated()
 
 		if (pagesStack->count() > 0){
 			pagesStack->setCurrentIndex(0);
+
 			CurrentPageLabel->setText(QString::number(pagesStack->count()));
 		}
 	}
@@ -64,8 +65,6 @@ void CMatrixMenuGuiComp::OnGuiCreated()
 
 void CMatrixMenuGuiComp::OnGuiDestroyed()
 {
-
-
 	BaseClass::OnGuiDestroyed();
 }
 
@@ -79,7 +78,7 @@ void CMatrixMenuGuiComp::OnGuiRetranslate()
 // private slots
 
 
-void CMatrixMenuGuiComp::on_listView_clicked(const QModelIndex& index)
+void CMatrixMenuGuiComp::on_PageList_clicked(const QModelIndex& index)
 {
 	CurrentPageLabel->clear();
 	const int pageCount = pagesStack->count();
@@ -124,8 +123,6 @@ void CMatrixMenuGuiComp::CreateItems(const iprm::ISelectionParam* selectionPtr)
 	if (selectionPtr == nullptr){
 		return;
 	}
-
-	m_menuPage = listView;
 	
 	int selectedIndex = selectionPtr->GetSelectedOptionIndex();
 
@@ -171,7 +168,7 @@ void CMatrixMenuGuiComp::CreateItems(const iprm::ISelectionParam* selectionPtr)
 	}
 
 	if (m_menuItemModel.columnCount() > 0){
-		m_menuPage->setModel(&m_menuItemModel);
+		PageList->setModel(&m_menuItemModel);
 	}
 }
 
@@ -200,15 +197,15 @@ void CMatrixMenuGuiComp::GetMenuLayout(int& rows, int& columns, const int count)
 	rows = 2;
 	columns = 2;
 	
-	m_menuPage->setResizeMode(QListView::ResizeMode::Adjust);
-	QSize size = m_menuPage->size();
+	PageList->setResizeMode(QListView::ResizeMode::Adjust);
+	QSize size = PageList->size();
 	static const int spacing = 10;
 	const QSize gridSize = QSize(size.width() / columns, size.height() / rows);
 	const QSize iconSize = QSize(gridSize.width() - spacing * 2, gridSize.height() - spacing * 2);
 
-	m_menuPage->setViewMode(QListView::ViewMode::IconMode);
-	m_menuPage->setIconSize(iconSize);
-	m_menuPage->setGridSize(gridSize);
+	PageList->setViewMode(QListView::ViewMode::IconMode);
+	PageList->setIconSize(iconSize);
+	PageList->setGridSize(gridSize);
 }
 
 

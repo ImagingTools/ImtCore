@@ -59,7 +59,7 @@ protected:
 	virtual void OnGuiRetranslate();
 
 private Q_SLOTS:
-	void on_listView_clicked(const QModelIndex& index);
+	void on_PageList_clicked(const QModelIndex& index);
 	void on_HomeButton_clicked();
 
 private:
@@ -101,7 +101,6 @@ private:
 
 	CommandsObserver m_commandsObserver;
 
-	QListView* m_menuPage;
 	QStandardItemModel m_menuItemModel;
 
 	// commands

@@ -295,14 +295,14 @@ QAbstractItemView
         </property>
         <item>
          <widget class="QStackedWidget" name="pagesStack">
-          <widget class="QWidget" name="defaultPage">
+          <widget class="QWidget" name="StartPage">
            <property name="maximumSize">
             <size>
              <width>975</width>
              <height>16777215</height>
             </size>
            </property>
-           <widget class="QListView" name="listView">
+           <widget class="QListView" name="PageList">
             <property name="geometry">
              <rect>
               <x>-5</x>
