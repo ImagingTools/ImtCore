@@ -1,4 +1,4 @@
-#include <imt3d/CMatrixMenuGuiComp.h>
+#include <imtgui/CMatrixMenuGuiComp.h>
 
 
 // Qt includes
@@ -12,7 +12,7 @@
 #include <iqtgui/CCommandTools.h>
 
 
-namespace imt3d
+namespace imtgui
 {
 
 
@@ -249,6 +249,6 @@ void CMatrixMenuGuiComp::CommandsObserver::OnModelChanged(int /*modelId*/, const
 }
 
 
-} // namespace imt3d
+} // namespace imtgui
 
 

@@ -15,13 +15,13 @@
 #include <iprm/ISelectionParam.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
-#include <GeneratedFiles/imt3d/ui_CMatrixMenuGuiComp.h>
+#include <GeneratedFiles/imtgui/ui_CMatrixMenuGuiComp.h>
 
 
 class QToolBar;
 
 
-namespace imt3d
+namespace imtgui
 {
 
 
@@ -114,7 +114,7 @@ private:
 };
 
 
-} // namespace imt3d
+} // namespace imtgui
 
 
 
