@@ -1,4 +1,4 @@
-#include <imtgui/CMatrixMenuGuiComp.h>
+#include <imtgui/CThumbnailDecoratorGuiComp.h>
 
 
 // Qt includes
@@ -18,7 +18,7 @@ namespace imtgui
 
 // public methods
 
-CMatrixMenuGuiComp::CMatrixMenuGuiComp()
+CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	:m_commands("&View", 100),
 	m_mainToolBar(NULL),
 	m_commandsObserver(*this)
@@ -29,7 +29,7 @@ CMatrixMenuGuiComp::CMatrixMenuGuiComp()
 
 // reimplemented (ibase::ICommandsProvider)
 
-const ibase::IHierarchicalCommand* CMatrixMenuGuiComp::GetCommands() const
+const ibase::IHierarchicalCommand* CThumbnailDecoratorGuiComp::GetCommands() const
 {
 	return &m_rootCommands;
 }
@@ -39,7 +39,7 @@ const ibase::IHierarchicalCommand* CMatrixMenuGuiComp::GetCommands() const
 
 // reimplemented (iqtgui::CGuiComponentBase)
 
-void CMatrixMenuGuiComp::OnGuiCreated()
+void CThumbnailDecoratorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
@@ -48,10 +48,12 @@ void CMatrixMenuGuiComp::OnGuiCreated()
 	if (m_pageModelCompPtr.IsValid()){
 		CreateItems(m_pageModelCompPtr.GetPtr());
 
-		if (pagesStack->count() > 0){
-			pagesStack->setCurrentIndex(0);
+		pagesStack->setCurrentIndex(0);
 
-			CurrentPageLabel->setText(QString::number(pagesStack->count()));
+		CurrentPageLabel->setText(QString::number(pagesStack->count()));
+
+		if (m_pagesWidgetCompPtr.IsValid()){
+			m_pagesWidgetCompPtr->CreateGui(ContentFrame);
 		}
 	}
 
@@ -63,13 +65,17 @@ void CMatrixMenuGuiComp::OnGuiCreated()
 }
 
 
-void CMatrixMenuGuiComp::OnGuiDestroyed()
+void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 {
+	if (m_pagesWidgetCompPtr.IsValid() && m_pagesWidgetCompPtr->IsGuiCreated()){
+		m_pagesWidgetCompPtr->DestroyGui();
+	}
+
 	BaseClass::OnGuiDestroyed();
 }
 
 
-void CMatrixMenuGuiComp::OnGuiRetranslate()
+void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 }
@@ -78,16 +84,15 @@ void CMatrixMenuGuiComp::OnGuiRetranslate()
 // private slots
 
 
-void CMatrixMenuGuiComp::on_PageList_clicked(const QModelIndex& index)
+void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 {
 	CurrentPageLabel->clear();
 	const int pageCount = pagesStack->count();
 
 	QStandardItem* item = m_menuItemModel.itemFromIndex(index);
 	if (item == nullptr){
-		qDebug() << "item doesnt exist " << index;
-
 		on_HomeButton_clicked();
+
 		return;
 	}
 
@@ -99,32 +104,30 @@ void CMatrixMenuGuiComp::on_PageList_clicked(const QModelIndex& index)
 		if (info.selectionPtr != nullptr){
 			info.selectionPtr->SetSelectedOptionIndex(info.pageIndex);
 		}
-		if (info.pageIndex < pageCount){
-			pagesStack->setCurrentIndex(info.pageIndex);
+
+		if (info.pageIndex < 0){
+			pagesStack->setCurrentIndex(0);
+		}
+		else{
+			pagesStack->setCurrentIndex(1);
 		}
 	}
-	else{
-		qDebug() << "item is not in the list. could this be?";
-	}
 }
 
 
-void CMatrixMenuGuiComp::on_HomeButton_clicked()
+void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 {
-	if (pagesStack->count() > 0){
-		pagesStack->setCurrentIndex(0);
-	}
+	pagesStack->setCurrentIndex(0);
 }
+
 
 // private methods
 
-void CMatrixMenuGuiComp::CreateItems(const iprm::ISelectionParam* selectionPtr)
+void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* selectionPtr)
 {
 	if (selectionPtr == nullptr){
 		return;
 	}
-	
-	int selectedIndex = selectionPtr->GetSelectedOptionIndex();
 
 	const iqtgui::IMultiVisualStatusProvider* visualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(selectionPtr);
 
@@ -136,6 +139,10 @@ void CMatrixMenuGuiComp::CreateItems(const iprm::ISelectionParam* selectionPtr)
 	int colsCount = 0;
 	GetMenuLayout(rowsCount, colsCount, menuItemsCount);
 
+	//Q_ASSERT((rowsCount * colsCount) == menuItemsCount);
+	m_menuItemModel.setRowCount(rowsCount);
+	m_menuItemModel.setColumnCount(colsCount);
+
 	for (int itemIndex = 0; itemIndex < menuItemsCount; ++itemIndex){
 		QString itemName = itemsListPtr->GetOptionName(itemIndex);
 		if (itemName.isEmpty()){
@@ -146,9 +153,9 @@ void CMatrixMenuGuiComp::CreateItems(const iprm::ISelectionParam* selectionPtr)
 		QStandardItem* menuItem = new QStandardItem(itemName);
 		menuItem->setData(menuItemId, DR_PAGE_ID);
 
-		if (visualStatusProviderPtr != nullptr) {
+		if (visualStatusProviderPtr != nullptr){
 			const iqtgui::IVisualStatus* statusPtr = visualStatusProviderPtr->GetVisualStatus(itemIndex);
-			if (statusPtr != nullptr) {
+			if (statusPtr != nullptr){
 				menuItem->setIcon(statusPtr->GetStatusIcon());
 			}
 		}
@@ -160,10 +167,7 @@ void CMatrixMenuGuiComp::CreateItems(const iprm::ISelectionParam* selectionPtr)
 
 		int itemRow = itemIndex / colsCount;
 		int itemCol = itemIndex % colsCount;
-		m_menuItemModel.setItem(itemRow, itemCol, menuItem);
-
-		/* add corresponding page to stackedWidget*/
-		CreatePageItem(itemsListPtr, itemIndex);
+		m_menuItemModel.setItem(itemIndex, menuItem);
 	}
 
 	if (m_menuItemModel.columnCount() > 0){
@@ -172,29 +176,11 @@ void CMatrixMenuGuiComp::CreateItems(const iprm::ISelectionParam* selectionPtr)
 }
 
 
-QWidget* CMatrixMenuGuiComp::CreatePageItem(const iprm::IOptionsList* optionsPtr, const int index)
+void CThumbnailDecoratorGuiComp::GetMenuLayout(int& rows, int& columns, const int count)
 {
-	if (optionsPtr == nullptr) {
-		return nullptr;
-	}
-
-	if (index < 0 || index > optionsPtr->GetOptionsCount()-1){
-		return nullptr;
-	}
-
-	QWidget* menuItemPage = new QWidget(pagesStack);
-	pagesStack->addWidget(menuItemPage);
-	//set text(menuName)
-	//set data (menuId)
-	
-}
-
-
-void CMatrixMenuGuiComp::GetMenuLayout(int& rows, int& columns, const int count)
-{
-	// todo
-	rows = 2;
-	columns = 2;
+	// fuck!
+	rows = 1;
+	columns = count;
 	
 	PageList->setResizeMode(QListView::ResizeMode::Adjust);
 	QSize size = PageList->size();
@@ -203,12 +189,15 @@ void CMatrixMenuGuiComp::GetMenuLayout(int& rows, int& columns, const int count)
 	const QSize iconSize = QSize(gridSize.width() - spacing * 2, gridSize.height() - spacing * 2);
 
 	PageList->setViewMode(QListView::ViewMode::IconMode);
+	PageList->setFlow(QListView::Flow::LeftToRight);
 	PageList->setIconSize(iconSize);
 	PageList->setGridSize(gridSize);
+	PageList->setWrapping(true);
+	PageList->setWordWrap(true);
 }
 
 
-void CMatrixMenuGuiComp::UpdateCommands()
+void CThumbnailDecoratorGuiComp::UpdateCommands()
 {
 	const iqtgui::CHierarchicalCommand* commandsPtr = nullptr;
 	if (m_commandsProviderCompPtr.IsValid()){
@@ -233,7 +222,7 @@ void CMatrixMenuGuiComp::UpdateCommands()
 
 // public methods of embedded class CommandsObserver
 
-CMatrixMenuGuiComp::CommandsObserver::CommandsObserver(CMatrixMenuGuiComp& parent)
+CThumbnailDecoratorGuiComp::CommandsObserver::CommandsObserver(CThumbnailDecoratorGuiComp& parent)
 :	m_parent(parent)
 {
 }
@@ -243,7 +232,7 @@ CMatrixMenuGuiComp::CommandsObserver::CommandsObserver(CMatrixMenuGuiComp& paren
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CMatrixMenuGuiComp::CommandsObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CThumbnailDecoratorGuiComp::CommandsObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_parent.UpdateCommands();
 }

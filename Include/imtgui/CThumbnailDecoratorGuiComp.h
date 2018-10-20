@@ -15,7 +15,7 @@
 #include <iprm/ISelectionParam.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
-#include <GeneratedFiles/imtgui/ui_CMatrixMenuGuiComp.h>
+#include <GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h>
 
 
 class QToolBar;
@@ -25,18 +25,18 @@ namespace imtgui
 {
 
 
-class CMatrixMenuGuiComp:
-			public iqtgui::TDesignerGuiCompBase<Ui::CMatrixMenuGuiComp>,
+class CThumbnailDecoratorGuiComp:
+			public iqtgui::TDesignerGuiCompBase<Ui::CThumbnailDecoratorGuiComp>,
 			public virtual ibase::ICommandsProvider
 {
 	Q_OBJECT
 
 public:
-	typedef iqtgui::TDesignerGuiCompBase<Ui::CMatrixMenuGuiComp> BaseClass;
+	typedef iqtgui::TDesignerGuiCompBase<Ui::CThumbnailDecoratorGuiComp> BaseClass;
 
-	I_BEGIN_COMPONENT(CMatrixMenuGuiComp);
+	I_BEGIN_COMPONENT(CThumbnailDecoratorGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
-//		I_ASSIGN(m_pagesWidgetCompPtr, "PageUiContainer", "UI component containing all application pages", true, "PageUiContainer");
+		I_ASSIGN(m_pagesWidgetCompPtr, "PageUiContainer", "UI component containing all application pages", true, "PageUiContainer");
 		I_ASSIGN(m_pageModelCompPtr, "PageModel", "Data model describing the used pages", true, "PageModel");
 		I_ASSIGN(m_commandsProviderCompPtr, "Commands", "Provider of the commands showed in the main tool bar", false, "Commands");
 		I_ASSIGN_TO(m_commandsProviderModelCompPtr, m_commandsProviderCompPtr, false);
@@ -47,7 +47,7 @@ public:
 		DR_PAGE_ID = Qt::UserRole + 1
 	};
 
-	CMatrixMenuGuiComp();
+	CThumbnailDecoratorGuiComp();
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const;
@@ -89,13 +89,13 @@ private:
 	public:
 		typedef imod::CMultiModelDispatcherBase BaseClass;
 
-		explicit CommandsObserver(CMatrixMenuGuiComp& parent);
+		explicit CommandsObserver(CThumbnailDecoratorGuiComp& parent);
 
 		// reimplemented (imod::CMultiModelDispatcherBase)
 		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet);
 
 	private:
-		CMatrixMenuGuiComp& m_parent;
+		CThumbnailDecoratorGuiComp& m_parent;
 	};
 
 	CommandsObserver m_commandsObserver;
@@ -106,6 +106,7 @@ private:
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_commands;
 
+	I_REF(iqtgui::IGuiObject, m_pagesWidgetCompPtr);
 	I_REF(iprm::ISelectionParam, m_pageModelCompPtr);
 	I_REF(ibase::ICommandsProvider, m_commandsProviderCompPtr);
 	I_REF(imod::IModel, m_commandsProviderModelCompPtr);

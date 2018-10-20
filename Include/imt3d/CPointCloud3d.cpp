@@ -180,7 +180,7 @@ IPointCloud3d::PointCloudPtr CPointCloud3d::FromImage(iimg::IRasterImage &image,
 
 void CPointCloud3d::EnsureCenterCalculated() const
 {
-	if (!IsEmpty() && !m_isCloudCenterCalculationValid) {
+	if (!IsEmpty() && !m_isCloudCenterCalculationValid){
 		istd::CRange xRange(qInf(), -qInf());
 		istd::CRange yRange(qInf(), -qInf());
 		istd::CRange zRange(qInf(), -qInf());
@@ -190,32 +190,32 @@ void CPointCloud3d::EnsureCenterCalculated() const
 			double y = pointIter->GetY();
 			double z = pointIter->GetZ();
 
-			if (x < xRange.GetMinValue()) {
+			if (x < xRange.GetMinValue()){
 				xRange.SetMinValue(x);
 			}
 
-			if (y < yRange.GetMinValue()) {
+			if (y < yRange.GetMinValue()){
 				yRange.SetMinValue(y);
 			}
 
-			if (z < zRange.GetMinValue()) {
+			if (z < zRange.GetMinValue()){
 				zRange.SetMinValue(z);
 			}
 
-			if (x > xRange.GetMaxValue()) {
+			if (x > xRange.GetMaxValue()){
 				xRange.SetMaxValue(x);
 			}
 
-			if (y > yRange.GetMaxValue()) {
+			if (y > yRange.GetMaxValue()){
 				yRange.SetMaxValue(y);
 			}
 
-			if (z > zRange.GetMaxValue()) {
+			if (z > zRange.GetMaxValue()){
 				zRange.SetMaxValue(z);
 			}
 		}
 
-		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()) {
+		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
 			m_cloudCenter = i3d::CVector3d(
 						xRange.GetValueFromAlpha(0.5),
 						yRange.GetValueFromAlpha(0.5),

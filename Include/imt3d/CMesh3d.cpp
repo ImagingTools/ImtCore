@@ -29,7 +29,7 @@ bool CMesh3d::SaveToStlFile(const QString& filePath) const
 
 	std::FILE* file = std::fopen(filePath.toStdString().c_str(), "wb");
 	
-	if (file == NULL) {
+	if (file == NULL){
 		return false;
 	}
 
@@ -73,7 +73,7 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath)
 	m_isMeshCuboidCalculationValid = false;
 
 	std::FILE* file = std::fopen(filePath.toStdString().c_str(), "rb");
-	if (file == NULL) {
+	if (file == NULL){
 		return false;
 	}
 
@@ -83,7 +83,7 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath)
 	uint32_t numTris = 0;
 	std::fread(&numTris, sizeof(numTris), 1, file);
 
-	for (uint32_t i = 0; i < numTris; ++i) {
+	for (uint32_t i = 0; i < numTris; ++i){
 		// store indices of the m_vertices
 		Triangle oneTriangle;
 		oneTriangle.SetElement(0, i * 3);
@@ -209,7 +209,7 @@ void CMesh3d::EnsureCenterCalculated() const
 		istd::CRange yRange(boundingCuboid.GetBottom(), boundingCuboid.GetTop());
 		istd::CRange zRange(boundingCuboid.GetNear(), boundingCuboid.GetFar());
 
-		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()) {
+		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
 			m_meshCenter = i3d::CVector3d(
 				xRange.GetValueFromAlpha(0.5),
 				yRange.GetValueFromAlpha(0.5),
@@ -225,42 +225,42 @@ void CMesh3d::EnsureCenterCalculated() const
 
 void CMesh3d::EnsureCuboidCalculated() const
 {
-	if (!IsEmpty() && !m_isMeshCuboidCalculationValid) {
+	if (!IsEmpty() && !m_isMeshCuboidCalculationValid){
 		istd::CRange xRange(qInf(), -qInf());
 		istd::CRange yRange(qInf(), -qInf());
 		istd::CRange zRange(qInf(), -qInf());
 
-		for (MeshVertices::const_iterator itVertex = m_vertices.constBegin(); itVertex != m_vertices.constEnd(); itVertex++) {
+		for (MeshVertices::const_iterator itVertex = m_vertices.constBegin(); itVertex != m_vertices.constEnd(); itVertex++){
 			double x = itVertex->GetElement(E_X);
 			double y = itVertex->GetElement(E_Y);
 			double z = itVertex->GetElement(E_Z);
 
-			if (x < xRange.GetMinValue()) {
+			if (x < xRange.GetMinValue()){
 				xRange.SetMinValue(x);
 			}
 
-			if (y < yRange.GetMinValue()) {
+			if (y < yRange.GetMinValue()){
 				yRange.SetMinValue(y);
 			}
 
-			if (z < zRange.GetMinValue()) {
+			if (z < zRange.GetMinValue()){
 				zRange.SetMinValue(z);
 			}
 
-			if (x > xRange.GetMaxValue()) {
+			if (x > xRange.GetMaxValue()){
 				xRange.SetMaxValue(x);
 			}
 
-			if (y > yRange.GetMaxValue()) {
+			if (y > yRange.GetMaxValue()){
 				yRange.SetMaxValue(y);
 			}
 
-			if (z > zRange.GetMaxValue()) {
+			if (z > zRange.GetMaxValue()){
 				zRange.SetMaxValue(z);
 			}
 		}
 
-		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()) {
+		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
 
 			const double left = xRange.GetMinValue();
 			const double right = xRange.GetMaxValue();

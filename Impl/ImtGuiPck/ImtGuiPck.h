@@ -4,14 +4,14 @@
 // ACF includes
 
 // ImtAlgo includes
-#include <imtgui/CMatrixMenuGuiComp.h>
+#include <imtgui/CThumbnailDecoratorGuiComp.h>
 
 /**
 	ImtGuiPck package
 */
 namespace ImtGuiPck
 {
-	typedef imtgui::CMatrixMenuGuiComp MatrixMenuGui;
+	typedef imtgui::CThumbnailDecoratorGuiComp ThumbnailDecoratorGui;
 
 } // namespace ImtAlgoPck
 

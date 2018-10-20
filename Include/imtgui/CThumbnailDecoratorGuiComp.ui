@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CMatrixMenuGuiComp</class>
- <widget class="QWidget" name="CMatrixMenuGuiComp">
+ <class>CThumbnailDecoratorGuiComp</class>
+ <widget class="QWidget" name="CThumbnailDecoratorGuiComp">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -334,7 +334,46 @@ QAbstractItemView
             </property>
            </widget>
           </widget>
-          <widget class="QWidget" name="page_2"/>
+          <widget class="QWidget" name="UiContainerPage">
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QFrame" name="ContentFrame">
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -344,14 +383,12 @@ QAbstractItemView
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="jacgui.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>FullScreenButton</sender>
    <signal>toggled(bool)</signal>
-   <receiver>CMatrixMenuGuiComp</receiver>
+   <receiver>CThumbnailDecoratorGuiComp</receiver>
    <slot>showFullScreen()</slot>
    <hints>
     <hint type="sourcelabel">
