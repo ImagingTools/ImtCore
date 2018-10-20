@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QtWidgets/QToolbar>
 #include <QtGui/QStandardItemModel>
+#include <QTableView>
 
 // ACF includes
 #include <iprm/IOptionsList.h>
@@ -167,12 +168,17 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 
 		int itemRow = itemIndex / colsCount;
 		int itemCol = itemIndex % colsCount;
-		m_menuItemModel.setItem(itemIndex, menuItem);
+		m_menuItemModel.setItem(itemRow, itemCol, menuItem);
 	}
 
 	if (m_menuItemModel.columnCount() > 0){
 		PageList->setModel(&m_menuItemModel);
 	}
+
+
+	PageList->resizeColumnsToContents();
+	PageList->resizeRowsToContents();
+
 }
 
 
@@ -182,18 +188,17 @@ void CThumbnailDecoratorGuiComp::GetMenuLayout(int& rows, int& columns, const in
 	rows = 1;
 	columns = count;
 	
-	PageList->setResizeMode(QListView::ResizeMode::Adjust);
-	QSize size = PageList->size();
+	QSize size = StartPage->size();
+
 	static const int spacing = 10;
 	const QSize gridSize = QSize(size.width() / columns, size.height() / rows);
-	const QSize iconSize = QSize(gridSize.width() - spacing * 2, gridSize.height() - spacing * 2);
-
-	PageList->setViewMode(QListView::ViewMode::IconMode);
-	PageList->setFlow(QListView::Flow::LeftToRight);
-	PageList->setIconSize(iconSize);
-	PageList->setGridSize(gridSize);
-	PageList->setWrapping(true);
-	PageList->setWordWrap(true);
+	//const QSize iconSize = QSize(gridSize.width() - spacing * 2, gridSize.height() - spacing * 2);
+	PageList->setIconSize(/*iconSize*/gridSize);
+	PageList->setShowGrid(false);
+	PageList->horizontalHeader()->hide();
+	PageList->verticalHeader()->hide();
+	PageList->horizontalHeader()->setStretchLastSection(false);
+	PageList->verticalHeader()->setStretchLastSection(false);
 }
 
 
