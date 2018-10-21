@@ -2,10 +2,9 @@
 
 
 // Qt includes
-#include <QDebug>
 #include <QtWidgets/QToolbar>
+#include <QtWidgets/QTableView>
 #include <QtGui/QStandardItemModel>
-#include <QTableView>
 
 // ACF includes
 #include <iprm/IOptionsList.h>
@@ -83,7 +82,6 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 
 
 // private slots
-
 
 void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 {
