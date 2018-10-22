@@ -48,6 +48,8 @@ public:
 		I_ASSIGN(m_verticalItemsViewAttrPtr, "VerticalItemsView", "Count of visual items in vertical column", false, 1);
 		I_ASSIGN(m_horizontalSpacingAttrPtr, "HorizontalSpacing", "Horizontal spacing of items on view", false, 6);
 		I_ASSIGN(m_verticalSpacingAttrPtr, "VerticalSpacing", "Vertical spacing of items on view", false, 6);
+		I_ASSIGN(m_horizontalFrameMarginAttrPtr, "HorizontalFrameMargin", "Horizontal (left&right) side margin of thumbnail frame", false, 6);
+		I_ASSIGN(m_verticalFrameMarginAttrPtr, "VerticalFrameMargin", "Vertical (top&bottom) side margin of thumbnail frame", false, 6);
 
 	I_END_COMPONENT;
 
@@ -76,6 +78,7 @@ private:
 	void GetMenuLayout(const int count);
 	void SetLayoutProperties(const int count);
 	void UpdateSpacing();
+	void UpdateMargins();
 	void UpdateCommands();
 
 private:
@@ -117,6 +120,7 @@ private:
 	iqtgui::CHierarchicalCommand m_commands;
 	int m_columnsCount, m_rowsCount;
 	int m_horizontalSpacing, m_verticalSpacing;
+	int m_horizontalFrameMargin, m_verticalFrameMargin;
 
 	I_REF(iqtgui::IGuiObject, m_pagesWidgetCompPtr);
 	I_REF(iprm::ISelectionParam, m_pageModelCompPtr);
@@ -126,6 +130,8 @@ private:
 	I_ATTR(int, m_verticalItemsViewAttrPtr);
 	I_ATTR(int, m_horizontalSpacingAttrPtr);
 	I_ATTR(int, m_verticalSpacingAttrPtr);
+	I_ATTR(int, m_horizontalFrameMarginAttrPtr);
+	I_ATTR(int, m_verticalFrameMarginAttrPtr);
 
 	QToolBar* m_mainToolBar;
 };

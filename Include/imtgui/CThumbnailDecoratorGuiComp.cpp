@@ -29,7 +29,9 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_columnsCount(0),
 	m_rowsCount(0),
 	m_verticalSpacing(0),
-	m_horizontalSpacing(0)
+	m_horizontalSpacing(0),
+	m_horizontalFrameMargin(6),
+	m_verticalFrameMargin(6)
 {
 	m_rootCommands.InsertChild(&m_commands);
 }
@@ -240,8 +242,8 @@ void CThumbnailDecoratorGuiComp::SetLayoutProperties(const int count)
 	PageList->setShowGrid(false);
 	PageList->horizontalHeader()->hide();
 	PageList->verticalHeader()->hide();
-	PageList->horizontalHeader()->setStretchLastSection(false);
-	PageList->verticalHeader()->setStretchLastSection(false);
+	PageList->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	PageList->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
 
 
@@ -249,6 +251,21 @@ void CThumbnailDecoratorGuiComp::UpdateSpacing()
 {
 	m_horizontalSpacing = m_horizontalSpacingAttrPtr.IsValid() ? qMax(0, *m_horizontalSpacingAttrPtr) : 6;
 	m_verticalSpacing = m_verticalSpacingAttrPtr.IsValid() ? qMax(0, *m_verticalSpacingAttrPtr) : 6;
+	//TODO check constraints
+}
+
+
+void CThumbnailDecoratorGuiComp::UpdateMargins()
+{
+	if (m_horizontalFrameMargin <= 0){
+		m_horizontalFrameMargin = m_horizontalFrameMarginAttrPtr.IsValid() ? qMax(0, *m_horizontalFrameMarginAttrPtr) : 6;
+		m_verticalFrameMargin = m_verticalFrameMarginAttrPtr.IsValid() ? qMax(0, *m_verticalFrameMarginAttrPtr) : 6;
+	}
+	//TODO check constraints
+	hSpacerLeft->changeSize(m_horizontalFrameMargin, 20);
+	hSpacerRight->changeSize(m_horizontalFrameMargin, 20);
+	vSpacerTop->changeSize(20, m_verticalFrameMargin);
+	vSpacerBottom->changeSize(20, m_verticalFrameMargin);
 }
 
 
