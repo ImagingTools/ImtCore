@@ -15,7 +15,11 @@
 #include <iprm/ISelectionParam.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
+
+//imtgui includes
+
 #include <GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h>
+
 
 
 class QToolBar;
@@ -40,12 +44,12 @@ public:
 		I_ASSIGN(m_pageModelCompPtr, "PageModel", "Data model describing the used pages", true, "PageModel");
 		I_ASSIGN(m_commandsProviderCompPtr, "Commands", "Provider of the commands showed in the main tool bar", false, "Commands");
 		I_ASSIGN_TO(m_commandsProviderModelCompPtr, m_commandsProviderCompPtr, false);
-	I_END_COMPONENT;
+		I_ASSIGN(m_horizontalItemsViewAttrPtr, "HorizontalItemsView", "Count of visual items in horizontal row", false, 1);
+		I_ASSIGN(m_verticalItemsViewAttrPtr, "VerticalItemsView", "Count of visual items in vertical column", false, 1);
+		I_ASSIGN(m_horizontalSpacingAttrPtr, "HorizontalSpacing", "Horizontal spacing of items on view", false, 6);
+		I_ASSIGN(m_verticalSpacingAttrPtr, "VerticalSpacing", "Vertical spacing of items on view", false, 6);
 
-	enum DataRole
-	{
-		DR_PAGE_ID = Qt::UserRole + 1
-	};
+	I_END_COMPONENT;
 
 	CThumbnailDecoratorGuiComp();
 
@@ -64,8 +68,14 @@ private Q_SLOTS:
 
 private:
 	void CreateItems(const iprm::ISelectionParam* selectionPtr);
-	QWidget* CreatePageItem(const iprm::IOptionsList* optionsPtr, const int index);
-	void GetMenuLayout(int& rows, int& columns, const int count);
+	/**
+		calculates layout of page thumbnails based on m_horizontalItemsViewAttrPtr and m_verticalItemsViewAttrPtr
+		if the attributes are not set, or set incorrectly, the dimentions close to sqrt(totalcounr) are taken with
+		the preferred vertical
+	*/
+	void GetMenuLayout(const int count);
+	void SetLayoutProperties(const int count);
+	void UpdateSpacing();
 	void UpdateCommands();
 
 private:
@@ -105,11 +115,17 @@ private:
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_commands;
+	int m_columnsCount, m_rowsCount;
+	int m_horizontalSpacing, m_verticalSpacing;
 
 	I_REF(iqtgui::IGuiObject, m_pagesWidgetCompPtr);
 	I_REF(iprm::ISelectionParam, m_pageModelCompPtr);
 	I_REF(ibase::ICommandsProvider, m_commandsProviderCompPtr);
 	I_REF(imod::IModel, m_commandsProviderModelCompPtr);
+	I_ATTR(int, m_horizontalItemsViewAttrPtr);
+	I_ATTR(int, m_verticalItemsViewAttrPtr);
+	I_ATTR(int, m_horizontalSpacingAttrPtr);
+	I_ATTR(int, m_verticalSpacingAttrPtr);
 
 	QToolBar* m_mainToolBar;
 };

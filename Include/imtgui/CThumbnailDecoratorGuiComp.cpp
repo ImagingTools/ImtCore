@@ -5,11 +5,15 @@
 #include <QtWidgets/QToolbar>
 #include <QtWidgets/QTableView>
 #include <QtGui/QStandardItemModel>
+#include <QFrame>
 
 // ACF includes
 #include <iprm/IOptionsList.h>
 #include <iqtgui/IMultiVisualStatusProvider.h>
 #include <iqtgui/CCommandTools.h>
+
+//imtgui includes
+#include <imtgui/CThumbpageItemGuiDelegate.h>
 
 
 namespace imtgui
@@ -21,7 +25,11 @@ namespace imtgui
 CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	:m_commands("&View", 100),
 	m_mainToolBar(NULL),
-	m_commandsObserver(*this)
+	m_commandsObserver(*this),
+	m_columnsCount(0),
+	m_rowsCount(0),
+	m_verticalSpacing(0),
+	m_horizontalSpacing(0)
 {
 	m_rootCommands.InsertChild(&m_commands);
 }
@@ -89,7 +97,8 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 	const int pageCount = pagesStack->count();
 
 	QStandardItem* item = m_menuItemModel.itemFromIndex(index);
-	if (item == nullptr){
+	bool pageExists = (item == nullptr) ? (false) : (item->data(CThumbpageItemGuiDelegate::DR_PAGE_ID).isValid());
+	if (!pageExists){
 		on_HomeButton_clicked();
 
 		return;
@@ -116,7 +125,9 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 
 void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 {
+	CurrentPageLabel->setText("Production");
 	pagesStack->setCurrentIndex(0);
+	PageList->clearSelection();
 }
 
 
@@ -133,14 +144,11 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 	const iprm::IOptionsList* itemsListPtr = selectionPtr->GetSelectionConstraints();
 	int menuItemsCount = itemsListPtr->GetOptionsCount();
 
-
-	int rowsCount = 0;
-	int colsCount = 0;
-	GetMenuLayout(rowsCount, colsCount, menuItemsCount);
+	SetLayoutProperties(menuItemsCount);
 
 	//Q_ASSERT((rowsCount * colsCount) == menuItemsCount);
-	m_menuItemModel.setRowCount(rowsCount);
-	m_menuItemModel.setColumnCount(colsCount);
+	m_menuItemModel.setRowCount(m_rowsCount);
+	m_menuItemModel.setColumnCount(m_columnsCount);
 
 	for (int itemIndex = 0; itemIndex < menuItemsCount; ++itemIndex){
 		QString itemName = itemsListPtr->GetOptionName(itemIndex);
@@ -150,7 +158,7 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 		QByteArray menuItemId = itemsListPtr->GetOptionId(itemIndex);
 
 		QStandardItem* menuItem = new QStandardItem(itemName);
-		menuItem->setData(menuItemId, DR_PAGE_ID);
+		menuItem->setData(menuItemId, CThumbpageItemGuiDelegate::DR_PAGE_ID);
 
 		if (visualStatusProviderPtr != nullptr){
 			const iqtgui::IVisualStatus* statusPtr = visualStatusProviderPtr->GetVisualStatus(itemIndex);
@@ -164,13 +172,16 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 		itemInfo.selectionPtr = const_cast<iprm::ISelectionParam*>(selectionPtr);
 		m_itemInfoMap[menuItem] = itemInfo;
 
-		int itemRow = itemIndex / colsCount;
-		int itemCol = itemIndex % colsCount;
+		int itemRow = itemIndex / m_columnsCount;
+		int itemCol = itemIndex % m_columnsCount;
 		m_menuItemModel.setItem(itemRow, itemCol, menuItem);
 	}
 
 	if (m_menuItemModel.columnCount() > 0){
 		PageList->setModel(&m_menuItemModel);
+		PageList->setItemDelegate(new imtgui::CThumbpageItemGuiDelegate(m_menuItemModel, m_horizontalSpacing, m_verticalSpacing, this));
+		//QStyle style = QStyleOptionButton();
+
 	}
 
 
@@ -180,16 +191,50 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 }
 
 
-void CThumbnailDecoratorGuiComp::GetMenuLayout(int& rows, int& columns, const int count)
+void CThumbnailDecoratorGuiComp::GetMenuLayout(const int count)
 {
-	// fuck!
-	rows = 1;
-	columns = count;
-	
+	m_columnsCount = m_horizontalItemsViewAttrPtr.IsValid() ? qMax(0, *m_horizontalItemsViewAttrPtr) : 0;
+	m_rowsCount = m_verticalItemsViewAttrPtr.IsValid() ? qMax(0, *m_verticalItemsViewAttrPtr) : 0;
+
+	bool ifOneSet = (m_columnsCount > 0) || (m_rowsCount > 0);
+	bool ifFits = ifOneSet && (m_columnsCount * m_rowsCount == count);
+
+	if (m_columnsCount <= 0 && m_rowsCount <= 0 || (!ifOneSet && !ifFits)){
+		int columns = (int)sqrt((double)count);
+		m_columnsCount = qMax(1, columns);
+		m_rowsCount = count / m_columnsCount;
+
+		if ((count % m_columnsCount) > 0){
+			m_rowsCount++;
+		}
+	}
+	else if (m_rowsCount <= 0){
+		m_rowsCount = count / m_columnsCount;
+		if ((count % m_columnsCount) > 0){
+			m_rowsCount++;
+		}
+	}
+	else if (m_columnsCount <= 0) {
+		m_columnsCount = count / m_rowsCount;
+		if ((count % m_rowsCount) > 0) {
+			m_columnsCount++;
+		}
+	}
+}
+
+
+void CThumbnailDecoratorGuiComp::SetLayoutProperties(const int count)
+{
 	QSize size = StartPage->size();
+	if (m_columnsCount <= 0 || m_rowsCount <= 0){
+		GetMenuLayout(count);
+	}
+	if (m_verticalSpacing <= 0 || m_horizontalSpacing <= 0){
+		UpdateSpacing();
+	}
 
 	static const int spacing = 10;
-	const QSize gridSize = QSize(size.width() / columns, size.height() / rows);
+	const QSize gridSize = QSize(size.width() / m_columnsCount, size.height() / m_rowsCount);
 	//const QSize iconSize = QSize(gridSize.width() - spacing * 2, gridSize.height() - spacing * 2);
 	PageList->setIconSize(/*iconSize*/gridSize);
 	PageList->setShowGrid(false);
@@ -197,6 +242,13 @@ void CThumbnailDecoratorGuiComp::GetMenuLayout(int& rows, int& columns, const in
 	PageList->verticalHeader()->hide();
 	PageList->horizontalHeader()->setStretchLastSection(false);
 	PageList->verticalHeader()->setStretchLastSection(false);
+}
+
+
+void CThumbnailDecoratorGuiComp::UpdateSpacing()
+{
+	m_horizontalSpacing = m_horizontalSpacingAttrPtr.IsValid() ? qMax(0, *m_horizontalSpacingAttrPtr) : 6;
+	m_verticalSpacing = m_verticalSpacingAttrPtr.IsValid() ? qMax(0, *m_verticalSpacingAttrPtr) : 6;
 }
 
 
