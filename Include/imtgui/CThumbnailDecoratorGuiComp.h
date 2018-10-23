@@ -50,6 +50,10 @@ public:
 		I_ASSIGN(m_verticalSpacingAttrPtr, "VerticalSpacing", "Vertical spacing of items on view", false, 6);
 		I_ASSIGN(m_horizontalFrameMarginAttrPtr, "HorizontalFrameMargin", "Horizontal (left&right) side margin of thumbnail frame", false, 6);
 		I_ASSIGN(m_verticalFrameMarginAttrPtr, "VerticalFrameMargin", "Vertical (top&bottom) side margin of thumbnail frame", false, 6);
+		I_ASSIGN(m_maximumFrameWidthAttrPtr, "MaximumFrameWidth", "Maximum width of thumbnail frame", false, 800);
+		I_ASSIGN(m_maximumFrameHeightAttrPtr, "MaximumFrameHeight", "Maximum height of thumbnail frame", false, 600);
+
+		
 
 	I_END_COMPONENT;
 
@@ -79,6 +83,7 @@ private:
 	void SetLayoutProperties(const int count);
 	void UpdateSpacing();
 	void UpdateMargins();
+	void UpdateMaxSize();
 	void UpdateCommands();
 
 private:
@@ -119,8 +124,12 @@ private:
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_commands;
 	int m_columnsCount, m_rowsCount;
-	int m_horizontalSpacing, m_verticalSpacing;
-	int m_horizontalFrameMargin, m_verticalFrameMargin;
+	int m_horizontalSpacing;
+	int m_verticalSpacing;
+	int m_horizontalFrameMargin;
+	int m_verticalFrameMargin;
+	int m_maxWidth;
+	int m_maxHeight;
 
 	I_REF(iqtgui::IGuiObject, m_pagesWidgetCompPtr);
 	I_REF(iprm::ISelectionParam, m_pageModelCompPtr);
@@ -132,6 +141,8 @@ private:
 	I_ATTR(int, m_verticalSpacingAttrPtr);
 	I_ATTR(int, m_horizontalFrameMarginAttrPtr);
 	I_ATTR(int, m_verticalFrameMarginAttrPtr);
+	I_ATTR(int, m_maximumFrameWidthAttrPtr);
+	I_ATTR(int, m_maximumFrameHeightAttrPtr);
 
 	QToolBar* m_mainToolBar;
 };

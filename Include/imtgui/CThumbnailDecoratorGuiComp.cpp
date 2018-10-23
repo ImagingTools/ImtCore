@@ -231,13 +231,17 @@ void CThumbnailDecoratorGuiComp::SetLayoutProperties(const int count)
 	if (m_columnsCount <= 0 || m_rowsCount <= 0){
 		GetMenuLayout(count);
 	}
+	if (m_maxWidth < 0 || m_maxHeight <= 0){
+		UpdateMaxSize();
+	}
 	if (m_verticalSpacing <= 0 || m_horizontalSpacing <= 0){
 		UpdateSpacing();
 	}
+	UpdateMargins();
 
 	static const int spacing = 10;
 	const QSize gridSize = QSize(size.width() / m_columnsCount, size.height() / m_rowsCount);
-	//const QSize iconSize = QSize(gridSize.width() - spacing * 2, gridSize.height() - spacing * 2);
+	//PageList->setMaximumSize(QSize(m_maxWidth, m_maxHeight));
 	PageList->setIconSize(/*iconSize*/gridSize);
 	PageList->setShowGrid(false);
 	PageList->horizontalHeader()->hide();
@@ -266,6 +270,15 @@ void CThumbnailDecoratorGuiComp::UpdateMargins()
 	hSpacerRight->changeSize(m_horizontalFrameMargin, 20);
 	vSpacerTop->changeSize(20, m_verticalFrameMargin);
 	vSpacerBottom->changeSize(20, m_verticalFrameMargin);
+}
+
+
+void CThumbnailDecoratorGuiComp::UpdateMaxSize()
+{
+	m_maxWidth = m_maximumFrameWidthAttrPtr.IsValid() ? qMax(0, *m_maximumFrameWidthAttrPtr) : 800;
+	m_maxHeight = m_maximumFrameHeightAttrPtr.IsValid() ? qMax(0, *m_maximumFrameHeightAttrPtr) : 600;
+
+	PageList->setMaximumSize(QSize(m_maxWidth, m_maxHeight));
 }
 
 

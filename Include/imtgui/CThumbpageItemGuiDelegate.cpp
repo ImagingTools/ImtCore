@@ -4,6 +4,8 @@
 // Qt includes
 #include <QtGui/QPainter>
 #include <QtCore/QDir>
+#include <QApplication>
+
 
 // ACF includes
 #include <istd/IInformationProvider.h>
@@ -20,13 +22,14 @@ namespace imtgui
 
 // public methods
 
-CThumbpageItemGuiDelegate::CThumbpageItemGuiDelegate(const QStandardItemModel& itemModel, const int horizontalSpacing, const int verticalSpacing, QObject* parent)
+CThumbpageItemGuiDelegate::CThumbpageItemGuiDelegate(const QStandardItemModel& itemModel, int horizontalSpacing, int verticalSpacing, QObject* parent)
 	:BaseClass(parent),
 	m_itemModel(itemModel)
 {
 	m_verticalMargin = int(qMax(verticalSpacing, 6) / 2);
 	m_horizontalMargin = int(qMax(horizontalSpacing, 6) / 2);
 }
+
 
 // reimplemented (QItemDelegate)
 
@@ -50,7 +53,16 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	QRect drawArea = QRect(mainRect.left() + m_horizontalMargin, mainRect.top() + m_verticalMargin,
 				mainRect.width() - 2*m_horizontalMargin, mainRect.height() - 2*m_verticalMargin);
 
-	const int minPadding = 4;
+	int minPadding = 7;
+
+	QStyleOptionButton button;
+//	button.text = itemPtr->text();
+	button.rect = drawArea;
+	button.state = QStyle::State_Enabled;
+	//button.icon = itemIcon;
+	QApplication::style()->drawControl(QStyle::CE_PushButton, &button, painter);
+
+	
 
 	int oneThirdthHeight = int(float(drawArea.height()) / 3 - minPadding);
 	int widthAvailable = drawArea.width() - 2 * minPadding;
@@ -61,9 +73,9 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->setRenderHint(QPainter::TextAntialiasing);
 
-	QColor backgroundColor(160, 70, 70);	//TODO
+/*	QColor backgroundColor(160, 70, 70);	//TODO
 	
-	const int shadowOffset = 7;
+	int shadowOffset = 7;
 
 	if (option.state & QStyle::State_Selected){
 		drawArea.adjust(shadowOffset, -shadowOffset, 0, - 2 * shadowOffset);
@@ -77,7 +89,7 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 
 		painter->fillRect(shadowRect, shadowColor);
 		painter->fillRect(drawArea, backgroundColor);
-	}
+	}*/
 
 	int iconRectLeft = drawArea.left() + (drawArea.width() - iconSize) / 2;
 	QRect iconRect(iconRectLeft, drawArea.top() + minPadding, iconSize, iconSize);
@@ -85,17 +97,17 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	painter->drawPixmap(iconRect, itemPixmap);
 
 	QFont font;
-	font.setPointSize(fontSize);
+	font.setPointSize(14);
 	painter->setFont(font);
 
-	QColor textColor = QColor(230, 230, 230);	//TODO
+	const QColor& textColor = option.palette.text().color(); // QColor(230, 230, 230);	//TODO
 	painter->setPen(textColor);
 
 	int textRectTop = drawArea.top() + 2 * minPadding + iconSize;
 	QRect textRect(drawArea.left() + minPadding, textRectTop, drawArea.width() - 2*minPadding, oneThirdthHeight);
 	painter->drawText(
 		textRect,
-		Qt::AlignHCenter | Qt::AlignVCenter,
+		Qt::AlignHCenter | Qt::AlignBottom,
 		itemPtr->text()
 	);
 
@@ -111,6 +123,11 @@ QWidget* CThumbpageItemGuiDelegate::createEditor(QWidget* /*parent*/, const QSty
 	return NULL;
 }
 
+
+void CThumbpageItemGuiDelegate::SetStyleSheet()
+{
+
+}
 
 } // namespace imtgui
 

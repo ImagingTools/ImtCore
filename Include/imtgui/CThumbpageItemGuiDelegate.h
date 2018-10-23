@@ -34,13 +34,16 @@ namespace imtgui
 		virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& /*index*/) const override;
 		virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 		virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+		void SetStyleSheet();
+
 
 	private:
 		const QStandardItemModel& m_itemModel;
 		/**
 			draw margin, equals half the spacing
 		*/
-		int m_verticalMargin, m_horizontalMargin;
+		int m_verticalMargin;
+		int m_horizontalMargin;
 	};
 
 
