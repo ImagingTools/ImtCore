@@ -30,12 +30,29 @@ QWidget#BottomFrame
 	background: rgb(230,230,230);	
 }
 
+QTableView
+{
+	/*background: rgb(235,235,235);*/
+	color: qpalette(background);
+	background: qpalette(background);
+    font-weight: bold;
+    text-align: center;
+}
+
+QTableView::item
+{
+	color: qpalette(background);
+	background: qpalette(background);
+	font-weight: bold;
+    text-align: center;
+}
 
 /*
 	Tab simulation using tree widget
 */
 QTreeWidget[TabSimulation=true]
 {
+color: #808080;
 	background: rgb(230,230,230);	
     font-weight: bold;
     text-align: left;
@@ -175,7 +192,7 @@ QAbstractItemView
          <string notr="true"/>
         </property>
         <property name="text">
-         <string>Production</string>
+         <string>Home</string>
         </property>
        </widget>
       </item>
@@ -320,6 +337,9 @@ QAbstractItemView
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::NoFrame</enum>
               </property>
@@ -387,6 +407,9 @@ QAbstractItemView
                    <width>16777215</width>
                    <height>16777215</height>
                   </size>
+                 </property>
+                 <property name="autoFillBackground">
+                  <bool>false</bool>
                  </property>
                  <property name="frameShape">
                   <enum>QFrame::NoFrame</enum>

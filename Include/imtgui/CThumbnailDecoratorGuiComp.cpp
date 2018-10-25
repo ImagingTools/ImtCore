@@ -55,9 +55,14 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 	m_itemInfoMap.clear();
 
+	static const istd::IChangeable::ChangeSet commandsChangeSet(ibase::ICommandsProvider::CF_COMMANDS);
+
+	if (m_commandsProviderModelCompPtr.IsValid()) {
+		m_commandsObserver.RegisterModel(m_commandsProviderModelCompPtr.GetPtr(), 0, commandsChangeSet);
+	}
+
 	if (m_pageModelCompPtr.IsValid()){
 		CreateItems(m_pageModelCompPtr.GetPtr());
-
 		pagesStack->setCurrentIndex(0);
 
 		CurrentPageLabel->setText(QString::number(pagesStack->count()));
@@ -65,12 +70,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		if (m_pagesWidgetCompPtr.IsValid()){
 			m_pagesWidgetCompPtr->CreateGui(ContentFrame);
 		}
-	}
+		m_pageModelCompPtr->SetSelectedOptionIndex(-1);
 
-	static const istd::IChangeable::ChangeSet commandsChangeSet(ibase::ICommandsProvider::CF_COMMANDS);
-
-	if (m_commandsProviderModelCompPtr.IsValid()){
-		m_commandsObserver.RegisterModel(m_commandsProviderModelCompPtr.GetPtr(), 0, commandsChangeSet);
 	}
 }
 
@@ -127,7 +128,8 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 
 void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 {
-	CurrentPageLabel->setText("Production");
+	CurrentPageLabel->setText(tr("Home"));
+	m_pageModelCompPtr->SetSelectedOptionIndex(-1);
 	pagesStack->setCurrentIndex(0);
 	PageList->clearSelection();
 }
@@ -151,6 +153,7 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 	//Q_ASSERT((rowsCount * colsCount) == menuItemsCount);
 	m_menuItemModel.setRowCount(m_rowsCount);
 	m_menuItemModel.setColumnCount(m_columnsCount);
+	m_menuItemModel.setParent(this);
 
 	for (int itemIndex = 0; itemIndex < menuItemsCount; ++itemIndex){
 		QString itemName = itemsListPtr->GetOptionName(itemIndex);
@@ -182,8 +185,6 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 	if (m_menuItemModel.columnCount() > 0){
 		PageList->setModel(&m_menuItemModel);
 		PageList->setItemDelegate(new imtgui::CThumbpageItemGuiDelegate(m_menuItemModel, m_horizontalSpacing, m_verticalSpacing, this));
-		//QStyle style = QStyleOptionButton();
-
 	}
 
 
