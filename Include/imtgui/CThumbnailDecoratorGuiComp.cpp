@@ -242,8 +242,7 @@ void CThumbnailDecoratorGuiComp::SetLayoutProperties(const int count)
 
 	static const int spacing = 10;
 	const QSize gridSize = QSize(size.width() / m_columnsCount, size.height() / m_rowsCount);
-	//PageList->setMaximumSize(QSize(m_maxWidth, m_maxHeight));
-	PageList->setIconSize(/*iconSize*/gridSize);
+	PageList->setIconSize(gridSize);
 	PageList->setShowGrid(false);
 	PageList->horizontalHeader()->hide();
 	PageList->verticalHeader()->hide();
@@ -254,8 +253,8 @@ void CThumbnailDecoratorGuiComp::SetLayoutProperties(const int count)
 
 void CThumbnailDecoratorGuiComp::UpdateSpacing()
 {
-	m_horizontalSpacing = m_horizontalSpacingAttrPtr.IsValid() ? qMax(0, *m_horizontalSpacingAttrPtr) : 6;
-	m_verticalSpacing = m_verticalSpacingAttrPtr.IsValid() ? qMax(0, *m_verticalSpacingAttrPtr) : 6;
+	m_horizontalSpacing = m_horizontalSpacingAttrPtr.IsValid() ? qMax(0, *m_horizontalSpacingAttrPtr) : 15;
+	m_verticalSpacing = m_verticalSpacingAttrPtr.IsValid() ? qMax(0, *m_verticalSpacingAttrPtr) : 15;
 	//TODO check constraints
 }
 
@@ -263,8 +262,8 @@ void CThumbnailDecoratorGuiComp::UpdateSpacing()
 void CThumbnailDecoratorGuiComp::UpdateMargins()
 {
 	if (m_horizontalFrameMargin <= 0){
-		m_horizontalFrameMargin = m_horizontalFrameMarginAttrPtr.IsValid() ? qMax(0, *m_horizontalFrameMarginAttrPtr) : 6;
-		m_verticalFrameMargin = m_verticalFrameMarginAttrPtr.IsValid() ? qMax(0, *m_verticalFrameMarginAttrPtr) : 6;
+		m_horizontalFrameMargin = m_horizontalFrameMarginAttrPtr.IsValid() ? qMax(0, *m_horizontalFrameMarginAttrPtr) : 15;
+		m_verticalFrameMargin = m_verticalFrameMarginAttrPtr.IsValid() ? qMax(0, *m_verticalFrameMarginAttrPtr) : 15;
 	}
 	//TODO check constraints
 	hSpacerLeft->changeSize(m_horizontalFrameMargin, 20);
@@ -309,7 +308,7 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 // public methods of embedded class CommandsObserver
 
 CThumbnailDecoratorGuiComp::CommandsObserver::CommandsObserver(CThumbnailDecoratorGuiComp& parent)
-:	m_parent(parent)
+	:m_parent(parent)
 {
 }
 
