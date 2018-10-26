@@ -79,7 +79,6 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	int iconSize = qMin(oneHalf, widthAvailable);
 	int fontSize = 18;
 
-
 // button appearance
 	QStyleOptionButton button;
 	button.rect = drawArea;

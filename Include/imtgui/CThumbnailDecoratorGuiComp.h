@@ -52,9 +52,6 @@ public:
 		I_ASSIGN(m_verticalFrameMarginAttrPtr, "VerticalFrameMargin", "Vertical (top&bottom) side margin of thumbnail frame", false, 6);
 		I_ASSIGN(m_maximumFrameWidthAttrPtr, "MaximumFrameWidth", "Maximum width of thumbnail frame", false, 800);
 		I_ASSIGN(m_maximumFrameHeightAttrPtr, "MaximumFrameHeight", "Maximum height of thumbnail frame", false, 600);
-
-		
-
 	I_END_COMPONENT;
 
 	CThumbnailDecoratorGuiComp();
