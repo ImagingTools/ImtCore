@@ -7,7 +7,6 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 
-
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>
 #include <iqtgui/TDesignerGuiCompBase.h>
@@ -15,11 +14,8 @@
 #include <iprm/ISelectionParam.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
-
-//imtgui includes
-
+// ImtCore includes
 #include <GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h>
-
 
 
 class QToolBar;
