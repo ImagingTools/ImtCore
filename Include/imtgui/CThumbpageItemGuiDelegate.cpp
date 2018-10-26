@@ -59,10 +59,11 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->setRenderHint(QPainter::TextAntialiasing);
 	QFont font;
-	font.setPointSize(14);
+	font.setPointSize(24);
 	painter->setFont(font);
 
-	const QColor& textColor = option.palette.text().color();
+	QColor textColor = Qt::gray;
+
 	painter->setPen(textColor);
 
 // geometry parameters
@@ -77,7 +78,6 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	int widthAvailable = drawArea.width() - 2 * minPadding;
 
 	int iconSize = qMin(oneHalf, widthAvailable);
-	int fontSize = 18;
 
 // button appearance
 	QStyleOptionButton button;
