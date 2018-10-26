@@ -45,9 +45,9 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	Q_ASSERT(itemPtr != NULL);
 
 //ugly solution for tableview item color
-		QRect mainRect = option.rect;
-		const QColor& color = option.palette.background().color();
-		painter->fillRect(mainRect, color);
+	QRect mainRect = option.rect;
+	const QColor& color = option.palette.background().color();
+	painter->fillRect(mainRect, color);
 
 	if (!(itemPtr->data(DR_PAGE_ID).isValid())){
 		return;
@@ -92,7 +92,7 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	QPixmap itemPixmap = itemIcon.pixmap(QSize(iconRect.width(), iconRect.height()));
 
 // text parameters
-	int textRectTop = drawArea.top() + 2 * minPadding + iconSize;
+	int textRectTop = drawArea.top() + twoThirdth + minPadding;
 	QRect textRect(drawArea.left() + minPadding, textRectTop, drawArea.width() - 2 * minPadding, oneThirdth);
 
 	if (option.state & QStyle::State_Selected){

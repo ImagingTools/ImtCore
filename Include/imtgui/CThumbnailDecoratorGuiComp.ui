@@ -154,8 +154,8 @@ QAbstractItemView
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>:/Icons/ShowMenu</normaloff>:/Icons/ShowMenu</iconset>
+         <iconset resource="resource.qrc">
+          <normaloff>:/Icons/HomeBlue</normaloff>:/Icons/HomeBlue</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -529,7 +529,9 @@ QAbstractItemView
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>FullScreenButton</sender>
