@@ -2,10 +2,10 @@
 
 
 // Qt includes
+#include <QtGui/QStandardItemModel>
 #include <QtWidgets/QToolbar>
 #include <QtWidgets/QTableView>
-#include <QtGui/QStandardItemModel>
-#include <QFrame>
+#include <QtWidgets/QFrame>
 
 // ACF includes
 #include <iprm/IOptionsList.h>
