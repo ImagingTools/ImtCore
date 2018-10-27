@@ -23,7 +23,14 @@ CThumbpageItemGuiDelegate::CThumbpageItemGuiDelegate(const QStandardItemModel& i
 }
 
 
-// reimplemented (QItemDelegate)
+void CThumbpageItemGuiDelegate::SetMargins(int horizontal, int vertical)
+{
+	m_horizontalMargin = horizontal > 0 ? horizontal : m_horizontalMargin;
+	m_verticalMargin = vertical > 0 ? vertical : m_verticalMargin;
+}
+
+
+// reimplemented (QItemDelegate/)
 
 QSize CThumbpageItemGuiDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& /*index*/) const
 {

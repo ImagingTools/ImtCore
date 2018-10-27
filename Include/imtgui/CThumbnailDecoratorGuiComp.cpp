@@ -20,6 +20,8 @@
 namespace imtgui
 {
 
+	static const QSize minItemSize(150, 82);
+	static const int minSpacing = 4;
 
 // public methods
 
@@ -32,7 +34,8 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_verticalSpacing(0),
 	m_horizontalSpacing(0),
 	m_horizontalFrameMargin(6),
-	m_verticalFrameMargin(6)
+	m_verticalFrameMargin(6),
+	m_itemDelegate(nullptr)
 {
 	m_rootCommands.InsertChild(&m_commands);
 }
@@ -43,6 +46,18 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 const ibase::IHierarchicalCommand* CThumbnailDecoratorGuiComp::GetCommands() const
 {
 	return &m_rootCommands;
+}
+
+
+// reimplemented (QOjbect)
+
+bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
+{
+	if (event->type() == QEvent::Resize){
+		UpdateSpacing();
+		OnGuiRetranslate();
+	}
+	return BaseClass::eventFilter(watched, event);
 }
 
 
@@ -74,6 +89,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 		m_pageModelCompPtr->SetSelectedOptionIndex(-1);
 	}
+
+	installEventFilter(this);
 }
 
 
@@ -218,20 +235,24 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 
 	if (m_menuItemModel.columnCount() > 0){
 		PageList->setModel(&m_menuItemModel);
-		PageList->setItemDelegate(new imtgui::CThumbpageItemGuiDelegate(m_menuItemModel, m_horizontalSpacing, m_verticalSpacing, this));
-	}
+		m_itemDelegate = new imtgui::CThumbpageItemGuiDelegate(m_menuItemModel, m_horizontalSpacing, m_verticalSpacing, this);
 
+		PageList->setItemDelegate(m_itemDelegate);
+	}
 
 	PageList->resizeColumnsToContents();
 	PageList->resizeRowsToContents();
 
+	UpdateSpacing();
 }
 
 
 void CThumbnailDecoratorGuiComp::GetMenuLayout(const int count)
 {
-	m_columnsCount = m_horizontalItemsViewAttrPtr.IsValid() ? qMax(0, *m_horizontalItemsViewAttrPtr) : 0;
-	m_rowsCount = m_verticalItemsViewAttrPtr.IsValid() ? qMax(0, *m_verticalItemsViewAttrPtr) : 0;
+	if (m_columnsCount <= 0 || m_rowsCount <= 0){
+		m_columnsCount = m_horizontalItemsViewAttrPtr.IsValid() ? qMax(0, *m_horizontalItemsViewAttrPtr) : 0;
+		m_rowsCount = m_verticalItemsViewAttrPtr.IsValid() ? qMax(0, *m_verticalItemsViewAttrPtr) : 0;
+	}
 
 	bool ifOneSet = (m_columnsCount > 0) || (m_rowsCount > 0);
 	bool ifFits = ifOneSet && (m_columnsCount * m_rowsCount == count);
@@ -263,16 +284,7 @@ void CThumbnailDecoratorGuiComp::GetMenuLayout(const int count)
 void CThumbnailDecoratorGuiComp::SetLayoutProperties(const int count)
 {
 	QSize size = StartPage->size();
-	if (m_columnsCount <= 0 || m_rowsCount <= 0){
-		GetMenuLayout(count);
-	}
-	if (m_maxWidth < 0 || m_maxHeight <= 0){
-		UpdateMaxSize();
-	}
-	if (m_verticalSpacing <= 0 || m_horizontalSpacing <= 0){
-		UpdateSpacing();
-	}
-	UpdateMargins();
+	UpdateSettings(count);
 
 	static const int spacing = 10;
 	const QSize gridSize = QSize(size.width() / m_columnsCount, size.height() / m_rowsCount);
@@ -285,11 +297,37 @@ void CThumbnailDecoratorGuiComp::SetLayoutProperties(const int count)
 }
 
 
+void CThumbnailDecoratorGuiComp::UpdateSettings(const int count)
+{
+	GetMenuLayout(count);
+	UpdateSpacing();
+	UpdateMargins();
+	UpdateMaxSize();
+	UpdateMinSize();
+}
+
+
 void CThumbnailDecoratorGuiComp::UpdateSpacing()
 {
-	m_horizontalSpacing = m_horizontalSpacingAttrPtr.IsValid() ? qMax(0, *m_horizontalSpacingAttrPtr) : 15;
-	m_verticalSpacing = m_verticalSpacingAttrPtr.IsValid() ? qMax(0, *m_verticalSpacingAttrPtr) : 15;
-	//TODO check constraints
+	m_horizontalSpacing = m_horizontalSpacingAttrPtr.IsValid() ? qMax(0, *m_horizontalSpacingAttrPtr) : minSpacing;
+	m_verticalSpacing = m_verticalSpacingAttrPtr.IsValid() ? qMax(0, *m_verticalSpacingAttrPtr) : minSpacing;
+
+	//check constraints
+	QSize currentSize = PageList->size();
+	int emptySpaceH = currentSize.width() - (m_columnsCount * minItemSize.width());
+	int emptySpaceV = currentSize.height() - (m_rowsCount * minItemSize.height());
+
+	int maxPossibleSpacingH = (m_columnsCount > 1) ? (float(emptySpaceH) / (float(m_columnsCount - 1))) : -1;
+	int maxPossibleSpacingV = (m_rowsCount > 1) ? (float(emptySpaceV) / (float(m_rowsCount - 1))) : -1;
+
+	m_horizontalSpacing = (m_horizontalSpacing > maxPossibleSpacingH && maxPossibleSpacingH > 0) ?
+		maxPossibleSpacingH : m_horizontalSpacing;
+	m_verticalSpacing = (m_verticalSpacing > maxPossibleSpacingV && maxPossibleSpacingV > 0) ?
+		maxPossibleSpacingV : m_verticalSpacing;
+
+	if (m_itemDelegate != nullptr){
+		m_itemDelegate->SetMargins(m_horizontalSpacing/2, m_verticalSpacing/2);
+	}
 }
 
 
@@ -309,10 +347,24 @@ void CThumbnailDecoratorGuiComp::UpdateMargins()
 
 void CThumbnailDecoratorGuiComp::UpdateMaxSize()
 {
-	m_maxWidth = m_maximumFrameWidthAttrPtr.IsValid() ? qMax(0, *m_maximumFrameWidthAttrPtr) : 800;
-	m_maxHeight = m_maximumFrameHeightAttrPtr.IsValid() ? qMax(0, *m_maximumFrameHeightAttrPtr) : 600;
+	if (m_maxWidth < 0 || m_maxHeight <= 0){
+		m_maxWidth = m_maximumFrameWidthAttrPtr.IsValid() ? qMax(0, *m_maximumFrameWidthAttrPtr) : 800;
+		m_maxHeight = m_maximumFrameHeightAttrPtr.IsValid() ? qMax(0, *m_maximumFrameHeightAttrPtr) : 600;
+	}
 
 	PageList->setMaximumSize(QSize(m_maxWidth, m_maxHeight));
+}
+
+
+/**
+	does not perform plausibility check for variables. Should be called after all variables are set!
+*/
+void CThumbnailDecoratorGuiComp::UpdateMinSize()
+{
+	int minWidth = m_columnsCount * minItemSize.width() + (m_columnsCount - 1) * minSpacing;
+	int minHeight = m_rowsCount * minItemSize.height() + (m_rowsCount - 1) * minSpacing;
+
+	PageList->setMinimumSize(minWidth, minHeight);
 }
 
 

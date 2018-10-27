@@ -15,6 +15,8 @@
 #include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
+#include <imtgui/CThumbpageItemGuiDelegate.h>
+
 #include <GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h>
 
 
@@ -55,6 +57,9 @@ public:
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const;
 
+	//reimplemented (QObject)
+	virtual bool eventFilter(QObject *watched, QEvent *event);
+
 protected:
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated();
@@ -74,9 +79,11 @@ private:
 	*/
 	void GetMenuLayout(const int count);
 	void SetLayoutProperties(const int count);
+	void UpdateSettings(const int count);
 	void UpdateSpacing();
 	void UpdateMargins();
 	void UpdateMaxSize();
+	void UpdateMinSize();
 	void UpdateCommands();
 
 private:
@@ -123,6 +130,7 @@ private:
 	int m_verticalFrameMargin;
 	int m_maxWidth;
 	int m_maxHeight;
+	imtgui::CThumbpageItemGuiDelegate* m_itemDelegate;
 
 	I_REF(iqtgui::IGuiObject, m_pagesWidgetCompPtr);
 	I_REF(iprm::ISelectionParam, m_pageModelCompPtr);

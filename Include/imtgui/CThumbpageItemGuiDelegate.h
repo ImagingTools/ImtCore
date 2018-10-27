@@ -34,6 +34,12 @@ protected:
 	virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 	virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
+		/**
+			Margins setter function. If input parameter equals -1, corresponding margin is left untouched
+		*/
+		void SetMargins(int horizontal, int vertical);
+
+	protected:
 
 private:
 	const QStandardItemModel& m_itemModel;
