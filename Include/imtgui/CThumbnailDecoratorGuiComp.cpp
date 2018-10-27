@@ -9,6 +9,7 @@
 
 // ACF includes
 #include <iprm/IOptionsList.h>
+#include <iwidgets/iwidgets.h>
 #include <iqtgui/IMultiVisualStatusProvider.h>
 #include <iqtgui/CCommandTools.h>
 
@@ -70,8 +71,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		if (m_pagesWidgetCompPtr.IsValid()){
 			m_pagesWidgetCompPtr->CreateGui(ContentFrame);
 		}
-		m_pageModelCompPtr->SetSelectedOptionIndex(-1);
 
+		m_pageModelCompPtr->SetSelectedOptionIndex(-1);
 	}
 }
 
@@ -114,6 +115,37 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 		ItemInfo& info = m_itemInfoMap[item];
 		if (info.selectionPtr != nullptr){
 			info.selectionPtr->SetSelectedOptionIndex(info.pageIndex);
+
+			QLayout* subPageLayoutPtr = SubPageToolBarFrame->layout();
+			Q_ASSERT(subPageLayoutPtr != NULL);
+
+			iwidgets::ClearLayout(subPageLayoutPtr);
+
+			const iprm::ISelectionParam* subSelectionPtr = info.selectionPtr->GetSubselection(info.pageIndex);
+			if (subSelectionPtr != NULL){
+				const iqtgui::IMultiVisualStatusProvider* visualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(subSelectionPtr);
+				const iprm::IOptionsList* subPagesListPtr = subSelectionPtr->GetSelectionConstraints();
+				if (subPagesListPtr != NULL){
+					int subPagesCount = subPagesListPtr->GetOptionsCount();
+					for (int subPageIndex = 0; subPageIndex < subPagesCount; ++subPageIndex){
+						QString subPageName = subPagesListPtr->GetOptionName(subPageIndex);
+
+						QToolButton* subPageButton = new QToolButton(SubPageToolBarFrame);
+						subPageButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+						subPageButton->setText(subPageName);
+
+						QIcon icon;
+						const iqtgui::IVisualStatus* subPageStatusPtr = visualStatusProviderPtr->GetVisualStatus(subPageIndex);
+						if (subPageStatusPtr != NULL){
+							icon = subPageStatusPtr->GetStatusIcon();
+						}
+
+						subPageButton->setIcon(icon);
+
+						subPageLayoutPtr->addWidget(subPageButton);
+					}
+				}
+			}
 		}
 
 		if (info.pageIndex < 0){
@@ -129,7 +161,9 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 {
 	CurrentPageLabel->setText(tr("Home"));
+
 	m_pageModelCompPtr->SetSelectedOptionIndex(-1);
+
 	pagesStack->setCurrentIndex(0);
 	PageList->clearSelection();
 }
@@ -158,7 +192,7 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 	for (int itemIndex = 0; itemIndex < menuItemsCount; ++itemIndex){
 		QString itemName = itemsListPtr->GetOptionName(itemIndex);
 		if (itemName.isEmpty()){
-			itemName = "<unnamed>";
+			itemName = tr("<unnamed>");
 		}
 		QByteArray menuItemId = itemsListPtr->GetOptionId(itemIndex);
 
@@ -293,8 +327,8 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 		commandsPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_commandsProviderCompPtr->GetCommands());
 		if (commandsPtr != nullptr){
 			if (m_mainToolBar == nullptr){
-				m_mainToolBar = new QToolBar(ToolbarFrame);
-				ToolbarFrame->layout()->addWidget(m_mainToolBar);
+				m_mainToolBar = new QToolBar(CurrentPageToolBarFrame);
+				CurrentPageToolBarFrame->layout()->addWidget(m_mainToolBar);
 
 				m_mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 			}
