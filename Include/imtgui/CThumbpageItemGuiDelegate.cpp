@@ -23,7 +23,7 @@ CThumbpageItemGuiDelegate::CThumbpageItemGuiDelegate(const QStandardItemModel& i
 }
 
 
-// reimplemented (QItemDelegate/)
+// reimplemented (QItemDelegate)
 
 QSize CThumbpageItemGuiDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& /*index*/) const
 {
