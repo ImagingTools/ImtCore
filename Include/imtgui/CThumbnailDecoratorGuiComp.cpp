@@ -20,7 +20,7 @@
 namespace imtgui
 {
 
-	static const QSize minItemSize(150, 82);
+	static const QSize minItemSize(175, 90);
 	static const int minSpacing = 4;
 
 // public methods
@@ -55,7 +55,6 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 {
 	if (event->type() == QEvent::Resize){
 		UpdateSpacing();
-		OnGuiRetranslate();
 	}
 	return BaseClass::eventFilter(watched, event);
 }
@@ -81,7 +80,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		CreateItems(m_pageModelCompPtr.GetPtr());
 		pagesStack->setCurrentIndex(0);
 
-		CurrentPageLabel->setText(QString::number(pagesStack->count()));
+		CurrentPageLabel->setText(tr("Home"));
 
 		if (m_pagesWidgetCompPtr.IsValid()){
 			m_pagesWidgetCompPtr->CreateGui(ContentFrame);
@@ -180,6 +179,16 @@ void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 	CurrentPageLabel->setText(tr("Home"));
 
 	m_pageModelCompPtr->SetSelectedOptionIndex(-1);
+
+//clear subpageToolbar
+	QLayout* subToolbarLayout = SubPageToolBarFrame->layout();
+	while (QLayoutItem* item = subToolbarLayout->takeAt(0)){
+		QWidget* itemWidget = item->widget();
+		if (itemWidget != nullptr) {
+			itemWidget->deleteLater();
+		}
+		delete item;
+	}
 
 	pagesStack->setCurrentIndex(0);
 	PageList->clearSelection();
