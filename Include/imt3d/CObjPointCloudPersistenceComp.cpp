@@ -111,6 +111,8 @@ int CObjPointCloudPersistenceComp::SaveToFile(const istd::IChangeable& data, con
 
 	QFile file(filePath);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+		SendErrorMessage(0, QString("File could not be written: '%1'").arg(filePath));
+
 		return OS_FAILED;
 	}
 

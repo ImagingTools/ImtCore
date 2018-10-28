@@ -72,7 +72,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 	static const istd::IChangeable::ChangeSet commandsChangeSet(ibase::ICommandsProvider::CF_COMMANDS);
 
-	if (m_commandsProviderModelCompPtr.IsValid()) {
+	if (m_commandsProviderModelCompPtr.IsValid()){
 		m_commandsObserver.RegisterModel(m_commandsProviderModelCompPtr.GetPtr(), 0, commandsChangeSet);
 	}
 
@@ -184,7 +184,7 @@ void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 	QLayout* subToolbarLayout = SubPageToolBarFrame->layout();
 	while (QLayoutItem* item = subToolbarLayout->takeAt(0)){
 		QWidget* itemWidget = item->widget();
-		if (itemWidget != nullptr) {
+		if (itemWidget != nullptr){
 			itemWidget->deleteLater();
 		}
 		delete item;
@@ -283,9 +283,9 @@ void CThumbnailDecoratorGuiComp::GetMenuLayout(const int count)
 			m_rowsCount++;
 		}
 	}
-	else if (m_columnsCount <= 0) {
+	else if (m_columnsCount <= 0){
 		m_columnsCount = count / m_rowsCount;
-		if ((count % m_rowsCount) > 0) {
+		if ((count % m_rowsCount) > 0){
 			m_columnsCount++;
 		}
 	}
