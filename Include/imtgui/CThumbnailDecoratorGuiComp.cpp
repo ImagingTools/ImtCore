@@ -252,6 +252,8 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 	PageList->resizeColumnsToContents();
 	PageList->resizeRowsToContents();
 
+	PageList->setStyleSheet("QTableView::item::hover\n{\nbackground-color:cyan;\n}");
+
 	UpdateSpacing();
 }
 

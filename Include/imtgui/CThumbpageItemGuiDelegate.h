@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtWidgets/QItemDelegate>
+#include <QtWidgets/QStyledItemDelegate>
 #include <QtGui/QStandardItemModel>
 
 // ACF includes
@@ -15,10 +15,10 @@ namespace imtgui
 {
 
 
-class CThumbpageItemGuiDelegate : public QItemDelegate
+class CThumbpageItemGuiDelegate : public QStyledItemDelegate
 {
 public:
-	typedef QItemDelegate BaseClass;
+	typedef QStyledItemDelegate BaseClass;
 
 	enum DataRole
 	{
