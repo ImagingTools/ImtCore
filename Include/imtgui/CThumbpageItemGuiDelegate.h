@@ -7,8 +7,6 @@
 
 // ACF includes
 #include <iprm/ISelectionParam.h>
-#include <ilog/IMessageContainer.h>
-#include <iimg/IBitmap.h>
 
 
 namespace imtgui
@@ -33,9 +31,12 @@ public:
 	*/
 	void SetMargins(int horizontal, int vertical);
 
-protected:
 	// reimplemented (QItemDelegate)
 	virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& /*index*/) const override;
+
+protected:
+	// reimplemented (QItemDelegate)
+	
 	virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 	virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 

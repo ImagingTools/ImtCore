@@ -19,8 +19,6 @@
 
 namespace imtgui
 {
-
-	static const QSize minItemSize(175, 90);
 	static const int minSpacing = 4;
 
 // public methods
@@ -38,6 +36,7 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_itemDelegate(nullptr)
 {
 	m_rootCommands.InsertChild(&m_commands);
+	m_minItemSize = QSize(100, 50);
 }
 
 
@@ -181,14 +180,9 @@ void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 	m_pageModelCompPtr->SetSelectedOptionIndex(-1);
 
 //clear subpageToolbar
-	QLayout* subToolbarLayout = SubPageToolBarFrame->layout();
-	while (QLayoutItem* item = subToolbarLayout->takeAt(0)){
-		QWidget* itemWidget = item->widget();
-		if (itemWidget != nullptr){
-			itemWidget->deleteLater();
-		}
-		delete item;
-	}
+	QLayout* subPageLayoutPtr = SubPageToolBarFrame->layout();
+	Q_ASSERT(subPageLayoutPtr != NULL);
+	iwidgets::ClearLayout(subPageLayoutPtr);
 
 	pagesStack->setCurrentIndex(0);
 	PageList->clearSelection();
@@ -252,9 +246,8 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 	PageList->resizeColumnsToContents();
 	PageList->resizeRowsToContents();
 
-	PageList->setStyleSheet("QTableView::item::hover\n{\nbackground-color:cyan;\n}");
-
 	UpdateSpacing();
+	UpdateMinSize();
 }
 
 
@@ -325,8 +318,15 @@ void CThumbnailDecoratorGuiComp::UpdateSpacing()
 
 	//check constraints
 	QSize currentSize = PageList->size();
-	int emptySpaceH = currentSize.width() - (m_columnsCount * minItemSize.width());
-	int emptySpaceV = currentSize.height() - (m_rowsCount * minItemSize.height());
+
+	if (m_itemDelegate != nullptr){
+		QStyleOptionViewItem option;
+		option.font = PageList->font();
+		m_minItemSize = m_itemDelegate->sizeHint(option, QModelIndex());
+	}
+
+	int emptySpaceH = currentSize.width() - (m_columnsCount * m_minItemSize.width());
+	int emptySpaceV = currentSize.height() - (m_rowsCount * m_minItemSize.height());
 
 	int maxPossibleSpacingH = (m_columnsCount > 1) ? (float(emptySpaceH) / (float(m_columnsCount - 1))) : -1;
 	int maxPossibleSpacingV = (m_rowsCount > 1) ? (float(emptySpaceV) / (float(m_rowsCount - 1))) : -1;
@@ -372,8 +372,14 @@ void CThumbnailDecoratorGuiComp::UpdateMaxSize()
 */
 void CThumbnailDecoratorGuiComp::UpdateMinSize()
 {
-	int minWidth = m_columnsCount * minItemSize.width() + (m_columnsCount - 1) * minSpacing;
-	int minHeight = m_rowsCount * minItemSize.height() + (m_rowsCount - 1) * minSpacing;
+	if (m_itemDelegate != nullptr){
+		QStyleOptionViewItem option;
+		option.font = PageList->font();
+		m_minItemSize = m_itemDelegate->sizeHint(option, QModelIndex());
+	}
+
+	int minWidth = m_columnsCount * m_minItemSize.width() + (m_columnsCount - 1) * minSpacing;
+	int minHeight = m_rowsCount * m_minItemSize.height() + (m_rowsCount - 1) * minSpacing;
 
 	PageList->setMinimumSize(minWidth, minHeight);
 }

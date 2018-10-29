@@ -41,8 +41,7 @@ QTableView
 
 QTableView::item
 {
-	color: qpalette(background);
-	background: qpalette(background);
+	background: red;
 	font-weight: bold;
     text-align: center;
 }

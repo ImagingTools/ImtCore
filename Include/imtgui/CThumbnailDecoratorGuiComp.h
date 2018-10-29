@@ -130,6 +130,7 @@ private:
 	int m_verticalFrameMargin;
 	int m_maxWidth;
 	int m_maxHeight;
+	QSize m_minItemSize;
 	imtgui::CThumbpageItemGuiDelegate* m_itemDelegate;
 
 	I_REF(iqtgui::IGuiObject, m_pagesWidgetCompPtr);
