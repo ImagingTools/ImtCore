@@ -40,6 +40,8 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 {
 	m_rootCommands.InsertChild(&m_commands);
 	m_minItemSize = QSize(100, 50);
+	m_maxWidth = 0;
+	m_maxHeight = 0;
 }
 
 
@@ -202,14 +204,14 @@ void CThumbnailDecoratorGuiComp::on_PageTree_itemSelectionChanged()
 
 void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 {
-	CurrentPageLabel->setText(tr("Home"));
-
 	m_pageModelCompPtr->SetSelectedOptionIndex(-1);
 
 	PageStack->setCurrentIndex(0);
 	PageList->clearSelection();
 	PageTree->clear();
 	LeftFrame->setVisible(false);
+
+	CurrentPageLabel->setText(tr("Home"));
 }
 
 
@@ -442,7 +444,7 @@ void CThumbnailDecoratorGuiComp::UpdateMargins()
 
 void CThumbnailDecoratorGuiComp::UpdateMaxSize()
 {
-	if (m_maxWidth < 0 || m_maxHeight <= 0){
+	if (m_maxWidth <= 0 || m_maxHeight <= 0){
 		m_maxWidth = m_maximumFrameWidthAttrPtr.IsValid() ? qMax(0, *m_maximumFrameWidthAttrPtr) : 800;
 		m_maxHeight = m_maximumFrameHeightAttrPtr.IsValid() ? qMax(0, *m_maximumFrameHeightAttrPtr) : 600;
 	}

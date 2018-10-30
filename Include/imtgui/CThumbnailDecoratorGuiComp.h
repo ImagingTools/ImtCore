@@ -129,7 +129,8 @@ private:
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_commands;
-	int m_columnsCount, m_rowsCount;
+	int m_columnsCount;
+	int m_rowsCount;
 	int m_horizontalSpacing;
 	int m_verticalSpacing;
 	int m_horizontalFrameMargin;
