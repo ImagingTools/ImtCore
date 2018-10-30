@@ -19,7 +19,10 @@
 
 namespace imtgui
 {
-	static const int minSpacing = 4;
+
+
+static const int s_minSpacing = 4;
+
 
 // public methods
 
@@ -68,6 +71,9 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	BaseClass::OnGuiCreated();
 
 	m_itemInfoMap.clear();
+	m_menuItemInfoMap.clear();
+
+	LeftFrame->setVisible(false);
 
 	static const istd::IChangeable::ChangeSet commandsChangeSet(ibase::ICommandsProvider::CF_COMMANDS);
 
@@ -77,7 +83,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 	if (m_pageModelCompPtr.IsValid()){
 		CreateItems(m_pageModelCompPtr.GetPtr());
-		pagesStack->setCurrentIndex(0);
+		PageStack->setCurrentIndex(0);
 
 		CurrentPageLabel->setText(tr("Home"));
 
@@ -112,8 +118,10 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 
 void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 {
+	PageTree->clear();
 	CurrentPageLabel->clear();
-	const int pageCount = pagesStack->count();
+
+	const int pageCount = PageStack->count();
 
 	QStandardItem* item = m_menuItemModel.itemFromIndex(index);
 	bool pageExists = (item == nullptr) ? (false) : (item->data(CThumbpageItemGuiDelegate::DR_PAGE_ID).isValid());
@@ -131,44 +139,63 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 		if (info.selectionPtr != nullptr){
 			info.selectionPtr->SetSelectedOptionIndex(info.pageIndex);
 
-			QLayout* subPageLayoutPtr = SubPageToolBarFrame->layout();
-			Q_ASSERT(subPageLayoutPtr != NULL);
-
-			iwidgets::ClearLayout(subPageLayoutPtr);
-
 			const iprm::ISelectionParam* subSelectionPtr = info.selectionPtr->GetSubselection(info.pageIndex);
 			if (subSelectionPtr != NULL){
-				const iqtgui::IMultiVisualStatusProvider* visualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(subSelectionPtr);
-				const iprm::IOptionsList* subPagesListPtr = subSelectionPtr->GetSelectionConstraints();
-				if (subPagesListPtr != NULL){
-					int subPagesCount = subPagesListPtr->GetOptionsCount();
-					for (int subPageIndex = 0; subPageIndex < subPagesCount; ++subPageIndex){
-						QString subPageName = subPagesListPtr->GetOptionName(subPageIndex);
-
-						QToolButton* subPageButton = new QToolButton(SubPageToolBarFrame);
-						subPageButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-						subPageButton->setText(subPageName);
-
-						QIcon icon;
-						const iqtgui::IVisualStatus* subPageStatusPtr = visualStatusProviderPtr->GetVisualStatus(subPageIndex);
-						if (subPageStatusPtr != NULL){
-							icon = subPageStatusPtr->GetStatusIcon();
-						}
-
-						subPageButton->setIcon(icon);
-
-						subPageLayoutPtr->addWidget(subPageButton);
-					}
-				}
+				CreateMenu(subSelectionPtr, NULL);
 			}
 		}
 
 		if (info.pageIndex < 0){
-			pagesStack->setCurrentIndex(0);
+			PageStack->setCurrentIndex(0);
 		}
 		else{
-			pagesStack->setCurrentIndex(1);
+			PageStack->setCurrentIndex(1);
 		}
+	}
+}
+
+
+void CThumbnailDecoratorGuiComp::on_FullScreenButton_toggled(bool isToggled)
+{
+	if (!isToggled){
+		GetWidget()->showNormal();
+	}
+	else{
+		GetWidget()->showFullScreen();
+	}
+}
+
+
+void CThumbnailDecoratorGuiComp::on_PageTree_itemSelectionChanged()
+{
+	CurrentPageLabel->clear();
+
+	QList<QTreeWidgetItem*> selectedItems = PageTree->selectedItems();
+	if (!selectedItems.isEmpty()){
+		QTreeWidgetItem* selectedItemPtr = selectedItems[0];
+		QTreeWidgetItem* parentItemPtr = selectedItemPtr->parent();
+
+		while (parentItemPtr != nullptr){
+			if (m_menuItemInfoMap.contains(parentItemPtr)){
+				ItemInfo& info = m_menuItemInfoMap[parentItemPtr];
+
+				if (info.selectionPtr != nullptr){
+					info.selectionPtr->SetSelectedOptionIndex(info.pageIndex);
+				}
+			}
+
+			parentItemPtr = parentItemPtr->parent();
+		}
+
+		if (m_menuItemInfoMap.contains(selectedItemPtr)){
+			ItemInfo& info = m_menuItemInfoMap[selectedItemPtr];
+
+			if (info.selectionPtr != nullptr){
+				info.selectionPtr->SetSelectedOptionIndex(info.pageIndex);
+			}
+		}
+
+		CurrentPageLabel->setText(selectedItemPtr->text(0));
 	}
 }
 
@@ -179,13 +206,10 @@ void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 
 	m_pageModelCompPtr->SetSelectedOptionIndex(-1);
 
-//clear subpageToolbar
-	QLayout* subPageLayoutPtr = SubPageToolBarFrame->layout();
-	Q_ASSERT(subPageLayoutPtr != NULL);
-	iwidgets::ClearLayout(subPageLayoutPtr);
-
-	pagesStack->setCurrentIndex(0);
+	PageStack->setCurrentIndex(0);
 	PageList->clearSelection();
+	PageTree->clear();
+	LeftFrame->setVisible(false);
 }
 
 
@@ -204,7 +228,6 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 
 	SetLayoutProperties(menuItemsCount);
 
-	//Q_ASSERT((rowsCount * colsCount) == menuItemsCount);
 	m_menuItemModel.setRowCount(m_rowsCount);
 	m_menuItemModel.setColumnCount(m_columnsCount);
 	m_menuItemModel.setParent(this);
@@ -249,6 +272,67 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 	UpdateSpacing();
 	UpdateMinSize();
 }
+
+
+void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selectionPtr, QTreeWidgetItem* parentItemPtr)
+{
+	PageTree->clear();
+
+	if (selectionPtr == nullptr){
+		return;
+	}
+
+	const iqtgui::IMultiVisualStatusProvider* visualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(selectionPtr);
+
+	const iprm::IOptionsList* pageListPtr = selectionPtr->GetSelectionConstraints();
+	int pagesCount = pageListPtr->GetOptionsCount();
+
+	int selectedIndex = selectionPtr->GetSelectedOptionIndex();
+
+	for (int pageIndex = 0; pageIndex < pagesCount; ++pageIndex){
+		QString pageName = pageListPtr->GetOptionName(pageIndex);
+		if (pageName.isEmpty()){
+			continue;
+		}
+
+		QByteArray pageId = pageListPtr->GetOptionId(pageIndex);
+
+		QTreeWidgetItem* pageItem = new QTreeWidgetItem;
+		pageItem->setText(0, pageName);
+		pageItem->setData(0, CThumbpageItemGuiDelegate::DR_PAGE_ID, pageId);
+
+		if (visualStatusProviderPtr != nullptr){
+			const iqtgui::IVisualStatus* statusPtr = visualStatusProviderPtr->GetVisualStatus(pageIndex);
+			if (statusPtr != nullptr){
+				pageItem->setIcon(0, statusPtr->GetStatusIcon());
+			}
+		}
+
+		ItemInfo itemInfo;
+		itemInfo.pageIndex = pageIndex;
+		itemInfo.selectionPtr = const_cast<iprm::ISelectionParam*>(selectionPtr);
+		m_menuItemInfoMap[pageItem] = itemInfo;
+
+		if (parentItemPtr == nullptr){
+			PageTree->addTopLevelItem(pageItem);
+		}
+		else {
+			parentItemPtr->addChild(pageItem);
+		}
+
+		if ((parentItemPtr == nullptr) && (pageIndex == selectedIndex)){
+			pageItem->setSelected(true);
+		}
+
+		iprm::ISelectionParam* subSelectionPtr = selectionPtr->GetSubselection(pageIndex);
+		if (subSelectionPtr != nullptr){
+			CreateMenu(subSelectionPtr, pageItem);
+		}
+	}
+
+	LeftFrame->setVisible(PageTree->topLevelItemCount() > 0);
+}
+
 
 
 void CThumbnailDecoratorGuiComp::GetMenuLayout(const int count)
@@ -313,8 +397,8 @@ void CThumbnailDecoratorGuiComp::UpdateSettings(const int count)
 
 void CThumbnailDecoratorGuiComp::UpdateSpacing()
 {
-	m_horizontalSpacing = m_horizontalSpacingAttrPtr.IsValid() ? qMax(0, *m_horizontalSpacingAttrPtr) : minSpacing;
-	m_verticalSpacing = m_verticalSpacingAttrPtr.IsValid() ? qMax(0, *m_verticalSpacingAttrPtr) : minSpacing;
+	m_horizontalSpacing = m_horizontalSpacingAttrPtr.IsValid() ? qMax(0, *m_horizontalSpacingAttrPtr) : s_minSpacing;
+	m_verticalSpacing = m_verticalSpacingAttrPtr.IsValid() ? qMax(0, *m_verticalSpacingAttrPtr) : s_minSpacing;
 
 	//check constraints
 	QSize currentSize = PageList->size();
@@ -378,8 +462,8 @@ void CThumbnailDecoratorGuiComp::UpdateMinSize()
 		m_minItemSize = m_itemDelegate->sizeHint(option, QModelIndex());
 	}
 
-	int minWidth = m_columnsCount * m_minItemSize.width() + (m_columnsCount - 1) * minSpacing;
-	int minHeight = m_rowsCount * m_minItemSize.height() + (m_rowsCount - 1) * minSpacing;
+	int minWidth = m_columnsCount * m_minItemSize.width() + (m_columnsCount - 1) * s_minSpacing;
+	int minHeight = m_rowsCount * m_minItemSize.height() + (m_rowsCount - 1) * s_minSpacing;
 
 	PageList->setMinimumSize(minWidth, minHeight);
 }

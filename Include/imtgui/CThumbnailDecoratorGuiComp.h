@@ -4,8 +4,8 @@
 // Qt includes
 #include <QtCore/QMap>
 #include <QtWidgets/QListView>
-#include <QStandardItemModel>
-#include <QStandardItem>
+#include <QtGui/QStandardItemModel>
+#include <QtGui/QStandardItem>
 
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>
@@ -16,7 +16,6 @@
 
 // ImtCore includes
 #include <imtgui/CThumbpageItemGuiDelegate.h>
-
 #include <GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h>
 
 
@@ -48,8 +47,8 @@ public:
 		I_ASSIGN(m_verticalSpacingAttrPtr, "VerticalSpacing", "Vertical spacing of items on view", false, 6);
 		I_ASSIGN(m_horizontalFrameMarginAttrPtr, "HorizontalFrameMargin", "Horizontal (left&right) side margin of thumbnail frame", false, 6);
 		I_ASSIGN(m_verticalFrameMarginAttrPtr, "VerticalFrameMargin", "Vertical (top&bottom) side margin of thumbnail frame", false, 6);
-		I_ASSIGN(m_maximumFrameWidthAttrPtr, "MaximumFrameWidth", "Maximum width of thumbnail frame", false, 800);
-		I_ASSIGN(m_maximumFrameHeightAttrPtr, "MaximumFrameHeight", "Maximum height of thumbnail frame", false, 600);
+		I_ASSIGN(m_maximumFrameWidthAttrPtr, "MaximumFrameWidth", "Maximum width of thumbnail frame", false, 320);
+		I_ASSIGN(m_maximumFrameHeightAttrPtr, "MaximumFrameHeight", "Maximum height of thumbnail frame", false, 240);
 	I_END_COMPONENT;
 
 	CThumbnailDecoratorGuiComp();
@@ -68,10 +67,14 @@ protected:
 
 private Q_SLOTS:
 	void on_PageList_clicked(const QModelIndex& index);
+	void on_FullScreenButton_toggled(bool isToggled);
+	void on_PageTree_itemSelectionChanged();
 	void on_HomeButton_clicked();
 
 private:
 	void CreateItems(const iprm::ISelectionParam* selectionPtr);
+	void CreateMenu(const iprm::ISelectionParam* selectionPtr, QTreeWidgetItem* parentItemPtr);
+
 	/**
 		calculates layout of page thumbnails based on m_horizontalItemsViewAttrPtr and m_verticalItemsViewAttrPtr
 		if the attributes are not set, or set incorrectly, the dimentions close to sqrt(totalcounr) are taken with
@@ -101,6 +104,9 @@ private:
 
 	typedef QMap<QStandardItem*, ItemInfo> ItemInfoMap;
 	ItemInfoMap m_itemInfoMap;
+
+	typedef QMap<QTreeWidgetItem*, ItemInfo> MenuItemInfoMap;
+	MenuItemInfoMap m_menuItemInfoMap;
 
 	class CommandsObserver: public imod::CMultiModelDispatcherBase
 	{
