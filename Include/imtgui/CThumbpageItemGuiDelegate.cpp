@@ -7,14 +7,14 @@
 #include <QtWidgets/QApplication>
 
 
-
 namespace imtgui
 {
 
-	static int maxCharacterCount = 12;
-	static int fontSize = 24;
-	static int minIconSize = 24;
-	static const int minPadding = 7;
+
+static const int s_maxCharacterCount = 15;
+static const int s_fontSize = 24;
+static const int s_minIconSize = 32;
+static const int s_minPadding = 7;
 
 
 // public methods
@@ -40,10 +40,11 @@ void CThumbpageItemGuiDelegate::SetMargins(int horizontal, int vertical)
 QSize CThumbpageItemGuiDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& /*index*/) const
 {
 	QFont font = option.font;
-	font.setPointSize(fontSize);
+	font.setPointSize(s_fontSize);
 	QFontMetrics fm(font);
-	int minHeight = fm.height() + fm.lineSpacing() + minIconSize + 2* minPadding;
-	int minWidth = fm.averageCharWidth() * (maxCharacterCount+1);
+
+	int minHeight = fm.height() + fm.lineSpacing() + s_minIconSize + 2 * s_minPadding;
+	int minWidth = fm.averageCharWidth() * (s_maxCharacterCount + 1);
 	if (option.rect.width() < minWidth || option.rect.height() < minHeight){
 		return QSize(minWidth, minHeight);
 	}
@@ -79,11 +80,11 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 
 	QRect drawArea = QRect(mainRect.left() + m_horizontalMargin, mainRect.top() + m_verticalMargin, mainRect.width() - 2*m_horizontalMargin, mainRect.height() - 2*m_verticalMargin);
 
-	int iconPosVCenter = int(float(drawArea.height()) / 3 - minPadding);
-	int iconSize = int(float(drawArea.height()) / 2 - minPadding);
+	int iconPosVCenter = int(float(drawArea.height()) / 3 - s_minPadding);
+	int iconSize = int(float(drawArea.height()) / 2 - s_minPadding);
 	int textAreaTop = 2 * iconPosVCenter;
-	int textAreaHeight = (drawArea.height() - 2*minPadding) - textAreaTop;
-	int widthAvailable = drawArea.width() - 2 * minPadding;
+	int textAreaHeight = (drawArea.height() - 2 * s_minPadding) - textAreaTop;
+	int widthAvailable = drawArea.width() - 2 * s_minPadding;
 
 	iconSize = qMin(iconSize, widthAvailable);
 
@@ -93,16 +94,16 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	button.palette = option.palette;
 
 	int iconRectLeft = drawArea.left() + (drawArea.width() - iconSize) / 2;
-	QRect iconRect(iconRectLeft, drawArea.top() + minPadding + (textAreaTop - iconSize)/2, iconSize, iconSize);
+	QRect iconRect(iconRectLeft, drawArea.top() + s_minPadding + (textAreaTop - iconSize)/2, iconSize, iconSize);
 	QPixmap itemPixmap = itemIcon.pixmap(QSize(iconRect.width(), iconRect.height()));
 
-	int textRectTop = drawArea.top() + textAreaTop + minPadding;
-	QRect textRect(drawArea.left() + minPadding, textRectTop, drawArea.width() - 2 * minPadding, textAreaHeight);
+	int textRectTop = drawArea.top() + textAreaTop + s_minPadding;
+	QRect textRect(drawArea.left() + s_minPadding, textRectTop, drawArea.width() - 2 * s_minPadding, textAreaHeight);
 
 	if (option.state & QStyle::State_Selected){
-		// move textRect & iconRect right and down as if pressed
-		iconRect.adjust(minPadding, minPadding, 0, 0);
-		textRect.adjust(minPadding, minPadding, 0, 0);
+		// Move textRect & iconRect right and down as if pressed:
+		iconRect.adjust(s_minPadding, s_minPadding, 0, 0);
+		textRect.adjust(s_minPadding, s_minPadding, 0, 0);
 	}
 
 	QStyle* appStylePtr = QApplication::style();
@@ -110,7 +111,7 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 
 	appStylePtr->drawControl(QStyle::CE_PushButton, &button, painter);
 	painter->drawPixmap(iconRect, itemPixmap);
-	painter->drawText(textRect, Qt::AlignCenter /* | Qt::AlignVCenter*/, itemPtr->text());
+	painter->drawText(textRect, Qt::AlignCenter, itemPtr->text());
 
 	if ((option.state & QStyle::State_MouseOver)){
 		QColor curtainColor(255, 255, 255, 70);
