@@ -137,7 +137,11 @@ bool CPointCloud3d::CopyFrom(const istd::IChangeable &object, istd::IChangeable:
 {
 	const CPointCloud3d* objectPtr = dynamic_cast<const CPointCloud3d*>(&object);
 	if (objectPtr != NULL){
+		istd::CChangeNotifier changeNotifier(this);
+
 		m_cloudPoints = objectPtr->m_cloudPoints;
+
+		return true;
 	}
 
 	return false;
