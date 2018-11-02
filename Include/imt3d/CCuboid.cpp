@@ -36,17 +36,20 @@ CCuboid CCuboid::FromCloudPoints(const CloudPoints& cloudPoints)
 		for (CloudPoints::const_iterator pointIter = cloudPoints.constBegin(); pointIter != cloudPoints.constEnd(); pointIter++){
 			if ((pointIter->GetX() > right)){
 				right = pointIter->GetX();
-			} else if ((pointIter->GetX() < left)){
+			}
+			else if ((pointIter->GetX() < left)){
 				left = pointIter->GetX();
 			}
 			if ((pointIter->GetY() > top)){
 				top = pointIter->GetY();
-			} else if ((pointIter->GetY() < bottom)){
+			}
+			else if ((pointIter->GetY() < bottom)){
 				bottom = pointIter->GetY();
 			}
 			if ((pointIter->GetZ() > near)){
 				near = pointIter->GetZ();
-			} else if ((pointIter->GetZ() < far)){
+			}
+			else if ((pointIter->GetZ() < far)){
 				far = pointIter->GetZ();
 			}
 		}
