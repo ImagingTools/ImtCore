@@ -73,7 +73,9 @@ void CPointCloud3d::MoveCenterTo(const i3d::CVector3d &position)
 		istd::CChangeNotifier notifier(this);
 
 		i3d::CVector3d delta = position - center;
-		for (CloudPoints::iterator pointIter = m_cloudPoints.begin(); pointIter != m_cloudPoints.end(); pointIter++){
+		for (		CloudPoints::iterator pointIter = m_cloudPoints.begin();
+					pointIter != m_cloudPoints.end();
+					pointIter++){
 			pointIter->SetX(pointIter->GetX() + delta.GetX());
 			pointIter->SetY(pointIter->GetY() + delta.GetY());
 			pointIter->SetZ(pointIter->GetZ() + delta.GetZ());
