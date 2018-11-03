@@ -68,6 +68,8 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 
 	QTextStream stream(&file);
 
+	imt3d::CloudPoints cloudPoints;
+
 	while (!stream.atEnd()){
 		QString line = stream.readLine();
 
@@ -91,10 +93,12 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 					continue;
 				}
 
-				documentPtr->AddPoint(i3d::CVector3d(x, y, z));
+				cloudPoints.push_back(i3d::CVector3d(x, y, z));
 			}
 		}
 	}
+
+	documentPtr->CreateCloud(cloudPoints);
 
 	file.close();
 

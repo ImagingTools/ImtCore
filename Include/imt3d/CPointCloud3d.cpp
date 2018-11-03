@@ -148,6 +148,16 @@ bool CPointCloud3d::CopyFrom(const istd::IChangeable &object, istd::IChangeable:
 }
 
 
+bool CPointCloud3d::ResetData(CompatibilityMode /*mode*/)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_cloudPoints.clear();
+
+	return true;
+}
+
+
 // static methods
 
 IPointCloud3d::PointCloudPtr CPointCloud3d::FromImage(iimg::IRasterImage &image, istd::CIndex2d& size, double step)
