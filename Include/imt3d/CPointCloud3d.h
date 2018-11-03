@@ -28,19 +28,19 @@ public:
 
 	// reimplemented (IPointCloud3d)
 	virtual void CreateCloud(const imt3d::CloudPoints &points);
-	virtual const CloudPoints& GetPoints() const Q_DECL_OVERRIDE;
+	virtual const CloudPoints& GetPoints() const override;
 
 	// reimplemented (IObject3d)
-	virtual bool IsEmpty() const Q_DECL_OVERRIDE;
-	virtual i3d::CVector3d GetCenter() const Q_DECL_OVERRIDE;
-	virtual void MoveCenterTo(const i3d::CVector3d& position) Q_DECL_OVERRIDE;
-	virtual const CCuboid& GetBoundingCuboid() const Q_DECL_OVERRIDE;
+	virtual bool IsEmpty() const override;
+	virtual i3d::CVector3d GetCenter() const override;
+	virtual void MoveCenterTo(const i3d::CVector3d& position) override;
+	virtual const CCuboid& GetBoundingCuboid() const override;
 
 	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive) Q_DECL_OVERRIDE;
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented (istd::IChangeable)
-	virtual bool CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode) Q_DECL_OVERRIDE;
+	virtual bool CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode) override;
 
 	// static methods
 	/*
