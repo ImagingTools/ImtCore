@@ -13,6 +13,7 @@
 #include <ibase/ICommandsProvider.h>
 #include <iprm/ISelectionParam.h>
 #include <iqtgui/CHierarchicalCommand.h>
+#include <iqtgui/TRestorableGuiWrap.h>
 
 // ImtCore includes
 #include <imtgui/CThumbpageItemGuiDelegate.h>
@@ -27,13 +28,14 @@ namespace imtgui
 
 
 class CThumbnailDecoratorGuiComp:
-			public iqtgui::TDesignerGuiCompBase<Ui::CThumbnailDecoratorGuiComp>,
+			public iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<Ui::CThumbnailDecoratorGuiComp>>,
 			public virtual ibase::ICommandsProvider
 {
 	Q_OBJECT
 
 public:
-	typedef iqtgui::TDesignerGuiCompBase<Ui::CThumbnailDecoratorGuiComp> BaseClass;
+	typedef iqtgui::TRestorableGuiWrap<
+				iqtgui::TDesignerGuiCompBase<Ui::CThumbnailDecoratorGuiComp>> BaseClass;
 
 	I_BEGIN_COMPONENT(CThumbnailDecoratorGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
@@ -60,6 +62,10 @@ public:
 	virtual bool eventFilter(QObject *watched, QEvent *event);
 
 protected:
+	// reimplemented (iqtgui::TRestorableGuiWrap)
+	virtual void OnRestoreSettings(const QSettings& settings) override;
+	virtual void OnSaveSettings(QSettings& settings) const override;
+
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated();
 	virtual void OnGuiDestroyed();

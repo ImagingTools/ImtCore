@@ -66,11 +66,36 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 
 // protected methods
 
+// reimplemented (iqtgui::TRestorableGuiWrap)
+
+void CThumbnailDecoratorGuiComp::OnRestoreSettings(const QSettings& settings)
+{
+	bool isFullscreen = settings.value("IsFullScreenEnabled").toBool();
+
+	FullScreenButton->setChecked(isFullscreen);
+}
+
+
+void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& settings) const
+{
+	bool isFullscreen = FullScreenButton->isChecked();
+
+	settings.setValue("IsFullScreenEnabled", isFullscreen);
+}
+
+
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CThumbnailDecoratorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
+
+	QWidget* widgetPtr = GetWidget();
+	Q_ASSERT(widgetPtr != NULL);
+
+	if (widgetPtr->isFullScreen()){
+		FullScreenButton->setChecked(true);
+	}
 
 	m_itemInfoMap.clear();
 	m_menuItemInfoMap.clear();
