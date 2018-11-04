@@ -14,9 +14,20 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget#TopFrame
+   <string notr="true">QToolBar &gt; QToolButton
 {
-background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+	min-width: 3em;
+}
+
+QToolBar
+{
+	qproperty-iconSize: 24px;
+}
+
+
+QWidget#TopFrame
+{
+	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                  stop: 0 rgb(235,235,238), stop: 0.9 rgb(220,220,223),
                                  stop: 0.97 rgb(220,220,223), stop: 1.0 rgb(190,190,193));
 	border-bottom: 1px solid  rgb(170,170,170);
@@ -161,8 +172,8 @@ QAbstractItemView
         </property>
         <property name="iconSize">
          <size>
-          <width>32</width>
-          <height>32</height>
+          <width>40</width>
+          <height>40</height>
          </size>
         </property>
         <property name="checkable">
@@ -189,9 +200,6 @@ QAbstractItemView
           <family>Lucida Sans Unicode</family>
           <pointsize>23</pointsize>
          </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
         </property>
         <property name="text">
          <string>Home</string>
@@ -265,8 +273,8 @@ QAbstractItemView
         </property>
         <property name="iconSize">
          <size>
-          <width>32</width>
-          <height>32</height>
+          <width>40</width>
+          <height>40</height>
          </size>
         </property>
         <property name="shortcut">
@@ -427,9 +435,6 @@ QAbstractItemView
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="autoFillBackground">
-                <bool>false</bool>
-               </property>
                <property name="frameShape">
                 <enum>QFrame::NoFrame</enum>
                </property>
@@ -491,15 +496,6 @@ QAbstractItemView
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="autoFillBackground">
-                   <bool>false</bool>
                   </property>
                   <property name="frameShape">
                    <enum>QFrame::NoFrame</enum>
