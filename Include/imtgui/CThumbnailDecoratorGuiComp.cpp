@@ -21,7 +21,7 @@ namespace imtgui
 {
 
 
-static const int s_minSpacing = 4;
+static const int s_minSpacing = 10;
 
 
 // public methods
@@ -148,7 +148,7 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 	PageTree->clear();
 	CurrentPageLabel->clear();
 
-	const int pageCount = PageStack->count();
+	int pageCount = PageStack->count();
 
 	QStandardItem* item = m_menuItemModel.itemFromIndex(index);
 	bool pageExists = (item == nullptr) ? (false) : (item->data(CThumbpageItemGuiDelegate::DR_PAGE_ID).isValid());
@@ -158,7 +158,7 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 		return;
 	}
 
-	const QString itemName = item->text();
+	QString itemName = item->text();
 	CurrentPageLabel->setText(itemName);
 
 	if (m_itemInfoMap.contains(item)){
