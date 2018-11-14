@@ -37,6 +37,13 @@ void CThumbpageItemGuiDelegate::SetMargins(int horizontal, int vertical)
 
 // reimplemented (QItemDelegate/)
 
+QSize CThumbpageItemGuiDelegate::minimumSizeHint() const
+{
+	QStyleOptionViewItem option;
+	return sizeHint(option, QModelIndex());
+}
+
+
 QSize CThumbpageItemGuiDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& /*index*/) const
 {
 	QFont font = option.font;

@@ -32,6 +32,7 @@ public:
 	void SetMargins(int horizontal, int vertical);
 
 	// reimplemented (QItemDelegate)
+	virtual QSize minimumSizeHint() const override;
 	virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& /*index*/) const override;
 
 protected:
