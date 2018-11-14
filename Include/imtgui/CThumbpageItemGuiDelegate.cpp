@@ -37,13 +37,6 @@ void CThumbpageItemGuiDelegate::SetMargins(int horizontal, int vertical)
 
 // reimplemented (QItemDelegate/)
 
-QSize CThumbpageItemGuiDelegate::minimumSizeHint() const
-{
-	QStyleOptionViewItem option;
-	return sizeHint(option, QModelIndex());
-}
-
-
 QSize CThumbpageItemGuiDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& /*index*/) const
 {
 	QFont font = option.font;
@@ -91,9 +84,9 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	int iconSize = int(float(drawArea.height()) / 2 - s_minPadding);
 	int textAreaTop = 2 * iconPosVCenter;
 	int textAreaHeight = (drawArea.height() - 2 * s_minPadding) - textAreaTop;
-	int widthAvailable = drawArea.width() - 2 * s_minPadding;
+	int availableWidth = drawArea.width() - 2 * s_minPadding;
 
-	iconSize = qMin(iconSize, widthAvailable);
+	iconSize = qMin(iconSize, availableWidth);
 
 	QStyleOptionButton button;
 	button.rect = drawArea;

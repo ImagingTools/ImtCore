@@ -297,7 +297,7 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 	PageList->resizeRowsToContents();
 
 	UpdateSpacing();
-	//UpdateMinSize();
+	UpdateMinSize();
 }
 
 
@@ -418,7 +418,7 @@ void CThumbnailDecoratorGuiComp::UpdateSettings(const int count)
 	UpdateSpacing();
 	UpdateMargins();
 	UpdateMaxSize();
-	//UpdateMinSize();
+	UpdateMinSize();
 }
 
 

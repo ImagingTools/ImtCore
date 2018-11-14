@@ -27,12 +27,11 @@ public:
 	CThumbpageItemGuiDelegate(const QStandardItemModel& itemModel, const int horizontalSpacing = 6, const int verticalSpacing = 6, QObject* parent = NULL);
 	
 	/**
-		Margins setter function. If input parameter equals -1, corresponding margin is left untouched
+		Margins setter function. If any input parameter is -1, corresponding margin is left untouched
 	*/
 	void SetMargins(int horizontal, int vertical);
 
 	// reimplemented (QItemDelegate)
-	virtual QSize minimumSizeHint() const override;
 	virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& /*index*/) const override;
 
 protected:
