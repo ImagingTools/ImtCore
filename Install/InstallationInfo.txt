@@ -1,0 +1,4 @@
+Installation creation time: $AcfTimestamp$
+ACF-Solutions Version: $AcfVersion:1$ ($AcfRawVersion:1$)
+Based on ACF Version: $AcfVersion:0$ ($AcfRawVersion:0$)
+Compiler code: $CompilerName$

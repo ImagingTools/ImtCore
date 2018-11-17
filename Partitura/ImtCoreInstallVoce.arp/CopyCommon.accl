@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4736" Description="ACF"/>
+            <Version Id="1" Number="2017" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330497" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CopyAllFiles" X="150" Y="300" Note=""/>
+        <Element ComponentName="CopyConfig" X="1050" Y="100" Note=""/>
+        <Element ComponentName="CopyDocs" X="800" Y="650" Note=""/>
+        <Element ComponentName="CopyImpl" X="550" Y="400" Note=""/>
+        <Element ComponentName="CopyIncludes" X="450" Y="525" Note=""/>
+        <Element ComponentName="CopyInstallInfo" X="825" Y="200" Note=""/>
+        <Element ComponentName="CopyLicenses" X="925" Y="525" Note=""/>
+        <Element ComponentName="CopyPartitura" X="1050" Y="400" Note=""/>
+        <Element ComponentName="CopyRoot" X="350" Y="650" Note=""/>
+        <Element ComponentName="CopyTexts" X="700" Y="775" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

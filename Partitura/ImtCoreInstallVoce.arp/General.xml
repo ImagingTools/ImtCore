@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<Acf>
+  <AcfHeader>
+    <VersionInfos count="1">
+      <Version>
+        <Id>
+          0
+        </Id>
+        <Number>
+          1486
+        </Number>
+        <Description>
+          ACF
+        </Description>
+      </Version>
+    </VersionInfos>
+  </AcfHeader>
+  <Description>
+		Installation-related component package
+	</Description>
+  <Keywords>
+    Installation Tag='Install' Company='ImagingTools GmbH' Project='Core Framework' Author='"Kirill Lepskiy"'
+  </Keywords>
+</Acf>

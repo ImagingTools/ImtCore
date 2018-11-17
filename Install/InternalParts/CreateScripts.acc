@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4054" Description="ACF"/>
+            <Version Id="1" Number="1505" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="328706" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="Application" PackageId="InstallVoce" ComponentId="ComplexCopyApplication">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="ACF-Solutions"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FileCopiers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CopyScriptFiles</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="ACF-Solutions"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="VersionInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CopyScriptFiles" PackageId="InstallVoce" ComponentId="CopyInfoProcessor">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Application/ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Filters" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Doxyfile</Value>
+                                <Value>*.iss</Value>
+                                <Value>Commit.log</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Application/Log"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ReplaceEmbeddedVariables" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ReplaceEnvironmentVariables" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubstitutionTagExpr" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="\$(.+)\$"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="VersionInfo" PackageId="AcfSlnVoce" ComponentId="VersionInfo">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="ibase::IApplication" ComponentId="Application"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Application"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

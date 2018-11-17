@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QLinkedList>
-
 // Acf includes
 #include <i3d/CVector3d.h>
 #include <istd/TSmartPtr.h>
