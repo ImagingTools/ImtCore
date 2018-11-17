@@ -16,7 +16,7 @@
   <property name="styleSheet">
    <string notr="true">QToolBar &gt; QToolButton
 {
-	min-width: 3em;
+	min-width: 4em;
 }
 
 QToolBar
