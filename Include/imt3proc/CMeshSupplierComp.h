@@ -10,7 +10,7 @@
 #include <imt3d/CMesh3d.h>
 
 
-namespace imt3dalgo
+namespace imt3proc
 {
 
 
@@ -52,6 +52,6 @@ private:
 };
 
 
-} // namespace imt3dalgo
+} // namespace imt3proc
 
 

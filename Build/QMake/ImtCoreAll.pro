@@ -7,8 +7,8 @@ imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
 SUBDIRS += imt3d
 imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
 
-SUBDIRS += imt3dalgo
-imt3dalgo.file = ../../Include/imt3dalgo/QMake/imt3dalgo.pro
+SUBDIRS += imt3proc
+imt3proc.file = ../../Include/imt3proc/QMake/imt3proc.pro
 
 SUBDIRS += imtgui
 imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
@@ -23,10 +23,10 @@ ImtCoreLoc.file = ../../Impl/ImtCoreLoc/QMake/ImtCoreLoc.pro
 
 SUBDIRS += ImtAlgoPck
 ImtAlgoPck.file = ../../Impl/ImtAlgoPck/QMake/ImtAlgoPck.pro
-ImtAlgoPck.depends = imt3d imt3dalgo
+ImtAlgoPck.depends = imt3d imt3proc
 
 SUBDIRS += ImtGuiPck
 ImtGuiPck.file = ../../Impl/ImtGuiPck/QMake/ImtGuiPck.pro
-ImtGuiPck.depends = imt3d imt3dalgo imtgui
+ImtGuiPck.depends = imt3d imt3proc imtgui
 
 

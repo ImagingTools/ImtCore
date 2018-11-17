@@ -7,10 +7,10 @@
 	This package depends on:
 	\li imt3d
 */
-namespace imt3dalgo
+namespace imt3proc
 {
 
 
-} // namespace imt3dalgo
+} // namespace imt3proc
 
 

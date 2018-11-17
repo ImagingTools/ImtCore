@@ -6,9 +6,9 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtAlgo includes
-#include <imt3dalgo/CMeshSupplierComp.h>
-#include <imt3dalgo/CHeadExtractorSupplierComp.h>
-#include <imt3dalgo/CForeheadExtractorSupplierComp.h>
+#include <imt3proc/CMeshSupplierComp.h>
+#include <imt3proc/CHeadExtractorSupplierComp.h>
+#include <imt3proc/CForeheadExtractorSupplierComp.h>
 
 
 /**
@@ -18,9 +18,9 @@ namespace ImtAlgoPck
 {
 
 
-typedef icomp::TModelCompWrap<imt3dalgo::CMeshSupplierComp> MeshSupplier;
-typedef icomp::TModelCompWrap<imt3dalgo::CHeadExtractorSupplierComp> HeadSupplier;
-typedef icomp::TModelCompWrap<imt3dalgo::CForeheadExtractorSupplierComp> ForeheadPoiSupplier;
+typedef icomp::TModelCompWrap<imt3proc::CMeshSupplierComp> MeshSupplier;
+typedef icomp::TModelCompWrap<imt3proc::CHeadExtractorSupplierComp> HeadSupplier;
+typedef icomp::TModelCompWrap<imt3proc::CForeheadExtractorSupplierComp> ForeheadPoiSupplier;
 
 
 } // namespace ImtAlgoPck
