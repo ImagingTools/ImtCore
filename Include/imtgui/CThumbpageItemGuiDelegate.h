@@ -13,7 +13,10 @@ namespace imtgui
 {
 
 
-class CThumbpageItemGuiDelegate : public QStyledItemDelegate
+/**
+	Item delegate used for drawing page' thumbnails.
+*/
+class CThumbpageItemGuiDelegate: public QStyledItemDelegate
 {
 public:
 	typedef QStyledItemDelegate BaseClass;
@@ -24,10 +27,14 @@ public:
 		DR_PAGE_ID
 	};
 
-	CThumbpageItemGuiDelegate(const QStandardItemModel& itemModel, const int horizontalSpacing = 6, const int verticalSpacing = 6, QObject* parent = NULL);
+	CThumbpageItemGuiDelegate(
+				const QStandardItemModel& itemModel,
+				int horizontalSpacing = 6,
+				int verticalSpacing = 6,
+				QObject* parent = NULL);
 	
 	/**
-		Margins setter function. If any input parameter is -1, corresponding margin is left untouched
+		Set margin size for the main frame. If any input parameter is -1, corresponding margin is left untouched.
 	*/
 	void SetMargins(int horizontal, int vertical);
 
@@ -36,25 +43,17 @@ public:
 
 protected:
 	// reimplemented (QItemDelegate)
-	
 	virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 	virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
-
-
-	protected:
-
 private:
 	const QStandardItemModel& m_itemModel;
-	/**
-		draw margin, equals half the spacing
-	*/
+
 	int m_verticalMargin;
 	int m_horizontalMargin;
 };
 
 
 } // namespace imtgui
-
 
 

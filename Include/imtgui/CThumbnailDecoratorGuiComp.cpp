@@ -148,8 +148,6 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 	PageTree->clear();
 	CurrentPageLabel->clear();
 
-	int pageCount = PageStack->count();
-
 	QStandardItem* item = m_menuItemModel.itemFromIndex(index);
 	bool pageExists = (item == nullptr) ? (false) : (item->data(CThumbpageItemGuiDelegate::DR_PAGE_ID).isValid());
 	if (!pageExists){

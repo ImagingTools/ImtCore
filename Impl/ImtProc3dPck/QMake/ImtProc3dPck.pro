@@ -1,4 +1,4 @@
-TARGET = ImtAlgoPck
+TARGET = ImtProc3dPck
 
 include($(ACFDIR)/Config/QMake/ComponentConfig.pri)
 include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)

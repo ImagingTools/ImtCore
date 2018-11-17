@@ -19,7 +19,11 @@ static const int s_minPadding = 7;
 
 // public methods
 
-CThumbpageItemGuiDelegate::CThumbpageItemGuiDelegate(const QStandardItemModel& itemModel, int horizontalSpacing, int verticalSpacing, QObject* parent)
+CThumbpageItemGuiDelegate::CThumbpageItemGuiDelegate(
+			const QStandardItemModel& itemModel,
+			int horizontalSpacing,
+			int verticalSpacing,
+			QObject* parent)
 	:BaseClass(parent),
 	m_itemModel(itemModel)
 {

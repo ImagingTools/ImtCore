@@ -1,15 +1,15 @@
-#include "ImtAlgoPck.h"
+#include "ImtProc3dPck.h"
 
 
 #include <icomp/export.h>
 
 
 
-namespace ImtAlgoPck
+namespace ImtProc3dPck
 {
 
 
-I_EXPORT_PACKAGE("ImtAlgoPck", "ImagingTools algorithmic component package", "Algorithm Basics");
+I_EXPORT_PACKAGE("ImtProc3dPck", "ImagingTools algorithmic component package", "Algorithm Basics");
 
 
 //I_EXPORT_COMPONENT(
@@ -28,6 +28,6 @@ I_EXPORT_PACKAGE("ImtAlgoPck", "ImagingTools algorithmic component package", "Al
 //	"Supplier Forehead Mesh 3D PointCloud");
 
 
-} // namespace ImtAlgoPck
+} // namespace ImtProc3dPck
 
 

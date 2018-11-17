@@ -56,10 +56,10 @@ public:
 	CThumbnailDecoratorGuiComp();
 
 	// reimplemented (ibase::ICommandsProvider)
-	virtual const ibase::IHierarchicalCommand* GetCommands() const;
+	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 	//reimplemented (QObject)
-	virtual bool eventFilter(QObject *watched, QEvent *event);
+	virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
 protected:
 	// reimplemented (iqtgui::TRestorableGuiWrap)
@@ -67,9 +67,9 @@ protected:
 	virtual void OnSaveSettings(QSettings& settings) const override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
-	virtual void OnGuiCreated();
-	virtual void OnGuiDestroyed();
-	virtual void OnGuiRetranslate();
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiDestroyed() override;
+	virtual void OnGuiRetranslate() override;
 
 private Q_SLOTS:
 	void on_PageList_clicked(const QModelIndex& index);
@@ -82,9 +82,9 @@ private:
 	void CreateMenu(const iprm::ISelectionParam* selectionPtr, QTreeWidgetItem* parentItemPtr);
 
 	/**
-		calculates layout of page thumbnails based on m_horizontalItemsViewAttrPtr and m_verticalItemsViewAttrPtr
+		Calculate layout of page thumbnails based on m_horizontalItemsViewAttrPtr and m_verticalItemsViewAttrPtr
 		if the attributes are not set, or set incorrectly, the dimentions close to sqrt(totalcounr) are taken with
-		the preferred vertical
+		the preferred vertical.
 	*/
 	void GetMenuLayout(const int count);
 	void SetLayoutProperties(const int count);
@@ -122,7 +122,7 @@ private:
 		explicit CommandsObserver(CThumbnailDecoratorGuiComp& parent);
 
 		// reimplemented (imod::CMultiModelDispatcherBase)
-		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet);
+		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	private:
 		CThumbnailDecoratorGuiComp& m_parent;

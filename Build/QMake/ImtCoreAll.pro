@@ -21,9 +21,9 @@ ImtCorePck.depends = imt3d
 SUBDIRS += ImtCoreLoc
 ImtCoreLoc.file = ../../Impl/ImtCoreLoc/QMake/ImtCoreLoc.pro
 
-SUBDIRS += ImtAlgoPck
-ImtAlgoPck.file = ../../Impl/ImtAlgoPck/QMake/ImtAlgoPck.pro
-ImtAlgoPck.depends = imt3d imt3proc
+SUBDIRS += ImtProc3dPck
+ImtProc3dPck.file = ../../Impl/ImtProc3dPck/QMake/ImtProc3dPck.pro
+ImtProc3dPck.depends = imt3d imt3proc
 
 SUBDIRS += ImtGuiPck
 ImtGuiPck.file = ../../Impl/ImtGuiPck/QMake/ImtGuiPck.pro
