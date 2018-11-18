@@ -1,5 +1,7 @@
 #include <imt3d/CCuboid.h>
 
+#include <imt3d/CPointCloud3d.h>
+
 
 namespace imt3d
 {
@@ -26,30 +28,37 @@ CCuboid::CCuboid(double left, double right, double bottom, double top, double ne
 CCuboid CCuboid::FromCloudPoints(const CloudPoints& cloudPoints)
 {
 	if (!cloudPoints.isEmpty()){
-		double left = cloudPoints.first().GetX();
-		double right = cloudPoints.first().GetX();
-		double bottom = cloudPoints.first().GetY();
-		double top = cloudPoints.first().GetY();
-		double near = cloudPoints.first().GetZ();
-		double far = cloudPoints.first().GetZ();
+		double left = std::numeric_limits<double>::max();
+		double right = std::numeric_limits<double>::min();
+		double bottom = std::numeric_limits<double>::max();
+		double top = std::numeric_limits<double>::min();
+		double near = std::numeric_limits<double>::min();
+		double far = std::numeric_limits<double>::max();
 
 		for (CloudPoints::const_iterator pointIter = cloudPoints.constBegin(); pointIter != cloudPoints.constEnd(); pointIter++){
+			if (!imt3d::CPointCloud3d::IsPointValid(*pointIter)){
+				continue;
+			}
+
 			if ((pointIter->GetX() > right)){
 				right = pointIter->GetX();
 			}
-			else if ((pointIter->GetX() < left)){
+			
+			if ((pointIter->GetX() < left)){
 				left = pointIter->GetX();
 			}
 			if ((pointIter->GetY() > top)){
 				top = pointIter->GetY();
 			}
-			else if ((pointIter->GetY() < bottom)){
+			
+			if ((pointIter->GetY() < bottom)){
 				bottom = pointIter->GetY();
 			}
 			if ((pointIter->GetZ() > near)){
 				near = pointIter->GetZ();
 			}
-			else if ((pointIter->GetZ() < far)){
+			
+			if ((pointIter->GetZ() < far)){
 				far = pointIter->GetZ();
 			}
 		}

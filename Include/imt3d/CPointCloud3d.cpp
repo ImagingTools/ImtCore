@@ -22,6 +22,12 @@ CPointCloud3d::CPointCloud3d()
 }
 
 
+void CPointCloud3d::SetGridSize(const istd::CIndex2d& gridSize)
+{
+	m_gridSize = gridSize;
+}
+
+
 void CPointCloud3d::AddPoint(const i3d::CVector3d &point)
 {
 	istd::CChangeNotifier notifier(this);
@@ -47,6 +53,26 @@ void CPointCloud3d::CreateCloud(const imt3d::CloudPoints &points)
 const CloudPoints& CPointCloud3d::GetPoints() const
 {
 	return m_cloudPoints;
+}
+
+
+const istd::CIndex2d CPointCloud3d::GetGridSize() const
+{
+	return m_gridSize;
+}
+
+
+const istd::CIndex2d CPointCloud3d::GetGridPosition(int index) const
+{
+	const int y = index / m_gridSize.GetY();
+	const int x = index - m_gridSize.GetY() * y;
+	return istd::CIndex2d(x, y);
+}
+
+
+int CPointCloud3d::GetCloudPosition(const istd::CIndex2d & index) const
+{
+	return m_gridSize.GetY()*index.GetY() + index.GetX();
 }
 
 
@@ -76,9 +102,11 @@ void CPointCloud3d::MoveCenterTo(const i3d::CVector3d &position)
 		for (		CloudPoints::iterator pointIter = m_cloudPoints.begin();
 					pointIter != m_cloudPoints.end();
 					pointIter++){
-			pointIter->SetX(pointIter->GetX() + delta.GetX());
-			pointIter->SetY(pointIter->GetY() + delta.GetY());
-			pointIter->SetZ(pointIter->GetZ() + delta.GetZ());
+			if (IsPointValid(*pointIter)){
+				pointIter->SetX(pointIter->GetX() + delta.GetX());
+				pointIter->SetY(pointIter->GetY() + delta.GetY());
+				pointIter->SetZ(pointIter->GetZ() + delta.GetZ());
+			}
 		}
 
 		m_cloudCenter = position;
@@ -169,6 +197,9 @@ IPointCloud3d::PointCloudPtr CPointCloud3d::FromImage(iimg::IRasterImage &image,
 			istd::CIndex2d imageSize = image.GetImageSize();
 			int xSize = size.GetX();
 			int ySize = size.GetY();
+			istd::CIndex2d cloudGrid(ySize, xSize);
+			pointCloudPtr->SetGridSize(cloudGrid);
+
 			for (int i = 0; i < xSize; ++i){
 				for (int j = 0; j < ySize; ++j){
 					// Calculate index in image
@@ -191,6 +222,15 @@ IPointCloud3d::PointCloudPtr CPointCloud3d::FromImage(iimg::IRasterImage &image,
 	return retVal;
 }
 
+bool CPointCloud3d::IsPointValid(const i3d::CVector3d & position)
+{
+	return !qIsNaN(position.GetX()) && !qIsNaN(position.GetY()) && !qIsNaN(position.GetZ());
+}
+
+i3d::CVector3d CPointCloud3d::GetInvalidPoint()
+{
+	return i3d::CVector3d(qQNaN(), qQNaN(), qQNaN());
+}
 
 // private methods
 
@@ -202,6 +242,10 @@ void CPointCloud3d::EnsureCenterCalculated() const
 		istd::CRange zRange(qInf(), -qInf());
 
 		for (CloudPoints::const_iterator pointIter = m_cloudPoints.constBegin(); pointIter != m_cloudPoints.constEnd(); pointIter++){
+			if (!IsPointValid(*pointIter)){
+				continue;
+			}
+
 			double x = pointIter->GetX();
 			double y = pointIter->GetY();
 			double z = pointIter->GetZ();

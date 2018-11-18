@@ -10,6 +10,7 @@
 // ImtCore includes
 #include <imt3d/imt3d.h>
 #include <imt3d/IPointCloud3d.h>
+#include <imt3d/IGridInfo.h>
 
 
 namespace imt3d
@@ -19,16 +20,22 @@ namespace imt3d
 /**
 	Common cloud (list) of 3D-points implementation (IPointCloud3d interface).
 */
-class CPointCloud3d: virtual public IPointCloud3d
+class CPointCloud3d: virtual public IPointCloud3d, virtual public IGridInfo
 {
 public:
 	CPointCloud3d();
 
+	void SetGridSize(const istd::CIndex2d& gridSize);
+
 	void AddPoint(const i3d::CVector3d& point);
 
 	// reimplemented (IPointCloud3d)
-	virtual void CreateCloud(const imt3d::CloudPoints &points);
+	virtual void CreateCloud(const imt3d::CloudPoints &points) override;
 	virtual const CloudPoints& GetPoints() const override;
+
+	virtual const istd::CIndex2d GetGridSize() const;
+	virtual const istd::CIndex2d GetGridPosition(int index) const;
+	virtual int GetCloudPosition(const istd::CIndex2d& index) const;
 
 	// reimplemented (IObject3d)
 	virtual bool IsEmpty() const override;
@@ -50,11 +57,15 @@ public:
 	*/
 	static IPointCloud3d::PointCloudPtr FromImage(iimg::IRasterImage& image, istd::CIndex2d& size, double step = 0.05);
 
+	static bool IsPointValid(const i3d::CVector3d& position);
+
+	static i3d::CVector3d GetInvalidPoint();
 private:
 	void EnsureCenterCalculated() const;
 
 private:
 	CloudPoints m_cloudPoints;
+	istd::CIndex2d m_gridSize;
 
 	mutable i3d::CVector3d m_cloudCenter;
 	mutable CCuboid m_boundingCuboid;
