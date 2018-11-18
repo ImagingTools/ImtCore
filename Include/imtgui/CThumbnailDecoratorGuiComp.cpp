@@ -182,11 +182,18 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 
 void CThumbnailDecoratorGuiComp::on_FullScreenButton_toggled(bool isToggled)
 {
-	if (!isToggled){
-		GetWidget()->showNormal();
+	QWidget* topWidgetPtr = GetWidget();
+	while (topWidgetPtr->parentWidget() != NULL){
+		topWidgetPtr = topWidgetPtr->parentWidget();
 	}
-	else{
-		GetWidget()->showFullScreen();
+
+	if (topWidgetPtr != NULL){
+		if (!isToggled){
+			topWidgetPtr->showNormal();
+		}
+		else{
+			topWidgetPtr->showFullScreen();
+		}
 	}
 }
 
