@@ -1,3 +1,5 @@
+#include <Windows.h>
+
 #include <GL/gl.h>
 
 #include "nicp_qglviewer.h"

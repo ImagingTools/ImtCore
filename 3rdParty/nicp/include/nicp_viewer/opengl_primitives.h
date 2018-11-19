@@ -1,5 +1,6 @@
 #pragma once
-
+#include <Windows.h>
+#include <QGLViewer/config.h>
 #include <GL/gl.h>
 #include <GL/glut.h>
 

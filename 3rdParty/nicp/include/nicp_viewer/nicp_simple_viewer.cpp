@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
 	drawableNormals->parameter()->setShow(false);
       }
     }
-    if(selectionChanged) { viewer->updateGL(); }
+    if(selectionChanged) { viewer->update/*GL*/(); }
 
     application.processEvents();
   }

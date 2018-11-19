@@ -1,4 +1,6 @@
 #pragma once
+#include <Windows.h>
+
 
 #include <Eigen/Geometry>
 #include <GL/gl.h>

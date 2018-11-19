@@ -1,10 +1,12 @@
 #include "nicp_aligner_gui_main_window.h"
 
 #include <stdio.h>
-#include <dirent.h>
+//#include <dirent.h>
 #include <set>
 #include <sys/stat.h>
 #include <sys/types.h>
+
+#include <QDir.h>
 
 #include <opencv2/highgui/highgui.hpp>
 
@@ -27,13 +29,19 @@ namespace nicp_viewer {
     viewer->setAxisIsDrawn(true);
 
     // Init file list
-    std::set<std::string> filenames = _readDirectory(directory);
-    for(std::set<std::string>::const_iterator it = filenames.begin(); it != filenames.end(); ++it) {
-      QString listItem(&(*it)[0]);
-      if(listItem.endsWith(".pgm", Qt::CaseInsensitive) || listItem.endsWith(".png", Qt::CaseInsensitive)) {
-	cloud_selection_listWidget->addItem(listItem);
-      }
-    }
+	QDir directoryContent = QDir(QString::fromStdString(directory));
+	QStringList listItems = directoryContent.entryList(QStringList() << "*.pgm" << "*.png", QDir::Files);
+	foreach(QString oneItem, listItems){
+		cloud_selection_listWidget->addItem(oneItem);
+	}
+
+ //   std::set<std::string> filenames = _readDirectory(directory);
+ //   for(std::set<std::string>::const_iterator it = filenames.begin(); it != filenames.end(); ++it) {
+ //     QString listItem(&(*it)[0]);
+ //     if(listItem.endsWith(".pgm", Qt::CaseInsensitive) || listItem.endsWith(".png", Qt::CaseInsensitive)) {
+	//cloud_selection_listWidget->addItem(listItem);
+ //     }
+ //   }
 
     // Create class objects
     _sensorOffset = Eigen::Isometry3f::Identity();
@@ -156,7 +164,7 @@ namespace nicp_viewer {
       dCloud->drawableCovariances()->updateCovarianceDrawList();
       dCloud->drawableCorrespondences()->updateCorrespondenceDrawList();
     }
-    viewer->updateGL();
+    viewer->update/*GL*/();
   }
 
   void NICPAlignerGuiMainWindow::addCloud() {
@@ -205,7 +213,7 @@ namespace nicp_viewer {
       reference_graphicsView->show();
       current_graphicsView->show();
       visualizationUpdate();
-      viewer->updateGL();
+      viewer->update/*GL*/();
       std::cout << "[STATUS] Added new cloud of " << cloud->points().size() << " points from file " << filename << ", the drawable queue size now is: "
 		<< viewer->drawableList().size() << std::endl;
 
@@ -240,7 +248,7 @@ namespace nicp_viewer {
       reference_graphicsView->show();
       current_graphicsView->show();
     }
-    viewer->updateGL();
+    viewer->update/*GL*/();
     std::cout << "[STATUS] Deleted last loaded depth images, the drawable queue size now is: "
 	      << viewer->drawableList().size() << std::endl;
   }
@@ -263,7 +271,7 @@ namespace nicp_viewer {
     _poses.clear();
     _referenceScene->clear();
     _currentScene->clear();
-    viewer->updateGL();
+    viewer->update/*GL*/();
     std::cout << "[STATUS] Deleted all previously loaded depth images, the drawable queue size now is: "
 	      << viewer->drawableList().size() << std::endl;
   }
@@ -359,7 +367,7 @@ namespace nicp_viewer {
     current_graphicsView->fitInView(_currentScene->itemsBoundingRect(), Qt::KeepAspectRatio);
     current_graphicsView->show();
     visualizationUpdate();
-    viewer->updateGL();
+    viewer->update/*GL*/();
   }
 
   void NICPAlignerGuiMainWindow::correspondences() {
@@ -399,7 +407,7 @@ namespace nicp_viewer {
       std::cout << "[STATUS] " << _correspondenceFinder->numCorrespondences() << " correspondences computed" << std::endl;
     }
     visualizationUpdate();
-    viewer->updateGL();
+    viewer->update/*GL*/();
   }
 
   void NICPAlignerGuiMainWindow::initialGuess() {
@@ -418,27 +426,27 @@ namespace nicp_viewer {
       current_graphicsView->show();
       std::cout << "[STATUS] Initial guess imposed" << std::endl;
     }
-    viewer->updateGL();
+    viewer->update/*GL*/();
   }
 
   void NICPAlignerGuiMainWindow::merge() { }
 
-  std::set<string> NICPAlignerGuiMainWindow::_readDirectory(std::string directory) {
-    DIR *dp;
-    struct dirent *dirp;
-    struct stat filestat;
-    std::set<std::string> filenames;
-    dp = opendir(directory.c_str());
-    if(dp == NULL) { return filenames; }
-    while((dirp = readdir(dp))) {
-      std::string filepath = directory + "/" + dirp->d_name;
-      if(stat(filepath.c_str(), &filestat)) { continue; }
-      if(S_ISDIR(filestat.st_mode)) { continue; }
-      filenames.insert(filepath);
-    }
-    closedir(dp);
-    return filenames;
-  }
+  //std::set<string> NICPAlignerGuiMainWindow::_readDirectory(std::string directory) {
+  //  QDIR dp;
+  //  struct dirent *dirp;
+  //  struct stat filestat;
+  //  std::set<std::string> filenames;
+  //  dp = opendir(directory.c_str());
+  //  if(dp == NULL) { return filenames; }
+  //  while((dirp = readdir(dp))) {
+  //    std::string filepath = directory + "/" + dirp->d_name;
+  //    if(stat(filepath.c_str(), &filestat)) { continue; }
+  //    if(S_ISDIR(filestat.st_mode)) { continue; }
+  //    filenames.insert(filepath);
+  //  }
+  //  closedir(dp);
+  //  return filenames;
+  //}
 
   void NICPAlignerGuiMainWindow::_selectProjector() {
     if(pinhole_projector_radioButton->isChecked()) {

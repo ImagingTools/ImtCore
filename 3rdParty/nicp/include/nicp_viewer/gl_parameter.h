@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Windows.h>
+
 #include <GL/gl.h>
 #include <QObject>
 
