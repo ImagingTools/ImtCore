@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/Icons">
-        <file alias="HomeBlue">Resources/Icons/homeBlue.svg</file>
+        <file alias="FullScreen">Resources/Icons/FullScreen.svg</file>
+        <file alias="Home">Resources/Icons/Home.svg</file>
     </qresource>
 </RCC>

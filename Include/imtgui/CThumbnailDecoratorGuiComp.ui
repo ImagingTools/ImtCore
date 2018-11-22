@@ -165,7 +165,7 @@ QAbstractItemView
         </property>
         <property name="icon">
          <iconset resource="imtgui.qrc">
-          <normaloff>:/Icons/HomeBlue</normaloff>:/Icons/HomeBlue</iconset>
+          <normaloff>:/Icons/Home</normaloff>:/Icons/Home</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -262,7 +262,7 @@ QAbstractItemView
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="imtgui.qrc">
           <normaloff>:/Icons/FullScreen</normaloff>:/Icons/FullScreen</iconset>
         </property>
         <property name="iconSize">
