@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "cloud.h"
 
@@ -34,7 +35,7 @@ namespace nicp {
   /** \class CorrespondenceFinder correspondencefinder.h "correspondencefinder.h"
    *  \brief Class interface that can be used to build correspondence finder to make data association between two point clouds.
    */
-  class CorrespondenceFinder {
+  class NICP_API CorrespondenceFinder {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

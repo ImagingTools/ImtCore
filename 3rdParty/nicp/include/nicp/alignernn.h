@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "aligner.h"
 #include "correspondencefindernn.h"
@@ -12,7 +13,7 @@ namespace nicp {
    *  a point cloud to superpose an other reference point cloud. Data association
    *  is computed via nearest neighbor.
    */
-class AlignerNN : public Aligner {
+class NICP_API AlignerNN : public Aligner {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

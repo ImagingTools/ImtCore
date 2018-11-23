@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "pointprojector.h"
 
@@ -10,7 +11,7 @@ namespace nicp {
    *  This class extends the PointProjector class in order to provide point 
    *  projection/unprojection based on pinhole camera model.
    */
-  class PinholePointProjector : virtual public PointProjector {
+  class NICP_API PinholePointProjector : virtual public PointProjector {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

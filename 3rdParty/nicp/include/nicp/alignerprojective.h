@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "aligner.h"
 #include "correspondencefinderprojective.h"
@@ -12,7 +13,7 @@ namespace nicp {
    *  a point cloud to superpose an other reference point cloud. Data association
    *  is computed via depth image projection.
    */
-class AlignerProjective : public Aligner {
+class NICP_API AlignerProjective : public Aligner {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

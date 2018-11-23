@@ -1,4 +1,11 @@
 #pragma once
+#include "ExportNicp.h"
+
+#ifdef nicp_EXPORTS
+#define EXPORT extern
+#else
+#define EXPORT
+#endif
 
 #include "definitions.h"
 
@@ -11,7 +18,7 @@ namespace nicp {
    *  @param step is the resize factor. If step is greater than 1 the image will be smaller
    *  (for example in case it's 2 the size of the image will be half the size of the original one).
    */
-  void DepthImage_scale(DepthImage &dest, const DepthImage &src, int step, float maxDepthCov = 0.01f);
+	EXPORT void NICP_API DepthImage_scale(DepthImage &dest, const DepthImage &src, int step, float maxDepthCov = 0.01f);
 
   /**
    *  This method scales a depth image to the size specified.
@@ -20,7 +27,7 @@ namespace nicp {
    *  @param step is the resize factor. If step is greater than 1 the image will be smaller
    *  (for example in case it's 2 the size of the image will be half the size of the original one).
    */
-  void RGBImage_scale(RGBImage &dest, const RGBImage &src, int step);
+	EXPORT void NICP_API RGBImage_scale(RGBImage &dest, const RGBImage &src, int step);
 
 
   /**
@@ -31,7 +38,7 @@ namespace nicp {
    *  the depth values from a unit measure to another. Here it is assumed by default that the elements have
    *  to be converted from millimeters to meters and so the scale is 1000.
    */
-  void DepthImage_convert_32FC1_to_16UC1(cv::Mat &dest, const cv::Mat &src, float scale = 1000.0f);
+	EXPORT void NICP_API DepthImage_convert_32FC1_to_16UC1(cv::Mat &dest, const cv::Mat &src, float scale = 1000.0f);
 
   /**
    *  This method converts an unsigned char cv::Mat to a float cv::Mat.
@@ -41,6 +48,6 @@ namespace nicp {
    *  the depth values from a unit measure to another. Here it is assumed by default that the elements have
    *  to be converted from meters to millimeters and so the scale is 0.001.
    */
-  void DepthImage_convert_16UC1_to_32FC1(cv::Mat &dest, const cv::Mat &src, float scale = 0.001f);
+	EXPORT void NICP_API DepthImage_convert_16UC1_to_32FC1(cv::Mat &dest, const cv::Mat &src, float scale = 0.001f);
 
 }

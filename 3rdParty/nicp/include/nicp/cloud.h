@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "stats.h"
 #include "informationmatrix.h"
@@ -17,7 +18,7 @@ namespace nicp {
    *  information matrices, a vector of gaussians representing the intrinsic error due to the sensor and also
    *  a traversability information about the points.
    */
-  class Cloud {
+  class NICP_API Cloud {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

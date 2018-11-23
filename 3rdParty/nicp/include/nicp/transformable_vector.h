@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>

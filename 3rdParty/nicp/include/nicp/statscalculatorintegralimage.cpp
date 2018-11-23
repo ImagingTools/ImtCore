@@ -2,7 +2,7 @@
 
 #include <cstdio>
 
-#include <Eigen/Eigenvalues> 
+#include <Eigen/Eigenvalues>
 
 #include "cloud.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+#include <C:\Develop\3rdParty\Eigen\3.3.5\include\Eigen/Core>
+#include <C:\Develop\3rdParty\Eigen\3.3.5\include\Eigen/Geometry>
 #include "bm_defs.h"
 
 namespace nicp {

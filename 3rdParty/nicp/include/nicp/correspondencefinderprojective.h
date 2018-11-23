@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "correspondencefinder.h"
 
@@ -14,7 +15,7 @@ namespace nicp {
    *  a correspondence, if they satisfy all the constraints then the pair of points is added to the vector
    *  of correspondences.
    */
-  class CorrespondenceFinderProjective : public CorrespondenceFinder {
+  class NICP_API CorrespondenceFinderProjective : public CorrespondenceFinder {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

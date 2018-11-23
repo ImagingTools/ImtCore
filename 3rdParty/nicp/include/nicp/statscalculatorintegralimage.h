@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "statscalculator.h"
 #include "pointintegralimage.h"
@@ -11,7 +12,7 @@ namespace nicp {
    *  This class provides the necessary methods for normals and additional point properties using
    *  a fast structure called integral image.
    */
-  class StatsCalculatorIntegralImage : virtual public StatsCalculator {
+  class NICP_API StatsCalculatorIntegralImage : virtual public StatsCalculator {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   

@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "homogeneousvector4f.h"
 

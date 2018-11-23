@@ -6,7 +6,9 @@
 
 namespace nicp {
 
-#define M_PI 3.141592
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
   /** \typedef Diagonal3f
    * \brief A 3x3 diagonal matrix.

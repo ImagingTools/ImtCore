@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "depthimageconverter.h"
 
@@ -12,7 +13,7 @@ namespace nicp {
    *  the normal computatio with respect to classical methods since using them it is possible to compute the 
    *  covariance of a point in constant time.
    */
-  class DepthImageConverterIntegralImage : virtual public DepthImageConverter {
+  class NICP_API DepthImageConverterIntegralImage : virtual public DepthImageConverter {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     
