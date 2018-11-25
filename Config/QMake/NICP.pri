@@ -1,6 +1,6 @@
-INCLUDEPATH += $(NICP_DIR)/include
+INCLUDEPATH += $(NICPDIR)/include
 
-LIBS += -L$(NICP_DIR)/lib/$$COMPILER_DIR
+LIBS += -L$(NICPDIR)/lib/$$COMPILER_DIR
 
 CONFIG(release, debug|release){
 	LIBS += -lnicp
