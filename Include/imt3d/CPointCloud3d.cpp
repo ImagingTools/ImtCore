@@ -129,6 +129,8 @@ bool CPointCloud3d::Serialize(iser::IArchive &archive)
 {
 	static iser::CArchiveTag pointCloudTag("PointCloud", "Point cloud", iser::CArchiveTag::TT_LEAF);
 	static iser::CArchiveTag pointTag("Point", "Point", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag gridSizeXTag("GridSizeX", "Size of points grid throw x", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag gridSizeYTag("GridSizeY", "Size of points grid throw y", iser::CArchiveTag::TT_LEAF);
 
 	bool retVal = true;
 	int count = m_cloudPoints.count();
@@ -155,6 +157,21 @@ bool CPointCloud3d::Serialize(iser::IArchive &archive)
 
 	archive.EndTag(pointCloudTag);
 
+	int sizeX = m_gridSize.GetX();
+	int sizeY = m_gridSize.GetY();
+
+	retVal = retVal && archive.BeginTag(gridSizeXTag);
+	retVal = retVal && archive.Process(sizeX);
+	retVal = retVal && archive.EndTag(gridSizeXTag);
+	retVal = retVal && archive.BeginTag(gridSizeYTag);
+	retVal = retVal && archive.Process(sizeY);
+	retVal = retVal && archive.EndTag(gridSizeYTag);
+
+	if (!archive.IsStoring()){
+		m_gridSize.SetX(sizeX);
+		m_gridSize.SetY(sizeY);
+	}
+
 	return retVal;
 }
 
@@ -168,6 +185,7 @@ bool CPointCloud3d::CopyFrom(const istd::IChangeable &object, istd::IChangeable:
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_cloudPoints = objectPtr->m_cloudPoints;
+		m_gridSize = objectPtr->m_gridSize;
 
 		return true;
 	}
