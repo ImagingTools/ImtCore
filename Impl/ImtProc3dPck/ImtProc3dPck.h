@@ -6,7 +6,7 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtAlgo includes
-#include <imt3proc/CMeshSupplierComp.h>
+#include <imt3dproc/CMeshSupplierComp.h>
 
 
 /**

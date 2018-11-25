@@ -7,8 +7,8 @@ imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
 SUBDIRS += imt3d
 imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
 
-SUBDIRS += imt3proc
-imt3proc.file = ../../Include/imt3proc/QMake/imt3proc.pro
+SUBDIRS += imt3dproc
+imt3dproc.file = ../../Include/imt3dproc/QMake/imt3dproc.pro
 
 SUBDIRS += imtgui
 imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
