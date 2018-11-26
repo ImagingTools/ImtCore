@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4720" Description="ACF"/>
+            <Version Id="1" Number="2009" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330496" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Acula-based application framework</Description>
+    <Keywords>Application Acula</Keywords>
+    <ElementsList>
+        <Element Id="ApplicationInfo" PackageId="BasePck" ComponentId="ApplicationInfo">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationName" Type="Text" ExportId="ApplicationName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationSubname" Type="Text" ExportId="ApplicationSubname">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationType" Type="Text" ExportId="ApplicationType">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CompanyName" Type="Text" ExportId="CompanyName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LegalCopyright" Type="Text" ExportId="LegalCopyright">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MainVersionId" Type="Integer" ExportId="MainVersionId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductEdition" Type="Text" ExportId="ProductEdition">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductName" Type="Text" ExportId="ProductName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CommandsMultiplexer" PackageId="QtGuiPck" ComponentId="CommandsMultiplexer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandProviders" Type="Reference[]" ExportId="CommandProviders">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandSelector" Type="Reference" ExportId="CommandSelector">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GuiApplication" PackageId="QtGuiPck" ComponentId="GuiApplication">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AllowClose" Type="Reference" ExportId="AllowClose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="ComponentsToInitialize">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FrameSpaceSize" Type="Integer" ExportId="FrameSpaceSize">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconPath" Type="String" ExportId="IconPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MainGui" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MainGui"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SplashScreen" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SplashScreen"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SplashTime" Type="Real" ExportId="SplashTime">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StyleSheet" Type="String" ExportId="StyleSheet">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TitleFormat" Type="String" ExportId="TitleFormat">
+                        <Data IsEnabled="true" Value="$(AppName) by $(CompanyName)"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TrayIconsCommands" Type="Reference" ExportId="TrayIconsCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UiStartMode" Type="Integer" ExportId="UiStartMode">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseMenuIconsOnMac" Type="Boolean" ExportId="UseMenuIconsOnMac">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseTrayIcon" Type="Boolean" ExportId="UseTrayIcon">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MainGui" PackageId="QtGuiPck" ComponentId="SimpleMainGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="HelpFile" Type="Reference" ExportId="HelpFile">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconSize" Type="Integer" ExportId="IconSize">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsMenuVisible" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsToolbarVisible" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MainWindowComponents" Type="Reference[]" ExportId="MainWindowComponents">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SettingsDialog" Type="Reference" ExportId="SettingsDialog">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SettingsProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Workspace" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Pages"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Pages" PackageId="ImtGuiPck" ComponentId="ThumbnailDecoratorGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Commands" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CommandsMultiplexer"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HorizontalItemsView" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="2"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HorizontalSpacing" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="10"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageModel" Type="Reference" ExportId="MainPageModel">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageUiContainer" Type="Reference" ExportId="MainUiPages">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SettingsProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VerticalSpacing" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="10"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SettingsProvider" PackageId="QtPck" ComponentId="ApplicationSettingsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SplashScreen" PackageId="QtGuiPck" ComponentId="SplashScreen">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ImagePath" Type="String" ExportId="SplashImagePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionIds" Type="Integer[]" ExportId="SplashVersionIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionNames" Type="Text[]" ExportId="SplashVersionNames">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="ibase::IApplication" ComponentId="GuiApplication"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="ApplicationInfo" ComponentId="ApplicationInfo"/>
+        <Component ExportedId="RuntimeStatus" ComponentId="GuiApplication/RuntimeStatus"/>
+        <Component ExportedId="SettingsProvider" ComponentId="SettingsProvider"/>
+    </ExportedComponents>
+</Acf>
