@@ -23,10 +23,10 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CompanyName" Type="Text" ExportId="CompanyName">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="ImagingTools GmbH"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LegalCopyright" Type="Text" ExportId="LegalCopyright">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="(C) 2018 ImagingTools GmbH. All rights reserved."/>
                     </AttributeInfo>
                     <AttributeInfo Id="MainVersionId" Type="Integer" ExportId="MainVersionId">
                         <Data IsEnabled="false"/>
@@ -180,6 +180,24 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ImagePath" Type="String" ExportId="SplashImagePath">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowApplicationName" Type="Boolean" ExportId="SplashShowApplicationName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowApplicationSubName" Type="Boolean" ExportId="SplashShowApplicationSubName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowLegalCopyright" Type="Boolean" ExportId="SplashShowLegalCopyright">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowProductName" Type="Boolean" ExportId="SplashShowProductName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowProductType" Type="Boolean" ExportId="SplashShowProductType">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StyleSheet" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="SplashStyleSheet"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionIds" Type="Integer[]" ExportId="SplashVersionIds">
                         <Data IsEnabled="false"/>
