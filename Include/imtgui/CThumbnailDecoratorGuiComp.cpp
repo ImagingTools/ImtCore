@@ -70,17 +70,11 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 
 void CThumbnailDecoratorGuiComp::OnRestoreSettings(const QSettings& settings)
 {
-	bool isFullscreen = settings.value("IsFullScreenEnabled").toBool();
-
-	FullScreenButton->setChecked(isFullscreen);
 }
 
 
 void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& settings) const
 {
-	bool isFullscreen = FullScreenButton->isChecked();
-
-	settings.setValue("IsFullScreenEnabled", isFullscreen);
 }
 
 
@@ -92,10 +86,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 	QWidget* widgetPtr = GetWidget();
 	Q_ASSERT(widgetPtr != NULL);
-
-	if (widgetPtr->isFullScreen()){
-		FullScreenButton->setChecked(true);
-	}
 
 	m_itemInfoMap.clear();
 	m_menuItemInfoMap.clear();
@@ -180,7 +170,7 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 }
 
 
-void CThumbnailDecoratorGuiComp::on_FullScreenButton_toggled(bool isToggled)
+void CThumbnailDecoratorGuiComp::on_ExitButton_clicked()
 {
 	QWidget* topWidgetPtr = GetWidget();
 	while (topWidgetPtr->parentWidget() != NULL){
@@ -188,12 +178,9 @@ void CThumbnailDecoratorGuiComp::on_FullScreenButton_toggled(bool isToggled)
 	}
 
 	if (topWidgetPtr != NULL){
-		if (!isToggled){
-			topWidgetPtr->showNormal();
-		}
-		else{
-			topWidgetPtr->showFullScreen();
-		}
+		topWidgetPtr->close();
+
+		qApp->quit();
 	}
 }
 

@@ -73,7 +73,7 @@ protected:
 
 private Q_SLOTS:
 	void on_PageList_clicked(const QModelIndex& index);
-	void on_FullScreenButton_toggled(bool isToggled);
+	void on_ExitButton_clicked();
 	void on_PageTree_itemSelectionChanged();
 	void on_HomeButton_clicked();
 

@@ -2,5 +2,6 @@
     <qresource prefix="/Icons">
         <file alias="FullScreen">Resources/Icons/FullScreen.svg</file>
         <file alias="Home">Resources/Icons/Home.svg</file>
+        <file alias="Exit">Resources/Icons/Exit.svg</file>
     </qresource>
 </RCC>
