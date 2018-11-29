@@ -33,10 +33,10 @@ bool CMesh3d::SaveToStlFile(const QString& filePath) const
 		return false;
 	}
 
-	std::array<uint8_t, 80> stlHeader = { 0 };
+	std::array<quint8, 80> stlHeader = { 0 };
 	std::fwrite(stlHeader.data(), sizeof(stlHeader[0]), stlHeader.size(), file);
 
-	uint32_t trianglesCount = static_cast<uint32_t>(m_triangles.size());
+	quint32 trianglesCount = static_cast<quint32>(m_triangles.size());
 	std::fwrite(&trianglesCount, sizeof(trianglesCount), 1, file);
 
 	for (uint index = 0; index < trianglesCount; index++){
@@ -54,7 +54,7 @@ bool CMesh3d::SaveToStlFile(const QString& filePath) const
 		std::fwrite(&secondVert[0], sizeof(float), 3, file);
 		std::fwrite(&thirdVert[0], sizeof(float), 3, file);
 
-		uint16_t attributes = 0;
+		quint16 attributes = 0;
 		std::fwrite(&attributes, sizeof(attributes), 1, file);
 	}
 
@@ -77,13 +77,13 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath)
 		return false;
 	}
 
-	std::array<uint8_t, 80> stlHeader = { {0} };
+	std::array<quint8, 80> stlHeader = { {0} };
 	std::fread(stlHeader.data(), sizeof(stlHeader[0]), stlHeader.size(), file);
 
-	uint32_t numTris = 0;
+	quint32 numTris = 0;
 	std::fread(&numTris, sizeof(numTris), 1, file);
 
-	for (uint32_t i = 0; i < numTris; ++i){
+	for (quint32 i = 0; i < numTris; ++i){
 		// store indices of the m_vertices
 		Triangle oneTriangle;
 		oneTriangle.SetElement(0, i * 3);
@@ -105,7 +105,7 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath)
 		std::fread(&secondVert[0], sizeof(float), 3, file);
 		std::fread(&thirdVert[0], sizeof(float), 3, file);
 
-		uint16_t attributes = 0;
+		quint16 attributes = 0;
 		std::fread(&attributes, sizeof(attributes), 1, file);
 
 		m_vertices.push_back(firstVert);

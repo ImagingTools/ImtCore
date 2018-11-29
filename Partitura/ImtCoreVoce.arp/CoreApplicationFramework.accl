@@ -9,7 +9,7 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApplicationInfo" X="1050" Y="100" Note=""/>
-        <Element ComponentName="CommandsMultiplexer" X="300" Y="525" Note=""/>
+        <Element ComponentName="CommandsMultiplexer" X="200" Y="525" Note=""/>
         <Element ComponentName="GuiApplication" X="575" Y="250" Note=""/>
         <Element ComponentName="MainGui" X="575" Y="375" Note=""/>
         <Element ComponentName="Pages" X="575" Y="525" Note=""/>
