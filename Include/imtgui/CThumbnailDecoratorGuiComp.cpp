@@ -500,6 +500,8 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 		if (commandsPtr != nullptr){
 			if (m_mainToolBar == nullptr){
 				m_mainToolBar = new QToolBar(CurrentPageToolBarFrame);
+				m_mainToolBar->setProperty("ImtToolBar", true);
+
 				CurrentPageToolBarFrame->layout()->addWidget(m_mainToolBar);
 
 				m_mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);

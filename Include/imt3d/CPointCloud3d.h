@@ -25,8 +25,10 @@ class CPointCloud3d: virtual public IPointCloud3d, virtual public IGridInfo
 public:
 	CPointCloud3d();
 
-	void SetGridSize(const istd::CIndex2d& gridSize);
+	static bool IsPointValid(const i3d::CVector3d& position);
+	static i3d::CVector3d GetInvalidPoint();
 
+	void SetGridSize(const istd::CIndex2d& gridSize);
 	void AddPoint(const i3d::CVector3d& point);
 
 	// reimplemented (IPointCloud3d)
@@ -50,16 +52,6 @@ public:
 	virtual bool CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode) override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
-	// static methods
-	/*
-		image size will be adjusted to required size
-		\ todo think to make height (color value in index) scaleable
-	*/
-	static IPointCloud3d::PointCloudPtr FromImage(iimg::IRasterImage& image, istd::CIndex2d& size, double step = 0.05);
-
-	static bool IsPointValid(const i3d::CVector3d& position);
-
-	static i3d::CVector3d GetInvalidPoint();
 private:
 	void EnsureCenterCalculated() const;
 

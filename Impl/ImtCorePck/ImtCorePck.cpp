@@ -33,7 +33,6 @@ I_EXPORT_COMPONENT(
 			"Mesh STL Persistence");
 
 
-
 } // namespace ImtCorePck
 
 

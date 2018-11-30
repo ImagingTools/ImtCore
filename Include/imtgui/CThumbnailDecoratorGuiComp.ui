@@ -14,12 +14,12 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QToolBar &gt; QToolButton
+   <string notr="true">QToolBar[ImtToolBar=true] &gt; QToolButton
 {
 	min-width: 4em;
 }
 
-QToolBar
+QToolBar[ImtToolBar=true]
 {
 	qproperty-iconSize: 24px;
 }
@@ -40,7 +40,7 @@ QWidget#BottomFrame
 	background: rgb(230,230,230);	
 }
 
-QTableView
+QTableView[ImtMenu=true]
 {
 	color: qpalette(background);
 	background: qpalette(background);
@@ -48,7 +48,7 @@ QTableView
 	text-align: center;
 }
 
-QTableView::item
+QTableView[ImtMenu=true]::item
 {
 	font-weight: bold;
 	text-align: center;
@@ -105,7 +105,7 @@ QTreeWidget[TabSimulation=true]::item:first:selected
 
 
 
-QAbstractItemView
+QAbstractItemView[TabSimulation=true]
 {
     outline: 0;
 }
@@ -250,6 +250,12 @@ QAbstractItemView
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
         </property>
        </spacer>
       </item>
@@ -527,6 +533,9 @@ QAbstractItemView
                   </property>
                   <property name="selectionMode">
                    <enum>QAbstractItemView::SingleSelection</enum>
+                  </property>
+                  <property name="ImtMenu" stdset="0">
+                   <bool>true</bool>
                   </property>
                   <attribute name="horizontalHeaderVisible">
                    <bool>false</bool>
