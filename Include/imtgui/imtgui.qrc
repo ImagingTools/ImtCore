@@ -12,5 +12,6 @@
         <file alias="Settings">Resources/Icons/Settings.svg</file>
         <file alias="Undo">Resources/Icons/Undo.svg</file>
         <file alias="AutoUpdate">Resources/Icons/AutoUpdate.svg</file>
+        <file alias="Save">Resources/Icons/Save.svg</file>
     </qresource>
 </RCC>
