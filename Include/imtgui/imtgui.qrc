@@ -3,5 +3,14 @@
         <file alias="FullScreen">Resources/Icons/FullScreen.svg</file>
         <file alias="Home">Resources/Icons/Home.svg</file>
         <file alias="Exit">Resources/Icons/Exit.svg</file>
+        <file alias="Diagnostics">Resources/Icons/Diagnostics.svg</file>
+        <file alias="Info">Resources/Icons/Information.svg</file>
+        <file alias="Magic">Resources/Icons/Magic.svg</file>
+        <file alias="Menu">Resources/Icons/Menu.svg</file>
+        <file alias="Play">Resources/Icons/Play.svg</file>
+        <file alias="Redo">Resources/Icons/Redo.svg</file>
+        <file alias="Settings">Resources/Icons/Settings.svg</file>
+        <file alias="Undo">Resources/Icons/Undo.svg</file>
+        <file alias="AutoUpdate">Resources/Icons/AutoUpdate.svg</file>
     </qresource>
 </RCC>
