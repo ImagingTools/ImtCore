@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QMap>
+#include <QtCore/QTimer>
 #include <QtWidgets/QListView>
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QStandardItem>
@@ -14,6 +15,7 @@
 #include <iprm/ISelectionParam.h>
 #include <iqtgui/CHierarchicalCommand.h>
 #include <iqtgui/TRestorableGuiWrap.h>
+#include <iauth/ILogin.h>
 
 // ImtCore includes
 #include <imtgui/CThumbpageItemGuiDelegate.h>
@@ -51,7 +53,16 @@ public:
 		I_ASSIGN(m_verticalFrameMarginAttrPtr, "VerticalFrameMargin", "Vertical (top&bottom) side margin of thumbnail frame", false, 15);
 		I_ASSIGN(m_maximumFrameWidthAttrPtr, "MaximumFrameWidth", "Maximum width of thumbnail frame", false, 320);
 		I_ASSIGN(m_maximumFrameHeightAttrPtr, "MaximumFrameHeight", "Maximum height of thumbnail frame", false, 240);
+		I_ASSIGN(m_loginCompPtr, "Login", "Login logic component", false, "Login");
+		I_ASSIGN(m_autoLogoutMinutesAttrPtr, "AutoLogoutMinutes", "Time intervall for the automatic logout", false, 60);
 	I_END_COMPONENT;
+
+	enum
+	{
+		LOGIN_PAGE_INDEX,
+		HOME_PAGE_INDEX,
+		PAGE_CONTAINER_INDEX
+	};
 
 	CThumbnailDecoratorGuiComp();
 
@@ -76,8 +87,13 @@ private Q_SLOTS:
 	void on_ExitButton_clicked();
 	void on_PageTree_itemSelectionChanged();
 	void on_HomeButton_clicked();
+	virtual void on_LoginButton_clicked();
+	virtual void on_LogoutButton_clicked();
 
 private:
+	void ShowLoginPage();
+	void ShowHomePage();
+	void UpdateLoginButtonsState();
 	void CreateItems(const iprm::ISelectionParam* selectionPtr);
 	void CreateMenu(const iprm::ISelectionParam* selectionPtr, QTreeWidgetItem* parentItemPtr);
 
@@ -158,8 +174,12 @@ private:
 	I_ATTR(int, m_verticalFrameMarginAttrPtr);
 	I_ATTR(int, m_maximumFrameWidthAttrPtr);
 	I_ATTR(int, m_maximumFrameHeightAttrPtr);
+	I_REF(iauth::ILogin, m_loginCompPtr);
+	I_ATTR(int, m_autoLogoutMinutesAttrPtr);
 
 	QToolBar* m_mainToolBar;
+	QTimer m_autoLogoutTimer;
+	int m_autoLogoutMilisec;
 };
 
 

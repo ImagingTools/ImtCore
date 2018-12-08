@@ -6,6 +6,7 @@
 #include <QtWidgets/QToolbar>
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QFrame>
+#include <QtWidgets/QMessageBox>
 
 // ACF includes
 #include <iprm/IOptionsList.h>
@@ -100,17 +101,19 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 	if (m_pageModelCompPtr.IsValid()){
 		CreateItems(m_pageModelCompPtr.GetPtr());
-		PageStack->setCurrentIndex(0);
-
-		CurrentPageLabel->setText(tr("Home"));
 
 		if (m_pagesWidgetCompPtr.IsValid()){
 			m_pagesWidgetCompPtr->CreateGui(ContentFrame);
 		}
-
-		m_pageModelCompPtr->SetSelectedOptionIndex(-1);
 	}
 
+	if (m_loginCompPtr.IsValid()){
+		ShowLoginPage();
+	}
+	else{
+		ShowHomePage();
+	}
+	
 	installEventFilter(this);
 }
 
@@ -161,10 +164,10 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 		}
 
 		if (info.pageIndex < 0){
-			PageStack->setCurrentIndex(0);
+			PageStack->setCurrentIndex(HOME_PAGE_INDEX);
 		}
 		else{
-			PageStack->setCurrentIndex(1);
+			PageStack->setCurrentIndex(PAGE_CONTAINER_INDEX);
 		}
 	}
 }
@@ -221,9 +224,66 @@ void CThumbnailDecoratorGuiComp::on_PageTree_itemSelectionChanged()
 
 void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 {
+	ShowHomePage();
+}
+
+
+void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
+{
+	if (m_loginCompPtr.IsValid()){
+		QString userName = UserEdit->text();
+		QString password = PasswordEdit->text();
+		if (m_loginCompPtr->Login(userName, password)){
+			if (m_autoLogoutMinutesAttrPtr.IsValid()){
+				Q_ASSERT(*m_autoLogoutMinutesAttrPtr > 0);
+
+				m_autoLogoutMilisec = *m_autoLogoutMinutesAttrPtr * 60 * 1000;
+				m_autoLogoutTimer.start(m_autoLogoutMilisec);
+			}
+
+			UpdateLoginButtonsState();
+
+			ShowHomePage();
+		}
+		else{
+			QMessageBox::warning(GetQtWidget(), tr("Error"), tr("Wrong password"));
+		}
+	}
+
+	PasswordEdit->setText("");
+}
+
+
+void CThumbnailDecoratorGuiComp::on_LogoutButton_clicked()
+{
+	if (m_loginCompPtr.IsValid() && m_loginCompPtr->Logout()){
+		m_autoLogoutTimer.stop();
+
+		UpdateLoginButtonsState();
+	}
+}
+
+
+// private methods
+
+void CThumbnailDecoratorGuiComp::ShowLoginPage()
+{
 	m_pageModelCompPtr->SetSelectedOptionIndex(-1);
 
-	PageStack->setCurrentIndex(0);
+	PageStack->setCurrentIndex(LOGIN_PAGE_INDEX);
+	PageList->clearSelection();
+	PageTree->clear();
+	LeftFrame->setVisible(false);
+
+	CurrentPageLabel->setText(tr("Jacul"));
+}
+
+
+void CThumbnailDecoratorGuiComp::ShowHomePage()
+{
+	m_pageModelCompPtr->SetSelectedOptionIndex(-1);
+
+	PageStack->setCurrentIndex(HOME_PAGE_INDEX);
 	PageList->clearSelection();
 	PageTree->clear();
 	LeftFrame->setVisible(false);
@@ -232,7 +292,24 @@ void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 }
 
 
-// private methods
+void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
+{
+	if (m_loginCompPtr.IsValid()){
+		bool isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
+
+		LoginButton->setVisible(!isLogged);
+		LogoutButton->setVisible(isLogged);
+		UserEdit->setEnabled(!isLogged);
+		PasswordEdit->setEnabled(!isLogged);
+		UserEdit->setEnabled(!isLogged);
+		if (!isLogged){
+			m_autoLogoutTimer.stop();
+			qApp->removeEventFilter(this);
+			m_autoLogoutMilisec = 0;
+		}
+	}
+}
+
 
 void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* selectionPtr)
 {
