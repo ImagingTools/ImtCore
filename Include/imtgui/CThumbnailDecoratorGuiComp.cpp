@@ -115,6 +115,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 	
 	installEventFilter(this);
+
+	UpdateLoginButtonsState();
 }
 
 
@@ -260,6 +262,8 @@ void CThumbnailDecoratorGuiComp::on_LogoutButton_clicked()
 		m_autoLogoutTimer.stop();
 
 		UpdateLoginButtonsState();
+
+		ShowLoginPage();
 	}
 }
 
@@ -281,6 +285,13 @@ void CThumbnailDecoratorGuiComp::ShowLoginPage()
 
 void CThumbnailDecoratorGuiComp::ShowHomePage()
 {
+	if (m_loginCompPtr.IsValid()){
+		iauth::CUser* userPtr = m_loginCompPtr->GetLoggedUser();
+		if (userPtr == NULL){
+			return;
+		}
+	}
+
 	m_pageModelCompPtr->SetSelectedOptionIndex(-1);
 
 	PageStack->setCurrentIndex(HOME_PAGE_INDEX);
@@ -297,8 +308,8 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 	if (m_loginCompPtr.IsValid()){
 		bool isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
 
-		LoginButton->setVisible(!isLogged);
-		LogoutButton->setVisible(isLogged);
+		LoginButton->setEnabled(!isLogged);
+		LogoutButton->setEnabled(isLogged);
 		UserEdit->setEnabled(!isLogged);
 		PasswordEdit->setEnabled(!isLogged);
 		UserEdit->setEnabled(!isLogged);
@@ -307,6 +318,8 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 			qApp->removeEventFilter(this);
 			m_autoLogoutMilisec = 0;
 		}
+
+		HomeButton->setEnabled(isLogged);
 	}
 }
 
