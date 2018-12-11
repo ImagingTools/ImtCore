@@ -196,7 +196,7 @@ QAbstractItemView[TabSimulation=true]
          </font>
         </property>
         <property name="text">
-         <string>Home</string>
+         <string>Welcome</string>
         </property>
        </widget>
       </item>
@@ -306,6 +306,9 @@ QAbstractItemView[TabSimulation=true]
           <width>24</width>
           <height>24</height>
          </size>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -537,6 +540,9 @@ QAbstractItemView[TabSimulation=true]
                     <property name="icon">
                      <iconset resource="imtgui.qrc">
                       <normaloff>:/Icons/Lock</normaloff>:/Icons/Lock</iconset>
+                    </property>
+                    <property name="default">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>

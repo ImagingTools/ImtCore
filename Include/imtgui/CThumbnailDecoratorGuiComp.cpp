@@ -279,7 +279,7 @@ void CThumbnailDecoratorGuiComp::ShowLoginPage()
 	PageTree->clear();
 	LeftFrame->setVisible(false);
 
-	CurrentPageLabel->setText(tr("Jacul"));
+	CurrentPageLabel->setText(tr("Welcome"));
 }
 
 
