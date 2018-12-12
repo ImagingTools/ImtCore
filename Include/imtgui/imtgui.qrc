@@ -16,5 +16,10 @@
         <file alias="Lock">Resources/Icons/Lock.svg</file>
         <file alias="Unlock">Resources/Icons/Unlock.svg</file>
         <file alias="PowerOff">Resources/Icons/PowerOff.svg</file>
+        <file alias="ManualProcessing">Resources/Icons/ManualProcessing.svg</file>
+        <file alias="Pointer">Resources/Icons/Pointer.svg</file>
+        <file alias="Product">Resources/Icons/Product.svg</file>
+        <file alias="Production">Resources/Icons/Production.svg</file>
+        <file alias="Statistics">Resources/Icons/Statistics.svg</file>
     </qresource>
 </RCC>

@@ -515,7 +515,11 @@ QAbstractItemView[TabSimulation=true]
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QLineEdit" name="PasswordEdit"/>
+                 <widget class="QLineEdit" name="PasswordEdit">
+                  <property name="echoMode">
+                   <enum>QLineEdit::PasswordEchoOnEdit</enum>
+                  </property>
+                 </widget>
                 </item>
                 <item row="2" column="0" colspan="2">
                  <layout class="QHBoxLayout" name="horizontalLayout">
@@ -540,6 +544,9 @@ QAbstractItemView[TabSimulation=true]
                     <property name="icon">
                      <iconset resource="imtgui.qrc">
                       <normaloff>:/Icons/Lock</normaloff>:/Icons/Lock</iconset>
+                    </property>
+                    <property name="autoDefault">
+                     <bool>true</bool>
                     </property>
                     <property name="default">
                      <bool>true</bool>
