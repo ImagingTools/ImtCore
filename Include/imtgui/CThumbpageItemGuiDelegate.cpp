@@ -73,13 +73,13 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 
 	QIcon itemIcon = itemPtr->icon();
 
+	bool isEnabled = index.data(DR_STATE).toBool();
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->setRenderHint(QPainter::TextAntialiasing);
 	QFont font;
 	font.setPointSize(24);
 	painter->setFont(font);
-
-	QColor textColor = Qt::gray;
+	QColor textColor = isEnabled ? Qt::gray : Qt::lightGray;
 	painter->setPen(textColor);
 
 	QRect drawArea = QRect(mainRect.left() + m_horizontalMargin, mainRect.top() + m_verticalMargin, mainRect.width() - 2*m_horizontalMargin, mainRect.height() - 2*m_verticalMargin);
@@ -94,12 +94,12 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 
 	QStyleOptionButton button;
 	button.rect = drawArea;
-	button.state = QStyle::State_Enabled;
+	button.state = isEnabled ? QStyle::State_Enabled : QStyle::State_None;
 	button.palette = option.palette;
 
 	int iconRectLeft = drawArea.left() + (drawArea.width() - iconSize) / 2;
 	QRect iconRect(iconRectLeft, drawArea.top() + s_minPadding + (textAreaTop - iconSize)/2, iconSize, iconSize);
-	QPixmap itemPixmap = itemIcon.pixmap(QSize(iconRect.width(), iconRect.height()));
+	QPixmap itemPixmap = itemIcon.pixmap(QSize(iconRect.width(), iconRect.height()), isEnabled ? QIcon::Normal : QIcon::Disabled);
 
 	int textRectTop = drawArea.top() + textAreaTop + s_minPadding;
 	QRect textRect(drawArea.left() + s_minPadding, textRectTop, drawArea.width() - 2 * s_minPadding, textAreaHeight);
@@ -118,9 +118,8 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	painter->drawText(textRect, Qt::AlignCenter, itemPtr->text());
 
 	if ((option.state & QStyle::State_MouseOver)){
-		QColor curtainColor(255, 255, 255, 70);
-
-		painter->fillRect(option.rect, curtainColor);
+		painter->setPen(Qt::blue);
+		painter->drawRect(button.rect);
 	}
 }
 

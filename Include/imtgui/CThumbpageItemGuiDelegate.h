@@ -24,7 +24,8 @@ public:
 	enum DataRole
 	{
 		DR_TYPE_ID = Qt::UserRole,
-		DR_PAGE_ID
+		DR_PAGE_ID,
+		DR_STATE
 	};
 
 	CThumbpageItemGuiDelegate(

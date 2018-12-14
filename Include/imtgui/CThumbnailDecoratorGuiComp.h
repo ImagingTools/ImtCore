@@ -42,7 +42,8 @@ public:
 	I_BEGIN_COMPONENT(CThumbnailDecoratorGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
 		I_ASSIGN(m_pagesWidgetCompPtr, "PageUiContainer", "UI component containing all application pages", true, "PageUiContainer");
-		I_ASSIGN(m_pageModelCompPtr, "PageModel", "Data model describing the used pages", true, "PageModel");
+		I_ASSIGN(m_pagesCompPtr, "PageModel", "Data model describing the used pages", true, "PageModel");
+		I_ASSIGN_TO(m_pagesModelCompPtr, m_pagesCompPtr, true);
 		I_ASSIGN(m_commandsProviderCompPtr, "Commands", "Provider of the commands showed in the main tool bar", false, "Commands");
 		I_ASSIGN_TO(m_commandsProviderModelCompPtr, m_commandsProviderCompPtr, false);
 		I_ASSIGN(m_horizontalItemsViewAttrPtr, "HorizontalItemsView", "Count of visual items in horizontal row", false, 1);
@@ -96,6 +97,7 @@ private:
 	void UpdateLoginButtonsState();
 	void CreateItems(const iprm::ISelectionParam* selectionPtr);
 	void CreateMenu(const iprm::ISelectionParam* selectionPtr, QTreeWidgetItem* parentItemPtr);
+	void UpdatePageState();
 
 	/**
 		Calculate layout of page thumbnails based on m_horizontalItemsViewAttrPtr and m_verticalItemsViewAttrPtr
@@ -144,7 +146,20 @@ private:
 		CThumbnailDecoratorGuiComp& m_parent;
 	};
 
+	class PageModelObserver: public imod::CMultiModelDispatcherBase
+	{
+	public:
+		explicit PageModelObserver(CThumbnailDecoratorGuiComp& parent);
+
+		// reimplemented (imod::CMultiModelDispatcherBase)
+		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+
+	private:
+		CThumbnailDecoratorGuiComp& m_parent;
+	};
+
 	CommandsObserver m_commandsObserver;
+	PageModelObserver m_pageModelObserver;
 
 	QStandardItemModel m_menuItemModel;
 
@@ -163,7 +178,8 @@ private:
 	imtgui::CThumbpageItemGuiDelegate* m_itemDelegate;
 
 	I_REF(iqtgui::IGuiObject, m_pagesWidgetCompPtr);
-	I_REF(iprm::ISelectionParam, m_pageModelCompPtr);
+	I_REF(iprm::ISelectionParam, m_pagesCompPtr);
+	I_REF(imod::IModel, m_pagesModelCompPtr);
 	I_REF(ibase::ICommandsProvider, m_commandsProviderCompPtr);
 	I_REF(imod::IModel, m_commandsProviderModelCompPtr);
 	I_ATTR(int, m_horizontalItemsViewAttrPtr);

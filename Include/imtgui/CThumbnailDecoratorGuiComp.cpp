@@ -14,7 +14,7 @@
 #include <iqtgui/IMultiVisualStatusProvider.h>
 #include <iqtgui/CCommandTools.h>
 
-//imtgui includes
+// ImtCore includes
 #include <imtgui/CThumbpageItemGuiDelegate.h>
 
 
@@ -31,6 +31,7 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	:m_commands("&View", 100),
 	m_mainToolBar(NULL),
 	m_commandsObserver(*this),
+	m_pageModelObserver(*this),
 	m_columnsCount(0),
 	m_rowsCount(0),
 	m_verticalSpacing(0),
@@ -69,12 +70,12 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 
 // reimplemented (iqtgui::TRestorableGuiWrap)
 
-void CThumbnailDecoratorGuiComp::OnRestoreSettings(const QSettings& settings)
+void CThumbnailDecoratorGuiComp::OnRestoreSettings(const QSettings& /*settings*/)
 {
 }
 
 
-void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& settings) const
+void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& /*settings*/) const
 {
 }
 
@@ -99,11 +100,15 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		m_commandsObserver.RegisterModel(m_commandsProviderModelCompPtr.GetPtr(), 0, commandsChangeSet);
 	}
 
-	if (m_pageModelCompPtr.IsValid()){
-		CreateItems(m_pageModelCompPtr.GetPtr());
+	if (m_pagesCompPtr.IsValid()){
+		CreateItems(m_pagesCompPtr.GetPtr());
 
 		if (m_pagesWidgetCompPtr.IsValid()){
 			m_pagesWidgetCompPtr->CreateGui(ContentFrame);
+		}
+
+		if (m_pagesModelCompPtr.IsValid()){
+			m_pageModelObserver.RegisterModel(m_pagesModelCompPtr.GetPtr());
 		}
 	}
 
@@ -126,6 +131,9 @@ void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 		m_pagesWidgetCompPtr->DestroyGui();
 	}
 
+	m_pageModelObserver.UnregisterAllModels();
+	m_commandsObserver.UnregisterAllModels();
+
 	BaseClass::OnGuiDestroyed();
 }
 
@@ -140,36 +148,36 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 
 void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 {
-	PageTree->clear();
-	CurrentPageLabel->clear();
-
 	QStandardItem* item = m_menuItemModel.itemFromIndex(index);
 	bool pageExists = (item == nullptr) ? (false) : (item->data(CThumbpageItemGuiDelegate::DR_PAGE_ID).isValid());
 	if (!pageExists){
+		PageTree->clear();
+		CurrentPageLabel->clear();
 		on_HomeButton_clicked();
 
 		return;
 	}
 
-	QString itemName = item->text();
-	CurrentPageLabel->setText(itemName);
-
 	if (m_itemInfoMap.contains(item)){
 		ItemInfo& info = m_itemInfoMap[item];
 		if (info.selectionPtr != nullptr){
-			info.selectionPtr->SetSelectedOptionIndex(info.pageIndex);
+			if (info.selectionPtr->SetSelectedOptionIndex(info.pageIndex)){
+				PageTree->clear();
 
-			const iprm::ISelectionParam* subSelectionPtr = info.selectionPtr->GetSubselection(info.pageIndex);
-			if (subSelectionPtr != NULL){
-				CreateMenu(subSelectionPtr, NULL);
+				QString itemName = item->text();
+				CurrentPageLabel->setText(itemName);
+
+				const iprm::ISelectionParam* subSelectionPtr = info.selectionPtr->GetSubselection(info.pageIndex);
+				if (subSelectionPtr != NULL){
+					CreateMenu(subSelectionPtr, NULL);
+				}
+				if (info.pageIndex < 0){
+					PageStack->setCurrentIndex(HOME_PAGE_INDEX);
+				}
+				else{
+					PageStack->setCurrentIndex(PAGE_CONTAINER_INDEX);
+				}
 			}
-		}
-
-		if (info.pageIndex < 0){
-			PageStack->setCurrentIndex(HOME_PAGE_INDEX);
-		}
-		else{
-			PageStack->setCurrentIndex(PAGE_CONTAINER_INDEX);
 		}
 	}
 }
@@ -272,7 +280,9 @@ void CThumbnailDecoratorGuiComp::on_LogoutButton_clicked()
 
 void CThumbnailDecoratorGuiComp::ShowLoginPage()
 {
-	m_pageModelCompPtr->SetSelectedOptionIndex(-1);
+	if (m_pagesCompPtr.IsValid()){
+		m_pagesCompPtr->SetSelectedOptionIndex(-1);
+	}
 
 	PageStack->setCurrentIndex(LOGIN_PAGE_INDEX);
 	PageList->clearSelection();
@@ -292,7 +302,9 @@ void CThumbnailDecoratorGuiComp::ShowHomePage()
 		}
 	}
 
-	m_pageModelCompPtr->SetSelectedOptionIndex(-1);
+	if (m_pagesCompPtr.IsValid()){
+		m_pagesCompPtr->SetSelectedOptionIndex(-1);
+	}
 
 	PageStack->setCurrentIndex(HOME_PAGE_INDEX);
 	PageList->clearSelection();
@@ -330,6 +342,8 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 		return;
 	}
 
+	m_menuItemModel.clear();
+
 	const iqtgui::IMultiVisualStatusProvider* visualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(selectionPtr);
 
 	const iprm::IOptionsList* itemsListPtr = selectionPtr->GetSelectionConstraints();
@@ -346,10 +360,14 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 		if (itemName.isEmpty()){
 			itemName = tr("<unnamed>");
 		}
+
 		QByteArray menuItemId = itemsListPtr->GetOptionId(itemIndex);
+		bool isItemEnabled = itemsListPtr->IsOptionEnabled(itemIndex);
 
 		QStandardItem* menuItem = new QStandardItem(itemName);
 		menuItem->setData(menuItemId, CThumbpageItemGuiDelegate::DR_PAGE_ID);
+		menuItem->setData(isItemEnabled, CThumbpageItemGuiDelegate::DR_STATE);
+		menuItem->setEnabled(isItemEnabled);
 
 		if (visualStatusProviderPtr != nullptr){
 			const iqtgui::IVisualStatus* statusPtr = visualStatusProviderPtr->GetVisualStatus(itemIndex);
@@ -442,6 +460,34 @@ void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selecti
 	LeftFrame->setVisible(PageTree->topLevelItemCount() > 0);
 }
 
+
+void CThumbnailDecoratorGuiComp::UpdatePageState()
+{
+	if (m_pagesCompPtr.IsValid()){
+		const iprm::IOptionsList* pageListPtr = m_pagesCompPtr->GetSelectionConstraints();
+		int pagesCount = pageListPtr->GetOptionsCount();
+
+		for (ItemInfoMap::Iterator itemIter = m_itemInfoMap.begin(); itemIter != m_itemInfoMap.end(); ++itemIter){
+			int pageIndex = itemIter.value().pageIndex;
+			if (pageIndex < pagesCount){
+				QStandardItem* itemPtr = itemIter.key();
+
+				QByteArray pageId = pageListPtr->GetOptionId(pageIndex);
+				QByteArray itemId = itemPtr->data(CThumbpageItemGuiDelegate::DR_PAGE_ID).toByteArray();
+				if (itemId == pageId){
+					QString itemName = pageListPtr->GetOptionName(pageIndex);
+					if (itemName.isEmpty()){
+						itemName = tr("<unnamed>");
+					}
+
+					bool isItemEnabled = pageListPtr->IsOptionEnabled(pageIndex);
+					itemPtr->setEnabled(isItemEnabled);
+					itemPtr->setText(itemName);
+				}
+			}
+		}
+	}
+}
 
 
 void CThumbnailDecoratorGuiComp::GetMenuLayout(const int count)
@@ -618,6 +664,28 @@ CThumbnailDecoratorGuiComp::CommandsObserver::CommandsObserver(CThumbnailDecorat
 void CThumbnailDecoratorGuiComp::CommandsObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_parent.UpdateCommands();
+}
+
+
+// public methods of embedded class PageModelObserver
+
+CThumbnailDecoratorGuiComp::PageModelObserver::PageModelObserver(CThumbnailDecoratorGuiComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// protected methods of embedded class PageModelObserver
+
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CThumbnailDecoratorGuiComp::PageModelObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& changeSet)
+{
+	if (changeSet.ContainsExplicit(iprm::ISelectionParam::CF_SELECTION_CHANGED, true)){
+		return;
+	}
+
+	m_parent.UpdatePageState();
 }
 
 
