@@ -29,23 +29,14 @@ namespace imtgui
 {
 
 
-class CThumbnailDecoratorGuiComp:
-			public iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<Ui::CThumbnailDecoratorGuiComp>>,
-			public virtual ibase::ICommandsProvider
+class CThumbnailDecoratorGuiCompAttr:
+			public iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<Ui::CThumbnailDecoratorGuiComp>>
 {
-	Q_OBJECT
-
 public:
 	typedef iqtgui::TRestorableGuiWrap<
 				iqtgui::TDesignerGuiCompBase<Ui::CThumbnailDecoratorGuiComp>> BaseClass;
 
-	I_BEGIN_COMPONENT(CThumbnailDecoratorGuiComp);
-		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
-		I_ASSIGN(m_pagesWidgetCompPtr, "PageUiContainer", "UI component containing all application pages", true, "PageUiContainer");
-		I_ASSIGN(m_pagesCompPtr, "PageModel", "Data model describing the used pages", true, "PageModel");
-		I_ASSIGN_TO(m_pagesModelCompPtr, m_pagesCompPtr, true);
-		I_ASSIGN(m_commandsProviderCompPtr, "Commands", "Provider of the commands showed in the main tool bar", false, "Commands");
-		I_ASSIGN_TO(m_commandsProviderModelCompPtr, m_commandsProviderCompPtr, false);
+	I_BEGIN_BASE_COMPONENT(CThumbnailDecoratorGuiCompAttr);
 		I_ASSIGN(m_horizontalItemsViewAttrPtr, "HorizontalItemsView", "Count of visual items in horizontal row", false, 1);
 		I_ASSIGN(m_verticalItemsViewAttrPtr, "VerticalItemsView", "Count of visual items in vertical column", false, 1);
 		I_ASSIGN(m_horizontalSpacingAttrPtr, "HorizontalSpacing", "Horizontal spacing of items on view", false, 15);
@@ -54,8 +45,41 @@ public:
 		I_ASSIGN(m_verticalFrameMarginAttrPtr, "VerticalFrameMargin", "Vertical (top&bottom) side margin of thumbnail frame", false, 15);
 		I_ASSIGN(m_maximumFrameWidthAttrPtr, "MaximumFrameWidth", "Maximum width of thumbnail frame", false, 320);
 		I_ASSIGN(m_maximumFrameHeightAttrPtr, "MaximumFrameHeight", "Maximum height of thumbnail frame", false, 240);
-		I_ASSIGN(m_loginCompPtr, "Login", "Login logic component", false, "Login");
 		I_ASSIGN(m_autoLogoutMinutesAttrPtr, "AutoLogoutMinutes", "Time intervall for the automatic logout", false, 60);
+		I_ASSIGN(m_settingsPageIndexAttrPtr, "SettingsPageIndex", "Index of the system settings page", false, -1);
+	I_END_COMPONENT;
+
+protected:
+	I_ATTR(int, m_horizontalItemsViewAttrPtr);
+	I_ATTR(int, m_verticalItemsViewAttrPtr);
+	I_ATTR(int, m_horizontalSpacingAttrPtr);
+	I_ATTR(int, m_verticalSpacingAttrPtr);
+	I_ATTR(int, m_horizontalFrameMarginAttrPtr);
+	I_ATTR(int, m_verticalFrameMarginAttrPtr);
+	I_ATTR(int, m_maximumFrameWidthAttrPtr);
+	I_ATTR(int, m_maximumFrameHeightAttrPtr);
+	I_ATTR(int, m_autoLogoutMinutesAttrPtr);
+	I_ATTR(int, m_settingsPageIndexAttrPtr);
+};
+
+
+class CThumbnailDecoratorGuiComp:
+			public CThumbnailDecoratorGuiCompAttr,
+			public virtual ibase::ICommandsProvider
+{
+	Q_OBJECT
+
+public:
+	typedef CThumbnailDecoratorGuiCompAttr BaseClass;
+
+	I_BEGIN_COMPONENT(CThumbnailDecoratorGuiComp);
+		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
+		I_ASSIGN(m_pagesWidgetCompPtr, "PageUiContainer", "UI component containing all application pages", true, "PageUiContainer");
+		I_ASSIGN(m_pagesCompPtr, "PageModel", "Data model describing the used pages", true, "PageModel");
+		I_ASSIGN_TO(m_pagesModelCompPtr, m_pagesCompPtr, true);
+		I_ASSIGN(m_commandsProviderCompPtr, "Commands", "Provider of the commands showed in the main tool bar", false, "Commands");
+		I_ASSIGN_TO(m_commandsProviderModelCompPtr, m_commandsProviderCompPtr, false);
+		I_ASSIGN(m_loginCompPtr, "Login", "Login logic component", false, "Login");
 	I_END_COMPONENT;
 
 	enum
@@ -88,8 +112,9 @@ private Q_SLOTS:
 	void on_ExitButton_clicked();
 	void on_PageTree_itemSelectionChanged();
 	void on_HomeButton_clicked();
-	virtual void on_LoginButton_clicked();
-	virtual void on_LogoutButton_clicked();
+	void on_LoginButton_clicked();
+	void on_LogoutButton_clicked();
+	void on_SettingsButton_clicked();
 
 private:
 	void ShowLoginPage();
@@ -130,7 +155,7 @@ private:
 	ItemInfoMap m_itemInfoMap;
 
 	typedef QMap<QTreeWidgetItem*, ItemInfo> MenuItemInfoMap;
-	MenuItemInfoMap m_menuItemInfoMap;
+	MenuItemInfoMap m_subPageItemMap;
 
 	class CommandsObserver: public imod::CMultiModelDispatcherBase
 	{
@@ -182,16 +207,7 @@ private:
 	I_REF(imod::IModel, m_pagesModelCompPtr);
 	I_REF(ibase::ICommandsProvider, m_commandsProviderCompPtr);
 	I_REF(imod::IModel, m_commandsProviderModelCompPtr);
-	I_ATTR(int, m_horizontalItemsViewAttrPtr);
-	I_ATTR(int, m_verticalItemsViewAttrPtr);
-	I_ATTR(int, m_horizontalSpacingAttrPtr);
-	I_ATTR(int, m_verticalSpacingAttrPtr);
-	I_ATTR(int, m_horizontalFrameMarginAttrPtr);
-	I_ATTR(int, m_verticalFrameMarginAttrPtr);
-	I_ATTR(int, m_maximumFrameWidthAttrPtr);
-	I_ATTR(int, m_maximumFrameHeightAttrPtr);
 	I_REF(iauth::ILogin, m_loginCompPtr);
-	I_ATTR(int, m_autoLogoutMinutesAttrPtr);
 
 	QToolBar* m_mainToolBar;
 	QTimer m_autoLogoutTimer;

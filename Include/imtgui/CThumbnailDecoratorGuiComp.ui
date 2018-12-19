@@ -11,13 +11,24 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Main Window</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QToolBar[ImtToolBar=true] &gt; QToolButton
 {
 	min-width: 4em;
 }
+
+QWidget[ImtTopFrame=true] &gt; QWidget
+{
+	color: #0d8dd3;
+}
+
+QWidget[ImtTopFrame=true] &gt; QWidget:disabled
+{
+	color: palette(disabled);
+}
+
 
 QToolBar[ImtToolBar=true]
 {
@@ -34,6 +45,7 @@ QWidget[ImtTopFrame=true]
 	color: #0d8dd3;
 	min-height: 5em;
 }
+
 
 QWidget#BottomFrame
 {
@@ -130,9 +142,6 @@ QAbstractItemView[TabSimulation=true]
    </property>
    <item>
     <widget class="QFrame" name="TopFrame">
-     <property name="styleSheet">
-      <string notr="true">color: #0d8dd3;</string>
-     </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -293,7 +302,10 @@ QAbstractItemView[TabSimulation=true]
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="toolButton">
+       <widget class="QToolButton" name="SettingsButton">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>Settings</string>
         </property>
@@ -544,12 +556,6 @@ QAbstractItemView[TabSimulation=true]
                     <property name="icon">
                      <iconset resource="imtgui.qrc">
                       <normaloff>:/Icons/Lock</normaloff>:/Icons/Lock</iconset>
-                    </property>
-                    <property name="autoDefault">
-                     <bool>true</bool>
-                    </property>
-                    <property name="default">
-                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>

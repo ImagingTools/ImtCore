@@ -62,6 +62,18 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 	if (event->type() == QEvent::Resize){
 		UpdateSpacing();
 	}
+
+	if (m_loginCompPtr.IsValid()){
+		bool isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
+
+		if (isLogged && ((event->type() == QEvent::KeyRelease) || (event->type() == QEvent::MouseButtonRelease))){
+			// Auto log off functionality is activated
+			if (m_autoLogoutMilisec > 0){
+				m_autoLogoutTimer.start(m_autoLogoutMilisec);
+			}
+		}
+	}
+
 	return BaseClass::eventFilter(watched, event);
 }
 
@@ -90,7 +102,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	Q_ASSERT(widgetPtr != NULL);
 
 	m_itemInfoMap.clear();
-	m_menuItemInfoMap.clear();
+	m_subPageItemMap.clear();
 
 	LeftFrame->setVisible(false);
 
@@ -122,6 +134,16 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	installEventFilter(this);
 
 	UpdateLoginButtonsState();
+
+	connect(&m_autoLogoutTimer, SIGNAL(timeout()), this, SLOT(on_LogoutButton_clicked()));
+
+	bool isLogged = true;
+	SettingsButton->setVisible(m_settingsPageIndexAttrPtr.IsValid());
+	if (m_loginCompPtr.IsValid()){
+		isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
+	}
+
+	SettingsButton->setEnabled(isLogged);
 }
 
 
@@ -208,8 +230,8 @@ void CThumbnailDecoratorGuiComp::on_PageTree_itemSelectionChanged()
 		QTreeWidgetItem* parentItemPtr = selectedItemPtr->parent();
 
 		while (parentItemPtr != nullptr){
-			if (m_menuItemInfoMap.contains(parentItemPtr)){
-				ItemInfo& info = m_menuItemInfoMap[parentItemPtr];
+			if (m_subPageItemMap.contains(parentItemPtr)){
+				ItemInfo& info = m_subPageItemMap[parentItemPtr];
 
 				if (info.selectionPtr != nullptr){
 					info.selectionPtr->SetSelectedOptionIndex(info.pageIndex);
@@ -219,8 +241,8 @@ void CThumbnailDecoratorGuiComp::on_PageTree_itemSelectionChanged()
 			parentItemPtr = parentItemPtr->parent();
 		}
 
-		if (m_menuItemInfoMap.contains(selectedItemPtr)){
-			ItemInfo& info = m_menuItemInfoMap[selectedItemPtr];
+		if (m_subPageItemMap.contains(selectedItemPtr)){
+			ItemInfo& info = m_subPageItemMap[selectedItemPtr];
 
 			if (info.selectionPtr != nullptr){
 				info.selectionPtr->SetSelectedOptionIndex(info.pageIndex);
@@ -272,6 +294,21 @@ void CThumbnailDecoratorGuiComp::on_LogoutButton_clicked()
 		UpdateLoginButtonsState();
 
 		ShowLoginPage();
+	}
+}
+
+
+void CThumbnailDecoratorGuiComp::on_SettingsButton_clicked()
+{
+	Q_ASSERT(m_settingsPageIndexAttrPtr.IsValid());
+
+	for (ItemInfoMap::Iterator itemIter = m_itemInfoMap.begin(); itemIter != m_itemInfoMap.end(); ++itemIter){
+		int pageIndex = itemIter.value().pageIndex;
+		if (pageIndex == *m_settingsPageIndexAttrPtr){
+			QStandardItem* itemPtr = itemIter.key();
+
+			on_PageList_clicked(itemPtr->index());
+		}
 	}
 }
 
@@ -438,7 +475,7 @@ void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selecti
 		ItemInfo itemInfo;
 		itemInfo.pageIndex = pageIndex;
 		itemInfo.selectionPtr = const_cast<iprm::ISelectionParam*>(selectionPtr);
-		m_menuItemInfoMap[pageItem] = itemInfo;
+		m_subPageItemMap[pageItem] = itemInfo;
 
 		if (parentItemPtr == nullptr){
 			PageTree->addTopLevelItem(pageItem);

@@ -139,16 +139,28 @@
         <Element Id="Pages" PackageId="ImtGuiPck" ComponentId="ThumbnailDecoratorGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AutoLogoutMinutes" Type="Integer" ExportId="AutoLogoutMinutes">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Commands" Type="Reference" ExportId="PageCommands">
                         <Data IsEnabled="true" Value="CommandsMultiplexer"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="HorizontalItemsView" Type="Integer" ExportId="">
+                    <AttributeInfo Id="HorizontalFrameMargin" Type="Integer" ExportId="HorizontalFrameMargin">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HorizontalItemsView" Type="Integer" ExportId="HorizontalItemsView">
                         <Data IsEnabled="true" Value="2"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="HorizontalSpacing" Type="Integer" ExportId="">
+                    <AttributeInfo Id="HorizontalSpacing" Type="Integer" ExportId="HorizontalSpacing">
                         <Data IsEnabled="true" Value="10"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Login" Type="Reference" ExportId="Login">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MaximumFrameHeight" Type="Integer" ExportId="MaximumFrameHeight">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MaximumFrameWidth" Type="Integer" ExportId="MaximumFrameWidth">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PageModel" Type="Reference" ExportId="MainPageModel">
@@ -157,8 +169,17 @@
                     <AttributeInfo Id="PageUiContainer" Type="Reference" ExportId="MainUiPages">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SettingsPageIndex" Type="Integer" ExportId="SettingsPageIndex">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SettingsProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VerticalFrameMargin" Type="Integer" ExportId="VerticalFrameMargin">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VerticalItemsView" Type="Integer" ExportId="VerticalItemsView">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VerticalSpacing" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="10"/>
