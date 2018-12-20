@@ -379,6 +379,7 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 		return;
 	}
 
+	m_itemInfoMap.clear();
 	m_menuItemModel.clear();
 
 	const iqtgui::IMultiVisualStatusProvider* visualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(selectionPtr);
@@ -519,6 +520,7 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 
 					bool isItemEnabled = pageListPtr->IsOptionEnabled(pageIndex);
 					itemPtr->setEnabled(isItemEnabled);
+					itemPtr->setData(isItemEnabled, CThumbpageItemGuiDelegate::DR_STATE);
 					itemPtr->setText(itemName);
 				}
 			}

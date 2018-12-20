@@ -21,5 +21,25 @@
         <file alias="Product">Resources/Icons/Product.svg</file>
         <file alias="Production">Resources/Icons/Production.svg</file>
         <file alias="Statistics">Resources/Icons/Statistics.svg</file>
+        <file alias="Log">Resources/Icons/Log.svg</file>
+        <file alias="Ok">Resources/Icons/Ok.svg</file>
+        <file alias="StateInvalid">Resources/Icons/StateInvalid.svg</file>
+        <file alias="StateOk">Resources/Icons/StateOk.svg</file>
+        <file alias="StateWarning">Resources/Icons/StateWarning.svg</file>
+        <file alias="StateUnknown">Resources/Icons/StateUnknown.svg</file>
+        <file alias="Overview">Resources/Icons/Overview.svg</file>
+        <file alias="Cancel">Resources/Icons/Cancel.svg</file>
+        <file alias="Restore">Resources/Icons/Restore.svg</file>
+        <file alias="ZoomIn">Resources/Icons/ZoomIn.svg</file>
+        <file alias="ZoomOut">Resources/Icons/ZoomOut.svg</file>
+        <file alias="ZoomReset">Resources/Icons/ZoomReset.svg</file>
+        <file alias="ZoomToFit">Resources/Icons/ZoomToFit.svg</file>
+        <file alias="Polygon">Resources/Icons/Polygon.svg</file>
+        <file alias="Add">Resources/Icons/Add.svg</file>
+        <file alias="Delete">Resources/Icons/Delete.svg</file>
+        <file alias="Grid">Resources/Icons/Grid.svg</file>
+        <file alias="LogicalUnit">Resources/Icons/LogicalUnit.svg</file>
+        <file alias="Copy">Resources/Icons/Copy.svg</file>
+        <file alias="Checkerboard">Resources/Icons/Checkerboard.svg</file>
     </qresource>
 </RCC>

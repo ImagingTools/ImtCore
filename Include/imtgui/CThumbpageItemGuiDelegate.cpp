@@ -73,13 +73,13 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 
 	QIcon itemIcon = itemPtr->icon();
 
-	bool isEnabled = index.data(DR_STATE).toBool();
+	bool isEnabled = itemPtr->data(DR_STATE).toBool();
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->setRenderHint(QPainter::TextAntialiasing);
 	QFont font;
 	font.setPointSize(24);
 	painter->setFont(font);
-	QColor textColor = isEnabled ? Qt::gray : Qt::lightGray;
+	QColor textColor = isEnabled ? QColor("#0d8dd3"): Qt::lightGray;
 	painter->setPen(textColor);
 
 	QRect drawArea = QRect(mainRect.left() + m_horizontalMargin, mainRect.top() + m_verticalMargin, mainRect.width() - 2*m_horizontalMargin, mainRect.height() - 2*m_verticalMargin);
