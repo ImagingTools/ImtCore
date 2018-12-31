@@ -798,6 +798,17 @@ QAbstractItemView[TabSimulation=true]
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>UserEdit</tabstop>
+  <tabstop>PasswordEdit</tabstop>
+  <tabstop>LoginButton</tabstop>
+  <tabstop>ExitButton</tabstop>
+  <tabstop>PageTree</tabstop>
+  <tabstop>HomeButton</tabstop>
+  <tabstop>LogoutButton</tabstop>
+  <tabstop>SettingsButton</tabstop>
+  <tabstop>PageList</tabstop>
+ </tabstops>
  <resources>
   <include location="imtgui.qrc"/>
  </resources>
@@ -809,8 +820,8 @@ QAbstractItemView[TabSimulation=true]
    <slot>showFullScreen()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>955</x>
-     <y>62</y>
+     <x>965</x>
+     <y>47</y>
     </hint>
     <hint type="destinationlabel">
      <x>454</x>

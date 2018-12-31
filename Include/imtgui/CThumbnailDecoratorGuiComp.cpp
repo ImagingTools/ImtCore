@@ -82,13 +82,19 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 
 // reimplemented (iqtgui::TRestorableGuiWrap)
 
-void CThumbnailDecoratorGuiComp::OnRestoreSettings(const QSettings& /*settings*/)
+void CThumbnailDecoratorGuiComp::OnRestoreSettings(const QSettings& settings)
 {
+	QString lastUser  = settings.value("LastUser").toString();
+
+	UserEdit->setText(lastUser);
 }
 
 
-void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& /*settings*/) const
+void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& settings) const
 {
+	QString lastUser  = UserEdit->text();
+	
+	settings.setValue("LastUser", lastUser);
 }
 
 
@@ -130,6 +136,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	else{
 		ShowHomePage();
 	}
+
+	LogoutButton->setVisible(m_loginCompPtr.IsValid());
 	
 	installEventFilter(this);
 
@@ -207,15 +215,17 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 
 void CThumbnailDecoratorGuiComp::on_ExitButton_clicked()
 {
-	QWidget* topWidgetPtr = GetWidget();
-	while (topWidgetPtr->parentWidget() != NULL){
-		topWidgetPtr = topWidgetPtr->parentWidget();
-	}
+	if (QMessageBox::question(GetWidget(), tr("Quit"), tr("Do you really want to quit?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes){
+		QWidget* topWidgetPtr = GetWidget();
+		while (topWidgetPtr->parentWidget() != NULL){
+			topWidgetPtr = topWidgetPtr->parentWidget();
+		}
 
-	if (topWidgetPtr != NULL){
-		topWidgetPtr->close();
+		if (topWidgetPtr != NULL){
+			topWidgetPtr->close();
 
-		qApp->quit();
+			qApp->quit();
+		}
 	}
 }
 
