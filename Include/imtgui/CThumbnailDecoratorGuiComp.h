@@ -47,6 +47,7 @@ public:
 		I_ASSIGN(m_maximumFrameHeightAttrPtr, "MaximumFrameHeight", "Maximum height of thumbnail frame", false, 240);
 		I_ASSIGN(m_autoLogoutMinutesAttrPtr, "AutoLogoutMinutes", "Time intervall for the automatic logout", false, 60);
 		I_ASSIGN(m_settingsPageIndexAttrPtr, "SettingsPageIndex", "Index of the system settings page", false, -1);
+		I_ASSIGN(m_welcomeTextAttrPtr, "WelcomeText", "Welcome text on the start page", true, "Welcome");
 	I_END_COMPONENT;
 
 protected:
@@ -60,6 +61,7 @@ protected:
 	I_ATTR(int, m_maximumFrameHeightAttrPtr);
 	I_ATTR(int, m_autoLogoutMinutesAttrPtr);
 	I_ATTR(int, m_settingsPageIndexAttrPtr);
+	I_TEXTATTR(m_welcomeTextAttrPtr);
 };
 
 

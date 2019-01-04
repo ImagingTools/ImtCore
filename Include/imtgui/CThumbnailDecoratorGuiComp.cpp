@@ -171,6 +171,11 @@ void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
+
+	int currentPageIndex = PageStack->currentIndex();
+	if (currentPageIndex == LOGIN_PAGE_INDEX){
+		CurrentPageLabel->setText(*m_welcomeTextAttrPtr);
+	}
 }
 
 
@@ -336,7 +341,7 @@ void CThumbnailDecoratorGuiComp::ShowLoginPage()
 	PageTree->clear();
 	LeftFrame->setVisible(false);
 
-	CurrentPageLabel->setText(tr("Welcome"));
+	CurrentPageLabel->setText(*m_welcomeTextAttrPtr);
 }
 
 
