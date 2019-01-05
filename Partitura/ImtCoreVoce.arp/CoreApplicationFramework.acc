@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4737" Description="ACF"/>
-            <Version Id="1" Number="2019" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330497" Description="Qt Framework"/>
+            <Version Id="0" Number="4720" Description="ACF"/>
+            <Version Id="1" Number="2009" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330496" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Acula-based application framework</Description>
@@ -183,6 +183,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="VerticalSpacing" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="10"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WelcomeText" Type="Text" ExportId="WelcomeText">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
