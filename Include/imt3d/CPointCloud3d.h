@@ -35,6 +35,7 @@ public:
 	virtual void CreateCloud(const imt3d::CloudPoints &points) override;
 	virtual const CloudPoints& GetPoints() const override;
 
+	// reimplemented (IGridInfo)
 	virtual const istd::CIndex2d GetGridSize() const;
 	virtual const istd::CIndex2d GetGridPosition(int index) const;
 	virtual int GetCloudPosition(const istd::CIndex2d& index) const;

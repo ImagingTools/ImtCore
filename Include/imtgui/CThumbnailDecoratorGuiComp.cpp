@@ -235,7 +235,7 @@ void CThumbnailDecoratorGuiComp::on_ExitButton_clicked()
 }
 
 
-void CThumbnailDecoratorGuiComp::on_PageTree_itemSelectionChanged()
+void CThumbnailDecoratorGuiComp::on_SubPages_itemSelectionChanged()
 {
 	CurrentPageLabel->clear();
 
@@ -551,12 +551,12 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 				if (subMenuPtr != NULL){
 					const iprm::IOptionsList* subPageListPtr = subMenuPtr->GetSelectionConstraints();
 					if (subPageListPtr != NULL){
-						for (MenuItemInfoMap::Iterator itemIter = m_subPageItemMap.begin(); itemIter != m_subPageItemMap.end(); ++itemIter){
+						for (MenuItemInfoMap::Iterator subPageIter = m_subPageItemMap.begin(); subPageIter != m_subPageItemMap.end(); ++subPageIter){
 							int pageIndex = itemIter.value().pageIndex;
 
 							bool isPageEnabled = subPageListPtr->IsOptionEnabled(pageIndex);
 
-							itemIter.key()->setDisabled(!isPageEnabled);
+							subPageIter.key()->setDisabled(!isPageEnabled);
 						}
 					}
 				}
