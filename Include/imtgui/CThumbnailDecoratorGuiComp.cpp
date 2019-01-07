@@ -119,7 +119,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 
 	if (m_pagesCompPtr.IsValid()){
-		CreateItems(m_pagesCompPtr.GetPtr());
+		CreatePages(m_pagesCompPtr.GetPtr());
 
 		if (m_pagesWidgetCompPtr.IsValid()){
 			m_pagesWidgetCompPtr->CreateGui(ContentFrame);
@@ -186,7 +186,7 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 	QStandardItem* item = m_menuItemModel.itemFromIndex(index);
 	bool pageExists = (item == nullptr) ? (false) : (item->data(CThumbpageItemGuiDelegate::DR_PAGE_ID).isValid());
 	if (!pageExists){
-		PageTree->clear();
+		SubPages->clear();
 		CurrentPageLabel->clear();
 		on_HomeButton_clicked();
 
@@ -197,7 +197,7 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 		ItemInfo& info = m_itemInfoMap[item];
 		if (info.selectionPtr != nullptr){
 			if (info.selectionPtr->SetSelectedOptionIndex(info.pageIndex)){
-				PageTree->clear();
+				SubPages->clear();
 
 				QString itemName = item->text();
 				CurrentPageLabel->setText(itemName);
@@ -239,7 +239,7 @@ void CThumbnailDecoratorGuiComp::on_PageTree_itemSelectionChanged()
 {
 	CurrentPageLabel->clear();
 
-	QList<QTreeWidgetItem*> selectedItems = PageTree->selectedItems();
+	QList<QTreeWidgetItem*> selectedItems = SubPages->selectedItems();
 	if (!selectedItems.isEmpty()){
 		QTreeWidgetItem* selectedItemPtr = selectedItems[0];
 		QTreeWidgetItem* parentItemPtr = selectedItemPtr->parent();
@@ -338,7 +338,7 @@ void CThumbnailDecoratorGuiComp::ShowLoginPage()
 
 	PageStack->setCurrentIndex(LOGIN_PAGE_INDEX);
 	PageList->clearSelection();
-	PageTree->clear();
+	SubPages->clear();
 	LeftFrame->setVisible(false);
 
 	CurrentPageLabel->setText(*m_welcomeTextAttrPtr);
@@ -360,7 +360,7 @@ void CThumbnailDecoratorGuiComp::ShowHomePage()
 
 	PageStack->setCurrentIndex(HOME_PAGE_INDEX);
 	PageList->clearSelection();
-	PageTree->clear();
+	SubPages->clear();
 	LeftFrame->setVisible(false);
 
 	CurrentPageLabel->setText(tr("Home"));
@@ -388,7 +388,7 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 }
 
 
-void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* selectionPtr)
+void CThumbnailDecoratorGuiComp::CreatePages(const iprm::ISelectionParam* selectionPtr)
 {
 	if (selectionPtr == nullptr){
 		return;
@@ -456,16 +456,20 @@ void CThumbnailDecoratorGuiComp::CreateItems(const iprm::ISelectionParam* select
 
 void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selectionPtr, QTreeWidgetItem* parentItemPtr)
 {
-	PageTree->clear();
+	SubPages->clear();
 
 	if (selectionPtr == nullptr){
 		return;
 	}
 
-	const iqtgui::IMultiVisualStatusProvider* visualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(selectionPtr);
-
 	const iprm::IOptionsList* pageListPtr = selectionPtr->GetSelectionConstraints();
+	if (pageListPtr == nullptr){
+		return;
+	}
+
 	int pagesCount = pageListPtr->GetOptionsCount();
+
+	const iqtgui::IMultiVisualStatusProvider* visualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(selectionPtr);
 
 	int selectedIndex = selectionPtr->GetSelectedOptionIndex();
 
@@ -477,9 +481,10 @@ void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selecti
 
 		QByteArray pageId = pageListPtr->GetOptionId(pageIndex);
 
-		QTreeWidgetItem* pageItem = new QTreeWidgetItem;
+		QTreeWidgetItem* pageItem = new QTreeWidgetItem(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 		pageItem->setText(0, pageName);
 		pageItem->setData(0, CThumbpageItemGuiDelegate::DR_PAGE_ID, pageId);
+		pageItem->setDisabled(!pageListPtr->IsOptionEnabled(pageIndex));
 
 		if (visualStatusProviderPtr != nullptr){
 			const iqtgui::IVisualStatus* statusPtr = visualStatusProviderPtr->GetVisualStatus(pageIndex);
@@ -494,7 +499,7 @@ void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selecti
 		m_subPageItemMap[pageItem] = itemInfo;
 
 		if (parentItemPtr == nullptr){
-			PageTree->addTopLevelItem(pageItem);
+			SubPages->addTopLevelItem(pageItem);
 		}
 		else {
 			parentItemPtr->addChild(pageItem);
@@ -510,7 +515,7 @@ void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selecti
 		}
 	}
 
-	LeftFrame->setVisible(PageTree->topLevelItemCount() > 0);
+	LeftFrame->setVisible(SubPages->topLevelItemCount() > 0);
 }
 
 
@@ -519,6 +524,7 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 	if (m_pagesCompPtr.IsValid()){
 		const iprm::IOptionsList* pageListPtr = m_pagesCompPtr->GetSelectionConstraints();
 		int pagesCount = pageListPtr->GetOptionsCount();
+		int selectedPageIndex = 0;
 
 		for (ItemInfoMap::Iterator itemIter = m_itemInfoMap.begin(); itemIter != m_itemInfoMap.end(); ++itemIter){
 			int pageIndex = itemIter.value().pageIndex;
@@ -537,6 +543,22 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 					itemPtr->setEnabled(isItemEnabled);
 					itemPtr->setData(isItemEnabled, CThumbpageItemGuiDelegate::DR_STATE);
 					itemPtr->setText(itemName);
+				}
+			}
+
+			if (selectedPageIndex >= 0){
+				iprm::ISelectionParam* subMenuPtr = m_pagesCompPtr->GetSubselection(selectedPageIndex);
+				if (subMenuPtr != NULL){
+					const iprm::IOptionsList* subPageListPtr = subMenuPtr->GetSelectionConstraints();
+					if (subPageListPtr != NULL){
+						for (MenuItemInfoMap::Iterator itemIter = m_subPageItemMap.begin(); itemIter != m_subPageItemMap.end(); ++itemIter){
+							int pageIndex = itemIter.value().pageIndex;
+
+							bool isPageEnabled = subPageListPtr->IsOptionEnabled(pageIndex);
+
+							itemIter.key()->setDisabled(!isPageEnabled);
+						}
+					}
 				}
 			}
 		}

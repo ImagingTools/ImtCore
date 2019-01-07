@@ -122,7 +122,7 @@ private:
 	void ShowLoginPage();
 	void ShowHomePage();
 	void UpdateLoginButtonsState();
-	void CreateItems(const iprm::ISelectionParam* selectionPtr);
+	void CreatePages(const iprm::ISelectionParam* selectionPtr);
 	void CreateMenu(const iprm::ISelectionParam* selectionPtr, QTreeWidgetItem* parentItemPtr);
 	void UpdatePageState();
 
