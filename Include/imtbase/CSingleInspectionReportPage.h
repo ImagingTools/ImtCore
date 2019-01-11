@@ -2,14 +2,14 @@
 
 
 // ImtCore includes
-#include <imtbase/IReportPage.h>
+#include <imtbase/CReportPage.h>
 
 
 namespace imtbase
 {
 
 
-class CSingleInspectionReportPage: virtual public IReportPage
+class CSingleInspectionReportPage: public CReportPage
 {
 public:
 	// reimplemented (iser::ISerializable)

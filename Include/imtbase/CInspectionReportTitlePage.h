@@ -2,14 +2,14 @@
 
 
 // ImtCore includes
-#include <imtbase/IReportPage.h>
+#include <imtbase/CReportPage.h>
 
 
 namespace imtbase
 {
 
 
-class CInspectionReportTitlePage: virtual public IReportPage
+class CInspectionReportTitlePage: public CReportPage
 {
 public:
 	/**
