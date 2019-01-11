@@ -552,9 +552,9 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 					const iprm::IOptionsList* subPageListPtr = subMenuPtr->GetSelectionConstraints();
 					if (subPageListPtr != NULL){
 						for (MenuItemInfoMap::Iterator subPageIter = m_subPageItemMap.begin(); subPageIter != m_subPageItemMap.end(); ++subPageIter){
-							int pageIndex = itemIter.value().pageIndex;
+							int subPageIndex = itemIter.value().pageIndex;
 
-							bool isPageEnabled = subPageListPtr->IsOptionEnabled(pageIndex);
+							bool isPageEnabled = subPageListPtr->IsOptionEnabled(subPageIndex);
 
 							subPageIter.key()->setDisabled(!isPageEnabled);
 						}

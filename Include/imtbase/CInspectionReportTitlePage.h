@@ -1,19 +1,19 @@
 #pragma once
 
 
-// ACF includes
-#include <iser/ISerializable.h>
+// ImtCore includes
+#include <imtbase/IReportPage.h>
 
 
 namespace imtbase
 {
 
 
-class CInspectionReportTitlePage: virtual public iser::ISerializable
+class CInspectionReportTitlePage: virtual public IReportPage
 {
 public:
 	/**
-	Get the name of the produced part.
+		Get the name of the produced part.
 	*/
 	QString GetProductName() const;
 

@@ -1,11 +1,26 @@
 #include <imtbase/CReportBase.h>
 
 
+// ImtCore includes
+#include <imtbase/IReportPage.h>
+
+
 namespace imtbase
 {
 
 
 // public methods
+
+// reimplemented (IReportDocument)
+
+const IReportPage* CReportBase::GetReportPage(int pageIndex) const
+{
+	Q_ASSERT(pageIndex >= 0);
+	Q_ASSERT(pageIndex < m_documentPages.count());
+
+	return dynamic_cast<const IReportPage*>(m_documentPages[pageIndex]);
+}
+
 
 // reimplemented (idoc::IMultiPageDocument)
 

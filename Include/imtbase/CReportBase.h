@@ -6,6 +6,9 @@
 #include <idoc/TMultiPageDocumentWrap.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 
+// ImtCore includes
+#include <imtbase/IReportDocument.h>
+
 
 namespace imtbase
 {
@@ -14,10 +17,13 @@ namespace imtbase
 /**
 	Base implementation of a report document.
 */
-class CReportBase: public idoc::CMultiPageDocumentBase
+class CReportBase: public idoc::TMultiPageDocumentWrap<IReportDocument>
 {
 public:
-	typedef idoc::CMultiPageDocumentBase BaseClass;
+	typedef idoc::TMultiPageDocumentWrap<IReportDocument> BaseClass;
+
+	// reimplemented (IReportDocument)
+	virtual const IReportPage* GetReportPage(int pageIndex) const;
 
 	// reimplemented (idoc::IMultiPageDocument)
 	virtual istd::IChangeable* InsertPage(

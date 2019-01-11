@@ -1,15 +1,15 @@
 #pragma once
 
 
-// ACF includes
-#include <iser/ISerializable.h>
+// ImtCore includes
+#include <imtbase/IReportPage.h>
 
 
 namespace imtbase
 {
 
 
-class CSingleInspectionReportPage: virtual public iser::ISerializable
+class CSingleInspectionReportPage: virtual public IReportPage
 {
 public:
 	// reimplemented (iser::ISerializable)
