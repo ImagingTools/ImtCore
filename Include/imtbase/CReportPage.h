@@ -1,6 +1,12 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMap>
+
+// ACF includes
+#include <istd/TSmartPtr.h>
+
 // ImtCore includes
 #include <imtbase/IReportPage.h>
 
@@ -20,6 +26,14 @@ public:
 	virtual bool Serialize(iser::IArchive & archive) override;
 
 protected:
+
+	struct PageElement
+	{
+		istd::TSmartPtr<IGraphicsElement> elementPtr;
+	};
+
+	typedef QMap<QByteArray, PageElement> PageElementsMap;
+	PageElementsMap m_pageElementsMap;
 };
 
 

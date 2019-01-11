@@ -17,14 +17,16 @@ namespace imtbase
 
 IReportPage::ElementIds CReportPage::GetPageElements() const
 {
-	ElementIds retVal;
-
-	return retVal;
+	return m_pageElementsMap.keys();
 }
 
 
 const IGraphicsElement* CReportPage::GetPageElement(const QByteArray& elementId) const
 {
+	if (m_pageElementsMap.contains(elementId)){
+		return m_pageElementsMap[elementId].elementPtr.GetPtr();
+	}
+
 	return NULL;
 }
 

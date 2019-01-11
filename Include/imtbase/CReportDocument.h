@@ -17,7 +17,7 @@ namespace imtbase
 /**
 	Base implementation of a report document.
 */
-class CReportBase: public idoc::TMultiPageDocumentWrap<IReportDocument>
+class CReportDocument: public idoc::TMultiPageDocumentWrap<IReportDocument>
 {
 public:
 	typedef idoc::TMultiPageDocumentWrap<IReportDocument> BaseClass;
@@ -34,23 +34,6 @@ public:
 	// reimplemented (istd::IChangeable)
 	virtual bool CopyFrom(const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS);
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS);
-
-protected:
-	// abstract methods
-
-	/**
-		Create the title (overview) page of the report.
-	*/
-	virtual istd::IChangeable* CreateOverviewPage(
-				const iprm::IParamsSet* paramsPtr = nullptr,
-				const idoc::IDocumentMetaInfo* pageMetaInfoPtr = nullptr) const = 0;
-
-	/**
-		Create the detail page of the report.
-	*/
-	virtual istd::IChangeable* CreateDetailPage(
-				const iprm::IParamsSet* paramsPtr = nullptr,
-				const idoc::IDocumentMetaInfo* pageMetaInfoPtr = nullptr) const = 0;
 };
 
 

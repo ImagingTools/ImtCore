@@ -21,7 +21,7 @@ class IGraphicsElement;
 class IReportPage: virtual public iser::ISerializable
 {
 public:
-	typedef QVector<QByteArray> ElementIds;
+	typedef QList<QByteArray> ElementIds;
 
 	/**
 		Get the list of page elements.

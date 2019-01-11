@@ -1,8 +1,8 @@
-#include <imtbase/CReportBase.h>
+#include <imtbase/CReportDocument.h>
 
 
 // ImtCore includes
-#include <imtbase/IReportPage.h>
+#include <imtbase/CReportPage.h>
 
 
 namespace imtbase
@@ -13,7 +13,7 @@ namespace imtbase
 
 // reimplemented (IReportDocument)
 
-const IReportPage* CReportBase::GetReportPage(int pageIndex) const
+const IReportPage* CReportDocument::GetReportPage(int pageIndex) const
 {
 	Q_ASSERT(pageIndex >= 0);
 	Q_ASSERT(pageIndex < m_documentPages.count());
@@ -24,7 +24,7 @@ const IReportPage* CReportBase::GetReportPage(int pageIndex) const
 
 // reimplemented (idoc::IMultiPageDocument)
 
-istd::IChangeable* CReportBase::InsertPage(
+istd::IChangeable* CReportDocument::InsertPage(
 			const idoc::IDocumentMetaInfo* pageMetaInfoPtr,
 			const iprm::IParamsSet* pageParameterPtr,
 			int position)
@@ -37,18 +37,7 @@ istd::IChangeable* CReportBase::InsertPage(
 		}
 	}
 
-	istd::IChangeable* pageContentPtr = nullptr;
-
-	if (position == 0){
-		pageContentPtr = CreateOverviewPage(pageParameterPtr, pageMetaInfoPtr);
-	}
-	else{
-		pageContentPtr = CreateDetailPage(pageParameterPtr, pageMetaInfoPtr);
-	}
-
-	if (pageContentPtr == nullptr){
-		return nullptr;
-	}
+	istd::IChangeable* pageContentPtr = new imod::TModelWrap<CReportPage>;
 
 	newPage.pagePtr.SetPtr(pageContentPtr);
 
@@ -69,7 +58,7 @@ istd::IChangeable* CReportBase::InsertPage(
 
 // reimplemented (istd::IChangeable)
 
-bool CReportBase::CopyFrom(const istd::IChangeable& object, CompatibilityMode mode)
+bool CReportDocument::CopyFrom(const istd::IChangeable& object, CompatibilityMode mode)
 {
 	if (BaseClass::CopyFrom(object, mode)){
 		return true;
@@ -79,7 +68,7 @@ bool CReportBase::CopyFrom(const istd::IChangeable& object, CompatibilityMode mo
 }
 
 
-bool CReportBase::ResetData(CompatibilityMode /*mode*/)
+bool CReportDocument::ResetData(CompatibilityMode /*mode*/)
 {
 	ResetPages();
 
