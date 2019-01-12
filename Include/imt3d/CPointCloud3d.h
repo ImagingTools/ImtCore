@@ -4,7 +4,7 @@
 // Qt includes
 #include <QtCore/QLinkedList>
 
-// Acf includes
+// ACF includes
 #include <iimg/IRasterImage.h>
 
 // ImtCore includes

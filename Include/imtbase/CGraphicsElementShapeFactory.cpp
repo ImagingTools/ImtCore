@@ -28,21 +28,18 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const IGraphicsElement&
 	double strokeWidth = -1;
 	QGraphicsItem* itemPtr = NULL;
 	const CRectangleElement* rectangleElementPtr = dynamic_cast<const CRectangleElement*> (&graphicsElement);
-	if (rectangleElementPtr != NULL)
-	{
+	if (rectangleElementPtr != NULL){
 		itemPtr = new QGraphicsRectItem(iqt::GetQRectF(*rectangleElementPtr));
 		strokeWidth = rectangleElementPtr->GetStrokeWidth();
 	}
 
 	const CCircleElement* circleElementPtr = dynamic_cast<const CCircleElement*> (&graphicsElement);
-	if (circleElementPtr != NULL)
-	{
+	if (circleElementPtr != NULL){
 		itemPtr = new QGraphicsEllipseItem(iqt::GetQRectF(circleElementPtr->GetBoundingBox()));
 	}
 
 	const CTextLabelElement* labelElementPtr = dynamic_cast<const CTextLabelElement*> (&graphicsElement);
-	if (labelElementPtr != NULL)
-	{
+	if (labelElementPtr != NULL){
 		QGraphicsSimpleTextItem* textItemPtr = new QGraphicsSimpleTextItem(labelElementPtr->GetText());
 
 		double fontSize = labelElementPtr->GetFontSize();
@@ -66,12 +63,10 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const IGraphicsElement&
 	}
 
 	const CPolygonElement* polygonElementPtr = dynamic_cast<const CPolygonElement*> (&graphicsElement);
-	if (polygonElementPtr != NULL)
-	{
+	if (polygonElementPtr != NULL){
 		QPolygonF polygon;
-		for (int i = 0; i < polygonElementPtr->GetNodesCount(); ++i)
-		{
-            const i2d::CVector2d& node = polygonElementPtr->GetNodePos(i);
+		for (int i = 0; i < polygonElementPtr->GetNodesCount(); ++i){
+			const i2d::CVector2d& node = polygonElementPtr->GetNodePos(i);
 
 			polygon.append(QPointF(node.GetX(), node.GetY()));
 		}
@@ -80,12 +75,10 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const IGraphicsElement&
 	}
 
 	const CImageRectangleElement* imageRectangleElementPtr = dynamic_cast<const CImageRectangleElement*> (&graphicsElement);
-	if (imageRectangleElementPtr != NULL)
-	{
+	if (imageRectangleElementPtr != NULL){
 		QString imgPath = imageRectangleElementPtr->GetImagePath();
 
-		if (!QFileInfo(imgPath).exists())
-		{
+		if (!QFileInfo(imgPath).exists()){
 			qDebug(QString("CGraphicsElementShapeFactory: Image %1 can not be found!").arg(imgPath).toLocal8Bit().constData());
 		}
 
@@ -101,22 +94,18 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const IGraphicsElement&
 
 		QSize s = pixmap.size();
 
-		if (s.width() > 0)
-		{
+		if (s.width() > 0){
 			double scale = rect.width() / s.width();
 
 			itemPtr->setScale(scale);
 		}
-		else
-		{
+		else{
 			itemPtr->setScale(1);
 		}
-
 	}
 	
 	QAbstractGraphicsShapeItem* abstractGraphicsShapeItemPtr = dynamic_cast<QAbstractGraphicsShapeItem*> (itemPtr);
-	if (abstractGraphicsShapeItemPtr != NULL)
-	{
+	if (abstractGraphicsShapeItemPtr != NULL){
 		QPen pen(graphicsElement.GetStrokeColor());
 
 		if (strokeWidth > 0)

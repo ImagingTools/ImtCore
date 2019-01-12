@@ -5,7 +5,7 @@
 #include <QtCore/QLinkedList>
 #include <QVector>
 
-// Acf includes
+// ACF includes
 #include <i3d/CVector3d.h>
 #include <istd/TSmartPtr.h>
 
