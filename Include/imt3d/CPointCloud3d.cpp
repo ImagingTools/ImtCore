@@ -78,7 +78,7 @@ const istd::CIndex2d CPointCloud3d::GetGridPosition(int index) const
 
 int CPointCloud3d::GetCloudPosition(const istd::CIndex2d & index) const
 {
-	return m_gridSize.GetY()*index.GetY() + index.GetX();
+	return m_gridSize.GetY() * index.GetY() + index.GetX();
 }
 
 
