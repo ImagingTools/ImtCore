@@ -262,7 +262,9 @@ void CPointCloud3d::EnsureCenterCalculated() const
 		istd::CRange yRange(qInf(), -qInf());
 		istd::CRange zRange(qInf(), -qInf());
 
-		for (CloudPoints::const_iterator pointIter = m_cloudPoints.constBegin(); pointIter != m_cloudPoints.constEnd(); pointIter++){
+		for (		CloudPoints::ConstIterator pointIter = m_cloudPoints.constBegin();
+					pointIter != m_cloudPoints.constEnd();
+					pointIter++){
 			if (!IsPointValid(*pointIter)){
 				continue;
 			}
