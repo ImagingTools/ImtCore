@@ -68,7 +68,7 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 
 	QTextStream stream(&file);
 
-	imt3d::CloudPoints cloudPoints;
+	IPointCloud3d::CloudPoints cloudPoints;
 
 	while (!stream.atEnd()){
 		QString line = stream.readLine();
@@ -122,8 +122,8 @@ int CObjPointCloudPersistenceComp::SaveToFile(const istd::IChangeable& data, con
 
 	QTextStream stream(&file);
 
-	const imt3d::CloudPoints& points = documentPtr->GetPoints();
-	for (imt3d::CloudPoints::ConstIterator iter = points.constBegin(); iter != points.constEnd(); ++iter){
+	const IPointCloud3d::CloudPoints& points = documentPtr->GetPoints();
+	for (IPointCloud3d::CloudPoints::ConstIterator iter = points.constBegin(); iter != points.constEnd(); ++iter){
 		QString textLine = QString("v %1 %2 %3").arg(iter->GetX()).arg(iter->GetY()).arg(iter->GetZ());
 
 		stream << textLine << "\n";

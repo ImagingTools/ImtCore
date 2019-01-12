@@ -32,7 +32,7 @@ public:
 	void AddPoint(const i3d::CVector3d& point);
 
 	// reimplemented (IPointCloud3d)
-	virtual void CreateCloud(const imt3d::CloudPoints &points) override;
+	virtual void CreateCloud(const CloudPoints &points) override;
 	virtual const CloudPoints& GetPoints() const override;
 
 	// reimplemented (IGridInfo)

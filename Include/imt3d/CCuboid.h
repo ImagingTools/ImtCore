@@ -3,9 +3,7 @@
 
 // ACF includes
 #include <istd/TRange.h>
-
-// ImtCore includes
-#include <imt3d/imt3d.h>
+#include <i3d/CVector3d.h>
 
 
 namespace imt3d
@@ -73,7 +71,6 @@ public:
 
 	i3d::CVector3d GetCenterPoint();
 	void ExpandToPoint(const i3d::CVector3d& point);
-	static CCuboid FromCloudPoints(const CloudPoints& cloudPoints);
 
 	const istd::CRange& GetHorizontalRange() const;
 	istd::CRange& GetHorizontalRangeRef();

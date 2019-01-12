@@ -24,8 +24,6 @@ namespace imt3d
 {
 
 
-typedef QVector<i3d::CVector3d> CloudPoints;
-
 
 } // namespace imt3d
 

@@ -56,7 +56,7 @@ void CPointCloud3d::AddPoint(const i3d::CVector3d &point)
 
 // reimplemented (IPointCloud3d)
 
-void CPointCloud3d::CreateCloud(const imt3d::CloudPoints &points)
+void CPointCloud3d::CreateCloud(const IPointCloud3d::CloudPoints &points)
 {
 	m_isCloudCenterCalculationValid = false;
 
@@ -66,7 +66,7 @@ void CPointCloud3d::CreateCloud(const imt3d::CloudPoints &points)
 }
 
 
-const CloudPoints& CPointCloud3d::GetPoints() const
+const IPointCloud3d::CloudPoints& CPointCloud3d::GetPoints() const
 {
 	return m_cloudPoints;
 }
@@ -80,8 +80,8 @@ const istd::CIndex2d CPointCloud3d::GetGridSize() const
 
 const istd::CIndex2d CPointCloud3d::GetGridPosition(int index) const
 {
-	const int y = index / m_gridSize.GetY();
-	const int x = index - m_gridSize.GetY() * y;
+	int y = index / m_gridSize.GetY();
+	int x = index - m_gridSize.GetY() * y;
 	return istd::CIndex2d(x, y);
 }
 
@@ -132,14 +132,57 @@ void CPointCloud3d::MoveCenterTo(const i3d::CVector3d &position)
 
 const CCuboid& CPointCloud3d::GetBoundingCuboid() const
 {
-	if (!IsEmpty() && !m_isCloudCuboidCalculationValid){
-		m_boundingCuboid = CCuboid::FromCloudPoints(m_cloudPoints);
-		
+	if (!m_isCloudCuboidCalculationValid){
 		m_isCloudCuboidCalculationValid = true;
+
+		if (!m_cloudPoints.isEmpty()){
+			double left = std::numeric_limits<double>::max();
+			double right = std::numeric_limits<double>::min();
+			double bottom = std::numeric_limits<double>::max();
+			double top = std::numeric_limits<double>::min();
+			double near = std::numeric_limits<double>::min();
+			double far = std::numeric_limits<double>::max();
+
+			for (IPointCloud3d::CloudPoints::const_iterator pointIter = m_cloudPoints.constBegin(); pointIter != m_cloudPoints.constEnd(); pointIter++){
+				if (!imt3d::CPointCloud3d::IsPointValid(*pointIter)){
+					continue;
+				}
+
+				if ((pointIter->GetX() > right)){
+					right = pointIter->GetX();
+				}
+
+				if ((pointIter->GetX() < left)){
+					left = pointIter->GetX();
+				}
+				if ((pointIter->GetY() > top)){
+					top = pointIter->GetY();
+				}
+
+				if ((pointIter->GetY() < bottom)){
+					bottom = pointIter->GetY();
+				}
+				if ((pointIter->GetZ() > near)){
+					near = pointIter->GetZ();
+				}
+
+				if ((pointIter->GetZ() < far)){
+					far = pointIter->GetZ();
+				}
+			}
+
+			m_boundingCuboid = CCuboid(left, right, bottom, top, near, far);
+		}
+		else{
+			m_boundingCuboid = CCuboid();
+		}
 	}
 
 	return m_boundingCuboid;
 }
+
+
+// reimplemented (iser::ISerializable)
 
 bool CPointCloud3d::Serialize(iser::IArchive &archive)
 {
