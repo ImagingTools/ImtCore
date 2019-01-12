@@ -29,7 +29,6 @@ public:
 	static i3d::CVector3d GetInvalidPoint();
 
 	void SetGridSize(const istd::CIndex2d& gridSize);
-	void AddPoint(const i3d::CVector3d& point);
 
 	// reimplemented (IPointCloud3d)
 	virtual void CreateCloud(const CloudPoints &points) override;

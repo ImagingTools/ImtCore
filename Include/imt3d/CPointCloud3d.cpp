@@ -1,7 +1,7 @@
 #include <imt3d/CPointCloud3d.h>
 
 
-// Acf includes
+// ACF includes
 #include <istd/TRange.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/CArchiveTag.h>
@@ -41,16 +41,6 @@ i3d::CVector3d CPointCloud3d::GetInvalidPoint()
 void CPointCloud3d::SetGridSize(const istd::CIndex2d& gridSize)
 {
 	m_gridSize = gridSize;
-}
-
-
-void CPointCloud3d::AddPoint(const i3d::CVector3d &point)
-{
-	istd::CChangeNotifier notifier(this);
-
-	m_cloudPoints.push_back(point);
-	m_isCloudCenterCalculationValid = false;
-	m_isCloudCuboidCalculationValid = false;
 }
 
 
