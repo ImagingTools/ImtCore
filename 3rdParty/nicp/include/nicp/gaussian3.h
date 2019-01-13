@@ -1,5 +1,4 @@
 #pragma once
-#include "ExportNicp.h"
 
 #include "definitions.h"
 #include "homogeneousvector4f.h"
@@ -16,7 +15,7 @@ namespace nicp {
    *  to define the dimension at compile time. This struct memorize all the foundamental
    *  informations about a gaussian like the mean, the covariance matrix and the information matrix.
    */
-  class NICP_API Gaussian3fVector : public TransformableVector<Gaussian3f> {
+  class Gaussian3fVector : public TransformableVector<Gaussian3f> {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

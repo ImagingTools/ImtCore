@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "pinholepointprojector.h"
 #include "depthimageconverter.h"
@@ -14,7 +15,7 @@ namespace nicp {
    *  of points that are not necessary and slow the computation. The merging process will reduct
    *  the points erasing the ones in surplus.
    */
-  class Merger {
+  class NICP_API Merger {
   public:  
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

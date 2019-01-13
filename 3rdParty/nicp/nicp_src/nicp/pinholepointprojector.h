@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "pointprojector.h"
 
@@ -10,7 +11,7 @@ namespace nicp {
    *  This class extends the PointProjector class in order to provide point 
    *  projection/unprojection based on pinhole camera model.
    */
-  class PinholePointProjector : virtual public PointProjector {
+  class NICP_API PinholePointProjector : virtual public PointProjector {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -297,7 +298,7 @@ namespace nicp {
       	return cv::Vec2i(-1, -1);      
       Eigen::Vector3f p = _cameraMatrix * Eigen::Vector3f(worldRadius, worldRadius, 0);
       p *= (1.0f / d);
-      float maxSide = std::max(p.coeff(0), p.coeff(1));
+      float maxSide = (std::max)(p.coeff(0), p.coeff(1));
       return cv::Vec2i(maxSide, maxSide);
     }
 

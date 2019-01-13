@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include <flann/flann.hpp>
 
@@ -14,7 +15,7 @@ namespace nicp {
      *  nearest neighbor approach. A correspondence has to satisfy some constraint like
      *  maximum angle between normals, maximum distance between the points and so on.
      */
-    class CorrespondenceFinderNN : public CorrespondenceFinder {
+    class NICP_API CorrespondenceFinderNN : public CorrespondenceFinder {
       public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

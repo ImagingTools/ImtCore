@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "stats.h"
 #include "definitions.h"
@@ -12,7 +13,7 @@ namespace nicp {
    *  normals computation.
    *  It should be extended in order to implement your own properties to compute.
    */
-  class StatsCalculator {
+  class NICP_API StatsCalculator {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

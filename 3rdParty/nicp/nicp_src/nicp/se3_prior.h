@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "bm_se3.h"
 
@@ -25,7 +26,7 @@
 
 namespace nicp {
 
-  class SE3Prior {
+  class NICP_API SE3Prior {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   
@@ -63,7 +64,7 @@ namespace nicp {
      where invT s the *inverse* of the transformation we are looking for.
   */
 
-  class SE3RelativePrior: public SE3Prior{
+  class NICP_API SE3RelativePrior: public SE3Prior{
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -83,7 +84,7 @@ namespace nicp {
      where invT s the *inverse* of the transformation we are looking for.
   */
 
-  class SE3AbsolutePrior : public SE3Prior{
+  class NICP_API SE3AbsolutePrior : public SE3Prior{
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
     

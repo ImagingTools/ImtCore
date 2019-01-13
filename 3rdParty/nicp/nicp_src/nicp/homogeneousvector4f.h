@@ -18,7 +18,7 @@ namespace nicp {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-    static constexpr float wCoordinate = wCoordinate_;
+	static const float wCoordinate;// = wCoordinate_;
 
     /**
      *  Empty constructor.
@@ -67,6 +67,9 @@ namespace nicp {
 
   };
 
+	template<int wCoordinate_>
+	const float HomogeneousVector4f<wCoordinate_>::wCoordinate = wCoordinate_;
+
   /** \typedef Point
    * \brief An Homogeneous4fVector where the homogeneous coordinates is equal to 1.
    */
@@ -87,4 +90,4 @@ namespace nicp {
    */
   typedef TransformableVector<Normal> NormalVector;
 
-}
+};

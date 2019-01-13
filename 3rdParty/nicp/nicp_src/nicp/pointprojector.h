@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "gaussian3.h"
 
@@ -13,7 +14,7 @@ namespace nicp {
    *  interface that can be extended in order to build a specific PointProjector and then use it 
    *  to do the basic projection/unprojection operations on set of points.
    */
-  class PointProjector {
+  class NICP_API PointProjector {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

@@ -37,8 +37,8 @@ namespace nicp {
     inline Eigen::Transform<typename Derived::Scalar, 3, Eigen::Isometry> v2t(const Eigen::MatrixBase<Derived>& x_) {
     Eigen::Transform<typename Derived::Scalar, 3, Eigen::Isometry> X;
     Eigen::Matrix<typename Derived::Scalar, 6, 1> x(x_);
-    X.linear() = quat2mat(x.block<3,1>(3,0));
-    X.translation() = x.block<3,1>(0,0);
+    X./*template */linear() = quat2mat(x.template block<3,1>(3,0));
+    X./*.template */translation() = x.template block<3,1>(0,0);
     return X;
   }
 

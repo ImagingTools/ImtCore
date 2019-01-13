@@ -29,15 +29,15 @@ namespace nicp {
 
     // Allocate the variables for the sum reduction;
     int numThreads = omp_get_max_threads();
-    std::vector<Matrix4f> _Htt(numThreads);
-    std::vector<Matrix4f> _Htr(numThreads);
-    std::vector<Matrix4f> _Hrr(numThreads);
-    std::vector<Vector4f> _bt(numThreads);
-    std::vector<Vector4f> _br(numThreads);
-    std::vector<int> _inliers(numThreads);
-    std::vector<float> _errors(numThreads);
+	std::vector<Matrix4f> _Htt(numThreads);
+	std::vector<Matrix4f> _Htr(numThreads);
+	std::vector<Matrix4f> _Hrr(numThreads);
+	std::vector<Vector4f> _bt(numThreads);
+	std::vector<Vector4f> _br(numThreads);
+	std::vector<int> _inliers(numThreads);
+	std::vector<float> _errors(numThreads);
     int iterationsPerThread = _aligner->correspondenceFinder()->numCorrespondences() / numThreads;
-#pragma omp parallel
+//#pragma omp parallel
     {
       int threadId = omp_get_thread_num();
       int imin = iterationsPerThread * threadId;

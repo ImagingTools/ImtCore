@@ -41,8 +41,8 @@ namespace nicp {
     depthImage.setTo(cv::Scalar(std::numeric_limits<float>::max()));
     indexImage.setTo(cv::Scalar(-1));   
 
-    std::vector<float*> drowPtrs(_imageRows);
-    std::vector<int*> irowPtrs(_imageRows);
+	std::vector<float*> drowPtrs(_imageRows);
+	std::vector<int*> irowPtrs(_imageRows);
     for(int i = 0; i < _imageRows; i++) {
       drowPtrs[i] = &depthImage(i, 0);
       irowPtrs[i] = &indexImage(i, 0);

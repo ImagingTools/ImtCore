@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "stats.h"
 #include "informationmatrix.h"
@@ -11,7 +12,7 @@ namespace nicp {
    *  This class provides an easy interface for information matrix computation. This class should be
    *  extended in order to define a specific InformationMatrixCalculator that fits your needs.
    */
-  class InformationMatrixCalculator {
+  class NICP_API InformationMatrixCalculator {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   
@@ -104,7 +105,7 @@ namespace nicp {
    *  
    *  This class allows to compyte the information matrices associated to the points of a point cloud.
    */
-  class PointInformationMatrixCalculator : virtual public InformationMatrixCalculator {
+  class NICP_API PointInformationMatrixCalculator : virtual public InformationMatrixCalculator {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -139,7 +140,7 @@ namespace nicp {
    *  
    *  This class allows to compyte the information matrices associated to the normals of a point cloud.
    */
-  class NormalInformationMatrixCalculator : virtual public InformationMatrixCalculator {
+  class NICP_API NormalInformationMatrixCalculator : virtual public InformationMatrixCalculator {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

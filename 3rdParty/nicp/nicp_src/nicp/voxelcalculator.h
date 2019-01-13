@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "cloud.h"
 
@@ -9,7 +10,7 @@ using namespace Eigen;
 
 namespace nicp {
 
-  class VoxelCalculator {
+  class NICP_API VoxelCalculator {
     struct VoxelAccumulator {
       Point accumulator;
       int numPoints;

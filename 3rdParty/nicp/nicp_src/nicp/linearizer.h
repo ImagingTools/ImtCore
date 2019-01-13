@@ -16,7 +16,7 @@ namespace nicp {
    *  This class provides a linearing algorithm used by the Aligner to align
    *  two point clouds.
    */
-  class Linearizer {
+  class NICP_API Linearizer {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

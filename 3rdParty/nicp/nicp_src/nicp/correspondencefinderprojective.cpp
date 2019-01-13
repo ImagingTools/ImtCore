@@ -37,14 +37,14 @@ namespace nicp {
       // Construct an array of counters;
       int numThreads = omp_get_max_threads();
       std::vector<int> localCorrespondenceIndex(numThreads);
-      std::vector<int> localOffset(numThreads);
+	  std::vector<int> localOffset(numThreads);
       int rowsPerThread = _referenceIndexImage.rows / numThreads;
       int iterationsPerThread = (_referenceIndexImage.rows * _referenceIndexImage.cols) / numThreads;
       for(int i = 0; i < numThreads; i++) {
 	 localOffset[i] = i * iterationsPerThread;
 	 localCorrespondenceIndex[i] = localOffset[i];
       }
-#pragma omp parallel
+//#pragma omp parallel
       {
 	 int threadId = omp_get_thread_num();
 	 int rMin = threadId * rowsPerThread;
@@ -132,16 +132,16 @@ namespace nicp {
 
       // Construct an array of counters;
       int numThreads = omp_get_max_threads();
-      std::vector<int> localCorrespondenceIndex(numThreads);
-      std::vector<int> localOffset(numThreads);
+	  std::vector<int> localCorrespondenceIndex(numThreads);
+	  std::vector<int> localOffset(numThreads);
       int rowsPerThread = _referenceIndexImage.rows / numThreads;
       int iterationsPerThread = (_referenceIndexImage.rows * _referenceIndexImage.cols) / numThreads;
       for(int i = 0; i < numThreads; i++) {
-         localOffset[i] = i * iterationsPerThread;
-         localCorrespondenceIndex[i] = localOffset[i];
+	 localOffset[i] = i * iterationsPerThread;
+	 localCorrespondenceIndex[i] = localOffset[i];
       }
 
-#pragma omp parallel
+//#pragma omp parallel
       {
 	 int threadId = omp_get_thread_num();
 	 int rMin = threadId * rowsPerThread;

@@ -1,4 +1,5 @@
 #pragma once
+#include "ExportNicp.h"
 
 #include "cloud.h"
 #include "pointprojector.h"
@@ -15,7 +16,7 @@ namespace nicp {
    *  in the compute function. This allows to compact the code in a unique class that will
    *  handle the depth images loading.
    */
-  class DepthImageConverter {
+  class NICP_API DepthImageConverter {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 

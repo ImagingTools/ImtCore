@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ExportNicp.h"
+
 #include "linearizer.h"
 #include "pointprojector.h"
 #include "cloud.h"
@@ -13,7 +15,7 @@ namespace nicp {
    *
    *  This class is an interface for objects that want to align two point clouds.
    */
-  class Aligner {
+  class NICP_API Aligner {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -23,7 +25,7 @@ namespace nicp {
      *  All the pointers to objects implementing an algorithm have to be set since
      *  this constructor sets them to zero.
      */
-    Aligner();
+	Aligner();
 
     /**
      *  This constructor creates an Aligner with default values for all its attributes.
@@ -32,7 +34,7 @@ namespace nicp {
      *  @param linearizer_ is a pointer to the linearizer that will be used by the Aligner.
      *  @param correspondenceFinder_ is a pointer to the point correspondence finder that will be used by the Aligner.
      */
-    Aligner(PointProjector* projector_, Linearizer* linearizer_, CorrespondenceFinder* correspondenceFinder_);
+	Aligner(PointProjector* projector_, Linearizer* linearizer_, CorrespondenceFinder* correspondenceFinder_);
 
     /**
      *  Destructor.
