@@ -1,11 +1,11 @@
 #pragma once
 
 
-// ImtCore includes
-#include <imtbase/IGraphicsElement.h>
+// imtreports includes
+#include <imtreports/IGraphicsElement.h>
 
 
-namespace imtbase
+namespace imtreports
 {
 
 
@@ -24,8 +24,6 @@ public:
 	virtual void SetStrokeColor(const QColor& strokeColor);
 	virtual double GetStrokeWidth() const;
 	virtual void SetStrokeWidth(double strokeWidth);
-	virtual void SetId(const QByteArray& id);
-	virtual QByteArray GetId() const;
 
 	// reimplemented (iser::ISerializeable)
 	virtual bool Serialize(iser::IArchive& archive);
@@ -37,10 +35,9 @@ private:
 	QColor m_fillColor;
 	QColor m_strokeColor;
 	double m_strokeWidth;
-	QByteArray m_elementId;
 };
 
 
-} // namespace imtbase
+} // namespace imtreports
 
 

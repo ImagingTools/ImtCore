@@ -4,6 +4,9 @@ include ($(ACFDIR)/Config/QMake/Solution.pri)
 SUBDIRS += imtbase
 imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
 
+SUBDIRS += imtreports
+imtreports.file = ../../Include/imtreports/QMake/imtreports.pro
+
 SUBDIRS += imt3d
 imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
 

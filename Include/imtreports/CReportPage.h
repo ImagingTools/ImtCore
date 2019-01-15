@@ -7,11 +7,11 @@
 // ACF includes
 #include <istd/TSmartPtr.h>
 
-// ImtCore includes
-#include <imtbase/IReportPage.h>
+// imtreports includes
+#include <imtreports/IReportPage.h>
 
 
-namespace imtbase
+namespace imtreports
 {
 
 
@@ -30,6 +30,7 @@ protected:
 	struct PageElement
 	{
 		istd::TSmartPtr<IGraphicsElement> elementPtr;
+		QByteArray uuid;
 	};
 
 	typedef QMap<QByteArray, PageElement> PageElementsMap;
@@ -37,6 +38,6 @@ protected:
 };
 
 
-} // namespace imtbase
+} // namespace imtreports
 
 

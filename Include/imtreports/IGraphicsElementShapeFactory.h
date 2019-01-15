@@ -11,10 +11,10 @@
 
 
 // GraphicsDocument includes
-#include <imtbase/IGraphicsElement.h>
+#include <imtreports/IGraphicsElement.h>
 
 
-namespace imtbase
+namespace imtreports
 {
 
 
@@ -31,6 +31,6 @@ public:
 };
 
 
-} // namespace imtbase
+} // namespace imtreports
 
 

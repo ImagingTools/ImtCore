@@ -1,11 +1,11 @@
 #pragma once
 
 
-// ImtCore includes
-#include <imtbase/IGraphicsElementShapeFactory.h>
+// imtreports includes
+#include <imtreports/IGraphicsElementShapeFactory.h>
 
 
-namespace imtbase
+namespace imtreports
 {
 
 
@@ -17,6 +17,6 @@ public:
 };
 
 
-} // namespace imtbase
+} // namespace imtreports
 
 

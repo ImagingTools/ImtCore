@@ -13,7 +13,7 @@
 #endif
 
 
-namespace imtbase
+namespace imtreports
 {
 
 
@@ -52,18 +52,9 @@ public:
 		Set the width used for drawing the strokes of the object.
 	*/
 	virtual void SetStrokeWidth(double strokeWidth) = 0;
-	/**
-		Set the id. Useful if one wants to distinguish GraphicalElements. E.g. Left element vs. Right Element.
-	*/
-	virtual void SetId(const QByteArray& id) = 0;
-	
-	/**
-	Get the id. If it is not set, an empty string is returned. Can be used in order to distinguish elements in a chart. E.g. Left element vs. Right Element.
-	*/
-	virtual QByteArray GetId() const = 0;
 };
 
 
-} // namespace imtbase
+} // namespace imtreports
 
 

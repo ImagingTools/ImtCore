@@ -5,7 +5,7 @@
 #include <idoc/IMultiPageDocument.h>
 
 
-namespace imtbase
+namespace imtreports
 {
 
 
@@ -25,6 +25,6 @@ public:
 };
 
 
-} // namespace imtbase
+} // namespace imtreports
 
 

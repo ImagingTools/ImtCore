@@ -1,4 +1,4 @@
-#include <imtbase/CGraphicsElementShapeFactory.h>
+#include <imtreports/CGraphicsElementShapeFactory.h>
 
 
 // ACF includes
@@ -14,10 +14,10 @@
 #endif
 
 // GraphicsDocument includes
-#include <imtbase/TGraphicsElement.h>
+#include <imtreports/TGraphicsElement.h>
 
 
-namespace imtbase
+namespace imtreports
 {
 
 
@@ -119,6 +119,6 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const IGraphicsElement&
 }
 
 
-} // namespace imtbase
+} // namespace imtreports
 
 

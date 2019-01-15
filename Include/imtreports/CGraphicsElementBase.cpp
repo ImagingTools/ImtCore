@@ -1,4 +1,4 @@
-#include <imtbase/CGraphicsElementBase.h>
+#include <imtreports/CGraphicsElementBase.h>
 
 
 // ACF includes
@@ -8,7 +8,7 @@
 #include <iser/CArchiveTag.h>
 
 
-namespace imtbase
+namespace imtreports
 {
 
 
@@ -72,15 +72,6 @@ void CGraphicsElementBase::SetStrokeWidth(double strokeWidth)
 	}
 }
 
-void CGraphicsElementBase::SetId(const QByteArray& id)
-{
-	m_elementId = id;
-}
-
-QByteArray CGraphicsElementBase::GetId() const
-{
-	return m_elementId;
-}
 
 // reimplemented (iser::ISerializeable)
 
@@ -107,8 +98,7 @@ bool CGraphicsElementBase::Serialize(iser::IArchive& archive)
 
 	QRgb strokeColorValue = m_strokeColor.rgba();
 	retVal = retVal && archive.Process(strokeColorValue);
-	if (retVal && !archive.IsStoring())
-	{
+	if (retVal && !archive.IsStoring()){
 		m_strokeColor.setRgba(strokeColorValue);
 	}
 
@@ -119,16 +109,6 @@ bool CGraphicsElementBase::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_strokeWidth);
 	retVal = retVal && archive.EndTag(strokeWidthTag);
 
-	quint32 framework = 0;
-	if (archive.GetVersionInfo().GetVersionNumber(iser::IVersionInfo::AcfVersionId, framework) && framework >= 4090)//hack to be able to handle serialization without ids
-	{
-		static iser::CArchiveTag idTag("Id", "Id to distinguish elements");
-		retVal = retVal && archive.BeginTag(idTag);
-		retVal = retVal && archive.Process(m_elementId);
-		retVal = retVal && archive.EndTag(idTag);
-	}
-
-
 	return retVal;
 }
 
@@ -138,14 +118,12 @@ bool CGraphicsElementBase::Serialize(iser::IArchive& archive)
 bool CGraphicsElementBase::CopyFrom(const istd::IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CGraphicsElementBase* sourcePtr = dynamic_cast<const CGraphicsElementBase*>(&object);
-	if (sourcePtr != NULL)
-	{
+	if (sourcePtr != NULL){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_fillColor = sourcePtr->m_fillColor;
 		m_strokeColor = sourcePtr->m_strokeColor;
 		m_strokeWidth = sourcePtr->m_strokeWidth;
-		m_elementId = sourcePtr->m_elementId;
 
 		return true;
 	}
@@ -154,6 +132,6 @@ bool CGraphicsElementBase::CopyFrom(const istd::IChangeable& object, Compatibili
 }
 
 
-} // namespace imtbase
+} // namespace imtreports
 
 

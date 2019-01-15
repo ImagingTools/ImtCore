@@ -1,4 +1,4 @@
-#include <imtbase/CReportPage.h>
+#include <imtreports/CReportPage.h>
 
 
 // ACF includes
@@ -7,7 +7,7 @@
 #include <iser/CArchiveTag.h>
 
 
-namespace imtbase
+namespace imtreports
 {
 
 
@@ -43,6 +43,6 @@ bool CReportPage::Serialize(iser::IArchive & archive)
 }
 
 
-} // namespace imtbase
+} // namespace imtreports
 
 

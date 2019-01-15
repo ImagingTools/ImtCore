@@ -1,4 +1,4 @@
-#include <imtbase/CImageRectangle.h>
+#include <imtreports/CImageRectangle.h>
 
 
 // ACF includes
@@ -7,7 +7,7 @@
 #include "iser/CArchiveTag.h"
 
 
-namespace imtbase
+namespace imtreports
 {
 
 
@@ -91,6 +91,6 @@ istd::IChangeable* CImageRectangle::CloneMe(CompatibilityMode mode) const
 }
 
 
-} // namespace imtbase
+} // namespace imtreports
 
 

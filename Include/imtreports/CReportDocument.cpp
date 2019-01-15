@@ -1,11 +1,11 @@
-#include <imtbase/CReportDocument.h>
+#include <imtreports/CReportDocument.h>
 
 
-// ImtCore includes
-#include <imtbase/CReportPage.h>
+// imtreports includes
+#include <imtreports/CReportPage.h>
 
 
-namespace imtbase
+namespace imtreports
 {
 
 
@@ -26,7 +26,7 @@ const IReportPage* CReportDocument::GetReportPage(int pageIndex) const
 
 istd::IChangeable* CReportDocument::InsertPage(
 			const idoc::IDocumentMetaInfo* pageMetaInfoPtr,
-			const iprm::IParamsSet* pageParameterPtr,
+			const iprm::IParamsSet* /*pageParameterPtr*/,
 			int position)
 {
 	Page newPage;
@@ -76,6 +76,6 @@ bool CReportDocument::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-} // namespace imtbase
+} // namespace imtreports
 
 

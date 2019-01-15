@@ -6,11 +6,11 @@
 #include <idoc/TMultiPageDocumentWrap.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 
-// ImtCore includes
-#include <imtbase/IReportDocument.h>
+// imtreports includes
+#include <imtreports/IReportDocument.h>
 
 
-namespace imtbase
+namespace imtreports
 {
 
 
@@ -37,6 +37,6 @@ public:
 };
 
 
-} // namespace imtbase
+} // namespace imtreports
 
 

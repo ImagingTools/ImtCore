@@ -8,7 +8,7 @@
 #include <iser/ISerializable.h>
 
 
-namespace imtbase
+namespace imtreports
 {
 
 
@@ -18,6 +18,7 @@ class IGraphicsElement;
 /**
 	Interface for a page in the report document.
 */
+
 class IReportPage: virtual public iser::ISerializable
 {
 public:
@@ -35,6 +36,6 @@ public:
 };
 
 
-} // namespace imtbase
+} // namespace imtreports
 
 
