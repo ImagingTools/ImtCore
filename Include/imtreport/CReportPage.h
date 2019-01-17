@@ -30,7 +30,10 @@ public:
 	ElementIds GetPageElements() const override;
 	const IGraphicsElement* GetPageElement(const QByteArray& elementId) const override;
 	QByteArray AddText(const QString& text, const i2d::CVector2d& position) override;
-	QByteArray AddImage(const QString& imagePath, const i2d::CVector2d& position) override;
+	QByteArray AddImage(const QString& imagePath, const QRect& rect /*const i2d::CVector2d& position*/) override;
+	QByteArray AddRectangle(const QRect& rect) override;
+	QByteArray AddPolygone(const QVector<i2d::CVector2d>& points) override;
+
 	bool RemovePageElement(const QByteArray& elementId) override;
 
 	// reimplemented (istd::IChangeable)
@@ -46,7 +49,8 @@ protected:
 private:
 	int FindItemIndex(const IGraphicsElement& element) const;
 
-private:
+	template <typename TGraphicsElement> TGraphicsElement* AddGraphicsElement(QByteArray& uuid);
+
 	typedef QMap<QByteArray, int> ElementsIndiciesMap; // key - element uuid, value - element index in TContainer
 	ElementsIndiciesMap m_elementsIndicies;
 

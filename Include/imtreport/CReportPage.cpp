@@ -46,55 +46,67 @@ const IGraphicsElement* CReportPage::GetPageElement(const QByteArray& elementId)
 
 QByteArray CReportPage::AddText(const QString& text, const i2d::CVector2d& position)
 {
-	istd::CChangeNotifier changeNotifier(this);
+	QByteArray uuid;
 
-	IGraphicsElement* newElement = BaseClass::AddElement(CTextLabelElement::GetTypeName());
-	if (!newElement){
-		return QByteArray();
-	}
+	CTextLabelElement* element = AddGraphicsElement<CTextLabelElement>(uuid);
+	Q_ASSERT(element);
 
-	CTextLabelElement* newTextLabel = dynamic_cast<CTextLabelElement*>(newElement);
-	Q_ASSERT(newTextLabel);
-
-	newTextLabel->SetFontSize(80);
-	newTextLabel->SetText(text);
-	newTextLabel->SetPosition(position);
-	newTextLabel->SetFillColor(qRgb(255, 0, 0));
-	newTextLabel->SetStrokeColor(qRgb(0, 255, 255));
-
-	QByteArray uuid = QUuid::createUuid().toByteArray();
-
-	m_elementsIndicies.insert(uuid, BaseClass::GetItemsCount() - 1);
+	element->SetFontSize(80);
+	element->SetText(text);
+	element->SetPosition(position);
+	element->SetFillColor(qRgb(255, 0, 0));
+	element->SetStrokeColor(qRgb(0, 255, 255));
 
 	return uuid;
 }
 
 
-QByteArray CReportPage::AddImage(const QString& imagePath, const i2d::CVector2d& position)
+QByteArray CReportPage::AddImage(const QString& imagePath, const QRect& rect/*, const i2d::CVector2d& position*/)
 {
-	istd::CChangeNotifier changeNotifier(this);
+	QByteArray uuid;
 
-	IGraphicsElement* newElement = BaseClass::AddElement(CImageRectangleElement::GetTypeName());
-	if (!newElement){
-		return QByteArray();
-	}
+	CImageRectangleElement* element = AddGraphicsElement<CImageRectangleElement>(uuid);
+	Q_ASSERT(element);
 
-	CImageRectangleElement* newTextLabel = dynamic_cast<CImageRectangleElement*>(newElement);
-	Q_ASSERT(newTextLabel);
-
-	newTextLabel->SetImagePath(imagePath);
-	newTextLabel->SetLeft(0);
-	newTextLabel->SetRight(500);
-	newTextLabel->SetTop(400);
-	newTextLabel->SetBottom(500);
-
-	QByteArray uuid = QUuid::createUuid().toByteArray();
-
-	m_elementsIndicies.insert(uuid, BaseClass::GetItemsCount() - 1);
+	element->SetImagePath(imagePath);
+	element->SetLeft(rect.left());
+	element->SetRight(rect.right());
+	element->SetTop(rect.top());
+	element->SetBottom(rect.bottom());
 
 	return uuid;
 }
 
+
+QByteArray CReportPage::AddRectangle(const QRect& rect)
+{
+	QByteArray uuid;
+
+	CRectangleElement* element = AddGraphicsElement<CRectangleElement>(uuid);
+	Q_ASSERT(element);
+
+	element->SetLeft(rect.left());
+	element->SetRight(rect.right());
+	element->SetTop(rect.top());
+	element->SetBottom(rect.bottom());
+
+	return uuid;
+}
+
+
+QByteArray CReportPage::AddPolygone(const QVector<i2d::CVector2d>& points)
+{
+	QByteArray uuid;
+
+	CPolygonElement* element = AddGraphicsElement<CPolygonElement>(uuid);
+	Q_ASSERT(element);
+
+	for (const i2d::CVector2d& point : points) {
+		element->InsertNode(point);
+	}
+
+	return uuid;
+}
 
 bool CReportPage::RemovePageElement(const QByteArray& elementId)
 {
@@ -280,6 +292,25 @@ int CReportPage::FindItemIndex(const IGraphicsElement& element) const
 	}
 
 	return -1;
+}
+
+
+template <typename TGraphicsElement> TGraphicsElement* CReportPage::AddGraphicsElement(QByteArray& uuid)
+{
+	uuid.clear();
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	TGraphicsElement* element = dynamic_cast<TGraphicsElement*>(BaseClass::AddElement(TGraphicsElement::GetTypeName()));
+	if (!element) {
+		return nullptr;
+	}
+
+	uuid = QUuid::createUuid().toByteArray();
+
+	m_elementsIndicies.insert(uuid, BaseClass::GetItemsCount() - 1);
+
+	return element;
 }
 
 
