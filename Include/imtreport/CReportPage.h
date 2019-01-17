@@ -8,7 +8,7 @@
 #include <istd/TSmartPtr.h>
 #include <ibase/TFactorisableContainer.h>
 
-// imtreport includes
+// ImtCore includes
 #include <imtreport/IReportPage.h>
 #include <imtreport/IGraphicsElement.h>
 #include <imtreport/CGraphicsElementFactory.h>

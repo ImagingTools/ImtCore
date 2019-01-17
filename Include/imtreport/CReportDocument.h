@@ -6,7 +6,7 @@
 #include <idoc/TMultiPageDocumentWrap.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 
-// imtreport includes
+// ImtCore includes
 #include <imtreport/IReportDocument.h>
 
 

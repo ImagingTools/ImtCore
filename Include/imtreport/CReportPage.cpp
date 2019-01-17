@@ -1,7 +1,8 @@
 #include <imtreport/CReportPage.h>
 
+
 // Qt includes
-#include <QUuid>
+#include <QtCore/QUuid>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -9,7 +10,7 @@
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 
-// imtreport includes
+// ImtCore includes
 #include <imtreport/TGraphicsElement.h>
 
 namespace imtreport
@@ -22,6 +23,7 @@ CReportPage::CReportPage()
 {
 	RegisterItemFactory(&m_elementsFactory);
 }
+
 
 // reimplemented (IReportPage)
 
@@ -51,11 +53,14 @@ QByteArray CReportPage::AddText(const QString& text, const i2d::CVector2d& posit
 		return QByteArray();
 	}
 
-	CTextLabel* newTextLabel = dynamic_cast<CTextLabel*>(newElement);
+	CTextLabelElement* newTextLabel = dynamic_cast<CTextLabelElement*>(newElement);
 	Q_ASSERT(newTextLabel);
 
+	newTextLabel->SetFontSize(80);
 	newTextLabel->SetText(text);
-	newTextLabel->MoveCenterTo(position);
+	newTextLabel->SetPosition(position);
+	newTextLabel->SetFillColor(qRgb(255, 0, 0));
+	newTextLabel->SetStrokeColor(qRgb(0, 255, 255));
 
 	QByteArray uuid = QUuid::createUuid().toByteArray();
 
@@ -78,7 +83,6 @@ QByteArray CReportPage::AddImage(const QString& imagePath, const i2d::CVector2d&
 	Q_ASSERT(newTextLabel);
 
 	newTextLabel->SetImagePath(imagePath);
-	newTextLabel->MoveCenterTo(position);
 
 	QByteArray uuid = QUuid::createUuid().toByteArray();
 
@@ -249,6 +253,10 @@ bool CReportPage::SerializeItem(ItemClass& item, iser::IArchive& archive, iser::
 	retVal = retVal && archive.BeginTag(elementTag);
 	retVal = retVal && BaseClass::SerializeItem(item, archive, &elementTag);
 	retVal = retVal && archive.EndTag(elementTag);
+
+	if (retVal && !archive.IsStoring()){
+		m_elementsIndicies.insert(uuid, BaseClass::GetItemsCount() - 1);
+	}
 
 	return retVal;
 }

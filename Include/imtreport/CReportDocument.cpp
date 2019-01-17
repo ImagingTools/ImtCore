@@ -1,7 +1,7 @@
 #include <imtreport/CReportDocument.h>
 
 
-// imtreport includes
+// ImtCore includes
 #include <imtreport/CReportPage.h>
 
 

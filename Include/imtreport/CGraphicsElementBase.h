@@ -1,7 +1,7 @@
 #pragma once
 
 
-// imtreport includes
+// ImtCore includes
 #include <imtreport/IGraphicsElement.h>
 
 

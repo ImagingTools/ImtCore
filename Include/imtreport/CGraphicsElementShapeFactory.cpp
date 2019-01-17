@@ -1,4 +1,4 @@
-#include <imtreports/CGraphicsElementShapeFactory.h>
+#include <imtreport/CGraphicsElementShapeFactory.h>
 
 
 // ACF includes
@@ -7,6 +7,7 @@
 // Qt includes
 #include <QtGui/QPen>
 #include <QtGui/QFont>
+#include <QtGui/QFontMetrics>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QGraphicsRectItem>
 #else
@@ -14,10 +15,10 @@
 #endif
 
 // GraphicsDocument includes
-#include <imtreports/TGraphicsElement.h>
+#include <imtreport/TGraphicsElement.h>
 
 
-namespace imtreports
+namespace imtreport
 {
 
 
@@ -48,12 +49,24 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const IGraphicsElement&
 		// still unclear why the screen transformation of the scene displays the text to big - so scale it down hardcoded:
 		fontSize *= 0.9;
 
-		textItemPtr->setFont( QFont(labelElementPtr->GetFontName(), fontSize) );
+		QFont labelFont(labelElementPtr->GetFontName(), fontSize);
+
+		textItemPtr->setFont(labelFont);
 
 		// set the text item position centered to the text item rectangle
 		QSizeF boundingSize = textItemPtr->boundingRect().size();
 
-		QPointF pos = iqt::GetQRectF(labelElementPtr->GetRectangle()).center();
+		//i2d::CRectangle rectangle = labelElementPtr->GetRectangle();
+		//if (rectangle.IsEmpty()) {
+		//	QFontMetrics fm(labelFont);
+
+		//	int textHeight = fm.height();
+		//	int textWidth = fm.width(labelElementPtr->GetText());
+
+		//	i2d::CVector2d position = labelElementPtr->GetPosition();
+		//}
+
+		QPointF pos(labelElementPtr->GetPosition().GetX(), labelElementPtr->GetPosition().GetY());
 		pos.setX(pos.x() - boundingSize.width() / 2 );
 		pos.setY(pos.y() - boundingSize.height() / 2 );
 
@@ -119,6 +132,6 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const IGraphicsElement&
 }
 
 
-} // namespace imtreports
+} // namespace imtreport
 
 

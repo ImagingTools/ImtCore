@@ -1,20 +1,14 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QtGlobal>
-#if QT_VERSION >= 0x050000
-#include <QtWidgets/QGraphicsItem>
-#else
-#include <QtGui/QGraphicsItem>
-#endif
+// ImtCore includes
+#include <imtreport/IGraphicsElement.h>
 
 
-// GraphicsDocument includes
-#include <imtreports/IGraphicsElement.h>
+class QGraphicsItem;
 
 
-namespace imtreports
+namespace imtreport
 {
 
 
@@ -31,6 +25,6 @@ public:
 };
 
 
-} // namespace imtreports
+} // namespace imtreport
 
 

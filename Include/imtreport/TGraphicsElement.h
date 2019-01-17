@@ -11,7 +11,7 @@
 #include <i2d/CCircle.h>
 #include <i2d/CPolygon.h>
 
-// imtreport includes
+// ImtCore includes
 #include <imtreport/CGraphicsElementBase.h>
 #include <imtreport/CTextLabel.h>
 #include <imtreport/CImageRectangle.h>

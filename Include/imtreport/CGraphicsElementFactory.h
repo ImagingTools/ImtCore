@@ -4,7 +4,7 @@
 // ACF includes
 #include <iser/IObject.h>
 
-// imtreport includes
+// ImtCore includes
 #include <imtreport/IGraphicsElement.h>
 
 namespace imtreport

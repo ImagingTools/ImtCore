@@ -18,7 +18,9 @@ void CReportDocumentComp::OnComponentCreated()
 
 	imtreport::IReportPage* pageImplPtr = dynamic_cast<imtreport::IReportPage*>(pagePtr);
 	if (pageImplPtr != nullptr){
-		pageImplPtr->AddText("Hello world!!!", i2d::CVector2d(0.5, 0.5));
+		pageImplPtr->AddText("Hello world!", i2d::CVector2d(0, 0));
+		pageImplPtr->AddText("Left top", i2d::CVector2d(-200, -200));
+		pageImplPtr->AddText("Right bottom", i2d::CVector2d(200, 200));
 	}
 }
 

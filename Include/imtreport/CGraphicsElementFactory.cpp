@@ -1,6 +1,6 @@
 #include <imtreport/CGraphicsElementFactory.h>
 
-// imtreport includes
+// ImtCore includes
 #include <imtreport/TGraphicsElement.h>
 
 namespace imtreport

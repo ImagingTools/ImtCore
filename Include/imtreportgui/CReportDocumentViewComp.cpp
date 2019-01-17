@@ -1,6 +1,11 @@
 #include <imtreportgui/CReportDocumentViewComp.h>
 
 
+// ImtCore includes
+#include <imtreport/IReportPage.h>
+#include <imtreport/CGraphicsElementShapeFactory.h>
+
+
 namespace imtreportgui
 {
 
@@ -31,9 +36,25 @@ void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*ch
 	imtreport::IReportDocument* documentPtr = GetObjectPtr();
 	Q_ASSERT(documentPtr != NULL);
 
+	m_scene.clear();
+
+	imtreport::CGraphicsElementShapeFactory shapeFactory;
+
 	int pageCount = documentPtr->GetPagesCount();
 	if (pageCount > 0){
 		const imtreport::IReportPage* pagePtr = documentPtr->GetReportPage(0);
+		Q_ASSERT(pagePtr != NULL);
+
+		imtreport::IReportPage::ElementIds ids = pagePtr->GetPageElements();
+
+		for (const QByteArray& elementId : ids){
+			const imtreport::IGraphicsElement* elementPtr = pagePtr->GetPageElement(elementId);
+			Q_ASSERT(elementPtr != nullptr);
+
+			QGraphicsItem* itemPtr = shapeFactory.CreateShape(*elementPtr);
+
+			m_scene.addItem(itemPtr);
+		}
 	}
 }
 
