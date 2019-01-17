@@ -1,6 +1,10 @@
 #include <imtreportgui/CReportDocumentViewComp.h>
 
 
+// Qt includes
+#include <QtPrintSupport/QPrinter>
+#include <QtWidgets/qmessagebox.h>
+
 // ImtCore includes
 #include <imtreport/IReportPage.h>
 #include <imtreportgui/CGraphicsElementShapeFactory.h>
@@ -37,6 +41,7 @@ void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*ch
 	Q_ASSERT(documentPtr != NULL);
 
 	m_scene.clear();
+	m_scene.setSceneRect(0, 0, s_A4Width, s_A4Height);
 
 	imtreportgui::CGraphicsElementShapeFactory shapeFactory;
 
@@ -65,12 +70,16 @@ void CReportDocumentViewComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
+	PageView->setFixedWidth(PageView->width() / PageView->widthMM() * s_A4Width);
+	PageView->setFixedHeight(PageView->height() / PageView->heightMM() * s_A4Height);
 	PageView->setScene(&m_scene);
 }
 
 
 void CReportDocumentViewComp::OnGuiDestroyed()
 {
+	SaveToPDF(); // to be removed, just for test
+
 	BaseClass::OnGuiDestroyed();
 }
 
@@ -80,6 +89,21 @@ void CReportDocumentViewComp::OnGuiRetranslate()
 	BaseClass::OnGuiRetranslate();
 }
 
+
+// private methods
+void CReportDocumentViewComp::SaveToPDF()
+{
+	QPrinter printer(QPrinter::HighResolution);
+	printer.setPageSize(QPrinter::A4);
+	printer.setOrientation(QPrinter::Portrait);
+	printer.setOutputFormat(QPrinter::PdfFormat);
+	printer.setOutputFileName("c:\\work\\test.pdf");
+
+	QPainter painter(&printer);
+	m_scene.render(&painter, QRectF(), QRectF());
+
+	//printer.newPage(); // perhaps it might help for paging in PDF
+}
 
 } // namespace imtreportgui
 

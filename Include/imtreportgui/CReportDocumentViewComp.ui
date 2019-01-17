@@ -125,6 +125,9 @@ QAbstractItemView[TabSimulation=true]
 </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>7</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -183,7 +186,23 @@ QAbstractItemView[TabSimulation=true]
          <number>0</number>
         </property>
         <item>
-         <widget class="QGraphicsView" name="PageView"/>
+         <widget class="QGraphicsView" name="PageView">
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="lineWidth">
+           <number>2</number>
+          </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAsNeeded</enum>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>

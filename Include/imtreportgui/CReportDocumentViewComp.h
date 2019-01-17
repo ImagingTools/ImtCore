@@ -45,11 +45,16 @@ protected:
 private Q_SLOTS:
 
 private:
+	void SaveToPDF();
+
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_commands;
 
 	QGraphicsScene m_scene;
+
+	static const int s_A4Width = 210;
+	static const int s_A4Height = 297;
 };
 
 
