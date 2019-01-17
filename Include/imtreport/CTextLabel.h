@@ -17,7 +17,7 @@ public:
 	CTextLabel();
 
 	/**
-	Get label font name.
+		Get label font name.
 	*/
 	virtual const QString& GetFontName() const;
 
@@ -37,12 +37,12 @@ public:
 	virtual void SetFontSize(double fontSize);
 
 	/**
-		Get label rectangle.
+		Get label's rectangle.
 	*/
 	virtual const i2d::CRectangle& GetRectangle() const;
 
 	/**
-		Set label rectangle.
+		Set label's rectangle.
 	*/
 	virtual void SetRectangle(const i2d::CRectangle& rectangle);
 

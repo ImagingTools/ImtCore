@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4736" Description="ACF"/>
+            <Version Id="0" Number="4743" Description="ACF"/>
             <Version Id="1" Number="2017" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330497" Description="Qt Framework"/>
+            <Version Id="1023" Number="330496" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Copy all source files (without compiled binaries) for installation during component instantiation</Description>
@@ -28,7 +28,6 @@
                                 <Value>CopyImplProjects</Value>
                                 <Value>CopyImplResources</Value>
                                 <Value>CopyImplOther</Value>
-                                <Value>CopyBuildProjects</Value>
                                 <Value>CopyLibs</Value>
                                 <Value>CopyBins</Value>
                                 <Value>CopyAuxIncludes</Value>
@@ -90,8 +89,6 @@
                                 <Value>*.exe</Value>
                                 <Value>*.arp</Value>
                                 <Value>*.dll</Value>
-                                <Value>*.pdb</Value>
-                                <Value>*.exe.manifest</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -106,57 +103,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RecursionDepth" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="2"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="CopyBuildProjects" PackageId="InstallVoce" ComponentId="CopyInfoProcessor">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ExcludeFilters" Type="String[]" ExportId="OtherExcludeFilters">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Filters" Type="String[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>*.vcproj</Value>
-                                <Value>*.vcxproj</Value>
-                                <Value>*.sln</Value>
-                                <Value>*.pro</Value>
-                                <Value>*.pri</Value>
-                                <Value>*.qbs</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IgnoreUnknownTags" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="InputSubDir" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Build"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="OutputSubDir" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Build"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RecursionDepth" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="-1"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SubstitutionTagExpr" Type="String" ExportId="ProjectsSubstitutionTagExpr">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserSubstitutionTags" Type="String[]" ExportId="ProjectsSubstitutionTags">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserSubstitutionValues" Type="String[]" ExportId="ProjectsSubstitutionValues">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -530,7 +476,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>*.lib</Value>
-                                <Value>*.pdb</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

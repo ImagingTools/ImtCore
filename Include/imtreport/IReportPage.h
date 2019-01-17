@@ -8,6 +8,7 @@
 #include <iser/ISerializable.h>
 #include <i2d/CVector2d.h>
 
+
 namespace imtreport
 {
 
@@ -30,32 +31,32 @@ public:
 	virtual ElementIds GetPageElements() const = 0;
 
 	/**
-		Get a page element with a given ID
+		Get a page element with a given ID.
 	*/
 	virtual const IGraphicsElement* GetPageElement(const QByteArray& elementId) const = 0;
 
 	/**
-		Add a text label to the report page
+		Add a text label to the report page.
 	*/
 	virtual QByteArray AddText(const QString& text, const i2d::CVector2d& position) = 0;
 	
 	/**
-		Add an image file to the report page
+		Add an image file to the report page.
 	*/
-	virtual QByteArray AddImage(const QString& imagePath, const QRect& rect /*const i2d::CVector2d& position*/) = 0;
+	virtual QByteArray AddImage(const QString& imagePath, const QRect& rect) = 0;
 
 	/**
-		Add a rectangle to the report page
+		Add a rectangle to the report page.
 	*/
 	virtual QByteArray AddRectangle(const QRect& rect) = 0;
 
 	/**
-		Add a polygone to the report page
+		Add a polygone to the report page.
 	*/
 	virtual QByteArray AddPolygone(const QVector<i2d::CVector2d>& points) = 0;
 
 	/**
-		Remove a page element
+		Remove a page element.
 	*/
 	virtual bool RemovePageElement(const QByteArray& elementId) = 0;
 };
