@@ -6,11 +6,11 @@
 #include <idoc/TMultiPageDocumentWrap.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 
-// imtreports includes
-#include <imtreports/IReportDocument.h>
+// imtreport includes
+#include <imtreport/IReportDocument.h>
 
 
-namespace imtreports
+namespace imtreport
 {
 
 
@@ -30,13 +30,9 @@ public:
 				const idoc::IDocumentMetaInfo* pageMetaInfoPtr = NULL,
 				const iprm::IParamsSet* pageParameterPtr = NULL,
 				int position = -1);
-
-	// reimplemented (istd::IChangeable)
-	virtual bool CopyFrom(const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS);
-	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS);
 };
 
 
-} // namespace imtreports
+} // namespace imtreport
 
 

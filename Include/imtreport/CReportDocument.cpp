@@ -1,11 +1,11 @@
-#include <imtreports/CReportDocument.h>
+#include <imtreport/CReportDocument.h>
 
 
-// imtreports includes
-#include <imtreports/CReportPage.h>
+// imtreport includes
+#include <imtreport/CReportPage.h>
 
 
-namespace imtreports
+namespace imtreport
 {
 
 
@@ -26,9 +26,11 @@ const IReportPage* CReportDocument::GetReportPage(int pageIndex) const
 
 istd::IChangeable* CReportDocument::InsertPage(
 			const idoc::IDocumentMetaInfo* pageMetaInfoPtr,
-			const iprm::IParamsSet* /*pageParameterPtr*/,
+			const iprm::IParamsSet* pageParameterPtr,
 			int position)
 {
+	Q_UNUSED(pageParameterPtr);
+
 	Page newPage;
 
 	if (pageMetaInfoPtr != NULL){
@@ -56,26 +58,6 @@ istd::IChangeable* CReportDocument::InsertPage(
 }
 
 
-// reimplemented (istd::IChangeable)
-
-bool CReportDocument::CopyFrom(const istd::IChangeable& object, CompatibilityMode mode)
-{
-	if (BaseClass::CopyFrom(object, mode)){
-		return true;
-	}
-
-	return false;
-}
-
-
-bool CReportDocument::ResetData(CompatibilityMode /*mode*/)
-{
-	ResetPages();
-
-	return true;
-}
-
-
-} // namespace imtreports
+} // namespace imtreport
 
 

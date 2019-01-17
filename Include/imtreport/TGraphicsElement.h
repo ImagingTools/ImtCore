@@ -11,13 +11,13 @@
 #include <i2d/CCircle.h>
 #include <i2d/CPolygon.h>
 
-// imtreports includes
-#include <imtreports/CGraphicsElementBase.h>
-#include <imtreports/CTextLabel.h>
-#include <imtreports/CImageRectangle.h>
+// imtreport includes
+#include <imtreport/CGraphicsElementBase.h>
+#include <imtreport/CTextLabel.h>
+#include <imtreport/CImageRectangle.h>
 
 
-namespace imtreports
+namespace imtreport
 {
 
 
@@ -115,6 +115,6 @@ typedef TGraphicsElement<i2d::CPolygon> CPolygonElement;
 typedef TGraphicsElement<CImageRectangle> CImageRectangleElement;
 
 
-} // namespace imtreports
+} // namespace imtreport
 
 

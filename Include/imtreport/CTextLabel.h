@@ -5,7 +5,7 @@
 #include <i2d/CRectangle.h>
 
 
-namespace imtreports
+namespace imtreport
 {
 
 
@@ -61,6 +61,6 @@ private:
 };
 
 
-} // namespace imtreports
+} // namespace imtreport
 
 

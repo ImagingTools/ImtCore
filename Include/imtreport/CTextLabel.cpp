@@ -1,4 +1,4 @@
-#include <imtreports/CTextLabel.h>
+#include <imtreport/CTextLabel.h>
 
 
 // ACF includes
@@ -7,7 +7,7 @@
 #include "iser/CArchiveTag.h"
 
 
-namespace imtreports
+namespace imtreport
 {
 
 
@@ -142,6 +142,6 @@ istd::IChangeable* CTextLabel::CloneMe(CompatibilityMode mode) const
 }
 
 
-} // namespace imtreports
+} // namespace imtreport
 
 

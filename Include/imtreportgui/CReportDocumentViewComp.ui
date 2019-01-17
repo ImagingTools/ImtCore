@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CReportDocumentViewComp</class>
+ <widget class="QWidget" name="CReportDocumentViewComp">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>971</width>
+    <height>641</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Main Window</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QToolBar[ImtToolBar=true] &gt; QToolButton
+{
+	min-width: 4em;
+}
+
+QWidget[ImtTopFrame=true] &gt; QWidget
+{
+	color: #0d8dd3;
+}
+
+QWidget[ImtTopFrame=true] &gt; QWidget:disabled
+{
+	color: palette(disabled);
+}
+
+
+QToolBar[ImtToolBar=true]
+{
+	qproperty-iconSize: 24px;
+}
+
+
+QWidget[ImtTopFrame=true]
+{
+	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0 rgb(235,235,238), stop: 0.9 rgb(220,220,223),
+                                 stop: 0.97 rgb(220,220,223), stop: 1.0 rgb(190,190,193));
+	border-bottom: 1px solid  rgb(170,170,170);
+	color: #0d8dd3;
+	min-height: 5em;
+}
+
+
+QWidget#BottomFrame
+{
+	background: rgb(230,230,230);	
+}
+
+QTableView[ImtMenu=true]
+{
+	color: qpalette(background);
+	background: qpalette(background);
+	font-weight: bold;
+	text-align: center;
+}
+
+QTableView[ImtMenu=true]::item
+{
+	font-weight: bold;
+	text-align: center;
+}
+
+/*
+	Tab simulation using tree widget
+*/
+QTreeWidget[TabSimulation=true]
+{
+	color: #808080;
+	background: rgb(230,230,230);
+	font-weight: bold;
+	text-align: left;
+	color: #808080;
+}
+
+
+QTreeWidget[TabSimulation=true]::item 
+{
+    border: 0px none transparent;
+    padding-top: 0.7em;
+    padding-bottom: 0.7em;
+}
+
+QTreeWidget[TabSimulation=true]::item:first
+{
+    padding-left: 5px;
+}
+
+
+QTreeWidget[TabSimulation=true]::item:last
+{
+    padding-right: 15px;
+}
+
+QTreeWidget[TabSimulation=true]::item:selected 
+{
+    color: #0d8dd3;
+    background-color: rgb(255, 255, 255);
+}
+
+QTreeWidget[TabSimulation=true]::item:!selected:hover 
+{
+	background-color: #dedede;
+}
+
+
+
+QTreeWidget[TabSimulation=true]::item:first:selected
+{
+    border-top: 1px white;
+}
+
+
+
+QAbstractItemView[TabSimulation=true]
+{
+    outline: 0;
+}
+
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QFrame" name="PagePreviewFrame">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="ViewFrame">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>8</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QGraphicsView" name="PageView"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="imtgui.qrc"/>
+ </resources>
+ <connections/>
+</ui>

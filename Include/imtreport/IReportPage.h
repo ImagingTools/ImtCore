@@ -2,13 +2,13 @@
 
 
 // Qt includes
-#include <QtCore/QVector>
+#include <QtCore>
 
 // ACF includes
 #include <iser/ISerializable.h>
+#include <i2d/CVector2d.h>
 
-
-namespace imtreports
+namespace imtreport
 {
 
 
@@ -33,9 +33,24 @@ public:
 		Get a page element with a given ID
 	*/
 	virtual const IGraphicsElement* GetPageElement(const QByteArray& elementId) const = 0;
+
+	/**
+		Add a new page element
+	*/
+	virtual QByteArray AddText(const QString& text, const i2d::CVector2d& position) = 0;
+	
+	/**
+		Add an image file to the report page.
+	*/
+	virtual QByteArray AddImage(const QString& imagePath, const i2d::CVector2d& position) = 0;
+
+	/**
+		Remove a page element
+	*/
+	virtual bool RemovePageElement(const QByteArray& elementId) = 0;
 };
 
 
-} // namespace imtreports
+} // namespace imtreport
 
 

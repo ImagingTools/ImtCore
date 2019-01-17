@@ -1,4 +1,4 @@
-#include <imtreports/CGraphicsElementBase.h>
+#include <imtreport/CGraphicsElementBase.h>
 
 
 // ACF includes
@@ -8,7 +8,7 @@
 #include <iser/CArchiveTag.h>
 
 
-namespace imtreports
+namespace imtreport
 {
 
 
@@ -132,6 +132,6 @@ bool CGraphicsElementBase::CopyFrom(const istd::IChangeable& object, Compatibili
 }
 
 
-} // namespace imtreports
+} // namespace imtreport
 
 

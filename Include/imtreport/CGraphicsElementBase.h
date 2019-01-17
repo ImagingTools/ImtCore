@@ -1,11 +1,11 @@
 #pragma once
 
 
-// imtreports includes
-#include <imtreports/IGraphicsElement.h>
+// imtreport includes
+#include <imtreport/IGraphicsElement.h>
 
 
-namespace imtreports
+namespace imtreport
 {
 
 
@@ -38,6 +38,6 @@ private:
 };
 
 
-} // namespace imtreports
+} // namespace imtreport
 
 
