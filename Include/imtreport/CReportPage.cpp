@@ -83,6 +83,10 @@ QByteArray CReportPage::AddImage(const QString& imagePath, const i2d::CVector2d&
 	Q_ASSERT(newTextLabel);
 
 	newTextLabel->SetImagePath(imagePath);
+	newTextLabel->SetLeft(0);
+	newTextLabel->SetRight(500);
+	newTextLabel->SetTop(400);
+	newTextLabel->SetBottom(500);
 
 	QByteArray uuid = QUuid::createUuid().toByteArray();
 

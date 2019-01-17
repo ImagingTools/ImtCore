@@ -56,19 +56,7 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const IGraphicsElement&
 		// set the text item position centered to the text item rectangle
 		QSizeF boundingSize = textItemPtr->boundingRect().size();
 
-		//i2d::CRectangle rectangle = labelElementPtr->GetRectangle();
-		//if (rectangle.IsEmpty()) {
-		//	QFontMetrics fm(labelFont);
-
-		//	int textHeight = fm.height();
-		//	int textWidth = fm.width(labelElementPtr->GetText());
-
-		//	i2d::CVector2d position = labelElementPtr->GetPosition();
-		//}
-
 		QPointF pos(labelElementPtr->GetPosition().GetX(), labelElementPtr->GetPosition().GetY());
-		pos.setX(pos.x() - boundingSize.width() / 2 );
-		pos.setY(pos.y() - boundingSize.height() / 2 );
 
 		textItemPtr->setPos(pos);
 		

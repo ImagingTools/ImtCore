@@ -81,7 +81,7 @@ bool CGraphicsElementBase::Serialize(iser::IArchive& archive)
 
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? NULL : this);
 
-	static iser::CArchiveTag fillColorTag("FillColor", "Color used for object filling");
+	static iser::CArchiveTag fillColorTag("FillColor", "Color used for object filling", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(fillColorTag);
 
 	QRgb fillcColorValue = m_fillColor.rgba();
@@ -93,7 +93,7 @@ bool CGraphicsElementBase::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && archive.EndTag(fillColorTag);
 
-	static iser::CArchiveTag strokeColorTag("StrokeColor", "Color used for object stroking");
+	static iser::CArchiveTag strokeColorTag("StrokeColor", "Color used for object stroking", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(strokeColorTag);
 
 	QRgb strokeColorValue = m_strokeColor.rgba();
@@ -104,7 +104,7 @@ bool CGraphicsElementBase::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && archive.EndTag(strokeColorTag);
 
-	static iser::CArchiveTag strokeWidthTag("StrokeWidth", "Width used for object stroking");
+	static iser::CArchiveTag strokeWidthTag("StrokeWidth", "Width used for object stroking", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(strokeWidthTag);
 	retVal = retVal && archive.Process(m_strokeWidth);
 	retVal = retVal && archive.EndTag(strokeWidthTag);

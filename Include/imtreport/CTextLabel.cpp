@@ -75,9 +75,9 @@ void CTextLabel::SetRectangle(const i2d::CRectangle& rectangle)
 
 bool CTextLabel::Serialize(iser::IArchive& archive)
 {
-	static iser::CArchiveTag fontNameTag("FontName", "Text label font name");
-	static iser::CArchiveTag fontSizeTag("FontSize", "Text label font size");
-	static iser::CArchiveTag rectTag("Rectangle", "Text label rectangle");
+	static iser::CArchiveTag fontNameTag("FontName", "Text label font name", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag fontSizeTag("FontSize", "Text label font size", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag rectTag("Rectangle", "Text label rectangle", iser::CArchiveTag::TT_GROUP);
 
 	istd::CChangeNotifier notifier(archive.IsStoring()? NULL: this, &GetAllChanges());
 

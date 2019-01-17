@@ -34,18 +34,16 @@ void CImageRectangle::SetImagePath(const QString& imagePath)
 
 bool CImageRectangle::Serialize(iser::IArchive& archive)
 {
-	static iser::CArchiveTag imagePathTag("ImagePath", "The image path");
-
 	istd::CChangeNotifier notifier(archive.IsStoring()? NULL: this);
 
 	bool retVal = true;
 
-	retVal = retVal && BaseClass::Serialize(archive);
-
+	static iser::CArchiveTag imagePathTag("ImagePath", "The image path", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(imagePathTag);
 	retVal = retVal && archive.Process(m_imagePath);
 	retVal = retVal && archive.EndTag(imagePathTag);
 
+	retVal = retVal && BaseClass::Serialize(archive);
 
 	return retVal;
 }
