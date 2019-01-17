@@ -1,4 +1,4 @@
-#include <imtreport/CGraphicsElementShapeFactory.h>
+#include <imtreportgui/CGraphicsElementShapeFactory.h>
 
 
 // ACF includes
@@ -18,28 +18,28 @@
 #include <imtreport/TGraphicsElement.h>
 
 
-namespace imtreport
+namespace imtreportgui
 {
 
 
 // public methods
 
-QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const IGraphicsElement& graphicsElement) const
+QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraphicsElement& graphicsElement) const
 {
 	double strokeWidth = -1;
 	QGraphicsItem* itemPtr = NULL;
-	const CRectangleElement* rectangleElementPtr = dynamic_cast<const CRectangleElement*> (&graphicsElement);
+	const imtreport::CRectangleElement* rectangleElementPtr = dynamic_cast<const imtreport::CRectangleElement*> (&graphicsElement);
 	if (rectangleElementPtr != NULL){
 		itemPtr = new QGraphicsRectItem(iqt::GetQRectF(*rectangleElementPtr));
 		strokeWidth = rectangleElementPtr->GetStrokeWidth();
 	}
 
-	const CCircleElement* circleElementPtr = dynamic_cast<const CCircleElement*> (&graphicsElement);
+	const imtreport::CCircleElement* circleElementPtr = dynamic_cast<const imtreport::CCircleElement*>(&graphicsElement);
 	if (circleElementPtr != NULL){
 		itemPtr = new QGraphicsEllipseItem(iqt::GetQRectF(circleElementPtr->GetBoundingBox()));
 	}
 
-	const CTextLabelElement* labelElementPtr = dynamic_cast<const CTextLabelElement*> (&graphicsElement);
+	const imtreport::CTextLabelElement* labelElementPtr = dynamic_cast<const imtreport::CTextLabelElement*> (&graphicsElement);
 	if (labelElementPtr != NULL){
 		QGraphicsSimpleTextItem* textItemPtr = new QGraphicsSimpleTextItem(labelElementPtr->GetText());
 
@@ -63,7 +63,7 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const IGraphicsElement&
 		itemPtr = textItemPtr;
 	}
 
-	const CPolygonElement* polygonElementPtr = dynamic_cast<const CPolygonElement*> (&graphicsElement);
+	const imtreport::CPolygonElement* polygonElementPtr = dynamic_cast<const imtreport::CPolygonElement*> (&graphicsElement);
 	if (polygonElementPtr != NULL){
 		QPolygonF polygon;
 		for (int i = 0; i < polygonElementPtr->GetNodesCount(); ++i){
@@ -75,7 +75,7 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const IGraphicsElement&
 		itemPtr = new QGraphicsPolygonItem(polygon);
 	}
 
-	const CImageRectangleElement* imageRectangleElementPtr = dynamic_cast<const CImageRectangleElement*> (&graphicsElement);
+	const imtreport::CImageRectangleElement* imageRectangleElementPtr = dynamic_cast<const imtreport::CImageRectangleElement*> (&graphicsElement);
 	if (imageRectangleElementPtr != NULL){
 		QString imgPath = imageRectangleElementPtr->GetImagePath();
 
@@ -120,6 +120,6 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const IGraphicsElement&
 }
 
 
-} // namespace imtreport
+} // namespace imtreportgui
 
 

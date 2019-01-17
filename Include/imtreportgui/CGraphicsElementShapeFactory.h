@@ -2,10 +2,10 @@
 
 
 // ImtCore includes
-#include <imtreport/IGraphicsElementShapeFactory.h>
+#include <imtreportgui/IGraphicsElementShapeFactory.h>
 
 
-namespace imtreport
+namespace imtreportgui
 {
 
 
@@ -13,10 +13,10 @@ class CGraphicsElementShapeFactory: virtual public IGraphicsElementShapeFactory
 {
 public:
 	// reimplemented (IGraphicsElementShapeFactory)
-	virtual QGraphicsItem* CreateShape(const IGraphicsElement& graphicsElement) const;
+	virtual QGraphicsItem* CreateShape(const imtreport::IGraphicsElement& graphicsElement) const;
 };
 
 
-} // namespace imtreport
+} // namespace imtreportgui
 
 

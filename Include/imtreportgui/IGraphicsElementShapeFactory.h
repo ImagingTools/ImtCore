@@ -8,7 +8,7 @@
 class QGraphicsItem;
 
 
-namespace imtreport
+namespace imtreportgui
 {
 
 
@@ -21,10 +21,10 @@ public:
 	/**
 		Create shape item for a graphics element.
 	*/
-	virtual QGraphicsItem* CreateShape(const IGraphicsElement& graphicsElement) const = 0;
+	virtual QGraphicsItem* CreateShape(const imtreport::IGraphicsElement& graphicsElement) const = 0;
 };
 
 
-} // namespace imtreport
+} // namespace imtreportgui
 
 

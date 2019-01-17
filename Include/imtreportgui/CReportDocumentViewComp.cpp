@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtreport/IReportPage.h>
-#include <imtreport/CGraphicsElementShapeFactory.h>
+#include <imtreportgui/CGraphicsElementShapeFactory.h>
 
 
 namespace imtreportgui
@@ -38,7 +38,7 @@ void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*ch
 
 	m_scene.clear();
 
-	imtreport::CGraphicsElementShapeFactory shapeFactory;
+	imtreportgui::CGraphicsElementShapeFactory shapeFactory;
 
 	int pageCount = documentPtr->GetPagesCount();
 	if (pageCount > 0){
