@@ -43,18 +43,18 @@ protected:
 	virtual void OnGuiRetranslate() override;
 
 private Q_SLOTS:
+	void OnExportToPdf();
 
 private:
-	void SaveToPDF();
-
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_commands;
+	iqtgui::CHierarchicalCommand m_exportToPdfCommand;
 
 	QGraphicsScene m_scene;
 
-	static const int s_A4Width = 210;
-	static const int s_A4Height = 297;
+	static const int s_A4Width = 210.0;
+	static const int s_A4Height = 297.0;
 };
 
 

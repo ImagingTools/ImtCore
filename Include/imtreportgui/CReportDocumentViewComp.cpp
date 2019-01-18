@@ -3,7 +3,7 @@
 
 // Qt includes
 #include <QtPrintSupport/QPrinter>
-#include <QtWidgets/qmessagebox.h>
+#include <QtWidgets/QFileDialog>
 
 // ImtCore includes
 #include <imtreport/IReportPage.h>
@@ -17,8 +17,12 @@ namespace imtreportgui
 // public methods
 
 CReportDocumentViewComp::CReportDocumentViewComp()
-	:m_commands("&View", 100)
+	:m_commands("&File", 100),
+	m_exportToPdfCommand("Export to PDF...", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 1984)
 {
+	connect(&m_exportToPdfCommand, SIGNAL(triggered()), this, SLOT(OnExportToPdf()));
+
+	m_commands.InsertChild(&m_exportToPdfCommand);
 	m_rootCommands.InsertChild(&m_commands);
 }
 
@@ -41,7 +45,12 @@ void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*ch
 	Q_ASSERT(documentPtr != NULL);
 
 	m_scene.clear();
-	m_scene.setSceneRect(0, 0, s_A4Width, s_A4Height);
+
+	qreal pxMmRatio = static_cast<double>(PageView->width()) / static_cast<double>(PageView->widthMM());
+
+	QRectF sceneRect(0.0, 0.0, s_A4Width * pxMmRatio, s_A4Height * pxMmRatio);
+	m_scene.setSceneRect(sceneRect);
+	m_scene.addRect(sceneRect, QPen(Qt::red));
 
 	imtreportgui::CGraphicsElementShapeFactory shapeFactory;
 
@@ -70,16 +79,12 @@ void CReportDocumentViewComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	PageView->setFixedWidth(PageView->width() / PageView->widthMM() * s_A4Width);
-	PageView->setFixedHeight(PageView->height() / PageView->heightMM() * s_A4Height);
 	PageView->setScene(&m_scene);
 }
 
 
 void CReportDocumentViewComp::OnGuiDestroyed()
 {
-	SaveToPDF(); // to be removed, just for test
-
 	BaseClass::OnGuiDestroyed();
 }
 
@@ -90,20 +95,22 @@ void CReportDocumentViewComp::OnGuiRetranslate()
 }
 
 
-// private methods
-void CReportDocumentViewComp::SaveToPDF()
+void CReportDocumentViewComp::OnExportToPdf()
 {
-	QPrinter printer(QPrinter::HighResolution);
-	printer.setPageSize(QPrinter::A4);
-	printer.setOrientation(QPrinter::Portrait);
-	printer.setOutputFormat(QPrinter::PdfFormat);
-	printer.setOutputFileName("c:\\work\\test.pdf");
+	QString fileName = QFileDialog::getSaveFileName(GetWidget(), tr("Export to PDF..."), "", "*.pdf");
 
-	QPainter painter(&printer);
-	m_scene.render(&painter, QRectF(), QRectF());
+	if (!fileName.isEmpty()) {
+		QPrinter printer(QPrinter::HighResolution);
+		printer.setPageSize(QPrinter::A4);
+		printer.setOrientation(QPrinter::Portrait);
+		printer.setOutputFormat(QPrinter::PdfFormat);
+		printer.setOutputFileName(fileName);
 
-	//printer.newPage(); // perhaps it might help for paging in PDF
+		QPainter painter(&printer);
+		m_scene.render(&painter);
+	}
 }
+
 
 } // namespace imtreportgui
 
