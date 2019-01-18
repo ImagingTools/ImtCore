@@ -60,7 +60,7 @@ bool CDepthBitmap::ConvertToQImage(QImage& result) const
 			if (m_depthRange.Contains(inputValue)) {
 				double alpha = m_depthRange.GetAlphaFromValue(inputValue);
 
-				int colorMapIndex = alpha * 255;
+				int colorMapIndex = (1.0 - alpha) * 255;
 
 				int red = r[colorMapIndex] * 255;
 				int green = g[colorMapIndex] * 255;
