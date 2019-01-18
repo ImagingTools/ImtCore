@@ -23,6 +23,8 @@ namespace imtreport
 class IGraphicsElement: virtual public i2d::IObject2d, virtual public iser::IObject
 {
 public:
+	enum Alignment { None, Left, Center, Right };
+
 	/**
 		Get the color used for filling of the object.
 	*/
@@ -52,6 +54,16 @@ public:
 		Set the width used for drawing the strokes of the object.
 	*/
 	virtual void SetStrokeWidth(double strokeWidth) = 0;
+
+	/**
+		Get alignment of the object.
+	*/
+	virtual Alignment GetAlignment() const = 0;
+
+	/**
+		Set alignment of the object.
+	*/
+	virtual void SetAlignment(const Alignment alignment) = 0;
 };
 
 

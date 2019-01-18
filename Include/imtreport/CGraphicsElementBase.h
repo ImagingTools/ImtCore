@@ -24,6 +24,8 @@ public:
 	virtual void SetStrokeColor(const QColor& strokeColor);
 	virtual double GetStrokeWidth() const;
 	virtual void SetStrokeWidth(double strokeWidth);
+	virtual Alignment GetAlignment() const;
+	virtual void SetAlignment(const Alignment alignment);
 
 	// reimplemented (iser::ISerializeable)
 	virtual bool Serialize(iser::IArchive& archive);
@@ -35,6 +37,7 @@ private:
 	QColor m_fillColor;
 	QColor m_strokeColor;
 	double m_strokeWidth;
+	Alignment m_alignment;
 };
 
 

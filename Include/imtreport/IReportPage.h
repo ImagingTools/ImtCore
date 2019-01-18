@@ -8,6 +8,9 @@
 #include <iser/ISerializable.h>
 #include <i2d/CVector2d.h>
 
+// ImtCore includes
+#include <imtreport/IGraphicsElement.h>
+
 
 namespace imtreport
 {
@@ -39,7 +42,12 @@ public:
 		Add a text label to the report page.
 	*/
 	virtual QByteArray AddText(const QString& text, const i2d::CVector2d& position) = 0;
-	
+
+	/**
+		Add a text label to the report page.
+	*/
+	virtual QByteArray AddText(const QString& text, const double top, const IGraphicsElement::Alignment alignment) = 0;
+
 	/**
 		Add an image file to the report page.
 	*/

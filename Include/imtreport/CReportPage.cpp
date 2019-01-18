@@ -46,22 +46,17 @@ const IGraphicsElement* CReportPage::GetPageElement(const QByteArray& elementId)
 
 QByteArray CReportPage::AddText(const QString& text, const i2d::CVector2d& position)
 {
-	QByteArray uuid;
-
-	CTextLabelElement* element = AddGraphicsElement<CTextLabelElement>(uuid);
-	Q_ASSERT(element);
-
-	element->SetFontSize(8);
-	element->SetText(text);
-	element->SetPosition(position);
-	element->SetFillColor(qRgb(255, 0, 0));
-	element->SetStrokeColor(qRgb(0, 255, 255));
-
-	return uuid;
+	return AddText(text, position, IGraphicsElement::Alignment::None);
 }
 
 
-QByteArray CReportPage::AddImage(const QString& imagePath, const QRect& rect/*, const i2d::CVector2d& position*/)
+QByteArray CReportPage::AddText(const QString& text, const double top, const IGraphicsElement::Alignment alignment)
+{
+	return AddText(text, i2d::CVector2d(-1, top), alignment);
+}
+
+
+QByteArray CReportPage::AddImage(const QString& imagePath, const QRect& rect)
 {
 	QByteArray uuid;
 
@@ -292,6 +287,24 @@ int CReportPage::FindItemIndex(const IGraphicsElement& element) const
 	}
 
 	return -1;
+}
+
+
+QByteArray CReportPage::AddText(const QString& text, const i2d::CVector2d& position, const IGraphicsElement::Alignment alignment)
+{
+	QByteArray uuid;
+
+	CTextLabelElement* element = AddGraphicsElement<CTextLabelElement>(uuid);
+	Q_ASSERT(element);
+
+	element->SetFontSize(8);
+	element->SetText(text);
+	element->SetPosition(position);
+	element->SetFillColor(qRgb(255, 0, 0));
+	element->SetStrokeColor(qRgb(0, 255, 255));
+	element->SetAlignment(alignment);
+
+	return uuid;
 }
 
 

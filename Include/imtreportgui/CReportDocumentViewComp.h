@@ -52,6 +52,7 @@ private:
 
 	QPointF MapPointToScene(const QPointF& point) const;
 	QRectF MapRectToScene(const QRectF& rect) const;
+
 	void ConvertShapeCoodinates(const imtreport::IGraphicsElement* pageElement, QGraphicsItem* sceneElement) const;
 	void ConvertRectCoodinates(const imtreport::CRectangleElement* pageElement, QGraphicsItem* sceneElement) const;
 	void ConvertEllipseCoodinates(const imtreport::CCircleElement* pageElement, QGraphicsItem* sceneElement) const;

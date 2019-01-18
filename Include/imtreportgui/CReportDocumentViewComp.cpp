@@ -209,7 +209,18 @@ void CReportDocumentViewComp::ConvertLabelCoodinates(const imtreport::CTextLabel
 	Q_ASSERT(labelSceneElement);
 	Q_ASSERT(pageElement);
 
-	labelSceneElement->setPos(MapPointToScene(pageElement->GetPosition()));
+	QPointF pos = MapPointToScene(pageElement->GetPosition());
+
+	if (pageElement->GetAlignment() == imtreport::IGraphicsElement::Alignment::None) {
+		labelSceneElement->setPos(pos);
+	}
+	else {
+		QRectF rect = labelSceneElement->boundingRect();
+		//rect.moveCenter(PageView->sceneRect.center()); // doesnt work so far
+		pos.setX(rect.left());
+
+		labelSceneElement->setPos(pos);
+	}
 
 	double fontSize = MapPointToScene(QPointF(pageElement->GetFontSize(), 0)).x();
 	fontSize *= 0.9; // still unclear why the screen transformation of the scene displays the text to big - so scale it down hardcoded
