@@ -8,8 +8,9 @@
 
 // ImtCore includes
 #include <imtreport/IReportDocument.h>
+#include <imtreport/IGraphicsElement.h>
+#include <imtreport/TGraphicsElement.h>
 #include <GeneratedFiles/imtreportgui/ui_CReportDocumentViewComp.h>
-
 
 namespace imtreportgui
 {
@@ -48,6 +49,15 @@ private Q_SLOTS:
 private:
 	void UpdateSceneRect();
 	void UpdateSceneShapes();
+
+	QPointF MapPointToScene(const QPointF& point) const;
+	QRectF MapRectToScene(const QRectF& rect) const;
+	void ConvertShapeCoodinates(const imtreport::IGraphicsElement* pageElement, QGraphicsItem* sceneElement) const;
+	void ConvertRectCoodinates(const imtreport::CRectangleElement* pageElement, QGraphicsItem* sceneElement) const;
+	void ConvertEllipseCoodinates(const imtreport::CCircleElement* pageElement, QGraphicsItem* sceneElement) const;
+	void ConvertLabelCoodinates(const imtreport::CTextLabelElement* pageElement, QGraphicsItem* sceneElement) const;
+	void ConvertPolygoneCoodinates(const imtreport::CPolygonElement* pageElement, QGraphicsItem* sceneElement) const;
+	void ConvertImageCoodinates(const imtreport::CImageRectangleElement* pageElement, QGraphicsItem* sceneElement) const;
 
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;

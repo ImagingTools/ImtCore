@@ -8,15 +8,13 @@
 #include <QtGui/QPen>
 #include <QtGui/QFont>
 #include <QtGui/QFontMetrics>
-#include <QtGui/QScreen>
-#include <QtGui/QGuiApplication>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QGraphicsRectItem>
 #else
 #include <QtGui/QGraphicsRectItem>
 #endif
 
-// GraphicsDocument includes
+// ImtCore includes
 #include <imtreport/TGraphicsElement.h>
 
 
@@ -32,15 +30,13 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraph
 	QGraphicsItem* itemPtr = NULL;
 	const imtreport::CRectangleElement* rectangleElementPtr = dynamic_cast<const imtreport::CRectangleElement*> (&graphicsElement);
 	if (rectangleElementPtr != NULL){
-		QRectF rect = MapRectToScene(iqt::GetQRectF(*rectangleElementPtr));
-		itemPtr = new QGraphicsRectItem(rect);
+		itemPtr = new QGraphicsRectItem();
 		strokeWidth = rectangleElementPtr->GetStrokeWidth();
 	}
 
 	const imtreport::CCircleElement* circleElementPtr = dynamic_cast<const imtreport::CCircleElement*>(&graphicsElement);
 	if (circleElementPtr != NULL){
-		QRectF rect = MapRectToScene(iqt::GetQRectF(circleElementPtr->GetBoundingBox()));
-		itemPtr = new QGraphicsEllipseItem(rect);
+		itemPtr = new QGraphicsEllipseItem();
 	}
 
 	const imtreport::CTextLabelElement* labelElementPtr = dynamic_cast<const imtreport::CTextLabelElement*> (&graphicsElement);
@@ -56,20 +52,12 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraph
 		QFont labelFont(labelElementPtr->GetFontName(), fontSize);
 		textItemPtr->setFont(labelFont);
 
-		textItemPtr->setPos(MapPointToScene(labelElementPtr->GetPosition()));
-
 		itemPtr = textItemPtr;
 	}
 
 	const imtreport::CPolygonElement* polygonElementPtr = dynamic_cast<const imtreport::CPolygonElement*> (&graphicsElement);
 	if (polygonElementPtr != NULL){
-		QPolygonF polygon;
-		for (int i = 0; i < polygonElementPtr->GetNodesCount(); ++i){
-			const i2d::CVector2d& node = polygonElementPtr->GetNodePos(i);
-			polygon.append(MapPointToScene(node));
-		}
-
-		itemPtr = new QGraphicsPolygonItem(polygon);
+		itemPtr = new QGraphicsPolygonItem();
 	}
 
 	const imtreport::CImageRectangleElement* imageRectangleElementPtr = dynamic_cast<const imtreport::CImageRectangleElement*> (&graphicsElement);
@@ -81,22 +69,7 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraph
 		}
 
 		//pixmap = pixmap.scaled(rect.width(), rect.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-		QPixmap pixmap(imgPath);
-		itemPtr = new QGraphicsPixmapItem(pixmap);
-
-		QRectF rect = MapRectToScene(iqt::GetQRectF(*imageRectangleElementPtr));
-		itemPtr->setPos(rect.topLeft());
-
-		QSize s = pixmap.size();
-
-		if (s.width() > 0){
-			double scale = rect.width() / s.width();
-			itemPtr->setScale(scale);
-		}
-		else{
-			itemPtr->setScale(1);
-		}
+		itemPtr = new QGraphicsPixmapItem(QPixmap(imgPath));
 	}
 	
 	QAbstractGraphicsShapeItem* abstractGraphicsShapeItemPtr = dynamic_cast<QAbstractGraphicsShapeItem*> (itemPtr);
@@ -111,26 +84,6 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraph
 	}
 
 	return itemPtr;
-}
-
-
-// private methods
-
-QPointF CGraphicsElementShapeFactory::MapPointToScene(const QPointF& point)
-{
-	// map shape coordinates given in mm to scene's coordinates
-	QScreen* screen = QGuiApplication::primaryScreen();
-	Q_ASSERT(screen);
-
-	return QPointF(point.x() * screen->physicalDotsPerInchX() / 25.4,
-                   point.y() * screen->physicalDotsPerInchY() / 25.4);
-}
-
-
-QRectF CGraphicsElementShapeFactory::MapRectToScene(const QRectF& rect)
-{
-	return QRectF(MapPointToScene(rect.topLeft()),
-		MapPointToScene(rect.bottomRight()));
 }
 
 
