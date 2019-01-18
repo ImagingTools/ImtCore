@@ -42,16 +42,6 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraph
 	const imtreport::CTextLabelElement* labelElementPtr = dynamic_cast<const imtreport::CTextLabelElement*> (&graphicsElement);
 	if (labelElementPtr != NULL){
 		QGraphicsSimpleTextItem* textItemPtr = new QGraphicsSimpleTextItem(labelElementPtr->GetText());
-
-		double fontSize = labelElementPtr->GetFontSize();
-		fontSize *= 25.4 / 72.0;	// convert the font size in mm (1 pt = 25.4/72 mm = 0.3527 mm)
-
-		// still unclear why the screen transformation of the scene displays the text to big - so scale it down hardcoded:
-		fontSize *= 0.9;
-
-		QFont labelFont(labelElementPtr->GetFontName(), fontSize);
-		textItemPtr->setFont(labelFont);
-
 		itemPtr = textItemPtr;
 	}
 

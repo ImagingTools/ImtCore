@@ -210,6 +210,14 @@ void CReportDocumentViewComp::ConvertLabelCoodinates(const imtreport::CTextLabel
 	Q_ASSERT(pageElement);
 
 	labelSceneElement->setPos(MapPointToScene(pageElement->GetPosition()));
+
+	// set font
+	double fontSize = pageElement->GetFontSize();
+	fontSize *= 25.4 / 72.0;	// convert the font size in mm (1 pt = 25.4/72 mm = 0.3527 mm)
+	fontSize *= 0.9;			// still unclear why the screen transformation of the scene displays the text to big - so scale it down hardcoded
+
+	QFont font(pageElement->GetFontName(), fontSize);
+	labelSceneElement->setFont(font);
 }
 
 
