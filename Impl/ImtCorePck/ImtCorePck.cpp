@@ -33,6 +33,12 @@ I_EXPORT_COMPONENT(
 			"Mesh STL Persistence");
 
 
+I_EXPORT_COMPONENT(
+			DepthBitmap,
+			"Depth bitmap",
+			"Bitmap 3D Depth Image");
+
+
 } // namespace ImtCorePck
 
 

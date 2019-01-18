@@ -11,7 +11,7 @@
 #include <imt3d/CObjPointCloudPersistenceComp.h>
 #include <imt3d/CMesh3d.h>
 #include <imt3d/CStlMeshPersistenceComp.h>
-
+#include <imt3d/CDepthBitmap.h>
 
 /**
 	ImtCorePck package
@@ -28,6 +28,10 @@ typedef icomp::TModelCompWrap<
 	icomp::TMakeComponentWrap<imt3d::CMesh3d, imt3d::IMesh3d, imt3d::IObject3d, iser::ISerializable>> TetrahedralMesh3D;
 
 typedef imt3d::CStlMeshPersistenceComp StlMeshPersistence;
+
+typedef icomp::TModelCompWrap<
+	icomp::TMakeComponentWrap<imt3d::CDepthBitmap, iimg::IQImageProvider, iimg::IBitmap, iimg::IRasterImage, i2d::IObject2d, iser::ISerializable>> DepthBitmap;
+
 
 } // namespace ImtCorePck
 

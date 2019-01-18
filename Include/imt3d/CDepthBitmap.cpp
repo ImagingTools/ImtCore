@@ -18,7 +18,10 @@ void CDepthBitmap::SetDepthRange(const istd::CRange & depthRange)
 
 		m_depthRange = depthRange;
 	}
+
+	InvalidateCache(istd::IChangeable::GetAnyChange());
 }
+
 
 istd::CRange CDepthBitmap::GetDepthRange() const
 {
@@ -52,20 +55,24 @@ bool CDepthBitmap::ConvertToQImage(QImage& result) const
 		float* inputLinePtr = (float*)GetLinePtr(y);
 
 		for (int x = 0; x < width; ++x){
-			double alpha = m_depthRange.GetAlphaFromValue(*inputLinePtr);
+			float inputValue = inputLinePtr[x];
 
-			int colorMapIndex = alpha * 255;
+			if (m_depthRange.Contains(inputValue)) {
+				double alpha = m_depthRange.GetAlphaFromValue(inputValue);
 
-			int red = r[colorMapIndex] * 256;
-			int green = g[colorMapIndex] * 256;
-			int blue = b[colorMapIndex] * 256;
+				int colorMapIndex = alpha * 255;
 
-			int rgbValue = qRgb(red, green, blue);
+				int red = r[colorMapIndex] * 255;
+				int green = g[colorMapIndex] * 255;
+				int blue = b[colorMapIndex] * 255;
 
-			*outputLinePtr = rgbValue;
+				int rgbValue = qRgb(red, green, blue);
 
-			++outputLinePtr;
-			++inputLinePtr;
+				outputLinePtr[x] = rgbValue;
+			}
+			else {
+				outputLinePtr[x] = qRgb(255,255,255);
+			}
 		}
 	}
 
