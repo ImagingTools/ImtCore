@@ -14,6 +14,11 @@ namespace imtreportgui
 {
 
 
+// static members
+const qreal CReportDocumentViewComp::s_A4WidthMm = 210.0;
+const qreal CReportDocumentViewComp::s_A4HeightMm = 297.0;
+
+
 // public methods
 
 CReportDocumentViewComp::CReportDocumentViewComp()
@@ -41,35 +46,10 @@ const ibase::IHierarchicalCommand* CReportDocumentViewComp::GetCommands() const
 
 void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	imtreport::IReportDocument* documentPtr = GetObjectPtr();
-	Q_ASSERT(documentPtr != NULL);
-
 	m_scene.clear();
 
-	qreal pxMmRatio = static_cast<double>(PageView->width()) / static_cast<double>(PageView->widthMM());
-
-	QRectF sceneRect(0.0, 0.0, s_A4Width * pxMmRatio, s_A4Height * pxMmRatio);
-	m_scene.setSceneRect(sceneRect);
-	m_scene.addRect(sceneRect, QPen(Qt::red));
-
-	imtreportgui::CGraphicsElementShapeFactory shapeFactory;
-
-	int pageCount = documentPtr->GetPagesCount();
-	if (pageCount > 0){
-		const imtreport::IReportPage* pagePtr = documentPtr->GetReportPage(0);
-		Q_ASSERT(pagePtr != NULL);
-
-		imtreport::IReportPage::ElementIds ids = pagePtr->GetPageElements();
-
-		for (const QByteArray& elementId : ids){
-			const imtreport::IGraphicsElement* elementPtr = pagePtr->GetPageElement(elementId);
-			Q_ASSERT(elementPtr != nullptr);
-
-			QGraphicsItem* itemPtr = shapeFactory.CreateShape(*elementPtr);
-
-			m_scene.addItem(itemPtr);
-		}
-	}
+	UpdateSceneRect();
+	UpdateSceneShapes();
 }
 
 
@@ -108,6 +88,43 @@ void CReportDocumentViewComp::OnExportToPdf()
 
 		QPainter painter(&printer);
 		m_scene.render(&painter);
+	}
+}
+
+
+// private methods
+void CReportDocumentViewComp::UpdateSceneRect()
+{
+	qreal sceneWidth = s_A4WidthMm * static_cast<qreal>(PageView->physicalDpiX()) / 25.4;
+	qreal sceneHeight = s_A4HeightMm * static_cast<qreal>(PageView->physicalDpiY()) / 25.4;
+	QRectF sceneRect(0.0, 0.0, sceneWidth, sceneHeight);
+
+	m_scene.setSceneRect(sceneRect);
+	m_scene.addRect(sceneRect, QPen(Qt::red));
+}
+
+
+void CReportDocumentViewComp::UpdateSceneShapes()
+{
+	imtreport::IReportDocument* documentPtr = GetObjectPtr();
+	Q_ASSERT(documentPtr != NULL);
+
+	imtreportgui::CGraphicsElementShapeFactory shapeFactory;
+
+	int pageCount = documentPtr->GetPagesCount();
+	if (pageCount > 0) {
+		const imtreport::IReportPage* pagePtr = documentPtr->GetReportPage(0);
+		Q_ASSERT(pagePtr != NULL);
+
+		imtreport::IReportPage::ElementIds ids = pagePtr->GetPageElements();
+
+		for (const QByteArray& elementId : ids) {
+			const imtreport::IGraphicsElement* elementPtr = pagePtr->GetPageElement(elementId);
+			Q_ASSERT(elementPtr != nullptr);
+
+			QGraphicsItem* itemPtr = shapeFactory.CreateShape(*elementPtr);
+			m_scene.addItem(itemPtr);
+		}
 	}
 }
 

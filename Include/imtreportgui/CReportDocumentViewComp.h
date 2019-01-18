@@ -46,6 +46,9 @@ private Q_SLOTS:
 	void OnExportToPdf();
 
 private:
+	void UpdateSceneRect();
+	void UpdateSceneShapes();
+
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_commands;
@@ -53,8 +56,8 @@ private:
 
 	QGraphicsScene m_scene;
 
-	static const int s_A4Width = 210.0;
-	static const int s_A4Height = 297.0;
+	static const qreal s_A4WidthMm;
+	static const qreal s_A4HeightMm;
 };
 
 
