@@ -51,7 +51,7 @@ QByteArray CReportPage::AddText(const QString& text, const i2d::CVector2d& posit
 	CTextLabelElement* element = AddGraphicsElement<CTextLabelElement>(uuid);
 	Q_ASSERT(element);
 
-	element->SetFontSize(80);
+	element->SetFontSize(8);
 	element->SetText(text);
 	element->SetPosition(position);
 	element->SetFillColor(qRgb(255, 0, 0));
