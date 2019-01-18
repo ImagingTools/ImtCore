@@ -42,7 +42,3 @@ ImtProc3dPck.depends = imt3d imt3proc
 SUBDIRS += ImtGuiPck
 ImtGuiPck.file = ../../Impl/ImtGuiPck/QMake/ImtGuiPck.pro
 ImtGuiPck.depends = imt3d imt3proc imtgui
-
-SUBDIRS += ImtReportGuiPck
-ImtGuiReportPck.file = ../../Impl/ImtGuiReportPck/QMake/ImtGuiReportPck.pro
-ImtGuiReportPck.depends = imtreport
