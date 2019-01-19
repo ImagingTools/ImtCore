@@ -46,6 +46,7 @@ public:
 		I_ASSIGN(m_maximumFrameWidthAttrPtr, "MaximumFrameWidth", "Maximum width of thumbnail frame", false, 320);
 		I_ASSIGN(m_maximumFrameHeightAttrPtr, "MaximumFrameHeight", "Maximum height of thumbnail frame", false, 240);
 		I_ASSIGN(m_autoLogoutMinutesAttrPtr, "AutoLogoutMinutes", "Time intervall for the automatic logout", false, 60);
+		I_ASSIGN(m_defaultPageIndexAttrPtr, "DefaultPageIndex", "Index of the default (start) page", false, -1);
 		I_ASSIGN(m_settingsPageIndexAttrPtr, "SettingsPageIndex", "Index of the system settings page", false, -1);
 		I_ASSIGN(m_welcomeTextAttrPtr, "WelcomeText", "Welcome text on the start page", true, "Welcome");
 	I_END_COMPONENT;
@@ -60,6 +61,7 @@ protected:
 	I_ATTR(int, m_maximumFrameWidthAttrPtr);
 	I_ATTR(int, m_maximumFrameHeightAttrPtr);
 	I_ATTR(int, m_autoLogoutMinutesAttrPtr);
+	I_ATTR(int, m_defaultPageIndexAttrPtr);
 	I_ATTR(int, m_settingsPageIndexAttrPtr);
 	I_TEXTATTR(m_welcomeTextAttrPtr);
 };
@@ -91,6 +93,19 @@ public:
 		PAGE_CONTAINER_INDEX
 	};
 
+	enum LoginMode
+	{
+		/**
+			The user must be logged in to see any page of the application
+		*/
+		LM_STRONG,
+
+		/**
+			The unlogged user can see the application's menu and navigate over all accessible pages.
+		*/
+		LM_DEFAULT
+	};
+
 	CThumbnailDecoratorGuiComp();
 
 	// reimplemented (ibase::ICommandsProvider)
@@ -115,16 +130,19 @@ private Q_SLOTS:
 	void on_SubPages_itemSelectionChanged();
 	void on_HomeButton_clicked();
 	void on_LoginButton_clicked();
-	void on_LogoutButton_clicked();
+	void on_LoginControlButton_clicked();
 	void on_SettingsButton_clicked();
+	void Logout();
 
 private:
 	void ShowLoginPage();
 	void ShowHomePage();
+	void SwitchToPage(int index);
 	void UpdateLoginButtonsState();
 	void CreatePages(const iprm::ISelectionParam* selectionPtr);
 	void CreateMenu(const iprm::ISelectionParam* selectionPtr, QTreeWidgetItem* parentItemPtr);
 	void UpdatePageState();
+	LoginMode GetLoginMode();
 
 	/**
 		Calculate layout of page thumbnails based on m_horizontalItemsViewAttrPtr and m_verticalItemsViewAttrPtr

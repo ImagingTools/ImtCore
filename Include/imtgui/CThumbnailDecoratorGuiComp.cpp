@@ -125,33 +125,37 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 			m_pagesWidgetCompPtr->CreateGui(ContentFrame);
 		}
 
+		m_pagesCompPtr->SetSelectedOptionIndex(-1);
+
 		if (m_pagesModelCompPtr.IsValid()){
 			m_pageModelObserver.RegisterModel(m_pagesModelCompPtr.GetPtr());
 		}
 	}
 
-	if (m_loginCompPtr.IsValid()){
-		ShowLoginPage();
+	if (m_defaultPageIndexAttrPtr.IsValid()){
+		int startPageIndex = *m_defaultPageIndexAttrPtr;
+		if (startPageIndex >= 0){
+			SwitchToPage(startPageIndex);
+		}
 	}
 	else{
-		ShowHomePage();
+		if (m_loginCompPtr.IsValid()){
+			ShowLoginPage();
+		}
+		else{
+			ShowHomePage();
+		}
 	}
 
-	LogoutButton->setVisible(m_loginCompPtr.IsValid());
+	LoginControlButton->setVisible(m_loginCompPtr.IsValid());
 	
 	installEventFilter(this);
 
+	SettingsButton->setVisible(m_settingsPageIndexAttrPtr.IsValid());
+
 	UpdateLoginButtonsState();
 
-	connect(&m_autoLogoutTimer, SIGNAL(timeout()), this, SLOT(on_LogoutButton_clicked()));
-
-	bool isLogged = true;
-	SettingsButton->setVisible(m_settingsPageIndexAttrPtr.IsValid());
-	if (m_loginCompPtr.IsValid()){
-		isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
-	}
-
-	SettingsButton->setEnabled(isLogged);
+	connect(&m_autoLogoutTimer, SIGNAL(timeout()), this, SLOT(Logout()));
 }
 
 
@@ -173,7 +177,11 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 	BaseClass::OnGuiRetranslate();
 
 	int currentPageIndex = PageStack->currentIndex();
-	if (currentPageIndex == LOGIN_PAGE_INDEX){
+	if (currentPageIndex == LOGIN_PAGE_INDEX) {
+		CurrentPageLabel->setText(tr("Log-in"));
+	}
+
+	if (currentPageIndex == HOME_PAGE_INDEX) {
 		CurrentPageLabel->setText(*m_welcomeTextAttrPtr);
 	}
 }
@@ -195,25 +203,8 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 
 	if (m_itemInfoMap.contains(item)){
 		ItemInfo& info = m_itemInfoMap[item];
-		if (info.selectionPtr != nullptr){
-			if (info.selectionPtr->SetSelectedOptionIndex(info.pageIndex)){
-				SubPages->clear();
 
-				QString itemName = item->text();
-				CurrentPageLabel->setText(itemName);
-
-				const iprm::ISelectionParam* subSelectionPtr = info.selectionPtr->GetSubselection(info.pageIndex);
-				if (subSelectionPtr != NULL){
-					CreateMenu(subSelectionPtr, NULL);
-				}
-				if (info.pageIndex < 0){
-					PageStack->setCurrentIndex(HOME_PAGE_INDEX);
-				}
-				else{
-					PageStack->setCurrentIndex(PAGE_CONTAINER_INDEX);
-				}
-			}
-		}
+		SwitchToPage(info.pageIndex);
 	}
 }
 
@@ -290,7 +281,17 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 
 			UpdateLoginButtonsState();
 
-			ShowHomePage();
+			int lastPageIndex = -1;
+			if (m_pagesCompPtr.IsValid()) {
+				lastPageIndex = m_pagesCompPtr->GetSelectedOptionIndex();
+			}
+
+			if (lastPageIndex < 0) {
+				ShowHomePage();
+			}
+			else {
+				SwitchToPage(lastPageIndex);
+			}
 		}
 		else{
 			QMessageBox::warning(GetQtWidget(), tr("Error"), tr("Wrong password"));
@@ -301,14 +302,32 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 }
 
 
-void CThumbnailDecoratorGuiComp::on_LogoutButton_clicked()
+void CThumbnailDecoratorGuiComp::on_LoginControlButton_clicked()
 {
-	if (m_loginCompPtr.IsValid() && m_loginCompPtr->Logout()){
-		m_autoLogoutTimer.stop();
+	Q_ASSERT(m_loginCompPtr.IsValid());
 
-		UpdateLoginButtonsState();
-
+	if (m_loginCompPtr->GetLoggedUser() == nullptr){
 		ShowLoginPage();
+	}
+	else {
+		if (m_loginCompPtr->Logout()){
+			m_autoLogoutTimer.stop();
+
+			UpdateLoginButtonsState();
+
+			LoginMode loginMode = GetLoginMode();
+			if (loginMode == LM_STRONG) {
+				ShowLoginPage();
+			}
+			else {
+				if (m_defaultPageIndexAttrPtr.IsValid()) {
+					SwitchToPage(*m_defaultPageIndexAttrPtr);
+				}
+				else {
+					ShowHomePage();
+				}
+			}
+		}
 	}
 }
 
@@ -328,20 +347,30 @@ void CThumbnailDecoratorGuiComp::on_SettingsButton_clicked()
 }
 
 
+void CThumbnailDecoratorGuiComp::Logout()
+{
+	if (m_loginCompPtr.IsValid() && m_loginCompPtr->Logout()){
+		m_autoLogoutTimer.stop();
+
+		UpdateLoginButtonsState();
+
+		ShowLoginPage();
+	}
+}
+
+
 // private methods
 
 void CThumbnailDecoratorGuiComp::ShowLoginPage()
 {
-	if (m_pagesCompPtr.IsValid()){
-		m_pagesCompPtr->SetSelectedOptionIndex(-1);
-	}
-
 	PageStack->setCurrentIndex(LOGIN_PAGE_INDEX);
 	PageList->clearSelection();
 	SubPages->clear();
 	LeftFrame->setVisible(false);
 
-	CurrentPageLabel->setText(*m_welcomeTextAttrPtr);
+	UpdateLoginButtonsState();
+
+	CurrentPageLabel->setText(tr("Log-in"));
 }
 
 
@@ -349,7 +378,7 @@ void CThumbnailDecoratorGuiComp::ShowHomePage()
 {
 	if (m_loginCompPtr.IsValid()){
 		iauth::CUser* userPtr = m_loginCompPtr->GetLoggedUser();
-		if (userPtr == NULL){
+		if ((GetLoginMode() == LM_STRONG) && (userPtr == NULL)){
 			return;
 		}
 	}
@@ -363,17 +392,66 @@ void CThumbnailDecoratorGuiComp::ShowHomePage()
 	SubPages->clear();
 	LeftFrame->setVisible(false);
 
-	CurrentPageLabel->setText(tr("Home"));
+	UpdateLoginButtonsState();
+
+	CurrentPageLabel->setText(*m_welcomeTextAttrPtr);
 }
+
+
+void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
+{
+	if (m_pagesCompPtr.IsValid()){
+		if (m_pagesCompPtr->SetSelectedOptionIndex(index)){
+			SubPages->clear();
+
+			QString pageLabel;
+			const iprm::IOptionsList* pageListPtr = m_pagesCompPtr->GetSelectionConstraints();
+			if ((pageListPtr != NULL) && index >= 0){
+				pageLabel = pageListPtr->GetOptionName(index);
+			}
+
+			CurrentPageLabel->setText(pageLabel);
+
+			const iprm::ISelectionParam* subSelectionPtr = m_pagesCompPtr->GetSubselection(index);
+			if (subSelectionPtr != NULL){
+				CreateMenu(subSelectionPtr, NULL);
+			}
+			if (index < 0){
+				PageStack->setCurrentIndex(HOME_PAGE_INDEX);
+			}
+			else {
+				PageStack->setCurrentIndex(PAGE_CONTAINER_INDEX);
+			}
+		}
+	}
+
+	UpdateLoginButtonsState();
+
+	HomeButton->setEnabled(true);
+}
+
 
 
 void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 {
+	bool isLogged = true;
 	if (m_loginCompPtr.IsValid()){
-		bool isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
+		isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
 
 		LoginButton->setEnabled(!isLogged);
-		LogoutButton->setEnabled(isLogged);
+
+		LoginMode loginMode = GetLoginMode();
+		if (loginMode == LM_STRONG){
+			LoginControlButton->setEnabled(isLogged);
+
+			HomeButton->setEnabled(isLogged);
+		}
+		else {
+			LoginControlButton->setEnabled(PageStack->currentIndex() != LOGIN_PAGE_INDEX);
+
+			LoginControlButton->setIcon(isLogged ? QIcon(":/Icons/Lock") : QIcon(":/Icons/Unlock"));
+		}
+
 		UserEdit->setEnabled(!isLogged);
 		PasswordEdit->setEnabled(!isLogged);
 		UserEdit->setEnabled(!isLogged);
@@ -382,9 +460,9 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 			qApp->removeEventFilter(this);
 			m_autoLogoutMilisec = 0;
 		}
-
-		HomeButton->setEnabled(isLogged);
 	}
+
+	SettingsButton->setEnabled(isLogged);
 }
 
 
@@ -563,6 +641,16 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 			}
 		}
 	}
+}
+
+
+CThumbnailDecoratorGuiComp::LoginMode CThumbnailDecoratorGuiComp::GetLoginMode()
+{
+	if (m_defaultPageIndexAttrPtr.IsValid()) {
+		return LM_DEFAULT;
+	}
+
+	return LM_STRONG;
 }
 
 

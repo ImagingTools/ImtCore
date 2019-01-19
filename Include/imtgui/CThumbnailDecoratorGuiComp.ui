@@ -43,7 +43,7 @@ QWidget[ImtTopFrame=true]
                                  stop: 0.97 rgb(220,220,223), stop: 1.0 rgb(190,190,193));
 	border-bottom: 1px solid  rgb(170,170,170);
 	color: #0d8dd3;
-	min-height: 5em;
+	min-height: 4.5em;
 }
 
 
@@ -282,13 +282,13 @@ QAbstractItemView[TabSimulation=true]
        </spacer>
       </item>
       <item>
-       <widget class="QToolButton" name="LogoutButton">
+       <widget class="QToolButton" name="LoginControlButton">
         <property name="text">
          <string>Log out</string>
         </property>
         <property name="icon">
          <iconset resource="imtgui.qrc">
-          <normaloff>:/Icons/Unlock</normaloff>:/Icons/Unlock</iconset>
+          <normaloff>:/Icons/Lock</normaloff>:/Icons/Lock</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -555,7 +555,10 @@ QAbstractItemView[TabSimulation=true]
                     </property>
                     <property name="icon">
                      <iconset resource="imtgui.qrc">
-                      <normaloff>:/Icons/Lock</normaloff>:/Icons/Lock</iconset>
+                      <normaloff>:/Icons/Unlock</normaloff>:/Icons/Unlock</iconset>
+                    </property>
+                    <property name="default">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
@@ -805,29 +808,12 @@ QAbstractItemView[TabSimulation=true]
   <tabstop>ExitButton</tabstop>
   <tabstop>SubPages</tabstop>
   <tabstop>HomeButton</tabstop>
-  <tabstop>LogoutButton</tabstop>
+  <tabstop>LoginControlButton</tabstop>
   <tabstop>SettingsButton</tabstop>
   <tabstop>PageList</tabstop>
  </tabstops>
  <resources>
   <include location="imtgui.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>ExitButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>CThumbnailDecoratorGuiComp</receiver>
-   <slot>showFullScreen()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>965</x>
-     <y>47</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>454</x>
-     <y>4</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
