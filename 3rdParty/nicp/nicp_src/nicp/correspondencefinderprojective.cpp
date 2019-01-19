@@ -35,7 +35,7 @@ namespace nicp {
       float maxCurvatureRatio = _inlierCurvatureRatioThreshold;
 
       // Construct an array of counters;
-      int numThreads = omp_get_max_threads();
+	  int numThreads = omp_get_max_threads();
       std::vector<int> localCorrespondenceIndex(numThreads);
 	  std::vector<int> localOffset(numThreads);
       int rowsPerThread = _referenceIndexImage.rows / numThreads;
@@ -44,9 +44,9 @@ namespace nicp {
 	 localOffset[i] = i * iterationsPerThread;
 	 localCorrespondenceIndex[i] = localOffset[i];
       }
-//#pragma omp parallel
+#pragma omp parallel
       {
-	 int threadId = omp_get_thread_num();
+		int threadId = omp_get_thread_num();
 	 int rMin = threadId * rowsPerThread;
 	 int rMax = rMin + rowsPerThread;
 	 if(rMax > _referenceIndexImage.rows)
@@ -131,7 +131,7 @@ namespace nicp {
       float maxCurvatureRatio = _inlierCurvatureRatioThreshold;
 
       // Construct an array of counters;
-      int numThreads = omp_get_max_threads();
+	  int numThreads = omp_get_max_threads();
 	  std::vector<int> localCorrespondenceIndex(numThreads);
 	  std::vector<int> localOffset(numThreads);
       int rowsPerThread = _referenceIndexImage.rows / numThreads;
@@ -141,9 +141,9 @@ namespace nicp {
 	 localCorrespondenceIndex[i] = localOffset[i];
       }
 
-//#pragma omp parallel
+#pragma omp parallel
       {
-	 int threadId = omp_get_thread_num();
+		  int threadId = omp_get_thread_num();
 	 int rMin = threadId * rowsPerThread;
 	 int rMax = rMin + rowsPerThread;
 	 if(rMax > _referenceIndexImage.rows)

@@ -14,8 +14,8 @@ namespace nicp {
 
     informationMatrix.resize(statsVector.size());
     
-//#pragma omp parallel for
-    for(size_t i = 0; i < statsVector.size(); i++) {
+#pragma omp parallel for
+    for(int i = 0; i < statsVector.size(); i++) {
       const Stats &stats = statsVector[i];
       InformationMatrix U = Matrix4f::Zero();
       U.block<3, 3>(0, 0) = stats.eigenVectors(); 
@@ -39,8 +39,8 @@ namespace nicp {
 
     informationMatrix.resize(statsVector.size());
 
-//#pragma omp parallel for
-    for(size_t i = 0; i < statsVector.size(); i++) {
+#pragma omp parallel for
+    for(int i = 0; i < statsVector.size(); i++) {
       const Stats &stats = statsVector[i];
       InformationMatrix U = Matrix4f::Zero();
       U.block<3, 3>(0, 0) = stats.eigenVectors(); 

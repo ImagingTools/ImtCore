@@ -35,7 +35,7 @@ namespace nicp {
     // Computing the integral image
     _integralImage.compute(indexImage, points);    
 
-//#pragma omp parallel for
+#pragma omp parallel for
     for(int r = 0; r < indexImage.rows; ++r) {
       const int *index = &indexImage(r, 0);
       const cv::Vec2i *interval = &_intervalImage(r, 0);

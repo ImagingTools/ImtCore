@@ -13,7 +13,7 @@ namespace nicp {
     clear();
 
     // Fill the accumulators with the points
-//#pragma omp parallel for
+#pragma omp parallel for
     for(int c = 0; c < cols(); c++) {
       const int* rowptr =  &indices(c,0);
       for(int r = 0; r < rows(); r++) {
@@ -27,7 +27,7 @@ namespace nicp {
     }
     
     // Fill by column
-//#pragma omp parallel for
+#pragma omp parallel for
     for(int c = 0; c < cols(); c++) {
       for(int r = 1; r < rows(); r++) {
 	coeffRef(r, c) += coeffRef(r - 1, c);
@@ -35,7 +35,7 @@ namespace nicp {
     }
 
     // Fill by row
-//#pragma omp parallel for
+#pragma omp parallel for
     for(int r = 0; r < rows(); r++) {
       for(int c = 1; c < cols(); c++) {
 	coeffRef(r, c) += coeffRef(r, c - 1);

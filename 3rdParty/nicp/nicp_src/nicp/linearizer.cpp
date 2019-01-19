@@ -28,7 +28,7 @@ namespace nicp {
     const InformationMatrixVector &normalOmegas = _aligner->currentCloud()->normalInformationMatrix();
 
     // Allocate the variables for the sum reduction;
-    int numThreads = omp_get_max_threads();
+	int numThreads = omp_get_max_threads();
 	std::vector<Matrix4f> _Htt(numThreads);
 	std::vector<Matrix4f> _Htr(numThreads);
 	std::vector<Matrix4f> _Hrr(numThreads);
@@ -37,9 +37,9 @@ namespace nicp {
 	std::vector<int> _inliers(numThreads);
 	std::vector<float> _errors(numThreads);
     int iterationsPerThread = _aligner->correspondenceFinder()->numCorrespondences() / numThreads;
-//#pragma omp parallel
+#pragma omp parallel
     {
-      int threadId = omp_get_thread_num();
+		int threadId = omp_get_thread_num();
       int imin = iterationsPerThread * threadId;
       int imax = imin + iterationsPerThread;
       if(imax > _aligner->correspondenceFinder()->numCorrespondences())
