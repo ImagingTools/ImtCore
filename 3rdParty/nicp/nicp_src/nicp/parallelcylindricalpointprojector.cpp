@@ -14,7 +14,7 @@ namespace nicp {
     _updateParameters();
   }
 
-  void ParallelCylindricalPointProjector::_updateParameters() {
+  void ParallelCylindricalPointProjector::_updateParameters() const {
     _iT =_transform.inverse();
     _iT.matrix().row(3) << 0.0f, 0.0f, 0.0f, 1.0f;
     _horizontalResolution = _imageCols / (2.0f * _horizontalFov);
@@ -33,7 +33,7 @@ namespace nicp {
 
   void ParallelCylindricalPointProjector::project(IntImage &indexImage,
 					DepthImage &depthImage, 
-					const PointVector &points)  {
+					const PointVector &points) const {
     if(_imageRows == 0 ||  _imageCols == 0) { 
       throw "ParallelCylindricalPointProjector: _imageRows and/or _imageCols are zero";
     }

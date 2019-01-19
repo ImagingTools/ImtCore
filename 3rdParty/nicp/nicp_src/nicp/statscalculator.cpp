@@ -5,7 +5,7 @@ namespace nicp {
   void StatsCalculator::compute(NormalVector &normals,
 				StatsVector &statsVector,
 				const PointVector &points,
-				const IntImage &indexImage) {
+				const IntImage &indexImage) const {
     assert(indexImage.rows > 0 && indexImage.cols > 0 && "StatsCalculator: indexImage has zero size");
     assert(points.size() > 0 && "StatsCalculator: points has zero size");
     

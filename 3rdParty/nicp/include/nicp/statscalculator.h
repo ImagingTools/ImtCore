@@ -37,7 +37,7 @@ namespace nicp {
     virtual void compute(NormalVector &normals,
 			 StatsVector &statsVector,
 			 const PointVector &points,
-			 const IntImage &indexImage);
+			 const IntImage &indexImage) const;
   };
 
 }

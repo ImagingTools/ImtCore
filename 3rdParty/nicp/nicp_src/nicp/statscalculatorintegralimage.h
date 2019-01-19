@@ -39,7 +39,7 @@ namespace nicp {
 			 StatsVector &statsVector,
 			 const PointVector &points,
 			 const IntImage &indexImage,
-			 bool suppressImageRadius = false);
+			 bool suppressImageRadius = false) const;
     
     /**
      *  This method sets the maximum image radius of the StatsCalculatorIntegralImage to the one given in input.
@@ -115,13 +115,13 @@ namespace nicp {
      *  This method returns the integral image computed by the StatsCalculatorIntegralImage.
      *  @return the the integral image computed by the StatsCalculatorIntegralImage.
      */
-    inline PointIntegralImage& integralImage() { return _integralImage; }
+    inline PointIntegralImage& integralImage() const { return _integralImage; }
     
     /**
      *  This method returns the interval image computed by the StatsCalculatorIntegralImage.
      *  @return the interval image computed by the StatsCalculatorIntegralImage.
      */
-    inline IntervalImage& intervalImage() { return _intervalImage; }
+    inline IntervalImage& intervalImage() const { return _intervalImage; }
 
   protected:
     int _maxImageRadius; /**< Maximum radius in the image space where to select neighboring points for normal computation. */
@@ -129,8 +129,8 @@ namespace nicp {
     int _minPoints; /**< Minimum number of points to consider a normal valid. */
     float _curvatureThreshold; /**< Curvature threshold for which point normals with higher curvature are not valid. */
     float _worldRadius; /**< Radius in the 3D euclidean space in which neighboring points are selceted for normal computation. */
-    PointIntegralImage _integralImage; /**< Integral image used to compute the normals and additional properties. */
-    IntervalImage _intervalImage; /**< Interval image used to compute the normals and additional properties. */
+    mutable PointIntegralImage _integralImage; /**< Integral image used to compute the normals and additional properties. */
+    mutable IntervalImage _intervalImage; /**< Interval image used to compute the normals and additional properties. */
   };
 
 }

@@ -96,7 +96,7 @@ namespace nicp {
      *  @see imageRows()
      *  @see imageCols()
      */
-    virtual inline void setImageSize(const int imageRows_, const int imageCols_) {
+    virtual inline void setImageSize(const int imageRows_, const int imageCols_) override {
       PointProjector::setImageSize(imageRows_, imageCols_);
       _updateParameters();
     }    
@@ -106,7 +106,7 @@ namespace nicp {
      *  @param transform_ is a constant reference to the isometry used to update the pose transform. 
      *  @see transform()
      */
-    virtual inline void setTransform(const Eigen::Isometry3f &transform_) { 
+    virtual inline void setTransform(const Eigen::Isometry3f &transform_) const override { 
       _transform = transform_; 
       _transform.matrix().row(3) << 0.0f, 0.0f, 0.0f, 1.0f;
       _updateParameters();
@@ -129,7 +129,7 @@ namespace nicp {
      */
     virtual void project(IntImage &indexImage, 
 			 DepthImage &depthImage, 
-			 const PointVector& points) const;
+			 const PointVector& points) const override;
 
     /**
      *  Virtual method that unprojects to the 3D euclidean space the points contained in a spherical depth image
@@ -146,7 +146,7 @@ namespace nicp {
      */    
     virtual void unProject(PointVector &points, 
 			   IntImage &indexImage, 
-			   const DepthImage &depthImage) const;
+			   const DepthImage &depthImage) const override;
 
     /**
      *  Virtual method that unprojects to the 3D euclidean space the points contained in a spherical depth image
@@ -167,7 +167,7 @@ namespace nicp {
     virtual void unProject(PointVector &points,
 			   Gaussian3fVector &gaussians,
 			   IntImage &indexImage,
-			   const DepthImage &depthImage) const;
+			   const DepthImage &depthImage) const override;
     /**
      *  Virtual method that projects on the output image the size in pixels of a square regions
      *  around the respective point in the input spherical depth image.
@@ -181,7 +181,7 @@ namespace nicp {
      */
     virtual void projectIntervals(IntervalImage &intervalImage, 
 				  const DepthImage &depthImage, 
-				  const float worldRadius) const;  
+				  const float worldRadius) const override;
   
     /**
      *  Virtual method that projects a given point from the 3D euclidean space to 
@@ -194,7 +194,7 @@ namespace nicp {
      *  @return true if the projection is valid, false otherwise.
      *  @see project() 
      */
-    virtual inline bool project(int &x, int &y, float &f, const Point &p) const { return _project(x, y, f, p); }
+    virtual inline bool project(int &x, int &y, float &f, const Point &p) const override { return _project(x, y, f, p); }
 
     /**
      *  Virtual method that unprojects to the 3D euclidean space the spherical point given in input.
@@ -207,7 +207,7 @@ namespace nicp {
      *  @return true if the unprojection is valid, false otherwise.
      *  @see unProject() 
      */
-    virtual inline bool unProject(Point &p, const int x, const int y, const float d) const { return _unProject(p, x, y, d); }
+    virtual inline bool unProject(Point &p, const int x, const int y, const float d) const override { return _unProject(p, x, y, d); }
 
     /**
      *  Virtual method that projects the size in pixels of a square regions around the point specified by the 
@@ -220,13 +220,13 @@ namespace nicp {
      *  @return an int value representing the size in pixels of the square region around the input point.
      *  @see projectIntervals()
      */
-    virtual inline cv::Vec2i projectInterval(const int x, const int y, const float d, const float worldRadius) const { return _projectInterval(x, y, d, worldRadius); }
+    virtual inline cv::Vec2i projectInterval(const int x, const int y, const float d, const float worldRadius) const override { return _projectInterval(x, y, d, worldRadius); }
 
     /**
      *  This method is called when is necessary to update the internal parameters used 
      *  for point projection/unprojection.
      */
-    void _updateParameters();
+    void _updateParameters() const;
     
     /**
      *  Method that updates the projector structures in order to handle different size of the
@@ -236,7 +236,7 @@ namespace nicp {
      *  of the image will be half the size of the original one).
      *  @param scalingFactor is a float value used to update the projector structures.
      */
-    virtual void scale(float scalingFactor);
+    virtual void scale(float scalingFactor) override;
 
   protected:
     /**
@@ -318,11 +318,11 @@ namespace nicp {
     float _horizontalCenter; /**< Horizontal center which is equal to the horizontal resolution times the horizontal field of view. */
     float _verticalFov; /**< Half vertical field of view in radians. */
     float _verticalCenter; /**< Vertical center which is equal to the half of the rows of the depth image where the projector projects the points. */
-    float _horizontalResolution; /**< Horizontal resolution indicating how many degrees there are between two columns of the depth image where the projector projects the points. */
-    float _inverseHorizontalResolution; /**< Inverse of the horizontal resolution. */
-    float _verticalResolution; /**< Vertical resolution indicating how many degrees there are between two columns of the depth image where the projector projects the points. */
-    float _inverseVerticalResolution; /**< Inverse of the vertical resolution. */    
-    Eigen::Isometry3f _iT; /**< Inverse of the homogeneous transformation of the projector. */
+    mutable float _horizontalResolution; /**< Horizontal resolution indicating how many degrees there are between two columns of the depth image where the projector projects the points. */
+    mutable float _inverseHorizontalResolution; /**< Inverse of the horizontal resolution. */
+    mutable float _verticalResolution; /**< Vertical resolution indicating how many degrees there are between two columns of the depth image where the projector projects the points. */
+    mutable float _inverseVerticalResolution; /**< Inverse of the vertical resolution. */    
+    mutable Eigen::Isometry3f _iT; /**< Inverse of the homogeneous transformation of the projector. */
   };
 
 }

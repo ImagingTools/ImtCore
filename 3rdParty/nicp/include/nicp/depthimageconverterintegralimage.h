@@ -24,10 +24,10 @@ namespace nicp {
      *  constructor, then all the pointers to objects implementing an algorithm have to be setted since
      *  this constructor sets them to zero by default.
      */
-    DepthImageConverterIntegralImage(PointProjector *_projector = 0,
-				     StatsCalculator *_statsCalculator = 0,
-				     PointInformationMatrixCalculator *_pointInformationMatrixCalculator = 0,
-				     NormalInformationMatrixCalculator *_normalInformationMatrixCalculator = 0);
+    DepthImageConverterIntegralImage(const PointProjector *_projector = 0,
+				     const StatsCalculator *_statsCalculator = 0,
+				     const PointInformationMatrixCalculator *_pointInformationMatrixCalculator = 0,
+				     const NormalInformationMatrixCalculator *_normalInformationMatrixCalculator = 0);
 
     /**
      *  Destructor.
@@ -44,7 +44,7 @@ namespace nicp {
      */
     virtual void compute(Cloud &cloud,
 			 const DepthImage &depthImage, 
-			 const Eigen::Isometry3f &sensorOffset = Eigen::Isometry3f::Identity());
+			 const Eigen::Isometry3f &sensorOffset = Eigen::Isometry3f::Identity()) const override;
 
 
     /**
@@ -59,7 +59,7 @@ namespace nicp {
     virtual void compute(Cloud &cloud,
 			 const DepthImage &depthImage, 
 			 const RGBImage &rgbImage, 
-			 const Eigen::Isometry3f &sensorOffset = Eigen::Isometry3f::Identity());
+			 const Eigen::Isometry3f &sensorOffset = Eigen::Isometry3f::Identity()) const override;
 
   };
 

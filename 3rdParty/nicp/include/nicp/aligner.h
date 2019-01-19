@@ -67,7 +67,7 @@ namespace nicp {
      *  @param referenceCloud_ is a pointer to the point cloud used to update the reference point cloud.
      *  @see referenceCloud()
      */
-    inline void setReferenceCloud(Cloud *referenceCloud_) {
+    inline void setReferenceCloud(const Cloud *referenceCloud_) {
       _referenceCloud = referenceCloud_;
       //clearPriors();
     }
@@ -84,7 +84,7 @@ namespace nicp {
      *  @param currentCloud_ is a pointer to the point cloud used to update the point cloud to align.
      *  @see currentCloud()
      */
-    inline void setCurrentCloud(Cloud *currentCloud_) {
+    inline void setCurrentCloud(const Cloud *currentCloud_) {
       _currentCloud = currentCloud_;
       //clearPriors();
     }
@@ -400,8 +400,8 @@ namespace nicp {
     Linearizer *_linearizer; /**< Pointer to the linearizer used by the Aligner to linearize the error function. */
     CorrespondenceFinder *_correspondenceFinder; /**< Pointer to the correspondence finder used by the Aligner to find correspondences between the reprojected point clouds. */
 
-    Cloud *_referenceCloud; /**< Pointer to the reference point cloud. */
-    Cloud *_currentCloud; /**< Pointer to the point cloud to align. */
+    const Cloud *_referenceCloud; /**< Pointer to the reference point cloud. */
+    const Cloud *_currentCloud; /**< Pointer to the point cloud to align. */
 
     bool _debug; /**< Bool value that if it is true additional informations will be printed on the terminal. */
     int _outerIterations; /**< Number of linear iterations. */

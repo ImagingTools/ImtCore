@@ -8,7 +8,7 @@ namespace nicp {
 
   void PointInformationMatrixCalculator::compute(InformationMatrixVector &informationMatrix,
 						 const StatsVector &statsVector,
-						 const NormalVector &imageNormals) {
+						 const NormalVector &imageNormals) const {
     assert(statsVector.size() > 0 && "PointInformationMatrixCalculator: statsVector has zero size");
     assert(imageNormals.size() > 0 && "PointInformationMatrixCalculator: imageNormals has zero size");
 
@@ -33,7 +33,7 @@ namespace nicp {
 
   void NormalInformationMatrixCalculator::compute(InformationMatrixVector &informationMatrix,
 						  const StatsVector &statsVector,
-						  const NormalVector &imageNormals) {
+						  const NormalVector &imageNormals) const {
     assert(statsVector.size() > 0 && "PointInformationMatrixCalculator: statsVector has zero size");
     assert(imageNormals.size() > 0 && "PointInformationMatrixCalculator: imageNormals has zero size");
 

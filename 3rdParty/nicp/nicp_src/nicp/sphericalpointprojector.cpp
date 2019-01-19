@@ -16,7 +16,7 @@ namespace nicp {
     _updateParameters();
   }
 
-  void SphericalPointProjector::_updateParameters() {
+  void SphericalPointProjector::_updateParameters() const {
     _iT =_transform.inverse();
     _iT.matrix().row(3) << 0.0f, 0.0f, 0.0f, 1.0f;
     _horizontalResolution = _imageCols / (2.0f * _horizontalFov);

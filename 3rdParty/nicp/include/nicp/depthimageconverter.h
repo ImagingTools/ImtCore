@@ -27,10 +27,10 @@ namespace nicp {
      *  constructor, then all the pointers to objects implementing an algorithm have to be setted since
      *  this constructor sets them to zero by default.
      */
-    DepthImageConverter(PointProjector *_projector = 0,
-			StatsCalculator *_statsCalculator = 0,
-			PointInformationMatrixCalculator *_pointInformationMatrixCalculator = 0,
-			NormalInformationMatrixCalculator *_normalInformationMatrixCalculator = 0);
+    DepthImageConverter(const PointProjector *_projector = 0,
+			const StatsCalculator *_statsCalculator = 0,
+			const PointInformationMatrixCalculator *_pointInformationMatrixCalculator = 0,
+			const NormalInformationMatrixCalculator *_normalInformationMatrixCalculator = 0);
 
     /**
      *  Destructor.
@@ -47,7 +47,7 @@ namespace nicp {
      */
     virtual void compute(Cloud &cloud,
 			 const DepthImage &depthImage, 
-			 const Eigen::Isometry3f &sensorOffset = Eigen::Isometry3f::Identity());
+			 const Eigen::Isometry3f &sensorOffset = Eigen::Isometry3f::Identity()) const;
 
     /**
      *  This method computes the point cloud included the properties of the points starting from the depth image
@@ -61,28 +61,28 @@ namespace nicp {
     virtual void compute(Cloud &cloud,
 			 const DepthImage &depthImage, 
 			 const RGBImage &rgbImage, 
-			 const Eigen::Isometry3f &sensorOffset = Eigen::Isometry3f::Identity());
+			 const Eigen::Isometry3f &sensorOffset = Eigen::Isometry3f::Identity()) const;
 
     /**
      *  Method that returns a pointer to the point projector used by the DepthImageConverter.
      *  @return a pointer to the DepthImageConverter's point projector.
      *  @see setProjector()
      */
-    inline PointProjector* projector() { return _projector; }
+    inline const PointProjector* projector() { return _projector; }
     
     /**
      *  Method that set the point projector used by the DepthImageConverter to the one given in input.
      *  @param projector_ is a pointer to the point projector used to update the DepthImageConverter's point projector. 
      *  @see projector()
      */
-    inline void setProjector(PointProjector *projector_) { _projector = projector_; }
+    inline void setProjector(const PointProjector *projector_) { _projector = projector_; }
 
     /**
      *  Method that returns a pointer to the StatsCalaculator used by the DepthImageConverter.
      *  @return a pointer to the DepthImageConverter's StatsCalaculator.
      *  @see setStatsCalculator()
      */
-    inline StatsCalculator* statsCalculator() { return _statsCalculator; }
+    inline const StatsCalculator* statsCalculator() { return _statsCalculator; }
 
     /**
      *  Method that set the StatsCalculator used by the DepthImageConverter to the one given in input.
@@ -96,7 +96,7 @@ namespace nicp {
      *  @return a pointer to the DepthImageConverter's PointInformationMatrixCalculator.
      *  @see setPointInformationMatrixCalculator()
      */
-    inline PointInformationMatrixCalculator* pointInformationMatrixCalculator() { return _pointInformationMatrixCalculator; }
+    inline const PointInformationMatrixCalculator* pointInformationMatrixCalculator() { return _pointInformationMatrixCalculator; }
     
     /**
      *  Method that set the PointInformationMatrixCalculator used by the DepthImageConverter to the one given in input.
@@ -110,7 +110,7 @@ namespace nicp {
      *  @return a pointer to the DepthImageConverter's NormalInformationMatrixCalculator.
      *  @see setNormalInformationMatrixCalculator()
      */
-    inline NormalInformationMatrixCalculator* normalInformationMatrixCalculator() { return _normalInformationMatrixCalculator; }
+    inline const NormalInformationMatrixCalculator* normalInformationMatrixCalculator() { return _normalInformationMatrixCalculator; }
 
     /**
      *  Method that set the NormalInformationMatrixCalculator used by the DepthImageConverter to the one given in input.
@@ -126,11 +126,11 @@ namespace nicp {
     inline IntImage& indexImage() { return _indexImage; }
 
   protected:
-    PointProjector *_projector; /**< Pointer to the point projector used by the DepthImageConverter to reproject points. */
-    StatsCalculator *_statsCalculator; /**< Pointer to the StatsCalculator used by the DepthImageConverter to compute the properties of the points like the normals. */
-    PointInformationMatrixCalculator *_pointInformationMatrixCalculator; /**< Pointer to the PointInformationMatrixCalculator used by the DepthImageConverter to compute the information matrix of the points. */
-    NormalInformationMatrixCalculator *_normalInformationMatrixCalculator; /**< Pointer to the NormalInformationMatrixCalculator used by the DepthImageConverter to compute the information matrix of the normals. */
+    const PointProjector *_projector; /**< Pointer to the point projector used by the DepthImageConverter to reproject points. */
+    const StatsCalculator *_statsCalculator; /**< Pointer to the StatsCalculator used by the DepthImageConverter to compute the properties of the points like the normals. */
+    const PointInformationMatrixCalculator *_pointInformationMatrixCalculator; /**< Pointer to the PointInformationMatrixCalculator used by the DepthImageConverter to compute the information matrix of the points. */
+    const NormalInformationMatrixCalculator *_normalInformationMatrixCalculator; /**< Pointer to the NormalInformationMatrixCalculator used by the DepthImageConverter to compute the information matrix of the normals. */
 
-    IntImage _indexImage; /**< Index image computed during the depth image loading process. */
+    mutable IntImage _indexImage; /**< Index image computed during the depth image loading process. */
   };
 }

@@ -13,7 +13,7 @@ namespace nicp {
     _updateMatrices();
   }
 
-  void PinholePointProjector::_updateMatrices() {
+  void PinholePointProjector::_updateMatrices() const {
     Eigen::Isometry3f t =_transform.inverse();
     t.matrix().block<1, 4>(3, 0) << 0.0f, 0.0f, 0.0f, 1.0f;
     _originaliK = _originalCameraMatrix.inverse();

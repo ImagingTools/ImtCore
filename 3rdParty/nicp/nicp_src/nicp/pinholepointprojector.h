@@ -32,7 +32,7 @@ namespace nicp {
      *  @param transform_ is a constant reference to the isometry used to update the pose transform. 
      *  @see transform()
      */
-    virtual inline void setTransform(const Eigen::Isometry3f &transform_) {   
+    virtual inline void setTransform(const Eigen::Isometry3f &transform_) const override {
       _transform = transform_;
       _updateMatrices();
     }
@@ -135,7 +135,7 @@ namespace nicp {
      */
     virtual void project(IntImage &indexImage, 
 			 DepthImage &depthImage, 
-			 const PointVector& points) const;
+			 const PointVector& points) const override;
 
     /**
      *  Virtual method that unprojects to the 3D euclidean space the points contained in a depth image
@@ -152,7 +152,7 @@ namespace nicp {
      */    
     virtual void unProject(PointVector &points, 
 			   IntImage &indexImage, 
-			   const DepthImage &depthImage) const;
+			   const DepthImage &depthImage) const override;
 
     /**
      *  Virtual method that unprojects to the 3D euclidean space the points contained in a depth image
@@ -173,7 +173,7 @@ namespace nicp {
     virtual void unProject(PointVector &points,
 			   Gaussian3fVector &gaussians,
 			   IntImage &indexImage,
-			   const DepthImage &depthImage) const;
+			   const DepthImage &depthImage) const override;
     
     /**
      *  Virtual method that projects on the output image the size in pixels of a rectangular regions
@@ -201,7 +201,7 @@ namespace nicp {
      *  @return true if the projection is valid, false otherwise.
      *  @see project() 
      */
-    virtual inline bool project(int &x, int &y, float &f, const Point &p) const { return _project(x, y, f, p); }
+    virtual inline bool project(int &x, int &y, float &f, const Point &p) const override { return _project(x, y, f, p); }
     
     /**
      *  Virtual method that unprojects to the 3D euclidean space the point given in input.
@@ -214,7 +214,7 @@ namespace nicp {
      *  @return true if the unprojection is valid, false otherwise.
      *  @see unProject() 
      */
-    virtual inline bool unProject(Point &p, const int x, const int y, const float d) const { return _unProject(p, x, y, d); }
+    virtual inline bool unProject(Point &p, const int x, const int y, const float d) const override { return _unProject(p, x, y, d); }
     
     /**
      *  Virtual method that projects the size in pixels of a rectangular regions around the point specified by the 
@@ -227,7 +227,7 @@ namespace nicp {
      *  @return an int value representing the size in pixels of the rectangular region around the input point.
      *  @see projectIntervals()
      */
-    virtual inline cv::Vec2i projectInterval(const int x, const int y, const float d, const float worldRadius) const { return _projectInterval(x, y, d, worldRadius); }  
+    virtual inline cv::Vec2i projectInterval(const int x, const int y, const float d, const float worldRadius) const override { return _projectInterval(x, y, d, worldRadius); }  
 
     /**
      *  Method that updates the projector structures in order to handle different size of the
@@ -237,7 +237,7 @@ namespace nicp {
      *  of the image will be half the size of the original one).
      *  @param scalingFactor is a float value used to update the projector structures.
      */
-    virtual void scale(float scalingFactor);
+    virtual void scale(float scalingFactor) override;
     
   protected: 
     /**
@@ -306,21 +306,21 @@ namespace nicp {
      *  This method is called when is necessary to update the internal matrices used 
      *  for point projection/unprojection.
      */
-    void _updateMatrices();
+    void _updateMatrices() const;
   
     float _baseline; /**< Horizontal baseline between the cameras (in meters). */
     float _alpha; /**< Alpha increment. */
  
     Eigen::Matrix3f _originalCameraMatrix; /**< Original Camera matrix K. */
-    Eigen::Matrix3f _originaliK; /**< Inverse of the original camera matrix K. */
+    mutable Eigen::Matrix3f _originaliK; /**< Inverse of the original camera matrix K. */
     Eigen::Matrix3f _cameraMatrix; /**< Camera matrix K. */    
-    Eigen::Matrix4f _KRt; /**< Camera matrix multiplied with the rotation matrix and translation vector of the projector pose transoform. */
-    Eigen::Matrix4f _iKRt; /**< Inverse of the camera matrix multiplied with the rotation matrix and translation vector of the projector pose transoform. */
-    Eigen::Matrix3f _iK; /**< Inverse of the camera matrix K. */
-    Eigen::Matrix3f _KR; /**< Camera matrix multiplied with the rotation matrix of the projector pose transoform. */
-    Eigen::Vector3f _Kt; /**< Camera matrix multiplied with the translation vector of the projector pose transoform. */
-    Eigen::Matrix3f _iKR; /**< Inverse of the camera matrix multiplied with the rotation matrix of the projector pose transoform. */
-    Eigen::Vector3f _iKt; /**< Inverse of the camera matrix multiplied with the translation vector of the projector pose transoform. */
+    mutable Eigen::Matrix4f _KRt; /**< Camera matrix multiplied with the rotation matrix and translation vector of the projector pose transoform. */
+    mutable Eigen::Matrix4f _iKRt; /**< Inverse of the camera matrix multiplied with the rotation matrix and translation vector of the projector pose transoform. */
+    mutable Eigen::Matrix3f _iK; /**< Inverse of the camera matrix K. */
+    mutable Eigen::Matrix3f _KR; /**< Camera matrix multiplied with the rotation matrix of the projector pose transoform. */
+    mutable Eigen::Vector3f _Kt; /**< Camera matrix multiplied with the translation vector of the projector pose transoform. */
+    mutable Eigen::Matrix3f _iKR; /**< Inverse of the camera matrix multiplied with the rotation matrix of the projector pose transoform. */
+    mutable Eigen::Vector3f _iKt; /**< Inverse of the camera matrix multiplied with the translation vector of the projector pose transoform. */
   };
 
 }

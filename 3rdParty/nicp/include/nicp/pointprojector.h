@@ -43,7 +43,7 @@ namespace nicp {
      *  @param transform_ is a constant reference to the isometry used to update the pose transform. 
      *  @see transform()
      */
-    virtual inline void setTransform(const Eigen::Isometry3f &transform_) { 
+    virtual inline void setTransform(const Eigen::Isometry3f &transform_) const { 
       _transform = transform_; 
       _transform.matrix().row(3) << 0.0f, 0.0f, 0.0f, 1.0f;
     }
@@ -274,7 +274,7 @@ namespace nicp {
     virtual void scale(float scalingFactor);
    
   protected:
-    Eigen::Isometry3f _transform; /**< Transform to apply to the pose in order to change the point of view from which the points are seen. */
+    mutable Eigen::Isometry3f _transform; /**< Transform to apply to the pose in order to change the point of view from which the points are seen. */
   
     float _minDistance; /**< Minimum distance in meters for which all the points below its value are cutted. */
     float _maxDistance; /**< Maximum distance in meters for which all the points above its value are cutted. */

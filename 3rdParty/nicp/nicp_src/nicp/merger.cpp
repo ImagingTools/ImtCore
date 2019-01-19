@@ -17,7 +17,7 @@ namespace nicp {
     assert(_depthImageConverter  && "Merger: missing _depthImageConverter");  
     assert(_depthImageConverter->projector()  && "Merger: missing projector in _depthImageConverter");  
 
-    PointProjector *pointProjector = _depthImageConverter->projector();
+    const PointProjector *pointProjector = _depthImageConverter->projector();
     Eigen::Isometry3f oldTransform = pointProjector->transform();
     
     pointProjector->setTransform(transform);

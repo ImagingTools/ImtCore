@@ -21,7 +21,7 @@ namespace nicp {
 					     StatsVector &statsVector,
 					     const PointVector &points,
 					     const IntImage &indexImage,
-					     bool suppressImageRadius) {
+					     bool suppressImageRadius) const {
     assert(points.size() > 0 && "StatsCalculatorIntegralImage: points has zero size");
     assert(indexImage.rows > 0 && indexImage.cols > 0 && "StatsCalculatorIntegralImage: indexImage has zero size");    
     assert(_intervalImage.rows > 0 && _intervalImage.cols > 0 && "StatsCalculatorIntegralImage: _intervalImage has zero size");

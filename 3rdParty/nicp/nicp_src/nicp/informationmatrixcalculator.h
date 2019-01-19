@@ -84,7 +84,7 @@ namespace nicp {
      */
     virtual void compute(InformationMatrixVector &informationMatrix,
 			 const StatsVector &stats,
-			 const NormalVector &imageNormals) = 0;
+			 const NormalVector &imageNormals) const = 0;
 
     inline float scale() const { return _scale; }
     inline void setScale(float scale_) { 
@@ -132,7 +132,7 @@ namespace nicp {
      */
     virtual void compute(InformationMatrixVector &informationMatrix,
 			 const StatsVector &statsVector,
-			 const NormalVector &imageNormals);
+			 const NormalVector &imageNormals) const override;
   };
 
   /** \class NormalInformationMatrixCalculator informationmatrixcalculator.h "informationmatrixcalculator.h"
@@ -168,7 +168,7 @@ namespace nicp {
      */
     virtual void compute(InformationMatrixVector &informationMatrix,
 			 const StatsVector &statsVector,
-			 const NormalVector &imageNormals);
+			 const NormalVector &imageNormals) const override;
   };
 
 }

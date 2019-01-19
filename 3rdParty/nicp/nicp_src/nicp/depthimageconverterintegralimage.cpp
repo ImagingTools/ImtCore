@@ -6,10 +6,10 @@
 
 namespace nicp {
 
-  DepthImageConverterIntegralImage::DepthImageConverterIntegralImage(PointProjector *projector_,
-								     StatsCalculator *statsCalculator_,
-								     PointInformationMatrixCalculator *pointInformationMatrixCalculator_,
-								     NormalInformationMatrixCalculator *normalInformationMatrixCalculator_) : 
+  DepthImageConverterIntegralImage::DepthImageConverterIntegralImage(const PointProjector *projector_,
+								     const StatsCalculator *statsCalculator_,
+								     const PointInformationMatrixCalculator *pointInformationMatrixCalculator_,
+								     const NormalInformationMatrixCalculator *normalInformationMatrixCalculator_) : 
     DepthImageConverter(projector_, 
 			statsCalculator_, 
 			pointInformationMatrixCalculator_, 
@@ -17,20 +17,19 @@ namespace nicp {
   
   void DepthImageConverterIntegralImage::compute(Cloud &cloud,
 						 const DepthImage &depthImage, 
-						 const Eigen::Isometry3f &sensorOffset) {
+						 const Eigen::Isometry3f &sensorOffset) const {
     assert(_projector && "DepthImageConverterIntegralImage: missing _projector");
     assert(_statsCalculator && "DepthImageConverterIntegralImage: missing _statsCalculator");
     assert(_pointInformationMatrixCalculator && "DepthImageConverterIntegralImage: missing _pointInformationMatrixCalculator");
     assert(_normalInformationMatrixCalculator && "DepthImageConverterIntegralImage: missing _normalInformationMatrixCalculator");
     assert(depthImage.rows > 0 && depthImage.cols > 0 && "DepthImageConverterIntegralImage: depthImage has zero size");
 
-    StatsCalculatorIntegralImage *statsCalculator = 0;
-    statsCalculator = dynamic_cast<StatsCalculatorIntegralImage*>(_statsCalculator);
+    const StatsCalculatorIntegralImage *statsCalculator = 0;
+    statsCalculator = dynamic_cast<const StatsCalculatorIntegralImage*>(_statsCalculator);
     assert(statsCalculator && "DepthImageConverterIntegralImage: _statsCalculator of non type StatsCalculatorIntegralImage");
     
     const float _normalWorldRadius = statsCalculator->worldRadius();
     cloud.clear();
-    _projector->setImageSize(depthImage.rows, depthImage.cols);
     
     // Resizing the temporaries    
     if (depthImage.rows != _indexImage.rows || depthImage.cols != _indexImage.cols){
@@ -46,9 +45,9 @@ namespace nicp {
     
     // Compute stats
     // If it is a spherical projector suppress image radius for better normals
-    SphericalPointProjector* sphericalProjector = 0;
+    const SphericalPointProjector* sphericalProjector = 0;
     bool suppressImageRadius = false;
-    sphericalProjector = dynamic_cast<SphericalPointProjector*>(_projector);
+    sphericalProjector = dynamic_cast<const SphericalPointProjector*>(_projector);
     if(sphericalProjector) { suppressImageRadius = true; }
     statsCalculator->compute(cloud.normals(),
 			     cloud.stats(),
@@ -66,21 +65,20 @@ namespace nicp {
   void DepthImageConverterIntegralImage::compute(Cloud &cloud,
 						 const DepthImage &depthImage,
 						 const RGBImage &rgbImage, 
-						 const Eigen::Isometry3f &sensorOffset) {
+						 const Eigen::Isometry3f &sensorOffset) const {
     assert(_projector && "DepthImageConverterIntegralImage: missing _projector");
     assert(_statsCalculator && "DepthImageConverterIntegralImage: missing _statsCalculator");
     assert(_pointInformationMatrixCalculator && "DepthImageConverterIntegralImage: missing _pointInformationMatrixCalculator");
     assert(_normalInformationMatrixCalculator && "DepthImageConverterIntegralImage: missing _normalInformationMatrixCalculator");
     assert(depthImage.rows > 0 && depthImage.cols > 0 && "DepthImageConverterIntegralImage: depthImage has zero size");
-    StatsCalculatorIntegralImage *statsCalculator = 0;
-    statsCalculator = dynamic_cast<StatsCalculatorIntegralImage*>(_statsCalculator);
+    const StatsCalculatorIntegralImage *statsCalculator = 0;
+    statsCalculator = dynamic_cast<const StatsCalculatorIntegralImage*>(_statsCalculator);
     assert(statsCalculator && "DepthImageConverterIntegralImage: _statsCalculator of non type StatsCalculatorIntegralImage");
     
 
     const float _normalWorldRadius = statsCalculator->worldRadius();
     cloud.clear();
-    _projector->setImageSize(depthImage.rows, depthImage.cols);
-    
+   
     // Resizing the temporaries    
     if (depthImage.rows != _indexImage.rows || depthImage.cols != _indexImage.cols){
       _indexImage.create(depthImage.rows, depthImage.cols);

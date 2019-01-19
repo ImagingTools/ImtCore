@@ -8,10 +8,10 @@ using namespace std;
 
 namespace nicp {
 
-  DepthImageConverter::DepthImageConverter(PointProjector *projector_,
-					   StatsCalculator *statsCalculator_,
-					   PointInformationMatrixCalculator *pointInformationMatrixCalculator_,
-					   NormalInformationMatrixCalculator *normalInformationMatrixCalculator_) {
+  DepthImageConverter::DepthImageConverter(const PointProjector *projector_,
+					   const StatsCalculator *statsCalculator_,
+					   const PointInformationMatrixCalculator *pointInformationMatrixCalculator_,
+					   const NormalInformationMatrixCalculator *normalInformationMatrixCalculator_) {
     _projector = projector_;
     _statsCalculator = statsCalculator_;
     _pointInformationMatrixCalculator = pointInformationMatrixCalculator_;
@@ -20,7 +20,7 @@ namespace nicp {
 
   void DepthImageConverter::compute(Cloud &cloud,
 				    const DepthImage &depthImage, 
-				    const Eigen::Isometry3f &sensorOffset) {
+				    const Eigen::Isometry3f &sensorOffset) const {
     assert(_projector && "DepthImageConverter: missing _projector");
     assert(_statsCalculator && "DepthImageConverter: missing _statsCalculator");
     assert(_pointInformationMatrixCalculator && "DepthImageConverter: missing _pointInformationMatrixCalculator");
@@ -28,7 +28,6 @@ namespace nicp {
     assert(depthImage.rows > 0 && depthImage.cols > 0 && "DepthImageConverter: depthImage has zero size");
 
     cloud.clear();
-    _projector->setImageSize(depthImage.rows, depthImage.cols);
         
     // Resizing the temporaries
     if(depthImage.rows != _indexImage.rows || depthImage.cols != _indexImage.cols) {
@@ -51,9 +50,9 @@ namespace nicp {
   }
 
   void DepthImageConverter::compute(Cloud &cloud,
-				    const DepthImage &depthImage, 
-				    const RGBImage &rgbImage, 				    
-				    const Eigen::Isometry3f &sensorOffset) {
+				    const DepthImage &depthImage,
+				    const RGBImage &rgbImage,
+				    const Eigen::Isometry3f &sensorOffset) const {
 
     assert(_projector && "DepthImageConverter: missing _projector");
     assert(_statsCalculator && "DepthImageConverter: missing _statsCalculator");
@@ -62,7 +61,6 @@ namespace nicp {
     assert(depthImage.rows > 0 && depthImage.cols > 0 && "DepthImageConverter: depthImage has zero size");
 
     cloud.clear();
-    _projector->setImageSize(depthImage.rows, depthImage.cols);
         
     // Resizing the temporaries
     if(depthImage.rows != _indexImage.rows || depthImage.cols != _indexImage.cols) {
