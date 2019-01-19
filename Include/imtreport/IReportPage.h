@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtCore>
+#include <QtCore/QtCore>
 
 // ACF includes
 #include <iser/ISerializable.h>

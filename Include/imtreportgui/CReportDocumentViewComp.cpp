@@ -50,6 +50,7 @@ void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*ch
 	m_scene.clear();
 
 	UpdateSceneRect();
+
 	UpdateSceneShapes();
 }
 
@@ -78,9 +79,9 @@ void CReportDocumentViewComp::OnGuiRetranslate()
 
 void CReportDocumentViewComp::OnExportToPdf()
 {
-	QString fileName = QFileDialog::getSaveFileName(GetWidget(), tr("Export to PDF..."), "", "*.pdf");
+	QString fileName = QFileDialog::getSaveFileName(GetWidget(), tr("Export to PDF..."), "", tr("Report Files (*.pdf)"));
 
-	if (!fileName.isEmpty()) {
+	if (!fileName.isEmpty()){
 		QPrinter printer(QPrinter::HighResolution);
 		printer.setPageSize(QPrinter::A4);
 		printer.setOrientation(QPrinter::Portrait);
@@ -91,7 +92,7 @@ void CReportDocumentViewComp::OnExportToPdf()
 		QPainter painter(&printer);
 		m_scene.render(&painter);
 
-		QMessageBox::information(GetWidget(), "Export to PDF", "Report has been exported successfully");
+		QMessageBox::information(GetWidget(), tr("Export to PDF"), tr("Report has been exported successfully"));
 	}
 }
 
@@ -115,18 +116,19 @@ void CReportDocumentViewComp::UpdateSceneShapes()
 	imtreportgui::CGraphicsElementShapeFactory shapeFactory;
 
 	int pageCount = documentPtr->GetPagesCount();
-	if (pageCount > 0) {
+	if (pageCount > 0){
 		const imtreport::IReportPage* pagePtr = documentPtr->GetReportPage(0);
 		Q_ASSERT(pagePtr != NULL);
 
 		imtreport::IReportPage::ElementIds ids = pagePtr->GetPageElements();
-
-		for (const QByteArray& elementId : ids) {
+		for (const QByteArray& elementId : ids){
 			const imtreport::IGraphicsElement* elementPtr = pagePtr->GetPageElement(elementId);
 			Q_ASSERT(elementPtr != nullptr);
 
 			QGraphicsItem* itemPtr = shapeFactory.CreateShape(*elementPtr);
+
 			ConvertShapeCoodinates(elementPtr, itemPtr);
+
 			m_scene.addItem(itemPtr);
 		}
 	}
@@ -136,47 +138,48 @@ void CReportDocumentViewComp::UpdateSceneShapes()
 QPointF CReportDocumentViewComp::MapPointToScene(const QPointF& point) const
 {
 	// map shape coordinates given in mm to scene's coordinates
-	qreal x = point.x() * static_cast<qreal>(PageView->physicalDpiX()) / 25.4;
-	qreal y = point.y() * static_cast<qreal>(PageView->physicalDpiY()) / 25.4;
+	qreal x = point.x() * PageView->physicalDpiX() / 25.4;
+	qreal y = point.y() * PageView->physicalDpiY() / 25.4;
+
 	return QPointF(x, y);
 }
 
 
 QRectF CReportDocumentViewComp::MapRectToScene(const QRectF& rect) const
 {
-	return QRectF(MapPointToScene(rect.topLeft()),
-		MapPointToScene(rect.bottomRight()));
+	return QRectF(MapPointToScene(rect.topLeft()), MapPointToScene(rect.bottomRight()));
 }
 
 
-void CReportDocumentViewComp::ConvertShapeCoodinates(const imtreport::IGraphicsElement* pageElement, QGraphicsItem* sceneElement) const
+void CReportDocumentViewComp::ConvertShapeCoodinates(const imtreport::IGraphicsElement* pageElementPtr, QGraphicsItem* sceneElementPtr) const
 {
-	if (!pageElement || !sceneElement)
+	if ((pageElementPtr == nullptr) || (sceneElementPtr == nullptr)){
 		return;
-
-	const imtreport::CRectangleElement* rectPageElement = dynamic_cast<const imtreport::CRectangleElement*>(pageElement);
-	if (rectPageElement) {
-		return ConvertRectCoodinates(rectPageElement, sceneElement);
 	}
 
-	const imtreport::CCircleElement* circleSceneElement = dynamic_cast<const imtreport::CCircleElement*>(pageElement);
-	if (circleSceneElement) {
-		return ConvertEllipseCoodinates(circleSceneElement, sceneElement);
+	const imtreport::CRectangleElement* rectPageElement = dynamic_cast<const imtreport::CRectangleElement*>(pageElementPtr);
+	if (rectPageElement){
+		return ConvertRectCoodinates(rectPageElement, sceneElementPtr);
 	}
 
-	const imtreport::CTextLabelElement* labelSceneElement = dynamic_cast<const imtreport::CTextLabelElement*>(pageElement);
-	if (labelSceneElement) {
-		return ConvertLabelCoodinates(labelSceneElement, sceneElement);
+	const imtreport::CCircleElement* circleSceneElement = dynamic_cast<const imtreport::CCircleElement*>(pageElementPtr);
+	if (circleSceneElement){
+		return ConvertEllipseCoodinates(circleSceneElement, sceneElementPtr);
 	}
 
-	const imtreport::CPolygonElement* polygonElement = dynamic_cast<const imtreport::CPolygonElement*>(pageElement);
-	if (polygonElement) {
-		return ConvertPolygoneCoodinates(polygonElement, sceneElement);
+	const imtreport::CTextLabelElement* labelSceneElement = dynamic_cast<const imtreport::CTextLabelElement*>(pageElementPtr);
+	if (labelSceneElement){
+		return ConvertLabelCoodinates(labelSceneElement, sceneElementPtr);
 	}
 
-	const imtreport::CImageRectangleElement* imageElement = dynamic_cast<const imtreport::CImageRectangleElement*>(pageElement);
-	if (imageElement) {
-		return ConvertImageCoodinates(imageElement, sceneElement);
+	const imtreport::CPolygonElement* polygonElement = dynamic_cast<const imtreport::CPolygonElement*>(pageElementPtr);
+	if (polygonElement){
+		return ConvertPolygoneCoodinates(polygonElement, sceneElementPtr);
+	}
+
+	const imtreport::CImageRectangleElement* imageElement = dynamic_cast<const imtreport::CImageRectangleElement*>(pageElementPtr);
+	if (imageElement){
+		return ConvertImageCoodinates(imageElement, sceneElementPtr);
 	}
 }
 
@@ -211,21 +214,20 @@ void CReportDocumentViewComp::ConvertLabelCoodinates(const imtreport::CTextLabel
 
 	QPointF pos = MapPointToScene(pageElement->GetPosition());
 
-	if (pageElement->GetAlignment() == imtreport::IGraphicsElement::Alignment::None) {
+	if (pageElement->GetAlignment() == imtreport::IGraphicsElement::Alignment::None){
 		labelSceneElement->setPos(pos);
 	}
-	else {
+	else{
 		QRectF rect = labelSceneElement->boundingRect();
-		//rect.moveCenter(PageView->sceneRect.center()); // doesnt work so far
 		pos.setX(rect.left());
 
 		labelSceneElement->setPos(pos);
 	}
 
 	double fontSize = MapPointToScene(QPointF(pageElement->GetFontSize(), 0)).x();
-	fontSize *= 0.9; // still unclear why the screen transformation of the scene displays the text to big - so scale it down hardcoded
 
 	QFont font(pageElement->GetFontName(), fontSize);
+
 	labelSceneElement->setFont(font);
 }
 
@@ -239,7 +241,7 @@ void CReportDocumentViewComp::ConvertPolygoneCoodinates(const imtreport::CPolygo
 	QPolygonF polygon;
 	polygon.reserve(pageElement->GetNodesCount());
 
-	for (int i = 0; i < pageElement->GetNodesCount(); ++i) {
+	for (int i = 0; i < pageElement->GetNodesCount(); ++i){
 		const i2d::CVector2d& node = pageElement->GetNodePos(i);
 		polygon.append(MapPointToScene(node));
 	}
@@ -259,11 +261,11 @@ void CReportDocumentViewComp::ConvertImageCoodinates(const imtreport::CImageRect
 
 	QSize pixmapSize = imageSceneElement->pixmap().size();
 
-	if (pixmapSize.width() > 0) {
+	if (pixmapSize.width() > 0){
 		qreal scale = rect.width() / pixmapSize.width();
 		imageSceneElement->setScale(scale);
 	}
-	else {
+	else{
 		imageSceneElement->setScale(1.0);
 	}
 }

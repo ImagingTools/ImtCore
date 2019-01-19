@@ -13,6 +13,7 @@
 // ImtCore includes
 #include <imtreport/TGraphicsElement.h>
 
+
 namespace imtreport
 {
 
@@ -96,7 +97,7 @@ QByteArray CReportPage::AddPolygone(const QVector<i2d::CVector2d>& points)
 	CPolygonElement* element = AddGraphicsElement<CPolygonElement>(uuid);
 	Q_ASSERT(element);
 
-	for (const i2d::CVector2d& point : points) {
+	for (const i2d::CVector2d& point : points){
 		element->InsertNode(point);
 	}
 
@@ -118,44 +119,6 @@ bool CReportPage::RemovePageElement(const QByteArray& elementId)
 
 	return false;
 }
-
-
-// reimplemented (iser::ISerializable)
-
-//bool CReportPage::Serialize(iser::IArchive& archive)
-//{
-//	static iser::CArchiveTag elementsTag("Elements", "Container of the page elements", iser::CArchiveTag::TT_MULTIPLE);
-//	static iser::CArchiveTag elementTag("Elements", "Single page element", iser::CArchiveTag::TT_GROUP, &elementsTag);
-//
-//	int elementsCount = m_pageElementsMap.count();
-//
-//	bool retVal = archive.BeginMultiTag(elementsTag, elementTag, elementsCount);
-//
-//	if (archive.IsStoring()){
-//		for (PageElementsMap::Iterator i = m_pageElementsMap.begin(); i != m_pageElementsMap.end(); ++i){
-//			retVal = retVal && archive.BeginTag(elementTag);
-//			retVal = retVal && i->IsValid() && i->GetPtr()->Serialize(archive);
-//			retVal = retVal && archive.EndTag(elementTag);
-//		}
-//	}
-//	else{
-//		istd::CChangeNotifier changePtr(this);
-//
-//		ResetData();
-//
-//		for (PageElementsMap::ConstIterator i = m_pageElementsMap.cbegin(); i != m_pageElementsMap.cend(); ++i){
-//			AddPageElement(NULL, NULL, elementIndex);
-//
-//			retVal = retVal && archive.BeginTag(elementTag);
-//			retVal = retVal && Serializeelement(archive, m_pageElementsMap[elementIndex]);
-//			retVal = retVal && archive.EndTag(elementTag);
-//		}
-//	}
-//
-//	retVal = retVal && archive.EndTag(elementsTag);
-//
-//	return retVal;
-//}
 
 
 // reimplemented (istd::IChangeable)
