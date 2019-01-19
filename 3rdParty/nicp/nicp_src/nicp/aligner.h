@@ -46,14 +46,14 @@ namespace nicp {
      *  @return a pointer to the Aligner's point projector.
      *  @see setProjector()
      */
-    inline PointProjector* projector() { return _projector; }
+    inline const PointProjector* projector() { return _projector; }
 
     /**
      *  Method that set the point projector used by the aligner to the one given in input.
      *  @param projector_ is a pointer to the point projector used to update the Aligner's point projector.
      *  @see projector()
      */
-    inline void setProjector(PointProjector *projector_) { _projector = projector_; }
+    inline void setProjector(const PointProjector *projector_) { _projector = projector_; }
 
     /**
      *  Method that returns a pointer to the reference point cloud.
@@ -396,7 +396,7 @@ namespace nicp {
     void _computeStatistics(Vector6f &mean, Matrix6f &Omega,
 			    float &translationalRatio, float &rotationalRatio, bool usePriors = false) const;
 
-    PointProjector *_projector; /**< Pointer to the point projector used by the Aligner to reproject points. */
+    const PointProjector *_projector; /**< Pointer to the point projector used by the Aligner to reproject points. */
     Linearizer *_linearizer; /**< Pointer to the linearizer used by the Aligner to linearize the error function. */
     CorrespondenceFinder *_correspondenceFinder; /**< Pointer to the correspondence finder used by the Aligner to find correspondences between the reprojected point clouds. */
 
