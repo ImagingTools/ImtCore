@@ -29,7 +29,7 @@ namespace nicp {
     Cloud() {}
     
     void resize(size_t s, bool hasRGB = false);
-    size_t size();
+    size_t size() const;
 
     /**
      *  Method that returns a constant reference to the vector of points.

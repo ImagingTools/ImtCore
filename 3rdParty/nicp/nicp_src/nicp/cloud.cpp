@@ -37,7 +37,7 @@ namespace nicp {
       clear();
   }
   
-  size_t Cloud::size() { return _points.size(); }
+  size_t Cloud::size() const { return _points.size(); }
 
   bool Cloud::load(Eigen::Isometry3f &T, istream &is) {
     _points.clear();
