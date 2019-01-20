@@ -176,13 +176,25 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
-	int currentPageIndex = PageStack->currentIndex();
-	if (currentPageIndex == LOGIN_PAGE_INDEX) {
+	int stackIndex = PageStack->currentIndex();
+	if (stackIndex == LOGIN_PAGE_INDEX){
 		CurrentPageLabel->setText(tr("Log-in"));
 	}
-
-	if (currentPageIndex == HOME_PAGE_INDEX) {
+	else if (stackIndex == HOME_PAGE_INDEX){
 		CurrentPageLabel->setText(*m_welcomeTextAttrPtr);
+	}
+	else {
+		Q_ASSERT(stackIndex = PAGE_CONTAINER_INDEX);
+		if (m_pagesCompPtr.IsValid()){
+			int selectedPageIndex = m_pagesCompPtr->GetSelectedOptionIndex();
+			QString pageLabel;
+			const iprm::IOptionsList* pageListPtr = m_pagesCompPtr->GetSelectionConstraints();
+			if ((pageListPtr != NULL) && selectedPageIndex >= 0) {
+				pageLabel = pageListPtr->GetOptionName(selectedPageIndex);
+
+				CurrentPageLabel->setText(pageLabel);
+			}
+		}
 	}
 }
 
@@ -400,6 +412,10 @@ void CThumbnailDecoratorGuiComp::ShowHomePage()
 
 void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 {
+	PageList->clearSelection();
+	SubPages->clear();
+	LeftFrame->setVisible(false);
+
 	if (m_pagesCompPtr.IsValid()){
 		if (m_pagesCompPtr->SetSelectedOptionIndex(index)){
 			SubPages->clear();
@@ -652,7 +668,6 @@ CThumbnailDecoratorGuiComp::LoginMode CThumbnailDecoratorGuiComp::GetLoginMode()
 
 	return LM_STRONG;
 }
-
 
 void CThumbnailDecoratorGuiComp::GetMenuLayout(const int count)
 {
