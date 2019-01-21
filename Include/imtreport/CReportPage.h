@@ -31,8 +31,8 @@ public:
 	const IGraphicsElement* GetPageElement(const QByteArray& elementId) const override;
 	QByteArray AddText(const QString& text, const i2d::CVector2d& position, const double textWidth = -1.0, const Qt::Alignment alignment = Qt::AlignLeft) override;
 	QByteArray AddImage(const QString& imagePath, const i2d::CRectangle& rect) override;
-	QByteArray AddRectangle(const i2d::CRectangle& rect) override;
-	QByteArray AddPolygone(const QVector<i2d::CVector2d>& points) override;
+	QByteArray AddRectangle(const i2d::CRectangle& rect, const QColor& fillColor = Qt::transparent) override;
+	QByteArray AddPolygone(const QVector<i2d::CVector2d>& points, const QColor& fillColor = Qt::transparent) override;
 
 	bool RemovePageElement(const QByteArray& elementId) override;
 

@@ -207,7 +207,7 @@ void CReportDocumentViewComp::ConvertRectCoodinates(const imtreport::CRectangleE
 	Q_ASSERT(rectSceneElement);
 	Q_ASSERT(pageElement);
 
-	QRectF rect = iqt::GetQRectF(*pageElement);
+	QRectF rect = MapRectToScene(iqt::GetQRectF(*pageElement));
 	rectSceneElement->setRect(rect);
 }
 
@@ -218,7 +218,7 @@ void CReportDocumentViewComp::ConvertEllipseCoodinates(const imtreport::CCircleE
 	Q_ASSERT(ellipseSceneElement);
 	Q_ASSERT(pageElement);
 
-	QRectF rect = iqt::GetQRectF(pageElement->GetBoundingBox());
+	QRectF rect = MapRectToScene(iqt::GetQRectF(pageElement->GetBoundingBox()));
 	ellipseSceneElement->setRect(MapRectToScene(rect));
 }
 

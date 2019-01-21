@@ -51,12 +51,12 @@ public:
 	/**
 		Add a rectangle to the report page.
 	*/
-	virtual QByteArray AddRectangle(const i2d::CRectangle& rect) = 0;
+	virtual QByteArray AddRectangle(const i2d::CRectangle& rect, const QColor& fillColor = Qt::transparent) = 0;
 
 	/**
 		Add a polygone to the report page.
 	*/
-	virtual QByteArray AddPolygone(const QVector<i2d::CVector2d>& points) = 0;
+	virtual QByteArray AddPolygone(const QVector<i2d::CVector2d>& points, const QColor& fillColor = Qt::transparent) = 0;
 
 	/**
 		Remove a page element.

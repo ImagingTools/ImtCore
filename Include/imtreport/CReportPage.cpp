@@ -82,7 +82,7 @@ QByteArray CReportPage::AddImage(const QString& imagePath, const i2d::CRectangle
 }
 
 
-QByteArray CReportPage::AddRectangle(const i2d::CRectangle& rect)
+QByteArray CReportPage::AddRectangle(const i2d::CRectangle& rect, const QColor& fillColor /*= Qt::transparent*/)
 {
 	QByteArray uuid;
 
@@ -93,12 +93,13 @@ QByteArray CReportPage::AddRectangle(const i2d::CRectangle& rect)
 	element->SetRight(rect.GetRight());
 	element->SetTop(rect.GetTop());
 	element->SetBottom(rect.GetBottom());
+	element->SetFillColor(fillColor);
 
 	return uuid;
 }
 
 
-QByteArray CReportPage::AddPolygone(const QVector<i2d::CVector2d>& points)
+QByteArray CReportPage::AddPolygone(const QVector<i2d::CVector2d>& points, const QColor& fillColor /*= Qt::transparent*/)
 {
 	QByteArray uuid;
 
@@ -108,6 +109,8 @@ QByteArray CReportPage::AddPolygone(const QVector<i2d::CVector2d>& points)
 	for (const i2d::CVector2d& point : points){
 		element->InsertNode(point);
 	}
+
+	element->SetFillColor(fillColor);
 
 	return uuid;
 }
