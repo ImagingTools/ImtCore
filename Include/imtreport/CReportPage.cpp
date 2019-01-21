@@ -45,15 +45,23 @@ const IGraphicsElement* CReportPage::GetPageElement(const QByteArray& elementId)
 }
 
 
-QByteArray CReportPage::AddText(const QString& text, const i2d::CVector2d& position)
+QByteArray CReportPage::AddText(const QString& text, const i2d::CVector2d& position, const double textWidth /*= -1.0*/, const Qt::Alignment alignment /*= Qt::AlignLeft*/)
 {
-	return AddText(text, position, IGraphicsElement::Alignment::None);
-}
+	QByteArray uuid;
 
+	CTextLabelElement* element = AddGraphicsElement<CTextLabelElement>(uuid);
+	Q_ASSERT(element);
 
-QByteArray CReportPage::AddText(const QString& text, const double top, const IGraphicsElement::Alignment alignment)
-{
-	return AddText(text, i2d::CVector2d(-1, top), alignment);
+	element->SetFontSize(5);
+	element->SetText(text);
+
+	element->SetPosition(position);
+	element->SetRectangle(i2d::CRectangle(position.GetX(), position.GetY(), textWidth, 0.0));
+	element->SetFillColor(qRgb(255, 0, 0));
+	element->SetStrokeColor(qRgb(0, 255, 255));
+	element->SetAlignment(alignment);
+
+	return uuid;
 }
 
 
@@ -129,72 +137,6 @@ int CReportPage::GetSupportedOperations() const
 }
 
 
-//bool CReportPage::CopyFrom(const IChangeable& object, CompatibilityMode mode/* = CM_WITHOUT_REFS*/)
-//{
-//	const CReportPage* sourcePtr = dynamic_cast<const CReportPage*>(&object);
-//	if (sourcePtr){
-//		istd::CChangeNotifier changeNotifier(this);
-//
-//		m_pageElementsMap.clear();
-//
-//		for (PageElementsMap::ConstIterator i = sourcePtr->m_pageElementsMap.cbegin(); i != sourcePtr->m_pageElementsMap.cend(); ++i){
-//			IGraphicsElement* pageElement = dynamic_cast<IGraphicsElement*>(i->GetPtr()->CloneMe());
-//
-//			if (AddPageElement(pageElement).isNull())
-//				return false;
-//		}
-//
-//		return BaseClass::CopyFrom(object, mode);
-//	}
-//
-//	return false;
-//}
-//
-//
-//bool CReportPage::IsEqual(const IChangeable& object) const
-//{
-//	const CReportPage* otherPage = dynamic_cast<const CReportPage*>(&object);
-//	if (!otherPage)
-//		return false;
-//
-//	if (m_pageElementsMap.size() != otherPage->m_pageElementsMap.size())
-//		return false;
-//
-//	PageElementsMap::ConstIterator i = m_pageElementsMap.cbegin();
-//	PageElementsMap::ConstIterator j = otherPage->m_pageElementsMap.cbegin();
-//
-//	for (; i != m_pageElementsMap.cend(); ++i, ++j){
-//		const IGraphicsElement* pageElement      = i->GetPtr();
-//		const IGraphicsElement* otherPageElement = j->GetPtr();
-//		if (!pageElement || !otherPageElement || !pageElement->IsEqual(*otherPageElement))
-//			return false;
-//	}
-//
-//	return BaseClass::IsEqual(object);
-//}
-//
-//
-//istd::IChangeable* CReportPage::CloneMe(CompatibilityMode mode/* = CM_WITHOUT_REFS*/) const
-//{
-//	istd::TDelPtr<CReportPage> clonePtr(new CReportPage);
-//
-//	if (clonePtr->CopyFrom(*this, mode))
-//		return clonePtr.PopPtr();
-//
-//	return NULL;
-//}
-//
-//
-//bool CReportPage::ResetData(CompatibilityMode mode /*= CM_WITHOUT_REFS*/)
-//{
-//	Q_UNUSED(mode);
-//
-//	m_pageElementsMap.clear();
-//
-//	return true;
-//}
-
-
 // reimplemented (ibase::TFactorisableContainer)
 
 bool CReportPage::SerializeItem(ItemClass& item, iser::IArchive& archive, iser::CArchiveTag* /*parentTagPtr*/)
@@ -250,24 +192,6 @@ int CReportPage::FindItemIndex(const IGraphicsElement& element) const
 	}
 
 	return -1;
-}
-
-
-QByteArray CReportPage::AddText(const QString& text, const i2d::CVector2d& position, const IGraphicsElement::Alignment alignment)
-{
-	QByteArray uuid;
-
-	CTextLabelElement* element = AddGraphicsElement<CTextLabelElement>(uuid);
-	Q_ASSERT(element);
-
-	element->SetFontSize(8);
-	element->SetText(text);
-	element->SetPosition(position);
-	element->SetFillColor(qRgb(255, 0, 0));
-	element->SetStrokeColor(qRgb(0, 255, 255));
-	element->SetAlignment(alignment);
-
-	return uuid;
 }
 
 

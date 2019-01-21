@@ -69,6 +69,7 @@ private:
 
 	static const qreal s_A4WidthMm;
 	static const qreal s_A4HeightMm;
+	static const qreal s_MmPerInch;
 };
 
 

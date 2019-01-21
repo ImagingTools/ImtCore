@@ -8,6 +8,8 @@
 #include <QtGui/QPen>
 #include <QtGui/QFont>
 #include <QtGui/QFontMetrics>
+#include <QtGui/QTextDocument>
+#include <QtGui/QTextOption>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QGraphicsRectItem>
 #else
@@ -41,7 +43,12 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraph
 
 	const imtreport::CTextLabelElement* labelElementPtr = dynamic_cast<const imtreport::CTextLabelElement*> (&graphicsElement);
 	if (labelElementPtr != NULL){
-		QGraphicsSimpleTextItem* textItemPtr = new QGraphicsSimpleTextItem(labelElementPtr->GetText());
+		QGraphicsTextItem* textItemPtr = new QGraphicsTextItem(labelElementPtr->GetText());
+
+		QTextOption option = textItemPtr->document()->defaultTextOption();
+		option.setAlignment(labelElementPtr->GetAlignment());
+		textItemPtr->document()->setDefaultTextOption(option);
+
 		itemPtr = textItemPtr;
 	}
 

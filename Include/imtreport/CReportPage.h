@@ -29,9 +29,8 @@ public:
 	// reimplemented (IReportPage)
 	ElementIds GetPageElements() const override;
 	const IGraphicsElement* GetPageElement(const QByteArray& elementId) const override;
-	QByteArray AddText(const QString& text, const i2d::CVector2d& position) override;
-	QByteArray AddText(const QString& text, const double top, const IGraphicsElement::Alignment alignment) override;
-	QByteArray AddImage(const QString& imagePath, const QRect& rect /*const i2d::CVector2d& position*/) override;
+	QByteArray AddText(const QString& text, const i2d::CVector2d& position, const double textWidth = -1.0, const Qt::Alignment alignment = Qt::AlignLeft) override;
+	QByteArray AddImage(const QString& imagePath, const QRect& rect) override;
 	QByteArray AddRectangle(const QRect& rect) override;
 	QByteArray AddPolygone(const QVector<i2d::CVector2d>& points) override;
 
@@ -39,9 +38,6 @@ public:
 
 	// reimplemented (istd::IChangeable)
 	int GetSupportedOperations() const override;
-	//bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	//IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const;
-	//bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
 	// reimplemented (ibase::TFactorisableContainer)
@@ -49,7 +45,6 @@ protected:
 
 private:
 	int FindItemIndex(const IGraphicsElement& element) const;
-	QByteArray AddText(const QString& text, const i2d::CVector2d& position, const IGraphicsElement::Alignment alignment);
 
 	template <typename TGraphicsElement> TGraphicsElement* AddGraphicsElement(QByteArray& uuid);
 

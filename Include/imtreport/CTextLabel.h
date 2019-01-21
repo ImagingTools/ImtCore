@@ -46,6 +46,16 @@ public:
 	*/
 	virtual void SetRectangle(const i2d::CRectangle& rectangle);
 
+	/**
+		Get label's text alignment.
+	*/
+	virtual Qt::Alignment GetAlignment() const;
+
+	/**
+		Set label's text alignment.
+	*/
+	virtual void SetAlignment(const Qt::Alignment alignment);
+
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive);
 
@@ -58,6 +68,7 @@ private:
 	QString m_fontName;
 	double m_fontSize;
 	i2d::CRectangle m_rectangle;
+	Qt::Alignment m_alignment;
 };
 
 

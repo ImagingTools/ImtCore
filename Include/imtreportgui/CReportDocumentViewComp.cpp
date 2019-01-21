@@ -18,6 +18,7 @@ namespace imtreportgui
 // static members
 const qreal CReportDocumentViewComp::s_A4WidthMm = 210.0;
 const qreal CReportDocumentViewComp::s_A4HeightMm = 297.0;
+const qreal CReportDocumentViewComp::s_MmPerInch = 25.4;
 
 
 // public methods
@@ -102,9 +103,25 @@ void CReportDocumentViewComp::OnExportToPdf()
 void CReportDocumentViewComp::UpdateSceneRect()
 {
 	QRectF sceneRect(QPointF(0.0, 0.0), MapPointToScene(QPointF(s_A4WidthMm, s_A4HeightMm)));
-
 	m_scene.setSceneRect(sceneRect);
-	m_scene.addRect(sceneRect, QPen(Qt::red));
+
+	// draw scene grid
+	for (qreal i = 0.0; i < s_A4WidthMm; i += 10.0)
+	{
+		QPointF p1 = MapPointToScene(QPointF(i, 0.0));
+		QPointF p2 = MapPointToScene(QPointF(i, s_A4HeightMm));
+
+		m_scene.addLine(QLineF(p1, p2), QPen(Qt::lightGray));
+	}
+
+	for (qreal i = 0.0; i < s_A4HeightMm; i += 10.0)
+	{
+		QPointF p1 = MapPointToScene(QPointF(0.0, i));
+		QPointF p2 = MapPointToScene(QPointF(s_A4WidthMm, i));
+		m_scene.addLine(QLineF(p1, p2), QPen(Qt::lightGray));
+	}
+
+	m_scene.addRect(sceneRect, QPen(Qt::black));
 }
 
 
@@ -138,8 +155,8 @@ void CReportDocumentViewComp::UpdateSceneShapes()
 QPointF CReportDocumentViewComp::MapPointToScene(const QPointF& point) const
 {
 	// map shape coordinates given in mm to scene's coordinates
-	qreal x = point.x() * PageView->physicalDpiX() / 25.4;
-	qreal y = point.y() * PageView->physicalDpiY() / 25.4;
+	qreal x = point.x() * PageView->physicalDpiX() / s_MmPerInch;
+	qreal y = point.y() * PageView->physicalDpiY() / s_MmPerInch;
 
 	return QPointF(x, y);
 }
@@ -208,26 +225,18 @@ void CReportDocumentViewComp::ConvertEllipseCoodinates(const imtreport::CCircleE
 
 void CReportDocumentViewComp::ConvertLabelCoodinates(const imtreport::CTextLabelElement* pageElement, QGraphicsItem* sceneElement) const
 {
-	QGraphicsSimpleTextItem* labelSceneElement = dynamic_cast<QGraphicsSimpleTextItem*>(sceneElement);
+	QGraphicsTextItem* labelSceneElement = dynamic_cast<QGraphicsTextItem*>(sceneElement);
 	Q_ASSERT(labelSceneElement);
 	Q_ASSERT(pageElement);
 
-	QPointF pos = MapPointToScene(pageElement->GetPosition());
+	QRectF rect = MapRectToScene(pageElement->GetRectangle());
+	labelSceneElement->setPos(rect.topLeft());
 
-	if (pageElement->GetAlignment() == imtreport::IGraphicsElement::Alignment::None){
-		labelSceneElement->setPos(pos);
-	}
-	else{
-		QRectF rect = labelSceneElement->boundingRect();
-		pos.setX(rect.left());
-
-		labelSceneElement->setPos(pos);
-	}
+	if (rect.width() > 0.0)
+		labelSceneElement->setTextWidth(rect.width());
 
 	double fontSize = MapPointToScene(QPointF(pageElement->GetFontSize(), 0)).x();
-
 	QFont font(pageElement->GetFontName(), fontSize);
-
 	labelSceneElement->setFont(font);
 }
 

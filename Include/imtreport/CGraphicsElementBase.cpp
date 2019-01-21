@@ -15,8 +15,7 @@ namespace imtreport
 CGraphicsElementBase::CGraphicsElementBase()
 	:m_fillColor(),
 	m_strokeColor(),
-	m_strokeWidth(-1),
-	m_alignment(Alignment::None)
+	m_strokeWidth(-1)
 {
 }
 
@@ -74,23 +73,6 @@ void CGraphicsElementBase::SetStrokeWidth(double strokeWidth)
 }
 
 
-IGraphicsElement::Alignment CGraphicsElementBase::GetAlignment() const
-{
-	return m_alignment;
-}
-
-
-void CGraphicsElementBase::SetAlignment(const Alignment alignment)
-{
-	if (m_alignment != alignment)
-	{
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_alignment = alignment;
-	}
-}
-
-
 // reimplemented (iser::ISerializeable)
 
 bool CGraphicsElementBase::Serialize(iser::IArchive& archive)
@@ -127,16 +109,6 @@ bool CGraphicsElementBase::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_strokeWidth);
 	retVal = retVal && archive.EndTag(strokeWidthTag);
 
-	int alignment = m_alignment;
-
-	static iser::CArchiveTag alignmentTag("Alignment", "Alignment", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(alignmentTag);
-	retVal = retVal && archive.Process(alignment);
-	retVal = retVal && archive.EndTag(alignmentTag);
-	if (retVal && !archive.IsStoring()) {
-		m_alignment = static_cast<IGraphicsElement::Alignment> (alignment);
-	}
-
 	return retVal;
 }
 
@@ -152,7 +124,6 @@ bool CGraphicsElementBase::CopyFrom(const istd::IChangeable& object, Compatibili
 		m_fillColor = sourcePtr->m_fillColor;
 		m_strokeColor = sourcePtr->m_strokeColor;
 		m_strokeWidth = sourcePtr->m_strokeWidth;
-		m_alignment = sourcePtr->m_alignment;
 
 		return true;
 	}

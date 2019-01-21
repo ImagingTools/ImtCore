@@ -15,7 +15,8 @@ namespace imtreport
 
 CTextLabel::CTextLabel()
 	:m_fontSize(8),
-	m_fontName("Arial")
+	m_fontName("Arial"),
+	m_alignment(Qt::AlignLeft)
 {
 }
 
@@ -71,6 +72,23 @@ void CTextLabel::SetRectangle(const i2d::CRectangle& rectangle)
 }
 
 
+Qt::Alignment CTextLabel::GetAlignment() const
+{
+	return m_alignment;
+}
+
+
+void CTextLabel::SetAlignment(const Qt::Alignment alignment)
+{
+	if (m_alignment != alignment)
+	{
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_alignment = alignment;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CTextLabel::Serialize(iser::IArchive& archive)
@@ -78,6 +96,7 @@ bool CTextLabel::Serialize(iser::IArchive& archive)
 	static iser::CArchiveTag fontNameTag("FontName", "Text label font name", iser::CArchiveTag::TT_LEAF);
 	static iser::CArchiveTag fontSizeTag("FontSize", "Text label font size", iser::CArchiveTag::TT_LEAF);
 	static iser::CArchiveTag rectTag("Rectangle", "Text label rectangle", iser::CArchiveTag::TT_GROUP);
+	static iser::CArchiveTag alignmentTag("Alignment", "Alignment", iser::CArchiveTag::TT_LEAF);
 
 	istd::CChangeNotifier notifier(archive.IsStoring()? NULL: this, &GetAllChanges());
 
@@ -96,6 +115,15 @@ bool CTextLabel::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(rectTag);
 	retVal = retVal && m_rectangle.Serialize(archive);
 	retVal = retVal && archive.EndTag(rectTag);
+
+	int alignment = m_alignment;
+
+	retVal = retVal && archive.BeginTag(alignmentTag);
+	retVal = retVal && archive.Process(alignment);
+	retVal = retVal && archive.EndTag(alignmentTag);
+	if (retVal && !archive.IsStoring()) {
+		m_alignment = static_cast<Qt::Alignment>(alignment);
+	}
 
 	return retVal;
 }
@@ -119,6 +147,7 @@ bool CTextLabel::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 		m_fontName = labelPtr->GetFontName();
 		m_fontSize = labelPtr->GetFontSize();
 		m_rectangle = labelPtr->GetRectangle();
+		m_alignment = labelPtr->GetAlignment();
 
 		BaseClass::CopyFrom(object, mode);
 
