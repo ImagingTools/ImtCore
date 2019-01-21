@@ -65,7 +65,7 @@ QByteArray CReportPage::AddText(const QString& text, const i2d::CVector2d& posit
 }
 
 
-QByteArray CReportPage::AddImage(const QString& imagePath, const QRect& rect)
+QByteArray CReportPage::AddImage(const QString& imagePath, const i2d::CRectangle& rect)
 {
 	QByteArray uuid;
 
@@ -73,26 +73,26 @@ QByteArray CReportPage::AddImage(const QString& imagePath, const QRect& rect)
 	Q_ASSERT(element);
 
 	element->SetImagePath(imagePath);
-	element->SetLeft(rect.left());
-	element->SetRight(rect.right());
-	element->SetTop(rect.top());
-	element->SetBottom(rect.bottom());
+	element->SetLeft(rect.GetLeft());
+	element->SetRight(rect.GetRight());
+	element->SetTop(rect.GetTop());
+	element->SetBottom(rect.GetBottom());
 
 	return uuid;
 }
 
 
-QByteArray CReportPage::AddRectangle(const QRect& rect)
+QByteArray CReportPage::AddRectangle(const i2d::CRectangle& rect)
 {
 	QByteArray uuid;
 
 	CRectangleElement* element = AddGraphicsElement<CRectangleElement>(uuid);
 	Q_ASSERT(element);
 
-	element->SetLeft(rect.left());
-	element->SetRight(rect.right());
-	element->SetTop(rect.top());
-	element->SetBottom(rect.bottom());
+	element->SetLeft(rect.GetLeft());
+	element->SetRight(rect.GetRight());
+	element->SetTop(rect.GetTop());
+	element->SetBottom(rect.GetBottom());
 
 	return uuid;
 }

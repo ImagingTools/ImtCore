@@ -46,12 +46,12 @@ public:
 	/**
 		Add an image file to the report page.
 	*/
-	virtual QByteArray AddImage(const QString& imagePath, const QRect& rect) = 0;
+	virtual QByteArray AddImage(const QString& imagePath, const i2d::CRectangle &rect) = 0;
 
 	/**
 		Add a rectangle to the report page.
 	*/
-	virtual QByteArray AddRectangle(const QRect& rect) = 0;
+	virtual QByteArray AddRectangle(const i2d::CRectangle& rect) = 0;
 
 	/**
 		Add a polygone to the report page.
