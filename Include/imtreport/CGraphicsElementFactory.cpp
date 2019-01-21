@@ -19,6 +19,8 @@ IGraphicsElement* CGraphicsElementFactory::CreateInstance(const QByteArray& keyI
 		return new CTextLabelElement();
 	else if (keyId == CPolygonElement::GetTypeName())
 		return new CPolygonElement();
+	else if (keyId == CLineElement::GetTypeName())
+		return new CLineElement();
 	else if (keyId == CImageRectangleElement::GetTypeName())
 		return new CImageRectangleElement();
 	else
@@ -36,6 +38,7 @@ CGraphicsElementFactory::KeyList CGraphicsElementFactory::GetFactoryKeys() const
 		CCircleElement::GetTypeName(),
 		CTextLabelElement::GetTypeName(),
 		CPolygonElement::GetTypeName(),
+		CLineElement::GetTypeName(),
 		CImageRectangleElement::GetTypeName()
 	};
 }

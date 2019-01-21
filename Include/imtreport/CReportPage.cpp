@@ -82,6 +82,19 @@ QByteArray CReportPage::AddImage(const QString& imagePath, const i2d::CRectangle
 }
 
 
+QByteArray CReportPage::AddLine(const i2d::CLine2d& line)
+{
+	QByteArray uuid;
+
+	CLineElement* element = AddGraphicsElement<CLineElement>(uuid);
+	Q_ASSERT(element);
+
+	element->SetPoint1(line.GetPoint1());
+	element->SetPoint2(line.GetPoint2());
+
+	return uuid;
+}
+
 QByteArray CReportPage::AddRectangle(const i2d::CRectangle& rect, const QColor& fillColor /*= Qt::transparent*/)
 {
 	QByteArray uuid;

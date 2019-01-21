@@ -7,6 +7,7 @@
 // ACF includes
 #include <iser/ISerializable.h>
 #include <i2d/CVector2d.h>
+#include <i2d/CLine2d.h>
 
 // ImtCore includes
 #include <imtreport/IGraphicsElement.h>
@@ -47,6 +48,11 @@ public:
 		Add an image file to the report page.
 	*/
 	virtual QByteArray AddImage(const QString& imagePath, const i2d::CRectangle &rect) = 0;
+
+	/**
+		Add a line to the report page.
+	*/
+	virtual QByteArray AddLine(const i2d::CLine2d& line) = 0;
 
 	/**
 		Add a rectangle to the report page.

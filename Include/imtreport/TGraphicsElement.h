@@ -50,6 +50,7 @@ QByteArray TGraphicsElement<Object2dType>::GetTypeName()
 	knownTypesMap[istd::CClassInfo::GetName<i2d::CCircle>()] = "Circle";
 	knownTypesMap[istd::CClassInfo::GetName<i2d::CLabel>()] = "Label";
 	knownTypesMap[istd::CClassInfo::GetName<i2d::CPolygon>()] = "Polygon";
+	knownTypesMap[istd::CClassInfo::GetName<i2d::CLine2d>()] = "Line";
 	knownTypesMap[istd::CClassInfo::GetName<CTextLabel>()] = "TextLabel";
 	knownTypesMap[istd::CClassInfo::GetName<CImageRectangle>()] = "Image";
 
@@ -112,6 +113,7 @@ typedef TGraphicsElement<i2d::CRectangle> CRectangleElement;
 typedef TGraphicsElement<i2d::CCircle> CCircleElement;
 typedef TGraphicsElement<CTextLabel> CTextLabelElement;
 typedef TGraphicsElement<i2d::CPolygon> CPolygonElement;
+typedef TGraphicsElement<i2d::CLine2d> CLineElement;
 typedef TGraphicsElement<CImageRectangle> CImageRectangleElement;
 
 

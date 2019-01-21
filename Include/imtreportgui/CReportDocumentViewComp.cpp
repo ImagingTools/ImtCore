@@ -194,6 +194,11 @@ void CReportDocumentViewComp::ConvertShapeCoodinates(const imtreport::IGraphicsE
 		return ConvertPolygoneCoodinates(polygonElement, sceneElementPtr);
 	}
 
+	const imtreport::CLineElement* lineElement = dynamic_cast<const imtreport::CLineElement*>(pageElementPtr);
+	if (lineElement) {
+		return ConvertLineCoodinates(lineElement, sceneElementPtr);
+	}
+
 	const imtreport::CImageRectangleElement* imageElement = dynamic_cast<const imtreport::CImageRectangleElement*>(pageElementPtr);
 	if (imageElement){
 		return ConvertImageCoodinates(imageElement, sceneElementPtr);
@@ -240,6 +245,17 @@ void CReportDocumentViewComp::ConvertLabelCoodinates(const imtreport::CTextLabel
 	labelSceneElement->setFont(font);
 }
 
+
+void CReportDocumentViewComp::ConvertLineCoodinates(const imtreport::CLineElement* pageElement, QGraphicsItem* sceneElement) const
+{
+	QGraphicsLineItem* lineSceneElement = dynamic_cast<QGraphicsLineItem*>(sceneElement);
+	Q_ASSERT(lineSceneElement);
+	Q_ASSERT(pageElement);
+
+	QPointF point1 = MapPointToScene(pageElement->GetPoint1());
+	QPointF point2 = MapPointToScene(pageElement->GetPoint2());
+	lineSceneElement->setLine(QLineF(point1, point2));
+}
 
 void CReportDocumentViewComp::ConvertPolygoneCoodinates(const imtreport::CPolygonElement* pageElement, QGraphicsItem* sceneElement) const
 {

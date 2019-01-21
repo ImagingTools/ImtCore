@@ -28,17 +28,25 @@ namespace imtreportgui
 
 QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraphicsElement& graphicsElement) const
 {
-	double strokeWidth = -1;
+	double strokeWidth = -1.0;
 	QGraphicsItem* itemPtr = NULL;
+
 	const imtreport::CRectangleElement* rectangleElementPtr = dynamic_cast<const imtreport::CRectangleElement*> (&graphicsElement);
 	if (rectangleElementPtr != NULL){
 		itemPtr = new QGraphicsRectItem();
 		strokeWidth = rectangleElementPtr->GetStrokeWidth();
 	}
 
+	const imtreport::CLineElement* lineElementPtr = dynamic_cast<const imtreport::CLineElement*>(&graphicsElement);
+	if (lineElementPtr != NULL) {
+		itemPtr = new QGraphicsLineItem();
+		strokeWidth = lineElementPtr->GetStrokeWidth();
+	}
+
 	const imtreport::CCircleElement* circleElementPtr = dynamic_cast<const imtreport::CCircleElement*>(&graphicsElement);
 	if (circleElementPtr != NULL){
 		itemPtr = new QGraphicsEllipseItem();
+		strokeWidth = lineElementPtr->GetStrokeWidth();
 	}
 
 	const imtreport::CTextLabelElement* labelElementPtr = dynamic_cast<const imtreport::CTextLabelElement*> (&graphicsElement);
@@ -68,7 +76,7 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraph
 		//pixmap = pixmap.scaled(rect.width(), rect.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 		itemPtr = new QGraphicsPixmapItem(QPixmap(imgPath));
 	}
-	
+
 	QAbstractGraphicsShapeItem* abstractGraphicsShapeItemPtr = dynamic_cast<QAbstractGraphicsShapeItem*> (itemPtr);
 	if (abstractGraphicsShapeItemPtr != NULL){
 		QPen pen(graphicsElement.GetStrokeColor());
