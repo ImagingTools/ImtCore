@@ -47,8 +47,8 @@ private Q_SLOTS:
 	void OnExportToPdf();
 
 private:
-	void UpdateSceneRect();
-	void UpdateSceneShapes();
+	void UpdateSceneRect(QGraphicsScene* scenePtr);
+	void UpdateSceneShapes(const imtreport::IReportPage* pagePtr, QGraphicsScene* scenePtr);
 
 	QPointF MapPointToScene(const QPointF& point) const;
 	QRectF MapRectToScene(const QRectF& rect) const;
@@ -65,8 +65,6 @@ private:
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_commands;
 	iqtgui::CHierarchicalCommand m_exportToPdfCommand;
-
-	QGraphicsScene m_scene;
 
 	static const qreal s_A4WidthMm;
 	static const qreal s_A4HeightMm;

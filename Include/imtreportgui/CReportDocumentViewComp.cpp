@@ -5,6 +5,9 @@
 #include <QtPrintSupport/QPrinter>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtGui/QScreen>
 
 // ImtCore includes
 #include <imtreport/IReportPage.h>
@@ -48,11 +51,20 @@ const ibase::IHierarchicalCommand* CReportDocumentViewComp::GetCommands() const
 
 void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	m_scene.clear();
+	imtreport::IReportDocument* documentPtr = GetObjectPtr();
+	Q_ASSERT(documentPtr != NULL);
 
-	UpdateSceneRect();
+	for (int i = 0; i < documentPtr->GetPagesCount(); i++){
+		const imtreport::IReportPage* pagePtr = documentPtr->GetReportPage(i);
 
-	UpdateSceneShapes();
+		QGraphicsScene* scenePtr = new QGraphicsScene();
+		UpdateSceneRect(scenePtr);
+		UpdateSceneShapes(pagePtr, scenePtr);
+
+		QGraphicsView* viewPtr = new QGraphicsView(scenePtr, GetWidget());
+
+		PagesTabs->addTab(viewPtr, "Page " + QString::number(i + 1));
+	}
 }
 
 
@@ -61,8 +73,6 @@ void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*ch
 void CReportDocumentViewComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
-
-	PageView->setScene(&m_scene);
 }
 
 
@@ -90,8 +100,8 @@ void CReportDocumentViewComp::OnExportToPdf()
 		printer.setOutputFileName(fileName);
 		printer.setPageMargins({ 0.0, 0.0, 0.0, 0.0 });
 
-		QPainter painter(&printer);
-		m_scene.render(&painter);
+		//QPainter painter(&printer); TODO
+		//m_scene.render(&painter);
 
 		QMessageBox::information(GetWidget(), tr("Export to PDF"), tr("Report has been exported successfully"));
 	}
@@ -99,11 +109,12 @@ void CReportDocumentViewComp::OnExportToPdf()
 
 
 // private methods
-
-void CReportDocumentViewComp::UpdateSceneRect()
+void CReportDocumentViewComp::UpdateSceneRect(QGraphicsScene* scenePtr)
 {
+	Q_ASSERT(scenePtr);
+
 	QRectF sceneRect(QPointF(0.0, 0.0), MapPointToScene(QPointF(s_A4WidthMm, s_A4HeightMm)));
-	m_scene.setSceneRect(sceneRect);
+	scenePtr->setSceneRect(sceneRect);
 
 	// draw scene grid
 	for (qreal i = 0.0; i < s_A4WidthMm; i += 10.0)
@@ -111,43 +122,37 @@ void CReportDocumentViewComp::UpdateSceneRect()
 		QPointF p1 = MapPointToScene(QPointF(i, 0.0));
 		QPointF p2 = MapPointToScene(QPointF(i, s_A4HeightMm));
 
-		m_scene.addLine(QLineF(p1, p2), QPen(Qt::lightGray));
+		scenePtr->addLine(QLineF(p1, p2), QPen(Qt::lightGray));
 	}
 
 	for (qreal i = 0.0; i < s_A4HeightMm; i += 10.0)
 	{
 		QPointF p1 = MapPointToScene(QPointF(0.0, i));
 		QPointF p2 = MapPointToScene(QPointF(s_A4WidthMm, i));
-		m_scene.addLine(QLineF(p1, p2), QPen(Qt::lightGray));
+		scenePtr->addLine(QLineF(p1, p2), QPen(Qt::lightGray));
 	}
 
-	m_scene.addRect(sceneRect, QPen(Qt::black));
+	scenePtr->addRect(sceneRect, QPen(Qt::black));
 }
 
 
-void CReportDocumentViewComp::UpdateSceneShapes()
+void CReportDocumentViewComp::UpdateSceneShapes(const imtreport::IReportPage* pagePtr, QGraphicsScene* scenePtr)
 {
-	imtreport::IReportDocument* documentPtr = GetObjectPtr();
-	Q_ASSERT(documentPtr != NULL);
+	Q_ASSERT(scenePtr);
+	Q_ASSERT(pagePtr);
 
 	imtreportgui::CGraphicsElementShapeFactory shapeFactory;
 
-	int pageCount = documentPtr->GetPagesCount();
-	if (pageCount > 0){
-		const imtreport::IReportPage* pagePtr = documentPtr->GetReportPage(0);
-		Q_ASSERT(pagePtr != NULL);
+	imtreport::IReportPage::ElementIds ids = pagePtr->GetPageElements();
+	for (const QByteArray& elementId : ids){
+		const imtreport::IGraphicsElement* elementPtr = pagePtr->GetPageElement(elementId);
+		Q_ASSERT(elementPtr != nullptr);
 
-		imtreport::IReportPage::ElementIds ids = pagePtr->GetPageElements();
-		for (const QByteArray& elementId : ids){
-			const imtreport::IGraphicsElement* elementPtr = pagePtr->GetPageElement(elementId);
-			Q_ASSERT(elementPtr != nullptr);
+		QGraphicsItem* itemPtr = shapeFactory.CreateShape(*elementPtr);
 
-			QGraphicsItem* itemPtr = shapeFactory.CreateShape(*elementPtr);
+		ConvertShapeCoodinates(elementPtr, itemPtr);
 
-			ConvertShapeCoodinates(elementPtr, itemPtr);
-
-			m_scene.addItem(itemPtr);
-		}
+		scenePtr->addItem(itemPtr);
 	}
 }
 
@@ -155,8 +160,11 @@ void CReportDocumentViewComp::UpdateSceneShapes()
 QPointF CReportDocumentViewComp::MapPointToScene(const QPointF& point) const
 {
 	// map shape coordinates given in mm to scene's coordinates
-	qreal x = point.x() * PageView->physicalDpiX() / s_MmPerInch;
-	qreal y = point.y() * PageView->physicalDpiY() / s_MmPerInch;
+	QScreen* screenPtr = QGuiApplication::primaryScreen();
+	Q_ASSERT(screenPtr);
+
+	qreal x = point.x() * screenPtr->physicalDotsPerInchX() / s_MmPerInch;
+	qreal y = point.y() * screenPtr->physicalDotsPerInchY() / s_MmPerInch;
 
 	return QPointF(x, y);
 }
