@@ -61,8 +61,7 @@ void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*ch
 		UpdateSceneRect(scenePtr);
 		UpdateSceneShapes(pagePtr, scenePtr);
 
-		QGraphicsView* viewPtr = new QGraphicsView(scenePtr, GetWidget());
-
+		QGraphicsView* viewPtr = new QGraphicsView(scenePtr, PagesTabs);
 		PagesTabs->addTab(viewPtr, "Page " + QString::number(i + 1));
 	}
 }
@@ -117,7 +116,7 @@ void CReportDocumentViewComp::UpdateSceneRect(QGraphicsScene* scenePtr)
 	scenePtr->setSceneRect(sceneRect);
 
 	// draw scene grid
-	for (qreal i = 0.0; i < s_A4WidthMm; i += 10.0)
+	for (qreal i = 0.0; i < s_A4WidthMm; i += 5.0)
 	{
 		QPointF p1 = MapPointToScene(QPointF(i, 0.0));
 		QPointF p2 = MapPointToScene(QPointF(i, s_A4HeightMm));
@@ -125,7 +124,7 @@ void CReportDocumentViewComp::UpdateSceneRect(QGraphicsScene* scenePtr)
 		scenePtr->addLine(QLineF(p1, p2), QPen(Qt::lightGray));
 	}
 
-	for (qreal i = 0.0; i < s_A4HeightMm; i += 10.0)
+	for (qreal i = 0.0; i < s_A4HeightMm; i += 5.0)
 	{
 		QPointF p1 = MapPointToScene(QPointF(0.0, i));
 		QPointF p2 = MapPointToScene(QPointF(s_A4WidthMm, i));
