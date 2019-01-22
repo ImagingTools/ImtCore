@@ -51,15 +51,18 @@ const ibase::IHierarchicalCommand* CReportDocumentViewComp::GetCommands() const
 
 void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
+	m_sceneGrids.clear();
+
 	imtreport::IReportDocument* documentPtr = GetObjectPtr();
 	Q_ASSERT(documentPtr != NULL);
 
 	for (int i = 0; i < documentPtr->GetPagesCount(); i++){
 		const imtreport::IReportPage* pagePtr = documentPtr->GetReportPage(i);
+		Q_ASSERT(pagePtr);
 
 		QGraphicsScene* scenePtr = new QGraphicsScene();
-		UpdateSceneRect(scenePtr);
-		UpdateSceneShapes(pagePtr, scenePtr);
+		UpdateSceneGrid(*scenePtr);
+		UpdateSceneShapes(*pagePtr, *scenePtr);
 
 		QGraphicsView* viewPtr = new QGraphicsView(scenePtr, PagesTabs);
 		PagesTabs->addTab(viewPtr, "Page " + QString::number(i + 1));
@@ -112,13 +115,10 @@ void CReportDocumentViewComp::OnExportToPdf()
 		QGraphicsView* viewPtr = dynamic_cast<QGraphicsView*>(PagesTabs->widget(i));
 		Q_ASSERT(viewPtr);
 
-		QGraphicsScene* scenePtr = viewPtr->scene();
-		Q_ASSERT(scenePtr);
+		ExportSceneToPdf(*viewPtr->scene(), painter);
 
-		scenePtr->render(&painter);
-
-		if (i < PagesTabs->count() - 1){ // initially printer already has one default page so don't add a new one on last iteration
-			if (!printer.newPage()){
+		if (i < PagesTabs->count() - 1) { // initially printer already has one default page so don't add a new one on the last iteration
+			if (!printer.newPage()) {
 				QMessageBox::critical(GetWidget(), tr("Export to PDF"), tr("Failed to export report"));
 				return;
 			}
@@ -130,50 +130,79 @@ void CReportDocumentViewComp::OnExportToPdf()
 
 
 // private methods
-void CReportDocumentViewComp::UpdateSceneRect(QGraphicsScene* scenePtr)
+void CReportDocumentViewComp::UpdateSceneGrid(QGraphicsScene& scene)
 {
-	Q_ASSERT(scenePtr);
-
+	// set scene rect
 	QRectF sceneRect(QPointF(0.0, 0.0), MapPointToScene(QPointF(s_A4WidthMm, s_A4HeightMm)));
-	scenePtr->setSceneRect(sceneRect);
+	scene.setSceneRect(sceneRect);
 
-	// draw scene grid
+	// set scene grid
+	QGraphicsItemGroup* sceneGridPtr = new QGraphicsItemGroup();
+	scene.addItem(sceneGridPtr);
+
+	m_sceneGrids.insert(&scene, sceneGridPtr);
+
+	// TODO: for loops are almost the same, do it in lambda
 	for (qreal i = 0.0; i < s_A4WidthMm; i += 5.0)
 	{
 		QPointF p1 = MapPointToScene(QPointF(i, 0.0));
 		QPointF p2 = MapPointToScene(QPointF(i, s_A4HeightMm));
 
-		scenePtr->addLine(QLineF(p1, p2), QPen(Qt::lightGray));
+		QGraphicsLineItem* linePtr = new QGraphicsLineItem(QLineF(p1, p2));
+		linePtr->setPen(QPen(Qt::lightGray));
+		sceneGridPtr->addToGroup(linePtr);
 	}
 
 	for (qreal i = 0.0; i < s_A4HeightMm; i += 5.0)
 	{
 		QPointF p1 = MapPointToScene(QPointF(0.0, i));
 		QPointF p2 = MapPointToScene(QPointF(s_A4WidthMm, i));
-		scenePtr->addLine(QLineF(p1, p2), QPen(Qt::lightGray));
+
+		QGraphicsLineItem* linePtr = new QGraphicsLineItem(QLineF(p1, p2));
+		linePtr->setPen(QPen(Qt::lightGray));
+		sceneGridPtr->addToGroup(linePtr);
 	}
 
-	scenePtr->addRect(sceneRect, QPen(Qt::black));
+	sceneGridPtr->addToGroup(new QGraphicsRectItem(sceneRect));
 }
 
 
-void CReportDocumentViewComp::UpdateSceneShapes(const imtreport::IReportPage* pagePtr, QGraphicsScene* scenePtr)
+void CReportDocumentViewComp::UpdateSceneShapes(const imtreport::IReportPage& page, QGraphicsScene& scene)
 {
-	Q_ASSERT(scenePtr);
-	Q_ASSERT(pagePtr);
-
 	imtreportgui::CGraphicsElementShapeFactory shapeFactory;
 
-	imtreport::IReportPage::ElementIds ids = pagePtr->GetPageElements();
+	imtreport::IReportPage::ElementIds ids = page.GetPageElements();
 	for (const QByteArray& elementId : ids){
-		const imtreport::IGraphicsElement* elementPtr = pagePtr->GetPageElement(elementId);
+		const imtreport::IGraphicsElement* elementPtr = page.GetPageElement(elementId);
 		Q_ASSERT(elementPtr != nullptr);
 
 		QGraphicsItem* itemPtr = shapeFactory.CreateShape(*elementPtr);
 
 		ConvertShapeCoodinates(elementPtr, itemPtr);
 
-		scenePtr->addItem(itemPtr);
+		scene.addItem(itemPtr);
+	}
+}
+
+
+void CReportDocumentViewComp::ExportSceneToPdf(QGraphicsScene& scene, QPainter& painter)
+{
+	ShowSceneGrid(scene, false);
+
+	scene.render(&painter);
+
+	ShowSceneGrid(scene, true);
+}
+
+
+
+void CReportDocumentViewComp::ShowSceneGrid(QGraphicsScene& scene, const bool show)
+{
+	SceneGrids::Iterator i = m_sceneGrids.find(&scene);
+	if (i != m_sceneGrids.end()){
+		QGraphicsItemGroup* sceneGridItem = i.value();
+		Q_ASSERT(sceneGridItem);
+		show ? sceneGridItem->show() : sceneGridItem->hide();
 	}
 }
 

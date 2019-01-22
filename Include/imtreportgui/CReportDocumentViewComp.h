@@ -47,8 +47,11 @@ private Q_SLOTS:
 	void OnExportToPdf();
 
 private:
-	void UpdateSceneRect(QGraphicsScene* scenePtr);
-	void UpdateSceneShapes(const imtreport::IReportPage* pagePtr, QGraphicsScene* scenePtr);
+	void UpdateSceneGrid(QGraphicsScene& scene);
+	void UpdateSceneShapes(const imtreport::IReportPage& page, QGraphicsScene& scene);
+
+	void ExportSceneToPdf(QGraphicsScene& scene, QPainter& painter);
+	void ShowSceneGrid(QGraphicsScene& scene, const bool show);
 
 	QPointF MapPointToScene(const QPointF& point) const;
 	QRectF MapRectToScene(const QRectF& rect) const;
@@ -65,6 +68,9 @@ private:
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_commands;
 	iqtgui::CHierarchicalCommand m_exportToPdfCommand;
+
+	typedef QMap<QGraphicsScene*, QGraphicsItemGroup*> SceneGrids;
+	SceneGrids m_sceneGrids;
 
 	static const qreal s_A4WidthMm;
 	static const qreal s_A4HeightMm;
