@@ -89,21 +89,43 @@ void CReportDocumentViewComp::OnGuiRetranslate()
 
 void CReportDocumentViewComp::OnExportToPdf()
 {
-	QString fileName = QFileDialog::getSaveFileName(GetWidget(), tr("Export to PDF..."), "", tr("Report Files (*.pdf)"));
-
-	if (!fileName.isEmpty()){
-		QPrinter printer(QPrinter::HighResolution);
-		printer.setPageSize(QPrinter::A4);
-		printer.setOrientation(QPrinter::Portrait);
-		printer.setOutputFormat(QPrinter::PdfFormat);
-		printer.setOutputFileName(fileName);
-		printer.setPageMargins({ 0.0, 0.0, 0.0, 0.0 });
-
-		//QPainter painter(&printer); TODO
-		//m_scene.render(&painter);
-
-		QMessageBox::information(GetWidget(), tr("Export to PDF"), tr("Report has been exported successfully"));
+	if (PagesTabs->count() <= 0){
+		QMessageBox::warning(GetWidget(), tr("Export to PDF"), tr("Report is empty"));
+		return;
 	}
+
+	QString fileName = QFileDialog::getSaveFileName(GetWidget(), tr("Export to PDF..."), "", tr("Report Files (*.pdf)"));
+	if (fileName.isEmpty()) {
+		return;
+	}
+
+	QPrinter printer(QPrinter::HighResolution);
+	printer.setPageSize(QPrinter::A4);
+	printer.setOrientation(QPrinter::Portrait);
+	printer.setOutputFormat(QPrinter::PdfFormat);
+	printer.setOutputFileName(fileName);
+	printer.setPageMargins({ 0.0, 0.0, 0.0, 0.0 });
+
+	QPainter painter(&printer);
+
+	for (int i = 0; i < PagesTabs->count(); i++){
+		QGraphicsView* viewPtr = dynamic_cast<QGraphicsView*>(PagesTabs->widget(i));
+		Q_ASSERT(viewPtr);
+
+		QGraphicsScene* scenePtr = viewPtr->scene();
+		Q_ASSERT(scenePtr);
+
+		scenePtr->render(&painter);
+
+		if (i < PagesTabs->count() - 1){ // initially printer already has one default page so don't add a new one on last iteration
+			if (!printer.newPage()){
+				QMessageBox::critical(GetWidget(), tr("Export to PDF"), tr("Failed to export report"));
+				return;
+			}
+		}
+	}
+
+	QMessageBox::information(GetWidget(), tr("Export to PDF"), tr("Report has been exported successfully"));
 }
 
 
