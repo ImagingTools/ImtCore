@@ -34,7 +34,7 @@ IReportPage::ElementIds CReportPage::GetPageElements() const
 }
 
 
-const IGraphicsElement* CReportPage::GetPageElement(const QByteArray& elementId) const
+IGraphicsElement* CReportPage::GetPageElement(const QByteArray& elementId) const
 {
 	ElementsIndiciesMap::ConstIterator i = m_elementsIndicies.find(elementId);
 	if (i != m_elementsIndicies.cend()){
@@ -57,8 +57,6 @@ QByteArray CReportPage::AddText(const QString& text, const i2d::CVector2d& posit
 
 	element->SetPosition(position);
 	element->SetRectangle(i2d::CRectangle(position.GetX(), position.GetY(), textWidth, 0.0));
-	element->SetFillColor(qRgb(255, 0, 0));
-	element->SetStrokeColor(qRgb(0, 255, 255));
 	element->SetAlignment(alignment);
 
 	return uuid;

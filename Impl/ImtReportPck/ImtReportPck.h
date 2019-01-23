@@ -7,6 +7,8 @@
 
 // ImtCore includes
 #include <imtreport/CReportDocumentComp.h>
+#include <imtreport/CInspectionReportBuilderComp.h>
+#include <imtreport/CInspectionReportSimulatorComp.h>
 
 
 /**
@@ -17,6 +19,8 @@ namespace ImtReportPck
 
 
 typedef icomp::TModelCompWrap<imtreport::CReportDocumentComp> ReportDocument;
+typedef imtreport::CInspectionReportBuilderComp InspectionReportBuilder;
+typedef imtreport::CInspectionReportSimulatorComp InspectionReportSimulator;
 
 
 } // namespace ImtReportPck

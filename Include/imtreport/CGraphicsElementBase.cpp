@@ -13,9 +13,9 @@ namespace imtreport
 
 
 CGraphicsElementBase::CGraphicsElementBase()
-	:m_fillColor(),
-	m_strokeColor(),
-	m_strokeWidth(-1)
+	:m_fillColor(Qt::black),
+	m_strokeColor(Qt::black),
+	m_strokeWidth(0)
 {
 }
 

@@ -28,34 +28,31 @@ namespace imtreportgui
 
 QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraphicsElement& graphicsElement) const
 {
-	double strokeWidth = -1.0;
+	double strokeWidth = graphicsElement.GetStrokeWidth();
 	QGraphicsItem* itemPtr = NULL;
 
 	const imtreport::CRectangleElement* rectangleElementPtr = dynamic_cast<const imtreport::CRectangleElement*> (&graphicsElement);
 	if (rectangleElementPtr != NULL){
 		itemPtr = new QGraphicsRectItem();
-		strokeWidth = rectangleElementPtr->GetStrokeWidth();
 	}
 
 	const imtreport::CLineElement* lineElementPtr = dynamic_cast<const imtreport::CLineElement*>(&graphicsElement);
 	if (lineElementPtr != NULL) {
 		itemPtr = new QGraphicsLineItem();
-		strokeWidth = lineElementPtr->GetStrokeWidth();
 	}
 
 	const imtreport::CCircleElement* circleElementPtr = dynamic_cast<const imtreport::CCircleElement*>(&graphicsElement);
 	if (circleElementPtr != NULL){
 		itemPtr = new QGraphicsEllipseItem();
-		strokeWidth = lineElementPtr->GetStrokeWidth();
 	}
 
 	const imtreport::CTextLabelElement* labelElementPtr = dynamic_cast<const imtreport::CTextLabelElement*> (&graphicsElement);
 	if (labelElementPtr != NULL){
-		QGraphicsTextItem* textItemPtr = new QGraphicsTextItem(labelElementPtr->GetText());
+		QGraphicsSimpleTextItem* textItemPtr = new QGraphicsSimpleTextItem(labelElementPtr->GetText());
 
-		QTextOption option = textItemPtr->document()->defaultTextOption();
-		option.setAlignment(labelElementPtr->GetAlignment());
-		textItemPtr->document()->setDefaultTextOption(option);
+		//QTextOption option = textItemPtr->document()->defaultTextOption();
+		//option.setAlignment(labelElementPtr->GetAlignment());
+		//textItemPtr->document()->setDefaultTextOption(option);
 
 		itemPtr = textItemPtr;
 	}
@@ -81,8 +78,12 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraph
 	if (abstractGraphicsShapeItemPtr != NULL){
 		QPen pen(graphicsElement.GetStrokeColor());
 
-		if (strokeWidth > 0)
+		if (strokeWidth >= 0) {
 			pen.setWidthF(strokeWidth);
+		}
+		else{
+			pen = Qt::NoPen;
+		}
 
 		abstractGraphicsShapeItemPtr->setPen(pen);
 		abstractGraphicsShapeItemPtr->setBrush(graphicsElement.GetFillColor());

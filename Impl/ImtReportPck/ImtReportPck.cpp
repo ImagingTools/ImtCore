@@ -17,6 +17,16 @@ I_EXPORT_COMPONENT(
 			"Default report document",
 			"Report Status Document");
 
+I_EXPORT_COMPONENT(
+			InspectionReportBuilder,
+			"Inspection report builder",
+			"Inspection Report Builder");
+
+I_EXPORT_COMPONENT(
+			InspectionReportSimulator,
+			"Inspection report simulator",
+			"Inspection Report Simulator");
+
 
 } // namespace ImtReportPck
 

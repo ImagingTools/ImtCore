@@ -111,10 +111,19 @@ istd::IChangeable* TGraphicsElement<Object2dType>::CloneMe(CompatibilityMode mod
 
 typedef TGraphicsElement<i2d::CRectangle> CRectangleElement;
 typedef TGraphicsElement<i2d::CCircle> CCircleElement;
-typedef TGraphicsElement<CTextLabel> CTextLabelElement;
 typedef TGraphicsElement<i2d::CPolygon> CPolygonElement;
 typedef TGraphicsElement<i2d::CLine2d> CLineElement;
 typedef TGraphicsElement<CImageRectangle> CImageRectangleElement;
+
+
+class CTextLabelElement : public TGraphicsElement<CTextLabel>
+{
+public:
+	CTextLabelElement()
+	{
+		SetStrokeWidth(-1);
+	}
+};
 
 
 } // namespace imtreport

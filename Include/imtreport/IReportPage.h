@@ -37,7 +37,7 @@ public:
 	/**
 		Get a page element with a given ID.
 	*/
-	virtual const IGraphicsElement* GetPageElement(const QByteArray& elementId) const = 0;
+	virtual IGraphicsElement* GetPageElement(const QByteArray& elementId) const = 0;
 
 	/**
 		Add a text label to the report page.
