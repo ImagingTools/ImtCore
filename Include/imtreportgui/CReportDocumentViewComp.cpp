@@ -95,6 +95,9 @@ void CReportDocumentViewComp::OnGuiDestroyed()
 void CReportDocumentViewComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
+
+	m_exportToPdfCommand.SetVisuals(tr("Export to PDF..."), tr("PDF..."), tr("Export current report to PDF file"), QIcon(":/Icons/Pdf"));
+	m_showGridCommand.SetVisuals(tr("Show/Hide Grid"), tr("Grid"), tr("Set grid visible/unvisible"), QIcon(":/Icons/Grid2"));
 }
 
 
