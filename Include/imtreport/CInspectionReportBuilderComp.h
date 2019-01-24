@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtreport/IInspectionReportBuilder.h>
+#include <imtreport/IReportPage.h>
 
 
 namespace imtreport
@@ -31,9 +32,28 @@ protected:
 private:
 	static QString GetStatusText(istd::IInformationProvider::InformationCategory status);
 	static QColor GetStatusColor(istd::IInformationProvider::InformationCategory status);
+	static QString GetErrorClassText(const ErrorClass errorClass);
 
 	bool CreateTitlePage(const ReportInputData& reportData, IReportDocument& reportDocument) const;
 	bool CreateInspectionPage(const ReportInputData& reportData, const InspectionInfo& inspection, IReportDocument& reportDocument) const;
+
+	void AddHeader(const ReportInputData& reportData,
+				   const double cellWidth,
+				   const QFont& font,
+				   i2d::CVector2d& topLeft,
+				   IReportPage& page) const;
+	void AddBody(const ReportInputData& reportData, i2d::CVector2d& topLeft, IReportPage& page) const;
+	void AddFooter(const ReportInputData& reportData,
+				   const double cellWidth,
+				   const QFont& font,
+				   i2d::CVector2d& topLeft,
+				   IReportPage& page) const;
+
+	typedef QPair<QString, QColor> TableCell;
+	typedef QVector<QVector<TableCell>> Table;
+	void AddTable(const Table& values, const double colWidth, const QFont& font, i2d::CVector2d& topLeft, IReportPage& page) const;
+
+	static const int s_maxSummaryResults = 5;
 };
 
 

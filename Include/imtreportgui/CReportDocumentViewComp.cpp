@@ -288,15 +288,15 @@ void CReportDocumentViewComp::ConvertEllipseCoodinates(const imtreport::CCircleE
 
 void CReportDocumentViewComp::ConvertLabelCoodinates(const imtreport::CTextLabelElement* pageElement, QGraphicsItem* sceneElement) const
 {
-	QGraphicsSimpleTextItem* labelSceneElement = dynamic_cast<QGraphicsSimpleTextItem*>(sceneElement);
+	QGraphicsTextItem* labelSceneElement = dynamic_cast<QGraphicsTextItem*>(sceneElement);
 	Q_ASSERT(labelSceneElement);
 	Q_ASSERT(pageElement);
 
 	QRectF rect = MapRectToScene(pageElement->GetRectangle());
 	labelSceneElement->setPos(rect.topLeft());
 
-	//if (rect.width() > 0.0)
-	//	labelSceneElement->setTextWidth(rect.width());
+	if (rect.width() > 0.0)
+		labelSceneElement->setTextWidth(rect.width());
 
 	double fontSize = MapPointToScene(QPointF(pageElement->GetFontSize(), 0)).x();
 	QFont font(pageElement->GetFontName(), fontSize);

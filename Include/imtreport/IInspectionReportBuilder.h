@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtCore/QtCore>
-#include <QtGui/QImage>
 
 // ACF includes
 #include <iprm/IParamsSet.h>
@@ -28,7 +27,7 @@ public:
 	enum ErrorClass
 	{
 		EC_NONE,
-		EC_GAP,
+		EC_GLUE_GAP,
 		EC_GLUE_NARROW,
 		EC_GLUE_WIDE,
 	};
@@ -56,7 +55,7 @@ public:
 	struct InspectionInfo
 	{
 		QString name;
-		QImage image;
+		QString imagePath;
 		istd::IInformationProvider::InformationCategory status;
 		Regions regions;
 	};
@@ -69,7 +68,7 @@ public:
 		QString appVersion;
 		QString productName;
 		QDateTime time;
-		QImage productOverview;
+		QString imagePath;
 		QString partSerialNumber;
 		istd::IInformationProvider::InformationCategory partStatus;
 		Inspections inspections;

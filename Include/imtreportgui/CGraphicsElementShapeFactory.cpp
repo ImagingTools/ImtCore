@@ -46,13 +46,14 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraph
 		itemPtr = new QGraphicsEllipseItem();
 	}
 
-	const imtreport::CTextLabelElement* labelElementPtr = dynamic_cast<const imtreport::CTextLabelElement*> (&graphicsElement);
+	const imtreport::CTextLabelElement* labelElementPtr = dynamic_cast<const imtreport::CTextLabelElement*>(&graphicsElement);
 	if (labelElementPtr != NULL){
-		QGraphicsSimpleTextItem* textItemPtr = new QGraphicsSimpleTextItem(labelElementPtr->GetText());
+		QGraphicsTextItem* textItemPtr = new QGraphicsTextItem(labelElementPtr->GetText());
+		textItemPtr->setDefaultTextColor(labelElementPtr->GetFillColor());
 
-		//QTextOption option = textItemPtr->document()->defaultTextOption();
-		//option.setAlignment(labelElementPtr->GetAlignment());
-		//textItemPtr->document()->setDefaultTextOption(option);
+		QTextOption option = textItemPtr->document()->defaultTextOption();
+		option.setAlignment(labelElementPtr->GetAlignment());
+		textItemPtr->document()->setDefaultTextOption(option);
 
 		itemPtr = textItemPtr;
 	}
@@ -74,7 +75,7 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraph
 		itemPtr = new QGraphicsPixmapItem(QPixmap(imgPath));
 	}
 
-	QAbstractGraphicsShapeItem* abstractGraphicsShapeItemPtr = dynamic_cast<QAbstractGraphicsShapeItem*> (itemPtr);
+	QAbstractGraphicsShapeItem* abstractGraphicsShapeItemPtr = dynamic_cast<QAbstractGraphicsShapeItem*>(itemPtr);
 	if (abstractGraphicsShapeItemPtr != NULL){
 		QPen pen(graphicsElement.GetStrokeColor());
 
