@@ -27,13 +27,21 @@ const qreal CReportDocumentViewComp::s_MmPerInch = 25.4;
 // public methods
 
 CReportDocumentViewComp::CReportDocumentViewComp()
-	:m_commands("&File", 100),
-	m_exportToPdfCommand("Export to PDF...", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 1984)
+	:m_fileCommands("&File", 100),
+	m_viewCommands("&View", 100),
+	m_exportToPdfCommand("Export to PDF...", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 1984),
+	m_showGridCommand("Show grid", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1985)
 {
+	m_showGridCommand.setChecked(true);
+
+	connect(&m_showGridCommand, SIGNAL(triggered()), this, SLOT(OnShowGrid()));
 	connect(&m_exportToPdfCommand, SIGNAL(triggered()), this, SLOT(OnExportToPdf()));
 
-	m_commands.InsertChild(&m_exportToPdfCommand);
-	m_rootCommands.InsertChild(&m_commands);
+	m_fileCommands.InsertChild(&m_exportToPdfCommand);
+	m_viewCommands.InsertChild(&m_showGridCommand);
+
+	m_rootCommands.InsertChild(&m_fileCommands);
+	m_rootCommands.InsertChild(&m_viewCommands);
 }
 
 
@@ -87,6 +95,15 @@ void CReportDocumentViewComp::OnGuiDestroyed()
 void CReportDocumentViewComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
+}
+
+
+void CReportDocumentViewComp::OnShowGrid()
+{
+	for (QGraphicsItemGroup* sceneGrid : m_sceneGrids.values()){
+		Q_ASSERT(sceneGrid);
+		sceneGrid->isVisible() ? sceneGrid->hide() : sceneGrid->show();
+	}
 }
 
 

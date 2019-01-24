@@ -44,6 +44,7 @@ protected:
 	virtual void OnGuiRetranslate() override;
 
 private Q_SLOTS:
+	void OnShowGrid();
 	void OnExportToPdf();
 
 private:
@@ -66,8 +67,10 @@ private:
 
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;
-	iqtgui::CHierarchicalCommand m_commands;
+	iqtgui::CHierarchicalCommand m_fileCommands;
+	iqtgui::CHierarchicalCommand m_viewCommands;
 	iqtgui::CHierarchicalCommand m_exportToPdfCommand;
+	iqtgui::CHierarchicalCommand m_showGridCommand;
 
 	typedef QMap<QGraphicsScene*, QGraphicsItemGroup*> SceneGrids;
 	SceneGrids m_sceneGrids;
