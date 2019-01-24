@@ -26,7 +26,7 @@ bool CInspectionReportBuilderComp::CreateReport(const ReportInputData& inputData
 		return false;
 	}
 
-	for (const InspectionInfo& inspection : inputData.inspections){
+	for (const Inspection& inspection : inputData.inspections){
 		if (!CreateInspectionPage(inputData, inspection, reportDocument)){
 			return false;
 		}
@@ -115,36 +115,69 @@ bool CInspectionReportBuilderComp::CreateTitlePage(const ReportInputData& report
 		return false;
 	}
 
+	Results results;
+	GetTitlePageRegionResults(reportData, results);
+
 	i2d::CVector2d topLeft(15.0, 10.0);
 
 	AddHeader(reportData, 60.0, QFont("Arial", 3), topLeft, *pagePtr);
-	AddBody(reportData, topLeft, *pagePtr);
-	AddFooter(reportData, 30.0, QFont("Arial", 3), topLeft, *pagePtr);
+	AddBody(reportData.imagePath, topLeft, *pagePtr);
+	AddFooter(results, 30.0, QFont("Arial", 3), topLeft, *pagePtr);
 
 	return true;
 }
 
 
-bool CInspectionReportBuilderComp::CreateInspectionPage(const ReportInputData& reportData, const InspectionInfo& inspection, IReportDocument& reportDocument) const
+bool CInspectionReportBuilderComp::CreateInspectionPage(const ReportInputData& reportData, const Inspection& inspection, IReportDocument& reportDocument) const
 {
 	IReportPage* pagePtr = dynamic_cast<IReportPage*>(reportDocument.InsertPage());
 	if (!pagePtr) {
 		return false;
 	}
 
-	pagePtr->AddText("Date: " + reportData.time.date().toString(Qt::DateFormat::ISODate),
-		i2d::CVector2d(30.0, 30.0));
+	Results results;
+	GetInspectionPageRegionResults(inspection, results);
 
-	pagePtr->AddText("Time: " + reportData.time.time().toString(Qt::DateFormat::ISODate),
-		i2d::CVector2d(30.0, 35.0));
+	i2d::CVector2d topLeft(15.0, 10.0);
 
-	pagePtr->AddText("Product Date (Serial ID): " + reportData.partSerialNumber,
-		i2d::CVector2d(30.0, 45.0));
-
-	pagePtr->AddText("State: " + GetStatusText(inspection.status),
-		i2d::CVector2d(120.0, 30.0));
+	AddHeader(reportData, 60.0, QFont("Arial", 3), topLeft, *pagePtr);
+	AddBody(inspection.imagePath, topLeft, *pagePtr);
+	AddFooter(results, 30.0, QFont("Arial", 3), topLeft, *pagePtr);
 
 	return true;
+}
+
+
+void CInspectionReportBuilderComp::GetTitlePageRegionResults(const ReportInputData& reportData, Results& results) const
+{
+	results.reserve(s_maxSummaryResults);
+
+	bool enough = false;
+
+	for (int i = 0; i < reportData.inspections.size() && !enough; i++) {
+		const Inspection& inspection = reportData.inspections[i];
+
+		for (int j = 0; j < inspection.regions.size() && !enough; j++) {
+			const InspectionRegion& region = inspection.regions[j];
+
+			for (int k = 0; k < region.results.size() && !enough; k++) {
+				const InspectionRegionResult& result = region.results[k];
+
+				if (results.size() < s_maxSummaryResults)
+					results.push_back(result);
+				else
+					enough = true;
+			}
+		}
+	}
+}
+
+
+void CInspectionReportBuilderComp::GetInspectionPageRegionResults(const Inspection& inspection, Results& results) const
+{
+	for (const InspectionRegion& region : inspection.regions) {
+		results.append(region.results);
+	}
 }
 
 
@@ -172,36 +205,30 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 }
 
 
-void CInspectionReportBuilderComp::AddBody(const ReportInputData& reportData, i2d::CVector2d& topLeft, IReportPage& page) const
+void CInspectionReportBuilderComp::AddBody(const QString& imagePath, i2d::CVector2d& topLeft, IReportPage& page) const
 {
 	topLeft.SetY(topLeft.GetY() + 15.0);
 
-	const QSize imageSize(180.0, 176.0);
-	page.AddImage(reportData.imagePath, i2d::CRectangle(topLeft.GetX(), topLeft.GetY(), imageSize.width(), imageSize.height()));
+	const QSize imageSize(180.0, 120.0);
+	page.AddImage(imagePath, i2d::CRectangle(topLeft.GetX(), topLeft.GetY(), imageSize.width(), imageSize.height()));
 
 	topLeft.SetY(topLeft.GetY() + imageSize.height());
 }
 
 
-void CInspectionReportBuilderComp::AddFooter(const ReportInputData& reportData,
+void CInspectionReportBuilderComp::AddFooter(const Results& results,
 											 const double cellWidth,
 											 const QFont& font,
 											 i2d::CVector2d& topLeft,
 											 IReportPage& page) const
 {
+	if (results.isEmpty())
+		return;
+
 	topLeft.SetY(topLeft.GetY() + 15.0);
 
-	if (reportData.inspections.empty() ||
-		reportData.inspections[0].regions.empty() ||
-		reportData.inspections[0].regions[0].results.empty()) {
-		return;
-	}
-
-	const InspectionRegion& region = reportData.inspections[0].regions[0];
-	int rows = qMin(region.results.size(), s_maxSummaryResults) + 1;
-
-	Table table(rows);
-	table[0] =
+	Table table;
+	table.push_back(
 	{
 		{ "Region",			Qt::black },
 		{ "Error",			Qt::black },
@@ -209,19 +236,18 @@ void CInspectionReportBuilderComp::AddFooter(const ReportInputData& reportData,
 		{ "Value mm",		Qt::black },
 		{ "Tolerance mm",	Qt::black },
 		{ "Diff",			Qt::black }
-	};
+	});
 
-	for (int row = 1; row < rows; row++) {
-		const InspectionRegionResult& regionResult = region.results[row - 1];
-		table[row] =
+	for (const InspectionRegionResult& result : results){
+		table.push_back(
 		{
-			{ region.name,                                     Qt::black },
-			{ GetErrorClassText(regionResult.errorClass),      Qt::black },
-			{ QString::number(regionResult.length, 'g', 2),    Qt::black },
-			{ QString::number(regionResult.value, 'g', 2),     Qt::black },
-			{ QString::number(regionResult.tolerance, 'g', 2), Qt::black },
-			{ QString::number(regionResult.diff, 'g', 2),      Qt::black }
-		};
+			{ result.regionName,                         Qt::black },
+			{ GetErrorClassText(result.errorClass),      Qt::black },
+			{ QString::number(result.length, 'g', 2),    Qt::black },
+			{ QString::number(result.value, 'g', 2),     Qt::black },
+			{ QString::number(result.tolerance, 'g', 2), Qt::black },
+			{ QString::number(result.diff, 'g', 2),      Qt::black }
+		});
 	}
 
 	AddTable(table, cellWidth, font, topLeft, page);

@@ -32,8 +32,11 @@ public:
 		EC_GLUE_WIDE,
 	};
 
+	struct InspectionRegion;
+
 	struct InspectionRegionResult
 	{
+		QString regionName;
 		ErrorClass errorClass;
 		istd::IInformationProvider::InformationCategory status;
 		double length;
@@ -52,7 +55,7 @@ public:
 
 	typedef QVector<InspectionRegion> Regions;
 
-	struct InspectionInfo
+	struct Inspection
 	{
 		QString name;
 		QString imagePath;
@@ -60,7 +63,7 @@ public:
 		Regions regions;
 	};
 
-	typedef QVector<InspectionInfo> Inspections;
+	typedef QVector<Inspection> Inspections;
 
 	struct ReportInputData
 	{

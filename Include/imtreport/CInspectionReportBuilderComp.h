@@ -35,15 +35,18 @@ private:
 	static QString GetErrorClassText(const ErrorClass errorClass);
 
 	bool CreateTitlePage(const ReportInputData& reportData, IReportDocument& reportDocument) const;
-	bool CreateInspectionPage(const ReportInputData& reportData, const InspectionInfo& inspection, IReportDocument& reportDocument) const;
+	bool CreateInspectionPage(const ReportInputData& reportData, const Inspection& inspection, IReportDocument& reportDocument) const;
+
+	void GetTitlePageRegionResults(const ReportInputData& reportData, Results& results) const;
+	void GetInspectionPageRegionResults(const Inspection& inspection, Results& results) const;
 
 	void AddHeader(const ReportInputData& reportData,
 				   const double cellWidth,
 				   const QFont& font,
 				   i2d::CVector2d& topLeft,
 				   IReportPage& page) const;
-	void AddBody(const ReportInputData& reportData, i2d::CVector2d& topLeft, IReportPage& page) const;
-	void AddFooter(const ReportInputData& reportData,
+	void AddBody(const QString& imagePath, i2d::CVector2d& topLeft, IReportPage& page) const;
+	void AddFooter(const Results& regions,
 				   const double cellWidth,
 				   const QFont& font,
 				   i2d::CVector2d& topLeft,
