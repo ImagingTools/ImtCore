@@ -183,13 +183,13 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 	else if (stackIndex == HOME_PAGE_INDEX){
 		CurrentPageLabel->setText(*m_welcomeTextAttrPtr);
 	}
-	else {
+	else{
 		Q_ASSERT(stackIndex = PAGE_CONTAINER_INDEX);
 		if (m_pagesCompPtr.IsValid()){
 			int selectedPageIndex = m_pagesCompPtr->GetSelectedOptionIndex();
 			QString pageLabel;
 			const iprm::IOptionsList* pageListPtr = m_pagesCompPtr->GetSelectionConstraints();
-			if ((pageListPtr != NULL) && selectedPageIndex >= 0) {
+			if ((pageListPtr != NULL) && selectedPageIndex >= 0){
 				pageLabel = pageListPtr->GetOptionName(selectedPageIndex);
 
 				CurrentPageLabel->setText(pageLabel);
@@ -200,6 +200,12 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 
 
 // private slots
+
+void CThumbnailDecoratorGuiComp::on_PageStack_currentChanged(int stackIndex)
+{
+	CurrentPageToolBarFrame->setVisible(stackIndex == PAGE_CONTAINER_INDEX);
+}
+
 
 void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 {
@@ -294,14 +300,14 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 			UpdateLoginButtonsState();
 
 			int lastPageIndex = -1;
-			if (m_pagesCompPtr.IsValid()) {
+			if (m_pagesCompPtr.IsValid()){
 				lastPageIndex = m_pagesCompPtr->GetSelectedOptionIndex();
 			}
 
-			if (lastPageIndex < 0) {
+			if (lastPageIndex < 0){
 				ShowHomePage();
 			}
-			else {
+			else{
 				SwitchToPage(lastPageIndex);
 			}
 		}
@@ -321,21 +327,21 @@ void CThumbnailDecoratorGuiComp::on_LoginControlButton_clicked()
 	if (m_loginCompPtr->GetLoggedUser() == nullptr){
 		ShowLoginPage();
 	}
-	else {
+	else{
 		if (m_loginCompPtr->Logout()){
 			m_autoLogoutTimer.stop();
 
 			UpdateLoginButtonsState();
 
 			LoginMode loginMode = GetLoginMode();
-			if (loginMode == LM_STRONG) {
+			if (loginMode == LM_STRONG){
 				ShowLoginPage();
 			}
-			else {
-				if (m_defaultPageIndexAttrPtr.IsValid()) {
+			else{
+				if (m_defaultPageIndexAttrPtr.IsValid()){
 					SwitchToPage(*m_defaultPageIndexAttrPtr);
 				}
-				else {
+				else{
 					ShowHomePage();
 				}
 			}
@@ -435,7 +441,7 @@ void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 			if (index < 0){
 				PageStack->setCurrentIndex(HOME_PAGE_INDEX);
 			}
-			else {
+			else{
 				PageStack->setCurrentIndex(PAGE_CONTAINER_INDEX);
 			}
 		}
@@ -462,7 +468,7 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 
 			HomeButton->setEnabled(isLogged);
 		}
-		else {
+		else{
 			LoginControlButton->setEnabled(PageStack->currentIndex() != LOGIN_PAGE_INDEX);
 
 			LoginControlButton->setIcon(isLogged ? QIcon(":/Icons/Lock") : QIcon(":/Icons/Unlock"));
@@ -595,7 +601,7 @@ void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selecti
 		if (parentItemPtr == nullptr){
 			SubPages->addTopLevelItem(pageItem);
 		}
-		else {
+		else{
 			parentItemPtr->addChild(pageItem);
 		}
 
@@ -662,7 +668,7 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 
 CThumbnailDecoratorGuiComp::LoginMode CThumbnailDecoratorGuiComp::GetLoginMode()
 {
-	if (m_defaultPageIndexAttrPtr.IsValid()) {
+	if (m_defaultPageIndexAttrPtr.IsValid()){
 		return LM_DEFAULT;
 	}
 

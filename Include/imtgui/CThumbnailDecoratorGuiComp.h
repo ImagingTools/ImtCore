@@ -125,6 +125,7 @@ protected:
 	virtual void OnGuiRetranslate() override;
 
 private Q_SLOTS:
+	void on_PageStack_currentChanged(int stackIndex);
 	void on_PageList_clicked(const QModelIndex& index);
 	void on_ExitButton_clicked();
 	void on_SubPages_itemSelectionChanged();
