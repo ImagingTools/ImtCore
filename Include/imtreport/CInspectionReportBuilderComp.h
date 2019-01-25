@@ -41,6 +41,7 @@ private:
 	void GetInspectionPageRegionResults(const Inspection& inspection, Results& results) const;
 
 	void AddHeader(const ReportInputData& reportData,
+				   const Inspection* inspectionPtr,
 				   const double cellWidth,
 				   const QFont& font,
 				   i2d::CVector2d& topLeft,
@@ -55,8 +56,6 @@ private:
 	typedef QPair<QString, QColor> TableCell;
 	typedef QVector<QVector<TableCell>> Table;
 	void AddTable(const Table& values, const double colWidth, const QFont& font, i2d::CVector2d& topLeft, IReportPage& page) const;
-
-	static const int s_maxSummaryResults = 5;
 };
 
 

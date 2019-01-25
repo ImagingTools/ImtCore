@@ -38,6 +38,7 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 	i1r1r1.value = 85.0;
 	i1r1r1.tolerance = 50.0;
 	i1r1r1.diff = 35.0;
+	i1r1r1.flags = IInspectionReportBuilder::RF_SHOW_IN_SUMMARY;
 
 	IInspectionReportBuilder::InspectionRegionResult i1r1r2;
 	i1r1r2.regionName = "i1r1";
@@ -47,6 +48,7 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 	i1r1r2.value = 85.0;
 	i1r1r2.tolerance = 80.0;
 	i1r1r2.diff = 5.0;
+	i1r1r2.flags = IInspectionReportBuilder::RF_NONE;
 
 	IInspectionReportBuilder::InspectionRegionResult i1r1r3;
 	i1r1r3.regionName = "i1r1";
@@ -56,6 +58,7 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 	i1r1r3.value = 50.0;
 	i1r1r3.tolerance = 80.0;
 	i1r1r3.diff = 30.0;
+	i1r1r3.flags = IInspectionReportBuilder::RF_SHOW_IN_SUMMARY;
 
 	IInspectionReportBuilder::InspectionRegionResult i1r1r4;
 	i1r1r4.regionName = "i1r1";
@@ -65,6 +68,7 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 	i1r1r4.value = 53.0;
 	i1r1r4.tolerance = 80.0;
 	i1r1r4.diff = 13.0;
+	i1r1r4.flags = IInspectionReportBuilder::RF_NONE;
 
 	// inspectrion 1 region 2 results
 	IInspectionReportBuilder::InspectionRegionResult i1r2r1;
@@ -75,6 +79,7 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 	i1r2r1.value = 40.0;
 	i1r2r1.tolerance = 80.0;
 	i1r2r1.diff = 40.0;
+	i1r2r1.flags = IInspectionReportBuilder::RF_SHOW_IN_SUMMARY;
 
 	IInspectionReportBuilder::InspectionRegionResult i1r2r2;
 	i1r2r2.regionName = "i1r2";
@@ -84,6 +89,7 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 	i1r2r2.value = 41.0;
 	i1r2r2.tolerance = 80.0;
 	i1r2r2.diff = 39.0;
+	i1r2r2.flags = IInspectionReportBuilder::RF_NONE;
 
 	// inspection 1 region 1
 	IInspectionReportBuilder::InspectionRegion i1r1;

@@ -150,23 +150,16 @@ bool CInspectionReportBuilderComp::CreateInspectionPage(const ReportInputData& r
 
 void CInspectionReportBuilderComp::GetTitlePageRegionResults(const ReportInputData& reportData, Results& results) const
 {
-	results.reserve(s_maxSummaryResults);
-
-	bool enough = false;
-
-	for (int i = 0; i < reportData.inspections.size() && !enough; i++) {
+	for (int i = 0; i < reportData.inspections.size(); i++){
 		const Inspection& inspection = reportData.inspections[i];
 
-		for (int j = 0; j < inspection.regions.size() && !enough; j++) {
+		for (int j = 0; j < inspection.regions.size(); j++){
 			const InspectionRegion& region = inspection.regions[j];
 
-			for (int k = 0; k < region.results.size() && !enough; k++) {
+			for (int k = 0; k < region.results.size(); k++){
 				const InspectionRegionResult& result = region.results[k];
-
-				if (results.size() < s_maxSummaryResults)
+				if (result.flags & RF_SHOW_IN_SUMMARY)
 					results.push_back(result);
-				else
-					enough = true;
 			}
 		}
 	}
@@ -182,23 +175,27 @@ void CInspectionReportBuilderComp::GetInspectionPageRegionResults(const Inspecti
 
 
 void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
+											 const Inspection* inspectionPtr,
 											 const double cellWidth,
 											 const QFont& font,
 											 i2d::CVector2d& topLeft,
 											 IReportPage& page) const
 {
+	QString productName = inspectionPtr ? inspection->name : reportData.productName;
+	istd::IInformationProvider::InformationCategory status = inspectionPtr ? inspection->status : reportData.partStatus;
+
 	Table table(2);
 	table[0] =
 	{
 		{ reportData.companyName, Qt::black },
 		{ reportData.appVersion, Qt::black },
-		{ reportData.productName, Qt::black }
+		{ inspection->name, Qt::black }
 	};
 	table[1] =
 	{
 		{ reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate), Qt::black },
 		{ reportData.partSerialNumber, Qt::black },
-		{ GetStatusText(reportData.partStatus), GetStatusColor(reportData.partStatus) }
+		{ GetStatusText(status), GetStatusColor(status) }
 	};
 
 	AddTable(table, cellWidth, font, topLeft, page);
@@ -243,10 +240,10 @@ void CInspectionReportBuilderComp::AddFooter(const Results& results,
 		{
 			{ result.regionName,                         Qt::black },
 			{ GetErrorClassText(result.errorClass),      Qt::black },
-			{ QString::number(result.length, 'g', 2),    Qt::black },
-			{ QString::number(result.value, 'g', 2),     Qt::black },
-			{ QString::number(result.tolerance, 'g', 2), Qt::black },
-			{ QString::number(result.diff, 'g', 2),      Qt::black }
+			{ QString::number(result.length, 'f', 2),    Qt::black },
+			{ QString::number(result.value, 'f', 2),     Qt::black },
+			{ QString::number(result.tolerance, 'f', 2), Qt::black },
+			{ QString::number(result.diff, 'f', 2),      Qt::black }
 		});
 	}
 
@@ -267,7 +264,6 @@ void CInspectionReportBuilderComp::AddTable(const Table& table, const double col
 			Q_ASSERT(textLabelPtr);
 			textLabelPtr->SetFontName(font.family());
 			textLabelPtr->SetFontSize(font.pointSize());
-			textLabelPtr->SetFillColor(table[row][col].second);
 			textLabelPtr->SetFillColor(table[row][col].second);
 
 			page.AddRectangle(i2d::CRectangle(cellTopLeft.GetX(), cellTopLeft.GetY(), colWidth, cellHeight));

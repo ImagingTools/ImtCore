@@ -59,7 +59,7 @@ const ibase::IHierarchicalCommand* CReportDocumentViewComp::GetCommands() const
 
 void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	m_sceneGrids.clear();
+	m_sceneDecorations.clear();
 
 	imtreport::IReportDocument* documentPtr = GetObjectPtr();
 	Q_ASSERT(documentPtr != NULL);
@@ -69,7 +69,7 @@ void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*ch
 		Q_ASSERT(pagePtr);
 
 		QGraphicsScene* scenePtr = new QGraphicsScene();
-		UpdateSceneGrid(*scenePtr);
+		UpdateSceneDecoration(*scenePtr);
 		UpdateSceneShapes(*pagePtr, *scenePtr);
 
 		QGraphicsView* viewPtr = new QGraphicsView(scenePtr, PagesTabs);
@@ -103,10 +103,7 @@ void CReportDocumentViewComp::OnGuiRetranslate()
 
 void CReportDocumentViewComp::OnShowGrid()
 {
-	for (QGraphicsItemGroup* sceneGrid : m_sceneGrids.values()){
-		Q_ASSERT(sceneGrid);
-		sceneGrid->isVisible() ? sceneGrid->hide() : sceneGrid->show();
-	}
+	ShowSceneDecoration(true, !m_isGridShown);
 }
 
 
@@ -122,6 +119,11 @@ void CReportDocumentViewComp::OnExportToPdf()
 		return;
 	}
 
+	bool ok = true;
+	bool wasGridShown = m_isGridShown;
+
+	ShowSceneDecoration(false, false);
+
 	QPrinter printer(QPrinter::HighResolution);
 	printer.setPageSize(QPrinter::A4);
 	printer.setOrientation(QPrinter::Portrait);
@@ -135,34 +137,41 @@ void CReportDocumentViewComp::OnExportToPdf()
 		QGraphicsView* viewPtr = dynamic_cast<QGraphicsView*>(PagesTabs->widget(i));
 		Q_ASSERT(viewPtr);
 
-		ExportSceneToPdf(*viewPtr->scene(), painter);
+		scene.render(&painter);
 
-		if (i < PagesTabs->count() - 1) { // initially printer already has one default page so don't add a new one on the last iteration
-			if (!printer.newPage()) {
+		if (i < PagesTabs->count() - 1){ // initially printer already has one default page so don't add a new one on the last iteration
+			if (!printer.newPage()){
 				QMessageBox::critical(GetWidget(), tr("Export to PDF"), tr("Failed to export report"));
-				return;
+				ok = false;
+				break;
 			}
 		}
 	}
 
-	QMessageBox::information(GetWidget(), tr("Export to PDF"), tr("Report has been exported successfully"));
+	ShowSceneDecoration(true, wasGridShown);
+
+	if (ok){
+		QMessageBox::information(GetWidget(), tr("Export to PDF"), tr("Report has been exported successfully"));
+	}
 }
 
 
 // private methods
-void CReportDocumentViewComp::UpdateSceneGrid(QGraphicsScene& scene)
+
+void CReportDocumentViewComp::UpdateSceneDecoration(QGraphicsScene& scene)
 {
 	// set scene rect
 	QRectF sceneRect(QPointF(0.0, 0.0), MapPointToScene(QPointF(s_A4WidthMm, s_A4HeightMm)));
 	scene.setSceneRect(sceneRect);
 
+	QGraphicsRectItem* sceneBorderPtr = new QGraphicsRectItem(sceneRect);
+	scene.AddItem(sceneBorderPtr);
+
 	// set scene grid
 	QGraphicsItemGroup* sceneGridPtr = new QGraphicsItemGroup();
+	m_isGridShown ? sceneGridPtr->show() : sceneGridPtr->hide();
 	scene.addItem(sceneGridPtr);
 
-	m_sceneGrids.insert(&scene, sceneGridPtr);
-
-	// TODO: for loops are almost the same, do it in lambda
 	for (qreal i = 0.0; i < s_A4WidthMm; i += 5.0)
 	{
 		QPointF p1 = MapPointToScene(QPointF(i, 0.0));
@@ -183,7 +192,7 @@ void CReportDocumentViewComp::UpdateSceneGrid(QGraphicsScene& scene)
 		sceneGridPtr->addToGroup(linePtr);
 	}
 
-	sceneGridPtr->addToGroup(new QGraphicsRectItem(sceneRect));
+	m_sceneDecorations.push_back(QPair(sceneBorderPtr, sceneGridPtr));
 }
 
 
@@ -205,25 +214,16 @@ void CReportDocumentViewComp::UpdateSceneShapes(const imtreport::IReportPage& pa
 }
 
 
-void CReportDocumentViewComp::ExportSceneToPdf(QGraphicsScene& scene, QPainter& painter)
+void CReportDocumentViewComp::ShowSceneDecoration(const bool showBorder, const bool showGrid)
 {
-	ShowSceneGrid(scene, false);
-
-	scene.render(&painter);
-
-	ShowSceneGrid(scene, true);
-}
-
-
-
-void CReportDocumentViewComp::ShowSceneGrid(QGraphicsScene& scene, const bool show)
-{
-	SceneGrids::Iterator i = m_sceneGrids.find(&scene);
-	if (i != m_sceneGrids.end()){
-		QGraphicsItemGroup* sceneGridItem = i.value();
-		Q_ASSERT(sceneGridItem);
-		show ? sceneGridItem->show() : sceneGridItem->hide();
+	for (SceneDecoration& sceneDecoration : m_sceneDecorations){
+		Q_ASSERT(sceneDecoration.first);
+		Q_ASSERT(sceneDecoration.second);
+		showBorder ? sceneDecoration.first->show()  : sceneDecoration.first->hide();
+		showGrid   ? sceneDecoration.second->show() : sceneDecoration.second->hide();
 	}
+
+	m_isGridShown = showGrid;
 }
 
 

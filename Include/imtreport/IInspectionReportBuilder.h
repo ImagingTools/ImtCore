@@ -32,7 +32,11 @@ public:
 		EC_GLUE_WIDE,
 	};
 
-	struct InspectionRegion;
+	enum ResultFlags
+	{
+		RF_NONE = 0x0,
+		RF_SHOW_IN_SUMMARY = 0x1
+	};
 
 	struct InspectionRegionResult
 	{
@@ -43,6 +47,7 @@ public:
 		double value;
 		double tolerance;
 		double diff;
+		int flags;
 	};
 
 	typedef QVector<InspectionRegionResult> Results;
