@@ -75,8 +75,6 @@ private:
 	SceneDecorations m_sceneDecorations;
 	bool m_isGridShown = true;
 
-	QGraphicsRectItem* m_sceneBorder;
-
 	static const qreal s_A4WidthMm;
 	static const qreal s_A4HeightMm;
 	static const qreal s_MmPerInch;

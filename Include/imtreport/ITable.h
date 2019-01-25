@@ -41,7 +41,7 @@ public:
 	/**
 		Set item
 	*/
-	virtual void SetItem(const int row, const int column, const ITableItem* item) const;
+	virtual void SetItem(const int row, const int column, const ITableItem* item);
 };
 
 
