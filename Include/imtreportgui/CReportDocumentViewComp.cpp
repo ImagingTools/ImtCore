@@ -115,7 +115,7 @@ void CReportDocumentViewComp::OnExportToPdf()
 	}
 
 	QString fileName = QFileDialog::getSaveFileName(GetWidget(), tr("Export to PDF..."), "", tr("Report Files (*.pdf)"));
-	if (fileName.isEmpty()) {
+	if (fileName.isEmpty()){
 		return;
 	}
 
@@ -135,9 +135,9 @@ void CReportDocumentViewComp::OnExportToPdf()
 
 	for (int i = 0; i < PagesTabs->count(); i++){
 		QGraphicsView* viewPtr = dynamic_cast<QGraphicsView*>(PagesTabs->widget(i));
-		Q_ASSERT(viewPtr);
+		Q_ASSERT(viewPtr != nullptr);
 
-		scene.render(&painter);
+		viewPtr->scene()->render(&painter);
 
 		if (i < PagesTabs->count() - 1){ // initially printer already has one default page so don't add a new one on the last iteration
 			if (!printer.newPage()){
@@ -165,7 +165,7 @@ void CReportDocumentViewComp::UpdateSceneDecoration(QGraphicsScene& scene)
 	scene.setSceneRect(sceneRect);
 
 	QGraphicsRectItem* sceneBorderPtr = new QGraphicsRectItem(sceneRect);
-	scene.AddItem(sceneBorderPtr);
+	scene.addItem(sceneBorderPtr);
 
 	// set scene grid
 	QGraphicsItemGroup* sceneGridPtr = new QGraphicsItemGroup();
@@ -192,7 +192,7 @@ void CReportDocumentViewComp::UpdateSceneDecoration(QGraphicsScene& scene)
 		sceneGridPtr->addToGroup(linePtr);
 	}
 
-	m_sceneDecorations.push_back(QPair(sceneBorderPtr, sceneGridPtr));
+	m_sceneDecorations.push_back(SceneDecoration(sceneBorderPtr, sceneGridPtr));
 }
 
 
@@ -273,7 +273,7 @@ void CReportDocumentViewComp::ConvertShapeCoodinates(const imtreport::IGraphicsE
 	}
 
 	const imtreport::CLineElement* lineElement = dynamic_cast<const imtreport::CLineElement*>(pageElementPtr);
-	if (lineElement) {
+	if (lineElement){
 		return ConvertLineCoodinates(lineElement, sceneElementPtr);
 	}
 

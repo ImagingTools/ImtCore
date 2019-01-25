@@ -120,7 +120,7 @@ bool CInspectionReportBuilderComp::CreateTitlePage(const ReportInputData& report
 
 	i2d::CVector2d topLeft(15.0, 10.0);
 
-	AddHeader(reportData, 60.0, QFont("Arial", 3), topLeft, *pagePtr);
+	AddHeader(reportData, NULL, 60.0, QFont("Arial", 3), topLeft, *pagePtr);
 	AddBody(reportData.imagePath, topLeft, *pagePtr);
 	AddFooter(results, 30.0, QFont("Arial", 3), topLeft, *pagePtr);
 
@@ -140,7 +140,7 @@ bool CInspectionReportBuilderComp::CreateInspectionPage(const ReportInputData& r
 
 	i2d::CVector2d topLeft(15.0, 10.0);
 
-	AddHeader(reportData, 60.0, QFont("Arial", 3), topLeft, *pagePtr);
+	AddHeader(reportData, &inspection, 60.0, QFont("Arial", 3), topLeft, *pagePtr);
 	AddBody(inspection.imagePath, topLeft, *pagePtr);
 	AddFooter(results, 30.0, QFont("Arial", 3), topLeft, *pagePtr);
 
@@ -181,15 +181,15 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 											 i2d::CVector2d& topLeft,
 											 IReportPage& page) const
 {
-	QString productName = inspectionPtr ? inspection->name : reportData.productName;
-	istd::IInformationProvider::InformationCategory status = inspectionPtr ? inspection->status : reportData.partStatus;
+	QString productName = inspectionPtr ? inspectionPtr->name : reportData.productName;
+	istd::IInformationProvider::InformationCategory status = inspectionPtr ? inspectionPtr->status : reportData.partStatus;
 
 	Table table(2);
 	table[0] =
 	{
 		{ reportData.companyName, Qt::black },
 		{ reportData.appVersion, Qt::black },
-		{ inspection->name, Qt::black }
+		{ inspectionPtr->name, Qt::black }
 	};
 	table[1] =
 	{
