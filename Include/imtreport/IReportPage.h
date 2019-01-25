@@ -42,7 +42,11 @@ public:
 	/**
 		Add a text label to the report page.
 	*/
-	virtual QByteArray AddText(const QString& text, const i2d::CVector2d& position, const double textWidth = -1.0, const Qt::Alignment alignment = Qt::AlignLeft) = 0;
+	virtual QByteArray AddText(
+				const QString& text,
+				const i2d::CVector2d& position,
+				const double textWidth = -1.0,
+				const Qt::Alignment alignment = Qt::AlignLeft) = 0;
 
 	/**
 		Add an image file to the report page.

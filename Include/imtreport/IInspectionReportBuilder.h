@@ -5,10 +5,8 @@
 #include <QtCore/QtCore>
 
 // ACF includes
+#include <istd/IInformationProvider.h>
 #include <iprm/IParamsSet.h>
-
-// ImtCore includes
-#include <imtreport/CInspectionReportStatus.h>
 
 
 namespace imtreport
