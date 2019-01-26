@@ -16,8 +16,6 @@ namespace imtreport
 class CTableItem: public virtual ITableItem
 {
 public:
-	typedef ITableItem BaseClass;
-
 	explicit CTableItem(const QString& text);
 
 	// reimplemented (ITableItem)
@@ -48,16 +46,18 @@ public:
 	istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 
 private:
-	template <typename T> SetValue(const T& srcValue, T& dstValue)
+	template <typename T>
+	void SetValue(const T& srcValue, T& dstValue)
 	{
-		if (srcValue != dstValue)
-		{
+		if (srcValue != dstValue){
 			istd::CChangeNotifier changeNotifier(this);
+
 			dstValue = srcValue;
 		}
 	}
 
-	template <typename T> bool SerializeValue(iser::IArchive& archive, const QByteArray& tagId, const QByteArray& tagComment, const TagType tagType, T& value)
+	template <typename T>
+	bool SerializeValue(iser::IArchive& archive, const QByteArray& tagId, const QByteArray& tagComment, TagType tagType, T& value)
 	{
 		static iser::CArchiveTag tag(tagId, tagComment, tagType);
 
@@ -68,7 +68,8 @@ private:
 		return retVal;
 	}
 
-	template <typename T> bool SerializeNonStandardValue(iser::IArchive& archive, const QByteArray& tagId, const QByteArray& tagComment, const TagType tagType, T& value)
+	template <typename T>
+	bool SerializeNonStandardValue(iser::IArchive& archive, const QByteArray& tagId, const QByteArray& tagComment, TagType tagType, T& value)
 	{
 		static iser::CArchiveTag tag(tagId, tagComment, tagType);
 
