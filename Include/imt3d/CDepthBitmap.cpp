@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 
 
@@ -26,6 +27,36 @@ void CDepthBitmap::SetDepthRange(const istd::CRange & depthRange)
 istd::CRange CDepthBitmap::GetDepthRange() const
 {
 	return m_depthRange;
+}
+
+
+// reimplemented (istd::IChangeable)
+
+bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode mode)
+{
+	const CDepthBitmap* sourcePtr = dynamic_cast<const CDepthBitmap*>(&object);
+	if (sourcePtr ){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_depthRange = sourcePtr->m_depthRange;
+
+		InvalidateCache(istd::IChangeable::GetAnyChange());
+
+		return BaseClass::CopyFrom(object, mode);
+	}
+	
+	return false;
+}
+
+
+istd::IChangeable* CDepthBitmap::CloneMe(CompatibilityMode mode) const
+{
+	istd::TDelPtr<CDepthBitmap> clonePtr(new CDepthBitmap);
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr.PopPtr();
+	}
+
+	return NULL;
 }
 
 

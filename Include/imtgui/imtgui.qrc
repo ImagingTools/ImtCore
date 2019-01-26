@@ -41,7 +41,5 @@
         <file alias="LogicalUnit">Resources/Icons/LogicalUnit.svg</file>
         <file alias="Copy">Resources/Icons/Copy.svg</file>
         <file alias="Checkerboard">Resources/Icons/Checkerboard.svg</file>
-        <file alias="Pdf">Resources/Icons/Pdf.svg</file>
-        <file alias="Grid2">Resources/Icons/Grid2.svg</file>
     </qresource>
 </RCC>

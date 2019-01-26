@@ -20,6 +20,10 @@ public:
 	void SetDepthRange(const istd::CRange& depthRange);
 	istd::CRange GetDepthRange() const;
 
+	// reimplemented (istd::IChangeable)
+	virtual bool CopyFrom(const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+
 protected:
 	// reimplemented (iimg::CReflectedBitmapBase)
 	virtual bool ConvertFromQImage(const QImage& image) override;
