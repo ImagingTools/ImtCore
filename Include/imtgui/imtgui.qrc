@@ -4,6 +4,7 @@
         <file alias="Home">Resources/Icons/Home.svg</file>
         <file alias="Exit">Resources/Icons/Exit.svg</file>
         <file alias="Diagnostics">Resources/Icons/Diagnostics.svg</file>
+        <file alias="Information">Resources/Icons/Information.svg</file>
         <file alias="Info">Resources/Icons/Information.svg</file>
         <file alias="Magic">Resources/Icons/Magic.svg</file>
         <file alias="Menu">Resources/Icons/Menu.svg</file>
@@ -19,7 +20,6 @@
         <file alias="ManualProcessing">Resources/Icons/ManualProcessing.svg</file>
         <file alias="Pointer">Resources/Icons/Pointer.svg</file>
         <file alias="Product">Resources/Icons/Product.svg</file>
-        <file alias="Production">Resources/Icons/Production.svg</file>
         <file alias="Statistics">Resources/Icons/Statistics.svg</file>
         <file alias="Log">Resources/Icons/Log.svg</file>
         <file alias="Ok">Resources/Icons/Ok.svg</file>
@@ -41,5 +41,26 @@
         <file alias="LogicalUnit">Resources/Icons/LogicalUnit.svg</file>
         <file alias="Copy">Resources/Icons/Copy.svg</file>
         <file alias="Checkerboard">Resources/Icons/Checkerboard.svg</file>
+        <file alias="Environment">Resources/Icons/Environment.svg</file>
+        <file alias="Production">Resources/Icons/Production.svg</file>
+        <file alias="System">Resources/Icons/System.svg</file>
+        <file alias="Workflow">Resources/Icons/Workflow.svg</file>
+        <file alias="Light">Resources/Icons/Light.svg</file>
+        <file alias="LogSearch">Resources/Icons/LogSearch.svg</file>
+        <file alias="CalibrationBoard">Resources/Icons/CalibrationBoard.svg</file>
+        <file alias="CalibrationMark">Resources/Icons/CalibrationMark.svg</file>
+        <file alias="CameraFlash">Resources/Icons/CameraFlash.svg</file>
+        <file alias="Communication">Resources/Icons/Communication.svg</file>
+        <file alias="LightSettings">Resources/Icons/LightSettings.svg</file>
+        <file alias="Camera">Resources/Icons/Camera.svg</file>
+        <file alias="Sensor">Resources/Icons/Sensor.svg</file>
+        <file alias="Cube">Resources/Icons/Cube.svg</file>
+        <file alias="Up">Resources/Icons/Up.svg</file>
+        <file alias="Down">Resources/Icons/Down.svg</file>
+        <file alias="Open">Resources/Icons/Open.svg</file>
+        <file alias="Close">Resources/Icons/Close.svg</file>
+        <file alias="Warning">Resources/Icons/Warning.svg</file>
+        <file alias="Error">Resources/Icons/Error.svg</file>
+        <file alias="Clear">Resources/Icons/Clear.svg</file>
     </qresource>
 </RCC>
