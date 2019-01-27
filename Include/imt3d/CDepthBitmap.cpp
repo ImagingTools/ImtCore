@@ -30,6 +30,22 @@ istd::CRange CDepthBitmap::GetDepthRange() const
 }
 
 
+// reimplemented (iser::ISerializable)
+
+bool CDepthBitmap::Serialize(iser::IArchive& archive)
+{
+	if (!archive.IsStoring()){
+		InvalidateCache(istd::IChangeable::GetAnyChange());
+	}
+
+	m_depthRange = istd::CRange(700, 2000);
+
+	bool retVal = BaseClass::Serialize(archive);
+
+	return retVal;
+}
+
+
 // reimplemented (istd::IChangeable)
 
 bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode mode)

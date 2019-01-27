@@ -118,8 +118,8 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	painter->drawText(textRect, Qt::AlignCenter, itemPtr->text());
 
 	if ((option.state & QStyle::State_MouseOver)){
-		painter->setPen(Qt::blue);
-		painter->drawRect(button.rect);
+		//painter->setPen(Qt::blue);
+		//painter->drawRect(button.rect);
 	}
 }
 
