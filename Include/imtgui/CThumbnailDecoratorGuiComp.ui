@@ -43,7 +43,7 @@ QWidget[ImtTopFrame=true]
                                  stop: 0.97 rgb(220,220,223), stop: 1.0 rgb(190,190,193));
 	border-bottom: 1px solid  rgb(170,170,170);
 	color: #0d8dd3;
-	min-height: 4.5em;
+	min-height: 4.8em;
 }
 
 

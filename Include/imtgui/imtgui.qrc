@@ -62,5 +62,16 @@
         <file alias="Warning">Resources/Icons/Warning.svg</file>
         <file alias="Error">Resources/Icons/Error.svg</file>
         <file alias="Clear">Resources/Icons/Clear.svg</file>
+        <file alias="Load">Resources/Icons/Load.svg</file>
+        <file alias="Import">Resources/Icons/Load.svg</file>
+        <file alias="Duplicate">Resources/Icons/Duplicate.svg</file>
+        <file alias="Edit">Resources/Icons/Edit.svg</file>
+        <file alias="Ruler">Resources/Icons/Ruler.svg</file>
+        <file alias="PointsNone">Resources/Icons/PointsNone.svg</file>
+        <file alias="PointsAdd">Resources/Icons/PointsAdd.svg</file>
+        <file alias="PointsSub">Resources/Icons/PointsSub.svg</file>
+        <file alias="PointsMove">Resources/Icons/PointsMove.svg</file>
+        <file alias="Tools">Resources/Icons/Tools.svg</file>
+        <file alias="Paste">Resources/Icons/Paste.svg</file>
     </qresource>
 </RCC>

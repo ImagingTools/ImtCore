@@ -20,7 +20,7 @@ namespace imtreport
 /**
 	Interface for describing a graphic element.
 */
-class IGraphicsElement: virtual public i2d::IObject2d, virtual public iser::IObject
+class IGraphicsElement: virtual public i2d::IObject2d
 {
 public:
 	/**
