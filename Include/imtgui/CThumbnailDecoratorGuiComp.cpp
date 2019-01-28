@@ -104,9 +104,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	QWidget* widgetPtr = GetWidget();
-	Q_ASSERT(widgetPtr != NULL);
-
 	m_itemInfoMap.clear();
 	m_subPageItemMap.clear();
 

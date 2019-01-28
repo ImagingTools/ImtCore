@@ -2,24 +2,24 @@
 
 
 // ACF includes
-#include <i2d/CObject2dBase.h>
+#include <i2d/CRectangle.h>
 
 // ImtCore includes
-#include <CTextTableItem.h>
+#include <imtreport/CTextTableItem.h>
 
 
 namespace imtreport
 {
 
 
-class CTextTable: protected virtual CRectangle
+class CTextTable: protected i2d::CRectangle
 {
 public:
-	typedef CRectangle BaseClass;
+	typedef i2d::CRectangle BaseClass;
 
-	explicit CTextTable(int rowCount, int columnCount); // including header
+	CTextTable(int rowCount, int columnCount); // including header
 
-	void SetTopLeft(const CVector2d& topLeft);
+	void SetTopLeft(const i2d::CVector2d& topLeft);
 
 	int GetRowCount() const;
 	int GetColumnCount() const;

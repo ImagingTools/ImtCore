@@ -1,6 +1,9 @@
 #include <imtreport/CTextTableItem.h>
 
 
+// Qt includes
+#include <QtGui/QFontMetrics>
+
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <istd/TDelPtr.h>
@@ -14,19 +17,16 @@ namespace imtreport
 
 // public methods
 
-CTextTableItem::CTextTableItem()
-{
-}
-
-
-explicit CTextTableItem::CTableItem(const QString& text = QString(),
-	Qt::Alignment alignment = Qt::AlignLeft,
-	const QFont& font = QFont("Arial", 8),
-	const QColor& foregroundColor = Qt::black,
-	const QColor& backgroundColor = Qt::transparent,
-	const QIcon& icon = QIcon()) :
-	m_text(text),
-	m_alignment(alignment);
+CTextTableItem::CTextTableItem(
+			const QString& text,
+			Qt::Alignment alignment,
+			QString fontName,
+			double fontSize,
+			const QColor& foregroundColor,
+			const QColor& backgroundColor,
+			const QIcon& icon)
+	:m_text(text),
+	m_alignment(alignment),
 	m_fontSize(fontSize),
 	m_fontName(fontName),
 	m_foregroundColor(foregroundColor),
@@ -44,7 +44,11 @@ QString CTextTableItem::GetText() const
 
 void CTextTableItem::SetText(const QString& text)
 {
-	SetValue(text, m_text);
+	if (m_text != text){
+		istd::CChangeNotifier changeNotifier(this);
+		
+		m_text = text;
+	}
 }
 
 
@@ -56,7 +60,11 @@ Qt::Alignment CTextTableItem::GetAlignment() const
 
 void CTextTableItem::SetAlignment(const Qt::Alignment alignment)
 {
-	SetValue(alignment, m_alignment);
+	if (m_alignment != alignment){
+		istd::CChangeNotifier changeNotifier(this);
+		
+		m_alignment = alignment;
+	}
 }
 
 
@@ -68,19 +76,27 @@ double CTextTableItem::GetFontSize() const
 
 void CTextTableItem::SetFontSize(const double fontSize)
 {
-	SetValue(fontSize, m_fontSize);
+	if (m_fontSize != fontSize){
+		istd::CChangeNotifier changeNotifier(this);
+		
+		m_fontSize = fontSize;
+	}
 }
 
 
 QString CTextTableItem::GetFontName() const
 {
-	return fontName;
+	return m_fontName;
 }
 
 
 void CTextTableItem::SetFontName(const QString& fontName)
 {
-	SetValue(fontName, m_fontName);
+	if (m_fontName != fontName){
+		istd::CChangeNotifier changeNotifier(this);
+		
+		m_fontName = fontName;
+	}
 }
 
 
@@ -92,7 +108,11 @@ QColor CTextTableItem::GetForegroundColor() const
 
 void CTextTableItem::SetForegroundColor(const QColor& color)
 {
-	SetValue(foregroundColor, m_color);
+	if (m_foregroundColor != color){
+		istd::CChangeNotifier changeNotifier(this);
+		
+		m_foregroundColor = color;
+	}
 }
 
 
@@ -104,11 +124,15 @@ QColor CTextTableItem::GetBackgroundColor() const
 
 void CTextTableItem::SetBackgroundColor(const QColor& color)
 {
-	SetValue(backgroundColor, m_backgroundColor);
+	if (m_backgroundColor != color){
+		istd::CChangeNotifier changeNotifier(this);
+		
+		m_backgroundColor = color;
+	}
 }
 
 
-QString CTextTableItem::GetIcon() const
+QIcon CTextTableItem::GetIcon() const
 {
 	return m_icon;
 }
@@ -116,13 +140,15 @@ QString CTextTableItem::GetIcon() const
 
 void CTextTableItem::SetIcon(const QIcon& icon)
 {
-	SetValue(icon, m_icon);
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_icon = icon;
 }
 
 
 double CTextTableItem::GetHeight() const
 {
-	return QFontMetrics(QFont(fontName, fontSize)).height();
+	return QFontMetrics(QFont(m_fontName, m_fontSize)).height();
 }
 
 
@@ -133,12 +159,12 @@ bool CTextTableItem::Serialize(iser::IArchive& archive)
 	istd::CChangeNotifier notifier(archive.IsStoring()? NULL: this, &GetAllChanges());
 
 	bool retVal = SerializeValue(archive, "Text", "Table item text", iser::CArchiveTag::TT_LEAF, m_text);
-	retVal = retVal && SerializeNonStandardValue(archive, "Alignment", "Table item alignment", iser::CArchiveTag::TT_LEAF, m_alignment);
 	retVal = retVal && SerializeValue(archive, "Font size", "Table item font size", iser::CArchiveTag::TT_LEAF, m_fontSize);
 	retVal = retVal && SerializeValue(archive, "Font name", "Table item font name", iser::CArchiveTag::TT_LEAF, m_fontName);
-	retVal = retVal && SerializeNonStandardValue(archive, "Foreground color", "Table item foreground color", iser::CArchiveTag::TT_LEAF, m_foregroundColor);
-	retVal = retVal && SerializeNonStandardValue(archive, "Background color", "Table item background color", iser::CArchiveTag::TT_LEAF, m_backgroundColor);
-	retVal = retVal && SerializeNonStandardValue(archive, "Icon", "Table item icon", iser::CArchiveTag::TT_LEAF, m_icon);
+	//retVal = retVal && SerializeNonStandardValue(archive, "Foreground color", "Table item foreground color", iser::CArchiveTag::TT_LEAF, m_foregroundColor);
+	//retVal = retVal && SerializeNonStandardValue(archive, "Alignment", "Table item alignment", iser::CArchiveTag::TT_LEAF, m_alignment);
+	//retVal = retVal && SerializeNonStandardValue(archive, "Background color", "Table item background color", iser::CArchiveTag::TT_LEAF, m_backgroundColor);
+	//retVal = retVal && SerializeNonStandardValue(archive, "Icon", "Table item icon", iser::CArchiveTag::TT_LEAF, m_icon);
 
 	return retVal;
 }
@@ -152,19 +178,19 @@ int CTextTableItem::GetSupportedOperations() const
 }
 
 
-bool CTextTableItem::CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS)
+bool CTextTableItem::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CTextTableItem* sourcePtr = dynamic_cast<const CTextTableItem*>(&object);
 	if (sourcePtr != NULL){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_text            = sourcePtr->m_text;
-		m_alignment       = sourcePtr->m_alignment;
-		m_fontSize        = sourcePtr->m_fontSize;
-		m_fontName        = sourcePtr->m_fontName;
+		m_text = sourcePtr->m_text;
+		m_alignment = sourcePtr->m_alignment;
+		m_fontSize = sourcePtr->m_fontSize;
+		m_fontName = sourcePtr->m_fontName;
 		m_foregroundColor = sourcePtr->m_foregroundColor;
 		m_backgroundColor = sourcePtr->m_backgroundColor;
-		m_icon            = sourcePtr->m_icon;
+		m_icon = sourcePtr->m_icon;
 
 		return true;
 	}
@@ -173,10 +199,9 @@ bool CTextTableItem::CopyFrom(const IChangeable& object, CompatibilityMode mode 
 }
 
 
-istd::IChangeable* CTextTableItem::CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const
+istd::IChangeable* CTextTableItem::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CTextTableItem> clonePtr(new CTextTableItem());
-
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}

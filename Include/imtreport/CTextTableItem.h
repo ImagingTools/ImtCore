@@ -4,47 +4,50 @@
 // Qt includes
 #include <QtCore/QtCore>
 #include <QtGui/QColor>
+#include <QtGui/QFont>
 #include <QtGui/QIcon>
 
 // ACF includes
-#include <iser/ISerializable>
+#include <iser/ISerializable.h>
+#include <iser/CArchiveTag.h>
 
 
 namespace imtreport
 {
 
 
-class CTextTableItem: public virtual ISerializable
+class CTextTableItem: virtual public iser::ISerializable
 {
 public:
-	explicit CTableItem(const QString& text = QString(),
-		Qt::Alignment alignment = Qt::AlignLeft,
-		QString fontName = "Arial",
-		double fontSize = 8.0,
-		const QColor& foregroundColor = Qt::black,
-		const QColor& backgroundColor = Qt::transparent,
-		QIcon& icon = QIcon());
+	CTextTableItem(
+				const QString& text = QString(),
+				Qt::Alignment alignment = Qt::AlignLeft,
+				QString fontName = "Arial",
+				double fontSize = 8.0,
+				const QColor& foregroundColor = Qt::black,
+				const QColor& backgroundColor = Qt::transparent,
+				const QIcon& icon = QIcon());
 
-	QString GetText() const override;
-	void SetText(const QString& text) override;
+	QString GetText() const;
+	void SetText(const QString& text);
 
-	Qt::Alignment GetAlignment() const override;
-	void SetAlignment(const Qt::Alignment alignment) override;
+	Qt::Alignment GetAlignment() const;
+	void SetAlignment(const Qt::Alignment alignment);
 
-	double GetFontSize() const override;
-	void SetFontSize(const double fontSize) override;
+	double GetFontSize() const;
+	void SetFontSize(const double fontSize);
 
-	QString GetFontName() const override;
-	void SetFontName(const QString& fontName) override;
+	QString GetFontName() const;
+	void SetFontName(const QString& fontName);
 
-	QColor GetForegroundColor() const override;
-	void SetForegroundColor(const QColor& color) override;
+	QColor GetForegroundColor() const;
+	void SetForegroundColor(const QColor& color);
 
-	QColor GetBackgroundColor() const override;
-	void SetBackgroundColor(const QColor& color) override;
+	QColor GetBackgroundColor() const;
+	void SetBackgroundColor(const QColor& color);
 
-	QIcon GetIcon() const override;
-	void SetIcon(const QIcon& icon) override;
+	QIcon GetIcon() const;
+	void SetIcon(const QIcon& icon);
 
 	double GetHeight() const;
 
@@ -58,17 +61,7 @@ public:
 
 private:
 	template <typename T>
-	void SetValue(const T& srcValue, T& dstValue)
-	{
-		if (srcValue != dstValue){
-			istd::CChangeNotifier changeNotifier(this);
-
-			dstValue = srcValue;
-		}
-	}
-
-	template <typename T>
-	bool SerializeValue(iser::IArchive& archive, const QByteArray& tagId, const QByteArray& tagComment, TagType tagType, T& value)
+	bool SerializeValue(iser::IArchive& archive, const QByteArray& tagId, const QByteArray& tagComment, iser::CArchiveTag::TagType tagType, T& value)
 	{
 		static iser::CArchiveTag tag(tagId, tagComment, tagType);
 
@@ -80,7 +73,7 @@ private:
 	}
 
 	template <typename T>
-	bool SerializeNonStandardValue(iser::IArchive& archive, const QByteArray& tagId, const QByteArray& tagComment, TagType tagType, T& value)
+	bool SerializeNonStandardValue(iser::IArchive& archive, const QByteArray& tagId, const QByteArray& tagComment, iser::CArchiveTag::TagType tagType, T& value)
 	{
 		static iser::CArchiveTag tag(tagId, tagComment, tagType);
 

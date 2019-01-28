@@ -4,7 +4,6 @@
 // STL includes
 #include <numeric>
 
-
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <istd/TDelPtr.h>
@@ -17,7 +16,8 @@ namespace imtreport
 {
 
 
-// static members
+// private static members
+
 const double CTextTable::s_defaultColumnWidth = 30.0;
 
 
@@ -26,19 +26,20 @@ const double CTextTable::s_defaultColumnWidth = 30.0;
 CTextTable::CTextTable(int rowCount, int columnCount)
 {
 	Resize(rowCount, columnCount);
+
 	UpdateRect();
 }
 
 
-void CTextTable::SetTopLeft(const CVector2d& topLeft);
+void CTextTable::SetTopLeft(const i2d::CVector2d& topLeft)
 {
-	Base::SetTopLeft(topLeft);
+	BaseClass::SetTopLeft(topLeft);
 }
 
 
 int CTextTable::GetRowCount() const
 {
-	return m_items.IsEmpty() ? 0 : m_items[0].size();
+	return m_items.isEmpty() ? 0 : m_items[0].size();
 }
 
 
@@ -50,7 +51,6 @@ int CTextTable::GetColumnCount() const
 
 void CTextTable::SetColumnHeaderLabels(const QStringList& labels)
 {
-	Q_ASSERT(labels.size() == m_items.size() == m_columnHeaders.size());
 	Q_ASSERT(GetRowCount() > 0);
 
 	for (int col = 0; col < m_items.size(); col++){
@@ -83,11 +83,9 @@ void CTextTable::SetItem(int row, int column, const CTextTableItem& item)
 	Q_ASSERT(column > 0 && column < m_items.size());
 	Q_ASSERT(row > 0 && row < m_items[column].size());
 
-	bool retVal = m_items[column][row] = item;
+	m_items[column][row] = item;
 	
 	UpdateRect();
-	
-	return retVal;
 }
 
 
@@ -102,14 +100,14 @@ bool CTextTable::Serialize(iser::IArchive& archive)
 	bool retVal = BaseClass::Serialize(archive);
 
 	// column widths
-	retVal = retVal && CPrimitiveTypesSerializer::SerializeContainer<QVector>(archive, m_columnWidths, "ColumnWidths", "ColumnWidth");
+//	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QVector>(archive, m_columnWidths, "ColumnWidths", "ColumnWidth");
 
 	// items
-	int rowCount    = GetRowCount();
+	int rowCount = GetRowCount();
 	int columnCount = GetColumnCount();
 
 	static iser::CArchiveTag columnCountTag("TableColumnCount", "Table columns count", iser::CArchiveTag::TT_LEAF);
-	bool retVal = archive.BeginTag(columnCountTag);
+	retVal = archive.BeginTag(columnCountTag);
 	retVal = retVal && archive.Process(columnCount);
 	retVal = retVal && archive.EndTag(columnCountTag);
 
@@ -126,13 +124,15 @@ bool CTextTable::Serialize(iser::IArchive& archive)
 	static iser::CArchiveTag itemsTag("TableItems", "Table items", iser::CArchiveTag::TT_MULTIPLE);
 	static iser::CArchiveTag itemTag("TableItem", "Table item", iser::CArchiveTag::TT_GROUP, &itemsTag);
 
-	bool retVal = archive.BeginMultiTag(itemsTag, itemTag, rowCount * columnCount);
+	int count = rowCount * columnCount;
+	retVal = retVal  && archive.BeginMultiTag(itemsTag, itemTag, count);
 
 	for (int col = 0; col < columnCount && retVal; col++){
 		for (int row = 0; row < rowCount && retVal; row++){
 			retVal = retVal && archive.BeginTag(itemTag);
 			retVal = retVal && m_items[col][row].Serialize(archive);
 			retVal = retVal && archive.EndTag(itemTag);
+		}
 	}
 
 	retVal = retVal && archive.EndTag(itemsTag);
@@ -145,32 +145,19 @@ bool CTextTable::Serialize(iser::IArchive& archive)
 
 int CTextTable::GetSupportedOperations() const
 {
-	return (SO_COPY | SO_CLONE);
+	return SO_COPY | SO_CLONE;
 }
 
 
-bool CTextTable::CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS)
+bool CTextTable::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 {
 	const CTextTable* sourcePtr = dynamic_cast<const CTextTable*>(&object);
 
 	if (sourcePtr != NULL){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_items.clear();
-		m_items.resize(sourcePtr->GetColumnsCount());
-
-		for (int col = 0; i < object.m_items.size(); col++){
-			m_items[col].resize(sourcePtr->GetRowsCount());
-
-			for (int row = 0; row < sourcePtr->GetRowsCount(); row++){
-				const CTextTableItem& sourceItem = sourcePtr->m_items[col][row];
-				CTextTableItem& item = m_items[col][row];
-
-				if (!item.CopyFrom(&item)){
-					return false;
-				}
-			}
-		}
+		m_items = sourcePtr->m_items;
+		m_columnWidths = sourcePtr->m_columnWidths;
 
 		return BaseClass::CopyFrom(object, mode);
 	}
@@ -179,10 +166,9 @@ bool CTextTable::CopyFrom(const IChangeable& object, CompatibilityMode mode = CM
 }
 
 
-istd::IChangeable* CTextTable::CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const
+istd::IChangeable* CTextTable::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CTextTable> clonePtr(new CTextTable());
-
+	istd::TDelPtr<CTextTable> clonePtr(new CTextTable(0, 0));
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}
@@ -199,11 +185,11 @@ void CTextTable::Resize(const int rows, const int columns)
 	Q_ASSERT(columns > 0);
 
 	m_items.resize(columns);
-	m_columnHeaders.resize(columns);
+	m_columnWidths.resize(columns);
 
 	for (int col = 0; col < m_items.size(); col++){
 		m_items[col].resize(rows);
-		m_columnHeaders[col] = s_defaultColumnWidth;
+		m_columnWidths[col] = s_defaultColumnWidth;
 	}
 }
 
@@ -211,6 +197,7 @@ void CTextTable::Resize(const int rows, const int columns)
 void CTextTable::UpdateRect()
 {
 	SetRight(GetLeft() + GetTableWidth());
+
 	SetBottom(GetTop() + GetTableHeight());
 }
 
@@ -221,7 +208,7 @@ double CTextTable::GetTableWidth() const
 }
 
 
-double CTextTable::GetTableWidth() const
+double CTextTable::GetTableHeight() const
 {
 	// calculate table height as sum of all rows heights,
 	// row height is height of the highest cell in a row
@@ -231,12 +218,16 @@ double CTextTable::GetTableWidth() const
 		double cellHeightMax = 0.0;
 
 		for (int row = 0; row < m_items.size(); row++){
-			double cellHeight = m_items[col, row].GetHeight();
-			if (cellHeight > cellHeightMax)
+			double cellHeight = m_items[col][row].GetHeight();
+			if (cellHeight > cellHeightMax){
 				cellHeightMax = cellHeight;
+			}
 		}
 
 		retVal += cellHeightMax;
+	}
+
+	return retVal;
 }
 
 
