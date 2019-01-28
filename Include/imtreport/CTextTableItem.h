@@ -4,21 +4,27 @@
 // Qt includes
 #include <QtCore/QtCore>
 #include <QtGui/QColor>
+#include <QtGui/QIcon>
 
-// ImtCore includes
-#include <imtreport/ITableItem>
+// ACF includes
+#include <iser/ISerializable>
 
 
 namespace imtreport
 {
 
 
-class CTableItem: public virtual ITableItem
+class CTextTableItem: public virtual ISerializable
 {
 public:
-	explicit CTableItem(const QString& text);
+	explicit CTableItem(const QString& text = QString(),
+		Qt::Alignment alignment = Qt::AlignLeft,
+		QString fontName = "Arial",
+		double fontSize = 8.0,
+		const QColor& foregroundColor = Qt::black,
+		const QColor& backgroundColor = Qt::transparent,
+		QIcon& icon = QIcon());
 
-	// reimplemented (ITableItem)
 	QString GetText() const override;
 	void SetText(const QString& text) override;
 
@@ -36,6 +42,11 @@ public:
 
 	QColor GetBackgroundColor() const override;
 	void SetBackgroundColor(const QColor& color) override;
+
+	QIcon GetIcon() const override;
+	void SetIcon(const QIcon& icon) override;
+
+	double GetHeight() const;
 
 	// reimplemented (iser::ISerializable)
 	bool Serialize(iser::IArchive& archive) override;
@@ -88,11 +99,12 @@ private:
 
 private:
 	QString m_text;
-	Qt::Alignment m_alignment = Qt::AlignLeft;
-	double m_fontSize = 8.0;
-	QString m_fontName = "Arial";
-	QColor m_foregroundColor = Qt::black;
-	QColor m_backgroundColor = Qt::transparent;
+	Qt::Alignment m_alignment;
+	double m_fontSize;
+	QString m_fontName;
+	QColor m_foregroundColor;
+	QColor m_backgroundColor;
+	QIcon m_icon;
 };
 
 
