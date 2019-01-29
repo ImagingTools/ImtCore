@@ -4,6 +4,8 @@
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imt3d
@@ -18,6 +20,8 @@ void CDepthBitmap::SetDepthRange(const istd::CRange & depthRange)
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_depthRange = depthRange;
+
+		EnsureMetaInfoCreated();
 	}
 
 	InvalidateCache(istd::IChangeable::GetAnyChange());
@@ -34,13 +38,31 @@ istd::CRange CDepthBitmap::GetDepthRange() const
 
 bool CDepthBitmap::Serialize(iser::IArchive& archive)
 {
+	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? NULL : this);
 	if (!archive.IsStoring()){
 		InvalidateCache(istd::IChangeable::GetAnyChange());
 	}
 
-	m_depthRange = istd::CRange(700, 2000);
+	bool retVal = true;
 
-	bool retVal = BaseClass::Serialize(archive);
+	static iser::CArchiveTag metaInfoTag("MetaInfo", "Meta informations", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(metaInfoTag);
+	retVal = retVal && BaseClass2::Serialize(archive);
+	retVal = retVal && archive.EndTag(metaInfoTag);
+
+	static iser::CArchiveTag depthRangeTag("DepthRange", "Depth range", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(depthRangeTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeRange(archive, m_depthRange);
+	retVal = retVal && archive.EndTag(depthRangeTag);
+
+	static iser::CArchiveTag bitmapDataTag("Bitmap", "Bitmap data", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(bitmapDataTag);
+	retVal = retVal && BaseClass::Serialize(archive);
+	retVal = retVal && archive.EndTag(bitmapDataTag);
+
+	if (!archive.IsStoring()){
+		EnsureMetaInfoCreated();
+	}
 
 	return retVal;
 }
@@ -124,6 +146,15 @@ bool CDepthBitmap::ConvertToQImage(QImage& result) const
 	}
 
 	return true;
+}
+
+
+// private methods
+
+void CDepthBitmap::EnsureMetaInfoCreated()
+{
+	SetMetaInfo(MIT_MIN_DEPTH, m_depthRange.GetMinValue());
+	SetMetaInfo(MIT_MAX_DEPTH, m_depthRange.GetMaxValue());
 }
 
 

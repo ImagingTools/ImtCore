@@ -120,7 +120,7 @@ void CPointCloud3d::MoveCenterTo(const i3d::CVector3d &position)
 }
 
 
-const CCuboid& CPointCloud3d::GetBoundingCuboid() const
+CCuboid CPointCloud3d::GetBoundingCuboid() const
 {
 	if (!m_isCloudCuboidCalculationValid){
 		m_isCloudCuboidCalculationValid = true;

@@ -33,10 +33,10 @@ public:
 	virtual const CMesh3d::MeshNormals& GetNormals() const;
 
 	// reimplemented (imt3d::IObject3d)
-	bool IsEmpty() const;
-	i3d::CVector3d GetCenter() const;
-	void MoveCenterTo(const i3d::CVector3d& position);
-	const CCuboid& GetBoundingCuboid() const;
+	bool IsEmpty() const override;
+	i3d::CVector3d GetCenter() const override;
+	void MoveCenterTo(const i3d::CVector3d& position) override;
+	CCuboid GetBoundingCuboid() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;

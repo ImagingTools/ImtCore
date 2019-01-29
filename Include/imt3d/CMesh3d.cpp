@@ -179,7 +179,7 @@ void CMesh3d::MoveCenterTo(const i3d::CVector3d& position)
 }
 
 
-const CCuboid& CMesh3d::GetBoundingCuboid() const
+CCuboid CMesh3d::GetBoundingCuboid() const
 {
 	EnsureCuboidCalculated();
 

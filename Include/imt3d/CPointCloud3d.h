@@ -43,7 +43,7 @@ public:
 	virtual bool IsEmpty() const override;
 	virtual i3d::CVector3d GetCenter() const override;
 	virtual void MoveCenterTo(const i3d::CVector3d& position) override;
-	virtual const CCuboid& GetBoundingCuboid() const override;
+	virtual CCuboid GetBoundingCuboid() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;

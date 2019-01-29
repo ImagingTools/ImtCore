@@ -38,7 +38,7 @@ public:
 	/**
 		Get bounding cuboid of this object.
 	*/
-	virtual const CCuboid& GetBoundingCuboid() const = 0;
+	virtual CCuboid GetBoundingCuboid() const = 0;
 };
 
 
