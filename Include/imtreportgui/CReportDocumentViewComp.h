@@ -10,6 +10,7 @@
 #include <imtreport/IReportDocument.h>
 #include <imtreport/IGraphicsElement.h>
 #include <imtreport/TGraphicsElement.h>
+#include <imtreport/CTextTable.h>
 #include <GeneratedFiles/imtreportgui/ui_CReportDocumentViewComp.h>
 
 namespace imtreportgui
@@ -54,6 +55,7 @@ private:
 
 	QPointF MapPointToScene(const QPointF& point) const;
 	QRectF MapRectToScene(const QRectF& rect) const;
+	QFont MapFontToScene(const QString& fontName, double fontSize) const;
 
 	void ConvertShapeCoodinates(const i2d::IObject2d* pageElement, QGraphicsItem* sceneElement) const;
 	void ConvertRectCoodinates(const imtreport::CRectangleElement* pageElement, QGraphicsItem* sceneElement) const;
@@ -62,6 +64,7 @@ private:
 	void ConvertLineCoodinates(const imtreport::CLineElement* pageElement, QGraphicsItem* sceneElement) const;
 	void ConvertPolygoneCoodinates(const imtreport::CPolygonElement* pageElement, QGraphicsItem* sceneElement) const;
 	void ConvertImageCoodinates(const imtreport::CImageRectangleElement* pageElement, QGraphicsItem* sceneElement) const;
+	void ConvertTableCoodinates(const imtreport::CTextTable* pageElement, QGraphicsItem* sceneElement) const;
 
 private:
 	// commands

@@ -7,6 +7,8 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QTableWidget>
 #include <QtGui/QScreen>
 
 // ImtCore includes
@@ -246,6 +248,13 @@ QRectF CReportDocumentViewComp::MapRectToScene(const QRectF& rect) const
 }
 
 
+QFont CReportDocumentViewComp::MapFontToScene(const QString& fontName, double fontSize) const
+{
+	double sceneFontSize = MapPointToScene(QPointF(fontSize, 0.0)).x();
+	return QFont(fontName, sceneFontSize);
+}
+
+
 void CReportDocumentViewComp::ConvertShapeCoodinates(const i2d::IObject2d* pageElementPtr, QGraphicsItem* sceneElementPtr) const
 {
 	if ((pageElementPtr == nullptr) || (sceneElementPtr == nullptr)){
@@ -280,6 +289,11 @@ void CReportDocumentViewComp::ConvertShapeCoodinates(const i2d::IObject2d* pageE
 	const imtreport::CImageRectangleElement* imageElement = dynamic_cast<const imtreport::CImageRectangleElement*>(pageElementPtr);
 	if (imageElement){
 		return ConvertImageCoodinates(imageElement, sceneElementPtr);
+	}
+
+	const imtreport::CTextTable* tableElementPtr = dynamic_cast<const imtreport::CTextTable*>(pageElementPtr);
+	if (tableElementPtr){
+		return ConvertTableCoodinates(tableElementPtr, sceneElementPtr);
 	}
 }
 
@@ -318,9 +332,7 @@ void CReportDocumentViewComp::ConvertLabelCoodinates(const imtreport::CTextLabel
 	if (rect.width() > 0.0)
 		labelSceneElement->setTextWidth(rect.width());
 
-	double fontSize = MapPointToScene(QPointF(pageElement->GetFontSize(), 0)).x();
-	QFont font(pageElement->GetFontName(), fontSize);
-	labelSceneElement->setFont(font);
+	labelSceneElement->setFont(MapFontToScene(pageElement->GetFontName(), pageElement->GetFontSize()));
 }
 
 
@@ -370,6 +382,38 @@ void CReportDocumentViewComp::ConvertImageCoodinates(const imtreport::CImageRect
 	}
 	else{
 		imageSceneElement->setScale(1.0);
+	}
+}
+
+
+void CReportDocumentViewComp::ConvertTableCoodinates(const imtreport::CTextTable* pageElement, QGraphicsItem* sceneElement) const
+{
+	QGraphicsProxyWidget* tableSceneElement = dynamic_cast<QGraphicsProxyWidget*>(sceneElement);
+	Q_ASSERT(tableSceneElement);
+	Q_ASSERT(pageElement);
+
+	QTableWidget* tableWidget = dynamic_cast<QTableWidget*>(tableSceneElement->widget());
+	Q_ASSERT(tableWidget);
+
+	// set top left
+	QPointF topLeft = MapPointToScene(pageElement->GetLeftTop());
+	tableSceneElement->setPos(topLeft);
+
+	// set items
+	for (int col = 0; col < pageElement->GetColumnCount(); col++){
+		for (int row = 0; row < pageElement->GetRowCount(); row++){
+			const imtreport::CTextTableItem& tableItem = pageElement->GetItem(row, col);
+
+			QTableWidgetItem* tableWidgetItem = new QTableWidgetItem();
+			tableWidgetItem->setText(tableItem.GetText());
+			tableWidgetItem->setTextAlignment(tableItem.GetAlignment());
+			tableWidgetItem->setFont(MapFontToScene(tableItem.GetFontName(), tableItem.GetFontSize()));
+			tableWidgetItem->setForeground(QBrush(tableItem.GetForegroundColor()));
+			tableWidgetItem->setBackground(QBrush(tableItem.GetBackgroundColor()));
+			tableWidgetItem->setIcon(tableItem.GetIcon());
+
+			tableWidget->setItem(row, col, tableWidgetItem);
+		}
 	}
 }
 
