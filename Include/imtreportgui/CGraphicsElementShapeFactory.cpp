@@ -15,6 +15,8 @@
 #else
 #include <QtGui/QGraphicsRectItem>
 #endif
+#include <QtWidgets/QTableWidget>
+#include <QtWidgets/QGraphicsProxyWidget>
 
 // ImtCore includes
 #include <imtreport/TGraphicsElement.h>
@@ -72,6 +74,11 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const i2d::IObject2d& o
 
 		itemPtr = new QGraphicsPixmapItem(QPixmap(imgPath));
 	}
+	
+	const imtreport::CTextTable* tablePtr = dynamic_cast<const imtreport::CTextTable*>(&object2d);
+	if (tablePtr != NULL){
+		itemPtr = CreateTextTable(*tablePtr);
+	}
 
 	QAbstractGraphicsShapeItem* abstractGraphicsShapeItemPtr = dynamic_cast<QAbstractGraphicsShapeItem*>(itemPtr);
 	const imtreport::IGraphicsElement* graphicsElementPtr = dynamic_cast<const imtreport::IGraphicsElement*>(&object2d);
@@ -91,6 +98,17 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const i2d::IObject2d& o
 	}
 
 	return itemPtr;
+}
+
+
+QGraphicsItem* CGraphicsElementShapeFactory::CreateTextTable(const imtreport::CTextTable& table) const
+{
+	QTableWidget* tableWidget = new QTableWidget(table.GetRowCount(), table.GetColumnCount());
+
+	QGraphicsProxyWidget* sceneTableWidget = new QGraphicsProxyWidget();
+	sceneTableWidget->setWidget(tableWidget);
+
+	return sceneTableWidget;
 }
 
 

@@ -27,6 +27,8 @@ public:
 	int GetColumnCount() const;
 
 	void SetColumnHeaderLabels(const QStringList& labels);
+
+	const QVector<double>& GetColumnHeaderWidths() const;
 	void SetColumnHeaderWidths(const QVector<double>& widths);
 
 	const CTextTableItem& GetItem(int row, int column) const;

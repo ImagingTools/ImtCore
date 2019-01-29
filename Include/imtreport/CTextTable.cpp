@@ -30,6 +30,8 @@ CTextTable::CTextTable()
 
 void CTextTable::Initialize(int rowCount, int columnCount)
 {
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+	
 	Resize(rowCount, columnCount);
 
 	UpdateRect();
@@ -38,6 +40,8 @@ void CTextTable::Initialize(int rowCount, int columnCount)
 
 void CTextTable::SetTopLeft(const i2d::CVector2d& topLeft)
 {
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
 	BaseClass::SetTopLeft(topLeft);
 }
 
@@ -58,6 +62,8 @@ void CTextTable::SetColumnHeaderLabels(const QStringList& labels)
 {
 	Q_ASSERT(GetRowCount() > 0);
 
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
 	for (int col = 0; col < m_items.size(); col++){
 		m_items[col][0].SetText(labels[col]);
 		m_items[col][0].SetAlignment(Qt::AlignCenter);
@@ -65,9 +71,18 @@ void CTextTable::SetColumnHeaderLabels(const QStringList& labels)
 }
 
 
+const QVector<double>& CTextTable::GetColumnHeaderWidths() const
+{
+	return m_columnWidths;
+}
+
+
 void CTextTable::SetColumnHeaderWidths(const QVector<double>& widths)
 {
 	Q_ASSERT(widths.size() == m_items.size());
+
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
 	m_columnWidths = widths;
 
 	UpdateRect();
@@ -87,6 +102,8 @@ void CTextTable::SetItem(int row, int column, const CTextTableItem& item)
 {
 	Q_ASSERT(column > 0 && column < m_items.size());
 	Q_ASSERT(row > 0 && row < m_items[column].size());
+
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
 
 	m_items[column][row] = item;
 	
