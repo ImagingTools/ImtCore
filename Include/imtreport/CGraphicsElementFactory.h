@@ -3,9 +3,8 @@
 
 // ACF includes
 #include <iser/IObject.h>
+#include <i2d/IObject2d.h>
 
-// ImtCore includes
-#include <imtreport/IGraphicsElement.h>
 
 namespace imtreport
 {
@@ -14,11 +13,11 @@ namespace imtreport
 /**
 	 factory for 2D-objects.
 */
-class CGraphicsElementFactory: virtual public istd::TIFactory<IGraphicsElement>
+class CGraphicsElementFactory: virtual public istd::TIFactory<i2d::IObject2d>
 {
 public:
 	// reimplemented (istd::TIFactory)
-	IGraphicsElement* CreateInstance(const QByteArray& keyId = "") const override;
+   i2d::IObject2d* CreateInstance(const QByteArray& keyId = "") const override;
 
 	// reimplemented (istd::IFactoryInfo)
 	KeyList GetFactoryKeys() const override;

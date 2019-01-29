@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtreport/IGraphicsElement.h>
+#include <i2d/IObject2d.h>
 
 
 class QGraphicsItem;
@@ -21,7 +21,7 @@ public:
 	/**
 		Create shape item for a graphics element.
 	*/
-	virtual QGraphicsItem* CreateShape(const imtreport::IGraphicsElement& graphicsElement) const = 0;
+	virtual QGraphicsItem* CreateShape(const i2d::IObject2d& object2d) const = 0;
 };
 
 

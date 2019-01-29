@@ -23,7 +23,12 @@ const double CTextTable::s_defaultColumnWidth = 30.0;
 
 // public methods
 
-CTextTable::CTextTable(int rowCount, int columnCount)
+CTextTable::CTextTable()
+{
+}
+
+
+void CTextTable::Initialize(int rowCount, int columnCount)
 {
 	Resize(rowCount, columnCount);
 
@@ -168,7 +173,7 @@ bool CTextTable::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 
 istd::IChangeable* CTextTable::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CTextTable> clonePtr(new CTextTable(0, 0));
+	istd::TDelPtr<CTextTable> clonePtr(new CTextTable());
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}

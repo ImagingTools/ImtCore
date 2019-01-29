@@ -3,21 +3,19 @@
 
 // Qt includes
 #include <QtCore/QtCore>
+#include <QtGui/QColor>
 
 // ACF includes
 #include <iser/ISerializable.h>
 #include <i2d/CVector2d.h>
 #include <i2d/CLine2d.h>
 
-// ImtCore includes
-#include <imtreport/IGraphicsElement.h>
-
 
 namespace imtreport
 {
 
 
-class IGraphicsElement;
+class IObject2d;
 
 
 /**
@@ -37,7 +35,7 @@ public:
 	/**
 		Get a page element with a given ID.
 	*/
-	virtual IGraphicsElement* GetPageElement(const QByteArray& elementId) const = 0;
+	virtual i2d::IObject2d* GetPageElement(const QByteArray& elementId) const = 0;
 
 	/**
 		Add a text label to the report page.
@@ -67,6 +65,11 @@ public:
 		Add a polygone to the report page.
 	*/
 	virtual QByteArray AddPolygone(const QVector<i2d::CVector2d>& points, const QColor& fillColor = Qt::transparent) = 0;
+
+	/**
+		Add a text table to the report page.
+	*/
+	virtual QByteArray AddTextTable(int rowCount, int columnCount, const i2d::CVector2d& topLeft) = 0;
 
 	/**
 		Remove a page element.

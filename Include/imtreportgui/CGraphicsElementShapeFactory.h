@@ -13,7 +13,7 @@ class CGraphicsElementShapeFactory: virtual public IGraphicsElementShapeFactory
 {
 public:
 	// reimplemented (IGraphicsElementShapeFactory)
-	virtual QGraphicsItem* CreateShape(const imtreport::IGraphicsElement& graphicsElement) const;
+	virtual QGraphicsItem* CreateShape(const i2d::IObject2d& object2d) const;
 };
 
 

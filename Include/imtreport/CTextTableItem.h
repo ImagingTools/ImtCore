@@ -9,6 +9,7 @@
 
 // ACF includes
 #include <iser/ISerializable.h>
+#include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 
 
@@ -23,7 +24,7 @@ public:
 				const QString& text = QString(),
 				Qt::Alignment alignment = Qt::AlignLeft,
 				QString fontName = "Arial",
-				double fontSize = 8.0,
+				double fontSize = 3.0,
 				const QColor& foregroundColor = Qt::black,
 				const QColor& backgroundColor = Qt::transparent,
 				const QIcon& icon = QIcon());

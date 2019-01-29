@@ -1,15 +1,18 @@
 #include <imtreport/CGraphicsElementFactory.h>
 
+
 // ImtCore includes
 #include <imtreport/TGraphicsElement.h>
+#include <imtreport/CTextTable.h>
+
 
 namespace imtreport
 {
 
 
-// reimplemented (istd::TIFactory<iser::IObject>)
+// reimplemented (istd::TIFactory<iser::IObject2d>)
 
-IGraphicsElement* CGraphicsElementFactory::CreateInstance(const QByteArray& keyId) const
+i2d::IObject2d* CGraphicsElementFactory::CreateInstance(const QByteArray& keyId) const
 {
 	if (keyId == CRectangleElement::GetTypeName())
 		return new CRectangleElement();
@@ -23,6 +26,8 @@ IGraphicsElement* CGraphicsElementFactory::CreateInstance(const QByteArray& keyI
 		return new CLineElement();
 	else if (keyId == CImageRectangleElement::GetTypeName())
 		return new CImageRectangleElement();
+	else if (keyId == CTextTable::GetTypeName())
+		return new CTextTable();
 	else
 		return NULL;
 }

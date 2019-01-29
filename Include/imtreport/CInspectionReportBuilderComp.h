@@ -42,20 +42,10 @@ private:
 
 	void AddHeader(const ReportInputData& reportData,
 				   const Inspection* inspectionPtr,
-				   const double cellWidth,
-				   const QFont& font,
 				   i2d::CVector2d& topLeft,
 				   IReportPage& page) const;
 	void AddBody(const QString& imagePath, i2d::CVector2d& topLeft, IReportPage& page) const;
-	void AddFooter(const Results& regions,
-				   const double cellWidth,
-				   const QFont& font,
-				   i2d::CVector2d& topLeft,
-				   IReportPage& page) const;
-
-	typedef QPair<QString, QColor> TableCell;
-	typedef QVector<QVector<TableCell>> Table;
-	void AddTable(const Table& values, const double colWidth, const QFont& font, i2d::CVector2d& topLeft, IReportPage& page) const;
+	void AddFooter(const Results& regions, i2d::CVector2d& topLeft, IReportPage& page) const;
 };
 
 

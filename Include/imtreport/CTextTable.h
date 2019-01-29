@@ -12,12 +12,14 @@ namespace imtreport
 {
 
 
-class CTextTable: protected i2d::CRectangle
+class CTextTable: public i2d::CRectangle
 {
 public:
 	typedef i2d::CRectangle BaseClass;
 
-	CTextTable(int rowCount, int columnCount); // including header
+	CTextTable();
+
+	void Initialize(int rowCount, int columnCount); // including header
 
 	void SetTopLeft(const i2d::CVector2d& topLeft);
 
@@ -29,6 +31,8 @@ public:
 
 	const CTextTableItem& GetItem(int row, int column) const;
 	void SetItem(int row, int column, const CTextTableItem& item);
+
+	static QByteArray GetTypeName() { return "TextTable"; }
 
 	// reimplemented (iser::ISerializable)
 	bool Serialize(iser::IArchive& archive) override;

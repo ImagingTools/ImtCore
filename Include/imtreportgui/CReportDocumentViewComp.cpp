@@ -202,7 +202,7 @@ void CReportDocumentViewComp::UpdateSceneShapes(const imtreport::IReportPage& pa
 
 	imtreport::IReportPage::ElementIds ids = page.GetPageElements();
 	for (const QByteArray& elementId : ids){
-		const imtreport::IGraphicsElement* elementPtr = page.GetPageElement(elementId);
+		const i2d::IObject2d* elementPtr = page.GetPageElement(elementId);
 		Q_ASSERT(elementPtr != nullptr);
 
 		QGraphicsItem* itemPtr = shapeFactory.CreateShape(*elementPtr);
@@ -246,7 +246,7 @@ QRectF CReportDocumentViewComp::MapRectToScene(const QRectF& rect) const
 }
 
 
-void CReportDocumentViewComp::ConvertShapeCoodinates(const imtreport::IGraphicsElement* pageElementPtr, QGraphicsItem* sceneElementPtr) const
+void CReportDocumentViewComp::ConvertShapeCoodinates(const i2d::IObject2d* pageElementPtr, QGraphicsItem* sceneElementPtr) const
 {
 	if ((pageElementPtr == nullptr) || (sceneElementPtr == nullptr)){
 		return;

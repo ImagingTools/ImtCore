@@ -26,27 +26,26 @@ namespace imtreportgui
 
 // public methods
 
-QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraphicsElement& graphicsElement) const
+QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const i2d::IObject2d& object2d) const
 {
-	double strokeWidth = graphicsElement.GetStrokeWidth();
 	QGraphicsItem* itemPtr = NULL;
 
-	const imtreport::CRectangleElement* rectangleElementPtr = dynamic_cast<const imtreport::CRectangleElement*> (&graphicsElement);
+	const imtreport::CRectangleElement* rectangleElementPtr = dynamic_cast<const imtreport::CRectangleElement*>(&object2d);
 	if (rectangleElementPtr != NULL){
 		itemPtr = new QGraphicsRectItem();
 	}
 
-	const imtreport::CLineElement* lineElementPtr = dynamic_cast<const imtreport::CLineElement*>(&graphicsElement);
+	const imtreport::CLineElement* lineElementPtr = dynamic_cast<const imtreport::CLineElement*>(&object2d);
 	if (lineElementPtr != NULL) {
 		itemPtr = new QGraphicsLineItem();
 	}
 
-	const imtreport::CCircleElement* circleElementPtr = dynamic_cast<const imtreport::CCircleElement*>(&graphicsElement);
+	const imtreport::CCircleElement* circleElementPtr = dynamic_cast<const imtreport::CCircleElement*>(&object2d);
 	if (circleElementPtr != NULL){
 		itemPtr = new QGraphicsEllipseItem();
 	}
 
-	const imtreport::CTextLabelElement* labelElementPtr = dynamic_cast<const imtreport::CTextLabelElement*>(&graphicsElement);
+	const imtreport::CTextLabelElement* labelElementPtr = dynamic_cast<const imtreport::CTextLabelElement*>(&object2d);
 	if (labelElementPtr != NULL){
 		QGraphicsTextItem* textItemPtr = new QGraphicsTextItem(labelElementPtr->GetText());
 		textItemPtr->setDefaultTextColor(labelElementPtr->GetFillColor());
@@ -58,12 +57,12 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraph
 		itemPtr = textItemPtr;
 	}
 
-	const imtreport::CPolygonElement* polygonElementPtr = dynamic_cast<const imtreport::CPolygonElement*> (&graphicsElement);
+	const imtreport::CPolygonElement* polygonElementPtr = dynamic_cast<const imtreport::CPolygonElement*>(&object2d);
 	if (polygonElementPtr != NULL){
 		itemPtr = new QGraphicsPolygonItem();
 	}
 
-	const imtreport::CImageRectangleElement* imageRectangleElementPtr = dynamic_cast<const imtreport::CImageRectangleElement*> (&graphicsElement);
+	const imtreport::CImageRectangleElement* imageRectangleElementPtr = dynamic_cast<const imtreport::CImageRectangleElement*>(&object2d);
 	if (imageRectangleElementPtr != NULL){
 		QString imgPath = imageRectangleElementPtr->GetImagePath();
 
@@ -71,15 +70,16 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraph
 			qDebug(QString("CGraphicsElementShapeFactory: Image %1 can not be found!").arg(imgPath).toLocal8Bit().constData());
 		}
 
-		//pixmap = pixmap.scaled(rect.width(), rect.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 		itemPtr = new QGraphicsPixmapItem(QPixmap(imgPath));
 	}
 
 	QAbstractGraphicsShapeItem* abstractGraphicsShapeItemPtr = dynamic_cast<QAbstractGraphicsShapeItem*>(itemPtr);
-	if (abstractGraphicsShapeItemPtr != NULL){
-		QPen pen(graphicsElement.GetStrokeColor());
+	const imtreport::IGraphicsElement* graphicsElementPtr = dynamic_cast<const imtreport::IGraphicsElement*>(&object2d);
+	if (abstractGraphicsShapeItemPtr != NULL && graphicsElementPtr != NULL){
+		QPen pen(graphicsElementPtr->GetStrokeColor());
 
-		if (strokeWidth >= 0) {
+		double strokeWidth = graphicsElementPtr->GetStrokeWidth();
+		if (strokeWidth >= 0){
 			pen.setWidthF(strokeWidth);
 		}
 		else{
@@ -87,7 +87,7 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const imtreport::IGraph
 		}
 
 		abstractGraphicsShapeItemPtr->setPen(pen);
-		abstractGraphicsShapeItemPtr->setBrush(graphicsElement.GetFillColor());
+		abstractGraphicsShapeItemPtr->setBrush(graphicsElementPtr->GetFillColor());
 	}
 
 	return itemPtr;

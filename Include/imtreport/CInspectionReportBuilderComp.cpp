@@ -9,6 +9,7 @@
 
 // ImtCore includes
 #include <imtreport/TGraphicsElement.h>
+#include <imtreport/CTextTable.h>
 #include <imtreport/IReportDocument.h>
 
 
@@ -120,9 +121,9 @@ bool CInspectionReportBuilderComp::CreateTitlePage(const ReportInputData& report
 
 	i2d::CVector2d topLeft(15.0, 10.0);
 
-	AddHeader(reportData, NULL, 60.0, QFont("Arial", 3), topLeft, *pagePtr);
+	AddHeader(reportData, NULL, topLeft, *pagePtr);
 	AddBody(reportData.imagePath, topLeft, *pagePtr);
-	AddFooter(results, 30.0, QFont("Arial", 3), topLeft, *pagePtr);
+	AddFooter(results, topLeft, *pagePtr);
 
 	return true;
 }
@@ -140,9 +141,9 @@ bool CInspectionReportBuilderComp::CreateInspectionPage(const ReportInputData& r
 
 	i2d::CVector2d topLeft(15.0, 10.0);
 
-	AddHeader(reportData, &inspection, 60.0, QFont("Arial", 3), topLeft, *pagePtr);
+	AddHeader(reportData, &inspection, topLeft, *pagePtr);
 	AddBody(inspection.imagePath, topLeft, *pagePtr);
-	AddFooter(results, 30.0, QFont("Arial", 3), topLeft, *pagePtr);
+	AddFooter(results, topLeft, *pagePtr);
 
 	return true;
 }
@@ -176,29 +177,22 @@ void CInspectionReportBuilderComp::GetInspectionPageRegionResults(const Inspecti
 
 void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 											 const Inspection* inspectionPtr,
-											 const double cellWidth,
-											 const QFont& font,
 											 i2d::CVector2d& topLeft,
 											 IReportPage& page) const
 {
 	QString productName = inspectionPtr ? inspectionPtr->name : reportData.productName;
 	istd::IInformationProvider::InformationCategory status = inspectionPtr ? inspectionPtr->status : reportData.partStatus;
 
-	Table table(2);
-	table[0] =
-	{
-		{ reportData.companyName, Qt::black },
-		{ reportData.appVersion, Qt::black },
-		{ inspectionPtr->name, Qt::black }
-	};
-	table[1] =
-	{
-		{ reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate), Qt::black },
-		{ reportData.partSerialNumber, Qt::black },
-		{ GetStatusText(status), GetStatusColor(status) }
-	};
+	QByteArray uuid = page.AddTextTable(2, 3, topLeft);
 
-	AddTable(table, cellWidth, font, topLeft, page);
+	CTextTable* tablePtr = dynamic_cast<CTextTable*>(page.GetPageElement(uuid));
+	Q_ASSERT(tablePtr);
+
+	tablePtr->SetColumnHeaderLabels({ reportData.companyName, reportData.appVersion, inspectionPtr->name });
+	tablePtr->SetColumnHeaderWidths({ 60.0, 60.0, 60.0 });
+	tablePtr->SetItem(1, 0, { reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate) });
+	tablePtr->SetItem(1, 1, { reportData.partSerialNumber  });
+	tablePtr->SetItem(1, 2, { GetStatusText(status), Qt::AlignLeft, "Arial", 3.0, GetStatusColor(status) });
 }
 
 
@@ -213,64 +207,31 @@ void CInspectionReportBuilderComp::AddBody(const QString& imagePath, i2d::CVecto
 }
 
 
-void CInspectionReportBuilderComp::AddFooter(const Results& results,
-											 const double cellWidth,
-											 const QFont& font,
-											 i2d::CVector2d& topLeft,
-											 IReportPage& page) const
+void CInspectionReportBuilderComp::AddFooter(const Results& results, i2d::CVector2d& topLeft, IReportPage& page) const
 {
-	if (results.isEmpty())
+	if (results.isEmpty()){
 		return;
+	}
 
 	topLeft.SetY(topLeft.GetY() + 15.0);
 
-	Table table;
-	table.push_back(
-	{
-		{ "Region",			Qt::black },
-		{ "Error",			Qt::black },
-		{ "Length",			Qt::black },
-		{ "Value mm",		Qt::black },
-		{ "Tolerance mm",	Qt::black },
-		{ "Diff",			Qt::black }
-	});
+	QByteArray uuid = page.AddTextTable(results.size() + 1, 6, topLeft);
 
-	for (const InspectionRegionResult& result : results){
-		table.push_back(
-		{
-			{ result.regionName,                         Qt::black },
-			{ GetErrorClassText(result.errorClass),      Qt::black },
-			{ QString::number(result.length, 'f', 2),    Qt::black },
-			{ QString::number(result.value, 'f', 2),     Qt::black },
-			{ QString::number(result.tolerance, 'f', 2), Qt::black },
-			{ QString::number(result.diff, 'f', 2),      Qt::black }
-		});
+	CTextTable* tablePtr = dynamic_cast<CTextTable*>(page.GetPageElement(uuid));
+	Q_ASSERT(tablePtr);
+
+	tablePtr->SetColumnHeaderLabels({ "Region", "Error", "Length", "Value mm", "Tolerance mm", "Diff" });
+	tablePtr->SetColumnHeaderWidths({ 30.0, 30.0, 30.0, 30.0, 30.0, 30.0 });
+
+	for (int i = 0; i < results.size(); i++){
+		const InspectionRegionResult& result = results[i];
+		tablePtr->SetItem(i + 1, 0, { result.regionName                         });
+		tablePtr->SetItem(i + 1, 1, { GetErrorClassText(result.errorClass)      });
+		tablePtr->SetItem(i + 1, 2, { QString::number(result.length, 'f', 2)    });
+		tablePtr->SetItem(i + 1, 3, { QString::number(result.value, 'f', 2)     });
+		tablePtr->SetItem(i + 1, 4, { QString::number(result.tolerance, 'f', 2) });
+		tablePtr->SetItem(i + 1, 5, { QString::number(result.diff, 'f', 2)      });
 	}
-
-	AddTable(table, cellWidth, font, topLeft, page);
-}
-
-
-void CInspectionReportBuilderComp::AddTable(const Table& table, const double colWidth, const QFont& font, i2d::CVector2d& topLeft, IReportPage& page) const
-{
-	int cellHeight = QFontMetrics(font).height() + 2;
-
-	for (int row = 0; row < table.size(); row++){
-		for (int col = 0; col < table[row].size(); col++){
-			i2d::CVector2d cellTopLeft(topLeft.GetX() + col * colWidth, topLeft.GetY() + row * cellHeight);
-			QByteArray uuid = page.AddText(table[row][col].first, cellTopLeft);
-
-			CTextLabelElement* textLabelPtr = dynamic_cast<CTextLabelElement*>(page.GetPageElement(uuid));
-			Q_ASSERT(textLabelPtr);
-			textLabelPtr->SetFontName(font.family());
-			textLabelPtr->SetFontSize(font.pointSize());
-			textLabelPtr->SetFillColor(table[row][col].second);
-
-			page.AddRectangle(i2d::CRectangle(cellTopLeft.GetX(), cellTopLeft.GetY(), colWidth, cellHeight));
-		}
-	}
-
-	topLeft.SetY(topLeft.GetY() + table.size() * cellHeight);
 }
 
 

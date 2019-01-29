@@ -12,6 +12,7 @@
 
 // ImtCore includes
 #include <imtreport/TGraphicsElement.h>
+#include <imtreport/CTextTable.h>
 
 
 namespace imtreport
@@ -34,7 +35,7 @@ IReportPage::ElementIds CReportPage::GetPageElements() const
 }
 
 
-IGraphicsElement* CReportPage::GetPageElement(const QByteArray& elementId) const
+i2d::IObject2d* CReportPage::GetPageElement(const QByteArray& elementId) const
 {
 	ElementsIndiciesMap::ConstIterator i = m_elementsIndicies.find(elementId);
 	if (i != m_elementsIndicies.cend()){
@@ -49,7 +50,7 @@ QByteArray CReportPage::AddText(const QString& text, const i2d::CVector2d& posit
 {
 	QByteArray uuid;
 
-	CTextLabelElement* element = AddGraphicsElement<CTextLabelElement>(uuid);
+	CTextLabelElement* element = AddObject<CTextLabelElement>(uuid);
 	Q_ASSERT(element);
 
 	element->SetFontSize(5);
@@ -67,7 +68,7 @@ QByteArray CReportPage::AddImage(const QString& imagePath, const i2d::CRectangle
 {
 	QByteArray uuid;
 
-	CImageRectangleElement* element = AddGraphicsElement<CImageRectangleElement>(uuid);
+	CImageRectangleElement* element = AddObject<CImageRectangleElement>(uuid);
 	Q_ASSERT(element);
 
 	element->SetImagePath(imagePath);
@@ -84,7 +85,7 @@ QByteArray CReportPage::AddLine(const i2d::CLine2d& line)
 {
 	QByteArray uuid;
 
-	CLineElement* element = AddGraphicsElement<CLineElement>(uuid);
+	CLineElement* element = AddObject<CLineElement>(uuid);
 	Q_ASSERT(element);
 
 	element->SetPoint1(line.GetPoint1());
@@ -97,7 +98,7 @@ QByteArray CReportPage::AddRectangle(const i2d::CRectangle& rect, const QColor& 
 {
 	QByteArray uuid;
 
-	CRectangleElement* element = AddGraphicsElement<CRectangleElement>(uuid);
+	CRectangleElement* element = AddObject<CRectangleElement>(uuid);
 	Q_ASSERT(element);
 
 	element->SetLeft(rect.GetLeft());
@@ -114,7 +115,7 @@ QByteArray CReportPage::AddPolygone(const QVector<i2d::CVector2d>& points, const
 {
 	QByteArray uuid;
 
-	CPolygonElement* element = AddGraphicsElement<CPolygonElement>(uuid);
+	CPolygonElement* element = AddObject<CPolygonElement>(uuid);
 	Q_ASSERT(element);
 
 	for (const i2d::CVector2d& point : points){
@@ -125,6 +126,21 @@ QByteArray CReportPage::AddPolygone(const QVector<i2d::CVector2d>& points, const
 
 	return uuid;
 }
+
+
+QByteArray CReportPage::AddTextTable(int rowCount, int columnCount, const i2d::CVector2d& topLeft)
+{
+	QByteArray uuid;
+
+	CTextTable* element = AddObject<CTextTable>(uuid);
+	Q_ASSERT(element);
+
+	element->Initialize(rowCount, columnCount);
+	element->SetTopLeft(topLeft);
+
+	return uuid;
+}
+
 
 bool CReportPage::RemovePageElement(const QByteArray& elementId)
 {
@@ -157,7 +173,7 @@ bool CReportPage::SerializeItem(ItemClass& item, iser::IArchive& archive, iser::
 {
 	bool retVal = true;
 
-	IGraphicsElement* elementPtr = item.first.GetPtr();
+   i2d::IObject2d* elementPtr = item.first.GetPtr();
 	Q_ASSERT(elementPtr != nullptr);
 
 	QByteArray uuid;
@@ -194,12 +210,12 @@ bool CReportPage::SerializeItem(ItemClass& item, iser::IArchive& archive, iser::
 
 // private methods
 
-int CReportPage::FindItemIndex(const IGraphicsElement& element) const
+int CReportPage::FindItemIndex(const i2d::IObject2d& element) const
 {
 	for (ElementsIndiciesMap::ConstIterator iter = m_elementsIndicies.constBegin(); iter != m_elementsIndicies.constEnd(); ++iter){
 		int index = iter.value();
 
-		const IGraphicsElement* elementPtr = GetAt(index).first.GetPtr();
+		const i2d::IObject2d* elementPtr = GetAt(index).first.GetPtr();
 		if (elementPtr == &element){
 			return index;
 		}
@@ -209,13 +225,13 @@ int CReportPage::FindItemIndex(const IGraphicsElement& element) const
 }
 
 
-template <typename TGraphicsElement> TGraphicsElement* CReportPage::AddGraphicsElement(QByteArray& uuid)
+template <typename TObject> TObject* CReportPage::AddObject(QByteArray& uuid)
 {
 	uuid.clear();
 
 	istd::CChangeNotifier changeNotifier(this);
 
-	TGraphicsElement* element = dynamic_cast<TGraphicsElement*>(BaseClass::AddElement(TGraphicsElement::GetTypeName()));
+	TObject* element = dynamic_cast<TObject*>(BaseClass::AddElement(TObject::GetTypeName()));
 	if (!element) {
 		return nullptr;
 	}
