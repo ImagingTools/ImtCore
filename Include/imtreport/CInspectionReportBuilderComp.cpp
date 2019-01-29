@@ -186,9 +186,16 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 	QByteArray uuid = page.AddTextTable(2, 3, topLeft);
 
 	CTextTable* tablePtr = dynamic_cast<CTextTable*>(page.GetPageElement(uuid));
-	Q_ASSERT(tablePtr);
+	Q_ASSERT(tablePtr != NULL);
 
-	tablePtr->SetColumnHeaderLabels({ reportData.companyName, reportData.appVersion, inspectionPtr->name });
+	QString inspectionName;
+	if (inspectionPtr != NULL){
+		inspectionName = inspectionPtr->name;
+	}
+
+	tablePtr->SetTopLeft(topLeft);
+
+	tablePtr->SetColumnHeaderLabels({ reportData.companyName, reportData.appVersion, inspectionName});
 	tablePtr->SetColumnHeaderWidths({ 60.0, 60.0, 60.0 });
 	tablePtr->SetItem(1, 0, { reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate) });
 	tablePtr->SetItem(1, 1, { reportData.partSerialNumber  });
@@ -225,12 +232,12 @@ void CInspectionReportBuilderComp::AddFooter(const Results& results, i2d::CVecto
 
 	for (int i = 0; i < results.size(); i++){
 		const InspectionRegionResult& result = results[i];
-		tablePtr->SetItem(i + 1, 0, { result.regionName                         });
-		tablePtr->SetItem(i + 1, 1, { GetErrorClassText(result.errorClass)      });
-		tablePtr->SetItem(i + 1, 2, { QString::number(result.length, 'f', 2)    });
-		tablePtr->SetItem(i + 1, 3, { QString::number(result.value, 'f', 2)     });
-		tablePtr->SetItem(i + 1, 4, { QString::number(result.tolerance, 'f', 2) });
-		tablePtr->SetItem(i + 1, 5, { QString::number(result.diff, 'f', 2)      });
+		tablePtr->SetItem(i + 1, 0, {result.regionName});
+		tablePtr->SetItem(i + 1, 1, {GetErrorClassText(result.errorClass)});
+		tablePtr->SetItem(i + 1, 2, {QString::number(result.length, 'f', 2)});
+		tablePtr->SetItem(i + 1, 3, {QString::number(result.value, 'f', 2)});
+		tablePtr->SetItem(i + 1, 4, {QString::number(result.tolerance, 'f', 2)});
+		tablePtr->SetItem(i + 1, 5, {QString::number(result.diff, 'f', 2)});
 	}
 }
 

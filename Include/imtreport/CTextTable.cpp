@@ -91,8 +91,8 @@ void CTextTable::SetColumnHeaderWidths(const QVector<double>& widths)
 
 const CTextTableItem& CTextTable::GetItem(int row, int column) const
 {
-	Q_ASSERT(column > 0 && column < m_items.size());
-	Q_ASSERT(row > 0 && row < m_items[column].size());
+	Q_ASSERT(column >= 0 && column < m_items.size());
+	Q_ASSERT(row >= 0 && row < m_items[column].size());
 
 	return m_items[column][row];
 }
@@ -100,8 +100,8 @@ const CTextTableItem& CTextTable::GetItem(int row, int column) const
 
 void CTextTable::SetItem(int row, int column, const CTextTableItem& item)
 {
-	Q_ASSERT(column > 0 && column < m_items.size());
-	Q_ASSERT(row > 0 && row < m_items[column].size());
+	Q_ASSERT(column >= 0 && column < m_items.size());
+	Q_ASSERT(row >= 0 && row < m_items[column].size());
 
 	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
 
@@ -239,7 +239,7 @@ double CTextTable::GetTableHeight() const
 	for (int col = 0; col < m_items.size(); col++){
 		double cellHeightMax = 0.0;
 
-		for (int row = 0; row < m_items.size(); row++){
+		for (int row = 0; row < m_items[col].size(); row++){
 			double cellHeight = m_items[col][row].GetHeight();
 			if (cellHeight > cellHeightMax){
 				cellHeightMax = cellHeight;
