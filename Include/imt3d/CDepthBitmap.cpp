@@ -38,6 +38,14 @@ istd::CRange CDepthBitmap::GetDepthRange() const
 
 bool CDepthBitmap::Serialize(iser::IArchive& archive)
 {
+	//if (!archive.IsStoring()){
+	//	m_depthRange = istd::CRange(700, 1700);
+
+	//	InvalidateCache(istd::IChangeable::GetAnyChange());
+
+	//	return BaseClass::Serialize(archive);
+	//}
+
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? NULL : this);
 	if (!archive.IsStoring()){
 		InvalidateCache(istd::IChangeable::GetAnyChange());
