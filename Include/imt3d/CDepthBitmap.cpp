@@ -81,7 +81,7 @@ bool CDepthBitmap::Serialize(iser::IArchive& archive)
 bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode mode)
 {
 	const CDepthBitmap* sourcePtr = dynamic_cast<const CDepthBitmap*>(&object);
-	if (sourcePtr ){
+	if (sourcePtr != NULL){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_depthRange = sourcePtr->m_depthRange;
