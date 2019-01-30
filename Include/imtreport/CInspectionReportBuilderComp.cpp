@@ -184,7 +184,7 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 	istd::IInformationProvider::InformationCategory status = inspectionPtr ? inspectionPtr->status : reportData.partStatus;
 
 	const double tableWidth = 180.0;
-	const double tableHeight = 20.0;
+	const double tableHeight = 18.0;
 
 	QByteArray uuid = page.AddTextTable(i2d::CRectangle(topLeft.GetX(), topLeft.GetY(), tableWidth, tableHeight), 2, 3);
 
@@ -199,7 +199,7 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 	tablePtr->SetColumnHeaderLabels({ reportData.companyName, reportData.appVersion, inspectionName});
 	tablePtr->SetItem(1, 0, { reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate) });
 	tablePtr->SetItem(1, 1, { reportData.partSerialNumber  });
-	tablePtr->SetItem(1, 2, { GetStatusText(status), Qt::AlignLeft, "Arial", 2.5, GetStatusColor(status) });
+	tablePtr->SetItem(1, 2, { GetStatusText(status), Qt::AlignLeft | Qt::AlignVCenter, "Arial", 2.5, GetStatusColor(status) });
 
 	topLeft.SetY(topLeft.GetY() + tableHeight);
 }

@@ -22,7 +22,7 @@ class CTextTableItem: virtual public iser::ISerializable
 public:
 	CTextTableItem(
 				const QString& text = QString(),
-				Qt::Alignment alignment = Qt::AlignLeft,
+				Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignVCenter,
 				QString fontName = "Arial",
 				double fontSize = 2.5,
 				const QColor& foregroundColor = Qt::black,

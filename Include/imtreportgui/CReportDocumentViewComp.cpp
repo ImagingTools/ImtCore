@@ -396,6 +396,9 @@ void CReportDocumentViewComp::ConvertTableCoodinates(const imtreport::CTextTable
 	Q_ASSERT(tableWidget);
 
 	QRectF rect = MapRectToScene(*pageElement);
+
+	tableSceneElement->setPreferredSize(rect.size());
+
 	tableWidget->setGeometry(rect.toAlignedRect());
 	tableWidget->setFixedSize(rect.size().toSize());
 
