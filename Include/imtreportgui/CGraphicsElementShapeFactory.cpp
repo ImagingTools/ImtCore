@@ -105,7 +105,7 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const i2d::IObject2d& o
 QGraphicsItem* CGraphicsElementShapeFactory::CreateTextTable(const imtreport::CTextTable& table) const
 {
 	QTableWidget* tableWidget = new QTableWidget(table.GetRowCount(), table.GetColumnCount());
-	tableWidget->setFrameShape(QFrame::NoFrame);
+	tableWidget->setFrameShape(QFrame::Box);
 	tableWidget->setFocusPolicy(Qt::NoFocus);
 	tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	tableWidget->setSelectionMode(QAbstractItemView::NoSelection);

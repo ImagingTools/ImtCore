@@ -406,12 +406,14 @@ void CReportDocumentViewComp::ConvertTableCoodinates(const imtreport::CTextTable
 	for (int col = 0; col < pageElement->GetColumnCount(); col++){
 		const imtreport::CTextTableItem& tableItem = pageElement->GetHorizontalHeaderItem(col);
 		tableWidget->setHorizontalHeaderItem(col, ConvertTableItem(tableItem));
+		tableWidget->horizontalHeaderItem(col)->setBackground(tableItem.GetBackgroundColor());
 	}
 
 	// set vertical header items
 	for (int row = 0; row < pageElement->GetRowCount(); row++){
 		const imtreport::CTextTableItem& tableItem = pageElement->GetVerticalHeaderItem(row);
 		tableWidget->setVerticalHeaderItem(row, ConvertTableItem(tableItem));
+		tableWidget->verticalHeaderItem(row)->setBackground(tableItem.GetBackgroundColor());
 	}
 
 	// set items
@@ -419,6 +421,7 @@ void CReportDocumentViewComp::ConvertTableCoodinates(const imtreport::CTextTable
 		for (int row = 0; row < pageElement->GetRowCount(); row++){
 			const imtreport::CTextTableItem& tableItem = pageElement->GetItem(row, col);
 			tableWidget->setItem(row, col, ConvertTableItem(tableItem));
+			tableWidget->item(row, col)->setBackground(tableItem.GetBackgroundColor());
 		}
 	}
 }
@@ -432,7 +435,6 @@ QTableWidgetItem* CReportDocumentViewComp::ConvertTableItem(const imtreport::CTe
 	tableWidgetItem->setTextAlignment(tableItem.GetAlignment());
 	tableWidgetItem->setFont(MapFontToScene(tableItem.GetFontName(), tableItem.GetFontSize()));
 	tableWidgetItem->setForeground(QBrush(tableItem.GetForegroundColor()));
-	tableWidgetItem->setBackground(QBrush(tableItem.GetBackgroundColor()));
 	tableWidgetItem->setIcon(tableItem.GetIcon());
 
 	return tableWidgetItem;
