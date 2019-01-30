@@ -402,22 +402,40 @@ void CReportDocumentViewComp::ConvertTableCoodinates(const imtreport::CTextTable
 	tableWidget->setGeometry(rect.toAlignedRect());
 	tableWidget->setFixedSize(rect.size().toSize());
 
+	// set horizontal header items
+	for (int col = 0; col < pageElement->GetColumnCount(); col++){
+		const imtreport::CTextTableItem& tableItem = pageElement->GetHorizontalHeaderItem(col);
+		tableWidget->setHorizontalHeaderItem(col, ConvertTableItem(tableItem));
+	}
+
+	// set vertical header items
+	for (int row = 0; row < pageElement->GetRowCount(); row++){
+		const imtreport::CTextTableItem& tableItem = pageElement->GetVerticalHeaderItem(row);
+		tableWidget->setVerticalHeaderItem(row, ConvertTableItem(tableItem));
+	}
+
 	// set items
 	for (int col = 0; col < pageElement->GetColumnCount(); col++){
 		for (int row = 0; row < pageElement->GetRowCount(); row++){
 			const imtreport::CTextTableItem& tableItem = pageElement->GetItem(row, col);
-
-			QTableWidgetItem* tableWidgetItem = new QTableWidgetItem();
-			tableWidgetItem->setText(tableItem.GetText());
-			tableWidgetItem->setTextAlignment(tableItem.GetAlignment());
-			tableWidgetItem->setFont(MapFontToScene(tableItem.GetFontName(), tableItem.GetFontSize()));
-			tableWidgetItem->setForeground(QBrush(tableItem.GetForegroundColor()));
-			tableWidgetItem->setBackground(QBrush(tableItem.GetBackgroundColor()));
-			tableWidgetItem->setIcon(tableItem.GetIcon());
-
-			tableWidget->setItem(row, col, tableWidgetItem);
+			tableWidget->setItem(row, col, ConvertTableItem(tableItem));
 		}
 	}
+}
+
+
+QTableWidgetItem* CReportDocumentViewComp::ConvertTableItem(const imtreport::CTextTableItem& tableItem) const
+{
+	QTableWidgetItem* tableWidgetItem = new QTableWidgetItem();
+
+	tableWidgetItem->setText(tableItem.GetText());
+	tableWidgetItem->setTextAlignment(tableItem.GetAlignment());
+	tableWidgetItem->setFont(MapFontToScene(tableItem.GetFontName(), tableItem.GetFontSize()));
+	tableWidgetItem->setForeground(QBrush(tableItem.GetForegroundColor()));
+	tableWidgetItem->setBackground(QBrush(tableItem.GetBackgroundColor()));
+	tableWidgetItem->setIcon(tableItem.GetIcon());
+
+	return tableWidgetItem;
 }
 
 

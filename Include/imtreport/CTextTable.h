@@ -19,15 +19,28 @@ public:
 
 	CTextTable();
 
-	void SetDimensions(int rowCount, int columnCount); // including header
+	void SetDimensions(int rowCount, int columnCount);
 
 	int GetRowCount() const;
 	int GetColumnCount() const;
 
-	void SetColumnHeaderLabels(const QStringList& labels);
+	bool IsHorizontalHeaderVisible() const;
+	void ShowHorizontalHeader(bool show);
 
-	const QVector<double>& GetColumnHeaderWidths() const;
-	void SetColumnHeaderWidths(const QVector<double>& widths);
+	bool IsVerticalHeaderVisible() const;
+	void ShowVerticalHeader(bool show);
+
+	void SetHorizontalHeaderLabels(const QStringList& labels);
+	void SetVerticalHeaderLabels(const QStringList& labels);
+
+	const QVector<double>& GetColumnWidths() const;
+	void SetColumnWidths(const QVector<double>& columnWidths);
+
+	const CTextTableItem& GetHorizontalHeaderItem(int column) const;
+	void SetHorizontalHeaderItem(int column, const CTextTableItem& item);
+
+	const CTextTableItem& GetVerticalHeaderItem(int row) const;
+	void SetVerticalHeaderItem(int row, const CTextTableItem& item);
 
 	const CTextTableItem& GetItem(int row, int column) const;
 	void SetItem(int row, int column, const CTextTableItem& item);
@@ -45,7 +58,12 @@ public:
 private:
 	void Resize(int rowCount, int columnCount);
 
+	const CTextTableItem& GetInternalItem(int row, int column) const;
+	void SetInternalItem(int row, int column, const CTextTableItem& item);
+
 private:
+	bool m_isHorizontalHeaderVisible;
+	bool m_isVerticalHeaderVisible;
 	QVector<double> m_columnWidths;
 	QVector<QVector<CTextTableItem>> m_items;
 	

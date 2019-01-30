@@ -186,7 +186,7 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 	const double tableWidth = 180.0;
 	const double tableHeight = 18.0;
 
-	QByteArray uuid = page.AddTextTable(i2d::CRectangle(topLeft.GetX(), topLeft.GetY(), tableWidth, tableHeight), 2, 3);
+	QByteArray uuid = page.AddTextTable(i2d::CRectangle(topLeft.GetX(), topLeft.GetY(), tableWidth, tableHeight), 1, 3);
 
 	CTextTable* tablePtr = dynamic_cast<CTextTable*>(page.GetPageElement(uuid));
 	Q_ASSERT(tablePtr != NULL);
@@ -196,10 +196,12 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 		inspectionName = inspectionPtr->name;
 	}
 
-	tablePtr->SetColumnHeaderLabels({ reportData.companyName, reportData.appVersion, inspectionName});
-	tablePtr->SetItem(1, 0, { reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate) });
-	tablePtr->SetItem(1, 1, { reportData.partSerialNumber  });
-	tablePtr->SetItem(1, 2, { GetStatusText(status), Qt::AlignLeft | Qt::AlignVCenter, "Arial", 2.5, GetStatusColor(status) });
+	tablePtr->SetHorizontalHeaderLabels({ reportData.companyName, reportData.appVersion, inspectionName});
+	tablePtr->ShowVerticalHeader(false);
+
+	tablePtr->SetItem(0, 0, { reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate) });
+	tablePtr->SetItem(0, 1, { reportData.partSerialNumber  });
+	tablePtr->SetItem(0, 2, { GetStatusText(status), Qt::AlignLeft | Qt::AlignVCenter, "Arial", 2.5, GetStatusColor(status) });
 
 	topLeft.SetY(topLeft.GetY() + tableHeight);
 }
@@ -224,21 +226,22 @@ void CInspectionReportBuilderComp::AddFooter(const Results& results, i2d::CVecto
 
 	topLeft.SetY(topLeft.GetY() + 15.0);
 
-	QByteArray uuid = page.AddTextTable(i2d::CRectangle(topLeft.GetX(), topLeft.GetY(), 180.0, 100.0), results.size() + 1, 6);
+	QByteArray uuid = page.AddTextTable(i2d::CRectangle(topLeft.GetX(), topLeft.GetY(), 180.0, 100.0), results.size(), 6);
 
 	CTextTable* tablePtr = dynamic_cast<CTextTable*>(page.GetPageElement(uuid));
 	Q_ASSERT(tablePtr);
 
-	tablePtr->SetColumnHeaderLabels({ "Region", "Error", "Length", "Value mm", "Tolerance mm", "Diff" });
+	tablePtr->SetHorizontalHeaderLabels({ "Region", "Error", "Length", "Value mm", "Tolerance mm", "Diff" });
+	tablePtr->ShowVerticalHeader(false);
 
 	for (int i = 0; i < results.size(); i++){
 		const InspectionRegionResult& result = results[i];
-		tablePtr->SetItem(i + 1, 0, {result.regionName});
-		tablePtr->SetItem(i + 1, 1, {GetErrorClassText(result.errorClass)});
-		tablePtr->SetItem(i + 1, 2, {QString::number(result.length, 'f', 2)});
-		tablePtr->SetItem(i + 1, 3, {QString::number(result.value, 'f', 2)});
-		tablePtr->SetItem(i + 1, 4, {QString::number(result.tolerance, 'f', 2)});
-		tablePtr->SetItem(i + 1, 5, {QString::number(result.diff, 'f', 2)});
+		tablePtr->SetItem(i, 0, {result.regionName});
+		tablePtr->SetItem(i, 1, {GetErrorClassText(result.errorClass)});
+		tablePtr->SetItem(i, 2, {QString::number(result.length, 'f', 2)});
+		tablePtr->SetItem(i, 3, {QString::number(result.value, 'f', 2)});
+		tablePtr->SetItem(i, 4, {QString::number(result.tolerance, 'f', 2)});
+		tablePtr->SetItem(i, 5, {QString::number(result.diff, 'f', 2)});
 	}
 }
 

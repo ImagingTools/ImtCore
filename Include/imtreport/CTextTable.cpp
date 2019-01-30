@@ -20,7 +20,9 @@ const double CTextTable::s_defaultColumnWidth = 30.0;
 
 // public methods
 
-CTextTable::CTextTable()
+CTextTable::CTextTable() :
+	m_isHorizontalHeaderVisible(true),
+	m_isVerticalHeaderVisible(true)
 {
 }
 
@@ -35,62 +37,119 @@ void CTextTable::SetDimensions(int rowCount, int columnCount)
 
 int CTextTable::GetRowCount() const
 {
-	return m_items.isEmpty() ? 0 : m_items[0].size();
+	return m_items.isEmpty() ? 0 : m_items[0].size() - 1;
 }
 
 
 int CTextTable::GetColumnCount() const
 {
-	return m_items.size();
+	return m_items.isEmpty() ? 0 : m_items.size() - 1;
 }
 
 
-void CTextTable::SetColumnHeaderLabels(const QStringList& labels)
+bool CTextTable::IsHorizontalHeaderVisible() const
 {
-	Q_ASSERT(GetRowCount() > 0);
+	return m_isHorizontalHeaderVisible;
+}
+
+
+void CTextTable::ShowHorizontalHeader(bool show)
+{
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
+	m_isHorizontalHeaderVisible = show;
+}
+
+
+bool CTextTable::IsVerticalHeaderVisible() const
+{
+	return m_isVerticalHeaderVisible;
+}
+
+
+void CTextTable::ShowVerticalHeader(bool show)
+{
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
+	m_isVerticalHeaderVisible = show;
+}
+
+
+void CTextTable::SetHorizontalHeaderLabels(const QStringList& labels)
+{
+	Q_ASSERT(!labels.isEmpty());
+	Q_ASSERT(labels.size() == GetColumnCount());
 
 	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
 
-	for (int col = 0; col < m_items.size(); col++){
-		m_items[col][0].SetText(labels[col]);
-		m_items[col][0].SetAlignment(Qt::AlignCenter);
+	for (int col = 0; col < GetColumnCount(); col++){
+		SetInternalItem(0, col + 1, CTextTableItem(labels[col], Qt::AlignCenter));
 	}
 }
 
 
-const QVector<double>& CTextTable::GetColumnHeaderWidths() const
+void CTextTable::SetVerticalHeaderLabels(const QStringList& labels)
+{
+	Q_ASSERT(!labels.isEmpty());
+	Q_ASSERT(labels.size() == GetRowCount());
+
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
+	for (int row = 0; row < GetRowCount(); row++){
+		SetInternalItem(row + 1, 0, CTextTableItem(labels[row], Qt::AlignCenter));
+	}
+}
+
+
+const QVector<double>& CTextTable::GetColumnWidths() const
 {
 	return m_columnWidths;
 }
 
 
-void CTextTable::SetColumnHeaderWidths(const QVector<double>& widths)
+void CTextTable::SetColumnWidths(const QVector<double>& columnWidths)
 {
-	Q_ASSERT(widths.size() == m_items.size());
+	Q_ASSERT(columnWidths.size() == m_items.size());
 
 	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
 
-	m_columnWidths = widths;
+	m_columnWidths = columnWidths;
+}
+
+
+const CTextTableItem& CTextTable::GetHorizontalHeaderItem(int column) const
+{
+	return GetInternalItem(0, column + 1);
+}
+
+
+void CTextTable::SetHorizontalHeaderItem(int column, const CTextTableItem& item)
+{
+	SetInternalItem(0, column + 1, item);
+}
+
+
+const CTextTableItem& CTextTable::GetVerticalHeaderItem(int row) const
+{
+	return GetInternalItem(row + 1, 0);
+}
+
+
+void CTextTable::SetVerticalHeaderItem(int row, const CTextTableItem& item)
+{
+	SetInternalItem(row + 1, 0, item);
 }
 
 
 const CTextTableItem& CTextTable::GetItem(int row, int column) const
 {
-	Q_ASSERT(column >= 0 && column < m_items.size());
-	Q_ASSERT(row >= 0 && row < m_items[column].size());
-
-	return m_items[column][row];
+	return GetInternalItem(row + 1, column + 1);
 }
 
 
 void CTextTable::SetItem(int row, int column, const CTextTableItem& item)
 {
-	Q_ASSERT(column >= 0 && column < m_items.size());
-	Q_ASSERT(row >= 0 && row < m_items[column].size());
-
-	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
-
-	m_items[column][row] = item;
+	SetInternalItem(row + 1, column + 1, item);
 }
 
 
@@ -103,6 +162,17 @@ bool CTextTable::Serialize(iser::IArchive& archive)
 
 	// base
 	bool retVal = BaseClass::Serialize(archive);
+
+	// header visibility
+	static iser::CArchiveTag isHorizontalHeaderVisibleTag("IsHorizontalHeaderVisible", "Table horizontal header visibility", iser::CArchiveTag::TT_LEAF);
+	retVal = archive.BeginTag(isHorizontalHeaderVisibleTag);
+	retVal = retVal && archive.Process(m_isHorizontalHeaderVisible);
+	retVal = retVal && archive.EndTag(isHorizontalHeaderVisibleTag);
+
+	static iser::CArchiveTag isVerticalHeaderVisibleTag("IsVerticalHeaderVisible", "Table vertical header visibility", iser::CArchiveTag::TT_LEAF);
+	retVal = archive.BeginTag(isVerticalHeaderVisibleTag);
+	retVal = retVal && archive.Process(m_isVerticalHeaderVisible);
+	retVal = retVal && archive.EndTag(isVerticalHeaderVisibleTag);
 
 	// column widths
 	//retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QVector<double>>(archive, m_columnWidths, "ColumnWidths", "ColumnWidth");
@@ -162,6 +232,8 @@ bool CTextTable::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_items = sourcePtr->m_items;
+		m_isHorizontalHeaderVisible = sourcePtr->m_isHorizontalHeaderVisible;
+		m_isVerticalHeaderVisible = sourcePtr->m_isVerticalHeaderVisible;
 		m_columnWidths = sourcePtr->m_columnWidths;
 
 		return BaseClass::CopyFrom(object, mode);
@@ -189,15 +261,36 @@ void CTextTable::Resize(const int rows, const int columns)
 	Q_ASSERT(rows > 0);
 	Q_ASSERT(columns > 0);
 
-	m_items.resize(columns);
-	m_columnWidths.resize(columns);
+	m_items.resize(columns + 1);
+	m_columnWidths.resize(columns + 1);
 
 	for (int col = 0; col < m_items.size(); col++){
-		m_items[col].resize(rows);
+		m_items[col].resize(rows + 1);
 		m_columnWidths[col] = s_defaultColumnWidth;
 	}
 }
 
 
+const CTextTableItem& CTextTable::GetInternalItem(int row, int column) const
+{
+	Q_ASSERT(column >= 0 && column < m_items.size());
+	Q_ASSERT(row >= 0 && row < m_items[column].size());
+
+	return m_items[column][row];
+}
+
+
+void CTextTable::SetInternalItem(int row, int column, const CTextTableItem& item)
+{
+	Q_ASSERT(column >= 0 && column < m_items.size());
+	Q_ASSERT(row >= 0 && row < m_items[column].size());
+
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
+
+	m_items[column][row] = item;
+}
+
+
 } // namespace imtreport
+
 

@@ -13,6 +13,10 @@
 #include <imtreport/CTextTable.h>
 #include <GeneratedFiles/imtreportgui/ui_CReportDocumentViewComp.h>
 
+
+class QTableWidgetItem;
+
+
 namespace imtreportgui
 {
 
@@ -65,6 +69,8 @@ private:
 	void ConvertPolygoneCoodinates(const imtreport::CPolygonElement* pageElement, QGraphicsItem* sceneElement) const;
 	void ConvertImageCoodinates(const imtreport::CImageRectangleElement* pageElement, QGraphicsItem* sceneElement) const;
 	void ConvertTableCoodinates(const imtreport::CTextTable* pageElement, QGraphicsItem* sceneElement) const;
+
+	QTableWidgetItem* ConvertTableItem(const imtreport::CTextTableItem& tableItem) const;
 
 private:
 	// commands
