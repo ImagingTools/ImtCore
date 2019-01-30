@@ -7,6 +7,7 @@
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <istd/TDelPtr.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtreport
@@ -157,13 +158,30 @@ bool CTextTableItem::Serialize(iser::IArchive& archive)
 	istd::CChangeNotifier notifier(archive.IsStoring()? NULL: this, &GetAllChanges());
 
 	bool retVal = SerializeValue(archive, "Text", "Table item text", iser::CArchiveTag::TT_LEAF, m_text);
+
+	static iser::CArchiveTag tagAlignment("Alignment", "Table item alignment", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tagAlignment);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<Qt::Alignment, NULL, NULL>(archive, m_alignment);
+	retVal = retVal && archive.EndTag(tagAlignment);
+
 	retVal = retVal && SerializeValue(archive, "Font size", "Table item font size", iser::CArchiveTag::TT_LEAF, m_fontSize);
 	retVal = retVal && SerializeValue(archive, "Font name", "Table item font name", iser::CArchiveTag::TT_LEAF, m_fontName);
-	//retVal = retVal && SerializeNonStandardValue(archive, "Foreground color", "Table item foreground color", iser::CArchiveTag::TT_LEAF, m_foregroundColor);
-	//retVal = retVal && SerializeNonStandardValue(archive, "Alignment", "Table item alignment", iser::CArchiveTag::TT_LEAF, m_alignment);
-	//retVal = retVal && SerializeNonStandardValue(archive, "Background color", "Table item background color", iser::CArchiveTag::TT_LEAF, m_backgroundColor);
-	//retVal = retVal && SerializeNonStandardValue(archive, "Icon", "Table item icon", iser::CArchiveTag::TT_LEAF, m_icon);
+/*
+	static iser::CArchiveTag tagForegroundColor("Foreground color", "Table item foreground color", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tagForegroundColor);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeQtObject(archive, m_foregroundColor);
+	retVal = retVal && archive.EndTag(tagForegroundColor);
 
+	static iser::CArchiveTag tagBackgroundColor("Background color", "Table item background color", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tagBackgroundColor);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeQtObject(archive, m_backgroundColor);
+	retVal = retVal && archive.EndTag(tagBackgroundColor);
+
+	static iser::CArchiveTag tagIcon("Icon", "Table item icon", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tagIcon);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeQtObject(archive, m_icon);
+	retVal = retVal && archive.EndTag(tagIcon);
+*/
 	return retVal;
 }
 
