@@ -106,6 +106,9 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateTextTable(const imtreport::CT
 {
 	QTableWidget* tableWidget = new QTableWidget(table.GetRowCount(), table.GetColumnCount());
 	tableWidget->setFrameShape(QFrame::NoFrame);
+	tableWidget->setFocusPolicy(Qt::NoFocus);
+	tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	tableWidget->setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
 
 	tableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

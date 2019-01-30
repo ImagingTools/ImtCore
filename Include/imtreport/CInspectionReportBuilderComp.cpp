@@ -197,7 +197,6 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 	}
 
 	tablePtr->SetColumnHeaderLabels({ reportData.companyName, reportData.appVersion, inspectionName});
-	tablePtr->SetColumnHeaderWidths({ 60.0, 60.0, 60.0 });
 	tablePtr->SetItem(1, 0, { reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate) });
 	tablePtr->SetItem(1, 1, { reportData.partSerialNumber  });
 	tablePtr->SetItem(1, 2, { GetStatusText(status), Qt::AlignLeft, "Arial", 2.5, GetStatusColor(status) });
@@ -231,7 +230,6 @@ void CInspectionReportBuilderComp::AddFooter(const Results& results, i2d::CVecto
 	Q_ASSERT(tablePtr);
 
 	tablePtr->SetColumnHeaderLabels({ "Region", "Error", "Length", "Value mm", "Tolerance mm", "Diff" });
-	tablePtr->SetColumnHeaderWidths({ 30.0, 30.0, 30.0, 30.0, 30.0, 30.0 });
 
 	for (int i = 0; i < results.size(); i++){
 		const InspectionRegionResult& result = results[i];
