@@ -34,7 +34,7 @@ public:
 	QByteArray AddLine(const i2d::CLine2d& line) override;
 	QByteArray AddRectangle(const i2d::CRectangle& rect, const QColor& fillColor = Qt::transparent) override;
 	QByteArray AddPolygone(const QVector<i2d::CVector2d>& points, const QColor& fillColor = Qt::transparent) override;
-	QByteArray AddTextTable(int rowCount, int columnCount, const i2d::CVector2d& topLeft) override;
+	QByteArray AddTextTable(const i2d::CRectangle& rect, int rowCount, int columnCount) override;
 
 	bool RemovePageElement(const QByteArray& elementId) override;
 

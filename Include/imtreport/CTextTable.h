@@ -19,9 +19,7 @@ public:
 
 	CTextTable();
 
-	void Initialize(int rowCount, int columnCount); // including header
-
-	void SetTopLeft(const i2d::CVector2d& topLeft);
+	void SetDimensions(int rowCount, int columnCount); // including header
 
 	int GetRowCount() const;
 	int GetColumnCount() const;
@@ -46,10 +44,6 @@ public:
 
 private:
 	void Resize(int rowCount, int columnCount);
-	void UpdateRect();
-
-	double GetTableWidth() const;
-	double GetTableHeight() const;
 
 private:
 	QVector<double> m_columnWidths;

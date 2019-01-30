@@ -128,15 +128,18 @@ QByteArray CReportPage::AddPolygone(const QVector<i2d::CVector2d>& points, const
 }
 
 
-QByteArray CReportPage::AddTextTable(int rowCount, int columnCount, const i2d::CVector2d& topLeft)
+QByteArray CReportPage::AddTextTable(const i2d::CRectangle& rect, int rowCount, int columnCount)
 {
 	QByteArray uuid;
 
 	CTextTable* element = AddObject<CTextTable>(uuid);
 	Q_ASSERT(element);
 
-	element->Initialize(rowCount, columnCount);
-	element->SetTopLeft(topLeft);
+	element->SetDimensions(rowCount, columnCount);
+	element->SetLeft(rect.GetLeft());
+	element->SetRight(rect.GetRight());
+	element->SetTop(rect.GetTop());
+	element->SetBottom(rect.GetBottom());
 
 	return uuid;
 }

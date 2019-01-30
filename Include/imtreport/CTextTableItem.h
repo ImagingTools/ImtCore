@@ -24,7 +24,7 @@ public:
 				const QString& text = QString(),
 				Qt::Alignment alignment = Qt::AlignLeft,
 				QString fontName = "Arial",
-				double fontSize = 3.0,
+				double fontSize = 2.5,
 				const QColor& foregroundColor = Qt::black,
 				const QColor& backgroundColor = Qt::transparent,
 				const QIcon& icon = QIcon());

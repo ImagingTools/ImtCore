@@ -16,6 +16,7 @@
 #include <QtGui/QGraphicsRectItem>
 #endif
 #include <QtWidgets/QTableWidget>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QGraphicsProxyWidget>
 
 // ImtCore includes
@@ -104,6 +105,16 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const i2d::IObject2d& o
 QGraphicsItem* CGraphicsElementShapeFactory::CreateTextTable(const imtreport::CTextTable& table) const
 {
 	QTableWidget* tableWidget = new QTableWidget(table.GetRowCount(), table.GetColumnCount());
+	tableWidget->setFrameShape(QFrame::NoFrame);
+
+	tableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+	tableWidget->horizontalHeader()->hide();
+	tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	tableWidget->horizontalHeader()->setStretchLastSection(true);
+
+	tableWidget->verticalHeader()->hide();
 
 	QGraphicsProxyWidget* sceneTableWidget = new QGraphicsProxyWidget();
 	sceneTableWidget->setWidget(tableWidget);

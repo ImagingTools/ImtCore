@@ -1,9 +1,6 @@
 #include <imtreport/CTextTable.h>
 
 
-// STL includes
-#include <numeric>
-
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <istd/TDelPtr.h>
@@ -28,21 +25,11 @@ CTextTable::CTextTable()
 }
 
 
-void CTextTable::Initialize(int rowCount, int columnCount)
+void CTextTable::SetDimensions(int rowCount, int columnCount)
 {
 	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
 	
 	Resize(rowCount, columnCount);
-
-	UpdateRect();
-}
-
-
-void CTextTable::SetTopLeft(const i2d::CVector2d& topLeft)
-{
-	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
-
-	BaseClass::SetTopLeft(topLeft);
 }
 
 
@@ -84,8 +71,6 @@ void CTextTable::SetColumnHeaderWidths(const QVector<double>& widths)
 	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
 
 	m_columnWidths = widths;
-
-	UpdateRect();
 }
 
 
@@ -106,8 +91,6 @@ void CTextTable::SetItem(int row, int column, const CTextTableItem& item)
 	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
 
 	m_items[column][row] = item;
-	
-	UpdateRect();
 }
 
 
@@ -122,7 +105,7 @@ bool CTextTable::Serialize(iser::IArchive& archive)
 	bool retVal = BaseClass::Serialize(archive);
 
 	// column widths
-//	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QVector>(archive, m_columnWidths, "ColumnWidths", "ColumnWidth");
+	//retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QVector<double>>(archive, m_columnWidths, "ColumnWidths", "ColumnWidth");
 
 	// items
 	int rowCount = GetRowCount();
@@ -213,43 +196,6 @@ void CTextTable::Resize(const int rows, const int columns)
 		m_items[col].resize(rows);
 		m_columnWidths[col] = s_defaultColumnWidth;
 	}
-}
-
-
-void CTextTable::UpdateRect()
-{
-	SetRight(GetLeft() + GetTableWidth());
-
-	SetBottom(GetTop() + GetTableHeight());
-}
-
-
-double CTextTable::GetTableWidth() const
-{
-	return std::accumulate(m_columnWidths.begin(), m_columnWidths.end(), 0.0);
-}
-
-
-double CTextTable::GetTableHeight() const
-{
-	// calculate table height as sum of all rows heights,
-	// row height is height of the highest cell in a row
-	double retVal = 0.0;
-
-	for (int col = 0; col < m_items.size(); col++){
-		double cellHeightMax = 0.0;
-
-		for (int row = 0; row < m_items[col].size(); row++){
-			double cellHeight = m_items[col][row].GetHeight();
-			if (cellHeight > cellHeightMax){
-				cellHeightMax = cellHeight;
-			}
-		}
-
-		retVal += cellHeightMax;
-	}
-
-	return retVal;
 }
 
 

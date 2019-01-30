@@ -395,9 +395,9 @@ void CReportDocumentViewComp::ConvertTableCoodinates(const imtreport::CTextTable
 	QTableWidget* tableWidget = dynamic_cast<QTableWidget*>(tableSceneElement->widget());
 	Q_ASSERT(tableWidget);
 
-	// set top left
-	QPointF topLeft = MapPointToScene(pageElement->GetLeftTop());
-	tableSceneElement->setPos(topLeft);
+	QRectF rect = MapRectToScene(*pageElement);
+	tableWidget->setGeometry(rect.toAlignedRect());
+	tableWidget->setFixedSize(rect.size().toSize());
 
 	// set items
 	for (int col = 0; col < pageElement->GetColumnCount(); col++){

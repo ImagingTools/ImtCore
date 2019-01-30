@@ -69,7 +69,7 @@ public:
 	/**
 		Add a text table to the report page.
 	*/
-	virtual QByteArray AddTextTable(int rowCount, int columnCount, const i2d::CVector2d& topLeft) = 0;
+	virtual QByteArray AddTextTable(const i2d::CRectangle& rect, int rowCount, int columnCount) = 0;
 
 	/**
 		Remove a page element.

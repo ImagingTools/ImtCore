@@ -183,7 +183,10 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 	QString productName = inspectionPtr ? inspectionPtr->name : reportData.productName;
 	istd::IInformationProvider::InformationCategory status = inspectionPtr ? inspectionPtr->status : reportData.partStatus;
 
-	QByteArray uuid = page.AddTextTable(2, 3, topLeft);
+	const double tableWidth = 180.0;
+	const double tableHeight = 20.0;
+
+	QByteArray uuid = page.AddTextTable(i2d::CRectangle(topLeft.GetX(), topLeft.GetY(), tableWidth, tableHeight), 2, 3);
 
 	CTextTable* tablePtr = dynamic_cast<CTextTable*>(page.GetPageElement(uuid));
 	Q_ASSERT(tablePtr != NULL);
@@ -193,13 +196,13 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 		inspectionName = inspectionPtr->name;
 	}
 
-	tablePtr->SetTopLeft(topLeft);
-
 	tablePtr->SetColumnHeaderLabels({ reportData.companyName, reportData.appVersion, inspectionName});
 	tablePtr->SetColumnHeaderWidths({ 60.0, 60.0, 60.0 });
 	tablePtr->SetItem(1, 0, { reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate) });
 	tablePtr->SetItem(1, 1, { reportData.partSerialNumber  });
-	tablePtr->SetItem(1, 2, { GetStatusText(status), Qt::AlignLeft, "Arial", 3.0, GetStatusColor(status) });
+	tablePtr->SetItem(1, 2, { GetStatusText(status), Qt::AlignLeft, "Arial", 2.5, GetStatusColor(status) });
+
+	topLeft.SetY(topLeft.GetY() + tableHeight);
 }
 
 
@@ -222,7 +225,7 @@ void CInspectionReportBuilderComp::AddFooter(const Results& results, i2d::CVecto
 
 	topLeft.SetY(topLeft.GetY() + 15.0);
 
-	QByteArray uuid = page.AddTextTable(results.size() + 1, 6, topLeft);
+	QByteArray uuid = page.AddTextTable(i2d::CRectangle(topLeft.GetX(), topLeft.GetY(), 180.0, 100.0), results.size() + 1, 6);
 
 	CTextTable* tablePtr = dynamic_cast<CTextTable*>(page.GetPageElement(uuid));
 	Q_ASSERT(tablePtr);
