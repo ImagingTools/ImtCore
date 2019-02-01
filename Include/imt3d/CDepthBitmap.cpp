@@ -24,7 +24,7 @@ void CDepthBitmap::SetDepthRange(const istd::CRange & depthRange)
 		EnsureMetaInfoCreated();
 	}
 
-	InvalidateCache(istd::IChangeable::GetAnyChange());
+	InvalidateCache(istd::IChangeable::GetNoChanges());
 }
 
 
@@ -38,17 +38,9 @@ istd::CRange CDepthBitmap::GetDepthRange() const
 
 bool CDepthBitmap::Serialize(iser::IArchive& archive)
 {
-	//if (!archive.IsStoring()){
-	//	m_depthRange = istd::CRange(700, 1700);
-
-	//	InvalidateCache(istd::IChangeable::GetAnyChange());
-
-	//	return BaseClass::Serialize(archive);
-	//}
-
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? NULL : this);
 	if (!archive.IsStoring()){
-		InvalidateCache(istd::IChangeable::GetAnyChange());
+		InvalidateCache(istd::IChangeable::GetNoChanges());
 	}
 
 	bool retVal = true;
@@ -86,7 +78,7 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 
 		m_depthRange = sourcePtr->m_depthRange;
 
-		InvalidateCache(istd::IChangeable::GetAnyChange());
+		InvalidateCache(istd::IChangeable::GetNoChanges());
 
 		return BaseClass::CopyFrom(object, mode);
 	}
