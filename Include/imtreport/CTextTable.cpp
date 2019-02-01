@@ -175,7 +175,7 @@ bool CTextTable::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(isVerticalHeaderVisibleTag);
 
 	// column widths
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QVector<double>>(archive, m_columnWidths, "ColumnWidths", "ColumnWidth");
+//	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QVector<double>>(archive, m_columnWidths, "ColumnWidths", "ColumnWidth");
 
 	// items
 	int rowCount = GetRowCount();
