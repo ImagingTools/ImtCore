@@ -9,7 +9,7 @@
 #include <QtGui/QScreen>
 
 // ImtCore includes
-#include <imtreport/CReportSceneBuilder.h>
+#include <imtreportgui/CReportSceneBuilder.h>
 
 
 namespace imtreportgui
@@ -61,7 +61,7 @@ void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*ch
 	imtreport::IReportDocument* documentPtr = GetObjectPtr();
 	Q_ASSERT(documentPtr != NULL);
 
-	imtreport::CReportSceneBuilder::ReportScenes scenes = imtreport::CReportSceneBuilder::Build(*documentPtr);
+	CReportSceneBuilder::ReportScenes scenes = CReportSceneBuilder::Build(*documentPtr);
 
 	for (int i = 0; i < scenes.size(); ++i){
 		QGraphicsScene* scenePtr = scenes[i];
