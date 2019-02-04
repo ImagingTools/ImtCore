@@ -126,21 +126,26 @@ bool CDepthBitmap::ConvertToQImage(QImage& result) const
 		for (int x = 0; x < width; ++x){
 			float inputValue = inputLinePtr[x];
 
-			if (m_depthRange.Contains(inputValue)) {
-				double alpha = m_depthRange.GetAlphaFromValue(inputValue);
-
-				int colorMapIndex = (1.0 - alpha) * 255;
-
-				int red = r[colorMapIndex] * 255;
-				int green = g[colorMapIndex] * 255;
-				int blue = b[colorMapIndex] * 255;
-
-				int rgbValue = qRgb(red, green, blue);
-
-				outputLinePtr[x] = rgbValue;
+			if (qIsNaN(inputValue)){
+				outputLinePtr[x] = qRgb(255, 255, 255);
 			}
-			else {
-				outputLinePtr[x] = qRgb(255,255,255);
+			else{
+				if (m_depthRange.Contains(inputValue)) {
+					double alpha = m_depthRange.GetAlphaFromValue(inputValue);
+
+					int colorMapIndex = (1.0 - alpha) * 255;
+
+					int red = r[colorMapIndex] * 255;
+					int green = g[colorMapIndex] * 255;
+					int blue = b[colorMapIndex] * 255;
+
+					int rgbValue = qRgb(red, green, blue);
+
+					outputLinePtr[x] = rgbValue;
+				}
+				else{
+					outputLinePtr[x] = qRgb(192, 192, 192);
+				}
 			}
 		}
 	}
