@@ -4,14 +4,12 @@
 // Qt includes
 #include <QtCore/QtCore>
 #include <QtGui/QColor>
-#include <QtGui/QFont>
-#include <QtGui/QIcon>
 
 // ACF includes
 #include <iser/ISerializable.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
-
+#include <iimg/CBitmap.h>
 
 namespace imtreport
 {
@@ -27,7 +25,7 @@ public:
 				double fontSize = 2.5,
 				const QColor& foregroundColor = Qt::black,
 				const QColor& backgroundColor = Qt::transparent,
-				const QIcon& icon = QIcon());
+				const iimg::CBitmap& image = iimg::CBitmap());
 
 	QString GetText() const;
 	void SetText(const QString& text);
@@ -47,10 +45,8 @@ public:
 	QColor GetBackgroundColor() const;
 	void SetBackgroundColor(const QColor& color);
 
-	QIcon GetIcon() const;
-	void SetIcon(const QIcon& icon);
-
-	double GetHeight() const;
+	const iimg::CBitmap& GetImage() const;
+	void SetImage(const iimg::CBitmap& image);
 
 	// reimplemented (iser::ISerializable)
 	bool Serialize(iser::IArchive& archive) override;
@@ -98,7 +94,7 @@ private:
 	QString m_fontName;
 	QColor m_foregroundColor;
 	QColor m_backgroundColor;
-	QIcon m_icon;
+	iimg::CBitmap m_image;
 };
 
 

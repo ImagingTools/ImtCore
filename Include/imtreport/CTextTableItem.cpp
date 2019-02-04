@@ -1,9 +1,6 @@
 #include <imtreport/CTextTableItem.h>
 
 
-// Qt includes
-#include <QtGui/QFontMetrics>
-
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <istd/TDelPtr.h>
@@ -23,14 +20,14 @@ CTextTableItem::CTextTableItem(
 			double fontSize,
 			const QColor& foregroundColor,
 			const QColor& backgroundColor,
-			const QIcon& icon)
+			const iimg::CBitmap& image)
 	:m_text(text),
 	m_alignment(alignment),
 	m_fontSize(fontSize),
 	m_fontName(fontName),
 	m_foregroundColor(foregroundColor),
 	m_backgroundColor(backgroundColor),
-	m_icon(icon)
+	m_image(image)
 {
 }
 
@@ -131,23 +128,17 @@ void CTextTableItem::SetBackgroundColor(const QColor& color)
 }
 
 
-QIcon CTextTableItem::GetIcon() const
+const iimg::CBitmap& CTextTableItem::GetImage() const
 {
-	return m_icon;
+	return m_image;
 }
 
 
-void CTextTableItem::SetIcon(const QIcon& icon)
+void CTextTableItem::SetImage(const iimg::CBitmap& image)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_icon = icon;
-}
-
-
-double CTextTableItem::GetHeight() const
-{
-	return QFontMetrics(QFont(m_fontName, m_fontSize)).height();
+	m_image = image;
 }
 
 
@@ -166,22 +157,22 @@ bool CTextTableItem::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && SerializeValue(archive, "FontSize", "Table item font size", iser::CArchiveTag::TT_LEAF, m_fontSize);
 	retVal = retVal && SerializeValue(archive, "FontName", "Table item font name", iser::CArchiveTag::TT_LEAF, m_fontName);
-/*
-	static iser::CArchiveTag tagForegroundColor("ForegroundColor", "Table item foreground color", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(tagForegroundColor);
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeQtObject(archive, m_foregroundColor);
-	retVal = retVal && archive.EndTag(tagForegroundColor);
 
-	static iser::CArchiveTag tagBackgroundColor("BackgroundColor", "Table item background color", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(tagBackgroundColor);
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeQtObject(archive, m_backgroundColor);
-	retVal = retVal && archive.EndTag(tagBackgroundColor);
+	//static iser::CArchiveTag tagForegroundColor("ForegroundColor", "Table item foreground color", iser::CArchiveTag::TT_LEAF);
+	//retVal = retVal && archive.BeginTag(tagForegroundColor);
+	//retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeQColor(archive, m_foregroundColor);
+	//retVal = retVal && archive.EndTag(tagForegroundColor);
 
-	static iser::CArchiveTag tagIcon("Icon", "Table item icon", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(tagIcon);
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeQtObject(archive, m_icon);
-	retVal = retVal && archive.EndTag(tagIcon);
-*/
+	//static iser::CArchiveTag tagBackgroundColor("BackgroundColor", "Table item background color", iser::CArchiveTag::TT_LEAF);
+	//retVal = retVal && archive.BeginTag(tagBackgroundColor);
+	//retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeQColor(archive, m_backgroundColor);
+	//retVal = retVal && archive.EndTag(tagBackgroundColor);
+
+	static iser::CArchiveTag tagImage("Image", "Table item image", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tagImage);
+	retVal = retVal && m_image.Serialize(archive);
+	retVal = retVal && archive.EndTag(tagImage);
+
 	return retVal;
 }
 
@@ -206,7 +197,7 @@ bool CTextTableItem::CopyFrom(const IChangeable& object, CompatibilityMode /*mod
 		m_fontName = sourcePtr->m_fontName;
 		m_foregroundColor = sourcePtr->m_foregroundColor;
 		m_backgroundColor = sourcePtr->m_backgroundColor;
-		m_icon = sourcePtr->m_icon;
+		m_image = sourcePtr->m_image;
 
 		return true;
 	}

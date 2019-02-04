@@ -435,7 +435,7 @@ QTableWidgetItem* CReportDocumentViewComp::ConvertTableItem(const imtreport::CTe
 	tableWidgetItem->setTextAlignment(tableItem.GetAlignment());
 	tableWidgetItem->setFont(MapFontToScene(tableItem.GetFontName(), tableItem.GetFontSize()));
 	tableWidgetItem->setForeground(QBrush(tableItem.GetForegroundColor()));
-	tableWidgetItem->setIcon(tableItem.GetIcon());
+	tableWidgetItem->setIcon(QPixmap::fromImage(tableItem.GetImage().GetQImage()));
 
 	return tableWidgetItem;
 }
