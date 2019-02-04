@@ -1,4 +1,4 @@
-#include <imtreportgui/CGraphicsElementShapeFactory.h>
+#include <imtreport/CGraphicsElementShapeFactory.h>
 
 
 // ACF includes
@@ -6,8 +6,6 @@
 
 // Qt includes
 #include <QtGui/QPen>
-#include <QtGui/QFont>
-#include <QtGui/QFontMetrics>
 #include <QtGui/QTextDocument>
 #include <QtGui/QTextOption>
 #if QT_VERSION >= 0x050000
@@ -23,7 +21,7 @@
 #include <imtreport/TGraphicsElement.h>
 
 
-namespace imtreportgui
+namespace imtreport
 {
 
 
@@ -33,22 +31,22 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const i2d::IObject2d& o
 {
 	QGraphicsItem* itemPtr = NULL;
 
-	const imtreport::CRectangleElement* rectangleElementPtr = dynamic_cast<const imtreport::CRectangleElement*>(&object2d);
+	const CRectangleElement* rectangleElementPtr = dynamic_cast<const CRectangleElement*>(&object2d);
 	if (rectangleElementPtr != NULL){
 		itemPtr = new QGraphicsRectItem();
 	}
 
-	const imtreport::CLineElement* lineElementPtr = dynamic_cast<const imtreport::CLineElement*>(&object2d);
+	const CLineElement* lineElementPtr = dynamic_cast<const CLineElement*>(&object2d);
 	if (lineElementPtr != NULL) {
 		itemPtr = new QGraphicsLineItem();
 	}
 
-	const imtreport::CCircleElement* circleElementPtr = dynamic_cast<const imtreport::CCircleElement*>(&object2d);
+	const CCircleElement* circleElementPtr = dynamic_cast<const CCircleElement*>(&object2d);
 	if (circleElementPtr != NULL){
 		itemPtr = new QGraphicsEllipseItem();
 	}
 
-	const imtreport::CTextLabelElement* labelElementPtr = dynamic_cast<const imtreport::CTextLabelElement*>(&object2d);
+	const CTextLabelElement* labelElementPtr = dynamic_cast<const CTextLabelElement*>(&object2d);
 	if (labelElementPtr != NULL){
 		QGraphicsTextItem* textItemPtr = new QGraphicsTextItem(labelElementPtr->GetText());
 		textItemPtr->setDefaultTextColor(labelElementPtr->GetFillColor());
@@ -60,12 +58,12 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const i2d::IObject2d& o
 		itemPtr = textItemPtr;
 	}
 
-	const imtreport::CPolygonElement* polygonElementPtr = dynamic_cast<const imtreport::CPolygonElement*>(&object2d);
+	const CPolygonElement* polygonElementPtr = dynamic_cast<const CPolygonElement*>(&object2d);
 	if (polygonElementPtr != NULL){
 		itemPtr = new QGraphicsPolygonItem();
 	}
 
-	const imtreport::CImageRectangleElement* imageRectangleElementPtr = dynamic_cast<const imtreport::CImageRectangleElement*>(&object2d);
+	const CImageRectangleElement* imageRectangleElementPtr = dynamic_cast<const CImageRectangleElement*>(&object2d);
 	if (imageRectangleElementPtr != NULL){
 		QString imgPath = imageRectangleElementPtr->GetImagePath();
 
@@ -76,13 +74,13 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const i2d::IObject2d& o
 		itemPtr = new QGraphicsPixmapItem(QPixmap(imgPath));
 	}
 	
-	const imtreport::CTextTable* tablePtr = dynamic_cast<const imtreport::CTextTable*>(&object2d);
+	const CTextTable* tablePtr = dynamic_cast<const CTextTable*>(&object2d);
 	if (tablePtr != NULL){
 		itemPtr = CreateTextTable(*tablePtr);
 	}
 
 	QAbstractGraphicsShapeItem* abstractGraphicsShapeItemPtr = dynamic_cast<QAbstractGraphicsShapeItem*>(itemPtr);
-	const imtreport::IGraphicsElement* graphicsElementPtr = dynamic_cast<const imtreport::IGraphicsElement*>(&object2d);
+	const IGraphicsElement* graphicsElementPtr = dynamic_cast<const IGraphicsElement*>(&object2d);
 	if (abstractGraphicsShapeItemPtr != NULL && graphicsElementPtr != NULL){
 		QPen pen(graphicsElementPtr->GetStrokeColor());
 
@@ -102,7 +100,7 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const i2d::IObject2d& o
 }
 
 
-QGraphicsItem* CGraphicsElementShapeFactory::CreateTextTable(const imtreport::CTextTable& table) const
+QGraphicsItem* CGraphicsElementShapeFactory::CreateTextTable(const CTextTable& table) const
 {
 	QTableWidget* tableWidget = new QTableWidget(table.GetRowCount(), table.GetColumnCount());
 	tableWidget->setFrameShape(QFrame::Box);

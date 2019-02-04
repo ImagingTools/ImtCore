@@ -53,9 +53,8 @@ QByteArray CReportPage::AddText(const QString& text, const i2d::CVector2d& posit
 	CTextLabelElement* element = AddObject<CTextLabelElement>(uuid);
 	Q_ASSERT(element);
 
-	element->SetFontSize(5);
+	element->SetFont(CFont("Arial", 5.0));
 	element->SetText(text);
-
 	element->SetPosition(position);
 	element->SetRectangle(i2d::CRectangle(position.GetX(), position.GetY(), textWidth, 0.0));
 	element->SetAlignment(alignment);

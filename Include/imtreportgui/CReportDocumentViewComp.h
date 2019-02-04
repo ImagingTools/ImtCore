@@ -8,13 +8,11 @@
 
 // ImtCore includes
 #include <imtreport/IReportDocument.h>
-#include <imtreport/IGraphicsElement.h>
-#include <imtreport/TGraphicsElement.h>
-#include <imtreport/CTextTable.h>
 #include <GeneratedFiles/imtreportgui/ui_CReportDocumentViewComp.h>
 
 
-class QTableWidgetItem;
+class QGraphicsRectItem;
+class QGraphicsItemGroup;
 
 
 namespace imtreportgui
@@ -53,24 +51,10 @@ private Q_SLOTS:
 	void OnExportToPdf();
 
 private:
-	void UpdateSceneDecoration(QGraphicsScene& scene);
-	void UpdateSceneShapes(const imtreport::IReportPage& page, QGraphicsScene& scene);
+	void CreateSceneDecoration(QGraphicsScene& scene);
 	void ShowSceneDecoration(const bool showBorder, const bool showGrid);
 
-	QPointF MapPointToScene(const QPointF& point) const;
-	QRectF MapRectToScene(const QRectF& rect) const;
-	QFont MapFontToScene(const QString& fontName, double fontSize) const;
-
-	void ConvertShapeCoodinates(const i2d::IObject2d* pageElement, QGraphicsItem* sceneElement) const;
-	void ConvertRectCoodinates(const imtreport::CRectangleElement* pageElement, QGraphicsItem* sceneElement) const;
-	void ConvertEllipseCoodinates(const imtreport::CCircleElement* pageElement, QGraphicsItem* sceneElement) const;
-	void ConvertLabelCoodinates(const imtreport::CTextLabelElement* pageElement, QGraphicsItem* sceneElement) const;
-	void ConvertLineCoodinates(const imtreport::CLineElement* pageElement, QGraphicsItem* sceneElement) const;
-	void ConvertPolygoneCoodinates(const imtreport::CPolygonElement* pageElement, QGraphicsItem* sceneElement) const;
-	void ConvertImageCoodinates(const imtreport::CImageRectangleElement* pageElement, QGraphicsItem* sceneElement) const;
-	void ConvertTableCoodinates(const imtreport::CTextTable* pageElement, QGraphicsItem* sceneElement) const;
-
-	QTableWidgetItem* ConvertTableItem(const imtreport::CTextTableItem& tableItem) const;
+	static QPointF MapPointToScene(const QPointF& point);
 
 private:
 	// commands

@@ -16,15 +16,13 @@ namespace imtreport
 CTextTableItem::CTextTableItem(
 			const QString& text,
 			Qt::Alignment alignment,
-			QString fontName,
-			double fontSize,
+			CFont font,
 			const QColor& foregroundColor,
 			const QColor& backgroundColor,
 			const iimg::CBitmap& image)
 	:m_text(text),
 	m_alignment(alignment),
-	m_fontSize(fontSize),
-	m_fontName(fontName),
+	m_font(font),
 	m_foregroundColor(foregroundColor),
 	m_backgroundColor(backgroundColor),
 	m_image(image)
@@ -64,34 +62,18 @@ void CTextTableItem::SetAlignment(const Qt::Alignment alignment)
 }
 
 
-double CTextTableItem::GetFontSize() const
+const CFont& CTextTableItem::GetFont() const
 {
-	return m_fontSize;
+	return m_font;
 }
 
 
-void CTextTableItem::SetFontSize(const double fontSize)
+void CTextTableItem::SetFont(const CFont& font)
 {
-	if (m_fontSize != fontSize){
+	if (!m_font.IsEqual(font)){
 		istd::CChangeNotifier changeNotifier(this);
 		
-		m_fontSize = fontSize;
-	}
-}
-
-
-QString CTextTableItem::GetFontName() const
-{
-	return m_fontName;
-}
-
-
-void CTextTableItem::SetFontName(const QString& fontName)
-{
-	if (m_fontName != fontName){
-		istd::CChangeNotifier changeNotifier(this);
-		
-		m_fontName = fontName;
+		m_font = font;
 	}
 }
 
@@ -155,8 +137,10 @@ bool CTextTableItem::Serialize(iser::IArchive& archive)
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<Qt::Alignment, NULL, NULL>(archive, m_alignment);
 	retVal = retVal && archive.EndTag(tagAlignment);
 
-	retVal = retVal && SerializeValue(archive, "FontSize", "Table item font size", iser::CArchiveTag::TT_LEAF, m_fontSize);
-	retVal = retVal && SerializeValue(archive, "FontName", "Table item font name", iser::CArchiveTag::TT_LEAF, m_fontName);
+	static iser::CArchiveTag tagFont("Font", "Table item font", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tagFont);
+	retVal = retVal && m_font.Serialize(archive);
+	retVal = retVal && archive.EndTag(tagFont);
 
 	//static iser::CArchiveTag tagForegroundColor("ForegroundColor", "Table item foreground color", iser::CArchiveTag::TT_LEAF);
 	//retVal = retVal && archive.BeginTag(tagForegroundColor);
@@ -193,8 +177,7 @@ bool CTextTableItem::CopyFrom(const IChangeable& object, CompatibilityMode /*mod
 
 		m_text = sourcePtr->m_text;
 		m_alignment = sourcePtr->m_alignment;
-		m_fontSize = sourcePtr->m_fontSize;
-		m_fontName = sourcePtr->m_fontName;
+		m_font = sourcePtr->m_font;
 		m_foregroundColor = sourcePtr->m_foregroundColor;
 		m_backgroundColor = sourcePtr->m_backgroundColor;
 		m_image = sourcePtr->m_image;

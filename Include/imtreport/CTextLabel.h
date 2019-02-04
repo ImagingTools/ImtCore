@@ -4,6 +4,9 @@
 #include <i2d/CLabel.h>
 #include <i2d/CRectangle.h>
 
+// ImtCore
+#include <imtreport/CFont.h>
+
 
 namespace imtreport
 {
@@ -17,24 +20,14 @@ public:
 	CTextLabel();
 
 	/**
-		Get label font name.
+		Get label font.
 	*/
-	virtual const QString& GetFontName() const;
+	virtual const CFont& GetFont() const;
 
 	/**
-		Set label font name.
+		Set label font.
 	*/
-	virtual void SetFontName(const QString& fontName);
-
-	/**
-		Get label font size.
-	*/
-	virtual double GetFontSize() const;
-
-	/**
-		Set label font size.
-	*/
-	virtual void SetFontSize(double fontSize);
+	virtual void SetFont(const CFont& font);
 
 	/**
 		Get label's rectangle.
@@ -65,8 +58,7 @@ public:
 	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const;
 
 private:
-	QString m_fontName;
-	double m_fontSize;
+	CFont m_font;
 	i2d::CRectangle m_rectangle;
 	Qt::Alignment m_alignment;
 };

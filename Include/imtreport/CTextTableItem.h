@@ -11,6 +11,10 @@
 #include <iser/CArchiveTag.h>
 #include <iimg/CBitmap.h>
 
+// ImtCore includes
+#include <imtreport/CFont.h>
+
+
 namespace imtreport
 {
 
@@ -21,8 +25,7 @@ public:
 	CTextTableItem(
 				const QString& text = QString(),
 				Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignVCenter,
-				QString fontName = "Arial",
-				double fontSize = 2.5,
+				CFont font = CFont("Arial", 2.5),
 				const QColor& foregroundColor = Qt::black,
 				const QColor& backgroundColor = Qt::transparent,
 				const iimg::CBitmap& image = iimg::CBitmap());
@@ -33,11 +36,8 @@ public:
 	Qt::Alignment GetAlignment() const;
 	void SetAlignment(const Qt::Alignment alignment);
 
-	double GetFontSize() const;
-	void SetFontSize(const double fontSize);
-
-	QString GetFontName() const;
-	void SetFontName(const QString& fontName);
+	const CFont& GetFont() const;
+	void SetFont(const CFont& font);
 
 	QColor GetForegroundColor() const;
 	void SetForegroundColor(const QColor& color);
@@ -69,29 +69,10 @@ private:
 		return retVal;
 	}
 
-	template <typename T>
-	bool SerializeNonStandardValue(iser::IArchive& archive, const QByteArray& tagId, const QByteArray& tagComment, iser::CArchiveTag::TagType tagType, T& value)
-	{
-		static iser::CArchiveTag tag(tagId, tagComment, tagType);
-
-		T tempValue = value;
-
-		bool retVal = archive.BeginTag(tag);
-		retVal = retVal && archive.Process(tempValue);
-		retVal = retVal && archive.EndTag(tag);
-
-		if (retVal && !archive.IsStoring()){
-			value = tempValue;
-		}
-
-		return retVal;
-	}
-
 private:
 	QString m_text;
 	Qt::Alignment m_alignment;
-	double m_fontSize;
-	QString m_fontName;
+	CFont m_font;
 	QColor m_foregroundColor;
 	QColor m_backgroundColor;
 	iimg::CBitmap m_image;

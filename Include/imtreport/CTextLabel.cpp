@@ -14,43 +14,25 @@ namespace imtreport
 // public methods
 
 CTextLabel::CTextLabel()
-	:m_fontSize(8),
-	m_fontName("Arial"),
+	:m_font("Arial", 8.0),
 	m_alignment(Qt::AlignLeft)
 {
 }
 
 
-const QString& CTextLabel::GetFontName() const
+const CFont& CTextLabel::GetFont() const
 {
-	return m_fontName;
+	return m_font;
 }
 
 
-void CTextLabel::SetFontName(const QString& fontName)
+void CTextLabel::SetFont(const CFont& font)
 {
-	if (m_fontName != fontName)
+	if (!m_font.IsEqual(font))
 	{
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_fontName = fontName;
-	}
-}
-
-
-double CTextLabel::GetFontSize() const
-{
-	return m_fontSize;
-}
-
-
-void CTextLabel::SetFontSize(double fontSize)
-{
-	if (m_fontSize != fontSize)
-	{
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_fontSize = fontSize;
+		m_font = font;
 	}
 }
 
@@ -93,8 +75,7 @@ void CTextLabel::SetAlignment(const Qt::Alignment alignment)
 
 bool CTextLabel::Serialize(iser::IArchive& archive)
 {
-	static iser::CArchiveTag fontNameTag("FontName", "Text label font name", iser::CArchiveTag::TT_LEAF);
-	static iser::CArchiveTag fontSizeTag("FontSize", "Text label font size", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag fontTag("Font", "Text label font", iser::CArchiveTag::TT_LEAF);
 	static iser::CArchiveTag rectTag("Rectangle", "Text label rectangle", iser::CArchiveTag::TT_GROUP);
 	static iser::CArchiveTag alignmentTag("Alignment", "Alignment", iser::CArchiveTag::TT_LEAF);
 
@@ -104,13 +85,9 @@ bool CTextLabel::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && BaseClass::Serialize(archive);
 
-	retVal = retVal && archive.BeginTag(fontNameTag);
-	retVal = retVal && archive.Process(m_fontName);
-	retVal = retVal && archive.EndTag(fontNameTag);
-
-	retVal = retVal && archive.BeginTag(fontSizeTag);
-	retVal = retVal && archive.Process(m_fontSize);
-	retVal = retVal && archive.EndTag(fontSizeTag);
+	retVal = retVal && archive.BeginTag(fontTag);
+	retVal = retVal && m_font.Serialize(archive);
+	retVal = retVal && archive.EndTag(fontTag);
 
 	retVal = retVal && archive.BeginTag(rectTag);
 	retVal = retVal && m_rectangle.Serialize(archive);
@@ -144,14 +121,16 @@ bool CTextLabel::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 	{
 		istd::CChangeNotifier notifier(this);
 
-		m_fontName = labelPtr->GetFontName();
-		m_fontSize = labelPtr->GetFontSize();
-		m_rectangle = labelPtr->GetRectangle();
-		m_alignment = labelPtr->GetAlignment();
+		bool retVal = m_font.CopyFrom(labelPtr->GetFont());
 
-		BaseClass::CopyFrom(object, mode);
+		if (retVal){
+			m_rectangle = labelPtr->GetRectangle();
+			m_alignment = labelPtr->GetAlignment();
 
-		return true;
+			retVal = BaseClass::CopyFrom(object, mode);
+		}
+
+		return retVal;
 	}
 
 	return false;

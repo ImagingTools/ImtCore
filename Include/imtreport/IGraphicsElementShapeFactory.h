@@ -8,7 +8,7 @@
 class QGraphicsItem;
 
 
-namespace imtreportgui
+namespace imtreport
 {
 
 
@@ -25,6 +25,6 @@ public:
 };
 
 
-} // namespace imtreportgui
+} // namespace imtreport
 
 

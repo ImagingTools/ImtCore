@@ -201,7 +201,7 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 
 	tablePtr->SetItem(0, 0, { reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate) });
 	tablePtr->SetItem(0, 1, { reportData.partSerialNumber  });
-	tablePtr->SetItem(0, 2, { GetStatusText(status), Qt::AlignLeft | Qt::AlignVCenter, "Arial", 2.5, GetStatusColor(status) });
+	tablePtr->SetItem(0, 2, { GetStatusText(status), Qt::AlignLeft | Qt::AlignVCenter, CFont("Arial", 2.5), GetStatusColor(status) });
 
 	topLeft.SetY(topLeft.GetY() + tableHeight);
 }
