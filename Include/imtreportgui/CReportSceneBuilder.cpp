@@ -1,4 +1,4 @@
-#include <imtreport/CReportSceneBuilder.h>
+#include <imtreportgui/CReportSceneBuilder.h>
 
 
 // Qt includes
@@ -8,11 +8,11 @@
 #include <QtWidgets/QTableWidget>
 
 // ImtCore includes
-#include <imtreport/CGraphicsElementShapeFactory.h>
+#include <imtreportgui/CGraphicsElementShapeFactory.h>
 #include <imtreport/IReportPage.h>
 
 
-namespace imtreport
+namespace imtreportgui
 {
 
 
@@ -23,13 +23,13 @@ CReportSceneBuilder::CReportSceneBuilder()
 }
 
 
-QVector<QGraphicsScene*> CReportSceneBuilder::Build(IReportDocument& reportDocument)
+QVector<QGraphicsScene*> CReportSceneBuilder::Build(imtreport::IReportDocument& reportDocument)
 {
 	QVector<QGraphicsScene*> retVal;
 	retVal.resize(reportDocument.GetPagesCount());
 
 	for (int i = 0; i < reportDocument.GetPagesCount(); i++){
-		const IReportPage* pagePtr = reportDocument.GetReportPage(i);
+		const imtreport::IReportPage* pagePtr = reportDocument.GetReportPage(i);
 		Q_ASSERT(pagePtr);
 
 		retVal[i] = new QGraphicsScene();
@@ -42,11 +42,11 @@ QVector<QGraphicsScene*> CReportSceneBuilder::Build(IReportDocument& reportDocum
 
 // private methods
 
-void CReportSceneBuilder::BuildSceneShapes(const IReportPage& page, QGraphicsScene& scene)
+void CReportSceneBuilder::BuildSceneShapes(const imtreport::IReportPage& page, QGraphicsScene& scene)
 {
 	CGraphicsElementShapeFactory shapeFactory;
 
-	IReportPage::ElementIds ids = page.GetPageElements();
+	imtreport::IReportPage::ElementIds ids = page.GetPageElements();
 	for (const QByteArray& elementId : ids){
 		const i2d::IObject2d* elementPtr = page.GetPageElement(elementId);
 		Q_ASSERT(elementPtr != nullptr);
@@ -62,44 +62,44 @@ void CReportSceneBuilder::BuildSceneShapes(const IReportPage& page, QGraphicsSce
 
 void CReportSceneBuilder::ConvertShapeCoodinates(const i2d::IObject2d& pageElement, QGraphicsItem& sceneElement)
 {
-	const CRectangleElement* rectPageElementPtr = dynamic_cast<const CRectangleElement*>(&pageElement);
+	const imtreport::CRectangleElement* rectPageElementPtr = dynamic_cast<const imtreport::CRectangleElement*>(&pageElement);
 	if (rectPageElementPtr){
 		return ConvertRectCoodinates(*rectPageElementPtr, sceneElement);
 	}
 
-	const CCircleElement* circleSceneElementPtr = dynamic_cast<const CCircleElement*>(&pageElement);
+	const imtreport::CCircleElement* circleSceneElementPtr = dynamic_cast<const imtreport::CCircleElement*>(&pageElement);
 	if (circleSceneElementPtr){
 		return ConvertEllipseCoodinates(*circleSceneElementPtr, sceneElement);
 	}
 
-	const CTextLabelElement* labelSceneElementPtr = dynamic_cast<const CTextLabelElement*>(&pageElement);
+	const imtreport::CTextLabelElement* labelSceneElementPtr = dynamic_cast<const imtreport::CTextLabelElement*>(&pageElement);
 	if (labelSceneElementPtr){
 		return ConvertLabelCoodinates(*labelSceneElementPtr, sceneElement);
 	}
 
-	const CPolygonElement* polygonElementPtr = dynamic_cast<const CPolygonElement*>(&pageElement);
+	const imtreport::CPolygonElement* polygonElementPtr = dynamic_cast<const imtreport::CPolygonElement*>(&pageElement);
 	if (polygonElementPtr){
 		return ConvertPolygoneCoodinates(*polygonElementPtr, sceneElement);
 	}
 
-	const CLineElement* lineElementPtr = dynamic_cast<const CLineElement*>(&pageElement);
+	const imtreport::CLineElement* lineElementPtr = dynamic_cast<const imtreport::CLineElement*>(&pageElement);
 	if (lineElementPtr){
 		return ConvertLineCoodinates(*lineElementPtr, sceneElement);
 	}
 
-	const CImageRectangleElement* imageElementPtr = dynamic_cast<const CImageRectangleElement*>(&pageElement);
+	const imtreport::CImageRectangleElement* imageElementPtr = dynamic_cast<const imtreport::CImageRectangleElement*>(&pageElement);
 	if (imageElementPtr){
 		return ConvertImageCoodinates(*imageElementPtr, sceneElement);
 	}
 
-	const CTextTable* tableElementPtr = dynamic_cast<const CTextTable*>(&pageElement);
+	const imtreport::CTextTable* tableElementPtr = dynamic_cast<const imtreport::CTextTable*>(&pageElement);
 	if (tableElementPtr){
 		return ConvertTableCoodinates(*tableElementPtr, sceneElement);
 	}
 }
 
 
-void CReportSceneBuilder::ConvertRectCoodinates(const CRectangleElement& pageElement, QGraphicsItem& sceneElement)
+void CReportSceneBuilder::ConvertRectCoodinates(const imtreport::CRectangleElement& pageElement, QGraphicsItem& sceneElement)
 {
 	QGraphicsRectItem* rectSceneElementPtr = dynamic_cast<QGraphicsRectItem*>(&sceneElement);
 	Q_ASSERT(rectSceneElementPtr);
@@ -109,7 +109,7 @@ void CReportSceneBuilder::ConvertRectCoodinates(const CRectangleElement& pageEle
 }
 
 
-void CReportSceneBuilder::ConvertEllipseCoodinates(const CCircleElement& pageElement, QGraphicsItem& sceneElement)
+void CReportSceneBuilder::ConvertEllipseCoodinates(const imtreport::CCircleElement& pageElement, QGraphicsItem& sceneElement)
 {
 	QGraphicsEllipseItem* ellipseSceneElementPtr = dynamic_cast<QGraphicsEllipseItem*>(&sceneElement);
 	Q_ASSERT(ellipseSceneElementPtr);
@@ -119,7 +119,7 @@ void CReportSceneBuilder::ConvertEllipseCoodinates(const CCircleElement& pageEle
 }
 
 
-void CReportSceneBuilder::ConvertLabelCoodinates(const CTextLabelElement& pageElement, QGraphicsItem& sceneElement)
+void CReportSceneBuilder::ConvertLabelCoodinates(const imtreport::CTextLabelElement& pageElement, QGraphicsItem& sceneElement)
 {
 	QGraphicsTextItem* labelSceneElementPtr = dynamic_cast<QGraphicsTextItem*>(&sceneElement);
 	Q_ASSERT(labelSceneElementPtr);
@@ -134,7 +134,7 @@ void CReportSceneBuilder::ConvertLabelCoodinates(const CTextLabelElement& pageEl
 }
 
 
-void CReportSceneBuilder::ConvertLineCoodinates(const CLineElement& pageElement, QGraphicsItem& sceneElement)
+void CReportSceneBuilder::ConvertLineCoodinates(const imtreport::CLineElement& pageElement, QGraphicsItem& sceneElement)
 {
 	QGraphicsLineItem* lineSceneElementPtr = dynamic_cast<QGraphicsLineItem*>(&sceneElement);
 	Q_ASSERT(lineSceneElementPtr);
@@ -144,7 +144,7 @@ void CReportSceneBuilder::ConvertLineCoodinates(const CLineElement& pageElement,
 	lineSceneElementPtr->setLine(QLineF(point1, point2));
 }
 
-void CReportSceneBuilder::ConvertPolygoneCoodinates(const CPolygonElement& pageElement, QGraphicsItem& sceneElement)
+void CReportSceneBuilder::ConvertPolygoneCoodinates(const imtreport::CPolygonElement& pageElement, QGraphicsItem& sceneElement)
 {
 	QGraphicsPolygonItem* polygoneSceneElementPtr = dynamic_cast<QGraphicsPolygonItem*>(&sceneElement);
 	Q_ASSERT(polygoneSceneElementPtr);
@@ -161,7 +161,7 @@ void CReportSceneBuilder::ConvertPolygoneCoodinates(const CPolygonElement& pageE
 }
 
 
-void CReportSceneBuilder::ConvertImageCoodinates(const CImageRectangleElement& pageElement, QGraphicsItem& sceneElement)
+void CReportSceneBuilder::ConvertImageCoodinates(const imtreport::CImageRectangleElement& pageElement, QGraphicsItem& sceneElement)
 {
 	QGraphicsPixmapItem* imageSceneElementPtr = dynamic_cast<QGraphicsPixmapItem*>(&sceneElement);
 	Q_ASSERT(imageSceneElementPtr);
@@ -181,7 +181,7 @@ void CReportSceneBuilder::ConvertImageCoodinates(const CImageRectangleElement& p
 }
 
 
-void CReportSceneBuilder::ConvertTableCoodinates(const CTextTable& pageElement, QGraphicsItem& sceneElement)
+void CReportSceneBuilder::ConvertTableCoodinates(const imtreport::CTextTable& pageElement, QGraphicsItem& sceneElement)
 {
 	QGraphicsProxyWidget* tableSceneElementPtr = dynamic_cast<QGraphicsProxyWidget*>(&sceneElement);
 	Q_ASSERT(tableSceneElementPtr);
@@ -198,14 +198,14 @@ void CReportSceneBuilder::ConvertTableCoodinates(const CTextTable& pageElement, 
 
 	// set horizontal header items
 	for (int col = 0; col < pageElement.GetColumnCount(); col++){
-		const CTextTableItem& tableItem = pageElement.GetHorizontalHeaderItem(col);
+		const imtreport::CTextTableItem& tableItem = pageElement.GetHorizontalHeaderItem(col);
 		tableWidget->setHorizontalHeaderItem(col, ConvertTableItem(tableItem));
 		tableWidget->horizontalHeaderItem(col)->setBackground(tableItem.GetBackgroundColor());
 	}
 
 	// set vertical header items
 	for (int row = 0; row < pageElement.GetRowCount(); row++){
-		const CTextTableItem& tableItem = pageElement.GetVerticalHeaderItem(row);
+		const imtreport::CTextTableItem& tableItem = pageElement.GetVerticalHeaderItem(row);
 		tableWidget->setVerticalHeaderItem(row, ConvertTableItem(tableItem));
 		tableWidget->verticalHeaderItem(row)->setBackground(tableItem.GetBackgroundColor());
 	}
@@ -213,7 +213,7 @@ void CReportSceneBuilder::ConvertTableCoodinates(const CTextTable& pageElement, 
 	// set items
 	for (int col = 0; col < pageElement.GetColumnCount(); col++){
 		for (int row = 0; row < pageElement.GetRowCount(); row++){
-			const CTextTableItem& tableItem = pageElement.GetItem(row, col);
+			const imtreport::CTextTableItem& tableItem = pageElement.GetItem(row, col);
 			tableWidget->setItem(row, col, ConvertTableItem(tableItem));
 			tableWidget->item(row, col)->setBackground(tableItem.GetBackgroundColor());
 		}
@@ -221,7 +221,7 @@ void CReportSceneBuilder::ConvertTableCoodinates(const CTextTable& pageElement, 
 }
 
 
-QTableWidgetItem* CReportSceneBuilder::ConvertTableItem(const CTextTableItem& tableItem)
+QTableWidgetItem* CReportSceneBuilder::ConvertTableItem(const imtreport::CTextTableItem& tableItem)
 {
 	QTableWidgetItem* tableWidgetItem = new QTableWidgetItem();
 
@@ -254,13 +254,13 @@ QRectF CReportSceneBuilder::MapRectToScene(const QRectF& rect)
 }
 
 
-QFont CReportSceneBuilder::MapFontToScene(const CFont& font)
+QFont CReportSceneBuilder::MapFontToScene(const imtreport::CFont& font)
 {
 	double sceneFontSize = MapPointToScene(QPointF(font.GetSize(), 0.0)).x();
 	return QFont(font.GetName(), sceneFontSize);
 }
 
 
-} // namespace imtreport
+} // namespace imtreportgui
 
 

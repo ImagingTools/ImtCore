@@ -2,11 +2,11 @@
 
 
 // ImtCore includes
-#include <imtreport/IGraphicsElementShapeFactory.h>
+#include <imtreportgui/IGraphicsElementShapeFactory.h>
 #include <imtreport/CTextTable.h>
 
 
-namespace imtreport
+namespace imtreportgui
 {
 
 
