@@ -28,9 +28,10 @@ public:
 	CReportSceneBuilder();
 
 	typedef QVector<QGraphicsScene*> ReportScenes;
-	static ReportScenes Build(imtreport::IReportDocument& reportDocument);
+	static ReportScenes Build(const imtreport::IReportDocument& reportDocument);
 
 private:
+	static void SetupScene(QGraphicsScene& scene);
 	static void BuildSceneShapes(const imtreport::IReportPage& page, QGraphicsScene& scene);
 
 	static void ConvertShapeCoodinates(const i2d::IObject2d& pageElement, QGraphicsItem& sceneElement);
@@ -47,6 +48,9 @@ private:
 	static QPointF MapPointToScene(const QPointF& point);
 	static QRectF MapRectToScene(const QRectF& rect);
 	static QFont MapFontToScene(const imtreport::CFont& font);
+
+	static const qreal s_A4WidthMm;
+	static const qreal s_A4HeightMm;
 };
 
 

@@ -16,6 +16,11 @@ I_EXPORT_COMPONENT(
 			"Report view",
 			"Report Document View");
 
+I_EXPORT_COMPONENT(
+			ReportDocumentPDFPersistence,
+			"PDF-format report document persistence",
+			"PDF Report Persistence");
+
 
 } // namespace ImtReportGuiPck
 

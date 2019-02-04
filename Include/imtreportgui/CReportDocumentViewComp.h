@@ -54,8 +54,6 @@ private:
 	void CreateSceneDecoration(QGraphicsScene& scene);
 	void ShowSceneDecoration(const bool showBorder, const bool showGrid);
 
-	static QPointF MapPointToScene(const QPointF& point);
-
 private:
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;
@@ -68,10 +66,6 @@ private:
 	typedef QVector<SceneDecoration> SceneDecorations;
 	SceneDecorations m_sceneDecorations;
 	bool m_isGridShown = true;
-
-	static const qreal s_A4WidthMm;
-	static const qreal s_A4HeightMm;
-	static const qreal s_MmPerInch;
 };
 
 

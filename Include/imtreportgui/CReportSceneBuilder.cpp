@@ -16,6 +16,11 @@ namespace imtreportgui
 {
 
 
+// static members
+const qreal CReportSceneBuilder::s_A4WidthMm = 210.0;
+const qreal CReportSceneBuilder::s_A4HeightMm = 297.0;
+
+
 // public methods
 
 CReportSceneBuilder::CReportSceneBuilder()
@@ -23,7 +28,7 @@ CReportSceneBuilder::CReportSceneBuilder()
 }
 
 
-QVector<QGraphicsScene*> CReportSceneBuilder::Build(imtreport::IReportDocument& reportDocument)
+QVector<QGraphicsScene*> CReportSceneBuilder::Build(const imtreport::IReportDocument& reportDocument)
 {
 	QVector<QGraphicsScene*> retVal;
 	retVal.resize(reportDocument.GetPagesCount());
@@ -32,8 +37,12 @@ QVector<QGraphicsScene*> CReportSceneBuilder::Build(imtreport::IReportDocument& 
 		const imtreport::IReportPage* pagePtr = reportDocument.GetReportPage(i);
 		Q_ASSERT(pagePtr);
 
-		retVal[i] = new QGraphicsScene();
-		BuildSceneShapes(*pagePtr, *(retVal[i]));
+		QGraphicsScene* scenePtr = new QGraphicsScene();
+
+		SetupScene(*scenePtr);
+		BuildSceneShapes(*pagePtr, *scenePtr);
+
+		retVal[i] = scenePtr;
 	}
 
 	return retVal;
@@ -41,6 +50,12 @@ QVector<QGraphicsScene*> CReportSceneBuilder::Build(imtreport::IReportDocument& 
 
 
 // private methods
+
+void CReportSceneBuilder::SetupScene(QGraphicsScene& scene)
+{
+	scene.setSceneRect(MapRectToScene(QRectF(0.0, 0.0, s_A4WidthMm, s_A4HeightMm)));
+}
+
 
 void CReportSceneBuilder::BuildSceneShapes(const imtreport::IReportPage& page, QGraphicsScene& scene)
 {

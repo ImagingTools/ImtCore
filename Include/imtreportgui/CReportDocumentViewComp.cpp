@@ -16,11 +16,6 @@ namespace imtreportgui
 {
 
 
-// static members
-const qreal CReportDocumentViewComp::s_A4WidthMm = 210.0;
-const qreal CReportDocumentViewComp::s_A4HeightMm = 297.0;
-
-
 // public methods
 
 CReportDocumentViewComp::CReportDocumentViewComp()
@@ -157,34 +152,29 @@ void CReportDocumentViewComp::OnExportToPdf()
 
 void CReportDocumentViewComp::CreateSceneDecoration(QGraphicsScene& scene)
 {
-	// set scene rect
-	QRectF sceneRect(QPointF(0.0, 0.0), MapPointToScene(QPointF(s_A4WidthMm, s_A4HeightMm)));
-	scene.setSceneRect(sceneRect);
-
-	QGraphicsRectItem* sceneBorderPtr = new QGraphicsRectItem(sceneRect);
+	// add scene border
+	QGraphicsRectItem* sceneBorderPtr = new QGraphicsRectItem(scene.sceneRect());
 	scene.addItem(sceneBorderPtr);
 
-	// set scene grid
+	// add scene grid
 	QGraphicsItemGroup* sceneGridPtr = new QGraphicsItemGroup();
 	m_isGridShown ? sceneGridPtr->show() : sceneGridPtr->hide();
 	scene.addItem(sceneGridPtr);
 
-	for (qreal i = 0.0; i < s_A4WidthMm; i += 5.0)
-	{
-		QPointF p1 = MapPointToScene(QPointF(i, 0.0));
-		QPointF p2 = MapPointToScene(QPointF(i, s_A4HeightMm));
+	// calculate grid cell size (5 mm in pixels)
+	qreal gridCellWidth = QGuiApplication::primaryScreen()->physicalDotsPerInchX() * 5.0 / 25.4;
+	qreal gridCellHeight = QGuiApplication::primaryScreen()->physicalDotsPerInchY() * 5.0 / 25.4;
 
-		QGraphicsLineItem* linePtr = new QGraphicsLineItem(QLineF(p1, p2));
+	for (qreal i = 0.0; i < scene.sceneRect().width(); i += gridCellWidth)
+	{
+		QGraphicsLineItem* linePtr = new QGraphicsLineItem(i, 0.0, i, scene.sceneRect().height());
 		linePtr->setPen(QPen(Qt::lightGray));
 		sceneGridPtr->addToGroup(linePtr);
 	}
 
-	for (qreal i = 0.0; i < s_A4HeightMm; i += 5.0)
+	for (qreal i = 0.0; i < scene.sceneRect().height(); i += gridCellHeight)
 	{
-		QPointF p1 = MapPointToScene(QPointF(0.0, i));
-		QPointF p2 = MapPointToScene(QPointF(s_A4WidthMm, i));
-
-		QGraphicsLineItem* linePtr = new QGraphicsLineItem(QLineF(p1, p2));
+		QGraphicsLineItem* linePtr = new QGraphicsLineItem(0.0, i, scene.sceneRect().width(), i);
 		linePtr->setPen(QPen(Qt::lightGray));
 		sceneGridPtr->addToGroup(linePtr);
 	}
@@ -207,19 +197,6 @@ void CReportDocumentViewComp::ShowSceneDecoration(const bool showBorder, const b
 	}
 
 	m_isGridShown = showGrid;
-}
-
-
-QPointF CReportDocumentViewComp::MapPointToScene(const QPointF& point)
-{
-	// map shape coordinates given in mm to scene's coordinates
-	QScreen* screenPtr = QGuiApplication::primaryScreen();
-	Q_ASSERT(screenPtr);
-
-	qreal x = point.x() * screenPtr->physicalDotsPerInchX() / 25.4;
-	qreal y = point.y() * screenPtr->physicalDotsPerInchY() / 25.4;
-
-	return QPointF(x, y);
 }
 
 

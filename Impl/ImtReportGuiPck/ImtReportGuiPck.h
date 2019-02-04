@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtreportgui/CReportDocumentViewComp.h>
+#include <imtreportgui/CReportDocumentPDFPersistenceComp.h>
 
 
 /**
@@ -13,9 +14,10 @@ namespace ImtReportGuiPck
 
 
 typedef imtreportgui::CReportDocumentViewComp ReportDocumentView;
+typedef imtreportgui::CReportDocumentPDFPersistenceComp ReportDocumentPDFPersistence;
 
 
-} // namespace ImtProc3dPck
+} // namespace ImtReportGuiPck
 
 
 
