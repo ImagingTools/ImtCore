@@ -1,5 +1,6 @@
 #pragma once
 
+
 // ACF includes
 #include <iser/ISerializable.h>
 
@@ -8,10 +9,9 @@ namespace imtreport
 {
 
 
-class CFont: public iser::ISerializable
+class CFont: virtual public iser::ISerializable
 {
 public:
-	typedef iser::ISerializable BaseClass;
 
 	enum FontFlags
 	{
@@ -20,6 +20,8 @@ public:
 		FF_ITALIC = 0x2,
 		FF_UNDERLINE = 0x4
 	};
+
+	I_DECLARE_FLAGS(FontFlags, FF_NORMAL, FF_BOLD, FF_ITALIC, FF_UNDERLINE);
 
 	CFont();
 	CFont(const QString& name, double size, int fontFlags = FontFlags::FF_NORMAL);

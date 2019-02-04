@@ -2,10 +2,11 @@
 
 
 // ACF includes
-#include "istd/TDelPtr.h"
-#include "istd/CChangeNotifier.h"
-#include "iser/IArchive.h"
-#include "iser/CArchiveTag.h"
+#include <istd/TDelPtr.h>
+#include <istd/CChangeNotifier.h>
+#include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtreport
@@ -98,7 +99,7 @@ bool CFont::Serialize(iser::IArchive& archive)
 
 	static iser::CArchiveTag fontFlagsTag("FontFlags", "Font flags", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(fontFlagsTag);
-	retVal = retVal && archive.Process(m_fontFlags);
+	retVal = retVal && I_SERIALIZE_FLAG(FontFlags, archive, m_fontFlags);
 	retVal = retVal && archive.EndTag(fontFlagsTag);
 
 	return retVal;
