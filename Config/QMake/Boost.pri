@@ -1,0 +1,4 @@
+INCLUDEPATH += $(BOOSTDIR)
+
+LIBS += -L$(BOOSTDIR)/lib64-msvc-14.1
+
