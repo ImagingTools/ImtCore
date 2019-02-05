@@ -32,18 +32,20 @@ public:
 
 private:
 	static void SetupScene(QGraphicsScene& scene);
-	static void BuildSceneShapes(const imtreport::IReportPage& page, QGraphicsScene& scene);
 
-	static void ConvertShapeCoodinates(const i2d::IObject2d& pageElement, QGraphicsItem& sceneElement);
-	static void ConvertRectCoodinates(const imtreport::CRectangleElement& pageElement, QGraphicsItem& sceneElement);
-	static void ConvertEllipseCoodinates(const imtreport::CCircleElement& pageElement, QGraphicsItem& sceneElement);
-	static void ConvertLabelCoodinates(const imtreport::CTextLabelElement& pageElement, QGraphicsItem& sceneElement);
-	static void ConvertLineCoodinates(const imtreport::CLineElement& pageElement, QGraphicsItem& sceneElement);
-	static void ConvertPolygoneCoodinates(const imtreport::CPolygonElement& pageElement, QGraphicsItem& sceneElement);
-	static void ConvertImageCoodinates(const imtreport::CImageRectangleElement& pageElement, QGraphicsItem& sceneElement);
-	static void ConvertTableCoodinates(const imtreport::CTextTable& pageElement, QGraphicsItem& sceneElement);
+	static void CreateSceneShapes(const imtreport::IReportPage& page, QGraphicsScene& scene);
+	static QGraphicsItem* CreateSceneShape(const i2d::IObject2d& pageElement);
 
-	static QTableWidgetItem* ConvertTableItem(const imtreport::CTextTableItem& tableItem);
+	static QGraphicsItem* CreateRect(const imtreport::CRectangleElement& pageElement);
+	static QGraphicsItem* CreateEllipse(const imtreport::CCircleElement& pageElement);
+	static QGraphicsItem* CreateLabel(const imtreport::CTextLabelElement& pageElement);
+	static QGraphicsItem* CreateLine(const imtreport::CLineElement& pageElement);
+	static QGraphicsItem* CreatePolygone(const imtreport::CPolygonElement& pageElement);
+	static QGraphicsItem* CreateImage(const imtreport::CImageRectangleElement& pageElement);
+	static QGraphicsItem* CreateTextTable(const imtreport::CTextTable& pageElement);
+	static QTableWidgetItem* CreateTextTableItem(const imtreport::CTextTableItem& tableItem);
+
+	static void SetShapePenAndBrush(const imtreport::IGraphicsElement& pageElement, QAbstractGraphicsShapeItem& sceneElement);
 
 	static QPointF MapPointToScene(const QPointF& point);
 	static QRectF MapRectToScene(const QRectF& rect);
