@@ -59,7 +59,24 @@ bool CReportDocumentViewComp::IsMessageSupported(
 
 void CReportDocumentViewComp::AddMessage(const MessagePtr& messagePtr)
 {
-	Q_UNUSED(messagePtr);
+	if (!messagePtr.IsValid()){
+		return;
+	}
+
+	switch (messagePtr->GetInformationCategory()){
+		case istd::IInformationProvider::IC_WARNING:
+			QMessageBox::warning(GetWidget(), tr("Report document"), messagePtr->GetInformationDescription());
+			break;
+
+		case istd::IInformationProvider::IC_ERROR:
+		case istd::IInformationProvider::IC_CRITICAL:
+			QMessageBox::critical(GetWidget(), tr("Report document"), messagePtr->GetInformationDescription());
+			break;
+
+		default:
+			QMessageBox::information(GetWidget(), tr("Report document"), messagePtr->GetInformationDescription());
+			break;
+	}
 }
 
 

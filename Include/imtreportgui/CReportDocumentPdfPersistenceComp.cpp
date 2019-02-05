@@ -50,8 +50,6 @@ int CReportDocumentPdfPersistenceComp::LoadFromFile(
 
 int CReportDocumentPdfPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	SendWarningMessage(0, "Some very important warning");
-
 	const imtreport::IReportDocument* documentPtr = dynamic_cast<const imtreport::IReportDocument*>(&data);
 	if (documentPtr == NULL){
 		return OS_FAILED;
