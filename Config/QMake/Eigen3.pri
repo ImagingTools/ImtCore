@@ -1,4 +1,0 @@
-INCLUDEPATH += $(EIGEN3_DIR)
-INCLUDEPATH += $(EIGEN3_DIR)/include
-
-
