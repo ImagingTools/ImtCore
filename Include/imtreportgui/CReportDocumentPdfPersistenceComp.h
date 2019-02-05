@@ -11,30 +11,32 @@ namespace imtreportgui
 {
 
 
-class CReportDocumentPDFPersistenceComp:
-	public ilog::CLoggerComponentBase,
-	virtual public ifile::IFilePersistence
+class CReportDocumentPdfPersistenceComp:
+			public ilog::CLoggerComponentBase,
+			virtual public ifile::IFilePersistence
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CReportDocumentPDFPersistenceComp);
+	I_BEGIN_COMPONENT(CReportDocumentPdfPersistenceComp);
 		I_REGISTER_INTERFACE(ifile::IFilePersistence);
 		I_REGISTER_INTERFACE(ifile::IFileTypeInfo);
 	I_END_COMPONENT;
 
 	// reimplemented (ifile::IFilePersistence)
 	bool IsOperationSupported(
-		const istd::IChangeable* dataObjectPtr,
-		const QString* filePathPtr = NULL,
-		int flags = -1,
-		bool beQuiet = true) const override;
+				const istd::IChangeable* dataObjectPtr,
+				const QString* filePathPtr = NULL,
+				int flags = -1,
+				bool beQuiet = true) const override;
+
 	int LoadFromFile(istd::IChangeable& data,
-		const QString& filePath = QString(),
-		ibase::IProgressManager* progressManagerPtr = NULL) const override;
+				const QString& filePath = QString(),
+				ibase::IProgressManager* progressManagerPtr = NULL) const override;
+
 	int SaveToFile(const istd::IChangeable& data,
-		const QString& filePath = QString(),
-		ibase::IProgressManager* progressManagerPtr = NULL) const override;
+				const QString& filePath = QString(),
+				ibase::IProgressManager* progressManagerPtr = NULL) const override;
 
 	// reimplemented (ifile::IFileTypeInfo)
 	bool GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr = NULL, int flags = -1, bool doAppend = false) const override;

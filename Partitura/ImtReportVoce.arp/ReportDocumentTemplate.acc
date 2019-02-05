@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4736" Description="ACF"/>
+            <Version Id="1" Number="2019" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330498" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ReportDocument" PackageId="" ComponentId="ReportDocument">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="ReportDocumentTemplate" PackageId="QtGuiPck" ComponentId="ExtendedDocumentTemplate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DocumentFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="ReportDocument"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentLoader" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ReportPersistence"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentTypeName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Report"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsEditSupported" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsNewSupported" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UndoManager" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="SerializedUndoManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="ReportDocumentView"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ReportDocumentView" PackageId="" ComponentId="ReportDocumentView">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ReportDocumentPdfPersistence" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="FileDialogPersistence"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ReportPersistence" PackageId="FilePck" ComponentId="CompactXmlFileSerializer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FileExtensions" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>xml</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeDescriptions" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Report Files</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SerializedUndoManager" PackageId="BasePck" ComponentId="SerializedUndoManager">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="ReportDocument">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="InspectionReportBuilder" PackageId="ImtReportPck" ComponentId="InspectionReportBuilder">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                    <Element Id="InspectionReportSimulator" PackageId="ImtReportPck" ComponentId="InspectionReportSimulator">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="InspectionReportBuilder" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="InspectionReportBuilder"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ReportDocument" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="ReportDocument"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="ReportDocument" PackageId="ImtReportPck" ComponentId="ReportDocument">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="idoc::IMultiPageDocument" ComponentId="ReportDocument"/>
+                    <Interface InterfaceId="imod::IModel" ComponentId="ReportDocument"/>
+                    <Interface InterfaceId="imtreport::IReportDocument" ComponentId="ReportDocument"/>
+                    <Interface InterfaceId="iser::ISerializable" ComponentId="ReportDocument"/>
+                    <Interface InterfaceId="istd::IChangeable" ComponentId="ReportDocument"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="ReportDocument"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
+        <EmbeddedRegistry Id="ReportDocumentView">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="ComposedFilePersistence" PackageId="FilePck" ComponentId="ComposedFilePersistence">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="SlaveLoaders" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>ReportDocumentPdfPersistence</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="FileDialogPersistence" PackageId="FileGuiPck" ComponentId="FileDialogLoader">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Loaders" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>ComposedFilePersistence</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="ReportDocumentPdfPersistence" PackageId="ImtReportGuiPck" ComponentId="ReportPdfPersistence">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="ReportDocumentView"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="ReportDocumentView" PackageId="ImtReportGuiPck" ComponentId="ReportDocumentView">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ReportDocumentPdfPersistence" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="FileDialogPersistence"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="ibase::ICommandsProvider" ComponentId="ReportDocumentView"/>
+                    <Interface InterfaceId="imod::IModelEditor" ComponentId="ReportDocumentView"/>
+                    <Interface InterfaceId="imod::IObserver" ComponentId="ReportDocumentView"/>
+                    <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="ReportDocumentView"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="ReportDocumentView"/>
+                </ExportedInterfaces>
+                <ExportedComponents>
+                    <Component ExportedId="VisualStatus" ComponentId="ReportDocumentView/VisualStatus"/>
+                </ExportedComponents>
+            </Data>
+        </EmbeddedRegistry>
+    </EmbeddedRegistriesList>
+    <ExportedInterfaces>
+        <Interface InterfaceId="idoc::IDocumentTemplate" ComponentId="ReportDocumentTemplate"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ReportDocumentTemplate"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

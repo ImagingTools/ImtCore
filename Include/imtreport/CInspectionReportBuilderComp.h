@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
+#include <icmm/CRgb.h>
 
 // ImtCore includes
 #include <imtreport/IInspectionReportBuilder.h>
@@ -31,7 +32,7 @@ protected:
 
 private:
 	static QString GetStatusText(istd::IInformationProvider::InformationCategory status);
-	static QColor GetStatusColor(istd::IInformationProvider::InformationCategory status);
+	static icmm::CRgb GetStatusColor(istd::IInformationProvider::InformationCategory status);
 	static QString GetErrorClassText(const ErrorClass errorClass);
 
 	bool CreateTitlePage(const ReportInputData& reportData, IReportDocument& reportDocument) const;

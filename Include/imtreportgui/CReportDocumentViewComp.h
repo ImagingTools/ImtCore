@@ -2,8 +2,10 @@
 
 
 // ACF includes
-#include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <ibase/ICommandsProvider.h>
+//#include <ifile/IFilePersistence.h>
+#include <imtreportgui/CReportDocumentPdfPersistenceComp.h>
+#include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
@@ -21,7 +23,8 @@ namespace imtreportgui
 
 class CReportDocumentViewComp:
 			public iqtgui::TDesignerGuiObserverCompBase<Ui::CReportDocumentViewComp, imtreport::IReportDocument>,
-			public virtual ibase::ICommandsProvider
+			virtual public ibase::ICommandsProvider,
+			virtual public ilog::IMessageConsumer
 {
 	Q_OBJECT
 
@@ -30,21 +33,30 @@ public:
 
 	I_BEGIN_COMPONENT(CReportDocumentViewComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
+		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
+		I_ASSIGN(m_pdfExportCompPtr, "ReportDocumentPdfPersistence", "Export report document to PDF", false, "ReportDocumentPdfPersistence");
 	I_END_COMPONENT;
 
 	CReportDocumentViewComp();
 
 	// reimplemented (ibase::ICommandsProvider)
-	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
+	const ibase::IHierarchicalCommand* GetCommands() const override;
+
+	// reimplemented (ilog::IMessageConsumer)
+	bool IsMessageSupported(
+		int messageCategory = -1,
+		int messageId = -1,
+		const istd::IInformationProvider* messagePtr = NULL) const override;
+	void AddMessage(const MessagePtr& messagePtr) override;
 
 protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
-	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
+	void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
-	virtual void OnGuiCreated() override;
-	virtual void OnGuiDestroyed() override;
-	virtual void OnGuiRetranslate() override;
+	void OnGuiCreated() override;
+	void OnGuiDestroyed() override;
+	void OnGuiRetranslate() override;
 
 private Q_SLOTS:
 	void OnShowGrid();
@@ -65,7 +77,9 @@ private:
 	typedef QPair<QGraphicsRectItem*, QGraphicsItemGroup*> SceneDecoration; // scene border and scene grid
 	typedef QVector<SceneDecoration> SceneDecorations;
 	SceneDecorations m_sceneDecorations;
-	bool m_isGridShown = true;
+	bool m_isGridShown;
+
+	I_REF(ifile::IFilePersistence, m_pdfExportCompPtr);
 };
 
 

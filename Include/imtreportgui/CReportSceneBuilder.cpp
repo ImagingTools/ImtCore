@@ -28,9 +28,9 @@ CReportSceneBuilder::CReportSceneBuilder()
 }
 
 
-QVector<QGraphicsScene*> CReportSceneBuilder::Build(const imtreport::IReportDocument& reportDocument)
+CReportSceneBuilder::ReportScenes CReportSceneBuilder::Build(const imtreport::IReportDocument& reportDocument)
 {
-	QVector<QGraphicsScene*> retVal;
+	ReportScenes retVal;
 	retVal.resize(reportDocument.GetPagesCount());
 
 	for (int i = 0; i < reportDocument.GetPagesCount(); i++){
@@ -215,14 +215,14 @@ void CReportSceneBuilder::ConvertTableCoodinates(const imtreport::CTextTable& pa
 	for (int col = 0; col < pageElement.GetColumnCount(); col++){
 		const imtreport::CTextTableItem& tableItem = pageElement.GetHorizontalHeaderItem(col);
 		tableWidget->setHorizontalHeaderItem(col, ConvertTableItem(tableItem));
-		tableWidget->horizontalHeaderItem(col)->setBackground(tableItem.GetBackgroundColor());
+		tableWidget->horizontalHeaderItem(col)->setBackground(ConvertToQColor(tableItem.GetBackgroundColor()));
 	}
 
 	// set vertical header items
 	for (int row = 0; row < pageElement.GetRowCount(); row++){
 		const imtreport::CTextTableItem& tableItem = pageElement.GetVerticalHeaderItem(row);
 		tableWidget->setVerticalHeaderItem(row, ConvertTableItem(tableItem));
-		tableWidget->verticalHeaderItem(row)->setBackground(tableItem.GetBackgroundColor());
+		tableWidget->verticalHeaderItem(row)->setBackground(ConvertToQColor(tableItem.GetBackgroundColor()));
 	}
 
 	// set items
@@ -230,7 +230,7 @@ void CReportSceneBuilder::ConvertTableCoodinates(const imtreport::CTextTable& pa
 		for (int row = 0; row < pageElement.GetRowCount(); row++){
 			const imtreport::CTextTableItem& tableItem = pageElement.GetItem(row, col);
 			tableWidget->setItem(row, col, ConvertTableItem(tableItem));
-			tableWidget->item(row, col)->setBackground(tableItem.GetBackgroundColor());
+			tableWidget->item(row, col)->setBackground(ConvertToQColor(tableItem.GetBackgroundColor()));
 		}
 	}
 }
@@ -243,7 +243,7 @@ QTableWidgetItem* CReportSceneBuilder::ConvertTableItem(const imtreport::CTextTa
 	tableWidgetItem->setText(tableItem.GetText());
 	tableWidgetItem->setTextAlignment(tableItem.GetAlignment());
 	tableWidgetItem->setFont(MapFontToScene(tableItem.GetFont()));
-	tableWidgetItem->setForeground(QBrush(tableItem.GetForegroundColor()));
+	tableWidgetItem->setForeground(QBrush(ConvertToQColor(tableItem.GetForegroundColor())));
 	tableWidgetItem->setIcon(QPixmap::fromImage(tableItem.GetImage().GetQImage()));
 
 	return tableWidgetItem;
@@ -273,6 +273,12 @@ QFont CReportSceneBuilder::MapFontToScene(const imtreport::CFont& font)
 {
 	double sceneFontSize = MapPointToScene(QPointF(font.GetSize(), 0.0)).x();
 	return QFont(font.GetName(), sceneFontSize);
+}
+
+
+QColor CReportSceneBuilder::ConvertToQColor(const icmm::CRgb& color)
+{
+	return qRgb(color[0] * 255, color[1] * 255, color[2] * 255);
 }
 
 

@@ -1,4 +1,4 @@
-#include <imtreportgui/CReportDocumentPDFPersistenceComp.h>
+#include <imtreportgui/CReportDocumentPdfPersistenceComp.h>
 
 
 // Qt includes
@@ -18,7 +18,7 @@ namespace imtreportgui
 
 // reimplemented (ifile::IFilePersistence)
 
-bool CReportDocumentPDFPersistenceComp::IsOperationSupported(
+bool CReportDocumentPdfPersistenceComp::IsOperationSupported(
 	const istd::IChangeable* dataObjectPtr,
 	const QString* filePathPtr,
 	int flags,
@@ -39,7 +39,7 @@ bool CReportDocumentPDFPersistenceComp::IsOperationSupported(
 }
 
 
-int CReportDocumentPDFPersistenceComp::LoadFromFile(
+int CReportDocumentPdfPersistenceComp::LoadFromFile(
 	istd::IChangeable& /*data*/,
 	const QString& /*filePath*/,
 	ibase::IProgressManager* /*progressManagerPtr*/) const
@@ -48,8 +48,10 @@ int CReportDocumentPDFPersistenceComp::LoadFromFile(
 }
 
 
-int CReportDocumentPDFPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const
+int CReportDocumentPdfPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const
 {
+	SendWarningMessage(0, "Some very important warning");
+
 	const imtreport::IReportDocument* documentPtr = dynamic_cast<const imtreport::IReportDocument*>(&data);
 	if (documentPtr == NULL){
 		return OS_FAILED;
@@ -71,10 +73,12 @@ int CReportDocumentPDFPersistenceComp::SaveToFile(const istd::IChangeable& data,
 	QPainter painter(&printer);
 
 	for (int i = 0; i < scenes.count(); ++i){
-		QGraphicsScene* scenePtr = dynamic_cast<QGraphicsScene*>(scenes[i]);
-		Q_ASSERT(scenePtr != nullptr);
+		QGraphicsScene* scenePtr = scenes[i];
+		Q_ASSERT(scenePtr != NULL);
 
 		scenePtr->render(&painter);
+
+		delete scenePtr;
 
 		if (i < scenes.count() - 1){ // initially printer already has one default page so don't add a new one on the last iteration
 			if (!printer.newPage()){
@@ -92,7 +96,7 @@ int CReportDocumentPDFPersistenceComp::SaveToFile(const istd::IChangeable& data,
 
 // reimplemented (ifile::IFileTypeInfo)
 
-bool CReportDocumentPDFPersistenceComp::GetFileExtensions(QStringList& result, const istd::IChangeable* /*dataObjectPtr*/, int /*flags*/, bool doAppend) const
+bool CReportDocumentPdfPersistenceComp::GetFileExtensions(QStringList& result, const istd::IChangeable* /*dataObjectPtr*/, int /*flags*/, bool doAppend) const
 {
 	if (!doAppend){
 		result.clear();
@@ -104,7 +108,7 @@ bool CReportDocumentPDFPersistenceComp::GetFileExtensions(QStringList& result, c
 }
 
 
-QString CReportDocumentPDFPersistenceComp::GetTypeDescription(const QString* /*extensionPtr*/) const
+QString CReportDocumentPdfPersistenceComp::GetTypeDescription(const QString* /*extensionPtr*/) const
 {
 	return "Report files";
 }

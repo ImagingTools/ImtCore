@@ -3,12 +3,12 @@
 
 // Qt includes
 #include <QtCore/QtCore>
-#include <QtGui/QColor>
 
 // ACF includes
 #include <iser/ISerializable.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+#include <icmm/CRgb.h>
 #include <iimg/CBitmap.h>
 
 // ImtCore includes
@@ -26,8 +26,8 @@ public:
 				const QString& text = QString(),
 				Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignVCenter,
 				CFont font = CFont("Arial", 2.5),
-				const QColor& foregroundColor = Qt::black,
-				const QColor& backgroundColor = Qt::transparent,
+				const icmm::CRgb& foregroundColor = icmm::CRgb(0.0, 0.0, 0.0),
+				const icmm::CRgb& backgroundColor = icmm::CRgb(1.0, 1.0, 1.0),
 				const iimg::CBitmap& image = iimg::CBitmap());
 
 	QString GetText() const;
@@ -39,11 +39,11 @@ public:
 	const CFont& GetFont() const;
 	void SetFont(const CFont& font);
 
-	QColor GetForegroundColor() const;
-	void SetForegroundColor(const QColor& color);
+	icmm::CRgb GetForegroundColor() const;
+	void SetForegroundColor(const icmm::CRgb& color);
 
-	QColor GetBackgroundColor() const;
-	void SetBackgroundColor(const QColor& color);
+	icmm::CRgb GetBackgroundColor() const;
+	void SetBackgroundColor(const icmm::CRgb& color);
 
 	const iimg::CBitmap& GetImage() const;
 	void SetImage(const iimg::CBitmap& image);
@@ -73,8 +73,8 @@ private:
 	QString m_text;
 	Qt::Alignment m_alignment;
 	CFont m_font;
-	QColor m_foregroundColor;
-	QColor m_backgroundColor;
+	icmm::CRgb m_foregroundColor;
+	icmm::CRgb m_backgroundColor;
 	iimg::CBitmap m_image;
 };
 

@@ -48,6 +48,7 @@ private:
 	static QPointF MapPointToScene(const QPointF& point);
 	static QRectF MapRectToScene(const QRectF& rect);
 	static QFont MapFontToScene(const imtreport::CFont& font);
+	static QColor ConvertToQColor(const icmm::CRgb& color);
 
 	static const qreal s_A4WidthMm;
 	static const qreal s_A4HeightMm;

@@ -17,8 +17,8 @@ CTextTableItem::CTextTableItem(
 			const QString& text,
 			Qt::Alignment alignment,
 			CFont font,
-			const QColor& foregroundColor,
-			const QColor& backgroundColor,
+			const icmm::CRgb& foregroundColor,
+			const icmm::CRgb& backgroundColor,
 			const iimg::CBitmap& image)
 	:m_text(text),
 	m_alignment(alignment),
@@ -78,13 +78,13 @@ void CTextTableItem::SetFont(const CFont& font)
 }
 
 
-QColor CTextTableItem::GetForegroundColor() const
+icmm::CRgb CTextTableItem::GetForegroundColor() const
 {
 	return m_foregroundColor;
 }
 
 
-void CTextTableItem::SetForegroundColor(const QColor& color)
+void CTextTableItem::SetForegroundColor(const icmm::CRgb& color)
 {
 	if (m_foregroundColor != color){
 		istd::CChangeNotifier changeNotifier(this);
@@ -94,13 +94,13 @@ void CTextTableItem::SetForegroundColor(const QColor& color)
 }
 
 
-QColor CTextTableItem::GetBackgroundColor() const
+icmm::CRgb CTextTableItem::GetBackgroundColor() const
 {
 	return m_backgroundColor;
 }
 
 
-void CTextTableItem::SetBackgroundColor(const QColor& color)
+void CTextTableItem::SetBackgroundColor(const icmm::CRgb& color)
 {
 	if (m_backgroundColor != color){
 		istd::CChangeNotifier changeNotifier(this);
@@ -142,15 +142,15 @@ bool CTextTableItem::Serialize(iser::IArchive& archive)
 	retVal = retVal && m_font.Serialize(archive);
 	retVal = retVal && archive.EndTag(tagFont);
 
-	//static iser::CArchiveTag tagForegroundColor("ForegroundColor", "Table item foreground color", iser::CArchiveTag::TT_LEAF);
-	//retVal = retVal && archive.BeginTag(tagForegroundColor);
-	//retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeQColor(archive, m_foregroundColor);
-	//retVal = retVal && archive.EndTag(tagForegroundColor);
+	static iser::CArchiveTag tagForegroundColor("ForegroundColor", "Table item foreground color", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tagForegroundColor);
+	retVal = retVal && m_foregroundColor.Serialize(archive);
+	retVal = retVal && archive.EndTag(tagForegroundColor);
 
-	//static iser::CArchiveTag tagBackgroundColor("BackgroundColor", "Table item background color", iser::CArchiveTag::TT_LEAF);
-	//retVal = retVal && archive.BeginTag(tagBackgroundColor);
-	//retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeQColor(archive, m_backgroundColor);
-	//retVal = retVal && archive.EndTag(tagBackgroundColor);
+	static iser::CArchiveTag tagBackgroundColor("BackgroundColor", "Table item background color", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tagBackgroundColor);
+	retVal = retVal && m_backgroundColor.Serialize(archive);
+	retVal = retVal && archive.EndTag(tagBackgroundColor);
 
 	static iser::CArchiveTag tagImage("Image", "Table item image", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(tagImage);

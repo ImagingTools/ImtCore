@@ -17,7 +17,7 @@ I_EXPORT_COMPONENT(
 			"Report Document View");
 
 I_EXPORT_COMPONENT(
-			ReportDocumentPDFPersistence,
+			ReportPdfPersistence,
 			"PDF-format report document persistence",
 			"PDF Report Persistence");
 

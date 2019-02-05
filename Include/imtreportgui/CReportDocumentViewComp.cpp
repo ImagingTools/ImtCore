@@ -22,7 +22,8 @@ CReportDocumentViewComp::CReportDocumentViewComp()
 	:m_fileCommands("&File", 100),
 	m_viewCommands("&View", 100),
 	m_exportToPdfCommand("Export to PDF...", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 1984),
-	m_showGridCommand("Show grid", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1985)
+	m_showGridCommand("Show grid", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1985),
+	m_isGridShown(true)
 {
 	m_showGridCommand.setChecked(true);
 
@@ -45,6 +46,23 @@ const ibase::IHierarchicalCommand* CReportDocumentViewComp::GetCommands() const
 }
 
 
+// reimplemented (ilog::IMessageConsumer)
+
+bool CReportDocumentViewComp::IsMessageSupported(
+	int /*messageCategory*/,
+	int /*messageId*/,
+	const istd::IInformationProvider* /*messagePtr*/) const
+{
+	return true;
+}
+
+
+void CReportDocumentViewComp::AddMessage(const MessagePtr& messagePtr)
+{
+	Q_UNUSED(messagePtr);
+}
+
+
 // protected methods
 
 // reimplemented (iqtgui::TGuiObserverWrap)
@@ -60,7 +78,7 @@ void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*ch
 
 	for (int i = 0; i < scenes.size(); ++i){
 		QGraphicsScene* scenePtr = scenes[i];
-		Q_ASSERT(scenePtr);
+		Q_ASSERT(scenePtr != NULL);
 
 		CreateSceneDecoration(*scenePtr);
 
@@ -101,49 +119,11 @@ void CReportDocumentViewComp::OnShowGrid()
 
 void CReportDocumentViewComp::OnExportToPdf()
 {
-	if (PagesTabs->count() <= 0){
-		QMessageBox::warning(GetWidget(), tr("Export to PDF"), tr("Report is empty"));
-		return;
-	}
+	if (m_pdfExportCompPtr.IsValid()){
+		imtreport::IReportDocument* documentPtr = GetObjectPtr();
+		Q_ASSERT(documentPtr != NULL);
 
-	QString fileName = QFileDialog::getSaveFileName(GetWidget(), tr("Export to PDF..."), "", tr("Report Files (*.pdf)"));
-	if (fileName.isEmpty()){
-		return;
-	}
-
-	bool ok = true;
-	bool wasGridShown = m_isGridShown;
-
-	ShowSceneDecoration(false, false);
-
-	QPrinter printer(QPrinter::HighResolution);
-	printer.setPageSize(QPrinter::A4);
-	printer.setOrientation(QPrinter::Portrait);
-	printer.setOutputFormat(QPrinter::PdfFormat);
-	printer.setOutputFileName(fileName);
-	printer.setPageMargins({ 0.0, 0.0, 0.0, 0.0 });
-
-	QPainter painter(&printer);
-
-	for (int i = 0; i < PagesTabs->count(); i++){
-		QGraphicsView* viewPtr = dynamic_cast<QGraphicsView*>(PagesTabs->widget(i));
-		Q_ASSERT(viewPtr != nullptr);
-
-		viewPtr->scene()->render(&painter);
-
-		if (i < PagesTabs->count() - 1){ // initially printer already has one default page so don't add a new one on the last iteration
-			if (!printer.newPage()){
-				QMessageBox::critical(GetWidget(), tr("Export to PDF"), tr("Failed to export report"));
-				ok = false;
-				break;
-			}
-		}
-	}
-
-	ShowSceneDecoration(true, wasGridShown);
-
-	if (ok){
-		QMessageBox::information(GetWidget(), tr("Export to PDF"), tr("Report has been exported successfully"));
+		m_pdfExportCompPtr->SaveToFile(*documentPtr);
 	}
 }
 

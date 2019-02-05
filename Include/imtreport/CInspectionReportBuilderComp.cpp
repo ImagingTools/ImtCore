@@ -68,23 +68,23 @@ QString CInspectionReportBuilderComp::GetStatusText(istd::IInformationProvider::
 }
 
 
-QColor CInspectionReportBuilderComp::GetStatusColor(istd::IInformationProvider::InformationCategory status)
+icmm::CRgb CInspectionReportBuilderComp::GetStatusColor(istd::IInformationProvider::InformationCategory status)
 {
 	switch (status){
 	case istd::IInformationProvider::InformationCategory::IC_CRITICAL:
-		return Qt::darkRed;
+		return icmm::CRgb(0.8, 0, 0);
 
 	case istd::IInformationProvider::InformationCategory::IC_ERROR:
-		return Qt::red;
+		return icmm::CRgb(1.0, 0, 0);
 
 	case istd::IInformationProvider::InformationCategory::IC_INFO:
-		return Qt::darkGreen;
+		return icmm::CRgb(0, 0.8, 0);
 
 	case istd::IInformationProvider::InformationCategory::IC_WARNING:
-		return qRgb(128, 128, 0);
+		return icmm::CRgb(0.5, 0.5, 0);
 
 	default:
-		return Qt::gray;
+		return icmm::CRgb(0.5, 0.5, 0.5);
 	}
 }
 
