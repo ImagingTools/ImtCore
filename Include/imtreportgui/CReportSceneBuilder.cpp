@@ -67,6 +67,7 @@ void CReportSceneBuilder::BuildSceneShapes(const imtreport::IReportPage& page, Q
 		Q_ASSERT(elementPtr != nullptr);
 
 		QGraphicsItem* itemPtr = shapeFactory.CreateShape(*elementPtr);
+		Q_ASSERT(itemPtr);
 
 		ConvertShapeCoodinates(*elementPtr, *itemPtr);
 
@@ -212,25 +213,30 @@ void CReportSceneBuilder::ConvertTableCoodinates(const imtreport::CTextTable& pa
 	tableWidget->setFixedSize(rect.size().toSize());
 
 	// set horizontal header items
-	for (int col = 0; col < pageElement.GetColumnCount(); col++){
-		const imtreport::CTextTableItem& tableItem = pageElement.GetHorizontalHeaderItem(col);
-		tableWidget->setHorizontalHeaderItem(col, ConvertTableItem(tableItem));
-		tableWidget->horizontalHeaderItem(col)->setBackground(ConvertToQColor(tableItem.GetBackgroundColor()));
+	if (pageElement.IsHorizontalHeaderVisible()){
+		for (int col = 0; col < pageElement.GetColumnCount(); col++){
+			const imtreport::CTextTableItem& tableItem = pageElement.GetHorizontalHeaderItem(col);
+			tableWidget->setItem(0, col, ConvertTableItem(tableItem));
+		}
 	}
 
 	// set vertical header items
-	for (int row = 0; row < pageElement.GetRowCount(); row++){
-		const imtreport::CTextTableItem& tableItem = pageElement.GetVerticalHeaderItem(row);
-		tableWidget->setVerticalHeaderItem(row, ConvertTableItem(tableItem));
-		tableWidget->verticalHeaderItem(row)->setBackground(ConvertToQColor(tableItem.GetBackgroundColor()));
+	if (pageElement.IsVerticalHeaderVisible()){
+		for (int row = 0; row < pageElement.GetRowCount(); row++){
+			const imtreport::CTextTableItem& tableItem = pageElement.GetVerticalHeaderItem(row);
+			tableWidget->setItem(row, 0, ConvertTableItem(tableItem));
+		}
 	}
 
 	// set items
 	for (int col = 0; col < pageElement.GetColumnCount(); col++){
 		for (int row = 0; row < pageElement.GetRowCount(); row++){
 			const imtreport::CTextTableItem& tableItem = pageElement.GetItem(row, col);
-			tableWidget->setItem(row, col, ConvertTableItem(tableItem));
-			tableWidget->item(row, col)->setBackground(ConvertToQColor(tableItem.GetBackgroundColor()));
+
+			int widgetRow = pageElement.IsHorizontalHeaderVisible() ? row + 1 : row;
+			int widgetCol = pageElement.IsVerticalHeaderVisible() ? col + 1 : col;
+
+			tableWidget->setItem(widgetRow, widgetCol, ConvertTableItem(tableItem));
 		}
 	}
 }
@@ -244,6 +250,7 @@ QTableWidgetItem* CReportSceneBuilder::ConvertTableItem(const imtreport::CTextTa
 	tableWidgetItem->setTextAlignment(tableItem.GetAlignment());
 	tableWidgetItem->setFont(MapFontToScene(tableItem.GetFont()));
 	tableWidgetItem->setForeground(QBrush(ConvertToQColor(tableItem.GetForegroundColor())));
+	tableWidgetItem->setBackground(QBrush(ConvertToQColor(tableItem.GetBackgroundColor())));
 	tableWidgetItem->setIcon(QPixmap::fromImage(tableItem.GetImage().GetQImage()));
 
 	return tableWidgetItem;

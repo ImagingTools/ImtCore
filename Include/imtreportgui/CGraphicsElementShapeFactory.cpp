@@ -99,8 +99,16 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateShape(const i2d::IObject2d& o
 
 QGraphicsItem* CGraphicsElementShapeFactory::CreateTextTable(const imtreport::CTextTable& table) const
 {
-	QTableWidget* tableWidget = new QTableWidget(table.GetRowCount(), table.GetColumnCount());
-	tableWidget->setFrameShape(QFrame::Box);
+	int rowCount = table.GetRowCount();
+	if (table.IsHorizontalHeaderVisible())
+		rowCount++;
+
+	int columnCount = table.GetColumnCount();
+	if (table.IsVerticalHeaderVisible())
+		columnCount++;
+
+	QTableWidget* tableWidget = new QTableWidget(rowCount, columnCount);
+	tableWidget->setFrameShape(QFrame::NoFrame);
 	tableWidget->setFocusPolicy(Qt::NoFocus);
 	tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
@@ -108,21 +116,10 @@ QGraphicsItem* CGraphicsElementShapeFactory::CreateTextTable(const imtreport::CT
 	tableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-	if (table.IsHorizontalHeaderVisible()){
-		tableWidget->horizontalHeader()->show();
-		tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-		tableWidget->horizontalHeader()->setStretchLastSection(true);
-	}
-	else{
-		tableWidget->horizontalHeader()->hide();
-	}
+	tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	tableWidget->horizontalHeader()->hide();
 
-	if (table.IsVerticalHeaderVisible()){
-		tableWidget->verticalHeader()->show();
-	}
-	else{
-		tableWidget->verticalHeader()->hide();
-	}
+	tableWidget->verticalHeader()->hide();
 
 	QGraphicsProxyWidget* sceneTableWidget = new QGraphicsProxyWidget();
 	sceneTableWidget->setWidget(tableWidget);
