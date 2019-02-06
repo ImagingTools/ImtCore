@@ -84,7 +84,6 @@ ifile::IFilePersistence::OperationState CReportDocumentTiffPersistenceComp::Save
 		image.fill(Qt::transparent);
 
 		QPainter painter(&image);
-		painter.setRenderHints(QPainter::TextAntialiasing);
 		scenePtr->render(&painter);
 
 		QString imgFilePath = filePath;
@@ -104,7 +103,6 @@ ifile::IFilePersistence::OperationState CReportDocumentTiffPersistenceComp::Save
 		if (m_saveFirstPageOnlyAttrPtr.IsValid() && m_saveFirstPageOnlyAttrPtr->GetValue()){
 			break;
 		}
-
 	}
 
 	SendInfoMessage(0, "Report has been exported successfully");
