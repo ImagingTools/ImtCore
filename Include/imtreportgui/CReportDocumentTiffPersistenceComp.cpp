@@ -61,55 +61,50 @@ int CReportDocumentTiffPersistenceComp::SaveToFile(const istd::IChangeable& data
 		return OS_OK;
 	}
 	
-	bool retVal = SaveToFile(scenes, filePath);
+	OperationState retVal = SaveToFile(scenes, filePath);
 
 	for (const QGraphicsScene* scenePtr : scenes)
 		delete scenePtr;
 
-	if (retVal){
-		SendInfoMessage(0, "Report has been exported successfully");
-		return OS_OK;
-	}
-	else{
-		return OS_FAILED;
-	}
+	return retVal;
 }
 
 
-bool CReportDocumentTiffPersistenceComp::SaveToFile(const CReportSceneBuilder::ReportScenes scenes, const QString& filePath) const
+ifile::IFilePersistence::OperationState CReportDocumentTiffPersistenceComp::SaveToFile(const CReportSceneBuilder::ReportScenes scenes, const QString& filePath) const
 {
 	Q_ASSERT(!scenes.isEmpty());
 
-	const double interMargin = 10.0;
+	QFileInfo fileInfo(filePath);
 
-	QSize sceneSize = scenes[0]->sceneRect().size().toSize();
-
-	int imageWidth = sceneSize.width();
-	int imageHeigth = scenes.size() * (sceneSize.height() + interMargin);
-
-	QRectF targetRect(0.0, 0.0, sceneSize.width(), sceneSize.height());
-
-	QImage image(imageWidth, imageHeigth, QImage::Format::Format_ARGB32);
-	image.fill(Qt::transparent);
-
-	QPainter painter(&image);
-
-	for (QGraphicsScene* scenePtr : scenes){
+	for (int i = 0; i < scenes.size(); ++i){
+		QGraphicsScene* scenePtr = scenes[i];
 		Q_ASSERT(scenePtr != NULL);
 
-		scenePtr->render(&painter, targetRect);
+		QImage image(scenePtr->sceneRect().size().toSize(), QImage::Format::Format_ARGB32);
+		image.fill(Qt::transparent);
 
-		QImageWriter writer(filePath, "tiff");
-		if (!writer.write(image)){
-			SendErrorMessage(0, "Failed to export report\r\n" + writer.errorString());
-			return false;
+		QPainter painter(&image);
+		painter.setRenderHints(QPainter::TextAntialiasing);
+		scenePtr->render(&painter);
+
+		QString imgFilePath = filePath;
+		if (i > 0){
+			imgFilePath = fileInfo.path() + "/" +
+				fileInfo.baseName() +
+				QString("%1").arg(i, 3, 10, QChar('0')) + "." +
+				fileInfo.completeSuffix();
 		}
 
-		targetRect.setTop(targetRect.top() + targetRect.height() + interMargin);
-		targetRect.setHeight(sceneSize.height());
+		QImageWriter writer(imgFilePath, "tiff");
+		if (!writer.write(image)){
+			SendErrorMessage(0, "Failed to export report\r\n" + writer.errorString());
+			return OS_FAILED;
+		}
 	}
 
-	return true;
+	SendInfoMessage(0, "Report has been exported successfully");
+
+	return OS_OK;
 }
 
 

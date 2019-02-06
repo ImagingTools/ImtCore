@@ -46,7 +46,7 @@ public:
 	QString GetTypeDescription(const QString* extensionPtr = NULL) const override;
 
 private:
-	bool SaveToFile(const CReportSceneBuilder::ReportScenes scenes, const QString& filePath) const;
+	OperationState SaveToFile(const CReportSceneBuilder::ReportScenes scenes, const QString& filePath) const;
 };
 
 
