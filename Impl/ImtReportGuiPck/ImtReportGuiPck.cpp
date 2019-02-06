@@ -9,7 +9,7 @@ namespace ImtReportGuiPck
 {
 
 
-I_EXPORT_PACKAGE("ImtReportGuiPck", "ImagingTools report UI-component package", "Report GUI UI UX View");
+I_EXPORT_PACKAGE("ImtReportGuiPck", "ImagingTools report UI-component package", "Report GUI");
 
 I_EXPORT_COMPONENT(
 			ReportDocumentView,

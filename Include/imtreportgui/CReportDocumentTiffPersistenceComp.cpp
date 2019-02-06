@@ -63,8 +63,9 @@ int CReportDocumentTiffPersistenceComp::SaveToFile(const istd::IChangeable& data
 	
 	OperationState retVal = SaveToFile(scenes, filePath);
 
-	for (const QGraphicsScene* scenePtr : scenes)
+	for (const QGraphicsScene* scenePtr : scenes){
 		delete scenePtr;
+	}
 
 	return retVal;
 }
@@ -89,14 +90,15 @@ ifile::IFilePersistence::OperationState CReportDocumentTiffPersistenceComp::Save
 		QString imgFilePath = filePath;
 		if (i > 0){
 			imgFilePath = fileInfo.path() + "/" +
-				fileInfo.baseName() +
-				QString("%1").arg(i, 3, 10, QChar('0')) + "." +
-				fileInfo.completeSuffix();
+						fileInfo.baseName() +
+						QString("%1").arg(i, 3, 10, QChar('0')) + "." +
+						fileInfo.completeSuffix();
 		}
 
 		QImageWriter writer(imgFilePath, "tiff");
 		if (!writer.write(image)){
 			SendErrorMessage(0, "Failed to export report\r\n" + writer.errorString());
+
 			return OS_FAILED;
 		}
 
@@ -120,6 +122,7 @@ bool CReportDocumentTiffPersistenceComp::GetFileExtensions(QStringList& result, 
 	}
 
 	result.push_back("tiff");
+	result.push_back("tif");
 
 	return true;
 }

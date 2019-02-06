@@ -49,6 +49,7 @@ public:
 private:
 	OperationState SaveToFile(const CReportSceneBuilder::ReportScenes scenes, const QString& filePath) const;
 
+private:
 	I_ATTR(bool, m_saveFirstPageOnlyAttrPtr);
 };
 
