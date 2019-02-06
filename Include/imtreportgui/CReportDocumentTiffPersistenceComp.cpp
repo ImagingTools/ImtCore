@@ -10,7 +10,6 @@
 
 // ImtCore includes
 #include <imtreport/CReportDocument.h>
-#include <imtreportgui/CReportSceneBuilder.h>
 
 
 namespace imtreportgui
@@ -62,27 +61,7 @@ int CReportDocumentTiffPersistenceComp::SaveToFile(const istd::IChangeable& data
 		return OS_OK;
 	}
 	
-	bool retVal = false;
-
-	for (QGraphicsScene* scenePtr : scenes){
-		Q_ASSERT(scenePtr != NULL);
-
-		QImage image(scenePtr->sceneRect().size().toSize(), QImage::Format::Format_ARGB32);
-
-		QPainter painter(&image);
-		//painter.setRenderHint(QPainter::Antialiasing);
-
-		scenePtr->render(&painter);
-
-		QImageWriter writer(filePath, "tiff");
-		if (!writer.write(image)){
-			SendErrorMessage(0, "Failed to export report\r\n" + writer.errorString());
-			retVal = false;
-			break;
-		}
-
-		break;
-	}
+	bool retVal = SaveToFile(scenes, filePath);
 
 	for (const QGraphicsScene* scenePtr : scenes)
 		delete scenePtr;
@@ -94,6 +73,43 @@ int CReportDocumentTiffPersistenceComp::SaveToFile(const istd::IChangeable& data
 	else{
 		return OS_FAILED;
 	}
+}
+
+
+bool CReportDocumentTiffPersistenceComp::SaveToFile(const CReportSceneBuilder::ReportScenes scenes, const QString& filePath) const
+{
+	Q_ASSERT(!scenes.isEmpty());
+
+	const double interMargin = 10.0;
+
+	QSize sceneSize = scenes[0]->sceneRect().size().toSize();
+
+	int imageWidth = sceneSize.width();
+	int imageHeigth = scenes.size() * (sceneSize.height() + interMargin);
+
+	QRectF targetRect(0.0, 0.0, sceneSize.width(), sceneSize.height());
+
+	QImage image(imageWidth, imageHeigth, QImage::Format::Format_ARGB32);
+	image.fill(Qt::transparent);
+
+	QPainter painter(&image);
+
+	for (QGraphicsScene* scenePtr : scenes){
+		Q_ASSERT(scenePtr != NULL);
+
+		scenePtr->render(&painter, targetRect);
+
+		QImageWriter writer(filePath, "tiff");
+		if (!writer.write(image)){
+			SendErrorMessage(0, "Failed to export report\r\n" + writer.errorString());
+			return false;
+		}
+
+		targetRect.setTop(targetRect.top() + targetRect.height() + interMargin);
+		targetRect.setHeight(sceneSize.height());
+	}
+
+	return true;
 }
 
 

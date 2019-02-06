@@ -6,6 +6,9 @@
 #include <ilog/TLoggerCompWrap.h>
 #include <ifile/IFilePersistence.h>
 
+// ImtCore includes
+#include <imtreportgui/CReportSceneBuilder.h>
+
 
 namespace imtreportgui
 {
@@ -41,6 +44,9 @@ public:
 	// reimplemented (ifile::IFileTypeInfo)
 	bool GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr = NULL, int flags = -1, bool doAppend = false) const override;
 	QString GetTypeDescription(const QString* extensionPtr = NULL) const override;
+
+private:
+	bool SaveToFile(const CReportSceneBuilder::ReportScenes scenes, const QString& filePath) const;
 };
 
 
