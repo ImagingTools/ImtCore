@@ -43,7 +43,12 @@ private:
 	static QGraphicsItem* CreatePolygone(const imtreport::CPolygonElement& pageElement);
 	static QGraphicsItem* CreateImage(const imtreport::CImageRectangleElement& pageElement);
 	static QGraphicsItem* CreateTextTable(const imtreport::CTextTable& pageElement);
-	static QTableWidgetItem* CreateTextTableItem(const imtreport::CTextTableItem& tableItem);
+	static QGraphicsTextItem* CreateTextTableItem(const imtreport::CTextTable& table,
+		const imtreport::CTextTableItem& tableItem,
+		int row,
+		int col,
+		double cellWidth,
+		double cellHeight);
 
 	static void SetShapePenAndBrush(const imtreport::IGraphicsElement& pageElement, QAbstractGraphicsShapeItem& sceneElement);
 

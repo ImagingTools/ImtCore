@@ -15,14 +15,14 @@ namespace imtreport
 
 // private static members
 
-const double CTextTable::s_defaultColumnWidth = 30.0;
+const double CTextTable::s_defaultColumnWidth = 10.0;
 
 
 // public methods
 
 CTextTable::CTextTable() :
-	m_isHorizontalHeaderVisible(true),
-	m_isVerticalHeaderVisible(true)
+	m_showHorizontalHeader(true),
+	m_showVerticalHeader(true)
 {
 }
 
@@ -49,7 +49,7 @@ int CTextTable::GetColumnCount() const
 
 bool CTextTable::IsHorizontalHeaderVisible() const
 {
-	return m_isHorizontalHeaderVisible;
+	return m_showHorizontalHeader;
 }
 
 
@@ -57,13 +57,13 @@ void CTextTable::ShowHorizontalHeader(bool show)
 {
 	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
 
-	m_isHorizontalHeaderVisible = show;
+	m_showHorizontalHeader = show;
 }
 
 
 bool CTextTable::IsVerticalHeaderVisible() const
 {
-	return m_isVerticalHeaderVisible;
+	return m_showVerticalHeader;
 }
 
 
@@ -71,7 +71,7 @@ void CTextTable::ShowVerticalHeader(bool show)
 {
 	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
 
-	m_isVerticalHeaderVisible = show;
+	m_showVerticalHeader = show;
 }
 
 
@@ -101,15 +101,16 @@ void CTextTable::SetVerticalHeaderLabels(const QStringList& labels)
 }
 
 
-const QVector<double>& CTextTable::GetColumnWidths() const
+double CTextTable::GetColumnWidth(int column) const
 {
-	return m_columnWidths;
+	Q_ASSERT(column >= 0 && column < m_columnWidths.size());
+	return m_columnWidths[column];
 }
 
 
 void CTextTable::SetColumnWidths(const QVector<double>& columnWidths)
 {
-	Q_ASSERT(columnWidths.size() == m_items.size());
+	Q_ASSERT(columnWidths.size() == GetInternalColumnCount());
 
 	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAllChanges());
 
@@ -166,12 +167,12 @@ bool CTextTable::Serialize(iser::IArchive& archive)
 	// header visibility
 	static iser::CArchiveTag isHorizontalHeaderVisibleTag("IsHorizontalHeaderVisible", "Table horizontal header visibility", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(isHorizontalHeaderVisibleTag);
-	retVal = retVal && archive.Process(m_isHorizontalHeaderVisible);
+	retVal = retVal && archive.Process(m_showHorizontalHeader);
 	retVal = retVal && archive.EndTag(isHorizontalHeaderVisibleTag);
 
 	static iser::CArchiveTag isVerticalHeaderVisibleTag("IsVerticalHeaderVisible", "Table vertical header visibility", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(isVerticalHeaderVisibleTag);
-	retVal = retVal && archive.Process(m_isVerticalHeaderVisible);
+	retVal = retVal && archive.Process(m_showVerticalHeader);
 	retVal = retVal && archive.EndTag(isVerticalHeaderVisibleTag);
 
 	// column widths
@@ -232,8 +233,8 @@ bool CTextTable::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_items = sourcePtr->m_items;
-		m_isHorizontalHeaderVisible = sourcePtr->m_isHorizontalHeaderVisible;
-		m_isVerticalHeaderVisible = sourcePtr->m_isVerticalHeaderVisible;
+		m_showHorizontalHeader = sourcePtr->m_showHorizontalHeader;
+		m_showVerticalHeader = sourcePtr->m_showVerticalHeader;
 		m_columnWidths = sourcePtr->m_columnWidths;
 
 		return BaseClass::CopyFrom(object, mode);
@@ -256,17 +257,35 @@ istd::IChangeable* CTextTable::CloneMe(CompatibilityMode mode) const
 
 // private methods
 
-void CTextTable::Resize(const int rows, const int columns)
+void CTextTable::Resize(int rowCount, int columnCount)
 {
-	Q_ASSERT(rows > 0);
-	Q_ASSERT(columns > 0);
+	Q_ASSERT(rowCount > 0);
+	Q_ASSERT(columnCount > 0);
 
-	m_items.resize(columns + 1);
-	m_columnWidths.resize(columns + 1);
+	m_items.resize(columnCount + 1);
 
 	for (int col = 0; col < m_items.size(); col++){
-		m_items[col].resize(rows + 1);
+		m_items[col].resize(rowCount + 1);
+	}
+
+	m_columnWidths.resize(GetInternalColumnCount());
+	for (int col = 0; col < m_columnWidths.size(); col++){
 		m_columnWidths[col] = s_defaultColumnWidth;
+	}
+}
+
+
+int CTextTable::GetInternalColumnCount() const
+{
+	if (m_items.isEmpty()){
+		return 0;
+	}
+
+	if (m_showVerticalHeader){
+		return m_items.size();
+	}
+	else{
+		return m_items.size() - 1;
 	}
 }
 

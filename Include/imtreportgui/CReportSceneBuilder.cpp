@@ -14,6 +14,7 @@
 
 // ImtCore includes
 #include <imtreport/IReportPage.h>
+#include <imtreportgui/CTextTableProxy.h>
 
 
 namespace imtreportgui
@@ -211,77 +212,77 @@ QGraphicsItem* CReportSceneBuilder::CreateImage(const imtreport::CImageRectangle
 
 QGraphicsItem* CReportSceneBuilder::CreateTextTable(const imtreport::CTextTable& pageElement)
 {
-	int rowCount = pageElement.GetRowCount();
-	if (pageElement.IsHorizontalHeaderVisible())
-		rowCount++;
+	QGraphicsItemGroup* sceneElementPtr = new QGraphicsItemGroup();
 
-	int columnCount = pageElement.GetColumnCount();
-	if (pageElement.IsVerticalHeaderVisible())
-		columnCount++;
+	// draw table border
+	sceneElementPtr->addToGroup(new QGraphicsRectItem(MapRectToScene(pageElement)));
 
-	QRectF rect = MapRectToScene(pageElement);
+	// draw table grid vertical lines
+	CTextTableProxy tableProxy(pageElement);
 
-	QTableWidget* tableWidget = new QTableWidget(rowCount, columnCount);
-	tableWidget->setFrameShape(QFrame::NoFrame);
-	tableWidget->setFocusPolicy(Qt::NoFocus);
-	tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
-	tableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-	tableWidget->horizontalHeader()->hide();
-	tableWidget->verticalHeader()->hide();
-	tableWidget->setGeometry(rect.toAlignedRect());
-	tableWidget->setFixedSize(rect.size().toSize());
+	for (int col = 0; col < tableProxy.GetColumnCount(); ++col){
+		double x = static_cast<double>(col * pageElement.GetColumnWidth(col)) + pageElement.GetLeft();
+		QPointF p1 = MapPointToScene(QPointF(x, pageElement.GetTop()));
+		QPointF p2 = MapPointToScene(QPointF(x, pageElement.GetBottom()));
 
-	// set horizontal header items
-	if (pageElement.IsHorizontalHeaderVisible()){
-		for (int col = 0; col < pageElement.GetColumnCount(); col++){
-			const imtreport::CTextTableItem& tableItem = pageElement.GetHorizontalHeaderItem(col);
-			tableWidget->setItem(0, col, CreateTextTableItem(tableItem));
-		}
+		sceneElementPtr->addToGroup(new QGraphicsLineItem(QLineF(p1, p2)));
 	}
 
-	// set vertical header items
-	if (pageElement.IsVerticalHeaderVisible()){
-		for (int row = 0; row < pageElement.GetRowCount(); row++){
-			const imtreport::CTextTableItem& tableItem = pageElement.GetVerticalHeaderItem(row);
-			tableWidget->setItem(row, 0, CreateTextTableItem(tableItem));
-		}
+	// draw table grid horizontal lines
+	for (int row = 0; row < tableProxy.GetRowCount(); ++row){
+		double y = static_cast<double>(row * tableProxy.GetRowHeight(row)) + pageElement.GetTop();
+
+		QPointF p1 = MapPointToScene(QPointF(pageElement.GetLeft(), y));
+		QPointF p2 = MapPointToScene(QPointF(pageElement.GetRight(), y));
+
+		sceneElementPtr->addToGroup(new QGraphicsLineItem(QLineF(p1, p2)));
 	}
 
-	// set items
-	for (int col = 0; col < pageElement.GetColumnCount(); col++){
-		for (int row = 0; row < pageElement.GetRowCount(); row++){
-			const imtreport::CTextTableItem& tableItem = pageElement.GetItem(row, col);
+	// draw table cells
+	for (int row = 0; row < tableProxy.GetRowCount(); ++row){
+		for (int col = 0; col < tableProxy.GetColumnCount(); ++col){
+			const imtreport::CTextTableItem* tableItem = tableProxy.GetItem(row, col);
+			Q_ASSERT(tableItem);
 
-			int widgetRow = pageElement.IsHorizontalHeaderVisible() ? row + 1 : row;
-			int widgetCol = pageElement.IsVerticalHeaderVisible() ? col + 1 : col;
+			double cellWidth = tableProxy.GetColumnWidth(col);
+			double cellHeight = tableProxy.GetRowHeight(row);
 
-			tableWidget->setItem(widgetRow, widgetCol, CreateTextTableItem(tableItem));
+			QGraphicsTextItem* textItem = CreateTextTableItem(pageElement, *tableItem, row, col, cellWidth, cellHeight);
+			Q_ASSERT(textItem);
+
+			sceneElementPtr->addToGroup(textItem);
 		}
 	}
-
-	QGraphicsProxyWidget* sceneElementPtr = new QGraphicsProxyWidget();
-	sceneElementPtr->setWidget(tableWidget);
-	sceneElementPtr->setPreferredSize(rect.size());
 
 	return sceneElementPtr;
 }
 
 
-QTableWidgetItem* CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTableItem& tableItem)
+QGraphicsTextItem* CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTable& table,
+	const imtreport::CTextTableItem& tableItem,
+	int row,
+	int col,
+	double cellWidth,
+	double cellHeight)
 {
-	QTableWidgetItem* tableWidgetItem = new QTableWidgetItem();
+	QPointF pos;
+	pos.setX(static_cast<double>(col) * cellWidth + table.GetLeft() + 1.0);
+	pos.setY(static_cast<double>(row) * cellHeight + table.GetTop() + 1.0);
 
-	tableWidgetItem->setText(tableItem.GetText());
-	tableWidgetItem->setTextAlignment(tableItem.GetAlignment());
-	tableWidgetItem->setFont(MapFontToScene(tableItem.GetFont()));
-	tableWidgetItem->setForeground(QBrush(ConvertToQColor(tableItem.GetForegroundColor())));
-	tableWidgetItem->setBackground(QBrush(ConvertToQColor(tableItem.GetBackgroundColor())));
-	tableWidgetItem->setIcon(QPixmap::fromImage(tableItem.GetImage().GetQImage()));
+	QGraphicsTextItem* sceneElementPtr = new QGraphicsTextItem();
+	sceneElementPtr->setPos(MapPointToScene(pos));
+	sceneElementPtr->setPlainText(tableItem.GetText());
+	sceneElementPtr->setFont(MapFontToScene(tableItem.GetFont()));
+	sceneElementPtr->setDefaultTextColor(ConvertToQColor(tableItem.GetForegroundColor()));
+	sceneElementPtr->setTextWidth(MapPointToScene(QPointF(cellWidth, cellHeight)).x());
 
-	return tableWidgetItem;
+	QTextOption option = sceneElementPtr->document()->defaultTextOption();
+	option.setAlignment(tableItem.GetAlignment());
+	sceneElementPtr->document()->setDefaultTextOption(option);
+
+	// TODO: set background and icon
+
+	return sceneElementPtr;
 }
 
 

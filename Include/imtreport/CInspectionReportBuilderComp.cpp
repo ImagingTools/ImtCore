@@ -1,9 +1,6 @@
 #include <imtreport/CInspectionReportBuilderComp.h>
 
 
-// Qt includes
-#include <QtGui/QFontMetrics>
-
 // ACF includes
 #include <i2d/CRectangle.h>
 
@@ -184,7 +181,7 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 	istd::IInformationProvider::InformationCategory status = inspectionPtr ? inspectionPtr->status : reportData.partStatus;
 
 	const double tableWidth = 180.0;
-	const double tableHeight = 18.0;
+	const double tableHeight = 16.0;
 
 	QByteArray uuid = page.AddTextTable(i2d::CRectangle(topLeft.GetX(), topLeft.GetY(), tableWidth, tableHeight), 1, 3);
 
@@ -198,6 +195,7 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 
 	tablePtr->SetHorizontalHeaderLabels({ reportData.companyName, reportData.appVersion, inspectionName});
 	tablePtr->ShowVerticalHeader(false);
+	tablePtr->SetColumnWidths(QVector<double>(tablePtr->GetColumnCount(), tableWidth / tablePtr->GetColumnCount()));
 
 	tablePtr->SetItem(0, 0, { reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate) });
 	tablePtr->SetItem(0, 1, { reportData.partSerialNumber  });
@@ -226,13 +224,17 @@ void CInspectionReportBuilderComp::AddFooter(const Results& results, i2d::CVecto
 
 	topLeft.SetY(topLeft.GetY() + 15.0);
 
-	QByteArray uuid = page.AddTextTable(i2d::CRectangle(topLeft.GetX(), topLeft.GetY(), 180.0, 100.0), results.size(), 6);
+	const double tableWidth = 180.0;
+	const double tableHeight = 100.0;
+
+	QByteArray uuid = page.AddTextTable(i2d::CRectangle(topLeft.GetX(), topLeft.GetY(), tableWidth, tableHeight), results.size(), 6);
 
 	CTextTable* tablePtr = dynamic_cast<CTextTable*>(page.GetPageElement(uuid));
 	Q_ASSERT(tablePtr);
 
 	tablePtr->SetHorizontalHeaderLabels({ "Region", "Error", "Length", "Value mm", "Tolerance mm", "Diff" });
 	tablePtr->ShowVerticalHeader(false);
+	tablePtr->SetColumnWidths(QVector<double>(tablePtr->GetColumnCount(), tableWidth / tablePtr->GetColumnCount()));
 
 	for (int i = 0; i < results.size(); i++){
 		const InspectionRegionResult& result = results[i];
