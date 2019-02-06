@@ -3,8 +3,8 @@
 
 // ACF includes
 #include <ibase/ICommandsProvider.h>
-//#include <ifile/IFilePersistence.h>
 #include <imtreportgui/CReportDocumentPdfPersistenceComp.h>
+#include <imtreportgui/CReportDocumentTiffPersistenceComp.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
@@ -35,6 +35,7 @@ public:
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
 		I_ASSIGN(m_pdfExportCompPtr, "ReportDocumentPdfPersistence", "Export report document to PDF", false, "ReportDocumentPdfPersistence");
+		I_ASSIGN(m_tiffExportCompPtr, "ReportDocumentTiffPersistence", "Export report document to TIFF", false, "ReportDocumentTiffPersistence");
 	I_END_COMPONENT;
 
 	CReportDocumentViewComp();
@@ -61,6 +62,7 @@ protected:
 private Q_SLOTS:
 	void OnShowGrid();
 	void OnExportToPdf();
+	void OnExportToTiff();
 
 private:
 	void CreateSceneDecoration(QGraphicsScene& scene);
@@ -72,6 +74,7 @@ private:
 	iqtgui::CHierarchicalCommand m_fileCommands;
 	iqtgui::CHierarchicalCommand m_viewCommands;
 	iqtgui::CHierarchicalCommand m_exportToPdfCommand;
+	iqtgui::CHierarchicalCommand m_exportToTiffCommand;
 	iqtgui::CHierarchicalCommand m_showGridCommand;
 
 	typedef QPair<QGraphicsRectItem*, QGraphicsItemGroup*> SceneDecoration; // scene border and scene grid
@@ -80,6 +83,7 @@ private:
 	bool m_isGridShown;
 
 	I_REF(ifile::IFilePersistence, m_pdfExportCompPtr);
+	I_REF(ifile::IFilePersistence, m_tiffExportCompPtr);
 };
 
 

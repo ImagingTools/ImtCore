@@ -21,6 +21,11 @@ I_EXPORT_COMPONENT(
 			"PDF-format report document persistence",
 			"PDF Report Persistence");
 
+I_EXPORT_COMPONENT(
+			ReportTiffPersistence,
+			"TIFF-format report document persistence",
+			"TIFF Report Persistence");
+
 
 } // namespace ImtReportGuiPck
 

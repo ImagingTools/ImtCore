@@ -1,4 +1,4 @@
-#include <imtreportgui/CReportDocumentPdfPersistenceComp.h>
+#include <imtreportgui/CReportDocumentTiffPersistenceComp.h>
 
 
 // Qt includes
@@ -6,6 +6,7 @@
 #include <QtCore/QObject>
 #include <QtPrintSupport/QPrinter>
 #include <QtGui/QPainter>
+#include <QtGui/QImageWriter>
 
 // ImtCore includes
 #include <imtreport/CReportDocument.h>
@@ -18,7 +19,7 @@ namespace imtreportgui
 
 // reimplemented (ifile::IFilePersistence)
 
-bool CReportDocumentPdfPersistenceComp::IsOperationSupported(
+bool CReportDocumentTiffPersistenceComp::IsOperationSupported(
 	const istd::IChangeable* dataObjectPtr,
 	const QString* filePathPtr,
 	int flags,
@@ -39,7 +40,7 @@ bool CReportDocumentPdfPersistenceComp::IsOperationSupported(
 }
 
 
-int CReportDocumentPdfPersistenceComp::LoadFromFile(
+int CReportDocumentTiffPersistenceComp::LoadFromFile(
 	istd::IChangeable& /*data*/,
 	const QString& /*filePath*/,
 	ibase::IProgressManager* /*progressManagerPtr*/) const
@@ -48,7 +49,7 @@ int CReportDocumentPdfPersistenceComp::LoadFromFile(
 }
 
 
-int CReportDocumentPdfPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const
+int CReportDocumentTiffPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	const imtreport::IReportDocument* documentPtr = dynamic_cast<const imtreport::IReportDocument*>(&data);
 	if (documentPtr == NULL){
@@ -60,31 +61,27 @@ int CReportDocumentPdfPersistenceComp::SaveToFile(const istd::IChangeable& data,
 		SendWarningMessage(0, "Report is empty");
 		return OS_OK;
 	}
+	
+	bool retVal = false;
 
-	QPrinter printer(QPrinter::HighResolution);
-	printer.setPageSize(QPrinter::A4);
-	printer.setOrientation(QPrinter::Portrait);
-	printer.setOutputFormat(QPrinter::PdfFormat);
-	printer.setOutputFileName(filePath);
-	printer.setPageMargins({0.0, 0.0, 0.0, 0.0});
-
-	QPainter painter(&printer);
-
-	bool retVal = true;
-
-	for (int i = 0; i < scenes.count(); ++i){
-		QGraphicsScene* scenePtr = scenes[i];
+	for (QGraphicsScene* scenePtr : scenes){
 		Q_ASSERT(scenePtr != NULL);
+
+		QImage image(scenePtr->sceneRect().size().toSize(), QImage::Format::Format_ARGB32);
+
+		QPainter painter(&image);
+		//painter.setRenderHint(QPainter::Antialiasing);
 
 		scenePtr->render(&painter);
 
-		if (i < scenes.count() - 1){ // initially printer already has one default page so don't add a new one on the last iteration
-			if (!printer.newPage()){
-				SendErrorMessage(0, "Failed to create a new report page");
-				retVal = false;
-				break;
-			}
+		QImageWriter writer(filePath, "tiff");
+		if (!writer.write(image)){
+			SendErrorMessage(0, "Failed to export report\r\n" + writer.errorString());
+			retVal = false;
+			break;
 		}
+
+		break;
 	}
 
 	for (const QGraphicsScene* scenePtr : scenes)
@@ -102,19 +99,19 @@ int CReportDocumentPdfPersistenceComp::SaveToFile(const istd::IChangeable& data,
 
 // reimplemented (ifile::IFileTypeInfo)
 
-bool CReportDocumentPdfPersistenceComp::GetFileExtensions(QStringList& result, const istd::IChangeable* /*dataObjectPtr*/, int /*flags*/, bool doAppend) const
+bool CReportDocumentTiffPersistenceComp::GetFileExtensions(QStringList& result, const istd::IChangeable* /*dataObjectPtr*/, int /*flags*/, bool doAppend) const
 {
 	if (!doAppend){
 		result.clear();
 	}
 
-	result.push_back("pdf");
+	result.push_back("tiff");
 
 	return true;
 }
 
 
-QString CReportDocumentPdfPersistenceComp::GetTypeDescription(const QString* /*extensionPtr*/) const
+QString CReportDocumentTiffPersistenceComp::GetTypeDescription(const QString* /*extensionPtr*/) const
 {
 	return "Report files";
 }

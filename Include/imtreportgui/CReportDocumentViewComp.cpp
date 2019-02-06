@@ -22,15 +22,18 @@ CReportDocumentViewComp::CReportDocumentViewComp()
 	:m_fileCommands("&File", 100),
 	m_viewCommands("&View", 100),
 	m_exportToPdfCommand("Export to PDF...", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 1984),
-	m_showGridCommand("Show grid", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1985),
+	m_exportToTiffCommand("Export to TIFF...", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 1985),
+	m_showGridCommand("Show grid", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1986),
 	m_isGridShown(true)
 {
 	m_showGridCommand.setChecked(true);
 
 	connect(&m_showGridCommand, SIGNAL(triggered()), this, SLOT(OnShowGrid()));
 	connect(&m_exportToPdfCommand, SIGNAL(triggered()), this, SLOT(OnExportToPdf()));
+	connect(&m_exportToTiffCommand, SIGNAL(triggered()), this, SLOT(OnExportToTiff()));
 
 	m_fileCommands.InsertChild(&m_exportToPdfCommand);
+	m_fileCommands.InsertChild(&m_exportToTiffCommand);
 	m_viewCommands.InsertChild(&m_showGridCommand);
 
 	m_rootCommands.InsertChild(&m_fileCommands);
@@ -124,6 +127,7 @@ void CReportDocumentViewComp::OnGuiRetranslate()
 	BaseClass::OnGuiRetranslate();
 
 	m_exportToPdfCommand.SetVisuals(tr("Export to PDF..."), tr("PDF..."), tr("Export current report to PDF file"), QIcon(":/Icons/Pdf"));
+	m_exportToTiffCommand.SetVisuals(tr("Export to TIFF..."), tr("TIFF..."), tr("Export current report to TIFF file"));
 	m_showGridCommand.SetVisuals(tr("Show/Hide Grid"), tr("Grid"), tr("Set grid visible/unvisible"), QIcon(":/Icons/Grid2"));
 }
 
@@ -141,6 +145,17 @@ void CReportDocumentViewComp::OnExportToPdf()
 		Q_ASSERT(documentPtr != NULL);
 
 		m_pdfExportCompPtr->SaveToFile(*documentPtr);
+	}
+}
+
+
+void CReportDocumentViewComp::OnExportToTiff()
+{
+	if (m_tiffExportCompPtr.IsValid()){
+		imtreport::IReportDocument* documentPtr = GetObjectPtr();
+		Q_ASSERT(documentPtr != NULL);
+
+		m_tiffExportCompPtr->SaveToFile(*documentPtr);
 	}
 }
 

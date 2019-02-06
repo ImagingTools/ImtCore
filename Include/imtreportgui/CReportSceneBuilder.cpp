@@ -271,8 +271,6 @@ void CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTable& table
 	textItemPtr->document()->setDefaultTextOption(option);
 
 	scene.addItem(textItemPtr);
-
-	// TODO: set icon
 }
 
 
