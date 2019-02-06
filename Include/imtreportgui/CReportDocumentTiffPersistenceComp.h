@@ -24,6 +24,7 @@ public:
 	I_BEGIN_COMPONENT(CReportDocumentTiffPersistenceComp);
 		I_REGISTER_INTERFACE(ifile::IFilePersistence);
 		I_REGISTER_INTERFACE(ifile::IFileTypeInfo);
+		I_ASSIGN(m_saveFirstPageOnlyAttrPtr, "SaveFirstPageOnly", "Save first report page only", true, false);
 	I_END_COMPONENT;
 
 	// reimplemented (ifile::IFilePersistence)
@@ -47,6 +48,8 @@ public:
 
 private:
 	OperationState SaveToFile(const CReportSceneBuilder::ReportScenes scenes, const QString& filePath) const;
+
+	I_ATTR(bool, m_saveFirstPageOnlyAttrPtr);
 };
 
 

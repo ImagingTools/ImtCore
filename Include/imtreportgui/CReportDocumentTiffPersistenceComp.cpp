@@ -100,6 +100,11 @@ ifile::IFilePersistence::OperationState CReportDocumentTiffPersistenceComp::Save
 			SendErrorMessage(0, "Failed to export report\r\n" + writer.errorString());
 			return OS_FAILED;
 		}
+
+		if (m_saveFirstPageOnlyAttrPtr.IsValid() && m_saveFirstPageOnlyAttrPtr->GetValue()){
+			break;
+		}
+
 	}
 
 	SendInfoMessage(0, "Report has been exported successfully");
