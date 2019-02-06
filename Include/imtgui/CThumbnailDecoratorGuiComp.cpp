@@ -87,6 +87,10 @@ void CThumbnailDecoratorGuiComp::OnRestoreSettings(const QSettings& settings)
 	QString lastUser  = settings.value("LastUser").toString();
 
 	UserEdit->setText(lastUser);
+
+	if (!lastUser.isEmpty()){
+		PasswordEdit->setFocus();
+	}
 }
 
 
