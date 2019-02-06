@@ -166,7 +166,7 @@ bool CTextTable::Serialize(iser::IArchive& archive)
 
 	// header visibility
 	static iser::CArchiveTag isHorizontalHeaderVisibleTag("IsHorizontalHeaderVisible", "Table horizontal header visibility", iser::CArchiveTag::TT_LEAF);
-	retVal = archive.BeginTag(isHorizontalHeaderVisibleTag);
+	retVal = retVal && archive.BeginTag(isHorizontalHeaderVisibleTag);
 	retVal = retVal && archive.Process(m_showHorizontalHeader);
 	retVal = retVal && archive.EndTag(isHorizontalHeaderVisibleTag);
 

@@ -244,11 +244,21 @@ void CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTable& table
 
 	scene.addItem(rectItemPtr);
 
-	// add cell text
-	QPointF pos;
-	pos.setX(left + 1.0);
-	pos.setY(top + 1.0);
+	// add cell icon (if any)
+	QPointF pos(left + 1.0, top + 1.0);
 
+	if (!tableItem.GetImage().IsEmpty()){
+		QPixmap pixmap = QPixmap::fromImage(tableItem.GetImage().GetQImage());
+
+		QGraphicsPixmapItem* pixmapItemPtr = new QGraphicsPixmapItem(pixmap);
+		pixmapItemPtr->setPos(MapPointToScene(pos));
+
+		scene.addItem(pixmapItemPtr);
+
+		pos.setX(pos.x() + pixmap.widthMM() + 2.0);
+	}
+
+	// add cell text
 	QGraphicsTextItem* textItemPtr = new QGraphicsTextItem();
 	textItemPtr->setPos(MapPointToScene(pos));
 	textItemPtr->setPlainText(tableItem.GetText());
@@ -276,9 +286,10 @@ double CReportSceneBuilder::GetTextTableRowHeight(const CTextTableProxy& table, 
 		Q_ASSERT(tableItem);
 
 		QFont font(tableItem->GetFont().GetName(), tableItem->GetFont().GetSize());
-		double cellHeight = QFontMetrics(font).height() + cellMargin;
-		if (cellHeight > maxCellHeight)
-			maxCellHeight = cellHeight;
+		double cellFontHeight = QFontMetrics(font).height() + cellMargin;
+		double cellIconHeight = tableItem->GetImage().GetQImage().heightMM();
+
+		maxCellHeight = qMax(maxCellHeight, qMax(cellFontHeight, cellIconHeight));
 	}
 
 	return maxCellHeight;
