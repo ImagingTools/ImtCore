@@ -14,7 +14,6 @@
 
 // ImtCore includes
 #include <imtreport/IReportPage.h>
-#include <imtreportgui/CTextTableProxy.h>
 
 
 namespace imtreportgui
@@ -69,69 +68,67 @@ void CReportSceneBuilder::CreateSceneShapes(const imtreport::IReportPage& page, 
 		const i2d::IObject2d* pageElementPtr = page.GetPageElement(elementId);
 		Q_ASSERT(pageElementPtr != nullptr);
 
-		scene.addItem(CreateSceneShape(*pageElementPtr));
+		CreateSceneShape(*pageElementPtr, scene);
 	}
 }
 
 
-QGraphicsItem* CReportSceneBuilder::CreateSceneShape(const i2d::IObject2d& pageElement)
+void CReportSceneBuilder::CreateSceneShape(const i2d::IObject2d& pageElement, QGraphicsScene& scene)
 {
 	const imtreport::CRectangleElement* rectPageElementPtr = dynamic_cast<const imtreport::CRectangleElement*>(&pageElement);
 	if (rectPageElementPtr){
-		return CreateRect(*rectPageElementPtr);
+		return CreateRect(*rectPageElementPtr, scene);
 	}
 
 	const imtreport::CCircleElement* circleSceneElementPtr = dynamic_cast<const imtreport::CCircleElement*>(&pageElement);
 	if (circleSceneElementPtr){
-		return CreateEllipse(*circleSceneElementPtr);
+		return CreateEllipse(*circleSceneElementPtr, scene);
 	}
 
 	const imtreport::CTextLabelElement* labelSceneElementPtr = dynamic_cast<const imtreport::CTextLabelElement*>(&pageElement);
 	if (labelSceneElementPtr){
-		return CreateLabel(*labelSceneElementPtr);
+		return CreateLabel(*labelSceneElementPtr, scene);
 	}
 
 	const imtreport::CPolygonElement* polygonElementPtr = dynamic_cast<const imtreport::CPolygonElement*>(&pageElement);
 	if (polygonElementPtr){
-		return CreatePolygone(*polygonElementPtr);
+		return CreatePolygone(*polygonElementPtr, scene);
 	}
 
 	const imtreport::CLineElement* lineElementPtr = dynamic_cast<const imtreport::CLineElement*>(&pageElement);
 	if (lineElementPtr){
-		return CreateLine(*lineElementPtr);
+		return CreateLine(*lineElementPtr, scene);
 	}
 
 	const imtreport::CImageRectangleElement* imageElementPtr = dynamic_cast<const imtreport::CImageRectangleElement*>(&pageElement);
 	if (imageElementPtr){
-		return CreateImage(*imageElementPtr);
+		return CreateImage(*imageElementPtr, scene);
 	}
 
 	const imtreport::CTextTable* tableElementPtr = dynamic_cast<const imtreport::CTextTable*>(&pageElement);
 	if (tableElementPtr){
-		return CreateTextTable(*tableElementPtr);
+		return CreateTextTable(*tableElementPtr, scene);
 	}
-
-	return NULL;
 }
 
 
-QGraphicsItem* CReportSceneBuilder::CreateRect(const imtreport::CRectangleElement& pageElement)
+void CReportSceneBuilder::CreateRect(const imtreport::CRectangleElement& pageElement, QGraphicsScene& scene)
 {
 	QGraphicsRectItem* sceneElementPtr = new QGraphicsRectItem(MapRectToScene(pageElement));
 	SetShapePenAndBrush(pageElement, *sceneElementPtr);
-	return sceneElementPtr;
+	scene.addItem(sceneElementPtr);
 }
 
 
-QGraphicsItem* CReportSceneBuilder::CreateEllipse(const imtreport::CCircleElement& pageElement)
+void CReportSceneBuilder::CreateEllipse(const imtreport::CCircleElement& pageElement, QGraphicsScene& scene)
 {
 	QGraphicsEllipseItem* sceneElementPtr = new QGraphicsEllipseItem(MapRectToScene(pageElement.GetBoundingBox()));
 	SetShapePenAndBrush(pageElement, *sceneElementPtr);
-	return sceneElementPtr;
+	scene.addItem(sceneElementPtr);
 }
 
 
-QGraphicsItem* CReportSceneBuilder::CreateLabel(const imtreport::CTextLabelElement& pageElement)
+void CReportSceneBuilder::CreateLabel(const imtreport::CTextLabelElement& pageElement, QGraphicsScene& scene)
 {
 	QGraphicsTextItem* sceneElementPtr = new QGraphicsTextItem();
 
@@ -148,11 +145,11 @@ QGraphicsItem* CReportSceneBuilder::CreateLabel(const imtreport::CTextLabelEleme
 	option.setAlignment(pageElement.GetAlignment());
 	sceneElementPtr->document()->setDefaultTextOption(option);
 
-	return sceneElementPtr;
+	scene.addItem(sceneElementPtr);
 }
 
 
-QGraphicsItem* CReportSceneBuilder::CreateLine(const imtreport::CLineElement& pageElement)
+void CReportSceneBuilder::CreateLine(const imtreport::CLineElement& pageElement, QGraphicsScene& scene)
 {
 	QGraphicsLineItem* sceneElementPtr = new QGraphicsLineItem();
 
@@ -160,10 +157,10 @@ QGraphicsItem* CReportSceneBuilder::CreateLine(const imtreport::CLineElement& pa
 	QPointF point2 = MapPointToScene(pageElement.GetPoint2());
 	sceneElementPtr->setLine(QLineF(point1, point2));
 
-	return sceneElementPtr;
+	scene.addItem(sceneElementPtr);
 }
 
-QGraphicsItem* CReportSceneBuilder::CreatePolygone(const imtreport::CPolygonElement& pageElement)
+void CReportSceneBuilder::CreatePolygone(const imtreport::CPolygonElement& pageElement, QGraphicsScene& scene)
 {
 	QGraphicsPolygonItem* sceneElementPtr = new QGraphicsPolygonItem();
 
@@ -179,11 +176,11 @@ QGraphicsItem* CReportSceneBuilder::CreatePolygone(const imtreport::CPolygonElem
 
 	SetShapePenAndBrush(pageElement, *sceneElementPtr);
 
-	return sceneElementPtr;
+	scene.addItem(sceneElementPtr);
 }
 
 
-QGraphicsItem* CReportSceneBuilder::CreateImage(const imtreport::CImageRectangleElement& pageElement)
+void CReportSceneBuilder::CreateImage(const imtreport::CImageRectangleElement& pageElement, QGraphicsScene& scene)
 {
 	QString imgPath = pageElement.GetImagePath();
 
@@ -206,83 +203,85 @@ QGraphicsItem* CReportSceneBuilder::CreateImage(const imtreport::CImageRectangle
 		sceneElementPtr->setScale(1.0);
 	}
 
-	return sceneElementPtr;
+	scene.addItem(sceneElementPtr);
 }
 
 
-QGraphicsItem* CReportSceneBuilder::CreateTextTable(const imtreport::CTextTable& pageElement)
+void CReportSceneBuilder::CreateTextTable(const imtreport::CTextTable& pageElement, QGraphicsScene& scene)
 {
-	QGraphicsItemGroup* sceneElementPtr = new QGraphicsItemGroup();
-
-	// draw table border
-	sceneElementPtr->addToGroup(new QGraphicsRectItem(MapRectToScene(pageElement)));
-
-	// draw table grid vertical lines
 	CTextTableProxy tableProxy(pageElement);
 
-	for (int col = 0; col < tableProxy.GetColumnCount(); ++col){
-		double x = static_cast<double>(col * pageElement.GetColumnWidth(col)) + pageElement.GetLeft();
-		QPointF p1 = MapPointToScene(QPointF(x, pageElement.GetTop()));
-		QPointF p2 = MapPointToScene(QPointF(x, pageElement.GetBottom()));
-
-		sceneElementPtr->addToGroup(new QGraphicsLineItem(QLineF(p1, p2)));
-	}
-
-	// draw table grid horizontal lines
-	for (int row = 0; row < tableProxy.GetRowCount(); ++row){
-		double y = static_cast<double>(row * tableProxy.GetRowHeight(row)) + pageElement.GetTop();
-
-		QPointF p1 = MapPointToScene(QPointF(pageElement.GetLeft(), y));
-		QPointF p2 = MapPointToScene(QPointF(pageElement.GetRight(), y));
-
-		sceneElementPtr->addToGroup(new QGraphicsLineItem(QLineF(p1, p2)));
-	}
-
-	// draw table cells
 	for (int row = 0; row < tableProxy.GetRowCount(); ++row){
 		for (int col = 0; col < tableProxy.GetColumnCount(); ++col){
 			const imtreport::CTextTableItem* tableItem = tableProxy.GetItem(row, col);
 			Q_ASSERT(tableItem);
 
-			double cellWidth = tableProxy.GetColumnWidth(col);
-			double cellHeight = tableProxy.GetRowHeight(row);
+			double cellWidth = pageElement.GetColumnWidth(col);
+			double cellHeight = GetTextTableRowHeight(tableProxy, row);
 
-			QGraphicsTextItem* textItem = CreateTextTableItem(pageElement, *tableItem, row, col, cellWidth, cellHeight);
-			Q_ASSERT(textItem);
-
-			sceneElementPtr->addToGroup(textItem);
+			CreateTextTableItem(pageElement, *tableItem, row, col, cellWidth, cellHeight, scene);
 		}
 	}
-
-	return sceneElementPtr;
 }
 
 
-QGraphicsTextItem* CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTable& table,
-	const imtreport::CTextTableItem& tableItem,
-	int row,
-	int col,
-	double cellWidth,
-	double cellHeight)
+void CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTable& table,
+			const imtreport::CTextTableItem& tableItem,
+			int row,
+			int col,
+			double cellWidth,
+			double cellHeight,
+			QGraphicsScene& scene)
 {
+	double left = static_cast<double>(col) * cellWidth + table.GetLeft();
+	double top = static_cast<double>(row) * cellHeight + table.GetTop();
+
+	// add cell border
+	QRectF rect(left, top, cellWidth, cellHeight);
+
+	QGraphicsRectItem* rectItemPtr = new QGraphicsRectItem(MapRectToScene(rect));
+	rectItemPtr->setBrush(ConvertToQColor(tableItem.GetBackgroundColor()));
+
+	scene.addItem(rectItemPtr);
+
+	// add cell text
 	QPointF pos;
-	pos.setX(static_cast<double>(col) * cellWidth + table.GetLeft() + 1.0);
-	pos.setY(static_cast<double>(row) * cellHeight + table.GetTop() + 1.0);
+	pos.setX(left + 1.0);
+	pos.setY(top + 1.0);
 
-	QGraphicsTextItem* sceneElementPtr = new QGraphicsTextItem();
-	sceneElementPtr->setPos(MapPointToScene(pos));
-	sceneElementPtr->setPlainText(tableItem.GetText());
-	sceneElementPtr->setFont(MapFontToScene(tableItem.GetFont()));
-	sceneElementPtr->setDefaultTextColor(ConvertToQColor(tableItem.GetForegroundColor()));
-	sceneElementPtr->setTextWidth(MapPointToScene(QPointF(cellWidth, cellHeight)).x());
+	QGraphicsTextItem* textItemPtr = new QGraphicsTextItem();
+	textItemPtr->setPos(MapPointToScene(pos));
+	textItemPtr->setPlainText(tableItem.GetText());
+	textItemPtr->setFont(MapFontToScene(tableItem.GetFont()));
+	textItemPtr->setDefaultTextColor(ConvertToQColor(tableItem.GetForegroundColor()));
+	textItemPtr->setTextWidth(MapPointToScene(QPointF(cellWidth, cellHeight)).x());
 
-	QTextOption option = sceneElementPtr->document()->defaultTextOption();
+	QTextOption option = textItemPtr->document()->defaultTextOption();
 	option.setAlignment(tableItem.GetAlignment());
-	sceneElementPtr->document()->setDefaultTextOption(option);
+	textItemPtr->document()->setDefaultTextOption(option);
 
-	// TODO: set background and icon
+	scene.addItem(textItemPtr);
 
-	return sceneElementPtr;
+	// TODO: set icon
+}
+
+
+double CReportSceneBuilder::GetTextTableRowHeight(const CTextTableProxy& table, int row)
+{
+	double maxCellHeight = 0.0;
+	const double cellMargin = 4.0;
+
+	for (int col = 0; col < table.GetColumnCount(); ++col){
+		const imtreport::CTextTableItem* tableItem = table.GetItem(row, col);
+		Q_ASSERT(tableItem);
+
+		QFont font(tableItem->GetFont().GetName(), tableItem->GetFont().GetSize());
+		double cellHeight = QFontMetrics(font).height() + cellMargin;
+		if (cellHeight > maxCellHeight)
+			maxCellHeight = cellHeight;
+	}
+
+	return maxCellHeight;
 }
 
 

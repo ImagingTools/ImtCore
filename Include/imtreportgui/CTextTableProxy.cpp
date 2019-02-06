@@ -1,11 +1,6 @@
 #include <imtreportgui/CTextTableProxy.h>
 
 
-// Qt includes
-#include <QtGui/QFont>
-#include <QtGui/QFontMetrics>
-
-
 namespace imtreportgui
 {
 
@@ -79,31 +74,6 @@ const imtreport::CTextTableItem* CTextTableProxy::GetItem(int row, int col) cons
 	else{
 		return NULL;
 	}
-}
-
-
-double CTextTableProxy::GetRowHeight(int row) const
-{
-	double maxCellHeight = 0.0;
-	const double cellMargin = 4.0;
-
-	for (int col = 0; col < GetColumnCount(); ++col){
-		const imtreport::CTextTableItem* tableItem = GetItem(row, col);
-		Q_ASSERT(tableItem);
-
-		QFont font(tableItem->GetFont().GetName(), tableItem->GetFont().GetSize());
-		double cellHeight = QFontMetrics(font).height() + cellMargin;
-		if (cellHeight > maxCellHeight)
-			maxCellHeight = cellHeight;
-	}
-
-	return maxCellHeight;
-}
-
-
-double CTextTableProxy::GetColumnWidth(int col) const
-{
-	return m_textTable.GetColumnWidth(col);
 }
 
 

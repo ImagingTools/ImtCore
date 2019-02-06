@@ -18,9 +18,6 @@ public:
 	int GetColumnCount() const;
 	const imtreport::CTextTableItem* GetItem(int row, int col) const;
 
-	double GetRowHeight(int row) const;
-	double GetColumnWidth(int col) const;
-
 private:
 	const imtreport::CTextTable& m_textTable;
 };
