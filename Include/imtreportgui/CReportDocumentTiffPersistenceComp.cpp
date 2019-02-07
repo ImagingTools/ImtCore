@@ -88,12 +88,16 @@ ifile::IFilePersistence::OperationState CReportDocumentTiffPersistenceComp::Save
 		scenePtr->render(&painter);
 
 		QString imgFilePath = filePath;
-		if (i > 0){
-			imgFilePath = fileInfo.path() + "/" +
-						fileInfo.baseName() +
-						QString("%1").arg(i, 3, 10, QChar('0')) + "." +
-						fileInfo.completeSuffix();
+
+		QString fileCounter;
+		if (!*m_saveFirstPageOnlyAttrPtr){
+			fileCounter = QString("%1").arg(i + 1, 2, 10, QChar('0'));
 		}
+
+		imgFilePath = fileInfo.path() + "/" +
+					fileInfo.baseName() +
+					fileCounter + "." +
+					fileInfo.completeSuffix();
 
 		QImageWriter writer(imgFilePath, "tiff");
 		if (!writer.write(image)){
@@ -102,7 +106,7 @@ ifile::IFilePersistence::OperationState CReportDocumentTiffPersistenceComp::Save
 			return OS_FAILED;
 		}
 
-		if (m_saveFirstPageOnlyAttrPtr.IsValid() && m_saveFirstPageOnlyAttrPtr->GetValue()){
+		if (*m_saveFirstPageOnlyAttrPtr){
 			break;
 		}
 	}
