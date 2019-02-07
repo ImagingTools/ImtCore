@@ -237,12 +237,16 @@ void CInspectionReportBuilderComp::AddFooter(const Results& results, i2d::CVecto
 
 	for (int i = 0; i < results.size(); i++){
 		const InspectionRegionResult& result = results[i];
+
 		tablePtr->SetItem(i, 0, {result.regionName});
 		tablePtr->SetItem(i, 1, {GetErrorClassText(result.errorClass)});
 		tablePtr->SetItem(i, 2, {QString::number(result.length, 'f', 2)});
-		tablePtr->SetItem(i, 3, {QString::number(result.value, 'f', 2)});
-		tablePtr->SetItem(i, 4, {QString::number(result.tolerance, 'f', 2)});
-		tablePtr->SetItem(i, 5, {QString::number(result.diff, 'f', 2)});
+
+		if (result.errorClass != IInspectionReportBuilder::EC_NONE){
+			tablePtr->SetItem(i, 3, {QString::number(result.value, 'f', 2)});
+			tablePtr->SetItem(i, 4, {QString::number(result.tolerance, 'f', 2)});
+			tablePtr->SetItem(i, 5, {QString::number(result.diff, 'f', 2)});
+		}
 	}
 }
 

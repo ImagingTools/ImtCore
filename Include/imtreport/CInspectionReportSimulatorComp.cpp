@@ -42,7 +42,7 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 
 	IInspectionReportBuilder::InspectionRegionResult i1r1r2;
 	i1r1r2.regionName = "i1r1";
-	i1r1r2.errorClass = IInspectionReportBuilder::ErrorClass::EC_GLUE_WIDE;
+	i1r1r2.errorClass = IInspectionReportBuilder::ErrorClass::EC_NONE;
 	i1r1r2.status = istd::IInformationProvider::IC_ERROR;
 	i1r1r2.length = 15.0;
 	i1r1r2.value = 85.0;
