@@ -332,8 +332,22 @@ QRectF CReportSceneBuilder::MapRectToScene(const QRectF& rect)
 
 QFont CReportSceneBuilder::MapFontToScene(const imtreport::CFont& font)
 {
-	double sceneFontSize = MapPointToScene(QPointF(font.GetSize(), 0.0)).x();
-	return QFont(font.GetName(), sceneFontSize);
+	QFont sceneFont(font.GetName());
+	sceneFont.setPointSize(MapPointToScene(QPointF(font.GetSize(), 0.0)).x());
+
+	if (font.GetFontFlags() & imtreport::CFont::FF_BOLD){
+		sceneFont.setBold(true);
+	}
+
+	if (font.GetFontFlags() & imtreport::CFont::FF_ITALIC){
+		sceneFont.setItalic(true);
+	}
+
+	if (font.GetFontFlags() & imtreport::CFont::FF_UNDERLINE){
+		sceneFont.setUnderline(true);
+	}
+
+	return sceneFont;
 }
 
 
