@@ -62,7 +62,7 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 
 	IInspectionReportBuilder::InspectionRegionResult i1r1r4;
 	i1r1r4.regionName = "i1r1";
-	i1r1r4.errorClass = IInspectionReportBuilder::ErrorClass::EC_GLUE_NARROW;
+	i1r1r4.errorClass = IInspectionReportBuilder::ErrorClass::EC_GLUE_BEYOND_AREA;
 	i1r1r4.status = istd::IInformationProvider::InformationCategory::IC_ERROR;
 	i1r1r4.length = 11.0;
 	i1r1r4.value = 53.0;

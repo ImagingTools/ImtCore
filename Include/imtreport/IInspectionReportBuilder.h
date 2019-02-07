@@ -28,6 +28,7 @@ public:
 		EC_GLUE_GAP,
 		EC_GLUE_NARROW,
 		EC_GLUE_WIDE,
+		EC_GLUE_BEYOND_AREA
 	};
 
 	enum ResultFlags

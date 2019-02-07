@@ -98,6 +98,9 @@ QString CInspectionReportBuilderComp::GetErrorClassText(const ErrorClass errorCl
 	case ErrorClass::EC_GLUE_WIDE:
 		return "Wide";
 
+	case ErrorClass::EC_GLUE_BEYOND_AREA:
+		return "Beyond area";
+
 	default:
 		return QString();
 	}
