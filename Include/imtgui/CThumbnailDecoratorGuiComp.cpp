@@ -454,7 +454,6 @@ void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 }
 
 
-
 void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 {
 	bool isLogged = true;
@@ -468,6 +467,8 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 			LoginControlButton->setEnabled(isLogged);
 
 			HomeButton->setEnabled(isLogged);
+
+			ExitButton->setEnabled(isLogged);
 		}
 		else{
 			LoginControlButton->setEnabled(PageStack->currentIndex() != LOGIN_PAGE_INDEX);

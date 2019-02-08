@@ -19,10 +19,10 @@ namespace imtreportgui
 // reimplemented (ifile::IFilePersistence)
 
 bool CReportDocumentPdfPersistenceComp::IsOperationSupported(
-	const istd::IChangeable* dataObjectPtr,
-	const QString* filePathPtr,
-	int flags,
-	bool /*beQuiet*/) const
+			const istd::IChangeable* dataObjectPtr,
+			const QString* filePathPtr,
+			int flags,
+			bool /*beQuiet*/) const
 {
 	if ((filePathPtr == NULL) || (flags & QF_LOAD)){
 		return false;
@@ -40,15 +40,18 @@ bool CReportDocumentPdfPersistenceComp::IsOperationSupported(
 
 
 int CReportDocumentPdfPersistenceComp::LoadFromFile(
-	istd::IChangeable& /*data*/,
-	const QString& /*filePath*/,
-	ibase::IProgressManager* /*progressManagerPtr*/) const
+			istd::IChangeable& /*data*/,
+			const QString& /*filePath*/,
+			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	return OS_FAILED;
 }
 
 
-int CReportDocumentPdfPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const
+int CReportDocumentPdfPersistenceComp::SaveToFile(
+			const istd::IChangeable& data,
+			const QString& filePath,
+			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	const imtreport::IReportDocument* documentPtr = dynamic_cast<const imtreport::IReportDocument*>(&data);
 	if (documentPtr == NULL){

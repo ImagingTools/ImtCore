@@ -14,6 +14,7 @@
         <file alias="Undo">Resources/Icons/Undo.svg</file>
         <file alias="AutoUpdate">Resources/Icons/AutoUpdate.svg</file>
         <file alias="Save">Resources/Icons/Save.svg</file>
+        <file alias="DocumentExport">Resources/Icons/Save.svg</file>
         <file alias="Lock">Resources/Icons/Lock.svg</file>
         <file alias="Unlock">Resources/Icons/Unlock.svg</file>
         <file alias="PowerOff">Resources/Icons/PowerOff.svg</file>

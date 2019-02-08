@@ -19,10 +19,10 @@ namespace imtreportgui
 // reimplemented (ifile::IFilePersistence)
 
 bool CReportDocumentTiffPersistenceComp::IsOperationSupported(
-	const istd::IChangeable* dataObjectPtr,
-	const QString* filePathPtr,
-	int flags,
-	bool /*beQuiet*/) const
+			const istd::IChangeable* dataObjectPtr,
+			const QString* filePathPtr,
+			int flags,
+			bool /*beQuiet*/) const
 {
 	if ((filePathPtr == NULL) || (flags & QF_LOAD)){
 		return false;
@@ -40,15 +40,18 @@ bool CReportDocumentTiffPersistenceComp::IsOperationSupported(
 
 
 int CReportDocumentTiffPersistenceComp::LoadFromFile(
-	istd::IChangeable& /*data*/,
-	const QString& /*filePath*/,
-	ibase::IProgressManager* /*progressManagerPtr*/) const
+			istd::IChangeable& /*data*/,
+			const QString& /*filePath*/,
+			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	return OS_FAILED;
 }
 
 
-int CReportDocumentTiffPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const
+int CReportDocumentTiffPersistenceComp::SaveToFile(
+			const istd::IChangeable& data,
+			const QString& filePath,
+			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	const imtreport::IReportDocument* documentPtr = dynamic_cast<const imtreport::IReportDocument*>(&data);
 	if (documentPtr == NULL){
@@ -71,7 +74,9 @@ int CReportDocumentTiffPersistenceComp::SaveToFile(const istd::IChangeable& data
 }
 
 
-ifile::IFilePersistence::OperationState CReportDocumentTiffPersistenceComp::SaveToFile(const CReportSceneBuilder::ReportScenes scenes, const QString& filePath) const
+ifile::IFilePersistence::OperationState CReportDocumentTiffPersistenceComp::SaveToFile(
+			const CReportSceneBuilder::ReportScenes scenes,
+			const QString& filePath) const
 {
 	Q_ASSERT(!scenes.isEmpty());
 
@@ -91,7 +96,7 @@ ifile::IFilePersistence::OperationState CReportDocumentTiffPersistenceComp::Save
 
 		QString fileCounter;
 		if (!*m_saveFirstPageOnlyAttrPtr){
-			fileCounter = QString("%1").arg(i + 1, 2, 10, QChar('0'));
+			fileCounter = QString(" - %1").arg(i + 1, 2, 10, QChar('0'));
 		}
 
 		imgFilePath = fileInfo.path() + "/" +
