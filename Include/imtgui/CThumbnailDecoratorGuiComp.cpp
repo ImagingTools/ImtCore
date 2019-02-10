@@ -461,14 +461,13 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 		isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
 
 		LoginButton->setEnabled(!isLogged);
+		ExitButton->setEnabled(isLogged);
 
 		LoginMode loginMode = GetLoginMode();
 		if (loginMode == LM_STRONG){
 			LoginControlButton->setEnabled(isLogged);
 
 			HomeButton->setEnabled(isLogged);
-
-			ExitButton->setEnabled(isLogged);
 		}
 		else{
 			LoginControlButton->setEnabled(PageStack->currentIndex() != LOGIN_PAGE_INDEX);
