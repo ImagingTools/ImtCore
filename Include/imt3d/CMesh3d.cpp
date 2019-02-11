@@ -68,6 +68,7 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath)
 {
 	m_vertices.clear();
 	m_triangles.clear();
+	m_normals.clear();
 
 	m_isMeshCenterCalculationValid = false;
 	m_isMeshCuboidCalculationValid = false;

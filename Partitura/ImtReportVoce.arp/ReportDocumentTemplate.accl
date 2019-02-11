@@ -15,20 +15,21 @@
         <Element ComponentName="SerializedUndoManager" X="1000" Y="375" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="ReportDocumentView">
-            <PositionMap>
-                <Element ComponentName="ComposedFilePersistence" X="400" Y="263" Note=""/>
-                <Element ComponentName="FileDialogPersistence" X="400" Y="425" Note=""/>
-                <Element ComponentName="ReportDocumentPdfPersistence" X="400" Y="125" Note=""/>
-                <Element ComponentName="ReportDocumentView" X="825" Y="425" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="ReportDocument">
             <PositionMap>
                 <Element ComponentName="InspectionReportBuilder" X="200" Y="425" Note=""/>
                 <Element ComponentName="InspectionReportSimulator" X="625" Y="175" Note=""/>
                 <Element ComponentName="ReportDocument" X="975" Y="425" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="ReportDocumentView">
+            <PositionMap>
+                <Element ComponentName="ComposedFilePersistence" X="400" Y="263" Note=""/>
+                <Element ComponentName="FileDialogPersistence" X="450" Y="625" Note=""/>
+                <Element ComponentName="ReportDocumentView" X="850" Y="675" Note=""/>
+                <Element ComponentName="ReportPdfPersistence" X="650" Y="100" Note=""/>
+                <Element ComponentName="ReportTiffPersistence" X="1000" Y="100" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

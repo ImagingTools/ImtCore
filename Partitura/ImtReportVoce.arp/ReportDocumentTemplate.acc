@@ -131,7 +131,7 @@
                                 <AttributeInfo Id="SlaveLoaders" Type="Reference[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ReportDocumentPdfPersistence</Value>
+                                            <Value>ReportPdfPersistence</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -154,7 +154,19 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="ReportDocumentPdfPersistence" PackageId="ImtReportGuiPck" ComponentId="ReportPdfPersistence">
+                    <Element Id="ReportDocumentView" PackageId="ImtReportGuiPck" ComponentId="ReportDocumentView">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ReportDocumentPdfPersistence" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="FileDialogPersistence"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ReportDocumentTiffPersistence" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="FileDialogPersistence"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="ReportPdfPersistence" PackageId="ImtReportGuiPck" ComponentId="ReportPdfPersistence">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="">
@@ -163,11 +175,14 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="ReportDocumentView" PackageId="ImtReportGuiPck" ComponentId="ReportDocumentView">
+                    <Element Id="ReportTiffPersistence" PackageId="ImtReportGuiPck" ComponentId="ReportTiffPersistence">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="ReportDocumentPdfPersistence" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="FileDialogPersistence"/>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="ReportDocumentView"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SaveFirstPageOnly" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
