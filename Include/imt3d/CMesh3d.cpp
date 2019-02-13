@@ -4,6 +4,10 @@
 // STL includes
 #include <array>
 
+// ACF includes
+#include <istd/CChangeNotifier.h>
+
+
 // vertex element access
 static const int E_X = 0;
 static const int E_Y = 1;
@@ -23,7 +27,7 @@ CMesh3d::CMesh3d():
 
 bool CMesh3d::SaveToStlFile(const QString& filePath) const
 {
-	if (m_vertices.size() < 1){
+	if (m_vertices.isEmpty()){
 		return false;
 	}
 
@@ -66,6 +70,8 @@ bool CMesh3d::SaveToStlFile(const QString& filePath) const
 
 bool CMesh3d::LoadFromStlFile(const QString& filePath)
 {
+	istd::CChangeNotifier changeNotifier(this);
+
 	m_vertices.clear();
 	m_triangles.clear();
 	m_normals.clear();
@@ -83,6 +89,10 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath)
 
 	quint32 numTris = 0;
 	std::fread(&numTris, sizeof(numTris), 1, file);
+
+	m_triangles.reserve(numTris);
+	m_normals.reserve(numTris);
+	m_vertices.reserve(3 * numTris);
 
 	for (quint32 i = 0; i < numTris; ++i){
 		// store indices of the m_vertices
@@ -159,8 +169,7 @@ const CMesh3d::MeshNormals& CMesh3d::GetNormals() const
 
 bool CMesh3d::IsEmpty() const
 {
-	bool nope = (m_vertices.size() > 0);
-	return !nope;
+	return m_vertices.isEmpty();
 }
 
 
@@ -175,6 +184,9 @@ i3d::CVector3d CMesh3d::GetCenter() const
 void CMesh3d::MoveCenterTo(const i3d::CVector3d& position)
 {
 	Q_UNUSED(position);
+
+	istd::CChangeNotifier changeNotifier(this);
+
 	m_isMeshCenterCalculationValid = false;
 	m_isMeshCuboidCalculationValid = false;
 }
@@ -203,7 +215,6 @@ bool CMesh3d::Serialize(iser::IArchive& archive)
 void CMesh3d::EnsureCenterCalculated() const
 {
 	if (!IsEmpty() && !m_isMeshCenterCalculationValid){
-
 		const CCuboid boundingCuboid = GetBoundingCuboid();
 
 		istd::CRange xRange(boundingCuboid.GetLeft(), boundingCuboid.GetRight());
@@ -211,6 +222,8 @@ void CMesh3d::EnsureCenterCalculated() const
 		istd::CRange zRange(boundingCuboid.GetNear(), boundingCuboid.GetFar());
 
 		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
+			istd::CChangeNotifier changeNotifier(this);
+
 			m_meshCenter = i3d::CVector3d(
 				xRange.GetValueFromAlpha(0.5),
 				yRange.GetValueFromAlpha(0.5),
@@ -262,13 +275,14 @@ void CMesh3d::EnsureCuboidCalculated() const
 		}
 
 		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
-
 			const double left = xRange.GetMinValue();
 			const double right = xRange.GetMaxValue();
 			const double bottom = yRange.GetMinValue();
 			const double top = yRange.GetMaxValue();
 			const double far = zRange.GetMinValue();
 			const double near = zRange.GetMaxValue();
+
+			istd::CChangeNotifier changeNotifier(this);
 
 			m_meshCuboid = CCuboid(left, right, bottom, top, near, far);
 
