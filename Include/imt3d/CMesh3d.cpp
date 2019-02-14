@@ -222,7 +222,7 @@ void CMesh3d::EnsureCenterCalculated() const
 		istd::CRange zRange(boundingCuboid.GetNear(), boundingCuboid.GetFar());
 
 		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
-			istd::CChangeNotifier changeNotifier(this);
+			istd::CChangeNotifier changeNotifier(const_cast<CMesh3d*>(this));
 
 			m_meshCenter = i3d::CVector3d(
 				xRange.GetValueFromAlpha(0.5),
@@ -282,15 +282,15 @@ void CMesh3d::EnsureCuboidCalculated() const
 			const double far = zRange.GetMinValue();
 			const double near = zRange.GetMaxValue();
 
-			istd::CChangeNotifier changeNotifier(this);
+			istd::CChangeNotifier changeNotifier(const_cast<CMesh3d*>(this));
 
 			m_meshCuboid = CCuboid(left, right, bottom, top, near, far);
 
 			m_isMeshCuboidCalculationValid = true;
 		}
 	}
-
 }
+
 
 } // namespace imt3d
 
