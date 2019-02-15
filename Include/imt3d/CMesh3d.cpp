@@ -232,9 +232,7 @@ void CMesh3d::EnsureCenterCalculated() const
 			m_isMeshCenterCalculationValid = true;
 		}
 	}
-
 }
-
 
 
 void CMesh3d::EnsureCuboidCalculated() const
