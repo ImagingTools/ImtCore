@@ -54,6 +54,7 @@ public:
 
 private:
 	void EnsureCenterCalculated() const;
+	void EnsureCuboidCalculated() const;
 
 private:
 	CloudPoints m_cloudPoints;

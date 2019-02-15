@@ -122,48 +122,7 @@ void CPointCloud3d::MoveCenterTo(const i3d::CVector3d &position)
 
 CCuboid CPointCloud3d::GetBoundingCuboid() const
 {
-	if (!IsEmpty() && !m_isCloudCuboidCalculationValid){
-		double left = std::numeric_limits<double>::max();
-		double right = std::numeric_limits<double>::min();
-		double bottom = std::numeric_limits<double>::max();
-		double top = std::numeric_limits<double>::min();
-		double near = std::numeric_limits<double>::min();
-		double far = std::numeric_limits<double>::max();
-
-		for (IPointCloud3d::CloudPoints::const_iterator pointIter = m_cloudPoints.constBegin(); pointIter != m_cloudPoints.constEnd(); pointIter++){
-			if (!imt3d::CPointCloud3d::IsPointValid(*pointIter)){
-				continue;
-			}
-
-			if ((pointIter->GetX() > right)){
-				right = pointIter->GetX();
-			}
-
-			if ((pointIter->GetX() < left)){
-				left = pointIter->GetX();
-			}
-			if ((pointIter->GetY() > top)){
-				top = pointIter->GetY();
-			}
-
-			if ((pointIter->GetY() < bottom)){
-				bottom = pointIter->GetY();
-			}
-			if ((pointIter->GetZ() > near)){
-				near = pointIter->GetZ();
-			}
-
-			if ((pointIter->GetZ() < far)){
-				far = pointIter->GetZ();
-			}
-		}
-
-		m_boundingCuboid = CCuboid(left, right, bottom, top, near, far);
-		m_isCloudCuboidCalculationValid = true;
-	}
-	else{
-		m_boundingCuboid = CCuboid();
-	}
+	EnsureCuboidCalculated();
 
 	return m_boundingCuboid;
 }
@@ -296,12 +255,73 @@ void CPointCloud3d::EnsureCenterCalculated() const
 		}
 
 		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
+			istd::CChangeNotifier changeNotifier(const_cast<CPointCloud3d*>(this));
+
 			m_cloudCenter = i3d::CVector3d(
 						xRange.GetValueFromAlpha(0.5),
 						yRange.GetValueFromAlpha(0.5),
 						zRange.GetValueFromAlpha(0.5));
 
 			m_isCloudCenterCalculationValid = true;
+		}
+	}
+}
+
+
+void CPointCloud3d::EnsureCuboidCalculated() const
+{
+	if (!IsEmpty() && !m_isCloudCuboidCalculationValid){
+		istd::CRange xRange(qInf(), -qInf());
+		istd::CRange yRange(qInf(), -qInf());
+		istd::CRange zRange(qInf(), -qInf());
+
+		for (const i3d::CVector3d& point : m_cloudPoints){
+			if (!IsPointValid(point)){
+				continue;
+			}
+
+			double x = point.GetElement(0);
+			double y = point.GetElement(1);
+			double z = point.GetElement(2);
+
+			if (x < xRange.GetMinValue()){
+				xRange.SetMinValue(x);
+			}
+
+			if (y < yRange.GetMinValue()){
+				yRange.SetMinValue(y);
+			}
+
+			if (z < zRange.GetMinValue()){
+				zRange.SetMinValue(z);
+			}
+
+			if (x > xRange.GetMaxValue()){
+				xRange.SetMaxValue(x);
+			}
+
+			if (y > yRange.GetMaxValue()){
+				yRange.SetMaxValue(y);
+			}
+
+			if (z > zRange.GetMaxValue()){
+				zRange.SetMaxValue(z);
+			}
+		}
+
+		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
+			const double left = xRange.GetMinValue();
+			const double right = xRange.GetMaxValue();
+			const double bottom = yRange.GetMinValue();
+			const double top = yRange.GetMaxValue();
+			const double far = zRange.GetMinValue();
+			const double near = zRange.GetMaxValue();
+
+			istd::CChangeNotifier changeNotifier(const_cast<CPointCloud3d*>(this));
+
+			m_boundingCuboid = CCuboid(left, right, bottom, top, near, far);
+
+			m_isCloudCuboidCalculationValid = true;
 		}
 	}
 }
