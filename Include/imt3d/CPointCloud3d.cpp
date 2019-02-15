@@ -122,50 +122,47 @@ void CPointCloud3d::MoveCenterTo(const i3d::CVector3d &position)
 
 CCuboid CPointCloud3d::GetBoundingCuboid() const
 {
-	if (!m_isCloudCuboidCalculationValid){
-		m_isCloudCuboidCalculationValid = true;
+	if (!IsEmpty() && !m_isCloudCuboidCalculationValid){
+		double left = std::numeric_limits<double>::max();
+		double right = std::numeric_limits<double>::min();
+		double bottom = std::numeric_limits<double>::max();
+		double top = std::numeric_limits<double>::min();
+		double near = std::numeric_limits<double>::min();
+		double far = std::numeric_limits<double>::max();
 
-		if (!m_cloudPoints.isEmpty()){
-			double left = std::numeric_limits<double>::max();
-			double right = std::numeric_limits<double>::min();
-			double bottom = std::numeric_limits<double>::max();
-			double top = std::numeric_limits<double>::min();
-			double near = std::numeric_limits<double>::min();
-			double far = std::numeric_limits<double>::max();
-
-			for (IPointCloud3d::CloudPoints::const_iterator pointIter = m_cloudPoints.constBegin(); pointIter != m_cloudPoints.constEnd(); pointIter++){
-				if (!imt3d::CPointCloud3d::IsPointValid(*pointIter)){
-					continue;
-				}
-
-				if ((pointIter->GetX() > right)){
-					right = pointIter->GetX();
-				}
-
-				if ((pointIter->GetX() < left)){
-					left = pointIter->GetX();
-				}
-				if ((pointIter->GetY() > top)){
-					top = pointIter->GetY();
-				}
-
-				if ((pointIter->GetY() < bottom)){
-					bottom = pointIter->GetY();
-				}
-				if ((pointIter->GetZ() > near)){
-					near = pointIter->GetZ();
-				}
-
-				if ((pointIter->GetZ() < far)){
-					far = pointIter->GetZ();
-				}
+		for (IPointCloud3d::CloudPoints::const_iterator pointIter = m_cloudPoints.constBegin(); pointIter != m_cloudPoints.constEnd(); pointIter++){
+			if (!imt3d::CPointCloud3d::IsPointValid(*pointIter)){
+				continue;
 			}
 
-			m_boundingCuboid = CCuboid(left, right, bottom, top, near, far);
+			if ((pointIter->GetX() > right)){
+				right = pointIter->GetX();
+			}
+
+			if ((pointIter->GetX() < left)){
+				left = pointIter->GetX();
+			}
+			if ((pointIter->GetY() > top)){
+				top = pointIter->GetY();
+			}
+
+			if ((pointIter->GetY() < bottom)){
+				bottom = pointIter->GetY();
+			}
+			if ((pointIter->GetZ() > near)){
+				near = pointIter->GetZ();
+			}
+
+			if ((pointIter->GetZ() < far)){
+				far = pointIter->GetZ();
+			}
 		}
-		else{
-			m_boundingCuboid = CCuboid();
-		}
+
+		m_boundingCuboid = CCuboid(left, right, bottom, top, near, far);
+		m_isCloudCuboidCalculationValid = true;
+	}
+	else{
+		m_boundingCuboid = CCuboid();
 	}
 
 	return m_boundingCuboid;
