@@ -19,7 +19,6 @@ namespace imt3d
 class CMesh3d: virtual public IMesh3d
 {
 public:
-
 	CMesh3d();
 
 	bool SaveToStlFile(const QString& filePath) const;
@@ -42,20 +41,22 @@ public:
 	virtual bool Serialize(iser::IArchive& archive) override;
 
 private:
-
 	void EnsureCenterCalculated() const;
 	void EnsureCuboidCalculated() const;
 
 private:
-
 	MeshVertices m_vertices;
 	MeshNormals m_normals;
 	MeshTriangles m_triangles;
 
 	mutable i3d::CVector3d m_meshCenter;
 	mutable CCuboid m_meshCuboid;
+
 	mutable bool m_isMeshCuboidCalculationValid;
 	mutable bool m_isMeshCenterCalculationValid;
+
+	static const istd::IChangeable::ChangeSet s_verticesChangeSet;
+	static const istd::IChangeable::ChangeSet s_cuboidChangeSet;
 };
 
 

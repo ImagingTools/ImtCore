@@ -18,6 +18,14 @@ namespace imt3d
 {
 
 
+// static members
+
+const istd::IChangeable::ChangeSet CMesh3d::s_verticesChangeSet(IMesh3d::CF_VERTICES);
+const istd::IChangeable::ChangeSet CMesh3d::s_cuboidChangeSet(IMesh3d::CF_CUBOID);
+
+
+// public methods
+
 CMesh3d::CMesh3d():
 	m_isMeshCenterCalculationValid(false),
 	m_isMeshCuboidCalculationValid(false)
@@ -70,7 +78,7 @@ bool CMesh3d::SaveToStlFile(const QString& filePath) const
 
 bool CMesh3d::LoadFromStlFile(const QString& filePath)
 {
-	istd::CChangeNotifier changeNotifier(this);
+	istd::CChangeNotifier changeNotifier(this, &s_verticesChangeSet);
 
 	m_vertices.clear();
 	m_triangles.clear();
@@ -185,7 +193,7 @@ void CMesh3d::MoveCenterTo(const i3d::CVector3d& position)
 {
 	Q_UNUSED(position);
 
-	istd::CChangeNotifier changeNotifier(this);
+	istd::CChangeNotifier changeNotifier(this, &s_cuboidChangeSet);
 
 	m_isMeshCenterCalculationValid = false;
 	m_isMeshCuboidCalculationValid = false;
@@ -222,7 +230,7 @@ void CMesh3d::EnsureCenterCalculated() const
 		istd::CRange zRange(boundingCuboid.GetNear(), boundingCuboid.GetFar());
 
 		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
-			istd::CChangeNotifier changeNotifier(const_cast<CMesh3d*>(this));
+			istd::CChangeNotifier changeNotifier(const_cast<CMesh3d*>(this), &s_cuboidChangeSet);
 
 			m_meshCenter = i3d::CVector3d(
 				xRange.GetValueFromAlpha(0.5),
@@ -280,7 +288,7 @@ void CMesh3d::EnsureCuboidCalculated() const
 			const double far = zRange.GetMinValue();
 			const double near = zRange.GetMaxValue();
 
-			istd::CChangeNotifier changeNotifier(const_cast<CMesh3d*>(this));
+			istd::CChangeNotifier changeNotifier(const_cast<CMesh3d*>(this), &s_cuboidChangeSet);
 
 			m_meshCuboid = CCuboid(left, right, bottom, top, near, far);
 
