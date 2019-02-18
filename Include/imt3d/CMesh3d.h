@@ -54,9 +54,6 @@ private:
 
 	mutable bool m_isMeshCuboidCalculationValid;
 	mutable bool m_isMeshCenterCalculationValid;
-
-	static const istd::IChangeable::ChangeSet s_verticesChangeSet;
-	static const istd::IChangeable::ChangeSet s_cuboidChangeSet;
 };
 
 

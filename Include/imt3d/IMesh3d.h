@@ -24,15 +24,6 @@ namespace imt3d
 class IMesh3d: virtual public IObject3d
 {
 public:
-	/**
-		Data model change notification flags
-	*/
-	enum ChangeFlags
-	{
-		CF_VERTICES,
-		CF_CUBOID
-	};
-
 	typedef imath::TVector<3, float> FloatVector3d;
 	typedef imath::TVector<3, int> IntVector3d;
 	typedef FloatVector3d Vertex;

@@ -102,8 +102,6 @@ void CPointCloud3d::MoveCenterTo(const i3d::CVector3d &position)
 {
 	i3d::CVector3d center = GetCenter();
 	if (center != position){
-		istd::CChangeNotifier notifier(this);
-
 		i3d::CVector3d delta = position - center;
 		for (		CloudPoints::iterator pointIter = m_cloudPoints.begin();
 					pointIter != m_cloudPoints.end();
@@ -255,8 +253,6 @@ void CPointCloud3d::EnsureCenterCalculated() const
 		}
 
 		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
-			istd::CChangeNotifier changeNotifier(const_cast<CPointCloud3d*>(this));
-
 			m_cloudCenter = i3d::CVector3d(
 						xRange.GetValueFromAlpha(0.5),
 						yRange.GetValueFromAlpha(0.5),
@@ -316,8 +312,6 @@ void CPointCloud3d::EnsureCuboidCalculated() const
 			const double top = yRange.GetMaxValue();
 			const double far = zRange.GetMinValue();
 			const double near = zRange.GetMaxValue();
-
-			istd::CChangeNotifier changeNotifier(const_cast<CPointCloud3d*>(this));
 
 			m_boundingCuboid = CCuboid(left, right, bottom, top, near, far);
 
