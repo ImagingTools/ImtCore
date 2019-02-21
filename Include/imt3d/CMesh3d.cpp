@@ -39,19 +39,21 @@ bool CMesh3d::SaveToStlFile(const QString& filePath) const
 		return false;
 	}
 
+	// write header
 	std::array<quint8, 80> stlHeader = { 0 };
 	std::fwrite(stlHeader.data(), sizeof(stlHeader[0]), stlHeader.size(), file);
 
+	// write triangles count
 	quint32 trianglesCount = static_cast<quint32>(m_triangles.size());
 	std::fwrite(&trianglesCount, sizeof(trianglesCount), 1, file);
 
-	for (uint index = 0; index < trianglesCount; index++){
-		const Triangle& oneTriangle = m_triangles[index];
-
-		Normal normal;
-		normal.Clear();
+	for (int index = 0; index < m_triangles.size(); index++){
+		// write normal
+		const Normal& normal = m_normals[index];
 		std::fwrite(&normal[0], sizeof(float), 3, file);
 
+		// write vertices
+		const Triangle& oneTriangle = m_triangles[index];
 		Vertex firstVert = m_vertices[oneTriangle.GetElement(0)];
 		Vertex secondVert = m_vertices[oneTriangle.GetElement(1)];
 		Vertex thirdVert = m_vertices[oneTriangle.GetElement(2)];
@@ -60,6 +62,7 @@ bool CMesh3d::SaveToStlFile(const QString& filePath) const
 		std::fwrite(&secondVert[0], sizeof(float), 3, file);
 		std::fwrite(&thirdVert[0], sizeof(float), 3, file);
 
+		// write attributes
 		quint16 attributes = 0;
 		std::fwrite(&attributes, sizeof(attributes), 1, file);
 	}
