@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4743" Description="ACF"/>
-            <Version Id="1" Number="2017" Description="ACF-Solutions"/>
+            <Version Id="0" Number="4749" Description="ACF"/>
+            <Version Id="1" Number="2026" Description="ACF-Solutions"/>
             <Version Id="1023" Number="330496" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -20,7 +20,7 @@
                         <Data IsEnabled="true" Value="Commercial"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CompanyName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="ImagingTools"/>
+                        <Data IsEnabled="true" Value="ImagingTools GmbH"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FileCopiers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -36,7 +36,7 @@
                         <Data IsEnabled="true" Value="10"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProductName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="ImtCore"/>
+                        <Data IsEnabled="true" Value="IMT SDK"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
