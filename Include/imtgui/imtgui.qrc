@@ -75,5 +75,6 @@
         <file alias="Tools">Resources/Icons/Tools.svg</file>
         <file alias="Paste">Resources/Icons/Paste.svg</file>
         <file alias="Record">Resources/Icons/Record.svg</file>
+        <file alias="Parameters">Resources/Icons/Parameters.svg</file>
     </qresource>
 </RCC>
