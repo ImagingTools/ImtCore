@@ -15,6 +15,7 @@
 #include <iprm/ISelectionParam.h>
 #include <iqtgui/CHierarchicalCommand.h>
 #include <iqtgui/TRestorableGuiWrap.h>
+#include <imeas/INumericValue.h>
 #include <iauth/ILogin.h>
 
 // ImtCore includes
@@ -84,6 +85,7 @@ public:
 		I_ASSIGN(m_commandsProviderCompPtr, "Commands", "Provider of the commands showed in the main tool bar", false, "Commands");
 		I_ASSIGN_TO(m_commandsProviderModelCompPtr, m_commandsProviderCompPtr, false);
 		I_ASSIGN(m_loginCompPtr, "Login", "Login logic component", false, "Login");
+		I_ASSIGN(m_autoLogoutMinutesCompPtr, "AutoLogoutTime", "Parameter to control automatical logout interval. Setting of this parameter overrides 'AutoLogoutMinutes' value", false, "AutoLogoutTime");
 	I_END_COMPONENT;
 
 	enum
@@ -144,6 +146,7 @@ private:
 	void CreateMenu(const iprm::ISelectionParam* selectionPtr, QTreeWidgetItem* parentItemPtr);
 	void UpdatePageState();
 	LoginMode GetLoginMode();
+	int GetAutoLogoutTime() const;
 
 	/**
 		Calculate layout of page thumbnails based on m_horizontalItemsViewAttrPtr and m_verticalItemsViewAttrPtr
@@ -229,10 +232,10 @@ private:
 	I_REF(ibase::ICommandsProvider, m_commandsProviderCompPtr);
 	I_REF(imod::IModel, m_commandsProviderModelCompPtr);
 	I_REF(iauth::ILogin, m_loginCompPtr);
+	I_REF(imeas::INumericValue, m_autoLogoutMinutesCompPtr);
 
 	QToolBar* m_mainToolBar;
 	QTimer m_autoLogoutTimer;
-	int m_autoLogoutMilisec;
 };
 
 

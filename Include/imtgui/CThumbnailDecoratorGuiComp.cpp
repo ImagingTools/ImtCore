@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtGui/QStandardItemModel>
+#include <QtGui/QKeyEvent>
 #include <QtWidgets/QToolbar>
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QFrame>
@@ -67,9 +68,21 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 		bool isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
 
 		if (isLogged && ((event->type() == QEvent::KeyRelease) || (event->type() == QEvent::MouseButtonRelease))){
-			// Auto log off functionality is activated
-			if (m_autoLogoutMilisec > 0){
-				m_autoLogoutTimer.start(m_autoLogoutMilisec);
+			// Auto log off functionality is activated, aslo restart the timer after any user activity:
+			int autoLogoutSeconds = GetAutoLogoutTime();
+			if (autoLogoutSeconds > 0){
+				m_autoLogoutTimer.start(autoLogoutSeconds * 1000);
+			}
+		}
+
+		QKeyEvent* keyEventPtr = dynamic_cast<QKeyEvent*>(event);
+		if (keyEventPtr != NULL){
+			int pressedKey = keyEventPtr->key();
+
+			if (pressedKey == Qt::Key_Return){
+				if ((PageStack->currentIndex() == LOGIN_PAGE_INDEX) && !isLogged && LoginButton->isEnabled()){
+					on_LoginButton_clicked();
+				}
 			}
 		}
 	}
@@ -90,6 +103,7 @@ void CThumbnailDecoratorGuiComp::OnRestoreSettings(const QSettings& settings)
 
 	if (!lastUser.isEmpty()){
 		PasswordEdit->setFocus();
+		PasswordEdit->setCursorPosition(0);
 	}
 }
 
@@ -205,6 +219,11 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 void CThumbnailDecoratorGuiComp::on_PageStack_currentChanged(int stackIndex)
 {
 	CurrentPageToolBarFrame->setVisible(stackIndex == PAGE_CONTAINER_INDEX);
+
+	if (!UserEdit->text().isEmpty() && (stackIndex == LOGIN_PAGE_INDEX)){
+		PasswordEdit->setFocus();
+		PasswordEdit->setCursorPosition(0);
+	}
 }
 
 
@@ -291,11 +310,9 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 		QString userName = UserEdit->text();
 		QString password = PasswordEdit->text();
 		if (m_loginCompPtr->Login(userName, password)){
-			if (m_autoLogoutMinutesAttrPtr.IsValid()){
-				Q_ASSERT(*m_autoLogoutMinutesAttrPtr > 0);
-
-				m_autoLogoutMilisec = *m_autoLogoutMinutesAttrPtr * 60 * 1000;
-				m_autoLogoutTimer.start(m_autoLogoutMilisec);
+			int autoLogoutSeconds = GetAutoLogoutTime();
+			if (autoLogoutSeconds > 0){
+				m_autoLogoutTimer.start(autoLogoutSeconds * 1000);
 			}
 
 			UpdateLoginButtonsState();
@@ -480,8 +497,8 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 		UserEdit->setEnabled(!isLogged);
 		if (!isLogged){
 			m_autoLogoutTimer.stop();
+
 			qApp->removeEventFilter(this);
-			m_autoLogoutMilisec = 0;
 		}
 	}
 
@@ -675,6 +692,26 @@ CThumbnailDecoratorGuiComp::LoginMode CThumbnailDecoratorGuiComp::GetLoginMode()
 
 	return LM_STRONG;
 }
+
+
+int CThumbnailDecoratorGuiComp::GetAutoLogoutTime() const
+{
+	int retVal = 0;
+	if (m_autoLogoutMinutesAttrPtr.IsValid()){
+		Q_ASSERT(*m_autoLogoutMinutesAttrPtr > 0);
+
+		retVal = *m_autoLogoutMinutesAttrPtr * 60;
+	}
+
+	if (m_autoLogoutMinutesCompPtr.IsValid()){
+		Q_ASSERT(m_autoLogoutMinutesCompPtr->GetValues().GetElementsCount() == 1);
+
+		retVal = m_autoLogoutMinutesCompPtr->GetValues()[0] * 60;
+	}
+
+	return retVal;
+}
+
 
 void CThumbnailDecoratorGuiComp::GetMenuLayout(const int count)
 {
