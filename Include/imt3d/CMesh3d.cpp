@@ -240,7 +240,7 @@ void CMesh3d::EnsureCuboidCalculated() const
 		istd::CRange yRange(qInf(), -qInf());
 		istd::CRange zRange(qInf(), -qInf());
 
-		for (MeshVertices::const_iterator itVertex = m_vertices.constBegin(); itVertex != m_vertices.constEnd(); itVertex++){
+		for (MeshVertices::const_iterator itVertex = m_vertices.constBegin(); itVertex != m_vertices.constEnd(); ++itVertex){
 			double x = itVertex->GetElement(E_X);
 			double y = itVertex->GetElement(E_Y);
 			double z = itVertex->GetElement(E_Z);

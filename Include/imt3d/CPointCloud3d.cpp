@@ -105,7 +105,7 @@ void CPointCloud3d::MoveCenterTo(const i3d::CVector3d &position)
 		i3d::CVector3d delta = position - center;
 		for (		CloudPoints::iterator pointIter = m_cloudPoints.begin();
 					pointIter != m_cloudPoints.end();
-					pointIter++){
+					++pointIter){
 			if (IsPointValid(*pointIter)){
 				pointIter->SetX(pointIter->GetX() + delta.GetX());
 				pointIter->SetY(pointIter->GetY() + delta.GetY());
@@ -140,7 +140,7 @@ bool CPointCloud3d::Serialize(iser::IArchive &archive)
 	archive.BeginMultiTag(pointCloudTag, pointTag, count);
 
 	if (archive.IsStoring()){
-		for (CloudPoints::iterator pointIter = m_cloudPoints.begin(); pointIter != m_cloudPoints.end(); pointIter++){
+		for (CloudPoints::iterator pointIter = m_cloudPoints.begin(); pointIter != m_cloudPoints.end(); ++pointIter){
 			retVal = retVal && archive.BeginTag(pointTag);
 			retVal = retVal && pointIter->Serialize(archive);
 			retVal = retVal && archive.EndTag(pointTag);
@@ -218,7 +218,7 @@ void CPointCloud3d::EnsureCenterCalculated() const
 
 		for (		CloudPoints::ConstIterator pointIter = m_cloudPoints.constBegin();
 					pointIter != m_cloudPoints.constEnd();
-					pointIter++){
+					++pointIter){
 			if (!IsPointValid(*pointIter)){
 				continue;
 			}
