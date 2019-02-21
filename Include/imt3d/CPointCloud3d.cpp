@@ -38,12 +38,6 @@ i3d::CVector3d CPointCloud3d::GetInvalidPoint()
 
 // public methods
 
-void CPointCloud3d::SetGridSize(const istd::CIndex2d& gridSize)
-{
-	m_gridSize = gridSize;
-}
-
-
 // reimplemented (IPointCloud3d)
 
 void CPointCloud3d::CreateCloud(const IPointCloud3d::CloudPoints &points)
@@ -62,23 +56,36 @@ const IPointCloud3d::CloudPoints& CPointCloud3d::GetPoints() const
 }
 
 
-const istd::CIndex2d CPointCloud3d::GetGridSize() const
+// reimplemented (IGridInfo)
+
+istd::CIndex2d CPointCloud3d::GetGridSize() const
 {
 	return m_gridSize;
 }
 
 
-const istd::CIndex2d CPointCloud3d::GetGridPosition(int index) const
+void CPointCloud3d::SetGridSize(const istd::CIndex2d& gridSize)
+{
+	if (m_gridSize != gridSize){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_gridSize = gridSize;
+	}
+}
+
+
+istd::CIndex2d CPointCloud3d::GetGridPosition(int index) const
 {
 	int y = index / m_gridSize.GetY();
-	int x = index - m_gridSize.GetY() * y;
+	int x = index - m_gridSize.GetX() * y;
+
 	return istd::CIndex2d(x, y);
 }
 
 
 int CPointCloud3d::GetCloudPosition(const istd::CIndex2d & index) const
 {
-	return m_gridSize.GetY() * index.GetY() + index.GetX();
+	return m_gridSize.GetX() * index.GetY() + index.GetX();
 }
 
 

@@ -28,16 +28,15 @@ public:
 	static bool IsPointValid(const i3d::CVector3d& position);
 	static i3d::CVector3d GetInvalidPoint();
 
-	void SetGridSize(const istd::CIndex2d& gridSize);
-
 	// reimplemented (IPointCloud3d)
 	virtual void CreateCloud(const CloudPoints &points) override;
 	virtual const CloudPoints& GetPoints() const override;
 
 	// reimplemented (IGridInfo)
-	virtual const istd::CIndex2d GetGridSize() const;
-	virtual const istd::CIndex2d GetGridPosition(int index) const;
-	virtual int GetCloudPosition(const istd::CIndex2d& index) const;
+	virtual istd::CIndex2d GetGridSize() const override;
+	virtual void SetGridSize(const istd::CIndex2d& gridSize) override;
+	virtual istd::CIndex2d GetGridPosition(int index) const override;
+	virtual int GetCloudPosition(const istd::CIndex2d& index) const override;
 
 	// reimplemented (IObject3d)
 	virtual bool IsEmpty() const override;

@@ -13,9 +13,6 @@ imtreportgui.file = ../../Include/imtreportgui/QMake/imtreportgui.pro
 SUBDIRS += imt3d
 imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
 
-SUBDIRS += imt3dproc
-imt3dproc.file = ../../Include/imt3dproc/QMake/imt3dproc.pro
-
 SUBDIRS += imtgui
 imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
 
@@ -34,10 +31,6 @@ ImtReportPck.depends = imtreport imtbase
 
 SUBDIRS += ImtCoreLoc
 ImtCoreLoc.file = ../../Impl/ImtCoreLoc/QMake/ImtCoreLoc.pro
-
-SUBDIRS += ImtProc3dPck
-ImtProc3dPck.file = ../../Impl/ImtProc3dPck/QMake/ImtProc3dPck.pro
-ImtProc3dPck.depends = imt3d imt3proc
 
 SUBDIRS += ImtGuiPck
 ImtGuiPck.file = ../../Impl/ImtGuiPck/QMake/ImtGuiPck.pro
