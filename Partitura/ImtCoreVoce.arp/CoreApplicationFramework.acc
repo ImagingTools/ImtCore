@@ -2,13 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4737" Description="ACF"/>
-            <Version Id="1" Number="2019" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330497" Description="Qt Framework"/>
+            <Version Id="0" Number="4758" Description="ACF"/>
+            <Version Id="1" Number="2032" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330496" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description>Acula-based application framework</Description>
-    <Keywords>Application Acula</Keywords>
+    <Description>ImagingTools application framework</Description>
+    <Keywords>Application</Keywords>
     <ElementsList>
         <Element Id="ApplicationInfo" PackageId="BasePck" ComponentId="ApplicationInfo">
             <Data IsEnabled="true" Flags="0">
@@ -140,6 +140,9 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AutoLogoutMinutes" Type="Integer" ExportId="AutoLogoutMinutes">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoLogoutTime" Type="Reference" ExportId="AutoLogoutTime">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Commands" Type="Reference" ExportId="PageCommands">
