@@ -76,8 +76,8 @@ void CPointCloud3d::SetGridSize(const istd::CIndex2d& gridSize)
 
 istd::CIndex2d CPointCloud3d::GetGridPosition(int index) const
 {
-	int y = index / m_gridSize.GetY();
-	int x = index - m_gridSize.GetX() * y;
+	int y = index / m_gridSize.GetX();
+	int x = index % m_gridSize.GetX();
 
 	return istd::CIndex2d(x, y);
 }
@@ -138,13 +138,15 @@ CCuboid CPointCloud3d::GetBoundingCuboid() const
 bool CPointCloud3d::Serialize(iser::IArchive &archive)
 {
 	static iser::CArchiveTag pointCloudTag("PointCloud", "Point cloud", iser::CArchiveTag::TT_LEAF);
-	static iser::CArchiveTag pointTag("Point", "Point", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag pointTag("Point", "Point", iser::CArchiveTag::TT_GROUP);
 	static iser::CArchiveTag gridSizeXTag("GridSizeX", "Size of points grid throw x", iser::CArchiveTag::TT_LEAF);
 	static iser::CArchiveTag gridSizeYTag("GridSizeY", "Size of points grid throw y", iser::CArchiveTag::TT_LEAF);
 
-	bool retVal = true;
 	int count = m_cloudPoints.count();
-	archive.BeginMultiTag(pointCloudTag, pointTag, count);
+
+	bool retVal = true;
+
+	retVal = retVal && archive.BeginMultiTag(pointCloudTag, pointTag, count);
 
 	if (archive.IsStoring()){
 		for (CloudPoints::iterator pointIter = m_cloudPoints.begin(); pointIter != m_cloudPoints.end(); ++pointIter){
