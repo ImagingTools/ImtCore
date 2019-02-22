@@ -23,6 +23,12 @@ public:
 	typedef QVector<i3d::CVector3d> CloudPoints;
 	typedef istd::TSmartPtr<IPointCloud3d> PointCloudPtr;
 
+	enum PointFormat
+	{
+		PF_XYZ_FLOAT32,
+		PF_XYZ_FLOAT64
+	};
+
 	/**
 		Create cloud object from the list of 3D-points.
 	*/

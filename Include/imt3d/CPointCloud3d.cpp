@@ -137,8 +137,8 @@ CCuboid CPointCloud3d::GetBoundingCuboid() const
 
 bool CPointCloud3d::Serialize(iser::IArchive &archive)
 {
-	static iser::CArchiveTag pointCloudTag("PointCloud", "Point cloud", iser::CArchiveTag::TT_LEAF);
-	static iser::CArchiveTag pointTag("Point", "Point", iser::CArchiveTag::TT_GROUP);
+	static iser::CArchiveTag pointCountTag("PointCount", "Point count", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag dataTag("Data", "Point data", iser::CArchiveTag::TT_GROUP);
 	static iser::CArchiveTag gridSizeXTag("GridSizeX", "Size of points grid throw x", iser::CArchiveTag::TT_LEAF);
 	static iser::CArchiveTag gridSizeYTag("GridSizeY", "Size of points grid throw y", iser::CArchiveTag::TT_LEAF);
 
@@ -146,28 +146,24 @@ bool CPointCloud3d::Serialize(iser::IArchive &archive)
 
 	bool retVal = true;
 
-	retVal = retVal && archive.BeginMultiTag(pointCloudTag, pointTag, count);
+	retVal = retVal && archive.BeginTag(pointCountTag);
+	retVal = retVal && archive.Process(count);
+	retVal = retVal && archive.EndTag(pointCountTag);
+
+	int dataSize = count * sizeof(i3d::CVector3d);
 
 	if (archive.IsStoring()){
-		for (CloudPoints::iterator pointIter = m_cloudPoints.begin(); pointIter != m_cloudPoints.end(); ++pointIter){
-			retVal = retVal && archive.BeginTag(pointTag);
-			retVal = retVal && pointIter->Serialize(archive);
-			retVal = retVal && archive.EndTag(pointTag);
-		}
+		retVal = retVal && archive.BeginTag(dataTag);
+		retVal = retVal && archive.ProcessData(&m_cloudPoints[0], dataSize);
+		retVal = retVal && archive.EndTag(dataTag);
 	}
 	else{
-		i3d::CVector3d point;
-		for (int i = 0; i < count; ++i){
-			retVal = retVal && archive.BeginTag(pointTag);
-			retVal = retVal && point.Serialize(archive);
-			retVal = retVal && archive.EndTag(pointTag);
-			if (retVal){
-				m_cloudPoints.push_back(point);
-			}
-		}
-	}
+		m_cloudPoints.resize(count);
 
-	archive.EndTag(pointCloudTag);
+		retVal = retVal && archive.BeginTag(dataTag);
+		retVal = retVal && archive.ProcessData(&m_cloudPoints[0], dataSize);
+		retVal = retVal && archive.EndTag(dataTag);
+	}
 
 	int sizeX = m_gridSize.GetX();
 	int sizeY = m_gridSize.GetY();
