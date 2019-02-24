@@ -40,13 +40,17 @@ i3d::CVector3d CPointCloud3d::GetInvalidPoint()
 
 // reimplemented (IPointCloud3d)
 
-void CPointCloud3d::CreateCloud(const IPointCloud3d::CloudPoints &points)
+void CPointCloud3d::CreateCloud(const IPointCloud3d::CloudPoints &points, const istd::CIndex2d* gridSizePtr)
 {
 	m_isCloudCenterCalculationValid = false;
 
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_cloudPoints = points;
+
+	if (gridSizePtr != nullptr){
+		m_gridSize= *gridSizePtr;
+	}
 }
 
 

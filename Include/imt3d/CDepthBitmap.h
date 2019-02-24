@@ -5,6 +5,9 @@
 #include <iimg/CReflectedBitmapBase.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 
+// ImtCore includes
+#include <imt3d/IDepthBitmap.h>
+
 
 namespace imt3d
 {
@@ -13,7 +16,7 @@ namespace imt3d
 /**
 	Implementation of a depth bitmap with integrated conversion to QImage (using for displaying the bitmap)
 */
-class CDepthBitmap: public iimg::CReflectedBitmapBase, public idoc::CStandardDocumentMetaInfo 
+class CDepthBitmap: virtual public imt3d::IDepthBitmap, public iimg::CReflectedBitmapBase, public idoc::CStandardDocumentMetaInfo 
 {
 public:
 	typedef iimg::CReflectedBitmapBase BaseClass;
@@ -26,7 +29,11 @@ public:
 	};
 
 	void SetDepthRange(const istd::CRange& depthRange);
-	istd::CRange GetDepthRange() const;
+
+	// reimplemented (IDepthBitmap)
+	istd::CRange GetDepthRange() const override;
+	virtual bool CreatDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size) override;
+	virtual bool CreatDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size, void * dataPtr, bool releaseFlag, int linesDifference = 0) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive);

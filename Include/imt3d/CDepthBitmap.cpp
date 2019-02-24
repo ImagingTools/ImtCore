@@ -28,9 +28,27 @@ void CDepthBitmap::SetDepthRange(const istd::CRange & depthRange)
 }
 
 
+// reimplemented (IDepthBitmap)
+
 istd::CRange CDepthBitmap::GetDepthRange() const
 {
 	return m_depthRange;
+}
+
+
+bool CDepthBitmap::CreatDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size)
+{
+	m_depthRange = depthRange;
+
+	return CreateBitmap(PF_FLOAT32,size);
+}
+
+
+bool CDepthBitmap::CreatDepthBitmap(const istd::CRange& depthRange, const istd::CIndex2d & size, void * dataPtr, bool releaseFlag, int linesDifference)
+{
+	m_depthRange = depthRange;
+
+	return CreateBitmap(PF_FLOAT32,size, dataPtr, releaseFlag, linesDifference);
 }
 
 

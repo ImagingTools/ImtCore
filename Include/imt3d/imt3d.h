@@ -1,11 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QVector>
-#include <QtCore/QPair>
-#include <QtCore/QLinkedList>
-
 // ACF includes
 #include <imath/imath.h>
 #include <i3d/CVector3d.h>
@@ -23,6 +18,12 @@
 namespace imt3d
 {
 
+
+class IDepthBitmap;
+class IPointCloud3d;
+
+bool ConvertDepthImageToCloud(const imt3d::IDepthBitmap& bitmap, IPointCloud3d& pointCloud);
+bool ConvertPointCloudToDepthBitmap(const IPointCloud3d& pointCloud, imt3d::IDepthBitmap& bitmap);
 
 
 } // namespace imt3d

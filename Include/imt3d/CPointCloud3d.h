@@ -18,7 +18,7 @@ namespace imt3d
 
 
 /**
-	Common cloud (list) of 3D-points implementation (IPointCloud3d interface).
+	Common implementation of a 3D-point cloud.
 */
 class CPointCloud3d: virtual public IPointCloud3d, virtual public IGridInfo
 {
@@ -29,7 +29,7 @@ public:
 	static i3d::CVector3d GetInvalidPoint();
 
 	// reimplemented (IPointCloud3d)
-	virtual void CreateCloud(const CloudPoints &points) override;
+	virtual void CreateCloud(const CloudPoints &points, const istd::CIndex2d* gridSizePtr = nullptr) override;
 	virtual const CloudPoints& GetPoints() const override;
 
 	// reimplemented (IGridInfo)

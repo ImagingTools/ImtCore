@@ -1,6 +1,9 @@
 #pragma once
 
 
+// STL includes
+#include <vector>
+
 // ACF includes
 #include <i3d/CVector3d.h>
 #include <istd/TSmartPtr.h>
@@ -32,7 +35,7 @@ public:
 	/**
 		Create cloud object from the list of 3D-points.
 	*/
-	virtual void CreateCloud(const CloudPoints& points) = 0;
+	virtual void CreateCloud(const CloudPoints& points, const istd::CIndex2d* gridSizePtr = nullptr) = 0;
 
 	/**
 		Get the list of pointsin 3D-space.
