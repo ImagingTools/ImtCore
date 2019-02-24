@@ -20,7 +20,7 @@ namespace imt3d
 class IPointCloud3d: virtual public IObject3d
 {
 public:
-	typedef QVector<i3d::CVector3d> CloudPoints;
+	typedef std::vector<i3d::CVector3d> CloudPoints;
 	typedef istd::TSmartPtr<IPointCloud3d> PointCloudPtr;
 
 	enum PointFormat

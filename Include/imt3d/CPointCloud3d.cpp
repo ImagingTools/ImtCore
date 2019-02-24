@@ -93,7 +93,7 @@ int CPointCloud3d::GetCloudPosition(const istd::CIndex2d & index) const
 
 bool CPointCloud3d::IsEmpty() const
 {
-	return m_cloudPoints.isEmpty();
+	return m_cloudPoints.empty();
 }
 
 
@@ -142,7 +142,7 @@ bool CPointCloud3d::Serialize(iser::IArchive &archive)
 	static iser::CArchiveTag gridSizeXTag("GridSizeX", "Size of points grid throw x", iser::CArchiveTag::TT_LEAF);
 	static iser::CArchiveTag gridSizeYTag("GridSizeY", "Size of points grid throw y", iser::CArchiveTag::TT_LEAF);
 
-	int count = m_cloudPoints.count();
+	int count = int(m_cloudPoints.size());
 
 	bool retVal = true;
 
@@ -221,8 +221,8 @@ void CPointCloud3d::EnsureCenterCalculated() const
 		istd::CRange yRange(qInf(), -qInf());
 		istd::CRange zRange(qInf(), -qInf());
 
-		for (		CloudPoints::ConstIterator pointIter = m_cloudPoints.constBegin();
-					pointIter != m_cloudPoints.constEnd();
+		for (		CloudPoints::const_iterator pointIter = m_cloudPoints.cbegin();
+					pointIter != m_cloudPoints.cend();
 					++pointIter){
 			if (!IsPointValid(*pointIter)){
 				continue;
