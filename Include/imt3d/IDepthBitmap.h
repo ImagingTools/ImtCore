@@ -1,0 +1,53 @@
+#pragma once
+
+
+// ACF includes
+#include <istd/TRange.h>
+#include <iimg/IBitmap.h>
+
+
+namespace imt3d
+{
+
+
+/**
+	Interface for a depth (range) image.
+*/
+class IDepthBitmap: virtual public iimg::IBitmap
+{
+public:
+	/**
+		Get the depth range of the bitmap space. The depth range defines the possible range of the pixel values in the bitmap.
+	*/
+	virtual istd::CRange GetDepthRange() const = 0;
+
+	/**
+		Create bitmap with specified size and format.
+		\param	size			bitmap size.
+		\param	pixelBitsCount	bits per pixel. Default value \c 0 means that the number of bits per pixel is defined by format specification.
+		\param	componentsCount	components per pixel. Default value \c 0 means that the number of bits per pixel is defined by format specification.
+	*/
+	virtual bool CreatDepthBitmap(
+				const istd::CRange& depthRange,
+				const istd::CIndex2d& size) = 0;
+
+	/**
+		Create bitmap with specified size and format using external image data buffer.
+		\param	size			bitmap size.
+		\param	dataPtr			pointer to external image buffer.
+		\param	releaseFlag		if its true, external buffer will be managed (removed) by this object.
+		\param	linesDifference	address difference between next and previos line. If it equals 0, the value will be taken from size and number of bits per pixel.
+	*/
+	virtual bool CreatDepthBitmap(
+				const istd::CRange& depthRange,
+				const istd::CIndex2d& size,
+				void* dataPtr,
+				bool releaseFlag,
+				int linesDifference = 0) = 0;
+
+};
+
+
+} // namespace imt3d
+
+
