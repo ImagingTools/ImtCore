@@ -5,6 +5,9 @@
 #include <istd/TRange.h>
 #include <iimg/IBitmap.h>
 
+// ImtCore includes
+#include <imt3d/imt3d.h>
+
 
 namespace imt3d
 {
@@ -27,7 +30,7 @@ public:
 		\param	pixelBitsCount	bits per pixel. Default value \c 0 means that the number of bits per pixel is defined by format specification.
 		\param	componentsCount	components per pixel. Default value \c 0 means that the number of bits per pixel is defined by format specification.
 	*/
-	virtual bool CreatDepthBitmap(
+	virtual bool CreateDepthBitmap(
 				const istd::CRange& depthRange,
 				const istd::CIndex2d& size) = 0;
 
@@ -38,7 +41,7 @@ public:
 		\param	releaseFlag		if its true, external buffer will be managed (removed) by this object.
 		\param	linesDifference	address difference between next and previos line. If it equals 0, the value will be taken from size and number of bits per pixel.
 	*/
-	virtual bool CreatDepthBitmap(
+	virtual bool CreateDepthBitmap(
 				const istd::CRange& depthRange,
 				const istd::CIndex2d& size,
 				void* dataPtr,

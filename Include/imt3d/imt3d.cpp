@@ -1,6 +1,9 @@
 #include <imt3d/imt3d.h>
 
 
+// ACF includes
+#include <istd/CChangeNotifier.h>
+
 // ImtCore includes
 #include <imt3d/IGridInfo.h>
 #include <imt3d/IPointCloud3d.h>
@@ -39,7 +42,9 @@ bool imt3d::ConvertPointCloudToDepthBitmap(const IPointCloud3d& pointCloud, imt3
 			istd::CRange depthRange(pointCloud.GetBoundingCuboid().GetNear(), pointCloud.GetBoundingCuboid().GetFar());
 			depthRange.Validate();
 
-			if (bitmap.CreatDepthBitmap(depthRange, gridInfoPtr->GetGridSize())){
+			istd::CChangeNotifier bitmapChangeNotifier(&bitmap);
+
+			if (bitmap.CreateDepthBitmap(depthRange, gridInfoPtr->GetGridSize())){
 				const imt3d::IPointCloud3d::CloudPoints& points = pointCloud.GetPoints();
 				for (int pointIndex = 0; pointIndex < int(points.size()); ++pointIndex){
 					istd::CIndex2d imagePos = gridInfoPtr->GetGridPosition(pointIndex);

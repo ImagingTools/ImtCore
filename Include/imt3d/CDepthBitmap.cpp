@@ -36,19 +36,39 @@ istd::CRange CDepthBitmap::GetDepthRange() const
 }
 
 
-bool CDepthBitmap::CreatDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size)
+bool CDepthBitmap::CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size)
 {
-	m_depthRange = depthRange;
+	istd::CChangeNotifier changeNotifier(this);
 
-	return CreateBitmap(PF_FLOAT32,size);
+	if (CreateBitmap(PF_FLOAT32, size)){
+		m_depthRange = depthRange;
+
+		EnsureMetaInfoCreated();
+
+		InvalidateCache(istd::IChangeable::GetNoChanges());
+
+		return true;
+	}
+
+	return false;
 }
 
 
-bool CDepthBitmap::CreatDepthBitmap(const istd::CRange& depthRange, const istd::CIndex2d & size, void * dataPtr, bool releaseFlag, int linesDifference)
+bool CDepthBitmap::CreateDepthBitmap(const istd::CRange& depthRange, const istd::CIndex2d & size, void * dataPtr, bool releaseFlag, int linesDifference)
 {
-	m_depthRange = depthRange;
+	istd::CChangeNotifier changeNotifier(this);
 
-	return CreateBitmap(PF_FLOAT32,size, dataPtr, releaseFlag, linesDifference);
+	if (CreateBitmap(PF_FLOAT32,size, dataPtr, releaseFlag, linesDifference)){
+		m_depthRange = depthRange;
+
+		EnsureMetaInfoCreated();
+
+		InvalidateCache(istd::IChangeable::GetNoChanges());
+
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -145,7 +165,7 @@ bool CDepthBitmap::ConvertToQImage(QImage& result) const
 			float inputValue = inputLinePtr[x];
 
 			if (qIsNaN(inputValue)){
-				outputLinePtr[x] = qRgb(255, 255, 255);
+				outputLinePtr[x] = qRgb(0, 0, 0);
 			}
 			else{
 				if (m_depthRange.Contains(inputValue)) {
@@ -157,12 +177,12 @@ bool CDepthBitmap::ConvertToQImage(QImage& result) const
 					int green = g[colorMapIndex] * 255;
 					int blue = b[colorMapIndex] * 255;
 
-					int rgbValue = qRgb(red, green, blue);
+					int rgbValue = qRgb(colorMapIndex, colorMapIndex, colorMapIndex);
 
 					outputLinePtr[x] = rgbValue;
 				}
 				else{
-					outputLinePtr[x] = qRgb(192, 192, 192);
+					outputLinePtr[x] = qRgb(0, 0, 0);
 				}
 			}
 		}

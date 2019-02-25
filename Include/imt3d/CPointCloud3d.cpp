@@ -220,6 +220,18 @@ bool CPointCloud3d::ResetData(CompatibilityMode /*mode*/)
 }
 
 
+// protected methods
+
+// reimplemented (istd::IChangeable)
+
+void CPointCloud3d::OnEndChanges(const ChangeSet& /*changes*/)
+{
+	m_isCloudCuboidCalculationValid = false;
+
+	m_isCloudCenterCalculationValid = false;
+}
+
+
 // private methods
 
 void CPointCloud3d::EnsureCenterCalculated() const

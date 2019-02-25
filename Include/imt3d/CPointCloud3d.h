@@ -51,6 +51,10 @@ public:
 	virtual bool CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode) override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
+protected:
+	// reimplemented (istd::IChangeable)
+	virtual void OnEndChanges(const ChangeSet& changes) override;
+
 private:
 	void EnsureCenterCalculated() const;
 	void EnsureCuboidCalculated() const;

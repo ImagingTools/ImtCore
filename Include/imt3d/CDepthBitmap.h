@@ -32,8 +32,8 @@ public:
 
 	// reimplemented (IDepthBitmap)
 	istd::CRange GetDepthRange() const override;
-	virtual bool CreatDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size) override;
-	virtual bool CreatDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size, void * dataPtr, bool releaseFlag, int linesDifference = 0) override;
+	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size) override;
+	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size, void * dataPtr, bool releaseFlag, int linesDifference = 0) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive);
