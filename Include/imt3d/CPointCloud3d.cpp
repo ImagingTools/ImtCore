@@ -80,10 +80,14 @@ void CPointCloud3d::SetGridSize(const istd::CIndex2d& gridSize)
 
 istd::CIndex2d CPointCloud3d::GetGridPosition(int index) const
 {
-	int y = index / m_gridSize.GetX();
-	int x = index % m_gridSize.GetX();
+	if (!m_gridSize.IsSizeEmpty() && m_gridSize.IsValid()){
+		int y = index / m_gridSize.GetX();
+		int x = index % m_gridSize.GetX();
 
-	return istd::CIndex2d(x, y);
+		return istd::CIndex2d(x, y);
+	}
+
+	return istd::CIndex2d::GetInvalid();
 }
 
 
