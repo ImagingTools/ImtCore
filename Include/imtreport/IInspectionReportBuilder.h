@@ -21,7 +21,6 @@ class IReportDocument;
 class IInspectionReportBuilder: virtual public istd::IPolymorphic
 {
 public:
-
 	enum ErrorClass
 	{
 		EC_NONE,

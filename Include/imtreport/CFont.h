@@ -12,7 +12,6 @@ namespace imtreport
 class CFont: virtual public iser::ISerializable
 {
 public:
-
 	enum FontFlags
 	{
 		FF_NORMAL = 0x0,
