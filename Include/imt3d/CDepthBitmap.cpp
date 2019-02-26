@@ -177,12 +177,12 @@ bool CDepthBitmap::ConvertToQImage(QImage& result) const
 					int green = g[colorMapIndex] * 255;
 					int blue = b[colorMapIndex] * 255;
 
-					int rgbValue = qRgb(colorMapIndex, colorMapIndex, colorMapIndex);
+					int rgbValue = qRgb(red, green, blue);
 
 					outputLinePtr[x] = rgbValue;
 				}
 				else{
-					outputLinePtr[x] = qRgb(0, 0, 0);
+					outputLinePtr[x] = qRgb(192, 192, 192);
 				}
 			}
 		}
