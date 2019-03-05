@@ -38,6 +38,7 @@ public:
 
 	struct InspectionRegionResult
 	{
+		QString inspectionName;
 		QString regionName;
 		ErrorClass errorClass;
 		istd::IInformationProvider::InformationCategory status;

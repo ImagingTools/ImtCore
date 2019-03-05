@@ -31,7 +31,8 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 {
 	// inspection 1 region 1 results
 	IInspectionReportBuilder::InspectionRegionResult i1r1r1;
-	i1r1r1.regionName = "i1r1";
+	i1r1r1.inspectionName = "Inspection1";
+	i1r1r1.regionName = "Region1";
 	i1r1r1.errorClass = IInspectionReportBuilder::ErrorClass::EC_GLUE_GAP;
 	i1r1r1.status = istd::IInformationProvider::IC_ERROR;
 	i1r1r1.length = 0.0;
@@ -41,7 +42,8 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 	i1r1r1.flags = IInspectionReportBuilder::RF_SHOW_IN_SUMMARY;
 
 	IInspectionReportBuilder::InspectionRegionResult i1r1r2;
-	i1r1r2.regionName = "i1r1";
+	i1r1r2.inspectionName = "Inspection1";
+	i1r1r2.regionName = "Region1";
 	i1r1r2.errorClass = IInspectionReportBuilder::ErrorClass::EC_NONE;
 	i1r1r2.status = istd::IInformationProvider::IC_ERROR;
 	i1r1r2.length = 15.0;
@@ -51,7 +53,8 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 	i1r1r2.flags = IInspectionReportBuilder::RF_NONE;
 
 	IInspectionReportBuilder::InspectionRegionResult i1r1r3;
-	i1r1r3.regionName = "i1r1";
+	i1r1r3.inspectionName = "Inspection1";
+	i1r1r3.regionName = "Region1";
 	i1r1r3.errorClass = IInspectionReportBuilder::ErrorClass::EC_GLUE_NARROW;
 	i1r1r3.status = istd::IInformationProvider::InformationCategory::IC_ERROR;
 	i1r1r3.length = 10.0;
@@ -61,7 +64,8 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 	i1r1r3.flags = IInspectionReportBuilder::RF_SHOW_IN_SUMMARY;
 
 	IInspectionReportBuilder::InspectionRegionResult i1r1r4;
-	i1r1r4.regionName = "i1r1";
+	i1r1r4.inspectionName = "Inspection1";
+	i1r1r4.regionName = "Region1";
 	i1r1r4.errorClass = IInspectionReportBuilder::ErrorClass::EC_GLUE_BEYOND_AREA;
 	i1r1r4.status = istd::IInformationProvider::InformationCategory::IC_ERROR;
 	i1r1r4.length = 11.0;
@@ -72,7 +76,8 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 
 	// inspectrion 1 region 2 results
 	IInspectionReportBuilder::InspectionRegionResult i1r2r1;
-	i1r2r1.regionName = "i1r2";
+	i1r2r1.inspectionName = "Inspection1";
+	i1r2r1.regionName = "Region2";
 	i1r2r1.errorClass = IInspectionReportBuilder::ErrorClass::EC_GLUE_NARROW;
 	i1r2r1.status = istd::IInformationProvider::InformationCategory::IC_ERROR;
 	i1r2r1.length = 12.0;
@@ -82,7 +87,8 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 	i1r2r1.flags = IInspectionReportBuilder::RF_SHOW_IN_SUMMARY;
 
 	IInspectionReportBuilder::InspectionRegionResult i1r2r2;
-	i1r2r2.regionName = "i1r2";
+	i1r2r2.inspectionName = "Inspection1";
+	i1r2r2.regionName = "Region2";
 	i1r2r2.errorClass = IInspectionReportBuilder::ErrorClass::EC_GLUE_GAP;
 	i1r2r2.status = istd::IInformationProvider::InformationCategory::IC_CRITICAL;
 	i1r2r2.length = 13.0;
@@ -93,7 +99,7 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 
 	// inspection 1 region 1
 	IInspectionReportBuilder::InspectionRegion i1r1;
-	i1r1.name = "i1r1";
+	i1r1.name = "Region1";
 	i1r1.results.push_back(i1r1r1);
 	i1r1.results.push_back(i1r1r2);
 	i1r1.results.push_back(i1r1r3);
@@ -101,24 +107,23 @@ void CInspectionReportSimulatorComp::PrepareReportInputData(IInspectionReportBui
 
 	// inspection 1 region 2
 	IInspectionReportBuilder::InspectionRegion i1r2;
-	i1r2.name = "i1r2";
+	i1r2.name = "Region2";
 	i1r2.results.push_back(i1r2r1);
 	i1r2.results.push_back(i1r2r2);
 
 	IInspectionReportBuilder::Inspection i1;
-	i1.name = "Inspection 1";
-	i1.imagePath = "c:\\work\\Inspection.png";
+	i1.name = "Inspection1";
+	i1.imagePath = "C:\\Work\\InspectionReportViewer\\Inspection.png";
 	i1.status = istd::IInformationProvider::IC_ERROR;
 	i1.regions.push_back(i1r1);
 	i1.regions.push_back(i1r2);
 
 	// inspection 2
-
 	reportData.companyName = "Company name";
 	reportData.appVersion = "1.0.0.0";
 	reportData.productName = "Product name";
 	reportData.time = QDateTime::currentDateTime();
-	reportData.imagePath = "c:\\work\\Inspection.png";
+	reportData.imagePath = "C:\\Work\\InspectionReportViewer\\Inspection.png";
 	reportData.partSerialNumber = "1234 5678";
 	reportData.partStatus = istd::IInformationProvider::IC_WARNING;
 

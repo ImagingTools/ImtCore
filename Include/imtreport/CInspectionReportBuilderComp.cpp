@@ -123,7 +123,7 @@ bool CInspectionReportBuilderComp::CreateTitlePage(const ReportInputData& report
 
 	AddHeader(reportData, NULL, topLeft, *pagePtr);
 	AddBody(reportData.imagePath, topLeft, *pagePtr);
-	AddFooter(results, topLeft, *pagePtr);
+	AddFooter(results, true, topLeft, *pagePtr);
 
 	return true;
 }
@@ -143,7 +143,7 @@ bool CInspectionReportBuilderComp::CreateInspectionPage(const ReportInputData& r
 
 	AddHeader(reportData, &inspection, topLeft, *pagePtr);
 	AddBody(inspection.imagePath, topLeft, *pagePtr);
-	AddFooter(results, topLeft, *pagePtr);
+	AddFooter(results, false, topLeft, *pagePtr);
 
 	return true;
 }
@@ -218,7 +218,7 @@ void CInspectionReportBuilderComp::AddBody(const QString& imagePath, i2d::CVecto
 }
 
 
-void CInspectionReportBuilderComp::AddFooter(const Results& results, i2d::CVector2d& topLeft, IReportPage& page) const
+void CInspectionReportBuilderComp::AddFooter(const Results& results, bool isTitlePage, i2d::CVector2d& topLeft, IReportPage& page) const
 {
 	if (results.isEmpty()){
 		return;
@@ -236,12 +236,16 @@ void CInspectionReportBuilderComp::AddFooter(const Results& results, i2d::CVecto
 
 	tablePtr->SetHorizontalHeaderLabels({ "Region", "Error", "Length", "Value mm", "Tolerance mm", "Diff" });
 	tablePtr->ShowVerticalHeader(false);
-	tablePtr->SetColumnWidths(QVector<double>(tablePtr->GetColumnCount(), tableWidth / tablePtr->GetColumnCount()));
+	tablePtr->SetColumnWidths({ 55.0, 25.0, 25.0, 25.0, 25.0, 25.0 });
 
 	for (int i = 0; i < results.size(); i++){
 		const InspectionRegionResult& result = results[i];
 
-		tablePtr->SetItem(i, 0, {result.regionName});
+		QString regionName = result.regionName;
+		if (isTitlePage && !result.inspectionName.isEmpty())
+			regionName = result.inspectionName + " " + regionName;
+
+		tablePtr->SetItem(i, 0, {regionName});
 		tablePtr->SetItem(i, 1, {GetErrorClassText(result.errorClass)});
 		tablePtr->SetItem(i, 2, {QString::number(result.length, 'f', 2)});
 

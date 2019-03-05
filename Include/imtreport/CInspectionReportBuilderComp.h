@@ -46,7 +46,7 @@ private:
 				   i2d::CVector2d& topLeft,
 				   IReportPage& page) const;
 	void AddBody(const QString& imagePath, i2d::CVector2d& topLeft, IReportPage& page) const;
-	void AddFooter(const Results& regions, i2d::CVector2d& topLeft, IReportPage& page) const;
+	void AddFooter(const Results& regions, bool isTitlePage, i2d::CVector2d& topLeft, IReportPage& page) const;
 };
 
 
