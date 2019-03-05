@@ -211,41 +211,39 @@ void CReportSceneBuilder::CreateTextTable(const imtreport::CTextTable& pageEleme
 {
 	CTextTableProxy tableProxy(pageElement);
 
+	QRectF cellRect;
+	cellRect.setTop(pageElement.GetTop());
+
 	for (int row = 0; row < tableProxy.GetRowCount(); ++row){
+		cellRect.setLeft(pageElement.GetLeft());
+
 		for (int col = 0; col < tableProxy.GetColumnCount(); ++col){
 			const imtreport::CTextTableItem* tableItem = tableProxy.GetItem(row, col);
 			Q_ASSERT(tableItem);
 
-			double cellWidth = pageElement.GetColumnWidth(col);
-			double cellHeight = GetTextTableRowHeight(tableProxy, row);
+			cellRect.setWidth(pageElement.GetColumnWidth(col));
+			cellRect.setHeight(GetTextTableRowHeight(tableProxy, row));
 
-			CreateTextTableItem(pageElement, *tableItem, row, col, cellWidth, cellHeight, scene);
+			CreateTextTableItem(*tableItem, cellRect, scene);
+
+			cellRect.setLeft(cellRect.left() + cellRect.width());
 		}
+
+		cellRect.setTop(cellRect.top() + cellRect.height());
 	}
 }
 
 
-void CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTable& table,
-			const imtreport::CTextTableItem& tableItem,
-			int row,
-			int col,
-			double cellWidth,
-			double cellHeight,
-			QGraphicsScene& scene)
+void CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTableItem& tableItem, const QRectF& cellRect, QGraphicsScene& scene)
 {
-	double left = static_cast<double>(col) * cellWidth + table.GetLeft();
-	double top = static_cast<double>(row) * cellHeight + table.GetTop();
-
 	// add cell border
-	QRectF rect(left, top, cellWidth, cellHeight);
-
-	QGraphicsRectItem* rectItemPtr = new QGraphicsRectItem(MapRectToScene(rect));
+	QGraphicsRectItem* rectItemPtr = new QGraphicsRectItem(MapRectToScene(cellRect));
 	rectItemPtr->setBrush(ConvertToQColor(tableItem.GetBackgroundColor()));
 
 	scene.addItem(rectItemPtr);
 
 	// add cell icon (if any)
-	QPointF pos(left + 1.0, top + 1.0);
+	QPointF pos(cellRect.left() + 1.0, cellRect.top() + 1.0);
 
 	if (!tableItem.GetImage().IsEmpty()){
 		QPixmap pixmap = QPixmap::fromImage(tableItem.GetImage().GetQImage());
@@ -264,7 +262,7 @@ void CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTable& table
 	textItemPtr->setPlainText(tableItem.GetText());
 	textItemPtr->setFont(MapFontToScene(tableItem.GetFont()));
 	textItemPtr->setDefaultTextColor(ConvertToQColor(tableItem.GetForegroundColor()));
-	textItemPtr->setTextWidth(MapPointToScene(QPointF(cellWidth, cellHeight)).x());
+	textItemPtr->setTextWidth(MapPointToScene(QPointF(cellRect.width(), cellRect.height())).x());
 
 	QTextOption option = textItemPtr->document()->defaultTextOption();
 	option.setAlignment(tableItem.GetAlignment());
