@@ -229,8 +229,8 @@
                     <AttributeInfo Id="ShowProductType" Type="Boolean" ExportId="SplashShowProductType">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="StyleSheet" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="SplashStyleSheet"/>
+                    <AttributeInfo Id="StyleSheet" Type="String" ExportId="SplashStyleSheet">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionIds" Type="Integer[]" ExportId="SplashVersionIds">
                         <Data IsEnabled="false"/>

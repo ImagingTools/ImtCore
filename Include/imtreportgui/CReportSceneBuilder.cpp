@@ -195,8 +195,9 @@ void CReportSceneBuilder::CreateImage(const imtreport::CImageRectangleElement& p
 
 	QSize pixmapSize = sceneElementPtr->pixmap().size();
 
-	if (pixmapSize.width() > 0){
-		qreal scale = rect.width() / pixmapSize.width();
+	if (pixmapSize.height() > 0){
+		qreal scale = rect.height() / pixmapSize.height();
+
 		sceneElementPtr->setScale(scale);
 	}
 	else{
@@ -315,8 +316,11 @@ QPointF CReportSceneBuilder::MapPointToScene(const QPointF& point)
 	QScreen* screenPtr = QGuiApplication::primaryScreen();
 	Q_ASSERT(screenPtr);
 
-	qreal x = point.x() * screenPtr->physicalDotsPerInchX() / 25.4;
-	qreal y = point.y() * screenPtr->physicalDotsPerInchY() / 25.4;
+	double logicalX = screenPtr->logicalDotsPerInchX();
+	double logicalY = screenPtr->logicalDotsPerInchY();
+
+	qreal x = point.x() * logicalX / 25.4;
+	qreal y = point.y() * logicalY / 25.4;
 
 	return QPointF(x, y);
 }
