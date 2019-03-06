@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4749" Description="ACF"/>
-            <Version Id="1" Number="2026" Description="ACF-Solutions"/>
+            <Version Id="0" Number="4758" Description="ACF"/>
+            <Version Id="1" Number="2032" Description="ACF-Solutions"/>
             <Version Id="1023" Number="330496" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -93,24 +93,6 @@
                             <Values>
                                 <Value>GeneratedFiles</Value>
                                 <Value>generated</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="WinProjectsSubstitutionTags" Type="String[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ACFDIR</Value>
-                                <Value>ACFCONFIGDIR</Value>
-                                <Value>ACFSLNDIR</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="WinProjectsSubstitutionValues" Type="String[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>$RelativeToInputFileWin:$(ACFDIR)</Value>
-                                <Value>$RelativeToInputFileWin:$(ACFDIR)/Config</Value>
-                                <Value>$RelativeToInputFileWin:$(ACFSLNDIR)</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
