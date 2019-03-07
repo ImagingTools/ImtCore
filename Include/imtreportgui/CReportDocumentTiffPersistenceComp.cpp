@@ -58,7 +58,7 @@ int CReportDocumentTiffPersistenceComp::SaveToFile(
 		return OS_FAILED;
 	}
 
-	CReportSceneBuilder::ReportScenes scenes = CReportSceneBuilder::Build(*documentPtr);
+	CReportSceneBuilder::ReportScenes scenes = CReportSceneBuilder::Build(*documentPtr, *m_resolutionDpiAttrPtr);
 	if (scenes.isEmpty()){
 		SendWarningMessage(0, "Report is empty");
 		return OS_OK;

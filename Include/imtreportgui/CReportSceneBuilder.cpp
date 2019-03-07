@@ -32,7 +32,7 @@ CReportSceneBuilder::CReportSceneBuilder()
 }
 
 
-CReportSceneBuilder::ReportScenes CReportSceneBuilder::Build(const imtreport::IReportDocument& reportDocument)
+CReportSceneBuilder::ReportScenes CReportSceneBuilder::Build(const imtreport::IReportDocument& reportDocument, int resolutionDpi)
 {
 	ReportScenes retVal;
 	retVal.resize(reportDocument.GetPagesCount());
@@ -43,8 +43,8 @@ CReportSceneBuilder::ReportScenes CReportSceneBuilder::Build(const imtreport::IR
 
 		QGraphicsScene* scenePtr = new QGraphicsScene();
 
-		SetupScene(*scenePtr);
-		CreateSceneShapes(*pagePtr, *scenePtr);
+		SetupScene(*scenePtr, resolutionDpi);
+		CreateSceneShapes(*pagePtr, *scenePtr, resolutionDpi);
 
 		retVal[i] = scenePtr;
 	}
@@ -55,90 +55,90 @@ CReportSceneBuilder::ReportScenes CReportSceneBuilder::Build(const imtreport::IR
 
 // private methods
 
-void CReportSceneBuilder::SetupScene(QGraphicsScene& scene)
+void CReportSceneBuilder::SetupScene(QGraphicsScene& scene, int resolutionDpi)
 {
-	scene.setSceneRect(MapRectToScene(QRectF(0.0, 0.0, s_A4WidthMm, s_A4HeightMm)));
+	scene.setSceneRect(MapRectToScene(QRectF(0.0, 0.0, s_A4WidthMm, s_A4HeightMm), resolutionDpi));
 }
 
 
-void CReportSceneBuilder::CreateSceneShapes(const imtreport::IReportPage& page, QGraphicsScene& scene)
+void CReportSceneBuilder::CreateSceneShapes(const imtreport::IReportPage& page, QGraphicsScene& scene, int resolutionDpi)
 {
 	imtreport::IReportPage::ElementIds ids = page.GetPageElements();
 	for (const QByteArray& elementId : ids){
 		const i2d::IObject2d* pageElementPtr = page.GetPageElement(elementId);
 		Q_ASSERT(pageElementPtr != nullptr);
 
-		CreateSceneShape(*pageElementPtr, scene);
+		CreateSceneShape(*pageElementPtr, scene, resolutionDpi);
 	}
 }
 
 
-void CReportSceneBuilder::CreateSceneShape(const i2d::IObject2d& pageElement, QGraphicsScene& scene)
+void CReportSceneBuilder::CreateSceneShape(const i2d::IObject2d& pageElement, QGraphicsScene& scene, int resolutionDpi)
 {
 	const imtreport::CRectangleElement* rectPageElementPtr = dynamic_cast<const imtreport::CRectangleElement*>(&pageElement);
 	if (rectPageElementPtr){
-		return CreateRect(*rectPageElementPtr, scene);
+		return CreateRect(*rectPageElementPtr, scene, resolutionDpi);
 	}
 
 	const imtreport::CCircleElement* circleSceneElementPtr = dynamic_cast<const imtreport::CCircleElement*>(&pageElement);
 	if (circleSceneElementPtr){
-		return CreateEllipse(*circleSceneElementPtr, scene);
+		return CreateEllipse(*circleSceneElementPtr, scene, resolutionDpi);
 	}
 
 	const imtreport::CTextLabelElement* labelSceneElementPtr = dynamic_cast<const imtreport::CTextLabelElement*>(&pageElement);
 	if (labelSceneElementPtr){
-		return CreateLabel(*labelSceneElementPtr, scene);
+		return CreateLabel(*labelSceneElementPtr, scene, resolutionDpi);
 	}
 
 	const imtreport::CPolygonElement* polygonElementPtr = dynamic_cast<const imtreport::CPolygonElement*>(&pageElement);
 	if (polygonElementPtr){
-		return CreatePolygone(*polygonElementPtr, scene);
+		return CreatePolygone(*polygonElementPtr, scene, resolutionDpi);
 	}
 
 	const imtreport::CLineElement* lineElementPtr = dynamic_cast<const imtreport::CLineElement*>(&pageElement);
 	if (lineElementPtr){
-		return CreateLine(*lineElementPtr, scene);
+		return CreateLine(*lineElementPtr, scene, resolutionDpi);
 	}
 
 	const imtreport::CImageRectangleElement* imageElementPtr = dynamic_cast<const imtreport::CImageRectangleElement*>(&pageElement);
 	if (imageElementPtr){
-		return CreateImage(*imageElementPtr, scene);
+		return CreateImage(*imageElementPtr, scene, resolutionDpi);
 	}
 
 	const imtreport::CTextTable* tableElementPtr = dynamic_cast<const imtreport::CTextTable*>(&pageElement);
 	if (tableElementPtr){
-		return CreateTextTable(*tableElementPtr, scene);
+		return CreateTextTable(*tableElementPtr, scene, resolutionDpi);
 	}
 }
 
 
-void CReportSceneBuilder::CreateRect(const imtreport::CRectangleElement& pageElement, QGraphicsScene& scene)
+void CReportSceneBuilder::CreateRect(const imtreport::CRectangleElement& pageElement, QGraphicsScene& scene, int resolutionDpi)
 {
-	QGraphicsRectItem* sceneElementPtr = new QGraphicsRectItem(MapRectToScene(pageElement));
+	QGraphicsRectItem* sceneElementPtr = new QGraphicsRectItem(MapRectToScene(pageElement, resolutionDpi));
 	SetShapePenAndBrush(pageElement, *sceneElementPtr);
 	scene.addItem(sceneElementPtr);
 }
 
 
-void CReportSceneBuilder::CreateEllipse(const imtreport::CCircleElement& pageElement, QGraphicsScene& scene)
+void CReportSceneBuilder::CreateEllipse(const imtreport::CCircleElement& pageElement, QGraphicsScene& scene, int resolutionDpi)
 {
-	QGraphicsEllipseItem* sceneElementPtr = new QGraphicsEllipseItem(MapRectToScene(pageElement.GetBoundingBox()));
+	QGraphicsEllipseItem* sceneElementPtr = new QGraphicsEllipseItem(MapRectToScene(pageElement.GetBoundingBox(), resolutionDpi));
 	SetShapePenAndBrush(pageElement, *sceneElementPtr);
 	scene.addItem(sceneElementPtr);
 }
 
 
-void CReportSceneBuilder::CreateLabel(const imtreport::CTextLabelElement& pageElement, QGraphicsScene& scene)
+void CReportSceneBuilder::CreateLabel(const imtreport::CTextLabelElement& pageElement, QGraphicsScene& scene, int resolutionDpi)
 {
 	QGraphicsTextItem* sceneElementPtr = new QGraphicsTextItem();
 
-	QRectF rect = MapRectToScene(pageElement.GetRectangle());
+	QRectF rect = MapRectToScene(pageElement.GetRectangle(), resolutionDpi);
 	sceneElementPtr->setPos(rect.topLeft());
 
 	if (rect.width() > 0.0)
 		sceneElementPtr->setTextWidth(rect.width());
 
-	sceneElementPtr->setFont(MapFontToScene(pageElement.GetFont()));
+	sceneElementPtr->setFont(MapFontToScene(pageElement.GetFont(), resolutionDpi));
 	sceneElementPtr->setDefaultTextColor(pageElement.GetFillColor());
 
 	QTextOption option = sceneElementPtr->document()->defaultTextOption();
@@ -149,18 +149,18 @@ void CReportSceneBuilder::CreateLabel(const imtreport::CTextLabelElement& pageEl
 }
 
 
-void CReportSceneBuilder::CreateLine(const imtreport::CLineElement& pageElement, QGraphicsScene& scene)
+void CReportSceneBuilder::CreateLine(const imtreport::CLineElement& pageElement, QGraphicsScene& scene, int resolutionDpi)
 {
 	QGraphicsLineItem* sceneElementPtr = new QGraphicsLineItem();
 
-	QPointF point1 = MapPointToScene(pageElement.GetPoint1());
-	QPointF point2 = MapPointToScene(pageElement.GetPoint2());
+	QPointF point1 = MapPointToScene(pageElement.GetPoint1(), resolutionDpi);
+	QPointF point2 = MapPointToScene(pageElement.GetPoint2(), resolutionDpi);
 	sceneElementPtr->setLine(QLineF(point1, point2));
 
 	scene.addItem(sceneElementPtr);
 }
 
-void CReportSceneBuilder::CreatePolygone(const imtreport::CPolygonElement& pageElement, QGraphicsScene& scene)
+void CReportSceneBuilder::CreatePolygone(const imtreport::CPolygonElement& pageElement, QGraphicsScene& scene, int resolutionDpi)
 {
 	QGraphicsPolygonItem* sceneElementPtr = new QGraphicsPolygonItem();
 
@@ -169,7 +169,7 @@ void CReportSceneBuilder::CreatePolygone(const imtreport::CPolygonElement& pageE
 
 	for (int i = 0; i < pageElement.GetNodesCount(); ++i){
 		const i2d::CVector2d& node = pageElement.GetNodePos(i);
-		polygon.append(MapPointToScene(node));
+		polygon.append(MapPointToScene(node, resolutionDpi));
 	}
 
 	sceneElementPtr->setPolygon(polygon);
@@ -180,7 +180,7 @@ void CReportSceneBuilder::CreatePolygone(const imtreport::CPolygonElement& pageE
 }
 
 
-void CReportSceneBuilder::CreateImage(const imtreport::CImageRectangleElement& pageElement, QGraphicsScene& scene)
+void CReportSceneBuilder::CreateImage(const imtreport::CImageRectangleElement& pageElement, QGraphicsScene& scene, int resolutionDpi)
 {
 	QString imgPath = pageElement.GetImagePath();
 
@@ -190,7 +190,7 @@ void CReportSceneBuilder::CreateImage(const imtreport::CImageRectangleElement& p
 
 	QGraphicsPixmapItem* sceneElementPtr = new QGraphicsPixmapItem(QPixmap(imgPath));
 
-	QRectF rect = MapRectToScene(pageElement);
+	QRectF rect = MapRectToScene(pageElement, resolutionDpi);
 	sceneElementPtr->setPos(rect.topLeft());
 
 	QSize pixmapSize = sceneElementPtr->pixmap().size();
@@ -208,7 +208,7 @@ void CReportSceneBuilder::CreateImage(const imtreport::CImageRectangleElement& p
 }
 
 
-void CReportSceneBuilder::CreateTextTable(const imtreport::CTextTable& pageElement, QGraphicsScene& scene)
+void CReportSceneBuilder::CreateTextTable(const imtreport::CTextTable& pageElement, QGraphicsScene& scene, int resolutionDpi)
 {
 	CTextTableProxy tableProxy(pageElement);
 
@@ -225,7 +225,7 @@ void CReportSceneBuilder::CreateTextTable(const imtreport::CTextTable& pageEleme
 			cellRect.setWidth(pageElement.GetColumnWidth(col));
 			cellRect.setHeight(GetTextTableRowHeight(tableProxy, row));
 
-			CreateTextTableItem(*tableItem, cellRect, scene);
+			CreateTextTableItem(*tableItem, cellRect, scene, resolutionDpi);
 
 			cellRect.setLeft(cellRect.left() + cellRect.width());
 		}
@@ -235,10 +235,10 @@ void CReportSceneBuilder::CreateTextTable(const imtreport::CTextTable& pageEleme
 }
 
 
-void CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTableItem& tableItem, const QRectF& cellRect, QGraphicsScene& scene)
+void CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTableItem& tableItem, const QRectF& cellRect, QGraphicsScene& scene, int resolutionDpi)
 {
 	// add cell border
-	QGraphicsRectItem* rectItemPtr = new QGraphicsRectItem(MapRectToScene(cellRect));
+	QGraphicsRectItem* rectItemPtr = new QGraphicsRectItem(MapRectToScene(cellRect, resolutionDpi));
 	rectItemPtr->setBrush(ConvertToQColor(tableItem.GetBackgroundColor()));
 
 	scene.addItem(rectItemPtr);
@@ -250,7 +250,7 @@ void CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTableItem& t
 		QPixmap pixmap = QPixmap::fromImage(tableItem.GetImage().GetQImage());
 
 		QGraphicsPixmapItem* pixmapItemPtr = new QGraphicsPixmapItem(pixmap);
-		pixmapItemPtr->setPos(MapPointToScene(pos));
+		pixmapItemPtr->setPos(MapPointToScene(pos, resolutionDpi));
 
 		scene.addItem(pixmapItemPtr);
 
@@ -259,11 +259,11 @@ void CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTableItem& t
 
 	// add cell text
 	QGraphicsTextItem* textItemPtr = new QGraphicsTextItem();
-	textItemPtr->setPos(MapPointToScene(pos));
+	textItemPtr->setPos(MapPointToScene(pos, resolutionDpi));
 	textItemPtr->setPlainText(tableItem.GetText());
-	textItemPtr->setFont(MapFontToScene(tableItem.GetFont()));
+	textItemPtr->setFont(MapFontToScene(tableItem.GetFont(), resolutionDpi));
 	textItemPtr->setDefaultTextColor(ConvertToQColor(tableItem.GetForegroundColor()));
-	textItemPtr->setTextWidth(MapPointToScene(QPointF(cellRect.width(), cellRect.height())).x());
+	textItemPtr->setTextWidth(MapPointToScene(QPointF(cellRect.width(), cellRect.height()), resolutionDpi).x());
 
 	QTextOption option = textItemPtr->document()->defaultTextOption();
 	option.setAlignment(tableItem.GetAlignment());
@@ -310,7 +310,7 @@ void CReportSceneBuilder::SetShapePenAndBrush(const imtreport::IGraphicsElement&
 }
 
 
-QPointF CReportSceneBuilder::MapPointToScene(const QPointF& point)
+QPointF CReportSceneBuilder::MapPointToScene(const QPointF& point, int resolutionDpi)
 {
 	// map shape coordinates given in mm to scene's coordinates
 	QScreen* screenPtr = QGuiApplication::primaryScreen();
@@ -319,6 +319,10 @@ QPointF CReportSceneBuilder::MapPointToScene(const QPointF& point)
 	double logicalX = screenPtr->logicalDotsPerInchX();
 	double logicalY = screenPtr->logicalDotsPerInchY();
 
+	if (resolutionDpi > 0){
+		logicalX = logicalY = resolutionDpi;
+	}
+
 	qreal x = point.x() * logicalX / 25.4;
 	qreal y = point.y() * logicalY / 25.4;
 
@@ -326,16 +330,16 @@ QPointF CReportSceneBuilder::MapPointToScene(const QPointF& point)
 }
 
 
-QRectF CReportSceneBuilder::MapRectToScene(const QRectF& rect)
+QRectF CReportSceneBuilder::MapRectToScene(const QRectF& rect, int resolutionDpi)
 {
-	return QRectF(MapPointToScene(rect.topLeft()), MapPointToScene(rect.bottomRight()));
+	return QRectF(MapPointToScene(rect.topLeft(), resolutionDpi), MapPointToScene(rect.bottomRight(), resolutionDpi));
 }
 
 
-QFont CReportSceneBuilder::MapFontToScene(const imtreport::CFont& font)
+QFont CReportSceneBuilder::MapFontToScene(const imtreport::CFont& font, int resolutionDpi)
 {
 	QFont sceneFont(font.GetName());
-	sceneFont.setPointSize(MapPointToScene(QPointF(font.GetSize(), 0.0)).x());
+	sceneFont.setPointSize(MapPointToScene(QPointF(font.GetSize(), 0.0), resolutionDpi).x());
 
 	if (font.GetFontFlags() & imtreport::CFont::FF_BOLD){
 		sceneFont.setBold(true);

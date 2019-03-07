@@ -21,6 +21,7 @@ public:
 	I_BEGIN_COMPONENT(CReportDocumentPdfPersistenceComp);
 		I_REGISTER_INTERFACE(ifile::IFilePersistence);
 		I_REGISTER_INTERFACE(ifile::IFileTypeInfo);
+		I_ASSIGN(m_resolutionDpiAttrPtr, "ResolutionDpi", "Resolution in DPI", true, 150);
 	I_END_COMPONENT;
 
 	// reimplemented (ifile::IFilePersistence)
@@ -41,6 +42,9 @@ public:
 	// reimplemented (ifile::IFileTypeInfo)
 	bool GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr = NULL, int flags = -1, bool doAppend = false) const override;
 	QString GetTypeDescription(const QString* extensionPtr = NULL) const override;
+
+private:
+	I_ATTR(int, m_resolutionDpiAttrPtr);
 };
 
 

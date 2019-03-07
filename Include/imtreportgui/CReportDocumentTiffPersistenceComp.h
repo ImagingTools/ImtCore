@@ -25,6 +25,7 @@ public:
 		I_REGISTER_INTERFACE(ifile::IFilePersistence);
 		I_REGISTER_INTERFACE(ifile::IFileTypeInfo);
 		I_ASSIGN(m_saveFirstPageOnlyAttrPtr, "SaveFirstPageOnly", "Save first report page only", true, false);
+		I_ASSIGN(m_resolutionDpiAttrPtr, "ResolutionDpi", "Resolution in DPI", true, 150);
 	I_END_COMPONENT;
 
 	// reimplemented (ifile::IFilePersistence)
@@ -51,6 +52,7 @@ private:
 
 private:
 	I_ATTR(bool, m_saveFirstPageOnlyAttrPtr);
+	I_ATTR(int, m_resolutionDpiAttrPtr);
 };
 
 

@@ -94,7 +94,7 @@ void CReportDocumentViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*ch
 	imtreport::IReportDocument* documentPtr = GetObjectPtr();
 	Q_ASSERT(documentPtr != NULL);
 
-	CReportSceneBuilder::ReportScenes scenes = CReportSceneBuilder::Build(*documentPtr);
+	CReportSceneBuilder::ReportScenes scenes = CReportSceneBuilder::Build(*documentPtr, 0);
 
 	for (int i = 0; i < scenes.size(); ++i){
 		QGraphicsScene* scenePtr = scenes[i];
