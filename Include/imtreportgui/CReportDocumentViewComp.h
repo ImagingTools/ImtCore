@@ -41,23 +41,23 @@ public:
 	CReportDocumentViewComp();
 
 	// reimplemented (ibase::ICommandsProvider)
-	const ibase::IHierarchicalCommand* GetCommands() const override;
+	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 	// reimplemented (ilog::IMessageConsumer)
-	bool IsMessageSupported(
+	virtual bool IsMessageSupported(
 		int messageCategory = -1,
 		int messageId = -1,
 		const istd::IInformationProvider* messagePtr = NULL) const override;
-	void AddMessage(const MessagePtr& messagePtr) override;
+	virtual void AddMessage(const MessagePtr& messagePtr) override;
 
 protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
-	void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
+	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
-	void OnGuiCreated() override;
-	void OnGuiDestroyed() override;
-	void OnGuiRetranslate() override;
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiDestroyed() override;
+	virtual void OnGuiRetranslate() override;
 
 private Q_SLOTS:
 	void OnShowGrid();
@@ -82,6 +82,7 @@ private:
 	SceneDecorations m_sceneDecorations;
 	bool m_isGridShown;
 
+private:
 	I_REF(ifile::IFilePersistence, m_pdfExportCompPtr);
 	I_REF(ifile::IFilePersistence, m_tiffExportCompPtr);
 };

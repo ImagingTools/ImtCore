@@ -52,9 +52,9 @@ const ibase::IHierarchicalCommand* CReportDocumentViewComp::GetCommands() const
 // reimplemented (ilog::IMessageConsumer)
 
 bool CReportDocumentViewComp::IsMessageSupported(
-	int /*messageCategory*/,
-	int /*messageId*/,
-	const istd::IInformationProvider* /*messagePtr*/) const
+			int /*messageCategory*/,
+			int /*messageId*/,
+			const istd::IInformationProvider* /*messagePtr*/) const
 {
 	return true;
 }
@@ -66,18 +66,20 @@ void CReportDocumentViewComp::AddMessage(const MessagePtr& messagePtr)
 		return;
 	}
 
+	QString messageText = messagePtr->GetInformationDescription();
+
 	switch (messagePtr->GetInformationCategory()){
 		case istd::IInformationProvider::IC_WARNING:
-			QMessageBox::warning(GetWidget(), tr("Report document"), messagePtr->GetInformationDescription());
+			QMessageBox::warning(GetWidget(), tr("Report document"), messageText);
 			break;
 
 		case istd::IInformationProvider::IC_ERROR:
 		case istd::IInformationProvider::IC_CRITICAL:
-			QMessageBox::critical(GetWidget(), tr("Report document"), messagePtr->GetInformationDescription());
+			QMessageBox::critical(GetWidget(), tr("Report document"), messageText);
 			break;
 
 		default:
-			QMessageBox::information(GetWidget(), tr("Report document"), messagePtr->GetInformationDescription());
+			QMessageBox::information(GetWidget(), tr("Report document"), messageText);
 			break;
 	}
 }
