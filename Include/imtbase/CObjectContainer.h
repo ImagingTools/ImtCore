@@ -20,7 +20,7 @@ namespace imtbase
 /**
 	Implementation of an object container.
 */
-class CComposedObject:
+class CObjectContainer:
 			virtual public IObjectContainer,
 			virtual protected iprm::IOptionsList,
 			public istd::TComposedFactory<istd::IChangeable>
@@ -28,8 +28,8 @@ class CComposedObject:
 public:
 	typedef istd::TComposedFactory<istd::IChangeable> BaseClass;
 
-	CComposedObject();
-	virtual ~CComposedObject();
+	CObjectContainer();
+	virtual ~CObjectContainer();
 
 	// reimplemented (IObjectContainer)
 	virtual QByteArray InsertNewObject(

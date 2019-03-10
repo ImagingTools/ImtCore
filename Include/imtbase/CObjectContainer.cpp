@@ -1,4 +1,4 @@
-#include <imtbase/CComposedObject.h>
+#include <imtbase/CObjectContainer.h>
 
 
 // Qt includes
@@ -11,13 +11,13 @@ namespace imtbase
 
 // public methods
 
-CComposedObject::CComposedObject()
+CObjectContainer::CObjectContainer()
 	:m_modelUpdateBridge(this)
 {
 }
 
 
-CComposedObject::~CComposedObject()
+CObjectContainer::~CObjectContainer()
 {
 	m_modelUpdateBridge.EnsureModelsDetached();
 }
@@ -25,7 +25,7 @@ CComposedObject::~CComposedObject()
 
 // reimplemented (IObjectContainer)
 
-QByteArray CComposedObject::InsertNewObject(
+QByteArray CObjectContainer::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description)
@@ -52,7 +52,7 @@ QByteArray CComposedObject::InsertNewObject(
 }
 
 
-bool CComposedObject::RemoveObject(const QByteArray& objectId)
+bool CObjectContainer::RemoveObject(const QByteArray& objectId)
 {
 	for (Objects::iterator iter = m_objects.begin(); iter != m_objects.end(); ++iter){
 		if ((*iter).id == objectId){
@@ -73,13 +73,13 @@ bool CComposedObject::RemoveObject(const QByteArray& objectId)
 
 // reimplemented (IObjectProvider)
 
-const iprm::IOptionsList& CComposedObject::GetObjectInfoList() const
+const iprm::IOptionsList& CObjectContainer::GetObjectInfoList() const
 {
 	return *this;
 }
 
 
-const istd::IChangeable* CComposedObject::GetObject(const QByteArray& objectId) const
+const istd::IChangeable* CObjectContainer::GetObject(const QByteArray& objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -91,7 +91,7 @@ const istd::IChangeable* CComposedObject::GetObject(const QByteArray& objectId) 
 }
 
 
-QByteArray CComposedObject::GetObjectTypeId(const QByteArray& objectId) const
+QByteArray CObjectContainer::GetObjectTypeId(const QByteArray& objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -105,7 +105,7 @@ QByteArray CComposedObject::GetObjectTypeId(const QByteArray& objectId) const
 
 // protected methods
 
-istd::IChangeable* CComposedObject::CreateObjectInstance(const QByteArray& typeId) const
+istd::IChangeable* CObjectContainer::CreateObjectInstance(const QByteArray& typeId) const
 {
 	return BaseClass::CreateInstance(typeId);
 }
@@ -115,37 +115,37 @@ istd::IChangeable* CComposedObject::CreateObjectInstance(const QByteArray& typeI
 
 // reimplemented (IOptionsList)
 
-int CComposedObject::GetOptionsFlags() const
+int CObjectContainer::GetOptionsFlags() const
 {
 	return SCF_SUPPORT_UNIQUE_ID;
 }
 
 
-int CComposedObject::GetOptionsCount() const
+int CObjectContainer::GetOptionsCount() const
 {
 	return m_objects.count();
 }
 
 
-QString CComposedObject::GetOptionName(int index) const
+QString CObjectContainer::GetOptionName(int index) const
 {
 	return m_objects[index].name;
 }
 
 
-QString CComposedObject::GetOptionDescription(int index) const
+QString CObjectContainer::GetOptionDescription(int index) const
 {
 	return m_objects[index].description;
 }
 
 
-QByteArray CComposedObject::GetOptionId(int index) const
+QByteArray CObjectContainer::GetOptionId(int index) const
 {
 	return m_objects[index].id;
 }
 
 
-bool CComposedObject::IsOptionEnabled(int /*index*/) const
+bool CObjectContainer::IsOptionEnabled(int /*index*/) const
 {
 	return true;
 }

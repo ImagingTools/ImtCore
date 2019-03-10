@@ -13,6 +13,11 @@ I_EXPORT_PACKAGE("ImtCorePck", "ImagingTools core component package", "Core Basi
 
 
 I_EXPORT_COMPONENT(
+			ObjectContainer,
+			"General container of the data objects",
+			"Object Data Model Composition");
+
+I_EXPORT_COMPONENT(
 			PointCloud,
 			"3D-point cloud",
 			"3D Points");

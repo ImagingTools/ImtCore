@@ -7,11 +7,13 @@
 
 
 // ImtCore includes
+#include <imtbase/CObjectContainerComp.h>
 #include <imt3d/CPointCloud3d.h>
 #include <imt3d/CObjPointCloudPersistenceComp.h>
 #include <imt3d/CMesh3d.h>
 #include <imt3d/CStlMeshPersistenceComp.h>
 #include <imt3d/CDepthBitmap.h>
+
 
 /**
 	ImtCorePck package
@@ -19,6 +21,8 @@
 namespace ImtCorePck
 {
 
+
+typedef icomp::TModelCompWrap<imtbase::CObjectContainerComp> ObjectContainer;
 
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<imt3d::CPointCloud3d, imt3d::IPointCloud3d, imt3d::IObject3d, iser::ISerializable>> PointCloud;
