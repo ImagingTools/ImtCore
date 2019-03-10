@@ -10,7 +10,7 @@ namespace imtbase
 
 
 /**
-	Iterface for an object container.
+	Interface for an object container.
 */
 class IObjectContainer: virtual public IObjectProvider
 {

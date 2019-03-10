@@ -13,7 +13,7 @@ namespace imtbase
 
 
 /**
-	Iterface for access of general defined list of data objects.
+	Interface for access of general defined list of data objects.
 */
 class IObjectProvider: virtual public istd::IChangeable
 {
