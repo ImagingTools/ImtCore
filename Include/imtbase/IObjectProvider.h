@@ -1,8 +1,11 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QObject>
+
 // ACF includes
-#include <istd/IChangeable.h>
+#include <iprm/IOptionsList.h>
 
 
 namespace imtbase
@@ -15,15 +18,22 @@ namespace imtbase
 class IObjectProvider: virtual public istd::IChangeable
 {
 public:
-	/**
-		Get the count of the objects in the list.
-	*/
-	virtual int GetObjectCount() const = 0;
+	typedef QList<QByteArray> Ids;
 
 	/**
-		Get the object instance at the given position.
+		Get the list with basicaly informations about stored objects.
 	*/
-	virtual const istd::IChangeable* GetObject(int objectIndex) const = 0;
+	virtual const iprm::IOptionsList& GetObjectInfoList() const = 0;
+
+	/**
+		Get the object instance with the given ID.
+	*/
+	virtual const istd::IChangeable* GetObject(const QByteArray& objectId) const = 0;
+
+	/**
+		Get the type-ID of an object with the given ID.
+	*/
+	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const = 0;
 };
 
 
