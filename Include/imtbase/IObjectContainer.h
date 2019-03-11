@@ -34,6 +34,12 @@ public:
 		\note The method should return \c false only if an object could not be removed and remains in the container!
 	*/
 	virtual bool RemoveObject(const QByteArray& objectId) = 0;
+
+	/**
+		Get object for the editing.
+		\param objectId ID of the object to be edited.
+	*/
+	virtual istd::IChangeable* GetEditableObject(const QByteArray& objectId) const = 0;
 };
 
 

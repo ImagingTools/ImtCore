@@ -71,6 +71,12 @@ bool CObjectContainer::RemoveObject(const QByteArray& objectId)
 }
 
 
+istd::IChangeable* CObjectContainer::GetEditableObject(const QByteArray& objectId) const
+{
+	return const_cast<istd::IChangeable*>(GetObject(objectId));
+}
+
+
 // reimplemented (IObjectProvider)
 
 const iprm::IOptionsList& CObjectContainer::GetObjectInfoList() const

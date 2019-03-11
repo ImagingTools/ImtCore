@@ -37,6 +37,7 @@ public:
 				const QString& name,
 				const QString& description) override;
 	virtual bool RemoveObject(const QByteArray& objectId) override;
+	virtual istd::IChangeable* GetEditableObject(const QByteArray& objectId) const override;
 
 	// reimplemented (IObjectProvider)
 	virtual const iprm::IOptionsList& GetObjectInfoList() const override;
