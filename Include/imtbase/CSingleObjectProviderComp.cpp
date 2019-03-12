@@ -25,7 +25,7 @@ const iprm::IOptionsList& CSingleObjectProviderComp::GetObjectInfoList() const
 }
 
 
-const istd::IChangeable* CSingleObjectProviderComp::GetObject(const QByteArray& objectId) const
+const istd::IChangeable* CSingleObjectProviderComp::GetDataObject(const QByteArray& objectId) const
 {
 	int index = m_info.GetOptionIndexById(objectId);
 	if ((index >= 0) && m_dataObjectCompPtr.IsValid()){

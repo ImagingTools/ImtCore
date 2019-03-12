@@ -28,7 +28,7 @@ public:
 	/**
 		Get the object instance with the given ID.
 	*/
-	virtual const istd::IChangeable* GetObject(const QByteArray& objectId) const = 0;
+	virtual const istd::IChangeable* GetDataObject(const QByteArray& objectId) const = 0;
 
 	/**
 		Get the type-ID of an object with the given ID.

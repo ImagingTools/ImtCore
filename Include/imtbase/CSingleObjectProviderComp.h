@@ -38,7 +38,7 @@ public:
 
 	// reimplemented (IObjectProvider)
 	virtual const iprm::IOptionsList& GetObjectInfoList() const override;
-	virtual const istd::IChangeable* GetObject(const QByteArray& objectId) const override;
+	virtual const istd::IChangeable* GetDataObject(const QByteArray& objectId) const override;
 	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 
 protected:
