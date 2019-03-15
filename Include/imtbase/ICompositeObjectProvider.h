@@ -16,7 +16,6 @@ class ICompositeObjectProvider: virtual public istd::IChangeable
 {
 public:
 	virtual const imtbase::IObjectProvider* GetCompositeObject() const = 0;
-	
 };
 
 
