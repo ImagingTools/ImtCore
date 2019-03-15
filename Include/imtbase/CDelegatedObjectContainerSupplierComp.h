@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/ICompositeObjectProvider.h>
-#include <imtbase/IObjectProvider.h>
+#include <imtbase/IObjectContainer.h>
 #include <imtbase/TDelegatedSupplierCompBase.h>
 
 
@@ -15,16 +15,16 @@ namespace imtbase
 	Image supplier delegating the calls to another one or accessing some point cloud object directly.
 */
 class CDelegatedObjectContainerSupplierComp:
-	public imtbase::TDelegatedSupplierCompBase<imtbase::ICompositeObjectProvider, imtbase::IObjectProvider>
+	public imtbase::TDelegatedSupplierCompBase<imtbase::ICompositeObjectProvider, imtbase::IObjectContainer>
 {
 public:
-	typedef imtbase::TDelegatedSupplierCompBase<imtbase::ICompositeObjectProvider, imtbase::IObjectProvider> BaseClass;
+	typedef imtbase::TDelegatedSupplierCompBase<imtbase::ICompositeObjectProvider, imtbase::IObjectContainer> BaseClass;
 
 	I_BEGIN_COMPONENT(CDelegatedObjectContainerSupplierComp);
 	I_END_COMPONENT;
 
 	// reimplemented (imtbase::ICompositeObjectProvider)
-	virtual const imtbase::IObjectProvider* GetCompositeObject() const override;
+	virtual const imtbase::IObjectContainer* GetCompositeObject() const override;
 };
 
 

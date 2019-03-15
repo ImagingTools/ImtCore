@@ -2,7 +2,7 @@
 
 
 // ACF includes
-#include <imtbase/IObjectProvider.h>
+#include <imtbase/IObjectContainer.h>
 
 
 namespace imtbase
@@ -15,7 +15,7 @@ namespace imtbase
 class ICompositeObjectProvider: virtual public istd::IChangeable
 {
 public:
-	virtual const imtbase::IObjectProvider* GetCompositeObject() const = 0;
+	virtual const imtbase::IObjectContainer* GetCompositeObject() const = 0;
 };
 
 
