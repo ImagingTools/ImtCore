@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QVector>
+#include <QtCore/QUuid>
 
 // ACF includes
 #include <istd/TComposedFactory.h>
@@ -44,6 +45,9 @@ public:
 	virtual const istd::IChangeable* GetDataObject(const QByteArray& objectId) const override;
 	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 
+	// reimplemented (istd::IChangeable)
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+
 protected:
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const;
 
@@ -61,6 +65,11 @@ protected:
 
 	struct ObjectInfo
 	{
+		ObjectInfo()
+		{
+			id = QUuid::createUuid().toByteArray();
+		}
+
 		ObjectPtr object;
 		QString name;
 		QString description;

@@ -25,8 +25,8 @@ class CPointCloud3d: virtual public IPointCloud3d, virtual public IGridInfo
 public:
 	CPointCloud3d();
 
-	static bool IsPointValid(const i3d::CVector3d& position);
-	static i3d::CVector3d GetInvalidPoint();
+	static bool IsPointValid(const Point3d& position);
+	static Point3d GetInvalidPoint();
 
 	// reimplemented (IPointCloud3d)
 	virtual void CreateCloud(const CloudPoints &points, const istd::CIndex2d* gridSizePtr = nullptr) override;

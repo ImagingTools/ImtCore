@@ -21,7 +21,12 @@ bool ConvertDepthImageToCloud(const imt3d::IDepthBitmap& bitmap, IPointCloud3d& 
 	for (int y = 0; y < bitmap.GetImageSize().GetY(); ++y){
 		const float* linePtr = (const float*)bitmap.GetLinePtr(y);
 		for (int x = 0; x < bitmap.GetImageSize().GetX(); ++x){
-			points.push_back(i3d::CVector3d(x, y, linePtr[x]));
+			IPointCloud3d::Point3d point;
+			point[0] = x;
+			point[1] = y;
+			point[2] = linePtr[x];
+
+			points.push_back(point);
 		}
 	}
 
@@ -51,7 +56,7 @@ bool imt3d::ConvertPointCloudToDepthBitmap(const IPointCloud3d& pointCloud, imt3
 
 					float* imageLinePtr = (float*)bitmap.GetLinePtr(imagePos.GetY());
 
-					imageLinePtr[imagePos.GetX()] = points[pointIndex].GetZ();
+					imageLinePtr[imagePos.GetX()] = points[pointIndex][2];
 				}
 
 			return true;

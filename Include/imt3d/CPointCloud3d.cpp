@@ -24,15 +24,20 @@ CPointCloud3d::CPointCloud3d()
 
 // static methods
 
-bool CPointCloud3d::IsPointValid(const i3d::CVector3d& position)
+bool CPointCloud3d::IsPointValid(const Point3d& position)
 {
-	return !qIsNaN(position.GetX()) && !qIsNaN(position.GetY()) && !qIsNaN(position.GetZ());
+	return !qIsNaN(position[0]) && !qIsNaN(position[1]) && !qIsNaN(position[2]);
 }
 
 
-i3d::CVector3d CPointCloud3d::GetInvalidPoint()
+CPointCloud3d::Point3d CPointCloud3d::GetInvalidPoint()
 {
-	return i3d::CVector3d(qQNaN(), qQNaN(), qQNaN());
+	Point3d retVal;
+	retVal[0] = qQNaN();
+	retVal[1] = qQNaN();
+	retVal[2] = qQNaN();
+
+	return retVal;
 }
 
 
@@ -122,9 +127,9 @@ void CPointCloud3d::MoveCenterTo(const i3d::CVector3d &position)
 					pointIter != m_cloudPoints.end();
 					++pointIter){
 			if (IsPointValid(*pointIter)){
-				pointIter->SetX(pointIter->GetX() + delta.GetX());
-				pointIter->SetY(pointIter->GetY() + delta.GetY());
-				pointIter->SetZ(pointIter->GetZ() + delta.GetZ());
+				(*pointIter)[0] = (*pointIter)[0] + delta.GetX();
+				(*pointIter)[1] = (*pointIter)[1] + delta.GetY();
+				(*pointIter)[2] = (*pointIter)[2] + delta.GetZ();
 			}
 		}
 
@@ -248,9 +253,9 @@ void CPointCloud3d::EnsureCenterCalculated() const
 				continue;
 			}
 
-			double x = pointIter->GetX();
-			double y = pointIter->GetY();
-			double z = pointIter->GetZ();
+			float x =  (*pointIter)[0];
+			float y = (*pointIter)[1];
+			float z = (*pointIter)[2];
 
 			if (x < xRange.GetMinValue()){
 				xRange.SetMinValue(x);
@@ -296,14 +301,14 @@ void CPointCloud3d::EnsureCuboidCalculated() const
 		istd::CRange yRange(qInf(), -qInf());
 		istd::CRange zRange(qInf(), -qInf());
 
-		for (const i3d::CVector3d& point : m_cloudPoints){
+		for (const Point3d& point : m_cloudPoints){
 			if (!IsPointValid(point)){
 				continue;
 			}
 
-			double x = point.GetElement(0);
-			double y = point.GetElement(1);
-			double z = point.GetElement(2);
+			float x = point.GetElement(0);
+			float y = point.GetElement(1);
+			float z = point.GetElement(2);
 
 			if (x < xRange.GetMinValue()){
 				xRange.SetMinValue(x);
@@ -331,12 +336,12 @@ void CPointCloud3d::EnsureCuboidCalculated() const
 		}
 
 		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
-			const double left = xRange.GetMinValue();
-			const double right = xRange.GetMaxValue();
-			const double bottom = yRange.GetMinValue();
-			const double top = yRange.GetMaxValue();
-			const double far = zRange.GetMinValue();
-			const double near = zRange.GetMaxValue();
+			const float left = xRange.GetMinValue();
+			const float right = xRange.GetMaxValue();
+			const float bottom = yRange.GetMinValue();
+			const float top = yRange.GetMaxValue();
+			const float far = zRange.GetMinValue();
+			const float near = zRange.GetMaxValue();
 
 			m_boundingCuboid = CCuboid(left, right, bottom, top, near, far);
 

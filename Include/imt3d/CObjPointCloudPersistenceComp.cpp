@@ -93,7 +93,11 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 					continue;
 				}
 
-				cloudPoints.push_back(i3d::CVector3d(x, y, z));
+				IPointCloud3d::Point3d point;
+				point[0] = x;
+				point[1] = y;
+				point[2] = z;
+				cloudPoints.push_back(point);
 			}
 		}
 	}
@@ -124,7 +128,7 @@ int CObjPointCloudPersistenceComp::SaveToFile(const istd::IChangeable& data, con
 
 	const IPointCloud3d::CloudPoints& points = documentPtr->GetPoints();
 	for (IPointCloud3d::CloudPoints::const_iterator iter = points.cbegin(); iter != points.cend(); ++iter){
-		QString textLine = QString("v %1 %2 %3").arg(iter->GetX()).arg(iter->GetY()).arg(iter->GetZ());
+		QString textLine = QString("v %1 %2 %3").arg((*iter)[0]).arg((*iter)[1]).arg((*iter)[2]);
 
 		stream << textLine << "\n";
 	}

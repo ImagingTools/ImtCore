@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtCore/QUuid>
 
+// ACF includes
+#include <istd/CChangeNotifier.h>
+
 
 namespace imtbase
 {
@@ -34,6 +37,8 @@ QByteArray CObjectContainer::InsertNewObject(
 
 	info.object.SetPtr(CreateObjectInstance(typeId));
 	if (info.object.IsValid()){
+		istd::CChangeNotifier changeNotifier(this);
+
 		info.description = description;
 		info.name = name;
 		info.typeId = typeId;
@@ -107,6 +112,19 @@ QByteArray CObjectContainer::GetObjectTypeId(const QByteArray& objectId) const
 	
 	return QByteArray();
 }
+
+
+// reimplemented (istd::IChangeable)
+
+bool CObjectContainer::ResetData(CompatibilityMode /*mode*/)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_objects.clear();
+
+	return true;
+}
+
 
 
 // protected methods
