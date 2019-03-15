@@ -19,7 +19,7 @@ namespace imtbase
 
 
 /**
-	Implementation of an object container.
+	Implementation of a general object container.
 */
 class CObjectContainer:
 			virtual public IObjectContainer,

@@ -18,6 +18,11 @@ I_EXPORT_COMPONENT(
 			"Object Data Model Composition");
 
 I_EXPORT_COMPONENT(
+			DelegatedObjectContainerSupplier,
+			"Delegated provider of a composite object (object container)",
+			"Delegator Object Data Model Composition Supplier Provider");
+
+I_EXPORT_COMPONENT(
 			PointCloud,
 			"3D-point cloud",
 			"3D Points");
@@ -36,7 +41,6 @@ I_EXPORT_COMPONENT(
 			StlMeshPersistence,
 			"STL-format mesh persistence",
 			"Mesh STL Persistence");
-
 
 I_EXPORT_COMPONENT(
 			DepthBitmap,
