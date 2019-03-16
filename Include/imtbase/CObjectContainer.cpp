@@ -5,6 +5,7 @@
 #include <QtCore/QUuid>
 
 // ACF includes
+#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 
 
@@ -115,6 +116,51 @@ QByteArray CObjectContainer::GetObjectTypeId(const QByteArray& objectId) const
 
 
 // reimplemented (istd::IChangeable)
+
+int CObjectContainer::GetSupportedOperations() const
+{
+	return SO_CLONE | SO_COPY | SO_RESET;
+}
+
+
+bool CObjectContainer::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+{
+	const CObjectContainer* sourcePtr = dynamic_cast<const CObjectContainer*>(&object);
+	if (sourcePtr != nullptr){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_objects.clear();
+
+		for (const ObjectInfo& objectInfo : sourcePtr->m_objects){
+			QByteArray newId = InsertNewObject(objectInfo.typeId, objectInfo.name, objectInfo.description);
+			if (!newId.isEmpty()){
+				istd::IChangeable* newObjectPtr = GetEditableObject(newId);
+				Q_ASSERT(newObjectPtr != nullptr);
+				if (newObjectPtr != nullptr && objectInfo.object.IsValid()){
+					if (!newObjectPtr->CopyFrom(*objectInfo.object.GetPtr())){
+						RemoveObject(newId);
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+	
+	return false;
+}
+
+
+istd::IChangeable* CObjectContainer::CloneMe(CompatibilityMode mode) const
+{
+	istd::TDelPtr<CObjectContainer> clonePtr(new CObjectContainer());
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr.PopPtr();
+	}
+
+	return nullptr;
+}
+
 
 bool CObjectContainer::ResetData(CompatibilityMode /*mode*/)
 {
