@@ -12,7 +12,7 @@ namespace imtbase
 
 
 /**
-	Image supplier delegating the calls to another one or accessing some point cloud object directly.
+	Composite object supplier delegating the calls to another one or accessing some underlaying object directly.
 */
 class CDelegatedObjectContainerSupplierComp:
 	public imtbase::TDelegatedSupplierCompBase<imtbase::ICompositeObjectProvider, imtbase::IObjectContainer>
