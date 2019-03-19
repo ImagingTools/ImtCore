@@ -4,6 +4,7 @@
 // ACF includes
 #include <istd/TRange.h>
 #include <iimg/IBitmap.h>
+#include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imt3d/imt3d.h>
@@ -19,6 +20,17 @@ namespace imt3d
 class IDepthBitmap: virtual public iimg::IBitmap
 {
 public:
+	enum
+	{
+		MIT_MIN_DEPTH = idoc::IDocumentMetaInfo::MIT_USER,
+		MIT_MAX_DEPTH,
+
+		/**
+			Matrix used for transofrmation of depth values into the world coordinates given as QMatrix4x4
+		*/
+		MIT_REPROJECTION_MATRIX
+	};
+
 	/**
 		Get the depth range of the bitmap space. The depth range defines the possible range of the pixel values in the bitmap.
 	*/

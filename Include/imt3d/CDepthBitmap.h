@@ -16,17 +16,14 @@ namespace imt3d
 /**
 	Implementation of a depth bitmap with integrated conversion to QImage (using for displaying the bitmap)
 */
-class CDepthBitmap: virtual public imt3d::IDepthBitmap, public iimg::CReflectedBitmapBase, public idoc::CStandardDocumentMetaInfo 
+class CDepthBitmap:
+			virtual public imt3d::IDepthBitmap,
+			public iimg::CReflectedBitmapBase,
+			public idoc::CStandardDocumentMetaInfo 
 {
 public:
 	typedef iimg::CReflectedBitmapBase BaseClass;
 	typedef idoc::CStandardDocumentMetaInfo BaseClass2;
-
-	enum
-	{
-		MIT_MIN_DEPTH = idoc::IDocumentMetaInfo::MIT_USER,
-		MIT_MAX_DEPTH
-	};
 
 	void SetDepthRange(const istd::CRange& depthRange);
 

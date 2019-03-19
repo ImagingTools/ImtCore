@@ -118,6 +118,8 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 
 		InvalidateCache(istd::IChangeable::GetNoChanges());
 
+		BaseClass2::CopyFrom(object, mode);
+	
 		return BaseClass::CopyFrom(object, mode);
 	}
 	
