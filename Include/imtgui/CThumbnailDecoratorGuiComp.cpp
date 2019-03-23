@@ -129,7 +129,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 	static const istd::IChangeable::ChangeSet commandsChangeSet(ibase::ICommandsProvider::CF_COMMANDS);
 
-	if (m_commandsProviderModelCompPtr.IsValid()){
+	if (m_commandsProviderCompPtr.IsValid() && m_commandsProviderModelCompPtr.IsValid()){
 		m_commandsObserver.RegisterModel(m_commandsProviderModelCompPtr.GetPtr(), 0, commandsChangeSet);
 	}
 
