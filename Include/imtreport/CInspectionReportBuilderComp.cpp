@@ -116,14 +116,11 @@ bool CInspectionReportBuilderComp::CreateTitlePage(const ReportInputData& report
 		return false;
 	}
 
-	Results results;
-	GetTitlePageRegionResults(reportData, results);
-
 	i2d::CVector2d topLeft(15.0, 10.0);
 
 	AddHeader(reportData, NULL, topLeft, *pagePtr);
 	AddBody(reportData.imagePath, topLeft, *pagePtr);
-	AddFooter(results, true, topLeft, *pagePtr);
+	AddTitlePageFooter(reportData, topLeft, *pagePtr);
 
 	return true;
 }
@@ -136,14 +133,11 @@ bool CInspectionReportBuilderComp::CreateInspectionPage(const ReportInputData& r
 		return false;
 	}
 
-	Results results;
-	GetInspectionPageRegionResults(inspection, results);
-
 	i2d::CVector2d topLeft(15.0, 10.0);
 
 	AddHeader(reportData, &inspection, topLeft, *pagePtr);
 	AddBody(inspection.imagePath, topLeft, *pagePtr);
-	AddFooter(results, false, topLeft, *pagePtr);
+	AddInspectionPageFooter(inspection, topLeft, *pagePtr);
 
 	return true;
 }
@@ -218,8 +212,51 @@ void CInspectionReportBuilderComp::AddBody(const QString& imagePath, i2d::CVecto
 }
 
 
-void CInspectionReportBuilderComp::AddFooter(const Results& results, bool isTitlePage, i2d::CVector2d& topLeft, IReportPage& page) const
+void CInspectionReportBuilderComp::AddTitlePageFooter(const ReportInputData& reportData, i2d::CVector2d& topLeft, IReportPage& page) const
 {
+	Results results;
+	GetTitlePageRegionResults(reportData, results);
+
+	if (results.isEmpty()){
+		return;
+	}
+
+	topLeft.SetY(topLeft.GetY() + 15.0);
+
+	const double tableWidth = 180.0;
+	const double tableHeight = 100.0;
+
+	QByteArray uuid = page.AddTextTable(i2d::CRectangle(topLeft.GetX(), topLeft.GetY(), tableWidth, tableHeight), results.size(), 7);
+
+	CTextTable* tablePtr = dynamic_cast<CTextTable*>(page.GetPageElement(uuid));
+	Q_ASSERT(tablePtr);
+
+	tablePtr->SetHorizontalHeaderLabels({ "Inspection", "Region", "Error", "Length", "Value mm", "Tolerance mm", "Diff" });
+	tablePtr->ShowVerticalHeader(false);
+	tablePtr->SetColumnWidths({40.0, 40.0, 20.0, 20.0, 20.0, 20.0, 20.0 });
+
+	for (int i = 0; i < results.size(); i++){
+		const InspectionRegionResult& result = results[i];
+
+		tablePtr->SetItem(i, 0, {result.inspectionName});
+		tablePtr->SetItem(i, 1, {result.regionName});
+		tablePtr->SetItem(i, 2, {GetErrorClassText(result.errorClass)});
+		tablePtr->SetItem(i, 3, {QString::number(result.length, 'f', 2)});
+
+		if (result.errorClass != IInspectionReportBuilder::EC_NONE){
+			tablePtr->SetItem(i, 4, {QString::number(result.value, 'f', 2)});
+			tablePtr->SetItem(i, 5, {QString::number(result.tolerance, 'f', 2)});
+			tablePtr->SetItem(i, 6, {QString::number(result.diff, 'f', 2)});
+		}
+	}
+}
+
+
+void CInspectionReportBuilderComp::AddInspectionPageFooter(const Inspection& inspection, i2d::CVector2d& topLeft, IReportPage& page) const
+{
+	Results results;
+	GetInspectionPageRegionResults(inspection, results);
+
 	if (results.isEmpty()){
 		return;
 	}
@@ -234,18 +271,14 @@ void CInspectionReportBuilderComp::AddFooter(const Results& results, bool isTitl
 	CTextTable* tablePtr = dynamic_cast<CTextTable*>(page.GetPageElement(uuid));
 	Q_ASSERT(tablePtr);
 
-	tablePtr->SetHorizontalHeaderLabels({ "Region", "Error", "Length", "Value mm", "Tolerance mm", "Diff" });
+	tablePtr->SetHorizontalHeaderLabels({"Region", "Error", "Length", "Value mm", "Tolerance mm", "Diff"});
 	tablePtr->ShowVerticalHeader(false);
-	tablePtr->SetColumnWidths({ 55.0, 25.0, 25.0, 25.0, 25.0, 25.0 });
+	tablePtr->SetColumnWidths({55.0, 25.0, 25.0, 25.0, 25.0, 25.0});
 
 	for (int i = 0; i < results.size(); i++){
 		const InspectionRegionResult& result = results[i];
 
-		QString regionName = result.regionName;
-		if (isTitlePage && !result.inspectionName.isEmpty())
-			regionName = result.inspectionName + " " + regionName;
-
-		tablePtr->SetItem(i, 0, {regionName});
+		tablePtr->SetItem(i, 0, {result.regionName});
 		tablePtr->SetItem(i, 1, {GetErrorClassText(result.errorClass)});
 		tablePtr->SetItem(i, 2, {QString::number(result.length, 'f', 2)});
 
