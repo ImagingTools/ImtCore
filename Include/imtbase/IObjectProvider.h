@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QObject>
-
 // ACF includes
 #include <iprm/IOptionsList.h>
 
