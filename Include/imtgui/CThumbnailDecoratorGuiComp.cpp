@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QKeyEvent>
+#include <QtGui/QGuiApplication>
 #include <QtWidgets/QToolbar>
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QFrame>
@@ -61,18 +62,32 @@ const ibase::IHierarchicalCommand* CThumbnailDecoratorGuiComp::GetCommands() con
 
 bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 {
-	if (event->type() == QEvent::Resize){
+	int eventType = event->type();
+
+	if (eventType == QEvent::Resize){
 		UpdateSpacing();
 	}
+
+	QSet<int> supportedEvents;
+	supportedEvents.insert(QEvent::KeyRelease);
+	supportedEvents.insert(QEvent::MouseButtonRelease);
+	supportedEvents.insert(QEvent::MouseMove);
+	supportedEvents.insert(QEvent::Wheel);
+	supportedEvents.insert(QEvent::FocusIn);
+	supportedEvents.insert(QEvent::FocusOut);
+	supportedEvents.insert(QEvent::Enter);
+	supportedEvents.insert(QEvent::Leave);
 
 	if (m_loginCompPtr.IsValid()){
 		bool isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
 
-		if (isLogged && ((event->type() == QEvent::KeyRelease) || (event->type() == QEvent::MouseButtonRelease))){
+		if (isLogged && supportedEvents.contains(eventType)){
 			// Auto log off functionality is activated, aslo restart the timer after any user activity:
 			int autoLogoutSeconds = GetAutoLogoutTime();
 			if (autoLogoutSeconds > 0){
 				m_autoLogoutTimer.start(autoLogoutSeconds * 1000);
+
+				qApp->installEventFilter(this);
 			}
 		}
 
@@ -323,6 +338,8 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 			int autoLogoutSeconds = GetAutoLogoutTime();
 			if (autoLogoutSeconds > 0){
 				m_autoLogoutTimer.start(autoLogoutSeconds * 1000);
+
+				qApp->installEventFilter(this);
 			}
 
 			UpdateLoginButtonsState();
@@ -358,6 +375,8 @@ void CThumbnailDecoratorGuiComp::on_LoginControlButton_clicked()
 	else{
 		if (m_loginCompPtr->Logout()){
 			m_autoLogoutTimer.stop();
+			
+			qApp->removeEventFilter(this);
 
 			UpdateLoginButtonsState();
 
@@ -397,6 +416,8 @@ void CThumbnailDecoratorGuiComp::Logout()
 {
 	if (m_loginCompPtr.IsValid() && m_loginCompPtr->Logout()){
 		m_autoLogoutTimer.stop();
+
+		qApp->removeEventFilter(this);
 
 		UpdateLoginButtonsState();
 
