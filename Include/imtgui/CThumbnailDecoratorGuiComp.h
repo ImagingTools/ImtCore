@@ -17,6 +17,7 @@
 #include <iqtgui/TRestorableGuiWrap.h>
 #include <imeas/INumericValue.h>
 #include <iauth/ILogin.h>
+#include <iauth/IRightsProvider.h>
 
 // ImtCore includes
 #include <imtgui/CThumbpageItemGuiDelegate.h>
@@ -50,6 +51,7 @@ public:
 		I_ASSIGN(m_defaultPageIndexAttrPtr, "DefaultPageIndex", "Index of the default (start) page", false, -1);
 		I_ASSIGN(m_settingsPageIndexAttrPtr, "SettingsPageIndex", "Index of the system settings page", false, -1);
 		I_ASSIGN(m_welcomeTextAttrPtr, "WelcomeText", "Welcome text on the start page", true, "Welcome");
+		I_ASSIGN(m_closeRightIdAttrPtr, "CloseRightId", "ID of the user right to close the application", true, "Close");
 	I_END_COMPONENT;
 
 protected:
@@ -65,6 +67,7 @@ protected:
 	I_ATTR(int, m_defaultPageIndexAttrPtr);
 	I_ATTR(int, m_settingsPageIndexAttrPtr);
 	I_TEXTATTR(m_welcomeTextAttrPtr);
+	I_ATTR(QByteArray, m_closeRightIdAttrPtr);
 };
 
 
@@ -85,6 +88,9 @@ public:
 		I_ASSIGN(m_commandsProviderCompPtr, "Commands", "Provider of the commands showed in the main tool bar", false, "Commands");
 		I_ASSIGN_TO(m_commandsProviderModelCompPtr, m_commandsProviderCompPtr, false);
 		I_ASSIGN(m_loginCompPtr, "Login", "Login logic component", false, "Login");
+		I_ASSIGN_TO(m_loginModelCompPtr, m_loginCompPtr, false);
+		I_ASSIGN(m_rightsCompPtr, "Rights", "User rights for the application", false, "Rights");
+		I_ASSIGN_TO(m_rightsModelCompPtr, m_rightsCompPtr, false);
 		I_ASSIGN(m_autoLogoutMinutesCompPtr, "AutoLogoutTime", "Parameter to control automatical logout interval. Setting of this parameter overrides 'AutoLogoutMinutes' value", false, "AutoLogoutTime");
 	I_END_COMPONENT;
 
@@ -206,9 +212,24 @@ private:
 	private:
 		CThumbnailDecoratorGuiComp& m_parent;
 	};
+	
+
+	class LoginObserver: public imod::CMultiModelDispatcherBase
+	{
+	public:
+		explicit LoginObserver(CThumbnailDecoratorGuiComp& parent);
+
+		// reimplemented (imod::CMultiModelDispatcherBase)
+		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+
+	private:
+		CThumbnailDecoratorGuiComp& m_parent;
+	};
+
 
 	CommandsObserver m_commandsObserver;
 	PageModelObserver m_pageModelObserver;
+	LoginObserver m_loginObserver;
 
 	QStandardItemModel m_menuItemModel;
 
@@ -232,6 +253,9 @@ private:
 	I_REF(ibase::ICommandsProvider, m_commandsProviderCompPtr);
 	I_REF(imod::IModel, m_commandsProviderModelCompPtr);
 	I_REF(iauth::ILogin, m_loginCompPtr);
+	I_REF(imod::IModel, m_loginModelCompPtr);
+	I_REF(iauth::IRightsProvider, m_rightsCompPtr);
+	I_REF(imod::IModel, m_rightsModelCompPtr);
 	I_REF(imeas::INumericValue, m_autoLogoutMinutesCompPtr);
 
 	QToolBar* m_mainToolBar;

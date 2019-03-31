@@ -33,6 +33,7 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_mainToolBar(NULL),
 	m_commandsObserver(*this),
 	m_pageModelObserver(*this),
+	m_loginObserver(*this),
 	m_columnsCount(0),
 	m_rowsCount(0),
 	m_verticalSpacing(0),
@@ -147,6 +148,14 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		}
 	}
 
+	if (m_loginModelCompPtr.IsValid()){
+		m_loginObserver.RegisterModel(m_loginModelCompPtr.GetPtr());
+	}
+
+	if (m_rightsModelCompPtr.IsValid()){
+		m_loginObserver.RegisterModel(m_rightsModelCompPtr.GetPtr(), 1);
+	}
+
 	if (m_defaultPageIndexAttrPtr.IsValid()){
 		int startPageIndex = *m_defaultPageIndexAttrPtr;
 		if (startPageIndex >= 0){
@@ -182,6 +191,7 @@ void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 
 	m_pageModelObserver.UnregisterAllModels();
 	m_commandsObserver.UnregisterAllModels();
+	m_loginObserver.UnregisterAllModels();
 
 	BaseClass::OnGuiDestroyed();
 }
@@ -473,12 +483,19 @@ void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 
 void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 {
+	bool hasCloseRight = true;
+	if (m_rightsCompPtr.IsValid()){
+		hasCloseRight = m_rightsCompPtr->HasRight(*m_closeRightIdAttrPtr, true);
+		
+		ExitButton->setEnabled(hasCloseRight);
+	}
+
 	bool isLogged = true;
 	if (m_loginCompPtr.IsValid()){
 		isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
 
 		LoginButton->setEnabled(!isLogged);
-		ExitButton->setEnabled(isLogged);
+		ExitButton->setEnabled(hasCloseRight && isLogged);
 
 		LoginMode loginMode = GetLoginMode();
 		if (loginMode == LM_STRONG){
@@ -829,9 +846,6 @@ void CThumbnailDecoratorGuiComp::UpdateMaxSize()
 }
 
 
-/**
-	does not perform plausibility check for variables. Should be called after all variables are set!
-*/
 void CThumbnailDecoratorGuiComp::UpdateMinSize()
 {
 	if (m_itemDelegate != nullptr){
@@ -909,6 +923,22 @@ void CThumbnailDecoratorGuiComp::PageModelObserver::OnModelChanged(int /*modelId
 	}
 
 	m_parent.UpdatePageState();
+}
+
+
+// protected methods of embedded class LoginObserver
+
+CThumbnailDecoratorGuiComp::LoginObserver::LoginObserver(CThumbnailDecoratorGuiComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CThumbnailDecoratorGuiComp::LoginObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	m_parent.UpdateLoginButtonsState();
 }
 
 

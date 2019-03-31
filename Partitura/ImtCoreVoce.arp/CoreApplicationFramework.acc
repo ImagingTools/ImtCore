@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4758" Description="ACF"/>
-            <Version Id="1" Number="2032" Description="ACF-Solutions"/>
+            <Version Id="0" Number="4769" Description="ACF"/>
+            <Version Id="1" Number="2053" Description="ACF-Solutions"/>
             <Version Id="1023" Number="330496" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -145,6 +145,9 @@
                     <AttributeInfo Id="AutoLogoutTime" Type="Reference" ExportId="AutoLogoutTime">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="CloseRightId" Type="Id" ExportId="CloseRightId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Commands" Type="Reference" ExportId="PageCommands">
                         <Data IsEnabled="true" Value="CommandsMultiplexer"/>
                     </AttributeInfo>
@@ -173,6 +176,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PageUiContainer" Type="Reference" ExportId="MainUiPages">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Rights" Type="Reference" ExportId="Rights">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsPageIndex" Type="Integer" ExportId="SettingsPageIndex">
