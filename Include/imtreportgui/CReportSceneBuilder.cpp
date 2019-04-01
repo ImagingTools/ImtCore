@@ -192,18 +192,21 @@ void CReportSceneBuilder::CreateImage(const imtreport::CImageRectangleElement& p
 	QGraphicsPixmapItem* sceneElementPtr = new QGraphicsPixmapItem(QPixmap(imgPath));
 
 	QRectF rect = MapRectToScene(pageElement, resolutionDpi);
-	sceneElementPtr->setPos(rect.topLeft());
+
+	// set scale
+	qreal scale = 1.0;
 
 	QSize pixmapSize = sceneElementPtr->pixmap().size();
-
 	if (pixmapSize.height() > 0){
-		qreal scale = rect.height() / pixmapSize.height();
+		scale = rect.height() / pixmapSize.height();
+	}
+	sceneElementPtr->setScale(scale);
 
-		sceneElementPtr->setScale(scale);
-	}
-	else{
-		sceneElementPtr->setScale(1.0);
-	}
+	// set position
+	QPointF pos;
+	pos.setX(scene.sceneRect().center().x() - sceneElementPtr->pixmap().width() * scale / 2);
+	pos.setY(rect.top());
+	sceneElementPtr->setPos(pos);
 
 	scene.addItem(sceneElementPtr);
 }
