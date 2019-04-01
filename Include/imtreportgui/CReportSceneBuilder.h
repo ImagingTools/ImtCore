@@ -43,18 +43,21 @@ private:
 	static void CreatePolygone(const imtreport::CPolygonElement& pageElement, QGraphicsScene& scene, int resolutionDpi);
 	static void CreateImage(const imtreport::CImageRectangleElement& pageElement, QGraphicsScene& scene, int resolutionDpi);
 	static void CreateTextTable(const imtreport::CTextTable& pageElement, QGraphicsScene& scene, int resolutionDpi);
-	static void CreateTextTableItem(const imtreport::CTextTableItem& tableItem, const QRectF& cellRect, QGraphicsScene& scene, int resolutionDpi);
+	static void CreateTextTableItem(const imtreport::CTextTableItem& tableItem, const QRectF& cellRect, QGraphicsScene& scene);
 
-	static double GetTextTableRowHeight(const CTextTableProxy& table, int row);
+	static qreal GetTextTableRowHeight(const imtreport::CTextTable& table, const CTextTableProxy& tableProxy, int row, int resolutionDpi);
 	static void SetShapePenAndBrush(const imtreport::IGraphicsElement& pageElement, QAbstractGraphicsShapeItem& sceneElement);
 
+	static qreal MapCoordinateToScene(qreal value, bool isX, int resolutionDpi);
 	static QPointF MapPointToScene(const QPointF& point, int resolutionDpi);
 	static QRectF MapRectToScene(const QRectF& rect, int resolutionDpi);
-	static QFont MapFontToScene(const imtreport::CFont& font, int resolutionDpi);
+	
+	static QFont ConvertToQFont(const imtreport::CFont& font);
 	static QColor ConvertToQColor(const icmm::CRgb& color);
 
 	static const qreal s_A4WidthMm;
 	static const qreal s_A4HeightMm;
+	static const qreal s_margin;
 };
 
 

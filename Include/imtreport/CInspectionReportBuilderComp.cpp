@@ -189,13 +189,13 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 	tablePtr->ShowVerticalHeader(false);
 	tablePtr->SetColumnWidths(QVector<double>(tablePtr->GetColumnCount(), tableWidth / tablePtr->GetColumnCount()));
 
-	tablePtr->SetItem(0, 0, { reportData.companyName });
-	tablePtr->SetItem(0, 1, { reportData.partSerialNumber });
-	tablePtr->SetItem(0, 2, { productName });
+	tablePtr->SetItem(0, 0, CTextTableItem(reportData.companyName));
+	tablePtr->SetItem(0, 1, CTextTableItem(reportData.partSerialNumber));
+	tablePtr->SetItem(0, 2, CTextTableItem(productName));
 
-	tablePtr->SetItem(1, 0, { reportData.appVersion });
-	tablePtr->SetItem(1, 1, { reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate) });
-	tablePtr->SetItem(1, 2, { GetStatusText(status), Qt::AlignLeft | Qt::AlignVCenter, CFont("Arial", 2.5, CFont::FF_BOLD), GetStatusColor(status)});
+	tablePtr->SetItem(1, 0, CTextTableItem(reportData.appVersion));
+	tablePtr->SetItem(1, 1, CTextTableItem(reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate)));
+	tablePtr->SetItem(1, 2, CTextTableItem(GetStatusText(status), Qt::AlignLeft, CFont("Arial", 10.0, CFont::FF_BOLD), GetStatusColor(status)));
 
 	topLeft.SetY(topLeft.GetY() + tableHeight);
 }
@@ -238,15 +238,15 @@ void CInspectionReportBuilderComp::AddTitlePageFooter(const ReportInputData& rep
 	for (int i = 0; i < results.size(); i++){
 		const InspectionRegionResult& result = results[i];
 
-		tablePtr->SetItem(i, 0, {result.inspectionName});
-		tablePtr->SetItem(i, 1, {result.regionName});
-		tablePtr->SetItem(i, 2, {GetErrorClassText(result.errorClass)});
-		tablePtr->SetItem(i, 3, {QString::number(result.length, 'f', 2)});
+		tablePtr->SetItem(i, 0, CTextTableItem(result.inspectionName));
+		tablePtr->SetItem(i, 1, CTextTableItem(result.regionName));
+		tablePtr->SetItem(i, 2, CTextTableItem(GetErrorClassText(result.errorClass)));
+		tablePtr->SetItem(i, 3, CTextTableItem(QString::number(result.length, 'f', 2), Qt::AlignRight));
 
 		if (result.errorClass != IInspectionReportBuilder::EC_NONE){
-			tablePtr->SetItem(i, 4, {QString::number(result.value, 'f', 2)});
-			tablePtr->SetItem(i, 5, {QString::number(result.tolerance, 'f', 2)});
-			tablePtr->SetItem(i, 6, {QString::number(result.diff, 'f', 2)});
+			tablePtr->SetItem(i, 4, CTextTableItem(QString::number(result.value, 'f', 2), Qt::AlignRight));
+			tablePtr->SetItem(i, 5, CTextTableItem(QString::number(result.tolerance, 'f', 2), Qt::AlignRight));
+			tablePtr->SetItem(i, 6, CTextTableItem(QString::number(result.diff, 'f', 2), Qt::AlignRight));
 		}
 	}
 }
@@ -278,14 +278,14 @@ void CInspectionReportBuilderComp::AddInspectionPageFooter(const Inspection& ins
 	for (int i = 0; i < results.size(); i++){
 		const InspectionRegionResult& result = results[i];
 
-		tablePtr->SetItem(i, 0, {result.regionName});
-		tablePtr->SetItem(i, 1, {GetErrorClassText(result.errorClass)});
-		tablePtr->SetItem(i, 2, {QString::number(result.length, 'f', 2)});
+		tablePtr->SetItem(i, 0, CTextTableItem(result.regionName));
+		tablePtr->SetItem(i, 1, CTextTableItem(GetErrorClassText(result.errorClass)));
+		tablePtr->SetItem(i, 2, CTextTableItem(QString::number(result.length, 'f', 2)));
 
 		if (result.errorClass != IInspectionReportBuilder::EC_NONE){
-			tablePtr->SetItem(i, 3, {QString::number(result.value, 'f', 2)});
-			tablePtr->SetItem(i, 4, {QString::number(result.tolerance, 'f', 2)});
-			tablePtr->SetItem(i, 5, {QString::number(result.diff, 'f', 2)});
+			tablePtr->SetItem(i, 3, CTextTableItem(QString::number(result.value, 'f', 2), Qt::AlignRight));
+			tablePtr->SetItem(i, 4, CTextTableItem(QString::number(result.tolerance, 'f', 2), Qt::AlignRight));
+			tablePtr->SetItem(i, 5, CTextTableItem(QString::number(result.diff, 'f', 2), Qt::AlignRight));
 		}
 	}
 }

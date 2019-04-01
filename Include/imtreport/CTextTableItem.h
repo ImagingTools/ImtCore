@@ -24,8 +24,8 @@ class CTextTableItem: virtual public iser::ISerializable
 public:
 	CTextTableItem(
 				const QString& text = QString(),
-				Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignVCenter,
-				CFont font = CFont("Arial", 2.5),
+				Qt::Alignment alignment = Qt::AlignLeft,
+				CFont font = CFont("Arial", 10.0),
 				const icmm::CRgb& foregroundColor = icmm::CRgb(0.0, 0.0, 0.0),
 				const icmm::CRgb& backgroundColor = icmm::CRgb(1.0, 1.0, 1.0),
 				const iimg::CBitmap& image = iimg::CBitmap());

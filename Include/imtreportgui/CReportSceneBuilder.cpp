@@ -23,6 +23,7 @@ namespace imtreportgui
 // static members
 const qreal CReportSceneBuilder::s_A4WidthMm = 210.0;
 const qreal CReportSceneBuilder::s_A4HeightMm = 297.0;
+const qreal CReportSceneBuilder::s_margin = 5.0;
 
 
 // public methods
@@ -138,7 +139,7 @@ void CReportSceneBuilder::CreateLabel(const imtreport::CTextLabelElement& pageEl
 	if (rect.width() > 0.0)
 		sceneElementPtr->setTextWidth(rect.width());
 
-	sceneElementPtr->setFont(MapFontToScene(pageElement.GetFont(), resolutionDpi));
+	sceneElementPtr->setFont(ConvertToQFont(pageElement.GetFont()));
 	sceneElementPtr->setDefaultTextColor(pageElement.GetFillColor());
 
 	QTextOption option = sceneElementPtr->document()->defaultTextOption();
@@ -213,19 +214,19 @@ void CReportSceneBuilder::CreateTextTable(const imtreport::CTextTable& pageEleme
 	CTextTableProxy tableProxy(pageElement);
 
 	QRectF cellRect;
-	cellRect.setTop(pageElement.GetTop());
+	cellRect.setTop(MapCoordinateToScene(pageElement.GetTop(), false, resolutionDpi));
 
 	for (int row = 0; row < tableProxy.GetRowCount(); ++row){
-		cellRect.setLeft(pageElement.GetLeft());
+		cellRect.setLeft(MapCoordinateToScene(pageElement.GetLeft(), true, resolutionDpi));
+		cellRect.setHeight(GetTextTableRowHeight(pageElement, tableProxy, row, resolutionDpi));
 
 		for (int col = 0; col < tableProxy.GetColumnCount(); ++col){
 			const imtreport::CTextTableItem* tableItem = tableProxy.GetItem(row, col);
 			Q_ASSERT(tableItem);
 
-			cellRect.setWidth(pageElement.GetColumnWidth(col));
-			cellRect.setHeight(GetTextTableRowHeight(tableProxy, row));
+			cellRect.setWidth(MapCoordinateToScene(pageElement.GetColumnWidth(col), true, resolutionDpi));
 
-			CreateTextTableItem(*tableItem, cellRect, scene, resolutionDpi);
+			CreateTextTableItem(*tableItem, cellRect, scene);
 
 			cellRect.setLeft(cellRect.left() + cellRect.width());
 		}
@@ -235,61 +236,70 @@ void CReportSceneBuilder::CreateTextTable(const imtreport::CTextTable& pageEleme
 }
 
 
-void CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTableItem& tableItem, const QRectF& cellRect, QGraphicsScene& scene, int resolutionDpi)
+void CReportSceneBuilder::CreateTextTableItem(const imtreport::CTextTableItem& tableItem, const QRectF& cellRect, QGraphicsScene& scene)
 {
 	// add cell border
-	QGraphicsRectItem* rectItemPtr = new QGraphicsRectItem(MapRectToScene(cellRect, resolutionDpi));
+	QGraphicsRectItem* rectItemPtr = new QGraphicsRectItem(cellRect);
 	rectItemPtr->setBrush(ConvertToQColor(tableItem.GetBackgroundColor()));
 
 	scene.addItem(rectItemPtr);
 
 	// add cell icon (if any)
-	QPointF pos(cellRect.left() + 1.0, cellRect.top() + 1.0);
+	QPointF pos(cellRect.left() + s_margin, cellRect.top() + s_margin);
 
 	if (!tableItem.GetImage().IsEmpty()){
 		QPixmap pixmap = QPixmap::fromImage(tableItem.GetImage().GetQImage());
 
 		QGraphicsPixmapItem* pixmapItemPtr = new QGraphicsPixmapItem(pixmap);
-		pixmapItemPtr->setPos(MapPointToScene(pos, resolutionDpi));
+		pixmapItemPtr->setPos(pos);
 
 		scene.addItem(pixmapItemPtr);
 
-		pos.setX(pos.x() + pixmap.widthMM() + 2.0);
+		pos.setX(pos.x() + pixmap.width() + s_margin * 2);
 	}
 
 	// add cell text
 	QGraphicsTextItem* textItemPtr = new QGraphicsTextItem();
-	textItemPtr->setPos(MapPointToScene(pos, resolutionDpi));
+	textItemPtr->setPos(pos);
 	textItemPtr->setPlainText(tableItem.GetText());
-	textItemPtr->setFont(MapFontToScene(tableItem.GetFont(), resolutionDpi));
+	textItemPtr->setFont(ConvertToQFont(tableItem.GetFont()));
 	textItemPtr->setDefaultTextColor(ConvertToQColor(tableItem.GetForegroundColor()));
-	textItemPtr->setTextWidth(MapPointToScene(QPointF(cellRect.width(), cellRect.height()), resolutionDpi).x());
+	textItemPtr->setTextWidth(cellRect.width() - s_margin * 2);
 
 	QTextOption option = textItemPtr->document()->defaultTextOption();
 	option.setAlignment(tableItem.GetAlignment());
 	textItemPtr->document()->setDefaultTextOption(option);
+	textItemPtr->document()->setDocumentMargin(0.0);
 
 	scene.addItem(textItemPtr);
 }
 
 
-double CReportSceneBuilder::GetTextTableRowHeight(const CTextTableProxy& table, int row)
+qreal CReportSceneBuilder::GetTextTableRowHeight(const imtreport::CTextTable& table, const CTextTableProxy& tableProxy, int row, int resolutionDpi)
 {
-	double maxCellHeight = 0.0;
-	const double cellMargin = 4.0;
+	qreal rowHeight = 0.0;
+	const qreal maxRowHeight = 100.0;
 
-	for (int col = 0; col < table.GetColumnCount(); ++col){
-		const imtreport::CTextTableItem* tableItem = table.GetItem(row, col);
+	for (int col = 0; col < tableProxy.GetColumnCount(); ++col){
+		const imtreport::CTextTableItem* tableItem = tableProxy.GetItem(row, col);
 		Q_ASSERT(tableItem);
 
-		QFont font(tableItem->GetFont().GetName(), tableItem->GetFont().GetSize());
-		double cellFontHeight = QFontMetrics(font).height() + cellMargin;
-		double cellIconHeight = tableItem->GetImage().GetQImage().heightMM();
+		QFontMetrics fontMetrics(ConvertToQFont(tableItem->GetFont()));
 
-		maxCellHeight = qMax(maxCellHeight, qMax(cellFontHeight, cellIconHeight));
+		qreal colWidth = MapCoordinateToScene(table.GetColumnWidth(col), true, resolutionDpi);
+		QRectF constrainingRect(0, 0, colWidth - s_margin * 2, maxRowHeight);
+
+		QRect textRect = fontMetrics.boundingRect(constrainingRect.toRect(),
+			tableItem->GetAlignment() | Qt::TextWordWrap,
+			tableItem->GetText());
+
+		double rowTextHeight = textRect.height();
+		double rowIconHeight = tableItem->GetImage().GetQImage().height();
+
+		rowHeight = qMax(rowHeight, qMax(rowTextHeight, rowIconHeight));
 	}
 
-	return maxCellHeight;
+	return rowHeight + s_margin * 2;
 }
 
 
@@ -310,23 +320,26 @@ void CReportSceneBuilder::SetShapePenAndBrush(const imtreport::IGraphicsElement&
 }
 
 
-QPointF CReportSceneBuilder::MapPointToScene(const QPointF& point, int resolutionDpi)
+qreal CReportSceneBuilder::MapCoordinateToScene(qreal value, bool isX, int resolutionDpi)
 {
 	// map shape coordinates given in mm to scene's coordinates
-	QScreen* screenPtr = QGuiApplication::primaryScreen();
-	Q_ASSERT(screenPtr);
-
-	double logicalX = screenPtr->logicalDotsPerInchX();
-	double logicalY = screenPtr->logicalDotsPerInchY();
-
-	if (resolutionDpi > 0){
-		logicalX = logicalY = resolutionDpi;
+	if (resolutionDpi <= 0){
+		QScreen* screenPtr = QGuiApplication::primaryScreen();
+		Q_ASSERT(screenPtr);
+		resolutionDpi = isX ? screenPtr->logicalDotsPerInchX() : screenPtr->logicalDotsPerInchY();
 	}
 
-	qreal x = point.x() * logicalX / 25.4;
-	qreal y = point.y() * logicalY / 25.4;
+	return value * resolutionDpi / 25.4;
+}
 
-	return QPointF(x, y);
+
+QPointF CReportSceneBuilder::MapPointToScene(const QPointF& point, int resolutionDpi)
+{
+	QPointF retVal;
+	retVal.setX(MapCoordinateToScene(point.x(), true, resolutionDpi));
+	retVal.setY(MapCoordinateToScene(point.y(), false, resolutionDpi));
+
+	return retVal;
 }
 
 
@@ -336,10 +349,9 @@ QRectF CReportSceneBuilder::MapRectToScene(const QRectF& rect, int resolutionDpi
 }
 
 
-QFont CReportSceneBuilder::MapFontToScene(const imtreport::CFont& font, int resolutionDpi)
+QFont CReportSceneBuilder::ConvertToQFont(const imtreport::CFont& font)
 {
-	QFont sceneFont(font.GetName());
-	sceneFont.setPointSize(MapPointToScene(QPointF(font.GetSize(), 0.0), resolutionDpi).x());
+	QFont sceneFont(font.GetName(), font.GetSize());
 
 	if (font.GetFontFlags() & imtreport::CFont::FF_BOLD){
 		sceneFont.setBold(true);
