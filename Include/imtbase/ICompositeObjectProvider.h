@@ -10,7 +10,7 @@ namespace imtbase
 
 
 /**
-	Interface for an object container.
+	Interface for a provider of a composite object.
 */
 class ICompositeObjectProvider: virtual public istd::IChangeable
 {
