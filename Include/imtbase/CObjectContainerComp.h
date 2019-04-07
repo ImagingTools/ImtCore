@@ -13,7 +13,7 @@ namespace imtbase
 
 
 /**
-	Implementation of an object container.
+	Component-based implementation of an object container. The sub-objects will be created using registered factories (via 'ObjectFactories')
 */
 class CObjectContainerComp:
 			public icomp::CComponentBase,
