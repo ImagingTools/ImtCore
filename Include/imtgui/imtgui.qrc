@@ -76,5 +76,13 @@
         <file alias="Paste">Resources/Icons/Paste.svg</file>
         <file alias="Record">Resources/Icons/Record.svg</file>
         <file alias="Parameters">Resources/Icons/Parameters.svg</file>
+        <file alias="Eye">Resources/Icons/Eye.svg</file>
+        <file alias="GeneralSettings">Resources/Icons/GeneralSettings.svg</file>
+        <file alias="History">Resources/Icons/History.svg</file>
+        <file alias="Lamp">Resources/Icons/Lamp.svg</file>
+        <file alias="Parameters2">Resources/Icons/Parameters2.svg</file>
+        <file alias="Quality">Resources/Icons/Quality.svg</file>
+        <file alias="Speed">Resources/Icons/Speed.svg</file>
+        <file alias="Timeline">Resources/Icons/Timeline.svg</file>
     </qresource>
 </RCC>
