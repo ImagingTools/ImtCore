@@ -19,6 +19,6 @@
 		Installation-related component package
 	</Description>
   <Keywords>
-    Installation Tag='Install' Company='ImagingTools GmbH' Project='Core Framework' Author='"Kirill Lepskiy"'
+    Installation Tag='Install' Company='ImagingTools' Project='Core Framework' Author='"Kirill Lepskiy"'
   </Keywords>
 </Acf>

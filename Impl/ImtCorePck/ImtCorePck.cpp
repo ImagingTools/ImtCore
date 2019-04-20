@@ -1,16 +1,18 @@
 #include "ImtCorePck.h"
 
 
+// ACF includes
 #include <icomp/export.h>
-
 
 
 namespace ImtCorePck
 {
 
 
-I_EXPORT_PACKAGE("ImtCorePck", "ImagingTools core component package", "Core Basics");
-
+I_EXPORT_PACKAGE(
+			"ImtCorePck",
+			"ImagingTools core component package",
+			IM_PROJECT("\"Core Framework\"") IM_COMPANY("ImagingTools") IM_AUTHOR("\"Kirill Lepskiy\""));
 
 I_EXPORT_COMPONENT(
 			ObjectContainer,
@@ -33,7 +35,7 @@ I_EXPORT_COMPONENT(
 			"3D Points OBJ Persistence");
 
 I_EXPORT_COMPONENT(
-			TetrahedralMesh3D,
+			TetrahedralMesh3d,
 			"3D tetrahedral mesh",
 			"3D Mesh Triangle Tetrahedral");
 

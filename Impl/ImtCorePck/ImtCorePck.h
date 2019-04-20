@@ -32,7 +32,7 @@ typedef icomp::TModelCompWrap<
 typedef imt3d::CObjPointCloudPersistenceComp ObjPointCloudPersistence;
 
 typedef icomp::TModelCompWrap<
-	icomp::TMakeComponentWrap<imt3d::CMesh3d, imt3d::IMesh3d, imt3d::IObject3d, iser::ISerializable>> TetrahedralMesh3D;
+	icomp::TMakeComponentWrap<imt3d::CMesh3d, imt3d::IMesh3d, imt3d::IObject3d, iser::ISerializable>> TetrahedralMesh3d;
 
 typedef imt3d::CStlMeshPersistenceComp StlMeshPersistence;
 

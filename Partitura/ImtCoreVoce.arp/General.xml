@@ -16,9 +16,9 @@
     </VersionInfos>
   </AcfHeader>
   <Description>
-    Base framework components
+    Core framework components of the ImagingTools SDK
   </Description>
   <Keywords>
-    Company='ImagingTools GmbH' Project='Owl'
+    Company='ImagingTools' Project='Core Framework'
   </Keywords>
 </Acf>
