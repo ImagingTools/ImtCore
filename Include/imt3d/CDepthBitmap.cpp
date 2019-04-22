@@ -167,7 +167,7 @@ bool CDepthBitmap::ConvertToQImage(QImage& result) const
 			float inputValue = inputLinePtr[x];
 
 			if (qIsNaN(inputValue)){
-				outputLinePtr[x] = qRgb(0, 0, 0);
+				outputLinePtr[x] = qRgb(255, 255, 255);
 			}
 			else{
 				if (m_depthRange.Contains(inputValue)) {

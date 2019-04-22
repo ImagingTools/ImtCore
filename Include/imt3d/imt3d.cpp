@@ -18,9 +18,18 @@ bool ConvertDepthImageToCloud(const imt3d::IDepthBitmap& bitmap, IPointCloud3d& 
 {
 	imt3d::IPointCloud3d::CloudPoints points;
 
+	bool isOrganized = true;
+
 	for (int y = 0; y < bitmap.GetImageSize().GetY(); ++y){
 		const float* linePtr = (const float*)bitmap.GetLinePtr(y);
+
 		for (int x = 0; x < bitmap.GetImageSize().GetX(); ++x){
+			if (qIsNaN(linePtr[x])){
+				isOrganized = false;
+
+				continue;
+			}
+
 			IPointCloud3d::Point3d point;
 			point[0] = x;
 			point[1] = y;
@@ -32,7 +41,7 @@ bool ConvertDepthImageToCloud(const imt3d::IDepthBitmap& bitmap, IPointCloud3d& 
 
 	istd::CIndex2d gridSize = bitmap.GetImageSize();
 
-	pointCloud.CreateCloud(points, &gridSize);
+	pointCloud.CreateCloud(points, isOrganized ? &gridSize : nullptr);
 
 	return true;
 }

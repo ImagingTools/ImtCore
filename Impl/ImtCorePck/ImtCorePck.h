@@ -37,7 +37,7 @@ typedef icomp::TModelCompWrap<
 typedef imt3d::CStlMeshPersistenceComp StlMeshPersistence;
 
 typedef icomp::TModelCompWrap<
-	icomp::TMakeComponentWrap<imt3d::CDepthBitmap, iimg::IQImageProvider, iimg::IBitmap, iimg::IRasterImage, i2d::IObject2d, iser::ISerializable>> DepthBitmap;
+	icomp::TMakeComponentWrap<imt3d::CDepthBitmap,imt3d::IDepthBitmap, iimg::IQImageProvider, iimg::IBitmap, iimg::IRasterImage, i2d::IObject2d, iser::ISerializable>> DepthBitmap;
 
 
 } // namespace ImtCorePck
