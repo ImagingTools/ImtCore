@@ -218,7 +218,7 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 
 	int stackIndex = PageStack->currentIndex();
 	if (stackIndex == LOGIN_PAGE_INDEX){
-		CurrentPageLabel->setText(tr("Log-in"));
+		CurrentPageLabel->setText(tr("Login"));
 	}
 	else if (stackIndex == HOME_PAGE_INDEX){
 		CurrentPageLabel->setText(*m_welcomeTextAttrPtr);
