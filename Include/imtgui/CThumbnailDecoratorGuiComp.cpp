@@ -437,7 +437,7 @@ void CThumbnailDecoratorGuiComp::ShowLoginPage()
 
 	UpdateLoginButtonsState();
 
-	CurrentPageLabel->setText(tr("Log-in"));
+	CurrentPageLabel->setText(tr("Login"));
 }
 
 
