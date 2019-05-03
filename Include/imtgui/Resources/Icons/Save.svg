@@ -1,68 +1,101 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 29.978 29.978" style="enable-background:new 0 0 29.978 29.978;" xml:space="preserve" width="512px" height="512px">
-<g>
-	<path d="M25.462,19.105v6.848H4.515v-6.848H0.489v8.861c0,1.111,0.9,2.012,2.016,2.012h24.967c1.115,0,2.016-0.9,2.016-2.012   v-8.861H25.462z" fill="#335777"/>
-	<path d="M14.62,18.426l-5.764-6.965c0,0-0.877-0.828,0.074-0.828s3.248,0,3.248,0s0-0.557,0-1.416c0-2.449,0-6.906,0-8.723   c0,0-0.129-0.494,0.615-0.494c0.75,0,4.035,0,4.572,0c0.536,0,0.524,0.416,0.524,0.416c0,1.762,0,6.373,0,8.742   c0,0.768,0,1.266,0,1.266s1.842,0,2.998,0c1.154,0,0.285,0.867,0.285,0.867s-4.904,6.51-5.588,7.193   C15.092,18.979,14.62,18.426,14.62,18.426z" fill="#335777"/>
-	<g>
-	</g>
-	<g>
-	</g>
-	<g>
-	</g>
-	<g>
-	</g>
-	<g>
-	</g>
-	<g>
-	</g>
-	<g>
-	</g>
-	<g>
-	</g>
-	<g>
-	</g>
-	<g>
-	</g>
-	<g>
-	</g>
-	<g>
-	</g>
-	<g>
-	</g>
-	<g>
-	</g>
-	<g>
-	</g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-</svg>
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Capa_1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 29.978 29.978"
+   style="enable-background:new 0 0 29.978 29.978;"
+   xml:space="preserve"
+   width="512px"
+   height="512px"
+   sodipodi:docname="Save.svg"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"><metadata
+     id="metadata73"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+     id="defs71" /><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1148"
+     id="namedview69"
+     showgrid="false"
+     inkscape:zoom="0.4609375"
+     inkscape:cx="-46.644068"
+     inkscape:cy="256"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Capa_1" /><g
+     id="g36"
+     transform="matrix(0.9691498,0,0,0.9375,0.46289822,0.9368125)"
+     style="stroke-width:1.04910481"><path
+       d="m 25.462,19.105 v 6.848 H 4.515 V 19.105 H 0.489 v 8.861 c 0,1.111 0.9,2.012 2.016,2.012 h 24.967 c 1.115,0 2.016,-0.9 2.016,-2.012 v -8.861 z"
+       id="path2"
+       inkscape:connector-curvature="0"
+       style="fill:#335777;stroke-width:1.08351135" /><path
+       d="M 14.62,18.426 8.856,11.461 c 0,0 -0.877,-0.828 0.074,-0.828 0.951,0 3.248,0 3.248,0 0,0 0,-0.557 0,-1.416 0,-2.449 0,-6.906 0,-8.723 0,0 -0.129,-0.494 0.615,-0.494 0.75,0 4.035,0 4.572,0 0.536,0 0.524,0.416 0.524,0.416 0,1.762 0,6.373 0,8.742 0,0.768 0,1.266 0,1.266 0,0 1.842,0 2.998,0 1.154,0 0.285,0.867 0.285,0.867 0,0 -4.904,6.51 -5.588,7.193 -0.492,0.495 -0.964,-0.058 -0.964,-0.058 z"
+       id="path4"
+       inkscape:connector-curvature="0"
+       style="fill:#335777;stroke-width:1.08351135" /><g
+       id="g6"
+       style="stroke-width:1.04910481" /><g
+       id="g8"
+       style="stroke-width:1.04910481" /><g
+       id="g10"
+       style="stroke-width:1.04910481" /><g
+       id="g12"
+       style="stroke-width:1.04910481" /><g
+       id="g14"
+       style="stroke-width:1.04910481" /><g
+       id="g16"
+       style="stroke-width:1.04910481" /><g
+       id="g18"
+       style="stroke-width:1.04910481" /><g
+       id="g20"
+       style="stroke-width:1.04910481" /><g
+       id="g22"
+       style="stroke-width:1.04910481" /><g
+       id="g24"
+       style="stroke-width:1.04910481" /><g
+       id="g26"
+       style="stroke-width:1.04910481" /><g
+       id="g28"
+       style="stroke-width:1.04910481" /><g
+       id="g30"
+       style="stroke-width:1.04910481" /><g
+       id="g32"
+       style="stroke-width:1.04910481" /><g
+       id="g34"
+       style="stroke-width:1.04910481" /></g><g
+     id="g38" /><g
+     id="g40" /><g
+     id="g42" /><g
+     id="g44" /><g
+     id="g46" /><g
+     id="g48" /><g
+     id="g50" /><g
+     id="g52" /><g
+     id="g54" /><g
+     id="g56" /><g
+     id="g58" /><g
+     id="g60" /><g
+     id="g62" /><g
+     id="g64" /><g
+     id="g66" /></svg>

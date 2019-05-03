@@ -5,7 +5,6 @@
         <file alias="Exit">Resources/Icons/Exit.svg</file>
         <file alias="Diagnostics">Resources/Icons/Diagnostics.svg</file>
         <file alias="Information">Resources/Icons/Information.svg</file>
-        <file alias="Info">Resources/Icons/Information.svg</file>
         <file alias="Magic">Resources/Icons/Magic.svg</file>
         <file alias="Menu">Resources/Icons/Menu.svg</file>
         <file alias="Play">Resources/Icons/Play.svg</file>
@@ -85,5 +84,6 @@
         <file alias="Speed">Resources/Icons/Speed.svg</file>
         <file alias="Timeline">Resources/Icons/Timeline.svg</file>
         <file alias="CameraLens3">Resources/Icons/CameraLens3.svg</file>
+        <file alias="Info">Resources/Icons/Info.svg</file>
     </qresource>
 </RCC>

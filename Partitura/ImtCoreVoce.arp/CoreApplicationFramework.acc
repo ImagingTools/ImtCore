@@ -163,6 +163,9 @@
                     <AttributeInfo Id="HorizontalSpacing" Type="Integer" ExportId="HorizontalSpacing">
                         <Data IsEnabled="true" Value="10"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="LogPageIndex" Type="Integer" ExportId="LogPageIndex">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Login" Type="Reference" ExportId="Login">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

@@ -50,6 +50,7 @@ public:
 		I_ASSIGN(m_autoLogoutMinutesAttrPtr, "AutoLogoutMinutes", "Time intervall for the automatic logout", false, 60);
 		I_ASSIGN(m_defaultPageIndexAttrPtr, "DefaultPageIndex", "Index of the default (start) page", false, -1);
 		I_ASSIGN(m_settingsPageIndexAttrPtr, "SettingsPageIndex", "Index of the system settings page", false, -1);
+		I_ASSIGN(m_logPageIndexAttrPtr, "LogPageIndex", "Index of the system log page", false, -1);
 		I_ASSIGN(m_welcomeTextAttrPtr, "WelcomeText", "Welcome text on the start page", true, "Welcome");
 		I_ASSIGN(m_closeRightIdAttrPtr, "CloseRightId", "ID of the user right to close the application", true, "Close");
 	I_END_COMPONENT;
@@ -66,6 +67,7 @@ protected:
 	I_ATTR(int, m_autoLogoutMinutesAttrPtr);
 	I_ATTR(int, m_defaultPageIndexAttrPtr);
 	I_ATTR(int, m_settingsPageIndexAttrPtr);
+	I_ATTR(int, m_logPageIndexAttrPtr);
 	I_TEXTATTR(m_welcomeTextAttrPtr);
 	I_ATTR(QByteArray, m_closeRightIdAttrPtr);
 };
@@ -141,6 +143,7 @@ private Q_SLOTS:
 	void on_LoginButton_clicked();
 	void on_LoginControlButton_clicked();
 	void on_SettingsButton_clicked();
+	void on_LogButton_clicked();
 	void Logout();
 
 private:
@@ -227,9 +230,23 @@ private:
 	};
 
 
+	class PageVisualStatusObserver: public imod::CMultiModelDispatcherBase
+	{
+	public:
+		explicit PageVisualStatusObserver(CThumbnailDecoratorGuiComp& parent);
+
+		// reimplemented (imod::CMultiModelDispatcherBase)
+		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+
+	private:
+		CThumbnailDecoratorGuiComp& m_parent;
+	};
+
+
 	CommandsObserver m_commandsObserver;
 	PageModelObserver m_pageModelObserver;
 	LoginObserver m_loginObserver;
+	PageVisualStatusObserver m_pageVisualStatusObserver;
 
 	QStandardItemModel m_menuItemModel;
 

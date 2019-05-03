@@ -39,37 +39,39 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1920"
-     inkscape:window-height="1028"
+     inkscape:window-height="1148"
      id="namedview12"
      showgrid="false"
-     inkscape:zoom="0.4609375"
-     inkscape:cx="-538.0339"
-     inkscape:cy="256"
+     inkscape:zoom="0.921875"
+     inkscape:cx="-148.44276"
+     inkscape:cy="121.26025"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg10" />
   <g
-     id="g819">
+     id="g819"
+     transform="matrix(1.0699152,0,0,1.0726392,-0.5593216,-0.5811136)"
+     style="stroke-width:0.93346596">
     <path
-       style="fill:#335777;fill-opacity:1"
+       style="fill:#335777;fill-opacity:1;stroke-width:0.93346596"
        id="path2"
-       d="M5.3 6.7l1.4-1.4-3-3 1.3-1.3h-4v4l1.3-1.3z"
-       fill="#335777" />
+       d="M 5.3,6.7 6.7,5.3 3.7,2.3 5,1 H 1 V 5 L 2.3,3.7 Z"
+       inkscape:connector-curvature="0" />
     <path
-       style="fill:#335777;fill-opacity:1"
+       style="fill:#335777;fill-opacity:1;stroke-width:0.93346596"
        id="path4"
-       d="M6.7 10.7l-1.4-1.4-3 3-1.3-1.3v4h4l-1.3-1.3z"
-       fill="#335777" />
+       d="M 6.7,10.7 5.3,9.3 2.3,12.3 1,11 v 4 H 5 L 3.7,13.7 Z"
+       inkscape:connector-curvature="0" />
     <path
-       style="fill:#335777;fill-opacity:1"
+       style="fill:#335777;fill-opacity:1;stroke-width:0.93346596"
        id="path6"
-       d="M10.7 9.3l-1.4 1.4 3 3-1.3 1.3h4v-4l-1.3 1.3z"
-       fill="#335777" />
+       d="m 10.7,9.3 -1.4,1.4 3,3 L 11,15 h 4 v -4 l -1.3,1.3 z"
+       inkscape:connector-curvature="0" />
     <path
-       style="fill:#335777;fill-opacity:1"
+       style="fill:#335777;fill-opacity:1;stroke-width:0.93346596"
        id="path8"
-       d="M11 1l1.3 1.3-3 3 1.4 1.4 3-3 1.3 1.3v-4z"
-       fill="#335777" />
+       d="m 11,1 1.3,1.3 -3,3 1.4,1.4 3,-3 L 15,5 V 1 Z"
+       inkscape:connector-curvature="0" />
   </g>
 </svg>

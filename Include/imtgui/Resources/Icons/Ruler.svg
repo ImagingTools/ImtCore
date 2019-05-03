@@ -1,38 +1,67 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" width="512px" height="512px" viewBox="0 0 490.728 490.728" style="enable-background:new 0 0 490.728 490.728;" xml:space="preserve">
-<g>
-	<path d="M168.19,289.146l8.636,8.634L40.309,434.284L0,393.978l136.501-136.51l8.642,8.635l133.054-133.052l-4.841-4.837   l6.909-6.908l4.833,4.842l23.043,23.04l3.796,3.8l-6.906,6.903l-3.797-3.8L168.19,289.146z M171.641,222.324l23.096-23.098   l32.137-32.14l23.098-23.097l-8.644-8.635l-23.094,23.097c-9.023-5.201-20.728-4.035-28.449,3.686   c-7.721,7.721-8.886,19.42-3.682,28.449L163,213.684L171.641,222.324z M290.289,184.31l-3.448-3.458l-78.335,78.335l12.093,12.099   l0.065-0.078c0.131,0.166,0.219,0.357,0.367,0.51c3.579,3.579,10.994,1.964,16.561-3.606c5.566-5.56,7.173-12.975,3.598-16.558   c-0.145-0.143-0.343-0.229-0.499-0.359l23.968-23.966c63.915,51.253,111.455,42.904,111.455,42.904l-77.179-77.18L290.289,184.31z    M359.412,61.042l-8.646,8.642l-13.242-13.24l-41.467,41.463l13.242,13.246l-14.97,14.979l23.616,23.617l18.429-18.43   l24.771,33.979l125.557,125.565l4.025-28.22C472.299,154.359,359.412,61.042,359.412,61.042z" fill="#335777"/>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-</svg>
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Capa_1"
+   x="0px"
+   y="0px"
+   width="512px"
+   height="512px"
+   viewBox="0 0 490.728 490.728"
+   style="enable-background:new 0 0 490.728 490.728;"
+   xml:space="preserve"
+   sodipodi:docname="Ruler.svg"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"><metadata
+     id="metadata41"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+     id="defs39" /><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1148"
+     id="namedview37"
+     showgrid="false"
+     inkscape:zoom="0.4609375"
+     inkscape:cx="-46.644068"
+     inkscape:cy="256"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Capa_1" /><g
+     id="g4"
+     transform="matrix(0.93750191,0,0,0.93856568,15.33525,15.07377)"
+     style="stroke-width:1.06605983"><path
+       d="m 168.19,289.146 8.636,8.634 L 40.309,434.284 0,393.978 l 136.501,-136.51 8.642,8.635 133.054,-133.052 -4.841,-4.837 6.909,-6.908 4.833,4.842 23.043,23.04 3.796,3.8 -6.906,6.903 -3.797,-3.8 z m 3.451,-66.822 23.096,-23.098 32.137,-32.14 23.098,-23.097 -8.644,-8.635 -23.094,23.097 c -9.023,-5.201 -20.728,-4.035 -28.449,3.686 -7.721,7.721 -8.886,19.42 -3.682,28.449 L 163,213.684 Z m 118.648,-38.014 -3.448,-3.458 -78.335,78.335 12.093,12.099 0.065,-0.078 c 0.131,0.166 0.219,0.357 0.367,0.51 3.579,3.579 10.994,1.964 16.561,-3.606 5.566,-5.56 7.173,-12.975 3.598,-16.558 -0.145,-0.143 -0.343,-0.229 -0.499,-0.359 l 23.968,-23.966 c 63.915,51.253 111.455,42.904 111.455,42.904 l -77.179,-77.18 z m 69.123,-123.268 -8.646,8.642 -13.242,-13.24 -41.467,41.463 13.242,13.246 -14.97,14.979 23.616,23.617 18.429,-18.43 24.771,33.979 125.557,125.565 4.025,-28.22 C 472.299,154.359 359.412,61.042 359.412,61.042 Z"
+       id="path2"
+       inkscape:connector-curvature="0"
+       style="fill:#335777;stroke-width:1.10102069" /></g><g
+     id="g6" /><g
+     id="g8" /><g
+     id="g10" /><g
+     id="g12" /><g
+     id="g14" /><g
+     id="g16" /><g
+     id="g18" /><g
+     id="g20" /><g
+     id="g22" /><g
+     id="g24" /><g
+     id="g26" /><g
+     id="g28" /><g
+     id="g30" /><g
+     id="g32" /><g
+     id="g34" /></svg>

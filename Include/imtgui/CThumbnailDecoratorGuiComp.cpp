@@ -35,6 +35,7 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_commandsObserver(*this),
 	m_pageModelObserver(*this),
 	m_loginObserver(*this),
+	m_pageVisualStatusObserver(*this),
 	m_columnsCount(0),
 	m_rowsCount(0),
 	m_verticalSpacing(0),
@@ -191,6 +192,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	installEventFilter(this);
 
 	SettingsButton->setVisible(m_settingsPageIndexAttrPtr.IsValid());
+	LogButton->setVisible(m_logPageIndexAttrPtr.IsValid());
 
 	UpdateLoginButtonsState();
 
@@ -207,6 +209,7 @@ void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 	m_pageModelObserver.UnregisterAllModels();
 	m_commandsObserver.UnregisterAllModels();
 	m_loginObserver.UnregisterAllModels();
+	m_pageVisualStatusObserver.UnregisterAllModels();
 
 	BaseClass::OnGuiDestroyed();
 }
@@ -412,6 +415,21 @@ void CThumbnailDecoratorGuiComp::on_SettingsButton_clicked()
 }
 
 
+void CThumbnailDecoratorGuiComp::on_LogButton_clicked()
+{
+	Q_ASSERT(m_logPageIndexAttrPtr.IsValid());
+
+	for (ItemInfoMap::Iterator itemIter = m_itemInfoMap.begin(); itemIter != m_itemInfoMap.end(); ++itemIter){
+		int pageIndex = itemIter.value().pageIndex;
+		if (pageIndex == *m_logPageIndexAttrPtr){
+			QStandardItem* itemPtr = itemIter.key();
+
+			on_PageList_clicked(itemPtr->index());
+		}
+	}
+}
+
+
 void CThumbnailDecoratorGuiComp::Logout()
 {
 	if (m_loginCompPtr.IsValid() && m_loginCompPtr->Logout()){
@@ -552,6 +570,7 @@ void CThumbnailDecoratorGuiComp::CreatePages(const iprm::ISelectionParam* select
 
 	m_itemInfoMap.clear();
 	m_menuItemModel.clear();
+	m_pageVisualStatusObserver.UnregisterAllModels();
 
 	const iqtgui::IMultiVisualStatusProvider* visualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(selectionPtr);
 
@@ -582,6 +601,11 @@ void CThumbnailDecoratorGuiComp::CreatePages(const iprm::ISelectionParam* select
 			const iqtgui::IVisualStatus* statusPtr = visualStatusProviderPtr->GetVisualStatus(itemIndex);
 			if (statusPtr != nullptr){
 				menuItem->setIcon(statusPtr->GetStatusIcon());
+
+				imod::IModel* statusModelPtr = dynamic_cast<imod::IModel*>(const_cast<iqtgui::IVisualStatus*>(statusPtr));
+				if (statusModelPtr != nullptr){
+					m_pageVisualStatusObserver.RegisterModel(statusModelPtr, itemIndex);
+				}
 			}
 		}
 
@@ -682,6 +706,8 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 		int pagesCount = pageListPtr->GetOptionsCount();
 		int selectedPageIndex = 0;
 
+		const iqtgui::IMultiVisualStatusProvider* pageVisualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(m_pagesCompPtr.GetPtr());
+
 		for (ItemInfoMap::Iterator itemIter = m_itemInfoMap.begin(); itemIter != m_itemInfoMap.end(); ++itemIter){
 			int pageIndex = itemIter.value().pageIndex;
 			if (pageIndex < pagesCount){
@@ -699,12 +725,25 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 					itemPtr->setEnabled(isItemEnabled);
 					itemPtr->setData(isItemEnabled, CThumbpageItemGuiDelegate::DR_STATE);
 					itemPtr->setText(itemName);
+
+					if (pageVisualStatusProviderPtr != nullptr){
+						const iqtgui::IVisualStatus* pageStatusPtr = pageVisualStatusProviderPtr->GetVisualStatus(pageIndex);
+						if (pageStatusPtr != nullptr){
+							itemPtr->setIcon(pageStatusPtr->GetStatusIcon());
+						}
+
+						if (m_logPageIndexAttrPtr.IsValid() && (pageIndex == *m_logPageIndexAttrPtr)){
+							LogButton->setIcon(pageStatusPtr->GetStatusIcon());
+						}
+					}
 				}
 			}
 
 			if (selectedPageIndex >= 0){
 				iprm::ISelectionParam* subMenuPtr = m_pagesCompPtr->GetSubselection(selectedPageIndex);
 				if (subMenuPtr != NULL){
+					const iqtgui::IMultiVisualStatusProvider* subPageVisualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(subMenuPtr);
+
 					const iprm::IOptionsList* subPageListPtr = subMenuPtr->GetSelectionConstraints();
 					if (subPageListPtr != NULL){
 						for (MenuItemInfoMap::Iterator subPageIter = m_subPageItemMap.begin(); subPageIter != m_subPageItemMap.end(); ++subPageIter){
@@ -713,6 +752,13 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 							bool isPageEnabled = subPageListPtr->IsOptionEnabled(subPageIndex);
 
 							subPageIter.key()->setDisabled(!isPageEnabled);
+
+							if (subPageVisualStatusProviderPtr != nullptr){
+								const iqtgui::IVisualStatus* subPageStatusPtr = subPageVisualStatusProviderPtr->GetVisualStatus(pageIndex);
+								if (subPageStatusPtr != nullptr){
+									subPageIter.key()->setIcon(0, subPageStatusPtr->GetStatusIcon());
+								}
+							}
 						}
 					}
 				}
@@ -961,6 +1007,23 @@ void CThumbnailDecoratorGuiComp::LoginObserver::OnModelChanged(int /*modelId*/, 
 {
 	m_parent.UpdateLoginButtonsState();
 }
+
+
+// protected methods of embedded class PageStatusObserver
+
+CThumbnailDecoratorGuiComp::PageVisualStatusObserver::PageVisualStatusObserver(CThumbnailDecoratorGuiComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CThumbnailDecoratorGuiComp::PageVisualStatusObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	m_parent.UpdatePageState();
+}
+
 
 
 } // namespace imtgui
