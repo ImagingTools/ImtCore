@@ -19,7 +19,7 @@ namespace imt3d
 class CDepthBitmap:
 			virtual public imt3d::IDepthBitmap,
 			public iimg::CReflectedBitmapBase,
-			public idoc::CStandardDocumentMetaInfo 
+			public idoc::CStandardDocumentMetaInfo
 {
 public:
 	typedef iimg::CReflectedBitmapBase BaseClass;
