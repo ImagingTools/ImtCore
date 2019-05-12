@@ -5,13 +5,13 @@
     <name>Attribute</name>
     <message>
         <location filename="../../../AuxInclude/Qt5_VC12_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+29"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+29"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+31"/>
         <source>Report</source>
         <translation>Bericht</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
         <source>Report Files</source>
         <translation>Berichte</translation>
     </message>
@@ -23,9 +23,45 @@
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>ImagingTools GmbH</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <source>ImtCore</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>CFileRepositoryGuiComp</name>
+    <message>
+        <location filename="../../../Include/imtrepogui/CFileRepositoryGuiComp.ui" line="+14"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileRepositoryGuiComp.h" line="+250"/>
+        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileRepositoryGuiComp.h" line="+250"/>
+        <source>File Repository</source>
+        <translation>Date-Repository</translation>
+    </message>
+    <message>
+        <location line="+90"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileRepositoryGuiComp.h" line="+1"/>
+        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileRepositoryGuiComp.h" line="+1"/>
+        <source>Search</source>
+        <translation>Suche</translation>
+    </message>
+    <message>
+        <location line="+151"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileRepositoryGuiComp.h" line="+3"/>
+        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileRepositoryGuiComp.h" line="+3"/>
+        <source>Resource Type</source>
+        <translation>Resourcentyp</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileRepositoryGuiComp.h" line="-1"/>
+        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileRepositoryGuiComp.h" line="-1"/>
+        <source>Count</source>
+        <translation>Anzahl</translation>
     </message>
 </context>
 <context>
@@ -45,9 +81,9 @@
     <message>
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC12_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+522"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+521"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+532"/>
         <location filename="../../../Install/Temp/AuxInclude/Qt5_VC12_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+522"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+521"/>
+        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+532"/>
         <source>Main Window</source>
         <translation></translation>
     </message>
@@ -71,6 +107,13 @@
     </message>
     <message>
         <location line="+79"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
+        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
+        <source>Log</source>
+        <translation>Protokoll</translation>
+    </message>
+    <message>
+        <location line="+20"/>
         <location filename="../../../AuxInclude/Qt5_VC12_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <location filename="../../../Install/Temp/AuxInclude/Qt5_VC12_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
@@ -134,15 +177,169 @@
     </message>
 </context>
 <context>
-    <name>imtgui::CThumbnailDecoratorGuiComp</name>
+    <name>QCoreApplication</name>
     <message>
-        <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+206"/>
-        <location line="+213"/>
-        <source>Log-in</source>
-        <translation>Login</translation>
+        <location filename="../../../Include/imtrepogui/CRepositoryDefaultDocumentDelegate.cpp" line="+272"/>
+        <source>View...</source>
+        <translation>Ansicht...</translation>
     </message>
     <message>
-        <location line="-157"/>
+        <location line="+0"/>
+        <source>View</source>
+        <translation>Ansicht
+</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>View contents of the file resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>&amp;File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>File menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Create a new file resource in the repository</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Edit...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Edit contents of the file resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Import File...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Import an existing file into the repository</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Update...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Update an existing file resource in the repository</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Export...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Export the file from the repository</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Duplicate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Duplicate selected resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Remove File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Remove an existing file from the repository</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Rename File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Rename an existing file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Lock File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Lock resource in the repository</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>imtgui::CThumbnailDecoratorGuiComp</name>
+    <message>
+        <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+224"/>
+        <location line="+234"/>
+        <source>Login</source>
+        <translation>Einloggen</translation>
+    </message>
+    <message>
+        <location line="-178"/>
         <source>Quit</source>
         <translation>Beenden</translation>
     </message>
@@ -152,7 +349,7 @@
         <translation>Möchten Sie die Applikation beenden?</translation>
     </message>
     <message>
-        <location line="+81"/>
+        <location line="+83"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
@@ -162,10 +359,191 @@
         <translation>Falsches Passwort</translation>
     </message>
     <message>
-        <location line="+206"/>
-        <location line="+125"/>
+        <location line="+226"/>
+        <location line="+132"/>
         <source>&lt;unnamed&gt;</source>
         <translation>&lt;unbenannt&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>imtrepo::CFileRepositoryComp</name>
+    <message>
+        <location filename="../../../Include/imtrepo/CFileRepositoryComp.cpp" line="+1261"/>
+        <source>Input file name %1 renamed to %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>imtrepogui::CFileRepositoryGuiComp</name>
+    <message>
+        <location filename="../../../Include/imtrepogui/CFileRepositoryGuiComp.cpp" line="+200"/>
+        <location line="+1099"/>
+        <location line="+7"/>
+        <source>Resource Manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1106"/>
+        <source>The resource could not be created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+657"/>
+        <source>Waiting for upload data to the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+41"/>
+        <source>No valid License available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+88"/>
+        <source>Resource name: %1 
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+313"/>
+        <source>The resource cannot be edited</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>The resource &apos;%1&apos; could not be donwloaded from the repository</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Select file to be added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Do you realy want to remove the selected resource(s)?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Delete Resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+97"/>
+        <source>Enter the new name of the resource</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+158"/>
+        <source>Select file to be updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>File update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>File could not be updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <location line="+96"/>
+        <source>Enter the name for the exported file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-90"/>
+        <source>Exported file(*.%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+44"/>
+        <source>Export standard GMG profiles? 
+ If you select &apos;Yes&apos; export may take a longer time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+56"/>
+        <source>File export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>File could not exported</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>imtrepogui::CFileRepositoryGuiComp::ResourcePersistence</name>
+    <message>
+        <location line="+388"/>
+        <source>Repository Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Resource with this name is already existed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>imtrepogui::CRepositoryDefaultDocumentDelegate</name>
+    <message>
+        <location filename="../../../Include/imtrepogui/CRepositoryDefaultDocumentDelegate.cpp" line="-183"/>
+        <source>Copy of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <location line="+12"/>
+        <source>Resource duplicating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-12"/>
+        <source>Resource could not be duplicated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Resource could not be duplicated. You have possibly problems with the license or there is no connection to the server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+40"/>
+        <location line="+4"/>
+        <location line="+11"/>
+        <location line="+9"/>
+        <source>Repository Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-24"/>
+        <source>Resource with this name is already existed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The resource name could not be set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>The resource description could not be set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>The resource could not be updated</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
