@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <iimg/IRasterImage.h>
+#include <istd/TOptDelPtr.h>
 
 // ImtCore includes
 #include <imt3d/imt3d.h>
@@ -25,12 +26,15 @@ class CPointCloud3d: virtual public IPointCloud3d, virtual public IGridInfo
 public:
 	CPointCloud3d();
 
-	static bool IsPointValid(const Point3d& position);
-	static Point3d GetInvalidPoint();
-
 	// reimplemented (IPointCloud3d)
-	virtual void CreateCloud(const CloudPoints &points, const istd::CIndex2d* gridSizePtr = nullptr) override;
-	virtual const CloudPoints& GetPoints() const override;
+	bool CreateCloud(PointFormat pointFormat,
+			int pointsCount,
+			void* dataPtr,
+			bool releaseFlag,
+			const istd::CIndex2d* gridSizePtr = nullptr) override;
+	PointFormat GetPointFormat() const override;
+	int GetPointsCount() const override;
+	const void* GetPointData(int pointIndex) const override;
 
 	// reimplemented (IGridInfo)
 	virtual istd::CIndex2d GetGridSize() const override;
@@ -57,10 +61,22 @@ protected:
 
 private:
 	void EnsureCenterCalculated() const;
+	template <typename DataType> void TEnsureCenterCalculated() const;
 	void EnsureCuboidCalculated() const;
+	template <typename DataType> void TEnsureCuboidCalculated() const;
+	template <typename DataType> DataType* TGetPointData(int pointIndex, bool validOnly) const;
+	template <typename DataType> void TMoveCenterTo(const i3d::CVector3d& position);
+	template <typename DataType> void GetBoundingRanges(istd::CRange& xRange, istd::CRange& yRange, istd::CRange& zRange) const;
+	template <typename DataType> bool IsPointValid(const DataType& pointData) const;
+	int GetDataSize() const;
+	void ReallocateData();
 
 private:
-	CloudPoints m_cloudPoints;
+	istd::TOptDelPtr<quint8, true> m_dataPtr;
+	PointFormat m_pointFormat;
+	int m_pointsCount;
+	int m_componentsCount;
+
 	istd::CIndex2d m_gridSize;
 
 	mutable i3d::CVector3d m_cloudCenter;

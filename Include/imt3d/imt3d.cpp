@@ -16,40 +16,44 @@ namespace imt3d
 
 bool ConvertDepthImageToCloud(const imt3d::IDepthBitmap& bitmap, IPointCloud3d& pointCloud)
 {
-	imt3d::IPointCloud3d::CloudPoints points;
+	istd::CIndex2d bitmapSize = bitmap.GetImageSize();
+
+	QVector<float> pointCoordinates;
+	pointCoordinates.reserve(bitmapSize.GetX() * bitmapSize.GetY());
 
 	bool isOrganized = true;
 
-	for (int y = 0; y < bitmap.GetImageSize().GetY(); ++y){
+	for (int y = 0; y < bitmapSize.GetY(); ++y){
 		const float* linePtr = (const float*)bitmap.GetLinePtr(y);
 
-		for (int x = 0; x < bitmap.GetImageSize().GetX(); ++x){
+		for (int x = 0; x < bitmapSize.GetX(); ++x){
 			if (qIsNaN(linePtr[x])){
 				isOrganized = false;
 
 				continue;
 			}
 
-			IPointCloud3d::Point3d point;
-			point[0] = x;
-			point[1] = y;
-			point[2] = linePtr[x];
-
-			points.push_back(point);
+			pointCoordinates.push_back(static_cast<float>(x));
+			pointCoordinates.push_back(static_cast<float>(y));
+			pointCoordinates.push_back(static_cast<float>(linePtr[x]));
 		}
 	}
 
-	istd::CIndex2d gridSize = bitmap.GetImageSize();
+	int pointsCount = pointCoordinates.size() / 3;
 
-	pointCloud.CreateCloud(points, isOrganized ? &gridSize : nullptr);
+	float* pointsDataPtr = new float[pointCoordinates.size()];
+	memcpy(pointsDataPtr, pointCoordinates.constData(), pointCoordinates.size() * sizeof(float));
 
-	return true;
+	istd::CIndex2d* gridSizePtr = isOrganized ? &bitmapSize : nullptr;
+
+	return pointCloud.CreateCloud(IPointCloud3d::PF_XYZF, pointsCount, pointsDataPtr, true, gridSizePtr);
 }
 
 
 bool imt3d::ConvertPointCloudToDepthBitmap(const IPointCloud3d& pointCloud, imt3d::IDepthBitmap& bitmap)
 {
 	const imt3d::IGridInfo* gridInfoPtr = dynamic_cast<const imt3d::IGridInfo*>(&pointCloud);
+
 	if (gridInfoPtr != nullptr){
 		istd::CIndex2d gridSize = gridInfoPtr->GetGridSize();
 		if (gridSize.GetProductVolume() > 0){
@@ -58,17 +62,16 @@ bool imt3d::ConvertPointCloudToDepthBitmap(const IPointCloud3d& pointCloud, imt3
 
 			istd::CChangeNotifier bitmapChangeNotifier(&bitmap);
 
-			if (bitmap.CreateDepthBitmap(depthRange, gridInfoPtr->GetGridSize())){
-				const imt3d::IPointCloud3d::CloudPoints& points = pointCloud.GetPoints();
-				for (int pointIndex = 0; pointIndex < int(points.size()); ++pointIndex){
+			if (bitmap.CreateDepthBitmap(depthRange, gridSize)){
+				for (int pointIndex = 0; pointIndex < pointCloud.GetPointsCount(); ++pointIndex){
+					const float* pointDataPtr = static_cast<const float*>(pointCloud.GetPointData(pointIndex));
 					istd::CIndex2d imagePos = gridInfoPtr->GetGridPosition(pointIndex);
 
 					float* imageLinePtr = (float*)bitmap.GetLinePtr(imagePos.GetY());
-
-					imageLinePtr[imagePos.GetX()] = points[pointIndex][2];
+					imageLinePtr[imagePos.GetX()] = pointDataPtr[2];
 				}
 
-			return true;
+				return true;
 			}
 		}
 	}

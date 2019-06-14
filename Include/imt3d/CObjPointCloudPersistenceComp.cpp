@@ -3,13 +3,9 @@
 
 // Qt includes
 #include <QtCore/QFile>
-#include <QtCore/QTextStream>
 
 // ACF includes
 #include <istd/CChangeGroup.h>
-
-// ImtCore includes
-#include <imt3d/CPointCloud3d.h>
 
 
 namespace imt3d
@@ -68,7 +64,7 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 
 	QTextStream stream(&file);
 
-	IPointCloud3d::CloudPoints cloudPoints;
+	QVector<float> pointComponents;
 
 	while (!stream.atEnd()){
 		QString line = stream.readLine();
@@ -79,6 +75,7 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 			QString valueKey = components[0].simplified();
 			if (valueKey == "v"){
 				bool ok = false;
+
 				double x = components[1].toDouble(&ok);
 				if (!ok){
 					continue;
@@ -88,25 +85,27 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 				if (!ok){
 					continue;
 				}
+
 				double z = components[3].toDouble(&ok);
 				if (!ok){
 					continue;
 				}
 
-				IPointCloud3d::Point3d point;
-				point[0] = x;
-				point[1] = y;
-				point[2] = z;
-				cloudPoints.push_back(point);
+				pointComponents.push_back(x);
+				pointComponents.push_back(y);
+				pointComponents.push_back(z);
 			}
 		}
 	}
 
-	documentPtr->CreateCloud(cloudPoints);
-
 	file.close();
 
-	return OS_OK;
+	int pointsCount = pointComponents.size() / 3;
+
+	float* pointsDataPtr = new float[pointComponents.size()];
+	memcpy(pointsDataPtr, pointComponents.constData(), pointComponents.size() * sizeof(float));
+
+	return documentPtr->CreateCloud(IPointCloud3d::PF_XYZF, pointsCount, pointsDataPtr, true) ? OS_OK : OS_FAILED;
 }
 
 
@@ -126,16 +125,7 @@ int CObjPointCloudPersistenceComp::SaveToFile(const istd::IChangeable& data, con
 
 	QTextStream stream(&file);
 
-	const IPointCloud3d::CloudPoints& points = documentPtr->GetPoints();
-	for (IPointCloud3d::CloudPoints::const_iterator iter = points.cbegin(); iter != points.cend(); ++iter){
-		QString textLine = QString("v %1 %2 %3").arg((*iter)[0]).arg((*iter)[1]).arg((*iter)[2]);
-
-		stream << textLine << "\n";
-	}
-	
-	file.close();
-
-	return OS_OK;
+	CALL_TEMPLATED_POINTCLOUD_METHOD(documentPtr, SaveToFileHelper, OS_FAILED, *documentPtr, stream);
 }
 
 
