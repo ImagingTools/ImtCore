@@ -68,7 +68,16 @@ int CPointCloud3d::GetPointsCount() const
 
 const void* CPointCloud3d::GetPointData(int pointIndex) const
 {
-	CALL_TEMPLATED_POINTCLOUD_METHOD(this, TGetPointData, nullptr, pointIndex, false);
+	switch (m_pointFormat){
+		case imt3d::IPointCloud3d::PF_XYZF:
+			return TGetPointData<PointStructXyzF>(pointIndex, false);
+		case imt3d::IPointCloud3d::PF_XYZD:
+			return TGetPointData<PointStructXyzD>(pointIndex, false);
+		case imt3d::IPointCloud3d::PF_XYZF_1I:
+			return TGetPointData<PointStructXyzF1I>(pointIndex, false);
+		default:
+			return nullptr;
+	}
 }
 
 
@@ -127,7 +136,14 @@ i3d::CVector3d CPointCloud3d::GetCenter() const
 
 void CPointCloud3d::MoveCenterTo(const i3d::CVector3d& position)
 {
-	CALL_TEMPLATED_POINTCLOUD_METHOD(this, TMoveCenterTo, , position);
+	switch (m_pointFormat){
+		case imt3d::IPointCloud3d::PF_XYZF:
+			return TMoveCenterTo<PointStructXyzF>(position);
+		case imt3d::IPointCloud3d::PF_XYZD:
+			return TMoveCenterTo<PointStructXyzD>(position);
+		case imt3d::IPointCloud3d::PF_XYZF_1I:
+			return TMoveCenterTo<PointStructXyzF1I>(position);
+	}
 }
 
 
@@ -258,7 +274,14 @@ void CPointCloud3d::OnEndChanges(const ChangeSet& /*changes*/)
 
 void CPointCloud3d::EnsureCenterCalculated() const
 {
-	CALL_TEMPLATED_POINTCLOUD_METHOD(this, TEnsureCenterCalculated,,);
+	switch (m_pointFormat){
+		case imt3d::IPointCloud3d::PF_XYZF:
+			return TEnsureCenterCalculated<PointStructXyzF>();
+		case imt3d::IPointCloud3d::PF_XYZD:
+			return TEnsureCenterCalculated<PointStructXyzD>();
+		case imt3d::IPointCloud3d::PF_XYZF_1I:
+			return TEnsureCenterCalculated<PointStructXyzF1I>();
+	}
 }
 
 
@@ -283,7 +306,14 @@ void CPointCloud3d::TEnsureCenterCalculated() const
 
 void CPointCloud3d::EnsureCuboidCalculated() const
 {
-	CALL_TEMPLATED_POINTCLOUD_METHOD(this, TEnsureCuboidCalculated,,);
+	switch (m_pointFormat){
+		case imt3d::IPointCloud3d::PF_XYZF:
+			return TEnsureCuboidCalculated<PointStructXyzF>();
+		case imt3d::IPointCloud3d::PF_XYZD:
+			return TEnsureCuboidCalculated<PointStructXyzD>();
+		case imt3d::IPointCloud3d::PF_XYZF_1I:
+			return TEnsureCuboidCalculated<PointStructXyzF1I>();
+	}
 }
 
 

@@ -65,20 +65,6 @@ public:
 };
 
 
-// macro to call templated method to process typed point cloud data
-#define CALL_TEMPLATED_POINTCLOUD_METHOD(pointCloudPtr, templatedMethod, defaultResult, ...) \
-switch (pointCloudPtr->GetPointFormat()){ \
-	case imt3d::IPointCloud3d::PF_XYZF: \
-		return templatedMethod<imt3d::IPointCloud3d::PointStructXyzF>(##__VA_ARGS__); \
-	case imt3d::IPointCloud3d::PF_XYZD: \
-		return templatedMethod<imt3d::IPointCloud3d::PointStructXyzD>(##__VA_ARGS__); \
-	case imt3d::IPointCloud3d::PF_XYZF_1I: \
-		return templatedMethod<imt3d::IPointCloud3d::PointStructXyzF1I>(##__VA_ARGS__); \
-	default: \
-		return defaultResult; \
-}
-
-
 } // namespace imt3d
 
 

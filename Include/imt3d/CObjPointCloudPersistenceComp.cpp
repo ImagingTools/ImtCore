@@ -125,7 +125,16 @@ int CObjPointCloudPersistenceComp::SaveToFile(const istd::IChangeable& data, con
 
 	QTextStream stream(&file);
 
-	CALL_TEMPLATED_POINTCLOUD_METHOD(documentPtr, SaveToFileHelper, OS_FAILED, *documentPtr, stream);
+	switch (documentPtr->GetPointFormat()){
+		case imt3d::IPointCloud3d::PF_XYZF:
+			return SaveToFileHelper<imt3d::IPointCloud3d::PointStructXyzF>(*documentPtr, stream);
+		case imt3d::IPointCloud3d::PF_XYZD:
+			return SaveToFileHelper<imt3d::IPointCloud3d::PointStructXyzD>(*documentPtr, stream);
+		case imt3d::IPointCloud3d::PF_XYZF_1I:
+			return SaveToFileHelper<imt3d::IPointCloud3d::PointStructXyzF1I>(*documentPtr, stream);
+		default:
+			return OS_FAILED;
+	}
 }
 
 
