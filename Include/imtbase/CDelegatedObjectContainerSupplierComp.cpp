@@ -7,7 +7,7 @@ namespace imtbase
 
 // reimplemented (imtbase::ICompositeObjectProvider)
 
-const imtbase::IObjectContainer* CDelegatedObjectContainerSupplierComp::GetCompositeObject() const
+const imtbase::IObjectManager* CDelegatedObjectContainerSupplierComp::GetCompositeObject() const
 {
 	if (m_objectProviderCompPtr.IsValid()){
 		return m_objectProviderCompPtr->GetCompositeObject();

@@ -27,7 +27,21 @@ CObjectContainer::~CObjectContainer()
 }
 
 
-// reimplemented (IObjectContainer)
+// reimplemented (IObjectManager)
+
+int CObjectContainer::GetOperationFlags(const QByteArray& objectId) const
+{
+	if (!objectId.isEmpty()){
+		for (const ObjectInfo& objectInfo : m_objects){
+			if (objectInfo.id == objectId){
+				return objectInfo.flags;
+			}
+		}
+	}
+
+	return OF_DEFAULT;
+}
+
 
 QByteArray CObjectContainer::InsertNewObject(
 			const QByteArray& typeId,
@@ -58,6 +72,18 @@ QByteArray CObjectContainer::InsertNewObject(
 }
 
 
+CObjectContainer::ObjectPtr CObjectContainer::GetEditableObject(const QByteArray& objectId)
+{
+	for (const ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == objectId){
+			return objectInfo.object;
+		}
+	}
+
+	return ObjectPtr();
+}
+
+
 bool CObjectContainer::RemoveObject(const QByteArray& objectId)
 {
 	for (Objects::iterator iter = m_objects.begin(); iter != m_objects.end(); ++iter){
@@ -77,17 +103,59 @@ bool CObjectContainer::RemoveObject(const QByteArray& objectId)
 }
 
 
-istd::IChangeable* CObjectContainer::GetEditableObject(const QByteArray& objectId) const
+void CObjectContainer::SetObjectName(const QByteArray& objectId, const QString& objectName)
 {
-	return const_cast<istd::IChangeable*>(GetDataObject(objectId));
+	for (ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == objectId){
+			istd::CChangeNotifier changeNotifier(this);
+
+			objectInfo.name = objectName;
+		}
+	}
+}
+
+
+void CObjectContainer::SetObjectDescription(const QByteArray& objectId, const QString& objectDescription)
+{
+	for (ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == objectId){
+			istd::CChangeNotifier changeNotifier(this);
+
+			objectInfo.description = objectDescription;
+		}
+	}
+}
+
+
+void CObjectContainer::SetObjectEnabled(const QByteArray& objectId, bool isEnabled)
+{
+	for (ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == objectId){
+			istd::CChangeNotifier changeNotifier(this);
+
+			objectInfo.isEnabled = isEnabled;
+		}
+	}
 }
 
 
 // reimplemented (IObjectProvider)
 
-const iprm::IOptionsList& CObjectContainer::GetObjectInfoList() const
+const iprm::IOptionsList* CObjectContainer::GetSupportedObjectTypes() const
 {
-	return *this;
+	return nullptr;
+}
+
+
+IElementList::Id CObjectContainer::GetObjectTypeId(const QByteArray& objectId) const
+{
+	for (const ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == objectId){
+			return objectInfo.typeId;
+		}
+	}
+	
+	return QByteArray();
 }
 
 
@@ -103,15 +171,53 @@ const istd::IChangeable* CObjectContainer::GetDataObject(const QByteArray& objec
 }
 
 
-QByteArray CObjectContainer::GetObjectTypeId(const QByteArray& objectId) const
+// reimplemented (IElementList)
+
+IElementList::Ids CObjectContainer::GetElementIds() const
+{
+	Ids retVal;
+
+	for (const ObjectInfo& objectInfo : m_objects){
+		retVal.insert(objectInfo.id);
+	}
+
+	return retVal;
+}
+
+
+QString CObjectContainer::GetElementName(const QByteArray & objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
-			return objectInfo.typeId;
+			return objectInfo.name;
 		}
 	}
-	
-	return QByteArray();
+
+	return QString();
+}
+
+
+QString CObjectContainer::GetElementDescription(const QByteArray & objectId) const
+{
+	for (const ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == objectId){
+			return objectInfo.description;
+		}
+	}
+
+	return QString();
+}
+
+
+bool CObjectContainer::IsElementEnabled(const QByteArray & objectId) const
+{
+	for (const ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == objectId){
+			return objectInfo.isEnabled;
+		}
+	}
+
+	return false;
 }
 
 
@@ -134,11 +240,13 @@ bool CObjectContainer::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 		for (const ObjectInfo& objectInfo : sourcePtr->m_objects){
 			QByteArray newId = InsertNewObject(objectInfo.typeId, objectInfo.name, objectInfo.description);
 			if (!newId.isEmpty()){
-				istd::IChangeable* newObjectPtr = GetEditableObject(newId);
-				Q_ASSERT(newObjectPtr != nullptr);
-				if (newObjectPtr != nullptr && objectInfo.object.IsValid()){
+				ObjectPtr newObjectPtr = GetEditableObject(newId);
+				Q_ASSERT(newObjectPtr.IsValid());
+				if (newObjectPtr.IsValid() && objectInfo.object.IsValid()){
 					if (!newObjectPtr->CopyFrom(*objectInfo.object.GetPtr())){
 						RemoveObject(newId);
+
+						return false;
 					}
 				}
 			}
@@ -172,52 +280,11 @@ bool CObjectContainer::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-
 // protected methods
 
 istd::IChangeable* CObjectContainer::CreateObjectInstance(const QByteArray& typeId) const
 {
 	return BaseClass::CreateInstance(typeId);
-}
-
-
-// protected methods
-
-// reimplemented (IOptionsList)
-
-int CObjectContainer::GetOptionsFlags() const
-{
-	return SCF_SUPPORT_UNIQUE_ID;
-}
-
-
-int CObjectContainer::GetOptionsCount() const
-{
-	return m_objects.count();
-}
-
-
-QString CObjectContainer::GetOptionName(int index) const
-{
-	return m_objects[index].name;
-}
-
-
-QString CObjectContainer::GetOptionDescription(int index) const
-{
-	return m_objects[index].description;
-}
-
-
-QByteArray CObjectContainer::GetOptionId(int index) const
-{
-	return m_objects[index].id;
-}
-
-
-bool CObjectContainer::IsOptionEnabled(int /*index*/) const
-{
-	return true;
 }
 
 

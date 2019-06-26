@@ -19,9 +19,15 @@ CSingleObjectProviderComp::CSingleObjectProviderComp()
 
 // reimplemented (IObjectProvider)
 
-const iprm::IOptionsList& CSingleObjectProviderComp::GetObjectInfoList() const
+const iprm::IOptionsList * CSingleObjectProviderComp::GetSupportedObjectTypes() const
 {
-	return m_info;
+	return nullptr;
+}
+
+
+QByteArray CSingleObjectProviderComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
+{
+	return *m_typeIdAttrPtr;
 }
 
 
@@ -36,16 +42,33 @@ const istd::IChangeable* CSingleObjectProviderComp::GetDataObject(const QByteArr
 }
 
 
-QByteArray CSingleObjectProviderComp::GetObjectTypeId(const QByteArray& objectId) const
+// reimplemented (IElementList)
+
+IElementList::Ids CSingleObjectProviderComp::GetElementIds() const
 {
-	int index = m_info.GetOptionIndexById(objectId);
-	if (index >= 0){
-		return m_typeId;
-	}
-	
-	return QByteArray();
+	Ids retVal;
+	retVal.insert(m_info.GetOptionId(0));
+
+	return retVal;
 }
 
+
+QString CSingleObjectProviderComp::GetElementName(const QByteArray & /*elementId*/) const
+{
+	return m_info.GetOptionName(0);
+}
+
+
+QString CSingleObjectProviderComp::GetElementDescription(const QByteArray & /*elementId*/) const
+{
+	return m_info.GetOptionDescription(0);
+}
+
+
+bool CSingleObjectProviderComp::IsElementEnabled(const QByteArray & /*elementId*/) const
+{
+	return m_info.IsOptionEnabled(0);
+}
 
 
 // protected methods

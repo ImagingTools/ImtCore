@@ -37,9 +37,15 @@ public:
 	CSingleObjectProviderComp();
 
 	// reimplemented (IObjectProvider)
-	virtual const iprm::IOptionsList& GetObjectInfoList() const override;
-	virtual const istd::IChangeable* GetDataObject(const QByteArray& objectId) const override;
+	virtual const iprm::IOptionsList* GetSupportedObjectTypes() const override;
 	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
+	virtual const istd::IChangeable* GetDataObject(const QByteArray& objectId) const override;
+
+	// reimplemented (IElementList)
+	virtual Ids GetElementIds() const override;
+	virtual QString GetElementName(const QByteArray & elementId) const override;
+	virtual QString GetElementDescription(const QByteArray & elementId) const override;
+	virtual bool IsElementEnabled(const QByteArray & elementId) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
