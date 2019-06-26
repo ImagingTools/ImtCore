@@ -280,7 +280,7 @@ void CInspectionReportBuilderComp::AddInspectionPageFooter(const Inspection& ins
 
 		tablePtr->SetItem(i, 0, CTextTableItem(result.regionName));
 		tablePtr->SetItem(i, 1, CTextTableItem(GetErrorClassText(result.errorClass)));
-		tablePtr->SetItem(i, 2, CTextTableItem(QString::number(result.length, 'f', 2)));
+		tablePtr->SetItem(i, 2, CTextTableItem(QString::number(result.length, 'f', 2), Qt::AlignRight));
 
 		if (result.errorClass != IInspectionReportBuilder::EC_NONE){
 			tablePtr->SetItem(i, 3, CTextTableItem(QString::number(result.value, 'f', 2), Qt::AlignRight));
