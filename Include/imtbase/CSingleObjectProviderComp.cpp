@@ -19,7 +19,7 @@ CSingleObjectProviderComp::CSingleObjectProviderComp()
 
 // reimplemented (IObjectProvider)
 
-const iprm::IOptionsList * CSingleObjectProviderComp::GetSupportedObjectTypes() const
+const iprm::IOptionsList * CSingleObjectProviderComp::GetObjectTypesInfo() const
 {
 	return nullptr;
 }

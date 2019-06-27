@@ -46,13 +46,20 @@ int CObjectContainer::GetOperationFlags(const QByteArray& objectId) const
 QByteArray CObjectContainer::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
-			const QString& description)
+			const QString& description,
+			const istd::IChangeable* defaultValuePtr)
 {
 	ObjectInfo info;
 
 	info.object.SetPtr(CreateObjectInstance(typeId));
 	if (info.object.IsValid()){
 		istd::CChangeNotifier changeNotifier(this);
+
+		if (defaultValuePtr != nullptr){
+			if (!info.object->CopyFrom(*defaultValuePtr)){
+				return QByteArray();
+			}
+		}
 
 		info.description = description;
 		info.name = name;
@@ -141,7 +148,7 @@ void CObjectContainer::SetObjectEnabled(const QByteArray& objectId, bool isEnabl
 
 // reimplemented (IObjectProvider)
 
-const iprm::IOptionsList* CObjectContainer::GetSupportedObjectTypes() const
+const iprm::IOptionsList* CObjectContainer::GetObjectTypesInfo() const
 {
 	return nullptr;
 }
@@ -238,17 +245,9 @@ bool CObjectContainer::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 		m_objects.clear();
 
 		for (const ObjectInfo& objectInfo : sourcePtr->m_objects){
-			QByteArray newId = InsertNewObject(objectInfo.typeId, objectInfo.name, objectInfo.description);
-			if (!newId.isEmpty()){
-				ObjectPtr newObjectPtr = GetEditableObject(newId);
-				Q_ASSERT(newObjectPtr.IsValid());
-				if (newObjectPtr.IsValid() && objectInfo.object.IsValid()){
-					if (!newObjectPtr->CopyFrom(*objectInfo.object.GetPtr())){
-						RemoveObject(newId);
-
-						return false;
-					}
-				}
+			QByteArray newId = InsertNewObject(objectInfo.typeId, objectInfo.name, objectInfo.description, objectInfo.object.GetPtr());
+			if (newId.isEmpty()){
+				return false;
 			}
 		}
 

@@ -37,7 +37,7 @@ public:
 	CSingleObjectProviderComp();
 
 	// reimplemented (IObjectProvider)
-	virtual const iprm::IOptionsList* GetSupportedObjectTypes() const override;
+	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 	virtual const istd::IChangeable* GetDataObject(const QByteArray& objectId) const override;
 

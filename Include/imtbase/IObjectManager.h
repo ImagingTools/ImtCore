@@ -42,7 +42,8 @@ public:
 	virtual QByteArray InsertNewObject(
 				const QByteArray& typeId,
 				const QString& name,
-				const QString& description) = 0;
+				const QString& description,
+				const istd::IChangeable* defaultValuePtr = nullptr) = 0;
 
 	/**
 		Get object with the given ID for the editing.

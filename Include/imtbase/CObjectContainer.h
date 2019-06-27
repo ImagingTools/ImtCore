@@ -35,7 +35,8 @@ public:
 	virtual QByteArray InsertNewObject(
 				const QByteArray& typeId,
 				const QString& name,
-				const QString& description) override;
+				const QString& description,
+				const istd::IChangeable* defaultValuePtr = nullptr) override;
 	virtual ObjectPtr GetEditableObject(const QByteArray& objectId) override;
 	virtual bool RemoveObject(const QByteArray& objectId) override;
 	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
@@ -43,7 +44,7 @@ public:
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
 
 	// reimplemented (IObjectProvider)
-	virtual const iprm::IOptionsList* GetSupportedObjectTypes() const override;
+	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
 	virtual const istd::IChangeable* GetDataObject(const QByteArray & objectId) const override;
 

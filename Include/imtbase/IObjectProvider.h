@@ -14,7 +14,7 @@ namespace imtbase
 
 
 /**
-	Interface for access of general defined list of data objects.
+	Interface for access of generally defined list of data objects.
 */
 class IObjectProvider: virtual public IElementList
 {
@@ -22,9 +22,9 @@ public:
 	typedef istd::TSmartPtr<istd::IChangeable> ObjectPtr;
 
 	/**
-		Get the list of supported object types. Only elements of supported types can be added to the container.
+		Get the list of the available object types.
 	*/
-	virtual const iprm::IOptionsList* GetSupportedObjectTypes() const = 0;
+	virtual const iprm::IOptionsList* GetObjectTypesInfo() const = 0;
 
 	/**
 		Get the type-ID of the object.
