@@ -12,7 +12,6 @@ namespace imtbase
 class IObjectManager: virtual public IObjectProvider
 {
 public:
-
 	enum OperationalFlags
 	{
 		OF_DEFAULT = 1,
@@ -23,12 +22,42 @@ public:
 		OF_FIXED = 2,
 
 		/**
-			Manager flag for allowing the adding of the new element.
+			Active if rename of objects is supported.
 		*/
-		OF_MANAGER_ADD = 4
+		OF_SUPPORT_RENAME = 4,
+
+		/**
+			Active if insert of objects is possible.
+		*/
+		OF_SUPPORT_INSERT = 8,
+
+		/**
+			Active if delete of objects is possible.
+		*/
+		OF_SUPPORT_DELETE = 16,
+
+		/**
+			Active if swap of objects with the other one is possible.
+		*/
+		OF_SUPPORT_SWAP = 32,
+
+		/**
+			Active if it is possible to get the disabled option.
+		*/
+		OF_DISABLE_ALLOWED = 64,
+
+		/**
+			Active if it is possible to edit parameter values.
+		*/
+		OF_SUPPORT_EDIT = 128,
+
+		/**
+			Option is inactive (i.e. cannot be activated or selected) 
+		*/
+		OF_INACTIVE = 256
 	};
 
-	I_DECLARE_FLAGS(OperationalFlags, OF_DEFAULT, OF_FIXED, OF_MANAGER_ADD);
+	I_DECLARE_FLAGS(OperationalFlags, OF_DEFAULT, OF_FIXED, OF_SUPPORT_RENAME, OF_SUPPORT_INSERT, OF_SUPPORT_DELETE, OF_SUPPORT_SWAP, OF_DISABLE_ALLOWED, OF_SUPPORT_EDIT, OF_INACTIVE);
 
 	/**
 		Get binary flags describing the possible operations on the single object or on the whole manager/container.
