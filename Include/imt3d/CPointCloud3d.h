@@ -25,8 +25,10 @@ class CPointCloud3d: virtual public IPointCloud3d, virtual public IGridInfo
 {
 public:
 	CPointCloud3d();
+	~CPointCloud3d();
 
 	// reimplemented (IPointCloud3d)
+	bool CreateCloud(PointFormat pointFormat, int pointsCount, const istd::CIndex2d* gridSizePtr = nullptr) override;
 	bool CreateCloud(PointFormat pointFormat,
 			int pointsCount,
 			void* dataPtr,
@@ -35,44 +37,53 @@ public:
 	PointFormat GetPointFormat() const override;
 	int GetPointsCount() const override;
 	const void* GetPointData(int pointIndex) const override;
+	void* GetPointData(int pointIndex) override;
 
 	// reimplemented (IGridInfo)
-	virtual istd::CIndex2d GetGridSize() const override;
-	virtual void SetGridSize(const istd::CIndex2d& gridSize) override;
-	virtual istd::CIndex2d GetGridPosition(int index) const override;
-	virtual int GetCloudPosition(const istd::CIndex2d& index) const override;
+	istd::CIndex2d GetGridSize() const override;
+	void SetGridSize(const istd::CIndex2d& gridSize) override;
+	istd::CIndex2d GetGridPosition(int index) const override;
+	int GetCloudPosition(const istd::CIndex2d& index) const override;
 
 	// reimplemented (IObject3d)
-	virtual bool IsEmpty() const override;
-	virtual i3d::CVector3d GetCenter() const override;
-	virtual void MoveCenterTo(const i3d::CVector3d& position) override;
-	virtual CCuboid GetBoundingCuboid() const override;
+	bool IsEmpty() const override;
+	i3d::CVector3d GetCenter() const override;
+	void MoveCenterTo(const i3d::CVector3d& position) override;
+	CCuboid GetBoundingCuboid() const override;
 
 	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive) override;
+	bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented (istd::IChangeable)
-	virtual bool CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode) override;
-	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	bool CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode) override;
+	bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
 	// reimplemented (istd::IChangeable)
-	virtual void OnEndChanges(const ChangeSet& changes) override;
+	void OnEndChanges(const ChangeSet& changes) override;
 
 private:
+	bool CreateCloudHelper(PointFormat pointFormat,
+			int pointsCount,
+			void* dataPtr,
+			bool releaseFlag,
+			const istd::CIndex2d* gridSizePtr);
 	void EnsureCenterCalculated() const;
-	template <typename DataType> void TEnsureCenterCalculated() const;
+	template <typename PointType> void TEnsureCenterCalculated() const;
 	void EnsureCuboidCalculated() const;
-	template <typename DataType> void TEnsureCuboidCalculated() const;
-	template <typename DataType> DataType* TGetPointData(int pointIndex, bool validOnly) const;
-	template <typename DataType> void TMoveCenterTo(const i3d::CVector3d& position);
-	template <typename DataType> void GetBoundingRanges(istd::CRange& xRange, istd::CRange& yRange, istd::CRange& zRange) const;
-	template <typename DataType> bool IsPointValid(const DataType& pointData) const;
+	template <typename PointType> void TEnsureCuboidCalculated() const;
+	template <typename PointType> PointType* TGetPointData(int pointIndex, bool validOnly = false) const;
+	template <typename PointType> void TMoveCenterTo(const i3d::CVector3d& position);
+	template <typename PointType> void GetBoundingRanges(istd::CRange& xRange, istd::CRange& yRange, istd::CRange& zRange) const;
+	template <typename PointType> bool IsPointValid(const PointType& pointData) const;
 	int GetDataSize() const;
-	void ReallocateData();
+	void AllocateData();
+	void FreeData();
+	template <typename PointType> void FreeData();
 
 private:
-	istd::TOptDelPtr<quint8, true> m_dataPtr;
+	quint8* m_dataPtr;
+	bool m_dataOwner;
 	PointFormat m_pointFormat;
 	int m_pointsCount;
 	int m_componentsCount;

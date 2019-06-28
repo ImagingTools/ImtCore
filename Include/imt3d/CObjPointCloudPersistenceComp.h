@@ -53,27 +53,9 @@ public:
 	virtual QString GetTypeDescription(const QString* extensionPtr = NULL) const;
 
 private:
-	template <typename DataType> int SaveToFileHelper(const CPointCloud3d& pointCloud, QTextStream& stream) const;
+	template <typename PointType> void SaveToFileHelper(const CPointCloud3d& pointCloud, QTextStream& stream) const;
 };
 
-
-template<typename DataType>
-inline int CObjPointCloudPersistenceComp::SaveToFileHelper(const CPointCloud3d& pointCloud, QTextStream& stream) const
-{
-	for (int i = 0; i < pointCloud.GetPointsCount(); ++i){
-		const DataType* pointDataPtr = static_cast<const DataType*>(pointCloud.GetPointData(i));
-		if (!pointDataPtr){
-			return OS_FAILED;
-		}
-
-		QString textLine;
-		textLine = QString("v %1 %2 %3").arg(pointDataPtr->xyz[0]).arg(pointDataPtr->xyz[1]).arg(pointDataPtr->xyz[2]);
-
-		stream << textLine << "\n";
-	}
-
-	return OS_OK;
-}
 
 } // namespace imt3d
 

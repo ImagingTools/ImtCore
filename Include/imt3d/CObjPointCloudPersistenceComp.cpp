@@ -64,7 +64,7 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 
 	QTextStream stream(&file);
 
-	QVector<float> pointComponents;
+	std::vector<imt3d::IPointCloud3d::PointXyz32> points;
 
 	while (!stream.atEnd()){
 		QString line = stream.readLine();
@@ -76,36 +76,39 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 			if (valueKey == "v"){
 				bool ok = false;
 
-				double x = components[1].toDouble(&ok);
+				float x = components[1].toFloat(&ok);
 				if (!ok){
 					continue;
 				}
 
-				double y = components[2].toDouble(&ok);
+				float y = components[2].toFloat(&ok);
 				if (!ok){
 					continue;
 				}
 
-				double z = components[3].toDouble(&ok);
+				float z = components[3].toFloat(&ok);
 				if (!ok){
 					continue;
 				}
 
-				pointComponents.push_back(x);
-				pointComponents.push_back(y);
-				pointComponents.push_back(z);
+				imt3d::IPointCloud3d::PointXyz32 point;
+				point.data[0] = x;
+				point.data[1] = y;
+				point.data[2] = z;
+
+				points.push_back(point);
 			}
 		}
 	}
 
 	file.close();
 
-	int pointsCount = pointComponents.size() / 3;
+	int pointsCount = static_cast<int>(points.size());
 
-	float* pointsDataPtr = new float[pointComponents.size()];
-	memcpy(pointsDataPtr, pointComponents.constData(), pointComponents.size() * sizeof(float));
+	imt3d::IPointCloud3d::PointXyz32* pointsDataPtr = new imt3d::IPointCloud3d::PointXyz32[pointsCount];
+	memcpy(pointsDataPtr, points.data(), pointsCount * sizeof(imt3d::IPointCloud3d::PointXyz32));
 
-	return documentPtr->CreateCloud(IPointCloud3d::PF_XYZF, pointsCount, pointsDataPtr, true) ? OS_OK : OS_FAILED;
+	return documentPtr->CreateCloud(IPointCloud3d::PF_XYZ_32, pointsCount, pointsDataPtr, true) ? OS_OK : OS_FAILED;
 }
 
 
@@ -126,15 +129,21 @@ int CObjPointCloudPersistenceComp::SaveToFile(const istd::IChangeable& data, con
 	QTextStream stream(&file);
 
 	switch (documentPtr->GetPointFormat()){
-		case imt3d::IPointCloud3d::PF_XYZF:
-			return SaveToFileHelper<imt3d::IPointCloud3d::PointStructXyzF>(*documentPtr, stream);
-		case imt3d::IPointCloud3d::PF_XYZD:
-			return SaveToFileHelper<imt3d::IPointCloud3d::PointStructXyzD>(*documentPtr, stream);
-		case imt3d::IPointCloud3d::PF_XYZF_1I:
-			return SaveToFileHelper<imt3d::IPointCloud3d::PointStructXyzF1I>(*documentPtr, stream);
-		default:
-			return OS_FAILED;
+		case imt3d::IPointCloud3d::PF_XYZ_32:
+			SaveToFileHelper<imt3d::IPointCloud3d::PointXyz32>(*documentPtr, stream);
+			break;
+		case imt3d::IPointCloud3d::PF_XYZ_64:
+			SaveToFileHelper<imt3d::IPointCloud3d::PointXyz64>(*documentPtr, stream);
+			break;
+		case imt3d::IPointCloud3d::PF_XYZW_32:
+			SaveToFileHelper<imt3d::IPointCloud3d::PointXyzw32>(*documentPtr, stream);
+			break;
+		case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
+			SaveToFileHelper<imt3d::IPointCloud3d::PointXyzAbc32>(*documentPtr, stream);
+			break;
 	}
+
+	return OS_OK;
 }
 
 
@@ -155,6 +164,21 @@ bool CObjPointCloudPersistenceComp::GetFileExtensions(QStringList& result, const
 QString CObjPointCloudPersistenceComp::GetTypeDescription(const QString* /*extensionPtr*/) const
 {
 	return "3D-object files";
+}
+
+
+template<typename PointType>
+void CObjPointCloudPersistenceComp::SaveToFileHelper(const CPointCloud3d& pointCloud, QTextStream& stream) const
+{
+	for (int i = 0; i < pointCloud.GetPointsCount(); ++i){
+		const PointType* pointDataPtr = static_cast<const PointType*>(pointCloud.GetPointData(i));
+		Q_ASSERT(pointDataPtr != nullptr);
+
+		QString textLine;
+		textLine = QString("v %1 %2 %3").arg(pointDataPtr->data[0]).arg(pointDataPtr->data[1]).arg(pointDataPtr->data[2]);
+
+		stream << textLine << "\n";
+	}
 }
 
 

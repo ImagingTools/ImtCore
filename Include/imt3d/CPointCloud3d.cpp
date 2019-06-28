@@ -19,11 +19,26 @@ namespace imt3d
 // public methods
 
 CPointCloud3d::CPointCloud3d()
-	:m_pointFormat(PointFormat::PF_XYZF),
+	:m_dataPtr(nullptr),
+	m_dataOwner(false),
+	m_pointFormat(PointFormat::PF_XYZ_32),
 	m_pointsCount(0),
 	m_isCloudCenterCalculationValid(false),
 	m_isCloudCuboidCalculationValid(false)
 {
+}
+
+CPointCloud3d::~CPointCloud3d()
+{
+	FreeData();
+}
+
+
+// reimplemented (IPointCloud3d)
+
+bool CPointCloud3d::CreateCloud(PointFormat pointFormat, int pointsCount, const istd::CIndex2d* gridSizePtr)
+{
+	return CreateCloudHelper(pointFormat, pointsCount, nullptr, false, gridSizePtr);
 }
 
 
@@ -33,24 +48,11 @@ bool CPointCloud3d::CreateCloud(PointFormat pointFormat,
 			bool releaseFlag,
 			const istd::CIndex2d* gridSizePtr)
 {
-	if (pointsCount <= 0 || !dataPtr){
+	if (!dataPtr){
 		return false;
 	}
 
-	m_isCloudCenterCalculationValid = false;
-
-	istd::CChangeNotifier changeNotifier(this);
-
-	m_pointFormat = pointFormat;
-	m_pointsCount = pointsCount;
-
-	m_dataPtr.SetPtr(static_cast<quint8*>(dataPtr), releaseFlag);
-
-	if (gridSizePtr){
-		m_gridSize = *gridSizePtr;
-	}
-
-	return true;
+	return CreateCloudHelper(pointFormat, pointsCount, dataPtr, releaseFlag, gridSizePtr);
 }
 
 
@@ -69,15 +71,24 @@ int CPointCloud3d::GetPointsCount() const
 const void* CPointCloud3d::GetPointData(int pointIndex) const
 {
 	switch (m_pointFormat){
-		case imt3d::IPointCloud3d::PF_XYZF:
-			return TGetPointData<PointStructXyzF>(pointIndex, false);
-		case imt3d::IPointCloud3d::PF_XYZD:
-			return TGetPointData<PointStructXyzD>(pointIndex, false);
-		case imt3d::IPointCloud3d::PF_XYZF_1I:
-			return TGetPointData<PointStructXyzF1I>(pointIndex, false);
+		case imt3d::IPointCloud3d::PF_XYZ_32:
+			return TGetPointData<PointXyz32>(pointIndex);
+		case imt3d::IPointCloud3d::PF_XYZ_64:
+			return TGetPointData<PointXyz64>(pointIndex);
+		case imt3d::IPointCloud3d::PF_XYZW_32:
+			return TGetPointData<PointXyzw32>(pointIndex);
+		case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
+			return TGetPointData<PointXyzAbc32>(pointIndex);
 		default:
 			return nullptr;
 	}
+}
+
+
+void* CPointCloud3d::GetPointData(int pointIndex)
+{
+	const CPointCloud3d* constThis = static_cast<const CPointCloud3d*>(this);
+	return const_cast<void*>(constThis->GetPointData(pointIndex));
 }
 
 
@@ -137,12 +148,14 @@ i3d::CVector3d CPointCloud3d::GetCenter() const
 void CPointCloud3d::MoveCenterTo(const i3d::CVector3d& position)
 {
 	switch (m_pointFormat){
-		case imt3d::IPointCloud3d::PF_XYZF:
-			return TMoveCenterTo<PointStructXyzF>(position);
-		case imt3d::IPointCloud3d::PF_XYZD:
-			return TMoveCenterTo<PointStructXyzD>(position);
-		case imt3d::IPointCloud3d::PF_XYZF_1I:
-			return TMoveCenterTo<PointStructXyzF1I>(position);
+		case imt3d::IPointCloud3d::PF_XYZ_32:
+			return TMoveCenterTo<PointXyz32>(position);
+		case imt3d::IPointCloud3d::PF_XYZ_64:
+			return TMoveCenterTo<PointXyz64>(position);
+		case imt3d::IPointCloud3d::PF_XYZW_32:
+			return TMoveCenterTo<PointXyzw32>(position);
+		case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
+			return TMoveCenterTo<PointXyzAbc32>(position);
 	}
 }
 
@@ -186,14 +199,14 @@ bool CPointCloud3d::Serialize(iser::IArchive& archive)
 
 	if (archive.IsStoring()){
 		retVal = retVal && archive.BeginTag(dataTag);
-		retVal = retVal && archive.ProcessData(m_dataPtr.GetPtr(), dataSize);
+		retVal = retVal && archive.ProcessData(m_dataPtr, dataSize);
 		retVal = retVal && archive.EndTag(dataTag);
 	}
 	else{
-		ReallocateData();
+		AllocateData();
 
 		retVal = retVal && archive.BeginTag(dataTag);
-		retVal = retVal && archive.ProcessData(m_dataPtr.GetPtr(), dataSize);
+		retVal = retVal && archive.ProcessData(m_dataPtr, dataSize);
 		retVal = retVal && archive.EndTag(dataTag);
 	}
 
@@ -232,9 +245,9 @@ bool CPointCloud3d::CopyFrom(const istd::IChangeable& object, istd::IChangeable:
 
 		int dataSize = GetDataSize();
 
-		ReallocateData();
+		AllocateData();
 
-		std::memcpy(m_dataPtr.GetPtr(), objectPtr->m_dataPtr.GetPtr(), dataSize);
+		std::memcpy(m_dataPtr, objectPtr->m_dataPtr, dataSize);
 
 		return true;
 	}
@@ -247,10 +260,10 @@ bool CPointCloud3d::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_dataPtr.Reset();
+	FreeData();
 	m_gridSize.Reset();
 
-	m_pointFormat = IPointCloud3d::PF_XYZF;
+	m_pointFormat = IPointCloud3d::PF_XYZ_32;
 	m_pointsCount = 0;
 	m_componentsCount = 0;
 
@@ -265,32 +278,67 @@ bool CPointCloud3d::ResetData(CompatibilityMode /*mode*/)
 void CPointCloud3d::OnEndChanges(const ChangeSet& /*changes*/)
 {
 	m_isCloudCuboidCalculationValid = false;
-
 	m_isCloudCenterCalculationValid = false;
 }
 
 
 // private methods
 
+bool CPointCloud3d::CreateCloudHelper(PointFormat pointFormat,
+			int pointsCount,
+			void* dataPtr,
+			bool releaseFlag,
+			const istd::CIndex2d* gridSizePtr)
+{
+	if (pointsCount <= 0){
+		return false;
+	}
+
+	m_isCloudCenterCalculationValid = false;
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_pointFormat = pointFormat;
+	m_pointsCount = pointsCount;
+	m_dataOwner = releaseFlag;
+
+	if (dataPtr){
+		FreeData();
+		m_dataPtr = static_cast<quint8*>(dataPtr);
+	}
+	else{
+		AllocateData();
+	}
+
+	if (gridSizePtr){
+		m_gridSize = *gridSizePtr;
+	}
+
+	return true;
+}
+
+
 void CPointCloud3d::EnsureCenterCalculated() const
 {
 	switch (m_pointFormat){
-		case imt3d::IPointCloud3d::PF_XYZF:
-			return TEnsureCenterCalculated<PointStructXyzF>();
-		case imt3d::IPointCloud3d::PF_XYZD:
-			return TEnsureCenterCalculated<PointStructXyzD>();
-		case imt3d::IPointCloud3d::PF_XYZF_1I:
-			return TEnsureCenterCalculated<PointStructXyzF1I>();
+		case imt3d::IPointCloud3d::PF_XYZ_32:
+			return TEnsureCenterCalculated<PointXyz32>();
+		case imt3d::IPointCloud3d::PF_XYZ_64:
+			return TEnsureCenterCalculated<PointXyz64>();
+		case imt3d::IPointCloud3d::PF_XYZW_32:
+			return TEnsureCenterCalculated<PointXyzw32>();
+		case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
+			return TEnsureCenterCalculated<PointXyzAbc32>();
 	}
 }
 
 
-template <typename DataType>
+template <typename PointType>
 void CPointCloud3d::TEnsureCenterCalculated() const
 {
 	if (!IsEmpty() && !m_isCloudCenterCalculationValid){
 		istd::CRange xRange, yRange, zRange;
-		GetBoundingRanges<DataType>(xRange, yRange, zRange);
+		GetBoundingRanges<PointType>(xRange, yRange, zRange);
 
 		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
 			m_cloudCenter = i3d::CVector3d(
@@ -307,22 +355,24 @@ void CPointCloud3d::TEnsureCenterCalculated() const
 void CPointCloud3d::EnsureCuboidCalculated() const
 {
 	switch (m_pointFormat){
-		case imt3d::IPointCloud3d::PF_XYZF:
-			return TEnsureCuboidCalculated<PointStructXyzF>();
-		case imt3d::IPointCloud3d::PF_XYZD:
-			return TEnsureCuboidCalculated<PointStructXyzD>();
-		case imt3d::IPointCloud3d::PF_XYZF_1I:
-			return TEnsureCuboidCalculated<PointStructXyzF1I>();
+		case imt3d::IPointCloud3d::PF_XYZ_32:
+			return TEnsureCuboidCalculated<PointXyz32>();
+		case imt3d::IPointCloud3d::PF_XYZ_64:
+			return TEnsureCuboidCalculated<PointXyz64>();
+		case imt3d::IPointCloud3d::PF_XYZW_32:
+			return TEnsureCuboidCalculated<PointXyzw32>();
+		case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
+			return TEnsureCuboidCalculated<PointXyzAbc32>();
 	}
 }
 
 
-template <typename DataType>
+template <typename PointType>
 void CPointCloud3d::TEnsureCuboidCalculated() const
 {
 	if (!IsEmpty() && !m_isCloudCuboidCalculationValid){
 		istd::CRange xRange, yRange, zRange;
-		GetBoundingRanges<DataType>(xRange, yRange, zRange);
+		GetBoundingRanges<PointType>(xRange, yRange, zRange);
 
 		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
 			double left = xRange.GetMinValue();
@@ -340,15 +390,15 @@ void CPointCloud3d::TEnsureCuboidCalculated() const
 }
 
 
-template <typename DataType>
-DataType* CPointCloud3d::TGetPointData(int pointIndex, bool validOnly) const
+template <typename PointType>
+PointType* CPointCloud3d::TGetPointData(int pointIndex, bool validOnly) const
 {
 	Q_ASSERT(pointIndex >= 0 && pointIndex < m_pointsCount);
 
-	quint8* rawDataPtr = m_dataPtr.GetPtr() + pointIndex * sizeof(DataType);
-	DataType* typedDataPtr = reinterpret_cast<DataType*>(rawDataPtr);
+	quint8* rawDataPtr = m_dataPtr + pointIndex * sizeof(PointType);
+	PointType* typedDataPtr = reinterpret_cast<PointType*>(rawDataPtr);
 
-	if (validOnly && typedDataPtr && !IsPointValid<DataType>(*typedDataPtr)){
+	if (validOnly && typedDataPtr && !IsPointValid<PointType>(*typedDataPtr)){
 		return nullptr;
 	}
 
@@ -356,7 +406,7 @@ DataType* CPointCloud3d::TGetPointData(int pointIndex, bool validOnly) const
 }
 
 
-template<typename DataType>
+template<typename PointType>
 void CPointCloud3d::TMoveCenterTo(const i3d::CVector3d& position)
 {
 	i3d::CVector3d center = GetCenter();
@@ -365,14 +415,14 @@ void CPointCloud3d::TMoveCenterTo(const i3d::CVector3d& position)
 		i3d::CVector3d delta = position - center;
 
 		for (int i = 0; i < m_pointsCount; ++i){
-			DataType* pointData = TGetPointData<DataType>(i, true);
+			PointType* pointDataPtr = TGetPointData<PointType>(i, true);
 
-			if (pointData){
-				typedef std::remove_reference<decltype(*pointData->xyz)>::type PointCoordinateType;
+			if (pointDataPtr){
+				typedef std::remove_reference<decltype(*pointDataPtr->data)>::type PointCoordinateType;
 
-				pointData->xyz[0] += static_cast<PointCoordinateType>(delta.GetX());
-				pointData->xyz[1] += static_cast<PointCoordinateType>(delta.GetY());
-				pointData->xyz[2] += static_cast<PointCoordinateType>(delta.GetZ());
+				pointDataPtr->data[0] += static_cast<PointCoordinateType>(delta.GetX());
+				pointDataPtr->data[1] += static_cast<PointCoordinateType>(delta.GetY());
+				pointDataPtr->data[2] += static_cast<PointCoordinateType>(delta.GetZ());
 			}
 		}
 	}
@@ -381,7 +431,7 @@ void CPointCloud3d::TMoveCenterTo(const i3d::CVector3d& position)
 }
 
 
-template<typename DataType>
+template<typename PointType>
 void CPointCloud3d::GetBoundingRanges(istd::CRange& xRange, istd::CRange& yRange, istd::CRange& zRange) const
 {
 	xRange.SetMinValue(qInf());
@@ -392,14 +442,14 @@ void CPointCloud3d::GetBoundingRanges(istd::CRange& xRange, istd::CRange& yRange
 	zRange.SetMaxValue(-qInf());
 
 	for (int i = 0; i < m_pointsCount; ++i){
-		const DataType* pointDataPtr = TGetPointData<DataType>(i, true);
+		const PointType* pointDataPtr = TGetPointData<PointType>(i, true);
 		if (!pointDataPtr){
 			continue;
 		}
 
-		double x = static_cast<double>(pointDataPtr->xyz[0]);
-		double y = static_cast<double>(pointDataPtr->xyz[1]);
-		double z = static_cast<double>(pointDataPtr->xyz[2]);
+		double x = static_cast<double>(pointDataPtr->data[0]);
+		double y = static_cast<double>(pointDataPtr->data[1]);
+		double z = static_cast<double>(pointDataPtr->data[2]);
 
 		if (x < xRange.GetMinValue()){
 			xRange.SetMinValue(x);
@@ -428,38 +478,68 @@ void CPointCloud3d::GetBoundingRanges(istd::CRange& xRange, istd::CRange& yRange
 }
 
 
-template <typename DataType>
-bool CPointCloud3d::IsPointValid(const DataType& pointData) const
+template <typename PointType>
+bool CPointCloud3d::IsPointValid(const PointType& pointData) const
 {
-	return !qIsNaN(pointData.xyz[0]) && !qIsNaN(pointData.xyz[1]) && !qIsNaN(pointData.xyz[2]);
+	return !qIsNaN(pointData.data[0]) && !qIsNaN(pointData.data[1]) && !qIsNaN(pointData.data[2]);
 }
 
 
 int CPointCloud3d::GetDataSize() const
 {
 	switch (m_pointFormat){
-		case IPointCloud3d::PF_XYZF:
-			return m_pointsCount * sizeof(PointStructXyzF);
-		case IPointCloud3d::PF_XYZD:
-			return m_pointsCount * sizeof(PointStructXyzD);
-		case IPointCloud3d::PF_XYZF_1I:
-			return m_pointsCount * sizeof(PointStructXyzF1I);
+		case imt3d::IPointCloud3d::PF_XYZ_32:
+			return m_pointsCount * sizeof(PointXyz32);
+		case imt3d::IPointCloud3d::PF_XYZ_64:
+			return m_pointsCount * sizeof(PointXyz64);
+		case imt3d::IPointCloud3d::PF_XYZW_32:
+			return m_pointsCount * sizeof(PointXyzw32);
+		case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
+			return m_pointsCount * sizeof(PointXyzAbc32);
 		default:
 			return 0;
 	}
 }
 
 
-void CPointCloud3d::ReallocateData()
+void CPointCloud3d::AllocateData()
 {
+	FreeData();
+
 	int dataSize = GetDataSize();
 
 	if (dataSize > 0){
-		m_dataPtr.SetPtr(new quint8[dataSize], true);
+		m_dataPtr = new quint8[dataSize];
+		m_dataOwner = true;
 	}
-	else{
-		m_dataPtr.Reset();
+}
+
+
+void CPointCloud3d::FreeData()
+{
+	if (m_dataOwner){
+		switch (m_pointFormat){
+			case imt3d::IPointCloud3d::PF_XYZ_32:
+				return FreeData<PointXyz32>();
+			case imt3d::IPointCloud3d::PF_XYZ_64:
+				return FreeData<PointXyz64>();
+			case imt3d::IPointCloud3d::PF_XYZW_32:
+				return FreeData<PointXyzw32>();
+			case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
+				return FreeData<PointXyzAbc32>();
+		}
 	}
+}
+
+
+template <typename PointType>
+void CPointCloud3d::FreeData()
+{
+	PointType* dataPtr = reinterpret_cast<PointType*>(m_dataPtr);
+	delete[] dataPtr;
+
+	m_dataPtr = nullptr;
+	m_dataOwner = false;
 }
 
 
