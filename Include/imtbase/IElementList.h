@@ -18,7 +18,7 @@ class IElementList: virtual public istd::IChangeable
 {
 public:
 	typedef QByteArray Id;
-	typedef QSet<Id> Ids;
+	typedef QVector<Id> Ids;
 
 	/**
 		Get available element-IDs.

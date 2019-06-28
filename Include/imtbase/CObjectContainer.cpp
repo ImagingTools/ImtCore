@@ -185,7 +185,7 @@ IElementList::Ids CObjectContainer::GetElementIds() const
 	Ids retVal;
 
 	for (const ObjectInfo& objectInfo : m_objects){
-		retVal.insert(objectInfo.id);
+		retVal.push_back(objectInfo.id);
 	}
 
 	return retVal;
