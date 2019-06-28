@@ -247,9 +247,11 @@ bool CPointCloud3d::CopyFrom(const istd::IChangeable& object, istd::IChangeable:
 
 		AllocateData();
 
-		std::memcpy(m_dataPtr, objectPtr->m_dataPtr, dataSize);
+		if (m_dataPtr){
+			std::memcpy(m_dataPtr, objectPtr->m_dataPtr, dataSize);
 
-		return true;
+			return true;
+		}
 	}
 
 	return false;
@@ -504,13 +506,17 @@ int CPointCloud3d::GetDataSize() const
 
 void CPointCloud3d::AllocateData()
 {
-	FreeData();
-
-	int dataSize = GetDataSize();
-
-	if (dataSize > 0){
-		m_dataPtr = new quint8[dataSize];
-		m_dataOwner = true;
+	if (m_dataOwner){
+		switch (m_pointFormat){
+			case imt3d::IPointCloud3d::PF_XYZ_32:
+				return AllocateData<PointXyz32>();
+			case imt3d::IPointCloud3d::PF_XYZ_64:
+				return AllocateData<PointXyz64>();
+			case imt3d::IPointCloud3d::PF_XYZW_32:
+				return AllocateData<PointXyzw32>();
+			case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
+				return AllocateData<PointXyzAbc32>();
+		}
 	}
 }
 
@@ -528,6 +534,19 @@ void CPointCloud3d::FreeData()
 			case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
 				return FreeData<PointXyzAbc32>();
 		}
+	}
+}
+
+template <typename PointType>
+void CPointCloud3d::AllocateData()
+{
+	FreeData();
+
+	int dataSize = GetDataSize();
+
+	if (dataSize > 0){
+		m_dataPtr = reinterpret_cast<quint8*>(new PointType[dataSize]);
+		m_dataOwner = true;
 	}
 }
 

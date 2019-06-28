@@ -79,6 +79,7 @@ private:
 	int GetDataSize() const;
 	void AllocateData();
 	void FreeData();
+	template <typename PointType> void AllocateData();
 	template <typename PointType> void FreeData();
 
 private:
