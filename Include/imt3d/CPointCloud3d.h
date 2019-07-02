@@ -87,8 +87,6 @@ private:
 	bool m_dataOwner;
 	PointFormat m_pointFormat;
 	int m_pointsCount;
-	int m_componentsCount;
-
 	istd::CIndex2d m_gridSize;
 
 	mutable i3d::CVector3d m_cloudCenter;

@@ -174,7 +174,6 @@ bool CPointCloud3d::Serialize(iser::IArchive& archive)
 {
 	static iser::CArchiveTag pointFormatTag("PointFormat", "Point format", iser::CArchiveTag::TT_LEAF);
 	static iser::CArchiveTag pointsCountTag("PointsCount", "Points count", iser::CArchiveTag::TT_LEAF);
-	static iser::CArchiveTag componentsCountTag("ComponentsCount", "Components count", iser::CArchiveTag::TT_LEAF);
 	static iser::CArchiveTag dataTag("Data", "Point data", iser::CArchiveTag::TT_GROUP);
 	static iser::CArchiveTag gridSizeXTag("GridSizeX", "Size of points grid throw x", iser::CArchiveTag::TT_LEAF);
 	static iser::CArchiveTag gridSizeYTag("GridSizeY", "Size of points grid throw y", iser::CArchiveTag::TT_LEAF);
@@ -188,11 +187,6 @@ bool CPointCloud3d::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(pointsCountTag);
 	retVal = retVal && archive.Process(m_pointsCount);
 	retVal = retVal && archive.EndTag(pointsCountTag);
-
-	// components count
-	retVal = retVal && archive.BeginTag(componentsCountTag);
-	retVal = retVal && archive.Process(m_componentsCount);
-	retVal = retVal && archive.EndTag(componentsCountTag);
 
 	// data
 	int dataSize = GetDataSize();
@@ -267,7 +261,6 @@ bool CPointCloud3d::ResetData(CompatibilityMode /*mode*/)
 
 	m_pointFormat = IPointCloud3d::PF_XYZ_32;
 	m_pointsCount = 0;
-	m_componentsCount = 0;
 
 	return true;
 }
@@ -397,10 +390,14 @@ PointType* CPointCloud3d::TGetPointData(int pointIndex, bool validOnly) const
 {
 	Q_ASSERT(pointIndex >= 0 && pointIndex < m_pointsCount);
 
-	quint8* rawDataPtr = m_dataPtr + pointIndex * sizeof(PointType);
-	PointType* typedDataPtr = reinterpret_cast<PointType*>(rawDataPtr);
+	if (!m_dataPtr){
+		return nullptr;
+	}
 
-	if (validOnly && typedDataPtr && !IsPointValid<PointType>(*typedDataPtr)){
+	PointType* typedDataPtr = reinterpret_cast<PointType*>(m_dataPtr);
+	typedDataPtr += pointIndex;
+
+	if (validOnly && !IsPointValid<PointType>(*typedDataPtr)){
 		return nullptr;
 	}
 
@@ -523,17 +520,15 @@ void CPointCloud3d::AllocateData()
 
 void CPointCloud3d::FreeData()
 {
-	if (m_dataOwner){
-		switch (m_pointFormat){
-			case imt3d::IPointCloud3d::PF_XYZ_32:
-				return FreeData<PointXyz32>();
-			case imt3d::IPointCloud3d::PF_XYZ_64:
-				return FreeData<PointXyz64>();
-			case imt3d::IPointCloud3d::PF_XYZW_32:
-				return FreeData<PointXyzw32>();
-			case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
-				return FreeData<PointXyzAbc32>();
-		}
+	switch (m_pointFormat){
+		case imt3d::IPointCloud3d::PF_XYZ_32:
+			return FreeData<PointXyz32>();
+		case imt3d::IPointCloud3d::PF_XYZ_64:
+			return FreeData<PointXyz64>();
+		case imt3d::IPointCloud3d::PF_XYZW_32:
+			return FreeData<PointXyzw32>();
+		case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
+			return FreeData<PointXyzAbc32>();
 	}
 }
 
@@ -554,11 +549,13 @@ void CPointCloud3d::AllocateData()
 template <typename PointType>
 void CPointCloud3d::FreeData()
 {
-	PointType* dataPtr = reinterpret_cast<PointType*>(m_dataPtr);
-	delete[] dataPtr;
+	if (m_dataOwner){
+		PointType* dataPtr = reinterpret_cast<PointType*>(m_dataPtr);
+		delete[] dataPtr;
 
-	m_dataPtr = nullptr;
-	m_dataOwner = false;
+		m_dataPtr = nullptr;
+		m_dataOwner = false;
+	}
 }
 
 
