@@ -227,7 +227,7 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 		CurrentPageLabel->setText(*m_welcomeTextAttrPtr);
 	}
 	else{
-		Q_ASSERT(stackIndex = PAGE_CONTAINER_INDEX);
+		Q_ASSERT(stackIndex == PAGE_CONTAINER_INDEX);
 		if (m_pagesCompPtr.IsValid()){
 			int selectedPageIndex = m_pagesCompPtr->GetSelectedOptionIndex();
 			QString pageLabel;
