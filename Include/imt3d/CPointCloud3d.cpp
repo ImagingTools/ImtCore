@@ -38,7 +38,7 @@ CPointCloud3d::~CPointCloud3d()
 
 bool CPointCloud3d::CreateCloud(PointFormat pointFormat, int pointsCount, const istd::CIndex2d* gridSizePtr)
 {
-	return CreateCloudHelper(pointFormat, pointsCount, nullptr, false, gridSizePtr);
+	return CreateCloudHelper(pointFormat, pointsCount, nullptr, true, gridSizePtr);
 }
 
 
@@ -295,7 +295,6 @@ bool CPointCloud3d::CreateCloudHelper(PointFormat pointFormat,
 
 	m_pointFormat = pointFormat;
 	m_pointsCount = pointsCount;
-	m_dataOwner = releaseFlag;
 
 	if (dataPtr){
 		FreeData();
@@ -304,6 +303,8 @@ bool CPointCloud3d::CreateCloudHelper(PointFormat pointFormat,
 	else{
 		AllocateData();
 	}
+
+	m_dataOwner = releaseFlag;
 
 	if (gridSizePtr){
 		m_gridSize = *gridSizePtr;
@@ -503,17 +504,15 @@ int CPointCloud3d::GetDataSize() const
 
 void CPointCloud3d::AllocateData()
 {
-	if (m_dataOwner){
-		switch (m_pointFormat){
-			case imt3d::IPointCloud3d::PF_XYZ_32:
-				return AllocateData<PointXyz32>();
-			case imt3d::IPointCloud3d::PF_XYZ_64:
-				return AllocateData<PointXyz64>();
-			case imt3d::IPointCloud3d::PF_XYZW_32:
-				return AllocateData<PointXyzw32>();
-			case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
-				return AllocateData<PointXyzAbc32>();
-		}
+	switch (m_pointFormat){
+		case imt3d::IPointCloud3d::PF_XYZ_32:
+			return AllocateData<PointXyz32>();
+		case imt3d::IPointCloud3d::PF_XYZ_64:
+			return AllocateData<PointXyz64>();
+		case imt3d::IPointCloud3d::PF_XYZW_32:
+			return AllocateData<PointXyzw32>();
+		case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
+			return AllocateData<PointXyzAbc32>();
 	}
 }
 
@@ -552,10 +551,10 @@ void CPointCloud3d::FreeData()
 	if (m_dataOwner){
 		PointType* dataPtr = reinterpret_cast<PointType*>(m_dataPtr);
 		delete[] dataPtr;
-
-		m_dataPtr = nullptr;
-		m_dataOwner = false;
 	}
+
+	m_dataPtr = nullptr;
+	m_dataOwner = false;
 }
 
 
