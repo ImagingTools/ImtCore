@@ -1,0 +1,73 @@
+#pragma once
+
+
+// ACF includes
+#include <imt3d/IObject3d.h>
+
+
+namespace imt3d
+{
+
+
+/**
+	Common interface describing object of 3d points with specified format
+*/
+class IPointsBasedObject : virtual public imt3d::IObject3d
+{
+public:
+	enum PointFormat
+	{
+		PF_XYZ_32 = 0,		// 3 float point coordinates
+		PF_XYZ_64,			// 3 double point coordinates
+		PF_XYZ_ABC_32,		// 3 float point coordinates + 3 float additional components
+		PF_XYZW_32,			// 4 float point coordinates (homogeneous point coordinates)
+		PF_XYZW_NORMAL_32	// 4 float point coordinates + 4 float normal coordinates + 4 float curvature
+	};
+
+	I_DECLARE_ENUM(PointFormat, PF_XYZ_32, PF_XYZ_64, PF_XYZ_ABC_32, PF_XYZW_32, PF_XYZW_NORMAL_32);
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4324)
+#endif
+	template <typename CoordinateType, int AlignSize, int ... InitValues>
+	struct alignas(AlignSize) Point
+	{
+		CoordinateType data[sizeof...(InitValues)] = { InitValues... };
+
+		void* operator new(size_t size) { return _mm_malloc(size, AlignSize); }
+		void *operator new[](size_t size) { return _mm_malloc(size, AlignSize); }
+		void operator delete(void* ptr) { _mm_free(ptr); }
+		void operator delete[](void* ptr) { _mm_free(ptr); }
+	};
+#ifdef _MSC_VER
+#pragma warning(pop) 
+#endif
+
+	typedef Point<float, 16, 0, 0, 0> PointXyz32;
+	typedef Point<double, 32, 0, 0, 0> PointXyz64;
+	typedef Point<float, 16, 0, 0, 0, 0, 0, 0> PointXyzAbc32;
+	typedef Point<float, 16, 0, 0, 0, 1> PointXyzw32;
+	typedef Point<float, 16, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0> PointXyzwNormal32;
+
+	/**
+		Get point format.
+	*/
+	virtual PointFormat GetPointFormat() const = 0;
+
+	/**
+		Get points count.
+	*/
+	virtual int GetPointsCount() const = 0;
+
+	/**
+		Get points data.
+	*/
+	virtual void* GetPointData(int pointIndex) = 0;
+	virtual const void* GetPointData(int pointIndex) const = 0;
+};
+
+
+} // namespace imt3d
+
+

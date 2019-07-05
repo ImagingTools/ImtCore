@@ -14,12 +14,12 @@ namespace imt3d
 {
 
 
-bool ConvertDepthImageToCloud(const imt3d::IDepthBitmap& bitmap, IPointCloud3d& pointCloud)
+bool ConvertDepthImageToCloud(const IDepthBitmap& bitmap, IPointCloud3d& pointCloud)
 {
 	istd::CIndex2d bitmapSize = bitmap.GetImageSize();
 
 	// since points count is unknown we have to store points in temporaray dynamic array and then copy them to to the point cloud
-	std::vector<IPointCloud3d::PointXyz32> points;
+	std::vector<IPointsBasedObject::PointXyz32> points;
 	points.reserve(bitmapSize.GetX() * bitmapSize.GetY());
 
 	bool isOrganized = true;
@@ -33,7 +33,7 @@ bool ConvertDepthImageToCloud(const imt3d::IDepthBitmap& bitmap, IPointCloud3d& 
 				continue;
 			}
 
-			IPointCloud3d::PointXyz32 point;
+			IPointsBasedObject::PointXyz32 point;
 			point.data[0] = static_cast<float>(x);
 			point.data[1] = static_cast<float>(y);
 			point.data[2] = linePtr[x];
@@ -49,26 +49,28 @@ bool ConvertDepthImageToCloud(const imt3d::IDepthBitmap& bitmap, IPointCloud3d& 
 	int pointsCount = static_cast<int>(points.size());
 
 	// copy points to the point cloud buffer
-	IPointCloud3d::PointXyz32* pointsDataPtr = new IPointCloud3d::PointXyz32[pointsCount];
-	memcpy(pointsDataPtr, points.data(), pointsCount * sizeof(IPointCloud3d::PointXyz32));
+	IPointsBasedObject::PointXyz32* pointsDataPtr = new IPointsBasedObject::PointXyz32[pointsCount];
+	memcpy(pointsDataPtr, points.data(), pointsCount * sizeof(IPointsBasedObject::PointXyz32));
 
 	istd::CIndex2d* gridSizePtr = isOrganized ? &bitmapSize : nullptr;
 
-	return pointCloud.CreateCloud(IPointCloud3d::PF_XYZ_32, pointsCount, pointsDataPtr, true, gridSizePtr);
+	return pointCloud.CreateCloud(IPointsBasedObject::PF_XYZ_32, pointsCount, pointsDataPtr, true, gridSizePtr);
 }
 
 
-bool ConvertPointCloudToDepthBitmap(const IPointCloud3d& pointCloud, imt3d::IDepthBitmap& bitmap)
+bool ConvertPointCloudToDepthBitmap(const IPointCloud3d& pointCloud, IDepthBitmap& bitmap)
 {
 	switch (pointCloud.GetPointFormat()){
-		case imt3d::IPointCloud3d::PF_XYZ_32:
-			return ConvertPointCloudToDepthBitmap<imt3d::IPointCloud3d::PointXyz32>(pointCloud, bitmap);
-		case imt3d::IPointCloud3d::PF_XYZ_64:
-			return ConvertPointCloudToDepthBitmap<imt3d::IPointCloud3d::PointXyz64>(pointCloud, bitmap);
-		case imt3d::IPointCloud3d::PF_XYZW_32:
-			return ConvertPointCloudToDepthBitmap<imt3d::IPointCloud3d::PointXyzw32>(pointCloud, bitmap);
-		case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
-			return ConvertPointCloudToDepthBitmap<imt3d::IPointCloud3d::PointXyzAbc32>(pointCloud, bitmap);
+		case IPointsBasedObject::PF_XYZ_32:
+			return ConvertPointCloudToDepthBitmap<IPointsBasedObject::PointXyz32>(pointCloud, bitmap);
+		case IPointsBasedObject::PF_XYZ_64:
+			return ConvertPointCloudToDepthBitmap<IPointsBasedObject::PointXyz64>(pointCloud, bitmap);
+		case IPointsBasedObject::PF_XYZW_32:
+			return ConvertPointCloudToDepthBitmap<IPointsBasedObject::PointXyzw32>(pointCloud, bitmap);
+		case IPointsBasedObject::PF_XYZ_ABC_32:
+			return ConvertPointCloudToDepthBitmap<IPointsBasedObject::PointXyzAbc32>(pointCloud, bitmap);
+		case IPointsBasedObject::PF_XYZW_NORMAL_32:
+			return ConvertPointCloudToDepthBitmap<IPointsBasedObject::PointXyzwNormal32>(pointCloud, bitmap);
 		default:
 			return false;
 	}
@@ -76,9 +78,9 @@ bool ConvertPointCloudToDepthBitmap(const IPointCloud3d& pointCloud, imt3d::IDep
 
 
 template <typename PointType>
-bool ConvertPointCloudToDepthBitmap(const IPointCloud3d& pointCloud, imt3d::IDepthBitmap& bitmap)
+bool ConvertPointCloudToDepthBitmap(const IPointCloud3d& pointCloud, IDepthBitmap& bitmap)
 {
-	const imt3d::IGridInfo* gridInfoPtr = dynamic_cast<const imt3d::IGridInfo*>(&pointCloud);
+	const IGridInfo* gridInfoPtr = dynamic_cast<const IGridInfo*>(&pointCloud);
 	if (!gridInfoPtr){
 		return false;
 	}

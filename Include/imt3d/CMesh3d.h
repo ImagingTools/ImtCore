@@ -1,12 +1,12 @@
 #pragma once
 
 
-// ACF includes
-#include <istd/TArray.h>
+// Qt includes
+#include <QtCore/QFile>
 
 // ImtCore includes
-#include <imt3d/imt3d.h>
 #include <imt3d/IMesh3d.h>
+#include <imt3d/CPointsBasedObject.h>
 
 
 namespace imt3d
@@ -14,46 +14,35 @@ namespace imt3d
 
 
 /**
-	Tetrahedral mesh.
+	Triangle mesh implementation.
 */
-class CMesh3d: virtual public IMesh3d
+class CMesh3d: virtual public IMesh3d, public CPointsBasedObject
 {
 public:
-	CMesh3d();
-
 	bool SaveToStlFile(const QString& filePath) const;
 	bool LoadFromStlFile(const QString& filePath);
 
 	// reimplemented (imt3d::IMesh3d)
-	virtual const MeshVertices& GetVertices() const;
-	virtual const MeshEdgesPtr GetEdges() const;
-	virtual const MeshIndexEdgesPtr GetIndexEdges() const;
-	virtual const MeshTriangles& GetTriangles() const;
-	virtual const CMesh3d::MeshNormals& GetNormals() const;
-
-	// reimplemented (imt3d::IObject3d)
-	bool IsEmpty() const override;
-	i3d::CVector3d GetCenter() const override;
-	void MoveCenterTo(const i3d::CVector3d& position) override;
-	CCuboid GetBoundingCuboid() const override;
+	bool CreateMesh(PointFormat pointFormat, int pointsCount, const Indices& indices) override;
+	bool CreateMesh(PointFormat pointFormat, int pointsCount, void* pointsDataPtr, bool pointsDataReleaseFlag, const Indices& indices) override;
+	const Indices& GetIndices() const override;
 
 	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive) override;
+	bool Serialize(iser::IArchive& archive) override;
+
+	// reimplemented (istd::IChangeable)
+	bool CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode) override;
+	bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
-	void EnsureCenterCalculated() const;
-	void EnsureCuboidCalculated() const;
+	template <typename PointType> bool SaveToStlFile(const QString& filePath) const;
+	template <typename DataType> bool WriteTypedValue(const DataType& data, QFile& file) const;
+	template <typename PointType> bool WritePointData(int pointIndex, int pointComponentOffset, QFile& file) const;
+	bool ReadPointData(QFile& file, float* pointBufPtr) const;
 
 private:
-	MeshVertices m_vertices;
-	MeshNormals m_normals;
-	MeshTriangles m_triangles;
-
-	mutable i3d::CVector3d m_meshCenter;
-	mutable CCuboid m_meshCuboid;
-
-	mutable bool m_isMeshCuboidCalculationValid;
-	mutable bool m_isMeshCenterCalculationValid;
+	Indices m_indices;
+	static const int s_stlHeaderSize = 80;
 };
 
 

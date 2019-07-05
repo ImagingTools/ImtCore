@@ -64,7 +64,7 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 
 	QTextStream stream(&file);
 
-	std::vector<imt3d::IPointCloud3d::PointXyz32> points;
+	std::vector<IPointsBasedObject::PointXyz32> points;
 
 	while (!stream.atEnd()){
 		QString line = stream.readLine();
@@ -91,7 +91,7 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 					continue;
 				}
 
-				imt3d::IPointCloud3d::PointXyz32 point;
+				IPointsBasedObject::PointXyz32 point;
 				point.data[0] = x;
 				point.data[1] = y;
 				point.data[2] = z;
@@ -105,10 +105,10 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 
 	int pointsCount = static_cast<int>(points.size());
 
-	imt3d::IPointCloud3d::PointXyz32* pointsDataPtr = new imt3d::IPointCloud3d::PointXyz32[pointsCount];
-	memcpy(pointsDataPtr, points.data(), pointsCount * sizeof(imt3d::IPointCloud3d::PointXyz32));
+	IPointsBasedObject::PointXyz32* pointsDataPtr = new IPointsBasedObject::PointXyz32[pointsCount];
+	memcpy(pointsDataPtr, points.data(), pointsCount * sizeof(IPointsBasedObject::PointXyz32));
 
-	return documentPtr->CreateCloud(IPointCloud3d::PF_XYZ_32, pointsCount, pointsDataPtr, true) ? OS_OK : OS_FAILED;
+	return documentPtr->CreateCloud(IPointsBasedObject::PF_XYZ_32, pointsCount, pointsDataPtr, true) ? OS_OK : OS_FAILED;
 }
 
 
@@ -129,17 +129,20 @@ int CObjPointCloudPersistenceComp::SaveToFile(const istd::IChangeable& data, con
 	QTextStream stream(&file);
 
 	switch (documentPtr->GetPointFormat()){
-		case imt3d::IPointCloud3d::PF_XYZ_32:
-			SaveToFileHelper<imt3d::IPointCloud3d::PointXyz32>(*documentPtr, stream);
+		case IPointsBasedObject::PF_XYZ_32:
+			SaveToFileHelper<IPointsBasedObject::PointXyz32>(*documentPtr, stream);
 			break;
-		case imt3d::IPointCloud3d::PF_XYZ_64:
-			SaveToFileHelper<imt3d::IPointCloud3d::PointXyz64>(*documentPtr, stream);
+		case IPointsBasedObject::PF_XYZ_64:
+			SaveToFileHelper<IPointsBasedObject::PointXyz64>(*documentPtr, stream);
 			break;
-		case imt3d::IPointCloud3d::PF_XYZW_32:
-			SaveToFileHelper<imt3d::IPointCloud3d::PointXyzw32>(*documentPtr, stream);
+		case IPointsBasedObject::PF_XYZW_32:
+			SaveToFileHelper<IPointsBasedObject::PointXyzw32>(*documentPtr, stream);
 			break;
-		case imt3d::IPointCloud3d::PF_XYZ_ABC_32:
-			SaveToFileHelper<imt3d::IPointCloud3d::PointXyzAbc32>(*documentPtr, stream);
+		case IPointsBasedObject::PF_XYZ_ABC_32:
+			SaveToFileHelper<IPointsBasedObject::PointXyzAbc32>(*documentPtr, stream);
+			break;
+		case IPointsBasedObject::PF_XYZW_NORMAL_32:
+			SaveToFileHelper<IPointsBasedObject::PointXyzwNormal32>(*documentPtr, stream);
 			break;
 	}
 

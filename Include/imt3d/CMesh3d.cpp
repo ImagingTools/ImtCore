@@ -1,17 +1,8 @@
 #include <imt3d/CMesh3d.h>
 
 
-// STL includes
-#include <array>
-
 // ACF includes
 #include <istd/CChangeNotifier.h>
-
-
-// vertex element access
-static const int E_X = 0;
-static const int E_Y = 1;
-static const int E_Z = 2;
 
 
 namespace imt3d
@@ -20,56 +11,15 @@ namespace imt3d
 
 // public methods
 
-CMesh3d::CMesh3d():
-	m_isMeshCenterCalculationValid(false),
-	m_isMeshCuboidCalculationValid(false)
-{
-}
-
-
 bool CMesh3d::SaveToStlFile(const QString& filePath) const
 {
-	if (m_vertices.isEmpty()){
-		return false;
+	switch (m_pointFormat){
+		case IPointsBasedObject::PF_XYZW_NORMAL_32:
+			return SaveToStlFile<IPointsBasedObject::PointXyzwNormal32>(filePath);
+		default:
+			// STL file format assumes the presence of normals
+			return false;
 	}
-
-	std::FILE* file = std::fopen(filePath.toStdString().c_str(), "wb");
-	
-	if (file == NULL){
-		return false;
-	}
-
-	// write header
-	std::array<quint8, 80> stlHeader = { 0 };
-	std::fwrite(stlHeader.data(), sizeof(stlHeader[0]), stlHeader.size(), file);
-
-	// write triangles count
-	quint32 trianglesCount = static_cast<quint32>(m_triangles.size());
-	std::fwrite(&trianglesCount, sizeof(trianglesCount), 1, file);
-
-	for (int index = 0; index < m_triangles.size(); index++){
-		// write normal
-		const Normal& normal = m_normals[index];
-		std::fwrite(&normal[0], sizeof(float), 3, file);
-
-		// write vertices
-		const Triangle& oneTriangle = m_triangles[index];
-		Vertex firstVert = m_vertices[oneTriangle.GetElement(0)];
-		Vertex secondVert = m_vertices[oneTriangle.GetElement(1)];
-		Vertex thirdVert = m_vertices[oneTriangle.GetElement(2)];
-
-		std::fwrite(&firstVert[0], sizeof(float), 3, file);
-		std::fwrite(&secondVert[0], sizeof(float), 3, file);
-		std::fwrite(&thirdVert[0], sizeof(float), 3, file);
-
-		// write attributes
-		quint16 attributes = 0;
-		std::fwrite(&attributes, sizeof(attributes), 1, file);
-	}
-
-	std::fclose(file);
-
-	return true;
 }
 
 
@@ -77,218 +27,237 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_vertices.clear();
-	m_triangles.clear();
-	m_normals.clear();
+	ResetData();
 
-	m_isMeshCenterCalculationValid = false;
-	m_isMeshCuboidCalculationValid = false;
+	m_isCenterCalculationValid = false;
+	m_isCuboidCalculationValid = false;
 
-	std::FILE* file = std::fopen(filePath.toStdString().c_str(), "rb");
-	if (file == NULL){
+	QFile file(filePath);
+	if (!file.open(QIODevice::ReadOnly)){
 		return false;
 	}
 
-	std::array<quint8, 80> stlHeader = { {0} };
-	std::fread(stlHeader.data(), sizeof(stlHeader[0]), stlHeader.size(), file);
+	// read header
+	file.read(s_stlHeaderSize);
 
-	quint32 numTris = 0;
-	std::fread(&numTris, sizeof(numTris), 1, file);
+	quint32 trianglesCount = 0;
+	file.read(reinterpret_cast<char*>(&trianglesCount), sizeof(trianglesCount));
 
-	m_triangles.reserve(numTris);
-	m_normals.reserve(numTris);
-	m_vertices.reserve(3 * numTris);
+	m_indices.resize(trianglesCount);
 
-	for (quint32 i = 0; i < numTris; ++i){
-		// store indices of the m_vertices
-		Triangle oneTriangle;
-		oneTriangle.SetElement(0, i * 3);
-		oneTriangle.SetElement(1, i * 3 + 1);
-		oneTriangle.SetElement(2, i * 3 + 2);
+	int pointsCount = trianglesCount * 3;
 
-		m_triangles.push_back(oneTriangle);
+	// allocate memory for points data
+	IPointsBasedObject::PointXyzwNormal32* pointsDataPtr = new IPointsBasedObject::PointXyzwNormal32[pointsCount];
 
-		FloatVector3d normal;
-		normal.Clear();
+	for (quint32 i = 0; i < trianglesCount; ++i){
+		// set indices
+		m_indices[i].resize(3);
+		m_indices[i][0] = i * 3 + 0;
+		m_indices[i][1] = i * 3 + 1;
+		m_indices[i][2] = i * 3 + 2;
 
-		std::fread(&normal[0], sizeof(float), 3, file);
+		// read normal
+		IPointsBasedObject::PointXyzwNormal32& point1 = pointsDataPtr[i * 3 + 0];
+		IPointsBasedObject::PointXyzwNormal32& point2 = pointsDataPtr[i * 3 + 1];
+		IPointsBasedObject::PointXyzwNormal32& point3 = pointsDataPtr[i * 3 + 2];
 
-		FloatVector3d firstVert;
-		FloatVector3d secondVert;
-		FloatVector3d thirdVert;
+		if (!ReadPointData(file, &point1.data[4])){
+			return false;
+		}
 
-		std::fread(&firstVert[0], sizeof(float), 3, file);
-		std::fread(&secondVert[0], sizeof(float), 3, file);
-		std::fread(&thirdVert[0], sizeof(float), 3, file);
+		// read vertices
+		if (!ReadPointData(file, &point1.data[0])){
+			return false;
+		}
 
-		quint16 attributes = 0;
-		std::fread(&attributes, sizeof(attributes), 1, file);
+		if (!ReadPointData(file, &point2.data[0])){
+			return false;
+		}
 
-		m_vertices.push_back(firstVert);
-		m_vertices.push_back(secondVert);
-		m_vertices.push_back(thirdVert);
+		if (!ReadPointData(file, &point3.data[0])){
+			return false;
+		}
 
-		m_normals.push_back(normal);
+		// point data structure assumes that normal is specified for each point,
+		// so there is nothing to do but copy them
+		memcpy(&point2.data[4], &point1.data[4], sizeof(float) * 3);
+		memcpy(&point3.data[4], &point1.data[4], sizeof(float) * 3);
+
+		// read (skip) attributes
+		file.read(sizeof(quint16));
 	}
 
-	std::fclose(file);
-
-	return true;
+	return Create(IPointsBasedObject::PF_XYZW_NORMAL_32, pointsCount, pointsDataPtr, true);
 }
 
 
-// reimplemented (imt3d::IMesh3d)
-const CMesh3d::MeshVertices& CMesh3d::GetVertices() const
+bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, const Indices& indices)
 {
-	return m_vertices;
+	istd::CChangeNotifier changeNotifier(this);
+
+	bool retVal = Create(pointFormat, pointsCount, nullptr, true);
+
+	if (retVal){
+		m_indices = indices;
+	}
+
+	return retVal;
 }
 
 
-const CMesh3d::MeshEdgesPtr CMesh3d::GetEdges() const
+bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, void* pointsDataPtr, bool pointsDataReleaseFlag, const Indices& indices)
 {
-	//TODO
-	return istd::TSmartPtr<MeshEdges>();
+	istd::CChangeNotifier changeNotifier(this);
+
+	bool retVal = Create(pointFormat, pointsCount, pointsDataPtr, pointsDataReleaseFlag);
+
+	if (retVal){
+		m_indices = indices;
+	}
+
+	return retVal;
 }
 
 
-const CMesh3d::MeshIndexEdgesPtr CMesh3d::GetIndexEdges() const
+const IMesh3d::Indices& CMesh3d::GetIndices() const
 {
-	//TODO
-	return istd::TSmartPtr<MeshIndexEdges>();
-}
-
-
-const CMesh3d::MeshTriangles& CMesh3d::GetTriangles() const
-{
-	return m_triangles;
-}
-
-
-const CMesh3d::MeshNormals& CMesh3d::GetNormals() const
-{
-	return m_normals;
-}
-
-
-// reimplemented (imt3d::IObject3d)
-
-bool CMesh3d::IsEmpty() const
-{
-	return m_vertices.isEmpty();
-}
-
-
-i3d::CVector3d CMesh3d::GetCenter() const
-{
-	EnsureCenterCalculated();
-
-	return m_meshCenter;
-}
-
-
-void CMesh3d::MoveCenterTo(const i3d::CVector3d& position)
-{
-	Q_UNUSED(position);
-
-	m_isMeshCenterCalculationValid = false;
-	m_isMeshCuboidCalculationValid = false;
-}
-
-
-CCuboid CMesh3d::GetBoundingCuboid() const
-{
-	EnsureCuboidCalculated();
-
-	return m_meshCuboid;
+	return m_indices;
 }
 
 
 // reimplemented (iser::ISerializable)
 
-bool CMesh3d::Serialize(iser::IArchive& archive)
+bool CMesh3d::Serialize(iser::IArchive& /*archive*/)
 {
-	Q_UNUSED(archive);
-
 	return false;
 }
 
 
-// private methods
+// reimplemented (istd::IChangeable)
 
-void CMesh3d::EnsureCenterCalculated() const
+bool CMesh3d::CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode)
 {
-	if (!IsEmpty() && !m_isMeshCenterCalculationValid){
-		const CCuboid boundingCuboid = GetBoundingCuboid();
+	bool retVal = CPointsBasedObject::CopyFrom(object, mode);
 
-		istd::CRange xRange(boundingCuboid.GetLeft(), boundingCuboid.GetRight());
-		istd::CRange yRange(boundingCuboid.GetBottom(), boundingCuboid.GetTop());
-		istd::CRange zRange(boundingCuboid.GetNear(), boundingCuboid.GetFar());
+	if (retVal){
+		const CMesh3d* objectPtr = dynamic_cast<const CMesh3d*>(&object);
+		if (objectPtr != nullptr){
+			istd::CChangeNotifier changeNotifier(this);
 
-		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
-			m_meshCenter = i3d::CVector3d(
-				xRange.GetValueFromAlpha(0.5),
-				yRange.GetValueFromAlpha(0.5),
-				zRange.GetValueFromAlpha(0.5));
-
-			m_isMeshCenterCalculationValid = true;
+			m_indices = objectPtr->m_indices;
 		}
 	}
+
+	return retVal;
 }
 
 
-void CMesh3d::EnsureCuboidCalculated() const
+bool CMesh3d::ResetData(CompatibilityMode mode)
 {
-	if (!IsEmpty() && !m_isMeshCuboidCalculationValid){
-		istd::CRange xRange(qInf(), -qInf());
-		istd::CRange yRange(qInf(), -qInf());
-		istd::CRange zRange(qInf(), -qInf());
+	istd::CChangeNotifier changeNotifier(this);
 
-		for (MeshVertices::const_iterator itVertex = m_vertices.constBegin(); itVertex != m_vertices.constEnd(); ++itVertex){
-			double x = itVertex->GetElement(E_X);
-			double y = itVertex->GetElement(E_Y);
-			double z = itVertex->GetElement(E_Z);
+	bool retVal = CPointsBasedObject::ResetData(mode);
 
-			if (x < xRange.GetMinValue()){
-				xRange.SetMinValue(x);
-			}
+	if (retVal){
+		m_indices.clear();
+	}
 
-			if (y < yRange.GetMinValue()){
-				yRange.SetMinValue(y);
-			}
+	return retVal;
+}
 
-			if (z < zRange.GetMinValue()){
-				zRange.SetMinValue(z);
-			}
 
-			if (x > xRange.GetMaxValue()){
-				xRange.SetMaxValue(x);
-			}
+template <typename PointType>
+bool CMesh3d::SaveToStlFile(const QString& filePath) const
+{
+	if (IsEmpty()){
+		return false;
+	}
 
-			if (y > yRange.GetMaxValue()){
-				yRange.SetMaxValue(y);
-			}
+	QFile file(filePath);
+	if (!file.open(QIODevice::WriteOnly)){
+		return false;
+	}
 
-			if (z > zRange.GetMaxValue()){
-				zRange.SetMaxValue(z);
-			}
+	// write header
+	file.write(QByteArray(s_stlHeaderSize, 0));
+
+	// write triangles count
+	quint32 trianglesCount = static_cast<quint32>(m_indices.size());
+	bool retVal = WriteTypedValue<quint16>(trianglesCount, file);
+
+	// write triangles
+	for (size_t i = 0; retVal && i < m_indices.size(); i++){
+		const std::vector<uint32_t>& triangle = m_indices[i];
+
+		retVal = (triangle.size() == 3);
+
+		// write normal coordinates (assume that normal starts from the 4th point component)
+		if (retVal){
+			retVal = WritePointData<PointType>(triangle[0], 3, file);
 		}
 
-		if (xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty()){
-			const double left = xRange.GetMinValue();
-			const double right = xRange.GetMaxValue();
-			const double bottom = yRange.GetMinValue();
-			const double top = yRange.GetMaxValue();
-			const double far = zRange.GetMinValue();
-			const double near = zRange.GetMaxValue();
+		// write points coordinates
+		if (retVal){
+			retVal = WritePointData<PointType>(triangle[0], 0, file);
+		}
+		if (retVal){
+			retVal = WritePointData<PointType>(triangle[1], 0, file);
+		}
+		if (retVal){
+			retVal = WritePointData<PointType>(triangle[2], 0, file);
+		}
 
-			m_meshCuboid = CCuboid(left, right, bottom, top, near, far);
-
-			m_isMeshCuboidCalculationValid = true;
+		// write attributes
+		if (retVal){
+			quint16 attributes = 0;
+			retVal = WriteTypedValue<quint16>(attributes, file);
 		}
 	}
+
+	return retVal;
+}
+
+
+template <typename DataType>
+bool CMesh3d::WriteTypedValue(const DataType& data, QFile& file) const
+{
+	const char* bufPtr = reinterpret_cast<const char*>(&data);
+	qint64 bufSize = sizeof(DataType);
+
+	return file.write(bufPtr, bufSize) == bufSize;
+}
+
+
+template <typename PointType>
+bool CMesh3d::WritePointData(int pointIndex, int pointComponentOffset, QFile& file) const
+{
+	const PointType* pointDataPtr = static_cast<const PointType*>(GetPointData(pointIndex));
+	Q_ASSERT(pointDataPtr != nullptr);
+
+	float buf[3]; // STL format requires all floating point data to be 32 bit so cast to float
+	buf[0] = static_cast<float>(pointDataPtr->data[pointComponentOffset + 0]);
+	buf[1] = static_cast<float>(pointDataPtr->data[pointComponentOffset + 1]);
+	buf[2] = static_cast<float>(pointDataPtr->data[pointComponentOffset + 2]);
+
+	const char* bufPtr = reinterpret_cast<const char*>(buf);
+	qint64 bufSize = sizeof(buf);
+	
+	return file.write(bufPtr, bufSize) == bufSize;
+}
+
+
+bool CMesh3d::ReadPointData(QFile& file, float* pointDataPtr) const
+{
+	if (!pointDataPtr){
+		return false;
+	}
+
+	char* bufPtr = reinterpret_cast<char*>(pointDataPtr);
+	qint64 bufSize = sizeof(float) * 3;
+
+	return (file.read(bufPtr, bufSize) == bufSize);
 }
 
 
 } // namespace imt3d
-
-

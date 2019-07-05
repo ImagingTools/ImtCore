@@ -1,17 +1,12 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QLinkedList>
-#include <QVector>
-
-// ACF includes
-#include <i3d/CVector3d.h>
-#include <istd/TSmartPtr.h>
+// STL includes
+#include <vector>
 
 // ImtCore includes
-#include <imt3d/imt3d.h>
 #include <imt3d/IObject3d.h>
+#include <imt3d/IPointsBasedObject.h>
 
 
 namespace imt3d
@@ -19,73 +14,27 @@ namespace imt3d
 
 
 /**
-	Common interface for describing the mesh on 3D-points.
+	Common interface describing a mesh on 3D-points.
 */
-class IMesh3d: virtual public IObject3d
+class IMesh3d: virtual public IPointsBasedObject
 {
 public:
-	typedef imath::TVector<3, float> FloatVector3d;
-	typedef imath::TVector<3, int> IntVector3d;
-	typedef FloatVector3d Vertex;
-	typedef FloatVector3d Normal;
+	typedef std::vector<std::vector<uint32_t>> Indices;
 
 	/**
-		Edge defined through coordinates of its points
+		Create mesh with specified point format.
 	*/
-	typedef QPair<FloatVector3d, FloatVector3d> Edge;
+	virtual bool CreateMesh(PointFormat pointFormat, int pointsCount, const Indices& indices) = 0;
 
 	/**
-		Edge defined trough indices of its points
+		Create mesh with specified point format using external data buffer.
 	*/
-	typedef QPair<int, int> IndexEdge;
+	virtual bool CreateMesh(PointFormat pointFormat, int pointsCount, void* pointsDataPtr, bool pointsDataReleaseFlag, const Indices& indices) = 0;
 
 	/**
-		Contains indices of the corresp Vertices
+		Get mesh indices.
 	*/
-	typedef IntVector3d Triangle;
-
-
-	typedef QVector<Vertex> MeshVertices;
-	typedef QVector<Normal> MeshNormals;
-	typedef QVector<Edge> MeshEdges;
-	typedef QVector<IndexEdge> MeshIndexEdges;
-	typedef QVector<Triangle> MeshTriangles;
-	
-	/**
-		Mesh object pointer
-	*/
-	typedef istd::TSmartPtr<IMesh3d> MeshPtr;
-
-	typedef istd::TSmartPtr<MeshEdges> MeshEdgesPtr;
-	typedef istd::TSmartPtr<MeshIndexEdges> MeshIndexEdgesPtr;
-
-	//virtual void CreateMesh(/*const MeshTriangles& triangles*/) = 0;
-	
-	/**
-		Get list of vertices
-	*/
-	virtual const MeshVertices& GetVertices() const = 0;
-
-	/**
-		Get the list of edges.
-	*/
-	virtual const MeshEdgesPtr GetEdges() const = 0;
-
-	/**
-		Get the list of index edges.
-	*/
-	virtual const MeshIndexEdgesPtr GetIndexEdges() const = 0;
-
-	/**
-		Get list of triangles
-	*/
-	virtual const MeshTriangles& GetTriangles() const = 0;
-
-	/**
-		Get list of normals
-	*/
-	virtual const MeshNormals& GetNormals() const = 0;
-
+	virtual const Indices& GetIndices() const = 0;
 };
 
 
