@@ -38,6 +38,7 @@ public:
 
 		/**
 			Active if swap of objects with the other one is possible.
+			Make sense only for ordered object lists.
 		*/
 		OF_SUPPORT_SWAP = 32,
 
