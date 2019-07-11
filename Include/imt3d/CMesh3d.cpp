@@ -184,7 +184,7 @@ bool CMesh3d::SaveToStlFile(const QString& filePath) const
 
 	// write triangles count
 	quint32 trianglesCount = static_cast<quint32>(m_indices.size());
-	bool retVal = WriteTypedValue<quint16>(trianglesCount, file);
+	bool retVal = WriteTypedValue<quint32>(trianglesCount, file);
 
 	// write triangles
 	for (size_t i = 0; retVal && i < m_indices.size(); i++){
