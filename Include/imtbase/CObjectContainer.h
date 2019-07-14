@@ -37,7 +37,7 @@ public:
 				const QString& name,
 				const QString& description,
 				const istd::IChangeable* defaultValuePtr = nullptr) override;
-	virtual ObjectPtr GetEditableObject(const QByteArray& objectId) override;
+	virtual istd::IChangeable* GetEditableObject(const QByteArray& objectId) const override;
 	virtual bool RemoveObject(const QByteArray& objectId) override;
 	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
 	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
@@ -64,7 +64,7 @@ protected:
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const;
 
 protected:
-	typedef istd::TSmartPtr<istd::IChangeable> ObjectPtr;
+	typedef istd::TOptDelPtr<istd::IChangeable> ObjectPtr;
 
 	struct ObjectInfo
 	{
@@ -75,8 +75,20 @@ protected:
 			id = QUuid::createUuid().toByteArray();
 		}
 
+		ObjectInfo(const ObjectInfo& object)
+		{
+			this->objectPtr.TakeOver(const_cast<ObjectInfo&>(object).objectPtr);
+
+			this->id = object.id;
+			this->typeId = object.typeId;
+			this->name = object.name;
+			this->isEnabled = object.isEnabled;
+			this->flags = object.flags;
+			this->description = object.description;
+		}
+
 		bool isEnabled;
-		ObjectPtr object;
+		ObjectPtr objectPtr;
 		QString name;
 		QString description;
 		QByteArray id;
@@ -86,7 +98,6 @@ protected:
 
 	typedef QVector<ObjectInfo> Objects;
 
-private:
 	imod::CModelUpdateBridge m_modelUpdateBridge;
 
 	Objects m_objects;

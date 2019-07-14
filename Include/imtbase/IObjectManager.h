@@ -78,7 +78,7 @@ public:
 	/**
 		Get object with the given ID for the editing.
 	*/
-	virtual ObjectPtr GetEditableObject(const QByteArray& objectId) = 0;
+	virtual istd::IChangeable* GetEditableObject(const QByteArray& objectId) const = 0;
 
 	/**
 		Remove element with the given ID.

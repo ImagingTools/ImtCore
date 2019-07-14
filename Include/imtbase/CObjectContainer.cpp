@@ -51,12 +51,12 @@ QByteArray CObjectContainer::InsertNewObject(
 {
 	ObjectInfo info;
 
-	info.object.SetPtr(CreateObjectInstance(typeId));
-	if (info.object.IsValid()){
+	info.objectPtr.SetPtr(CreateObjectInstance(typeId), true);
+	if (info.objectPtr.IsValid()){
 		istd::CChangeNotifier changeNotifier(this);
 
 		if (defaultValuePtr != nullptr){
-			if (!info.object->CopyFrom(*defaultValuePtr)){
+			if (!info.objectPtr->CopyFrom(*defaultValuePtr)){
 				return QByteArray();
 			}
 		}
@@ -65,7 +65,7 @@ QByteArray CObjectContainer::InsertNewObject(
 		info.name = name;
 		info.typeId = typeId;
 
-		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(info.object.GetPtr());
+		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(info.objectPtr.GetPtr());
 		if (modelPtr != nullptr){
 			modelPtr->AttachObserver(&m_modelUpdateBridge);
 		}
@@ -79,15 +79,15 @@ QByteArray CObjectContainer::InsertNewObject(
 }
 
 
-CObjectContainer::ObjectPtr CObjectContainer::GetEditableObject(const QByteArray& objectId)
+istd::IChangeable* CObjectContainer::GetEditableObject(const QByteArray& objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
-			return objectInfo.object;
+			return objectInfo.objectPtr.GetPtr();
 		}
 	}
 
-	return ObjectPtr();
+	return nullptr;
 }
 
 
@@ -95,7 +95,7 @@ bool CObjectContainer::RemoveObject(const QByteArray& objectId)
 {
 	for (Objects::iterator iter = m_objects.begin(); iter != m_objects.end(); ++iter){
 		if ((*iter).id == objectId){
-			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>((*iter).object.GetPtr());
+			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>((*iter).objectPtr.GetPtr());
 			if (modelPtr != nullptr){
 				modelPtr->DetachObserver(&m_modelUpdateBridge);
 			}
@@ -170,7 +170,7 @@ const istd::IChangeable* CObjectContainer::GetDataObject(const QByteArray& objec
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
-			return objectInfo.object.GetPtr();
+			return objectInfo.objectPtr.GetPtr();
 		}
 	}
 
@@ -242,10 +242,11 @@ bool CObjectContainer::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
+		// TODO: Correct this implementation for the fixed objects!
 		m_objects.clear();
 
 		for (const ObjectInfo& objectInfo : sourcePtr->m_objects){
-			QByteArray newId = InsertNewObject(objectInfo.typeId, objectInfo.name, objectInfo.description, objectInfo.object.GetPtr());
+			QByteArray newId = InsertNewObject(objectInfo.typeId, objectInfo.name, objectInfo.description, objectInfo.objectPtr.GetPtr());
 			if (newId.isEmpty()){
 				return false;
 			}
