@@ -19,7 +19,8 @@ namespace imtbase
 */
 class CMultiStatusProviderComp:
 			public icomp::CComponentBase,
-			virtual public imtbase::IMultiStatusProvider
+			virtual public imtbase::IMultiStatusProvider,
+			virtual public istd::IInformationProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;

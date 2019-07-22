@@ -11,29 +11,34 @@ namespace imtgui
 
 void CMultiStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	imtbase::IMultiStatusProvider* objectPtr = GetObjectPtr();
-	Q_ASSERT(objectPtr != nullptr);
+	const imtbase::IMultiStatusProvider* multiStatusProviderPtr = GetObjectPtr();
+	Q_ASSERT(multiStatusProviderPtr != nullptr);
 
-	UpdateCommonStatusGui(*objectPtr);
-	UpdateSubStatusesGui(*objectPtr);
+	const istd::IInformationProvider* informationProviderPtr = dynamic_cast<const istd::IInformationProvider*>(multiStatusProviderPtr);
+
+	UpdateStatusesGui(*multiStatusProviderPtr);
+
+	if (informationProviderPtr){
+		UpdateCommonStatusGui(*informationProviderPtr);
+	}
 }
 
 
 // reimplemented (iqtgui::CGuiComponentBase)
 
-void CMultiStatusProviderGuiComp::UpdateCommonStatusGui(imtbase::IMultiStatusProvider& object)
+void CMultiStatusProviderGuiComp::UpdateCommonStatusGui(const istd::IInformationProvider& status)
 {
-	QString statusName = object.GetInformationDescription();
-	QIcon statusIcon = GetStatusIcon(object.GetInformationCategory());
+	QString statusName = status.GetInformationDescription();
+	QIcon statusIcon = GetStatusIcon(status.GetInformationCategory());
 
 	CommonStatusIcon->setPixmap(statusIcon.pixmap(QSize(32, 32)));
 	CommonStatusText->setText(statusName);
 }
 
 
-void CMultiStatusProviderGuiComp::UpdateSubStatusesGui(imtbase::IMultiStatusProvider& object)
+void CMultiStatusProviderGuiComp::UpdateStatusesGui(const imtbase::IMultiStatusProvider& statuses)
 {
-	const iprm::IOptionsList& statusProviderInfo = object.GetStatusInfoList();
+	const iprm::IOptionsList& statusProviderInfo = statuses.GetStatusInfoList();
 
 	int statusesCount = statusProviderInfo.GetOptionsCount();
 	if (statusesCount <= 0){
@@ -45,7 +50,7 @@ void CMultiStatusProviderGuiComp::UpdateSubStatusesGui(imtbase::IMultiStatusProv
 	for (int i = 0; i < statusesCount; ++i){
 		QByteArray statusInfoId = statusProviderInfo.GetOptionId(i);
 
-		const istd::IInformationProvider* statusPtr = object.GetStatusInfo(statusInfoId);
+		const istd::IInformationProvider* statusPtr = statuses.GetStatusInfo(statusInfoId);
 		Q_ASSERT(statusPtr != nullptr);
 
 		QString statusText = statusPtr->GetInformationDescription();

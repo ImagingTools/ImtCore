@@ -26,8 +26,8 @@ protected:
 	void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
-	void UpdateCommonStatusGui(imtbase::IMultiStatusProvider& object);
-	void UpdateSubStatusesGui(imtbase::IMultiStatusProvider& object);
+	void UpdateCommonStatusGui(const istd::IInformationProvider& status);
+	void UpdateStatusesGui(const imtbase::IMultiStatusProvider& statuses);
 
 	static QIcon GetStatusIcon(istd::IInformationProvider::InformationCategory status);
 };

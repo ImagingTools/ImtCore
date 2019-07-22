@@ -2,8 +2,14 @@
 
 
 // ACF includes
-#include <istd/IInformationProvider.h>
 #include <iprm/IOptionsList.h>
+
+
+// Forward declarations
+namespace istd
+{
+	class IInformationProvider;
+};
 
 
 namespace imtbase
@@ -13,7 +19,7 @@ namespace imtbase
 /**
 	Multi status provider interface.
 */
-class IMultiStatusProvider: virtual public istd::IInformationProvider
+class IMultiStatusProvider: virtual public istd::IChangeable
 {
 public:
 	/**
