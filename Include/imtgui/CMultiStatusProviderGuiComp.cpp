@@ -7,6 +7,16 @@ namespace imtgui
 
 // protected methods
 
+// reimplemented (iqtgui::CGuiComponentBase)
+
+void CMultiStatusProviderGuiComp::OnGuiCreated()
+{
+	BaseClass::OnGuiCreated();
+
+	SubStatusesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+}
+
+
 // reimplemented (iqtgui::TGuiObserverWrap)
 
 void CMultiStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
@@ -14,25 +24,22 @@ void CMultiStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& 
 	const imtbase::IMultiStatusProvider* multiStatusProviderPtr = GetObjectPtr();
 	Q_ASSERT(multiStatusProviderPtr != nullptr);
 
-	const istd::IInformationProvider* informationProviderPtr = dynamic_cast<const istd::IInformationProvider*>(multiStatusProviderPtr);
-
 	UpdateStatusesGui(*multiStatusProviderPtr);
 
+	const istd::IInformationProvider* informationProviderPtr = dynamic_cast<const istd::IInformationProvider*>(multiStatusProviderPtr);
 	if (informationProviderPtr){
 		UpdateCommonStatusGui(*informationProviderPtr);
 	}
 }
 
 
-// reimplemented (iqtgui::CGuiComponentBase)
-
 void CMultiStatusProviderGuiComp::UpdateCommonStatusGui(const istd::IInformationProvider& status)
 {
-	QString statusName = status.GetInformationDescription();
+	QString statusText = status.GetInformationDescription();
 	QIcon statusIcon = GetStatusIcon(status.GetInformationCategory());
 
 	CommonStatusIcon->setPixmap(statusIcon.pixmap(QSize(32, 32)));
-	CommonStatusText->setText(statusName);
+	CommonStatusText->setText(statusText);
 }
 
 
@@ -57,8 +64,8 @@ void CMultiStatusProviderGuiComp::UpdateStatusesGui(const imtbase::IMultiStatusP
 		QString statusSource = statusPtr->GetInformationSource();
 		QIcon statusIcon = GetStatusIcon(statusPtr->GetInformationCategory());
 
-		SubStatusesTable->setItem(i, 0, new QTableWidgetItem(statusSource));
-		SubStatusesTable->setItem(i, 1, new QTableWidgetItem(statusIcon, statusText));
+		SubStatusesTable->setItem(i, 0, new QTableWidgetItem(statusIcon, statusSource));
+		SubStatusesTable->setItem(i, 1, new QTableWidgetItem(statusText));
 	}
 }
 

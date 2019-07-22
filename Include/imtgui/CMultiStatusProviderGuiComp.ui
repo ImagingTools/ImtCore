@@ -59,14 +59,29 @@
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
      </property>
-     <property name="sizeAdjustPolicy">
-      <enum>QAbstractScrollArea::AdjustToContents</enum>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(0, 0, 0, 0);</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
      </property>
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
+     <property name="tabKeyNavigation">
+      <bool>false</bool>
+     </property>
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
+     </property>
      <property name="alternatingRowColors">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="selectionMode">
       <enum>QAbstractItemView::NoSelection</enum>
@@ -75,6 +90,12 @@
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
      <property name="showGrid">
+      <bool>false</bool>
+     </property>
+     <property name="gridStyle">
+      <enum>Qt::NoPen</enum>
+     </property>
+     <property name="cornerButtonEnabled">
       <bool>false</bool>
      </property>
      <property name="columnCount">

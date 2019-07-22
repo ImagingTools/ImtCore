@@ -22,8 +22,11 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (iqtgui::CGuiComponentBase)
+	virtual void OnGuiCreated() override;
+
 	// reimplemented (iqtgui::TGuiObserverWrap)
-	void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
+	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
 	void UpdateCommonStatusGui(const istd::IInformationProvider& status);
