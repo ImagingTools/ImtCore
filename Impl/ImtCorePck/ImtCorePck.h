@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtbase/CObjectContainerComp.h>
 #include <imtbase/CDelegatedObjectContainerSupplierComp.h>
+#include <imtbase/CMultiStatusProviderComp.h>
 
 #include <imt3d/CPointCloud3d.h>
 #include <imt3d/CObjPointCloudPersistenceComp.h>
@@ -26,6 +27,7 @@ namespace ImtCorePck
 
 typedef icomp::TModelCompWrap<imtbase::CObjectContainerComp> ObjectContainer;
 typedef icomp::TModelCompWrap<imtbase::CDelegatedObjectContainerSupplierComp> DelegatedObjectContainerSupplier;
+typedef icomp::TModelCompWrap<imtbase::CMultiStatusProviderComp> MultiStatusProvider;
 
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<imt3d::CPointCloud3d, imt3d::IPointCloud3d, imt3d::IObject3d, iser::ISerializable>> PointCloud;

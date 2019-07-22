@@ -19,7 +19,10 @@ I_EXPORT_COMPONENT(
 			"Thumbnail selection page view component",
 			"Menu Thumbnail Selection Page");
 
+I_EXPORT_COMPONENT(
+			MultiStatusProviderGui,
+			"Multi information status provider GUI component",
+			"Multi Information Status Provider");
+
 
 } // namespace ImtGuiPck
-
-

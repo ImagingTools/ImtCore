@@ -25,6 +25,11 @@ I_EXPORT_COMPONENT(
 			"Delegator Object Data Model Composition Supplier Provider");
 
 I_EXPORT_COMPONENT(
+			MultiStatusProvider,
+			"Multiple information status provider",
+			"Multiple Information Status Provider");
+
+I_EXPORT_COMPONENT(
 			PointCloud,
 			"3D-point cloud",
 			"3D Points");
