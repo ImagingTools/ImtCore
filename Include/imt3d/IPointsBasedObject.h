@@ -1,7 +1,7 @@
 #pragma once
 
 
-// ACF includes
+// ImtCore includes
 #include <imt3d/IObject3d.h>
 
 
