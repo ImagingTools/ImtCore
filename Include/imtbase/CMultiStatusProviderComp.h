@@ -15,7 +15,7 @@ namespace imtbase
 
 
 /**
-	Multi status provider component implementation.
+	Multiple status provider component implementation.
 */
 class CMultiStatusProviderComp:
 			public icomp::CComponentBase,
@@ -35,20 +35,20 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtbase::IMultiStatusProvider)
-	const iprm::IOptionsList& GetStatusInfoList() const override;
-	const istd::IInformationProvider* GetStatusInfo(const QByteArray& id) const override;
+	virtual const iprm::IOptionsList& GetStatusInfoList() const override;
+	virtual const istd::IInformationProvider* GetStatusInfo(const QByteArray& id) const override;
 
 	// reimplemented (iinsp::IInformationProvider)
-	QDateTime GetInformationTimeStamp() const override;
-	InformationCategory GetInformationCategory() const override;
-	int GetInformationId() const override;
-	QString GetInformationDescription() const override;
-	QString GetInformationSource() const override;
-	int GetInformationFlags() const override;
+	virtual QDateTime GetInformationTimeStamp() const override;
+	virtual InformationCategory GetInformationCategory() const override;
+	virtual int GetInformationId() const override;
+	virtual QString GetInformationDescription() const override;
+	virtual QString GetInformationSource() const override;
+	virtual int GetInformationFlags() const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
-	void OnComponentCreated() override;
+	virtual void OnComponentCreated() override;
 
 private:
 	I_MULTIREF(istd::IInformationProvider, m_informationProvidersCompPtr);
@@ -61,3 +61,5 @@ private:
 
 
 } // namespace imtbase
+
+

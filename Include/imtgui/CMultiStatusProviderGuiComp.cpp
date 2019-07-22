@@ -85,3 +85,5 @@ QIcon CMultiStatusProviderGuiComp::GetStatusIcon(istd::IInformationProvider::Inf
 
 
 } // namespace imtgui
+
+
