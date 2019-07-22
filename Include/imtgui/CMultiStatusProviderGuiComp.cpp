@@ -54,11 +54,11 @@ void CMultiStatusProviderGuiComp::UpdateStatusesGui(const imtbase::IMultiStatusP
 		Q_ASSERT(statusPtr != nullptr);
 
 		QString statusText = statusPtr->GetInformationDescription();
-		QString statusDesc = statusPtr->GetInformationSource();
+		QString statusSource = statusPtr->GetInformationSource();
 		QIcon statusIcon = GetStatusIcon(statusPtr->GetInformationCategory());
 
-		SubStatusesTable->setItem(i, 0, new QTableWidgetItem(statusIcon, statusText));
-		SubStatusesTable->setItem(i, 1, new QTableWidgetItem(statusDesc));
+		SubStatusesTable->setItem(i, 0, new QTableWidgetItem(statusSource));
+		SubStatusesTable->setItem(i, 1, new QTableWidgetItem(statusIcon, statusText));
 	}
 }
 
