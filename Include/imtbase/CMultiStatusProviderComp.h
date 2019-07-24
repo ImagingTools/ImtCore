@@ -50,7 +50,6 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
-private:
 	I_MULTIREF(istd::IInformationProvider, m_informationProvidersCompPtr);
 	I_MULTIATTR(QByteArray, m_statusIdsAttrPtr);
 	I_MULTITEXTATTR(m_statusNamesAttrPtr);

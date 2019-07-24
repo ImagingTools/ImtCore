@@ -30,6 +30,11 @@ I_EXPORT_COMPONENT(
 			"Multiple Information Status Provider");
 
 I_EXPORT_COMPONENT(
+			MultiStatusManager,
+			"Multiple information status manager",
+			"Multiple Information Status Manager");
+
+I_EXPORT_COMPONENT(
 			PointCloud,
 			"3D-point cloud",
 			"3D Points");
