@@ -13,10 +13,13 @@ namespace imtgui
 {
 
 
-class CMultiStatusProviderGuiComp: public iqtgui::TDesignerGuiObserverCompBase<Ui::MultiStatusProviderGui, imtbase::IMultiStatusProvider>
+class CMultiStatusProviderGuiComp:
+			public iqtgui::TDesignerGuiObserverCompBase<
+						Ui::MultiStatusProviderGui, imtbase::IMultiStatusProvider>
 {
 public:
-	typedef iqtgui::TDesignerGuiObserverCompBase<Ui::MultiStatusProviderGui, imtbase::IMultiStatusProvider> BaseClass;
+	typedef iqtgui::TDesignerGuiObserverCompBase<
+				Ui::MultiStatusProviderGui, imtbase::IMultiStatusProvider> BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CMultiStatusProviderGuiComp);
 	I_END_COMPONENT;
@@ -37,3 +40,5 @@ private:
 
 
 } // namespace imtgui
+
+
