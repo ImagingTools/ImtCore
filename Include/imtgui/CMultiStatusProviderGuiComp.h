@@ -21,7 +21,7 @@ public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
 				Ui::MultiStatusProviderGui, imtbase::IMultiStatusProvider> BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CMultiStatusProviderGuiComp);
+	I_BEGIN_COMPONENT(CMultiStatusProviderGuiComp);
 	I_END_COMPONENT;
 
 protected:

@@ -29,10 +29,10 @@ void CSingleStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 
 QIcon CSingleStatusProviderGuiComp::GetStatusIcon(istd::IInformationProvider::InformationCategory status)
 {
-	static QIcon stateUnknownIcon(":/Icons/StateUnknown");
-	static QIcon stateOkIcon(":/Icons/StateOk");
-	static QIcon stateWarningIcon(":/Icons/StateWarning");
-	static QIcon stateInvalidIcon(":/Icons/StateInvalid");
+	static QIcon stateUnknownIcon(":/Icons/StateUnknown2");
+	static QIcon stateOkIcon(":/Icons/StateOk2");
+	static QIcon stateWarningIcon(":/Icons/StateWarning2");
+	static QIcon stateInvalidIcon(":/Icons/StateInvalid2");
 
 	switch (status){
 		case istd::IInformationProvider::IC_INFO:

@@ -18,7 +18,7 @@ class CSingleStatusProviderGuiComp: public iqtgui::TDesignerGuiObserverCompBase<
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<Ui::SingleStatusProviderGui, istd::IInformationProvider> BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CSingleStatusProviderGuiComp);
+	I_BEGIN_COMPONENT(CSingleStatusProviderGuiComp);
 		I_ASSIGN(m_showStatusAttrPtr, "ShowStatus", "Show status text", false, true);
 		I_ASSIGN(m_showDescriptionAttrPtr, "ShowDescription", "Show description text", false, true);
 	I_END_COMPONENT;

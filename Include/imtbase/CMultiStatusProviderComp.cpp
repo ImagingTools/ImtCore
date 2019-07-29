@@ -76,13 +76,13 @@ int CMultiStatusProviderComp::GetInformationId() const
 
 QString CMultiStatusProviderComp::GetInformationDescription() const
 {
-	return QString();
+	return m_defaultDescriptionAttrPtr.IsValid() ? *m_defaultDescriptionAttrPtr : QString();
 }
 
 
 QString CMultiStatusProviderComp::GetInformationSource() const
 {
-	return QString();
+	return m_defaultSourceAttrPtr.IsValid() ? *m_defaultSourceAttrPtr : QString();
 }
 
 

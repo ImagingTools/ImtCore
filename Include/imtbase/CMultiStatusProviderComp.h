@@ -28,6 +28,8 @@ public:
 	I_BEGIN_COMPONENT(CMultiStatusProviderComp);
 		I_REGISTER_INTERFACE(IInformationProvider);
 		I_REGISTER_INTERFACE(IMultiStatusProvider);
+		I_ASSIGN(m_defaultDescriptionAttrPtr, "DefaultDescription", "Default information description", false, "");
+		I_ASSIGN(m_defaultSourceAttrPtr, "DefaultSource", "Default information source", false, "");
 		I_ASSIGN_MULTI_0(m_informationProvidersCompPtr, "InformationProviders", "List of underlying information providers", true);
 		I_ASSIGN_MULTI_0(m_statusIdsAttrPtr, "InformationStatusIds", "Information status identifiers", true);
 		I_ASSIGN_MULTI_0(m_statusNamesAttrPtr, "InformationStatusNames", "Information status names", true);
@@ -50,6 +52,8 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
+	I_ATTR(QString, m_defaultDescriptionAttrPtr);
+	I_ATTR(QString, m_defaultSourceAttrPtr);
 	I_MULTIREF(istd::IInformationProvider, m_informationProvidersCompPtr);
 	I_MULTIATTR(QByteArray, m_statusIdsAttrPtr);
 	I_MULTITEXTATTR(m_statusNamesAttrPtr);

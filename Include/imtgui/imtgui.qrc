@@ -24,9 +24,13 @@
         <file alias="Log">Resources/Icons/Log.svg</file>
         <file alias="Ok">Resources/Icons/Ok.svg</file>
         <file alias="StateInvalid">Resources/Icons/StateInvalid.svg</file>
+        <file alias="StateInvalid2">Resources/Icons/StateInvalid2.svg</file>
         <file alias="StateOk">Resources/Icons/StateOk.svg</file>
+        <file alias="StateOk2">Resources/Icons/StateOk2.svg</file>
         <file alias="StateWarning">Resources/Icons/StateWarning.svg</file>
+        <file alias="StateWarning2">Resources/Icons/StateWarning2.svg</file>
         <file alias="StateUnknown">Resources/Icons/StateUnknown.svg</file>
+        <file alias="StateUnknown2">Resources/Icons/StateUnknown2.svg</file>
         <file alias="Overview">Resources/Icons/Overview.svg</file>
         <file alias="Cancel">Resources/Icons/Cancel.svg</file>
         <file alias="Restore">Resources/Icons/Restore.svg</file>
