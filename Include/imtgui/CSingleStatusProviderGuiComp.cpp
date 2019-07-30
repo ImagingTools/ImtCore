@@ -7,6 +7,22 @@ namespace imtgui
 
 // protected methods
 
+// reimplemented (iqtgui::CGuiComponentBase)
+
+void CSingleStatusProviderGuiComp::OnGuiCreated()
+{
+	BaseClass::OnGuiCreated();
+
+	const istd::IInformationProvider* informationProviderPtr = GetObjectPtr();
+	Q_ASSERT(informationProviderPtr != nullptr);
+
+	QWidget* widgetPtr = GetWidget();
+	Q_ASSERT(widgetPtr != nullptr);
+
+	widgetPtr->setToolTip(informationProviderPtr->GetInformationDescription());
+}
+
+
 // reimplemented (iqtgui::TGuiObserverWrap)
 
 void CSingleStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)

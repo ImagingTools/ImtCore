@@ -24,14 +24,18 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (iqtgui::CGuiComponentBase)
+	virtual void OnGuiCreated() override;
+
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
+	static QIcon GetStatusIcon(istd::IInformationProvider::InformationCategory status);
+
+private:
 	I_ATTR(bool, m_showStatusAttrPtr);
 	I_ATTR(bool, m_showDescriptionAttrPtr);
-
-	static QIcon GetStatusIcon(istd::IInformationProvider::InformationCategory status);
 };
 
 
