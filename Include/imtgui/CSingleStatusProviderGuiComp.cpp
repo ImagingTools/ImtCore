@@ -15,14 +15,20 @@ void CSingleStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 	Q_ASSERT(informationProviderPtr != nullptr);
 
 	QIcon icon = GetStatusIcon(informationProviderPtr->GetInformationCategory());
-	IconLabel->setPixmap(icon.pixmap(QSize(32, 32)));
+	IconLabel->setPixmap(icon.pixmap(QSize(24, 24)));
 
 	if (m_showStatusAttrPtr.IsValid() && *m_showStatusAttrPtr){
 		SourceLabel->setText(informationProviderPtr->GetInformationSource());
 	}
+	else{
+		SourceLabel->hide();
+	}
 
 	if (m_showDescriptionAttrPtr.IsValid() && *m_showDescriptionAttrPtr){
 		DescriptionLabel->setText(informationProviderPtr->GetInformationDescription());
+	}
+	else{
+		DescriptionLabel->hide();
 	}
 }
 
