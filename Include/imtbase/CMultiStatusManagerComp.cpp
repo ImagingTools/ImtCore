@@ -1,6 +1,10 @@
 #include <imtbase/CMultiStatusManagerComp.h>
 
 
+// ACF includes
+#include <istd/CChangeNotifier.h>
+
+
 namespace imtbase
 {
 
@@ -11,8 +15,9 @@ namespace imtbase
 
 void CMultiStatusManagerComp::SetStatus(const QByteArray& statusId, const istd::IInformationProvider& status)
 {
-	int statusIndex = m_statusInfo.GetOptionIndexById(statusId);
+	istd::CChangeNotifier changeNotifier(this);
 
+	int statusIndex = m_statusInfo.GetOptionIndexById(statusId);
 	if (statusIndex >= 0 && statusIndex < m_informationProvidersCompPtr.GetCount()){
 		istd::IInformationProvider* statusPtr = m_informationProvidersCompPtr[statusIndex];
 		Q_ASSERT(statusPtr != nullptr);
