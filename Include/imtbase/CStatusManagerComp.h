@@ -23,7 +23,8 @@ public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CStatusManagerComp);
-		I_REGISTER_INTERFACE(IStatusManager);
+		I_REGISTER_INTERFACE(imtbase::IStatusManager);
+		I_REGISTER_INTERFACE(istd::IInformationProvider);
 		I_ASSIGN(m_defaultDescriptionAttrPtr, "DefaultDescription", "Default information description used if no information description is set", false, "");
 		I_ASSIGN(m_defaultSourceAttrPtr, "DefaultSource", "Default information source used if no information source is set", false, "Unknown");
 	I_END_COMPONENT;

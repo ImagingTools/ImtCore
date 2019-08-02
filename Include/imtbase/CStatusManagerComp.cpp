@@ -125,16 +125,16 @@ void CStatusManagerComp::SetInformationFlags(int flags)
 
 bool CStatusManagerComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const imtbase::CStatusManagerComp* providerPtr = dynamic_cast<const imtbase::CStatusManagerComp*>(&object);
+	const istd::IInformationProvider* providerPtr = dynamic_cast<const istd::IInformationProvider*>(&object);
 	if (providerPtr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_timeStamp = providerPtr->m_timeStamp;
-		m_category = providerPtr->m_category;
-		m_id = providerPtr->m_id;
-		m_description = providerPtr->m_description;
-		m_source = providerPtr->m_source;
-		m_flags = providerPtr->m_flags;
+		m_timeStamp = providerPtr->GetInformationTimeStamp();
+		m_category = providerPtr->GetInformationCategory();
+		m_id = providerPtr->GetInformationId();
+		m_description = providerPtr->GetInformationDescription();
+		m_source = providerPtr->GetInformationSource();
+		m_flags = providerPtr->GetInformationFlags();
 
 		return true;
 	}
