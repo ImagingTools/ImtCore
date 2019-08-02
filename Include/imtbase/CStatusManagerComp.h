@@ -2,8 +2,10 @@
 
 
 // ACF includes
-#include <istd/IInformationProvider.h>
 #include <icomp/CComponentBase.h>
+
+// ImtCore includes
+#include <imtbase/IStatusManager.h>
 
 
 namespace imtbase
@@ -15,13 +17,13 @@ namespace imtbase
 */
 class CStatusManagerComp:
 			public icomp::CComponentBase,
-			virtual public istd::IInformationProvider
+			virtual public imtbase::IStatusManager
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CStatusManagerComp);
-		I_REGISTER_INTERFACE(IInformationProvider);
+		I_REGISTER_INTERFACE(IStatusManager);
 		I_ASSIGN(m_defaultDescriptionAttrPtr, "DefaultDescription", "Default information description used if no information description is set", false, "");
 		I_ASSIGN(m_defaultSourceAttrPtr, "DefaultSource", "Default information source used if no information source is set", false, "Unknown");
 	I_END_COMPONENT;
@@ -36,9 +38,17 @@ public:
 	virtual QString GetInformationSource() const;
 	virtual int GetInformationFlags() const;
 
+	// reimplemented (imtbase::IStatusManager)
+	virtual void SetInformationTimeStamp(const QDateTime& timestamp) override;
+	virtual void SetInformationCategory(InformationCategory category) override;
+	virtual void SetInformationId(int id) override;
+	virtual void SetInformationDescription(const QString& description) override;
+	virtual void SetInformationSource(const QString& source) override;
+	virtual void SetInformationFlags(int flags) override;
+
 	// reimplemented (istd::IChangeable)
-	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS);
-	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS);
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
 	QDateTime m_timeStamp;
