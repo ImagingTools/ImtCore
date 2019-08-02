@@ -11,6 +11,7 @@
 #include <imtbase/CDelegatedObjectContainerSupplierComp.h>
 #include <imtbase/CMultiStatusProviderComp.h>
 #include <imtbase/CMultiStatusManagerComp.h>
+#include <imtbase/CStatusManagerComp.h>
 
 #include <imt3d/CPointCloud3d.h>
 #include <imt3d/CObjPointCloudPersistenceComp.h>
@@ -43,6 +44,7 @@ typedef imt3d::CStlMeshPersistenceComp StlMeshPersistence;
 typedef icomp::TModelCompWrap<
 	icomp::TMakeComponentWrap<imt3d::CDepthBitmap,imt3d::IDepthBitmap, iimg::IQImageProvider, iimg::IBitmap, iimg::IRasterImage, i2d::IObject2d, iser::ISerializable>> DepthBitmap;
 
+typedef icomp::TModelCompWrap<imtbase::CStatusManagerComp> StatusManager;
 
 } // namespace ImtCorePck
 

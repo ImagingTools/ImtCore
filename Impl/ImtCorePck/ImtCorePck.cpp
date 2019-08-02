@@ -59,6 +59,11 @@ I_EXPORT_COMPONENT(
 			"Depth bitmap",
 			"Bitmap 3D Depth Image");
 
+I_EXPORT_COMPONENT(
+			StatusManager,
+			"Information status manager",
+			"Information Status Manager");
+
 
 } // namespace ImtCorePck
 
