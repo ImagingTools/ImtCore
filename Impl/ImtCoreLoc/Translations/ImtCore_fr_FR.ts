@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru_RU">
+<TS version="2.1" language="fr_FR">
 <context>
     <name>Attribute</name>
     <message>
@@ -22,14 +22,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <source>ImtCore</source>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <source>ImagingTools GmbH</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../AuxInclude/Qt5_VC12_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
-        <source>ImagingTools GmbH</source>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <source>ImtCore</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
