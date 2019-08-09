@@ -31,7 +31,7 @@ void CSingleStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 	Q_ASSERT(informationProviderPtr != nullptr);
 
 	QIcon icon = GetStatusIcon(informationProviderPtr->GetInformationCategory());
-	IconLabel->setPixmap(icon.pixmap(QSize(24, 24)));
+	IconLabel->setPixmap(icon.pixmap(QSize(16, 16)));
 
 	if (m_showStatusAttrPtr.IsValid() && *m_showStatusAttrPtr){
 		SourceLabel->setText(informationProviderPtr->GetInformationSource());
