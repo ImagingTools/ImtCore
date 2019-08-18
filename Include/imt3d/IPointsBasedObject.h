@@ -19,7 +19,7 @@ public:
 	{
 		PF_XYZ_32 = 0,		// 3 float point coordinates
 		PF_XYZ_64,			// 3 double point coordinates
-		PF_XYZ_ABC_32,		// 3 float point coordinates + 3 float additional components
+		PF_XYZ_ABC_32,		// position data (XYZ) and Euler angles (ABC) in radians, both as 32-bit float number
 		PF_XYZW_32,			// 4 float point coordinates (homogeneous point coordinates)
 		PF_XYZW_NORMAL_32	// 4 float point coordinates + 4 float normal coordinates + 4 float curvature
 	};
