@@ -146,7 +146,7 @@ void CObjectContainer::SetObjectEnabled(const QByteArray& objectId, bool isEnabl
 }
 
 
-// reimplemented (IObjectProvider)
+// reimplemented (IObjectCollectionInfo)
 
 const iprm::IOptionsList* CObjectContainer::GetObjectTypesInfo() const
 {
@@ -165,6 +165,8 @@ IElementList::Id CObjectContainer::GetObjectTypeId(const QByteArray& objectId) c
 	return QByteArray();
 }
 
+
+// reimplemented (IObjectProvider)
 
 const istd::IChangeable* CObjectContainer::GetDataObject(const QByteArray& objectId) const
 {

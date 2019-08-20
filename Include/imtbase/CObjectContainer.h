@@ -43,9 +43,11 @@ public:
 	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
 
-	// reimplemented (IObjectProvider)
+	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
+
+	// reimplemented (IObjectProvider)
 	virtual const istd::IChangeable* GetDataObject(const QByteArray & objectId) const override;
 
 	// reimplemented (IElementList)
