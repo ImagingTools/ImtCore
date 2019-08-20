@@ -260,7 +260,9 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 	QStandardItem* item = m_menuItemModel.itemFromIndex(index);
 	bool pageExists = (item == nullptr) ? (false) : (item->data(CThumbpageItemGuiDelegate::DR_PAGE_ID).isValid());
 	if (!pageExists){
+		m_subPageItemMap.clear();
 		SubPages->clear();
+
 		CurrentPageLabel->clear();
 		on_HomeButton_clicked();
 
@@ -450,7 +452,10 @@ void CThumbnailDecoratorGuiComp::ShowLoginPage()
 {
 	PageStack->setCurrentIndex(LOGIN_PAGE_INDEX);
 	PageList->clearSelection();
+
+	m_subPageItemMap.clear();
 	SubPages->clear();
+
 	LeftFrame->setVisible(false);
 
 	UpdateLoginButtonsState();
@@ -474,7 +479,10 @@ void CThumbnailDecoratorGuiComp::ShowHomePage()
 
 	PageStack->setCurrentIndex(HOME_PAGE_INDEX);
 	PageList->clearSelection();
+	
+	m_subPageItemMap.clear();
 	SubPages->clear();
+
 	LeftFrame->setVisible(false);
 
 	UpdateLoginButtonsState();
@@ -486,13 +494,14 @@ void CThumbnailDecoratorGuiComp::ShowHomePage()
 void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 {
 	PageList->clearSelection();
+	
+	m_subPageItemMap.clear();
 	SubPages->clear();
+
 	LeftFrame->setVisible(false);
 
 	if (m_pagesCompPtr.IsValid()){
 		if (m_pagesCompPtr->SetSelectedOptionIndex(index)){
-			SubPages->clear();
-
 			QString pageLabel;
 			const iprm::IOptionsList* pageListPtr = m_pagesCompPtr->GetSelectionConstraints();
 			if ((pageListPtr != NULL) && index >= 0){
@@ -636,6 +645,7 @@ void CThumbnailDecoratorGuiComp::CreatePages(const iprm::ISelectionParam* select
 
 void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selectionPtr, QTreeWidgetItem* parentItemPtr)
 {
+	m_subPageItemMap.clear();
 	SubPages->clear();
 
 	if (selectionPtr == nullptr){
@@ -695,7 +705,16 @@ void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selecti
 		}
 	}
 
-	LeftFrame->setVisible(SubPages->topLevelItemCount() > 0);
+	bool hidePageListView = false;
+
+	if (m_pagesCompPtr.IsValid() && m_disablePageListViewIndexesAttrPtr.IsValid()){
+		int topLevelPageIndex = m_pagesCompPtr->GetSelectedOptionIndex();
+		if ((topLevelPageIndex >= 0) && (m_disablePageListViewIndexesAttrPtr.FindValue(topLevelPageIndex) >= 0)){
+			hidePageListView = true;
+		}
+	}
+
+	LeftFrame->setVisible(!hidePageListView && (SubPages->topLevelItemCount() > 0));
 }
 
 
@@ -747,7 +766,7 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 					const iprm::IOptionsList* subPageListPtr = subMenuPtr->GetSelectionConstraints();
 					if (subPageListPtr != NULL){
 						for (MenuItemInfoMap::Iterator subPageIter = m_subPageItemMap.begin(); subPageIter != m_subPageItemMap.end(); ++subPageIter){
-							int subPageIndex = itemIter.value().pageIndex;
+							int subPageIndex = subPageIter.value().pageIndex;
 
 							bool isPageEnabled = subPageListPtr->IsOptionEnabled(subPageIndex);
 
