@@ -12,6 +12,9 @@ namespace imtbase
 {
 
 
+/**
+	Interface for collection of references to objects which can be identified ( e.g. in a storage) using their IDs.
+*/
 class IReferenceCollection: virtual public imtbase::IObjectCollectionInfo, virtual public iser::ISerializable
 {
 public:
