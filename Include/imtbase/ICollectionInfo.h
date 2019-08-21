@@ -18,7 +18,7 @@ class ICollectionInfo: virtual public istd::IChangeable
 {
 public:
 	typedef QByteArray Id;
-	typedef QVector<Id> Ids;
+	typedef QSet<Id> Ids;
 
 	/**
 		Get available element-IDs.
