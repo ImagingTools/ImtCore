@@ -19,17 +19,17 @@ class IReferenceCollection: virtual public imtbase::IObjectCollectionInfo, virtu
 {
 public:
 	/**
-		Insert new resource into the collection.
+		Insert a new reference into the collection.
 	*/
 	virtual bool InsertReference(const Id& resourceId) = 0;
 
 	/**
-		Remove a given resource from the collection.
+		Remove a given reference from the collection.
 	*/
 	virtual bool RemoveReference(const Id& resourceId) = 0;
 
 	/**
-		Remove all resources from the collection.
+		Remove all references from the collection.
 	*/
 	virtual bool RemoveAllReferences() = 0;
 };
