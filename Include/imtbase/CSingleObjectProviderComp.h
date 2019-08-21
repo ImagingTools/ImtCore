@@ -41,7 +41,7 @@ public:
 	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 	virtual const istd::IChangeable* GetDataObject(const QByteArray& objectId) const override;
 
-	// reimplemented (IElementList)
+	// reimplemented (ICollectionInfo)
 	virtual Ids GetElementIds() const override;
 	virtual QString GetElementName(const QByteArray & elementId) const override;
 	virtual QString GetElementDescription(const QByteArray & elementId) const override;

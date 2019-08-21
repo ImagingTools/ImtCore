@@ -24,7 +24,7 @@ public:
 	typedef CObjectContainer BaseClass2;
 
 	I_BEGIN_COMPONENT(CObjectContainerComp);
-		I_REGISTER_INTERFACE(IObjectManager);
+		I_REGISTER_INTERFACE(IObjectCollection);
 		I_REGISTER_INTERFACE(IObjectProvider);
 		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "List of factories used for object creation", true);
 		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", true);

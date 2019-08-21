@@ -9,7 +9,7 @@ namespace imtbase
 {
 
 
-class IObjectManager: virtual public IObjectProvider
+class IObjectCollection: virtual public IObjectProvider
 {
 public:
 	enum OperationalFlags

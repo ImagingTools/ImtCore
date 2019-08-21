@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/IObjectManager.h>
+#include <imtbase/IObjectCollection.h>
 
 
 namespace imtbase
@@ -15,7 +15,7 @@ namespace imtbase
 class ICompositeObjectProvider: virtual public istd::IChangeable
 {
 public:
-	virtual const IObjectManager* GetCompositeObject() const = 0;
+	virtual const IObjectCollection* GetCompositeObject() const = 0;
 };
 
 

@@ -24,7 +24,7 @@ public:
 	virtual const iprm::IOptionsList * GetObjectTypesInfo() const override;
 	virtual Id GetObjectTypeId(const QByteArray & objectId) const override;
 
-	// reimplemented (imtbase::IElementList)
+	// reimplemented (imtbase::ICollectionInfo)
 	virtual Ids GetElementIds() const override;
 	virtual QString GetElementName(const QByteArray& elementId) const override;
 	virtual QString GetElementDescription(const QByteArray& elementId) const override;

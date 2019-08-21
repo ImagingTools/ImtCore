@@ -5,7 +5,7 @@
 #include <iprm/IOptionsList.h>
 
 // ImtCore includes
-#include <imtbase/IElementList.h>
+#include <imtbase/ICollectionInfo.h>
 
 
 namespace imtbase
@@ -15,7 +15,7 @@ namespace imtbase
 /**
 	Interface for getting information about a collection of objects.
 */
-class IObjectCollectionInfo: virtual public IElementList
+class IObjectCollectionInfo: virtual public ICollectionInfo
 {
 public:
 	/**

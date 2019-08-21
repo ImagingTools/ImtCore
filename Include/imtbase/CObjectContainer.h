@@ -10,7 +10,7 @@
 #include <imod/CModelUpdateBridge.h>
 
 // ImtCore includes
-#include <imtbase/IObjectManager.h>
+#include <imtbase/IObjectCollection.h>
 
 
 namespace imtbase
@@ -21,7 +21,7 @@ namespace imtbase
 	Implementation of a general object container.
 */
 class CObjectContainer:
-			virtual public IObjectManager,
+			virtual public IObjectCollection,
 			public istd::TComposedFactory<istd::IChangeable>
 {
 public:
@@ -30,7 +30,7 @@ public:
 	CObjectContainer();
 	virtual ~CObjectContainer();
 
-	// reimplemented (IObjectManager)
+	// reimplemented (IObjectCollection)
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
 	virtual QByteArray InsertNewObject(
 				const QByteArray& typeId,
@@ -50,7 +50,7 @@ public:
 	// reimplemented (IObjectProvider)
 	virtual const istd::IChangeable* GetDataObject(const QByteArray & objectId) const override;
 
-	// reimplemented (IElementList)
+	// reimplemented (ICollectionInfo)
 	virtual Ids GetElementIds() const override;
 	virtual QString GetElementName(const QByteArray& elementId) const override;
 	virtual QString GetElementDescription(const QByteArray& elementId) const override;

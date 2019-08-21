@@ -27,7 +27,7 @@ CObjectContainer::~CObjectContainer()
 }
 
 
-// reimplemented (IObjectManager)
+// reimplemented (IObjectCollection)
 
 int CObjectContainer::GetOperationFlags(const QByteArray& objectId) const
 {
@@ -154,7 +154,7 @@ const iprm::IOptionsList* CObjectContainer::GetObjectTypesInfo() const
 }
 
 
-IElementList::Id CObjectContainer::GetObjectTypeId(const QByteArray& objectId) const
+ICollectionInfo::Id CObjectContainer::GetObjectTypeId(const QByteArray& objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -180,9 +180,9 @@ const istd::IChangeable* CObjectContainer::GetDataObject(const QByteArray& objec
 }
 
 
-// reimplemented (IElementList)
+// reimplemented (ICollectionInfo)
 
-IElementList::Ids CObjectContainer::GetElementIds() const
+ICollectionInfo::Ids CObjectContainer::GetElementIds() const
 {
 	Ids retVal;
 

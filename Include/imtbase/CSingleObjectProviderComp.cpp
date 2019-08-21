@@ -42,9 +42,9 @@ const istd::IChangeable* CSingleObjectProviderComp::GetDataObject(const QByteArr
 }
 
 
-// reimplemented (IElementList)
+// reimplemented (ICollectionInfo)
 
-IElementList::Ids CSingleObjectProviderComp::GetElementIds() const
+ICollectionInfo::Ids CSingleObjectProviderComp::GetElementIds() const
 {
 	Ids retVal;
 	retVal.push_back(m_info.GetOptionId(0));

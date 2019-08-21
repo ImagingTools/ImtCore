@@ -14,7 +14,7 @@ namespace imtbase
 {
 
 
-class IElementList: virtual public istd::IChangeable
+class ICollectionInfo: virtual public istd::IChangeable
 {
 public:
 	typedef QByteArray Id;

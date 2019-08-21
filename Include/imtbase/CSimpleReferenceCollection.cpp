@@ -60,7 +60,7 @@ const iprm::IOptionsList* CSimpleReferenceCollection::GetObjectTypesInfo() const
 }
 
 
-imtbase::IElementList::Id CSimpleReferenceCollection::GetObjectTypeId(const QByteArray& objectId) const
+imtbase::ICollectionInfo::Id CSimpleReferenceCollection::GetObjectTypeId(const QByteArray& objectId) const
 {
 	int index = FindReference(objectId);
 	if (index >= 0){
@@ -71,9 +71,9 @@ imtbase::IElementList::Id CSimpleReferenceCollection::GetObjectTypeId(const QByt
 }
 
 
-// reimplemented (imtbase::IElementList)
+// reimplemented (imtbase::ICollectionInfo)
 
-imtbase::IElementList::Ids CSimpleReferenceCollection::GetElementIds() const
+imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds() const
 {
 	Ids retVal;
 
