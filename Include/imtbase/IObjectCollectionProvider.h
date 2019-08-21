@@ -10,9 +10,9 @@ namespace imtbase
 
 
 /**
-	Interface for a provider of a composite object.
+	Interface for a provider of a object collection.
 */
-class ICompositeObjectProvider: virtual public istd::IChangeable
+class IObjectCollectionProvider: virtual public istd::IChangeable
 {
 public:
 	virtual const IObjectCollection* GetCompositeObject() const = 0;

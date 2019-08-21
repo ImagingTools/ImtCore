@@ -5,7 +5,7 @@ namespace imtbase
 {
 
 
-// reimplemented (imtbase::ICompositeObjectProvider)
+// reimplemented (imtbase::IObjectCollectionProvider)
 
 const imtbase::IObjectCollection* CDelegatedObjectContainerSupplierComp::GetCompositeObject() const
 {

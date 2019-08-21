@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4769" Description="ACF"/>
-            <Version Id="1" Number="2053" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330496" Description="Qt Framework"/>
+            <Version Id="0" Number="4804" Description="ACF"/>
+            <Version Id="1" Number="2101" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331008" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>ImagingTools application framework</Description>
@@ -152,6 +152,9 @@
                         <Data IsEnabled="true" Value="CommandsMultiplexer"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultPageIndex" Type="Integer" ExportId="DefaultPageIndex">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DisablePageListViewIndexes" Type="Integer[]" ExportId="DisablePageListViewIndexes">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="HorizontalFrameMargin" Type="Integer" ExportId="HorizontalFrameMargin">
