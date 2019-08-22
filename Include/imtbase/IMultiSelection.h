@@ -19,6 +19,9 @@ namespace imtbase
 {
 
 
+/**
+	Multiple selection of the elements identified by an unique ID.
+*/
 class IMultiSelection: virtual public iser::ISerializable
 {
 public:

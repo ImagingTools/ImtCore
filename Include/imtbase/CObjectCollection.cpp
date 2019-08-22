@@ -1,4 +1,4 @@
-#include <imtbase/CObjectContainer.h>
+#include <imtbase/CObjectCollection.h>
 
 
 // Qt includes
@@ -15,13 +15,13 @@ namespace imtbase
 
 // public methods
 
-CObjectContainer::CObjectContainer()
+CObjectCollection::CObjectCollection()
 	:m_modelUpdateBridge(this)
 {
 }
 
 
-CObjectContainer::~CObjectContainer()
+CObjectCollection::~CObjectCollection()
 {
 	m_modelUpdateBridge.EnsureModelsDetached();
 }
@@ -29,7 +29,7 @@ CObjectContainer::~CObjectContainer()
 
 // reimplemented (IObjectCollection)
 
-int CObjectContainer::GetOperationFlags(const QByteArray& objectId) const
+int CObjectCollection::GetOperationFlags(const QByteArray& objectId) const
 {
 	if (!objectId.isEmpty()){
 		for (const ObjectInfo& objectInfo : m_objects){
@@ -43,7 +43,7 @@ int CObjectContainer::GetOperationFlags(const QByteArray& objectId) const
 }
 
 
-QByteArray CObjectContainer::InsertNewObject(
+QByteArray CObjectCollection::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
@@ -79,7 +79,7 @@ QByteArray CObjectContainer::InsertNewObject(
 }
 
 
-istd::IChangeable* CObjectContainer::GetEditableObject(const QByteArray& objectId) const
+istd::IChangeable* CObjectCollection::GetEditableObject(const QByteArray& objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -91,7 +91,7 @@ istd::IChangeable* CObjectContainer::GetEditableObject(const QByteArray& objectI
 }
 
 
-bool CObjectContainer::RemoveObject(const QByteArray& objectId)
+bool CObjectCollection::RemoveObject(const QByteArray& objectId)
 {
 	for (Objects::iterator iter = m_objects.begin(); iter != m_objects.end(); ++iter){
 		if ((*iter).id == objectId){
@@ -110,7 +110,7 @@ bool CObjectContainer::RemoveObject(const QByteArray& objectId)
 }
 
 
-void CObjectContainer::SetObjectName(const QByteArray& objectId, const QString& objectName)
+void CObjectCollection::SetObjectName(const QByteArray& objectId, const QString& objectName)
 {
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -122,7 +122,7 @@ void CObjectContainer::SetObjectName(const QByteArray& objectId, const QString& 
 }
 
 
-void CObjectContainer::SetObjectDescription(const QByteArray& objectId, const QString& objectDescription)
+void CObjectCollection::SetObjectDescription(const QByteArray& objectId, const QString& objectDescription)
 {
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -134,7 +134,7 @@ void CObjectContainer::SetObjectDescription(const QByteArray& objectId, const QS
 }
 
 
-void CObjectContainer::SetObjectEnabled(const QByteArray& objectId, bool isEnabled)
+void CObjectCollection::SetObjectEnabled(const QByteArray& objectId, bool isEnabled)
 {
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -148,13 +148,13 @@ void CObjectContainer::SetObjectEnabled(const QByteArray& objectId, bool isEnabl
 
 // reimplemented (IObjectCollectionInfo)
 
-const iprm::IOptionsList* CObjectContainer::GetObjectTypesInfo() const
+const iprm::IOptionsList* CObjectCollection::GetObjectTypesInfo() const
 {
 	return nullptr;
 }
 
 
-ICollectionInfo::Id CObjectContainer::GetObjectTypeId(const QByteArray& objectId) const
+ICollectionInfo::Id CObjectCollection::GetObjectTypeId(const QByteArray& objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -168,7 +168,7 @@ ICollectionInfo::Id CObjectContainer::GetObjectTypeId(const QByteArray& objectId
 
 // reimplemented (IObjectProvider)
 
-const istd::IChangeable* CObjectContainer::GetDataObject(const QByteArray& objectId) const
+const istd::IChangeable* CObjectCollection::GetDataObject(const QByteArray& objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -182,7 +182,7 @@ const istd::IChangeable* CObjectContainer::GetDataObject(const QByteArray& objec
 
 // reimplemented (ICollectionInfo)
 
-ICollectionInfo::Ids CObjectContainer::GetElementIds() const
+ICollectionInfo::Ids CObjectCollection::GetElementIds() const
 {
 	Ids retVal;
 
@@ -194,7 +194,7 @@ ICollectionInfo::Ids CObjectContainer::GetElementIds() const
 }
 
 
-QString CObjectContainer::GetElementName(const QByteArray & objectId) const
+QString CObjectCollection::GetElementName(const QByteArray & objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -206,7 +206,7 @@ QString CObjectContainer::GetElementName(const QByteArray & objectId) const
 }
 
 
-QString CObjectContainer::GetElementDescription(const QByteArray & objectId) const
+QString CObjectCollection::GetElementDescription(const QByteArray & objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -218,7 +218,7 @@ QString CObjectContainer::GetElementDescription(const QByteArray & objectId) con
 }
 
 
-bool CObjectContainer::IsElementEnabled(const QByteArray & objectId) const
+bool CObjectCollection::IsElementEnabled(const QByteArray & objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -232,15 +232,15 @@ bool CObjectContainer::IsElementEnabled(const QByteArray & objectId) const
 
 // reimplemented (istd::IChangeable)
 
-int CObjectContainer::GetSupportedOperations() const
+int CObjectCollection::GetSupportedOperations() const
 {
 	return SO_CLONE | SO_COPY | SO_RESET;
 }
 
 
-bool CObjectContainer::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool CObjectCollection::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const CObjectContainer* sourcePtr = dynamic_cast<const CObjectContainer*>(&object);
+	const CObjectCollection* sourcePtr = dynamic_cast<const CObjectCollection*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
@@ -261,9 +261,9 @@ bool CObjectContainer::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 }
 
 
-istd::IChangeable* CObjectContainer::CloneMe(CompatibilityMode mode) const
+istd::IChangeable* CObjectCollection::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CObjectContainer> clonePtr(new CObjectContainer());
+	istd::TDelPtr<CObjectCollection> clonePtr(new CObjectCollection());
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}
@@ -272,7 +272,7 @@ istd::IChangeable* CObjectContainer::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CObjectContainer::ResetData(CompatibilityMode /*mode*/)
+bool CObjectCollection::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
@@ -284,7 +284,7 @@ bool CObjectContainer::ResetData(CompatibilityMode /*mode*/)
 
 // protected methods
 
-istd::IChangeable* CObjectContainer::CreateObjectInstance(const QByteArray& typeId) const
+istd::IChangeable* CObjectCollection::CreateObjectInstance(const QByteArray& typeId) const
 {
 	return BaseClass::CreateInstance(typeId);
 }

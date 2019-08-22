@@ -15,7 +15,7 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"Core Framework\"") IM_COMPANY("ImagingTools") IM_AUTHOR("\"Kirill Lepskiy\""));
 
 I_EXPORT_COMPONENT(
-			ObjectContainer,
+			ObjectCollection,
 			"General container of the data objects",
 			"Object Data Model Composition");
 

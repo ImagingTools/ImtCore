@@ -7,7 +7,7 @@
 
 
 // ImtCore includes
-#include <imtbase/CObjectContainerComp.h>
+#include <imtbase/CObjectCollectionComp.h>
 #include <imtbase/CDelegatedObjectContainerSupplierComp.h>
 #include <imtbase/CMultiStatusProviderComp.h>
 #include <imtbase/CMultiStatusManagerComp.h>
@@ -27,7 +27,7 @@ namespace ImtCorePck
 {
 
 
-typedef icomp::TModelCompWrap<imtbase::CObjectContainerComp> ObjectContainer;
+typedef icomp::TModelCompWrap<imtbase::CObjectCollectionComp> ObjectCollection;
 typedef icomp::TModelCompWrap<imtbase::CDelegatedObjectContainerSupplierComp> DelegatedObjectContainerSupplier;
 typedef icomp::TModelCompWrap<imtbase::CMultiStatusProviderComp> MultiStatusProvider;
 typedef icomp::TModelCompWrap<imtbase::CMultiStatusManagerComp> MultiStatusManager;

@@ -1,4 +1,4 @@
-#include <imtbase/CObjectContainerComp.h>
+#include <imtbase/CObjectCollectionComp.h>
 
 
 namespace imtbase
@@ -7,7 +7,7 @@ namespace imtbase
 
 // protected methods
 
-istd::IChangeable* CObjectContainerComp::CreateObjectInstance(const QByteArray& typeId) const
+istd::IChangeable* CObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
 {
 	int factoryIndex = m_typeIdsAttrPtr.FindValue(typeId);
 	if (factoryIndex >= 0){
@@ -22,7 +22,7 @@ istd::IChangeable* CObjectContainerComp::CreateObjectInstance(const QByteArray& 
 
 // reimplemented (icomp::CComponentBase)
 
-void CObjectContainerComp::OnComponentCreated()
+void CObjectCollectionComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 

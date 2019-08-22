@@ -5,7 +5,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtbase/CObjectContainer.h>
+#include <imtbase/CObjectCollection.h>
 
 
 namespace imtbase
@@ -15,15 +15,15 @@ namespace imtbase
 /**
 	Component-based implementation of an object container. The sub-objects will be created using registered factories (via 'ObjectFactories')
 */
-class CObjectContainerComp:
+class CObjectCollectionComp:
 			public icomp::CComponentBase,
-			public CObjectContainer
+			public CObjectCollection
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-	typedef CObjectContainer BaseClass2;
+	typedef CObjectCollection BaseClass2;
 
-	I_BEGIN_COMPONENT(CObjectContainerComp);
+	I_BEGIN_COMPONENT(CObjectCollectionComp);
 		I_REGISTER_INTERFACE(IObjectCollection);
 		I_REGISTER_INTERFACE(IObjectProvider);
 		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "List of factories used for object creation", true);
@@ -36,7 +36,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (CObjectContainer)
+	// reimplemented (CObjectCollection)
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override;
 
 	// reimplemented (icomp::CComponentBase)

@@ -14,6 +14,11 @@ namespace imtbase
 {
 
 
+/**
+	Interface for describing the contents of a collection.
+	Assuming that elements of a collection can be assigned by a unique ID,
+	this interface provides access to the general properties of the elements in such a collection
+*/
 class ICollectionInfo: virtual public istd::IChangeable
 {
 public:
@@ -36,7 +41,7 @@ public:
 	virtual QString GetElementDescription(const QByteArray& elementId) const = 0;
 
 	/**
-		Return \c true if the element is enabled and can be selected.
+		Return \c true if the element is enabled.
 	*/
 	virtual bool IsElementEnabled(const QByteArray& elementId) const = 0;
 };

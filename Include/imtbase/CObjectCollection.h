@@ -18,17 +18,17 @@ namespace imtbase
 
 
 /**
-	Implementation of a general object container.
+	Implementation of a general object collection.
 */
-class CObjectContainer:
+class CObjectCollection:
 			virtual public IObjectCollection,
 			public istd::TComposedFactory<istd::IChangeable>
 {
 public:
 	typedef istd::TComposedFactory<istd::IChangeable> BaseClass;
 
-	CObjectContainer();
-	virtual ~CObjectContainer();
+	CObjectCollection();
+	virtual ~CObjectCollection();
 
 	// reimplemented (IObjectCollection)
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
