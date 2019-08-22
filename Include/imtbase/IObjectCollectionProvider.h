@@ -15,7 +15,7 @@ namespace imtbase
 class IObjectCollectionProvider: virtual public istd::IChangeable
 {
 public:
-	virtual const IObjectCollection* GetCompositeObject() const = 0;
+	virtual const IObjectCollection* GetObjectCollection() const = 0;
 };
 
 

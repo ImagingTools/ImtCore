@@ -7,10 +7,10 @@ namespace imtbase
 
 // reimplemented (imtbase::IObjectCollectionProvider)
 
-const imtbase::IObjectCollection* CDelegatedObjectContainerSupplierComp::GetCompositeObject() const
+const imtbase::IObjectCollection* CDelegatedObjectContainerSupplierComp::GetObjectCollection() const
 {
 	if (m_objectProviderCompPtr.IsValid()){
-		return m_objectProviderCompPtr->GetCompositeObject();
+		return m_objectProviderCompPtr->GetObjectCollection();
 	}
 
 	if (m_objectCompPtr.IsValid()){

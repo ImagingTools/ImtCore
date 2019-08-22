@@ -24,7 +24,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtbase::IObjectCollectionProvider)
-	virtual const imtbase::IObjectCollection* GetCompositeObject() const override;
+	virtual const imtbase::IObjectCollection* GetObjectCollection() const override;
 };
 
 
