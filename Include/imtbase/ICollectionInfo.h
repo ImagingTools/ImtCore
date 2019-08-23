@@ -17,13 +17,13 @@ namespace imtbase
 /**
 	Interface for describing the contents of a collection.
 	Assuming that elements of a collection can be assigned by a unique ID,
-	this interface provides access to the general properties of the elements in such a collection
+	this interface provides access to the general properties of the elements in such a collection.
 */
 class ICollectionInfo: virtual public istd::IChangeable
 {
 public:
 	typedef QByteArray Id;
-	typedef QSet<Id> Ids;
+	typedef QVector<Id> Ids;
 
 	/**
 		Get available element-IDs.

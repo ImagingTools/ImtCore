@@ -52,6 +52,7 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
+protected:
 	I_ATTR(QString, m_defaultDescriptionAttrPtr);
 	I_ATTR(QString, m_defaultSourceAttrPtr);
 	I_MULTIREF(istd::IInformationProvider, m_informationProvidersCompPtr);

@@ -78,7 +78,7 @@ imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds() const
 	Ids retVal;
 
 	for (const Reference& ref : m_references){
-		retVal.insert(ref.id);
+		retVal.push_back(ref.id);
 	}
 
 	return retVal;
