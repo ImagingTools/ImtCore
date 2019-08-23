@@ -63,7 +63,7 @@ public:
 	};
 
 	/**
-		Get available element-IDs.
+		Get all IDs of the elements inside the collection.
 	*/
 	virtual Ids GetElementIds() const = 0;
 
