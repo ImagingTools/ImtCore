@@ -14,6 +14,7 @@ namespace imtbase
 
 /**
 	Interface for collection of references to objects which can be identified ( e.g. in a storage) using their IDs.
+	\ingroup Collection
 */
 class IReferenceCollection:
 			virtual public IObjectCollectionInfo,

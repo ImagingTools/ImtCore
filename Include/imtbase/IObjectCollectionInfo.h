@@ -14,6 +14,7 @@ namespace imtbase
 
 /**
 	Interface for getting information about a collection of data objects.
+	\ingroup Collection
 */
 class IObjectCollectionInfo: virtual public ICollectionInfo
 {

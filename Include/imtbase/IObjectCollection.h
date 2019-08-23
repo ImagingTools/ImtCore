@@ -11,6 +11,7 @@ namespace imtbase
 
 /**
 	Common interface for an data object collection.
+	\ingroup Collection
 */
 class IObjectCollection: virtual public IObjectProvider
 {

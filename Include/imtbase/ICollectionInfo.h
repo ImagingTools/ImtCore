@@ -19,6 +19,7 @@ namespace imtbase
 	Interface for describing the contents of a collection.
 	Assuming that elements of a collection can be assigned by a unique ID,
 	this interface provides access to the general properties of the elements in such a collection.
+	\ingroup Collection
 */
 class ICollectionInfo: virtual public istd::IChangeable
 {

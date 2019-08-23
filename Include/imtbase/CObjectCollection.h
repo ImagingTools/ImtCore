@@ -19,6 +19,7 @@ namespace imtbase
 
 /**
 	Implementation of a general object collection.
+	\ingroup Collection
 */
 class CObjectCollection:
 			virtual public IObjectCollection,

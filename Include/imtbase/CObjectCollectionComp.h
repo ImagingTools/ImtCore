@@ -15,6 +15,7 @@ namespace imtbase
 /**
 	Component-based implementation of an object collection.
 	The sub-objects will be created using registered factories (via 'ObjectFactories')
+	\ingroup Collection
 */
 class CObjectCollectionComp:
 			public icomp::CComponentBase,

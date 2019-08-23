@@ -15,6 +15,7 @@ namespace imtbase
 
 /**
 	Interface for accessing data object identfied by unique ID inside of some abstract storage.
+	\ingroup Collection
 */
 class IObjectProvider: virtual public IObjectCollectionInfo
 {

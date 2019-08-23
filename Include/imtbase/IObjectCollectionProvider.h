@@ -11,6 +11,7 @@ namespace imtbase
 
 /**
 	Interface for a provider of a object collection.
+	\ingroup Collection
 */
 class IObjectCollectionProvider: virtual public istd::IChangeable
 {
