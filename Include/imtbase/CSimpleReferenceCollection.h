@@ -12,7 +12,10 @@ namespace imtbase
 {
 
 
-class CSimpleReferenceCollection: virtual public imtbase::IReferenceCollection
+/**
+	Simple implementation of a object reference collection.
+*/
+class CSimpleReferenceCollection: virtual public IReferenceCollection
 {
 public:
 	// reimplemented (IReferenceCollection)

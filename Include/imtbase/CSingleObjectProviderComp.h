@@ -16,7 +16,7 @@ namespace imtbase
 
 
 /**
-	Implementation of the sinle data-object provider.
+	Implementation of the single data-object provider.
 */
 class CSingleObjectProviderComp:
 			public icomp::CComponentBase,

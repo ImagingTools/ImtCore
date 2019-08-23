@@ -13,7 +13,7 @@ namespace imtbase
 
 
 /**
-	Interface for getting information about a collection of objects.
+	Interface for getting information about a collection of data objects.
 */
 class IObjectCollectionInfo: virtual public ICollectionInfo
 {

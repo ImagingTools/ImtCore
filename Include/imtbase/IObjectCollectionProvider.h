@@ -15,6 +15,9 @@ namespace imtbase
 class IObjectCollectionProvider: virtual public istd::IChangeable
 {
 public:
+	/**
+		Get access to the collection instance.
+	*/
 	virtual const IObjectCollection* GetObjectCollection() const = 0;
 };
 

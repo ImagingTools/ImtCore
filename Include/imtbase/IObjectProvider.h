@@ -14,7 +14,7 @@ namespace imtbase
 
 
 /**
-	Interface for access of generally defined list of data objects.
+	Interface for accessing data object identfied by unique ID inside of some abstract storage.
 */
 class IObjectProvider: virtual public IObjectCollectionInfo
 {

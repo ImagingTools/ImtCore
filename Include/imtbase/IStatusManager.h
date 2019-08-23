@@ -10,7 +10,7 @@ namespace imtbase
 
 
 /**
-	Status manager interface.
+	Common interface for editing a status.
 */
 class IStatusManager: virtual public istd::IInformationProvider
 {

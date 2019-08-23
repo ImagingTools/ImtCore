@@ -11,6 +11,9 @@ namespace imtbase
 {
 
 
+/**
+	Generic implementation of a supplier that delegates his calls to an underlaying supplier implementation or to an existing data object.
+*/
 template <class ProviderInterface, class ObjectInterface>
 class TDelegatedSupplierCompBase:
 			public ilog::CLoggerComponentBase,

@@ -9,6 +9,9 @@ namespace imtbase
 {
 
 
+/**
+	Implementation of the multiple selection.
+*/
 class CMultiSelection: virtual public IMultiSelection
 {
 public:

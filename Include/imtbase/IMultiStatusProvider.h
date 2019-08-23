@@ -17,7 +17,7 @@ namespace imtbase
 
 
 /**
-	Multi status provider interface.
+	Multiple status provider interface.
 */
 class IMultiStatusProvider: virtual public istd::IChangeable
 {

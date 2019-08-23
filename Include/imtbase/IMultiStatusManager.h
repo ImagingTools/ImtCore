@@ -9,6 +9,9 @@ namespace imtbase
 {
 
 
+/**
+	Interface for editing status list.
+*/
 class IMultiStatusManager: virtual public IMultiStatusProvider
 {
 public:
