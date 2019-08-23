@@ -85,31 +85,20 @@ imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds() const
 }
 
 
-QString CSimpleReferenceCollection::GetElementName(const QByteArray& elementId) const
+QVariant CSimpleReferenceCollection::GetElementInfo(const QByteArray& elementId, int infoType) const
 {
 	int index = FindReference(elementId);
 	if (index >= 0){
-		return m_references[index].name;
+		switch (infoType){
+			case EIT_DESCRIPTION:
+				return m_references[index].description;
+
+			case EIT_NAME:
+				return m_references[index].name;
+		}
 	}
 
-	return QString();
-}
-
-
-QString CSimpleReferenceCollection::GetElementDescription(const QByteArray& elementId) const
-{
-	int index = FindReference(elementId);
-	if (index >= 0){
-		return m_references[index].description;
-	}
-
-	return QString();
-}
-
-
-bool CSimpleReferenceCollection::IsElementEnabled(const QByteArray& /*elementId*/) const
-{
-	return true;
+	return QVariant();
 }
 
 

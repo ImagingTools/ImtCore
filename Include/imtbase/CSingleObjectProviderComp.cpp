@@ -53,21 +53,20 @@ ICollectionInfo::Ids CSingleObjectProviderComp::GetElementIds() const
 }
 
 
-QString CSingleObjectProviderComp::GetElementName(const QByteArray & /*elementId*/) const
+QVariant CSingleObjectProviderComp::GetElementInfo(const QByteArray& /*elementId*/, int infoType) const
 {
-	return m_info.GetOptionName(0);
-}
+	switch (infoType){
+	case EIT_DESCRIPTION:
+		return m_info.GetOptionName(0);
 
+	case EIT_NAME:
+		return m_info.GetOptionDescription(0);
 
-QString CSingleObjectProviderComp::GetElementDescription(const QByteArray & /*elementId*/) const
-{
-	return m_info.GetOptionDescription(0);
-}
+	case EIT_ENABLED:
+		return m_info.IsOptionEnabled(0);
+	}
 
-
-bool CSingleObjectProviderComp::IsElementEnabled(const QByteArray & /*elementId*/) const
-{
-	return m_info.IsOptionEnabled(0);
+	return QVariant();
 }
 
 

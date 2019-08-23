@@ -4,7 +4,8 @@
 // Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
-#include <QtCore/QSet>
+#include <QtCore/QVector>
+#include <QtCore/QVariant>
 
 // ACF includes
 #include <istd/IChangeable.h>
@@ -26,24 +27,50 @@ public:
 	typedef QVector<Id> Ids;
 
 	/**
+		Type of the element information.
+	*/
+	enum ElementInfoType
+	{
+		/**
+			Name of the element given as a QString.
+		*/
+		EIT_NAME,
+
+		/**
+			Human-readable description of the element given as a QString.
+		*/
+		EIT_DESCRIPTION,
+
+		/**
+			Enabled/Disabled status of the element as a boolean.
+		*/
+		EIT_ENABLED,
+
+		/**
+			Type-ID of the element given as a QByteArray.
+		*/
+		EIT_TYPE_ID,
+
+		/**
+			Human-readable name of the element type given as a QString.
+		*/
+		EIT_TYPE_NAME,
+
+		/**
+			Start value for user-defined info types.
+		*/
+		EIT_USER = 1000
+	};
+
+	/**
 		Get available element-IDs.
 	*/
 	virtual Ids GetElementIds() const = 0;
 
 	/**
-		Get name of the element with the given ID.
+		Get information about a given element.
 	*/
-	virtual QString GetElementName(const QByteArray& elementId) const = 0;
-
-	/**
-		Get the human-readable description for an element with the given ID.
-	*/
-	virtual QString GetElementDescription(const QByteArray& elementId) const = 0;
-
-	/**
-		Return \c true if the element is enabled.
-	*/
-	virtual bool IsElementEnabled(const QByteArray& elementId) const = 0;
+	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const = 0;
 };
 
 

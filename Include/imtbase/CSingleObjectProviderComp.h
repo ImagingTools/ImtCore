@@ -43,9 +43,7 @@ public:
 
 	// reimplemented (ICollectionInfo)
 	virtual Ids GetElementIds() const override;
-	virtual QString GetElementName(const QByteArray & elementId) const override;
-	virtual QString GetElementDescription(const QByteArray & elementId) const override;
-	virtual bool IsElementEnabled(const QByteArray & elementId) const override;
+	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

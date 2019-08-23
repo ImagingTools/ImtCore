@@ -194,39 +194,30 @@ ICollectionInfo::Ids CObjectCollection::GetElementIds() const
 }
 
 
-QString CObjectCollection::GetElementName(const QByteArray & objectId) const
+QVariant CObjectCollection::GetElementInfo(const QByteArray& elementId, int infoType) const
 {
-	for (const ObjectInfo& objectInfo : m_objects){
-		if (objectInfo.id == objectId){
-			return objectInfo.name;
+	int objectIndex = -1;
+	for (int i = 0; i < m_objects.count(); ++i){
+		if (m_objects[i].id == elementId){
+			 objectIndex = i;
+			 break;
 		}
 	}
 
-	return QString();
-}
+	if (objectIndex >= 0){
+		switch (infoType){
+		case EIT_DESCRIPTION:
+			return m_objects[objectIndex].description;
 
+		case EIT_NAME:
+			return m_objects[objectIndex].name;
 
-QString CObjectCollection::GetElementDescription(const QByteArray & objectId) const
-{
-	for (const ObjectInfo& objectInfo : m_objects){
-		if (objectInfo.id == objectId){
-			return objectInfo.description;
+		case EIT_ENABLED:
+			return m_objects[objectIndex].isEnabled;
 		}
 	}
 
-	return QString();
-}
-
-
-bool CObjectCollection::IsElementEnabled(const QByteArray & objectId) const
-{
-	for (const ObjectInfo& objectInfo : m_objects){
-		if (objectInfo.id == objectId){
-			return objectInfo.isEnabled;
-		}
-	}
-
-	return false;
+	return QVariant();
 }
 
 
