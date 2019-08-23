@@ -70,7 +70,11 @@ public:
 
 	/**
 		Create a new object in the container.
-		\param typeId	Type-ID of the object to be created.
+		\param typeId			Type-ID of the object to be created.
+		\param name				Name of the object in the collection.
+		\param description		Descrpition of the object.
+		\param defaultValuePtr	Optional instance used for the object data initialization.
+		\return If the operation was successful the method will return ID of the created data object in the collection or an empty ID otherwise.
 	*/
 	virtual QByteArray InsertNewObject(
 				const QByteArray& typeId,
