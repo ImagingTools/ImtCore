@@ -7,6 +7,22 @@ namespace imtbase
 
 // public methods
 
+// reimplemented (imtbase::IMultiStatusManager)
+
+void CMultiStatusProviderComp::SetStatus(const QByteArray& statusId, const istd::IInformationProvider& status)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	int statusIndex = m_statusInfo.GetOptionIndexById(statusId);
+	if (statusIndex >= 0 && statusIndex < m_informationProvidersCompPtr.GetCount()){
+		istd::IInformationProvider* statusPtr = m_informationProvidersCompPtr[statusIndex];
+		Q_ASSERT(statusPtr != nullptr);
+
+		statusPtr->CopyFrom(status);
+	}
+}
+
+
 // reimplemented (imtbase::IMultiStatusProvider)
 
 const iprm::IOptionsList& CMultiStatusProviderComp::GetStatusInfoList() const

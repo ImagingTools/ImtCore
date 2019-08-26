@@ -25,14 +25,9 @@ I_EXPORT_COMPONENT(
 			"Delegator Object Data Model Composition Supplier Provider");
 
 I_EXPORT_COMPONENT(
-			MultiStatusProvider,
-			"Multiple information status provider",
-			"Multiple Information Status Provider");
-
-I_EXPORT_COMPONENT(
 			MultiStatusManager,
 			"Multiple information status manager",
-			"Multiple Information Status Manager");
+			"Status Information Multiple");
 
 I_EXPORT_COMPONENT(
 			PointCloud,

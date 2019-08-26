@@ -7,7 +7,7 @@
 #include <iprm/COptionsManager.h>
 
 // ImtCore includes
-#include <imtbase/IMultiStatusProvider.h>
+#include <imtbase/IMultiStatusManager.h>
 
 
 namespace imtbase
@@ -19,7 +19,8 @@ namespace imtbase
 */
 class CMultiStatusProviderComp:
 			public icomp::CComponentBase,
-			virtual public imtbase::IMultiStatusProvider,
+			virtual public IMultiStatusProvider,
+			virtual public IMultiStatusManager,
 			virtual public istd::IInformationProvider
 {
 public:
@@ -28,6 +29,7 @@ public:
 	I_BEGIN_COMPONENT(CMultiStatusProviderComp);
 		I_REGISTER_INTERFACE(IInformationProvider);
 		I_REGISTER_INTERFACE(IMultiStatusProvider);
+		I_REGISTER_INTERFACE(IMultiStatusManager);
 		I_ASSIGN(m_defaultDescriptionAttrPtr, "DefaultDescription", "Default information description", false, "");
 		I_ASSIGN(m_defaultSourceAttrPtr, "DefaultSource", "Default information source", false, "");
 		I_ASSIGN_MULTI_0(m_informationProvidersCompPtr, "InformationProviders", "List of underlying information providers", true);
@@ -35,6 +37,9 @@ public:
 		I_ASSIGN_MULTI_0(m_statusNamesAttrPtr, "InformationStatusNames", "Information status names", true);
 		I_ASSIGN_MULTI_0(m_statusDescriptionsAttrPtr, "InformationStatusDescriptions", "Information status descriptions", true);
 	I_END_COMPONENT;
+
+	// reimplemented (imtbase::IMultiStatusManager)
+	virtual void SetStatus(const QByteArray& statusId, const istd::IInformationProvider& status) override;
 
 	// reimplemented (imtbase::IMultiStatusProvider)
 	virtual const iprm::IOptionsList& GetStatusInfoList() const override;
