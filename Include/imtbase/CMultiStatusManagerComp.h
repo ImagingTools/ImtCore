@@ -17,7 +17,7 @@ namespace imtbase
 /**
 	Multiple status provider component implementation.
 */
-class CMultiStatusProviderComp:
+class CMultiStatusManagerComp:
 			public icomp::CComponentBase,
 			virtual public IMultiStatusProvider,
 			virtual public IMultiStatusManager,
@@ -26,7 +26,7 @@ class CMultiStatusProviderComp:
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CMultiStatusProviderComp);
+	I_BEGIN_COMPONENT(CMultiStatusManagerComp);
 		I_REGISTER_INTERFACE(IInformationProvider);
 		I_REGISTER_INTERFACE(IMultiStatusProvider);
 		I_REGISTER_INTERFACE(IMultiStatusManager);

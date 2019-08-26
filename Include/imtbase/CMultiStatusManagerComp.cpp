@@ -1,4 +1,4 @@
-#include <imtbase/CMultiStatusProviderComp.h>
+#include <imtbase/CMultiStatusManagerComp.h>
 
 
 namespace imtbase
@@ -9,7 +9,7 @@ namespace imtbase
 
 // reimplemented (imtbase::IMultiStatusManager)
 
-void CMultiStatusProviderComp::SetStatus(const QByteArray& statusId, const istd::IInformationProvider& status)
+void CMultiStatusManagerComp::SetStatus(const QByteArray& statusId, const istd::IInformationProvider& status)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
@@ -25,13 +25,13 @@ void CMultiStatusProviderComp::SetStatus(const QByteArray& statusId, const istd:
 
 // reimplemented (imtbase::IMultiStatusProvider)
 
-const iprm::IOptionsList& CMultiStatusProviderComp::GetStatusInfoList() const
+const iprm::IOptionsList& CMultiStatusManagerComp::GetStatusInfoList() const
 {
 	return m_statusInfo;
 }
 
 
-const istd::IInformationProvider* CMultiStatusProviderComp::GetStatusInfo(const QByteArray& id) const
+const istd::IInformationProvider* CMultiStatusManagerComp::GetStatusInfo(const QByteArray& id) const
 {
 	int statusIndex = m_statusInfo.GetOptionIndexById(id);
 
@@ -45,7 +45,7 @@ const istd::IInformationProvider* CMultiStatusProviderComp::GetStatusInfo(const 
 
 // reimplemented (iinsp::IInformationProvider)
 
-QDateTime CMultiStatusProviderComp::GetInformationTimeStamp() const
+QDateTime CMultiStatusManagerComp::GetInformationTimeStamp() const
 {
 	QDateTime retVal;
 
@@ -68,7 +68,7 @@ QDateTime CMultiStatusProviderComp::GetInformationTimeStamp() const
 }
 
 
-istd::IInformationProvider::InformationCategory CMultiStatusProviderComp::GetInformationCategory() const
+istd::IInformationProvider::InformationCategory CMultiStatusManagerComp::GetInformationCategory() const
 {
 	InformationCategory retVal = IC_NONE;
 
@@ -84,25 +84,25 @@ istd::IInformationProvider::InformationCategory CMultiStatusProviderComp::GetInf
 }
 
 
-int CMultiStatusProviderComp::GetInformationId() const
+int CMultiStatusManagerComp::GetInformationId() const
 {
 	return -1;
 }
 
 
-QString CMultiStatusProviderComp::GetInformationDescription() const
+QString CMultiStatusManagerComp::GetInformationDescription() const
 {
 	return m_defaultDescriptionAttrPtr.IsValid() ? *m_defaultDescriptionAttrPtr : QString();
 }
 
 
-QString CMultiStatusProviderComp::GetInformationSource() const
+QString CMultiStatusManagerComp::GetInformationSource() const
 {
 	return m_defaultSourceAttrPtr.IsValid() ? *m_defaultSourceAttrPtr : QString();
 }
 
 
-int CMultiStatusProviderComp::GetInformationFlags() const
+int CMultiStatusManagerComp::GetInformationFlags() const
 {
 	return -1;
 }
@@ -112,7 +112,7 @@ int CMultiStatusProviderComp::GetInformationFlags() const
 
 // reimplemented (icomp::CComponentBase)
 
-void CMultiStatusProviderComp::OnComponentCreated()
+void CMultiStatusManagerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
