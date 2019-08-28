@@ -354,11 +354,30 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 				lastPageIndex = m_pagesCompPtr->GetSelectedOptionIndex();
 			}
 
+			// No page was selected:
 			if (lastPageIndex < 0){
 				ShowHomePage();
 			}
 			else{
-				SwitchToPage(lastPageIndex);
+				// Check if the page can be entered for the newly logged user:
+				const iprm::IOptionsList* pageInfoListPtr = m_pagesCompPtr->GetSelectionConstraints();
+				Q_ASSERT(pageInfoListPtr != nullptr);
+
+				bool isPageEnabled = pageInfoListPtr->IsOptionEnabled(lastPageIndex);
+	
+				// If possible, go to the last active page:
+				if (isPageEnabled){
+					SwitchToPage(lastPageIndex);
+				}
+				// If not swtich to the default page or show the main menu:
+				else{
+					if (m_defaultPageIndexAttrPtr.IsValid()){
+						SwitchToPage(*m_defaultPageIndexAttrPtr);
+					}
+					else{
+						ShowHomePage();
+					}
+				}
 			}
 		}
 		else{
