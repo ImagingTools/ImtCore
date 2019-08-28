@@ -14,6 +14,7 @@ namespace imtbase
 
 /**
 	Common status manager component implementation.
+	\todo Split implementation into component and non-component parts.
 */
 class CStatusManagerComp:
 			public icomp::CComponentBase,
