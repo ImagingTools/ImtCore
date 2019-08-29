@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
+#include <iprm/COptionsManager.h>
 
 // ImtCore includes
 #include <imtbase/CObjectCollection.h>
@@ -28,14 +29,18 @@ public:
 	I_BEGIN_COMPONENT(CObjectCollectionComp);
 		I_REGISTER_INTERFACE(IObjectCollection);
 		I_REGISTER_INTERFACE(IObjectProvider);
-		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "List of factories used for object creation", true);
-		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", true);
-		I_ASSIGN_MULTI_0(m_typeNamesAttrPtr, "TypeNames", "List of type names corresponding to the registered factories", true);
+		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "List of factories used for object creation", false);
+		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
+		I_ASSIGN_MULTI_0(m_typeNamesAttrPtr, "TypeNames", "List of type names corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_fixedObjectsCompPtr, "FixedObjects", "List of static defined objects", false);
 		I_ASSIGN_MULTI_0(m_fixedObjectIdsAttrPtr, "FixedObjectIds", "List of IDs for corresponding fixed object", false);
 		I_ASSIGN_MULTI_0(m_fixedObjectTypeIdsAttrPtr, "FixedObjectTypeIds", "List of type-IDs for corresponding fixed object", false);
+		I_ASSIGN_MULTI_0(m_fixedObjectNamesAttrPtr, "FixedObjectNames", "List of names for corresponding fixed object", false);
 		I_ASSIGN_MULTI_0(m_fixedObjectTypeNamesAttrPtr, "FixedObjectTypeNames", "List of names for corresponding fixed object type", false);
 	I_END_COMPONENT;
+
+	// reimplemented (IObjectCollectionInfo)
+	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 
 protected:
 	// reimplemented (CObjectCollection)
@@ -51,7 +56,10 @@ private:
 	I_MULTIREF(istd::IChangeable, m_fixedObjectsCompPtr);
 	I_MULTIATTR(QByteArray, m_fixedObjectIdsAttrPtr);
 	I_MULTIATTR(QByteArray, m_fixedObjectTypeIdsAttrPtr);
+	I_MULTITEXTATTR(m_fixedObjectNamesAttrPtr);
 	I_MULTITEXTATTR(m_fixedObjectTypeNamesAttrPtr);
+
+	iprm::COptionsManager m_typesInfo;
 };
 
 

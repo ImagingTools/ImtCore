@@ -65,14 +65,9 @@ QByteArray CObjectCollection::InsertNewObject(
 		info.name = name;
 		info.typeId = typeId;
 
-		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(info.objectPtr.GetPtr());
-		if (modelPtr != nullptr){
-			modelPtr->AttachObserver(&m_modelUpdateBridge);
+		if (InsertObjectIntoCollection(info)){
+			return info.id;
 		}
-
-		m_objects.push_back(info);
-
-		return info.id;
 	}
 
 	return QByteArray();
@@ -279,6 +274,20 @@ istd::IChangeable* CObjectCollection::CreateObjectInstance(const QByteArray& typ
 {
 	return BaseClass::CreateInstance(typeId);
 }
+
+
+bool CObjectCollection::InsertObjectIntoCollection(const ObjectInfo& info)
+{
+	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(info.objectPtr.GetPtr());
+	if (modelPtr != nullptr){
+		modelPtr->AttachObserver(&m_modelUpdateBridge);
+	}
+
+	m_objects.push_back(info);
+
+	return true;
+}
+
 
 
 } // namespace imtbase

@@ -5,6 +5,14 @@ namespace imtbase
 {
 
 
+// reimplemented (IObjectCollectionInfo)
+
+const iprm::IOptionsList* CObjectCollectionComp::GetObjectTypesInfo() const
+{
+	return &m_typesInfo;
+}
+
+
 // protected methods
 
 istd::IChangeable* CObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
@@ -43,21 +51,32 @@ void CObjectCollectionComp::OnComponentCreated()
 				continue;
 			}
 
-			QString name = "<unnamed>";
+			QString typeName;
 			if (i < m_fixedObjectTypeNamesAttrPtr.GetCount()){
-				name = m_fixedObjectTypeNamesAttrPtr[i];
+				typeName = m_fixedObjectTypeNamesAttrPtr[i];
+			}
+
+			QString objectName = "<unnamed>";
+			if (i < m_fixedObjectNamesAttrPtr.GetCount()){
+				objectName = m_fixedObjectNamesAttrPtr[i];
 			}
 
 			ObjectInfo object;
 			object.isEnabled = true;
-			object.name = name;
+			object.name = objectName;
 			object.flags = OF_FIXED;
 			object.objectPtr.SetPtr(objectPtr, false);
 			object.typeId = typeId;
 			object.id = uuid;
 
-			m_objects.push_back(object);
+			InsertObjectIntoCollection(object);
+
+			m_typesInfo.InsertOption(typeName, typeId);
 		}
+	}
+
+	for (int i = 0; i < qMin(m_typeIdsAttrPtr.GetCount(), m_typeNamesAttrPtr.GetCount()); ++i){
+		m_typesInfo.InsertOption(m_typeNamesAttrPtr[i], m_typeIdsAttrPtr[i]);
 	}
 }
 

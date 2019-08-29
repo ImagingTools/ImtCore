@@ -62,9 +62,6 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const;
-
-protected:
 	typedef istd::TOptDelPtr<istd::IChangeable> ObjectPtr;
 
 	struct ObjectInfo
@@ -99,6 +96,11 @@ protected:
 
 	typedef QVector<ObjectInfo> Objects;
 
+protected:
+	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const;
+	virtual bool InsertObjectIntoCollection(const ObjectInfo& info);
+
+private:
 	imod::CModelUpdateBridge m_modelUpdateBridge;
 
 	Objects m_objects;

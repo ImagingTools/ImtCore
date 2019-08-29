@@ -29,6 +29,11 @@ I_EXPORT_COMPONENT(
 			"Multiple information status provider GUI component",
 			"Multiple Information Status Provider");
 
+I_EXPORT_COMPONENT(
+			ObjectCollectionView,
+			"View for a object collection",
+			"Object Collection View");
+
 
 } // namespace ImtGuiPck
 
