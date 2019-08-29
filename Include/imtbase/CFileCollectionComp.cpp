@@ -227,6 +227,9 @@ QByteArray CFileCollectionComp::AddFile(
 
 	QString savedPath = SaveCollectionItem(repositoryItem);
 	if (!savedPath.isEmpty()){
+		static ChangeSet changes(CF_FILE_ADDED);
+		istd::CChangeNotifier changeNotifier(this, &changes);
+
 		locker.relock();
 
 		// Insert into the file list:
@@ -367,7 +370,7 @@ QByteArray CFileCollectionComp::InsertNewObject(
 
 			QString tempFilePath = QDir::tempPath() + "/" + QUuid::createUuid().toString() + "." + supportedExts[0];
 
-			if (persistencePtr->SaveToFile(*defaultValuePtr, tempFilePath) == ifile::IFilePersistence::OS_OK){
+			if (persistencePtr->SaveToFile(*newObjectPtr, tempFilePath) == ifile::IFilePersistence::OS_OK){
 				return AddFile(tempFilePath, typeId, name);
 			}
 		}
