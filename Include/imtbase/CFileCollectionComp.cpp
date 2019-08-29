@@ -705,7 +705,7 @@ QString CFileCollectionComp::GetInfoFileExtention()
 
 QString CFileCollectionComp::GetDataFileExtention()
 {
-	return ".coi";
+	return ".item";
 }
 
 

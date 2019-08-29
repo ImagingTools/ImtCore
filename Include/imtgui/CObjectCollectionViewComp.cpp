@@ -104,6 +104,8 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			m_itemModel.appendRow(typeItemPtr);
 
 			m_typeItems.push_back(typeItemPtr);
+
+			ItemTree->setExpanded(typeItemPtr->index(), true);
 		}
 		
 		for (const QByteArray& itemId : collectionItemIds){
