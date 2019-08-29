@@ -35,7 +35,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ObjPointCloudPersistence" PackageId="ImtCorePck" ComponentId="ObjPointCloudPersistence">
+        <Element Id="ObjPointCloudPersistence" PackageId="Imt3dPck" ComponentId="ObjPointCloudPersistence">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">

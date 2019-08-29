@@ -25,7 +25,11 @@ imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
 # Component packages
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
-ImtCorePck.depends = imt3d
+ImtCorePck.depends = imtbase
+
+SUBDIRS += Imt3dPck
+Imt3dPck.file = ../../Impl/Imt3dPck/QMake/Imt3dPck.pro
+Imt3dPck.depends = imt3d
 
 SUBDIRS += ImtRepoPck
 ImtRepoPck.file = ../../Impl/ImtRepoPck/QMake/ImtRepoPck.pro
