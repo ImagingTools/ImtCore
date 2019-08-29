@@ -76,7 +76,12 @@ void CObjectCollectionComp::OnComponentCreated()
 	}
 
 	for (int i = 0; i < qMin(m_typeIdsAttrPtr.GetCount(), m_typeNamesAttrPtr.GetCount()); ++i){
-		m_typesInfo.InsertOption(m_typeNamesAttrPtr[i], m_typeIdsAttrPtr[i]);
+		QByteArray typeId = m_typeIdsAttrPtr[i];
+
+		int foundIndex = m_typesInfo.GetOptionIndexById(typeId);
+		if (foundIndex < 0){
+			m_typesInfo.InsertOption(m_typeNamesAttrPtr[i], typeId);
+		}
 	}
 }
 

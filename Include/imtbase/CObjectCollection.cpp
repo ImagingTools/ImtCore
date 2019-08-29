@@ -39,7 +39,7 @@ int CObjectCollection::GetOperationFlags(const QByteArray& objectId) const
 		}
 	}
 
-	return OF_DEFAULT;
+	return OF_SUPPORT_INSERT | OF_SUPPORT_DELETE | OF_SUPPORT_EDIT | OF_SUPPORT_RENAME;
 }
 
 
@@ -64,6 +64,7 @@ QByteArray CObjectCollection::InsertNewObject(
 		info.description = description;
 		info.name = name;
 		info.typeId = typeId;
+		info.flags = GetItemDefaultFlags();
 
 		if (InsertObjectIntoCollection(info)){
 			return info.id;
@@ -94,6 +95,8 @@ bool CObjectCollection::RemoveObject(const QByteArray& objectId)
 			if (modelPtr != nullptr){
 				modelPtr->DetachObserver(&m_modelUpdateBridge);
 			}
+
+			istd::CChangeNotifier changeNotifier(this);
 
 			m_objects.erase(iter);
 
@@ -286,6 +289,12 @@ bool CObjectCollection::InsertObjectIntoCollection(const ObjectInfo& info)
 	m_objects.push_back(info);
 
 	return true;
+}
+
+
+int CObjectCollection::GetItemDefaultFlags() const
+{
+	return OF_SUPPORT_DELETE | OF_SUPPORT_RENAME | OF_SUPPORT_EDIT;
 }
 
 

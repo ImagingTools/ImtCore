@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtGui/QStandardItemModel>
+#include <QtWidgets/QMenu>
 
 // ACF includes
 #include <ibase/ICommandsProvider.h>
@@ -29,6 +30,12 @@ public:
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
 	I_END_COMPONENT;
 
+	enum DataRole
+	{
+		DR_TYPE_ID = Qt::UserRole,
+		DR_OBJECT_ID
+	};
+
 	CObjectCollectionViewComp();
 
 	// reimplemented (ibase::ICommandsProvider)
@@ -43,9 +50,14 @@ protected:
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelAttached() override;
 
+private:
+	void UpdateCommands();
+
 private Q_SLOTS:
 	void OnInsert();
 	void OnRemove();
+	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+	void OnAddMenuOptionClicked(QAction* action);
 
 private:
 	QStandardItemModel m_itemModel;
@@ -56,6 +68,7 @@ private:
 	iqtgui::CHierarchicalCommand m_editCommands;
 	iqtgui::CHierarchicalCommand m_insertCommand;
 	iqtgui::CHierarchicalCommand m_removeCommand;
+	QMenu m_startVariableMenus;
 };
 
 

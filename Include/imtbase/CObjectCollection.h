@@ -99,7 +99,7 @@ protected:
 protected:
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const;
 	virtual bool InsertObjectIntoCollection(const ObjectInfo& info);
-
+	virtual int GetItemDefaultFlags() const;
 private:
 	imod::CModelUpdateBridge m_modelUpdateBridge;
 

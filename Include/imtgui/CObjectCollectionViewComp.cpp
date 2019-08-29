@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtWidgets/QToolBar>
+#include <QtWidgets/QMessageBox>
 
 // ACF includes
 #include <iqtgui/CCommandTools.h>
@@ -53,6 +54,14 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 	iqtgui::CCommandTools::SetupToolbar(m_rootCommands, *toolBarPtr);
 	toolBarPtr->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+	QItemSelectionModel* selectionModelPtr = ItemTree->selectionModel();
+	if (selectionModelPtr != nullptr){
+		connect(
+					selectionModelPtr,
+					SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)),
+					this, SLOT(OnSelectionChanged(const QItemSelection&, const QItemSelection&)));
+	}
 }
 
 
@@ -88,10 +97,10 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			QString typeName = objectTypeInfoPtr->GetOptionName(typeIndex);
 
 			QStandardItem* typeItemPtr = new QStandardItem;
-			typeItemPtr->setFlags(Qt::ItemIsEnabled);
+			typeItemPtr->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 			typeItemPtr->setData(typeName, Qt::DisplayRole);
 			typeItemPtr->setData(typeName, Qt::EditRole);
-			typeItemPtr->setData(typeId, Qt::UserRole);
+			typeItemPtr->setData(typeId, DR_TYPE_ID);
 			m_itemModel.appendRow(typeItemPtr);
 
 			m_typeItems.push_back(typeItemPtr);
@@ -113,7 +122,8 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			QString objectName = objectPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_NAME).toString();
 			objectItemPtr->setData(objectName, Qt::DisplayRole);
 			objectItemPtr->setData(objectName, Qt::EditRole);
-			objectItemPtr->setData(itemId, Qt::UserRole);
+			objectItemPtr->setData(itemId, DR_OBJECT_ID);
+			objectItemPtr->setData(objectPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_TYPE_ID), DR_TYPE_ID);
 
 			if (parentItemPtr != nullptr){
 				parentItemPtr->appendRow(objectItemPtr);
@@ -123,6 +133,8 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			}
 		}
 	}
+
+	UpdateCommands();
 }
 
 
@@ -132,6 +144,53 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 
 	const imtbase::IObjectCollection* objectPtr = GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
+
+	const iprm::IOptionsList* typesPtr = objectPtr->GetObjectTypesInfo();
+	if (typesPtr != nullptr){
+		int typesCount = typesPtr->GetOptionsCount();
+		if (typesCount > 1){
+			for (int i = 0; i < typesCount; ++i){
+				const QString typeName = typesPtr->GetOptionName(i);
+
+				QAction* action = m_startVariableMenus.addAction(typeName);
+				action->setData(typesPtr->GetOptionId(i));
+			}
+
+			m_insertCommand.setMenu(&m_startVariableMenus);
+
+			QObject::connect(&m_startVariableMenus, SIGNAL(triggered(QAction*)), this, SLOT(OnAddMenuOptionClicked(QAction*)));
+		}
+	}
+}
+
+
+// private methods
+
+void CObjectCollectionViewComp::UpdateCommands()
+{
+	const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
+	Q_ASSERT(collectionPtr != nullptr);
+
+	QModelIndexList selectedIndexes = ItemTree->selectionModel()->selectedRows();
+
+	bool isAddEnabled = collectionPtr->GetOperationFlags() & imtbase::IObjectCollection::OF_SUPPORT_INSERT;
+	bool isRemoveEnabled = false;
+
+	if (!selectedIndexes.isEmpty()){
+		QStandardItem* itemPtr = m_itemModel.itemFromIndex(selectedIndexes[0]);
+		if (itemPtr != nullptr){
+			QByteArray objectId = itemPtr->data(DR_OBJECT_ID).toByteArray();
+			if (!objectId.isEmpty()){
+				int flags = collectionPtr->GetOperationFlags(objectId);
+				if ((flags & imtbase::IObjectCollection::OF_SUPPORT_DELETE) && ((flags & imtbase::IObjectCollection::OF_FIXED) == 0)){
+					isRemoveEnabled = true;
+				}
+			}
+		}
+	}
+
+	m_insertCommand.setEnabled(isAddEnabled);
+	m_removeCommand.setEnabled(isRemoveEnabled);
 }
 
 
@@ -139,11 +198,63 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 
 void CObjectCollectionViewComp::OnInsert()
 {
+	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
+	Q_ASSERT(collectionPtr != nullptr);
+
+	const iprm::IOptionsList* typesPtr = collectionPtr->GetObjectTypesInfo();
+	if (typesPtr == nullptr || typesPtr->GetOptionsCount() < 1){
+		return;
+	}
+
+	QByteArray typeId = typesPtr->GetOptionId(0);
+
+	QByteArray objectId = collectionPtr->InsertNewObject(typeId, tr("New"), QString());
+	if (objectId.isEmpty()){
+		QMessageBox::critical(GetWidget(), tr("Collection"), tr("New resource could not be created"));
+	}
 }
 
 
 void CObjectCollectionViewComp::OnRemove()
 {
+	const QItemSelection currentSelection = ItemTree->selectionModel()->selection();
+	const QModelIndexList indexes = currentSelection.indexes();
+	if (indexes.isEmpty()){
+		return;
+	}
+
+	const QModelIndex& index = indexes[0];
+
+	ItemTree->selectionModel()->select(currentSelection, QItemSelectionModel::Deselect);
+
+	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
+	Q_ASSERT(collectionPtr != nullptr);
+
+	imtbase::ICollectionInfo::Ids elementIds = collectionPtr->GetElementIds();
+
+	QByteArray objectId = index.data(DR_OBJECT_ID).toByteArray();
+
+	collectionPtr->RemoveObject(objectId);
+}
+
+
+void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
+{
+	UpdateCommands();
+}
+
+
+void CObjectCollectionViewComp::OnAddMenuOptionClicked(QAction * action)
+{
+	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
+	Q_ASSERT(collectionPtr != nullptr);
+
+	QByteArray typeId = action->data().toByteArray();
+
+	QByteArray objectId = collectionPtr->InsertNewObject(typeId, tr("New"), QString());
+	if (objectId.isEmpty()){
+		QMessageBox::critical(GetWidget(), tr("Collection"), tr("New resource could not be created"));
+	}
 }
 
 
