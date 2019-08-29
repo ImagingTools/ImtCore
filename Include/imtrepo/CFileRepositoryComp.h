@@ -136,41 +136,41 @@ public:
 	virtual istd::IInformationProvider::InformationCategory ValidateResource(
 				const QByteArray& resourceId,
 				const ifile::IFileResourcesManager* fileRepositoryPtr,
-				ilog::IMessageConsumer* messageConsumerPtr = NULL) const;
+				ilog::IMessageConsumer* messageConsumerPtr = NULL) const override;
 
 	// reimplemented (IDataObjectFactory)
-	virtual istd::IChangeable* CreateInstance(const QByteArray& keyId = "") const;
+	virtual istd::IChangeable* CreateInstance(const QByteArray& keyId = "") const override;
 
 	// reimplemented (istd::IFactoryInfo)
-	virtual KeyList GetFactoryKeys() const;
+	virtual KeyList GetFactoryKeys() const override;
 
 	// reimplemented (ifile::IFileResourcesManager)
-	virtual ifile::IFileResourcesManager::Ids GetFileIds() const;
-	virtual const ifile::IFileResourceTypeConstraints* GetResourceTypeConstraints() const;
-	virtual QByteArray GetResourceTypeId(const QByteArray& resourceId) const;
+	virtual ifile::IFileResourcesManager::Ids GetFileIds() const override;
+	virtual const ifile::IFileResourceTypeConstraints* GetResourceTypeConstraints() const override;
+	virtual QByteArray GetResourceTypeId(const QByteArray& resourceId) const override;
 	virtual QByteArray CreateNewFile(
 				const QByteArray& fileTypeId,
 				const istd::IChangeable* dataObjectPtr,
 				const QString& filePath = QString(),
-				const QString& resourceName = QString());
-	virtual bool RemoveFile(const QByteArray& fileId);
-	virtual DataObjectPtr GetDataObject(const QByteArray& fileId) const;
-	virtual MetaInfoPtr GetFileMetaInfo(const QByteArray& resourceId) const;
-	virtual QString GetResourceName(const QByteArray& resourceId)  const;
-	virtual bool SetResourceName(const QByteArray& resourceId, const QString& name);
-	virtual QString GetResourceDescription(const QByteArray& resourceId)  const;
-	virtual bool SetResourceDescription(const QByteArray& resourceId, const QString& description);
-	virtual LicenseStatus GetLicenseStatus(const QByteArray& resourceId, const QByteArray& resourceTypeId = QByteArray(), ilog::IMessageConsumer* messageConsumerPtr = NULL) const;
+				const QString& resourceName = QString()) override;
+	virtual bool RemoveFile(const QByteArray& fileId) override;
+	virtual DataObjectPtr GetDataObject(const QByteArray& fileId) const override;
+	virtual MetaInfoPtr GetFileMetaInfo(const QByteArray& resourceId) const override;
+	virtual QString GetResourceName(const QByteArray& resourceId)  const override;
+	virtual bool SetResourceName(const QByteArray& resourceId, const QString& name) override;
+	virtual QString GetResourceDescription(const QByteArray& resourceId)  const override;
+	virtual bool SetResourceDescription(const QByteArray& resourceId, const QString& description) override;
+	virtual LicenseStatus GetLicenseStatus(const QByteArray& resourceId, const QByteArray& resourceTypeId = QByteArray(), ilog::IMessageConsumer* messageConsumerPtr = NULL) const override;
 
 	// reimplemented (IFileRepository)
-	virtual int GetSupportedEditOperations(const QByteArray& resourceTypeId) const;
-	virtual FileInfo GetFileInfo(const QByteArray& resourceId) const;
-	virtual QByteArray FindResourceByName(const QString& resourceName) const;
+	virtual int GetSupportedEditOperations(const QByteArray& resourceTypeId) const override;
+	virtual FileInfo GetFileInfo(const QByteArray& resourceId) const override;
+	virtual QByteArray FindResourceByName(const QString& resourceName) const override;
 	virtual QString GetFile(
 				const QByteArray& resourceId,
 				const QString& targetFilePath,
 				ibase::IProgressManager* progressManagerPtr = NULL,
-				ilog::IMessageConsumer* messageConsumerPtr = NULL) const;
+				ilog::IMessageConsumer* messageConsumerPtr = NULL) const override;
 	virtual QByteArray AddFile(
 				const QString& localFilePath,
 				const QByteArray& resourceTypeId = QByteArray(),
@@ -178,19 +178,17 @@ public:
 				const QString& resourceDescription = QString(),
 				const QByteArray& resourceId = QByteArray(),
 				ibase::IProgressManager* progressManagerPtr = NULL,
-				ilog::IMessageConsumer* messageConsumerPtr = NULL);
+				ilog::IMessageConsumer* messageConsumerPtr = NULL) override;
 	virtual bool UpdateFile(
 				const QString& localFilePath,
 				const QByteArray& resourceId,
 				ibase::IProgressManager* progressManagerPtr = NULL,
-				ilog::IMessageConsumer* messageConsumerPtr = NULL);
+				ilog::IMessageConsumer* messageConsumerPtr = NULL) override;
 	virtual bool UpdateContent(
 				const istd::IChangeable& fileContents,
 				const QByteArray& resourceId,
 				ibase::IProgressManager* progressManagerPtr = NULL,
-				ilog::IMessageConsumer* messageConsumerPtr = NULL);
-	virtual bool IsFileLocked(const QByteArray& resourceId) const;
-	virtual bool SetFileLocked(const QByteArray& resourceId, bool isFileLocked);
+				ilog::IMessageConsumer* messageConsumerPtr = NULL) override;
 
 	// reimplemented (IFileRepositoryInfo)
 	virtual QString GetRepositoryPath() const;
@@ -210,7 +208,6 @@ protected:
 	public:
 		RepositoryItem(const CFileRepositoryComp& parent)
 			:checkSum(0),
-			isLocked(false),
 			m_parent(&parent)
 		{
 		}
@@ -265,11 +262,6 @@ protected:
 			CRC-32 check sum of the file.
 		*/
 		quint32 checkSum;
-
-		/**
-			Lock state of the file.
-		*/
-		bool isLocked;
 
 		/**
 			Meta-informations for the file item.

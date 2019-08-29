@@ -154,21 +154,6 @@ public:
 				const QByteArray& resourceId,
 				ibase::IProgressManager* progressManagerPtr = NULL,
 				ilog::IMessageConsumer* messageConsumerPtr = NULL) = 0;
-
-	/**
-		Acquire lock state of a file in the repository.
-		\param resourceId			ID of the resource to be updated in the repository.
-		\return \c true if the file is locked in the repository or \c false otherwise.
-	*/
-	virtual bool IsFileLocked(const QByteArray& resourceId) const = 0;
-
-	/**
-		Lock/Unlock the file in the repository. Locked resources cannot be edited or removed. Only read-only access to the resource is possible.
-		\param resourceId			ID of the resource to be updated in the repository.
-		\param isFileLocked			New lock status of the resource.
-		\return \c true if the file resource was successfully locked/unlocked or \c false otherwise.
-	*/
-	virtual bool SetFileLocked(const QByteArray& resourceId, bool isFileLocked) = 0;
 };
 
 

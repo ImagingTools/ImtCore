@@ -187,11 +187,6 @@ bool CFileRepositoryComp::RemoveFile(const QByteArray& resourceId)
 	if (fileIndex >= 0){
 		// If the file was copied into the repository, remove also the file from repository folder:
 		const RepositoryItem& itemToRemove = m_files[fileIndex];
-		if (itemToRemove.isLocked){
-			SendErrorMessage(0, "File is locked. File could not be removed");
-
-			return false;
-		}
 
 		QFileInfo fileInfo(itemToRemove.filePathInRepository);
 
@@ -722,11 +717,6 @@ bool CFileRepositoryComp::UpdateFile(
 	}
 
 	RepositoryItem itemToUpdate = m_files[fileIndex];
-	if (itemToUpdate.isLocked){
-		SendErrorMessage(0, "File is locked. File could not be updated");
-
-		return false;
-	}
 
 	locker.unlock();
 
@@ -811,46 +801,6 @@ bool CFileRepositoryComp::UpdateContent(
 
 			return retVal;
 		}
-	}
-
-	return false;
-}
-
-
-bool CFileRepositoryComp::IsFileLocked(const QByteArray& resourceId) const
-{
-	bool retVal = false;
-
-	QReadLocker locker(&m_repositoryLock);
-
-	int fileIndex = GetFileIndexById(resourceId);
-	if (fileIndex >= 0){
-		retVal = m_files[fileIndex].isLocked;
-	}
-
-	return retVal;
-}
-
-
-bool CFileRepositoryComp::SetFileLocked(const QByteArray& resourceId, bool isFileLocked)
-{
-	QWriteLocker locker(&m_repositoryLock);
-
-	int fileIndex = GetFileIndexById(resourceId);
-	if (fileIndex >= 0){
-		if (m_files[fileIndex].isLocked != isFileLocked){
-			istd::CChangeNotifier changeNotifier(this);
-
-			m_files[fileIndex].isLocked = isFileLocked;
-
-			SaveRepositoryItem(m_files[fileIndex]);
-
-			locker.unlock();
-
-			return true;
-		}
-
-		return true;
 	}
 
 	return false;
@@ -1524,12 +1474,6 @@ QStringList CFileRepositoryComp::ConvertMessageContainer(ilog::CMessageContainer
 
 void CFileRepositoryComp::OnFileRemove(const QByteArray& fileId)
 {
-	istd::CChangeGroup changeGroup(this);
-
-	// Unlock resource:
-	SetFileLocked(fileId, false);
-
-	// Remove file from the repository:
 	RemoveFile(fileId);
 }
 
@@ -1688,11 +1632,6 @@ bool CFileRepositoryComp::RepositoryItem::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(checkSum);
 	retVal = retVal && archive.EndTag(checkSumTag);
 
-	static iser::CArchiveTag isLockedTag("IsLocked", "Lock state of the file");
-	retVal = retVal && archive.BeginTag(isLockedTag);
-	retVal = retVal && archive.Process(isLocked);
-	retVal = retVal && archive.EndTag(isLockedTag);
-
 	return retVal;
 }
 
@@ -1712,7 +1651,6 @@ bool CFileRepositoryComp::RepositoryItem::CopyFrom(const istd::IChangeable& obje
 		lastModificationTime = sourceItemPtr->lastModificationTime;
 		resourceTypeId = sourceItemPtr->resourceTypeId;
 		checkSum = sourceItemPtr->checkSum;
-		isLocked = sourceItemPtr->isLocked;
 
 		if (mode == istd::IChangeable::CM_WITH_REFS){
 			metaInfoPtr = sourceItemPtr->metaInfoPtr;
