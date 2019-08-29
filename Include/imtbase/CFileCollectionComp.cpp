@@ -6,6 +6,7 @@
 #include <QtCore/QUuid>
 
 // ACF includes
+#include <istd/TOptDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 #include <istd/CCrcCalculator.h>
@@ -345,11 +346,20 @@ int CFileCollectionComp::GetOperationFlags(const QByteArray& /*objectId*/) const
 
 QByteArray CFileCollectionComp::InsertNewObject(
 			const QByteArray& typeId,
-			const QString& name, 
+			const QString& name,
 			const QString& /*description*/,
 			const istd::IChangeable * defaultValuePtr)
 {
+	istd::TOptDelPtr<const istd::IChangeable> newObjectPtr;
+
 	if (defaultValuePtr != NULL){
+		newObjectPtr.SetPtr(defaultValuePtr, false);
+	}
+	else{
+		newObjectPtr.SetPtr(CreateDataObject(typeId), true);
+	}
+
+	if (newObjectPtr.IsValid()){
 		const ifile::IFilePersistence* persistencePtr = GetPersistenceForResource(typeId);
 		if (persistencePtr != NULL){
 			QStringList supportedExts;

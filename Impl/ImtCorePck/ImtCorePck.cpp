@@ -16,8 +16,13 @@ I_EXPORT_PACKAGE(
 
 I_EXPORT_COMPONENT(
 			ObjectCollection,
-			"General container of the data objects",
-			"Object Data Model Composition");
+			"General collection of the data objects",
+			"Object Data Model Collection Container Composition");
+
+I_EXPORT_COMPONENT(
+			FileCollection,
+			"File-based container of the objects",
+			"Object Collection File Data Model Repository");
 
 I_EXPORT_COMPONENT(
 			DelegatedObjectContainerSupplier,
