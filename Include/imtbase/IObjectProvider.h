@@ -2,7 +2,6 @@
 
 
 // ACF includes
-#include <istd/TSmartPtr.h>
 #include <iprm/IOptionsList.h>
 
 // ImtCore includes
@@ -20,8 +19,6 @@ namespace imtbase
 class IObjectProvider: virtual public IObjectCollectionInfo
 {
 public:
-	typedef istd::TSmartPtr<istd::IChangeable> ObjectPtr;
-
 	/**
 		Get the object instance with the given ID.
 	*/
