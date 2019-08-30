@@ -30,7 +30,7 @@ void CFileObjectCollectionViewDelegate::UpdateCommands(int viewStateFlags, const
 {
 	BaseClass::UpdateCommands(viewStateFlags, itemIds);
 
-	
+	m_exportCommand.setEnabled(viewStateFlags & VS_SINGLE_SELECTION);
 }
 
 
@@ -45,7 +45,16 @@ QByteArray CFileObjectCollectionViewDelegate::ImportObject(const QByteArray& typ
 
 bool CFileObjectCollectionViewDelegate::ExportObject(const QByteArray& objectId, const QString& targetPath) const
 {
-	return false;
+	if (targetPath.isEmpty()){
+		return false;
+	}
+
+	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	Q_ASSERT(fileCollectionPtr != nullptr);
+
+	QString resultPath = fileCollectionPtr->GetFile(objectId, targetPath);
+
+	return (resultPath == targetPath);
 }
 
 
@@ -96,8 +105,11 @@ void CFileObjectCollectionViewDelegate::OnImport()
 	if (!files.isEmpty()){
 		for (const QString& filePath : files){
 			QByteArray typeId = FindTypeIdFromFile(filePath);
+			QByteArray importedId = ImportObject(typeId, filePath);
 
-			ImportObject(typeId, filePath);
+			if (importedId.isEmpty()){
+				QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Resource could not be imported"));
+			}
 		}
 	}
 }
@@ -105,6 +117,35 @@ void CFileObjectCollectionViewDelegate::OnImport()
 
 void CFileObjectCollectionViewDelegate::OnExport()
 {
+	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	Q_ASSERT(fileCollectionPtr != nullptr);
+
+	QByteArray typeId = fileCollectionPtr->GetObjectTypeId(m_selectedItemIds[0]);
+	const ifile::IFileTypeInfo* fileInfoPtr = FindFileInfo(typeId);
+
+	QStringList filters;
+	QStringList allExt;
+
+	if (fileInfoPtr != nullptr){
+		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileInfoPtr, nullptr, -1, allExt, filters, false);
+		if (allExt.size() > 1){
+			filters.prepend(tr("All known documents (%1)").arg("*." + allExt.join(" *.")));
+		}
+	}
+
+	istd::CChangeGroup changeGroup(fileCollectionPtr);
+
+	QString filePath = QFileDialog::getSaveFileName(
+				(m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr,
+				tr("Export File"),
+				QString(),
+				filters.join(";;"));
+
+	if (!filePath.isEmpty()){
+		if (!ExportObject(m_selectedItemIds[0], filePath)){
+			QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Resource could not be exported"));
+		}
+	}
 }
 
 
@@ -132,6 +173,23 @@ QByteArray CFileObjectCollectionViewDelegate::FindTypeIdFromFile(const QString& 
 	}
 
 	return QByteArray();
+}
+
+
+const ifile::IFileTypeInfo* CFileObjectCollectionViewDelegate::FindFileInfo(const QByteArray& typeId) const
+{
+	const imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<const imtbase::IFileObjectCollection*>(m_collectionPtr);
+	Q_ASSERT(fileCollectionPtr != nullptr);
+
+	const ifile::IFileResourceTypeConstraints* fileConstraintsPtr = fileCollectionPtr->GetResourceTypeConstraints();
+
+	for (int typeIndex = 0; typeIndex < fileConstraintsPtr->GetOptionsCount(); ++typeIndex){
+		if (typeId == fileConstraintsPtr->GetOptionId(typeIndex)){
+			return fileConstraintsPtr->GetFileTypeInfo(typeIndex);
+		}
+	}
+
+	return nullptr;
 }
 
 

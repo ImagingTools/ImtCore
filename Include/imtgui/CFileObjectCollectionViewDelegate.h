@@ -1,6 +1,9 @@
 #pragma once
 
 
+// ACF includes
+#include <ifile/IFileTypeInfo.h>
+
 // ImtCore includes
 #include <imtgui/CObjectCollectionViewDelegate.h>
 
@@ -39,6 +42,7 @@ protected Q_SLOTS:
 
 private:
 	QByteArray FindTypeIdFromFile(const QString& filePath) const;
+	const ifile::IFileTypeInfo* FindFileInfo(const QByteArray& typeId) const;
 	QString CreateFileFilter(int flags) const;
 
 private:
