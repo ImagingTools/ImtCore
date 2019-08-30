@@ -28,6 +28,7 @@ public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<Ui::CObjectCollectionViewComp, imtbase::IObjectCollection> BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
+		I_ASSIGN(m_viewDelegateCompPtr, "ViewDelegate", "View delegate used for the collection", false, "ViewDelegate");
 	I_END_COMPONENT;
 
 	enum DataRole
@@ -42,6 +43,9 @@ public:
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 protected:
+	ICollectionViewDelegate& GetViewDelegateRef();
+	const ICollectionViewDelegate& GetViewDelegate() const;
+
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiRetranslate() override;
@@ -61,7 +65,11 @@ private:
 	QVector<QStandardItem*> m_typeItems;
 
 	CObjectCollectionViewDelegate m_defaultViewDelegate;
+
+	I_REF(ICollectionViewDelegate, m_viewDelegateCompPtr);
 };
 
 
 } // namespace imtgui
+
+

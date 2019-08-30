@@ -25,11 +25,28 @@ CObjectCollectionViewComp::CObjectCollectionViewComp()
 
 const ibase::IHierarchicalCommand* CObjectCollectionViewComp::GetCommands() const
 {
-	return m_defaultViewDelegate.GetCommands();
+	return GetViewDelegate().GetCommands();
 }
 
 
 // protected methods
+
+ICollectionViewDelegate & CObjectCollectionViewComp::GetViewDelegateRef()
+{
+	if (m_viewDelegateCompPtr.IsValid()){
+		return *m_viewDelegateCompPtr;
+	}
+
+	return m_defaultViewDelegate;
+}
+
+
+const ICollectionViewDelegate & CObjectCollectionViewComp::GetViewDelegate() const
+{
+	return (const_cast<CObjectCollectionViewComp*>(this))->GetViewDelegateRef();
+}
+
+
 
 // reimplemented (iqtgui::CGuiComponentBase)
 
@@ -44,7 +61,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	QToolBar* toolBarPtr = new QToolBar(TopFrame);
 	TopFrame->layout()->addWidget(toolBarPtr);
 
-	iqtgui::CHierarchicalCommand* rootCommandPtr = dynamic_cast<iqtgui::CHierarchicalCommand*>(const_cast<ibase::IHierarchicalCommand*>(m_defaultViewDelegate.GetCommands()));
+	iqtgui::CHierarchicalCommand* rootCommandPtr = dynamic_cast<iqtgui::CHierarchicalCommand*>(const_cast<ibase::IHierarchicalCommand*>(GetViewDelegate().GetCommands()));
 	if (rootCommandPtr != nullptr){
 		iqtgui::CCommandTools::SetupToolbar(*rootCommandPtr, *toolBarPtr);
 		toolBarPtr->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -139,7 +156,7 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 	imtbase::IObjectCollection* objectPtr = GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
 
-	m_defaultViewDelegate.InitializeDelegate(objectPtr, this);
+	GetViewDelegateRef().InitializeDelegate(objectPtr, this);
 }
 
 
@@ -174,7 +191,7 @@ void CObjectCollectionViewComp::UpdateCommands()
 		}
 	}
 
-	m_defaultViewDelegate.UpdateCommands(stateFlags, itemIds);
+	GetViewDelegateRef().UpdateCommands(stateFlags, itemIds);
 }
 
 
