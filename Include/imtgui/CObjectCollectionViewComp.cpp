@@ -7,6 +7,8 @@
 
 // ACF includes
 #include <iqtgui/CCommandTools.h>
+#include <iqtgui/CHierarchicalCommand.h>
+
 
 namespace imtgui
 {
@@ -15,25 +17,15 @@ namespace imtgui
 // protected methods
 
 CObjectCollectionViewComp::CObjectCollectionViewComp()
-	:m_editCommands("&Edit", 100),
-	m_insertCommand("Add", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 2020),
-	m_removeCommand("Remove", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 2020)
 {
-	connect(&m_insertCommand, SIGNAL(triggered()), this, SLOT(OnInsert()));
-	connect(&m_removeCommand, SIGNAL(triggered()), this, SLOT(OnRemove()));
-
-	m_editCommands.InsertChild(&m_insertCommand);
-	m_editCommands.InsertChild(&m_removeCommand);
-
-	m_rootCommands.InsertChild(&m_editCommands);
 }
 
 
 // reimplemented (ibase::ICommandsProvider)
 
-const ibase::IHierarchicalCommand * CObjectCollectionViewComp::GetCommands() const
+const ibase::IHierarchicalCommand* CObjectCollectionViewComp::GetCommands() const
 {
-	return &m_rootCommands;
+	return m_defaultViewDelegate.GetCommands();
 }
 
 
@@ -52,8 +44,11 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	QToolBar* toolBarPtr = new QToolBar(TopFrame);
 	TopFrame->layout()->addWidget(toolBarPtr);
 
-	iqtgui::CCommandTools::SetupToolbar(m_rootCommands, *toolBarPtr);
-	toolBarPtr->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+	iqtgui::CHierarchicalCommand* rootCommandPtr = dynamic_cast<iqtgui::CHierarchicalCommand*>(const_cast<ibase::IHierarchicalCommand*>(m_defaultViewDelegate.GetCommands()));
+	if (rootCommandPtr != nullptr){
+		iqtgui::CCommandTools::SetupToolbar(*rootCommandPtr, *toolBarPtr);
+		toolBarPtr->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+	}
 
 	QItemSelectionModel* selectionModelPtr = ItemTree->selectionModel();
 	if (selectionModelPtr != nullptr){
@@ -68,9 +63,6 @@ void CObjectCollectionViewComp::OnGuiCreated()
 void CObjectCollectionViewComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
-
-	m_insertCommand.SetVisuals(tr("Insert"), tr("New"), tr("Insert new resource into the collection"), QIcon(":/Icons/Add"));
-	m_removeCommand.SetVisuals(tr("Remove"), tr("Remove"), tr("Remove selected resource from the collection"), QIcon(":/Icons/Delete"));
 
 	UpdateGui(istd::IChangeable::GetAnyChange());
 }
@@ -144,25 +136,10 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 {
 	BaseClass::OnGuiModelAttached();
 
-	const imtbase::IObjectCollection* objectPtr = GetObservedObject();
+	imtbase::IObjectCollection* objectPtr = GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
 
-	const iprm::IOptionsList* typesPtr = objectPtr->GetObjectTypesInfo();
-	if (typesPtr != nullptr){
-		int typesCount = typesPtr->GetOptionsCount();
-		if (typesCount > 1){
-			for (int i = 0; i < typesCount; ++i){
-				const QString typeName = typesPtr->GetOptionName(i);
-
-				QAction* action = m_startVariableMenus.addAction(typeName);
-				action->setData(typesPtr->GetOptionId(i));
-			}
-
-			m_insertCommand.setMenu(&m_startVariableMenus);
-
-			QObject::connect(&m_startVariableMenus, SIGNAL(triggered(QAction*)), this, SLOT(OnAddMenuOptionClicked(QAction*)));
-		}
-	}
+	m_defaultViewDelegate.InitializeDelegate(objectPtr, this);
 }
 
 
@@ -170,93 +147,42 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 
 void CObjectCollectionViewComp::UpdateCommands()
 {
-	const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
-	Q_ASSERT(collectionPtr != nullptr);
-
 	QModelIndexList selectedIndexes = ItemTree->selectionModel()->selectedRows();
 
-	bool isAddEnabled = collectionPtr->GetOperationFlags() & imtbase::IObjectCollection::OF_SUPPORT_INSERT;
-	bool isRemoveEnabled = false;
+	imtbase::ICollectionInfo::Ids itemIds;
 
 	if (!selectedIndexes.isEmpty()){
-		QStandardItem* itemPtr = m_itemModel.itemFromIndex(selectedIndexes[0]);
-		if (itemPtr != nullptr){
-			QByteArray objectId = itemPtr->data(DR_OBJECT_ID).toByteArray();
-			if (!objectId.isEmpty()){
-				int flags = collectionPtr->GetOperationFlags(objectId);
-				if ((flags & imtbase::IObjectCollection::OF_SUPPORT_DELETE) && ((flags & imtbase::IObjectCollection::OF_FIXED) == 0)){
-					isRemoveEnabled = true;
+		const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
+		Q_ASSERT(collectionPtr != nullptr);
+		for (int i = 0; i < selectedIndexes.count(); ++i){
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(selectedIndexes[0]);
+			if (itemPtr != nullptr){
+				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
+				if (!itemId.isEmpty()){
+					itemIds.push_back(itemPtr->data(DR_OBJECT_ID).toByteArray());
 				}
 			}
 		}
 	}
 
-	m_insertCommand.setEnabled(isAddEnabled);
-	m_removeCommand.setEnabled(isRemoveEnabled);
+	int stateFlags = imtgui::ICollectionViewDelegate::VS_NONE;
+
+	if (!itemIds.isEmpty()){
+		stateFlags |= imtgui::ICollectionViewDelegate::VS_SELECTED;
+		if (itemIds.count() == 1){
+			stateFlags |= imtgui::ICollectionViewDelegate::VS_SINGLE_SELECTION;
+		}
+	}
+
+	m_defaultViewDelegate.UpdateCommands(stateFlags, itemIds);
 }
 
 
 // private slots
 
-void CObjectCollectionViewComp::OnInsert()
-{
-	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
-	Q_ASSERT(collectionPtr != nullptr);
-
-	const iprm::IOptionsList* typesPtr = collectionPtr->GetObjectTypesInfo();
-	if (typesPtr == nullptr || typesPtr->GetOptionsCount() < 1){
-		return;
-	}
-
-	QByteArray typeId = typesPtr->GetOptionId(0);
-
-	QByteArray objectId = collectionPtr->InsertNewObject(typeId, tr("New"), QString());
-	if (objectId.isEmpty()){
-		QMessageBox::critical(GetWidget(), tr("Collection"), tr("New resource could not be created"));
-	}
-}
-
-
-void CObjectCollectionViewComp::OnRemove()
-{
-	const QItemSelection currentSelection = ItemTree->selectionModel()->selection();
-	const QModelIndexList indexes = currentSelection.indexes();
-	if (indexes.isEmpty()){
-		return;
-	}
-
-	const QModelIndex& index = indexes[0];
-
-	ItemTree->selectionModel()->select(currentSelection, QItemSelectionModel::Deselect);
-
-	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
-	Q_ASSERT(collectionPtr != nullptr);
-
-	imtbase::ICollectionInfo::Ids elementIds = collectionPtr->GetElementIds();
-
-	QByteArray objectId = index.data(DR_OBJECT_ID).toByteArray();
-
-	collectionPtr->RemoveObject(objectId);
-}
-
-
 void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
 {
 	UpdateCommands();
-}
-
-
-void CObjectCollectionViewComp::OnAddMenuOptionClicked(QAction * action)
-{
-	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
-	Q_ASSERT(collectionPtr != nullptr);
-
-	QByteArray typeId = action->data().toByteArray();
-
-	QByteArray objectId = collectionPtr->InsertNewObject(typeId, tr("New"), QString());
-	if (objectId.isEmpty()){
-		QMessageBox::critical(GetWidget(), tr("Collection"), tr("New resource could not be created"));
-	}
 }
 
 

@@ -13,7 +13,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h>
-
+#include <imtgui/CObjectCollectionViewDelegate.h>
 
 namespace imtgui
 {
@@ -54,21 +54,13 @@ private:
 	void UpdateCommands();
 
 private Q_SLOTS:
-	void OnInsert();
-	void OnRemove();
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-	void OnAddMenuOptionClicked(QAction* action);
 
 private:
 	QStandardItemModel m_itemModel;
 	QVector<QStandardItem*> m_typeItems;
 
-	// commands
-	iqtgui::CHierarchicalCommand m_rootCommands;
-	iqtgui::CHierarchicalCommand m_editCommands;
-	iqtgui::CHierarchicalCommand m_insertCommand;
-	iqtgui::CHierarchicalCommand m_removeCommand;
-	QMenu m_startVariableMenus;
+	CObjectCollectionViewDelegate m_defaultViewDelegate;
 };
 
 
