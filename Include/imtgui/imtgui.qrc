@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/Icons">
+        <file alias="New">Resources/Icons/New.svg</file>
         <file alias="FullScreen">Resources/Icons/FullScreen.svg</file>
         <file alias="Home">Resources/Icons/Home.svg</file>
         <file alias="Exit">Resources/Icons/Exit.svg</file>
@@ -13,7 +14,6 @@
         <file alias="Undo">Resources/Icons/Undo.svg</file>
         <file alias="AutoUpdate">Resources/Icons/AutoUpdate.svg</file>
         <file alias="Save">Resources/Icons/Save.svg</file>
-        <file alias="DocumentExport">Resources/Icons/Save.svg</file>
         <file alias="Lock">Resources/Icons/Lock.svg</file>
         <file alias="Unlock">Resources/Icons/Unlock.svg</file>
         <file alias="PowerOff">Resources/Icons/PowerOff.svg</file>
@@ -67,7 +67,6 @@
         <file alias="Error">Resources/Icons/Error.svg</file>
         <file alias="Clear">Resources/Icons/Clear.svg</file>
         <file alias="Load">Resources/Icons/Load.svg</file>
-        <file alias="Import">Resources/Icons/Load.svg</file>
         <file alias="Duplicate">Resources/Icons/Duplicate.svg</file>
         <file alias="Edit">Resources/Icons/Edit.svg</file>
         <file alias="Ruler">Resources/Icons/Ruler.svg</file>
@@ -91,5 +90,7 @@
         <file alias="Info">Resources/Icons/Info.svg</file>
         <file alias="Working">Resources/Icons/Working.svg</file>
         <file alias="NonWorking">Resources/Icons/NonWorking.svg</file>
+        <file alias="Export">Resources/Icons/Export.svg</file>
+        <file alias="Import">Resources/Icons/Import.svg</file>
     </qresource>
 </RCC>
