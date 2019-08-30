@@ -59,6 +59,7 @@ private:
 
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+	void OnItemChanged(QStandardItem *item);
 
 private:
 	QStandardItemModel m_itemModel;

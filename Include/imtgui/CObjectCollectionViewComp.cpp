@@ -74,6 +74,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 					SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)),
 					this, SLOT(OnSelectionChanged(const QItemSelection&, const QItemSelection&)));
 	}
+
+	connect(&m_itemModel, &QStandardItemModel::itemChanged, this, &CObjectCollectionViewComp::OnItemChanged);
 }
 
 
@@ -136,6 +138,14 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			objectItemPtr->setData(itemId, DR_OBJECT_ID);
 			objectItemPtr->setData(objectPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_TYPE_ID), DR_TYPE_ID);
 
+			Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+
+			if (objectPtr->GetSupportedOperations() & imtbase::IObjectCollection::OF_SUPPORT_RENAME){
+				flags |= Qt::ItemIsEditable;
+			}
+
+			objectItemPtr->setFlags(flags);
+
 			if (parentItemPtr != nullptr){
 				parentItemPtr->appendRow(objectItemPtr);
 			}
@@ -195,11 +205,27 @@ void CObjectCollectionViewComp::UpdateCommands()
 }
 
 
+
 // private slots
 
 void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
 {
 	UpdateCommands();
+}
+
+
+void CObjectCollectionViewComp::OnItemChanged(QStandardItem* itemPtr)
+{
+	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
+	Q_ASSERT(collectionPtr != nullptr);
+
+	QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
+	if (!itemId.isEmpty()){
+		QString currentName = collectionPtr->GetElementInfo(itemId, imtbase::ICollectionInfo::EIT_NAME).toString();
+		QString newName = itemPtr->text();
+
+		collectionPtr->SetObjectName(itemId, newName);
+	}
 }
 
 
