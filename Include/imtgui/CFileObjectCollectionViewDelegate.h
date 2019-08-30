@@ -10,7 +10,7 @@ namespace imtgui
 
 
 /**
-	Standard view delegate for an object collection view.
+	View delegate for a file-based object collection.
 	\ingroup Collection
 */
 class CFileObjectCollectionViewDelegate: public CObjectCollectionViewDelegate
