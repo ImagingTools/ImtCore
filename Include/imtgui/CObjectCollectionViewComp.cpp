@@ -47,7 +47,6 @@ const ICollectionViewDelegate & CObjectCollectionViewComp::GetViewDelegate() con
 }
 
 
-
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CObjectCollectionViewComp::OnGuiCreated()

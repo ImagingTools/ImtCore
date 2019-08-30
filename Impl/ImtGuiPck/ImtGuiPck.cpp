@@ -34,6 +34,11 @@ I_EXPORT_COMPONENT(
 			"View for a object collection",
 			"Object Collection View");
 
+I_EXPORT_COMPONENT(
+			FileObjectCollectionViewDelegate,
+			"View delegate for a file-based collection",
+			"Object Collection File Delegate View");
+
 
 } // namespace ImtGuiPck
 

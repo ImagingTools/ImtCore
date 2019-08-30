@@ -14,17 +14,10 @@ namespace imtgui
 
 CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 	:m_editCommands("&Edit", 100),
-	m_insertCommand("Add", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 2020),
-	m_removeCommand("Remove", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 2020),
+	m_insertCommand("Add", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
+	m_removeCommand("Remove", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_collectionPtr(nullptr)
 {
-	connect(&m_insertCommand, SIGNAL(triggered()), this, SLOT(OnInsert()));
-	connect(&m_removeCommand, SIGNAL(triggered()), this, SLOT(OnRemove()));
-
-	m_editCommands.InsertChild(&m_insertCommand);
-	m_editCommands.InsertChild(&m_removeCommand);
-
-	m_rootCommands.InsertChild(&m_editCommands);
 }
 
 
@@ -32,8 +25,6 @@ CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 
 bool CObjectCollectionViewDelegate::InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr)
 {
-	OnLanguageChanged();
-
 	m_collectionPtr = collectionPtr;
 	m_parentGuiPtr = parentGuiPtr;
 
@@ -54,6 +45,10 @@ bool CObjectCollectionViewDelegate::InitializeDelegate(imtbase::IObjectCollectio
 				QObject::connect(&m_startVariableMenus, SIGNAL(triggered(QAction*)), this, SLOT(OnAddMenuOptionClicked(QAction*)));
 			}
 		}
+
+		SetupCommands();
+
+		OnLanguageChanged();
 
 		return true;
 	}
@@ -150,6 +145,18 @@ const ibase::IHierarchicalCommand* CObjectCollectionViewDelegate::GetCommands() 
 
 // protected methods
 
+void CObjectCollectionViewDelegate::SetupCommands()
+{
+	connect(&m_insertCommand, SIGNAL(triggered()), this, SLOT(OnInsert()));
+	connect(&m_removeCommand, SIGNAL(triggered()), this, SLOT(OnRemove()));
+
+	m_editCommands.InsertChild(&m_insertCommand);
+	m_editCommands.InsertChild(&m_removeCommand);
+
+	m_rootCommands.InsertChild(&m_editCommands);
+}
+
+
 // reimplemented (ibase::TLocalizableWrap)
 
 void CObjectCollectionViewDelegate::OnLanguageChanged()
@@ -159,7 +166,7 @@ void CObjectCollectionViewDelegate::OnLanguageChanged()
 }
 
 
-// private slots
+// protected slots
 
 void CObjectCollectionViewDelegate::OnInsert()
 {

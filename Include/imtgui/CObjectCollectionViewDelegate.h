@@ -25,6 +25,13 @@ class CObjectCollectionViewDelegate: public QObject, public ibase::TLocalizableW
 {
 	Q_OBJECT
 public:
+	typedef ibase::TLocalizableWrap<ICollectionViewDelegate> BaseClass;
+
+	enum CommandGroup
+	{
+		CG_EDIT = 2050
+	};
+
 	CObjectCollectionViewDelegate();
 
 	// reimplemented (ICollectionViewDelegate)
@@ -42,15 +49,17 @@ public:
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 protected:
+	virtual void SetupCommands();
+
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
 
-private Q_SLOTS:
-	void OnInsert();
-	void OnRemove();
-	void OnAddMenuOptionClicked(QAction* action);
+protected Q_SLOTS:
+	virtual void OnInsert();
+	virtual void OnRemove();
+	virtual void OnAddMenuOptionClicked(QAction* action);
 
-private:
+protected:
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_editCommands;
