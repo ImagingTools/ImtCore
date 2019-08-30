@@ -14,7 +14,7 @@
    height="512px"
    id="svg4"
    sodipodi:docname="Delete.svg"
-   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
   <metadata
      id="metadata10">
     <rdf:RDF>
@@ -38,12 +38,12 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="1148"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
      id="namedview6"
      showgrid="false"
      inkscape:zoom="0.4609375"
-     inkscape:cx="-520.67797"
+     inkscape:cx="-994.71187"
      inkscape:cy="256"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
@@ -53,6 +53,6 @@
      d="m 22.3125,10.026828 c -15.2351432,-0.090343 -13.0617068,-0.1611621 -20.625,0 -0.5625,0 -0.9375,0.4 -0.9375,1 v 2 c 0,0.6 0.375,1 0.9375,1 17.24172,0.125029 9.225321,-0.07316 20.625,0 0.5625,0 0.9375,-0.4 0.9375,-1 v -2 c 0,-0.6 -0.375,-1 -0.9375,-1 z"
      id="path2"
      inkscape:connector-curvature="0"
-     style="fill:#335777;stroke-width:1"
+     style="fill:#bd0050;stroke-width:1;fill-opacity:1"
      sodipodi:nodetypes="ccssccssc" />
 </svg>
