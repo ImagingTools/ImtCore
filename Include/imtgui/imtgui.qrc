@@ -63,6 +63,7 @@
         <file alias="Down">Resources/Icons/Down.svg</file>
         <file alias="Open">Resources/Icons/Open.svg</file>
         <file alias="Close">Resources/Icons/Close.svg</file>
+        <file alias="Remove">Resources/Icons/Remove.svg</file>
         <file alias="Warning">Resources/Icons/Warning.svg</file>
         <file alias="Error">Resources/Icons/Error.svg</file>
         <file alias="Clear">Resources/Icons/Clear.svg</file>
@@ -91,6 +92,7 @@
         <file alias="Working">Resources/Icons/Working.svg</file>
         <file alias="NonWorking">Resources/Icons/NonWorking.svg</file>
         <file alias="Export">Resources/Icons/Export.svg</file>
+        <file alias="DocumentExport">Resources/Icons/Export.svg</file>
         <file alias="Import">Resources/Icons/Import.svg</file>
     </qresource>
 </RCC>

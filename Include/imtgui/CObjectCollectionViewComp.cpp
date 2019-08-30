@@ -64,6 +64,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	if (rootCommandPtr != nullptr){
 		iqtgui::CCommandTools::SetupToolbar(*rootCommandPtr, *toolBarPtr);
 		toolBarPtr->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+		toolBarPtr->setIconSize(QSize(16, 16));
 	}
 
 	QItemSelectionModel* selectionModelPtr = ItemTree->selectionModel();
