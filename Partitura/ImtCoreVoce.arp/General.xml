@@ -19,6 +19,6 @@
     Core framework components of the ImagingTools SDK
   </Description>
   <Keywords>
-    Company='ImagingTools' Project='Core Framework'
+    Company='ImagingTools' Project='"ImagingTools Core"'
   </Keywords>
 </Acf>
