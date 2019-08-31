@@ -65,7 +65,7 @@ QByteArrayList CObjectCollectionViewDelegate::GetObjectTypeIds() const
 }
 
 
-void CObjectCollectionViewDelegate::UpdateCommands(int viewStateFlags, const imtbase::ICollectionInfo::Ids& itemIds)
+void CObjectCollectionViewDelegate::UpdateItemSelection(int viewStateFlags, const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId)
 {
 	bool isAddEnabled = false;
 	bool isRemoveEnabled = false;
@@ -74,8 +74,8 @@ void CObjectCollectionViewDelegate::UpdateCommands(int viewStateFlags, const imt
 		isAddEnabled = m_collectionPtr->GetOperationFlags() & imtbase::IObjectCollection::OF_SUPPORT_INSERT;
 		isRemoveEnabled = false;
 
-		if (!itemIds.isEmpty()){
-			int flags = m_collectionPtr->GetOperationFlags(itemIds[0]);
+		if (!selectedItems.isEmpty()){
+			int flags = m_collectionPtr->GetOperationFlags(selectedItems[0]);
 			if ((flags & imtbase::IObjectCollection::OF_SUPPORT_DELETE) && ((flags & imtbase::IObjectCollection::OF_FIXED) == 0)){
 				isRemoveEnabled = true;
 			}
@@ -85,7 +85,8 @@ void CObjectCollectionViewDelegate::UpdateCommands(int viewStateFlags, const imt
 	m_insertCommand.setEnabled(isAddEnabled);
 	m_removeCommand.setEnabled(isRemoveEnabled);
 
-	m_selectedItemIds = itemIds;
+	m_selectedItemIds = selectedItems;
+	m_selectedTypeId = selectedTypeId;
 }
 
 

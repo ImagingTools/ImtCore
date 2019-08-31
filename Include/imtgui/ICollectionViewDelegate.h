@@ -83,7 +83,7 @@ public:
 	/**
 		Update the commands state according to the state of the collection and the current state of the collection view.
 	*/
-	virtual void UpdateCommands(int viewStateFlags, const imtbase::ICollectionInfo::Ids& itemIds) = 0;
+	virtual void UpdateItemSelection(int viewStateFlags, const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) = 0;
 
 	/**
 		Create a new object in the collection.

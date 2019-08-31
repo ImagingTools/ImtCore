@@ -37,7 +37,7 @@ public:
 	// reimplemented (ICollectionViewDelegate)
 	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;
 	virtual QByteArrayList GetObjectTypeIds() const override;
-	virtual void UpdateCommands(int viewStateFlags, const imtbase::ICollectionInfo::Ids& itemIds) override;
+	virtual void UpdateItemSelection(int viewStateFlags, const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 	virtual QByteArray CreateNewObject(const QByteArray& typeId) const override;
 	virtual QByteArray ImportObject(const QByteArray& typeId, const QString& sourcePath = QString()) const override;
 	virtual bool ExportObject(const QByteArray& objectId, const QString& targetPath = QString()) const override;
@@ -72,6 +72,7 @@ protected:
 	iqtgui::IGuiObject* m_parentGuiPtr;
 
 	imtbase::ICollectionInfo::Ids m_selectedItemIds;
+	QByteArray m_selectedTypeId;
 };
 
 

@@ -26,9 +26,9 @@ CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
 
 // reimplemented (ICollectionViewDelegate)
 
-void CFileObjectCollectionViewDelegate::UpdateCommands(int viewStateFlags, const imtbase::ICollectionInfo::Ids& itemIds)
+void CFileObjectCollectionViewDelegate::UpdateItemSelection(int viewStateFlags, const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId)
 {
-	BaseClass::UpdateCommands(viewStateFlags, itemIds);
+	BaseClass::UpdateItemSelection(viewStateFlags, selectedItems, selectedTypeId);
 
 	m_exportCommand.setEnabled(viewStateFlags & VS_SINGLE_SELECTION);
 }
@@ -104,9 +104,12 @@ void CFileObjectCollectionViewDelegate::OnImport()
 				CreateFileFilter(ifile::IFilePersistence::QF_LOAD));
 	if (!files.isEmpty()){
 		for (const QString& filePath : files){
-			QByteArray typeId = FindTypeIdFromFile(filePath);
-			QByteArray importedId = ImportObject(typeId, filePath);
+			QByteArray typeId = m_selectedTypeId;
+			if (typeId.isEmpty()){
+				FindTypeIdFromFile(filePath);
+			}
 
+			QByteArray importedId = ImportObject(typeId, filePath);
 			if (importedId.isEmpty()){
 				QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Resource could not be imported"));
 			}
@@ -203,9 +206,13 @@ QString CFileObjectCollectionViewDelegate::CreateFileFilter(int flags) const
 
 	const ifile::IFileResourceTypeConstraints* fileConstraintsPtr = fileCollectionPtr->GetResourceTypeConstraints();
 	for (int typeIndex = 0; typeIndex < fileConstraintsPtr->GetOptionsCount(); ++typeIndex){
-		const ifile::IFileTypeInfo* fileTypeInfoPtr = fileConstraintsPtr->GetFileTypeInfo(typeIndex);
-		if (fileTypeInfoPtr != nullptr){
-			ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileTypeInfoPtr, nullptr, -1, allExt, filters, false);
+		QByteArray typeId = fileConstraintsPtr->GetOptionId(typeIndex);
+
+		if (m_selectedTypeId.isEmpty() || (m_selectedTypeId == typeId)){
+			const ifile::IFileTypeInfo* fileTypeInfoPtr = fileConstraintsPtr->GetFileTypeInfo(typeIndex);
+			if (fileTypeInfoPtr != nullptr){
+				ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileTypeInfoPtr, nullptr, -1, allExt, filters, false);
+			}
 		}
 	}
 

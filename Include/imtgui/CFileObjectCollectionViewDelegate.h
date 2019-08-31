@@ -25,7 +25,7 @@ public:
 	CFileObjectCollectionViewDelegate();
 
 	// reimplemented (ICollectionViewDelegate)
-	virtual void UpdateCommands(int viewStateFlags, const imtbase::ICollectionInfo::Ids& itemIds) override;
+	virtual void UpdateItemSelection(int viewStateFlags, const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 	virtual QByteArray ImportObject(const QByteArray& typeId, const QString& sourcePath = QString()) const override;
 	virtual bool ExportObject(const QByteArray& objectId, const QString& targetPath = QString()) const override;
 

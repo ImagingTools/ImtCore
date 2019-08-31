@@ -178,6 +178,8 @@ void CObjectCollectionViewComp::UpdateCommands()
 
 	imtbase::ICollectionInfo::Ids itemIds;
 
+	QSet<QByteArray> selectedTypes;
+
 	if (!selectedIndexes.isEmpty()){
 		const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
 		Q_ASSERT(collectionPtr != nullptr);
@@ -187,6 +189,11 @@ void CObjectCollectionViewComp::UpdateCommands()
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
 				if (!itemId.isEmpty()){
 					itemIds.push_back(itemPtr->data(DR_OBJECT_ID).toByteArray());
+				}
+
+				QByteArray typeId = itemPtr->data(DR_TYPE_ID).toByteArray();
+				if (!typeId.isEmpty()){
+					selectedTypes.insert(typeId);
 				}
 			}
 		}
@@ -201,7 +208,12 @@ void CObjectCollectionViewComp::UpdateCommands()
 		}
 	}
 
-	GetViewDelegateRef().UpdateCommands(stateFlags, itemIds);
+	QByteArray selectedTypeId;
+	if (selectedTypes.count() == 1){
+		selectedTypeId = *selectedTypes.begin();
+	}
+
+	GetViewDelegateRef().UpdateItemSelection(stateFlags, itemIds, selectedTypeId);
 }
 
 
