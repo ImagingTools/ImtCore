@@ -32,6 +32,7 @@ public:
 		I_REGISTER_INTERFACE(iprm::IOptionsList);
 		I_ASSIGN(m_collectionInfoCompPtr, "CollectionInfo", "Collection information", false, "CollectionInfo");
 		I_ASSIGN_TO(m_collectionInfoModelCompPtr, m_collectionInfoCompPtr, false);
+		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "FilterByTypeIds", "List of type-IDs used for filtering the collection items", false);
 	I_END_COMPONENT;
 
 protected:
@@ -47,6 +48,7 @@ private:
 private:
 	I_REF(ICollectionInfo, m_collectionInfoCompPtr);
 	I_REF(imod::IModel, m_collectionInfoModelCompPtr);
+	I_MULTIATTR(QByteArray, m_typeIdsAttrPtr);
 };
 
 

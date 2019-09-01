@@ -667,6 +667,10 @@ QVariant CFileCollectionComp::GetElementInfo(const QByteArray& elementId, int in
 		case EIT_DESCRIPTION:
 			return m_files[fileIndex].resourceDescription;
 			break;
+
+		case EIT_TYPE_ID:
+			return m_files[fileIndex].resourceTypeId;
+			break;
 		}
 	}
 

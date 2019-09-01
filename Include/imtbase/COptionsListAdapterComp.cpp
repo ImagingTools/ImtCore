@@ -48,6 +48,15 @@ void COptionsListAdapterComp::UpdateList()
 	if (m_collectionInfoCompPtr.IsValid()){
 		imtbase::ICollectionInfo::Ids elementIds = m_collectionInfoCompPtr->GetElementIds();
 		for (const QByteArray& id : elementIds){
+			if (m_typeIdsAttrPtr.IsValid()){
+				QByteArray typeId = m_collectionInfoCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_TYPE_ID).toByteArray();
+				
+				int index = m_typeIdsAttrPtr.FindValue(typeId);
+				if (index < 0){
+					continue;
+				}
+			}
+
 			InsertOption(
 				m_collectionInfoCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString(),
 				id,
