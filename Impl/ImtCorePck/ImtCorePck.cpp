@@ -39,6 +39,11 @@ I_EXPORT_COMPONENT(
 			"Information status manager",
 			"Information Status Manager");
 
+I_EXPORT_COMPONENT(
+			OptionsListAdapter,
+			"ICollectionInfo-To-IOptionsList adapted",
+			"Collection List Options Adapter");
+
 
 } // namespace ImtCorePck
 

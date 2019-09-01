@@ -11,6 +11,7 @@
 #include <imtbase/CDelegatedObjectContainerSupplierComp.h>
 #include <imtbase/CMultiStatusManagerComp.h>
 #include <imtbase/CStatusManagerComp.h>
+#include <imtbase/COptionsListAdapterComp.h>
 
 
 /**
@@ -25,6 +26,7 @@ typedef icomp::TModelCompWrap<imtbase::CFileCollectionComp> FileCollection;
 typedef icomp::TModelCompWrap<imtbase::CDelegatedObjectContainerSupplierComp> DelegatedObjectContainerSupplier;
 typedef icomp::TModelCompWrap<imtbase::CMultiStatusManagerComp> MultiStatusManager;
 typedef icomp::TModelCompWrap<imtbase::CStatusManagerComp> StatusManager;
+typedef icomp::TModelCompWrap<imtbase::COptionsListAdapterComp> OptionsListAdapter;
 
 
 } // namespace ImtCorePck
