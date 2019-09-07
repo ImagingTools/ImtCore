@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtCore/QSet>
+#include <QtCore/QVector>
 #include <QtCore/QByteArray>
 
 // ACF includes
@@ -25,7 +25,7 @@ namespace imtbase
 class IMultiSelection: virtual public iser::ISerializable
 {
 public:
-	typedef QSet<QByteArray> Ids;
+	typedef QVector<QByteArray> Ids;
 
 	/**
 		Change notification flags.

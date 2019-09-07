@@ -113,7 +113,7 @@ bool CSimpleReferenceCollection::Serialize(iser::IArchive& archive)
 	static iser::CArchiveTag referencesTag("References", "List of references", iser::CArchiveTag::TT_MULTIPLE);
 	static iser::CArchiveTag referenceTag("Reference", "Single reference item", iser::CArchiveTag::TT_GROUP, &referencesTag);
 
-	int referencesCount = 0;
+	int referencesCount = m_references.count();
 	retVal = retVal && archive.BeginMultiTag(referencesTag, referenceTag, referencesCount);
 
 	if (!archive.IsStoring()){
@@ -135,6 +135,8 @@ bool CSimpleReferenceCollection::Serialize(iser::IArchive& archive)
 
 		retVal = retVal && archive.EndTag(referenceTag);
 	}
+	
+	retVal = retVal && archive.EndTag(referencesTag);
 
 	return retVal;
 }

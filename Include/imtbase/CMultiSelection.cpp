@@ -61,7 +61,7 @@ bool CMultiSelection::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(selectedItemTag);
 
 		if (retVal && !archive.IsStoring()){
-			selectedIds.insert(id);
+			selectedIds.push_back(id);
 		}
 	}
 
