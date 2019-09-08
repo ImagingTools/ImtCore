@@ -5,6 +5,46 @@ namespace imtbase
 {
 
 
+// public methods
+
+// reimplemented (iprm::IOptionsList)
+
+int COptionsListAdapterComp::GetOptionsFlags() const
+{
+	return SCF_SUPPORT_UNIQUE_ID;
+}
+
+
+int COptionsListAdapterComp::GetOptionsCount() const
+{
+	return m_options.GetOptionsCount();
+}
+
+
+QString COptionsListAdapterComp::GetOptionName(int index) const
+{
+	return m_options.GetOptionName(index);
+}
+
+
+QString COptionsListAdapterComp::GetOptionDescription(int index) const
+{
+	return m_options.GetOptionDescription(index);
+}
+
+
+QByteArray COptionsListAdapterComp::GetOptionId(int index) const
+{
+	return m_options.GetOptionId(index);
+}
+
+
+bool COptionsListAdapterComp::IsOptionEnabled(int index) const
+{
+	return m_options.IsOptionEnabled(index);
+}
+
+
 // protected methods
 
 // reimplemented (imod::CMultiModelDispatcherBase)
@@ -43,7 +83,7 @@ void COptionsListAdapterComp::UpdateList()
 
 	istd::CChangeNotifier changeNotfier(this, &changes);
 
-	ResetOptions();
+	m_options.ResetOptions();
 
 	if (m_collectionInfoCompPtr.IsValid()){
 		imtbase::ICollectionInfo::Ids elementIds = m_collectionInfoCompPtr->GetElementIds();
@@ -57,10 +97,10 @@ void COptionsListAdapterComp::UpdateList()
 				}
 			}
 
-			InsertOption(
-				m_collectionInfoCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString(),
-				id,
-				m_collectionInfoCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString());
+			m_options.InsertOption(
+						m_collectionInfoCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString(),
+						id,
+						m_collectionInfoCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString());
 		}
 	}
 }

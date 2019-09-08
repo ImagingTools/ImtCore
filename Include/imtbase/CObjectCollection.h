@@ -38,8 +38,10 @@ public:
 				const QString& name,
 				const QString& description,
 				const istd::IChangeable* defaultValuePtr = nullptr) override;
-	virtual istd::IChangeable* GetEditableObject(const QByteArray& objectId) const override;
 	virtual bool RemoveObject(const QByteArray& objectId) override;
+	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
+	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
+	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object) override;
 	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
 	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
@@ -47,9 +49,6 @@ public:
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
-
-	// reimplemented (IObjectProvider)
-	virtual const istd::IChangeable* GetDataObject(const QByteArray & objectId) const override;
 
 	// reimplemented (ICollectionInfo)
 	virtual Ids GetElementIds() const override;

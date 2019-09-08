@@ -1,8 +1,11 @@
 #pragma once
 
 
+// ACF includes
+#include <istd/TSmartPtr.h>
+
 // ImtCore includes
-#include <imtbase/IObjectProvider.h>
+#include <imtbase/IObjectCollectionInfo.h>
 
 
 namespace imtbase
@@ -13,9 +16,11 @@ namespace imtbase
 	Common interface for a data object collection.
 	\ingroup Collection
 */
-class IObjectCollection: virtual public IObjectProvider
+class IObjectCollection: virtual public IObjectCollectionInfo
 {
 public:
+	typedef istd::TSmartPtr<istd::IChangeable> DataPtr;
+
 	enum OperationalFlags
 	{
 		OF_DEFAULT = 1,
@@ -84,14 +89,25 @@ public:
 				const istd::IChangeable* defaultValuePtr = nullptr) = 0;
 
 	/**
-		Get object with the given ID for the editing.
-	*/
-	virtual istd::IChangeable* GetEditableObject(const QByteArray& objectId) const = 0;
-
-	/**
 		Remove element with the given ID.
 	*/
 	virtual bool RemoveObject(const QByteArray& objectId) = 0;
+
+	/**
+		Get access to the object instance inside of collecton.
+		\note This method should returns objects that are fixed in the collection.
+	*/
+	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const = 0;
+
+	/**
+		Get object data instance for the entry with the given ID.
+	*/
+	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const = 0;
+
+	/**
+		Set data for the entry with the given ID.
+	*/
+	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object) = 0;
 
 	/**
 		Set name of the element with the given ID.

@@ -1,28 +1,20 @@
 #pragma once
 
 
-// ACF includes
-#include <iprm/IOptionsList.h>
-
-// ImtCore includes
-#include <imtbase/IObjectCollectionInfo.h>
-
-
 namespace imtbase
 {
 
 
 /**
-	Interface for accessing data object identfied by unique ID inside of some abstract storage.
-	\ingroup Collection
+	General interface for access any data object.
 */
-class IObjectProvider: virtual public IObjectCollectionInfo
+class IObjectProvider: virtual public istd::IChangeable
 {
 public:
 	/**
-		Get the object instance with the given ID.
+		Get access to the object.
 	*/
-	virtual const istd::IChangeable* GetDataObject(const QByteArray& objectId) const = 0;
+	virtual const istd::IChangeable* GetDataObject() const = 0;
 };
 
 

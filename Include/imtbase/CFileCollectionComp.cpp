@@ -380,12 +380,6 @@ QByteArray CFileCollectionComp::InsertNewObject(
 }
 
 
-istd::IChangeable * CFileCollectionComp::GetEditableObject(const QByteArray& /*objectId*/) const
-{
-	return nullptr;
-}
-
-
 bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 {
 	if (objectId.isEmpty()){
@@ -475,6 +469,24 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 	}
 
 	return true;
+}
+
+
+const istd::IChangeable* CFileCollectionComp::GetObjectPtr(const QByteArray& /*objectId*/) const
+{
+	return nullptr;
+}
+
+
+bool CFileCollectionComp::GetObjectData(const QByteArray & objectId, DataPtr & dataPtr) const
+{
+	return false;
+}
+
+
+bool CFileCollectionComp::SetObjectData(const QByteArray & objectId, const istd::IChangeable & object)
+{
+	return false;
 }
 
 
@@ -599,14 +611,6 @@ void CFileCollectionComp::SetObjectDescription(const QByteArray & objectId, cons
 
 void CFileCollectionComp::SetObjectEnabled(const QByteArray& /*objectId*/, bool /*isEnabled*/)
 {
-}
-
-
-// reimplemented (IObjectProvider)
-
-const istd::IChangeable* CFileCollectionComp::GetDataObject(const QByteArray& /*objectId*/) const
-{
-	return nullptr;
 }
 
 

@@ -75,18 +75,6 @@ QByteArray CObjectCollection::InsertNewObject(
 }
 
 
-istd::IChangeable* CObjectCollection::GetEditableObject(const QByteArray& objectId) const
-{
-	for (const ObjectInfo& objectInfo : m_objects){
-		if (objectInfo.id == objectId){
-			return objectInfo.objectPtr.GetPtr();
-		}
-	}
-
-	return nullptr;
-}
-
-
 bool CObjectCollection::RemoveObject(const QByteArray& objectId)
 {
 	for (Objects::iterator iter = m_objects.begin(); iter != m_objects.end(); ++iter){
@@ -105,6 +93,54 @@ bool CObjectCollection::RemoveObject(const QByteArray& objectId)
 	}
 
 	return true;
+}
+
+
+const istd::IChangeable* CObjectCollection::GetObjectPtr(const QByteArray& objectId) const
+{
+	for (const ObjectInfo& objectInfo : m_objects){
+		if ((objectInfo.id == objectId) && (objectInfo.flags & OF_FIXED)){
+			return objectInfo.objectPtr.GetPtr();
+		}
+	}
+
+	return nullptr;
+}
+
+
+bool CObjectCollection::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const
+{
+	for (const ObjectInfo& objectInfo : m_objects){
+		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
+			if (!dataPtr.IsValid()){
+				istd::TDelPtr<istd::IChangeable> newInstancePtr(CreateObjectInstance(objectInfo.typeId));
+				if (newInstancePtr.IsValid()){
+					if (newInstancePtr->CopyFrom(*objectInfo.objectPtr)){
+						dataPtr.SetPtr(newInstancePtr.PopPtr());
+
+						return true;
+					}
+				}
+			}
+			else{
+				return dataPtr->CopyFrom(*objectInfo.objectPtr);
+			}
+		}
+	}
+
+	return false;
+}
+
+
+bool CObjectCollection::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object)
+{
+	for (const ObjectInfo& objectInfo : m_objects){
+		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
+			return objectInfo.objectPtr->CopyFrom(object);
+		}
+	}
+
+	return false;
 }
 
 
@@ -161,20 +197,6 @@ ICollectionInfo::Id CObjectCollection::GetObjectTypeId(const QByteArray& objectI
 	}
 	
 	return QByteArray();
-}
-
-
-// reimplemented (IObjectProvider)
-
-const istd::IChangeable* CObjectCollection::GetDataObject(const QByteArray& objectId) const
-{
-	for (const ObjectInfo& objectInfo : m_objects){
-		if (objectInfo.id == objectId){
-			return objectInfo.objectPtr.GetPtr();
-		}
-	}
-
-	return nullptr;
 }
 
 

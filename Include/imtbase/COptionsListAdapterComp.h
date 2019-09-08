@@ -15,14 +15,13 @@ namespace imtbase
 
 
 /**
-	Component-based implementation of an object collection.
-	The sub-objects will be created using registered factories (via 'ObjectFactories')
+	Adapter of the \c ICollectionInfo interface to \c iprmIOptionsList
 	\ingroup Collection
 */
 class COptionsListAdapterComp:
 			public icomp::CComponentBase,
 			private imod::CMultiModelDispatcherBase,
-			public iprm::COptionsManager
+			protected iprm::IOptionsList
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -35,6 +34,14 @@ public:
 		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "FilterByTypeIds", "List of type-IDs used for filtering the collection items", false);
 	I_END_COMPONENT;
 
+	// reimplemented (iprm::IOptionsList)
+	virtual int GetOptionsFlags() const override;
+	virtual int GetOptionsCount() const override;
+	virtual QString GetOptionName(int index) const override;
+	virtual QString GetOptionDescription(int index) const override;
+	virtual QByteArray GetOptionId(int index) const override;
+	virtual bool IsOptionEnabled(int index) const override;
+
 protected:
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet & changeSet) override;
@@ -45,10 +52,13 @@ protected:
 
 private:
 	void UpdateList();
+
 private:
 	I_REF(ICollectionInfo, m_collectionInfoCompPtr);
 	I_REF(imod::IModel, m_collectionInfoModelCompPtr);
 	I_MULTIATTR(QByteArray, m_typeIdsAttrPtr);
+
+	iprm::COptionsManager m_options;
 };
 
 

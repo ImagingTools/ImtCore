@@ -28,7 +28,8 @@ public:
 
 	I_BEGIN_COMPONENT(CObjectCollectionComp);
 		I_REGISTER_INTERFACE(IObjectCollection);
-		I_REGISTER_INTERFACE(IObjectProvider);
+		I_REGISTER_INTERFACE(IObjectCollectionInfo);
+		I_REGISTER_INTERFACE(ICollectionInfo);
 		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "List of factories used for object creation", false);
 		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_typeNamesAttrPtr, "TypeNames", "List of type names corresponding to the registered factories", false);
