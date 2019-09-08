@@ -36,6 +36,7 @@ public:
 
 	// reimplemented (istd::IChangeable)
 	virtual bool CopyFrom(const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool IsEqual(const istd::IChangeable& object) const override;
 	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
@@ -49,6 +50,16 @@ private:
 		QString name;
 		QString description;
 		QByteArray typeId;
+
+		bool operator ==(const Reference& other) const
+		{
+			return (id == other.id) && (name == other.name) && (description == other.description) && (typeId == other.typeId);
+		}
+		
+		bool operator !=(const Reference& other) const
+		{
+			return !operator==(other);
+		}
 	};
 	typedef QVector<Reference> References;
 	

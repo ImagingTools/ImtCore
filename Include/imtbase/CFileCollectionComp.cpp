@@ -306,17 +306,6 @@ bool CFileCollectionComp::UpdateFile(
 
 		locker.unlock();
 
-		QMutexLocker lockCache(&m_cacheMutex);
-
-		for (int cacheItemIndex = 0; cacheItemIndex < m_dataCache.count(); ++cacheItemIndex){
-			if (m_dataCache[cacheItemIndex]->fileId == objectId){
-				m_dataCache.removeAt(cacheItemIndex);
-				break;
-			}
-		}
-
-		lockCache.unlock();
-
 		return true;
 	}
 
@@ -444,20 +433,8 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 
 			istd::CChangeNotifier changeNotifier(this, &changes);
 
-			QMutexLocker lockCache(&m_cacheMutex);
-
-			for (int cacheItemIndex = 0; cacheItemIndex < m_dataCache.count(); ++cacheItemIndex){
-				if (m_dataCache[cacheItemIndex]->fileId == objectId){
-					m_dataCache.removeAt(cacheItemIndex);
-					break;
-				}
-			}
-
 			// Remove the repository item with the corresponding resource ID:
 			m_files.removeAt(fileIndex);
-
-			// Ensure unlocking before change notification:
-			lockCache.unlock();
 
 			repositoryDataLocker.unlock();
 		}
@@ -478,13 +455,36 @@ const istd::IChangeable* CFileCollectionComp::GetObjectPtr(const QByteArray& /*o
 }
 
 
-bool CFileCollectionComp::GetObjectData(const QByteArray & objectId, DataPtr & dataPtr) const
+bool CFileCollectionComp::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const
 {
+	for (const CollectionItem& item : m_files){
+		if (item.fileId == objectId){
+			istd::TDelPtr<istd::IChangeable> dataObjectPtr(CreateObjectFromFile(item.filePathInRepository, item.resourceTypeId));
+			if (!dataObjectPtr.IsValid()){
+				return false;
+			}
+
+			if (!dataPtr.IsValid()){
+				istd::TDelPtr<istd::IChangeable> newInstancePtr(CreateDataObject(item.resourceTypeId));
+				if (newInstancePtr.IsValid()){
+					if (newInstancePtr->CopyFrom(*dataObjectPtr)){
+						dataPtr.SetPtr(newInstancePtr.PopPtr());
+
+						return true;
+					}
+				}
+			}
+			else{
+				return dataPtr->CopyFrom(*dataObjectPtr);
+			}
+		}
+	}
+
 	return false;
 }
 
 
-bool CFileCollectionComp::SetObjectData(const QByteArray & objectId, const istd::IChangeable & object)
+bool CFileCollectionComp::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object)
 {
 	return false;
 }
@@ -1042,9 +1042,6 @@ void CFileCollectionComp::OnComponentDestroyed()
 	m_repositoryLock.lockForWrite();
 	m_files.clear();
 	m_repositoryLock.unlock();
-
-	QMutexLocker lockCache(&m_cacheMutex);
-	m_dataCache.clear();
 
 	BaseClass::OnComponentDestroyed();
 }

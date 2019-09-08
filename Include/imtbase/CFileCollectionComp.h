@@ -335,22 +335,6 @@ private:
 	mutable QReadWriteLock m_repositoryLock;
 
 	/**
-		Mutex used for locking the data cache.
-	*/
-	mutable QMutex m_cacheMutex;
-
-	struct Data
-	{
-		QByteArray fileId;
-		istd::TSmartPtr<istd::IChangeable> dataObjectPtr;
-		QString tempFilePath;
-	};
-
-	typedef istd::TSmartPtr<Data> DataCachePtr;
-	typedef QList<istd::TSmartPtr<Data>> DataCache;
-	mutable DataCache m_dataCache;
-
-	/**
 		Path to the directory where the file repository is located.
 		If the path is set, the incomming file will be copied to this location,
 		otherwise only a link to the file wil be created.

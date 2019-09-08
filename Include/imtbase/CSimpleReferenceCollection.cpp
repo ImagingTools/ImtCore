@@ -159,6 +159,17 @@ bool CSimpleReferenceCollection::CopyFrom(const istd::IChangeable& object, Compa
 }
 
 
+bool CSimpleReferenceCollection::IsEqual(const istd::IChangeable& object) const
+{
+	const CSimpleReferenceCollection* sourcePtr = dynamic_cast<const CSimpleReferenceCollection*>(&object);
+	if (sourcePtr != NULL){
+		return (m_references == sourcePtr->m_references);
+	}
+
+	return false;
+}
+
+
 istd::IChangeable* CSimpleReferenceCollection::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CSimpleReferenceCollection> clonePtr( new CSimpleReferenceCollection);
