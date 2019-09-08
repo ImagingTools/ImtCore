@@ -7,6 +7,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QFileInfo>
+#include <QtCore/QFileSystemWatcher>
 
 // ACF includes
 #include <istd/TSmartPtr.h>
@@ -59,6 +60,7 @@ public:
 		I_ASSIGN_MULTI_0(m_objectFactoryListCompPtr, "ObjectFactoryList", "List of factories used for data ojbect instance creation", false);
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
 		I_ASSIGN(m_createFolderOnStartAttrPtr, "CreateRepositoryFolder", "Ensure that the repository folder is created on the start", true, true);
+		I_ASSIGN(m_pollFileSystemAttrPtr, "PollFileSystem", "If enabled, the collection folder will be observed and the items will be re-read on changes in the folder structure", true, false);
 	I_END_COMPONENT;
 
 	CFileCollectionComp();
@@ -227,7 +229,7 @@ protected:
 	/**
 		Update the meta informations for the existing item.
 	*/
-	void UpdateItemMetaInfo(CollectionItem& item);
+	void UpdateItemMetaInfo(CollectionItem& item) const;
 
 	/**
 		Save file's meta info.
@@ -294,6 +296,8 @@ protected:
 	typedef imod::TModelWrap<ResourceTypeConstraints> ResourceTypeConstraintsModel;
 
 private:
+	typedef QList<CollectionItem> Files;
+
 	bool InsertFileIntoRepository(
 				const QString& filePath,
 				const QString& resourceName,
@@ -309,15 +313,37 @@ private:
 	/**
 		Read repository contents.
 	*/
-	void ReadCollectionItems();
+	void ReadCollectionItems(Files& files) const;
 
 	QString GetTempDirectory() const;
 	QString GetDataItemFilePath(const CollectionItem& repositoryFile) const;
 	QString GetMetaInfoFilePath(const CollectionItem& repositoryFile) const;
 	QString ShortenWindowsFilename(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const;
 
+private Q_SLOTS:
+	void OnDirectoryChanged(const QString& path);
+
 private:
-	typedef QList<CollectionItem> Files;
+	QFileSystemWatcher m_itemsFolderWatcher;
+	mutable bool m_directoryBlocked;
+
+	class DirectoryBlocker
+	{
+	public:
+		DirectoryBlocker(const CFileCollectionComp& parent)
+			:m_parent(parent)
+		{
+			parent.m_directoryBlocked = true;
+		}
+
+		~DirectoryBlocker()
+		{
+			m_parent.m_directoryBlocked = false;
+		}
+
+	private:
+		const CFileCollectionComp& m_parent;
+	};
 
 	/**
 		Collection data.
@@ -380,6 +406,8 @@ private:
 		Ensure that the repository folder is created on starting.
 	*/
 	I_ATTR(bool, m_createFolderOnStartAttrPtr);
+
+	I_ATTR(bool, m_pollFileSystemAttrPtr);
 };
 
 

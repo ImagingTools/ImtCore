@@ -149,6 +149,7 @@ QByteArray CFileCollectionComp::AddFile(
 			const QString& resourceDescription,
 			const QByteArray& objectId)
 {
+
 	static QByteArray emptyId;
 
 	QWriteLocker locker(&m_repositoryLock);
@@ -603,6 +604,8 @@ void CFileCollectionComp::SetObjectDescription(const QByteArray & objectId, cons
 
 			item.resourceDescription = objectDescription;
 
+			SaveCollectionItem(item);
+
 			locker.unlock();
 		}
 	}
@@ -858,7 +861,7 @@ ifile::IFileMetaInfoProvider::MetaInfoPtr CFileCollectionComp::TryLoadMetaInfoFr
 }
 
 
-void CFileCollectionComp::UpdateItemMetaInfo(CollectionItem& item)
+void CFileCollectionComp::UpdateItemMetaInfo(CollectionItem& item) const
 {
 	QString metaInfoFilePath = GetMetaInfoFilePath(item);
 	QFileInfo fileInfo(metaInfoFilePath);
@@ -1033,7 +1036,19 @@ void CFileCollectionComp::OnComponentCreated()
 		}
 	}
 
-	ReadCollectionItems();
+	QWriteLocker lock(&m_repositoryLock);
+	
+	istd::CChangeNotifier changeNotifier(this);
+
+	ReadCollectionItems(m_files);
+
+	lock.unlock();
+
+	if (*m_pollFileSystemAttrPtr && !path.isEmpty()){
+		m_itemsFolderWatcher.addPath(path);
+
+		connect(&m_itemsFolderWatcher, &QFileSystemWatcher::directoryChanged, this, &CFileCollectionComp::OnDirectoryChanged);
+	}
 }
 
 
@@ -1115,6 +1130,8 @@ bool CFileCollectionComp::InsertFileIntoRepository(
 
 QString CFileCollectionComp::SaveCollectionItem(const CollectionItem& repositoryItem) const
 {
+	DirectoryBlocker blocker(*this);
+
 	QString itemFilePath = GetDataItemFilePath(repositoryItem);
 
 	ifile::CCompactXmlFileWriteArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
@@ -1129,13 +1146,9 @@ QString CFileCollectionComp::SaveCollectionItem(const CollectionItem& repository
 }
 
 
-void CFileCollectionComp::ReadCollectionItems()
+void CFileCollectionComp::ReadCollectionItems(Files& files) const
 {
-	istd::CChangeNotifier changeNotifier(this);
-
-	m_repositoryLock.lockForWrite();
-
-	m_files.clear();
+	files.clear();
 
 	QString repositoryRootPath = GetRepositoryPath();
 	QDir repositoryRootDir(repositoryRootPath);
@@ -1159,14 +1172,12 @@ void CFileCollectionComp::ReadCollectionItems()
 		if (repositoryFileInfo.exists()){
 			UpdateItemMetaInfo(fileItem);
 
-			m_files.push_back(fileItem);
+			files.push_back(fileItem);
 		}
 		else{
 			SendErrorMessage(0, QString("File '%1' doesn't exist. Repository item was automatically removed").arg(fileItem.filePathInRepository));
 		}
 	}
-
-	m_repositoryLock.unlock();
 }
 
 
@@ -1231,6 +1242,22 @@ QString CFileCollectionComp::ShortenWindowsFilename(const QString& fileName, con
 	}
 	else{
 		return fileName;
+	}
+}
+
+
+// private slots
+
+void CFileCollectionComp::OnDirectoryChanged(const QString& path)
+{
+	if (!m_directoryBlocked){
+		QWriteLocker lock(&m_repositoryLock);
+	
+		istd::CChangeNotifier changeNotifier(this);
+
+		ReadCollectionItems(m_files);
+
+		lock.unlock();
 	}
 }
 
