@@ -1045,9 +1045,9 @@ void CFileCollectionComp::OnComponentCreated()
 	lock.unlock();
 
 	if (*m_pollFileSystemAttrPtr && !path.isEmpty()){
-		m_itemsFolderWatcher.addPath(path);
+		connect(&m_syncTimer, &QTimer::timeout, this, &CFileCollectionComp::OnSync);
 
-		connect(&m_itemsFolderWatcher, &QFileSystemWatcher::directoryChanged, this, &CFileCollectionComp::OnDirectoryChanged);
+		m_syncTimer.start(1000);
 	}
 }
 
@@ -1248,7 +1248,7 @@ QString CFileCollectionComp::ShortenWindowsFilename(const QString& fileName, con
 
 // private slots
 
-void CFileCollectionComp::OnDirectoryChanged(const QString& path)
+void CFileCollectionComp::OnSync()
 {
 	if (!m_directoryBlocked){
 		QWriteLocker lock(&m_repositoryLock);

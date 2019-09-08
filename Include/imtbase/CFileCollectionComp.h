@@ -7,7 +7,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QFileInfo>
-#include <QtCore/QFileSystemWatcher>
+#include <QtCore/QTimer>
 
 // ACF includes
 #include <istd/TSmartPtr.h>
@@ -321,10 +321,10 @@ private:
 	QString ShortenWindowsFilename(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const;
 
 private Q_SLOTS:
-	void OnDirectoryChanged(const QString& path);
+	void OnSync();
 
 private:
-	QFileSystemWatcher m_itemsFolderWatcher;
+	QTimer m_syncTimer;
 	mutable bool m_directoryBlocked;
 
 	class DirectoryBlocker
