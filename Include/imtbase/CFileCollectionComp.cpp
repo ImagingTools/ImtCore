@@ -29,7 +29,8 @@ namespace imtbase
 // public methods
 
 CFileCollectionComp::CFileCollectionComp()
-	:m_repositoryLock(QReadWriteLock::Recursive)
+	:m_repositoryLock(QReadWriteLock::Recursive),
+	m_directoryBlocked(false)
 {
 	m_resourceTypeConstraints.SetParent(this);
 }
