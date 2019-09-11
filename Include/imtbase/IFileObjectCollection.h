@@ -25,7 +25,7 @@ class IFileObjectCollection: virtual public IObjectCollection
 public:
 	enum ChangeFlags
 	{
-		CF_FILE_ADDED = 0xacf478,
+		CF_FILE_ADDED = 0xacfabe,
 		CF_FILE_REMOVED,
 		CF_FILE_UPDATED
 	};
@@ -79,7 +79,7 @@ public:
 
 	/**
 		Get file from the repository.
-		\param objectId			ID of the file object.
+		\param objectId				ID of the file object.
 		\param targetFilePath		Path to the location where the file should be stored. If the path is empty, the implementation should define the location of the file automatically.
 		\return Path to the file on the local system or an empty string if the operation has been failed.
 	*/
@@ -91,10 +91,10 @@ public:
 		Add a file to the repository. This method works synchronous, what means that the file must already exist on the file system before the operation can be executed. 
 		In the event, that the repository is running on another machine adding of a file means an upload to the repository server.
 		\param filePath				Location of the file.
-		\param objectTypeId		Type ID of the file object. \sa GetResourceTypeConstraints
+		\param objectTypeId			Type ID of the file object. \sa GetResourceTypeConstraints
 		\param objectName			Name of the file object used for human readable representation. If no name was set, the file name will be used.
 		\param objectDescription	Description of the file object.
-		\param objectId					Externally defined object's unique ID.
+		\param objectId				Externally defined object's unique ID.
 		\return ID of the file object. If the operation was not successful, the method returns an empty ID.
 	*/
 	virtual QByteArray AddFile(
@@ -106,8 +106,8 @@ public:
 
 	/**
 		Update file in the repository.
-		\param filePath				Location of the file containing the new content.
-		\param objectId			ID of the object to be updated in the repository.
+		\param filePath		Location of the file containing the new content.
+		\param objectId		ID of the object to be updated in the repository.
 		\return \c true if the file object was successfully updated or \c false otherwise.
 	*/
 	virtual bool UpdateFile(

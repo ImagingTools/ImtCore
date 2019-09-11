@@ -30,9 +30,9 @@ namespace imtbase
 
 /**
 	Implementation of a file-based data object collection. Each object will be placed in the file system according to the configured settings.
-	Two modes are supported:
-	* Plain. In this mode the data file and related description files will be simply placed into the repository folder.
-	* Subfolder. Each file will be placed into a separate folder. This folder contains the data file itself, repository description file, and the meta-info file.
+	Two modes are supported:\n
+	*<b>Plain</b>:In this mode the data file and related description files will be simply placed into the repository folder.
+	*<b>Subfolder</b>: Each file will be placed into a separate folder. This folder contains the data file itself, repository description file, and the meta-info file.
 	\ingroup Collection
 */
 class CFileCollectionComp:
