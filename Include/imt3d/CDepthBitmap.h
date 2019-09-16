@@ -22,10 +22,29 @@ class CDepthBitmap:
 			public idoc::CStandardDocumentMetaInfo
 {
 public:
+	/**
+		Types of color table used in the image view for visualization of the bitmap pixels.
+	*/
+	enum ColorMapType
+	{
+		/**
+			Use jet color table.
+		*/
+		CMT_JET,
+
+		/**
+			Use grayscale table.
+		*/
+		CMT_GRAY
+	};
+
 	typedef iimg::CReflectedBitmapBase BaseClass;
 	typedef idoc::CStandardDocumentMetaInfo BaseClass2;
 
+	CDepthBitmap();
+
 	void SetDepthRange(const istd::CRange& depthRange);
+	void SetColorMap(ColorMapType colorMapType);
 
 	// reimplemented (IDepthBitmap)
 	istd::CRange GetDepthRange() const override;
@@ -49,6 +68,7 @@ private:
 
 private:
 	istd::CRange m_depthRange;
+	ColorMapType m_colorMapType;
 };
 
 
