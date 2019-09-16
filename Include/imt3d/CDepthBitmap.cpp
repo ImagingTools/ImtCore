@@ -133,6 +133,7 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_depthRange = sourcePtr->m_depthRange;
+		m_colorMapType = sourcePtr->m_colorMapType;
 
 		InvalidateCache(istd::IChangeable::GetNoChanges());
 
