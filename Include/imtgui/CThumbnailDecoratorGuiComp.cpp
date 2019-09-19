@@ -160,7 +160,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		m_pagesCompPtr->SetSelectedOptionIndex(-1);
 
 		if (m_pagesModelCompPtr.IsValid()){
-			m_pageModelObserver.RegisterModel(m_pagesModelCompPtr.GetPtr());
+			m_pageModelObserver.RegisterModel(m_pagesModelCompPtr.GetPtr(), 0);
 		}
 	}
 
@@ -531,6 +531,13 @@ void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 
 			const iprm::ISelectionParam* subSelectionPtr = m_pagesCompPtr->GetSubselection(index);
 			if (subSelectionPtr != NULL){
+				m_pageModelObserver.UnregisterModel(1);
+
+				imod::IModel* subPageSelectionModelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(subSelectionPtr));
+				if (subPageSelectionModelPtr != nullptr){
+					m_pageModelObserver.RegisterModel(subPageSelectionModelPtr, 1);
+				}
+
 				CreateMenu(subSelectionPtr, NULL);
 			}
 			if (index < 0){
