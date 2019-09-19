@@ -15,7 +15,7 @@ namespace imt3d
 // public methods
 
 CDepthBitmap::CDepthBitmap()
-	:m_colorMapType(CMT_JET)
+	:m_colorMapType(CMT_GRAY)
 {
 }
 
