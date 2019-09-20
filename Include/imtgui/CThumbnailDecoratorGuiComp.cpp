@@ -1030,7 +1030,7 @@ CThumbnailDecoratorGuiComp::PageModelObserver::PageModelObserver(CThumbnailDecor
 
 void CThumbnailDecoratorGuiComp::PageModelObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& changeSet)
 {
-	if (changeSet.ContainsExplicit(iprm::ISelectionParam::CF_SELECTION_CHANGED, true)){
+	if (!changeSet.ContainsExplicit(iprm::ISelectionParam::CF_SELECTION_CHANGED, false)){
 		return;
 	}
 
