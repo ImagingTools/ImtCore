@@ -4,6 +4,9 @@ include ($(ACFDIR)/Config/QMake/Solution.pri)
 SUBDIRS += imtbase
 imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
 
+SUBDIRS += imtrest
+imtrest.file = ../../Include/imtrest/QMake/imtrest.pro
+
 SUBDIRS += imtreport
 imtreport.file = ../../Include/imtreport/QMake/imtreport.pro
 
@@ -20,6 +23,10 @@ imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
 ImtCorePck.depends = imtbase
+
+SUBDIRS += ImtRestPck
+ImtRestPck.file = ../../Impl/ImtRestPck/QMake/ImtRestPck.pro
+ImtRestPck.depends = imtbase imtrest
 
 SUBDIRS += Imt3dPck
 Imt3dPck.file = ../../Impl/Imt3dPck/QMake/Imt3dPck.pro
