@@ -733,12 +733,12 @@ void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selecti
 
 	bool hidePageListView = false;
 
-	//if (m_pagesCompPtr.IsValid() && m_disablePageListViewIndexesAttrPtr.IsValid()){
-	//	int topLevelPageIndex = m_pagesCompPtr->GetSelectedOptionIndex();
-	//	if ((topLevelPageIndex >= 0) && (m_disablePageListViewIndexesAttrPtr.FindValue(topLevelPageIndex) >= 0)){
-	//		hidePageListView = true;
-	//	}
-	//}
+	if (m_pagesCompPtr.IsValid() && m_disablePageListViewIndexesAttrPtr.IsValid()){
+		int topLevelPageIndex = m_pagesCompPtr->GetSelectedOptionIndex();
+		if ((topLevelPageIndex >= 0) && (m_disablePageListViewIndexesAttrPtr.FindValue(topLevelPageIndex) >= 0)){
+			hidePageListView = true;
+		}
+	}
 
 	LeftFrame->setVisible(!hidePageListView && (SubPages->topLevelItemCount() > 0));
 }
@@ -1028,15 +1028,13 @@ CThumbnailDecoratorGuiComp::PageModelObserver::PageModelObserver(CThumbnailDecor
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CThumbnailDecoratorGuiComp::PageModelObserver::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CThumbnailDecoratorGuiComp::PageModelObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& changeSet)
 {
 	if (!changeSet.ContainsExplicit(iprm::ISelectionParam::CF_SELECTION_CHANGED, false)){
 		return;
 	}
 
 	m_parent.UpdatePageState();
-
-	m_parent.on_SubPages_itemSelectionChanged();
 }
 
 
