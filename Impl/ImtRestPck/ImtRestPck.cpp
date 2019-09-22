@@ -19,6 +19,16 @@ I_EXPORT_COMPONENT(
 			"General TCP-server",
 			"TCP Connection Server");
 
+I_EXPORT_COMPONENT(
+			HttpProtocolEngine,
+			"HTTP protocol engine",
+			"TCP Connection Server HTTP REST");
+
+I_EXPORT_COMPONENT(
+			HttpRootHandler,
+			"HTTP root handler",
+			"HTTP REST Root Protocol");
+
 
 } // namespace ImtRestPck
 

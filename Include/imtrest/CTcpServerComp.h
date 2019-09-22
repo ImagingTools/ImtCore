@@ -21,10 +21,11 @@ class CTcpServerComp: public QObject, public ilog::CLoggerComponentBase
 {
 	Q_OBJECT
 public:
-	typedef icomp::CComponentBase BaseClass;
+	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTcpServerComp);
 		I_ASSIGN(m_requestHandlerCompPtr, "RequestHandler", "Request handler registered for the server", true, "RequestHandler");
+		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
 		I_ASSIGN(m_serverAddressAttrPtr, "ServerAddress", "Server address to be listened", false, "ServerAddress");
 		I_ASSIGN(m_serverPortAttrPtr, "ServerPort", "Server port to be listened", false, 0);
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
@@ -44,7 +45,7 @@ private Q_SLOTS:
 
 private:
 	I_REF(imtrest::IRequestHandler, m_requestHandlerCompPtr);
-	I_REF(IProtocolEngine, m_protocolManagerCompPtr);
+	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
 	I_ATTR(QByteArray, m_serverAddressAttrPtr);
 	I_ATTR(int, m_serverPortAttrPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);

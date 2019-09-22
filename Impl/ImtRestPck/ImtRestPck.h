@@ -7,6 +7,8 @@
 
 // ImtCore includes
 #include <imtrest/CTcpServerComp.h>
+#include <imtrest/CHttpProtocolEngineComp.h>
+#include <imtrest/CHttpRootHandlerComp.h>
 
 
 /**
@@ -17,6 +19,8 @@ namespace ImtRestPck
 
 
 typedef imtrest::CTcpServerComp TcpServer;
+typedef imtrest::CHttpProtocolEngineComp HttpProtocolEngine;
+typedef imtrest::CHttpRootHandlerComp HttpRootHandler;
 
 
 } // namespace ImtRestPck

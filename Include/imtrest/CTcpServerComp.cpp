@@ -20,7 +20,7 @@ void CTcpServerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_protocolManagerCompPtr.IsValid() && m_requestHandlerCompPtr.IsValid()){
+	if (m_protocolEngineCompPtr.IsValid() && m_requestHandlerCompPtr.IsValid()){
 		if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
 			if (m_serverAddressAttrPtr.IsValid() && m_serverPortAttrPtr.IsValid()){
 				StartListening(QHostAddress((*m_serverAddressAttrPtr).toStdString().c_str()), *m_serverPortAttrPtr);
@@ -37,7 +37,7 @@ void CTcpServerComp::OnComponentCreated()
 
 bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 {
-	if (!m_protocolManagerCompPtr.IsValid()){
+	if (!m_protocolEngineCompPtr.IsValid()){
 		return false;
 	}
 
@@ -88,11 +88,14 @@ void CTcpServerComp::HandleReadyRead()
 	// Read all data:
 	QByteArray data = socketPtr->readAll();
 
+	QString peerName = socketPtr->peerName();
+	QString peerAddress = socketPtr->peerAddress().toString();
+
 	SendVerboseMessage(QString("Incomming data: %1").arg(qPrintable(data)));
 
 	// Get state of request data:
 	IProtocolEngine::RequestState requestState = IProtocolEngine::RS_NON_STARTED;
-	if (!m_protocolManagerCompPtr->GetRequestState(data, requestState)){
+	if (!m_protocolEngineCompPtr->GetRequestState(data, requestState)) {
 		socketPtr->disconnect();
 
 		return;
@@ -103,7 +106,7 @@ void CTcpServerComp::HandleReadyRead()
 		return;
 	}
 
-	istd::TDelPtr<IRequest> requestPtr = m_protocolManagerCompPtr->CreateRequest(data);
+	istd::TDelPtr<IRequest> requestPtr = m_protocolEngineCompPtr->CreateRequest(data);
 	if (!requestPtr.IsValid()){
 		socketPtr->disconnect();
 
@@ -121,7 +124,7 @@ void CTcpServerComp::HandleReadyRead()
 void CTcpServerComp::HandleRequest(const IRequest& request)
 {
 	if (m_requestHandlerCompPtr.IsValid()){
-		m_requestHandlerCompPtr->ProcessRequest(request, *m_protocolManagerCompPtr);
+		m_requestHandlerCompPtr->ProcessRequest(request, *m_protocolEngineCompPtr);
 	}
 }
 
