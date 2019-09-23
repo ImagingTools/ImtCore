@@ -21,7 +21,7 @@ public:
 	enum RequestState
 	{
 		RS_NON_STARTED,
-		RS_MESSAGE_BEGIN,
+		RS_START_MESSAGE,
 		RS_URL,
 		RS_STATUS,
 		RS_HEADERS,

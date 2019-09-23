@@ -12,7 +12,7 @@ namespace imtrest
 
 static http_parser_settings s_httpParserSettings
 {
-	&CHttpRequest::OnMessageBegin,
+	&CHttpRequest::OnStartMessage,
 	&CHttpRequest::OnUrl,
 	&CHttpRequest::OnStatus,
 	&CHttpRequest::OnHeaderField,
@@ -102,14 +102,14 @@ QHostAddress CHttpRequest::GetRemoteAddress() const
 
 // public static methods
 
-int CHttpRequest::OnMessageBegin(http_parser* httpParser)
+int CHttpRequest::OnStartMessage(http_parser* httpParser)
 {
 	Q_ASSERT(httpParser != nullptr);
 
 	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
 	Q_ASSERT(requestPtr != nullptr);
 
-	requestPtr->m_state = CHttpRequest::RS_MESSAGE_BEGIN;
+	requestPtr->m_state = CHttpRequest::RS_START_MESSAGE;
 
 	return 0;
 }
