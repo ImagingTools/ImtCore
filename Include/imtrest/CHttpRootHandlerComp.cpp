@@ -9,7 +9,7 @@ namespace imtrest
 
 // reimplemented (IProtocolEngine)
 
-bool CHttpRootHandlerComp::ProcessRequest(const IRequest& request, const IProtocolEngine& protocolEngine) const
+bool CHttpRootHandlerComp::ProcessRequest(const IRequest& request) const
 {
 	return false;
 }

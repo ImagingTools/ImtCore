@@ -12,6 +12,20 @@ namespace imtrest
 {
 
 
+// public methods
+
+// reimplemented (IRequestHandler)
+
+bool CTcpServerComp::ProcessRequest(const IRequest& request) const
+{
+	if (m_requestHandlerCompPtr.IsValid()){
+		return m_requestHandlerCompPtr->ProcessRequest(request);
+	}
+
+	return false;
+}
+
+
 // protected methods
 
 // reimplemented (icomp::CComponentBase)
@@ -64,67 +78,13 @@ void CTcpServerComp::HandleNewConnections()
 	QTcpServer* tcpServerPtr = qobject_cast<QTcpServer*>(sender());
 	Q_ASSERT(tcpServerPtr != nullptr);
 
-	while (QTcpSocket* socket = tcpServerPtr->nextPendingConnection()){
-		Request newRequest(socket);
+	while (QTcpSocket* socketPtr = tcpServerPtr->nextPendingConnection()){
+		IRequest* newRequestPtr = m_protocolEngineCompPtr->CreateRequest(socketPtr, *this);
+		if (newRequestPtr != nullptr){
+			m_requests.PushBack(newRequestPtr);
 
-		m_requests.push_back(newRequest);
-
-		QObject::connect(socket, &QTcpSocket::readyRead, this, &CTcpServerComp::HandleReadyRead);
-
-		QObject::connect(socket, &QTcpSocket::disconnected, &QObject::deleteLater);
-	}
-}
-
-
-void CTcpServerComp::HandleReadyRead()
-{
-	QTcpSocket* socketPtr = qobject_cast<QTcpSocket*>(sender());
-	Q_ASSERT(socketPtr != nullptr);
-
-	if (!socketPtr->isTransactionStarted()){
-		socketPtr->startTransaction();
-	}
-
-	// Read all data:
-	QByteArray data = socketPtr->readAll();
-
-	QString peerName = socketPtr->peerName();
-	QString peerAddress = socketPtr->peerAddress().toString();
-
-	SendVerboseMessage(QString("Incomming data: %1").arg(qPrintable(data)));
-
-	// Get state of request data:
-	IProtocolEngine::RequestState requestState = IProtocolEngine::RS_NON_STARTED;
-	if (!m_protocolEngineCompPtr->GetRequestState(data, requestState)) {
-		socketPtr->disconnect();
-
-		return;
-	}
-
-	// Not all data was read:
-	if (requestState != IProtocolEngine::RS_MESSAGE_COMPLETE){
-		return;
-	}
-
-	istd::TDelPtr<IRequest> requestPtr = m_protocolEngineCompPtr->CreateRequest(data);
-	if (!requestPtr.IsValid()){
-		socketPtr->disconnect();
-
-		return;
-	}
-
-	// All request data was read:
-	socketPtr->commitTransaction();
-
-	// Start request handler:
-	HandleRequest(*requestPtr);
-}
-
-
-void CTcpServerComp::HandleRequest(const IRequest& request)
-{
-	if (m_requestHandlerCompPtr.IsValid()){
-		m_requestHandlerCompPtr->ProcessRequest(request, *m_protocolEngineCompPtr);
+			QObject::connect(socketPtr, &QTcpSocket::disconnected, &QObject::deleteLater);
+		}
 	}
 }
 

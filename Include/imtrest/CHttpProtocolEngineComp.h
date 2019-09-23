@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
+#include <imtrest/http_parser.h>
 
 
 namespace imtrest
@@ -23,10 +24,9 @@ public:
 
 	// reimplemented (IProtocolEngine)
 	virtual QByteArray GetProtocolTypeId() const override;
-	virtual const iser::IVersionInfo * GetProtocolVersion() const override;
-	virtual bool GetRequestState(const QByteArray& data, RequestState& state) const override;
-	virtual IRequest* CreateRequest(const QByteArray& data) const override;
-	virtual IResponse* CreateResponse(const QByteArray& data, const IRequest& request, int statusCode) const override;
+	virtual const iser::IVersionInfo* GetProtocolVersion() const override;
+	virtual IRequest* CreateRequest(const QAbstractSocket* socketPtr, const IRequestHandler& requestHandler) const override;
+	virtual IResponse* CreateResponse(const QIODevice* devicePtr, const QByteArray& data, const IRequest& request, int statusCode) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

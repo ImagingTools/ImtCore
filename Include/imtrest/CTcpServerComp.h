@@ -6,9 +6,11 @@
 #include <QtNetwork/QTcpSocket>
 
 // ACF includes
+#include <istd/TPointerVector.h>
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
+#include <imtrest/IRequest.h>
 #include <imtrest/IRequestHandler.h>
 #include <imtrest/IProtocolEngine.h>
 
@@ -17,7 +19,10 @@ namespace imtrest
 {
 
 
-class CTcpServerComp: public QObject, public ilog::CLoggerComponentBase
+class CTcpServerComp:
+			public QObject,
+			public ilog::CLoggerComponentBase,
+			virtual public IRequestHandler
 {
 	Q_OBJECT
 public:
@@ -31,6 +36,9 @@ public:
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
 	I_END_COMPONENT
 
+	// reimplemented (IRequestHandler)
+	virtual bool ProcessRequest(const IRequest& request) const override;
+
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated();
@@ -40,8 +48,6 @@ private:
 
 private Q_SLOTS:
 	void HandleNewConnections();
-	void HandleReadyRead();
-	void HandleRequest(const IRequest& request);
 
 private:
 	I_REF(imtrest::IRequestHandler, m_requestHandlerCompPtr);
@@ -54,21 +60,7 @@ private:
 
 	Servers m_servers;
 
-	struct Request
-	{
-		Request(QTcpSocket* socket = nullptr)
-			:socketPtr(socket)
-		{
-		}
-
-		~Request()
-		{
-		}
-
-		QTcpSocket* socketPtr;
-	};
-
-	typedef QVector<Request> Requests;
+	typedef istd::TPointerVector<IRequest> Requests;
 	Requests m_requests;
 };
 

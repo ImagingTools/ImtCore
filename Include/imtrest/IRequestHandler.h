@@ -16,7 +16,7 @@ class IProtocolEngine;
 class IRequestHandler: virtual public istd::IPolymorphic
 {
 public:
-	virtual bool ProcessRequest(const IRequest& request, const IProtocolEngine& protocolEngine) const = 0;
+	virtual bool ProcessRequest(const IRequest& request) const = 0;
 };
 
 

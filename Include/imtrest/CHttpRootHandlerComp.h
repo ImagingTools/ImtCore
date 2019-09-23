@@ -24,9 +24,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (IRequestHandler)
-	virtual bool ProcessRequest(
-				const IRequest& request,
-				const IProtocolEngine& protocolEngine) const override;
+	virtual bool ProcessRequest(const IRequest& request) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
