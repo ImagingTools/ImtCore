@@ -1,6 +1,11 @@
 #include <imtrest/CHttpRequest.h>
 
 
+#if QT_CONFIG(ssl)
+#include <QtNetwork/QSslSocket>
+#endif
+
+
 namespace imtrest
 {
 
@@ -24,7 +29,8 @@ static http_parser_settings s_httpParserSettings
 
 CHttpRequest::CHttpRequest(const QAbstractSocket& socket, const IRequestHandler& handler, const IProtocolEngine& engine)
 	:m_requestHandler(handler),
-	m_engine(engine)
+	m_engine(engine),
+	m_state(RS_NON_STARTED)
 {
 	m_remoteAddress = socket.peerAddress();
 
@@ -37,64 +43,211 @@ CHttpRequest::CHttpRequest(const QAbstractSocket& socket, const IRequestHandler&
 }
 
 
+QByteArray CHttpRequest::GetHeaderValue(const QByteArray & headerType) const
+{
+	if (m_headers.contains(headerType)){
+		return m_headers[headerType];
+	}
+
+	return QByteArray();
+}
+
+
+QUrl CHttpRequest::GetUrl() const
+{
+	return m_url;
+}
+
+
+QUrlQuery CHttpRequest::GetQuery() const
+{
+	return QUrlQuery(m_url.query());
+}
+
+
+CHttpRequest::MethodType CHttpRequest::GetMethodType() const
+{
+	switch (m_httpParser.method){
+	case HTTP_GET:
+		return MT_GET;
+	case HTTP_POST:
+		return MT_POST;
+	case HTTP_PUT:
+		return MT_PUT;
+	case HTTP_PATCH:
+		return MT_PATCH;
+	case HTTP_DELETE:
+		return MT_DELETE;
+	case HTTP_HEAD:
+		return MT_HEAD;
+	case HTTP_OPTIONS:
+		return MT_OPTIONS;
+	default:
+		return MT_UNKNOWN;
+	}
+}
+
+
+QByteArray CHttpRequest::GetBody() const
+{
+	return m_body;
+}
+
+
+QHostAddress CHttpRequest::GetRemoteAddress() const
+{
+	return m_remoteAddress;
+}
+
+
 // public static methods
 
 int CHttpRequest::OnMessageBegin(http_parser* httpParser)
 {
+	Q_ASSERT(httpParser != nullptr);
+
+	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
+	Q_ASSERT(requestPtr != nullptr);
+
+	requestPtr->m_state = CHttpRequest::RS_MESSAGE_BEGIN;
+
 	return 0;
 }
 
 
 int CHttpRequest::OnUrl(http_parser* httpParser, const char *at, size_t length)
 {
+	Q_ASSERT(httpParser != nullptr);
+
+	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
+	Q_ASSERT(requestPtr != nullptr);
+
+	CHttpRequest::ParseUrl(at, length, false, requestPtr->m_url);
+
+	requestPtr->m_state = CHttpRequest::RS_URL;
+
 	return 0;
 }
 
 
 int CHttpRequest::OnStatus(http_parser* httpParser, const char *at, size_t length)
 {
+	Q_ASSERT(httpParser != nullptr);
+
+	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
+	Q_ASSERT(requestPtr != nullptr);
+
+	requestPtr->m_state = CHttpRequest::RS_STATUS;
+
 	return 0;
 }
 
 
-int CHttpRequest::OnHeaderField(http_parser* httpParser, const char *at, size_t length)
+int CHttpRequest::OnHeaderField(http_parser* httpParser, const char* at, size_t length)
 {
+	Q_ASSERT(httpParser != nullptr);
+
+	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
+	Q_ASSERT(requestPtr != nullptr);
+
+	QByteArray headerKey = QByteArray(at, int(length));
+	requestPtr->m_headers[headerKey] = QByteArray();
+
+	requestPtr->m_lastHeader = headerKey;
+
+	requestPtr->m_state = CHttpRequest::RS_HEADERS;
+
 	return 0;
 }
 
 
-int CHttpRequest::OnHeaderValue(http_parser*httpParser, const char *at, size_t length)
+int CHttpRequest::OnHeaderValue(http_parser* httpParser, const char* at, size_t length)
 {
+	Q_ASSERT(httpParser != nullptr);
+
+	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
+	Q_ASSERT(requestPtr != nullptr);
+
+	requestPtr->m_state = CHttpRequest::RS_HEADERS;
+
+	QByteArray headerValue = QByteArray(at, int(length));
+	requestPtr->m_headers[requestPtr->m_lastHeader] = headerValue;
+
+	if (requestPtr->m_lastHeader.compare(QByteArrayLiteral("host"), Qt::CaseInsensitive) == 0){
+		CHttpRequest::ParseUrl(at, length, true,requestPtr->m_url);
+	}
+
 	return 0;
 }
 
 
 int CHttpRequest::OnHeadersComplete(http_parser* httpParser)
 {
+	Q_ASSERT(httpParser != nullptr);
+
+	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
+	Q_ASSERT(requestPtr != nullptr);
+
+	requestPtr->m_state = CHttpRequest::RS_HEADERS_COMPLETE;
+
 	return 0;
 }
 
 
 int CHttpRequest::OnBody(http_parser* httpParser, const char *at, size_t length)
 {
+	Q_ASSERT(httpParser != nullptr);
+
+	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
+	Q_ASSERT(requestPtr != nullptr);
+
+	requestPtr->m_state = CHttpRequest::RS_BODY;
+
+	if (requestPtr->m_body.isEmpty()){
+		requestPtr->m_body.reserve(static_cast<int>(httpParser->content_length) + static_cast<int>(length));
+	}
+
+	requestPtr->m_body.append(at, int(length));
+
 	return 0;
 }
 
 
 int CHttpRequest::OnMessageComplete(http_parser* httpParser)
 {
+	Q_ASSERT(httpParser != nullptr);
+
+	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
+	Q_ASSERT(requestPtr != nullptr);
+
+	requestPtr->m_state = CHttpRequest::RS_MESSAGE_COMPLETE;
+
 	return 0;
 }
 
 
 int CHttpRequest::OnChunkHeader(http_parser* httpParser)
 {
+	Q_ASSERT(httpParser != nullptr);
+
+	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
+	Q_ASSERT(requestPtr != nullptr);
+
+	requestPtr->m_state = CHttpRequest::RS_CHUNK_HEADER;
+
 	return 0;
 }
 
 
 int CHttpRequest::OnChunkComplete(http_parser* httpParser)
 {
+	Q_ASSERT(httpParser != nullptr);
+
+	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
+	Q_ASSERT(requestPtr != nullptr);
+
+	requestPtr->m_state = CHttpRequest::RS_CHUNK_COMPLETE;
+
 	return 0;
 }
 
@@ -119,7 +272,12 @@ bool CHttpRequest::ReadFromDevice(QIODevice& device)
 	if (!data.isEmpty()){
 #if QT_CONFIG(ssl)
 		QSslSocket* sslSocketPtr = qobject_cast<QSslSocket*>(&device);
-		url.setScheme(sslSocketPtr && sslSocketPtr->isEncrypted() ? QStringLiteral("https") : QStringLiteral("http"));
+		if ((sslSocketPtr != nullptr) && sslSocketPtr->isEncrypted()){
+			m_url.setScheme(QStringLiteral("https"));
+		}
+		else{
+			m_url.setScheme(QStringLiteral("http"));
+		}
 #else
 		m_url.setScheme(QStringLiteral("http"));
 #endif
@@ -179,6 +337,52 @@ void CHttpRequest::HandleReadyRead()
 	// Start request handler:
 	m_requestHandler.ProcessRequest(*this);
 }
+
+
+// private static methods
+
+bool CHttpRequest::ParseUrl(const char* at, size_t length, bool connect, QUrl& url)
+{
+	struct http_parser_url parserUrl;
+	if (http_parser_parse_url(at, length, connect ? 1 : 0, &parserUrl) == 0){
+		for (int i = 0; i < UF_MAX; i++){
+			QString value = QString::fromUtf8(at + parserUrl.field_data[i].off, parserUrl.field_data[i].len);
+
+			if (parserUrl.field_set & (1 << UF_SCHEMA)){
+				url.setScheme(value);
+			}
+
+			if (parserUrl.field_set & (1 << UF_HOST)){
+				url.setHost(value);
+			}
+
+			if (parserUrl.field_set & (1 << UF_PORT)){
+				url.setPort(value.toInt());
+			}
+
+			if (parserUrl.field_set & (1 << UF_PATH)){
+				url.setPath(value, QUrl::TolerantMode);
+			}
+
+			if (parserUrl.field_set & (1 << UF_QUERY)){
+				url.setQuery(value);
+			}
+
+			if (parserUrl.field_set & (1 << UF_FRAGMENT)){
+				url.setFragment(value);
+			}
+
+			if (parserUrl.field_set & (1 << UF_USERINFO)){
+				url.setUserInfo(value);
+			}
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 
 } // namespace imtrest
 

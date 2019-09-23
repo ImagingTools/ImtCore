@@ -65,13 +65,22 @@ private Q_SLOTS:
 	void HandleReadyRead();
 
 private:
+	static bool ParseUrl(const char *at, size_t length, bool connect, QUrl& url);
+
+private:
 	http_parser m_httpParser;
 	QHostAddress m_remoteAddress;
 	QUrl m_url;
 	RequestState m_state;
+	QByteArray m_body;
 
 	const IRequestHandler& m_requestHandler;
 	const IProtocolEngine& m_engine;
+
+	typedef QMap<QByteArray, QByteArray> HeaderMap;
+	HeaderMap m_headers;
+
+	QByteArray m_lastHeader;
 };
 
 
