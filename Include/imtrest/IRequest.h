@@ -34,7 +34,7 @@ public:
 
 	virtual RequestState GetState() const = 0;
 	virtual QByteArray GetRequestId() const = 0;
-	virtual bool ReadFromDevice(QIODevice& device) = 0;
+	virtual bool ParseDeviceData(QIODevice& device) = 0;
 	virtual const IProtocolEngine& GetProtocolEngine() const = 0;
 };
 

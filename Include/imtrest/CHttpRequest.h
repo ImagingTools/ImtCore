@@ -58,7 +58,7 @@ public:
 	// reimplemented (IRequest)
 	virtual RequestState GetState() const override;
 	virtual QByteArray GetRequestId() const override;
-	virtual bool ReadFromDevice(QIODevice& device) override;
+	virtual bool ParseDeviceData(QIODevice& device) override;
 	virtual const IProtocolEngine& GetProtocolEngine() const override;
 
 	// reimplemented (istd::IChangeable)

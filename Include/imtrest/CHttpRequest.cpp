@@ -266,7 +266,7 @@ QByteArray CHttpRequest::GetRequestId() const
 }
 
 
-bool CHttpRequest::ReadFromDevice(QIODevice& device)
+bool CHttpRequest::ParseDeviceData(QIODevice& device)
 {
 	QByteArray data = device.readAll();
 	if (!data.isEmpty()){
@@ -332,7 +332,7 @@ void CHttpRequest::HandleReadyRead()
 	}
 
 	// Get state of request data:
-	if (!ReadFromDevice(*socketPtr)){
+	if (!ParseDeviceData(*socketPtr)){
 		socketPtr->disconnect();
 
 		return;
@@ -356,35 +356,46 @@ void CHttpRequest::HandleReadyRead()
 bool CHttpRequest::ParseUrl(const char* at, size_t length, bool connect, QUrl& url)
 {
 	struct http_parser_url parserUrl;
+
+	int schemeMask = 1 << UF_SCHEMA;
+	int hostMask = 1 << UF_HOST;
+	int portMask = 1 << UF_PORT;
+	int pathMask = 1 << UF_PATH;
+	int queryMask = 1 << UF_QUERY;
+	int fragmentMask = 1 << UF_FRAGMENT;
+	int userInfoMask = 1 << UF_USERINFO;
+
 	if (http_parser_parse_url(at, length, connect ? 1 : 0, &parserUrl) == 0){
 		for (int i = 0; i < UF_MAX; i++){
+			int mask = 1 << i;
+
 			QString value = QString::fromUtf8(at + parserUrl.field_data[i].off, parserUrl.field_data[i].len);
 
-			if (parserUrl.field_set & (1 << UF_SCHEMA)){
+			if ((parserUrl.field_set & schemeMask) && (schemeMask == mask)){
 				url.setScheme(value);
 			}
 
-			if (parserUrl.field_set & (1 << UF_HOST)){
+			if ((parserUrl.field_set & hostMask) && (hostMask == mask)){
 				url.setHost(value);
 			}
 
-			if (parserUrl.field_set & (1 << UF_PORT)){
+			if ((parserUrl.field_set & portMask) && (portMask == mask)){
 				url.setPort(value.toInt());
 			}
 
-			if (parserUrl.field_set & (1 << UF_PATH)){
+			if ((parserUrl.field_set & pathMask) && (pathMask == mask)){
 				url.setPath(value, QUrl::TolerantMode);
 			}
 
-			if (parserUrl.field_set & (1 << UF_QUERY)){
+			if ((parserUrl.field_set & queryMask) && (queryMask == mask)){
 				url.setQuery(value);
 			}
 
-			if (parserUrl.field_set & (1 << UF_FRAGMENT)){
+			if ((parserUrl.field_set & fragmentMask) && (fragmentMask == mask)){
 				url.setFragment(value);
 			}
 
-			if (parserUrl.field_set & (1 << UF_USERINFO)){
+			if ((parserUrl.field_set & userInfoMask) && (userInfoMask == mask)){
 				url.setUserInfo(value);
 			}
 		}
