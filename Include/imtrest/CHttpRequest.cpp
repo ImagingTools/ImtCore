@@ -301,6 +301,21 @@ const IProtocolEngine& CHttpRequest::GetProtocolEngine() const
 }
 
 
+// reimplemented (istd::IChangeable)
+
+bool CHttpRequest::ResetData(CompatibilityMode /*mode*/)
+{
+	m_body.clear();
+	m_headers.clear();
+	m_lastHeader.clear();
+	m_url.clear();
+
+	m_state = RS_NON_STARTED;
+
+	return true;
+}
+
+
 // private slots
 
 void CHttpRequest::HandleReadyRead()
@@ -312,12 +327,9 @@ void CHttpRequest::HandleReadyRead()
 		socketPtr->startTransaction();
 	}
 
-#if _DEBUG
-	QByteArray data = socketPtr->readAll();
-	QString peerName = socketPtr->peerName();
-	QString peerAddress = socketPtr->peerAddress().toString();
-//	SendVerboseMessage(QString("Incomming data from '%1''%2': %3").arg(peerAddress).arg(peerName).arg(qPrintable(data)));
-#endif
+	if (m_state == RS_MESSAGE_COMPLETE){
+		ResetData();
+	}
 
 	// Get state of request data:
 	if (!ReadFromDevice(*socketPtr)){

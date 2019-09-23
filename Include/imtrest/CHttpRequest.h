@@ -61,6 +61,9 @@ public:
 	virtual bool ReadFromDevice(QIODevice& device) override;
 	virtual const IProtocolEngine& GetProtocolEngine() const override;
 
+	// reimplemented (istd::IChangeable)
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+
 private Q_SLOTS:
 	void HandleReadyRead();
 
