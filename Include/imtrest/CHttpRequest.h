@@ -59,6 +59,8 @@ public:
 	virtual RequestState GetState() const override;
 	virtual QByteArray GetRequestId() const override;
 	virtual bool ParseDeviceData(QIODevice& device) override;
+
+	// reimplemented (INetworkObject)
 	virtual const IProtocolEngine& GetProtocolEngine() const override;
 	virtual const QAbstractSocket& GetSocket() const override;
 

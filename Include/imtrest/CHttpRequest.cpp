@@ -296,6 +296,8 @@ bool CHttpRequest::ParseDeviceData(QIODevice& device)
 }
 
 
+// reimplemented (INetworkObject)
+
 const IProtocolEngine& CHttpRequest::GetProtocolEngine() const
 {
 	return m_engine;

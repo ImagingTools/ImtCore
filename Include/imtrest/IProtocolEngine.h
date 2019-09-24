@@ -15,6 +15,7 @@ namespace imtrest
 class IRequest;
 class IRequestHandler;
 class IResponse;
+class IResponder;
 
 
 /**
@@ -23,6 +24,40 @@ class IResponse;
 class IProtocolEngine: virtual public istd::IPolymorphic
 {
 public:
+	enum StatusCode
+	{
+		/**
+			Operation could be successfull processed
+		*/
+		SC_OK,
+
+		/**
+			Requested operation is not available or implemented.
+		*/
+		SC_OPERATION_NOT_AVAILABLE,
+
+		/**
+			Requested resource is not available.
+		*/
+		SC_RESOURCE_NOT_AVAILABLE,
+
+		/**
+			Requested resource was not modified since the last call.
+			The caller should use the last version of the resource on the client side.
+		*/
+		SC_NOT_MODIFIED,
+
+		/**
+			Operation is not authorized.
+		*/
+		SC_UNAUTHORIZED,
+
+		/**
+			Internal server error.
+		*/
+		SC_INTERNAL_ERROR
+	};
+
 	/**
 		Get type-ID of the used protocol.
 	*/
@@ -32,6 +67,11 @@ public:
 		Get the protocol version.
 	*/
 	virtual const iser::IVersionInfo* GetProtocolVersion() const = 0;
+
+	/**
+		Get the protocol-specific code for the engine's status.
+	*/
+	virtual bool GetProtocolStatusCode(int statusCode, int& protocolStatusCode, QByteArray& statusCodeLiteral) const = 0;
 
 	/**
 		Create request based on the incomming data.
@@ -46,10 +86,15 @@ public:
 		\param request	Related request.
 	*/
 	virtual IResponse* CreateResponse(
-				const QIODevice* devicePtr,
-				const QByteArray& data,
 				const IRequest& request,
-				int statusCode) const = 0;
+				const QByteArray& data,
+				int statusCode,
+				const QByteArray& dataTypeId = QByteArray()) const = 0;
+
+	/**
+		Get responder instance using for sending responses to the clients.
+	*/
+	virtual const IResponder& GetResponder(const IRequest* requestPtr = nullptr) const = 0;
 };
 
 

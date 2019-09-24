@@ -1,18 +1,26 @@
 #pragma once
 
 
-// ACF includes
-#include <istd/IChangeable.h>
+// Qt includes
+#include <QtCore/QMap>
+
+// ImtCore includes
+#include <imtrest/INetworkObject.h>
 
 
 namespace imtrest
 {
 
 
-class IResponse: virtual public istd::IChangeable
+class IResponse: virtual public INetworkObject
 {
 public:
-	virtual QByteArray GetRequestId() const = 0;
+	typedef QMap<QByteArray, QByteArray> Headers;
+
+	virtual int GetStatusCode() const = 0;
+	virtual const QByteArray& GetData() const = 0;
+	virtual QByteArray GetDataTypeId() const = 0;
+	virtual Headers GetHeaders() const = 0;
 };
 
 

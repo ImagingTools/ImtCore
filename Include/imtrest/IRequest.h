@@ -1,21 +1,15 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QIODevice>
-
 // ACF includes
-#include <istd/IChangeable.h>
+#include <imtrest/INetworkObject.h>
 
 
 namespace imtrest
 {
 
 
-class IProtocolEngine;
-
-
-class IRequest: virtual public istd::IChangeable
+class IRequest: virtual public INetworkObject
 {
 public:
 	enum RequestState
@@ -35,8 +29,6 @@ public:
 	virtual RequestState GetState() const = 0;
 	virtual QByteArray GetRequestId() const = 0;
 	virtual bool ParseDeviceData(QIODevice& device) = 0;
-	virtual const IProtocolEngine& GetProtocolEngine() const = 0;
-	virtual const QAbstractSocket& GetSocket() const = 0;
 };
 
 

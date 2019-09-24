@@ -25,6 +25,48 @@ const iser::IVersionInfo* CHttpProtocolEngineComp::GetProtocolVersion() const
 }
 
 
+bool CHttpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protocolStatusCode, QByteArray& statusCodeLiteral) const
+{
+	switch (statusCode){
+	case SC_OK:
+		protocolStatusCode = 200;
+		statusCodeLiteral = "OK";
+		return true;
+
+	case SC_OPERATION_NOT_AVAILABLE:
+		protocolStatusCode = 405;
+		statusCodeLiteral = "Method Not Allowed";
+		return true;
+
+	case SC_RESOURCE_NOT_AVAILABLE:
+		protocolStatusCode = 404;
+		statusCodeLiteral = "Not Found";
+		return true;
+
+	case SC_NOT_MODIFIED:
+		protocolStatusCode = 304;
+		statusCodeLiteral = "Not Found";
+		return true;
+
+	case SC_UNAUTHORIZED:
+		protocolStatusCode = 401;
+		statusCodeLiteral = "Unauthorized";
+		return true;
+
+	case SC_INTERNAL_ERROR:
+		protocolStatusCode = 500;
+		statusCodeLiteral = "Internal Server Error";
+		return true;
+
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+
+	return false;
+}
+
+
 IRequest* CHttpProtocolEngineComp::CreateRequest(const QAbstractSocket* socketPtr, const IRequestHandler& requestHandler) const
 {
 	if (socketPtr != nullptr){
@@ -35,9 +77,19 @@ IRequest* CHttpProtocolEngineComp::CreateRequest(const QAbstractSocket* socketPt
 }
 
 
-IResponse* CHttpProtocolEngineComp::CreateResponse(const QIODevice* devicePtr, const QByteArray& data, const IRequest& request, int statusCode) const
+IResponse* CHttpProtocolEngineComp::CreateResponse(
+			const IRequest& request,
+			const QByteArray& data,
+			int statusCode,
+			const QByteArray& dataTypeId) const
 {
 	return nullptr;
+}
+
+
+const IResponder& CHttpProtocolEngineComp::GetResponder(const IRequest* /*requestPtr*/) const
+{
+	return m_responder;
 }
 
 
