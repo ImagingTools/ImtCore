@@ -18,7 +18,10 @@
 namespace imtrest
 {
 
-
+/**
+	TCP-based communication server.
+	The server uses the underlaying protocol engine for creation of requests and responses.
+*/
 class CTcpServerComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
@@ -48,6 +51,7 @@ private:
 
 private Q_SLOTS:
 	void HandleNewConnections();
+	void OnSocketDisconnected();
 
 private:
 	I_REF(imtrest::IRequestHandler, m_requestHandlerCompPtr);

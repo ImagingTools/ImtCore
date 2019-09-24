@@ -60,6 +60,7 @@ public:
 	virtual QByteArray GetRequestId() const override;
 	virtual bool ParseDeviceData(QIODevice& device) override;
 	virtual const IProtocolEngine& GetProtocolEngine() const override;
+	virtual const QAbstractSocket& GetSocket() const override;
 
 	// reimplemented (istd::IChangeable)
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
@@ -79,6 +80,7 @@ private:
 
 	const IRequestHandler& m_requestHandler;
 	const IProtocolEngine& m_engine;
+	const QAbstractSocket& m_socket;
 
 	typedef QMap<QByteArray, QByteArray> HeaderMap;
 	HeaderMap m_headers;

@@ -83,9 +83,31 @@ void CTcpServerComp::HandleNewConnections()
 		if (newRequestPtr != nullptr){
 			m_requests.PushBack(newRequestPtr);
 
-			QObject::connect(socketPtr, &QTcpSocket::disconnected, &QObject::deleteLater);
+			QObject::connect(socketPtr, &QTcpSocket::disconnected, this, &CTcpServerComp::OnSocketDisconnected);
 		}
 	}
+}
+
+
+void CTcpServerComp::OnSocketDisconnected()
+{
+	QTcpSocket* socketPtr = qobject_cast<QTcpSocket*>(sender());
+	Q_ASSERT(socketPtr != nullptr);
+
+	for (int i = 0; i < m_requests.GetCount(); ++i){
+		IRequest* requestPtr = m_requests.GetAt(i);
+		Q_ASSERT(requestPtr != nullptr);
+
+		if (&requestPtr->GetSocket() == socketPtr){
+			m_requests.RemoveAt(i);
+
+			qDebug("Request deleted");
+
+			break;
+		}
+	}
+
+	socketPtr->deleteLater();
 }
 
 

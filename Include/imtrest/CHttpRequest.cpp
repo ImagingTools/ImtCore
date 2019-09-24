@@ -30,6 +30,7 @@ static http_parser_settings s_httpParserSettings
 CHttpRequest::CHttpRequest(const QAbstractSocket& socket, const IRequestHandler& handler, const IProtocolEngine& engine)
 	:m_requestHandler(handler),
 	m_engine(engine),
+	m_socket(socket),
 	m_state(RS_NON_STARTED)
 {
 	m_remoteAddress = socket.peerAddress();
@@ -298,6 +299,12 @@ bool CHttpRequest::ParseDeviceData(QIODevice& device)
 const IProtocolEngine& CHttpRequest::GetProtocolEngine() const
 {
 	return m_engine;
+}
+
+
+const QAbstractSocket& CHttpRequest::GetSocket() const
+{
+	return m_socket;
 }
 
 
