@@ -14,7 +14,7 @@ namespace imtrest
 
 // reimplemented (IResponder)
 
-bool CHttpResponder::SendResponse(const IResponse& response, QIODevice& device) const
+bool CHttpResponder::SendResponse(const IResponse& response, QAbstractSocket& socket) const
 {
 	int protocolStatusCode = -1;
 	QByteArray statusLiteral;
@@ -24,23 +24,23 @@ bool CHttpResponder::SendResponse(const IResponse& response, QIODevice& device) 
 		return false;
 	}
 
-	if (!device.isOpen()){
+	if (!socket.isOpen()){
 		return false;
 	}
 
-	retVal = retVal && WriteStatus(protocolStatusCode, statusLiteral, device);
+	retVal = retVal && WriteStatus(protocolStatusCode, statusLiteral, socket);
 
 	IResponse::Headers headers = response.GetHeaders();
 
 	for (IResponse::Headers::ConstIterator headerIter = headers.constBegin(); headerIter != headers.constEnd(); ++headerIter){
-		retVal = retVal && WriteHeader(headerIter.key(), headerIter.value(), device);
+		retVal = retVal && WriteHeader(headerIter.key(), headerIter.value(), socket);
 	}
 
 	const QByteArray& contentData = response.GetData();
 	quint64 contentLength = contentData.size();
-	retVal = retVal && WriteHeader(QByteArrayLiteral("Content-Length"), QByteArray::number(contentLength), device);
+	retVal = retVal && WriteHeader(QByteArrayLiteral("Content-Length"), QByteArray::number(contentLength), socket);
 
-	retVal = retVal && WriteBody(contentData, device);
+	retVal = retVal && WriteBody(contentData, socket);
 
 	return retVal;
 }
@@ -48,47 +48,48 @@ bool CHttpResponder::SendResponse(const IResponse& response, QIODevice& device) 
 
 // protected methods
 
-bool CHttpResponder::WriteStatus(int statusCode, const QByteArray& statusCodeLiteral, QIODevice & outputDevice) const
+bool CHttpResponder::WriteStatus(int statusCode, const QByteArray& statusCodeLiteral, QAbstractSocket& socket) const
 {
-	Q_ASSERT(outputDevice.isOpen());
-	if (!outputDevice.isOpen()){
+	Q_ASSERT(socket.isOpen());
+	if (!socket.isOpen()){
 		return false;
 	}
 
-	outputDevice.write("HTTP/");
-	outputDevice.write(QByteArray::number(1));
-	outputDevice.write(".");
-	outputDevice.write(QByteArray::number(0));
-	outputDevice.write(" ");
-	outputDevice.write(QByteArray::number(statusCode));
-	outputDevice.write(" ");
-	outputDevice.write(statusCodeLiteral);
-	outputDevice.write("\r\n");
+	socket.write("HTTP/");
+	socket.write(QByteArray::number(1));
+	socket.write(".");
+	socket.write(QByteArray::number(0));
+	socket.write(" ");
+	socket.write(QByteArray::number(statusCode));
+	socket.write(" ");
+	socket.write(statusCodeLiteral);
+	socket.write("\r\n");
 
 	return true;
 }
 
 
-bool CHttpResponder::WriteHeader(const QByteArray & headerKey, const QByteArray & value, QIODevice & outputDevice) const
+bool CHttpResponder::WriteHeader(const QByteArray & headerKey, const QByteArray & value, QAbstractSocket& socket) const
 {
-	Q_ASSERT(outputDevice.isOpen());
-	if (!outputDevice.isOpen()){
+	Q_ASSERT(socket.isOpen());
+	if (!socket.isOpen()){
 		return false;
 	}
 
-	outputDevice.write(headerKey);
-	outputDevice.write(": ");
-	outputDevice.write(value);
-	outputDevice.write("\r\n");
+	socket.write(headerKey);
+	socket.write(": ");
+	socket.write(value);
+	socket.write("\r\n");
 
 	return true;
 }
 
 
-bool CHttpResponder::WriteBody(const QByteArray & data, QIODevice & outputDevice) const
+bool CHttpResponder::WriteBody(const QByteArray& data, QAbstractSocket& socket) const
 {
 	return false;
 }
+
 
 } // namespace imtrest
 

@@ -17,12 +17,12 @@ class CHttpResponder: public QObject, virtual public IResponder
 	Q_OBJECT
 public:
 	// reimplemented (IResponder)
-	virtual bool SendResponse(const IResponse& response, QIODevice& device) const override;
+	virtual bool SendResponse(const IResponse& response, QAbstractSocket& socket) const override;
 
 protected:
-	virtual bool WriteStatus(int statusCode,const QByteArray& statusCodeLiteral, QIODevice& outputDevice) const;
-	virtual bool WriteHeader(const QByteArray& headerKey, const QByteArray& value, QIODevice& outputDevice) const;
-	virtual bool WriteBody(const QByteArray& data, QIODevice& outputDevice) const;
+	virtual bool WriteStatus(int statusCode,const QByteArray& statusCodeLiteral, QAbstractSocket& socket) const;
+	virtual bool WriteHeader(const QByteArray& headerKey, const QByteArray& value, QAbstractSocket& socket) const;
+	virtual bool WriteBody(const QByteArray& data, QAbstractSocket& socket) const;
 };
 
 
