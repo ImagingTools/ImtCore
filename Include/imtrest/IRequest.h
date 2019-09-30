@@ -26,8 +26,11 @@ public:
 		RS_CHUNK_COMPLETE
 	};
 
+	typedef QMap<QByteArray, QByteArray> CommandParams;
+
 	virtual RequestState GetState() const = 0;
-	virtual QByteArray GetRequestId() const = 0;
+	virtual QByteArray GetCommandId() const = 0;
+	virtual CommandParams GetCommandParams() const = 0;
 	virtual bool ParseDeviceData(QIODevice& device) = 0;
 };
 

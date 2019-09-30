@@ -20,7 +20,10 @@ bool CHttpRootHandlerComp::ProcessRequest(const IRequest& request) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 
-	istd::TDelPtr<IResponse> responsePtr(engine.CreateResponse(request, QByteArray("<html><head><title>A Simple HTML Document</title></head><body><p>This is a very simple HTML document</p><p>It only has two paragraphs</p></body></html>"), IProtocolEngine::SC_OK, QByteArray("text/html; charset=utf-8")));
+	QByteArray body = QByteArray("<html><head><title>A Simple HTML Document</title></head><body><p>This is a very simple HTML document</p><p>It only has two paragraphs</p></body></html>");
+	QByteArray typeId = QByteArray("text/html; charset=utf-8");
+
+	istd::TDelPtr<IResponse> responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, typeId));
 	if (responsePtr.IsValid()){
 		return engine.GetResponder().SendResponse(*responsePtr);
 	}

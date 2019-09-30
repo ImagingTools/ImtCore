@@ -57,7 +57,8 @@ public:
 
 	// reimplemented (IRequest)
 	virtual RequestState GetState() const override;
-	virtual QByteArray GetRequestId() const override;
+	virtual QByteArray GetCommandId() const override;
+	virtual CommandParams GetCommandParams() const override;
 	virtual bool ParseDeviceData(QIODevice& device) override;
 
 	// reimplemented (INetworkObject)

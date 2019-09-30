@@ -32,7 +32,7 @@ public:
 		SC_NONE,
 
 		/**
-			Operation could be successfull processed
+			Operation could be successfull processed.
 		*/
 		SC_OK,
 
@@ -76,10 +76,15 @@ public:
 	/**
 		Get the protocol-specific code for the engine's status.
 	*/
-	virtual bool GetProtocolStatusCode(int statusCode, int& protocolStatusCode, QByteArray& statusCodeLiteral) const = 0;
+	virtual bool GetProtocolStatusCode(
+				int statusCode,
+				int& protocolStatusCode,
+				QByteArray& statusCodeLiteral) const = 0;
 
 	/**
 		Create request based on the incomming data.
+		\param socketPtr		Socket instance for reading the incommming data
+		\param requestHandler	Instance to process the request after all data has been read.
 	*/
 	virtual IRequest* CreateRequest(
 				QAbstractSocket* socketPtr,
@@ -92,9 +97,9 @@ public:
 	*/
 	virtual IResponse* CreateResponse(
 				const IRequest& request,
-				const QByteArray& data,
 				int statusCode,
-				const QByteArray& dataTypeId = QByteArray()) const = 0;
+				const QByteArray& data,
+				const QByteArray& dataTypeId) const = 0;
 
 	/**
 		Get responder instance using for sending responses to the clients.

@@ -35,9 +35,9 @@ public:
 	virtual IRequest* CreateRequest(QAbstractSocket* socketPtr, const IRequestHandler& requestHandler) const override;
 	virtual IResponse* CreateResponse(
 				const IRequest& request,
-				const QByteArray& data,
 				int statusCode,
-				const QByteArray& dataTypeId = QByteArray()) const override;
+				const QByteArray& data,
+				const QByteArray& dataTypeId) const override;
 	virtual const IResponder& GetResponder(const IRequest* requestPtr = nullptr) const override;
 
 protected:

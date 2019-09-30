@@ -261,9 +261,15 @@ IRequest::RequestState CHttpRequest::GetState() const
 }
 
 
-QByteArray CHttpRequest::GetRequestId() const
+QByteArray CHttpRequest::GetCommandId() const
 {
 	return QByteArray();
+}
+
+
+IRequest::CommandParams CHttpRequest::GetCommandParams() const
+{
+	return CommandParams();
 }
 
 

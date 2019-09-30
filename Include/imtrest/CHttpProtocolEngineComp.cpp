@@ -80,8 +80,8 @@ IRequest* CHttpProtocolEngineComp::CreateRequest(QAbstractSocket* socketPtr, con
 
 IResponse* CHttpProtocolEngineComp::CreateResponse(
 			const IRequest& request,
-			const QByteArray& data,
 			int statusCode,
+			const QByteArray& data,
 			const QByteArray& dataTypeId) const
 {
 	return new CHttpResponse(statusCode, data, dataTypeId, request.GetSocket(), *this);
