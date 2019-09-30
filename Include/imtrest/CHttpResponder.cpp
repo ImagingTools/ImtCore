@@ -1,6 +1,9 @@
 #include <imtrest/CHttpResponder.h>
 
 
+// Qt includes
+#include <QDataStream>
+
 // ImtCore includes
 #include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
@@ -14,7 +17,7 @@ namespace imtrest
 
 // reimplemented (IResponder)
 
-bool CHttpResponder::SendResponse(const IResponse& response, QAbstractSocket& socket) const
+bool CHttpResponder::SendResponse(const IResponse& response) const
 {
 	int protocolStatusCode = -1;
 	QByteArray statusLiteral;
@@ -23,6 +26,8 @@ bool CHttpResponder::SendResponse(const IResponse& response, QAbstractSocket& so
 	if (!retVal){
 		return false;
 	}
+
+	QAbstractSocket& socket = response.GetSocket();
 
 	if (!socket.isOpen()){
 		return false;
@@ -38,7 +43,9 @@ bool CHttpResponder::SendResponse(const IResponse& response, QAbstractSocket& so
 
 	const QByteArray& contentData = response.GetData();
 	quint64 contentLength = contentData.size();
-	retVal = retVal && WriteHeader(QByteArrayLiteral("Content-Length"), QByteArray::number(contentLength), socket);
+
+	retVal = retVal && WriteHeader(QByteArray("Content-Length"), QByteArray::number(contentLength), socket);
+	retVal = retVal && WriteHeader(QByteArray("Content-Type"), response.GetDataTypeId(), socket);
 
 	retVal = retVal && WriteBody(contentData, socket);
 
@@ -87,7 +94,10 @@ bool CHttpResponder::WriteHeader(const QByteArray & headerKey, const QByteArray 
 
 bool CHttpResponder::WriteBody(const QByteArray& data, QAbstractSocket& socket) const
 {
-	return false;
+	socket.write("\r\n");
+	socket.write(data);
+
+	return true;
 }
 
 

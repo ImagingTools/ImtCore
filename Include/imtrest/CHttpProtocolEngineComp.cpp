@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtrest/CHttpRequest.h>
+#include <imtrest/CHttpResponse.h>
 
 
 namespace imtrest
@@ -67,7 +68,7 @@ bool CHttpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protoco
 }
 
 
-IRequest* CHttpProtocolEngineComp::CreateRequest(const QAbstractSocket* socketPtr, const IRequestHandler& requestHandler) const
+IRequest* CHttpProtocolEngineComp::CreateRequest(QAbstractSocket* socketPtr, const IRequestHandler& requestHandler) const
 {
 	if (socketPtr != nullptr){
 		return new CHttpRequest(*socketPtr, requestHandler, *this);
@@ -83,7 +84,7 @@ IResponse* CHttpProtocolEngineComp::CreateResponse(
 			int statusCode,
 			const QByteArray& dataTypeId) const
 {
-	return nullptr;
+	return new CHttpResponse(statusCode, data, dataTypeId, request.GetSocket(), *this);
 }
 
 

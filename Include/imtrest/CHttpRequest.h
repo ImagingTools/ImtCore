@@ -35,7 +35,7 @@ public:
 		MT_PATCH = 64
 	};
 
-	CHttpRequest(const QAbstractSocket& socket, const IRequestHandler& requestHandler, const IProtocolEngine& engine);
+	CHttpRequest(QAbstractSocket& socket, const IRequestHandler& requestHandler, const IProtocolEngine& engine);
 
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
 	QUrl GetUrl() const;
@@ -62,7 +62,7 @@ public:
 
 	// reimplemented (INetworkObject)
 	virtual const IProtocolEngine& GetProtocolEngine() const override;
-	virtual const QAbstractSocket& GetSocket() const override;
+	virtual QAbstractSocket& GetSocket() const override;
 
 	// reimplemented (istd::IChangeable)
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
@@ -82,7 +82,7 @@ private:
 
 	const IRequestHandler& m_requestHandler;
 	const IProtocolEngine& m_engine;
-	const QAbstractSocket& m_socket;
+	QAbstractSocket& m_socket;
 
 	typedef QMap<QByteArray, QByteArray> HeaderMap;
 	HeaderMap m_headers;

@@ -19,7 +19,7 @@ class INetworkObject: virtual public istd::IChangeable
 {
 public:
 	virtual const IProtocolEngine& GetProtocolEngine() const = 0;
-	virtual const QAbstractSocket& GetSocket() const = 0;
+	virtual QAbstractSocket& GetSocket() const = 0;
 };
 
 

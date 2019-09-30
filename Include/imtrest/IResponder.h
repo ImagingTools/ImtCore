@@ -24,7 +24,7 @@ public:
 	/**
 		Send a response to the output device (e.g a socket).
 	*/
-	virtual bool SendResponse(const IResponse& response, QAbstractSocket& socket) const = 0;
+	virtual bool SendResponse(const IResponse& response) const = 0;
 };
 
 

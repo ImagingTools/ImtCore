@@ -27,7 +27,7 @@ static http_parser_settings s_httpParserSettings
 
 // public methods
 
-CHttpRequest::CHttpRequest(const QAbstractSocket& socket, const IRequestHandler& handler, const IProtocolEngine& engine)
+CHttpRequest::CHttpRequest(QAbstractSocket& socket, const IRequestHandler& handler, const IProtocolEngine& engine)
 	:m_requestHandler(handler),
 	m_engine(engine),
 	m_socket(socket),
@@ -304,7 +304,7 @@ const IProtocolEngine& CHttpRequest::GetProtocolEngine() const
 }
 
 
-const QAbstractSocket& CHttpRequest::GetSocket() const
+QAbstractSocket& CHttpRequest::GetSocket() const
 {
 	return m_socket;
 }

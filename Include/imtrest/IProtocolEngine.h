@@ -27,6 +27,11 @@ public:
 	enum StatusCode
 	{
 		/**
+			No status is available.
+		*/
+		SC_NONE,
+
+		/**
 			Operation could be successfull processed
 		*/
 		SC_OK,
@@ -77,7 +82,7 @@ public:
 		Create request based on the incomming data.
 	*/
 	virtual IRequest* CreateRequest(
-				const QAbstractSocket* socketPtr,
+				QAbstractSocket* socketPtr,
 				const IRequestHandler& requestHandler) const = 0;
 
 	/**

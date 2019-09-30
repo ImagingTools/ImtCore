@@ -17,7 +17,7 @@ class CHttpResponder: public QObject, virtual public IResponder
 	Q_OBJECT
 public:
 	// reimplemented (IResponder)
-	virtual bool SendResponse(const IResponse& response, QAbstractSocket& socket) const override;
+	virtual bool SendResponse(const IResponse& response) const override;
 
 protected:
 	virtual bool WriteStatus(int statusCode,const QByteArray& statusCodeLiteral, QAbstractSocket& socket) const;
