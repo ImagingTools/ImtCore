@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtCore/QObject>
+#include <QtNetwork/QAbstractSocket>
 
 // ImtCore includes
 #include <imtrest/IResponder.h>

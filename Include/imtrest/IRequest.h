@@ -31,7 +31,6 @@ public:
 	virtual RequestState GetState() const = 0;
 	virtual QByteArray GetCommandId() const = 0;
 	virtual CommandParams GetCommandParams() const = 0;
-	virtual bool ParseDeviceData(QIODevice& device) = 0;
 };
 
 

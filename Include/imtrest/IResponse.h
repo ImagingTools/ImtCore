@@ -12,6 +12,9 @@ namespace imtrest
 {
 
 
+/**
+	Common interface for the server's response
+*/
 class IResponse: virtual public INetworkObject
 {
 public:

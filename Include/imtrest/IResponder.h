@@ -1,11 +1,8 @@
 #pragma once
 
 
-// Qt includes
-#include <QtNetwork/QAbstractSocket>
-
 // ACF includes
-#include <istd/IChangeable.h>
+#include <istd/IPolymorphic.h>
 
 
 namespace imtrest
@@ -22,7 +19,8 @@ class IResponder: virtual public istd::IPolymorphic
 {
 public:
 	/**
-		Send a response to the output device (e.g a socket).
+		Send a response to the client.
+		The transfer should be realized over the socket instance provided by the response object.
 	*/
 	virtual bool SendResponse(const IResponse& response) const = 0;
 };

@@ -273,35 +273,6 @@ IRequest::CommandParams CHttpRequest::GetCommandParams() const
 }
 
 
-bool CHttpRequest::ParseDeviceData(QIODevice& device)
-{
-	QByteArray data = device.readAll();
-	if (!data.isEmpty()){
-#if QT_CONFIG(ssl)
-		QSslSocket* sslSocketPtr = qobject_cast<QSslSocket*>(&device);
-		if ((sslSocketPtr != nullptr) && sslSocketPtr->isEncrypted()){
-			m_url.setScheme(QStringLiteral("https"));
-		}
-		else{
-			m_url.setScheme(QStringLiteral("http"));
-		}
-#else
-		m_url.setScheme(QStringLiteral("http"));
-#endif
-		int parsedCount = http_parser_execute(
-					&m_httpParser,
-					&s_httpParserSettings,
-					data.constData(),
-					size_t(data.size()));
-		if (parsedCount < data.size()){
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
 // reimplemented (INetworkObject)
 
 const IProtocolEngine& CHttpRequest::GetProtocolEngine() const
@@ -326,6 +297,37 @@ bool CHttpRequest::ResetData(CompatibilityMode /*mode*/)
 	m_url.clear();
 
 	m_state = RS_NON_STARTED;
+
+	return true;
+}
+
+
+// protected methods
+
+bool CHttpRequest::ParseDeviceData(QIODevice& device)
+{
+	QByteArray data = device.readAll();
+	if (!data.isEmpty()){
+#if QT_CONFIG(ssl)
+		QSslSocket* sslSocketPtr = qobject_cast<QSslSocket*>(&device);
+		if ((sslSocketPtr != nullptr) && sslSocketPtr->isEncrypted()){
+			m_url.setScheme(QStringLiteral("https"));
+		}
+		else{
+			m_url.setScheme(QStringLiteral("http"));
+		}
+#else
+		m_url.setScheme(QStringLiteral("http"));
+#endif
+		int parsedCount = http_parser_execute(
+					&m_httpParser,
+					&s_httpParserSettings,
+					data.constData(),
+					size_t(data.size()));
+		if (parsedCount < data.size()){
+			return false;
+		}
+	}
 
 	return true;
 }
