@@ -4,6 +4,7 @@
 #if QT_CONFIG(ssl)
 #include <QtNetwork/QSslSocket>
 #endif
+#include <QtCore/QUrlQuery>
 
 
 namespace imtrest
@@ -57,12 +58,6 @@ QByteArray CHttpRequest::GetHeaderValue(const QByteArray & headerType) const
 QUrl CHttpRequest::GetUrl() const
 {
 	return m_url;
-}
-
-
-QUrlQuery CHttpRequest::GetQuery() const
-{
-	return QUrlQuery(m_url.query());
 }
 
 
@@ -263,12 +258,25 @@ IRequest::RequestState CHttpRequest::GetState() const
 
 QByteArray CHttpRequest::GetCommandId() const
 {
-	return QByteArray();
+	return m_url.path().toUtf8();
 }
 
 
 IRequest::CommandParams CHttpRequest::GetCommandParams() const
 {
+	if (m_url.hasQuery()){
+		QUrlQuery query(m_url);
+
+		CommandParams params;
+
+		QList<QPair<QString, QString>> items = query.queryItems();
+		for (const QPair<QString, QString>& item : items){
+			params[item.first] = item.second;
+		}
+
+		return params;
+	}
+
 	return CommandParams();
 }
 

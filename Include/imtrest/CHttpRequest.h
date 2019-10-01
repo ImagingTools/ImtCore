@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtCore/QUrlQuery>
+#include <QtCore/QUrl>
 #include <QtNetwork/QHostAddress>
 
 // ACF includes
@@ -38,7 +38,6 @@ public:
 
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
 	QUrl GetUrl() const;
-	QUrlQuery GetQuery() const;
 	MethodType GetMethodType() const;
 	QByteArray GetBody() const;
 	QHostAddress GetRemoteAddress() const;
