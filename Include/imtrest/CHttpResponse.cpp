@@ -8,6 +8,7 @@
 namespace imtrest
 {
 
+
 // public methods
 
 CHttpResponse::CHttpResponse(

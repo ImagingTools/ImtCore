@@ -8,7 +8,6 @@
 #include <imtrest/IResponse.h>
 
 
-
 namespace imtrest
 {
 
