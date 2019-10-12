@@ -158,6 +158,7 @@ private:
 	void UpdatePageState();
 	LoginMode GetLoginMode();
 	int GetAutoLogoutTime() const;
+	void ProcessLogout();
 
 	/**
 		Calculate layout of page thumbnails based on m_horizontalItemsViewAttrPtr and m_verticalItemsViewAttrPtr

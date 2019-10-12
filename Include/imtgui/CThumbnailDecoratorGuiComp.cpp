@@ -397,26 +397,7 @@ void CThumbnailDecoratorGuiComp::on_LoginControlButton_clicked()
 		ShowLoginPage();
 	}
 	else{
-		if (m_loginCompPtr->Logout()){
-			m_autoLogoutTimer.stop();
-			
-			qApp->removeEventFilter(this);
-
-			UpdateLoginButtonsState();
-
-			LoginMode loginMode = GetLoginMode();
-			if (loginMode == LM_STRONG){
-				ShowLoginPage();
-			}
-			else{
-				if (m_defaultPageIndexAttrPtr.IsValid()){
-					SwitchToPage(*m_defaultPageIndexAttrPtr);
-				}
-				else{
-					ShowHomePage();
-				}
-			}
-		}
+		ProcessLogout();
 	}
 }
 
@@ -453,15 +434,7 @@ void CThumbnailDecoratorGuiComp::on_LogButton_clicked()
 
 void CThumbnailDecoratorGuiComp::Logout()
 {
-	if (m_loginCompPtr.IsValid() && m_loginCompPtr->Logout()){
-		m_autoLogoutTimer.stop();
-
-		qApp->removeEventFilter(this);
-
-		UpdateLoginButtonsState();
-
-		ShowLoginPage();
-	}
+	ProcessLogout();
 }
 
 
@@ -842,6 +815,31 @@ int CThumbnailDecoratorGuiComp::GetAutoLogoutTime() const
 }
 
 
+void CThumbnailDecoratorGuiComp::ProcessLogout()
+{
+	if (m_loginCompPtr->Logout()){
+		m_autoLogoutTimer.stop();
+
+		qApp->removeEventFilter(this);
+
+		UpdateLoginButtonsState();
+
+		LoginMode loginMode = GetLoginMode();
+		if (loginMode == LM_STRONG){
+			ShowLoginPage();
+		}
+		else {
+			if (m_defaultPageIndexAttrPtr.IsValid()){
+				SwitchToPage(*m_defaultPageIndexAttrPtr);
+			}
+			else {
+				ShowHomePage();
+			}
+		}
+	}
+
+}
+
 void CThumbnailDecoratorGuiComp::GetMenuLayout(const int count)
 {
 	if (m_columnsCount <= 0 || m_rowsCount <= 0){
@@ -1028,12 +1026,8 @@ CThumbnailDecoratorGuiComp::PageModelObserver::PageModelObserver(CThumbnailDecor
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CThumbnailDecoratorGuiComp::PageModelObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& changeSet)
+void CThumbnailDecoratorGuiComp::PageModelObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	if (!changeSet.ContainsExplicit(iprm::ISelectionParam::CF_SELECTION_CHANGED, false)){
-		return;
-	}
-
 	m_parent.UpdatePageState();
 }
 
