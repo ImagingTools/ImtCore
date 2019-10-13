@@ -1064,7 +1064,6 @@ void CThumbnailDecoratorGuiComp::PageVisualStatusObserver::OnModelChanged(int /*
 }
 
 
-
 } // namespace imtgui
 
 
