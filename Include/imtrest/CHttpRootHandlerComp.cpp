@@ -65,7 +65,7 @@ void CHttpRootHandlerComp::OnComponentCreated()
 
 		int handlersCount = qMin(m_commandIdsAttrPtr.GetCount(), m_requestHandlersCompPtr.GetCount());
 		
-		for (int i = 0; i < m_commandIdsAttrPtr.GetCount(); ++i){
+		for (int i = 0; i < handlersCount; ++i){
 			QString registeredCommandId = m_commandIdsAttrPtr[i];
 			IRequestHandler* handlerPtr = m_requestHandlersCompPtr[i];
 
