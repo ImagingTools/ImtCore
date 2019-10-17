@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QDataStream>
+#include <QtCore/QDataStream>
 
 // ImtCore includes
 #include <imtrest/IResponse.h>

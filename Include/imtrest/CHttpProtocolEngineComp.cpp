@@ -46,7 +46,7 @@ bool CHttpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protoco
 
 	case SC_NOT_MODIFIED:
 		protocolStatusCode = 304;
-		statusCodeLiteral = "Not Found";
+		statusCodeLiteral = "Not Modified";
 		return true;
 
 	case SC_UNAUTHORIZED:
