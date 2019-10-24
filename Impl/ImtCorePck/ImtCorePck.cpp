@@ -41,7 +41,7 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			OptionsListAdapter,
-			"ICollectionInfo-To-IOptionsList adapted",
+			"ICollectionInfo-To-IOptionsList adapter",
 			"Collection List Options Adapter");
 
 

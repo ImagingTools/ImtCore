@@ -41,10 +41,11 @@ private:
 	void GetTitlePageRegionResults(const ReportInputData& reportData, Results& results) const;
 	void GetInspectionPageRegionResults(const Inspection& inspection, Results& results) const;
 
-	void AddHeader(const ReportInputData& reportData,
-				   const Inspection* inspectionPtr,
-				   i2d::CVector2d& topLeft,
-				   IReportPage& page) const;
+	void AddHeader(
+				const ReportInputData& reportData,
+				const Inspection* inspectionPtr,
+				i2d::CVector2d& topLeft,
+				IReportPage& page) const;
 	void AddBody(const QString& imagePath, i2d::CVector2d& topLeft, IReportPage& page) const;
 	void AddTitlePageFooter(const ReportInputData& reportData, i2d::CVector2d& topLeft, IReportPage& page) const;
 	void AddInspectionPageFooter(const Inspection& inspection, i2d::CVector2d& topLeft, IReportPage& page) const;
