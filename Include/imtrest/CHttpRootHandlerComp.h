@@ -24,7 +24,7 @@ public:
 
 	I_BEGIN_COMPONENT(CHttpRootHandlerComp);
 		I_REGISTER_INTERFACE(IRequestHandler);
-		I_ASSIGN_MULTI_0(m_commandIdsAttrPtr, "CommandsIds", "List of command-IDs used with corresponded handlers", true);
+		I_ASSIGN_MULTI_0(m_commandIdsAttrPtr, "CommandIds", "List of command-IDs used with corresponded handlers", true);
 		I_ASSIGN_MULTI_0(m_requestHandlersCompPtr, "RequestHandlers", "List of request handlers for corresponding command-IDs", true);
 	I_END_COMPONENT
 
