@@ -15,6 +15,11 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
+			SupplierFactory,
+			"Supplier factory",
+			"Processing Supplier Factory");
+
+I_EXPORT_COMPONENT(
 			ObjectCollection,
 			"General collection of the data objects",
 			"Object Data Model Collection Container Composition");
