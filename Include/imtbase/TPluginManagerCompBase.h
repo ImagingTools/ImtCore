@@ -26,13 +26,13 @@ namespace imtbase
 {
 
 
-template <class PluginInterface, typename CreateFunction, typename DestroyFunction>
+template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass = ilog::CLoggerComponentBase>
 class TPluginManagerCompBase:
-			public ilog::CLoggerComponentBase,
+			public BaseComponentClass,
 			protected imod::CSingleModelObserverBase
 {
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef BaseComponentClass BaseClass;
 	typedef imod::CSingleModelObserverBase BaseClass2;
 
 	I_BEGIN_BASE_COMPONENT(TPluginManagerCompBase);
@@ -100,8 +100,8 @@ private:
 
 // public methods
 
-template <class PluginInterface, typename CreateFunction, typename DestroyFunction>
-TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction>::TPluginManagerCompBase(const QByteArray& createMethodName, const QByteArray& destroyMethodName)
+template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
+TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::TPluginManagerCompBase(const QByteArray& createMethodName, const QByteArray& destroyMethodName)
 	:m_createMethodName(createMethodName),
 	m_destroyMethodName(destroyMethodName)
 {
@@ -110,8 +110,8 @@ TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction>::TPlugi
 
 // protected methods
 
-template <class PluginInterface, typename CreateFunction, typename DestroyFunction>
-void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugins()
+template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
+void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::LoadPlugins()
 {
 	if (m_settingsCompPtr.IsValid()){
 		// Load default plug-in directory:
@@ -151,8 +151,8 @@ void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction>::L
 }
 
 
-template <class PluginInterface, typename CreateFunction, typename DestroyFunction>
-bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction>::LoadPluginDirectory(const QString& pluginDirectoryPath)
+template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
+bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::LoadPluginDirectory(const QString& pluginDirectoryPath)
 {
 	SendInfoMessage(0, QString("Looking for the plug-ins in '%1'").arg(pluginDirectoryPath));
 
@@ -202,8 +202,8 @@ bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction>::L
 }
 
 
-template<class PluginInterface, typename CreateFunction, typename DestroyFunction>
-inline bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction>::InitializePlugin(PluginInterface * pluginPtr)
+template<class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
+inline bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::InitializePlugin(PluginInterface * pluginPtr)
 {
 	Q_UNUSED(pluginPtr);
 
@@ -211,16 +211,16 @@ inline bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunct
 }
 
 
-template<class PluginInterface, typename CreateFunction, typename DestroyFunction>
-inline void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction>::OnPluginsCreated()
+template<class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
+inline void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::OnPluginsCreated()
 {
 }
 
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-template <class PluginInterface, typename CreateFunction, typename DestroyFunction>
-void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction>::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
+void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	LoadPlugins();
 }
@@ -228,8 +228,8 @@ void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction>::O
 
 // reimplemented (icomp::CComponentBase)
 
-template <class PluginInterface, typename CreateFunction, typename DestroyFunction>
-void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction>::OnComponentCreated()
+template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
+void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
@@ -239,12 +239,12 @@ void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction>::O
 }
 
 
-template <class PluginInterface, typename CreateFunction, typename DestroyFunction>
-void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction>::OnComponentDestroyed()
+template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
+void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::OnComponentDestroyed()
 {
 	BaseClass2::EnsureModelDetached();
 
-	for (auto iter = m_plugins.begin(); iter != m_plugins.end(); ++iter){
+	for (Plugins::iterator iter = m_plugins.begin(); iter != m_plugins.end(); ++iter){
 		iter->destroyFunc(iter->pluginPtr);
 	}
 
