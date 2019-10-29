@@ -18,7 +18,7 @@ public:
 	/**
 		Get the name of the Plug-In.
 	*/
-	virtual QString GetPlugInName() const = 0;
+	virtual QString GetPluginName() const = 0;
 };
 
 
