@@ -9,6 +9,9 @@ namespace imtbase
 {
 
 
+/**
+	Generic adapter of the component factorization to istd::TIFactory<> interface.
+*/
 template <typename ObjectInterface>
 class TComponentFactoryComp:
 			public icomp::CComponentBase,
