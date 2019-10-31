@@ -27,13 +27,10 @@ namespace imtbase
 
 
 template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass = ilog::CLoggerComponentBase>
-class TPluginManagerCompBase:
-			public BaseComponentClass,
-			protected imod::CSingleModelObserverBase
+class TPluginManagerCompBase: public BaseComponentClass
 {
 public:
 	typedef BaseComponentClass BaseClass;
-	typedef imod::CSingleModelObserverBase BaseClass2;
 
 	I_BEGIN_BASE_COMPONENT(TPluginManagerCompBase);
 		I_ASSIGN(m_settingsCompPtr, "Settings", "Plugin settings", true, "Settings");
@@ -62,12 +59,23 @@ protected:
 	*/
 	virtual void OnPluginsCreated();
 
-	// reimplemented (imod::CSingleModelObserverBase)
-	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
-
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated();
 	virtual void OnComponentDestroyed();
+
+protected:
+	class SettingsObserver: public imod::CSingleModelObserverBase
+	{
+	public:
+		SettingsObserver(TPluginManagerCompBase& parent);
+
+	protected:
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
+
+	private:
+		TPluginManagerCompBase& m_parent;
+	};
 
 protected:
 	struct PluginInfo
@@ -95,6 +103,8 @@ private:
 
 	QByteArray m_createMethodName;
 	QByteArray m_destroyMethodName;
+
+	SettingsObserver m_settingsObserver;
 };
 
 
@@ -103,7 +113,8 @@ private:
 template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
 TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::TPluginManagerCompBase(const QByteArray& createMethodName, const QByteArray& destroyMethodName)
 	:m_createMethodName(createMethodName),
-	m_destroyMethodName(destroyMethodName)
+	m_destroyMethodName(destroyMethodName),
+	m_settingsObserver(*this)
 {
 }
 
@@ -217,15 +228,6 @@ inline void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunct
 }
 
 
-// reimplemented (imod::CSingleModelObserverBase)
-
-template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
-void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
-{
-	LoadPlugins();
-}
-
-
 // reimplemented (icomp::CComponentBase)
 
 template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
@@ -234,7 +236,7 @@ void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 	BaseClass::OnComponentCreated();
 
 	if (m_settingsModelCompPtr.IsValid()){
-		m_settingsModelCompPtr->AttachObserver(this);
+		m_settingsModelCompPtr->AttachObserver(&m_settingsObserver);
 	}
 }
 
@@ -242,7 +244,7 @@ void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
 void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::OnComponentDestroyed()
 {
-	BaseClass2::EnsureModelDetached();
+	m_settingsObserver.EnsureModelDetached();
 
 	for (Plugins::iterator iter = m_plugins.begin(); iter != m_plugins.end(); ++iter){
 		iter->destroyFunc(iter->pluginPtr);
@@ -251,6 +253,26 @@ void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 	m_plugins.clear();
 
 	BaseClass::OnComponentDestroyed();
+}
+
+
+// public methods of the embedded class SettingsObserver
+
+template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
+TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::SettingsObserver::SettingsObserver(TPluginManagerCompBase& parent)
+	:m_parent(parent)
+{
+}
+
+
+// protected methods
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
+void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::SettingsObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	m_parent.LoadPlugins();
 }
 
 
