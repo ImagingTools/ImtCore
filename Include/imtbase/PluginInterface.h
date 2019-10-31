@@ -17,9 +17,9 @@
 #define IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION(suffix) DestroyPluginInstanceDebug_##suffix
 	#define IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION_NAME(suffix) "DestroyPluginInstanceDebug_"##IMT_MAKE_STRING(suffix)
 #else // !QT_NO_DEBUG
-	#define IMT_CREATE_PLUGIN_INSTANCE_FUNCTION(suffix) CreatePluginInstance_#suffix
+	#define IMT_CREATE_PLUGIN_INSTANCE_FUNCTION(suffix) CreatePluginInstance_##suffix
 	#define IMT_CREATE_PLUGIN_INSTANCE_FUNCTION_NAME(suffix) "CreatePluginInstance_"##IMT_MAKE_STRING(suffix)
-	#define IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION(suffix) DestroyPluginInstance_#suffix
+	#define IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION(suffix) DestroyPluginInstance_##suffix
 	#define IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION_NAME(suffix) "DestroyPluginInstance_"##IMT_MAKE_STRING(suffix)
 #endif // !QT_NO_DEBUG
 
