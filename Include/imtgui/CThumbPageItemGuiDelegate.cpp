@@ -1,4 +1,4 @@
-#include <imtgui/CThumbpageItemGuiDelegate.h>
+#include <imtgui/CThumbPageItemGuiDelegate.h>
 
 
 // Qt includes
@@ -19,7 +19,7 @@ static const int s_minPadding = 7;
 
 // public methods
 
-CThumbpageItemGuiDelegate::CThumbpageItemGuiDelegate(
+CThumbPageItemGuiDelegate::CThumbPageItemGuiDelegate(
 			const QStandardItemModel& itemModel,
 			int horizontalSpacing,
 			int verticalSpacing,
@@ -32,7 +32,7 @@ CThumbpageItemGuiDelegate::CThumbpageItemGuiDelegate(
 }
 
 
-void CThumbpageItemGuiDelegate::SetMargins(int horizontal, int vertical)
+void CThumbPageItemGuiDelegate::SetMargins(int horizontal, int vertical)
 {
 	m_horizontalMargin = horizontal > 0 ? horizontal : m_horizontalMargin;
 	m_verticalMargin = vertical > 0 ? vertical : m_verticalMargin;
@@ -41,7 +41,7 @@ void CThumbpageItemGuiDelegate::SetMargins(int horizontal, int vertical)
 
 // reimplemented (QItemDelegate/)
 
-QSize CThumbpageItemGuiDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& /*index*/) const
+QSize CThumbPageItemGuiDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& /*index*/) const
 {
 	QFont font = option.font;
 	font.setPointSize(s_fontSize);
@@ -58,7 +58,7 @@ QSize CThumbpageItemGuiDelegate::sizeHint(const QStyleOptionViewItem& option, co
 }
 
 
-void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void CThumbPageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
 	QStandardItem* itemPtr = m_itemModel.itemFromIndex(index);
 	Q_ASSERT(itemPtr != NULL);
@@ -124,7 +124,7 @@ void CThumbpageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 }
 
 
-QWidget* CThumbpageItemGuiDelegate::createEditor(QWidget* /*parent*/, const QStyleOptionViewItem& /*option*/, const QModelIndex& /*index*/) const
+QWidget* CThumbPageItemGuiDelegate::createEditor(QWidget* /*parent*/, const QStyleOptionViewItem& /*option*/, const QModelIndex& /*index*/) const
 {
 	return NULL;
 }

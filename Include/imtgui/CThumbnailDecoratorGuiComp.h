@@ -20,7 +20,7 @@
 #include <iauth/IRightsProvider.h>
 
 // ImtCore includes
-#include <imtgui/CThumbpageItemGuiDelegate.h>
+#include <imtgui/CThumbPageItemGuiDelegate.h>
 #include <GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h>
 
 
@@ -265,7 +265,7 @@ private:
 	int m_maxWidth;
 	int m_maxHeight;
 	QSize m_minItemSize;
-	imtgui::CThumbpageItemGuiDelegate* m_itemDelegate;
+	imtgui::CThumbPageItemGuiDelegate* m_itemDelegate;
 
 	I_REF(iqtgui::IGuiObject, m_pagesWidgetCompPtr);
 	I_REF(iprm::ISelectionParam, m_pagesCompPtr);

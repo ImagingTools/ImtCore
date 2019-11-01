@@ -16,7 +16,7 @@ namespace imtgui
 /**
 	Item delegate used for drawing page' thumbnails.
 */
-class CThumbpageItemGuiDelegate: public QStyledItemDelegate
+class CThumbPageItemGuiDelegate: public QStyledItemDelegate
 {
 public:
 	typedef QStyledItemDelegate BaseClass;
@@ -28,7 +28,7 @@ public:
 		DR_STATE
 	};
 
-	CThumbpageItemGuiDelegate(
+	CThumbPageItemGuiDelegate(
 				const QStandardItemModel& itemModel,
 				int horizontalSpacing = 6,
 				int verticalSpacing = 6,

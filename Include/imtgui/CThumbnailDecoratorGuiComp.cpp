@@ -17,7 +17,7 @@
 #include <iqtgui/CCommandTools.h>
 
 // ImtCore includes
-#include <imtgui/CThumbpageItemGuiDelegate.h>
+#include <imtgui/CThumbPageItemGuiDelegate.h>
 
 
 namespace imtgui
@@ -258,7 +258,7 @@ void CThumbnailDecoratorGuiComp::on_PageStack_currentChanged(int stackIndex)
 void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 {
 	QStandardItem* item = m_menuItemModel.itemFromIndex(index);
-	bool pageExists = (item == nullptr) ? (false) : (item->data(CThumbpageItemGuiDelegate::DR_PAGE_ID).isValid());
+	bool pageExists = (item == nullptr) ? (false) : (item->data(CThumbPageItemGuiDelegate::DR_PAGE_ID).isValid());
 	if (!pageExists){
 		m_subPageItemMap.clear();
 		SubPages->clear();
@@ -601,8 +601,8 @@ void CThumbnailDecoratorGuiComp::CreatePages(const iprm::ISelectionParam* select
 		bool isItemEnabled = itemsListPtr->IsOptionEnabled(itemIndex);
 
 		QStandardItem* menuItem = new QStandardItem(itemName);
-		menuItem->setData(menuItemId, CThumbpageItemGuiDelegate::DR_PAGE_ID);
-		menuItem->setData(isItemEnabled, CThumbpageItemGuiDelegate::DR_STATE);
+		menuItem->setData(menuItemId, CThumbPageItemGuiDelegate::DR_PAGE_ID);
+		menuItem->setData(isItemEnabled, CThumbPageItemGuiDelegate::DR_STATE);
 		menuItem->setEnabled(isItemEnabled);
 
 		if (visualStatusProviderPtr != nullptr){
@@ -629,7 +629,7 @@ void CThumbnailDecoratorGuiComp::CreatePages(const iprm::ISelectionParam* select
 
 	if (m_menuItemModel.columnCount() > 0){
 		PageList->setModel(&m_menuItemModel);
-		m_itemDelegate = new imtgui::CThumbpageItemGuiDelegate(m_menuItemModel, m_horizontalSpacing, m_verticalSpacing, this);
+		m_itemDelegate = new imtgui::CThumbPageItemGuiDelegate(m_menuItemModel, m_horizontalSpacing, m_verticalSpacing, this);
 
 		PageList->setItemDelegate(m_itemDelegate);
 	}
@@ -672,7 +672,7 @@ void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selecti
 
 		QTreeWidgetItem* pageItem = new QTreeWidgetItem(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 		pageItem->setText(0, pageName);
-		pageItem->setData(0, CThumbpageItemGuiDelegate::DR_PAGE_ID, pageId);
+		pageItem->setData(0, CThumbPageItemGuiDelegate::DR_PAGE_ID, pageId);
 		pageItem->setDisabled(!pageListPtr->IsOptionEnabled(pageIndex));
 
 		if (visualStatusProviderPtr != nullptr){
@@ -732,7 +732,7 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 				QStandardItem* itemPtr = itemIter.key();
 
 				QByteArray pageId = pageListPtr->GetOptionId(pageIndex);
-				QByteArray itemId = itemPtr->data(CThumbpageItemGuiDelegate::DR_PAGE_ID).toByteArray();
+				QByteArray itemId = itemPtr->data(CThumbPageItemGuiDelegate::DR_PAGE_ID).toByteArray();
 				if (itemId == pageId){
 					QString itemName = pageListPtr->GetOptionName(pageIndex);
 					if (itemName.isEmpty()){
@@ -741,7 +741,7 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 
 					bool isItemEnabled = pageListPtr->IsOptionEnabled(pageIndex);
 					itemPtr->setEnabled(isItemEnabled);
-					itemPtr->setData(isItemEnabled, CThumbpageItemGuiDelegate::DR_STATE);
+					itemPtr->setData(isItemEnabled, CThumbPageItemGuiDelegate::DR_STATE);
 					itemPtr->setText(itemName);
 
 					if (pageVisualStatusProviderPtr != nullptr){
