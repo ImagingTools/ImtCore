@@ -25,6 +25,9 @@ namespace imtgui
 class ICollectionViewDelegate: virtual public ibase::ICommandsProvider
 {
 public:
+	/**
+		Type of the command for operations on a collection item or on the entire collection.
+	*/
 	enum CommandType
 	{
 		/**
