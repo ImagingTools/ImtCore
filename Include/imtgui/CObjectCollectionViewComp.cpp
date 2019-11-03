@@ -53,19 +53,22 @@ void CObjectCollectionViewComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	ItemTree->header()->hide();
-
 	ItemTree->setModel(&m_itemModel);
 
-	QToolBar* toolBarPtr = new QToolBar(TopFrame);
-	TopFrame->layout()->addWidget(toolBarPtr);
+	if (*m_showCommandsToolBarAttrPtr){
+		QToolBar* toolBarPtr = new QToolBar(TopFrame);
+		TopFrame->layout()->addWidget(toolBarPtr);
 
-	iqtgui::CHierarchicalCommand* rootCommandPtr = dynamic_cast<iqtgui::CHierarchicalCommand*>(const_cast<ibase::IHierarchicalCommand*>(GetViewDelegate().GetCommands()));
-	if (rootCommandPtr != nullptr){
-		iqtgui::CCommandTools::SetupToolbar(*rootCommandPtr, *toolBarPtr);
-		toolBarPtr->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-		toolBarPtr->setIconSize(QSize(16, 16));
+		iqtgui::CHierarchicalCommand* rootCommandPtr = dynamic_cast<iqtgui::CHierarchicalCommand*>(const_cast<ibase::IHierarchicalCommand*>(GetViewDelegate().GetCommands()));
+		if (rootCommandPtr != nullptr){
+			iqtgui::CCommandTools::SetupToolbar(*rootCommandPtr, *toolBarPtr);
+			toolBarPtr->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+			toolBarPtr->setIconSize(QSize(16, 16));
+		}
 	}
+
+	TopFrame->setVisible(*m_showCommandsToolBarAttrPtr);
+	ItemTree->header()->setVisible(!*m_showCommandsToolBarAttrPtr);
 
 	QItemSelectionModel* selectionModelPtr = ItemTree->selectionModel();
 	if (selectionModelPtr != nullptr){
@@ -97,6 +100,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	m_typeItems.clear();
 	m_itemModel.clear();
 	m_itemModel.setColumnCount(1);
+	m_itemModel.setHorizontalHeaderLabels(QStringList() << tr("Name"));
 
 	const iprm::IOptionsList* objectTypeInfoPtr = objectPtr->GetObjectTypesInfo();
 	if (objectTypeInfoPtr != nullptr){

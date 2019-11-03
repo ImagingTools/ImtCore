@@ -28,7 +28,9 @@ public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<Ui::CObjectCollectionViewComp, imtbase::IObjectCollection> BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
+		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
 		I_ASSIGN(m_viewDelegateCompPtr, "ViewDelegate", "View delegate used for the collection", false, "ViewDelegate");
+		I_ASSIGN(m_showCommandsToolBarAttrPtr, "ShowToolBar", "If enabled the command tool bar will be shown", true, true);
 	I_END_COMPONENT;
 
 	enum DataRole
@@ -68,6 +70,7 @@ private:
 	CObjectCollectionViewDelegate m_defaultViewDelegate;
 
 	I_REF(ICollectionViewDelegate, m_viewDelegateCompPtr);
+	I_ATTR(bool, m_showCommandsToolBarAttrPtr);
 };
 
 
