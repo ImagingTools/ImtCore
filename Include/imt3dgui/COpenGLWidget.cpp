@@ -231,8 +231,6 @@ void COpenGLWidget::initializeGL()
 
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_ALWAYS);
 	glEnable(GL_PROGRAM_POINT_SIZE);
 
 	if (!m_programPtr->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Shaders/vshader.glsl")){
@@ -387,6 +385,8 @@ void COpenGLWidget::PaintGl()
 
 void COpenGLWidget::Paint(QPainter& painter)
 {
+	glDisable(GL_DEPTH_TEST);
+
 	m_scene.Draw(painter);
 
 	if (m_viewMode == VM_SELECTION){
@@ -484,6 +484,7 @@ void COpenGLWidget::SetSelection(SelectionMode selectionMode, bool on)
 void COpenGLWidget::SetGlFlags()
 {
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
 	if (m_renderHints & RH_ANTIALIASING){
 		glEnable(GL_LINE_SMOOTH);
