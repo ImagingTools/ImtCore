@@ -1,9 +1,6 @@
 #include <imt3dgui/CMeshShape.h>
 
 
-// Qt includes
-#include <QtCore/QMutexLocker>
-
 // ACF includes
 #include <imod/IModel.h>
 
@@ -101,6 +98,8 @@ void CMeshShape::TUpdateShapeGeometry(const imt3d::IMesh3d& mesh)
 
 		m_vertices[i].position = QVector3D(pointX, pointY, pointZ);
 		m_vertices[i].normal = QVector3D(normalX, normalY, normalZ);
+
+		EnsureNormalExist(i);
 	}
 
 	// update indices
@@ -111,6 +110,22 @@ void CMeshShape::TUpdateShapeGeometry(const imt3d::IMesh3d& mesh)
 
 		for (int j = 0; j < index.size(); ++j){
 			m_indices.push_back(index[j]);
+		}
+	}
+}
+
+
+void CMeshShape::EnsureNormalExist(int pointIndex)
+{
+	if ((pointIndex + 1) % 3 == 0){
+		Vertex& point1 = m_vertices[pointIndex - 0];
+		Vertex& point2 = m_vertices[pointIndex - 1];
+		Vertex& point3 = m_vertices[pointIndex - 2];
+
+		if (point1.normal == QVector3D(0.0, 0.0, 0.0) &&
+			point2.normal == QVector3D(0.0, 0.0, 0.0) &&
+			point3.normal == QVector3D(0.0, 0.0, 0.0)){
+			point1.normal = point2.normal = point3.normal = QVector3D::normal(point1.position, point2.position, point3.position);
 		}
 	}
 }
