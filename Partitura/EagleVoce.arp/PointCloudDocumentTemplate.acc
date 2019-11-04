@@ -99,7 +99,7 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="PointCloudView" PackageId="EagleGuiPck" ComponentId="PointCloudView">
+                    <Element Id="PointCloudView" PackageId="ImtGui3dPck" ComponentId="PointCloudView">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
@@ -111,8 +111,8 @@
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
-                    <Interface InterfaceId="eagle::IScene3dProvider" ComponentId="PointCloudView"/>
-                    <Interface InterfaceId="eagle::ITargetPointer" ComponentId="PointCloudView"/>
+                    <Interface InterfaceId="imtview3d::IScene3dProvider" ComponentId="PointCloudView"/>
+                    <Interface InterfaceId="imtview3d::ITargetPointer" ComponentId="PointCloudView"/>
                     <Interface InterfaceId="ibase::ICommandsProvider" ComponentId="CommandsBinder"/>
                     <Interface InterfaceId="imod::IModelEditor" ComponentId="PointCloudView"/>
                     <Interface InterfaceId="imod::IObserver" ComponentId="PointCloudView"/>

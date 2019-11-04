@@ -170,7 +170,7 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="EagleLocalization" PackageId="QtPck" ComponentId="TranslationManager">
+                    <Element Id="ImtView3dLocalization" PackageId="QtPck" ComponentId="TranslationManager">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
@@ -198,7 +198,7 @@
                                     <Data IsEnabled="true" Value=":/Translations"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="TranslationFilePrefix" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="EagleDemo"/>
+                                    <Data IsEnabled="true" Value="ImtView3dDemo"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -206,11 +206,11 @@
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
-                    <Interface InterfaceId="imod::IModel" ComponentId="EagleLocalization"/>
-                    <Interface InterfaceId="iprm::IOptionsList" ComponentId="EagleLocalization"/>
-                    <Interface InterfaceId="iqt::ITranslationManager" ComponentId="EagleLocalization"/>
-                    <Interface InterfaceId="istd::IChangeable" ComponentId="EagleLocalization"/>
-                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="EagleLocalization"/>
+                    <Interface InterfaceId="imod::IModel" ComponentId="ImtView3dLocalization"/>
+                    <Interface InterfaceId="iprm::IOptionsList" ComponentId="ImtView3dLocalization"/>
+                    <Interface InterfaceId="iqt::ITranslationManager" ComponentId="ImtView3dLocalization"/>
+                    <Interface InterfaceId="istd::IChangeable" ComponentId="ImtView3dLocalization"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="ImtView3dLocalization"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>
             </Data>

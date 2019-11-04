@@ -20,7 +20,7 @@
         <EmbededRegistry Id="LocalizationManager">
             <PositionMap>
                 <Element ComponentName="AcfSolutionsLocalization" X="525" Y="350" Note=""/>
-                <Element ComponentName="EagleLocalization" X="525" Y="200" Note=""/>
+                <Element ComponentName="ImtView3dLocalization" X="525" Y="200" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

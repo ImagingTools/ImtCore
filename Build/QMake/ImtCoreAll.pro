@@ -19,6 +19,12 @@ imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
 SUBDIRS += imtgui
 imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
 
+SUBDIRS += imtview3d
+imtview3d.file = ../../Include/imtview3d/QMake/imtview3d.pro
+
+SUBDIRS += imtgui3d
+imtgui3d.file = ../../Include/imtgui3d/QMake/imtgui3d.pro
+
 # Component packages
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
@@ -46,3 +52,19 @@ ImtCoreLoc.file = ../../Impl/ImtCoreLoc/QMake/ImtCoreLoc.pro
 SUBDIRS += ImtGuiPck
 ImtGuiPck.file = ../../Impl/ImtGuiPck/QMake/ImtGuiPck.pro
 ImtGuiPck.depends = imt3d imt3proc imtgui
+
+SUBDIRS += ImtView3dPck
+ImtView3dPck.file = ../../Impl/ImtView3dPck/QMake/ImtView3dPck.pro
+ImtView3dPck.depends = imtview3d
+
+SUBDIRS += ImtGui3dPck
+ImtGui3dPck.file = ../../Impl/ImtGui3dPck/QMake/ImtGui3dPck.pro
+ImtGui3dPck.depends = imtview3d imtgui3d
+
+SUBDIRS += ImtView3dLoc
+ImtView3dLoc.file = ../../Impl/ImtView3dLoc/QMake/ImtView3dLoc.pro
+
+# Application
+SUBDIRS += ImtView3d
+ImtView3d.file = ../../Impl/ImtView3dExe/QMake/ImtView3d.pro
+ImtView3d.depends = ImtView3dPck ImtGui3dPck ImtView3dLoc
