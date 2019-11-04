@@ -6,7 +6,7 @@
 
 // ACF includes
 #include <ibase/IApplication.h>
-#include <GeneratedFiles/ImtView3d/CImtView3d.h>
+#include <GeneratedFiles/ImtView3d/CEagleView.h>
 
 
 int main(int argc, char *argv[])
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(CImtView3d);
 	Q_INIT_RESOURCE(iqtgui);
 
-	CImtView3d instance;
+	CEagleView instance;
 
 	ibase::IApplication* applicationPtr = instance.GetInterface<ibase::IApplication>();
 	if (applicationPtr != NULL){
