@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="4814" Description="ACF"/>
             <Version Id="1" Number="2113" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331008" Description="Qt Framework"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -23,7 +23,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="ImtView 3d"/>
+                        <Data IsEnabled="true" Value="3D-Viewer"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CompanyName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="ImagingTools GmbH"/>

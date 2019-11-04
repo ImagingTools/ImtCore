@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4665" Description="ACF"/>
-            <Version Id="1" Number="1960" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="329217" Description="Qt Framework"/>
+            <Version Id="0" Number="4814" Description="ACF"/>
+            <Version Id="1" Number="2113" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Replacer for marked text file content</Description>
@@ -20,7 +20,7 @@
                         <Data IsEnabled="true" Value="ImagingTools GmbH"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LegalCopyright" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Copyright 2018 ImagingTools GmbH"/>
+                        <Data IsEnabled="true" Value="Copyright 2019 ImagingTools GmbH"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ReplaceEmbeddedVariables" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
@@ -34,7 +34,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="VersionInfo" PackageId="EagleVoce" ComponentId="VersionInfo">
+        <Element Id="VersionInfo" PackageId="ImtCoreVoce" ComponentId="VersionInfo">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>
