@@ -19,7 +19,7 @@ const float COpenGLWidget::s_verticalAngle = 45.0;
 const float COpenGLWidget::s_nearPlane = 0.1;
 const float COpenGLWidget::s_farPlane = 100.0;
 const float COpenGLWidget::s_defaultLineWidth = 1.0f;
-const QVector3D COpenGLWidget::s_defaultCameraPosition = { 0.0, 0.0, 5.0 };
+const QVector3D COpenGLWidget::s_defaultCameraPosition(0.0, 0.0, 5.0);
 const QVector3D COpenGLWidget::s_lightPosition(1.2, 1.0, 2.0);
 const QVector3D COpenGLWidget::s_lightColor(1.0, 1.0, 1.0);
 
@@ -484,7 +484,7 @@ void COpenGLWidget::SetSelection(SelectionMode selectionMode, bool on)
 void COpenGLWidget::SetGlFlags()
 {
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LEQUAL);
 
 	if (m_renderHints & RH_ANTIALIASING){
 		glEnable(GL_LINE_SMOOTH);
