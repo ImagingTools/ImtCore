@@ -19,11 +19,11 @@ imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
 SUBDIRS += imtgui
 imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
 
-SUBDIRS += imtview3d
-imtview3d.file = ../../Include/imtview3d/QMake/imtview3d.pro
+SUBDIRS += imt3dview
+imt3dview.file = ../../Include/imt3dview/QMake/imt3dview.pro
 
-SUBDIRS += imtgui3d
-imtgui3d.file = ../../Include/imtgui3d/QMake/imtgui3d.pro
+SUBDIRS += imt3dgui
+imt3dgui.file = ../../Include/imt3dgui/QMake/imt3dgui.pro
 
 # Component packages
 SUBDIRS += ImtCorePck
@@ -53,15 +53,15 @@ SUBDIRS += ImtGuiPck
 ImtGuiPck.file = ../../Impl/ImtGuiPck/QMake/ImtGuiPck.pro
 ImtGuiPck.depends = imt3d imt3proc imtgui
 
-SUBDIRS += ImtView3dPck
-ImtView3dPck.file = ../../Impl/ImtView3dPck/QMake/ImtView3dPck.pro
-ImtView3dPck.depends = imtview3d
+SUBDIRS += Imt3dViewPck
+Imt3dViewPck.file = ../../Impl/Imt3dViewPck/QMake/Imt3dViewPck.pro
+Imt3dViewPck.depends = imt3dview
 
-SUBDIRS += ImtGui3dPck
-ImtGui3dPck.file = ../../Impl/ImtGui3dPck/QMake/ImtGui3dPck.pro
-ImtGui3dPck.depends = imtview3d imtgui3d
+SUBDIRS += Imt3dGuiPck
+Imt3dGuiPck.file = ../../Impl/Imt3dGuiPck/QMake/Imt3dGuiPck.pro
+Imt3dGuiPck.depends = imt3dview imt3dgui
 
 # Application
 SUBDIRS += EagleView
 EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
-EagleView.depends = ImtView3dPck ImtGui3dPck
+EagleView.depends = Imt3dViewPck Imt3dGuiPck

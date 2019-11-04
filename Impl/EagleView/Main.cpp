@@ -11,7 +11,7 @@
 
 int main(int argc, char *argv[])
 {
-	Q_INIT_RESOURCE(imtgui3d);
+	Q_INIT_RESOURCE(imt3dgui);
 	Q_INIT_RESOURCE(AcfLoc);
 	Q_INIT_RESOURCE(AcfSlnLoc);
 	Q_INIT_RESOURCE(EagleView);

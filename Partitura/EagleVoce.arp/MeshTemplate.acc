@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="MeshView" PackageId="ImtGui3dPck" ComponentId="MeshView">
+        <Element Id="MeshView" PackageId="Imt3dGuiPck" ComponentId="MeshView">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
