@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4797" Description="ACF"/>
+            <Version Id="1" Number="2088" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330498" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="MaximumAngle" X="650" Y="325" Note=""/>
+        <Element ComponentName="MaximumNearestNeighbors" X="1000" Y="325" Note=""/>
+        <Element ComponentName="MaximumSurfaceAngle" X="800" Y="225" Note=""/>
+        <Element ComponentName="MinimumAngle" X="450" Y="225" Note=""/>
+        <Element ComponentName="Mu" X="275" Y="300" Note=""/>
+        <Element ComponentName="ParamsGui" X="575" Y="100" Note=""/>
+        <Element ComponentName="SearchRadius" X="150" Y="225" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

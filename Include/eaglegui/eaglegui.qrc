@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/Shaders">
+        <file alias="fshader.glsl">Resources/Shaders/fshader.glsl</file>
+        <file alias="vshader.glsl">Resources/Shaders/vshader.glsl</file>
+        <file alias="FragementNormal.glsl">Resources/Shaders/fragment_pos_color_normal.glsl</file>
+        <file alias="VertexNormal.glsl">Resources/Shaders/vertex_pos_color_normal.glsl</file>
+    </qresource>
+    <qresource prefix="/Textures">
+        <file>Resources/Textures/sample.png</file>
+    </qresource>
+    <qresource prefix="/Icons">
+        <file alias="ViewFront">Resources/Icons/ViewFront.svg</file>
+        <file alias="ViewReset">Resources/Icons/ViewReset.svg</file>
+        <file alias="ViewRight">Resources/Icons/ViewRight.svg</file>
+        <file alias="ViewTop">Resources/Icons/ViewTop.svg</file>
+        <file alias="ViewZoomIn">Resources/Icons/ViewZoomIn.svg</file>
+        <file alias="ViewZoomOut">Resources/Icons/ViewZoomOut.svg</file>
+        <file alias="ViewBack">Resources/Icons/ViewBack.svg</file>
+        <file alias="ViewBottom">Resources/Icons/ViewBottom.svg</file>
+        <file alias="ViewLeft">Resources/Icons/ViewLeft.svg</file>
+        <file alias="Grid">Resources/Icons/Grid.svg</file>
+        <file alias="Axis">Resources/Icons/Axis.svg</file>
+        <file alias="CircleSelection">Resources/Icons/CircleSelection.svg</file>
+        <file alias="ClearSelection">Resources/Icons/ClearSelection.svg</file>
+        <file alias="InvertSelection">Resources/Icons/InvertSelection.svg</file>
+        <file alias="DeleteSelection">Resources/Icons/DeleteSelection.svg</file>
+    </qresource>
+</RCC>

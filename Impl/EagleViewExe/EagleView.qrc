@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/Images">
+        <file alias="EagleSplashScreen">Resources/Images/EagleSplashScreen.svg</file>
+    </qresource>
+    <qresource prefix="/Icons">
+        <file alias="EagleIcon">Resources/Icons/EagleIcon.svg</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4796" Description="ACF"/>
+            <Version Id="1" Number="2085" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330498" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="MeshView" PackageId="EagleGuiPck" ComponentId="MeshView">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="StlMeshPersistence" PackageId="Imt3dPck" ComponentId="StlMeshPersistence">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TemplateMesh" PackageId="QtGuiPck" ComponentId="ExtendedDocumentTemplate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DocumentFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TetrahedralMesh3d"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentLoader" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="StlMeshPersistence"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentTypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Mesh"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentTypeName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="STL"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="MeshView"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TetrahedralMesh3d" PackageId="Imt3dPck" ComponentId="TetrahedralMesh3d">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="idoc::IDocumentTemplate" ComponentId="TemplateMesh"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="TemplateMesh"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

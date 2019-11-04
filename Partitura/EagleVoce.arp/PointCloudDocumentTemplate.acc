@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4811" Description="ACF"/>
+            <Version Id="1" Number="2109" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Point cloud document template</Description>
+    <Keywords>3D &quot;Point cloud&quot; Template OBJ</Keywords>
+    <ElementsList>
+        <Element Id="ObjPointCloudPersistence" PackageId="Imt3dPck" ComponentId="ObjPointCloudPersistence">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="PointCloud" PackageId="Imt3dPck" ComponentId="PointCloud">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="PointCloudView" PackageId="" ComponentId="PointCloudView">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DocumentManager" Type="Reference" ExportId="DocumentManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Template" PackageId="QtGuiPck" ComponentId="ExtendedDocumentTemplate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DocumentFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="PointCloud"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentLoader" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ObjPointCloudPersistence"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentTypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="PointCloud"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentTypeName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="OBJ"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsEditSupported" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="PointCloudView"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="PointCloudView">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="CommandsBinder" PackageId="QtGuiPck" ComponentId="CommandsBinder">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandProviders" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>PointCloudView</Value>
+                                            <Value>DocumentProcessingManager</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="DocumentProcessingManager" PackageId="ProcessingGuiPck" ComponentId="DocumentProcessingManager">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DocumentManager" Type="Reference" ExportId="DocumentManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="DocumentTypeId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="Mesh"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="InputDocumentRequired" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ProcessingCommandName" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Create mesh..."/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ProcessingMenuName" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Edit"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowInToolsBar" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="PointCloudView" PackageId="EagleGuiPck" ComponentId="PointCloudView">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="eagle::IScene3dProvider" ComponentId="PointCloudView"/>
+                    <Interface InterfaceId="eagle::ITargetPointer" ComponentId="PointCloudView"/>
+                    <Interface InterfaceId="ibase::ICommandsProvider" ComponentId="CommandsBinder"/>
+                    <Interface InterfaceId="imod::IModelEditor" ComponentId="PointCloudView"/>
+                    <Interface InterfaceId="imod::IObserver" ComponentId="PointCloudView"/>
+                    <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="PointCloudView"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="PointCloudView"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
+    </EmbeddedRegistriesList>
+    <ExportedInterfaces>
+        <Interface InterfaceId="idoc::IDocumentTemplate" ComponentId="Template"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Template"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

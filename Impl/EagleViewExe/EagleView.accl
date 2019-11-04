@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4797" Description="ACF"/>
+            <Version Id="1" Number="2088" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330498" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="MeshDocumentTemplate" X="1025" Y="450" Note=""/>
+        <Element ComponentName="MultiDocApp" X="625" Y="250" Note=""/>
+        <Element ComponentName="PointCloudDocumentTemplate" X="225" Y="450" Note=""/>
+        <Element ComponentName="VersionInfo" X="625" Y="75" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

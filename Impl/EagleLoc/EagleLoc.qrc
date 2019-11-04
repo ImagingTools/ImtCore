@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/Translations">
+        <file alias="EagleDemo_en_US">Translations/Eagle_en_US.qm</file>
+        <file alias="Eagle_de_DE">Translations/Eagle_de_DE.qm</file>
+        <file alias="Eagle_ru_RU">Translations/Eagle_ru_RU.qm</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4796" Description="ACF"/>
+            <Version Id="1" Number="2085" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330498" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="MeshView" X="400" Y="500" Note=""/>
+        <Element ComponentName="StlMeshPersistence" X="625" Y="500" Note=""/>
+        <Element ComponentName="TemplateMesh" X="625" Y="300" Note=""/>
+        <Element ComponentName="TetrahedralMesh3d" X="875" Y="500" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

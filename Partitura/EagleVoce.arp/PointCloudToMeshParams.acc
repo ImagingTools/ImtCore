@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4797" Description="ACF"/>
+            <Version Id="1" Number="2088" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330498" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="MaxAngle" PackageId="MeasPck" ComponentId="NumericParams">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MaxAngleConstraints"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Values" Type="Real[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>2</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MaxAngleConstraints" PackageId="MeasPck" ComponentId="NumericConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="MaxValue" Type="Real" ExportId="">
+                        <Data IsEnabled="true" Value="3.14"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Precision" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="3"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UnitName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="rad"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UnitType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MaxNearestNeighbors" PackageId="MeasPck" ComponentId="NumericParams">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MaxNearestNeighborsConstraints"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Values" Type="Real[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>10</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MaxNearestNeighborsConstraints" PackageId="MeasPck" ComponentId="NumericConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="MaxValue" Type="Real" ExportId="">
+                        <Data IsEnabled="true" Value="10000"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Precision" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="0"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MaxSurfaceAngle" PackageId="MeasPck" ComponentId="NumericParams">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MaxSurfaceAngleConstraints"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Values" Type="Real[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>3.14</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MaxSurfaceAngleConstraints" PackageId="MeasPck" ComponentId="NumericConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="MaxValue" Type="Real" ExportId="">
+                        <Data IsEnabled="true" Value="3.14"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Precision" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="3"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UnitName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="rad"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UnitType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MinAngle" PackageId="MeasPck" ComponentId="NumericParams">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MinAngleConstraints"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Values" Type="Real[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>0.175</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MinAngleConstraints" PackageId="MeasPck" ComponentId="NumericConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="MaxValue" Type="Real" ExportId="">
+                        <Data IsEnabled="true" Value="3.14"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Precision" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="3"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UnitName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="rad"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UnitType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Mu" PackageId="MeasPck" ComponentId="NumericParams">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MuConstraints"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Values" Type="Real[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>2</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MuConstraints" PackageId="MeasPck" ComponentId="NumericConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="MaxValue" Type="Real" ExportId="">
+                        <Data IsEnabled="true" Value="100"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Precision" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="3"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Params" PackageId="BasePck" ComponentId="ComposedParamsSet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SearchRadius</Value>
+                                <Value>Mu</Value>
+                                <Value>MinAngle</Value>
+                                <Value>MaxAngle</Value>
+                                <Value>MaxSurfaceAngle</Value>
+                                <Value>MaxNearestNeighbors</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SearchRadius</Value>
+                                <Value>Mu</Value>
+                                <Value>MinimumAngle</Value>
+                                <Value>MaximumAngle</Value>
+                                <Value>MaximumSurfaceAngle</Value>
+                                <Value>MaximumNearestNeighbors</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="PointCloudToMeshParams"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SearchRadius" PackageId="MeasPck" ComponentId="NumericParams">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SearchRadiusConstraints"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Values" Type="Real[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>5</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SearchRadiusConstraints" PackageId="MeasPck" ComponentId="NumericConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="MaxValue" Type="Real" ExportId="">
+                        <Data IsEnabled="true" Value="100000"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Precision" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="3"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="Params"/>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="Params"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="Params"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="Params"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Params"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>
