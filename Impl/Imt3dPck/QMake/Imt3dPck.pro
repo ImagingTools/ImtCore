@@ -5,7 +5,7 @@ include($(ACFDIR)/Config/QMake/ComponentConfig.pri)
 include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -imt3d
+LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limt3d
 LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -limeas -liinsp -liproc
 
 include($(ACFDIR)/Config/QMake/AcfQt.pri)
