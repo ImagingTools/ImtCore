@@ -36,7 +36,6 @@ protected:
 
 private:
 	template <typename PointType> void TUpdateShapeGeometry(const imt3d::IMesh3d& mesh);
-	void EnsureNormalExist(int pointIndex);
 };
 
 

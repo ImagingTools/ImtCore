@@ -53,7 +53,9 @@ int CStlMeshPersistenceComp::LoadFromFile(
 		return OS_FAILED;
 	}
 
-	bool loaded = documentPtr->LoadFromStlFile(filePath);
+	bool ensureNormalsExist = !m_ensureNormalsExistAttrPtr.IsValid() || *m_ensureNormalsExistAttrPtr;
+
+	bool loaded = documentPtr->LoadFromStlFile(filePath, ensureNormalsExist);
 	if (!loaded){
 		return OS_FAILED;
 	}

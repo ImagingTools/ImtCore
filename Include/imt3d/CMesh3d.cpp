@@ -1,6 +1,9 @@
 #include <imt3d/CMesh3d.h>
 
 
+// Qt includes
+#include <QtGui/QVector3D>
+
 // ACF includes
 #include <istd/CChangeNotifier.h>
 
@@ -23,7 +26,7 @@ bool CMesh3d::SaveToStlFile(const QString& filePath) const
 }
 
 
-bool CMesh3d::LoadFromStlFile(const QString& filePath)
+bool CMesh3d::LoadFromStlFile(const QString& filePath, bool ensureNormalExists)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
@@ -51,17 +54,18 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath)
 	IPointsBasedObject::PointXyzwNormal32* pointsDataPtr = new IPointsBasedObject::PointXyzwNormal32[pointsCount];
 
 	for (quint32 i = 0; i < trianglesCount; ++i){
-		// set indices
+		IPointsBasedObject::PointXyzwNormal32& point1 = pointsDataPtr[i * 3 + 0];
+		IPointsBasedObject::PointXyzwNormal32& point2 = pointsDataPtr[i * 3 + 1];
+		IPointsBasedObject::PointXyzwNormal32& point3 = pointsDataPtr[i * 3 + 2];
+
+		// vertex indices are not stored in STL, but vertices in STL are ordered
+		// so we can set indices by order
 		m_indices[i].resize(3);
 		m_indices[i][0] = i * 3 + 0;
 		m_indices[i][1] = i * 3 + 1;
 		m_indices[i][2] = i * 3 + 2;
 
 		// read normal
-		IPointsBasedObject::PointXyzwNormal32& point1 = pointsDataPtr[i * 3 + 0];
-		IPointsBasedObject::PointXyzwNormal32& point2 = pointsDataPtr[i * 3 + 1];
-		IPointsBasedObject::PointXyzwNormal32& point3 = pointsDataPtr[i * 3 + 2];
-
 		if (!ReadPointData(file, &point1.data[4])){
 			return false;
 		}
@@ -83,6 +87,10 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath)
 		// so there is nothing to do but copy them
 		memcpy(&point2.data[4], &point1.data[4], sizeof(float) * 3);
 		memcpy(&point3.data[4], &point1.data[4], sizeof(float) * 3);
+
+		if (ensureNormalExists){
+			EnsureNormalExists(point1, point2, point3);
+		}
 
 		// read (skip) attributes
 		file.read(sizeof(quint16));
@@ -257,6 +265,34 @@ bool CMesh3d::ReadPointData(QFile& file, float* pointDataPtr) const
 	qint64 bufSize = sizeof(float) * 3;
 
 	return (file.read(bufPtr, bufSize) == bufSize);
+}
+
+
+void CMesh3d::EnsureNormalExists(
+				IPointsBasedObject::PointXyzwNormal32& point1,
+				IPointsBasedObject::PointXyzwNormal32& point2,
+				IPointsBasedObject::PointXyzwNormal32& point3) const
+{
+	if (qFuzzyIsNull(point1.data[4]) &&
+		qFuzzyIsNull(point1.data[5]) &&
+		qFuzzyIsNull(point1.data[6]) &&
+		qFuzzyIsNull(point2.data[4]) &&
+		qFuzzyIsNull(point2.data[5]) &&
+		qFuzzyIsNull(point2.data[6]) &&
+		qFuzzyIsNull(point3.data[4]) &&
+		qFuzzyIsNull(point3.data[5]) &&
+		qFuzzyIsNull(point3.data[6])){
+		// zero normals in STL, build it
+		QVector3D p1(point1.data[0], point1.data[1], point1.data[2]);
+		QVector3D p2(point2.data[0], point2.data[1], point2.data[2]);
+		QVector3D p3(point3.data[0], point3.data[1], point3.data[2]);
+
+		QVector3D normal = QVector3D::normal(p1, p2, p3);
+
+		point1.data[4] = point2.data[4] = point3.data[4] = normal[0];
+		point1.data[5] = point2.data[5] = point3.data[5] = normal[1];
+		point1.data[6] = point2.data[6] = point3.data[6] = normal[2];
+	}
 }
 
 

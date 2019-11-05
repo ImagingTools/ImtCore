@@ -20,7 +20,7 @@ class CMesh3d: virtual public IMesh3d, public CPointsBasedObject
 {
 public:
 	bool SaveToStlFile(const QString& filePath) const;
-	bool LoadFromStlFile(const QString& filePath);
+	bool LoadFromStlFile(const QString& filePath, bool ensureNormalExists);
 
 	// reimplemented (imt3d::IMesh3d)
 	bool CreateMesh(PointFormat pointFormat, int pointsCount, const Indices& indices) override;
@@ -39,6 +39,10 @@ private:
 	template <typename DataType> bool WriteTypedValue(const DataType& data, QFile& file) const;
 	template <typename PointType> bool WritePointData(int pointIndex, int pointComponentOffset, QFile& file) const;
 	bool ReadPointData(QFile& file, float* pointBufPtr) const;
+	void EnsureNormalExists(
+				IPointsBasedObject::PointXyzwNormal32& point1,
+				IPointsBasedObject::PointXyzwNormal32& point2,
+				IPointsBasedObject::PointXyzwNormal32& point3) const;
 
 private:
 	Indices m_indices;
