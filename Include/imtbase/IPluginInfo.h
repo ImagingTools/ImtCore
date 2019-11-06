@@ -12,7 +12,7 @@ namespace imtbase
 /**
 	Interface for getting information about a Plug-In.
 */
-class IPlugInInfo: virtual public istd::IPolymorphic
+class IPluginInfo: virtual public istd::IPolymorphic
 {
 public:
 	/**
