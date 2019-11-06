@@ -39,7 +39,10 @@ extern "C" IMT_PLUGIN_FUNCTION_EXPORT void IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION(
 	}\
 	void IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION(PluginType)(PluginInterface* pluginInstancePtr)\
 	{\
-		delete pluginInstancePtr;\
+		Q_ASSERT(pluginInstancePtr != nullptr);\
+		if (pluginInstancePtr != nullptr){\
+			delete pluginInstancePtr;\
+		};\
 	}\
 
 
