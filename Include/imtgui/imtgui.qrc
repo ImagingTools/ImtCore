@@ -94,5 +94,6 @@
         <file alias="Export">Resources/Icons/Export.svg</file>
         <file alias="DocumentExport">Resources/Icons/Export.svg</file>
         <file alias="Import">Resources/Icons/Import.svg</file>
+        <file alias="Keyboard">Resources/Icons/Keyboard.svg</file>
     </qresource>
 </RCC>
