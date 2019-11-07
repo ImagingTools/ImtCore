@@ -146,6 +146,7 @@ private Q_SLOTS:
 	void on_LoginControlButton_clicked();
 	void on_SettingsButton_clicked();
 	void on_LogButton_clicked();
+	void on_KeyboardButton_clicked();
 	void Logout();
 
 private:

@@ -432,6 +432,11 @@ void CThumbnailDecoratorGuiComp::on_LogButton_clicked()
 }
 
 
+void CThumbnailDecoratorGuiComp::on_KeyboardButton_clicked()
+{
+}
+
+
 void CThumbnailDecoratorGuiComp::Logout()
 {
 	ProcessLogout();
