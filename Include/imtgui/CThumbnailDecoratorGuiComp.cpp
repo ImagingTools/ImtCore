@@ -42,7 +42,8 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_horizontalSpacing(0),
 	m_horizontalFrameMargin(6),
 	m_verticalFrameMargin(6),
-	m_itemDelegate(nullptr)
+	m_itemDelegate(nullptr),
+	m_isKeyboardShown(false)
 {
 	m_rootCommands.InsertChild(&m_commands);
 	m_minItemSize = QSize(100, 50);
@@ -197,6 +198,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	UpdateLoginButtonsState();
 
 	connect(&m_autoLogoutTimer, SIGNAL(timeout()), this, SLOT(Logout()));
+
+	SetKeyboardCommandPath();
 }
 
 
@@ -434,6 +437,16 @@ void CThumbnailDecoratorGuiComp::on_LogButton_clicked()
 
 void CThumbnailDecoratorGuiComp::on_KeyboardButton_clicked()
 {
+	if (m_isKeyboardShown){
+		HideKeyboard();
+
+		m_isKeyboardShown = false;
+	}
+	else{
+		ShowKeyboard();
+
+		m_isKeyboardShown = true;
+	}
 }
 
 
@@ -996,6 +1009,51 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 			}
 
 			iqtgui::CCommandTools::SetupToolbar(*commandsPtr, *m_mainToolBar);
+		}
+	}
+}
+
+
+// private methods
+
+void CThumbnailDecoratorGuiComp::ShowKeyboard()
+{
+	HideKeyboard();
+
+	m_keyboardProcessPtr.SetPtr(new QProcess(this));
+	m_keyboardProcessPtr->setProgram(m_winKeyboardPath);
+	m_keyboardProcessPtr->startDetached();
+}
+
+
+void CThumbnailDecoratorGuiComp::HideKeyboard()
+{
+	if (m_keyboardProcessPtr != nullptr){
+		m_keyboardProcessPtr->terminate();
+		m_keyboardProcessPtr->waitForFinished(2000);
+		if (!m_keyboardProcessPtr->isOpen()){
+			m_keyboardProcessPtr->kill();
+		}
+		m_keyboardProcessPtr.Reset();
+	}
+}
+
+
+void CThumbnailDecoratorGuiComp::SetKeyboardCommandPath()
+{
+	QString processPath;
+
+	if (m_winKeyboardPath.isEmpty()){
+		processPath = getenv("SystemRoot");
+		if (processPath.isEmpty()) {
+			processPath = "C:\\Windows";
+		}
+
+		processPath += "\\System32\\osk.exe";
+
+		QFileInfo processFileInfo(processPath);
+		if (processFileInfo.exists()){
+			m_winKeyboardPath = processPath;
 		}
 	}
 }

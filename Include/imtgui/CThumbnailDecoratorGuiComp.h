@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtCore/QMap>
 #include <QtCore/QTimer>
+#include <QtCore/QProcess>
 #include <QtWidgets/QListView>
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QStandardItem>
@@ -174,6 +175,9 @@ private:
 	void UpdateMaxSize();
 	void UpdateMinSize();
 	void UpdateCommands();
+	void ShowKeyboard();
+	void HideKeyboard();
+	void SetKeyboardCommandPath();
 
 private:
 	struct ItemInfo
@@ -281,6 +285,10 @@ private:
 
 	QToolBar* m_mainToolBar;
 	QTimer m_autoLogoutTimer;
+
+	istd::TDelPtr<QProcess> m_keyboardProcessPtr;
+	QString m_winKeyboardPath;
+	bool m_isKeyboardShown;
 };
 
 
