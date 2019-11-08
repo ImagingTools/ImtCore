@@ -42,13 +42,15 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_horizontalSpacing(0),
 	m_horizontalFrameMargin(6),
 	m_verticalFrameMargin(6),
-	m_itemDelegate(nullptr),
-	m_isKeyboardShown(false)
+	m_itemDelegate(nullptr)
 {
 	m_rootCommands.InsertChild(&m_commands);
 	m_minItemSize = QSize(100, 50);
 	m_maxWidth = 0;
 	m_maxHeight = 0;
+
+	qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
+	qRegisterMetaType<QProcess::ProcessState>();
 }
 
 
@@ -437,22 +439,19 @@ void CThumbnailDecoratorGuiComp::on_LogButton_clicked()
 
 void CThumbnailDecoratorGuiComp::on_KeyboardButton_clicked()
 {
-	if (m_isKeyboardShown){
-		HideKeyboard();
-
-		m_isKeyboardShown = false;
-	}
-	else{
-		ShowKeyboard();
-
-		m_isKeyboardShown = true;
-	}
+	ShowKeyboard();
 }
 
 
 void CThumbnailDecoratorGuiComp::Logout()
 {
 	ProcessLogout();
+}
+
+
+void CThumbnailDecoratorGuiComp::OnVirtualKeyboardStateChanged(QProcess::ProcessState state)
+{
+	KeyboardButton->setEnabled(state == QProcess::NotRunning);
 }
 
 
@@ -1021,7 +1020,14 @@ void CThumbnailDecoratorGuiComp::ShowKeyboard()
 	HideKeyboard();
 
 	m_keyboardProcessPtr.SetPtr(new QProcess(this));
+
+	connect(	m_keyboardProcessPtr.GetPtr(),
+				SIGNAL(stateChanged(QProcess::ProcessState)),
+				this,
+				SLOT(OnVirtualKeyboardStateChanged(QProcess::ProcessState)));
+
 	m_keyboardProcessPtr->setProgram(m_winKeyboardPath);
+
 	m_keyboardProcessPtr->startDetached();
 }
 
@@ -1043,6 +1049,8 @@ void CThumbnailDecoratorGuiComp::SetKeyboardCommandPath()
 {
 	QString processPath;
 
+	KeyboardButton->setVisible(false);
+
 	if (m_winKeyboardPath.isEmpty()){
 		processPath = getenv("SystemRoot");
 		if (processPath.isEmpty()) {
@@ -1054,6 +1062,8 @@ void CThumbnailDecoratorGuiComp::SetKeyboardCommandPath()
 		QFileInfo processFileInfo(processPath);
 		if (processFileInfo.exists()){
 			m_winKeyboardPath = processPath;
+
+			KeyboardButton->setVisible(true);
 		}
 	}
 }

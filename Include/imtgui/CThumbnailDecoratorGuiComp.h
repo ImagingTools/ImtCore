@@ -149,6 +149,7 @@ private Q_SLOTS:
 	void on_LogButton_clicked();
 	void on_KeyboardButton_clicked();
 	void Logout();
+	void OnVirtualKeyboardStateChanged(QProcess::ProcessState state);
 
 private:
 	void ShowLoginPage();
@@ -288,7 +289,6 @@ private:
 
 	istd::TDelPtr<QProcess> m_keyboardProcessPtr;
 	QString m_winKeyboardPath;
-	bool m_isKeyboardShown;
 };
 
 
