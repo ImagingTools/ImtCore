@@ -131,7 +131,6 @@ private:
 	static const float s_verticalAngle;
 	static const float s_nearPlane;
 	static const float s_farPlane;
-	static const float s_defaultLineWidth;
 	static const QVector3D s_defaultCameraPosition;
 	static const QVector3D s_lightPosition;
 	static const QVector3D s_lightColor;

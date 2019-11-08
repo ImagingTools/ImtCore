@@ -2,10 +2,7 @@
 
 
 // ACF includes
-#include <icomp/CComponentBase.h>
-#include <iqtgui/TGuiComponentBase.h>
 #include <iqtgui/TGuiObserverWrap.h>
-#include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
 #include <imt3dgui/CGridShape.h>

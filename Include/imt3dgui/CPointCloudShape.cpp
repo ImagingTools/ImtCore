@@ -235,18 +235,20 @@ void CPointCloudShape::DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctio
 
 	// draw point cloud
 	const GLuint* indexBufferOffset = 0;
+
 	functions.glDrawElements(GL_POINTS, m_pointCloudSize, GL_UNSIGNED_INT, indexBufferOffset);
 
 	// draw selection cube
 	if (!m_cubeSelectionSize.isNull()){
 		// draw selection cube faces
 		indexBufferOffset += m_pointCloudSize;
+
+		functions.glLineWidth(3.0f);
 		functions.glDrawElements(GL_QUADS, s_selectionCubeFacesSize, GL_UNSIGNED_INT, indexBufferOffset);
 
 		// draw selection cube edges
 		indexBufferOffset += s_selectionCubeFacesSize;
 
-		functions.glLineWidth(3.0f);
 		functions.glDrawElements(GL_LINES, s_selectionCubeEdgesSize, GL_UNSIGNED_INT, indexBufferOffset);
 	}
 }

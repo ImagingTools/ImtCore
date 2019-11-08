@@ -68,6 +68,7 @@ void CGridShape::UpdateShapeGeometry()
 
 void CGridShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions& functions)
 {
+	functions.glLineWidth(1.0f);
 	functions.glDrawElements(GL_LINES, m_indices.count(), GL_UNSIGNED_INT, 0);
 }
 

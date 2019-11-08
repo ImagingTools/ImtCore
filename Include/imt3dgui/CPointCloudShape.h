@@ -31,7 +31,6 @@ public:
 
 	void SetColor(const QVector3D& color);
 	void SetPointSize(float pointSize);
-
 	void SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection, const QRect& viewPort);
 	void SetBoxSelection(const QRect& selectionRect, bool clearPreviousSelection, const QRect& viewPort);
 	void SetCircleSelection(const QRect& selectionRect, bool clearPreviousSelection, const QRect& viewPort);
@@ -64,12 +63,12 @@ private:
 	void SetSelectionCubeEdgeColors();
 
 private:
+	typedef std::set<int> SelectedVerticesIndicies;
+
 	QVector3D m_color;
 	float m_pointSize;
 	int m_pointCloudSize;
 	QVector3D m_cubeSelectionSize;
-
-	typedef std::set<int> SelectedVerticesIndicies;
 	SelectedVerticesIndicies m_selectedVerticesIndicies;
 
 	static const QVector3D s_selectionColor;
