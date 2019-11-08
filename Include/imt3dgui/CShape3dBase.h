@@ -84,6 +84,8 @@ protected:
 			else{
 				dataBuffer.write(0, dataVector.data(), dataVector.count() * sizeof(dataVector.first()));
 			}
+
+			dataBuffer.release();
 		}
 	}
 

@@ -74,6 +74,8 @@ void CAxisShape::Draw(QPainter& painter)
 		return;
 	}
 
+	painter.save();
+
 	painter.setPen(Qt::black);
 	painter.setFont(GetAxeLabelFont());
 
@@ -85,6 +87,8 @@ void CAxisShape::Draw(QPainter& painter)
 
 	windowCoordinate = ModelToWindow(QVector3D(0.0, 0.0, m_axisLength), painter.viewport());
 	painter.drawText(windowCoordinate, "Z");
+
+	painter.restore();
 }
 
 

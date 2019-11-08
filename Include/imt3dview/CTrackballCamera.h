@@ -28,7 +28,7 @@ public:
 
 	const QQuaternion& GetRotation() const override;
 	void RotateTo(const QQuaternion& rotation) override;
-	void RotateTo(const QPoint& pointFrom, const QPoint& pointTo) override;
+	void RotateTo(const QPoint& pointFrom, const QPoint& pointTo, const QVector3D& axis = QVector3D()) override;
 
 	void ZoomIn() override;
 	void ZoomOut() override;

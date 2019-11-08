@@ -7,9 +7,9 @@ namespace imt3dview
 
 // static members
 
-const double CTrackballCamera::s_zoomSpeed = 0.05;
+const double CTrackballCamera::s_zoomSpeed = 0.1;
 const double CTrackballCamera::s_moveSpeed = 0.005;
-const double CTrackballCamera::s_rotationSpeed = 5.0;
+const double CTrackballCamera::s_rotationSpeed = 1.0;
 
 
 // public methods
@@ -68,18 +68,37 @@ void CTrackballCamera::RotateTo(const QQuaternion& rotation)
 }
 
 
-void CTrackballCamera::RotateTo(const QPoint& pointFrom, const QPoint& pointTo)
+void CTrackballCamera::RotateTo(const QPoint& pointFrom, const QPoint& pointTo, const QVector3D& axis)
 {
-	QVector3D point3dFrom = GetTrackballVector(pointFrom);
-	QVector3D point3dTo = GetTrackballVector(pointTo);
+	QVector3D rotationAxis;
+	float rotationAngle = 0.0;
 
-	if ((point3dFrom - point3dTo).length() > FLT_MIN)
-	{
-		QVector3D rotationAxis = QVector3D::crossProduct(point3dFrom, point3dTo);
-		float rotationAngle = qRadiansToDegrees(std::asin(rotationAxis.length())) * s_rotationSpeed;
+	if (!axis.isNull()){
+		rotationAxis = axis;
 
-		m_rotation = QQuaternion::fromAxisAndAngle(rotationAxis.normalized(), rotationAngle) * m_rotation;
+		if (!qFuzzyIsNull(axis.x())){
+			rotationAngle = (pointTo - pointFrom).y() * s_rotationSpeed;
+		}
+		else{
+			rotationAngle = (pointTo - pointFrom).x() * s_rotationSpeed;
+		}
 	}
+	else
+	{
+		// no rotation axis specified, do free rotation
+		QVector3D point3dFrom = GetTrackballVector(pointFrom);
+		QVector3D point3dTo = GetTrackballVector(pointTo);
+
+		if ((point3dFrom - point3dTo).length() > FLT_MIN)
+		{
+			rotationAxis = QVector3D::crossProduct(point3dFrom, point3dTo);
+			rotationAngle = qRadiansToDegrees(std::asin(rotationAxis.length())) * s_rotationSpeed;
+
+			m_rotation = QQuaternion::fromAxisAndAngle(rotationAxis.normalized(), rotationAngle) * m_rotation;
+		}
+	}
+
+	m_rotation = QQuaternion::fromAxisAndAngle(rotationAxis.normalized(), rotationAngle) * m_rotation;
 }
 
 

@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4811" Description="ACF"/>
-            <Version Id="1" Number="2109" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331009" Description="Qt Framework"/>
+            <Version Id="0" Number="4814" Description="ACF"/>
+            <Version Id="1" Number="2113" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331008" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Point cloud document template</Description>
@@ -28,6 +28,21 @@
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowEditCommands" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowShowAxisCommands" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowShowGridCommand" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowViewCommands" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowZoomCommands" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -105,17 +120,32 @@
                                 <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="ShowEditCommands" Type="Boolean" ExportId="ShowEditCommands">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowShowAxisCommands" Type="Boolean" ExportId="ShowShowAxisCommands">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowShowGridCommand" Type="Boolean" ExportId="ShowShowGridCommand">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowViewCommands" Type="Boolean" ExportId="ShowViewCommands">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowZoomCommands" Type="Boolean" ExportId="ShowZoomCommands">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
                     </Element>
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
-                    <Interface InterfaceId="imt3dview::IScene3dProvider" ComponentId="PointCloudView"/>
-                    <Interface InterfaceId="imt3dview::ITargetPointer" ComponentId="PointCloudView"/>
                     <Interface InterfaceId="ibase::ICommandsProvider" ComponentId="CommandsBinder"/>
                     <Interface InterfaceId="imod::IModelEditor" ComponentId="PointCloudView"/>
                     <Interface InterfaceId="imod::IObserver" ComponentId="PointCloudView"/>
+                    <Interface InterfaceId="imt3dview::IScene3dProvider" ComponentId="PointCloudView"/>
+                    <Interface InterfaceId="imt3dview::ITargetPointer" ComponentId="PointCloudView"/>
                     <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="PointCloudView"/>
                     <Interface InterfaceId="istd::IPolymorphic" ComponentId="PointCloudView"/>
                 </ExportedInterfaces>

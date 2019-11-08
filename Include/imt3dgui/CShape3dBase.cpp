@@ -245,7 +245,7 @@ QVector3D CShape3dBase::WindowToModel(const QPoint& windowCoordinate, int z, con
 
 	QVector3D windowCoordinateTmp;
 	windowCoordinateTmp.setX(windowCoordinate.x());
-	windowCoordinateTmp.setY(viewPort.height() - windowCoordinateTmp.y());
+	windowCoordinateTmp.setY(viewPort.height() - windowCoordinate.y());
 	windowCoordinateTmp.setZ(z);
 
 	return windowCoordinateTmp.unproject(viewMatrix * modelMatrix, m_projection, viewPort);

@@ -30,8 +30,9 @@ COpenGLWidget::COpenGLWidget(QWidget *parent)
 	:QOpenGLWidget(parent),
 	m_renderHints(0),
 	m_eventHandler(nullptr),
-	m_viewMode(VM_SHOW),
-	m_selectionMode(SM_BOX)
+	m_selectionMode(SelectionMode::SM_NONE),
+	m_rotationMode(RotationMode::RM_FREE),
+	m_programPtr(new QOpenGLShaderProgram(this))
 {
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
@@ -44,8 +45,6 @@ COpenGLWidget::COpenGLWidget(QWidget *parent)
 	m_timer.setInterval(20);
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(OnInternalTimer()));
 	m_timer.start();
-
-	m_programPtr = new QOpenGLShaderProgram(this);
 }
 
 
@@ -82,7 +81,7 @@ imt3dview::IScene3d* COpenGLWidget::GetScene()
 
 void COpenGLWidget::ZoomIn()
 {
-	if (m_viewMode == VM_SHOW){
+	if (m_selectionMode == SelectionMode::SM_NONE){
 		m_camera.ZoomIn();
 	}
 }
@@ -90,7 +89,7 @@ void COpenGLWidget::ZoomIn()
 
 void COpenGLWidget::ZoomOut()
 {
-	if (m_viewMode == VM_SHOW){
+	if (m_selectionMode == SelectionMode::SM_NONE){
 		m_camera.ZoomOut();
 	}
 }
@@ -135,30 +134,37 @@ void COpenGLWidget::SetCameraView(COpenGLWidget::ViewDirection viewDirection, bo
 	m_cameraPositionAnimation.stop();
 
 	QQuaternion newRotation;
+
 	switch (viewDirection){
 	case VD_DEFAULT:
-		newRotation = QQuaternion::fromAxisAndAngle(0., 1., 0., -45.) * QQuaternion::fromAxisAndAngle(1., 0., -1., 45.);
+		newRotation = QQuaternion::fromAxisAndAngle(0.0, 1.0, 0.0, -45.0) * QQuaternion::fromAxisAndAngle(1.0, 0.0, -1.0, 45.0);
 		break;
+
 	case VD_RIGHT:
-		newRotation = QQuaternion::fromAxisAndAngle(0., 1., 0., -90.);
+		newRotation = QQuaternion::fromAxisAndAngle(0.0, 1.0, 0.0, -90.0);
 		break;
+
 	case VD_FRONT:
-		newRotation = QQuaternion::fromAxisAndAngle(0., 1., 0., 0.);
+		newRotation = QQuaternion::fromAxisAndAngle(0.0, 1.0, 0.0, 0.0);
 		break;
+
 	case VD_TOP:
-		newRotation = QQuaternion::fromAxisAndAngle(1., 0., 0., 90.);
+		newRotation = QQuaternion::fromAxisAndAngle(1.0, 0.0, 0.0, 90.0);
 		break;
+
 	case VD_LEFT:
-		newRotation = QQuaternion::fromAxisAndAngle(0., 1., 0., 90.);
+		newRotation = QQuaternion::fromAxisAndAngle(0.0, 1.0, 0.0, 90.0);
 		break;
+
 	case VD_BOTTOM:
-		newRotation = QQuaternion::fromAxisAndAngle(1., 0., 0., -90.);
+		newRotation = QQuaternion::fromAxisAndAngle(1.0, 0.0, 0.0, -90.0);
 		break;
+
 	case VD_BACK:
-		newRotation = QQuaternion::fromAxisAndAngle(0., 1., 0., 180.);
+		newRotation = QQuaternion::fromAxisAndAngle(0.0, 1.0, 0.0, 180.0);
 		break;
+
 	default:
-		Q_ASSERT(false);
 		return;
 	}
 
@@ -185,15 +191,31 @@ void COpenGLWidget::SetCameraView(COpenGLWidget::ViewDirection viewDirection, bo
 }
 
 
-void COpenGLWidget::SetBoxSelection(bool on)
+void COpenGLWidget::SetSelectionMode(SelectionMode selectionMode)
 {
-	SetSelection(SM_BOX, on);
+	m_selectionMode = selectionMode;
+
+	switch (selectionMode){
+		case SelectionMode::SM_BOX:
+		case SelectionMode::SM_CIRCLE:
+			setCursor(Qt::CrossCursor);
+			break;
+
+		case SelectionMode::SM_POINT:
+			setCursor(Qt::PointingHandCursor);
+			break;
+
+		case SelectionMode::SM_NONE:
+			m_selectionRect.setRect(0.0, 0.0, 0.0, 0.0);
+			unsetCursor();
+			break;
+	}
 }
 
 
-void COpenGLWidget::SetCircleSelection(bool on)
+void COpenGLWidget::SetRotationMode(RotationMode rotationMode)
 {
-	SetSelection(SM_CIRCLE, on);
+	m_rotationMode = rotationMode;
 }
 
 
@@ -201,6 +223,14 @@ void COpenGLWidget::ClearSelection()
 {
 	if (m_eventHandler){
 		m_eventHandler->OnClearSelection();
+	}
+}
+
+
+void COpenGLWidget::AllSelection()
+{
+	if (m_eventHandler){
+		m_eventHandler->OnAllSelection();
 	}
 }
 
@@ -217,6 +247,14 @@ void COpenGLWidget::DeleteSelection()
 {
 	if (m_eventHandler){
 		m_eventHandler->OnDeleteSelection();
+	}
+}
+
+
+void COpenGLWidget::BoxFromSelection()
+{
+	if (m_eventHandler){
+		m_eventHandler->OnBoxFromSelection();
 	}
 }
 
@@ -282,6 +320,12 @@ void COpenGLWidget::mousePressEvent(QMouseEvent* e)
 	m_cameraPositionAnimation.stop();
 
 	m_mouseClickPosition = m_prevMousePosition = e->pos();
+
+	if (m_selectionMode == SelectionMode::SM_POINT && m_eventHandler){
+		bool clearPreviousSelection = !e->modifiers().testFlag(Qt::ControlModifier);
+
+		m_eventHandler->OnPointSelection(m_mouseClickPosition, clearPreviousSelection);
+	}
 }
 
 
@@ -293,10 +337,10 @@ void COpenGLWidget::mouseReleaseEvent(QMouseEvent* /*e*/)
 
 void COpenGLWidget::mouseMoveEvent(QMouseEvent* e)
 {
-	if (m_viewMode == VM_SHOW){
-		MouseMoveEventShow(*e);
+	if (m_selectionMode == SelectionMode::SM_NONE){
+		MouseMoveEventNoSelection(*e);
 	}
-	else if (m_viewMode == VM_SELECTION){
+	else{
 		MouseMoveEventSelection(*e);
 	}
 
@@ -349,10 +393,6 @@ void COpenGLWidget::OnInternalTimer()
 void COpenGLWidget::OnCameraRotationAnimation(const QVariant& value)
 {
 	m_camera.RotateTo(value.value<QQuaternion>());
-	float x = 0.;
-	float y = 0.;
-	float z = 0.;
-	value.value<QQuaternion>().getEulerAngles(&x, &y, &z);
 }
 
 
@@ -389,23 +429,21 @@ void COpenGLWidget::Paint(QPainter& painter)
 
 	m_scene.Draw(painter);
 
-	if (m_viewMode == VM_SELECTION){
-		PaintSelection(painter);
-	}
+	PaintSelection(painter);
 }
 
 
 void COpenGLWidget::PaintSelection(QPainter& painter)
 {
 	switch (m_selectionMode){
-	case SM_BOX:
+	case SelectionMode::SM_BOX:
 		if (m_selectionRect.isValid()){
 			painter.setPen(Qt::DashLine);
 			painter.drawRect(m_selectionRect);
 		}
 		break;
 
-	case SM_CIRCLE:
+	case SelectionMode::SM_CIRCLE:
 		if (m_selectionRect.isValid()){
 			painter.setPen(Qt::DashLine);
 			painter.drawEllipse(m_selectionRect);
@@ -415,10 +453,26 @@ void COpenGLWidget::PaintSelection(QPainter& painter)
 }
 
 
-void COpenGLWidget::MouseMoveEventShow(QMouseEvent& e)
+void COpenGLWidget::MouseMoveEventNoSelection(QMouseEvent& e)
 {
 	if (e.buttons() == Qt::LeftButton){
-		m_camera.RotateTo(m_prevMousePosition, e.pos());
+		switch (m_rotationMode){
+			case RotationMode::RM_FREE:
+				m_camera.RotateTo(m_prevMousePosition, e.pos());
+				break;
+
+			case RotationMode::RM_AROUND_X:
+				m_camera.RotateTo(m_prevMousePosition, e.pos(), QVector3D(1.0, 0.0, 0.0));
+				break;
+
+			case RotationMode::RM_AROUND_Y:
+				m_camera.RotateTo(m_prevMousePosition, e.pos(), QVector3D(0.0, 1.0, 0.0));
+				break;
+
+			case RotationMode::RM_AROUND_Z:
+				m_camera.RotateTo(m_prevMousePosition, e.pos(), QVector3D(0.0, 0.0, 1.0));
+				break;
+		}
 	}
 	else if (e.buttons() == Qt::RightButton){
 		m_camera.MoveTo(m_prevMousePosition, e.pos());
@@ -435,8 +489,8 @@ void COpenGLWidget::MouseMoveEventSelection(QMouseEvent& e)
 	bool clearPreviousSelection = !e.modifiers().testFlag(Qt::ControlModifier);
 
 	switch (m_selectionMode){
-	case SM_BOX:
-	case SM_CIRCLE:
+	case SelectionMode::SM_BOX:
+	case SelectionMode::SM_CIRCLE:
 		if (e.pos().x() > m_mouseClickPosition.x() && e.pos().y() < m_mouseClickPosition.y()){
 			m_selectionRect.setCoords(m_mouseClickPosition.x(), e.pos().y(), e.pos().x(), m_mouseClickPosition.y());
 		}
@@ -451,32 +505,15 @@ void COpenGLWidget::MouseMoveEventSelection(QMouseEvent& e)
 		}
 
 		if (m_eventHandler){
-			if (m_selectionMode == SM_BOX){
+			if (m_selectionMode == SelectionMode::SM_BOX){
 				m_eventHandler->OnBoxSelection(m_selectionRect, clearPreviousSelection);
 			}
-			else if (m_selectionMode == SM_CIRCLE){
+			else if (m_selectionMode == SelectionMode::SM_CIRCLE){
 				m_eventHandler->OnCircleSelection(m_selectionRect, clearPreviousSelection);
 			}
 		}
 
 		break;
-	}
-}
-
-
-void COpenGLWidget::SetSelection(SelectionMode selectionMode, bool on)
-{
-	if (on){
-		m_viewMode = VM_SELECTION;
-		m_selectionMode = selectionMode;
-
-		setCursor(Qt::CrossCursor);
-	}
-	else{
-		m_viewMode = VM_SHOW;
-		m_selectionRect.setRect(0.0, 0.0, 0.0, 0.0);
-
-		unsetCursor();
 	}
 }
 

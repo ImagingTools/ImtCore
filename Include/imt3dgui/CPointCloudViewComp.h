@@ -24,7 +24,6 @@ namespace imt3dgui
 class CPointCloudViewComp:
 			public iqtgui::TGuiObserverWrap<CView3dProviderComp, CPointCloudShape>,
 			public imt3dview::ITargetPointer
-
 {
 	Q_OBJECT
 
@@ -46,11 +45,14 @@ protected:
 	// reimplemented (imt3dgui::ISceneEventHandler)
 	void OnShowGrid(bool show) override;
 	void OnShowAxis(bool show) override;
+	void OnPointSelection(const QPoint& point, bool clearPreviousSelection) override;
 	void OnBoxSelection(const QRect& rect, bool clearPreviousSelection) override;
 	void OnCircleSelection(const QRect& rect, bool clearPreviousSelection) override;
 	void OnClearSelection() override;
+	void OnAllSelection() override;
 	void OnInvertSelection() override;
 	void OnDeleteSelection() override;
+	void OnBoxFromSelection() override;
 
 	// reimplemented (iqtgui::TRestorableGuiWrap)
 	void OnRestoreSettings(const QSettings& settings) override;

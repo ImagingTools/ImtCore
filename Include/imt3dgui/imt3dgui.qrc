@@ -18,6 +18,8 @@
         <file alias="ViewLeft">Resources/Icons/ViewLeft.svg</file>
         <file alias="Grid">Resources/Icons/Grid.svg</file>
         <file alias="Axis">Resources/Icons/Axis.svg</file>
+        <file alias="BoxSelection">Resources/Icons/BoxSelection.svg</file>
+        <!--<file alias="Box3dSelection">Resources/Icons/Box3dSelection.svg</file>-->
         <file alias="CircleSelection">Resources/Icons/CircleSelection.svg</file>
         <file alias="ClearSelection">Resources/Icons/ClearSelection.svg</file>
         <file alias="InvertSelection">Resources/Icons/InvertSelection.svg</file>

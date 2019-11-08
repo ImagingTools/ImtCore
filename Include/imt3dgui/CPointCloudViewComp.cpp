@@ -78,6 +78,18 @@ void CPointCloudViewComp::OnShowAxis(bool show)
 }
 
 
+void CPointCloudViewComp::OnPointSelection(const QPoint& point, bool clearPreviousSelection)
+{
+	CPointCloudShape* cloudShapePtr = dynamic_cast<CPointCloudShape*>(this);
+	Q_ASSERT(cloudShapePtr != NULL);
+
+	COpenGLWidget* widgetPtr = GetQtWidget();
+	Q_ASSERT(widgetPtr != NULL);
+
+	cloudShapePtr->SetPointSelection(point, clearPreviousSelection, widgetPtr->rect());
+}
+
+
 void CPointCloudViewComp::OnBoxSelection(const QRect& rect, bool clearPreviousSelection)
 {
 	CPointCloudShape* cloudShapePtr = dynamic_cast<CPointCloudShape*>(this);
@@ -111,6 +123,15 @@ void CPointCloudViewComp::OnClearSelection()
 }
 
 
+void CPointCloudViewComp::OnAllSelection()
+{
+	CPointCloudShape* cloudShapePtr = dynamic_cast<CPointCloudShape*>(this);
+	Q_ASSERT(cloudShapePtr != NULL);
+
+	cloudShapePtr->AllSelection();
+}
+
+
 void CPointCloudViewComp::OnInvertSelection()
 {
 	CPointCloudShape* cloudShapePtr = dynamic_cast<CPointCloudShape*>(this);
@@ -126,6 +147,18 @@ void CPointCloudViewComp::OnDeleteSelection()
 	Q_ASSERT(cloudShapePtr != NULL);
 
 	cloudShapePtr->DeleteSelection();
+}
+
+
+void CPointCloudViewComp::OnBoxFromSelection()
+{
+	CPointCloudShape* cloudShapePtr = dynamic_cast<CPointCloudShape*>(this);
+	Q_ASSERT(cloudShapePtr != NULL);
+
+	COpenGLWidget* widgetPtr = GetQtWidget();
+	Q_ASSERT(widgetPtr != NULL);
+
+	cloudShapePtr->BoxFromSelection();
 }
 
 

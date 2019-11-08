@@ -37,16 +37,20 @@ public:
 		VD_BACK
 	};
 
-	enum ViewMode
-	{
-		VM_SHOW,
-		VM_SELECTION
-	};
-
 	enum SelectionMode
 	{
+		SM_NONE,
+		SM_POINT,
 		SM_BOX,
 		SM_CIRCLE
+	};
+
+	enum RotationMode
+	{
+		RM_FREE,
+		RM_AROUND_X,
+		RM_AROUND_Y,
+		RM_AROUND_Z
 	};
 
 	enum RenderHint
@@ -71,11 +75,13 @@ public:
 	bool GetRenderHint(RenderHint renderHint) const;
 	void SetRenderHint(RenderHint renderHint, bool on = true);
 	void SetCameraView(ViewDirection viewDirection, bool animated = true);
-	void SetBoxSelection(bool on);
-	void SetCircleSelection(bool on);
+	void SetSelectionMode(SelectionMode selectionMode);
+	void SetRotationMode(RotationMode rotationMode);
 	void ClearSelection();
+	void AllSelection();
 	void InvertSelection();
 	void DeleteSelection();
+	void BoxFromSelection();
 
 protected:
 	// reimplemented (QOpenGLWidget)
@@ -101,9 +107,8 @@ private:
 	void PaintGl();
 	void Paint(QPainter& painter);
 	void PaintSelection(QPainter& painter);
-	void MouseMoveEventShow(QMouseEvent& e);
+	void MouseMoveEventNoSelection(QMouseEvent& e);
 	void MouseMoveEventSelection(QMouseEvent& e);
-	void SetSelection(SelectionMode selectionMode, bool on);
 	void SetGlFlags();
 	void SetGlUniformValues();
 	QMatrix4x4 GetProjectionMatrix() const;
@@ -119,8 +124,8 @@ private:
 	QVariantAnimation m_cameraRotationAnimation;
 	QVariantAnimation m_cameraPositionAnimation;
 	int m_renderHints;
-	ViewMode m_viewMode;
 	SelectionMode m_selectionMode;
+	RotationMode m_rotationMode;
 	QOpenGLShaderProgram* m_programPtr;
 
 	static const float s_verticalAngle;

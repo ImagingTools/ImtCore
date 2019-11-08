@@ -38,7 +38,9 @@ public:
 		CG_CAMERA_MODE,
 		CG_SHOW_SCENE_ITEMS,
 		CG_SCENE_FLAGS,
-		CG_SELECTION
+		CG_SELECTION,
+		CG_SELECTION_ACTIONS,
+		CG_ROTATION
 	};
 
 	I_BEGIN_COMPONENT(CView3dProviderComp);
@@ -57,15 +59,23 @@ public:
 
 	CView3dProviderComp();
 
-	// reimplemented (imt3dgui::ISceneEventHandler
+	// reimplemented (imt3dgui::ISceneEventHandler)
 	void OnCameraPoseChanged(const QQuaternion& rotation, const QVector3D& position) override;
 	void OnShowGrid(bool show) override;
 	void OnShowAxis(bool show) override;
+	void OnNoSelection() override;
+	void OnPointSelection(const QPoint& point, bool clearPreviousSelection) override;
 	void OnBoxSelection(const QRect& rect, bool clearPreviousSelection) override;
 	void OnCircleSelection(const QRect& rect, bool clearPreviousSelection) override;
 	void OnClearSelection() override;
+	void OnAllSelection() override;
 	void OnInvertSelection() override;
 	void OnDeleteSelection() override;
+	void OnBoxFromSelection() override;
+	void OnFreeRotation() override;
+	void OnRotationAroundX() override;
+	void OnRotationAroundY() override;
+	void OnRotationAroundZ() override;
 
 	// reimplemented (imt3dview::IScene3dProvider)
 	imt3dview::IScene3d* GetScene() const override;
@@ -80,6 +90,7 @@ protected:
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
+	virtual void OnGuiRetranslate() override;
 
 protected:
 	iqtgui::CHierarchicalCommand& GetShowGridCommand();
@@ -99,11 +110,19 @@ protected Q_SLOTS:
 	void OnViewFromBack();
 	void OnUseAntialiasingCommand(bool checked);
 	void OnUseCullFaceCommand(bool checked);
+	void OnNoSelectionCommand(bool checked);
+	void OnPointSelectionCommand(bool checked);
 	void OnBoxSelectionCommand(bool checked);
 	void OnCircleSelectionCommand(bool checked);
 	void OnClearSelectionCommand();
+	void OnAllSelectionCommand();
 	void OnInvertSelectionCommand();
 	void OnDeleteSelectionCommand();
+	void OnBoxFromSelectionCommand();
+	void OnFreeRotationCommand();
+	void OnRotationAroundXCommand();
+	void OnRotationAroundYCommand();
+	void OnRotationAroundZCommand();
 
 private:
 	// static template methods for subelement access
@@ -157,11 +176,21 @@ private:
 	iqtgui::CHierarchicalCommand m_useCullFaceCommand;
 
 	// selection
+	iqtgui::CHierarchicalCommand m_noSelectionCommand;
+	iqtgui::CHierarchicalCommand m_pointSelectionCommand;
 	iqtgui::CHierarchicalCommand m_boxSelectionCommand;
 	iqtgui::CHierarchicalCommand m_circleSelectionCommand;
 	iqtgui::CHierarchicalCommand m_clearSelectionCommand;
+	iqtgui::CHierarchicalCommand m_allSelectionCommand;
 	iqtgui::CHierarchicalCommand m_invertSelectionCommand;
 	iqtgui::CHierarchicalCommand m_deleteSelectionCommand;
+	iqtgui::CHierarchicalCommand m_boxFromSelectionCommand;
+
+	// rotation
+	iqtgui::CHierarchicalCommand m_freeRotationCommand;
+	iqtgui::CHierarchicalCommand m_rotationAroundXCommand;
+	iqtgui::CHierarchicalCommand m_rotationAroundYCommand;
+	iqtgui::CHierarchicalCommand m_rotationAroundZCommand;
 
 	I_ATTR(bool, m_showEditCommandsAttrPtr);
 	I_ATTR(bool, m_showShowGridCommandAttrPtr);
