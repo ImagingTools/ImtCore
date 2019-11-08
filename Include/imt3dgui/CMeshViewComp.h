@@ -2,10 +2,7 @@
 
 
 // ACF includes
-#include <icomp/CComponentBase.h>
-#include <iqtgui/TGuiComponentBase.h>
 #include <iqtgui/TGuiObserverWrap.h>
-#include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
 #include <imt3dgui/CGridShape.h>
@@ -38,6 +35,14 @@ protected:
 	// reimplemented (imt3dgui::ISceneEventHandler
 	void OnShowGrid(bool show) override;
 	void OnShowAxis(bool show) override;
+	void OnPointSelection(const QPoint& point, bool clearPreviousSelection) override;
+	void OnBoxSelection(const QRect& rect, bool clearPreviousSelection) override;
+	void OnCircleSelection(const QRect& rect, bool clearPreviousSelection) override;
+	void OnClearSelection() override;
+	void OnAllSelection() override;
+	void OnInvertSelection() override;
+	void OnDeleteSelection() override;
+	void OnBoxFromSelection() override;
 
 	// reimplemented (iqtgui::TRestorableGuiWrap)
 	void OnRestoreSettings(const QSettings& settings) override;

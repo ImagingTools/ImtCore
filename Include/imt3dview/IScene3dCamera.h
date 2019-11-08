@@ -20,7 +20,6 @@ namespace imt3dview
 class IScene3dCamera: virtual public istd::IPolymorphic
 {
 public:
-	virtual void SetPlanes(float nearPlane, float farPlane) = 0;
 	virtual void SetViewPortSize(const QSize& size) = 0;
 
 	virtual const QVector3D& GetPosition() const = 0;

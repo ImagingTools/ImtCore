@@ -8,7 +8,7 @@
 #include <imod/IModel.h>
 
 // ImtCore includes
-#include <imt3d/CPointCloud3d.h>
+#include <imt3d/IGridInfo.h>
 
 
 namespace imt3dgui
@@ -30,7 +30,7 @@ const int CPointCloudShape::s_selectionCubeEdgesSize = 24;
 
 CPointCloudShape::CPointCloudShape()
 	:m_color(QVector3D(0.0, 0.8, 0.2)),
-	m_pointSize(2.0),
+	m_pointSize(3.0),
 	m_pointCloudSize(0)
 {
 }
@@ -263,7 +263,7 @@ void CPointCloudShape::Draw(QPainter& painter)
 		return;
 	}
 
-	QString text = QString("<b><p>Vertices: %1</p>").arg(pointCloudPtr->GetPointsCount());
+	QString text = QString("<b><p>Total vertices: %1</p>").arg(pointCloudPtr->GetPointsCount());
 	text += QString("<p>Selected vertices: %1</p></b>").arg(static_cast<int>(m_selectedVerticesIndicies.size()));
 
 	if (!m_cubeSelectionSize.isNull()){
@@ -289,7 +289,7 @@ void CPointCloudShape::Draw(QPainter& painter)
 	painter.save();
 
 	painter.setBrush(QBrush(QColor(240, 240, 240)));
-	painter.drawRoundedRect(10, 10, 270, 90, 3.0, 3.0);
+	painter.drawRoundedRect(10, 10, 300, 90, 3.0, 3.0);
 	painter.translate(15.0, 15.0);
 
 	QTextDocument doc;
@@ -354,6 +354,11 @@ void CPointCloudShape::UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& poi
 	m_indices.clear();
 	m_indices.reserve(m_vertices.capacity());
 
+	if (m_pointCloudSize <= 0){
+		return;
+	}
+
+	// update vertices
 	for (int i = 0; i < m_pointCloudSize; ++i){
 		const PointType* pointDataPtr = static_cast<const PointType*>(pointCloud.GetPointData(i));
 		Q_ASSERT(pointDataPtr != nullptr);

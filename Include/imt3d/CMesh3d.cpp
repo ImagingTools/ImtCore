@@ -60,10 +60,9 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath, bool ensureNormalExists)
 
 		// vertex indices are not stored in STL, but vertices in STL are ordered
 		// so we can set indices by order
-		m_indices[i].resize(3);
-		m_indices[i][0] = i * 3 + 0;
-		m_indices[i][1] = i * 3 + 1;
-		m_indices[i][2] = i * 3 + 2;
+		m_indices[i].push_back(i * 3 + 0);
+		m_indices[i].push_back(i * 3 + 1);
+		m_indices[i].push_back(i * 3 + 2);
 
 		// read normal
 		if (!ReadPointData(file, &point1.data[4])){

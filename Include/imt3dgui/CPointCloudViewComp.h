@@ -31,7 +31,7 @@ public:
 		I_REGISTER_INTERFACE(imod::IObserver);
 		I_REGISTER_INTERFACE(imod::IModelEditor);
 		I_REGISTER_INTERFACE(imt3dview::ITargetPointer);
-		I_ASSIGN(m_pointSizeAttrPtr, "PointSize", "Size of the point used for rendering of the 3D-points in the cloud view", true, 2.0);
+		I_ASSIGN(m_pointSizeAttrPtr, "PointSize", "Size of the point used for rendering of the 3D-points in the cloud view", true, 3.0);
 	I_END_COMPONENT
 
 protected:

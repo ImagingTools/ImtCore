@@ -35,7 +35,6 @@ COpenGLWidget::COpenGLWidget(QWidget *parent)
 {
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-	m_camera.SetPlanes(s_nearPlane, s_farPlane);
 	m_camera.MoveTo(s_defaultCameraPosition);
 
 	connect(&m_cameraRotationAnimation, SIGNAL(valueChanged(const QVariant&)), this, SLOT(OnCameraRotationAnimation(const QVariant&)));

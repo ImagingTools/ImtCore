@@ -16,10 +16,7 @@ namespace imt3dview
 class CTrackballCamera: public imt3dview::IScene3dCamera
 {
 public:
-	CTrackballCamera();
-
 	// reimplement (imt3dview::IScene3dCamera)
-	void SetPlanes(float nearPlane, float farPlane);
 	void SetViewPortSize(const QSize& size) override;
 
 	const QVector3D& GetPosition() const override;
@@ -38,8 +35,6 @@ private:
 	QVector3D GetTrackballVector(const QPoint& point2d) const;
 
 private:
-	float m_nearPlane;
-	float m_farPlane;
 	QVector3D m_position;
 	QQuaternion m_rotation;
 	QSize m_viewPortSize;

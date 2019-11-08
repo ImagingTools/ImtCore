@@ -67,6 +67,90 @@ void CMeshViewComp::OnShowAxis(bool show)
 }
 
 
+void CMeshViewComp::OnPointSelection(const QPoint& point, bool clearPreviousSelection)
+{
+	CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
+	Q_ASSERT(meshShapePtr != NULL);
+
+	COpenGLWidget* widgetPtr = GetQtWidget();
+	Q_ASSERT(widgetPtr != NULL);
+
+	meshShapePtr->SetPointSelection(point, clearPreviousSelection, widgetPtr->rect());
+}
+
+
+void CMeshViewComp::OnBoxSelection(const QRect& rect, bool clearPreviousSelection)
+{
+	CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
+	Q_ASSERT(meshShapePtr != NULL);
+
+	COpenGLWidget* widgetPtr = GetQtWidget();
+	Q_ASSERT(widgetPtr != NULL);
+
+	meshShapePtr->SetBoxSelection(rect, clearPreviousSelection, widgetPtr->rect());
+}
+
+
+void CMeshViewComp::OnCircleSelection(const QRect& rect, bool clearPreviousSelection)
+{
+	CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
+	Q_ASSERT(meshShapePtr != NULL);
+
+	COpenGLWidget* widgetPtr = GetQtWidget();
+	Q_ASSERT(widgetPtr != NULL);
+
+	meshShapePtr->SetCircleSelection(rect, clearPreviousSelection, widgetPtr->rect());
+}
+
+
+void CMeshViewComp::OnClearSelection()
+{
+	CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
+	Q_ASSERT(meshShapePtr != NULL);
+
+	meshShapePtr->ClearSelection();
+}
+
+
+void CMeshViewComp::OnAllSelection()
+{
+	CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
+	Q_ASSERT(meshShapePtr != NULL);
+
+	meshShapePtr->AllSelection();
+}
+
+
+void CMeshViewComp::OnInvertSelection()
+{
+	CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
+	Q_ASSERT(meshShapePtr != NULL);
+
+	meshShapePtr->InvertSelection();
+}
+
+
+void CMeshViewComp::OnDeleteSelection()
+{
+	CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
+	Q_ASSERT(meshShapePtr != NULL);
+
+	meshShapePtr->DeleteSelection();
+}
+
+
+void CMeshViewComp::OnBoxFromSelection()
+{
+	CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
+	Q_ASSERT(meshShapePtr != NULL);
+
+	COpenGLWidget* widgetPtr = GetQtWidget();
+	Q_ASSERT(widgetPtr != NULL);
+
+	meshShapePtr->BoxFromSelection();
+}
+
+
 // reimplemented (iqtgui::TRestorableGuiWrap)
 
 void CMeshViewComp::OnRestoreSettings(const QSettings& settings)

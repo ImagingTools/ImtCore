@@ -14,21 +14,7 @@ const double CTrackballCamera::s_rotationSpeed = 1.0;
 
 // public methods
 
-CTrackballCamera::CTrackballCamera()
-	:m_nearPlane(0.0),
-	m_farPlane(0.0)
-{
-}
-
-
 // reimplement (imt3dview::IScene3dCamera)
-
-void CTrackballCamera::SetPlanes(float nearPlane, float farPlane)
-{
-	m_nearPlane = nearPlane;
-	m_farPlane = farPlane;
-}
-
 
 void CTrackballCamera::SetViewPortSize(const QSize& size)
 {
@@ -104,17 +90,13 @@ void CTrackballCamera::RotateTo(const QPoint& pointFrom, const QPoint& pointTo, 
 
 void CTrackballCamera::ZoomIn()
 {
-	if (m_position.z() - s_zoomSpeed > m_nearPlane){
-		m_position.setZ(m_position.z() - s_zoomSpeed);
-	}
+	m_position.setZ(m_position.z() - s_zoomSpeed);
 }
 
 
 void CTrackballCamera::ZoomOut()
 {
-	if (m_position.z() + s_zoomSpeed < m_farPlane){
-		m_position.setZ(m_position.z() + s_zoomSpeed);
-	}
+	m_position.setZ(m_position.z() + s_zoomSpeed);
 }
 
 

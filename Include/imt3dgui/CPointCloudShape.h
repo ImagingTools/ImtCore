@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtGui/QOpenGLBuffer>
-
 // STL includes
 #include <set>
 
