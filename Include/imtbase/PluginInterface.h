@@ -24,9 +24,18 @@
 #endif // !QT_NO_DEBUG
 
 
+#define IMT_CREATE_PLUGIN_FUNCTION(PluginType) CreatePluginInstanceFunction##PluginType
+#define IMT_DESTROY_PLUGIN_FUNCTION(PluginType) DestroyPluginInstanceFunction##PluginType
+
+#define IMT_CREATE_PLUGIN_FUNCTION_PTR(PluginType, PluginInterface)\
+PluginInterface* (*IMT_CREATE_PLUGIN_FUNCTION(PluginType))();
+
+#define IMT_DESTROY_PLUGIN_FUNCTION_PTR(PluginType, PluginInterface)\
+void (*IMT_DESTROY_PLUGIN_FUNCTION(PluginType))(PluginInterface*);\
+
 #define IMT_DECLARE_PLUGIN_INTERFACE(PluginType, PluginInterface)\
-typedef PluginInterface* (*CreatePluginInstanceFunction)();\
-typedef void (*DestroyPluginInstanceFunction)(PluginInterface*);\
+typedef IMT_CREATE_PLUGIN_FUNCTION_PTR(PluginType, PluginInterface);\
+typedef IMT_DESTROY_PLUGIN_FUNCTION_PTR(PluginType, PluginInterface);\
 extern "C" IMT_PLUGIN_FUNCTION_EXPORT PluginInterface* IMT_CREATE_PLUGIN_INSTANCE_FUNCTION(PluginType)();\
 extern "C" IMT_PLUGIN_FUNCTION_EXPORT void IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION(PluginType)(PluginInterface* pluginInstancePtr);\
 
