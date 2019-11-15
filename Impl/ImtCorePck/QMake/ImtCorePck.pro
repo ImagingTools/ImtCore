@@ -1,6 +1,5 @@
 TARGET = ImtCorePck
 
-
 include($(ACFDIR)/Config/QMake/ComponentConfig.pri)
 include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)

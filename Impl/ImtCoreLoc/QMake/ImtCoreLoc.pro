@@ -14,6 +14,5 @@ ARXC_CONFIG = $$PWD/../../../Config/ImtCore.awc
 ARXC_FILES += $$PWD/../*.acc
 ARXC_OUTDIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 
-
-
 include($(ACFDIR)/Config/QMake/CustomBuild.pri)
+

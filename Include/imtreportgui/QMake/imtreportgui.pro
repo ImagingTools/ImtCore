@@ -8,3 +8,4 @@ QT += printsupport
 
 FORMS += $$_PRO_FILE_PWD_/../*.ui
 #RESOURCES += $$_PRO_FILE_PWD_/../*.qrc
+

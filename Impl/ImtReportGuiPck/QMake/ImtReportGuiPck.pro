@@ -23,3 +23,4 @@ ACFDIRBUILD = $$(ACFDIR_BUILD)
 
 include($(ACFDIR)/Config/QMake/AcfQt.pri)
 include($(ACFDIR)/Config/QMake/AcfStd.pri)
+

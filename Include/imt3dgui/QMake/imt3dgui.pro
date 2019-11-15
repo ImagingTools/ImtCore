@@ -10,4 +10,3 @@ RESOURCES += $$_PRO_FILE_PWD_/../*.qrc
 
 INCLUDEPATH += ../../
 
-
