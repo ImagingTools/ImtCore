@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4814" Description="ACF"/>
-            <Version Id="1" Number="2113" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331008" Description="Qt Framework"/>
+            <Version Id="0" Number="4818" Description="ACF"/>
+            <Version Id="1" Number="2116" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Point cloud document template</Description>
@@ -83,33 +83,8 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>PointCloudView</Value>
-                                            <Value>DocumentProcessingManager</Value>
                                         </Values>
                                     </Data>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="DocumentProcessingManager" PackageId="ProcessingGuiPck" ComponentId="DocumentProcessingManager">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="DocumentManager" Type="Reference" ExportId="DocumentManager">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="DocumentTypeId" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="Mesh"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="InputDocumentRequired" Type="Boolean" ExportId="">
-                                    <Data IsEnabled="true" Value="true"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ProcessingCommandName" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Create mesh..."/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ProcessingMenuName" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Edit"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ShowInToolsBar" Type="Boolean" ExportId="">
-                                    <Data IsEnabled="true" Value="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>

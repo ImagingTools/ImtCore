@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4814" Description="ACF"/>
-            <Version Id="1" Number="2113" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331008" Description="Qt Framework"/>
+            <Version Id="0" Number="4818" Description="ACF"/>
+            <Version Id="1" Number="2116" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -17,8 +17,7 @@
         <EmbededRegistry Id="PointCloudView">
             <PositionMap>
                 <Element ComponentName="CommandsBinder" X="250" Y="150" Note=""/>
-                <Element ComponentName="DocumentProcessingManager" X="275" Y="300" Note=""/>
-                <Element ComponentName="PointCloudView" X="950" Y="125" Note=""/>
+                <Element ComponentName="PointCloudView" X="900" Y="150" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

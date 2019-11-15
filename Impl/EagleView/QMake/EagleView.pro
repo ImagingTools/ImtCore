@@ -4,8 +4,6 @@ include($(ACFDIR)/Config/QMake/ApplicationConfig.pri)
 include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 include($(IMTCOREDIR)/Config/QMake/ImtCore.pri)
-include($(ACULADIR)/Config/QMake/Acula.pri)
-include($(IMTROOTDIR)/Config/QMake/PCL.pri)
 
 INCLUDEPATH += $(IMTCOREDIR)/Include
 INCLUDEPATH += $(IMTCOREDIR)/Impl
@@ -13,7 +11,7 @@ INCLUDEPATH +=  $$AUXINCLUDEDIR
 
 RESOURCES += $$_PRO_FILE_PWD_/../*.qrc
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liproc -liqtmeas -lAcfSlnLoc -lAcfLoc -laculapcl
+LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liproc -liqtmeas -lAcfSlnLoc -lAcfLoc
 LIBS += -L../../../Lib/$$COMPILER_DIR -limt3dview -limt3dgui
 
 HEADERS =
@@ -52,8 +50,8 @@ win*{
 	ACF_CONVERT_REGISTRY =  $$PWD/../VC/FileSubstitCopyApp.acc
 	ACF_CONVERT_CONFIG = $$PWD/../../../Config/BaseOnly.awc
 
-        #RC_FILE = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/EagleView.rc
-        #RC_INCLUDEPATH = $$_PRO_FILE_PWD_
+	#RC_FILE = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/EagleView.rc
+	#RC_INCLUDEPATH = $$_PRO_FILE_PWD_
 }
 
 include($(ACFDIR)/Config/QMake/AcfQt.pri)
