@@ -56,8 +56,8 @@ void CPointCloudShape::SetPointSelection(const QPoint& selectionPoint, bool clea
 
 	// project window 2D coordinate to near and far planes getting 3D world coordinates
 	// create a ray between those points
-	QVector3D rayFrom = WindowToModel(selectionPoint, 0, viewPort);
-	QVector3D rayTo = WindowToModel(selectionPoint, 1, viewPort);
+	QVector3D rayFrom = WindowToModel(selectionPoint, 0.0, viewPort);
+	QVector3D rayTo = WindowToModel(selectionPoint, 1.0, viewPort);
 
 	QVector3D rayDirection = rayTo - rayFrom;
 	rayDirection.normalize();
@@ -259,7 +259,7 @@ void CPointCloudShape::DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctio
 void CPointCloudShape::Draw(QPainter& painter)
 {
 	imt3d::IPointCloud3d* pointCloudPtr = dynamic_cast<imt3d::IPointCloud3d*>(GetObservedModel());
-	if (!pointCloudPtr || !m_cameraPtr){
+	if (!pointCloudPtr){
 		return;
 	}
 

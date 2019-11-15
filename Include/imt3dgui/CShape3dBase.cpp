@@ -234,7 +234,7 @@ QPoint CShape3dBase::ModelToWindow(const QVector3D& modelCoordinate, const QRect
 }
 
 
-QVector3D CShape3dBase::WindowToModel(const QPoint& windowCoordinate, int z, const QRect& viewPort) const
+QVector3D CShape3dBase::WindowToModel(const QPoint& windowCoordinate, float z, const QRect& viewPort) const
 {
 	if (!m_cameraPtr){
 		return QVector3D();

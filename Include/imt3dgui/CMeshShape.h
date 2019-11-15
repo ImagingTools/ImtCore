@@ -54,8 +54,16 @@ private:
 	template <typename PointType> void UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh);
 	template <typename PointType> void DeleteSelectionHelper(imt3d::IMesh3d& mesh);
 	static bool IsPointWithin(const QPoint& point, const QRect& rect, bool isCircle);
+	static bool IsRayFaceIntersection(
+				const QVector3D& rayOrigin,
+				const QVector3D& rayDirection,
+				const QVector3D& trianglePoint1,
+				const QVector3D& trianglePoint2,
+				const QVector3D& trianglePoint3,
+				float& distanceToTriangle);
 	bool CalculateSelectionBox(istd::TRange<float>& xRange, istd::TRange<float>& yRange, istd::TRange<float>& zRange);
 	void SetSelectionCubeFaces(const istd::TRange<float>& xRange, const istd::TRange<float>& yRange, const istd::TRange<float>& zRange);
+	void SetSelectionCubeFaceNormals();
 	void SetSelectionCubeEdges(const istd::TRange<float>& xRange, const istd::TRange<float>& yRange, const istd::TRange<float>& zRange);
 	void SetSelectionCubeEdgeColors();
 	void SelectFaceVertices();

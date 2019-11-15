@@ -32,52 +32,64 @@ CMeshShape::CMeshShape()
 }
 
 
+void CMeshShape::SetColor(const QVector3D& color)
+{
+	m_color = color;
+}
+
+
 void CMeshShape::SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection, const QRect& viewPort)
 {
 	if (selectionPoint.isNull() || m_meshSize <= 0){
 		return;
 	}
 
-	// project window 2D coordinate to near and far planes getting 3D world coordinates
-	// create a ray between those points
-	QVector3D rayFrom = WindowToModel(selectionPoint, 0, viewPort);
-	QVector3D rayTo = WindowToModel(selectionPoint, 1, viewPort);
+	// determine mesh face under the click point.
+	// among those faces choose the closest one (to the camera).
+	// for that, we calculate the distance between the projection of the click point on the near plane and each face
+	QVector3D rayOrigin = WindowToModel(selectionPoint, 0.0, viewPort);
+	QVector3D rayDestination = WindowToModel(selectionPoint, 1.0, viewPort);
+	QVector3D rayDirection = (rayDestination - rayOrigin).normalized();
 
-	QVector3D rayDirection = rayTo - rayFrom;
-	rayDirection.normalize();
+	int selectedFacePointIndex = -1;
+	float minDistance = qInf();
 
-	// find a vertex closest to the ray
-	float minDist = qInf();
-	VertexIndicies closestVertexIndicies;
+	for (int i = 0; i < m_meshSize; i += 3){
+		const QVector3D& position1 = m_vertices[i + 0].position;
+		const QVector3D& position2 = m_vertices[i + 1].position;
+		const QVector3D& position3 = m_vertices[i + 2].position;
 
-	for (int i = 0; i < m_meshSize; ++i){
-		float dist = m_vertices[i].position.distanceToLine(rayFrom, rayDirection);
+		float distance = -1.0;
+		if (IsRayFaceIntersection(rayOrigin, rayDirection, position1, position2, position3, distance)){
+			if (distance < minDistance){
+				minDistance = distance;
 
-		if (dist < minDist){
-			minDist = dist;
-
-			closestVertexIndicies.clear();
-			closestVertexIndicies.insert(i);
-		}
-		else if (qFuzzyCompare(dist, minDist)){
-			closestVertexIndicies.insert(i);
+				selectedFacePointIndex = i;
+			}
 		}
 	}
 
-	// update selected vertices and vertex colors
-	for (int i = 0; i < m_meshSize; ++i){
-		if (closestVertexIndicies.find(i) != closestVertexIndicies.cend()){
-			m_selectedVerticesIndicies.insert(i);
-			m_vertices[i].color = s_selectionColor;
+	// select/deselect vertices
+	for (int i = 0; i < m_meshSize; i += 3){
+		if (i == selectedFacePointIndex){
+			m_selectedVerticesIndicies.insert(i + 0);
+			m_selectedVerticesIndicies.insert(i + 1);
+			m_selectedVerticesIndicies.insert(i + 2);
+
+			m_vertices[i + 0].color = s_selectionColor;
+			m_vertices[i + 1].color = s_selectionColor;
+			m_vertices[i + 2].color = s_selectionColor;
 		}
 		else if (clearPreviousSelection){
-			m_selectedVerticesIndicies.erase(i);
-			m_vertices[i].color = m_color;
+			m_selectedVerticesIndicies.erase(i + 0);
+			m_selectedVerticesIndicies.erase(i + 1);
+			m_selectedVerticesIndicies.erase(i + 2);
+
+			m_vertices[i + 0].color = m_color;
+			m_vertices[i + 1].color = m_color;
+			m_vertices[i + 2].color = m_color;
 		}
 	}
-
-	// select not just selected vertex but entire face
-	SelectFaceVertices();
 
 	UploadGeometry(false, m_vertices, m_vertexBuffer);
 }
@@ -182,6 +194,7 @@ void CMeshShape::BoxFromSelection()
 	}
 
 	SetSelectionCubeFaces(xRange, yRange, zRange);
+	SetSelectionCubeFaceNormals();
 	SetSelectionCubeEdges(xRange, yRange, zRange);
 	SetSelectionCubeEdgeColors();
 
@@ -248,7 +261,7 @@ void CMeshShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions
 void CMeshShape::Draw(QPainter& painter)
 {
 	imt3d::IMesh3d* meshPtr = dynamic_cast<imt3d::IMesh3d*>(GetObservedModel());
-	if (!meshPtr || !m_cameraPtr){
+	if (!meshPtr){
 		return;
 	}
 
@@ -360,14 +373,15 @@ void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh)
 		const PointType* pointDataPtr = static_cast<const PointType*>(mesh.GetPointData(i));
 		Q_ASSERT(pointDataPtr != nullptr);
 
-		float pointX = static_cast<float>(pointDataPtr->data[0]);
-		float pointY = static_cast<float>(pointDataPtr->data[1]);
-		float pointZ = static_cast<float>(pointDataPtr->data[2]);
+		float positionX = static_cast<float>(pointDataPtr->data[0]);
+		float positionY = static_cast<float>(pointDataPtr->data[1]);
+		float positionZ = static_cast<float>(pointDataPtr->data[2]);
+
 		float normalX = static_cast<float>(pointDataPtr->data[4]);
 		float normalY = static_cast<float>(pointDataPtr->data[5]);
 		float normalZ = static_cast<float>(pointDataPtr->data[6]);
 
-		m_vertices.push_back(Vertex(QVector3D(pointX, pointY, pointZ),
+		m_vertices.push_back(Vertex(QVector3D(positionX, positionY, positionZ),
 				QVector3D(normalX, normalY, normalZ),
 				m_color));
 	}
@@ -458,6 +472,52 @@ bool CMeshShape::IsPointWithin(const QPoint& point, const QRect& rect, bool isCi
 }
 
 
+bool CMeshShape::IsRayFaceIntersection(
+				const QVector3D& rayOrigin,
+				const QVector3D& rayDirection,
+				const QVector3D& trianglePoint1,
+				const QVector3D& trianglePoint2,
+				const QVector3D& trianglePoint3,
+				float& distanceToTriangle)
+{
+	// Möller–Trumbore ray-triangle intersection algorithm implementation
+	distanceToTriangle = -1.0;
+
+	const float EPSILON = 0.0000001;
+
+	QVector3D edge1 = trianglePoint2 - trianglePoint1;
+	QVector3D edge2 = trianglePoint3 - trianglePoint1;
+	QVector3D h = QVector3D::crossProduct(rayDirection, edge2);
+
+	// check if ray is parallel to the triangle
+	float a = QVector3D::dotProduct(edge1, h);
+	if (a > -EPSILON && a < EPSILON)
+		return false;
+
+	float f = 1.0 / a;
+
+	QVector3D s = rayOrigin - trianglePoint1;
+
+	float u = f * QVector3D::dotProduct(s, h);
+	if (u < 0.0 || u > 1.0)
+		return false;
+
+	QVector3D q = QVector3D::crossProduct(s, edge1);
+
+	float v = f * QVector3D::dotProduct(rayDirection, q);
+	if (v < 0.0 || u + v > 1.0)
+		return false;
+
+	distanceToTriangle = f * QVector3D::dotProduct(edge2, q);
+	if (distanceToTriangle > EPSILON && distanceToTriangle < 1 / EPSILON){
+		return true; // there is ray intersection
+	}
+	else{
+		return false; // line intersection but not a ray intersection
+	}
+}
+
+
 bool CMeshShape::CalculateSelectionBox(
 				istd::TRange<float>& xRange,
 				istd::TRange<float>& yRange,
@@ -523,6 +583,21 @@ void CMeshShape::SetSelectionCubeFaces(
 }
 
 
+void CMeshShape::SetSelectionCubeFaceNormals()
+{
+	for (int i = 0; i < s_selectionCubeFacesSize; i += 4){
+		Vertex& v1 = m_vertices[i + m_meshSize + 0];
+		Vertex& v2 = m_vertices[i + m_meshSize + 1];
+		Vertex& v3 = m_vertices[i + m_meshSize + 2];
+		Vertex& v4 = m_vertices[i + m_meshSize + 3];
+
+		QVector3D normal = QVector3D::normal(v1.position, v2.position, v3.position);
+
+		v1.normal = v2.normal = v3.normal = v4.normal = normal;
+	}
+}
+
+
 void CMeshShape::SetSelectionCubeEdges(
 				const istd::TRange<float>& xRange,
 				const istd::TRange<float>& yRange,
@@ -564,7 +639,7 @@ void CMeshShape::SetSelectionCubeEdgeColors()
 	for (int i = 0; i < s_selectionCubeEdgesSize; i += 2){
 		int idx = i + m_meshSize + s_selectionCubeFacesSize;
 
-		Vertex& v1 = m_vertices[idx];
+		Vertex& v1 = m_vertices[idx + 0];
 		Vertex& v2 = m_vertices[idx + 1];
 
 		if (v1.position.x() != v2.position.x()){

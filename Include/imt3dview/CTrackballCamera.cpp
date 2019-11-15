@@ -7,7 +7,7 @@ namespace imt3dview
 
 // static members
 
-const double CTrackballCamera::s_zoomSpeed = 0.1;
+const double CTrackballCamera::s_zoomSpeed = 0.05;
 const double CTrackballCamera::s_moveSpeed = 0.005;
 const double CTrackballCamera::s_rotationSpeed = 1.0;
 

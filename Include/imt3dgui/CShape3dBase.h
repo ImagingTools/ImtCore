@@ -70,7 +70,7 @@ protected:
 	void UpdateGeometry();
 	QMatrix4x4 GetModelMatrix() const;
 	QPoint ModelToWindow(const QVector3D& modelCoordinate, const QRect& viewPort) const;
-	QVector3D WindowToModel(const QPoint& windowCoordinate, int z, const QRect& viewPort) const;
+	QVector3D WindowToModel(const QPoint& windowCoordinate, float z, const QRect& viewPort) const;
 
 	template <typename TDataVector>
 	void UploadGeometry(bool reallocate, const TDataVector& dataVector, QOpenGLBuffer& dataBuffer)
