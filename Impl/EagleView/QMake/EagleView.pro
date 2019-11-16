@@ -2,7 +2,6 @@ TARGET = EagleView
 
 include($(ACFDIR)/Config/QMake/ApplicationConfig.pri)
 include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)
-include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 include($(IMTCOREDIR)/Config/QMake/ImtCore.pri)
 
 INCLUDEPATH += $(IMTCOREDIR)/Include
@@ -12,7 +11,7 @@ INCLUDEPATH +=  $$AUXINCLUDEDIR
 RESOURCES += $$_PRO_FILE_PWD_/../*.qrc
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liproc -liqtmeas -lAcfSlnLoc -lAcfLoc
-LIBS += -L../../../Lib/$$COMPILER_DIR -limt3dview -limt3dgui
+LIBS += -L../../../Lib/$$COMPILER_DIR -limt3d -limt3dview -limt3dgui
 
 HEADERS =
 

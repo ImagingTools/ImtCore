@@ -7,7 +7,7 @@ include($(ACFDIR)/Config/QMake/AcfQt.pri)
 include($(ACFDIR)/Config/QMake/AcfStd.pri)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liinsp -liipr -liproc
-LIBS += -limt3dview
+LIBS += -limt3d -limt3dview
 
 # Get build output directory of shadow build:
 ACFSLNDIRBUILD = $$(ACFSLNDIR_BUILD)

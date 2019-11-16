@@ -9,8 +9,7 @@ INCLUDEPATH += $(IMTCOREDIR)/Include
 # ACF-Solutions libs
 LIBS += -L$(ACFSLNDIR)/Lib/$$COMPILER_DIR -limeas
 
-# imt3dview libs
-LIBS += -L../../../Lib/$$COMPILER_DIR -limt3dgui -limt3dview
+LIBS += -L../../../Lib/$$COMPILER_DIR -limt3d -limt3dgui -limt3dview
 
 # Get build output directory of shadow build:
 ACFSLNDIRBUILD = $$(ACFSLNDIR_BUILD)
@@ -28,3 +27,4 @@ ACFDIRBUILD = $$(ACFDIR_BUILD)
 
 include($(ACFDIR)/Config/QMake/AcfQt.pri)
 include($(ACFDIR)/Config/QMake/AcfStd.pri)
+
