@@ -153,6 +153,7 @@ private:
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_viewCommands;
 	iqtgui::CHierarchicalCommand m_editCommands;
+	iqtgui::CHierarchicalCommand m_rotationCommands;
 
 	// zoom commands
 	iqtgui::CHierarchicalCommand m_zoomInCommand;

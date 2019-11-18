@@ -18,6 +18,7 @@ CView3dProviderComp::CView3dProviderComp()
 	:m_rootCommands("", 100, ibase::ICommand::CF_GLOBAL_MENU),
 	m_viewCommands("View", 100, ibase::ICommand::CF_GLOBAL_MENU),
 	m_editCommands("Edit", 100, ibase::ICommand::CF_GLOBAL_MENU),
+	m_rotationCommands("Rotation", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
 	m_zoomInCommand("Zoom In", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_ZOOM),
 	m_zoomOutCommand("Zoom Out", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_ZOOM),
 	m_showGridCommand("Show grid", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, CG_SHOW_SCENE_ITEMS),
@@ -250,10 +251,11 @@ void CView3dProviderComp::OnGuiCreated()
 	}
 
 	if (*m_showViewCommandsAttrPtr){
-		m_viewCommands.InsertChild(&m_freeRotationCommand);
-		m_viewCommands.InsertChild(&m_rotationAroundXCommand);
-		m_viewCommands.InsertChild(&m_rotationAroundYCommand);
-		m_viewCommands.InsertChild(&m_rotationAroundZCommand);
+		m_viewCommands.InsertChild(&m_rotationCommands);
+		m_rotationCommands.InsertChild(&m_freeRotationCommand);
+		m_rotationCommands.InsertChild(&m_rotationAroundXCommand);
+		m_rotationCommands.InsertChild(&m_rotationAroundYCommand);
+		m_rotationCommands.InsertChild(&m_rotationAroundZCommand);
 		m_viewCommands.InsertChild(&m_resetViewCommand);
 		m_viewCommands.InsertChild(&m_setViewFromRightCommand);
 		m_viewCommands.InsertChild(&m_setViewFromFrontCommand);
