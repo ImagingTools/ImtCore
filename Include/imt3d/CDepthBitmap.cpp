@@ -141,6 +141,61 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 	
 		return BaseClass::CopyFrom(object, mode);
 	}
+	else{
+		const iimg::IBitmap* inputBitmapPtr = dynamic_cast<const IBitmap*>(&object);
+		if (inputBitmapPtr != NULL){
+			iimg::IBitmap::PixelFormat format = inputBitmapPtr->GetPixelFormat();
+			if (format == iimg::IBitmap::PF_FLOAT32){
+				istd::CIndex2d size = inputBitmapPtr->GetImageSize();
+				
+				float minValue = *(const float*)inputBitmapPtr->GetLinePtr(0);
+				float maxValue = minValue;
+
+				for (int y = 0; y < size.GetY(); ++y){
+					const float* inputLinePtr = (const float*)inputBitmapPtr->GetLinePtr(y);
+
+					for (int x = 0; x < size.GetX(); ++x){
+						float value = inputLinePtr[x];
+
+						if (!qIsNaN(double(value))){
+							if (value < minValue){
+								minValue = value;
+							}
+
+							if (value > maxValue){
+								maxValue = value;
+							}
+						}
+					}
+				}
+
+				if (maxValue < minValue){
+					Q_ASSERT_X(false, "CDepthBitmap::CopyFrom", "Invalid depth range");
+	
+					return false;
+				}
+
+				istd::CChangeNotifier changeNotifier(this);
+				
+				istd::CRange depthRange(minValue, maxValue);
+
+				int lineBytesCount = sourcePtr->GetLineBytesCount();
+
+				if (CreateDepthBitmap(depthRange, size)){
+					Q_ASSERT(lineBytesCount == GetLineBytesCount());
+
+					for (int y = 0; y < size.GetY(); ++y){
+						const float* inputLinePtr = (const float*)sourcePtr->GetLinePtr(y);
+						float* outputLinePtr = (float*)GetLinePtr(y);
+
+						memcpy(outputLinePtr, inputLinePtr, lineBytesCount);
+					}
+
+					return true;
+				}
+			}
+		}
+	}
 	
 	return false;
 }
@@ -189,7 +244,7 @@ bool CDepthBitmap::ConvertToQImage(QImage& result) const
 				outputLinePtr[x] = qRgb(255, 255, 255);
 			}
 			else{
-				if (m_depthRange.Contains(inputValue)) {
+				if (m_depthRange.Contains(inputValue)){
 					double alpha = m_depthRange.GetAlphaFromValue(inputValue);
 
 					int colorMapIndex = (1.0 - alpha) * 255;
