@@ -15,19 +15,12 @@ namespace imt3dgui
 // static members
 
 const QVector3D CMeshShape::s_selectionColor(0.5, 0.0, 0.5);
-const QVector3D CMeshShape::s_selectionCubeColor(0.5, 0.5, 0.5);
-const QVector3D CMeshShape::s_selectionCubeXColor(0.75, 0.0, 0.0);
-const QVector3D CMeshShape::s_selectionCubeYColor(0.0, 0.75, 0.0);
-const QVector3D CMeshShape::s_selectionCubeZColor(0.0, 0.0, 0.75);
-const int CMeshShape::s_selectionCubeFacesSize = 24;
-const int CMeshShape::s_selectionCubeEdgesSize = 24;
 
 
 // public methods
 
 CMeshShape::CMeshShape()
-	:m_color(QVector3D(0.0, 1.0, 1.0)),
-	m_meshSize(0)
+	:m_color(QVector3D(0.0, 1.0, 1.0))
 {
 }
 
@@ -40,37 +33,14 @@ void CMeshShape::SetColor(const QVector3D& color)
 
 void CMeshShape::SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection, const QRect& viewPort)
 {
-	if (selectionPoint.isNull() || m_meshSize <= 0){
-		return;
-	}
-
-	// determine mesh face under the click point.
-	// among those faces choose the closest one (to the camera).
-	// for that, we calculate the distance between the projection of the click point on the near plane and each face
-	QVector3D rayOrigin = WindowToModel(selectionPoint, 0.0, viewPort);
-	QVector3D rayDestination = WindowToModel(selectionPoint, 1.0, viewPort);
-	QVector3D rayDirection = (rayDestination - rayOrigin).normalized();
-
+	// get 2D point-face intersection if any
 	int selectedFacePointIndex = -1;
-	float minDistance = qInf();
+	QVector3D intersectionPoint;
 
-	for (int i = 0; i < m_meshSize; i += 3){
-		const QVector3D& position1 = m_vertices[i + 0].position;
-		const QVector3D& position2 = m_vertices[i + 1].position;
-		const QVector3D& position3 = m_vertices[i + 2].position;
+	IsPointFaceIntersection(selectionPoint, viewPort, selectedFacePointIndex, intersectionPoint);
 
-		float distance = -1.0;
-		if (IsRayFaceIntersection(rayOrigin, rayDirection, position1, position2, position3, distance)){
-			if (distance < minDistance){
-				minDistance = distance;
-
-				selectedFacePointIndex = i;
-			}
-		}
-	}
-
-	// select/deselect vertices
-	for (int i = 0; i < m_meshSize; i += 3){
+	// select/deselect corresponding vertices
+	for (int i = 0; i < m_vertices.size(); i += 3){
 		if (i == selectedFacePointIndex){
 			m_selectedVerticesIndicies.insert(i + 0);
 			m_selectedVerticesIndicies.insert(i + 1);
@@ -113,12 +83,11 @@ void CMeshShape::ClearSelection()
 		return;
 	}
 
-	for (int i = 0; i < m_meshSize; ++i){
+	for (int i = 0; i < m_vertices.size(); ++i){
 		m_vertices[i].color = m_color;
 	}
 
 	m_selectedVerticesIndicies.clear();
-	m_cubeSelectionSize = QVector3D();
 
 	UploadGeometry(false, m_vertices, m_vertexBuffer);
 }
@@ -126,7 +95,7 @@ void CMeshShape::ClearSelection()
 
 void CMeshShape::AllSelection()
 {
-	for (int i = 0; i < m_meshSize; ++i){
+	for (int i = 0; i < m_vertices.size(); ++i){
 		m_selectedVerticesIndicies.insert(i);
 
 		m_vertices[i].color = s_selectionColor;
@@ -138,7 +107,7 @@ void CMeshShape::AllSelection()
 
 void CMeshShape::InvertSelection()
 {
-	for (int i = 0; i < m_meshSize; ++i){
+	for (int i = 0; i < m_vertices.size(); ++i){
 		Vertex& vertex = m_vertices[i];
 
 		VertexIndicies::iterator it = m_selectedVerticesIndicies.find(i);
@@ -179,31 +148,17 @@ void CMeshShape::DeleteSelection()
 }
 
 
-void CMeshShape::BoxFromSelection()
+float CMeshShape::CalculateRulerLength(const QLine& rulerLine, const QRect& viewPort) const
 {
-	m_cubeSelectionSize = QVector3D();
+	int intersectedVertexIndex = -1;
+	QVector3D intersectionPoint1, intersectionPoint2;
 
-	if (m_selectedVerticesIndicies.empty()){
-		return;
+	if (IsPointFaceIntersection(rulerLine.p1(), viewPort, intersectedVertexIndex, intersectionPoint1) &&
+		IsPointFaceIntersection(rulerLine.p2(), viewPort, intersectedVertexIndex, intersectionPoint2)){
+		return qAbs(intersectionPoint1.distanceToPoint(intersectionPoint2));
 	}
 
-	// calculate selection cube boundaries
-	istd::TRange<float> xRange, yRange, zRange;
-	if (!CalculateSelectionBox(xRange, yRange, zRange)){
-		return;
-	}
-
-	SetSelectionCubeFaces(xRange, yRange, zRange);
-	SetSelectionCubeFaceNormals();
-	SetSelectionCubeEdges(xRange, yRange, zRange);
-	SetSelectionCubeEdgeColors();
-
-	// calculate selection cube size in pixels
-	m_cubeSelectionSize.setX(xRange.GetLength());
-	m_cubeSelectionSize.setY(yRange.GetLength());
-	m_cubeSelectionSize.setZ(zRange.GetLength());
-
-	UploadGeometry(false, m_vertices, m_vertexBuffer);
+	return -1.0;
 }
 
 
@@ -235,24 +190,7 @@ void CMeshShape::UpdateShapeGeometry()
 
 void CMeshShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions& functions)
 {
-	// draw mesh
-	const GLuint* indexBufferOffset = 0;
-
-	functions.glDrawElements(GL_TRIANGLES, m_meshSize, GL_UNSIGNED_INT, indexBufferOffset);
-
-	// draw selection cube
-	if (!m_cubeSelectionSize.isNull()){
-		// draw selection cube faces
-		indexBufferOffset += m_meshSize;
-
-		functions.glDrawElements(GL_QUADS, s_selectionCubeFacesSize, GL_UNSIGNED_INT, indexBufferOffset);
-
-		// draw selection cube edges
-		indexBufferOffset += s_selectionCubeFacesSize;
-
-		functions.glLineWidth(3.0f);
-		functions.glDrawElements(GL_LINES, s_selectionCubeEdgesSize, GL_UNSIGNED_INT, indexBufferOffset);
-	}
+	functions.glDrawElements(GL_TRIANGLES, m_vertices.size(), GL_UNSIGNED_INT, (GLuint*)0);
 }
 
 
@@ -268,30 +206,10 @@ void CMeshShape::Draw(QPainter& painter)
 	QString text = QString("<b><p>Total vertices: %1</p>").arg(meshPtr->GetPointsCount());
 	text += QString("<p>Selected vertices: %1</p></b>").arg(static_cast<int>(m_selectedVerticesIndicies.size()));
 
-	if (!m_cubeSelectionSize.isNull()){
-		text += QString("<b><p>Selection cuboid: <span style='color: rgb(%1, %2, %3)'>%4</span> x ")
-			.arg(static_cast<int>(s_selectionCubeXColor.x() * 255.0))
-			.arg(static_cast<int>(s_selectionCubeXColor.y() * 255.0))
-			.arg(static_cast<int>(s_selectionCubeXColor.z() * 255.0))
-			.arg(m_cubeSelectionSize.x(), 0, 'f', 2);
-
-		text += QString("<span style='color: rgb(%1, %2, %3)'>%4</span> x ")
-			.arg(static_cast<int>(s_selectionCubeYColor.x() * 255.0))
-			.arg(static_cast<int>(s_selectionCubeYColor.y() * 255.0))
-			.arg(static_cast<int>(s_selectionCubeYColor.z() * 255.0))
-			.arg(m_cubeSelectionSize.y(), 0, 'f', 2);
-
-		text += QString("<span style='color: rgb(%1, %2, %3)'>%4</span></p></b>")
-			.arg(static_cast<int>(s_selectionCubeZColor.x() * 255.0))
-			.arg(static_cast<int>(s_selectionCubeZColor.y() * 255.0))
-			.arg(static_cast<int>(s_selectionCubeZColor.z() * 255.0))
-			.arg(m_cubeSelectionSize.z(), 0, 'f', 2);
-	}
-
 	painter.save();
 
 	painter.setBrush(QBrush(QColor(240, 240, 240)));
-	painter.drawRoundedRect(10, 10, 300, 90, 3.0, 3.0);
+	painter.drawRoundedRect(10, 10, 300, 60, 3.0, 3.0);
 	painter.translate(15.0, 15.0);
 
 	QTextDocument doc;
@@ -329,11 +247,11 @@ bool CMeshShape::HasNormals() const
 
 void CMeshShape::SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection, const QRect& viewPort)
 {
-	if (!selectionRect.isValid() || m_meshSize <= 0){
+	if (!selectionRect.isValid() || m_vertices.isEmpty()){
 		return;
 	}
 
-	for (int i = 0; i < m_meshSize; ++i){
+	for (int i = 0; i < m_vertices.size(); ++i){
 		QPoint windowPosition = ModelToWindow(m_vertices[i].position, viewPort);
 
 		if (IsPointWithin(windowPosition, selectionRect, isCircle)){
@@ -356,20 +274,18 @@ void CMeshShape::SetRectSelection(const QRect& selectionRect, bool isCircle, boo
 template <typename PointType>
 void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh)
 {
-	const int cubeVerticesSize = s_selectionCubeFacesSize + s_selectionCubeEdgesSize;
-
-	m_meshSize = mesh.GetPointsCount();
+	int meshSize = mesh.GetPointsCount();
 	const imt3d::IMesh3d::Indices& indices = mesh.GetIndices();
 
 	m_vertices.clear();
-	m_vertices.reserve(m_meshSize + cubeVerticesSize);
+	m_vertices.reserve(meshSize);
 
-	if (m_meshSize <= 0 || indices.empty()){
+	if (meshSize <= 0 || indices.empty()){
 		return;
 	}
 
 	// update vertices and normals
-	for (int i = 0; i < m_meshSize; ++i){
+	for (int i = 0; i < meshSize; ++i){
 		const PointType* pointDataPtr = static_cast<const PointType*>(mesh.GetPointData(i));
 		Q_ASSERT(pointDataPtr != nullptr);
 
@@ -388,7 +304,7 @@ void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh)
 
 	// update indices
 	m_indices.clear();
-	m_indices.reserve(static_cast<int>(indices.size() * indices.front().size()) + cubeVerticesSize);
+	m_indices.reserve(static_cast<int>(indices.size() * indices.front().size()));
 
 	for (int i = 0; i < indices.size(); ++i){
 		const std::vector<uint32_t>& index = indices[i];
@@ -396,12 +312,6 @@ void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh)
 		for (int j = 0; j < index.size(); ++j){
 			m_indices.push_back(index[j]);
 		}
-	}
-
-	// add empty selection cube vertices so that they will be allocated in opengl buffers
-	for (int i = 0; i < cubeVerticesSize; ++i){
-		m_vertices.push_back(Vertex(QVector3D(), QVector3D(), s_selectionCubeColor));
-		m_indices.push_back(m_indices.size());
 	}
 }
 
@@ -472,16 +382,58 @@ bool CMeshShape::IsPointWithin(const QPoint& point, const QRect& rect, bool isCi
 }
 
 
+bool CMeshShape::IsPointFaceIntersection(const QPoint& point, const QRect& viewPort, int& intersectedVertexIndex, QVector3D& intersectionPoint) const
+{
+	intersectedVertexIndex = -1;
+	intersectionPoint = QVector3D();
+
+	if (point.isNull() || m_vertices.isEmpty()){
+		return false;
+	}
+
+	// Determine mesh faces intersected with the given 2D point.
+	// Among all the intersected faces choose the closest one to the camera.
+	// For that, calculate the distance between the projection of the click point on the near plane and each face.
+	QVector3D rayOrigin = WindowToModel(point, 0.0, viewPort);
+	QVector3D rayDestination = WindowToModel(point, 1.0, viewPort);
+	QVector3D rayDirection = (rayDestination - rayOrigin).normalized();
+
+	float minDistance = qInf();
+
+	for (int i = 0; i < m_vertices.size(); i += 3){
+		const QVector3D& position1 = m_vertices[i + 0].position;
+		const QVector3D& position2 = m_vertices[i + 1].position;
+		const QVector3D& position3 = m_vertices[i + 2].position;
+
+		float distance = -1.0;
+		QVector3D faceIntersectionPoint;
+
+		if (IsRayFaceIntersection(rayOrigin, rayDirection, position1, position2, position3, distance, faceIntersectionPoint)){
+			if (distance < minDistance){
+				minDistance = distance;
+
+				intersectedVertexIndex = i;
+				intersectionPoint = faceIntersectionPoint;
+			}
+		}
+	}
+
+	return intersectedVertexIndex >= 0;
+}
+
+
 bool CMeshShape::IsRayFaceIntersection(
 				const QVector3D& rayOrigin,
 				const QVector3D& rayDirection,
 				const QVector3D& trianglePoint1,
 				const QVector3D& trianglePoint2,
 				const QVector3D& trianglePoint3,
-				float& distanceToTriangle)
+				float& distanceToTriangle,
+				QVector3D& intersectionPoint)
 {
 	// Möller–Trumbore ray-triangle intersection algorithm implementation
 	distanceToTriangle = -1.0;
+	intersectionPoint = QVector3D();
 
 	const float EPSILON = 0.0000001;
 
@@ -510,147 +462,12 @@ bool CMeshShape::IsRayFaceIntersection(
 
 	distanceToTriangle = f * QVector3D::dotProduct(edge2, q);
 	if (distanceToTriangle > EPSILON && distanceToTriangle < 1 / EPSILON){
+		intersectionPoint = rayOrigin + distanceToTriangle * rayDirection;
+
 		return true; // there is ray intersection
 	}
 	else{
 		return false; // line intersection but not a ray intersection
-	}
-}
-
-
-bool CMeshShape::CalculateSelectionBox(
-				istd::TRange<float>& xRange,
-				istd::TRange<float>& yRange,
-				istd::TRange<float>& zRange)
-{
-	xRange.SetMinValue(std::numeric_limits<float>::max());
-	xRange.SetMaxValue(std::numeric_limits<float>::lowest());
-
-	yRange = xRange;
-	zRange = xRange;
-
-	for (int i : m_selectedVerticesIndicies){
-		const QVector3D& position = m_vertices[i].position;
-
-		xRange.SetMinValue(qMin(xRange.GetMinValue(), position.x()));
-		xRange.SetMaxValue(qMax(xRange.GetMaxValue(), position.x()));
-		yRange.SetMinValue(qMin(yRange.GetMinValue(), position.y()));
-		yRange.SetMaxValue(qMax(yRange.GetMaxValue(), position.y()));
-		zRange.SetMinValue(qMin(zRange.GetMinValue(), position.z()));
-		zRange.SetMaxValue(qMax(zRange.GetMaxValue(), position.z()));
-	}
-
-	return xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty();
-}
-
-
-void CMeshShape::SetSelectionCubeFaces(
-				const istd::TRange<float>& xRange,
-				const istd::TRange<float>& yRange,
-				const istd::TRange<float>& zRange)
-{
-	int i = m_meshSize;
-
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMinValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-}
-
-
-void CMeshShape::SetSelectionCubeFaceNormals()
-{
-	for (int i = 0; i < s_selectionCubeFacesSize; i += 4){
-		Vertex& v1 = m_vertices[i + m_meshSize + 0];
-		Vertex& v2 = m_vertices[i + m_meshSize + 1];
-		Vertex& v3 = m_vertices[i + m_meshSize + 2];
-		Vertex& v4 = m_vertices[i + m_meshSize + 3];
-
-		QVector3D normal = QVector3D::normal(v1.position, v2.position, v3.position);
-
-		v1.normal = v2.normal = v3.normal = v4.normal = normal;
-	}
-}
-
-
-void CMeshShape::SetSelectionCubeEdges(
-				const istd::TRange<float>& xRange,
-				const istd::TRange<float>& yRange,
-				const istd::TRange<float>& zRange)
-{
-	int i = m_meshSize + s_selectionCubeFacesSize;
-
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMinValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMinValue());
-}
-
-
-void CMeshShape::SetSelectionCubeEdgeColors()
-{
-	for (int i = 0; i < s_selectionCubeEdgesSize; i += 2){
-		int idx = i + m_meshSize + s_selectionCubeFacesSize;
-
-		Vertex& v1 = m_vertices[idx + 0];
-		Vertex& v2 = m_vertices[idx + 1];
-
-		if (v1.position.x() != v2.position.x()){
-			v1.color = v2.color = s_selectionCubeXColor;
-		}
-		else if (v1.position.y() != v2.position.y()){
-			v1.color = v2.color = s_selectionCubeYColor;
-		}
-		else{
-			v1.color = v2.color = s_selectionCubeZColor;
-		}
 	}
 }
 

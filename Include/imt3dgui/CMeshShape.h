@@ -34,7 +34,7 @@ public:
 	void AllSelection();
 	void InvertSelection();
 	void DeleteSelection();
-	void BoxFromSelection();
+	float CalculateRulerLength(const QLine& rulerLine, const QRect& viewPort) const;
 
 protected:
 	// reimplement (imt3dgui::CShape3dBase)
@@ -54,35 +54,23 @@ private:
 	template <typename PointType> void UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh);
 	template <typename PointType> void DeleteSelectionHelper(imt3d::IMesh3d& mesh);
 	static bool IsPointWithin(const QPoint& point, const QRect& rect, bool isCircle);
+	bool IsPointFaceIntersection(const QPoint& point, const QRect& viewPort, int& intersectedVertexIndex, QVector3D& intersectionPoint) const;
 	static bool IsRayFaceIntersection(
 				const QVector3D& rayOrigin,
 				const QVector3D& rayDirection,
 				const QVector3D& trianglePoint1,
 				const QVector3D& trianglePoint2,
 				const QVector3D& trianglePoint3,
-				float& distanceToTriangle);
-	bool CalculateSelectionBox(istd::TRange<float>& xRange, istd::TRange<float>& yRange, istd::TRange<float>& zRange);
-	void SetSelectionCubeFaces(const istd::TRange<float>& xRange, const istd::TRange<float>& yRange, const istd::TRange<float>& zRange);
-	void SetSelectionCubeFaceNormals();
-	void SetSelectionCubeEdges(const istd::TRange<float>& xRange, const istd::TRange<float>& yRange, const istd::TRange<float>& zRange);
-	void SetSelectionCubeEdgeColors();
+				float& distanceToTriangle,
+				QVector3D& intersectionPoint);
 	void SelectFaceVertices();
 
 private:
-	typedef std::set<int> VertexIndicies;
-
 	QVector3D m_color;
-	int m_meshSize;
-	QVector3D m_cubeSelectionSize;
+	typedef std::set<int> VertexIndicies;
 	VertexIndicies m_selectedVerticesIndicies;
 
 	static const QVector3D s_selectionColor;
-	static const QVector3D s_selectionCubeColor;
-	static const QVector3D s_selectionCubeXColor;
-	static const QVector3D s_selectionCubeYColor;
-	static const QVector3D s_selectionCubeZColor;
-	static const int s_selectionCubeFacesSize;
-	static const int s_selectionCubeEdgesSize;
 };
 
 

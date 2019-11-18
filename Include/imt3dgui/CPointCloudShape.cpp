@@ -18,20 +18,14 @@ namespace imt3dgui
 // static members
 
 const QVector3D CPointCloudShape::s_selectionColor(0.0, 0.0, 0.0);
-const QVector3D CPointCloudShape::s_selectionCubeColor(0.5, 0.5, 0.5);
-const QVector3D CPointCloudShape::s_selectionCubeXColor(0.75, 0.0, 0.0);
-const QVector3D CPointCloudShape::s_selectionCubeYColor(0.0, 0.75, 0.0);
-const QVector3D CPointCloudShape::s_selectionCubeZColor(0.0, 0.0, 0.75);
-const int CPointCloudShape::s_selectionCubeFacesSize = 24;
-const int CPointCloudShape::s_selectionCubeEdgesSize = 24;
+const float CPointCloudShape::s_distanceEpsilon = 0.1;
 
 
 // public methods
 
 CPointCloudShape::CPointCloudShape()
 	:m_color(QVector3D(0.0, 0.8, 0.2)),
-	m_pointSize(3.0),
-	m_pointCloudSize(0)
+	m_pointSize(3.0)
 {
 }
 
@@ -50,33 +44,15 @@ void CPointCloudShape::SetPointSize(float pointSize)
 
 void CPointCloudShape::SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection, const QRect& viewPort)
 {
-	if (selectionPoint.isNull() || m_pointCloudSize <= 0){
+	if (selectionPoint.isNull() || m_vertices.isEmpty()){
 		return;
 	}
 
-	// project window 2D coordinate to near and far planes getting 3D world coordinates
-	// create a ray between those points
-	QVector3D rayFrom = WindowToModel(selectionPoint, 0.0, viewPort);
-	QVector3D rayTo = WindowToModel(selectionPoint, 1.0, viewPort);
-
-	QVector3D rayDirection = rayTo - rayFrom;
-	rayDirection.normalize();
-
-	// find a vertex closest to the ray
-	float minDist = qInf();
 	int closestVertexIndex = -1;
-
-	for (int i = 0; i < m_pointCloudSize; ++i){
-		float dist = m_vertices[i].position.distanceToLine(rayFrom, rayDirection);
-
-		if (dist < minDist){
-			minDist = dist;
-			closestVertexIndex = i;
-		}
-	}
+	IsPointVertexIntersection(selectionPoint, viewPort, closestVertexIndex);
 
 	// update selected vertices and vertex colors
-	for (int i = 0; i < m_pointCloudSize; ++i){
+	for (int i = 0; i < m_vertices.size(); ++i){
 		if (i == closestVertexIndex){
 			m_selectedVerticesIndicies.insert(i);
 			m_vertices[i].color = s_selectionColor;
@@ -109,12 +85,11 @@ void CPointCloudShape::ClearSelection()
 		return;
 	}
 
-	for (int i = 0; i < m_pointCloudSize; ++i){
-		m_vertices[i].color = m_color;
+	for (Vertex& vertex : m_vertices){
+		vertex.color = m_color;
 	}
 
 	m_selectedVerticesIndicies.clear();
-	m_cubeSelectionSize = QVector3D();
 
 	UploadGeometry(false, m_vertices, m_vertexBuffer);
 }
@@ -122,7 +97,7 @@ void CPointCloudShape::ClearSelection()
 
 void CPointCloudShape::AllSelection()
 {
-	for (int i = 0; i < m_pointCloudSize; ++i){
+	for (int i = 0; i < m_vertices.size(); ++i){
 		m_selectedVerticesIndicies.insert(i);
 
 		m_vertices[i].color = s_selectionColor;
@@ -134,7 +109,7 @@ void CPointCloudShape::AllSelection()
 
 void CPointCloudShape::InvertSelection()
 {
-	for (int i = 0; i < m_pointCloudSize; ++i){
+	for (int i = 0; i < m_vertices.size(); ++i){
 		Vertex& vertex = m_vertices[i];
 
 		SelectedVerticesIndicies::iterator it = m_selectedVerticesIndicies.find(i);
@@ -175,30 +150,19 @@ void CPointCloudShape::DeleteSelection()
 }
 
 
-void CPointCloudShape::BoxFromSelection()
+float CPointCloudShape::CalculateRulerLength(const QLine& rulerLine, const QRect& viewPort)
 {
-	m_cubeSelectionSize = QVector3D();
+	int intersectedVertexIndex1 = -1, intersectedVertexIndex2 = -1;
 
-	if (m_selectedVerticesIndicies.empty()){
-		return;
+	if (IsPointVertexIntersection(rulerLine.p1(), viewPort, intersectedVertexIndex1) &&
+		IsPointVertexIntersection(rulerLine.p2(), viewPort, intersectedVertexIndex2)){
+		QVector3D position1 = m_vertices[intersectedVertexIndex1].position;
+		QVector3D position2 = m_vertices[intersectedVertexIndex2].position;
+
+		return qAbs(position1.distanceToPoint(position2));
 	}
 
-	// calculate selection cube boundaries
-	istd::TRange<float> xRange, yRange, zRange;
-	if (!CalculateSelectionBox(xRange, yRange, zRange)){
-		return;
-	}
-
-	SetSelectionCubeFaces(xRange, yRange, zRange);
-	SetSelectionCubeEdges(xRange, yRange, zRange);
-	SetSelectionCubeEdgeColors();
-
-	// calculate selection cube size in pixels
-	m_cubeSelectionSize.setX(xRange.GetLength());
-	m_cubeSelectionSize.setY(yRange.GetLength());
-	m_cubeSelectionSize.setZ(zRange.GetLength());
-
-	UploadGeometry(false, m_vertices, m_vertexBuffer);
+	return -1.0;
 }
 
 
@@ -233,24 +197,7 @@ void CPointCloudShape::DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctio
 	program.setUniformValue("usePointSize", true);
 	program.setUniformValue("pointSize", m_pointSize);
 
-	// draw point cloud
-	const GLuint* indexBufferOffset = 0;
-
-	functions.glDrawElements(GL_POINTS, m_pointCloudSize, GL_UNSIGNED_INT, indexBufferOffset);
-
-	// draw selection cube
-	if (!m_cubeSelectionSize.isNull()){
-		// draw selection cube faces
-		indexBufferOffset += m_pointCloudSize;
-
-		functions.glLineWidth(3.0f);
-		functions.glDrawElements(GL_QUADS, s_selectionCubeFacesSize, GL_UNSIGNED_INT, indexBufferOffset);
-
-		// draw selection cube edges
-		indexBufferOffset += s_selectionCubeFacesSize;
-
-		functions.glDrawElements(GL_LINES, s_selectionCubeEdgesSize, GL_UNSIGNED_INT, indexBufferOffset);
-	}
+	functions.glDrawElements(GL_POINTS, m_vertices.size(), GL_UNSIGNED_INT, (GLuint*)0);
 }
 
 
@@ -266,30 +213,10 @@ void CPointCloudShape::Draw(QPainter& painter)
 	QString text = QString("<b><p>Total vertices: %1</p>").arg(pointCloudPtr->GetPointsCount());
 	text += QString("<p>Selected vertices: %1</p></b>").arg(static_cast<int>(m_selectedVerticesIndicies.size()));
 
-	if (!m_cubeSelectionSize.isNull()){
-		text += QString("<b><p>Selection cuboid: <span style='color: rgb(%1, %2, %3)'>%4</span> x ")
-				.arg(static_cast<int>(s_selectionCubeXColor.x() * 255.0))
-				.arg(static_cast<int>(s_selectionCubeXColor.y() * 255.0))
-				.arg(static_cast<int>(s_selectionCubeXColor.z() * 255.0))
-				.arg(m_cubeSelectionSize.x(), 0, 'f', 2);
-
-		text += QString("<span style='color: rgb(%1, %2, %3)'>%4</span> x ")
-				.arg(static_cast<int>(s_selectionCubeYColor.x() * 255.0))
-				.arg(static_cast<int>(s_selectionCubeYColor.y() * 255.0))
-				.arg(static_cast<int>(s_selectionCubeYColor.z() * 255.0))
-				.arg(m_cubeSelectionSize.y(), 0, 'f', 2);
-
-		text += QString("<span style='color: rgb(%1, %2, %3)'>%4</span></p></b>")
-				.arg(static_cast<int>(s_selectionCubeZColor.x() * 255.0))
-				.arg(static_cast<int>(s_selectionCubeZColor.y() * 255.0))
-				.arg(static_cast<int>(s_selectionCubeZColor.z() * 255.0))
-				.arg(m_cubeSelectionSize.z(), 0, 'f', 2);
-	}
-
 	painter.save();
 
 	painter.setBrush(QBrush(QColor(240, 240, 240)));
-	painter.drawRoundedRect(10, 10, 300, 90, 3.0, 3.0);
+	painter.drawRoundedRect(10, 10, 300, 60, 3.0, 3.0);
 	painter.translate(15.0, 15.0);
 
 	QTextDocument doc;
@@ -318,11 +245,11 @@ QVector3D CPointCloudShape::GetColor() const
 
 void CPointCloudShape::SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection, const QRect& viewPort)
 {
-	if (!selectionRect.isValid() || m_pointCloudSize <= 0){
+	if (!selectionRect.isValid() || m_vertices.isEmpty()){
 		return;
 	}
 
-	for (int i = 0; i < m_pointCloudSize; ++i){
+	for (int i = 0; i < m_vertices.size(); ++i){
 		Vertex& vertex = m_vertices[i];
 
 		QPoint windowPosition = ModelToWindow(vertex.position, viewPort);
@@ -344,22 +271,20 @@ void CPointCloudShape::SetRectSelection(const QRect& selectionRect, bool isCircl
 template <typename PointType>
 void CPointCloudShape::UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& pointCloud)
 {
-	const int cubeVerticesSize = s_selectionCubeFacesSize + s_selectionCubeEdgesSize;
-
-	m_pointCloudSize = pointCloud.GetPointsCount();
-
 	m_vertices.clear();
-	m_vertices.reserve(m_pointCloudSize + cubeVerticesSize);
-
 	m_indices.clear();
-	m_indices.reserve(m_vertices.capacity());
 
-	if (m_pointCloudSize <= 0){
+	int pointCloudSize = pointCloud.GetPointsCount();
+
+	if (pointCloudSize <= 0){
 		return;
 	}
 
+	m_vertices.reserve(pointCloudSize);
+	m_indices.reserve(pointCloudSize);
+
 	// update vertices
-	for (int i = 0; i < m_pointCloudSize; ++i){
+	for (int i = 0; i < pointCloudSize; ++i){
 		const PointType* pointDataPtr = static_cast<const PointType*>(pointCloud.GetPointData(i));
 		Q_ASSERT(pointDataPtr != nullptr);
 
@@ -372,12 +297,6 @@ void CPointCloudShape::UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& poi
 		}
 
 		m_vertices.push_back(Vertex(QVector3D(x, y, z), QVector3D(), m_color));
-		m_indices.push_back(m_indices.size());
-	}
-
-	// add empty selection cube vertices so that they will be allocated in opengl buffers
-	for (int i = 0; i < cubeVerticesSize; ++i){
-		m_vertices.push_back(Vertex(QVector3D(), QVector3D(), s_selectionCubeColor));
 		m_indices.push_back(m_indices.size());
 	}
 }
@@ -446,125 +365,33 @@ bool CPointCloudShape::IsPointWithin(const QPoint& point, const QRect& rect, boo
 }
 
 
-bool CPointCloudShape::CalculateSelectionBox(
-				istd::TRange<float>& xRange,
-				istd::TRange<float>& yRange,
-				istd::TRange<float>& zRange)
+bool CPointCloudShape::IsPointVertexIntersection(const QPoint& point, const QRect& viewPort, int& intersectedVertexIndex) const
 {
-	xRange.SetMinValue(std::numeric_limits<float>::max());
-	xRange.SetMaxValue(std::numeric_limits<float>::lowest());
+	intersectedVertexIndex = -1;
 
-	yRange = xRange;
-	zRange = xRange;
-
-	for (int i : m_selectedVerticesIndicies){
-		const QVector3D& position = m_vertices[i].position;
-
-		xRange.SetMinValue(qMin(xRange.GetMinValue(), position.x()));
-		xRange.SetMaxValue(qMax(xRange.GetMaxValue(), position.x()));
-		yRange.SetMinValue(qMin(yRange.GetMinValue(), position.y()));
-		yRange.SetMaxValue(qMax(yRange.GetMaxValue(), position.y()));
-		zRange.SetMinValue(qMin(zRange.GetMinValue(), position.z()));
-		zRange.SetMaxValue(qMax(zRange.GetMaxValue(), position.z()));
+	if (point.isNull() || m_vertices.isEmpty()){
+		return false;
 	}
 
-	return xRange.IsValidNonEmpty() && yRange.IsValidNonEmpty() && zRange.IsValidNonEmpty();
-}
+	// project window 2D coordinate to near and far planes getting 3D world coordinates
+	// create a ray between those points
+	QVector3D rayFrom = WindowToModel(point, 0.0, viewPort);
+	QVector3D rayTo = WindowToModel(point, 1.0, viewPort);
+	QVector3D rayDirection = (rayTo - rayFrom).normalized();
 
+	// find a vertex closest to the ray
+	float minDist = qInf();
 
-void CPointCloudShape::SetSelectionCubeFaces(
-				const istd::TRange<float>& xRange,
-				const istd::TRange<float>& yRange,
-				const istd::TRange<float>& zRange)
-{
-	int i = m_pointCloudSize;
+	for (int i = 0; i < m_vertices.size(); ++i){
+		float dist = qAbs(m_vertices[i].position.distanceToLine(rayFrom, rayDirection));
 
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMinValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-}
-
-
-void CPointCloudShape::SetSelectionCubeEdges(
-				const istd::TRange<float>& xRange,
-				const istd::TRange<float>& yRange,
-				const istd::TRange<float>& zRange)
-{
-	int i = m_pointCloudSize + s_selectionCubeFacesSize;
-
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMinValue());
-
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMinValue(), yRange.GetMinValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMaxValue(), zRange.GetMinValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMaxValue());
-	m_vertices[i++].position = QVector3D(xRange.GetMaxValue(), yRange.GetMinValue(), zRange.GetMinValue());
-}
-
-
-void CPointCloudShape::SetSelectionCubeEdgeColors()
-{
-	for (int i = 0; i < s_selectionCubeEdgesSize; i += 2){
-		int idx = i + m_pointCloudSize + s_selectionCubeFacesSize;
-
-		Vertex& v1 = m_vertices[idx];
-		Vertex& v2 = m_vertices[idx + 1];
-
-		if (v1.position.x() != v2.position.x()){
-			v1.color = v2.color = s_selectionCubeXColor;
-		}
-		else if (v1.position.y() != v2.position.y()){
-			v1.color = v2.color = s_selectionCubeYColor;
-		}
-		else{
-			v1.color = v2.color = s_selectionCubeZColor;
+		if (dist < s_distanceEpsilon && dist < minDist){
+			minDist = dist;
+			intersectedVertexIndex = i;
 		}
 	}
+
+	return intersectedVertexIndex >= 0;
 }
 
 

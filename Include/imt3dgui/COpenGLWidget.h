@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtGui/QOpenGLFunctions>
 #include <QtWidgets/QOpenGLWidget>
+#include <QtCore/QLine>
 #include <QtCore/QTimer>
 #include <QtCore/QVariantAnimation>
 
@@ -37,9 +38,15 @@ public:
 		VD_BACK
 	};
 
+	enum ViewMode
+	{
+		VM_VIEW,
+		VM_SELECTION,
+		VM_ROLER
+	};
+
 	enum SelectionMode
 	{
-		SM_NONE,
 		SM_POINT,
 		SM_BOX,
 		SM_CIRCLE
@@ -47,10 +54,17 @@ public:
 
 	enum RotationMode
 	{
-		RM_FREE,
-		RM_AROUND_X,
-		RM_AROUND_Y,
-		RM_AROUND_Z
+		RTM_FREE,
+		RTM_AROUND_X,
+		RTM_AROUND_Y,
+		RTM_AROUND_Z
+	};
+
+	enum RulerMode
+	{
+		RLM_NONE,
+		RLM_POINT1,
+		RLM_POINT2,
 	};
 
 	enum RenderHint
@@ -75,13 +89,13 @@ public:
 	bool GetRenderHint(RenderHint renderHint) const;
 	void SetRenderHint(RenderHint renderHint, bool on = true);
 	void SetCameraView(ViewDirection viewDirection, bool animated = true);
+	void SetViewMode(ViewMode viewMode);
 	void SetSelectionMode(SelectionMode selectionMode);
 	void SetRotationMode(RotationMode rotationMode);
 	void ClearSelection();
 	void AllSelection();
 	void InvertSelection();
 	void DeleteSelection();
-	void BoxFromSelection();
 
 protected:
 	// reimplemented (QOpenGLWidget)
@@ -107,8 +121,12 @@ private:
 	void PaintGl();
 	void Paint(QPainter& painter);
 	void PaintSelection(QPainter& painter);
-	void MouseMoveEventNoSelection(QMouseEvent& e);
-	void MouseMoveEventSelection(QMouseEvent& e);
+	void PaintRuler(QPainter& painter);
+	void MousePressRuler(QMouseEvent& e);
+	void MousePressSelection(QMouseEvent& e);
+	void MouseMoveView(QMouseEvent& e);
+	void MouseMoveSelection(QMouseEvent& e);
+	void MouseMoveRoler(QMouseEvent& e);
 	void SetGlFlags();
 	void SetGlUniformValues();
 	QMatrix4x4 GetProjectionMatrix() const;
@@ -117,15 +135,19 @@ private:
 	QPoint m_mouseClickPosition;
 	QPoint m_prevMousePosition;
 	QRect m_selectionRect;
-	imt3dgui::ISceneEventHandler* m_eventHandler;
+	imt3dgui::ISceneEventHandler* m_eventHandlerPtr;
 	imt3dview::CTrackballCamera m_camera;
 	imt3dview::CScene3d m_scene;
 	QTimer m_timer;
 	QVariantAnimation m_cameraRotationAnimation;
 	QVariantAnimation m_cameraPositionAnimation;
 	int m_renderHints;
+	ViewMode m_viewMode;
 	SelectionMode m_selectionMode;
 	RotationMode m_rotationMode;
+	RulerMode m_rulerMode;
+	QLine m_rulerLine;
+	float m_rulerLength;
 	QOpenGLShaderProgram* m_programPtr;
 
 	static const float s_verticalAngle;

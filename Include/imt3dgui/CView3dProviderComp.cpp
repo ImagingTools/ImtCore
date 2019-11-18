@@ -32,7 +32,6 @@ CView3dProviderComp::CView3dProviderComp()
 	m_resetViewCommand("Reset", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_CAMERA_MODE),
 	m_useAntialiasingCommand("Antialiasing", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_ONOFF, CG_SCENE_FLAGS),
 	m_useCullFaceCommand("Cull face", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_ONOFF, CG_SCENE_FLAGS),
-	m_noSelectionCommand("No selection", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_SELECTION),
 	m_pointSelectionCommand("Point selection", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_SELECTION),
 	m_boxSelectionCommand("Box selection", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_SELECTION),
 	m_circleSelectionCommand("Circle selection", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_SELECTION),
@@ -40,11 +39,13 @@ CView3dProviderComp::CView3dProviderComp()
 	m_allSelectionCommand("Select all", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_SELECTION_ACTIONS),
 	m_invertSelectionCommand("Invert selection", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_SELECTION_ACTIONS),
 	m_deleteSelectionCommand("Delete selection", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_SELECTION_ACTIONS),
-	m_boxFromSelectionCommand("Build 3D box from selection", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_SELECTION_ACTIONS),
 	m_freeRotationCommand("Free rotation", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_ROTATION),
 	m_rotationAroundXCommand("Rotation around X", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_ROTATION),
 	m_rotationAroundYCommand("Rotation around Y", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_ROTATION),
-	m_rotationAroundZCommand("Rotation around Z", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_ROTATION)
+	m_rotationAroundZCommand("Rotation around Z", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_ROTATION),
+	m_viewModeCommand("View", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_VIEW_MODE),
+	m_selectionModeCommand("Selection", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_VIEW_MODE),
+	m_rulerModeCommand("Ruler", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_VIEW_MODE)
 {
 	connect(&m_zoomInCommand, SIGNAL(triggered()), this, SLOT(OnZoomIn()));
 	connect(&m_zoomOutCommand, SIGNAL(triggered()), this, SLOT(OnZoomOut()));
@@ -59,7 +60,6 @@ CView3dProviderComp::CView3dProviderComp()
 	connect(&m_setViewFromBackCommand, SIGNAL(triggered()), this, SLOT(OnViewFromBack()));
 	connect(&m_useAntialiasingCommand, SIGNAL(triggered(bool)), this, SLOT(OnUseAntialiasingCommand(bool)));
 	connect(&m_useCullFaceCommand, SIGNAL(triggered(bool)), this, SLOT(OnUseCullFaceCommand(bool)));
-	connect(&m_noSelectionCommand, SIGNAL(triggered(bool)), this, SLOT(OnNoSelectionCommand(bool)));
 	connect(&m_pointSelectionCommand, SIGNAL(triggered(bool)), this, SLOT(OnPointSelectionCommand(bool)));
 	connect(&m_boxSelectionCommand, SIGNAL(triggered(bool)), this, SLOT(OnBoxSelectionCommand(bool)));
 	connect(&m_circleSelectionCommand, SIGNAL(triggered(bool)), this, SLOT(OnCircleSelectionCommand(bool)));
@@ -67,20 +67,17 @@ CView3dProviderComp::CView3dProviderComp()
 	connect(&m_allSelectionCommand, SIGNAL(triggered(bool)), this, SLOT(OnAllSelectionCommand()));
 	connect(&m_invertSelectionCommand, SIGNAL(triggered(bool)), this, SLOT(OnInvertSelectionCommand()));
 	connect(&m_deleteSelectionCommand, SIGNAL(triggered(bool)), this, SLOT(OnDeleteSelectionCommand()));
-	connect(&m_boxFromSelectionCommand, SIGNAL(triggered(bool)), this, SLOT(OnBoxFromSelectionCommand()));
 	connect(&m_freeRotationCommand, SIGNAL(triggered(bool)), this, SLOT(OnFreeRotationCommand()));
 	connect(&m_rotationAroundXCommand, SIGNAL(triggered(bool)), this, SLOT(OnRotationAroundXCommand()));
 	connect(&m_rotationAroundYCommand, SIGNAL(triggered(bool)), this, SLOT(OnRotationAroundYCommand()));
 	connect(&m_rotationAroundZCommand, SIGNAL(triggered(bool)), this, SLOT(OnRotationAroundZCommand()));
+	connect(&m_viewModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnViewModeCommand()));
+	connect(&m_selectionModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnSelectionModeCommand()));
+	connect(&m_rulerModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnRulerModeCommand()));
 }
 
 
 // reimplemented (imt3dgui::ISceneEventHandler)
-
-void CView3dProviderComp::OnCameraPoseChanged(const QQuaternion& /*rotation*/, const QVector3D& /*position*/)
-{
-}
-
 
 void CView3dProviderComp::OnShowGrid(bool /*show*/)
 {
@@ -88,11 +85,6 @@ void CView3dProviderComp::OnShowGrid(bool /*show*/)
 
 
 void CView3dProviderComp::OnShowAxis(bool /*show*/)
-{
-}
-
-
-void CView3dProviderComp::OnNoSelection()
 {
 }
 
@@ -132,24 +124,9 @@ void CView3dProviderComp::OnDeleteSelection()
 }
 
 
-void CView3dProviderComp::OnBoxFromSelection()
+float CView3dProviderComp::CalculateRulerLength(const QLine& /*rulerLine*/)
 {
-}
-
-void CView3dProviderComp::OnFreeRotation()
-{
-}
-
-void CView3dProviderComp::OnRotationAroundX()
-{
-}
-
-void CView3dProviderComp::OnRotationAroundY()
-{
-}
-
-void CView3dProviderComp::OnRotationAroundZ()
-{
+	return -1.0;
 }
 
 
@@ -235,11 +212,6 @@ void CView3dProviderComp::OnGuiCreated()
 	static ChangeSet commandsChanged(ibase::ICommandsProvider::CF_COMMANDS);
 	istd::CChangeNotifier changeNotifier(this, &commandsChanged);
 
-	if (*m_showZoomCommandsAttrPtr){
-		m_viewCommands.InsertChild(&m_zoomInCommand);
-		m_viewCommands.InsertChild(&m_zoomOutCommand);
-	}
-
 	if (*m_showShowGridCommandAttrPtr){
 		m_viewCommands.InsertChild(&m_showGridCommand);
 		m_showGridCommand.setChecked(true);
@@ -251,6 +223,9 @@ void CView3dProviderComp::OnGuiCreated()
 	}
 
 	if (*m_showViewCommandsAttrPtr){
+		m_viewCommands.InsertChild(&m_viewModeCommand);
+		m_viewCommands.InsertChild(&m_selectionModeCommand);
+		m_viewCommands.InsertChild(&m_rulerModeCommand);
 		m_viewCommands.InsertChild(&m_rotationCommands);
 		m_rotationCommands.InsertChild(&m_freeRotationCommand);
 		m_rotationCommands.InsertChild(&m_rotationAroundXCommand);
@@ -264,10 +239,20 @@ void CView3dProviderComp::OnGuiCreated()
 		m_viewCommands.InsertChild(&m_setViewFromBottomCommand);
 		m_viewCommands.InsertChild(&m_setViewFromBackCommand);
 
+		m_viewModeCommand.setChecked(true);
 		m_freeRotationCommand.setChecked(true);
+		m_pointSelectionCommand.setChecked(true);
+
+		EnableCommands(COpenGLWidget::ViewMode::VM_VIEW);
+
 		m_rotationAroundXCommand.setShortcut(Qt::Key_X);
 		m_rotationAroundYCommand.setShortcut(Qt::Key_Y);
 		m_rotationAroundZCommand.setShortcut(Qt::Key_Z);
+	}
+
+	if (*m_showZoomCommandsAttrPtr){
+		m_viewCommands.InsertChild(&m_zoomInCommand);
+		m_viewCommands.InsertChild(&m_zoomOutCommand);
 	}
 
 	m_viewCommands.InsertChild(&m_useAntialiasingCommand);
@@ -277,13 +262,11 @@ void CView3dProviderComp::OnGuiCreated()
 	m_useCullFaceCommand.setChecked(true);
 
 	if (*m_showEditCommandsAttrPtr){
-		m_noSelectionCommand.setChecked(true);
 		m_clearSelectionCommand.setShortcut(Qt::Key_Escape);
 		m_deleteSelectionCommand.setShortcut(Qt::Key_Delete);
 		m_invertSelectionCommand.setShortcut(Qt::Key_Asterisk);
 		m_allSelectionCommand.setShortcut(Qt::CTRL + Qt::Key_A);
 
-		m_editCommands.InsertChild(&m_noSelectionCommand);
 		m_editCommands.InsertChild(&m_pointSelectionCommand);
 		m_editCommands.InsertChild(&m_boxSelectionCommand);
 		m_editCommands.InsertChild(&m_circleSelectionCommand);
@@ -291,7 +274,6 @@ void CView3dProviderComp::OnGuiCreated()
 		m_editCommands.InsertChild(&m_allSelectionCommand);
 		m_editCommands.InsertChild(&m_invertSelectionCommand);
 		m_editCommands.InsertChild(&m_deleteSelectionCommand);
-		m_editCommands.InsertChild(&m_boxFromSelectionCommand);
 		m_rootCommands.InsertChild(&m_editCommands);
 	}
 
@@ -316,7 +298,6 @@ void CView3dProviderComp::OnGuiRetranslate()
 	m_setViewFromLeftCommand.SetVisuals(tr("Left View"), tr("Left"), tr("Left View"), QIcon(":/Icons/ViewLeft"));
 	m_setViewFromBottomCommand.SetVisuals(tr("Bottom View"), tr("Bottom"), tr("Bottom View"), QIcon(":/Icons/ViewBottom"));
 	m_setViewFromBackCommand.SetVisuals(tr("Back View"), tr("Back"), tr("Back View"), QIcon(":/Icons/ViewBack"));
-	m_noSelectionCommand.SetVisuals(tr("View Mode"), tr("View"), tr("Set View Mode"), QIcon(":/Icons/NoSelection"));
 	m_pointSelectionCommand.SetVisuals(tr("Select Point"), tr("Select Point"), tr("Set Point Selection Mode"), QIcon(":/Icons/PointSelection"));
 	m_boxSelectionCommand.SetVisuals(tr("Select Box"), tr("Select Box"), tr("Set Box Selection Mode"), QIcon(":/Icons/BoxSelection"));
 	m_circleSelectionCommand.SetVisuals(tr("Select Circle"), tr("Select Circle"), tr("Set Circle Selection Mode"), QIcon(":/Icons/CircleSelection"));
@@ -324,11 +305,13 @@ void CView3dProviderComp::OnGuiRetranslate()
 	m_allSelectionCommand.SetVisuals(tr("Select all"), tr("Select all"), tr("Select all"), QIcon(":/Icons/SelectAll"));
 	m_invertSelectionCommand.SetVisuals(tr("Invert Selection"), tr("Invert"), tr("Invert Selection"), QIcon(":/Icons/InvertSelection"));
 	m_deleteSelectionCommand.SetVisuals(tr("Delete Selection"), tr("Delete"), tr("Delete Selection"), QIcon(":/Icons/DeleteSelection"));
-	m_boxFromSelectionCommand.SetVisuals(tr("Box from Selection"), tr("Box from Selection"), tr("Build bounding Box from Selection"), QIcon(":/Icons/Box3dSelection"));
 	m_freeRotationCommand.SetVisuals(tr("Free Rotation"), tr("Free Rotation"), tr("Set Free Rotation Mode"), QIcon(":/Icons/FreeRotation"));
 	m_rotationAroundXCommand.SetVisuals(tr("Rotation around X-Axis"), tr("X-Rotation"), tr("Set Rotation around X-Axis Mode"), QIcon(":/Icons/RotationAroundX"));
 	m_rotationAroundYCommand.SetVisuals(tr("Rotation around Y-Axis"), tr("Y-Rotation"), tr("Set Rotation around Y-Axis Mode"), QIcon(":/Icons/RotationAroundX"));
 	m_rotationAroundZCommand.SetVisuals(tr("Rotation around Z-Axis"), tr("Z-Rotation"), tr("Set Rotation around Z-Axis Mode"), QIcon(":/Icons/RotationAroundX"));
+	m_viewModeCommand.SetVisuals(tr("View"), tr("View Mode"), tr("Set View Mode"), QIcon(":/Icons/View"));
+	m_selectionModeCommand.SetVisuals(tr("Selection"), tr("Selection Mode"), tr("Set Selection Mode"), QIcon(":/Icons/Selection"));
+	m_rulerModeCommand.SetVisuals(tr("Ruler"), tr("Ruler Mode"), tr("Set Ruler Mode"), QIcon(":/Icons/Ruler"));
 }
 
 
@@ -464,15 +447,6 @@ void CView3dProviderComp::OnUseCullFaceCommand(bool checked)
 }
 
 
-void CView3dProviderComp::OnNoSelectionCommand(bool /*checked*/)
-{
-	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
-	Q_ASSERT(widgetPtr != NULL);
-
-	widgetPtr->SetSelectionMode(COpenGLWidget::SM_NONE);
-}
-
-
 void CView3dProviderComp::OnPointSelectionCommand(bool /*checked*/)
 {
 	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
@@ -536,21 +510,12 @@ void CView3dProviderComp::OnDeleteSelectionCommand()
 }
 
 
-void CView3dProviderComp::OnBoxFromSelectionCommand()
-{
-	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
-	Q_ASSERT(widgetPtr != NULL);
-
-	widgetPtr->BoxFromSelection();
-}
-
-
 void CView3dProviderComp::OnFreeRotationCommand()
 {
 	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
 	Q_ASSERT(widgetPtr != NULL);
 
-	widgetPtr->SetRotationMode(COpenGLWidget::RM_FREE);
+	widgetPtr->SetRotationMode(COpenGLWidget::RTM_FREE);
 }
 
 
@@ -559,7 +524,7 @@ void CView3dProviderComp::OnRotationAroundXCommand()
 	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
 	Q_ASSERT(widgetPtr != NULL);
 
-	widgetPtr->SetRotationMode(COpenGLWidget::RM_AROUND_X);
+	widgetPtr->SetRotationMode(COpenGLWidget::RTM_AROUND_X);
 }
 
 
@@ -568,7 +533,7 @@ void CView3dProviderComp::OnRotationAroundYCommand()
 	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
 	Q_ASSERT(widgetPtr != NULL);
 
-	widgetPtr->SetRotationMode(COpenGLWidget::RM_AROUND_Y);
+	widgetPtr->SetRotationMode(COpenGLWidget::RTM_AROUND_Y);
 }
 
 
@@ -577,7 +542,70 @@ void CView3dProviderComp::OnRotationAroundZCommand()
 	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
 	Q_ASSERT(widgetPtr != NULL);
 
-	widgetPtr->SetRotationMode(COpenGLWidget::RM_AROUND_Z);
+	widgetPtr->SetRotationMode(COpenGLWidget::RTM_AROUND_Z);
+}
+
+
+void CView3dProviderComp::OnViewModeCommand()
+{
+	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
+	Q_ASSERT(widgetPtr != NULL);
+
+	widgetPtr->SetViewMode(COpenGLWidget::ViewMode::VM_VIEW);
+
+	EnableCommands(COpenGLWidget::ViewMode::VM_VIEW);
+}
+
+
+void CView3dProviderComp::OnSelectionModeCommand()
+{
+	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
+	Q_ASSERT(widgetPtr != NULL);
+
+	widgetPtr->SetViewMode(COpenGLWidget::ViewMode::VM_SELECTION);
+
+	EnableCommands(COpenGLWidget::ViewMode::VM_SELECTION);
+}
+
+
+void CView3dProviderComp::OnRulerModeCommand()
+{
+	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
+	Q_ASSERT(widgetPtr != NULL);
+
+	widgetPtr->SetViewMode(COpenGLWidget::ViewMode::VM_ROLER);
+
+	EnableCommands(COpenGLWidget::ViewMode::VM_ROLER);
+}
+
+
+void CView3dProviderComp::EnableCommands(COpenGLWidget::ViewMode viewMode)
+{
+	bool isView = (viewMode == COpenGLWidget::ViewMode::VM_VIEW);
+	bool isSelection = (viewMode == COpenGLWidget::ViewMode::VM_SELECTION);
+
+	m_zoomInCommand.setEnabled(isView);
+	m_zoomOutCommand.setEnabled(isView);
+	m_setViewFromRightCommand.setEnabled(isView);
+	m_setViewFromFrontCommand.setEnabled(isView);
+	m_setViewFromTopCommand.setEnabled(isView);
+	m_setViewFromLeftCommand.setEnabled(isView);
+	m_setViewFromBottomCommand.setEnabled(isView);
+	m_setViewFromBackCommand.setEnabled(isView);
+	m_resetViewCommand.setEnabled(isView);
+	m_rotationCommands.setEnabled(isView);
+	m_freeRotationCommand.setEnabled(isView);
+	m_rotationAroundXCommand.setEnabled(isView);
+	m_rotationAroundYCommand.setEnabled(isView);
+	m_rotationAroundZCommand.setEnabled(isView);
+
+	m_pointSelectionCommand.setEnabled(isSelection);
+	m_boxSelectionCommand.setEnabled(isSelection);
+	m_circleSelectionCommand.setEnabled(isSelection);
+	m_clearSelectionCommand.setEnabled(isSelection);
+	m_allSelectionCommand.setEnabled(isSelection);
+	m_invertSelectionCommand.setEnabled(isSelection);
+	m_deleteSelectionCommand.setEnabled(isSelection);
 }
 
 

@@ -42,7 +42,7 @@ protected:
 	void OnAllSelection() override;
 	void OnInvertSelection() override;
 	void OnDeleteSelection() override;
-	void OnBoxFromSelection() override;
+	float CalculateRulerLength(const QLine& rulerLine) override;
 
 	// reimplemented (iqtgui::TRestorableGuiWrap)
 	void OnRestoreSettings(const QSettings& settings) override;

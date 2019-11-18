@@ -139,7 +139,7 @@ void CMeshViewComp::OnDeleteSelection()
 }
 
 
-void CMeshViewComp::OnBoxFromSelection()
+float CMeshViewComp::CalculateRulerLength(const QLine& rulerLine)
 {
 	CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
 	Q_ASSERT(meshShapePtr != NULL);
@@ -147,7 +147,7 @@ void CMeshViewComp::OnBoxFromSelection()
 	COpenGLWidget* widgetPtr = GetQtWidget();
 	Q_ASSERT(widgetPtr != NULL);
 
-	meshShapePtr->BoxFromSelection();
+	return meshShapePtr->CalculateRulerLength(rulerLine, widgetPtr->rect());
 }
 
 

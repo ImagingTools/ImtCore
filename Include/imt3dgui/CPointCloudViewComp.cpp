@@ -150,7 +150,7 @@ void CPointCloudViewComp::OnDeleteSelection()
 }
 
 
-void CPointCloudViewComp::OnBoxFromSelection()
+float CPointCloudViewComp::CalculateRulerLength(const QLine& rulerLine)
 {
 	CPointCloudShape* cloudShapePtr = dynamic_cast<CPointCloudShape*>(this);
 	Q_ASSERT(cloudShapePtr != NULL);
@@ -158,7 +158,7 @@ void CPointCloudViewComp::OnBoxFromSelection()
 	COpenGLWidget* widgetPtr = GetQtWidget();
 	Q_ASSERT(widgetPtr != NULL);
 
-	cloudShapePtr->BoxFromSelection();
+	return cloudShapePtr->CalculateRulerLength(rulerLine, widgetPtr->rect());
 }
 
 

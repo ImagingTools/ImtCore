@@ -35,7 +35,7 @@ public:
 	void AllSelection();
 	void InvertSelection();
 	void DeleteSelection();
-	void BoxFromSelection();
+	float CalculateRulerLength(const QLine& rulerLine, const QRect& viewPort);
 
 protected:
 	// reimplemented (imt3dview::CShape3dBase)
@@ -54,27 +54,17 @@ private:
 	template <typename PointType> void UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& pointCloud);
 	template <typename PointType> void DeleteSelectionHelper(imt3d::IPointCloud3d& pointCloud);
 	static bool IsPointWithin(const QPoint& point, const QRect& rect, bool isCircle);
-	bool CalculateSelectionBox(istd::TRange<float>& xRange, istd::TRange<float>& yRange, istd::TRange<float>& zRange);
-	void SetSelectionCubeFaces(const istd::TRange<float>& xRange, const istd::TRange<float>& yRange, const istd::TRange<float>& zRange);
-	void SetSelectionCubeEdges(const istd::TRange<float>& xRange, const istd::TRange<float>& yRange, const istd::TRange<float>& zRange);
-	void SetSelectionCubeEdgeColors();
+	bool IsPointVertexIntersection(const QPoint& point, const QRect& viewPort, int& intersectedVertexIndex) const;
 
 private:
 	typedef std::set<int> SelectedVerticesIndicies;
 
 	QVector3D m_color;
 	float m_pointSize;
-	int m_pointCloudSize;
-	QVector3D m_cubeSelectionSize;
 	SelectedVerticesIndicies m_selectedVerticesIndicies;
 
 	static const QVector3D s_selectionColor;
-	static const QVector3D s_selectionCubeColor;
-	static const QVector3D s_selectionCubeXColor;
-	static const QVector3D s_selectionCubeYColor;
-	static const QVector3D s_selectionCubeZColor;
-	static const int s_selectionCubeFacesSize;
-	static const int s_selectionCubeEdgesSize;
+	static const float s_distanceEpsilon;
 };
 
 
