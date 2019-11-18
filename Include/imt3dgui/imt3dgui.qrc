@@ -23,6 +23,5 @@
         <file alias="ClearSelection">Resources/Icons/ClearSelection.svg</file>
         <file alias="InvertSelection">Resources/Icons/InvertSelection.svg</file>
         <file alias="DeleteSelection">Resources/Icons/DeleteSelection.svg</file>
-        <file alias="Ruler">Resources/Icons/Ruler.svg</file>
     </qresource>
 </RCC>

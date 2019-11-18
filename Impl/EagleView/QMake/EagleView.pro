@@ -11,7 +11,7 @@ INCLUDEPATH +=  $$AUXINCLUDEDIR
 RESOURCES += $$_PRO_FILE_PWD_/../*.qrc
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liproc -liqtmeas -lAcfSlnLoc -lAcfLoc
-LIBS += -L../../../Lib/$$COMPILER_DIR -limt3d -limt3dview -limt3dgui
+LIBS += -L../../../Lib/$$COMPILER_DIR -limtgui -limt3d -limt3dview -limt3dgui
 
 HEADERS =
 
