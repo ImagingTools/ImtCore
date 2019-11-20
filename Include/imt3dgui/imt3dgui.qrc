@@ -31,5 +31,7 @@
         <file alias="RotationAroundZ">Resources/Icons/RotationAroundZ.svg</file>
         <file alias="SelectAll">Resources/Icons/SelectAll.svg</file>
         <file alias="NoSelection">Resources/Icons/NoSelection.svg</file>
+        <file alias="Selection">Resources/Icons/Selection.svg</file>
+        <file alias="View">Resources/Icons/View.svg</file>
     </qresource>
 </RCC>
