@@ -23,5 +23,13 @@
         <file alias="ClearSelection">Resources/Icons/ClearSelection.svg</file>
         <file alias="InvertSelection">Resources/Icons/InvertSelection.svg</file>
         <file alias="DeleteSelection">Resources/Icons/DeleteSelection.svg</file>
+        <file alias="Box3dSelection">Resources/Icons/Box3dSelection.svg</file>
+        <file alias="FreeRotation">Resources/Icons/FreeRotation.svg</file>
+        <file alias="PointSelection">Resources/Icons/PointSelection.svg</file>
+        <file alias="RotationAroundX">Resources/Icons/RotationAroundX.svg</file>
+        <file alias="RotationAroundY">Resources/Icons/RotationAroundY.svg</file>
+        <file alias="RotationAroundZ">Resources/Icons/RotationAroundZ.svg</file>
+        <file alias="SelectAll">Resources/Icons/SelectAll.svg</file>
+        <file alias="NoSelection">Resources/Icons/NoSelection.svg</file>
     </qresource>
 </RCC>
