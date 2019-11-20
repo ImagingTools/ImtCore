@@ -307,8 +307,8 @@ void CView3dProviderComp::OnGuiRetranslate()
 	m_deleteSelectionCommand.SetVisuals(tr("Delete Selection"), tr("Delete"), tr("Delete Selection"), QIcon(":/Icons/DeleteSelection"));
 	m_freeRotationCommand.SetVisuals(tr("Free Rotation"), tr("Free Rotation"), tr("Set Free Rotation Mode"), QIcon(":/Icons/FreeRotation"));
 	m_rotationAroundXCommand.SetVisuals(tr("Rotation around X-Axis"), tr("X-Rotation"), tr("Set Rotation around X-Axis Mode"), QIcon(":/Icons/RotationAroundX"));
-	m_rotationAroundYCommand.SetVisuals(tr("Rotation around Y-Axis"), tr("Y-Rotation"), tr("Set Rotation around Y-Axis Mode"), QIcon(":/Icons/RotationAroundX"));
-	m_rotationAroundZCommand.SetVisuals(tr("Rotation around Z-Axis"), tr("Z-Rotation"), tr("Set Rotation around Z-Axis Mode"), QIcon(":/Icons/RotationAroundX"));
+	m_rotationAroundYCommand.SetVisuals(tr("Rotation around Y-Axis"), tr("Y-Rotation"), tr("Set Rotation around Y-Axis Mode"), QIcon(":/Icons/RotationAroundY"));
+	m_rotationAroundZCommand.SetVisuals(tr("Rotation around Z-Axis"), tr("Z-Rotation"), tr("Set Rotation around Z-Axis Mode"), QIcon(":/Icons/RotationAroundZ"));
 	m_viewModeCommand.SetVisuals(tr("View"), tr("View Mode"), tr("Set View Mode"), QIcon(":/Icons/View"));
 	m_selectionModeCommand.SetVisuals(tr("Selection"), tr("Selection Mode"), tr("Set Selection Mode"), QIcon(":/Icons/Selection"));
 	m_rulerModeCommand.SetVisuals(tr("Ruler"), tr("Ruler Mode"), tr("Set Ruler Mode"), QIcon(":/Icons/Ruler"));
