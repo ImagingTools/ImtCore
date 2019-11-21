@@ -90,16 +90,16 @@ QString CInspectionReportBuilderComp::GetErrorClassText(const ErrorClass errorCl
 {
 	switch (errorClass){
 	case ErrorClass::EC_GLUE_GAP:
-		return "Gap";
+		return QObject::tr("Gap");
 
 	case ErrorClass::EC_GLUE_NARROW:
-		return "Narrow";
+		return QObject::tr("Narrow");
 
 	case ErrorClass::EC_GLUE_WIDE:
-		return "Wide";
+		return QObject::tr("Wide");
 
 	case ErrorClass::EC_GLUE_BEYOND_AREA:
-		return "Beyond area";
+		return QObject::tr("Beyond area");
 
 	default:
 		return QString();
@@ -231,7 +231,14 @@ void CInspectionReportBuilderComp::AddTitlePageFooter(const ReportInputData& rep
 	CTextTable* tablePtr = dynamic_cast<CTextTable*>(page.GetPageElement(uuid));
 	Q_ASSERT(tablePtr);
 
-	tablePtr->SetHorizontalHeaderLabels({ "Inspection", "Region", "Error", "Length", "Value mm", "Tolerance mm", "Diff" });
+	tablePtr->SetHorizontalHeaderLabels({
+				QObject::tr("Inspection"),
+				QObject::tr("Region"),
+				QObject::tr("Error"),
+				QObject::tr("Length"),
+				QObject::tr("Value mm"),
+				QObject::tr("Tolerance mm"),
+				QObject::tr("Diff") });
 	tablePtr->ShowVerticalHeader(false);
 	tablePtr->SetColumnWidths({40.0, 40.0, 20.0, 20.0, 20.0, 20.0, 20.0 });
 
@@ -271,7 +278,13 @@ void CInspectionReportBuilderComp::AddInspectionPageFooter(const Inspection& ins
 	CTextTable* tablePtr = dynamic_cast<CTextTable*>(page.GetPageElement(uuid));
 	Q_ASSERT(tablePtr);
 
-	tablePtr->SetHorizontalHeaderLabels({"Region", "Error", "Length", "Value mm", "Tolerance mm", "Diff"});
+	tablePtr->SetHorizontalHeaderLabels({
+				QObject::tr("Region"),
+				QObject::tr("Error"),
+				QObject::tr("Length"),
+				QObject::tr("Value mm"),
+				QObject::tr("Tolerance mm"),
+				QObject::tr("Diff")});
 	tablePtr->ShowVerticalHeader(false);
 	tablePtr->SetColumnWidths({55.0, 25.0, 25.0, 25.0, 25.0, 25.0});
 
