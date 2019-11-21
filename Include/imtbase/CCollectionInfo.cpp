@@ -77,7 +77,7 @@ QVariant CCollectionInfo::GetElementInfo(const QByteArray& elementId, int infoTy
 
 int CCollectionInfo::GetSupportedOperations() const
 {
-	return SO_CLONE | SO_COPY | SO_RESET;
+	return SO_CLONE | SO_COPY | SO_RESET | SO_COMPARE;
 }
 
 
@@ -95,6 +95,16 @@ bool CCollectionInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 	return false;
 }
 
+
+bool CCollectionInfo::IsEqual(const IChangeable & object) const
+{
+	const CCollectionInfo* sourcePtr = dynamic_cast<const CCollectionInfo*>(&object);
+	if (sourcePtr != NULL){
+		return 0;//(m_items == sourcePtr->m_items);
+	}
+
+	return false;
+}
 
 istd::IChangeable* CCollectionInfo::CloneMe(CompatibilityMode mode) const
 {

@@ -688,17 +688,22 @@ QVariant CFileCollectionComp::GetElementInfo(const QByteArray& elementId, int in
 
 // reimplemented (istd::IChangeable)
 
+int CFileCollectionComp::GetSupportedOperations() const
+{
+	return SO_CLONE | SO_COMPARE | SO_COPY | SO_RESET;
+}
+
+
 bool CFileCollectionComp::CopyFrom(const istd::IChangeable& object, CompatibilityMode /*mode*/)
 {
-	QWriteLocker locker(&m_repositoryLock);
-
 	const CFileCollectionComp* sourcePtr = dynamic_cast<const CFileCollectionComp*>(&object);
 	if (sourcePtr != NULL){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_files = sourcePtr->m_files; 
-
-		locker.unlock();
+		{
+			QWriteLocker locker(&m_repositoryLock);
+			m_files = sourcePtr->m_files;
+		}
 
 		return true;
 	}
@@ -706,6 +711,40 @@ bool CFileCollectionComp::CopyFrom(const istd::IChangeable& object, Compatibilit
 	return false;
 }
 
+
+bool CFileCollectionComp::IsEqual(const IChangeable & object) const
+{
+	const CFileCollectionComp* sourcePtr = dynamic_cast<const CFileCollectionComp*>(&object);
+	if (sourcePtr != NULL){
+		return 0;//(m_files == sourcePtr->m_files);
+	}
+
+	return false;
+}
+
+
+istd::IChangeable* CFileCollectionComp::CloneMe(CompatibilityMode mode) const
+{
+	istd::TDelPtr<CFileCollectionComp> clonePtr(new CFileCollectionComp());
+
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr.PopPtr();
+	}
+
+	return nullptr;
+}
+
+
+bool CFileCollectionComp::ResetData(CompatibilityMode /*mode*/)
+{
+	if (!m_files.isEmpty()){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_files.clear();
+	}
+
+	return true;
+}
 
 // static protected methods
 
