@@ -175,13 +175,13 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 				
 				istd::CRange depthRange(minValue, maxValue);
 
-				int lineBytesCount = sourcePtr->GetLineBytesCount();
+				int lineBytesCount = inputBitmapPtr->GetLineBytesCount();
 
 				if (CreateDepthBitmap(depthRange, size)){
 					Q_ASSERT(lineBytesCount == GetLineBytesCount());
 
 					for (int y = 0; y < size.GetY(); ++y){
-						const float* inputLinePtr = (const float*)sourcePtr->GetLinePtr(y);
+						const float* inputLinePtr = (const float*)inputBitmapPtr->GetLinePtr(y);
 						float* outputLinePtr = (float*)GetLinePtr(y);
 
 						memcpy(outputLinePtr, inputLinePtr, lineBytesCount);
