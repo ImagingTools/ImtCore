@@ -35,6 +35,11 @@ public:
 	virtual void SetProjection(const QMatrix4x4& projection) = 0;
 
 	/**
+		Set scene view port.
+	*/
+	virtual void SetViewPort(const QRect& viewPort) = 0;
+
+	/**
 		Get scene bounding cuboid.
 	*/
 	virtual const imt3d::CCuboid& GetBoundingCuboid() const = 0;

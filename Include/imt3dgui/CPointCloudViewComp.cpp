@@ -39,21 +39,23 @@ void CPointCloudViewComp::OnGuiCreated()
 
 		m_crossTargetShape.SetVisible(false);
 		scenePtr->AddShapeToScene(&m_crossTargetShape);
+
+		m_rulerShape.SetVisible(false);
+		m_rulerShape.SetSlaveShape(cloudShapePtr);
+		scenePtr->AddShapeToScene(&m_rulerShape);
 	}
 }
 
 
 void CPointCloudViewComp::OnGuiDestroyed()
 {
-	COpenGLWidget* widgetPtr = GetQtWidget();
-	Q_ASSERT(widgetPtr != NULL);
-
 	imt3dview::IScene3d* scenePtr = GetScene();
 	if (scenePtr != NULL){
 		scenePtr->RemoveShapeFromScene(&m_gridShape);
 		scenePtr->RemoveShapeFromScene(&m_axisShape);
 		scenePtr->RemoveShapeFromScene(&m_targetPointerShape);
 		scenePtr->RemoveShapeFromScene(&m_crossTargetShape);
+		scenePtr->RemoveShapeFromScene(&m_rulerShape);
 
 		CPointCloudShape* cloudShapePtr = dynamic_cast<CPointCloudShape*>(this);
 		Q_ASSERT(cloudShapePtr != NULL);
@@ -78,15 +80,18 @@ void CPointCloudViewComp::OnShowAxis(bool show)
 }
 
 
+void CPointCloudViewComp::OnShowRuler(bool show)
+{
+	m_rulerShape.SetVisible(show);
+}
+
+
 void CPointCloudViewComp::OnPointSelection(const QPoint& point, bool clearPreviousSelection)
 {
 	CPointCloudShape* cloudShapePtr = dynamic_cast<CPointCloudShape*>(this);
 	Q_ASSERT(cloudShapePtr != NULL);
 
-	COpenGLWidget* widgetPtr = GetQtWidget();
-	Q_ASSERT(widgetPtr != NULL);
-
-	cloudShapePtr->SetPointSelection(point, clearPreviousSelection, widgetPtr->rect());
+	cloudShapePtr->SetPointSelection(point, clearPreviousSelection);
 }
 
 
@@ -95,10 +100,7 @@ void CPointCloudViewComp::OnBoxSelection(const QRect& rect, bool clearPreviousSe
 	CPointCloudShape* cloudShapePtr = dynamic_cast<CPointCloudShape*>(this);
 	Q_ASSERT(cloudShapePtr != NULL);
 
-	COpenGLWidget* widgetPtr = GetQtWidget();
-	Q_ASSERT(widgetPtr != NULL);
-
-	cloudShapePtr->SetBoxSelection(rect, clearPreviousSelection, widgetPtr->rect());
+	cloudShapePtr->SetBoxSelection(rect, clearPreviousSelection);
 }
 
 
@@ -107,10 +109,7 @@ void CPointCloudViewComp::OnCircleSelection(const QRect& rect, bool clearPreviou
 	CPointCloudShape* cloudShapePtr = dynamic_cast<CPointCloudShape*>(this);
 	Q_ASSERT(cloudShapePtr != NULL);
 
-	COpenGLWidget* widgetPtr = GetQtWidget();
-	Q_ASSERT(widgetPtr != NULL);
-
-	cloudShapePtr->SetCircleSelection(rect, clearPreviousSelection, widgetPtr->rect());
+	cloudShapePtr->SetCircleSelection(rect, clearPreviousSelection);
 }
 
 
@@ -150,15 +149,15 @@ void CPointCloudViewComp::OnDeleteSelection()
 }
 
 
-float CPointCloudViewComp::CalculateRulerLength(const QLine& rulerLine)
+bool CPointCloudViewComp::OnMousePress(QMouseEvent& e)
 {
-	CPointCloudShape* cloudShapePtr = dynamic_cast<CPointCloudShape*>(this);
-	Q_ASSERT(cloudShapePtr != NULL);
+	return m_rulerShape.OnMousePress(e);
+}
 
-	COpenGLWidget* widgetPtr = GetQtWidget();
-	Q_ASSERT(widgetPtr != NULL);
 
-	return cloudShapePtr->CalculateRulerLength(rulerLine, widgetPtr->rect());
+bool CPointCloudViewComp::OnMouseMove(QMouseEvent& e)
+{
+	return m_rulerShape.OnMouseMove(e);
 }
 
 

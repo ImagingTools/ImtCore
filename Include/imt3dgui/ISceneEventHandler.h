@@ -1,9 +1,8 @@
 #pragma once
 
 // Qt includes
-#include <QtGui/QQuaternion>
-#include <QtGui/QVector3D>
 #include <QtCore/QRect>
+#include <QtGui/QMouseEvent>
 
 
 namespace imt3dgui {
@@ -16,6 +15,7 @@ class ISceneEventHandler
 public:
 	virtual void OnShowGrid(bool show) = 0;
 	virtual void OnShowAxis(bool show) = 0;
+	virtual void OnShowRuler(bool show) = 0;
 	virtual void OnPointSelection(const QPoint& point, bool clearPreviousSelection) = 0;
 	virtual void OnBoxSelection(const QRect& rect, bool clearPreviousSelection) = 0;
 	virtual void OnCircleSelection(const QRect& rect, bool clearPreviousSelection) = 0;
@@ -23,7 +23,8 @@ public:
 	virtual void OnAllSelection() = 0;
 	virtual void OnInvertSelection() = 0;
 	virtual void OnDeleteSelection() = 0;
-	virtual float CalculateRulerLength(const QLine& rulerLine) = 0;
+	virtual bool OnMousePress(QMouseEvent& e) = 0;
+	virtual bool OnMouseMove(QMouseEvent& e) = 0;
 };
 
 } //namespace imt3dgui

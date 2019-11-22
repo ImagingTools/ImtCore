@@ -30,19 +30,21 @@ void CMeshViewComp::OnGuiCreated()
 
 		m_axisShape.SetAxisLength(3.0);
 		scenePtr->AddShapeToScene(&m_axisShape);
+
+		m_rulerShape.SetVisible(false);
+		m_rulerShape.SetSlaveShape(meshShapePtr);
+		scenePtr->AddShapeToScene(&m_rulerShape);
 	}
 }
 
 
 void CMeshViewComp::OnGuiDestroyed()
 {
-	COpenGLWidget* widgetPtr = GetQtWidget();
-	Q_ASSERT(widgetPtr != NULL);
-
 	imt3dview::IScene3d* scenePtr = GetScene();
 	if (scenePtr != NULL){
 		scenePtr->RemoveShapeFromScene(&m_gridShape);
 		scenePtr->RemoveShapeFromScene(&m_axisShape);
+		scenePtr->RemoveShapeFromScene(&m_rulerShape);
 
 		CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
 		Q_ASSERT(meshShapePtr != NULL);
@@ -67,15 +69,18 @@ void CMeshViewComp::OnShowAxis(bool show)
 }
 
 
+void CMeshViewComp::OnShowRuler(bool show)
+{
+	m_rulerShape.SetVisible(show);
+}
+
+
 void CMeshViewComp::OnPointSelection(const QPoint& point, bool clearPreviousSelection)
 {
 	CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
 	Q_ASSERT(meshShapePtr != NULL);
 
-	COpenGLWidget* widgetPtr = GetQtWidget();
-	Q_ASSERT(widgetPtr != NULL);
-
-	meshShapePtr->SetPointSelection(point, clearPreviousSelection, widgetPtr->rect());
+	meshShapePtr->SetPointSelection(point, clearPreviousSelection);
 }
 
 
@@ -84,10 +89,7 @@ void CMeshViewComp::OnBoxSelection(const QRect& rect, bool clearPreviousSelectio
 	CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
 	Q_ASSERT(meshShapePtr != NULL);
 
-	COpenGLWidget* widgetPtr = GetQtWidget();
-	Q_ASSERT(widgetPtr != NULL);
-
-	meshShapePtr->SetBoxSelection(rect, clearPreviousSelection, widgetPtr->rect());
+	meshShapePtr->SetBoxSelection(rect, clearPreviousSelection);
 }
 
 
@@ -96,10 +98,7 @@ void CMeshViewComp::OnCircleSelection(const QRect& rect, bool clearPreviousSelec
 	CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
 	Q_ASSERT(meshShapePtr != NULL);
 
-	COpenGLWidget* widgetPtr = GetQtWidget();
-	Q_ASSERT(widgetPtr != NULL);
-
-	meshShapePtr->SetCircleSelection(rect, clearPreviousSelection, widgetPtr->rect());
+	meshShapePtr->SetCircleSelection(rect, clearPreviousSelection);
 }
 
 
@@ -139,15 +138,14 @@ void CMeshViewComp::OnDeleteSelection()
 }
 
 
-float CMeshViewComp::CalculateRulerLength(const QLine& rulerLine)
+bool CMeshViewComp::OnMousePress(QMouseEvent& e)
 {
-	CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
-	Q_ASSERT(meshShapePtr != NULL);
+	return m_rulerShape.OnMousePress(e);
+}
 
-	COpenGLWidget* widgetPtr = GetQtWidget();
-	Q_ASSERT(widgetPtr != NULL);
-
-	return meshShapePtr->CalculateRulerLength(rulerLine, widgetPtr->rect());
+bool CMeshViewComp::OnMouseMove(QMouseEvent& e)
+{
+	return m_rulerShape.OnMouseMove(e);
 }
 
 

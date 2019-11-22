@@ -2,7 +2,6 @@
 
 
 // ImtCore includes
-#include <imt3d/CCuboid.h>
 #include <imt3dview/IScene3dItem.h>
 
 

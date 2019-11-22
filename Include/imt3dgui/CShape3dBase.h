@@ -30,6 +30,8 @@ public:
 	CShape3dBase();
 	virtual ~CShape3dBase();
 
+	int FindVertex(const QPoint& point, bool limitDistance, QVector3D* positionPtr = nullptr) const;
+
 	// reimplement (imt3dgui::IShape3d)
 	bool IsValid() const override;
 	bool IsVisible() const override;
@@ -38,6 +40,7 @@ public:
 	// reimplement (imt3dview::IScene3dItem)
 	void SetCamera(const imt3dview::IScene3dCamera* cameraPtr) override;
 	void SetProjection(const QMatrix4x4& projection) override;
+	void SetViewPort(const QRect& viewPort) override;
 
 	const QVector3D& GetPosition() const override;
 	void SetPosition(const QVector3D& position) override;
@@ -45,8 +48,8 @@ public:
 	const QQuaternion& GetRotation() const override;
 	void SetRotation(const QQuaternion& rotation) override;
 
-	const QVector3D& GetScale() const override;
-	void SetScale(const QVector3D& scale) override;
+	float GetScale() const override;
+	void SetScale(float scale) override;
 
 	// reimplement (imt3dview::IDrawable)
 	void SetContext(QOpenGLContext* contextPtr) override;
@@ -69,8 +72,8 @@ protected:
 protected:
 	void UpdateGeometry();
 	QMatrix4x4 GetModelMatrix() const;
-	QPoint ModelToWindow(const QVector3D& modelCoordinate, const QRect& viewPort) const;
-	QVector3D WindowToModel(const QPoint& windowCoordinate, float z, const QRect& viewPort) const;
+	QPoint ModelToWindow(const QVector3D& modelCoordinate) const;
+	QVector3D WindowToModel(const QPoint& windowCoordinate, float z) const;
 
 	template <typename TDataVector>
 	void UploadGeometry(bool reallocate, const TDataVector& dataVector, QOpenGLBuffer& dataBuffer)
@@ -116,10 +119,11 @@ protected:
 
 	QVector3D m_position;
 	QQuaternion m_rotation;
-	QVector3D m_scale;
+	float m_scale;
 
 	QOpenGLContext* m_contextPtr;
 	const imt3dview::IScene3dCamera* m_cameraPtr;
+	QRect m_viewPort;
 	QOpenGLBuffer m_vertexBuffer;
 	QOpenGLBuffer m_indexBuffer;
 	QMatrix4x4 m_projection;

@@ -24,6 +24,7 @@ public:
 
 	virtual void SetCamera(const IScene3dCamera* cameraPtr) = 0;
 	virtual void SetProjection(const QMatrix4x4& projection) = 0;
+	virtual void SetViewPort(const QRect& viewPort) = 0;
 
 	virtual const QVector3D& GetPosition() const = 0;
 	virtual void SetPosition(const QVector3D& position) = 0;
@@ -31,8 +32,8 @@ public:
 	virtual const QQuaternion& GetRotation() const = 0;
 	virtual void SetRotation(const QQuaternion& rotation) = 0;
 
-	virtual const QVector3D& GetScale() const = 0;
-	virtual void SetScale(const QVector3D& scale) = 0;
+	virtual float GetScale() const = 0;
+	virtual void SetScale(float scale) = 0;
 };
 
 

@@ -22,8 +22,9 @@ public:
 	CScene3d();
 
 	// reimplemented (IScene3d)
-	void SetCamera(const IScene3dCamera* cameraPtr);
-	void SetProjection(const QMatrix4x4& projection);
+	void SetCamera(const IScene3dCamera* cameraPtr) override;
+	void SetProjection(const QMatrix4x4& projection) override;
+	void SetViewPort(const QRect& viewPort) override;
 	const imt3d::CCuboid& GetBoundingCuboid() const override;
 	QByteArrayList GetShapeIds() const override;
 	imt3dview::IScene3dItem* GetShapePtr(const QByteArray& id) const override;
@@ -64,8 +65,6 @@ private:
 	Shapes m_shapes;
 
 	QOpenGLContext* m_contextPtr;
-	const imt3dview::IScene3dCamera* m_cameraPtr;
-	QMatrix4x4 m_projection;
 	imt3d::CCuboid m_sceneBoundingCuboid;
 
 	int m_nextModelId;

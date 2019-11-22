@@ -1,6 +1,10 @@
 #include <imt3dview/CTrackballCamera.h>
 
 
+// Qt includes
+#include <QtMath>
+
+
 namespace imt3dview
 {
 

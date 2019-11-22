@@ -42,7 +42,6 @@ public:
 	{
 		VM_VIEW,
 		VM_SELECTION,
-		VM_ROLER
 	};
 
 	enum SelectionMode
@@ -58,13 +57,6 @@ public:
 		RTM_AROUND_X,
 		RTM_AROUND_Y,
 		RTM_AROUND_Z
-	};
-
-	enum RulerMode
-	{
-		RLM_NONE,
-		RLM_POINT1,
-		RLM_POINT2,
 	};
 
 	enum RenderHint
@@ -86,6 +78,7 @@ public:
 	void ZoomOut();
 	void ShowGrid(bool show);
 	void ShowAxis(bool show);
+	void ShowRuler(bool show);
 	bool GetRenderHint(RenderHint renderHint) const;
 	void SetRenderHint(RenderHint renderHint, bool on = true);
 	void SetCameraView(ViewDirection viewDirection, bool animated = true);
@@ -121,12 +114,10 @@ private:
 	void PaintGl();
 	void Paint(QPainter& painter);
 	void PaintSelection(QPainter& painter);
-	void PaintRuler(QPainter& painter);
-	void MousePressRuler(QMouseEvent& e);
+	void MousePressView(QMouseEvent& e);
 	void MousePressSelection(QMouseEvent& e);
 	void MouseMoveView(QMouseEvent& e);
 	void MouseMoveSelection(QMouseEvent& e);
-	void MouseMoveRoler(QMouseEvent& e);
 	void SetGlFlags();
 	void SetGlUniformValues();
 	QMatrix4x4 GetProjectionMatrix() const;
@@ -145,9 +136,6 @@ private:
 	ViewMode m_viewMode;
 	SelectionMode m_selectionMode;
 	RotationMode m_rotationMode;
-	RulerMode m_rulerMode;
-	QLine m_rulerLine;
-	float m_rulerLength;
 	QOpenGLShaderProgram* m_programPtr;
 
 	static const float s_verticalAngle;

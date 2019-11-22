@@ -79,13 +79,13 @@ void CAxisShape::Draw(QPainter& painter)
 	painter.setPen(Qt::black);
 	painter.setFont(GetAxeLabelFont());
 
-	QPoint windowCoordinate = ModelToWindow(QVector3D(m_axisLength, 0.0, 0.0), painter.viewport());
+	QPoint windowCoordinate = ModelToWindow(QVector3D(m_axisLength, 0.0, 0.0));
 	painter.drawText(windowCoordinate, "X");
 
-	windowCoordinate = ModelToWindow(QVector3D(0.0, m_axisLength, 0.0), painter.viewport());
+	windowCoordinate = ModelToWindow(QVector3D(0.0, m_axisLength, 0.0));
 	painter.drawText(windowCoordinate, "Y");
 
-	windowCoordinate = ModelToWindow(QVector3D(0.0, 0.0, m_axisLength), painter.viewport());
+	windowCoordinate = ModelToWindow(QVector3D(0.0, 0.0, m_axisLength));
 	painter.drawText(windowCoordinate, "Z");
 
 	painter.restore();

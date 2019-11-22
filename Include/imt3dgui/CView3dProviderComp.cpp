@@ -18,11 +18,12 @@ CView3dProviderComp::CView3dProviderComp()
 	:m_rootCommands("", 100, ibase::ICommand::CF_GLOBAL_MENU),
 	m_viewCommands("View", 100, ibase::ICommand::CF_GLOBAL_MENU),
 	m_editCommands("Edit", 100, ibase::ICommand::CF_GLOBAL_MENU),
-	m_rotationCommands("Rotation", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
+	m_rotationCommands("Rotation", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_OTHER),
 	m_zoomInCommand("Zoom In", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_ZOOM),
 	m_zoomOutCommand("Zoom Out", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_ZOOM),
-	m_showGridCommand("Show grid", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, CG_SHOW_SCENE_ITEMS),
-	m_showAxisCommand("Show axis", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, CG_SHOW_SCENE_ITEMS),
+	m_showGridCommand("Show Grid", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, CG_SHOW_SCENE_ITEMS),
+	m_showAxisCommand("Show Axis", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, CG_SHOW_SCENE_ITEMS),
+	m_showRulerCommand("Show Ruler", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, CG_SHOW_SCENE_ITEMS),
 	m_setViewFromRightCommand("Right", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_CAMERA_MODE),
 	m_setViewFromFrontCommand("Front", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_CAMERA_MODE),
 	m_setViewFromTopCommand("Top", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_CAMERA_MODE),
@@ -44,13 +45,13 @@ CView3dProviderComp::CView3dProviderComp()
 	m_rotationAroundYCommand("Rotation around Y", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_ROTATION),
 	m_rotationAroundZCommand("Rotation around Z", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_ROTATION),
 	m_viewModeCommand("View", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_VIEW_MODE),
-	m_selectionModeCommand("Selection", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_VIEW_MODE),
-	m_rulerModeCommand("Ruler", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_VIEW_MODE)
+	m_selectionModeCommand("Selection", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_VIEW_MODE)
 {
 	connect(&m_zoomInCommand, SIGNAL(triggered()), this, SLOT(OnZoomIn()));
 	connect(&m_zoomOutCommand, SIGNAL(triggered()), this, SLOT(OnZoomOut()));
 	connect(&m_showGridCommand, SIGNAL(triggered(bool)), this, SLOT(OnShowGridCommand(bool)));
 	connect(&m_showAxisCommand, SIGNAL(triggered(bool)), this, SLOT(OnShowAxisCommand(bool)));
+	connect(&m_showRulerCommand, SIGNAL(triggered(bool)), this, SLOT(OnShowRulerCommand(bool)));
 	connect(&m_resetViewCommand, SIGNAL(triggered()), this, SLOT(OnViewReset()));
 	connect(&m_setViewFromRightCommand, SIGNAL(triggered()), this, SLOT(OnViewFromRight()));
 	connect(&m_setViewFromFrontCommand, SIGNAL(triggered()), this, SLOT(OnViewFromFront()));
@@ -73,7 +74,6 @@ CView3dProviderComp::CView3dProviderComp()
 	connect(&m_rotationAroundZCommand, SIGNAL(triggered(bool)), this, SLOT(OnRotationAroundZCommand()));
 	connect(&m_viewModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnViewModeCommand()));
 	connect(&m_selectionModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnSelectionModeCommand()));
-	connect(&m_rulerModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnRulerModeCommand()));
 }
 
 
@@ -85,6 +85,11 @@ void CView3dProviderComp::OnShowGrid(bool /*show*/)
 
 
 void CView3dProviderComp::OnShowAxis(bool /*show*/)
+{
+}
+
+
+void CView3dProviderComp::OnShowRuler(bool /*show*/)
 {
 }
 
@@ -124,9 +129,15 @@ void CView3dProviderComp::OnDeleteSelection()
 }
 
 
-float CView3dProviderComp::CalculateRulerLength(const QLine& /*rulerLine*/)
+bool CView3dProviderComp::OnMousePress(QMouseEvent& /*e*/)
 {
-	return -1.0;
+	return false;
+}
+
+
+bool CView3dProviderComp::OnMouseMove(QMouseEvent& /*e*/)
+{
+	return false;
 }
 
 
@@ -222,10 +233,11 @@ void CView3dProviderComp::OnGuiCreated()
 		m_showAxisCommand.setChecked(true);
 	}
 
+	m_viewCommands.InsertChild(&m_showRulerCommand);
+
 	if (*m_showViewCommandsAttrPtr){
 		m_viewCommands.InsertChild(&m_viewModeCommand);
 		m_viewCommands.InsertChild(&m_selectionModeCommand);
-		m_viewCommands.InsertChild(&m_rulerModeCommand);
 		m_viewCommands.InsertChild(&m_rotationCommands);
 		m_rotationCommands.InsertChild(&m_freeRotationCommand);
 		m_rotationCommands.InsertChild(&m_rotationAroundXCommand);
@@ -241,6 +253,7 @@ void CView3dProviderComp::OnGuiCreated()
 
 		m_viewModeCommand.setChecked(true);
 		m_freeRotationCommand.setChecked(true);
+		m_rotationCommands.setIcon(m_freeRotationCommand.icon());
 		m_pointSelectionCommand.setChecked(true);
 
 		EnableCommands(COpenGLWidget::ViewMode::VM_VIEW);
@@ -261,6 +274,10 @@ void CView3dProviderComp::OnGuiCreated()
 	m_useAntialiasingCommand.setChecked(true);
 	m_useCullFaceCommand.setChecked(true);
 
+	if (m_viewCommands.GetChildsCount() > 0){
+		m_rootCommands.InsertChild(&m_viewCommands);
+	}
+
 	if (*m_showEditCommandsAttrPtr){
 		m_clearSelectionCommand.setShortcut(Qt::Key_Escape);
 		m_deleteSelectionCommand.setShortcut(Qt::Key_Delete);
@@ -276,10 +293,6 @@ void CView3dProviderComp::OnGuiCreated()
 		m_editCommands.InsertChild(&m_deleteSelectionCommand);
 		m_rootCommands.InsertChild(&m_editCommands);
 	}
-
-	if (m_viewCommands.GetChildsCount() > 0){
-		m_rootCommands.InsertChild(&m_viewCommands);
-	}
 }
 
 
@@ -291,6 +304,7 @@ void CView3dProviderComp::OnGuiRetranslate()
 	m_zoomOutCommand.SetVisuals(tr("Zoom out"), tr("Zoom out"), tr("Zoom out"), QIcon(":/Icons/ViewZoomOut"));
 	m_showGridCommand.SetVisuals(tr("Show Grid"), tr("Grid"), tr("Show Grid"), QIcon(":/Icons/Grid"));
 	m_showAxisCommand.SetVisuals(tr("Show Axis"), tr("Axis"), tr("Show Axis"), QIcon(":/Icons/Axis"));
+	m_showRulerCommand.SetVisuals(tr("Show Ruler"), tr("Ruler"), tr("Show Ruler"), QIcon(":/Icons/Ruler"));
 	m_resetViewCommand.SetVisuals(tr("Reset View"), tr("Reset"), tr("Reset View"), QIcon(":/Icons/ViewReset"));
 	m_setViewFromRightCommand.SetVisuals(tr("Right View"), tr("Right"), tr("Right View"), QIcon(":/Icons/ViewRight"));
 	m_setViewFromFrontCommand.SetVisuals(tr("Front View"), tr("Front"), tr("Front View"), QIcon(":/Icons/ViewFront"));
@@ -311,7 +325,6 @@ void CView3dProviderComp::OnGuiRetranslate()
 	m_rotationAroundZCommand.SetVisuals(tr("Rotation around Z-Axis"), tr("Z-Rotation"), tr("Set Rotation around Z-Axis Mode"), QIcon(":/Icons/RotationAroundZ"));
 	m_viewModeCommand.SetVisuals(tr("View"), tr("View Mode"), tr("Set View Mode"), QIcon(":/Icons/View"));
 	m_selectionModeCommand.SetVisuals(tr("Selection"), tr("Selection Mode"), tr("Set Selection Mode"), QIcon(":/Icons/Selection"));
-	m_rulerModeCommand.SetVisuals(tr("Ruler"), tr("Ruler Mode"), tr("Set Ruler Mode"), QIcon(":/Icons/Ruler"));
 }
 
 
@@ -362,6 +375,15 @@ void CView3dProviderComp::OnShowAxisCommand(bool checked)
 	Q_ASSERT(widgetPtr != NULL);
 
 	widgetPtr->ShowAxis(checked);
+}
+
+
+void CView3dProviderComp::OnShowRulerCommand(bool checked)
+{
+	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
+	Q_ASSERT(widgetPtr != NULL);
+
+	widgetPtr->ShowRuler(checked);
 }
 
 
@@ -516,6 +538,7 @@ void CView3dProviderComp::OnFreeRotationCommand()
 	Q_ASSERT(widgetPtr != NULL);
 
 	widgetPtr->SetRotationMode(COpenGLWidget::RTM_FREE);
+	m_rotationCommands.setIcon(m_freeRotationCommand.icon());
 }
 
 
@@ -525,6 +548,7 @@ void CView3dProviderComp::OnRotationAroundXCommand()
 	Q_ASSERT(widgetPtr != NULL);
 
 	widgetPtr->SetRotationMode(COpenGLWidget::RTM_AROUND_X);
+	m_rotationCommands.setIcon(m_rotationAroundXCommand.icon());
 }
 
 
@@ -534,6 +558,7 @@ void CView3dProviderComp::OnRotationAroundYCommand()
 	Q_ASSERT(widgetPtr != NULL);
 
 	widgetPtr->SetRotationMode(COpenGLWidget::RTM_AROUND_Y);
+	m_rotationCommands.setIcon(m_rotationAroundYCommand.icon());
 }
 
 
@@ -543,6 +568,7 @@ void CView3dProviderComp::OnRotationAroundZCommand()
 	Q_ASSERT(widgetPtr != NULL);
 
 	widgetPtr->SetRotationMode(COpenGLWidget::RTM_AROUND_Z);
+	m_rotationCommands.setIcon(m_rotationAroundZCommand.icon());
 }
 
 
@@ -565,17 +591,6 @@ void CView3dProviderComp::OnSelectionModeCommand()
 	widgetPtr->SetViewMode(COpenGLWidget::ViewMode::VM_SELECTION);
 
 	EnableCommands(COpenGLWidget::ViewMode::VM_SELECTION);
-}
-
-
-void CView3dProviderComp::OnRulerModeCommand()
-{
-	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
-	Q_ASSERT(widgetPtr != NULL);
-
-	widgetPtr->SetViewMode(COpenGLWidget::ViewMode::VM_ROLER);
-
-	EnableCommands(COpenGLWidget::ViewMode::VM_ROLER);
 }
 
 

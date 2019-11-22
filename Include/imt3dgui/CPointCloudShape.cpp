@@ -18,7 +18,6 @@ namespace imt3dgui
 // static members
 
 const QVector3D CPointCloudShape::s_selectionColor(0.0, 0.0, 0.0);
-const float CPointCloudShape::s_distanceEpsilon = 0.1;
 
 
 // public methods
@@ -42,14 +41,13 @@ void CPointCloudShape::SetPointSize(float pointSize)
 }
 
 
-void CPointCloudShape::SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection, const QRect& viewPort)
+void CPointCloudShape::SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection)
 {
 	if (selectionPoint.isNull() || m_vertices.isEmpty()){
 		return;
 	}
 
-	int closestVertexIndex = -1;
-	IsPointVertexIntersection(selectionPoint, viewPort, closestVertexIndex);
+	int closestVertexIndex = FindVertex(selectionPoint, true);
 
 	// update selected vertices and vertex colors
 	for (int i = 0; i < m_vertices.size(); ++i){
@@ -67,15 +65,15 @@ void CPointCloudShape::SetPointSelection(const QPoint& selectionPoint, bool clea
 }
 
 
-void CPointCloudShape::SetBoxSelection(const QRect& selectionRect, bool clearPreviousSelection, const QRect& viewPort)
+void CPointCloudShape::SetBoxSelection(const QRect& selectionRect, bool clearPreviousSelection)
 {
-	SetRectSelection(selectionRect, false, clearPreviousSelection, viewPort);
+	SetRectSelection(selectionRect, false, clearPreviousSelection);
 }
 
 
-void CPointCloudShape::SetCircleSelection(const QRect& selectionRect, bool clearPreviousSelection, const QRect& viewPort)
+void CPointCloudShape::SetCircleSelection(const QRect& selectionRect, bool clearPreviousSelection)
 {
-	SetRectSelection(selectionRect, true, clearPreviousSelection, viewPort);
+	SetRectSelection(selectionRect, true, clearPreviousSelection);
 }
 
 
@@ -150,12 +148,12 @@ void CPointCloudShape::DeleteSelection()
 }
 
 
-float CPointCloudShape::CalculateRulerLength(const QLine& rulerLine, const QRect& viewPort)
+float CPointCloudShape::CalculateRulerLength(const QLine& rulerLine)
 {
-	int intersectedVertexIndex1 = -1, intersectedVertexIndex2 = -1;
+	int intersectedVertexIndex1 = FindVertex(rulerLine.p1(), true);
+	int intersectedVertexIndex2 = FindVertex(rulerLine.p2(), true);
 
-	if (IsPointVertexIntersection(rulerLine.p1(), viewPort, intersectedVertexIndex1) &&
-		IsPointVertexIntersection(rulerLine.p2(), viewPort, intersectedVertexIndex2)){
+	if (intersectedVertexIndex1 >= 0 && intersectedVertexIndex2 >= 0){
 		QVector3D position1 = m_vertices[intersectedVertexIndex1].position;
 		QVector3D position2 = m_vertices[intersectedVertexIndex2].position;
 
@@ -243,7 +241,7 @@ QVector3D CPointCloudShape::GetColor() const
 
 // private methods
 
-void CPointCloudShape::SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection, const QRect& viewPort)
+void CPointCloudShape::SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection)
 {
 	if (!selectionRect.isValid() || m_vertices.isEmpty()){
 		return;
@@ -252,7 +250,7 @@ void CPointCloudShape::SetRectSelection(const QRect& selectionRect, bool isCircl
 	for (int i = 0; i < m_vertices.size(); ++i){
 		Vertex& vertex = m_vertices[i];
 
-		QPoint windowPosition = ModelToWindow(vertex.position, viewPort);
+		QPoint windowPosition = ModelToWindow(vertex.position);
 
 		if (IsPointWithin(windowPosition, selectionRect, isCircle)){
 			m_selectedVerticesIndicies.insert(i);
@@ -362,36 +360,6 @@ bool CPointCloudShape::IsPointWithin(const QPoint& point, const QRect& rect, boo
 	else{
 		return rect.contains(point);
 	}
-}
-
-
-bool CPointCloudShape::IsPointVertexIntersection(const QPoint& point, const QRect& viewPort, int& intersectedVertexIndex) const
-{
-	intersectedVertexIndex = -1;
-
-	if (point.isNull() || m_vertices.isEmpty()){
-		return false;
-	}
-
-	// project window 2D coordinate to near and far planes getting 3D world coordinates
-	// create a ray between those points
-	QVector3D rayFrom = WindowToModel(point, 0.0, viewPort);
-	QVector3D rayTo = WindowToModel(point, 1.0, viewPort);
-	QVector3D rayDirection = (rayTo - rayFrom).normalized();
-
-	// find a vertex closest to the ray
-	float minDist = qInf();
-
-	for (int i = 0; i < m_vertices.size(); ++i){
-		float dist = qAbs(m_vertices[i].position.distanceToLine(rayFrom, rayDirection));
-
-		if (dist < s_distanceEpsilon && dist < minDist){
-			minDist = dist;
-			intersectedVertexIndex = i;
-		}
-	}
-
-	return intersectedVertexIndex >= 0;
 }
 
 

@@ -8,7 +8,7 @@ namespace imt3dgui
 // public methods
 
 CShape3dBase::CShape3dBase()
-	:m_scale(1.0, 1.0, 1.0),
+	:m_scale(1.0),
 	m_contextPtr(nullptr),
 	m_cameraPtr(nullptr),
 	m_vertexBuffer(QOpenGLBuffer::VertexBuffer),
@@ -22,6 +22,51 @@ CShape3dBase::CShape3dBase()
 
 CShape3dBase::~CShape3dBase()
 {
+}
+
+
+int CShape3dBase::FindVertex(const QPoint& point, bool limitDistance, QVector3D* positionPtr) const
+{
+	if (point.isNull() || m_vertices.isEmpty()){
+		return -1;
+	}
+
+	// project window 2D coordinate to near and far planes getting 3D world coordinates
+	// create a ray between those points
+	QVector3D rayFrom = WindowToModel(point, 0.0);
+	QVector3D rayTo = WindowToModel(point, 1.0);
+	QVector3D rayDirection = (rayTo - rayFrom).normalized();
+
+	// find a vertex closest to the ray
+	float distanceEpsilon = 0.1 * m_scale;
+	float minDistance = qInf();
+	int retVal = -1;
+
+	for (int i = 0; i < m_vertices.size(); ++i){
+		float distanceToRay = qAbs(m_vertices[i].position.distanceToLine(rayFrom, rayDirection));
+
+		// if epsilon is given, we search for a vertex lying at that distance from the ray, closest to the beginning of the ray (to the camera)
+		// otherwise we look for any vertex closest to the ray
+		if (limitDistance){
+			float distanceToRayStart = qAbs(m_vertices[i].position.distanceToPoint(rayFrom));
+			if (distanceToRay < distanceEpsilon && distanceToRayStart < minDistance){
+				minDistance = distanceToRayStart;
+				retVal = i;
+			}
+		}
+		else{
+			if (distanceToRay < minDistance){
+				minDistance = distanceToRay;
+				retVal = i;
+			}
+		}
+	}
+
+	if (retVal >= 0 && positionPtr){
+		*positionPtr = m_vertices[retVal].position;
+	}
+
+	return retVal;
 }
 
 
@@ -59,6 +104,12 @@ void CShape3dBase::SetProjection(const QMatrix4x4& projection)
 }
 
 
+void CShape3dBase::SetViewPort(const QRect& viewPort)
+{
+	m_viewPort = viewPort;
+}
+
+
 const QVector3D& CShape3dBase::GetPosition() const
 {
 	return m_position;
@@ -83,13 +134,13 @@ void CShape3dBase::SetRotation(const QQuaternion &rotation)
 }
 
 
-const QVector3D& CShape3dBase::GetScale() const
+float CShape3dBase::GetScale() const
 {
 	return m_scale;
 }
 
 
-void CShape3dBase::SetScale(const QVector3D& scale)
+void CShape3dBase::SetScale(float scale)
 {
 	m_scale = scale;
 }
@@ -206,7 +257,7 @@ QMatrix4x4 CShape3dBase::GetModelMatrix() const
 {
 	QMatrix4x4 modelMatrix;
 
-	modelMatrix.scale(m_scale);
+	modelMatrix.scale(QVector3D(m_scale, m_scale, m_scale));
 	modelMatrix.translate(m_position);
 	modelMatrix.rotate(m_rotation);
 
@@ -214,7 +265,7 @@ QMatrix4x4 CShape3dBase::GetModelMatrix() const
 }
 
 
-QPoint CShape3dBase::ModelToWindow(const QVector3D& modelCoordinate, const QRect& viewPort) const
+QPoint CShape3dBase::ModelToWindow(const QVector3D& modelCoordinate) const
 {
 	if (!m_cameraPtr){
 		return QPoint();
@@ -223,18 +274,18 @@ QPoint CShape3dBase::ModelToWindow(const QVector3D& modelCoordinate, const QRect
 	QMatrix4x4 modelMatrix = GetModelMatrix();
 	QMatrix4x4 viewMatrix = m_cameraPtr->GetViewMatrix();
 
-	QVector3D windowCoordinate = modelCoordinate.project(viewMatrix * modelMatrix, m_projection, viewPort);
+	QVector3D windowCoordinate = modelCoordinate.project(viewMatrix * modelMatrix, m_projection, m_viewPort);
 
 	// QVector3D::project method returns Y coordinate in OpenGL orientation (bottom is 0)
 	// as opposed to Qt widget orientation (top is 0)
 	// so make the y coordinate transformation to widget orientation
-	windowCoordinate.setY(viewPort.height() - windowCoordinate.y());
+	windowCoordinate.setY(m_viewPort.height() - windowCoordinate.y());
 
 	return windowCoordinate.toPoint();
 }
 
 
-QVector3D CShape3dBase::WindowToModel(const QPoint& windowCoordinate, float z, const QRect& viewPort) const
+QVector3D CShape3dBase::WindowToModel(const QPoint& windowCoordinate, float z) const
 {
 	if (!m_cameraPtr){
 		return QVector3D();
@@ -245,10 +296,10 @@ QVector3D CShape3dBase::WindowToModel(const QPoint& windowCoordinate, float z, c
 
 	QVector3D windowCoordinateTmp;
 	windowCoordinateTmp.setX(windowCoordinate.x());
-	windowCoordinateTmp.setY(viewPort.height() - windowCoordinate.y());
+	windowCoordinateTmp.setY(m_viewPort.height() - windowCoordinate.y());
 	windowCoordinateTmp.setZ(z);
 
-	return windowCoordinateTmp.unproject(viewMatrix * modelMatrix, m_projection, viewPort);
+	return windowCoordinateTmp.unproject(viewMatrix * modelMatrix, m_projection, m_viewPort);
 }
 
 

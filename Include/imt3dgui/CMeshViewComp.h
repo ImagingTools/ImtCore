@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <imt3dgui/CGridShape.h>
 #include <imt3dgui/CMeshShape.h>
+#include <imt3dgui/CRulerShape.h>
 #include <imt3dgui/CView3dProviderComp.h>
 #include <imt3dgui/CAxisShape.h>
 #include <imt3dgui/CTargetPointerShape.h>
@@ -35,6 +36,7 @@ protected:
 	// reimplemented (imt3dgui::ISceneEventHandler
 	void OnShowGrid(bool show) override;
 	void OnShowAxis(bool show) override;
+	void OnShowRuler(bool show) override;
 	void OnPointSelection(const QPoint& point, bool clearPreviousSelection) override;
 	void OnBoxSelection(const QRect& rect, bool clearPreviousSelection) override;
 	void OnCircleSelection(const QRect& rect, bool clearPreviousSelection) override;
@@ -42,7 +44,8 @@ protected:
 	void OnAllSelection() override;
 	void OnInvertSelection() override;
 	void OnDeleteSelection() override;
-	float CalculateRulerLength(const QLine& rulerLine) override;
+	bool OnMousePress(QMouseEvent& e) override;
+	bool OnMouseMove(QMouseEvent& e) override;
 
 	// reimplemented (iqtgui::TRestorableGuiWrap)
 	void OnRestoreSettings(const QSettings& settings) override;
@@ -51,6 +54,7 @@ protected:
 private:
 	CGridShape m_gridShape;
 	CAxisShape m_axisShape;
+	CRulerShape m_rulerShape;
 };
 
 

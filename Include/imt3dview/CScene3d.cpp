@@ -19,7 +19,6 @@ namespace imt3dview
 
 CScene3d::CScene3d()
 	:m_contextPtr(nullptr),
-	m_cameraPtr(nullptr),
 	m_sceneBoundingCuboid(-1., 1., -1., 1., 1., -1.),
 	m_nextModelId(0)
 {
@@ -37,8 +36,6 @@ void CScene3d::SetCamera(const IScene3dCamera* cameraPtr)
 			shapeInfoPtr->shapePtr->SetCamera(cameraPtr);
 		}
 	}
-
-	m_cameraPtr = cameraPtr;
 }
 
 
@@ -51,8 +48,18 @@ void CScene3d::SetProjection(const QMatrix4x4& projection)
 			shapeInfoPtr->shapePtr->SetProjection(projection);
 		}
 	}
+}
 
-	m_projection = projection;
+
+void CScene3d::SetViewPort(const QRect& viewPort)
+{
+	for (Shapes::Iterator i = m_shapes.begin(); i != m_shapes.end(); ++i){
+		const ShapeInfoPtr& shapeInfoPtr = i.value();
+
+		if (shapeInfoPtr && shapeInfoPtr->shapePtr){
+			shapeInfoPtr->shapePtr->SetViewPort(viewPort);
+		}
+	}
 }
 
 
@@ -237,9 +244,9 @@ void CScene3d::UpdateItemScale(IScene3dItem& scene3dItem)
 	maxBound = qMax(maxBound, qAbs(m_sceneBoundingCuboid.GetNear()));
 	maxBound = qMax(maxBound, qAbs(m_sceneBoundingCuboid.GetFar()));
 
-	if (maxBound != 0.0){
-		float scale = 1.0 / static_cast<float>(maxBound);
-		scene3dItem.SetScale(QVector3D(scale, scale, scale));
+	if (!qFuzzyIsNull(maxBound)){
+		float scale = 1.0f / static_cast<float>(maxBound);
+		scene3dItem.SetScale(scale);
 	}
 }
 

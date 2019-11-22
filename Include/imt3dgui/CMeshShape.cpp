@@ -31,13 +31,13 @@ void CMeshShape::SetColor(const QVector3D& color)
 }
 
 
-void CMeshShape::SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection, const QRect& viewPort)
+void CMeshShape::SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection)
 {
 	// get 2D point-face intersection if any
 	int selectedFacePointIndex = -1;
 	QVector3D intersectionPoint;
 
-	IsPointFaceIntersection(selectionPoint, viewPort, selectedFacePointIndex, intersectionPoint);
+	IsPointFaceIntersection(selectionPoint, selectedFacePointIndex, intersectionPoint);
 
 	// select/deselect corresponding vertices
 	for (int i = 0; i < m_vertices.size(); i += 3){
@@ -65,15 +65,15 @@ void CMeshShape::SetPointSelection(const QPoint& selectionPoint, bool clearPrevi
 }
 
 
-void CMeshShape::SetBoxSelection(const QRect& selectionRect, bool clearPreviousSelection, const QRect& viewPort)
+void CMeshShape::SetBoxSelection(const QRect& selectionRect, bool clearPreviousSelection)
 {
-	SetRectSelection(selectionRect, false, clearPreviousSelection, viewPort);
+	SetRectSelection(selectionRect, false, clearPreviousSelection);
 }
 
 
-void CMeshShape::SetCircleSelection(const QRect& selectionRect, bool clearPreviousSelection, const QRect& viewPort)
+void CMeshShape::SetCircleSelection(const QRect& selectionRect, bool clearPreviousSelection)
 {
-	SetRectSelection(selectionRect, true, clearPreviousSelection, viewPort);
+	SetRectSelection(selectionRect, true, clearPreviousSelection);
 }
 
 
@@ -148,13 +148,13 @@ void CMeshShape::DeleteSelection()
 }
 
 
-float CMeshShape::CalculateRulerLength(const QLine& rulerLine, const QRect& viewPort) const
+float CMeshShape::CalculateRulerLength(const QLine& rulerLine) const
 {
 	int intersectedVertexIndex = -1;
 	QVector3D intersectionPoint1, intersectionPoint2;
 
-	if (IsPointFaceIntersection(rulerLine.p1(), viewPort, intersectedVertexIndex, intersectionPoint1) &&
-		IsPointFaceIntersection(rulerLine.p2(), viewPort, intersectedVertexIndex, intersectionPoint2)){
+	if (IsPointFaceIntersection(rulerLine.p1(), intersectedVertexIndex, intersectionPoint1) &&
+		IsPointFaceIntersection(rulerLine.p2(), intersectedVertexIndex, intersectionPoint2)){
 		return qAbs(intersectionPoint1.distanceToPoint(intersectionPoint2));
 	}
 
@@ -245,14 +245,14 @@ bool CMeshShape::HasNormals() const
 
 // private methods
 
-void CMeshShape::SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection, const QRect& viewPort)
+void CMeshShape::SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection)
 {
 	if (!selectionRect.isValid() || m_vertices.isEmpty()){
 		return;
 	}
 
 	for (int i = 0; i < m_vertices.size(); ++i){
-		QPoint windowPosition = ModelToWindow(m_vertices[i].position, viewPort);
+		QPoint windowPosition = ModelToWindow(m_vertices[i].position);
 
 		if (IsPointWithin(windowPosition, selectionRect, isCircle)){
 			m_selectedVerticesIndicies.insert(i);
@@ -382,7 +382,7 @@ bool CMeshShape::IsPointWithin(const QPoint& point, const QRect& rect, bool isCi
 }
 
 
-bool CMeshShape::IsPointFaceIntersection(const QPoint& point, const QRect& viewPort, int& intersectedVertexIndex, QVector3D& intersectionPoint) const
+bool CMeshShape::IsPointFaceIntersection(const QPoint& point, int& intersectedVertexIndex, QVector3D& intersectionPoint) const
 {
 	intersectedVertexIndex = -1;
 	intersectionPoint = QVector3D();
@@ -394,8 +394,8 @@ bool CMeshShape::IsPointFaceIntersection(const QPoint& point, const QRect& viewP
 	// Determine mesh faces intersected with the given 2D point.
 	// Among all the intersected faces choose the closest one to the camera.
 	// For that, calculate the distance between the projection of the click point on the near plane and each face.
-	QVector3D rayOrigin = WindowToModel(point, 0.0, viewPort);
-	QVector3D rayDestination = WindowToModel(point, 1.0, viewPort);
+	QVector3D rayOrigin = WindowToModel(point, 0.0);
+	QVector3D rayDestination = WindowToModel(point, 1.0);
 	QVector3D rayDirection = (rayDestination - rayOrigin).normalized();
 
 	float minDistance = qInf();

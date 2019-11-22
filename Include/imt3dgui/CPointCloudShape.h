@@ -28,14 +28,14 @@ public:
 
 	void SetColor(const QVector3D& color);
 	void SetPointSize(float pointSize);
-	void SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection, const QRect& viewPort);
-	void SetBoxSelection(const QRect& selectionRect, bool clearPreviousSelection, const QRect& viewPort);
-	void SetCircleSelection(const QRect& selectionRect, bool clearPreviousSelection, const QRect& viewPort);
+	void SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection);
+	void SetBoxSelection(const QRect& selectionRect, bool clearPreviousSelection);
+	void SetCircleSelection(const QRect& selectionRect, bool clearPreviousSelection);
 	void ClearSelection();
 	void AllSelection();
 	void InvertSelection();
 	void DeleteSelection();
-	float CalculateRulerLength(const QLine& rulerLine, const QRect& viewPort);
+	float CalculateRulerLength(const QLine& rulerLine);
 
 protected:
 	// reimplemented (imt3dview::CShape3dBase)
@@ -50,11 +50,10 @@ protected:
 	QVector3D GetColor() const override;
 
 private:
-	void SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection, const QRect& viewPort);
+	void SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection);
 	template <typename PointType> void UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& pointCloud);
 	template <typename PointType> void DeleteSelectionHelper(imt3d::IPointCloud3d& pointCloud);
 	static bool IsPointWithin(const QPoint& point, const QRect& rect, bool isCircle);
-	bool IsPointVertexIntersection(const QPoint& point, const QRect& viewPort, int& intersectedVertexIndex) const;
 
 private:
 	typedef std::set<int> SelectedVerticesIndicies;
@@ -64,7 +63,6 @@ private:
 	SelectedVerticesIndicies m_selectedVerticesIndicies;
 
 	static const QVector3D s_selectionColor;
-	static const float s_distanceEpsilon;
 };
 
 

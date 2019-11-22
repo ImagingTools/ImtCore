@@ -27,34 +27,34 @@ public:
 	CMeshShape();
 
 	void SetColor(const QVector3D& color);
-	void SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection, const QRect& viewPort);
-	void SetBoxSelection(const QRect& selectionRect, bool clearPreviousSelection, const QRect& viewPort);
-	void SetCircleSelection(const QRect& selectionRect, bool clearPreviousSelection, const QRect& viewPort);
+	void SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection);
+	void SetBoxSelection(const QRect& selectionRect, bool clearPreviousSelection);
+	void SetCircleSelection(const QRect& selectionRect, bool clearPreviousSelection);
 	void ClearSelection();
 	void AllSelection();
 	void InvertSelection();
 	void DeleteSelection();
-	float CalculateRulerLength(const QLine& rulerLine, const QRect& viewPort) const;
+	float CalculateRulerLength(const QLine& rulerLine) const;
 
 protected:
-	// reimplement (imt3dgui::CShape3dBase)
+	// reimplemented (imt3dgui::CShape3dBase)
 	void UpdateShapeGeometry() override;
 	void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
 
 	// reimplemented (imt3dview::IDrawable)
 	void Draw(QPainter& painter) override;
 
-	// reimplement (imt3dgui::IShape3d)
+	// reimplemented (imt3dgui::IShape3d)
 	ColorMode GetColorMode() const;
 	QVector3D GetColor() const;
 	bool HasNormals() const override;
 
 private:
-	void SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection, const QRect& viewPort);
+	void SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection);
 	template <typename PointType> void UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh);
 	template <typename PointType> void DeleteSelectionHelper(imt3d::IMesh3d& mesh);
 	static bool IsPointWithin(const QPoint& point, const QRect& rect, bool isCircle);
-	bool IsPointFaceIntersection(const QPoint& point, const QRect& viewPort, int& intersectedVertexIndex, QVector3D& intersectionPoint) const;
+	bool IsPointFaceIntersection(const QPoint& point, int& intersectedVertexIndex, QVector3D& intersectionPoint) const;
 	static bool IsRayFaceIntersection(
 				const QVector3D& rayOrigin,
 				const QVector3D& rayDirection,

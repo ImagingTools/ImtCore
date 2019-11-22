@@ -41,7 +41,8 @@ public:
 		CG_SELECTION,
 		CG_SELECTION_ACTIONS,
 		CG_ROTATION,
-		CG_VIEW_MODE
+		CG_VIEW_MODE,
+		CG_OTHER
 	};
 
 	I_BEGIN_COMPONENT(CView3dProviderComp);
@@ -63,6 +64,7 @@ public:
 	// reimplemented (imt3dgui::ISceneEventHandler)
 	void OnShowGrid(bool show) override;
 	void OnShowAxis(bool show) override;
+	void OnShowRuler(bool show) override;
 	void OnPointSelection(const QPoint& point, bool clearPreviousSelection) override;
 	void OnBoxSelection(const QRect& rect, bool clearPreviousSelection) override;
 	void OnCircleSelection(const QRect& rect, bool clearPreviousSelection) override;
@@ -70,7 +72,8 @@ public:
 	void OnAllSelection() override;
 	void OnInvertSelection() override;
 	void OnDeleteSelection() override;
-	float CalculateRulerLength(const QLine& rulerLine) override;
+	bool OnMousePress(QMouseEvent& e) override;
+	bool OnMouseMove(QMouseEvent& e) override;
 
 	// reimplemented (imt3dview::IScene3dProvider)
 	imt3dview::IScene3d* GetScene() const override;
@@ -96,6 +99,7 @@ protected Q_SLOTS:
 	void OnZoomOut();
 	void OnShowGridCommand(bool checked);
 	void OnShowAxisCommand(bool checked);
+	void OnShowRulerCommand(bool checked);
 	void OnViewReset();
 	void OnViewFromRight();
 	void OnViewFromFront();
@@ -118,7 +122,6 @@ protected Q_SLOTS:
 	void OnRotationAroundZCommand();
 	void OnViewModeCommand();
 	void OnSelectionModeCommand();
-	void OnRulerModeCommand();
 
 private:
 	// static template methods for subelement access
@@ -160,6 +163,7 @@ private:
 	// show/hide scene decorations
 	iqtgui::CHierarchicalCommand m_showGridCommand;
 	iqtgui::CHierarchicalCommand m_showAxisCommand;
+	iqtgui::CHierarchicalCommand m_showRulerCommand;
 
 	// viewpoint commands
 	iqtgui::CHierarchicalCommand m_setViewFromRightCommand;
@@ -192,7 +196,6 @@ private:
 	// view mode
 	iqtgui::CHierarchicalCommand m_viewModeCommand;
 	iqtgui::CHierarchicalCommand m_selectionModeCommand;
-	iqtgui::CHierarchicalCommand m_rulerModeCommand;
 
 	I_ATTR(bool, m_showEditCommandsAttrPtr);
 	I_ATTR(bool, m_showShowGridCommandAttrPtr);
