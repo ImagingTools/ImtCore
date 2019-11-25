@@ -323,7 +323,6 @@ int CObjectCollection::GetItemDefaultFlags() const
 }
 
 
-
 } // namespace imtbase
 
 

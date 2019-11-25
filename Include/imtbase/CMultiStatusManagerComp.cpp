@@ -127,3 +127,5 @@ void CMultiStatusManagerComp::OnComponentCreated()
 
 
 } // namespace imtbase
+
+
