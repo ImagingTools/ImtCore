@@ -18,7 +18,7 @@ namespace imtbase
 
 
 /**
-	Implementation of a general object collection.
+	Implementation of a general data object collection.
 	\ingroup Collection
 */
 class CObjectCollection:

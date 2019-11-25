@@ -702,6 +702,7 @@ bool CFileCollectionComp::CopyFrom(const istd::IChangeable& object, Compatibilit
 
 		{
 			QWriteLocker locker(&m_repositoryLock);
+
 			m_files = sourcePtr->m_files;
 		}
 
@@ -745,6 +746,7 @@ bool CFileCollectionComp::ResetData(CompatibilityMode /*mode*/)
 
 	return true;
 }
+
 
 // static protected methods
 
