@@ -19,6 +19,8 @@ namespace imt3d
 class CMesh3d: virtual public IMesh3d, public CPointsBasedObject
 {
 public:
+	typedef CPointsBasedObject BaseClass;
+
 	bool SaveToStlFile(const QString& filePath) const;
 	bool LoadFromStlFile(const QString& filePath, bool ensureNormalExists);
 
@@ -31,8 +33,11 @@ public:
 	bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented (istd::IChangeable)
-	bool CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode) override;
-	bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual int GetSupportedOperations() const override;
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool IsEqual(const IChangeable& object) const;
+	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
 	template <typename PointType> bool SaveToStlFile(const QString& filePath) const;

@@ -126,6 +126,12 @@ bool CDepthBitmap::Serialize(iser::IArchive& archive)
 
 // reimplemented (istd::IChangeable)
 
+int CDepthBitmap::GetSupportedOperations() const
+{
+	return SO_CLONE | SO_COMPARE | SO_COPY | SO_RESET;
+}
+
+
 bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode mode)
 {
 	const CDepthBitmap* sourcePtr = dynamic_cast<const CDepthBitmap*>(&object);
@@ -197,6 +203,30 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 }
 
 
+bool CDepthBitmap::IsEqual(const IChangeable& object) const
+{
+	const CDepthBitmap* sourcePtr = dynamic_cast<const CDepthBitmap*>(&object);
+	if (sourcePtr != nullptr) {
+		if (BaseClass2::GetSupportedOperations() & SO_COMPARE){
+			if (!BaseClass2::IsEqual(object)){
+				return false;
+			}
+		}
+
+		if (BaseClass::GetSupportedOperations() & SO_COMPARE){
+			if (!BaseClass::IsEqual(object)){
+				return false;
+			}
+		}
+
+		return ((m_colorMapType == sourcePtr->m_colorMapType)
+				&& (m_depthRange == sourcePtr->m_depthRange));
+	}
+
+	return false;
+}
+
+
 istd::IChangeable* CDepthBitmap::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CDepthBitmap> clonePtr(new CDepthBitmap);
@@ -205,6 +235,29 @@ istd::IChangeable* CDepthBitmap::CloneMe(CompatibilityMode mode) const
 	}
 
 	return NULL;
+}
+
+
+bool CDepthBitmap::ResetData(CompatibilityMode mode)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	if (BaseClass2::GetSupportedOperations() & SO_RESET){
+		if(!BaseClass2::ResetData(mode)){
+			return false;
+		}
+	}
+
+	if (BaseClass::GetSupportedOperations() & SO_RESET){
+		if (!BaseClass::ResetData(mode)){
+			return false;
+		}
+	}
+
+	m_colorMapType = CMT_GRAY;
+	m_depthRange = istd::CRange();
+
+	return true;
 }
 
 

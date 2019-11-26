@@ -105,7 +105,7 @@ bool CPosition3d::Serialize(iser::IArchive& archive)
 
 int CPosition3d::GetSupportedOperations() const
 {
-	return SO_COPY | SO_CLONE | SO_COMPARE;
+	return SO_COPY | SO_CLONE | SO_COMPARE | SO_RESET;
 }
 
 
@@ -148,6 +148,15 @@ istd::IChangeable* CPosition3d::CloneMe(CompatibilityMode mode) const
 	return NULL;
 }
 
+
+bool CPosition3d::ResetData(CompatibilityMode /*mode*/)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_position.Reset();
+
+	return true;
+}
 
 } // namespace imt3d
 

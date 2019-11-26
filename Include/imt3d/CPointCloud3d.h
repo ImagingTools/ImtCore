@@ -17,6 +17,8 @@ namespace imt3d
 class CPointCloud3d: virtual public IPointCloud3d, virtual public IGridInfo, public CPointsBasedObject
 {
 public:
+	typedef CPointsBasedObject BaseClass;
+
 	// reimplemented (imt3d::IPointCloud3d)
 	bool CreateCloud(PointFormat pointFormat, int pointsCount, const istd::CIndex2d* gridSizePtr = nullptr) override;
 	bool CreateCloud(PointFormat pointFormat,
@@ -35,8 +37,11 @@ public:
 	bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented (istd::IChangeable)
-	bool CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode) override;
-	bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual int GetSupportedOperations() const override;
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool IsEqual(const IChangeable& object) const;
+	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
 	istd::CIndex2d m_gridSize;

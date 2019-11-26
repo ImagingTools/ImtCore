@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
+#include <istd/TDelPtr.h>
 
 
 namespace imt3d
@@ -143,6 +144,12 @@ bool CMesh3d::Serialize(iser::IArchive& /*archive*/)
 
 // reimplemented (istd::IChangeable)
 
+int CMesh3d::GetSupportedOperations() const
+{
+	return SO_CLONE | SO_COMPARE | SO_COPY | SO_RESET;
+}
+
+
 bool CMesh3d::CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode)
 {
 	bool retVal = CPointsBasedObject::CopyFrom(object, mode);
@@ -157,6 +164,35 @@ bool CMesh3d::CopyFrom(const istd::IChangeable& object, istd::IChangeable::Compa
 	}
 
 	return retVal;
+}
+
+
+bool CMesh3d::IsEqual(const IChangeable & object) const
+{
+	const CMesh3d* sourcePtr = dynamic_cast<const CMesh3d*>(&object);
+	if (sourcePtr != nullptr) {
+		if (BaseClass::GetSupportedOperations() & SO_COMPARE){
+			if (!BaseClass::IsEqual(object)){
+				return false;
+			}
+		}
+
+		return (m_indices == sourcePtr->m_indices);
+	}
+
+	return false;
+}
+
+
+istd::IChangeable* CMesh3d::CloneMe(CompatibilityMode mode) const
+{
+	istd::TDelPtr<CMesh3d> clonePtr(new CMesh3d());
+
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr.PopPtr();
+	}
+
+	return nullptr;
 }
 
 

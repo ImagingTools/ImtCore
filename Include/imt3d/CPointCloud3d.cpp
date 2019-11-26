@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <istd/TDelPtr.h>
 #include <istd/TRange.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/CArchiveTag.h>
@@ -125,6 +126,12 @@ bool CPointCloud3d::Serialize(iser::IArchive& archive)
 
 // reimplemented (istd::IChangeable)
 
+int CPointCloud3d::GetSupportedOperations() const
+{
+	return SO_CLONE | SO_COMPARE | SO_COPY | SO_RESET;
+}
+
+
 bool CPointCloud3d::CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode)
 {
 	bool retVal = CPointsBasedObject::CopyFrom(object, mode);
@@ -139,6 +146,36 @@ bool CPointCloud3d::CopyFrom(const istd::IChangeable& object, istd::IChangeable:
 	}
 
 	return retVal;
+}
+
+
+bool CPointCloud3d::IsEqual(const IChangeable & object) const
+{
+	const CPointCloud3d* sourcePtr = dynamic_cast<const CPointCloud3d*>(&object);
+	if (sourcePtr != nullptr) {
+
+		if (BaseClass::GetSupportedOperations() & SO_COMPARE){
+			if (!BaseClass::IsEqual(object)){
+				return false;
+			}
+		}
+
+		return (m_gridSize == sourcePtr->m_gridSize);
+	}
+
+	return false;
+}
+
+
+istd::IChangeable* CPointCloud3d::CloneMe(CompatibilityMode mode) const
+{
+	istd::TDelPtr<CPointCloud3d> clonePtr(new CPointCloud3d());
+
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr.PopPtr();
+	}
+
+	return nullptr;
 }
 
 

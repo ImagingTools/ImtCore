@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
@@ -151,6 +152,12 @@ bool CPointsBasedObject::Serialize(iser::IArchive& archive)
 
 // reimplemented (istd::IChangeable)
 
+int CPointsBasedObject::GetSupportedOperations() const
+{
+	return SO_CLONE | SO_COMPARE | SO_COPY | SO_RESET;
+}
+
+
 bool CPointsBasedObject::CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode /*mode*/)
 {
 	const CPointsBasedObject* objectPtr = dynamic_cast<const CPointsBasedObject*>(&object);
@@ -175,14 +182,52 @@ bool CPointsBasedObject::CopyFrom(const istd::IChangeable& object, istd::IChange
 }
 
 
+bool CPointsBasedObject::IsEqual(const IChangeable & object) const
+{
+	const CPointsBasedObject* sourcePtr = dynamic_cast<const CPointsBasedObject*>(&object);
+	if (sourcePtr != nullptr) {
+		return ((GetDataSize() == sourcePtr->GetDataSize())
+				&& (memcmp(m_dataPtr, sourcePtr->m_dataPtr, GetDataSize()) == 0)
+				&& (m_dataOwner == sourcePtr->m_dataOwner)
+				&& (m_pointFormat == sourcePtr->m_pointFormat)
+				&& (m_pointsCount == sourcePtr->m_pointsCount)
+				&& (m_cloudCenter == sourcePtr->m_cloudCenter)
+				&& (m_boundingCuboid == sourcePtr->m_boundingCuboid)
+				&& (m_isCenterCalculationValid == sourcePtr->m_isCenterCalculationValid)
+				&& (m_isCuboidCalculationValid == sourcePtr->m_isCuboidCalculationValid));
+	}
+
+	return false;
+}
+
+
+istd::IChangeable* CPointsBasedObject::CloneMe(CompatibilityMode mode) const
+{
+	istd::TDelPtr<CPointsBasedObject> clonePtr(new CPointsBasedObject());
+
+	if (clonePtr->CopyFrom(*this, mode)) {
+		return clonePtr.PopPtr();
+	}
+
+	return nullptr;
+}
+
+
 bool CPointsBasedObject::ResetData(istd::IChangeable::CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
 	FreeData();
 
+	m_dataPtr = nullptr;
+	m_dataOwner = false;
 	m_pointFormat = IPointsBasedObject::PF_XYZ_32;
 	m_pointsCount = 0;
+
+	m_cloudCenter.Reset();
+	m_boundingCuboid = CCuboid();
+	m_isCenterCalculationValid = false;
+	m_isCuboidCalculationValid = false;
 
 	return true;
 }

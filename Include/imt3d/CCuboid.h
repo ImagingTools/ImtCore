@@ -96,6 +96,10 @@ public:
 	*/
 	static const imt3d::CCuboid& GetInvalid();
 
+	bool operator==(const CCuboid &object);
+
+	bool operator!=(const CCuboid &object);
+
 private:
 	istd::CRange m_horizontalRange;
 	istd::CRange m_verticalRange;
@@ -411,6 +415,18 @@ inline const imt3d::CCuboid& CCuboid::GetEmpty()
 inline const imt3d::CCuboid& CCuboid::GetInvalid()
 {
 	return s_invalid;
+}
+
+inline bool CCuboid::operator==(const CCuboid & object)
+{
+	return ((m_horizontalRange == object.m_horizontalRange)
+			&& (m_verticalRange == object.m_verticalRange)
+			&& (m_depthRange == object.m_depthRange));
+}
+
+inline bool CCuboid::operator!=(const CCuboid & object)
+{
+	return !(operator==(object));
 }
 
 
