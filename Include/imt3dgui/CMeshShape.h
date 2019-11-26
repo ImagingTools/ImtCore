@@ -34,7 +34,6 @@ public:
 	void AllSelection();
 	void InvertSelection();
 	void DeleteSelection();
-	float CalculateRulerLength(const QLine& rulerLine) const;
 
 protected:
 	// reimplemented (imt3dgui::CShape3dBase)

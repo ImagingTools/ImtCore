@@ -148,20 +148,6 @@ void CMeshShape::DeleteSelection()
 }
 
 
-float CMeshShape::CalculateRulerLength(const QLine& rulerLine) const
-{
-	int intersectedVertexIndex = -1;
-	QVector3D intersectionPoint1, intersectionPoint2;
-
-	if (IsPointFaceIntersection(rulerLine.p1(), intersectedVertexIndex, intersectionPoint1) &&
-		IsPointFaceIntersection(rulerLine.p2(), intersectedVertexIndex, intersectionPoint2)){
-		return qAbs(intersectionPoint1.distanceToPoint(intersectionPoint2));
-	}
-
-	return -1.0;
-}
-
-
 // protected methods
 
 // reimplement (imt3dgui::CShape3dBase)

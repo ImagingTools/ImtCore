@@ -148,22 +148,6 @@ void CPointCloudShape::DeleteSelection()
 }
 
 
-float CPointCloudShape::CalculateRulerLength(const QLine& rulerLine)
-{
-	int intersectedVertexIndex1 = FindVertex(rulerLine.p1(), true);
-	int intersectedVertexIndex2 = FindVertex(rulerLine.p2(), true);
-
-	if (intersectedVertexIndex1 >= 0 && intersectedVertexIndex2 >= 0){
-		QVector3D position1 = m_vertices[intersectedVertexIndex1].position;
-		QVector3D position2 = m_vertices[intersectedVertexIndex2].position;
-
-		return qAbs(position1.distanceToPoint(position2));
-	}
-
-	return -1.0;
-}
-
-
 // protected methods
 
 // reimplement (imt3dgui::CShape3dBase)
