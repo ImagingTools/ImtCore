@@ -113,8 +113,8 @@ void CRulerShape::DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& f
 	program.setUniformValue("pointSize", 5.0f);
 
 	functions.glLineWidth(3.0f);
-	functions.glDrawElements(GL_LINES, m_vertices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
-	functions.glDrawElements(GL_POINTS, m_vertices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
+	functions.glDrawElements(GL_LINES, m_indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
+	functions.glDrawElements(GL_POINTS, m_indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
 }
 
 

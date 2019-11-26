@@ -176,7 +176,7 @@ void CMeshShape::UpdateShapeGeometry()
 
 void CMeshShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions& functions)
 {
-	functions.glDrawElements(GL_TRIANGLES, m_vertices.size(), GL_UNSIGNED_INT, (GLuint*)0);
+	functions.glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, (GLuint*)0);
 }
 
 
@@ -429,24 +429,28 @@ bool CMeshShape::IsRayFaceIntersection(
 
 	// check if ray is parallel to the triangle
 	float a = QVector3D::dotProduct(edge1, h);
-	if (a > -EPSILON && a < EPSILON)
+	if (a > -EPSILON && a < EPSILON){
 		return false;
+	}
 
 	float f = 1.0 / a;
 
 	QVector3D s = rayOrigin - trianglePoint1;
 
 	float u = f * QVector3D::dotProduct(s, h);
-	if (u < 0.0 || u > 1.0)
+	if (u < 0.0 || u > 1.0){
 		return false;
+	}
 
 	QVector3D q = QVector3D::crossProduct(s, edge1);
 
 	float v = f * QVector3D::dotProduct(rayDirection, q);
-	if (v < 0.0 || u + v > 1.0)
+	if (v < 0.0 || u + v > 1.0){
 		return false;
+	}
 
 	distanceToTriangle = f * QVector3D::dotProduct(edge2, q);
+
 	if (distanceToTriangle > EPSILON && distanceToTriangle < 1 / EPSILON){
 		intersectionPoint = rayOrigin + distanceToTriangle * rayDirection;
 

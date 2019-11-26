@@ -179,7 +179,7 @@ void CPointCloudShape::DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctio
 	program.setUniformValue("usePointSize", true);
 	program.setUniformValue("pointSize", m_pointSize);
 
-	functions.glDrawElements(GL_POINTS, m_vertices.size(), GL_UNSIGNED_INT, (GLuint*)0);
+	functions.glDrawElements(GL_POINTS, m_indices.size(), GL_UNSIGNED_INT, (GLuint*)0);
 }
 
 
