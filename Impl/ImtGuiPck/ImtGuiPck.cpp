@@ -11,8 +11,10 @@ I_REGISTER_QT_RESOURCE(imtgui);
 namespace ImtGuiPck
 {
 
-
-I_EXPORT_PACKAGE("ImtGuiPck", "ImagingTools standard UI-component package", "GUI UI UX View");
+I_EXPORT_PACKAGE(
+			"ImtGuiPck",
+			"ImagingTools core framework UI-component package",
+			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
 			ThumbnailDecoratorGui,

@@ -11,13 +11,15 @@ namespace Imt3dGuiPck
 {
 
 
-I_EXPORT_PACKAGE("Imt3dGuiPck", "Easy GL Engine UI component package", "Easy GL Engine Gui")
-
+I_EXPORT_PACKAGE(
+			"Imt3dGuiPck",
+			"ImagingTools 3D-geometry UI-component package",
+			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
 			View3dProvider,
-			"Eagle Gui widget",
-			"Eagle Gui widget")
+			"3D-view provider",
+			"3D View Scene")
 
 I_EXPORT_COMPONENT(
 			PointCloudView,
@@ -28,6 +30,7 @@ I_EXPORT_COMPONENT(
 			MeshView,
 			"Viewer of the 3D mesh",
 			"3D Mesh View")
+
 
 } // namespace Imt3dGuiPck
 

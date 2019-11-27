@@ -12,7 +12,7 @@ namespace Imt3dPck
 I_EXPORT_PACKAGE(
 			"Imt3dPck",
 			"ImagingTools 3D-geometry component package",
-			IM_PROJECT("\"Core Framework\"") IM_COMPANY("ImagingTools"));
+			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
 			PointCloud,
