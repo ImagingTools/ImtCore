@@ -100,7 +100,7 @@ bool CCollectionInfo::IsEqual(const IChangeable & object) const
 {
 	const CCollectionInfo* sourcePtr = dynamic_cast<const CCollectionInfo*>(&object);
 	if (sourcePtr != NULL){
-		return 0;//(m_items == sourcePtr->m_items);
+		return (m_items == sourcePtr->m_items);
 	}
 
 	return false;

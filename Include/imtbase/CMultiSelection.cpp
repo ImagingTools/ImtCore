@@ -89,7 +89,7 @@ int CMultiSelection::GetSupportedOperations() const
 bool CMultiSelection::CopyFrom(const IChangeable & object, CompatibilityMode /*mode*/)
 {
 	const CMultiSelection* sourcePtr = dynamic_cast<const CMultiSelection*>(&object);
-	if (sourcePtr != NULL){
+	if (sourcePtr != nullptr){
 		if (m_selectedIds != sourcePtr->m_selectedIds){
 			istd::CChangeNotifier changeNotifier(this);
 
@@ -106,7 +106,7 @@ bool CMultiSelection::CopyFrom(const IChangeable & object, CompatibilityMode /*m
 bool CMultiSelection::IsEqual(const IChangeable & object) const
 {
 	const CMultiSelection* sourcePtr = dynamic_cast<const CMultiSelection*>(&object);
-	if (sourcePtr != NULL){
+	if (sourcePtr != nullptr){
 		return (m_selectedIds == sourcePtr->m_selectedIds);
 	}
 

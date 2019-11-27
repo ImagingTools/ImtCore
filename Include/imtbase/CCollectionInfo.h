@@ -59,6 +59,19 @@ protected:
 		QString name;
 		QString description;
 		QByteArray id;
+
+		bool operator==(const Item &item) const
+		{
+			return ((isEnabled == item.isEnabled)
+					&& (name == item.name)
+					&& (description == item.description)
+					&& (id == item.id));
+		}
+
+		bool operator!=(const Item &item) const
+		{
+			return !(operator==(item));
+		}
 	};
 
 	typedef QVector<Item> Items;
