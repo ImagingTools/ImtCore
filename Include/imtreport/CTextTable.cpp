@@ -221,7 +221,7 @@ bool CTextTable::Serialize(iser::IArchive& archive)
 
 int CTextTable::GetSupportedOperations() const
 {
-	return SO_COPY | SO_CLONE;
+	return SO_COPY | SO_CLONE | SO_COMPARE | SO_RESET;
 }
 
 
@@ -244,6 +244,27 @@ bool CTextTable::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 }
 
 
+bool CTextTable::IsEqual(const IChangeable & object) const
+{
+	const CTextTable* sourcePtr = dynamic_cast<const CTextTable*>(&object);
+	if (sourcePtr != nullptr){
+
+		if (BaseClass::GetSupportedOperations () & SO_COMPARE){
+			if (!BaseClass::IsEqual (object)){
+				return false;
+			}
+		}
+
+		return ((m_showHorizontalHeader == sourcePtr->m_showHorizontalHeader)
+				&& (m_showVerticalHeader == sourcePtr->m_showVerticalHeader)
+				&& (m_columnWidths == sourcePtr->m_columnWidths)
+				&& (m_items == sourcePtr->m_items));
+	}
+
+	return false;
+}
+
+
 istd::IChangeable* CTextTable::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CTextTable> clonePtr(new CTextTable());
@@ -253,6 +274,26 @@ istd::IChangeable* CTextTable::CloneMe(CompatibilityMode mode) const
 
 	return nullptr;
 }
+
+
+bool CTextTable::ResetData (CompatibilityMode mode)
+{
+	istd::CChangeNotifier changeNotifier (this);
+
+	if (BaseClass::GetSupportedOperations() & SO_RESET){
+		if (!BaseClass::ResetData(mode)){
+			return false;
+		}
+	}
+
+	m_showHorizontalHeader = true;
+	m_showVerticalHeader = true;
+	m_columnWidths.clear();
+	m_items.clear();
+
+	return true;
+}
+
 
 
 // private methods

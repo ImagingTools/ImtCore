@@ -124,6 +124,16 @@ void CTextTableItem::SetImage(const iimg::CBitmap& image)
 }
 
 
+bool CTextTableItem::operator==(const CTextTableItem &object) const
+{
+	return IsEqual(object);
+}
+
+bool CTextTableItem::operator!=(const CTextTableItem &object) const
+{
+	return !IsEqual(object);
+}
+
 // reimplemented (iser::ISerializable)
 
 bool CTextTableItem::Serialize(iser::IArchive& archive)
@@ -165,7 +175,7 @@ bool CTextTableItem::Serialize(iser::IArchive& archive)
 
 int CTextTableItem::GetSupportedOperations() const
 {
-	return (SO_COPY | SO_CLONE);
+	return (SO_COPY | SO_CLONE | SO_COMPARE | SO_RESET);
 }
 
 
@@ -189,6 +199,43 @@ bool CTextTableItem::CopyFrom(const IChangeable& object, CompatibilityMode /*mod
 }
 
 
+bool CTextTableItem::IsEqual(const IChangeable & object) const
+{
+	const CTextTableItem* sourcePtr = dynamic_cast<const CTextTableItem*>(&object);
+
+	if (sourcePtr != nullptr){
+		if (m_font.GetSupportedOperations() & SO_COMPARE){
+			if (!m_font.IsEqual(sourcePtr->m_font)){
+				return false;
+			}
+		}
+
+		if (m_image.GetSupportedOperations() & SO_COMPARE){
+			if (!m_image.IsEqual(sourcePtr->m_image)){
+				return false;
+			}
+		}
+
+		if (m_foregroundColor.GetSupportedOperations() & SO_COMPARE){
+			if (!m_foregroundColor.IsEqual(sourcePtr->m_foregroundColor)){
+				return false;
+			}
+		}
+
+		if (m_backgroundColor.GetSupportedOperations() & SO_COMPARE){
+			if (!m_backgroundColor.IsEqual(sourcePtr->m_backgroundColor)){
+				return false;
+			}
+		}
+
+		return ((m_text == sourcePtr->m_text)
+				&& (m_alignment == sourcePtr->m_alignment));
+	}
+
+	return false;
+}
+
+
 istd::IChangeable* CTextTableItem::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CTextTableItem> clonePtr(new CTextTableItem());
@@ -197,6 +244,41 @@ istd::IChangeable* CTextTableItem::CloneMe(CompatibilityMode mode) const
 	}
 
 	return nullptr;
+}
+
+
+bool CTextTableItem::ResetData(CompatibilityMode mode)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	if (m_font.GetSupportedOperations() & SO_RESET){
+		if (!m_font.ResetData(mode)){
+			return false;
+		}
+	}
+
+	if (m_foregroundColor.GetSupportedOperations() & SO_RESET){
+		if (!m_foregroundColor.ResetData(mode)){
+			return false;
+		}
+	}
+
+	if (m_backgroundColor.GetSupportedOperations() & SO_RESET){
+		if (!m_backgroundColor.ResetData(mode)){
+			return false;
+		}
+	}
+
+	if (m_image.GetSupportedOperations() & SO_RESET){
+		if (!m_image.ResetData(mode)){
+			return false;
+		}
+	}
+
+	m_text = QString();
+	m_alignment = Qt::AlignLeft;
+
+	return true;
 }
 
 

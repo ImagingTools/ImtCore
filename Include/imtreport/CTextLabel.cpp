@@ -110,27 +110,70 @@ bool CTextLabel::Serialize(iser::IArchive& archive)
 
 int CTextLabel::GetSupportedOperations() const
 {
-	return SO_COPY | SO_CLONE;
+	return SO_COPY | SO_CLONE | SO_COMPARE | SO_RESET;
 }
 
 
 bool CTextLabel::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 {
 	const CTextLabel* labelPtr = dynamic_cast<const CTextLabel*>(&object);
-	if (labelPtr != NULL)
+
+	if (labelPtr != nullptr)
 	{
 		istd::CChangeNotifier notifier(this);
 
-		bool retVal = m_font.CopyFrom(labelPtr->GetFont());
-
-		if (retVal){
-			m_rectangle = labelPtr->GetRectangle();
-			m_alignment = labelPtr->GetAlignment();
-
-			retVal = BaseClass::CopyFrom(object, mode);
+		if (BaseClass::GetSupportedOperations() & SO_COPY){
+			if (!BaseClass::CopyFrom(object, mode)){
+				return false;
+			}
 		}
 
-		return retVal;
+		if (m_font.GetSupportedOperations() & SO_COPY){
+			if (!m_font.CopyFrom(labelPtr->m_font, mode)){
+				return false;
+			}
+		}
+
+		if (m_rectangle.GetSupportedOperations() & SO_COPY){
+			if (!m_rectangle.CopyFrom(labelPtr->m_rectangle, mode)){
+				return false;
+			}
+		}
+
+		m_alignment = labelPtr->m_alignment;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CTextLabel::IsEqual(const IChangeable & object) const
+{
+	const CTextLabel* sourcePtr = dynamic_cast<const CTextLabel*>(&object);
+
+	if (sourcePtr != nullptr){
+
+		if (BaseClass::GetSupportedOperations() & SO_COMPARE){
+			if (!BaseClass::IsEqual(object)){
+				return false;
+			}
+		}
+
+		if (m_font.GetSupportedOperations() & SO_COMPARE){
+			if (!m_font.IsEqual(sourcePtr->m_font)){
+				return false;
+			}
+		}
+
+		if (m_rectangle.GetSupportedOperations() & SO_COMPARE){
+			if (!m_rectangle.IsEqual(sourcePtr->m_rectangle)){
+				return false;
+			}
+		}
+
+		return (m_alignment == sourcePtr->m_alignment);
 	}
 
 	return false;
@@ -141,14 +184,40 @@ istd::IChangeable* CTextLabel::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CTextLabel> clonePtr(new CTextLabel);
 
-	if (clonePtr->CopyFrom(*this, mode))
-	{
+	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
+
+bool CTextLabel::ResetData(CompatibilityMode mode)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	if (BaseClass::GetSupportedOperations () & SO_RESET){
+		if (!BaseClass::ResetData(mode)){
+			return false;
+		}
+	}
+
+	if (m_font.GetSupportedOperations() & SO_RESET){
+		if (!m_font.ResetData(mode)){
+			return false;
+		}
+	}
+
+	if (m_rectangle.GetSupportedOperations() & SO_RESET){
+		if (!m_rectangle.ResetData(mode)){
+			return false;
+		}
+	}
+
+	m_alignment = Qt::AlignLeft;
+
+	return true;
+}
 
 } // namespace imtreport
 

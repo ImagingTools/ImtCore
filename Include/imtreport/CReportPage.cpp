@@ -165,7 +165,75 @@ bool CReportPage::RemovePageElement(const QByteArray& elementId)
 
 int CReportPage::GetSupportedOperations() const
 {
-	return (SO_COPY | SO_CLONE | SO_RESET);
+	return (SO_COPY | SO_CLONE | SO_RESET | SO_COMPARE);
+}
+
+
+bool CReportPage::CopyFrom(const IChangeable & object, CompatibilityMode mode)
+{
+	const CReportPage* sourcePtr = dynamic_cast<const CReportPage*>(&object);
+
+	if (sourcePtr != nullptr){
+		istd::CChangeNotifier changeNotifier(this);
+
+		if (BaseClass::GetSupportedOperations() & SO_COPY){
+			if (!BaseClass::CopyFrom(object, mode)){
+				return false;
+			}
+		}
+
+		m_elementsIndicies = sourcePtr->m_elementsIndicies;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CReportPage::IsEqual(const IChangeable & object) const
+{
+	const CReportPage* sourcePtr = dynamic_cast<const CReportPage*>(&object);
+
+	if (sourcePtr != nullptr){
+		if (BaseClass::GetSupportedOperations() & SO_COMPARE){
+			if (!BaseClass::IsEqual(object)){
+				return false;
+			}
+		}
+
+		return (m_elementsIndicies == sourcePtr->m_elementsIndicies);
+	}
+
+	return false;
+}
+
+
+istd::IChangeable* CReportPage::CloneMe(CompatibilityMode mode) const
+{
+	istd::TDelPtr<CReportPage> clonePtr(new CReportPage());
+
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr.PopPtr();
+	}
+
+	return nullptr;
+}
+
+
+bool CReportPage::ResetData(CompatibilityMode mode)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	if (BaseClass::GetSupportedOperations() & SO_RESET){
+		if (!BaseClass::ResetData(mode)){
+			return false;
+		}
+	}
+
+	m_elementsIndicies.clear();
+
+	return true;
 }
 
 

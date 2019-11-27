@@ -110,7 +110,7 @@ bool CFont::Serialize(iser::IArchive& archive)
 
 int CFont::GetSupportedOperations() const
 {
-	return SO_COPY | SO_CLONE | SO_COMPARE;
+	return SO_COPY | SO_CLONE | SO_COMPARE | SO_RESET;
 }
 
 
@@ -136,6 +136,7 @@ bool CFont::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 bool CFont::IsEqual(const IChangeable& object) const
 {
 	const CFont* fontPtr = dynamic_cast<const CFont*>(&object);
+
 	if (fontPtr != NULL){
 		return m_name == fontPtr->m_name &&
 			m_size == fontPtr->m_size &&
@@ -158,6 +159,17 @@ istd::IChangeable* CFont::CloneMe(CompatibilityMode mode) const
 	return NULL;
 }
 
+
+bool CFont::ResetData(CompatibilityMode /*mode*/)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_name = QString();
+	m_size = 3.0;
+	m_fontFlags = FF_NORMAL;
+
+	return true;
+}
 
 } // namespace imtreport
 

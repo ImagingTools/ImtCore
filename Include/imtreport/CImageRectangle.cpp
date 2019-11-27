@@ -53,7 +53,7 @@ bool CImageRectangle::Serialize(iser::IArchive& archive)
 
 int CImageRectangle::GetSupportedOperations() const
 {
-	return SO_COPY | SO_CLONE;
+	return SO_COPY | SO_CLONE | SO_COMPARE | SO_RESET;
 }
 
 
@@ -61,15 +61,35 @@ bool CImageRectangle::CopyFrom(const IChangeable& object, CompatibilityMode mode
 {
 	const CImageRectangle* labelPtr = dynamic_cast<const CImageRectangle*>(&object);
 
-	if (labelPtr != NULL)
-	{
+	if (labelPtr != nullptr){
 		istd::CChangeNotifier notifier(this);
 
+		if (BaseClass::GetSupportedOperations() & SO_COPY){
+			if (!BaseClass::CopyFrom(object, mode)){
+				return false;
+			}
+		}
+
 		m_imagePath = labelPtr->GetImagePath();
-
-		BaseClass::CopyFrom(object, mode);
-
+		
 		return true;
+	}
+
+	return false;
+}
+
+bool CImageRectangle::IsEqual(const IChangeable & object) const
+{
+	const CImageRectangle* sourcePtr = dynamic_cast<const CImageRectangle*>(&object);
+
+	if (sourcePtr != nullptr){
+		if (BaseClass::GetSupportedOperations() & SO_COMPARE){
+			if (!BaseClass::IsEqual(object)){
+				return false;
+			}
+		}
+
+		return (m_imagePath == sourcePtr->m_imagePath);
 	}
 
 	return false;
@@ -80,14 +100,28 @@ istd::IChangeable* CImageRectangle::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CImageRectangle> clonePtr(new CImageRectangle);
 
-	if (clonePtr->CopyFrom(*this, mode))
-	{
+	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
+
+bool CImageRectangle::ResetData(CompatibilityMode mode)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	if (BaseClass::GetSupportedOperations() & SO_RESET){
+		if (!BaseClass::ResetData(mode)){
+			return false;
+		}
+	}
+	
+	m_imagePath = QString();
+
+	return true;
+}
 
 } // namespace imtreport
 
