@@ -1,4 +1,4 @@
-#include <imt3dview/CTrackballCamera.h>
+#include <imt3dview/CTrackballCameraComp.h>
 
 
 // Qt includes
@@ -11,34 +11,40 @@ namespace imt3dview
 
 // static members
 
-const double CTrackballCamera::s_zoomSpeed = 0.05;
-const double CTrackballCamera::s_moveSpeed = 0.005;
-const double CTrackballCamera::s_rotationSpeed = 1.0;
+const double CTrackballCameraComp::s_zoomSpeed = 0.05;
+const double CTrackballCameraComp::s_moveSpeed = 0.005;
+const double CTrackballCameraComp::s_rotationSpeed = 1.0;
 
 
 // public methods
 
-// reimplement (imt3dview::IScene3dCamera)
+CTrackballCameraComp::CTrackballCameraComp()
+	:m_position(0.0, 0.0, 5.0)
+{
+}
 
-void CTrackballCamera::SetViewPortSize(const QSize& size)
+
+// reimplemented (imt3dview::IScene3dCamera)
+
+void CTrackballCameraComp::SetViewPortSize(const QSize& size)
 {
 	m_viewPortSize = size;
 }
 
 
-const QVector3D& CTrackballCamera::GetPosition() const
+const QVector3D& CTrackballCameraComp::GetPosition() const
 {
 	return m_position;
 }
 
 
-void CTrackballCamera::MoveTo(const QVector3D& position)
+void CTrackballCameraComp::MoveTo(const QVector3D& position)
 {
 	m_position = position;
 }
 
 
-void CTrackballCamera::MoveTo(const QPoint& pointFrom, const QPoint& pointTo)
+void CTrackballCameraComp::MoveTo(const QPoint& pointFrom, const QPoint& pointTo)
 {
 	QPoint mousePositionDiff = pointTo - pointFrom;
 
@@ -46,19 +52,19 @@ void CTrackballCamera::MoveTo(const QPoint& pointFrom, const QPoint& pointTo)
 }
 
 
-const QQuaternion& CTrackballCamera::GetRotation() const
+const QQuaternion& CTrackballCameraComp::GetRotation() const
 {
 	return m_rotation;
 }
 
 
-void CTrackballCamera::RotateTo(const QQuaternion& rotation)
+void CTrackballCameraComp::RotateTo(const QQuaternion& rotation)
 {
 	m_rotation = rotation;
 }
 
 
-void CTrackballCamera::RotateTo(const QPoint& pointFrom, const QPoint& pointTo, const QVector3D& axis)
+void CTrackballCameraComp::RotateTo(const QPoint& pointFrom, const QPoint& pointTo, const QVector3D& axis)
 {
 	QVector3D rotationAxis;
 	float rotationAngle = 0.0;
@@ -92,19 +98,19 @@ void CTrackballCamera::RotateTo(const QPoint& pointFrom, const QPoint& pointTo, 
 }
 
 
-void CTrackballCamera::ZoomIn()
+void CTrackballCameraComp::ZoomIn()
 {
 	m_position.setZ(m_position.z() - s_zoomSpeed);
 }
 
 
-void CTrackballCamera::ZoomOut()
+void CTrackballCameraComp::ZoomOut()
 {
 	m_position.setZ(m_position.z() + s_zoomSpeed);
 }
 
 
-QMatrix4x4 CTrackballCamera::GetViewMatrix() const
+QMatrix4x4 CTrackballCameraComp::GetViewMatrix() const
 {
 	QMatrix4x4 viewMatrix;
 	viewMatrix.translate(-m_position);
@@ -114,7 +120,9 @@ QMatrix4x4 CTrackballCamera::GetViewMatrix() const
 }
 
 
-QVector3D CTrackballCamera::GetTrackballVector(const QPoint& point2d) const
+// protected methods
+
+QVector3D CTrackballCameraComp::GetTrackballVector(const QPoint& point2d) const
 {
 	QVector3D point3d;
 

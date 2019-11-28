@@ -12,7 +12,6 @@
 #include <istd/istd.h>
 
 // ImtCore includes
-#include <imt3dview/CTrackballCamera.h>
 #include <imt3dview/CScene3d.h>
 
 
@@ -20,7 +19,6 @@ namespace imt3dgui
 {
 
 class ISceneEventHandler;
-class IScene3dCamera;
 
 class COpenGLWidget: public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -67,12 +65,12 @@ public:
 
 	I_DECLARE_FLAGS(RenderHints, RH_ANTIALIASING, RH_CULLFACE);
 
-	COpenGLWidget(QWidget *parent = 0);
+	COpenGLWidget(QWidget* parentPtr = nullptr);
 	~COpenGLWidget();
 	
+	void SetCamera(imt3dview::IScene3dCamera* cameraPtr);
 	void SetSceneEventHandler(ISceneEventHandler* handlerPtr);
 	void UnsetSceneEventHandler();
-	imt3dview::IScene3dCamera* GetCamera();
 	imt3dview::IScene3d* GetScene();
 	void ZoomIn();
 	void ZoomOut();
@@ -127,7 +125,6 @@ private:
 	QPoint m_prevMousePosition;
 	QRect m_selectionRect;
 	imt3dgui::ISceneEventHandler* m_eventHandlerPtr;
-	imt3dview::CTrackballCamera m_camera;
 	imt3dview::CScene3d m_scene;
 	QTimer m_timer;
 	QVariantAnimation m_cameraRotationAnimation;
@@ -137,11 +134,11 @@ private:
 	SelectionMode m_selectionMode;
 	RotationMode m_rotationMode;
 	QOpenGLShaderProgram* m_programPtr;
+	imt3dview::IScene3dCamera* m_cameraPtr;
 
 	static const float s_verticalAngle;
 	static const float s_nearPlane;
 	static const float s_farPlane;
-	static const QVector3D s_defaultCameraPosition;
 	static const QVector3D s_lightPosition;
 	static const QVector3D s_lightColor;
 };

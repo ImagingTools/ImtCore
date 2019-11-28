@@ -28,7 +28,7 @@ public:
 
 	virtual const QQuaternion& GetRotation() const = 0;
 	virtual void RotateTo(const QQuaternion& rotation) = 0;
-	virtual void RotateTo(const QPoint& pointFrom, const QPoint& pointTo, const QVector3D& axis) = 0;
+	virtual void RotateTo(const QPoint& pointFrom, const QPoint& pointTo, const QVector3D& axis = QVector3D()) = 0;
 
 	virtual void ZoomIn() = 0;
 	virtual void ZoomOut() = 0;

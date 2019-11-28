@@ -18,27 +18,25 @@ namespace imt3dgui
 const float COpenGLWidget::s_verticalAngle = 45.0;
 const float COpenGLWidget::s_nearPlane = 0.1;
 const float COpenGLWidget::s_farPlane = 100.0;
-const QVector3D COpenGLWidget::s_defaultCameraPosition(0.0, 0.0, 5.0);
 const QVector3D COpenGLWidget::s_lightPosition(1.2, 1.0, 2.0);
 const QVector3D COpenGLWidget::s_lightColor(1.0, 1.0, 1.0);
 
 
 // public methods
 
-COpenGLWidget::COpenGLWidget(QWidget *parent)
-	:QOpenGLWidget(parent),
+COpenGLWidget::COpenGLWidget(QWidget* parentPtr)
+	:QOpenGLWidget(parentPtr),
 	m_renderHints(0),
 	m_eventHandlerPtr(nullptr),
 	m_viewMode(ViewMode::VM_VIEW),
 	m_selectionMode(SelectionMode::SM_POINT),
 	m_rotationMode(RotationMode::RTM_FREE),
-	m_programPtr(new QOpenGLShaderProgram(this))
+	m_programPtr(new QOpenGLShaderProgram(this)),
+	m_cameraPtr(nullptr)
 {
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	setMouseTracking(true);
 	setCursor(Qt::OpenHandCursor);
-
-	m_camera.MoveTo(s_defaultCameraPosition);
 
 	connect(&m_cameraRotationAnimation, SIGNAL(valueChanged(const QVariant&)), this, SLOT(OnCameraRotationAnimation(const QVariant&)));
 	connect(&m_cameraPositionAnimation, SIGNAL(valueChanged(const QVariant&)), this, SLOT(OnCameraPositionAnimation(const QVariant&)));
@@ -56,6 +54,12 @@ COpenGLWidget::~COpenGLWidget()
 }
 
 
+void COpenGLWidget::SetCamera(imt3dview::IScene3dCamera* cameraPtr)
+{
+	m_cameraPtr = cameraPtr;
+}
+
+
 void COpenGLWidget::SetSceneEventHandler(ISceneEventHandler* handlerPtr)
 {
 	m_eventHandlerPtr = handlerPtr;
@@ -68,12 +72,6 @@ void COpenGLWidget::UnsetSceneEventHandler()
 }
 
 
-imt3dview::IScene3dCamera *COpenGLWidget::GetCamera()
-{
-	return &m_camera;
-}
-
-
 imt3dview::IScene3d* COpenGLWidget::GetScene()
 {
 	return &m_scene;
@@ -82,16 +80,16 @@ imt3dview::IScene3d* COpenGLWidget::GetScene()
 
 void COpenGLWidget::ZoomIn()
 {
-	if (m_viewMode == ViewMode::VM_VIEW){
-		m_camera.ZoomIn();
+	if (m_cameraPtr && m_viewMode == ViewMode::VM_VIEW){
+		m_cameraPtr->ZoomIn();
 	}
 }
 
 
 void COpenGLWidget::ZoomOut()
 {
-	if (m_viewMode == ViewMode::VM_VIEW){
-		m_camera.ZoomOut();
+	if (m_cameraPtr && m_viewMode == ViewMode::VM_VIEW){
+		m_cameraPtr->ZoomOut();
 	}
 }
 
@@ -139,6 +137,10 @@ void COpenGLWidget::SetRenderHint(RenderHint renderHint, bool on)
 
 void COpenGLWidget::SetCameraView(COpenGLWidget::ViewDirection viewDirection, bool animated)
 {
+	if (!m_cameraPtr){
+		return;
+	}
+
 	m_cameraRotationAnimation.stop();
 	m_cameraPositionAnimation.stop();
 
@@ -177,21 +179,21 @@ void COpenGLWidget::SetCameraView(COpenGLWidget::ViewDirection viewDirection, bo
 		return;
 	}
 
-	QQuaternion oldRotation = m_camera.GetRotation();
+	QQuaternion oldRotation = m_cameraPtr->GetRotation();
 	if (animated){
 		m_cameraRotationAnimation.setStartValue(oldRotation);
 		m_cameraRotationAnimation.setEndValue(newRotation);
 		m_cameraRotationAnimation.setDuration(500);
 		m_cameraRotationAnimation.start();
 
-		m_cameraPositionAnimation.setStartValue(m_camera.GetPosition());
-		m_cameraPositionAnimation.setEndValue(s_defaultCameraPosition);
+		m_cameraPositionAnimation.setStartValue(m_cameraPtr->GetPosition());
+		m_cameraPositionAnimation.setEndValue(QVector3D(0.0, 0.0, 5.0));
 		m_cameraPositionAnimation.setDuration(500);
 		m_cameraPositionAnimation.start();
 	}
 	else{
-		m_camera.RotateTo(newRotation);
-		m_camera.MoveTo(s_defaultCameraPosition);
+		m_cameraPtr->RotateTo(newRotation);
+		m_cameraPtr->MoveTo(QVector3D(0.0, 0.0, 5.0));
 	}
 }
 
@@ -295,7 +297,7 @@ void COpenGLWidget::initializeGL()
 		return;
 	}
 
-	m_scene.SetCamera(&m_camera);
+	m_scene.SetCamera(m_cameraPtr);
 	m_scene.SetViewPort(rect());
 	m_scene.SetProjection(GetProjectionMatrix());
 	m_scene.SetContext(QOpenGLWidget::context());
@@ -304,7 +306,9 @@ void COpenGLWidget::initializeGL()
 
 void COpenGLWidget::resizeGL(int w, int h)
 {
-	m_camera.SetViewPortSize(QSize(w, h));
+	if (m_cameraPtr){
+		m_cameraPtr->SetViewPortSize(QSize(w, h));
+	}
 
 	m_scene.SetViewPort(rect());
 	m_scene.SetProjection(GetProjectionMatrix());
@@ -418,13 +422,17 @@ void COpenGLWidget::OnInternalTimer()
 
 void COpenGLWidget::OnCameraRotationAnimation(const QVariant& value)
 {
-	m_camera.RotateTo(value.value<QQuaternion>());
+	if (m_cameraPtr){
+		m_cameraPtr->RotateTo(value.value<QQuaternion>());
+	}
 }
 
 
 void COpenGLWidget::OnCameraPositionAnimation(const QVariant& value)
 {
-	m_camera.MoveTo(value.value<QVector3D>());
+	if (m_cameraPtr){
+		m_cameraPtr->MoveTo(value.value<QVector3D>());
+	}
 }
 
 
@@ -503,31 +511,31 @@ void COpenGLWidget::MousePressSelection(QMouseEvent& e)
 
 void COpenGLWidget::MouseMoveView(QMouseEvent& e)
 {
-	if (m_eventHandlerPtr && m_eventHandlerPtr->OnMouseMove(e)){
+	if (!m_cameraPtr || m_eventHandlerPtr && m_eventHandlerPtr->OnMouseMove(e)){
 		return;
 	}
 
 	if (e.buttons() == Qt::LeftButton){
 		switch (m_rotationMode){
 			case RotationMode::RTM_FREE:
-				m_camera.RotateTo(m_prevMousePosition, e.pos());
+				m_cameraPtr->RotateTo(m_prevMousePosition, e.pos());
 				break;
 
 			case RotationMode::RTM_AROUND_X:
-				m_camera.RotateTo(m_prevMousePosition, e.pos(), QVector3D(1.0, 0.0, 0.0));
+				m_cameraPtr->RotateTo(m_prevMousePosition, e.pos(), QVector3D(1.0, 0.0, 0.0));
 				break;
 
 			case RotationMode::RTM_AROUND_Y:
-				m_camera.RotateTo(m_prevMousePosition, e.pos(), QVector3D(0.0, 1.0, 0.0));
+				m_cameraPtr->RotateTo(m_prevMousePosition, e.pos(), QVector3D(0.0, 1.0, 0.0));
 				break;
 
 			case RotationMode::RTM_AROUND_Z:
-				m_camera.RotateTo(m_prevMousePosition, e.pos(), QVector3D(0.0, 0.0, 1.0));
+				m_cameraPtr->RotateTo(m_prevMousePosition, e.pos(), QVector3D(0.0, 0.0, 1.0));
 				break;
 		}
 	}
 	else if (e.buttons() == Qt::RightButton){
-		m_camera.MoveTo(m_prevMousePosition, e.pos());
+		m_cameraPtr->MoveTo(m_prevMousePosition, e.pos());
 	}
 }
 
@@ -602,8 +610,11 @@ void COpenGLWidget::SetGlFlags()
 
 void COpenGLWidget::SetGlUniformValues()
 {
-	m_programPtr->setUniformValue("viewPosition", m_camera.GetPosition());
-	m_programPtr->setUniformValue("viewMatrix", m_camera.GetViewMatrix());
+	if (m_cameraPtr){
+		m_programPtr->setUniformValue("viewPosition", m_cameraPtr->GetPosition());
+		m_programPtr->setUniformValue("viewMatrix", m_cameraPtr->GetViewMatrix());
+	}
+
 	m_programPtr->setUniformValue("projectionMatrix", GetProjectionMatrix());
 	m_programPtr->setUniformValue("lightPosition", s_lightPosition);
 	m_programPtr->setUniformValue("lightColor", s_lightColor);

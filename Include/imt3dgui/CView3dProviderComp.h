@@ -48,8 +48,6 @@ public:
 	I_BEGIN_COMPONENT(CView3dProviderComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
 		I_REGISTER_INTERFACE(imt3dview::IScene3dProvider);
-		I_REGISTER_SUBELEMENT(Camera);
-		I_REGISTER_SUBELEMENT_INTERFACE(Camera, imt3dview::IScene3dCamera, ExtractCamera);
 		I_REGISTER_SUBELEMENT(Scene);
 		I_REGISTER_SUBELEMENT_INTERFACE(Scene, imt3dview::IScene3d, ExtractScene);
 		I_ASSIGN(m_showEditCommandsAttrPtr, "ShowEditCommands", "Show commands for editing the 3D-objects", true, false);
@@ -57,6 +55,7 @@ public:
 		I_ASSIGN(m_showShowAxisCommandAttrPtr, "ShowShowAxisCommands", "Enable command for shoe/hide axis", true, false);
 		I_ASSIGN(m_showViewCommandsAttrPtr, "ShowViewCommands", "Show view commands", true, true);
 		I_ASSIGN(m_showZoomCommandsAttrPtr, "ShowZoomCommands", "Show zoom-in/zoom-out commands", true, true);
+		I_ASSIGN(m_cameraCompPtr, "Camera", "Camera", true, "Camera");
 	I_END_COMPONENT
 
 	CView3dProviderComp();
@@ -88,8 +87,8 @@ protected:
 	void OnSaveSettings(QSettings& settings) const override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
-	virtual void OnGuiCreated() override;
-	virtual void OnGuiRetranslate() override;
+	void OnGuiCreated() override;
+	void OnGuiRetranslate() override;
 
 protected:
 	iqtgui::CHierarchicalCommand& GetShowGridCommand();
@@ -126,17 +125,6 @@ protected Q_SLOTS:
 
 private:
 	// static template methods for subelement access
-	template <class InterfaceType>
-	static InterfaceType* ExtractCamera(CView3dProviderComp& component)
-	{
-		COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(component.GetWidget());
-		if (widgetPtr != NULL){
-			return widgetPtr->GetCamera();
-		}
-
-		return NULL;
-	}
-
 	template <class InterfaceType>
 	static InterfaceType* ExtractScene(CView3dProviderComp& component)
 	{
@@ -203,6 +191,7 @@ private:
 	I_ATTR(bool, m_showShowAxisCommandAttrPtr);
 	I_ATTR(bool, m_showViewCommandsAttrPtr);
 	I_ATTR(bool, m_showZoomCommandsAttrPtr);
+	I_REF(imt3dview::IScene3dCamera, m_cameraCompPtr);
 };
 
 

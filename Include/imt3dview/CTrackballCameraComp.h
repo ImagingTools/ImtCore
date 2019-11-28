@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Acf includes
+#include <icomp/CComponentBase.h>
+
 // ImtCore includes
 #include <imt3dview/IScene3dCamera.h>
 #include <imt3dgui/CShape3dBase.h>
@@ -11,12 +14,22 @@ namespace imt3dview
 
 
 /**
-	Static view camera.
+	Trackball camera component implementation.
 */
-class CTrackballCamera: public imt3dview::IScene3dCamera
+class CTrackballCameraComp:
+			public imt3dview::IScene3dCamera,
+			public icomp::CComponentBase
 {
 public:
-	// reimplement (imt3dview::IScene3dCamera)
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CTrackballCameraComp);
+		I_REGISTER_INTERFACE(imt3dview::IScene3dCamera);
+	I_END_COMPONENT;
+
+	CTrackballCameraComp();
+
+	// reimplemented (imt3dview::IScene3dCamera)
 	void SetViewPortSize(const QSize& size) override;
 
 	const QVector3D& GetPosition() const override;

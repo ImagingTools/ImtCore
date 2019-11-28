@@ -14,6 +14,11 @@ I_EXPORT_PACKAGE(
 			"ImagingTools 3D-view component package",
 			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
 
+I_EXPORT_COMPONENT(
+			TrackballCamera,
+			"Trackball camera",
+			"Trackball Camera");
+
 
 } // namespace Imt3dViewPck
 

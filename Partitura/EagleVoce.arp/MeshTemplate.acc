@@ -2,17 +2,25 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4814" Description="ACF"/>
-            <Version Id="1" Number="2113" Description="ACF-Solutions"/>
+            <Version Id="0" Number="4824" Description="ACF"/>
+            <Version Id="1" Number="2119" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331008" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="Camera" PackageId="Imt3dViewPck" ComponentId="TrackballCamera">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="MeshView" PackageId="Imt3dGuiPck" ComponentId="MeshView">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="Camera" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Camera"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

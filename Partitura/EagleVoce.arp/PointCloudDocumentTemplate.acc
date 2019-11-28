@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4818" Description="ACF"/>
-            <Version Id="1" Number="2116" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331009" Description="Qt Framework"/>
+            <Version Id="0" Number="4824" Description="ACF"/>
+            <Version Id="1" Number="2119" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331008" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Point cloud document template</Description>
@@ -76,6 +76,11 @@
         <EmbeddedRegistry Id="PointCloudView">
             <Data Description="" Keywords="">
                 <ElementsList>
+                    <Element Id="Camera" PackageId="Imt3dViewPck" ComponentId="TrackballCamera">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
                     <Element Id="CommandsBinder" PackageId="QtGuiPck" ComponentId="CommandsBinder">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -92,6 +97,9 @@
                     <Element Id="PointCloudView" PackageId="Imt3dGuiPck" ComponentId="PointCloudView">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="Camera" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="Camera"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>

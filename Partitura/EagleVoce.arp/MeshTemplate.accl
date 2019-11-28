@@ -2,12 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4814" Description="ACF"/>
-            <Version Id="1" Number="2113" Description="ACF-Solutions"/>
+            <Version Id="0" Number="4824" Description="ACF"/>
+            <Version Id="1" Number="2119" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331008" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="Camera" X="400" Y="625" Note=""/>
         <Element ComponentName="MeshView" X="400" Y="500" Note=""/>
         <Element ComponentName="StlMeshPersistence" X="625" Y="500" Note=""/>
         <Element ComponentName="TemplateMesh" X="625" Y="300" Note=""/>

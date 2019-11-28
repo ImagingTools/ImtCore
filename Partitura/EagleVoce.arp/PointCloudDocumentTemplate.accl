@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4818" Description="ACF"/>
-            <Version Id="1" Number="2116" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331009" Description="Qt Framework"/>
+            <Version Id="0" Number="4824" Description="ACF"/>
+            <Version Id="1" Number="2119" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331008" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -16,8 +16,9 @@
     <EmbeddedRegistries>
         <EmbededRegistry Id="PointCloudView">
             <PositionMap>
-                <Element ComponentName="CommandsBinder" X="250" Y="150" Note=""/>
-                <Element ComponentName="PointCloudView" X="900" Y="150" Note=""/>
+                <Element ComponentName="Camera" X="525" Y="325" Note=""/>
+                <Element ComponentName="CommandsBinder" X="525" Y="125" Note=""/>
+                <Element ComponentName="PointCloudView" X="525" Y="225" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

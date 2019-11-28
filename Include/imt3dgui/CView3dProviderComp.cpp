@@ -177,9 +177,6 @@ void CView3dProviderComp::OnRestoreSettings(const QSettings& settings)
 	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
 	Q_ASSERT(widgetPtr != NULL);
 
-	imt3dview::IScene3dCamera* cameraPtr = widgetPtr->GetCamera();
-	Q_ASSERT(cameraPtr);
-
 	// render flags
 	bool useAntialiasing = settings.value("RenderHints/Antialiasing", true).toBool();
 	widgetPtr->SetRenderHint(COpenGLWidget::RH_ANTIALIASING, useAntialiasing);
@@ -190,33 +187,34 @@ void CView3dProviderComp::OnRestoreSettings(const QSettings& settings)
 	m_useCullFaceCommand.setChecked(useCullFace);
 
 	// camera
-	if (settings.contains("Camera/Position")){
-		cameraPtr->MoveTo(settings.value("Camera/Position").value<QVector3D>());
-	}
+	if (m_cameraCompPtr.IsValid()){
+		if (settings.contains("Camera/Position")){
+			m_cameraCompPtr->MoveTo(settings.value("Camera/Position").value<QVector3D>());
+		}
 
-	if (settings.contains("Camera/Rotation")){
-		cameraPtr->RotateTo(settings.value("Camera/Rotation").value<QQuaternion>());
+		if (settings.contains("Camera/Rotation")){
+			m_cameraCompPtr->RotateTo(settings.value("Camera/Rotation").value<QQuaternion>());
+		}
 	}
 }
 
 
 void CView3dProviderComp::OnSaveSettings(QSettings& settings) const
 {
-	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
-	Q_ASSERT(widgetPtr != NULL);
-
-	imt3dview::IScene3dCamera* cameraPtr = widgetPtr->GetCamera();
-	Q_ASSERT(cameraPtr);
+	COpenGLWidget* widgetPtr = GetQtWidget();
+	Q_ASSERT(widgetPtr != nullptr);
 
 	settings.beginGroup("RenderHints");
 	settings.setValue("Antialiasing", widgetPtr->GetRenderHint(COpenGLWidget::RH_ANTIALIASING));
 	settings.setValue("CullFace", widgetPtr->GetRenderHint(COpenGLWidget::RH_CULLFACE));
 	settings.endGroup();
 
-	settings.beginGroup("Camera");
-	settings.setValue("Position", cameraPtr->GetPosition());
-	settings.setValue("Rotation", cameraPtr->GetRotation());
-	settings.endGroup();
+	if (m_cameraCompPtr.IsValid()){
+		settings.beginGroup("Camera");
+		settings.setValue("Position", m_cameraCompPtr->GetPosition());
+		settings.setValue("Rotation", m_cameraCompPtr->GetRotation());
+		settings.endGroup();
+	}
 }
 
 
@@ -225,6 +223,11 @@ void CView3dProviderComp::OnSaveSettings(QSettings& settings) const
 void CView3dProviderComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
+
+	imt3dgui::COpenGLWidget* widgetPtr = GetQtWidget();
+	Q_ASSERT(widgetPtr != nullptr);
+
+	widgetPtr->SetCamera(m_cameraCompPtr.GetPtr());
 
 	static ChangeSet commandsChanged(ibase::ICommandsProvider::CF_COMMANDS);
 	istd::CChangeNotifier changeNotifier(this, &commandsChanged);
