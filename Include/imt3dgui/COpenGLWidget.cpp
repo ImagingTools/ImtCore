@@ -344,10 +344,14 @@ void COpenGLWidget::mousePressEvent(QMouseEvent* e)
 }
 
 
-void COpenGLWidget::mouseReleaseEvent(QMouseEvent* /*e*/)
+void COpenGLWidget::mouseReleaseEvent(QMouseEvent* e)
 {
 	if (m_viewMode == ViewMode::VM_VIEW){
 		setCursor(Qt::OpenHandCursor);
+
+		if (m_eventHandlerPtr){
+			m_eventHandlerPtr->OnMouseRelease(*e);
+		}
 	}
 
 	m_selectionRect.setRect(0.0, 0.0, 0.0, 0.0);

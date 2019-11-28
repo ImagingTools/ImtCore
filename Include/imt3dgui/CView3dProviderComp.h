@@ -74,6 +74,7 @@ public:
 	void OnDeleteSelection() override;
 	bool OnMousePress(QMouseEvent& e) override;
 	bool OnMouseMove(QMouseEvent& e) override;
+	bool OnMouseRelease(QMouseEvent& e) override;
 
 	// reimplemented (imt3dview::IScene3dProvider)
 	imt3dview::IScene3d* GetScene() const override;

@@ -141,6 +141,12 @@ bool CView3dProviderComp::OnMouseMove(QMouseEvent& /*e*/)
 }
 
 
+bool CView3dProviderComp::OnMouseRelease(QMouseEvent& /*e*/)
+{
+	return false;
+}
+
+
 // reimplemented (imt3dview::IScene3dProvider)
 
 imt3dview::IScene3d* CView3dProviderComp::GetScene() const

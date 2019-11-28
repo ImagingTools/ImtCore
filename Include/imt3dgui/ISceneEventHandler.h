@@ -25,6 +25,7 @@ public:
 	virtual void OnDeleteSelection() = 0;
 	virtual bool OnMousePress(QMouseEvent& e) = 0;
 	virtual bool OnMouseMove(QMouseEvent& e) = 0;
+	virtual bool OnMouseRelease(QMouseEvent& e) = 0;
 };
 
 } //namespace imt3dgui

@@ -12,6 +12,8 @@ namespace imt3dgui
 // static members
 
 const float CRulerShape::s_moveSpeed = 0.03;
+const QVector3D CRulerShape::s_color(1.5, 0.4, 0.0);
+const QVector3D CRulerShape::s_selectionColor(0.0, 0.0, 1.0);
 
 
 // public methods
@@ -44,10 +46,13 @@ bool CRulerShape::OnMousePress(QMouseEvent& e)
 			int slaveShapeVertexIndex = m_slaveShapePtr->FindVertex(e.pos(), false, &slaveShapeVertexPos);
 
 			// determine the ruler vertex closest to the click point
-			int rulerVertexIndex = FindVertex(e.pos(), false);
+			int rulerVertexIndex = FindVertex(e.pos(), false) % 2;
 
 			if (slaveShapeVertexIndex >= 0 && rulerVertexIndex >= 0){
-				m_vertices[rulerVertexIndex].position = slaveShapeVertexPos * m_slaveShapePtr->GetScale();
+				QVector3D newPos = slaveShapeVertexPos * m_slaveShapePtr->GetScale();
+
+				m_vertices[rulerVertexIndex + 0].position = newPos;
+				m_vertices[rulerVertexIndex + 2].position = newPos;
 
 				UploadGeometry(false, m_vertices, m_vertexBuffer);
 			}
@@ -56,9 +61,19 @@ bool CRulerShape::OnMousePress(QMouseEvent& e)
 		return true;
 	}
 
-	// on single click save clicked ruler vertex for further moving
-	m_movingVertexIndex = FindVertex(e.pos(), true);
-	return m_movingVertexIndex >= 0;
+	// on single click, save clicked ruler vertex for further moving
+	m_movingVertexIndex = FindVertex(e.pos(), true) % 2;
+
+	if (m_movingVertexIndex >= 0){
+		m_vertices[m_movingVertexIndex + 2].color = s_selectionColor;
+
+		UploadGeometry(false, m_vertices, m_vertexBuffer);
+
+		return true;
+	}
+	else{
+		return false;
+	}
 }
 
 
@@ -74,9 +89,10 @@ bool CRulerShape::OnMouseMove(QMouseEvent& e)
 	if (m_movingVertexIndex >= 0 && e.buttons() == Qt::LeftButton){
 		QVector3D oldPos = WindowToModel(m_mousePrevPos, 1.0);
 		QVector3D newPos = WindowToModel(e.pos(), 1.0);
-		QVector3D posDiff = newPos - oldPos;
+		QVector3D posDiff = (newPos - oldPos) * s_moveSpeed;
 
-		m_vertices[m_movingVertexIndex].position += (posDiff * s_moveSpeed);
+		m_vertices[m_movingVertexIndex + 0].position += posDiff;
+		m_vertices[m_movingVertexIndex + 2].position += posDiff;
 
 		UploadGeometry(false, m_vertices, m_vertexBuffer);
 
@@ -89,6 +105,23 @@ bool CRulerShape::OnMouseMove(QMouseEvent& e)
 }
 
 
+bool CRulerShape::OnMouseRelease(QMouseEvent& /*e*/)
+{
+	if (m_movingVertexIndex >= 0){
+		m_vertices[m_movingVertexIndex + 2].color = s_color;
+
+		m_movingVertexIndex = -1;
+
+		UploadGeometry(false, m_vertices, m_vertexBuffer);
+
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+
 // protected methods
 
 // reimplemented (imt3dgui::CShape3dBase)
@@ -96,10 +129,16 @@ bool CRulerShape::OnMouseMove(QMouseEvent& e)
 void CRulerShape::UpdateShapeGeometry()
 {
 	m_vertices.clear();
-	m_vertices.push_back(Vertex(QVector3D(0.0, 0.0, 1.0), QVector3D(), QVector3D(1.5, 0.4, 0.0)));
-	m_vertices.push_back(Vertex(QVector3D(1.0, 0.0, 1.0), QVector3D(), QVector3D(1.5, 0.4, 0.0)));
 
-	m_indices = {0, 1};
+	// line vertices
+	m_vertices.push_back(Vertex(QVector3D(0.0, 0.0, 1.0), QVector3D(), s_color));
+	m_vertices.push_back(Vertex(QVector3D(1.0, 0.0, 1.0), QVector3D(), s_color));
+
+	// point vertices
+	m_vertices.push_back(m_vertices[0]);
+	m_vertices.push_back(m_vertices[1]);
+
+	m_indices = {0, 1, 2, 3};
 }
 
 
@@ -109,12 +148,17 @@ void CRulerShape::UpdateShapeGeometry()
 
 void CRulerShape::DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions)
 {
-	program.setUniformValue("usePointSize", true);
-	program.setUniformValue("pointSize", 5.0f);
+	// draw line
+	GLuint* offsetPtr = (GLuint*)0;
 
-	functions.glLineWidth(3.0f);
-	functions.glDrawElements(GL_LINES, m_indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
-	functions.glDrawElements(GL_POINTS, m_indices.size(), GL_UNSIGNED_INT, (GLvoid*)0);
+	functions.glLineWidth(4.0f);
+	functions.glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT, offsetPtr);
+
+	// draw points
+	program.setUniformValue("usePointSize", true);
+	program.setUniformValue("pointSize", 12.0f);
+
+	functions.glDrawElements(GL_POINTS, 2, GL_UNSIGNED_INT, offsetPtr + 2);
 }
 
 

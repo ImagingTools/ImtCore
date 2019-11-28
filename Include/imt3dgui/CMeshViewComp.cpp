@@ -149,6 +149,12 @@ bool CMeshViewComp::OnMouseMove(QMouseEvent& e)
 }
 
 
+bool CMeshViewComp::OnMouseRelease(QMouseEvent & e)
+{
+	return m_rulerShape.OnMouseRelease(e);
+}
+
+
 // reimplemented (iqtgui::TRestorableGuiWrap)
 
 void CMeshViewComp::OnRestoreSettings(const QSettings& settings)

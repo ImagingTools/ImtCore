@@ -20,6 +20,7 @@ public:
 	void SetSlaveShape(const CShape3dBase* slaveShapePtr);
 	bool OnMousePress(QMouseEvent& e);
 	bool OnMouseMove(QMouseEvent& e);
+	bool OnMouseRelease(QMouseEvent& e);
 
 protected:
 	// reimplemented (imt3dgui::CShape3dBase)
@@ -35,6 +36,8 @@ private:
 	int m_movingVertexIndex;
 	QPoint m_mousePrevPos;
 	static const float s_moveSpeed;
+	static const QVector3D s_color;
+	static const QVector3D s_selectionColor;
 };
 
 

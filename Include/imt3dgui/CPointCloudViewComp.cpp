@@ -161,6 +161,12 @@ bool CPointCloudViewComp::OnMouseMove(QMouseEvent& e)
 }
 
 
+bool CPointCloudViewComp::OnMouseRelease(QMouseEvent & e)
+{
+	return m_rulerShape.OnMouseRelease(e);
+}
+
+
 // reimplemented (iqtgui::TRestorableGuiWrap)
 
 void CPointCloudViewComp::OnRestoreSettings(const QSettings& settings)
