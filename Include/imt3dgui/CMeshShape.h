@@ -49,12 +49,15 @@ protected:
 	bool HasNormals() const override;
 
 private:
+	typedef std::set<int> Indices;
+
 	void SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection);
 	template <typename PointType> void UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh);
 	template <typename PointType> void DeleteSelectionHelper(imt3d::IMesh3d& mesh);
 	static bool IsPointWithin(const QPoint& point, const QRect& rect, bool isCircle);
-	bool IsPointFaceIntersection(const QPoint& point, int& intersectedVertexIndex, QVector3D& intersectionPoint) const;
-	static bool IsRayFaceIntersection(
+	bool GetFacePointIntersection(const QPoint& point, Indices& intersectedIndicies) const;
+	bool GetFaceRectIntersections(const QRect& rect, bool isCircle, Indices& intersectedIndicies) const;
+	static bool IsFaceRayIntersection(
 				const QVector3D& rayOrigin,
 				const QVector3D& rayDirection,
 				const QVector3D& trianglePoint1,
@@ -62,12 +65,11 @@ private:
 				const QVector3D& trianglePoint3,
 				float& distanceToTriangle,
 				QVector3D& intersectionPoint);
-	void SelectFaceVertices();
+	void SelectVertices(Indices& intersectedIndicies, bool clearPreviousSelection);
 
 private:
 	QVector3D m_color;
-	typedef std::set<int> VertexIndicies;
-	VertexIndicies m_selectedVerticesIndicies;
+	Indices m_selectedIndicies;
 
 	static const QVector3D s_selectionColor;
 };

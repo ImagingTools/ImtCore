@@ -33,35 +33,12 @@ void CMeshShape::SetColor(const QVector3D& color)
 
 void CMeshShape::SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection)
 {
-	// get 2D point-face intersection if any
-	int selectedFacePointIndex = -1;
-	QVector3D intersectionPoint;
+	// get point-face intersection if any
+	Indices intersectedIndicies;
+	GetFacePointIntersection(selectionPoint, intersectedIndicies);
 
-	IsPointFaceIntersection(selectionPoint, selectedFacePointIndex, intersectionPoint);
-
-	// select/deselect corresponding vertices
-	for (int i = 0; i < m_vertices.size(); i += 3){
-		if (i == selectedFacePointIndex){
-			m_selectedVerticesIndicies.insert(i + 0);
-			m_selectedVerticesIndicies.insert(i + 1);
-			m_selectedVerticesIndicies.insert(i + 2);
-
-			m_vertices[i + 0].color = s_selectionColor;
-			m_vertices[i + 1].color = s_selectionColor;
-			m_vertices[i + 2].color = s_selectionColor;
-		}
-		else if (clearPreviousSelection){
-			m_selectedVerticesIndicies.erase(i + 0);
-			m_selectedVerticesIndicies.erase(i + 1);
-			m_selectedVerticesIndicies.erase(i + 2);
-
-			m_vertices[i + 0].color = m_color;
-			m_vertices[i + 1].color = m_color;
-			m_vertices[i + 2].color = m_color;
-		}
-	}
-
-	UploadGeometry(false, m_vertices, m_vertexBuffer);
+	// select/deselect vertices
+	SelectVertices(intersectedIndicies, clearPreviousSelection);
 }
 
 
@@ -79,15 +56,15 @@ void CMeshShape::SetCircleSelection(const QRect& selectionRect, bool clearPrevio
 
 void CMeshShape::ClearSelection()
 {
-	if (m_selectedVerticesIndicies.empty()){
+	if (m_selectedIndicies.empty()){
 		return;
 	}
 
-	for (int i = 0; i < m_vertices.size(); ++i){
-		m_vertices[i].color = m_color;
-	}
+	m_selectedIndicies.clear();
 
-	m_selectedVerticesIndicies.clear();
+	for (Vertex& vertex : m_vertices){
+		vertex.color = m_color;
+	}
 
 	UploadGeometry(false, m_vertices, m_vertexBuffer);
 }
@@ -95,10 +72,14 @@ void CMeshShape::ClearSelection()
 
 void CMeshShape::AllSelection()
 {
-	for (int i = 0; i < m_vertices.size(); ++i){
-		m_selectedVerticesIndicies.insert(i);
+	m_selectedIndicies.clear();
 
-		m_vertices[i].color = s_selectionColor;
+	for (int i = 0; i < m_indices.size(); ++i){
+		m_selectedIndicies.insert(i);
+	}
+
+	for (Vertex& vertex : m_vertices){
+		vertex.color = s_selectionColor;
 	}
 
 	UploadGeometry(false, m_vertices, m_vertexBuffer);
@@ -107,18 +88,24 @@ void CMeshShape::AllSelection()
 
 void CMeshShape::InvertSelection()
 {
-	for (int i = 0; i < m_vertices.size(); ++i){
-		Vertex& vertex = m_vertices[i];
+	// select all vertices
+	for (Vertex& vertex : m_vertices){
+		vertex.color = s_selectionColor;
+	}
 
-		VertexIndicies::iterator it = m_selectedVerticesIndicies.find(i);
+	// invert selection
+	for (int selectedIndex : m_selectedIndicies){
+		int vertexIndex = m_indices[selectedIndex];
 
-		if (it != m_selectedVerticesIndicies.end()){
-			m_selectedVerticesIndicies.erase(it);
-			vertex.color = m_color;
+		m_vertices[vertexIndex].color = m_color;
+	}
+
+	for (int i = 0; i < m_indices.size(); ++i){
+		if (m_selectedIndicies.find(i) == m_selectedIndicies.end()){
+			m_selectedIndicies.insert(i);
 		}
 		else{
-			m_selectedVerticesIndicies.insert(i);
-			vertex.color = s_selectionColor;
+			m_selectedIndicies.erase(i);
 		}
 	}
 
@@ -184,18 +171,14 @@ void CMeshShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions
 
 void CMeshShape::Draw(QPainter& painter)
 {
-	imt3d::IMesh3d* meshPtr = dynamic_cast<imt3d::IMesh3d*>(GetObservedModel());
-	if (!meshPtr){
-		return;
-	}
-
-	QString text = QString("<b><p>Total vertices: %1</p>").arg(meshPtr->GetPointsCount());
-	text += QString("<p>Selected vertices: %1</p></b>").arg(static_cast<int>(m_selectedVerticesIndicies.size()));
+	QString text = QString("<b><p>Total vertices: %1</p>").arg(m_vertices.size());
+	text += QString("<p>Total faces: %1</p>").arg(m_indices.size() / 3);
+	text += QString("<p>Selected faces: %1</p></b>").arg(static_cast<int>(m_selectedIndicies.size() / 3));
 
 	painter.save();
 
 	painter.setBrush(QBrush(QColor(240, 240, 240)));
-	painter.drawRoundedRect(10, 10, 300, 60, 3.0, 3.0);
+	painter.drawRoundedRect(10, 10, 300, 90, 3.0, 3.0);
 	painter.translate(15.0, 15.0);
 
 	QTextDocument doc;
@@ -233,27 +216,12 @@ bool CMeshShape::HasNormals() const
 
 void CMeshShape::SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection)
 {
-	if (!selectionRect.isValid() || m_vertices.isEmpty()){
-		return;
-	}
+	// get rect-face intersections if any
+	Indices intersectedIndicies;
+	GetFaceRectIntersections(selectionRect, isCircle, intersectedIndicies);
 
-	for (int i = 0; i < m_vertices.size(); ++i){
-		QPoint windowPosition = ModelToWindow(m_vertices[i].position);
-
-		if (IsPointWithin(windowPosition, selectionRect, isCircle)){
-			m_selectedVerticesIndicies.insert(i);
-			m_vertices[i].color = s_selectionColor;
-		}
-		else if (clearPreviousSelection){
-			m_selectedVerticesIndicies.erase(i);
-			m_vertices[i].color = m_color;
-		}
-	}
-
-	// select not just selected vertex but entire face
-	SelectFaceVertices();
-
-	UploadGeometry(false, m_vertices, m_vertexBuffer);
+	// select/deselect vertices
+	SelectVertices(intersectedIndicies, clearPreviousSelection);
 }
 
 
@@ -305,50 +273,67 @@ void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh)
 template <typename PointType>
 void CMeshShape::DeleteSelectionHelper(imt3d::IMesh3d& mesh)
 {
-	if (m_selectedVerticesIndicies.empty()){
+	if (m_selectedIndicies.empty()){
 		return;
 	}
 
-	int pointsCount = mesh.GetPointsCount();
-	int remainingPointsCount = pointsCount - static_cast<int>(m_selectedVerticesIndicies.size());
-
-	if (remainingPointsCount <= 0){
-		return; // we can't create empty mesh
+	// prepare vertex indices
+	Indices selectedVertexIndices;
+	for (int selectedIndex : m_selectedIndicies){
+		selectedVertexIndices.insert(m_indices[selectedIndex]);
 	}
 
-	// save mesh data to create the same mesh without selected points
-	imt3d::IPointsBasedObject::PointFormat pointFormat = mesh.GetPointFormat();
+	// find remaining points count
+	int newPointsCount = mesh.GetPointsCount() - static_cast<int>(selectedVertexIndices.size());
+	int newIndicesCount = static_cast<int>(mesh.GetIndices().size() - m_selectedIndicies.size() / 3);
 
-	PointType* pointsDataPtr = new PointType[remainingPointsCount];
-	PointType* ptr = pointsDataPtr;
+	if (newPointsCount <= 0 || newIndicesCount <= 0){
+		return; // can't create empty mesh due to architectural reasons
+	}
 
-	// add only non-selected mesh points
-	// corresponding vertices and indicies will be removed after change notification in IMesh3d::CreateMesh
-	for (int i = 0; i < pointsCount; ++i){
-		const PointType* pointDataPtr = static_cast<const PointType*>(mesh.GetPointData(i));
-		if (!pointDataPtr){
-			continue;
+	// initialize new mesh indices
+	imt3d::IMesh3d::Indices newIndices;
+	newIndices.resize(newIndicesCount);
+	for (std::vector<uint32_t>& v : newIndices){
+		v.resize(3);
+	}
+
+	// prepare new mesh data: copy not selected vertices reordering them accordingly to the selected indices
+	PointType* newPointsDataPtr = new PointType[newPointsCount];
+	PointType* ptr = newPointsDataPtr;
+
+	QMap<int, int> vertexIndicesMap; // old vertex index - new vertex index
+	int currentIndexNum = 0;
+
+	for (int i = 0; i < m_indices.size(); ++i){
+		if (m_selectedIndicies.find(i) == m_selectedIndicies.end()){
+			int oldVertexIndex = m_indices[i];
+
+			QMap<int, int>::ConstIterator it = vertexIndicesMap.constFind(oldVertexIndex);
+
+			if (it == vertexIndicesMap.constEnd()){
+				const PointType* pointDataPtr = static_cast<const PointType*>(mesh.GetPointData(oldVertexIndex));
+				memcpy(ptr++, pointDataPtr, sizeof(PointType));
+
+				int newVertexIndex = vertexIndicesMap.size();
+
+				vertexIndicesMap.insert(oldVertexIndex, newVertexIndex);
+
+				newIndices[currentIndexNum / 3][currentIndexNum % 3] = newVertexIndex;
+			}
+			else{
+				int newVertexIndex = *it;
+				newIndices[currentIndexNum / 3][currentIndexNum % 3] = newVertexIndex;
+			}
+
+			currentIndexNum++;
 		}
-
-		if (m_selectedVerticesIndicies.find(i) == m_selectedVerticesIndicies.end()){
-			memcpy(ptr++, pointDataPtr, sizeof(PointType));
-		}
 	}
 
-	// rebuild vertex indices
-	imt3d::IMesh3d::Indices indices;
-	indices.resize(remainingPointsCount / 3);
-
-	for (int i = 0; i < indices.size(); ++i){
-		indices[i].push_back(i * 3 + 0);
-		indices[i].push_back(i * 3 + 1);
-		indices[i].push_back(i * 3 + 2);
-	}
+	m_selectedIndicies.clear();
 
 	// create new mesh
-	mesh.CreateMesh(pointFormat, remainingPointsCount, pointsDataPtr, true, indices);
-
-	m_selectedVerticesIndicies.clear();
+	mesh.CreateMesh(mesh.GetPointFormat(), newPointsCount, newPointsDataPtr, true, newIndices);
 }
 
 
@@ -368,10 +353,9 @@ bool CMeshShape::IsPointWithin(const QPoint& point, const QRect& rect, bool isCi
 }
 
 
-bool CMeshShape::IsPointFaceIntersection(const QPoint& point, int& intersectedVertexIndex, QVector3D& intersectionPoint) const
+bool CMeshShape::GetFacePointIntersection(const QPoint& point, Indices& intersectedIndicies) const
 {
-	intersectedVertexIndex = -1;
-	intersectionPoint = QVector3D();
+	intersectedIndicies.clear();
 
 	if (point.isNull() || m_vertices.isEmpty()){
 		return false;
@@ -385,8 +369,9 @@ bool CMeshShape::IsPointFaceIntersection(const QPoint& point, int& intersectedVe
 	QVector3D rayDirection = (rayDestination - rayOrigin).normalized();
 
 	float minDistance = qInf();
+	int intersectedFaceIndex = -1;
 
-	for (int i = 0; i < m_vertices.size(); i += 3){
+	for (int i = 0; i < m_indices.size(); i += 3){
 		const QVector3D& position1 = m_vertices[i + 0].position;
 		const QVector3D& position2 = m_vertices[i + 1].position;
 		const QVector3D& position3 = m_vertices[i + 2].position;
@@ -394,21 +379,55 @@ bool CMeshShape::IsPointFaceIntersection(const QPoint& point, int& intersectedVe
 		float distance = -1.0;
 		QVector3D faceIntersectionPoint;
 
-		if (IsRayFaceIntersection(rayOrigin, rayDirection, position1, position2, position3, distance, faceIntersectionPoint)){
+		if (IsFaceRayIntersection(rayOrigin, rayDirection, position1, position2, position3, distance, faceIntersectionPoint)){
 			if (distance < minDistance){
 				minDistance = distance;
-
-				intersectedVertexIndex = i;
-				intersectionPoint = faceIntersectionPoint;
+				intersectedFaceIndex = i;
 			}
 		}
 	}
 
-	return intersectedVertexIndex >= 0;
+	if (intersectedFaceIndex >= 0){
+		intersectedIndicies.insert(intersectedFaceIndex + 0);
+		intersectedIndicies.insert(intersectedFaceIndex + 1);
+		intersectedIndicies.insert(intersectedFaceIndex + 2);
+	}
+
+	return !intersectedIndicies.empty();
 }
 
 
-bool CMeshShape::IsRayFaceIntersection(
+bool CMeshShape::GetFaceRectIntersections(const QRect& rect, bool isCircle, Indices& intersectedIndicies) const
+{
+	intersectedIndicies.clear();
+
+	if (rect.isNull() || m_vertices.isEmpty()){
+		return false;
+	}
+
+	for (int i = 0; i < m_indices.size(); i += 3){
+		const QVector3D& pos3d1 = m_vertices[i + 0].position;
+		const QVector3D& pos3d2 = m_vertices[i + 1].position;
+		const QVector3D& pos3d3 = m_vertices[i + 2].position;
+
+		QPoint pos2d1 = ModelToWindow(pos3d1);
+		QPoint pos2d2 = ModelToWindow(pos3d2);
+		QPoint pos2d3 = ModelToWindow(pos3d3);
+
+		if (IsPointWithin(pos2d1, rect, isCircle) &&
+			IsPointWithin(pos2d2, rect, isCircle) &&
+			IsPointWithin(pos2d3, rect, isCircle)){
+			intersectedIndicies.insert(i + 0);
+			intersectedIndicies.insert(i + 1);
+			intersectedIndicies.insert(i + 2);
+		}
+	}
+
+	return !intersectedIndicies.empty();
+}
+
+
+bool CMeshShape::IsFaceRayIntersection(
 				const QVector3D& rayOrigin,
 				const QVector3D& rayDirection,
 				const QVector3D& trianglePoint1,
@@ -462,23 +481,30 @@ bool CMeshShape::IsRayFaceIntersection(
 }
 
 
-void CMeshShape::SelectFaceVertices()
+void CMeshShape::SelectVertices(Indices& intersectedIndicies, bool clearPreviousSelection)
 {
-	VertexIndicies selectedVerticesIndicies;
-
-	for (int i : m_selectedVerticesIndicies){
-		int faceVertexIdx = (i / 3) * 3;
-
-		selectedVerticesIndicies.insert(faceVertexIdx + 0);
-		selectedVerticesIndicies.insert(faceVertexIdx + 1);
-		selectedVerticesIndicies.insert(faceVertexIdx + 2);
-
-		m_vertices[faceVertexIdx + 0].color = s_selectionColor;
-		m_vertices[faceVertexIdx + 1].color = s_selectionColor;
-		m_vertices[faceVertexIdx + 2].color = s_selectionColor;
+	// update selected indices
+	if (clearPreviousSelection){
+		m_selectedIndicies.swap(intersectedIndicies);
+	}
+	else{
+		m_selectedIndicies.insert(intersectedIndicies.begin(), intersectedIndicies.end());
 	}
 
-	m_selectedVerticesIndicies.swap(selectedVerticesIndicies);
+	// deselect all vertices
+	for (Vertex& vertex : m_vertices){
+		vertex.color = m_color;
+	}
+
+	// select intersected vertices
+	for (int selectedIndex : m_selectedIndicies){
+		int vertexIndex = m_indices[selectedIndex];
+
+		m_vertices[vertexIndex].color = s_selectionColor;
+	}
+
+	// upload new geometry
+	UploadGeometry(false, m_vertices, m_vertexBuffer);
 }
 
 
