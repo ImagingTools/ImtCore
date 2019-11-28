@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4819" Description="ACF"/>
-            <Version Id="1" Number="2116" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331009" Description="Qt Framework"/>
+            <Version Id="0" Number="4824" Description="ACF"/>
+            <Version Id="1" Number="2119" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331008" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -63,9 +63,6 @@
         <Element Id="PointCloudDocumentTemplate" PackageId="EagleVoce" ComponentId="PointCloudDocumentTemplate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DocumentManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="MultiDocApp"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="MultiDocApp/SettingsProvider"/>
                     </AttributeInfo>

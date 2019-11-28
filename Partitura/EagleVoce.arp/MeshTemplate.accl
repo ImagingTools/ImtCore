@@ -8,11 +8,12 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="Camera" X="400" Y="625" Note=""/>
-        <Element ComponentName="MeshView" X="400" Y="500" Note=""/>
-        <Element ComponentName="StlMeshPersistence" X="625" Y="500" Note=""/>
+        <Element ComponentName="Camera" X="225" Y="625" Note=""/>
+        <Element ComponentName="MeshView" X="225" Y="500" Note=""/>
+        <Element ComponentName="StlMeshPersistence" X="450" Y="500" Note=""/>
         <Element ComponentName="TemplateMesh" X="625" Y="300" Note=""/>
-        <Element ComponentName="TetrahedralMesh3d" X="875" Y="500" Note=""/>
+        <Element ComponentName="TetrahedralMesh3d" X="725" Y="500" Note=""/>
+        <Element ComponentName="UndoManager" X="1000" Y="500" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

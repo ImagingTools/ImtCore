@@ -8,10 +8,11 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ObjPointCloudPersistence" X="575" Y="450" Note=""/>
-        <Element ComponentName="PointCloud" X="975" Y="450" Note=""/>
+        <Element ComponentName="ObjPointCloudPersistence" X="500" Y="450" Note=""/>
+        <Element ComponentName="PointCloud" X="750" Y="450" Note=""/>
         <Element ComponentName="PointCloudView" X="200" Y="450" Note=""/>
         <Element ComponentName="Template" X="575" Y="300" Note=""/>
+        <Element ComponentName="UndoManager" X="975" Y="450" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="PointCloudView">

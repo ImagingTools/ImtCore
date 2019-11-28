@@ -62,6 +62,12 @@
                     <AttributeInfo Id="DocumentTypeName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="STL"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="IsEditSupported" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UndoManager" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UndoManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ViewFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="MeshView"/>
                     </AttributeInfo>
@@ -69,6 +75,11 @@
             </Data>
         </Element>
         <Element Id="TetrahedralMesh3d" PackageId="Imt3dPck" ComponentId="TetrahedralMesh3d">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="UndoManager" PackageId="BasePck" ComponentId="SerializedUndoManager">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
             </Data>

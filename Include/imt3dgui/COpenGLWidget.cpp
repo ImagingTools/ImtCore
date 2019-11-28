@@ -180,6 +180,7 @@ void COpenGLWidget::SetCameraView(COpenGLWidget::ViewDirection viewDirection, bo
 	}
 
 	QQuaternion oldRotation = m_cameraPtr->GetRotation();
+
 	if (animated){
 		m_cameraRotationAnimation.setStartValue(oldRotation);
 		m_cameraRotationAnimation.setEndValue(newRotation);

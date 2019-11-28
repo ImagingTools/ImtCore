@@ -65,10 +65,18 @@
                     <AttributeInfo Id="IsEditSupported" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UndoManager" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UndoManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ViewFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="PointCloudView"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UndoManager" PackageId="BasePck" ComponentId="SerializedUndoManager">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
             </Data>
         </Element>
     </ElementsList>
