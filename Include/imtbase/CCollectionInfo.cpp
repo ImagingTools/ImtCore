@@ -30,6 +30,17 @@ QByteArray CCollectionInfo::InsertItem(const QByteArray& id, const QString & nam
 	return newItem.id;
 }
 
+
+void CCollectionInfo::RemoveItem(const QByteArray& id)
+{
+}
+
+
+void CCollectionInfo::UpdateItem(const QByteArray& id, const QString& name, const QString& description)
+{
+}
+
+
 // reimplemented (ICollectionInfo)
 
 ICollectionInfo::Ids CCollectionInfo::GetElementIds() const

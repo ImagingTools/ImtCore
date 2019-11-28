@@ -20,7 +20,9 @@ namespace imtbase
 class CCollectionInfo: virtual public ICollectionInfo
 {
 public:
-	QByteArray InsertItem(const QByteArray& id, const QString& name, const QString& description);
+	virtual QByteArray InsertItem(const QByteArray& id, const QString& name, const QString& description);
+	virtual void RemoveItem(const QByteArray& id);
+	virtual void UpdateItem(const QByteArray& id, const QString& name, const QString& description);
 
 	// reimplemented (ICollectionInfo)
 	virtual Ids GetElementIds() const override;

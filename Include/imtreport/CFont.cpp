@@ -38,8 +38,7 @@ QString CFont::GetName() const
 
 void CFont::SetName(const QString& name)
 {
-	if (m_name != name)
-	{
+	if (m_name != name){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_name = name;
@@ -55,8 +54,7 @@ double CFont::GetSize() const
 
 void CFont::SetSize(double size)
 {
-	if (m_size != size)
-	{
+	if (!qFuzzyCompare(m_size, size)){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_size = size;
@@ -72,8 +70,7 @@ int CFont::GetFontFlags() const
 
 void CFont::SetFontFlags(int fontFlags)
 {
-	if (m_fontFlags != fontFlags)
-	{
+	if (m_fontFlags != fontFlags){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_fontFlags = fontFlags;
@@ -85,7 +82,7 @@ void CFont::SetFontFlags(int fontFlags)
 
 bool CFont::Serialize(iser::IArchive& archive)
 {
-	istd::CChangeNotifier notifier(archive.IsStoring() ? NULL : this);
+	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
 	static iser::CArchiveTag nameTag("Name", "Font name", iser::CArchiveTag::TT_LEAF);
 	bool retVal = archive.BeginTag(nameTag);
@@ -117,9 +114,7 @@ int CFont::GetSupportedOperations() const
 bool CFont::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CFont* fontPtr = dynamic_cast<const CFont*>(&object);
-
-	if (fontPtr != NULL)
-	{
+	if (fontPtr != nullptr){
 		istd::CChangeNotifier notifier(this);
 
 		m_name = fontPtr->m_name;
@@ -136,8 +131,7 @@ bool CFont::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 bool CFont::IsEqual(const IChangeable& object) const
 {
 	const CFont* fontPtr = dynamic_cast<const CFont*>(&object);
-
-	if (fontPtr != NULL){
+	if (fontPtr != nullptr){
 		return m_name == fontPtr->m_name &&
 			m_size == fontPtr->m_size &&
 			m_fontFlags == fontPtr->m_fontFlags;
@@ -150,13 +144,11 @@ bool CFont::IsEqual(const IChangeable& object) const
 istd::IChangeable* CFont::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CFont> clonePtr(new CFont());
-
-	if (clonePtr->CopyFrom(*this, mode))
-	{
+	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -170,6 +162,7 @@ bool CFont::ResetData(CompatibilityMode /*mode*/)
 
 	return true;
 }
+
 
 } // namespace imtreport
 

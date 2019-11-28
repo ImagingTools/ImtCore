@@ -19,8 +19,8 @@ class CSimpleReferenceCollection: virtual public IReferenceCollection
 {
 public:
 	// reimplemented (IReferenceCollection)
-	virtual bool InsertReference(const Id& resourceId) override;
-	virtual bool RemoveReference(const Id& resourceId) override;
+	virtual bool InsertReference(const Id& objectId) override;
+	virtual bool RemoveReference(const Id& objectId) override;
 	virtual bool RemoveAllReferences() override;
 
 	// reimplemented (IObjectCollectionInfo)

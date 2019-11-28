@@ -24,12 +24,12 @@ public:
 	/**
 		Insert a new reference into the collection.
 	*/
-	virtual bool InsertReference(const Id& resourceId) = 0;
+	virtual bool InsertReference(const Id& objectId) = 0;
 
 	/**
 		Remove a given reference from the collection.
 	*/
-	virtual bool RemoveReference(const Id& resourceId) = 0;
+	virtual bool RemoveReference(const Id& objectId) = 0;
 
 	/**
 		Remove all references from the collection.

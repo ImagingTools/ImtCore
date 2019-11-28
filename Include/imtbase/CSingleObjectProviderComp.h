@@ -14,7 +14,9 @@ namespace imtbase
 
 
 /**
-	Implementation of the single data-object provider.
+	Component implementation of the single data-object provider.
+	The implementation uses the underlaying component reference to the object for providing the instance.
+	The data model updates of the underlaying object will be delegated to the observers of this object.
 */
 class CSingleObjectProviderComp:
 			public icomp::CComponentBase,
@@ -44,6 +46,9 @@ protected:
 	I_REF(imod::IModel, m_dataObjectModelCompPtr);
 
 private:
+	/**
+		Model update bridge used for delegation of the changes from the underlaying object to the observers of this component.
+	*/
 	imod::CModelUpdateBridge m_modelUpdateBridge;
 };
 

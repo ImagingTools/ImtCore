@@ -41,7 +41,7 @@ ICollectionViewDelegate & CObjectCollectionViewComp::GetViewDelegateRef()
 }
 
 
-const ICollectionViewDelegate & CObjectCollectionViewComp::GetViewDelegate() const
+const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate() const
 {
 	return (const_cast<CObjectCollectionViewComp*>(this))->GetViewDelegateRef();
 }

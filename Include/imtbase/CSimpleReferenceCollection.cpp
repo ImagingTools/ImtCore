@@ -16,12 +16,12 @@ namespace imtbase
 
 // reimplemented (IReferenceCollection)
 
-bool CSimpleReferenceCollection::InsertReference(const Id& resourceId)
+bool CSimpleReferenceCollection::InsertReference(const Id& objectId)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
 	Reference reference;
-	reference.id = resourceId;
+	reference.id = objectId;
 
 	m_references.push_back(reference);
 
@@ -29,9 +29,9 @@ bool CSimpleReferenceCollection::InsertReference(const Id& resourceId)
 }
 
 
-bool CSimpleReferenceCollection::RemoveReference(const Id& resourceId)
+bool CSimpleReferenceCollection::RemoveReference(const Id& objectId)
 {
-	int index = FindReference(resourceId);
+	int index = FindReference(objectId);
 	if (index >= 0){
 		istd::CChangeNotifier changeNotifier(this);
 
