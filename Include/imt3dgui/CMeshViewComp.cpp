@@ -149,7 +149,7 @@ bool CMeshViewComp::OnMouseMove(QMouseEvent& e)
 }
 
 
-bool CMeshViewComp::OnMouseRelease(QMouseEvent & e)
+bool CMeshViewComp::OnMouseRelease(QMouseEvent& e)
 {
 	return m_rulerShape.OnMouseRelease(e);
 }
