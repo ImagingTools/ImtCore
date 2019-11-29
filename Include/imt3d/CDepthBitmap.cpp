@@ -163,7 +163,7 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 					for (int x = 0; x < size.GetX(); ++x){
 						float value = inputLinePtr[x];
 
-						if (!qIsNaN(double(value))){
+						if (!std::isnan(value)){
 							if (value < minValue){
 								minValue = value;
 							}
