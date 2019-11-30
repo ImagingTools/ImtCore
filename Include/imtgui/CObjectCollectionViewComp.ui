@@ -115,7 +115,7 @@ QHeaderView::section
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QSplitter" name="splitter">
+     <widget class="QSplitter" name="MetaInfoFrameSplitter">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
@@ -130,7 +130,7 @@ QHeaderView::section
         <enum>QFrame::NoFrame</enum>
        </property>
       </widget>
-      <widget class="QFrame" name="ViewFrame_2">
+      <widget class="QFrame" name="MetaInfoFrame">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>6</horstretch>
@@ -162,7 +162,7 @@ QHeaderView::section
        </layout>
       </widget>
      </widget>
-     <widget class="QFrame" name="ViewFrame">
+     <widget class="QFrame" name="WorkspaceFrame">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>6</horstretch>

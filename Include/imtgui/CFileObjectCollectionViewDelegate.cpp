@@ -152,7 +152,7 @@ void CFileObjectCollectionViewDelegate::OnExport()
 }
 
 
-// private methods
+// protected methods
 
 QByteArray CFileObjectCollectionViewDelegate::FindTypeIdFromFile(const QString& filePath) const
 {

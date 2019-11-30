@@ -40,7 +40,7 @@ protected Q_SLOTS:
 	virtual void OnImport();
 	virtual void OnExport();
 
-private:
+protected:
 	QByteArray FindTypeIdFromFile(const QString& filePath) const;
 	const ifile::IFileTypeInfo* FindFileInfo(const QByteArray& typeId) const;
 	QString CreateFileFilter(int flags) const;

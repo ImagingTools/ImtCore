@@ -5,6 +5,7 @@
 #include <QtWidgets/QMenu>
 
 // ACF includes
+#include <istd/TDelPtr.h>
 #include <ibase/TLocalizableWrap.h>
 #include <iqtgui/IGuiObject.h>
 #include <iqtgui/CHierarchicalCommand.h>
@@ -36,8 +37,11 @@ public:
 
 	// reimplemented (ICollectionViewDelegate)
 	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;
-	virtual QByteArrayList GetObjectTypeIds() const override;
-	virtual void UpdateItemSelection(int viewStateFlags, const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
+	virtual QByteArray GetSupportedTypeId() const override;
+	virtual void UpdateItemSelection(
+				int viewStateFlags,
+				const imtbase::ICollectionInfo::Ids& selectedItems,
+				const QByteArray& selectedTypeId) override;
 	virtual QByteArray CreateNewObject(const QByteArray& typeId) const override;
 	virtual QByteArray ImportObject(const QByteArray& typeId, const QString& sourcePath = QString()) const override;
 	virtual bool ExportObject(const QByteArray& objectId, const QString& targetPath = QString()) const override;
@@ -66,7 +70,7 @@ protected:
 	iqtgui::CHierarchicalCommand m_insertCommand;
 	iqtgui::CHierarchicalCommand m_removeCommand;
 
-	QMenu m_startVariableMenus;
+	istd::TDelPtr<QMenu> m_insertNewDocumentMenuPtr;
 
 	imtbase::IObjectCollection* m_collectionPtr;
 	iqtgui::IGuiObject* m_parentGuiPtr;

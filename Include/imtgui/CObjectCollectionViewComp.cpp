@@ -2,10 +2,13 @@
 
 
 // Qt includes
+#include <QtCore/QUuid>
+#include <QtCore/QDir>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QMessageBox>
 
 // ACF includes
+#include <idoc/IDocumentMetaInfo.h>
 #include <iqtgui/CCommandTools.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
@@ -18,75 +21,25 @@ namespace imtgui
 
 CObjectCollectionViewComp::CObjectCollectionViewComp()
 {
-}
-
-
-// reimplemented (ibase::ICommandsProvider)
-
-const ibase::IHierarchicalCommand* CObjectCollectionViewComp::GetCommands() const
-{
-	return GetViewDelegate().GetCommands();
+	m_commands.SetParent(this);
 }
 
 
 // protected methods
 
-ICollectionViewDelegate & CObjectCollectionViewComp::GetViewDelegateRef()
+ICollectionViewDelegate & CObjectCollectionViewComp::GetViewDelegateRef(const QByteArray& typeId)
 {
-	if (m_viewDelegateCompPtr.IsValid()){
-		return *m_viewDelegateCompPtr;
+	if (m_viewDelegateMap.contains(typeId)){
+		return *m_viewDelegateMap[typeId];
 	}
 
 	return m_defaultViewDelegate;
 }
 
 
-const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate() const
+const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const QByteArray& typeId) const
 {
-	return (const_cast<CObjectCollectionViewComp*>(this))->GetViewDelegateRef();
-}
-
-
-// reimplemented (iqtgui::CGuiComponentBase)
-
-void CObjectCollectionViewComp::OnGuiCreated()
-{
-	BaseClass::OnGuiCreated();
-
-	ItemTree->setModel(&m_itemModel);
-
-	if (*m_showCommandsToolBarAttrPtr){
-		QToolBar* toolBarPtr = new QToolBar(TopFrame);
-		TopFrame->layout()->addWidget(toolBarPtr);
-
-		iqtgui::CHierarchicalCommand* rootCommandPtr = dynamic_cast<iqtgui::CHierarchicalCommand*>(const_cast<ibase::IHierarchicalCommand*>(GetViewDelegate().GetCommands()));
-		if (rootCommandPtr != nullptr){
-			iqtgui::CCommandTools::SetupToolbar(*rootCommandPtr, *toolBarPtr);
-			toolBarPtr->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-			toolBarPtr->setIconSize(QSize(16, 16));
-		}
-	}
-
-	TopFrame->setVisible(*m_showCommandsToolBarAttrPtr);
-	ItemTree->header()->setVisible(!*m_showCommandsToolBarAttrPtr);
-
-	QItemSelectionModel* selectionModelPtr = ItemTree->selectionModel();
-	if (selectionModelPtr != nullptr){
-		connect(
-					selectionModelPtr,
-					SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)),
-					this, SLOT(OnSelectionChanged(const QItemSelection&, const QItemSelection&)));
-	}
-
-	connect(&m_itemModel, &QStandardItemModel::itemChanged, this, &CObjectCollectionViewComp::OnItemChanged);
-}
-
-
-void CObjectCollectionViewComp::OnGuiRetranslate()
-{
-	BaseClass::OnGuiRetranslate();
-
-	UpdateGui(istd::IChangeable::GetAnyChange());
+	return (const_cast<CObjectCollectionViewComp*>(this))->GetViewDelegateRef(typeId);
 }
 
 
@@ -170,7 +123,81 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 	imtbase::IObjectCollection* objectPtr = GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
 
-	GetViewDelegateRef().InitializeDelegate(objectPtr, this);
+	m_defaultViewDelegate.InitializeDelegate(objectPtr, this);
+
+	for (ViewDelegateMap::Iterator iter = m_viewDelegateMap.begin(); iter != m_viewDelegateMap.end(); ++iter){
+		iter.value()->InitializeDelegate(objectPtr, this);
+	}
+}
+
+
+// reimplemented (iqtgui::CGuiComponentBase)
+
+void CObjectCollectionViewComp::OnGuiCreated()
+{
+	ItemTree->setModel(&m_itemModel);
+
+	if (*m_showCommandsToolBarAttrPtr){
+		QToolBar* toolBarPtr = new QToolBar(TopFrame);
+		TopFrame->layout()->addWidget(toolBarPtr);
+
+		iqtgui::CHierarchicalCommand* rootCommandPtr = dynamic_cast<iqtgui::CHierarchicalCommand*>(const_cast<ibase::IHierarchicalCommand*>(GetViewDelegate(m_currentTypeId).GetCommands()));
+		if (rootCommandPtr != nullptr){
+			iqtgui::CCommandTools::SetupToolbar(*rootCommandPtr, *toolBarPtr);
+			toolBarPtr->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+			toolBarPtr->setIconSize(QSize(16, 16));
+		}
+	}
+
+	TopFrame->setVisible(*m_showCommandsToolBarAttrPtr);
+	ItemTree->header()->setVisible(!*m_showCommandsToolBarAttrPtr);
+
+	QItemSelectionModel* selectionModelPtr = ItemTree->selectionModel();
+	if (selectionModelPtr != nullptr){
+		connect(
+					selectionModelPtr,
+					SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)),
+					this, SLOT(OnSelectionChanged(const QItemSelection&, const QItemSelection&)));
+	}
+
+	connect(&m_itemModel, &QStandardItemModel::itemChanged, this, &CObjectCollectionViewComp::OnItemChanged);
+
+	BaseClass::OnGuiCreated();
+}
+
+
+void CObjectCollectionViewComp::OnGuiRetranslate()
+{
+	BaseClass::OnGuiRetranslate();
+
+	UpdateGui(istd::IChangeable::GetAnyChange());
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CObjectCollectionViewComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	int delegatesCount = qMin(m_viewDelegatesCompPtr.GetCount(), m_objectTypeIdsAttrPtr.GetCount());
+	for (int i = 0; i < delegatesCount; ++i){
+		ICollectionViewDelegate* delegatePtr = m_viewDelegatesCompPtr[i];
+		if (delegatePtr != nullptr){
+			QByteArray typeId = m_objectTypeIdsAttrPtr[i];
+			Q_ASSERT(!typeId.isEmpty());
+
+			m_viewDelegateMap[typeId] = delegatePtr;
+		}
+	}
+}
+
+
+void CObjectCollectionViewComp::OnComponentDestroyed()
+{
+	m_viewDelegateMap.clear();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 
@@ -217,9 +244,13 @@ void CObjectCollectionViewComp::UpdateCommands()
 		selectedTypeId = *selectedTypes.begin();
 	}
 
-	GetViewDelegateRef().UpdateItemSelection(stateFlags, itemIds, selectedTypeId);
-}
+	GetViewDelegateRef(selectedTypeId).UpdateItemSelection(stateFlags, itemIds, selectedTypeId);
 
+	istd::IChangeable::ChangeSet changes(ibase::ICommandsProvider::CF_COMMANDS);
+	istd::CChangeNotifier changeNotifier(&m_commands, &changes);
+
+	m_currentTypeId = selectedTypeId;
+}
 
 
 // private slots
@@ -242,6 +273,32 @@ void CObjectCollectionViewComp::OnItemChanged(QStandardItem* itemPtr)
 
 		collectionPtr->SetObjectName(itemId, newName);
 	}
+}
+
+
+// public methods of the embedded class Commands
+
+CObjectCollectionViewComp::Commands::Commands()
+	:m_parentPtr(nullptr)
+{
+}
+
+
+void CObjectCollectionViewComp::Commands::SetParent(CObjectCollectionViewComp* parentPtr)
+{
+	Q_ASSERT(parentPtr != nullptr);
+
+	m_parentPtr = parentPtr;
+}
+
+
+// reimplemented (ibase::ICommandsProvider)
+
+const ibase::IHierarchicalCommand* CObjectCollectionViewComp::Commands::GetCommands() const
+{
+	Q_ASSERT(m_parentPtr != nullptr);
+
+	return m_parentPtr->GetViewDelegate(m_parentPtr->m_currentTypeId).GetCommands();
 }
 
 

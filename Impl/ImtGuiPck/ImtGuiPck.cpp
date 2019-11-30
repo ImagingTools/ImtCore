@@ -41,6 +41,11 @@ I_EXPORT_COMPONENT(
 			"View delegate for a file-based collection",
 			"Object Collection File Delegate View");
 
+I_EXPORT_COMPONENT(
+			DocumentBasedFileCollectionDelegate,
+			"View delegate for a file collection using document manager for the data operations",
+			"Object Collection File Delegate View Document MDI");
+
 
 } // namespace ImtGuiPck
 

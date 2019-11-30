@@ -14,7 +14,7 @@ namespace imtgui
 
 CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 	:m_editCommands("&Edit", 100),
-	m_insertCommand("Add", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
+	m_insertCommand("New", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_removeCommand("Remove", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_collectionPtr(nullptr)
 {
@@ -28,6 +28,8 @@ bool CObjectCollectionViewDelegate::InitializeDelegate(imtbase::IObjectCollectio
 	m_collectionPtr = collectionPtr;
 	m_parentGuiPtr = parentGuiPtr;
 
+	m_insertNewDocumentMenuPtr.SetPtr(new QMenu);
+
 	if (m_collectionPtr != nullptr){
 		const iprm::IOptionsList* typesPtr = m_collectionPtr->GetObjectTypesInfo();
 		if (typesPtr != nullptr){
@@ -36,13 +38,13 @@ bool CObjectCollectionViewDelegate::InitializeDelegate(imtbase::IObjectCollectio
 				for (int i = 0; i < typesCount; ++i){
 					const QString typeName = typesPtr->GetOptionName(i);
 
-					QAction* action = m_startVariableMenus.addAction(typeName);
+					QAction* action = m_insertNewDocumentMenuPtr->addAction(typeName);
 					action->setData(typesPtr->GetOptionId(i));
 				}
 
-				m_insertCommand.setMenu(&m_startVariableMenus);
+				m_insertCommand.setMenu(m_insertNewDocumentMenuPtr.GetPtr());
 
-				QObject::connect(&m_startVariableMenus, SIGNAL(triggered(QAction*)), this, SLOT(OnAddMenuOptionClicked(QAction*)));
+				QObject::connect(m_insertNewDocumentMenuPtr.GetPtr(), SIGNAL(triggered(QAction*)), this, SLOT(OnAddMenuOptionClicked(QAction*)));
 			}
 		}
 
@@ -57,9 +59,9 @@ bool CObjectCollectionViewDelegate::InitializeDelegate(imtbase::IObjectCollectio
 }
 
 
-QByteArrayList CObjectCollectionViewDelegate::GetObjectTypeIds() const
+QByteArray CObjectCollectionViewDelegate::GetSupportedTypeId() const
 {
-	QByteArrayList retVal;
+	QByteArray retVal;
 
 	return retVal;
 }
@@ -148,6 +150,9 @@ const ibase::IHierarchicalCommand* CObjectCollectionViewDelegate::GetCommands() 
 
 void CObjectCollectionViewDelegate::SetupCommands()
 {
+	m_rootCommands.ResetChilds();
+	m_editCommands.ResetChilds();
+
 	connect(&m_insertCommand, SIGNAL(triggered()), this, SLOT(OnInsert()));
 	connect(&m_removeCommand, SIGNAL(triggered()), this, SLOT(OnRemove()));
 

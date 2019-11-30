@@ -10,6 +10,7 @@
 #include <imtgui/CMultiStatusProviderGuiComp.h>
 #include <imtgui/CObjectCollectionViewComp.h>
 #include <imtgui/CFileObjectCollectionViewDelegate.h>
+#include <imtgui/CDocumentBasedFileCollectionDelegateComp.h>
 
 
 /**
@@ -24,6 +25,7 @@ typedef imtgui::CSingleStatusProviderGuiComp SingleStatusProviderGui;
 typedef imtgui::CMultiStatusProviderGuiComp MultiStatusProviderGui;
 typedef imtgui::CObjectCollectionViewComp ObjectCollectionView;
 typedef icomp::TMakeComponentWrap<imtgui::CFileObjectCollectionViewDelegate, imtgui::ICollectionViewDelegate> FileObjectCollectionViewDelegate;
+typedef imtgui::CDocumentBasedFileCollectionDelegateComp DocumentBasedFileCollectionDelegate;
 
 
 } // namespace ImtProc3dPck
