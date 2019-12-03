@@ -8,6 +8,7 @@
 
 // ACF includes
 #include <istd/CChangeGroup.h>
+#include <istd/CSystem.h>
 #include <ifilegui/CFileDialogLoaderComp.h>
 
 // ImtCore includes
@@ -64,7 +65,11 @@ void CDocumentBasedFileCollectionDelegateComp::SetupCommands()
 {
 	BaseClass2::SetupCommands();
 
-	m_editCommands.InsertChild(&m_editContentsCommand);
+	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	if (fileCollectionPtr != nullptr){
+		connect(&m_editContentsCommand, SIGNAL(triggered()), this, SLOT(OnEdit()));
+		m_editCommands.InsertChild(&m_editContentsCommand);
+	}
 }
 
 
@@ -96,6 +101,46 @@ void CDocumentBasedFileCollectionDelegateComp::OnComponentDestroyed()
 	m_workingObjects.Reset();
 
 	BaseClass::OnComponentDestroyed();
+}
+
+
+// protected slots
+
+void CDocumentBasedFileCollectionDelegateComp::OnEdit()
+{
+	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	Q_ASSERT(fileCollectionPtr != nullptr);
+
+	if (m_documentManagerCompPtr.IsValid()){
+		for (const QByteArray& objectId : m_selectedItemIds){
+			for (int i = 0; i < m_workingObjects.GetCount(); ++i){
+				if (m_workingObjects.GetAt(i)->uuid == objectId){
+					return;
+				}
+			}
+
+			ObjectInfo* objectInfoPtr = new ObjectInfo;
+			objectInfoPtr->typeId = m_collectionPtr->GetObjectTypeId(objectId);
+			objectInfoPtr->name = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+
+			imtbase::IFileObjectCollection::FileInfo fileInfo = fileCollectionPtr->GetFileInfo(objectId);
+
+			objectInfoPtr->uuid = objectId;
+
+			QString tempPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString();
+
+			istd::CSystem::EnsurePathExists(tempPath);
+
+			QString tempFilePath = tempPath + "/ " + objectInfoPtr->name + "." + QFileInfo(fileInfo.fileName).suffix();
+
+			QString targetFilePath = fileCollectionPtr->GetFile(objectId, tempFilePath);
+			if (!targetFilePath.isEmpty()){
+				if (m_documentManagerCompPtr->OpenDocument(&objectInfoPtr->typeId, &targetFilePath, true, "", &objectInfoPtr->objectPtr)){
+					m_workingObjects.PushBack(objectInfoPtr);
+				}
+			}
+		}
+	}
 }
 
 

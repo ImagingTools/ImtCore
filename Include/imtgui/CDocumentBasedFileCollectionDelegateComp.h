@@ -94,6 +94,9 @@ protected:
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
+protected Q_SLOTS:
+	virtual void OnEdit();
+
 private:
 	template <class InterfaceType>
 	static InterfaceType* ExtractCollectionPersistence(CDocumentBasedFileCollectionDelegateComp& component)
