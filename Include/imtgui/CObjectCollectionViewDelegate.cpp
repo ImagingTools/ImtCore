@@ -15,6 +15,7 @@ namespace imtgui
 CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 	:m_editCommands("&Edit", 100),
 	m_insertCommand("New", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
+	m_duplicateCommand("Duplicate", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_removeCommand("Remove", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_collectionPtr(nullptr)
 {
@@ -66,6 +67,7 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(int viewStateFlags, cons
 	}
 
 	m_insertCommand.setEnabled(isAddEnabled);
+	m_duplicateCommand.setEnabled(isAddEnabled && !selectedItems.isEmpty());
 	m_removeCommand.setEnabled(isRemoveEnabled);
 
 	m_selectedItemIds = selectedItems;
@@ -73,10 +75,10 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(int viewStateFlags, cons
 }
 
 
-QByteArray CObjectCollectionViewDelegate::CreateNewObject(const QByteArray& typeId) const
+QByteArray CObjectCollectionViewDelegate::CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr) const
 {
 	if (m_collectionPtr != nullptr){
-		return m_collectionPtr->InsertNewObject(typeId, tr("New"), QString(), nullptr);
+		return m_collectionPtr->InsertNewObject(typeId, tr("New"), QString(), defaultDataPtr);
 	}
 
 	return QByteArray();
@@ -137,9 +139,11 @@ void CObjectCollectionViewDelegate::SetupCommands()
 	m_editCommands.ResetChilds();
 
 	connect(&m_insertCommand, SIGNAL(triggered()), this, SLOT(OnInsert()));
+	connect(&m_duplicateCommand, SIGNAL(triggered()), this, SLOT(OnDuplicate()));
 	connect(&m_removeCommand, SIGNAL(triggered()), this, SLOT(OnRemove()));
 
 	m_editCommands.InsertChild(&m_insertCommand);
+	m_editCommands.InsertChild(&m_duplicateCommand);
 	m_editCommands.InsertChild(&m_removeCommand);
 
 	m_rootCommands.InsertChild(&m_editCommands);
@@ -176,6 +180,7 @@ void CObjectCollectionViewDelegate::SetupInsertCommand()
 void CObjectCollectionViewDelegate::OnLanguageChanged()
 {
 	m_insertCommand.SetVisuals(tr("Insert"), tr("New"), tr("Insert new resource into the collection"), QIcon(":/Icons/Add"));
+	m_duplicateCommand.SetVisuals(tr("Dupplicate"), tr("Dupplicate"), tr("Duplicate selected objects"), QIcon(":/Icons/Duplicate"));
 	m_removeCommand.SetVisuals(tr("Remove"), tr("Remove"), tr("Remove selected resource from the collection"), QIcon(":/Icons/Delete"));
 }
 
@@ -189,6 +194,22 @@ void CObjectCollectionViewDelegate::OnInsert()
 	QByteArray objectId = CreateNewObject(m_selectedTypeId);
 	if (objectId.isEmpty()){
 		QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("New resource could not be created"));
+	}
+}
+
+
+void CObjectCollectionViewDelegate::OnDuplicate()
+{
+	Q_ASSERT(m_collectionPtr != nullptr);
+
+	for (const QByteArray& selectedItemId : m_selectedItemIds){
+		const istd::IChangeable* sourceDataPtr = m_collectionPtr->GetObjectPtr(selectedItemId);
+		QString sourceName = m_collectionPtr->GetElementInfo(selectedItemId, imtbase::ICollectionInfo::EIT_NAME).toString();
+
+		QByteArray objectId = this->CObjectCollectionViewDelegate::CreateNewObject(m_collectionPtr->GetObjectTypeId(selectedItemId), sourceDataPtr);
+		if (!objectId.isEmpty()){
+			m_collectionPtr->SetObjectName(objectId, QString("Copy of %1").arg(sourceName));
+		}
 	}
 }
 

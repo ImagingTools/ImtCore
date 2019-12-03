@@ -38,10 +38,15 @@ public:
 		I_ASSIGN(m_documentManagerCompPtr, "DocumentManager", "Document manager", true, "DocumentManager");
 	I_END_COMPONENT;
 
+	enum CommandGroup
+	{
+		CG_DOCUMENT_MANAGER = 2100
+	};
+
 	CDocumentBasedFileCollectionDelegateComp();
 
 	// reimplemented (ICollectionViewDelegate)
-	virtual QByteArray CreateNewObject(const QByteArray& typeId) const override;
+	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
 	virtual void UpdateItemSelection(int viewStateFlags, const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 
 protected:

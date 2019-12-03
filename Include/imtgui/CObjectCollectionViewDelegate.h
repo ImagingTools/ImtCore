@@ -42,7 +42,7 @@ public:
 				int viewStateFlags,
 				const imtbase::ICollectionInfo::Ids& selectedItems,
 				const QByteArray& selectedTypeId) override;
-	virtual QByteArray CreateNewObject(const QByteArray& typeId) const override;
+	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
 	virtual QByteArray ImportObject(const QByteArray& typeId, const QString& sourcePath = QString()) const override;
 	virtual bool ExportObject(const QByteArray& objectId, const QString& targetPath = QString()) const override;
 	virtual void RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const override;
@@ -61,14 +61,17 @@ protected:
 
 protected Q_SLOTS:
 	virtual void OnInsert();
+	virtual void OnDuplicate();
 	virtual void OnRemove();
 	virtual void OnAddMenuOptionClicked(QAction* action);
 
 protected:
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;
+
 	iqtgui::CHierarchicalCommand m_editCommands;
 	iqtgui::CHierarchicalCommand m_insertCommand;
+	iqtgui::CHierarchicalCommand m_duplicateCommand;
 	iqtgui::CHierarchicalCommand m_removeCommand;
 
 	istd::TDelPtr<QMenu> m_insertNewDocumentMenuPtr;

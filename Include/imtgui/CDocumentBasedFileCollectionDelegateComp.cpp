@@ -20,14 +20,14 @@ namespace imtgui
 
 CDocumentBasedFileCollectionDelegateComp::CDocumentBasedFileCollectionDelegateComp()
 	:m_collectionPersistence(*this),
-	m_editContentsCommand("Edit", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT)
+	m_editContentsCommand("Edit", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_DOCUMENT_MANAGER)
 {
 }
 
 
 // reimplemented (ICollectionViewDelegate)
 
-QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(const QByteArray& typeId) const
+QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(const QByteArray& typeId, const istd::IChangeable* /*defaultDataPtr*/) const
 {
 	if (m_documentManagerCompPtr.IsValid()){
 		ObjectInfo* objectInfoPtr = new ObjectInfo;

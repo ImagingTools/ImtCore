@@ -162,6 +162,9 @@ QAbstractItemView[TabSimulation=true]
      <property name="selectionMode">
       <enum>QAbstractItemView::ExtendedSelection</enum>
      </property>
+     <property name="indentation">
+      <number>0</number>
+     </property>
     </widget>
    </item>
   </layout>
