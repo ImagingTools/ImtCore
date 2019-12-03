@@ -143,8 +143,8 @@ void CObjectCollectionViewDelegate::SetupCommands()
 	connect(&m_removeCommand, SIGNAL(triggered()), this, SLOT(OnRemove()));
 
 	m_editCommands.InsertChild(&m_insertCommand);
-	m_editCommands.InsertChild(&m_duplicateCommand);
 	m_editCommands.InsertChild(&m_removeCommand);
+	m_editCommands.InsertChild(&m_duplicateCommand);
 
 	m_rootCommands.InsertChild(&m_editCommands);
 }
