@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <imod/TSingleModelObserverBase.h>
 #include <icomp/CComponentBase.h>
 #include <ifile/IFilePersistence.h>
 #include <idoc/IDocumentManager.h>
@@ -36,6 +37,7 @@ public:
 		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "Type-ID supported by this delegate", true, "ObjectTypeId");
 		I_ASSIGN(m_filePersistenceCompPtr, "FilePersistence", "Persistence for editable objects", true, "FilePersistence");
 		I_ASSIGN(m_documentManagerCompPtr, "DocumentManager", "Document manager", true, "DocumentManager");
+		I_ASSIGN_TO(m_documentManagerModelCompPtr, m_documentManagerCompPtr, true);
 	I_END_COMPONENT;
 
 	enum CommandGroup
@@ -82,6 +84,19 @@ protected:
 		CDocumentBasedFileCollectionDelegateComp& m_parent;
 	};
 
+
+	class DocumentManagerObserver: public imod::TSingleModelObserverBase<idoc::IDocumentManager>
+	{
+	public:
+		DocumentManagerObserver(CDocumentBasedFileCollectionDelegateComp& parent);
+
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
+
+	private:
+		CDocumentBasedFileCollectionDelegateComp& m_parent;
+	};
+
 protected:
 	// reimplemented (CObjectCollectionViewDelegate)
 	virtual void SetupCommands() override;
@@ -116,11 +131,13 @@ private:
 		Underlaying document manager used for object operations.
 	*/
 	I_REF(idoc::IDocumentManager, m_documentManagerCompPtr);
+	I_REF(imod::IModel, m_documentManagerModelCompPtr);
 
 	typedef istd::TPointerVector<ICollectionViewDelegate::ObjectInfo> WorkingObjects;
 	mutable WorkingObjects m_workingObjects;
 
 	ObjectPersistenceProxy m_collectionPersistence;
+	DocumentManagerObserver m_documentManagerObserver;
 
 	iqtgui::CHierarchicalCommand m_editContentsCommand;
 };

@@ -21,6 +21,7 @@ namespace imtgui
 
 CDocumentBasedFileCollectionDelegateComp::CDocumentBasedFileCollectionDelegateComp()
 	:m_collectionPersistence(*this),
+	m_documentManagerObserver(*this),
 	m_editContentsCommand("Edit", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_DOCUMENT_MANAGER)
 {
 }
@@ -93,12 +94,20 @@ void CDocumentBasedFileCollectionDelegateComp::OnLanguageChanged()
 void CDocumentBasedFileCollectionDelegateComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	if (m_documentManagerModelCompPtr.IsValid()){
+		m_documentManagerModelCompPtr->AttachObserver(&m_documentManagerObserver);
+	}
 }
 
 
 void CDocumentBasedFileCollectionDelegateComp::OnComponentDestroyed()
 {
 	m_workingObjects.Reset();
+
+	if (m_documentManagerModelCompPtr.IsValid()){
+		m_documentManagerModelCompPtr->DetachObserver(&m_documentManagerObserver);
+	}
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -271,6 +280,44 @@ QString CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::GetTyp
 {
 	return QString();
 }
+
+
+// public methods of the embedded class DocumentManagerObserver
+
+CDocumentBasedFileCollectionDelegateComp::DocumentManagerObserver::DocumentManagerObserver(CDocumentBasedFileCollectionDelegateComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CDocumentBasedFileCollectionDelegateComp::DocumentManagerObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+{
+	Q_ASSERT(m_parent.m_documentManagerCompPtr.IsValid());
+
+	if (changeSet.ContainsExplicit(idoc::IDocumentManager::CF_DOCUMENT_REMOVED)){
+		int documentsCount = m_parent.m_documentManagerCompPtr->GetDocumentsCount();
+
+		for (int i = 0; i < m_parent.m_workingObjects.GetCount(); ++i){
+			const istd::IChangeable* dataPtr = m_parent.m_workingObjects.GetAt(i)->objectPtr;
+
+			bool wasFound = false;
+			for (int documentIndex = 0; documentIndex < documentsCount; ++documentIndex){
+				const istd::IChangeable& documentData = m_parent.m_documentManagerCompPtr->GetDocumentFromIndex(documentIndex);
+				if (dataPtr == &documentData){
+					wasFound = true;
+					break;
+				}
+			}
+
+			if (!wasFound){
+				m_parent.m_workingObjects.RemoveAt(i);
+			}
+		}
+	}
+}
+
 
 } // namespace imtgui
 
