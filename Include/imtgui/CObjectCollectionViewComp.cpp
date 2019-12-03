@@ -123,7 +123,9 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 	imtbase::IObjectCollection* objectPtr = GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
 
-	m_defaultViewDelegate.InitializeDelegate(objectPtr, this);
+	if (m_viewDelegateMap.isEmpty()){
+		m_defaultViewDelegate.InitializeDelegate(objectPtr, this);
+	}
 
 	for (ViewDelegateMap::Iterator iter = m_viewDelegateMap.begin(); iter != m_viewDelegateMap.end(); ++iter){
 		iter.value()->InitializeDelegate(objectPtr, this);

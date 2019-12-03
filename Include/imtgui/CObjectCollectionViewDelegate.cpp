@@ -28,26 +28,7 @@ bool CObjectCollectionViewDelegate::InitializeDelegate(imtbase::IObjectCollectio
 	m_collectionPtr = collectionPtr;
 	m_parentGuiPtr = parentGuiPtr;
 
-	m_insertNewDocumentMenuPtr.SetPtr(new QMenu);
-
 	if (m_collectionPtr != nullptr){
-		const iprm::IOptionsList* typesPtr = m_collectionPtr->GetObjectTypesInfo();
-		if (typesPtr != nullptr){
-			int typesCount = typesPtr->GetOptionsCount();
-			if (typesCount > 1){
-				for (int i = 0; i < typesCount; ++i){
-					const QString typeName = typesPtr->GetOptionName(i);
-
-					QAction* action = m_insertNewDocumentMenuPtr->addAction(typeName);
-					action->setData(typesPtr->GetOptionId(i));
-				}
-
-				m_insertCommand.setMenu(m_insertNewDocumentMenuPtr.GetPtr());
-
-				QObject::connect(m_insertNewDocumentMenuPtr.GetPtr(), SIGNAL(triggered(QAction*)), this, SLOT(OnAddMenuOptionClicked(QAction*)));
-			}
-		}
-
 		SetupCommands();
 
 		OnLanguageChanged();
@@ -150,6 +131,8 @@ const ibase::IHierarchicalCommand* CObjectCollectionViewDelegate::GetCommands() 
 
 void CObjectCollectionViewDelegate::SetupCommands()
 {
+	SetupInsertCommand();
+
 	m_rootCommands.ResetChilds();
 	m_editCommands.ResetChilds();
 
@@ -160,6 +143,31 @@ void CObjectCollectionViewDelegate::SetupCommands()
 	m_editCommands.InsertChild(&m_removeCommand);
 
 	m_rootCommands.InsertChild(&m_editCommands);
+}
+
+
+void CObjectCollectionViewDelegate::SetupInsertCommand()
+{
+	if (m_collectionPtr != nullptr){
+		m_insertNewDocumentMenuPtr.SetPtr(new QMenu);
+
+		const iprm::IOptionsList* typesPtr = m_collectionPtr->GetObjectTypesInfo();
+		if (typesPtr != nullptr){
+			int typesCount = typesPtr->GetOptionsCount();
+			if (typesCount > 1){
+				for (int i = 0; i < typesCount; ++i){
+					const QString typeName = typesPtr->GetOptionName(i);
+
+					QAction* action = m_insertNewDocumentMenuPtr->addAction(typeName);
+					action->setData(typesPtr->GetOptionId(i));
+				}
+
+				m_insertCommand.setMenu(m_insertNewDocumentMenuPtr.GetPtr());
+
+				QObject::connect(m_insertNewDocumentMenuPtr.GetPtr(), SIGNAL(triggered(QAction*)), this, SLOT(OnAddMenuOptionClicked(QAction*)));
+			}
+		}
+	}
 }
 
 
@@ -178,12 +186,7 @@ void CObjectCollectionViewDelegate::OnInsert()
 {
 	Q_ASSERT(m_collectionPtr != nullptr);
 
-	const iprm::IOptionsList* typesPtr = m_collectionPtr->GetObjectTypesInfo();
-	if (typesPtr == nullptr || typesPtr->GetOptionsCount() < 1){
-		return;
-	}
-
-	QByteArray objectId = CreateNewObject(typesPtr->GetOptionId(0));
+	QByteArray objectId = CreateNewObject(m_selectedTypeId);
 	if (objectId.isEmpty()){
 		QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("New resource could not be created"));
 	}

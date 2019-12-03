@@ -42,6 +42,7 @@ public:
 
 	// reimplemented (ICollectionViewDelegate)
 	virtual QByteArray CreateNewObject(const QByteArray& typeId) const override;
+	virtual void UpdateItemSelection(int viewStateFlags, const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 
 protected:
 	/**
@@ -77,6 +78,13 @@ protected:
 	};
 
 protected:
+	// reimplemented (CObjectCollectionViewDelegate)
+	virtual void SetupCommands() override;
+	virtual void SetupInsertCommand() override;
+
+	// reimplemented (ibase::TLocalizableWrap)
+	virtual void OnLanguageChanged() override;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
@@ -105,6 +113,8 @@ private:
 	mutable WorkingObjects m_workingObjects;
 
 	ObjectPersistenceProxy m_collectionPersistence;
+
+	iqtgui::CHierarchicalCommand m_editContentsCommand;
 };
 
 

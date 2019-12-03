@@ -54,6 +54,7 @@ public:
 
 protected:
 	virtual void SetupCommands();
+	virtual void SetupInsertCommand();
 
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;

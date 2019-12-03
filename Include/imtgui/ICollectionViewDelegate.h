@@ -145,8 +145,7 @@ public:
 	virtual bool ExportObject(const QByteArray& objectId, const QString& targetPath = QString()) const = 0;
 
 	/**
-		Get the list of type-IDs supported by the delegate implementation.
-		The delegate can only work with the supported objects.
+		Remove objects with given IDs.
 	*/
 	virtual void RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const = 0;
 

@@ -5,7 +5,6 @@
 #include <QtCore/QUuid>
 #include <QtCore/QDir>
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QFileDialog>
 
 // ACF includes
 #include <istd/CChangeGroup.h>
@@ -20,7 +19,8 @@ namespace imtgui
 
 
 CDocumentBasedFileCollectionDelegateComp::CDocumentBasedFileCollectionDelegateComp()
-	:m_collectionPersistence(*this)
+	:m_collectionPersistence(*this),
+	m_editContentsCommand("Edit", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT)
 {
 }
 
@@ -48,7 +48,40 @@ QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(const QByte
 }
 
 
+void CDocumentBasedFileCollectionDelegateComp::UpdateItemSelection(int viewStateFlags, const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId)
+{
+	BaseClass2::UpdateItemSelection(viewStateFlags, selectedItems, selectedTypeId);
+
+	m_editContentsCommand.setEnabled(!selectedItems.isEmpty());
+}
+
+
 // protected methods
+
+// reimplemented (CObjectCollectionViewDelegate)
+
+void CDocumentBasedFileCollectionDelegateComp::SetupCommands()
+{
+	BaseClass2::SetupCommands();
+
+	m_editCommands.InsertChild(&m_editContentsCommand);
+}
+
+
+void CDocumentBasedFileCollectionDelegateComp::SetupInsertCommand()
+{
+}
+
+
+// reimplemented (ibase::TLocalizableWrap)
+
+void CDocumentBasedFileCollectionDelegateComp::OnLanguageChanged()
+{
+	BaseClass2::OnLanguageChanged();
+
+	m_editContentsCommand.SetVisuals(tr("Edit"), tr("Edit"), tr("Edit existing object"), QIcon(":/Icons/Edit"));
+}
+
 
 // reimplemented (icomp::CComponentBase)
 
