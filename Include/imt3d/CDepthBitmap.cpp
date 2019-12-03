@@ -154,8 +154,8 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 			if (format == iimg::IBitmap::PF_FLOAT32){
 				istd::CIndex2d size = inputBitmapPtr->GetImageSize();
 				
-				float minValue = *(const float*)inputBitmapPtr->GetLinePtr(0);
-				float maxValue = minValue;
+				float minValue = std::numeric_limits<float>::max();
+				float maxValue = -std::numeric_limits<float>::max();
 
 				for (int y = 0; y < size.GetY(); ++y){
 					const float* inputLinePtr = (const float*)inputBitmapPtr->GetLinePtr(y);

@@ -50,7 +50,9 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	const imtbase::IObjectCollection* objectPtr = GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
 
-	m_typeItems.clear();
+	QByteArray lastTypeId = m_currentTypeId;
+
+	TypeList->clear();
 	m_itemModel.clear();
 	m_itemModel.setColumnCount(1);
 	m_itemModel.setHorizontalHeaderLabels(QStringList() << tr("Name"));
@@ -64,29 +66,24 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			QByteArray typeId = objectTypeInfoPtr->GetOptionId(typeIndex);
 			QString typeName = objectTypeInfoPtr->GetOptionName(typeIndex);
 
-			QStandardItem* typeItemPtr = new QStandardItem;
+			QTreeWidgetItem* typeItemPtr = new QTreeWidgetItem;
 			typeItemPtr->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-			typeItemPtr->setData(typeName, Qt::DisplayRole);
-			typeItemPtr->setData(typeName, Qt::EditRole);
-			typeItemPtr->setData(typeId, DR_TYPE_ID);
-			m_itemModel.appendRow(typeItemPtr);
+			typeItemPtr->setData(0, Qt::DisplayRole, typeName);
+			typeItemPtr->setData(0, Qt::EditRole, typeName);
+			typeItemPtr->setData(0, DR_TYPE_ID, typeId);
+			TypeList->addTopLevelItem(typeItemPtr);
 
-			m_typeItems.push_back(typeItemPtr);
+			if (lastTypeId == typeId){
+				TypeList->setItemSelected(typeItemPtr, true);
+			}
 
-			ItemTree->setExpanded(typeItemPtr->index(), true);
+			if (lastTypeId.isEmpty() && (typeIndex == 0)){
+				TypeList->setItemSelected(typeItemPtr, true);
+			}
 		}
 		
 		for (const QByteArray& itemId : collectionItemIds){
 			QByteArray itemTypeId = objectPtr->GetObjectTypeId(itemId);
-
-			QStandardItem* parentItemPtr = nullptr;
-			for (int i = 0; i < m_typeItems.count(); ++i){
-				QByteArray typeId = m_typeItems[i]->data(Qt::UserRole).toByteArray();
-				if (typeId == itemTypeId){
-					parentItemPtr = m_typeItems[i];
-					break;
-				}
-			}
 
 			QStandardItem* objectItemPtr = new QStandardItem;
 			QString objectName = objectPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_NAME).toString();
@@ -103,12 +100,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 
 			objectItemPtr->setFlags(flags);
 
-			if (parentItemPtr != nullptr){
-				parentItemPtr->appendRow(objectItemPtr);
-			}
-			else{
-				m_itemModel.appendRow(objectItemPtr);
-			}
+			m_itemModel.appendRow(objectItemPtr);
 		}
 	}
 
@@ -137,24 +129,14 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 
 void CObjectCollectionViewComp::OnGuiCreated()
 {
-	ItemTree->setModel(&m_itemModel);
+	m_proxyModelPtr = new QSortFilterProxyModel(this);
+	m_proxyModelPtr->setSourceModel(&m_itemModel);
+	m_proxyModelPtr->setFilterKeyColumn(0);
+	m_proxyModelPtr->setFilterRole(DR_TYPE_ID);
 
-	if (*m_showCommandsToolBarAttrPtr){
-		QToolBar* toolBarPtr = new QToolBar(TopFrame);
-		TopFrame->layout()->addWidget(toolBarPtr);
+	ItemList->setModel(m_proxyModelPtr);
 
-		iqtgui::CHierarchicalCommand* rootCommandPtr = dynamic_cast<iqtgui::CHierarchicalCommand*>(const_cast<ibase::IHierarchicalCommand*>(GetViewDelegate(m_currentTypeId).GetCommands()));
-		if (rootCommandPtr != nullptr){
-			iqtgui::CCommandTools::SetupToolbar(*rootCommandPtr, *toolBarPtr);
-			toolBarPtr->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-			toolBarPtr->setIconSize(QSize(16, 16));
-		}
-	}
-
-	TopFrame->setVisible(*m_showCommandsToolBarAttrPtr);
-	ItemTree->header()->setVisible(!*m_showCommandsToolBarAttrPtr);
-
-	QItemSelectionModel* selectionModelPtr = ItemTree->selectionModel();
+	QItemSelectionModel* selectionModelPtr = ItemList->selectionModel();
 	if (selectionModelPtr != nullptr){
 		connect(
 					selectionModelPtr,
@@ -207,7 +189,10 @@ void CObjectCollectionViewComp::OnComponentDestroyed()
 
 void CObjectCollectionViewComp::UpdateCommands()
 {
-	QModelIndexList selectedIndexes = ItemTree->selectionModel()->selectedRows();
+	istd::IChangeable::ChangeSet changes(ibase::ICommandsProvider::CF_COMMANDS);
+	istd::CChangeNotifier changeNotifier(&m_commands, &changes);
+
+	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
 
 	imtbase::ICollectionInfo::Ids itemIds;
 
@@ -223,11 +208,6 @@ void CObjectCollectionViewComp::UpdateCommands()
 				if (!itemId.isEmpty()){
 					itemIds.push_back(itemPtr->data(DR_OBJECT_ID).toByteArray());
 				}
-
-				QByteArray typeId = itemPtr->data(DR_TYPE_ID).toByteArray();
-				if (!typeId.isEmpty()){
-					selectedTypes.insert(typeId);
-				}
 			}
 		}
 	}
@@ -241,17 +221,7 @@ void CObjectCollectionViewComp::UpdateCommands()
 		}
 	}
 
-	QByteArray selectedTypeId;
-	if (selectedTypes.count() == 1){
-		selectedTypeId = *selectedTypes.begin();
-	}
-
-	GetViewDelegateRef(selectedTypeId).UpdateItemSelection(stateFlags, itemIds, selectedTypeId);
-
-	istd::IChangeable::ChangeSet changes(ibase::ICommandsProvider::CF_COMMANDS);
-	istd::CChangeNotifier changeNotifier(&m_commands, &changes);
-
-	m_currentTypeId = selectedTypeId;
+	GetViewDelegateRef(m_currentTypeId).UpdateItemSelection(stateFlags, itemIds, m_currentTypeId);
 }
 
 
@@ -275,6 +245,21 @@ void CObjectCollectionViewComp::OnItemChanged(QStandardItem* itemPtr)
 
 		collectionPtr->SetObjectName(itemId, newName);
 	}
+}
+
+
+void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
+{
+	m_currentTypeId.clear();
+
+	QList<QTreeWidgetItem*> selectedItems = TypeList->selectedItems();
+	if (!selectedItems.isEmpty()){
+		m_currentTypeId = selectedItems[0]->data(0, DR_TYPE_ID).toByteArray();
+	}
+
+	m_proxyModelPtr->setFilterFixedString(m_currentTypeId);
+
+	UpdateCommands();
 }
 
 

@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QMenu>
 
@@ -91,10 +92,10 @@ private:
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 	void OnItemChanged(QStandardItem *item);
+	void on_TypeList_itemSelectionChanged();
 
 private:
 	QStandardItemModel m_itemModel;
-	QVector<QStandardItem*> m_typeItems;
 
 	CObjectCollectionViewDelegate m_defaultViewDelegate;
 
@@ -112,6 +113,8 @@ private:
 	QByteArray m_currentTypeId;
 
 	imod::TModelWrap<Commands> m_commands;
+
+	QSortFilterProxyModel* m_proxyModelPtr;
 };
 
 
