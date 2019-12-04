@@ -7,6 +7,8 @@
 #include <QtCore/QEvent>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QTabBar>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QTreeWidgetItem>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -283,16 +285,25 @@ void CCollectionDocumentWorkspaceGuiComp::OnViewRegistered(istd::IPolymorphic* v
 	iqtgui::IGuiObject* guiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(viewPtr);
 	if (guiObjectPtr != NULL){
 		QWidget* frameForGuiComponentPtr = NULL; // TODO Create stack page
+		frameForGuiComponentPtr = new QWidget();
+		DocumentStack->setCurrentIndex(DocumentStack->addWidget(frameForGuiComponentPtr));
+		QVBoxLayout *frameForGuiLayout = new QVBoxLayout(frameForGuiComponentPtr);
+
 		if (guiObjectPtr->CreateGui(frameForGuiComponentPtr)){
 			QWidget* widgetPtr = guiObjectPtr->GetWidget();
 			Q_ASSERT(widgetPtr != NULL);
 
 			widgetPtr->installEventFilter(this);
-
+						
 			// TODO: Add item to the list!
 
 			SetActiveView(viewPtr);
 		}
+		else{
+			DocumentStack->removeWidget(frameForGuiComponentPtr);
+			delete frameForGuiComponentPtr;
+		}
+
 	}
 
 	++m_viewsCount;
@@ -347,6 +358,21 @@ bool CCollectionDocumentWorkspaceGuiComp::QueryDocumentSave(const SingleDocument
 void CCollectionDocumentWorkspaceGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
+
+	m_pToolBar = new QToolBar();
+
+	m_pBtnBack = new QPushButton("Back", m_pToolBar);
+	m_pBtnSave = new QPushButton("Save", m_pToolBar);
+	m_pBtnClose = new QPushButton("Close", m_pToolBar);
+	m_pToolBar->addWidget(m_pBtnBack);
+	m_pToolBar->addWidget(m_pBtnSave);
+	m_pToolBar->addWidget(m_pBtnClose);
+
+	connect(m_pBtnBack, &QPushButton::clicked, this, &CCollectionDocumentWorkspaceGuiComp::OnBtnBack);
+	connect(m_pBtnSave, &QPushButton::clicked, this, &CCollectionDocumentWorkspaceGuiComp::OnBtnSave);
+	connect(m_pBtnClose, &QPushButton::clicked, this, &CCollectionDocumentWorkspaceGuiComp::OnBtnClose);
+
+	verticalLayout->insertWidget(0, m_pToolBar);
 
 	int documentsCount = GetDocumentsCount();
 	for (int docIndex = 0; docIndex < documentsCount; ++docIndex){
@@ -438,6 +464,24 @@ void CCollectionDocumentWorkspaceGuiComp::OnCloseAllViews()
 	}
 }
 
+// private slots
+
+void CCollectionDocumentWorkspaceGuiComp::OnBtnBack()
+{
+	DocumentStack->setCurrentIndex(0);
+}
+
+
+void CCollectionDocumentWorkspaceGuiComp::OnBtnSave()
+{
+
+}
+
+
+void CCollectionDocumentWorkspaceGuiComp::OnBtnClose()
+{
+
+}
 
 // public methods of the embedded class DocumentSelectionInfo
 

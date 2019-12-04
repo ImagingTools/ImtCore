@@ -11,6 +11,9 @@
 #include <iqtgui/TRestorableGuiWrap.h>
 #include <iqtgui/CHierarchicalCommand.h>
 #include <iqtdoc/TQtDocumentManagerWrap.h>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QPushButton>
+
 
 // ImtCore includes
 #include <GeneratedFiles/imtgui/ui_CCollectionDocumentWorkspaceGuiComp.h>
@@ -129,6 +132,11 @@ protected:
 protected Q_SLOTS:
 	void OnCloseAllViews();
 
+private slots:
+	void OnBtnBack();
+	void OnBtnSave();
+	void OnBtnClose();
+
 private:
 	class DocumentSelectionInfo: virtual public iprm::ISelectionParam, virtual public iprm::IOptionsList
 	{
@@ -194,6 +202,11 @@ private:
 	I_ATTR(bool, m_allowViewRepeatingAttrPtr);
 	I_ATTR(QString, m_workspaceBackgroundColorAttrPtr);
 	I_ATTR(QByteArray, m_defaultCreatedDocumentTypeIdAttrPtr);
+
+	QToolBar *m_pToolBar;
+	QPushButton *m_pBtnBack;
+	QPushButton *m_pBtnSave;
+	QPushButton *m_pBtnClose;
 };
 
 
