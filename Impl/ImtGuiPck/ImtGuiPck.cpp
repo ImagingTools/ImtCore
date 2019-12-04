@@ -42,10 +42,14 @@ I_EXPORT_COMPONENT(
 			"Object Collection File Delegate View");
 
 I_EXPORT_COMPONENT(
-			DocumentBasedFileCollectionDelegate,
-			"View delegate for a file collection using document manager for the data operations",
-			"Object Collection File Delegate View Document MDI");
+	DocumentBasedFileCollectionDelegate,
+	"View delegate for a file collection using document manager for the data operations",
+	"Object Collection File Delegate View Document MDI");
 
+I_EXPORT_COMPONENT(
+	CollectionDocumentWorkspaceGui,
+	"Collection Document Workspace GUI Component",
+	"Collection Document Workspace GUI");
 
 } // namespace ImtGuiPck
 
