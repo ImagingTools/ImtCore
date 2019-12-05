@@ -40,11 +40,11 @@ public:
 		I_REGISTER_INTERFACE(idoc::IDocumentManager);
 		I_REGISTER_INTERFACE(idoc::IDocumentTypesInfo);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
-		I_REGISTER_SUBELEMENT(DocumentSelection);
-		I_REGISTER_SUBELEMENT_INTERFACE(DocumentSelection, iprm::ISelectionParam, ExtractSelectionInfo);
-		I_REGISTER_SUBELEMENT_INTERFACE(DocumentSelection, imod::IModel, ExtractSelectionInfo);
-		I_REGISTER_SUBELEMENT_INTERFACE(DocumentSelection, istd::IChangeable, ExtractSelectionInfo);
-		I_REGISTER_SUBELEMENT_INTERFACE(DocumentSelection, iprm::IOptionsList, ExtractSelectionInfo);
+		I_REGISTER_SUBELEMENT(DocumentList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DocumentList, iprm::ISelectionParam, ExtractDocumentList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DocumentList, imod::IModel, ExtractDocumentList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DocumentList, istd::IChangeable, ExtractDocumentList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DocumentList, iprm::IOptionsList, ExtractDocumentList);
 		I_ASSIGN(m_documentTemplateCompPtr, "DocumentTemplate", "Document template", true, "DocumentTemplate");
 		I_ASSIGN(m_showMaximizedAttrPtr, "ShowViewMaximized", "At start shows the document view maximized", false, true);
 		I_ASSIGN(m_showPathAsTipAttrPtr, "ShowFilePathAsToolTip", "if enabled, the current document file path will be shown as tool tip of document tab", true, false);
@@ -138,10 +138,10 @@ private slots:
 	void OnBtnClose();
 
 private:
-	class DocumentSelectionInfo: virtual public iprm::ISelectionParam, virtual public iprm::IOptionsList
+	class DocumentList: virtual public iprm::ISelectionParam, virtual public iprm::IOptionsList
 	{
 	public:
-		DocumentSelectionInfo();
+		DocumentList();
 
 		void SetParent(CCollectionDocumentWorkspaceGuiComp& parent);
 
@@ -167,13 +167,13 @@ private:
 		CCollectionDocumentWorkspaceGuiComp* m_parent;
 	};
 
-	friend class imod::TModelWrap<DocumentSelectionInfo>;
+	friend class imod::TModelWrap<DocumentList>;
 
 	// static template methods for subelement access
 	template <class InterfaceType>
-	static InterfaceType* ExtractSelectionInfo(CCollectionDocumentWorkspaceGuiComp& component)
+	static InterfaceType* ExtractDocumentList(CCollectionDocumentWorkspaceGuiComp& component)
 	{
-		return &component.m_documentSelectionInfo;
+		return &component.m_documentList;
 	}
 
 	iqtgui::CHierarchicalCommand m_commands;
@@ -188,7 +188,7 @@ private:
 
 	int m_viewsCount;
 
-	imod::TModelWrap<DocumentSelectionInfo> m_documentSelectionInfo;
+	imod::TModelWrap<DocumentList> m_documentList;
 
 	QString m_organizationName;
 	QString m_applicationName;

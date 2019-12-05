@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <icomp/TMakeComponentWrap.h>
+#include <icomp/TModelCompWrap.h>
 
 // ImtCore includes
 #include <imtgui/CThumbnailDecoratorGuiComp.h>
@@ -12,6 +13,7 @@
 #include <imtgui/CFileObjectCollectionViewDelegate.h>
 #include <imtgui/CDocumentBasedFileCollectionDelegateComp.h>
 #include <imtgui/CCollectionDocumentWorkspaceGuiComp.h>
+#include <imtgui/CDocumentWorkspaceGuiComp.h>
 
 
 /**
@@ -27,9 +29,10 @@ typedef imtgui::CMultiStatusProviderGuiComp MultiStatusProviderGui;
 typedef imtgui::CObjectCollectionViewComp ObjectCollectionView;
 typedef icomp::TMakeComponentWrap<imtgui::CFileObjectCollectionViewDelegate, imtgui::ICollectionViewDelegate> FileObjectCollectionViewDelegate;
 typedef imtgui::CDocumentBasedFileCollectionDelegateComp DocumentBasedFileCollectionDelegate;
-typedef imtgui::CCollectionDocumentWorkspaceGuiComp CollectionDocumentWorkspaceGui;
+typedef icomp::TModelCompWrap<imtgui::CCollectionDocumentWorkspaceGuiComp> CollectionDocumentWorkspaceGui;
+typedef icomp::TModelCompWrap<imtgui::CDocumentWorkspaceGuiComp> DocumentWorkspaceGui;
 
 
-} // namespace ImtProc3dPck
+} // namespace ImtGuiPck
 
 

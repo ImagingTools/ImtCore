@@ -1,0 +1,104 @@
+#pragma once
+
+
+// ImtCore includes
+#include <imtgui/CDocumentWorkspaceGuiCompBase.h>
+#include <GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h>
+
+
+namespace imtgui
+{
+
+
+/**
+	Default implementation of tab-based document workspace.
+	For the content visualization and editing the standard view decorator is used.
+*/
+class CDocumentWorkspaceGuiComp: public imtgui::CDocumentWorkspaceGuiCompBase
+{
+	Q_OBJECT
+
+public:
+	typedef imtgui::CDocumentWorkspaceGuiCompBase BaseClass;
+
+	I_BEGIN_COMPONENT(CDocumentWorkspaceGuiComp);
+	I_END_COMPONENT;
+
+protected:
+	// reimplemented (imtgui::CDocumentWorkspaceGuiCompBase)
+	virtual IDocumentViewDecorator* CreateDocumentViewDecorator(
+				istd::IPolymorphic* viewPtr,
+				QWidget* parentWidgetPtr,
+				const SingleDocumentData& documentData,
+				const ifile::IFilePersistence* persistencePtr);
+
+	// reimplemented (idoc::CMultiDocumentManagerBase)
+	virtual QString GetSaveFilePath(const QByteArray& documentTypeId, const istd::IChangeable* dataObjectPtr, const QString& currentFilePath) const;
+	virtual QStringList GetOpenFilePaths(const QByteArray* documentTypeIdPtr = NULL) const;
+
+protected Q_SLOTS:
+	void OnSaveDocument();
+
+private:
+	enum DataRole
+	{
+		DR_PATH = Qt::UserRole,
+		DR_TYPE_ID
+	};
+
+	class CollectionDocumentViewDecorator:
+				public QWidget,
+				public Ui::CStandardDocumentViewDecorator,
+				virtual public IDocumentViewDecorator ,
+				protected imod::CMultiModelDispatcherBase
+	{
+	public:
+		enum ModelId
+		{
+			MI_VIEW_COMMANDS,
+			MI_VIEW_CONSTRAINTS,
+			MI_UNDO_MANAGER,
+			MI_DOCUMENT_META_INFO
+		};
+
+		CollectionDocumentViewDecorator(
+					CDocumentWorkspaceGuiComp* parentPtr,
+					istd::IPolymorphic* viewPtr,
+					QWidget* parentWidgetPtr,
+					SingleDocumentData& documentData,
+					const ifile::IFilePersistence* persistencePtr);
+
+		void UpdateSaveButtonsStatus();
+		SingleDocumentData& GetDocumentData() const;
+
+		// reimplemeneted (IDocumentViewDecorator)
+		virtual QWidget* GetDecoratorWidget() override;
+		virtual QWidget* GetViewFrame() override;
+		virtual istd::IPolymorphic* GetView() const override;
+		virtual void SetViewEnabled(bool isEnabled) override;
+		virtual QString GetTitle() override;
+		virtual void SetTitle(const QString& title) override;
+		virtual void SetDocumentTypeName(const QString& name) override;
+
+	protected:
+		void OnViewContraintsChanged();
+
+		// reimplemented (imod::CMultiModelDispatcherBase)
+		virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet);
+
+	private:
+		SingleDocumentData& m_documentData;
+		istd::IPolymorphic* m_viewObjectPtr;
+		idoc::IUndoManager* m_undoManagerPtr;
+		const ifile::IFilePersistence* m_filePersistencePtr;
+		CDocumentWorkspaceGuiComp* m_parentPtr;
+		bool m_isInitialized;
+		QString m_documentName;
+		QString m_comment;
+	};
+};
+
+
+} // namespace imtgui
+
+

@@ -27,7 +27,7 @@ CCollectionDocumentWorkspaceGuiComp::CCollectionDocumentWorkspaceGuiComp()
 :	m_viewsCount(0),
 	m_forceQuietClose(false)
 {
-	m_documentSelectionInfo.SetParent(*this);
+	m_documentList.SetParent(*this);
 
 	m_commands.InsertChild(&m_windowCommand, false);
 	m_windowCommand.SetPriority(130);
@@ -54,10 +54,10 @@ void CCollectionDocumentWorkspaceGuiComp::OnTryClose(bool* ignoredPtr)
 	if (m_rememberOpenDocumentsParamPtr.IsValid() && m_rememberOpenDocumentsParamPtr->IsEnabled()){
 		if (!m_organizationName.isEmpty() && !m_applicationName.isEmpty()){
 			iqt::CSettingsWriteArchive archive(
-							m_organizationName,
-							m_applicationName,
-							"OpenDocumentList",
-							QSettings::UserScope);
+						m_organizationName,
+						m_applicationName,
+						"OpenDocumentList",
+						QSettings::UserScope);
 
 			SerializeOpenDocumentList(archive);
 		}
@@ -213,12 +213,12 @@ void CCollectionDocumentWorkspaceGuiComp::SetActiveView(istd::IPolymorphic* view
 
 		idoc::CMultiDocumentManagerBase::SingleDocumentData* activeDocumentInfoPtr = GetDocumentInfoFromView(*viewPtr);
 		if (activeDocumentInfoPtr == NULL){
-			m_documentSelectionInfo.SetSelectedOptionIndex(iprm::ISelectionParam::NO_SELECTION);
+			m_documentList.SetSelectedOptionIndex(iprm::ISelectionParam::NO_SELECTION);
 		}
 		else{
 			int documentIndex = GetDocumentIndex(*activeDocumentInfoPtr);
 
-			m_documentSelectionInfo.SetSelectedOptionIndex(documentIndex);
+			m_documentList.SetSelectedOptionIndex(documentIndex);
 		}
 	}
 
@@ -257,7 +257,7 @@ void CCollectionDocumentWorkspaceGuiComp::CloseAllDocuments()
 {
 	m_forceQuietClose = true;
 
-	m_documentSelectionInfo.SetSelectedOptionIndex(iprm::ISelectionParam::NO_SELECTION);
+	m_documentList.SetSelectedOptionIndex(iprm::ISelectionParam::NO_SELECTION);
 
 	// TODO: Close all opened widgets:
 // 	workspacePtr->closeAllSubWindows();
@@ -287,7 +287,8 @@ void CCollectionDocumentWorkspaceGuiComp::OnViewRegistered(istd::IPolymorphic* v
 		QWidget* frameForGuiComponentPtr = NULL; // TODO Create stack page
 		frameForGuiComponentPtr = new QWidget();
 		DocumentStack->setCurrentIndex(DocumentStack->addWidget(frameForGuiComponentPtr));
-		QVBoxLayout *frameForGuiLayout = new QVBoxLayout(frameForGuiComponentPtr);
+		QVBoxLayout* frameForGuiLayout = new QVBoxLayout(frameForGuiComponentPtr);
+		Q_UNUSED(frameForGuiLayout);
 
 		if (guiObjectPtr->CreateGui(frameForGuiComponentPtr)){
 			QWidget* widgetPtr = guiObjectPtr->GetWidget();
@@ -409,7 +410,6 @@ void CCollectionDocumentWorkspaceGuiComp::OnRetranslate()
 	Q_UNUSED(commandsNotifier);
 
 	m_windowCommand.SetName(tr("&Window"));
-	// Window commands
 	m_closeAllDocumentsCommand.SetVisuals(tr("&Close All Documents"), tr("Close All"), tr("Closes all opened documents"));
 }
 
@@ -444,12 +444,12 @@ void CCollectionDocumentWorkspaceGuiComp::OnEndChanges(const ChangeSet& changeSe
 
 	idoc::CMultiDocumentManagerBase::SingleDocumentData* activeDocumentInfoPtr = GetActiveDocumentInfo();
 	if (activeDocumentInfoPtr == NULL){
-		m_documentSelectionInfo.SetSelectedOptionIndex(iprm::ISelectionParam::NO_SELECTION);
+		m_documentList.SetSelectedOptionIndex(iprm::ISelectionParam::NO_SELECTION);
 	}
 	else{
 		int documentIndex = GetDocumentIndex(*activeDocumentInfoPtr);
 
-		m_documentSelectionInfo.SetSelectedOptionIndex(documentIndex);
+		m_documentList.SetSelectedOptionIndex(documentIndex);
 	}
 }
 
@@ -483,16 +483,16 @@ void CCollectionDocumentWorkspaceGuiComp::OnBtnClose()
 
 }
 
-// public methods of the embedded class DocumentSelectionInfo
+// public methods of the embedded class DocumentList
 
-CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::DocumentSelectionInfo()
+CCollectionDocumentWorkspaceGuiComp::DocumentList::DocumentList()
 	:m_selectedDocumentIndex(iprm::ISelectionParam::NO_SELECTION),
 	m_parent(NULL)
 {
 }
 
 
-void CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::SetParent(CCollectionDocumentWorkspaceGuiComp& parent)
+void CCollectionDocumentWorkspaceGuiComp::DocumentList::SetParent(CCollectionDocumentWorkspaceGuiComp& parent)
 {
 	m_parent = &parent;
 }
@@ -500,19 +500,19 @@ void CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::SetParent(CColl
 
 // reimplemented (iprm::ISelectionParam)
 
-const iprm::IOptionsList* CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::GetSelectionConstraints() const
+const iprm::IOptionsList* CCollectionDocumentWorkspaceGuiComp::DocumentList::GetSelectionConstraints() const
 {
 	return this;
 }
 
 
-int CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::GetSelectedOptionIndex() const
+int CCollectionDocumentWorkspaceGuiComp::DocumentList::GetSelectedOptionIndex() const
 {
 	return m_selectedDocumentIndex;
 }
 
 
-bool CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::SetSelectedOptionIndex(int index)
+bool CCollectionDocumentWorkspaceGuiComp::DocumentList::SetSelectedOptionIndex(int index)
 {
 	if (index >= GetOptionsCount()){
 		return false;
@@ -536,7 +536,7 @@ bool CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::SetSelectedOpti
 }
 
 
-iprm::ISelectionParam* CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::GetSubselection(int /*index*/) const
+iprm::ISelectionParam* CCollectionDocumentWorkspaceGuiComp::DocumentList::GetSubselection(int /*index*/) const
 {
 	return NULL;
 }
@@ -544,13 +544,13 @@ iprm::ISelectionParam* CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInf
 
 // reimplemented (iprm::IOptionsList)
 
-int CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::GetOptionsFlags() const
+int CCollectionDocumentWorkspaceGuiComp::DocumentList::GetOptionsFlags() const
 {
 	return SCF_SUPPORT_UNIQUE_ID;
 }
 
 
-int CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::GetOptionsCount() const
+int CCollectionDocumentWorkspaceGuiComp::DocumentList::GetOptionsCount() const
 {
 	Q_ASSERT(m_parent != NULL);
 
@@ -558,7 +558,7 @@ int CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::GetOptionsCount(
 }
 
 
-QString CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::GetOptionName(int index) const
+QString CCollectionDocumentWorkspaceGuiComp::DocumentList::GetOptionName(int index) const
 {
 	SingleDocumentData& documentData = m_parent->GetSingleDocumentData(index);
 
@@ -572,19 +572,19 @@ QString CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::GetOptionNam
 }
 
 
-QString CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::GetOptionDescription(int /*index*/) const
+QString CCollectionDocumentWorkspaceGuiComp::DocumentList::GetOptionDescription(int /*index*/) const
 {
 	return QString();
 }
 
 
-QByteArray CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::GetOptionId(int index) const
+QByteArray CCollectionDocumentWorkspaceGuiComp::DocumentList::GetOptionId(int index) const
 {
 	return GetOptionName(index).toLatin1();
 }
 
 
-bool CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::IsOptionEnabled(int /*index*/) const
+bool CCollectionDocumentWorkspaceGuiComp::DocumentList::IsOptionEnabled(int /*index*/) const
 {
 	return true;
 }
@@ -592,7 +592,7 @@ bool CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::IsOptionEnabled
 
 // reimplemented (iser::ISerializable)
 
-bool CCollectionDocumentWorkspaceGuiComp::DocumentSelectionInfo::Serialize(iser::IArchive& /*archive*/)
+bool CCollectionDocumentWorkspaceGuiComp::DocumentList::Serialize(iser::IArchive& /*archive*/)
 {
 	I_CRITICAL(); // NOT IMPLEMENTED
 

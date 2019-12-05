@@ -179,9 +179,9 @@ void CObjectCollectionViewDelegate::SetupInsertCommand()
 
 void CObjectCollectionViewDelegate::OnLanguageChanged()
 {
-	m_insertCommand.SetVisuals(tr("Insert"), tr("New"), tr("Insert new resource into the collection"), QIcon(":/Icons/Add"));
+	m_insertCommand.SetVisuals(tr("Insert"), tr("New"), tr("Insert new document into the collection"), QIcon(":/Icons/Add"));
 	m_duplicateCommand.SetVisuals(tr("Dupplicate"), tr("Dupplicate"), tr("Duplicate selected objects"), QIcon(":/Icons/Duplicate"));
-	m_removeCommand.SetVisuals(tr("Remove"), tr("Remove"), tr("Remove selected resource from the collection"), QIcon(":/Icons/Delete"));
+	m_removeCommand.SetVisuals(tr("Remove"), tr("Remove"), tr("Remove selected document from the collection"), QIcon(":/Icons/Delete"));
 }
 
 
@@ -193,7 +193,7 @@ void CObjectCollectionViewDelegate::OnInsert()
 
 	QByteArray objectId = CreateNewObject(m_selectedTypeId);
 	if (objectId.isEmpty()){
-		QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("New resource could not be created"));
+		QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("New document could not be created"));
 	}
 }
 
@@ -224,7 +224,7 @@ void CObjectCollectionViewDelegate::OnAddMenuOptionClicked(QAction* action)
 {
 	QByteArray objectId = CreateNewObject(action->data().toByteArray());
 	if (objectId.isEmpty()){
-		QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("New resource could not be created"));
+		QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("New document could not be created"));
 	}
 }
 

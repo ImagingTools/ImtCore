@@ -111,7 +111,7 @@ void CFileObjectCollectionViewDelegate::OnImport()
 
 			QByteArray importedId = ImportObject(typeId, filePath);
 			if (importedId.isEmpty()){
-				QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Resource could not be imported"));
+				QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be imported"));
 			}
 		}
 	}
@@ -146,7 +146,7 @@ void CFileObjectCollectionViewDelegate::OnExport()
 
 	if (!filePath.isEmpty()){
 		if (!ExportObject(m_selectedItemIds[0], filePath)){
-			QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Resource could not be exported"));
+			QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be exported"));
 		}
 	}
 }
