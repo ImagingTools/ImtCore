@@ -29,17 +29,22 @@ CDocumentBasedFileCollectionDelegateComp::CDocumentBasedFileCollectionDelegateCo
 
 // reimplemented (ICollectionViewDelegate)
 
+QByteArray CDocumentBasedFileCollectionDelegateComp::GetSupportedTypeId() const
+{
+	return *m_objectTypeIdAttrPtr;
+}
+
+
 QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(const QByteArray& typeId, const istd::IChangeable* /*defaultDataPtr*/) const
 {
 	if (m_documentManagerCompPtr.IsValid()){
 		ObjectInfo* objectInfoPtr = new ObjectInfo;
 		objectInfoPtr->typeId = GetSupportedTypeId();
-		objectInfoPtr->uuid = QUuid::createUuid().toByteArray();
 
 		if (m_documentManagerCompPtr->InsertNewDocument(typeId, true, "", &objectInfoPtr->objectPtr)){
 			m_workingObjects.PushBack(objectInfoPtr);
 
-			return objectInfoPtr->uuid;
+			return "Default";
 		}
 		else{
 			QMessageBox::critical(NULL, tr("Collection Manager"), tr("The file could not be created"));

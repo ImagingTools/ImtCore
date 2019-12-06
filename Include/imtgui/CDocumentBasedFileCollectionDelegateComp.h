@@ -48,6 +48,7 @@ public:
 	CDocumentBasedFileCollectionDelegateComp();
 
 	// reimplemented (ICollectionViewDelegate)
+	virtual QByteArray GetSupportedTypeId() const override;
 	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
 	virtual void UpdateItemSelection(int viewStateFlags, const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 
