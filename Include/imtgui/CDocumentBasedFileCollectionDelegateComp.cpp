@@ -37,9 +37,13 @@ QByteArray CDocumentBasedFileCollectionDelegateComp::GetSupportedTypeId() const
 
 QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(const QByteArray& typeId, const istd::IChangeable* /*defaultDataPtr*/) const
 {
+	if (typeId != GetSupportedTypeId()){
+		return QByteArray();
+	}
+
 	if (m_documentManagerCompPtr.IsValid()){
 		ObjectInfo* objectInfoPtr = new ObjectInfo;
-		objectInfoPtr->typeId = GetSupportedTypeId();
+		objectInfoPtr->typeId = typeId;
 
 		if (m_documentManagerCompPtr->InsertNewDocument(typeId, true, "", &objectInfoPtr->objectPtr)){
 			m_workingObjects.PushBack(objectInfoPtr);
