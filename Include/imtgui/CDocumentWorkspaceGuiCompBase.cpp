@@ -32,9 +32,34 @@ namespace imtgui
 CDocumentWorkspaceGuiCompBase::CDocumentWorkspaceGuiCompBase()
 :	m_forceQuietClose(false),
 	m_isUpdateBlocked(false),
-	m_previousPageIndex(-1)
+	m_previousTabIndex(-1)
 {
 	m_documentList.SetParent(*this);
+}
+
+
+// reimplemented (ibase::ICommandsProvider)
+
+const ibase::IHierarchicalCommand* CDocumentWorkspaceGuiCompBase::GetCommands() const
+{
+	if (IsGuiCreated()){
+		int tabIndex = Tabs->currentIndex();
+		if (tabIndex >= m_fixedTabs.count()){
+			istd::IPolymorphic* viewPtr = GetActiveView();
+			ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(viewPtr);
+			if (viewCommandsProviderPtr != nullptr){
+				return viewCommandsProviderPtr->GetCommands();
+			}
+		}
+		else{
+			ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(m_fixedTabs[tabIndex]);
+			if (viewCommandsProviderPtr != nullptr){
+				return viewCommandsProviderPtr->GetCommands();
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 
@@ -63,7 +88,7 @@ void CDocumentWorkspaceGuiCompBase::OnTryClose(bool* ignoredPtr)
 
 int CDocumentWorkspaceGuiCompBase::GetFixedWindowsCount() const
 {
-	return m_additionalGuis.size();
+	return m_fixedTabs.size();
 }
 
 
@@ -158,7 +183,49 @@ void CDocumentWorkspaceGuiCompBase::InitializeDocumentView(IDocumentViewDecorato
 }
 
 
+void CDocumentWorkspaceGuiCompBase::UpdateCommands()
+{
+	static ChangeSet changes(CF_COMMANDS);
+	istd::CChangeNotifier changeNotifier(this, &changes);
+
+
+}
+
+
 // protected methods
+
+bool CDocumentWorkspaceGuiCompBase::AddTab(const QString& name, iqtgui::IGuiObject* guiPtr, const QIcon& icon)
+{
+	Q_ASSERT(guiPtr != NULL);
+
+	QWidget* tabFrame = new QWidget;
+	QVBoxLayout* tabFrameLayout = new QVBoxLayout(tabFrame);
+	tabFrameLayout->setMargin(0);
+
+	m_fixedTabs.push_back(guiPtr);
+
+	if (guiPtr->CreateGui(tabFrame)){
+		Tabs->addTab(tabFrame, icon, name);
+
+		// Remove close button form the permanent tabs:
+		int tabCount = Tabs->count();
+		QWidget* widgetPtr = Tabs->tabBar()->tabButton(tabCount - 1, QTabBar::RightSide);
+		if (widgetPtr != NULL){
+			widgetPtr->setVisible(false);
+		}
+
+		return true;
+	}
+	else{
+		m_fixedTabs.pop_back();
+
+		tabFrame->deleteLater();
+		tabFrame = NULL;
+
+		return false;
+	}
+}
+
 
 void CDocumentWorkspaceGuiCompBase::OnDragEnterEvent(QDragEnterEvent* dragEnterEventPtr)
 {
@@ -186,39 +253,6 @@ void CDocumentWorkspaceGuiCompBase::OnDropEvent(QDropEvent* dropEventPtr)
 
 	dropEventPtr->setAccepted(false);
 	return;
-}
-
-
-bool CDocumentWorkspaceGuiCompBase::AddAdditionalGui(const QString& name, iqtgui::IGuiObject* guiPtr, const QIcon& icon)
-{
-	Q_ASSERT(guiPtr != NULL);
-
-	QWidget* tabFrame = new QWidget;
-	QVBoxLayout* tabFrameLayout = new QVBoxLayout(tabFrame);
-	tabFrameLayout->setMargin(0);
-
-	m_additionalGuis.push_back(guiPtr);
-
-	if (guiPtr->CreateGui(tabFrame)){
-		Tabs->addTab(tabFrame, icon, name);
-
-		// Remove close button form the permanent tabs:
-		int tabCount = Tabs->count();
-		QWidget* widgetPtr = Tabs->tabBar()->tabButton(tabCount - 1, QTabBar::RightSide);
-		if (widgetPtr != NULL){
-			widgetPtr->setVisible(false);
-		}
-
-		return true;
-	}
-	else{
-		m_additionalGuis.pop_back();
-
-		tabFrame->deleteLater();
-		tabFrame = NULL;
-
-		return false;
-	}
 }
 
 
@@ -287,8 +321,8 @@ void CDocumentWorkspaceGuiCompBase::SetActiveView(istd::IPolymorphic* viewPtr)
 
 		int pageIndex = -1;
 		int viewIndex = 0;
-		for (; viewIndex < m_additionalGuis.size(); viewIndex++){
-			if (viewPtr == m_additionalGuis[viewIndex]){
+		for (; viewIndex < m_fixedTabs.size(); viewIndex++){
+			if (viewPtr == m_fixedTabs[viewIndex]){
 				pageIndex = viewIndex;
 
 				m_currentDocumentName.SetName("");
@@ -314,7 +348,7 @@ void CDocumentWorkspaceGuiCompBase::SetActiveView(istd::IPolymorphic* viewPtr)
 		}
 
 		if (pageIndex >= 0){
-			m_previousPageIndex = Tabs->currentIndex();
+			m_previousTabIndex = Tabs->currentIndex();
 			Tabs->setCurrentIndex(pageIndex);
 		}
 
@@ -430,7 +464,7 @@ void CDocumentWorkspaceGuiCompBase::OnViewRemoved(istd::IPolymorphic* viewPtr)
 		Q_ASSERT(documentViewPtr != NULL);
 
 		if (documentViewPtr->GetView() == viewPtr){
-			int lastPageIndex = qMin(m_previousPageIndex, Tabs->count() - 2);
+			int lastPageIndex = qMin(m_previousTabIndex, Tabs->count() - 2);
 
 			Tabs->removeTab(pageIndex);
 			iqtgui::IGuiObject* guiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(viewPtr);
@@ -513,7 +547,7 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 				}
 			}
 
-			AddAdditionalGui(tabName, guiPtr, tabIcon);
+			AddTab(tabName, guiPtr, tabIcon);
 		}
 	}
 
@@ -543,7 +577,7 @@ void CDocumentWorkspaceGuiCompBase::OnGuiDestroyed()
 	CloseAllDocuments();
 
 	// Add additional fixed UI components to the tab bar:
-	for (AdditionalGuiList::ConstIterator iter = m_additionalGuis.constBegin(); iter != m_additionalGuis.constEnd(); ++iter){
+	for (TabList::ConstIterator iter = m_fixedTabs.constBegin(); iter != m_fixedTabs.constEnd(); ++iter){
 		iqtgui::IGuiObject* guiPtr = *iter;
 		Q_ASSERT(guiPtr != NULL);
 		if (guiPtr->IsGuiCreated()){
@@ -551,7 +585,7 @@ void CDocumentWorkspaceGuiCompBase::OnGuiDestroyed()
 		}
 	}
 
-	m_additionalGuis.clear();
+	m_fixedTabs.clear();
 
 	BaseClass::OnGuiDestroyed();
 }
@@ -672,8 +706,8 @@ void CDocumentWorkspaceGuiCompBase::OnRedoDocument()
 
 void CDocumentWorkspaceGuiCompBase::OnWindowActivated(int index)
 {
-	if (index < m_additionalGuis.size()){
-		SetActiveView(m_additionalGuis[index]);
+	if (index < m_fixedTabs.size()){
+		SetActiveView(m_fixedTabs[index]);
 
 		Tabs->setCurrentIndex(index);
 	}
@@ -683,6 +717,8 @@ void CDocumentWorkspaceGuiCompBase::OnWindowActivated(int index)
 
 		SetActiveView(documentViewPtr->GetView());
 	}
+
+	UpdateCommands();
 }
 
 

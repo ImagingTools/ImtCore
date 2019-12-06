@@ -31,7 +31,8 @@ class CDocumentWorkspaceGuiCompBase:
 			public iqtdoc::TQtDocumentManagerWrap<
 						idoc::CMultiDocumentManagerBase,
 						iqtgui::TRestorableGuiWrap< iqtgui::TDesignerGuiCompBase<Ui::CDocumentWorkspaceGuiCompBase> > >,
-			protected imod::CMultiModelDispatcherBase
+			protected imod::CMultiModelDispatcherBase,
+			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 
@@ -42,6 +43,7 @@ public:
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_BASE_COMPONENT(CDocumentWorkspaceGuiCompBase);
+		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
 		I_REGISTER_INTERFACE(idoc::IDocumentManager);
 		I_REGISTER_INTERFACE(idoc::IDocumentTypesInfo);
 		I_REGISTER_SUBELEMENT(DocumentList);
@@ -66,20 +68,23 @@ public:
 
 	CDocumentWorkspaceGuiCompBase();
 
+	// reimplemented (ibase::ICommandsProvider)
+	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
+
 	// reimplemented (iqtgui::IGuiObject)
-	virtual void OnTryClose(bool* ignoredPtr = NULL);
+	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
 
 protected:
 	int GetFixedWindowsCount() const;
 	void UpdateAllTitles();
 	int GetDocumentIndexFromWidget(const QWidget& widget) const;
 	virtual void InitializeDocumentView(IDocumentViewDecorator* pageViewPtr, const SingleDocumentData& documentData);
+	virtual void UpdateCommands();
 
 protected:
+	virtual bool AddTab(const QString& name, iqtgui::IGuiObject* guiPtr, const QIcon& icon = QIcon());
 	virtual void OnDragEnterEvent(QDragEnterEvent* dragEnterEventPtr);
 	virtual void OnDropEvent(QDropEvent* dropEventPtr);
-
-	bool AddAdditionalGui(const QString& name, iqtgui::IGuiObject* guiPtr, const QIcon& icon = QIcon());
 
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet);
@@ -195,9 +200,9 @@ private:
 	bool m_forceQuietClose;
 	bool m_isUpdateBlocked;
 
-	typedef QList<iqtgui::IGuiObject*> AdditionalGuiList;
-	AdditionalGuiList m_additionalGuis;
-	int m_previousPageIndex;
+	typedef QList<iqtgui::IGuiObject*> TabList;
+	TabList m_fixedTabs;
+	int m_previousTabIndex;
 
 	I_REF(idoc::IDocumentTemplate, m_documentTemplateCompPtr);
 	I_MULTIREF(iqtgui::IGuiObject, m_fixedTabsCompPtr);
