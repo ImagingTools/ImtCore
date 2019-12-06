@@ -256,8 +256,8 @@ int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::SaveToFile
 						}
 					}
 					// An existing object in the collection should be updated:
-					else {
-						return m_parent.UpdateObject(objectInfoPtr->uuid, data);
+					else{
+						return m_parent.UpdateObject(objectInfoPtr->uuid, data) ? OS_OK : OS_FAILED;
 					}
 				}
 			}
