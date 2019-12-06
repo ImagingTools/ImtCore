@@ -488,6 +488,28 @@ bool CFileCollectionComp::GetObjectData(const QByteArray& objectId, DataPtr& dat
 
 bool CFileCollectionComp::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object)
 {
+	const ifile::IFilePersistence* persistencePtr = GetPersistenceForResource(GetObjectTypeId(objectId));
+	if (persistencePtr == nullptr){
+		return false;
+	}
+
+	QStringList extensions;
+	if (!persistencePtr->GetFileExtensions(extensions, &object, ifile::IFilePersistence::QF_SAVE)){
+		return false;
+	}
+
+	QString extension = extensions.isEmpty() ? QString() : extensions[0];
+
+	QString tempFilePath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString() + "." + extension;
+
+	if (persistencePtr->SaveToFile(object, tempFilePath) == ifile::IFilePersistence::OS_OK){
+		bool retVal = UpdateFile(tempFilePath, objectId);
+
+		QFile::remove(tempFilePath);
+
+		return retVal;
+	}
+
 	return false;
 }
 

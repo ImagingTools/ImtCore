@@ -111,12 +111,22 @@ void CObjectCollectionViewDelegate::RemoveObjects(const imtbase::ICollectionInfo
 
 bool CObjectCollectionViewDelegate::UpdateObject(const QByteArray& objectId, const istd::IChangeable& contents) const
 {
+	if (m_collectionPtr != nullptr){
+		return m_collectionPtr->SetObjectData(objectId, contents);
+	}
+
 	return false;
 }
 
 
 bool CObjectCollectionViewDelegate::RenameObject(const QByteArray& objectId, const QString& newName) const
 {
+	if (m_collectionPtr != nullptr){
+		m_collectionPtr->SetObjectName(objectId, newName);
+
+		return true;
+	}
+
 	return false;
 }
 
