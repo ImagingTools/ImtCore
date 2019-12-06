@@ -12,7 +12,6 @@
 #include <imtgui/CObjectCollectionViewComp.h>
 #include <imtgui/CFileObjectCollectionViewDelegate.h>
 #include <imtgui/CDocumentBasedFileCollectionDelegateComp.h>
-#include <imtgui/CCollectionDocumentWorkspaceGuiComp.h>
 #include <imtgui/CDocumentWorkspaceGuiComp.h>
 
 
@@ -29,7 +28,6 @@ typedef imtgui::CMultiStatusProviderGuiComp MultiStatusProviderGui;
 typedef imtgui::CObjectCollectionViewComp ObjectCollectionView;
 typedef icomp::TMakeComponentWrap<imtgui::CFileObjectCollectionViewDelegate, imtgui::ICollectionViewDelegate> FileObjectCollectionViewDelegate;
 typedef imtgui::CDocumentBasedFileCollectionDelegateComp DocumentBasedFileCollectionDelegate;
-typedef icomp::TModelCompWrap<imtgui::CCollectionDocumentWorkspaceGuiComp> CollectionDocumentWorkspaceGui;
 typedef icomp::TModelCompWrap<imtgui::CDocumentWorkspaceGuiComp> DocumentWorkspaceGui;
 
 

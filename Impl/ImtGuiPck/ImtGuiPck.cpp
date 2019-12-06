@@ -11,6 +11,7 @@ I_REGISTER_QT_RESOURCE(imtgui);
 namespace ImtGuiPck
 {
 
+
 I_EXPORT_PACKAGE(
 			"ImtGuiPck",
 			"ImagingTools core framework UI-component package",
@@ -45,11 +46,6 @@ I_EXPORT_COMPONENT(
 			DocumentBasedFileCollectionDelegate,
 			"View delegate for a file collection using document manager for the data operations",
 			"Object Collection File Delegate View Document MDI");
-
-I_EXPORT_COMPONENT(
-			CollectionDocumentWorkspaceGui,
-			"Document workspace used for documents in a collection/repository",
-			"Collection Document Workspace GUI");
 
 I_EXPORT_COMPONENT(
 			DocumentWorkspaceGui,
