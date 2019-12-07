@@ -210,7 +210,7 @@ void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::OnViewContraint
 		}
 
 		SaveButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT));
-		CloseButton->setDefault(!!(viewFlags & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT));
+//		CloseButton->setDefault(!!(viewFlags & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT));
 
 		UndoButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
 		RedoButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));

@@ -10,6 +10,12 @@
     <height>1028</height>
    </rect>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#HeaderFrame
+{
+	background:#ADBBC8;
+}</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
     <number>0</number>
@@ -33,12 +39,6 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
@@ -80,6 +80,9 @@
           <height>16</height>
          </size>
         </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -105,6 +108,9 @@
           <width>16</width>
           <height>16</height>
          </size>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -162,7 +168,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="SaveButton">
+       <widget class="QToolButton" name="SaveButton">
         <property name="text">
          <string>Save</string>
         </property>
@@ -170,13 +176,13 @@
          <iconset resource="imtgui.qrc">
           <normaloff>:/Icons/Save</normaloff>:/Icons/Save</iconset>
         </property>
-        <property name="flat">
-         <bool>false</bool>
+        <property name="autoRaise">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="CloseButton">
+       <widget class="QToolButton" name="CloseButton">
         <property name="text">
          <string>Close</string>
         </property>
@@ -184,8 +190,8 @@
          <iconset resource="imtgui.qrc">
           <normaloff>:/Icons/Remove</normaloff>:/Icons/Remove</iconset>
         </property>
-        <property name="flat">
-         <bool>false</bool>
+        <property name="autoRaise">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
