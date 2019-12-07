@@ -213,12 +213,14 @@ void CObjectCollectionViewDelegate::OnDuplicate()
 	Q_ASSERT(m_collectionPtr != nullptr);
 
 	for (const QByteArray& selectedItemId : m_selectedItemIds){
-		const istd::IChangeable* sourceDataPtr = m_collectionPtr->GetObjectPtr(selectedItemId);
-		QString sourceName = m_collectionPtr->GetElementInfo(selectedItemId, imtbase::ICollectionInfo::EIT_NAME).toString();
+		imtbase::IObjectCollection::DataPtr sourceDataPtr;
+		if (m_collectionPtr->GetObjectData(selectedItemId, sourceDataPtr)){
+			QString sourceName = m_collectionPtr->GetElementInfo(selectedItemId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
-		QByteArray objectId = this->CObjectCollectionViewDelegate::CreateNewObject(m_collectionPtr->GetObjectTypeId(selectedItemId), sourceDataPtr);
-		if (!objectId.isEmpty()){
-			m_collectionPtr->SetObjectName(objectId, QString("Copy of %1").arg(sourceName));
+			QByteArray objectId = this->CObjectCollectionViewDelegate::CreateNewObject(m_collectionPtr->GetObjectTypeId(selectedItemId), sourceDataPtr.GetPtr());
+			if (!objectId.isEmpty()){
+				m_collectionPtr->SetObjectName(objectId, QString("Copy of %1").arg(sourceName));
+			}
 		}
 	}
 }
