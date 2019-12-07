@@ -45,10 +45,17 @@ const ibase::IHierarchicalCommand* CDocumentWorkspaceGuiCompBase::GetCommands() 
 	if (IsGuiCreated()){
 		int tabIndex = Tabs->currentIndex();
 		if (tabIndex >= m_fixedTabs.count()){
-			istd::IPolymorphic* viewPtr = GetActiveView();
-			ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(viewPtr);
-			if (viewCommandsProviderPtr != nullptr){
-				return viewCommandsProviderPtr->GetCommands();
+			QWidget* decoratorPagePtr = Tabs->currentWidget();
+			ibase::ICommandsProvider* decoratorPtr = dynamic_cast<ibase::ICommandsProvider*>(decoratorPagePtr);
+			if (decoratorPtr != nullptr){
+				return decoratorPtr->GetCommands();
+			}
+			else{
+				istd::IPolymorphic* viewPtr = GetActiveView();
+				ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(viewPtr);
+				if (viewCommandsProviderPtr != nullptr){
+					return viewCommandsProviderPtr->GetCommands();
+				}
 			}
 		}
 		else{

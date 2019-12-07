@@ -116,7 +116,11 @@ CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::CollectionDocumentVi
 	m_filePersistencePtr(persistencePtr),
 	m_undoManagerPtr(documentData.undoManagerPtr.GetPtr()),
 	m_parentPtr(parentPtr),
-	m_isInitialized(false)
+	m_isInitialized(false),
+	m_saveCommand("Save", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
+	m_undoCommand("Undo", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
+	m_redoCommand("Redo", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
+	m_closeCommand("Close", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20001)
 {
 	Q_ASSERT(parentPtr != NULL);
 
@@ -126,9 +130,13 @@ CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::CollectionDocumentVi
 
 	UndoButton->setEnabled(false);
 	RedoButton->setEnabled(false);
+	m_undoCommand.setEnabled(false);
+	m_redoCommand.setEnabled(false);
 
 	UndoButton->setVisible(m_undoManagerPtr != nullptr);
 	RedoButton->setVisible(m_undoManagerPtr != nullptr);
+	m_undoCommand.setVisible(m_undoManagerPtr != nullptr);
+	m_redoCommand.setVisible(m_undoManagerPtr != nullptr);
 
 	const imtgui::IDocumentViewConstraints* viewConstraintsPtr = CompCastPtr<imtgui::IDocumentViewConstraints>(viewPtr);
 	if (viewConstraintsPtr != NULL){
@@ -149,6 +157,16 @@ CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::CollectionDocumentVi
 	connect(RedoButton, SIGNAL(clicked()), parentPtr, SLOT(OnRedoDocument()));
 	connect(CloseButton, SIGNAL(clicked()), parentPtr, SLOT(OnCloseDocument()));
 	connect(SaveButton, SIGNAL(clicked()), parentPtr, SLOT(OnSaveDocument()));
+
+	connect(&m_undoCommand, SIGNAL(triggered()), parentPtr, SLOT(OnUndoDocument()));
+	connect(&m_redoCommand, SIGNAL(triggered()), parentPtr, SLOT(OnRedoDocument()));
+	connect(&m_closeCommand, SIGNAL(triggered()), parentPtr, SLOT(OnCloseDocument()));
+	connect(&m_saveCommand, SIGNAL(triggered()), parentPtr, SLOT(OnSaveDocument()));
+
+	m_undoCommand.SetVisuals(tr("&Undo"), tr("Undo"), tr("Undo last document changes"), QIcon(":/Icons/Undo"));
+	m_redoCommand.SetVisuals(tr("&Redo"), tr("Redo"), tr("Redo last document changes"), QIcon(":/Icons/Redo"));
+	m_closeCommand.SetVisuals(tr("&Close"), tr("Close"), tr("Close the document"), QIcon(":/Icons/Remove"));
+	m_saveCommand.SetVisuals(tr("&Save"), tr("Save"), tr("Save the document changes"), QIcon(":/Icons/Save"));
 
 	UpdateSaveButtonsStatus();
 
@@ -171,6 +189,8 @@ CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::CollectionDocumentVi
 			RegisterModel(commandsModelPtr, MI_VIEW_COMMANDS);
 		}
 	}
+
+	HeaderFrame->setVisible(false);
 }
 
 
@@ -188,6 +208,7 @@ void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::UpdateSaveButto
 		isSaveActive = false;
 	}
 
+	m_saveCommand.setEnabled(isSaveActive);
 	SaveButton->setEnabled(isSaveActive);
 }
 
@@ -210,10 +231,10 @@ void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::OnViewContraint
 		}
 
 		SaveButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT));
-//		CloseButton->setDefault(!!(viewFlags & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT));
-
 		UndoButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
 		RedoButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
+		m_undoCommand.setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
+		m_redoCommand.setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
 
 		CloseButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_CLOSE_SUPPORT));
 	}
@@ -262,6 +283,14 @@ void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::SetDocumentType
 }
 
 
+// reimplemented (ibase::ICommandsProvider)
+
+const ibase::IHierarchicalCommand * CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::GetCommands() const
+{
+	return &m_commands;
+}
+
+
 // protected methods of the embedded class CollectionDocumentViewDecorator
 
 // reimplemented (imod::CMultiModelDispatcherBase)
@@ -279,23 +308,31 @@ void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::OnModelChanged(
 			if (m_undoManagerPtr != NULL){
 				UndoButton->setEnabled(m_undoManagerPtr->GetAvailableUndoSteps() > 0);
 				RedoButton->setEnabled(m_undoManagerPtr->GetAvailableRedoSteps() > 0);
+				m_undoCommand.setEnabled(m_undoManagerPtr->GetAvailableUndoSteps() > 0);
+				m_redoCommand.setEnabled(m_undoManagerPtr->GetAvailableRedoSteps() > 0);
 			}
 			break;
 
 		case MI_VIEW_COMMANDS:{
 			ibase::ICommandsProvider* commandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(m_viewObjectPtr);
+			m_commands.ResetChilds();
+
 			if (commandsProviderPtr != NULL){
 				iwidgets::ClearLayout(CommandToolBarFrame->layout());
 				const iqtgui::CHierarchicalCommand* guiCommandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(commandsProviderPtr->GetCommands());
 				if (guiCommandPtr != NULL){
 					QToolBar* toolBarPtr = new QToolBar(CommandToolBarFrame);
-					toolBarPtr->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+					toolBarPtr->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 					CommandToolBarFrame->layout()->addWidget(toolBarPtr);
-					toolBarPtr->clear();
-					toolBarPtr->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 					iqtgui::CCommandTools::SetupToolbar(*guiCommandPtr, *toolBarPtr);
-					toolBarPtr->setIconSize(QSize(32, 32));
+					toolBarPtr->setIconSize(QSize(16, 16));
 				}
+
+				m_commands.JoinLinkFrom(commandsProviderPtr->GetCommands());
+				m_commands.InsertChild(&m_undoCommand);
+				m_commands.InsertChild(&m_redoCommand);
+				m_commands.InsertChild(&m_saveCommand);
+				m_commands.InsertChild(&m_closeCommand);
 			}
 		}
 		break;

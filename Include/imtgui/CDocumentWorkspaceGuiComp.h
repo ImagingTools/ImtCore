@@ -49,7 +49,8 @@ private:
 	class CollectionDocumentViewDecorator:
 				public QWidget,
 				public Ui::CStandardDocumentViewDecorator,
-				virtual public IDocumentViewDecorator ,
+				virtual public IDocumentViewDecorator,
+				virtual public ibase::ICommandsProvider,
 				protected imod::CMultiModelDispatcherBase
 	{
 	public:
@@ -80,6 +81,9 @@ private:
 		virtual void SetTitle(const QString& title) override;
 		virtual void SetDocumentTypeName(const QString& name) override;
 
+		// reimplemented (ibase::ICommandsProvider)
+		virtual const ibase::IHierarchicalCommand* GetCommands() const override;
+
 	protected:
 		void OnViewContraintsChanged();
 
@@ -95,6 +99,12 @@ private:
 		bool m_isInitialized;
 		QString m_documentName;
 		QString m_comment;
+
+		iqtgui::CHierarchicalCommand m_commands;
+		iqtgui::CHierarchicalCommand m_saveCommand;
+		iqtgui::CHierarchicalCommand m_undoCommand;
+		iqtgui::CHierarchicalCommand m_redoCommand;
+		iqtgui::CHierarchicalCommand m_closeCommand;
 	};
 };
 
