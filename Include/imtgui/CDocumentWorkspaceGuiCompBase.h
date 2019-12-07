@@ -62,8 +62,8 @@ public:
 
 	enum ModelIds
 	{
-		MI_ACTIVE_VIEW,
-		MI_ACTIVE_DOCUMENT
+		MI_VISUAL_STATUS_BASE_INDEX = 1000,
+		MI_DOCUMENT_COMMANDS_BASE_INDEX = 10000
 	};
 
 	CDocumentWorkspaceGuiCompBase();

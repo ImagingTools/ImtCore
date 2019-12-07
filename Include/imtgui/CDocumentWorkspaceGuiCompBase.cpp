@@ -78,7 +78,7 @@ void CDocumentWorkspaceGuiCompBase::OnTryClose(bool* ignoredPtr)
 		CloseAllDocuments();
 	}
 
-	if (ignoredPtr != NULL){
+	if (ignoredPtr != nullptr){
 		*ignoredPtr = (GetDocumentsCount() > 0);
 	}
 }
@@ -99,14 +99,14 @@ void CDocumentWorkspaceGuiCompBase::UpdateAllTitles()
 
 	for (int pageIndex = GetFixedWindowsCount(); pageIndex < Tabs->count(); ++pageIndex){
 		IDocumentViewDecorator* documentViewPtr = dynamic_cast<IDocumentViewDecorator*>(Tabs->widget(pageIndex));
-		Q_ASSERT(documentViewPtr != NULL);
+		Q_ASSERT(documentViewPtr != nullptr);
 
 		istd::IPolymorphic* viewPtr = documentViewPtr->GetView();
-		Q_ASSERT(viewPtr != NULL);
+		Q_ASSERT(viewPtr != nullptr);
 
 		CMultiDocumentManagerBase::SingleDocumentData* infoPtr = GetDocumentInfoFromView(*viewPtr);
 
-		if (infoPtr != NULL){
+		if (infoPtr != nullptr){
 			QString fileText = infoPtr->filePath.isEmpty()?
 						"":
 						QFileInfo(infoPtr->filePath).completeBaseName();
@@ -137,7 +137,7 @@ void CDocumentWorkspaceGuiCompBase::UpdateAllTitles()
 			Tabs->setTabText(pageIndex, titleName);
 			QIcon documentIcon;
 			iqtgui::IVisualStatus* visualStatusPtr = CompCastPtr<iqtgui::IVisualStatus>(viewPtr);
-			if (visualStatusPtr != NULL){
+			if (visualStatusPtr != nullptr){
 				documentIcon = visualStatusPtr->GetStatusIcon();
 			}
 
@@ -166,7 +166,7 @@ int CDocumentWorkspaceGuiCompBase::GetDocumentIndexFromWidget(const QWidget& wid
 			const ViewInfo& viewInfo = *viewIter;
 
 			iqtgui::IGuiObject* guiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(viewInfo.viewPtr.GetPtr());
-			if (guiObjectPtr != NULL){
+			if (guiObjectPtr != nullptr){
 				if (guiObjectPtr->GetWidget() == &widget){
 					return documentIndex;
 				}
@@ -196,7 +196,7 @@ void CDocumentWorkspaceGuiCompBase::UpdateCommands()
 
 bool CDocumentWorkspaceGuiCompBase::AddTab(const QString& name, iqtgui::IGuiObject* guiPtr, const QIcon& icon)
 {
-	Q_ASSERT(guiPtr != NULL);
+	Q_ASSERT(guiPtr != nullptr);
 
 	QWidget* tabFrame = new QWidget;
 	QVBoxLayout* tabFrameLayout = new QVBoxLayout(tabFrame);
@@ -210,7 +210,7 @@ bool CDocumentWorkspaceGuiCompBase::AddTab(const QString& name, iqtgui::IGuiObje
 		// Remove close button form the permanent tabs:
 		int tabCount = Tabs->count();
 		QWidget* widgetPtr = Tabs->tabBar()->tabButton(tabCount - 1, QTabBar::RightSide);
-		if (widgetPtr != NULL){
+		if (widgetPtr != nullptr){
 			widgetPtr->setVisible(false);
 		}
 
@@ -220,7 +220,7 @@ bool CDocumentWorkspaceGuiCompBase::AddTab(const QString& name, iqtgui::IGuiObje
 		m_fixedTabs.pop_back();
 
 		tabFrame->deleteLater();
-		tabFrame = NULL;
+		tabFrame = nullptr;
 
 		return false;
 	}
@@ -244,7 +244,7 @@ void CDocumentWorkspaceGuiCompBase::OnDropEvent(QDropEvent* dropEventPtr)
 		for (int fileIndex = 0; fileIndex < files.count(); fileIndex++){
 			QString filePath = files.at(fileIndex).toLocalFile();
 
-			if (OpenDocument(NULL, &filePath)){
+			if (OpenDocument(nullptr, &filePath)){
 				dropEventPtr->setAccepted(true);
 				return;
 			}
@@ -260,12 +260,18 @@ void CDocumentWorkspaceGuiCompBase::OnDropEvent(QDropEvent* dropEventPtr)
 
 void CDocumentWorkspaceGuiCompBase::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	int tabIndex = modelId;
-	if (tabIndex < m_fixedVisualInfosCompPtr.GetCount()){
-		const iqtgui::IVisualStatus* visualStatusPtr = m_fixedVisualInfosCompPtr[tabIndex];
-		if (visualStatusPtr != NULL){
-			Tabs->setTabIcon(tabIndex, visualStatusPtr->GetStatusIcon());
+	if ((modelId >= MI_VISUAL_STATUS_BASE_INDEX) && (modelId < MI_DOCUMENT_COMMANDS_BASE_INDEX)){
+		int tabIndex = modelId - MI_VISUAL_STATUS_BASE_INDEX;
+		if (tabIndex < m_fixedVisualInfosCompPtr.GetCount()){
+			const iqtgui::IVisualStatus* visualStatusPtr = m_fixedVisualInfosCompPtr[tabIndex];
+			if (visualStatusPtr != nullptr){
+				Tabs->setTabIcon(tabIndex, visualStatusPtr->GetStatusIcon());
+			}
 		}
+	}
+
+	if (modelId >= MI_DOCUMENT_COMMANDS_BASE_INDEX){
+		UpdateCommands();
 	}
 }
 
@@ -283,7 +289,7 @@ istd::IChangeable* CDocumentWorkspaceGuiCompBase::OpenSingleDocument(
 {
 	SingleDocumentData* documentInfoPtr = GetDocumentInfoFromPath(filePath);
 	bool isNewViewType = true;
-	if (documentInfoPtr != NULL){
+	if (documentInfoPtr != nullptr){
 		for (int i = 0; i < documentInfoPtr->views.count(); ++i){
 			if (documentInfoPtr->views[i].viewTypeId == viewTypeId){
 				isNewViewType = false;
@@ -292,7 +298,7 @@ istd::IChangeable* CDocumentWorkspaceGuiCompBase::OpenSingleDocument(
 		}
 	}
 
-	if (documentInfoPtr != NULL && !isNewViewType){
+	if (documentInfoPtr != nullptr && !isNewViewType){
 		createView = false;
 	}
 
@@ -312,7 +318,7 @@ void CDocumentWorkspaceGuiCompBase::SetActiveView(istd::IPolymorphic* viewPtr)
 		static istd::IChangeable::ChangeSet commandsChangeSet(ibase::ICommandsProvider::CF_COMMANDS);
 
 		idoc::CMultiDocumentManagerBase::SingleDocumentData* activeDocumentInfoPtr = GetDocumentInfoFromView(*viewPtr);
-		if (activeDocumentInfoPtr == NULL){
+		if (activeDocumentInfoPtr == nullptr){
 			m_documentList.SetSelectedOptionIndex(iprm::ISelectionParam::NO_SELECTION);
 		}
 		else{
@@ -335,7 +341,7 @@ void CDocumentWorkspaceGuiCompBase::SetActiveView(istd::IPolymorphic* viewPtr)
 			int tabsCount = Tabs->count();
 			for (; viewIndex < tabsCount; viewIndex++){
 				IDocumentViewDecorator* documentViewPtr = dynamic_cast<IDocumentViewDecorator*>(Tabs->widget(viewIndex));
-				Q_ASSERT(documentViewPtr != NULL);
+				Q_ASSERT(documentViewPtr != nullptr);
 
 				if (viewPtr == documentViewPtr->GetView()){
 					pageIndex = viewIndex;
@@ -369,12 +375,12 @@ bool CDocumentWorkspaceGuiCompBase::InsertNewDocument(
 {
 	bool retVal = BaseClass::InsertNewDocument(documentTypeId, createView, viewTypeId, newDocumentPtr, beQuiet, ignoredPtr);
 
-	if (retVal && (newDocumentPtr != NULL) && (*newDocumentPtr != NULL) && createView){
+	if (retVal && (newDocumentPtr != nullptr) && (*newDocumentPtr != nullptr) && createView){
 		int documentsCount = GetDocumentsCount();
 		for (int i = 0; i < documentsCount; ++i){
 			if (&GetDocumentFromIndex(i) == *newDocumentPtr){
 				istd::IPolymorphic* viewPtr = GetViewFromIndex(i, 0);
-				if (viewPtr != NULL){
+				if (viewPtr != nullptr){
 					SetActiveView(viewPtr);
 				}
 
@@ -432,17 +438,17 @@ QStringList CDocumentWorkspaceGuiCompBase::GetOpenFilePaths(const QByteArray* do
 
 void CDocumentWorkspaceGuiCompBase::OnViewRegistered(istd::IPolymorphic* viewPtr, const SingleDocumentData& documentData)
 {
-	ifile::IFilePersistence* persistencePtr = NULL;
+	ifile::IFilePersistence* persistencePtr = nullptr;
 	const idoc::IDocumentTemplate* templatePtr = GetDocumentTemplate();
-	if (templatePtr != NULL){
+	if (templatePtr != nullptr){
 		persistencePtr = templatePtr->GetFileLoader(documentData.documentTypeId);
 	}
 
 	iqtgui::IGuiObject* guiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(viewPtr);
-	if ((guiObjectPtr != NULL) && IsGuiCreated()){
+	if ((guiObjectPtr != nullptr) && IsGuiCreated()){
 		istd::TDelPtr<IDocumentViewDecorator> documentViewPtr(CreateDocumentViewDecorator(viewPtr, Tabs, documentData, persistencePtr));
 		if (guiObjectPtr->CreateGui(documentViewPtr->GetViewFrame())){
-			Q_ASSERT(guiObjectPtr->GetWidget() != NULL);
+			Q_ASSERT(guiObjectPtr->GetWidget() != nullptr);
 
 			int newViewIndex = Tabs->count();
 			Tabs->insertTab(newViewIndex, documentViewPtr->GetDecoratorWidget(), "");
@@ -461,14 +467,14 @@ void CDocumentWorkspaceGuiCompBase::OnViewRemoved(istd::IPolymorphic* viewPtr)
 {
 	for (int pageIndex = GetFixedWindowsCount(); pageIndex < Tabs->count(); ++pageIndex){
 		IDocumentViewDecorator* documentViewPtr = dynamic_cast<IDocumentViewDecorator*>(Tabs->widget(pageIndex));
-		Q_ASSERT(documentViewPtr != NULL);
+		Q_ASSERT(documentViewPtr != nullptr);
 
 		if (documentViewPtr->GetView() == viewPtr){
 			int lastPageIndex = qMin(m_previousTabIndex, Tabs->count() - 2);
 
 			Tabs->removeTab(pageIndex);
 			iqtgui::IGuiObject* guiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(viewPtr);
-			Q_ASSERT(guiObjectPtr != NULL);
+			Q_ASSERT(guiObjectPtr != nullptr);
 
 			guiObjectPtr->DestroyGui();
 
@@ -485,7 +491,7 @@ bool CDocumentWorkspaceGuiCompBase::QueryDocumentSave(const SingleDocumentData& 
 	QFileInfo fileInfo(info.filePath);
 	QMessageBox::StandardButtons buttons = QMessageBox::Yes | QMessageBox::No;
 
-	if (ignoredPtr != NULL){
+	if (ignoredPtr != nullptr){
 		*ignoredPtr = false;
 		buttons |= QMessageBox::Cancel;
 	}
@@ -500,7 +506,7 @@ bool CDocumentWorkspaceGuiCompBase::QueryDocumentSave(const SingleDocumentData& 
 	if (response == QMessageBox::Yes){
 		return true;
 	}
-	else if ((ignoredPtr != NULL) && (response == QMessageBox::Cancel)){
+	else if ((ignoredPtr != nullptr) && (response == QMessageBox::Cancel)){
 		*ignoredPtr = true;
 	}
 
@@ -515,7 +521,7 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 	BaseClass::OnGuiCreated();
 
 	QWidget* mainWindowPtr = GetQtWidget();
-	if (mainWindowPtr != NULL){
+	if (mainWindowPtr != nullptr){
 		mainWindowPtr->setAcceptDrops(true);
 	}
 
@@ -527,7 +533,7 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 	// Add additional fixed UI components to the tab bar:
 	for (int i = 0; i < m_fixedTabsCompPtr.GetCount(); ++i){
 		iqtgui::IGuiObject* guiPtr = m_fixedTabsCompPtr[i];
-		if (guiPtr != NULL){
+		if (guiPtr != nullptr){
 			QString tabName = QString(tr("Tab %1").arg(i + 1));
 			if (i < m_fixedTabsNamesAttrPtr.GetCount()){
 				tabName = m_fixedTabsNamesAttrPtr[i];
@@ -536,14 +542,21 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 			QIcon tabIcon;
 			if (i < m_fixedVisualInfosCompPtr.GetCount()){
 				iqtgui::IVisualStatus* visualStatusPtr = m_fixedVisualInfosCompPtr[i];
-				if (visualStatusPtr != NULL){
+				if (visualStatusPtr != nullptr){
 					tabIcon = visualStatusPtr->GetStatusIcon();
 
-					imod::IModel* statusModelPtr = dynamic_cast<imod::IModel*>(visualStatusPtr);
-					if (statusModelPtr != NULL)
-					{
-						RegisterModel(statusModelPtr, i);
+					imod::IModel* visualStatusModelPtr = dynamic_cast<imod::IModel*>(visualStatusPtr);
+					if (visualStatusModelPtr != nullptr){
+						RegisterModel(visualStatusModelPtr, MI_VISUAL_STATUS_BASE_INDEX + i);
 					}
+				}
+			}
+
+			ibase::ICommandsProvider* commandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(guiPtr);
+			if (commandsProviderPtr != nullptr) {
+				imod::IModel* commandsProviderModelPtr = dynamic_cast<imod::IModel*>(commandsProviderPtr);
+				if (commandsProviderModelPtr != nullptr) {
+					RegisterModel(commandsProviderModelPtr, MI_DOCUMENT_COMMANDS_BASE_INDEX + i);
 				}
 			}
 
@@ -562,7 +575,7 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 
 		for (int viewIndex = 0; viewIndex < viewsCount; ++viewIndex){
 			istd::IPolymorphic* viewPtr = GetViewFromIndex(docIndex, viewIndex);
-			Q_ASSERT(viewPtr != NULL);
+			Q_ASSERT(viewPtr != nullptr);
 
 			OnViewRegistered(viewPtr, info);
 		}
@@ -579,7 +592,7 @@ void CDocumentWorkspaceGuiCompBase::OnGuiDestroyed()
 	// Add additional fixed UI components to the tab bar:
 	for (TabList::ConstIterator iter = m_fixedTabs.constBegin(); iter != m_fixedTabs.constEnd(); ++iter){
 		iqtgui::IGuiObject* guiPtr = *iter;
-		Q_ASSERT(guiPtr != NULL);
+		Q_ASSERT(guiPtr != nullptr);
 		if (guiPtr->IsGuiCreated()){
 			guiPtr->DestroyGui();
 		}
@@ -635,7 +648,7 @@ void CDocumentWorkspaceGuiCompBase::OnEndChanges(const ChangeSet& changeSet)
 	}
 
 	idoc::CMultiDocumentManagerBase::SingleDocumentData* activeDocumentInfoPtr = GetActiveDocumentInfo();
-	if (activeDocumentInfoPtr == NULL){
+	if (activeDocumentInfoPtr == nullptr){
 		m_documentList.SetSelectedOptionIndex(iprm::ISelectionParam::NO_SELECTION);
 		m_currentDocumentName.SetName("");
 	}
@@ -653,7 +666,7 @@ bool CDocumentWorkspaceGuiCompBase::eventFilter(QObject* sourcePtr, QEvent* even
 {
 	if (eventPtr->type() == QEvent::DragEnter){
 		QDragEnterEvent* dragEnterEventPtr = dynamic_cast<QDragEnterEvent*>(eventPtr);
-		Q_ASSERT(dragEnterEventPtr != NULL);
+		Q_ASSERT(dragEnterEventPtr != nullptr);
 
 		OnDragEnterEvent(dragEnterEventPtr);
 
@@ -661,7 +674,7 @@ bool CDocumentWorkspaceGuiCompBase::eventFilter(QObject* sourcePtr, QEvent* even
 	}
 	else if (eventPtr->type() == QEvent::Drop){
 		QDropEvent* dropEventPtr = dynamic_cast<QDropEvent*>(eventPtr);
-		Q_ASSERT(dropEventPtr != NULL);
+		Q_ASSERT(dropEventPtr != nullptr);
 
 		OnDropEvent(dropEventPtr);
 
@@ -679,7 +692,7 @@ void CDocumentWorkspaceGuiCompBase::OnCloseDocument()
 	int pageIndex = Tabs->currentIndex();
 	if (pageIndex > GetFixedWindowsCount() - 1){
 		IDocumentViewDecorator* documentViewPtr = dynamic_cast<IDocumentViewDecorator*>(Tabs->widget(pageIndex));
-		Q_ASSERT(documentViewPtr != NULL);
+		Q_ASSERT(documentViewPtr != nullptr);
 
 		CloseView(documentViewPtr->GetView(), false);
 	}
@@ -689,7 +702,7 @@ void CDocumentWorkspaceGuiCompBase::OnCloseDocument()
 void CDocumentWorkspaceGuiCompBase::OnUndoDocument()
 {
 	SingleDocumentData* documentDataPtr = GetActiveDocumentInfo();
-	if ((documentDataPtr != NULL) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableUndoSteps() > 0){
+	if ((documentDataPtr != nullptr) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableUndoSteps() > 0){
 		documentDataPtr->undoManagerPtr->DoUndo();
 	}
 }
@@ -698,7 +711,7 @@ void CDocumentWorkspaceGuiCompBase::OnUndoDocument()
 void CDocumentWorkspaceGuiCompBase::OnRedoDocument()
 {
 	SingleDocumentData* documentDataPtr = GetActiveDocumentInfo();
-	if ((documentDataPtr != NULL) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableRedoSteps() > 0){
+	if ((documentDataPtr != nullptr) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableRedoSteps() > 0){
 		documentDataPtr->undoManagerPtr->DoRedo();
 	}
 }
@@ -713,7 +726,7 @@ void CDocumentWorkspaceGuiCompBase::OnWindowActivated(int index)
 	}
 	else{
 		IDocumentViewDecorator* documentViewPtr = dynamic_cast<IDocumentViewDecorator*>(Tabs->widget(index));
-		Q_ASSERT(documentViewPtr != NULL);
+		Q_ASSERT(documentViewPtr != nullptr);
 
 		SetActiveView(documentViewPtr->GetView());
 	}
@@ -740,9 +753,9 @@ void CDocumentWorkspaceGuiCompBase::OnNewDocument(const QByteArray& documentType
 void CDocumentWorkspaceGuiCompBase::OnOpenDocument(const QByteArray& documentTypeId)
 {
 	bool ignoredFlag = false;
-	if (!OpenDocument(&documentTypeId, NULL, true, "", NULL, NULL, false, &ignoredFlag)){
+	if (!OpenDocument(&documentTypeId, nullptr, true, "", nullptr, nullptr, false, &ignoredFlag)){
 		if (!ignoredFlag){
-			QMessageBox::warning(NULL, "", tr("Document could not be opened"));
+			QMessageBox::warning(nullptr, "", tr("Document could not be opened"));
 		}
 	}
 }
@@ -755,7 +768,7 @@ void CDocumentWorkspaceGuiCompBase::OnTabCloseRequested(int index)
 			QWidget* widgetPtr = Tabs->widget(index);
 
 			IDocumentViewDecorator* documentViewPtr = dynamic_cast<IDocumentViewDecorator*>(widgetPtr);
-			Q_ASSERT(documentViewPtr != NULL);
+			Q_ASSERT(documentViewPtr != nullptr);
 
 			CloseView(documentViewPtr->GetView(), m_forceQuietClose);
 		}
@@ -803,7 +816,7 @@ bool CDocumentWorkspaceGuiCompBase::DocumentList::SetSelectedOptionIndex(int ind
 
 		m_selectedDocumentIndex = index;
 
-		istd::IPolymorphic* viewPtr = NULL;
+		istd::IPolymorphic* viewPtr = nullptr;
 		if (m_selectedDocumentIndex >= 0){
 			viewPtr = m_parent->GetViewFromIndex(m_selectedDocumentIndex, 0);
 
@@ -817,7 +830,7 @@ bool CDocumentWorkspaceGuiCompBase::DocumentList::SetSelectedOptionIndex(int ind
 
 iprm::ISelectionParam* CDocumentWorkspaceGuiCompBase::DocumentList::GetSubselection(int /*index*/) const
 {
-	return NULL;
+	return nullptr;
 }
 
 
@@ -831,7 +844,7 @@ int CDocumentWorkspaceGuiCompBase::DocumentList::GetOptionsFlags() const
 
 int CDocumentWorkspaceGuiCompBase::DocumentList::GetOptionsCount() const
 {
-	Q_ASSERT(m_parent != NULL);
+	Q_ASSERT(m_parent != nullptr);
 
 	return m_parent->GetDocumentsCount();
 }

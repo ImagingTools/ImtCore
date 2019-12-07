@@ -43,7 +43,7 @@ bool CObjectCollectionViewDelegate::InitializeDelegate(imtbase::IObjectCollectio
 
 QByteArray CObjectCollectionViewDelegate::GetSupportedTypeId() const
 {
-	QByteArray retVal;
+	static QByteArray retVal;
 
 	return retVal;
 }
