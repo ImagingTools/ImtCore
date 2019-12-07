@@ -131,10 +131,16 @@ void CDocumentBasedFileCollectionDelegateComp::OnEdit()
 
 	if (m_documentManagerCompPtr.IsValid()){
 		for (const QByteArray& objectId : m_selectedItemIds){
+			bool isAlreadyOpened = false;
 			for (int i = 0; i < m_workingObjects.GetCount(); ++i){
 				if (m_workingObjects.GetAt(i)->uuid == objectId){
-					return;
+					isAlreadyOpened = true;
+					break;
 				}
+			}
+
+			if (isAlreadyOpened){
+				continue;
 			}
 
 			ObjectInfo* objectInfoPtr = new ObjectInfo;

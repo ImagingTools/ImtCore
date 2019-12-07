@@ -472,13 +472,14 @@ void CDocumentWorkspaceGuiCompBase::OnViewRemoved(istd::IPolymorphic* viewPtr)
 		if (documentViewPtr->GetView() == viewPtr){
 			int lastPageIndex = qMin(m_previousTabIndex, Tabs->count() - 2);
 
-			Tabs->removeTab(pageIndex);
 			iqtgui::IGuiObject* guiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(viewPtr);
 			Q_ASSERT(guiObjectPtr != nullptr);
 
 			guiObjectPtr->DestroyGui();
 
 			OnWindowActivated(lastPageIndex);
+
+			Tabs->removeTab(pageIndex);
 
 			break;
 		}

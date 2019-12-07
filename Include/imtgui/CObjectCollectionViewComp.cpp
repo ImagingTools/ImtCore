@@ -202,7 +202,7 @@ void CObjectCollectionViewComp::UpdateCommands()
 		const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
 		Q_ASSERT(collectionPtr != nullptr);
 		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QStandardItem* itemPtr = m_itemModel.itemFromIndex(m_proxyModelPtr->mapToSource(selectedIndexes[0]));
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(m_proxyModelPtr->mapToSource(selectedIndexes[i]));
 			if (itemPtr != nullptr){
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
 				if (!itemId.isEmpty()){
