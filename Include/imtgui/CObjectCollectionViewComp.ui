@@ -28,8 +28,8 @@ QAbstractItemView[NoFrame=&quot;true&quot;]
 
 QAbstractItemView::item
 {
-	padding-top:5px;
-	padding-bottom:5px;
+	padding-top: 0.7em;
+	padding-bottom: 0.7em;
 }
 
 QHeaderView
@@ -69,8 +69,8 @@ QTreeWidget[TabSimulation=true]
 QTreeWidget[TabSimulation=true]::item 
 {
     border: 0px none transparent;
-    padding-top: 0.7em;
-    padding-bottom: 0.7em;
+    padding-top: 1em;
+    padding-bottom: 1em;
 }
 
 QTreeWidget[TabSimulation=true]::item:first
