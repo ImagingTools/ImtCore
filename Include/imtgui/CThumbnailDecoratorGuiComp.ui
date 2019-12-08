@@ -177,7 +177,7 @@ QAbstractItemView[TabSimulation=true]
         </property>
         <property name="icon">
          <iconset resource="imtgui.qrc">
-          <normaloff>:/Icons/Menu</normaloff>:/Icons/Menu</iconset>
+          <normaloff>:/Icons/MenuQuad</normaloff>:/Icons/MenuQuad</iconset>
         </property>
         <property name="iconSize">
          <size>
