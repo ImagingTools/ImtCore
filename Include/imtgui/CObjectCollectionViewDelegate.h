@@ -7,6 +7,7 @@
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <ibase/TLocalizableWrap.h>
+#include <imtbase/CCollectionInfo.h>
 #include <iqtgui/IGuiObject.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
@@ -48,6 +49,8 @@ public:
 	virtual void RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const override;
 	virtual bool UpdateObject(const QByteArray& objectId, const istd::IChangeable& contents) const override;
 	virtual bool RenameObject(const QByteArray& objectId, const QString& newName) const override;
+	virtual imtbase::ICollectionInfo& GetSummaryInformationTypes() const override;
+	virtual QVariant GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
@@ -81,6 +84,8 @@ protected:
 
 	imtbase::ICollectionInfo::Ids m_selectedItemIds;
 	QByteArray m_selectedTypeId;
+
+	imtbase::CCollectionInfo m_summaryInformationFields;
 };
 
 

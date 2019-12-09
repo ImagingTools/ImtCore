@@ -158,6 +158,16 @@ public:
 		Rename an existing object.
 	*/
 	virtual bool RenameObject(const QByteArray& objectId, const QString& newName) const = 0;
+
+	/**
+		TODO: Add comment
+	*/
+	virtual imtbase::ICollectionInfo& GetSummaryInformationTypes() const = 0;
+
+	/**
+		TODO: Add comment
+	*/
+	virtual QVariant GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const = 0;
 };
 
 

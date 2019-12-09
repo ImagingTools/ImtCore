@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtbase/IFileObjectCollection.h>
+#include <idoc/IDocumentMetaInfo.h>
 
 
 namespace imtgui
@@ -21,6 +22,11 @@ CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
 	:m_importCommand("Import", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_exportCommand("Export", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT)
 {
+	m_summaryInformationFields.ResetData();
+	m_summaryInformationFields.InsertItem(QByteArray("Author"), "Author", "");
+	m_summaryInformationFields.InsertItem(QByteArray("ResourceTypeId"), "Resource Type Id", "");
+	m_summaryInformationFields.InsertItem(QByteArray("Description"), "Description", "");
+	m_summaryInformationFields.InsertItem(QByteArray("ModificationTime"), "Modification Time", "");
 }
 
 
@@ -55,6 +61,25 @@ bool CFileObjectCollectionViewDelegate::ExportObject(const QByteArray& objectId,
 	QString resultPath = fileCollectionPtr->GetFile(objectId, targetPath);
 
 	return (resultPath == targetPath);
+}
+
+
+QVariant CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+{
+	imtbase::IFileObjectCollection *fileObjectCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+
+	if (fileObjectCollectionPtr != nullptr){
+		if (informationId == QByteArray("Author"))
+			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_AUTHOR);
+		if (informationId == QByteArray("ResourceTypeId"))
+			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(imtbase::IFileObjectCollection::MIT_RESOURCE_TYPE_ID);
+		if (informationId == QByteArray("Description"))
+			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION);
+		if (informationId == QByteArray("ModificationTime"))
+			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
+	}
+
+	return QVariant();
 }
 
 
