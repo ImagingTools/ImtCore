@@ -88,6 +88,7 @@ protected:
 
 private:
 	void UpdateCommands();
+	void UpdateMetaInfo();
 
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);

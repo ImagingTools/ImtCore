@@ -105,6 +105,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	}
 
 	UpdateCommands();
+	UpdateMetaInfo();
 }
 
 
@@ -225,6 +226,44 @@ void CObjectCollectionViewComp::UpdateCommands()
 }
 
 
+void CObjectCollectionViewComp::UpdateMetaInfo()
+{
+	const ICollectionViewDelegate &viewDelegate = GetViewDelegateRef(m_currentTypeId);
+	const imtbase::ICollectionInfo &informationTypes = viewDelegate.GetSummaryInformationTypes();
+	QVector<QByteArray> informationTypesIds = informationTypes.GetElementIds();	
+	
+	m_itemModel.setColumnCount(1);
+	
+	for (int counterId = 0; counterId < informationTypesIds.count(); counterId++){
+		QList<QStandardItem*> column;
+		for (int i = 0; i < m_itemModel.rowCount(); i++){
+			QByteArray itemId = m_itemModel.item(i, 0)->data(DR_OBJECT_ID).toByteArray();
+			QVariant info = viewDelegate.GetSummaryInformation(itemId, informationTypesIds[counterId]);
+			switch (info.type()){
+			case QVariant::ByteArray:
+				column.append(new QStandardItem(QString(info.toByteArray())));
+				break;
+			case QVariant::String:
+				column.append(new QStandardItem(info.toString()));
+				break;
+			case QVariant::DateTime:
+				column.append(new QStandardItem(info.toDateTime().toString("dd.MM.yyyy hh:mm:ss")));
+				break;
+			}
+		}
+		m_itemModel.appendColumn(column);
+	}
+
+	QStringList headerLabelList;
+	headerLabelList.append(tr("Name"));
+	for (int counterId = 0; counterId < informationTypesIds.count(); counterId++){
+		QString label = informationTypes.GetElementInfo(informationTypesIds[counterId], imtbase::ICollectionInfo::EIT_NAME).toString();
+		headerLabelList.append(label);
+	}
+	m_itemModel.setHorizontalHeaderLabels(headerLabelList);
+}
+
+
 // private slots
 
 void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
@@ -260,6 +299,7 @@ void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 	m_proxyModelPtr->setFilterFixedString(m_currentTypeId);
 
 	UpdateCommands();
+	UpdateMetaInfo();
 }
 
 

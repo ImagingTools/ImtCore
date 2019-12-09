@@ -49,7 +49,7 @@ public:
 	virtual void RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const override;
 	virtual bool UpdateObject(const QByteArray& objectId, const istd::IChangeable& contents) const override;
 	virtual bool RenameObject(const QByteArray& objectId, const QString& newName) const override;
-	virtual imtbase::ICollectionInfo& GetSummaryInformationTypes() const override;
+	virtual const imtbase::ICollectionInfo& GetSummaryInformationTypes() const override;
 	virtual QVariant GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
 
 	// reimplemented (ibase::ICommandsProvider)

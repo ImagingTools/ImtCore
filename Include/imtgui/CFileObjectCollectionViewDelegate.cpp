@@ -69,14 +69,21 @@ QVariant CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArr
 	imtbase::IFileObjectCollection *fileObjectCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
 
 	if (fileObjectCollectionPtr != nullptr){
-		if (informationId == QByteArray("Author"))
+		if (informationId == QByteArray("Author")){
 			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_AUTHOR);
-		if (informationId == QByteArray("ResourceTypeId"))
+		}
+
+		if (informationId == QByteArray("ResourceTypeId")){
 			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(imtbase::IFileObjectCollection::MIT_RESOURCE_TYPE_ID);
-		if (informationId == QByteArray("Description"))
+		}
+
+		if (informationId == QByteArray("Description")){
 			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION);
-		if (informationId == QByteArray("ModificationTime"))
+		}
+
+		if (informationId == QByteArray("ModificationTime")){
 			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
+		}
 	}
 
 	return QVariant();

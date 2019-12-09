@@ -162,7 +162,7 @@ public:
 	/**
 		TODO: Add comment
 	*/
-	virtual imtbase::ICollectionInfo& GetSummaryInformationTypes() const = 0;
+	virtual const imtbase::ICollectionInfo& GetSummaryInformationTypes() const = 0;
 
 	/**
 		TODO: Add comment
