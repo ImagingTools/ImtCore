@@ -23,10 +23,10 @@ CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
 	m_exportCommand("Export", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT)
 {
 	m_summaryInformationFields.ResetData();
-	m_summaryInformationFields.InsertItem(QByteArray("Author"), "Author", "");
-	m_summaryInformationFields.InsertItem(QByteArray("ResourceTypeId"), "Resource Type Id", "");
-	m_summaryInformationFields.InsertItem(QByteArray("Description"), "Description", "");
-	m_summaryInformationFields.InsertItem(QByteArray("ModificationTime"), "Modification Time", "");
+	m_summaryInformationFields.InsertItem(QByteArray("ResourceTypeId"), tr("Type"), "");
+	m_summaryInformationFields.InsertItem(QByteArray("Description"), tr("Description"), "");
+	m_summaryInformationFields.InsertItem(QByteArray("ModificationTime"), tr("Modification Time"), "");
+	m_summaryInformationFields.InsertItem(QByteArray("Author"), tr("Author"), "");
 }
 
 
