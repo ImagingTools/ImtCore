@@ -93,6 +93,7 @@ private:
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 	void OnItemChanged(QStandardItem *item);
+	void OnDoubleClick(const QModelIndex &item);
 	void on_TypeList_itemSelectionChanged();
 
 private:

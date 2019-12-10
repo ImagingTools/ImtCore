@@ -146,6 +146,9 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	}
 
 	connect(&m_itemModel, &QStandardItemModel::itemChanged, this, &CObjectCollectionViewComp::OnItemChanged);
+	connect(ItemList, &QTreeView::doubleClicked, this, &CObjectCollectionViewComp::OnDoubleClick);
+
+	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 	BaseClass::OnGuiCreated();
 }
@@ -283,6 +286,24 @@ void CObjectCollectionViewComp::OnItemChanged(QStandardItem* itemPtr)
 		QString newName = itemPtr->text();
 
 		collectionPtr->SetObjectName(itemId, newName);
+	}
+}
+
+
+void CObjectCollectionViewComp::OnDoubleClick(const QModelIndex &item)
+{
+	int sourceRow = m_proxyModelPtr->mapToSource(item).row();
+	QByteArray itemId = m_itemModel.item(sourceRow, 0)->data(DR_OBJECT_ID).toByteArray();
+
+	const ICollectionViewDelegate &delegate = GetViewDelegateRef(m_currentTypeId);
+	ibase::IHierarchicalCommand* editCommands = dynamic_cast<ibase::IHierarchicalCommand*>(delegate.GetCommands()->GetChild(0));
+
+	for (int i = 0; i < editCommands->GetChildsCount(); i++){
+		ibase::IHierarchicalCommand* command = dynamic_cast<ibase::IHierarchicalCommand*>(editCommands->GetChild(i));
+		if (command->GetName() == "Edit"){
+			command->Execute(NULL);
+			return;
+		}			
 	}
 }
 
