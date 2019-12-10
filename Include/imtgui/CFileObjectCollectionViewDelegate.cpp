@@ -23,7 +23,7 @@ CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
 	m_exportCommand("Export", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT)
 {
 	m_summaryInformationFields.ResetData();
-	m_summaryInformationFields.InsertItem(QByteArray("ResourceTypeId"), tr("Type"), "");
+	m_summaryInformationFields.InsertItem(QByteArray("TypeId"), tr("Type"), "");
 	m_summaryInformationFields.InsertItem(QByteArray("Description"), tr("Description"), "");
 	m_summaryInformationFields.InsertItem(QByteArray("ModificationTime"), tr("Modification Time"), "");
 	m_summaryInformationFields.InsertItem(QByteArray("Author"), tr("Author"), "");
@@ -73,7 +73,7 @@ QVariant CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArr
 			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_AUTHOR);
 		}
 
-		if (informationId == QByteArray("ResourceTypeId")){
+		if (informationId == QByteArray("TypeId")){
 			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(imtbase::IFileObjectCollection::MIT_RESOURCE_TYPE_ID);
 		}
 
