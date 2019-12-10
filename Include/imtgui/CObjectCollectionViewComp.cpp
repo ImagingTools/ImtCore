@@ -231,38 +231,43 @@ void CObjectCollectionViewComp::UpdateCommands()
 
 void CObjectCollectionViewComp::UpdateMetaInfo()
 {
-	const ICollectionViewDelegate &viewDelegate = GetViewDelegateRef(m_currentTypeId);
-	const imtbase::ICollectionInfo &informationTypes = viewDelegate.GetSummaryInformationTypes();
-	QVector<QByteArray> informationTypesIds = informationTypes.GetElementIds();	
+	const ICollectionViewDelegate& viewDelegate = GetViewDelegateRef(m_currentTypeId);
+	const imtbase::ICollectionInfo& informationTypes = viewDelegate.GetSummaryInformationTypes();
+	QVector<QByteArray> informationTypesIds = informationTypes.GetElementIds();
 	
 	m_itemModel.setColumnCount(1);
 	
-	for (int counterId = 0; counterId < informationTypesIds.count(); counterId++){
-		QList<QStandardItem*> column;
+	for (int columnIndex = 0; columnIndex < informationTypesIds.count(); columnIndex++){
+		QList<QStandardItem*> columns;
 		for (int i = 0; i < m_itemModel.rowCount(); i++){
 			QByteArray itemId = m_itemModel.item(i, 0)->data(DR_OBJECT_ID).toByteArray();
-			QVariant info = viewDelegate.GetSummaryInformation(itemId, informationTypesIds[counterId]);
+
+			QVariant info = viewDelegate.GetSummaryInformation(itemId, informationTypesIds[columnIndex]);
+
 			switch (info.type()){
 			case QVariant::ByteArray:
-				column.append(new QStandardItem(QString(info.toByteArray())));
+				columns.append(new QStandardItem(QString(info.toByteArray())));
 				break;
 			case QVariant::String:
-				column.append(new QStandardItem(info.toString()));
+				columns.append(new QStandardItem(info.toString()));
 				break;
 			case QVariant::DateTime:
-				column.append(new QStandardItem(info.toDateTime().toString("dd.MM.yyyy hh:mm:ss")));
+				columns.append(new QStandardItem(info.toDateTime().toString("dd.MM.yyyy hh:mm:ss")));
 				break;
 			}
 		}
-		m_itemModel.appendColumn(column);
+
+		m_itemModel.appendColumn(columns);
 	}
 
 	QStringList headerLabelList;
 	headerLabelList.append(tr("Name"));
-	for (int counterId = 0; counterId < informationTypesIds.count(); counterId++){
-		QString label = informationTypes.GetElementInfo(informationTypesIds[counterId], imtbase::ICollectionInfo::EIT_NAME).toString();
+	for (int columnIndex = 0; columnIndex < informationTypesIds.count(); columnIndex++){
+		QString label = informationTypes.GetElementInfo(informationTypesIds[columnIndex], imtbase::ICollectionInfo::EIT_NAME).toString();
+
 		headerLabelList.append(label);
 	}
+
 	m_itemModel.setHorizontalHeaderLabels(headerLabelList);
 }
 
@@ -296,15 +301,8 @@ void CObjectCollectionViewComp::OnDoubleClick(const QModelIndex &item)
 	QByteArray itemId = m_itemModel.item(sourceRow, 0)->data(DR_OBJECT_ID).toByteArray();
 
 	const ICollectionViewDelegate &delegate = GetViewDelegateRef(m_currentTypeId);
-	ibase::IHierarchicalCommand* editCommands = dynamic_cast<ibase::IHierarchicalCommand*>(delegate.GetCommands()->GetChild(0));
 
-	for (int i = 0; i < editCommands->GetChildsCount(); i++){
-		ibase::IHierarchicalCommand* command = dynamic_cast<ibase::IHierarchicalCommand*>(editCommands->GetChild(i));
-		if (command->GetName() == "Edit"){
-			command->Execute(NULL);
-			return;
-		}			
-	}
+	delegate.OpenDocumentEditor(itemId);
 }
 
 

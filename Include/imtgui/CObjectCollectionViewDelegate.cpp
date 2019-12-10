@@ -158,6 +158,12 @@ QVariant CObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& 
 }
 
 
+bool CObjectCollectionViewDelegate::OpenDocumentEditor(const QByteArray& /*objectId*/, const QByteArray& /*viewTypeId*/) const
+{
+	return false;
+}
+
+
 // reimplemented (ibase::ICommandsProvider)
 
 const ibase::IHierarchicalCommand* CObjectCollectionViewDelegate::GetCommands() const

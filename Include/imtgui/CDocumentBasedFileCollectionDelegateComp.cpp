@@ -67,6 +67,54 @@ void CDocumentBasedFileCollectionDelegateComp::UpdateItemSelection(int viewState
 }
 
 
+bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId) const
+{
+	if (!m_documentManagerCompPtr.IsValid()){
+		return false;
+	}
+
+	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	Q_ASSERT(fileCollectionPtr != nullptr);
+
+	bool isAlreadyOpened = false;
+	for (int i = 0; i < m_workingObjects.GetCount(); ++i){
+		if (m_workingObjects.GetAt(i)->uuid == objectId){
+			isAlreadyOpened = true;
+			break;
+		}
+	}
+
+	if (isAlreadyOpened){
+		return false;
+	}
+
+	ObjectInfo* objectInfoPtr = new ObjectInfo;
+	objectInfoPtr->typeId = m_collectionPtr->GetObjectTypeId(objectId);
+	objectInfoPtr->name = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+
+	imtbase::IFileObjectCollection::FileInfo fileInfo = fileCollectionPtr->GetFileInfo(objectId);
+
+	objectInfoPtr->uuid = objectId;
+
+	QString tempPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString();
+
+	istd::CSystem::EnsurePathExists(tempPath);
+
+	QString tempFilePath = tempPath + "/ " + objectInfoPtr->name + "." + QFileInfo(fileInfo.fileName).suffix();
+
+	QString targetFilePath = fileCollectionPtr->GetFile(objectId, tempFilePath);
+	if (!targetFilePath.isEmpty()) {
+		if (m_documentManagerCompPtr->OpenDocument(&objectInfoPtr->typeId, &targetFilePath, true, viewTypeId, &objectInfoPtr->objectPtr)){
+			m_workingObjects.PushBack(objectInfoPtr);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 // protected methods
 
 // reimplemented (CObjectCollectionViewDelegate)
@@ -126,44 +174,8 @@ void CDocumentBasedFileCollectionDelegateComp::OnComponentDestroyed()
 
 void CDocumentBasedFileCollectionDelegateComp::OnEdit()
 {
-	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
-	Q_ASSERT(fileCollectionPtr != nullptr);
-
-	if (m_documentManagerCompPtr.IsValid()){
-		for (const QByteArray& objectId : m_selectedItemIds){
-			bool isAlreadyOpened = false;
-			for (int i = 0; i < m_workingObjects.GetCount(); ++i){
-				if (m_workingObjects.GetAt(i)->uuid == objectId){
-					isAlreadyOpened = true;
-					break;
-				}
-			}
-
-			if (isAlreadyOpened){
-				continue;
-			}
-
-			ObjectInfo* objectInfoPtr = new ObjectInfo;
-			objectInfoPtr->typeId = m_collectionPtr->GetObjectTypeId(objectId);
-			objectInfoPtr->name = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-
-			imtbase::IFileObjectCollection::FileInfo fileInfo = fileCollectionPtr->GetFileInfo(objectId);
-
-			objectInfoPtr->uuid = objectId;
-
-			QString tempPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString();
-
-			istd::CSystem::EnsurePathExists(tempPath);
-
-			QString tempFilePath = tempPath + "/ " + objectInfoPtr->name + "." + QFileInfo(fileInfo.fileName).suffix();
-
-			QString targetFilePath = fileCollectionPtr->GetFile(objectId, tempFilePath);
-			if (!targetFilePath.isEmpty()){
-				if (m_documentManagerCompPtr->OpenDocument(&objectInfoPtr->typeId, &targetFilePath, true, "", &objectInfoPtr->objectPtr)){
-					m_workingObjects.PushBack(objectInfoPtr);
-				}
-			}
-		}
+	for (const QByteArray& objectId : m_selectedItemIds){
+		OpenDocumentEditor(objectId);
 	}
 }
 

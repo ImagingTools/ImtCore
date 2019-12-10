@@ -25,47 +25,6 @@ namespace imtgui
 class ICollectionViewDelegate: virtual public ibase::ICommandsProvider
 {
 public:
-	/**
-		Type of the command for operations on a collection item or on the entire collection.
-	*/
-	enum CommandType
-	{
-		/**
-			Neues object will be created in the collection.
-		*/
-		CT_NEW,
-
-		/**
-			An existing object will be imported from an external source.
-		*/
-		CT_IMPORT,
-
-		/**
-			An existing object will be exported from the collection to an external source.
-		*/
-		CT_EXPORT,
-
-		/**
-			An existing object will be removed from the collection.
-		*/
-		CT_REMOVE,
-
-		/**
-			The contents of an existing object should be edited.
-		*/
-		CT_EDIT,
-
-		/**
-			The name of the object will be changed.
-		*/
-		CT_RENAME,
-
-		/**
-			Base index for used-defined operations.
-		*/
-		CT_USER = 1000
-	};
-
 	enum ViewState
 	{
 		/**
@@ -168,6 +127,11 @@ public:
 		TODO: Add comment
 	*/
 	virtual QVariant GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const = 0;
+
+	/**
+		Open a document editor for a given data object.
+	*/
+	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const = 0;
 };
 
 

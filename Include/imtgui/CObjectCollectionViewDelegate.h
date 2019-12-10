@@ -51,6 +51,7 @@ public:
 	virtual bool RenameObject(const QByteArray& objectId, const QString& newName) const override;
 	virtual const imtbase::ICollectionInfo& GetSummaryInformationTypes() const override;
 	virtual QVariant GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
+	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
