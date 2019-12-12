@@ -397,7 +397,7 @@ private:
 	I_MULTIFACT(istd::IChangeable, m_objectFactoryListCompPtr);
 
 	/**
-		Version info provider.
+		Provider of the version information for the entire system.
 	*/
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 
@@ -411,6 +411,9 @@ private:
 	*/
 	I_ATTR(bool, m_createFolderOnStartAttrPtr);
 
+	/**
+		Poll changes in file system to get automatic updates if an external process do some changes in the repository.
+	*/
 	I_ATTR(bool, m_pollFileSystemAttrPtr);
 };
 
