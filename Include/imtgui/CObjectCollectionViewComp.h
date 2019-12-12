@@ -93,13 +93,8 @@ protected:
 
 private:
 	void UpdateCommands();
-	QStringList getTypeIdMetaHeader(QByteArray typeId);
-	QStringList getObjectMetaInfo(QByteArray itemId, QByteArray typeId);
-
-	bool m_blockHeaderSectionSizeStore;
-
-	QMap<QByteArray, QStringList> m_headerLabel;
-	QMap<QByteArray, QList<int>> m_headerSectionSize;
+	QStringList GetTypeIdMetaHeader(const QByteArray &typeId);
+	QStringList GetObjectMetaInfo(const QByteArray &itemId, const QByteArray &typeId);
 
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
@@ -129,6 +124,9 @@ private:
 	imod::TModelWrap<Commands> m_commands;
 
 	QSortFilterProxyModel* m_proxyModelPtr;
+
+	bool m_blockHeaderSectionSizeStore;
+	QMap<QByteArray, QList<int>> m_headerSectionSize;
 };
 
 

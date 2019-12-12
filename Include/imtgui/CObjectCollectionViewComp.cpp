@@ -95,11 +95,6 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			if (lastTypeId.isEmpty() && (typeIndex == 0)){
 				TypeList->setItemSelected(typeItemPtr, true);
 			}
-
-			QStringList headerLabels;
-			headerLabels.append(tr("Name"));
-			headerLabels.append(getTypeIdMetaHeader(typeId));
-			m_headerLabel[typeId] = headerLabels;
 		}
 		
 		for (const QByteArray& itemId : collectionItemIds){
@@ -121,7 +116,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			objectItemPtr->setFlags(flags);
 			
 			QList<QStandardItem*> columns;
-			QStringList metaInfo = getObjectMetaInfo(itemId, itemTypeId);
+			QStringList metaInfo = GetObjectMetaInfo(itemId, itemTypeId);
 
 			columns += objectItemPtr;
 			for(QString infoItem : metaInfo){
@@ -262,7 +257,7 @@ void CObjectCollectionViewComp::UpdateCommands()
 }
 
 
-QStringList CObjectCollectionViewComp::getTypeIdMetaHeader(QByteArray typeId)
+QStringList CObjectCollectionViewComp::GetTypeIdMetaHeader(const QByteArray &typeId)
 {
 	const ICollectionViewDelegate& viewDelegate = GetViewDelegateRef(typeId);
 	const imtbase::ICollectionInfo& informationTypes = viewDelegate.GetSummaryInformationTypes();
@@ -278,7 +273,7 @@ QStringList CObjectCollectionViewComp::getTypeIdMetaHeader(QByteArray typeId)
 }
 
 
-QStringList CObjectCollectionViewComp::getObjectMetaInfo(QByteArray itemId, QByteArray typeId)
+QStringList CObjectCollectionViewComp::GetObjectMetaInfo(const QByteArray &itemId, const QByteArray &typeId)
 {
 	const ICollectionViewDelegate& viewDelegate = GetViewDelegateRef(typeId);
 	const imtbase::ICollectionInfo& informationTypes = viewDelegate.GetSummaryInformationTypes();
@@ -388,16 +383,19 @@ void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 
 	UpdateCommands();
 	
+	QStringList headerLabels;
+	headerLabels.append(tr("Name"));
+	headerLabels.append(GetTypeIdMetaHeader(m_currentTypeId));
+	m_itemModel.setHorizontalHeaderLabels(headerLabels);
+
 	for (int i = 0; i < m_itemModel.columnCount(); i++){
-		if (i < m_headerLabel[m_currentTypeId].count()){
+		if (i < headerLabels.count()){
 			ItemList->showColumn(i);
 		}
 		else {
 			ItemList->hideColumn(i);
 		}
 	}
-
-	m_itemModel.setHorizontalHeaderLabels(m_headerLabel[m_currentTypeId]);
 
 	int columnCount = m_itemModel.columnCount();
 	if (m_headerSectionSize.contains(m_currentTypeId)){
