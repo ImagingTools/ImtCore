@@ -100,8 +100,12 @@ private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 	void OnItemChanged(QStandardItem *item);
 	void OnItemDoubleClick(const QModelIndex &item);
-	//void OnCustomContextMenuRequested(const QPoint &point);
+	void OnCustomContextMenuRequested(const QPoint &point);
 	void on_TypeList_itemSelectionChanged();
+
+	void OnContextMenuRename(bool checked);
+	void OnContextMenuEdit(bool checked);
+	void OnContextMenuRemove(bool checked);
 
 private:
 	QStandardItemModel m_itemModel;

@@ -6,6 +6,8 @@
 #include <QtCore/QDir>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QMessageBox>
+#include <QLineEdit>
+#include <QInputDialog>
 
 // ACF includes
 #include <idoc/IDocumentMetaInfo.h>
@@ -173,8 +175,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 	connect(&m_itemModel, &QStandardItemModel::itemChanged, this, &CObjectCollectionViewComp::OnItemChanged);
 	connect(ItemList, &QTreeView::doubleClicked, this, &CObjectCollectionViewComp::OnItemDoubleClick);
-	//connect(ItemList, &QTreeView::customContextMenuRequested, this, &CObjectCollectionViewComp::OnCustomContextMenuRequested);
-	//ItemList->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(ItemList, &QTreeView::customContextMenuRequested, this, &CObjectCollectionViewComp::OnCustomContextMenuRequested);
+	ItemList->setContextMenuPolicy(Qt::CustomContextMenu);
 
 	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
@@ -337,27 +339,23 @@ void CObjectCollectionViewComp::OnItemDoubleClick(const QModelIndex &item)
 }
 
 
-//void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point)
-//{
-//	
-//
-//	QMenu menu(ItemList);
-//	menu.addAction(QIcon(":/Icons/Rename"), tr("Rename"),
-//				[](){
-//					;;
-//				});
-//	menu.addAction(QIcon(":/Icons/Edit"), tr("Edit"),
-//				[](){
-//					//for (const QByteArray& objectId : m_sele){
-//					//	OpenDocumentEditor(objectId);
-//					//};
-//				});
-//	menu.addAction(QIcon(":/Icons/Remove"), tr("Remove"),
-//				[](){
-//					;
-//				});
-//	menu.exec(ItemList->viewport()->mapToGlobal(point));
-//}
+void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point)
+{
+	QAction *actionRename;
+	QAction *actionEdit;
+	QAction *actionRemove;
+
+	QMenu menu(ItemList);
+	actionRename = menu.addAction(QIcon(":/Icons/Rename"), tr("Rename"));
+	actionEdit = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit"));
+	actionRemove = menu.addAction(QIcon(":/Icons/Remove"), tr("Remove"));
+
+	connect(actionRename, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRename);
+	connect(actionEdit, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEdit);
+	connect(actionRemove, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRemove);
+
+	menu.exec(ItemList->viewport()->mapToGlobal(point));
+}
 
 
 void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
@@ -408,6 +406,77 @@ void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 			ItemList->resizeColumnToContents(i);
 		}
 	}
+}
+
+
+void CObjectCollectionViewComp::OnContextMenuRename(bool checked)
+{
+	ICollectionViewDelegate & delegate = GetViewDelegateRef(m_currentTypeId);
+	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
+
+	if (selectedIndexes.count() != 1){
+		return;
+	}	
+
+	if (!selectedIndexes.isEmpty()){
+		for (int i = 0; i < selectedIndexes.count(); ++i){
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(m_proxyModelPtr->mapToSource(selectedIndexes[i]));
+			if (itemPtr != nullptr){
+				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
+				QByteArray typeId = itemPtr->data(DR_TYPE_ID).toByteArray();
+				if (!itemId.isEmpty()){
+					bool ok;
+					const QString newName = QInputDialog::getText(ItemList, tr("Enter new object name"), tr("Name"), QLineEdit::Normal, "", &ok);
+					if (ok){
+						delegate.RenameObject(itemId, newName);
+					}
+				}
+			}
+		}
+	}
+}
+
+
+void CObjectCollectionViewComp::OnContextMenuEdit(bool checked)
+{
+	ICollectionViewDelegate & delegate = GetViewDelegateRef(m_currentTypeId);
+	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
+
+	if (!selectedIndexes.isEmpty()){
+		for (int i = 0; i < selectedIndexes.count(); ++i){
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(m_proxyModelPtr->mapToSource(selectedIndexes[i]));
+			if (itemPtr != nullptr){
+				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
+				QByteArray typeId = itemPtr->data(DR_TYPE_ID).toByteArray();
+				if (!itemId.isEmpty()){
+					bool result = delegate.OpenDocumentEditor(itemId);
+				}
+			}
+		}
+	}
+}
+
+
+void CObjectCollectionViewComp::OnContextMenuRemove(bool checked)
+{
+	ICollectionViewDelegate & delegate = GetViewDelegateRef(m_currentTypeId);
+	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
+
+	QVector<QByteArray> itemIds;
+	if (!selectedIndexes.isEmpty()){
+		for (int i = 0; i < selectedIndexes.count(); ++i){
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(m_proxyModelPtr->mapToSource(selectedIndexes[i]));
+			if (itemPtr != nullptr){
+				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
+				QByteArray typeId = itemPtr->data(DR_TYPE_ID).toByteArray();
+				if (!itemId.isEmpty()){
+					itemIds.append(itemId);
+				}
+			}
+		}
+	}
+
+	delegate.RemoveObjects(itemIds);
 }
 
 
