@@ -9,6 +9,7 @@
 // ACF includes
 #include <ibase/ICommandsProvider.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
+#include <iqtgui/TRestorableGuiWrap.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
@@ -51,7 +52,11 @@ public:
 protected:
 	ICollectionViewDelegate& GetViewDelegateRef(const QByteArray& typeId);
 	const ICollectionViewDelegate& GetViewDelegate(const QByteArray& typeId) const;
- 
+
+	// reimplemented (iqtgui::TRestorableGuiWrap)
+	virtual void OnRestoreSettings(const QSettings& settings);
+	virtual void OnSaveSettings(QSettings& settings) const;
+
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelAttached() override;

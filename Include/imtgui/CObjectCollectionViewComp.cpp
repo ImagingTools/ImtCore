@@ -20,9 +20,9 @@ namespace imtgui
 // protected methods
 
 CObjectCollectionViewComp::CObjectCollectionViewComp()
+	:m_blockHeaderSectionSizeStore(false)
 {
 	m_commands.SetParent(this);
-	m_blockHeaderSectionSizeStore = true;
 }
 
 
@@ -41,6 +41,18 @@ ICollectionViewDelegate & CObjectCollectionViewComp::GetViewDelegateRef(const QB
 const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const QByteArray& typeId) const
 {
 	return (const_cast<CObjectCollectionViewComp*>(this))->GetViewDelegateRef(typeId);
+}
+
+
+// reimplemented (iqtgui::TRestorableGuiWrap)
+
+void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
+{
+}
+
+
+void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
+{
 }
 
 
@@ -123,6 +135,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	UpdateCommands();
 
 	on_TypeList_itemSelectionChanged();
+
 	m_blockHeaderSectionSizeStore = false;
 }
 
