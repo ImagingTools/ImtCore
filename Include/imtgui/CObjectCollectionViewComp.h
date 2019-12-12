@@ -88,12 +88,19 @@ protected:
 
 private:
 	void UpdateCommands();
-	void UpdateMetaInfo();
+	QStringList getTypeIdMetaHeader(QByteArray typeId);
+	QStringList getObjectMetaInfo(QByteArray itemId, QByteArray typeId);
+
+	bool m_blockHeaderSectionSizeStore;
+
+	QMap<QByteArray, QStringList> m_headerLabel;
+	QMap<QByteArray, QList<int>> m_headerSectionSize;
 
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 	void OnItemChanged(QStandardItem *item);
-	void OnDoubleClick(const QModelIndex &item);
+	void OnItemDoubleClick(const QModelIndex &item);
+	//void OnCustomContextMenuRequested(const QPoint &point);
 	void on_TypeList_itemSelectionChanged();
 
 private:

@@ -22,6 +22,7 @@ namespace imtgui
 CObjectCollectionViewComp::CObjectCollectionViewComp()
 {
 	m_commands.SetParent(this);
+	m_blockHeaderSectionSizeStore = true;
 }
 
 
@@ -49,6 +50,8 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 {
 	const imtbase::IObjectCollection* objectPtr = GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
+
+	m_blockHeaderSectionSizeStore = true;
 
 	QByteArray lastTypeId = m_currentTypeId;
 
@@ -80,6 +83,11 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			if (lastTypeId.isEmpty() && (typeIndex == 0)){
 				TypeList->setItemSelected(typeItemPtr, true);
 			}
+
+			QStringList headerLabels;
+			headerLabels.append(tr("Name"));
+			headerLabels.append(getTypeIdMetaHeader(typeId));
+			m_headerLabel[typeId] = headerLabels;
 		}
 		
 		for (const QByteArray& itemId : collectionItemIds){
@@ -96,16 +104,26 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 
 			if (objectPtr->GetSupportedOperations() & imtbase::IObjectCollection::OF_SUPPORT_RENAME){
 				flags |= Qt::ItemIsEditable;
+			}		
+			
+			objectItemPtr->setFlags(flags);
+			
+			QList<QStandardItem*> columns;
+			QStringList metaInfo = getObjectMetaInfo(itemId, itemTypeId);
+
+			columns += objectItemPtr;
+			for(QString infoItem : metaInfo){
+				columns += new QStandardItem(infoItem);
 			}
 
-			objectItemPtr->setFlags(flags);
-
-			m_itemModel.appendRow(objectItemPtr);
+			m_itemModel.appendRow(columns);
 		}
 	}
 
 	UpdateCommands();
-	UpdateMetaInfo();
+
+	on_TypeList_itemSelectionChanged();
+	m_blockHeaderSectionSizeStore = false;
 }
 
 
@@ -146,7 +164,9 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	}
 
 	connect(&m_itemModel, &QStandardItemModel::itemChanged, this, &CObjectCollectionViewComp::OnItemChanged);
-	connect(ItemList, &QTreeView::doubleClicked, this, &CObjectCollectionViewComp::OnDoubleClick);
+	connect(ItemList, &QTreeView::doubleClicked, this, &CObjectCollectionViewComp::OnItemDoubleClick);
+	//connect(ItemList, &QTreeView::customContextMenuRequested, this, &CObjectCollectionViewComp::OnCustomContextMenuRequested);
+	//ItemList->setContextMenuPolicy(Qt::CustomContextMenu);
 
 	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
@@ -229,46 +249,49 @@ void CObjectCollectionViewComp::UpdateCommands()
 }
 
 
-void CObjectCollectionViewComp::UpdateMetaInfo()
+QStringList CObjectCollectionViewComp::getTypeIdMetaHeader(QByteArray typeId)
 {
-	const ICollectionViewDelegate& viewDelegate = GetViewDelegateRef(m_currentTypeId);
+	const ICollectionViewDelegate& viewDelegate = GetViewDelegateRef(typeId);
+	const imtbase::ICollectionInfo& informationTypes = viewDelegate.GetSummaryInformationTypes();
+	QVector<QByteArray> informationTypesIds = informationTypes.GetElementIds();
+
+	QStringList headers;
+
+	for (int informationIndex = 0; informationIndex < informationTypesIds.count(); informationIndex++){
+		headers += informationTypes.GetElementInfo(informationTypesIds[informationIndex], imtbase::ICollectionInfo::EIT_NAME).toString();
+	}
+
+	return headers;
+}
+
+
+QStringList CObjectCollectionViewComp::getObjectMetaInfo(QByteArray itemId, QByteArray typeId)
+{
+	const ICollectionViewDelegate& viewDelegate = GetViewDelegateRef(typeId);
 	const imtbase::ICollectionInfo& informationTypes = viewDelegate.GetSummaryInformationTypes();
 	QVector<QByteArray> informationTypesIds = informationTypes.GetElementIds();
 	
-	m_itemModel.setColumnCount(1);
-	
-	for (int columnIndex = 0; columnIndex < informationTypesIds.count(); columnIndex++){
-		QList<QStandardItem*> columns;
-		for (int i = 0; i < m_itemModel.rowCount(); i++){
-			QByteArray itemId = m_itemModel.item(i, 0)->data(DR_OBJECT_ID).toByteArray();
+	QStringList informationsItems;
 
-			QVariant info = viewDelegate.GetSummaryInformation(itemId, informationTypesIds[columnIndex]);
+	for (int informationIndex = 0; informationIndex < informationTypesIds.count(); informationIndex++){
+		QVariant info = viewDelegate.GetSummaryInformation(itemId, informationTypesIds[informationIndex]);
 
-			switch (info.type()){
-			case QVariant::ByteArray:
-				columns.append(new QStandardItem(QString(info.toByteArray())));
-				break;
-			case QVariant::String:
-				columns.append(new QStandardItem(info.toString()));
-				break;
-			case QVariant::DateTime:
-				columns.append(new QStandardItem(info.toDateTime().toString("dd.MM.yyyy hh:mm:ss")));
-				break;
-			}
+		switch (info.type()){
+		case QVariant::ByteArray:
+			informationsItems.append(QString(info.toByteArray()));
+			break;
+		case QVariant::String:
+			informationsItems.append(info.toString());
+			break;
+		case QVariant::DateTime:
+			informationsItems.append(info.toDateTime().toString("dd.MM.yyyy hh:mm:ss"));
+			break;
+		default:
+			informationsItems.append(QString());
 		}
-
-		m_itemModel.appendColumn(columns);
 	}
 
-	QStringList headerLabelList;
-	headerLabelList.append(tr("Name"));
-	for (int columnIndex = 0; columnIndex < informationTypesIds.count(); columnIndex++){
-		QString label = informationTypes.GetElementInfo(informationTypesIds[columnIndex], imtbase::ICollectionInfo::EIT_NAME).toString();
-
-		headerLabelList.append(label);
-	}
-
-	m_itemModel.setHorizontalHeaderLabels(headerLabelList);
+	return informationsItems;
 }
 
 
@@ -295,7 +318,7 @@ void CObjectCollectionViewComp::OnItemChanged(QStandardItem* itemPtr)
 }
 
 
-void CObjectCollectionViewComp::OnDoubleClick(const QModelIndex &item)
+void CObjectCollectionViewComp::OnItemDoubleClick(const QModelIndex &item)
 {
 	int sourceRow = m_proxyModelPtr->mapToSource(item).row();
 	QByteArray itemId = m_itemModel.item(sourceRow, 0)->data(DR_OBJECT_ID).toByteArray();
@@ -306,8 +329,41 @@ void CObjectCollectionViewComp::OnDoubleClick(const QModelIndex &item)
 }
 
 
+//void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point)
+//{
+//	
+//
+//	QMenu menu(ItemList);
+//	menu.addAction(QIcon(":/Icons/Rename"), tr("Rename"),
+//				[](){
+//					;;
+//				});
+//	menu.addAction(QIcon(":/Icons/Edit"), tr("Edit"),
+//				[](){
+//					//for (const QByteArray& objectId : m_sele){
+//					//	OpenDocumentEditor(objectId);
+//					//};
+//				});
+//	menu.addAction(QIcon(":/Icons/Remove"), tr("Remove"),
+//				[](){
+//					;
+//				});
+//	menu.exec(ItemList->viewport()->mapToGlobal(point));
+//}
+
+
 void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 {
+	if (!m_blockHeaderSectionSizeStore && m_proxyModelPtr->rowCount()){
+		QList<int> headerSectionsSize;
+
+		for (int i = 0; i < m_itemModel.columnCount(); i++){
+			headerSectionsSize.append(ItemList->header()->sectionSize(i));
+		}
+
+		m_headerSectionSize[m_currentTypeId] = headerSectionsSize;
+	}
+
 	m_currentTypeId.clear();
 
 	QList<QTreeWidgetItem*> selectedItems = TypeList->selectedItems();
@@ -318,7 +374,29 @@ void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 	m_proxyModelPtr->setFilterFixedString(m_currentTypeId);
 
 	UpdateCommands();
-	UpdateMetaInfo();
+	
+	for (int i = 0; i < m_itemModel.columnCount(); i++){
+		if (i < m_headerLabel[m_currentTypeId].count()){
+			ItemList->showColumn(i);
+		}
+		else {
+			ItemList->hideColumn(i);
+		}
+	}
+
+	m_itemModel.setHorizontalHeaderLabels(m_headerLabel[m_currentTypeId]);
+
+	int columnCount = m_itemModel.columnCount();
+	if (m_headerSectionSize.contains(m_currentTypeId)){
+		for (int i = 0; i < columnCount; i++){
+			ItemList->setColumnWidth(i, m_headerSectionSize[m_currentTypeId][i]);
+		}
+	}
+	else{
+		for (int i = 0; i < columnCount; i++){
+			ItemList->resizeColumnToContents(i);
+		}
+	}
 }
 
 
