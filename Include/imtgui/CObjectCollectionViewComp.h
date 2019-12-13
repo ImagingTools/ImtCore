@@ -96,6 +96,9 @@ private:
 	QStringList GetTypeIdMetaHeader(const QByteArray &typeId);
 	QStringList GetObjectMetaInfo(const QByteArray &itemId, const QByteArray &typeId);
 
+	void StoreHeaderSectionSettings();
+	void RestoreHeaderSectionSettings();
+
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 	void OnItemChanged(QStandardItem *item);
@@ -129,8 +132,14 @@ private:
 
 	QSortFilterProxyModel* m_proxyModelPtr;
 
-	bool m_blockHeaderSectionSizeStore;
-	QMap<QByteArray, QList<int>> m_headerSectionSize;
+	bool m_blockHeaderSectionSettingsStore;
+
+	struct HeaderSectionSettings
+	{
+		int width;
+		int logicalIndex;
+	};
+	QMap<QByteArray, QList<HeaderSectionSettings>> m_headerSectionSettings;
 };
 
 

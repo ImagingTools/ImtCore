@@ -22,7 +22,7 @@ namespace imtgui
 // protected methods
 
 CObjectCollectionViewComp::CObjectCollectionViewComp()
-	:m_blockHeaderSectionSizeStore(false)
+	:m_blockHeaderSectionSettingsStore(false)
 {
 	m_commands.SetParent(this);
 }
@@ -65,7 +65,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	const imtbase::IObjectCollection* objectPtr = GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
 
-	m_blockHeaderSectionSizeStore = true;
+	m_blockHeaderSectionSettingsStore = true;
 
 	QByteArray lastTypeId = m_currentTypeId;
 
@@ -133,7 +133,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 
 	on_TypeList_itemSelectionChanged();
 
-	m_blockHeaderSectionSizeStore = false;
+	m_blockHeaderSectionSettingsStore = false;
 }
 
 
@@ -305,6 +305,43 @@ QStringList CObjectCollectionViewComp::GetObjectMetaInfo(const QByteArray &itemI
 }
 
 
+void CObjectCollectionViewComp::StoreHeaderSectionSettings()
+{
+	QList<HeaderSectionSettings> headerSectionSettings;
+
+	for (int i = 0; i < m_itemModel.columnCount(); i++){
+		HeaderSectionSettings settings;
+		settings.width = ItemList->header()->sectionSize(i);
+		settings.logicalIndex = ItemList->header()->logicalIndex(i);
+		headerSectionSettings.append(settings);
+	}
+
+	m_headerSectionSettings[m_currentTypeId] = headerSectionSettings;
+}
+
+
+void CObjectCollectionViewComp::RestoreHeaderSectionSettings()
+{
+	int columnCount = m_itemModel.columnCount();
+	if (m_headerSectionSettings.contains(m_currentTypeId)){
+		for (int i = 0; i < columnCount; i++){
+			ItemList->setColumnWidth(i, m_headerSectionSettings[m_currentTypeId][i].width);
+
+			int currentVisualIndex = ItemList->header()->visualIndex(m_headerSectionSettings[m_currentTypeId][i].logicalIndex);
+			ItemList->header()->moveSection(currentVisualIndex, i);
+		}
+	}
+	else{
+		for (int i = 0; i < columnCount; i++){
+			ItemList->resizeColumnToContents(i);
+
+			int currentVisualIndex = ItemList->header()->visualIndex(i);
+			ItemList->header()->moveSection(currentVisualIndex, i);
+		}
+	}
+}
+
+
 // private slots
 
 void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
@@ -360,14 +397,8 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 
 void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 {
-	if (!m_blockHeaderSectionSizeStore && m_proxyModelPtr->rowCount()){
-		QList<int> headerSectionsSize;
-
-		for (int i = 0; i < m_itemModel.columnCount(); i++){
-			headerSectionsSize.append(ItemList->header()->sectionSize(i));
-		}
-
-		m_headerSectionSize[m_currentTypeId] = headerSectionsSize;
+	if (!m_blockHeaderSectionSettingsStore && m_proxyModelPtr->rowCount()){
+		StoreHeaderSectionSettings();
 	}
 
 	m_currentTypeId.clear();
@@ -395,17 +426,7 @@ void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 		}
 	}
 
-	int columnCount = m_itemModel.columnCount();
-	if (m_headerSectionSize.contains(m_currentTypeId)){
-		for (int i = 0; i < columnCount; i++){
-			ItemList->setColumnWidth(i, m_headerSectionSize[m_currentTypeId][i]);
-		}
-	}
-	else{
-		for (int i = 0; i < columnCount; i++){
-			ItemList->resizeColumnToContents(i);
-		}
-	}
+	RestoreHeaderSectionSettings();
 }
 
 
