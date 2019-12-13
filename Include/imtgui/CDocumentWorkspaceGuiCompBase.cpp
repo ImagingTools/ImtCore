@@ -890,6 +890,36 @@ bool CDocumentWorkspaceGuiCompBase::DocumentList::IsOptionEnabled(int /*index*/)
 }
 
 
+// reimplemented (imtbase::IObjectCollectionInfo)
+
+const iprm::IOptionsList* CDocumentWorkspaceGuiCompBase::DocumentList::GetObjectTypesInfo() const
+{
+	return nullptr;
+}
+
+
+imtbase::ICollectionInfo::Id CDocumentWorkspaceGuiCompBase::DocumentList::GetObjectTypeId(const QByteArray& objectId) const
+{
+	Id retVal;
+
+	return retVal;
+}
+
+
+// reimplemented (imtbase::ICollectionInfo)
+
+imtbase::ICollectionInfo::Ids CDocumentWorkspaceGuiCompBase::DocumentList::GetElementIds() const
+{
+	return Ids();
+}
+
+
+QVariant CDocumentWorkspaceGuiCompBase::DocumentList::GetElementInfo(const QByteArray& elementId, int infoType) const
+{
+	return QVariant();
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CDocumentWorkspaceGuiCompBase::DocumentList::Serialize(iser::IArchive& /*archive*/)

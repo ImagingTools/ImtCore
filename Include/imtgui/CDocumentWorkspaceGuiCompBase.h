@@ -15,6 +15,7 @@
 #include <iqtdoc/TQtDocumentManagerWrap.h>
 
 // ImtCore includes
+#include <imtbase/IObjectCollectionInfo.h>
 #include <imtgui/IDocumentViewDecorator.h>
 #include <GeneratedFiles/imtgui/Ui_CDocumentWorkspaceGuiCompBase.h>
 
@@ -51,6 +52,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(DocumentList, imod::IModel, ExtractDocumentList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DocumentList, istd::IChangeable, ExtractDocumentList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DocumentList, iprm::IOptionsList, ExtractDocumentList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DocumentList, imtbase::ICollectionInfo, ExtractDocumentList);
 		I_REGISTER_SUBELEMENT(CurrentDocumentName);
 		I_REGISTER_SUBELEMENT_INTERFACE(CurrentDocumentName, iprm::INameParam, ExtractCurrentDocumentName);
 		I_REGISTER_SUBELEMENT_INTERFACE(CurrentDocumentName, imod::IModel, ExtractCurrentDocumentName);
@@ -151,7 +153,8 @@ protected Q_SLOTS:
 private:
 	class DocumentList:
 				virtual public iprm::ISelectionParam,
-				virtual public iprm::IOptionsList
+				virtual public iprm::IOptionsList,
+				virtual public imtbase::IObjectCollectionInfo
 	{
 	public:
 		DocumentList();
@@ -171,6 +174,14 @@ private:
 		virtual QString GetOptionDescription(int index) const;
 		virtual QByteArray GetOptionId(int index) const;
 		virtual bool IsOptionEnabled(int index) const;
+
+		// reimplemented (imtbase::IObjectCollectionInfo)
+		virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
+		virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
+
+		// reimplemented (imtbase::ICollectionInfo)
+		virtual Ids GetElementIds() const override;
+		virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
 
 		// reimplemented (iser::ISerializable)
 		virtual bool Serialize(iser::IArchive& archive);
