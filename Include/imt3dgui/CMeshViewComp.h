@@ -8,9 +8,8 @@
 #include <imt3dgui/CGridShape.h>
 #include <imt3dgui/CMeshShape.h>
 #include <imt3dgui/CRulerShape.h>
-#include <imt3dgui/CView3dProviderComp.h>
 #include <imt3dgui/CAxisShape.h>
-#include <imt3dgui/CTargetPointerShape.h>
+#include <imt3dgui/CView3dProviderComp.h>
 
 
 namespace imt3dgui

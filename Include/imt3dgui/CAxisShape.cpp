@@ -96,16 +96,17 @@ void CAxisShape::Draw(QPainter& painter)
 
 QFont CAxisShape::GetAxeLabelFont() const
 {
-	if (!m_cameraPtr){
+	if (m_cameraPtr == nullptr){
 		return QFont();
 	}
 
 	float fontSize = qAbs(s_zoomFontFactor / m_cameraPtr->GetPosition().z());
-	fontSize = qMin(fontSize, 10.0f);
+	fontSize = qMin(fontSize, 12.0f);
 
 	QFont font("Arial");
 	font.setPointSizeF(fontSize);
 	font.setBold(true);
+
 	return font;
 }
 

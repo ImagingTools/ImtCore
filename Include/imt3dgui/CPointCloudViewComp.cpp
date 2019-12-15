@@ -34,12 +34,6 @@ void CPointCloudViewComp::OnGuiCreated()
 		m_axisShape.SetAxisLength(3.0);
 		scenePtr->AddShapeToScene(&m_axisShape);
 
-		m_targetPointerShape.SetVisible(false);
-		scenePtr->AddShapeToScene(&m_targetPointerShape);
-
-		m_crossTargetShape.SetVisible(false);
-		scenePtr->AddShapeToScene(&m_crossTargetShape);
-
 		m_rulerShape.SetVisible(false);
 		m_rulerShape.SetSlaveShape(cloudShapePtr);
 		scenePtr->AddShapeToScene(&m_rulerShape);
@@ -53,8 +47,6 @@ void CPointCloudViewComp::OnGuiDestroyed()
 	if (scenePtr != NULL){
 		scenePtr->RemoveShapeFromScene(&m_gridShape);
 		scenePtr->RemoveShapeFromScene(&m_axisShape);
-		scenePtr->RemoveShapeFromScene(&m_targetPointerShape);
-		scenePtr->RemoveShapeFromScene(&m_crossTargetShape);
 		scenePtr->RemoveShapeFromScene(&m_rulerShape);
 
 		CPointCloudShape* cloudShapePtr = dynamic_cast<CPointCloudShape*>(this);
@@ -189,24 +181,6 @@ void CPointCloudViewComp::OnSaveSettings(QSettings& settings) const
 
 	settings.setValue("ShowGrid", m_gridShape.IsVisible());
 	settings.setValue("ShowAxis", m_axisShape.IsVisible());
-}
-
-
-// reimplemented (imt3dview::ITargetPointer)
-
-void CPointCloudViewComp::SetTargetPointer(QVector3D vectorFrom, QVector3D vectorTo)
-{
-	bool isExists = (vectorTo - vectorFrom).length() > 0.001;
-
-	m_crossTargetShape.SetVisible(isExists);
-	m_targetPointerShape.SetVisible(isExists);
-
-	if (isExists){
-		m_targetPointerShape.SetFromPoint(vectorFrom);
-		m_targetPointerShape.SetToPoint(vectorTo);
-		m_crossTargetShape.SetPosition(vectorTo);
-		m_crossTargetShape.SetRotation(QQuaternion::fromDirection(vectorTo - vectorFrom, QVector3D(0.0, 1.0, 0.0)));
-	}
 }
 
 
