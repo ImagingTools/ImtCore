@@ -17,7 +17,6 @@ namespace imt3dgui
 
 
 class CMeshViewComp: public iqtgui::TGuiObserverWrap<CView3dProviderComp, CMeshShape>
-
 {
 public:
 	typedef iqtgui::TGuiObserverWrap<CView3dProviderComp, CMeshShape> BaseClass;

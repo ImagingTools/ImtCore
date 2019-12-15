@@ -13,8 +13,8 @@
 // ImtCore includes
 #include <imt3dview/IScene3dProvider.h>
 #include <imt3dview/IScene3dCamera.h>
-#include <imt3dgui/COpenGLWidget.h>
 #include <imt3dgui/ISceneEventHandler.h>
+#include <imt3dgui/COpenGLWidget.h>
 
 
 namespace imt3dgui
@@ -23,9 +23,9 @@ namespace imt3dgui
 
 class CView3dProviderComp:
 			public iqtgui::TRestorableGuiWrap<iqtgui::TGuiComponentBase<COpenGLWidget>>,
-			public ibase::ICommandsProvider,
-			public imt3dview::IScene3dProvider,
-			public ISceneEventHandler
+			virtual public ibase::ICommandsProvider,
+			virtual public imt3dview::IScene3dProvider,
+			virtual public ISceneEventHandler
 {
 	Q_OBJECT
 
@@ -54,6 +54,9 @@ public:
 		I_ASSIGN(m_showShowGridCommandAttrPtr, "ShowShowGridCommand", "Enable command for shoe/hide grid", true, false);
 		I_ASSIGN(m_showShowAxisCommandAttrPtr, "ShowShowAxisCommands", "Enable command for shoe/hide axis", true, false);
 		I_ASSIGN(m_showViewCommandsAttrPtr, "ShowViewCommands", "Show view commands", true, true);
+		I_ASSIGN(m_showViewModeCommandsAttrPtr, "ShowViewModeCommands", "Show view mode commands", true, false);
+		I_ASSIGN(m_showRotationModeCommandsAttrPtr, "ShowRotationModeCommands", "Show rotation mode commands", true, false);
+		I_ASSIGN(m_showViewpointCommandsAttrPtr, "ShowViewpointCommands", "Show view point commands", true, false);
 		I_ASSIGN(m_showZoomCommandsAttrPtr, "ShowZoomCommands", "Show zoom-in/zoom-out commands", true, true);
 		I_ASSIGN(m_cameraCompPtr, "Camera", "Camera", true, "Camera");
 	I_END_COMPONENT
@@ -190,6 +193,9 @@ private:
 	I_ATTR(bool, m_showShowGridCommandAttrPtr);
 	I_ATTR(bool, m_showShowAxisCommandAttrPtr);
 	I_ATTR(bool, m_showViewCommandsAttrPtr);
+	I_ATTR(bool, m_showViewModeCommandsAttrPtr);
+	I_ATTR(bool, m_showRotationModeCommandsAttrPtr);
+	I_ATTR(bool, m_showViewpointCommandsAttrPtr);
 	I_ATTR(bool, m_showZoomCommandsAttrPtr);
 	I_REF(imt3dview::IScene3dCamera, m_cameraCompPtr);
 };

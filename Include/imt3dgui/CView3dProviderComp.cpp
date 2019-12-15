@@ -44,7 +44,7 @@ CView3dProviderComp::CView3dProviderComp()
 	m_rotationAroundXCommand("Rotation around X", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_ROTATION),
 	m_rotationAroundYCommand("Rotation around Y", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_ROTATION),
 	m_rotationAroundZCommand("Rotation around Z", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_ROTATION),
-	m_viewModeCommand("View", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_VIEW_MODE),
+	m_viewModeCommand("View Mode", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_VIEW_MODE),
 	m_selectionModeCommand("Selection", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_VIEW_MODE)
 {
 	connect(&m_zoomInCommand, SIGNAL(triggered()), this, SLOT(OnZoomIn()));
@@ -245,20 +245,28 @@ void CView3dProviderComp::OnGuiCreated()
 	m_viewCommands.InsertChild(&m_showRulerCommand);
 
 	if (*m_showViewCommandsAttrPtr){
-		m_viewCommands.InsertChild(&m_viewModeCommand);
-		m_viewCommands.InsertChild(&m_selectionModeCommand);
-		m_viewCommands.InsertChild(&m_rotationCommands);
-		m_rotationCommands.InsertChild(&m_freeRotationCommand);
-		m_rotationCommands.InsertChild(&m_rotationAroundXCommand);
-		m_rotationCommands.InsertChild(&m_rotationAroundYCommand);
-		m_rotationCommands.InsertChild(&m_rotationAroundZCommand);
-		m_viewCommands.InsertChild(&m_resetViewCommand);
-		m_viewCommands.InsertChild(&m_setViewFromRightCommand);
-		m_viewCommands.InsertChild(&m_setViewFromFrontCommand);
-		m_viewCommands.InsertChild(&m_setViewFromTopCommand);
-		m_viewCommands.InsertChild(&m_setViewFromLeftCommand);
-		m_viewCommands.InsertChild(&m_setViewFromBottomCommand);
-		m_viewCommands.InsertChild(&m_setViewFromBackCommand);
+		if (*m_showViewModeCommandsAttrPtr){
+			m_viewCommands.InsertChild(&m_viewModeCommand);
+			m_viewCommands.InsertChild(&m_selectionModeCommand);
+		}
+
+		if (*m_showRotationModeCommandsAttrPtr){
+			m_viewCommands.InsertChild(&m_rotationCommands);
+			m_rotationCommands.InsertChild(&m_freeRotationCommand);
+			m_rotationCommands.InsertChild(&m_rotationAroundXCommand);
+			m_rotationCommands.InsertChild(&m_rotationAroundYCommand);
+			m_rotationCommands.InsertChild(&m_rotationAroundZCommand);
+		}
+
+		if (*m_showViewpointCommandsAttrPtr){
+			m_viewCommands.InsertChild(&m_resetViewCommand);
+			m_viewCommands.InsertChild(&m_setViewFromRightCommand);
+			m_viewCommands.InsertChild(&m_setViewFromFrontCommand);
+			m_viewCommands.InsertChild(&m_setViewFromTopCommand);
+			m_viewCommands.InsertChild(&m_setViewFromLeftCommand);
+			m_viewCommands.InsertChild(&m_setViewFromBottomCommand);
+			m_viewCommands.InsertChild(&m_setViewFromBackCommand);
+		}
 
 		m_viewModeCommand.setChecked(true);
 		m_freeRotationCommand.setChecked(true);

@@ -168,6 +168,10 @@ void CRulerShape::Draw(QPainter& painter)
 		return;
 	}
 
+	if (m_vertices.count() < 2){
+		return;
+	}
+
 	QVector3D pos3d1 = m_vertices[0].position / m_slaveShapePtr->GetScale();
 	QVector3D pos3d2 = m_vertices[1].position / m_slaveShapePtr->GetScale();
 	float distance = qAbs(pos3d1.distanceToPoint(pos3d2));
