@@ -144,6 +144,9 @@ int CObjPointCloudPersistenceComp::SaveToFile(const istd::IChangeable& data, con
 		case IPointsBasedObject::PF_XYZW_NORMAL_32:
 			SaveToFileHelper<IPointsBasedObject::PointXyzwNormal32>(*documentPtr, stream);
 			break;
+		case IPointsBasedObject::PF_XYZW_RGBA_32:
+			SaveToFileHelper<IPointsBasedObject::PointXyzwRgba32>(*documentPtr, stream);
+			break;
 	}
 
 	return OS_OK;

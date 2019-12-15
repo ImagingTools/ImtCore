@@ -17,7 +17,7 @@ namespace imt3dgui
 
 // static members
 
-const QVector3D CPointCloudShape::s_selectionColor(0.0, 0.0, 0.0);
+const QVector3D CPointCloudShape::s_selectionColor(0.8, 0.8, 0.0);
 
 
 // public methods
@@ -144,6 +144,8 @@ void CPointCloudShape::DeleteSelection()
 			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*pointCloudPtr);
 		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_32:
 			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*pointCloudPtr);
+		case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
+			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*pointCloudPtr);
 	}
 }
 
@@ -170,6 +172,8 @@ void CPointCloudShape::UpdateShapeGeometry()
 			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*pointCloudPtr);
 		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_32:
 			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*pointCloudPtr);
+		case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*pointCloudPtr);
 	}
 }
 
@@ -265,6 +269,8 @@ void CPointCloudShape::UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& poi
 	m_vertices.reserve(pointCloudSize);
 	m_indices.reserve(pointCloudSize);
 
+	imt3d::IPointsBasedObject::PointFormat format = pointCloud.GetPointFormat();
+
 	// update vertices
 	for (int i = 0; i < pointCloudSize; ++i){
 		const PointType* pointDataPtr = static_cast<const PointType*>(pointCloud.GetPointData(i));
@@ -278,7 +284,18 @@ void CPointCloudShape::UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& poi
 			continue;
 		}
 
-		m_vertices.push_back(Vertex(QVector3D(x, y, z), QVector3D(), m_color));
+
+		QVector3D color = m_color;
+
+		if (format == imt3d::IPointsBasedObject::PF_XYZW_RGBA_32){
+			float r = static_cast<float>(pointDataPtr->data[4]);
+			float g = static_cast<float>(pointDataPtr->data[5]);
+			float b = static_cast<float>(pointDataPtr->data[6]);
+
+			color = QVector3D(r, g, b);
+		}
+
+		m_vertices.push_back(Vertex(QVector3D(x, y, z), QVector3D(), color));
 		m_indices.push_back(m_indices.size());
 	}
 }

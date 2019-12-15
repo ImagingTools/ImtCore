@@ -100,6 +100,8 @@ void CPointsBasedObject::MoveCenterTo(const i3d::CVector3d& position)
 			return TMoveCenterTo<PointXyzAbc32>(position);
 		case IPointsBasedObject::PF_XYZW_NORMAL_32:
 			return TMoveCenterTo<IPointsBasedObject::PointXyzwNormal32>(position);
+		case IPointsBasedObject::PF_XYZW_RGBA_32:
+			return TMoveCenterTo<IPointsBasedObject::PointXyzwRgba32>(position);
 	}
 }
 
@@ -291,6 +293,8 @@ int CPointsBasedObject::GetDataSize() const
 			return m_pointsCount * sizeof(PointXyzAbc32);
 		case IPointsBasedObject::PF_XYZW_NORMAL_32:
 			return m_pointsCount * sizeof(PointXyzwNormal32);
+		case IPointsBasedObject::PF_XYZW_RGBA_32:
+			return m_pointsCount * sizeof(PointXyzwRgba32);
 		default:
 			return 0;
 	}
@@ -310,6 +314,8 @@ void CPointsBasedObject::AllocateData()
 			return TAllocateData<PointXyzAbc32>();
 		case IPointsBasedObject::PF_XYZW_NORMAL_32:
 			return TAllocateData<PointXyzwNormal32>();
+		case IPointsBasedObject::PF_XYZW_RGBA_32:
+			return TAllocateData<PointXyzwRgba32>();
 	}
 }
 
@@ -341,6 +347,8 @@ void CPointsBasedObject::FreeData()
 			return TFreeData<PointXyzAbc32>();
 		case IPointsBasedObject::PF_XYZW_NORMAL_32:
 			return TFreeData<PointXyzwNormal32>();
+		case IPointsBasedObject::PF_XYZW_RGBA_32:
+			return TFreeData<PointXyzwRgba32>();
 	}
 }
 
@@ -378,6 +386,8 @@ void CPointsBasedObject::EnsureCenterCalculated() const
 			return TEnsureCenterCalculated<PointXyzAbc32>();
 		case IPointsBasedObject::PF_XYZW_NORMAL_32:
 			return TEnsureCenterCalculated<PointXyzwNormal32>();
+		case IPointsBasedObject::PF_XYZW_RGBA_32:
+			return TEnsureCenterCalculated<PointXyzwRgba32>();
 	}
 }
 
@@ -414,6 +424,8 @@ void CPointsBasedObject::EnsureCuboidCalculated() const
 			return TEnsureCuboidCalculated<PointXyzAbc32>();
 		case IPointsBasedObject::PF_XYZW_NORMAL_32:
 			return TEnsureCuboidCalculated<PointXyzwNormal32>();
+		case IPointsBasedObject::PF_XYZW_RGBA_32:
+			return TEnsureCuboidCalculated<PointXyzwRgba32>();
 	}
 }
 

@@ -131,6 +131,8 @@ void CMeshShape::DeleteSelection()
 			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*meshPtr);
 		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_32:
 			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*meshPtr);
+		case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
+			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*meshPtr);
 	}
 }
 
@@ -157,6 +159,8 @@ void CMeshShape::UpdateShapeGeometry()
 			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*meshPtr);
 		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_32:
 			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*meshPtr);
+		case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*meshPtr);
 	}
 }
 
@@ -238,6 +242,8 @@ void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh)
 		return;
 	}
 
+	imt3d::IPointsBasedObject::PointFormat format = mesh.GetPointFormat();
+
 	// update vertices and normals
 	for (int i = 0; i < meshSize; ++i){
 		const PointType* pointDataPtr = static_cast<const PointType*>(mesh.GetPointData(i));
@@ -251,9 +257,20 @@ void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh)
 		float normalY = static_cast<float>(pointDataPtr->data[5]);
 		float normalZ = static_cast<float>(pointDataPtr->data[6]);
 
-		m_vertices.push_back(Vertex(QVector3D(positionX, positionY, positionZ),
-				QVector3D(normalX, normalY, normalZ),
-				m_color));
+		QVector3D color = m_color;
+
+		if (format == imt3d::IPointsBasedObject::PF_XYZW_RGBA_32){
+			float r = static_cast<float>(pointDataPtr->data[4]);
+			float g = static_cast<float>(pointDataPtr->data[5]);
+			float b = static_cast<float>(pointDataPtr->data[6]);
+
+			color = QVector3D(r, g, b);
+		}
+
+		m_vertices.push_back(Vertex(
+					QVector3D(positionX, positionY, positionZ),
+					QVector3D(normalX, normalY, normalZ),
+					color));
 	}
 
 	// update indices

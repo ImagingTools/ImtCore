@@ -21,10 +21,11 @@ public:
 		PF_XYZ_64,			// 3 double point coordinates
 		PF_XYZ_ABC_32,		// position data (XYZ) and Euler angles (ABC) in radians, both as 32-bit float number
 		PF_XYZW_32,			// 4 float point coordinates (homogeneous point coordinates)
-		PF_XYZW_NORMAL_32	// 4 float point coordinates + 4 float normal coordinates + 4 float curvature
+		PF_XYZW_NORMAL_32,	// 4 float point coordinates + 4 float normal coordinates + 4 float curvature
+		PF_XYZW_RGBA_32		// 4 float point coordinates + color information as 32-bit float number
 	};
 
-	I_DECLARE_ENUM(PointFormat, PF_XYZ_32, PF_XYZ_64, PF_XYZ_ABC_32, PF_XYZW_32, PF_XYZW_NORMAL_32);
+	I_DECLARE_ENUM(PointFormat, PF_XYZ_32, PF_XYZ_64, PF_XYZ_ABC_32, PF_XYZW_32, PF_XYZW_NORMAL_32, PF_XYZW_RGBA_32);
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -49,6 +50,7 @@ public:
 	typedef Point<float, 16, 0, 0, 0, 0, 0, 0> PointXyzAbc32;
 	typedef Point<float, 16, 0, 0, 0, 1> PointXyzw32;
 	typedef Point<float, 16, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0> PointXyzwNormal32;
+	typedef Point<float, 16, 0, 0, 0, 1, 0, 1, 0, 1> PointXyzwRgba32;
 
 	/**
 		Get point format.

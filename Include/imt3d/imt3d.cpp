@@ -71,6 +71,8 @@ bool ConvertPointCloudToDepthBitmap(const IPointCloud3d& pointCloud, IDepthBitma
 			return ConvertPointCloudToDepthBitmap<IPointsBasedObject::PointXyzAbc32>(pointCloud, bitmap);
 		case IPointsBasedObject::PF_XYZW_NORMAL_32:
 			return ConvertPointCloudToDepthBitmap<IPointsBasedObject::PointXyzwNormal32>(pointCloud, bitmap);
+		case IPointsBasedObject::PF_XYZW_RGBA_32:
+			return ConvertPointCloudToDepthBitmap<IPointsBasedObject::PointXyzwRgba32>(pointCloud, bitmap);
 		default:
 			return false;
 	}
