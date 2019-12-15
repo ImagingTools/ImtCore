@@ -58,6 +58,8 @@ const void* CPointsBasedObject::GetPointData(int pointIndex) const
 			return TGetPointData<PointXyzAbc32>(pointIndex);
 		case IPointsBasedObject::PF_XYZW_NORMAL_32:
 			return TGetPointData<IPointsBasedObject::PointXyzwNormal32>(pointIndex);
+		case IPointsBasedObject::PF_XYZW_RGBA_32:
+			return TGetPointData<IPointsBasedObject::PointXyzwRgba32>(pointIndex);
 		default:
 			return nullptr;
 	}
