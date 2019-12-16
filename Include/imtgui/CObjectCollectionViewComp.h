@@ -23,13 +23,12 @@ namespace imtgui
 
 
 class CObjectCollectionViewComp:
-			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>
+			public iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiObserverCompBase<Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>
+			
 {
 	Q_OBJECT
 public:
-	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CObjectCollectionViewComp, imtbase::IObjectCollection> BaseClass;
+	typedef iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiObserverCompBase<Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>> BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
 		I_REGISTER_SUBELEMENT(Commands);
@@ -93,11 +92,13 @@ protected:
 
 private:
 	void UpdateCommands();
-	QStringList GetTypeIdMetaHeader(const QByteArray &typeId);
+
+	QVector<QByteArray> GetMetaInfoIds(const QByteArray &typeId);
+	QStringList GetMetaInfoHeaders(const QByteArray &typeId);
 	QStringList GetObjectMetaInfo(const QByteArray &itemId, const QByteArray &typeId);
 
-	void StoreHeaderSectionSettings();
-	void RestoreHeaderSectionSettings();
+	void SaveColumnSettings();
+	void RestoreColumnSettings();
 
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
@@ -132,14 +133,11 @@ private:
 
 	QSortFilterProxyModel* m_proxyModelPtr;
 
-	bool m_blockHeaderSectionSettingsStore;
+	bool m_blockColumnSettingsSave;
 
-	struct HeaderSectionSettings
-	{
-		int width;
-		int logicalIndex;
-	};
-	QMap<QByteArray, QList<HeaderSectionSettings>> m_headerSectionSettings;
+	typedef QMap<QString, QVariant> ColumnSettings;
+	typedef QVector<ColumnSettings> ColumnList;
+	QMap<QByteArray, ColumnList> m_itemViewProperties;
 };
 
 
