@@ -56,8 +56,10 @@ const void* CPointsBasedObject::GetPointData(int pointIndex) const
 			return TGetPointData<PointXyzw32>(pointIndex);
 		case IPointsBasedObject::PF_XYZ_ABC_32:
 			return TGetPointData<PointXyzAbc32>(pointIndex);
-		case IPointsBasedObject::PF_XYZW_NORMAL_32:
+		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 			return TGetPointData<IPointsBasedObject::PointXyzwNormal32>(pointIndex);
+		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
+			return TGetPointData<IPointsBasedObject::PointXyzwNormalRgba32>(pointIndex);
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
 			return TGetPointData<IPointsBasedObject::PointXyzwRgba32>(pointIndex);
 		default:
@@ -100,8 +102,10 @@ void CPointsBasedObject::MoveCenterTo(const i3d::CVector3d& position)
 			return TMoveCenterTo<PointXyzw32>(position);
 		case IPointsBasedObject::PF_XYZ_ABC_32:
 			return TMoveCenterTo<PointXyzAbc32>(position);
-		case IPointsBasedObject::PF_XYZW_NORMAL_32:
+		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 			return TMoveCenterTo<IPointsBasedObject::PointXyzwNormal32>(position);
+		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
+			return TMoveCenterTo<IPointsBasedObject::PointXyzwNormalRgba32>(position);
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
 			return TMoveCenterTo<IPointsBasedObject::PointXyzwRgba32>(position);
 	}
@@ -293,8 +297,10 @@ int CPointsBasedObject::GetDataSize() const
 			return m_pointsCount * sizeof(PointXyzw32);
 		case IPointsBasedObject::PF_XYZ_ABC_32:
 			return m_pointsCount * sizeof(PointXyzAbc32);
-		case IPointsBasedObject::PF_XYZW_NORMAL_32:
+		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 			return m_pointsCount * sizeof(PointXyzwNormal32);
+		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
+			return m_pointsCount * sizeof(PointXyzwNormalRgba32);
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
 			return m_pointsCount * sizeof(PointXyzwRgba32);
 		default:
@@ -314,8 +320,10 @@ void CPointsBasedObject::AllocateData()
 			return TAllocateData<PointXyzw32>();
 		case IPointsBasedObject::PF_XYZ_ABC_32:
 			return TAllocateData<PointXyzAbc32>();
-		case IPointsBasedObject::PF_XYZW_NORMAL_32:
+		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 			return TAllocateData<PointXyzwNormal32>();
+		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
+			return TAllocateData<PointXyzwNormalRgba32>();
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
 			return TAllocateData<PointXyzwRgba32>();
 	}
@@ -347,8 +355,10 @@ void CPointsBasedObject::FreeData()
 			return TFreeData<PointXyzw32>();
 		case IPointsBasedObject::PF_XYZ_ABC_32:
 			return TFreeData<PointXyzAbc32>();
-		case IPointsBasedObject::PF_XYZW_NORMAL_32:
+		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 			return TFreeData<PointXyzwNormal32>();
+		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
+			return TFreeData<PointXyzwNormalRgba32>();
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
 			return TFreeData<PointXyzwRgba32>();
 	}
@@ -386,8 +396,10 @@ void CPointsBasedObject::EnsureCenterCalculated() const
 			return TEnsureCenterCalculated<PointXyzw32>();
 		case IPointsBasedObject::PF_XYZ_ABC_32:
 			return TEnsureCenterCalculated<PointXyzAbc32>();
-		case IPointsBasedObject::PF_XYZW_NORMAL_32:
+		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 			return TEnsureCenterCalculated<PointXyzwNormal32>();
+		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
+			return TEnsureCenterCalculated<PointXyzwNormalRgba32>();
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
 			return TEnsureCenterCalculated<PointXyzwRgba32>();
 	}
@@ -424,8 +436,10 @@ void CPointsBasedObject::EnsureCuboidCalculated() const
 			return TEnsureCuboidCalculated<PointXyzw32>();
 		case IPointsBasedObject::PF_XYZ_ABC_32:
 			return TEnsureCuboidCalculated<PointXyzAbc32>();
-		case IPointsBasedObject::PF_XYZW_NORMAL_32:
+		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 			return TEnsureCuboidCalculated<PointXyzwNormal32>();
+		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
+			return TEnsureCuboidCalculated<PointXyzwNormalRgba32>();
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
 			return TEnsureCuboidCalculated<PointXyzwRgba32>();
 	}

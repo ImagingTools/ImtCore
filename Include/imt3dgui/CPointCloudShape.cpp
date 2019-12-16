@@ -142,8 +142,10 @@ void CPointCloudShape::DeleteSelection()
 			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzw32>(*pointCloudPtr);
 		case imt3d::IPointsBasedObject::PF_XYZ_ABC_32:
 			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*pointCloudPtr);
-		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_32:
+		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*pointCloudPtr);
+		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
+			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzwNormalRgba32>(*pointCloudPtr);
 		case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
 			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*pointCloudPtr);
 	}
@@ -170,7 +172,9 @@ void CPointCloudShape::UpdateShapeGeometry()
 			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzw32>(*pointCloudPtr);
 		case imt3d::IPointsBasedObject::PF_XYZ_ABC_32:
 			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*pointCloudPtr);
-		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_32:
+		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*pointCloudPtr);
+		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
 			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*pointCloudPtr);
 		case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
 			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*pointCloudPtr);

@@ -132,18 +132,27 @@ int CObjPointCloudPersistenceComp::SaveToFile(const istd::IChangeable& data, con
 		case IPointsBasedObject::PF_XYZ_32:
 			SaveToFileHelper<IPointsBasedObject::PointXyz32>(*documentPtr, stream);
 			break;
+
 		case IPointsBasedObject::PF_XYZ_64:
 			SaveToFileHelper<IPointsBasedObject::PointXyz64>(*documentPtr, stream);
 			break;
+
 		case IPointsBasedObject::PF_XYZW_32:
 			SaveToFileHelper<IPointsBasedObject::PointXyzw32>(*documentPtr, stream);
 			break;
+
 		case IPointsBasedObject::PF_XYZ_ABC_32:
 			SaveToFileHelper<IPointsBasedObject::PointXyzAbc32>(*documentPtr, stream);
 			break;
-		case IPointsBasedObject::PF_XYZW_NORMAL_32:
-			SaveToFileHelper<IPointsBasedObject::PointXyzwNormal32>(*documentPtr, stream);
+
+		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
+			SaveToFileHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*documentPtr, stream);
 			break;
+
+		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
+			SaveToFileHelper<imt3d::IPointsBasedObject::PointXyzwNormalRgba32>(*documentPtr, stream);
+			break;
+
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
 			SaveToFileHelper<IPointsBasedObject::PointXyzwRgba32>(*documentPtr, stream);
 			break;

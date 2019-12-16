@@ -129,8 +129,10 @@ void CMeshShape::DeleteSelection()
 			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzw32>(*meshPtr);
 		case imt3d::IPointsBasedObject::PF_XYZ_ABC_32:
 			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*meshPtr);
-		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_32:
+		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*meshPtr);
+		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
+			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzwNormalRgba32>(*meshPtr);
 		case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
 			return DeleteSelectionHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*meshPtr);
 	}
@@ -157,8 +159,10 @@ void CMeshShape::UpdateShapeGeometry()
 			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzw32>(*meshPtr);
 		case imt3d::IPointsBasedObject::PF_XYZ_ABC_32:
 			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*meshPtr);
-		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_32:
+		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*meshPtr);
+		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormalRgba32>(*meshPtr);
 		case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
 			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*meshPtr);
 	}
@@ -208,11 +212,13 @@ QVector3D CMeshShape::GetColor() const
 bool CMeshShape::HasNormals() const
 {
 	imt3d::IMesh3d* meshPtr = dynamic_cast<imt3d::IMesh3d*>(GetObservedModel());
-	if (!meshPtr){
+	if (meshPtr == nullptr){
 		return false;
 	}
 
-	return meshPtr->GetPointFormat() == imt3d::IPointsBasedObject::PF_XYZW_NORMAL_32;
+	imt3d::IPointsBasedObject::PointFormat format = meshPtr->GetPointFormat();
+
+	return (format == imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32) || (format == imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32);
 }
 
 
@@ -266,12 +272,19 @@ void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh)
 
 			color = QVector3D(r, g, b);
 		}
+		else if (format == imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32){
+			float r = static_cast<float>(pointDataPtr->data[8]);
+			float g = static_cast<float>(pointDataPtr->data[9]);
+			float b = static_cast<float>(pointDataPtr->data[10]);
+
+			color = QVector3D(r, g, b);
+		}
 
 		m_vertices.push_back(Vertex(
 					QVector3D(positionX, positionY, positionZ),
 					QVector3D(normalX, normalY, normalZ),
 					color));
-	}
+		}
 
 	// update indices
 	m_indices.clear();

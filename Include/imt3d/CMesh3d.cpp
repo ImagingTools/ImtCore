@@ -18,7 +18,7 @@ namespace imt3d
 bool CMesh3d::SaveToStlFile(const QString& filePath) const
 {
 	switch (m_pointFormat){
-		case IPointsBasedObject::PF_XYZW_NORMAL_32:
+		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 			return SaveToStlFile<IPointsBasedObject::PointXyzwNormal32>(filePath);
 		default:
 			// STL file format assumes the presence of normals
@@ -96,7 +96,7 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath, bool ensureNormalExists)
 		file.read(sizeof(quint16));
 	}
 
-	return Create(IPointsBasedObject::PF_XYZW_NORMAL_32, pointsCount, pointsDataPtr, true);
+	return Create(IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32, pointsCount, pointsDataPtr, true);
 }
 
 
