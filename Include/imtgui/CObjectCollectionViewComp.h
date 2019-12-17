@@ -90,15 +90,33 @@ protected:
 		return &component.m_commands;
 	}
 
+	class QCustomSortFilterProxyModel: public QSortFilterProxyModel
+	{
+		QString m_filter;
+
+	public:
+		QCustomSortFilterProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent)
+		{
+		}
+
+		void setFilter(const QString &filter)
+		{
+			m_filter = filter;
+		}
+
+	protected:
+		virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+	};
+
 private:
 	void UpdateCommands();
 
-	QVector<QByteArray> GetMetaInfoIds(const QByteArray &typeId);
-	QStringList GetMetaInfoHeaders(const QByteArray &typeId);
-	QStringList GetObjectMetaInfo(const QByteArray &itemId, const QByteArray &typeId);
+	QVector<QByteArray> GetMetaInfoIds(const QByteArray &typeId) const;
+	QStringList GetMetaInfoHeaders(const QByteArray &typeId) const;
+	QStringList GetObjectMetaInfo(const QByteArray &itemId, const QByteArray &typeId) const;
 
-	void SaveColumnSettings();
-	void RestoreColumnSettings();
+	void EnsureColumnsSettingsSynchronized() const;
+	void RestoreColumnsSettings();
 
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
@@ -110,6 +128,8 @@ private Q_SLOTS:
 	void OnContextMenuRename(bool checked);
 	void OnContextMenuEdit(bool checked);
 	void OnContextMenuRemove(bool checked);
+
+	void OnFilterChanged(const QString &text);
 
 private:
 	QStandardItemModel m_itemModel;
@@ -130,14 +150,16 @@ private:
 	QByteArray m_currentTypeId;
 
 	imod::TModelWrap<Commands> m_commands;
-
+	
 	QSortFilterProxyModel* m_proxyModelPtr;
+	QCustomSortFilterProxyModel* m_customProxyModelPtr;
 
-	bool m_blockColumnSettingsSave;
+	bool m_blockColumnsSettingsSynchronize;
 
 	typedef QMap<QString, QVariant> ColumnSettings;
-	typedef QVector<ColumnSettings> ColumnList;
-	QMap<QByteArray, ColumnList> m_itemViewProperties;
+	typedef QVector<ColumnSettings> ColumnsList;
+	typedef QMap<QString, ColumnsList> TypeIdColumnsSettings;
+	mutable TypeIdColumnsSettings m_typeIdColumnsSettings;
 };
 
 
