@@ -8,10 +8,6 @@
 #include <QtWidgets/QMessageBox>
 #include <QLineEdit>
 #include <QInputDialog>
-#include <qjsondocument.h>
-#include <qjsonobject.h>
-#include <qjsonvalue.h>
-#include <qjsonarray.h>
 
 // ACF includes
 #include <idoc/IDocumentMetaInfo.h>
@@ -26,7 +22,7 @@ namespace imtgui
 // protected methods
 
 CObjectCollectionViewComp::CObjectCollectionViewComp()
-	:m_blockColumnsSettingsSynchronize(false)
+	:m_blockColumnSettingsSave(false)
 {
 	m_commands.SetParent(this);
 }
@@ -54,111 +50,81 @@ const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const 
 
 void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 {
-	if (!settings.contains("ObjectCollectionViewColumns/Data")){
-		return;
-	}
+	//if (!settings.childGroups().contains("ObjectCollectionViewColumns")){
+	//	return;
+	//}
 
-	QVariant varData = settings.value("ObjectCollectionViewColumns/Data");
-	if (varData.type() != QVariant::ByteArray){
-		return;
-	}
+	//settings.beginGroup("ObjectCollectionViewColumns");
 
-	QByteArray data = varData.toByteArray();
-	QJsonParseError error;
-	QJsonDocument jsonDocument = QJsonDocument::fromJson(data, &error);
+	//QSettings &nonConstSettings	= const_cast<QSettings &>(settings);
+	//nonConstSettings.beginGroup("ObjectCollectionViewColumns");
 
-	if (jsonDocument.isNull()){
-		return;
-	}
+	//
+	//
+	//QDataStream stream(&dataByteArray, QIODevice::ReadOnly);
 
-	TypeIdColumnsSettings typeIdColumnsSettings;
-	
-	QJsonArray jsonTypeIds = jsonDocument.array();
-	if (jsonTypeIds.isEmpty()){
-		return;
-	}
+	//// Count of typeId's
+	//int typeIdCount;
+	//stream >> typeIdCount;
 
-	for (int typeIdIndex = 0; typeIdIndex < jsonTypeIds.count(); typeIdIndex++){
-		QJsonObject jsonTypeId = jsonTypeIds[typeIdIndex].toObject();
-		if (jsonTypeId.isEmpty()){
-			return;
-		}
+	//for (int typeIdCounter = 0; typeIdCounter < typeIdCount; typeIdCounter++){
+	//	// Size and data of typeId
+	//	int  typeIdSize;
+	//	stream >> typeIdSize;
 
-		QByteArray typeId = jsonTypeId.value("TypeId").toVariant().toByteArray();
-		if (typeId.isEmpty()){
-			return;
-		}
+	//	QByteArray typeId(typeIdSize, 0);
+	//	stream >> typeId;
 
-		ColumnsList columnsList;
+	//	// Count of header section	
+	//	int sectionCount;
+	//	stream >> sectionCount;
 
-		QJsonArray jsonColumns = jsonTypeId.value("Columns").toArray();
-		if (jsonColumns.isEmpty()){
-			return;
-		}
+	//	QVector<HeaderSectionSettings> sectionList;
 
-		for (int columnIndex = 0; columnIndex < jsonColumns.count(); columnIndex++){
-			QJsonObject jsonColumn = jsonColumns[columnIndex].toObject();
-			if (jsonColumn.isEmpty()){
-				return;
-			}
-
-			ColumnSettings columnSettings;
-
-			QStringList keys = jsonColumn.keys();
-			for (QString key : keys) {
-				QVariant variant = jsonColumn[key].toVariant();
-				if (!variant.isValid()){
-					return;
-				}
-
-				columnSettings[key] = variant;
-			}
-
-			columnsList.append(columnSettings);
-		}
-
-		typeIdColumnsSettings[typeId] = columnsList;
-	}
-
-	m_typeIdColumnsSettings = typeIdColumnsSettings;
+	//	// Array of header section settings
+	//	for (int i = 0; i < sectionCount; i++){
+	//		HeaderSectionSettings section;
+	//		int fieldIdSize;
+	//		stream >> fieldIdSize;
+	//		section.fieldId.resize(fieldIdSize);
+	//		stream >> section.fieldId;
+	//		//stream >> section.width;
+	//		sectionList.append(section);
+	//	}
+	//	
+	//	m_headerSectionSettings[typeId] = sectionList;
+	//}
 }
 
 
 void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 {
-	EnsureColumnsSettingsSynchronized();
-
-	QJsonDocument jsonDocument;
-	QJsonArray jsonTypeIds;
-
-	for (QString typeId : m_typeIdColumnsSettings.keys()){
-		ColumnsList columnsList = m_typeIdColumnsSettings[typeId];
-
-		QJsonObject jsonTypeId;
-		jsonTypeId.insert("TypeId", QJsonValue::fromVariant(typeId));
-
-		QJsonArray jsonColumns;
-		for (int columnIndex = 0; columnIndex < columnsList.count(); columnIndex++){
-			ColumnSettings columnSettings = columnsList[columnIndex];
-			QStringList columnSettingsKeys = columnSettings.keys();
-
-			QJsonObject jsonColumnSettings;
-			for (QString columnSettingsKey : columnSettingsKeys){
-				jsonColumnSettings.insert(columnSettingsKey, QJsonValue::fromVariant(columnSettings[columnSettingsKey]));			
-			}
-			
-			jsonColumns.append(QJsonValue::fromVariant(jsonColumnSettings));
-		}
-		jsonTypeId.insert("Columns", QJsonValue::fromVariant(jsonColumns));
-		jsonTypeIds.append(QJsonValue::fromVariant(jsonTypeId));
+	if (!m_blockColumnSettingsSave && m_proxyModelPtr->rowCount()){
+		const_cast<CObjectCollectionViewComp*>(this)->SaveColumnSettings();
 	}
 
-	jsonDocument.setArray(jsonTypeIds);
-
-	QByteArray data = jsonDocument.toJson(QJsonDocument::Compact);
-
 	settings.beginGroup("ObjectCollectionViewColumns");
-	settings.setValue("Data", data);
+	settings.remove("");
+
+	for (QByteArray typeId : m_itemViewProperties.keys()){
+		ColumnList columnList = m_itemViewProperties[typeId];
+
+		settings.beginGroup(QString(typeId));
+		settings.setValue("TypeId", typeId);
+
+		for (int columnIndex = 0; columnIndex < columnList.count(); columnIndex++){
+			settings.beginGroup(QString("Column%1").arg(columnIndex));
+			
+			ColumnSettings columnSettings = columnList[columnIndex];
+			QStringList columnSettingsKeys = columnSettings.keys();
+			for (QString columnSettingsKey : columnSettingsKeys){
+				settings.setValue(columnSettingsKey, columnSettings[columnSettingsKey]);
+			}
+			
+			settings.endGroup();
+		}
+		settings.endGroup();
+	}
 	settings.endGroup();
 }
 
@@ -170,7 +136,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	const imtbase::IObjectCollection* objectPtr = GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
 
-	m_blockColumnsSettingsSynchronize = true;
+	m_blockColumnSettingsSave = true;
 
 	QByteArray lastTypeId = m_currentTypeId;
 
@@ -237,7 +203,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			m_itemModel.appendRow(columns);
 		}
 
-		if (foundedTypeIds.count() > 1){
+		if (foundedTypeIds.count() >= 2){
 			TypeList->show();
 		}
 		else {
@@ -249,7 +215,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 
 	on_TypeList_itemSelectionChanged();
 
-	m_blockColumnsSettingsSynchronize = false;
+	m_blockColumnSettingsSave = false;
 }
 
 
@@ -274,11 +240,8 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 
 void CObjectCollectionViewComp::OnGuiCreated()
 {
-	m_customProxyModelPtr = new QCustomSortFilterProxyModel(this);
-	m_customProxyModelPtr->setSourceModel(&m_itemModel);
-
 	m_proxyModelPtr = new QSortFilterProxyModel(this);
-	m_proxyModelPtr->setSourceModel(m_customProxyModelPtr);
+	m_proxyModelPtr->setSourceModel(&m_itemModel);
 	m_proxyModelPtr->setFilterKeyColumn(0);
 	m_proxyModelPtr->setFilterRole(DR_TYPE_ID);
 
@@ -295,9 +258,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	connect(&m_itemModel, &QStandardItemModel::itemChanged, this, &CObjectCollectionViewComp::OnItemChanged);
 	connect(ItemList, &QTreeView::doubleClicked, this, &CObjectCollectionViewComp::OnItemDoubleClick);
 	connect(ItemList, &QTreeView::customContextMenuRequested, this, &CObjectCollectionViewComp::OnCustomContextMenuRequested);
-	connect(Filter, &QLineEdit::textChanged, this, &CObjectCollectionViewComp::OnFilterChanged);
-
 	ItemList->setContextMenuPolicy(Qt::CustomContextMenu);
+
 	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 	BaseClass::OnGuiCreated();
@@ -339,22 +301,6 @@ void CObjectCollectionViewComp::OnComponentDestroyed()
 }
 
 
-bool CObjectCollectionViewComp::QCustomSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
-{
-	if (m_filter.isEmpty()){
-		return true;
-	}
-
-	for (int i = 0; i < columnCount(); i++){
-		QString value = sourceModel()->index(source_row, i).data(Qt::DisplayRole).toString();
-		if (value.contains(m_filter)){
-			return true;
-		}
-	}	
-
-	return false;
-}
-
 // private methods
 
 void CObjectCollectionViewComp::UpdateCommands()
@@ -395,17 +341,17 @@ void CObjectCollectionViewComp::UpdateCommands()
 }
 
 
-QVector<QByteArray> CObjectCollectionViewComp::GetMetaInfoIds(const QByteArray &typeId) const
+QVector<QByteArray> CObjectCollectionViewComp::GetMetaInfoIds(const QByteArray &typeId)
 {
-	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
+	const ICollectionViewDelegate& viewDelegate = GetViewDelegateRef(typeId);
 	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();
 	return fieldCollection.GetElementIds();
 }
 
 
-QStringList CObjectCollectionViewComp::GetMetaInfoHeaders(const QByteArray &typeId) const
+QStringList CObjectCollectionViewComp::GetMetaInfoHeaders(const QByteArray &typeId)
 {
-	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
+	const ICollectionViewDelegate& viewDelegate = GetViewDelegateRef(typeId);
 	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();
 	QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
 
@@ -418,52 +364,44 @@ QStringList CObjectCollectionViewComp::GetMetaInfoHeaders(const QByteArray &type
 }
 
 
-QStringList CObjectCollectionViewComp::GetObjectMetaInfo(const QByteArray &itemId, const QByteArray &typeId) const
+QStringList CObjectCollectionViewComp::GetObjectMetaInfo(const QByteArray &itemId, const QByteArray &typeId)
 {
-	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
+	const ICollectionViewDelegate& viewDelegate = GetViewDelegateRef(typeId);
 	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();
 	QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
 
-	QStringList objectMetaInfo;
+	QStringList itemsMetaInfo;
 
 	for (QByteArray fieldId : fieldIds){
 		QVariant info = viewDelegate.GetSummaryInformation(itemId, fieldId);
 
 		switch (info.type()){
 		case QVariant::ByteArray:
-			objectMetaInfo.append(QString(info.toByteArray()));
+			itemsMetaInfo.append(QString(info.toByteArray()));
 			break;
 		case QVariant::String:
-			objectMetaInfo.append(info.toString());
+			itemsMetaInfo.append(info.toString());
 			break;
 		case QVariant::DateTime:
-			objectMetaInfo.append(info.toDateTime().toString("dd.MM.yyyy hh:mm:ss"));
+			itemsMetaInfo.append(info.toDateTime().toString("dd.MM.yyyy hh:mm:ss"));
 			break;
 		default:
-			objectMetaInfo.append(QString());
+			itemsMetaInfo.append(QString());
 		}
 	}
 
-	return objectMetaInfo;
+	return itemsMetaInfo;
 }
 
 
-void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
+void CObjectCollectionViewComp::SaveColumnSettings()
 {
-	if (m_blockColumnsSettingsSynchronize){
-		return;
-	}
-
-	if (m_proxyModelPtr->rowCount() == 0){
-		return;
-	}
-
-	ColumnsList columnsList;
+	ColumnList columnList;
 
 	ColumnSettings columnSettings;
-	columnSettings["FieldId"] = QString();
+	columnSettings["FieldId"] = QByteArray();
 	columnSettings["Width"] = ItemList->columnWidth(0);
-	columnsList.append(columnSettings);
+	columnList.append(columnSettings);
 
 	QVector<QByteArray> ids = GetMetaInfoIds(m_currentTypeId);
 	QStringList headers = GetMetaInfoHeaders(m_currentTypeId);
@@ -473,43 +411,39 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 		int fieldIndex = columndIndex - 1;
 
 		ColumnSettings columnSettings;
-		columnSettings["FieldId"] = QString(ids[fieldIndex]);
+		columnSettings["FieldId"] = ids[fieldIndex];
 		columnSettings["Width"] = ItemList->columnWidth(columndIndex);
-		columnsList.append(columnSettings);
+		columnList.append(columnSettings);
 	}
 
-	m_typeIdColumnsSettings[m_currentTypeId] = columnsList;
+	m_itemViewProperties[m_currentTypeId] = columnList;
 }
 
 
-void CObjectCollectionViewComp::RestoreColumnsSettings()
+void CObjectCollectionViewComp::RestoreColumnSettings()
 {
-	QVector<QByteArray> tempFieldIds = GetMetaInfoIds(m_currentTypeId);
-	QStringList fieldIds;
-	for (QByteArray tempFieldId : tempFieldIds){
-		fieldIds.append(tempFieldId);
-	}
-	QSet<QString> fieldSet = fieldIds.toSet();
+	QVector<QByteArray> fieldIds = GetMetaInfoIds(m_currentTypeId);
+	QSet<QByteArray> fieldSet = fieldIds.toList().toSet();
 		
-	if (m_typeIdColumnsSettings.contains(m_currentTypeId)){
-		ColumnsList columnsList = m_typeIdColumnsSettings[m_currentTypeId];
+	if (m_itemViewProperties.contains(m_currentTypeId)){
+		ColumnList columnList = m_itemViewProperties[m_currentTypeId];
 
 		int currentIndex = 0;
 
-		for (int i = 0; i < columnsList.count(); i++){
-			ColumnSettings columnSettings = columnsList[i];
+		for (int i = 0; i < columnList.count(); i++){
+			ColumnSettings columnSettings = columnList[i];
 			
 			QVariant varFieldId = columnSettings["FieldId"];
 			QVariant varWidth = columnSettings["Width"];
 
-			QString fieldId;
+			QByteArray fieldId;
 			int width;
 
-			if (varFieldId.type() != QVariant::String){
+			if (varFieldId.type() != QVariant::ByteArray){
 				continue;
 			}
-
-			fieldId = varFieldId.toString();
+			
+			fieldId = varFieldId.toByteArray();
 
 			bool ok;
 			width = varWidth.toInt(&ok);
@@ -527,12 +461,12 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 			}
 
 			if (fieldSet.contains(fieldId)) {
-				int logicIndex = fieldIds.indexOf(fieldId) + 1;
-				ItemList->header()->moveSection(ItemList->header()->visualIndex(logicIndex), currentIndex);
+				int fieldLogicIndex = fieldIds.indexOf(fieldId) + 1;
+				ItemList->header()->moveSection(ItemList->header()->visualIndex(fieldLogicIndex), currentIndex);
 				fieldSet.remove(fieldId);
 				
 				if (ok){
-					ItemList->setColumnWidth(logicIndex, width);
+					ItemList->setColumnWidth(fieldLogicIndex, width);
 				}
 				else{
 					ItemList->resizeColumnToContents(currentIndex);
@@ -548,8 +482,8 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 			}
 		}
 
-		for (QString fieldId : fieldIds){
-			if (fieldId.isEmpty()){
+		for (QByteArray fieldId : fieldIds){
+			if (fieldId.count() == 0){
 				continue;
 			}
 
@@ -559,7 +493,8 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 		}
 	}
 	else{
-		for (int i = 0; i < m_itemModel.columnCount(); i++){
+		int columnCount = m_itemModel.columnCount();
+		for (int i = 0; i < columnCount; i++){
 			int currentVisualIndex = ItemList->header()->visualIndex(i);
 			ItemList->header()->moveSection(currentVisualIndex, i);
 			ItemList->resizeColumnToContents(i);
@@ -623,7 +558,9 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 
 void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 {
-	EnsureColumnsSettingsSynchronized();
+	if (!m_blockColumnSettingsSave && m_proxyModelPtr->rowCount()){
+		SaveColumnSettings();
+	}
 
 	m_currentTypeId.clear();
 
@@ -650,7 +587,7 @@ void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 		}
 	}
 
-	RestoreColumnsSettings();
+	RestoreColumnSettings();
 }
 
 
@@ -722,13 +659,6 @@ void CObjectCollectionViewComp::OnContextMenuRemove(bool checked)
 	}
 
 	delegate.RemoveObjects(itemIds);
-}
-
-
-void CObjectCollectionViewComp::OnFilterChanged(const QString &text)
-{
-	m_customProxyModelPtr->setFilter(text);
-	m_itemModel.dataChanged(m_itemModel.index(0,0), m_itemModel.index(m_itemModel.rowCount() - 1, m_itemModel.columnCount() - 1));
 }
 
 
