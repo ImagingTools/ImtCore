@@ -57,7 +57,7 @@ ifile::IFileMetaInfoProvider::MetaInfoPtr CFileCollectionComp::GetFileMetaInfo(c
 	// Looking for file item:
 	int fileIndex = GetFileIndexById(objectId);
 	if (fileIndex < 0){
-		SendVerboseMessage(QString("Repository item doesn't exist for the given resource ID (%1). Meta-information could not be provided").arg(objectId.constData()), "File Collection");
+		SendVerboseMessage(QString("Collection item doesn't exist for the given resource ID (%1). Meta-information could not be provided").arg(objectId.constData()), "File Collection");
 
 		return ifile::IFileMetaInfoProvider::MetaInfoPtr();
 	}
@@ -135,7 +135,7 @@ QString CFileCollectionComp::GetFile(
 			}
 		}
 		else{
-			SendErrorMessage(0, QString("Repository file doesn't exist '%1'").arg(filePathInRepository));
+			SendErrorMessage(0, QString("Collection file doesn't exist '%1'").arg(filePathInRepository));
 		}
 	}
 
@@ -391,7 +391,7 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 		QString dataFilePath = GetDataItemFilePath(itemToRemove);
 		QFile dataFile(dataFilePath);
 		if (!dataFile.remove()){
-			SendErrorMessage(0, QString("Repository data file '%1' could not be removed. Error status: %2").arg(dataFilePath).arg(dataFile.errorString()));
+			SendErrorMessage(0, QString("Collection data file '%1' could not be removed. Error status: %2").arg(dataFilePath).arg(dataFile.errorString()));
 
 			return false;
 		}
@@ -399,7 +399,7 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 		QString metaDataFilePath = GetMetaInfoFilePath(itemToRemove);
 		QFile metaDataFile(metaDataFilePath);
 		if (!metaDataFile.remove()){
-			SendErrorMessage(0, QString("Repository meta-data file '%1' could not be removed. Error status: %2").arg(metaDataFilePath).arg(metaDataFile.errorString()));
+			SendErrorMessage(0, QString("Collection meta-data file '%1' could not be removed. Error status: %2").arg(metaDataFilePath).arg(metaDataFile.errorString()));
 
 			return false;
 		}
@@ -933,12 +933,12 @@ void CFileCollectionComp::UpdateItemMetaInfo(CollectionItem& item) const
 	if (!retVal.IsValid()){
 		retVal = CreateFileMetaInfo(item.filePathInRepository, item.resourceTypeId, item.checkSum);
 		if (!retVal.IsValid()){
-			SendErrorMessage(0, QString("Meta-information for the file '%1' could not be created. Meta-information could not be provided").arg(metaInfoFilePath), "File Repository");
+			SendErrorMessage(0, QString("Meta-information for the file '%1' could not be created. Meta-information could not be provided").arg(metaInfoFilePath), "File Collection");
 		}
 		else{
 			bool isSuccessfulySaved = SaveMetaInfo(*retVal, metaInfoFilePath);
 			if (!isSuccessfulySaved){
-				SendWarningMessage(0, QString("Meta-information for the file '%1' created, but could not be saved to file").arg(metaInfoFilePath), "File Repository");
+				SendWarningMessage(0, QString("Meta-information for the file '%1' created, but could not be saved to file").arg(metaInfoFilePath), "File Collection");
 			}
 		}
 	}
@@ -1030,7 +1030,7 @@ QString CFileCollectionComp::CalculateFolderPathInRepository(
 					SendWarningMessage(0, warning);
 
 					if (messageConsumerPtr != NULL){
-						messageConsumerPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_WARNING, 0, warning, "File Repository")));
+						messageConsumerPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_WARNING, 0, warning, "File Collection")));
 					}
 				}
 
@@ -1143,7 +1143,7 @@ bool CFileCollectionComp::InsertFileIntoRepository(
 
 	QString targetFolderPath = CalculateFolderPathInRepository(filePath, resourceName, resourceTypeId, *m_useSubfolderAttrPtr, true, messageConsumerPtr);
 	if (targetFolderPath.isEmpty()){
-		SendErrorMessage(0, QString("Repository folder for the input file '%1'could not be calculated").arg(filePath));
+		SendErrorMessage(0, QString("Collection folder for the input file '%1'could not be calculated").arg(filePath));
 
 		return false;
 	}
@@ -1155,7 +1155,7 @@ bool CFileCollectionComp::InsertFileIntoRepository(
 		SendErrorMessage(0, errorMessage);
 
 		if (messageConsumerPtr != NULL){
-			messageConsumerPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0,  errorMessage, "File Repository")));
+			messageConsumerPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0,  errorMessage, "File Collection")));
 		}
 
 		return false;
@@ -1165,7 +1165,7 @@ bool CFileCollectionComp::InsertFileIntoRepository(
 		QDir targetFolder(targetFolderPath);
 
 		if (!targetFolder.mkpath(targetFolderPath)){
-			SendErrorMessage(0, QString("File repository could not be set up. Repository directory '%1' could not be created").arg(targetFolderPath));
+			SendErrorMessage(0, QString("File repository could not be set up. Collection directory '%1' could not be created").arg(targetFolderPath));
 
 			return false;
 		}
@@ -1200,7 +1200,7 @@ QString CFileCollectionComp::SaveCollectionItem(const CollectionItem& repository
 	ifile::CCompactXmlFileWriteArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
 
 	if (!const_cast<CollectionItem&>(repositoryItem).Serialize(archive)){
-		SendErrorMessage(0, QString("Repository item could not be saved into '%1'").arg(itemFilePath));
+		SendErrorMessage(0, QString("Collection item could not be saved into '%1'").arg(itemFilePath));
 
 		return QString();
 	}
@@ -1226,7 +1226,7 @@ void CFileCollectionComp::ReadCollectionItems(Files& files) const
 		CollectionItem fileItem(GetRepositoryPath());
 
 		if (!fileItem.Serialize(archive)){
-			SendErrorMessage(0, QString("Repository item could not be loaded from '%1'").arg(itemFilePath));
+			SendErrorMessage(0, QString("Collection item could not be loaded from '%1'").arg(itemFilePath));
 
 			continue;
 		}
@@ -1238,7 +1238,7 @@ void CFileCollectionComp::ReadCollectionItems(Files& files) const
 			files.push_back(fileItem);
 		}
 		else{
-			SendErrorMessage(0, QString("File '%1' doesn't exist. Repository item was automatically removed").arg(fileItem.filePathInRepository));
+			SendErrorMessage(0, QString("File '%1' doesn't exist. Collection item was automatically removed").arg(fileItem.filePathInRepository));
 		}
 	}
 }
