@@ -210,7 +210,7 @@ QByteArray CFileCollectionComp::AddFile(
 
 	QByteArray fileId = objectId.isEmpty() ? QUuid::createUuid().toByteArray() : objectId;
 
-	CollectionItem repositoryItem(*this);
+	CollectionItem repositoryItem(GetRepositoryPath());
 	repositoryItem.fileId = fileId;
 	repositoryItem.resourceTypeId = resourceTypeId;
 	repositoryItem.resourceName = targetFilePathInfo.completeBaseName();
@@ -547,7 +547,7 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 			QString newPhysicalName = objectName;
 #if _WIN32
 			QString newFullName = objectName + "." + fileInfo.suffix();
-			newPhysicalName = ShortenWindowsFilename(newFullName, QFileInfo(newFullName), "");
+			newPhysicalName = CalculateShortWindowsFileName(newFullName, QFileInfo(newFullName), "");
 			newPhysicalName = QFileInfo(newPhysicalName).completeBaseName();
 #endif
 			QString newFileName = newPhysicalName + "." + fileInfo.suffix();
@@ -562,7 +562,7 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 			QString oldMetaInfoFilePath = GetMetaInfoFilePath(item);
 			QFileInfo metaFileInfo(oldMetaInfoFilePath);
 			if (metaFileInfo.exists()){
-				QString newMetaInfoFilePath = metaFileInfo.absolutePath() + "/" + newFileName + GetInfoFileExtention();
+				QString newMetaInfoFilePath = metaFileInfo.absolutePath() + "/" + newFileName + "." + GetRepositoryInfo().metaInfoFileSuffix;
 
 				if (!QFile::rename(oldMetaInfoFilePath, newMetaInfoFilePath)){
 					SendWarningMessage(0, QString("Meta-info file '%1' could not be removed").arg(oldMetaInfoFilePath));
@@ -772,15 +772,14 @@ bool CFileCollectionComp::ResetData(CompatibilityMode /*mode*/)
 
 // static protected methods
 
-QString CFileCollectionComp::GetInfoFileExtention()
+CFileCollectionComp::RepositoryInfo CFileCollectionComp::GetRepositoryInfo()
 {
-	return ".meta";
-}
+	RepositoryInfo retVal;
 
+	retVal.metaInfoFileSuffix = "meta";
+	retVal.dataFileSuffix = "item";
 
-QString CFileCollectionComp::GetDataFileExtention()
-{
-	return ".item";
+	return retVal;
 }
 
 
@@ -1063,7 +1062,7 @@ QString CFileCollectionComp::CalculateTargetFilePath(
 		}
 
 #ifdef _WIN32
-		targetFileName = ShortenWindowsFilename(targetFileName, inputFileInfo, "");
+		targetFileName = CalculateShortWindowsFileName(targetFileName, inputFileInfo, "");
 #endif
 		targetFilePath = targetFolderPath + QString("/") + targetFileName;
 	}
@@ -1071,7 +1070,7 @@ QString CFileCollectionComp::CalculateTargetFilePath(
 		QString uuidPrefix = QUuid::createUuid().toString() + QString(" - ");
 		QString targetFileName = uuidPrefix + inputFileInfo.fileName();
 #ifdef _WIN32
-		targetFileName = ShortenWindowsFilename(targetFileName, inputFileInfo, uuidPrefix);
+		targetFileName = CalculateShortWindowsFileName(targetFileName, inputFileInfo, uuidPrefix);
 #endif
 		targetFilePath = targetFolderPath + QString("/") + targetFileName;
 	}
@@ -1218,13 +1217,13 @@ void CFileCollectionComp::ReadCollectionItems(Files& files) const
 	QDir repositoryRootDir(repositoryRootPath);
 
 	QFileInfoList repositoryFiles;
-	ifile::CFileListProviderComp::CreateFileList(repositoryRootDir, 0, 2, QStringList() << QString("*%1").arg(GetDataFileExtention()), QDir::Name, repositoryFiles);
+	ifile::CFileListProviderComp::CreateFileList(repositoryRootDir, 0, 2, QStringList() << QString("*.%1").arg(GetRepositoryInfo().dataFileSuffix), QDir::Name, repositoryFiles);
 
 	for (int fileIndex = 0; fileIndex < repositoryFiles.count(); ++fileIndex){
 		QString itemFilePath = repositoryFiles[fileIndex].absoluteFilePath();
 
 		ifile::CCompactXmlFileReadArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
-		CollectionItem fileItem(*this);
+		CollectionItem fileItem(GetRepositoryPath());
 
 		if (!fileItem.Serialize(archive)){
 			SendErrorMessage(0, QString("Repository item could not be loaded from '%1'").arg(itemFilePath));
@@ -1263,7 +1262,7 @@ QString CFileCollectionComp::GetDataItemFilePath(const CollectionItem& repositor
 
 	QFileInfo fileInfo(repositoryFile.filePathInRepository);
 
-	itemFilePath = fileInfo.absolutePath() + "/" + baseName + GetDataFileExtention();
+	itemFilePath = fileInfo.absolutePath() + "/" + baseName + "." + GetRepositoryInfo().dataFileSuffix;
 
 	return itemFilePath;
 }
@@ -1281,23 +1280,25 @@ QString CFileCollectionComp::GetMetaInfoFilePath(const CollectionItem& repositor
 
 	QFileInfo fileInfo(repositoryFile.filePathInRepository);
 
-	itemFilePath = fileInfo.absolutePath() + "/" + baseName + GetInfoFileExtention();
+	itemFilePath = fileInfo.absolutePath() + "/" + baseName + "." + GetRepositoryInfo().metaInfoFileSuffix;
 
 	return itemFilePath;
 }
 
 
-QString CFileCollectionComp::ShortenWindowsFilename(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const
+QString CFileCollectionComp::CalculateShortWindowsFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const
 {
-	if (fileName.size() + GetDataFileExtention().size() > 255){
-		int shortenedFilenameSize = 255 - GetDataFileExtention().size() - prefix.size();
+	int extensionLength = GetRepositoryInfo().dataFileSuffix.size() + 1;
+
+	if (fileName.size() + extensionLength > 255){
+		int shortenedFilenameSize = 255 - extensionLength - prefix.size();
 
 		QString shortenedFilename = fileInfo.fileName().mid(0, shortenedFilenameSize - (fileInfo.suffix().size() + 1));
 		shortenedFilename.chop(1);
 		shortenedFilename.append("~.").append(fileInfo.suffix());
 		shortenedFilename.prepend(prefix);
 
-		Q_ASSERT(shortenedFilename.size() <= 255 - GetDataFileExtention().size());
+		Q_ASSERT(shortenedFilename.size() <= 255 - extensionLength);
 
 #if _DEBUG
 		SendInfoMessage(0, QString("File storage name shortened (too long on Windows), from '%1' to '%2'").arg(fileName).arg(shortenedFilename));
@@ -1426,7 +1427,7 @@ bool CFileCollectionComp::CollectionItem::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(fileIdTag);
 
 	// Change file path in the repository to a relative path (relvative to repository's folder):
-	QDir repositoryDir(m_parent->GetRepositoryPath());
+	QDir repositoryDir(m_repositoryFolderPath);
 	QString relativeFilePathInRepository = repositoryDir.relativeFilePath(filePathInRepository);
 
 	static iser::CArchiveTag filePathInrepositoryItemsTag("RepositoryFilePath", "File path in the repository");

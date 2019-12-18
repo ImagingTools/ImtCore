@@ -31,8 +31,8 @@ namespace imtbase
 /**
 	Implementation of a file-based data object collection. Each object will be placed in the file system according to the configured settings.
 	Two modes are supported:\n
-	*<b>Plain</b>:In this mode the data file and related description files will be simply placed into the repository folder.
-	*<b>Subfolder</b>: Each file will be placed into a separate folder. This folder contains the data file itself, repository description file, and the meta-info file.
+	*<b>Plain</b>:In this mode the data file and related description files will be simply placed into the file collection folder.
+	*<b>Subfolder</b>: Each file will be placed into a separate folder. This folder contains the data file itself, file collection description file, and the meta-info file.
 	\ingroup Collection
 */
 class CFileCollectionComp:
@@ -51,7 +51,7 @@ public:
 		I_REGISTER_INTERFACE(IObjectCollection);
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(ICollectionInfo);
-		I_ASSIGN(m_repositoryPathCompPtr, "RepositoryPath", "Path to the repository folder", false, "RepositoryPath");
+		I_ASSIGN(m_repositoryPathCompPtr, "RepositoryPath", "Path to the file collection folder", false, "RepositoryPath");
 		I_ASSIGN(m_isCalculateCheckSumAttrPtr, "IsCalculateCheckSum", "Calculate check sums for the file", true, true);
 		I_ASSIGN(m_resourceTypesCompPtr, "ResourceTypes", "List of supported resource types", false, "ResourceTypes");
 		I_ASSIGN_MULTI_0(m_resourceFileTypesCompPtr, "FileTypeInfos", "List of file type infos for corresponding resource type", false);
@@ -59,7 +59,7 @@ public:
 		I_ASSIGN_MULTI_0(m_objectPersistenceListCompPtr, "ObjectPersistenceList", "List of persistence components used for data object loading", false);
 		I_ASSIGN_MULTI_0(m_objectFactoryListCompPtr, "ObjectFactoryList", "List of factories used for data ojbect instance creation", false);
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
-		I_ASSIGN(m_createFolderOnStartAttrPtr, "CreateRepositoryFolder", "Ensure that the repository folder is created on the start", true, true);
+		I_ASSIGN(m_createFolderOnStartAttrPtr, "CreateRepositoryFolder", "Ensure that the file collection folder is created on the start", true, true);
 		I_ASSIGN(m_pollFileSystemAttrPtr, "PollFileSystem", "If enabled, the collection folder will be observed and the items will be re-read on changes in the folder structure", true, false);
 	I_END_COMPONENT;
 
@@ -113,14 +113,14 @@ public:
 
 protected:
 	/**
-		Internal structure representing the file item in the repository.
+		Internal structure representing the file item in the collection.
 	*/
 	class CollectionItem: virtual public iser::ISerializable
 	{
 	public:
-		CollectionItem(const CFileCollectionComp& parent)
+		CollectionItem(const QString& repositoryFolderPath)
 			:checkSum(0),
-			m_parent(&parent)
+			m_repositoryFolderPath(repositoryFolderPath)
 		{
 		}
 
@@ -131,12 +131,12 @@ protected:
 		virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS);
 
 		/**
-			ID of the file in the repository.
+			ID of the file in the file collection.
 		*/
 		QByteArray fileId;
 
 		/**
-			File path in the repository.
+			File path in the file collection.
 		*/
 		QString filePathInRepository;
 
@@ -180,11 +180,16 @@ protected:
 		*/
 		ifile::IFileMetaInfoProvider::MetaInfoPtr metaInfoPtr;
 
-		const CFileCollectionComp* m_parent;
+		QString m_repositoryFolderPath;
 	};
 
-	static QString GetInfoFileExtention();
-	static QString GetDataFileExtention();
+	struct RepositoryInfo
+	{
+		QString metaInfoFileSuffix;
+		QString dataFileSuffix;
+	};
+
+	static RepositoryInfo GetRepositoryInfo();
 
 	/**
 		Create data object for the given resource type.
@@ -203,7 +208,7 @@ protected:
 	int GetFileIndexById(const QByteArray& fileId) const;
 
 	/**
-		Get repository item by ID.
+		Get file collection item by ID.
 		If the file was not found, the method will return a negative number.
 	*/
 	int GetCollectionItemById(const QByteArray& fileId, CollectionItem& item) const;
@@ -220,7 +225,7 @@ protected:
 	virtual istd::IChangeable* CreateObjectFromFile(const QString& filePath, const QByteArray& resourceTypeId) const;
 
 	/**
-		Create meta-info object for a given file in the repository.
+		Create meta-info object for a given file in the file collection.
 		\return The instance of the meta-information object, or \c NULL of no meta-info was created for the given file.
 	*/
 	virtual ifile::IFileMetaInfoProvider::MetaInfoPtr CreateFileMetaInfo(const QString& filePath, const QByteArray& type, const quint32& checkSum) const;
@@ -252,7 +257,7 @@ protected:
 	virtual bool LoadFileMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QString& filePath) const;
 
 	/**
-		Calculate path in repository for the local file path
+		Calculate path in file collection for the local file path
 	*/
 	virtual QString CalculateFolderPathInRepository(
 				const QString& localFilePath,
@@ -263,7 +268,7 @@ protected:
 				ilog::IMessageConsumer* messageConsumerPtr) const;
 
 	/**
-		Calculate full file path for the item in the repository.
+		Calculate full file path for the item in the file collection.
 	*/
 	virtual QString CalculateTargetFilePath(
 				const QString& targetFolderPath,
@@ -310,19 +315,19 @@ private:
 				QString& filePathInRepository);
 
 	/**
-		Write a repository item to file system
+		Write a file collection item to file system
 	*/
 	QString SaveCollectionItem(const CollectionItem& repositoryItem) const;
 
 	/**
-		Read repository contents.
+		Read file collection contents.
 	*/
 	void ReadCollectionItems(Files& files) const;
 
 	QString GetTempDirectory() const;
 	QString GetDataItemFilePath(const CollectionItem& repositoryFile) const;
 	QString GetMetaInfoFilePath(const CollectionItem& repositoryFile) const;
-	QString ShortenWindowsFilename(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const;
+	QString CalculateShortWindowsFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const;
 
 private Q_SLOTS:
 	void OnSync();
@@ -365,7 +370,7 @@ private:
 	mutable QReadWriteLock m_repositoryLock;
 
 	/**
-		Path to the directory where the file repository is located.
+		Path to the directory where the file file collection is located.
 		If the path is set, the incomming file will be copied to this location,
 		otherwise only a link to the file wil be created.
 	*/
@@ -407,12 +412,12 @@ private:
 	I_ATTR(bool, m_useSubfolderAttrPtr);
 
 	/**
-		Ensure that the repository folder is created on starting.
+		Ensure that the file collection folder is created on starting.
 	*/
 	I_ATTR(bool, m_createFolderOnStartAttrPtr);
 
 	/**
-		Poll changes in file system to get automatic updates if an external process do some changes in the repository.
+		Poll changes in file system to get automatic updates if an external process do some changes in the file collection.
 	*/
 	I_ATTR(bool, m_pollFileSystemAttrPtr);
 };
