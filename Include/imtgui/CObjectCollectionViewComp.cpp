@@ -148,6 +148,13 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	const iprm::IOptionsList* objectTypeInfoPtr = objectPtr->GetObjectTypesInfo();
 	if (objectTypeInfoPtr != nullptr){
 		int typesCount = objectTypeInfoPtr->GetOptionsCount();
+		if (typesCount > 1){
+			TypeList->show();
+		}
+		else{
+			TypeList->hide();
+		}
+
 		imtbase::IObjectCollectionInfo::Ids collectionItemIds = objectPtr->GetElementIds();
 
 		for (int typeIndex = 0; typeIndex < typesCount; ++typeIndex){
@@ -201,13 +208,6 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			}
 
 			m_itemModel.appendRow(columns);
-		}
-
-		if (foundedTypeIds.count() >= 2){
-			TypeList->show();
-		}
-		else {
-			TypeList->hide();
 		}
 	}
 
