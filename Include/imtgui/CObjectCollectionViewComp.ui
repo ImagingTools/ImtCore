@@ -214,7 +214,7 @@ QAbstractItemView[TabSimulation=true]
            </size>
           </property>
           <property name="placeholderText">
-           <string>&lt;Enter search text&gt;</string>
+           <string>Enter some text to filter the item list</string>
           </property>
           <property name="clearButtonEnabled">
            <bool>true</bool>
