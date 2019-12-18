@@ -290,9 +290,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	m_focusDecoratorPtr = new iwidgets::CFocusDecorator(this);
 	m_focusDecoratorPtr->RegisterWidget(FilterEdit, &m_graphicsEffectFactory);
 
+	FilterPanel->setMaximumHeight(0);
 	m_filterPanelAnimationPtr = new QPropertyAnimation(FilterPanel, "maximumHeight", this);
-	m_filterPanelCloseButtonPtr = new CClickableLabel(FilterPanel);
-	FilterPanel->layout()->addWidget(m_filterPanelCloseButtonPtr);
 
 	ItemList->setModel(m_proxyModelPtr);
 
@@ -308,14 +307,9 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	connect(ItemList, &QTreeView::doubleClicked, this, &CObjectCollectionViewComp::OnItemDoubleClick);
 	connect(ItemList, &QTreeView::customContextMenuRequested, this, &CObjectCollectionViewComp::OnCustomContextMenuRequested);
 	connect(FilterEdit, &QLineEdit::textChanged, this, &CObjectCollectionViewComp::OnFilterChanged);
-	connect(m_filterPanelCloseButtonPtr, &CClickableLabel::clicked, this, &CObjectCollectionViewComp::OnEscShortCut);
+	connect(CloseButton, &QToolButton::clicked, this, &CObjectCollectionViewComp::OnEscShortCut);
 	connect(m_searchShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnSearchShortCut);
 	connect(m_escShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnEscShortCut);
-
-	QPixmap pixmap;
-	pixmap.load(":/Icons/Remove");
-	pixmap = pixmap.scaledToHeight(FilterEdit->height() * 0.75);
-	m_filterPanelCloseButtonPtr->setPixmap(pixmap);
 
 	ItemList->setContextMenuPolicy(Qt::CustomContextMenu);
 	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);

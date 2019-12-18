@@ -3,10 +3,10 @@
 
 // Qt includes
 #include <QtCore/QSortFilterProxyModel>
+#include <QtCore/QPropertyAnimation>
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QShortCut>
-#include <QtCore/QPropertyAnimation>
 
 // ACF includes
 #include <ibase/ICommandsProvider.h>
@@ -17,20 +17,25 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
-#include <imtgui/CClickableLabel.h>
+#include <GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h>
+
 
 namespace imtgui
 {
 
+
 class CObjectCollectionViewComp:
-			public iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiObserverCompBase<Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>
+			public iqtgui::TRestorableGuiWrap<
+						iqtgui::TDesignerGuiObserverCompBase<
+									Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>
 			
 {
 	Q_OBJECT
 public:
-	typedef iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiObserverCompBase<Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>> BaseClass;
+	typedef iqtgui::TRestorableGuiWrap<
+				iqtgui::TDesignerGuiObserverCompBase<
+							Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>> BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
 		I_REGISTER_SUBELEMENT(Commands);
@@ -144,7 +149,6 @@ private Q_SLOTS:
 	void OnEscShortCut();
 
 private:
-	CClickableLabel *m_filterPanelCloseButtonPtr;
 	QShortcut *m_searchShortCutPtr;
 	QShortcut *m_escShortCutPtr;
 	iwidgets::CFocusDecorator *m_focusDecoratorPtr;
