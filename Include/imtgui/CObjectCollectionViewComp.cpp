@@ -367,7 +367,7 @@ bool CObjectCollectionViewComp::QCustomSortFilterProxyModel::filterAcceptsRow(in
 
 	for (int i = 0; i < columnCount(); i++){
 		QString value = sourceModel()->index(source_row, i).data(Qt::DisplayRole).toString();
-		if (value.contains(m_filter)){
+		if (value.toLower().contains(m_filter.toLower())){
 			return true;
 		}
 	}	
