@@ -5,22 +5,24 @@
 #include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QShortCut>
+#include <QtCore/QPropertyAnimation>
 
 // ACF includes
 #include <ibase/ICommandsProvider.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <iqtgui/TRestorableGuiWrap.h>
 #include <iqtgui/CHierarchicalCommand.h>
+#include <iwidgets/CFocusDecorator.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
-
+#include <imtgui/CClickableLabel.h>
 
 namespace imtgui
 {
-
 
 class CObjectCollectionViewComp:
 			public iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiObserverCompBase<Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>
@@ -90,15 +92,41 @@ protected:
 		return &component.m_commands;
 	}
 
+	class QCustomSortFilterProxyModel: public QSortFilterProxyModel
+	{
+		QString m_filter;
+
+	public:
+		QCustomSortFilterProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent)
+		{
+		}
+
+		void setFilter(const QString &filter)
+		{
+			m_filter = filter;
+		}
+
+	protected:
+		virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+	};
+
+	class DefaultFocusDecorationFactory: public iwidgets::CFocusDecorator::GraphicsEffectFactory
+	{
+	public:
+		// reimplemented (iGraphicsEffectFactory)
+		virtual QGraphicsEffect* CreateInstance(const QByteArray& keyId = "") const;
+		virtual KeyList GetFactoryKeys() const;
+	};
+
 private:
 	void UpdateCommands();
 
-	QVector<QByteArray> GetMetaInfoIds(const QByteArray &typeId);
-	QStringList GetMetaInfoHeaders(const QByteArray &typeId);
-	QStringList GetObjectMetaInfo(const QByteArray &itemId, const QByteArray &typeId);
+	QVector<QByteArray> GetMetaInfoIds(const QByteArray &typeId) const;
+	QStringList GetMetaInfoHeaders(const QByteArray &typeId) const;
+	QStringList GetObjectMetaInfo(const QByteArray &itemId, const QByteArray &typeId) const;
 
-	void SaveColumnSettings();
-	void RestoreColumnSettings();
+	void EnsureColumnsSettingsSynchronized() const;
+	void RestoreColumnsSettings();
 
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
@@ -111,7 +139,18 @@ private Q_SLOTS:
 	void OnContextMenuEdit(bool checked);
 	void OnContextMenuRemove(bool checked);
 
+	void OnFilterChanged(const QString &text);
+	void OnSearchShortCut();
+	void OnEscShortCut();
+
 private:
+	CClickableLabel *m_filterPanelCloseButtonPtr;
+	QShortcut *m_searchShortCutPtr;
+	QShortcut *m_escShortCutPtr;
+	iwidgets::CFocusDecorator *m_focusDecoratorPtr;
+	DefaultFocusDecorationFactory m_graphicsEffectFactory;
+	QPropertyAnimation *m_filterPanelAnimationPtr;
+
 	QStandardItemModel m_itemModel;
 
 	CObjectCollectionViewDelegate m_defaultViewDelegate;
@@ -130,14 +169,16 @@ private:
 	QByteArray m_currentTypeId;
 
 	imod::TModelWrap<Commands> m_commands;
-
+	
 	QSortFilterProxyModel* m_proxyModelPtr;
+	QCustomSortFilterProxyModel* m_customProxyModelPtr;
 
-	bool m_blockColumnSettingsSave;
+	bool m_blockColumnsSettingsSynchronize;
 
 	typedef QMap<QString, QVariant> ColumnSettings;
-	typedef QVector<ColumnSettings> ColumnList;
-	QMap<QByteArray, ColumnList> m_itemViewProperties;
+	typedef QVector<ColumnSettings> ColumnsList;
+	typedef QMap<QString, ColumnsList> TypeIdColumnsSettings;
+	mutable TypeIdColumnsSettings m_typeIdColumnsSettings;
 };
 
 
