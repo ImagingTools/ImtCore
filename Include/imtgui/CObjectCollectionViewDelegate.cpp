@@ -245,7 +245,9 @@ void CObjectCollectionViewDelegate::OnDuplicate()
 {
 	Q_ASSERT(m_collectionPtr != nullptr);
 
-	for (const QByteArray& selectedItemId : m_selectedItemIds){
+	imtbase::ICollectionInfo::Ids selectedIds = m_selectedItemIds;
+
+	for (const QByteArray& selectedItemId : selectedIds){
 		imtbase::IObjectCollection::DataPtr sourceDataPtr;
 		if (m_collectionPtr->GetObjectData(selectedItemId, sourceDataPtr)){
 			QString sourceName = m_collectionPtr->GetElementInfo(selectedItemId, imtbase::ICollectionInfo::EIT_NAME).toString();
