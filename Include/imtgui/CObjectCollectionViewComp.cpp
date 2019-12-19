@@ -376,7 +376,7 @@ QGraphicsEffect* CObjectCollectionViewComp::DefaultFocusDecorationFactory::Creat
 	shadowPtr->setXOffset(0);
 	shadowPtr->setYOffset(0);
 	shadowPtr->setBlurRadius(6);
-	shadowPtr->setColor(qRgba(13, 141, 211, 128));
+	shadowPtr->setColor(qRgba(74, 149, 217, 128));
 
 	return shadowPtr;
 }

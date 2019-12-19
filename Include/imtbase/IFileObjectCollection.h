@@ -23,18 +23,22 @@ namespace imtbase
 class IFileObjectCollection: virtual public IObjectCollection
 {
 public:
-	enum ChangeFlags
+	/**
+		Type of the meta-informations supported by the file collection.
+	*/
+	enum MetaInfoType
 	{
-		CF_FILE_ADDED = 0xacfabe,
-		CF_FILE_REMOVED,
-		CF_FILE_UPDATED
-	};
-
-	enum
-	{
+		/**
+			CRC-checksum of the file contents.
+		*/
 		MIT_CHECKSUM = idoc::IDocumentMetaInfo::MIT_USER + 10000,
+
+		/**
+			Type-ID of the file object in the collection.
+		*/
 		MIT_RESOURCE_TYPE_ID
 	};
+
 
 	/**
 		Information related to the file inside the repository

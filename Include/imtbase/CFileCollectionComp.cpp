@@ -229,7 +229,7 @@ QByteArray CFileCollectionComp::AddFile(
 
 	QString savedPath = SaveCollectionItem(repositoryItem);
 	if (!savedPath.isEmpty()){
-		static ChangeSet changes(CF_FILE_ADDED);
+		static ChangeSet changes(CF_ADDED);
 		istd::CChangeNotifier changeNotifier(this, &changes);
 
 		locker.relock();
@@ -292,7 +292,7 @@ bool CFileCollectionComp::UpdateFile(
 
 		locker.relock();
 
-		static ChangeSet changes(CF_FILE_UPDATED);
+		static ChangeSet changes(CF_UPDATED);
 		istd::CChangeNotifier changeNotifier(this, &changes);
 
 		m_files[fileIndex].CopyFrom(itemToUpdate, istd::IChangeable::CM_WITH_REFS);
@@ -431,7 +431,7 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 		}
 
 		{
-			ChangeSet changes(CF_FILE_REMOVED);
+			static ChangeSet changes(CF_REMOVED);
 
 			istd::CChangeNotifier changeNotifier(this, &changes);
 

@@ -21,6 +21,30 @@ class IObjectCollection: virtual public IObjectCollectionInfo
 public:
 	typedef istd::TSmartPtr<istd::IChangeable> DataPtr;
 
+	/**
+		Change notification flags.
+	*/
+	enum ChangeFlags
+	{
+		/**
+			Item was added.
+		*/
+		CF_ADDED = 10000,
+
+		/**
+			Item was removed.
+		*/
+		CF_REMOVED,
+
+		/**
+			Data object was changed.
+		*/
+		CF_UPDATED
+	};
+
+	/**
+		Flags for describing operational constraints on the collection items and the collection itself.
+	*/
 	enum OperationalFlags
 	{
 		OF_DEFAULT = 1,
@@ -70,7 +94,7 @@ public:
 	I_DECLARE_FLAGS(OperationalFlags, OF_DEFAULT, OF_FIXED, OF_SUPPORT_RENAME, OF_SUPPORT_INSERT, OF_SUPPORT_DELETE, OF_SUPPORT_SWAP, OF_DISABLE_ALLOWED, OF_SUPPORT_EDIT, OF_INACTIVE);
 
 	/**
-		Get binary flags describing the possible operations on the single object or on the whole manager/container.
+		Get binary flags describing the possible operations on the single object or on the whole collection.
 	*/
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const = 0;
 
