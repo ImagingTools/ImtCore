@@ -97,12 +97,12 @@ protected:
 		return &component.m_commands;
 	}
 
-	class QCustomSortFilterProxyModel: public QSortFilterProxyModel
+	class ItemProxyModel: public QSortFilterProxyModel
 	{
 		QString m_filter;
 
 	public:
-		QCustomSortFilterProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent)
+		ItemProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent)
 		{
 		}
 
@@ -112,10 +112,11 @@ protected:
 		}
 
 	protected:
-		virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+		// reimplemented (QSortFilterProxyModel)
+		virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 	};
 
-	class DefaultFocusDecorationFactory: public iwidgets::CFocusDecorator::GraphicsEffectFactory
+	class FocusDecorationFactory: public iwidgets::CFocusDecorator::GraphicsEffectFactory
 	{
 	public:
 		// reimplemented (iGraphicsEffectFactory)
@@ -152,7 +153,7 @@ private:
 	QShortcut *m_searchShortCutPtr;
 	QShortcut *m_escShortCutPtr;
 	iwidgets::CFocusDecorator *m_focusDecoratorPtr;
-	DefaultFocusDecorationFactory m_graphicsEffectFactory;
+	FocusDecorationFactory m_graphicsEffectFactory;
 	QPropertyAnimation *m_filterPanelAnimationPtr;
 
 	QStandardItemModel m_itemModel;
@@ -175,7 +176,7 @@ private:
 	imod::TModelWrap<Commands> m_commands;
 	
 	QSortFilterProxyModel* m_proxyModelPtr;
-	QCustomSortFilterProxyModel* m_customProxyModelPtr;
+	ItemProxyModel* m_customProxyModelPtr;
 
 	bool m_blockColumnsSettingsSynchronize;
 

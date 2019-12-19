@@ -58,12 +58,12 @@ void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 		return;
 	}
 
-	QVariant varData = settings.value("ObjectCollectionViewColumns/Data");
-	if (varData.type() != QVariant::ByteArray){
+	QVariant settingsValue = settings.value("ObjectCollectionViewColumns/Data");
+	if (settingsValue.type() != QVariant::ByteArray){
 		return;
 	}
 
-	QByteArray data = varData.toByteArray();
+	QByteArray data = settingsValue.toByteArray();
 	QJsonParseError error;
 	QJsonDocument jsonDocument = QJsonDocument::fromJson(data, &error);
 
@@ -203,11 +203,11 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			TypeList->addTopLevelItem(typeItemPtr);
 
 			if (lastTypeId == typeId){
-				TypeList->setItemSelected(typeItemPtr, true);
+				typeItemPtr->setSelected(true);
 			}
 
 			if (lastTypeId.isEmpty() && (typeIndex == 0)){
-				TypeList->setItemSelected(typeItemPtr, true);
+				typeItemPtr->setSelected(true);
 			}
 		}
 
@@ -274,7 +274,7 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 
 void CObjectCollectionViewComp::OnGuiCreated()
 {
-	m_customProxyModelPtr = new QCustomSortFilterProxyModel(this);
+	m_customProxyModelPtr = new ItemProxyModel(this);
 	m_customProxyModelPtr->setSourceModel(&m_itemModel);
 
 	m_proxyModelPtr = new QSortFilterProxyModel(this);
@@ -350,43 +350,6 @@ void CObjectCollectionViewComp::OnComponentDestroyed()
 	m_viewDelegateMap.clear();
 
 	BaseClass::OnComponentDestroyed();
-}
-
-
-bool CObjectCollectionViewComp::QCustomSortFilterProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
-{
-	if (m_filter.isEmpty()){
-		return true;
-	}
-
-	for (int i = 0; i < columnCount(); i++){
-		QString value = sourceModel()->index(source_row, i).data(Qt::DisplayRole).toString();
-		if (value.toLower().contains(m_filter.toLower())){
-			return true;
-		}
-	}	
-
-	return false;
-}
-
-
-QGraphicsEffect* CObjectCollectionViewComp::DefaultFocusDecorationFactory::CreateInstance(const QByteArray& keyId) const
-{
-	QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect;
-	shadowPtr->setXOffset(0);
-	shadowPtr->setYOffset(0);
-	shadowPtr->setBlurRadius(6);
-	shadowPtr->setColor(qRgba(74, 149, 217, 128));
-
-	return shadowPtr;
-}
-
-
-istd::IFactoryInfo::KeyList CObjectCollectionViewComp::DefaultFocusDecorationFactory::GetFactoryKeys() const
-{
-	istd::IFactoryInfo::KeyList retVal;
-
-	return retVal;
 }
 
 
@@ -509,10 +472,10 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 		int columndIndex = ItemList->header()->logicalIndex(i + 1);
 		int fieldIndex = columndIndex - 1;
 
-		ColumnSettings columnSettings;
-		columnSettings["FieldId"] = QString(ids[fieldIndex]);
-		columnSettings["Width"] = ItemList->columnWidth(columndIndex);
-		columnsList.append(columnSettings);
+		ColumnSettings settings;
+		settings["FieldId"] = QString(ids[fieldIndex]);
+		settings["Width"] = ItemList->columnWidth(columndIndex);
+		columnsList.append(settings);
 	}
 
 	m_typeIdColumnsSettings[m_currentTypeId] = columnsList;
@@ -692,7 +655,7 @@ void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 }
 
 
-void CObjectCollectionViewComp::OnContextMenuRename(bool checked)
+void CObjectCollectionViewComp::OnContextMenuRename(bool /*checked*/)
 {
 	ICollectionViewDelegate & delegate = GetViewDelegateRef(m_currentTypeId);
 	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
@@ -726,7 +689,7 @@ void CObjectCollectionViewComp::OnContextMenuRename(bool checked)
 }
 
 
-void CObjectCollectionViewComp::OnContextMenuEdit(bool checked)
+void CObjectCollectionViewComp::OnContextMenuEdit(bool /*checked*/)
 {
 	ICollectionViewDelegate & delegate = GetViewDelegateRef(m_currentTypeId);
 	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
@@ -741,7 +704,7 @@ void CObjectCollectionViewComp::OnContextMenuEdit(bool checked)
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
 				QByteArray typeId = itemPtr->data(DR_TYPE_ID).toByteArray();
 				if (!itemId.isEmpty()){
-					bool result = delegate.OpenDocumentEditor(itemId);
+					delegate.OpenDocumentEditor(itemId);
 				}
 			}
 		}
@@ -749,7 +712,7 @@ void CObjectCollectionViewComp::OnContextMenuEdit(bool checked)
 }
 
 
-void CObjectCollectionViewComp::OnContextMenuRemove(bool checked)
+void CObjectCollectionViewComp::OnContextMenuRemove(bool /*checked*/)
 {
 	ICollectionViewDelegate & delegate = GetViewDelegateRef(m_currentTypeId);
 	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
@@ -845,6 +808,51 @@ const ibase::IHierarchicalCommand* CObjectCollectionViewComp::Commands::GetComma
 	Q_ASSERT(m_parentPtr != nullptr);
 
 	return m_parentPtr->GetViewDelegate(m_parentPtr->m_currentTypeId).GetCommands();
+}
+
+
+// protected methods of the embedded class ItemProxyModel
+
+// reimplemented (QSortFilterProxyModel)
+
+bool CObjectCollectionViewComp::ItemProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& /*sourceParent*/) const
+{
+	if (m_filter.isEmpty()){
+		return true;
+	}
+
+	for (int i = 0; i < columnCount(); i++){
+		QString value = sourceModel()->index(sourceRow, i).data(Qt::DisplayRole).toString();
+		if (value.toLower().contains(m_filter.toLower())){
+			return true;
+		}
+	}	
+
+	return false;
+}
+
+
+// protected methods of the embedded class FocusDecorationFactory
+
+// reimplemented (iGraphicsEffectFactory)
+
+QGraphicsEffect* CObjectCollectionViewComp::FocusDecorationFactory::CreateInstance(const QByteArray& /*keyId*/) const
+{
+	QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect;
+	shadowPtr->setXOffset(0);
+	shadowPtr->setYOffset(0);
+	shadowPtr->setBlurRadius(6);
+	shadowPtr->setColor(qRgba(74, 149, 217, 128));
+
+	return shadowPtr;
+}
+
+
+istd::IFactoryInfo::KeyList CObjectCollectionViewComp::FocusDecorationFactory::GetFactoryKeys() const
+{
+	istd::IFactoryInfo::KeyList retVal;
+
+	return retVal;
 }
 
 
