@@ -823,7 +823,7 @@ bool CObjectCollectionViewComp::ItemProxyModel::filterAcceptsRow(int sourceRow, 
 
 	for (int i = 0; i < columnCount(); i++){
 		QString value = sourceModel()->index(sourceRow, i).data(Qt::DisplayRole).toString();
-		if (value.toLower().contains(m_filter.toLower())){
+		if (value.contains(m_filter, Qt::CaseInsensitive)){
 			return true;
 		}
 	}	
