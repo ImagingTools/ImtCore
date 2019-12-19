@@ -706,7 +706,8 @@ void CDocumentWorkspaceGuiCompBase::OnCloseDocument()
 		IDocumentViewDecorator* documentViewPtr = dynamic_cast<IDocumentViewDecorator*>(Tabs->widget(pageIndex));
 		Q_ASSERT(documentViewPtr != nullptr);
 
-		CloseView(documentViewPtr->GetView(), false);
+		bool ignored = false;
+		CloseView(documentViewPtr->GetView(), false, &ignored);
 	}
 }
 
