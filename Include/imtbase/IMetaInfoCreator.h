@@ -12,6 +12,7 @@ namespace imtbase
 
 /**
 	Interface for creating meta-informations for a data object.
+	\ingroup DataManagement
 */
 class IMetaInfoCreator: virtual public istd::IPolymorphic
 {

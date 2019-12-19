@@ -66,8 +66,7 @@ bool CFileObjectCollectionViewDelegate::ExportObject(const QByteArray& objectId,
 
 QVariant CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
 {
-	imtbase::IFileObjectCollection *fileObjectCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
-
+	imtbase::IFileObjectCollection* fileObjectCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
 	if (fileObjectCollectionPtr != nullptr){
 		if (informationId == QByteArray("Author")){
 			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_AUTHOR);

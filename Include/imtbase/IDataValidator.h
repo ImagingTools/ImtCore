@@ -15,6 +15,7 @@ class IValidationContext;
 
 /**
 	Common interface for validation of a data object.
+	\ingroup DataManagement
 */
 class IDataValidator: virtual public istd::IPolymorphic
 {
