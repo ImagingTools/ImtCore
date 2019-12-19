@@ -17,7 +17,7 @@
 #include <ifile/IFileNameParam.h>
 #include <ifile/IFilePersistence.h>
 #include <ifile/IFileResourceTypeConstraints.h>
-#include <idoc/IDocumentMetaInfo.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtbase/IFileObjectCollection.h>
@@ -67,7 +67,8 @@ public:
 
 	// reimplemented (IFileObjectCollection)
 	virtual const ifile::IFileResourceTypeConstraints* GetResourceTypeConstraints() const override;
-	virtual ifile::IFileMetaInfoProvider::MetaInfoPtr GetFileMetaInfo(const QByteArray& objectId) const;
+	virtual bool GetItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
+	virtual bool GetFileMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const override;
 	virtual FileInfo GetFileInfo(const QByteArray& resourceId) const override;
 	virtual QString GetFile(
 				const QByteArray& resourceId,
@@ -119,8 +120,7 @@ protected:
 	{
 	public:
 		CollectionItem(const QString& repositoryFolderPath)
-			:checkSum(0),
-			m_repositoryFolderPath(repositoryFolderPath)
+			:m_repositoryFolderPath(repositoryFolderPath)
 		{
 		}
 
@@ -146,39 +146,19 @@ protected:
 		QString sourceFilePath;
 
 		/**
-			Name of the file resource.
+			Name of the file object.
 		*/
-		QString resourceName;
+		QString objectName;
 
 		/**
-			Description of the file resource.
+			Type ID of the file object.
 		*/
-		QString resourceDescription;
-
-		/**
-			File was added at the time.
-		*/
-		QDateTime addedTime;
-
-		/**
-			Timestamp of the last file modification.
-		*/
-		QDateTime lastModificationTime;
-
-		/**
-			Type ID of the resource.
-		*/
-		QByteArray resourceTypeId;
-
-		/**
-			CRC-32 check sum of the file.
-		*/
-		quint32 checkSum;
+		QByteArray typeId;
 
 		/**
 			Meta-informations for the file item.
 		*/
-		ifile::IFileMetaInfoProvider::MetaInfoPtr metaInfoPtr;
+		idoc::CStandardDocumentMetaInfo metaInfo;
 
 		QString m_repositoryFolderPath;
 	};
@@ -228,12 +208,9 @@ protected:
 		Create meta-info object for a given file in the file collection.
 		\return The instance of the meta-information object, or \c NULL of no meta-info was created for the given file.
 	*/
-	virtual ifile::IFileMetaInfoProvider::MetaInfoPtr CreateFileMetaInfo(const QString& filePath, const QByteArray& type, const quint32& checkSum) const;
-
-	/**
-		Try to load the meta-informations from the file.
-	*/
-	virtual ifile::IFileMetaInfoProvider::MetaInfoPtr TryLoadMetaInfoFromFile(const QString& filePath) const;
+	virtual bool SetFileMetaInfo(
+				const QString& filePath,
+				idoc::IDocumentMetaInfo& metaInfo) const;
 
 	/**
 		Update the meta informations for the existing item.
@@ -367,7 +344,7 @@ private:
 	/**
 		Mutex used for locking the collectio items.
 	*/
-	mutable QReadWriteLock m_repositoryLock;
+	mutable QReadWriteLock m_collectionLock;
 
 	/**
 		Path to the directory where the file file collection is located.

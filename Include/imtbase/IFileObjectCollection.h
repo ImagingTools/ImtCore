@@ -34,11 +34,30 @@ public:
 		MIT_CHECKSUM = idoc::IDocumentMetaInfo::MIT_USER + 10000,
 
 		/**
-			Type-ID of the file object in the collection.
+			Name of the user who has added the file.
 		*/
-		MIT_RESOURCE_TYPE_ID
-	};
+		MIT_INSERTION_USER,
 
+		/**
+			Timestamp of the file inserting into the collection.
+		*/
+		MIT_INSERTION_TIME,
+
+		/**
+			Name of the user who has modified the file.
+		*/
+		MIT_LAST_OPERATION_USER,
+
+		/**
+			Timestamp of the last operation on the file in the collection.
+		*/
+		MIT_LAST_OPERATION_TIME,
+
+		/**
+			Timestamp of the last operation on the file in the collection.
+		*/
+		MIT_ITEM_DESCRIPTION
+	};
 
 	/**
 		Information related to the file inside the repository
@@ -68,11 +87,21 @@ public:
 	virtual const ifile::IFileResourceTypeConstraints* GetResourceTypeConstraints() const = 0;
 
 	/**
-		Get meta info of an existing file resource.
-		\param objectId			ID of the file resource.
-		\return Pointer to the meta-info instance or \c NULL, if no information could be provided.
+		Get meta-information of the item in the collection.
+		\param objectId			ID of the object in the collection.
+		\param metaInfo			Meta-info to be filled by this method.
+		\return \c true if the operation was successful, and \c false if no information could be provided.
 	*/
-	virtual ifile::IFileMetaInfoProvider::MetaInfoPtr GetFileMetaInfo(const QByteArray& objectId) const = 0;
+	virtual bool GetItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const = 0;
+
+	/**
+		Get meta-information provided by the file itself.
+		In difference to GetItemMetaInfo, this method get the meta-informations created from the file contents.
+		\param objectId			ID of the object in the collection.
+		\param metaInfoPtr		Meta-info pointer to be created and filled by this method.
+		\return \c true if the operation was successful, and \c false if no information could be provided.
+	*/
+	virtual bool GetFileMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const = 0;
 
 	/**
 		Get file information related to a object

@@ -11,7 +11,7 @@
 
 // ImtCore includes
 #include <imtbase/IFileObjectCollection.h>
-#include <idoc/IDocumentMetaInfo.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
 
 
 namespace imtgui
@@ -68,20 +68,23 @@ QVariant CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArr
 {
 	imtbase::IFileObjectCollection* fileObjectCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
 	if (fileObjectCollectionPtr != nullptr){
-		if (informationId == QByteArray("Author")){
-			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_AUTHOR);
-		}
+		idoc::CStandardDocumentMetaInfo metaInfo;
+		if (fileObjectCollectionPtr->GetItemMetaInfo(objectId, metaInfo)){
+			if (informationId == QByteArray("Author")){
+				return metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_AUTHOR);
+			}
 
-		if (informationId == QByteArray("TypeId")){
-			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(imtbase::IFileObjectCollection::MIT_RESOURCE_TYPE_ID);
-		}
+			if (informationId == QByteArray("TypeId")){
+				return fileObjectCollectionPtr->GetObjectTypeId(objectId);
+			}
 
-		if (informationId == QByteArray("Description")){
-			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION);
-		}
+			if (informationId == QByteArray("Description")){
+				return fileObjectCollectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+			}
 
-		if (informationId == QByteArray("ModificationTime")){
-			return fileObjectCollectionPtr->GetFileMetaInfo(objectId)->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
+			if (informationId == QByteArray("ModificationTime")){
+				return metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
+			}
 		}
 	}
 
