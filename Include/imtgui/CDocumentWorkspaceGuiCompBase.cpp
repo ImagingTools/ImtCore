@@ -908,7 +908,7 @@ const iprm::IOptionsList* CDocumentWorkspaceGuiCompBase::DocumentList::GetObject
 }
 
 
-imtbase::ICollectionInfo::Id CDocumentWorkspaceGuiCompBase::DocumentList::GetObjectTypeId(const QByteArray& objectId) const
+imtbase::ICollectionInfo::Id CDocumentWorkspaceGuiCompBase::DocumentList::GetObjectTypeId(const QByteArray& /*objectId*/) const
 {
 	Id retVal;
 
@@ -924,7 +924,7 @@ imtbase::ICollectionInfo::Ids CDocumentWorkspaceGuiCompBase::DocumentList::GetEl
 }
 
 
-QVariant CDocumentWorkspaceGuiCompBase::DocumentList::GetElementInfo(const QByteArray& elementId, int infoType) const
+QVariant CDocumentWorkspaceGuiCompBase::DocumentList::GetElementInfo(const QByteArray& /*elementId*/, int /*infoType*/) const
 {
 	return QVariant();
 }
