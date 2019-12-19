@@ -606,16 +606,19 @@ void CObjectCollectionViewComp::OnItemDoubleClick(const QModelIndex &item)
 void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point)
 {
 	QAction *actionRename;
-	QAction *actionEdit;
+	QAction *actionEditDescription;
+	QAction *actionEditDocument;
 	QAction *actionRemove;
 
 	QMenu menu(ItemList);
 	actionRename = menu.addAction(QIcon(":/Icons/Rename"), tr("Rename"));
-	actionEdit = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit"));
+	actionEditDescription = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit description"));
+	actionEditDocument = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit document"));
 	actionRemove = menu.addAction(QIcon(":/Icons/Remove"), tr("Remove"));
 
 	connect(actionRename, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRename);
-	connect(actionEdit, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEdit);
+	connect(actionEditDescription, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDescription);
+	connect(actionEditDocument, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDocument);
 	connect(actionRemove, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRemove);
 
 	menu.exec(ItemList->viewport()->mapToGlobal(point));
@@ -672,7 +675,6 @@ void CObjectCollectionViewComp::OnContextMenuRename(bool /*checked*/)
 
 			if (itemPtr != nullptr){
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
-				QByteArray typeId = itemPtr->data(DR_TYPE_ID).toByteArray();
 				if (!itemId.isEmpty()){
 					const imtbase::IObjectCollection* objectPtr = GetObservedObject();
 					QString name = objectPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_NAME).toString();
@@ -689,7 +691,39 @@ void CObjectCollectionViewComp::OnContextMenuRename(bool /*checked*/)
 }
 
 
-void CObjectCollectionViewComp::OnContextMenuEdit(bool /*checked*/)
+void CObjectCollectionViewComp::OnContextMenuEditDescription(bool /*checked*/)
+{
+	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
+
+	if (selectedIndexes.count() != 1){
+		return;
+	}
+
+	if (!selectedIndexes.isEmpty()){
+		for (int i = 0; i < selectedIndexes.count(); ++i){
+			QModelIndex mappedIndex1 = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+			QModelIndex mappedIndex2 = m_customProxyModelPtr->mapToSource(mappedIndex1);
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex2);
+
+			if (itemPtr != nullptr){
+				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
+				if (!itemId.isEmpty()){
+					imtbase::IObjectCollection* objectPtr = GetObservedObject();
+					QString description = objectPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_DESCRIPTION).toString();
+
+					bool ok;
+					QString newDescription = QInputDialog::getText(ItemList, tr("Enter object description"), tr("Description"), QLineEdit::Normal, description, &ok);
+					if (ok){
+						objectPtr->SetObjectDescription(itemId, newDescription);
+					}
+				}
+			}
+		}
+	}
+}
+
+
+void CObjectCollectionViewComp::OnContextMenuEditDocument(bool /*checked*/)
 {
 	ICollectionViewDelegate & delegate = GetViewDelegateRef(m_currentTypeId);
 	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
@@ -702,7 +736,6 @@ void CObjectCollectionViewComp::OnContextMenuEdit(bool /*checked*/)
 
 			if (itemPtr != nullptr){
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
-				QByteArray typeId = itemPtr->data(DR_TYPE_ID).toByteArray();
 				if (!itemId.isEmpty()){
 					delegate.OpenDocumentEditor(itemId);
 				}
@@ -726,7 +759,6 @@ void CObjectCollectionViewComp::OnContextMenuRemove(bool /*checked*/)
 
 			if (itemPtr != nullptr){
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
-				QByteArray typeId = itemPtr->data(DR_TYPE_ID).toByteArray();
 				if (!itemId.isEmpty()){
 					itemIds.append(itemId);
 				}

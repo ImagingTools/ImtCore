@@ -142,7 +142,8 @@ private Q_SLOTS:
 	void on_TypeList_itemSelectionChanged();
 
 	void OnContextMenuRename(bool checked);
-	void OnContextMenuEdit(bool checked);
+	void OnContextMenuEditDescription(bool checked);
+	void OnContextMenuEditDocument(bool checked);
 	void OnContextMenuRemove(bool checked);
 
 	void OnFilterChanged(const QString &text);
