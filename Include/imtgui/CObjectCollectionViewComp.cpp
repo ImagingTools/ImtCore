@@ -313,6 +313,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 	ItemList->setContextMenuPolicy(Qt::CustomContextMenu);
 	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	ItemList->setFocusPolicy(Qt::NoFocus);
 
 	BaseClass::OnGuiCreated();
 }
@@ -605,19 +606,26 @@ void CObjectCollectionViewComp::OnItemDoubleClick(const QModelIndex &item)
 
 void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point)
 {
-	QAction *actionRename;
-	QAction *actionEditDescription;
-	QAction *actionEditDocument;
-	QAction *actionRemove;
+	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
+	if (selectedIndexes.isEmpty()){
+		return;
+	}
 
+	QAction* actionRename;
+	QAction* actionEditDescription;
+	QAction* actionEditDocument;
+	QAction* actionRemove;
 	QMenu menu(ItemList);
-	actionRename = menu.addAction(QIcon(":/Icons/Rename"), tr("Rename"));
-	actionEditDescription = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit description"));
+
+	if (selectedIndexes.count() == 1){
+		actionRename = menu.addAction(QIcon(":/Icons/Rename"), tr("Rename"));
+		actionEditDescription = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit description"));
+		connect(actionRename, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRename);
+		connect(actionEditDescription, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDescription);
+	}
+
 	actionEditDocument = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit document"));
 	actionRemove = menu.addAction(QIcon(":/Icons/Remove"), tr("Remove"));
-
-	connect(actionRename, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRename);
-	connect(actionEditDescription, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDescription);
 	connect(actionEditDocument, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDocument);
 	connect(actionRemove, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRemove);
 

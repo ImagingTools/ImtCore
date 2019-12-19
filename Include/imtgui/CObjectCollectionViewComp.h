@@ -151,11 +151,11 @@ private Q_SLOTS:
 	void OnEscShortCut();
 
 private:
-	QShortcut *m_searchShortCutPtr;
-	QShortcut *m_escShortCutPtr;
-	iwidgets::CFocusDecorator *m_focusDecoratorPtr;
+	QShortcut* m_searchShortCutPtr;
+	QShortcut* m_escShortCutPtr;
+	iwidgets::CFocusDecorator* m_focusDecoratorPtr;
 	FocusDecorationFactory m_graphicsEffectFactory;
-	QPropertyAnimation *m_filterPanelAnimationPtr;
+	QPropertyAnimation* m_filterPanelAnimationPtr;
 
 	QStandardItemModel m_itemModel;
 
