@@ -537,6 +537,9 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 	Tabs->tabBar()->setDrawBase(false);
 	Tabs->setTabsClosable(true);
 	Tabs->setElideMode(Qt::ElideMiddle);
+
+	m_closeCurrentTabShortcutPtr = new QShortcut(GetQtWidget());
+	m_closeCurrentTabShortcutPtr->setKey(Qt::CTRL + Qt::Key_W);
 	
 	// Add additional fixed UI components to the tab bar:
 	for (int i = 0; i < m_fixedTabsCompPtr.GetCount(); ++i){
@@ -574,6 +577,7 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 
 	connect(Tabs, SIGNAL(currentChanged(int)), this, SLOT(OnWindowActivated(int)));
 	connect(Tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(OnTabCloseRequested(int)));
+	connect(m_closeCurrentTabShortcutPtr, &QShortcut::activated, this, &CDocumentWorkspaceGuiCompBase::OnCloseCurrentTabShortcut);
 
 	int documentsCount = GetDocumentsCount();
 	for (int docIndex = 0; docIndex < documentsCount; ++docIndex){
@@ -783,6 +787,11 @@ void CDocumentWorkspaceGuiCompBase::OnTabCloseRequested(int index)
 	}
 }
 
+
+void CDocumentWorkspaceGuiCompBase::OnCloseCurrentTabShortcut()
+{
+	OnTabCloseRequested(Tabs->currentIndex());
+}
 
 // public methods of the embedded class DocumentList
 

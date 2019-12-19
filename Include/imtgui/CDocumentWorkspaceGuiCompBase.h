@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtWidgets/QShortcut>
+
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>
 #include <iprm/ISelectionParam.h>
@@ -149,6 +152,7 @@ protected Q_SLOTS:
 	virtual void OnNewDocument(const QByteArray& documentTypeId);
 	virtual void OnOpenDocument(const QByteArray& documentTypeId);
 	void OnTabCloseRequested(int index);
+	void OnCloseCurrentTabShortcut();
 
 private:
 	class DocumentList:
@@ -210,6 +214,8 @@ private:
 
 	bool m_forceQuietClose;
 	bool m_isUpdateBlocked;
+
+	QShortcut *m_closeCurrentTabShortcutPtr;
 
 	typedef QList<iqtgui::IGuiObject*> TabList;
 	TabList m_fixedTabs;
