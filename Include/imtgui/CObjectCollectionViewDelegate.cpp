@@ -259,10 +259,12 @@ void CObjectCollectionViewDelegate::OnDuplicate()
 		imtbase::IObjectCollection::DataPtr sourceDataPtr;
 		if (m_collectionPtr->GetObjectData(selectedItemId, sourceDataPtr)){
 			QString sourceName = m_collectionPtr->GetElementInfo(selectedItemId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			QString sourceDescription = m_collectionPtr->GetElementInfo(selectedItemId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 			QByteArray objectId = this->CObjectCollectionViewDelegate::CreateNewObject(m_collectionPtr->GetObjectTypeId(selectedItemId), sourceDataPtr.GetPtr());
 			if (!objectId.isEmpty()){
 				m_collectionPtr->SetObjectName(objectId, QString("Copy of %1").arg(sourceName));
+				m_collectionPtr->SetObjectDescription(objectId, sourceDescription);
 			}
 		}
 	}
