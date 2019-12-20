@@ -174,8 +174,6 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 
 	QByteArray lastTypeId = m_currentTypeId;
 
-	SaveItemsSelection();
-
 	TypeList->clear();
 	m_itemModel.clear();
 	m_itemModel.setColumnCount(1);
@@ -614,6 +612,7 @@ void CObjectCollectionViewComp::RestoreItemsSelection()
 
 void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
 {
+	SaveItemsSelection();
 	UpdateCommands();
 }
 
