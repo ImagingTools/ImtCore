@@ -174,6 +174,8 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 
 	QByteArray lastTypeId = m_currentTypeId;
 
+	SaveItemsSelection();
+
 	TypeList->clear();
 	m_itemModel.clear();
 	m_itemModel.setColumnCount(1);
@@ -248,6 +250,8 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	UpdateCommands();
 
 	on_TypeList_itemSelectionChanged();
+
+	RestoreItemsSelection();
 
 	m_blockColumnsSettingsSynchronize = false;
 }
@@ -569,6 +573,43 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 }
 
 
+void CObjectCollectionViewComp::SaveItemsSelection()
+{
+	m_itemsSelection.clear();
+
+	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
+	if (!selectedIndexes.isEmpty()){
+		for (int i = 0; i < selectedIndexes.count(); i++){
+			QModelIndex mappedIndex1 = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+			QModelIndex mappedIndex2 = m_customProxyModelPtr->mapToSource(mappedIndex1);
+
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex2);
+			if (itemPtr != nullptr){
+				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
+				m_itemsSelection.append(itemId);
+			}
+		}
+	}
+}
+
+
+void CObjectCollectionViewComp::RestoreItemsSelection()
+{
+	QItemSelection selection;
+	for (int i = 0; i < m_proxyModelPtr->rowCount(); i++){
+		QModelIndex mappedIndex1 = m_proxyModelPtr->mapToSource(m_proxyModelPtr->index(i, 0));
+		QModelIndex mappedIndex2 = m_customProxyModelPtr->mapToSource(mappedIndex1);
+
+		QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex2);
+		QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
+		if (m_itemsSelection.contains(itemId)){
+			selection.append(QItemSelectionRange(m_proxyModelPtr->index(i, 0)));
+		}
+	}
+
+	ItemList->selectionModel()->select(selection, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+}
+
 // private slots
 
 void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
@@ -821,7 +862,7 @@ void CObjectCollectionViewComp::OnEscShortCut()
 	m_filterPanelAnimationPtr->setEndValue(0);
 	m_filterPanelAnimationPtr->setDuration(300);
 	m_filterPanelAnimationPtr->start();
-	ItemList->setFocus();
+	GetQtWidget()->setFocus();
 }
 
 

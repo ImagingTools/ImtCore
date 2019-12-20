@@ -134,6 +134,9 @@ private:
 	void EnsureColumnsSettingsSynchronized() const;
 	void RestoreColumnsSettings();
 
+	void SaveItemsSelection();
+	void RestoreItemsSelection();
+
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 	void OnItemChanged(QStandardItem *item);
@@ -185,6 +188,8 @@ private:
 	typedef QVector<ColumnSettings> ColumnsList;
 	typedef QMap<QString, ColumnsList> TypeIdColumnsSettings;
 	mutable TypeIdColumnsSettings m_typeIdColumnsSettings;
+
+	QByteArrayList m_itemsSelection;
 };
 
 
