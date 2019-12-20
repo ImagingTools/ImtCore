@@ -183,13 +183,14 @@ private:
 	ItemProxyModel* m_customProxyModelPtr;
 
 	bool m_blockColumnsSettingsSynchronize;
+	bool m_blockSaveItemsSelection;
 
 	typedef QMap<QString, QVariant> ColumnSettings;
 	typedef QVector<ColumnSettings> ColumnsList;
 	typedef QMap<QString, ColumnsList> TypeIdColumnsSettings;
 	mutable TypeIdColumnsSettings m_typeIdColumnsSettings;
 
-	QByteArrayList m_itemsSelection;
+	QMap<QByteArray, QByteArrayList> m_itemsSelection;
 };
 
 

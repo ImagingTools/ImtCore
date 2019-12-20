@@ -26,7 +26,7 @@ namespace imtgui
 // protected methods
 
 CObjectCollectionViewComp::CObjectCollectionViewComp()
-	:m_blockColumnsSettingsSynchronize(false)
+	:m_blockColumnsSettingsSynchronize(false), m_blockSaveItemsSelection(false)
 {
 	m_commands.SetParent(this);
 }
@@ -171,6 +171,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	Q_ASSERT(objectPtr != nullptr);
 
 	m_blockColumnsSettingsSynchronize = true;
+	m_blockSaveItemsSelection = true;
 
 	QByteArray lastTypeId = m_currentTypeId;
 
@@ -249,9 +250,10 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 
 	on_TypeList_itemSelectionChanged();
 
-	RestoreItemsSelection();
-
+	m_blockSaveItemsSelection = false;
 	m_blockColumnsSettingsSynchronize = false;
+
+	RestoreItemsSelection();
 }
 
 
@@ -573,7 +575,11 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 
 void CObjectCollectionViewComp::SaveItemsSelection()
 {
-	m_itemsSelection.clear();
+	if (m_blockSaveItemsSelection) {
+		return;
+	}
+
+	m_itemsSelection[m_currentTypeId].clear();
 
 	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
 	if (!selectedIndexes.isEmpty()){
@@ -584,7 +590,7 @@ void CObjectCollectionViewComp::SaveItemsSelection()
 			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex2);
 			if (itemPtr != nullptr){
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
-				m_itemsSelection.append(itemId);
+				m_itemsSelection[m_currentTypeId].append(itemId);
 			}
 		}
 	}
@@ -600,7 +606,7 @@ void CObjectCollectionViewComp::RestoreItemsSelection()
 
 		QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex2);
 		QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
-		if (m_itemsSelection.contains(itemId)){
+		if (m_itemsSelection[m_currentTypeId].contains(itemId)){
 			selection.append(QItemSelectionRange(m_proxyModelPtr->index(i, 0)));
 		}
 	}
@@ -675,7 +681,11 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 
 void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 {
+	bool m_blockStored = m_blockSaveItemsSelection;
+
 	EnsureColumnsSettingsSynchronized();
+	SaveItemsSelection();
+	m_blockSaveItemsSelection = true;
 
 	m_currentTypeId.clear();
 
@@ -702,7 +712,11 @@ void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 		}
 	}
 
+	m_blockSaveItemsSelection = false;
+	RestoreItemsSelection();
 	RestoreColumnsSettings();
+
+	m_blockSaveItemsSelection = m_blockStored;
 }
 
 
