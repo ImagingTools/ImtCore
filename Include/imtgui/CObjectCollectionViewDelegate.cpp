@@ -104,6 +104,14 @@ bool CObjectCollectionViewDelegate::ExportObject(const QByteArray& objectId, con
 
 void CObjectCollectionViewDelegate::RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const
 {
+	if (objectIds.isEmpty()){
+		return;
+	}
+
+	if (QMessageBox::question(NULL, tr("Remove"), tr("Remove selected document from the collection"), QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes){
+		return;
+	}
+
 	if (m_collectionPtr != nullptr){
 		istd::CChangeGroup changeGroup(m_collectionPtr);
 
