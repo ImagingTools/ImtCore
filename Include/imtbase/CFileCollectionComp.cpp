@@ -37,7 +37,7 @@ CFileCollectionComp::CFileCollectionComp()
 
 // reimplemented (IFileObjectCollection)
 
-const ifile::IFileResourceTypeConstraints* CFileCollectionComp::GetResourceTypeConstraints() const
+const ifile::IFileResourceTypeConstraints* CFileCollectionComp::GetFileTypeConstraints() const
 {
 	if (!m_resourceFileTypesCompPtr.IsValid() || !m_resourceTypesCompPtr.IsValid()){
 		return NULL;
@@ -146,7 +146,7 @@ QString CFileCollectionComp::GetFile(
 }
 
 
-QByteArray CFileCollectionComp::AddFile(
+QByteArray CFileCollectionComp::InsertFile(
 			const QString& localFilePath,
 			const QByteArray& typeId,
 			const QString& objectName,
@@ -351,7 +351,7 @@ QByteArray CFileCollectionComp::InsertNewObject(
 			QString tempFilePath = QDir::tempPath() + "/" + QUuid::createUuid().toString() + "." + supportedExts[0];
 
 			if (persistencePtr->SaveToFile(*newObjectPtr, tempFilePath) == ifile::IFilePersistence::OS_OK){
-				return AddFile(tempFilePath, typeId, name);
+				return InsertFile(tempFilePath, typeId, name);
 			}
 		}
 	}

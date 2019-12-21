@@ -84,7 +84,7 @@ public:
 		Get type contraints describing each supported type of a resource.
 		\return	Type constraints, if available or \c NULL, if no type constraints were defined.
 	*/
-	virtual const ifile::IFileResourceTypeConstraints* GetResourceTypeConstraints() const = 0;
+	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const = 0;
 
 	/**
 		Get meta-information of the item in the collection.
@@ -116,36 +116,31 @@ public:
 		\param targetFilePath		Path to the location where the file should be stored. If the path is empty, the implementation should define the location of the file automatically.
 		\return Path to the file on the local system or an empty string if the operation has been failed.
 	*/
-	virtual QString GetFile(
-				const QByteArray& objectId,
-				const QString& targetFilePath = QString()) const = 0;
+	virtual QString GetFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const = 0;
 
 	/**
-		Add a file to the repository. This method works synchronous, what means that the file must already exist on the file system before the operation can be executed. 
-		In the event, that the repository is running on another machine adding of a file means an upload to the repository server.
-		\param filePath				Location of the file.
-		\param objectTypeId			Type ID of the file object. \sa GetResourceTypeConstraints
+		Add a file to the repository 
+		\param filePath				Path to the file.
+		\param objectTypeId			Type ID of the file object. \sa GetFileTypeConstraints
 		\param objectName			Name of the file object used for human readable representation. If no name was set, the file name will be used.
 		\param objectDescription	Description of the file object.
-		\param objectId				Externally defined object's unique ID.
+		\param proposedObjectId		User-defined object-ID. If this parameter is not set, the implementation should generate a ID automatically.
 		\return ID of the file object. If the operation was not successful, the method returns an empty ID.
 	*/
-	virtual QByteArray AddFile(
+	virtual QByteArray InsertFile(
 				const QString& filePath,
 				const QByteArray& objectTypeId = QByteArray(),
 				const QString& objectName = QString(),
 				const QString& objectDescription = QString(),
-				const QByteArray& objectId = QByteArray()) = 0;
+				const QByteArray& proposedObjectId = QByteArray()) = 0;
 
 	/**
 		Update file in the repository.
-		\param filePath		Location of the file containing the new content.
+		\param filePath		Path to the file containing the new data content.
 		\param objectId		ID of the object to be updated in the repository.
 		\return \c true if the file object was successfully updated or \c false otherwise.
 	*/
-	virtual bool UpdateFile(
-				const QString& filePath,
-				const QByteArray& objectId) = 0;
+	virtual bool UpdateFile(const QString& filePath, const QByteArray& objectId) = 0;
 };
 
 

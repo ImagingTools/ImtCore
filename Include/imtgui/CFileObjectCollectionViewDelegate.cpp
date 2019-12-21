@@ -45,7 +45,7 @@ QByteArray CFileObjectCollectionViewDelegate::ImportObject(const QByteArray& typ
 	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
-	return fileCollectionPtr->AddFile(sourcePath, typeId);
+	return fileCollectionPtr->InsertFile(sourcePath, typeId);
 }
 
 
@@ -196,7 +196,7 @@ QByteArray CFileObjectCollectionViewDelegate::FindTypeIdFromFile(const QString& 
 	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
-	const ifile::IFileResourceTypeConstraints* fileConstraintsPtr = fileCollectionPtr->GetResourceTypeConstraints();
+	const ifile::IFileResourceTypeConstraints* fileConstraintsPtr = fileCollectionPtr->GetFileTypeConstraints();
 
 	for (int typeIndex = 0; typeIndex < fileConstraintsPtr->GetOptionsCount(); ++typeIndex){
 		const ifile::IFileTypeInfo* fileTypeInfoPtr = fileConstraintsPtr->GetFileTypeInfo(typeIndex);
@@ -218,7 +218,7 @@ const ifile::IFileTypeInfo* CFileObjectCollectionViewDelegate::FindFileInfo(cons
 	const imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<const imtbase::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
-	const ifile::IFileResourceTypeConstraints* fileConstraintsPtr = fileCollectionPtr->GetResourceTypeConstraints();
+	const ifile::IFileResourceTypeConstraints* fileConstraintsPtr = fileCollectionPtr->GetFileTypeConstraints();
 
 	for (int typeIndex = 0; typeIndex < fileConstraintsPtr->GetOptionsCount(); ++typeIndex){
 		if (typeId == fileConstraintsPtr->GetOptionId(typeIndex)){
@@ -238,7 +238,7 @@ QString CFileObjectCollectionViewDelegate::CreateFileFilter(int flags) const
 	QStringList filters;
 	QStringList allExt;
 
-	const ifile::IFileResourceTypeConstraints* fileConstraintsPtr = fileCollectionPtr->GetResourceTypeConstraints();
+	const ifile::IFileResourceTypeConstraints* fileConstraintsPtr = fileCollectionPtr->GetFileTypeConstraints();
 	for (int typeIndex = 0; typeIndex < fileConstraintsPtr->GetOptionsCount(); ++typeIndex){
 		QByteArray typeId = fileConstraintsPtr->GetOptionId(typeIndex);
 

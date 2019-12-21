@@ -66,14 +66,14 @@ public:
 	CFileCollectionComp();
 
 	// reimplemented (IFileObjectCollection)
-	virtual const ifile::IFileResourceTypeConstraints* GetResourceTypeConstraints() const override;
+	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
 	virtual bool GetItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
 	virtual bool GetFileMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const override;
 	virtual FileInfo GetFileInfo(const QByteArray& resourceId) const override;
 	virtual QString GetFile(
 				const QByteArray& resourceId,
 				const QString& targetFilePath) const override;
-	virtual QByteArray AddFile(
+	virtual QByteArray InsertFile(
 				const QString& localFilePath,
 				const QByteArray& resourceTypeId = QByteArray(),
 				const QString& resourceName = QString(),
