@@ -663,17 +663,18 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 	QAction* actionRemove;
 	QMenu menu(ItemList);
 
-	if (selectedIndexes.count() == 1){
-		actionRename = menu.addAction(QIcon(":/Icons/Rename"), tr("Rename"));
-		actionEditDescription = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit description"));
-		connect(actionRename, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRename);
-		connect(actionEditDescription, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDescription);
-	}
-
-	actionEditDocument = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit document"));
+	actionEditDocument = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit..."));
 	actionRemove = menu.addAction(QIcon(":/Icons/Remove"), tr("Remove"));
 	connect(actionEditDocument, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDocument);
 	connect(actionRemove, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRemove);
+
+	if (selectedIndexes.count() == 1){
+		menu.addSeparator();
+		actionRename = menu.addAction(tr("Rename..."));
+		actionEditDescription = menu.addAction(tr("Set Description..."));
+		connect(actionRename, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRename);
+		connect(actionEditDescription, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDescription);
+	}
 
 	menu.exec(ItemList->viewport()->mapToGlobal(point));
 }
