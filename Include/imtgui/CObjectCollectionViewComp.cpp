@@ -278,11 +278,8 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 
 void CObjectCollectionViewComp::OnGuiCreated()
 {
-	m_customProxyModelPtr = new ItemProxyModel(this);
-	m_customProxyModelPtr->setSourceModel(&m_itemModel);
-
-	m_proxyModelPtr = new QSortFilterProxyModel(this);
-	m_proxyModelPtr->setSourceModel(m_customProxyModelPtr);
+	m_proxyModelPtr = new ItemProxyModel(this);
+	m_proxyModelPtr->setSourceModel(&m_itemModel);
 	m_proxyModelPtr->setFilterKeyColumn(0);
 	m_proxyModelPtr->setFilterRole(DR_TYPE_ID);
 
@@ -375,9 +372,8 @@ void CObjectCollectionViewComp::UpdateCommands()
 		const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
 		Q_ASSERT(collectionPtr != nullptr);
 		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex1 = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
-			QModelIndex mappedIndex2 = m_customProxyModelPtr->mapToSource(mappedIndex1);
-			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex2);
+			QModelIndex mappedIndex = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex);
 			if (itemPtr != nullptr){
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
 				if (!itemId.isEmpty()){
@@ -584,10 +580,8 @@ void CObjectCollectionViewComp::SaveItemsSelection()
 	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
 	if (!selectedIndexes.isEmpty()){
 		for (int i = 0; i < selectedIndexes.count(); i++){
-			QModelIndex mappedIndex1 = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
-			QModelIndex mappedIndex2 = m_customProxyModelPtr->mapToSource(mappedIndex1);
-
-			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex2);
+			QModelIndex mappedIndex = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex);
 			if (itemPtr != nullptr){
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
 				m_itemsSelection[m_currentTypeId].append(itemId);
@@ -601,10 +595,8 @@ void CObjectCollectionViewComp::RestoreItemsSelection()
 {
 	QItemSelection selection;
 	for (int i = 0; i < m_proxyModelPtr->rowCount(); i++){
-		QModelIndex mappedIndex1 = m_proxyModelPtr->mapToSource(m_proxyModelPtr->index(i, 0));
-		QModelIndex mappedIndex2 = m_customProxyModelPtr->mapToSource(mappedIndex1);
-
-		QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex2);
+		QModelIndex mappedIndex = m_proxyModelPtr->mapToSource(m_proxyModelPtr->index(i, 0));
+		QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex);
 		QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
 		if (m_itemsSelection[m_currentTypeId].contains(itemId)){
 			selection.append(QItemSelectionRange(m_proxyModelPtr->index(i, 0)));
@@ -640,12 +632,10 @@ void CObjectCollectionViewComp::OnItemChanged(QStandardItem* itemPtr)
 
 void CObjectCollectionViewComp::OnItemDoubleClick(const QModelIndex &item)
 {
-	QModelIndex mappedIndex1 = m_proxyModelPtr->mapToSource(item);
-	int sourceRow = m_customProxyModelPtr->mapToSource(mappedIndex1).row();
+	int sourceRow = m_proxyModelPtr->mapToSource(item).row();
 	QByteArray itemId = m_itemModel.item(sourceRow, 0)->data(DR_OBJECT_ID).toByteArray();
 
 	const ICollectionViewDelegate &delegate = GetViewDelegateRef(m_currentTypeId);
-
 	delegate.OpenDocumentEditor(itemId);
 }
 
@@ -732,10 +722,8 @@ void CObjectCollectionViewComp::OnContextMenuRename(bool /*checked*/)
 
 	if (!selectedIndexes.isEmpty()){
 		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex1 = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
-			QModelIndex mappedIndex2 = m_customProxyModelPtr->mapToSource(mappedIndex1);
-			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex2);
-
+			QModelIndex mappedIndex = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex);
 			if (itemPtr != nullptr){
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
 				if (!itemId.isEmpty()){
@@ -764,10 +752,8 @@ void CObjectCollectionViewComp::OnContextMenuEditDescription(bool /*checked*/)
 
 	if (!selectedIndexes.isEmpty()){
 		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex1 = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
-			QModelIndex mappedIndex2 = m_customProxyModelPtr->mapToSource(mappedIndex1);
-			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex2);
-
+			QModelIndex mappedIndex = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex);
 			if (itemPtr != nullptr){
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
 				if (!itemId.isEmpty()){
@@ -793,10 +779,8 @@ void CObjectCollectionViewComp::OnContextMenuEditDocument(bool /*checked*/)
 
 	if (!selectedIndexes.isEmpty()){
 		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex1 = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
-			QModelIndex mappedIndex2 = m_customProxyModelPtr->mapToSource(mappedIndex1);
-			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex2);
-
+			QModelIndex mappedIndex = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex);
 			if (itemPtr != nullptr){
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
 				if (!itemId.isEmpty()){
@@ -816,10 +800,8 @@ void CObjectCollectionViewComp::OnContextMenuRemove(bool /*checked*/)
 	QVector<QByteArray> itemIds;
 	if (!selectedIndexes.isEmpty()){
 		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex1 = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
-			QModelIndex mappedIndex2 = m_customProxyModelPtr->mapToSource(mappedIndex1);
-			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex2);
-
+			QModelIndex mappedIndex = m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(mappedIndex);
 			if (itemPtr != nullptr){
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
 				if (!itemId.isEmpty()){
@@ -835,7 +817,7 @@ void CObjectCollectionViewComp::OnContextMenuRemove(bool /*checked*/)
 
 void CObjectCollectionViewComp::OnFilterChanged(const QString &text)
 {
-	m_customProxyModelPtr->setFilter(text);
+	m_proxyModelPtr->setFilter(text);
 	m_itemModel.dataChanged(m_itemModel.index(0,0), m_itemModel.index(m_itemModel.rowCount() - 1, m_itemModel.columnCount() - 1));
 }
 
@@ -912,6 +894,16 @@ const ibase::IHierarchicalCommand* CObjectCollectionViewComp::Commands::GetComma
 
 bool CObjectCollectionViewComp::ItemProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& /*sourceParent*/) const
 {
+	QRegExp internalFilterRegExp = filterRegExp();
+	int internalFilterColumn = filterKeyColumn();
+	int internalFilterRole = filterRole();
+
+	QString internalFilterData = sourceModel()->index(sourceRow, internalFilterColumn).data(internalFilterRole).toString();
+
+	if (!internalFilterRegExp.exactMatch(internalFilterData)){
+		return false;
+	}
+
 	if (m_filter.isEmpty()){
 		return true;
 	}

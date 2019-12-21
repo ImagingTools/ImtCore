@@ -179,8 +179,7 @@ private:
 
 	imod::TModelWrap<Commands> m_commands;
 	
-	QSortFilterProxyModel* m_proxyModelPtr;
-	ItemProxyModel* m_customProxyModelPtr;
+	ItemProxyModel* m_proxyModelPtr;
 
 	bool m_blockColumnsSettingsSynchronize;
 	bool m_blockSaveItemsSelection;
