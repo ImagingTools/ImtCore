@@ -29,8 +29,8 @@ namespace imtbase
 
 
 /**
-	Implementation of a file-based data object collection. Each object will be placed in the file system according to the configured settings.
-	Two modes are supported:\n
+	Implementation of a file-based data object collection.
+	Each object will be placed in the file system according to the configured settings:
 	*<b>Plain</b>:In this mode the data file and related description files will be simply placed into the file collection folder.
 	*<b>Subfolder</b>: Each file will be placed into a separate folder. This folder contains the data file itself, file collection description file, and the meta-info file.
 	\ingroup Collection

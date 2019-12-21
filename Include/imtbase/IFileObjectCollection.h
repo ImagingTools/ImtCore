@@ -121,7 +121,7 @@ public:
 	/**
 		Add a file to the repository 
 		\param filePath				Path to the file.
-		\param objectTypeId			Type ID of the file object. \sa GetFileTypeConstraints
+		\param objectTypeId			Type-ID of the file object. \sa GetFileTypeConstraints
 		\param objectName			Name of the file object used for human readable representation. If no name was set, the file name will be used.
 		\param objectDescription	Description of the file object.
 		\param proposedObjectId		User-defined object-ID. If this parameter is not set, the implementation should generate a ID automatically.

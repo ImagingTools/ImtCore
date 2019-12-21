@@ -9,6 +9,7 @@
 
 // ACF includes
 #include <ibase/ICommandsProvider.h>
+#include <iqtgui/IVisualStatus.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
@@ -73,6 +74,11 @@ public:
 	};
 
 	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) = 0;
+
+	/**
+		Get access to the visual status of the document type supported by this delegate.
+	*/
+	virtual const iqtgui::IVisualStatus& GetDocumentTypeStatus() const = 0;
 
 	/**
 		Get the type-IDs supported by the delegate implementation.
