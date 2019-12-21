@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <istd/TDelPtr.h>
+#include <imod/TModelWrap.h>
 #include <ibase/TLocalizableWrap.h>
 #include <imtbase/CCollectionInfo.h>
 #include <iqtgui/IGuiObject.h>
@@ -38,6 +39,7 @@ public:
 
 	// reimplemented (ICollectionViewDelegate)
 	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;
+	virtual const iqtgui::IVisualStatus& GetDocumentTypeStatus() const override;
 	virtual QByteArray GetSupportedTypeId() const override;
 	virtual void UpdateItemSelection(
 				int viewStateFlags,
@@ -63,6 +65,15 @@ protected:
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
 
+protected:
+	class VisualStatus: virtual public iqtgui::IVisualStatus
+	{
+	private:
+		// reimplemented (IVisualStatus)
+		virtual QIcon GetStatusIcon() const override;
+		virtual QString GetStatusText() const override;
+	};
+
 protected Q_SLOTS:
 	virtual void OnInsert();
 	virtual void OnDuplicate();
@@ -87,6 +98,8 @@ protected:
 	QByteArray m_selectedTypeId;
 
 	imtbase::CCollectionInfo m_summaryInformationFields;
+
+	imod::TModelWrap<VisualStatus> m_visualStatus;
 };
 
 

@@ -9,6 +9,7 @@
 #include <QtWidgets/QShortCut>
 
 // ACF includes
+#include <imod/CMultiModelDispatcherBase.h>
 #include <ibase/ICommandsProvider.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <iqtgui/TRestorableGuiWrap.h>
@@ -28,7 +29,8 @@ namespace imtgui
 class CObjectCollectionViewComp:
 			public iqtgui::TRestorableGuiWrap<
 						iqtgui::TDesignerGuiObserverCompBase<
-									Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>
+									Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>,
+	private imod::CMultiModelDispatcherBase
 			
 {
 	Q_OBJECT
@@ -36,6 +38,7 @@ public:
 	typedef iqtgui::TRestorableGuiWrap<
 				iqtgui::TDesignerGuiObserverCompBase<
 							Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>> BaseClass;
+	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
 		I_REGISTER_SUBELEMENT(Commands);
@@ -51,6 +54,11 @@ public:
 	{
 		DR_TYPE_ID = Qt::UserRole,
 		DR_OBJECT_ID
+	};
+
+	enum ModelId
+	{
+		MI_DOCUMENT_TYPE_VISUAL_STATUS = 0
 	};
 
 	CObjectCollectionViewComp();
@@ -70,6 +78,9 @@ protected:
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiRetranslate() override;
+
+	// reimplemented (imod::CMultiModelDispatcherBase)
+	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

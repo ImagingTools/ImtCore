@@ -14,6 +14,7 @@
 #include <QtCore/QJsonArray>
 
 // ACF includes
+#include <imod/IModel.h>
 #include <idoc/IDocumentMetaInfo.h>
 #include <iqtgui/CCommandTools.h>
 #include <iqtgui/CHierarchicalCommand.h>
@@ -328,6 +329,18 @@ void CObjectCollectionViewComp::OnGuiRetranslate()
 }
 
 
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CObjectCollectionViewComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	switch (modelId){
+	case MI_DOCUMENT_TYPE_VISUAL_STATUS:
+		// UpdateTypeList();
+		break;
+	}
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CObjectCollectionViewComp::OnComponentCreated()
@@ -342,6 +355,11 @@ void CObjectCollectionViewComp::OnComponentCreated()
 			Q_ASSERT(!typeId.isEmpty());
 
 			m_viewDelegateMap[typeId] = delegatePtr;
+
+			imod::IModel* documentTypeVisualStatusModelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(&delegatePtr->GetDocumentTypeStatus()));
+			if (documentTypeVisualStatusModelPtr != nullptr){
+				BaseClass2::RegisterModel(documentTypeVisualStatusModelPtr, MI_DOCUMENT_TYPE_VISUAL_STATUS);
+			}
 		}
 	}
 }
@@ -349,6 +367,8 @@ void CObjectCollectionViewComp::OnComponentCreated()
 
 void CObjectCollectionViewComp::OnComponentDestroyed()
 {
+	BaseClass2::UnregisterAllModels();
+
 	m_viewDelegateMap.clear();
 
 	BaseClass::OnComponentDestroyed();

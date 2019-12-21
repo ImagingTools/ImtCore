@@ -43,6 +43,12 @@ bool CObjectCollectionViewDelegate::InitializeDelegate(imtbase::IObjectCollectio
 }
 
 
+const iqtgui::IVisualStatus& CObjectCollectionViewDelegate::GetDocumentTypeStatus() const
+{
+	return m_visualStatus;
+}
+
+
 QByteArray CObjectCollectionViewDelegate::GetSupportedTypeId() const
 {
 	static QByteArray retVal;
@@ -283,6 +289,22 @@ void CObjectCollectionViewDelegate::OnAddMenuOptionClicked(QAction* action)
 	if (objectId.isEmpty()){
 		QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("New document could not be created"));
 	}
+}
+
+
+// private methods of the embedded class VisualStatus
+
+// reimplemented (IVisualStatus)
+
+QIcon CObjectCollectionViewDelegate::VisualStatus::GetStatusIcon() const
+{
+	return QIcon();
+}
+
+
+QString CObjectCollectionViewDelegate::VisualStatus::GetStatusText() const
+{
+	return QString();
 }
 
 
