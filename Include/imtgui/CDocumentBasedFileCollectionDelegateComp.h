@@ -50,7 +50,7 @@ public:
 	// reimplemented (ICollectionViewDelegate)
 	virtual QByteArray GetSupportedTypeId() const override;
 	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
-	virtual void UpdateItemSelection(int viewStateFlags, const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
+	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
 
 protected:

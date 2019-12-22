@@ -29,29 +29,19 @@ public:
 	enum ViewState
 	{
 		/**
-			No state.
+			No flags.
 		*/
 		VS_NONE = 0,
 
 		/**
-			Something is selected.
+			Collection item is enabled and can be processed.
 		*/
-		VS_SELECTED = 1,
-
-		/**
-			Single instance is selected.
-		*/
-		VS_SINGLE_SELECTION = 2,
-
-		/**
-			Object is enabled and can be processed.
-		*/
-		VS_ENABLED = 4,
+		VS_ENABLED = 1,
 
 		/**
 			An editor for the object is available.
 		*/
-		VS_EDITOR_AVAILABLE = 8
+		VS_EDITOR_AVAILABLE = 2
 	};
 
 	/**
@@ -89,10 +79,7 @@ public:
 	/**
 		Update the commands state according to the state of the collection and the current state of the collection view.
 	*/
-	virtual void UpdateItemSelection(
-				int viewStateFlags,
-				const imtbase::ICollectionInfo::Ids& selectedItems,
-				const QByteArray& selectedTypeId) = 0;
+	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) = 0;
 
 	/**
 		Create a new object in the collection.
@@ -125,12 +112,13 @@ public:
 	virtual bool RenameObject(const QByteArray& objectId, const QString& newName) const = 0;
 
 	/**
-		TODO: Add comment
+		Get the list of the summary informations for the document type managed by this delegate.
+		Those informations will be shown on the collection view.
 	*/
 	virtual const imtbase::ICollectionInfo& GetSummaryInformationTypes() const = 0;
 
 	/**
-		TODO: Add comment
+		Get summary information of a given type for a given object.
 	*/
 	virtual QVariant GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const = 0;
 

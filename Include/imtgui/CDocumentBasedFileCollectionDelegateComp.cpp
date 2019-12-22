@@ -59,9 +59,9 @@ QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(const QByte
 }
 
 
-void CDocumentBasedFileCollectionDelegateComp::UpdateItemSelection(int viewStateFlags, const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId)
+void CDocumentBasedFileCollectionDelegateComp::UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId)
 {
-	BaseClass2::UpdateItemSelection(viewStateFlags, selectedItems, selectedTypeId);
+	BaseClass2::UpdateItemSelection(selectedItems, selectedTypeId);
 
 	m_editContentsCommand.setEnabled(!selectedItems.isEmpty());
 }

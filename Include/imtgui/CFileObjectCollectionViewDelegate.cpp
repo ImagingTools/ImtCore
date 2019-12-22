@@ -32,11 +32,11 @@ CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
 
 // reimplemented (ICollectionViewDelegate)
 
-void CFileObjectCollectionViewDelegate::UpdateItemSelection(int viewStateFlags, const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId)
+void CFileObjectCollectionViewDelegate::UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId)
 {
-	BaseClass::UpdateItemSelection(viewStateFlags, selectedItems, selectedTypeId);
+	BaseClass::UpdateItemSelection(selectedItems, selectedTypeId);
 
-	m_exportCommand.setEnabled(viewStateFlags & VS_SINGLE_SELECTION);
+	m_exportCommand.setEnabled(selectedItems.count() == 1);
 }
 
 

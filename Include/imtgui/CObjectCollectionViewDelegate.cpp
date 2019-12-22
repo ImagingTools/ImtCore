@@ -58,7 +58,6 @@ QByteArray CObjectCollectionViewDelegate::GetSupportedTypeId() const
 
 
 void CObjectCollectionViewDelegate::UpdateItemSelection(
-			int viewStateFlags,
 			const imtbase::ICollectionInfo::Ids& selectedItems,
 			const QByteArray& selectedTypeId)
 {

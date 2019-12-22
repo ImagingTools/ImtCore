@@ -252,6 +252,9 @@ QAbstractItemView[TabSimulation=true]
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
        </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
        <property name="alternatingRowColors">
         <bool>true</bool>
        </property>

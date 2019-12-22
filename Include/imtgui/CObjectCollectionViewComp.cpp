@@ -4,14 +4,14 @@
 // Qt includes
 #include <QtCore/QUuid>
 #include <QtCore/QDir>
-#include <QtWidgets/QToolBar>
-#include <QtWidgets/QMessageBox>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QInputDialog>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
 #include <QtCore/QJsonArray>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QInputDialog>
 
 // ACF includes
 #include <imod/IModel.h>
@@ -403,16 +403,7 @@ void CObjectCollectionViewComp::UpdateCommands()
 		}
 	}
 
-	int stateFlags = imtgui::ICollectionViewDelegate::VS_NONE;
-
-	if (!itemIds.isEmpty()){
-		stateFlags |= imtgui::ICollectionViewDelegate::VS_SELECTED;
-		if (itemIds.count() == 1){
-			stateFlags |= imtgui::ICollectionViewDelegate::VS_SINGLE_SELECTION;
-		}
-	}
-
-	GetViewDelegateRef(m_currentTypeId).UpdateItemSelection(stateFlags, itemIds, m_currentTypeId);
+	GetViewDelegateRef(m_currentTypeId).UpdateItemSelection(itemIds, m_currentTypeId);
 }
 
 
