@@ -54,9 +54,9 @@ public:
 		MIT_LAST_OPERATION_TIME,
 
 		/**
-			Timestamp of the last operation on the file in the collection.
+			Tumbnail for the item preview.
 		*/
-		MIT_ITEM_DESCRIPTION
+		MIT_PREVIEW_THUMBNAIL
 	};
 
 	/**

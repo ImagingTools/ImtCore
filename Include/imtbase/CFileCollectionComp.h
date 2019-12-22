@@ -22,6 +22,7 @@
 // ImtCore includes
 #include <imtbase/IFileObjectCollection.h>
 #include <imtbase/IFileCollectionInfo.h>
+#include <imtbase/IMetaInfoCreator.h>
 
 
 namespace imtbase
@@ -57,7 +58,8 @@ public:
 		I_ASSIGN_MULTI_0(m_resourceFileTypesCompPtr, "FileTypeInfos", "List of file type infos for corresponding resource type", false);
 		I_ASSIGN(m_useSubfolderAttrPtr, "UseSubfolder", "If set, for each input file a subfolder with the corresponding file name will be created", true, false);
 		I_ASSIGN_MULTI_0(m_objectPersistenceListCompPtr, "ObjectPersistenceList", "List of persistence components used for data object loading", false);
-		I_ASSIGN_MULTI_0(m_objectFactoryListCompPtr, "ObjectFactoryList", "List of factories used for data ojbect instance creation", false);
+		I_ASSIGN_MULTI_0(m_objectFactoryListCompPtr, "ObjectFactoryList", "List of factories used for data object instance creation", false);
+		I_ASSIGN_MULTI_0(m_metaInfoCreatorListCompPtr, "MetaInfoCreatorList", "List of meta-info creators related to the object types", false);
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
 		I_ASSIGN(m_createFolderOnStartAttrPtr, "CreateRepositoryFolder", "Ensure that the file collection folder is created on the start", true, true);
 		I_ASSIGN(m_pollFileSystemAttrPtr, "PollFileSystem", "If enabled, the collection folder will be observed and the items will be re-read on changes in the folder structure", true, false);
@@ -130,6 +132,12 @@ protected:
 		// reimplement (istd::IChangeable)
 		virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS);
 
+	public:
+		/**
+			Path to the root folder of the repository.
+		*/
+		QString m_repositoryFolderPath;
+
 		/**
 			ID of the file in the file collection.
 		*/
@@ -156,11 +164,14 @@ protected:
 		QByteArray typeId;
 
 		/**
-			Meta-informations for the file item.
+			Meta-informations for the file item in the collection.
 		*/
 		idoc::CStandardDocumentMetaInfo metaInfo;
 
-		QString m_repositoryFolderPath;
+		/**
+			Meta-informations for the file contents.
+		*/
+		imtbase::IMetaInfoCreator::MetaInfoPtr contentsMetaInfoPtr;
 	};
 
 	struct RepositoryInfo
@@ -208,9 +219,7 @@ protected:
 		Create meta-info object for a given file in the file collection.
 		\return The instance of the meta-information object, or \c NULL of no meta-info was created for the given file.
 	*/
-	virtual bool SetFileMetaInfo(
-				const QString& filePath,
-				idoc::IDocumentMetaInfo& metaInfo) const;
+	virtual imtbase::IMetaInfoCreator::MetaInfoPtr CreateFileContentsMetaInfo(const QString& filePath, const QByteArray& typeId) const;
 
 	/**
 		Update the meta informations for the existing item.
@@ -346,6 +355,9 @@ private:
 	*/
 	mutable QReadWriteLock m_collectionLock;
 
+	typedef QMap<QByteArray, const imtbase::IMetaInfoCreator*> MetaInfoCreatorMap;
+	MetaInfoCreatorMap m_metaInfoCreatorMap;
+
 	/**
 		Path to the directory where the file file collection is located.
 		If the path is set, the incomming file will be copied to this location,
@@ -377,6 +389,11 @@ private:
 		List of data object factories related to registered resource types.
 	*/
 	I_MULTIFACT(istd::IChangeable, m_objectFactoryListCompPtr);
+
+	/**
+		List of meta-info creators related to registered resource types.
+	*/
+	I_MULTIREF(imtbase::IMetaInfoCreator, m_metaInfoCreatorListCompPtr);
 
 	/**
 		Provider of the version information for the entire system.

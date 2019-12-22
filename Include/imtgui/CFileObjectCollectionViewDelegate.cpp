@@ -25,8 +25,8 @@ CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
 	m_summaryInformationFields.ResetData();
 	m_summaryInformationFields.InsertItem(QByteArray("TypeId"), tr("Type"), "");
 	m_summaryInformationFields.InsertItem(QByteArray("Description"), tr("Description"), "");
-	m_summaryInformationFields.InsertItem(QByteArray("ModificationTime"), tr("Modification Time"), "");
-	m_summaryInformationFields.InsertItem(QByteArray("Author"), tr("Author"), "");
+	m_summaryInformationFields.InsertItem(QByteArray("ModificationTime"), tr("Last Modified"), "");
+	m_summaryInformationFields.InsertItem(QByteArray("Added"), tr("Added"), "");
 }
 
 
@@ -70,8 +70,8 @@ QVariant CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArr
 	if (fileObjectCollectionPtr != nullptr){
 		idoc::CStandardDocumentMetaInfo metaInfo;
 		if (fileObjectCollectionPtr->GetItemMetaInfo(objectId, metaInfo)){
-			if (informationId == QByteArray("Author")){
-				return metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_AUTHOR);
+			if (informationId == QByteArray("Added")){
+				return metaInfo.GetMetaInfo(imtbase::IFileObjectCollection::MIT_INSERTION_TIME);
 			}
 
 			if (informationId == QByteArray("TypeId")){
@@ -83,7 +83,7 @@ QVariant CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArr
 			}
 
 			if (informationId == QByteArray("ModificationTime")){
-				return metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
+				return metaInfo.GetMetaInfo(imtbase::IFileObjectCollection::MIT_LAST_OPERATION_TIME);
 			}
 		}
 	}
