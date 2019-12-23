@@ -288,6 +288,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	m_searchShortCutPtr->setKey(Qt::CTRL + Qt::Key_F);
 	m_escShortCutPtr = new QShortcut(GetQtWidget());
 	m_escShortCutPtr->setKey(Qt::Key_Escape);
+	m_delShortCutPtr = new QShortcut(GetQtWidget());
+	m_delShortCutPtr->setKey(Qt::Key_Delete);
 
 	m_focusDecoratorPtr = new iwidgets::CFocusDecorator(this);
 	m_focusDecoratorPtr->RegisterWidget(FilterEdit, &m_graphicsEffectFactory);
@@ -312,6 +314,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	connect(CloseButton, &QToolButton::clicked, this, &CObjectCollectionViewComp::OnEscShortCut);
 	connect(m_searchShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnSearchShortCut);
 	connect(m_escShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnEscShortCut);
+	connect(m_delShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnDelShortCut);
 
 	ItemList->setContextMenuPolicy(Qt::CustomContextMenu);
 	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -872,6 +875,11 @@ void CObjectCollectionViewComp::OnEscShortCut()
 	GetQtWidget()->setFocus();
 }
 
+
+void CObjectCollectionViewComp::OnDelShortCut()
+{
+	OnContextMenuRemove(false);
+}
 
 // public methods of the embedded class Commands
 
