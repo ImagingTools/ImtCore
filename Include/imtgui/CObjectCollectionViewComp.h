@@ -57,7 +57,8 @@ public:
 
 	enum ModelId
 	{
-		MI_DOCUMENT_TYPE_VISUAL_STATUS = 0
+		MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE = 0,
+		MI_LAST = MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE + 1000
 	};
 
 	CObjectCollectionViewComp();
