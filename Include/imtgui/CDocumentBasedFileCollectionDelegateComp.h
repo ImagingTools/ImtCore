@@ -113,6 +113,9 @@ protected:
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
+	// reimplemented (imtgui::ICollectionViewDelegate)
+	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;
+
 protected Q_SLOTS:
 	virtual void OnEdit();
 

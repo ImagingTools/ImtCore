@@ -128,8 +128,6 @@ void CDocumentBasedFileCollectionDelegateComp::SetupCommands()
 		connect(&m_editContentsCommand, SIGNAL(triggered()), this, SLOT(OnEdit()));
 		m_editCommands.InsertChild(&m_editContentsCommand);
 	}
-
-	InitializeVisualStatus();
 }
 
 
@@ -169,6 +167,17 @@ void CDocumentBasedFileCollectionDelegateComp::OnComponentDestroyed()
 	}
 
 	BaseClass::OnComponentDestroyed();
+}
+
+
+bool CDocumentBasedFileCollectionDelegateComp::InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr)
+{
+	if (!BaseClass2::InitializeDelegate(collectionPtr, parentGuiPtr)){
+		return false;
+	}
+
+	InitializeVisualStatus();
+	return true;
 }
 
 
