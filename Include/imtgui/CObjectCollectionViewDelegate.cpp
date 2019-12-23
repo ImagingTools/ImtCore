@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <istd/CChangeGroup.h>
+#include <istd/CChangeNotifier.h>
 
 
 namespace imtgui
@@ -295,15 +296,31 @@ void CObjectCollectionViewDelegate::OnAddMenuOptionClicked(QAction* action)
 
 // reimplemented (IVisualStatus)
 
+void CObjectCollectionViewDelegate::VisualStatus::SetStatusIcon(const QIcon &statusIcon)
+{
+	istd::CChangeNotifier changeNotifier(this);
+	m_statusIcon = statusIcon;
+}
+
+
+void CObjectCollectionViewDelegate::VisualStatus::SetStatusText(const QString &statusText)
+{
+	if (m_statusText != statusText){
+		istd::CChangeNotifier changeNotifier(this);
+		m_statusText = statusText;
+	}
+}
+
+
 QIcon CObjectCollectionViewDelegate::VisualStatus::GetStatusIcon() const
 {
-	return QIcon();
+	return m_statusIcon;
 }
 
 
 QString CObjectCollectionViewDelegate::VisualStatus::GetStatusText() const
 {
-	return QString();
+	return m_statusText;
 }
 
 

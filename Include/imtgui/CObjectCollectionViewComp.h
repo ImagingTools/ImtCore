@@ -147,6 +147,8 @@ private:
 	void SaveItemsSelection();
 	void RestoreItemsSelection();
 
+	void UpdateTypeStatus();
+
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 	void OnItemChanged(QStandardItem *item);

@@ -255,6 +255,8 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	m_blockColumnsSettingsSynchronize = false;
 
 	RestoreItemsSelection();
+
+	UpdateTypeStatus();
 }
 
 
@@ -336,11 +338,13 @@ void CObjectCollectionViewComp::OnGuiRetranslate()
 
 void CObjectCollectionViewComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	switch (modelId){
-	case MI_DOCUMENT_TYPE_VISUAL_STATUS:
-		// UpdateTypeList();
-		break;
-	}
+	//switch (modelId){
+	//case MI_DOCUMENT_TYPE_VISUAL_STATUS:
+		if (IsGuiCreated()){
+			UpdateTypeStatus();
+		}
+	//	break;
+	//}
 }
 
 
@@ -360,7 +364,7 @@ void CObjectCollectionViewComp::OnComponentCreated()
 
 			imod::IModel* documentTypeVisualStatusModelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(&delegatePtr->GetDocumentTypeStatus()));
 			if (documentTypeVisualStatusModelPtr != nullptr){
-				BaseClass2::RegisterModel(documentTypeVisualStatusModelPtr, MI_DOCUMENT_TYPE_VISUAL_STATUS);
+				BaseClass2::RegisterModel(documentTypeVisualStatusModelPtr, MI_DOCUMENT_TYPE_VISUAL_STATUS + i);
 			}
 		}
 	}
@@ -617,6 +621,23 @@ void CObjectCollectionViewComp::RestoreItemsSelection()
 	}
 
 	ItemList->selectionModel()->select(selection, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+}
+
+
+void CObjectCollectionViewComp::UpdateTypeStatus()
+{
+	for (int delegateIndex = 0; delegateIndex < m_viewDelegatesCompPtr.GetCount(); ++delegateIndex){
+		ICollectionViewDelegate* delegatePtr = m_viewDelegatesCompPtr[delegateIndex];
+		QByteArray delegateTypeId = delegatePtr->GetSupportedTypeId();
+
+		for (int itemIndex = 0; itemIndex < TypeList->topLevelItemCount(); itemIndex++){
+			QByteArray itemTypeId = TypeList->topLevelItem(itemIndex)->data(0, DR_TYPE_ID).toByteArray();
+			if (delegateTypeId == itemTypeId){
+				TypeList->topLevelItem(itemIndex)->setIcon(0, delegatePtr->GetDocumentTypeStatus().GetStatusIcon());
+				break;
+			}
+		}
+	}
 }
 
 // private slots

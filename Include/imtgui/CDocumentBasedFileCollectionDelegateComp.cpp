@@ -155,6 +155,11 @@ void CDocumentBasedFileCollectionDelegateComp::OnComponentCreated()
 	if (m_documentManagerModelCompPtr.IsValid()){
 		m_documentManagerModelCompPtr->AttachObserver(&m_documentManagerObserver);
 	}
+
+	if (GetSupportedTypeId() == "Application")
+		m_visualStatus.SetStatusIcon(QIcon(":/Icons/StateInvalid2"));
+	if (GetSupportedTypeId() == "Scene")
+		m_visualStatus.SetStatusIcon(QIcon(":/Icons/StateOk2"));
 }
 
 
