@@ -45,7 +45,6 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
-		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIds", "List of type-IDs supported by this view", false);
 		I_ASSIGN_MULTI_0(m_viewDelegatesCompPtr, "ViewDelegates", "List of view delegates (corresponding with the object type) used for the collection", false);
 		I_ASSIGN(m_showCommandsToolBarAttrPtr, "ShowToolBar", "If enabled the command tool bar will be shown", true, true);
 	I_END_COMPONENT;
@@ -183,9 +182,8 @@ private:
 	I_ATTR(bool, m_showCommandsToolBarAttrPtr);
 
 	/**
-		List of supported type object's type-IDs.
+		List of collection view delegates.
 	*/
-	I_MULTIATTR(QByteArray, m_objectTypeIdsAttrPtr);
 	I_MULTIREF(ICollectionViewDelegate, m_viewDelegatesCompPtr);
 
 	QByteArray m_currentTypeId;

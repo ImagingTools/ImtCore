@@ -350,11 +350,10 @@ void CObjectCollectionViewComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	int delegatesCount = qMin(m_viewDelegatesCompPtr.GetCount(), m_objectTypeIdsAttrPtr.GetCount());
-	for (int i = 0; i < delegatesCount; ++i){
+	for (int i = 0; i < m_viewDelegatesCompPtr.GetCount(); ++i){
 		ICollectionViewDelegate* delegatePtr = m_viewDelegatesCompPtr[i];
 		if (delegatePtr != nullptr){
-			QByteArray typeId = m_objectTypeIdsAttrPtr[i];
+			QByteArray typeId = delegatePtr->GetSupportedTypeId();
 			Q_ASSERT(!typeId.isEmpty());
 
 			m_viewDelegateMap[typeId] = delegatePtr;
