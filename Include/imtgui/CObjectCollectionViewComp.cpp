@@ -338,13 +338,11 @@ void CObjectCollectionViewComp::OnGuiRetranslate()
 
 void CObjectCollectionViewComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	//switch (modelId){
-	//case MI_DOCUMENT_TYPE_VISUAL_STATUS:
+	if ((modelId >= MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE) && (modelId < MI_LAST)){
 		if (IsGuiCreated()){
 			UpdateTypeStatus();
 		}
-	//	break;
-	//}
+	}
 }
 
 
@@ -364,7 +362,7 @@ void CObjectCollectionViewComp::OnComponentCreated()
 
 			imod::IModel* documentTypeVisualStatusModelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(&delegatePtr->GetDocumentTypeStatus()));
 			if (documentTypeVisualStatusModelPtr != nullptr){
-				BaseClass2::RegisterModel(documentTypeVisualStatusModelPtr, MI_DOCUMENT_TYPE_VISUAL_STATUS + i);
+				BaseClass2::RegisterModel(documentTypeVisualStatusModelPtr, MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE + i);
 			}
 		}
 	}
@@ -634,6 +632,7 @@ void CObjectCollectionViewComp::UpdateTypeStatus()
 			QByteArray itemTypeId = TypeList->topLevelItem(itemIndex)->data(0, DR_TYPE_ID).toByteArray();
 			if (delegateTypeId == itemTypeId){
 				TypeList->topLevelItem(itemIndex)->setIcon(0, delegatePtr->GetDocumentTypeStatus().GetStatusIcon());
+				TypeList->topLevelItem(itemIndex)->setToolTip(0, delegatePtr->GetDocumentTypeStatus().GetStatusText());
 				break;
 			}
 		}

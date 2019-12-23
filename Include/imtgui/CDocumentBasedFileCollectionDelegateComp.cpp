@@ -128,6 +128,8 @@ void CDocumentBasedFileCollectionDelegateComp::SetupCommands()
 		connect(&m_editContentsCommand, SIGNAL(triggered()), this, SLOT(OnEdit()));
 		m_editCommands.InsertChild(&m_editContentsCommand);
 	}
+
+	InitializeVisualStatus();
 }
 
 
@@ -155,11 +157,6 @@ void CDocumentBasedFileCollectionDelegateComp::OnComponentCreated()
 	if (m_documentManagerModelCompPtr.IsValid()){
 		m_documentManagerModelCompPtr->AttachObserver(&m_documentManagerObserver);
 	}
-
-	if (GetSupportedTypeId() == "Application")
-		m_visualStatus.SetStatusIcon(QIcon(":/Icons/StateInvalid2"));
-	if (GetSupportedTypeId() == "Scene")
-		m_visualStatus.SetStatusIcon(QIcon(":/Icons/StateOk2"));
 }
 
 
@@ -174,6 +171,33 @@ void CDocumentBasedFileCollectionDelegateComp::OnComponentDestroyed()
 	BaseClass::OnComponentDestroyed();
 }
 
+
+void CDocumentBasedFileCollectionDelegateComp::InitializeVisualStatus()
+{
+	if (GetSupportedTypeId() == "Application"){
+		m_visualStatus.SetStatusIcon(m_statusIconsProviderCompPtr->GetIcon(0));
+
+		const iprm::IOptionsList* options = m_collectionPtr->GetObjectTypesInfo();
+		for (int i = 0; i < options->GetOptionsCount(); i++){
+			if (options->GetOptionId(i) == "Application"){
+				m_visualStatus.SetStatusText(options->GetOptionDescription(i));
+				break;
+			}
+		}
+	}
+
+	if (GetSupportedTypeId() == "Scene"){
+		m_visualStatus.SetStatusIcon(m_statusIconsProviderCompPtr->GetIcon(1));
+
+		const iprm::IOptionsList* options = m_collectionPtr->GetObjectTypesInfo();
+		for (int i = 0; i < options->GetOptionsCount(); i++){
+			if (options->GetOptionId(i) == "Scene"){
+				m_visualStatus.SetStatusText(options->GetOptionDescription(i));
+				break;
+			}
+		}
+	}
+}
 
 // protected slots
 

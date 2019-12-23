@@ -6,6 +6,7 @@
 #include <icomp/CComponentBase.h>
 #include <ifile/IFilePersistence.h>
 #include <idoc/IDocumentManager.h>
+#include <iqtgui/IIconProvider.h>
 
 // ImtCore includes
 #include <imtgui/CFileObjectCollectionViewDelegate.h>
@@ -36,6 +37,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(CollectionPersistence, ifile::IFileTypeInfo, ExtractCollectionPersistence);
 		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "Type-ID supported by this delegate", true, "ObjectTypeId");
 		I_ASSIGN(m_filePersistenceCompPtr, "FilePersistence", "Persistence for editable objects", true, "FilePersistence");
+		I_ASSIGN(m_statusIconsProviderCompPtr, "StatusIcons", "Icons for delegate visual status", false, "StatusIcons");
 		I_ASSIGN(m_documentManagerCompPtr, "DocumentManager", "Document manager", true, "DocumentManager");
 		I_ASSIGN_TO(m_documentManagerModelCompPtr, m_documentManagerCompPtr, true);
 	I_END_COMPONENT;
@@ -121,8 +123,11 @@ private:
 		return &component.m_collectionPersistence;
 	}
 
+	void InitializeVisualStatus();
+
 private:
 	I_ATTR(QByteArray, m_objectTypeIdAttrPtr);
+	I_REF(iqtgui::IIconProvider, m_statusIconsProviderCompPtr);
 
 	/**
 		Persistence for the related object.
