@@ -892,6 +892,8 @@ void CObjectCollectionViewComp::OnEscShortCut()
 	m_filterPanelAnimationPtr->setDuration(300);
 	m_filterPanelAnimationPtr->start();
 	GetQtWidget()->setFocus();
+	FilterEdit->clear();
+	OnFilterChanged("");
 }
 
 
