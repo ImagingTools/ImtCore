@@ -28,7 +28,7 @@ public:
 	/**
 		Create meta informations for the data object of the given type.
 	*/
-	virtual bool CreateMetaInfo(const istd::IChangeable& data, const QByteArray& typeId, MetaInfoPtr& metaInfo) const = 0;
+	virtual bool CreateMetaInfo(const istd::IChangeable& data, const QByteArray& typeId, MetaInfoPtr& metaInfoPtr) const = 0;
 };
 
 
