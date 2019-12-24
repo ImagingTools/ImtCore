@@ -35,6 +35,18 @@ QByteArray CDocumentBasedFileCollectionDelegateComp::GetSupportedTypeId() const
 }
 
 
+bool CDocumentBasedFileCollectionDelegateComp::InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr)
+{
+	if (!BaseClass2::InitializeDelegate(collectionPtr, parentGuiPtr)){
+		return false;
+	}
+
+	InitializeVisualStatus();
+
+	return true;
+}
+
+
 QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(const QByteArray& typeId, const istd::IChangeable* /*defaultDataPtr*/) const
 {
 	if (typeId != GetSupportedTypeId()){
@@ -170,43 +182,21 @@ void CDocumentBasedFileCollectionDelegateComp::OnComponentDestroyed()
 }
 
 
-bool CDocumentBasedFileCollectionDelegateComp::InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr)
-{
-	if (!BaseClass2::InitializeDelegate(collectionPtr, parentGuiPtr)){
-		return false;
-	}
-
-	InitializeVisualStatus();
-	return true;
-}
-
+// private methods
 
 void CDocumentBasedFileCollectionDelegateComp::InitializeVisualStatus()
 {
-	if (GetSupportedTypeId() == "Application"){
-		m_visualStatus.SetStatusIcon(m_statusIconsProviderCompPtr->GetIcon(0));
+	m_visualStatus.SetStatusIcon(m_statusIconsProviderCompPtr->GetIcon(0));
 
-		const iprm::IOptionsList* options = m_collectionPtr->GetObjectTypesInfo();
-		for (int i = 0; i < options->GetOptionsCount(); i++){
-			if (options->GetOptionId(i) == "Application"){
-				m_visualStatus.SetStatusText(options->GetOptionDescription(i));
-				break;
-			}
-		}
-	}
-
-	if (GetSupportedTypeId() == "Scene"){
-		m_visualStatus.SetStatusIcon(m_statusIconsProviderCompPtr->GetIcon(1));
-
-		const iprm::IOptionsList* options = m_collectionPtr->GetObjectTypesInfo();
-		for (int i = 0; i < options->GetOptionsCount(); i++){
-			if (options->GetOptionId(i) == "Scene"){
-				m_visualStatus.SetStatusText(options->GetOptionDescription(i));
-				break;
-			}
+	const iprm::IOptionsList* options = m_collectionPtr->GetObjectTypesInfo();
+	for (int i = 0; i < options->GetOptionsCount(); i++) {
+		if (options->GetOptionId(i) == *m_objectTypeIdAttrPtr) {
+			m_visualStatus.SetStatusText(options->GetOptionDescription(i));
+			break;
 		}
 	}
 }
+
 
 // protected slots
 

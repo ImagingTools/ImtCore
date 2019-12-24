@@ -51,6 +51,7 @@ public:
 
 	// reimplemented (ICollectionViewDelegate)
 	virtual QByteArray GetSupportedTypeId() const override;
+	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;
 	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
@@ -112,9 +113,6 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
-
-	// reimplemented (imtgui::ICollectionViewDelegate)
-	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;
 
 protected Q_SLOTS:
 	virtual void OnEdit();
