@@ -126,6 +126,13 @@ public:
 		Open a document editor for a given data object.
 	*/
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const = 0;
+
+	/**
+		Get access to the information view.
+		Information widget will show the information about currently selected item(s).
+		\sa UpdateItemSelection
+	*/
+	virtual iqtgui::IGuiObject* GetInformationView() const = 0;
 };
 
 

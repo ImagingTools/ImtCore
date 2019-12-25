@@ -27,7 +27,9 @@ namespace imtgui
 // protected methods
 
 CObjectCollectionViewComp::CObjectCollectionViewComp()
-	:m_blockColumnsSettingsSynchronize(false), m_blockSaveItemsSelection(false)
+	:m_blockColumnsSettingsSynchronize(false),
+	m_blockSaveItemsSelection(false),
+	m_currentInformationViewPtr(nullptr)
 {
 	m_commands.SetParent(this);
 }
@@ -705,10 +707,12 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 
 void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 {
-	bool m_blockStored = m_blockSaveItemsSelection;
+	bool blockStored = m_blockSaveItemsSelection;
 
 	EnsureColumnsSettingsSynchronized();
+
 	SaveItemsSelection();
+
 	m_blockSaveItemsSelection = true;
 
 	m_currentTypeId.clear();
@@ -737,10 +741,22 @@ void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 	}
 
 	m_blockSaveItemsSelection = false;
+
 	RestoreItemsSelection();
 	RestoreColumnsSettings();
 
-	m_blockSaveItemsSelection = m_blockStored;
+	m_blockSaveItemsSelection = blockStored;
+
+	if ((m_currentInformationViewPtr != nullptr) && m_currentInformationViewPtr->IsGuiCreated()){
+		m_currentInformationViewPtr->DestroyGui();
+
+		if (!m_currentTypeId.isEmpty()){
+			m_currentInformationViewPtr = GetViewDelegateRef(m_currentTypeId).GetInformationView();
+			if (m_currentInformationViewPtr != nullptr){
+				m_currentInformationViewPtr->CreateGui(RightPanel);
+			}
+		}
+	}
 }
 
 
@@ -751,7 +767,7 @@ void CObjectCollectionViewComp::OnContextMenuRename(bool /*checked*/)
 
 	if (selectedIndexes.count() != 1){
 		return;
-	}	
+	}
 
 	if (!selectedIndexes.isEmpty()){
 		for (int i = 0; i < selectedIndexes.count(); ++i){
@@ -901,6 +917,7 @@ void CObjectCollectionViewComp::OnDelShortCut()
 {
 	OnContextMenuRemove(false);
 }
+
 
 // public methods of the embedded class Commands
 

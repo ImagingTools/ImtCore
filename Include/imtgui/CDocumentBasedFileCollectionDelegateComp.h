@@ -40,6 +40,7 @@ public:
 		I_ASSIGN(m_statusIconsProviderCompPtr, "StatusIcons", "Icons for delegate visual status", false, "StatusIcons");
 		I_ASSIGN(m_documentManagerCompPtr, "DocumentManager", "Document manager", true, "DocumentManager");
 		I_ASSIGN_TO(m_documentManagerModelCompPtr, m_documentManagerCompPtr, true);
+		I_ASSIGN(m_informationViewCompPtr, "InformationView", "information view", false, "InformationView");
 	I_END_COMPONENT;
 
 	enum CommandGroup
@@ -55,6 +56,7 @@ public:
 	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
+	virtual iqtgui::IGuiObject* GetInformationView() const override;
 
 protected:
 	/**
@@ -140,6 +142,12 @@ private:
 	*/
 	I_REF(idoc::IDocumentManager, m_documentManagerCompPtr);
 	I_REF(imod::IModel, m_documentManagerModelCompPtr);
+
+
+	/**
+		View used for showing the information about the currently selected item.
+	*/
+	I_REF(iqtgui::IGuiObject, m_informationViewCompPtr);
 
 	typedef istd::TPointerVector<ICollectionViewDelegate::ObjectInfo> WorkingObjects;
 	mutable WorkingObjects m_workingObjects;

@@ -204,6 +204,8 @@ private:
 	mutable TypeIdColumnsSettings m_typeIdColumnsSettings;
 
 	QMap<QByteArray, QByteArrayList> m_itemsSelection;
+
+	iqtgui::IGuiObject* m_currentInformationViewPtr;
 };
 
 

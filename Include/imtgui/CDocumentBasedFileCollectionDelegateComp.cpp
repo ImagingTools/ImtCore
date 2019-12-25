@@ -127,6 +127,12 @@ bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(const QByteArr
 }
 
 
+iqtgui::IGuiObject* CDocumentBasedFileCollectionDelegateComp::GetInformationView() const
+{
+	return m_informationViewCompPtr.GetPtr();
+}
+
+
 // protected methods
 
 // reimplemented (CObjectCollectionViewDelegate)

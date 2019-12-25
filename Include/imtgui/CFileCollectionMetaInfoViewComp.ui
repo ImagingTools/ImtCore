@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CFileCollectionMetaInfoViewComp</class>
+ <widget class="QWidget" name="CFileCollectionMetaInfoViewComp">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>268</width>
+    <height>771</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QAbstractItemView
+{
+	outline: 0;
+}
+
+
+QAbstractItemView[NoFrame=&quot;true&quot;]
+{
+	border: none;
+}
+
+
+QAbstractItemView::item
+{
+	padding-top: 0.7em;
+	padding-bottom: 0.7em;
+}
+
+QHeaderView
+{
+	border: none;
+	padding: 0px;
+}
+
+QHeaderView::section
+{
+	padding-top:5px;
+	padding-bottom:5px;
+	background-color: white;
+	padding-left: 4px;
+	border-bottom: 1px solid #dfdfdf;
+	border-left: none;
+	border-right: none;
+	border-top: none;
+	color: #335777;
+	font-weight: bold;
+}
+
+
+/*
+	Tab simulation using tree widget
+*/
+QTreeWidget[TabSimulation=true]
+{
+	color: #808080;
+	background: rgb(230,230,230);
+	font-weight: bold;
+	text-align: left;
+	color: #808080;
+}
+
+
+QTreeWidget[TabSimulation=true]::item 
+{
+    border: 0px none transparent;
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+QTreeWidget[TabSimulation=true]::item:first
+{
+    padding-left: 5px;
+}
+
+
+QTreeWidget[TabSimulation=true]::item:last
+{
+    padding-right: 15px;
+}
+
+QTreeWidget[TabSimulation=true]::item:selected 
+{
+    color: #335777;
+    background-color: rgb(255, 255, 255);
+}
+
+QTreeWidget[TabSimulation=true]::item:!selected:hover 
+{
+	background-color: #dedede;
+}
+
+
+
+QTreeWidget[TabSimulation=true]::item:first:selected
+{
+    border-top: 1px white;
+}
+
+
+
+QAbstractItemView[TabSimulation=true]
+{
+    outline: 0;
+}
+
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QFrame" name="PreviewFrame">
+     <property name="minimumSize">
+      <size>
+       <width>250</width>
+       <height>250</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>250</width>
+       <height>250</height>
+      </size>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="leftMargin">
+       <number>20</number>
+      </property>
+      <property name="topMargin">
+       <number>20</number>
+      </property>
+      <property name="rightMargin">
+       <number>20</number>
+      </property>
+      <property name="bottomMargin">
+       <number>20</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="PreviewPixmap">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="imtgui.qrc">:/Icons/StateOk</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="InfoContainer">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>250</width>
+        <height>69</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>419</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="imtgui.qrc"/>
+ </resources>
+ <connections/>
+</ui>

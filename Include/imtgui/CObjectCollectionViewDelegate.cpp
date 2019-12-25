@@ -178,6 +178,12 @@ bool CObjectCollectionViewDelegate::OpenDocumentEditor(const QByteArray& /*objec
 }
 
 
+iqtgui::IGuiObject* CObjectCollectionViewDelegate::GetInformationView() const
+{
+	return nullptr;
+}
+
+
 // reimplemented (ibase::ICommandsProvider)
 
 const ibase::IHierarchicalCommand* CObjectCollectionViewDelegate::GetCommands() const
