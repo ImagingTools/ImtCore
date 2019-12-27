@@ -925,7 +925,7 @@ imtbase::IMetaInfoCreator::MetaInfoPtr CFileCollectionComp::CreateFileContentsMe
 			m_metaInfoCreatorMap[typeId]->CreateMetaInfo(*dataObjectPtr, typeId, retVal);
 		}
 		else{
-			retVal.SetPtr(new idoc::CStandardDocumentMetaInfo);
+			retVal.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
 		}
 
 		if (retVal.IsValid()){
