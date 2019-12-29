@@ -46,7 +46,7 @@ void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeS
 
 			switch (type) {
 			case imtbase::IFileObjectCollection::MIT_CHECKSUM:
-				labelNamePtr->setText("CRC");
+				labelNamePtr->setText("Checksum");
 				labelValuePtr = new QLabel((QString("%1").arg(value.toLongLong(), 8, 16, QChar('0'))).toUpper());
 				break;
 			case imtbase::IFileObjectCollection::MIT_INSERTION_USER:
@@ -70,12 +70,12 @@ void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeS
 				labelValuePtr = new QLabel("UNKNOWN MIT_ID");
 			}
 
-			labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: black");
-			labelValuePtr->setStyleSheet("font-size: 9px; font: bold; color: gray");
-			layout->addWidget(labelNamePtr, layout->rowCount(), 0, 1, 3);
-			layout->addWidget(labelValuePtr, layout->rowCount(), 1, 1, 2);
+			labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: #335777");
+			labelValuePtr->setStyleSheet("font-size: 9px; color: gray");
+			layout->addWidget(labelNamePtr, layout->rowCount(), 0, 1, 1);
+			layout->addWidget(labelValuePtr, layout->rowCount(), 0, 1, 1);
 			QSpacerItem* delimeter = new QSpacerItem(10, 5);
-			layout->addItem(delimeter, layout->rowCount(), 0, 1, 3);
+			layout->addItem(delimeter, layout->rowCount(), 0, 1, 1);
 		}
 
 		PreviewPixmap->setPixmap(pixmap.scaledToWidth(200));
