@@ -5,6 +5,7 @@
 #include <imod/TSingleModelObserverBase.h>
 #include <icomp/CComponentBase.h>
 #include <ifile/IFilePersistence.h>
+#include <ifile/IFileMetaInfoProvider.h>
 #include <idoc/IDocumentManager.h>
 #include <iqtgui/IIconProvider.h>
 
@@ -148,6 +149,7 @@ private:
 		View used for showing the information about the currently selected item.
 	*/
 	I_REF(iqtgui::IGuiObject, m_informationViewCompPtr);
+	ifile::IFileMetaInfoProvider::MetaInfoPtr m_informationModelPtr;
 
 	typedef istd::TPointerVector<ICollectionViewDelegate::ObjectInfo> WorkingObjects;
 	mutable WorkingObjects m_workingObjects;

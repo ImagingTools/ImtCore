@@ -749,12 +749,12 @@ void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 
 	if ((m_currentInformationViewPtr != nullptr) && m_currentInformationViewPtr->IsGuiCreated()){
 		m_currentInformationViewPtr->DestroyGui();
+	}
 
-		if (!m_currentTypeId.isEmpty()){
-			m_currentInformationViewPtr = GetViewDelegateRef(m_currentTypeId).GetInformationView();
-			if (m_currentInformationViewPtr != nullptr){
-				m_currentInformationViewPtr->CreateGui(RightPanel);
-			}
+	if (!m_currentTypeId.isEmpty()){
+		m_currentInformationViewPtr = GetViewDelegateRef(m_currentTypeId).GetInformationView();
+		if (m_currentInformationViewPtr != nullptr){
+			m_currentInformationViewPtr->CreateGui(RightPanel);
 		}
 	}
 }

@@ -76,6 +76,33 @@ void CDocumentBasedFileCollectionDelegateComp::UpdateItemSelection(const imtbase
 	BaseClass2::UpdateItemSelection(selectedItems, selectedTypeId);
 
 	m_editContentsCommand.setEnabled(!selectedItems.isEmpty());
+
+	if (m_informationModelPtr.IsValid()){
+		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_informationModelPtr.GetPtr());
+		if (modelPtr){
+			modelPtr->DetachAllObservers();
+		}
+		m_informationModelPtr.Reset();
+	}
+
+	if (selectedItems.count() != 1){
+		return;
+	}
+
+	if (m_informationViewCompPtr.IsValid()){
+		imod::IObserver* observerPtr = dynamic_cast<imod::IObserver*>(m_informationViewCompPtr.GetPtr());
+		if (observerPtr){
+			imtbase::IFileObjectCollection* collectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+			if (collectionPtr->GetFileMetaInfo(selectedItems[0], m_informationModelPtr)) {
+				imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_informationModelPtr.GetPtr());
+				if (modelPtr){
+					if (dynamic_cast<idoc::IDocumentMetaInfo*>(modelPtr)){
+						modelPtr->AttachObserver(observerPtr);
+					}	
+				}
+			}
+		}
+	}
 }
 
 

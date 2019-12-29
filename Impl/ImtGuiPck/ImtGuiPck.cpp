@@ -52,6 +52,10 @@ I_EXPORT_COMPONENT(
 			"Standard document workspace",
 			"Workspace Tabs View Document File MDI");
 
+I_EXPORT_COMPONENT(
+	FileCollectionMetaInfoView,
+	"File collection metainfo view",
+	"File Data Collection Document Meta Info Metainfo View Preview");
 
 } // namespace ImtGuiPck
 
