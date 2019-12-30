@@ -1,6 +1,10 @@
 #include <imtgui/CFileCollectionMetaInfoViewComp.h>
 
 
+// ACF includes
+#include <iwidgets/iwidgets.h>
+
+
 namespace imtgui
 {
 
@@ -18,22 +22,12 @@ CFileCollectionMetaInfoViewComp::CFileCollectionMetaInfoViewComp()
 
 void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	QGridLayout* layout = dynamic_cast<QGridLayout *>(InfoWidget->layout());
-	if (layout){
-		while (layout->count()){
-			QLayoutItem* item = layout->takeAt(0);
-			delete item->widget();
-			delete item;
-		}
-	}
+	iwidgets::ClearLayout(InfoWidget->layout());
 
-	if (!IsModelAttached()){
-		return;
-	}
+	static QPixmap pixmap = QPixmap(":/Icons/StateOk");
 
-	QPixmap pixmap = QPixmap(":/Icons/StateOk");
-	layout = dynamic_cast<QGridLayout*>(InfoWidget->layout());
-	if (layout){
+	QGridLayout* layoutPtr = dynamic_cast<QGridLayout*>(InfoWidget->layout());
+	if (layoutPtr != nullptr){
 		idoc::IDocumentMetaInfo* metaInfo = GetObservedObject();
 		idoc::IDocumentMetaInfo::MetaInfoTypes types = metaInfo->GetMetaInfoTypes();
 
@@ -42,7 +36,7 @@ void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeS
 			QVariant value = metaInfo->GetMetaInfo(type);
 
 			QLabel* labelNamePtr = new QLabel(name);
-			QLabel* labelValuePtr;
+			QLabel* labelValuePtr = nullptr;
 
 			switch (type) {
 			case imtbase::IFileObjectCollection::MIT_CHECKSUM:
@@ -72,21 +66,23 @@ void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeS
 
 			labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: #335777");
 			labelValuePtr->setStyleSheet("font-size: 9px; color: gray");
-			layout->addWidget(labelNamePtr, layout->rowCount(), 0, 1, 1);
-			layout->addWidget(labelValuePtr, layout->rowCount(), 0, 1, 1);
+			layoutPtr->addWidget(labelNamePtr, layoutPtr->rowCount(), 0, 1, 1);
+			layoutPtr->addWidget(labelValuePtr, layoutPtr->rowCount(), 0, 1, 1);
+
 			QSpacerItem* delimeter = new QSpacerItem(10, 5);
-			layout->addItem(delimeter, layout->rowCount(), 0, 1, 1);
+			layoutPtr->addItem(delimeter, layoutPtr->rowCount(), 0, 1, 1);
 		}
 
 		PreviewPixmap->setPixmap(pixmap.scaledToWidth(200));
 
-		layout->setColumnMinimumWidth(0, 10);
-		layout->setColumnStretch(0, 1);
-		layout->setColumnStretch(1, 100);
-		layout->setColumnStretch(1, 100);
-		layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding),layout->rowCount(), 0);
+		layoutPtr->setColumnMinimumWidth(0, 10);
+		layoutPtr->setColumnStretch(0, 1);
+		layoutPtr->setColumnStretch(1, 100);
+		layoutPtr->setColumnStretch(1, 100);
+		layoutPtr->addItem(new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding),layoutPtr->rowCount(), 0);
 	}
 }
+
 
 // reimplemented (iqtgui::CGuiComponentBase)
 
