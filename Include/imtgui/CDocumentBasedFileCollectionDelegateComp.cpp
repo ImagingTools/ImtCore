@@ -216,11 +216,13 @@ void CDocumentBasedFileCollectionDelegateComp::InitializeVisualStatus()
 {
 	m_visualStatus.SetStatusIcon(m_statusIconsProviderCompPtr->GetIcon(0));
 
-	const iprm::IOptionsList* options = m_collectionPtr->GetObjectTypesInfo();
-	for (int i = 0; i < options->GetOptionsCount(); i++){
-		if (options->GetOptionId(i) == *m_objectTypeIdAttrPtr){
-			m_visualStatus.SetStatusText(options->GetOptionDescription(i));
-			break;
+	const iprm::IOptionsList* typeListPtr = m_collectionPtr->GetObjectTypesInfo();
+	if (typeListPtr != nullptr){
+		for (int i = 0; i < typeListPtr->GetOptionsCount(); i++){
+			if (typeListPtr->GetOptionId(i) == *m_objectTypeIdAttrPtr){
+				m_visualStatus.SetStatusText(typeListPtr->GetOptionDescription(i));
+				break;
+			}
 		}
 	}
 }
