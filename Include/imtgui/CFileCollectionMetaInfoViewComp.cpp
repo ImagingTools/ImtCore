@@ -28,12 +28,14 @@ void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeS
 
 	QGridLayout* layoutPtr = dynamic_cast<QGridLayout*>(InfoWidget->layout());
 	if (layoutPtr != nullptr){
-		idoc::IDocumentMetaInfo* metaInfo = GetObservedObject();
-		idoc::IDocumentMetaInfo::MetaInfoTypes types = metaInfo->GetMetaInfoTypes();
+		idoc::IDocumentMetaInfo* metaInfoPtr= GetObservedObject();
+		Q_ASSERT(metaInfoPtr != nullptr);
+
+		idoc::IDocumentMetaInfo::MetaInfoTypes types = metaInfoPtr->GetMetaInfoTypes();
 
 		for (int type : types) {
-			QString name = metaInfo->GetMetaInfoName(type);
-			QVariant value = metaInfo->GetMetaInfo(type);
+			QString name = metaInfoPtr->GetMetaInfoName(type);
+			QVariant value = metaInfoPtr->GetMetaInfo(type);
 
 			QLabel* labelNamePtr = new QLabel(name);
 			QLabel* labelValuePtr = nullptr;
@@ -102,7 +104,9 @@ void CFileCollectionMetaInfoViewComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
-	UpdateGui(istd::IChangeable::GetAnyChange());
+	if (IsModelAttached()){
+		UpdateGui(istd::IChangeable::GetAnyChange());
+	}
 }
 
 // reimplemented (iqtgui::TGuiObserverWrap)
