@@ -22,9 +22,11 @@ CFileCollectionMetaInfoViewComp::CFileCollectionMetaInfoViewComp()
 
 void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	iwidgets::ClearLayout(InfoWidget->layout());
+	if (InfoWidget->layout() != nullptr){
+		iwidgets::ClearLayout(InfoWidget->layout());
+	}
 
-	static QPixmap pixmap = QPixmap(":/Icons/StateOk");
+	QPixmap pixmap;
 
 	QGridLayout* layoutPtr = dynamic_cast<QGridLayout*>(InfoWidget->layout());
 	if (layoutPtr != nullptr){
@@ -60,7 +62,9 @@ void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeS
 				labelValuePtr = new QLabel(value.toDateTime().toString(Qt::DefaultLocaleShortDate));
 				break;
 			case imtbase::IFileObjectCollection::MetaInfoType::MIT_PREVIEW_THUMBNAIL:
-				pixmap = value.value<QPixmap>();
+				pixmap.convertFromImage(value.value<QImage>());
+				PreviewPixmap->setPixmap(pixmap.scaledToWidth(200));
+				PreviewFrame->show();
 				break;
 			default:
 				labelValuePtr = new QLabel("UNKNOWN MIT_ID");
@@ -74,8 +78,6 @@ void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeS
 			QSpacerItem* delimeter = new QSpacerItem(10, 5);
 			layoutPtr->addItem(delimeter, layoutPtr->rowCount(), 0, 1, 1);
 		}
-
-		PreviewPixmap->setPixmap(pixmap.scaledToWidth(200));
 
 		layoutPtr->setColumnMinimumWidth(0, 10);
 		layoutPtr->setColumnStretch(0, 1);
@@ -96,7 +98,7 @@ void CFileCollectionMetaInfoViewComp::OnGuiCreated()
 		InfoWidget->setLayout(new QGridLayout());
 	}
 
-	PreviewPixmap->setPixmap(QPixmap(":/Icons/StateOk").scaledToWidth(200));
+	PreviewFrame->hide();
 }
 
 
@@ -122,7 +124,7 @@ void CFileCollectionMetaInfoViewComp::OnGuiModelDetached()
 		}
 	}
 
-	PreviewPixmap->setPixmap(QPixmap(":/Icons/StateOk").scaledToWidth(200));
+	PreviewFrame->hide();
 }
 
 
