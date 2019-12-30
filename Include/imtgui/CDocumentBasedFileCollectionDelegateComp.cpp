@@ -77,28 +77,23 @@ void CDocumentBasedFileCollectionDelegateComp::UpdateItemSelection(const imtbase
 
 	m_editContentsCommand.setEnabled(!selectedItems.isEmpty());
 
-	if (m_informationModelPtr.IsValid()){
-		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_informationModelPtr.GetPtr());
-		if (modelPtr){
+	if (m_selectedMetaInfoPtr.IsValid()){
+		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_selectedMetaInfoPtr.GetPtr());
+		if (modelPtr != nullptr){
 			modelPtr->DetachAllObservers();
 		}
-		m_informationModelPtr.Reset();
+
+		m_selectedMetaInfoPtr.Reset();
 	}
 
-	if (selectedItems.count() != 1){
-		return;
-	}
-
-	if (m_informationViewCompPtr.IsValid()){
+	if (m_informationViewCompPtr.IsValid() && (selectedItems.count() == 1)){
 		imod::IObserver* observerPtr = dynamic_cast<imod::IObserver*>(m_informationViewCompPtr.GetPtr());
-		if (observerPtr){
+		if (observerPtr != nullptr){
 			imtbase::IFileObjectCollection* collectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
-			if (collectionPtr->GetFileMetaInfo(selectedItems[0], m_informationModelPtr)) {
-				imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_informationModelPtr.GetPtr());
-				if (modelPtr){
-					if (dynamic_cast<idoc::IDocumentMetaInfo*>(modelPtr)){
-						modelPtr->AttachObserver(observerPtr);
-					}	
+			if (collectionPtr->GetFileMetaInfo(selectedItems[0], m_selectedMetaInfoPtr)){
+				imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_selectedMetaInfoPtr.GetPtr());
+				if (modelPtr != nullptr){
+					modelPtr->AttachObserver(observerPtr);
 				}
 			}
 		}
@@ -142,7 +137,7 @@ bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(const QByteArr
 	QString tempFilePath = tempPath + "/ " + objectInfoPtr->name + "." + QFileInfo(fileInfo.fileName).suffix();
 
 	QString targetFilePath = fileCollectionPtr->GetFile(objectId, tempFilePath);
-	if (!targetFilePath.isEmpty()) {
+	if (!targetFilePath.isEmpty()){
 		if (m_documentManagerCompPtr->OpenDocument(&objectInfoPtr->typeId, &targetFilePath, true, viewTypeId, &objectInfoPtr->objectPtr)){
 			m_workingObjects.PushBack(objectInfoPtr);
 
@@ -222,8 +217,8 @@ void CDocumentBasedFileCollectionDelegateComp::InitializeVisualStatus()
 	m_visualStatus.SetStatusIcon(m_statusIconsProviderCompPtr->GetIcon(0));
 
 	const iprm::IOptionsList* options = m_collectionPtr->GetObjectTypesInfo();
-	for (int i = 0; i < options->GetOptionsCount(); i++) {
-		if (options->GetOptionId(i) == *m_objectTypeIdAttrPtr) {
+	for (int i = 0; i < options->GetOptionsCount(); i++){
+		if (options->GetOptionId(i) == *m_objectTypeIdAttrPtr){
 			m_visualStatus.SetStatusText(options->GetOptionDescription(i));
 			break;
 		}
@@ -314,19 +309,19 @@ int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::SaveToFile
 				objectInfoPtr->tempFilePath = tempFilePath;
 
 				int saveState = m_parent.m_filePersistenceCompPtr->SaveToFile(data, tempFilePath, progressManagerPtr);
-				if (saveState == ifile::IFilePersistence::OS_OK) {
+				if (saveState == ifile::IFilePersistence::OS_OK){
 					QString objectName = QFileInfo(filePath).completeBaseName();
 
 					// If the object-ID is empty, we have to insert a new instance to the collection:
-					if (objectInfoPtr->uuid.isEmpty()) {
+					if (objectInfoPtr->uuid.isEmpty()){
 						QString description;
 						const idoc::IDocumentMetaInfo* documentMetaInfoPtr = CompCastPtr<idoc::IDocumentMetaInfo>(&data);
-						if (documentMetaInfoPtr != NULL) {
+						if (documentMetaInfoPtr != NULL){
 							description = documentMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
 						}
 
 						QByteArray objectId = m_parent.m_collectionPtr->InsertNewObject(typeId, objectName, description, &data);
-						if (!objectId.isEmpty()) {
+						if (!objectId.isEmpty()){
 							objectInfoPtr->uuid = objectId;
 							objectInfoPtr->name = objectName;
 							objectInfoPtr->description = description;

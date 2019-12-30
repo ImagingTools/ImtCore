@@ -149,7 +149,11 @@ private:
 		View used for showing the information about the currently selected item.
 	*/
 	I_REF(iqtgui::IGuiObject, m_informationViewCompPtr);
-	ifile::IFileMetaInfoProvider::MetaInfoPtr m_informationModelPtr;
+
+	/**
+
+	*/
+	ifile::IFileMetaInfoProvider::MetaInfoPtr m_selectedMetaInfoPtr;
 
 	typedef istd::TPointerVector<ICollectionViewDelegate::ObjectInfo> WorkingObjects;
 	mutable WorkingObjects m_workingObjects;
