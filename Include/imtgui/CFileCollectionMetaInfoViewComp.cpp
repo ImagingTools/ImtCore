@@ -121,6 +121,7 @@ void CFileCollectionMetaInfoViewComp::OnGuiModelDetached()
 	PreviewPixmap->setPixmap(QPixmap(":/Icons/StateOk").scaledToWidth(200));
 }
 
+
 } // namespace imtgui
 
 
