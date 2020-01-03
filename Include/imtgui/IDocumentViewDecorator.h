@@ -15,7 +15,7 @@ namespace imtgui
 
 /**
 	Interface for the document view decorator.
-	View decorator is used for some extended (decorated) presenation of a document view.
+	View decorator is used for some extended (decorated) presentation of a document view.
 */
 class IDocumentViewDecorator: virtual public istd::IPolymorphic
 {
