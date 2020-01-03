@@ -11,20 +11,11 @@ namespace imtgui
 
 // protected methods
 
-CFileCollectionMetaInfoViewComp::CFileCollectionMetaInfoViewComp()
-{
-}
-
-
-// protected methods
-
 // reimplemented (iqtgui::TGuiObserverWrap)
 
 void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	if (InfoWidget->layout() != nullptr){
-		iwidgets::ClearLayout(InfoWidget->layout());
-	}
+	iwidgets::ClearLayout(InfoWidget->layout());
 
 	QPixmap pixmap;
 
@@ -94,7 +85,7 @@ void CFileCollectionMetaInfoViewComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	if (!InfoWidget->layout()){
+	if (InfoWidget->layout() == nullptr){
 		InfoWidget->setLayout(new QGridLayout());
 	}
 
@@ -111,20 +102,16 @@ void CFileCollectionMetaInfoViewComp::OnGuiRetranslate()
 	}
 }
 
+
 // reimplemented (iqtgui::TGuiObserverWrap)
 
 void CFileCollectionMetaInfoViewComp::OnGuiModelDetached()
 {
-	QGridLayout* layout = dynamic_cast<QGridLayout *>(InfoWidget->layout());
-	if (layout){
-		while (layout->count()){
-			QLayoutItem* item = layout->takeAt(0);
-			delete item->widget();
-			delete item;
-		}
-	}
+	iwidgets::ClearLayout(InfoWidget->layout());
 
 	PreviewFrame->hide();
+
+	BaseClass::OnGuiModelDetached();
 }
 
 
