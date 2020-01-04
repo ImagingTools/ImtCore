@@ -69,9 +69,9 @@ void COptionsListAdapterComp::OnComponentCreated()
 
 void COptionsListAdapterComp::OnComponentDestroyed()
 {
-	BaseClass::OnComponentDestroyed();
-
 	BaseClass2::UnregisterAllModels();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 

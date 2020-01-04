@@ -21,7 +21,7 @@ namespace imtbase
 class COptionsListAdapterComp:
 			public icomp::CComponentBase,
 			private imod::CMultiModelDispatcherBase,
-			protected iprm::IOptionsList
+			virtual public iprm::IOptionsList
 {
 public:
 	typedef icomp::CComponentBase BaseClass;

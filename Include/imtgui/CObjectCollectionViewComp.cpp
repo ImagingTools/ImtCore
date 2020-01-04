@@ -328,6 +328,16 @@ void CObjectCollectionViewComp::OnGuiCreated()
 }
 
 
+void CObjectCollectionViewComp::OnGuiDestroyed()
+{
+	if ((m_currentInformationViewPtr != nullptr) && m_currentInformationViewPtr->IsGuiCreated()){
+		m_currentInformationViewPtr->DestroyGui();
+	}
+
+	BaseClass::OnGuiDestroyed();
+}
+
+
 void CObjectCollectionViewComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
