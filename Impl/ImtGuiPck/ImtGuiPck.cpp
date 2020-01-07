@@ -53,9 +53,15 @@ I_EXPORT_COMPONENT(
 			"Workspace Tabs View Document File MDI");
 
 I_EXPORT_COMPONENT(
-	FileCollectionMetaInfoView,
-	"File collection metainfo view",
-	"File Data Collection Document Meta Info Metainfo View Preview");
+			FileCollectionMetaInfoView,
+			"File collection metainfo view",
+			"File Data Collection Document Meta Info Metainfo View Preview");
+
+I_EXPORT_COMPONENT(
+			DelegatedCommandsProvider,
+			"Delegator for a commands provider",
+			"Command Provider Delegate");
+
 
 } // namespace ImtGuiPck
 

@@ -14,6 +14,7 @@
 #include <imtgui/CDocumentBasedFileCollectionDelegateComp.h>
 #include <imtgui/CDocumentWorkspaceGuiComp.h>
 #include <imtgui/CFileCollectionMetaInfoViewComp.h>
+#include <imtgui/CDelegatedCommandsProviderComp.h>
 
 
 /**
@@ -31,6 +32,7 @@ typedef icomp::TMakeComponentWrap<imtgui::CFileObjectCollectionViewDelegate, imt
 typedef imtgui::CDocumentBasedFileCollectionDelegateComp DocumentBasedFileCollectionDelegate;
 typedef icomp::TModelCompWrap<imtgui::CDocumentWorkspaceGuiComp> DocumentWorkspaceGui;
 typedef imtgui::CFileCollectionMetaInfoViewComp FileCollectionMetaInfoView;
+typedef imtgui::CDelegatedCommandsProviderComp DelegatedCommandsProvider;
 
 
 } // namespace ImtGuiPck
