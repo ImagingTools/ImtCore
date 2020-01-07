@@ -61,7 +61,7 @@ void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeS
 				labelValuePtr = new QLabel("UNKNOWN MIT_ID");
 			}
 
-			labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: #335777");
+			labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: #88b8e3");
 			labelValuePtr->setStyleSheet("font-size: 9px; color: gray");
 			layoutPtr->addWidget(labelNamePtr, layoutPtr->rowCount(), 0, 1, 1);
 			layoutPtr->addWidget(labelValuePtr, layoutPtr->rowCount(), 0, 1, 1);
