@@ -460,6 +460,11 @@ void CDocumentWorkspaceGuiCompBase::OnViewRegistered(istd::IPolymorphic* viewPtr
 			int newViewIndex = Tabs->count();
 			Tabs->insertTab(newViewIndex, documentViewPtr->GetDecoratorWidget(), "");
 
+			iqtgui::IVisualStatus *visualStatusPtr = CompCastPtr<iqtgui::IVisualStatus>(viewPtr);
+			if (visualStatusPtr != nullptr){
+				Tabs->setTabIcon(newViewIndex, visualStatusPtr->GetStatusIcon());
+			}
+
 			SetActiveView(viewPtr);
 
 			InitializeDocumentView(documentViewPtr.GetPtr(), documentData);
