@@ -69,7 +69,6 @@ public:
 
 	// reimplemented (IFileObjectCollection)
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
-	virtual bool GetFileMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const override;
 	virtual FileInfo GetFileInfo(const QByteArray& resourceId) const override;
 	virtual QString GetFile(
 				const QByteArray& resourceId,
@@ -89,6 +88,7 @@ public:
 
 	// reimplemented (IObjectCollection)
 	virtual int GetOperationFlags(const QByteArray & objectId = QByteArray()) const override;
+	virtual bool GetDataMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const override;
 	virtual QByteArray InsertNewObject(const QByteArray & typeId, const QString & name, const QString & description, const istd::IChangeable * defaultValuePtr = nullptr) override;
 	virtual bool RemoveObject(const QByteArray & objectId) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;

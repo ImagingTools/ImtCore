@@ -20,6 +20,7 @@ class IObjectCollection: virtual public IObjectCollectionInfo
 {
 public:
 	typedef istd::TSmartPtr<istd::IChangeable> DataPtr;
+	typedef istd::TSmartPtr<idoc::IDocumentMetaInfo> MetaInfoPtr;
 
 	/**
 		Change notification flags.
@@ -84,6 +85,16 @@ public:
 		Get binary flags describing the possible operations on the single object or on the whole collection.
 	*/
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const = 0;
+
+
+	/**
+		Get meta-information of the data object.
+		In difference to GetCollectionItemMetaInfo, this method get the meta-informations related to the data itself.
+		\param objectId			ID of the object in the collection.
+		\param metaInfoPtr		Meta-info pointer to be created and filled by this method.
+		\return \c true if the operation was successful, and \c false if no information could be provided.
+	*/
+	virtual bool GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const = 0;
 
 	/**
 		Create a new object in the container.

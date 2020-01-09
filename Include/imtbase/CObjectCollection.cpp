@@ -43,6 +43,12 @@ int CObjectCollection::GetOperationFlags(const QByteArray& objectId) const
 }
 
 
+bool CObjectCollection::GetDataMetaInfo(const QByteArray& /*objectId*/, MetaInfoPtr& /*metaInfoPtr*/) const
+{
+	return false;
+}
+
+
 QByteArray CObjectCollection::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,

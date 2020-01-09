@@ -33,6 +33,7 @@ public:
 
 	// reimplemented (IObjectCollection)
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
+	virtual bool GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const override;
 	virtual QByteArray InsertNewObject(
 				const QByteArray& typeId,
 				const QString& name,

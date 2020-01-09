@@ -47,31 +47,6 @@ const ifile::IFileResourceTypeConstraints* CFileCollectionComp::GetFileTypeConst
 }
 
 
-bool CFileCollectionComp::GetFileMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const
-{
-	QReadLocker lockCollection(&m_collectionLock);
-
-	// Looking for file item:
-	int fileIndex = GetFileIndexById(objectId);
-	if (fileIndex < 0){
-		SendVerboseMessage(QString("Collection item doesn't exist for the given object-ID (%1). Meta-information could not be provided").arg(objectId.constData()), "File Collection");
-
-		return false;
-	}
-
-	// Get meta-information from cache:
-	CollectionItem& item = m_files[fileIndex];
-
-	if (item.contentsMetaInfoPtr.IsValid()){
-		metaInfoPtr.SetCastedOrRemove(item.contentsMetaInfoPtr->CloneMe());
-
-		return metaInfoPtr.IsValid();
-	}
-
-	return false;
-}
-
-
 IFileObjectCollection::FileInfo CFileCollectionComp::GetFileInfo(const QByteArray& objectId) const
 {
 	FileInfo retVal;
@@ -332,6 +307,31 @@ QString CFileCollectionComp::GetRepositoryPath() const
 int CFileCollectionComp::GetOperationFlags(const QByteArray& /*objectId*/) const
 {
 	return OF_SUPPORT_DELETE | OF_SUPPORT_EDIT | OF_SUPPORT_INSERT | OF_SUPPORT_RENAME;
+}
+
+
+bool CFileCollectionComp::GetDataMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const
+{
+	QReadLocker lockCollection(&m_collectionLock);
+
+	// Looking for file item:
+	int fileIndex = GetFileIndexById(objectId);
+	if (fileIndex < 0){
+		SendVerboseMessage(QString("Collection item doesn't exist for the given object-ID (%1). Meta-information could not be provided").arg(objectId.constData()), "File Collection");
+
+		return false;
+	}
+
+	// Get meta-information from cache:
+	CollectionItem& item = m_files[fileIndex];
+
+	if (item.contentsMetaInfoPtr.IsValid()){
+		metaInfoPtr.SetCastedOrRemove(item.contentsMetaInfoPtr->CloneMe());
+
+		return metaInfoPtr.IsValid();
+	}
+
+	return false;
 }
 
 
