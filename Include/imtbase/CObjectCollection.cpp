@@ -99,7 +99,7 @@ bool CObjectCollection::RemoveObject(const QByteArray& objectId)
 const istd::IChangeable* CObjectCollection::GetObjectPtr(const QByteArray& objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
-		if ((objectInfo.id == objectId) && (objectInfo.flags & OF_FIXED)){
+		if ((objectInfo.id == objectId) && ((objectInfo.flags & OF_SUPPORT_DELETE) == 0)){
 			return objectInfo.objectPtr.GetPtr();
 		}
 	}

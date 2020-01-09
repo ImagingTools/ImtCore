@@ -43,55 +43,42 @@ public:
 	};
 
 	/**
-		Flags for describing operational constraints on the collection items and the collection itself.
+		Flags for describing operational constraints on the collection items or the collection itself.
 	*/
 	enum OperationalFlags
 	{
-		OF_DEFAULT = 1,
+		/**
+			If active, the obejects can be renamed inside of the collection.
+		*/
+		OF_SUPPORT_RENAME = 1,
 
 		/**
-			Object is fixed and cannot be removed.
+			If active, the objects can be inserted into the collection.
 		*/
-		OF_FIXED = 2,
+		OF_SUPPORT_INSERT = 2,
 
 		/**
-			Active if rename of objects is supported.
+			If active, deleting of objects in the collection is possible.
 		*/
-		OF_SUPPORT_RENAME = 4,
+		OF_SUPPORT_DELETE = 4,
 
 		/**
-			Active if insert of objects is possible.
+			If active, editing of objects in the collection is possible.
 		*/
-		OF_SUPPORT_INSERT = 8,
+		OF_SUPPORT_EDIT = 8,
 
 		/**
-			Active if delete of objects is possible.
+			If active, using of objects in the collection is possible.
 		*/
-		OF_SUPPORT_DELETE = 16,
+		OF_SUPPORT_USING = 16,
 
 		/**
-			Active if swap of objects with the other one is possible.
-			Make sense only for ordered object lists.
+			All options are enabled.
 		*/
-		OF_SUPPORT_SWAP = 32,
-
-		/**
-			Active if it is possible to get the disabled option.
-		*/
-		OF_DISABLE_ALLOWED = 64,
-
-		/**
-			Active if it is possible to edit parameter values.
-		*/
-		OF_SUPPORT_EDIT = 128,
-
-		/**
-			Option is inactive (i.e. cannot be activated or selected) 
-		*/
-		OF_INACTIVE = 256
+		OF_ALL = 0xFFFFFFFF
 	};
 
-	I_DECLARE_FLAGS(OperationalFlags, OF_DEFAULT, OF_FIXED, OF_SUPPORT_RENAME, OF_SUPPORT_INSERT, OF_SUPPORT_DELETE, OF_SUPPORT_SWAP, OF_DISABLE_ALLOWED, OF_SUPPORT_EDIT, OF_INACTIVE);
+	I_DECLARE_FLAGS(OperationalFlags, OF_SUPPORT_RENAME, OF_SUPPORT_INSERT, OF_SUPPORT_DELETE, OF_SUPPORT_EDIT, OF_SUPPORT_USING, OF_ALL);
 
 	/**
 		Get binary flags describing the possible operations on the single object or on the whole collection.

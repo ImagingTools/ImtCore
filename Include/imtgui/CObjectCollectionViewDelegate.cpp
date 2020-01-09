@@ -71,7 +71,7 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(
 
 		if (!selectedItems.isEmpty()){
 			int flags = m_collectionPtr->GetOperationFlags(selectedItems[0]);
-			if ((flags & imtbase::IObjectCollection::OF_SUPPORT_DELETE) && ((flags & imtbase::IObjectCollection::OF_FIXED) == 0)){
+			if (flags & imtbase::IObjectCollection::OF_SUPPORT_DELETE){
 				isRemoveEnabled = true;
 			}
 		}

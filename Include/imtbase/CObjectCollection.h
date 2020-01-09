@@ -68,7 +68,7 @@ protected:
 	{
 		ObjectInfo()
 			:isEnabled(true),
-			flags(OF_DEFAULT)
+			flags(OF_ALL)
 		{
 			id = QUuid::createUuid().toByteArray();
 		}
