@@ -69,7 +69,6 @@ public:
 
 	// reimplemented (IFileObjectCollection)
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
-	virtual bool GetItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
 	virtual bool GetFileMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const override;
 	virtual FileInfo GetFileInfo(const QByteArray& resourceId) const override;
 	virtual QString GetFile(
@@ -100,6 +99,7 @@ public:
 	virtual void SetObjectEnabled(const QByteArray & objectId, bool isEnabled = true) override;
 
 	// reimplemented (IObjectCollectionInfo)
+	virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
 

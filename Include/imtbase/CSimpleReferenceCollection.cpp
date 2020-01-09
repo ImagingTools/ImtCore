@@ -54,6 +54,12 @@ bool CSimpleReferenceCollection::RemoveAllReferences()
 
 // reimplemented (IObjectCollectionInfo)
 
+bool CSimpleReferenceCollection::GetCollectionItemMetaInfo(const QByteArray& /*objectId*/, idoc::IDocumentMetaInfo& /*metaInfo*/) const
+{
+	return false;
+}
+
+
 const iprm::IOptionsList* CSimpleReferenceCollection::GetObjectTypesInfo() const
 {
 	return nullptr;

@@ -182,6 +182,12 @@ void CObjectCollection::SetObjectEnabled(const QByteArray& objectId, bool isEnab
 
 // reimplemented (IObjectCollectionInfo)
 
+bool CObjectCollection::GetCollectionItemMetaInfo(const QByteArray& /*objectId*/, idoc::IDocumentMetaInfo& /*metaInfo*/) const
+{
+	return false;
+}
+
+
 const iprm::IOptionsList* CObjectCollection::GetObjectTypesInfo() const
 {
 	return nullptr;

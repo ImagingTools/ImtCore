@@ -141,7 +141,7 @@ private:
 
 	QVector<QByteArray> GetMetaInfoIds(const QByteArray &typeId) const;
 	QStringList GetMetaInfoHeaders(const QByteArray &typeId) const;
-	QStringList GetItemMetaInfo(const QByteArray &itemId, const QByteArray &typeId) const;
+	QStringList GetCollectionItemInfos(const QByteArray &itemId, const QByteArray &typeId) const;
 
 	void EnsureColumnsSettingsSynchronized() const;
 	void RestoreColumnsSettings();

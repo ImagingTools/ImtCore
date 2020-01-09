@@ -238,7 +238,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			foundedTypeIds += itemTypeId;
 
 			QList<QStandardItem*> columns;
-			QStringList metaInfo = GetItemMetaInfo(itemId, itemTypeId);
+			QStringList metaInfo = GetCollectionItemInfos(itemId, itemTypeId);
 
 			columns += objectItemPtr;
 			for(QString infoItem : metaInfo){
@@ -446,7 +446,7 @@ QStringList CObjectCollectionViewComp::GetMetaInfoHeaders(const QByteArray &type
 }
 
 
-QStringList CObjectCollectionViewComp::GetItemMetaInfo(const QByteArray &itemId, const QByteArray &typeId) const
+QStringList CObjectCollectionViewComp::GetCollectionItemInfos(const QByteArray &itemId, const QByteArray &typeId) const
 {
 	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
 	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();

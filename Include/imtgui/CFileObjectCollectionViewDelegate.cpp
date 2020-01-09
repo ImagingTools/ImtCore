@@ -69,7 +69,7 @@ QVariant CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArr
 	imtbase::IFileObjectCollection* fileObjectCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
 	if (fileObjectCollectionPtr != nullptr){
 		idoc::CStandardDocumentMetaInfo metaInfo;
-		if (fileObjectCollectionPtr->GetItemMetaInfo(objectId, metaInfo)){
+		if (fileObjectCollectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
 			if (informationId == QByteArray("Added")){
 				return metaInfo.GetMetaInfo(imtbase::IFileObjectCollection::MIT_INSERTION_TIME);
 			}

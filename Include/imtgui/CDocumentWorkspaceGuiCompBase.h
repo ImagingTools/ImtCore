@@ -180,6 +180,7 @@ private:
 		virtual bool IsOptionEnabled(int index) const;
 
 		// reimplemented (imtbase::IObjectCollectionInfo)
+		virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
 		virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 		virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
 

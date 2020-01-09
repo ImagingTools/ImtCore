@@ -902,6 +902,12 @@ bool CDocumentWorkspaceGuiCompBase::DocumentList::IsOptionEnabled(int /*index*/)
 
 // reimplemented (imtbase::IObjectCollectionInfo)
 
+bool CDocumentWorkspaceGuiCompBase::DocumentList::GetCollectionItemMetaInfo(const QByteArray& /*objectId*/, idoc::IDocumentMetaInfo& /*metaInfo*/) const
+{
+	return false;
+}
+
+
 const iprm::IOptionsList* CDocumentWorkspaceGuiCompBase::DocumentList::GetObjectTypesInfo() const
 {
 	return nullptr;

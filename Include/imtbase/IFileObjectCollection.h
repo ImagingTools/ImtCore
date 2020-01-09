@@ -87,16 +87,8 @@ public:
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const = 0;
 
 	/**
-		Get meta-information of the item in the collection.
-		\param objectId			ID of the object in the collection.
-		\param metaInfo			Meta-info to be filled by this method.
-		\return \c true if the operation was successful, and \c false if no information could be provided.
-	*/
-	virtual bool GetItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const = 0;
-
-	/**
 		Get meta-information provided by the file itself.
-		In difference to GetItemMetaInfo, this method get the meta-informations created from the file contents.
+		In difference to GetCollectionItemMetaInfo, this method get the meta-informations created from the file contents.
 		\param objectId			ID of the object in the collection.
 		\param metaInfoPtr		Meta-info pointer to be created and filled by this method.
 		\return \c true if the operation was successful, and \c false if no information could be provided.

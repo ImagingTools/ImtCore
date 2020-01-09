@@ -47,25 +47,6 @@ const ifile::IFileResourceTypeConstraints* CFileCollectionComp::GetFileTypeConst
 }
 
 
-bool CFileCollectionComp::GetItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const
-{
-	QReadLocker lockCollection(&m_collectionLock);
-
-	// Looking for file item:
-	int fileIndex = GetFileIndexById(objectId);
-	if (fileIndex < 0){
-		SendVerboseMessage(QString("Collection item doesn't exist for the given object-ID (%1). Meta-information could not be provided").arg(objectId.constData()), "File Collection");
-
-		return false;
-	}
-
-	// Get meta-information from cache:
-	CollectionItem& item = m_files[fileIndex];
-
-	return metaInfo.CopyFrom(item.metaInfo);
-}
-
-
 bool CFileCollectionComp::GetFileMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const
 {
 	QReadLocker lockCollection(&m_collectionLock);
@@ -659,6 +640,25 @@ void CFileCollectionComp::SetObjectEnabled(const QByteArray& /*objectId*/, bool 
 
 
 // reimplemented (IObjectCollectionInfo)
+
+bool CFileCollectionComp::GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const
+{
+	QReadLocker lockCollection(&m_collectionLock);
+
+	// Looking for file item:
+	int fileIndex = GetFileIndexById(objectId);
+	if (fileIndex < 0){
+		SendVerboseMessage(QString("Collection item doesn't exist for the given object-ID (%1). Meta-information could not be provided").arg(objectId.constData()), "File Collection");
+
+		return false;
+	}
+
+	// Get meta-information from cache:
+	CollectionItem& item = m_files[fileIndex];
+
+	return metaInfo.CopyFrom(item.metaInfo);
+}
+
 
 const iprm::IOptionsList* CFileCollectionComp::GetObjectTypesInfo() const
 {
