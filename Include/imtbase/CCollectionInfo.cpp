@@ -33,11 +33,32 @@ QByteArray CCollectionInfo::InsertItem(const QByteArray& id, const QString & nam
 
 void CCollectionInfo::RemoveItem(const QByteArray& id)
 {
+	for (const Item& item : m_items){
+		if (item.id == id){
+			istd::CChangeNotifier changeNotifier(this);
+		
+			m_items.removeOne(item);
+
+			break;
+		}
+	}
 }
 
 
 void CCollectionInfo::UpdateItem(const QByteArray& id, const QString& name, const QString& description)
 {
+	for (Item& item : m_items){
+		if (item.id == id){
+			if (item.name != name || item.description != description){
+				istd::CChangeNotifier changeNotifier(this);
+
+				item.name = name;
+				item.description = description;
+			}
+
+			break;
+		}
+	}
 }
 
 

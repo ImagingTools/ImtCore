@@ -39,8 +39,7 @@ namespace imtbase
 class CFileCollectionComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
-			virtual public IFileObjectCollection,
-			virtual public IFileCollectionInfo
+			virtual public IFileObjectCollection
 {
 	Q_OBJECT
 public:

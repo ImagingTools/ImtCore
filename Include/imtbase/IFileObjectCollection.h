@@ -10,6 +10,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IFileCollectionInfo.h>
 
 
 namespace imtbase
@@ -20,7 +21,7 @@ namespace imtbase
 	Common interface for a object collection stored in the of files.
 	\ingroup Collection
 */
-class IFileObjectCollection: virtual public IObjectCollection
+class IFileObjectCollection: virtual public IObjectCollection, virtual public IFileCollectionInfo
 {
 public:
 	/**
