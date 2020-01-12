@@ -60,8 +60,8 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(CurrentDocumentName, iprm::INameParam, ExtractCurrentDocumentName);
 		I_REGISTER_SUBELEMENT_INTERFACE(CurrentDocumentName, imod::IModel, ExtractCurrentDocumentName);
 		I_ASSIGN(m_documentTemplateCompPtr, "DocumentTemplate", "Document template", true, "DocumentTemplate");
-		I_ASSIGN_MULTI_0(m_fixedTabsCompPtr, "FixedTabs", "List of fixed views", false);
-		I_ASSIGN_MULTI_0(m_fixedTabsNamesAttrPtr, "FixedTabNames", "List of names for the fixed views", false);
+		I_ASSIGN_MULTI_0(m_fixedTabsCompPtr, "FixedViews", "List of fixed views", false);
+		I_ASSIGN_MULTI_0(m_fixedTabsNamesAttrPtr, "FixedViewNames", "List of names for the fixed views", false);
 		I_ASSIGN_MULTI_0(m_fixedVisualInfosCompPtr, "FixedVisualInfos", "List of additional visual infos related to the fixed views", false);
 	I_END_COMPONENT;
 
