@@ -30,43 +30,12 @@ namespace imtgui
 // public methods
 
 CDocumentWorkspaceGuiCompBase::CDocumentWorkspaceGuiCompBase()
-:	m_forceQuietClose(false),
+	:m_forceQuietClose(false),
 	m_isUpdateBlocked(false),
 	m_previousTabIndex(-1)
 {
 	m_documentList.SetParent(*this);
-}
-
-
-// reimplemented (ibase::ICommandsProvider)
-
-const ibase::IHierarchicalCommand* CDocumentWorkspaceGuiCompBase::GetCommands() const
-{
-	if (IsGuiCreated()){
-		int tabIndex = Tabs->currentIndex();
-		if (tabIndex >= m_fixedTabs.count()){
-			QWidget* decoratorPagePtr = Tabs->currentWidget();
-			ibase::ICommandsProvider* decoratorPtr = dynamic_cast<ibase::ICommandsProvider*>(decoratorPagePtr);
-			if (decoratorPtr != nullptr){
-				return decoratorPtr->GetCommands();
-			}
-			else{
-				istd::IPolymorphic* viewPtr = GetActiveView();
-				ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(viewPtr);
-				if (viewCommandsProviderPtr != nullptr){
-					return viewCommandsProviderPtr->GetCommands();
-				}
-			}
-		}
-		else{
-			ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(m_fixedTabs[tabIndex]);
-			if (viewCommandsProviderPtr != nullptr){
-				return viewCommandsProviderPtr->GetCommands();
-			}
-		}
-	}
-
-	return nullptr;
+	m_commands.SetParent(this);
 }
 
 
@@ -192,10 +161,9 @@ void CDocumentWorkspaceGuiCompBase::InitializeDocumentView(IDocumentViewDecorato
 
 void CDocumentWorkspaceGuiCompBase::UpdateCommands()
 {
-	static ChangeSet changes(CF_COMMANDS);
-	istd::CChangeNotifier changeNotifier(this, &changes);
+	static ChangeSet changes(ibase::ICommandsProvider::CF_COMMANDS);
 
-
+	istd::CChangeNotifier changeNotifier(&m_commands, &changes);
 }
 
 
@@ -278,7 +246,7 @@ void CDocumentWorkspaceGuiCompBase::OnModelChanged(int modelId, const istd::ICha
 	}
 
 	if (modelId >= MI_DOCUMENT_COMMANDS_BASE_INDEX){
-		UpdateCommands();
+		Q_EMIT PostUpdateCommands();
 	}
 }
 
@@ -460,9 +428,20 @@ void CDocumentWorkspaceGuiCompBase::OnViewRegistered(istd::IPolymorphic* viewPtr
 			int newViewIndex = Tabs->count();
 			Tabs->insertTab(newViewIndex, documentViewPtr->GetDecoratorWidget(), "");
 
-			iqtgui::IVisualStatus *visualStatusPtr = CompCastPtr<iqtgui::IVisualStatus>(viewPtr);
+			iqtgui::IVisualStatus* visualStatusPtr = CompCastPtr<iqtgui::IVisualStatus>(viewPtr);
 			if (visualStatusPtr != nullptr){
 				Tabs->setTabIcon(newViewIndex, visualStatusPtr->GetStatusIcon());
+			}
+
+			imod::IModel* visualStatusModelPtr = dynamic_cast<imod::IModel*>(visualStatusPtr);
+			if (visualStatusModelPtr != nullptr) {
+				RegisterModel(visualStatusModelPtr, MI_VISUAL_STATUS_BASE_INDEX + newViewIndex);
+			}
+
+			ibase::ICommandsProvider* commandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(viewPtr);
+			imod::IModel* commandsProviderModelPtr = dynamic_cast<imod::IModel*>(commandsProviderPtr);
+			if (commandsProviderModelPtr != nullptr) {
+				RegisterModel(commandsProviderModelPtr, MI_DOCUMENT_COMMANDS_BASE_INDEX + newViewIndex);
 			}
 
 			SetActiveView(viewPtr);
@@ -532,6 +511,13 @@ bool CDocumentWorkspaceGuiCompBase::QueryDocumentSave(const SingleDocumentData& 
 void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
+
+	connect(
+				this,
+				&CDocumentWorkspaceGuiCompBase::PostUpdateCommands,
+				this,
+				&CDocumentWorkspaceGuiCompBase::UpdateCommands,
+				Qt::QueuedConnection);
 
 	QWidget* mainWindowPtr = GetQtWidget();
 	if (mainWindowPtr != nullptr){
@@ -948,6 +934,58 @@ bool CDocumentWorkspaceGuiCompBase::DocumentList::Serialize(iser::IArchive& /*ar
 	I_CRITICAL(); // NOT IMPLEMENTED
 
 	return false;
+}
+
+
+
+
+// public methods of the embedded class Commands
+
+CDocumentWorkspaceGuiCompBase::Commands::Commands()
+	:m_parentPtr(nullptr)
+{
+}
+
+
+void CDocumentWorkspaceGuiCompBase::Commands::SetParent(CDocumentWorkspaceGuiCompBase* parentPtr)
+{
+	Q_ASSERT(parentPtr != nullptr);
+
+	m_parentPtr = parentPtr;
+}
+
+
+// reimplemented (ibase::ICommandsProvider)
+
+const ibase::IHierarchicalCommand* CDocumentWorkspaceGuiCompBase::Commands::GetCommands() const
+{
+	Q_ASSERT(m_parentPtr != nullptr);
+
+	if (m_parentPtr->IsGuiCreated()){
+		int tabIndex = m_parentPtr->Tabs->currentIndex();
+		if (tabIndex >= m_parentPtr->m_fixedTabs.count()){
+			QWidget* decoratorPagePtr = m_parentPtr->Tabs->currentWidget();
+			ibase::ICommandsProvider* decoratorPtr = dynamic_cast<ibase::ICommandsProvider*>(decoratorPagePtr);
+			if (decoratorPtr != nullptr){
+				return decoratorPtr->GetCommands();
+			}
+			else{
+				istd::IPolymorphic* viewPtr = m_parentPtr->GetActiveView();
+				ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(viewPtr);
+				if (viewCommandsProviderPtr != nullptr){
+					return viewCommandsProviderPtr->GetCommands();
+				}
+			}
+		}
+		else{
+			ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(m_parentPtr->m_fixedTabs[tabIndex]);
+			if (viewCommandsProviderPtr != nullptr){
+				return viewCommandsProviderPtr->GetCommands();
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 

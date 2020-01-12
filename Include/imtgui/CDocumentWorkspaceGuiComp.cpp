@@ -328,7 +328,11 @@ void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::OnModelChanged(
 					toolBarPtr->setIconSize(QSize(16, 16));
 				}
 
-				m_commands.JoinLinkFrom(commandsProviderPtr->GetCommands());
+				const ibase::IHierarchicalCommand* viewCommandsPtr = commandsProviderPtr->GetCommands();
+				if (viewCommandsPtr != nullptr){
+					m_commands.JoinLinkFrom(viewCommandsPtr);
+				}
+
 				m_commands.InsertChild(&m_undoCommand);
 				m_commands.InsertChild(&m_redoCommand);
 				m_commands.InsertChild(&m_saveCommand);

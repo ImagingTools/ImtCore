@@ -35,8 +35,7 @@ class CDocumentWorkspaceGuiCompBase:
 			public iqtdoc::TQtDocumentManagerWrap<
 						idoc::CMultiDocumentManagerBase,
 						iqtgui::TRestorableGuiWrap< iqtgui::TDesignerGuiCompBase<Ui::CDocumentWorkspaceGuiCompBase> > >,
-			protected imod::CMultiModelDispatcherBase,
-			virtual public ibase::ICommandsProvider
+			protected imod::CMultiModelDispatcherBase
 {
 	Q_OBJECT
 
@@ -47,7 +46,6 @@ public:
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_BASE_COMPONENT(CDocumentWorkspaceGuiCompBase);
-		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
 		I_REGISTER_INTERFACE(idoc::IDocumentManager);
 		I_REGISTER_INTERFACE(idoc::IDocumentTypesInfo);
 		I_REGISTER_SUBELEMENT(DocumentList);
@@ -59,6 +57,10 @@ public:
 		I_REGISTER_SUBELEMENT(CurrentDocumentName);
 		I_REGISTER_SUBELEMENT_INTERFACE(CurrentDocumentName, iprm::INameParam, ExtractCurrentDocumentName);
 		I_REGISTER_SUBELEMENT_INTERFACE(CurrentDocumentName, imod::IModel, ExtractCurrentDocumentName);
+		I_REGISTER_SUBELEMENT(Commands);
+		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
+		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
+		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
 		I_ASSIGN(m_documentTemplateCompPtr, "DocumentTemplate", "Document template", true, "DocumentTemplate");
 		I_ASSIGN_MULTI_0(m_fixedTabsCompPtr, "FixedViews", "List of fixed views", false);
 		I_ASSIGN_MULTI_0(m_fixedTabsNamesAttrPtr, "FixedViewNames", "List of names for the fixed views", false);
@@ -73,9 +75,6 @@ public:
 
 	CDocumentWorkspaceGuiCompBase();
 
-	// reimplemented (ibase::ICommandsProvider)
-	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
-
 	// reimplemented (iqtgui::IGuiObject)
 	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
 
@@ -84,7 +83,6 @@ protected:
 	void UpdateAllTitles();
 	int GetDocumentIndexFromWidget(const QWidget& widget) const;
 	virtual void InitializeDocumentView(IDocumentViewDecorator* pageViewPtr, const SingleDocumentData& documentData);
-	virtual void UpdateCommands();
 
 protected:
 	virtual bool AddTab(const QString& name, iqtgui::IGuiObject* guiPtr, const QIcon& icon = QIcon());
@@ -153,6 +151,10 @@ protected Q_SLOTS:
 	virtual void OnOpenDocument(const QByteArray& documentTypeId);
 	void OnTabCloseRequested(int index);
 	void OnCloseCurrentTabShortcut();
+	virtual void UpdateCommands();
+
+Q_SIGNALS:
+	void PostUpdateCommands();
 
 private:
 	class DocumentList:
@@ -196,6 +198,22 @@ private:
 		CDocumentWorkspaceGuiCompBase* m_parent;
 	};
 
+	class Commands: virtual public ibase::ICommandsProvider
+	{
+	public:
+		Commands();
+
+		void SetParent(CDocumentWorkspaceGuiCompBase* parentPtr);
+
+	protected:
+		// reimplemented (ibase::ICommandsProvider)
+		virtual const ibase::IHierarchicalCommand* GetCommands() const override;
+
+	private:
+		CDocumentWorkspaceGuiCompBase* m_parentPtr;
+	};
+
+
 	// static template methods for subelement access
 	template <class InterfaceType>
 	static InterfaceType* ExtractDocumentList(CDocumentWorkspaceGuiCompBase& component)
@@ -209,9 +227,16 @@ private:
 		return &component.m_currentDocumentName;
 	}
 
+	template <typename InterfaceType>
+	static InterfaceType* ExtractCommands(CDocumentWorkspaceGuiCompBase& component)
+	{
+		return &component.m_commands;
+	}
+
 private:
 	imod::TModelWrap<DocumentList> m_documentList;
 	imod::TModelWrap<iprm::CNameParam> m_currentDocumentName;
+	imod::TModelWrap<Commands> m_commands;
 
 	bool m_forceQuietClose;
 	bool m_isUpdateBlocked;
