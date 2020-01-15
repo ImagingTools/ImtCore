@@ -25,46 +25,50 @@ void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeS
 		Q_ASSERT(metaInfoPtr != nullptr);
 
 		idoc::IDocumentMetaInfo::MetaInfoTypes types = metaInfoPtr->GetMetaInfoTypes();
-
-		for (int type : types) {
+		for (int type : types){
 			QString name = metaInfoPtr->GetMetaInfoName(type);
+			if (name.isEmpty()){
+				continue;
+			}
+
+			QString textValue;
 			QVariant value = metaInfoPtr->GetMetaInfo(type);
+			switch (value.type()){
+			case QVariant::String:
+				textValue = value.toString();
+				break;
+			case QVariant::DateTime:
+				textValue = value.toDateTime().toString(Qt::DefaultLocaleShortDate);
+				break;
+			case QVariant::ByteArray:
+				textValue = value.toByteArray();
+				break;
+			}
 
-			QLabel* labelNamePtr = new QLabel(name);
-			QLabel* labelValuePtr = nullptr;
+			QLabel* labelNamePtr = new QLabel(name, GetWidget());
+			labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: #88b8e3");
 
-			switch (type) {
+			QLabel* labelValuePtr = new QLabel(textValue, GetWidget());
+
+			switch (type){
 			case imtbase::IFileObjectCollection::MIT_CHECKSUM:
-				labelNamePtr->setText("Checksum");
-				labelValuePtr = new QLabel((QString("%1").arg(value.toLongLong(), 8, 16, QChar('0'))).toUpper());
-				break;
-			case imtbase::IFileObjectCollection::MIT_INSERTION_USER:
-			case imtbase::IFileObjectCollection::MIT_LAST_OPERATION_USER:
-			case idoc::IDocumentMetaInfo::MIT_TITLE:
-			case idoc::IDocumentMetaInfo::MIT_AUTHOR:
-			case idoc::IDocumentMetaInfo::MIT_CREATOR:
-			case idoc::IDocumentMetaInfo::MIT_DESCRIPTION:
-				labelValuePtr = new QLabel(value.toString());
-				break;
-			case imtbase::IFileObjectCollection::MetaInfoType::MIT_INSERTION_TIME:
-			case imtbase::IFileObjectCollection::MetaInfoType::MIT_LAST_OPERATION_TIME:
-			case idoc::IDocumentMetaInfo::MIT_CREATION_TIME:
-			case idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME:
-				labelValuePtr = new QLabel(value.toDateTime().toString(Qt::DefaultLocaleShortDate));
+				labelValuePtr->setText((QString("%1").arg(value.toLongLong(), 8, 16, QChar('0'))).toUpper());
 				break;
 			case imtbase::IFileObjectCollection::MetaInfoType::MIT_PREVIEW_THUMBNAIL:
 				pixmap.convertFromImage(value.value<QImage>());
 				PreviewPixmap->setPixmap(pixmap.scaledToWidth(200));
 				PreviewFrame->show();
 				break;
-			default:
-				labelValuePtr = new QLabel("UNKNOWN MIT_ID");
 			}
 
-			labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: #88b8e3");
-			labelValuePtr->setStyleSheet("font-size: 9px; color: gray");
-			layoutPtr->addWidget(labelNamePtr, layoutPtr->rowCount(), 0, 1, 1);
-			layoutPtr->addWidget(labelValuePtr, layoutPtr->rowCount(), 0, 1, 1);
+			if (type != imtbase::IFileObjectCollection::MetaInfoType::MIT_PREVIEW_THUMBNAIL){
+				layoutPtr->addWidget(labelNamePtr, layoutPtr->rowCount(), 0, 1, 1);
+
+				if (labelValuePtr != nullptr){
+					labelValuePtr->setStyleSheet("font-size: 9px; color: gray");
+					layoutPtr->addWidget(labelValuePtr, layoutPtr->rowCount(), 0, 1, 1);
+				}
+			}
 
 			QSpacerItem* delimeter = new QSpacerItem(10, 5);
 			layoutPtr->addItem(delimeter, layoutPtr->rowCount(), 0, 1, 1);
