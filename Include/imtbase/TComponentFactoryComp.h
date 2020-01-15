@@ -31,7 +31,7 @@ public:
 	ObjectInterface* CreateInstance(const QByteArray& keyId = "") const override;
 
 	// reimplemented (istd::IFactoryInfo)
-	KeyList GetFactoryKeys() const override;
+	istd::IFactoryInfo::KeyList GetFactoryKeys() const override;
 
 private:
 	I_TFACT(ObjectInterface, m_factCompPtr);
@@ -51,7 +51,7 @@ ObjectInterface* TComponentFactoryComp<ObjectInterface>::CreateInstance(const QB
 template<typename ObjectInterface>
 istd::IFactoryInfo::KeyList TComponentFactoryComp<ObjectInterface>::GetFactoryKeys() const
 {
-	KeyList keys;
+	istd::IFactoryInfo::KeyList keys;
 
 	keys.insert(*m_typeIdAttrPtr);
 

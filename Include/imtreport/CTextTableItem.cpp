@@ -144,7 +144,7 @@ bool CTextTableItem::Serialize(iser::IArchive& archive)
 
 	static iser::CArchiveTag tagAlignment("Alignment", "Table item alignment", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(tagAlignment);
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<Qt::Alignment, NULL, NULL>(archive, m_alignment);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<Qt::Alignment, nullptr, nullptr>(archive, m_alignment);
 	retVal = retVal && archive.EndTag(tagAlignment);
 
 	static iser::CArchiveTag tagFont("Font", "Table item font", iser::CArchiveTag::TT_LEAF);

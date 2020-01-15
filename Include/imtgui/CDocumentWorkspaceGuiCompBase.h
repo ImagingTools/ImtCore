@@ -20,7 +20,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollectionInfo.h>
 #include <imtgui/IDocumentViewDecorator.h>
-#include <GeneratedFiles/imtgui/Ui_CDocumentWorkspaceGuiCompBase.h>
+#include <GeneratedFiles/imtgui/ui_CDocumentWorkspaceGuiCompBase.h>
 
 
 namespace imtgui

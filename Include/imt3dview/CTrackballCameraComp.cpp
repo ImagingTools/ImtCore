@@ -1,4 +1,5 @@
 #include <imt3dview/CTrackballCameraComp.h>
+#include <cfloat>
 
 
 // Qt includes

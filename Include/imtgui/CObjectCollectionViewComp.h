@@ -6,7 +6,7 @@
 #include <QtCore/QPropertyAnimation>
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QShortCut>
+#include <QtWidgets/QShortcut>
 
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>

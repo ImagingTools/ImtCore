@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtGui/QTextDocument.h>
+#include <QtGui/QTextDocument>
 
 // ACF includes
 #include <imod/IModel.h>

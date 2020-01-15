@@ -76,7 +76,7 @@ public:
 		/**
 			All options are enabled.
 		*/
-		OF_ALL = 0xFFFFFFFF
+		OF_ALL = -1
 	};
 
 	I_DECLARE_FLAGS(OperationalFlags, OF_SUPPORT_RENAME, OF_SUPPORT_INSERT, OF_SUPPORT_DELETE, OF_SUPPORT_EDIT, OF_SUPPORT_USING, OF_ALL);

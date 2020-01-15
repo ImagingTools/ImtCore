@@ -5,7 +5,7 @@
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QGuiApplication>
-#include <QtWidgets/QToolbar>
+#include <QtWidgets/QToolBar>
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QMessageBox>

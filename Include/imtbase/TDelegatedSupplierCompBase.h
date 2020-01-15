@@ -22,8 +22,8 @@ class TDelegatedSupplierCompBase:
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
-	typedef typename ProviderInterface ProviderInterfaceType;
-	typedef typename ObjectInterface ObjectInterfaceType;
+	typedef ProviderInterface ProviderInterfaceType;
+	typedef ObjectInterface ObjectInterfaceType;
 
 	I_BEGIN_BASE_COMPONENT(TDelegatedSupplierCompBase);
 		I_REGISTER_INTERFACE(iinsp::ISupplier);

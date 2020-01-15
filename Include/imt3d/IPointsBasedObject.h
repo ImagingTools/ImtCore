@@ -1,6 +1,11 @@
 #pragma once
 
 
+#ifdef INCLUDE_MM_MALLOC
+    #include <mm_malloc.h>
+#endif
+
+
 // ImtCore includes
 #include <imt3d/IObject3d.h>
 

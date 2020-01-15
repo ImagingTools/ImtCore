@@ -1,4 +1,6 @@
 #include <imt3d/CPointsBasedObject.h>
+#include <string>
+#include <type_traits>
 
 
 // ACF includes
@@ -180,7 +182,7 @@ bool CPointsBasedObject::CopyFrom(const istd::IChangeable& object, istd::IChange
 		AllocateData();
 
 		if (m_dataPtr){
-			std::memcpy(m_dataPtr, objectPtr->m_dataPtr, dataSize);
+			memcpy(m_dataPtr, objectPtr->m_dataPtr, dataSize);
 
 			return true;
 		}
@@ -481,7 +483,7 @@ void CPointsBasedObject::TMoveCenterTo(const i3d::CVector3d& position)
 			PointType* pointDataPtr = TGetPointData<PointType>(i, true);
 
 			if (pointDataPtr){
-				typedef std::remove_reference<decltype(*pointDataPtr->data)>::type PointCoordinateType;
+				typedef typename std::remove_reference<decltype(*pointDataPtr->data)>::type PointCoordinateType;
 
 				pointDataPtr->data[0] += static_cast<PointCoordinateType>(delta.GetX());
 				pointDataPtr->data[1] += static_cast<PointCoordinateType>(delta.GetY());
