@@ -62,6 +62,8 @@ Imt3dGuiPck.file = ../../Impl/Imt3dGuiPck/QMake/Imt3dGuiPck.pro
 Imt3dGuiPck.depends = imt3dview imt3dgui
 
 # Application
-SUBDIRS += EagleView
-EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
-EagleView.depends = Imt3dViewPck Imt3dGuiPck
+!linux{
+    SUBDIRS += EagleView
+    EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
+    EagleView.depends = Imt3dViewPck Imt3dGuiPck
+}

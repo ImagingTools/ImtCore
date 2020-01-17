@@ -1,7 +1,13 @@
 #pragma once
 
 
-#ifdef INCLUDE_MM_MALLOC
+#ifdef COMPILER_NAME_CLANG
+    #include <mm_malloc.h>
+#endif
+#ifdef COMPILER_NAME_GCC
+    #include <mm_malloc.h>
+#endif
+#ifdef COMPILER_NAME_GPP
     #include <mm_malloc.h>
 #endif
 
