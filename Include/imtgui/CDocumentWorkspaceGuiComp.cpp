@@ -138,6 +138,10 @@ CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::CollectionDocumentVi
 	m_undoCommand.setVisible(m_undoManagerPtr != nullptr);
 	m_redoCommand.setVisible(m_undoManagerPtr != nullptr);
 
+	m_saveCommand.setShortcut(Qt::CTRL + Qt::Key_S);
+	m_undoCommand.setShortcut(Qt::CTRL + Qt::Key_Z);
+	m_redoCommand.setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
+
 	const imtgui::IDocumentViewConstraints* viewConstraintsPtr = CompCastPtr<imtgui::IDocumentViewConstraints>(viewPtr);
 	if (viewConstraintsPtr != NULL){
 		imod::IModel* viewModelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(viewConstraintsPtr));

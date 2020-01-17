@@ -380,7 +380,7 @@ QAbstractItemView[TabSimulation=true]
          </size>
         </property>
         <property name="shortcut">
-         <string>Ctrl+S</string>
+         <string>Ctrl+Q</string>
         </property>
         <property name="autoRaise">
          <bool>true</bool>

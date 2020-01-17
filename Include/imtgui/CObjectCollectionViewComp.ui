@@ -28,8 +28,8 @@ QAbstractItemView[NoFrame=&quot;true&quot;]
 
 QAbstractItemView::item
 {
-	padding-top: 0.7em;
-	padding-bottom: 0.7em;
+	padding-top: 0.9em;
+	padding-bottom: 0.9em;
 }
 
 QHeaderView
@@ -248,9 +248,6 @@ QAbstractItemView[TabSimulation=true]
              <width>16</width>
              <height>16</height>
             </size>
-           </property>
-           <property name="shortcut">
-            <string>Ctrl+S</string>
            </property>
            <property name="autoRaise">
             <bool>true</bool>
