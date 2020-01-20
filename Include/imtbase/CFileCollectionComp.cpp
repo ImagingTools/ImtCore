@@ -924,17 +924,18 @@ imtbase::IMetaInfoCreator::MetaInfoPtr CFileCollectionComp::CreateFileContentsMe
 
 			m_metaInfoCreatorMap[typeId]->CreateMetaInfo(*dataObjectPtr, typeId, retVal);
 		}
-		else{
+
+		if (!retVal.IsValid()){
 			retVal.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
 		}
 
-		if (retVal.IsValid()){
-			retVal->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, fileInfo.lastModified());
+		Q_ASSERT(retVal.IsValid());
 
-			if (m_isCalculateCheckSumAttrPtr.IsValid()){
-				if (*m_isCalculateCheckSumAttrPtr){
-					retVal->SetMetaInfo(MIT_CHECKSUM, istd::CCrcCalculator::GetCrcFromFile(filePath));
-				}
+		retVal->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, fileInfo.lastModified());
+
+		if (m_isCalculateCheckSumAttrPtr.IsValid()){
+			if (*m_isCalculateCheckSumAttrPtr){
+				retVal->SetMetaInfo(MIT_CHECKSUM, istd::CCrcCalculator::GetCrcFromFile(filePath));
 			}
 		}
 	}

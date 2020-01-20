@@ -1117,6 +1117,16 @@ CThumbnailDecoratorGuiComp::LoginObserver::LoginObserver(CThumbnailDecoratorGuiC
 
 void CThumbnailDecoratorGuiComp::LoginObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
+	if (m_parent.IsGuiCreated()){
+		QWidget* rootWidgetPtr = m_parent.GetWidget();
+		Q_ASSERT(rootWidgetPtr != nullptr);
+
+		QList<QDialog*> openDialogs = rootWidgetPtr->findChildren<QDialog*>();
+		for (QDialog* dialogPtr : openDialogs){
+			dialogPtr->reject();
+		}
+	}
+
 	m_parent.UpdateLoginButtonsState();
 }
 

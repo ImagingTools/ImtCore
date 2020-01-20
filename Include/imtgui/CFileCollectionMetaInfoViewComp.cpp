@@ -49,6 +49,7 @@ void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeS
 			labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: #88b8e3");
 
 			QLabel* labelValuePtr = new QLabel(textValue, GetWidget());
+			labelValuePtr->setWordWrap(true);
 
 			switch (type){
 			case imtbase::IFileObjectCollection::MIT_CHECKSUM:
