@@ -14,15 +14,16 @@
    <string>Main Window</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QToolBar[ImtToolBar=true] &gt; QToolButton
+   <string notr="true">QWidget
+{
+	color: #335777;
+}
+
+QToolBar[ImtToolBar=true] &gt; QToolButton
 {
 	min-width: 4em;
 }
 
-QWidget[ImtTopFrame=true] &gt; QWidget
-{
-	color: #335777;
-}
 
 QWidget[ImtTopFrame=true] &gt; QWidget:disabled
 {
