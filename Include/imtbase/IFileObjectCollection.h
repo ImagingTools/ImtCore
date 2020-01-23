@@ -30,14 +30,9 @@ public:
 	enum MetaInfoType
 	{
 		/**
-			CRC-checksum of the file contents.
-		*/
-		MIT_CHECKSUM = idoc::IDocumentMetaInfo::MIT_USER + 10000,
-
-		/**
 			Name of the user who has added the file.
 		*/
-		MIT_INSERTION_USER,
+		MIT_INSERTION_USER = idoc::IDocumentMetaInfo::MIT_USER + 10000,
 
 		/**
 			Timestamp of the file inserting into the collection.

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>92</width>
-    <height>645</height>
+    <width>476</width>
+    <height>808</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -111,7 +111,22 @@ QAbstractItemView[TabSimulation=true]
 
 </string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,100">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QFrame" name="PreviewFrame">
      <property name="frameShape">
@@ -121,18 +136,6 @@ QAbstractItemView[TabSimulation=true]
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
-      <property name="leftMargin">
-       <number>20</number>
-      </property>
-      <property name="topMargin">
-       <number>20</number>
-      </property>
-      <property name="rightMargin">
-       <number>20</number>
-      </property>
-      <property name="bottomMargin">
-       <number>20</number>
-      </property>
       <item>
        <widget class="QLabel" name="PreviewPixmap">
         <property name="text">
@@ -159,8 +162,8 @@ QAbstractItemView[TabSimulation=true]
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>74</width>
-        <height>568</height>
+        <width>476</width>
+        <height>777</height>
        </rect>
       </property>
      </widget>

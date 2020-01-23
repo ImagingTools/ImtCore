@@ -935,7 +935,7 @@ imtbase::IMetaInfoCreator::MetaInfoPtr CFileCollectionComp::CreateFileContentsMe
 
 		if (m_isCalculateCheckSumAttrPtr.IsValid()){
 			if (*m_isCalculateCheckSumAttrPtr){
-				retVal->SetMetaInfo(MIT_CHECKSUM, istd::CCrcCalculator::GetCrcFromFile(filePath));
+				retVal->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM, istd::CCrcCalculator::GetCrcFromFile(filePath));
 			}
 		}
 	}

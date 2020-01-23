@@ -1,6 +1,9 @@
 #include <imtgui/CFileCollectionMetaInfoViewComp.h>
 
 
+// Qt includes
+#include <QtWidgets/QGraphicsEffect>
+
 // ACF includes
 #include <iwidgets/iwidgets.h>
 
@@ -52,19 +55,19 @@ void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeS
 			labelValuePtr->setWordWrap(true);
 
 			switch (type){
-			case imtbase::IFileObjectCollection::MIT_CHECKSUM:
+			case idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM:
 				labelValuePtr->setText((QString("%1").arg(value.toLongLong(), 8, 16, QChar('0'))).toUpper());
 				break;
-			case imtbase::IFileObjectCollection::MetaInfoType::MIT_PREVIEW_THUMBNAIL:
+
+			case imtbase::IFileObjectCollection::MIT_PREVIEW_THUMBNAIL:
 				pixmap.convertFromImage(value.value<QImage>());
-				PreviewPixmap->setPixmap(pixmap.scaledToWidth(200));
+				PreviewPixmap->setPixmap(pixmap.scaledToWidth(250));
 				PreviewFrame->show();
 				break;
 			}
 
-			if (type != imtbase::IFileObjectCollection::MetaInfoType::MIT_PREVIEW_THUMBNAIL){
+			if (type != imtbase::IFileObjectCollection::MIT_PREVIEW_THUMBNAIL){
 				layoutPtr->addWidget(labelNamePtr, layoutPtr->rowCount(), 0, 1, 1);
-
 				if (labelValuePtr != nullptr){
 					labelValuePtr->setStyleSheet("font-size: 9px; color: gray");
 					layoutPtr->addWidget(labelValuePtr, layoutPtr->rowCount(), 0, 1, 1);
@@ -95,6 +98,15 @@ void CFileCollectionMetaInfoViewComp::OnGuiCreated()
 	}
 
 	PreviewFrame->hide();
+
+	QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect;
+	shadowPtr->setXOffset(0);
+	shadowPtr->setYOffset(0);
+	shadowPtr->setBlurRadius(12);
+	shadowPtr->setColor(QColor("#555555"));
+
+	PreviewFrame->setGraphicsEffect(shadowPtr);
+
 }
 
 

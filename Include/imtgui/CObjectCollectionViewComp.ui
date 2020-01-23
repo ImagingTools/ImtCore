@@ -282,6 +282,12 @@ QAbstractItemView[TabSimulation=true]
    </item>
    <item>
     <widget class="QWidget" name="RightPanel" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>250</width>
+       <height>0</height>
+      </size>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
        <number>0</number>
