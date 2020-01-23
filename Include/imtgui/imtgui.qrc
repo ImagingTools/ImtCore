@@ -96,5 +96,7 @@
         <file alias="Import">Resources/Icons/Import.svg</file>
         <file alias="Keyboard">Resources/Icons/Keyboard.svg</file>
         <file alias="MenuQuad">Resources/Icons/MenuQuad.svg</file>
+        <file alias="Detailed">Resources/Icons/Detailed.svg</file>
+        <file alias="ProductionOverview">Resources/Icons/ProductionOverview.svg</file>
     </qresource>
 </RCC>

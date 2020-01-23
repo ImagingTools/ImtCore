@@ -25,6 +25,11 @@ QToolBar[ImtToolBar=true] &gt; QToolButton
 }
 
 
+QToolBar[ImtToolBar=true]
+{
+	spacing: 8px;
+}
+
 QWidget[ImtTopFrame=true] &gt; QWidget:disabled
 {
 	color: palette(disabled);
