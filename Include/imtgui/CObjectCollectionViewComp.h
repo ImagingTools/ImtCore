@@ -167,11 +167,13 @@ private Q_SLOTS:
 	void OnSearchShortCut();
 	void OnEscShortCut();
 	void OnDelShortCut();
+	void OnRenameShortCut();
 
 private:
 	QShortcut* m_searchShortCutPtr;
 	QShortcut* m_escShortCutPtr;
 	QShortcut* m_delShortCutPtr;
+	QShortcut* m_renameShortCutPtr;
 	iwidgets::CFocusDecorator* m_focusDecoratorPtr;
 	FocusDecorationFactory m_graphicsEffectFactory;
 	QPropertyAnimation* m_filterPanelAnimationPtr;

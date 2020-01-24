@@ -57,6 +57,8 @@ const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const 
 
 void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 {
+	return;
+
 	if (!settings.contains("ObjectCollectionViewColumns/Data")){
 		return;
 	}
@@ -294,6 +296,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	m_escShortCutPtr->setKey(Qt::Key_Escape);
 	m_delShortCutPtr = new QShortcut(GetQtWidget());
 	m_delShortCutPtr->setKey(Qt::Key_Delete);
+	m_renameShortCutPtr = new QShortcut(GetQtWidget());
+	m_renameShortCutPtr->setKey(Qt::Key_F2);
 
 	m_focusDecoratorPtr = new iwidgets::CFocusDecorator(this);
 	m_focusDecoratorPtr->RegisterWidget(FilterEdit, &m_graphicsEffectFactory);
@@ -319,10 +323,10 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	connect(m_searchShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnSearchShortCut);
 	connect(m_escShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnEscShortCut);
 	connect(m_delShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnDelShortCut);
+	connect(m_renameShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnRenameShortCut);
 
 	ItemList->setContextMenuPolicy(Qt::CustomContextMenu);
 	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	ItemList->setFocusPolicy(Qt::NoFocus);
 
 	BaseClass::OnGuiCreated();
 }
@@ -651,6 +655,7 @@ void CObjectCollectionViewComp::UpdateTypeStatus()
 	}
 }
 
+
 // private slots
 
 void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
@@ -926,6 +931,12 @@ void CObjectCollectionViewComp::OnEscShortCut()
 void CObjectCollectionViewComp::OnDelShortCut()
 {
 	OnContextMenuRemove(false);
+}
+
+
+void CObjectCollectionViewComp::OnRenameShortCut()
+{
+	OnContextMenuRename(false);
 }
 
 
