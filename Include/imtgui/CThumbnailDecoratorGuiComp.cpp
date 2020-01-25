@@ -142,6 +142,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
+	MenuLeftFrame->setVisible(false);
+
 	m_itemInfoMap.clear();
 	m_subPageItemMap.clear();
 
@@ -595,6 +597,8 @@ void CThumbnailDecoratorGuiComp::CreatePages(const iprm::ISelectionParam* select
 
 	m_itemInfoMap.clear();
 	m_menuItemModel.clear();
+	m_leftMenuModel.clear();
+	
 	m_pageVisualStatusObserver.UnregisterAllModels();
 
 	const iqtgui::IMultiVisualStatusProvider* visualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(selectionPtr);
@@ -607,6 +611,9 @@ void CThumbnailDecoratorGuiComp::CreatePages(const iprm::ISelectionParam* select
 	m_menuItemModel.setRowCount(m_rowsCount);
 	m_menuItemModel.setColumnCount(m_columnsCount);
 	m_menuItemModel.setParent(this);
+
+	m_leftMenuModel.setColumnCount(1);
+	m_leftMenuModel.setRowCount(menuItemsCount);
 
 	for (int itemIndex = 0; itemIndex < menuItemsCount; ++itemIndex){
 		QString itemName = itemsListPtr->GetOptionName(itemIndex);
@@ -642,10 +649,17 @@ void CThumbnailDecoratorGuiComp::CreatePages(const iprm::ISelectionParam* select
 		int itemRow = itemIndex / m_columnsCount;
 		int itemCol = itemIndex % m_columnsCount;
 		m_menuItemModel.setItem(itemRow, itemCol, menuItem);
+
+		QStandardItem* leftMenuItem = menuItem->clone();
+		leftMenuItem->setText("");
+		m_leftMenuModel.setItem(itemIndex, leftMenuItem);
 	}
 
 	if (m_menuItemModel.columnCount() > 0){
 		PageList->setModel(&m_menuItemModel);
+
+		LeftMenu->setModel(&m_leftMenuModel);
+
 		m_itemDelegate = new imtgui::CThumbPageItemGuiDelegate(m_menuItemModel, m_horizontalSpacing, m_verticalSpacing, this);
 
 		PageList->setItemDelegate(m_itemDelegate);

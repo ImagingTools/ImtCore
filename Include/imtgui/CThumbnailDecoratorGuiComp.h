@@ -258,6 +258,7 @@ private:
 	PageVisualStatusObserver m_pageVisualStatusObserver;
 
 	QStandardItemModel m_menuItemModel;
+	QStandardItemModel m_leftMenuModel;
 
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;
