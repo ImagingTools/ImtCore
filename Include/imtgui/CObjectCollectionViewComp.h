@@ -151,6 +151,8 @@ private:
 
 	void UpdateTypeStatus();
 
+	bool eventFilter(QObject *object, QEvent *event);
+
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 	void OnItemChanged(QStandardItem *item);

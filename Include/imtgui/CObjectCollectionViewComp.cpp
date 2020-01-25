@@ -12,6 +12,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QInputDialog>
+#include <QtGui/QResizeEvent>
 
 // ACF includes
 #include <imod/IModel.h>
@@ -57,8 +58,6 @@ const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const 
 
 void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 {
-	return;
-
 	if (!settings.contains("ObjectCollectionViewColumns/Data")){
 		return;
 	}
@@ -149,7 +148,7 @@ void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 
 			QJsonObject jsonColumnSettings;
 			for (QString columnSettingsKey : columnSettingsKeys){
-				jsonColumnSettings.insert(columnSettingsKey, QJsonValue::fromVariant(columnSettings[columnSettingsKey]));			
+				jsonColumnSettings.insert(columnSettingsKey, QJsonValue::fromVariant(columnSettings[columnSettingsKey]));
 			}
 			
 			jsonColumns.append(QJsonValue::fromVariant(jsonColumnSettings));
@@ -327,6 +326,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 	ItemList->setContextMenuPolicy(Qt::CustomContextMenu);
 	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	ItemList->header()->setStretchLastSection(true);
+	ItemList->installEventFilter(this);
 
 	BaseClass::OnGuiCreated();
 }
@@ -486,15 +487,11 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 		return;
 	}
 
-	if (m_proxyModelPtr->rowCount() == 0){
-		return;
-	}
-
 	ColumnsList columnsList;
 
 	ColumnSettings columnSettings;
 	columnSettings["FieldId"] = QString();
-	columnSettings["Width"] = ItemList->columnWidth(0);
+	columnSettings["Width"] = (double)ItemList->columnWidth(0) / ItemList->width();
 	columnsList.append(columnSettings);
 
 	QVector<QByteArray> ids = GetMetaInfoIds(m_currentTypeId);
@@ -506,7 +503,7 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 
 		ColumnSettings settings;
 		settings["FieldId"] = QString(ids[fieldIndex]);
-		settings["Width"] = ItemList->columnWidth(columndIndex);
+		settings["Width"] = (double)ItemList->columnWidth(columndIndex) / ItemList->width();
 		columnsList.append(settings);
 	}
 
@@ -534,21 +531,24 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 			QVariant varFieldId = columnSettings["FieldId"];
 			QVariant varWidth = columnSettings["Width"];
 
-			QString fieldId;
-			int width;
-
 			if (varFieldId.type() != QVariant::String){
 				continue;
 			}
 
+			if (varWidth.type() != QVariant::Double){
+				continue;
+			}
+
+			QString fieldId;
 			fieldId = varFieldId.toString();
 
 			bool ok;
-			width = varWidth.toInt(&ok);
+			double width;
+			width = varWidth.toDouble(&ok);
 
 			if (fieldId.isEmpty()){
 				if (ok){
-						ItemList->setColumnWidth(0, width);
+					ItemList->setColumnWidth(0, width * ItemList->width());
 				}
 				else{
 					ItemList->resizeColumnToContents(0);
@@ -564,7 +564,7 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 				fieldSet.remove(fieldId);
 				
 				if (ok){
-					ItemList->setColumnWidth(logicIndex, width);
+					ItemList->setColumnWidth(logicIndex, width * ItemList->width());
 				}
 				else{
 					ItemList->resizeColumnToContents(currentIndex);
@@ -656,12 +656,31 @@ void CObjectCollectionViewComp::UpdateTypeStatus()
 }
 
 
+bool CObjectCollectionViewComp::eventFilter(QObject *object, QEvent *event)
+{
+	if (object == ItemList){
+		if (event->type() == QEvent::Resize){
+			QResizeEvent *resizeEvent = (QResizeEvent*)event;
+			if (resizeEvent->size() != resizeEvent->oldSize()){
+				RestoreColumnsSettings();
+			}
+		}
+	}
+
+	return BaseClass::eventFilter(object, event);
+}
+
+
 // private slots
 
 void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
 {
 	SaveItemsSelection();
 	UpdateCommands();
+
+	if (ItemList->selectionModel()->selectedRows().isEmpty()){
+		ItemList->setCurrentIndex(QModelIndex());
+	}
 }
 
 
@@ -724,7 +743,8 @@ void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 {
 	bool blockStored = m_blockSaveItemsSelection;
 
-	EnsureColumnsSettingsSynchronized();
+	if (this->IsGuiShown())
+		EnsureColumnsSettingsSynchronized();
 
 	SaveItemsSelection();
 
