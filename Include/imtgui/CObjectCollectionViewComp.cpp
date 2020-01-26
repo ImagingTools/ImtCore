@@ -741,13 +741,13 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 }
 
 
-void CObjectCollectionViewComp::OnSectionResized(int logicalIndex, int oldSize, int newSize)
+void CObjectCollectionViewComp::OnSectionResized(int /*logicalIndex*/, int /*oldSize*/, int /*newSize*/)
 {
 	EnsureColumnsSettingsSynchronized();
 }
 
 
-void CObjectCollectionViewComp::OnSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex)
+void CObjectCollectionViewComp::OnSectionMoved(int /*logicalIndex*/, int /*oldVisualIndex*/, int /*newVisualIndex*/)
 {
 	EnsureColumnsSettingsSynchronized();
 }
