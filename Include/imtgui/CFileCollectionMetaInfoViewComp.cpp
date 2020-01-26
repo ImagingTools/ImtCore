@@ -102,7 +102,7 @@ void CFileCollectionMetaInfoViewComp::OnGuiCreated()
 	QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect;
 	shadowPtr->setXOffset(0);
 	shadowPtr->setYOffset(0);
-	shadowPtr->setBlurRadius(12);
+	shadowPtr->setBlurRadius(15);
 	shadowPtr->setColor(QColor("#555555"));
 
 	PreviewFrame->setGraphicsEffect(shadowPtr);
