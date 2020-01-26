@@ -158,6 +158,8 @@ private Q_SLOTS:
 	void OnItemChanged(QStandardItem *item);
 	void OnItemDoubleClick(const QModelIndex &item);
 	void OnCustomContextMenuRequested(const QPoint &point);
+	void OnSectionResized(int logicalIndex, int oldSize, int newSize);
+	void OnSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex);
 	void on_TypeList_itemSelectionChanged();
 
 	void OnContextMenuRename(bool checked);

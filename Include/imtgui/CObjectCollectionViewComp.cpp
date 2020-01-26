@@ -328,6 +328,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	ItemList->header()->setStretchLastSection(true);
 	ItemList->installEventFilter(this);
+	connect(ItemList->header(), &QHeaderView::sectionResized, this, &CObjectCollectionViewComp::OnSectionResized);
+	connect(ItemList->header(), &QHeaderView::sectionMoved, this, &CObjectCollectionViewComp::OnSectionMoved);
 
 	BaseClass::OnGuiCreated();
 }
@@ -739,12 +741,21 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 }
 
 
+void CObjectCollectionViewComp::OnSectionResized(int logicalIndex, int oldSize, int newSize)
+{
+	EnsureColumnsSettingsSynchronized();
+}
+
+
+void CObjectCollectionViewComp::OnSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex)
+{
+	EnsureColumnsSettingsSynchronized();
+}
+
+
 void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 {
 	bool blockStored = m_blockSaveItemsSelection;
-
-	if (this->IsGuiShown())
-		EnsureColumnsSettingsSynchronized();
 
 	SaveItemsSelection();
 
