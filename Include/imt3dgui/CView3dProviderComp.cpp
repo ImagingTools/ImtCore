@@ -288,8 +288,12 @@ void CView3dProviderComp::OnGuiCreated()
 	m_viewCommands.InsertChild(&m_useAntialiasingCommand);
 	m_viewCommands.InsertChild(&m_useCullFaceCommand);
 
-	m_useAntialiasingCommand.setChecked(true);
-	m_useCullFaceCommand.setChecked(true);
+	m_useAntialiasingCommand.setChecked(*m_useAntialiasingAttrPtr);
+	m_useCullFaceCommand.setChecked(*m_useCullfaceAttrPtr);
+
+	widgetPtr->SetRenderHint(COpenGLWidget::RH_ANTIALIASING, *m_useAntialiasingAttrPtr);
+	widgetPtr->SetRenderHint(COpenGLWidget::RH_CULLFACE, *m_useCullfaceAttrPtr);
+	widgetPtr->SetRenderHint(COpenGLWidget::RH_BLEND, *m_useBlendAttrPtr);
 
 	if (m_viewCommands.GetChildsCount() > 0){
 		m_rootCommands.InsertChild(&m_viewCommands);

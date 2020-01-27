@@ -59,6 +59,9 @@ public:
 		I_ASSIGN(m_showViewpointCommandsAttrPtr, "ShowViewpointCommands", "Show view point commands", true, false);
 		I_ASSIGN(m_showZoomCommandsAttrPtr, "ShowZoomCommands", "Show zoom-in/zoom-out commands", true, true);
 		I_ASSIGN(m_cameraCompPtr, "Camera", "Camera", true, "Camera");
+		I_ASSIGN(m_useAntialiasingAttrPtr, "UseAntialiasing", "Use rendering antialiasing", true, true);
+		I_ASSIGN(m_useCullfaceAttrPtr, "UseCullFace", "Use cull face mode", true, true);
+		I_ASSIGN(m_useBlendAttrPtr, "UseBlend", "Use blending mode", true, true);
 	I_END_COMPONENT
 
 	CView3dProviderComp();
@@ -197,6 +200,9 @@ private:
 	I_ATTR(bool, m_showRotationModeCommandsAttrPtr);
 	I_ATTR(bool, m_showViewpointCommandsAttrPtr);
 	I_ATTR(bool, m_showZoomCommandsAttrPtr);
+	I_ATTR(bool, m_useAntialiasingAttrPtr);
+	I_ATTR(bool, m_useCullfaceAttrPtr);
+	I_ATTR(bool, m_useBlendAttrPtr);
 	I_REF(imt3dview::IScene3dCamera, m_cameraCompPtr);
 };
 

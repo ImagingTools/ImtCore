@@ -60,10 +60,11 @@ public:
 	enum RenderHint
 	{
 		RH_ANTIALIASING = 0x1,
-		RH_CULLFACE = 0x2
+		RH_CULLFACE = 0x2,
+		RH_BLEND = 0x4
 	};
 
-	I_DECLARE_FLAGS(RenderHints, RH_ANTIALIASING, RH_CULLFACE);
+	I_DECLARE_FLAGS(RenderHints, RH_ANTIALIASING, RH_CULLFACE, RH_BLEND);
 
 	COpenGLWidget(QWidget* parentPtr = nullptr);
 	~COpenGLWidget();
