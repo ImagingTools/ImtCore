@@ -49,6 +49,11 @@ I_EXPORT_COMPONENT(
 			"ICollectionInfo-To-IOptionsList adapter",
 			"Collection List Options Adapter");
 
+I_EXPORT_COMPONENT(
+			LocalizedHelpPathProvider,
+			"Localization-dependant help path provider",
+			"Help Path Documentation Localization");
+
 
 } // namespace ImtCorePck
 
