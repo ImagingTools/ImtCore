@@ -25,7 +25,10 @@ public:
 	I_BEGIN_COMPONENT(CLocalizedHelpPathProviderComp);
 		I_REGISTER_INTERFACE(idoc::IHelpFileProvider);
 		I_ASSIGN(m_languageSelectionCompPtr, "LanguageSelection", "Language selector", true, "LanguageSelection");
-		I_ASSIGN_MULTI_0(m_helpPathListCompPtr, "HelpPaths", "List of help paths related to the locale-IDs", true);
+		I_ASSIGN_MULTI_0(m_helpUrlPathListCompPtr, "HelpUrlPaths", "List of help URL paths related to the locale-IDs", true);
+		I_ASSIGN_MULTI_0(m_helpLocalPathListCompPtr, "HelpLocalPaths", "List of help local paths related to the locale-IDs", true);
+		//I_ASSIGN_MULTI_0(m_helpUrlPathListCompPtr, "HelpUrlPaths", "List of help URL paths related to the locale-IDs", true);
+		//I_ASSIGN_MULTI_0(m_helpLocalPathListCompPtr, "HelpLocalPaths", "List of help local paths related to the locale-IDs", true);
 		I_ASSIGN_MULTI_0(m_localeIdsAttrPtr, "LocaleIds", "List of registered locale-IDs for corresponding help file paths", true);
 	I_END_COMPONENT;
 
@@ -39,7 +42,10 @@ private:
 	QString GetPathForLocale(int languageIndex = -1) const;
 
 	I_REF(iprm::ISelectionParam, m_languageSelectionCompPtr);
-	I_MULTIREF(ifile::IFileNameParam, m_helpPathListCompPtr);
+	//I_MULTIREF(ifile::IFileNameParam, m_helpUrlPathListCompPtr);
+	//I_MULTIREF(ifile::IFileNameParam, m_helpLocalPathListCompPtr);
+	I_MULTIATTR(QByteArray, m_helpUrlPathListCompPtr);
+	I_MULTIATTR(QByteArray, m_helpLocalPathListCompPtr);
 	I_MULTIATTR(QByteArray, m_localeIdsAttrPtr);
 };
 
