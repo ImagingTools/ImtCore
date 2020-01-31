@@ -19,6 +19,9 @@ imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
 SUBDIRS += imtgui
 imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
 
+SUBDIRS += imtwidgets
+imtwidgets.file = ../../Include/imtwidgets/QMake/imtwidgets.pro
+
 SUBDIRS += imt3dview
 imt3dview.file = ../../Include/imt3dview/QMake/imt3dview.pro
 

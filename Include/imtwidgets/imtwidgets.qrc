@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/Icons">
+        <file alias="Error">Resources/Icons/Error.svg</file>
+    </qresource>
+</RCC>
