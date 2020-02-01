@@ -29,11 +29,6 @@ QWidget:disabled
 	color: palette(disabled);
 }
 
-QToolBar[ImtToolBar=true]
-{
-	margin-bottom: 3px;
-}
-
 
 QToolBar[ImtToolBar=true]::separator
 {
@@ -266,7 +261,7 @@ QAbstractItemView[TabSimulation=true]
           <number>0</number>
          </property>
          <property name="bottomMargin">
-          <number>0</number>
+          <number>3</number>
          </property>
         </layout>
        </widget>
