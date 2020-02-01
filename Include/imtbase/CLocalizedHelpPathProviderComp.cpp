@@ -94,8 +94,7 @@ QString CLocalizedHelpPathProviderComp::GetPathForLocale(int languageIndex) cons
 			else {
 				int attribute = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
-				if (attribute >= 200 && attribute < 300) {
-					// Success
+				if (attribute >= 200 && attribute < 400){
 					return url;
 				}
 			}
@@ -114,6 +113,6 @@ QString CLocalizedHelpPathProviderComp::GetPathForLocale(int languageIndex) cons
 }
 
 
-}
+} // namespace imtbase
 
 

@@ -142,6 +142,14 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
+	if (m_mainToolBar == nullptr){
+		m_mainToolBar = new QToolBar(CurrentPageToolBarFrame);
+		m_mainToolBar->setProperty("ImtToolBar", true);
+		m_mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+		CurrentPageToolBarFrame->layout()->addWidget(m_mainToolBar);
+	}
+
 	MenuLeftFrame->setVisible(false);
 
 	m_itemInfoMap.clear();
@@ -253,8 +261,6 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 
 void CThumbnailDecoratorGuiComp::on_PageStack_currentChanged(int stackIndex)
 {
-	CurrentPageToolBarFrame->setVisible(stackIndex == PAGE_CONTAINER_INDEX);
-
 	if (!UserEdit->text().isEmpty() && (stackIndex == LOGIN_PAGE_INDEX)){
 		PasswordEdit->setFocus();
 		PasswordEdit->setCursorPosition(0);
@@ -1008,20 +1014,18 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 	if (m_commandsProviderCompPtr.IsValid()){
 		if (m_mainToolBar != nullptr){
 			m_mainToolBar->clear();
-		}
 	
-		commandsPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_commandsProviderCompPtr->GetCommands());
-		if (commandsPtr != nullptr){
-			if (m_mainToolBar == nullptr){
-				m_mainToolBar = new QToolBar(CurrentPageToolBarFrame);
-				m_mainToolBar->setProperty("ImtToolBar", true);
-
-				CurrentPageToolBarFrame->layout()->addWidget(m_mainToolBar);
-
-				m_mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+			commandsPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_commandsProviderCompPtr->GetCommands());
+			if (commandsPtr != nullptr){
+				iqtgui::CCommandTools::SetupToolbar(*commandsPtr, *m_mainToolBar);
 			}
+			else{
+				QAction* placeholderAction = new QAction(QIcon("/"), "");
+				placeholderAction->setEnabled(false);
 
-			iqtgui::CCommandTools::SetupToolbar(*commandsPtr, *m_mainToolBar);
+				m_mainToolBar->addAction(placeholderAction);
+				m_mainToolBar->addSeparator();
+			}
 		}
 	}
 }
