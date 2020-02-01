@@ -28,6 +28,9 @@ imt3dview.file = ../../Include/imt3dview/QMake/imt3dview.pro
 SUBDIRS += imt3dgui
 imt3dgui.file = ../../Include/imt3dgui/QMake/imt3dgui.pro
 
+SUBDIRS += qhelpgui
+qhelpgui.file = ../../Include/qhelpgui/QMake/qhelpgui.pro
+
 # Component packages
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
@@ -63,6 +66,10 @@ Imt3dViewPck.depends = imt3dview
 SUBDIRS += Imt3dGuiPck
 Imt3dGuiPck.file = ../../Impl/Imt3dGuiPck/QMake/Imt3dGuiPck.pro
 Imt3dGuiPck.depends = imt3dview imt3dgui
+
+SUBDIRS += QHelpGuiPck
+QHelpGuiPck.file = ../../Impl/QHelpGuiPck/QMake/QHelpGuiPck.pro
+QHelpGuiPck.depends = qhelpgui
 
 # Application
 !linux{
