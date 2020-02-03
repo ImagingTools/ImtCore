@@ -161,6 +161,7 @@ private:
 	QPropertyAnimation m_animationWidth;
 	QPropertyAnimation m_animationIndent;
 
+private:
 	QModelIndex GetModelIndex(const QByteArray& pageId) const;
 };
 

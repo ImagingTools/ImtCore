@@ -103,7 +103,7 @@ void CMenuPanel::SetActivePage(const QByteArray& pageId)
 bool CMenuPanel::IsPageEnabled(const QByteArray& pageId) const
 {
 	QModelIndex index = GetModelIndex(pageId);
-	if (index.isValid() == true){
+	if (index.isValid()){
 		return m_model.itemFromIndex(index)->data(DR_PAGE_ENABLED).toBool();
 	}
 
@@ -114,7 +114,7 @@ bool CMenuPanel::IsPageEnabled(const QByteArray& pageId) const
 bool CMenuPanel::SetPageEnabled(const QByteArray& pageId, bool isPageEnabled)
 {
 	QModelIndex index = GetModelIndex(pageId);
-	if (index.isValid() == true){
+	if (index.isValid()){
 		m_model.itemFromIndex(index)->setData(isPageEnabled, DR_PAGE_ENABLED);
 
 		return true;
@@ -127,7 +127,7 @@ bool CMenuPanel::SetPageEnabled(const QByteArray& pageId, bool isPageEnabled)
 bool CMenuPanel::IsPageVisible(const QByteArray& pageId) const
 {
 	QModelIndex index = GetModelIndex(pageId);
-	if (index.isValid() == true){
+	if (index.isValid()){
 		return m_model.itemFromIndex(index)->data(DR_PAGE_VISIBLE).toBool();
 	}
 
@@ -138,7 +138,7 @@ bool CMenuPanel::IsPageVisible(const QByteArray& pageId) const
 bool CMenuPanel::SetPageVisible(const QByteArray& pageId, bool isPageVisible)
 {
 	QModelIndex index = GetModelIndex(pageId);
-	if (index.isValid() == true){
+	if (index.isValid()){
 		m_model.itemFromIndex(index)->setData(isPageVisible, DR_PAGE_VISIBLE);
 
 		return true;
@@ -165,7 +165,7 @@ bool CMenuPanel::IsPageIdExist(const QByteArray& pageId) const
 bool CMenuPanel::RemovePage(const QByteArray& pageId)
 {
 	QModelIndex index = GetModelIndex(pageId);
-	if (index.isValid() == true){
+	if (index.isValid()){
 		return m_model.removeRow(index.row(), index.parent());
 	}
 
@@ -175,11 +175,11 @@ bool CMenuPanel::RemovePage(const QByteArray& pageId)
 
 bool CMenuPanel::InsertPage(const QByteArray& pageId, const QByteArray& parentPageId)
 {
-	if (pageId.isEmpty() == true){
+	if (pageId.isEmpty()){
 		return false;
 	}
 
-	if (IsPageIdExist(pageId) == true){
+	if (IsPageIdExist(pageId)){
 		return false;
 	}
 
@@ -215,7 +215,7 @@ bool CMenuPanel::InsertPage(const QByteArray& pageId, const QByteArray& parentPa
 int CMenuPanel::GetPageOrder(const QByteArray& pageId) const
 {
 	QModelIndex index = GetModelIndex(pageId);
-	if (index.isValid() == true){
+	if (index.isValid()){
 		return index.row();
 	}
 
@@ -226,7 +226,7 @@ int CMenuPanel::GetPageOrder(const QByteArray& pageId) const
 bool CMenuPanel::SetPageOrder(const QByteArray& pageId, int position)
 {
 	QModelIndex index = GetModelIndex(pageId);
-	if (index.isValid() == true){
+	if (index.isValid()){
 		QStandardItem* item = m_model.itemFromIndex(index.parent());
 		int row;
 		if (item == nullptr){
@@ -262,14 +262,14 @@ QList<QByteArray> CMenuPanel::GetChilds(const QByteArray& pageId)
 {
 	QList<QByteArray> childs;
 
-	if (pageId.isEmpty() == true){
+	if (pageId.isEmpty()){
 		for (int i = 0; i < m_model.rowCount(); i++){
 			childs.append(m_model.item(i, 0)->data(DR_PAGE_ID).toByteArray());
 		}
 	}
 
 	QModelIndex index = GetModelIndex(pageId);
-	if (index.isValid() == true){
+	if (index.isValid()){
 		QStandardItem* itemPtr = m_model.itemFromIndex(index);
 
 		for (int i = 0; i < itemPtr->rowCount(); i++){
@@ -284,7 +284,7 @@ QList<QByteArray> CMenuPanel::GetChilds(const QByteArray& pageId)
 QIcon CMenuPanel::GetPageIcon(const QByteArray& pageId) const
 {
 	QModelIndex index = GetModelIndex(pageId);
-	if (index.isValid() == true){
+	if (index.isValid()){
 		return m_model.itemFromIndex(index)->icon();
 	}
 
@@ -295,7 +295,7 @@ QIcon CMenuPanel::GetPageIcon(const QByteArray& pageId) const
 bool CMenuPanel::SetPageIcon(const QByteArray& pageId, const QIcon& pageIcon)
 {
 	QModelIndex index = GetModelIndex(pageId);
-	if (index.isValid() == true){
+	if (index.isValid()){
 		m_model.itemFromIndex(index)->setIcon(pageIcon);
 		return true;
 	}
@@ -307,7 +307,7 @@ bool CMenuPanel::SetPageIcon(const QByteArray& pageId, const QIcon& pageIcon)
 QString CMenuPanel::GetPageName(const QByteArray& pageId) const
 {
 	QModelIndex index = GetModelIndex(pageId);
-	if (index.isValid() == true){
+	if (index.isValid()){
 		return m_model.itemFromIndex(index)->text();
 	}
 
@@ -318,7 +318,7 @@ QString CMenuPanel::GetPageName(const QByteArray& pageId) const
 bool CMenuPanel::SetPageName(const QByteArray& pageId, const QString& pageName)
 {
 	QModelIndex index = GetModelIndex(pageId);
-	if (index.isValid() == true){
+	if (index.isValid()){
 		m_model.itemFromIndex(index)->setText(pageName);
 		return true;
 	}
@@ -377,7 +377,7 @@ QModelIndex CMenuPanel::GetModelIndex(const QByteArray& pageId) const
 
 	QModelIndex index = m_model.index(0, 0);
 
-	while (index.isValid() == true){
+	while (index.isValid()){
 		QVariant itemData = index.data(DR_PAGE_ID);
 		if (itemData.isValid()){
 			if (itemData.toByteArray() == pageId){
@@ -386,9 +386,9 @@ QModelIndex CMenuPanel::GetModelIndex(const QByteArray& pageId) const
 		}
 
 		QModelIndex childIndex = m_model.index(0, 0, index);
-		if (childIndex.isValid() == true){
+		if (childIndex.isValid()){
 			QModelIndex sibling = index.siblingAtRow(index.row() + 1);
-			if (sibling.isValid() == true){
+			if (sibling.isValid()){
 				stack.push(sibling);
 			}
 
@@ -402,7 +402,7 @@ QModelIndex CMenuPanel::GetModelIndex(const QByteArray& pageId) const
 			continue;
 		}
 
-		if (stack.isEmpty() == true){
+		if (stack.isEmpty()){
 			break;
 		}
 
