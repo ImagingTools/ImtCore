@@ -97,6 +97,7 @@ public:
 		I_ASSIGN(m_rightsCompPtr, "Rights", "User rights for the application", false, "Rights");
 		I_ASSIGN_TO(m_rightsModelCompPtr, m_rightsCompPtr, false);
 		I_ASSIGN(m_autoLogoutMinutesCompPtr, "AutoLogoutTime", "Parameter to control automatical logout interval. Setting of this parameter overrides 'AutoLogoutMinutes' value", false, "AutoLogoutTime");
+		I_ASSIGN(m_leftMenuPanelGuiCompPtr, "LeftMenuPanel", "Left menu panel", false, "LeftMenuPanel");
 	I_END_COMPONENT;
 
 	enum
@@ -258,7 +259,6 @@ private:
 	PageVisualStatusObserver m_pageVisualStatusObserver;
 
 	QStandardItemModel m_menuItemModel;
-	QStandardItemModel m_leftMenuModel;
 
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;
@@ -284,6 +284,7 @@ private:
 	I_REF(iauth::IRightsProvider, m_rightsCompPtr);
 	I_REF(imod::IModel, m_rightsModelCompPtr);
 	I_REF(imeas::INumericValue, m_autoLogoutMinutesCompPtr);
+	I_REF(iqtgui::IGuiObject, m_leftMenuPanelGuiCompPtr);
 
 	QToolBar* m_mainToolBar;
 	QTimer m_autoLogoutTimer;
