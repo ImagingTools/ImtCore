@@ -19,7 +19,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_activePage(QByteArray()),
 	m_maxWidth(200),
 	m_indent(30)
- {
+{
 	setupUi(this);
 
 	setMouseTracking(true);
@@ -116,6 +116,7 @@ bool CMenuPanel::SetPageEnabled(const QByteArray& pageId, bool isPageEnabled)
 	QModelIndex index = GetModelIndex(pageId);
 	if (index.isValid() == true){
 		m_model.itemFromIndex(index)->setData(isPageEnabled, DR_PAGE_ENABLED);
+
 		return true;
 	}
 
@@ -139,6 +140,7 @@ bool CMenuPanel::SetPageVisible(const QByteArray& pageId, bool isPageVisible)
 	QModelIndex index = GetModelIndex(pageId);
 	if (index.isValid() == true){
 		m_model.itemFromIndex(index)->setData(isPageVisible, DR_PAGE_VISIBLE);
+
 		return true;
 	}
 
@@ -229,8 +231,8 @@ bool CMenuPanel::SetPageOrder(const QByteArray& pageId, int position)
 		int row;
 		if (item == nullptr){
 			row = m_model.rowCount()-1;
-		} else
-		{
+		}
+		else{
 			row = item->rowCount()-1;
 		}
 
@@ -411,6 +413,6 @@ QModelIndex CMenuPanel::GetModelIndex(const QByteArray& pageId) const
 }
 
 
-} //namespace imtwidgets
+} // namespace imtwidgets
 
 

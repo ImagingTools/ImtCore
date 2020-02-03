@@ -14,7 +14,7 @@ namespace imtwidgets
 {
 
 
-class CMenuPanel : public QWidget, public Ui::CMenuPanel
+class CMenuPanel: public QWidget, public Ui::CMenuPanel
 {
 	Q_OBJECT
 
@@ -38,7 +38,7 @@ public:
 	virtual int GetMinWidth() const;
 
 	/**
-		Set the mminimum width of the menu panel.
+		Set the minimum width of the menu panel.
 	*/
 	virtual void SetMinWidth(int minWidth);
 
@@ -165,6 +165,6 @@ private:
 };
 
 
-} //namespace imtwidgets
+} // namespace imtwidgets
 
 
