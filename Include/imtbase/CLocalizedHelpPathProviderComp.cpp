@@ -45,7 +45,7 @@ QString CLocalizedHelpPathProviderComp::GetPathForLocale(int languageIndex) cons
 	QString path;
 	QString localeId;
 
-	if (languageIndex == -1) {
+	if (languageIndex == -1){
 		localeId = QLocale::system().name();
 	}
 	else{
@@ -65,48 +65,54 @@ QString CLocalizedHelpPathProviderComp::GetPathForLocale(int languageIndex) cons
 
 	int helpPathIndex = m_localeIdsAttrPtr.FindValue(localeId.toUtf8());
 	if ((helpPathIndex >= 0) && (helpPathIndex < m_helpUrlPathListCompPtr.GetCount())){
-		QString url = m_helpUrlPathListCompPtr[helpPathIndex];
+		ifile::IFileNameParam* pathPtr = m_helpUrlPathListCompPtr[helpPathIndex];
+		if (pathPtr != nullptr){
+			QString url = pathPtr->GetPath();
 
-		QNetworkAccessManager manager;
-		QNetworkRequest request;
+			QNetworkAccessManager manager;
+			QNetworkRequest request;
 
-		request.setUrl(QUrl(url));
-		request.setRawHeader("User-Agent", "MyAppName/1.0 (Nokia; Qt)");
-		request.setRawHeader("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
-		request.setRawHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-		request.setRawHeader("Accept-Language", "en-us,en;q=0.5");
-		request.setRawHeader("Connection", "Keep-Alive");
-		QNetworkReply *reply = manager.get(request);
+			request.setUrl(QUrl(url));
+			request.setRawHeader("User-Agent", "MyAppName/1.0 (Nokia; Qt)");
+			request.setRawHeader("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
+			request.setRawHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+			request.setRawHeader("Accept-Language", "en-us,en;q=0.5");
+			request.setRawHeader("Connection", "Keep-Alive");
+			QNetworkReply *reply = manager.get(request);
 
-		QEventLoop loop;
-		QTimer timer;
-		timer.setSingleShot(true);
-		timer.connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-		timer.connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-		timer.start(10000);   // 10 secs. timeout
-		loop.exec();
+			QEventLoop loop;
+			QTimer timer;
+			timer.setSingleShot(true);
+			timer.connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+			timer.connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+			timer.start(10000);   // 10 secs. timeout
+			loop.exec();
 
-		if (timer.isActive()){
-			timer.stop();
-			if (reply->error() > 0){
+			if (timer.isActive()){
+				timer.stop();
+				if (reply->error() > 0){
 
-			}
-			else {
-				int attribute = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+				}
+				else{
+					int attribute = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
-				if (attribute >= 200 && attribute < 400){
-					return url;
+					if (attribute >= 200 && attribute < 400){
+						return url;
+					}
 				}
 			}
-		}
-		else {
-			reply->disconnect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-			reply->abort();
+			else{
+				reply->disconnect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+				reply->abort();
+			}
 		}
 	}
 
 	if ((helpPathIndex >= 0) && (helpPathIndex < m_helpLocalPathListCompPtr.GetCount())){
-		return m_helpLocalPathListCompPtr[helpPathIndex];
+		ifile::IFileNameParam* pathPtr = m_helpLocalPathListCompPtr[helpPathIndex];
+		if (pathPtr != nullptr){
+			return pathPtr->GetPath();
+		}
 	}
 
 	return QString();
