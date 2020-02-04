@@ -22,6 +22,8 @@ class CMenuPanelComp:
 									iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
 									imod::TSingleModelObserverBase<iprm::ISelectionParam>>>
 {
+	//Q_OBJECT
+
 public:
 	typedef ibase::TModelObserverCompBaseWrap<
 				iqtgui::TGuiObserverWrap<
@@ -32,6 +34,11 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	void OnPageIdChanged(const QByteArray& selectedPageId, const QByteArray& deselectedPageId);
+
+	// reimplemented (iqtgui::CGuiComponentBase)
+	virtual void OnGuiCreated() override;
+
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 

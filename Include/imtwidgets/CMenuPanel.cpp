@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QDebug>
 #include <QtCore/QEvent>
 #include <QtCore/QStack>
 #include <QtCore/QModelIndex>
@@ -17,28 +18,35 @@ namespace imtwidgets
 CMenuPanel::CMenuPanel(QWidget* parent)
 	:QWidget(parent),
 	m_activePage(QByteArray()),
+	m_minWidth(32),
 	m_maxWidth(200),
-	m_indent(30)
+	m_indent(16)
 {
 	setupUi(this);
-
-	setMouseTracking(true);
 
 	m_model.setColumnCount(1);
 	m_model.setSortRole(Qt::UserRole + 100);
 
+	setMouseTracking(true);
+
 	PageTree->setModel(&m_model);
-	PageTree->setMinimumWidth(200);
+	PageTree->setSelectionMode(QAbstractItemView::SingleSelection);
+	PageTree->selectionModel()->clearSelection();
+	connect(PageTree->selectionModel(), &QItemSelectionModel::currentChanged, this, &CMenuPanel::OnPageIdChanged);
+
 	PageTree->setHeaderHidden(true);
 	PageTree->setIconSize(QSize(24, 24));
 	PageTree->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 	PageTree->setIndentation(0);
-	PageTree->setMinimumWidth(PageTree->iconSize().width() + 10);
+	PageTree->setMaximumWidth(PageTree->iconSize().width() + 10);
 
 	m_animationWidth.setTargetObject(PageTree);
-	m_animationWidth.setPropertyName("minimumWidth");
+	m_animationWidth.setPropertyName("maximumWidth");
 	m_animationIndent.setTargetObject(PageTree);
 	m_animationIndent.setPropertyName("indentation");
+
+	m_focusDecoratorPtr = new iwidgets::CFocusDecorator(this);
+	m_focusDecoratorPtr->RegisterWidget(PageTree, &m_graphicsEffectFactory);
 }
 
 
@@ -305,9 +313,24 @@ bool CMenuPanel::SetPageName(const QByteArray& pageId, const QString& pageName)
 }
 
 
-void CMenuPanel::OnPageIdChanged(const QByteArray& pageId)
+void CMenuPanel::OnPageIdChanged(const QModelIndex& selected, const QModelIndex& deselected)
 {
-	Q_UNUSED(pageId)
+	//QModelIndexList selectedList = selected.indexes();
+	//QModelIndexList deselectedList = deselected.indexes();
+
+	QByteArray selectedId;
+	QByteArray deselectedId;
+
+	if (selected.isValid()){
+		selectedId = selected.data(DR_PAGE_ID).toByteArray();
+	}
+
+	if (deselected.isValid()){
+		deselectedId = deselected.data(DR_PAGE_ID).toByteArray();
+	}
+
+	qDebug() << 111;
+	PageIdChanged(selectedId, deselectedId);
 }
 
 
@@ -319,12 +342,12 @@ void CMenuPanel::enterEvent(QEvent* event)
 {
 	Q_UNUSED(event)
 
-	m_animationWidth.setStartValue(PageTree->minimumWidth());
+	m_animationWidth.setStartValue(PageTree->maximumWidth());
 	m_animationWidth.setEndValue(m_maxWidth);
 	m_animationWidth.setDuration(150);
 	m_animationWidth.start();
 
-	m_animationIndent.setStartValue(PageTree->minimumWidth() * m_indent/ m_maxWidth);
+	m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent/ m_maxWidth);
 	m_animationIndent.setEndValue(m_indent);
 	m_animationIndent.setDuration(150);
 	m_animationIndent.start();
@@ -335,12 +358,12 @@ void CMenuPanel::leaveEvent(QEvent* event)
 {
 	Q_UNUSED(event)
 
-	m_animationWidth.setStartValue(PageTree->minimumWidth());
+	m_animationWidth.setStartValue(PageTree->maximumWidth());
 	m_animationWidth.setEndValue(PageTree->iconSize().width() + 10);
 	m_animationWidth.setDuration(150);
 	m_animationWidth.start();
 
-	m_animationIndent.setStartValue(PageTree->minimumWidth() * m_indent / m_maxWidth);
+	m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
 	m_animationIndent.setEndValue(0);
 	m_animationIndent.setDuration(150);
 	m_animationIndent.start();
@@ -354,7 +377,6 @@ QModelIndex CMenuPanel::GetModelIndex(const QByteArray& pageId) const
 	QStack<QModelIndex> stack;
 
 	QModelIndex index = m_model.index(0, 0);
-
 	while (index.isValid()){
 		QVariant itemData = index.data(DR_PAGE_ID);
 		if (itemData.isValid()){
@@ -388,6 +410,30 @@ QModelIndex CMenuPanel::GetModelIndex(const QByteArray& pageId) const
 	}
 
 	return QModelIndex();
+}
+
+
+// protected methods of the embedded class FocusDecorationFactory
+
+// reimplemented (iGraphicsEffectFactory)
+
+QGraphicsEffect* CMenuPanel::FocusDecorationFactory::CreateInstance(const QByteArray& /*keyId*/) const
+{
+	QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect;
+	shadowPtr->setXOffset(0);
+	shadowPtr->setYOffset(0);
+	shadowPtr->setBlurRadius(12);
+	shadowPtr->setColor(qRgba(74, 149, 217, 128));
+
+	return shadowPtr;
+}
+
+
+istd::IFactoryInfo::KeyList CMenuPanel::FocusDecorationFactory::GetFactoryKeys() const
+{
+	istd::IFactoryInfo::KeyList retVal;
+
+	return retVal;
 }
 
 

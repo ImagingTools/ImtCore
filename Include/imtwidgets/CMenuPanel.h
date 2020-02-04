@@ -6,6 +6,9 @@
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QTreeView>
 
+// ACF includes
+#include <iwidgets/CFocusDecorator.h>
+
 // ImtCore includes
 #include <GeneratedFiles/imtwidgets/ui_CMenuPanel.h>
 
@@ -141,10 +144,19 @@ Q_SIGNALS:
 	/**
 		Signal will be emitted whenever the currently selected page will be changed.
 	*/
-	void EmitPageIdChanged(const QByteArray& oldIndex, const QByteArray& newIndex);
+	void PageIdChanged(const QByteArray& selected, const QByteArray& deselected);
 
-protected Q_SLOTS:
-	void OnPageIdChanged(const QByteArray& pageId);
+private Q_SLOTS:
+	void OnPageIdChanged(const QModelIndex& selected, const QModelIndex& deselected);
+
+protected:
+	class FocusDecorationFactory: public iwidgets::CFocusDecorator::GraphicsEffectFactory
+	{
+	public:
+		// reimplemented (iGraphicsEffectFactory)
+		virtual QGraphicsEffect* CreateInstance(const QByteArray& keyId = "") const;
+		virtual KeyList GetFactoryKeys() const;
+	};
 
 protected:
 	// reimplemented (QWidget)
@@ -160,6 +172,9 @@ private:
 	QStandardItemModel m_model;
 	QPropertyAnimation m_animationWidth;
 	QPropertyAnimation m_animationIndent;
+
+	iwidgets::CFocusDecorator* m_focusDecoratorPtr;
+	FocusDecorationFactory m_graphicsEffectFactory;
 
 private:
 	QModelIndex GetModelIndex(const QByteArray& pageId) const;
