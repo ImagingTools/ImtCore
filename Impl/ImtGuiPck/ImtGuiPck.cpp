@@ -62,6 +62,11 @@ I_EXPORT_COMPONENT(
 			"Delegator for a commands provider",
 			"Command Provider Delegate");
 
+I_EXPORT_COMPONENT(
+			MenuPanel,
+			"Menu panel view component",
+			"Menu panel page");
+
 
 } // namespace ImtGuiPck
 
