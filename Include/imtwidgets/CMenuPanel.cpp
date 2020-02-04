@@ -27,28 +27,6 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_model.setColumnCount(1);
 	m_model.setSortRole(Qt::UserRole + 100);
 
-	InsertPage("page1", "");
-	InsertPage("page2", "");
-	InsertPage("page3", "");
-	SetPageName("page1", "page 1");
-	SetPageName("page2", "page 2");
-	SetPageName("page3", "page 3");
-	
-	InsertPage("page21", "page2");
-	SetPageName("page21", "page 2.1");
-	InsertPage("page22", "page2");
-	SetPageName("page22", "page 2.2");
-	
-	InsertPage("page221", "page22");
-	SetPageName("page221", "page 2.2.1");
-	
-	SetPageIcon("page1", QIcon(":/Error"));
-	SetPageIcon("page2", QIcon(":/Error"));
-	SetPageIcon("page3", QIcon(":/Error"));
-	SetPageIcon("page21", QIcon(":/Error"));
-	SetPageIcon("page22", QIcon(":/Error"));
-	SetPageIcon("page221", QIcon(":/Error"));
-
 	PageTree->setModel(&m_model);
 	PageTree->setMinimumWidth(200);
 	PageTree->setHeaderHidden(true);

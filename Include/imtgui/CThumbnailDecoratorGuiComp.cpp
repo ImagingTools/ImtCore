@@ -150,6 +150,10 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		CurrentPageToolBarFrame->layout()->addWidget(m_mainToolBar);
 	}
 
+	if (m_leftMenuPanelGuiCompPtr.IsValid()){
+		m_leftMenuPanelGuiCompPtr->CreateGui(MenuPanelFrame);
+	}
+
 	MenuPanelFrame->setVisible(m_leftMenuPanelGuiCompPtr.IsValid());
 
 	m_itemInfoMap.clear();
@@ -219,6 +223,10 @@ void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 {
 	if (m_pagesWidgetCompPtr.IsValid() && m_pagesWidgetCompPtr->IsGuiCreated()){
 		m_pagesWidgetCompPtr->DestroyGui();
+	}
+
+	if (m_leftMenuPanelGuiCompPtr.IsValid() && m_leftMenuPanelGuiCompPtr->IsGuiCreated()){
+		m_leftMenuPanelGuiCompPtr->DestroyGui();
 	}
 
 	m_pageModelObserver.UnregisterAllModels();

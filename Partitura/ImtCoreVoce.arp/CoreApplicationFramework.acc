@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4804" Description="ACF"/>
-            <Version Id="1" Number="2101" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331008" Description="Qt Framework"/>
+            <Version Id="0" Number="4840" Description="ACF"/>
+            <Version Id="1" Number="2122" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>ImagingTools application framework</Description>
@@ -165,6 +165,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="HorizontalSpacing" Type="Integer" ExportId="HorizontalSpacing">
                         <Data IsEnabled="true" Value="10"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LeftMenuPanel" Type="Reference" ExportId="LeftMenuPanel">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LogPageIndex" Type="Integer" ExportId="LogPageIndex">
                         <Data IsEnabled="false"/>

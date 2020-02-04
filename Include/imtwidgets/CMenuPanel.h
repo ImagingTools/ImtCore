@@ -30,7 +30,7 @@ public:
 		DR_PAGE_VISIBLE
 	};
 
-	explicit CMenuPanel(QWidget* parent = nullptr);
+	CMenuPanel(QWidget* parent = nullptr);
 
 	/**
 		Get the minimum width of the menu panel.
@@ -53,12 +53,12 @@ public:
 	virtual void SetMaxWidth(int maxWidth);
 
 	/**
-		Get MenuPanel active page.
+		Get currently active page.
 	*/
 	virtual QByteArray GetActivePage() const;
 
 	/**
-		Set MenuPanel active page.
+		Set active page.
 	*/
 	virtual void SetActivePage(const QByteArray& pageId);
 
@@ -133,7 +133,7 @@ public:
 	virtual QString GetPageName(const QByteArray& pageId) const;
 
 	/**
-		Set the page Name.
+		Set the page name.
 	*/
 	virtual bool SetPageName(const QByteArray& pageId, const QString& pageName);
 
