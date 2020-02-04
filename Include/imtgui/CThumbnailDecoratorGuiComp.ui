@@ -424,12 +424,6 @@ QAbstractItemView[TabSimulation=true]
       </property>
       <item>
        <widget class="QFrame" name="MenuPanelFrame">
-        <property name="maximumSize">
-         <size>
-          <width>48</width>
-          <height>16777215</height>
-         </size>
-        </property>
         <property name="styleSheet">
          <string notr="true">background:rgb(200,220,240);</string>
         </property>
