@@ -150,13 +150,13 @@ private Q_SLOTS:
 	void OnPageIdChanged(const QModelIndex& selected, const QModelIndex& deselected);
 
 protected:
-	class FocusDecorationFactory: public iwidgets::CFocusDecorator::GraphicsEffectFactory
-	{
-	public:
-		// reimplemented (iGraphicsEffectFactory)
-		virtual QGraphicsEffect* CreateInstance(const QByteArray& keyId = "") const;
-		virtual KeyList GetFactoryKeys() const;
-	};
+	//class FocusDecorationFactory: public iwidgets::CFocusDecorator::GraphicsEffectFactory
+	//{
+	//public:
+	//	// reimplemented (iGraphicsEffectFactory)
+	//	virtual QGraphicsEffect* CreateInstance(const QByteArray& keyId = "") const;
+	//	virtual KeyList GetFactoryKeys() const;
+	//};
 
 protected:
 	// reimplemented (QWidget)
@@ -173,8 +173,8 @@ private:
 	QPropertyAnimation m_animationWidth;
 	QPropertyAnimation m_animationIndent;
 
-	iwidgets::CFocusDecorator* m_focusDecoratorPtr;
-	FocusDecorationFactory m_graphicsEffectFactory;
+	//iwidgets::CFocusDecorator* m_focusDecoratorPtr;
+	//FocusDecorationFactory m_graphicsEffectFactory;
 
 private:
 	QModelIndex GetModelIndex(const QByteArray& pageId) const;

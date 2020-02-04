@@ -39,14 +39,15 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	PageTree->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 	PageTree->setIndentation(0);
 	PageTree->setMaximumWidth(PageTree->iconSize().width() + 10);
+	PageTree->setStyleSheet("QTreeView::item::hover{background-color:rgb(160,160,160);}" "QTreeView::item{padding: 6px;}");
 
 	m_animationWidth.setTargetObject(PageTree);
 	m_animationWidth.setPropertyName("maximumWidth");
 	m_animationIndent.setTargetObject(PageTree);
 	m_animationIndent.setPropertyName("indentation");
 
-	m_focusDecoratorPtr = new iwidgets::CFocusDecorator(this);
-	m_focusDecoratorPtr->RegisterWidget(PageTree, &m_graphicsEffectFactory);
+	//m_focusDecoratorPtr = new iwidgets::CFocusDecorator(this);
+	//m_focusDecoratorPtr->RegisterWidget(PageTree, &m_graphicsEffectFactory);
 }
 
 
@@ -417,24 +418,24 @@ QModelIndex CMenuPanel::GetModelIndex(const QByteArray& pageId) const
 
 // reimplemented (iGraphicsEffectFactory)
 
-QGraphicsEffect* CMenuPanel::FocusDecorationFactory::CreateInstance(const QByteArray& /*keyId*/) const
-{
-	QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect;
-	shadowPtr->setXOffset(0);
-	shadowPtr->setYOffset(0);
-	shadowPtr->setBlurRadius(12);
-	shadowPtr->setColor(qRgba(74, 149, 217, 128));
-
-	return shadowPtr;
-}
-
-
-istd::IFactoryInfo::KeyList CMenuPanel::FocusDecorationFactory::GetFactoryKeys() const
-{
-	istd::IFactoryInfo::KeyList retVal;
-
-	return retVal;
-}
+//QGraphicsEffect* CMenuPanel::FocusDecorationFactory::CreateInstance(const QByteArray& /*keyId*/) const
+//{
+//	QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect;
+//	shadowPtr->setXOffset(0);
+//	shadowPtr->setYOffset(0);
+//	shadowPtr->setBlurRadius(12);
+//	//shadowPtr->setColor(qRgba(74, 149, 217, 128));
+//
+//	return shadowPtr;
+//}
+//
+//
+//istd::IFactoryInfo::KeyList CMenuPanel::FocusDecorationFactory::GetFactoryKeys() const
+//{
+//	istd::IFactoryInfo::KeyList retVal;
+//
+//	return retVal;
+//}
 
 
 } // namespace imtwidgets
