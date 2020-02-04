@@ -4,7 +4,7 @@
 // ACF includes
 #include <ibase/TModelObserverCompWrap.h>
 #include <iqtgui/TGuiObserverWrap.h>
-#include <icomp/CComponentBase.h>
+#include <iqtgui/TGuiComponentBase.h>
 #include <iprm/ISelectionParam.h>
 #include <imod/TSingleModelObserverBase.h>
 
@@ -17,33 +17,26 @@ namespace imtgui
 
 
 class CMenuPanelComp:
-            public ibase::TModelObserverCompBaseWrap<
-                        iqtgui::TGuiObserverWrap<imtwidgets::CMenuPanel, imod::TSingleModelObserverBase<iprm::ISelectionParam>>>
+			public ibase::TModelObserverCompBaseWrap<
+						iqtgui::TGuiObserverWrap<
+									iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
+									imod::TSingleModelObserverBase<iprm::ISelectionParam>>>
 {
 public:
-    typedef ibase::TModelObserverCompBaseWrap<iqtgui::TGuiObserverWrap<imtwidgets::CMenuPanel, imod::TSingleModelObserverBase<iprm::ISelectionParam>>> BaseClass;
+	typedef ibase::TModelObserverCompBaseWrap<
+				iqtgui::TGuiObserverWrap<
+							iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
+							imod::TSingleModelObserverBase<iprm::ISelectionParam>>> BaseClass;
 
-    I_BEGIN_COMPONENT(CMenuPanelComp);
-    I_END_COMPONENT;
-
-    CMenuPanelComp();
+	I_BEGIN_COMPONENT(CMenuPanelComp);
+	I_END_COMPONENT;
 
 protected:
-    // reimplemented (iqtgui::TGuiObserverWrap)
-    virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
-    virtual void OnGuiModelAttached() override;
+	// reimplemented (iqtgui::TGuiObserverWrap)
+	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
-    // reimplemented (iqtgui::CGuiComponentBase)
-    virtual void OnGuiCreated() override;
-    virtual void OnGuiDestroyed() override;
-    virtual void OnGuiRetranslate() override;
-
-    // reimplemented (icomp::CComponentBase)
-    virtual void OnComponentCreated() override;
-    virtual void OnComponentDestroyed() override;
-
-private:
-
+	// reimplemented (iqtgui::CGuiComponentBase)
+	virtual void OnGuiRetranslate() override;
 };
 
 
