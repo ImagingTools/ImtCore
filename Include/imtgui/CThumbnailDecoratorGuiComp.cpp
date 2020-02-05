@@ -152,12 +152,12 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 
 	if (m_leftMenuPanelGuiCompPtr.IsValid()){
-		QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect;
-		shadowPtr->setXOffset(0);
-		shadowPtr->setYOffset(0);
-		shadowPtr->setBlurRadius(8);
-		shadowPtr->setColor(qRgb(255, 190, 190));
-		MenuPanelFrame->setGraphicsEffect(shadowPtr);
+//		QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect;
+//		shadowPtr->setXOffset(0);
+//		shadowPtr->setYOffset(0);
+//		shadowPtr->setBlurRadius(8);
+//		shadowPtr->setColor(qRgb(255, 190, 190));
+//		MenuPanelFrame->setGraphicsEffect(shadowPtr);
 
 		m_leftMenuPanelGuiCompPtr->CreateGui(MenuPanelFrame);
 	}

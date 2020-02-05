@@ -29,11 +29,6 @@ QWidget:disabled
 	color: palette(disabled);
 }
 
-QWidget#MenuPanelFrame
-{
-	background-color:white;
-}
-
 
 QToolBar[ImtToolBar=true]::separator
 {
@@ -60,6 +55,16 @@ QWidget[ImtTopFrame=true]
                                  stop: 0.97 rgb(220,220,223), stop: 1.0 rgb(190,190,193));
 	border-bottom: 1px solid  rgb(170,170,170);
 	color: #335777;
+}
+
+
+QWidget#PageTree
+{
+	background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                 stop: 0 rgb(235,235,238), stop: 0.9 rgb(220,220,223),
+                                 stop: 0.97 rgb(220,220,223), stop: 1.0 rgb(190,190,193));
+	border-right: 1px solid  rgb(170,170,170);
+	color: #775733;
 }
 
 
@@ -437,7 +442,7 @@ QAbstractItemView[TabSimulation=true]
           <number>0</number>
          </property>
          <property name="topMargin">
-          <number>11</number>
+          <number>0</number>
          </property>
          <property name="rightMargin">
           <number>0</number>
