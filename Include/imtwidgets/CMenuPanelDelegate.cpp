@@ -63,7 +63,7 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 	//option.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter);
 	if (option.state & QStyle::State_Selected || option.state & QStyle::State_MouseOver){
 		painter->fillRect(option.rect, QColor(Qt::transparent));
-		QRect bgRect = option.rect;
+		QRect bgRect = option.rect.adjusted(0, 0, -3, 0);
 		bgRect.setX(0);
 		bgRect.setWidth(bgRect.width() - bgRect.height() / 2);
 		painter->fillRect(bgRect, bgColor);

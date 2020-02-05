@@ -1123,12 +1123,17 @@ CThumbnailDecoratorGuiComp::PageModelObserver::PageModelObserver(CThumbnailDecor
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CThumbnailDecoratorGuiComp::PageModelObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& changeSet)
+void CThumbnailDecoratorGuiComp::PageModelObserver::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
 {
 	if (changeSet.Contains(iprm::ISelectionParam::CF_SELECTION_CHANGED)){
 		Q_ASSERT(m_parent.m_pagesCompPtr.IsValid());
 
-		m_parent.SwitchToPage(m_parent.m_pagesCompPtr->GetSelectedOptionIndex());
+		if (modelId == 0){
+			m_parent.SwitchToPage(m_parent.m_pagesCompPtr->GetSelectedOptionIndex());
+		}
+		else{
+			m_parent.on_SubPages_itemSelectionChanged();
+		}
 	}
 
 	m_parent.UpdatePageState();

@@ -119,8 +119,11 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 			if (panelPtr->InsertPage(pageId)) {
 				panelPtr->SetPageName(pageId, pageName);
 
-				QIcon icon = pageVisualStatus->GetVisualStatus(pageIndex)->GetStatusIcon();
-				panelPtr->SetPageIcon(pageId, icon);
+				const iqtgui::IVisualStatus* visualStatusPtr = pageVisualStatus->GetVisualStatus(pageIndex);
+				if (visualStatusPtr != nullptr){
+					QIcon icon = pageVisualStatus->GetVisualStatus(pageIndex)->GetStatusIcon();
+					panelPtr->SetPageIcon(pageId, icon);
+				}
 
 				panelPtr->SetPageEnabled(pageId, pageListPtr->IsOptionEnabled(pageIndex));
 			}
