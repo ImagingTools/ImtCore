@@ -6,6 +6,8 @@
 
 void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+	painter->setRenderHint(QPainter::Antialiasing, true);
+
 	static int i = 0;
 	qDebug() << option.state;
 
