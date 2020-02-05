@@ -37,19 +37,16 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	PageTree->setProperty("indent", 0);
 
 	PageTree->setHeaderHidden(true);
-	PageTree->setIconSize(QSize(24, 24));
+	PageTree->setIconSize(QSize(32, 32));
 	PageTree->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 	PageTree->setIndentation(0);
 	PageTree->setMaximumWidth(m_minWidth);
-	PageTree->setStyleSheet("QTreeView::item::hover{background-color:rgb(160,160,160);}" "QTreeView::item{padding: 6px;}");
+	PageTree->setStyleSheet("QTreeView::item::hover{background-color:rgb(220,220,220);}" "QTreeView::item{padding: 6px;}");
 
 	m_animationWidth.setTargetObject(PageTree);
 	m_animationWidth.setPropertyName("maximumWidth");
 	m_animationIndent.setTargetObject(PageTree);
 	m_animationIndent.setPropertyName("indent");
-
-	//m_focusDecoratorPtr = new iwidgets::CFocusDecorator(this);
-	//m_focusDecoratorPtr->RegisterWidget(PageTree, &m_graphicsEffectFactory);
 }
 
 

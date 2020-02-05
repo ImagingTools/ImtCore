@@ -9,6 +9,7 @@
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QGraphicsEffect>
 
 // ACF includes
 #include <iprm/IOptionsList.h>
@@ -151,6 +152,13 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 
 	if (m_leftMenuPanelGuiCompPtr.IsValid()){
+		QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect;
+		shadowPtr->setXOffset(0);
+		shadowPtr->setYOffset(0);
+		shadowPtr->setBlurRadius(8);
+		shadowPtr->setColor(qRgb(255, 190, 190));
+		MenuPanelFrame->setGraphicsEffect(shadowPtr);
+
 		m_leftMenuPanelGuiCompPtr->CreateGui(MenuPanelFrame);
 	}
 
@@ -1115,8 +1123,14 @@ CThumbnailDecoratorGuiComp::PageModelObserver::PageModelObserver(CThumbnailDecor
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CThumbnailDecoratorGuiComp::PageModelObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CThumbnailDecoratorGuiComp::PageModelObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& changeSet)
 {
+	if (changeSet.Contains(iprm::ISelectionParam::CF_SELECTION_CHANGED)){
+		Q_ASSERT(m_parent.m_pagesCompPtr.IsValid());
+
+		m_parent.SwitchToPage(m_parent.m_pagesCompPtr->GetSelectedOptionIndex());
+	}
+
 	m_parent.UpdatePageState();
 }
 

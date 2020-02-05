@@ -1,13 +1,9 @@
 #include <imtgui/CMenuPanelComp.h>
 
+
 // ACF includes
 #include <iprm/IOptionsList.h>
 #include <iqtgui/IMultiVisualStatusProvider.h>
-
-// ImtCore includes
-#include <imtwidgets/CMenuPanel.h>
-
-#include <QtCore/QDebug>
 
 
 namespace imtgui
@@ -18,19 +14,20 @@ namespace imtgui
 
 void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QByteArray& /*deselectedPageId*/)
 {
-	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
+	if (!IsUpdateBlocked()){
+		UpdateBlocker block(this);
 
-	Q_ASSERT(pageSelectionPtr != nullptr);
+		iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
+		Q_ASSERT(pageSelectionPtr != nullptr);
 
-	const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
-	if (pageListPtr != nullptr){
-		int pageCount = pageListPtr->GetOptionsCount();
-		for (int pageIndex = 0; pageIndex < pageCount; ++pageIndex){
-			QString pageName = pageListPtr->GetOptionName(pageIndex);
-			QByteArray pageId = pageListPtr->GetOptionId(pageIndex);
-
-			if (pageId == selectedPageId){
-				pageSelectionPtr->SetSelectedOptionIndex(pageIndex);
+		const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
+		if (pageListPtr != nullptr) {
+			int pageCount = pageListPtr->GetOptionsCount();
+			for (int pageIndex = 0; pageIndex < pageCount; ++pageIndex) {
+				QByteArray pageId = pageListPtr->GetOptionId(pageIndex);
+				if (pageId == selectedPageId) {
+					pageSelectionPtr->SetSelectedOptionIndex(pageIndex);
+				}
 			}
 		}
 	}
@@ -62,6 +59,8 @@ void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/
 	Q_ASSERT(pageSelectionPtr != nullptr);
 	Q_ASSERT(pageVisualStatus != nullptr);
 
+	int currentIndex = pageSelectionPtr->GetSelectedOptionIndex();
+	QByteArray currentPageId;
 	const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
 	if (pageListPtr != nullptr){
 		int pageCount = pageListPtr->GetOptionsCount();
@@ -74,8 +73,18 @@ void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/
 				
 				QIcon icon = pageVisualStatus->GetVisualStatus(pageIndex)->GetStatusIcon();
 				panelPtr->SetPageIcon(pageId, icon);
+
+				panelPtr->SetPageEnabled(pageId, pageListPtr->IsOptionEnabled(pageIndex));
+			}
+
+			if (pageIndex == currentIndex){
+				currentPageId = pageId;
 			}
 		}
+	}
+
+	if (!currentPageId.isEmpty()) {
+		panelPtr->SetActivePage(currentPageId);
 	}
 }
 

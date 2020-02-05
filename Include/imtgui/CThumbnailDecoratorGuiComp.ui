@@ -29,6 +29,11 @@ QWidget:disabled
 	color: palette(disabled);
 }
 
+QWidget#MenuPanelFrame
+{
+	background-color:white;
+}
+
 
 QToolBar[ImtToolBar=true]::separator
 {
@@ -424,9 +429,6 @@ QAbstractItemView[TabSimulation=true]
       </property>
       <item>
        <widget class="QFrame" name="MenuPanelFrame">
-        <property name="styleSheet">
-         <string notr="true">background:rgb(200,220,240);</string>
-        </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <property name="spacing">
           <number>0</number>
@@ -435,7 +437,7 @@ QAbstractItemView[TabSimulation=true]
           <number>0</number>
          </property>
          <property name="topMargin">
-          <number>0</number>
+          <number>11</number>
          </property>
          <property name="rightMargin">
           <number>0</number>
