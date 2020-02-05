@@ -17,7 +17,7 @@ namespace imtwidgets
 
 CMenuPanel::CMenuPanel(QWidget* parent)
 	:QWidget(parent),
-	m_minWidth(32),
+	m_minWidth(38),
 	m_maxWidth(200),
 	m_indent(20)
 {
@@ -40,7 +40,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	PageTree->setIconSize(QSize(24, 24));
 	PageTree->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 	PageTree->setIndentation(0);
-	PageTree->setMaximumWidth(PageTree->iconSize().width() + 10);
+	PageTree->setMaximumWidth(m_minWidth);
 	PageTree->setStyleSheet("QTreeView::item::hover{background-color:rgb(160,160,160);}" "QTreeView::item{padding: 6px;}");
 
 	m_animationWidth.setTargetObject(PageTree);
@@ -368,7 +368,7 @@ void CMenuPanel::leaveEvent(QEvent* event)
 	Q_UNUSED(event)
 
 	m_animationWidth.setStartValue(PageTree->maximumWidth());
-	m_animationWidth.setEndValue(PageTree->iconSize().width() + 10);
+	m_animationWidth.setEndValue(m_minWidth);
 	m_animationWidth.setDuration(150);
 	m_animationWidth.start();
 

@@ -82,7 +82,7 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 
 	const QTreeView *treeViewPtr = qobject_cast<const QTreeView*>(option.widget);
 
-	int offset = -treeViewPtr->property("indent").toInt();
+	int offset = 5 - treeViewPtr->property("indent").toInt();
 	QModelIndex check = index;
 	while (check.isValid()){
 		offset += treeViewPtr->property("indent").toInt();
