@@ -240,8 +240,6 @@ bool CMenuPanel::SetPageOrder(const QByteArray& pageId, int position)
 
 			if (parent.isValid()){
 				m_model.insertRow(position, newItem);
-			} else{
-
 			}
 		}
 	}
@@ -312,6 +310,7 @@ bool CMenuPanel::SetPageName(const QByteArray& pageId, const QString& pageName)
 	QModelIndex index = GetModelIndex(pageId);
 	if (index.isValid()){
 		m_model.itemFromIndex(index)->setText(pageName);
+
 		return true;
 	}
 
@@ -399,12 +398,14 @@ QModelIndex CMenuPanel::GetModelIndex(const QByteArray& pageId) const
 			}
 
 			index = m_model.index(0, 0, index);
+
 			continue;
 		}
 
 		QModelIndex siblingIndex = index.siblingAtRow(index.row() + 1);
 		if (siblingIndex.isValid()){
 			index = siblingIndex;
+
 			continue;
 		}
 
