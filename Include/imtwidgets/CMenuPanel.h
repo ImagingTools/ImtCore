@@ -167,12 +167,11 @@ private:
 	int m_minWidth;
 	int m_maxWidth;
 	int m_indent;
-	QByteArray m_activePage;
 
 	QStandardItemModel m_model;
 	QPropertyAnimation m_animationWidth;
 	QPropertyAnimation m_animationIndent;
-
+	
 	//iwidgets::CFocusDecorator* m_focusDecoratorPtr;
 	//FocusDecorationFactory m_graphicsEffectFactory;
 

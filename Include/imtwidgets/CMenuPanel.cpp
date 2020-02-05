@@ -1,5 +1,5 @@
 #include <imtwidgets/CMenuPanel.h>
-
+#include <imtwidgets/CMenuPanelDelegate.h>
 
 // Qt includes
 #include <QtCore/QDebug>
@@ -17,10 +17,9 @@ namespace imtwidgets
 
 CMenuPanel::CMenuPanel(QWidget* parent)
 	:QWidget(parent),
-	m_activePage(QByteArray()),
 	m_minWidth(32),
 	m_maxWidth(200),
-	m_indent(16)
+	m_indent(20)
 {
 	setupUi(this);
 
@@ -34,6 +33,9 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	PageTree->selectionModel()->clearSelection();
 	connect(PageTree->selectionModel(), &QItemSelectionModel::currentChanged, this, &CMenuPanel::OnPageIdChanged);
 
+	PageTree->setItemDelegate(new CMenuPanelDelegate(PageTree));
+	PageTree->setProperty("indent", 0);
+
 	PageTree->setHeaderHidden(true);
 	PageTree->setIconSize(QSize(24, 24));
 	PageTree->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
@@ -44,7 +46,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_animationWidth.setTargetObject(PageTree);
 	m_animationWidth.setPropertyName("maximumWidth");
 	m_animationIndent.setTargetObject(PageTree);
-	m_animationIndent.setPropertyName("indentation");
+	m_animationIndent.setPropertyName("indent");
 
 	//m_focusDecoratorPtr = new iwidgets::CFocusDecorator(this);
 	//m_focusDecoratorPtr->RegisterWidget(PageTree, &m_graphicsEffectFactory);
@@ -77,13 +79,19 @@ void CMenuPanel::SetMaxWidth(int maxWidth)
 
 QByteArray CMenuPanel::GetActivePage() const
 {
-	return m_activePage;
+	return QByteArray();
 }
 
 
 void CMenuPanel::SetActivePage(const QByteArray& pageId)
 {
-	m_activePage = pageId;
+	QModelIndex index;
+	if (!pageId.isEmpty()){
+		index = GetModelIndex(pageId);
+	}
+
+	PageTree->selectionModel()->clear();
+	PageTree->selectionModel()->setCurrentIndex(index, QItemSelectionModel::Select);
 }
 
 

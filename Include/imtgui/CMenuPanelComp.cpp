@@ -80,6 +80,30 @@ void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/
 }
 
 
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CMenuPanelComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+{
+	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
+
+	Q_ASSERT(pageSelectionPtr != nullptr);
+
+	int selectedIndex = pageSelectionPtr->GetSelectedOptionIndex();
+	const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
+	if (pageListPtr != nullptr){
+		QByteArray selectedId;
+		if (selectedIndex >= 0){
+			selectedId = pageListPtr->GetOptionId(selectedIndex);
+		}
+
+		if (IsGuiCreated()){
+			imtwidgets::CMenuPanel* widgetPtr = dynamic_cast<imtwidgets::CMenuPanel*>(GetWidget());
+			widgetPtr->SetActivePage(selectedId);
+		}
+	}
+}
+
+
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CMenuPanelComp::OnGuiRetranslate()
