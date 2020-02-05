@@ -1,6 +1,9 @@
 #include <imtgui/CMenuPanelComp.h>
 
 
+// Qt includes
+#include <QtWidgets/QGraphicsEffect>
+
 // ACF includes
 #include <iprm/IOptionsList.h>
 #include <iqtgui/IMultiVisualStatusProvider.h>
@@ -54,38 +57,9 @@ void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/
 	panelPtr->ResetPages();
 
 	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
-	iqtgui::IMultiVisualStatusProvider* pageVisualStatus = dynamic_cast<iqtgui::IMultiVisualStatusProvider*>(GetObservedObject());
-
 	Q_ASSERT(pageSelectionPtr != nullptr);
-	Q_ASSERT(pageVisualStatus != nullptr);
 
-	int currentIndex = pageSelectionPtr->GetSelectedOptionIndex();
-	QByteArray currentPageId;
-	const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
-	if (pageListPtr != nullptr){
-		int pageCount = pageListPtr->GetOptionsCount();
-		for (int pageIndex = 0; pageIndex < pageCount; ++pageIndex){
-			QString pageName = pageListPtr->GetOptionName(pageIndex);
-			QByteArray pageId = pageListPtr->GetOptionId(pageIndex);
-
-			if (panelPtr->InsertPage(pageId)){
-				panelPtr->SetPageName(pageId, pageName);
-				
-				QIcon icon = pageVisualStatus->GetVisualStatus(pageIndex)->GetStatusIcon();
-				panelPtr->SetPageIcon(pageId, icon);
-
-				panelPtr->SetPageEnabled(pageId, pageListPtr->IsOptionEnabled(pageIndex));
-			}
-
-			if (pageIndex == currentIndex){
-				currentPageId = pageId;
-			}
-		}
-	}
-
-	if (!currentPageId.isEmpty()) {
-		panelPtr->SetActivePage(currentPageId);
-	}
+	CreateMenuForSelection(*pageSelectionPtr, QByteArray());
 }
 
 
@@ -120,6 +94,51 @@ void CMenuPanelComp::OnGuiRetranslate()
 	BaseClass::OnGuiRetranslate();
 
 	UpdateGui(istd::IChangeable::GetAnyChange());
+}
+
+
+// private methods
+
+void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId)
+{
+	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
+	Q_ASSERT(panelPtr != nullptr);
+
+	const iqtgui::IMultiVisualStatusProvider* pageVisualStatus = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(&selection);
+	Q_ASSERT(pageVisualStatus != nullptr);
+
+	int currentIndex = selection.GetSelectedOptionIndex();
+	QByteArray currentPageId;
+	const iprm::IOptionsList* pageListPtr = selection.GetSelectionConstraints();
+	if (pageListPtr != nullptr) {
+		int pageCount = pageListPtr->GetOptionsCount();
+		for (int pageIndex = 0; pageIndex < pageCount; ++pageIndex) {
+			QString pageName = pageListPtr->GetOptionName(pageIndex);
+			QByteArray pageId = pageListPtr->GetOptionId(pageIndex);
+
+			if (panelPtr->InsertPage(pageId)) {
+				panelPtr->SetPageName(pageId, pageName);
+
+				QIcon icon = pageVisualStatus->GetVisualStatus(pageIndex)->GetStatusIcon();
+				panelPtr->SetPageIcon(pageId, icon);
+
+				panelPtr->SetPageEnabled(pageId, pageListPtr->IsOptionEnabled(pageIndex));
+			}
+
+			if (pageIndex == currentIndex){
+				currentPageId = pageId;
+			}
+
+			const iprm::ISelectionParam* subSelectionPtr = selection.GetSubselection(pageIndex);
+			if (subSelectionPtr != nullptr) {
+				CreateMenuForSelection(*subSelectionPtr, pageId);
+			}
+		}
+	}
+
+	if (!currentPageId.isEmpty()){
+		panelPtr->SetActivePage(currentPageId);
+	}
 }
 
 

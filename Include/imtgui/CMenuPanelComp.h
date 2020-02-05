@@ -47,6 +47,9 @@ protected:
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiRetranslate() override;
+
+private:
+	void CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId);
 };
 
 
