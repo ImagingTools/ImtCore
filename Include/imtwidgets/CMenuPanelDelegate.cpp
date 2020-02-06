@@ -1,105 +1,97 @@
 #include "CMenuPanelDelegate.h"
-#include "qtreeview.h"
-#include "qpainter.h"
+
+
+// Qt includes
+#include "QtGui/QPainter"
+#include "QtWidgets/QTreeView"
+
 #include "QDebug"
-#include "ui_CMenuPanel.h"
 
 void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	painter->setRenderHint(QPainter::Antialiasing, true);
-
-	static int i = 0;
-	qDebug() << option.state;
-
-	//background
 	QColor bgColor;
-	int bgColorType(0);
-	bgColorType = index.data(Qt::UserRole + 9).toInt();//custom flag I set to determine which color i want
-
-	//color logic
-	if (bgColorType == 0)
-		bgColor = QColor(Qt::transparent);//default is transparent to retain alternate row colors
-	else if (bgColorType == 1)
-		bgColor = qRgba(237, 106, 106, 255);//red
-	else if (bgColorType == 2)
-		bgColor = qRgba(241, 167, 226, 255);//pink
-	//etc...
-
 	QStyleOptionViewItem opt(option);
 
-	if (option.state & QStyle::State_Selected)//check if item is selected
-	{
-		//more color logic
-		if (bgColorType == 0)
-			bgColor = qRgba(150, 180, 200, 255);
-		else
-			bgColor = qRgba(bgColor.red() - 25, bgColor.green() - 25, bgColor.blue() - 25, 255);
-
-		//background color won't show on selected items unless you do this
-		opt.palette.setBrush(QPalette::Highlight, QBrush(bgColor));
+	if (option.state & QStyle::State_Selected){
+		bgColor = qRgba(0, 255, 0, 255);
 	}
 
-	if (option.state & QStyle::State_MouseOver)//check if item is hovered
-	{
-		//more color logic
-		bgColor = qRgba(bgColor.red() - 25, bgColor.green() - 25, bgColor.blue() - 25, 255);
+	if (option.state & QStyle::State_MouseOver){
+		bgColor = qRgba(255, 0, 0, 255);
 
-		if (option.state & QStyle::State_Selected)//check if it is hovered AND selected
-		{
-			//more color logic
-			if (bgColorType == 0)
-			{
-				bgColor = qRgba(100, 150, 200, 255);
-			}
-
-			//background color won't show on selected items unless you do this
-			opt.palette.setBrush(QPalette::Highlight, QBrush(bgColor));
+		if (option.state & QStyle::State_Selected){
+			bgColor = qRgba(0, 0, 255, 255);
 		}
-	}//set the backgroundBrush to our color. This affects unselected items.
-	//opt.backgroundBrush = QBrush(bgColor);
+	}
 
-	//draw the item background
-	QPen penBack = painter->pen();
-	//option.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter);
+	
+	const QTreeView *treeViewPtr = qobject_cast<const QTreeView*>(option.widget);
+	int indent = treeViewPtr->property("indent").toInt();
+	int indentMax = treeViewPtr->property("indentMax").toInt();
+	int padding = treeViewPtr->property("padding").toInt();
+
+	QPen savePen = painter->pen();
+	QPainter::RenderHints saveRenderHints = painter->renderHints();
+	painter->setRenderHint(QPainter::Antialiasing, true);
+
+	// Draw background
+
 	if (option.state & QStyle::State_Selected || option.state & QStyle::State_MouseOver){
-		painter->fillRect(option.rect, QColor(Qt::transparent));
-		QRect bgRect = option.rect.adjusted(0, 0, -3, 0);
-		bgRect.setX(0);
-		bgRect.setWidth(bgRect.width() - bgRect.height() / 2);
-		painter->fillRect(bgRect, bgColor);
-		QRect bgEllipse;
-		bgEllipse.setX(bgRect.width() - bgRect.height() / 2);
-		bgEllipse.setY(bgRect.y());
-		bgEllipse.setWidth(bgRect.height());
-		bgEllipse.setHeight(bgRect.height());
+		QRect backgroundRect = option.rect;
+		if (indent == 0){
+			backgroundRect.setLeft(option.rect.height() / 2 + padding);
+		}
+		else{
+			backgroundRect.setLeft(0);
+		}
+		backgroundRect.setRight(option.rect.right() - option.rect.height() / 2 - padding);
+		backgroundRect.setTop(option.rect.top());
+		backgroundRect.setBottom(option.rect.bottom());
+		painter->fillRect(backgroundRect, bgColor);
+
 		painter->setBrush(QBrush(bgColor));
 		painter->setPen(Qt::transparent);
-		painter->drawEllipse(bgEllipse);
-	}
-	else {
-	}
-	//option.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter);
 
-	painter->setPen(penBack);
+		QRect backgroundLeftEllipse;
+		backgroundLeftEllipse.setLeft(padding);
+		backgroundLeftEllipse.setRight(option.rect.height() + padding);
+		backgroundLeftEllipse.setTop(option.rect.top());
+		backgroundLeftEllipse.setBottom(option.rect.bottom());
+		painter->drawEllipse(backgroundLeftEllipse);
 
-	const QTreeView *treeViewPtr = qobject_cast<const QTreeView*>(option.widget);
-
-	int offset = 5 - treeViewPtr->property("indent").toInt();
-	QModelIndex check = index;
-	while (check.isValid()){
-		offset += treeViewPtr->property("indent").toInt();
-		check = check.parent();
+		QRect backgroundRightEllipse;
+		backgroundRightEllipse.setLeft(option.rect.right() - option.rect.height() - padding);
+		backgroundRightEllipse.setRight(option.rect.right() - padding);
+		backgroundRightEllipse.setTop(option.rect.top());
+		backgroundRightEllipse.setBottom(option.rect.bottom());
+		painter->drawEllipse(backgroundRightEllipse);
 	}
+
+	painter->setPen(savePen);
+
+	// Calculate offset from treeview left side
+
+	int offset = -indent;
+	QModelIndex currentIndex = index;
+	while (currentIndex.isValid()){
+		offset += indent;
+		currentIndex = currentIndex.parent();
+	}
+
+	// Draw icon
 
 	QRect iconRect = option.rect;
-	iconRect.setLeft(iconRect.left() + 3 + offset);//offset it a bit to the right
-	//draw in icon, this can be grabbed from Qt::DecorationRole
-	//altho it appears icons must be set with setIcon()
-	option.widget->style()->drawItemPixmap(painter, iconRect, Qt::AlignLeft | Qt::AlignVCenter, QIcon(index.data(Qt::DecorationRole).value<QIcon>()).pixmap(24, 24));
+	iconRect.setLeft(offset + padding + 2 + padding);
+	iconRect.setWidth(treeViewPtr->iconSize().width());
+	option.widget->style()->drawItemPixmap(painter, iconRect, Qt::AlignHCenter | Qt::AlignVCenter, QIcon(index.data(Qt::DecorationRole).value<QIcon>()).pixmap(treeViewPtr->iconSize().width(), treeViewPtr->iconSize().height()));
 
-	//text
-	QRect textRect = option.rect;
-	textRect.setLeft(textRect.left() + 35 + offset);//offset it a bit to the right
-	//draw in text, this can be grabbed from Qt::DisplayRole
-	option.widget->style()->drawItemText(painter, textRect, Qt::AlignLeft | Qt::AlignVCenter, option.palette, true, index.data(Qt::DisplayRole).toString());
+	// Draw text
+
+	if (indent > 0){
+		QRect textRect = option.rect;
+		textRect.setLeft(iconRect.right() + 2 * padding);
+		option.widget->style()->drawItemText(painter, textRect, Qt::AlignLeft | Qt::AlignVCenter, option.palette, true, index.data(Qt::DisplayRole).toString());
+	}
+
+	painter->setRenderHints(saveRenderHints);
 }

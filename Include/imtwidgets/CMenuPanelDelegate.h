@@ -1,13 +1,19 @@
 #pragma once
 
-#include <QStyledItemDelegate>
+
+// Qt includes
+#include <QtWidgets/QStyledItemDelegate>
+
+// ImtCore includes
+#include <imtwidgets/CMenuPanel.h>
+
 
 class CMenuPanelDelegate : public QStyledItemDelegate
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit CMenuPanelDelegate(QObject *parent = nullptr){}
+	explicit CMenuPanelDelegate(imtwidgets::CMenuPanel *menuPanelPtr = nullptr){}
 
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };

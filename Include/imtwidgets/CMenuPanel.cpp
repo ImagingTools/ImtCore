@@ -7,6 +7,7 @@
 #include <QtCore/QStack>
 #include <QtCore/QModelIndex>
 #include <QtGui/QStandardItem>
+#include <QtWidgets/QScrollBar>
 
 
 namespace imtwidgets
@@ -17,9 +18,9 @@ namespace imtwidgets
 
 CMenuPanel::CMenuPanel(QWidget* parent)
 	:QWidget(parent),
-	m_minWidth(38),
 	m_maxWidth(200),
-	m_indent(20)
+	m_indent(20),
+	m_padding(0)
 {
 	setupUi(this);
 
@@ -33,32 +34,29 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	PageTree->selectionModel()->clearSelection();
 	connect(PageTree->selectionModel(), &QItemSelectionModel::currentChanged, this, &CMenuPanel::OnPageIdChanged);
 
-	PageTree->setItemDelegate(new CMenuPanelDelegate(PageTree));
+	PageTree->setItemDelegate(new CMenuPanelDelegate(this));
 	PageTree->setProperty("indent", 0);
+	PageTree->setProperty("indentMax", m_indent);
+	PageTree->setProperty("padding", 0);
 
 	PageTree->setHeaderHidden(true);
-	PageTree->setIconSize(QSize(32, 32));
+	PageTree->setIconSize(QSize(16, 16));
 	PageTree->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 	PageTree->setIndentation(0);
-	PageTree->setMaximumWidth(m_minWidth);
-	PageTree->setStyleSheet("QTreeView::item::hover{background-color:rgb(220,220,220);}" "QTreeView::item{padding: 0em;}");
+
+	PageTree->setStyleSheet("QTreeView::item::hover {background - color:rgb(220, 220, 220); }");
+	PageTree->verticalScrollBar()->installEventFilter(this);
+
+	PageTree->setContentsMargins(QMargins(0,0,0,0));
+	PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 + 2 * m_padding + 2 * m_padding);
 
 	m_animationWidth.setTargetObject(PageTree);
 	m_animationWidth.setPropertyName("maximumWidth");
 	m_animationIndent.setTargetObject(PageTree);
 	m_animationIndent.setPropertyName("indent");
-}
 
-
-int CMenuPanel::GetMinWidth() const
-{
-	return m_minWidth;
-}
-
-
-void CMenuPanel::SetMinWidth(int maxWidth)
-{
-	m_minWidth = maxWidth;
+	pushTop->setIcon(QIcon(":/Icons/Up"));
+	pushBottom->setIcon(QIcon(":/Icons/Down"));
 }
 
 
@@ -184,6 +182,8 @@ bool CMenuPanel::InsertPage(const QByteArray& pageId, const QByteArray& parentPa
 		QModelIndex modelIndex = m_model.index(row, 0, QModelIndex());
 		m_model.setData(modelIndex, pageId, DR_PAGE_ID);
 
+		m_maxWidth = CalculateMaxItemWith();
+
 		return true;
 	}
 
@@ -196,6 +196,8 @@ bool CMenuPanel::InsertPage(const QByteArray& pageId, const QByteArray& parentPa
 
 		QModelIndex modelIndex = m_model.index(row, 0, parentModelIndex);
 		m_model.setData(modelIndex, pageId, Qt::UserRole);
+
+		m_maxWidth = CalculateMaxItemWith();
 
 		return true;
 	}
@@ -311,10 +313,33 @@ bool CMenuPanel::SetPageName(const QByteArray& pageId, const QString& pageName)
 	if (index.isValid()){
 		m_model.itemFromIndex(index)->setText(pageName);
 
+		m_maxWidth = CalculateMaxItemWith();
+
 		return true;
 	}
 
 	return false;
+}
+
+
+void CMenuPanel::SetItemPadding(int padding)
+{
+	if (padding > 0){
+		m_padding = padding;
+		PageTree->setProperty("padding", padding);
+		QString style = QString("QTreeView::item{padding: %1px;} QTreeView::item::hover{background-color:rgb(220,220,220);}").arg(padding);
+		PageTree->setStyleSheet(style);
+		PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 + 2 * m_padding + 2 * m_padding);
+	}
+}
+
+
+void CMenuPanel::SetIconSize(int size)
+{
+	if (size > 8){
+		PageTree->setIconSize(QSize(size, size));
+		PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 + 2 * m_padding + 2 * m_padding);
+	}
 }
 
 
@@ -334,12 +359,50 @@ void CMenuPanel::OnPageIdChanged(const QModelIndex& selected, const QModelIndex&
 		deselectedId = deselected.data(DR_PAGE_ID).toByteArray();
 	}
 
-	qDebug() << 111;
 	PageIdChanged(selectedId, deselectedId);
 }
 
 
+void imtwidgets::CMenuPanel::on_pushBottom_clicked()
+{
+	QModelIndex index = PageTree->indexAt(QPoint(0, PageTree->height()));
+	PageTree->scrollTo(index);
+	if (index == PageTree->indexAt(QPoint(0, PageTree->height())))
+	{
+//        qDebug() << "step too bottom";
+		index = PageTree->indexBelow(index);
+		PageTree->scrollTo(index);
+	}
+	checkButtonsVisible();
+}
+
+
+void imtwidgets::CMenuPanel::on_pushTop_clicked()
+{
+	QModelIndex index = PageTree->indexAt(QPoint(0, 0));
+	PageTree->scrollTo(index);
+
+	if (index == PageTree->indexAt(QPoint(0, 0)))
+	{
+//        qDebug() << "step too top";
+		index = PageTree->indexAbove(index);
+		PageTree->scrollTo(index);
+	}
+	checkButtonsVisible();
+}
+
+
 // protected methods
+
+
+// reimplemented (QObject)
+
+bool CMenuPanel::eventFilter(QObject *obj, QEvent *event)
+{
+	checkButtonsVisible();
+	return QObject::eventFilter(obj, event);
+}
+
 
 // reimplemented (QWidget)
 
@@ -364,7 +427,7 @@ void CMenuPanel::leaveEvent(QEvent* event)
 	Q_UNUSED(event)
 
 	m_animationWidth.setStartValue(PageTree->maximumWidth());
-	m_animationWidth.setEndValue(m_minWidth);
+	m_animationWidth.setEndValue(PageTree->iconSize().width() + 4 + 2 * m_padding + 2 * m_padding);
 	m_animationWidth.setDuration(150);
 	m_animationWidth.start();
 
@@ -372,6 +435,13 @@ void CMenuPanel::leaveEvent(QEvent* event)
 	m_animationIndent.setEndValue(0);
 	m_animationIndent.setDuration(150);
 	m_animationIndent.start();
+}
+
+
+void CMenuPanel::resizeEvent(QResizeEvent *event)
+{
+	Q_UNUSED(event)
+	checkButtonsVisible();
 }
 
 
@@ -417,6 +487,85 @@ QModelIndex CMenuPanel::GetModelIndex(const QByteArray& pageId) const
 	}
 
 	return QModelIndex();
+}
+
+
+int CMenuPanel::CalculateMaxItemWith()
+{
+	QStack<QModelIndex> stack;
+	QModelIndex index = m_model.index(0, 0);
+	int maxWidth = 0;
+
+	while (index.isValid()){
+		QString text = index.data(Qt::DisplayRole).toString();
+		
+
+		int offset = -m_indent;
+		QModelIndex check = index;
+		while (check.isValid()){
+			offset += m_indent;
+			check = check.parent();
+		}
+
+		int current = offset + m_padding + 2 + m_padding + PageTree->iconSize().width() + 2 * m_padding;
+		
+		QFontMetrics fm = PageTree->fontMetrics();
+		current += fm.boundingRect(text).width() + 2 * m_padding;
+		if (current > maxWidth){
+			maxWidth = current;
+		}
+
+		QModelIndex childIndex = m_model.index(0, 0, index);
+		if (childIndex.isValid()){
+			QModelIndex sibling = index.siblingAtRow(index.row() + 1);
+			if (sibling.isValid()){
+				stack.push(sibling);
+			}
+
+			index = m_model.index(0, 0, index);
+
+			continue;
+		}
+
+		QModelIndex siblingIndex = index.siblingAtRow(index.row() + 1);
+		if (siblingIndex.isValid()){
+			index = siblingIndex;
+
+			continue;
+		}
+
+		if (stack.isEmpty()){
+			break;
+		}
+
+		index = stack.pop();
+	}
+
+	return maxWidth;
+}
+
+
+void CMenuPanel::checkButtonsVisible()
+{
+	int position = PageTree->verticalScrollBar()->value();
+//    qDebug() << position << PageTree->verticalScrollBar()->maximum();
+	if (position == 0)
+	{
+		pushTop->setVisible(false);
+	}
+	else
+	{
+		pushTop->setVisible(true);
+	}
+
+	if (position == PageTree->verticalScrollBar()->maximum())
+	{
+		pushBottom->setVisible(false);
+	}
+	else
+	{
+		pushBottom->setVisible(true);
+	}
 }
 
 
