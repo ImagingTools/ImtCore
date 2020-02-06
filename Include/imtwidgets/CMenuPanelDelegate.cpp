@@ -13,14 +13,14 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 	QStyleOptionViewItem opt(option);
 
 	if (option.state & QStyle::State_Selected){
-		bgColor = qRgba(0, 255, 0, 255);
+		bgColor = qRgba(240, 200, 80, 255);
 	}
 
 	if (option.state & QStyle::State_MouseOver){
-		bgColor = qRgba(255, 0, 0, 255);
+		bgColor = qRgba(240, 220, 100, 50);
 
 		if (option.state & QStyle::State_Selected){
-			bgColor = qRgba(0, 0, 255, 255);
+			bgColor = qRgba(240, 220, 100, 255);
 		}
 	}
 
