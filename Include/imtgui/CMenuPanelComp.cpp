@@ -22,17 +22,18 @@ void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QBy
 		if (!selectedPageId.isEmpty()){
 			if (m_pagesInfoMap.contains(selectedPageId)) {
 				PageIdToSelectionAlias currentAlias = m_pagesInfoMap[selectedPageId];
-				
-				iprm::ISelectionParam *selectionParam = const_cast<iprm::ISelectionParam*>(currentAlias.selectionPtr);
-				selectionParam->SetSelectedOptionIndex(currentAlias.pageIndex);
+				iprm::ISelectionParam *currentSelectionParam = const_cast<iprm::ISelectionParam*>(currentAlias.selectionPtr);
 
 				//qDebug() << currentAlias.parentPageId << currentAlias.selectionPtr << currentAlias.pageIndex;
+
+				currentSelectionParam->SetSelectedOptionIndex(currentAlias.pageIndex);
 
 				QByteArray pageId = m_pagesInfoMap[selectedPageId].parentPageId;
 				while (!pageId.isEmpty()){
 					currentAlias = m_pagesInfoMap[pageId];
-					iprm::ISelectionParam *selectionParam = const_cast<iprm::ISelectionParam*>(currentAlias.selectionPtr);
-					selectionParam->SetSelectedOptionIndex(currentAlias.pageIndex);
+					currentSelectionParam = const_cast<iprm::ISelectionParam*>(currentAlias.selectionPtr);
+					currentSelectionParam->SetSelectedOptionIndex(currentAlias.pageIndex);
+
 					//qDebug() << currentAlias.parentPageId << currentAlias.selectionPtr << currentAlias.pageIndex;
 
 					pageId = m_pagesInfoMap[pageId].parentPageId;
