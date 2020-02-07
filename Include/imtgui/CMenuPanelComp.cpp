@@ -70,6 +70,8 @@ void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 
 	panelPtr->ResetPages();
 
+	m_pagesInfoMap.clear();
+
 	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
 	Q_ASSERT(pageSelectionPtr != nullptr);
 

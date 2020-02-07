@@ -152,13 +152,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 
 	if (m_leftMenuPanelGuiCompPtr.IsValid()){
-//		QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect;
-//		shadowPtr->setXOffset(0);
-//		shadowPtr->setYOffset(0);
-//		shadowPtr->setBlurRadius(8);
-//		shadowPtr->setColor(qRgb(255, 190, 190));
-//		MenuPanelFrame->setGraphicsEffect(shadowPtr);
-
 		m_leftMenuPanelGuiCompPtr->CreateGui(MenuPanelFrame);
 	}
 
@@ -330,8 +323,8 @@ void CThumbnailDecoratorGuiComp::on_SubPages_itemSelectionChanged()
 	QList<QTreeWidgetItem*> selectedItems = SubPages->selectedItems();
 	if (!selectedItems.isEmpty()){
 		QTreeWidgetItem* selectedItemPtr = selectedItems[0];
-		QTreeWidgetItem* parentItemPtr = selectedItemPtr->parent();
 
+		QTreeWidgetItem* parentItemPtr = selectedItemPtr->parent();
 		while (parentItemPtr != nullptr){
 			if (m_subPageItemMap.contains(parentItemPtr)){
 				ItemInfo& info = m_subPageItemMap[parentItemPtr];
@@ -1130,9 +1123,6 @@ void CThumbnailDecoratorGuiComp::PageModelObserver::OnModelChanged(int modelId, 
 
 		if (modelId == 0){
 			m_parent.SwitchToPage(m_parent.m_pagesCompPtr->GetSelectedOptionIndex());
-		}
-		else{
-			m_parent.on_SubPages_itemSelectionChanged();
 		}
 	}
 
