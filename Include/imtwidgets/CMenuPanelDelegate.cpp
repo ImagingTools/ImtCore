@@ -1,4 +1,5 @@
 #include "CMenuPanelDelegate.h"
+#include "CMenuPanel.h"
 
 
 // Qt includes
@@ -7,28 +8,31 @@
 
 #include "QDebug"
 
+
+namespace imtwidgets
+{
+
+
 void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	QColor bgColor;
-	QStyleOptionViewItem opt(option);
+	const QTreeView *pageTreePtr = qobject_cast<const QTreeView*>(option.widget);
+	int indent = pageTreePtr->property("indent").toInt();
+	int indentMax = pageTreePtr->property("indentMax").toInt();
+	int padding = pageTreePtr->property("padding").toInt();
+
+	QColor backgroundColor;
 
 	if (option.state & QStyle::State_Selected){
-		bgColor = qRgba(240, 200, 80, 255);
+		backgroundColor = pageTreePtr->property("ItemSelectedColor").value<QColor>();//qRgba(240, 200, 80, 255);
 	}
 
 	if (option.state & QStyle::State_MouseOver){
-		bgColor = qRgba(240, 220, 100, 50);
+		backgroundColor = pageTreePtr->property("ItemMouserOverColor").value<QColor>();//qRgba(240, 220, 100, 50);
 
 		if (option.state & QStyle::State_Selected){
-			bgColor = qRgba(240, 220, 100, 255);
+			backgroundColor = pageTreePtr->property("ItemMouserOverSelectedColor").value<QColor>();//qRgba(240, 220, 100, 255);
 		}
 	}
-
-	
-	const QTreeView *treeViewPtr = qobject_cast<const QTreeView*>(option.widget);
-	int indent = treeViewPtr->property("indent").toInt();
-	int indentMax = treeViewPtr->property("indentMax").toInt();
-	int padding = treeViewPtr->property("padding").toInt();
 
 	QPen savePen = painter->pen();
 	QPainter::RenderHints saveRenderHints = painter->renderHints();
@@ -36,38 +40,49 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 
 	// Draw background
 
-	if (option.state & QStyle::State_Selected || option.state & QStyle::State_MouseOver){
-		QRect backgroundRect = option.rect;
-		if (indent == 0){
-			backgroundRect.setLeft(option.rect.height() / 2 + padding);
-		}
-		else{
-			backgroundRect.setLeft(0);
-		}
-		backgroundRect.setRight(option.rect.right() - option.rect.height() / 2 - padding);
-		backgroundRect.setTop(option.rect.top());
-		backgroundRect.setBottom(option.rect.bottom());
-		painter->fillRect(backgroundRect, bgColor);
+	QRect singleEllipse;
+	singleEllipse.setLeft(padding);
+	singleEllipse.setRight(option.rect.right() - padding);
+	singleEllipse.setTop(option.rect.top());
+	singleEllipse.setBottom(option.rect.bottom());
 
-		painter->setBrush(QBrush(bgColor));
+	if (option.state & QStyle::State_Selected || option.state & QStyle::State_MouseOver){
+		painter->setBrush(QBrush(backgroundColor));
 		painter->setPen(Qt::transparent);
 
-		QRect backgroundLeftEllipse;
-		backgroundLeftEllipse.setLeft(padding);
-		backgroundLeftEllipse.setRight(option.rect.height() + padding);
-		backgroundLeftEllipse.setTop(option.rect.top());
-		backgroundLeftEllipse.setBottom(option.rect.bottom());
-		painter->drawEllipse(backgroundLeftEllipse);
+		QRect backgroundRect = option.rect;
+		if (indent != 0){
+			//backgroundRect.setLeft(option.rect.height() / 2 + padding);
+		//}
+		//else{
+			backgroundRect.setLeft(0);
+		//}
+			backgroundRect.setRight(option.rect.right() - option.rect.height() / 2 - padding);
+			backgroundRect.setTop(option.rect.top());
+			backgroundRect.setBottom(option.rect.bottom());
+			painter->fillRect(backgroundRect, backgroundColor);
 
-		QRect backgroundRightEllipse;
-		backgroundRightEllipse.setLeft(option.rect.right() - option.rect.height() - padding);
-		backgroundRightEllipse.setRight(option.rect.right() - padding);
-		backgroundRightEllipse.setTop(option.rect.top());
-		backgroundRightEllipse.setBottom(option.rect.bottom());
-		painter->drawEllipse(backgroundRightEllipse);
+			QRect backgroundLeftEllipse;
+			backgroundLeftEllipse.setLeft(padding);
+			backgroundLeftEllipse.setRight(option.rect.height() + padding);
+			backgroundLeftEllipse.setTop(option.rect.top());
+			backgroundLeftEllipse.setBottom(option.rect.bottom());
+			painter->drawEllipse(backgroundLeftEllipse);
+
+			QRect backgroundRightEllipse;
+			backgroundRightEllipse.setLeft(option.rect.right() - option.rect.height() - padding);
+			backgroundRightEllipse.setRight(option.rect.right() - padding);
+			backgroundRightEllipse.setTop(option.rect.top());
+			backgroundRightEllipse.setBottom(option.rect.bottom());
+			painter->drawEllipse(backgroundRightEllipse);
+		}
+		else {
+			painter->drawEllipse(singleEllipse);
+		}
 	}
 
 	painter->setPen(savePen);
+
 
 	// Calculate offset from treeview left side
 
@@ -78,20 +93,57 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 		currentIndex = currentIndex.parent();
 	}
 
+
 	// Draw icon
 
-	QRect iconRect = option.rect;
-	iconRect.setLeft(offset + padding + 2 + padding);
-	iconRect.setWidth(treeViewPtr->iconSize().width());
-	option.widget->style()->drawItemPixmap(painter, iconRect, Qt::AlignHCenter | Qt::AlignVCenter, QIcon(index.data(Qt::DecorationRole).value<QIcon>()).pixmap(treeViewPtr->iconSize().width(), treeViewPtr->iconSize().height()));
+	QRect iconRect;
+	if (indent == 0){
+		iconRect = singleEllipse;
+	}
+	else{
+		iconRect = option.rect;
+		iconRect.setLeft(offset + padding + 2 + padding);
+		iconRect.setWidth(pageTreePtr->iconSize().width());
+	}
+
+	QIcon::Mode iconMode = QIcon::Mode::Normal;
+
+	if (option.state & QStyle::State_Selected){
+		iconMode = QIcon::Mode::Selected;
+	}
+
+	if (option.state & QStyle::State_MouseOver){
+		iconMode = QIcon::Mode::Active;
+	}
+
+	if (!index.data(imtwidgets::CMenuPanel::DR_PAGE_ENABLED).toBool()){
+		iconMode = QIcon::Mode::Disabled;
+	}
+
+	option.widget->style()->drawItemPixmap(
+								painter, iconRect,
+								Qt::AlignHCenter | Qt::AlignVCenter,
+								QIcon(
+									index.data(Qt::DecorationRole).value<QIcon>()).pixmap(
+									pageTreePtr->iconSize().width(),
+									pageTreePtr->iconSize().height(),
+									iconMode));
+
 
 	// Draw text
 
 	if (indent > 0){
 		QRect textRect = option.rect;
 		textRect.setLeft(iconRect.right() + 2 * padding);
-		option.widget->style()->drawItemText(painter, textRect, Qt::AlignLeft | Qt::AlignVCenter, option.palette, true, index.data(Qt::DisplayRole).toString());
+		option.widget->style()->drawItemText(
+									painter, textRect, Qt::AlignLeft | Qt::AlignVCenter,
+									option.palette, true, index.data(Qt::DisplayRole).toString());
 	}
 
 	painter->setRenderHints(saveRenderHints);
 }
+
+
+} // namespace imtwidgets
+
+

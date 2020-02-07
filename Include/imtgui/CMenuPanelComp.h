@@ -49,7 +49,18 @@ protected:
 	virtual void OnGuiRetranslate() override;
 
 private:
+	struct PageIdToSelectionAlias
+	{
+		QByteArray parentPageId;
+		const iprm::ISelectionParam* selectionPtr;
+		int pageIndex;
+	};
+
+	QMap<QByteArray, PageIdToSelectionAlias> m_pageIdToSelectionAlias;
+
+private:
 	void CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId);
+	void CreatePageIdAliases(const iprm::ISelectionParam& selection, const QByteArray& parentId);
 };
 
 

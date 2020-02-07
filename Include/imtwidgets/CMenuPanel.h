@@ -56,6 +56,10 @@ public:
 	virtual void SetItemPadding(int padding);
 	virtual void SetIconSize(int size);
 
+	virtual void SetItemSelectedColor(QColor color);
+	virtual void SetItemMouserOverColor(QColor color);
+	virtual void SetItemMouserOverSelectedColor(QColor color);
+
 Q_SIGNALS:
 	/**
 		Signal will be emitted whenever the currently selected page will be changed.

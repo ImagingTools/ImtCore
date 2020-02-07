@@ -8,6 +8,10 @@
 #include <imtwidgets/CMenuPanel.h>
 
 
+namespace imtwidgets
+{
+
+
 class CMenuPanelDelegate : public QStyledItemDelegate
 {
 	Q_OBJECT
@@ -17,3 +21,8 @@ public:
 
 	virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
+
+
+} // namespace imtwidgets
+
+
