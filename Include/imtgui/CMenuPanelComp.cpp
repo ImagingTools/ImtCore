@@ -52,8 +52,8 @@ void CMenuPanelComp::OnGuiCreated()
 	imtwidgets::CMenuPanel* widgetPtr = dynamic_cast<imtwidgets::CMenuPanel*>(GetWidget());
 	connect(widgetPtr, &imtwidgets::CMenuPanel::PageIdChanged, this, &CMenuPanelComp::OnPageIdChanged);
 
-	widgetPtr->SetItemPadding(6);
-	widgetPtr->SetIconSize(32);
+	widgetPtr->SetItemPadding(4);
+	widgetPtr->SetIconSize(24);
 
 	widgetPtr->SetItemSelectedColor(QColor(240, 200, 80));
 	widgetPtr->SetItemMouserOverColor(QColor(240, 220, 100));
