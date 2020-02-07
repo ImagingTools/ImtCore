@@ -749,7 +749,7 @@ void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selecti
 		}
 	}
 
-	LeftFrame->setVisible(!hidePageListView && (SubPages->topLevelItemCount() > 0));
+	LeftFrame->setVisible(false && !hidePageListView && (SubPages->topLevelItemCount() > 0));
 }
 
 
