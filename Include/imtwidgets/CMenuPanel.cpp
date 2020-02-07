@@ -108,7 +108,7 @@ bool CMenuPanel::SetPageEnabled(const QByteArray& pageId, bool isPageEnabled)
 	QModelIndex index = GetModelIndex(pageId);
 	if (index.isValid()){
 		m_model.itemFromIndex(index)->setData(isPageEnabled, DR_PAGE_ENABLED);
-
+		m_model.itemFromIndex(index)->setEnabled(isPageEnabled);
 		return true;
 	}
 
@@ -185,6 +185,7 @@ bool CMenuPanel::InsertPage(const QByteArray& pageId, const QByteArray& parentPa
 		m_model.setData(modelIndex, pageId, DR_PAGE_ID);
 
 		m_maxWidth = CalculateMaxItemWith();
+		PageTree->expandAll();
 
 		return true;
 	}
@@ -197,9 +198,10 @@ bool CMenuPanel::InsertPage(const QByteArray& pageId, const QByteArray& parentPa
 		m_model.itemFromIndex(parentModelIndex)->insertRow(row,itemPtr);
 
 		QModelIndex modelIndex = m_model.index(row, 0, parentModelIndex);
-		m_model.setData(modelIndex, pageId, Qt::UserRole);
+		m_model.setData(modelIndex, pageId, DR_PAGE_ID);
 
 		m_maxWidth = CalculateMaxItemWith();
+		PageTree->expandAll();
 
 		return true;
 	}

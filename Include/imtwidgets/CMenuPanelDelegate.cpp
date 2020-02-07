@@ -34,8 +34,8 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 		}
 	}
 
-	QPen savePen = painter->pen();
-	QPainter::RenderHints saveRenderHints = painter->renderHints();
+	painter->save();
+	QPen storedPen = painter->pen();
 	painter->setRenderHint(QPainter::Antialiasing, true);
 
 	// Draw background
@@ -81,8 +81,6 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 		}
 	}
 
-	painter->setPen(savePen);
-
 
 	// Calculate offset from treeview left side
 
@@ -121,17 +119,18 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 	}
 
 	option.widget->style()->drawItemPixmap(
-								painter, iconRect,
-								Qt::AlignHCenter | Qt::AlignVCenter,
-								QIcon(
-									index.data(Qt::DecorationRole).value<QIcon>()).pixmap(
-									pageTreePtr->iconSize().width(),
-									pageTreePtr->iconSize().height(),
-									iconMode));
+				painter, iconRect,
+				Qt::AlignHCenter | Qt::AlignVCenter,
+				QIcon(
+							index.data(Qt::DecorationRole).value<QIcon>()).pixmap(
+							pageTreePtr->iconSize().width(),
+							pageTreePtr->iconSize().height(),
+							iconMode));
 
 
 	// Draw text
-
+	
+	painter->setPen(storedPen);
 	if (indent > 0){
 		QRect textRect = option.rect;
 		textRect.setLeft(iconRect.right() + 2 * padding);
@@ -140,7 +139,7 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 									option.palette, true, index.data(Qt::DisplayRole).toString());
 	}
 
-	painter->setRenderHints(saveRenderHints);
+	painter->restore();
 }
 
 

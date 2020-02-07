@@ -20,10 +20,23 @@ void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QBy
 		UpdateBlocker block(this);
 
 		if (!selectedPageId.isEmpty()){
-			if (m_pageIdToSelectionAlias.contains(selectedPageId)) {
-				PageIdToSelectionAlias alias = m_pageIdToSelectionAlias[selectedPageId];
-				iprm::ISelectionParam *selectionParam = const_cast<iprm::ISelectionParam*>(alias.selectionPtr);
-				selectionParam->SetSelectedOptionIndex(alias.pageIndex);
+			if (m_pagesInfoMap.contains(selectedPageId)) {
+				PageIdToSelectionAlias currentAlias = m_pagesInfoMap[selectedPageId];
+				
+				iprm::ISelectionParam *selectionParam = const_cast<iprm::ISelectionParam*>(currentAlias.selectionPtr);
+				selectionParam->SetSelectedOptionIndex(currentAlias.pageIndex);
+
+				//qDebug() << currentAlias.parentPageId << currentAlias.selectionPtr << currentAlias.pageIndex;
+
+				QByteArray pageId = m_pagesInfoMap[selectedPageId].parentPageId;
+				while (!pageId.isEmpty()){
+					currentAlias = m_pagesInfoMap[pageId];
+					iprm::ISelectionParam *selectionParam = const_cast<iprm::ISelectionParam*>(currentAlias.selectionPtr);
+					selectionParam->SetSelectedOptionIndex(currentAlias.pageIndex);
+					//qDebug() << currentAlias.parentPageId << currentAlias.selectionPtr << currentAlias.pageIndex;
+
+					pageId = m_pagesInfoMap[pageId].parentPageId;
+				}
 			}
 		}
 	}
@@ -49,7 +62,7 @@ void CMenuPanelComp::OnGuiCreated()
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
-void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 {
 	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
 	Q_ASSERT(panelPtr != nullptr);
@@ -59,36 +72,13 @@ void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/
 	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
 	Q_ASSERT(pageSelectionPtr != nullptr);
 
-	CreateMenuForSelection(*pageSelectionPtr, QByteArray());
-}
-
-
-// reimplemented (imod::CSingleModelObserverBase)
-
-void CMenuPanelComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
-{
-	m_pageIdToSelectionAlias.clear();
-
-	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
-	Q_ASSERT(pageSelectionPtr != nullptr);
-
 	CreatePageIdAliases(*pageSelectionPtr, QByteArray());
+	CreateMenuForSelection(*pageSelectionPtr, QByteArray());
 
-	Q_ASSERT(pageSelectionPtr != nullptr);
+	QByteArray selectedPageId = FindSelectedItem();
+	panelPtr->SetActivePage(selectedPageId);
 
-	int selectedIndex = pageSelectionPtr->GetSelectedOptionIndex();
-	const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
-	if (pageListPtr != nullptr){
-		QByteArray selectedId;
-		if (selectedIndex >= 0){
-			selectedId = pageListPtr->GetOptionId(selectedIndex);
-		}
-
-		if (IsGuiCreated()){
-			imtwidgets::CMenuPanel* widgetPtr = dynamic_cast<imtwidgets::CMenuPanel*>(GetWidget());
-			widgetPtr->SetActivePage(selectedId);
-		}
-	}
+	BaseClass::UpdateGui(changeSet);
 }
 
 
@@ -123,6 +113,7 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 
 			if (panelPtr->InsertPage(pageId, parentId)) {
 				panelPtr->SetPageName(pageId, pageName);
+				panelPtr->SetPageEnabled(pageId, pageListPtr->IsOptionEnabled(pageIndex));
 
 				const iqtgui::IVisualStatus* visualStatusPtr = pageVisualStatus->GetVisualStatus(pageIndex);
 				if (visualStatusPtr != nullptr){
@@ -135,9 +126,6 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 				else {
 					panelPtr->SetPageIcon(pageId, QIcon(":/Icons/Error"));
 				}
-
-				static int i = 0;
-				panelPtr->SetPageEnabled(pageId, (i++) % 2/*pageListPtr->IsOptionEnabled(pageIndex)*/);
 			}
 
 			if (pageIndex == currentIndex){
@@ -149,10 +137,6 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 				CreateMenuForSelection(*subSelectionPtr, pageId);
 			}
 		}
-	}
-
-	if (!currentPageId.isEmpty()){
-		panelPtr->SetActivePage(currentPageId);
 	}
 }
 
@@ -168,15 +152,11 @@ void CMenuPanelComp::CreatePageIdAliases(const iprm::ISelectionParam& selection,
 			QString pageName = pageListPtr->GetOptionName(pageIndex);
 			QByteArray pageId = pageListPtr->GetOptionId(pageIndex);
 
-			if (pageId.contains("Camera")){
-				qDebug() << pageId << &selection << pageIndex;
-			}
-
 			PageIdToSelectionAlias alias;
 			alias.parentPageId = parentId;
 			alias.selectionPtr = &selection;
 			alias.pageIndex = pageIndex;
-			m_pageIdToSelectionAlias[pageId] = alias;
+			m_pagesInfoMap[pageId] = alias;
 
 			if (pageIndex == currentIndex){
 				currentPageId = pageId;
@@ -188,6 +168,29 @@ void CMenuPanelComp::CreatePageIdAliases(const iprm::ISelectionParam& selection,
 			}
 		}
 	}
+}
+
+
+QByteArray CMenuPanelComp::FindSelectedItem()
+{
+	iprm::ISelectionParam* selectionPtr = GetObservedObject();
+	Q_ASSERT(selectionPtr != nullptr);
+
+	QString selectedPageId;
+
+	while (selectionPtr != nullptr){
+		int selectedIndex = selectionPtr->GetSelectedOptionIndex();
+		const iprm::IOptionsList *pageListPtr = selectionPtr->GetSelectionConstraints();
+		if (selectedIndex >= 0) {
+			selectedPageId = pageListPtr->GetOptionName(selectedIndex);
+			selectionPtr = selectionPtr->GetSubselection(selectedIndex);
+		}
+		else {
+			break;
+		}
+	}
+
+	return QByteArray(selectedPageId.toLatin1());
 }
 
 

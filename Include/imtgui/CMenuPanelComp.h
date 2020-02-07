@@ -42,9 +42,6 @@ protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
-	// reimplemented (imod::CSingleModelObserverBase)
-	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
-
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiRetranslate() override;
 
@@ -56,11 +53,12 @@ private:
 		int pageIndex;
 	};
 
-	QMap<QByteArray, PageIdToSelectionAlias> m_pageIdToSelectionAlias;
+	QMap<QByteArray, PageIdToSelectionAlias> m_pagesInfoMap;
 
 private:
 	void CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId);
 	void CreatePageIdAliases(const iprm::ISelectionParam& selection, const QByteArray& parentId);
+	QByteArray FindSelectedItem();
 };
 
 
