@@ -99,5 +99,6 @@
         <file alias="Detailed">Resources/Icons/Detailed.svg</file>
         <file alias="ProductionOverview">Resources/Icons/ProductionOverview.svg</file>
         <file alias="ArrowRight">Resources/Icons/ArrowRight.svg</file>
+        <file alias="Manual">Resources/Icons/Manual.svg</file>
     </qresource>
 </RCC>
