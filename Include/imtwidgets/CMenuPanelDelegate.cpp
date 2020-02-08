@@ -48,7 +48,7 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 
 	if (option.state & QStyle::State_Selected || option.state & QStyle::State_MouseOver){
 		painter->setBrush(QBrush(backgroundColor));
-		painter->setPen(Qt::transparent);
+//		painter->setPen(Qt::transparent);
 
 		QRect backgroundRect = option.rect;
 		if (indent != 0){

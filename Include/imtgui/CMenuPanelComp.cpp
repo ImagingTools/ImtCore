@@ -55,9 +55,9 @@ void CMenuPanelComp::OnGuiCreated()
 	widgetPtr->SetItemPadding(4);
 	widgetPtr->SetIconSize(24);
 
-	widgetPtr->SetItemSelectedColor(QColor(240, 200, 80));
+	widgetPtr->SetItemSelectedColor(QColor(240, 200, 120));
 	widgetPtr->SetItemMouserOverColor(QColor(240, 220, 100));
-	widgetPtr->SetItemMouserOverSelectedColor(QColor(240, 220, 100));
+	widgetPtr->SetItemMouserOverSelectedColor(QColor(255, 235, 100));
 }
 
 
