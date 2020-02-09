@@ -81,9 +81,7 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 		}
 	}
 
-
-	// Calculate offset from treeview left side
-
+	// Calculate offset from treeview's left side:
 	int offset = -indent;
 	QModelIndex currentIndex = index;
 	while (currentIndex.isValid()){
@@ -91,9 +89,7 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 		currentIndex = currentIndex.parent();
 	}
 
-
-	// Draw icon
-
+	// Draw icon:
 	QRect iconRect;
 	if (indent == 0){
 		iconRect = singleEllipse;
@@ -118,25 +114,31 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 		iconMode = QIcon::Mode::Disabled;
 	}
 
+	QIcon icon = index.data(Qt::DecorationRole).value<QIcon>();
+
+	QPixmap iconPixmap = icon.pixmap(
+				pageTreePtr->iconSize().width(),
+				pageTreePtr->iconSize().height(),
+				iconMode);
+
 	option.widget->style()->drawItemPixmap(
 				painter, iconRect,
 				Qt::AlignHCenter | Qt::AlignVCenter,
-				QIcon(
-							index.data(Qt::DecorationRole).value<QIcon>()).pixmap(
-							pageTreePtr->iconSize().width(),
-							pageTreePtr->iconSize().height(),
-							iconMode));
+				iconPixmap);
 
-
-	// Draw text
-	
+	// Draw text:
 	painter->setPen(storedPen);
 	if (indent > 0){
 		QRect textRect = option.rect;
 		textRect.setLeft(iconRect.right() + 2 * padding);
+
 		option.widget->style()->drawItemText(
-									painter, textRect, Qt::AlignLeft | Qt::AlignVCenter,
-									option.palette, true, index.data(Qt::DisplayRole).toString());
+					painter,
+					textRect,
+					Qt::AlignLeft | Qt::AlignVCenter,
+					option.palette,
+					true,
+					index.data(Qt::DisplayRole).toString());
 	}
 
 	painter->restore();
