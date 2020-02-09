@@ -45,7 +45,7 @@ public:
 	const CTextTableItem& GetItem(int row, int column) const;
 	void SetItem(int row, int column, const CTextTableItem& item);
 
-	static QByteArray GetTypeName() { return "TextTable"; }
+	static QByteArray GetTypeName(){ return "TextTable"; }
 
 	// reimplemented (iser::ISerializable)
 	bool Serialize(iser::IArchive& archive) override;

@@ -206,7 +206,7 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 bool CDepthBitmap::IsEqual(const IChangeable& object) const
 {
 	const CDepthBitmap* sourcePtr = dynamic_cast<const CDepthBitmap*>(&object);
-	if (sourcePtr != nullptr) {
+	if (sourcePtr != nullptr){
 		if (BaseClass2::GetSupportedOperations() & SO_COMPARE){
 			if (!BaseClass2::IsEqual(object)){
 				return false;

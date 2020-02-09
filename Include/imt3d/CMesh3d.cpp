@@ -170,7 +170,7 @@ bool CMesh3d::CopyFrom(const istd::IChangeable& object, istd::IChangeable::Compa
 bool CMesh3d::IsEqual(const IChangeable& object) const
 {
 	const CMesh3d* sourcePtr = dynamic_cast<const CMesh3d*>(&object);
-	if (sourcePtr != nullptr) {
+	if (sourcePtr != nullptr){
 		if (BaseClass::GetSupportedOperations() & SO_COMPARE){
 			if (!BaseClass::IsEqual(object)){
 				return false;

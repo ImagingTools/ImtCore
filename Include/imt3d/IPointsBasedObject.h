@@ -48,10 +48,10 @@ public:
 	{
 		CoordinateType data[sizeof...(InitValues)] = { InitValues... };
 
-		void* operator new(size_t size) { return _mm_malloc(size, AlignSize); }
-		void *operator new[](size_t size) { return _mm_malloc(size, AlignSize); }
-		void operator delete(void* ptr) { _mm_free(ptr); }
-		void operator delete[](void* ptr) { _mm_free(ptr); }
+		void* operator new(size_t size){ return _mm_malloc(size, AlignSize); }
+		void *operator new[](size_t size){ return _mm_malloc(size, AlignSize); }
+		void operator delete(void* ptr){ _mm_free(ptr); }
+		void operator delete[](void* ptr){ _mm_free(ptr); }
 	};
 #ifdef _MSC_VER
 #pragma warning(pop) 

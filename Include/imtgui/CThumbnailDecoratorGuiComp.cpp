@@ -1070,7 +1070,7 @@ void CThumbnailDecoratorGuiComp::SetKeyboardCommandPath()
 
 	if (m_winKeyboardPath.isEmpty()){
 		processPath = getenv("SystemRoot");
-		if (processPath.isEmpty()) {
+		if (processPath.isEmpty()){
 			processPath = "C:\\Windows";
 		}
 

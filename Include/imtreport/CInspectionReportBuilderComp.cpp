@@ -112,7 +112,7 @@ QString CInspectionReportBuilderComp::GetErrorClassText(const ErrorClass errorCl
 bool CInspectionReportBuilderComp::CreateTitlePage(const ReportInputData& reportData, IReportDocument& reportDocument) const
 {
 	IReportPage* pagePtr = dynamic_cast<IReportPage*>(reportDocument.InsertPage());
-	if (!pagePtr) {
+	if (!pagePtr){
 		return false;
 	}
 
@@ -129,7 +129,7 @@ bool CInspectionReportBuilderComp::CreateTitlePage(const ReportInputData& report
 bool CInspectionReportBuilderComp::CreateInspectionPage(const ReportInputData& reportData, const Inspection& inspection, IReportDocument& reportDocument) const
 {
 	IReportPage* pagePtr = dynamic_cast<IReportPage*>(reportDocument.InsertPage());
-	if (!pagePtr) {
+	if (!pagePtr){
 		return false;
 	}
 
@@ -163,7 +163,7 @@ void CInspectionReportBuilderComp::GetTitlePageRegionResults(const ReportInputDa
 
 void CInspectionReportBuilderComp::GetInspectionPageRegionResults(const Inspection& inspection, Results& results) const
 {
-	for (const InspectionRegion& region : inspection.regions) {
+	for (const InspectionRegion& region : inspection.regions){
 		results.append(region.results);
 	}
 }

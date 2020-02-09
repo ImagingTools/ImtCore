@@ -152,7 +152,7 @@ bool CPointCloud3d::CopyFrom(const istd::IChangeable& object, istd::IChangeable:
 bool CPointCloud3d::IsEqual(const IChangeable & object) const
 {
 	const CPointCloud3d* sourcePtr = dynamic_cast<const CPointCloud3d*>(&object);
-	if (sourcePtr != nullptr) {
+	if (sourcePtr != nullptr){
 
 		if (BaseClass::GetSupportedOperations() & SO_COMPARE){
 			if (!BaseClass::IsEqual(object)){

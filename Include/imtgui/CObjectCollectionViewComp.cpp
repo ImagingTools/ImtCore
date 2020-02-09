@@ -109,7 +109,7 @@ void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 			ColumnSettings columnSettings;
 
 			QStringList keys = jsonColumn.keys();
-			for (QString key : keys) {
+			for (QString key : keys){
 				QVariant variant = jsonColumn[key].toVariant();
 				if (!variant.isValid()){
 					return;
@@ -560,7 +560,7 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 				continue;
 			}
 
-			if (fieldSet.contains(fieldId)) {
+			if (fieldSet.contains(fieldId)){
 				int logicIndex = fieldIds.indexOf(fieldId) + 1;
 				ItemList->header()->moveSection(ItemList->header()->visualIndex(logicIndex), currentIndex);
 				fieldSet.remove(fieldId);
@@ -604,7 +604,7 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 
 void CObjectCollectionViewComp::SaveItemsSelection()
 {
-	if (m_blockSaveItemsSelection) {
+	if (m_blockSaveItemsSelection){
 		return;
 	}
 

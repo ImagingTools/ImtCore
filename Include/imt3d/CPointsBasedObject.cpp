@@ -195,7 +195,7 @@ bool CPointsBasedObject::CopyFrom(const istd::IChangeable& object, istd::IChange
 bool CPointsBasedObject::IsEqual(const IChangeable & object) const
 {
 	const CPointsBasedObject* sourcePtr = dynamic_cast<const CPointsBasedObject*>(&object);
-	if (sourcePtr != nullptr) {
+	if (sourcePtr != nullptr){
 		return ((GetDataSize() == sourcePtr->GetDataSize())
 				&& (memcmp(m_dataPtr, sourcePtr->m_dataPtr, GetDataSize()) == 0)
 				&& (m_dataOwner == sourcePtr->m_dataOwner)
@@ -215,7 +215,7 @@ istd::IChangeable* CPointsBasedObject::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CPointsBasedObject> clonePtr(new CPointsBasedObject());
 
-	if (clonePtr->CopyFrom(*this, mode)) {
+	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}
 

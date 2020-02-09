@@ -434,13 +434,13 @@ void CDocumentWorkspaceGuiCompBase::OnViewRegistered(istd::IPolymorphic* viewPtr
 			}
 
 			imod::IModel* visualStatusModelPtr = dynamic_cast<imod::IModel*>(visualStatusPtr);
-			if (visualStatusModelPtr != nullptr) {
+			if (visualStatusModelPtr != nullptr){
 				RegisterModel(visualStatusModelPtr, MI_VISUAL_STATUS_BASE_INDEX + newViewIndex);
 			}
 
 			ibase::ICommandsProvider* commandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(viewPtr);
 			imod::IModel* commandsProviderModelPtr = dynamic_cast<imod::IModel*>(commandsProviderPtr);
-			if (commandsProviderModelPtr != nullptr) {
+			if (commandsProviderModelPtr != nullptr){
 				RegisterModel(commandsProviderModelPtr, MI_DOCUMENT_COMMANDS_BASE_INDEX + newViewIndex);
 			}
 
@@ -555,9 +555,9 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 			}
 
 			ibase::ICommandsProvider* commandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(guiPtr);
-			if (commandsProviderPtr != nullptr) {
+			if (commandsProviderPtr != nullptr){
 				imod::IModel* commandsProviderModelPtr = dynamic_cast<imod::IModel*>(commandsProviderPtr);
-				if (commandsProviderModelPtr != nullptr) {
+				if (commandsProviderModelPtr != nullptr){
 					RegisterModel(commandsProviderModelPtr, MI_DOCUMENT_COMMANDS_BASE_INDEX + i);
 				}
 			}

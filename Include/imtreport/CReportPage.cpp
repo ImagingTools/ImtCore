@@ -302,7 +302,7 @@ template <typename TObject> TObject* CReportPage::AddObject(QByteArray& uuid)
 	istd::CChangeNotifier changeNotifier(this);
 
 	TObject* element = dynamic_cast<TObject*>(BaseClass::AddElement(TObject::GetTypeName()));
-	if (!element) {
+	if (!element){
 		return nullptr;
 	}
 

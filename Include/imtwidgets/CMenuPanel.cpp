@@ -191,7 +191,7 @@ bool CMenuPanel::InsertPage(const QByteArray& pageId, const QByteArray& parentPa
 	}
 
 	QModelIndex parentModelIndex = GetModelIndex(parentPageId);
-	if (parentModelIndex.isValid()) {
+	if (parentModelIndex.isValid()){
 		int row = m_model.rowCount(parentModelIndex);
 
 		QStandardItem* itemPtr = new QStandardItem();

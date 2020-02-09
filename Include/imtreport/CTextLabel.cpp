@@ -98,7 +98,7 @@ bool CTextLabel::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(alignmentTag);
 	retVal = retVal && archive.Process(alignment);
 	retVal = retVal && archive.EndTag(alignmentTag);
-	if (retVal && !archive.IsStoring()) {
+	if (retVal && !archive.IsStoring()){
 		m_alignment = static_cast<Qt::Alignment>(alignment);
 	}
 

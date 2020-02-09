@@ -20,7 +20,7 @@ void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QBy
 		UpdateBlocker block(this);
 
 		if (!selectedPageId.isEmpty()){
-			if (m_pagesInfoMap.contains(selectedPageId)) {
+			if (m_pagesInfoMap.contains(selectedPageId)){
 				PageIdToSelectionAlias currentAlias = m_pagesInfoMap[selectedPageId];
 				iprm::ISelectionParam *currentSelectionParam = const_cast<iprm::ISelectionParam*>(currentAlias.selectionPtr);
 
@@ -108,13 +108,13 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 	int currentIndex = selection.GetSelectedOptionIndex();
 	QByteArray currentPageId;
 	const iprm::IOptionsList* pageListPtr = selection.GetSelectionConstraints();
-	if (pageListPtr != nullptr) {
+	if (pageListPtr != nullptr){
 		int pageCount = pageListPtr->GetOptionsCount();
-		for (int pageIndex = 0; pageIndex < pageCount; ++pageIndex) {
+		for (int pageIndex = 0; pageIndex < pageCount; ++pageIndex){
 			QString pageName = pageListPtr->GetOptionName(pageIndex);
 			QByteArray pageId = pageListPtr->GetOptionId(pageIndex);
 
-			if (panelPtr->InsertPage(pageId, parentId)) {
+			if (panelPtr->InsertPage(pageId, parentId)){
 				panelPtr->SetPageName(pageId, pageName);
 				panelPtr->SetPageEnabled(pageId, pageListPtr->IsOptionEnabled(pageIndex));
 
@@ -136,7 +136,7 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 			}
 
 			const iprm::ISelectionParam* subSelectionPtr = selection.GetSubselection(pageIndex);
-			if (subSelectionPtr != nullptr) {
+			if (subSelectionPtr != nullptr){
 				CreateMenuForSelection(*subSelectionPtr, pageId);
 			}
 		}
@@ -149,9 +149,9 @@ void CMenuPanelComp::CreatePageIdAliases(const iprm::ISelectionParam& selection,
 	int currentIndex = selection.GetSelectedOptionIndex();
 	QByteArray currentPageId;
 	const iprm::IOptionsList* pageListPtr = selection.GetSelectionConstraints();
-	if (pageListPtr != nullptr) {
+	if (pageListPtr != nullptr){
 		int pageCount = pageListPtr->GetOptionsCount();
-		for (int pageIndex = 0; pageIndex < pageCount; ++pageIndex) {
+		for (int pageIndex = 0; pageIndex < pageCount; ++pageIndex){
 			QString pageName = pageListPtr->GetOptionName(pageIndex);
 			QByteArray pageId = pageListPtr->GetOptionId(pageIndex);
 
@@ -166,7 +166,7 @@ void CMenuPanelComp::CreatePageIdAliases(const iprm::ISelectionParam& selection,
 			}
 
 			const iprm::ISelectionParam* subSelectionPtr = selection.GetSubselection(pageIndex);
-			if (subSelectionPtr != nullptr) {
+			if (subSelectionPtr != nullptr){
 				CreatePageIdAliases(*subSelectionPtr, pageId);
 			}
 		}
@@ -184,7 +184,7 @@ QByteArray CMenuPanelComp::FindSelectedItem()
 	while (selectionPtr != nullptr){
 		int selectedIndex = selectionPtr->GetSelectedOptionIndex();
 		const iprm::IOptionsList *pageListPtr = selectionPtr->GetSelectionConstraints();
-		if (selectedIndex >= 0) {
+		if (selectedIndex >= 0){
 			selectedPageId = pageListPtr->GetOptionName(selectedIndex);
 			selectionPtr = selectionPtr->GetSubselection(selectedIndex);
 		}
