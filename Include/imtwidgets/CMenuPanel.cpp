@@ -20,7 +20,11 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	:QWidget(parent),
 	m_maxWidth(200),
 	m_indent(20),
-	m_padding(0)
+	m_padding(0),
+	m_animationAction(AA_NONE),
+	m_animationTimerIdentifier(0),
+	m_animationDelay(100),
+	m_animationDuration(100)
 {
 	setupUi(this);
 
@@ -54,6 +58,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_animationWidth.setPropertyName("maximumWidth");
 	m_animationIndent.setTargetObject(PageTree);
 	m_animationIndent.setPropertyName("indent");
+	connect(&m_animationWidth, &QPropertyAnimation::finished, this, &CMenuPanel::OnAnimationFinished);
 
 	pushTop->setIcon(QIcon(":/Icons/Up"));
 	pushTop->setAutoRepeat(true);
@@ -331,7 +336,8 @@ void CMenuPanel::SetItemPadding(int padding)
 	if (padding > 0){
 		m_padding = padding;
 		PageTree->setProperty("padding", padding);
-		QString style = QString("QTreeView::item{padding: %1px;} QTreeView::item::hover{background-color:rgb(0, 0, 0);}").arg(padding);		
+		QString style = QString("QTreeView::item{padding: %1px; margin: 0px 0px 0px 0px;} QTreeView::item::hover{background-color:rgb(0, 0, 0);}").arg(padding);		
+		//PageTree->viewport()->setContentsMargins(QMargins(0, padding, 0, 0));
 		PageTree->setStyleSheet(style);
 		PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 + 2 * m_padding + 2 * m_padding);
 	}
@@ -347,9 +353,37 @@ void CMenuPanel::SetIconSize(int size)
 }
 
 
+void CMenuPanel::SetAnimationDelay(int delay)
+{
+	if (delay >= 0){
+		m_animationDelay = delay;
+	}
+}
+
+
+void CMenuPanel::SetAnimationDuration(int duration)
+{
+	if (duration >= 0){
+		m_animationDuration = duration;
+	}
+}
+
+
+void CMenuPanel::SetItemTextColor(QColor color)
+{
+	PageTree->setProperty("ItemTextColor", color);
+}
+
+
 void CMenuPanel::SetItemSelectedColor(QColor color)
 {
 	PageTree->setProperty("ItemSelectedColor", color);
+}
+
+
+void CMenuPanel::SetItemSelectedContourColor(QColor color)
+{
+	PageTree->setProperty("ItemSelectedContourColor", color);
 }
 
 
@@ -391,7 +425,18 @@ void CMenuPanel::OnPageIdChanged(const QModelIndex& selected, const QModelIndex&
 }
 
 
-void imtwidgets::CMenuPanel::on_pushBottom_clicked()
+void CMenuPanel::OnAnimationFinished()
+{
+	if (m_animationAction != AA_NONE){
+		if (m_animationTimerIdentifier != 0){
+			killTimer(m_animationTimerIdentifier);
+		}
+		m_animationTimerIdentifier = startTimer(m_animationDelay);
+	}
+}
+
+
+void CMenuPanel::on_pushBottom_clicked()
 {
 	QModelIndex index = PageTree->indexAt(QPoint(0, PageTree->height()));
 	PageTree->scrollTo(index);
@@ -404,7 +449,7 @@ void imtwidgets::CMenuPanel::on_pushBottom_clicked()
 }
 
 
-void imtwidgets::CMenuPanel::on_pushTop_clicked()
+void CMenuPanel::on_pushTop_clicked()
 {
 	QModelIndex index = PageTree->indexAt(QPoint(0, 0));
 	PageTree->scrollTo(index);
@@ -430,41 +475,67 @@ bool CMenuPanel::eventFilter(QObject *obj, QEvent *event)
 }
 
 
-// reimplemented (QWidget)
-
-void CMenuPanel::enterEvent(QEvent* event)
+void CMenuPanel::timerEvent(QTimerEvent *event)
 {
-	Q_UNUSED(event)
+	killTimer(m_animationTimerIdentifier);
+	m_animationTimerIdentifier = 0;
 
-	m_animationWidth.stop();
-	m_animationWidth.setStartValue(PageTree->maximumWidth());
-	m_animationWidth.setEndValue(m_maxWidth);
-	m_animationWidth.setDuration(150);
-	m_animationWidth.start();
+	if (m_animationAction == AA_EXPAND && PageTree->maximumWidth() != m_maxWidth){
+		m_animationWidth.stop();
+		m_animationWidth.setStartValue(PageTree->maximumWidth());
+		m_animationWidth.setEndValue(m_maxWidth);
+		m_animationWidth.setDuration(m_animationDuration);
+		m_animationWidth.start();
 
-	m_animationIndent.stop();
-	m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent/ m_maxWidth);
-	m_animationIndent.setEndValue(m_indent);
-	m_animationIndent.setDuration(150);
-	m_animationIndent.start();
+		m_animationIndent.stop();
+		m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
+		m_animationIndent.setEndValue(m_indent);
+		m_animationIndent.setDuration(m_animationDuration - 10);
+		m_animationIndent.start();
+	}
+
+	int minWidth = PageTree->iconSize().width() + 4 + 2 * m_padding + 2 * m_padding;
+	if (m_animationAction == AA_COLLAPSE & PageTree->maximumWidth() != minWidth){
+		m_animationWidth.stop();
+		m_animationWidth.setStartValue(PageTree->maximumWidth());
+		m_animationWidth.setEndValue(minWidth);
+		m_animationWidth.setDuration(m_animationDuration);
+		m_animationWidth.start();
+
+		m_animationIndent.stop();
+		m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
+		m_animationIndent.setEndValue(0);
+		m_animationIndent.setDuration(m_animationDuration - 10);
+		m_animationIndent.start();
+	}
+
+	m_animationAction = AA_NONE;
 }
 
 
-void CMenuPanel::leaveEvent(QEvent* event)
+// reimplemented (QWidget)
+
+void CMenuPanel::enterEvent(QEvent* /*event*/)
 {
-	Q_UNUSED(event)
+	if (m_animationWidth.state() == QPropertyAnimation::State::Stopped){
+		if (m_animationTimerIdentifier != 0){
+			killTimer(m_animationTimerIdentifier);
+		}
+		m_animationTimerIdentifier = startTimer(m_animationDelay);
+	}
+	m_animationAction = AA_EXPAND;
+}
 
-	m_animationWidth.stop();
-	m_animationWidth.setStartValue(PageTree->maximumWidth());
-	m_animationWidth.setEndValue(PageTree->iconSize().width() + 4 + 2 * m_padding + 2 * m_padding);
-	m_animationWidth.setDuration(150);
-	m_animationWidth.start();
 
-	m_animationIndent.stop();
-	m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
-	m_animationIndent.setEndValue(0);
-	m_animationIndent.setDuration(150);
-	m_animationIndent.start();
+void CMenuPanel::leaveEvent(QEvent* /*event*/)
+{
+	if (m_animationWidth.state() == QPropertyAnimation::State::Stopped){
+		if (m_animationTimerIdentifier != 0){
+			killTimer(m_animationTimerIdentifier);
+		}
+		m_animationTimerIdentifier = startTimer(m_animationDelay);
+	}
+	m_animationAction = AA_COLLAPSE;
 }
 
 

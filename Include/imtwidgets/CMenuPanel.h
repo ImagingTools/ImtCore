@@ -32,6 +32,13 @@ public:
 		DR_PAGE_VISIBLE
 	};
 
+	enum AnimationAction
+	{
+		AA_NONE = 0,
+		AA_EXPAND,
+		AA_COLLAPSE
+	};
+
 	CMenuPanel(QWidget* parent = nullptr);
 
 	virtual int GetMaxWidth() const;
@@ -56,7 +63,12 @@ public:
 	virtual void SetItemPadding(int padding);
 	virtual void SetIconSize(int size);
 
+	virtual void SetAnimationDelay(int delay);
+	virtual void SetAnimationDuration(int duration);
+
+	virtual void SetItemTextColor(QColor color);
 	virtual void SetItemSelectedColor(QColor color);
+	virtual void SetItemSelectedContourColor(QColor color);
 	virtual void SetItemMouserOverColor(QColor color);
 	virtual void SetItemMouserOverSelectedColor(QColor color);
 
@@ -68,12 +80,14 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void OnPageIdChanged(const QModelIndex& selected, const QModelIndex& deselected);
+	void OnAnimationFinished();
 	void on_pushTop_clicked();
 	void on_pushBottom_clicked();
 
 protected:
 	// reimplemented (QObject)
 	virtual bool eventFilter(QObject *obj, QEvent *event) override;
+	virtual void timerEvent(QTimerEvent *event);
 
 	// reimplemented (QWidget)
 	virtual void enterEvent(QEvent* event) override;
@@ -84,6 +98,11 @@ private:
 	int m_padding;
 	int m_maxWidth;
 	int m_indent;
+
+	AnimationAction m_animationAction;
+	int m_animationTimerIdentifier;
+	int m_animationDelay;
+	int m_animationDuration;
 
 	QStandardItemModel m_model;
 	QPropertyAnimation m_animationWidth;

@@ -23,19 +23,18 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 	QColor backgroundColor;
 
 	if (option.state & QStyle::State_Selected){
-		backgroundColor = pageTreePtr->property("ItemSelectedColor").value<QColor>();//qRgba(240, 200, 80, 255);
+		backgroundColor = pageTreePtr->property("ItemSelectedColor").value<QColor>();
 	}
 
 	if (option.state & QStyle::State_MouseOver){
-		backgroundColor = pageTreePtr->property("ItemMouserOverColor").value<QColor>();//qRgba(240, 220, 100, 50);
+		backgroundColor = pageTreePtr->property("ItemMouserOverColor").value<QColor>();
 
 		if (option.state & QStyle::State_Selected){
-			backgroundColor = pageTreePtr->property("ItemMouserOverSelectedColor").value<QColor>();//qRgba(240, 220, 100, 255);
+			backgroundColor = pageTreePtr->property("ItemMouserOverSelectedColor").value<QColor>();
 		}
 	}
 
 	painter->save();
-	QPen storedPen = painter->pen();
 	painter->setRenderHint(QPainter::Antialiasing, true);
 
 	// Draw background
@@ -48,26 +47,16 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 
 	if (option.state & QStyle::State_Selected || option.state & QStyle::State_MouseOver){
 		painter->setBrush(QBrush(backgroundColor));
-//		painter->setPen(Qt::transparent);
 
 		QRect backgroundRect = option.rect;
 		if (indent != 0){
-			//backgroundRect.setLeft(option.rect.height() / 2 + padding);
-		//}
-		//else{
+			painter->setPen(backgroundColor);
+
 			backgroundRect.setLeft(0);
-		//}
 			backgroundRect.setRight(option.rect.right() - option.rect.height() / 2 - padding);
 			backgroundRect.setTop(option.rect.top());
 			backgroundRect.setBottom(option.rect.bottom());
 			painter->fillRect(backgroundRect, backgroundColor);
-
-			QRect backgroundLeftEllipse;
-			backgroundLeftEllipse.setLeft(padding);
-			backgroundLeftEllipse.setRight(option.rect.height() + padding);
-			backgroundLeftEllipse.setTop(option.rect.top());
-			backgroundLeftEllipse.setBottom(option.rect.bottom());
-			painter->drawEllipse(backgroundLeftEllipse);
 
 			QRect backgroundRightEllipse;
 			backgroundRightEllipse.setLeft(option.rect.right() - option.rect.height() - padding);
@@ -77,6 +66,7 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 			painter->drawEllipse(backgroundRightEllipse);
 		}
 		else {
+			painter->setPen(pageTreePtr->property("ItemSelectedContourColor").value<QColor>());
 			painter->drawEllipse(singleEllipse);
 		}
 	}
@@ -127,7 +117,7 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 				iconPixmap);
 
 	// Draw text:
-	painter->setPen(storedPen);
+	painter->setPen(pageTreePtr->property("ItemTextColor").value<QColor>());
 	if (indent > 0){
 		QRect textRect = option.rect;
 		textRect.setLeft(iconRect.right() + 2 * padding);
