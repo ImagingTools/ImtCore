@@ -122,14 +122,9 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 
 				const iqtgui::IVisualStatus* visualStatusPtr = pageVisualStatus->GetVisualStatus(pageIndex);
 				if (visualStatusPtr != nullptr){
-					QIcon icon = pageVisualStatus->GetVisualStatus(pageIndex)->GetStatusIcon();
-					if (icon.isNull()){
-						icon = QIcon(":/Icons/StateInvalid");
-					}
+					QIcon icon = visualStatusPtr->GetStatusIcon();
+
 					panelPtr->SetPageIcon(pageId, icon);
-				}
-				else {
-					panelPtr->SetPageIcon(pageId, QIcon(":/Icons/Error"));
 				}
 			}
 
