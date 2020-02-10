@@ -38,10 +38,16 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	PageTree->selectionModel()->clearSelection();
 	connect(PageTree->selectionModel(), &QItemSelectionModel::currentChanged, this, &CMenuPanel::OnPageIdChanged);
 
-	PageTree->setItemDelegate(new CMenuPanelDelegate(this));
+	PageTree->setItemDelegate(new CMenuPanelDelegate(PageTree));
 	PageTree->setProperty("indent", 0);
 	PageTree->setProperty("indentMax", m_indent);
 	PageTree->setProperty("padding", 0);
+
+	PageTree->setProperty("ItemSelectedColor", QColor(0,0,0));
+	PageTree->setProperty("ItemMouserOverColor", QColor(0, 0, 0));
+	PageTree->setProperty("ItemMouserOverSelectedColor", QColor(0, 0, 0));
+	PageTree->setProperty("ItemSelectedContourColor", QColor(0, 0, 0));
+	PageTree->setProperty("ItemTextColor", QColor(0, 0, 0));
 
 	PageTree->setHeaderHidden(true);
 	PageTree->setIconSize(QSize(16, 16));
@@ -52,7 +58,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	PageTree->verticalScrollBar()->installEventFilter(this);
 
 	PageTree->setContentsMargins(QMargins(0,0,0,0));
-	PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 + 2 * m_padding + 2 * m_padding);
+	PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
 
 	m_animationWidth.setTargetObject(PageTree);
 	m_animationWidth.setPropertyName("maximumWidth");
@@ -336,10 +342,7 @@ void CMenuPanel::SetItemPadding(int padding)
 	if (padding > 0){
 		m_padding = padding;
 		PageTree->setProperty("padding", padding);
-		QString style = QString("QTreeView::item{padding: %1px; margin: 0px 0px 0px 0px;} QTreeView::item::hover{background-color:rgb(0, 0, 0);}").arg(padding);		
-		//PageTree->viewport()->setContentsMargins(QMargins(0, padding, 0, 0));
-		PageTree->setStyleSheet(style);
-		PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 + 2 * m_padding + 2 * m_padding);
+		PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
 	}
 }
 
@@ -348,24 +351,20 @@ void CMenuPanel::SetIconSize(int size)
 {
 	if (size > 8){
 		PageTree->setIconSize(QSize(size, size));
-		PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 + 2 * m_padding + 2 * m_padding);
+		PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
 	}
 }
 
 
 void CMenuPanel::SetAnimationDelay(int delay)
 {
-	if (delay >= 0){
-		m_animationDelay = delay;
-	}
+	m_animationDelay = delay;
 }
 
 
 void CMenuPanel::SetAnimationDuration(int duration)
 {
-	if (duration >= 0){
-		m_animationDuration = duration;
-	}
+	m_animationDuration = duration;
 }
 
 
@@ -412,16 +411,7 @@ void CMenuPanel::OnPageIdChanged(const QModelIndex& selected, const QModelIndex&
 		deselectedId = deselected.data(DR_PAGE_ID).toByteArray();
 	}
 
-	//QVariant pageEnabled = selected.data(DR_PAGE_ENABLED);
-	//if (/*pageEnabled.isValid() && */pageEnabled.type() == QVariant::Bool){
-	//	if (pageEnabled.toBool()){
-			PageIdChanged(selectedId, deselectedId);
-	//	}
-	//	else {
-	//		PageTree->selectionModel()->clear();
-	//		PageTree->setCurrentIndex(deselected);
-	//	}
-	//}
+	PageIdChanged(selectedId, deselectedId);
 }
 
 
@@ -475,7 +465,7 @@ bool CMenuPanel::eventFilter(QObject *obj, QEvent *event)
 }
 
 
-void CMenuPanel::timerEvent(QTimerEvent *event)
+void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 {
 	killTimer(m_animationTimerIdentifier);
 	m_animationTimerIdentifier = 0;
@@ -494,8 +484,8 @@ void CMenuPanel::timerEvent(QTimerEvent *event)
 		m_animationIndent.start();
 	}
 
-	int minWidth = PageTree->iconSize().width() + 4 + 2 * m_padding + 2 * m_padding;
-	if (m_animationAction == AA_COLLAPSE & PageTree->maximumWidth() != minWidth){
+	int minWidth = PageTree->iconSize().width() + 4 * m_padding;
+	if (m_animationAction == AA_COLLAPSE && PageTree->maximumWidth() != minWidth){
 		m_animationWidth.stop();
 		m_animationWidth.setStartValue(PageTree->maximumWidth());
 		m_animationWidth.setEndValue(minWidth);
@@ -597,23 +587,13 @@ int CMenuPanel::CalculateMaxItemWith()
 	QModelIndex index = m_model.index(0, 0);
 	int maxWidth = 0;
 
+	QStyleOptionViewItem opt;
+	opt.initFrom(this);
+
 	while (index.isValid()){
-		QString text = index.data(Qt::DisplayRole).toString();
-		
-
-		int offset = -m_indent;
-		QModelIndex check = index;
-		while (check.isValid()){
-			offset += m_indent;
-			check = check.parent();
-		}
-
-		int current = offset + m_padding + 2 + m_padding + PageTree->iconSize().width() + 2 * m_padding;
-		
-		QFontMetrics fm = PageTree->fontMetrics();
-		current += fm.boundingRect(text).width() + 2 * m_padding;
-		if (current > maxWidth){
-			maxWidth = current;
+		QSize itemSize = PageTree->itemDelegate()->sizeHint(opt, index);
+		if (maxWidth < itemSize.width()){
+			maxWidth = itemSize.width();
 		}
 
 		QModelIndex childIndex = m_model.index(0, 0, index);

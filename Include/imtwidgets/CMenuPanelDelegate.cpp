@@ -6,16 +6,50 @@
 #include "QtGui/QPainter"
 #include "QtWidgets/QTreeView"
 
-#include "QDebug"
-
 
 namespace imtwidgets
 {
 
 
+QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+	QTreeView* pageTreePtr = qobject_cast<QTreeView*>(parent());
+	Q_ASSERT(pageTreePtr != nullptr);
+
+	int indent = 0;
+	if (pageTreePtr->property("indent").isValid()){
+		indent = pageTreePtr->property("indent").toInt();
+	}
+	int padding = 0;
+	if (pageTreePtr->property("padding").isValid()){
+		padding = pageTreePtr->property("padding").toInt();
+	}
+
+	QSize size;
+	size.setHeight(pageTreePtr->iconSize().height() + 4 * padding);
+
+	int offset = -indent;
+	QModelIndex currentIndex = index;
+	while (currentIndex.isValid()){
+		offset += indent;
+		currentIndex = currentIndex.parent();
+	}
+
+	int width = 2 * padding + offset + pageTreePtr->iconSize().width() + 2 * padding;
+	QFontMetrics fm = pageTreePtr->fontMetrics();
+	width += fm.boundingRect(index.data(Qt::ItemDataRole::DisplayRole).toString()).width() + 4 * padding;
+	
+	size.setWidth(width);
+
+	return size;
+}
+
+
 void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 	const QTreeView *pageTreePtr = qobject_cast<const QTreeView*>(option.widget);
+	Q_ASSERT(pageTreePtr != nullptr);
+
 	int indent = pageTreePtr->property("indent").toInt();
 	int indentMax = pageTreePtr->property("indentMax").toInt();
 	int padding = pageTreePtr->property("padding").toInt();
@@ -37,32 +71,31 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 	painter->save();
 	painter->setRenderHint(QPainter::Antialiasing, true);
 
-	// Draw background
-
+	// Draw background:
 	QRect singleEllipse;
 	singleEllipse.setLeft(padding);
-	singleEllipse.setRight(option.rect.right() - padding);
-	singleEllipse.setTop(option.rect.top());
-	singleEllipse.setBottom(option.rect.bottom());
+	singleEllipse.setTop(option.rect.top() + padding);
+	singleEllipse.setHeight(option.rect.height() - 2 * padding);
+	singleEllipse.setWidth(option.rect.height() - 2 * padding);
 
 	if (option.state & QStyle::State_Selected || option.state & QStyle::State_MouseOver){
 		painter->setBrush(QBrush(backgroundColor));
 
 		QRect backgroundRect = option.rect;
 		if (indent != 0){
-			painter->setPen(backgroundColor);
+			painter->setPen(Qt::transparent);
 
 			backgroundRect.setLeft(0);
-			backgroundRect.setRight(option.rect.right() - option.rect.height() / 2 - padding);
-			backgroundRect.setTop(option.rect.top());
-			backgroundRect.setBottom(option.rect.bottom());
+			backgroundRect.setRight(option.rect.right() - (option.rect.height()  - 2 * padding) / 2 - padding);
+			backgroundRect.setTop(option.rect.top() + padding);
+			backgroundRect.setBottom(option.rect.bottom() - padding);
 			painter->fillRect(backgroundRect, backgroundColor);
 
 			QRect backgroundRightEllipse;
-			backgroundRightEllipse.setLeft(option.rect.right() - option.rect.height() - padding);
+			backgroundRightEllipse.setLeft(option.rect.right() - (option.rect.height() - 2 * padding) - padding);
 			backgroundRightEllipse.setRight(option.rect.right() - padding);
-			backgroundRightEllipse.setTop(option.rect.top());
-			backgroundRightEllipse.setBottom(option.rect.bottom());
+			backgroundRightEllipse.setTop(option.rect.top() + padding);
+			backgroundRightEllipse.setBottom(option.rect.bottom() - padding);
 			painter->drawEllipse(backgroundRightEllipse);
 		}
 		else {
@@ -86,8 +119,8 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 	}
 	else{
 		iconRect = option.rect;
-		iconRect.setLeft(offset + padding + 2 + padding);
-		iconRect.setWidth(pageTreePtr->iconSize().width());
+		iconRect.setLeft(offset);
+		iconRect.setWidth(option.rect.height());
 	}
 
 	QIcon::Mode iconMode = QIcon::Mode::Normal;

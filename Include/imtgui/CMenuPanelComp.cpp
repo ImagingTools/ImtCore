@@ -23,16 +23,18 @@ void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QBy
 			if (m_pagesInfoMap.contains(selectedPageId)){
 				PageIdToSelectionAlias currentAlias = m_pagesInfoMap[selectedPageId];
 
-				iprm::ISelectionParam *currentSelectionParam = const_cast<iprm::ISelectionParam*>(currentAlias.selectionPtr);
+				iprm::ISelectionParam *currentSelectionParamPtr = const_cast<iprm::ISelectionParam*>(currentAlias.selectionPtr);
+				Q_ASSERT(currentSelectionParamPtr != nullptr);
 
-				currentSelectionParam->SetSelectedOptionIndex(currentAlias.pageIndex);
+				currentSelectionParamPtr->SetSelectedOptionIndex(currentAlias.pageIndex);
 
 				QByteArray pageId = m_pagesInfoMap[selectedPageId].parentPageId;
 				while (!pageId.isEmpty()){
 					currentAlias = m_pagesInfoMap[pageId];
-					currentSelectionParam = const_cast<iprm::ISelectionParam*>(currentAlias.selectionPtr);
-					
-					currentSelectionParam->SetSelectedOptionIndex(currentAlias.pageIndex);
+					currentSelectionParamPtr = const_cast<iprm::ISelectionParam*>(currentAlias.selectionPtr);
+					Q_ASSERT(currentSelectionParamPtr != nullptr);
+
+					currentSelectionParamPtr->SetSelectedOptionIndex(currentAlias.pageIndex);
 					
 					pageId = m_pagesInfoMap[pageId].parentPageId;
 				}
@@ -48,6 +50,7 @@ void CMenuPanelComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 	imtwidgets::CMenuPanel* widgetPtr = dynamic_cast<imtwidgets::CMenuPanel*>(GetWidget());
+	Q_ASSERT(widgetPtr != nullptr);
 	connect(widgetPtr, &imtwidgets::CMenuPanel::PageIdChanged, this, &CMenuPanelComp::OnPageIdChanged);
 
 	widgetPtr->SetItemPadding(4);

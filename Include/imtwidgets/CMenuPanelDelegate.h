@@ -17,9 +17,10 @@ class CMenuPanelDelegate : public QStyledItemDelegate
 	Q_OBJECT
 
 public:
-	explicit CMenuPanelDelegate(imtwidgets::CMenuPanel *menuPanelPtr = nullptr){}
+	explicit CMenuPanelDelegate(QTreeView *menuPanelPtr = nullptr): QStyledItemDelegate(menuPanelPtr) {}
 
-	virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+	virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 
 
