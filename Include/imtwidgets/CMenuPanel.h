@@ -111,7 +111,7 @@ private:
 private:
 	QModelIndex GetModelIndex(const QByteArray& pageId) const;
 	int CalculateMaxItemWith();
-	void checkButtonsVisible();
+	void CheckButtonsVisible();
 };
 
 

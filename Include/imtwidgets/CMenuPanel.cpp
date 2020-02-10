@@ -429,38 +429,43 @@ void CMenuPanel::OnAnimationFinished()
 void CMenuPanel::on_pushBottom_clicked()
 {
 	QModelIndex index = PageTree->indexAt(QPoint(0, PageTree->height()));
+
 	PageTree->scrollTo(index);
-	if (index == PageTree->indexAt(QPoint(0, PageTree->height())))
-	{
+
+	if (index == PageTree->indexAt(QPoint(0, PageTree->height()))){
 		index = PageTree->indexBelow(index);
+
 		PageTree->scrollTo(index);
 	}
-	checkButtonsVisible();
+
+	CheckButtonsVisible();
 }
 
 
 void CMenuPanel::on_pushTop_clicked()
 {
 	QModelIndex index = PageTree->indexAt(QPoint(0, 0));
+
 	PageTree->scrollTo(index);
 
-	if (index == PageTree->indexAt(QPoint(0, 0)))
-	{
+	if (index == PageTree->indexAt(QPoint(0, 0))){
 		index = PageTree->indexAbove(index);
+
 		PageTree->scrollTo(index);
 	}
-	checkButtonsVisible();
+
+	CheckButtonsVisible();
 }
 
 
 // protected methods
 
-
 // reimplemented (QObject)
 
 bool CMenuPanel::eventFilter(QObject *obj, QEvent *event)
 {
-	checkButtonsVisible();
+	CheckButtonsVisible();
+
 	return QObject::eventFilter(obj, event);
 }
 
@@ -511,8 +516,10 @@ void CMenuPanel::enterEvent(QEvent* /*event*/)
 		if (m_animationTimerIdentifier != 0){
 			killTimer(m_animationTimerIdentifier);
 		}
+
 		m_animationTimerIdentifier = startTimer(m_animationDelay);
 	}
+
 	m_animationAction = AA_EXPAND;
 }
 
@@ -523,16 +530,19 @@ void CMenuPanel::leaveEvent(QEvent* /*event*/)
 		if (m_animationTimerIdentifier != 0){
 			killTimer(m_animationTimerIdentifier);
 		}
+
 		m_animationTimerIdentifier = startTimer(m_animationDelay);
 	}
+
 	m_animationAction = AA_COLLAPSE;
 }
 
 
 void CMenuPanel::resizeEvent(QResizeEvent *event)
 {
-	Q_UNUSED(event)
-	checkButtonsVisible();
+	Q_UNUSED(event);
+
+	CheckButtonsVisible();
 }
 
 
@@ -626,24 +636,20 @@ int CMenuPanel::CalculateMaxItemWith()
 }
 
 
-void CMenuPanel::checkButtonsVisible()
+void CMenuPanel::CheckButtonsVisible()
 {
 	int position = PageTree->verticalScrollBar()->value();
-	if (position == 0)
-	{
+	if (position == 0){
 		pushTop->setVisible(false);
 	}
-	else
-	{
+	else{
 		pushTop->setVisible(true);
 	}
 
-	if (position == PageTree->verticalScrollBar()->maximum())
-	{
+	if (position == PageTree->verticalScrollBar()->maximum()){
 		pushBottom->setVisible(false);
 	}
-	else
-	{
+	else{
 		pushBottom->setVisible(true);
 	}
 }
