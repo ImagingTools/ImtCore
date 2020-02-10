@@ -22,19 +22,17 @@ void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QBy
 		if (!selectedPageId.isEmpty()){
 			if (m_pagesInfoMap.contains(selectedPageId)){
 				PageIdToSelectionAlias currentAlias = m_pagesInfoMap[selectedPageId];
+
 				iprm::ISelectionParam *currentSelectionParam = const_cast<iprm::ISelectionParam*>(currentAlias.selectionPtr);
 
-				//qDebug() << currentAlias.parentPageId << currentAlias.selectionPtr << currentAlias.pageIndex;
-
-				qDebug() << currentSelectionParam->SetSelectedOptionIndex(currentAlias.pageIndex);
+				currentSelectionParam->SetSelectedOptionIndex(currentAlias.pageIndex);
 
 				QByteArray pageId = m_pagesInfoMap[selectedPageId].parentPageId;
 				while (!pageId.isEmpty()){
 					currentAlias = m_pagesInfoMap[pageId];
 					currentSelectionParam = const_cast<iprm::ISelectionParam*>(currentAlias.selectionPtr);
-					qDebug() <<  currentSelectionParam->SetSelectedOptionIndex(currentAlias.pageIndex);
-
-					//qDebug() << currentAlias.parentPageId << currentAlias.selectionPtr << currentAlias.pageIndex;
+					
+					currentSelectionParam->SetSelectedOptionIndex(currentAlias.pageIndex);
 					
 					pageId = m_pagesInfoMap[pageId].parentPageId;
 				}
@@ -55,9 +53,9 @@ void CMenuPanelComp::OnGuiCreated()
 	widgetPtr->SetItemPadding(4);
 	widgetPtr->SetIconSize(24);
 
-	widgetPtr->SetItemTextColor(QColor(255, 0, 0));
+	widgetPtr->SetItemTextColor(QColor("#335777"));
 	widgetPtr->SetItemSelectedColor(QColor(240, 200, 120));
-	widgetPtr->SetItemSelectedContourColor(QColor(0, 255, 0));
+	widgetPtr->SetItemSelectedContourColor(QColor("#335777"));
 	widgetPtr->SetItemMouserOverColor(QColor(240, 220, 100));
 	widgetPtr->SetItemMouserOverSelectedColor(QColor(255, 235, 100));
 
