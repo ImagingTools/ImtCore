@@ -21,7 +21,7 @@ class CMenuPanelComp:
 						iqtgui::TGuiObserverWrap<
 									iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
 									imod::TSingleModelObserverBase<iprm::ISelectionParam>>>,
-			public imod::CMultiModelDispatcherBase
+			protected imod::CMultiModelDispatcherBase
 {
 	//Q_OBJECT
 
@@ -30,7 +30,7 @@ public:
 				iqtgui::TGuiObserverWrap<
 							iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
 							imod::TSingleModelObserverBase<iprm::ISelectionParam>>> BaseClass;
-	typedef public imod::CMultiModelDispatcherBase BaseClass2;
+	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CMenuPanelComp);
 	I_END_COMPONENT;
