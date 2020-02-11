@@ -127,13 +127,13 @@ public:
 
 	// reimplemented (imtgui::IWidgetProvider)
 	virtual const imtbase::ICollectionInfo* GetWidgetList() const override;
-	virtual QWidget* GetWidget() const override;
+	virtual QWidget* GetWidgetPtr(const QByteArray& widgetId) const override;
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 	//reimplemented (QObject)
-	virtual bool eventFilter(QObject *watched, QEvent *event) override;
+	virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 protected:
 	// reimplemented (iqtgui::TRestorableGuiWrap)

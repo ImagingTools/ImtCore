@@ -23,7 +23,7 @@ public:
 	/**
 		Get widget from the container according to the given ID.
 	*/
-	virtual QWidget* GetWidget(const QByteArray& widgetId) const = 0;
+	virtual QWidget* GetWidgetPtr(const QByteArray& widgetId) const = 0;
 };
 
 

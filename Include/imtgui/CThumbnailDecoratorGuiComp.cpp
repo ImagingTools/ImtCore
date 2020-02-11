@@ -60,7 +60,7 @@ const imtbase::ICollectionInfo* CThumbnailDecoratorGuiComp::GetWidgetList() cons
 }
 
 
-QWidget* CThumbnailDecoratorGuiComp::GetWidget() const
+QWidget* CThumbnailDecoratorGuiComp::GetWidgetPtr(const QByteArray& widgetId) const
 {
 	if (IsGuiCreated()){
 		return Main;
