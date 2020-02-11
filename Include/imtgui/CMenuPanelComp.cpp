@@ -49,6 +49,7 @@ void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QBy
 void CMenuPanelComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
+
 	imtwidgets::CMenuPanel* widgetPtr = dynamic_cast<imtwidgets::CMenuPanel*>(GetWidget());
 	Q_ASSERT(widgetPtr != nullptr);
 	connect(widgetPtr, &imtwidgets::CMenuPanel::PageIdChanged, this, &CMenuPanelComp::OnPageIdChanged);
@@ -71,6 +72,8 @@ void CMenuPanelComp::OnGuiCreated()
 
 void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 {
+	BaseClass::UpdateGui(changeSet);
+
 	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
 	Q_ASSERT(panelPtr != nullptr);
 
@@ -85,8 +88,6 @@ void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 
 	QByteArray selectedPageId = FindSelectedItem();
 	panelPtr->SetActivePage(selectedPageId);
-
-	BaseClass::UpdateGui(changeSet);
 }
 
 
@@ -97,6 +98,14 @@ void CMenuPanelComp::OnGuiRetranslate()
 	BaseClass::OnGuiRetranslate();
 
 	UpdateGui(istd::IChangeable::GetAnyChange());
+}
+
+
+void CMenuPanelComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+{
+	BaseClass2::OnModelChanged(modelId, changeSet);
+
+	UpdateGui(changeSet);
 }
 
 
@@ -146,8 +155,12 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 
 void CMenuPanelComp::CreatePageIdAliases(const iprm::ISelectionParam& selection, const QByteArray& parentId)
 {
+	UnregisterAllModels();
+
 	int currentIndex = selection.GetSelectedOptionIndex();
 	QByteArray currentPageId;
+	int subSelectionIterator = 0;
+
 	const iprm::IOptionsList* pageListPtr = selection.GetSelectionConstraints();
 	if (pageListPtr != nullptr){
 		int pageCount = pageListPtr->GetOptionsCount();
@@ -167,6 +180,11 @@ void CMenuPanelComp::CreatePageIdAliases(const iprm::ISelectionParam& selection,
 
 			const iprm::ISelectionParam* subSelectionPtr = selection.GetSubselection(pageIndex);
 			if (subSelectionPtr != nullptr){
+				const imod::IModel* constModelPtr = dynamic_cast<const imod::IModel*>(subSelectionPtr);
+				imod::IModel* modelPtr = const_cast<imod::IModel*>(constModelPtr);
+				if (modelPtr != nullptr){
+					RegisterModel(modelPtr, subSelectionIterator++);
+				}
 				CreatePageIdAliases(*subSelectionPtr, pageId);
 			}
 		}

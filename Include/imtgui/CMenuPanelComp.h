@@ -6,7 +6,7 @@
 #include <iqtgui/TGuiObserverWrap.h>
 #include <iqtgui/TGuiComponentBase.h>
 #include <iprm/ISelectionParam.h>
-#include <imod/TSingleModelObserverBase.h>
+#include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
 #include <imtwidgets/CMenuPanel.h>
@@ -20,7 +20,8 @@ class CMenuPanelComp:
 			public ibase::TModelObserverCompBaseWrap<
 						iqtgui::TGuiObserverWrap<
 									iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
-									imod::TSingleModelObserverBase<iprm::ISelectionParam>>>
+									imod::TSingleModelObserverBase<iprm::ISelectionParam>>>,
+			public imod::CMultiModelDispatcherBase
 {
 	//Q_OBJECT
 
@@ -29,6 +30,7 @@ public:
 				iqtgui::TGuiObserverWrap<
 							iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
 							imod::TSingleModelObserverBase<iprm::ISelectionParam>>> BaseClass;
+	typedef public imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CMenuPanelComp);
 	I_END_COMPONENT;
@@ -44,6 +46,9 @@ protected:
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiRetranslate() override;
+
+	// reimplemented (imod::CMultiModelDispatcherBase)
+	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
 	struct PageIdToSelectionAlias
