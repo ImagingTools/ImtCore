@@ -103,7 +103,7 @@ void CMenuPanelComp::OnGuiRetranslate()
 
 void CMenuPanelComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
 {
-	UpdateGui(changeSet);
+	//UpdateGui(changeSet);
 }
 
 
