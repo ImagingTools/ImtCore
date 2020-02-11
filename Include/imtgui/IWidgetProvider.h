@@ -2,7 +2,10 @@
 
 
 // Qt includes
-#include <QtCore/QWidget>
+#include <QtWidgets/QWidget>
+
+// ImtCore includes
+#include <imtbase/ICollectionInfo.h>
 
 
 namespace imtgui

@@ -17,9 +17,6 @@
 #include <iqtgui/IMultiVisualStatusProvider.h>
 #include <iqtgui/CCommandTools.h>
 
-// ImtCore includes
-#include <imtgui/CThumbPageItemGuiDelegate.h>
-
 
 namespace imtgui
 {
@@ -52,6 +49,24 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 
 	qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
 	qRegisterMetaType<QProcess::ProcessState>();
+}
+
+
+// reimplemented (ibase::ICommandsProvider)
+
+const imtbase::ICollectionInfo* CThumbnailDecoratorGuiComp::GetWidgetList() const
+{
+	return nullptr;
+}
+
+
+QWidget* CThumbnailDecoratorGuiComp::GetWidget() const
+{
+	if (IsGuiCreated()){
+		return Main;
+	}
+
+	return nullptr;
 }
 
 

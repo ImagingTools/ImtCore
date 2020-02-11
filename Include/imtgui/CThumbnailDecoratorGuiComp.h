@@ -21,6 +21,7 @@
 #include <iauth/IRightsProvider.h>
 
 // ImtCore includes
+#include <imtgui/IWidgetProvider.h>
 #include <imtgui/CThumbPageItemGuiDelegate.h>
 #include <GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h>
 
@@ -78,7 +79,8 @@ protected:
 
 class CThumbnailDecoratorGuiComp:
 			public CThumbnailDecoratorGuiCompAttr,
-			public virtual ibase::ICommandsProvider
+			public virtual ibase::ICommandsProvider,
+			virtual public IWidgetProvider
 {
 	Q_OBJECT
 
@@ -87,6 +89,7 @@ public:
 
 	I_BEGIN_COMPONENT(CThumbnailDecoratorGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
+		I_REGISTER_INTERFACE(IWidgetProvider);
 		I_ASSIGN(m_pagesWidgetCompPtr, "PageUiContainer", "UI component containing all application pages", true, "PageUiContainer");
 		I_ASSIGN(m_pagesCompPtr, "PageModel", "Data model describing the used pages", true, "PageModel");
 		I_ASSIGN_TO(m_pagesModelCompPtr, m_pagesCompPtr, true);
@@ -121,6 +124,10 @@ public:
 	};
 
 	CThumbnailDecoratorGuiComp();
+
+	// reimplemented (imtgui::IWidgetProvider)
+	virtual const imtbase::ICollectionInfo* GetWidgetList() const override;
+	virtual QWidget* GetWidget() const override;
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
