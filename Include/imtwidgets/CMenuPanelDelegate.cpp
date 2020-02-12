@@ -17,8 +17,8 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
 	Q_ASSERT(pageTreePtr != nullptr);
 
 	int indent = 0;
-	if (pageTreePtr->property("indent").isValid()){
-		indent = pageTreePtr->property("indent").toInt();
+	if (pageTreePtr->property("indentMax").isValid()){
+		indent = pageTreePtr->property("indentMax").toInt();
 	}
 	int padding = 0;
 	if (pageTreePtr->property("padding").isValid()){
@@ -37,8 +37,8 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
 
 	int width = 2 * padding + offset + pageTreePtr->iconSize().width() + 2 * padding;
 	QFontMetrics fm = pageTreePtr->fontMetrics();
-	width += fm.boundingRect(index.data(Qt::ItemDataRole::DisplayRole).toString()).width() + 4 * padding;
-	
+	width += fm.boundingRect(index.data(Qt::DisplayRole).toString()).width() + 3 * padding;
+
 	size.setWidth(width);
 
 	return size;
@@ -74,9 +74,9 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 	// Draw background:
 	QRect singleEllipse;
 	singleEllipse.setLeft(padding);
+	singleEllipse.setRight(padding + (option.rect.height() - 2 * padding));
 	singleEllipse.setTop(option.rect.top() + padding);
-	singleEllipse.setHeight(option.rect.height() - 2 * padding);
-	singleEllipse.setWidth(option.rect.height() - 2 * padding);
+	singleEllipse.setBottom(option.rect.bottom() - padding);
 
 	if (option.state & QStyle::State_Selected || option.state & QStyle::State_MouseOver){
 		painter->setBrush(QBrush(backgroundColor));
@@ -114,13 +114,10 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 
 	// Draw icon:
 	QRect iconRect;
-	if (indent == 0){
-		iconRect = singleEllipse;
-	}
-	else{
-		iconRect = option.rect;
-		iconRect.setLeft(offset);
-		iconRect.setWidth(option.rect.height());
+	iconRect = singleEllipse;
+	if (indent != 0){
+		iconRect.setLeft(singleEllipse.left() + offset);
+		iconRect.setRight(singleEllipse.right() + offset);
 	}
 
 	QIcon::Mode iconMode = QIcon::Mode::Normal;
@@ -153,7 +150,7 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 	painter->setPen(pageTreePtr->property("ItemTextColor").value<QColor>());
 	if (indent > 0){
 		QRect textRect = option.rect;
-		textRect.setLeft(iconRect.right() + 2 * padding);
+		textRect.setLeft(iconRect.right() + padding);
 
 		option.widget->style()->drawItemText(
 					painter,

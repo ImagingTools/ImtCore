@@ -58,7 +58,9 @@ void CMenuPanelComp::OnGuiCreated()
 		widgetPtr->SetMainWidget(m_widgetProviderPtr->GetWidgetPtr(QByteArray()));
 	}
 
+	widgetPtr->SetItemIndent(20);
 	widgetPtr->SetItemPadding(4);
+
 	widgetPtr->SetIconSize(24);
 
 	widgetPtr->SetItemTextColor(QColor("#335777"));

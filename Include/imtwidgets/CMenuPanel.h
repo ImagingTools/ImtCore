@@ -66,6 +66,8 @@ public:
 	virtual void SetAnimationDelay(int delay);
 	virtual void SetAnimationDuration(int duration);
 
+	virtual void SetItemIndent(int indent);
+
 	virtual void SetItemTextColor(QColor color);
 	virtual void SetItemSelectedColor(QColor color);
 	virtual void SetItemSelectedContourColor(QColor color);

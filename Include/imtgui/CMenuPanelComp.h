@@ -24,8 +24,6 @@ class CMenuPanelComp:
 									imod::TSingleModelObserverBase<iprm::ISelectionParam>>>,
 			protected imod::CMultiModelDispatcherBase
 {
-	//Q_OBJECT
-
 public:
 	typedef ibase::TModelObserverCompBaseWrap<
 				iqtgui::TGuiObserverWrap<

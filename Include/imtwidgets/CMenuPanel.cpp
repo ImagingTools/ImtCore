@@ -60,7 +60,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	PageTree->verticalScrollBar()->installEventFilter(this);
 
 	PageTree->setContentsMargins(QMargins(0,0,0,0));
-	//PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
+	PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
 
 	m_animationWidthComp.setTargetObject(this);
 	m_animationWidthComp.setPropertyName("geometry");
@@ -346,7 +346,7 @@ void CMenuPanel::SetItemPadding(int padding)
 	if (padding > 0){
 		m_padding = padding;
 		PageTree->setProperty("padding", padding);
-		//PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
+		PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
 	}
 }
 
@@ -355,7 +355,7 @@ void CMenuPanel::SetIconSize(int size)
 {
 	if (size > 8){
 		PageTree->setIconSize(QSize(size, size));
-		//PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
+		PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
 	}
 }
 
@@ -369,6 +369,13 @@ void CMenuPanel::SetAnimationDelay(int delay)
 void CMenuPanel::SetAnimationDuration(int duration)
 {
 	m_animationDuration = duration;
+}
+
+
+void CMenuPanel::SetItemIndent(int indent)
+{
+	m_indent = indent;
+	PageTree->setProperty("indentMax", indent);
 }
 
 
@@ -551,35 +558,6 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 		m_animationIndent.setDuration(m_animationDuration - 10);
 		m_animationIndent.start();
 	}
-
-	//if (m_animationAction == AA_EXPAND && PageTree->maximumWidth() != m_maxWidth){
-	//	m_animationWidth.stop();
-	//	m_animationWidth.setStartValue(PageTree->maximumWidth());
-	//	m_animationWidth.setEndValue(m_maxWidth);
-	//	m_animationWidth.setDuration(m_animationDuration);
-	//	m_animationWidth.start();
-
-	//	m_animationIndent.stop();
-	//	m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
-	//	m_animationIndent.setEndValue(m_indent);
-	//	m_animationIndent.setDuration(m_animationDuration - 10);
-	//	m_animationIndent.start();
-	//}
-
-	//int minWidth = PageTree->iconSize().width() + 4 * m_padding;
-	//if (m_animationAction == AA_COLLAPSE && PageTree->maximumWidth() != minWidth){
-	//	m_animationWidth.stop();
-	//	m_animationWidth.setStartValue(PageTree->maximumWidth());
-	//	m_animationWidth.setEndValue(minWidth);
-	//	m_animationWidth.setDuration(m_animationDuration);
-	//	m_animationWidth.start();
-
-	//	m_animationIndent.stop();
-	//	m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
-	//	m_animationIndent.setEndValue(0);
-	//	m_animationIndent.setDuration(m_animationDuration - 10);
-	//	m_animationIndent.start();
-	//}
 
 	m_animationAction = AA_NONE;
 }
