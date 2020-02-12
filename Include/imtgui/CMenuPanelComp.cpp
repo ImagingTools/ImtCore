@@ -85,8 +85,12 @@ void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 	Q_ASSERT(pageSelectionPtr != nullptr);
 
 	m_pagesInfoMap.clear();
+	
 	{
 		UpdateBlocker updateBlocker(this);
+
+		UnregisterAllModels();
+
 		CreatePageIdAliases(*pageSelectionPtr, QByteArray());
 	}
 
@@ -177,8 +181,6 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 
 void CMenuPanelComp::CreatePageIdAliases(const iprm::ISelectionParam& selection, const QByteArray& parentId)
 {
-	UnregisterAllModels();
-
 	int currentIndex = selection.GetSelectedOptionIndex();
 	QByteArray currentPageId;
 	int subSelectionIterator = 0;
