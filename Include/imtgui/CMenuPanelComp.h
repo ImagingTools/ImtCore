@@ -62,7 +62,7 @@ private:
 	QMap<QByteArray, PageIdToSelectionAlias> m_pagesInfoMap;
 
 	I_REF(imtgui::IWidgetProvider, m_widgetProviderPtr);
-    I_ATTR(bool, m_isShowOverPtr);
+	I_ATTR(bool, m_isShowOverPtr);
 
 private:
 	void CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId);
