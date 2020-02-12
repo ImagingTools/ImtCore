@@ -10,13 +10,6 @@ namespace imtgui
 {
 
 
-CMenuPanelComp::CMenuPanelComp()
-	:m_blockUpdateGui(false)
-{
-
-}
-
-
 // protected methods
 
 void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QByteArray& /*deselectedPageId*/)
@@ -92,9 +85,10 @@ void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 	Q_ASSERT(pageSelectionPtr != nullptr);
 
 	m_pagesInfoMap.clear();
-	m_blockUpdateGui = true;
-	CreatePageIdAliases(*pageSelectionPtr, QByteArray());
-	m_blockUpdateGui = false;
+	{
+		UpdateBlocker updateBlocker(this);
+		CreatePageIdAliases(*pageSelectionPtr, QByteArray());
+	}
 
 	CreateMenuForSelection(*pageSelectionPtr, QByteArray());
 
@@ -115,7 +109,7 @@ void CMenuPanelComp::OnGuiRetranslate()
 
 void CMenuPanelComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& changeSet)
 {
-	if (!m_blockUpdateGui){
+	if (!IsUpdateBlocked()){
 		UpdateGui(changeSet);
 	}
 }
@@ -123,7 +117,25 @@ void CMenuPanelComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::Ch
 
 // private methods
 
-void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId, bool enabled)
+bool CMenuPanelComp::IsPageEnabledWithParents(const QByteArray& pageId)
+{
+	QByteArray currentId = pageId;
+
+	while (!currentId.isEmpty()){
+		PageIdToSelectionAlias alias = m_pagesInfoMap[currentId];
+		const iprm::IOptionsList* list = alias.selectionPtr->GetSelectionConstraints();
+		if (!list->IsOptionEnabled(alias.pageIndex)){
+			return false;
+		}
+
+		currentId = m_pagesInfoMap[currentId].parentPageId;
+	}
+
+	return true;
+}
+
+
+void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId)
 {
 	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
 	Q_ASSERT(panelPtr != nullptr);
@@ -141,7 +153,8 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 
 			if (panelPtr->InsertPage(pageId, parentId)){
 				panelPtr->SetPageName(pageId, pageName);
-				bool enablePage = enabled && pageListPtr->IsOptionEnabled(pageIndex);
+
+				bool enablePage = IsPageEnabledWithParents(pageId);
 				panelPtr->SetPageEnabled(pageId, enablePage);
 
 				const iqtgui::IVisualStatus* visualStatusPtr = pageVisualStatus->GetVisualStatus(pageIndex);
@@ -153,7 +166,7 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 
 				const iprm::ISelectionParam* subSelectionPtr = selection.GetSubselection(pageIndex);
 				if (subSelectionPtr != nullptr){
-					CreateMenuForSelection(*subSelectionPtr, pageId, enablePage);
+					CreateMenuForSelection(*subSelectionPtr, pageId);
 				}
 			}
 		}

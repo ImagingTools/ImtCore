@@ -36,8 +36,6 @@ public:
 		I_ASSIGN(m_isShowOverAttrPtr, "ShowOver", "Show expanded menu over the underlaying widget", false, true);
 	I_END_COMPONENT;
 
-	CMenuPanelComp();
-
 protected:
 	void OnPageIdChanged(const QByteArray& selectedPageId, const QByteArray& deselectedPageId);
 
@@ -62,13 +60,13 @@ private:
 	};
 
 	QMap<QByteArray, PageIdToSelectionAlias> m_pagesInfoMap;
-	bool m_blockUpdateGui;
 
 	I_REF(imtgui::IWidgetProvider, m_widgetProviderCompPtr);
 	I_ATTR(bool, m_isShowOverAttrPtr);
 
 private:
-	void CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId, bool enabled = true);
+	bool IsPageEnabledWithParents(const QByteArray& pageId);
+	void CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId);
 	void CreatePageIdAliases(const iprm::ISelectionParam& selection, const QByteArray& parentId);
 	QByteArray FindSelectedItem();
 };
