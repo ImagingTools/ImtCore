@@ -1,17 +1,19 @@
-#include "CMenuPanelDelegate.h"
-#include "CMenuPanel.h"
+#include "imtwidgets/CMenuPanelDelegate.h"
 
 
 // Qt includes
 #include "QtGui/QPainter"
 #include "QtWidgets/QTreeView"
 
+// ImtCore includes
+#include "imtwidgets/CMenuPanel.h"
+
 
 namespace imtwidgets
 {
 
 
-QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const QModelIndex& index) const
 {
 	QTreeView* pageTreePtr = qobject_cast<QTreeView*>(parent());
 	Q_ASSERT(pageTreePtr != nullptr);
@@ -45,13 +47,12 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
 }
 
 
-void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
 	const QTreeView *pageTreePtr = qobject_cast<const QTreeView*>(option.widget);
 	Q_ASSERT(pageTreePtr != nullptr);
 
 	int indent = pageTreePtr->property("indent").toInt();
-	int indentMax = pageTreePtr->property("indentMax").toInt();
 	int padding = pageTreePtr->property("padding").toInt();
 
 	QColor backgroundColor;
@@ -74,7 +75,7 @@ void CMenuPanelDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 	// Draw background:
 	QRect singleEllipse;
 	singleEllipse.setLeft(padding);
-	singleEllipse.setRight(padding + (option.rect.height() - 2 * padding));
+	singleEllipse.setRight(padding + (option.rect.height() - 2 * padding) - 1);
 	singleEllipse.setTop(option.rect.top() + padding);
 	singleEllipse.setBottom(option.rect.bottom() - padding);
 

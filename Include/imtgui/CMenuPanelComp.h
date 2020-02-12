@@ -32,8 +32,8 @@ public:
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CMenuPanelComp);
-	I_ASSIGN(m_widgetProviderPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
-	I_ASSIGN(m_isShowOverPtr, "ShowOver", "Show menu over", false, true);
+		I_ASSIGN(m_widgetProviderPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
+		I_ASSIGN(m_isShowOverPtr, "ShowOver", "Show menu over", false, true);
 	I_END_COMPONENT;
 
 protected:

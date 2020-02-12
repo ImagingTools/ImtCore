@@ -1,8 +1,6 @@
 #include <imtgui/CMenuPanelComp.h>
 
 
-// Qt includes
-
 // ACF includes
 #include <iprm/IOptionsList.h>
 #include <iqtgui/IMultiVisualStatusProvider.h>
@@ -54,7 +52,7 @@ void CMenuPanelComp::OnGuiCreated()
 	Q_ASSERT(widgetPtr != nullptr);
 	connect(widgetPtr, &imtwidgets::CMenuPanel::PageIdChanged, this, &CMenuPanelComp::OnPageIdChanged);
 
-	if (m_widgetProviderPtr.IsValid() && m_isShowOverPtr.IsValid() && *m_isShowOverPtr) {
+	if (m_widgetProviderPtr.IsValid() && m_isShowOverPtr.IsValid() && *m_isShowOverPtr){
 		widgetPtr->SetMainWidget(m_widgetProviderPtr->GetWidgetPtr(QByteArray()));
 	}
 
@@ -107,7 +105,7 @@ void CMenuPanelComp::OnGuiRetranslate()
 }
 
 
-void CMenuPanelComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CMenuPanelComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	//UpdateGui(changeSet);
 }

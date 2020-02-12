@@ -74,7 +74,7 @@ public:
 	virtual void SetItemMouserOverColor(QColor color);
 	virtual void SetItemMouserOverSelectedColor(QColor color);
 
-	virtual void SetMainWidget(QWidget *mainWidget);
+	virtual void SetMainWidget(QWidget* mainWidget);
 
 
 Q_SIGNALS:
@@ -91,13 +91,13 @@ private Q_SLOTS:
 
 protected:
 	// reimplemented (QObject)
-	virtual bool eventFilter(QObject *watched, QEvent *event) override;
-	virtual void timerEvent(QTimerEvent *event);
+	virtual bool eventFilter(QObject* watched, QEvent* event) override;
+	virtual void timerEvent(QTimerEvent* event);
 
 	// reimplemented (QWidget)
 	virtual void enterEvent(QEvent* event) override;
 	virtual void leaveEvent(QEvent* event) override;
-	virtual void resizeEvent(QResizeEvent *event) override;
+	virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
 	int m_padding;

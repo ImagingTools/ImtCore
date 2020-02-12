@@ -1,13 +1,15 @@
 #include <imtwidgets/CMenuPanel.h>
-#include <imtwidgets/CMenuPanelDelegate.h>
+
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtCore/QEvent>
 #include <QtCore/QStack>
 #include <QtCore/QModelIndex>
 #include <QtGui/QStandardItem>
 #include <QtWidgets/QScrollBar>
+
+// ImtCore includes
+#include <imtwidgets/CMenuPanelDelegate.h>
 
 
 namespace imtwidgets
@@ -408,12 +410,10 @@ void CMenuPanel::SetItemMouserOverSelectedColor(QColor color)
 	PageTree->setProperty("ItemMouserOverSelectedColor", color);
 }
 
-void CMenuPanel::SetMainWidget(QWidget *mainWidget)
+void CMenuPanel::SetMainWidget(QWidget* mainWidget)
 {
 	m_mainWidget = mainWidget;
-	//m_overWidget = new QWidget(m_mainWidget);
 	this->setParent(m_mainWidget);
-	//m_leftMenuPanelGuiCompPtr->GetWidget()->installEventFilter(this);
 	m_mainWidget->installEventFilter(this);
 
 	if (m_leftFrame)
@@ -488,12 +488,12 @@ void CMenuPanel::on_pushTop_clicked()
 
 // reimplemented (QObject)
 
-bool CMenuPanel::eventFilter(QObject *watched, QEvent *event)
+bool CMenuPanel::eventFilter(QObject* watched, QEvent* event)
 {
 	int eventType = event->type();
 
-	if (m_mainWidget && watched == m_mainWidget) {
-		if (eventType == QEvent::Resize) {
+	if (m_mainWidget && watched == m_mainWidget){
+		if (eventType == QEvent::Resize){
 			QRect rect = this->geometry();
 			rect.setHeight(m_mainWidget->height());
 			this->setGeometry(rect);
@@ -512,15 +512,15 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 	killTimer(m_animationTimerIdentifier);
 	m_animationTimerIdentifier = 0;
 
-	if (m_animationAction == AA_EXPAND && this->width() != m_maxWidth) {
-		if (m_mainWidget) {
+	if (m_animationAction == AA_EXPAND && this->width() != m_maxWidth){
+		if (m_mainWidget){
 			m_animationWidthComp.stop();
 			m_animationWidthComp.setStartValue(QRect(0, 0, this->width(), height()));
 			m_animationWidthComp.setEndValue(QRect(0, 0, m_maxWidth, height()));
 			m_animationWidthComp.setDuration(m_animationDuration);
 			m_animationWidthComp.start();
 		}
-		else {
+		else{
 			m_animationWidth.stop();
 			m_animationWidth.setStartValue(PageTree->maximumWidth());
 			m_animationWidth.setEndValue(m_maxWidth);
@@ -537,15 +537,15 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 
 	int minWidth = PageTree->iconSize().width() + 4 * m_padding;
 
-	if (m_animationAction == AA_COLLAPSE && this->width() != minWidth) {
-		if (m_mainWidget) {
+	if (m_animationAction == AA_COLLAPSE && this->width() != minWidth){
+		if (m_mainWidget){
 			m_animationWidthComp.stop();
 			m_animationWidthComp.setStartValue(QRect(0, 0, width(), height()));
 			m_animationWidthComp.setEndValue(QRect(0, 0, minWidth, height()));
 			m_animationWidthComp.setDuration(m_animationDuration);
 			m_animationWidthComp.start();
 		}
-		else {
+		else{
 			m_animationWidth.stop();
 			m_animationWidth.setStartValue(PageTree->maximumWidth());
 			m_animationWidth.setEndValue(minWidth);
@@ -593,11 +593,11 @@ void CMenuPanel::leaveEvent(QEvent* /*event*/)
 }
 
 
-void CMenuPanel::resizeEvent(QResizeEvent *event)
+void CMenuPanel::resizeEvent(QResizeEvent* event)
 {
 	Q_UNUSED(event);
 
-	if (m_mainWidget) {
+	if (m_mainWidget){
 		PageTree->setMaximumWidth(this->width());
 	}
 
@@ -691,17 +691,17 @@ int CMenuPanel::CalculateMaxItemWith()
 
 		index = stack.pop();
 	}
-	if (m_mainWidget) {
-		if (m_leftFrame)
-		{
+	if (m_mainWidget){
+		if (m_leftFrame){
 			m_leftFrame->setMinimumWidth(minWidth);
 			m_leftFrame->setMaximumWidth(minWidth);
 		}
+
 		QRect rect = this->geometry();
 		rect.setWidth(minWidth);
 		this->setGeometry(rect);
 	}
-	else {
+	else{
 		PageTree->setMaximumWidth(minWidth);
 	}
 
