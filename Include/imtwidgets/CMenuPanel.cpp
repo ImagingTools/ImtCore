@@ -24,7 +24,9 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_animationAction(AA_NONE),
 	m_animationTimerIdentifier(0),
 	m_animationDelay(100),
-	m_animationDuration(100)
+	m_animationDuration(100),
+	m_mainWidget(nullptr),
+	m_leftFrame(parent)
 {
 	setupUi(this);
 
@@ -58,8 +60,10 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	PageTree->verticalScrollBar()->installEventFilter(this);
 
 	PageTree->setContentsMargins(QMargins(0,0,0,0));
-	PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
+	//PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
 
+	m_animationWidthComp.setTargetObject(this);
+	m_animationWidthComp.setPropertyName("geometry");
 	m_animationWidth.setTargetObject(PageTree);
 	m_animationWidth.setPropertyName("maximumWidth");
 	m_animationIndent.setTargetObject(PageTree);
@@ -342,7 +346,7 @@ void CMenuPanel::SetItemPadding(int padding)
 	if (padding > 0){
 		m_padding = padding;
 		PageTree->setProperty("padding", padding);
-		PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
+		//PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
 	}
 }
 
@@ -351,7 +355,7 @@ void CMenuPanel::SetIconSize(int size)
 {
 	if (size > 8){
 		PageTree->setIconSize(QSize(size, size));
-		PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
+		//PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
 	}
 }
 
@@ -397,6 +401,21 @@ void CMenuPanel::SetItemMouserOverSelectedColor(QColor color)
 	PageTree->setProperty("ItemMouserOverSelectedColor", color);
 }
 
+void CMenuPanel::SetMainWidget(QWidget *mainWidget)
+{
+	m_mainWidget = mainWidget;
+	//m_overWidget = new QWidget(m_mainWidget);
+	this->setParent(m_mainWidget);
+	//m_leftMenuPanelGuiCompPtr->GetWidget()->installEventFilter(this);
+	m_mainWidget->installEventFilter(this);
+
+	if (m_leftFrame)
+	{
+		int minWidth = PageTree->iconSize().width() + 4 * m_padding;
+		m_leftFrame->setMinimumWidth(minWidth);
+		m_leftFrame->setMaximumWidth(minWidth);
+	}
+}
 
 void CMenuPanel::OnPageIdChanged(const QModelIndex& selected, const QModelIndex& deselected)
 {
@@ -462,11 +481,22 @@ void CMenuPanel::on_pushTop_clicked()
 
 // reimplemented (QObject)
 
-bool CMenuPanel::eventFilter(QObject *obj, QEvent *event)
+bool CMenuPanel::eventFilter(QObject *watched, QEvent *event)
 {
+	int eventType = event->type();
+
+	if (m_mainWidget && watched == m_mainWidget) {
+		if (eventType == QEvent::Resize) {
+			QRect rect = this->geometry();
+			rect.setHeight(m_mainWidget->height());
+			this->setGeometry(rect);
+		}
+		return QObject::eventFilter(watched, event);
+	}
+
 	CheckButtonsVisible();
 
-	return QObject::eventFilter(obj, event);
+	return QObject::eventFilter(watched, event);
 }
 
 
@@ -475,12 +505,23 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 	killTimer(m_animationTimerIdentifier);
 	m_animationTimerIdentifier = 0;
 
-	if (m_animationAction == AA_EXPAND && PageTree->maximumWidth() != m_maxWidth){
-		m_animationWidth.stop();
-		m_animationWidth.setStartValue(PageTree->maximumWidth());
-		m_animationWidth.setEndValue(m_maxWidth);
-		m_animationWidth.setDuration(m_animationDuration);
-		m_animationWidth.start();
+	//	if (m_animationAction == AA_EXPAND && PageTree->maximumWidth() != m_maxWidth){
+	if (m_animationAction == AA_EXPAND && this->width() != m_maxWidth) {
+		if (m_mainWidget) {
+			m_animationWidthComp.stop();
+			m_animationWidthComp.setStartValue(QRect(0, 0, this->width(), height()));
+			m_animationWidthComp.setEndValue(QRect(0, 0, m_maxWidth, height()));
+			//m_animationWidth.setEndValue(300);
+			m_animationWidthComp.setDuration(150);
+			m_animationWidthComp.start();
+		}
+		else {
+			m_animationWidth.stop();
+			m_animationWidth.setStartValue(PageTree->maximumWidth());
+			m_animationWidth.setEndValue(m_maxWidth);
+			m_animationWidth.setDuration(m_animationDuration);
+			m_animationWidth.start();
+		}
 
 		m_animationIndent.stop();
 		m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
@@ -490,19 +531,60 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 	}
 
 	int minWidth = PageTree->iconSize().width() + 4 * m_padding;
-	if (m_animationAction == AA_COLLAPSE && PageTree->maximumWidth() != minWidth){
-		m_animationWidth.stop();
-		m_animationWidth.setStartValue(PageTree->maximumWidth());
-		m_animationWidth.setEndValue(minWidth);
-		m_animationWidth.setDuration(m_animationDuration);
-		m_animationWidth.start();
-
+	//if (m_animationAction == AA_COLLAPSE && PageTree->maximumWidth() != minWidth) {
+	if (m_animationAction == AA_COLLAPSE && this->width() != minWidth) {
+		if (m_mainWidget) {
+			m_animationWidthComp.stop();
+			//m_animationWidthComp.setStartValue(PageTree->maximumWidth());
+			//m_animationWidthComp.setEndValue(70);
+			m_animationWidthComp.setStartValue(QRect(0, 0, width(), height()));
+			m_animationWidthComp.setEndValue(QRect(0, 0, minWidth, height()));
+			//m_animationWidthComp.setEndValue(QRect(0, 0, PageTree->iconSize().width() + 4 + 2 * m_padding + 2 * m_padding, height()));
+			m_animationWidthComp.setDuration(150);
+			m_animationWidthComp.start();
+		}
+		else {
+			m_animationWidth.stop();
+			m_animationWidth.setStartValue(PageTree->maximumWidth());
+			m_animationWidth.setEndValue(minWidth);
+			m_animationWidth.setDuration(m_animationDuration);
+			m_animationWidth.start();
+		}
 		m_animationIndent.stop();
 		m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
 		m_animationIndent.setEndValue(0);
 		m_animationIndent.setDuration(m_animationDuration - 10);
 		m_animationIndent.start();
 	}
+
+	//if (m_animationAction == AA_EXPAND && PageTree->maximumWidth() != m_maxWidth){
+	//	m_animationWidth.stop();
+	//	m_animationWidth.setStartValue(PageTree->maximumWidth());
+	//	m_animationWidth.setEndValue(m_maxWidth);
+	//	m_animationWidth.setDuration(m_animationDuration);
+	//	m_animationWidth.start();
+
+	//	m_animationIndent.stop();
+	//	m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
+	//	m_animationIndent.setEndValue(m_indent);
+	//	m_animationIndent.setDuration(m_animationDuration - 10);
+	//	m_animationIndent.start();
+	//}
+
+	//int minWidth = PageTree->iconSize().width() + 4 * m_padding;
+	//if (m_animationAction == AA_COLLAPSE && PageTree->maximumWidth() != minWidth){
+	//	m_animationWidth.stop();
+	//	m_animationWidth.setStartValue(PageTree->maximumWidth());
+	//	m_animationWidth.setEndValue(minWidth);
+	//	m_animationWidth.setDuration(m_animationDuration);
+	//	m_animationWidth.start();
+
+	//	m_animationIndent.stop();
+	//	m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
+	//	m_animationIndent.setEndValue(0);
+	//	m_animationIndent.setDuration(m_animationDuration - 10);
+	//	m_animationIndent.start();
+	//}
 
 	m_animationAction = AA_NONE;
 }

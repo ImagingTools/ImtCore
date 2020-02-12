@@ -9,6 +9,7 @@
 #include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
+#include <imtgui/IWidgetProvider.h>
 #include <imtwidgets/CMenuPanel.h>
 
 
@@ -33,6 +34,8 @@ public:
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CMenuPanelComp);
+	I_ASSIGN(m_widgetProviderPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
+	I_ASSIGN(m_isShowOverPtr, "ShowOver", "Show menu over", false, true);
 	I_END_COMPONENT;
 
 protected:
@@ -59,6 +62,9 @@ private:
 	};
 
 	QMap<QByteArray, PageIdToSelectionAlias> m_pagesInfoMap;
+
+	I_REF(imtgui::IWidgetProvider, m_widgetProviderPtr);
+    I_ATTR(bool, m_isShowOverPtr);
 
 private:
 	void CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId);

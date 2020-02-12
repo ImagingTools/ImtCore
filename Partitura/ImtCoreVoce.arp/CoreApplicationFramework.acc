@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4840" Description="ACF"/>
+            <Version Id="0" Number="4842" Description="ACF"/>
             <Version Id="1" Number="2122" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="1023" Number="331010" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>ImagingTools application framework</Description>
@@ -260,6 +260,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="ibase::IApplication" ComponentId="GuiApplication"/>
+        <Interface InterfaceId="imtgui::IWidgetProvider" ComponentId="Pages"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ApplicationInfo" ComponentId="ApplicationInfo"/>

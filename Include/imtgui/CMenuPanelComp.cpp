@@ -54,6 +54,10 @@ void CMenuPanelComp::OnGuiCreated()
 	Q_ASSERT(widgetPtr != nullptr);
 	connect(widgetPtr, &imtwidgets::CMenuPanel::PageIdChanged, this, &CMenuPanelComp::OnPageIdChanged);
 
+	if (m_widgetProviderPtr.IsValid() && m_isShowOverPtr.IsValid() && *m_isShowOverPtr) {
+		widgetPtr->SetMainWidget(m_widgetProviderPtr->GetWidgetPtr(QByteArray()));
+	}
+
 	widgetPtr->SetItemPadding(4);
 	widgetPtr->SetIconSize(24);
 

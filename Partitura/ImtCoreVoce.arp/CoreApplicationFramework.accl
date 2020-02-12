@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4840" Description="ACF"/>
+            <Version Id="0" Number="4842" Description="ACF"/>
             <Version Id="1" Number="2122" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="1023" Number="331010" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>

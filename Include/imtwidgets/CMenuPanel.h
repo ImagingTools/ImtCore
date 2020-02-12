@@ -72,6 +72,9 @@ public:
 	virtual void SetItemMouserOverColor(QColor color);
 	virtual void SetItemMouserOverSelectedColor(QColor color);
 
+	virtual void SetMainWidget(QWidget *mainWidget);
+
+
 Q_SIGNALS:
 	/**
 		Signal will be emitted whenever the currently selected page will be changed.
@@ -86,7 +89,7 @@ private Q_SLOTS:
 
 protected:
 	// reimplemented (QObject)
-	virtual bool eventFilter(QObject *obj, QEvent *event) override;
+	virtual bool eventFilter(QObject *watched, QEvent *event) override;
 	virtual void timerEvent(QTimerEvent *event);
 
 	// reimplemented (QWidget)
@@ -107,6 +110,11 @@ private:
 	QStandardItemModel m_model;
 	QPropertyAnimation m_animationWidth;
 	QPropertyAnimation m_animationIndent;
+	QPropertyAnimation m_animationWidthComp;
+
+	QWidget *m_overWidget;
+	QWidget *m_leftFrame;
+	QWidget *m_mainWidget;
 
 private:
 	QModelIndex GetModelIndex(const QByteArray& pageId) const;
