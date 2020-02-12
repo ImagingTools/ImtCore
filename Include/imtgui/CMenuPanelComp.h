@@ -65,7 +65,7 @@ private:
 	I_ATTR(bool, m_isShowOverAttrPtr);
 
 private:
-	bool IsPageEnabledWithParents(const QByteArray& pageId);
+	bool IsPageEnabled(const QByteArray& pageId) const;
 	void CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId);
 	void CreatePageIdAliases(const iprm::ISelectionParam& selection, const QByteArray& parentId);
 	QByteArray FindSelectedItem();

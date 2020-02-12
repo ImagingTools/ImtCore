@@ -117,7 +117,7 @@ void CMenuPanelComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::Ch
 
 // private methods
 
-bool CMenuPanelComp::IsPageEnabledWithParents(const QByteArray& pageId)
+bool CMenuPanelComp::IsPageEnabled(const QByteArray& pageId) const
 {
 	QByteArray currentId = pageId;
 
@@ -154,8 +154,9 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 			if (panelPtr->InsertPage(pageId, parentId)){
 				panelPtr->SetPageName(pageId, pageName);
 
-				bool enablePage = IsPageEnabledWithParents(pageId);
-				panelPtr->SetPageEnabled(pageId, enablePage);
+				bool isPageEnabled = IsPageEnabled(pageId);
+				
+				panelPtr->SetPageEnabled(pageId, isPageEnabled);
 
 				const iqtgui::IVisualStatus* visualStatusPtr = pageVisualStatus->GetVisualStatus(pageIndex);
 				if (visualStatusPtr != nullptr){
