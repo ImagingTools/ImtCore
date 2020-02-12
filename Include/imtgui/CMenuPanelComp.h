@@ -32,8 +32,8 @@ public:
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CMenuPanelComp);
-		I_ASSIGN(m_widgetProviderPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
-		I_ASSIGN(m_isShowOverPtr, "ShowOver", "Show menu over", false, true);
+		I_ASSIGN(m_widgetProviderCompPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
+		I_ASSIGN(m_isShowOverAttrPtr, "ShowOver", "Show expanded menu over the underlaying widget", false, true);
 	I_END_COMPONENT;
 
 protected:
@@ -61,8 +61,8 @@ private:
 
 	QMap<QByteArray, PageIdToSelectionAlias> m_pagesInfoMap;
 
-	I_REF(imtgui::IWidgetProvider, m_widgetProviderPtr);
-	I_ATTR(bool, m_isShowOverPtr);
+	I_REF(imtgui::IWidgetProvider, m_widgetProviderCompPtr);
+	I_ATTR(bool, m_isShowOverAttrPtr);
 
 private:
 	void CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId);

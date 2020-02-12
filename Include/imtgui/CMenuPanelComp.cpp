@@ -52,8 +52,8 @@ void CMenuPanelComp::OnGuiCreated()
 	Q_ASSERT(widgetPtr != nullptr);
 	connect(widgetPtr, &imtwidgets::CMenuPanel::PageIdChanged, this, &CMenuPanelComp::OnPageIdChanged);
 
-	if (m_widgetProviderPtr.IsValid() && m_isShowOverPtr.IsValid() && *m_isShowOverPtr){
-		widgetPtr->SetMainWidget(m_widgetProviderPtr->GetWidgetPtr(QByteArray()));
+	if (m_widgetProviderCompPtr.IsValid() && m_isShowOverAttrPtr.IsValid() && *m_isShowOverAttrPtr){
+		widgetPtr->SetMainWidget(m_widgetProviderCompPtr->GetWidgetPtr(QByteArray()));
 	}
 
 	widgetPtr->SetItemIndent(20);
@@ -67,7 +67,7 @@ void CMenuPanelComp::OnGuiCreated()
 	widgetPtr->SetItemMouserOverColor(QColor(240, 220, 100));
 	widgetPtr->SetItemMouserOverSelectedColor(QColor(255, 235, 100));
 
-	widgetPtr->SetAnimationDelay(500);
+	widgetPtr->SetAnimationDelay(800);
 	widgetPtr->SetAnimationDuration(300);
 }
 
@@ -76,8 +76,6 @@ void CMenuPanelComp::OnGuiCreated()
 
 void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 {
-	BaseClass::UpdateGui(changeSet);
-
 	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
 	Q_ASSERT(panelPtr != nullptr);
 
