@@ -505,14 +505,12 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 	killTimer(m_animationTimerIdentifier);
 	m_animationTimerIdentifier = 0;
 
-	//	if (m_animationAction == AA_EXPAND && PageTree->maximumWidth() != m_maxWidth){
 	if (m_animationAction == AA_EXPAND && this->width() != m_maxWidth) {
 		if (m_mainWidget) {
 			m_animationWidthComp.stop();
 			m_animationWidthComp.setStartValue(QRect(0, 0, this->width(), height()));
 			m_animationWidthComp.setEndValue(QRect(0, 0, m_maxWidth, height()));
-			//m_animationWidth.setEndValue(300);
-			m_animationWidthComp.setDuration(150);
+			m_animationWidthComp.setDuration(m_animationDuration);
 			m_animationWidthComp.start();
 		}
 		else {
@@ -531,16 +529,13 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 	}
 
 	int minWidth = PageTree->iconSize().width() + 4 * m_padding;
-	//if (m_animationAction == AA_COLLAPSE && PageTree->maximumWidth() != minWidth) {
+
 	if (m_animationAction == AA_COLLAPSE && this->width() != minWidth) {
 		if (m_mainWidget) {
 			m_animationWidthComp.stop();
-			//m_animationWidthComp.setStartValue(PageTree->maximumWidth());
-			//m_animationWidthComp.setEndValue(70);
 			m_animationWidthComp.setStartValue(QRect(0, 0, width(), height()));
 			m_animationWidthComp.setEndValue(QRect(0, 0, minWidth, height()));
-			//m_animationWidthComp.setEndValue(QRect(0, 0, PageTree->iconSize().width() + 4 + 2 * m_padding + 2 * m_padding, height()));
-			m_animationWidthComp.setDuration(150);
+			m_animationWidthComp.setDuration(m_animationDuration);
 			m_animationWidthComp.start();
 		}
 		else {
@@ -624,6 +619,10 @@ void CMenuPanel::resizeEvent(QResizeEvent *event)
 {
 	Q_UNUSED(event);
 
+	if (m_mainWidget) {
+		PageTree->setMaximumWidth(this->width());
+	}
+
 	CheckButtonsVisible();
 }
 
@@ -678,6 +677,7 @@ int CMenuPanel::CalculateMaxItemWith()
 	QStack<QModelIndex> stack;
 	QModelIndex index = m_model.index(0, 0);
 	int maxWidth = 0;
+	int minWidth = PageTree->iconSize().width() + 4 * m_padding;
 
 	QStyleOptionViewItem opt;
 	opt.initFrom(this);
@@ -712,6 +712,19 @@ int CMenuPanel::CalculateMaxItemWith()
 		}
 
 		index = stack.pop();
+	}
+	if (m_mainWidget) {
+		if (m_leftFrame)
+		{
+			m_leftFrame->setMinimumWidth(minWidth);
+			m_leftFrame->setMaximumWidth(minWidth);
+		}
+		QRect rect = this->geometry();
+		rect.setWidth(minWidth);
+		this->setGeometry(rect);
+	}
+	else {
+		PageTree->setMaximumWidth(minWidth);
 	}
 
 	return maxWidth;

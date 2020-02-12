@@ -112,7 +112,6 @@ private:
 	QPropertyAnimation m_animationIndent;
 	QPropertyAnimation m_animationWidthComp;
 
-	QWidget *m_overWidget;
 	QWidget *m_leftFrame;
 	QWidget *m_mainWidget;
 
