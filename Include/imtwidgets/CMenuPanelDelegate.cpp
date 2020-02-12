@@ -77,13 +77,13 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 	painter->save();
 	painter->setRenderHint(QPainter::Antialiasing, true);
 
-	// Draw background:
 	QRect singleEllipse;
 	singleEllipse.setLeft(padding);
 	singleEllipse.setRight(padding + (option.rect.height() - 2 * padding) - 1);
 	singleEllipse.setTop(option.rect.top() + padding);
 	singleEllipse.setBottom(option.rect.bottom() - padding);
 
+	// Draw background:
 	if (option.state & QStyle::State_Selected || option.state & QStyle::State_MouseOver){
 		painter->setBrush(QBrush(backgroundColor));
 
@@ -105,8 +105,10 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 			painter->drawEllipse(backgroundRightEllipse);
 		}
 		else {
+			QRect drawRect = singleEllipse.adjusted(-padding / 2, -padding / 2, padding / 2, padding / 2);
+
 			painter->setPen(pageTreePtr->property("ItemSelectedContourColor").value<QColor>());
-			painter->drawEllipse(singleEllipse);
+			painter->drawEllipse(drawRect);
 		}
 	}
 
