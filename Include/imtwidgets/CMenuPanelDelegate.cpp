@@ -55,17 +55,22 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 	int indent = pageTreePtr->property("indent").toInt();
 	int padding = pageTreePtr->property("padding").toInt();
 
-	QColor backgroundColor;
+	QColor backgroundColor = Qt::transparent;
 
 	if (option.state & QStyle::State_Selected){
 		backgroundColor = pageTreePtr->property("ItemSelectedColor").value<QColor>();
 	}
 
 	if (option.state & QStyle::State_MouseOver){
-		backgroundColor = pageTreePtr->property("ItemMouserOverColor").value<QColor>();
+		const QStandardItemModel* modelPtr = dynamic_cast<const QStandardItemModel*>(index.model());
+		Q_ASSERT(modelPtr != nullptr);
 
-		if (option.state & QStyle::State_Selected){
-			backgroundColor = pageTreePtr->property("ItemMouserOverSelectedColor").value<QColor>();
+		if (modelPtr->itemFromIndex(index)->isEnabled()){
+			backgroundColor = pageTreePtr->property("ItemMouserOverColor").value<QColor>();
+
+			if (option.state & QStyle::State_Selected){
+				backgroundColor = pageTreePtr->property("ItemMouserOverSelectedColor").value<QColor>();
+			}
 		}
 	}
 
