@@ -13,7 +13,8 @@ namespace imtgui
 // public methods
 
 CMenuPanelComp::CMenuPanelComp()
-	:m_pageVisualStatusObserver(*this)
+	:m_pageSubselectionObserver(*this),
+	m_pageVisualStatusObserver(*this)
 {
 
 }
@@ -100,7 +101,8 @@ void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 		UnregisterAllModels();
 		m_pageVisualStatusObserver.UnregisterAllModels();
 		m_pagesInfoMap.clear();
-		m_modelIndex = 0;
+		m_subselectionModelIndex = 0;
+		m_visualStatusModelIndex = 0;
 
 		CreatePagesInfoMap(*pageSelectionPtr, QByteArray());
 		CreateMenuForSelection(*pageSelectionPtr, QByteArray());
@@ -211,7 +213,7 @@ void CMenuPanelComp::CreatePagesInfoMap(const iprm::ISelectionParam& selection, 
 			if (visualStatusPtr != nullptr){
 				imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(const_cast<iqtgui::IVisualStatus*>(visualStatusPtr));
 				if (modelPtr != nullptr){
-					m_pageVisualStatusObserver.RegisterModel(modelPtr, m_modelIndex++);
+					m_pageVisualStatusObserver.RegisterModel(modelPtr, m_visualStatusModelIndex++);
 				}
 			}
 		}
@@ -239,7 +241,7 @@ void CMenuPanelComp::CreatePagesInfoMap(const iprm::ISelectionParam& selection, 
 				const imod::IModel* constModelPtr = dynamic_cast<const imod::IModel*>(subSelectionPtr);
 				imod::IModel* modelPtr = const_cast<imod::IModel*>(constModelPtr);
 				if (modelPtr != nullptr){
-					RegisterModel(modelPtr, m_modelIndex++);
+					m_pageSubselectionObserver.RegisterModel(modelPtr, m_subselectionModelIndex++);
 				}
 				CreatePagesInfoMap(*subSelectionPtr, pageId);
 			}
@@ -271,9 +273,45 @@ QByteArray CMenuPanelComp::FindSelectedItem()
 }
 
 
+void CMenuPanelComp::UpdatePageSubselection()
+{
+	if (!IsUpdateBlocked()){
+		UpdateGui(istd::IChangeable::GetAnyChange());
+	}
+}
+
+
 void CMenuPanelComp::UpdatePageState()
 {
+	if (!IsUpdateBlocked()){
+		UpdateBlocker updateBlocker(this);
 
+		imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
+		Q_ASSERT(panelPtr != nullptr);
+
+		panelPtr->ResetPages();
+
+		iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
+		Q_ASSERT(pageSelectionPtr != nullptr);
+
+		CreateMenuForSelection(*pageSelectionPtr, QByteArray());
+	}
+}
+
+
+// protected methods of embedded class PageSubselectionObserver
+
+CMenuPanelComp::PageSubselectionObserver::PageSubselectionObserver(CMenuPanelComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CMenuPanelComp::PageSubselectionObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	m_parent.UpdatePageSubselection();
 }
 
 
