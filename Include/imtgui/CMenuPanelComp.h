@@ -52,14 +52,15 @@ protected:
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
-	struct PageIdToSelectionAlias
+	struct PageInfo
 	{
 		QByteArray parentPageId;
 		const iprm::ISelectionParam* selectionPtr;
 		int pageIndex;
 	};
 
-	QMap<QByteArray, PageIdToSelectionAlias> m_pagesInfoMap;
+	int m_modelIndex;
+	QMap<QByteArray, PageInfo> m_pagesInfoMap;
 
 	I_REF(imtgui::IWidgetProvider, m_widgetProviderCompPtr);
 	I_ATTR(bool, m_isShowOverAttrPtr);
@@ -67,7 +68,7 @@ private:
 private:
 	bool IsPageEnabled(const QByteArray& pageId) const;
 	void CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId);
-	void CreatePageIdAliases(const iprm::ISelectionParam& selection, const QByteArray& parentId);
+	void CreatePagesInfoMap(const iprm::ISelectionParam& selection, const QByteArray& parentId);
 	QByteArray FindSelectedItem();
 };
 
