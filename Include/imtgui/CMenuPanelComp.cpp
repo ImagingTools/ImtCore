@@ -10,6 +10,15 @@ namespace imtgui
 {
 
 
+// public methods
+
+CMenuPanelComp::CMenuPanelComp()
+			:m_pageVisualStatusObserver(*this)
+{
+
+}
+
+
 // protected methods
 
 void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QByteArray& /*deselectedPageId*/)
@@ -88,6 +97,7 @@ void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 		UpdateBlocker updateBlocker(this);
 
 		UnregisterAllModels();
+		m_pageVisualStatusObserver.UnregisterAllModels();
 		m_pagesInfoMap.clear();
 		m_modelIndex = 0;
 
@@ -200,7 +210,7 @@ void CMenuPanelComp::CreatePagesInfoMap(const iprm::ISelectionParam& selection, 
 			if (visualStatusPtr != nullptr){
 				imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(const_cast<iqtgui::IVisualStatus*>(visualStatusPtr));
 				if (modelPtr != nullptr){
-					RegisterModel(modelPtr, m_modelIndex++);
+					m_pageVisualStatusObserver.RegisterModel(modelPtr, m_modelIndex++);
 				}
 			}
 		}
@@ -259,6 +269,27 @@ QByteArray CMenuPanelComp::FindSelectedItem()
 	return QByteArray(selectedPageId.toLatin1());
 }
 
+
+void CMenuPanelComp::UpdatePageState()
+{
+
+}
+
+
+// protected methods of embedded class PageStatusObserver
+
+CMenuPanelComp::PageVisualStatusObserver::PageVisualStatusObserver(CMenuPanelComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CMenuPanelComp::PageVisualStatusObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	m_parent.UpdatePageState();
+}
 
 } // namespace imtgui
 

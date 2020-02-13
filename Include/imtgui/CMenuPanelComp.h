@@ -25,6 +25,8 @@ class CMenuPanelComp:
 			protected imod::CMultiModelDispatcherBase
 {
 public:
+	CMenuPanelComp();
+
 	typedef ibase::TModelObserverCompBaseWrap<
 				iqtgui::TGuiObserverWrap<
 							iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
@@ -52,6 +54,18 @@ protected:
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
+	class PageVisualStatusObserver: public imod::CMultiModelDispatcherBase
+	{
+	public:
+		explicit PageVisualStatusObserver(CMenuPanelComp& parent);
+
+		// reimplemented (imod::CMultiModelDispatcherBase)
+		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+
+	private:
+		CMenuPanelComp& m_parent;
+	};
+
 	struct PageInfo
 	{
 		QByteArray parentPageId;
@@ -61,6 +75,7 @@ private:
 
 	int m_modelIndex;
 	QMap<QByteArray, PageInfo> m_pagesInfoMap;
+	PageVisualStatusObserver m_pageVisualStatusObserver;
 
 	I_REF(imtgui::IWidgetProvider, m_widgetProviderCompPtr);
 	I_ATTR(bool, m_isShowOverAttrPtr);
@@ -70,6 +85,7 @@ private:
 	void CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId);
 	void CreatePagesInfoMap(const iprm::ISelectionParam& selection, const QByteArray& parentId);
 	QByteArray FindSelectedItem();
+	void UpdatePageState();
 };
 
 
