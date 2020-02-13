@@ -16,7 +16,6 @@ CMenuPanelComp::CMenuPanelComp()
 	:m_pageSubselectionObserver(*this),
 	m_pageVisualStatusObserver(*this)
 {
-
 }
 
 
@@ -68,7 +67,6 @@ void CMenuPanelComp::OnGuiCreated()
 
 	widgetPtr->SetItemIndent(20);
 	widgetPtr->SetItemPadding(6);
-
 	widgetPtr->SetIconSize(30);
 
 	widgetPtr->SetItemTextColor(QColor("#335777"));
@@ -76,7 +74,6 @@ void CMenuPanelComp::OnGuiCreated()
 	widgetPtr->SetItemSelectedContourColor(QColor(210, 210, 210));
 	widgetPtr->SetItemMouserOverColor(QColor(250, 250, 250));
 	widgetPtr->SetItemMouserOverSelectedColor(QColor(255, 255, 255));
-
 
 	widgetPtr->SetAnimationDelay(800);
 	widgetPtr->SetAnimationDuration(300);
@@ -155,13 +152,6 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 {
 	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
 	Q_ASSERT(panelPtr != nullptr);
-
-	//for (int i = 0; i < 40; i++){
-	//	QByteArray id = QString("page%1").arg(i).toLatin1();
-	//	panelPtr->InsertPage(id, QByteArray());
-	//	panelPtr->SetPageName(id, id);
-	//}
-	//return;
 
 	const iqtgui::IMultiVisualStatusProvider* visualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(&selection);
 	Q_ASSERT(visualStatusProviderPtr != nullptr);
@@ -262,7 +252,7 @@ QByteArray CMenuPanelComp::FindSelectedItem()
 			selectedPageId = pageListPtr->GetOptionName(selectedIndex);
 			selectionPtr = selectionPtr->GetSubselection(selectedIndex);
 		}
-		else {
+		else{
 			break;
 		}
 	}
@@ -330,6 +320,7 @@ void CMenuPanelComp::PageVisualStatusObserver::OnModelChanged(int /*modelId*/, c
 {
 	m_parent.UpdatePageState();
 }
+
 
 } // namespace imtgui
 
