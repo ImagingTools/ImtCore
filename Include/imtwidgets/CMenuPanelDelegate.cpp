@@ -6,12 +6,16 @@
 #include "QtWidgets/QTreeView"
 
 // ImtCore includes
-#include "imtwidgets/CMenuPanel.h"
+#include <imtwidgets/CMenuPanel.h>
 
 
 namespace imtwidgets
 {
 
+
+// protected methods
+
+// reimplemented (QItemDelegate)
 
 QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const QModelIndex& index) const
 {
