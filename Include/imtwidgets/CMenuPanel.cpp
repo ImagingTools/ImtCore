@@ -28,7 +28,8 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_animationDelay(100),
 	m_animationDuration(100),
 	m_mainWidget(nullptr),
-	m_leftFrame(parent)
+	m_leftFrame(parent),
+	m_shadowPtr(nullptr)
 {
 	setupUi(this);
 
@@ -63,6 +64,21 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 
 	PageTree->setContentsMargins(QMargins(0,0,0,0));
 	PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
+
+
+	pushTop->setStyleSheet("QPushButton:hover{	"
+		"background: qlineargradient(x1 : 0, y1 : 0, x2 : 0, y2 : 1, stop : 0.0 #ffd9aa,"
+		"stop :   0.5 #ffbb6e, stop :   0.55 #feae42, stop :   1.0 #fedb74); } "
+		" QPushButton{ "
+		"border: 1px solid #9d9d9d; "
+	//	"border - radius: 2px; "
+	//	"padding: 5px 15px 2px 5px; "
+	//	"background: qlineargradient(x1 : 0, y1 : 0, x2 : 0, y2 : 1, stop : 0.0 #f5f9ff, "
+	//	"stop :   0.5 #c7dfff, stop :   0.55 #afd2ff, stop :   1.0 #c0dbff); "
+		"background: #e0e0e0; "
+        "}");
+
+	pushBottom->setStyleSheet(pushTop->styleSheet());
 
 	m_animationWidthComp.setTargetObject(this);
 	m_animationWidthComp.setPropertyName("geometry");
@@ -416,15 +432,16 @@ void CMenuPanel::SetMainWidget(QWidget* mainWidget)
 	this->setParent(m_mainWidget);
 	m_mainWidget->installEventFilter(this);
 
-	QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect(this);
-	shadowPtr->setXOffset(0);
-	shadowPtr->setYOffset(0);
-	shadowPtr->setBlurRadius(12);
-	//shadowPtr->setColor(qRgba(74, 149, 217, 128));
-	this->setGraphicsEffect(shadowPtr);	
+	if (m_shadowPtr == nullptr){
+		m_shadowPtr = new QGraphicsDropShadowEffect(this);
+		m_shadowPtr->setXOffset(0);
+		m_shadowPtr->setYOffset(0);
+		m_shadowPtr->setBlurRadius(0);
+		//shadowPtr->setColor(qRgba(74, 149, 217, 128));
+		this->setGraphicsEffect(m_shadowPtr);
+	}
 	
-	if (m_leftFrame)
-	{
+	if (m_leftFrame){
 		int minWidth = PageTree->iconSize().width() + 4 * m_padding;
 		m_leftFrame->setMinimumWidth(minWidth);
 		m_leftFrame->setMaximumWidth(minWidth);
@@ -526,6 +543,9 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 			m_animationWidthComp.setEndValue(QRect(0, 0, m_maxWidth, height()));
 			m_animationWidthComp.setDuration(m_animationDuration);
 			m_animationWidthComp.start();
+			if (m_shadowPtr){
+				m_shadowPtr->setBlurRadius(12);
+			}
 		}
 		else{
 			m_animationWidth.stop();
@@ -551,6 +571,9 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 			m_animationWidthComp.setEndValue(QRect(0, 0, minWidth, height()));
 			m_animationWidthComp.setDuration(m_animationDuration);
 			m_animationWidthComp.start();
+			if (m_shadowPtr){
+				m_shadowPtr->setBlurRadius(0);
+			}
 		}
 		else{
 			m_animationWidth.stop();

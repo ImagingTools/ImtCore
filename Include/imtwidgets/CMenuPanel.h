@@ -117,6 +117,8 @@ private:
 	QWidget *m_leftFrame;
 	QWidget *m_mainWidget;
 
+	QGraphicsDropShadowEffect *m_shadowPtr;
+
 private:
 	QModelIndex GetModelIndex(const QByteArray& pageId) const;
 	int CalculateMaxItemWith();
