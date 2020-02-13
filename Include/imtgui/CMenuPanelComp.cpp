@@ -13,7 +13,7 @@ namespace imtgui
 // public methods
 
 CMenuPanelComp::CMenuPanelComp()
-			:m_pageVisualStatusObserver(*this)
+	:m_pageVisualStatusObserver(*this)
 {
 
 }
@@ -66,15 +66,16 @@ void CMenuPanelComp::OnGuiCreated()
 	}
 
 	widgetPtr->SetItemIndent(20);
-	widgetPtr->SetItemPadding(4);
+	widgetPtr->SetItemPadding(6);
 
-	widgetPtr->SetIconSize(24);
+	widgetPtr->SetIconSize(30);
 
 	widgetPtr->SetItemTextColor(QColor("#335777"));
-	widgetPtr->SetItemSelectedColor(QColor(240, 200, 120));
-	widgetPtr->SetItemSelectedContourColor(QColor("#335777"));
-	widgetPtr->SetItemMouserOverColor(QColor(240, 220, 100));
-	widgetPtr->SetItemMouserOverSelectedColor(QColor(255, 235, 100));
+	widgetPtr->SetItemSelectedColor(QColor(245, 245, 245));
+	widgetPtr->SetItemSelectedContourColor(QColor(215, 215, 215));
+	widgetPtr->SetItemMouserOverColor(QColor(250, 250, 250));
+	widgetPtr->SetItemMouserOverSelectedColor(QColor(255, 255, 255));
+
 
 	widgetPtr->SetAnimationDelay(800);
 	widgetPtr->SetAnimationDuration(300);

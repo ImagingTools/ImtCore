@@ -37,7 +37,7 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const
 		currentIndex = currentIndex.parent();
 	}
 
-	int width = 2 * padding + offset + pageTreePtr->iconSize().width() + 2 * padding;
+	int width = offset + pageTreePtr->iconSize().width() + 4 * padding;
 	QFontMetrics fm = pageTreePtr->fontMetrics();
 	width += fm.boundingRect(index.data(Qt::DisplayRole).toString()).width() + 3 * padding;
 
