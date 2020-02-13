@@ -108,8 +108,6 @@ void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 		CreateMenuForSelection(*pageSelectionPtr, QByteArray());
 	}
 
-	
-
 	QByteArray selectedPageId = FindSelectedItem();
 	panelPtr->SetActivePage(selectedPageId);
 }
@@ -295,6 +293,9 @@ void CMenuPanelComp::UpdatePageState()
 		Q_ASSERT(pageSelectionPtr != nullptr);
 
 		CreateMenuForSelection(*pageSelectionPtr, QByteArray());
+		
+		QByteArray selectedPageId = FindSelectedItem();
+		panelPtr->SetActivePage(selectedPageId);
 	}
 }
 
