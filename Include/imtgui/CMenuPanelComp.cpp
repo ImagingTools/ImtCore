@@ -75,8 +75,8 @@ void CMenuPanelComp::OnGuiCreated()
 	widgetPtr->SetItemMouserOverColor(QColor(250, 250, 250));
 	widgetPtr->SetItemMouserOverSelectedColor(QColor(255, 255, 255));
 
-	widgetPtr->SetAnimationDelay(800);
-	widgetPtr->SetAnimationDuration(300);
+	widgetPtr->SetAnimationDelay(400);
+	widgetPtr->SetAnimationDuration(150);
 }
 
 

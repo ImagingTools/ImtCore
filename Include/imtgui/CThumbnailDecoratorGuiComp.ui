@@ -51,9 +51,9 @@ QToolBar[ImtToolBar=true]
 QWidget[ImtTopFrame=true]
 {
 	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                 stop: 0 rgb(225,225,228), stop: 0.9 rgb(210,210,213),
-                                 stop: 0.97 rgb(210,210,213), stop: 1.0 rgb(180,180,183));
-	border-bottom: 1px solid  rgb(170,170,163);
+                                 stop: 0 rgb(205,205,210), stop: 0.9 rgb(195,195,200),
+                                 stop: 0.97 rgb(195,195,200), stop: 1.0 rgb(185,185,190));
+	border-bottom: 1px solid  rgb(180,180,185);
 	color: #335777;
 }
 
@@ -61,9 +61,9 @@ QWidget[ImtTopFrame=true]
 QWidget#PageTree
 {
 	background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
-                                 stop: 0 rgb(235,235,238), stop: 0.9 rgb(220,220,223),
-                                 stop: 0.99 rgb(220,220,223), stop: 1.0 rgb(190,190,193));
-	border-right: 1px solid  rgb(180,180,180);
+                                 stop: 0 rgb(220,220,225), stop: 0.9 rgb(210,210,215),
+                                 stop: 0.99 rgb(210,210,215), stop: 1.0 rgb(200,200,205));
+	border-right: 1px solid  rgb(190,190,190);
 	color: #775733;
 }
 
