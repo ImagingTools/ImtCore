@@ -100,5 +100,7 @@
         <file alias="ProductionOverview">Resources/Icons/ProductionOverview.svg</file>
         <file alias="ArrowRight">Resources/Icons/ArrowRight.svg</file>
         <file alias="Manual">Resources/Icons/Manual.svg</file>
+        <file alias="Robot">Resources/Icons/Robot.svg</file>
+        <file alias="StatusActive">Resources/Icons/StatusActive.svg</file>
     </qresource>
 </RCC>
