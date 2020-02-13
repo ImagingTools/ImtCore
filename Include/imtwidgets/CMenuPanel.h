@@ -116,6 +116,7 @@ private:
 
 	QWidget *m_leftFrame;
 	QWidget *m_mainWidget;
+	QWidget *m_parentWidget;
 
 	QGraphicsDropShadowEffect *m_shadowPtr;
 

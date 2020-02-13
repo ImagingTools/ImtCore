@@ -29,6 +29,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_animationDuration(100),
 	m_mainWidget(nullptr),
 	m_leftFrame(parent),
+	m_parentWidget(nullptr),
 	m_shadowPtr(nullptr)
 {
 	setupUi(this);
@@ -429,14 +430,18 @@ void CMenuPanel::SetItemMouserOverSelectedColor(QColor color)
 void CMenuPanel::SetMainWidget(QWidget* mainWidget)
 {
 	m_mainWidget = mainWidget;
-	this->setParent(m_mainWidget);
+	if (m_parentWidget == nullptr){
+		m_parentWidget = new QWidget(mainWidget);
+		this->setParent(m_parentWidget);
+	}
 	m_mainWidget->installEventFilter(this);
 
 	if (m_shadowPtr == nullptr){
-		m_shadowPtr = new QGraphicsDropShadowEffect(this);
+		m_shadowPtr = new QGraphicsDropShadowEffect(mainWidget);
 		m_shadowPtr->setXOffset(0);
 		m_shadowPtr->setYOffset(0);
-		m_shadowPtr->setBlurRadius(0);
+		m_shadowPtr->setBlurRadius(12);
+		m_shadowPtr->setEnabled(false);
 		//shadowPtr->setColor(qRgba(74, 149, 217, 128));
 		this->setGraphicsEffect(m_shadowPtr);
 	}
@@ -544,7 +549,8 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 			m_animationWidthComp.setDuration(m_animationDuration);
 			m_animationWidthComp.start();
 			if (m_shadowPtr){
-				m_shadowPtr->setBlurRadius(12);
+				//this->setGraphicsEffect(m_shadowPtr);
+				m_shadowPtr->setEnabled(true);// setBlurRadius(12);
 			}
 		}
 		else{
@@ -572,7 +578,9 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 			m_animationWidthComp.setDuration(m_animationDuration);
 			m_animationWidthComp.start();
 			if (m_shadowPtr){
-				m_shadowPtr->setBlurRadius(0);
+				//this->setGraphicsEffect(nullptr);
+				m_shadowPtr->setEnabled(false);
+				//m_shadowPtr->setBlurRadius(0);
 			}
 		}
 		else{
@@ -629,6 +637,12 @@ void CMenuPanel::resizeEvent(QResizeEvent* event)
 
 	if (m_mainWidget){
 		PageTree->setMaximumWidth(this->width());
+		
+		if (m_parentWidget){
+			QRect rect = this->geometry();
+			rect.setWidth(this->width() + 5);
+			m_parentWidget->setGeometry(rect);
+		}
 	}
 
 	CheckButtonsVisible();
