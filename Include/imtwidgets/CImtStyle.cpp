@@ -132,11 +132,11 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 						QRect borderRect(QPoint(0, 0), QPoint(2 * pmSize.width(), pmSize.height()));
 						borderRect.moveCenter(pixmapRect.center());
 
-						QColor fillColor = (toolbutton->state & (State_Sunken | State_On)) ? QColor("#335777").lighter(220) : qRgb(255, 255, 255);
+						QColor fillColor = (toolbutton->state & (State_Sunken | State_On)) ? QColor("#335777").lighter(220) : qRgb(245, 245, 250);
 
 						QLinearGradient gradient(borderRect.topLeft(), borderRect.bottomRight()); // diagonal gradient from top-left to bottom-right
-						gradient.setColorAt(0, Qt::white);
-						gradient.setColorAt(0.8, Qt::white);
+						gradient.setColorAt(0, qRgb(245, 245, 250));
+						gradient.setColorAt(0.8, qRgb(245, 245, 250));
 						gradient.setColorAt(1, fillColor);
 
 						painter->fillRect(borderRect, gradient);
