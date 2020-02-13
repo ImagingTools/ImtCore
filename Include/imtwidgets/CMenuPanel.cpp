@@ -416,6 +416,13 @@ void CMenuPanel::SetMainWidget(QWidget* mainWidget)
 	this->setParent(m_mainWidget);
 	m_mainWidget->installEventFilter(this);
 
+	QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect(this);
+	shadowPtr->setXOffset(0);
+	shadowPtr->setYOffset(0);
+	shadowPtr->setBlurRadius(12);
+	//shadowPtr->setColor(qRgba(74, 149, 217, 128));
+	this->setGraphicsEffect(shadowPtr);	
+	
 	if (m_leftFrame)
 	{
 		int minWidth = PageTree->iconSize().width() + 4 * m_padding;
