@@ -73,7 +73,7 @@ void CMenuPanelComp::OnGuiCreated()
 
 	widgetPtr->SetItemTextColor(QColor("#335777"));
 	widgetPtr->SetItemSelectedColor(QColor(245, 245, 245));
-	widgetPtr->SetItemSelectedContourColor(QColor(215, 215, 215));
+	widgetPtr->SetItemSelectedContourColor(QColor(210, 210, 210));
 	widgetPtr->SetItemMouserOverColor(QColor(250, 250, 250));
 	widgetPtr->SetItemMouserOverSelectedColor(QColor(255, 255, 255));
 
