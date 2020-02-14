@@ -21,8 +21,7 @@ class CMenuPanelComp:
 			public ibase::TModelObserverCompBaseWrap<
 						iqtgui::TGuiObserverWrap<
 									iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
-									imod::TSingleModelObserverBase<iprm::ISelectionParam>>>,
-			protected imod::CMultiModelDispatcherBase
+									imod::TSingleModelObserverBase<iprm::ISelectionParam>>>
 {
 public:
 	CMenuPanelComp();
@@ -31,7 +30,6 @@ public:
 				iqtgui::TGuiObserverWrap<
 							iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
 							imod::TSingleModelObserverBase<iprm::ISelectionParam>>> BaseClass;
-	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CMenuPanelComp);
 		I_ASSIGN(m_widgetProviderCompPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
@@ -49,9 +47,6 @@ protected:
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiRetranslate() override;
-
-	// reimplemented (imod::CMultiModelDispatcherBase)
-	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
 	class PageSubselectionObserver: public imod::CMultiModelDispatcherBase

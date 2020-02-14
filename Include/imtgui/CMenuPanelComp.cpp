@@ -95,7 +95,7 @@ void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 	{
 		UpdateBlocker updateBlocker(this);
 
-		UnregisterAllModels();
+		m_pageSubselectionObserver.UnregisterAllModels();
 		m_pageVisualStatusObserver.UnregisterAllModels();
 		m_pagesInfoMap.clear();
 		m_subselectionModelIndex = 0;
@@ -117,14 +117,6 @@ void CMenuPanelComp::OnGuiRetranslate()
 	BaseClass::OnGuiRetranslate();
 
 	UpdateGui(istd::IChangeable::GetAnyChange());
-}
-
-
-void CMenuPanelComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
-{
-	if (!IsUpdateBlocked()){
-		UpdateGui(changeSet);
-	}
 }
 
 
