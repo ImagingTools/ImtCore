@@ -129,6 +129,7 @@ bool CMenuPanelComp::IsPageEnabled(const QByteArray& pageId) const
 	while (!currentId.isEmpty()){
 		PageInfo pageInfo = m_pagesInfoMap[currentId];
 		const iprm::IOptionsList* list = pageInfo.selectionPtr->GetSelectionConstraints();
+		Q_ASSERT(list != nullptr);
 		if (!list->IsOptionEnabled(pageInfo.pageIndex)){
 			return false;
 		}
