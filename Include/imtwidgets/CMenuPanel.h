@@ -101,6 +101,7 @@ protected:
 
 private:
 	int m_padding;
+	int m_minWidth;
 	int m_maxWidth;
 	int m_indent;
 
@@ -122,7 +123,9 @@ private:
 
 private:
 	QModelIndex GetModelIndex(const QByteArray& pageId) const;
+	void SetMinimumPanelWidth(int width);
 	int CalculateMaxItemWith();
+	int CalculateMinItemWith();
 	void CheckButtonsVisible();
 };
 

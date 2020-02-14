@@ -1,9 +1,9 @@
-#include "imtwidgets/CMenuPanelDelegate.h"
+#include <imtwidgets/CMenuPanelDelegate.h>
 
 
 // Qt includes
-#include "QtGui/QPainter"
-#include "QtWidgets/QTreeView"
+#include <QtGui/QPainter>
+#include <QtWidgets/QTreeView>
 
 // ImtCore includes
 #include <imtwidgets/CMenuPanel.h>
