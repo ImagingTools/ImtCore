@@ -44,6 +44,8 @@ protected:
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
+	virtual void OnGuiModelAttached() override;
+	virtual void OnGuiModelDetached() override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiRetranslate() override;
@@ -91,7 +93,7 @@ private:
 
 private:
 	bool IsPageEnabled(const QByteArray& pageId) const;
-	void CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId);
+	void UpdateSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId);
 	void CreatePagesInfoMap(const iprm::ISelectionParam& selection, const QByteArray& parentId);
 	QByteArray FindSelectedItem();
 	void UpdatePageSubselection();

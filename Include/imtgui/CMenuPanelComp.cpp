@@ -16,6 +16,8 @@ CMenuPanelComp::CMenuPanelComp()
 	:m_pageSubselectionObserver(*this),
 	m_pageVisualStatusObserver(*this)
 {
+	m_subselectionModelIndex = 0;
+	m_visualStatusModelIndex = 0;
 }
 
 
@@ -84,29 +86,40 @@ void CMenuPanelComp::OnGuiCreated()
 
 void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 {
+	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
+	Q_ASSERT(pageSelectionPtr != nullptr);
+
+	UpdateSelection(*pageSelectionPtr, QByteArray());
+}
+
+
+void CMenuPanelComp::OnGuiModelAttached()
+{
+	BaseClass::OnGuiModelAttached();
+
+	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
+	Q_ASSERT(pageSelectionPtr != nullptr);
+
 	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
 	Q_ASSERT(panelPtr != nullptr);
 
 	panelPtr->ResetPages();
 
-	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
-	Q_ASSERT(pageSelectionPtr != nullptr);
+	CreatePagesInfoMap(*pageSelectionPtr, QByteArray());
+}
 
-	{
-		UpdateBlocker updateBlocker(this);
 
-		m_pageSubselectionObserver.UnregisterAllModels();
-		m_pageVisualStatusObserver.UnregisterAllModels();
-		m_pagesInfoMap.clear();
-		m_subselectionModelIndex = 0;
-		m_visualStatusModelIndex = 0;
+void CMenuPanelComp::OnGuiModelDetached()
+{
+	m_pageSubselectionObserver.UnregisterAllModels();
+	m_pageVisualStatusObserver.UnregisterAllModels();
 
-		CreatePagesInfoMap(*pageSelectionPtr, QByteArray());
-		CreateMenuForSelection(*pageSelectionPtr, QByteArray());
-	}
+	m_pagesInfoMap.clear();
 
-	QByteArray selectedPageId = FindSelectedItem();
-	panelPtr->SetActivePage(selectedPageId);
+	m_subselectionModelIndex = 0;
+	m_visualStatusModelIndex = 0;
+
+	BaseClass::OnGuiModelDetached();
 }
 
 
@@ -116,7 +129,11 @@ void CMenuPanelComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
-	UpdateGui(istd::IChangeable::GetAnyChange());
+	if (!IsUpdateBlocked()){
+		UpdateBlocker blockUpdate(this);
+	
+		UpdateGui(istd::IChangeable::GetAnyChange());
+	}
 }
 
 
@@ -127,21 +144,25 @@ bool CMenuPanelComp::IsPageEnabled(const QByteArray& pageId) const
 	QByteArray currentId = pageId;
 
 	while (!currentId.isEmpty()){
-		PageInfo pageInfo = m_pagesInfoMap[currentId];
-		const iprm::IOptionsList* list = pageInfo.selectionPtr->GetSelectionConstraints();
-		Q_ASSERT(list != nullptr);
-		if (!list->IsOptionEnabled(pageInfo.pageIndex)){
+		if (m_pagesInfoMap.contains(currentId)){
+			PageInfo pageInfo = m_pagesInfoMap[currentId];
+			const iprm::IOptionsList* list = pageInfo.selectionPtr->GetSelectionConstraints();
+			if (!list->IsOptionEnabled(pageInfo.pageIndex)){
+				return false;
+			}
+
+			currentId = m_pagesInfoMap[currentId].parentPageId;
+		}
+		else{
 			return false;
 		}
-
-		currentId = m_pagesInfoMap[currentId].parentPageId;
 	}
 
 	return true;
 }
 
 
-void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId)
+void CMenuPanelComp::UpdateSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId)
 {
 	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
 	Q_ASSERT(panelPtr != nullptr);
@@ -157,32 +178,34 @@ void CMenuPanelComp::CreateMenuForSelection(const iprm::ISelectionParam& selecti
 			QString pageName = pageListPtr->GetOptionName(pageIndex);
 			QByteArray pageId = pageListPtr->GetOptionId(pageIndex);
 
-			if (panelPtr->InsertPage(pageId, parentId)){
-				panelPtr->SetPageName(pageId, pageName);
+			panelPtr->SetPageName(pageId, pageName);
 
-				bool isPageEnabled = IsPageEnabled(pageId);
-				
-				panelPtr->SetPageEnabled(pageId, isPageEnabled);
+			bool isPageEnabled = IsPageEnabled(pageId);
+			panelPtr->SetPageEnabled(pageId, isPageEnabled);
 
-				const iqtgui::IVisualStatus* visualStatusPtr = visualStatusProviderPtr->GetVisualStatus(pageIndex);
-				if (visualStatusPtr != nullptr){
-					QIcon icon = visualStatusPtr->GetStatusIcon();
+			const iqtgui::IVisualStatus* visualStatusPtr = visualStatusProviderPtr->GetVisualStatus(pageIndex);
+			if (visualStatusPtr != nullptr) {
+				QIcon icon = visualStatusPtr->GetStatusIcon();
 
-					panelPtr->SetPageIcon(pageId, icon);
-				}
+				panelPtr->SetPageIcon(pageId, icon);
+			}
 
-				const iprm::ISelectionParam* subSelectionPtr = selection.GetSubselection(pageIndex);
-				if (subSelectionPtr != nullptr){
-					CreateMenuForSelection(*subSelectionPtr, pageId);
-				}
+			const iprm::ISelectionParam* subSelectionPtr = selection.GetSubselection(pageIndex);
+			if (subSelectionPtr != nullptr) {
+				UpdateSelection(*subSelectionPtr, pageId);
 			}
 		}
 	}
+
+	panelPtr->SetActivePage(FindSelectedItem());
 }
 
 
 void CMenuPanelComp::CreatePagesInfoMap(const iprm::ISelectionParam& selection, const QByteArray& parentId)
 {
+	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
+	Q_ASSERT(panelPtr != nullptr);
+
 	int currentIndex = selection.GetSelectedOptionIndex();
 	QByteArray currentPageId;
 
@@ -217,6 +240,8 @@ void CMenuPanelComp::CreatePagesInfoMap(const iprm::ISelectionParam& selection, 
 				currentPageId = pageId;
 			}
 
+			panelPtr->InsertPage(pageId, parentId);
+
 			const iprm::ISelectionParam* subSelectionPtr = selection.GetSubselection(pageIndex);
 			if (subSelectionPtr != nullptr){
 				const imod::IModel* constModelPtr = dynamic_cast<const imod::IModel*>(subSelectionPtr);
@@ -224,6 +249,7 @@ void CMenuPanelComp::CreatePagesInfoMap(const iprm::ISelectionParam& selection, 
 				if (modelPtr != nullptr){
 					m_pageSubselectionObserver.RegisterModel(modelPtr, m_subselectionModelIndex++);
 				}
+
 				CreatePagesInfoMap(*subSelectionPtr, pageId);
 			}
 		}
@@ -257,6 +283,8 @@ QByteArray CMenuPanelComp::FindSelectedItem()
 void CMenuPanelComp::UpdatePageSubselection()
 {
 	if (!IsUpdateBlocked()){
+		UpdateBlocker updateBlocker(this);
+
 		UpdateGui(istd::IChangeable::GetAnyChange());
 	}
 }
@@ -267,18 +295,7 @@ void CMenuPanelComp::UpdatePageState()
 	if (!IsUpdateBlocked()){
 		UpdateBlocker updateBlocker(this);
 
-		imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
-		Q_ASSERT(panelPtr != nullptr);
-
-		panelPtr->ResetPages();
-
-		iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
-		Q_ASSERT(pageSelectionPtr != nullptr);
-
-		CreateMenuForSelection(*pageSelectionPtr, QByteArray());
-		
-		QByteArray selectedPageId = FindSelectedItem();
-		panelPtr->SetActivePage(selectedPageId);
+		UpdateGui(istd::IChangeable::GetAnyChange());
 	}
 }
 
