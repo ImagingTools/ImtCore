@@ -127,6 +127,7 @@ private:
 	int CalculateMaxItemWith();
 	int CalculateMinItemWith();
 	void CheckButtonsVisible();
+	void StartAnimation();
 };
 
 

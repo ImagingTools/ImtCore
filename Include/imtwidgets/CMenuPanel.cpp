@@ -124,9 +124,7 @@ void CMenuPanel::SetActivePage(const QByteArray& pageId)
 		}
 
 		m_animationAction = AA_EXPAND;
-		m_animationTimerIdentifier = -1;
-		QTimerEvent event(m_animationTimerIdentifier);
-		timerEvent(&event);
+		StartAnimation();
 	}
 
 	if (!prevIndex.isValid() && index.isValid()){
@@ -135,9 +133,7 @@ void CMenuPanel::SetActivePage(const QByteArray& pageId)
 		}
 
 		m_animationAction = AA_COLLAPSE;
-		m_animationTimerIdentifier = -1;
-		QTimerEvent event(m_animationTimerIdentifier);
-		timerEvent(&event);
+		StartAnimation();
 	}
 }
 
@@ -559,63 +555,7 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 	killTimer(m_animationTimerIdentifier);
 	m_animationTimerIdentifier = 0;
 
-	if (m_animationAction == AA_EXPAND && this->width() != m_maxWidth){
-		if (m_mainWidget != nullptr){
-			m_animationWidthComp.stop();
-			m_animationWidthComp.setStartValue(QRect(0, 0, this->width(), height()));
-			m_animationWidthComp.setEndValue(QRect(0, 0, m_maxWidth, height()));
-			m_animationWidthComp.setDuration(m_animationDuration);
-			m_animationWidthComp.start();
-			if (m_shadowPtr){
-				//this->setGraphicsEffect(m_shadowPtr);
-				m_shadowPtr->setEnabled(true);// setBlurRadius(12);
-			}
-		}
-		else{
-			m_animationWidth.stop();
-			m_animationWidth.setStartValue(PageTree->maximumWidth());
-			m_animationWidth.setEndValue(m_maxWidth);
-			m_animationWidth.setDuration(m_animationDuration);
-			m_animationWidth.start();
-		}
-
-		m_animationIndent.stop();
-		m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
-		m_animationIndent.setEndValue(m_indent);
-		m_animationIndent.setDuration(m_animationDuration - 10);
-		m_animationIndent.start();
-	}
-
-	int minWidth = PageTree->iconSize().width() + 4 * m_padding;
-
-	if (m_animationAction == AA_COLLAPSE && this->width() != minWidth){
-		if (m_mainWidget != nullptr){
-			m_animationWidthComp.stop();
-			m_animationWidthComp.setStartValue(QRect(0, 0, width(), height()));
-			m_animationWidthComp.setEndValue(QRect(0, 0, minWidth, height()));
-			m_animationWidthComp.setDuration(m_animationDuration);
-			m_animationWidthComp.start();
-			if (m_shadowPtr){
-				//this->setGraphicsEffect(nullptr);
-				m_shadowPtr->setEnabled(false);
-				//m_shadowPtr->setBlurRadius(0);
-			}
-		}
-		else{
-			m_animationWidth.stop();
-			m_animationWidth.setStartValue(PageTree->maximumWidth());
-			m_animationWidth.setEndValue(minWidth);
-			m_animationWidth.setDuration(m_animationDuration);
-			m_animationWidth.start();
-		}
-		m_animationIndent.stop();
-		m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
-		m_animationIndent.setEndValue(0);
-		m_animationIndent.setDuration(m_animationDuration - 10);
-		m_animationIndent.start();
-	}
-
-	m_animationAction = AA_NONE;
+	StartAnimation();
 }
 
 
@@ -829,6 +769,65 @@ void CMenuPanel::CheckButtonsVisible()
 	else{
 		pushBottom->setVisible(true);
 	}
+}
+
+
+void CMenuPanel::StartAnimation()
+{
+	if (m_animationAction == AA_EXPAND && this->width() != m_maxWidth){
+		if (m_mainWidget != nullptr){
+			m_animationWidthComp.stop();
+			m_animationWidthComp.setStartValue(QRect(0, 0, this->width(), height()));
+			m_animationWidthComp.setEndValue(QRect(0, 0, m_maxWidth, height()));
+			m_animationWidthComp.setDuration(m_animationDuration);
+			m_animationWidthComp.start();
+			if (m_shadowPtr){
+				m_shadowPtr->setEnabled(true);
+			}
+		}
+		else{
+			m_animationWidth.stop();
+			m_animationWidth.setStartValue(PageTree->maximumWidth());
+			m_animationWidth.setEndValue(m_maxWidth);
+			m_animationWidth.setDuration(m_animationDuration);
+			m_animationWidth.start();
+		}
+
+		m_animationIndent.stop();
+		m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
+		m_animationIndent.setEndValue(m_indent);
+		m_animationIndent.setDuration(m_animationDuration - 10);
+		m_animationIndent.start();
+	}
+
+	int minWidth = PageTree->iconSize().width() + 4 * m_padding;
+
+	if (m_animationAction == AA_COLLAPSE && this->width() != minWidth){
+		if (m_mainWidget != nullptr){
+			m_animationWidthComp.stop();
+			m_animationWidthComp.setStartValue(QRect(0, 0, width(), height()));
+			m_animationWidthComp.setEndValue(QRect(0, 0, minWidth, height()));
+			m_animationWidthComp.setDuration(m_animationDuration);
+			m_animationWidthComp.start();
+			if (m_shadowPtr){
+				m_shadowPtr->setEnabled(false);
+			}
+		}
+		else{
+			m_animationWidth.stop();
+			m_animationWidth.setStartValue(PageTree->maximumWidth());
+			m_animationWidth.setEndValue(minWidth);
+			m_animationWidth.setDuration(m_animationDuration);
+			m_animationWidth.start();
+		}
+		m_animationIndent.stop();
+		m_animationIndent.setStartValue(PageTree->maximumWidth() * m_indent / m_maxWidth);
+		m_animationIndent.setEndValue(0);
+		m_animationIndent.setDuration(m_animationDuration - 10);
+		m_animationIndent.start();
+	}
+
+	m_animationAction = AA_NONE;
 }
 
 
