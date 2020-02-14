@@ -50,7 +50,7 @@ void CImtStyle::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption * 
 				if (widget != nullptr){
 					QWidget* parentWidget = widget->parentWidget();
 					if ((parentWidget != nullptr) && parentWidget->property("ImtToolBar").toBool()){
-						painter->fillRect(option->rect, Qt::transparent);
+//						painter->fillRect(option->rect, Qt::transparent);
 					}
 					else{
 						BaseClass::drawPrimitive(pe, option, painter, widget);
@@ -75,21 +75,20 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 {
 	switch (element){
 		case CE_ToolButtonLabel:
-			if (const QStyleOptionToolButton* toolbutton = qstyleoption_cast<const QStyleOptionToolButton *>(option)){
-				QRect rect = toolbutton->rect;
-
-				if (widget != nullptr){
-					QWidget* parentWidget = widget->parentWidget();
-					if (!parentWidget->property("ImtToolBar").toBool()){
-						BaseClass::drawControl(element, option, painter, widget);
-						return;
-					}
-				}
-				else{
+			if (widget != nullptr) {
+				QWidget* parentWidget = widget->parentWidget();
+				if (!parentWidget->property("ImtToolBar").toBool()) {
 					BaseClass::drawControl(element, option, painter, widget);
 					return;
 				}
+			}
+			else {
+				BaseClass::drawControl(element, option, painter, widget);
+				return;
+			}
 
+			if (const QStyleOptionToolButton* toolbutton = qstyleoption_cast<const QStyleOptionToolButton *>(option)){
+				QRect rect = toolbutton->rect;
 				int shiftX = 0;
 				int shiftY = 0;
 				if (toolbutton->state & (State_Sunken | State_On)){
@@ -101,6 +100,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 				bool hasArrow = toolbutton->features & QStyleOptionToolButton::Arrow;
 
 				QPixmap pm;
+				QRect pixmapRect = rect.adjusted(1, 1, -1, -1);
 				QSize pmSize = toolbutton->iconSize;
 				if (!toolbutton->icon.isNull()){
 					QIcon::State state = toolbutton->state & State_On ? QIcon::On : QIcon::Off;
@@ -109,59 +109,71 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 						mode = QIcon::Disabled;
 					else if ((option->state & State_MouseOver) && (option->state & State_AutoRaise))
 						mode = QIcon::Active;
-					else
+					else{
 						mode = QIcon::Normal;
-					pm = toolbutton->icon.pixmap(qt_getWindow(widget), toolbutton->rect.size().boundedTo(toolbutton->iconSize),
-						mode, state);
+					}
+
+					pm = toolbutton->icon.pixmap(qt_getWindow(widget), pixmapRect.size().boundedTo(toolbutton->iconSize), mode, state);
 					pmSize = pm.size() / pm.devicePixelRatio();
 				}
 
 				painter->setFont(toolbutton->font);
-				QRect pixmapRect = rect;
 				QRect textRect = rect;
-				int alignment = Qt::TextShowMnemonic;
-				if (!proxy()->styleHint(SH_UnderlineShortcut, option, widget))
-					alignment |= Qt::TextHideMnemonic;
 
 				if (toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon){
 					pixmapRect.setHeight(pmSize.height() + 6);
 					textRect.adjust(0, pixmapRect.height() - 1, 0, -1);
 					pixmapRect.translate(shiftX, shiftY);
+
 					if (!hasArrow){
 						painter->setRenderHint(QPainter::Antialiasing, true);
 						QRect borderRect(QPoint(0, 0), QPoint(2 * pmSize.width(), pmSize.height()));
 						borderRect.moveCenter(pixmapRect.center());
 
+#if 0 // Draw layout boxes
+						painter->setPen(Qt::black);
+						painter->drawRect(rect);
+
+						painter->setPen(Qt::darkGreen);
+						painter->drawRect(borderRect);
+
+						painter->setPen(Qt::red);
+						painter->drawRect(pixmapRect);
+#endif
 						painter->save();
 
-						QPen pen(QColor("#9d9d9d"), 0);
-						painter->setPen(pen);
-
 						QPainterPath path;
-						path.addRoundedRect(borderRect.adjusted(-1, -1, 2, 2), 3, 3);
-						painter->drawPath(path);
-
-						path.clear();
 						path.addRoundedRect(borderRect.adjusted(-2, -2, 2, 2), 3, 3);
 
-						painter->fillPath(path, QColor(245, 245, 245));
+						QPen pen(QColor(200, 200, 200), 0);
+						painter->setPen(pen);
 
 						if (toolbutton->state & (State_Sunken | State_On)){
-							QPainterPath path;
-							path.addRoundedRect(borderRect.adjusted(-2, 0, 2, 2), 3, 3);
-							painter->fillPath(path, QColor("#dddddd"));
+							painter->fillPath(path, QColor(200, 240, 255));
+						}
+						else{
+							painter->fillPath(path, QColor(245, 245, 245));
 						}
 
-//						painter->drawPath(path);
+						painter->drawPath(path);
+
 						painter->restore();
 
-						proxy()->drawItemPixmap(painter, borderRect, Qt::AlignCenter, pm);
+						proxy()->drawItemPixmap(painter, pixmapRect, Qt::AlignCenter, pm);
 					}
 					else {
 						drawArrow(proxy(), toolbutton, pixmapRect, painter, widget);
 					}
+
+					int alignment = Qt::TextShowMnemonic;
+					if (!proxy()->styleHint(SH_UnderlineShortcut, option, widget)){
+						alignment |= Qt::TextHideMnemonic;
+					}
+
 					alignment |= Qt::AlignCenter;
+
 					textRect.translate(shiftX, shiftY);
+
 					proxy()->drawItemText(painter, QStyle::visualRect(option->direction, rect, textRect), alignment, toolbutton->palette,
 						toolbutton->state & State_Enabled, toolbutton->text,
 						QPalette::ButtonText);

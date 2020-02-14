@@ -72,10 +72,10 @@ void CMenuPanelComp::OnGuiCreated()
 	widgetPtr->SetIconSize(28);
 
 	widgetPtr->SetItemTextColor(QColor("#335777"));
-	widgetPtr->SetItemSelectedColor(QColor(245, 245, 245));
+	widgetPtr->SetItemSelectedColor(QColor(255, 255, 255));
 	widgetPtr->SetItemSelectedContourColor(QColor(210, 210, 210));
-	widgetPtr->SetItemMouserOverColor(QColor(250, 250, 250));
-	widgetPtr->SetItemMouserOverSelectedColor(QColor(255, 255, 255));
+	widgetPtr->SetItemMouserOverColor(QColor(230, 230, 250));
+	widgetPtr->SetItemMouserOverSelectedColor(QColor(220, 220, 255));
 
 	widgetPtr->SetAnimationDelay(400);
 	widgetPtr->SetAnimationDuration(150);
