@@ -65,7 +65,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	PageTree->verticalScrollBar()->installEventFilter(this);
 
 	PageTree->setContentsMargins(QMargins(0,0,0,0));
-	PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
+	PageTree->setMaximumWidth(m_minWidth);
 
 
 	pushTop->setStyleSheet("QPushButton:hover{	background: white } "
@@ -490,7 +490,7 @@ void CMenuPanel::OnPageIdChanged(const QModelIndex& selected, const QModelIndex&
 
 void CMenuPanel::OnAnimationFinished()
 {
-	if (m_animationAction != AA_NONE){
+	if (m_animationAction != AA_NONE && PageTree->currentIndex().isValid()){
 		if (m_animationTimerIdentifier != 0){
 			killTimer(m_animationTimerIdentifier);
 		}
