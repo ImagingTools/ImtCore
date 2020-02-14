@@ -94,7 +94,7 @@ private:
 private:
 	bool IsPageEnabled(const QByteArray& pageId) const;
 	void UpdateSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId);
-	void CreatePagesInfoMap(const iprm::ISelectionParam& selection, const QByteArray& parentId);
+	void CreatePageTree(const iprm::ISelectionParam& selection, const QByteArray& parentId);
 	QByteArray FindSelectedItem();
 	void UpdatePageSubselection();
 	void UpdatePageState();

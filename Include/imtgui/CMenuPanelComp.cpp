@@ -100,12 +100,7 @@ void CMenuPanelComp::OnGuiModelAttached()
 	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
 	Q_ASSERT(pageSelectionPtr != nullptr);
 
-	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
-	Q_ASSERT(panelPtr != nullptr);
-
-	panelPtr->ResetPages();
-
-	CreatePagesInfoMap(*pageSelectionPtr, QByteArray());
+	CreatePageTree(*pageSelectionPtr, QByteArray());
 }
 
 
@@ -118,6 +113,11 @@ void CMenuPanelComp::OnGuiModelDetached()
 
 	m_subselectionModelIndex = 0;
 	m_visualStatusModelIndex = 0;
+
+	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
+	Q_ASSERT(panelPtr != nullptr);
+
+	panelPtr->ResetPages();
 
 	BaseClass::OnGuiModelDetached();
 }
@@ -201,7 +201,7 @@ void CMenuPanelComp::UpdateSelection(const iprm::ISelectionParam& selection, con
 }
 
 
-void CMenuPanelComp::CreatePagesInfoMap(const iprm::ISelectionParam& selection, const QByteArray& parentId)
+void CMenuPanelComp::CreatePageTree(const iprm::ISelectionParam& selection, const QByteArray& parentId)
 {
 	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
 	Q_ASSERT(panelPtr != nullptr);
@@ -250,7 +250,7 @@ void CMenuPanelComp::CreatePagesInfoMap(const iprm::ISelectionParam& selection, 
 					m_pageSubselectionObserver.RegisterModel(modelPtr, m_subselectionModelIndex++);
 				}
 
-				CreatePagesInfoMap(*subSelectionPtr, pageId);
+				CreatePageTree(*subSelectionPtr, pageId);
 			}
 		}
 	}
