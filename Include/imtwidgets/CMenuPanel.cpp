@@ -67,17 +67,8 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	PageTree->setMaximumWidth(PageTree->iconSize().width() + 4 * m_padding);
 
 
-	pushTop->setStyleSheet("QPushButton:hover{	"
-		"background: qlineargradient(x1 : 0, y1 : 0, x2 : 0, y2 : 1, stop : 0.0 #ffd9aa,"
-		"stop :   0.5 #ffbb6e, stop :   0.55 #feae42, stop :   1.0 #fedb74); } "
-		" QPushButton{ "
-		"border: 1px solid #9d9d9d; "
-	//	"border - radius: 2px; "
-	//	"padding: 5px 15px 2px 5px; "
-	//	"background: qlineargradient(x1 : 0, y1 : 0, x2 : 0, y2 : 1, stop : 0.0 #f5f9ff, "
-	//	"stop :   0.5 #c7dfff, stop :   0.55 #afd2ff, stop :   1.0 #c0dbff); "
-		"background: #e0e0e0; "
-        "}");
+	pushTop->setStyleSheet("QPushButton:hover{	background: white } "
+		" QPushButton{ border: 1px solid #9d9d9d; background: #e0e0e0; }" );
 
 	pushBottom->setStyleSheet(pushTop->styleSheet());
 
