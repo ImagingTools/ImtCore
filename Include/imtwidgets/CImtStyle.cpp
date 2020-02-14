@@ -134,11 +134,16 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 
 						painter->save();
 
-						QPainterPath path;
-						path.addRoundedRect(borderRect.adjusted(-2, -2, 2, 2), 3, 3);
-
 						QPen pen(QColor("#9d9d9d"), 0);
 						painter->setPen(pen);
+
+						QPainterPath path;
+						path.addRoundedRect(borderRect.adjusted(-1, -1, 2, 2), 3, 3);
+						painter->drawPath(path);
+
+						path.clear();
+						path.addRoundedRect(borderRect.adjusted(-2, -2, 2, 2), 3, 3);
+
 						painter->fillPath(path, QColor(245, 245, 245));
 
 						if (toolbutton->state & (State_Sunken | State_On)){
@@ -147,8 +152,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							painter->fillPath(path, QColor("#dddddd"));
 						}
 
-						painter->drawPath(path);
-
+//						painter->drawPath(path);
 						painter->restore();
 
 						proxy()->drawItemPixmap(painter, borderRect, Qt::AlignCenter, pm);
