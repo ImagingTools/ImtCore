@@ -132,33 +132,21 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 						QRect borderRect(QPoint(0, 0), QPoint(2 * pmSize.width(), pmSize.height()));
 						borderRect.moveCenter(pixmapRect.center());
 
-						//QColor fillColor = (toolbutton->state & (State_Sunken | State_On)) ? QColor("#335777").lighter(220) : qRgb(245, 245, 250);
-
-						//QLinearGradient gradient(borderRect.topLeft(), borderRect.bottomRight()); // diagonal gradient from top-left to bottom-right
-						//gradient.setColorAt(0, qRgb(245, 245, 250));
-						//gradient.setColorAt(0.8, qRgb(245, 245, 250));
-						//gradient.setColorAt(1, fillColor);
-
-						//painter->fillRect(borderRect, gradient);
-
-						//painter->setPen(QPen(Qt::darkGray, 1));
-						//painter->drawRect(borderRect.adjusted(-2, -2, 2, 2));
-
-						
 						painter->save();
 
-						painter->setRenderHint(QPainter::Antialiasing);
 						QPainterPath path;
-						path.addRoundedRect(borderRect.adjusted(-2, -2, 2, 2), 6, 6);
-						QPen pen(QColor("#9d9d9d"), 1);
+						path.addRoundedRect(borderRect.adjusted(-2, -2, 2, 2), 3, 3);
+
+						QPen pen(QColor("#9d9d9d"), 0);
 						painter->setPen(pen);
-						painter->fillPath(path, Qt::white);
-						//painter->fillPath(path, fillColor);
+						painter->fillPath(path, QColor(245, 245, 245));
+
 						if (toolbutton->state & (State_Sunken | State_On)){
 							QPainterPath path;
-							path.addRoundedRect(borderRect.adjusted(-2, 0, 2, 2), 6, 6);
+							path.addRoundedRect(borderRect.adjusted(-2, 0, 2, 2), 3, 3);
 							painter->fillPath(path, QColor("#dddddd"));
 						}
+
 						painter->drawPath(path);
 
 						painter->restore();
