@@ -490,24 +490,38 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 	}
 
 	ColumnsList columnsList;
-
 	ColumnSettings columnSettings;
-	columnSettings["FieldId"] = QString();
-	columnSettings["Width"] = (double)ItemList->columnWidth(0) / ItemList->width();
-	columnsList.append(columnSettings);
-
 	QVector<QByteArray> ids = GetMetaInfoIds(m_currentTypeId);
 	QStringList headers = GetMetaInfoHeaders(m_currentTypeId);
+
+	int totalWidth = (double)ItemList->columnWidth(0);
 	
+	for (int i = 0; i < ids.count(); i++){
+		int columndIndex = ItemList->header()->logicalIndex(i + 1);
+		totalWidth += ItemList->columnWidth(columndIndex);
+	}
+
+	columnSettings["FieldId"] = QString();
+	columnSettings["Width"] = (double)ItemList->columnWidth(0) / ItemList->width(); //totalWidth;
+	columnsList.append(columnSettings);
+
 	for (int i = 0; i < ids.count(); i++){
 		int columndIndex = ItemList->header()->logicalIndex(i + 1);
 		int fieldIndex = columndIndex - 1;
 
 		ColumnSettings settings;
 		settings["FieldId"] = QString(ids[fieldIndex]);
-		settings["Width"] = (double)ItemList->columnWidth(columndIndex) / ItemList->width();
+		settings["Width"] = (double)ItemList->columnWidth(columndIndex) / ItemList->width(); //totalWidth;
 		columnsList.append(settings);
 	}
+
+	qDebug() << columnsList[0]["Width"];
+	qDebug() << columnsList[1]["Width"];
+	qDebug() << columnsList[2]["Width"];
+	qDebug() << columnsList[3]["Width"];
+	qDebug() << columnsList[4]["Width"];
+	qDebug() << "*** " << columnsList[0]["Width"].toDouble() + columnsList[1]["Width"].toDouble() + columnsList[2]["Width"].toDouble() + columnsList[3]["Width"].toDouble() + columnsList[4]["Width"].toDouble();
+
 
 	m_typeIdColumnsSettings[m_currentTypeId] = columnsList;
 }
@@ -515,6 +529,15 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 
 void CObjectCollectionViewComp::RestoreColumnsSettings()
 {
+	disconnect(ItemList->header(), &QHeaderView::sectionResized, this, &CObjectCollectionViewComp::OnSectionResized);
+	disconnect(ItemList->header(), &QHeaderView::sectionMoved, this, &CObjectCollectionViewComp::OnSectionMoved);
+
+	bool localBlock = m_blockColumnsSettingsSynchronize;
+	if (localBlock){
+		m_blockColumnsSettingsSynchronize = true;
+	}
+	m_blockColumnsSettingsSynchronize = true;
+
 	QVector<QByteArray> tempFieldIds = GetMetaInfoIds(m_currentTypeId);
 	QStringList fieldIds;
 	for (QByteArray tempFieldId : tempFieldIds){
@@ -599,6 +622,11 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 			ItemList->resizeColumnToContents(i);
 		}
 	}
+
+	m_blockColumnsSettingsSynchronize = localBlock;
+
+	connect(ItemList->header(), &QHeaderView::sectionResized, this, &CObjectCollectionViewComp::OnSectionResized);
+	connect(ItemList->header(), &QHeaderView::sectionMoved, this, &CObjectCollectionViewComp::OnSectionMoved);
 }
 
 
