@@ -502,7 +502,7 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 	}
 
 	columnSettings["FieldId"] = QString();
-	columnSettings["Width"] = (double)ItemList->columnWidth(0) / ItemList->width(); //totalWidth;
+	columnSettings["Width"] = (double)ItemList->columnWidth(0) / totalWidth;
 	columnsList.append(columnSettings);
 
 	for (int i = 0; i < ids.count(); i++){
@@ -511,17 +511,9 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 
 		ColumnSettings settings;
 		settings["FieldId"] = QString(ids[fieldIndex]);
-		settings["Width"] = (double)ItemList->columnWidth(columndIndex) / ItemList->width(); //totalWidth;
+		settings["Width"] = (double)ItemList->columnWidth(columndIndex) / totalWidth;
 		columnsList.append(settings);
 	}
-
-	qDebug() << columnsList[0]["Width"];
-	qDebug() << columnsList[1]["Width"];
-	qDebug() << columnsList[2]["Width"];
-	qDebug() << columnsList[3]["Width"];
-	qDebug() << columnsList[4]["Width"];
-	qDebug() << "*** " << columnsList[0]["Width"].toDouble() + columnsList[1]["Width"].toDouble() + columnsList[2]["Width"].toDouble() + columnsList[3]["Width"].toDouble() + columnsList[4]["Width"].toDouble();
-
 
 	m_typeIdColumnsSettings[m_currentTypeId] = columnsList;
 }
@@ -533,9 +525,9 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 	disconnect(ItemList->header(), &QHeaderView::sectionMoved, this, &CObjectCollectionViewComp::OnSectionMoved);
 
 	bool localBlock = m_blockColumnsSettingsSynchronize;
-	if (localBlock){
-		m_blockColumnsSettingsSynchronize = true;
-	}
+	//if (localBlock){
+	//	m_blockColumnsSettingsSynchronize = true;
+	//}
 	m_blockColumnsSettingsSynchronize = true;
 
 	QVector<QByteArray> tempFieldIds = GetMetaInfoIds(m_currentTypeId);
@@ -544,8 +536,44 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 		fieldIds.append(tempFieldId);
 	}
 	QSet<QString> fieldSet = fieldIds.toSet();
-		
+	fieldSet += "";
+
+	// Compare restored column set with actual column set:
+	bool compareOk = true;
+
 	if (m_typeIdColumnsSettings.contains(m_currentTypeId)){
+		ColumnsList columnsList = m_typeIdColumnsSettings[m_currentTypeId];
+	
+		for (ColumnSettings settings : columnsList){
+			QVariant varFieldId = settings["FieldId"];
+			QVariant varWidth = settings["Width"];
+
+			if (varFieldId.type() != QVariant::String){
+				compareOk = false;
+				break;
+			}
+
+			if (varWidth.type() != QVariant::Double){
+				compareOk = false;
+				continue;
+			}
+
+			QString fieldId = varFieldId.toString();
+			if (!fieldSet.contains(fieldId)){
+				compareOk = false;
+				break;
+			}
+
+			fieldSet -= fieldId;
+		}
+	}
+
+	if (!fieldSet.isEmpty()){
+		compareOk = false;
+	}
+
+	// Set column order and sizes:
+	if (compareOk && m_typeIdColumnsSettings.contains(m_currentTypeId)){
 		ColumnsList columnsList = m_typeIdColumnsSettings[m_currentTypeId];
 
 		int currentIndex = 0;
@@ -583,43 +611,26 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 				continue;
 			}
 
-			if (fieldSet.contains(fieldId)){
-				int logicIndex = fieldIds.indexOf(fieldId) + 1;
-				ItemList->header()->moveSection(ItemList->header()->visualIndex(logicIndex), currentIndex);
-				fieldSet.remove(fieldId);
+			int logicIndex = fieldIds.indexOf(fieldId) + 1;
+			ItemList->header()->moveSection(ItemList->header()->visualIndex(logicIndex), currentIndex);
+			fieldSet.remove(fieldId);
 				
-				if (ok){
-					ItemList->setColumnWidth(logicIndex, width * ItemList->width());
-				}
-				else{
-					ItemList->resizeColumnToContents(currentIndex);
-				}
-
-				currentIndex++;
+			if (ok){
+				ItemList->setColumnWidth(logicIndex, width * ItemList->width());
 			}
-		}
-
-		for (int i = 0; i < fieldIds.count(); i++){
-			if (!fieldSet.contains(fieldIds[i])){
-				fieldIds[i].clear();
-			}
-		}
-
-		for (QString fieldId : fieldIds){
-			if (fieldId.isEmpty()){
-				continue;
+			else{
+				ItemList->setColumnWidth(logicIndex, ItemList->width() / columnsList.count());
 			}
 
-			int fieldLogicIndex = fieldIds.indexOf(fieldId) + 1;
-			ItemList->header()->moveSection(fieldLogicIndex, currentIndex++);
-			ItemList->resizeColumnToContents(fieldLogicIndex);
+			currentIndex++;
 		}
 	}
 	else{
-		for (int i = 0; i < m_itemModel.columnCount(); i++){
+		int columnCount = m_itemModel.columnCount();
+		for (int i = 0; i < columnCount; i++){
 			int currentVisualIndex = ItemList->header()->visualIndex(i);
 			ItemList->header()->moveSection(currentVisualIndex, i);
-			ItemList->resizeColumnToContents(i);
+			ItemList->setColumnWidth(currentVisualIndex, ItemList->width() / columnCount);
 		}
 	}
 
