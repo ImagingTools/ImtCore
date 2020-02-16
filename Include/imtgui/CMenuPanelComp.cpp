@@ -84,7 +84,7 @@ void CMenuPanelComp::OnGuiCreated()
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
-void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
+void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
 	Q_ASSERT(pageSelectionPtr != nullptr);
@@ -170,7 +170,6 @@ void CMenuPanelComp::UpdateSelection(const iprm::ISelectionParam& selection, con
 	const iqtgui::IMultiVisualStatusProvider* visualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(&selection);
 	Q_ASSERT(visualStatusProviderPtr != nullptr);
 
-	int currentIndex = selection.GetSelectedOptionIndex();
 	const iprm::IOptionsList* pageListPtr = selection.GetSelectionConstraints();
 	if (pageListPtr != nullptr){
 		int pageCount = pageListPtr->GetOptionsCount();

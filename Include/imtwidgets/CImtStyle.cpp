@@ -113,8 +113,13 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 						mode = QIcon::Normal;
 					}
 
-					pm = toolbutton->icon.pixmap(qt_getWindow(widget), pixmapRect.size().boundedTo(toolbutton->iconSize), mode, state);
-					pmSize = pm.size() / pm.devicePixelRatio();
+					QSize iconSize = pixmapRect.size().boundedTo(toolbutton->iconSize);
+
+					pm = toolbutton->icon.pixmap(qt_getWindow(widget), iconSize, mode, state);
+
+					double deviceRatio = pm.devicePixelRatio();
+
+					pmSize = pm.size() / deviceRatio;
 				}
 
 				painter->setFont(toolbutton->font);
@@ -143,13 +148,15 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 						painter->save();
 
 						QPainterPath path;
-						path.addRoundedRect(borderRect.adjusted(-2, -2, 2, 2), 3, 3);
+						path.addRoundedRect(borderRect.adjusted(-2, -2, 2, 2), 5, 5);
 
 						QPen pen(QColor(200, 200, 200), 0);
 						painter->setPen(pen);
 
 						if (toolbutton->state & (State_Sunken | State_On)){
-							painter->fillPath(path, QColor(200, 240, 255));
+							QPen pen(QColor(190, 190, 190), 0);
+							painter->setPen(pen);
+							painter->fillPath(path, QColor(215, 215, 215));
 						}
 						else{
 							painter->fillPath(path, QColor(245, 245, 245));
