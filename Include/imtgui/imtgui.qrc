@@ -105,5 +105,6 @@
         <file alias="LampHighlight">Resources/Icons/LampHighlight.svg</file>
         <file alias="ManualProcessingHighlight">Resources/Icons/ManualProcessingHighlight.svg</file>
         <file alias="DetailedHighlight">Resources/Icons/DetailedHighlight.svg</file>
+        <file alias="ProductionOverviewHighlight">Resources/Icons/ProductionOverviewHighlight.svg</file>
     </qresource>
 </RCC>
