@@ -45,122 +45,122 @@
 <g
    id="g5290"
    transform="matrix(1.0416666,0,0,1.0416666,56,56.000018)"
-   style="fill:#335777">
+   style="fill:#5A5A5A">
 	<g
    id="g5288"
-   style="fill:#335777">
+   style="fill:#5A5A5A">
 		<g
    id="g5286"
-   style="fill:#335777">
+   style="fill:#5A5A5A">
 			<rect
    x="0"
    y="85.333"
    width="42.667"
    height="42.667"
    id="rect5252"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<rect
    x="0"
    y="170.66701"
    width="42.667"
    height="42.667"
    id="rect5254"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<path
    d="M 0,42.667 H 42.667 V 0 C 19.093,0 0,19.093 0,42.667 Z"
    id="path5256"
    inkscape:connector-curvature="0"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<rect
    x="0"
    y="256"
    width="42.667"
    height="42.667"
    id="rect5258"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<path
    d="M 341.333,0 V 42.667 H 384 C 384,19.093 364.907,0 341.333,0 Z"
    id="path5260"
    inkscape:connector-curvature="0"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<rect
    x="170.66701"
    y="0"
    width="42.667"
    height="42.667"
    id="rect5262"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<path
    d="M 42.667,384 V 341.333 H 0 C 0,364.907 19.093,384 42.667,384 Z"
    id="path5264"
    inkscape:connector-curvature="0"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<rect
    x="85.333"
    y="341.33301"
    width="42.667"
    height="42.667"
    id="rect5266"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<rect
    x="85.333"
    y="0"
    width="42.667"
    height="42.667"
    id="rect5268"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<path
    d="M 341.333,384 C 364.907,384 384,364.907 384,341.333 h -42.667 z"
    id="path5270"
    inkscape:connector-curvature="0"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<rect
    x="341.33301"
    y="170.66701"
    width="42.667"
    height="42.667"
    id="rect5272"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<rect
    x="170.66701"
    y="341.33301"
    width="42.667"
    height="42.667"
    id="rect5274"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<rect
    x="341.33301"
    y="85.333"
    width="42.667"
    height="42.667"
    id="rect5276"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<rect
    x="341.33301"
    y="256"
    width="42.667"
    height="42.667"
    id="rect5278"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<rect
    x="256"
    y="341.33301"
    width="42.667"
    height="42.667"
    id="rect5280"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<path
    d="M 85.333,298.667 H 298.666 V 85.333 H 85.333 Z M 128,128 H 256 V 256 H 128 Z"
    id="path5282"
    inkscape:connector-curvature="0"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 			<rect
    x="256"
    y="0"
    width="42.667"
    height="42.667"
    id="rect5284"
-   style="fill:#335777" />
+   style="fill:#5A5A5A" />
 		</g>
 	</g>
 </g>

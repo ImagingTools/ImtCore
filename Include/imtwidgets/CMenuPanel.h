@@ -73,9 +73,7 @@ public:
 	virtual void SetItemSelectedContourColor(QColor color);
 	virtual void SetItemMouserOverColor(QColor color);
 	virtual void SetItemMouserOverSelectedColor(QColor color);
-
 	virtual void SetMainWidget(QWidget* mainWidget);
-
 
 Q_SIGNALS:
 	/**

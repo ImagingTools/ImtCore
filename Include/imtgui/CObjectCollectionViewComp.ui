@@ -28,7 +28,7 @@ QAbstractItemView[NoFrame=&quot;true&quot;]
 
 QAbstractItemView::item
 {
-    color: #335777;
+    color: #505050;
 	padding-top: 0.9em;
 	padding-bottom: 0.9em;
 }
@@ -49,7 +49,7 @@ QHeaderView::section
 	border-left: none;
 	border-right: none;
 	border-top: none;
-	color: #335777;
+	color: #505050;
 	font-weight: bold;
 }
 
@@ -59,11 +59,11 @@ QHeaderView::section
 */
 QTreeWidget[TabSimulation=true]
 {
-	color: #808080;
+	color: #505050;
 	background: rgb(230,230,230);
 	font-weight: bold;
 	text-align: left;
-	color: #808080;
+	color: #505050;
 }
 
 
@@ -87,7 +87,7 @@ QTreeWidget[TabSimulation=true]::item:last
 
 QTreeWidget[TabSimulation=true]::item:selected 
 {
-    color: #335777;
+    color: #505050;
     background-color: rgb(255, 255, 255);
 }
 
