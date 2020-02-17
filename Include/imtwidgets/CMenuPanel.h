@@ -120,6 +120,7 @@ private:
 	QGraphicsDropShadowEffect *m_shadowPtr;
 
 private:
+	void hoverMoveEvent(QHoverEvent *event);
 	QModelIndex GetModelIndex(const QByteArray& pageId) const;
 	void SetMinimumPanelWidth(int width);
 	int CalculateMaxItemWith();

@@ -7,6 +7,7 @@
 #include <QtCore/QStack>
 #include <QtCore/QModelIndex>
 #include <QtGui/QStandardItem>
+#include <QtGui/QMouseEvent>
 #include <QtWidgets/QScrollBar>
 
 // ImtCore includes
@@ -39,6 +40,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_model.setSortRole(Qt::UserRole + 100);
 
 	setMouseTracking(true);
+	PageTree->installEventFilter(this);
 
 	PageTree->setModel(&m_model);
 	PageTree->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -544,6 +546,16 @@ bool CMenuPanel::eventFilter(QObject* watched, QEvent* event)
 		return QObject::eventFilter(watched, event);
 	}
 
+	if (watched == PageTree) {
+		if (eventType == QEvent::HoverMove) {
+			QHoverEvent* hoverEvent = dynamic_cast<QHoverEvent*>(event);
+			if (hoverEvent != nullptr) {
+				hoverMoveEvent(hoverEvent);
+			}
+		}
+		return QObject::eventFilter(watched, event);
+	}
+
 	CheckButtonsVisible();
 
 	return QObject::eventFilter(watched, event);
@@ -638,8 +650,35 @@ void CMenuPanel::resizeEvent(QResizeEvent* event)
 	CheckButtonsVisible();
 }
 
-
 // private methods
+
+void CMenuPanel::hoverMoveEvent(QHoverEvent *event)
+{
+	int dx = event->oldPos().x() - event->pos().x();
+	int dy = event->oldPos().y() - event->pos().y();
+
+	if (dx > 2 || dx < -2 || dy > 2 || dy < -2) {
+		if (m_mainWidget != nullptr) {
+			if (m_animationWidthComp.state() == QPropertyAnimation::Stopped) {
+				if (m_animationTimerIdentifier != 0) {
+					killTimer(m_animationTimerIdentifier);
+				}
+
+				m_animationTimerIdentifier = startTimer(m_animationDelay);
+			}
+		}
+		else {
+			if (m_animationWidth.state() == QPropertyAnimation::Stopped) {
+				if (m_animationTimerIdentifier != 0) {
+					killTimer(m_animationTimerIdentifier);
+				}
+				m_animationTimerIdentifier = startTimer(m_animationDelay);
+			}
+		}
+	}
+
+}
+
 
 QModelIndex CMenuPanel::GetModelIndex(const QByteArray& pageId) const
 {
