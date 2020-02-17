@@ -6,6 +6,8 @@
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/QToolButton>
 
+Q_WIDGETS_EXPORT void qt_blurImage(QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0);
+
 
 static QWindow *qt_getWindow(const QWidget *widget)
 {
@@ -147,22 +149,56 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 #endif
 						painter->save();
 
-						QPainterPath path;
-						path.addRoundedRect(borderRect.adjusted(-2, -2, 2, 2), 5, 5);
+						//QPainterPath path;
+						//path.addRoundedRect(borderRect.adjusted(-2, -2, 2, 2), 5, 5);
 
-						QPen pen(QColor(200, 200, 200), 0);
-						painter->setPen(pen);
+						//QPen pen(QColor(200, 200, 200), 0);
+						//painter->setPen(pen);
+
+						//if (toolbutton->state & (State_Sunken | State_On)){
+						//	QPen pen(QColor(190, 190, 190), 0);
+						//	painter->setPen(pen);
+						//	painter->fillPath(path, QColor(215, 215, 215));
+						//}
+						//else{
+						//	painter->fillPath(path, QColor(245, 245, 245));
+						//}
+
+						//painter->drawPath(path);
+
+						borderRect = borderRect.adjusted(-2, -2, 2, 2);
+						int blurredRadius = 7;
+						QImage _temp(borderRect.adjusted(-blurredRadius, -blurredRadius, blurredRadius, blurredRadius).size(), QImage::Format_ARGB32_Premultiplied);
+						_temp.fill(0);
+						QPainter _tempPainter(&_temp);
+						QPainterPath path;
+
+//						path.addRoundedRect(QRect(QPoint(blurredRadius, blurredRadius),borderRect.size()), 5, 5);
+						path.addRoundedRect(blurredRadius + 2, blurredRadius + 2, borderRect.width() - 4, borderRect.height() - 4, 5, 5);
+
+						_tempPainter.setRenderHint(QPainter::Antialiasing, true);
+						_tempPainter.fillPath(path, Qt::black);
+						_tempPainter.end();
+
+						QImage blurred(_temp.size(), QImage::Format_ARGB32_Premultiplied);
+						blurred.fill(0);
+						QPainter blurPainter(&blurred);
+						qt_blurImage(&blurPainter, _temp, blurredRadius, false, true);
+						blurPainter.end();
+
+						QPoint topLeft = borderRect.topLeft();
+						topLeft -= QPoint(blurredRadius - 1, blurredRadius - 1);
+						painter->drawImage(QRect(topLeft, blurred.size()), blurred);
+
+						path.clear();
+						path.addRoundedRect(borderRect, 5, 5);
 
 						if (toolbutton->state & (State_Sunken | State_On)){
-							QPen pen(QColor(190, 190, 190), 0);
-							painter->setPen(pen);
 							painter->fillPath(path, QColor(215, 215, 215));
 						}
 						else{
 							painter->fillPath(path, QColor(245, 245, 245));
 						}
-
-						painter->drawPath(path);
 
 						painter->restore();
 
