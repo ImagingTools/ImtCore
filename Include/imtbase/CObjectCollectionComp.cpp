@@ -24,7 +24,7 @@ istd::IChangeable* CObjectCollectionComp::CreateObjectInstance(const QByteArray&
 		}
 	}
 
-	return BaseClass2::CreateInstance(typeId);
+	return nullptr;
 }
 
 

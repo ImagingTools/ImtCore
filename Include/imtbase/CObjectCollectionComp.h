@@ -20,7 +20,7 @@ namespace imtbase
 */
 class CObjectCollectionComp:
 			public icomp::CComponentBase,
-			public CObjectCollection
+			public CObjectCollectionBase
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -44,7 +44,7 @@ public:
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 
 protected:
-	// reimplemented (CObjectCollection)
+	// reimplemented (CObjectCollectionBase)
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override;
 
 	// reimplemented (icomp::CComponentBase)
