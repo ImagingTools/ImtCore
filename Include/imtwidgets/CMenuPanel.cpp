@@ -697,6 +697,9 @@ void CMenuPanel::SetMinimumPanelWidth(int width)
 			m_leftFrame->setMaximumWidth(width);
 		}
 
+		m_animationWidthComp.stop();
+		m_animationWidth.stop();
+
 		QRect rect = this->geometry();
 		rect.setWidth(width);
 		this->setGeometry(rect);
