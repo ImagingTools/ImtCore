@@ -17,16 +17,20 @@ namespace imtgui
 
 CMonitorInfoProvider::CMonitorInfoProvider()
 {
+	connect(qApp, &QGuiApplication::primaryScreenChanged, this, &CMonitorInfoProvider::PrimaryScreenChanged);
+	connect(qApp, &QGuiApplication::screenAdded, this, &CMonitorInfoProvider::ScreenAdded);
+	connect(qApp, &QGuiApplication::screenRemoved, this, &CMonitorInfoProvider::ScreenRemoved);
+
 	UpdateMonitorsInfo();
 }
 
 
 CMonitorInfoProvider::~CMonitorInfoProvider()
 {
-	qApp->disconnect(this);
-	for (MonitorInfo info : m_monitors){
-		info.screenPtr->disconnect(this);
-	}
+	//qApp->disconnect(this);
+	//for (MonitorInfo info : m_monitors){
+	//	info.screenPtr->disconnect(this);
+	//}
 }
 
 
@@ -138,7 +142,6 @@ void CMonitorInfoProvider::OrientationChanged(Qt::ScreenOrientation /*orientatio
 
 void CMonitorInfoProvider::UpdateMonitorsInfo()
 {
-	qApp->disconnect(this);
 	for (MonitorInfo info : m_monitors){
 		info.screenPtr->disconnect(this);
 	}
@@ -159,10 +162,6 @@ void CMonitorInfoProvider::UpdateMonitorsInfo()
 
 		m_monitors.append(info);
 	}
-
-	connect(qApp, &QGuiApplication::primaryScreenChanged, this, &CMonitorInfoProvider::PrimaryScreenChanged);
-	connect(qApp, &QGuiApplication::screenAdded, this, &CMonitorInfoProvider::ScreenAdded);
-	connect(qApp, &QGuiApplication::screenRemoved, this, &CMonitorInfoProvider::ScreenRemoved);
 }
 
 
