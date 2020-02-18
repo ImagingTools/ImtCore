@@ -9,35 +9,22 @@
 
 #include <QDebug>
 
-
 namespace imtgui
 {
+
+
 // pulic methods
+
 CMonitorInfoProvider::CMonitorInfoProvider()
 {
-	QList<QScreen*> screenList = QGuiApplication::screens();
-	for (QScreen* screen : screenList){
-		MonitorInfo info;
-		info.screenPtr = screen;
-		info.size = screen->physicalSize();
-		info.resolutionX = screen->physicalDotsPerInchX() / 25.4;
-		info.resolutionY = screen->physicalDotsPerInchX() / 25.4;
-		
-		connect(screen, &QScreen::physicalSizeChanged, this, &CMonitorInfoProvider::PhysicalSizeChanged);
-		connect(screen, &QScreen::logicalDotsPerInchChanged, this, &CMonitorInfoProvider::PhysicalDotsPerInchChanged);
-		connect(screen, &QScreen::orientationChanged, this, &CMonitorInfoProvider::OrientationChanged);
-	}
-
-	qDebug() << connect(qApp, &QGuiApplication::primaryScreenChanged, this, &CMonitorInfoProvider::PrimaryScreenChanged);
-	qDebug() << connect(qApp, &QGuiApplication::screenAdded, this, &CMonitorInfoProvider::ScreenAdded);
-	qDebug() << connect(qApp, &QGuiApplication::screenRemoved, this, &CMonitorInfoProvider::ScreenRemoved);
+	UpdateMonitorsInfo();
 }
 
 
 CMonitorInfoProvider::~CMonitorInfoProvider()
 {
 	qApp->disconnect(this);
-	for (MonitorInfo info : m_monitor){
+	for (MonitorInfo info : m_monitors){
 		info.screenPtr->disconnect(this);
 	}
 }
@@ -47,14 +34,14 @@ CMonitorInfoProvider::~CMonitorInfoProvider()
 
 int CMonitorInfoProvider::GetMonitorsCount() const
 {
-	return m_monitor.count();
+	return m_monitors.count();
 }
 
 
 QSizeF CMonitorInfoProvider::GetPhysicalSize(int index) const
 {
-	if (index >= 0 && index < m_monitor.count()){
-		return m_monitor[index].size;
+	if (index >= 0 && index < m_monitors.count()){
+		return m_monitors[index].size;
 	}
 	
 	return QSizeF();
@@ -63,8 +50,8 @@ QSizeF CMonitorInfoProvider::GetPhysicalSize(int index) const
 
 double CMonitorInfoProvider::GetPhysicalResolutionX(int index) const
 {
-	if (index >= 0 && index < m_monitor.count()){
-		return m_monitor[index].resolutionX;
+	if (index >= 0 && index < m_monitors.count()){
+		return m_monitors[index].resolutionX;
 	}
 
 	return -1;
@@ -73,8 +60,18 @@ double CMonitorInfoProvider::GetPhysicalResolutionX(int index) const
 
 double CMonitorInfoProvider::GetPhysicalResolutionY(int index) const
 {
-	if (index >= 0 && index < m_monitor.count()){
-		return m_monitor[index].resolutionY;
+	if (index >= 0 && index < m_monitors.count()){
+		return m_monitors[index].resolutionY;
+	}
+
+	return -1;
+}
+
+
+double CMonitorInfoProvider::GetMonitorScaling(int index) const
+{
+	if (index >= 0 && index < m_monitors.count()){
+		return m_monitors[index].screenPtr->logicalDotsPerInchX() / 96.0;
 	}
 
 	return -1;
@@ -87,6 +84,8 @@ void CMonitorInfoProvider::PrimaryScreenChanged(QScreen* /*screen*/)
 {
 	istd::IChangeable::ChangeSet changeSet(MCE_PRIMARY_SCREEN_CHANGED);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	UpdateMonitorsInfo();
 }
 
 
@@ -94,6 +93,8 @@ void CMonitorInfoProvider::ScreenAdded(QScreen* /*screen*/)
 {
 	istd::IChangeable::ChangeSet changeSet(MCE_SCREEN_ADDED);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	UpdateMonitorsInfo();
 }
 
 
@@ -101,13 +102,17 @@ void CMonitorInfoProvider::ScreenRemoved(QScreen* /*screen*/)
 {
 	istd::IChangeable::ChangeSet changeSet(MCE_SCREEN_REMOVED);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	UpdateMonitorsInfo();
 }
 
 
-void CMonitorInfoProvider::PhysicalDotsPerInchChanged(qreal /*dpi*/)
+void CMonitorInfoProvider::LogicalDotsPerInchChanged(qreal /*dpi*/)
 {
 	istd::IChangeable::ChangeSet changeSet(MCE_PHYSICAL_RESOLUTION);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	UpdateMonitorsInfo();
 }
 
 
@@ -115,6 +120,8 @@ void CMonitorInfoProvider::PhysicalSizeChanged(const QSizeF& /*size*/)
 {
 	istd::IChangeable::ChangeSet changeSet(MCE_PHYSICAL_SIZE);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	UpdateMonitorsInfo();
 }
 
 
@@ -122,6 +129,40 @@ void CMonitorInfoProvider::OrientationChanged(Qt::ScreenOrientation /*orientatio
 {
 	istd::IChangeable::ChangeSet changeSet(MCE_ORIENTATION);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	UpdateMonitorsInfo();
+}
+
+
+// private methods
+
+void CMonitorInfoProvider::UpdateMonitorsInfo()
+{
+	qApp->disconnect(this);
+	for (MonitorInfo info : m_monitors){
+		info.screenPtr->disconnect(this);
+	}
+
+	m_monitors.clear();
+
+	QList<QScreen*> screenList = QGuiApplication::screens();
+	for (QScreen* screen : screenList){
+		MonitorInfo info;
+		info.screenPtr = screen;
+		info.size = screen->physicalSize();
+		info.resolutionX = screen->physicalDotsPerInchX() / 25.4;
+		info.resolutionY = screen->physicalDotsPerInchX() / 25.4;
+
+		connect(screen, &QScreen::physicalSizeChanged, this, &CMonitorInfoProvider::PhysicalSizeChanged);
+		connect(screen, &QScreen::logicalDotsPerInchChanged, this, &CMonitorInfoProvider::LogicalDotsPerInchChanged);
+		connect(screen, &QScreen::orientationChanged, this, &CMonitorInfoProvider::OrientationChanged);
+
+		m_monitors.append(info);
+	}
+
+	connect(qApp, &QGuiApplication::primaryScreenChanged, this, &CMonitorInfoProvider::PrimaryScreenChanged);
+	connect(qApp, &QGuiApplication::screenAdded, this, &CMonitorInfoProvider::ScreenAdded);
+	connect(qApp, &QGuiApplication::screenRemoved, this, &CMonitorInfoProvider::ScreenRemoved);
 }
 
 

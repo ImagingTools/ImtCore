@@ -30,6 +30,11 @@ public:
 	*/
 	virtual double GetPhysicalResolutionX(int index) const = 0;
 	virtual double GetPhysicalResolutionY(int index) const = 0;
+
+	/**
+		Get monitor scaling.
+	*/
+	virtual double GetMonitorScaling(int index) const = 0;
 };
 
 

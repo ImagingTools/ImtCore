@@ -43,13 +43,14 @@ public:
 	virtual QSizeF GetPhysicalSize(int index) const override;
 	virtual double GetPhysicalResolutionX(int index) const override;
 	virtual double GetPhysicalResolutionY(int index) const override;
+	virtual double GetMonitorScaling(int index) const override;
 
 private Q_SLOTS:
 	void PrimaryScreenChanged(QScreen* screen);
 	void ScreenAdded(QScreen* screen);
 	void ScreenRemoved(QScreen* screen);
 
-	void PhysicalDotsPerInchChanged(qreal dpi);
+	void LogicalDotsPerInchChanged(qreal dpi);
 	void PhysicalSizeChanged(const QSizeF& size);
 	void OrientationChanged(Qt::ScreenOrientation orientation);
 
@@ -62,7 +63,10 @@ private:
 		double resolutionY;
 	};
 
-	QList<MonitorInfo> m_monitor;
+	QList<MonitorInfo> m_monitors;
+
+private:
+	void UpdateMonitorsInfo();
 };
 
 
