@@ -18,12 +18,13 @@ class CStaticObjectCollection: public CObjectCollectionBase
 public:
 	typedef CObjectCollectionBase BaseClass;
 
+	virtual void SetObject(const QByteArray& objectId, istd::IChangeable* objectPtr);
 	virtual QByteArray RegisterObject(
 				const QByteArray& objectId,
 				const QByteArray& typeId,
 				const QString& name,
-				const QString& description,
-				istd::IChangeable& object);
+				const QString& description = QString(),
+				istd::IChangeable* objectPtr = nullptr);
 
 	// reimplemented (IObjectCollection)
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;

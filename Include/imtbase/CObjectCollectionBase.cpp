@@ -318,6 +318,18 @@ int CObjectCollectionBase::GetItemDefaultFlags() const
 }
 
 
+CObjectCollectionBase::ObjectInfo* CObjectCollectionBase::GetObjectInfo(const QByteArray& id) const
+{
+	for (int i = 0; i < m_objects.count(); ++i){
+		if (m_objects[i].id == id){
+			 return const_cast<CObjectCollectionBase::ObjectInfo*>(&m_objects[i]);
+		}
+	}
+
+	return nullptr;
+}
+
+
 } // namespace imtbase
 
 

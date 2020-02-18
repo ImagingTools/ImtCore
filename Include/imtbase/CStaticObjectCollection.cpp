@@ -12,16 +12,25 @@ namespace imtbase
 
 // public methods
 
+void CStaticObjectCollection::SetObject(const QByteArray& objectId, istd::IChangeable* objectPtr)
+{
+	ObjectInfo* objectInfoPtr = GetObjectInfo(objectId);
+	if (objectInfoPtr != nullptr){
+		objectInfoPtr->objectPtr.SetPtr(objectPtr, false);
+	}
+}
+
+
 QByteArray CStaticObjectCollection::RegisterObject(
 			const QByteArray& objectId,
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
-			istd::IChangeable& object)
+			istd::IChangeable* objectPtr)
 {
 	ObjectInfo info;
 
-	info.objectPtr.SetPtr(&object, false);
+	info.objectPtr.SetPtr(objectPtr, false);
 	info.description = description;
 	info.name = name;
 	info.typeId = typeId;
