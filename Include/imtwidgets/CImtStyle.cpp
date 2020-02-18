@@ -133,80 +133,82 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 					pixmapRect.translate(shiftX, shiftY);
 
 					if (!hasArrow){
-						painter->setRenderHint(QPainter::Antialiasing, true);
-						QRect borderRect(QPoint(0, 0), QPoint(2 * pmSize.width(), pmSize.height()));
-						borderRect.moveCenter(pixmapRect.center());
+						if (!pmSize.isEmpty()) {
+							painter->setRenderHint(QPainter::Antialiasing, true);
+							QRect borderRect(QPoint(0, 0), QPoint(2 * pmSize.width(), pmSize.height()));
+							borderRect.moveCenter(pixmapRect.center());
 
 #if 0 // Draw layout boxes
-						painter->setPen(Qt::black);
-						painter->drawRect(rect);
+							painter->setPen(Qt::black);
+							painter->drawRect(rect);
 
-						painter->setPen(Qt::darkGreen);
-						painter->drawRect(borderRect);
+							painter->setPen(Qt::darkGreen);
+							painter->drawRect(borderRect);
 
-						painter->setPen(Qt::red);
-						painter->drawRect(pixmapRect);
+							painter->setPen(Qt::red);
+							painter->drawRect(pixmapRect);
 #endif
-						painter->save();
+							painter->save();
 
-						//QPainterPath path;
-						//path.addRoundedRect(borderRect.adjusted(-2, -2, 2, 2), 5, 5);
+							//QPainterPath path;
+							//path.addRoundedRect(borderRect.adjusted(-2, -2, 2, 2), 5, 5);
 
-						//QPen pen(QColor(200, 200, 200), 0);
-						//painter->setPen(pen);
+							//QPen pen(QColor(200, 200, 200), 0);
+							//painter->setPen(pen);
 
-						//if (toolbutton->state & (State_Sunken | State_On)){
-						//	QPen pen(QColor(190, 190, 190), 0);
-						//	painter->setPen(pen);
-						//	painter->fillPath(path, QColor(215, 215, 215));
-						//}
-						//else{
-						//	painter->fillPath(path, QColor(245, 245, 245));
-						//}
+							//if (toolbutton->state & (State_Sunken | State_On)){
+							//	QPen pen(QColor(190, 190, 190), 0);
+							//	painter->setPen(pen);
+							//	painter->fillPath(path, QColor(215, 215, 215));
+							//}
+							//else{
+							//	painter->fillPath(path, QColor(245, 245, 245));
+							//}
 
-						//painter->drawPath(path);
+							//painter->drawPath(path);
 
-						borderRect = borderRect.adjusted(-2, -2, 2, 2);
-						int blurredRadius = 7;
-						QImage _temp(borderRect.adjusted(-blurredRadius, -blurredRadius, blurredRadius, blurredRadius).size(), QImage::Format_ARGB32_Premultiplied);
-						_temp.fill(0);
-						QPainter _tempPainter(&_temp);
-						QPainterPath path;
+							borderRect = borderRect.adjusted(-2, -2, 2, 2);
+							int blurredRadius = 7;
+							QImage _temp(borderRect.adjusted(-blurredRadius, -blurredRadius, blurredRadius, blurredRadius).size(), QImage::Format_ARGB32_Premultiplied);
+							_temp.fill(0);
+							QPainter _tempPainter(&_temp);
+							QPainterPath path;
 
-//						path.addRoundedRect(QRect(QPoint(blurredRadius, blurredRadius),borderRect.size()), 5, 5);
-						path.addRoundedRect(blurredRadius + 2, blurredRadius + 2, borderRect.width() - 4, borderRect.height() - 4, 5, 5);
+							//						path.addRoundedRect(QRect(QPoint(blurredRadius, blurredRadius),borderRect.size()), 5, 5);
+							path.addRoundedRect(blurredRadius + 2, blurredRadius + 2, borderRect.width() - 4, borderRect.height() - 4, 5, 5);
 
-						_tempPainter.setRenderHint(QPainter::Antialiasing, true);
-						_tempPainter.fillPath(path, Qt::black);
-						_tempPainter.end();
+							_tempPainter.setRenderHint(QPainter::Antialiasing, true);
+							_tempPainter.fillPath(path, Qt::black);
+							_tempPainter.end();
 
-						QImage blurred(_temp.size(), QImage::Format_ARGB32_Premultiplied);
-						blurred.fill(0);
-						QPainter blurPainter(&blurred);
-						qt_blurImage(&blurPainter, _temp, blurredRadius, false, true);
-						blurPainter.end();
+							QImage blurred(_temp.size(), QImage::Format_ARGB32_Premultiplied);
+							blurred.fill(0);
+							QPainter blurPainter(&blurred);
+							qt_blurImage(&blurPainter, _temp, blurredRadius, false, true);
+							blurPainter.end();
 
-						QPoint topLeft = borderRect.topLeft();
-						topLeft -= QPoint(blurredRadius - 1, blurredRadius - 1);
-						painter->drawImage(QRect(topLeft, blurred.size()), blurred);
+							QPoint topLeft = borderRect.topLeft();
+							topLeft -= QPoint(blurredRadius - 1, blurredRadius - 1);
+							painter->drawImage(QRect(topLeft, blurred.size()), blurred);
 
-						path = QPainterPath();
-						path.addRoundedRect(borderRect, 5, 5);
-						painter->fillPath(path, Qt::white);
+							path = QPainterPath();
+							path.addRoundedRect(borderRect, 5, 5);
+							painter->fillPath(path, Qt::white);
 
-						path = QPainterPath();
-						path.addRoundedRect(borderRect.adjusted(0, 1, 0, 0), 5, 5);
+							path = QPainterPath();
+							path.addRoundedRect(borderRect.adjusted(0, 1, 0, 0), 5, 5);
 
-						if (toolbutton->state & (State_Sunken | State_On)){
-							painter->fillPath(path, QColor(215, 215, 215));
+							if (toolbutton->state & (State_Sunken | State_On)) {
+								painter->fillPath(path, QColor(215, 215, 215));
+							}
+							else {
+								painter->fillPath(path, QColor(245, 245, 245));
+							}
+
+							painter->restore();
+
+							proxy()->drawItemPixmap(painter, pixmapRect, Qt::AlignCenter, pm);
 						}
-						else{
-							painter->fillPath(path, QColor(245, 245, 245));
-						}
-
-						painter->restore();
-
-						proxy()->drawItemPixmap(painter, pixmapRect, Qt::AlignCenter, pm);
 					}
 					else {
 						drawArrow(proxy(), toolbutton, pixmapRect, painter, widget);
