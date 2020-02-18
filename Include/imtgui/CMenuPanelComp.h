@@ -10,6 +10,7 @@
 
 // ImtCore includes
 #include <imtgui/IWidgetProvider.h>
+#include <imtgui/IMonitorInfoProvider.h>
 #include <imtwidgets/CMenuPanel.h>
 
 
@@ -32,8 +33,9 @@ public:
 							imod::TSingleModelObserverBase<iprm::ISelectionParam>>> BaseClass;
 
 	I_BEGIN_COMPONENT(CMenuPanelComp);
-		I_ASSIGN(m_widgetProviderCompPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
-		I_ASSIGN(m_isShowOverAttrPtr, "ShowOver", "Show expanded menu over the underlaying widget", false, true);
+	I_ASSIGN(m_widgetProviderCompPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
+	I_ASSIGN(m_monitorInfoProviderPtr, "MonitorInfoProvider", "Monitor info provider (count, size, resolution, etc.)", false, "MonitorInfoProvider");
+	I_ASSIGN(m_isShowOverAttrPtr, "ShowOver", "Show expanded menu over the underlaying widget", false, true);
 	I_END_COMPONENT;
 
 protected:
@@ -75,6 +77,18 @@ private:
 		CMenuPanelComp& m_parent;
 	};
 
+	class MonitorsInfoObserver: public imod::CSingleModelObserverBase
+	{
+	public:
+		explicit MonitorsInfoObserver(CMenuPanelComp& parent);
+
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
+
+	private:
+		CMenuPanelComp& m_parent;
+	};
+
 	struct PageInfo
 	{
 		QByteArray parentPageId;
@@ -87,8 +101,10 @@ private:
 	int m_visualStatusModelIndex;
 	PageSubselectionObserver m_pageSubselectionObserver;
 	PageVisualStatusObserver m_pageVisualStatusObserver;
+	MonitorsInfoObserver m_monitorInfoObserver;
 
 	I_REF(imtgui::IWidgetProvider, m_widgetProviderCompPtr);
+	I_REF(imtgui::IMonitorInfoProvider, m_monitorInfoProviderPtr);
 	I_ATTR(bool, m_isShowOverAttrPtr);
 
 private:
@@ -98,6 +114,7 @@ private:
 	QByteArray FindSelectedItem();
 	void UpdatePageSubselection();
 	void UpdatePageState();
+	void UpdateMonitorsInfo();
 };
 
 

@@ -16,6 +16,7 @@
 #include <imtgui/CFileCollectionMetaInfoViewComp.h>
 #include <imtgui/CDelegatedCommandsProviderComp.h>
 #include <imtgui/CMenuPanelComp.h>
+#include <imtgui/CMonitorInfoProviderComp.h>
 
 
 /**
@@ -35,6 +36,7 @@ typedef icomp::TModelCompWrap<imtgui::CDocumentWorkspaceGuiComp> DocumentWorkspa
 typedef imtgui::CFileCollectionMetaInfoViewComp FileCollectionMetaInfoView;
 typedef imtgui::CDelegatedCommandsProviderComp DelegatedCommandsProvider;
 typedef imtgui::CMenuPanelComp MenuPanel;
+typedef icomp::TModelCompWrap<imtgui::CMonitorInfoProviderComp> MonitorInfoProvider;
 
 
 } // namespace ImtGuiPck

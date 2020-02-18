@@ -5,6 +5,11 @@
 #include <iprm/IOptionsList.h>
 #include <iqtgui/IMultiVisualStatusProvider.h>
 
+// ImtCore includes
+#include <imtgui/CMonitorInfoProvider.h>
+
+#include <QDebug>
+
 
 namespace imtgui
 {
@@ -14,7 +19,8 @@ namespace imtgui
 
 CMenuPanelComp::CMenuPanelComp()
 	:m_pageSubselectionObserver(*this),
-	m_pageVisualStatusObserver(*this)
+	m_pageVisualStatusObserver(*this),
+	m_monitorInfoObserver(*this)
 {
 	m_subselectionModelIndex = 0;
 	m_visualStatusModelIndex = 0;
@@ -79,6 +85,11 @@ void CMenuPanelComp::OnGuiCreated()
 
 	widgetPtr->SetAnimationDelay(400);
 	widgetPtr->SetAnimationDuration(150);
+
+	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_monitorInfoProviderPtr.GetPtr());
+	if (modelPtr != nullptr){
+		modelPtr->AttachObserver(&m_monitorInfoObserver);
+	}
 }
 
 
@@ -162,7 +173,7 @@ bool CMenuPanelComp::IsPageEnabled(const QByteArray& pageId) const
 }
 
 
-void CMenuPanelComp::UpdateSelection(const iprm::ISelectionParam& selection, const QByteArray& parentId)
+void CMenuPanelComp::UpdateSelection(const iprm::ISelectionParam& selection, const QByteArray& /*parentId*/)
 {
 	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
 	Q_ASSERT(panelPtr != nullptr);
@@ -299,6 +310,12 @@ void CMenuPanelComp::UpdatePageState()
 }
 
 
+void CMenuPanelComp::UpdateMonitorsInfo()
+{
+
+}
+
+
 // protected methods of embedded class PageSubselectionObserver
 
 CMenuPanelComp::PageSubselectionObserver::PageSubselectionObserver(CMenuPanelComp& parent)
@@ -328,6 +345,44 @@ CMenuPanelComp::PageVisualStatusObserver::PageVisualStatusObserver(CMenuPanelCom
 void CMenuPanelComp::PageVisualStatusObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_parent.UpdatePageState();
+}
+
+
+// protected methods of embedded class PageStatusObserver
+
+CMenuPanelComp::MonitorsInfoObserver::MonitorsInfoObserver(CMenuPanelComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CMenuPanelComp::MonitorsInfoObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+{
+	int event = changeSet.GetIds().values()[0];
+
+	switch (event){
+	case CMonitorInfoProvider::MCE_PRIMARY_SCREEN_CHANGED:
+		qDebug() << "MCE_PRIMARY_SCREEN_CHANGED";
+		break;
+	case CMonitorInfoProvider::MCE_SCREEN_ADDED:
+		qDebug() << "MCE_SCREEN_ADDED";
+		break;
+	case CMonitorInfoProvider::MCE_SCREEN_REMOVED:
+		qDebug() << "MCE_SCREEN_REMOVED";
+		break;
+
+	case CMonitorInfoProvider::MCE_PHYSICAL_SIZE:
+		qDebug() << "MCE_PHYSICAL_SIZE";
+		break;
+	case CMonitorInfoProvider::MCE_PHYSICAL_RESOLUTION:
+		qDebug() << "MCE_PHYSICAL_RESOLUTION";
+		break;
+	case CMonitorInfoProvider::MCE_ORIENTATION:
+		qDebug() << "MCE_ORIENTATION";
+		break;
+	}
 }
 
 
