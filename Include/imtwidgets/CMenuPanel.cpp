@@ -550,7 +550,7 @@ bool CMenuPanel::eventFilter(QObject* watched, QEvent* event)
 		if (eventType == QEvent::HoverMove) {
 			QHoverEvent* hoverEvent = dynamic_cast<QHoverEvent*>(event);
 			if (hoverEvent != nullptr) {
-				hoverMoveEvent(hoverEvent);
+				HoverMoveEvent(hoverEvent);
 			}
 		}
 		return QObject::eventFilter(watched, event);
@@ -652,8 +652,12 @@ void CMenuPanel::resizeEvent(QResizeEvent* event)
 
 // private methods
 
-void CMenuPanel::hoverMoveEvent(QHoverEvent *event)
+void CMenuPanel::HoverMoveEvent(QHoverEvent *event)
 {
+	if (!PageTree->currentIndex().isValid()) {
+		return;
+	}
+
 	int dx = event->oldPos().x() - event->pos().x();
 	int dy = event->oldPos().y() - event->pos().y();
 
