@@ -639,7 +639,8 @@ void CMenuPanel::resizeEvent(QResizeEvent* event)
 
 	if (m_mainWidget != nullptr){
 		PageTree->setMaximumWidth(this->width());
-		
+		PageTree->setMinimumWidth(this->width());
+
 		if (m_parentWidget){
 			QRect rect = this->geometry();
 			rect.setWidth(this->width() + 5);
