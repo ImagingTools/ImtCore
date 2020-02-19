@@ -16,7 +16,7 @@
   <property name="styleSheet">
    <string notr="true">QWidget
 {
-	color: #505050;
+	color: #424242;
 }
 
 QWidget::item:disabled
@@ -59,7 +59,7 @@ QWidget[ImtTopFrame=true]
                                  stop: 0 rgb(237,237,237), stop: 0.9 rgb(222,222,222),
                                  stop: 0.97 rgb(222,222,222), stop: 1.0 rgb(200,200,200));
 	border-bottom: 1px solid  rgb(190,190,190);
-	color: #505050;
+	color: #424242;
 }
 
 
@@ -97,11 +97,11 @@ QTableView[ImtMenu=true]::item
 */
 QTreeWidget[TabSimulation=true]
 {
-	color: #505050;
+	color: #424242;
 	background: rgb(230,230,230);
 	font-weight: bold;
 	text-align: left;
-	color: #505050;
+	color: #424242;
 }
 
 
@@ -125,7 +125,7 @@ QTreeWidget[TabSimulation=true]::item:last
 
 QTreeWidget[TabSimulation=true]::item:selected 
 {
-    color: #505050;
+    color: #424242;
     background-color: rgb(255, 255, 255);
 }
 

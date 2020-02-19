@@ -48,7 +48,7 @@ QHeaderView::section
 	border-left: none;
 	border-right: none;
 	border-top: none;
-	color: #505050;
+	color: #424242;
 	font-weight: bold;
 }
 
@@ -58,11 +58,11 @@ QHeaderView::section
 */
 QTreeWidget[TabSimulation=true]
 {
-	color: #505050;
+	color: #424242;
 	background: rgb(230,230,230);
 	font-weight: bold;
 	text-align: left;
-	color: #505050;
+	color: #424242;
 }
 
 
@@ -86,7 +86,7 @@ QTreeWidget[TabSimulation=true]::item:last
 
 QTreeWidget[TabSimulation=true]::item:selected 
 {
-    color: #505050;
+    color: #424242;
     background-color: rgb(255, 255, 255);
 }
 
