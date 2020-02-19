@@ -86,7 +86,6 @@ public:
 	*/
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const = 0;
 
-
 	/**
 		Get meta-information of the data object.
 		In difference to GetCollectionItemMetaInfo, this method get the meta-informations related to the data itself.

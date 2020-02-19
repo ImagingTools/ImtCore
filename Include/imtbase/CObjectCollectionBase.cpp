@@ -264,7 +264,7 @@ int CObjectCollectionBase::GetSupportedOperations() const
 }
 
 
-bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 {
 	const CObjectCollectionBase* sourcePtr = dynamic_cast<const CObjectCollectionBase*>(&object);
 	if (sourcePtr != nullptr){
@@ -281,6 +281,32 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 		}
 
 		return true;
+	}
+	else{
+		if (mode == CM_CONVERT){
+			const IObjectCollection* sourcePtr = dynamic_cast<const IObjectCollection*>(&object);
+			if (sourcePtr != nullptr){
+				istd::CChangeNotifier changeNotifier(this);
+
+				m_objects.clear();
+
+				Ids sourceElementIds = sourcePtr->GetElementIds();
+
+				for (const QByteArray& elementId : sourceElementIds){
+					QString name = sourcePtr->GetElementInfo(elementId, EIT_NAME).toString();
+					QString description = sourcePtr->GetElementInfo(elementId, EIT_DESCRIPTION).toString();
+					QByteArray typeId = sourcePtr->GetObjectTypeId(elementId);
+					const istd::IChangeable* objectPtr = sourcePtr->GetObjectPtr(elementId);
+
+					QByteArray newId = InsertNewObject(typeId, name, description, objectPtr);
+					if (newId.isEmpty()){
+						return false;
+					}
+				}
+
+				return true;
+			}
+		}
 	}
 	
 	return false;
