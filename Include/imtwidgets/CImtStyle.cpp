@@ -150,23 +150,6 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 #endif
 							painter->save();
 
-							//QPainterPath path;
-							//path.addRoundedRect(borderRect.adjusted(-2, -2, 2, 2), 5, 5);
-
-							//QPen pen(QColor(200, 200, 200), 0);
-							//painter->setPen(pen);
-
-							//if (toolbutton->state & (State_Sunken | State_On)){
-							//	QPen pen(QColor(190, 190, 190), 0);
-							//	painter->setPen(pen);
-							//	painter->fillPath(path, QColor(215, 215, 215));
-							//}
-							//else{
-							//	painter->fillPath(path, QColor(245, 245, 245));
-							//}
-
-							//painter->drawPath(path);
-
 							borderRect = borderRect.adjusted(-2, -2, 2, 2);
 							int blurredRadius = 7;
 							QImage _temp(borderRect.adjusted(-blurredRadius, -blurredRadius, blurredRadius, blurredRadius).size(), QImage::Format_ARGB32_Premultiplied);
@@ -174,7 +157,6 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							QPainter _tempPainter(&_temp);
 							QPainterPath path;
 
-							//						path.addRoundedRect(QRect(QPoint(blurredRadius, blurredRadius),borderRect.size()), 5, 5);
 							path.addRoundedRect(blurredRadius + 2, blurredRadius + 2, borderRect.width() - 4, borderRect.height() - 4, 5, 5);
 
 							_tempPainter.setRenderHint(QPainter::Antialiasing, true);
@@ -192,13 +174,13 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							painter->drawImage(QRect(topLeft, blurred.size()), blurred);
 
 							path = QPainterPath();
-							path.addRoundedRect(borderRect, 5, 5);
+							path.addRoundedRect(borderRect.adjusted(-1, 0, -1, 0), 5, 5);
 							painter->fillPath(path, Qt::white);
 
 							path = QPainterPath();
 							path.addRoundedRect(borderRect.adjusted(0, 1, 0, 0), 5, 5);
 
-							if (toolbutton->state & (State_Sunken | State_On)) {
+							if (toolbutton->state & (State_Sunken | State_On)){
 								painter->fillPath(path, QColor(215, 215, 215));
 							}
 							else {
