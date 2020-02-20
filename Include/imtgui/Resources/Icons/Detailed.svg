@@ -21,7 +21,7 @@
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"><metadata
    id="metadata997"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
    id="defs995" /><sodipodi:namedview
    pagecolor="#ffffff"
    bordercolor="#666666"
@@ -31,12 +31,12 @@
    guidetolerance="10"
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
-   inkscape:window-width="3840"
-   inkscape:window-height="2035"
+   inkscape:window-width="3000"
+   inkscape:window-height="1875"
    id="namedview993"
    showgrid="false"
    inkscape:zoom="1.2098155"
-   inkscape:cx="164.83229"
+   inkscape:cx="-197.20638"
    inkscape:cy="157.56937"
    inkscape:window-x="-13"
    inkscape:window-y="-13"
@@ -45,42 +45,42 @@
 <g
    id="g948"
    transform="matrix(0.88053447,0,0,0.88053447,22.937381,30.496462)"
-   style="fill:#5a5a5a;fill-opacity:1">
+   style="fill:#757575;fill-opacity:1">
 	<g
    id="g946"
-   style="fill:#5a5a5a;fill-opacity:1">
+   style="fill:#757575;fill-opacity:1">
 		<path
    d="M 281.6,0 H 25.6 C 10.24,0 0,10.24 0,25.6 V 486.4 C 0,501.76 10.24,512 25.6,512 h 332.8 c 15.36,0 25.6,-10.24 25.6,-25.6 v -384 z M 76.8,76.8 H 256 c 15.36,0 25.6,10.24 25.6,25.6 0,15.36 -10.24,25.6 -25.6,25.6 H 76.8 C 61.44,128 51.2,117.76 51.2,102.4 51.2,87.04 61.44,76.8 76.8,76.8 Z M 307.2,435.2 H 76.8 c -15.36,0 -25.6,-10.24 -25.6,-25.6 0,-15.36 10.24,-25.6 25.6,-25.6 h 230.4 c 15.36,0 25.6,10.24 25.6,25.6 0,15.36 -12.8,25.6 -25.6,25.6 z m 0,-102.4 H 76.8 c -15.36,0 -25.6,-10.24 -25.6,-25.6 0,-15.36 10.24,-25.6 25.6,-25.6 h 230.4 c 15.36,0 25.6,10.24 25.6,25.6 0,15.36 -12.8,25.6 -25.6,25.6 z m 0,-102.4 H 76.8 c -15.36,0 -25.6,-10.24 -25.6,-25.6 0,-15.36 10.24,-25.6 25.6,-25.6 h 230.4 c 15.36,0 25.6,10.24 25.6,25.6 0,15.36 -12.8,25.6 -25.6,25.6 z"
    id="path944"
    inkscape:connector-curvature="0"
-   style="fill:#5a5a5a;fill-opacity:1" />
+   style="fill:#757575;fill-opacity:1" />
 	</g>
 </g>
 <g
    id="g954"
    transform="translate(-22.937382,-30.669889)"
-   style="fill:#5a5a5a;fill-opacity:1">
+   style="fill:#757575;fill-opacity:1">
 	<g
    id="g952"
-   style="fill:#5a5a5a;fill-opacity:1">
+   style="fill:#757575;fill-opacity:1">
 		<polygon
    points="473.6,512 512,409.6 435.2,409.6 "
    id="polygon950"
-   style="fill:#5a5a5a;fill-opacity:1" />
+   style="fill:#757575;fill-opacity:1" />
 	</g>
 </g>
 <g
    id="g960"
    transform="translate(-22.937382,-30.669889)"
-   style="fill:#5a5a5a;fill-opacity:1">
+   style="fill:#757575;fill-opacity:1">
 	<g
    id="g958"
-   style="fill:#5a5a5a;fill-opacity:1">
+   style="fill:#757575;fill-opacity:1">
 		<path
    d="M 499.2,60.339779 H 448 c -7.68,0 -12.8,4.258003 -12.8,10.645008 V 358.4 H 512 V 70.984787 c 0,-6.387005 -5.12,-10.645008 -12.8,-10.645008 z"
    id="path956"
    inkscape:connector-curvature="0"
-   style="stroke-width:0.91194367;fill:#5a5a5a;fill-opacity:1" />
+   style="stroke-width:0.91194367;fill:#757575;fill-opacity:1" />
 	</g>
 </g>
 <g

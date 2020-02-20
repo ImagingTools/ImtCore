@@ -8,8 +8,6 @@
 // ImtCore includes
 #include <imtgui/CMonitorInfoProvider.h>
 
-#include <QDebug>
-
 
 namespace imtgui
 {
@@ -83,7 +81,7 @@ void CMenuPanelComp::OnGuiCreated()
 	widgetPtr->SetItemMouserOverColor(QColor(0, 205, 255));
 	widgetPtr->SetItemMouserOverSelectedColor(QColor(0, 172, 220));
 
-	widgetPtr->SetAnimationDelay(400);
+	widgetPtr->SetAnimationDelay(800);
 	widgetPtr->SetAnimationDuration(150);
 
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_monitorInfoProviderPtr.GetPtr());
