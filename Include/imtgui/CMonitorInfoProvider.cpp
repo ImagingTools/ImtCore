@@ -1,13 +1,18 @@
 #include <imtgui/CMonitorInfoProvider.h>
 
+#include <windows.h>
+#include <winreg.h>
+#include <cstring>
+
 
 // Qt includes
+#include <QtCore/QSettings>
 #include <QtGui/QGuiApplication>
+
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
 
-#include <QDebug>
 
 namespace imtgui
 {
@@ -27,10 +32,7 @@ CMonitorInfoProvider::CMonitorInfoProvider()
 
 CMonitorInfoProvider::~CMonitorInfoProvider()
 {
-	//qApp->disconnect(this);
-	//for (MonitorInfo info : m_monitors){
-	//	info.screenPtr->disconnect(this);
-	//}
+
 }
 
 
@@ -42,13 +44,13 @@ int CMonitorInfoProvider::GetMonitorsCount() const
 }
 
 
-QSizeF CMonitorInfoProvider::GetPhysicalSize(int index) const
+QSize CMonitorInfoProvider::GetPhysicalSize(int index) const
 {
 	if (index >= 0 && index < m_monitors.count()){
 		return m_monitors[index].size;
 	}
-	
-	return QSizeF();
+
+	return QSize();
 }
 
 
@@ -72,7 +74,17 @@ double CMonitorInfoProvider::GetPhysicalResolutionY(int index) const
 }
 
 
-double CMonitorInfoProvider::GetMonitorScaling(int index) const
+QRect CMonitorInfoProvider::GetGeometry(int index) const
+{
+	if (index >= 0 && index < m_monitors.count()){
+		return m_monitors[index].geometry;
+	}
+
+	return QRect();
+}
+
+
+double CMonitorInfoProvider::GetScaling(int index) const
 {
 	if (index >= 0 && index < m_monitors.count()){
 		return m_monitors[index].screenPtr->logicalDotsPerInchX() / 96.0;
@@ -120,15 +132,6 @@ void CMonitorInfoProvider::LogicalDotsPerInchChanged(qreal /*dpi*/)
 }
 
 
-void CMonitorInfoProvider::PhysicalSizeChanged(const QSizeF& /*size*/)
-{
-	istd::IChangeable::ChangeSet changeSet(MCE_PHYSICAL_SIZE);
-	istd::CChangeNotifier changeNotifier(this, &changeSet);
-
-	UpdateMonitorsInfo();
-}
-
-
 void CMonitorInfoProvider::OrientationChanged(Qt::ScreenOrientation /*orientation*/)
 {
 	istd::IChangeable::ChangeSet changeSet(MCE_ORIENTATION);
@@ -139,6 +142,75 @@ void CMonitorInfoProvider::OrientationChanged(Qt::ScreenOrientation /*orientatio
 
 
 // private methods
+
+QSize CMonitorInfoProvider::RetrievePhysicalSize(QString monitorId)
+{
+	QSize size;
+
+	DISPLAY_DEVICE ddAdapter;
+	ddAdapter.cb = sizeof(ddAdapter);
+	int adapterIndex = 0;
+
+	bool isMonitorFound = false;
+	while (EnumDisplayDevices(0, adapterIndex, &ddAdapter, 0) && !isMonitorFound)
+	{
+		DISPLAY_DEVICE ddMonitor;
+		memset(&ddMonitor, 0, sizeof(ddMonitor));
+		ddMonitor.cb = sizeof(ddMonitor);
+		int monitorIndex = 0;
+
+		if (monitorId == QString::fromStdWString(ddAdapter.DeviceName)){
+			while (EnumDisplayDevices(ddAdapter.DeviceName, monitorIndex, &ddMonitor, 0) && !isMonitorFound){
+				if (ddMonitor.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMonitor.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)){
+					QString monitorId = QString::fromStdWString(ddMonitor.DeviceID);
+					int index1 = monitorId.indexOf('\\');
+					int index2 = monitorId.indexOf('\\', index1 + 1);
+					monitorId = monitorId.mid(index1 + 1, index2 - index1 - 1);
+
+					QString displayKey = "SYSTEM\\CurrentControlSet\\Enum\\DISPLAY";
+					QSettings registry("HKEY_LOCAL_MACHINE\\" + displayKey, QSettings::NativeFormat);
+					QStringList keys = registry.allKeys();
+
+					QString edidKey;
+					for (QString key : keys){
+						if (key.contains(monitorId) && key.contains("EDID")){
+							edidKey = key;
+							break;
+						}
+					}
+
+					DWORD type = REG_BINARY;
+					unsigned char data[128];
+					DWORD dataSize = 128;
+
+					edidKey.remove(edidKey.size() - 5, 5);
+					edidKey.replace("/", "\\");
+					displayKey.append("\\");
+					displayKey.append(edidKey);
+					HKEY hKey = 0;
+					RegOpenKeyExA(HKEY_LOCAL_MACHINE, displayKey.toStdString().c_str(), 0, KEY_QUERY_VALUE, &hKey);
+					RegQueryValueExA(hKey, "EDID", NULL, &type, data, &dataSize);
+
+					size.setWidth(data[66] + (((int)data[68] & 0xF0) << 4));
+					size.setHeight(data[67] + (((int)data[68] & 0x0F) << 8));
+
+					isMonitorFound = true;
+				}
+				monitorIndex++;
+
+				memset(&ddMonitor, 0, sizeof(ddMonitor));
+				ddMonitor.cb = sizeof(ddMonitor);
+			}
+		}
+
+		memset(&ddAdapter, 0, sizeof(ddAdapter));
+		ddAdapter.cb = sizeof(ddAdapter);
+		adapterIndex++;
+	}
+
+	return size;
+}
+
 
 void CMonitorInfoProvider::UpdateMonitorsInfo()
 {
@@ -152,11 +224,11 @@ void CMonitorInfoProvider::UpdateMonitorsInfo()
 	for (QScreen* screen : screenList){
 		MonitorInfo info;
 		info.screenPtr = screen;
-		info.size = screen->physicalSize();
-		info.resolutionX = screen->physicalDotsPerInchX() / 25.4;
-		info.resolutionY = screen->physicalDotsPerInchX() / 25.4;
+		info.size = RetrievePhysicalSize(screen->name());
+		info.geometry = screen->geometry();
+		info.resolutionX = (double)info.geometry.width() / info.size.width();
+		info.resolutionY = (double)info.geometry.height() / info.size.height();
 
-		connect(screen, &QScreen::physicalSizeChanged, this, &CMonitorInfoProvider::PhysicalSizeChanged);
 		connect(screen, &QScreen::logicalDotsPerInchChanged, this, &CMonitorInfoProvider::LogicalDotsPerInchChanged);
 		connect(screen, &QScreen::orientationChanged, this, &CMonitorInfoProvider::OrientationChanged);
 

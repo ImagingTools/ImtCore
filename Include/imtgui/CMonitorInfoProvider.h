@@ -40,10 +40,11 @@ public:
 
 	// reimplemented (imtgui::IMonitorResolutionProvider)
 	virtual int GetMonitorsCount() const override;
-	virtual QSizeF GetPhysicalSize(int index) const override;
+	virtual QSize GetPhysicalSize(int index) const override;
 	virtual double GetPhysicalResolutionX(int index) const override;
 	virtual double GetPhysicalResolutionY(int index) const override;
-	virtual double GetMonitorScaling(int index) const override;
+	virtual QRect GetGeometry(int index) const override;
+	virtual double GetScaling(int index) const override;
 
 private Q_SLOTS:
 	void PrimaryScreenChanged(QScreen* screen);
@@ -51,14 +52,14 @@ private Q_SLOTS:
 	void ScreenRemoved(QScreen* screen);
 
 	void LogicalDotsPerInchChanged(qreal dpi);
-	void PhysicalSizeChanged(const QSizeF& size);
 	void OrientationChanged(Qt::ScreenOrientation orientation);
 
 private:
 	struct MonitorInfo
 	{
 		QScreen* screenPtr;
-		QSizeF size;
+		QSize size;
+		QRect geometry;
 		double resolutionX;
 		double resolutionY;
 	};
@@ -66,6 +67,7 @@ private:
 	QList<MonitorInfo> m_monitors;
 
 private:
+	QSize RetrievePhysicalSize(QString monitorId);
 	void UpdateMonitorsInfo();
 };
 

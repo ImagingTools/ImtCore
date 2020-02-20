@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QSize>
+#include <QtCore/QRect>
 
 // ACF includes
 #include <istd/IChangeable.h>
@@ -23,7 +24,7 @@ public:
 	/**
 		Get physical size of monitor with index (mm).
 	*/
-	virtual QSizeF GetPhysicalSize(int index) const = 0;
+	virtual QSize GetPhysicalSize(int index) const = 0;
 
 	/**
 		Get physical resolution of monitor with index (pixel per mm).
@@ -32,9 +33,14 @@ public:
 	virtual double GetPhysicalResolutionY(int index) const = 0;
 
 	/**
+		Get monitor geometry.
+	*/
+	virtual QRect GetGeometry(int index) const = 0;
+
+	/**
 		Get monitor scaling.
 	*/
-	virtual double GetMonitorScaling(int index) const = 0;
+	virtual double GetScaling(int index) const = 0;
 };
 
 
