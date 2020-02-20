@@ -365,7 +365,7 @@ void CMenuPanelComp::MonitorsInfoObserver::OnUpdate(const istd::IChangeable::Cha
 	imtwidgets::CMenuPanel* widgetPtr = m_parent.GetQtWidget();
 	Q_ASSERT(widgetPtr != nullptr);
 
-	widgetPtr->SetIconSize(8 * monitorInfoProviderPtr->GetPhysicalResolutionX(0));
+	widgetPtr->SetIconSize(7 * monitorInfoProviderPtr->GetPhysicalResolutionX(0));
 	widgetPtr->SetItemIndent(6 * monitorInfoProviderPtr->GetPhysicalResolutionX(0));
 	widgetPtr->SetItemPadding(1 * monitorInfoProviderPtr->GetPhysicalResolutionX(0));
 
