@@ -360,6 +360,13 @@ void CMenuPanelComp::MonitorsInfoObserver::OnUpdate(const istd::IChangeable::Cha
 {
 	int event = changeSet.GetIds().values()[0];
 
+	imtgui::IMonitorInfoProvider* monitorInfoProviderPtr = GetObservedObject();
+	
+	imtwidgets::CMenuPanel* widgetPtr = m_parent.GetQtWidget();
+	Q_ASSERT(widgetPtr != nullptr);
+
+	widgetPtr->SetIconSize(18 * monitorInfoProviderPtr->GetPhysicalResolutionX(0));
+
 	switch (event){
 	case CMonitorInfoProvider::MCE_PRIMARY_SCREEN_CHANGED:
 		qDebug() << "MCE_PRIMARY_SCREEN_CHANGED";

@@ -25,18 +25,18 @@ class CMenuPanelComp:
 									imod::TSingleModelObserverBase<iprm::ISelectionParam>>>
 {
 public:
-	CMenuPanelComp();
-
 	typedef ibase::TModelObserverCompBaseWrap<
 				iqtgui::TGuiObserverWrap<
 							iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
 							imod::TSingleModelObserverBase<iprm::ISelectionParam>>> BaseClass;
 
 	I_BEGIN_COMPONENT(CMenuPanelComp);
-	I_ASSIGN(m_widgetProviderCompPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
-	I_ASSIGN(m_monitorInfoProviderPtr, "MonitorInfoProvider", "Monitor info provider (count, size, resolution, etc.)", false, "MonitorInfoProvider");
-	I_ASSIGN(m_isShowOverAttrPtr, "ShowOver", "Show expanded menu over the underlaying widget", false, true);
+		I_ASSIGN(m_widgetProviderCompPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
+		I_ASSIGN(m_monitorInfoProviderPtr, "MonitorInfoProvider", "Monitor info provider (count, size, resolution, etc.)", false, "MonitorInfoProvider");
+		I_ASSIGN(m_isShowOverAttrPtr, "ShowOver", "Show expanded menu over the underlaying widget", false, true);
 	I_END_COMPONENT;
+
+	CMenuPanelComp();
 
 protected:
 	void OnPageIdChanged(const QByteArray& selectedPageId, const QByteArray& deselectedPageId);
@@ -77,7 +77,7 @@ private:
 		CMenuPanelComp& m_parent;
 	};
 
-	class MonitorsInfoObserver: public imod::CSingleModelObserverBase
+	class MonitorsInfoObserver: public imod::TSingleModelObserverBase<imtgui::IMonitorInfoProvider>
 	{
 	public:
 		explicit MonitorsInfoObserver(CMenuPanelComp& parent);
