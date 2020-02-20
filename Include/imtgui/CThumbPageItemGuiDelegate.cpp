@@ -79,7 +79,7 @@ void CThumbPageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	QFont font;
 	font.setPointSize(24);
 	painter->setFont(font);
-	QColor textColor = isEnabled ? QColor("#424242"): Qt::lightGray;
+	QColor textColor = isEnabled ? QColor("#606060"): Qt::lightGray;
 	painter->setPen(textColor);
 
 	QRect drawArea = QRect(mainRect.left() + m_horizontalMargin, mainRect.top() + m_verticalMargin, mainRect.width() - 2*m_horizontalMargin, mainRect.height() - 2*m_verticalMargin);
