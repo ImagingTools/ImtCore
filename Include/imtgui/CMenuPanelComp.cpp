@@ -75,7 +75,7 @@ void CMenuPanelComp::OnGuiCreated()
 	widgetPtr->SetItemPadding(5);
 	widgetPtr->SetIconSize(28);
 
-	widgetPtr->SetItemTextColor(QColor("#606060"));
+	widgetPtr->SetItemTextColor(QColor("#656565"));
 	widgetPtr->SetItemSelectedColor(QColor(255, 255, 255));
 	widgetPtr->SetItemSelectedContourColor(QColor(77, 113, 163));
 	widgetPtr->SetItemMouserOverColor(QColor(0, 205, 255));
@@ -365,7 +365,9 @@ void CMenuPanelComp::MonitorsInfoObserver::OnUpdate(const istd::IChangeable::Cha
 	imtwidgets::CMenuPanel* widgetPtr = m_parent.GetQtWidget();
 	Q_ASSERT(widgetPtr != nullptr);
 
-	widgetPtr->SetIconSize(18 * monitorInfoProviderPtr->GetPhysicalResolutionX(0));
+	widgetPtr->SetIconSize(8 * monitorInfoProviderPtr->GetPhysicalResolutionX(0));
+	widgetPtr->SetItemIndent(6 * monitorInfoProviderPtr->GetPhysicalResolutionX(0));
+	widgetPtr->SetItemPadding(1 * monitorInfoProviderPtr->GetPhysicalResolutionX(0));
 
 	switch (event){
 	case CMonitorInfoProvider::MCE_PRIMARY_SCREEN_CHANGED:

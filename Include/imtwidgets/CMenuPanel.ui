@@ -48,6 +48,11 @@
    </item>
    <item>
     <widget class="QTreeView" name="PageTree">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
