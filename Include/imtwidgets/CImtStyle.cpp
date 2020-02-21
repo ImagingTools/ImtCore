@@ -187,7 +187,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							path.addRoundedRect(borderRect.adjusted(0, 1, 0, 0), 6, 6);
 
 							if (toolbutton->state & (State_Sunken | State_On)){
-								painter->fillPath(path, QColor(190, 190, 195));
+								painter->fillPath(path, QColor(180, 180, 182));
 							}
 							else {
 								painter->fillPath(path, QColor(245, 245, 247));
