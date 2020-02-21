@@ -1,5 +1,7 @@
 #include <imtgui/CMenuPanelComp.h>
 
+#include <math.h>
+
 
 // ACF includes
 #include <iprm/IOptionsList.h>
@@ -18,7 +20,9 @@ namespace imtgui
 CMenuPanelComp::CMenuPanelComp()
 	:m_pageSubselectionObserver(*this),
 	m_pageVisualStatusObserver(*this),
-	m_monitorInfoObserver(*this)
+	m_monitorInfoObserver(*this),
+	m_resolutionX(3.5),
+	m_resolutionY(3.5)
 {
 	m_subselectionModelIndex = 0;
 	m_visualStatusModelIndex = 0;
@@ -61,33 +65,60 @@ void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QBy
 
 void CMenuPanelComp::OnGuiCreated()
 {
-	BaseClass::OnGuiCreated();
-
 	imtwidgets::CMenuPanel* widgetPtr = dynamic_cast<imtwidgets::CMenuPanel*>(GetWidget());
 	Q_ASSERT(widgetPtr != nullptr);
-	connect(widgetPtr, &imtwidgets::CMenuPanel::PageIdChanged, this, &CMenuPanelComp::OnPageIdChanged);
 
 	if (m_widgetProviderCompPtr.IsValid() && m_isShowOverAttrPtr.IsValid() && *m_isShowOverAttrPtr){
 		widgetPtr->SetMainWidget(m_widgetProviderCompPtr->GetWidgetPtr(QByteArray()));
 	}
+	
+	m_indent = m_indentAttrPtr.IsValid() ?	*m_indentAttrPtr : 20;
+	m_iconSize = m_iconSizeAttrPtr.IsValid() ? *m_iconSizeAttrPtr : 24;
+	m_selectionSizeRatioAttrPtr.IsValid() ? widgetPtr->SetSelectionSizeRatio(*m_selectionSizeRatioAttrPtr) : 1.2;
 
-	widgetPtr->SetItemIndent(20);
-	widgetPtr->SetItemPadding(5);
-	widgetPtr->SetIconSize(28);
+	m_verticalPadding = m_verticalPaddingAttrPtr.IsValid() ? *m_verticalPaddingAttrPtr : 5;
+	m_leftPadding = m_leftPaddingAttrPtr.IsValid() ? *m_leftPaddingAttrPtr : 5;
+	m_rightPadding = m_rightPaddingAttrPtr.IsValid() ?  *m_rightPaddingAttrPtr : 20;
+	m_iconToTextPadding = m_iconToTextPaddingAttrPtr.IsValid() ? *m_iconToTextPaddingAttrPtr : 5;
 
-	widgetPtr->SetItemTextColor(QColor("#656565"));
-	widgetPtr->SetItemSelectedColor(QColor(255, 255, 255));
-	widgetPtr->SetItemSelectedContourColor(QColor(77, 113, 163));
-	widgetPtr->SetItemMouserOverColor(QColor(0, 205, 255));
-	widgetPtr->SetItemMouserOverSelectedColor(QColor(0, 172, 220));
+	m_textColorAttrPtr.IsValid() ? widgetPtr->SetItemTextColor(QColor(QString(*m_textColorAttrPtr))) : (QColor(QString("#000000")));
+	m_selectedColorAttrPtr.IsValid() ? widgetPtr->SetItemSelectedColor(QColor(QString(*m_selectedColorAttrPtr))) : (QColor(QString("#808080")));
+	m_selectedContourColorAttrPtr.IsValid() ? widgetPtr->SetItemSelectedContourColor(QColor(QString(*m_selectedContourColorAttrPtr))) : (QColor(QString("#000000")));
+	m_mouseOverColorAttrPtr.IsValid() ? widgetPtr->SetItemMouseOverColor(QColor(QString(*m_mouseOverColorAttrPtr))) : (QColor(QString("#808080")));
+	m_mouseOverSelectedColorAttrPtr.IsValid() ? widgetPtr->SetItemMouseOverSelectedColor(QColor(QString(*m_mouseOverSelectedColorAttrPtr))) : (QColor(QString("#808080")));
 
-	widgetPtr->SetAnimationDelay(800);
-	widgetPtr->SetAnimationDuration(150);
+	m_animationDelayAttrPtr.IsValid() ? widgetPtr->SetAnimationDelay(*m_animationDelayAttrPtr) : widgetPtr->SetAnimationDelay(500);
+	m_animationDurationAttrPtr.IsValid() ? widgetPtr->SetAnimationDuration(*m_animationDurationAttrPtr) : widgetPtr->SetAnimationDuration(300);
 
-	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_monitorInfoProviderPtr.GetPtr());
-	if (modelPtr != nullptr){
-		modelPtr->AttachObserver(&m_monitorInfoObserver);
+	connect(widgetPtr, &imtwidgets::CMenuPanel::PageIdChanged, this, &CMenuPanelComp::OnPageIdChanged);
+
+	double manualResolution = 0;
+	if (m_physicalResolutionAttrPtr.IsValid()){
+		manualResolution = *m_physicalResolutionAttrPtr;
 	}
+
+	if (m_monitorInfoProviderPtr.IsValid()) {
+		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_monitorInfoProviderPtr.GetPtr());
+		if (modelPtr != nullptr){
+			modelPtr->AttachObserver(&m_monitorInfoObserver);
+		}
+		else{
+			if (manualResolution != 0){
+				m_resolutionX = manualResolution;
+				m_resolutionY = manualResolution;
+			}
+			UpdateWidgetSizeAttributes();
+		}
+	}
+	else{
+		if (manualResolution != 0){
+			m_resolutionX = manualResolution;
+			m_resolutionY = manualResolution;
+		}
+		UpdateWidgetSizeAttributes();
+	}
+
+	BaseClass::OnGuiCreated();
 }
 
 
@@ -310,7 +341,28 @@ void CMenuPanelComp::UpdatePageState()
 
 void CMenuPanelComp::UpdateMonitorsInfo()
 {
+	m_resolutionX = m_monitorInfoProviderPtr->GetPhysicalResolutionX(0);
+	m_resolutionY = m_monitorInfoProviderPtr->GetPhysicalResolutionY(0);
+	UpdateWidgetSizeAttributes();
 
+	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
+	Q_ASSERT(panelPtr != nullptr);
+	panelPtr->SetActivePage(FindSelectedItem());
+}
+
+
+void CMenuPanelComp::UpdateWidgetSizeAttributes()
+{
+	imtwidgets::CMenuPanel* menuPanelPtr = GetQtWidget();
+	Q_ASSERT(menuPanelPtr != nullptr);
+
+	menuPanelPtr->SetItemIndent(ceil(m_indent * m_resolutionX));
+	menuPanelPtr->SetIconSize(ceil(m_iconSize * m_resolutionX));
+
+	menuPanelPtr->SetItemVerticalPadding(ceil(m_verticalPadding * m_resolutionY));
+	menuPanelPtr->SetItemLeftPadding(ceil(m_leftPadding * m_resolutionX));
+	menuPanelPtr->SetItemRightPadding(ceil(m_rightPadding * m_resolutionY));
+	menuPanelPtr->SetItemIconToTextPadding(ceil(m_iconToTextPadding * m_resolutionX));
 }
 
 
@@ -360,15 +412,6 @@ void CMenuPanelComp::MonitorsInfoObserver::OnUpdate(const istd::IChangeable::Cha
 {
 	int event = changeSet.GetIds().values()[0];
 
-	imtgui::IMonitorInfoProvider* monitorInfoProviderPtr = GetObservedObject();
-	
-	imtwidgets::CMenuPanel* widgetPtr = m_parent.GetQtWidget();
-	Q_ASSERT(widgetPtr != nullptr);
-
-	widgetPtr->SetIconSize(7 * monitorInfoProviderPtr->GetPhysicalResolutionX(0));
-	widgetPtr->SetItemIndent(6 * monitorInfoProviderPtr->GetPhysicalResolutionX(0));
-	widgetPtr->SetItemPadding(1 * monitorInfoProviderPtr->GetPhysicalResolutionX(0));
-
 	switch (event){
 	case CMonitorInfoProvider::MCE_PRIMARY_SCREEN_CHANGED:
 		qDebug() << "MCE_PRIMARY_SCREEN_CHANGED";
@@ -390,6 +433,8 @@ void CMenuPanelComp::MonitorsInfoObserver::OnUpdate(const istd::IChangeable::Cha
 		qDebug() << "MCE_ORIENTATION";
 		break;
 	}
+
+	m_parent.UpdateMonitorsInfo();
 }
 
 

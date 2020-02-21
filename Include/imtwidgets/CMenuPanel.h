@@ -10,6 +10,7 @@
 #include <iwidgets/CFocusDecorator.h>
 
 // ImtCore includes
+#include <imtwidgets/CMenuPanelDelegate.h>
 #include <GeneratedFiles/imtwidgets/ui_CMenuPanel.h>
 
 
@@ -43,36 +44,51 @@ public:
 
 	virtual int GetMaxWidth() const;
 	virtual void SetMaxWidth(int maxWidth);
+
 	virtual QByteArray GetActivePage() const;
 	virtual void SetActivePage(const QByteArray& pageId);
+
 	virtual bool IsPageEnabled(const QByteArray& pageId) const;
 	virtual bool SetPageEnabled(const QByteArray& pageId, bool isPageEnabled = true);
+
 	virtual bool IsPageVisible(const QByteArray& pageId) const;
 	virtual bool SetPageVisible(const QByteArray& pageId, bool isPageVisible = true);
+
 	virtual void ResetPages();
 	virtual bool IsPageIdExist(const QByteArray& pageId) const;
+
 	virtual bool RemovePage(const QByteArray& pageId);
 	virtual bool InsertPage(const QByteArray& pageId, const QByteArray& parentPageId = QByteArray());
+
 	virtual int GetPageOrder(const QByteArray& pageId) const;
 	virtual bool SetPageOrder(const QByteArray& pageId, int position);
+
 	virtual QList<QByteArray> GetChilds(const QByteArray& pageId);
+
 	virtual QIcon GetPageIcon(const QByteArray& pageId) const;
 	virtual bool SetPageIcon(const QByteArray& pageId, const QIcon& pageIcon);
+
 	virtual QString GetPageName(const QByteArray& pageId) const;
 	virtual bool SetPageName(const QByteArray& pageId, const QString& pageName);
-	virtual void SetItemPadding(int padding);
-	virtual void SetIconSize(int size);
-
-	virtual void SetAnimationDelay(int delay);
-	virtual void SetAnimationDuration(int duration);
 
 	virtual void SetItemIndent(int indent);
+	virtual void SetIconSize(int size);
+	virtual void SetSelectionSizeRatio(double ratio);
+
+	virtual void SetItemVerticalPadding(int padding);
+	virtual void SetItemLeftPadding(int padding);
+	virtual void SetItemRightPadding(int padding);
+	virtual void SetItemIconToTextPadding(int padding);
 
 	virtual void SetItemTextColor(QColor color);
 	virtual void SetItemSelectedColor(QColor color);
 	virtual void SetItemSelectedContourColor(QColor color);
-	virtual void SetItemMouserOverColor(QColor color);
-	virtual void SetItemMouserOverSelectedColor(QColor color);
+	virtual void SetItemMouseOverColor(QColor color);
+	virtual void SetItemMouseOverSelectedColor(QColor color);
+
+	virtual void SetAnimationDelay(int delay);
+	virtual void SetAnimationDuration(int duration);
+
 	virtual void SetMainWidget(QWidget* mainWidget);
 
 Q_SIGNALS:
@@ -98,7 +114,6 @@ protected:
 	virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
-	int m_padding;
 	int m_minWidth;
 	int m_maxWidth;
 	int m_indent;
@@ -111,22 +126,29 @@ private:
 	QStandardItemModel m_model;
 	QPropertyAnimation m_animationWidth;
 	QPropertyAnimation m_animationIndent;
-	QPropertyAnimation m_animationWidthComp;
 
-	QWidget *m_leftFrame;
-	QWidget *m_mainWidget;
-	QWidget *m_parentWidget;
+	QWidget* m_leftFramePtr;
+	QWidget* m_mainWidgetPtr;
+	QWidget* m_parentWidgetPtr;
 
-	QGraphicsDropShadowEffect *m_shadowPtr;
+	CMenuPanelDelegate* m_delegatePtr;
+
+	QGraphicsDropShadowEffect* m_shadowPtr;
 
 private:
-	void HoverMoveEvent(QHoverEvent *event);
+	void HoverMoveEvent(QHoverEvent* event);
 	QModelIndex GetModelIndex(const QByteArray& pageId) const;
 	void SetMinimumPanelWidth(int width);
 	int CalculateMaxItemWith();
-	int CalculateMinItemWith();
 	void CheckButtonsVisible();
+	
+	void StartTimer();
+	void StopTimer();
 	void StartAnimation();
+	void StopAnimation();
+
+	void ReconnectModel();
+	void AfterSizesChanged();
 };
 
 
