@@ -170,7 +170,14 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							blurPainter.end();
 
 							QPoint topLeft = borderRect.topLeft();
-							topLeft -= QPoint(blurredRadius - 1, blurredRadius - 1);
+
+							if (toolbutton->state & (State_Sunken | State_On)){
+								topLeft -= QPoint(blurredRadius, blurredRadius);
+							}
+							else{
+								topLeft -= QPoint(blurredRadius - 1, blurredRadius - 1);
+							}
+
 							painter->drawImage(QRect(topLeft, blurred.size()), blurred);
 
 							path = QPainterPath();
@@ -184,7 +191,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							}
 
 							path = QPainterPath();
-							path.addRoundedRect(borderRect.adjusted(0, 1, 0, 0), 6, 6);
+							path.addRoundedRect(borderRect.adjusted(0, 1, 0, 1), 6, 6);
 
 							if (toolbutton->state & (State_Sunken | State_On)){
 								painter->fillPath(path, QColor(200, 200, 202));
