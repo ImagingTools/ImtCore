@@ -107,4 +107,16 @@
         <file alias="DetailedHighlight">Resources/Icons/DetailedHighlight.svg</file>
         <file alias="ProductionOverviewHighlight">Resources/Icons/ProductionOverviewHighlight.svg</file>
     </qresource>
+    <qresource prefix="/ColorIcons">
+        <file alias="Workflow">Resources/Icons/Color/Workflow.svg</file>
+        <file alias="WorkflowHighlight">Resources/Icons/Color/WorkflowHighlight.svg</file>
+        <file alias="Detailed">Resources/Icons/Color/Detailed.svg</file>
+        <file alias="Lamp">Resources/Icons/Color/Lamp.svg</file>
+        <file alias="DetailedHighlight">Resources/Icons/Color/DetailedHighlight.svg</file>
+        <file alias="LampHighlight">Resources/Icons/Color/LampHighlight.svg</file>
+        <file alias="Simulation">Resources/Icons/Color/Simulation.svg</file>
+        <file alias="SimulationHighlight">Resources/Icons/Color/SimulationHighlight.svg</file>
+        <file alias="NonWorking">Resources/Icons/Color/NonWorking.svg</file>
+        <file alias="Working">Resources/Icons/Color/Working.svg</file>
+    </qresource>
 </RCC>

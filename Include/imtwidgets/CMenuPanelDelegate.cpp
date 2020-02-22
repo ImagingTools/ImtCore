@@ -224,7 +224,6 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 		currentIndex = currentIndex.parent();
 	}
 
-	// Draw icon:
 	QRect iconRect;
 	iconRect = backgroundSingleEllipse;
 	if (indent != 0){
@@ -232,6 +231,24 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 		iconRect.setRight(backgroundSingleEllipse.right() + offset);
 	}
 
+	// Draw text:
+	QString text = index.data(Qt::DisplayRole).toString();
+	painter->setPen(m_textColor);
+	if (indent > 0){
+		QRect textRect = option.rect;
+		textRect.adjust(0, m_verticalPadding, 0, 0);
+		textRect.setLeft(iconRect.right() + 1 + m_iconToTextPadding);
+
+		option.widget->style()->drawItemText(
+					painter,
+					textRect,
+					Qt::AlignLeft | Qt::AlignVCenter,
+					option.palette,
+					true,
+					text);
+	}
+
+	// Draw icon:
 	QIcon::Mode iconMode = QIcon::Mode::Normal;
 
 	if (option.state & QStyle::State_Selected){
@@ -257,24 +274,6 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 				painter, iconRect,
 				Qt::AlignHCenter | Qt::AlignVCenter,
 				iconPixmap);
-
-	// Draw text:
-
-	QString text = index.data(Qt::DisplayRole).toString();
-	painter->setPen(m_textColor);
-	if (indent > 0){
-		QRect textRect = option.rect;
-		textRect.adjust(0, m_verticalPadding, 0, 0);
-		textRect.setLeft(iconRect.right() + 1 + m_iconToTextPadding);
-
-		option.widget->style()->drawItemText(
-					painter,
-					textRect,
-					Qt::AlignLeft | Qt::AlignVCenter,
-					option.palette,
-					true,
-					text);
-	}
 
 	painter->restore();
 }
