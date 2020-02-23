@@ -135,7 +135,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 					if (!hasArrow){
 						if (!pmSize.isEmpty()) {
 							painter->setRenderHint(QPainter::Antialiasing, true);
-							QRect borderRect(QPoint(0, 0), QPoint(2 * pmSize.width(), pmSize.height()));
+							QRectF borderRect(QPoint(0, 0), QPoint(2 * pmSize.width(), pmSize.height()));
 							borderRect.moveCenter(pixmapRect.center());
 
 #if 0 // Draw layout boxes
@@ -152,7 +152,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 
 							borderRect = borderRect.adjusted(-2, -2, 2, 2);
 							int blurredRadius = 5;
-							QImage _temp(borderRect.adjusted(-blurredRadius, -blurredRadius, blurredRadius, blurredRadius).size(), QImage::Format_ARGB32_Premultiplied);
+							QImage _temp(borderRect.toRect().adjusted(-blurredRadius, -blurredRadius, blurredRadius, blurredRadius).size(), QImage::Format_ARGB32_Premultiplied);
 							_temp.fill(0);
 							QPainter _tempPainter(&_temp);
 							QPainterPath path;
@@ -169,7 +169,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							qt_blurImage(&blurPainter, _temp, blurredRadius, false, true);
 							blurPainter.end();
 
-							QPoint topLeft = borderRect.topLeft();
+							QPoint topLeft = borderRect.toRect().topLeft();
 
 							if (toolbutton->state & (State_Sunken | State_On)){
 								topLeft -= QPoint(blurredRadius, blurredRadius);
@@ -181,12 +181,13 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							painter->drawImage(QRect(topLeft, blurred.size()), blurred);
 
 							path = QPainterPath();
-							path.addRoundedRect(borderRect.adjusted(-1, 0, -1, 0), 6, 6);
 							
 							if (toolbutton->state & (State_Sunken | State_On)){
-								painter->fillPath(path, QColor(225, 225, 227));
+								path.addRoundedRect(borderRect.adjusted(-1, 0, 1, 2), 6, 6);
+								painter->fillPath(path, QColor(180, 180, 183));
 							}
 							else{
+								path.addRoundedRect(borderRect.adjusted(-1, 0, -1, 0), 6, 6);
 								painter->fillPath(path, Qt::white);
 							}
 
@@ -194,7 +195,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							path.addRoundedRect(borderRect.adjusted(0, 1, 0, 1), 6, 6);
 
 							if (toolbutton->state & (State_Sunken | State_On)){
-								painter->fillPath(path, QColor(200, 200, 202));
+								painter->fillPath(path, QColor(205, 205, 207));
 							}
 							else {
 								painter->fillPath(path, QColor(245, 245, 247));
