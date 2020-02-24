@@ -64,9 +64,7 @@ QWidget[ImtTopFrame=true]
 
 QWidget#PageTree
 {
-	background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
-                                 stop: 0 rgb(243,243,245), stop: 0.9 rgb(235,235,237),
-                                 stop: 0.97 rgb(235,235,237), stop: 1.0 rgb(230,230,232));
+	background: rgb(220,220,220);
 }
 
 
