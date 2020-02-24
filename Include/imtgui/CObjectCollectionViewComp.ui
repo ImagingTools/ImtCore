@@ -28,7 +28,7 @@ QAbstractItemView[NoFrame=&quot;true&quot;]
 
 QAbstractItemView::item
 {
-    color: #656565;
+    color: #335777;
 	padding-top: 0.9em;
 	padding-bottom: 0.9em;
 }
