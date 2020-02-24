@@ -24,6 +24,7 @@ QWidget::item:disabled
 	color: palette(disabled);
 }
 
+
 QWidget:disabled
 {
 	color: palette(disabled);
@@ -119,6 +120,7 @@ QTreeWidget[TabSimulation=true]::item:last
 QTreeWidget[TabSimulation=true]::item:selected 
 {
     background-color: rgb(255, 255, 255);
+	color: #335777;
 }
 
 QTreeWidget[TabSimulation=true]::item:!selected:hover 
