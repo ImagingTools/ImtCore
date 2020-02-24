@@ -37,8 +37,8 @@
      id="namedview45"
      showgrid="false"
      inkscape:zoom="0.65186406"
-     inkscape:cx="-269.98145"
-     inkscape:cy="256"
+     inkscape:cx="-276.3627"
+     inkscape:cy="270.77907"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -66,4 +66,13 @@
      id="g36" /><g
      id="g38" /><g
      id="g40" /><g
-     id="g42" /></svg>
+     id="g42" /><g
+     id="g6"
+     transform="matrix(0.52720051,0,0,0.49425049,127.12534,155.17997)"
+     style="stroke-width:1.98643005"><g
+       id="g4"
+       style="stroke-width:1.98643005"><path
+         d="m 239.15,0 c 31.9,0 57.7,25.8 57.7,57.7 0,31.9 -25.8,57.7 -57.7,57.7 -31.9,0 -57.7,-25.8 -57.7,-57.7 0,-31.9 25.8,-57.7 57.7,-57.7 z m 52.5,151.6 h -1.5 -92.8 -3.4 c -19,0 -34.3,15.4 -34.3,34.3 v 0 c 0,19 15.4,34.3 34.3,34.3 h 3.4 v 200 h -37.7 v 68.7 h 169.6 v -68.7 h -37.5 V 151.6 Z"
+         id="path2-2"
+         inkscape:connector-curvature="0"
+         style="fill:#335777;stroke-width:1.98643005" /></g></g></svg>
