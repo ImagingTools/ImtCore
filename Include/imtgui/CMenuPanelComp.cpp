@@ -72,11 +72,11 @@ void CMenuPanelComp::OnGuiCreated()
 		widgetPtr->SetMainWidget(m_widgetProviderCompPtr->GetWidgetPtr(QByteArray()));
 	}
 	
-	m_indent = m_indentAttrPtr.IsValid() ?	*m_indentAttrPtr : 20;
-	m_iconSize = m_iconSizeAttrPtr.IsValid() ? *m_iconSizeAttrPtr : 24;
-	m_selectionSizeRatioAttrPtr.IsValid() ? widgetPtr->SetSelectionSizeRatio(*m_selectionSizeRatioAttrPtr) : 1.2;
+	m_indent = m_indentAttrPtr.IsValid() ?	*m_indentAttrPtr : 5;
+	m_itemHeight = m_itemHeightAttrPtr.IsValid() ? *m_itemHeightAttrPtr : 7;
+	m_iconSizeRatioAttrPtr.IsValid() ? widgetPtr->SetIconSizeRatio(*m_iconSizeRatioAttrPtr) : 1.1;
 
-	m_verticalPadding = m_verticalPaddingAttrPtr.IsValid() ? *m_verticalPaddingAttrPtr : 5;
+	m_topPadding = m_topPaddingAttrPtr.IsValid() ? *m_topPaddingAttrPtr : 5;
 	m_leftPadding = m_leftPaddingAttrPtr.IsValid() ? *m_leftPaddingAttrPtr : 5;
 	m_rightPadding = m_rightPaddingAttrPtr.IsValid() ?  *m_rightPaddingAttrPtr : 20;
 	m_iconToTextPadding = m_iconToTextPaddingAttrPtr.IsValid() ? *m_iconToTextPaddingAttrPtr : 5;
@@ -357,9 +357,9 @@ void CMenuPanelComp::UpdateWidgetSizeAttributes()
 	Q_ASSERT(menuPanelPtr != nullptr);
 
 	menuPanelPtr->SetItemIndent(ceil(m_indent * m_resolutionX));
-	menuPanelPtr->SetIconSize(ceil(m_iconSize * m_resolutionX));
+	menuPanelPtr->SetItemHeight(ceil(m_itemHeight * m_resolutionY));
 
-	menuPanelPtr->SetItemVerticalPadding(ceil(m_verticalPadding * m_resolutionY));
+	menuPanelPtr->SetItemVerticalPadding(ceil(m_topPadding * m_resolutionY));
 	menuPanelPtr->SetItemLeftPadding(ceil(m_leftPadding * m_resolutionX));
 	menuPanelPtr->SetItemRightPadding(ceil(m_rightPadding * m_resolutionY));
 	menuPanelPtr->SetItemIconToTextPadding(ceil(m_iconToTextPadding * m_resolutionX));

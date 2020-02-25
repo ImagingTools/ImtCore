@@ -72,8 +72,8 @@ public:
 	virtual bool SetPageName(const QByteArray& pageId, const QString& pageName);
 
 	virtual void SetItemIndent(int indent);
-	virtual void SetIconSize(int size);
-	virtual void SetSelectionSizeRatio(double ratio);
+	virtual void SetItemHeight(int height);
+	virtual void SetIconSizeRatio(double ratio);
 
 	virtual void SetItemVerticalPadding(int padding);
 	virtual void SetItemLeftPadding(int padding);

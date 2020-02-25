@@ -66,10 +66,10 @@ public:
 		I_ASSIGN(m_physicalResolutionAttrPtr, "PhysicalResolution", "Physical monitor resolution", true, 3.5);
 
 		I_ASSIGN(m_indentAttrPtr, "Indent", "Item indentation", true, 20);
-		I_ASSIGN(m_iconSizeAttrPtr, "IconSize", "Icon size", true, 24);
-		I_ASSIGN(m_selectionSizeRatioAttrPtr, "SelectionSizeRatio", "Selection height ratio relative to icon size", true, 1.2);
+		I_ASSIGN(m_itemHeightAttrPtr, "ItemHeight", "Item Height", true, 7);
+		I_ASSIGN(m_iconSizeRatioAttrPtr, "IconSizeRatio", "Icon size ratio relative to item height", true, 1.1);
 
-		I_ASSIGN(m_verticalPaddingAttrPtr, "VerticalPadding", "Vertical item padding", true, 5);
+		I_ASSIGN(m_topPaddingAttrPtr, "TopPadding", "Top panel padding", true, 5);
 		I_ASSIGN(m_leftPaddingAttrPtr, "LeftPadding", "Left item padding", true, 5);
 		I_ASSIGN(m_rightPaddingAttrPtr, "RightPadding", "Right item padding", true, 20);
 		I_ASSIGN(m_iconToTextPaddingAttrPtr, "IconToTextPadding", "Icon to text item padding", true, 5);
@@ -150,21 +150,21 @@ private:
 	I_ATTR(double, m_physicalResolutionAttrPtr);
 
 	I_ATTR(int, m_indentAttrPtr);
-	I_ATTR(int, m_iconSizeAttrPtr);
-	I_ATTR(double, m_selectionSizeRatioAttrPtr);
+	I_ATTR(int, m_itemHeightAttrPtr);
+	I_ATTR(double, m_iconSizeRatioAttrPtr);
 
-	I_ATTR(int, m_verticalPaddingAttrPtr);
-	I_ATTR(int, m_leftPaddingAttrPtr);
-	I_ATTR(int, m_rightPaddingAttrPtr);
-	I_ATTR(int, m_iconToTextPaddingAttrPtr);
+	I_ATTR(double, m_topPaddingAttrPtr);
+	I_ATTR(double, m_leftPaddingAttrPtr);
+	I_ATTR(double, m_rightPaddingAttrPtr);
+	I_ATTR(double, m_iconToTextPaddingAttrPtr);
 
 	int m_indent;
-	int m_iconSize;
+	double m_itemHeight;
 
-	int m_verticalPadding;
-	int m_leftPadding;
-	int m_rightPadding;
-	int m_iconToTextPadding;
+	double m_topPadding;
+	double m_leftPadding;
+	double m_rightPadding;
+	double m_iconToTextPadding;
 
 	double m_resolutionX;
 	double m_resolutionY; 

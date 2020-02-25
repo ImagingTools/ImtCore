@@ -22,10 +22,10 @@ public:
 	void SetFontMetrics(const QFontMetrics& fontMetrics);
 
 	void SetMaxIndent(int indent);
-	void SetIconSize(int size);
-	void SetSelectionSizeRatio(double ratio);
+	void SetItemHeight(int height);
+	void SetIconSizeRatio(double ratio);
 
-	void SetVerticalPadding(int padding);
+	void SetTopPadding(int padding);
 	void SetLeftPadding(int padding);
 	void SetRightPadding(int padding);
 	void SetIconToTextPadding(int padding);
@@ -43,12 +43,12 @@ protected:
 
 private:
 	int m_maxIndent;
-	int m_iconSize;
-	double m_selectionSizeRatio;
+	int m_height;
 
-	int m_selectionBoxHeight;
+	double m_iconSizeRatio;
+	int m_iconHeight;
 
-	int m_verticalPadding;
+	int m_topPadding;
 	int m_leftPadding;
 	int m_rightPadding;
 	int m_iconToTextPadding;

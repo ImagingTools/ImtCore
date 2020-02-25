@@ -19,10 +19,10 @@ CMenuPanelDelegate::CMenuPanelDelegate(QTreeView* menuPanelPtr)
 	:QStyledItemDelegate(menuPanelPtr),
 	m_fontMetrics(QFontMetrics(QFont())),
 	m_maxIndent(20),
-	m_iconSize(16),
-	m_selectionSizeRatio(1),
+	m_height(16),
+	m_iconSizeRatio(1),
 	
-	m_verticalPadding(0),
+	m_topPadding(0),
 	m_leftPadding(0),
 	m_rightPadding(0),
 	m_iconToTextPadding(0),
@@ -38,7 +38,7 @@ CMenuPanelDelegate::CMenuPanelDelegate(QTreeView* menuPanelPtr)
 
 int CMenuPanelDelegate::GetMinimumWidth()
 {
-	return 2 * m_leftPadding + m_selectionBoxHeight;
+	return 2 * m_leftPadding + m_height;
 }
 
 
@@ -54,31 +54,45 @@ void CMenuPanelDelegate::SetMaxIndent(int indent)
 }
 
 
-void CMenuPanelDelegate::SetIconSize(int size)
+void CMenuPanelDelegate::SetItemHeight(int heigth)
 {
-	m_iconSize = size;
+	m_height = heigth;
 
-	m_selectionBoxHeight = sqrt(2 * m_iconSize * m_iconSize) * m_selectionSizeRatio;
-	if ((m_selectionBoxHeight - m_iconSize) % 2){
-		m_selectionBoxHeight++;
+	m_iconHeight = sqrt((m_height * m_height / m_iconSizeRatio) / 2);
+
+	if (m_height % 2 != 0 && m_iconHeight % 2 == 0)
+	{
+		m_iconHeight--;
+	}
+
+	if (m_height % 2 == 0 && m_iconHeight % 2 != 0)
+	{
+		m_iconHeight--;
 	}
 }
 
 
-void CMenuPanelDelegate::SetSelectionSizeRatio(double ratio)
+void CMenuPanelDelegate::SetIconSizeRatio(double ratio)
 {
-	m_selectionSizeRatio = ratio;
+	m_iconSizeRatio = ratio;
 
-	m_selectionBoxHeight = sqrt(2 * m_iconSize * m_iconSize) * m_selectionSizeRatio;
-	if ((m_selectionBoxHeight - m_iconSize) % 2){
-		m_selectionBoxHeight++;
+	m_iconHeight = sqrt((m_height * m_height / m_iconSizeRatio) / 2);
+
+	if (m_height % 2 != 0 && m_iconHeight % 2 == 0)
+	{
+		m_iconHeight--;
+	}
+
+	if (m_height % 2 == 0 && m_iconHeight % 2 != 0)
+	{
+		m_iconHeight--;
 	}
 }
 
 
-void CMenuPanelDelegate::SetVerticalPadding(int padding)
+void CMenuPanelDelegate::SetTopPadding(int padding)
 {
-	m_verticalPadding = padding;
+	m_topPadding = padding;
 }
 
 
@@ -137,7 +151,13 @@ void CMenuPanelDelegate::SetTextColor(const QColor& color)
 QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const QModelIndex& index) const
 {
 	QSize size;
-	size.setHeight(m_selectionBoxHeight + m_verticalPadding);
+
+	if (index.row() == 0 && !index.parent().isValid()) {
+		size.setHeight(m_height + m_topPadding);
+	}
+	else{
+		size.setHeight(m_height);
+	}
 
 	int offset = -m_maxIndent;
 	QModelIndex currentIndex = index;
@@ -148,8 +168,8 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const
 
 	QString text = index.data(Qt::DisplayRole).toString();
 
-	int width = m_leftPadding + offset + m_selectionBoxHeight + m_iconToTextPadding;
-	width += m_fontMetrics.boundingRect(text).width() + m_rightPadding;
+	int width = m_leftPadding + offset + m_height + m_iconToTextPadding;
+	width += m_fontMetrics.boundingRect(text).width() + m_height / 2 + m_rightPadding;
 
 	size.setWidth(width);
 
@@ -185,8 +205,8 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 
 	QRect backgroundSingleEllipse;
 	backgroundSingleEllipse.setLeft(m_leftPadding);
-	backgroundSingleEllipse.setRight(m_leftPadding + m_selectionBoxHeight - 1);
-	backgroundSingleEllipse.setTop(option.rect.bottom() - m_selectionBoxHeight + 1);
+	backgroundSingleEllipse.setRight(m_leftPadding + m_height - 1);
+	backgroundSingleEllipse.setTop(option.rect.bottom() - m_height + 1);
 	backgroundSingleEllipse.setBottom(option.rect.bottom());
 
 	// Draw background:
@@ -198,15 +218,15 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 			painter->setPen(Qt::transparent);
 
 			backgroundRect.setLeft(0);
-			backgroundRect.setRight(option.rect.right() - m_selectionBoxHeight / 2 - m_leftPadding);
-			backgroundRect.setTop(option.rect.bottom() - m_selectionBoxHeight + 1);
+			backgroundRect.setRight(option.rect.right() - m_height / 2 - m_rightPadding);
+			backgroundRect.setTop(option.rect.bottom() - m_height + 1);
 			backgroundRect.setBottom(option.rect.bottom());
 			painter->fillRect(backgroundRect, backgroundColor);
 
 			QRect backgroundRightEllipse;
-			backgroundRightEllipse.setRight(option.rect.right() - m_leftPadding);
-			backgroundRightEllipse.setLeft(backgroundRightEllipse.right() - m_selectionBoxHeight + 1);
-			backgroundRightEllipse.setTop(option.rect.bottom() - m_selectionBoxHeight + 1);
+			backgroundRightEllipse.setRight(option.rect.right() - m_rightPadding);
+			backgroundRightEllipse.setLeft(backgroundRightEllipse.right() - m_height + 1);
+			backgroundRightEllipse.setTop(option.rect.bottom() - m_height + 1);
 			backgroundRightEllipse.setBottom(option.rect.bottom());
 			painter->drawEllipse(backgroundRightEllipse);
 		}
@@ -236,8 +256,8 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 	painter->setPen(m_textColor);
 	if (indent > 0){
 		QRect textRect = option.rect;
-		textRect.adjust(0, m_verticalPadding, 0, 0);
 		textRect.setLeft(iconRect.right() + 1 + m_iconToTextPadding);
+		textRect.setTop(option.rect.bottom() - m_height + 1);
 
 		option.widget->style()->drawItemText(
 					painter,
@@ -266,8 +286,8 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 	QIcon icon = index.data(Qt::DecorationRole).value<QIcon>();
 
 	QPixmap iconPixmap = icon.pixmap(
-				m_iconSize,
-				m_iconSize,
+				m_iconHeight,
+				m_iconHeight,
 				iconMode);
 
 	option.widget->style()->drawItemPixmap(

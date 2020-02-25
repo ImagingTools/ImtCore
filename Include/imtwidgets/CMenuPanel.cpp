@@ -53,7 +53,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 
 	PageTree->setHeaderHidden(true);
 	PageTree->setIconSize(QSize(16, 16));
-	SetIconSize(16);
+	SetItemHeight(16);
 	PageTree->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 	PageTree->setIndentation(0);
 
@@ -368,23 +368,23 @@ void CMenuPanel::SetItemIndent(int indent)
 }
 
 
-void CMenuPanel::SetIconSize(int size)
+void CMenuPanel::SetItemHeight(int height)
 {
-	m_delegatePtr->SetIconSize(size);
+	m_delegatePtr->SetItemHeight(height);
 	AfterSizesChanged();
 }
 
 
-void CMenuPanel::SetSelectionSizeRatio(double ratio)
+void CMenuPanel::SetIconSizeRatio(double ratio)
 {
-	m_delegatePtr->SetSelectionSizeRatio(ratio);
+	m_delegatePtr->SetIconSizeRatio(ratio);
 	AfterSizesChanged();
 }
 
 
 void CMenuPanel::SetItemVerticalPadding(int padding)
 {
-	m_delegatePtr->SetVerticalPadding(padding);
+	m_delegatePtr->SetTopPadding(padding);
 	AfterSizesChanged();
 }
 
