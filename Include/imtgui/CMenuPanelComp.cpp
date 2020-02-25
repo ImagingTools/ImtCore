@@ -341,18 +341,13 @@ void CMenuPanelComp::UpdatePageState()
 
 void CMenuPanelComp::UpdateMonitorsInfo()
 {
-	m_resolutionX = m_monitorInfoProviderPtr->GetPhysicalResolutionX(0);
-	m_resolutionY = m_monitorInfoProviderPtr->GetPhysicalResolutionY(0);
 
-	if (m_resolutionX == 0 || m_resolutionY == 0){
-		if (m_physicalResolutionAttrPtr.IsValid()){
-			m_resolutionX = *m_physicalResolutionAttrPtr;
-			m_resolutionY = *m_physicalResolutionAttrPtr;
-		}
-		else {
-			m_resolutionX = 3.5;
-			m_resolutionY = 3.5;
-		}
+	double resolutionX = m_monitorInfoProviderPtr->GetPhysicalResolutionX(0);
+	double resolutionY = m_monitorInfoProviderPtr->GetPhysicalResolutionX(0);
+
+	if (resolutionX != 0 && resolutionY != 0){
+		m_resolutionX = resolutionX;
+		m_resolutionY = resolutionY;
 	}
 
 	UpdateWidgetSizeAttributes();
