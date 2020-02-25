@@ -251,40 +251,13 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 		iconRect.setRight(backgroundSingleEllipse.right() + offset);
 	}
 
-	// Draw text:
-	QString text = index.data(Qt::DisplayRole).toString();
-	painter->setPen(m_textColor);
-	if (indent > 0){
-		QRect textRect = option.rect;
-		textRect.setLeft(iconRect.right() + 1 + m_iconToTextPadding);
-		textRect.setTop(option.rect.bottom() - m_height + 1);
-
-		option.widget->style()->drawItemText(
-					painter,
-					textRect,
-					Qt::AlignLeft | Qt::AlignVCenter,
-					option.palette,
-					true,
-					text);
-	}
-
 	// Draw icon:
 	QIcon::Mode iconMode = QIcon::Mode::Normal;
-
-	if (option.state & QStyle::State_Selected){
-		iconMode = QIcon::Mode::Selected;
-	}
-
-	if (option.state & QStyle::State_MouseOver){
-		iconMode = QIcon::Mode::Active;
-	}
-
 	if (!index.data(imtwidgets::CMenuPanel::DR_PAGE_ENABLED).toBool()){
 		iconMode = QIcon::Mode::Disabled;
 	}
 
 	QIcon icon = index.data(Qt::DecorationRole).value<QIcon>();
-
 	QPixmap iconPixmap = icon.pixmap(
 				m_iconHeight,
 				m_iconHeight,
@@ -294,6 +267,23 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 				painter, iconRect,
 				Qt::AlignHCenter | Qt::AlignVCenter,
 				iconPixmap);
+
+	// Draw text:
+	QString text = index.data(Qt::DisplayRole).toString();
+	painter->setPen(m_textColor);
+	if (indent > 0){
+		QRect textRect = option.rect;
+		textRect.setLeft(iconRect.right() + 1 + m_iconToTextPadding);
+		textRect.setTop(option.rect.bottom() - m_height + 1);
+
+		option.widget->style()->drawItemText(
+			painter,
+			textRect,
+			Qt::AlignLeft | Qt::AlignVCenter,
+			option.palette,
+			true,
+			text);
+	}
 
 	painter->restore();
 }
