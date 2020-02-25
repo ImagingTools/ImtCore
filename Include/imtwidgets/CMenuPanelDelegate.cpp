@@ -169,7 +169,7 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const
 	QString text = index.data(Qt::DisplayRole).toString();
 
 	int width = m_leftPadding + offset + m_height + m_iconToTextPadding;
-	width += m_fontMetrics.boundingRect(text).width() + m_height / 2 + m_rightPadding;
+	width += m_fontMetrics.boundingRect(text).width() + m_rightPadding;
 
 	size.setWidth(width);
 
@@ -218,13 +218,13 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 			painter->setPen(Qt::transparent);
 
 			backgroundRect.setLeft(0);
-			backgroundRect.setRight(option.rect.right() - m_height / 2 - m_rightPadding);
+			backgroundRect.setRight(option.rect.right() - m_height / 2 - m_leftPadding);
 			backgroundRect.setTop(option.rect.bottom() - m_height + 1);
 			backgroundRect.setBottom(option.rect.bottom());
 			painter->fillRect(backgroundRect, backgroundColor);
 
 			QRect backgroundRightEllipse;
-			backgroundRightEllipse.setRight(option.rect.right() - m_rightPadding);
+			backgroundRightEllipse.setRight(option.rect.right() - m_leftPadding);
 			backgroundRightEllipse.setLeft(backgroundRightEllipse.right() - m_height + 1);
 			backgroundRightEllipse.setTop(option.rect.bottom() - m_height + 1);
 			backgroundRightEllipse.setBottom(option.rect.bottom());
