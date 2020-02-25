@@ -343,6 +343,18 @@ void CMenuPanelComp::UpdateMonitorsInfo()
 {
 	m_resolutionX = m_monitorInfoProviderPtr->GetPhysicalResolutionX(0);
 	m_resolutionY = m_monitorInfoProviderPtr->GetPhysicalResolutionY(0);
+
+	if (m_resolutionX == 0 || m_resolutionY == 0){
+		if (m_physicalResolutionAttrPtr.IsValid()){
+			m_resolutionX = *m_physicalResolutionAttrPtr;
+			m_resolutionY = *m_physicalResolutionAttrPtr;
+		}
+		else {
+			m_resolutionX = 3.5;
+			m_resolutionY = 3.5;
+		}
+	}
+
 	UpdateWidgetSizeAttributes();
 
 	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();

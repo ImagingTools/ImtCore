@@ -226,8 +226,14 @@ void CMonitorInfoProvider::UpdateMonitorsInfo()
 		info.screenPtr = screen;
 		info.size = RetrievePhysicalSize(screen->name());
 		info.geometry = screen->geometry();
-		info.resolutionX = (double)info.geometry.width() / info.size.width();
-		info.resolutionY = (double)info.geometry.height() / info.size.height();
+		if (info.size.width() != 0 && info.size.height() != 0){
+			info.resolutionX = (double)info.geometry.width() / info.size.width();
+			info.resolutionY = (double)info.geometry.height() / info.size.height();
+		}
+		else{
+			info.resolutionX = 0;
+			info.resolutionY = 0;
+		}
 
 		connect(screen, &QScreen::logicalDotsPerInchChanged, this, &CMonitorInfoProvider::LogicalDotsPerInchChanged);
 		connect(screen, &QScreen::orientationChanged, this, &CMonitorInfoProvider::OrientationChanged);
