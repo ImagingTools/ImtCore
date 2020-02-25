@@ -309,7 +309,7 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 	if (m_itemInfoMap.contains(item)){
 		ItemInfo& info = m_itemInfoMap[item];
 
-		SwitchToPage(info.pageIndex);
+		m_pagesCompPtr->SetSelectedOptionIndex(info.pageIndex);
 	}
 }
 
@@ -773,7 +773,7 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 	if (m_pagesCompPtr.IsValid()){
 		const iprm::IOptionsList* pageListPtr = m_pagesCompPtr->GetSelectionConstraints();
 		int pagesCount = pageListPtr->GetOptionsCount();
-		int selectedPageIndex = 0;
+		int selectedPageIndex = m_pagesCompPtr->GetSelectedOptionIndex();
 
 		const iqtgui::IMultiVisualStatusProvider* pageVisualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(m_pagesCompPtr.GetPtr());
 
@@ -823,7 +823,7 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 							subPageIter.key()->setDisabled(!isPageEnabled);
 
 							if (subPageVisualStatusProviderPtr != nullptr){
-								const iqtgui::IVisualStatus* subPageStatusPtr = subPageVisualStatusProviderPtr->GetVisualStatus(pageIndex);
+								const iqtgui::IVisualStatus* subPageStatusPtr = subPageVisualStatusProviderPtr->GetVisualStatus(subPageIndex);
 								if (subPageStatusPtr != nullptr){
 									subPageIter.key()->setIcon(0, subPageStatusPtr->GetStatusIcon());
 								}
