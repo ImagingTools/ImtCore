@@ -259,7 +259,7 @@ QSize CImtStyle::sizeFromContents(QStyle::ContentsType type, const QStyleOption 
 	QSize size = BaseClass::sizeFromContents(type, option, contentsSize, widget);
 	if (const QStyleOptionToolButton* toolbutton = qstyleoption_cast<const QStyleOptionToolButton *>(option)){
 		if (toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon){
-			size.setWidth(74);
+			size.setWidth(toolbutton->iconSize.width() * 2 + 10);
 		}
 	}
 	return size;
