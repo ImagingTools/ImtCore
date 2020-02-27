@@ -48,11 +48,6 @@ QToolBar[ImtToolBar=true]
 	qproperty-iconSize: 32px;
 }
 
-QToolBar[ImtToolBar=true] &gt; QToolButton
-{
-		min-width: 74px;
-}
-
 
 QWidget[ImtTopFrame=true]
 {

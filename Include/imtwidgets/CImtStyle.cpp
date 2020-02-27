@@ -206,7 +206,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							proxy()->drawItemPixmap(painter, pixmapRect, Qt::AlignCenter, pm);
 						}
 					}
-					else {
+					else{
 						drawArrow(proxy(), toolbutton, pixmapRect, painter, widget);
 					}
 
@@ -224,11 +224,11 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 						QPalette::ButtonText);
 				}
 				else{
-					painter->save();
-					painter->setRenderHint(QPainter::Antialiasing, true);
-					painter->drawPixmap(rect.left(), rect.top() + rect.height() / 2 - 5, 10, 10, pm);
-					painter->restore();
-				//	BaseClass::drawControl(element, option, painter, widget);
+					//painter->save();
+					//painter->setRenderHint(QPainter::Antialiasing, true);
+					//painter->drawPixmap(rect.left(), rect.top() + rect.height() / 2 - 5, 10, 10, pm);
+					//painter->restore();
+					BaseClass::drawControl(element, option, painter, widget);
 				}
 			}
 			break;
@@ -251,6 +251,18 @@ QRect CImtStyle::subElementRect(SubElement subElement, const QStyleOption * opti
 	}
 
 	return QRect();
+}
+
+
+QSize CImtStyle::sizeFromContents(QStyle::ContentsType type, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const
+{
+	QSize size = BaseClass::sizeFromContents(type, option, contentsSize, widget);
+	if (const QStyleOptionToolButton* toolbutton = qstyleoption_cast<const QStyleOptionToolButton *>(option)){
+		if (toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon){
+			size.setWidth(74);
+		}
+	}
+	return size;
 }
 
 
