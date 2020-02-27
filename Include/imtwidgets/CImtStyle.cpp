@@ -224,7 +224,11 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 						QPalette::ButtonText);
 				}
 				else{
-					BaseClass::drawControl(element, option, painter, widget);
+					painter->save();
+					painter->setRenderHint(QPainter::Antialiasing, true);
+					painter->drawPixmap(rect.left(), rect.top() + rect.height() / 2 - 5, 10, 10, pm);
+					painter->restore();
+				//	BaseClass::drawControl(element, option, painter, widget);
 				}
 			}
 			break;
