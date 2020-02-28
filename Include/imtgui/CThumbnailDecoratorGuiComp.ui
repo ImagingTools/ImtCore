@@ -60,7 +60,7 @@ QWidget[ImtTopFrame=true]
 
 QWidget#PageTree
 {
-	background: rgb(220,220,220);
+	background: rgb(230,230,230);
 }
 
 
