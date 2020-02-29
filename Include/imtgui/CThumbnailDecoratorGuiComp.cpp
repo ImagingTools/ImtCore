@@ -40,7 +40,8 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_horizontalSpacing(0),
 	m_horizontalFrameMargin(6),
 	m_verticalFrameMargin(6),
-	m_itemDelegate(nullptr)
+	m_itemDelegate(nullptr),
+	m_lastPageIndexForLoggedUser(-1)
 {
 	m_rootCommands.InsertChild(&m_commands);
 	m_minItemSize = QSize(100, 50);
@@ -232,6 +233,10 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	connect(&m_autoLogoutTimer, SIGNAL(timeout()), this, SLOT(Logout()));
 
 	SetKeyboardCommandPath();
+
+	if (m_defaultPageIndexAttrPtr.IsValid()){
+		m_lastPageIndexForLoggedUser = *m_defaultPageIndexAttrPtr;
+	}
 }
 
 
@@ -386,10 +391,7 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 
 			UpdateLoginButtonsState();
 
-			int lastPageIndex = -1;
-			if (m_pagesCompPtr.IsValid()){
-				lastPageIndex = m_pagesCompPtr->GetSelectedOptionIndex();
-			}
+			int lastPageIndex = m_lastPageIndexForLoggedUser;
 
 			// No page was selected:
 			if (lastPageIndex < 0){
@@ -496,6 +498,12 @@ void CThumbnailDecoratorGuiComp::ShowLoginPage()
 
 	m_subPageItemMap.clear();
 	SubPages->clear();
+
+	if (m_pagesCompPtr.IsValid()){
+		m_lastPageIndexForLoggedUser = m_pagesCompPtr->GetSelectedOptionIndex();
+
+		m_pagesCompPtr->SetSelectedOptionIndex(-1);
+	}
 
 	LeftFrame->setVisible(false);
 

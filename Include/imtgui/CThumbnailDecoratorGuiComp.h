@@ -298,6 +298,8 @@ private:
 
 	istd::TDelPtr<QProcess> m_keyboardProcessPtr;
 	QString m_winKeyboardPath;
+
+	int m_lastPageIndexForLoggedUser;
 };
 
 
