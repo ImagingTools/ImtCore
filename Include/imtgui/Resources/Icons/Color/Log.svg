@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="Layer_1"
+   enable-background="new 0 0 124 124"
+   height="512"
+   viewBox="0 0 124 124"
+   width="512"
+   version="1.1"
+   sodipodi:docname="Log.svg"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
+  <metadata
+     id="metadata24">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs22" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2560"
+     inkscape:window-height="1388"
+     id="namedview20"
+     showgrid="false"
+     inkscape:zoom="0.4609375"
+     inkscape:cx="-46.644068"
+     inkscape:cy="256"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_1" />
+  <path
+     id="XMLID_1145_"
+     d="m77.397 0h-41.706c-3.681 0-6.648 2.97-6.648 6.603v76.773c0 3.656 2.99 6.603 6.648 6.603h56.289c3.681 0 6.648-2.97 6.648-6.603v-65.118z"
+     fill="#cacaca"
+     style="fill:#1f77b2;fill-opacity:1" />
+  <g
+     fill="#f7f7f5"
+     id="g9">
+    <path
+       id="XMLID_1146_"
+       d="m77.397 0v14.094c0 2.239 1.911 4.164 4.165 4.164h17.065z" />
+    <path
+       id="XMLID_104_"
+       d="m85.102 45.26h-42.556c-1.104 0-2-.896-2-2s.896-2 2-2h42.556c1.104 0 2 .896 2 2s-.896 2-2 2z" />
+    <path
+       id="XMLID_105_"
+       d="m85.102 56.119h-42.556c-1.104 0-2-.896-2-2s.896-2 2-2h42.556c1.104 0 2 .896 2 2s-.896 2-2 2z" />
+    <path
+       id="XMLID_106_"
+       d="m85.102 66.979h-42.556c-1.104 0-2-.896-2-2s.896-2 2-2h42.556c1.104 0 2 .896 2 2s-.896 2-2 2z" />
+    <path
+       id="XMLID_107_"
+       d="m85.102 34.4h-42.556c-1.104 0-2-.896-2-2s.896-2 2-2h42.556c1.104 0 2 .896 2 2s-.896 2-2 2z" />
+    <path
+       id="XMLID_108_"
+       d="m85.102 77.839h-42.556c-1.104 0-2-.896-2-2s.896-2 2-2h42.556c1.104 0 2 .896 2 2s-.896 2-2 2z" />
+  </g>
+  <g
+     id="g837">
+    <path
+       style="fill:#1da20e;fill-opacity:1"
+       d="m0 124 29.043-53.646 29.042 53.646z"
+       id="XMLID_4653_"
+       fill="#e85aa0" />
+    <path
+       d="m29.043 108.921c-1.104 0-2-.896-2-2v-22.718c0-1.104.896-2 2-2s2 .896 2 2v22.718c0 1.104-.896 2-2 2z"
+       id="XMLID_91_"
+       fill="#fff" />
+    <path
+       d="m29.042 117.845c-1.548 0-2.809-1.271-2.809-2.832 0-1.563 1.261-2.834 2.809-2.834 1.551 0 2.812 1.271 2.812 2.834 0 1.561-1.262 2.832-2.812 2.832z"
+       id="XMLID_759_"
+       fill="#fff" />
+  </g>
+  <path
+     id="XMLID_784_"
+     d="m123.837 9.576c0-2.849-2.202-5.179-4.894-5.179h-3.262c-2.781 0-4.812 2.396-4.812 5.093v7.078h12.968z"
+     fill="#78af42"
+     style="fill:#689839;fill-opacity:1" />
+  <path
+     id="XMLID_776_"
+     d="m110.95 74.748s0 2.158.082 2.331l4.894 13.725c.515 1.454 2.58 1.466 3.099 0l4.894-13.725c.081-.173.081-2.331.081-2.331"
+     fill="#ffd169"
+     style="fill:#ffc030;fill-opacity:1" />
+  <path
+     id="XMLID_790_"
+     d="m124 74.748v-58.18h-13.131v58.18"
+     fill="#fdbe4a"
+     style="fill:#f8a102;fill-opacity:1" />
+  <path
+     id="XMLID_109_"
+     d="m118.073 60.146h5.927v4h-5.927z"
+     fill="#ffd169" />
+  <path
+     id="XMLID_110_"
+     d="m118.073 48.405h5.927v4h-5.927z"
+     fill="#ffd169" />
+</svg>
