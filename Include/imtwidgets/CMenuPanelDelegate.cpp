@@ -60,13 +60,11 @@ void CMenuPanelDelegate::SetItemHeight(int heigth)
 
 	m_iconHeight = sqrt((m_height * m_height / m_iconSizeRatio) / 2);
 
-	if (m_height % 2 != 0 && m_iconHeight % 2 == 0)
-	{
+	if (m_height % 2 != 0 && m_iconHeight % 2 == 0){
 		m_iconHeight--;
 	}
 
-	if (m_height % 2 == 0 && m_iconHeight % 2 != 0)
-	{
+	if (m_height % 2 == 0 && m_iconHeight % 2 != 0){
 		m_iconHeight--;
 	}
 }
@@ -78,13 +76,11 @@ void CMenuPanelDelegate::SetIconSizeRatio(double ratio)
 
 	m_iconHeight = sqrt((m_height * m_height / m_iconSizeRatio) / 2);
 
-	if (m_height % 2 != 0 && m_iconHeight % 2 == 0)
-	{
+	if (m_height % 2 != 0 && m_iconHeight % 2 == 0){
 		m_iconHeight--;
 	}
 
-	if (m_height % 2 == 0 && m_iconHeight % 2 != 0)
-	{
+	if (m_height % 2 == 0 && m_iconHeight % 2 != 0){
 		m_iconHeight--;
 	}
 }
@@ -202,6 +198,7 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 
 	painter->save();
 	painter->setRenderHint(QPainter::Antialiasing, true);
+	painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
 
 	QRect backgroundSingleEllipse;
 	backgroundSingleEllipse.setLeft(m_leftPadding);
