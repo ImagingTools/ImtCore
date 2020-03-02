@@ -62,6 +62,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 
 	PageTree->setContentsMargins(QMargins(0,0,0,0));
 	PageTree->setMaximumWidth(m_minWidth);
+	PageTree->setItemsExpandable(false);
 
 	pushTop->setStyleSheet("QPushButton:hover{	background: white } "
 		" QPushButton{ border: 1px solid #9d9d9d; background: #e0e0e0; }" );
