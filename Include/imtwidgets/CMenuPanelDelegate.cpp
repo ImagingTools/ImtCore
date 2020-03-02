@@ -58,15 +58,7 @@ void CMenuPanelDelegate::SetItemHeight(int heigth)
 {
 	m_height = heigth;
 
-	m_iconHeight = sqrt((m_height * m_height / m_iconSizeRatio) / 2);
-
-	if (m_height % 2 != 0 && m_iconHeight % 2 == 0){
-		m_iconHeight--;
-	}
-
-	if (m_height % 2 == 0 && m_iconHeight % 2 != 0){
-		m_iconHeight--;
-	}
+	SetIconSizeRatio(m_iconSizeRatio);
 }
 
 
@@ -74,7 +66,7 @@ void CMenuPanelDelegate::SetIconSizeRatio(double ratio)
 {
 	m_iconSizeRatio = ratio;
 
-	m_iconHeight = sqrt((m_height * m_height / m_iconSizeRatio) / 2);
+	m_iconHeight = (m_height * m_iconSizeRatio ) / sqrt(2);
 
 	if (m_height % 2 != 0 && m_iconHeight % 2 == 0){
 		m_iconHeight--;
@@ -82,6 +74,24 @@ void CMenuPanelDelegate::SetIconSizeRatio(double ratio)
 
 	if (m_height % 2 == 0 && m_iconHeight % 2 != 0){
 		m_iconHeight--;
+	}
+
+	SetIconSizeHoverRatio(m_iconSizeHoverRatio);
+}
+
+
+void CMenuPanelDelegate::SetIconSizeHoverRatio(double ratio)
+{
+	m_iconSizeHoverRatio = ratio;
+
+	m_iconHeightHover = m_iconHeight * m_iconSizeHoverRatio;
+
+	if (m_height % 2 != 0 && m_iconHeightHover % 2 == 0){
+		m_iconHeightHover--;
+	}
+
+	if (m_height % 2 == 0 && m_iconHeightHover % 2 != 0){
+		m_iconHeightHover--;
 	}
 }
 
@@ -125,6 +135,18 @@ void CMenuPanelDelegate::SetMouserOverColor(const QColor& color)
 void CMenuPanelDelegate::SetMouserOverSelectedColor(const QColor& color)
 {
 	m_mouseOverSelectedColor = color;
+}
+
+
+void CMenuPanelDelegate::SetMouserOverTextColor(const QColor& color)
+{
+	m_mouseOverTextColor = color;
+}
+
+
+void CMenuPanelDelegate::SetMouserOverSelectedTextColor(const QColor& color)
+{
+	m_mouseOverSelectedTextColor = color;
 }
 
 
@@ -178,6 +200,7 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 	int indent = property("indent").toInt();
 
 	QColor backgroundColor = Qt::transparent;
+	QColor textColor = m_textColor;
 
 	if (option.state & QStyle::State_Selected){
 		backgroundColor = m_selectedColor;
@@ -189,9 +212,11 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 
 		if (modelPtr->itemFromIndex(index)->isEnabled()){
 			backgroundColor = m_mouseOverColor;
+			textColor = m_mouseOverTextColor;
 
 			if (option.state & QStyle::State_Selected){
 				backgroundColor = m_mouseOverSelectedColor;
+				textColor = m_mouseOverSelectedTextColor;
 			}
 		}
 	}
@@ -254,10 +279,20 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 		iconMode = QIcon::Mode::Disabled;
 	}
 
+	int iconSize = m_iconHeight;
+	if (option.state & QStyle::State_MouseOver){
+		const QStandardItemModel* modelPtr = dynamic_cast<const QStandardItemModel*>(index.model());
+		Q_ASSERT(modelPtr != nullptr);
+
+		if (modelPtr->itemFromIndex(index)->isEnabled()){
+			iconSize = m_iconHeightHover;
+		}
+	}
+
 	QIcon icon = index.data(Qt::DecorationRole).value<QIcon>();
 	QPixmap iconPixmap = icon.pixmap(
-				m_iconHeight,
-				m_iconHeight,
+				iconSize,
+				iconSize,
 				iconMode);
 
 	option.widget->style()->drawItemPixmap(
@@ -267,7 +302,7 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 
 	// Draw text:
 	QString text = index.data(Qt::DisplayRole).toString();
-	painter->setPen(m_textColor);
+	painter->setPen(textColor);
 	if (indent > 0){
 		QRect textRect = option.rect;
 		textRect.setLeft(iconRect.right() + 1 + m_iconToTextPadding);

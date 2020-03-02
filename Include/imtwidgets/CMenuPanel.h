@@ -74,6 +74,7 @@ public:
 	virtual void SetItemIndent(int indent);
 	virtual void SetItemHeight(int height);
 	virtual void SetIconSizeRatio(double ratio);
+	virtual void SetIconSizeHoverRatio(double ratio);
 
 	virtual void SetItemVerticalPadding(int padding);
 	virtual void SetItemLeftPadding(int padding);
@@ -85,6 +86,8 @@ public:
 	virtual void SetItemSelectedContourColor(QColor color);
 	virtual void SetItemMouseOverColor(QColor color);
 	virtual void SetItemMouseOverSelectedColor(QColor color);
+	virtual void SetItemMouseOverTextColor(QColor color);
+	virtual void SetItemMouseOverSelectedTextColor(QColor color);
 
 	virtual void SetAnimationDelay(int delay);
 	virtual void SetAnimationDuration(int duration);

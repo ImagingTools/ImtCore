@@ -75,6 +75,7 @@ void CMenuPanelComp::OnGuiCreated()
 	m_indent = m_indentAttrPtr.IsValid() ?	*m_indentAttrPtr : 5;
 	m_itemHeight = m_itemHeightAttrPtr.IsValid() ? *m_itemHeightAttrPtr : 7;
 	m_iconSizeRatioAttrPtr.IsValid() ? widgetPtr->SetIconSizeRatio(*m_iconSizeRatioAttrPtr) : 1.1;
+	m_iconSizeHoverRatioAttrPtr.IsValid() ? widgetPtr->SetIconSizeHoverRatio(*m_iconSizeHoverRatioAttrPtr) : 1.1;
 
 	m_topPadding = m_topPaddingAttrPtr.IsValid() ? *m_topPaddingAttrPtr : 5;
 	m_leftPadding = m_leftPaddingAttrPtr.IsValid() ? *m_leftPaddingAttrPtr : 5;
@@ -86,6 +87,8 @@ void CMenuPanelComp::OnGuiCreated()
 	m_selectedContourColorAttrPtr.IsValid() ? widgetPtr->SetItemSelectedContourColor(QColor(QString(*m_selectedContourColorAttrPtr))) : (QColor(QString("#000000")));
 	m_mouseOverColorAttrPtr.IsValid() ? widgetPtr->SetItemMouseOverColor(QColor(QString(*m_mouseOverColorAttrPtr))) : (QColor(QString("#808080")));
 	m_mouseOverSelectedColorAttrPtr.IsValid() ? widgetPtr->SetItemMouseOverSelectedColor(QColor(QString(*m_mouseOverSelectedColorAttrPtr))) : (QColor(QString("#808080")));
+	m_mouseOverTextColorAttrPtr.IsValid() ? widgetPtr->SetItemMouseOverTextColor(QColor(QString(*m_mouseOverTextColorAttrPtr))) : (QColor(QString("#000000")));
+	m_mouseOverSelectedTextColorAttrPtr.IsValid() ? widgetPtr->SetItemMouseOverSelectedTextColor(QColor(QString(*m_mouseOverSelectedTextColorAttrPtr))) : (QColor(QString("#808080")));
 
 	m_animationDelayAttrPtr.IsValid() ? widgetPtr->SetAnimationDelay(*m_animationDelayAttrPtr) : widgetPtr->SetAnimationDelay(500);
 	m_animationDurationAttrPtr.IsValid() ? widgetPtr->SetAnimationDuration(*m_animationDurationAttrPtr) : widgetPtr->SetAnimationDuration(300);

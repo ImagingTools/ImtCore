@@ -382,6 +382,13 @@ void CMenuPanel::SetIconSizeRatio(double ratio)
 }
 
 
+void CMenuPanel::SetIconSizeHoverRatio(double ratio)
+{
+	m_delegatePtr->SetIconSizeHoverRatio(ratio);
+	AfterSizesChanged();
+}
+
+
 void CMenuPanel::SetItemVerticalPadding(int padding)
 {
 	m_delegatePtr->SetTopPadding(padding);
@@ -439,6 +446,17 @@ void CMenuPanel::SetItemMouseOverSelectedColor(QColor color)
 	m_delegatePtr->SetMouserOverSelectedColor(color);
 }
 
+
+void CMenuPanel::SetItemMouseOverTextColor(QColor color)
+{
+	m_delegatePtr->SetMouserOverTextColor(color);
+}
+
+
+void CMenuPanel::SetItemMouseOverSelectedTextColor(QColor color)
+{
+	m_delegatePtr->SetMouserOverSelectedTextColor(color);
+}
 
 void CMenuPanel::SetAnimationDelay(int delay)
 {

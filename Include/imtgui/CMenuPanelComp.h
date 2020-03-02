@@ -36,7 +36,9 @@ public:
 		I_ASSIGN(m_selectedContourColorAttrPtr, "SelectedContourColor", "Selected item contour color", true, "#000000");
 		I_ASSIGN(m_mouseOverColorAttrPtr, "MouseOverColor", "Item under mouse background color", true, "#808080");
 		I_ASSIGN(m_mouseOverSelectedColorAttrPtr, "MouseOverSelectedColor", "Selected item under mouse background color ", true, "#808080");
-	
+		I_ASSIGN(m_mouseOverTextColorAttrPtr, "MouseOverTextColor", "Item under mouse text color", true, "#808080");
+		I_ASSIGN(m_mouseOverSelectedTextColorAttrPtr, "MouseOverSelectedTextColor", "Selected item under mouse text color ", true, "#808080");
+
 		I_ASSIGN(m_animationDelayAttrPtr, "AnimationDelay", "Animation delay", true, 500);
 		I_ASSIGN(m_animationDurationAttrPtr, "AnimationDuration", "Animation duration", true, 300);
 	I_END_COMPONENT;
@@ -47,6 +49,8 @@ protected:
 	I_ATTR(QByteArray, m_selectedContourColorAttrPtr);
 	I_ATTR(QByteArray, m_mouseOverColorAttrPtr);
 	I_ATTR(QByteArray, m_mouseOverSelectedColorAttrPtr);
+	I_ATTR(QByteArray, m_mouseOverTextColorAttrPtr);
+	I_ATTR(QByteArray, m_mouseOverSelectedTextColorAttrPtr);
 
 	I_ATTR(int, m_animationDelayAttrPtr);
 	I_ATTR(int, m_animationDurationAttrPtr);
@@ -68,6 +72,7 @@ public:
 		I_ASSIGN(m_indentAttrPtr, "Indent", "Item indentation", true, 20);
 		I_ASSIGN(m_itemHeightAttrPtr, "ItemHeight", "Item Height", true, 7);
 		I_ASSIGN(m_iconSizeRatioAttrPtr, "IconSizeRatio", "Icon size ratio relative to item height", true, 1.1);
+		I_ASSIGN(m_iconSizeHoverRatioAttrPtr, "IconSizeHoverRatio", "Icon size ratio under mouse (relative to item normal size)", true, 1.1);
 
 		I_ASSIGN(m_topPaddingAttrPtr, "TopPadding", "Top panel padding", true, 5);
 		I_ASSIGN(m_leftPaddingAttrPtr, "LeftPadding", "Left item padding", true, 5);
@@ -152,6 +157,7 @@ private:
 	I_ATTR(int, m_indentAttrPtr);
 	I_ATTR(int, m_itemHeightAttrPtr);
 	I_ATTR(double, m_iconSizeRatioAttrPtr);
+	I_ATTR(double, m_iconSizeHoverRatioAttrPtr);
 
 	I_ATTR(double, m_topPaddingAttrPtr);
 	I_ATTR(double, m_leftPaddingAttrPtr);
