@@ -127,5 +127,9 @@
         <file alias="Environment">Resources/Icons/Color/Environment.svg</file>
         <file alias="Manual">Resources/Icons/Color/Manual.svg</file>
         <file alias="Log">Resources/Icons/Color/Log.svg</file>
+        <file alias="Four">Resources/Icons/Color/Four.svg</file>
+        <file alias="One">Resources/Icons/Color/One.svg</file>
+        <file alias="Three">Resources/Icons/Color/Three.svg</file>
+        <file alias="Two">Resources/Icons/Color/Two.svg</file>
     </qresource>
 </RCC>

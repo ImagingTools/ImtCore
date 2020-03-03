@@ -151,7 +151,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							painter->save();
 
 							borderRect = borderRect.adjusted(-2, -2, 2, 2);
-							int blurredRadius = 7;
+							int blurredRadius = 5;
 							QImage _temp(borderRect.toRect().adjusted(-blurredRadius, -blurredRadius, blurredRadius, blurredRadius).size(), QImage::Format_ARGB32_Premultiplied);
 							_temp.fill(0);
 							QPainter _tempPainter(&_temp);
