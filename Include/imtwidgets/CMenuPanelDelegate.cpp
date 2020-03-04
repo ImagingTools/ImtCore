@@ -226,10 +226,10 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 	painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
 
 	QRect backgroundSingleEllipse;
-	backgroundSingleEllipse.setLeft(m_leftPadding);
-	backgroundSingleEllipse.setRight(m_leftPadding + m_height - 1);
-	backgroundSingleEllipse.setTop(option.rect.bottom() - m_height + 1);
-	backgroundSingleEllipse.setBottom(option.rect.bottom());
+	backgroundSingleEllipse.setLeft(m_leftPadding + 1);
+	backgroundSingleEllipse.setRight(m_leftPadding + m_height - 2);
+	backgroundSingleEllipse.setTop(option.rect.bottom() - m_height + 2);
+	backgroundSingleEllipse.setBottom(option.rect.bottom() - 1);
 
 	// Draw background:
 	if (option.state & QStyle::State_Selected || option.state & QStyle::State_MouseOver){
