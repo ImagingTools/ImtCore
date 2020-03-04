@@ -1,19 +1,18 @@
-QWidget
-{
-	color: #335777;
-}
 
 QWidget::item:disabled
 {
 	color: palette(disabled);
 }
 
-
 QWidget:disabled
 {
 	color: palette(disabled);
 }
 
+QToolButton 
+{
+    color: #335777;
+}
 
 QToolBar[ImtToolBar=true]::separator
 {
@@ -26,12 +25,10 @@ QWidget[ImtTopFrame=true] > QWidget:disabled
 	color: palette(disabled);
 }
 
-
 QToolBar[ImtToolBar=true]
 {
 	qproperty-iconSize: 32px;
 }
-
 
 QWidget[ImtTopFrame=true]
 {
@@ -41,12 +38,10 @@ QWidget[ImtTopFrame=true]
 	border-bottom: 1px solid  rgb(180,180,182);
 }
 
-
 QWidget#PageTree
 {
 	background: rgb(230,230,230);
 }
-
 
 QWidget#BottomFrame
 {
@@ -77,7 +72,6 @@ QTreeWidget[TabSimulation=true]
 	text-align: left;
 }
 
-
 QTreeWidget[TabSimulation=true]::item 
 {
     border: 0px none transparent;
@@ -89,7 +83,6 @@ QTreeWidget[TabSimulation=true]::item:first
 {
     padding-left: 5px;
 }
-
 
 QTreeWidget[TabSimulation=true]::item:last
 {
@@ -107,29 +100,29 @@ QTreeWidget[TabSimulation=true]::item:!selected:hover
 	background-color: #dedede;
 }
 
-
-
 QTreeWidget[TabSimulation=true]::item:first:selected
 {
     border-top: 1px white;
 }
-
-
 
 QAbstractItemView[TabSimulation=true]
 {
     outline: 0;
 }
 
-QTabWidget::pane { /* The tab widget frame */
+QTabWidget::pane 
+{ 
+    /* The tab widget frame */
     /*  border-top: 2px solid #C2C7CB;*/
-  }
-
-QTabWidget::tab-bar {
-    left: 5px; /* move to the right by 5px */
 }
 
-QTabBar::tab {
+QTabWidget::tab-bar 
+{
+   /*left: 5px; */ /* move to the right by 5px */
+}
+
+QTabBar::tab 
+{
     background: transparent;
     /* border-bottom-color: #C2C7CB;  same as the pane color */
     border-bottom-left-radius: 4px;
@@ -138,11 +131,13 @@ QTabBar::tab {
     padding: 2px;
 }
 
-QTabBar::tab:selected {
+QTabBar::tab:selected 
+{
     background: white;
 }
 
-  QTabBar::tab:!selected {
+QTabBar::tab:!selected
+{
     margin-top: 2px; /* make non-selected tabs look smaller */
-  }
+}
 
