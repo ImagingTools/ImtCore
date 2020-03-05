@@ -233,6 +233,7 @@ bool CMenuPanel::InsertPage(const QByteArray& pageId, const QByteArray& parentPa
 		int row = m_model.rowCount(parentModelIndex);
 
 		QStandardItem* itemPtr = new QStandardItem();
+		m_model.itemFromIndex(parentModelIndex)->setData(this->width() == m_minWidth, DR_PAGE_HIDDEN_WHILE_COLLAPSED);
 		m_model.itemFromIndex(parentModelIndex)->insertRow(row,itemPtr);
 
 		QModelIndex modelIndex = m_model.index(row, 0, parentModelIndex);
@@ -515,6 +516,14 @@ void CMenuPanel::OnPageIdChanged(const QModelIndex& selected, const QModelIndex&
 
 void CMenuPanel::OnAnimationFinished()
 {
+	if (this->width() == m_minWidth){
+		for (int i = 0; i < m_model.rowCount(); i++){
+			if (m_model.item(i)->hasChildren()){
+				m_model.item(i)->setData(true, DR_PAGE_HIDDEN_WHILE_COLLAPSED);
+			}
+		}
+	}
+
 	if (m_animationAction != AA_NONE && PageTree->currentIndex().isValid()){
 		StartTimer();
 	}
@@ -833,6 +842,12 @@ void CMenuPanel::StartAnimation()
 		m_animationIndent.setEndValue(m_indent);
 		m_animationIndent.setDuration(m_animationDuration - 10);
 		m_animationIndent.start();
+
+		for (int i = 0; i < m_model.rowCount(); i++){
+			if (m_model.item(i)->hasChildren()){
+				m_model.item(i)->setData(false, DR_PAGE_HIDDEN_WHILE_COLLAPSED);
+			}
+		}
 	}
 	
 	if (m_animationAction == AA_COLLAPSE && this->width() != m_minWidth){

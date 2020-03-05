@@ -177,6 +177,14 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const
 		size.setHeight(m_height);
 	}
 
+	QVariant isHidden = index.data(CMenuPanel::DR_PAGE_HIDDEN_WHILE_COLLAPSED);
+
+	if (isHidden.isValid() && isHidden.type() == QVariant::Bool){
+		if (isHidden.toBool()){
+			size.setHeight(size.height() - m_height);
+		}
+	}
+
 	int offset = -m_maxIndent;
 	QModelIndex currentIndex = index;
 	while (currentIndex.isValid()){
@@ -197,6 +205,10 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const
 
 void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
+	if (option.rect.height() < m_height){
+		return;
+	}
+
 	int indent = property("indent").toInt();
 
 	QColor backgroundColor = Qt::transparent;

@@ -30,7 +30,8 @@ public:
 	{
 		DR_PAGE_ID = Qt::UserRole,
 		DR_PAGE_ENABLED,
-		DR_PAGE_VISIBLE
+		DR_PAGE_VISIBLE,
+		DR_PAGE_HIDDEN_WHILE_COLLAPSED
 	};
 
 	enum AnimationAction
