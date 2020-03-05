@@ -14,7 +14,10 @@ namespace imt3d
 /**
 	Common implementation of a 3D-point cloud.
 */
-class CPointCloud3d: virtual public IPointCloud3d, virtual public IGridInfo, public CPointsBasedObject
+class CPointCloud3d:
+			public CPointsBasedObject,
+			virtual public IPointCloud3d,
+			virtual public IGridInfo
 {
 public:
 	typedef CPointsBasedObject BaseClass;
@@ -26,6 +29,9 @@ public:
 			void* dataPtr,
 			bool releaseFlag,
 			const istd::CIndex2d* gridSizePtr = nullptr) override;
+	virtual bool InsertPoints(
+				int pointsCount,
+				void* dataPtr) override;
 
 	// reimplemented (imt3d::IGridInfo)
 	istd::CIndex2d GetGridSize() const override;

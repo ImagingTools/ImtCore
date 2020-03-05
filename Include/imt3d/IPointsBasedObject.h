@@ -71,14 +71,18 @@ public:
 	virtual PointFormat GetPointFormat() const = 0;
 
 	/**
-		Get points count.
+		Get number of points in the point cloud.
 	*/
 	virtual int GetPointsCount() const = 0;
 
 	/**
-		Get points data.
+		Get full access to the point data buffer.
 	*/
 	virtual void* GetPointData(int pointIndex) = 0;
+
+	/**
+		Get read-only access to the point data buffer.
+	*/
 	virtual const void* GetPointData(int pointIndex) const = 0;
 };
 

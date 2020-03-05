@@ -45,22 +45,32 @@ public:
 
 protected:
 	bool Create(PointFormat pointFormat, int pointsCount, void* dataPtr, bool releaseFlag);
-	template <typename PointType> PointType* TGetPointData(int pointIndex, bool validOnly = false) const;
+	bool Append(int pointsCount, void* dataPtr);
 	int GetDataSize() const;
-	void AllocateData();
-	template <typename PointType> void TAllocateData();
+	void CreateInternalBuffer();
+	bool AllocateData(int size, quint8*& buffer);
 	void FreeData();
+	void EnsureCenterCalculated() const;
+	void EnsureCuboidCalculated() const;
+
+	template <typename PointType> PointType*
+	TGetPointData(int pointIndex, bool validOnly = false) const;
+	template <typename PointType>
+	void AllocateObjectBuffer();
 	template <typename PointType> void TFreeData();
 	template <typename PointType> bool TIsPointValid(const PointType& pointData) const;
-	void EnsureCenterCalculated() const;
 	template <typename PointType> void TEnsureCenterCalculated() const;
-	void EnsureCuboidCalculated() const;
 	template <typename PointType> void TEnsureCuboidCalculated() const;
 	template<typename PointType> void TMoveCenterTo(const i3d::CVector3d& position);
 	template<typename PointType> void GetBoundingRanges(istd::CRange& xRange, istd::CRange& yRange, istd::CRange& zRange) const;
 
 	// reimplemented (istd::IChangeable)
 	void OnEndChanges(const ChangeSet& changes) override;
+
+protected:
+	template <typename PointType>
+	static bool AllocateInternal(int size, quint8*& buffer);
+	static int GetBufferSize(PointFormat pointFormat, int pointsCount);
 
 protected:
 	quint8* m_dataPtr;

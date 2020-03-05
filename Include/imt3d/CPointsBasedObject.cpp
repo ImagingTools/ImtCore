@@ -149,7 +149,7 @@ bool CPointsBasedObject::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(dataTag);
 	}
 	else{
-		AllocateData();
+		CreateInternalBuffer();
 
 		retVal = retVal && archive.BeginTag(dataTag);
 		retVal = retVal && archive.ProcessData(m_dataPtr, dataSize);
@@ -179,7 +179,7 @@ bool CPointsBasedObject::CopyFrom(const istd::IChangeable& object, istd::IChange
 
 		int dataSize = GetDataSize();
 
-		AllocateData();
+		CreateInternalBuffer();
 
 		if (m_dataPtr){
 			memcpy(m_dataPtr, objectPtr->m_dataPtr, dataSize);
@@ -279,7 +279,7 @@ bool CPointsBasedObject::Create(PointFormat pointFormat, int pointsCount, void* 
 		m_dataPtr = static_cast<quint8*>(dataPtr);
 	}
 	else{
-		AllocateData();
+		CreateInternalBuffer();
 	}
 
 	m_dataOwner = releaseFlag;
@@ -288,61 +288,101 @@ bool CPointsBasedObject::Create(PointFormat pointFormat, int pointsCount, void* 
 }
 
 
-int CPointsBasedObject::GetDataSize() const
+bool CPointsBasedObject::Append(int pointsCount, void* dataPtr)
 {
-	switch (m_pointFormat){
-		case IPointsBasedObject::PF_XYZ_32:
-			return m_pointsCount * sizeof(PointXyz32);
-		case IPointsBasedObject::PF_XYZ_64:
-			return m_pointsCount * sizeof(PointXyz64);
-		case IPointsBasedObject::PF_XYZW_32:
-			return m_pointsCount * sizeof(PointXyzw32);
-		case IPointsBasedObject::PF_XYZ_ABC_32:
-			return m_pointsCount * sizeof(PointXyzAbc32);
-		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-			return m_pointsCount * sizeof(PointXyzwNormal32);
-		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-			return m_pointsCount * sizeof(PointXyzwNormalRgba32);
-		case IPointsBasedObject::PF_XYZW_RGBA_32:
-			return m_pointsCount * sizeof(PointXyzwRgba32);
-		default:
-			return 0;
+	if (pointsCount <= 0){
+		return false;
 	}
+
+	if (!m_dataOwner){
+		return false;
+	}
+
+	quint8* newBuffer = nullptr;
+
+	int oldBufferSize = GetBufferSize(m_pointFormat, m_pointsCount);
+	int appendSize = GetBufferSize(m_pointFormat, pointsCount);
+
+	int newBufferSize = GetBufferSize(m_pointFormat, m_pointsCount + pointsCount);
+	Q_ASSERT(newBufferSize == (oldBufferSize + appendSize));
+
+	if (AllocateData(newBufferSize, newBuffer)){
+		memcpy(newBuffer, m_dataPtr, oldBufferSize);
+		memcpy(newBuffer + oldBufferSize, dataPtr, appendSize);
+
+		FreeData();
+
+		m_dataPtr = newBuffer;
+		m_pointsCount += pointsCount;
+	}
+
+	CreateInternalBuffer();
+
+	return true;
 }
 
 
-void CPointsBasedObject::AllocateData()
+int CPointsBasedObject::GetDataSize() const
+{
+	return GetBufferSize(m_pointFormat, m_pointsCount);
+}
+
+
+void CPointsBasedObject::CreateInternalBuffer()
 {
 	switch (m_pointFormat){
 		case IPointsBasedObject::PF_XYZ_32:
-			return TAllocateData<PointXyz32>();
+			return AllocateObjectBuffer<PointXyz32>();
 		case IPointsBasedObject::PF_XYZ_64:
-			return TAllocateData<PointXyz64>();
+			return AllocateObjectBuffer<PointXyz64>();
 		case IPointsBasedObject::PF_XYZW_32:
-			return TAllocateData<PointXyzw32>();
+			return AllocateObjectBuffer<PointXyzw32>();
 		case IPointsBasedObject::PF_XYZ_ABC_32:
-			return TAllocateData<PointXyzAbc32>();
+			return AllocateObjectBuffer<PointXyzAbc32>();
 		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-			return TAllocateData<PointXyzwNormal32>();
+			return AllocateObjectBuffer<PointXyzwNormal32>();
 		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-			return TAllocateData<PointXyzwNormalRgba32>();
+			return AllocateObjectBuffer<PointXyzwNormalRgba32>();
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
-			return TAllocateData<PointXyzwRgba32>();
+			return AllocateObjectBuffer<PointXyzwRgba32>();
 	}
 }
 
 
 template <typename PointType>
-void CPointsBasedObject::TAllocateData()
+void CPointsBasedObject::AllocateObjectBuffer()
 {
 	FreeData();
 
 	int dataSize = GetDataSize();
-
 	if (dataSize > 0){
-		m_dataPtr = reinterpret_cast<quint8*>(new PointType[dataSize]);
+		AllocateInternal<PointType>(dataSize, m_dataPtr);
+
 		m_dataOwner = true;
 	}
+}
+
+
+bool CPointsBasedObject::AllocateData(int size, quint8*& buffer)
+{
+	switch (m_pointFormat){
+		case IPointsBasedObject::PF_XYZ_32:
+			return AllocateInternal<PointXyz32>(size, buffer);
+		case IPointsBasedObject::PF_XYZ_64:
+			return AllocateInternal<PointXyz64>(size, buffer);
+		case IPointsBasedObject::PF_XYZW_32:
+			return AllocateInternal<PointXyzw32>(size, buffer);
+		case IPointsBasedObject::PF_XYZ_ABC_32:
+			return AllocateInternal<PointXyzAbc32>(size, buffer);
+		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
+			return AllocateInternal<PointXyzwNormal32>(size, buffer);
+		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
+			return AllocateInternal<PointXyzwNormalRgba32>(size, buffer);
+		case IPointsBasedObject::PF_XYZW_RGBA_32:
+			return AllocateInternal<PointXyzwRgba32>(size, buffer);
+	}
+
+	return false;
 }
 
 
@@ -549,6 +589,40 @@ void CPointsBasedObject::OnEndChanges(const ChangeSet& /*changes*/)
 {
 	m_isCuboidCalculationValid = false;
 	m_isCenterCalculationValid = false;
+}
+
+
+// protected static methods
+
+template <typename PointType>
+bool CPointsBasedObject::AllocateInternal(int size, quint8*& buffer)
+{
+	buffer = reinterpret_cast<quint8*>(new PointType[size]);
+
+	return false;
+}
+
+
+int CPointsBasedObject::GetBufferSize(PointFormat pointFormat, int pointsCount)
+{
+	switch (pointFormat){
+		case IPointsBasedObject::PF_XYZ_32:
+			return pointsCount * sizeof(PointXyz32);
+		case IPointsBasedObject::PF_XYZ_64:
+			return pointsCount * sizeof(PointXyz64);
+		case IPointsBasedObject::PF_XYZW_32:
+			return pointsCount * sizeof(PointXyzw32);
+		case IPointsBasedObject::PF_XYZ_ABC_32:
+			return pointsCount * sizeof(PointXyzAbc32);
+		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
+			return pointsCount * sizeof(PointXyzwNormal32);
+		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
+			return pointsCount * sizeof(PointXyzwNormalRgba32);
+		case IPointsBasedObject::PF_XYZW_RGBA_32:
+			return pointsCount * sizeof(PointXyzwRgba32);
+		default:
+			return 0;
+	}
 }
 
 

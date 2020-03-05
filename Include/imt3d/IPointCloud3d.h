@@ -18,12 +18,28 @@ public:
 	/**
 		Create point cloud with specified point format.
 	*/
-	virtual bool CreateCloud(PointFormat pointFormat, int pointsCount, const istd::CIndex2d* gridSizePtr = nullptr) = 0;
+	virtual bool CreateCloud(
+				PointFormat pointFormat,
+				int pointsCount,
+				const istd::CIndex2d* gridSizePtr = nullptr) = 0;
 
 	/**
 		Create point cloud with specified point format using external data buffer.
 	*/
-	virtual bool CreateCloud(PointFormat pointFormat, int pointsCount, void* dataPtr, bool releaseFlag, const istd::CIndex2d* gridSizePtr = nullptr) = 0;
+	virtual bool CreateCloud(
+				PointFormat pointFormat,
+				int pointsCount,
+				void* dataPtr,
+				bool releaseFlag,
+				const istd::CIndex2d* gridSizePtr = nullptr) = 0;
+
+	/**
+		Append points to existing data in the point cloud.
+		The points should be in the format specified by \c CreateCloud.
+	*/
+	virtual bool InsertPoints(
+				int pointsCount,
+				void* dataPtr) = 0;
 };
 
 

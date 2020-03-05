@@ -38,6 +38,12 @@ public:
 		CMT_GRAY
 	};
 
+	enum
+	{
+		MIT_CALIBRATION = idoc::IDocumentMetaInfo::MIT_USER,
+		MIT_CALIBRATION_TYPE_ID
+	};
+
 	typedef iimg::CReflectedBitmapBase BaseClass;
 	typedef idoc::CStandardDocumentMetaInfo BaseClass2;
 
@@ -50,6 +56,9 @@ public:
 	istd::CRange GetDepthRange() const override;
 	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size) override;
 	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size, void * dataPtr, bool releaseFlag, int linesDifference = 0) override;
+
+	// reimplemented (i2d::CObject2dBase)
+	virtual void SetCalibration(const i2d::ICalibration2d* calibrationPtr, bool releaseFlag) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive);

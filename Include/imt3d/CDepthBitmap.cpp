@@ -5,7 +5,10 @@
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/CArchiveTag.h>
+#include <iser/CMemoryReadArchive.h>
+#include <iser/CMemoryWriteArchive.h>
 #include <iser/CPrimitiveTypesSerializer.h>
+#include <icalib/CAffineCalibration2d.h>
 
 
 namespace imt3d
@@ -90,6 +93,16 @@ bool CDepthBitmap::CreateDepthBitmap(const istd::CRange& depthRange, const istd:
 }
 
 
+// reimplemented (i2d::CObject2dBase)
+
+void CDepthBitmap::SetCalibration(const i2d::ICalibration2d* calibrationPtr, bool releaseFlag)
+{
+	BaseClass::SetCalibration(calibrationPtr, releaseFlag);
+
+	EnsureMetaInfoCreated();
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CDepthBitmap::Serialize(iser::IArchive& archive)
@@ -117,7 +130,25 @@ bool CDepthBitmap::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(bitmapDataTag);
 
 	if (!archive.IsStoring()){
-		EnsureMetaInfoCreated();
+		QByteArray calibrationTypeId = GetMetaInfo(MIT_CALIBRATION_TYPE_ID).toByteArray();
+		if (!calibrationTypeId.isEmpty()){
+			istd::TDelPtr<i2d::ICalibration2d> calibrationPtr;
+
+			if (calibrationTypeId == typeid(icalib::CAffineCalibration2d).name()){
+				calibrationPtr.SetPtr(new icalib::CAffineCalibration2d);
+			}
+
+			QVariant calibrationData = GetMetaInfo(MIT_CALIBRATION);
+			if (!calibrationData.isNull() && calibrationPtr.IsValid()){
+				QByteArray data = calibrationData.toByteArray();
+
+				iser::CMemoryReadArchive calibrationArchive(data, data.size());
+
+				if (calibrationPtr->Serialize(calibrationArchive)){
+					SetCalibration(calibrationPtr.PopPtr(), true);
+				}
+			}
+		}
 	}
 
 	return retVal;
@@ -336,6 +367,29 @@ void CDepthBitmap::EnsureMetaInfoCreated()
 {
 	SetMetaInfo(MIT_MIN_DEPTH, m_depthRange.GetMinValue());
 	SetMetaInfo(MIT_MAX_DEPTH, m_depthRange.GetMaxValue());
+
+	QVariant calibrationData;
+	QByteArray calibrationTypeId;
+	const i2d::ICalibration2d* calibrationPtr = GetCalibration();
+	if (calibrationPtr != nullptr){
+		const iser::ISerializable* serializablePtr = dynamic_cast<const iser::ISerializable*>(calibrationPtr);
+		if (serializablePtr != nullptr){
+			iser::CMemoryWriteArchive archive;
+
+			bool retVal = (const_cast<iser::ISerializable*>(serializablePtr))->Serialize(archive);
+			if (retVal){
+				calibrationData.setValue(QByteArray((const char*)archive.GetBuffer(), archive.GetBufferSize()));
+
+				const icalib::CAffineCalibration2d* affinePtr = dynamic_cast<const icalib::CAffineCalibration2d*>(calibrationPtr);
+				if (affinePtr != nullptr){
+					calibrationTypeId = typeid(icalib::CAffineCalibration2d).name();
+				}
+			}
+		}
+	}
+
+	SetMetaInfo(MIT_CALIBRATION, calibrationData);
+	SetMetaInfo(MIT_CALIBRATION_TYPE_ID, calibrationTypeId);
 }
 
 
