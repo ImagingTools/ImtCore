@@ -45,19 +45,16 @@ void CMultiStatusProviderGuiComp::UpdateCommonStatusGui(const istd::IInformation
 
 void CMultiStatusProviderGuiComp::UpdateStatusesGui(const imtbase::IMultiStatusProvider& statuses)
 {
-	const iprm::IOptionsList& statusProviderInfo = statuses.GetStatusInfoList();
+	const imtbase::ICollectionInfo& statusProviderInfo = statuses.GetStatusList();
 
-	int statusesCount = statusProviderInfo.GetOptionsCount();
-	if (statusesCount <= 0){
-		return;
-	}
+	imtbase::ICollectionInfo::Ids statusIds = statusProviderInfo.GetElementIds();
 
-	SubStatusesTable->setRowCount(statusesCount);
+	SubStatusesTable->setRowCount(statusIds.count());
 
-	for (int i = 0; i < statusesCount; ++i){
-		QByteArray statusInfoId = statusProviderInfo.GetOptionId(i);
+	for (int i = 0; i < statusIds.count(); ++i){
+		QByteArray statusInfoId = statusIds[i];
 
-		const istd::IInformationProvider* statusPtr = statuses.GetStatusInfo(statusInfoId);
+		const istd::IInformationProvider* statusPtr = statuses.GetStatus(statusInfoId);
 		Q_ASSERT(statusPtr != nullptr);
 
 		QString statusText = statusPtr->GetInformationDescription();

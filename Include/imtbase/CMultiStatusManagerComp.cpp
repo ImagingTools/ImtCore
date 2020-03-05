@@ -11,12 +11,12 @@ namespace imtbase
 
 void CMultiStatusManagerComp::SetStatus(const QByteArray& statusId, const istd::IInformationProvider& status)
 {
-	istd::CChangeNotifier changeNotifier(this);
-
-	int statusIndex = m_statusInfo.GetOptionIndexById(statusId);
+	int statusIndex = m_statusInfo.GetItemIndex(statusId);
 	if (statusIndex >= 0 && statusIndex < m_informationProvidersCompPtr.GetCount()){
 		istd::IInformationProvider* statusPtr = m_informationProvidersCompPtr[statusIndex];
 		Q_ASSERT(statusPtr != nullptr);
+
+		istd::CChangeNotifier changeNotifier(this);
 
 		statusPtr->CopyFrom(status);
 	}
@@ -25,15 +25,15 @@ void CMultiStatusManagerComp::SetStatus(const QByteArray& statusId, const istd::
 
 // reimplemented (imtbase::IMultiStatusProvider)
 
-const iprm::IOptionsList& CMultiStatusManagerComp::GetStatusInfoList() const
+const imtbase::ICollectionInfo& CMultiStatusManagerComp::GetStatusList() const
 {
 	return m_statusInfo;
 }
 
 
-const istd::IInformationProvider* CMultiStatusManagerComp::GetStatusInfo(const QByteArray& id) const
+const istd::IInformationProvider* CMultiStatusManagerComp::GetStatus(const QByteArray& id) const
 {
-	int statusIndex = m_statusInfo.GetOptionIndexById(id);
+	int statusIndex = m_statusInfo.GetItemIndex(id);
 
 	if (statusIndex >= 0 && statusIndex < m_informationProvidersCompPtr.GetCount()){
 		return m_informationProvidersCompPtr[statusIndex];
@@ -121,7 +121,7 @@ void CMultiStatusManagerComp::OnComponentCreated()
 	Q_ASSERT(m_informationProvidersCompPtr.GetCount() == m_statusDescriptionsAttrPtr.GetCount());
 
 	for (int i = 0; i < m_informationProvidersCompPtr.GetCount(); ++i){
-		m_statusInfo.InsertOption(m_statusNamesAttrPtr[i], m_statusIdsAttrPtr[i], m_statusDescriptionsAttrPtr[i]);
+		m_statusInfo.InsertItem(m_statusIdsAttrPtr[i], m_statusNamesAttrPtr[i], m_statusDescriptionsAttrPtr[i]);
 	}
 }
 

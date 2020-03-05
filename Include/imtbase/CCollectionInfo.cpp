@@ -12,6 +12,18 @@ namespace imtbase
 
 // public methods
 
+int CCollectionInfo::GetItemIndex(const QByteArray& id) const
+{
+	for (int i = 0; i < m_items.count(); ++i){
+		if (m_items[i].id == id){
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+
 QByteArray CCollectionInfo::InsertItem(const QByteArray& id, const QString & name, const QString & description)
 {
 	Ids existingIds = GetElementIds();

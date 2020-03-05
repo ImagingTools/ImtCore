@@ -284,19 +284,19 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 	}
 	else{
 		if (mode == CM_CONVERT){
-			const IObjectCollection* sourcePtr = dynamic_cast<const IObjectCollection*>(&object);
-			if (sourcePtr != nullptr){
+			const IObjectCollection* sourceCollectionPtr = dynamic_cast<const IObjectCollection*>(&object);
+			if (sourceCollectionPtr != nullptr){
 				istd::CChangeNotifier changeNotifier(this);
 
 				m_objects.clear();
 
-				Ids sourceElementIds = sourcePtr->GetElementIds();
+				Ids sourceElementIds = sourceCollectionPtr->GetElementIds();
 
 				for (const QByteArray& elementId : sourceElementIds){
-					QString name = sourcePtr->GetElementInfo(elementId, EIT_NAME).toString();
-					QString description = sourcePtr->GetElementInfo(elementId, EIT_DESCRIPTION).toString();
-					QByteArray typeId = sourcePtr->GetObjectTypeId(elementId);
-					const istd::IChangeable* objectPtr = sourcePtr->GetObjectPtr(elementId);
+					QString name = sourceCollectionPtr->GetElementInfo(elementId, EIT_NAME).toString();
+					QString description = sourceCollectionPtr->GetElementInfo(elementId, EIT_DESCRIPTION).toString();
+					QByteArray typeId = sourceCollectionPtr->GetObjectTypeId(elementId);
+					const istd::IChangeable* objectPtr = sourceCollectionPtr->GetObjectPtr(elementId);
 
 					QByteArray newId = InsertNewObject(typeId, name, description, objectPtr);
 					if (newId.isEmpty()){
@@ -329,7 +329,11 @@ bool CObjectCollectionBase::InsertObjectIntoCollection(const ObjectInfo& info)
 {
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(info.objectPtr.GetPtr());
 	if (modelPtr != nullptr){
-		modelPtr->AttachObserver(&m_modelUpdateBridge);
+		if (!modelPtr->AttachObserver(&m_modelUpdateBridge)){
+			qDebug("CObjectCollectionBase::InsertObjectIntoCollection: Attaching object's model to the internal observer failed");
+
+			return false;
+		}
 	}
 
 	m_objects.push_back(info);

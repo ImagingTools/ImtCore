@@ -7,9 +7,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QTableView>
-#include <QtWidgets/QFrame>
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QGraphicsEffect>
 
 // ACF includes
 #include <iprm/IOptionsList.h>
@@ -61,7 +59,7 @@ const imtbase::ICollectionInfo* CThumbnailDecoratorGuiComp::GetWidgetList() cons
 }
 
 
-QWidget* CThumbnailDecoratorGuiComp::GetWidgetPtr(const QByteArray& widgetId) const
+QWidget* CThumbnailDecoratorGuiComp::GetWidgetPtr(const QByteArray& /*widgetId*/) const
 {
 	if (IsGuiCreated()){
 		return Main;

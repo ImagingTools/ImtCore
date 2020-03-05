@@ -2,10 +2,9 @@
 
 
 // ACF includes
-#include <iprm/IOptionsList.h>
+#include <imtbase/ICollectionInfo.h>
 
 
-// Forward declarations
 namespace istd
 {
 	class IInformationProvider;
@@ -17,21 +16,23 @@ namespace imtbase
 
 
 /**
-	Multiple status provider interface.
+	Provider of list of status objects.
 */
 class IMultiStatusProvider: virtual public istd::IChangeable
 {
 public:
 	/**
-		Get status information list.
+		Get list of available status objects.
 	*/
-	virtual const iprm::IOptionsList& GetStatusInfoList() const = 0;
+	virtual const imtbase::ICollectionInfo& GetStatusList() const = 0;
 
 	/**
 		Get status information with specified identifier.
 	*/
-	virtual const istd::IInformationProvider* GetStatusInfo(const QByteArray& id) const = 0;
+	virtual const istd::IInformationProvider* GetStatus(const QByteArray& statusId) const = 0;
 };
 
 
 } // namespace imtbase
+
+

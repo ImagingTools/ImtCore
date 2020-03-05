@@ -13,9 +13,6 @@
   <property name="windowTitle">
    <string>Main Window</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true"/>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>
@@ -187,8 +184,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>30</width>
-          <height>30</height>
+          <width>24</width>
+          <height>24</height>
          </size>
         </property>
         <property name="shortcut">
@@ -210,8 +207,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>30</width>
-          <height>30</height>
+          <width>24</width>
+          <height>24</height>
          </size>
         </property>
         <property name="shortcut">
@@ -236,8 +233,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>30</width>
-          <height>30</height>
+          <width>24</width>
+          <height>24</height>
          </size>
         </property>
         <property name="shortcut">
@@ -259,8 +256,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>30</width>
-          <height>30</height>
+          <width>24</width>
+          <height>24</height>
          </size>
         </property>
         <property name="shortcut">
@@ -282,8 +279,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>30</width>
-          <height>30</height>
+          <width>24</width>
+          <height>24</height>
          </size>
         </property>
         <property name="shortcut">

@@ -4,10 +4,10 @@
 // ACF includes
 #include <istd/IInformationProvider.h>
 #include <icomp/CComponentBase.h>
-#include <iprm/COptionsManager.h>
 
 // ImtCore includes
 #include <imtbase/IMultiStatusManager.h>
+#include <imtbase/CCollectionInfo.h>
 
 
 namespace imtbase
@@ -42,8 +42,8 @@ public:
 	virtual void SetStatus(const QByteArray& statusId, const istd::IInformationProvider& status) override;
 
 	// reimplemented (imtbase::IMultiStatusProvider)
-	virtual const iprm::IOptionsList& GetStatusInfoList() const override;
-	virtual const istd::IInformationProvider* GetStatusInfo(const QByteArray& id) const override;
+	virtual const imtbase::ICollectionInfo& GetStatusList() const override;
+	virtual const istd::IInformationProvider* GetStatus(const QByteArray& id) const override;
 
 	// reimplemented (iinsp::IInformationProvider)
 	virtual QDateTime GetInformationTimeStamp() const override;
@@ -65,7 +65,7 @@ protected:
 	I_MULTITEXTATTR(m_statusNamesAttrPtr);
 	I_MULTITEXTATTR(m_statusDescriptionsAttrPtr);
 
-	iprm::COptionsManager m_statusInfo;
+	imtbase::CCollectionInfo m_statusInfo;
 };
 
 
