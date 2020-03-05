@@ -1,3 +1,7 @@
+QWidget#CurrentPageLabel
+{
+    color: #656565;
+}
 
 QWidget::item:disabled
 {
