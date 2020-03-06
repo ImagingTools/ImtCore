@@ -1,4 +1,6 @@
-QWidget#CurrentPageLabel 
+
+
+QWidget 
 {
     color: #335777;
 }
@@ -13,10 +15,141 @@ QWidget:disabled
 	color: palette(disabled);
 }
 
+
+QSplashScreen > QWidget 
+{
+    color: white;
+    background: transparent;
+}
+
+QSplashScreen > QWidget > QLabel 
+{
+    color: yellow;
+    background: transparent;
+}
+
+
+QWidget#MainVersionTitleLabel, QWidget#MainVersionLabel
+{
+    color: white;
+}
+
+QWidget#CInspectionApplicationDocumentEditorComp  /*, QWidget#LeftGroup, QWidget#MainGroup */
+{
+    background: white;
+}
+
+QSplashScreen > QWidget#CopyrightLabel
+{
+    color: yellow;
+}
+
+QWidget#PageTree
+{
+	background: rgb(230,230,230);
+}
+
+QWidget#BottomFrame
+{
+	background: rgb(230,230,230);	
+}
+
+QWidget#RightFrame 
+{
+    border-left: 1px solid #335777;
+}
+
+QWidget#ResultFrame
+{
+    font-size: 24px;
+}
+
+QWidget#StatusFrame 
+{
+    border-bottom: 1px solid #335777;
+}
+
+QWidget[ImtTopFrame=true] 
+{
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(227,227,229), stop: 0.9 rgb(212,212,214), stop: 0.97 rgb(212,212,214), stop: 1.0 rgb(190,190,192));
+    border-bottom: 1px solid rgb(180,180,182);
+}
+
+QWidget#LoadWorkflowButton
+{
+    text-align: left;
+}
+
+QWidget#TaskList 
+{
+    background-color: palette(window);
+}
+    
+QWidget#MessageFrame
+{
+    background-color: lightYellow;
+}
+
+QWidget#ErrorsCounterFrame, QWidget#NokCounterFrame, QWidget#OkCounterFrame, 
+QWidget#TotalCounterFrame, QWidget#WarningsCounterFrame 
+{
+    background: #ffffff;
+}
+    
+QLabel[Header=true] {
+    font-size: 12pt;
+    color: #88b8e3;
+}
+
+QLabel#PageLabel, QLabel#ManualModePageLabel
+{
+	color: #335777;
+	font-size: 12pt;
+	font-weight: bold;
+	font-family: "Segoe UI";
+}
+
+QLineEdit, QPlainTextEdit 
+{
+    height: 1.3em;
+    font-size: 10pt;
+}
+
 QToolButton 
 {
     color: #335777;
 }
+
+QToolButton#windowTitle
+{
+    background: white;
+    min-width: 3em;
+    max-width: 3em;
+    border-radius: 3px;
+    border: 1px solid lightGray;
+}
+
+QPushButton#LoadWorkflowButton
+{
+    text-align: left;
+}
+
+
+QToolButton#PageIconToolButton 
+{
+    background-color: transparent;
+    border: 0px solid transparent;
+    padding: 0px;
+}
+    
+
+QToolButton#PageIconToolButton:hover
+{
+	background-color: transparent; border: 0px solid transparent;
+	padding: 0px;
+}
+
+    
 
 QToolBar[ImtToolBar=true]::separator
 {
@@ -34,23 +167,7 @@ QToolBar[ImtToolBar=true]
 	qproperty-iconSize: 32px;
 }
 
-QWidget[ImtTopFrame=true]
-{
-	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                 stop: 0 rgb(227,227,229), stop: 0.9 rgb(212,212,214),
-                                 stop: 0.97 rgb(212,212,214), stop: 1.0 rgb(190,190,192));
-	border-bottom: 1px solid  rgb(180,180,182);
-}
 
-QWidget#PageTree
-{
-	background: rgb(230,230,230);
-}
-
-QWidget#BottomFrame
-{
-	background: rgb(230,230,230);	
-}
 
 QTableView[ImtMenu=true]
 {
@@ -109,10 +226,44 @@ QTreeWidget[TabSimulation=true]::item:first:selected
     border-top: 1px white;
 }
 
+
 QAbstractItemView[TabSimulation=true]
 {
     outline: 0;
 }
+
+QAbstractItemView[NoFrame="true"]
+{
+	border: none;
+}
+
+
+QAbstractItemView::item
+{
+    color: #335777;
+	padding-top: 0.9em;
+	padding-bottom: 0.9em;
+}
+
+QHeaderView
+{
+	border: none;
+	padding: 0px;
+}
+
+QHeaderView::section
+{
+	padding-top:5px;
+	padding-bottom:5px;
+	background-color: white;
+	padding-left: 4px;
+	border-bottom: 1px solid #dfdfdf;
+	border-left: none;
+	border-right: none;
+	border-top: none;
+	font-weight: bold;
+}
+
 
 QTabWidget::pane 
 { 
@@ -144,4 +295,32 @@ QTabBar::tab:!selected
 {
     margin-top: 2px; /* make non-selected tabs look smaller */
 }
+
+QAbstractItemView {
+    outline: 0;
+}
+
+
+QAbstractItemView[NoFrame="true"] 
+{
+    border: none;
+}
+
+
+QAbstractItemView[TabSimulation=true] {
+    outline: 0;
+}
+
+
+QAbstractItemView::item 
+{
+    padding-top: 0.7em;
+    padding-bottom: 0.7em;
+}
+
+
+
+
+
+
 

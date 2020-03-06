@@ -57,7 +57,7 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgba(0, 0, 0, 0);</string>
+      <string notr="true"/>
      </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
