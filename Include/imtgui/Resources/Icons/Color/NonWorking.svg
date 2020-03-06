@@ -51,33 +51,33 @@
      units="px" />
   <g
      id="g837"
-     style="fill:#ff5b61;fill-opacity:1;stroke:#ff5b61;stroke-opacity:1">
+     style="fill:#fc0000;fill-opacity:1;stroke:#fc0000;stroke-opacity:1">
     <path
        id="path2-5"
        d="M 26.757901,81.212542 H 112.37363 V 58.010671 H 4.424876 V 170.1591 h 22.333025 z m 0,0"
        inkscape:connector-curvature="0"
-       style="fill:#ff5b61;fill-opacity:1;stroke:#ff5b61;stroke-width:18.84975052;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#fc0000;fill-opacity:1;stroke:#fc0000;stroke-width:18.84975052;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        id="path4-1"
        d="m 277.62636,58.010671 v 23.201871 h 85.61573 V 170.1591 h 22.33303 V 58.010671 Z m 0,0"
        inkscape:connector-curvature="0"
-       style="fill:#ff5b61;fill-opacity:1;stroke:#ff5b61;stroke-width:18.84975052;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#fc0000;fill-opacity:1;stroke:#fc0000;stroke-width:18.84975052;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        id="path6-1"
        d="M 26.757901,341.84089 H 4.424876 V 453.98933 H 112.37363 V 430.78745 H 26.757901 Z m 0,0"
        inkscape:connector-curvature="0"
-       style="fill:#ff5b61;fill-opacity:1;stroke:#ff5b61;stroke-width:18.84975052;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#fc0000;fill-opacity:1;stroke:#fc0000;stroke-width:18.84975052;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        id="path8-0"
        d="m 363.24209,430.78745 h -85.61573 v 23.20188 H 385.57512 V 341.84089 h -22.33303 z m 0,0"
        inkscape:connector-curvature="0"
-       style="fill:#ff5b61;fill-opacity:1;stroke:#ff5b61;stroke-width:18.84975052;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#fc0000;fill-opacity:1;stroke:#fc0000;stroke-width:18.84975052;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <g
-       style="fill:#ff5b61;fill-opacity:1;stroke:#ff5b61;stroke-width:2.43778229;stroke-opacity:1"
+       style="fill:#fc0000;fill-opacity:1;stroke:#fc0000;stroke-width:2.43778229;stroke-opacity:1"
        id="g4"
        transform="matrix(0.2882171,0,0,0.32840751,72.887202,116.85232)">
       <path
-         style="fill:#ff5b61;fill-opacity:1;stroke:#ff5b61;stroke-width:2.43778229;stroke-opacity:1"
+         style="fill:#fc0000;fill-opacity:1;stroke:#fc0000;stroke-width:2.43778229;stroke-opacity:1"
          id="path2-8"
          d="m 406.269,10.052 -232.65,405.741 c -48.889,85.779 -52.665,194.85 0,286.697 79.169,138.07 255.277,185.82 393.348,106.65 C 705.038,729.971 752.788,553.864 673.618,415.792 L 440.968,10.052 c -7.685,-13.403 -27.015,-13.403 -34.699,0 z"
          inkscape:connector-curvature="0" />
