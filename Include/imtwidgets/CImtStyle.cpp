@@ -192,8 +192,8 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							path = QPainterPath();
 							
 							if (toolbutton->state & (State_Sunken | State_On)){
-								path.addRoundedRect(borderRect.adjusted(-1, -1, 1, 1), 6, 6);
-								painter->fillPath(path, QColor(180, 180, 183));
+								path.addRect(borderRect.adjusted(15, 0, -15, 3));
+								painter->fillPath(path, QColor(25, 200, 60));
 							}
 							else{
 								path.addRoundedRect(borderRect.adjusted(0, 0, 0, 0), 6, 6);
@@ -203,12 +203,12 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							path = QPainterPath();
 							path.addRoundedRect(borderRect.adjusted(0, 0, 0, 0), 6, 6);
 
-							if (toolbutton->state & (State_Sunken | State_On)){
-								painter->fillPath(path, QColor(205, 205, 207));
-							}
-							else {
+							//if (toolbutton->state & (State_Sunken | State_On)){
+							//	painter->fillPath(path, QColor(205, 205, 207));
+							//}
+//							else {
 								painter->fillPath(path, QColor(245, 245, 247));
-							}
+//							}
 
 							painter->restore();
 
