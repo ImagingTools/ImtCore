@@ -15,10 +15,12 @@ namespace imtbase
 	Composite object supplier delegating the calls to another one or accessing some underlaying object directly.
 */
 class CDelegatedObjectContainerSupplierComp:
-	public imtbase::TDelegatedSupplierCompBase<imtbase::IObjectCollectionProvider, imtbase::IObjectCollection>
+			public imtbase::TDelegatedSupplierCompBase<
+						imtbase::IObjectCollectionProvider, imtbase::IObjectCollection>
 {
 public:
-	typedef imtbase::TDelegatedSupplierCompBase<imtbase::IObjectCollectionProvider, imtbase::IObjectCollection> BaseClass;
+	typedef imtbase::TDelegatedSupplierCompBase<
+				imtbase::IObjectCollectionProvider, imtbase::IObjectCollection> BaseClass;
 
 	I_BEGIN_COMPONENT(CDelegatedObjectContainerSupplierComp);
 	I_END_COMPONENT;

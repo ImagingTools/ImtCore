@@ -27,6 +27,8 @@ const istd::IChangeable* CSingleObjectProviderComp::GetDataObject() const
 
 void CSingleObjectProviderComp::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
 	if (m_dataObjectModelCompPtr.IsValid()){
 		m_dataObjectModelCompPtr->AttachObserver(&m_modelUpdateBridge);
 	}

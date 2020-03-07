@@ -6,7 +6,8 @@
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/QToolButton>
 
-Q_WIDGETS_EXPORT void qt_blurImage(QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0);
+
+extern void qt_blurImage(QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0);
 
 
 static QWindow *qt_getWindow(const QWidget *widget)
@@ -14,10 +15,16 @@ static QWindow *qt_getWindow(const QWidget *widget)
 	return widget ? widget->window()->windowHandle() : 0;
 }
 
-static void drawArrow(const QStyle *style, const QStyleOptionToolButton *toolbutton,
-	const QRect &rect, QPainter *painter, const QWidget *widget = 0)
+
+static void drawArrow(
+			const QStyle* style,
+			const QStyleOptionToolButton* toolbutton,
+			const QRect& rect,
+			QPainter* painter,
+			const QWidget* widget = nullptr)
 {
 	QStyle::PrimitiveElement pe;
+
 	switch (toolbutton->arrowType){
 		case Qt::LeftArrow:
 			pe = QStyle::PE_IndicatorArrowLeft;
@@ -34,8 +41,10 @@ static void drawArrow(const QStyle *style, const QStyleOptionToolButton *toolbut
 		default:
 			return;
 	}
+
 	QStyleOption arrowOpt = *toolbutton;
 	arrowOpt.rect = rect;
+
 	style->drawPrimitive(pe, &arrowOpt, painter, widget);
 }
 
@@ -135,7 +144,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 					if (!hasArrow){
 						if (!pmSize.isEmpty()) {
 							painter->setRenderHint(QPainter::Antialiasing, true);
-							QRectF borderRect(QPoint(0, 0), QPoint(2 * pmSize.width(), pmSize.height()));
+							QRectF borderRect(QPoint(0, 0), QPoint(2.5 * pmSize.width(), pmSize.height()));
 							borderRect.moveCenter(pixmapRect.center());
 
 #if 0 // Draw layout boxes
@@ -224,10 +233,6 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 						QPalette::ButtonText);
 				}
 				else{
-					//painter->save();
-					//painter->setRenderHint(QPainter::Antialiasing, true);
-					//painter->drawPixmap(rect.left(), rect.top() + rect.height() / 2 - 5, 10, 10, pm);
-					//painter->restore();
 					BaseClass::drawControl(element, option, painter, widget);
 				}
 			}
@@ -261,7 +266,7 @@ QSize CImtStyle::sizeFromContents(QStyle::ContentsType type, const QStyleOption 
 		if (toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon){
 			int iconWidth = toolbutton->iconSize.width();
 
-			size.setWidth(2.5 * iconWidth);
+			size.setWidth(3 * iconWidth);
 		}
 	}
 	return size;
