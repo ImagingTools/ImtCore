@@ -290,29 +290,47 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 		return true;
 	}
 	else{
-		if (mode == CM_CONVERT){
-			const IObjectCollection* sourceCollectionPtr = dynamic_cast<const IObjectCollection*>(&object);
-			if (sourceCollectionPtr != nullptr){
-				istd::CChangeNotifier changeNotifier(this);
+		const IObjectCollection* sourceCollectionPtr = dynamic_cast<const IObjectCollection*>(&object);
+		if (sourceCollectionPtr != nullptr){
+			istd::CChangeNotifier changeNotifier(this);
 
-				m_objects.clear();
+			Ids sourceElementIds = sourceCollectionPtr->GetElementIds();
+			Ids targetIds = GetElementIds();
 
-				Ids sourceElementIds = sourceCollectionPtr->GetElementIds();
+			for (const QByteArray& elementId : sourceElementIds){
+				QString name = sourceCollectionPtr->GetElementInfo(elementId, EIT_NAME).toString();
+				QString description = sourceCollectionPtr->GetElementInfo(elementId, EIT_DESCRIPTION).toString();
+				QByteArray typeId = sourceCollectionPtr->GetObjectTypeId(elementId);
+				const istd::IChangeable* sourceObjectPtr = sourceCollectionPtr->GetObjectPtr(elementId);
 
-				for (const QByteArray& elementId : sourceElementIds){
-					QString name = sourceCollectionPtr->GetElementInfo(elementId, EIT_NAME).toString();
-					QString description = sourceCollectionPtr->GetElementInfo(elementId, EIT_DESCRIPTION).toString();
-					QByteArray typeId = sourceCollectionPtr->GetObjectTypeId(elementId);
-					const istd::IChangeable* objectPtr = sourceCollectionPtr->GetObjectPtr(elementId);
-
-					QByteArray newId = InsertNewObject(typeId, name, description, objectPtr);
+				if (!targetIds.contains(elementId)){
+					QByteArray newId = InsertNewObject(typeId, name, description, sourceObjectPtr);
 					if (newId.isEmpty()){
 						return false;
 					}
 				}
+				else{
+					ObjectInfo* targetInfoPtr = GetObjectInfo(elementId);
+					Q_ASSERT(targetInfoPtr != nullptr);
 
-				return true;
+					if (sourceObjectPtr != nullptr){
+						if (!targetInfoPtr->objectPtr.IsValid()){
+							targetInfoPtr->objectPtr.SetPtr(CreateObjectInstance(typeId));
+						}
+
+						if (targetInfoPtr->objectPtr.IsValid()){
+							if (!targetInfoPtr->objectPtr->CopyFrom(*sourceObjectPtr)){
+								return false;
+							}
+						}
+					}
+					else{
+						targetInfoPtr->objectPtr.Reset();
+					}
+				}
 			}
+
+			return true;
 		}
 	}
 	
