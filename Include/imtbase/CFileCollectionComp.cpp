@@ -189,7 +189,7 @@ QByteArray CFileCollectionComp::InsertFile(
 
 	QByteArray fileId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray() : proposedObjectId;
 
-	CollectionItem collectionItem(GetRepositoryPath());
+	CollectionItem collectionItem(GetCollectionRootFolder());
 	collectionItem.fileId = fileId;
 	collectionItem.typeId = typeId;
 	collectionItem.objectName = targetFilePathInfo.completeBaseName();
@@ -290,7 +290,7 @@ bool CFileCollectionComp::UpdateFile(
 
 // reimplemented (IFileCollectionInfo)
 
-QString CFileCollectionComp::GetRepositoryPath() const
+QString CFileCollectionComp::GetCollectionRootFolder() const
 {
 	QString retVal;
 
@@ -569,7 +569,7 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 			}
 
 			if (*m_useSubfolderAttrPtr){
-				targetFolderPath = GetRepositoryPath();
+				targetFolderPath = GetCollectionRootFolder();
 			
 				if (!item.typeId.isEmpty()){
 					Q_ASSERT(m_resourceTypesCompPtr.IsValid());
@@ -1247,7 +1247,7 @@ void CFileCollectionComp::ReadCollectionItems(Files& files) const
 {
 	files.clear();
 
-	QString repositoryRootPath = GetRepositoryPath();
+	QString repositoryRootPath = GetCollectionRootFolder();
 	QDir repositoryRootDir(repositoryRootPath);
 
 	QFileInfoList repositoryFiles;
@@ -1257,7 +1257,7 @@ void CFileCollectionComp::ReadCollectionItems(Files& files) const
 		QString itemFilePath = repositoryFiles[fileIndex].absoluteFilePath();
 
 		ifile::CCompactXmlFileReadArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
-		CollectionItem fileItem(GetRepositoryPath());
+		CollectionItem fileItem(GetCollectionRootFolder());
 
 		if (!fileItem.Serialize(archive)){
 			SendErrorMessage(0, QString("Collection item could not be loaded from '%1'").arg(itemFilePath));

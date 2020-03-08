@@ -22,7 +22,7 @@ public:
 		Get location of the file repository.
 		\return Path to the repository location or an empty string if no central location exists.
 	*/
-	virtual QString GetRepositoryPath() const = 0;
+	virtual QString GetCollectionRootFolder() const = 0;
 };
 
 

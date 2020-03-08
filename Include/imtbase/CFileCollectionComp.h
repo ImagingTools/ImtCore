@@ -83,7 +83,7 @@ public:
 				const QByteArray& resourceId) override;
 
 	// reimplemented (IFileCollectionInfo)
-	virtual QString GetRepositoryPath() const;
+	virtual QString GetCollectionRootFolder() const;
 
 	// reimplemented (IObjectCollection)
 	virtual int GetOperationFlags(const QByteArray & objectId = QByteArray()) const override;
