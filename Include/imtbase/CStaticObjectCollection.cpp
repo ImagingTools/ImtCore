@@ -60,7 +60,8 @@ QByteArray CStaticObjectCollection::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
-			const istd::IChangeable* defaultValuePtr)
+			const istd::IChangeable* defaultValuePtr,
+			const QByteArray& proposedObjectId)
 {
 	return QByteArray();
 }

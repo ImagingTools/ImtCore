@@ -53,9 +53,16 @@ QByteArray CObjectCollectionBase::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
-			const istd::IChangeable* defaultValuePtr)
+			const istd::IChangeable* defaultValuePtr,
+			const QByteArray& proposedObjectId)
 {
 	ObjectInfo info;
+
+	if (!proposedObjectId.isEmpty()){
+		if (GetObjectInfo(proposedObjectId) == nullptr){
+			info.id = proposedObjectId;
+		}
+	}
 
 	info.objectPtr.SetPtr(CreateObjectInstance(typeId), true);
 	if (info.objectPtr.IsValid()){

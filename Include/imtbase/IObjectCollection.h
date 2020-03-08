@@ -97,17 +97,19 @@ public:
 
 	/**
 		Create a new object in the container.
-		\param typeId			Type-ID of the object to be created.
-		\param name				Name of the object in the collection.
-		\param description		Descrpition of the object.
-		\param defaultValuePtr	Optional instance used for the object data initialization.
+		\param typeId				Type-ID of the object to be created.
+		\param name					Name of the object in the collection.
+		\param description			Descrpition of the object.
+		\param defaultValuePtr		Optional instance used for the object data initialization.
+		\param proposedObjectId		Optional-defined ID of the object in the collection. If the value is non-empty inserted object become specified ID if possible.
 		\return If the operation was successful the method will return ID of the created data object in the collection or an empty ID otherwise.
 	*/
 	virtual QByteArray InsertNewObject(
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				const istd::IChangeable* defaultValuePtr = nullptr) = 0;
+				const istd::IChangeable* defaultValuePtr = nullptr,
+				const QByteArray& proposedObjectId = QByteArray()) = 0;
 
 	/**
 		Remove element with the given ID.

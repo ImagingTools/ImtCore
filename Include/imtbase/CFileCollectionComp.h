@@ -86,16 +86,21 @@ public:
 	virtual QString GetCollectionRootFolder() const;
 
 	// reimplemented (IObjectCollection)
-	virtual int GetOperationFlags(const QByteArray & objectId = QByteArray()) const override;
+	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
 	virtual bool GetDataMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const override;
-	virtual QByteArray InsertNewObject(const QByteArray & typeId, const QString & name, const QString & description, const istd::IChangeable * defaultValuePtr = nullptr) override;
-	virtual bool RemoveObject(const QByteArray & objectId) override;
+	virtual QByteArray InsertNewObject(
+				const QByteArray& typeId,
+				const QString& name,
+				const QString& description,
+				const istd::IChangeable * defaultValuePtr = nullptr,
+				const QByteArray& proposedObjectId = QByteArray()) override;
+	virtual bool RemoveObject(const QByteArray& objectId) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object) override;
-	virtual void SetObjectName(const QByteArray & objectId, const QString & objectName) override;
-	virtual void SetObjectDescription(const QByteArray & objectId, const QString & objectDescription) override;
-	virtual void SetObjectEnabled(const QByteArray & objectId, bool isEnabled = true) override;
+	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
+	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
+	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;

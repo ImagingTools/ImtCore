@@ -32,7 +32,8 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				const istd::IChangeable* defaultValuePtr = nullptr) override;
+				const istd::IChangeable* defaultValuePtr = nullptr,
+				const QByteArray& proposedObjectId = QByteArray()) override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;

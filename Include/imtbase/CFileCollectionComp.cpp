@@ -339,7 +339,8 @@ QByteArray CFileCollectionComp::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& /*description*/,
-			const istd::IChangeable * defaultValuePtr)
+			const istd::IChangeable * defaultValuePtr,
+			const QByteArray& proposedObjectId)
 {
 	istd::TOptDelPtr<const istd::IChangeable> newObjectPtr;
 
@@ -359,7 +360,7 @@ QByteArray CFileCollectionComp::InsertNewObject(
 			QString tempFilePath = QDir::tempPath() + "/" + QUuid::createUuid().toString() + "." + supportedExts[0];
 
 			if (persistencePtr->SaveToFile(*newObjectPtr, tempFilePath) == ifile::IFilePersistence::OS_OK){
-				return InsertFile(tempFilePath, typeId, name);
+				return InsertFile(tempFilePath, typeId, name, QString(), proposedObjectId);
 			}
 		}
 	}
