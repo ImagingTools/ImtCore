@@ -5,6 +5,9 @@
 #include <ilog/TLoggerCompWrap.h>
 #include <ifile/IFilePersistence.h>
 
+// ImtCore includes
+#include <imtbase/IObjectCollection.h>
+
 
 namespace imtbase
 {
@@ -19,6 +22,9 @@ public:
 
 	I_BEGIN_COMPONENT(CCompositeObjectPersistenceComp);
 		I_REGISTER_INTERFACE(ifile::IFilePersistence);
+		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
+		I_ASSIGN_MULTI_0(m_objectTypeIds, "ObjectTypeIds", "Object type id's", true);
+		I_ASSIGN_MULTI_0(m_objectPresistencesCompPtr, "ObjectPersistences", "Persistences for object type id's", true);
 	I_END_COMPONENT;
 
 	// reimplemented (ifile::IFilePersistence)
@@ -38,7 +44,13 @@ public:
 
 	// reimplemented (ifile::IFileTypeInfo)
 	bool GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr = NULL, int flags = -1, bool doAppend = false) const override;
-	QString GetTypeDescription(const QString* extensionPtr = NULL) const override;};
+	QString GetTypeDescription(const QString* extensionPtr = NULL) const override;
+
+private:
+	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+	I_MULTIATTR(QByteArray, m_objectTypeIds);
+	I_MULTIREF(ifile::IFilePersistence, m_objectPresistencesCompPtr);
+};
 
 
 } // namespace imtbase

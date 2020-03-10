@@ -14,6 +14,7 @@
 #include <imtbase/CStatusManagerComp.h>
 #include <imtbase/COptionsListAdapterComp.h>
 #include <imtbase/CLocalizedHelpPathProviderComp.h>
+#include <imtbase/CCompositeObjectPersistenceComp.h>
 
 
 /**
@@ -31,6 +32,7 @@ typedef icomp::TModelCompWrap<imtbase::CMultiStatusManagerComp> MultiStatusManag
 typedef icomp::TModelCompWrap<imtbase::CStatusManagerComp> StatusManager;
 typedef icomp::TModelCompWrap<imtbase::COptionsListAdapterComp> OptionsListAdapter;
 typedef imtbase::CLocalizedHelpPathProviderComp LocalizedHelpPathProvider;
+typedef imtbase::CCompositeObjectPersistenceComp CompositeObjectPersistence;
 
 
 } // namespace ImtCorePck
