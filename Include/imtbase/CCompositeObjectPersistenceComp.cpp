@@ -54,7 +54,7 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 		return OS_FAILED;
 	}
 
-	const QString contentsFileName = filePath + "/contents.xml";
+	const QString contentsFileName = filePath + "/Contents.xml";
 	ifile::CCompactXmlFileReadArchive xmlArchive;
 	if (!xmlArchive.OpenFile(contentsFileName)){
 		return OS_FAILED;
@@ -74,11 +74,12 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 		istd::IChangeable* objectPtr = const_cast<istd::IChangeable*>(documentPtr->GetObjectPtr(elementInfo.id));
 		if (objectPtr == nullptr){
 			elementInfo.id = documentPtr->InsertNewObject(elementInfo.typeId, elementInfo.name, elementInfo.description);
+
 			objectPtr = const_cast<istd::IChangeable*>(documentPtr->GetObjectPtr(elementInfo.id));
 		}
 	
 		if (objectPtr == nullptr){
-			return 	OS_FAILED;
+			return OS_FAILED;
 		}
 
 		int status = persistencePtr->LoadFromFile(*objectPtr, filePath + "/" + elementInfo.fileName);
@@ -116,7 +117,7 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 		return OS_FAILED;
 	}
 
-	const QString contentsFileName = filePath + "/contents.xml";
+	const QString contentsFileName = filePath + "/Contents.xml";
 	ifile::CCompactXmlFileWriteArchive xmlArchive(contentsFileName);
 
 	imtbase::ICollectionInfo::Ids ids = documentPtr->GetElementIds();
@@ -200,8 +201,10 @@ const ifile::IFilePersistence* CCompositeObjectPersistenceComp::GetFilePersisten
 bool CCompositeObjectPersistenceComp::SerializeBundleMetaInfo(QVector<BundleElementInfo>& contentMetaInfo, iser::IArchive& archive) const
 {
 	int objectCount = contentMetaInfo.count();
+
 	if (!archive.IsStoring()){
 		objectCount = 0;
+
 		contentMetaInfo.clear();
 	}
 
@@ -209,42 +212,43 @@ bool CCompositeObjectPersistenceComp::SerializeBundleMetaInfo(QVector<BundleElem
 	static iser::CArchiveTag objectTag("Object", "Object item", iser::CArchiveTag::TT_GROUP, &objectListTag);
 
 	bool retVal = true;
+
 	retVal = retVal && archive.BeginMultiTag(objectListTag, objectTag, objectCount);
 	
 	for (int i = 0; i < objectCount; i++){
 		retVal = retVal && archive.BeginTag(objectTag);
-				
+
 		BundleElementInfo elementInfo;
 		if (archive.IsStoring()){
 			elementInfo = contentMetaInfo[i];
 		}
 
-		static iser::CArchiveTag fileNameTag("fileName", "Object file name", iser::CArchiveTag::TT_LEAF, &objectTag);
+		static iser::CArchiveTag fileNameTag("FileName", "Object file name", iser::CArchiveTag::TT_LEAF, &objectTag);
 		retVal = retVal && archive.BeginTag(fileNameTag);
 		retVal = retVal && archive.Process(elementInfo.fileName);
 		retVal = retVal && archive.EndTag(fileNameTag);
 
-		static iser::CArchiveTag objectIdTag("id", "Object id", iser::CArchiveTag::TT_LEAF, &objectTag);
+		static iser::CArchiveTag objectIdTag("Id", "Object ID", iser::CArchiveTag::TT_LEAF, &objectTag);
 		retVal = retVal && archive.BeginTag(objectIdTag);
 		retVal = retVal && archive.Process(elementInfo.id);
 		retVal = retVal && archive.EndTag(objectIdTag);
 
-		static iser::CArchiveTag typeIdTag("typeId", "Object typeId", iser::CArchiveTag::TT_LEAF, &objectTag);
+		static iser::CArchiveTag typeIdTag("TypeId", "Object type-ID", iser::CArchiveTag::TT_LEAF, &objectTag);
 		retVal = retVal && archive.BeginTag(typeIdTag);
 		retVal = retVal && archive.Process(elementInfo.typeId);
 		retVal = retVal && archive.EndTag(typeIdTag);
 
-		static iser::CArchiveTag objectNameTag("name", "Object name", iser::CArchiveTag::TT_LEAF, &objectTag);
+		static iser::CArchiveTag objectNameTag("Name", "Object name", iser::CArchiveTag::TT_LEAF, &objectTag);
 		retVal = retVal && archive.BeginTag(objectNameTag);
 		retVal = retVal && archive.Process(elementInfo.name);
 		retVal = retVal && archive.EndTag(objectNameTag);
 
-		static iser::CArchiveTag objectDescriptionTag("description", "Object description", iser::CArchiveTag::TT_LEAF, &objectTag);
+		static iser::CArchiveTag objectDescriptionTag("Description", "Object description", iser::CArchiveTag::TT_LEAF, &objectTag);
 		retVal = retVal && archive.BeginTag(objectDescriptionTag);
 		retVal = retVal && archive.Process(elementInfo.description);
 		retVal = retVal && archive.EndTag(objectDescriptionTag);
 
-		if (!archive.IsStoring()){
+		if (retVal && !archive.IsStoring()){
 			contentMetaInfo.append(elementInfo);
 		}
 
