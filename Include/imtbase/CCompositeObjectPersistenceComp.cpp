@@ -17,8 +17,6 @@ namespace imtbase
 
 // public methods
 
-
-
 // reimplemented (ifile::IFilePersistence)
 
 bool CCompositeObjectPersistenceComp::IsOperationSupported(
@@ -47,97 +45,49 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	const imtbase::IObjectCollection* documentPtr = dynamic_cast<const imtbase::IObjectCollection*>(&data);
+	imtbase::IObjectCollection* documentPtr = const_cast<imtbase::IObjectCollection*>(dynamic_cast<const imtbase::IObjectCollection*>(&data));
 	if (documentPtr == nullptr){
 		return OS_FAILED;
 	}
 
-	if (!m_objectCollectionCompPtr.IsValid() || !m_objectPresistencesCompPtr.IsValid() || !m_objectTypeIds.IsValid()){
+	if (!m_objectCollectionCompPtr.IsValid() || !m_objectTypeIdsAttrPtr.IsValid() || !m_objectPresistencesCompPtr.IsValid()){
 		return OS_FAILED;
 	}
 
-	if (m_objectPresistencesCompPtr.GetCount() != m_objectTypeIds.GetCount()){
+	const QString contentsFileName = filePath + "/contents.xml";
+	ifile::CCompactXmlFileReadArchive xmlArchive;
+	if (!xmlArchive.OpenFile(contentsFileName)){
 		return OS_FAILED;
 	}
 
-	QDir dir(filePath);
-	if (dir.exists()){
-		if (dir.removeRecursively()){
+	QVector<BundleElementInfo> contentMetaInfo;
+	if (!SerializeBundleMetaInfo(contentMetaInfo, xmlArchive)){
+		return OS_FAILED;
+	}
+
+	for (BundleElementInfo elementInfo : contentMetaInfo){
+		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(elementInfo.typeId);
+		if (persistencePtr == nullptr){
+			return OS_FAILED;
+		}
+		
+		istd::IChangeable* objectPtr = const_cast<istd::IChangeable*>(documentPtr->GetObjectPtr(elementInfo.id));
+		if (objectPtr == nullptr){
+			elementInfo.id = documentPtr->InsertNewObject(elementInfo.typeId, elementInfo.name, elementInfo.description);
+			objectPtr = const_cast<istd::IChangeable*>(documentPtr->GetObjectPtr(elementInfo.id));
+		}
+	
+		if (objectPtr == nullptr){
+			return 	OS_FAILED;
+		}
+
+		int status = persistencePtr->LoadFromFile(*objectPtr, filePath + "/" + elementInfo.fileName);
+		if (status != ifile::IFilePersistence::OS_OK){
 			return OS_FAILED;
 		}
 	}
 
-	int objectCounter = 0;
-
-	const QString contentsFileName = dir.path() + "/contents.xml";
-	ifile::CCompactXmlFileReadArchive xmlArchive(contentsFileName);
-
-	static iser::CArchiveTag objectListTag("ObjectsList", "List of objects", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag objectTag("Object", "Object item", iser::CArchiveTag::TT_GROUP, &objectListTag);
-
-	int objectCount;
-
-	bool retVal = true;
-	retVal = retVal && xmlArchive.BeginMultiTag(objectListTag, objectTag, objectCount);
-	for (int objectCounter = 0; objectCounter < objectCount; objectCounter++){
-		QString fileName;
-		static iser::CArchiveTag fileNameTag("FileName", "Object file name", iser::CArchiveTag::TT_GROUP, &objectTag);
-		retVal = retVal && xmlArchive.BeginTag(fileNameTag);
-		retVal = retVal && xmlArchive.Process(fileName);
-		retVal = retVal && xmlArchive.EndTag(fileNameTag);
-
-		QByteArray typeId;
-		static iser::CArchiveTag typeIdTag("TypeId", "Object type id", iser::CArchiveTag::TT_GROUP, &objectTag);
-		retVal = retVal && xmlArchive.BeginTag(typeIdTag);
-		retVal = retVal && xmlArchive.Process(typeId);
-		retVal = retVal && xmlArchive.EndTag(typeIdTag);
-
-		QByteArray objectId;
-		static iser::CArchiveTag objectIdTag("ObjectId", "Object id", iser::CArchiveTag::TT_GROUP, &objectTag);
-		retVal = retVal && xmlArchive.BeginTag(objectIdTag);
-		retVal = retVal && xmlArchive.Process(objectId);
-		retVal = retVal && xmlArchive.EndTag(objectIdTag);
-
-		QString objectName;
-		static iser::CArchiveTag objectNameTag("ObjectName", "Object name", iser::CArchiveTag::TT_GROUP, &objectTag);
-		retVal = retVal && xmlArchive.BeginTag(objectNameTag);
-		retVal = retVal && xmlArchive.Process(objectName);
-		retVal = retVal && xmlArchive.EndTag(objectNameTag);
-
-		if (!retVal){
-			return OS_FAILED;
-		}
-
-		for (int i = 0; i < m_objectTypeIds.GetCount(); i++){
-			if (m_objectTypeIds[i] == typeId){
-				QFile objectFile;
-				objectFile.setFileName(dir.path() + QString("/%1").arg(fileName));
-
-				QString desc;
-				QByteArray objectId = const_cast<imtbase::IObjectCollection*>(documentPtr)->InsertNewObject(typeId, objectName, desc);
-
-				if (!objectId.isNull()){
-					const istd::IChangeable* objectPtr = documentPtr->GetObjectPtr(objectId);
-					if (objectPtr != nullptr){
-						int status = m_objectPresistencesCompPtr[i]->LoadFromFile(*const_cast<istd::IChangeable*>(objectPtr), objectFile.fileName());
-						if (status != ifile::IFilePersistence::OS_OK){
-							const_cast<imtbase::IObjectCollection*>(documentPtr)->RemoveObject(objectId);
-						}
-					}
-				}
-
-				break;
-			}
-		}
-	}
-	retVal = retVal && xmlArchive.EndTag(objectListTag);
-
-	if (retVal){
-		return OS_OK;
-	}
-	else{
-		return OS_FAILED;
-	}
+	return OS_OK;
 }
 
 
@@ -146,83 +96,65 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	const imtbase::IObjectCollection* documentPtr = dynamic_cast<const imtbase::IObjectCollection*>(&data);
+	imtbase::IObjectCollection* documentPtr = const_cast<imtbase::IObjectCollection*>(dynamic_cast<const imtbase::IObjectCollection*>(&data));
 	if (documentPtr == nullptr){
 		return OS_FAILED;
 	}
 
-	if (!m_objectCollectionCompPtr.IsValid() ||	!m_objectPresistencesCompPtr.IsValid() || !m_objectTypeIds.IsValid()){
-		return OS_FAILED;
-	}
-
-	if (m_objectPresistencesCompPtr.GetCount() != m_objectTypeIds.GetCount()){
+	if (!m_objectCollectionCompPtr.IsValid() || !m_objectTypeIdsAttrPtr.IsValid() || !m_objectPresistencesCompPtr.IsValid()){
 		return OS_FAILED;
 	}
 
 	QDir dir(filePath);
 	if (dir.exists()){
-		if (dir.removeRecursively()){
+		if (!dir.removeRecursively()){
 			return OS_FAILED;
 		}
 	}
 
-	int objectCounter = 0;
-
-	const QString contentsFileName = dir.path() + "/contents.xml";
-	ifile::CCompactXmlFileWriteArchive xmlArchive(contentsFileName);
-
-	static iser::CArchiveTag objectListTag("ObjectsList", "List of objects", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag objectTag("Object", "Object item", iser::CArchiveTag::TT_GROUP, &objectListTag);
-
-	imtbase::ICollectionInfo::Ids ids = documentPtr->GetElementIds();
-	int objectCount = ids.count();
-
-	bool retVal = true;
-	retVal = retVal && xmlArchive.BeginMultiTag(objectListTag, objectTag, objectCount);
-	for (imtbase::ICollectionInfo::Id objectId: ids){
-		const istd::IChangeable *objectPtr = documentPtr->GetObjectPtr(objectId);
-		QByteArray typeId = documentPtr->GetElementInfo(objectId, imtbase::IObjectCollection::EIT_TYPE_ID).toByteArray();
-
-		for (int i = 0; i < m_objectTypeIds.GetCount(); i++){
-			if (m_objectTypeIds[i] == typeId){
-				QFile objectFile;
-				objectFile.setFileName(dir.path() + QString("/object%1").arg(objectCounter));
-				m_objectPresistencesCompPtr[i]->SaveToFile(*objectPtr, objectFile.fileName());
-
-				static iser::CArchiveTag fileNameTag("FileName", "Object file name", iser::CArchiveTag::TT_GROUP, &objectTag);
-				retVal = retVal && xmlArchive.BeginTag(fileNameTag);
-				QString fileName = objectFile.fileName();
-				retVal = retVal && xmlArchive.Process(fileName);
-				retVal = retVal && xmlArchive.EndTag(fileNameTag);
-				
-				static iser::CArchiveTag typeIdTag("TypeId", "Object type id", iser::CArchiveTag::TT_GROUP, &objectTag);
-				retVal = retVal && xmlArchive.BeginTag(typeIdTag);
-				retVal = retVal && xmlArchive.Process(typeId);
-				retVal = retVal && xmlArchive.EndTag(typeIdTag);
-
-				static iser::CArchiveTag objectIdTag("ObjectId", "Object id", iser::CArchiveTag::TT_GROUP, &objectTag);
-				retVal = retVal && xmlArchive.BeginTag(objectIdTag);
-				retVal = retVal && xmlArchive.Process(objectId);
-				retVal = retVal && xmlArchive.EndTag(objectIdTag);
-
-				static iser::CArchiveTag objectNameTag("ObjectName", "Object name", iser::CArchiveTag::TT_GROUP, &objectTag);
-				retVal = retVal && xmlArchive.BeginTag(objectNameTag);
-				QString objectName = documentPtr->GetElementInfo(objectId, imtbase::IObjectCollection::EIT_NAME).toString();
-				retVal = retVal && xmlArchive.Process(objectName);
-				retVal = retVal && xmlArchive.EndTag(objectNameTag);
-
-				break;
-			}
-		}
-	}
-	retVal = retVal && xmlArchive.EndTag(objectListTag);
-
-	if (retVal){
-		return OS_OK;
-	}
-	else{
+	if (!dir.mkpath(".")){
 		return OS_FAILED;
 	}
+
+	const QString contentsFileName = filePath + "/contents.xml";
+	ifile::CCompactXmlFileWriteArchive xmlArchive(contentsFileName);
+
+	imtbase::ICollectionInfo::Ids ids = documentPtr->GetElementIds();
+	int objectCounter = 0;
+	
+	QVector<BundleElementInfo> contentMetaInfo;
+	
+	for (imtbase::ICollectionInfo::Id objectId: ids){
+		const istd::IChangeable *objectPtr = documentPtr->GetObjectPtr(objectId);
+		if (objectPtr == nullptr){
+			return OS_FAILED;
+		}
+
+		QByteArray typeId = documentPtr->GetElementInfo(objectId, imtbase::IObjectCollection::EIT_TYPE_ID).toByteArray();
+
+		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(typeId);
+		if (persistencePtr == nullptr){
+			return OS_FAILED;
+		}
+
+		QString objectFile;
+		objectFile = QString("object%1").arg(objectCounter++);
+		if (persistencePtr->SaveToFile(*objectPtr, filePath + "/" + objectFile) != OS_OK){
+			return OS_FAILED;
+		}
+			
+		BundleElementInfo elementInfo;
+		
+		elementInfo.fileName = objectFile;
+		elementInfo.id = objectId;
+		elementInfo.typeId = typeId;
+		elementInfo.name = documentPtr->GetElementInfo(objectId, imtbase::IObjectCollection::EIT_NAME).toString();
+		elementInfo.description = documentPtr->GetElementInfo(objectId, imtbase::IObjectCollection::EIT_DESCRIPTION).toString();
+
+		contentMetaInfo.append(elementInfo);
+	}
+
+	return SerializeBundleMetaInfo(contentMetaInfo, xmlArchive);
 }
 
 
@@ -243,6 +175,85 @@ bool CCompositeObjectPersistenceComp::GetFileExtensions(QStringList& result, con
 QString CCompositeObjectPersistenceComp::GetTypeDescription(const QString* /*extensionPtr*/) const
 {
 	return "Bundle files";
+}
+
+
+// protected methods
+
+const ifile::IFilePersistence* CCompositeObjectPersistenceComp::GetFilePersistenceForTypeId(const QByteArray& typeId) const
+{
+	if (!m_objectTypeIdsAttrPtr.IsValid() || !m_objectPresistencesCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	int presistencesCount = qMin(m_objectTypeIdsAttrPtr.GetCount(), m_objectPresistencesCompPtr.GetCount());
+	for (int i = 0; i < presistencesCount; i++){
+		if (m_objectTypeIdsAttrPtr[i] == typeId){
+			return m_objectPresistencesCompPtr[i];
+		}
+	}
+
+	return nullptr;
+}
+
+
+bool CCompositeObjectPersistenceComp::SerializeBundleMetaInfo(QVector<BundleElementInfo>& contentMetaInfo, iser::IArchive& archive) const
+{
+	int objectCount = contentMetaInfo.count();
+	if (!archive.IsStoring()){
+		objectCount = 0;
+		contentMetaInfo.clear();
+	}
+
+	static iser::CArchiveTag objectListTag("ObjectsList", "List of objects", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag objectTag("Object", "Object item", iser::CArchiveTag::TT_GROUP, &objectListTag);
+
+	bool retVal = true;
+	retVal = retVal && archive.BeginMultiTag(objectListTag, objectTag, objectCount);
+	
+	for (int i = 0; i < objectCount; i++){
+		retVal = retVal && archive.BeginTag(objectTag);
+				
+		BundleElementInfo elementInfo;
+		if (archive.IsStoring()){
+			elementInfo = contentMetaInfo[i];
+		}
+
+		static iser::CArchiveTag fileNameTag("fileName", "Object file name", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(fileNameTag);
+		retVal = retVal && archive.Process(elementInfo.fileName);
+		retVal = retVal && archive.EndTag(fileNameTag);
+
+		static iser::CArchiveTag objectIdTag("id", "Object id", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(objectIdTag);
+		retVal = retVal && archive.Process(elementInfo.id);
+		retVal = retVal && archive.EndTag(objectIdTag);
+
+		static iser::CArchiveTag typeIdTag("typeId", "Object typeId", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(typeIdTag);
+		retVal = retVal && archive.Process(elementInfo.typeId);
+		retVal = retVal && archive.EndTag(typeIdTag);
+
+		static iser::CArchiveTag objectNameTag("name", "Object name", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(objectNameTag);
+		retVal = retVal && archive.Process(elementInfo.name);
+		retVal = retVal && archive.EndTag(objectNameTag);
+
+		static iser::CArchiveTag objectDescriptionTag("description", "Object description", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(objectDescriptionTag);
+		retVal = retVal && archive.Process(elementInfo.description);
+		retVal = retVal && archive.EndTag(objectDescriptionTag);
+
+		if (!archive.IsStoring()){
+			contentMetaInfo.append(elementInfo);
+		}
+
+		retVal = retVal && archive.EndTag(objectTag);
+	}
+
+	retVal = retVal && archive.EndTag(objectListTag);
+
+	return retVal;
 }
 
 

@@ -23,32 +23,45 @@ public:
 	I_BEGIN_COMPONENT(CCompositeObjectPersistenceComp);
 		I_REGISTER_INTERFACE(ifile::IFilePersistence);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
-		I_ASSIGN_MULTI_0(m_objectTypeIds, "ObjectTypeIds", "Object type id's", true);
+		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIds", "Object type id's", true);
 		I_ASSIGN_MULTI_0(m_objectPresistencesCompPtr, "ObjectPersistences", "Persistences for object type id's", true);
 	I_END_COMPONENT;
 
 	// reimplemented (ifile::IFilePersistence)
-	bool IsOperationSupported(
+	virtual bool IsOperationSupported(
 				const istd::IChangeable* dataObjectPtr,
 				const QString* filePathPtr = NULL,
 				int flags = -1,
 				bool beQuiet = true) const override;
 
-	int LoadFromFile(istd::IChangeable& data,
+	virtual int LoadFromFile(istd::IChangeable& data,
 				const QString& filePath = QString(),
 				ibase::IProgressManager* progressManagerPtr = NULL) const override;
 
-	int SaveToFile(const istd::IChangeable& data,
+	virtual int SaveToFile(const istd::IChangeable& data,
 				const QString& filePath = QString(),
 				ibase::IProgressManager* progressManagerPtr = NULL) const override;
 
 	// reimplemented (ifile::IFileTypeInfo)
-	bool GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr = NULL, int flags = -1, bool doAppend = false) const override;
-	QString GetTypeDescription(const QString* extensionPtr = NULL) const override;
+	virtual bool GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr = NULL, int flags = -1, bool doAppend = false) const override;
+	virtual QString GetTypeDescription(const QString* extensionPtr = NULL) const override;
+
+protected:
+	struct BundleElementInfo
+	{
+		QString fileName;
+		QByteArray id;
+		QByteArray typeId;
+		QString name;
+		QString description;
+	};
+
+	const ifile::IFilePersistence* GetFilePersistenceForTypeId(const QByteArray& typeId) const;
+	bool SerializeBundleMetaInfo(QVector<BundleElementInfo>& contentMetaInfo, iser::IArchive& archive) const;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
-	I_MULTIATTR(QByteArray, m_objectTypeIds);
+	I_MULTIATTR(QByteArray, m_objectTypeIdsAttrPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_objectPresistencesCompPtr);
 };
 
