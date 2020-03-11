@@ -225,17 +225,21 @@ QComboBox::item:selected
  	color: white;
 }
 
-QAbstractItemView[NoFrame="true"]
+QAbstractItemView 
 {
-	border: none;
+    outline: 0;
 }
-
 
 QAbstractItemView::item
 {
 	color: #335777;
 	padding-top: 0.9em;
 	padding-bottom: 0.9em;
+}
+
+QAbstractItemView[NoFrame="true"]
+{
+	border: none;
 }
 
 QHeaderView
@@ -276,19 +280,6 @@ QTabBar::tab:!selected
     margin-top: 2px; /* make non-selected tabs look smaller */
 }
 
-/*
-QAbstractItemView
-{
-    outline: 0;
-}
-
-QAbstractItemView::item
-{
-    padding-top: 0.7em;
-    padding-bottom: 0.7em;
-}
-
-*/
 
 
 
