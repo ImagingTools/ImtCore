@@ -2,9 +2,8 @@
 
 
 // Qt includes
-#include <QFile>
-#include <QDir>
-#include <QFileInfo>
+#include <QtCore/QDir>
+#include <QtCore/QUuid>
 
 // ACF includes
 #include <ifile/CCompactXmlFileReadArchive.h>
@@ -54,7 +53,7 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 		return OS_FAILED;
 	}
 
-	const QString contentsFileName = filePath + "/Contents.xml";
+	const QString contentsFileName = filePath + QDir::separator() + "Contents.xml";
 	ifile::CCompactXmlFileReadArchive xmlArchive;
 	if (!xmlArchive.OpenFile(contentsFileName)){
 		return OS_FAILED;
@@ -65,7 +64,7 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 		return OS_FAILED;
 	}
 
-	for (BundleElementInfo elementInfo : contentMetaInfo){
+	for (const BundleElementInfo& elementInfo : contentMetaInfo){
 		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(elementInfo.typeId);
 		if (persistencePtr == nullptr){
 			return OS_FAILED;
@@ -73,16 +72,20 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 		
 		istd::IChangeable* objectPtr = const_cast<istd::IChangeable*>(documentPtr->GetObjectPtr(elementInfo.id));
 		if (objectPtr == nullptr){
-			elementInfo.id = documentPtr->InsertNewObject(elementInfo.typeId, elementInfo.name, elementInfo.description);
+			if ((documentPtr->GetOperationFlags() & imtbase::IObjectCollection::OF_SUPPORT_INSERT) == 0){
+				return OS_FAILED;
+			}
 
-			objectPtr = const_cast<istd::IChangeable*>(documentPtr->GetObjectPtr(elementInfo.id));
+			QByteArray id = documentPtr->InsertNewObject(elementInfo.typeId, elementInfo.name, elementInfo.description);
+
+			objectPtr = const_cast<istd::IChangeable*>(documentPtr->GetObjectPtr(id));
 		}
 	
 		if (objectPtr == nullptr){
 			return OS_FAILED;
 		}
 
-		int status = persistencePtr->LoadFromFile(*objectPtr, filePath + "/" + elementInfo.fileName);
+		int status = persistencePtr->LoadFromFile(*objectPtr, filePath + QDir::separator() + elementInfo.fileName);
 		if (status != ifile::IFilePersistence::OS_OK){
 			return OS_FAILED;
 		}
@@ -106,18 +109,15 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 		return OS_FAILED;
 	}
 
-	QDir dir(filePath);
-	if (dir.exists()){
-		if (!dir.removeRecursively()){
-			return OS_FAILED;
-		}
-	}
 
-	if (!dir.mkpath(".")){
+	QDir tempPath = QDir::temp();
+	QString uuid = QUuid::createUuid().toString();
+	if (!tempPath.mkpath(uuid)){
 		return OS_FAILED;
 	}
+	tempPath.cd(uuid);
 
-	const QString contentsFileName = filePath + "/Contents.xml";
+	const QString contentsFileName = tempPath.path() + QDir::separator() + "Contents.xml";
 	ifile::CCompactXmlFileWriteArchive xmlArchive(contentsFileName);
 
 	imtbase::ICollectionInfo::Ids ids = documentPtr->GetElementIds();
@@ -125,9 +125,11 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 	
 	QVector<BundleElementInfo> contentMetaInfo;
 	
-	for (imtbase::ICollectionInfo::Id objectId: ids){
+	for (const imtbase::ICollectionInfo::Id& objectId: ids){
 		const istd::IChangeable *objectPtr = documentPtr->GetObjectPtr(objectId);
 		if (objectPtr == nullptr){
+			xmlArchive.Flush();
+			tempPath.removeRecursively();
 			return OS_FAILED;
 		}
 
@@ -135,12 +137,22 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 
 		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(typeId);
 		if (persistencePtr == nullptr){
+			xmlArchive.Flush();
+			tempPath.removeRecursively();
 			return OS_FAILED;
 		}
 
-		QString objectFile;
-		objectFile = QString("object%1").arg(objectCounter++);
-		if (persistencePtr->SaveToFile(*objectPtr, filePath + "/" + objectFile) != OS_OK){
+		QStringList extensions;
+		persistencePtr->GetFileExtensions(extensions);
+
+		QString objectFile(objectId);
+		if (extensions.count() > 0){
+			objectFile.append(QString(".%1").arg(extensions[0]));
+		}
+		
+		if (persistencePtr->SaveToFile(*objectPtr, tempPath.path() + QDir::separator() + objectFile) != OS_OK){
+			xmlArchive.Flush();
+			tempPath.removeRecursively();
 			return OS_FAILED;
 		}
 			
@@ -155,7 +167,32 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 		contentMetaInfo.append(elementInfo);
 	}
 
-	return SerializeBundleMetaInfo(contentMetaInfo, xmlArchive);
+	bool serializeResult = SerializeBundleMetaInfo(contentMetaInfo, xmlArchive);
+	xmlArchive.Flush();
+
+	if (serializeResult){
+		QDir destinationPath(filePath);
+		if (destinationPath.removeRecursively()){
+			if (destinationPath.mkpath(".")){
+				bool isCopyOk = true;
+
+				for (const QString& file : tempPath.entryList(QDir::Files)){
+					if (!QFile::copy(tempPath.path() + QDir::separator() + file, destinationPath.path() + QDir::separator() + file)){
+						isCopyOk = false;
+						break;
+					}
+				}
+
+				if (isCopyOk){
+					tempPath.removeRecursively();
+					return OS_OK;
+				}
+			}
+		}
+	}
+
+	tempPath.removeRecursively();
+	return OS_FAILED;
 }
 
 
