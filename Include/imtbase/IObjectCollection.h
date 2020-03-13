@@ -83,6 +83,7 @@ public:
 
 	/**
 		Get binary flags describing the possible operations on the single object or on the whole collection.
+		\param objectId	ID of the object for quering flags. If this parameter is empty, the flags for entire collection will be returned.
 	*/
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const = 0;
 
