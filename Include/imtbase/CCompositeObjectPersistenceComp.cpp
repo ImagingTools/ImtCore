@@ -112,24 +112,25 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 
 	QDir tempPath = QDir::temp();
 	QString uuid = QUuid::createUuid().toString();
+
 	if (!tempPath.mkpath(uuid)){
 		return OS_FAILED;
 	}
+
 	tempPath.cd(uuid);
 
-	const QString contentsFileName = tempPath.path() + QDir::separator() + "Contents.xml";
+	QString contentsFileName = tempPath.path() + QDir::separator() + "Contents.xml";
 	ifile::CCompactXmlFileWriteArchive xmlArchive(contentsFileName);
 
 	imtbase::ICollectionInfo::Ids ids = documentPtr->GetElementIds();
-	int objectCounter = 0;
-	
+
 	QVector<BundleElementInfo> contentMetaInfo;
 	
 	for (const imtbase::ICollectionInfo::Id& objectId: ids){
 		const istd::IChangeable *objectPtr = documentPtr->GetObjectPtr(objectId);
 		if (objectPtr == nullptr){
-			xmlArchive.Flush();
 			tempPath.removeRecursively();
+
 			return OS_FAILED;
 		}
 
@@ -137,28 +138,30 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 
 		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(typeId);
 		if (persistencePtr == nullptr){
-			xmlArchive.Flush();
 			tempPath.removeRecursively();
+
 			return OS_FAILED;
 		}
 
 		QStringList extensions;
 		persistencePtr->GetFileExtensions(extensions);
 
-		QString objectFile(objectId);
+		QString objectFileName(objectId);
 		if (extensions.count() > 0){
-			objectFile.append(QString(".%1").arg(extensions[0]));
+			objectFileName.append(QString(".%1").arg(extensions[0]));
 		}
 		
-		if (persistencePtr->SaveToFile(*objectPtr, tempPath.path() + QDir::separator() + objectFile) != OS_OK){
-			xmlArchive.Flush();
+		QString objectFilePath = tempPath.path() + QDir::separator() + objectFileName;
+
+		if (persistencePtr->SaveToFile(*objectPtr, objectFilePath) != OS_OK){
 			tempPath.removeRecursively();
+
 			return OS_FAILED;
 		}
-			
+
 		BundleElementInfo elementInfo;
 		
-		elementInfo.fileName = objectFile;
+		elementInfo.fileName = objectFileName;
 		elementInfo.id = objectId;
 		elementInfo.typeId = typeId;
 		elementInfo.name = documentPtr->GetElementInfo(objectId, imtbase::IObjectCollection::EIT_NAME).toString();
@@ -167,24 +170,30 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 		contentMetaInfo.append(elementInfo);
 	}
 
-	bool serializeResult = SerializeBundleMetaInfo(contentMetaInfo, xmlArchive);
+	bool bundleInfoWritten = SerializeBundleMetaInfo(contentMetaInfo, xmlArchive);
+
 	xmlArchive.Flush();
 
-	if (serializeResult){
+	if (bundleInfoWritten){
 		QDir destinationPath(filePath);
 		if (destinationPath.removeRecursively()){
 			if (destinationPath.mkpath(".")){
 				bool isCopyOk = true;
 
-				for (const QString& file : tempPath.entryList(QDir::Files)){
-					if (!QFile::copy(tempPath.path() + QDir::separator() + file, destinationPath.path() + QDir::separator() + file)){
+				for (const QString& fileName : tempPath.entryList(QDir::Files)){
+					QString sourceFilePath = tempPath.path() + QDir::separator() + fileName;
+					QString targetFilePath = destinationPath.path() + QDir::separator() + fileName;
+
+					if (!QFile::copy(sourceFilePath, targetFilePath)){
 						isCopyOk = false;
+
 						break;
 					}
 				}
 
 				if (isCopyOk){
 					tempPath.removeRecursively();
+
 					return OS_OK;
 				}
 			}
@@ -192,6 +201,7 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 	}
 
 	tempPath.removeRecursively();
+
 	return OS_FAILED;
 }
 
