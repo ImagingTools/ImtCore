@@ -44,7 +44,8 @@ QSplashScreen > QWidget#CopyrightLabel
     color: yellow;
 }
 
-QWidget#PageTree {
+QWidget#PageTree 
+{
     /*    background-image: url(:/Style/ImtLight/Images/PanelBackground);
     background-repeat: repeat-xy;
     background-color: rgb(230,230,232);*/
@@ -100,7 +101,8 @@ QWidget#TotalCounterFrame, QWidget#WarningsCounterFrame
     background: #ffffff;
 }
 
-QLabel[Header=true] {
+QLabel[Header=true]
+{
     font-size: 12pt;
     color: #88b8e3;
 }
@@ -220,6 +222,13 @@ QTreeWidget[TabSimulation=true]::item:first:selected
     border-top: 1px white;
 }
 
+QTreeView[ItemView=true]::item
+{
+	color: #335777;
+	padding-top: 0.9em;
+	padding-bottom: 0.9em;
+}
+
 QComboBox::item:selected 
 {
  	color: white;
@@ -228,13 +237,6 @@ QComboBox::item:selected
 QAbstractItemView 
 {
     outline: 0;
-}
-
-QAbstractItemView::item
-{
-	color: #335777;
-	padding-top: 0.9em;
-	padding-bottom: 0.9em;
 }
 
 QAbstractItemView[NoFrame="true"]

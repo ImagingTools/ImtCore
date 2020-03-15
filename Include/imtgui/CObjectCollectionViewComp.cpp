@@ -179,6 +179,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 
 	QByteArray lastTypeId = m_currentTypeId;
 
+	ItemList->setProperty("ItemView", true);
 	TypeList->clear();
 	m_itemModel.clear();
 	m_itemModel.setColumnCount(1);
