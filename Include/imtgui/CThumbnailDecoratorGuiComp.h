@@ -300,6 +300,8 @@ private:
 	QString m_winKeyboardPath;
 
 	int m_lastPageIndexForLoggedUser;
+
+	int m_keyEnterTimerId;
 };
 
 

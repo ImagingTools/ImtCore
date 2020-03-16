@@ -39,7 +39,8 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_horizontalFrameMargin(6),
 	m_verticalFrameMargin(6),
 	m_itemDelegate(nullptr),
-	m_lastPageIndexForLoggedUser(-1)
+	m_lastPageIndexForLoggedUser(-1),
+	m_keyEnterTimerId(0)
 {
 	m_rootCommands.InsertChild(&m_commands);
 	m_minItemSize = QSize(100, 50);
@@ -110,13 +111,22 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 			}
 		}
 
+		QTimerEvent* timerEventPtr = dynamic_cast<QTimerEvent*>(event);
+		if (timerEventPtr != nullptr){
+			if (timerEventPtr->timerId() == m_keyEnterTimerId){
+				killTimer(m_keyEnterTimerId);
+				m_keyEnterTimerId = 0;
+			}
+		}
+
 		QKeyEvent* keyEventPtr = dynamic_cast<QKeyEvent*>(event);
-		if (keyEventPtr != NULL){
+		if (keyEventPtr != nullptr){
 			int pressedKey = keyEventPtr->key();
 
-			if (pressedKey == Qt::Key_Return){
+			if (pressedKey == Qt::Key_Return && m_keyEnterTimerId == 0){
 				if ((PageStack->currentIndex() == LOGIN_PAGE_INDEX) && !isLogged && LoginButton->isEnabled()){
 					on_LoginButton_clicked();
+					m_keyEnterTimerId = startTimer(500);
 				}
 			}
 		}
