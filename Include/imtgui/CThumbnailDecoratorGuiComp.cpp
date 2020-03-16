@@ -123,7 +123,7 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 		if (keyEventPtr != nullptr){
 			int pressedKey = keyEventPtr->key();
 
-			if (pressedKey == Qt::Key_Return && m_keyEnterTimerId == 0){
+			if ((pressedKey == Qt::Key_Return || pressedKey == Qt::Key_Enter) && m_keyEnterTimerId == 0){
 				if ((PageStack->currentIndex() == LOGIN_PAGE_INDEX) && !isLogged && LoginButton->isEnabled()){
 					on_LoginButton_clicked();
 					m_keyEnterTimerId = startTimer(500);
