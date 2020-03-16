@@ -39,7 +39,7 @@ int CObjectCollectionBase::GetOperationFlags(const QByteArray& objectId) const
 		}
 	}
 
-	return OF_SUPPORT_INSERT | OF_SUPPORT_DELETE | OF_SUPPORT_EDIT | OF_SUPPORT_RENAME;
+	return OF_ALL;
 }
 
 
@@ -112,7 +112,7 @@ bool CObjectCollectionBase::RemoveObject(const QByteArray& objectId)
 const istd::IChangeable* CObjectCollectionBase::GetObjectPtr(const QByteArray& objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
-		if ((objectInfo.id == objectId) && ((objectInfo.flags & OF_SUPPORT_DELETE) == 0)){
+		if (objectInfo.id == objectId){
 			return objectInfo.objectPtr.GetPtr();
 		}
 	}
@@ -271,19 +271,43 @@ int CObjectCollectionBase::GetSupportedOperations() const
 }
 
 
-bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CObjectCollectionBase* sourcePtr = dynamic_cast<const CObjectCollectionBase*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		// TODO: Correct this implementation for the fixed objects!
-		m_objects.clear();
+		ICollectionInfo::Ids sourceElementIds = sourcePtr->GetElementIds();
 
-		for (const ObjectInfo& objectInfo : sourcePtr->m_objects){
-			QByteArray newId = InsertNewObject(objectInfo.typeId, objectInfo.name, objectInfo.description, objectInfo.objectPtr.GetPtr());
-			if (newId.isEmpty()){
-				return false;
+		// Remove non-existing objects from the target collection:
+		QMutableVectorIterator<ObjectInfo> targetObjectsIter(m_objects);
+		while (targetObjectsIter.hasNext()){
+			const ObjectInfo& objectInfo = targetObjectsIter.next();
+
+			if (!sourceElementIds.contains(objectInfo.id)){
+				targetObjectsIter.remove();
+			}
+		}
+
+		for (const ObjectInfo& sourceObjectInfo : sourcePtr->m_objects){
+			ObjectInfo* targetObjectInfoPtr = GetObjectInfo(sourceObjectInfo.id);
+
+			if (targetObjectInfoPtr == nullptr){
+				QByteArray newId = InsertNewObject(sourceObjectInfo.typeId, sourceObjectInfo.name, sourceObjectInfo.description, sourceObjectInfo.objectPtr.GetPtr());
+				if (newId.isEmpty()){
+					return false;
+				}
+			}
+			else{
+				const istd::IChangeable* dataPtr = sourcePtr->GetObjectPtr(sourceObjectInfo.id);
+				if (dataPtr != nullptr){
+					if (!targetObjectInfoPtr->objectPtr->CopyFrom(*dataPtr)){
+						return false;
+					}
+				}
+				else{
+					return false;
+				}
 			}
 		}
 
@@ -361,6 +385,8 @@ bool CObjectCollectionBase::InsertObjectIntoCollection(const ObjectInfo& info)
 		}
 	}
 
+	Q_ASSERT(info.objectPtr.IsValid());
+
 	m_objects.push_back(info);
 
 	return true;
@@ -369,7 +395,7 @@ bool CObjectCollectionBase::InsertObjectIntoCollection(const ObjectInfo& info)
 
 int CObjectCollectionBase::GetItemDefaultFlags() const
 {
-	return OF_SUPPORT_DELETE | OF_SUPPORT_RENAME | OF_SUPPORT_EDIT;
+	return OF_ALL;
 }
 
 

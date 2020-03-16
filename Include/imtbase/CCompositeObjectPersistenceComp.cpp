@@ -49,7 +49,7 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 		return OS_FAILED;
 	}
 
-	if (!m_objectCollectionCompPtr.IsValid() || !m_objectTypeIdsAttrPtr.IsValid() || !m_objectPresistencesCompPtr.IsValid()){
+	if (!m_objectTypeIdsAttrPtr.IsValid() || !m_objectPresistencesCompPtr.IsValid()){
 		return OS_FAILED;
 	}
 
@@ -105,7 +105,7 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 		return OS_FAILED;
 	}
 
-	if (!m_objectCollectionCompPtr.IsValid() || !m_objectTypeIdsAttrPtr.IsValid() || !m_objectPresistencesCompPtr.IsValid()){
+	if (!m_objectTypeIdsAttrPtr.IsValid() || !m_objectPresistencesCompPtr.IsValid()){
 		return OS_FAILED;
 	}
 
@@ -129,6 +129,8 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 	for (const imtbase::ICollectionInfo::Id& objectId: ids){
 		const istd::IChangeable *objectPtr = documentPtr->GetObjectPtr(objectId);
 		if (objectPtr == nullptr){
+			SendErrorMessage(0, QString("No object with the ID: '%1' was found").arg(qPrintable(objectId)));
+
 			tempPath.removeRecursively();
 
 			return OS_FAILED;
@@ -138,6 +140,8 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 
 		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(typeId);
 		if (persistencePtr == nullptr){
+			SendErrorMessage(0, QString("No persistence was registered for type-ID: '%1'").arg(qPrintable(typeId)));
+
 			tempPath.removeRecursively();
 
 			return OS_FAILED;
@@ -154,6 +158,8 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 		QString objectFilePath = tempPath.path() + QDir::separator() + objectFileName;
 
 		if (persistencePtr->SaveToFile(*objectPtr, objectFilePath) != OS_OK){
+			SendErrorMessage(0, QString("Object could not be saved to: '%1'").arg(objectFilePath));
+
 			tempPath.removeRecursively();
 
 			return OS_FAILED;

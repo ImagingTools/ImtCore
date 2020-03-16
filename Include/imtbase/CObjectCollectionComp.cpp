@@ -64,7 +64,7 @@ void CObjectCollectionComp::OnComponentCreated()
 			ObjectInfo object;
 			object.isEnabled = true;
 			object.name = objectName;
-			object.flags = OF_ALL &~OF_SUPPORT_DELETE;
+			object.flags = OF_ALL & ~OF_SUPPORT_DELETE;
 			object.objectPtr.SetPtr(objectPtr, false);
 			object.typeId = typeId;
 			object.id = uuid;

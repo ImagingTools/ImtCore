@@ -22,9 +22,9 @@ public:
 
 	I_BEGIN_COMPONENT(CCompositeObjectPersistenceComp);
 		I_REGISTER_INTERFACE(ifile::IFilePersistence);
-		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
-		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIds", "Object type id's", true);
-		I_ASSIGN_MULTI_0(m_objectPresistencesCompPtr, "ObjectPersistences", "Persistences for object type id's", true);
+		I_REGISTER_INTERFACE(ifile::IFileTypeInfo);
+		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIds", "List of type-IDs for corresponding persistences", true);
+		I_ASSIGN_MULTI_0(m_objectPresistencesCompPtr, "ObjectPersistences", "List of registered persistence according to the specified type-IDs", true);
 	I_END_COMPONENT;
 
 	// reimplemented (ifile::IFilePersistence)
@@ -33,11 +33,9 @@ public:
 				const QString* filePathPtr = NULL,
 				int flags = -1,
 				bool beQuiet = true) const override;
-
 	virtual int LoadFromFile(istd::IChangeable& data,
 				const QString& filePath = QString(),
 				ibase::IProgressManager* progressManagerPtr = NULL) const override;
-
 	virtual int SaveToFile(const istd::IChangeable& data,
 				const QString& filePath = QString(),
 				ibase::IProgressManager* progressManagerPtr = NULL) const override;
@@ -60,7 +58,6 @@ protected:
 	bool SerializeBundleMetaInfo(QVector<BundleElementInfo>& contentMetaInfo, iser::IArchive& archive) const;
 
 private:
-	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_MULTIATTR(QByteArray, m_objectTypeIdsAttrPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_objectPresistencesCompPtr);
 };
