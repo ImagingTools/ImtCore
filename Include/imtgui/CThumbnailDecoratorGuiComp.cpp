@@ -515,13 +515,13 @@ void CThumbnailDecoratorGuiComp::ShowLoginPage()
 
 	LeftFrame->setVisible(false);
 
-	if (m_menuPanelVisibilityCompPtr.IsValid()){
-		m_menuPanelVisibilityCompPtr->SetEnabled(false);
-	}
-
 	UpdateLoginButtonsState();
 
 	CurrentPageLabel->setText(tr("Login"));
+
+	if (m_menuPanelVisibilityCompPtr.IsValid()){
+		m_menuPanelVisibilityCompPtr->SetEnabled(false);
+	}
 }
 
 
@@ -544,15 +544,15 @@ void CThumbnailDecoratorGuiComp::ShowHomePage()
 	m_subPageItemMap.clear();
 	SubPages->clear();
 
-	if (m_menuPanelVisibilityCompPtr.IsValid()){
-		m_menuPanelVisibilityCompPtr->SetEnabled(true);
-	}
-
 	LeftFrame->setVisible(false);
 
 	UpdateLoginButtonsState();
 
 	CurrentPageLabel->setText(*m_welcomeTextAttrPtr);
+
+	if (m_menuPanelVisibilityCompPtr.IsValid()){
+		m_menuPanelVisibilityCompPtr->SetEnabled(true);
+	}
 }
 
 
@@ -566,10 +566,6 @@ void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 	LeftFrame->setVisible(false);
 
 	if (m_pagesCompPtr.IsValid()){
-		if (m_menuPanelVisibilityCompPtr.IsValid()){
-			m_menuPanelVisibilityCompPtr->SetEnabled(true);
-		}
-
 		if (m_pagesCompPtr->SetSelectedOptionIndex(index)){
 			QString pageLabel;
 			const iprm::IOptionsList* pageListPtr = m_pagesCompPtr->GetSelectionConstraints();
@@ -602,6 +598,10 @@ void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 	UpdateLoginButtonsState();
 
 	HomeButton->setEnabled(true);
+
+	if (m_menuPanelVisibilityCompPtr.IsValid()){
+		m_menuPanelVisibilityCompPtr->SetEnabled(true);
+	}
 }
 
 

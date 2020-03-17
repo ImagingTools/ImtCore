@@ -387,6 +387,9 @@ void CMenuPanelComp::UpdateWidgetSizeAttributes()
 void CMenuPanelComp::UpdateMenuPanelVisibility()
 {
 	GetQtWidget()->setVisible(m_menuPanelVisibilityCompPtr->IsEnabled());
+	if (m_menuPanelVisibilityCompPtr->IsEnabled() && FindSelectedItem() != QByteArray()){
+		GetQtWidget()->CollapsePanelImmideatly();
+	}
 }
 
 

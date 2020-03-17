@@ -497,6 +497,27 @@ void CMenuPanel::SetMainWidget(QWidget* mainWidget)
 	SetMinimumPanelWidth(0);
 }
 
+
+void CMenuPanel::CollapsePanelImmideatly()
+{
+	StopTimer();
+	StopAnimation();
+
+	if (m_mainWidgetPtr != nullptr){
+		setGeometry(QRect(0, 0, m_minWidth, height()));
+
+		if (m_shadowPtr){
+			m_shadowPtr->setEnabled(false);
+		}
+	}
+	else{
+		PageTree->setMaximumWidth(m_minWidth);
+	}
+
+	m_delegatePtr->setProperty("indent", 0);
+}
+
+
 void CMenuPanel::OnPageIdChanged(const QModelIndex& selected, const QModelIndex& deselected)
 {
 	QByteArray selectedId;

@@ -95,6 +95,8 @@ public:
 
 	virtual void SetMainWidget(QWidget* mainWidget);
 
+	virtual void CollapsePanelImmideatly();
+
 Q_SIGNALS:
 	/**
 		Signal will be emitted whenever the currently selected page will be changed.
