@@ -515,6 +515,10 @@ void CThumbnailDecoratorGuiComp::ShowLoginPage()
 
 	LeftFrame->setVisible(false);
 
+	if (m_menuPanelVisibilityCompPtr.IsValid()){
+		m_menuPanelVisibilityCompPtr->SetEnabled(false);
+	}
+
 	UpdateLoginButtonsState();
 
 	CurrentPageLabel->setText(tr("Login"));
@@ -540,6 +544,10 @@ void CThumbnailDecoratorGuiComp::ShowHomePage()
 	m_subPageItemMap.clear();
 	SubPages->clear();
 
+	if (m_menuPanelVisibilityCompPtr.IsValid()){
+		m_menuPanelVisibilityCompPtr->SetEnabled(true);
+	}
+
 	LeftFrame->setVisible(false);
 
 	UpdateLoginButtonsState();
@@ -558,6 +566,10 @@ void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 	LeftFrame->setVisible(false);
 
 	if (m_pagesCompPtr.IsValid()){
+		if (m_menuPanelVisibilityCompPtr.IsValid()){
+			m_menuPanelVisibilityCompPtr->SetEnabled(true);
+		}
+
 		if (m_pagesCompPtr->SetSelectedOptionIndex(index)){
 			QString pageLabel;
 			const iprm::IOptionsList* pageListPtr = m_pagesCompPtr->GetSelectionConstraints();

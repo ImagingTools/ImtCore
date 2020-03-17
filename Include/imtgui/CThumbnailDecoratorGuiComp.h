@@ -90,6 +90,7 @@ public:
 	I_BEGIN_COMPONENT(CThumbnailDecoratorGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
 		I_REGISTER_INTERFACE(IWidgetProvider);
+		I_ASSIGN(m_menuPanelVisibilityCompPtr, "MenuPanelVisibility", "Menu panel visibility status", false, "MenuPanelVisibility");
 		I_ASSIGN(m_pagesWidgetCompPtr, "PageUiContainer", "UI component containing all application pages", true, "PageUiContainer");
 		I_ASSIGN(m_pagesCompPtr, "PageModel", "Data model describing the used pages", true, "PageModel");
 		I_ASSIGN_TO(m_pagesModelCompPtr, m_pagesCompPtr, true);
@@ -281,6 +282,7 @@ private:
 	QSize m_minItemSize;
 	imtgui::CThumbPageItemGuiDelegate* m_itemDelegate;
 
+	I_REF(iprm::IEnableableParam, m_menuPanelVisibilityCompPtr);
 	I_REF(iqtgui::IGuiObject, m_pagesWidgetCompPtr);
 	I_REF(iprm::ISelectionParam, m_pagesCompPtr);
 	I_REF(imod::IModel, m_pagesModelCompPtr);

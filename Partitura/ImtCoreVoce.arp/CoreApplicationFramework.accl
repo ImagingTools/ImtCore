@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="4850" Description="ACF"/>
             <Version Id="1" Number="2122" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331010" Description="Qt Framework"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -12,6 +12,7 @@
         <Element ComponentName="CommandsMultiplexer" X="300" Y="525" Note=""/>
         <Element ComponentName="GuiApplication" X="575" Y="250" Note=""/>
         <Element ComponentName="MainGui" X="575" Y="375" Note=""/>
+        <Element ComponentName="MenuPanelVisibility" X="575" Y="625" Note=""/>
         <Element ComponentName="Pages" X="575" Y="525" Note=""/>
         <Element ComponentName="SettingsProvider" X="825" Y="525" Note=""/>
         <Element ComponentName="SplashScreen" X="575" Y="125" Note=""/>

@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="4850" Description="ACF"/>
             <Version Id="1" Number="2122" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331010" Description="Qt Framework"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>ImagingTools application framework</Description>
@@ -136,6 +136,15 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="MenuPanelVisibility" PackageId="BasePck" ComponentId="EnableableParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Pages" PackageId="ImtGuiPck" ComponentId="ThumbnailDecoratorGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -180,6 +189,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="MaximumFrameWidth" Type="Integer" ExportId="MaximumFrameWidth">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MenuPanelVisibility" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MenuPanelVisibility"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PageModel" Type="Reference" ExportId="MainPageModel">
                         <Data IsEnabled="false"/>
@@ -264,6 +276,7 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ApplicationInfo" ComponentId="ApplicationInfo"/>
+        <Component ExportedId="MenuPanelVisibility" ComponentId="MenuPanelVisibility"/>
         <Component ExportedId="PageCommands" ComponentId="CommandsMultiplexer"/>
         <Component ExportedId="RuntimeStatus" ComponentId="GuiApplication/RuntimeStatus"/>
         <Component ExportedId="SettingsProvider" ComponentId="SettingsProvider"/>

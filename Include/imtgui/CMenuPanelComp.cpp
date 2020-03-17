@@ -21,6 +21,7 @@ CMenuPanelComp::CMenuPanelComp()
 	:m_pageSubselectionObserver(*this),
 	m_pageVisualStatusObserver(*this),
 	m_monitorInfoObserver(*this),
+	m_menuPanelVisibilityObserver(*this),
 	m_resolutionX(3.5),
 	m_resolutionY(3.5)
 {
@@ -119,6 +120,13 @@ void CMenuPanelComp::OnGuiCreated()
 			m_resolutionY = manualResolution;
 		}
 		UpdateWidgetSizeAttributes();
+	}
+
+	if (m_menuPanelVisibilityCompPtr.IsValid()){
+		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_menuPanelVisibilityCompPtr.GetPtr());
+		if (modelPtr != nullptr){
+			modelPtr->AttachObserver(&m_menuPanelVisibilityObserver);
+		}
 	}
 
 	BaseClass::OnGuiCreated();
@@ -310,7 +318,7 @@ QByteArray CMenuPanelComp::FindSelectedItem()
 		int selectedIndex = selectionPtr->GetSelectedOptionIndex();
 		const iprm::IOptionsList *pageListPtr = selectionPtr->GetSelectionConstraints();
 		if (selectedIndex >= 0){
-			selectedPageId = pageListPtr->GetOptionName(selectedIndex);
+			selectedPageId = pageListPtr->GetOptionId(selectedIndex);
 			selectionPtr = selectionPtr->GetSubselection(selectedIndex);
 		}
 		else{
@@ -376,6 +384,12 @@ void CMenuPanelComp::UpdateWidgetSizeAttributes()
 }
 
 
+void CMenuPanelComp::UpdateMenuPanelVisibility()
+{
+	GetQtWidget()->setVisible(m_menuPanelVisibilityCompPtr->IsEnabled());
+}
+
+
 // protected methods of embedded class PageSubselectionObserver
 
 CMenuPanelComp::PageSubselectionObserver::PageSubselectionObserver(CMenuPanelComp& parent)
@@ -392,7 +406,7 @@ void CMenuPanelComp::PageSubselectionObserver::OnModelChanged(int /*modelId*/, c
 }
 
 
-// protected methods of embedded class PageStatusObserver
+// protected methods of embedded class PageVisualStatusObserver
 
 CMenuPanelComp::PageVisualStatusObserver::PageVisualStatusObserver(CMenuPanelComp& parent)
 	:m_parent(parent)
@@ -408,7 +422,7 @@ void CMenuPanelComp::PageVisualStatusObserver::OnModelChanged(int /*modelId*/, c
 }
 
 
-// protected methods of embedded class PageStatusObserver
+// protected methods of embedded class MonitorsInfoObserver
 
 CMenuPanelComp::MonitorsInfoObserver::MonitorsInfoObserver(CMenuPanelComp& parent)
 	:m_parent(parent)
@@ -445,6 +459,22 @@ void CMenuPanelComp::MonitorsInfoObserver::OnUpdate(const istd::IChangeable::Cha
 	}
 
 	m_parent.UpdateMonitorsInfo();
+}
+
+
+// protected methods of embedded class MenuPanelVisibility
+
+CMenuPanelComp::MenuPanelVisibility::MenuPanelVisibility(CMenuPanelComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CMenuPanelComp::MenuPanelVisibility::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	m_parent.UpdateMenuPanelVisibility();
 }
 
 

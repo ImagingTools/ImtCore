@@ -6,6 +6,7 @@
 #include <iqtgui/TGuiObserverWrap.h>
 #include <iqtgui/TGuiComponentBase.h>
 #include <iprm/ISelectionParam.h>
+#include <iprm/IEnableableParam.h>
 #include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
@@ -63,6 +64,7 @@ public:
 	typedef CMenuPanelCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CMenuPanelComp);
+		I_ASSIGN(m_menuPanelVisibilityCompPtr, "MenuPanelVisibility", "Menu panel visibility status", false, "MenuPanelVisibility");
 		I_ASSIGN(m_widgetProviderCompPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
 		I_ASSIGN(m_monitorInfoProviderPtr, "MonitorInfoProvider", "Monitor info provider (count, size, resolution, etc.)", false, "MonitorInfoProvider");
 		I_ASSIGN(m_isShowOverAttrPtr, "ShowOver", "Show expanded menu over the underlaying widget", false, true);
@@ -133,6 +135,18 @@ private:
 		CMenuPanelComp& m_parent;
 	};
 
+	class MenuPanelVisibility: public imod::TSingleModelObserverBase<iprm::IEnableableParam>
+	{
+	public:
+		explicit MenuPanelVisibility(CMenuPanelComp& parent);
+
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
+
+	private:
+		CMenuPanelComp& m_parent;
+	};
+
 	struct PageInfo
 	{
 		QByteArray parentPageId;
@@ -146,7 +160,9 @@ private:
 	PageSubselectionObserver m_pageSubselectionObserver;
 	PageVisualStatusObserver m_pageVisualStatusObserver;
 	MonitorsInfoObserver m_monitorInfoObserver;
+	MenuPanelVisibility m_menuPanelVisibilityObserver;
 
+	I_REF(iprm::IEnableableParam, m_menuPanelVisibilityCompPtr);
 	I_REF(imtgui::IWidgetProvider, m_widgetProviderCompPtr);
 	I_REF(imtgui::IMonitorInfoProvider, m_monitorInfoProviderPtr);
 	I_ATTR(bool, m_isShowOverAttrPtr);
@@ -184,6 +200,7 @@ private:
 	void UpdatePageState();
 	void UpdateMonitorsInfo();
 	void UpdateWidgetSizeAttributes();
+	void UpdateMenuPanelVisibility();
 };
 
 
