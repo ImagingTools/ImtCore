@@ -181,26 +181,31 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 	xmlArchive.Flush();
 
 	if (bundleInfoWritten){
-		QDir destinationPath(filePath);
-		if (destinationPath.removeRecursively()){
-			if (destinationPath.mkpath(".")){
-				bool isCopyOk = true;
+		if (false){
+			//m_fileCompressorCompPtr->CompressFolder(filePath, tempPath.path(), true);
+		}
+		else {
+			QDir destinationPath(filePath);
+			if (destinationPath.removeRecursively()){
+				if (destinationPath.mkpath(".")){
+					bool isCopyOk = true;
 
-				for (const QString& fileName : tempPath.entryList(QDir::Files)){
-					QString sourceFilePath = tempPath.path() + QDir::separator() + fileName;
-					QString targetFilePath = destinationPath.path() + QDir::separator() + fileName;
+					for (const QString& fileName : tempPath.entryList(QDir::Files)){
+						QString sourceFilePath = tempPath.path() + QDir::separator() + fileName;
+						QString targetFilePath = destinationPath.path() + QDir::separator() + fileName;
 
-					if (!QFile::copy(sourceFilePath, targetFilePath)){
-						isCopyOk = false;
+						if (!QFile::copy(sourceFilePath, targetFilePath)){
+							isCopyOk = false;
 
-						break;
+							break;
+						}
 					}
-				}
 
-				if (isCopyOk){
-					tempPath.removeRecursively();
+					if (isCopyOk){
+						tempPath.removeRecursively();
 
-					return OS_OK;
+						return OS_OK;
+					}
 				}
 			}
 		}

@@ -23,12 +23,12 @@ public:
 	/**
 		Decompress a single file.
 	*/
-	virtual bool DescompressFile(const QString& sourceFilePath, const QString& targetFilePath) const = 0;
+	virtual bool DecompressFile(const QString& sourceFilePath, const QString& targetFilePath) const = 0;
 
 	/**
 		Compress a folder will all files inside.
 	*/
-	virtual bool CompressFolder(const QString& sourceDirPath, const QString& targetFilePath) const = 0;
+	virtual bool CompressFolder(const QString& sourceFolderPath, const QString& targetFilePath, bool isRecursive) const = 0;
 
 	/**
 		Decompress a folder.
