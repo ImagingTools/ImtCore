@@ -181,8 +181,14 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 	xmlArchive.Flush();
 
 	if (bundleInfoWritten){
-		if (false){
-			//m_fileCompressorCompPtr->CompressFolder(filePath, tempPath.path(), true);
+		if (m_fileCompressionCompPtr.IsValid()){
+			bool isCompressOk = m_fileCompressionCompPtr->CompressFolder(tempPath.path(), filePath, true);
+		
+			if (isCompressOk){
+				tempPath.removeRecursively();
+
+				return OS_OK;
+			}
 		}
 		else {
 			QDir destinationPath(filePath);

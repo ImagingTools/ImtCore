@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtfile/IFileCompression.h>
 
 
 namespace imtbase
@@ -23,6 +24,7 @@ public:
 	I_BEGIN_COMPONENT(CCompositeObjectPersistenceComp);
 		I_REGISTER_INTERFACE(ifile::IFilePersistence);
 		I_REGISTER_INTERFACE(ifile::IFileTypeInfo);
+		I_ASSIGN(m_fileCompressionCompPtr, "FileCompressor", "File compressor", false, "FileCompressor");
 		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIds", "List of type-IDs for corresponding persistences", true);
 		I_ASSIGN_MULTI_0(m_objectPresistencesCompPtr, "ObjectPersistences", "List of registered persistence according to the specified type-IDs", true);
 	I_END_COMPONENT;
@@ -58,6 +60,7 @@ protected:
 	bool SerializeBundleMetaInfo(QVector<BundleElementInfo>& contentMetaInfo, iser::IArchive& archive) const;
 
 private:
+	I_REF(imtfile::IFileCompression, m_fileCompressionCompPtr);
 	I_MULTIATTR(QByteArray, m_objectTypeIdsAttrPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_objectPresistencesCompPtr);
 };
