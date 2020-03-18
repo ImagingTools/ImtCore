@@ -529,7 +529,7 @@ void CThumbnailDecoratorGuiComp::ShowHomePage()
 {
 	if (m_loginCompPtr.IsValid()){
 		iauth::CUser* userPtr = m_loginCompPtr->GetLoggedUser();
-		if ((GetLoginMode() == LM_STRONG) && (userPtr == NULL)){
+		if ((GetLoginMode() == LM_STRONG) && (userPtr == nullptr)){
 			return;
 		}
 	}

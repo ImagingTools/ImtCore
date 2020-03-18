@@ -34,10 +34,6 @@ QWidget#MainVersionTitleLabel, QWidget#MainVersionLabel
     color: white;
 }
 
-QWidget#CInspectionApplicationDocumentEditorComp  /*, QWidget#LeftGroup, QWidget#MainGroup */
-{
-    background: white;
-}
 
 QSplashScreen > QWidget#CopyrightLabel
 {
@@ -85,11 +81,6 @@ QWidget#LoadWorkflowButton
     text-align: left;
 }
 
-QWidget#TaskList 
-{
-    background-color: palette(window);
-}
-    
 QWidget#MessageFrame
 {
     background-color: lightYellow;
@@ -318,11 +309,5 @@ QTabBar::tab::bottom:!selected
 {
     margin-top: 2px; 
 }
-
-
-
-
-
-
 
 
