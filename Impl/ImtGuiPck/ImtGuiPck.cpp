@@ -68,9 +68,14 @@ I_EXPORT_COMPONENT(
 			"Menu panel page");
 
 I_EXPORT_COMPONENT(
-	MonitorInfoProvider,
-	"Monitor info provider component",
-	"Monitor Info Provider Resolution Size Count");
+			MonitorInfoProvider,
+			"Monitor info provider component",
+			"Monitor Info Provider Resolution Size Count");
+
+I_EXPORT_COMPONENT(
+			LayoutManager,
+			"LayoutManager component",
+			"LayoutManager page");
 
 } // namespace ImtGuiPck
 
