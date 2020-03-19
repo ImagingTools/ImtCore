@@ -9,7 +9,7 @@ namespace imtzip
 {
 
 
-class CFileCompressor: public imtfile::IFileCompression
+class CFileCompressor: virtual public imtfile::IFileCompression
 {
 public:
 	// reimplemented (imtfile::IFileCompression)

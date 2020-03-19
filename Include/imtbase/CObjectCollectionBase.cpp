@@ -349,7 +349,9 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 						}
 					}
 					else{
-						targetInfoPtr->objectPtr.Reset();
+						if (targetInfoPtr->objectPtr.IsToRelase()){
+							targetInfoPtr->objectPtr.Reset();
+						}
 					}
 				}
 			}
