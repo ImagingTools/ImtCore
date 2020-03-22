@@ -963,24 +963,26 @@ const ibase::IHierarchicalCommand* CDocumentWorkspaceGuiCompBase::Commands::GetC
 
 	if (m_parentPtr->IsGuiCreated()){
 		int tabIndex = m_parentPtr->Tabs->currentIndex();
-		if (tabIndex >= m_parentPtr->m_fixedTabs.count()){
-			QWidget* decoratorPagePtr = m_parentPtr->Tabs->currentWidget();
-			ibase::ICommandsProvider* decoratorPtr = dynamic_cast<ibase::ICommandsProvider*>(decoratorPagePtr);
-			if (decoratorPtr != nullptr){
-				return decoratorPtr->GetCommands();
+		if (tabIndex >= 0){
+			if (tabIndex >= m_parentPtr->m_fixedTabs.count()){
+				QWidget* decoratorPagePtr = m_parentPtr->Tabs->currentWidget();
+				ibase::ICommandsProvider* decoratorPtr = dynamic_cast<ibase::ICommandsProvider*>(decoratorPagePtr);
+				if (decoratorPtr != nullptr){
+					return decoratorPtr->GetCommands();
+				}
+				else{
+					istd::IPolymorphic* viewPtr = m_parentPtr->GetActiveView();
+					ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(viewPtr);
+					if (viewCommandsProviderPtr != nullptr){
+						return viewCommandsProviderPtr->GetCommands();
+					}
+				}
 			}
 			else{
-				istd::IPolymorphic* viewPtr = m_parentPtr->GetActiveView();
-				ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(viewPtr);
+				ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(m_parentPtr->m_fixedTabs[tabIndex]);
 				if (viewCommandsProviderPtr != nullptr){
 					return viewCommandsProviderPtr->GetCommands();
 				}
-			}
-		}
-		else{
-			ibase::ICommandsProvider* viewCommandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(m_parentPtr->m_fixedTabs[tabIndex]);
-			if (viewCommandsProviderPtr != nullptr){
-				return viewCommandsProviderPtr->GetCommands();
 			}
 		}
 	}
