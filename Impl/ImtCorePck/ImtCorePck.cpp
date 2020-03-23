@@ -55,9 +55,14 @@ I_EXPORT_COMPONENT(
 			"Help Path Documentation Localization");
 
 I_EXPORT_COMPONENT(
-	CompositeObjectPersistence,
-	"Localization-dependant help path provider",
-	"Object Collection Composite Persistence Bundle");
+			CompositeObjectPersistence,
+			"Localization-dependant help path provider",
+			"Object Collection Composite Persistence Bundle");
+
+I_EXPORT_COMPONENT(
+			ParamsManagerAdapter,
+			"Adapter of object collection to the parameter manager interface",
+			"Object Collection Params Manager Adapter");
 
 
 } // namespace ImtCorePck
