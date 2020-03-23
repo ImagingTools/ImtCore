@@ -53,7 +53,22 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 		return OS_FAILED;
 	}
 
-	const QString contentsFileName = filePath + QDir::separator() + "Contents.xml";
+	QDir tempPath = QDir::temp();
+	QString uuid = QUuid::createUuid().toString();
+
+	if (!tempPath.mkpath(uuid)){
+		return OS_FAILED;
+	}
+
+	if (m_fileCompressionCompPtr.IsValid()){
+		if (!m_fileCompressionCompPtr->DecompressFolder(filePath, tempPath.path())){
+			tempPath.removeRecursively();
+
+			return OS_FAILED;
+		}
+	}
+
+	const QString contentsFileName = tempPath.path() + QDir::separator() + "Contents.xml";
 	ifile::CCompactXmlFileReadArchive xmlArchive;
 	if (!xmlArchive.OpenFile(contentsFileName)){
 		return OS_FAILED;
@@ -85,7 +100,7 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 			return OS_FAILED;
 		}
 
-		int status = persistencePtr->LoadFromFile(*objectPtr, filePath + QDir::separator() + elementInfo.fileName);
+		int status = persistencePtr->LoadFromFile(*objectPtr, tempPath.path() + QDir::separator() + elementInfo.fileName);
 		if (status != ifile::IFilePersistence::OS_OK){
 			return OS_FAILED;
 		}
@@ -188,31 +203,6 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 				tempPath.removeRecursively();
 
 				return OS_OK;
-			}
-		}
-		else {
-			QDir destinationPath(filePath);
-			if (destinationPath.removeRecursively()){
-				if (destinationPath.mkpath(".")){
-					bool isCopyOk = true;
-
-					for (const QString& fileName : tempPath.entryList(QDir::Files)){
-						QString sourceFilePath = tempPath.path() + QDir::separator() + fileName;
-						QString targetFilePath = destinationPath.path() + QDir::separator() + fileName;
-
-						if (!QFile::copy(sourceFilePath, targetFilePath)){
-							isCopyOk = false;
-
-							break;
-						}
-					}
-
-					if (isCopyOk){
-						tempPath.removeRecursively();
-
-						return OS_OK;
-					}
-				}
 			}
 		}
 	}
