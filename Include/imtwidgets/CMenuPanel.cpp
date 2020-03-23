@@ -514,6 +514,12 @@ void CMenuPanel::CollapsePanelImmideatly()
 		PageTree->setMaximumWidth(m_minWidth);
 	}
 
+	for (int i = 0; i < m_model.rowCount(); i++){
+		if (m_model.item(i)->hasChildren()){
+			m_model.item(i)->setData(true, DR_PAGE_HIDDEN_WHILE_COLLAPSED);
+		}
+	}
+
 	m_delegatePtr->setProperty("indent", 0);
 }
 
