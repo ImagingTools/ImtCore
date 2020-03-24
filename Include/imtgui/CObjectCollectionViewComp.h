@@ -184,7 +184,7 @@ private:
 
 	QStandardItemModel m_itemModel;
 
-	CObjectCollectionViewDelegate m_defaultViewDelegate;
+	imod::TModelWrap<CObjectCollectionViewDelegate> m_defaultViewDelegate;
 
 	typedef QMap<QByteArray, ICollectionViewDelegate*> ViewDelegateMap;
 	ViewDelegateMap m_viewDelegateMap;
