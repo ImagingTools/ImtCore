@@ -40,10 +40,10 @@ IDocumentViewDecorator* CDocumentWorkspaceGuiComp::CreateDocumentViewDecorator(
 
 QString CDocumentWorkspaceGuiComp::GetSaveFilePath(const QByteArray& documentTypeId, const istd::IChangeable* dataObjectPtr, const QString& /*currentFilePath*/) const
 {
-	QInputDialog resourceNameDialog(GetWidget());
+	QInputDialog nameDialog(GetWidget());
 
 	bool isAccepted;
-	QString resourceName = resourceNameDialog.getText(GetWidget(), tr("Document Name"), tr("Please enter the name of the document:"), QLineEdit::Normal, QString(), &isAccepted);
+	QString resourceName = nameDialog.getText(GetWidget(), tr("Document Name"), tr("Please enter the name of the document:"), QLineEdit::Normal, QString(), &isAccepted);
 	if (!isAccepted){
 		return QString();
 	}

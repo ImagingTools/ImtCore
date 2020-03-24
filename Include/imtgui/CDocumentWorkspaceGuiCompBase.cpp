@@ -10,8 +10,6 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QTabBar>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QInputDialog>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
