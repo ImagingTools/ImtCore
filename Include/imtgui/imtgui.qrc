@@ -132,6 +132,7 @@
         <file alias="Three">Resources/Icons/Color/Three.svg</file>
         <file alias="Two">Resources/Icons/Color/Two.svg</file>
         <file alias="Five">Resources/Icons/Color/Five.svg</file>
+        <file alias="Results">Resources/Icons/Color/Results.svg</file>
     </qresource>
     <qresource prefix="/Styles">
         <file alias="ImtLightStyle">Resources/Styles/ImtLightStyle.css</file>
