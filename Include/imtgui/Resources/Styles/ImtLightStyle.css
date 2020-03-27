@@ -22,11 +22,9 @@ QSplashScreen > QWidget
 
 QSplashScreen > QWidget > QLabel 
 {
-
 	color: yellow;
 
 	background: transparent;
-
 }
 
 QWidget#MainVersionTitleLabel, QWidget#MainVersionLabel
@@ -40,15 +38,12 @@ QSplashScreen > QWidget#CopyrightLabel
     color: yellow;
 }
 
-QWidget#PageTree 
-{
-    /*    background-image: url(:/Style/ImtLight/Images/PanelBackground);
-    background-repeat: repeat-xy;*/
-    background-color: rgb(205,205,207);
 
-/*    background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 rgb(227,227,229), stop: 0.9 rgb(212,212,214), stop: 0.97 rgb(212,212,214), stop: 1.0 rgb(190,190,192));*/
-    border-right: 1px solid rgb(180,180,182);
+QWidget#PageTree {
+    background-color: palette(window);
+/*    border-right: 1px solid rgb(200,200,202);*/
 }
+
 
 QWidget#BottomFrame
 {
@@ -158,8 +153,8 @@ QToolBar[ImtToolBar=true]
 
 QTableView[ImtMenu=true]
 {
-	color: qpalette(background);
-	background: qpalette(background);
+	color: palette(background);
+	background: palette(background);
 	font-weight: bold;
 	text-align: center;
 }
