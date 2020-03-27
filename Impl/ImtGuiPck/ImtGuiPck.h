@@ -18,6 +18,7 @@
 #include <imtgui/CMenuPanelComp.h>
 #include <imtgui/CMonitorInfoProviderComp.h>
 #include <imtgui/CLayoutManagerComp.h>
+#include <imtgui/CCompositeObjectViewComp.h>
 
 
 /**
@@ -39,6 +40,7 @@ typedef imtgui::CDelegatedCommandsProviderComp DelegatedCommandsProvider;
 typedef imtgui::CMenuPanelComp MenuPanel;
 typedef icomp::TModelCompWrap<imtgui::CMonitorInfoProviderComp> MonitorInfoProvider;
 typedef imtgui::CLayoutManagerComp LayoutManager;
+typedef imtgui::CCompositeObjectViewComp CompositeObjectView;
 
 
 } // namespace ImtGuiPck

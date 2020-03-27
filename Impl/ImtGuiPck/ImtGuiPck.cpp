@@ -77,6 +77,12 @@ I_EXPORT_COMPONENT(
 			"LayoutManager component",
 			"LayoutManager page");
 
+I_EXPORT_COMPONENT(
+			CompositeObjectView,
+			"Composite object viewer",
+			"Composite Object View Observer Collection");
+
+
 } // namespace ImtGuiPck
 
 
