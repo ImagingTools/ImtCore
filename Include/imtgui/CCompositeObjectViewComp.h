@@ -1,20 +1,17 @@
 #pragma once
 
-// Qt includes
-#include <QtCore/QVector>
 
-// ACF includes
+#include <GeneratedFiles/imtgui/ui_CCompositeObjectViewComp.h>
+
+// Acf includes
 #include <ibase/ICommandsProvider.h>
 #include <imod/CModelProxy.h>
+#include <iqtgui/CHierarchicalCommand.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <iqtgui/TRestorableGuiWrap.h>
-#include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-
-// Acula includes
-#include <GeneratedFiles/imtgui/ui_CCompositeObjectViewComp.h>
 
 
 namespace imtgui
@@ -54,8 +51,8 @@ protected:
 	virtual void OnSaveSettings(QSettings& settings) const override;
 
 private:
-	void InitCompositeGui();
-	void UnInitCompositeGui();
+	void CreateView();
+	void DestroyView();
 
 private:
 	iqtgui::CHierarchicalCommand m_rootCommands;
