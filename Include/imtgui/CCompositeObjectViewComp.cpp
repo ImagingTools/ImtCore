@@ -120,6 +120,7 @@ void CCompositeObjectViewComp::CreateView()
 
 				QWidget* widgetPtr = new QWidget();
 				QVBoxLayout* layoutPtr = new QVBoxLayout(widgetPtr);
+				layoutPtr->setContentsMargins(0, 0, 0, 0);
 				widgetPtr->setLayout(layoutPtr);
 				GetQtWidget()->layout()->addWidget(widgetPtr);
 				viewPtr->CreateGui(widgetPtr);

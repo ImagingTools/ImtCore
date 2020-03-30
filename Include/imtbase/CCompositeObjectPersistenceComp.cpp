@@ -152,6 +152,7 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 		}
 
 		QByteArray typeId = documentPtr->GetElementInfo(objectId, imtbase::IObjectCollection::EIT_TYPE_ID).toByteArray();
+		QString name = documentPtr->GetElementInfo(objectId, imtbase::IObjectCollection::EIT_NAME).toByteArray();
 
 		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(typeId);
 		if (persistencePtr == nullptr){
@@ -167,7 +168,7 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 		QStringList extensions;
 		persistencePtr->GetFileExtensions(extensions);
 
-		QString objectFileName(objectId);
+		QString objectFileName(name + "_" + objectId);
 		if (extensions.count() > 0){
 			objectFileName.append(QString(".%1").arg(extensions[0]));
 		}

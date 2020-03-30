@@ -139,7 +139,7 @@ QAbstractItemView[TabSimulation=true]
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <property name="spacing">
-      <number>6</number>
+      <number>0</number>
      </property>
      <item>
       <widget class="QFrame" name="LeftFrame">
@@ -162,6 +162,9 @@ QAbstractItemView[TabSimulation=true]
         <enum>QFrame::Raised</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <property name="leftMargin">
          <number>0</number>
         </property>

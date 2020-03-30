@@ -1,8 +1,6 @@
 #pragma once
 
 
-#include <GeneratedFiles/imtgui/ui_CCompositeObjectViewComp.h>
-
 // Acf includes
 #include <ibase/ICommandsProvider.h>
 #include <imod/CModelProxy.h>
@@ -12,6 +10,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <GeneratedFiles/imtgui/ui_CCompositeObjectViewComp.h>
 
 
 namespace imtgui
