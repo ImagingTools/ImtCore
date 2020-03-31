@@ -44,7 +44,7 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	imtbase::IObjectCollection* documentPtr = const_cast<imtbase::IObjectCollection*>(dynamic_cast<const imtbase::IObjectCollection*>(&data));
+	imtbase::IObjectCollection* documentPtr = dynamic_cast<imtbase::IObjectCollection*>(const_cast<istd::IChangeable*>(&data));
 	if (documentPtr == nullptr){
 		return OS_FAILED;
 	}
@@ -115,7 +115,7 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	imtbase::IObjectCollection* documentPtr = const_cast<imtbase::IObjectCollection*>(dynamic_cast<const imtbase::IObjectCollection*>(&data));
+	imtbase::IObjectCollection* documentPtr = dynamic_cast<imtbase::IObjectCollection*>(const_cast<istd::IChangeable*>(&data));
 	if (documentPtr == nullptr){
 		return OS_FAILED;
 	}
