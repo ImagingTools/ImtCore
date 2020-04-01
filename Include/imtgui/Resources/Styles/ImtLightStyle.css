@@ -40,7 +40,7 @@ QSplashScreen > QWidget#CopyrightLabel
 
 
 QWidget#PageTree {
-    background-color: palette(window);
+    background-color: palette(midlight);
 /*    border-right: 1px solid rgb(200,200,202);*/
 }
 
