@@ -56,8 +56,12 @@ protected:
 		QString description;
 	};
 
+protected:
 	const ifile::IFilePersistence* GetFilePersistenceForTypeId(const QByteArray& typeId) const;
 	bool SerializeBundleMetaInfo(QVector<BundleElementInfo>& contentMetaInfo, iser::IArchive& archive) const;
+
+	virtual bool LoadAdditionalData(istd::IChangeable& data, const QString& path) const;
+	virtual bool SaveAdditionalData(const istd::IChangeable& data, const QString& path) const;
 
 private:
 	I_REF(imtfile::IFileCompression, m_fileCompressionCompPtr);

@@ -44,7 +44,7 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	imtbase::IObjectCollection* documentPtr = dynamic_cast<imtbase::IObjectCollection*>(const_cast<istd::IChangeable*>(&data));
+	imtbase::IObjectCollection* documentPtr = dynamic_cast<imtbase::IObjectCollection*>(&data);
 	if (documentPtr == nullptr){
 		return OS_FAILED;
 	}
@@ -60,6 +60,8 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 		return OS_FAILED;
 	}
 
+	tempPath.cd(uuid);
+
 	if (m_fileCompressionCompPtr.IsValid()){
 		if (!m_fileCompressionCompPtr->DecompressFolder(filePath, tempPath.path())){
 			tempPath.removeRecursively();
@@ -71,40 +73,56 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 	const QString contentsFileName = tempPath.path() + QDir::separator() + "Contents.xml";
 	ifile::CCompactXmlFileReadArchive xmlArchive;
 	if (!xmlArchive.OpenFile(contentsFileName)){
+		tempPath.removeRecursively();
+
 		return OS_FAILED;
 	}
 
 	QVector<BundleElementInfo> contentMetaInfo;
 	if (!SerializeBundleMetaInfo(contentMetaInfo, xmlArchive)){
+		tempPath.removeRecursively();
+
 		return OS_FAILED;
 	}
 
 	for (const BundleElementInfo& elementInfo : contentMetaInfo){
 		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(elementInfo.typeId);
 		if (persistencePtr == nullptr){
+			tempPath.removeRecursively();
+
 			return OS_FAILED;
 		}
 		
 		istd::IChangeable* objectPtr = const_cast<istd::IChangeable*>(documentPtr->GetObjectPtr(elementInfo.id));
 		if (objectPtr == nullptr){
 			if ((documentPtr->GetOperationFlags() & imtbase::IObjectCollection::OF_SUPPORT_INSERT) == 0){
+				tempPath.removeRecursively();
+
 				return OS_FAILED;
 			}
 
-			QByteArray id = documentPtr->InsertNewObject(elementInfo.typeId, elementInfo.name, elementInfo.description);
+			QByteArray id = documentPtr->InsertNewObject(elementInfo.typeId, elementInfo.name, elementInfo.description, nullptr, elementInfo.id);
 
 			objectPtr = const_cast<istd::IChangeable*>(documentPtr->GetObjectPtr(id));
 		}
 	
 		if (objectPtr == nullptr){
+			tempPath.removeRecursively();
+
 			return OS_FAILED;
 		}
 
 		int status = persistencePtr->LoadFromFile(*objectPtr, tempPath.path() + QDir::separator() + elementInfo.fileName);
 		if (status != ifile::IFilePersistence::OS_OK){
+			tempPath.removeRecursively();
+
 			return OS_FAILED;
 		}
 	}
+
+	LoadAdditionalData(data, tempPath.path());
+
+	tempPath.removeRecursively();
 
 	return OS_OK;
 }
@@ -115,7 +133,7 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	imtbase::IObjectCollection* documentPtr = dynamic_cast<imtbase::IObjectCollection*>(const_cast<istd::IChangeable*>(&data));
+	const imtbase::IObjectCollection* documentPtr = dynamic_cast<const imtbase::IObjectCollection*>(&data);
 	if (documentPtr == nullptr){
 		return OS_FAILED;
 	}
@@ -123,7 +141,6 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 	if (!m_objectTypeIdsAttrPtr.IsValid() || !m_objectPresistencesCompPtr.IsValid()){
 		return OS_FAILED;
 	}
-
 
 	QDir tempPath = QDir::temp();
 	QString uuid = QUuid::createUuid().toString();
@@ -199,6 +216,8 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 	bool bundleInfoWritten = SerializeBundleMetaInfo(contentMetaInfo, xmlArchive);
 
 	xmlArchive.Flush();
+
+	SaveAdditionalData(data, tempPath.path());
 
 	if (bundleInfoWritten){
 		if (m_fileCompressionCompPtr.IsValid()){
@@ -317,6 +336,18 @@ bool CCompositeObjectPersistenceComp::SerializeBundleMetaInfo(QVector<BundleElem
 	retVal = retVal && archive.EndTag(objectListTag);
 
 	return retVal;
+}
+
+
+bool CCompositeObjectPersistenceComp::LoadAdditionalData(istd::IChangeable& data, const QString& path) const
+{
+	return true;
+}
+
+
+bool CCompositeObjectPersistenceComp::SaveAdditionalData(const istd::IChangeable& data, const QString& path) const
+{
+	return true;
 }
 
 

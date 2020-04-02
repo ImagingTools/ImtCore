@@ -141,9 +141,15 @@ bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(const QByteArr
 		if (m_documentManagerCompPtr->OpenDocument(&objectInfoPtr->typeId, &targetFilePath, true, viewTypeId, &objectInfoPtr->objectPtr)){
 			m_workingObjects.PushBack(objectInfoPtr);
 
+			QDir tempDir(tempPath);
+			tempDir.removeRecursively();
+
 			return true;
 		}
 	}
+
+	QDir tempDir(tempPath);
+	tempDir.removeRecursively();
 
 	return false;
 }
