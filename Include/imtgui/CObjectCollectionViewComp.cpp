@@ -240,11 +240,17 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			foundedTypeIds += itemTypeId;
 
 			QList<QStandardItem*> columns;
-			QStringList metaInfo = GetCollectionItemInfos(itemId, itemTypeId);
+			QVariantList metaInfo = GetCollectionItemInfos(itemId, itemTypeId);
 
 			columns += objectItemPtr;
-			for(QString infoItem : metaInfo){
-				columns += new QStandardItem(infoItem);
+			for(QVariant infoItem : metaInfo){
+				if (infoItem.type() == QVariant::String){
+					columns += new QStandardItem(infoItem.toString());
+				}
+
+				if (infoItem.type() == QVariant::Icon){
+					columns += new QStandardItem(infoItem.value<QIcon>(), "");
+				}
 			}
 
 			m_itemModel.appendRow(columns);
@@ -454,13 +460,13 @@ QStringList CObjectCollectionViewComp::GetMetaInfoHeaders(const QByteArray &type
 }
 
 
-QStringList CObjectCollectionViewComp::GetCollectionItemInfos(const QByteArray &itemId, const QByteArray &typeId) const
+QVariantList CObjectCollectionViewComp::GetCollectionItemInfos(const QByteArray &itemId, const QByteArray &typeId) const
 {
 	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
 	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();
 	QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
 
-	QStringList objectMetaInfo;
+	QVariantList objectMetaInfo;
 
 	for (QByteArray fieldId : fieldIds){
 		QVariant info = viewDelegate.GetSummaryInformation(itemId, fieldId);
@@ -474,6 +480,9 @@ QStringList CObjectCollectionViewComp::GetCollectionItemInfos(const QByteArray &
 			break;
 		case QVariant::DateTime:
 			objectMetaInfo.append(info.toDateTime().toString("dd.MM.yyyy hh:mm:ss"));
+			break;
+		case QVariant::Icon:
+			objectMetaInfo.append(info);
 			break;
 		default:
 			objectMetaInfo.append(QString());

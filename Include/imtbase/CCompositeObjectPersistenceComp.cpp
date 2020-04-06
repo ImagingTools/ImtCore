@@ -120,7 +120,11 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 		}
 	}
 
-	LoadAdditionalData(data, tempPath.path());
+	if (!LoadAdditionalData(data, tempPath.path())) {
+		tempPath.removeRecursively();
+
+		return OS_FAILED;
+	}
 
 	tempPath.removeRecursively();
 
@@ -217,7 +221,7 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 
 	xmlArchive.Flush();
 
-	SaveAdditionalData(data, tempPath.path());
+	bundleInfoWritten &= SaveAdditionalData(data, tempPath.path());
 
 	if (bundleInfoWritten){
 		if (m_fileCompressionCompPtr.IsValid()){
