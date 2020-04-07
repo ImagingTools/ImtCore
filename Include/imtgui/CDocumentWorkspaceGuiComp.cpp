@@ -142,14 +142,6 @@ CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::CollectionDocumentVi
 	m_undoCommand.setShortcut(Qt::CTRL + Qt::Key_Z);
 	m_redoCommand.setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
 
-	const imtgui::IDocumentViewConstraints* viewConstraintsPtr = CompCastPtr<imtgui::IDocumentViewConstraints>(viewPtr);
-	if (viewConstraintsPtr != NULL){
-		imod::IModel* viewModelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(viewConstraintsPtr));
-		if (viewModelPtr != NULL){
-			RegisterModel(viewModelPtr, MI_VIEW_CONSTRAINTS);
-		}
-	}
-
 	idoc::IDocumentMetaInfo* metaInfoPtr = CompCastPtr<idoc::IDocumentMetaInfo>(m_documentData.documentPtr.GetPtr());
 	if (metaInfoPtr != NULL){
 		m_documentName = metaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE).toString();
@@ -175,6 +167,14 @@ CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::CollectionDocumentVi
 	UpdateSaveButtonsStatus();
 
 	m_isInitialized = true;
+
+	const imtgui::IDocumentViewConstraints* viewConstraintsPtr = CompCastPtr<imtgui::IDocumentViewConstraints>(viewPtr);
+	if (viewConstraintsPtr != NULL){
+		imod::IModel* viewModelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(viewConstraintsPtr));
+		if (viewModelPtr != NULL){
+			RegisterModel(viewModelPtr, MI_VIEW_CONSTRAINTS);
+		}
+	}
 
 	imod::IModel* modelPtr = documentData.undoManagerPtr.Cast<imod::IModel*>();
 	if (modelPtr != NULL){
@@ -214,6 +214,14 @@ void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::UpdateSaveButto
 
 	m_saveCommand.setEnabled(isSaveActive);
 	SaveButton->setEnabled(isSaveActive);
+
+	const imtgui::IDocumentViewConstraints* viewConstraintsPtr = CompCastPtr<imtgui::IDocumentViewConstraints>(m_viewObjectPtr);
+	if (viewConstraintsPtr != nullptr){
+		bool isSaveEnabled = viewConstraintsPtr->GetViewConstraints() & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT;
+
+		SaveButton->setVisible(isSaveEnabled);
+		m_saveCommand.setVisible(isSaveEnabled);
+	}
 }
 
 
