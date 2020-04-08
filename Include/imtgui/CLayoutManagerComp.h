@@ -128,6 +128,7 @@ private:
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_commands;
 	iqtgui::CHierarchicalCommand m_startEndEditModeCommand;
+	iqtgui::CHierarchicalCommand m_testCommand;
 
 	typedef istd::TSmartPtr<iqtgui::IGuiObject> GuiObjectDelPtr;
 	typedef QMap<QByteArray, GuiObjectDelPtr> GuiObjectMap;

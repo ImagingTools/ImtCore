@@ -10,10 +10,12 @@ namespace imtgui
 CLayoutManagerComp::CLayoutManagerComp(QWidget* parentPtr)
 	:m_layoutWidgetPtr(NULL),
 	m_commands("&View", 100),
-	m_startEndEditModeCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1988)
+	m_startEndEditModeCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1988),
+	m_testCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1988)
 {
 	m_rootCommands.InsertChild(&m_commands);
 	m_commands.InsertChild(&m_startEndEditModeCommand);
+//	m_commands.InsertChild(&m_testCommand);
 
 	connect(&m_startEndEditModeCommand, SIGNAL(triggered()), this, SLOT(OnStartEndEditCommand()));
 }
@@ -73,8 +75,9 @@ void CLayoutManagerComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
-	// File commands
+	// File commands emptyIcon
 	m_startEndEditModeCommand.SetVisuals(tr("Edit Mode"), tr("Edit Mode"), tr("EditMode"), QIcon(":/Icons/Edit"));
+	m_testCommand.SetVisuals(tr("Test"), tr("Test"), tr("Test"), QIcon(":/Icons/Edit"));
 }
 
 

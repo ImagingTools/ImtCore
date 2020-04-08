@@ -64,6 +64,7 @@ void CHierarchicalLayoutWidget::SetViewMode(ViewMode viewMode)
 			}
 		}
 	}
+	update();
 }
 
 
@@ -278,6 +279,7 @@ void CHierarchicalLayoutWidget::SetSplitterLayout(const QByteArray& id, Qt::Orie
 	if (m_customWidgetMap.contains(id) && (internalItemDataPtr != NULL)){
 		m_customWidgetMap[id]->setLayout(new QVBoxLayout(m_customWidgetMap[id]));
 		m_customWidgetMap[id]->layout()->setMargin(0);
+		m_customWidgetMap[id]->SetIsHaveChilds(true);
 
 		internalItemDataPtr->layoutType = orientation == Qt::Horizontal ? LT_HORIZONTAL_SPLITTER : LT_VERTICAL_SPLITTER;
 
@@ -408,7 +410,10 @@ CCustomLayoutWidget::CCustomLayoutWidget(const QByteArray& id, CHierarchicalLayo
 	m_hierarchicalLayoutWidget(hierarchicalLayoutWidget),
 	m_parentCustomWidgetPtr(parentCustomWidgetPtr),
 	m_id(id),
-	m_externalWidgetPtr(NULL)
+	m_externalWidgetPtr(NULL),
+	m_name("No name"),
+	m_titleSize(30),
+	m_isHaveChilds(false)
 {
 	setAutoFillBackground(true);
 	SetDefaultPalette();
@@ -449,6 +454,9 @@ bool CCustomLayoutWidget::SetWidget(QWidget* widgetPtr)
 		}
 
 		if (layout()->count() == 0){
+			QWidget *widget = new QWidget();
+			widget->setFixedSize(m_titleSize, m_titleSize);
+			layout()->addWidget(widget);
 			layout()->addWidget(widgetPtr);
 			m_externalWidgetPtr = widgetPtr;
 			return true;
@@ -472,19 +480,45 @@ bool CCustomLayoutWidget::SetWidget(QWidget* widgetPtr)
 }
 
 
+void CCustomLayoutWidget::SetIsHaveChilds(bool source)
+{
+	m_isHaveChilds = source;
+}
+
+
 // protected methods
 
 // reimplemented (QWidget)
 
 void CCustomLayoutWidget::paintEvent(QPaintEvent* eventPtr)
 {
+	if (m_isHaveChilds == true)
+		return;
 	QPainter painter(this);
-	painter.save();
-	painter.setOpacity(0.7);
-	painter.setPen(QPen(QColor("green")));
-	painter.setBrush(palette().color(QPalette::Background));
-	painter.drawRect(QRect(eventPtr->rect().adjusted(0, 0, -1, -1)));
-	painter.restore();
+	if ( m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT) {
+		painter.save();
+		painter.setOpacity(0.7);
+		painter.setPen(QPen(QColor("green")));
+	//	painter.setBrush(palette().color(QPalette::Background));
+		painter.drawRect(rect().adjusted(0, 0, -1, -1));
+		QRect r;
+		r.setWidth(rect().width());
+		r.setHeight(m_titleSize);
+		painter.drawRect(r);
+		r.setLeft(rect().right() - m_titleSize);
+		r.setTop(rect().top());
+		r.setWidth(m_titleSize);
+		r.setHeight(m_titleSize);
+		painter.drawRect(r);
+		painter.restore();
+	}
+	QFont font = painter.font();
+	font.setPixelSize(m_titleSize * 0.8);
+	painter.setFont(font);
+
+	const QRect rectangle = QRect(0, 0, rect().width(), 50);
+	QRect boundingRect;
+	painter.drawText(rectangle, Qt::AlignHCenter, m_name, &boundingRect);
 }
 
 
@@ -533,7 +567,9 @@ void CCustomLayoutWidget::dropEvent(QDropEvent *eventPtr)
 void CCustomLayoutWidget::mouseReleaseEvent(QMouseEvent *eventPtr)
 {
 	//m_hierarchicalLayoutWidget.OnMouseReleaseEvent(m_id, eventPtr);
-	m_hierarchicalLayoutWidget.EmitOpenMenuEvent(m_id, eventPtr);
+	if (eventPtr->x() > rect().width() - m_titleSize && eventPtr->y() < m_titleSize) {
+		m_hierarchicalLayoutWidget.EmitOpenMenuEvent(m_id, eventPtr);
+	}
 }
 
 

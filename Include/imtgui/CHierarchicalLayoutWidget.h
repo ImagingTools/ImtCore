@@ -28,6 +28,7 @@ public:
 	void SetDefaultPalette();
 	void SetHighLightPalette();
 	bool SetWidget(QWidget* widgetPtr);
+	void SetIsHaveChilds(bool source);
 
 protected:
 	// reimplemented (QWidget)
@@ -45,6 +46,9 @@ private:
 	CCustomLayoutWidget* m_parentCustomWidgetPtr;
 	QByteArray m_id;
 	QWidget* m_externalWidgetPtr;
+	QString m_name;
+	int m_titleSize;
+	bool m_isHaveChilds;
 };
 
 
