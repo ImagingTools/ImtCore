@@ -14,6 +14,65 @@ namespace imtgui
 
 // protected methods
 
+void CFileCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
+{
+	idoc::IDocumentMetaInfo* metaInfoPtr = GetObservedObject();
+	Q_ASSERT(metaInfoPtr != nullptr);
+
+	idoc::IDocumentMetaInfo::MetaInfoTypes types = metaInfoPtr->GetMetaInfoTypes();
+	for (int type : types){
+		QString name = metaInfoPtr->GetMetaInfoName(type);
+		if (name.isEmpty()){
+			continue;
+		}
+
+		QString textValue;
+		QVariant value = metaInfoPtr->GetMetaInfo(type);
+		switch (value.type()){
+		case QVariant::String:
+			textValue = value.toString();
+			break;
+		case QVariant::DateTime:
+			textValue = value.toDateTime().toString(Qt::DefaultLocaleShortDate);
+			break;
+		case QVariant::ByteArray:
+			textValue = value.toByteArray();
+			break;
+		}
+
+		switch (type){
+		case idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM:
+			textValue = QString("%1").arg(value.toLongLong(), 8, 16, QChar('0')).toUpper();
+			break;
+
+		case imtbase::IFileObjectCollection::MIT_PREVIEW_THUMBNAIL:
+			QPixmap pixmap;
+			pixmap.convertFromImage(value.value<QImage>());
+			PreviewPixmap->setPixmap(pixmap.scaledToWidth(250));
+			PreviewFrame->show();
+			break;
+		}
+
+		if (type != imtbase::IFileObjectCollection::MIT_PREVIEW_THUMBNAIL){
+			QLabel* labelNamePtr = new QLabel(name, GetWidget());
+			labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: #88b8e3");
+
+			QLabel* labelValuePtr = new QLabel(textValue, GetWidget());
+			labelValuePtr->setWordWrap(true);
+
+			layoutPtr->addWidget(labelNamePtr, layoutPtr->rowCount(), 0, 1, 1);
+			if (labelValuePtr != nullptr){
+				labelValuePtr->setStyleSheet("font-size: 9px; color: gray");
+				layoutPtr->addWidget(labelValuePtr, layoutPtr->rowCount(), 0, 1, 1);
+			}
+		}
+
+		QSpacerItem* delimeter = new QSpacerItem(10, 5);
+		layoutPtr->addItem(delimeter, layoutPtr->rowCount(), 0, 1, 1);
+	}
+}
+
+
 // reimplemented (iqtgui::TGuiObserverWrap)
 
 void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
@@ -24,59 +83,7 @@ void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeS
 
 	QGridLayout* layoutPtr = dynamic_cast<QGridLayout*>(InfoWidget->layout());
 	if (layoutPtr != nullptr){
-		idoc::IDocumentMetaInfo* metaInfoPtr= GetObservedObject();
-		Q_ASSERT(metaInfoPtr != nullptr);
-
-		idoc::IDocumentMetaInfo::MetaInfoTypes types = metaInfoPtr->GetMetaInfoTypes();
-		for (int type : types){
-			QString name = metaInfoPtr->GetMetaInfoName(type);
-			if (name.isEmpty()){
-				continue;
-			}
-
-			QString textValue;
-			QVariant value = metaInfoPtr->GetMetaInfo(type);
-			switch (value.type()){
-			case QVariant::String:
-				textValue = value.toString();
-				break;
-			case QVariant::DateTime:
-				textValue = value.toDateTime().toString(Qt::DefaultLocaleShortDate);
-				break;
-			case QVariant::ByteArray:
-				textValue = value.toByteArray();
-				break;
-			}
-
-			switch (type){
-			case idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM:
-				textValue = QString("%1").arg(value.toLongLong(), 8, 16, QChar('0')).toUpper();
-				break;
-
-			case imtbase::IFileObjectCollection::MIT_PREVIEW_THUMBNAIL:
-				pixmap.convertFromImage(value.value<QImage>());
-				PreviewPixmap->setPixmap(pixmap.scaledToWidth(250));
-				PreviewFrame->show();
-				break;
-			}
-
-			if (type != imtbase::IFileObjectCollection::MIT_PREVIEW_THUMBNAIL){
-				QLabel* labelNamePtr = new QLabel(name, GetWidget());
-				labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: #88b8e3");
-
-				QLabel* labelValuePtr = new QLabel(textValue, GetWidget());
-				labelValuePtr->setWordWrap(true);
-
-				layoutPtr->addWidget(labelNamePtr, layoutPtr->rowCount(), 0, 1, 1);
-				if (labelValuePtr != nullptr){
-					labelValuePtr->setStyleSheet("font-size: 9px; color: gray");
-					layoutPtr->addWidget(labelValuePtr, layoutPtr->rowCount(), 0, 1, 1);
-				}
-			}
-
-			QSpacerItem* delimeter = new QSpacerItem(10, 5);
-			layoutPtr->addItem(delimeter, layoutPtr->rowCount(), 0, 1, 1);
-		}
+		FillWidget(layoutPtr);
 
 		layoutPtr->setColumnMinimumWidth(0, 10);
 		layoutPtr->setColumnStretch(0, 1);

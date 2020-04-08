@@ -29,6 +29,8 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	virtual void FillWidget(QGridLayout* layoutPtr);
+
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelDetached() override;
@@ -36,7 +38,7 @@ protected:
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiRetranslate() override;
- };
+};
 
 
 } // namespace imtgui
