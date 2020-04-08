@@ -205,11 +205,21 @@ void CObjectCollectionViewDelegate::SetupCommands()
 	connect(&m_duplicateCommand, SIGNAL(triggered()), this, SLOT(OnDuplicate()));
 	connect(&m_removeCommand, SIGNAL(triggered()), this, SLOT(OnRemove()));
 
-	m_editCommands.InsertChild(&m_insertCommand);
-	m_editCommands.InsertChild(&m_removeCommand);
-	m_editCommands.InsertChild(&m_duplicateCommand);
+	if (IsCommandSupported(CI_INSERT)){
+		m_editCommands.InsertChild(&m_insertCommand);
+	}
 
-	m_rootCommands.InsertChild(&m_editCommands);
+	if (IsCommandSupported(CI_REMOVE)){
+		m_editCommands.InsertChild(&m_removeCommand);
+	}
+
+	if (IsCommandSupported(CI_DUPLICATE)){
+		m_editCommands.InsertChild(&m_duplicateCommand);
+	}
+
+	if (IsCommandSupported(CI_EDIT)){
+		m_rootCommands.InsertChild(&m_editCommands);
+	}
 }
 
 
@@ -245,6 +255,13 @@ void CObjectCollectionViewDelegate::OnLanguageChanged()
 	m_insertCommand.SetVisuals(tr("Insert"), tr("New"), tr("Insert new document into the collection"), QIcon(":/Icons/Add"));
 	m_duplicateCommand.SetVisuals(tr("Dupplicate"), tr("Dupplicate"), tr("Duplicate selected objects"), QIcon(":/Icons/Duplicate"));
 	m_removeCommand.SetVisuals(tr("Remove"), tr("Remove"), tr("Remove selected document from the collection"), QIcon(":/Icons/Delete"));
+}
+
+
+// reimplemented (imtgui::ICollectionViewDelegate)
+bool CObjectCollectionViewDelegate::IsCommandSupported(int commandId) const
+{
+	return true;
 }
 
 

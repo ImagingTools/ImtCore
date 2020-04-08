@@ -105,8 +105,13 @@ void CFileObjectCollectionViewDelegate::SetupCommands()
 		connect(&m_importCommand, SIGNAL(triggered()), this, SLOT(OnImport()));
 		connect(&m_exportCommand, SIGNAL(triggered()), this, SLOT(OnExport()));
 
-		m_editCommands.InsertChild(&m_importCommand);
-		m_editCommands.InsertChild(&m_exportCommand);
+		if (IsCommandSupported(CI_IMPORT)){
+			m_editCommands.InsertChild(&m_importCommand);
+		}
+
+		if (IsCommandSupported(CI_EXPORT)){
+			m_editCommands.InsertChild(&m_exportCommand);
+		}
 	}
 }
 
@@ -119,6 +124,13 @@ void CFileObjectCollectionViewDelegate::OnLanguageChanged()
 
 	m_importCommand.SetVisuals(tr("Import from File..."), tr("Import"), tr("Import existing file into the collection"), QIcon(":/Icons/Load"));
 	m_exportCommand.SetVisuals(tr("Export to File..."), tr("Export"), tr("Export data from the collection to a file"), QIcon(":/Icons/Export"));
+}
+
+
+// reimplemented (imtgui::ICollectionViewDelegate)
+bool CFileObjectCollectionViewDelegate::IsCommandSupported(int commandId) const
+{
+	return BaseClass::IsCommandSupported(commandId);
 }
 
 

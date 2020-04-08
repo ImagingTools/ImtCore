@@ -44,6 +44,11 @@ public:
 		VS_EDITOR_AVAILABLE = 2
 	};
 
+	enum CommandIdentifier
+	{
+		CI_USER = 1000
+	};
+
 	/**
 		Information about an object from the collection used for editing.
 	*/
@@ -133,6 +138,9 @@ public:
 		\sa UpdateItemSelection
 	*/
 	virtual iqtgui::IGuiObject* GetInformationView() const = 0;
+
+protected:
+	virtual bool IsCommandSupported(int commandId) const = 0;
 };
 
 

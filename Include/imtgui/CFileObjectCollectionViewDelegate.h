@@ -22,6 +22,14 @@ class CFileObjectCollectionViewDelegate: public CObjectCollectionViewDelegate
 public:
 	typedef CObjectCollectionViewDelegate BaseClass;
 
+	enum CommandIdentifier
+	{
+		CI_IMPORT = BaseClass::CI_USER,
+		CI_EXPORT,
+
+		CI_USER = BaseClass::CI_USER + 100
+	};
+
 	CFileObjectCollectionViewDelegate();
 
 	// reimplemented (ICollectionViewDelegate)
@@ -36,6 +44,9 @@ protected:
 
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
+
+	// reimplemented (imtgui::ICollectionViewDelegate)
+	bool IsCommandSupported(int commandId) const override;
 
 protected Q_SLOTS:
 	virtual void OnImport();

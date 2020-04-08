@@ -35,6 +35,16 @@ public:
 		CG_EDIT = 2050
 	};
 
+	enum CommandIdentifier
+	{
+		CI_EDIT = BaseClass::CI_USER,
+		CI_INSERT,
+		CI_DUPLICATE,
+		CI_REMOVE,
+
+		CI_USER = BaseClass::CI_USER + 100
+	};
+
 	CObjectCollectionViewDelegate();
 
 	// reimplemented (ICollectionViewDelegate)
@@ -62,6 +72,9 @@ protected:
 
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
+
+	// reimplemented (imtgui::ICollectionViewDelegate)
+	virtual bool IsCommandSupported(int commandId) const override;
 
 protected:
 	class VisualStatus: virtual public iqtgui::IVisualStatus
