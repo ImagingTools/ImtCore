@@ -20,8 +20,14 @@ CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 	m_removeCommand("Remove", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_collectionPtr(nullptr)
 {
-	m_summaryInformationFields.InsertItem(QByteArray("Type"), "Type", "");
-	m_summaryInformationFields.InsertItem(QByteArray("Description"), "Description", "");
+	m_summaryInformationTypes.InsertItem("Name", "Name", "");
+	m_summaryInformationHeaders["Name"] = HeaderInfo();
+
+	m_summaryInformationTypes.InsertItem("Type", "Type", "");
+	m_summaryInformationHeaders["Type"] = HeaderInfo();
+
+	m_summaryInformationTypes.InsertItem("Description", "Description", "");
+	m_summaryInformationHeaders["Description"] = HeaderInfo();
 }
 
 
@@ -152,13 +158,17 @@ bool CObjectCollectionViewDelegate::RenameObject(const QByteArray& objectId, con
 
 const imtbase::ICollectionInfo& CObjectCollectionViewDelegate::GetSummaryInformationTypes() const
 {
-	return m_summaryInformationFields;
+	return m_summaryInformationTypes;
 }
 
 
 QVariant CObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
 {
 	if (m_collectionPtr != nullptr){
+		if (informationId == QByteArray("Name")){
+			return m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME);
+		}
+
 		if (informationId == QByteArray("Type")){
 			return m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_TYPE_NAME);
 		}
@@ -169,6 +179,18 @@ QVariant CObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& 
 	}
 
 	return QVariant();
+}
+
+
+const ICollectionViewDelegate::HeaderInfo* CObjectCollectionViewDelegate::GetSummaryInformationHeaderInfo(const QByteArray& objectId, const QByteArray& informationId) const
+{
+	if (m_collectionPtr != nullptr){
+		if (m_summaryInformationHeaders.contains(informationId)){
+			return &m_summaryInformationHeaders[informationId];
+		}
+	}
+
+	return nullptr;
 }
 
 

@@ -60,6 +60,7 @@ public:
 	virtual bool RenameObject(const QByteArray& objectId, const QString& newName) const override;
 	virtual const imtbase::ICollectionInfo& GetSummaryInformationTypes() const override;
 	virtual QVariant GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
+	virtual const HeaderInfo* GetSummaryInformationHeaderInfo(const QByteArray& objectId, const QByteArray& informationId) const override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
 	virtual iqtgui::IGuiObject* GetInformationView() const override;
 
@@ -115,7 +116,8 @@ protected:
 	imtbase::ICollectionInfo::Ids m_selectedItemIds;
 	QByteArray m_selectedTypeId;
 
-	imtbase::CCollectionInfo m_summaryInformationFields;
+	imtbase::CCollectionInfo m_summaryInformationTypes;
+	QMap<QByteArray, HeaderInfo> m_summaryInformationHeaders;
 
 	imod::TModelWrap<VisualStatus> m_visualStatus;
 };

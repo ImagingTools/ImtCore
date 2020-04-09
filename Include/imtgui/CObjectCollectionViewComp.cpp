@@ -182,8 +182,7 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	ItemList->setProperty("ItemView", true);
 	TypeList->clear();
 	m_itemModel.clear();
-	m_itemModel.setColumnCount(1);
-	m_itemModel.setHorizontalHeaderLabels(QStringList() << tr("Name"));
+	m_itemModel.setColumnCount(0);
 
 	const iprm::IOptionsList* objectTypeInfoPtr = objectPtr->GetObjectTypesInfo();
 	if (objectTypeInfoPtr != nullptr){
@@ -217,33 +216,13 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			}
 		}
 
-		QSet<QByteArray> foundedTypeIds;
-
 		for (const QByteArray& itemId : collectionItemIds){
 			QByteArray itemTypeId = objectPtr->GetObjectTypeId(itemId);
-
-			QStandardItem* objectItemPtr = new QStandardItem;
-			QString objectName = objectPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_NAME).toString();
-			objectItemPtr->setData(objectName, Qt::DisplayRole);
-			objectItemPtr->setData(objectName, Qt::EditRole);
-			objectItemPtr->setData(itemId, DR_OBJECT_ID);
-			objectItemPtr->setData(objectPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_TYPE_ID), DR_TYPE_ID);
-
-			Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-
-			if (objectPtr->GetSupportedOperations() & imtbase::IObjectCollection::OF_SUPPORT_RENAME){
-				flags |= Qt::ItemIsEditable;
-			}		
-			
-			objectItemPtr->setFlags(flags);
-			
-			foundedTypeIds += itemTypeId;
 
 			QList<QStandardItem*> columns;
 			QVariantList metaInfo = GetCollectionItemInfos(itemId, itemTypeId);
 
-			columns += objectItemPtr;
-			for(QVariant infoItem : metaInfo){
+			for (QVariant infoItem : metaInfo){
 				if (infoItem.type() == QVariant::String){
 					columns += new QStandardItem(infoItem.toString());
 				}
@@ -252,6 +231,15 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 					columns += new QStandardItem(infoItem.value<QIcon>(), "");
 				}
 			}
+
+			Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+			if (objectPtr->GetSupportedOperations() & imtbase::IObjectCollection::OF_SUPPORT_RENAME){
+				flags |= Qt::ItemIsEditable;
+			}
+
+			columns[0]->setData(itemId, DR_OBJECT_ID);
+			columns[0]->setData(objectPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_TYPE_ID), DR_TYPE_ID);
+			columns[0]->setFlags(flags);
 
 			m_itemModel.appendRow(columns);
 		}
@@ -495,6 +483,8 @@ QVariantList CObjectCollectionViewComp::GetCollectionItemInfos(const QByteArray 
 
 void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 {
+	return;
+
 	if (m_blockColumnsSettingsSynchronize){
 		return;
 	}
@@ -531,6 +521,8 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 
 void CObjectCollectionViewComp::RestoreColumnsSettings()
 {
+	return;
+
 	disconnect(ItemList->header(), &QHeaderView::sectionResized, this, &CObjectCollectionViewComp::OnSectionResized);
 	disconnect(ItemList->header(), &QHeaderView::sectionMoved, this, &CObjectCollectionViewComp::OnSectionMoved);
 
@@ -822,7 +814,6 @@ void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 	UpdateCommands();
 	
 	QStringList headerLabels;
-	headerLabels.append(tr("Name"));
 	headerLabels.append(GetMetaInfoHeaders(m_currentTypeId));
 	m_itemModel.setHorizontalHeaderLabels(headerLabels);
 

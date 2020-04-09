@@ -22,11 +22,23 @@ CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
 	:m_importCommand("Import", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_exportCommand("Export", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT)
 {
-	m_summaryInformationFields.ResetData();
-	m_summaryInformationFields.InsertItem(QByteArray("TypeId"), tr("Type"), "");
-	m_summaryInformationFields.InsertItem(QByteArray("Description"), tr("Description"), "");
-	m_summaryInformationFields.InsertItem(QByteArray("ModificationTime"), tr("Last Modified"), "");
-	m_summaryInformationFields.InsertItem(QByteArray("Added"), tr("Added"), "");
+	m_summaryInformationTypes.ResetData();
+	m_summaryInformationHeaders.clear();
+
+	m_summaryInformationTypes.InsertItem("Name", "Name", "");
+	m_summaryInformationHeaders["Name"] = HeaderInfo();
+
+	m_summaryInformationTypes.InsertItem(QByteArray("TypeId"), tr("Type"), "");
+	m_summaryInformationHeaders["TypeId"] = HeaderInfo();
+
+	m_summaryInformationTypes.InsertItem(QByteArray("Description"), tr("Description"), "");
+	m_summaryInformationHeaders["Description"] = HeaderInfo();
+
+	m_summaryInformationTypes.InsertItem(QByteArray("Added"), tr("Added"), "");
+	m_summaryInformationHeaders["Added"] = HeaderInfo();
+
+	m_summaryInformationTypes.InsertItem(QByteArray("ModificationTime"), tr("Last Modified"), "");
+	m_summaryInformationHeaders["ModificationTime"] = HeaderInfo();
 }
 
 
@@ -70,8 +82,8 @@ QVariant CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArr
 	if (fileObjectCollectionPtr != nullptr){
 		idoc::CStandardDocumentMetaInfo metaInfo;
 		if (fileObjectCollectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
-			if (informationId == QByteArray("Added")){
-				return metaInfo.GetMetaInfo(imtbase::IFileObjectCollection::MIT_INSERTION_TIME);
+			if (informationId == QByteArray("Name")){
+				return m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME);
 			}
 
 			if (informationId == QByteArray("TypeId")){
@@ -80,6 +92,10 @@ QVariant CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArr
 
 			if (informationId == QByteArray("Description")){
 				return fileObjectCollectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+			}
+
+			if (informationId == QByteArray("Added")){
+				return metaInfo.GetMetaInfo(imtbase::IFileObjectCollection::MIT_INSERTION_TIME);
 			}
 
 			if (informationId == QByteArray("ModificationTime")){
