@@ -58,29 +58,25 @@ const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const 
 
 void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 {
-	if (!m_settingsValueNameAttrPtr.IsValid()){
+	QByteArray columnSettingsKey = *m_columnSettingsKeyAttrPtr;
+	if (columnSettingsKey.isEmpty()){
 		return;
 	}
 
-	if (*m_settingsValueNameAttrPtr == ""){
-		return;
-	}
-
-	QString key("ObjectCollectionViewColumnsSettings/" + *m_settingsValueNameAttrPtr);
-
+	QString key("ObjectCollectionViewColumnsSettings/" + columnSettingsKey);
 	if (!settings.contains(key)){
 		return;
 	}
-
+	
 	QVariant settingsValue = settings.value(key);
 	if (settingsValue.type() != QVariant::ByteArray){
 		return;
 	}
 
 	QByteArray data = settingsValue.toByteArray();
+
 	QJsonParseError error;
 	QJsonDocument jsonDocument = QJsonDocument::fromJson(data, &error);
-
 	if (jsonDocument.isNull()){
 		return;
 	}
@@ -140,11 +136,8 @@ void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 
 void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 {
-	if (!m_settingsValueNameAttrPtr.IsValid()){
-		return;
-	}
-
-	if (*m_settingsValueNameAttrPtr == ""){
+	QByteArray columnSettingsKey = *m_columnSettingsKeyAttrPtr;
+	if (columnSettingsKey.isEmpty()){
 		return;
 	}
 
@@ -180,7 +173,9 @@ void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 	QByteArray data = jsonDocument.toJson(QJsonDocument::Compact);
 
 	settings.beginGroup("ObjectCollectionViewColumnsSettings");
-	settings.setValue(*m_settingsValueNameAttrPtr, data);
+
+	settings.setValue(columnSettingsKey, data);
+
 	settings.endGroup();
 }
 
