@@ -58,11 +58,21 @@ const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const 
 
 void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 {
-	if (!settings.contains("ObjectCollectionViewColumns/Data")){
+	if (!m_settingsValueNameAttrPtr.IsValid()){
 		return;
 	}
 
-	QVariant settingsValue = settings.value("ObjectCollectionViewColumns/Data");
+	if (*m_settingsValueNameAttrPtr == ""){
+		return;
+	}
+
+	QString key("ObjectCollectionViewColumnsSettings/" + *m_settingsValueNameAttrPtr);
+
+	if (!settings.contains(key)){
+		return;
+	}
+
+	QVariant settingsValue = settings.value(key);
 	if (settingsValue.type() != QVariant::ByteArray){
 		return;
 	}
@@ -130,6 +140,14 @@ void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 
 void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 {
+	if (!m_settingsValueNameAttrPtr.IsValid()){
+		return;
+	}
+
+	if (*m_settingsValueNameAttrPtr == ""){
+		return;
+	}
+
 	EnsureColumnsSettingsSynchronized();
 
 	QJsonDocument jsonDocument;
@@ -161,8 +179,8 @@ void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 
 	QByteArray data = jsonDocument.toJson(QJsonDocument::Compact);
 
-	settings.beginGroup("ObjectCollectionViewColumns");
-	settings.setValue("Data", data);
+	settings.beginGroup("ObjectCollectionViewColumnsSettings");
+	settings.setValue(*m_settingsValueNameAttrPtr, data);
 	settings.endGroup();
 }
 
@@ -483,8 +501,6 @@ QVariantList CObjectCollectionViewComp::GetCollectionItemInfos(const QByteArray 
 
 void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 {
-	return;
-
 	if (m_blockColumnsSettingsSynchronize){
 		return;
 	}
@@ -501,13 +517,9 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 		totalWidth += ItemList->columnWidth(columndIndex);
 	}
 
-	columnSettings["FieldId"] = QString();
-	columnSettings["Width"] = (double)ItemList->columnWidth(0) / totalWidth;
-	columnsList.append(columnSettings);
-
 	for (int i = 0; i < ids.count(); i++){
-		int columndIndex = ItemList->header()->logicalIndex(i + 1);
-		int fieldIndex = columndIndex - 1;
+		int columndIndex = ItemList->header()->logicalIndex(i);
+		int fieldIndex = columndIndex;
 
 		ColumnSettings settings;
 		settings["FieldId"] = QString(ids[fieldIndex]);
@@ -521,15 +533,10 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 
 void CObjectCollectionViewComp::RestoreColumnsSettings()
 {
-	return;
-
 	disconnect(ItemList->header(), &QHeaderView::sectionResized, this, &CObjectCollectionViewComp::OnSectionResized);
 	disconnect(ItemList->header(), &QHeaderView::sectionMoved, this, &CObjectCollectionViewComp::OnSectionMoved);
 
 	bool localBlock = m_blockColumnsSettingsSynchronize;
-	//if (localBlock){
-	//	m_blockColumnsSettingsSynchronize = true;
-	//}
 	m_blockColumnsSettingsSynchronize = true;
 
 	QVector<QByteArray> tempFieldIds = GetMetaInfoIds(m_currentTypeId);
@@ -538,7 +545,6 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 		fieldIds.append(tempFieldId);
 	}
 	QSet<QString> fieldSet = fieldIds.toSet();
-	fieldSet += "";
 
 	// Compare restored column set with actual column set:
 	bool compareOk = true;
@@ -613,7 +619,7 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 				continue;
 			}
 
-			int logicIndex = fieldIds.indexOf(fieldId) + 1;
+			int logicIndex = fieldIds.indexOf(fieldId);
 			ItemList->header()->moveSection(ItemList->header()->visualIndex(logicIndex), currentIndex);
 			fieldSet.remove(fieldId);
 				

@@ -47,6 +47,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
 		I_ASSIGN_MULTI_0(m_viewDelegatesCompPtr, "ViewDelegates", "List of view delegates (corresponding with the object type) used for the collection", false);
 		I_ASSIGN(m_showCommandsToolBarAttrPtr, "ShowToolBar", "If enabled the command tool bar will be shown", true, true);
+		I_ASSIGN(m_settingsValueNameAttrPtr, "SettingsValueName", "Settings value name for storing column settings", true, "");
 	I_END_COMPONENT;
 
 	enum DataRole
@@ -190,6 +191,7 @@ private:
 	ViewDelegateMap m_viewDelegateMap;
 
 	I_ATTR(bool, m_showCommandsToolBarAttrPtr);
+	I_ATTR(QString, m_settingsValueNameAttrPtr);
 
 	/**
 		List of collection view delegates.
