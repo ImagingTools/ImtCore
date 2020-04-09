@@ -37,6 +37,7 @@ public:
 	virtual QByteArray ImportObject(const QByteArray& typeId, const QString& sourcePath = QString()) const override;
 	virtual bool ExportObject(const QByteArray& objectId, const QString& targetPath = QString()) const override;
 	virtual QVariant GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
+	virtual bool IsCommandSupported(int commandId) const override;
 
 protected:
 	// reimplemented (CObjectCollectionViewDelegate)
@@ -44,9 +45,6 @@ protected:
 
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
-
-	// reimplemented (imtgui::ICollectionViewDelegate)
-	bool IsCommandSupported(int commandId) const override;
 
 protected Q_SLOTS:
 	virtual void OnImport();

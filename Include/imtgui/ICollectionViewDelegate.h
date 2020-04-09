@@ -174,7 +174,6 @@ public:
 	*/
 	virtual iqtgui::IGuiObject* GetInformationView() const = 0;
 
-protected:
 	virtual bool IsCommandSupported(int commandId) const = 0;
 };
 

@@ -26,10 +26,10 @@ CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
 	m_summaryInformationHeaders.clear();
 
 	m_summaryInformationTypes.InsertItem("Name", "Name", "");
-	m_summaryInformationHeaders["Name"] = HeaderInfo(false);
+	m_summaryInformationHeaders["Name"] = HeaderInfo();
 
 	m_summaryInformationTypes.InsertItem(QByteArray("TypeId"), tr("Type"), "");
-	m_summaryInformationHeaders["TypeId"] = HeaderInfo(false, 30, 50);
+	m_summaryInformationHeaders["TypeId"] = HeaderInfo();
 
 	m_summaryInformationTypes.InsertItem(QByteArray("Description"), tr("Description"), "");
 	m_summaryInformationHeaders["Description"] = HeaderInfo();
@@ -108,6 +108,12 @@ QVariant CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArr
 }
 
 
+bool CFileObjectCollectionViewDelegate::IsCommandSupported(int commandId) const
+{
+	return BaseClass::IsCommandSupported(commandId);
+}
+
+
 // protected methods
 
 // reimplemented (CFileObjectCollectionViewDelegate)
@@ -140,13 +146,6 @@ void CFileObjectCollectionViewDelegate::OnLanguageChanged()
 
 	m_importCommand.SetVisuals(tr("Import from File..."), tr("Import"), tr("Import existing file into the collection"), QIcon(":/Icons/Load"));
 	m_exportCommand.SetVisuals(tr("Export to File..."), tr("Export"), tr("Export data from the collection to a file"), QIcon(":/Icons/Export"));
-}
-
-
-// reimplemented (imtgui::ICollectionViewDelegate)
-bool CFileObjectCollectionViewDelegate::IsCommandSupported(int commandId) const
-{
-	return BaseClass::IsCommandSupported(commandId);
 }
 
 
