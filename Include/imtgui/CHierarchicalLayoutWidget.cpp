@@ -122,13 +122,13 @@ bool CHierarchicalLayoutWidget::SetWidgetToItem(const QByteArray& id, QWidget* w
 {
 	InternalItemData* internalItemDataPtr = GetInternalItem(id);
 	if (internalItemDataPtr != NULL){
-		if (	((internalItemDataPtr->layoutType == LT_NONE) && (widgetPtr != NULL)) ||
-				(widgetPtr == NULL)){
+		//if (((internalItemDataPtr->layoutType == LT_NONE) && (widgetPtr != NULL)) ||
+		//	(widgetPtr == NULL)){
 			if ((m_customWidgetMap.contains(id)) && m_customWidgetMap[id]->SetWidget(widgetPtr)){
 				internalItemDataPtr->layoutType = (widgetPtr != NULL) ? LT_OBJECT : LT_NONE;
 				return true;
 			}
-		}
+		//}
 	}
 
 	return false;
@@ -275,41 +275,66 @@ void CHierarchicalLayoutWidget::OnSplitterMoved(const QByteArray& id, SizeList s
 
 void CHierarchicalLayoutWidget::SetSplitterLayout(const QByteArray& id, Qt::Orientation orientation, int count, IdsList *idsListPtr)
 {
+	IdsList localIdsList;
 	InternalItemData* internalItemDataPtr = GetInternalItem(id);
-	if (m_customWidgetMap.contains(id) && (internalItemDataPtr != NULL)){
-		m_customWidgetMap[id]->setLayout(new QVBoxLayout(m_customWidgetMap[id]));
-		m_customWidgetMap[id]->layout()->setMargin(0);
-		m_customWidgetMap[id]->SetIsHaveChilds(true);
+	QList<int> sizes;
 
-		internalItemDataPtr->layoutType = orientation == Qt::Horizontal ? LT_HORIZONTAL_SPLITTER : LT_VERTICAL_SPLITTER;
-
-		QSplitter* splitterPtr = new QSplitter(this);
-		splitterPtr->setStyleSheet("QSplitter{background-color: transparent;}");
-		splitterPtr->setOrientation(orientation);
-		m_customWidgetMap[id]->layout()->addWidget(splitterPtr);
-		IdsList localIdsList;
-		for (int i = 0; i < count; ++i){
-			QByteArray newId;
-			if ((idsListPtr != NULL) && (i < idsListPtr->count()) && !idsListPtr->at(i).isEmpty()){
-				newId =  idsListPtr->at(i);
-			}
-			else{
-				newId = QUuid::createUuid().toByteArray();
-			}
-			localIdsList.push_back(newId);
-
-			CCustomLayoutWidget* newItemPtr = new CCustomLayoutWidget(newId, *this, m_customWidgetMap[id], splitterPtr);
-			splitterPtr->addWidget(newItemPtr);
-			m_customWidgetMap.insert(newId, newItemPtr);
-			internalItemDataPtr->childItems << newId;
-			m_internalItemList << InternalItemData(newId);
+	if (m_customWidgetMap.contains(id) && (internalItemDataPtr != NULL)) {
+		QRect rectParent = m_customWidgetMap[id]->geometry();
+		QSplitter* splitterParentPtr = qobject_cast<QSplitter*> (m_customWidgetMap[id]->parent());
+		if (splitterParentPtr == NULL) {
+			splitterParentPtr = new QSplitter(this);
+			splitterParentPtr->setStyleSheet("QSplitter{background-color: transparent;}");
+			splitterParentPtr->setOrientation(orientation);
+			this->layout()->removeWidget(m_customWidgetMap[id]);
+			this->layout()->addWidget(splitterParentPtr);
+			splitterParentPtr->addWidget(m_customWidgetMap[id]);
 		}
-		if (idsListPtr != NULL){
-			idsListPtr->swap(localIdsList);
+		if (splitterParentPtr->orientation() != orientation) {
+			sizes = splitterParentPtr->sizes();
+			QSplitter* splitterPtr = new QSplitter(this);
+			splitterPtr->setStyleSheet("QSplitter{background-color: transparent;}");
+			splitterPtr->setOrientation(orientation);
+			int index = splitterParentPtr->indexOf(m_customWidgetMap[id]);
+			m_customWidgetMap[id]->setParent(NULL);
+			splitterParentPtr->insertWidget(index, splitterPtr);
+			splitterParentPtr->setSizes(sizes);
+			splitterParentPtr = splitterPtr;
+			splitterParentPtr->insertWidget(index, m_customWidgetMap[id]);
 		}
-		connect(splitterPtr, SIGNAL(splitterMoved(int,int)), m_customWidgetMap[id], SLOT(OnSplitterMoved(int,int)));
-		m_customWidgetMap[id]->setAcceptDrops(false);
+
+		int index = splitterParentPtr->indexOf(m_customWidgetMap[id]);
+		if (index < 0) {
+			index = 0;
+		}
+		QByteArray newId;
+		if ((idsListPtr != NULL) && (0 < idsListPtr->count()) && !idsListPtr->at(0).isEmpty()) {
+			newId = idsListPtr->at(0);
+		}
+		else {
+			newId = QUuid::createUuid().toByteArray();
+		}
+		localIdsList.push_back(newId);
+		CCustomLayoutWidget* newItemPtr = new CCustomLayoutWidget(newId, *this, m_customWidgetMap[id], splitterParentPtr);
+		splitterParentPtr->insertWidget(index, newItemPtr);
+		int size = 0;
+		
+		if (orientation == Qt::Horizontal) {
+			size = rectParent.width() / splitterParentPtr->count();
+		}
+		else {
+			size = rectParent.height() / splitterParentPtr->count();
+		}
+		for (int i = 0; i < splitterParentPtr->count(); i++) {
+			sizes << size;
+		}
+		splitterParentPtr->setSizes(sizes);
+		qDebug() << newItemPtr->geometry() << splitterParentPtr->geometry() << splitterParentPtr->sizes();
+		m_customWidgetMap.insert(newId, newItemPtr);
+		internalItemDataPtr->childItems << newId;
+		m_internalItemList << InternalItemData(newId);
 	}
+
 }
 
 
@@ -344,6 +369,61 @@ void CHierarchicalLayoutWidget::MergeLayout(const QByteArray& id)
 			delete layoutPtr;
 		}
 	}
+}
+
+
+void CHierarchicalLayoutWidget::RemoveLayout(const QByteArray& id)
+{
+
+	InternalItemData* internalItemDataPtr = GetInternalItem(id);
+	if ((internalItemDataPtr != NULL) && m_customWidgetMap.contains(id)) {
+		QSplitter* splitterPtr = qobject_cast<QSplitter*> (m_customWidgetMap[id]->parent());
+		if (splitterPtr != NULL)
+		{
+			m_customWidgetMap[id]->setParent(NULL);
+			if (splitterPtr->count() == 1) {
+				QSplitter* splitterParentPtr = qobject_cast<QSplitter*> (splitterPtr->parent());
+				if (splitterParentPtr != NULL) {
+					int index = splitterParentPtr->indexOf(splitterPtr);
+					QWidget *widget = splitterPtr->widget(0);
+					QSize size = widget->size();
+					splitterParentPtr->insertWidget(index,widget);
+					
+				}
+				else {
+					QWidget *widget = splitterPtr->widget(0);
+					widget->setParent(NULL);
+				//	CleanLayoutRecursive(this->layout());
+					this->layout()->addWidget(widget);
+				}
+				delete splitterPtr;
+			}
+			CleanLayoutRecursive(m_customWidgetMap[id]->layout());
+			m_customWidgetMap[id]->deleteLater();
+			m_customWidgetMap.remove(id);
+			m_internalItemList.removeAll(InternalItemData(id));
+		}
+
+	}
+
+}
+
+
+void CHierarchicalLayoutWidget::SetName(const QByteArray& id, QString &name)
+{
+	if (m_customWidgetMap.contains(id)) {
+		m_customWidgetMap[id]->SetName(name);
+	}
+}
+
+
+QString CHierarchicalLayoutWidget::GetName(const QByteArray& id)
+{
+	QString name;
+	if (m_customWidgetMap.contains(id)) {
+		name = m_customWidgetMap[id]->GetName();
+	}
+	return name;
 }
 
 
@@ -408,7 +488,8 @@ CHierarchicalLayoutWidget::InternalItemData* CHierarchicalLayoutWidget::GetInter
 CCustomLayoutWidget::CCustomLayoutWidget(const QByteArray& id, CHierarchicalLayoutWidget& hierarchicalLayoutWidget, CCustomLayoutWidget* parentCustomWidgetPtr, QWidget* parentPtr)
 	:QWidget(parentPtr),
 	m_hierarchicalLayoutWidget(hierarchicalLayoutWidget),
-	m_parentCustomWidgetPtr(parentCustomWidgetPtr),
+	//m_parentCustomWidgetPtr(parentCustomWidgetPtr),
+	m_parentCustomWidgetPtr(NULL),
 	m_id(id),
 	m_externalWidgetPtr(NULL),
 	m_name("No name"),
@@ -419,6 +500,7 @@ CCustomLayoutWidget::CCustomLayoutWidget(const QByteArray& id, CHierarchicalLayo
 	SetDefaultPalette();
 
 	setAcceptDrops(true);
+	setMinimumSize(m_titleSize * 2, m_titleSize * 2);
 }
 
 
@@ -428,9 +510,9 @@ void CCustomLayoutWidget::SetDefaultPalette()
 	pal.setColor(QPalette::Background, QColor("transparent"));
 	setPalette(pal);
 
-	if (m_parentCustomWidgetPtr != NULL){
-		m_parentCustomWidgetPtr->SetDefaultPalette();
-	}
+	//if (m_parentCustomWidgetPtr != NULL){
+	//	m_parentCustomWidgetPtr->SetDefaultPalette();
+	//}
 }
 
 
@@ -445,9 +527,9 @@ void CCustomLayoutWidget::SetHighLightPalette()
 bool CCustomLayoutWidget::SetWidget(QWidget* widgetPtr)
 {
 	if (widgetPtr != NULL){
-		if (m_externalWidgetPtr != NULL){
-			return false;
-		}
+		//if (m_externalWidgetPtr != NULL){
+		//	return false;
+		//}
 
 		if (layout() == NULL){
 			setLayout(new QVBoxLayout(this));
@@ -480,9 +562,27 @@ bool CCustomLayoutWidget::SetWidget(QWidget* widgetPtr)
 }
 
 
+QWidget* CCustomLayoutWidget::GetWidget()
+{
+	return m_externalWidgetPtr;
+}
+
+
 void CCustomLayoutWidget::SetIsHaveChilds(bool source)
 {
 	m_isHaveChilds = source;
+}
+
+
+void CCustomLayoutWidget::SetName(QString name)
+{
+	m_name = name;
+}
+
+
+QString CCustomLayoutWidget::GetName()
+{
+	return m_name;
 }
 
 
@@ -567,7 +667,7 @@ void CCustomLayoutWidget::dropEvent(QDropEvent *eventPtr)
 void CCustomLayoutWidget::mouseReleaseEvent(QMouseEvent *eventPtr)
 {
 	//m_hierarchicalLayoutWidget.OnMouseReleaseEvent(m_id, eventPtr);
-	if (eventPtr->x() > rect().width() - m_titleSize && eventPtr->y() < m_titleSize) {
+	if (eventPtr->x() > rect().width() - m_titleSize && eventPtr->y() < m_titleSize && eventPtr->button() == Qt::RightButton) {
 		m_hierarchicalLayoutWidget.EmitOpenMenuEvent(m_id, eventPtr);
 	}
 }

@@ -11,13 +11,13 @@ CLayoutManagerComp::CLayoutManagerComp(QWidget* parentPtr)
 	:m_layoutWidgetPtr(NULL),
 	m_commands("&View", 100),
 	m_startEndEditModeCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1988),
-	m_testCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1988)
+	m_clearCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1988)
 {
 	m_rootCommands.InsertChild(&m_commands);
 	m_commands.InsertChild(&m_startEndEditModeCommand);
-//	m_commands.InsertChild(&m_testCommand);
 
 	connect(&m_startEndEditModeCommand, SIGNAL(triggered()), this, SLOT(OnStartEndEditCommand()));
+	connect(&m_clearCommand, SIGNAL(triggered()), this, SLOT(OnClearAll()));
 }
 
 
@@ -77,7 +77,7 @@ void CLayoutManagerComp::OnGuiRetranslate()
 
 	// File commands emptyIcon
 	m_startEndEditModeCommand.SetVisuals(tr("Edit Mode"), tr("Edit Mode"), tr("EditMode"), QIcon(":/Icons/Edit"));
-	m_testCommand.SetVisuals(tr("Test"), tr("Test"), tr("Test"), QIcon(":/Icons/Edit"));
+	m_clearCommand.SetVisuals(tr("Clear All"), tr("Clear All"), tr("ClearAll"), QIcon(":/Icons/Edit"));
 }
 
 
@@ -87,6 +87,22 @@ void CLayoutManagerComp::OnClearAll()
 		m_layoutWidgetPtr->ClearAll();
 	}
 
+}
+
+
+void CLayoutManagerComp::OnChangeName()
+{
+	if (m_layoutWidgetPtr != NULL) {
+		QString name = m_layoutWidgetPtr->GetName(m_activeId);
+		bool ok;
+		name = QInputDialog::getText(this->GetQtWidget(), tr("Get Name"),
+			tr("View name:"), QLineEdit::Normal,
+			name, &ok);
+		if (ok && !name.isEmpty()) {
+			m_layoutWidgetPtr->SetName(m_activeId, name);
+		}
+	}
+	
 }
 
 
@@ -111,7 +127,7 @@ void CLayoutManagerComp::OnSplitHorizontal()
 void CLayoutManagerComp::OnDelete()
 {
 	if (m_layoutWidgetPtr != NULL) {
-		m_layoutWidgetPtr->MergeLayout(m_activeId);
+		m_layoutWidgetPtr->RemoveLayout(m_activeId);
 	}
 
 }
@@ -166,7 +182,8 @@ void CLayoutManagerComp::OnOpenMenu(QByteArray id, QMouseEvent* eventPtr)
 {
 	m_activeId = id;
 	QMenu menu(GetQtWidget());
-	menu.addAction("Clear All", this, &CLayoutManagerComp::OnClearAll);
+//	menu.addAction("Clear All", this, &CLayoutManagerComp::OnClearAll);
+	menu.addAction("Change Name", this, &CLayoutManagerComp::OnChangeName);
 	menu.addAction("Split Vertical", this, &CLayoutManagerComp::OnSplitVertical);
 	menu.addAction("Split Horizontal", this, &CLayoutManagerComp::OnSplitHorizontal);
 	menu.addAction("Delete", this, &CLayoutManagerComp::OnDelete);
@@ -174,6 +191,7 @@ void CLayoutManagerComp::OnOpenMenu(QByteArray id, QMouseEvent* eventPtr)
 		menu.addAction("Clear", this, &CLayoutManagerComp::OnClear);
 	}
 	menu.addSeparator();
+
 	for (int i = 0; i < m_guiViewOptionsManager.GetOptionsCount(); i++)
 	{
 		QString name = m_guiViewOptionsManager.GetOptionName(i);
@@ -188,6 +206,7 @@ void CLayoutManagerComp::OnOpenMenu(QByteArray id, QMouseEvent* eventPtr)
 void CLayoutManagerComp::OnClearWidget(QByteArray id)
 {
 	Q_ASSERT(m_createdViewMap.contains(id));
+	m_layoutWidgetPtr->SetWidgetToItem(m_activeId, NULL);
 	m_createdViewMap[id]->DestroyGui();
 	m_createdViewMap.remove(id);
 }
@@ -200,9 +219,12 @@ void CLayoutManagerComp::OnStartEndEditCommand()
 		if (actionPtr != NULL) {
 			if (actionPtr->isChecked()) {
 				m_layoutWidgetPtr->SetViewMode(CHierarchicalLayoutWidget::VM_EDIT);
+				m_commands.InsertChild(&m_clearCommand,false,1);
 			}
 			else {
 				m_layoutWidgetPtr->SetViewMode(CHierarchicalLayoutWidget::VM_NORMAL);
+				m_commands.RemoveChild(1);
+
 			}
 		}
 	}

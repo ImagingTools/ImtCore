@@ -103,6 +103,7 @@ protected Q_SLOTS:
 	void OnClearWidget(QByteArray id);
 	void OnStartEndEditCommand();
 	void OnClearAll();
+	void OnChangeName();
 	void OnSplitVertical();
 	void OnSplitHorizontal();
 	void OnDelete();
@@ -128,7 +129,7 @@ private:
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_commands;
 	iqtgui::CHierarchicalCommand m_startEndEditModeCommand;
-	iqtgui::CHierarchicalCommand m_testCommand;
+	iqtgui::CHierarchicalCommand m_clearCommand;
 
 	typedef istd::TSmartPtr<iqtgui::IGuiObject> GuiObjectDelPtr;
 	typedef QMap<QByteArray, GuiObjectDelPtr> GuiObjectMap;

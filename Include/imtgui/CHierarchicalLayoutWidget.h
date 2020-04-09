@@ -28,7 +28,10 @@ public:
 	void SetDefaultPalette();
 	void SetHighLightPalette();
 	bool SetWidget(QWidget* widgetPtr);
+	QWidget* GetWidget();
 	void SetIsHaveChilds(bool source);
+	void SetName(QString name);
+	QString GetName();
 
 protected:
 	// reimplemented (QWidget)
@@ -90,6 +93,9 @@ public:
 	void ResetWidget();
 	void SetSplitterLayout(const QByteArray& id, Qt::Orientation orientation, int count, IdsList* idsListPtr = NULL);
 	void MergeLayout(const QByteArray& id);
+	void RemoveLayout(const QByteArray& id);
+	void SetName(const QByteArray& id, QString &name);
+	QString GetName(const QByteArray& id);
 
 protected:
 	friend class CCustomLayoutWidget;
