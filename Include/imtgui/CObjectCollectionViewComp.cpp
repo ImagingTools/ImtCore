@@ -539,6 +539,18 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 	bool localBlock = m_blockColumnsSettingsSynchronize;
 	m_blockColumnsSettingsSynchronize = true;
 
+	// Restore visual cloumn position by model
+	for (int i = 0; i < m_itemModel.columnCount(); i++){
+		ItemList->header()->moveSection(ItemList->header()->visualIndex(i), i);
+	}
+
+	// Fix columns
+	int lastFixed = GetLastFixedColumn();
+	ItemList->header()->setSectionsMovable(true);
+	if (lastFixed == m_itemModel.columnCount() - 1){
+		ItemList->header()->setSectionsMovable(false);
+	}
+	
 	QVector<QByteArray> tempFieldIds = GetMetaInfoIds(m_currentTypeId);
 	QStringList fieldIds;
 	for (QByteArray tempFieldId : tempFieldIds){
@@ -624,10 +636,14 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 			fieldSet.remove(fieldId);
 				
 			if (ok){
-				ItemList->setColumnWidth(logicIndex, width * ItemList->width());
+				int size = width * ItemList->width();
+				ItemList->setColumnWidth(logicIndex, size);
+				ValidateSectionSize(logicIndex, size);
 			}
 			else{
-				ItemList->setColumnWidth(logicIndex, ItemList->width() / columnsList.count());
+				int size = ItemList->width() / columnsList.count();
+				ItemList->setColumnWidth(logicIndex, size);
+				ValidateSectionSize(logicIndex, size);
 			}
 
 			currentIndex++;
@@ -646,6 +662,59 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 
 	connect(ItemList->header(), &QHeaderView::sectionResized, this, &CObjectCollectionViewComp::OnSectionResized);
 	connect(ItemList->header(), &QHeaderView::sectionMoved, this, &CObjectCollectionViewComp::OnSectionMoved);
+}
+
+
+void CObjectCollectionViewComp::ValidateSectionSize(int logicalIndex, int size)
+{
+	if (m_currentTypeId.isEmpty()){
+		return;
+	}
+
+	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(m_currentTypeId);
+	QVector<QByteArray> ids = GetMetaInfoIds(m_currentTypeId);
+
+	if (logicalIndex >= ids.count()){
+		return;
+	}
+
+	const ICollectionViewDelegate::HeaderInfo* headerInfo = viewDelegate.GetSummaryInformationHeaderInfo(ids[logicalIndex]);
+	if (headerInfo){
+		int minWidth = headerInfo->GetMinWidth();
+		int maxWidth = headerInfo->GetMaxWidth();
+
+		if (minWidth > 0 && size < minWidth){
+			ItemList->setColumnWidth(logicalIndex, minWidth);
+		}
+
+		if (maxWidth > 0 && size > maxWidth){
+			ItemList->setColumnWidth(logicalIndex, maxWidth);
+		}
+	}
+}
+
+
+int CObjectCollectionViewComp::GetLastFixedColumn()
+{
+	if (m_currentTypeId.isEmpty()){
+		return -1;
+	}
+
+	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(m_currentTypeId);
+	QVector<QByteArray> ids = GetMetaInfoIds(m_currentTypeId);
+
+	int lastFixedSection = -1;
+
+	for (QByteArray id : ids){
+		if (!viewDelegate.GetSummaryInformationHeaderInfo(id)->IsMoveable()){
+			lastFixedSection++;
+			continue;
+		}
+
+		break;
+	}
+
+	return lastFixedSection;
 }
 
 
@@ -788,13 +857,15 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 }
 
 
-void CObjectCollectionViewComp::OnSectionResized(int /*logicalIndex*/, int /*oldSize*/, int /*newSize*/)
+void CObjectCollectionViewComp::OnSectionResized(int logicalIndex, int /*oldSize*/, int newSize)
 {
+	ValidateSectionSize(logicalIndex, newSize);
+
 	EnsureColumnsSettingsSynchronized();
 }
 
 
-void CObjectCollectionViewComp::OnSectionMoved(int /*logicalIndex*/, int /*oldVisualIndex*/, int /*newVisualIndex*/)
+void CObjectCollectionViewComp::OnSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex)
 {
 	EnsureColumnsSettingsSynchronized();
 }

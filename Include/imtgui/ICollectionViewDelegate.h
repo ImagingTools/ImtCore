@@ -70,37 +70,30 @@ public:
 
 	struct HeaderInfo
 	{
-		HeaderInfo(bool isMoveable = true, bool isResizeable = true, int minWidth = -1, int maxWidth = -1)
+		HeaderInfo(bool isMoveable = true, int minWidth = -1, int maxWidth = -1)
 			: m_isMoveable(isMoveable),
-			m_isResizeable(isResizeable),
 			m_minWidth(minWidth),
 			m_maxWidth(maxWidth)
 		{
 		}
 
-		bool IsMoveable()
+		bool IsMoveable() const
 		{
 			return m_isMoveable;
 		}
 
-		bool IsResizeable()
-		{
-			return m_isResizeable;
-		}
-
-		int GetMinWidth()
+		int GetMinWidth() const
 		{
 			return m_minWidth;
 		}
 
-		int GetMaxWidth()
+		int GetMaxWidth() const
 		{
 			return m_maxWidth;
 		}
 
 	private:
 		bool m_isMoveable;
-		bool m_isResizeable;
 		int m_minWidth;
 		int m_maxWidth;
 	};
@@ -167,7 +160,7 @@ public:
 	/**
 		Get summary information header info of a given type for a given object.
 	*/
-	virtual const HeaderInfo* GetSummaryInformationHeaderInfo(const QByteArray& objectId, const QByteArray& informationId) const = 0;
+	virtual const HeaderInfo* GetSummaryInformationHeaderInfo(const QByteArray& informationId) const = 0;
 
 	/**
 		Open a document editor for a given data object.

@@ -26,10 +26,10 @@ CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
 	m_summaryInformationHeaders.clear();
 
 	m_summaryInformationTypes.InsertItem("Name", "Name", "");
-	m_summaryInformationHeaders["Name"] = HeaderInfo();
+	m_summaryInformationHeaders["Name"] = HeaderInfo(false);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("TypeId"), tr("Type"), "");
-	m_summaryInformationHeaders["TypeId"] = HeaderInfo();
+	m_summaryInformationHeaders["TypeId"] = HeaderInfo(false, 30, 50);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("Description"), tr("Description"), "");
 	m_summaryInformationHeaders["Description"] = HeaderInfo();

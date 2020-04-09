@@ -146,6 +146,8 @@ private:
 
 	void EnsureColumnsSettingsSynchronized() const;
 	void RestoreColumnsSettings();
+	void ValidateSectionSize(int logicalIndex, int size);
+	int GetLastFixedColumn();
 
 	void SaveItemsSelection();
 	void RestoreItemsSelection();

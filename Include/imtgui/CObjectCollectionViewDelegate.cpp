@@ -182,7 +182,7 @@ QVariant CObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& 
 }
 
 
-const ICollectionViewDelegate::HeaderInfo* CObjectCollectionViewDelegate::GetSummaryInformationHeaderInfo(const QByteArray& objectId, const QByteArray& informationId) const
+const ICollectionViewDelegate::HeaderInfo* CObjectCollectionViewDelegate::GetSummaryInformationHeaderInfo(const QByteArray& informationId) const
 {
 	if (m_collectionPtr != nullptr){
 		if (m_summaryInformationHeaders.contains(informationId)){
