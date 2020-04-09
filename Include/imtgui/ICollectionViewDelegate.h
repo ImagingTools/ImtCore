@@ -70,32 +70,16 @@ public:
 
 	struct HeaderInfo
 	{
-		HeaderInfo(bool isMoveable = true, int minWidth = -1, int maxWidth = -1)
-			: m_isMoveable(isMoveable),
-			m_minWidth(minWidth),
-			m_maxWidth(maxWidth)
+		HeaderInfo(bool setIsMoveable = true, int setMinWidth = -1, int setMaxWidth = -1)
+			: isMoveable(setIsMoveable),
+			minWidth(setMinWidth),
+			maxWidth(setMaxWidth)
 		{
 		}
 
-		bool IsMoveable() const
-		{
-			return m_isMoveable;
-		}
-
-		int GetMinWidth() const
-		{
-			return m_minWidth;
-		}
-
-		int GetMaxWidth() const
-		{
-			return m_maxWidth;
-		}
-
-	private:
-		bool m_isMoveable;
-		int m_minWidth;
-		int m_maxWidth;
+		bool isMoveable;
+		int minWidth;
+		int maxWidth;
 	};
 
 	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) = 0;
@@ -155,12 +139,12 @@ public:
 	/**
 		Get summary information of a given type for a given object.
 	*/
-	virtual QVariant GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const = 0;
+	virtual QVariantList GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const = 0;
 
 	/**
 		Get summary information header info of a given type for a given object.
 	*/
-	virtual const HeaderInfo* GetSummaryInformationHeaderInfo(const QByteArray& informationId) const = 0;
+	virtual HeaderInfo GetSummaryInformationHeaderInfo(const QByteArray& informationId) const = 0;
 
 	/**
 		Open a document editor for a given data object.
@@ -174,6 +158,9 @@ public:
 	*/
 	virtual iqtgui::IGuiObject* GetInformationView() const = 0;
 
+	/**
+		By calling this method, the base class determines whether the command is supported by the child.
+	*/
 	virtual bool IsCommandSupported(int commandId) const = 0;
 };
 

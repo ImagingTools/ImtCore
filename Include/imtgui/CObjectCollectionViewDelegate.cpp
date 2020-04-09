@@ -162,35 +162,35 @@ const imtbase::ICollectionInfo& CObjectCollectionViewDelegate::GetSummaryInforma
 }
 
 
-QVariant CObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+QVariantList CObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
 {
+	QVariantList result;
+
 	if (m_collectionPtr != nullptr){
 		if (informationId == QByteArray("Name")){
-			return m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME);
+			result.append(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME));
 		}
-
-		if (informationId == QByteArray("Type")){
-			return m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_TYPE_NAME);
+		else if (informationId == QByteArray("Type")){
+			result.append(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_TYPE_NAME));
 		}
-
-		if (informationId == QByteArray("Description")){
-			return m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION);
+		else if (informationId == QByteArray("Description")){
+			result.append(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION));
 		}
 	}
 
-	return QVariant();
+	return result;
 }
 
 
-const ICollectionViewDelegate::HeaderInfo* CObjectCollectionViewDelegate::GetSummaryInformationHeaderInfo(const QByteArray& informationId) const
+ICollectionViewDelegate::HeaderInfo CObjectCollectionViewDelegate::GetSummaryInformationHeaderInfo(const QByteArray& informationId) const
 {
 	if (m_collectionPtr != nullptr){
 		if (m_summaryInformationHeaders.contains(informationId)){
-			return &m_summaryInformationHeaders[informationId];
+			return m_summaryInformationHeaders[informationId];
 		}
 	}
 
-	return nullptr;
+	return ICollectionViewDelegate::HeaderInfo();
 }
 
 

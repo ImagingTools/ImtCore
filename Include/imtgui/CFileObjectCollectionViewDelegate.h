@@ -36,7 +36,7 @@ public:
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 	virtual QByteArray ImportObject(const QByteArray& typeId, const QString& sourcePath = QString()) const override;
 	virtual bool ExportObject(const QByteArray& objectId, const QString& targetPath = QString()) const override;
-	virtual QVariant GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
+	virtual QVariantList GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
 	virtual bool IsCommandSupported(int commandId) const override;
 
 protected:

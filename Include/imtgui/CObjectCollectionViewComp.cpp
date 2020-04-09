@@ -63,7 +63,7 @@ void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 		return;
 	}
 
-	QString key("ObjectCollectionViewColumnsSettings/" + columnSettingsKey);
+	QByteArray key("ObjectCollectionViewColumnsSettings/" + columnSettingsKey);
 	if (!settings.contains(key)){
 		return;
 	}
@@ -233,16 +233,19 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			QByteArray itemTypeId = objectPtr->GetObjectTypeId(itemId);
 
 			QList<QStandardItem*> columns;
-			QVariantList metaInfo = GetCollectionItemInfos(itemId, itemTypeId);
+			ObjectMetaInfo metaInfo = GetMetaInfo(itemId, itemTypeId);
 
-			for (QVariant infoItem : metaInfo){
-				if (infoItem.type() == QVariant::String){
-					columns += new QStandardItem(infoItem.toString());
+			if (metaInfo.isEmpty()){
+				continue;
+			}
+
+			for (MetaInfoItem metaInfoItem : metaInfo){
+				QStandardItem* column = new QStandardItem(metaInfoItem.text);
+				if (!metaInfoItem.icon.isNull()){
+					column->setIcon(metaInfoItem.icon);
 				}
 
-				if (infoItem.type() == QVariant::Icon){
-					columns += new QStandardItem(infoItem.value<QIcon>(), "");
-				}
+				columns.append(column);
 			}
 
 			Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
@@ -461,36 +464,40 @@ QStringList CObjectCollectionViewComp::GetMetaInfoHeaders(const QByteArray &type
 }
 
 
-QVariantList CObjectCollectionViewComp::GetCollectionItemInfos(const QByteArray &itemId, const QByteArray &typeId) const
+CObjectCollectionViewComp::ObjectMetaInfo CObjectCollectionViewComp::GetMetaInfo(const QByteArray &itemId, const QByteArray &typeId) const
 {
 	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
 	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();
 	QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
 
-	QVariantList objectMetaInfo;
+	ObjectMetaInfo result;
 
 	for (QByteArray fieldId : fieldIds){
-		QVariant info = viewDelegate.GetSummaryInformation(itemId, fieldId);
+		MetaInfoItem metaInfo;
 
-		switch (info.type()){
-		case QVariant::ByteArray:
-			objectMetaInfo.append(QString(info.toByteArray()));
-			break;
-		case QVariant::String:
-			objectMetaInfo.append(info.toString());
-			break;
-		case QVariant::DateTime:
-			objectMetaInfo.append(info.toDateTime().toString("dd.MM.yyyy hh:mm:ss"));
-			break;
-		case QVariant::Icon:
-			objectMetaInfo.append(info);
-			break;
-		default:
-			objectMetaInfo.append(QString());
+		QVariantList summaryInfo = viewDelegate.GetSummaryInformation(itemId, fieldId);
+		
+		for (QVariant item : summaryInfo){
+			switch (item.type()){
+			case QVariant::ByteArray:
+				metaInfo.text = item.toByteArray();
+				break;
+			case QVariant::String:
+				metaInfo.text =  item.toString();
+				break;
+			case QVariant::DateTime:
+				metaInfo.text = item.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+				break;
+			case QVariant::Icon:
+				metaInfo.icon = item.value<QIcon>();
+				break;
+			}
 		}
+
+		result.append(metaInfo);
 	}
 
-	return objectMetaInfo;
+	return result;
 }
 
 
@@ -673,18 +680,14 @@ void CObjectCollectionViewComp::ValidateSectionSize(int logicalIndex, int size)
 		return;
 	}
 
-	const ICollectionViewDelegate::HeaderInfo* headerInfo = viewDelegate.GetSummaryInformationHeaderInfo(ids[logicalIndex]);
-	if (headerInfo){
-		int minWidth = headerInfo->GetMinWidth();
-		int maxWidth = headerInfo->GetMaxWidth();
+	ICollectionViewDelegate::HeaderInfo headerInfo = viewDelegate.GetSummaryInformationHeaderInfo(ids[logicalIndex]);
 
-		if (minWidth > 0 && size < minWidth){
-			ItemList->setColumnWidth(logicalIndex, minWidth);
-		}
+	if (headerInfo.minWidth > 0 && size < headerInfo.minWidth){
+		ItemList->setColumnWidth(logicalIndex, headerInfo.minWidth);
+	}
 
-		if (maxWidth > 0 && size > maxWidth){
-			ItemList->setColumnWidth(logicalIndex, maxWidth);
-		}
+	if (headerInfo.maxWidth > 0 && size > headerInfo.maxWidth){
+		ItemList->setColumnWidth(logicalIndex, headerInfo.maxWidth);
 	}
 }
 
@@ -701,7 +704,7 @@ int CObjectCollectionViewComp::GetLastFixedColumn()
 	int lastFixedSection = -1;
 
 	for (QByteArray id : ids){
-		if (!viewDelegate.GetSummaryInformationHeaderInfo(id)->IsMoveable()){
+		if (!viewDelegate.GetSummaryInformationHeaderInfo(id).isMoveable){
 			lastFixedSection++;
 			continue;
 		}

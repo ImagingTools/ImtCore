@@ -76,35 +76,33 @@ bool CFileObjectCollectionViewDelegate::ExportObject(const QByteArray& objectId,
 }
 
 
-QVariant CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+QVariantList CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
 {
+	QVariantList result;
+
 	imtbase::IFileObjectCollection* fileObjectCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
 	if (fileObjectCollectionPtr != nullptr){
 		idoc::CStandardDocumentMetaInfo metaInfo;
 		if (fileObjectCollectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
 			if (informationId == QByteArray("Name")){
-				return m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME);
+				result.append(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME));
 			}
-
-			if (informationId == QByteArray("TypeId")){
-				return fileObjectCollectionPtr->GetObjectTypeId(objectId);
+			else if (informationId == QByteArray("TypeId")){
+				result.append(fileObjectCollectionPtr->GetObjectTypeId(objectId));
 			}
-
-			if (informationId == QByteArray("Description")){
-				return fileObjectCollectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+			else if (informationId == QByteArray("Description")){
+				result.append(fileObjectCollectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString());
 			}
-
-			if (informationId == QByteArray("Added")){
-				return metaInfo.GetMetaInfo(imtbase::IFileObjectCollection::MIT_INSERTION_TIME);
+			else if (informationId == QByteArray("Added")){
+				result.append(metaInfo.GetMetaInfo(imtbase::IFileObjectCollection::MIT_INSERTION_TIME));
 			}
-
-			if (informationId == QByteArray("ModificationTime")){
-				return metaInfo.GetMetaInfo(imtbase::IFileObjectCollection::MIT_LAST_OPERATION_TIME);
+			else if (informationId == QByteArray("ModificationTime")){
+				result.append(metaInfo.GetMetaInfo(imtbase::IFileObjectCollection::MIT_LAST_OPERATION_TIME));
 			}
 		}
 	}
 
-	return QVariant();
+	return result;
 }
 
 

@@ -62,6 +62,13 @@ public:
 		MI_LAST = MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE + 1000
 	};
 
+	struct MetaInfoItem
+	{
+		QString text;
+		QIcon icon;
+	};
+	typedef QVector<MetaInfoItem> ObjectMetaInfo;
+
 	CObjectCollectionViewComp();
 
 protected:
@@ -142,7 +149,7 @@ private:
 
 	QVector<QByteArray> GetMetaInfoIds(const QByteArray &typeId) const;
 	QStringList GetMetaInfoHeaders(const QByteArray &typeId) const;
-	QVariantList GetCollectionItemInfos(const QByteArray &itemId, const QByteArray &typeId) const;
+	ObjectMetaInfo GetMetaInfo(const QByteArray &itemId, const QByteArray &typeId) const;
 
 	void EnsureColumnsSettingsSynchronized() const;
 	void RestoreColumnsSettings();
