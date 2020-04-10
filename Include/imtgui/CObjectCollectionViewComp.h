@@ -165,12 +165,11 @@ private:
 
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-	void OnItemChanged(QStandardItem *item);
 	void OnItemDoubleClick(const QModelIndex &item);
 	void OnCustomContextMenuRequested(const QPoint &point);
 	void OnSectionResized(int logicalIndex, int oldSize, int newSize);
 	void OnSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex);
-	void on_TypeList_itemSelectionChanged();
+	void OnTypeChanged();
 
 	void OnContextMenuRename(bool checked);
 	void OnContextMenuEditDescription(bool checked);
@@ -184,6 +183,29 @@ private Q_SLOTS:
 	void OnRenameShortCut();
 
 private:
+	class SignalSemaphore
+	{
+	public:
+		SignalSemaphore(int& counter)
+		{
+			m_counter = &counter;
+			(*m_counter)++;
+		}
+
+		~SignalSemaphore()
+		{
+			(*m_counter)--;
+		}
+
+	private:
+		int* m_counter;
+		SignalSemaphore()
+		{
+		}
+	};
+
+	int m_semaphoreCounter;
+
 	QShortcut* m_searchShortCutPtr;
 	QShortcut* m_escShortCutPtr;
 	QShortcut* m_delShortCutPtr;
@@ -203,9 +225,6 @@ private:
 	imod::TModelWrap<Commands> m_commands;
 
 	ItemProxyModel* m_proxyModelPtr;
-
-	bool m_blockColumnsSettingsSynchronize;
-	bool m_blockSaveItemsSelection;
 
 	typedef QMap<QString, QVariant> ColumnSettings;
 	typedef QVector<ColumnSettings> ColumnsList;

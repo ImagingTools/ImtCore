@@ -28,8 +28,7 @@ namespace imtgui
 // protected methods
 
 CObjectCollectionViewComp::CObjectCollectionViewComp()
-	:m_blockColumnsSettingsSynchronize(false),
-	m_blockSaveItemsSelection(false),
+	:m_semaphoreCounter(0),
 	m_currentInformationViewPtr(nullptr)
 {
 	m_commands.SetParent(this);
@@ -187,86 +186,85 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	const imtbase::IObjectCollection* objectPtr = GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
 
-	m_blockColumnsSettingsSynchronize = true;
-	m_blockSaveItemsSelection = true;
+	{
+		SignalSemaphore semaphore(m_semaphoreCounter);
 
-	QByteArray lastTypeId = m_currentTypeId;
+		QByteArray lastTypeId = m_currentTypeId;
 
-	ItemList->setProperty("ItemView", true);
-	TypeList->clear();
-	m_itemModel.clear();
-	m_itemModel.setColumnCount(0);
+		TypeList->clear();
+		ItemList->setProperty("ItemView", true);
 
-	const iprm::IOptionsList* objectTypeInfoPtr = objectPtr->GetObjectTypesInfo();
-	if (objectTypeInfoPtr != nullptr){
-		int typesCount = objectTypeInfoPtr->GetOptionsCount();
-		imtbase::IObjectCollectionInfo::Ids collectionItemIds = objectPtr->GetElementIds();
+		m_itemModel.clear();
+		m_itemModel.setColumnCount(0);
 
-		if (typesCount > 1){
-			TypeList->show();
-		}
-		else {
-			TypeList->hide();
-		}
+		const iprm::IOptionsList* objectTypeInfoPtr = objectPtr->GetObjectTypesInfo();
+		if (objectTypeInfoPtr != nullptr){
+			int typesCount = objectTypeInfoPtr->GetOptionsCount();
+			imtbase::IObjectCollectionInfo::Ids collectionItemIds = objectPtr->GetElementIds();
 
-		for (int typeIndex = 0; typeIndex < typesCount; ++typeIndex){
-			QByteArray typeId = objectTypeInfoPtr->GetOptionId(typeIndex);
-			QString typeName = objectTypeInfoPtr->GetOptionName(typeIndex);
-
-			QTreeWidgetItem* typeItemPtr = new QTreeWidgetItem;
-			typeItemPtr->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-			typeItemPtr->setData(0, Qt::DisplayRole, typeName);
-			typeItemPtr->setData(0, Qt::EditRole, typeName);
-			typeItemPtr->setData(0, DR_TYPE_ID, typeId);
-			TypeList->addTopLevelItem(typeItemPtr);
-
-			if (lastTypeId == typeId){
-				typeItemPtr->setSelected(true);
+			if (typesCount > 1){
+				TypeList->show();
+			}
+			else {
+				TypeList->hide();
 			}
 
-			if (lastTypeId.isEmpty() && (typeIndex == 0)){
-				typeItemPtr->setSelected(true);
-			}
-		}
+			for (int typeIndex = 0; typeIndex < typesCount; ++typeIndex){
+				QByteArray typeId = objectTypeInfoPtr->GetOptionId(typeIndex);
+				QString typeName = objectTypeInfoPtr->GetOptionName(typeIndex);
 
-		for (const QByteArray& itemId : collectionItemIds){
-			QByteArray itemTypeId = objectPtr->GetObjectTypeId(itemId);
+				QTreeWidgetItem* typeItemPtr = new QTreeWidgetItem(TypeList);
+				typeItemPtr->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+				typeItemPtr->setData(0, Qt::DisplayRole, typeName);
+				typeItemPtr->setData(0, Qt::EditRole, typeName);
+				typeItemPtr->setData(0, DR_TYPE_ID, typeId);
+				TypeList->addTopLevelItem(typeItemPtr);
 
-			QList<QStandardItem*> columns;
-			ObjectMetaInfo metaInfo = GetMetaInfo(itemId, itemTypeId);
-
-			if (metaInfo.isEmpty()){
-				continue;
-			}
-
-			for (MetaInfoItem metaInfoItem : metaInfo){
-				QStandardItem* column = new QStandardItem(metaInfoItem.text);
-				if (!metaInfoItem.icon.isNull()){
-					column->setIcon(metaInfoItem.icon);
+				if (lastTypeId == typeId){
+					typeItemPtr->setSelected(true);
 				}
 
-				columns.append(column);
+				if (lastTypeId.isEmpty() && (typeIndex == 0)){
+					typeItemPtr->setSelected(true);
+				}
 			}
 
-			Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-			if (objectPtr->GetSupportedOperations() & imtbase::IObjectCollection::OF_SUPPORT_RENAME){
-				flags |= Qt::ItemIsEditable;
+			for (const QByteArray& itemId : collectionItemIds){
+				QByteArray itemTypeId = objectPtr->GetObjectTypeId(itemId);
+
+				QList<QStandardItem*> columns;
+				ObjectMetaInfo metaInfo = GetMetaInfo(itemId, itemTypeId);
+
+				if (metaInfo.isEmpty()){
+					continue;
+				}
+
+				for (MetaInfoItem metaInfoItem : metaInfo){
+					QStandardItem* column = new QStandardItem(metaInfoItem.text);
+					if (!metaInfoItem.icon.isNull()){
+						column->setIcon(metaInfoItem.icon);
+					}
+
+					columns.append(column);
+				}
+
+				Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+				if (objectPtr->GetSupportedOperations() & imtbase::IObjectCollection::OF_SUPPORT_RENAME){
+					flags |= Qt::ItemIsEditable;
+				}
+
+				columns[0]->setData(itemId, DR_OBJECT_ID);
+				columns[0]->setData(objectPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_TYPE_ID), DR_TYPE_ID);
+				columns[0]->setFlags(flags);
+
+				m_itemModel.appendRow(columns);
 			}
-
-			columns[0]->setData(itemId, DR_OBJECT_ID);
-			columns[0]->setData(objectPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_TYPE_ID), DR_TYPE_ID);
-			columns[0]->setFlags(flags);
-
-			m_itemModel.appendRow(columns);
 		}
 	}
 
 	UpdateCommands();
 
-	on_TypeList_itemSelectionChanged();
-
-	m_blockSaveItemsSelection = false;
-	m_blockColumnsSettingsSynchronize = false;
+	OnTypeChanged();
 
 	RestoreItemsSelection();
 
@@ -317,19 +315,9 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 	ItemList->setModel(m_proxyModelPtr);
 
-	QItemSelectionModel* selectionModelPtr = ItemList->selectionModel();
-	if (selectionModelPtr != nullptr){
-		connect(
-					selectionModelPtr,
-					SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)),
-					this, SLOT(OnSelectionChanged(const QItemSelection&, const QItemSelection&)));
-	}
-
-	connect(&m_itemModel, &QStandardItemModel::itemChanged, this, &CObjectCollectionViewComp::OnItemChanged);
-	connect(ItemList, &QTreeView::doubleClicked, this, &CObjectCollectionViewComp::OnItemDoubleClick);
-	connect(ItemList, &QTreeView::customContextMenuRequested, this, &CObjectCollectionViewComp::OnCustomContextMenuRequested);
 	connect(FilterEdit, &QLineEdit::textChanged, this, &CObjectCollectionViewComp::OnFilterChanged);
 	connect(CloseButton, &QToolButton::clicked, this, &CObjectCollectionViewComp::OnEscShortCut);
+
 	connect(m_searchShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnSearchShortCut);
 	connect(m_escShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnEscShortCut);
 	connect(m_delShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnDelShortCut);
@@ -339,6 +327,11 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	ItemList->header()->setStretchLastSection(true);
 	ItemList->installEventFilter(this);
+
+	connect(TypeList, &QTreeWidget::itemSelectionChanged, this, &CObjectCollectionViewComp::OnTypeChanged);
+	connect(ItemList->selectionModel(), &QItemSelectionModel::selectionChanged, this, &CObjectCollectionViewComp::OnSelectionChanged);
+	connect(ItemList, &QTreeView::doubleClicked, this, &CObjectCollectionViewComp::OnItemDoubleClick);
+	connect(ItemList, &QTreeView::customContextMenuRequested, this, &CObjectCollectionViewComp::OnCustomContextMenuRequested);
 	connect(ItemList->header(), &QHeaderView::sectionResized, this, &CObjectCollectionViewComp::OnSectionResized);
 	connect(ItemList->header(), &QHeaderView::sectionMoved, this, &CObjectCollectionViewComp::OnSectionMoved);
 
@@ -503,10 +496,6 @@ CObjectCollectionViewComp::ObjectMetaInfo CObjectCollectionViewComp::GetMetaInfo
 
 void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 {
-	if (m_blockColumnsSettingsSynchronize){
-		return;
-	}
-
 	ColumnsList columnsList;
 	ColumnSettings columnSettings;
 	QVector<QByteArray> ids = GetMetaInfoIds(m_currentTypeId);
@@ -535,11 +524,7 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 
 void CObjectCollectionViewComp::RestoreColumnsSettings()
 {
-	disconnect(ItemList->header(), &QHeaderView::sectionResized, this, &CObjectCollectionViewComp::OnSectionResized);
-	disconnect(ItemList->header(), &QHeaderView::sectionMoved, this, &CObjectCollectionViewComp::OnSectionMoved);
-
-	bool localBlock = m_blockColumnsSettingsSynchronize;
-	m_blockColumnsSettingsSynchronize = true;
+	SignalSemaphore semaphore(m_semaphoreCounter);
 
 	// Restore visual cloumn position by model
 	for (int i = 0; i < m_itemModel.columnCount(); i++){
@@ -659,11 +644,6 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 			ItemList->setColumnWidth(currentVisualIndex, ItemList->width() / columnCount);
 		}
 	}
-
-	m_blockColumnsSettingsSynchronize = localBlock;
-
-	connect(ItemList->header(), &QHeaderView::sectionResized, this, &CObjectCollectionViewComp::OnSectionResized);
-	connect(ItemList->header(), &QHeaderView::sectionMoved, this, &CObjectCollectionViewComp::OnSectionMoved);
 }
 
 
@@ -718,10 +698,6 @@ int CObjectCollectionViewComp::GetLastFixedColumn()
 
 void CObjectCollectionViewComp::SaveItemsSelection()
 {
-	if (m_blockSaveItemsSelection){
-		return;
-	}
-
 	m_itemsSelection[m_currentTypeId].clear();
 
 	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
@@ -791,26 +767,15 @@ bool CObjectCollectionViewComp::eventFilter(QObject *object, QEvent *event)
 
 void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
 {
+	if (m_semaphoreCounter > 0){
+		return;
+	}
+
 	SaveItemsSelection();
 	UpdateCommands();
 
 	if (ItemList->selectionModel()->selectedRows().isEmpty()){
 		ItemList->setCurrentIndex(QModelIndex());
-	}
-}
-
-
-void CObjectCollectionViewComp::OnItemChanged(QStandardItem* itemPtr)
-{
-	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
-	Q_ASSERT(collectionPtr != nullptr);
-
-	QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
-	if (!itemId.isEmpty()){
-		QString currentName = collectionPtr->GetElementInfo(itemId, imtbase::ICollectionInfo::EIT_NAME).toString();
-		QString newName = itemPtr->text();
-
-		collectionPtr->SetObjectName(itemId, newName);
 	}
 }
 
@@ -839,15 +804,20 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 	QMenu menu(ItemList);
 
 	actionEditDocument = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit..."));
-	actionRemove = menu.addAction(QIcon(":/Icons/Remove"), tr("Remove"));
 	connect(actionEditDocument, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDocument);
-	connect(actionRemove, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRemove);
+
+	if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_REMOVE)){
+		actionRemove = menu.addAction(QIcon(":/Icons/Remove"), tr("Remove"));
+		connect(actionRemove, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRemove);
+	}
 
 	if (selectedIndexes.count() == 1){
 		menu.addSeparator();
-		actionRename = menu.addAction(tr("Rename..."));
 		actionEditDescription = menu.addAction(tr("Set Description..."));
-		connect(actionRename, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRename);
+		if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_RENAME)){
+			actionRename = menu.addAction(tr("Rename..."));
+			connect(actionRename, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRename);
+		}
 		connect(actionEditDescription, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDescription);
 	}
 
@@ -857,6 +827,10 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 
 void CObjectCollectionViewComp::OnSectionResized(int logicalIndex, int /*oldSize*/, int newSize)
 {
+	if (m_semaphoreCounter > 0){
+		return;
+	}
+
 	ValidateSectionSize(logicalIndex, newSize);
 
 	EnsureColumnsSettingsSynchronized();
@@ -865,17 +839,19 @@ void CObjectCollectionViewComp::OnSectionResized(int logicalIndex, int /*oldSize
 
 void CObjectCollectionViewComp::OnSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex)
 {
+	if (m_semaphoreCounter > 0){
+		return;
+	}
+
 	EnsureColumnsSettingsSynchronized();
 }
 
 
-void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
+void CObjectCollectionViewComp::OnTypeChanged()
 {
-	bool blockStored = m_blockSaveItemsSelection;
+	SignalSemaphore semaphore(m_semaphoreCounter);
 
 	SaveItemsSelection();
-
-	m_blockSaveItemsSelection = true;
 
 	m_currentTypeId.clear();
 
@@ -901,12 +877,8 @@ void CObjectCollectionViewComp::on_TypeList_itemSelectionChanged()
 		}
 	}
 
-	m_blockSaveItemsSelection = false;
-
 	RestoreItemsSelection();
 	RestoreColumnsSettings();
-
-	m_blockSaveItemsSelection = blockStored;
 
 	if ((m_currentInformationViewPtr != nullptr) && m_currentInformationViewPtr->IsGuiCreated()){
 		m_currentInformationViewPtr->DestroyGui();
