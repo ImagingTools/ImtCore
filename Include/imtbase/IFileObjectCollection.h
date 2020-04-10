@@ -25,37 +25,6 @@ class IFileObjectCollection: virtual public IObjectCollection, virtual public IF
 {
 public:
 	/**
-		Type of the meta-informations supported by the file collection.
-	*/
-	enum MetaInfoType
-	{
-		/**
-			Name of the user who has added the file.
-		*/
-		MIT_INSERTION_USER = idoc::IDocumentMetaInfo::MIT_USER + 10000,
-
-		/**
-			Timestamp of the file inserting into the collection.
-		*/
-		MIT_INSERTION_TIME,
-
-		/**
-			Name of the user who has modified the file.
-		*/
-		MIT_LAST_OPERATION_USER,
-
-		/**
-			Timestamp of the last operation on the file in the collection.
-		*/
-		MIT_LAST_OPERATION_TIME,
-
-		/**
-			Tumbnail for the item preview.
-		*/
-		MIT_PREVIEW_THUMBNAIL
-	};
-
-	/**
 		Information related to the file inside the repository
 	*/
 	struct FileInfo

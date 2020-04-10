@@ -80,24 +80,23 @@ QVariantList CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByt
 {
 	QVariantList result;
 
-	imtbase::IFileObjectCollection* fileObjectCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
-	if (fileObjectCollectionPtr != nullptr){
+	if (m_collectionPtr != nullptr){
 		idoc::CStandardDocumentMetaInfo metaInfo;
-		if (fileObjectCollectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
+		if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
 			if (informationId == QByteArray("Name")){
 				result.append(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME));
 			}
 			else if (informationId == QByteArray("TypeId")){
-				result.append(fileObjectCollectionPtr->GetObjectTypeId(objectId));
+				result.append(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_TYPE_ID));
 			}
 			else if (informationId == QByteArray("Description")){
-				result.append(fileObjectCollectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString());
+				result.append(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString());
 			}
 			else if (informationId == QByteArray("Added")){
-				result.append(metaInfo.GetMetaInfo(imtbase::IFileObjectCollection::MIT_INSERTION_TIME));
+				result.append(metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME));
 			}
 			else if (informationId == QByteArray("ModificationTime")){
-				result.append(metaInfo.GetMetaInfo(imtbase::IFileObjectCollection::MIT_LAST_OPERATION_TIME));
+				result.append(metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME));
 			}
 		}
 	}
