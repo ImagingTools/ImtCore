@@ -85,22 +85,22 @@ public:
 	enum MetaInfoType
 	{
 		/**
-			Name of the user who has added the file.
+			Name of the user who has added the element.
 		*/
 		MIT_INSERTION_USER = idoc::IDocumentMetaInfo::MIT_USER + 10000,
 
 		/**
-			Timestamp of the file inserting into the collection.
+			Timestamp of the element inserting into the collection.
 		*/
 		MIT_INSERTION_TIME,
 
 		/**
-			Name of the user who has modified the file.
+			Name of the user who has modified the element.
 		*/
 		MIT_LAST_OPERATION_USER,
 
 		/**
-			Timestamp of the last operation on the file in the collection.
+			Timestamp of the last operation on the element in the collection.
 		*/
 		MIT_LAST_OPERATION_TIME,
 
