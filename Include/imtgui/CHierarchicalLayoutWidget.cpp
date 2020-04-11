@@ -179,22 +179,18 @@ CHierarchicalLayoutWidget::SizeList CHierarchicalLayoutWidget::GetItemSizes(cons
 
 void CHierarchicalLayoutWidget::ClearAll()
 {
-	MergeLayout(m_rootId);
-	return;
+	CleanLayoutRecursive(layout());
+	m_customWidgetMap.clear();
+	m_internalItemList.clear();
 
-	QLayout* layoutPtr = m_customWidgetMap[m_rootId]->layout();
-	if (layoutPtr != NULL) {
-		IdsList childIdList;
-		IdsListCollectChildIdsRecursive(m_rootId, childIdList);
-		for (QByteArray& childId : childIdList) {
-			m_customWidgetMap[childId]->deleteLater();
-			m_customWidgetMap.remove(childId);
-			m_internalItemList.removeAll(InternalItemData(childId));
-		}
-		CleanLayoutRecursive(layoutPtr);
-		//m_customWidgetMap[m_rootId]->setAcceptDrops(true);
-		//delete layoutPtr;
+	m_rootId = QUuid::createUuid().toByteArray();
+	CCustomLayoutWidget* customLayoutWidgetPtr = new CCustomLayoutWidget(m_rootId, *this, NULL, this);
+	if (customLayoutWidgetPtr != NULL){
+		layout()->addWidget(customLayoutWidgetPtr);
+		m_customWidgetMap.insert(m_rootId, customLayoutWidgetPtr);
+		m_internalItemList.push_back(InternalItemData(m_rootId));
 	}
+
 }
 
 
@@ -216,7 +212,7 @@ void CHierarchicalLayoutWidget::OnDropEvent(const QByteArray& inputId, QDropEven
 
 	InternalItemData* internalItemDataPtr = GetInternalItem(id);
 	if (m_customWidgetMap.contains(id) && (internalItemDataPtr != NULL)){
-		if (eventPtr->mimeData()->hasFormat("layout-item")) {
+		if (eventPtr->mimeData()->hasFormat("layout-item")){
 			eventPtr->accept();
 			eventPtr->setDropAction(Qt::MoveAction);
 
@@ -279,10 +275,10 @@ void CHierarchicalLayoutWidget::SetSplitterLayout(const QByteArray& id, Qt::Orie
 	InternalItemData* internalItemDataPtr = GetInternalItem(id);
 	QList<int> sizes;
 
-	if (m_customWidgetMap.contains(id) && (internalItemDataPtr != NULL)) {
+	if (m_customWidgetMap.contains(id) && (internalItemDataPtr != NULL)){
 		QRect rectParent = m_customWidgetMap[id]->geometry();
 		QSplitter* splitterParentPtr = qobject_cast<QSplitter*> (m_customWidgetMap[id]->parent());
-		if (splitterParentPtr == NULL) {
+		if (splitterParentPtr == NULL){
 			splitterParentPtr = new QSplitter(this);
 			splitterParentPtr->setStyleSheet("QSplitter{background-color: transparent;}");
 			splitterParentPtr->setOrientation(orientation);
@@ -290,7 +286,7 @@ void CHierarchicalLayoutWidget::SetSplitterLayout(const QByteArray& id, Qt::Orie
 			this->layout()->addWidget(splitterParentPtr);
 			splitterParentPtr->addWidget(m_customWidgetMap[id]);
 		}
-		if (splitterParentPtr->orientation() != orientation) {
+		if (splitterParentPtr->orientation() != orientation){
 			sizes = splitterParentPtr->sizes();
 			QSplitter* splitterPtr = new QSplitter(this);
 			splitterPtr->setStyleSheet("QSplitter{background-color: transparent;}");
@@ -308,10 +304,10 @@ void CHierarchicalLayoutWidget::SetSplitterLayout(const QByteArray& id, Qt::Orie
 			index = 0;
 		}
 		QByteArray newId;
-		if ((idsListPtr != NULL) && (0 < idsListPtr->count()) && !idsListPtr->at(0).isEmpty()) {
+		if ((idsListPtr != NULL) && (0 < idsListPtr->count()) && !idsListPtr->at(0).isEmpty()){
 			newId = idsListPtr->at(0);
 		}
-		else {
+		else{
 			newId = QUuid::createUuid().toByteArray();
 		}
 		localIdsList.push_back(newId);
@@ -319,13 +315,13 @@ void CHierarchicalLayoutWidget::SetSplitterLayout(const QByteArray& id, Qt::Orie
 		splitterParentPtr->insertWidget(index, newItemPtr);
 		int size = 0;
 		
-		if (orientation == Qt::Horizontal) {
+		if (orientation == Qt::Horizontal){
 			size = rectParent.width() / splitterParentPtr->count();
 		}
-		else {
+		else{
 			size = rectParent.height() / splitterParentPtr->count();
 		}
-		for (int i = 0; i < splitterParentPtr->count(); i++) {
+		for (int i = 0; i < splitterParentPtr->count(); i++){
 			sizes << size;
 		}
 		splitterParentPtr->setSizes(sizes);
@@ -376,21 +372,20 @@ void CHierarchicalLayoutWidget::RemoveLayout(const QByteArray& id)
 {
 
 	InternalItemData* internalItemDataPtr = GetInternalItem(id);
-	if ((internalItemDataPtr != NULL) && m_customWidgetMap.contains(id)) {
+	if ((internalItemDataPtr != NULL) && m_customWidgetMap.contains(id)){
 		QSplitter* splitterPtr = qobject_cast<QSplitter*> (m_customWidgetMap[id]->parent());
-		if (splitterPtr != NULL)
-		{
+		if (splitterPtr != NULL){
 			m_customWidgetMap[id]->setParent(NULL);
-			if (splitterPtr->count() == 1) {
+			if (splitterPtr->count() == 1){
 				QSplitter* splitterParentPtr = qobject_cast<QSplitter*> (splitterPtr->parent());
-				if (splitterParentPtr != NULL) {
+				if (splitterParentPtr != NULL){
 					int index = splitterParentPtr->indexOf(splitterPtr);
 					QWidget *widget = splitterPtr->widget(0);
 					QSize size = widget->size();
 					splitterParentPtr->insertWidget(index,widget);
 					
 				}
-				else {
+				else{
 					QWidget *widget = splitterPtr->widget(0);
 					widget->setParent(NULL);
 				//	CleanLayoutRecursive(this->layout());
@@ -411,7 +406,7 @@ void CHierarchicalLayoutWidget::RemoveLayout(const QByteArray& id)
 
 void CHierarchicalLayoutWidget::SetName(const QByteArray& id, QString &name)
 {
-	if (m_customWidgetMap.contains(id)) {
+	if (m_customWidgetMap.contains(id)){
 		m_customWidgetMap[id]->SetName(name);
 	}
 }
@@ -420,7 +415,7 @@ void CHierarchicalLayoutWidget::SetName(const QByteArray& id, QString &name)
 QString CHierarchicalLayoutWidget::GetName(const QByteArray& id)
 {
 	QString name;
-	if (m_customWidgetMap.contains(id)) {
+	if (m_customWidgetMap.contains(id)){
 		name = m_customWidgetMap[id]->GetName();
 	}
 	return name;
@@ -595,7 +590,7 @@ void CCustomLayoutWidget::paintEvent(QPaintEvent* eventPtr)
 	if (m_isHaveChilds == true)
 		return;
 	QPainter painter(this);
-	if ( m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT) {
+	if ( m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT){
 		painter.save();
 		painter.setOpacity(0.7);
 		painter.setPen(QPen(QColor("green")));
@@ -652,7 +647,7 @@ void CCustomLayoutWidget::dropEvent(QDropEvent *eventPtr)
 {
 	return;
 	SetDefaultPalette();
-	if (eventPtr->mimeData()->hasFormat("layout-item") || eventPtr->mimeData()->hasFormat("widget-item")) {
+	if (eventPtr->mimeData()->hasFormat("layout-item") || eventPtr->mimeData()->hasFormat("widget-item")){
 		eventPtr->accept();
 		eventPtr->setDropAction(Qt::MoveAction);
 

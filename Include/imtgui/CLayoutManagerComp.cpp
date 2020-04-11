@@ -15,6 +15,9 @@ CLayoutManagerComp::CLayoutManagerComp(QWidget* parentPtr)
 {
 	m_rootCommands.InsertChild(&m_commands);
 	m_commands.InsertChild(&m_startEndEditModeCommand);
+	m_commands.InsertChild(&m_clearCommand);
+	m_clearCommand.setVisible(false);
+	m_clearCommand.setCheckable(false);
 
 	connect(&m_startEndEditModeCommand, SIGNAL(triggered()), this, SLOT(OnStartEndEditCommand()));
 	connect(&m_clearCommand, SIGNAL(triggered()), this, SLOT(OnClearAll()));
@@ -59,10 +62,10 @@ void CLayoutManagerComp::OnGuiCreated()
 		(m_guiViewNameMultiAttrPtr.GetCount() == m_guiViewMultiFactCompPtr.GetCount()), "CLayoutManagerComp", "attributes ViewIds, ViewNames and ViewFactories should have the same count");
 
 	// gui views part
-	if (m_guiViewIdMultiAttrPtr.IsValid() && m_guiViewMultiFactCompPtr.IsValid() && m_guiViewNameMultiAttrPtr.IsValid()) {
+	if (m_guiViewIdMultiAttrPtr.IsValid() && m_guiViewMultiFactCompPtr.IsValid() && m_guiViewNameMultiAttrPtr.IsValid()){
 		int minCount = qMin(m_guiViewIdMultiAttrPtr.GetCount(), m_guiViewMultiFactCompPtr.GetCount());
 		minCount = qMin(minCount, m_guiViewNameMultiAttrPtr.GetCount());
-		for (int i = 0; i < minCount; ++i) {
+		for (int i = 0; i < minCount; ++i){
 			m_guiViewOptionsManager.InsertOption(m_guiViewNameMultiAttrPtr[i], m_guiViewIdMultiAttrPtr[i]);
 		}
 	}
@@ -83,8 +86,15 @@ void CLayoutManagerComp::OnGuiRetranslate()
 
 void CLayoutManagerComp::OnClearAll()
 {
-	if (m_layoutWidgetPtr != NULL) {
-		m_layoutWidgetPtr->ClearAll();
+	if (m_layoutWidgetPtr != NULL){
+		QMessageBox msgBox;
+		msgBox.setText(tr("Do you want clear All views?"));
+		msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+		msgBox.setDefaultButton(QMessageBox::Cancel);
+		int ret = msgBox.exec();
+		if (ret == QMessageBox::Ok){
+			m_layoutWidgetPtr->ClearAll();
+		}
 	}
 
 }
@@ -92,13 +102,13 @@ void CLayoutManagerComp::OnClearAll()
 
 void CLayoutManagerComp::OnChangeName()
 {
-	if (m_layoutWidgetPtr != NULL) {
+	if (m_layoutWidgetPtr != NULL){
 		QString name = m_layoutWidgetPtr->GetName(m_activeId);
 		bool ok;
 		name = QInputDialog::getText(this->GetQtWidget(), tr("Get Name"),
 			tr("View name:"), QLineEdit::Normal,
 			name, &ok);
-		if (ok && !name.isEmpty()) {
+		if (ok && !name.isEmpty()){
 			m_layoutWidgetPtr->SetName(m_activeId, name);
 		}
 	}
@@ -108,7 +118,7 @@ void CLayoutManagerComp::OnChangeName()
 
 void CLayoutManagerComp::OnSplitVertical()
 {
-	if (m_layoutWidgetPtr != NULL) {
+	if (m_layoutWidgetPtr != NULL){
 		m_layoutWidgetPtr->SetSplitterLayout(m_activeId, Qt::Vertical, 2);
 	}
 
@@ -117,7 +127,7 @@ void CLayoutManagerComp::OnSplitVertical()
 
 void CLayoutManagerComp::OnSplitHorizontal()
 {
-	if (m_layoutWidgetPtr != NULL) {
+	if (m_layoutWidgetPtr != NULL){
 		m_layoutWidgetPtr->SetSplitterLayout(m_activeId, Qt::Horizontal, 2);
 	}
 
@@ -126,7 +136,7 @@ void CLayoutManagerComp::OnSplitHorizontal()
 
 void CLayoutManagerComp::OnDelete()
 {
-	if (m_layoutWidgetPtr != NULL) {
+	if (m_layoutWidgetPtr != NULL){
 		m_layoutWidgetPtr->RemoveLayout(m_activeId);
 	}
 
@@ -145,7 +155,7 @@ void CLayoutManagerComp::OnAddWidget()
 	if (action != nullptr){
 		int index = action->data().toInt();
 		istd::TSmartPtr<iqtgui::IGuiObject> newWidgetPtr(m_guiViewMultiFactCompPtr.CreateInstance(index));
-		if (newWidgetPtr->CreateGui(NULL)) {
+		if (newWidgetPtr->CreateGui(NULL)){
 			m_layoutWidgetPtr->SetWidgetToItem(m_activeId, newWidgetPtr->GetWidget());
 			m_createdViewMap.insert(m_activeId, newWidgetPtr);
 		}
@@ -156,18 +166,18 @@ void CLayoutManagerComp::OnAddWidget()
 void CLayoutManagerComp::OnDropWidget(QByteArray id, QDropEvent* eventPtr)
 {
 	const QMimeData* mimeDataPtr = eventPtr->mimeData();
-	if (mimeDataPtr != NULL) {
+	if (mimeDataPtr != NULL){
 		QByteArray mimeData = mimeDataPtr->data("widget-item");
 		qDebug() << "drop event for id " << id << " with data = " << mimeData;
 
 		// gui views part
-		if (m_guiViewIdMultiAttrPtr.IsValid() && m_guiViewMultiFactCompPtr.IsValid() && m_guiViewNameMultiAttrPtr.IsValid()) {
+		if (m_guiViewIdMultiAttrPtr.IsValid() && m_guiViewMultiFactCompPtr.IsValid() && m_guiViewNameMultiAttrPtr.IsValid()){
 			int minCount = qMin(m_guiViewIdMultiAttrPtr.GetCount(), m_guiViewMultiFactCompPtr.GetCount());
 			minCount = qMin(minCount, m_guiViewNameMultiAttrPtr.GetCount());
-			for (int i = 0; i < minCount; ++i) {
-				if ((m_layoutWidgetPtr != NULL) && (m_guiViewIdMultiAttrPtr[i] == mimeData)) {
+			for (int i = 0; i < minCount; ++i){
+				if ((m_layoutWidgetPtr != NULL) && (m_guiViewIdMultiAttrPtr[i] == mimeData)){
 					istd::TSmartPtr<iqtgui::IGuiObject> newWidgetPtr(m_guiViewMultiFactCompPtr.CreateInstance(i));
-					if (newWidgetPtr->CreateGui(NULL)) {
+					if (newWidgetPtr->CreateGui(NULL)){
 						m_layoutWidgetPtr->SetWidgetToItem(id, newWidgetPtr->GetWidget());
 						m_createdViewMap.insert(id, newWidgetPtr);
 					}
@@ -187,17 +197,15 @@ void CLayoutManagerComp::OnOpenMenu(QByteArray id, QMouseEvent* eventPtr)
 	menu.addAction("Split Vertical", this, &CLayoutManagerComp::OnSplitVertical);
 	menu.addAction("Split Horizontal", this, &CLayoutManagerComp::OnSplitHorizontal);
 	menu.addAction("Delete", this, &CLayoutManagerComp::OnDelete);
-	if (m_createdViewMap.contains(id)) {
+	if (m_createdViewMap.contains(id)){
 		menu.addAction("Clear", this, &CLayoutManagerComp::OnClear);
 	}
 	menu.addSeparator();
 
-	for (int i = 0; i < m_guiViewOptionsManager.GetOptionsCount(); i++)
-	{
+	for (int i = 0; i < m_guiViewOptionsManager.GetOptionsCount(); i++){
 		QString name = m_guiViewOptionsManager.GetOptionName(i);
 		QAction *action = menu.addAction("Insert " + name, this, &CLayoutManagerComp::OnAddWidget);
 		action->setData(i);
-
 	}
 	menu.exec(eventPtr->globalPos());
 }
@@ -214,17 +222,16 @@ void CLayoutManagerComp::OnClearWidget(QByteArray id)
 
 void CLayoutManagerComp::OnStartEndEditCommand()
 {
-	if (m_layoutWidgetPtr != NULL) {
+	if (m_layoutWidgetPtr != NULL){
 		QAction* actionPtr = dynamic_cast<QAction*>(sender());
-		if (actionPtr != NULL) {
-			if (actionPtr->isChecked()) {
+		if (actionPtr != NULL){
+			if (actionPtr->isChecked()){
 				m_layoutWidgetPtr->SetViewMode(CHierarchicalLayoutWidget::VM_EDIT);
-				m_commands.InsertChild(&m_clearCommand,false,1);
+				m_clearCommand.setVisible(true);
 			}
-			else {
+			else{
 				m_layoutWidgetPtr->SetViewMode(CHierarchicalLayoutWidget::VM_NORMAL);
-				m_commands.RemoveChild(1);
-
+				m_clearCommand.setVisible(false);
 			}
 		}
 	}
