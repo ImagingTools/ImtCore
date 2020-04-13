@@ -215,6 +215,14 @@ QTreeView[ItemView=true]::item
 	padding-bottom: 0.9em;
 }
 
+QTreeView[ItemView=true]::item::selected
+{
+	color: #335777;
+	padding-top: 0.9em;
+	padding-bottom: 0.9em;
+	background-color: #aad5ff;
+}
+
 QComboBox::item:selected 
 {
  	color: white;
