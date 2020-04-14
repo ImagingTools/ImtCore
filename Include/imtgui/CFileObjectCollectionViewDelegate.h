@@ -26,7 +26,6 @@ public:
 	{
 		CI_IMPORT = BaseClass::CI_USER,
 		CI_EXPORT,
-
 		CI_USER = BaseClass::CI_USER + 100
 	};
 
