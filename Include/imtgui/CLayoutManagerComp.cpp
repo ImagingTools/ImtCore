@@ -19,6 +19,7 @@ CLayoutManagerComp::CLayoutManagerComp(QWidget* parentPtr)
 	m_clearCommand.setVisible(false);
 	m_clearCommand.setCheckable(false);
 
+	
 	connect(&m_startEndEditModeCommand, SIGNAL(triggered()), this, SLOT(OnStartEndEditCommand()));
 	connect(&m_clearCommand, SIGNAL(triggered()), this, SLOT(OnClearAll()));
 }
@@ -49,10 +50,16 @@ void CLayoutManagerComp::OnGuiCreated()
 {
 	m_layoutWidgetPtr = new CHierarchicalLayoutWidget(GetQtWidget());
 	this->GetWidget()->layout()->addWidget(m_layoutWidgetPtr);
+
+
 	// only DirectConnection for valid DropEvent processing
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitDropEvent(QByteArray, QDropEvent*)), this, SLOT(OnDropWidget(QByteArray, QDropEvent*)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitOpenMenuEvent(QByteArray, QMouseEvent*)), this, SLOT(OnOpenMenu(QByteArray, QMouseEvent*)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitClearEvent(QByteArray)), this, SLOT(OnClearWidget(QByteArray)), Qt::DirectConnection);
+	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitAddWidget(const QByteArray&,int)), this, SLOT(OnAddWidget(const QByteArray&, int)), Qt::DirectConnection);
+	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitDeleteWidget(const QByteArray&)), this, SLOT(OnDeleteWidget(const QByteArray&)), Qt::DirectConnection);
+	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitSplitVertical(const QByteArray&)), this, SLOT(OnSplitVertical(const QByteArray&)), Qt::DirectConnection);
+	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitSplitHorizontal(const QByteArray&)), this, SLOT(OnSplitHorizontal(const QByteArray&)), Qt::DirectConnection);
 
 	// check views attributes
 	Q_ASSERT_X(m_guiViewIdMultiAttrPtr.IsValid(), "CLayoutManagerComp", "attribute ViewIds should be set");
@@ -62,14 +69,16 @@ void CLayoutManagerComp::OnGuiCreated()
 		(m_guiViewNameMultiAttrPtr.GetCount() == m_guiViewMultiFactCompPtr.GetCount()), "CLayoutManagerComp", "attributes ViewIds, ViewNames and ViewFactories should have the same count");
 
 	// gui views part
+	QStringList additionalNames;
 	if (m_guiViewIdMultiAttrPtr.IsValid() && m_guiViewMultiFactCompPtr.IsValid() && m_guiViewNameMultiAttrPtr.IsValid()){
 		int minCount = qMin(m_guiViewIdMultiAttrPtr.GetCount(), m_guiViewMultiFactCompPtr.GetCount());
 		minCount = qMin(minCount, m_guiViewNameMultiAttrPtr.GetCount());
 		for (int i = 0; i < minCount; ++i){
+			additionalNames.append(m_guiViewNameMultiAttrPtr[i]);
 			m_guiViewOptionsManager.InsertOption(m_guiViewNameMultiAttrPtr[i], m_guiViewIdMultiAttrPtr[i]);
 		}
 	}
-
+	m_layoutWidgetPtr->SetAdditionalNames(additionalNames);
 	BaseClass::OnGuiCreated();
 }
 
@@ -125,6 +134,14 @@ void CLayoutManagerComp::OnSplitVertical()
 }
 
 
+void CLayoutManagerComp::OnSplitVertical(const QByteArray& id)
+{
+	if (m_layoutWidgetPtr != NULL) {
+		m_layoutWidgetPtr->SetSplitterLayout(id, Qt::Vertical, 2);
+	}
+}
+
+
 void CLayoutManagerComp::OnSplitHorizontal()
 {
 	if (m_layoutWidgetPtr != NULL){
@@ -134,10 +151,28 @@ void CLayoutManagerComp::OnSplitHorizontal()
 }
 
 
+void CLayoutManagerComp::OnSplitHorizontal(const QByteArray& id)
+{
+	if (m_layoutWidgetPtr != NULL) {
+		m_layoutWidgetPtr->SetSplitterLayout(id, Qt::Horizontal, 2);
+	}
+
+}
+
+
 void CLayoutManagerComp::OnDelete()
 {
 	if (m_layoutWidgetPtr != NULL){
 		m_layoutWidgetPtr->RemoveLayout(m_activeId);
+	}
+
+}
+
+
+void CLayoutManagerComp::OnDeleteWidget(const QByteArray& id)
+{
+	if (m_layoutWidgetPtr != NULL) {
+		m_layoutWidgetPtr->RemoveLayout(id);
 	}
 
 }
@@ -160,6 +195,22 @@ void CLayoutManagerComp::OnAddWidget()
 			m_createdViewMap.insert(m_activeId, newWidgetPtr);
 		}
 	}
+}
+
+
+void CLayoutManagerComp::OnAddWidget(const QByteArray& id, int index)
+{
+	if (index < 0){
+		m_layoutWidgetPtr->SetWidgetToItem(id, NULL);
+	}
+	else {
+		istd::TSmartPtr<iqtgui::IGuiObject> newWidgetPtr(m_guiViewMultiFactCompPtr.CreateInstance(index));
+		if (newWidgetPtr->CreateGui(NULL)) {
+			m_layoutWidgetPtr->SetWidgetToItem(id, newWidgetPtr->GetWidget());
+			m_createdViewMap.insert(id, newWidgetPtr);
+		}
+	}
+
 }
 
 
@@ -193,10 +244,10 @@ void CLayoutManagerComp::OnOpenMenu(QByteArray id, QMouseEvent* eventPtr)
 	m_activeId = id;
 	QMenu menu(GetQtWidget());
 //	menu.addAction("Clear All", this, &CLayoutManagerComp::OnClearAll);
-	menu.addAction("Change Name", this, &CLayoutManagerComp::OnChangeName);
-	menu.addAction("Split Vertical", this, &CLayoutManagerComp::OnSplitVertical);
-	menu.addAction("Split Horizontal", this, &CLayoutManagerComp::OnSplitHorizontal);
-	menu.addAction("Delete", this, &CLayoutManagerComp::OnDelete);
+	//menu.addAction("Change Name", this, &CLayoutManagerComp::OnChangeName);
+	//menu.addAction("Split Vertical", this, &CLayoutManagerComp::OnSplitVertical);
+	//menu.addAction("Split Horizontal", this, &CLayoutManagerComp::OnSplitHorizontal);
+	//menu.addAction("Delete", this, &CLayoutManagerComp::OnDelete);
 	if (m_createdViewMap.contains(id)){
 		menu.addAction("Clear", this, &CLayoutManagerComp::OnClear);
 	}
@@ -204,8 +255,8 @@ void CLayoutManagerComp::OnOpenMenu(QByteArray id, QMouseEvent* eventPtr)
 
 	for (int i = 0; i < m_guiViewOptionsManager.GetOptionsCount(); i++){
 		QString name = m_guiViewOptionsManager.GetOptionName(i);
-		QAction *action = menu.addAction("Insert " + name, this, &CLayoutManagerComp::OnAddWidget);
-		action->setData(i);
+		//QAction *action = menu.addAction("Insert " + name, this, &CLayoutManagerComp::OnAddWidget);
+		//action->setData(i);
 	}
 	menu.exec(eventPtr->globalPos());
 }

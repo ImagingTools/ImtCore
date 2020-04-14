@@ -105,10 +105,14 @@ protected Q_SLOTS:
 	void OnClearAll();
 	void OnChangeName();
 	void OnSplitVertical();
+	void OnSplitVertical(const QByteArray& id);
 	void OnSplitHorizontal();
+	void OnSplitHorizontal(const QByteArray& id);
 	void OnDelete();
+	void OnDeleteWidget(const QByteArray& id);
 	void OnClear();
 	void OnAddWidget();
+	void OnAddWidget(const QByteArray& id, int index);
 
 private:
 	// static template methods for subelement access

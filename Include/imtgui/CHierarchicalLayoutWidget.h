@@ -4,6 +4,8 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
 #include <QtWidgets/QWidget>
+#include <GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h>
+
 
 
 namespace imtgui
@@ -19,7 +21,7 @@ class CHierarchicalLayoutWidget;
 	Helper class for one item in layout
 */
 class CCustomLayoutWidget
-		: public QWidget
+		: public QWidget, Ui::CCustomLayoutWidgetForm
 {
 	Q_OBJECT
 public:
@@ -32,6 +34,7 @@ public:
 	void SetIsHaveChilds(bool source);
 	void SetName(QString name);
 	QString GetName();
+	void SetEditMode(bool isEditMode);
 
 protected:
 	// reimplemented (QWidget)
@@ -43,11 +46,19 @@ protected:
 
 protected Q_SLOTS:
 	void OnSplitterMoved(int pos, int index);
+	void OnNamePosition();
+	void OnAddWidget();
+	void OnDeleteWidget();
+	void OnSplitVertical();
+	void OnSplitHorizontal();
+	void OnChangeName();
+	void OnChangeIcon();
 
 private:
 	CHierarchicalLayoutWidget& m_hierarchicalLayoutWidget;
 	CCustomLayoutWidget* m_parentCustomWidgetPtr;
 	QByteArray m_id;
+	QWidget* m_editPanelPtr;
 	QWidget* m_externalWidgetPtr;
 	QString m_name;
 	int m_titleSize;
@@ -96,6 +107,7 @@ public:
 	void RemoveLayout(const QByteArray& id);
 	void SetName(const QByteArray& id, QString &name);
 	QString GetName(const QByteArray& id);
+	void SetAdditionalNames(QStringList& additionalNames);
 
 protected:
 	friend class CCustomLayoutWidget;
@@ -137,6 +149,10 @@ Q_SIGNALS:
 	void EmitDropEvent(QByteArray id, QDropEvent* eventPtr);
 	void EmitOpenMenuEvent(QByteArray id, QMouseEvent* eventPtr);
 	void EmitClearEvent(const QByteArray& id);
+	void EmitAddWidget(const QByteArray& id, int index);
+	void EmitDeleteWidget(const QByteArray& id);
+	void EmitSplitVertical(const QByteArray& id);
+	void EmitSplitHorizontal(const QByteArray& id);
 
 private:
 	typedef QMap<QByteArray, CCustomLayoutWidget*> CustomWidgetMap;
@@ -144,6 +160,7 @@ private:
 	QList<InternalItemData> m_internalItemList;
 	typedef QMap<QByteArray, QWidget*> InsertedWidgetMap;
 	ViewMode m_viewMode;
+	QStringList m_additionalNames;
 	QByteArray m_rootId;
 };
 

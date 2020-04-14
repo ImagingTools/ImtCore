@@ -2,10 +2,18 @@
 
 
 // Qt includes
-#include <QMimeData>
-#include <QSplitter>
-#include <QVBoxLayout>
-#include <QUuid>
+#include <QtCore/QMimeData>
+#include <QtCore/QUuid>
+
+#include <QtGui/QPixmap>
+
+#include <QtWidgets/QAction>
+#include <QtWidgets/QSplitter>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QLineEdit>
 
 // remove later
 #include <QDebug>
@@ -26,12 +34,7 @@ CHierarchicalLayoutWidget::CHierarchicalLayoutWidget(QWidget* parentPtr)
 	layout()->setMargin(0);
 
 	m_rootId = QUuid::createUuid().toByteArray();
-	CCustomLayoutWidget* customLayoutWidgetPtr = new CCustomLayoutWidget(m_rootId, *this, NULL, this);
-	if (customLayoutWidgetPtr != NULL){
-		layout()->addWidget(customLayoutWidgetPtr);	
-		m_customWidgetMap.insert(m_rootId, customLayoutWidgetPtr);
-		m_internalItemList.push_back(InternalItemData(m_rootId));
-	}
+
 
 	SetViewMode(VM_NORMAL);
 }
@@ -45,6 +48,7 @@ void CHierarchicalLayoutWidget::SetViewMode(ViewMode viewMode)
 	for (QByteArray& key : keys){
 		CCustomLayoutWidget* customWidgetPtr = m_customWidgetMap[key];
 		InternalItemData* internalItemDataPtr = GetInternalItem(key);
+		customWidgetPtr->SetEditMode(viewMode == VM_EDIT);
 		if (internalItemDataPtr != NULL){
 			customWidgetPtr->setAcceptDrops((viewMode == VM_EDIT) && (internalItemDataPtr->layoutType != LT_HORIZONTAL_SPLITTER) && (internalItemDataPtr->layoutType != LT_VERTICAL_SPLITTER));
 			if ((customWidgetPtr->layout() != NULL) && (customWidgetPtr->layout()->count() > 0)){
@@ -422,6 +426,20 @@ QString CHierarchicalLayoutWidget::GetName(const QByteArray& id)
 }
 
 
+void CHierarchicalLayoutWidget::SetAdditionalNames(QStringList& additionalNames)
+{
+	m_additionalNames = additionalNames;
+	if (layout()->count() == 0){
+		CCustomLayoutWidget* customLayoutWidgetPtr = new CCustomLayoutWidget(m_rootId, *this, NULL, this);
+		if (customLayoutWidgetPtr != NULL) {
+			layout()->addWidget(customLayoutWidgetPtr);
+			m_customWidgetMap.insert(m_rootId, customLayoutWidgetPtr);
+			m_internalItemList.push_back(InternalItemData(m_rootId));
+		}
+	}
+}
+
+
 void CHierarchicalLayoutWidget::CleanLayoutRecursive(QLayout* layoutPtr)
 {
 	if (layoutPtr != NULL){
@@ -491,11 +509,49 @@ CCustomLayoutWidget::CCustomLayoutWidget(const QByteArray& id, CHierarchicalLayo
 	m_titleSize(30),
 	m_isHaveChilds(false)
 {
+	setupUi(this);
+	TitlePanel->setProperty("ImtTopFrame", QVariant(true));
+	EditPanel->setProperty("ImtTopFrame", QVariant(true));
+	EditPanel->setVisible(m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT);
+
+	connect(SplitVerticaly, &QToolButton::clicked, this, &CCustomLayoutWidget::OnSplitVertical);
+	connect(SplitHorizontaly, &QToolButton::clicked, this, &CCustomLayoutWidget::OnSplitHorizontal);
+	connect(DeleteButton, &QToolButton::clicked, this, &CCustomLayoutWidget::OnDeleteWidget);
+	connect(ChangeNameButton, &QToolButton::clicked, this, &CCustomLayoutWidget::OnChangeName);
+	connect(ChangeIconButton, &QToolButton::clicked, this, &CCustomLayoutWidget::OnChangeIcon);
+
+	//ButtonsPanel->setProperty("ImtTopFrame", QVariant(true));
+	QAction *action;
+	action = new QAction(tr("Left"), this);
+	NamePosition->addAction(action);
+	connect(action, &QAction::triggered, this, &CCustomLayoutWidget::OnNamePosition);
+	action = new QAction(tr("Right"), this);
+	NamePosition->addAction(action);
+	connect(action, &QAction::triggered, this, &CCustomLayoutWidget::OnNamePosition);
+	action = new QAction(tr("Center"), this);
+	NamePosition->addAction(action);
+	connect(action, &QAction::triggered, this, &CCustomLayoutWidget::OnNamePosition);
+
+	for (int i = -1; i < m_hierarchicalLayoutWidget.m_additionalNames.count(); i++)
+	{
+//		QAction *action = addWidgets->addAction(m_hierarchicalLayoutWidget.m_additionalNames[i], this, &CCustomLayoutWidget::OnAddWidget);
+		if (i < 0){
+			action = new QAction(tr("Empty"), this);
+		}
+		else{
+			action = new QAction(m_hierarchicalLayoutWidget.m_additionalNames[i], this);
+		}
+		connect(action, &QAction::triggered, this, &CCustomLayoutWidget::OnAddWidget);
+		AddWidgets->addAction(action);
+	}
+
 	setAutoFillBackground(true);
 	SetDefaultPalette();
 
-	setAcceptDrops(true);
+	//setAcceptDrops(true);
 	setMinimumSize(m_titleSize * 2, m_titleSize * 2);
+
+	setLayout(new QVBoxLayout(this));
 }
 
 
@@ -526,15 +582,15 @@ bool CCustomLayoutWidget::SetWidget(QWidget* widgetPtr)
 		//	return false;
 		//}
 
-		if (layout() == NULL){
-			setLayout(new QVBoxLayout(this));
+		if (WidgetPanel->layout() == NULL){
+			WidgetPanel->setLayout(new QVBoxLayout(this));
 		}
 
-		if (layout()->count() == 0){
-			QWidget *widget = new QWidget();
-			widget->setFixedSize(m_titleSize, m_titleSize);
-			layout()->addWidget(widget);
-			layout()->addWidget(widgetPtr);
+		if (WidgetPanel->layout()->count() == 0){
+			//QWidget *widget = new QWidget();
+			//widget->setFixedSize(m_titleSize, m_titleSize);
+			//layout()->addWidget(widget);
+			WidgetPanel->layout()->addWidget(widgetPtr);
 			m_externalWidgetPtr = widgetPtr;
 			return true;
 		}
@@ -545,12 +601,12 @@ bool CCustomLayoutWidget::SetWidget(QWidget* widgetPtr)
 	}
 
 	// take care about external widget
-	if ((layout() != NULL) && (layout()->count() == 1) && (layout()->itemAt(0)->widget() != NULL)){
-		QWidget* widgetPtr = layout()->takeAt(0)->widget();
+	if ((WidgetPanel->layout() != NULL) && (WidgetPanel->layout()->count() == 1) && (WidgetPanel->layout()->itemAt(0)->widget() != NULL)){
+		QWidget* widgetPtr = WidgetPanel->layout()->takeAt(0)->widget();
 		widgetPtr->setParent(NULL);
 	}
 
-	delete layout();
+	delete WidgetPanel->layout();
 	m_externalWidgetPtr = NULL;
 
 	return true;
@@ -571,13 +627,21 @@ void CCustomLayoutWidget::SetIsHaveChilds(bool source)
 
 void CCustomLayoutWidget::SetName(QString name)
 {
-	m_name = name;
+	//m_name = name;
+	CCustomLayoutWidgetForm::titleName->setText(name);
 }
 
 
 QString CCustomLayoutWidget::GetName()
 {
-	return m_name;
+//	return m_name;
+	return CCustomLayoutWidgetForm::titleName->text();
+}
+
+
+void CCustomLayoutWidget::SetEditMode(bool isEditMode)
+{
+	EditPanel->setVisible(isEditMode);
 }
 
 
@@ -590,12 +654,19 @@ void CCustomLayoutWidget::paintEvent(QPaintEvent* eventPtr)
 	if (m_isHaveChilds == true)
 		return;
 	QPainter painter(this);
-	if ( m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT){
-		painter.save();
-		painter.setOpacity(0.7);
-		painter.setPen(QPen(QColor("green")));
+	painter.save();
+	painter.setOpacity(0.7);
+	//		painter.setPen(QPen(QColor("green")));
+	QPen pen(QColor("gray"));
+	if (m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT) {
+		pen.setStyle(Qt::DashLine);
+	}
+	painter.setPen(pen);
 	//	painter.setBrush(palette().color(QPalette::Background));
-		painter.drawRect(rect().adjusted(0, 0, -1, -1));
+	painter.drawRect(rect().adjusted(0, 0, -1, -1));
+
+	if (m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT) {
+
 		QRect r;
 		r.setWidth(rect().width());
 		r.setHeight(m_titleSize);
@@ -607,13 +678,13 @@ void CCustomLayoutWidget::paintEvent(QPaintEvent* eventPtr)
 		painter.drawRect(r);
 		painter.restore();
 	}
-	QFont font = painter.font();
-	font.setPixelSize(m_titleSize * 0.8);
-	painter.setFont(font);
+	//QFont font = painter.font();
+	//font.setPixelSize(m_titleSize * 0.8);
+	//painter.setFont(font);
 
-	const QRect rectangle = QRect(0, 0, rect().width(), 50);
-	QRect boundingRect;
-	painter.drawText(rectangle, Qt::AlignHCenter, m_name, &boundingRect);
+	//const QRect rectangle = QRect(0, 0, rect().width(), 50);
+	//QRect boundingRect;
+	//painter.drawText(rectangle, Qt::AlignHCenter, m_name, &boundingRect);
 }
 
 
@@ -674,6 +745,80 @@ void CCustomLayoutWidget::OnSplitterMoved(int /*pos*/, int /*index*/)
 	if (splitterPtr != NULL){
 		m_hierarchicalLayoutWidget.OnSplitterMoved(m_id, splitterPtr->sizes());
 	}
+}
+
+
+void CCustomLayoutWidget::OnNamePosition()
+{
+	QAction *action = dynamic_cast<QAction*>(sender());
+	if (action) {
+		QList<QAction*> actions = NamePosition->actions();
+		int index = actions.indexOf(action);
+		if (index == 0){
+			titleName->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+		}
+		if (index == 1) {
+			titleName->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		}
+		if (index == 2) {
+			titleName->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		}
+	}
+}
+
+
+void CCustomLayoutWidget::OnAddWidget()
+{
+	QAction *action = dynamic_cast<QAction*>(sender());
+	if (action){
+		QList<QAction*> actions = AddWidgets->actions();
+		int index = actions.indexOf(action) - 1;
+		emit m_hierarchicalLayoutWidget.EmitAddWidget(m_id, index);
+	}
+}
+
+
+void CCustomLayoutWidget::OnDeleteWidget()
+{
+	m_hierarchicalLayoutWidget.RemoveLayout(m_id);
+	//emit m_hierarchicalLayoutWidget.EmitDeleteWidget(m_id);
+}
+
+
+void CCustomLayoutWidget::OnSplitVertical()
+{
+	m_hierarchicalLayoutWidget.SetSplitterLayout(m_id, Qt::Vertical, 2);
+	//emit m_hierarchicalLayoutWidget.EmitSplitVertical(m_id);
+}
+
+
+void CCustomLayoutWidget::OnSplitHorizontal()
+{
+	m_hierarchicalLayoutWidget.SetSplitterLayout(m_id, Qt::Horizontal, 2);
+	//emit m_hierarchicalLayoutWidget.EmitSplitHorizontal(m_id);
+}
+
+
+void CCustomLayoutWidget::OnChangeName()
+{
+	QString name = CCustomLayoutWidgetForm::titleName->text();
+	bool ok;
+	name = QInputDialog::getText(this, tr("Get Name"),
+		tr("View name:"), QLineEdit::Normal,
+		name, &ok);
+	if (ok && !name.isEmpty()) {
+		CCustomLayoutWidgetForm::titleName->setText(name);
+	}
+}
+
+
+void CCustomLayoutWidget::OnChangeIcon()
+{
+	QString fileName = QFileDialog::getOpenFileName(this,
+		tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp *.ico *.svg)"));
+	QPixmap pixmap(fileName);
+	pixmap = pixmap.scaled(28, 28);
+	CCustomLayoutWidgetForm::titleIcon->setPixmap(pixmap);
 }
 
 
