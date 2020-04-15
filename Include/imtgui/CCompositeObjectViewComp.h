@@ -10,6 +10,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtgui/IViewExtender.h>
 #include <GeneratedFiles/imtgui/ui_CCompositeObjectViewComp.h>
 
 
@@ -30,8 +31,11 @@ public:
 
 	I_BEGIN_COMPONENT(CCompositeObjectViewComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
-		I_ASSIGN_MULTI_0(m_objectViewFactoryListCompPtr, "ObjectView", "View for showing object", true);
 		I_ASSIGN_MULTI_0(m_objectTypeAttrPtr, "ObjectTypeId", "ID of objects on the container", true);
+		I_ASSIGN_MULTI_0(m_objectViewFactoryListCompPtr, "ObjectView", "View for showing object", true);
+		I_ASSIGN_MULTI_0(m_objectsToExtendAttrPtr, "ObjectsToExtend", "Objects which view will be extended", false);
+		I_ASSIGN_MULTI_0(m_objectsFromExtendAttrPtr, "ObjectsFromExtend", "Objects to extend view", false);
+		I_ASSIGN_MULTI_0(m_viewExtendersCompPtr, "ViewExtenders", "View extenders", false);
 	I_END_COMPONENT;
 
 	CCompositeObjectViewComp();
@@ -57,11 +61,16 @@ private:
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_commands;
 
-	I_MULTIFACT(iqtgui::IGuiObject, m_objectViewFactoryListCompPtr);
 	I_MULTIATTR(QByteArray, m_objectTypeAttrPtr);
+	I_MULTIFACT(iqtgui::IGuiObject, m_objectViewFactoryListCompPtr);
 
-	QVector<QByteArray> m_objectIds;
-	QVector<iqtgui::IGuiObject*> m_objectViews;
+	I_MULTIATTR(QString, m_objectsToExtendAttrPtr);
+	I_MULTIATTR(QString, m_objectsFromExtendAttrPtr);
+	I_MULTIFACT(imtgui::IViewExtender, m_viewExtendersCompPtr);
+
+	QList<QByteArray> m_objectIds;
+	QList<iqtgui::IGuiObject*> m_views;
+	QList<icomp::IComponent*> m_viewExtenders;
 };
 
 

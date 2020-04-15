@@ -19,6 +19,7 @@
 #include <imtgui/CMonitorInfoProviderComp.h>
 #include <imtgui/CLayoutManagerComp.h>
 #include <imtgui/CCompositeObjectViewComp.h>
+#include <imtgui/CImageContoursExtender.h>
 
 
 /**
@@ -41,7 +42,7 @@ typedef imtgui::CMenuPanelComp MenuPanel;
 typedef icomp::TModelCompWrap<imtgui::CMonitorInfoProviderComp> MonitorInfoProvider;
 typedef imtgui::CLayoutManagerComp LayoutManager;
 typedef imtgui::CCompositeObjectViewComp CompositeObjectView;
-
+typedef imtgui::CImageContoursExtender ImageContoursExtender;
 
 } // namespace ImtGuiPck
 

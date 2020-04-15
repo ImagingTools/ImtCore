@@ -82,6 +82,11 @@ I_EXPORT_COMPONENT(
 			"Composite object viewer",
 			"Composite Object View Observer Collection");
 
+I_EXPORT_COMPONENT(
+			ImageContoursExtender,
+			"Image contours extender component",
+			"Image Contours Contour Extender View Observer");
+
 
 } // namespace ImtGuiPck
 

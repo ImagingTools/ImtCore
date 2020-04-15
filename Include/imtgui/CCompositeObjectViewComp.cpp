@@ -90,42 +90,81 @@ void CCompositeObjectViewComp::CreateView()
 		return;
 	}
 
-	int factoryCount = qMin(m_objectViewFactoryListCompPtr.GetCount(), m_objectTypeAttrPtr.GetCount());
-
 	imtbase::ICollectionInfo::Ids objectIds = objectProviderPtr->GetElementIds();
-
 	for (const QByteArray& objectId : objectIds){
+		m_objectIds.append(objectId);
+
 		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(const_cast<istd::IChangeable*>(objectProviderPtr->GetObjectPtr(objectId)));
 		if (modelPtr == nullptr){
 			continue;
 		}
 
-		QByteArray objectTypeId = objectProviderPtr->GetObjectTypeId(objectId);
+		QByteArray objectTypeId = objectProviderPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_TYPE_ID).toByteArray();
+		QString objectName = objectProviderPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
-		for (int i = 0; i < factoryCount; i++){
-			if (objectTypeId == m_objectTypeAttrPtr[i]){
-				icomp::IComponent* componentPtr = m_objectViewFactoryListCompPtr.CreateComponent(i);
-				iqtgui::IGuiObject* viewPtr = dynamic_cast<iqtgui::IGuiObject*>(componentPtr);
-				imod::IObserver* observerPtr = dynamic_cast<imod::IObserver*>(viewPtr);
+		int factoryCount = qMin(m_objectViewFactoryListCompPtr.GetCount(), m_objectTypeAttrPtr.GetCount());
+		for (int factoryCounter = 0; factoryCounter < factoryCount; factoryCounter++){
+			if (objectTypeId == m_objectTypeAttrPtr[factoryCounter]){
+				icomp::IComponent* viewComponentPtr = m_objectViewFactoryListCompPtr.CreateComponent(factoryCounter);
+				iqtgui::IGuiObject* viewGuiObjectPtr = dynamic_cast<iqtgui::IGuiObject*>(viewComponentPtr);
+				imod::IObserver* viewObserverPtr = dynamic_cast<imod::IObserver*>(viewGuiObjectPtr);
 				
-				if (observerPtr == nullptr){
-					if (componentPtr != nullptr){
-						delete componentPtr;
+				if (viewObserverPtr == nullptr){
+					if (viewComponentPtr != nullptr){
+						delete viewComponentPtr;
 					}
 
 					break;
 				}
 
-				m_objectIds.append(objectId);
+				m_views.append(viewGuiObjectPtr);
 
 				QWidget* widgetPtr = new QWidget();
 				QVBoxLayout* layoutPtr = new QVBoxLayout(widgetPtr);
 				layoutPtr->setContentsMargins(0, 0, 0, 0);
 				widgetPtr->setLayout(layoutPtr);
 				GetQtWidget()->layout()->addWidget(widgetPtr);
-				viewPtr->CreateGui(widgetPtr);
+				viewGuiObjectPtr->CreateGui(widgetPtr);
 				
-				modelPtr->AttachObserver(observerPtr);
+				modelPtr->AttachObserver(viewObserverPtr);
+
+				if (!m_objectsToExtendAttrPtr.IsValid() || !m_objectsFromExtendAttrPtr.IsValid() || !m_viewExtendersCompPtr.IsValid()){
+					break;
+				}
+
+				int extendersCount = qMin(m_objectsToExtendAttrPtr.GetCount(), m_objectsFromExtendAttrPtr.GetCount());
+				extendersCount = qMin(extendersCount, m_viewExtendersCompPtr.GetCount());
+				
+				for (int extenderCounter = 0; extenderCounter < extendersCount; extenderCounter++){
+					if (m_objectsToExtendAttrPtr[extenderCounter] == objectName){
+						QString objectFromExtendName = m_objectsFromExtendAttrPtr[extenderCounter];
+						const istd::IChangeable* objectFromExtendPtr = nullptr;
+
+						for (QByteArray objectFromExtendId : objectIds){
+							QString currentObjectName = objectProviderPtr->GetElementInfo(objectFromExtendId, imtbase::ICollectionInfo::EIT_NAME).toString();
+
+							if (currentObjectName == objectFromExtendName){
+								objectFromExtendPtr = objectProviderPtr->GetObjectPtr(objectFromExtendId);
+								break;
+							}
+						}
+
+						if (objectFromExtendPtr == nullptr){
+							break;
+						}
+
+						icomp::IComponent* viewExtenderComponentPtr = m_viewExtendersCompPtr.CreateComponent(extenderCounter);
+						imtgui::IViewExtender* viewExtenderPtr = dynamic_cast<imtgui::IViewExtender*>(viewExtenderComponentPtr);
+						Q_ASSERT(viewExtenderPtr != nullptr);
+
+						viewExtenderPtr->AddItems(viewObserverPtr, objectFromExtendPtr);
+						m_viewExtenders.append(viewExtenderComponentPtr);
+
+						break;
+					}
+				}
+
+				break;
 			}
 		}
 	}
@@ -136,12 +175,18 @@ void CCompositeObjectViewComp::DestroyView()
 {
 	m_objectIds.clear();
 
-	for (iqtgui::IGuiObject* viewPtr : m_objectViews){
+	for (icomp::IComponent* viewExtenderPtr : m_viewExtenders){
+		delete viewExtenderPtr;
+	}
+
+	m_viewExtenders.clear();
+
+	for (iqtgui::IGuiObject* viewPtr : m_views){
 		viewPtr->DestroyGui();
 		delete viewPtr;
 	}
 
-	m_objectViews.clear();
+	m_views.clear();
 
 	iwidgets::ClearLayout(GetQtWidget()->layout());
 }
