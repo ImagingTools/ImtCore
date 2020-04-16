@@ -674,8 +674,8 @@ CCustomLayoutWidget::CCustomLayoutWidget(const QByteArray& id, CHierarchicalLayo
 	m_isHaveChilds(false)
 {
 	setupUi(this);
-	TitlePanel->setProperty("ImtTopFrame", QVariant(true));
-	EditPanel->setProperty("ImtTopFrame", QVariant(true));
+//	TitlePanel->setProperty("ImtTopFrame", QVariant(true));
+//	EditPanel->setProperty("ImtTopFrame", QVariant(true));
 	ChangeNameButton->setVisible(false);
 	ChangeIconButton1->setVisible(false);
 	SetEditMode(m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT);
@@ -894,16 +894,16 @@ void CCustomLayoutWidget::paintEvent(QPaintEvent* eventPtr)
 
 	if (m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT) {
 
-		QRect r;
-		r.setWidth(rect().width());
-		r.setHeight(m_titleSize);
-		painter.drawRect(r);
-		r.setLeft(rect().right() - m_titleSize);
-		r.setTop(rect().top());
-		r.setWidth(m_titleSize);
-		r.setHeight(m_titleSize);
-		painter.drawRect(r);
-		painter.restore();
+		//QRect r;
+		//r.setWidth(rect().width());
+		//r.setHeight(m_titleSize);
+		//painter.drawRect(r);
+		//r.setLeft(rect().right() - m_titleSize);
+		//r.setTop(rect().top());
+		//r.setWidth(m_titleSize);
+		//r.setHeight(m_titleSize);
+		//painter.drawRect(r);
+		//painter.restore();
 	}
 	//QFont font = painter.font();
 	//font.setPixelSize(m_titleSize * 0.8);
