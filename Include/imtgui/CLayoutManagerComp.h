@@ -103,6 +103,8 @@ protected Q_SLOTS:
 	void OnClearWidget(QByteArray id);
 	void OnStartEndEditCommand();
 	void OnClearAll();
+	void OnLoad();
+	void OnSave();
 	void OnChangeName();
 	void OnSplitVertical();
 	void OnSplitVertical(const QByteArray& id);
@@ -113,6 +115,7 @@ protected Q_SLOTS:
 	void OnClear();
 	void OnAddWidget();
 	void OnAddWidget(const QByteArray& id, int index);
+    void OnAddWidgetByViewId(const QByteArray& id, const QByteArray& viewId);
 
 private:
 	// static template methods for subelement access
@@ -134,6 +137,8 @@ private:
 	iqtgui::CHierarchicalCommand m_commands;
 	iqtgui::CHierarchicalCommand m_startEndEditModeCommand;
 	iqtgui::CHierarchicalCommand m_clearCommand;
+	iqtgui::CHierarchicalCommand m_loadCommand;
+	iqtgui::CHierarchicalCommand m_saveCommand;
 
 	typedef istd::TSmartPtr<iqtgui::IGuiObject> GuiObjectDelPtr;
 	typedef QMap<QByteArray, GuiObjectDelPtr> GuiObjectMap;

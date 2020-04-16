@@ -117,7 +117,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="ChangeIconButton">
+          <widget class="QToolButton" name="ChangeIconButton1">
            <property name="text">
             <string>...</string>
            </property>
@@ -130,19 +130,6 @@
              <width>28</width>
              <height>28</height>
             </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="NamePosition">
-           <property name="minimumSize">
-            <size>
-             <width>36</width>
-             <height>26</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>...</string>
            </property>
           </widget>
          </item>
@@ -216,6 +203,22 @@
           </widget>
          </item>
          <item>
+          <widget class="QToolButton" name="NamePosition">
+           <property name="minimumSize">
+            <size>
+             <width>36</width>
+             <height>26</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="popupMode">
+            <enum>QToolButton::InstantPopup</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QToolButton" name="AddWidgets">
            <property name="minimumSize">
             <size>
@@ -231,6 +234,9 @@
              <width>28</width>
              <height>28</height>
             </size>
+           </property>
+           <property name="popupMode">
+            <enum>QToolButton::InstantPopup</enum>
            </property>
           </widget>
          </item>
@@ -315,7 +321,38 @@
        </widget>
       </item>
       <item>
+       <widget class="QToolButton" name="ChangeIconButton">
+        <property name="minimumSize">
+         <size>
+          <width>36</width>
+          <height>26</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="TitleNameEdit">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>No Name</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="titleName">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="font">
          <font>
           <pointsize>12</pointsize>

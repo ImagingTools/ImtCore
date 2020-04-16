@@ -6,7 +6,10 @@
 #include <QtWidgets/QWidget>
 #include <GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h>
 
-
+// Acf includes
+#include <iser/ISerializable.h>
+#include <iser/CXmlStringWriteArchive.h>
+#include <iser/CXmlStringReadArchive.h>
 
 namespace imtgui
 {
@@ -35,6 +38,12 @@ public:
 	void SetName(QString name);
 	QString GetName();
 	void SetEditMode(bool isEditMode);
+	QByteArray GetId();
+	void SetId(QByteArray &id);
+	QPixmap GetIcon();
+	void SetIcon(QPixmap &icon);
+	QByteArray GetViewId();
+	void SetViewId(const QByteArray &viewId);
 
 protected:
 	// reimplemented (QWidget)
@@ -58,6 +67,7 @@ private:
 	CHierarchicalLayoutWidget& m_hierarchicalLayoutWidget;
 	CCustomLayoutWidget* m_parentCustomWidgetPtr;
 	QByteArray m_id;
+	QByteArray m_viewId;
 	QWidget* m_editPanelPtr;
 	QWidget* m_externalWidgetPtr;
 	QString m_name;
@@ -81,6 +91,7 @@ public:
 		LT_OBJECT,
 		LT_MERGE
 	};
+	I_DECLARE_ENUM(LayoutType, LT_NONE, LT_VERTICAL_SPLITTER, LT_HORIZONTAL_SPLITTER, LT_OBJECT, LT_MERGE);
 
 	enum ViewMode{
 		VM_UNDEFINED,
@@ -94,7 +105,7 @@ public:
 	bool SetRootItemId(const QByteArray& id);
 	bool SetLayoutToItem(const QByteArray& id, LayoutType type, int count, IdsList* idsListPtr = NULL);
 	bool SetItemSizes(const QByteArray& id, const SizeList& sizeList);
-	bool SetWidgetToItem(const QByteArray& id, QWidget* widgetPtr);
+	bool SetWidgetToItem(const QByteArray& id, const QByteArray& viewId, QWidget* widgetPtr);
 
 	QByteArray GetRootItemId();
 	IdsList GetItemChildIdList(const QByteArray& id);
@@ -108,6 +119,7 @@ public:
 	void SetName(const QByteArray& id, QString &name);
 	QString GetName(const QByteArray& id);
 	void SetAdditionalNames(QStringList& additionalNames);
+	bool Serialize(iser::IArchive& archive); // callbackFunc for get Widget
 
 protected:
 	friend class CCustomLayoutWidget;
@@ -139,10 +151,11 @@ private:
 	};
 
 private:
+	bool SerializeRecursive(iser::IArchive& archive, QWidget** widget);
 	void CleanLayoutRecursive(QLayout* layoutPtr);
 	void IdsListCollectChildIdsRecursive(const QByteArray& id, IdsList& idList);
 	InternalItemData* GetInternalItem(const QByteArray& id);
-	QByteArray GetParentId(const QByteArray& id);
+	//QByteArray GetParentId(const QByteArray& id);
 
 Q_SIGNALS:
 	void EmitLayoutChanged(QByteArray id, LayoutType type, int count);
@@ -150,6 +163,7 @@ Q_SIGNALS:
 	void EmitOpenMenuEvent(QByteArray id, QMouseEvent* eventPtr);
 	void EmitClearEvent(const QByteArray& id);
 	void EmitAddWidget(const QByteArray& id, int index);
+	void EmitAddWidgetByViewId(const QByteArray& id, const QByteArray& viewId);
 	void EmitDeleteWidget(const QByteArray& id);
 	void EmitSplitVertical(const QByteArray& id);
 	void EmitSplitHorizontal(const QByteArray& id);
@@ -158,7 +172,7 @@ private:
 	typedef QMap<QByteArray, CCustomLayoutWidget*> CustomWidgetMap;
 	CustomWidgetMap m_customWidgetMap;
 	QList<InternalItemData> m_internalItemList;
-	typedef QMap<QByteArray, QWidget*> InsertedWidgetMap;
+	//typedef QMap<QByteArray, QWidget*> InsertedWidgetMap;
 	ViewMode m_viewMode;
 	QStringList m_additionalNames;
 	QByteArray m_rootId;
