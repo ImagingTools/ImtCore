@@ -22,6 +22,7 @@
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QSpacerItem>
 
 // remove later
 #include <QDebug>
@@ -542,11 +543,13 @@ bool CHierarchicalLayoutWidget::SerializeRecursive(iser::IArchive& archive, QWid
 		QString name;
 		QByteArray iconAsByteArray;
 		QByteArray viewId;
+		AlignType titleAlign = AT_LEFT;
 
 		if (customWidget != NULL) {
 			id = customWidget->GetId();
 			name = customWidget->GetName();
 			viewId = customWidget->GetViewId();
+			titleAlign = customWidget->GetTitleAlign();
 			icon = customWidget->GetIcon();
 			QDataStream stream(&iconAsByteArray, QIODevice::WriteOnly);
 			stream << icon;
@@ -569,6 +572,11 @@ bool CHierarchicalLayoutWidget::SerializeRecursive(iser::IArchive& archive, QWid
 		retVal = retVal && archive.Process(viewId);
 		retVal = retVal && archive.EndTag(herrachicalViewId);
 
+		static iser::CArchiveTag herrachicalTitleAlign("Title Align", "Herarchical title align");
+		retVal = retVal && archive.BeginTag(herrachicalTitleAlign);
+		retVal = retVal && I_SERIALIZE_ENUM(AlignType, archive, titleAlign);
+		retVal = retVal && archive.EndTag(herrachicalTitleAlign);
+
 		static iser::CArchiveTag herrachicalIcon("Icon", "Herarchical icon");
 		retVal = retVal && archive.BeginTag(herrachicalIcon);
 		retVal = retVal && archive.Process(iconAsByteArray);
@@ -580,17 +588,14 @@ bool CHierarchicalLayoutWidget::SerializeRecursive(iser::IArchive& archive, QWid
 			customWidget = new CCustomLayoutWidget(id, *this, NULL, NULL);
 			m_customWidgetMap.insert(id, customWidget);
 			customWidget->SetName(name);
+			customWidget->SetTitleAlign(titleAlign);
 			QDataStream stream(&iconAsByteArray, QIODevice::ReadWrite);
 			stream >> icon;
 			customWidget->SetIcon(icon);
 			customWidget->SetViewId(viewId);
-			EmitAddWidgetByViewId(id, viewId);
-			//if (callbackFunc){
-			//	QWidget *widgetExt = callbackFunc(id, viewId);
-			//	if (widgetExt) {
-			//		customWidget->SetWidget(widgetExt);
-			//	}
-			//}
+			if (viewId.isEmpty() == false){
+				EmitAddWidgetByViewId(id, viewId);
+			}
 
 			*widget = customWidget;
 		}
@@ -671,7 +676,8 @@ CCustomLayoutWidget::CCustomLayoutWidget(const QByteArray& id, CHierarchicalLayo
 	m_externalWidgetPtr(NULL),
 	m_name("No name"),
 	m_titleSize(30),
-	m_isHaveChilds(false)
+	m_isHaveChilds(false),
+	m_titleAlign(CHierarchicalLayoutWidget::AT_LEFT)
 {
 	setupUi(this);
 //	TitlePanel->setProperty("ImtTopFrame", QVariant(true));
@@ -872,6 +878,33 @@ void CCustomLayoutWidget::SetViewId(const QByteArray &viewId)
 }
 
 
+void CCustomLayoutWidget::SetTitleAlign(const CHierarchicalLayoutWidget::AlignType &align)
+{
+	m_titleAlign = align;
+	if (m_titleAlign == CHierarchicalLayoutWidget::AT_LEFT){
+		TitleSpacerLeft->changeSize(2, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
+		TitleSpacerRight->changeSize(2, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+	}
+	if (m_titleAlign == CHierarchicalLayoutWidget::AT_RIGHT) {
+		TitleSpacerLeft->changeSize(2, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+		TitleSpacerRight->changeSize(2, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
+	}
+	if (m_titleAlign == CHierarchicalLayoutWidget::AT_H_CENTER) {
+		TitleSpacerLeft->changeSize(2, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+		TitleSpacerRight->changeSize(2, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+	}
+	bool isEditMode = m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT;
+	SetEditMode(!isEditMode);
+	SetEditMode(isEditMode);
+}
+
+
+CHierarchicalLayoutWidget::AlignType CCustomLayoutWidget::GetTitleAlign()
+{
+	return m_titleAlign;
+}
+
+
 // protected methods
 
 // reimplemented (QWidget)
@@ -982,16 +1015,23 @@ void CCustomLayoutWidget::OnNamePosition()
 		QList<QAction*> actions = NamePosition->actions();
 		int index = actions.indexOf(action);
 		if (index == 0){
-			titleName->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-			TitleNameEdit->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+			SetTitleAlign(CHierarchicalLayoutWidget::AT_LEFT);
+			//titleName->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+			//TitleNameEdit->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 		}
-		if (index == 1) {
-			titleName->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-			TitleNameEdit->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		if (index == 1){
+			SetTitleAlign(CHierarchicalLayoutWidget::AT_RIGHT);
+			//titleName->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+			//TitleNameEdit->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 		}
-		if (index == 2) {
-			titleName->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-			TitleNameEdit->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		if (index == 2){
+			SetTitleAlign(CHierarchicalLayoutWidget::AT_H_CENTER);
+			//titleName->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+			//TitleNameEdit->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+		}
+		QWidget *widget = dynamic_cast<QWidget*>(parent());
+		if (widget != NULL){
+			widget->update();
 		}
 	}
 }

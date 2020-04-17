@@ -18,63 +18,9 @@ namespace imtgui
 /**
 	Class defines hierarchical layouting as a widget.
 */
-class CHierarchicalLayoutWidget;
+//class CHierarchicalLayoutWidget;
 
-/**
-	Helper class for one item in layout
-*/
-class CCustomLayoutWidget
-		: public QWidget, Ui::CCustomLayoutWidgetForm
-{
-	Q_OBJECT
-public:
-	CCustomLayoutWidget(const QByteArray& id, CHierarchicalLayoutWidget& hierarchicalLayoutWidget, CCustomLayoutWidget* parentCustomWidgetPtr = Q_NULLPTR, QWidget* parentPtr = Q_NULLPTR);
-
-	void SetDefaultPalette();
-	void SetHighLightPalette();
-	bool SetWidget(QWidget* widgetPtr);
-	QWidget* GetWidget();
-	void SetIsHaveChilds(bool source);
-	void SetName(QString name);
-	QString GetName();
-	void SetEditMode(bool isEditMode);
-	QByteArray GetId();
-	void SetId(QByteArray &id);
-	QPixmap GetIcon();
-	void SetIcon(QPixmap &icon);
-	QByteArray GetViewId();
-	void SetViewId(const QByteArray &viewId);
-
-protected:
-	// reimplemented (QWidget)
-	virtual void paintEvent(QPaintEvent* eventPtr) Q_DECL_OVERRIDE;
-	virtual void dragEnterEvent(QDragEnterEvent* eventPtr) Q_DECL_OVERRIDE;
-	virtual void dragLeaveEvent(QDragLeaveEvent* eventPtr) Q_DECL_OVERRIDE;
-	virtual void dropEvent(QDropEvent* eventPtr) Q_DECL_OVERRIDE;
-	virtual void mouseReleaseEvent(QMouseEvent *eventPtr) Q_DECL_OVERRIDE;
-
-protected Q_SLOTS:
-	void OnSplitterMoved(int pos, int index);
-	void OnNamePosition();
-	void OnAddWidget();
-	void OnDeleteWidget();
-	void OnSplitVertical();
-	void OnSplitHorizontal();
-	void OnChangeName();
-	void OnChangeIcon();
-
-private:
-	CHierarchicalLayoutWidget& m_hierarchicalLayoutWidget;
-	CCustomLayoutWidget* m_parentCustomWidgetPtr;
-	QByteArray m_id;
-	QByteArray m_viewId;
-	QWidget* m_editPanelPtr;
-	QWidget* m_externalWidgetPtr;
-	QString m_name;
-	int m_titleSize;
-	bool m_isHaveChilds;
-};
-
+class CCustomLayoutWidget;
 
 class CHierarchicalLayoutWidget
 		: public QWidget
@@ -92,6 +38,13 @@ public:
 		LT_MERGE
 	};
 	I_DECLARE_ENUM(LayoutType, LT_NONE, LT_VERTICAL_SPLITTER, LT_HORIZONTAL_SPLITTER, LT_OBJECT, LT_MERGE);
+
+	enum AlignType {
+		AT_LEFT = 0,
+		AT_RIGHT,
+		AT_H_CENTER
+	};
+	I_DECLARE_ENUM(AlignType, AT_LEFT, AT_RIGHT, AT_H_CENTER);
 
 	enum ViewMode{
 		VM_UNDEFINED,
@@ -177,6 +130,66 @@ private:
 	QStringList m_additionalNames;
 	QByteArray m_rootId;
 };
+
+
+/**
+	Helper class for one item in layout
+*/
+class CCustomLayoutWidget
+	: public QWidget, Ui::CCustomLayoutWidgetForm
+{
+	Q_OBJECT
+public:
+	CCustomLayoutWidget(const QByteArray& id, CHierarchicalLayoutWidget& hierarchicalLayoutWidget, CCustomLayoutWidget* parentCustomWidgetPtr = Q_NULLPTR, QWidget* parentPtr = Q_NULLPTR);
+
+	void SetDefaultPalette();
+	void SetHighLightPalette();
+	bool SetWidget(QWidget* widgetPtr);
+	QWidget* GetWidget();
+	void SetIsHaveChilds(bool source);
+	void SetName(QString name);
+	QString GetName();
+	void SetEditMode(bool isEditMode);
+	QByteArray GetId();
+	void SetId(QByteArray &id);
+	QPixmap GetIcon();
+	void SetIcon(QPixmap &icon);
+	QByteArray GetViewId();
+	void SetViewId(const QByteArray &viewId);
+	void SetTitleAlign(const CHierarchicalLayoutWidget::AlignType &align);
+	CHierarchicalLayoutWidget::AlignType GetTitleAlign();
+
+protected:
+	// reimplemented (QWidget)
+	virtual void paintEvent(QPaintEvent* eventPtr) Q_DECL_OVERRIDE;
+	virtual void dragEnterEvent(QDragEnterEvent* eventPtr) Q_DECL_OVERRIDE;
+	virtual void dragLeaveEvent(QDragLeaveEvent* eventPtr) Q_DECL_OVERRIDE;
+	virtual void dropEvent(QDropEvent* eventPtr) Q_DECL_OVERRIDE;
+	virtual void mouseReleaseEvent(QMouseEvent *eventPtr) Q_DECL_OVERRIDE;
+
+protected Q_SLOTS:
+	void OnSplitterMoved(int pos, int index);
+	void OnNamePosition();
+	void OnAddWidget();
+	void OnDeleteWidget();
+	void OnSplitVertical();
+	void OnSplitHorizontal();
+	void OnChangeName();
+	void OnChangeIcon();
+
+private:
+	CHierarchicalLayoutWidget& m_hierarchicalLayoutWidget;
+	CCustomLayoutWidget* m_parentCustomWidgetPtr;
+	QByteArray m_id;
+	QByteArray m_viewId;
+	QWidget* m_editPanelPtr;
+	QWidget* m_externalWidgetPtr;
+	QString m_name;
+	int m_titleSize;
+	bool m_isHaveChilds;
+	CHierarchicalLayoutWidget::AlignType m_titleAlign;
+};
+
 
 
 } //namespace imtgui
