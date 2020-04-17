@@ -1268,9 +1268,16 @@ void CFileCollectionComp::ReadCollectionItems(Files& files) const
 
 		QFileInfo repositoryFileInfo(fileItem.filePathInRepository);
 		if (repositoryFileInfo.exists()){
-			UpdateItemMetaInfo(fileItem);
+			if (!fileItem.contentsMetaInfoPtr.IsValid()){
+			
+				// TODO: Create meta info using meta info creator or default.
+			}
 
-			files.push_back(fileItem);
+			if (fileItem.contentsMetaInfoPtr.IsValid()){
+				LoadFileMetaInfo(*fileItem.contentsMetaInfoPtr, GetMetaInfoFilePath(fileItem));
+
+				files.push_back(fileItem);
+			}
 		}
 		else{
 			SendErrorMessage(0, QString("File '%1' doesn't exist. Collection item was automatically removed").arg(fileItem.filePathInRepository));
