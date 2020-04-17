@@ -27,8 +27,9 @@ public:
 
 	/**
 		Create meta informations for the data object of the given type.
+		\note if the dataPtr is \c null, an empty meta-info object will be created.
 	*/
-	virtual bool CreateMetaInfo(const istd::IChangeable& data, const QByteArray& typeId, MetaInfoPtr& metaInfoPtr) const = 0;
+	virtual bool CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, MetaInfoPtr& metaInfoPtr) const = 0;
 };
 
 

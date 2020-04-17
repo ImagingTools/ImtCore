@@ -923,7 +923,7 @@ imtbase::IMetaInfoCreator::MetaInfoPtr CFileCollectionComp::CreateFileContentsMe
 				return retVal;
 			}
 
-			m_metaInfoCreatorMap[typeId]->CreateMetaInfo(*dataObjectPtr, typeId, retVal);
+			m_metaInfoCreatorMap[typeId]->CreateMetaInfo(dataObjectPtr.GetPtr(), typeId, retVal);
 		}
 
 		if (!retVal.IsValid()){
