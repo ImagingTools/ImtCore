@@ -1269,8 +1269,19 @@ void CFileCollectionComp::ReadCollectionItems(Files& files) const
 		QFileInfo repositoryFileInfo(fileItem.filePathInRepository);
 		if (repositoryFileInfo.exists()){
 			if (!fileItem.contentsMetaInfoPtr.IsValid()){
-			
-				// TODO: Create meta info using meta info creator or default.
+				imtbase::IMetaInfoCreator::MetaInfoPtr retVal;
+
+				if (m_metaInfoCreatorMap.contains(fileItem.typeId)){
+					m_metaInfoCreatorMap[fileItem.typeId]->CreateMetaInfo(nullptr, fileItem.typeId, retVal);
+				}
+
+				if (!retVal.IsValid()){
+					retVal.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
+				}
+
+				Q_ASSERT(retVal.IsValid());
+
+				fileItem.contentsMetaInfoPtr = retVal;
 			}
 
 			if (fileItem.contentsMetaInfoPtr.IsValid()){
