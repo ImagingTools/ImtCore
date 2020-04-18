@@ -44,8 +44,8 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	bool Create(PointFormat pointFormat, int pointsCount, void* dataPtr, bool releaseFlag);
-	bool Append(int pointsCount, void* dataPtr);
+	bool Create(PointFormat pointFormat, int pointsCount, void* dataPtr, bool copyData);
+	bool Append(int pointsCount, const void* dataPtr);
 	int GetDataSize() const;
 	void CreateInternalBuffer();
 	bool AllocateData(int size, quint8*& buffer);
@@ -61,8 +61,8 @@ protected:
 	template <typename PointType> bool TIsPointValid(const PointType& pointData) const;
 	template <typename PointType> void TEnsureCenterCalculated() const;
 	template <typename PointType> void TEnsureCuboidCalculated() const;
-	template<typename PointType> void TMoveCenterTo(const i3d::CVector3d& position);
-	template<typename PointType> void GetBoundingRanges(istd::CRange& xRange, istd::CRange& yRange, istd::CRange& zRange) const;
+	template <typename PointType> void TMoveCenterTo(const i3d::CVector3d& position);
+	template <typename PointType> void GetBoundingRanges(istd::CRange& xRange, istd::CRange& yRange, istd::CRange& zRange) const;
 
 	// reimplemented (istd::IChangeable)
 	void OnEndChanges(const ChangeSet& changes) override;
@@ -77,6 +77,7 @@ protected:
 	bool m_dataOwner;
 	PointFormat m_pointFormat;
 	int m_pointsCount;
+	int m_bufferSize;
 
 	mutable i3d::CVector3d m_cloudCenter;
 	mutable CCuboid m_boundingCuboid;

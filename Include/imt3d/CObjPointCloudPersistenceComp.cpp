@@ -104,11 +104,7 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 	file.close();
 
 	int pointsCount = static_cast<int>(points.size());
-
-	IPointsBasedObject::PointXyz32* pointsDataPtr = new IPointsBasedObject::PointXyz32[pointsCount];
-	memcpy(pointsDataPtr, points.data(), pointsCount * sizeof(IPointsBasedObject::PointXyz32));
-
-	return documentPtr->CreateCloud(IPointsBasedObject::PF_XYZ_32, pointsCount, pointsDataPtr, true) ? OS_OK : OS_FAILED;
+	return documentPtr->CreateCloud(IPointsBasedObject::PF_XYZ_32, pointsCount, points.data(), true) ? OS_OK : OS_FAILED;
 }
 
 

@@ -1,6 +1,6 @@
 TARGET = ImtCoreLoc
 
-include($(ACFDIR)/Config/QMake/StaticConfig.pri)
+include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
 
 HEADERS =
 SOURCES =
@@ -14,5 +14,5 @@ ARXC_CONFIG = $$PWD/../../../Config/ImtCore.awc
 ARXC_FILES += $$PWD/../*.acc
 ARXC_OUTDIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 
-include($(ACFDIR)/Config/QMake/CustomBuild.pri)
+include($(ACFCONFIGDIR)/QMake/CustomBuild.pri)
 

@@ -27,11 +27,12 @@ public:
 	bool CreateCloud(PointFormat pointFormat,
 			int pointsCount,
 			void* dataPtr,
-			bool releaseFlag,
+			bool copyData,
 			const istd::CIndex2d* gridSizePtr = nullptr) override;
 	virtual bool InsertPoints(
 				int pointsCount,
-				void* dataPtr) override;
+				const void* dataPtr) override;
+	virtual void* GetData() const override;
 
 	// reimplemented (imt3d::IGridInfo)
 	istd::CIndex2d GetGridSize() const override;

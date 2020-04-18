@@ -37,16 +37,12 @@ bool CPointCloud3d::CreateCloud(PointFormat pointFormat, int pointsCount, const 
 bool CPointCloud3d::CreateCloud(PointFormat pointFormat,
 			int pointsCount,
 			void* dataPtr,
-			bool releaseFlag,
+			bool copyData,
 			const istd::CIndex2d* gridSizePtr)
 {
-	if (dataPtr == nullptr){
-		return false;
-	}
-
 	istd::CChangeNotifier changeNotifier(this);
 
-	bool retVal = Create(pointFormat, pointsCount, dataPtr, releaseFlag);
+	bool retVal = Create(pointFormat, pointsCount, dataPtr, copyData);
 
 	if (retVal && gridSizePtr){
 		m_gridSize = *gridSizePtr;
@@ -58,11 +54,16 @@ bool CPointCloud3d::CreateCloud(PointFormat pointFormat,
 
 bool CPointCloud3d::InsertPoints(
 			int pointsCount,
-			void* dataPtr)
+			const void* dataPtr)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
 	return Append(pointsCount, dataPtr);
+}
+
+void* CPointCloud3d::GetData() const
+{
+	return m_dataPtr;
 }
 
 

@@ -30,7 +30,7 @@ public:
 				PointFormat pointFormat,
 				int pointsCount,
 				void* dataPtr,
-				bool releaseFlag,
+				bool copyData,
 				const istd::CIndex2d* gridSizePtr = nullptr) = 0;
 
 	/**
@@ -39,7 +39,12 @@ public:
 	*/
 	virtual bool InsertPoints(
 				int pointsCount,
-				void* dataPtr) = 0;
+				const void* dataPtr) = 0;
+
+	/**
+		Return pointer to actual data
+	*/
+	virtual void* GetData() const = 0;
 };
 
 

@@ -19,6 +19,8 @@ int main(int argc, char *argv[])
 
 	CEagleView instance;
 
+	QApplication::setStyle("fusion");
+
 	ibase::IApplication* applicationPtr = instance.GetInterface<ibase::IApplication>();
 	if (applicationPtr != NULL){
 		return applicationPtr->Execute(argc, argv);

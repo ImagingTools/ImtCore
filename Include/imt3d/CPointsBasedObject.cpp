@@ -1,7 +1,9 @@
 #include <imt3d/CPointsBasedObject.h>
+
+
+// STL includes
 #include <string>
 #include <type_traits>
-
 
 // ACF includes
 #include <istd/TDelPtr.h>
@@ -21,6 +23,7 @@ CPointsBasedObject::CPointsBasedObject()
 	m_dataOwner(false),
 	m_pointFormat(PointFormat::PF_XYZ_32),
 	m_pointsCount(0),
+	m_bufferSize(0),
 	m_isCenterCalculationValid(false),
 	m_isCuboidCalculationValid(false)
 {
@@ -229,7 +232,6 @@ bool CPointsBasedObject::ResetData(istd::IChangeable::CompatibilityMode /*mode*/
 
 	FreeData();
 
-	m_dataPtr = nullptr;
 	m_dataOwner = false;
 	m_pointFormat = IPointsBasedObject::PF_XYZ_32;
 	m_pointsCount = 0;
@@ -265,30 +267,34 @@ PointType* CPointsBasedObject::TGetPointData(int pointIndex, bool validOnly) con
 }
 
 
-bool CPointsBasedObject::Create(PointFormat pointFormat, int pointsCount, void* dataPtr, bool releaseFlag)
+bool CPointsBasedObject::Create(PointFormat pointFormat, int pointsCount, void* dataPtr, bool copyData)
 {
-	if (pointsCount <= 0){
-		return false;
-	}
+	FreeData();
 
 	m_pointFormat = pointFormat;
 	m_pointsCount = pointsCount;
+	m_dataOwner = copyData;
 
-	if (dataPtr){
-		FreeData();
-		m_dataPtr = static_cast<quint8*>(dataPtr);
+	if (m_dataOwner){
+		CreateInternalBuffer();
+
+		if (dataPtr) {
+			int dataSize = GetDataSize();
+			memcpy(m_dataPtr, dataPtr, dataSize);
+		}
 	}
 	else{
-		CreateInternalBuffer();
+		if (dataPtr) {
+			m_dataPtr = static_cast<quint8*>(dataPtr);
+		}
 	}
 
-	m_dataOwner = releaseFlag;
-
+	m_bufferSize = GetDataSize();
 	return true;
 }
 
 
-bool CPointsBasedObject::Append(int pointsCount, void* dataPtr)
+bool CPointsBasedObject::Append(int pointsCount, const void* dataPtr)
 {
 	if (pointsCount <= 0){
 		return false;
@@ -298,25 +304,17 @@ bool CPointsBasedObject::Append(int pointsCount, void* dataPtr)
 		return false;
 	}
 
-	quint8* newBuffer = nullptr;
-
 	int oldBufferSize = GetBufferSize(m_pointFormat, m_pointsCount);
 	int appendSize = GetBufferSize(m_pointFormat, pointsCount);
+	int newBufferSize = oldBufferSize + appendSize;
 
-	int newBufferSize = GetBufferSize(m_pointFormat, m_pointsCount + pointsCount);
-	Q_ASSERT(newBufferSize == (oldBufferSize + appendSize));
-
-	if (AllocateData(newBufferSize, newBuffer)){
-		memcpy(newBuffer, m_dataPtr, oldBufferSize);
-		memcpy(newBuffer + oldBufferSize, dataPtr, appendSize);
-
-		FreeData();
-
-		m_dataPtr = newBuffer;
-		m_pointsCount += pointsCount;
+	if (newBufferSize > m_bufferSize) {
+		m_bufferSize = newBufferSize + 2 * appendSize;
+		m_dataPtr = static_cast<quint8*>(realloc(m_dataPtr, m_bufferSize));
 	}
 
-	CreateInternalBuffer();
+	memcpy(m_dataPtr + oldBufferSize, dataPtr, appendSize);
+	m_pointsCount += pointsCount;
 
 	return true;
 }
@@ -410,13 +408,12 @@ void CPointsBasedObject::FreeData()
 template <typename PointType>
 void CPointsBasedObject::TFreeData()
 {
-	if (m_dataOwner){
-		PointType* dataPtr = reinterpret_cast<PointType*>(m_dataPtr);
-		delete[] dataPtr;
+	if (m_dataOwner && m_dataPtr != nullptr){
+		free(m_dataPtr);
 	}
 
 	m_dataPtr = nullptr;
-	m_dataOwner = false;
+	m_bufferSize = 0;
 }
 
 
@@ -597,9 +594,9 @@ void CPointsBasedObject::OnEndChanges(const ChangeSet& /*changes*/)
 template <typename PointType>
 bool CPointsBasedObject::AllocateInternal(int size, quint8*& buffer)
 {
-	buffer = reinterpret_cast<quint8*>(new PointType[size]);
+	buffer = reinterpret_cast<quint8*>(malloc(size*sizeof(PointType)));
 
-	return false;
+	return true;
 }
 
 

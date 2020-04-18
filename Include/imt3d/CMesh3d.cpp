@@ -114,11 +114,11 @@ bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, const Indices
 }
 
 
-bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, void* pointsDataPtr, bool pointsDataReleaseFlag, const Indices& indices)
+bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, void* pointsDataPtr, bool copyPointsDataFlag, const Indices& indices)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	bool retVal = Create(pointFormat, pointsCount, pointsDataPtr, pointsDataReleaseFlag);
+	bool retVal = Create(pointFormat, pointsCount, pointsDataPtr, copyPointsDataFlag);
 
 	if (retVal){
 		m_indices = indices;

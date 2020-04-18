@@ -1,7 +1,7 @@
 TARGET = ImtRestPck
 
-include($(ACFDIR)/Config/QMake/ComponentConfig.pri)
-include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)
+include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
+include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 
 CONFIG += network
@@ -9,6 +9,6 @@ CONFIG += network
 LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtrest
 LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liproc
 
-include($(ACFDIR)/Config/QMake/AcfQt.pri)
-include($(ACFDIR)/Config/QMake/AcfStd.pri)
+include($(ACFCONFIGDIR)/QMake/AcfQt.pri)
+include($(ACFCONFIGDIR)/QMake/AcfStd.pri)
 

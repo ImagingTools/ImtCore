@@ -29,7 +29,7 @@ public:
 	/**
 		Create mesh with specified point format using external data buffer.
 	*/
-	virtual bool CreateMesh(PointFormat pointFormat, int pointsCount, void* pointsDataPtr, bool pointsDataReleaseFlag, const Indices& indices) = 0;
+	virtual bool CreateMesh(PointFormat pointFormat, int pointsCount, void* pointsDataPtr, bool copyPointsDataFlag, const Indices& indices) = 0;
 
 	/**
 		Get mesh indices.

@@ -1,7 +1,7 @@
 TARGET = imtzip
 
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
-include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)
-include($(ACFDIR)/Config/QMake/StaticConfig.pri)
+include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
+include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
 include($(IMTROOTDIR)/Config/QMake/Quazip.pri)
 

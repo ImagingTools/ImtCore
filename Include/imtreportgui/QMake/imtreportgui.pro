@@ -1,7 +1,7 @@
 TARGET = imtreportgui
 
-include($(ACFDIR)/Config/QMake/StaticConfig.pri)
-include($(ACFDIR)/Config/QMake/QtGuiBaseConfig.pri)
+include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
+include($(ACFCONFIGDIR)/QMake/QtGuiBaseConfig.pri)
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 
 QT += printsupport
