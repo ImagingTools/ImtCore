@@ -100,40 +100,6 @@
           <number>2</number>
          </property>
          <item>
-          <widget class="QToolButton" name="ChangeNameButton">
-           <property name="text">
-            <string>...</string>
-           </property>
-           <property name="icon">
-            <iconset resource="imtgui.qrc">
-             <normaloff>:/Icons/Edit</normaloff>:/Icons/Edit</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>28</width>
-             <height>28</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="ChangeIconButton1">
-           <property name="text">
-            <string>...</string>
-           </property>
-           <property name="icon">
-            <iconset resource="imtgui.qrc">
-             <normaloff>:/Icons/Edit</normaloff>:/Icons/Edit</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>28</width>
-             <height>28</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QToolButton" name="SplitVerticaly">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -146,12 +112,12 @@
            </property>
            <property name="icon">
             <iconset resource="imtgui.qrc">
-             <normaloff>:/Icons/Duplicate</normaloff>:/Icons/Duplicate</iconset>
+             <normaloff>:/Icons/SplitVertical</normaloff>:/Icons/SplitVertical</iconset>
            </property>
            <property name="iconSize">
             <size>
-             <width>28</width>
-             <height>28</height>
+             <width>20</width>
+             <height>20</height>
             </size>
            </property>
           </widget>
@@ -169,12 +135,12 @@
            </property>
            <property name="icon">
             <iconset resource="imtgui.qrc">
-             <normaloff>:/Icons/Copy</normaloff>:/Icons/Copy</iconset>
+             <normaloff>:/Icons/SplitHorizontal</normaloff>:/Icons/SplitHorizontal</iconset>
            </property>
            <property name="iconSize">
             <size>
-             <width>28</width>
-             <height>28</height>
+             <width>20</width>
+             <height>20</height>
             </size>
            </property>
           </widget>
@@ -196,22 +162,66 @@
            </property>
            <property name="iconSize">
             <size>
-             <width>28</width>
-             <height>28</height>
+             <width>20</width>
+             <height>20</height>
             </size>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="NamePosition">
+          <widget class="QToolButton" name="AlignLeft">
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="imtgui.qrc">
+             <normaloff>:/Icons/AlignLeft</normaloff>:/Icons/AlignLeft</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="AlignCenter">
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="imtgui.qrc">
+             <normaloff>:/Icons/AlignCenter</normaloff>:/Icons/AlignCenter</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="AlignRight">
            <property name="minimumSize">
             <size>
-             <width>36</width>
-             <height>26</height>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
            <property name="text">
             <string>...</string>
+           </property>
+           <property name="icon">
+            <iconset resource="imtgui.qrc">
+             <normaloff>:/Icons/AlignRight</normaloff>:/Icons/AlignRight</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
            </property>
            <property name="popupMode">
             <enum>QToolButton::InstantPopup</enum>
@@ -222,17 +232,21 @@
           <widget class="QToolButton" name="AddWidgets">
            <property name="minimumSize">
             <size>
-             <width>36</width>
-             <height>26</height>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
            <property name="text">
             <string>...</string>
            </property>
+           <property name="icon">
+            <iconset resource="imtgui.qrc">
+             <normaloff>:/Icons/Widgets</normaloff>:/Icons/Widgets</iconset>
+           </property>
            <property name="iconSize">
             <size>
-             <width>28</width>
-             <height>28</height>
+             <width>20</width>
+             <height>20</height>
             </size>
            </property>
            <property name="popupMode">

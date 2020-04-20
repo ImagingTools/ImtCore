@@ -174,6 +174,9 @@ protected Q_SLOTS:
 	void OnDeleteWidget();
 	void OnSplitVertical();
 	void OnSplitHorizontal();
+	void OnAlignLeft();
+	void OnAlignCenter();
+	void OnAlignRight();
 	void OnChangeName();
 	void OnChangeIcon();
 

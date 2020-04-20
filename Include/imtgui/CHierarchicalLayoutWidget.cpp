@@ -682,29 +682,32 @@ CCustomLayoutWidget::CCustomLayoutWidget(const QByteArray& id, CHierarchicalLayo
 	setupUi(this);
 //	TitlePanel->setProperty("ImtTopFrame", QVariant(true));
 //	EditPanel->setProperty("ImtTopFrame", QVariant(true));
-	ChangeNameButton->setVisible(false);
-	ChangeIconButton1->setVisible(false);
+//	ChangeNameButton->setVisible(false);
+//	ChangeIconButton1->setVisible(false);
 	SetEditMode(m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT);
 	//EditPanel->setVisible(m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT);
 
 	connect(SplitVerticaly, &QToolButton::clicked, this, &CCustomLayoutWidget::OnSplitVertical);
 	connect(SplitHorizontaly, &QToolButton::clicked, this, &CCustomLayoutWidget::OnSplitHorizontal);
 	connect(DeleteButton, &QToolButton::clicked, this, &CCustomLayoutWidget::OnDeleteWidget);
+	connect(AlignLeft, &QToolButton::clicked, this, &CCustomLayoutWidget::OnAlignLeft);
+	connect(AlignCenter, &QToolButton::clicked, this, &CCustomLayoutWidget::OnAlignCenter);
+	connect(AlignRight, &QToolButton::clicked, this, &CCustomLayoutWidget::OnAlignRight);
 	//connect(ChangeNameButton, &QToolButton::clicked, this, &CCustomLayoutWidget::OnChangeName);
-	connect(ChangeIconButton, &QToolButton::clicked, this, &CCustomLayoutWidget::OnChangeIcon);
+	//connect(ChangeIconButton, &QToolButton::clicked, this, &CCustomLayoutWidget::OnChangeIcon);
 
 	//ButtonsPanel->setProperty("ImtTopFrame", QVariant(true));
-	QAction *action;
-	action = new QAction(tr("Left"), this);
-	NamePosition->addAction(action);
-	connect(action, &QAction::triggered, this, &CCustomLayoutWidget::OnNamePosition);
-	action = new QAction(tr("Right"), this);
-	NamePosition->addAction(action);
-	connect(action, &QAction::triggered, this, &CCustomLayoutWidget::OnNamePosition);
-	action = new QAction(tr("Center"), this);
-	NamePosition->addAction(action);
-	connect(action, &QAction::triggered, this, &CCustomLayoutWidget::OnNamePosition);
+//	action = new QAction(tr("Left"), this);
+//	NamePosition->addAction(action);
+//	connect(action, &QAction::triggered, this, &CCustomLayoutWidget::OnNamePosition);
+//	action = new QAction(tr("Right"), this);
+//	NamePosition->addAction(action);
+//	connect(action, &QAction::triggered, this, &CCustomLayoutWidget::OnNamePosition);
+//	action = new QAction(tr("Center"), this);
+//	NamePosition->addAction(action);
+//	connect(action, &QAction::triggered, this, &CCustomLayoutWidget::OnNamePosition);
 
+	QAction *action;
 	for (int i = -1; i < m_hierarchicalLayoutWidget.m_additionalNames.count(); i++)
 	{
 //		QAction *action = addWidgets->addAction(m_hierarchicalLayoutWidget.m_additionalNames[i], this, &CCustomLayoutWidget::OnAddWidget);
@@ -1010,30 +1013,30 @@ void CCustomLayoutWidget::OnSplitterMoved(int /*pos*/, int /*index*/)
 
 void CCustomLayoutWidget::OnNamePosition()
 {
-	QAction *action = dynamic_cast<QAction*>(sender());
-	if (action) {
-		QList<QAction*> actions = NamePosition->actions();
-		int index = actions.indexOf(action);
-		if (index == 0){
-			SetTitleAlign(CHierarchicalLayoutWidget::AT_LEFT);
-			//titleName->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-			//TitleNameEdit->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-		}
-		if (index == 1){
-			SetTitleAlign(CHierarchicalLayoutWidget::AT_RIGHT);
-			//titleName->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-			//TitleNameEdit->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		}
-		if (index == 2){
-			SetTitleAlign(CHierarchicalLayoutWidget::AT_H_CENTER);
-			//titleName->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-			//TitleNameEdit->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-		}
-		QWidget *widget = dynamic_cast<QWidget*>(parent());
-		if (widget != NULL){
-			widget->update();
-		}
-	}
+	//QAction *action = dynamic_cast<QAction*>(sender());
+	//if (action) {
+	//	QList<QAction*> actions = NamePosition->actions();
+	//	int index = actions.indexOf(action);
+	//	if (index == 0){
+	//		SetTitleAlign(CHierarchicalLayoutWidget::AT_LEFT);
+	//		//titleName->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+	//		//TitleNameEdit->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+	//	}
+	//	if (index == 1){
+	//		SetTitleAlign(CHierarchicalLayoutWidget::AT_RIGHT);
+	//		//titleName->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	//		//TitleNameEdit->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	//	}
+	//	if (index == 2){
+	//		SetTitleAlign(CHierarchicalLayoutWidget::AT_H_CENTER);
+	//		//titleName->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	//		//TitleNameEdit->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	//	}
+	//	QWidget *widget = dynamic_cast<QWidget*>(parent());
+	//	if (widget != NULL){
+	//		widget->update();
+	//	}
+	//}
 }
 
 
@@ -1066,6 +1069,24 @@ void CCustomLayoutWidget::OnSplitHorizontal()
 {
 	m_hierarchicalLayoutWidget.SetSplitterLayout(m_id, Qt::Horizontal, 2);
 	//emit m_hierarchicalLayoutWidget.EmitSplitHorizontal(m_id);
+}
+
+
+void  CCustomLayoutWidget::OnAlignLeft()
+{
+	SetTitleAlign(CHierarchicalLayoutWidget::AT_LEFT);
+}
+
+
+void  CCustomLayoutWidget::OnAlignCenter()
+{
+	SetTitleAlign(CHierarchicalLayoutWidget::AT_H_CENTER);
+}
+
+
+void  CCustomLayoutWidget::OnAlignRight()
+{
+	SetTitleAlign(CHierarchicalLayoutWidget::AT_RIGHT);
 }
 
 

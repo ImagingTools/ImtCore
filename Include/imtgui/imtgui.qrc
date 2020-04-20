@@ -106,6 +106,13 @@
         <file alias="ManualProcessingHighlight">Resources/Icons/ManualProcessingHighlight.svg</file>
         <file alias="DetailedHighlight">Resources/Icons/DetailedHighlight.svg</file>
         <file alias="ProductionOverviewHighlight">Resources/Icons/ProductionOverviewHighlight.svg</file>
+        <file alias="ClearLayouts">Resources/Icons/ClearLayers.svg</file>
+        <file alias="SplitVertical">Resources/Icons/SplitVertical.svg</file>
+        <file alias="SplitHorizontal">Resources/Icons/SplitHoryzontal.svg</file>
+        <file alias="Widgets">Resources/Icons/Widgets.svg</file>
+        <file alias="AlignCenter">Resources/Icons/AlignCenter.svg</file>
+        <file alias="AlignLeft">Resources/Icons/AlignLeft.svg</file>
+        <file alias="AlignRight">Resources/Icons/AlignRight.svg</file>
     </qresource>
     <qresource prefix="/ColorIcons">
         <file alias="Workflow">Resources/Icons/Color/Workflow.svg</file>
