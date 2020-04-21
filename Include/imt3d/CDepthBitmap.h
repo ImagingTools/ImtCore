@@ -40,7 +40,7 @@ public:
 
 	enum
 	{
-		MIT_CALIBRATION = idoc::IDocumentMetaInfo::MIT_USER,
+		MIT_CALIBRATION = MIT_LAST + 1,
 		MIT_CALIBRATION_TYPE_ID
 	};
 

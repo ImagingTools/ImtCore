@@ -28,7 +28,9 @@ public:
 		/**
 			Matrix used for transofrmation of depth values into the world coordinates given as QMatrix4x4
 		*/
-		MIT_REPROJECTION_MATRIX
+		MIT_REPROJECTION_MATRIX,
+
+		MIT_LAST = MIT_REPROJECTION_MATRIX
 	};
 
 	/**
