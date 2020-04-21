@@ -309,7 +309,7 @@ bool CPointsBasedObject::Append(int pointsCount, const void* dataPtr)
 	int newBufferSize = oldBufferSize + appendSize;
 
 	if (newBufferSize > m_bufferSize) {
-		m_bufferSize = newBufferSize + 2 * appendSize;
+		m_bufferSize = 2 * newBufferSize;
 		m_dataPtr = static_cast<quint8*>(realloc(m_dataPtr, m_bufferSize));
 	}
 
