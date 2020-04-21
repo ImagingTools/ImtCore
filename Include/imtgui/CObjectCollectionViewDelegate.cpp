@@ -21,13 +21,13 @@ CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 	m_collectionPtr(nullptr)
 {
 	m_summaryInformationTypes.InsertItem("Name", "Name", "");
-	m_summaryInformationHeaders["Name"] = HeaderInfo();
+	m_summaryInformationHeaders["Name"] = HeaderInfo(true);
 
 	m_summaryInformationTypes.InsertItem("Type", "Type", "");
-	m_summaryInformationHeaders["Type"] = HeaderInfo();
+	m_summaryInformationHeaders["Type"] = HeaderInfo(false);
 
 	m_summaryInformationTypes.InsertItem("Description", "Description", "");
-	m_summaryInformationHeaders["Description"] = HeaderInfo();
+	m_summaryInformationHeaders["Description"] = HeaderInfo(false);
 }
 
 
@@ -190,7 +190,7 @@ ICollectionViewDelegate::HeaderInfo CObjectCollectionViewDelegate::GetSummaryInf
 		}
 	}
 
-	return ICollectionViewDelegate::HeaderInfo();
+	return ICollectionViewDelegate::HeaderInfo(false);
 }
 
 

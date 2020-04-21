@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QUuid>
+#include <QtCore/QQueue>
 #include <QtCore/QDir>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
@@ -140,8 +141,6 @@ void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 		return;
 	}
 
-	EnsureColumnsSettingsSynchronized();
-
 	QJsonDocument jsonDocument;
 	QJsonArray jsonTypeIds;
 
@@ -264,8 +263,6 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 
 	UpdateCommands();
 
-	OnTypeChanged();
-
 	RestoreItemsSelection();
 
 	UpdateTypeStatus();
@@ -325,7 +322,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 	ItemList->setContextMenuPolicy(Qt::CustomContextMenu);
 	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	ItemList->header()->setStretchLastSection(true);
+	ItemList->header()->setFirstSectionMovable(true);
 	ItemList->installEventFilter(this);
 
 	connect(TypeList, &QTreeWidget::itemSelectionChanged, this, &CObjectCollectionViewComp::OnTypeChanged);
@@ -501,10 +498,10 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 	QVector<QByteArray> ids = GetMetaInfoIds(m_currentTypeId);
 	QStringList headers = GetMetaInfoHeaders(m_currentTypeId);
 
-	int totalWidth = (double)ItemList->columnWidth(0);
+	int totalWidth = 0;
 	
 	for (int i = 0; i < ids.count(); i++){
-		int columndIndex = ItemList->header()->logicalIndex(i + 1);
+		int columndIndex = ItemList->header()->logicalIndex(i);
 		totalWidth += ItemList->columnWidth(columndIndex);
 	}
 
@@ -531,13 +528,6 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 		ItemList->header()->moveSection(ItemList->header()->visualIndex(i), i);
 	}
 
-	// Fix columns
-	int lastFixed = GetLastFixedColumn();
-	ItemList->header()->setSectionsMovable(true);
-	if (lastFixed == m_itemModel.columnCount() - 1){
-		ItemList->header()->setSectionsMovable(false);
-	}
-	
 	QVector<QByteArray> tempFieldIds = GetMetaInfoIds(m_currentTypeId);
 	QStringList fieldIds;
 	for (QByteArray tempFieldId : tempFieldIds){
@@ -647,7 +637,7 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 }
 
 
-void CObjectCollectionViewComp::ValidateSectionSize(int logicalIndex, int size)
+void CObjectCollectionViewComp::ValidateSectionSize(int logicalIndex, int newSize)
 {
 	if (m_currentTypeId.isEmpty()){
 		return;
@@ -656,43 +646,17 @@ void CObjectCollectionViewComp::ValidateSectionSize(int logicalIndex, int size)
 	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(m_currentTypeId);
 	QVector<QByteArray> ids = GetMetaInfoIds(m_currentTypeId);
 
-	if (logicalIndex >= ids.count()){
-		return;
-	}
+	Q_ASSERT(logicalIndex < ids.count());
 
 	ICollectionViewDelegate::HeaderInfo headerInfo = viewDelegate.GetSummaryInformationHeaderInfo(ids[logicalIndex]);
 
-	if (headerInfo.minWidth > 0 && size < headerInfo.minWidth){
+	if (newSize < headerInfo.minWidth){
 		ItemList->setColumnWidth(logicalIndex, headerInfo.minWidth);
 	}
 
-	if (headerInfo.maxWidth > 0 && size > headerInfo.maxWidth){
+	if (newSize > headerInfo.maxWidth){
 		ItemList->setColumnWidth(logicalIndex, headerInfo.maxWidth);
 	}
-}
-
-
-int CObjectCollectionViewComp::GetLastFixedColumn()
-{
-	if (m_currentTypeId.isEmpty()){
-		return -1;
-	}
-
-	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(m_currentTypeId);
-	QVector<QByteArray> ids = GetMetaInfoIds(m_currentTypeId);
-
-	int lastFixedSection = -1;
-
-	for (QByteArray id : ids){
-		if (!viewDelegate.GetSummaryInformationHeaderInfo(id).isMoveable){
-			lastFixedSection++;
-			continue;
-		}
-
-		break;
-	}
-
-	return lastFixedSection;
 }
 
 
@@ -843,6 +807,44 @@ void CObjectCollectionViewComp::OnSectionMoved(int logicalIndex, int oldVisualIn
 		return;
 	}
 
+	SignalSemaphore semaphore(m_semaphoreCounter);
+
+	if (!m_currentTypeId.isEmpty()){
+		const ICollectionViewDelegate& viewDelegate = GetViewDelegate(m_currentTypeId);
+		QVector<QByteArray> ids = GetMetaInfoIds(m_currentTypeId);
+
+		Q_ASSERT(logicalIndex < ids.count());
+
+		QList<ICollectionViewDelegate::HeaderInfo> infos;
+
+		for (int i = 0; i < ids.count(); i++){
+			ICollectionViewDelegate::HeaderInfo headerInfo = viewDelegate.GetSummaryInformationHeaderInfo(ids[i]);
+			infos.append(headerInfo);
+		}
+
+		QQueue<int> movable;
+		QHeaderView *headerPtr = ItemList->header();
+
+		for (int i = 0; i < ids.count(); i++){
+			int logicalIndex = headerPtr->logicalIndex(i);
+
+			if (!infos[logicalIndex].isFixed){
+				movable.enqueue(logicalIndex);
+			}
+		}
+
+		for (int i = 0; i < ids.count(); i++){
+			if (infos[i].isFixed){
+				int from = headerPtr->visualIndex(i);
+				headerPtr->moveSection(from, i);
+			}
+			else{
+				int from = headerPtr->visualIndex(movable.dequeue());
+				headerPtr->moveSection(from, i);
+			}
+		}
+	}
+
 	EnsureColumnsSettingsSynchronized();
 }
 
@@ -877,8 +879,10 @@ void CObjectCollectionViewComp::OnTypeChanged()
 		}
 	}
 
-	RestoreItemsSelection();
-	RestoreColumnsSettings();
+	if (m_semaphoreCounter == 1){
+		RestoreItemsSelection();
+		RestoreColumnsSettings();
+	}
 
 	if ((m_currentInformationViewPtr != nullptr) && m_currentInformationViewPtr->IsGuiCreated()){
 		m_currentInformationViewPtr->DestroyGui();

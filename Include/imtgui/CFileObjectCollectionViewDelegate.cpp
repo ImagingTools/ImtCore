@@ -26,19 +26,19 @@ CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
 	m_summaryInformationHeaders.clear();
 
 	m_summaryInformationTypes.InsertItem("Name", "Name", "");
-	m_summaryInformationHeaders["Name"] = HeaderInfo();
+	m_summaryInformationHeaders["Name"] = HeaderInfo(true, 50, 100);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("TypeId"), tr("Type"), "");
-	m_summaryInformationHeaders["TypeId"] = HeaderInfo();
+	m_summaryInformationHeaders["TypeId"] = HeaderInfo(false);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("Description"), tr("Description"), "");
-	m_summaryInformationHeaders["Description"] = HeaderInfo();
+	m_summaryInformationHeaders["Description"] = HeaderInfo(false);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("Added"), tr("Added"), "");
-	m_summaryInformationHeaders["Added"] = HeaderInfo();
+	m_summaryInformationHeaders["Added"] = HeaderInfo(true);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("ModificationTime"), tr("Last Modified"), "");
-	m_summaryInformationHeaders["ModificationTime"] = HeaderInfo();
+	m_summaryInformationHeaders["ModificationTime"] = HeaderInfo(false);
 }
 
 

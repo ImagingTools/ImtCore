@@ -70,16 +70,16 @@ public:
 
 	struct HeaderInfo
 	{
-		HeaderInfo(bool setIsMoveable = true, int setMinWidth = -1, int setMaxWidth = -1)
-			: isMoveable(setIsMoveable),
+		HeaderInfo(bool setIsFixed = false, quint16 setMinWidth = 0, quint16 setMaxWidth = 0xFFFF)
+			: isFixed(setIsFixed),
 			minWidth(setMinWidth),
 			maxWidth(setMaxWidth)
 		{
 		}
 
-		bool isMoveable;
-		int minWidth;
-		int maxWidth;
+		bool isFixed;
+		quint16 minWidth;
+		quint16 maxWidth;
 	};
 
 	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) = 0;

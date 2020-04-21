@@ -153,8 +153,7 @@ private:
 
 	void EnsureColumnsSettingsSynchronized() const;
 	void RestoreColumnsSettings();
-	void ValidateSectionSize(int logicalIndex, int size);
-	int GetLastFixedColumn();
+	void ValidateSectionSize(int logicalIndex, int newSize);
 
 	void SaveItemsSelection();
 	void RestoreItemsSelection();
