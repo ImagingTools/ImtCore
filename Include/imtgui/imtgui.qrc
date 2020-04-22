@@ -140,6 +140,19 @@
         <file alias="Two">Resources/Icons/Color/Two.svg</file>
         <file alias="Five">Resources/Icons/Color/Five.svg</file>
         <file alias="Results">Resources/Icons/Color/Results.svg</file>
+        <file alias="BarChart">Resources/Icons/Color/BarChart.svg</file>
+        <file alias="Calibration">Resources/Icons/Color/Calibration.svg</file>
+        <file alias="Checkup">Resources/Icons/Color/Checkup.svg</file>
+        <file alias="Diagnostic">Resources/Icons/Color/Diagnostic.svg</file>
+        <file alias="Diagram1">Resources/Icons/Color/Diagram1.svg</file>
+        <file alias="Diagram2">Resources/Icons/Color/Diagram2.svg</file>
+        <file alias="FileSystemSettings">Resources/Icons/Color/FileSystemSettings.svg</file>
+        <file alias="Lens">Resources/Icons/Color/Lens.svg</file>
+        <file alias="Performance">Resources/Icons/Color/Performance.svg</file>
+        <file alias="ProductionHistory">Resources/Icons/Color/ProductionHistory.svg</file>
+        <file alias="Quality">Resources/Icons/Color/Quality.svg</file>
+        <file alias="Report1">Resources/Icons/Color/Report1.svg</file>
+        <file alias="Timeline">Resources/Icons/Color/Timeline.svg</file>
     </qresource>
     <qresource prefix="/Styles">
         <file alias="ImtLightStyle">Resources/Styles/ImtLightStyle.css</file>
