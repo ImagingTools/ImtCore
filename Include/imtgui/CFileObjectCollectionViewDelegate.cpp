@@ -26,7 +26,7 @@ CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
 	m_summaryInformationHeaders.clear();
 
 	m_summaryInformationTypes.InsertItem("Name", "Name", "");
-	m_summaryInformationHeaders["Name"] = HeaderInfo(true, 50, 100);
+	m_summaryInformationHeaders["Name"] = HeaderInfo(true);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("TypeId"), tr("Type"), "");
 	m_summaryInformationHeaders["TypeId"] = HeaderInfo(false);
@@ -35,7 +35,7 @@ CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
 	m_summaryInformationHeaders["Description"] = HeaderInfo(false);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("Added"), tr("Added"), "");
-	m_summaryInformationHeaders["Added"] = HeaderInfo(true);
+	m_summaryInformationHeaders["Added"] = HeaderInfo(false);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("ModificationTime"), tr("Last Modified"), "");
 	m_summaryInformationHeaders["ModificationTime"] = HeaderInfo(false);
