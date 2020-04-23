@@ -65,7 +65,6 @@ void CLayoutManagerComp::OnGuiCreated()
 	m_layoutWidgetPtr = new CHierarchicalLayoutWidget(GetQtWidget());
 	this->GetWidget()->layout()->addWidget(m_layoutWidgetPtr);
 
-
 	// only DirectConnection for valid DropEvent processing
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitDropEvent(QByteArray, QDropEvent*)), this, SLOT(OnDropWidget(QByteArray, QDropEvent*)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitOpenMenuEvent(QByteArray, QMouseEvent*)), this, SLOT(OnOpenMenu(QByteArray, QMouseEvent*)), Qt::DirectConnection);

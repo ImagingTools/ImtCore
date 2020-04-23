@@ -1,32 +1,7 @@
-/********************************************************************************
-**
-**	Copyright (C) 2007-2017 Witold Gantzke & Kirill Lepskiy
-**
-**	This file is part of the ACF Toolkit.
-**
-**	This file may be used under the terms of the GNU Lesser
-**	General Public License version 2.1 as published by the Free Software
-**	Foundation and appearing in the file LicenseLGPL.txt included in the
-**	packaging of this file.  Please review the following information to
-**	ensure the GNU Lesser General Public License version 2.1 requirements
-**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-**	If you are unsure which license is appropriate for your use, please
-**	contact us at info@imagingtools.de.
-**
-** 	See http://www.ilena.org or write info@imagingtools.de for further
-** 	information about the ACF.
-**
-********************************************************************************/
-
-
-#ifndef imtgui_CLayoutManager_included
-#define imtgui_CLayoutManager_included
+#pragma once
 
 
 // Qt includes
-//#include <QtCore/QTimer>
-#include <QtWidgets>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QAction>
 
@@ -34,11 +9,6 @@
 #include <ibase/ICommandsProvider.h>
 #include <iprm/COptionsManager.h>
 #include <iqtgui/CHierarchicalCommand.h>
-
-//#include <ifile/IFilePersistence.h>
-//#include <iprm/CEnableableParam.h>
-//#include <ilog/CMessageContainer.h>
-//#include <ilog/CMessage.h>
 
 #include <imtgui/ILayout.h>
 #include <imtgui/CHierarchicalLayoutWidget.h>
@@ -52,38 +22,28 @@ namespace imtgui
 
 
 /**
-    Layout editor.
+	Layout editor.
 */
 class CLayoutManagerComp:
-	//public iqtgui::TDesignerGuiCompBase<Ui::CLayoutManagerComp>
-    public iqtgui::TDesignerGuiObserverCompBase<
-	Ui::CLayoutManagerComp, imtgui::ILayout>,
-	public virtual ibase::ICommandsProvider
+			public iqtgui::TDesignerGuiObserverCompBase<Ui::CLayoutManagerComp, imtgui::ILayout>,
+			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 
 public:
-	//typedef iqtgui::TDesignerGuiCompBase<Ui::CLayoutManagerComp> BaseClass;
-
-
- //   I_BEGIN_COMPONENT(CLayoutManagerComp);
-	//I_END_COMPONENT;
-	typedef iqtgui::TDesignerGuiObserverCompBase<
-		Ui::CLayoutManagerComp, imtgui::ILayout> BaseClass;
+	typedef iqtgui::TDesignerGuiObserverCompBase<Ui::CLayoutManagerComp, imtgui::ILayout> BaseClass;
 
 	I_BEGIN_COMPONENT(CLayoutManagerComp);
-	//I_REGISTER_INTERFACE(imod::IObserver);
-	I_REGISTER_INTERFACE(ibase::ICommandsProvider);
-	I_REGISTER_SUBELEMENT(GuiViewOptionsList);
-	I_REGISTER_SUBELEMENT_INTERFACE(GuiViewOptionsList, iprm::IOptionsList, ExtractGuiViewOptionList);
-	I_ASSIGN_MULTI_0(m_guiViewIdMultiAttrPtr, "ViewIds", "View ids to be used in layout creation", true);
-	I_ASSIGN_MULTI_0(m_guiViewMultiFactCompPtr, "ViewFactories", "View factories to create gui in layout", true);
-	// \todo think about icons for layout options widget
-	I_ASSIGN_MULTI_0(m_guiViewNameMultiAttrPtr, "ViewNames", "View names will be shown to user in layout widget", true);
-
+		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
+		I_REGISTER_SUBELEMENT(GuiViewOptionsList);
+		I_REGISTER_SUBELEMENT_INTERFACE(GuiViewOptionsList, iprm::IOptionsList, ExtractGuiViewOptionList);
+		I_ASSIGN_MULTI_0(m_guiViewIdMultiAttrPtr, "ViewIds", "View ids to be used in layout creation", true);
+		I_ASSIGN_MULTI_0(m_guiViewMultiFactCompPtr, "ViewFactories", "View factories to create gui in layout", true);
+		// \todo think about icons for layout options widget
+		I_ASSIGN_MULTI_0(m_guiViewNameMultiAttrPtr, "ViewNames", "View names will be shown to user in layout widget", true);
 	I_END_COMPONENT
 
-    CLayoutManagerComp(QWidget* parentPtr = Q_NULLPTR);
+	CLayoutManagerComp(QWidget* parentPtr = Q_NULLPTR);
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const;
@@ -115,7 +75,7 @@ protected Q_SLOTS:
 	void OnClear();
 	void OnAddWidget();
 	void OnAddWidget(const QByteArray& id, int index);
-    void OnAddWidgetByViewId(const QByteArray& id, const QByteArray& viewId);
+	void OnAddWidgetByViewId(const QByteArray& id, const QByteArray& viewId);
 
 private:
 	// static template methods for subelement access
@@ -157,11 +117,9 @@ private:
 //
 //private:
 //	void UpdateVisualStatus();
-
-
 };
+
 
 } // namespace iloggui
 
 
-#endif // !imtgui_CLayoutManager_included

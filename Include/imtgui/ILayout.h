@@ -4,7 +4,6 @@
 // Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
-#include <QtWidgets/QWidget>
 
 // ACF includes
 #include <iser/ISerializable.h>
@@ -14,7 +13,7 @@ namespace imtgui
 {
 
 
-class ILayout : public iser::ISerializable
+class ILayout: virtual public iser::ISerializable
 {
 public:
 	typedef QList<int> IndexList;
@@ -76,3 +75,5 @@ public:
 
 
 } // namespace imtgui
+
+

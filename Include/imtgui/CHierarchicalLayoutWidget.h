@@ -18,35 +18,40 @@ namespace imtgui
 /**
 	Class defines hierarchical layouting as a widget.
 */
-//class CHierarchicalLayoutWidget;
+
 
 class CCustomLayoutWidget;
 
-class CHierarchicalLayoutWidget
-		: public QWidget
+
+class CHierarchicalLayoutWidget: public QWidget
 {
 	Q_OBJECT
 public:
 	typedef QList<QByteArray> IdsList;
 	typedef QList<int> SizeList;
 
-	enum LayoutType{
+	enum LayoutType
+	{
 		LT_NONE = 0,
 		LT_VERTICAL_SPLITTER,
 		LT_HORIZONTAL_SPLITTER,
 		LT_OBJECT,
 		LT_MERGE
 	};
+
 	I_DECLARE_ENUM(LayoutType, LT_NONE, LT_VERTICAL_SPLITTER, LT_HORIZONTAL_SPLITTER, LT_OBJECT, LT_MERGE);
 
-	enum AlignType {
+	enum AlignType
+	{
 		AT_LEFT = 0,
 		AT_RIGHT,
 		AT_H_CENTER
 	};
+
 	I_DECLARE_ENUM(AlignType, AT_LEFT, AT_RIGHT, AT_H_CENTER);
 
-	enum ViewMode{
+	enum ViewMode
+	{
 		VM_UNDEFINED,
 		VM_NORMAL,
 		VM_EDIT
@@ -135,8 +140,7 @@ private:
 /**
 	Helper class for one item in layout
 */
-class CCustomLayoutWidget
-	: public QWidget, Ui::CCustomLayoutWidgetForm
+class CCustomLayoutWidget: public QWidget, Ui::CCustomLayoutWidgetForm
 {
 	Q_OBJECT
 public:
