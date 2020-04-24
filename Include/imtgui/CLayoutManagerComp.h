@@ -9,11 +9,11 @@
 #include <ibase/ICommandsProvider.h>
 #include <iprm/COptionsManager.h>
 #include <iqtgui/CHierarchicalCommand.h>
+#include <iqtgui/TDesignerGuiObserverCompBase.h>
 
+// ImtCore includes
 #include <imtgui/ILayout.h>
 #include <imtgui/CHierarchicalLayoutWidget.h>
-
-#include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <GeneratedFiles/imtgui/ui_CLayoutManagerComp.h>
 
 
@@ -106,17 +106,6 @@ private:
 	QByteArray m_activeId;
 
 	iprm::COptionsManager m_guiViewOptionsManager;
-
-//protected:
-//	// reimplemented (iqtgui::CGuiComponentBase)
-//	virtual void OnGuiCreated();
-//	virtual void OnGuiDestroyed();
-//
-//	// reimplemented (icomp::CComponentBase)
-//	virtual void OnComponentCreated();
-//
-//private:
-//	void UpdateVisualStatus();
 };
 
 
