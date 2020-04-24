@@ -120,6 +120,9 @@
              <height>20</height>
             </size>
            </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item>
@@ -142,6 +145,9 @@
              <width>20</width>
              <height>20</height>
             </size>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -166,7 +172,26 @@
              <height>20</height>
             </size>
            </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
           </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
          <item>
           <widget class="QToolButton" name="AlignLeft">
@@ -182,6 +207,9 @@
              <width>20</width>
              <height>20</height>
             </size>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -199,6 +227,9 @@
              <width>20</width>
              <height>20</height>
             </size>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -226,7 +257,26 @@
            <property name="popupMode">
             <enum>QToolButton::InstantPopup</enum>
            </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
           </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
          <item>
           <widget class="QToolButton" name="AddWidgets">
@@ -251,6 +301,9 @@
            </property>
            <property name="popupMode">
             <enum>QToolButton::InstantPopup</enum>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -359,7 +412,7 @@
          </size>
         </property>
         <property name="text">
-         <string>...</string>
+         <string>Set Icon</string>
         </property>
        </widget>
       </item>
