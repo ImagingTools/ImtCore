@@ -1,7 +1,6 @@
 #pragma once
 
 
-
 // Qt includes
 #include <QtWidgets/QWidget>
 

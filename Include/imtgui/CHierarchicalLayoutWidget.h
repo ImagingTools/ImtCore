@@ -1,31 +1,32 @@
 #pragma once
 
+
 // Qt includes
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
 #include <QtWidgets/QWidget>
 #include <GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h>
 
-// Acf includes
+// ACF includes
 #include <iser/ISerializable.h>
 #include <iser/CXmlStringWriteArchive.h>
 #include <iser/CXmlStringReadArchive.h>
+
 
 namespace imtgui
 {
 
 
-/**
-	Class defines hierarchical layouting as a widget.
-*/
-
-
 class CCustomLayoutWidget;
 
 
+/**
+	Class defines hierarchical layouting as a widget.
+*/
 class CHierarchicalLayoutWidget: public QWidget
 {
 	Q_OBJECT
+
 public:
 	typedef QList<QByteArray> IdsList;
 	typedef QList<int> SizeList;
@@ -113,7 +114,6 @@ private:
 	void CleanLayoutRecursive(QLayout* layoutPtr);
 	void IdsListCollectChildIdsRecursive(const QByteArray& id, IdsList& idList);
 	InternalItemData* GetInternalItem(const QByteArray& id);
-	//QByteArray GetParentId(const QByteArray& id);
 
 Q_SIGNALS:
 	void EmitLayoutChanged(QByteArray id, LayoutType type, int count);
@@ -130,7 +130,6 @@ private:
 	typedef QMap<QByteArray, CCustomLayoutWidget*> CustomWidgetMap;
 	CustomWidgetMap m_customWidgetMap;
 	QList<InternalItemData> m_internalItemList;
-	//typedef QMap<QByteArray, QWidget*> InsertedWidgetMap;
 	ViewMode m_viewMode;
 	QStringList m_additionalNames;
 	QByteArray m_rootId;
@@ -198,5 +197,6 @@ private:
 };
 
 
-
 } //namespace imtgui
+
+

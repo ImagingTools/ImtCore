@@ -2,8 +2,8 @@
 
 
 // ACF includes
-#include <imod/IObserver.h>
 #include <istd/IChangeable.h>
+#include <imod/IObserver.h>
 
 
 namespace imtgui
