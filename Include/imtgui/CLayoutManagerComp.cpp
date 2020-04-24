@@ -1,6 +1,12 @@
 #include <imtgui/CLayoutManagerComp.h>
 
-// Acf includes
+
+// Qt includes
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QFileDialog>
+
+// ACF includes
 #include <iser/CXmlStringWriteArchive.h>
 #include <iser/CXmlStringReadArchive.h>
 
