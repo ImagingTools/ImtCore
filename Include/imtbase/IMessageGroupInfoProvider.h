@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <istd/IChangeable.h>
+#include <istd/IInformationProvider.h>
 
 
 namespace imtbase
@@ -19,7 +20,7 @@ public:
 		QByteArray groupId;
 	};
 
-	virtual GroupInfo GetMessageGroupInfo(int messageId) const = 0;
+	virtual GroupInfo GetMessageGroupInfo(const istd::IInformationProvider* messagePtr) const = 0;
 };
 
 
