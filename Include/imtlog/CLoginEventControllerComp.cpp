@@ -11,11 +11,6 @@ namespace imtlog
 
 // public methods
 
-CLoginEventControllerComp::CLoginEventControllerComp()
-{
-}
-
-
 // reimplemented (imod::CSingleModelObserverBase)
 
 void CLoginEventControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
@@ -25,21 +20,15 @@ void CLoginEventControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& cha
 		return;
 	}
 
-	if (changeSet.Contains(iauth::ILogin::CF_LOGIN)){
+	if (changeSet.ContainsExplicit(iauth::ILogin::CF_LOGIN)){
 		QString userName = loginPtr->GetLoggedUser()->GetUserName();
 
 		SendInfoMessage(imtbase::IMessageGroupInfoProvider::MI_USER_LOGIN, userName, "LoginEventController");
 	}
 
-	if (changeSet.Contains(iauth::ILogin::CF_LOGOUT)){
+	if (changeSet.ContainsExplicit(iauth::ILogin::CF_LOGOUT)){
 		SendInfoMessage(imtbase::IMessageGroupInfoProvider::MI_USER_LOGOUT, "", "LoginEventController");
 	}
-}
-
-
-bool CLoginEventControllerComp::OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask)
-{
-	return BaseClass2::OnModelAttached(modelPtr, changeMask);
 }
 
 
