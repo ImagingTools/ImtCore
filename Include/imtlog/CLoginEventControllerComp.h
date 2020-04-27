@@ -24,7 +24,11 @@ public:
 
 protected:
 	// reimplemented (imod::CSingleModelObserverBase)
+	virtual void BeforeUpdate(imod::IModel* modelPtr) override;
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+
+private:
+	QString m_userName;
 };
 
 

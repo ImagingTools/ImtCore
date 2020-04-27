@@ -13,6 +13,20 @@ namespace imtlog
 
 // reimplemented (imod::CSingleModelObserverBase)
 
+void CLoginEventControllerComp::BeforeUpdate(imod::IModel* modelPtr)
+{
+	iauth::ILogin* loginPtr = GetObjectPtr();
+	if (loginPtr == nullptr){
+		return;
+	}
+
+	iauth::CUser *userPtr = loginPtr->GetLoggedUser();
+	if (userPtr != nullptr){
+		m_userName = userPtr->GetUserName();
+	}
+}
+
+
 void CLoginEventControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	iauth::ILogin* loginPtr = GetObjectPtr();
@@ -21,13 +35,11 @@ void CLoginEventControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& cha
 	}
 
 	if (changeSet.ContainsExplicit(iauth::ILogin::CF_LOGIN)){
-		QString userName = loginPtr->GetLoggedUser()->GetUserName();
-
-		SendInfoMessage(imtbase::IMessageGroupInfoProvider::MI_USER_LOGIN, userName, "LoginEventController");
+		SendInfoMessage(imtbase::IMessageGroupInfoProvider::MI_USER_LOGIN, loginPtr->GetLoggedUser()->GetUserName(), "LoginEventController");
 	}
 
 	if (changeSet.ContainsExplicit(iauth::ILogin::CF_LOGOUT)){
-		SendInfoMessage(imtbase::IMessageGroupInfoProvider::MI_USER_LOGOUT, "", "LoginEventController");
+		SendInfoMessage(imtbase::IMessageGroupInfoProvider::MI_USER_LOGOUT, m_userName, "LoginEventController");
 	}
 }
 
