@@ -35,7 +35,9 @@ QByteArray CDocumentBasedFileCollectionDelegateComp::GetSupportedTypeId() const
 }
 
 
-bool CDocumentBasedFileCollectionDelegateComp::InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr)
+bool CDocumentBasedFileCollectionDelegateComp::InitializeDelegate(
+			imtbase::IObjectCollection* collectionPtr,
+			iqtgui::IGuiObject* parentGuiPtr)
 {
 	if (!BaseClass2::InitializeDelegate(collectionPtr, parentGuiPtr)){
 		return false;
@@ -47,7 +49,9 @@ bool CDocumentBasedFileCollectionDelegateComp::InitializeDelegate(imtbase::IObje
 }
 
 
-QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(const QByteArray& typeId, const istd::IChangeable* /*defaultDataPtr*/) const
+QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(
+			const QByteArray& typeId,
+			const istd::IChangeable* /*defaultDataPtr*/) const
 {
 	if (typeId != GetSupportedTypeId()){
 		return QByteArray();
@@ -71,7 +75,9 @@ QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(const QByte
 }
 
 
-void CDocumentBasedFileCollectionDelegateComp::UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId)
+void CDocumentBasedFileCollectionDelegateComp::UpdateItemSelection(
+			const imtbase::ICollectionInfo::Ids& selectedItems,
+			const QByteArray& selectedTypeId)
 {
 	BaseClass2::UpdateItemSelection(selectedItems, selectedTypeId);
 
@@ -101,7 +107,9 @@ void CDocumentBasedFileCollectionDelegateComp::UpdateItemSelection(const imtbase
 }
 
 
-bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId) const
+bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(
+			const QByteArray& objectId,
+			const QByteArray& viewTypeId) const
 {
 	if (!m_documentManagerCompPtr.IsValid()){
 		return false;
