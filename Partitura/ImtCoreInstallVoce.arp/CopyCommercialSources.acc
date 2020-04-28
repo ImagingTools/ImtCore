@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4749" Description="ACF"/>
-            <Version Id="1" Number="2026" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330496" Description="Qt Framework"/>
+            <Version Id="0" Number="4851" Description="ACF"/>
+            <Version Id="1" Number="2122" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Copy all source files (without compiled binaries) for installation during component instantiation</Description>
@@ -303,6 +303,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>*.lib</Value>
+                                <Value>*.pdb</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

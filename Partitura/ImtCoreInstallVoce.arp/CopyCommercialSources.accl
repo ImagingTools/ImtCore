@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4749" Description="ACF"/>
-            <Version Id="1" Number="2026" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330496" Description="Qt Framework"/>
+            <Version Id="0" Number="4851" Description="ACF"/>
+            <Version Id="1" Number="2122" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -12,7 +12,7 @@
         <Element ComponentName="CopyAuxIncludes" X="900" Y="500" Note=""/>
         <Element ComponentName="CopyBins" X="600" Y="500" Note=""/>
         <Element ComponentName="CopyCommon" X="100" Y="175" Note=""/>
-        <Element ComponentName="CopyImplOther" X="600" Y="175" Note=""/>
+        <Element ComponentName="CopyImplOther" X="627" Y="178" Note=""/>
         <Element ComponentName="CopyImplSources" X="900" Y="175" Note=""/>
         <Element ComponentName="CopyIncludeOther" X="75" Y="500" Note=""/>
         <Element ComponentName="CopyIncludeSources" X="350" Y="175" Note=""/>
