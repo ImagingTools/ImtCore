@@ -33,7 +33,7 @@
                         <Data IsEnabled="true" Value="All rights reserved by ImagingTools GmbH"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MainVersionId" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="10"/>
+                        <Data IsEnabled="true" Value="1978"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProductName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="IMT SDK"/>

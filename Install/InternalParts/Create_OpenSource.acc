@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4054" Description="ACF"/>
-            <Version Id="1" Number="1505" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="328706" Description="Qt Framework"/>
+            <Version Id="0" Number="4851" Description="ACF"/>
+            <Version Id="1" Number="2122" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -14,13 +14,13 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="ACF-Solutions"/>
+                        <Data IsEnabled="true" Value="ImtCore"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ApplicationType" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="OpenSource"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CompanyName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="ImagingTools"/>
+                        <Data IsEnabled="true" Value="ImagingTools GmbH"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FileCopiers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -30,10 +30,10 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="MainVersionId" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="10"/>
+                        <Data IsEnabled="true" Value="1978"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProductName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="ACF-Solutions"/>
+                        <Data IsEnabled="true" Value="ImtCore"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
@@ -67,47 +67,11 @@
                     <AttributeInfo Id="ProjectsSubstitutionTagExpr" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="\$\((.+)\)"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ProjectsSubstitutionTags" Type="String[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ACFDIR</Value>
-                                <Value>ACFCONFIGDIR</Value>
-                                <Value>ACFSLNDIR</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProjectsSubstitutionValues" Type="String[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>$RelativeToInputFile:$(ACFDIR)</Value>
-                                <Value>$RelativeToInputFile:$(ACFDIR)/Config</Value>
-                                <Value>$RelativeToInputFile:$(ACFSLNDIR)</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
                     <AttributeInfo Id="SourceExcludeFilters" Type="String[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>GeneratedFiles</Value>
                                 <Value>generated</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="WinProjectsSubstitutionTags" Type="String[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ACFDIR</Value>
-                                <Value>ACFCONFIGDIR</Value>
-                                <Value>ACFSLNDIR</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="WinProjectsSubstitutionValues" Type="String[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>$RelativeToInputFileWin:$(ACFDIR)</Value>
-                                <Value>$RelativeToInputFileWin:$(ACFDIR)/Config</Value>
-                                <Value>$RelativeToInputFileWin:$(ACFSLNDIR)</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
