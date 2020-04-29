@@ -53,6 +53,13 @@ const ibase::IHierarchicalCommand* CLayoutManagerComp::GetCommands() const
 }
 
 
+bool CLayoutManagerComp::Serialize(iser::IArchive& archive)
+{
+	return m_layoutWidgetPtr->Serialize(archive);
+//	return true;
+}
+
+
 // protected methods
 
 // reimplemented (iqtgui::TGuiObserverWrap)
@@ -60,7 +67,7 @@ const ibase::IHierarchicalCommand* CLayoutManagerComp::GetCommands() const
 void CLayoutManagerComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 {
 	qDebug() << "layout set";
-	Q_ASSERT(GetObjectPtr() != NULL);
+//	Q_ASSERT(GetObjectPtr() != NULL);
 }
 
 
@@ -87,6 +94,18 @@ void CLayoutManagerComp::OnGuiCreated()
 	Q_ASSERT_X(m_guiViewNameMultiAttrPtr.IsValid(), "CLayoutManagerComp", "attribute ViewNames should be set");
 	Q_ASSERT_X((m_guiViewIdMultiAttrPtr.GetCount() == m_guiViewMultiFactCompPtr.GetCount()) &&
 		(m_guiViewNameMultiAttrPtr.GetCount() == m_guiViewMultiFactCompPtr.GetCount()), "CLayoutManagerComp", "attributes ViewIds, ViewNames and ViewFactories should have the same count");
+
+	// add undo manager commands provider
+	if (m_commandsProviderCompPtr.IsValid()){
+		const iqtgui::CHierarchicalCommand *commands = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_commandsProviderCompPtr->GetCommands());
+		for (int i = 0; i < commands->GetChildsCount(); i++)
+		{
+		    iqtgui::CHierarchicalCommand *command = dynamic_cast<iqtgui::CHierarchicalCommand*>(commands->GetChild(i));
+			if (command != NULL){
+				m_rootCommands.InsertChild(command);
+			}
+		}
+	}
 
 	// gui views part
 	QStringList additionalNames;
@@ -191,6 +210,9 @@ void CLayoutManagerComp::OnSplitVertical()
 
 void CLayoutManagerComp::OnSplitVertical(const QByteArray& id)
 {
+	istd::IChangeable::ChangeSet changeSet(0);
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
 	if (m_layoutWidgetPtr != NULL) {
 		m_layoutWidgetPtr->SetSplitterLayout(id, Qt::Vertical, 2);
 	}
@@ -208,6 +230,8 @@ void CLayoutManagerComp::OnSplitHorizontal()
 
 void CLayoutManagerComp::OnSplitHorizontal(const QByteArray& id)
 {
+	istd::IChangeable::ChangeSet changeSet(0);
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
 	if (m_layoutWidgetPtr != NULL) {
 		m_layoutWidgetPtr->SetSplitterLayout(id, Qt::Horizontal, 2);
 	}
@@ -217,6 +241,9 @@ void CLayoutManagerComp::OnSplitHorizontal(const QByteArray& id)
 
 void CLayoutManagerComp::OnDelete()
 {
+	istd::IChangeable::ChangeSet changeSet(0);
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
 	if (m_layoutWidgetPtr != NULL){
 		m_layoutWidgetPtr->RemoveLayout(m_activeId);
 	}
@@ -259,6 +286,9 @@ void CLayoutManagerComp::OnAddWidget(const QByteArray& id, int index)
 		m_layoutWidgetPtr->SetWidgetToItem(id, QByteArray(), NULL);
 	}
 	else {
+		istd::IChangeable::ChangeSet changeSet(0);
+		istd::CChangeNotifier changeNotifier(this, &changeSet);
+
 		istd::TSmartPtr<iqtgui::IGuiObject> newWidgetPtr(m_guiViewMultiFactCompPtr.CreateInstance(index));
 		if (newWidgetPtr->CreateGui(NULL)) {
 			QByteArray viewId = m_guiViewIdMultiAttrPtr[index];

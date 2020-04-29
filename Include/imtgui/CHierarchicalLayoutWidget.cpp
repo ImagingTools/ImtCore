@@ -454,6 +454,9 @@ bool CHierarchicalLayoutWidget::Serialize(iser::IArchive& archive)
 {
 	QLayout *layoutPtr = layout();
 	QLayoutItem* itemPtr = layoutPtr->itemAt(0);
+	if (itemPtr == NULL){
+		return false;
+	}
 	QWidget *widget = itemPtr->widget();
 	if (!archive.IsStoring()) {
 		CleanLayoutRecursive(layout());
@@ -1053,22 +1056,22 @@ void CCustomLayoutWidget::OnAddWidget()
 
 void CCustomLayoutWidget::OnDeleteWidget()
 {
-	m_hierarchicalLayoutWidget.RemoveLayout(m_id);
-	//emit m_hierarchicalLayoutWidget.EmitDeleteWidget(m_id);
+	//m_hierarchicalLayoutWidget.RemoveLayout(m_id);
+	emit m_hierarchicalLayoutWidget.EmitDeleteWidget(m_id);
 }
 
 
 void CCustomLayoutWidget::OnSplitVertical()
 {
-	m_hierarchicalLayoutWidget.SetSplitterLayout(m_id, Qt::Vertical, 2);
-	//emit m_hierarchicalLayoutWidget.EmitSplitVertical(m_id);
+//	m_hierarchicalLayoutWidget.SetSplitterLayout(m_id, Qt::Vertical, 2);
+	emit m_hierarchicalLayoutWidget.EmitSplitVertical(m_id);
 }
 
 
 void CCustomLayoutWidget::OnSplitHorizontal()
 {
-	m_hierarchicalLayoutWidget.SetSplitterLayout(m_id, Qt::Horizontal, 2);
-	//emit m_hierarchicalLayoutWidget.EmitSplitHorizontal(m_id);
+	//m_hierarchicalLayoutWidget.SetSplitterLayout(m_id, Qt::Horizontal, 2);
+	emit m_hierarchicalLayoutWidget.EmitSplitHorizontal(m_id);
 }
 
 
