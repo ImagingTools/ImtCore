@@ -41,8 +41,8 @@ public:
 	typedef iqtgui::TDesignerGuiCompBase<Ui::CLayoutManagerComp> BaseClass;
 
 
- 	//typedef iqtgui::TDesignerGuiObserverCompBase<
-		//Ui::CLayoutManagerComp, imtgui::ILayout> BaseClass;
+ //	typedef iqtgui::TDesignerGuiObserverCompBase<
+//		Ui::CLayoutManagerComp, imtgui::ILayout> BaseClass;
 
 	I_BEGIN_COMPONENT(CLayoutManagerComp);
 	//I_REGISTER_INTERFACE(imod::IObserver);
