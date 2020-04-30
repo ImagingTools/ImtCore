@@ -18,6 +18,13 @@ CTimeAxis::CTimeAxis(QGraphicsItem *parent)
 }
 
 
+void CTimeAxis::setTimeInterval(const QDateTime & startDateTime, const QDateTime & endDateTime)
+{
+	m_startDateTime = startDateTime;
+	m_endDateTime = endDateTime;
+}
+
+
 bool CTimeAxis::setMinorTickCount(int count)
 {
 	if (count > 0){
@@ -36,13 +43,6 @@ void CTimeAxis::setGeometry(const QRectF &geometry)
 	prepareGeometryChange();
 	QGraphicsLayoutItem::setGeometry(geometry);
 	setPos(geometry.topLeft());
-}
-
-
-void CTimeAxis::setTimeInterval(const QDateTime & startDateTime, const QDateTime & endDateTime)
-{
-	m_startDateTime = startDateTime;
-	m_endDateTime = endDateTime;
 }
 
 

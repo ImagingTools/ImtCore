@@ -18,36 +18,11 @@ CEventGraphicsView::CEventGraphicsView(QWidget *parent) : QGraphicsView(parent)
 }
 
 
-void CEventGraphicsView::wheelEvent(QWheelEvent *event)
-{
-	QPointF scenePnt = mapToScene(event->pos());
-	QTransform transform(transform());
-
-	if (event->modifiers() & Qt::ShiftModifier){
-		if (event->delta() > 0){
-			scale(1, 1.1);
-		}
-		else{
-			scale(1, 1/1.1);
-		}
-		return;
-	}
-
-	if (event->delta() > 0){
-		scale(1.1, 1);
-	}
-	else{
-		scale(1 / 1.1, 1);
-	}
-
-	qDebug() << horizontalScrollBar()->minimum() << horizontalScrollBar()->maximum();
-}
-
+// protected methods
 
 void CEventGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
 	double delta = event->localPos().x() - m_prevPos.x();
-
 	double sceneDelta = delta / transform().m11();
 
 	QScrollBar *bar = horizontalScrollBar();
@@ -61,17 +36,50 @@ void CEventGraphicsView::mouseMoveEvent(QMouseEvent *event)
 	//qDebug() << sceneDelta * scrollFactor << int(sceneDelta * scrollFactor);
 
 	m_prevPos = event->localPos();
+
+	QGraphicsView::mouseMoveEvent(event);
 }
 
 
 void CEventGraphicsView::mousePressEvent(QMouseEvent *event)
 {
 	m_prevPos = event->localPos();
+
+	QGraphicsView::mousePressEvent(event);
+}
+
+
+void CEventGraphicsView::wheelEvent(QWheelEvent *event)
+{
+	QPointF scenePnt = mapToScene(event->pos());
+	QTransform transform(transform());
+
+	if (event->modifiers() & Qt::ShiftModifier){
+		if (event->delta() > 0){
+			scale(1, 1.1);
+		}
+		else{
+			scale(1, 1 / 1.1);
+		}
+		return;
+	}
+
+	if (event->delta() > 0){
+		scale(1.1, 1);
+	}
+	else{
+		scale(1 / 1.1, 1);
+	}
+
+	qDebug() << horizontalScrollBar()->minimum() << horizontalScrollBar()->maximum();
+
+	QGraphicsView::wheelEvent(event);
 }
 
 
 void CEventGraphicsView::resizeEvent(QResizeEvent *event)
 {
+	QGraphicsView::resizeEvent(event);
 }
 
 

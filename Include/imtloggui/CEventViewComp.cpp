@@ -126,16 +126,6 @@ void CEventViewComp::OnComponentDestroyed()
 }
 
 
-// private static methods
-
-CEventViewComp::MessageFactory& CEventViewComp::GetMessageFactory()
-{
-	static MessageFactory messageFactory;
-
-	return messageFactory;
-}
-
-
 } // namespace imtloggui
 
 

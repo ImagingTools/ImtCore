@@ -61,9 +61,6 @@ public:
 	virtual void OnComponentDestroyed() override;
 
 private:
-	typedef istd::TComposedFactory<iser::IObject> MessageFactory;
-	static MessageFactory& GetMessageFactory();
-
 	QGraphicsScene *m_scenePtr;
 	CEventGraphicsView *m_viewPtr;
 	CTimeAxis* m_timeAxisPtr;
