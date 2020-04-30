@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtWidgets/QGraphicsScene>
+
 // ACF includes
 #include <ilog/IMessageContainer.h>
 #include <ilog/IMessageConsumer.h>
@@ -12,6 +15,8 @@
 
 // ImtCore includes
 #include <imtbase/IMessageGroupInfoProvider.h>
+#include <imtloggui/CEventGraphicsView.h>
+#include <imtloggui/CTimeAxis.h>
 
 // Acula includes
 #include <GeneratedFiles/imtloggui/ui_CEventViewComp.h>
@@ -22,7 +27,6 @@ namespace imtloggui
 
 
 class CEventViewComp:
-			virtual public ilog::IMessageContainer,
 			virtual public ilog::IMessageConsumer,
 			public iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp>>
 {
@@ -30,26 +34,11 @@ public:
 	typedef iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp>> BaseClass;
 	
 	I_BEGIN_COMPONENT(CEventViewComp);
-		I_REGISTER_INTERFACE(ilog::IMessageContainer);
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
 		I_ASSIGN(m_messageGroupInfoProviderCompPtr, "MessageGroupInfoProvider", "Message group info provider", false, "")
 	I_END_COMPONENT;
 
 	CEventViewComp();
-
-	/**
-		Register a new message type.
-		Only messages of known (registered) types can be serialized.
-	*/
-	template <typename MessageType>
-	static bool RegisterMessageType(const QByteArray& messageTypeId = QByteArray());
-
-	int GetMessagesCount() const;
-
-	// reimplemented (ilog::IMessageContainer)
-	virtual int GetWorstCategory() const override;
-	virtual Messages GetMessages() const override;
-	virtual void ClearMessages() override;
 
 	// reimplemented (ilog::IMessageConsumer)
 	virtual bool IsMessageSupported(
@@ -71,43 +60,16 @@ public:
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
-	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive) override;
-
-protected:
-	Messages m_sessionMessages;
-	mutable int m_worstCategory;
-
 private:
 	typedef istd::TComposedFactory<iser::IObject> MessageFactory;
 	static MessageFactory& GetMessageFactory();
 
+	QGraphicsScene *m_scenePtr;
+	CEventGraphicsView *m_viewPtr;
+	CTimeAxis* m_timeAxisPtr;
+
 	I_REF(imtbase::IMessageGroupInfoProvider, m_messageGroupInfoProviderCompPtr);
 };
-
-
-// public static methods
-
-template <typename MessageType>
-bool CEventViewComp::RegisterMessageType(const QByteArray& messageTypeId)
-{
-	QByteArray realTypeId = messageTypeId;
-
-	if (realTypeId.isEmpty()){
-		realTypeId = istd::CClassInfo::GetName<MessageType>();
-	}
-	
-	return GetMessageFactory().RegisterFactory(new istd::TSingleFactory<iser::IObject, MessageType>(realTypeId), true);
-}
-
-#define REGISTER_MESSAGE_TYPE(messageType, messageTypeId)\
-	static struct DefaultMessageTypesRegistrator_##messageType\
-{\
-	DefaultMessageTypesRegistrator_##messageType()\
-{\
-	CEventViewComp::RegisterMessageType<ilog::messageType>(messageTypeId);\
-}\
-} s_defaultMessageTypesRegistrator_##messageType;
 
 
 } // namespace imtloggui
