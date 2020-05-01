@@ -1,4 +1,4 @@
-#include <imtgui/CLayoutManagerComp.h>
+#include <imtgui/CLayoutManagerGuiComp.h>
 
 
 // Qt includes
@@ -17,7 +17,7 @@ namespace imtgui
 
 // public methods
 
-CLayoutManagerComp::CLayoutManagerComp(QWidget* parentPtr)
+CLayoutManagerGuiComp::CLayoutManagerGuiComp(QWidget* parentPtr)
 	:m_layoutWidgetPtr(NULL),
 	m_commands("&View", 100),
 	m_startEndEditModeCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1988),
@@ -47,13 +47,13 @@ CLayoutManagerComp::CLayoutManagerComp(QWidget* parentPtr)
 
 // reimplemented (ibase::ICommandsProvider)
 
-const ibase::IHierarchicalCommand* CLayoutManagerComp::GetCommands() const
+const ibase::IHierarchicalCommand* CLayoutManagerGuiComp::GetCommands() const
 {
 	return &m_rootCommands;
 }
 
 
-bool CLayoutManagerComp::Serialize(iser::IArchive& archive)
+bool CLayoutManagerGuiComp::Serialize(iser::IArchive& archive)
 {
 	return m_layoutWidgetPtr->Serialize(archive);
 //	return true;
@@ -64,7 +64,7 @@ bool CLayoutManagerComp::Serialize(iser::IArchive& archive)
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
-void CLayoutManagerComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
+void CLayoutManagerGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 {
 	qDebug() << "layout set";
 //	Q_ASSERT(GetObjectPtr() != NULL);
@@ -73,7 +73,7 @@ void CLayoutManagerComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet
 
 // reimplemented (iqtgui::CGuiComponentBase)
 
-void CLayoutManagerComp::OnGuiCreated()
+void CLayoutManagerGuiComp::OnGuiCreated()
 {
 	m_layoutWidgetPtr = new CHierarchicalLayoutWidget(GetQtWidget());
 	this->GetWidget()->layout()->addWidget(m_layoutWidgetPtr);
@@ -89,11 +89,11 @@ void CLayoutManagerComp::OnGuiCreated()
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitSplitHorizontal(const QByteArray&)), this, SLOT(OnSplitHorizontal(const QByteArray&)), Qt::DirectConnection);
 
 	// check views attributes
-	Q_ASSERT_X(m_guiViewIdMultiAttrPtr.IsValid(), "CLayoutManagerComp", "attribute ViewIds should be set");
-	Q_ASSERT_X(m_guiViewMultiFactCompPtr.IsValid(), "CLayoutManagerComp", "attribute ViewFactories should be set");
-	Q_ASSERT_X(m_guiViewNameMultiAttrPtr.IsValid(), "CLayoutManagerComp", "attribute ViewNames should be set");
+	Q_ASSERT_X(m_guiViewIdMultiAttrPtr.IsValid(), "CLayoutManagerGuiComp", "attribute ViewIds should be set");
+	Q_ASSERT_X(m_guiViewMultiFactCompPtr.IsValid(), "CLayoutManagerGuiComp", "attribute ViewFactories should be set");
+	Q_ASSERT_X(m_guiViewNameMultiAttrPtr.IsValid(), "CLayoutManagerGuiComp", "attribute ViewNames should be set");
 	Q_ASSERT_X((m_guiViewIdMultiAttrPtr.GetCount() == m_guiViewMultiFactCompPtr.GetCount()) &&
-		(m_guiViewNameMultiAttrPtr.GetCount() == m_guiViewMultiFactCompPtr.GetCount()), "CLayoutManagerComp", "attributes ViewIds, ViewNames and ViewFactories should have the same count");
+		(m_guiViewNameMultiAttrPtr.GetCount() == m_guiViewMultiFactCompPtr.GetCount()), "CLayoutManagerGuiComp", "attributes ViewIds, ViewNames and ViewFactories should have the same count");
 
 	// add undo manager commands provider
 	if (m_commandsProviderCompPtr.IsValid()){
@@ -122,7 +122,7 @@ void CLayoutManagerComp::OnGuiCreated()
 }
 
 
-void CLayoutManagerComp::OnGuiRetranslate()
+void CLayoutManagerGuiComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
@@ -134,7 +134,7 @@ void CLayoutManagerComp::OnGuiRetranslate()
 }
 
 
-void CLayoutManagerComp::OnClearAll()
+void CLayoutManagerGuiComp::OnClearAll()
 {
 	if (m_layoutWidgetPtr != NULL) {
 		QMessageBox msgBox;
@@ -150,7 +150,7 @@ void CLayoutManagerComp::OnClearAll()
 }
 
 
-void CLayoutManagerComp::OnLoad()
+void CLayoutManagerGuiComp::OnLoad()
 {
 	QString fileName = QFileDialog::getOpenFileName(GetWidget(), tr("Open File"), QString(), QString("*.layout"));
 	if (!fileName.isEmpty()) {
@@ -167,7 +167,7 @@ void CLayoutManagerComp::OnLoad()
 }
 
 
-void CLayoutManagerComp::OnSave()
+void CLayoutManagerGuiComp::OnSave()
 {
 	QString fileName = QFileDialog::getSaveFileName(GetWidget(), tr("Save File"), QString(), QString("*.layout"));
 	if (!fileName.isEmpty()) {
@@ -183,7 +183,7 @@ void CLayoutManagerComp::OnSave()
 }
 
 
-void CLayoutManagerComp::OnChangeName()
+void CLayoutManagerGuiComp::OnChangeName()
 {
 	if (m_layoutWidgetPtr != NULL){
 		QString name = m_layoutWidgetPtr->GetName(m_activeId);
@@ -199,7 +199,7 @@ void CLayoutManagerComp::OnChangeName()
 }
 
 
-void CLayoutManagerComp::OnSplitVertical()
+void CLayoutManagerGuiComp::OnSplitVertical()
 {
 	if (m_layoutWidgetPtr != NULL){
 		m_layoutWidgetPtr->SetSplitterLayout(m_activeId, Qt::Vertical, 2);
@@ -208,7 +208,7 @@ void CLayoutManagerComp::OnSplitVertical()
 }
 
 
-void CLayoutManagerComp::OnSplitVertical(const QByteArray& id)
+void CLayoutManagerGuiComp::OnSplitVertical(const QByteArray& id)
 {
 	istd::IChangeable::ChangeSet changeSet(0);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
@@ -219,7 +219,7 @@ void CLayoutManagerComp::OnSplitVertical(const QByteArray& id)
 }
 
 
-void CLayoutManagerComp::OnSplitHorizontal()
+void CLayoutManagerGuiComp::OnSplitHorizontal()
 {
 	if (m_layoutWidgetPtr != NULL){
 		m_layoutWidgetPtr->SetSplitterLayout(m_activeId, Qt::Horizontal, 2);
@@ -228,7 +228,7 @@ void CLayoutManagerComp::OnSplitHorizontal()
 }
 
 
-void CLayoutManagerComp::OnSplitHorizontal(const QByteArray& id)
+void CLayoutManagerGuiComp::OnSplitHorizontal(const QByteArray& id)
 {
 	istd::IChangeable::ChangeSet changeSet(0);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
@@ -239,7 +239,7 @@ void CLayoutManagerComp::OnSplitHorizontal(const QByteArray& id)
 }
 
 
-void CLayoutManagerComp::OnDelete()
+void CLayoutManagerGuiComp::OnDelete()
 {
 	istd::IChangeable::ChangeSet changeSet(0);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
@@ -251,7 +251,7 @@ void CLayoutManagerComp::OnDelete()
 }
 
 
-void CLayoutManagerComp::OnDeleteWidget(const QByteArray& id)
+void CLayoutManagerGuiComp::OnDeleteWidget(const QByteArray& id)
 {
 	if (m_layoutWidgetPtr != NULL) {
 		m_layoutWidgetPtr->RemoveLayout(id);
@@ -260,13 +260,13 @@ void CLayoutManagerComp::OnDeleteWidget(const QByteArray& id)
 }
 
 
-void CLayoutManagerComp::OnClear()
+void CLayoutManagerGuiComp::OnClear()
 {
 	OnClearWidget(m_activeId);
 }
 
 
-void CLayoutManagerComp::OnAddWidget()
+void CLayoutManagerGuiComp::OnAddWidget()
 {
 	//QAction *action = qobject_cast<QAction*> (sender());
 	//if (action != nullptr){
@@ -280,7 +280,7 @@ void CLayoutManagerComp::OnAddWidget()
 }
 
 
-void CLayoutManagerComp::OnAddWidget(const QByteArray& id, int index)
+void CLayoutManagerGuiComp::OnAddWidget(const QByteArray& id, int index)
 {
 	if (index < 0){
 		m_layoutWidgetPtr->SetWidgetToItem(id, QByteArray(), NULL);
@@ -300,7 +300,7 @@ void CLayoutManagerComp::OnAddWidget(const QByteArray& id, int index)
 }
 
 
-void CLayoutManagerComp::OnAddWidgetByViewId(const QByteArray& id, const QByteArray& viewId)
+void CLayoutManagerGuiComp::OnAddWidgetByViewId(const QByteArray& id, const QByteArray& viewId)
 {
 	int index = m_guiViewIdMultiAttrPtr.FindValue(viewId);
 	if (index < 0){
@@ -315,7 +315,7 @@ void CLayoutManagerComp::OnAddWidgetByViewId(const QByteArray& id, const QByteAr
 	}
 }
 
-void CLayoutManagerComp::OnDropWidget(QByteArray id, QDropEvent* eventPtr)
+void CLayoutManagerGuiComp::OnDropWidget(QByteArray id, QDropEvent* eventPtr)
 {
 	//const QMimeData* mimeDataPtr = eventPtr->mimeData();
 	//if (mimeDataPtr != NULL){
@@ -340,7 +340,7 @@ void CLayoutManagerComp::OnDropWidget(QByteArray id, QDropEvent* eventPtr)
 }
 
 
-void CLayoutManagerComp::OnOpenMenu(QByteArray id, QMouseEvent* eventPtr)
+void CLayoutManagerGuiComp::OnOpenMenu(QByteArray id, QMouseEvent* eventPtr)
 {
 	m_activeId = id;
 	QMenu menu(GetQtWidget());
@@ -350,7 +350,7 @@ void CLayoutManagerComp::OnOpenMenu(QByteArray id, QMouseEvent* eventPtr)
 	//menu.addAction("Split Horizontal", this, &CLayoutManagerComp::OnSplitHorizontal);
 	//menu.addAction("Delete", this, &CLayoutManagerComp::OnDelete);
 	if (m_createdViewMap.contains(id)){
-		menu.addAction("Clear", this, &CLayoutManagerComp::OnClear);
+		menu.addAction("Clear", this, &CLayoutManagerGuiComp::OnClear);
 	}
 	menu.addSeparator();
 
@@ -363,7 +363,7 @@ void CLayoutManagerComp::OnOpenMenu(QByteArray id, QMouseEvent* eventPtr)
 }
 
 
-void CLayoutManagerComp::OnClearWidget(QByteArray id)
+void CLayoutManagerGuiComp::OnClearWidget(QByteArray id)
 {
 	Q_ASSERT(m_createdViewMap.contains(id));
 	m_layoutWidgetPtr->SetWidgetToItem(m_activeId, QByteArray(), NULL);
@@ -372,7 +372,7 @@ void CLayoutManagerComp::OnClearWidget(QByteArray id)
 }
 
 
-void CLayoutManagerComp::OnStartEndEditCommand()
+void CLayoutManagerGuiComp::OnStartEndEditCommand()
 {
 	if (m_layoutWidgetPtr != NULL){
 		QAction* actionPtr = dynamic_cast<QAction*>(sender());

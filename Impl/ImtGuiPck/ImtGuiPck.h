@@ -17,7 +17,8 @@
 #include <imtgui/CDelegatedCommandsProviderComp.h>
 #include <imtgui/CMenuPanelComp.h>
 #include <imtgui/CMonitorInfoProviderComp.h>
-#include <imtgui/CLayoutManagerComp.h>
+#include <imtgui/CLayoutManagerGuiComp.h>
+#include <imtgui/CLayout.h>
 #include <imtgui/CCompositeObjectViewComp.h>
 #include <imtgui/CImageContoursExtender.h>
 #include <imtgui/CEventViewComp.h>
@@ -41,7 +42,8 @@ typedef imtgui::CFileCollectionMetaInfoViewComp FileCollectionMetaInfoView;
 typedef imtgui::CDelegatedCommandsProviderComp DelegatedCommandsProvider;
 typedef imtgui::CMenuPanelComp MenuPanel;
 typedef icomp::TModelCompWrap<imtgui::CMonitorInfoProviderComp> MonitorInfoProvider;
-typedef icomp::TModelCompWrap<imtgui::CLayoutManagerComp> LayoutManager;
+typedef icomp::TMakeComponentWrap<imtgui::CLayout, imtgui::ILayout> LayoutManager;
+typedef icomp::TModelCompWrap<imtgui::CLayoutManagerGuiComp> LayoutManagerGui;
 typedef imtgui::CCompositeObjectViewComp CompositeObjectView;
 typedef imtgui::CImageContoursExtender ImageContoursExtender;
 typedef imtgui::CEventViewComp EventView;

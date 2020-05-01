@@ -75,7 +75,12 @@ I_EXPORT_COMPONENT(
 I_EXPORT_COMPONENT(
 			LayoutManager,
 			"LayoutManager component",
-			"LayoutManager page");
+			"LayoutManager model");
+
+I_EXPORT_COMPONENT(
+	LayoutManagerGui,
+	"LayoutManagerGui component",
+	"LayoutManagerGui page");
 
 I_EXPORT_COMPONENT(
 			CompositeObjectView,

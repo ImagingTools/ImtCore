@@ -45,12 +45,12 @@ public:
 	/**
 		Set layout's id.
 	*/
-	virtual void SetId(const QByteArray& id) = 0;
+	virtual void SetLayoutId(const QByteArray& id) = 0;
 
 	/**
 		Get layout's id.
 	*/
-	virtual QByteArray GetId() = 0;
+	virtual QByteArray GetLayoutId() const = 0;
 
 	/**
 		Set layout's type.
@@ -60,17 +60,17 @@ public:
 	/**
 		Get layout's type.
 	*/
-	virtual LayoutType GetType() = 0;
+	virtual LayoutType GetType() const = 0;
 
 	/**
 		Set layout's title.
 	*/
-	virtual void SetTitle(const QString& name) = 0;
+	virtual void SetTitle(const QString& title) = 0;
 
 	/**
 		Get layout's title.
 	*/
-	virtual QString GetTitle() = 0;
+	virtual QString GetTitle() const  = 0;
 
 	/**
 		Set layout's title aling.
@@ -80,12 +80,12 @@ public:
 	/**
 		Get layout's title align.
 	*/
-	virtual AlignType GetTitleAlign() = 0;
+	virtual AlignType GetTitleAlign() const = 0;
 
 	/**
 		Set layout's icon.
 	*/
-	virtual void SetIcon(const QIcon& name) = 0;
+	virtual void SetIcon(const QIcon& icon) = 0;
 
 	/**
 		Get layout's icon.
@@ -100,7 +100,7 @@ public:
 	/**
 		Get layout's Widget viewId.
 	*/
-	virtual QByteArray GetViewId() = 0;
+	virtual QByteArray GetViewId() const  = 0;
 
 	/**
 		Set layout's child sizes.
@@ -125,7 +125,7 @@ public:
 	/**
 		Get layout's childs count.
 	*/
-	virtual int GetCountChilds() = 0;
+	virtual int GetChildsCount() = 0;
 
 	/**
 		Get layout's child from index.
@@ -135,7 +135,7 @@ public:
 	/**
 		Insert layout's child to index.
 	*/
-	virtual void InsertChild(ILayout* layout, int index) = 0;
+	virtual void InsertChild(int index, ILayout* layout) = 0;
 
 	/**
 		Append layout's child.
@@ -165,7 +165,7 @@ public:
 	/**
 		Find layout's child recursive.
 	*/
-	virtual ILayout* FindRecursive(const QByteArray& id) = 0;
+	virtual ILayout* FindChild(const QByteArray& id) = 0;
 
 };
 
