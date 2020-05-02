@@ -5,6 +5,9 @@
 #include <QtCore/QRectF>
 #include <QtGui/QPen>
 #include <QtGui/QPainter>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QScrollBar>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
 
@@ -14,11 +17,10 @@ namespace imtloggui
 
 CTimeAxis::CTimeAxis(QGraphicsItem *parent)
 {
-	setGraphicsItem(this);
 }
 
 
-void CTimeAxis::setTimeInterval(const QDateTime & startDateTime, const QDateTime & endDateTime)
+void CTimeAxis::setTimeSpan(const QDateTime & startDateTime, const QDateTime & endDateTime)
 {
 	m_startDateTime = startDateTime;
 	m_endDateTime = endDateTime;
@@ -36,13 +38,59 @@ bool CTimeAxis::setMinorTickCount(int count)
 }
 
 
-// reimplemented (QGraphicsLayoutItem)
+void CTimeAxis::setColor(const QColor& color)
+{
+	m_color = color;
+}
+
 
 void CTimeAxis::setGeometry(const QRectF &geometry)
 {
-	prepareGeometryChange();
-	QGraphicsLayoutItem::setGeometry(geometry);
-	setPos(geometry.topLeft());
+	m_geometryRect = geometry;
+	m_boundingRect = QRectF(QPointF(), geometry.size());
+	m_boundingRect.translate(0, -geometry.height());
+	setPos(geometry.bottomLeft());
+}
+
+
+void CTimeAxis::update()
+{
+	QGraphicsScene* scenePtr = scene();
+	QGraphicsView* viewPtr = scene()->views()[0];
+
+	for (QGraphicsItem* item : m_sceneItems){
+		scenePtr->removeItem(item);
+	}
+
+	m_sceneItems.clear();
+
+	QPen pen = QPen(Qt::black, 3);
+	pen.setWidth(0);
+
+	QRectF visibleSceneRect = viewPtr->mapToScene(viewPtr->viewport()->rect()).boundingRect();
+	QRectF rect = m_geometryRect;
+
+	rect.setLeft(rect.left() + 5);
+	rect.setRight(rect.right() - 5);
+
+	rect.setTop(visibleSceneRect.bottom() - m_geometryRect.height() / viewPtr->transform().m22());
+	rect.setBottom(visibleSceneRect.bottom());
+	m_sceneItems.append(scenePtr->addRect(rect, QPen(), QBrush(Qt::red)));
+
+	QPointF pnt(visibleSceneRect.left() + 50, rect.top());
+	while (pnt.x() < visibleSceneRect.right()){
+		QGraphicsTextItem* item = scenePtr->addText(QString::number((int)pnt.x()/100));
+		item->setPos(pnt);
+		item->setFlag(QGraphicsItem::GraphicsItemFlag::ItemIgnoresTransformations, true);
+		m_sceneItems.append(item);
+		pnt.rx() += 100;
+
+		//QGraphicsItem* item = scenePtr->addLine(pnt.x(), rect.top(), pnt.x(), rect.bottom(), pen);
+		//m_sceneItems.append(item);
+		//pnt.rx() += 50;
+	}
+
+	qDebug() << m_sceneItems.count();
 }
 
 
@@ -50,99 +98,86 @@ void CTimeAxis::setGeometry(const QRectF &geometry)
 
 QRectF CTimeAxis::boundingRect() const
 {
-	return QRectF(QPointF(0, 0), geometry().size());
+	return m_boundingRect;
 }
 
 
 void CTimeAxis::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-	qDebug() << option->exposedRect;
+	//QPen pen;
+	//QPainterPath path;
+	//path.addRoundedRect(m_boundingRect, 10, 10);
 
-	QPen pen;
-	pen.setWidth(0);
-	painter->setPen(pen);
-
-	QRectF geom = geometry();
-	QPointF p1, p2;
-	p1 = QPointF(0,0);
-	p2 = QPointF(geom.width(), 0);
-	while (p1.y() <= geom.height()){
-		painter->drawLine(p1, p2);
-		p1.ry() += 5;
-		p2.ry() += 5;
-	}
-
-	p1 = QPointF(0, 0);
-	p2 = QPointF(0, geom.height());
-	while (p1.x() <= geom.width()){
-		painter->drawLine(p1, p2);
-		p1.rx() += 5;
-		p2.rx() += 5;
-	}
+	//pen = QPen(Qt::black, 3);
+	//painter->setPen(pen);
+	//painter->fillPath(path, m_color);
+	//painter->drawPath(path);
 
 	//return;
 
-	//for (QGraphicsItem* item : m_sceneItems){
-	//	scene()->removeItem(item);
+	//QGraphicsScene* scenePtr = scene();
+	//if (scenePtr->views().isEmpty()){
+	//	return;
 	//}
 
-	//m_sceneItems.clear();
+	//QRectF rect = boundingRect();
 
-	//m_sceneItems.append(scene()->addLine(20, -25, 20, 25));
+	//pen.setColor(Qt::red);
+	//painter->setPen(pen);
+	//painter->drawLine(QLineF(rect.topLeft(), rect.bottomLeft()));
+	//painter->drawLine(QLineF(rect.topRight(), rect.bottomRight()));
 
-	//int x = (((int)m_viewRect.left()) / 40) * 40;
-	//while (x < m_viewRect.right()){
-	//	QGraphicsLineItem *item = nullptr;
 
-	//	if (x % 400 == 0){
-	//		if (transform().m11() > 0.1){
-	//			item = scene()->addLine(x, 0, x, 25 - 1.5 / transform().m11() / 2.5);
-	//		}
-	//	}
-	//	else if (x % 200 == 0){
-	//		if (transform().m11() > 0.2){
-	//			item = scene()->addLine(x, 0, x, 15);
-	//		}
-	//	}
-	//	else{
-	//		if (transform().m11() > 1){
-	//			item = scene()->addLine(x, 0, x, 5);
-	//		}
-	//	}
+	//QGraphicsView* viewPtr = scenePtr->views().first();
+	//QRectF visibleRect = mapFromScene(viewPtr->mapToScene(viewPtr->rect()).boundingRect()).boundingRect();
 
-	//	if (item != nullptr){
-	//		QPen pen = item->pen();
-	//		pen.setWidthF(0/*1.5/transform().m11()*/);
-	//		pen.setColor(Qt::red);
-	//		item->setPen(pen);
-
-	//		//item->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-	//		m_sceneItems.append(item);
-	//	}
-
-	//	x += 40;
+	//if (visibleRect.left() < 0){
+	//	visibleRect.setLeft(0);
 	//}
 
-	//qDebug() << rect() << transform().m11() << transform().m22();
+	//if (visibleRect.right() > rect.right()){
+	//	visibleRect.setRight(rect.right());
+	//}
+
+	////double k = (m_endDateTime.toMSecsSinceEpoch() - m_startDateTime.toMSecsSinceEpoch()) / rect.width();
+
+	//QDateTime firstMajDT = m_startDateTime;
+	//firstMajDT.setTime(QTime(firstMajDT.time().hour(), 0));
+
+	//if (firstMajDT.toMSecsSinceEpoch() < m_startDateTime.toMSecsSinceEpoch()){
+	//	firstMajDT = firstMajDT.addMSecs(MS_HOUR);
+	//}
+
+	//double firstMajTick = convertDateTimeToPosX(firstMajDT);
+	//double nextMajTick = convertDateTimeToPosX(firstMajDT.addMSecs(MS_HOUR));
+	//double deltaMajTick = nextMajTick - firstMajTick;
+	//double deltaMinTick = deltaMajTick / m_minorTickCount;
+
+	//pen.setColor(Qt::black);
+	//painter->setPen(pen);
+
+	//while (firstMajTick < rect.right()){
+	//	painter->drawLine(firstMajTick, rect.bottom(), firstMajTick, rect.bottom() - 50);
+	//	painter->drawText(QPointF(firstMajTick, rect.bottom() - 50), "TEST");
+	//	
+	//	firstMajTick += deltaMajTick;
+	//}
 }
 
 
-// protected methods
+// private methods
 
-QSizeF CTimeAxis::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+double CTimeAxis::convertDateTimeToPosX(const QDateTime& dateTime)
 {
-	//switch (which) {
-	//case Qt::MinimumSize:
-	//case Qt::PreferredSize:
-	//	// Do not allow a size smaller than the pixmap with two frames around it.
-	//	//return m_pix.size() + QSize(12, 12);
-	//case Qt::MaximumSize:
-	//	return QSizeF(INT32_MAX, INT32_MAX);
-	//default:
-	//	break;
-	//}
+	qint64 msecStart = m_startDateTime.toMSecsSinceEpoch();
+	qint64 msecEnd = m_endDateTime.toMSecsSinceEpoch();
+	qint64 msecDateTime = dateTime.toMSecsSinceEpoch();
 
-	return constraint;
+	if (msecDateTime < msecStart || msecDateTime > msecEnd){
+		return -1;
+	}
+
+	return m_geometryRect.width() * (msecDateTime - msecStart) / (msecEnd - msecStart);
 }
 
 

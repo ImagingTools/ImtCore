@@ -13,6 +13,7 @@
 
 // ImtCore includes
 #include <imtloggui/CEventGraphicsView.h>
+#include <imtloggui/CEventGroup.h>
 
 
 namespace imtloggui
@@ -62,38 +63,38 @@ void CEventViewComp::OnGuiCreated()
 
 	m_scenePtr = new QGraphicsScene(GetQtWidget());
 
-	m_viewPtr = new CEventGraphicsView(GetQtWidget());
-	m_viewPtr->setScene(m_scenePtr);
-	m_viewPtr->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-
-	GetQtWidget()->layout()->addWidget(m_viewPtr);
-
 	QGraphicsLineItem *item;
-	QPen pen;
-	pen.setWidth(0);
-
-	//item = m_scenePtr->addLine(0, 0, 0, 200);
-	//item->setPen(pen);
-	//item = m_scenePtr->addLine(0, 0, 200, 200);
-	//item->setPen(pen);
-	//item = m_scenePtr->addLine(200, 0, 0, 200);
-	//item->setPen(pen);
-	//item = m_scenePtr->addLine(200, 0, 200, 200);
-	//item->setPen(pen);
-	//item = m_scenePtr->addLine(250, 0, -250, 200);
-	//item->setPen(pen);
 
 	QDateTime begin = QDateTime::currentDateTime();
 	QDateTime end;
-	end.setSecsSinceEpoch(begin.toSecsSinceEpoch() + 100000);
+	end.setSecsSinceEpoch(begin.toSecsSinceEpoch() + 11000);
 
 	m_timeAxisPtr = new CTimeAxis();
-	m_timeAxisPtr->setGeometry(QRect(-10000, 250, 500, 100));
-	m_timeAxisPtr->setTimeInterval(begin, end);
+	m_timeAxisPtr->setColor(Qt::green);
+	m_timeAxisPtr->setGeometry(QRect(0, 30, 10000, 30));
+	m_timeAxisPtr->setTimeSpan(begin, end);
+	m_timeAxisPtr->setMinorTickCount(12);
+
+	qsrand(QDateTime::currentDateTime().toMSecsSinceEpoch());
+
+	for (int i = 0; i < 10; i++){
+		CEventGroup *item = new CEventGroup();
+		QColor color(qrand() % 256, qrand() % 256, qrand() % 256);
+		item->setColor(color);
+		item->setGeometry(QRect(0, 300 * i, 10000, 300));
+		m_scenePtr->addItem(item);
+	}
 
 	m_scenePtr->addItem(m_timeAxisPtr);
 
-	//m_viewPtr->setSceneRect(QRectF(0,-100,200,200));
+	m_viewPtr = new CEventGraphicsView(GetQtWidget());
+	GetQtWidget()->layout()->addWidget(m_viewPtr);
+
+	m_viewPtr->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+	m_viewPtr->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+	m_viewPtr->setScene(m_scenePtr);
+	m_viewPtr->setSceneRect(m_scenePtr->sceneRect());
+	m_viewPtr->setTimeAxis(m_timeAxisPtr);
 }
 
 

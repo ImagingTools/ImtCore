@@ -3,8 +3,7 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
-#include <QtWidgets/QGraphicsItem>
-#include <QtWidgets/QGraphicsLayoutItem>
+#include <QtWidgets/QGraphicsObject>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
 
@@ -12,29 +11,47 @@ namespace imtloggui
 {
 
 
-class CTimeAxis: public QGraphicsLayoutItem, public QGraphicsItem
+class CTimeAxis: public QGraphicsObject
 {
 public:
+	enum MsecConsts
+	{
+		MS_SECOND = 1000,
+		MS_MINUTE = 60000,
+		MS_HOUR = 3600000,
+		MS_DAY = 86400000
+	};
+
+	typedef QGraphicsItem BaseClass;
+
 	CTimeAxis(QGraphicsItem *parent = nullptr);
 
-	void setTimeInterval(const QDateTime & startDateTime, const QDateTime & endDateTime);
+	void setTimeSpan(const QDateTime& startDateTime, const QDateTime& endDateTime);
 	bool setMinorTickCount(int count);
-
-	// reimplemented (QGraphicsLayoutItem)
-	void setGeometry(const QRectF &geometry) override;
+	void setColor(const QColor& color);
+	void setGeometry(const QRectF &geometry);
+	void update();
 
 	// reimplemented (QGraphicsItem)
 	QRectF boundingRect() const override;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
-protected:
-	// reimplemented (QGraphicsLayoutItem)
-	QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
+signals:
+	void GeometryChanged(const QRectF& geometry);
+	void TimeSpanChanged(const QDateTime& startDateTime, const QDateTime& endDateTime);
 
 private:
-	int m_minorTickCount;
+	double convertDateTimeToPosX(const QDateTime& dateTime);
+
+private:
+	QRectF m_geometryRect;
+	QRectF m_boundingRect;
+
 	QDateTime m_startDateTime;
 	QDateTime m_endDateTime;
+	int m_minorTickCount;
+	QColor m_color;
+	QList<QGraphicsItem*> m_sceneItems;
 };
 
 
