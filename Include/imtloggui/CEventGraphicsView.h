@@ -32,8 +32,10 @@ protected:
 	bool viewportEvent(QEvent *event) override;
 
 private slots:
-	void ScrollRangeChanged(int min, int max);
 	void ScrollValueChanged(int value);
+
+private:
+	QRectF SceneVisibleRect() const;
 
 private:
 	CTimeAxis* m_timeAxisPtr;

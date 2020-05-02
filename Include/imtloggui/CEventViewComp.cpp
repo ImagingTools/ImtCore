@@ -71,7 +71,7 @@ void CEventViewComp::OnGuiCreated()
 
 	m_timeAxisPtr = new CTimeAxis();
 	m_timeAxisPtr->setColor(Qt::green);
-	m_timeAxisPtr->setGeometry(QRect(0, 30, 10000, 30));
+	m_timeAxisPtr->setRect(0, 30, 10000, -30);
 	m_timeAxisPtr->setTimeSpan(begin, end);
 	m_timeAxisPtr->setMinorTickCount(12);
 

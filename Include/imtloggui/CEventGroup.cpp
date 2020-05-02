@@ -51,7 +51,7 @@ void CEventGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 {
 	QPen pen;
 	QPainterPath path;
-	path.addRoundedRect(m_boundingRect, 10, 10);
+	path.addRect(m_boundingRect);
 
 	pen = QPen(Qt::black, 3);
 	painter->setPen(pen);

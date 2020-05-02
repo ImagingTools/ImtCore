@@ -17,9 +17,7 @@ CEventGraphicsView::CEventGraphicsView(QWidget* parent)
 	: QGraphicsView(parent),
 	m_timeAxisPtr(nullptr)
 {
-	connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &CEventGraphicsView::ScrollRangeChanged);
 	connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::ScrollValueChanged);
-	connect(horizontalScrollBar(), &QScrollBar::rangeChanged, this, &CEventGraphicsView::ScrollRangeChanged);
 	connect(horizontalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::ScrollValueChanged);
 }
 
@@ -63,10 +61,14 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 		else{
 			scale(1 / 1.1, 1);
 		}
-
 	}
 
-	BaseClass::wheelEvent(event);
+	if (m_timeAxisPtr != nullptr){
+		QRectF visibleRect = SceneVisibleRect();
+		m_timeAxisPtr->setPos(0, visibleRect.bottom());
+	}
+
+	scene()->update();
 }
 
 
@@ -95,19 +97,21 @@ bool CEventGraphicsView::viewportEvent(QEvent *event)
 
 // private slots
 
-void CEventGraphicsView::ScrollRangeChanged(int min, int max)
-{
-	if (m_timeAxisPtr != nullptr){
-		m_timeAxisPtr->update();
-	}
-}
-
 
 void CEventGraphicsView::ScrollValueChanged(int value)
 {
 	if (m_timeAxisPtr != nullptr){
-		m_timeAxisPtr->update();
+		QRectF visibleRect = SceneVisibleRect();
+		m_timeAxisPtr->setPos(0, visibleRect.bottom());
 	}
+}
+
+
+// private methods
+
+QRectF CEventGraphicsView::SceneVisibleRect() const
+{
+	return mapToScene(viewport()->rect()).boundingRect();
 }
 
 

@@ -3,7 +3,7 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
-#include <QtWidgets/QGraphicsObject>
+#include <QtWidgets/QGraphicsRectItem>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
 
@@ -11,7 +11,7 @@ namespace imtloggui
 {
 
 
-class CTimeAxis: public QGraphicsObject
+class CTimeAxis: public QGraphicsRectItem
 {
 public:
 	enum MsecConsts
@@ -22,17 +22,15 @@ public:
 		MS_DAY = 86400000
 	};
 
-	typedef QGraphicsItem BaseClass;
+	typedef QGraphicsRectItem BaseClass;
 
 	CTimeAxis(QGraphicsItem *parent = nullptr);
 
 	void setTimeSpan(const QDateTime& startDateTime, const QDateTime& endDateTime);
 	bool setMinorTickCount(int count);
 	void setColor(const QColor& color);
-	void setGeometry(const QRectF &geometry);
-	void update();
 
-	// reimplemented (QGraphicsItem)
+	// reimplemented (QGraphicsRectItem)
 	QRectF boundingRect() const override;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
@@ -41,12 +39,10 @@ signals:
 	void TimeSpanChanged(const QDateTime& startDateTime, const QDateTime& endDateTime);
 
 private:
+	QRectF SceneVisibleRect() const;
 	double convertDateTimeToPosX(const QDateTime& dateTime);
 
 private:
-	QRectF m_geometryRect;
-	QRectF m_boundingRect;
-
 	QDateTime m_startDateTime;
 	QDateTime m_endDateTime;
 	int m_minorTickCount;

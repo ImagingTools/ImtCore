@@ -44,76 +44,43 @@ void CTimeAxis::setColor(const QColor& color)
 }
 
 
-void CTimeAxis::setGeometry(const QRectF &geometry)
-{
-	m_geometryRect = geometry;
-	m_boundingRect = QRectF(QPointF(), geometry.size());
-	m_boundingRect.translate(0, -geometry.height());
-	setPos(geometry.bottomLeft());
-}
-
-
-void CTimeAxis::update()
-{
-	QGraphicsScene* scenePtr = scene();
-	QGraphicsView* viewPtr = scene()->views()[0];
-
-	for (QGraphicsItem* item : m_sceneItems){
-		scenePtr->removeItem(item);
-	}
-
-	m_sceneItems.clear();
-
-	QPen pen = QPen(Qt::black, 3);
-	pen.setWidth(0);
-
-	QRectF visibleSceneRect = viewPtr->mapToScene(viewPtr->viewport()->rect()).boundingRect();
-	QRectF rect = m_geometryRect;
-
-	rect.setLeft(rect.left() + 5);
-	rect.setRight(rect.right() - 5);
-
-	rect.setTop(visibleSceneRect.bottom() - m_geometryRect.height() / viewPtr->transform().m22());
-	rect.setBottom(visibleSceneRect.bottom());
-	m_sceneItems.append(scenePtr->addRect(rect, QPen(), QBrush(Qt::red)));
-
-	QPointF pnt(visibleSceneRect.left() + 50, rect.top());
-	while (pnt.x() < visibleSceneRect.right()){
-		QGraphicsTextItem* item = scenePtr->addText(QString::number((int)pnt.x()/100));
-		item->setPos(pnt);
-		item->setFlag(QGraphicsItem::GraphicsItemFlag::ItemIgnoresTransformations, true);
-		m_sceneItems.append(item);
-		pnt.rx() += 100;
-
-		//QGraphicsItem* item = scenePtr->addLine(pnt.x(), rect.top(), pnt.x(), rect.bottom(), pen);
-		//m_sceneItems.append(item);
-		//pnt.rx() += 50;
-	}
-
-	qDebug() << m_sceneItems.count();
-}
-
-
-// reimplemented (QGraphicsItem)
+// reimplemented (QGraphicsRectItem)
 
 QRectF CTimeAxis::boundingRect() const
 {
-	return m_boundingRect;
+	QRectF visibleRect = SceneVisibleRect();
+	QRectF axisRect = rect();
+	QPointF origin = axisRect.bottomLeft();
+
+	if (visibleRect.left() < axisRect.left()){
+		axisRect.setLeft(visibleRect.left());
+	}
+
+	if (visibleRect.right() > axisRect.right()){
+		axisRect.setRight(visibleRect.right());
+	}
+
+	axisRect.setTop(rect().height() / scene()->views().first()->transform().m22());
+	axisRect.setBottom(0);
+	
+
+	return axisRect;
 }
 
 
 void CTimeAxis::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-	//QPen pen;
-	//QPainterPath path;
-	//path.addRoundedRect(m_boundingRect, 10, 10);
+	QPainterPath path;
+	path.addRect(boundingRect());
 
-	//pen = QPen(Qt::black, 3);
-	//painter->setPen(pen);
-	//painter->fillPath(path, m_color);
-	//painter->drawPath(path);
+	QPen pen;
+	pen.setWidth(2);
 
-	//return;
+	painter->setPen(pen);
+	painter->fillPath(path, m_color);
+	painter->drawPath(path);
+
+	return;
 
 	//QGraphicsScene* scenePtr = scene();
 	//if (scenePtr->views().isEmpty()){
@@ -167,6 +134,14 @@ void CTimeAxis::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 // private methods
 
+QRectF CTimeAxis::SceneVisibleRect() const
+{
+	QGraphicsView* viewPtr = scene()->views().first();
+	QRectF visibleSceneRect = viewPtr->mapToScene(viewPtr->viewport()->rect()).boundingRect();
+	return visibleSceneRect;
+}
+
+
 double CTimeAxis::convertDateTimeToPosX(const QDateTime& dateTime)
 {
 	qint64 msecStart = m_startDateTime.toMSecsSinceEpoch();
@@ -177,7 +152,7 @@ double CTimeAxis::convertDateTimeToPosX(const QDateTime& dateTime)
 		return -1;
 	}
 
-	return m_geometryRect.width() * (msecDateTime - msecStart) / (msecEnd - msecStart);
+	return rect().width() * (msecDateTime - msecStart) / (msecEnd - msecStart);
 }
 
 
