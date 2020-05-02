@@ -92,11 +92,6 @@ I_EXPORT_COMPONENT(
 			"Image contours extender component",
 			"Image Contours Contour Extender View Observer");
 
-I_EXPORT_COMPONENT(
-			EventView,
-			"Event view component",
-			"Event View Log");
-
 
 } // namespace ImtGuiPck
 

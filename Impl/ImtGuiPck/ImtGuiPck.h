@@ -21,7 +21,6 @@
 #include <imtgui/CLayout.h>
 #include <imtgui/CCompositeObjectViewComp.h>
 #include <imtgui/CImageContoursExtender.h>
-#include <imtgui/CEventViewComp.h>
 
 
 /**
@@ -46,7 +45,6 @@ typedef icomp::TMakeComponentWrap<imtgui::CLayout, imtgui::ILayout> LayoutManage
 typedef icomp::TModelCompWrap<imtgui::CLayoutManagerGuiComp> LayoutManagerGui;
 typedef imtgui::CCompositeObjectViewComp CompositeObjectView;
 typedef imtgui::CImageContoursExtender ImageContoursExtender;
-typedef imtgui::CEventViewComp EventView;
 
 
 } // namespace ImtGuiPck
