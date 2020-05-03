@@ -23,11 +23,14 @@ namespace imtgui
 class CLayout: public imtgui::ILayout
 {
 public:
-	CLayout();
+	CLayout(CLayout *root = NULL);
 	virtual ~CLayout();
 
 	//typedef istd::TSmartPtr<iser::ISerializable> ObjectInstancePtr;
 	//virtual ObjectInstancePtr CreateObjectInstance(const QByteArray& objectType) = 0;
+
+	void SetSplitterLayout(ILayout::LayoutType type);
+
 
 	// reimplemented (icarmagui::ILayout)
 
@@ -39,8 +42,8 @@ public:
 	virtual QString GetTitle() const Q_DECL_OVERRIDE;
 	virtual void SetTitleAlign(const AlignType& align) Q_DECL_OVERRIDE;
 	virtual AlignType GetTitleAlign() const Q_DECL_OVERRIDE;
-	virtual void SetIcon(const QIcon& icon) Q_DECL_OVERRIDE;
-	virtual QIcon GetIcon() const Q_DECL_OVERRIDE;
+	virtual void SetIcon(const QPixmap& icon) Q_DECL_OVERRIDE;
+	virtual QPixmap GetIcon() const Q_DECL_OVERRIDE;
 	virtual void SetViewId(const QByteArray& viewId) Q_DECL_OVERRIDE;
 	virtual QByteArray GetViewId() const Q_DECL_OVERRIDE;
 	virtual void SetSizes(const SizeList& sizes) Q_DECL_OVERRIDE;
@@ -57,23 +60,25 @@ public:
 	virtual ILayout* TakeLast() Q_DECL_OVERRIDE;
 	virtual void Clear() Q_DECL_OVERRIDE;
 	virtual ILayout* FindChild(const QByteArray& id) Q_DECL_OVERRIDE;
+	virtual ILayout* RemoveChild(const QByteArray& id) Q_DECL_OVERRIDE;
 
 	// reimplemented (iser::ISerializable)
 
 	virtual bool Serialize(iser::IArchive& archive) Q_DECL_OVERRIDE;
 
 private:
-	bool InternalSerializeItemRecursive(iser::IArchive& archive, int itemIndex);
+	bool InternalSerializeItemRecursive(iser::IArchive& archive);
 
 private:
 	SizeList m_sizes;
 	LayoutType m_layoutType;
 	AlignType m_alignType;
 	QString m_title;
-	QIcon m_icon;
+	QPixmap m_icon;
 	QByteArray m_id;
 	QByteArray m_viewId;
-	ILayout* m_parent;
+	CLayout* m_parent;
+	CLayout* m_root;
 	QList<ILayout*> m_childs;
 };
 

@@ -3,12 +3,14 @@
 
 // Qt includes
 #include <QtCore/QDataStream>
+#include <QtCore/QUuid>
 
 // Acf includes
 #include <iser/IArchive.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 #include <iser/CArchiveTag.h>
 #include <istd/CChangeNotifier.h>
+#include <istd/CChangeGroup.h>
 
 
 namespace imtgui
@@ -17,10 +19,19 @@ namespace imtgui
 
 // public methods
 
-CLayout::CLayout() :
+CLayout::CLayout(CLayout* root) :
 	m_parent(NULL),
-	m_layoutType(LT_NONE)
+	m_layoutType(LT_NONE),
+	m_alignType(AT_LEFT),
+	m_title("No name")
 {
+	m_id = QUuid::createUuid().toByteArray();
+	if (root == NULL){
+		m_root = this;
+	}
+	else{
+		m_root = root;
+	}
 }
 
 CLayout::~CLayout()
@@ -29,6 +40,39 @@ CLayout::~CLayout()
 		delete TakeFirst();
 	}
 }
+
+
+void CLayout::SetSplitterLayout(ILayout::LayoutType type)
+{
+	istd::CChangeGroup changeGroup(m_root);
+	//CLayout* layout = dynamic_cast<CLayout*>(m_root->FindChild(id));
+	//layout = m_rootLayout;
+	CLayout* parent = dynamic_cast<CLayout*>(GetParent());
+	if (parent != NULL && parent->GetType() == ILayout::LT_NONE) {
+		parent->AppendChild(new CLayout(m_root));
+	}
+	else{
+		CLayout* newLayout = new CLayout(m_root);
+		newLayout->SetLayoutId(GetLayoutId());
+		newLayout->SetType(GetType());
+		newLayout->SetTitleAlign(GetTitleAlign());
+		newLayout->SetTitle(GetTitle());
+		newLayout->SetIcon(GetIcon());
+		newLayout->SetViewId(GetViewId());
+		newLayout->SetSizes(GetSizes());
+
+		SetLayoutId(QUuid::createUuid().toByteArray());
+		SetType(type);
+		SetTitleAlign(ILayout::AT_LEFT);
+		SetTitle("");
+		SetIcon(QPixmap());
+		AppendChild(newLayout);
+		newLayout = new CLayout(m_root);
+		AppendChild(newLayout);
+	}
+
+}
+
 
 // reimplemented (icarmagui::ILayout)
 
@@ -58,6 +102,7 @@ ILayout::LayoutType CLayout::GetType() const
 
 void CLayout::SetTitle(const QString& title)
 {
+	istd::CChangeNotifier changeNotifier(m_root);
 	m_title = title;
 }
 
@@ -70,6 +115,7 @@ QString CLayout::GetTitle() const
 
 void CLayout::SetTitleAlign(const AlignType& align)
 {
+	istd::CChangeNotifier changeNotifier(m_root);
 	m_alignType = align;
 }
 
@@ -80,13 +126,14 @@ ILayout::AlignType CLayout::GetTitleAlign() const
 }
 
 
-void CLayout::SetIcon(const QIcon& icon)
+void CLayout::SetIcon(const QPixmap& icon)
 {
+	istd::CChangeNotifier changeNotifier(m_root);
 	m_icon = icon;
 }
 
 
-QIcon CLayout::GetIcon() const
+QPixmap CLayout::GetIcon() const
 {
 	return m_icon;
 }
@@ -94,6 +141,7 @@ QIcon CLayout::GetIcon() const
 
 void CLayout::SetViewId(const QByteArray& viewId)
 {
+	//istd::CChangeNotifier changeNotifier(m_root);
 	m_viewId = viewId;
 }
 
@@ -106,6 +154,7 @@ QByteArray CLayout::GetViewId() const
 
 void CLayout::SetSizes(const SizeList& sizes)
 {
+	istd::CChangeNotifier changeNotifier(m_root);
 	m_sizes = sizes;
 }
 
@@ -124,10 +173,11 @@ ILayout* CLayout::GetParent()
 
 ILayout* CLayout::GetRoot()
 {
-	if (m_parent == NULL){
-		return this;
-	}
-	return m_parent->GetRoot();
+	//if (m_parent == NULL){
+	//	return this;
+	//}
+	//return m_parent->GetRoot();
+	return m_root;
 }
 
 
@@ -149,11 +199,16 @@ ILayout* CLayout::GetChild(int index)
 
 void CLayout::InsertChild(int index, ILayout* layout)
 {
+	istd::CChangeNotifier changeNotifier(m_root);
 	if (index < 0){
 		m_childs.append(layout);
 	}
 	else{
 		m_childs.insert(index, layout);
+	}
+	CLayout* cLayout = dynamic_cast<CLayout*>(layout);
+	if (cLayout != NULL){
+		cLayout->m_parent = this;
 	}
 }
 
@@ -168,6 +223,7 @@ ILayout* CLayout::TakeChild(int index)
 {
 	ILayout* retVal = NULL;
 	if (index > -1 && index < m_childs.count()){
+		istd::CChangeNotifier changeNotifier(m_root);
 		retVal = m_childs.takeAt(index);
 	}
 	return retVal;
@@ -188,10 +244,15 @@ ILayout* CLayout::TakeLast()
 
 void CLayout::Clear()
 {
-	while (TakeFirst() != NULL)
-	{
-
+	istd::CChangeNotifier changeNotifier(m_root);
+	while (m_childs.count() > 0){
+		delete TakeFirst();
 	}
+	SetTitle("No name");
+	SetIcon(QPixmap());
+	SetType(LT_NONE);
+	SetTitleAlign(AT_LEFT);
+	SetViewId(QByteArray());
 }
 
 
@@ -213,13 +274,71 @@ ILayout* CLayout::FindChild(const QByteArray& id)
 	return retVal;
 }
 
+
+ILayout* CLayout::RemoveChild(const QByteArray& id)
+{
+	istd::CChangeGroup changeGroup(m_root);
+	istd::CChangeNotifier changeNotifier(m_root);
+	ILayout* retVal = NULL;
+	CLayout* layout = dynamic_cast<CLayout*>(FindChild(id));
+	if (layout != NULL){
+		CLayout* parent = dynamic_cast<CLayout*>(layout->GetParent());
+		if (parent != NULL){
+			int index = parent->m_childs.indexOf(layout);
+			if (index > -1){
+				retVal = parent->m_childs.takeAt(index);
+				if (parent->m_childs.count() == 1){
+					layout = dynamic_cast<CLayout*>(parent->m_childs.takeFirst());
+					CLayout* parentParent = dynamic_cast<CLayout*>(parent->GetParent());
+					if (parentParent == NULL){
+						parent->SetLayoutId(layout->GetLayoutId());
+						parent->SetType(layout->GetType());
+						parent->SetTitle(layout->GetTitle());
+						parent->SetTitleAlign(layout->GetTitleAlign());
+						parent->SetIcon(layout->GetIcon());
+						parent->SetSizes(layout->GetSizes());
+						parent->m_childs = layout->m_childs;
+						while (layout->GetChildsCount() > 0){
+							parent->InsertChild(0, layout->TakeLast());
+						}
+						parent->m_parent = NULL;
+						delete layout;
+					}
+					else{
+						index = parentParent->m_childs.indexOf(parent);
+						if (index > -1){
+							delete parentParent->m_childs.takeAt(index);
+							parentParent->InsertChild(index, layout);
+						}
+
+					}
+				}
+			}
+		}
+		else{
+			Clear();
+		}
+
+	}
+	return retVal;
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CLayout::Serialize(iser::IArchive& archive)
 {
-	bool retVal = true;
-	LayoutType layoutType = m_layoutType;
+	istd::CChangeGroup changeGroup(m_root);
+	if (!archive.IsStoring()){
+		Clear();
+	}
+	return InternalSerializeItemRecursive(archive);
+}
 
+
+bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
+{
+	bool retVal = true;
 
 	static iser::CArchiveTag layoutItemTag("LayoutItem", "Layout item");
 	retVal = retVal && archive.BeginTag(layoutItemTag);
@@ -227,10 +346,10 @@ bool CLayout::Serialize(iser::IArchive& archive)
 	static iser::CArchiveTag layoutItemTypeTag("LayoutItemType", "Layout item type");
 	retVal = retVal && archive.BeginTag(layoutItemTypeTag);
 
-	retVal = retVal && I_SERIALIZE_ENUM(LayoutType, archive, layoutType);
+	retVal = retVal && I_SERIALIZE_ENUM(LayoutType, archive, m_layoutType);
 	retVal = retVal && archive.EndTag(layoutItemTypeTag);
 	QByteArray sizeListAsByteArray;
-	if ((layoutType == LayoutType::LT_HORIZONTAL_SPLITTER) || (layoutType == LayoutType::LT_VERTICAL_SPLITTER)) {
+	if ((m_layoutType == LayoutType::LT_HORIZONTAL_SPLITTER) || (m_layoutType == LayoutType::LT_VERTICAL_SPLITTER)) {
 		static iser::CArchiveTag layoutSizeListTag("LayoutSizeList", "Layout item size list");
 		retVal = retVal && archive.BeginTag(layoutSizeListTag);
 		if (archive.IsStoring()) {
@@ -255,20 +374,20 @@ bool CLayout::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.BeginMultiTag(childItemGroupTag, layoutItemTag, childCount);
 
 		if (!archive.IsStoring()) {
-			while (m_childs.count() > 0){
+			while (m_childs.count() > 0) {
 				delete TakeFirst();
 			}
 		}
 
 		for (int i = 0; i < childCount; i++) {
-			ILayout *layout = NULL;
-			if (archive.IsStoring()){
-				layout = GetChild(i);
+			CLayout *layout = NULL;
+			if (archive.IsStoring()) {
+				layout = dynamic_cast<CLayout*>(GetChild(i));
 			}
-			else{
-				layout = new CLayout();
+			else {
+				layout = new CLayout(m_root);
 			}
-			retVal = retVal && layout->Serialize(archive);
+			retVal = retVal && layout->InternalSerializeItemRecursive(archive);
 			if (!archive.IsStoring()) {
 				AppendChild(layout);
 			}
@@ -302,8 +421,8 @@ bool CLayout::Serialize(iser::IArchive& archive)
 		retVal = retVal && I_SERIALIZE_ENUM(AlignType, archive, m_alignType);
 		retVal = retVal && archive.EndTag(herrachicalTitleAlign);
 
-		
-		QByteArray iconAsByteArray; 
+
+		QByteArray iconAsByteArray;
 		if (archive.IsStoring()) {
 			QDataStream stream(&iconAsByteArray, QIODevice::WriteOnly);
 			stream << m_icon;
@@ -325,8 +444,8 @@ bool CLayout::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(layoutItemTag);
 
 	return retVal;
-
 }
+
 
 
 } // namespace icarmagui

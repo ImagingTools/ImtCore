@@ -1,6 +1,5 @@
 #pragma once
 
-
 // Qt includes
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
@@ -11,6 +10,7 @@
 #include <iser/ISerializable.h>
 #include <iser/CXmlStringWriteArchive.h>
 #include <iser/CXmlStringReadArchive.h>
+#include <imtgui/ILayout.h>
 
 
 namespace imtgui
@@ -31,25 +31,25 @@ public:
 	typedef QList<QByteArray> IdsList;
 	typedef QList<int> SizeList;
 
-	enum LayoutType
-	{
-		LT_NONE = 0,
-		LT_VERTICAL_SPLITTER,
-		LT_HORIZONTAL_SPLITTER,
-		LT_OBJECT,
-		LT_MERGE
-	};
+	//enum LayoutType
+	//{
+	//	LT_NONE = 0,
+	//	LT_VERTICAL_SPLITTER,
+	//	LT_HORIZONTAL_SPLITTER,
+	//	LT_OBJECT,
+	//	LT_MERGE
+	//};
 
-	I_DECLARE_ENUM(LayoutType, LT_NONE, LT_VERTICAL_SPLITTER, LT_HORIZONTAL_SPLITTER, LT_OBJECT, LT_MERGE);
+	//I_DECLARE_ENUM(LayoutType, LT_NONE, LT_VERTICAL_SPLITTER, LT_HORIZONTAL_SPLITTER, LT_OBJECT, LT_MERGE);
 
-	enum AlignType
-	{
-		AT_LEFT = 0,
-		AT_RIGHT,
-		AT_H_CENTER
-	};
+	//enum AlignType
+	//{
+	//	AT_LEFT = 0,
+	//	AT_RIGHT,
+	//	AT_H_CENTER
+	//};
 
-	I_DECLARE_ENUM(AlignType, AT_LEFT, AT_RIGHT, AT_H_CENTER);
+//	I_DECLARE_ENUM(AlignType, AT_LEFT, AT_RIGHT, AT_H_CENTER);
 
 	enum ViewMode
 	{
@@ -62,13 +62,13 @@ public:
 
 	void SetViewMode(ViewMode viewMode);
 	bool SetRootItemId(const QByteArray& id);
-	bool SetLayoutToItem(const QByteArray& id, LayoutType type, int count, IdsList* idsListPtr = NULL);
+	bool SetLayoutToItem(const QByteArray& id, ILayout::LayoutType type, int count, IdsList* idsListPtr = NULL);
 	bool SetItemSizes(const QByteArray& id, const SizeList& sizeList);
 	bool SetWidgetToItem(const QByteArray& id, const QByteArray& viewId, QWidget* widgetPtr);
 
 	QByteArray GetRootItemId();
 	IdsList GetItemChildIdList(const QByteArray& id);
-	LayoutType GetItemLayoutType(const QByteArray& id);
+	ILayout::LayoutType GetItemLayoutType(const QByteArray& id);
 	SizeList GetItemSizes(const QByteArray& id);
 	void ClearAll();
 	void ResetWidget();
@@ -79,6 +79,8 @@ public:
 	QString GetName(const QByteArray& id);
 	void SetAdditionalNames(QStringList& additionalNames);
 	bool Serialize(iser::IArchive& archive); // callbackFunc for get Widget
+	void CleanLayoutRecursive(QLayout* layoutPtr);
+	CCustomLayoutWidget* createCustomWidget();
 
 protected:
 	friend class CCustomLayoutWidget;
@@ -88,7 +90,7 @@ protected:
 
 private:
 	struct InternalItemData{
-		InternalItemData(QByteArray idIn, IdsList childItemsIn = IdsList(), LayoutType layoutTypeIn = LayoutType::LT_NONE, SizeList sizeListIn = SizeList())
+		InternalItemData(QByteArray idIn, IdsList childItemsIn = IdsList(), ILayout::LayoutType layoutTypeIn = ILayout::LayoutType::LT_NONE, SizeList sizeListIn = SizeList())
 			:id(idIn),
 			childItems(childItemsIn),
 			layoutType(layoutTypeIn),
@@ -98,7 +100,7 @@ private:
 
 		QByteArray id;
 		IdsList childItems;
-		LayoutType layoutType;
+		ILayout::LayoutType layoutType;
 		SizeList sizeList;
 
 		bool operator<(const InternalItemData& item){
@@ -111,12 +113,11 @@ private:
 
 private:
 	bool SerializeRecursive(iser::IArchive& archive, QWidget** widget);
-	void CleanLayoutRecursive(QLayout* layoutPtr);
 	void IdsListCollectChildIdsRecursive(const QByteArray& id, IdsList& idList);
 	InternalItemData* GetInternalItem(const QByteArray& id);
 
 Q_SIGNALS:
-	void EmitLayoutChanged(QByteArray id, LayoutType type, int count);
+	void EmitLayoutChanged(QByteArray id, ILayout::LayoutType type, int count);
 	void EmitDropEvent(QByteArray id, QDropEvent* eventPtr);
 	void EmitOpenMenuEvent(QByteArray id, QMouseEvent* eventPtr);
 	void EmitClearEvent(const QByteArray& id);
@@ -125,6 +126,9 @@ Q_SIGNALS:
 	void EmitDeleteWidget(const QByteArray& id);
 	void EmitSplitVertical(const QByteArray& id);
 	void EmitSplitHorizontal(const QByteArray& id);
+	void EmitChangeIcon(const QByteArray& id);
+	void EmitChangeAlignTitle(const QByteArray& id, const ILayout::AlignType& align);
+	void EmitChangeTitle(const QByteArray& id, const QString& title);
 
 private:
 	typedef QMap<QByteArray, CCustomLayoutWidget*> CustomWidgetMap;
@@ -154,13 +158,13 @@ public:
 	QString GetName();
 	void SetEditMode(bool isEditMode);
 	QByteArray GetId();
-	void SetId(QByteArray &id);
+	void SetId(const QByteArray &id);
 	QPixmap GetIcon();
-	void SetIcon(QPixmap &icon);
+	void SetIcon(const QPixmap &icon);
 	QByteArray GetViewId();
 	void SetViewId(const QByteArray &viewId);
-	void SetTitleAlign(const CHierarchicalLayoutWidget::AlignType &align);
-	CHierarchicalLayoutWidget::AlignType GetTitleAlign();
+	void SetTitleAlign(const ILayout::AlignType &align);
+	ILayout::AlignType GetTitleAlign();
 
 protected:
 	// reimplemented (QWidget)
@@ -180,8 +184,9 @@ protected Q_SLOTS:
 	void OnAlignLeft();
 	void OnAlignCenter();
 	void OnAlignRight();
-	void OnChangeName();
 	void OnChangeIcon();
+	void OnTitleChanged();
+	void OnTitleEdited(const QString& newText);
 
 private:
 	CHierarchicalLayoutWidget& m_hierarchicalLayoutWidget;
@@ -193,7 +198,7 @@ private:
 	QString m_name;
 	int m_titleSize;
 	bool m_isHaveChilds;
-	CHierarchicalLayoutWidget::AlignType m_titleAlign;
+	ILayout::AlignType m_titleAlign;
 };
 
 

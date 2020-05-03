@@ -85,12 +85,12 @@ public:
 	/**
 		Set layout's icon.
 	*/
-	virtual void SetIcon(const QIcon& icon) = 0;
+	virtual void SetIcon(const QPixmap& icon) = 0;
 
 	/**
 		Get layout's icon.
 	*/
-	virtual QIcon GetIcon() const = 0;
+	virtual QPixmap GetIcon() const = 0;
 
 	/**
 		Set layout's Widget viewId.
@@ -167,6 +167,10 @@ public:
 	*/
 	virtual ILayout* FindChild(const QByteArray& id) = 0;
 
+	/**
+		Remove layout's child recursive.
+	*/
+	virtual ILayout* RemoveChild(const QByteArray& id) = 0;
 };
 
 

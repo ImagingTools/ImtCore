@@ -41,7 +41,7 @@ typedef imtgui::CFileCollectionMetaInfoViewComp FileCollectionMetaInfoView;
 typedef imtgui::CDelegatedCommandsProviderComp DelegatedCommandsProvider;
 typedef imtgui::CMenuPanelComp MenuPanel;
 typedef icomp::TModelCompWrap<imtgui::CMonitorInfoProviderComp> MonitorInfoProvider;
-typedef icomp::TMakeComponentWrap<imtgui::CLayout, imtgui::ILayout> LayoutManager;
+typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtgui::CLayout, imtgui::ILayout, iser::ISerializable>> LayoutManager;
 typedef icomp::TModelCompWrap<imtgui::CLayoutManagerGuiComp> LayoutManagerGui;
 typedef imtgui::CCompositeObjectViewComp CompositeObjectView;
 typedef imtgui::CImageContoursExtender ImageContoursExtender;

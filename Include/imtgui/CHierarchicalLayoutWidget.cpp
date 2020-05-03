@@ -59,7 +59,7 @@ void CHierarchicalLayoutWidget::SetViewMode(ViewMode viewMode)
 		InternalItemData* internalItemDataPtr = GetInternalItem(key);
 		customWidgetPtr->SetEditMode(viewMode == VM_EDIT);
 		if (internalItemDataPtr != NULL){
-			customWidgetPtr->setAcceptDrops((viewMode == VM_EDIT) && (internalItemDataPtr->layoutType != LT_HORIZONTAL_SPLITTER) && (internalItemDataPtr->layoutType != LT_VERTICAL_SPLITTER));
+			customWidgetPtr->setAcceptDrops((viewMode == VM_EDIT) && (internalItemDataPtr->layoutType != ILayout::LT_HORIZONTAL_SPLITTER) && (internalItemDataPtr->layoutType != ILayout::LT_VERTICAL_SPLITTER));
 			if ((customWidgetPtr->layout() != NULL) && (customWidgetPtr->layout()->count() > 0)){
 				QLayoutItem* layoutItemPtr = customWidgetPtr->layout()->itemAt(0);
 				if (layoutItemPtr != NULL){
@@ -102,14 +102,14 @@ bool CHierarchicalLayoutWidget::SetRootItemId(const QByteArray& id)
 }
 
 
-bool CHierarchicalLayoutWidget::SetLayoutToItem(const QByteArray& id, LayoutType type, int count, IdsList *idsListPtr)
+bool CHierarchicalLayoutWidget::SetLayoutToItem(const QByteArray& id, ILayout::LayoutType type, int count, IdsList *idsListPtr)
 {
 	InternalItemData* internalItemDataPtr = GetInternalItem(id);
 	if (internalItemDataPtr != NULL){
-		if (	(internalItemDataPtr->layoutType == LT_NONE) &&
-				((type == LT_HORIZONTAL_SPLITTER) ||
-				(type == LT_VERTICAL_SPLITTER))){
-			SetSplitterLayout(id, type == LT_HORIZONTAL_SPLITTER ? Qt::Horizontal : Qt::Vertical, count, idsListPtr);
+		if (	(internalItemDataPtr->layoutType == ILayout::LT_NONE) &&
+				((type == ILayout::LT_HORIZONTAL_SPLITTER) ||
+				(type == ILayout::LT_VERTICAL_SPLITTER))){
+			SetSplitterLayout(id, type == ILayout::LT_HORIZONTAL_SPLITTER ? Qt::Horizontal : Qt::Vertical, count, idsListPtr);
 
 			return true;
 		}
@@ -167,9 +167,9 @@ CHierarchicalLayoutWidget::IdsList CHierarchicalLayoutWidget::GetItemChildIdList
 }
 
 
-CHierarchicalLayoutWidget::LayoutType CHierarchicalLayoutWidget::GetItemLayoutType(const QByteArray& id)
+ILayout::LayoutType CHierarchicalLayoutWidget::GetItemLayoutType(const QByteArray& id)
 {
-	CHierarchicalLayoutWidget::LayoutType retVal;
+	ILayout::LayoutType retVal;
 	//InternalItemData* internalItemDataPtr = GetInternalItem(id);
 	//if (internalItemDataPtr != NULL){
 	//	retVal = internalItemDataPtr->layoutType;
@@ -195,15 +195,15 @@ void CHierarchicalLayoutWidget::ClearAll()
 {
 	CleanLayoutRecursive(layout());
 	m_customWidgetMap.clear();
-	//m_internalItemList.clear();
+	m_internalItemList.clear();
 
-	m_rootId = QUuid::createUuid().toByteArray();
-	CCustomLayoutWidget* customLayoutWidgetPtr = new CCustomLayoutWidget(m_rootId, *this, NULL, this);
-	if (customLayoutWidgetPtr != NULL){
-		layout()->addWidget(customLayoutWidgetPtr);
-		m_customWidgetMap.insert(m_rootId, customLayoutWidgetPtr);
-		//m_internalItemList.push_back(InternalItemData(m_rootId));
-	}
+	//m_rootId = QUuid::createUuid().toByteArray();
+	//CCustomLayoutWidget* customLayoutWidgetPtr = new CCustomLayoutWidget(m_rootId, *this, NULL, this);
+	//if (customLayoutWidgetPtr != NULL){
+	//	layout()->addWidget(customLayoutWidgetPtr);
+	//	m_customWidgetMap.insert(m_rootId, customLayoutWidgetPtr);
+	//	//m_internalItemList.push_back(InternalItemData(m_rootId));
+	//}
 
 }
 
@@ -220,50 +220,50 @@ void CHierarchicalLayoutWidget::OnDropEvent(const QByteArray& inputId, QDropEven
 {
 	return;
 
-	QByteArray id = inputId;
-	Q_ASSERT(m_customWidgetMap.contains(id));
-	Q_ASSERT(GetInternalItem(id) != NULL);
+	//QByteArray id = inputId;
+	//Q_ASSERT(m_customWidgetMap.contains(id));
+	//Q_ASSERT(GetInternalItem(id) != NULL);
 
-	InternalItemData* internalItemDataPtr = GetInternalItem(id);
-	if (m_customWidgetMap.contains(id) && (internalItemDataPtr != NULL)){
-		if (eventPtr->mimeData()->hasFormat("layout-item")){
-			eventPtr->accept();
-			eventPtr->setDropAction(Qt::MoveAction);
+	//InternalItemData* internalItemDataPtr = GetInternalItem(id);
+	//if (m_customWidgetMap.contains(id) && (internalItemDataPtr != NULL)){
+	//	if (eventPtr->mimeData()->hasFormat("layout-item")){
+	//		eventPtr->accept();
+	//		eventPtr->setDropAction(Qt::MoveAction);
 
-			QByteArray data = eventPtr->mimeData()->data("layout-item");
-			qDebug() << "Drop " << data;
-			if ((internalItemDataPtr->layoutType == LT_NONE) && (data == "Horizontal2")){
-				SetSplitterLayout(id, Qt::Horizontal, 2);
-				Q_EMIT EmitLayoutChanged(id, LT_HORIZONTAL_SPLITTER, 2);
-			}
-			else if ((internalItemDataPtr->layoutType == LT_NONE) && (data == "Horizontal3")){
-				SetSplitterLayout(id, Qt::Horizontal, 3);
-				Q_EMIT EmitLayoutChanged(id, LT_HORIZONTAL_SPLITTER, 3);
-			}
-			else if ((internalItemDataPtr->layoutType == LT_NONE) && (data == "Vertical2")){
-				SetSplitterLayout(id, Qt::Vertical, 2);
-				Q_EMIT EmitLayoutChanged(id, LT_VERTICAL_SPLITTER, 2);
-			}
-			else if ((internalItemDataPtr->layoutType == LT_NONE) && (data == "Vertical3")){
-				SetSplitterLayout(id, Qt::Vertical, 3);
-				Q_EMIT EmitLayoutChanged(id, LT_VERTICAL_SPLITTER, 3);
-			}
-			else if ((internalItemDataPtr->layoutType == LT_OBJECT) && (data == "CleanWidget")){
-	//			SetWidgetToItem(id, NULL);
-				Q_EMIT EmitClearEvent(id);
-			}
-			else if (data == "MergeLayout"){
-				MergeLayout(id);
-				Q_EMIT EmitLayoutChanged(id, LT_MERGE, 1);
-			}
-		}
-		else if (eventPtr->mimeData()->hasFormat("widget-item")){
-			Q_EMIT EmitDropEvent(id, eventPtr);
-		}
-		else{
-			eventPtr->ignore();
-		}
-	}
+	//		QByteArray data = eventPtr->mimeData()->data("layout-item");
+	//		qDebug() << "Drop " << data;
+	//		if ((internalItemDataPtr->layoutType == LT_NONE) && (data == "Horizontal2")){
+	//			SetSplitterLayout(id, Qt::Horizontal, 2);
+	//			Q_EMIT EmitLayoutChanged(id, LT_HORIZONTAL_SPLITTER, 2);
+	//		}
+	//		else if ((internalItemDataPtr->layoutType == LT_NONE) && (data == "Horizontal3")){
+	//			SetSplitterLayout(id, Qt::Horizontal, 3);
+	//			Q_EMIT EmitLayoutChanged(id, LT_HORIZONTAL_SPLITTER, 3);
+	//		}
+	//		else if ((internalItemDataPtr->layoutType == LT_NONE) && (data == "Vertical2")){
+	//			SetSplitterLayout(id, Qt::Vertical, 2);
+	//			Q_EMIT EmitLayoutChanged(id, LT_VERTICAL_SPLITTER, 2);
+	//		}
+	//		else if ((internalItemDataPtr->layoutType == LT_NONE) && (data == "Vertical3")){
+	//			SetSplitterLayout(id, Qt::Vertical, 3);
+	//			Q_EMIT EmitLayoutChanged(id, LT_VERTICAL_SPLITTER, 3);
+	//		}
+	//		else if ((internalItemDataPtr->layoutType == LT_OBJECT) && (data == "CleanWidget")){
+	////			SetWidgetToItem(id, NULL);
+	//			Q_EMIT EmitClearEvent(id);
+	//		}
+	//		else if (data == "MergeLayout"){
+	//			MergeLayout(id);
+	//			Q_EMIT EmitLayoutChanged(id, LT_MERGE, 1);
+	//		}
+	//	}
+	//	else if (eventPtr->mimeData()->hasFormat("widget-item")){
+	//		Q_EMIT EmitDropEvent(id, eventPtr);
+	//	}
+	//	else{
+	//		eventPtr->ignore();
+	//	}
+	//}
 }
 
 
@@ -452,163 +452,164 @@ void CHierarchicalLayoutWidget::SetAdditionalNames(QStringList& additionalNames)
 
 bool CHierarchicalLayoutWidget::Serialize(iser::IArchive& archive)
 {
-	QLayout *layoutPtr = layout();
-	QLayoutItem* itemPtr = layoutPtr->itemAt(0);
-	if (itemPtr == NULL){
-		return false;
-	}
-	QWidget *widget = itemPtr->widget();
-	if (!archive.IsStoring()) {
-		CleanLayoutRecursive(layout());
-		m_customWidgetMap.clear();
-		//m_internalItemList.clear();
-		widget = NULL;
-	}
+	//QLayout *layoutPtr = layout();
+	//QLayoutItem* itemPtr = layoutPtr->itemAt(0);
+	//if (itemPtr == NULL){
+	//	return false;
+	//}
+	//QWidget *widget = itemPtr->widget();
+	//if (!archive.IsStoring()) {
+	//	CleanLayoutRecursive(layout());
+	//	m_customWidgetMap.clear();
+	//	//m_internalItemList.clear();
+	//	widget = NULL;
+	//}
 
-	bool retVal = SerializeRecursive(archive, &widget);
-	if (!archive.IsStoring()) {
-		layoutPtr->addWidget(widget);
-	}
+	//bool retVal = SerializeRecursive(archive, &widget);
+	//if (!archive.IsStoring()) {
+	//	layoutPtr->addWidget(widget);
+	//}
 
-	return retVal;
+	//return retVal;
+	return true;
 }
 
 
 bool CHierarchicalLayoutWidget::SerializeRecursive(iser::IArchive& archive, QWidget** widget)
 {
-	bool retVal = true;
-	LayoutType layoutType = LT_NONE;
+	//bool retVal = true;
+	//ILayout::LayoutType layoutType = ILayout::LT_NONE;
 
-	QSplitter* splitter = dynamic_cast<QSplitter*> (*widget);
-
-
-	static iser::CArchiveTag layoutItemTag("LayoutItem", "Layout item");
-	retVal = retVal && archive.BeginTag(layoutItemTag);
-
-	static iser::CArchiveTag layoutItemTypeTag("LayoutItemType", "Layout item type");
-	retVal = retVal && archive.BeginTag(layoutItemTypeTag);
-
-	if (splitter != NULL) {
-		layoutType = splitter->orientation() == Qt::Horizontal ? LT_HORIZONTAL_SPLITTER : LT_VERTICAL_SPLITTER;
-	}
-	
-	retVal = retVal && I_SERIALIZE_ENUM(LayoutType, archive, layoutType);
-	retVal = retVal && archive.EndTag(layoutItemTypeTag);
-	QByteArray sizeListAsByteArray;
-	if ((layoutType == LayoutType::LT_HORIZONTAL_SPLITTER) || (layoutType == LayoutType::LT_VERTICAL_SPLITTER)) {
-		static iser::CArchiveTag layoutSizeListTag("LayoutSizeList", "Layout item size list");
-		retVal = retVal && archive.BeginTag(layoutSizeListTag);
-		if (archive.IsStoring()) {
-			QDataStream stream(&sizeListAsByteArray, QIODevice::WriteOnly);
-			SizeList sizeList = splitter->sizes();
-			stream << sizeList;
-		}
-		else {
-			splitter = new QSplitter();
-			splitter->setOrientation(layoutType == LayoutType::LT_HORIZONTAL_SPLITTER ? Qt::Horizontal : Qt::Vertical);
-			*widget = splitter;
-		}
-
-		retVal = retVal && archive.Process(sizeListAsByteArray);
-		retVal = retVal && archive.EndTag(layoutSizeListTag);
+	//QSplitter* splitter = dynamic_cast<QSplitter*> (*widget);
 
 
-		int childCount = splitter->count();
+	//static iser::CArchiveTag layoutItemTag("LayoutItem", "Layout item");
+	//retVal = retVal && archive.BeginTag(layoutItemTag);
 
-		static iser::CArchiveTag childItemGroupTag("ChildItems", "Child items");
-		retVal = retVal && archive.BeginMultiTag(childItemGroupTag, layoutItemTag, childCount);
+	//static iser::CArchiveTag layoutItemTypeTag("LayoutItemType", "Layout item type");
+	//retVal = retVal && archive.BeginTag(layoutItemTypeTag);
 
-		for (int i = 0; i < childCount; i++) {
-			QWidget *widget = NULL;
-			if (archive.IsStoring()) {
-				widget = splitter->widget(i);
-			}
-			retVal = retVal && SerializeRecursive(archive, &widget);
-			if (!archive.IsStoring()) {
-				splitter->addWidget(widget);
-			}
-		}
+	//if (splitter != NULL) {
+	//	layoutType = splitter->orientation() == Qt::Horizontal ? ILayout::LT_HORIZONTAL_SPLITTER : ILayout::LT_VERTICAL_SPLITTER;
+	//}
+	//
+	//retVal = retVal && I_SERIALIZE_ENUM(LayoutType, archive, layoutType);
+	//retVal = retVal && archive.EndTag(layoutItemTypeTag);
+	//QByteArray sizeListAsByteArray;
+	//if ((layoutType == LayoutType::LT_HORIZONTAL_SPLITTER) || (layoutType == LayoutType::LT_VERTICAL_SPLITTER)) {
+	//	static iser::CArchiveTag layoutSizeListTag("LayoutSizeList", "Layout item size list");
+	//	retVal = retVal && archive.BeginTag(layoutSizeListTag);
+	//	if (archive.IsStoring()) {
+	//		QDataStream stream(&sizeListAsByteArray, QIODevice::WriteOnly);
+	//		SizeList sizeList = splitter->sizes();
+	//		stream << sizeList;
+	//	}
+	//	else {
+	//		splitter = new QSplitter();
+	//		splitter->setOrientation(layoutType == LayoutType::LT_HORIZONTAL_SPLITTER ? Qt::Horizontal : Qt::Vertical);
+	//		*widget = splitter;
+	//	}
 
-		if (!archive.IsStoring()) {
-			QDataStream stream(&sizeListAsByteArray, QIODevice::ReadWrite);
-			SizeList sizeList;
-			stream >> sizeList;
-			splitter->setSizes(sizeList);
-		}
+	//	retVal = retVal && archive.Process(sizeListAsByteArray);
+	//	retVal = retVal && archive.EndTag(layoutSizeListTag);
 
-		retVal = retVal && archive.EndTag(childItemGroupTag);
 
-	}
-	else {
-		CCustomLayoutWidget* customWidget = dynamic_cast<CCustomLayoutWidget*>(*widget);
-		QByteArray id;
-		QPixmap icon;
-		QString name;
-		QByteArray iconAsByteArray;
-		QByteArray viewId;
-		AlignType titleAlign = AT_LEFT;
+	//	int childCount = splitter->count();
 
-		if (customWidget != NULL) {
-			id = customWidget->GetId();
-			name = customWidget->GetName();
-			viewId = customWidget->GetViewId();
-			titleAlign = customWidget->GetTitleAlign();
-			icon = customWidget->GetIcon();
-			QDataStream stream(&iconAsByteArray, QIODevice::WriteOnly);
-			stream << icon;
-		}
-		static iser::CArchiveTag herrachicalWidget("HerarchicalWidget", "Herarchical widget");
-		retVal = retVal && archive.BeginTag(herrachicalWidget);
+	//	static iser::CArchiveTag childItemGroupTag("ChildItems", "Child items");
+	//	retVal = retVal && archive.BeginMultiTag(childItemGroupTag, layoutItemTag, childCount);
 
-		static iser::CArchiveTag herrachicalId("Id", "Herarchical id");
-		retVal = retVal && archive.BeginTag(herrachicalId);
-		retVal = retVal && archive.Process(id);
-		retVal = retVal && archive.EndTag(herrachicalId);
+	//	for (int i = 0; i < childCount; i++) {
+	//		QWidget *widget = NULL;
+	//		if (archive.IsStoring()) {
+	//			widget = splitter->widget(i);
+	//		}
+	//		retVal = retVal && SerializeRecursive(archive, &widget);
+	//		if (!archive.IsStoring()) {
+	//			splitter->addWidget(widget);
+	//		}
+	//	}
 
-		static iser::CArchiveTag herrachicalName("Name", "Herarchical name");
-		retVal = retVal && archive.BeginTag(herrachicalName);
-		retVal = retVal && archive.Process(name);
-		retVal = retVal && archive.EndTag(herrachicalName);
+	//	if (!archive.IsStoring()) {
+	//		QDataStream stream(&sizeListAsByteArray, QIODevice::ReadWrite);
+	//		SizeList sizeList;
+	//		stream >> sizeList;
+	//		splitter->setSizes(sizeList);
+	//	}
 
-		static iser::CArchiveTag herrachicalViewId("ViewId", "Herarchical viewId");
-		retVal = retVal && archive.BeginTag(herrachicalViewId);
-		retVal = retVal && archive.Process(viewId);
-		retVal = retVal && archive.EndTag(herrachicalViewId);
+	//	retVal = retVal && archive.EndTag(childItemGroupTag);
 
-		static iser::CArchiveTag herrachicalTitleAlign("Title Align", "Herarchical title align");
-		retVal = retVal && archive.BeginTag(herrachicalTitleAlign);
-		retVal = retVal && I_SERIALIZE_ENUM(AlignType, archive, titleAlign);
-		retVal = retVal && archive.EndTag(herrachicalTitleAlign);
+	//}
+	//else {
+	//	CCustomLayoutWidget* customWidget = dynamic_cast<CCustomLayoutWidget*>(*widget);
+	//	QByteArray id;
+	//	QPixmap icon;
+	//	QString name;
+	//	QByteArray iconAsByteArray;
+	//	QByteArray viewId;
+	//	ILayout::AlignType titleAlign = AT_LEFT;
 
-		static iser::CArchiveTag herrachicalIcon("Icon", "Herarchical icon");
-		retVal = retVal && archive.BeginTag(herrachicalIcon);
-		retVal = retVal && archive.Process(iconAsByteArray);
-		retVal = retVal && archive.EndTag(herrachicalIcon);
+	//	if (customWidget != NULL) {
+	//		id = customWidget->GetId();
+	//		name = customWidget->GetName();
+	//		viewId = customWidget->GetViewId();
+	//		titleAlign = customWidget->GetTitleAlign();
+	//		icon = customWidget->GetIcon();
+	//		QDataStream stream(&iconAsByteArray, QIODevice::WriteOnly);
+	//		stream << icon;
+	//	}
+	//	static iser::CArchiveTag herrachicalWidget("HerarchicalWidget", "Herarchical widget");
+	//	retVal = retVal && archive.BeginTag(herrachicalWidget);
 
-		retVal = retVal && archive.EndTag(herrachicalWidget);
+	//	static iser::CArchiveTag herrachicalId("Id", "Herarchical id");
+	//	retVal = retVal && archive.BeginTag(herrachicalId);
+	//	retVal = retVal && archive.Process(id);
+	//	retVal = retVal && archive.EndTag(herrachicalId);
 
-		if (!archive.IsStoring()) {
-			customWidget = new CCustomLayoutWidget(id, *this, NULL, NULL);
-			m_customWidgetMap.insert(id, customWidget);
-			customWidget->SetName(name);
-			customWidget->SetTitleAlign(titleAlign);
-			QDataStream stream(&iconAsByteArray, QIODevice::ReadWrite);
-			stream >> icon;
-			customWidget->SetIcon(icon);
-			customWidget->SetViewId(viewId);
-			if (viewId.isEmpty() == false){
-				EmitAddWidgetByViewId(id, viewId);
-			}
+	//	static iser::CArchiveTag herrachicalName("Name", "Herarchical name");
+	//	retVal = retVal && archive.BeginTag(herrachicalName);
+	//	retVal = retVal && archive.Process(name);
+	//	retVal = retVal && archive.EndTag(herrachicalName);
 
-			*widget = customWidget;
-		}
+	//	static iser::CArchiveTag herrachicalViewId("ViewId", "Herarchical viewId");
+	//	retVal = retVal && archive.BeginTag(herrachicalViewId);
+	//	retVal = retVal && archive.Process(viewId);
+	//	retVal = retVal && archive.EndTag(herrachicalViewId);
 
-	}
+	//	static iser::CArchiveTag herrachicalTitleAlign("Title Align", "Herarchical title align");
+	//	retVal = retVal && archive.BeginTag(herrachicalTitleAlign);
+	//	retVal = retVal && I_SERIALIZE_ENUM(ILayout::AlignType, archive, titleAlign);
+	//	retVal = retVal && archive.EndTag(herrachicalTitleAlign);
 
-	retVal = retVal && archive.EndTag(layoutItemTag);
+	//	static iser::CArchiveTag herrachicalIcon("Icon", "Herarchical icon");
+	//	retVal = retVal && archive.BeginTag(herrachicalIcon);
+	//	retVal = retVal && archive.Process(iconAsByteArray);
+	//	retVal = retVal && archive.EndTag(herrachicalIcon);
 
-	return retVal;
-	
+	//	retVal = retVal && archive.EndTag(herrachicalWidget);
+
+	//	if (!archive.IsStoring()) {
+	//		customWidget = new CCustomLayoutWidget(id, *this, NULL, NULL);
+	//		m_customWidgetMap.insert(id, customWidget);
+	//		customWidget->SetName(name);
+	//		customWidget->SetTitleAlign(titleAlign);
+	//		QDataStream stream(&iconAsByteArray, QIODevice::ReadWrite);
+	//		stream >> icon;
+	//		customWidget->SetIcon(icon);
+	//		customWidget->SetViewId(viewId);
+	//		if (viewId.isEmpty() == false){
+	//			EmitAddWidgetByViewId(id, viewId);
+	//		}
+
+	//		*widget = customWidget;
+	//	}
+
+	//}
+
+	//retVal = retVal && archive.EndTag(layoutItemTag);
+
+	//return retVal;
+return true;
 }
 
 
@@ -631,6 +632,14 @@ void CHierarchicalLayoutWidget::CleanLayoutRecursive(QLayout* layoutPtr)
 	}
 }
 
+
+CCustomLayoutWidget* CHierarchicalLayoutWidget::createCustomWidget()
+{
+	QByteArray id = QUuid::createUuid().toByteArray();
+	CCustomLayoutWidget* customLayoutWidgetPtr = new CCustomLayoutWidget(id, *this);
+	m_customWidgetMap.insert(id, customLayoutWidgetPtr);
+	return customLayoutWidgetPtr;
+}
 
 void CHierarchicalLayoutWidget::IdsListCollectChildIdsRecursive(const QByteArray& id, IdsList& idList)
 {
@@ -671,7 +680,7 @@ CHierarchicalLayoutWidget::InternalItemData* CHierarchicalLayoutWidget::GetInter
 // public methods of class CCustomLayoutWidget
 
 CCustomLayoutWidget::CCustomLayoutWidget(const QByteArray& id, CHierarchicalLayoutWidget& hierarchicalLayoutWidget, CCustomLayoutWidget* parentCustomWidgetPtr, QWidget* parentPtr)
-	:QWidget(parentPtr),
+	:QWidget(NULL),
 	m_hierarchicalLayoutWidget(hierarchicalLayoutWidget),
 	//m_parentCustomWidgetPtr(parentCustomWidgetPtr),
 	m_parentCustomWidgetPtr(NULL),
@@ -680,7 +689,7 @@ CCustomLayoutWidget::CCustomLayoutWidget(const QByteArray& id, CHierarchicalLayo
 	m_name("No name"),
 	m_titleSize(30),
 	m_isHaveChilds(false),
-	m_titleAlign(CHierarchicalLayoutWidget::AT_LEFT)
+	m_titleAlign(ILayout::AT_LEFT)
 {
 	setupUi(this);
 //	TitlePanel->setProperty("ImtTopFrame", QVariant(true));
@@ -697,7 +706,11 @@ CCustomLayoutWidget::CCustomLayoutWidget(const QByteArray& id, CHierarchicalLayo
 	connect(AlignCenter, &QToolButton::clicked, this, &CCustomLayoutWidget::OnAlignCenter);
 	connect(AlignRight, &QToolButton::clicked, this, &CCustomLayoutWidget::OnAlignRight);
 	//connect(ChangeNameButton, &QToolButton::clicked, this, &CCustomLayoutWidget::OnChangeName);
-	//connect(ChangeIconButton, &QToolButton::clicked, this, &CCustomLayoutWidget::OnChangeIcon);
+	connect(ChangeIconButton, &QToolButton::clicked, this, &CCustomLayoutWidget::OnChangeIcon);
+//	connect(TitleNameEdit, &QLineEdit::textEdited, this, &CCustomLayoutWidget::OnTitleEdited);
+	connect(TitleNameEdit, &QLineEdit::editingFinished, this, &CCustomLayoutWidget::OnTitleChanged);
+	
+	
 
 	//ButtonsPanel->setProperty("ImtTopFrame", QVariant(true));
 //	action = new QAction(tr("Left"), this);
@@ -845,7 +858,7 @@ void CCustomLayoutWidget::SetEditMode(bool isEditMode)
 }
 
 
-void CCustomLayoutWidget::SetId(QByteArray& id)
+void CCustomLayoutWidget::SetId(const QByteArray& id)
 {
 	m_id = id;
 }
@@ -866,7 +879,7 @@ QPixmap CCustomLayoutWidget::GetIcon()
 }
 
 
-void CCustomLayoutWidget::SetIcon(QPixmap &icon)
+void CCustomLayoutWidget::SetIcon(const QPixmap &icon)
 {
 	titleIcon->setPixmap(icon);
 	ChangeIconButton->setIcon(icon);
@@ -884,18 +897,18 @@ void CCustomLayoutWidget::SetViewId(const QByteArray &viewId)
 }
 
 
-void CCustomLayoutWidget::SetTitleAlign(const CHierarchicalLayoutWidget::AlignType &align)
+void CCustomLayoutWidget::SetTitleAlign(const ILayout::AlignType &align)
 {
 	m_titleAlign = align;
-	if (m_titleAlign == CHierarchicalLayoutWidget::AT_LEFT){
+	if (align == ILayout::AT_LEFT){
 		TitleSpacerLeft->changeSize(2, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
 		TitleSpacerRight->changeSize(2, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 	}
-	if (m_titleAlign == CHierarchicalLayoutWidget::AT_RIGHT) {
+	if (align == ILayout::AT_RIGHT) {
 		TitleSpacerLeft->changeSize(2, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 		TitleSpacerRight->changeSize(2, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
 	}
-	if (m_titleAlign == CHierarchicalLayoutWidget::AT_H_CENTER) {
+	if (align == ILayout::AT_H_CENTER) {
 		TitleSpacerLeft->changeSize(2, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 		TitleSpacerRight->changeSize(2, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 	}
@@ -905,7 +918,7 @@ void CCustomLayoutWidget::SetTitleAlign(const CHierarchicalLayoutWidget::AlignTy
 }
 
 
-CHierarchicalLayoutWidget::AlignType CCustomLayoutWidget::GetTitleAlign()
+ILayout::AlignType CCustomLayoutWidget::GetTitleAlign()
 {
 	return m_titleAlign;
 }
@@ -999,9 +1012,9 @@ void CCustomLayoutWidget::dropEvent(QDropEvent *eventPtr)
 void CCustomLayoutWidget::mouseReleaseEvent(QMouseEvent *eventPtr)
 {
 	//m_hierarchicalLayoutWidget.OnMouseReleaseEvent(m_id, eventPtr);
-	if (eventPtr->x() > rect().width() - m_titleSize && eventPtr->y() < m_titleSize && eventPtr->button() == Qt::RightButton) {
-		m_hierarchicalLayoutWidget.EmitOpenMenuEvent(m_id, eventPtr);
-	}
+	//if (eventPtr->x() > rect().width() - m_titleSize && eventPtr->y() < m_titleSize && eventPtr->button() == Qt::RightButton) {
+	//	m_hierarchicalLayoutWidget.EmitOpenMenuEvent(m_id, eventPtr);
+	//}
 }
 
 
@@ -1056,66 +1069,56 @@ void CCustomLayoutWidget::OnAddWidget()
 
 void CCustomLayoutWidget::OnDeleteWidget()
 {
-	//m_hierarchicalLayoutWidget.RemoveLayout(m_id);
 	emit m_hierarchicalLayoutWidget.EmitDeleteWidget(m_id);
 }
 
 
 void CCustomLayoutWidget::OnSplitVertical()
 {
-//	m_hierarchicalLayoutWidget.SetSplitterLayout(m_id, Qt::Vertical, 2);
 	emit m_hierarchicalLayoutWidget.EmitSplitVertical(m_id);
 }
 
 
 void CCustomLayoutWidget::OnSplitHorizontal()
 {
-	//m_hierarchicalLayoutWidget.SetSplitterLayout(m_id, Qt::Horizontal, 2);
 	emit m_hierarchicalLayoutWidget.EmitSplitHorizontal(m_id);
 }
 
 
 void  CCustomLayoutWidget::OnAlignLeft()
 {
-	SetTitleAlign(CHierarchicalLayoutWidget::AT_LEFT);
+	emit m_hierarchicalLayoutWidget.EmitChangeAlignTitle(m_id, ILayout::AT_LEFT);
 }
 
 
 void  CCustomLayoutWidget::OnAlignCenter()
 {
-	SetTitleAlign(CHierarchicalLayoutWidget::AT_H_CENTER);
+	emit m_hierarchicalLayoutWidget.EmitChangeAlignTitle(m_id, ILayout::AT_H_CENTER);
 }
 
 
 void  CCustomLayoutWidget::OnAlignRight()
 {
-	SetTitleAlign(CHierarchicalLayoutWidget::AT_RIGHT);
-}
-
-
-void CCustomLayoutWidget::OnChangeName()
-{
-	QString name = CCustomLayoutWidgetForm::titleName->text();
-	bool ok;
-	name = QInputDialog::getText(this, tr("Get Name"),
-		tr("View name:"), QLineEdit::Normal,
-		name, &ok);
-	if (ok && !name.isEmpty()) {
-		titleName->setText(name);
-	}
+	emit m_hierarchicalLayoutWidget.EmitChangeAlignTitle(m_id, ILayout::AT_RIGHT);
 }
 
 
 void CCustomLayoutWidget::OnChangeIcon()
 {
-	QString fileName = QFileDialog::getOpenFileName(this,
-		tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp *.ico *.svg)"));
-	if (fileName.isEmpty() == false){
-		QPixmap pixmap(fileName);
-		pixmap = pixmap.scaled(28, 28);
-		titleIcon->setPixmap(pixmap);
-		ChangeIconButton->setIcon(pixmap);
-	}
+	emit m_hierarchicalLayoutWidget.EmitChangeIcon(m_id);
+}
+
+
+void CCustomLayoutWidget::OnTitleChanged()
+{
+	QString newText = TitleNameEdit->text();
+	emit m_hierarchicalLayoutWidget.EmitChangeTitle(m_id, newText);
+}
+
+
+void CCustomLayoutWidget::OnTitleEdited(const QString& newText)
+{
+//	emit m_hierarchicalLayoutWidget.EmitChangeTitle(m_id, newText);
 }
 
 

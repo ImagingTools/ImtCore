@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QAction>
+#include <QtWidgets/QSplitter>
 
 // ACF includes
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
@@ -15,7 +16,7 @@
 #include <iser/ISerializable.h>
 
 // ImtCore includes
-#include <imtgui/ILayout.h>
+#include <imtgui/CLayout.h>
 #include <imtgui/CHierarchicalLayoutWidget.h>
 #include <GeneratedFiles/imtgui/ui_CLayoutManagerGuiComp.h>
 
@@ -28,21 +29,18 @@ namespace imtgui
 	Layout editor.
 */
 class CLayoutManagerGuiComp:
-	public iqtgui::TDesignerGuiCompBase<Ui::CLayoutManagerGuiComp>,
-	public virtual iser::ISerializable,
+//	public iqtgui::TDesignerGuiCompBase<Ui::CLayoutManagerGuiComp>,
+    public iqtgui::TDesignerGuiObserverCompBase<Ui::CLayoutManagerGuiComp, imtgui::ILayout>,
+//	public virtual iser::ISerializable,
 //	protected imod::CSingleModelObserverBase,
- //   public iqtgui::TDesignerGuiObserverCompBase<
-	//Ui::CLayoutManagerComp, imtgui::ILayout>,
 	public virtual ibase::ICommandsProvider
 {
 	Q_OBJECT
 
 public:
-	typedef iqtgui::TDesignerGuiCompBase<Ui::CLayoutManagerGuiComp> BaseClass;
+	//typedef iqtgui::TDesignerGuiCompBase<Ui::CLayoutManagerGuiComp> BaseClass;
 
-
- //	typedef iqtgui::TDesignerGuiObserverCompBase<
-//		Ui::CLayoutManagerComp, imtgui::ILayout> BaseClass;
+ 	typedef iqtgui::TDesignerGuiObserverCompBase<Ui::CLayoutManagerGuiComp, imtgui::ILayout> BaseClass;
 
 	I_BEGIN_COMPONENT(CLayoutManagerGuiComp);
 	//I_REGISTER_INTERFACE(imod::IObserver);
@@ -69,6 +67,7 @@ public:
 	virtual bool Serialize(iser::IArchive& archive);
 
 protected:
+	QWidget* createCustomLayoutWidget(CLayout* layout);
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet);
@@ -85,10 +84,10 @@ protected Q_SLOTS:
 	void OnClearAll();
 	void OnLoad();
 	void OnSave();
-	void OnChangeName();
-	void OnSplitVertical();
+	void OnChangeTitle(const QByteArray& id, const QString& title);
+	void OnChangeAlignTitle(const QByteArray& id, const ILayout::AlignType& align);
+	void OnChangeIcon(const QByteArray& id);
 	void OnSplitVertical(const QByteArray& id);
-	void OnSplitHorizontal();
 	void OnSplitHorizontal(const QByteArray& id);
 	void OnDelete();
 	void OnDeleteWidget(const QByteArray& id);
@@ -104,6 +103,8 @@ private:
 	{
 		return &component.m_guiViewOptionsManager;
 	}
+
+
 
 private:
 //	I_FACT(idoc::IUndoManager, m_undoManagerCompFact);
@@ -127,6 +128,7 @@ private:
 	typedef QMap<QByteArray, GuiObjectDelPtr> GuiObjectMap;
 	GuiObjectMap m_createdViewMap;
 	QByteArray m_activeId;
+	CLayout* m_rootLayout;
 
 	iprm::COptionsManager m_guiViewOptionsManager;
 };
