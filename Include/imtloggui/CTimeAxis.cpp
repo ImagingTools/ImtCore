@@ -98,8 +98,8 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 	double viewWidth = itemRect.width() * viewTransform.m11();
 	double secondsPerPixel = viewWidth / timeRange;
 
-	QString beginTime = m_startDateTime.toString(Qt::ISODate);
-	QString endTime = m_endDateTime.toString(Qt::ISODate);
+	QString beginTime = m_startDateTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
+	QString endTime = m_endDateTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
 	int labelWidth = option->fontMetrics.width(beginTime);
 
 	double majorStepSize = 1.5 * labelWidth;
@@ -123,7 +123,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 			
 			int secondsOffset = secondsPerPixel * xPos;
 			QDateTime time = m_startDateTime.addSecs(secondsOffset);
-			QString timeString = time.toString(Qt::ISODate);
+			QString timeString = time.toString("dd.MM.yyyy hh:mm:ss.zzz");
 
 			painter->drawLine(QLineF(xPos, axisRect.top() + 1, xPos, axisRect.bottom() - axisRect.height() / 1.5));
 			QRectF labelRect = QRectF(xPos - labelWidth / 2, axisRect.top() + axisRect.height() / 2, labelWidth, axisRect.height() / 2 - 2);
