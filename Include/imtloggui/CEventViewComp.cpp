@@ -67,7 +67,7 @@ void CEventViewComp::OnGuiCreated()
 
 	QDateTime begin = QDateTime::currentDateTime();
 	QDateTime end;
-	end.setSecsSinceEpoch(begin.toSecsSinceEpoch() + 10000);
+	end.setSecsSinceEpoch(begin.toSecsSinceEpoch() + 3600);
 
 	m_timeAxisPtr = new CTimeAxis();
 	m_timeAxisPtr->setColor(Qt::green);
@@ -80,7 +80,7 @@ void CEventViewComp::OnGuiCreated()
 		CEventGroup *item = new CEventGroup();
 		QColor color(qrand() % 256, qrand() % 256, qrand() % 256);
 		item->setColor(color);
-		item->setGeometry(QRect(0, 300 * i, 10000, 300));
+		item->setGeometry(QRect(0, 300 * i, 3600, 300));
 		m_scenePtr->addItem(item);
 	}
 

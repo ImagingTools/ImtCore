@@ -8,7 +8,6 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QScrollBar>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
 
@@ -73,7 +72,7 @@ QRectF CTimeAxis::boundingRect() const
 	axisRect.setBottom(0);
 
 	// Left and right marings for the drawing the first and last tick labels:
-	return axisRect.adjusted(-200, 0, 200, 0);
+	return axisRect.adjusted(-100, 0, 100, 0);
 }
 
 
@@ -87,53 +86,49 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 	// Fill the full axis rectangle with the background color:
 	painter->setPen(Qt::transparent);
-	painter->setBrush(Qt::black);
+	painter->setBrush(Qt::darkGray);
 	painter->drawRect(axisRect);
 
 	// Current view transformation:
 	QGraphicsView* viewPtr = scene()->views().first();
 	QTransform viewTransform = viewPtr->transform();
 
-	quint64 secDiff = m_startDateTime.secsTo(m_endDateTime);
+	quint64 timeRange = m_startDateTime.secsTo(m_endDateTime);
 
 	double viewWidth = itemRect.width() * viewTransform.m11();
+	double secondsPerPixel = viewWidth / timeRange;
 
 	QString beginTime = m_startDateTime.toString(Qt::ISODate);
 	QString endTime = m_endDateTime.toString(Qt::ISODate);
 	int labelWidth = option->fontMetrics.width(beginTime);
 
-	int majorTicksCount = viewWidth / double((2 * labelWidth));
+	double majorStepSize = 1.5 * labelWidth;
+	int majorTicksCount = 1 + int(0.5 + viewWidth / majorStepSize);
 
-	double pixelsPerTick = viewWidth / double(secDiff);
-	if (pixelsPerTick < 5){
-		// Switch to minutes:
-		pixelsPerTick *= 60;
-	}
-
-	if (pixelsPerTick < 5){
-		// Switch to hours:
-		pixelsPerTick *= 60;
-	}
-
-	double step = pixelsPerTick;
-	if (step < 1){
-		step = 1;
-	}
-
-	painter->setPen(Qt::yellow);
+	painter->setPen(Qt::white);
 
 	QRectF firstLabelRect = QRectF(-labelWidth / 2, axisRect.top() + axisRect.height() / 2, labelWidth, axisRect.height() / 2 - 2);
-//	painter->drawRect(labelRect);
 	painter->drawText(firstLabelRect, beginTime);
+	painter->drawLine(QLineF(0, axisRect.top() + 1, 0, axisRect.bottom() - axisRect.height() / 1.5));
 
 	QRectF lastLabelRect = QRectF(itemRect.right() * viewTransform.m11() - labelWidth / 2, axisRect.top() + axisRect.height() / 2, labelWidth, axisRect.height() / 2 - 2);
-	//	painter->drawRect(labelRect);
 	painter->drawText(lastLabelRect, endTime);
+	painter->drawLine(QLineF(itemRect.right() * viewTransform.m11(), axisRect.top() + 1, itemRect.right() * viewTransform.m11(), axisRect.bottom() - axisRect.height() / 1.5));
 
-	painter->setPen(Qt::red);
+	// Draw major ticks:
+	majorStepSize = viewWidth / double(majorTicksCount - 2);
+	if (majorTicksCount > 0){
+		for (int x = 1; x < majorTicksCount - 2; ++x){
+			double xPos = x * majorStepSize;
+			
+			int secondsOffset = secondsPerPixel * xPos;
+			QDateTime time = m_startDateTime.addSecs(secondsOffset);
+			QString timeString = time.toString(Qt::ISODate);
 
-	for (double x = itemRect.left(); x <= itemRect.right() * viewTransform.m11(); x += step){
-		painter->drawLine(QLineF(x, axisRect.top() + 1, x, axisRect.bottom() - axisRect.height() / 1.5));
+			painter->drawLine(QLineF(xPos, axisRect.top() + 1, xPos, axisRect.bottom() - axisRect.height() / 1.5));
+			QRectF labelRect = QRectF(xPos - labelWidth / 2, axisRect.top() + axisRect.height() / 2, labelWidth, axisRect.height() / 2 - 2);
+			painter->drawText(labelRect, timeString);
+		}
 	}
 }
 
@@ -143,22 +138,12 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 QRectF CTimeAxis::SceneVisibleRect() const
 {
 	QGraphicsView* viewPtr = scene()->views().first();
-	QRectF visibleSceneRect = viewPtr->mapToScene(viewPtr->viewport()->rect()).boundingRect();
+
+	QRect viewportRect = viewPtr->viewport()->rect();
+
+	QRectF visibleSceneRect = viewPtr->mapToScene(viewportRect).boundingRect();
+
 	return visibleSceneRect;
-}
-
-
-double CTimeAxis::convertDateTimeToPosX(const QDateTime& dateTime)
-{
-	qint64 msecStart = m_startDateTime.toMSecsSinceEpoch();
-	qint64 msecEnd = m_endDateTime.toMSecsSinceEpoch();
-	qint64 msecDateTime = dateTime.toMSecsSinceEpoch();
-
-	if (msecDateTime < msecStart || msecDateTime > msecEnd){
-		return -1;
-	}
-
-	return rect().width() * (msecDateTime - msecStart) / (msecEnd - msecStart);
 }
 
 

@@ -40,7 +40,6 @@ signals:
 
 private:
 	QRectF SceneVisibleRect() const;
-	double convertDateTimeToPosX(const QDateTime& dateTime);
 
 private:
 	QDateTime m_startDateTime;
