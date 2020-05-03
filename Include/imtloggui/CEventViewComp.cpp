@@ -67,17 +67,16 @@ void CEventViewComp::OnGuiCreated()
 
 	QDateTime begin = QDateTime::currentDateTime();
 	QDateTime end;
-	end.setSecsSinceEpoch(begin.toSecsSinceEpoch() + 11000);
+	end.setSecsSinceEpoch(begin.toSecsSinceEpoch() + 10000);
 
 	m_timeAxisPtr = new CTimeAxis();
 	m_timeAxisPtr->setColor(Qt::green);
-	m_timeAxisPtr->setRect(0, 30, 10000, -30);
 	m_timeAxisPtr->setTimeSpan(begin, end);
 	m_timeAxisPtr->setMinorTickCount(12);
 
 	qsrand(QDateTime::currentDateTime().toMSecsSinceEpoch());
 
-	for (int i = 0; i < 10; i++){
+	for (int i = 0; i < 5; i++){
 		CEventGroup *item = new CEventGroup();
 		QColor color(qrand() % 256, qrand() % 256, qrand() % 256);
 		item->setColor(color);
@@ -90,7 +89,7 @@ void CEventViewComp::OnGuiCreated()
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
 	GetQtWidget()->layout()->addWidget(m_viewPtr);
 
-	m_viewPtr->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+	m_viewPtr->setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 	m_viewPtr->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
 	m_viewPtr->setScene(m_scenePtr);
 	m_viewPtr->setSceneRect(m_scenePtr->sceneRect());

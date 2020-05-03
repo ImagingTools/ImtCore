@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QtCore/QRectF>
 #include <QtGui/QPen>
+#include <QtGui/QFont>
 #include <QtGui/QPainter>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
@@ -17,6 +18,8 @@ namespace imtloggui
 
 CTimeAxis::CTimeAxis(QGraphicsItem *parent)
 {
+	setZValue(100000);
+	setFlags(ItemIgnoresTransformations);
 }
 
 
@@ -24,6 +27,12 @@ void CTimeAxis::setTimeSpan(const QDateTime & startDateTime, const QDateTime & e
 {
 	m_startDateTime = startDateTime;
 	m_endDateTime = endDateTime;
+
+	int secDiff = int(startDateTime.secsTo(endDateTime));
+
+	int width = qMax(1000, secDiff);
+
+	setRect(0, 40, width, -40);
 }
 
 
@@ -60,75 +69,72 @@ QRectF CTimeAxis::boundingRect() const
 		axisRect.setRight(visibleRect.right());
 	}
 
-	axisRect.setTop(rect().height() / scene()->views().first()->transform().m22());
+	axisRect.setTop(rect().height());
 	axisRect.setBottom(0);
-	
 
-	return axisRect;
+	// Left and right marings for the drawing the first and last tick labels:
+	return axisRect.adjusted(-200, 0, 200, 0);
 }
 
 
-void CTimeAxis::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-	QPainterPath path;
-	path.addRect(boundingRect());
+	// Full rectangle of the axis:
+	QRectF axisRect = boundingRect();
 
-	QPen pen;
-	pen.setWidth(2);
+	// Logical rectangle for the defined time range:
+	QRectF itemRect = rect();
 
-	painter->setPen(pen);
-	painter->fillPath(path, m_color);
-	painter->drawPath(path);
+	// Fill the full axis rectangle with the background color:
+	painter->setPen(Qt::transparent);
+	painter->setBrush(Qt::black);
+	painter->drawRect(axisRect);
 
-	return;
+	// Current view transformation:
+	QGraphicsView* viewPtr = scene()->views().first();
+	QTransform viewTransform = viewPtr->transform();
 
-	//QGraphicsScene* scenePtr = scene();
-	//if (scenePtr->views().isEmpty()){
-	//	return;
-	//}
+	quint64 secDiff = m_startDateTime.secsTo(m_endDateTime);
 
-	//QRectF rect = boundingRect();
+	double viewWidth = itemRect.width() * viewTransform.m11();
 
-	//pen.setColor(Qt::red);
-	//painter->setPen(pen);
-	//painter->drawLine(QLineF(rect.topLeft(), rect.bottomLeft()));
-	//painter->drawLine(QLineF(rect.topRight(), rect.bottomRight()));
+	QString beginTime = m_startDateTime.toString(Qt::ISODate);
+	QString endTime = m_endDateTime.toString(Qt::ISODate);
+	int labelWidth = option->fontMetrics.width(beginTime);
 
+	int majorTicksCount = viewWidth / double((2 * labelWidth));
 
-	//QGraphicsView* viewPtr = scenePtr->views().first();
-	//QRectF visibleRect = mapFromScene(viewPtr->mapToScene(viewPtr->rect()).boundingRect()).boundingRect();
+	double pixelsPerTick = viewWidth / double(secDiff);
+	if (pixelsPerTick < 5){
+		// Switch to minutes:
+		pixelsPerTick *= 60;
+	}
 
-	//if (visibleRect.left() < 0){
-	//	visibleRect.setLeft(0);
-	//}
+	if (pixelsPerTick < 5){
+		// Switch to hours:
+		pixelsPerTick *= 60;
+	}
 
-	//if (visibleRect.right() > rect.right()){
-	//	visibleRect.setRight(rect.right());
-	//}
+	double step = pixelsPerTick;
+	if (step < 1){
+		step = 1;
+	}
 
-	////double k = (m_endDateTime.toMSecsSinceEpoch() - m_startDateTime.toMSecsSinceEpoch()) / rect.width();
+	painter->setPen(Qt::yellow);
 
-	//QDateTime firstMajDT = m_startDateTime;
-	//firstMajDT.setTime(QTime(firstMajDT.time().hour(), 0));
+	QRectF firstLabelRect = QRectF(-labelWidth / 2, axisRect.top() + axisRect.height() / 2, labelWidth, axisRect.height() / 2 - 2);
+//	painter->drawRect(labelRect);
+	painter->drawText(firstLabelRect, beginTime);
 
-	//if (firstMajDT.toMSecsSinceEpoch() < m_startDateTime.toMSecsSinceEpoch()){
-	//	firstMajDT = firstMajDT.addMSecs(MS_HOUR);
-	//}
+	QRectF lastLabelRect = QRectF(itemRect.right() * viewTransform.m11() - labelWidth / 2, axisRect.top() + axisRect.height() / 2, labelWidth, axisRect.height() / 2 - 2);
+	//	painter->drawRect(labelRect);
+	painter->drawText(lastLabelRect, endTime);
 
-	//double firstMajTick = convertDateTimeToPosX(firstMajDT);
-	//double nextMajTick = convertDateTimeToPosX(firstMajDT.addMSecs(MS_HOUR));
-	//double deltaMajTick = nextMajTick - firstMajTick;
-	//double deltaMinTick = deltaMajTick / m_minorTickCount;
+	painter->setPen(Qt::red);
 
-	//pen.setColor(Qt::black);
-	//painter->setPen(pen);
-
-	//while (firstMajTick < rect.right()){
-	//	painter->drawLine(firstMajTick, rect.bottom(), firstMajTick, rect.bottom() - 50);
-	//	painter->drawText(QPointF(firstMajTick, rect.bottom() - 50), "TEST");
-	//	
-	//	firstMajTick += deltaMajTick;
-	//}
+	for (double x = itemRect.left(); x <= itemRect.right() * viewTransform.m11(); x += step){
+		painter->drawLine(QLineF(x, axisRect.top() + 1, x, axisRect.bottom() - axisRect.height() / 1.5));
+	}
 }
 
 

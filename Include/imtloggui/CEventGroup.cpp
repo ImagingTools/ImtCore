@@ -50,13 +50,11 @@ QRectF CEventGroup::boundingRect() const
 void CEventGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	QPen pen;
-	QPainterPath path;
-	path.addRect(m_boundingRect);
-
-	pen = QPen(Qt::black, 3);
+	pen = QPen(Qt::darkGray);
 	painter->setPen(pen);
-	painter->fillPath(path, m_color);
-	painter->drawPath(path);
+	painter->setBrush(m_color);
+
+	painter->drawRect(m_boundingRect);
 }
 
 
