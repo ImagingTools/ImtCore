@@ -44,6 +44,7 @@ void CEventGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 {
 	QPen pen;
 	pen = QPen(Qt::darkGray);
+	pen.setWidth(0);
 	painter->setPen(pen);
 	painter->setBrush(m_color);
 
