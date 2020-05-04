@@ -16,6 +16,7 @@ namespace imtloggui
 
 
 CTimeAxis::CTimeAxis(QGraphicsItem *parent)
+	: BaseClass(parent)
 {
 	setZValue(100000);
 	setFlags(ItemIgnoresTransformations);
@@ -31,7 +32,8 @@ void CTimeAxis::setTimeSpan(const QDateTime & startDateTime, const QDateTime & e
 
 	int width = qMax(1000, secDiff);
 
-	setRect(0, 40, width, -40);
+	setPos(0, 0);
+	setRect(0, 0, width, 40);
 }
 
 
@@ -68,8 +70,8 @@ QRectF CTimeAxis::boundingRect() const
 		axisRect.setRight(visibleRect.right());
 	}
 
-	axisRect.setTop(rect().height());
-	axisRect.setBottom(0);
+	axisRect.setTop(0);
+	axisRect.setBottom(rect().height());
 
 	// Left and right marings for the drawing the first and last tick labels:
 	axisRect.adjust(-100, 0, 100, 0);

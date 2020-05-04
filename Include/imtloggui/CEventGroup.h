@@ -3,7 +3,7 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
-#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QGraphicsRectItem>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
 
@@ -11,16 +11,14 @@ namespace imtloggui
 {
 
 
-class CEventGroup: public QGraphicsItem
+class CEventGroup: public QGraphicsRectItem
 {
 public:
-	typedef QGraphicsItem BaseClass;
+	typedef QGraphicsRectItem BaseClass;
 
 	CEventGroup(QGraphicsItem *parent = nullptr);
 
 	void setColor(const QColor& color);
-	void setGeometry(const QRectF &geometry);
-	void update();
 
 	// reimplemented (QGraphicsItem)
 	QRectF boundingRect() const override;

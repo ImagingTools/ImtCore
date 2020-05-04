@@ -16,6 +16,7 @@ namespace imtloggui
 
 
 CEventGroup::CEventGroup(QGraphicsItem *parent)
+	: BaseClass(parent)
 {
 }
 
@@ -26,24 +27,16 @@ void CEventGroup::setColor(const QColor& color)
 }
 
 
-void CEventGroup::setGeometry(const QRectF &geometry)
-{
-	m_geometryRect = geometry;
-	m_boundingRect = QRectF(QPointF(), geometry.size());
-	setPos(geometry.topLeft());
-}
-
-
-void CEventGroup::update()
-{
-}
-
-
 // reimplemented (QGraphicsItem)
 
 QRectF CEventGroup::boundingRect() const
 {
-	return m_boundingRect;
+	QRectF bounding = rect();
+	QPointF origin = bounding.bottomLeft();
+	
+	bounding.translate(-origin);
+
+	return bounding;
 }
 
 
@@ -54,7 +47,8 @@ void CEventGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 	painter->setPen(pen);
 	painter->setBrush(m_color);
 
-	painter->drawRect(m_boundingRect);
+	QRectF bounding = boundingRect();
+	painter->drawRect(bounding);
 }
 
 

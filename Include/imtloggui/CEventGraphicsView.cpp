@@ -75,7 +75,13 @@ bool CEventGraphicsView::viewportEvent(QEvent *event)
 {
 	if (event->type() == QEvent::Paint && m_timeAxisPtr != nullptr){
 		QRectF visibleRect = SceneVisibleRect();
-		m_timeAxisPtr->setPos(0, visibleRect.bottom());
+		m_timeAxisPtr->setPos(0, visibleRect.bottom() - m_timeAxisPtr->rect().height() / transform().m22());
+		QRectF rect = sceneRect();
+		if (m_timeAxisPtr != nullptr){
+			rect.setLeft(m_timeAxisPtr->rect().left() - 100 / transform().m11());
+			rect.setRight(m_timeAxisPtr->rect().right() + 100 / transform().m11());
+			setSceneRect(rect);
+		}
 	}
 
 	return BaseClass::viewportEvent(event);

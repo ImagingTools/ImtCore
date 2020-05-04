@@ -80,20 +80,21 @@ void CEventViewComp::OnGuiCreated()
 		CEventGroup *item = new CEventGroup();
 		QColor color(qrand() % 256, qrand() % 256, qrand() % 256);
 		item->setColor(color);
-		item->setGeometry(QRect(0, 300 * i, 3600, 300));
+		item->setRect(QRect(0, 0, 3600, 300));
+		item->setPos(0, -300 * i);
 		m_scenePtr->addItem(item);
 	}
 
-	m_scenePtr->addItem(m_timeAxisPtr);
-
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
-	GetQtWidget()->layout()->addWidget(m_viewPtr);
-
+	m_viewPtr->setScene(m_scenePtr);
 	m_viewPtr->setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 	m_viewPtr->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
-	m_viewPtr->setScene(m_scenePtr);
-	m_viewPtr->setSceneRect(m_scenePtr->sceneRect());
 	m_viewPtr->setTimeAxis(m_timeAxisPtr);
+	GetQtWidget()->layout()->addWidget(m_viewPtr);
+
+	m_scenePtr->addItem(m_timeAxisPtr);
+
+	m_viewPtr->setSceneRect(m_scenePtr->sceneRect());
 }
 
 
