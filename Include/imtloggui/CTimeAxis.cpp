@@ -83,7 +83,6 @@ QRectF CTimeAxis::boundingRect() const
 		axisRect.setRight(origin.x() + (axisRect.right() - origin.x()) * scale);
 	}
 
-
 	return axisRect;
 }
 
@@ -108,7 +107,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 	quint64 timeRange = m_startDateTime.secsTo(m_endDateTime);
 
 	double viewWidth = itemRect.width() * viewTransform.m11();
-	double secondsPerPixel = viewWidth / timeRange;
+	double secondsPerPixel = timeRange / viewWidth;
 
 	QString beginTime = m_startDateTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
 	QString endTime = m_endDateTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
@@ -133,8 +132,8 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 		for (int x = 1; x < majorTicksCount - 2; ++x){
 			double xPos = x * majorStepSize;
 			
-			int secondsOffset = secondsPerPixel * xPos;
-			QDateTime time = m_startDateTime.addSecs(secondsOffset);
+			int msOffset = secondsPerPixel * xPos * 1000;
+			QDateTime time = m_startDateTime.addMSecs(msOffset);
 			QString timeString = time.toString("dd.MM.yyyy hh:mm:ss.zzz");
 
 			painter->drawLine(QLineF(xPos, axisRect.top() + 1, xPos, axisRect.bottom() - axisRect.height() / 1.5));
