@@ -3,8 +3,6 @@
 
 // Qt includes
 #include <QtGui/QMouseEvent>
-#include <QDebug>
-#include <qscrollbar.h>
 
 
 namespace imtloggui
