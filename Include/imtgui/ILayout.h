@@ -115,22 +115,17 @@ public:
 	/**
 		Get layout's parent.
 	*/
-	virtual ILayout* GetParent() = 0;
-
-	/**
-		Get root layout.
-	*/
-	virtual ILayout* GetRoot() = 0;
+	virtual ILayout* GetParent()  const = 0;
 
 	/**
 		Get layout's childs count.
 	*/
-	virtual int GetChildsCount() = 0;
+	virtual int GetChildsCount() const = 0;
 
 	/**
 		Get layout's child from index.
 	*/
-	virtual ILayout* GetChild(int index) = 0;
+	virtual ILayout* GetChild(int index) const = 0;
 
 	/**
 		Insert layout's child to index.
