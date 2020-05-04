@@ -72,7 +72,17 @@ QRectF CTimeAxis::boundingRect() const
 	axisRect.setBottom(0);
 
 	// Left and right marings for the drawing the first and last tick labels:
-	return axisRect.adjusted(-100, 0, 100, 0);
+	axisRect.adjust(-100, 0, 100, 0);
+
+	double scale = scene()->views().first()->transform().m11();
+	
+	if (scale > 1){
+		axisRect.setLeft(origin.x() + (axisRect.left() - origin.x()) * scale);
+		axisRect.setRight(origin.x() + (axisRect.right() - origin.x()) * scale);
+	}
+
+
+	return axisRect;
 }
 
 
