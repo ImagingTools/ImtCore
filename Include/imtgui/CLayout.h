@@ -29,7 +29,6 @@ public:
 	//typedef istd::TSmartPtr<iser::ISerializable> ObjectInstancePtr;
 	//virtual ObjectInstancePtr CreateObjectInstance(const QByteArray& objectType) = 0;
 
-	void SetSplitterLayout(ILayout::LayoutType type);
 
 
 	// reimplemented (icarmagui::ILayout)
@@ -61,6 +60,7 @@ public:
 	virtual void Clear() Q_DECL_OVERRIDE;
 	virtual ILayout* FindChild(const QByteArray& id) Q_DECL_OVERRIDE;
 	virtual ILayout* RemoveChild(const QByteArray& id) Q_DECL_OVERRIDE;
+	virtual void SplitLayout(ILayout::LayoutType type) Q_DECL_OVERRIDE;
 
 	// reimplemented (iser::ISerializable)
 

@@ -171,6 +171,9 @@ public:
 		Remove layout's child recursive.
 	*/
 	virtual ILayout* RemoveChild(const QByteArray& id) = 0;
+
+	virtual void SplitLayout(ILayout::LayoutType type) = 0;
+
 };
 
 

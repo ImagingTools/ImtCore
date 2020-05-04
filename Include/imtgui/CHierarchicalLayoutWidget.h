@@ -129,6 +129,7 @@ Q_SIGNALS:
 	void EmitChangeIcon(const QByteArray& id);
 	void EmitChangeAlignTitle(const QByteArray& id, const ILayout::AlignType& align);
 	void EmitChangeTitle(const QByteArray& id, const QString& title);
+	void EmitChangeSizes(const QByteArray& id, const SizeList& sizeList);
 
 private:
 	typedef QMap<QByteArray, CCustomLayoutWidget*> CustomWidgetMap;

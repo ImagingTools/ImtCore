@@ -45,6 +45,9 @@ CLayoutManagerGuiComp::CLayoutManagerGuiComp()
 	connect(&m_clearCommand, SIGNAL(triggered()), this, SLOT(OnClearAll()));
 	connect(&m_loadCommand, SIGNAL(triggered()), this, SLOT(OnLoad()));
 	connect(&m_saveCommand, SIGNAL(triggered()), this, SLOT(OnSave()));
+
+	m_splitterTimer.setSingleShot(true);
+	connect(&m_splitterTimer, SIGNAL(timeout()), this, SLOT(OnSplitterMoveFinished()));
 }
 
 
@@ -95,20 +98,26 @@ QWidget* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 		retVal = customLayoutWidgetPtr;
 	}
 	else{
-		QSplitter* splitter = new QSplitter();
-		retVal = splitter;
+		QSplitter* splitterPtr = new QSplitter();
+		connect(splitterPtr, SIGNAL(splitterMoved(int, int)), this, SLOT(OnSplitterMoved(int, int)));
+		SplittersMap.insert(splitterPtr, layout->GetLayoutId());
+
+		retVal = splitterPtr;
 		if (layout->GetType() == ILayout::LT_HORIZONTAL_SPLITTER){
-			splitter->setOrientation(Qt::Horizontal);
+			splitterPtr->setOrientation(Qt::Horizontal);
 		}
 		else{
-			splitter->setOrientation(Qt::Vertical);
+			splitterPtr->setOrientation(Qt::Vertical);
 		}
 		for (int i = 0; i < layout->GetChildsCount(); i++){
 			ILayout* childLayoutPtr = layout->GetChild(i);
 			if (childLayoutPtr != nullptr){
-				splitter->addWidget(CreateCustomLayoutWidget(childLayoutPtr));
+				splitterPtr->addWidget(CreateCustomLayoutWidget(childLayoutPtr));
 			}
-			//splitter->setSizes(layout->GetSizes());
+		}
+		SizeList sizes = layout->GetSizes();
+		if (sizes.count() >= splitterPtr->count()) {
+			splitterPtr->setSizes(layout->GetSizes());
 		}
 	}
 
@@ -121,7 +130,9 @@ QWidget* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 void CLayoutManagerGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (m_layoutWidgetPtr != nullptr){
+
 		m_layoutWidgetPtr->ClearAll();
+		SplittersMap.clear();
 
 		m_layoutWidgetPtr->layout()->addWidget(CreateCustomLayoutWidget(GetObservedObject()));
 	}
@@ -147,7 +158,9 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeIcon(const QByteArray&)), this, SLOT(OnChangeIcon(const QByteArray&)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeTitle(const QByteArray&, const QString&)), this, SLOT(OnChangeTitle(const QByteArray&, const QString&)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeAlignTitle(const QByteArray&, const ILayout::AlignType&)), this, SLOT(OnChangeAlignTitle(const QByteArray&, const ILayout::AlignType&)), Qt::DirectConnection);
+	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeSizes(const QByteArray&, const SizeList&)), this, SLOT(OnChangeSizes(const QByteArray&, const SizeList&)), Qt::DirectConnection);
 
+	
 	// check views attributes
 	Q_ASSERT_X(m_guiViewIdMultiAttrPtr.IsValid(), "CLayoutManagerGuiComp", "attribute ViewIds should be set");
 	Q_ASSERT_X(m_guiViewMultiFactCompPtr.IsValid(), "CLayoutManagerGuiComp", "attribute ViewFactories should be set");
@@ -314,7 +327,7 @@ void CLayoutManagerGuiComp::OnSplitVertical(const QByteArray& id)
 
 	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
 	if (childLayoutPtr != nullptr){
-		childLayoutPtr->SetType(ILayout::LT_VERTICAL_SPLITTER);
+		childLayoutPtr->SplitLayout(ILayout::LT_VERTICAL_SPLITTER);
 	}
 }
 
@@ -326,7 +339,7 @@ void CLayoutManagerGuiComp::OnSplitHorizontal(const QByteArray& id)
 
 	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
 	if (childLayoutPtr != nullptr){
-		childLayoutPtr->SetType(ILayout::LT_HORIZONTAL_SPLITTER);
+		childLayoutPtr->SplitLayout(ILayout::LT_HORIZONTAL_SPLITTER);
 	}
 }
 
@@ -376,33 +389,16 @@ void CLayoutManagerGuiComp::OnAddWidget(const QByteArray& id, int index)
 	ILayout* rootLayoutPtr = GetObservedObject();
 	Q_ASSERT(rootLayoutPtr != nullptr);
 
-	if (index < 0){
-		//m_layoutWidgetPtr->SetWidgetToItem(id, QByteArray(), nullptr);
-	}
-	else{
-		QByteArray viewId = m_guiViewIdMultiAttrPtr[index];
+	QByteArray viewId;
 
-		ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
-		if (childLayoutPtr != nullptr){
-			childLayoutPtr->SetViewId(viewId);
-		}
+	if (index >= 0){
+		viewId = m_guiViewIdMultiAttrPtr[index];
 	}
 
-
-	//if (index < 0){
-	//	m_layoutWidgetPtr->SetWidgetToItem(id, QByteArray(), nullptr);
-	//}
-	//else{
-	//	istd::IChangeable::ChangeSet changeSet(0);
-	//	istd::CChangeNotifier changeNotifier(this, &changeSet);
-
-	//	istd::TSmartPtr<iqtgui::IGuiObject> newWidgetPtr(m_guiViewMultiFactCompPtr.CreateInstance(index));
-	//	if (newWidgetPtr->CreateGui(nullptr)){
-	//		QByteArray viewId = m_guiViewIdMultiAttrPtr[index];
-	//		m_layoutWidgetPtr->SetWidgetToItem(id, viewId, newWidgetPtr->GetWidget());
-	//		m_createdViewMap.insert(id, newWidgetPtr);
-	//	}
-	//}
+	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
+	if (childLayoutPtr != nullptr) {
+		childLayoutPtr->SetViewId(viewId);
+	}
 
 }
 
@@ -419,6 +415,42 @@ void CLayoutManagerGuiComp::OnAddWidgetByViewId(const QByteArray& id, const QByt
 
 }
 
+
+void CLayoutManagerGuiComp::OnChangeSizes(const QByteArray& id, const SizeList& sizeList)
+{
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
+
+	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
+	if (childLayoutPtr != nullptr) {
+		childLayoutPtr->SetSizes(sizeList);
+	}
+}
+
+
+void CLayoutManagerGuiComp::OnSplitterMoved(int /*pos*/, int /*index*/)
+{
+	QSplitter* splitterPtr = dynamic_cast<QSplitter*>(sender());
+	if (splitterPtr != NULL && SplittersMap.contains(splitterPtr)) {
+		m_activeId = SplittersMap.value(splitterPtr);
+		m_splitterTimer.stop();
+		m_splitterTimer.start(1000);
+	}
+}
+
+
+void CLayoutManagerGuiComp::OnSplitterMoveFinished()
+{
+	QMap<QSplitter*, QByteArray>::const_iterator i = SplittersMap.constBegin();
+	while (i != SplittersMap.constEnd()) {
+		if (i.value() == m_activeId){
+			QSplitter* splitterPtr = i.key();
+			OnChangeSizes(m_activeId, splitterPtr->sizes());
+			break;
+		}
+		++i;
+	}
+}
 
 void CLayoutManagerGuiComp::OnDropWidget(QByteArray id, QDropEvent* eventPtr)
 {

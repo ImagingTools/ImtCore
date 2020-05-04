@@ -42,38 +42,6 @@ CLayout::~CLayout()
 }
 
 
-void CLayout::SetSplitterLayout(ILayout::LayoutType type)
-{
-	istd::CChangeGroup changeGroup(m_root);
-	//CLayout* layout = dynamic_cast<CLayout*>(m_root->FindChild(id));
-	//layout = m_rootLayout;
-	CLayout* parent = dynamic_cast<CLayout*>(GetParent());
-	if (parent != NULL && parent->GetType() == ILayout::LT_NONE) {
-		parent->AppendChild(new CLayout(m_root));
-	}
-	else{
-		CLayout* newLayout = new CLayout(m_root);
-		newLayout->SetLayoutId(GetLayoutId());
-		newLayout->SetType(GetType());
-		newLayout->SetTitleAlign(GetTitleAlign());
-		newLayout->SetTitle(GetTitle());
-		newLayout->SetIcon(GetIcon());
-		newLayout->SetViewId(GetViewId());
-		newLayout->SetSizes(GetSizes());
-
-		SetLayoutId(QUuid::createUuid().toByteArray());
-		SetType(type);
-		SetTitleAlign(ILayout::AT_LEFT);
-		SetTitle("");
-		SetIcon(QPixmap());
-		AppendChild(newLayout);
-		newLayout = new CLayout(m_root);
-		AppendChild(newLayout);
-	}
-
-}
-
-
 // reimplemented (icarmagui::ILayout)
 
 void CLayout::SetLayoutId(const QByteArray& id)
@@ -141,7 +109,7 @@ QPixmap CLayout::GetIcon() const
 
 void CLayout::SetViewId(const QByteArray& viewId)
 {
-	//istd::CChangeNotifier changeNotifier(m_root);
+	istd::CChangeNotifier changeNotifier(m_root);
 	m_viewId = viewId;
 }
 
@@ -263,8 +231,7 @@ ILayout* CLayout::FindChild(const QByteArray& id)
 		return this;
 	}
 
-	for (ILayout* layout : m_childs)
-	{
+	for (ILayout* layout : m_childs){
 		retVal = layout->FindChild(id);
 		if (retVal != NULL){
 			break;
@@ -324,6 +291,37 @@ ILayout* CLayout::RemoveChild(const QByteArray& id)
 }
 
 
+
+void CLayout::SplitLayout(ILayout::LayoutType type)
+{
+	istd::CChangeGroup changeGroup(m_root);
+	ILayout* parent = GetParent();
+	if (parent != NULL && parent->GetType() == ILayout::LT_NONE){
+		parent->AppendChild(new CLayout(m_root));
+	}
+	else{
+		CLayout* newLayout = new CLayout(m_root);
+		newLayout->SetLayoutId(GetLayoutId());
+		newLayout->SetType(GetType());
+		newLayout->SetTitleAlign(GetTitleAlign());
+		newLayout->SetTitle(GetTitle());
+		newLayout->SetIcon(GetIcon());
+		newLayout->SetViewId(GetViewId());
+		newLayout->SetSizes(GetSizes());
+
+		SetLayoutId(QUuid::createUuid().toByteArray());
+		SetType(type);
+		SetTitleAlign(ILayout::AT_LEFT);
+		SetTitle("");
+		SetIcon(QPixmap());
+		AppendChild(newLayout);
+		newLayout = new CLayout(m_root);
+		AppendChild(newLayout);
+	}
+
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CLayout::Serialize(iser::IArchive& archive)
@@ -349,15 +347,15 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 	retVal = retVal && I_SERIALIZE_ENUM(LayoutType, archive, m_layoutType);
 	retVal = retVal && archive.EndTag(layoutItemTypeTag);
 	QByteArray sizeListAsByteArray;
-	if ((m_layoutType == LayoutType::LT_HORIZONTAL_SPLITTER) || (m_layoutType == LayoutType::LT_VERTICAL_SPLITTER)) {
+	if ((m_layoutType == LayoutType::LT_HORIZONTAL_SPLITTER) || (m_layoutType == LayoutType::LT_VERTICAL_SPLITTER)){
 		static iser::CArchiveTag layoutSizeListTag("LayoutSizeList", "Layout item size list");
 		retVal = retVal && archive.BeginTag(layoutSizeListTag);
-		if (archive.IsStoring()) {
+		if (archive.IsStoring()){
 			QDataStream stream(&sizeListAsByteArray, QIODevice::WriteOnly);
 			SizeList sizeList = GetSizes();
 			stream << sizeList;
 		}
-		else {
+		else{
 			QDataStream stream(&sizeListAsByteArray, QIODevice::ReadWrite);
 			SizeList sizeList;
 			stream >> sizeList;
@@ -373,22 +371,22 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 		static iser::CArchiveTag childItemGroupTag("ChildItems", "Child items");
 		retVal = retVal && archive.BeginMultiTag(childItemGroupTag, layoutItemTag, childCount);
 
-		if (!archive.IsStoring()) {
-			while (m_childs.count() > 0) {
+		if (!archive.IsStoring()){
+			while (m_childs.count() > 0){
 				delete TakeFirst();
 			}
 		}
 
-		for (int i = 0; i < childCount; i++) {
+		for (int i = 0; i < childCount; i++){
 			CLayout *layout = NULL;
-			if (archive.IsStoring()) {
+			if (archive.IsStoring()){
 				layout = dynamic_cast<CLayout*>(GetChild(i));
 			}
-			else {
+			else{
 				layout = new CLayout(m_root);
 			}
 			retVal = retVal && layout->InternalSerializeItemRecursive(archive);
-			if (!archive.IsStoring()) {
+			if (!archive.IsStoring()){
 				AppendChild(layout);
 			}
 		}
@@ -397,7 +395,7 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(childItemGroupTag);
 
 	}
-	else {
+	else{
 		static iser::CArchiveTag herrachicalWidget("HerarchicalWidget", "Herarchical widget");
 		retVal = retVal && archive.BeginTag(herrachicalWidget);
 
@@ -423,7 +421,7 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 
 
 		QByteArray iconAsByteArray;
-		if (archive.IsStoring()) {
+		if (archive.IsStoring()){
 			QDataStream stream(&iconAsByteArray, QIODevice::WriteOnly);
 			stream << m_icon;
 		}
@@ -434,7 +432,7 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 
 		retVal = retVal && archive.EndTag(herrachicalWidget);
 
-		if (!archive.IsStoring()) {
+		if (!archive.IsStoring()){
 			QDataStream stream(&iconAsByteArray, QIODevice::ReadWrite);
 			stream >> m_icon;
 		}

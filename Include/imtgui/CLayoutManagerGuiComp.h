@@ -5,6 +5,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QSplitter>
+#include <QtCore/QTimer>
 
 // ACF includes
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
@@ -36,6 +37,7 @@ class CLayoutManagerGuiComp:
 
 public:
  	typedef iqtgui::TDesignerGuiObserverCompBase<Ui::CLayoutManagerGuiComp, imtgui::ILayout> BaseClass;
+	typedef QList<int> SizeList;
 
 	I_BEGIN_COMPONENT(CLayoutManagerGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
@@ -68,7 +70,12 @@ protected:
 	virtual void OnGuiCreated();
 	virtual void OnGuiRetranslate(); 
 
+	// for finish moved splitter signal
+
+
 protected Q_SLOTS:
+	void OnSplitterMoved(int pos, int index);
+	void OnSplitterMoveFinished();
 	void OnDropWidget(QByteArray id, QDropEvent* eventPtr);
 	void OnOpenMenu(QByteArray id, QMouseEvent* eventPtr);
 	void OnClearWidget(QByteArray id);
@@ -87,6 +94,7 @@ protected Q_SLOTS:
 	void OnAddWidget();
 	void OnAddWidget(const QByteArray& id, int index);
 	void OnAddWidgetByViewId(const QByteArray& id, const QByteArray& viewId);
+	void OnChangeSizes(const QByteArray& id, const SizeList& sizeList);
 
 private:
 	// static template methods for subelement access
@@ -113,10 +121,12 @@ private:
 	iqtgui::CHierarchicalCommand m_loadCommand;
 	iqtgui::CHierarchicalCommand m_saveCommand;
 
+	QTimer m_splitterTimer;
 	typedef istd::TSmartPtr<iqtgui::IGuiObject> GuiObjectDelPtr;
 	typedef QMap<QByteArray, GuiObjectDelPtr> GuiObjectMap;
 	GuiObjectMap m_createdViewMap;
 	QByteArray m_activeId;
+	QMap<QSplitter*, QByteArray> SplittersMap;
 
 	iprm::COptionsManager m_guiViewOptionsManager;
 };
