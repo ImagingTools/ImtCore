@@ -17,8 +17,6 @@ CEventGraphicsView::CEventGraphicsView(QWidget* parent)
 	: QGraphicsView(parent),
 	m_timeAxisPtr(nullptr)
 {
-	connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::ScrollValueChanged);
-	connect(horizontalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::ScrollValueChanged);
 }
 
 
@@ -62,13 +60,6 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 			scale(1 / 1.1, 1);
 		}
 	}
-
-	if (m_timeAxisPtr != nullptr){
-		QRectF visibleRect = SceneVisibleRect();
-		m_timeAxisPtr->setPos(0, visibleRect.bottom());
-	}
-
-	scene()->update();
 }
 
 
@@ -82,28 +73,12 @@ void CEventGraphicsView::resizeEvent(QResizeEvent* event)
 
 bool CEventGraphicsView::viewportEvent(QEvent *event)
 {
-	if (m_timeAxisPtr != nullptr){
-		switch (event->type()){
-		case QEvent::Wheel:
-			break;
-		case QEvent::DragMove:
-			break;
-		}
-	}
-
-	return BaseClass::viewportEvent(event);
-}
-
-
-// private slots
-
-
-void CEventGraphicsView::ScrollValueChanged(int value)
-{
-	if (m_timeAxisPtr != nullptr){
+	if (event->type() == QEvent::Paint && m_timeAxisPtr != nullptr){
 		QRectF visibleRect = SceneVisibleRect();
 		m_timeAxisPtr->setPos(0, visibleRect.bottom());
 	}
+
+	return BaseClass::viewportEvent(event);
 }
 
 

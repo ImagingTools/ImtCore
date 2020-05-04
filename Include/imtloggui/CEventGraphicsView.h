@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtloggui/CTimeAxis.h>
 
+
 namespace imtloggui
 {
 
@@ -30,9 +31,6 @@ protected:
 
 	// reimplemented (QAbstractScrollArea)
 	bool viewportEvent(QEvent *event) override;
-
-private slots:
-	void ScrollValueChanged(int value);
 
 private:
 	QRectF SceneVisibleRect() const;
