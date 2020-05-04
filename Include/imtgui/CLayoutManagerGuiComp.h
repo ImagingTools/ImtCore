@@ -16,7 +16,7 @@
 #include <iser/ISerializable.h>
 
 // ImtCore includes
-#include <imtgui/CLayout.h>
+#include <imtgui/ILayout.h>
 #include <imtgui/CHierarchicalLayoutWidget.h>
 #include <GeneratedFiles/imtgui/ui_CLayoutManagerGuiComp.h>
 
@@ -29,36 +29,28 @@ namespace imtgui
 	Layout editor.
 */
 class CLayoutManagerGuiComp:
-//	public iqtgui::TDesignerGuiCompBase<Ui::CLayoutManagerGuiComp>,
-    public iqtgui::TDesignerGuiObserverCompBase<Ui::CLayoutManagerGuiComp, imtgui::ILayout>,
-//	public virtual iser::ISerializable,
-//	protected imod::CSingleModelObserverBase,
-	public virtual ibase::ICommandsProvider
+			public iqtgui::TDesignerGuiObserverCompBase<Ui::CLayoutManagerGuiComp, imtgui::ILayout>,
+			public virtual ibase::ICommandsProvider
 {
 	Q_OBJECT
 
 public:
-	//typedef iqtgui::TDesignerGuiCompBase<Ui::CLayoutManagerGuiComp> BaseClass;
-
  	typedef iqtgui::TDesignerGuiObserverCompBase<Ui::CLayoutManagerGuiComp, imtgui::ILayout> BaseClass;
 
 	I_BEGIN_COMPONENT(CLayoutManagerGuiComp);
-	//I_REGISTER_INTERFACE(imod::IObserver);
-	I_REGISTER_INTERFACE(ibase::ICommandsProvider);
-	I_REGISTER_INTERFACE(iser::ISerializable);
-	I_REGISTER_SUBELEMENT(GuiViewOptionsList);
-	I_REGISTER_SUBELEMENT_INTERFACE(GuiViewOptionsList, iprm::IOptionsList, ExtractGuiViewOptionList);
-	//I_ASSIGN(m_undoManagerCompFact, "UndoManager", "Undo manager providing undo functionality", false, "UndoManager");
-	I_ASSIGN(m_commandsProviderCompPtr, "UndoManagerCommands", "Undo manager commands providing commands functionality", false, "UndoManagerCommandsProvider");	
-	I_ASSIGN(m_layoutPtr, "LayoutModel", "Layout model", false, "LayoutManager");
-	I_ASSIGN_MULTI_0(m_guiViewIdMultiAttrPtr, "ViewIds", "View ids to be used in layout creation", true);
-	I_ASSIGN_MULTI_0(m_guiViewMultiFactCompPtr, "ViewFactories", "View factories to create gui in layout", true);
-	// \todo think about icons for layout options widget
-	I_ASSIGN_MULTI_0(m_guiViewNameMultiAttrPtr, "ViewNames", "View names will be shown to user in layout widget", true);
-
+		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
+		I_REGISTER_INTERFACE(iser::ISerializable);
+		I_REGISTER_SUBELEMENT(GuiViewOptionsList);
+		I_REGISTER_SUBELEMENT_INTERFACE(GuiViewOptionsList, iprm::IOptionsList, ExtractGuiViewOptionList);
+		I_ASSIGN(m_commandsProviderCompPtr, "UndoManagerCommands", "Undo manager commands providing commands functionality", false, "UndoManagerCommandsProvider");	
+		I_ASSIGN(m_layoutPtr, "LayoutModel", "Layout model", false, "LayoutManager");
+		I_ASSIGN_MULTI_0(m_guiViewIdMultiAttrPtr, "ViewIds", "View ids to be used in layout creation", true);
+		I_ASSIGN_MULTI_0(m_guiViewMultiFactCompPtr, "ViewFactories", "View factories to create gui in layout", true);
+		// \todo think about icons for layout options widget
+		I_ASSIGN_MULTI_0(m_guiViewNameMultiAttrPtr, "ViewNames", "View names will be shown to user in layout widget", true);
 	I_END_COMPONENT
 
-	CLayoutManagerGuiComp(QWidget* parentPtr = Q_NULLPTR);
+	CLayoutManagerGuiComp();
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const;
@@ -67,7 +59,7 @@ public:
 	virtual bool Serialize(iser::IArchive& archive);
 
 protected:
-	QWidget* createCustomLayoutWidget(CLayout* layout);
+	QWidget* CreateCustomLayoutWidget(ILayout* layout);
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet);
@@ -104,10 +96,7 @@ private:
 		return &component.m_guiViewOptionsManager;
 	}
 
-
-
 private:
-//	I_FACT(idoc::IUndoManager, m_undoManagerCompFact);
 	I_REF(ibase::ICommandsProvider, m_commandsProviderCompPtr);
 	I_REF(imtgui::ILayout, m_layoutPtr);
 	I_MULTIATTR(QByteArray, m_guiViewIdMultiAttrPtr);
@@ -128,7 +117,6 @@ private:
 	typedef QMap<QByteArray, GuiObjectDelPtr> GuiObjectMap;
 	GuiObjectMap m_createdViewMap;
 	QByteArray m_activeId;
-	CLayout* m_rootLayout;
 
 	iprm::COptionsManager m_guiViewOptionsManager;
 };

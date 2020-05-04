@@ -20,9 +20,8 @@ namespace imtgui
 
 // public methods
 
-CLayoutManagerGuiComp::CLayoutManagerGuiComp(QWidget* parentPtr)
-	:m_layoutWidgetPtr(NULL),
-	m_rootLayout(NULL),
+CLayoutManagerGuiComp::CLayoutManagerGuiComp()
+	:m_layoutWidgetPtr(nullptr),
 	m_commands("&View", 100),
 	m_startEndEditModeCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1988),
 	m_clearCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF, 1988),
@@ -66,10 +65,10 @@ bool CLayoutManagerGuiComp::Serialize(iser::IArchive& archive)
 
 // protected methods
 
-QWidget* CLayoutManagerGuiComp::createCustomLayoutWidget(CLayout* layout)
+QWidget* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 {
-	QWidget* retVal = NULL;
-	if (layout->GetType() == ILayout::LT_NONE) {
+	QWidget* retVal = nullptr;
+	if (layout->GetType() == ILayout::LT_NONE){
 		CCustomLayoutWidget* customLayoutWidgetPtr = m_layoutWidgetPtr->createCustomWidget();
 		customLayoutWidgetPtr->SetId(layout->GetLayoutId());
 		customLayoutWidgetPtr->SetIcon(layout->GetIcon());
@@ -78,12 +77,12 @@ QWidget* CLayoutManagerGuiComp::createCustomLayoutWidget(CLayout* layout)
 		QByteArray viewId = layout->GetViewId();
 		if (!viewId.isEmpty()){
 			int index = m_guiViewIdMultiAttrPtr.FindValue(viewId);
-			if (index < 0) {
-				//		m_layoutWidgetPtr->SetWidgetToItem(id, QByteArray(), NULL);
+			if (index < 0){
+				//		m_layoutWidgetPtr->SetWidgetToItem(id, QByteArray(), nullptr);
 			}
-			else {
+			else{
 				istd::TSmartPtr<iqtgui::IGuiObject> newWidgetPtr(m_guiViewMultiFactCompPtr.CreateInstance(index));
-				if (newWidgetPtr->CreateGui(NULL)) {
+				if (newWidgetPtr->CreateGui(nullptr)){
 					customLayoutWidgetPtr->SetWidget(newWidgetPtr->GetWidget());
 					customLayoutWidgetPtr->SetViewId(viewId);
 					//m_layoutWidgetPtr->SetWidgetToItem(id, viewId, newWidgetPtr->GetWidget());
@@ -105,9 +104,9 @@ QWidget* CLayoutManagerGuiComp::createCustomLayoutWidget(CLayout* layout)
 			splitter->setOrientation(Qt::Vertical);
 		}
 		for (int i = 0; i < layout->GetChildsCount(); i++){
-			CLayout *child = dynamic_cast<CLayout*>(layout->GetChild(i));
-			if (child != NULL){
-				splitter->addWidget(createCustomLayoutWidget(child));
+			ILayout* childLayoutPtr = layout->GetChild(i);
+			if (childLayoutPtr != nullptr){
+				splitter->addWidget(CreateCustomLayoutWidget(childLayoutPtr));
 			}
 			//splitter->setSizes(layout->GetSizes());
 		}
@@ -119,22 +118,13 @@ QWidget* CLayoutManagerGuiComp::createCustomLayoutWidget(CLayout* layout)
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
-void CLayoutManagerGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
+void CLayoutManagerGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	qDebug() << "layout set";
-
-	if (m_layoutWidgetPtr != NULL){
-
+	if (m_layoutWidgetPtr != nullptr){
 		m_layoutWidgetPtr->ClearAll();
-		if (m_rootLayout != NULL) {
-			m_layoutWidgetPtr->layout()->addWidget(createCustomLayoutWidget(m_rootLayout));
-		}
 
+		m_layoutWidgetPtr->layout()->addWidget(CreateCustomLayoutWidget(GetObservedObject()));
 	}
-
-
-//	Q_ASSERT(GetObjectPtr() != NULL);
-	//GetObservedObject();
 }
 
 
@@ -171,7 +161,7 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 		for (int i = 0; i < commands->GetChildsCount(); i++)
 		{
 		    iqtgui::CHierarchicalCommand *command = dynamic_cast<iqtgui::CHierarchicalCommand*>(commands->GetChild(i));
-			if (command != NULL){
+			if (command != nullptr){
 				m_rootCommands.InsertChild(command);
 			}
 		}
@@ -187,8 +177,9 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 			m_guiViewOptionsManager.InsertOption(m_guiViewNameMultiAttrPtr[i], m_guiViewIdMultiAttrPtr[i]);
 		}
 	}
+
 	m_layoutWidgetPtr->SetAdditionalNames(additionalNames);
-	m_rootLayout = dynamic_cast<CLayout*>(GetObservedObject());
+
 	BaseClass::OnGuiCreated();
 }
 
@@ -208,14 +199,18 @@ void CLayoutManagerGuiComp::OnGuiRetranslate()
 
 void CLayoutManagerGuiComp::OnClearAll()
 {
-	if (m_layoutWidgetPtr != NULL) {
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
+
+	if (m_layoutWidgetPtr != nullptr){
 		QMessageBox msgBox;
 		msgBox.setText(tr("Do you want clear All views?"));
 		msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 		msgBox.setDefaultButton(QMessageBox::Cancel);
+
 		int ret = msgBox.exec();
-		if (ret == QMessageBox::Ok) {
-			m_rootLayout->Clear();
+		if (ret == QMessageBox::Ok){
+			rootLayoutPtr->Clear();
 		}
 	}
 
@@ -224,12 +219,15 @@ void CLayoutManagerGuiComp::OnClearAll()
 
 void CLayoutManagerGuiComp::OnLoad()
 {
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
+
 	QString fileName = QFileDialog::getOpenFileName(GetWidget(), tr("Open File"), QString(), QString("*.layout"));
-	if (!fileName.isEmpty()) {
+	if (!fileName.isEmpty()){
 		QFile file(fileName);
-		if (file.open(QIODevice::ReadOnly)) {
+		if (file.open(QIODevice::ReadOnly)){
 			iser::CXmlStringReadArchive archive(file.readAll());
-			if (m_rootLayout != NULL && m_rootLayout->Serialize(archive)) {
+			if ((rootLayoutPtr != nullptr) && rootLayoutPtr->Serialize(archive)){
 				// error
 			}
 
@@ -241,12 +239,15 @@ void CLayoutManagerGuiComp::OnLoad()
 
 void CLayoutManagerGuiComp::OnSave()
 {
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
+
 	QString fileName = QFileDialog::getSaveFileName(GetWidget(), tr("Save File"), QString(), QString("*.layout"));
-	if (!fileName.isEmpty()) {
+	if (!fileName.isEmpty()){
 		iser::CXmlStringWriteArchive archive;
-		if (m_rootLayout != NULL && m_rootLayout->Serialize(archive)) {
+		if (rootLayoutPtr != nullptr && rootLayoutPtr->Serialize(archive)){
 			QFile file(fileName);
-			if (file.open(QIODevice::WriteOnly)) {
+			if (file.open(QIODevice::WriteOnly)){
 				file.write(archive.GetString());
 				file.close();
 			}
@@ -257,11 +258,15 @@ void CLayoutManagerGuiComp::OnSave()
 
 void CLayoutManagerGuiComp::OnChangeTitle(const QByteArray& id, const QString& title)
 {
-	if (m_rootLayout != NULL) {
-		CLayout* layout = dynamic_cast<CLayout*>(m_rootLayout->FindChild(id));
-		if (layout != NULL) {
-			istd::CChangeGroup changeGroup(m_rootLayout);
-			layout->SetTitle(title);
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
+
+	if (rootLayoutPtr != nullptr){
+		ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
+		if (childLayoutPtr != nullptr){
+			istd::CChangeGroup changeGroup(childLayoutPtr);
+
+			childLayoutPtr->SetTitle(title);
 		}
 	}
 }
@@ -269,26 +274,34 @@ void CLayoutManagerGuiComp::OnChangeTitle(const QByteArray& id, const QString& t
 
 void CLayoutManagerGuiComp::OnChangeAlignTitle(const QByteArray& id, const ILayout::AlignType& align)
 {
-	if (m_rootLayout != NULL) {
-		CLayout* layout = dynamic_cast<CLayout*>(m_rootLayout->FindChild(id));
-		if (layout != NULL) {
-			layout->SetTitleAlign(align);
-		}
-	}
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
 
+	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
+	if (childLayoutPtr != nullptr){
+		childLayoutPtr->SetTitleAlign(align);
+	}
 }
 
 
 void CLayoutManagerGuiComp::OnChangeIcon(const QByteArray& id)
 {
-	QString fileName = QFileDialog::getOpenFileName(NULL,
-	tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp *.ico *.svg)"));
-	if (fileName.isEmpty() == false && m_rootLayout != NULL){
-		CLayout* layout = dynamic_cast<CLayout*>(m_rootLayout->FindChild(id));
-		if (layout != NULL) {
+	QString fileName = QFileDialog::getOpenFileName(
+				nullptr,
+				tr("Open Image"),
+				"",
+				tr("Image Files (*.png *.jpg *.bmp *.ico *.svg)"));
+
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
+
+	if (!fileName.isEmpty()){
+		ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
+		if (childLayoutPtr != nullptr){
 			QPixmap pixmap(fileName);
 			pixmap = pixmap.scaled(28, 28);
-			layout->SetIcon(pixmap);
+
+			childLayoutPtr->SetIcon(pixmap);
 		}
 	}
 }
@@ -296,22 +309,24 @@ void CLayoutManagerGuiComp::OnChangeIcon(const QByteArray& id)
 
 void CLayoutManagerGuiComp::OnSplitVertical(const QByteArray& id)
 {
-	if (m_rootLayout != NULL){
-		CLayout* layout = dynamic_cast<CLayout*>(m_rootLayout->FindChild(id));
-		if (layout != NULL){
-			layout->SetSplitterLayout(ILayout::LT_VERTICAL_SPLITTER);
-		}
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
+
+	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
+	if (childLayoutPtr != nullptr){
+		childLayoutPtr->SetType(ILayout::LT_VERTICAL_SPLITTER);
 	}
 }
 
 
 void CLayoutManagerGuiComp::OnSplitHorizontal(const QByteArray& id)
 {
-	if (m_rootLayout != NULL) {
-		CLayout* layout = dynamic_cast<CLayout*>(m_rootLayout->FindChild(id));
-		if (layout != NULL) {
-			layout->SetSplitterLayout(ILayout::LT_HORIZONTAL_SPLITTER);
-		}
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
+
+	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
+	if (childLayoutPtr != nullptr){
+		childLayoutPtr->SetType(ILayout::LT_HORIZONTAL_SPLITTER);
 	}
 }
 
@@ -321,21 +336,18 @@ void CLayoutManagerGuiComp::OnDelete()
 	istd::IChangeable::ChangeSet changeSet(0);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-	if (m_layoutWidgetPtr != NULL){
+	if (m_layoutWidgetPtr != nullptr){
 		m_layoutWidgetPtr->RemoveLayout(m_activeId);
 	}
-
 }
 
 
 void CLayoutManagerGuiComp::OnDeleteWidget(const QByteArray& id)
 {
-	//if (m_layoutWidgetPtr != NULL) {
-	//	m_layoutWidgetPtr->RemoveLayout(id);
-	//}
-	if (m_rootLayout != NULL) {
-		delete m_rootLayout->RemoveChild(id);
-	}
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
+
+	delete rootLayoutPtr->RemoveChild(id);
 }
 
 
@@ -351,7 +363,7 @@ void CLayoutManagerGuiComp::OnAddWidget()
 	//if (action != nullptr){
 	//	int index = action->data().toInt();
 	//	istd::TSmartPtr<iqtgui::IGuiObject> newWidgetPtr(m_guiViewMultiFactCompPtr.CreateInstance(index));
-	//	if (newWidgetPtr->CreateGui(NULL)){
+	//	if (newWidgetPtr->CreateGui(nullptr)){
 	//		m_layoutWidgetPtr->SetWidgetToItem(m_activeId, newWidgetPtr->GetWidget());
 	//		m_createdViewMap.insert(m_activeId, newWidgetPtr);
 	//	}
@@ -361,29 +373,31 @@ void CLayoutManagerGuiComp::OnAddWidget()
 
 void CLayoutManagerGuiComp::OnAddWidget(const QByteArray& id, int index)
 {
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
+
 	if (index < 0){
-		//m_layoutWidgetPtr->SetWidgetToItem(id, QByteArray(), NULL);
+		//m_layoutWidgetPtr->SetWidgetToItem(id, QByteArray(), nullptr);
 	}
 	else{
 		QByteArray viewId = m_guiViewIdMultiAttrPtr[index];
-		if (m_rootLayout != NULL) {
-			CLayout* layout = dynamic_cast<CLayout*>(m_rootLayout->FindChild(id));
-			if (layout != NULL) {
-				layout->SetViewId(viewId);
-			}
+
+		ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
+		if (childLayoutPtr != nullptr){
+			childLayoutPtr->SetViewId(viewId);
 		}
 	}
 
 
 	//if (index < 0){
-	//	m_layoutWidgetPtr->SetWidgetToItem(id, QByteArray(), NULL);
+	//	m_layoutWidgetPtr->SetWidgetToItem(id, QByteArray(), nullptr);
 	//}
-	//else {
+	//else{
 	//	istd::IChangeable::ChangeSet changeSet(0);
 	//	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	//	istd::TSmartPtr<iqtgui::IGuiObject> newWidgetPtr(m_guiViewMultiFactCompPtr.CreateInstance(index));
-	//	if (newWidgetPtr->CreateGui(NULL)) {
+	//	if (newWidgetPtr->CreateGui(nullptr)){
 	//		QByteArray viewId = m_guiViewIdMultiAttrPtr[index];
 	//		m_layoutWidgetPtr->SetWidgetToItem(id, viewId, newWidgetPtr->GetWidget());
 	//		m_createdViewMap.insert(id, newWidgetPtr);
@@ -395,11 +409,12 @@ void CLayoutManagerGuiComp::OnAddWidget(const QByteArray& id, int index)
 
 void CLayoutManagerGuiComp::OnAddWidgetByViewId(const QByteArray& id, const QByteArray& viewId)
 {
-	if (m_rootLayout != NULL) {
-		CLayout* layout = dynamic_cast<CLayout*>(m_rootLayout->FindChild(id));
-		if (layout != NULL) {
-			layout->SetViewId(viewId);
-		}
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
+
+	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
+	if (childLayoutPtr != nullptr){
+		childLayoutPtr->SetViewId(viewId);
 	}
 
 }
@@ -408,7 +423,7 @@ void CLayoutManagerGuiComp::OnAddWidgetByViewId(const QByteArray& id, const QByt
 void CLayoutManagerGuiComp::OnDropWidget(QByteArray id, QDropEvent* eventPtr)
 {
 	//const QMimeData* mimeDataPtr = eventPtr->mimeData();
-	//if (mimeDataPtr != NULL){
+	//if (mimeDataPtr != nullptr){
 	//	QByteArray mimeData = mimeDataPtr->data("widget-item");
 	//	qDebug() << "drop event for id " << id << " with data = " << mimeData;
 
@@ -417,9 +432,9 @@ void CLayoutManagerGuiComp::OnDropWidget(QByteArray id, QDropEvent* eventPtr)
 	//		int minCount = qMin(m_guiViewIdMultiAttrPtr.GetCount(), m_guiViewMultiFactCompPtr.GetCount());
 	//		minCount = qMin(minCount, m_guiViewNameMultiAttrPtr.GetCount());
 	//		for (int i = 0; i < minCount; ++i){
-	//			if ((m_layoutWidgetPtr != NULL) && (m_guiViewIdMultiAttrPtr[i] == mimeData)){
+	//			if ((m_layoutWidgetPtr != nullptr) && (m_guiViewIdMultiAttrPtr[i] == mimeData)){
 	//				istd::TSmartPtr<iqtgui::IGuiObject> newWidgetPtr(m_guiViewMultiFactCompPtr.CreateInstance(i));
-	//				if (newWidgetPtr->CreateGui(NULL)){
+	//				if (newWidgetPtr->CreateGui(nullptr)){
 	//					m_layoutWidgetPtr->SetWidgetToItem(id, newWidgetPtr->GetWidget());
 	//					m_createdViewMap.insert(id, newWidgetPtr);
 	//				}
@@ -456,7 +471,7 @@ void CLayoutManagerGuiComp::OnOpenMenu(QByteArray id, QMouseEvent* eventPtr)
 void CLayoutManagerGuiComp::OnClearWidget(QByteArray id)
 {
 	Q_ASSERT(m_createdViewMap.contains(id));
-	m_layoutWidgetPtr->SetWidgetToItem(m_activeId, QByteArray(), NULL);
+	m_layoutWidgetPtr->SetWidgetToItem(m_activeId, QByteArray(), nullptr);
 	m_createdViewMap[id]->DestroyGui();
 	m_createdViewMap.remove(id);
 }
@@ -464,9 +479,9 @@ void CLayoutManagerGuiComp::OnClearWidget(QByteArray id)
 
 void CLayoutManagerGuiComp::OnStartEndEditCommand()
 {
-	if (m_layoutWidgetPtr != NULL){
+	if (m_layoutWidgetPtr != nullptr){
 		QAction* actionPtr = dynamic_cast<QAction*>(sender());
-		if (actionPtr != NULL){
+		if (actionPtr != nullptr){
 			if (actionPtr->isChecked()){
 				m_layoutWidgetPtr->SetViewMode(CHierarchicalLayoutWidget::VM_EDIT);
 				m_clearCommand.setVisible(true);
