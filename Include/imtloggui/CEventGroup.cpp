@@ -43,8 +43,7 @@ QRectF CEventGroup::boundingRect() const
 void CEventGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	QPen pen;
-	pen = QPen(Qt::darkGray);
-	pen.setWidth(0);
+	pen = QPen(Qt::darkGray, 0);
 	painter->setPen(pen);
 	painter->setBrush(m_color);
 
