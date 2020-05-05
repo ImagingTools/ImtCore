@@ -106,6 +106,12 @@ QWidget* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 			ILayout* childLayoutPtr = layout->GetChild(i);
 			if (childLayoutPtr != nullptr){
 				splitterPtr->addWidget(CreateCustomLayoutWidget(childLayoutPtr));
+				if (m_isFixedLayoutPtr.IsValid() 
+					&& *m_isFixedLayoutPtr == true 
+					&& m_layoutWidgetPtr->GetViewMode() == CHierarchicalLayoutWidget::VM_NORMAL){
+					QSplitterHandle *hndl = splitterPtr->handle(i);
+					hndl->setEnabled(false);
+				}
 			}
 		}
 		SizeList sizes = layout->GetSizes();
@@ -158,6 +164,9 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 	Q_ASSERT_X(m_guiViewNameMultiAttrPtr.IsValid(), "CLayoutManagerGuiComp", "attribute ViewNames should be set");
 	Q_ASSERT_X((m_guiViewIdMultiAttrPtr.GetCount() == m_guiViewMultiFactCompPtr.GetCount()) &&
 		(m_guiViewNameMultiAttrPtr.GetCount() == m_guiViewMultiFactCompPtr.GetCount()), "CLayoutManagerGuiComp", "attributes ViewIds, ViewNames and ViewFactories should have the same count");
+
+	m_colorBorderPtr.IsValid() ? m_layoutWidgetPtr->SetBorderColor(QColor(QString(*m_colorBorderPtr))) : m_layoutWidgetPtr->SetBorderColor(QColor(QString("#808080")));
+	m_isShowBoxPtr.IsValid() ? m_layoutWidgetPtr->SetIsShowBox(*m_isShowBoxPtr) : m_layoutWidgetPtr->SetIsShowBox(true);
 
 	// add undo manager commands provider
 	if (m_commandsProviderCompPtr.IsValid()){
@@ -430,6 +439,22 @@ void CLayoutManagerGuiComp::OnStartEndEditCommand()
 				m_clearCommand.setVisible(false);
 				m_loadCommand.setVisible(false);
 				m_saveCommand.setVisible(false);
+
+			}
+
+			QMap<QSplitter*, QByteArray>::const_iterator iter = SplittersMap.constBegin();
+			while (iter != SplittersMap.constEnd()) {
+				QSplitter* splitterPtr = iter.key();
+				for (int i = 0; i < splitterPtr->count(); i++) {
+					QSplitterHandle *hndl = splitterPtr->handle(i);
+					bool fixedSplitter = false;
+					if (actionPtr->isChecked() == false && m_isFixedLayoutPtr.IsValid() == true
+						&& *m_isFixedLayoutPtr == true) {
+						fixedSplitter = true;
+					}
+					hndl->setEnabled(!fixedSplitter);
+				}
+				++iter;
 			}
 		}
 	}

@@ -39,7 +39,8 @@ QSplashScreen > QWidget#CopyrightLabel
 }
 
 
-QWidget#PageTree {
+QWidget#PageTree 
+{
     background-color: palette(midlight);
 /*    border-right: 1px solid rgb(200,200,202);*/
 }
@@ -65,9 +66,16 @@ QWidget#StatusFrame
     border-bottom: 1px solid #335777;
 }
 
-QWidget[ImtTopFrame=true] {
+QWidget[ImtTopFrame=true] 
+{
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(227,227,229), stop: 0.9 rgb(212,212,214), stop: 0.97 rgb(212,212,214), stop: 1.0 rgb(190,190,192)); 
     border-bottom: 1px solid rgb(180,180,182);
+}
+
+QWidget#EditPanel
+{
+    background: rgb(230,230,232);
+    margin-top: 1px; margin-left: 1px; margin-right: 1px; 
 }
 
 QWidget#LoadWorkflowButton

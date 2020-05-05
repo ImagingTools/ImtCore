@@ -32,7 +32,9 @@ namespace imtgui
 
 CHierarchicalLayoutWidget::CHierarchicalLayoutWidget(QWidget* parentPtr)
 	:QWidget(parentPtr),
-	m_viewMode(VM_UNDEFINED)
+	m_viewMode(VM_UNDEFINED),
+	m_borderColor(QColor("gray")),
+	m_isShowBox(true)
 {
 	setAutoFillBackground(true);
 	setLayout(new QVBoxLayout(this));
@@ -54,6 +56,11 @@ void CHierarchicalLayoutWidget::SetViewMode(ViewMode viewMode)
 	update();
 }
 
+
+CHierarchicalLayoutWidget::ViewMode CHierarchicalLayoutWidget::GetViewMode()
+{
+	return m_viewMode;
+}
 
 void CHierarchicalLayoutWidget::ClearAll()
 {
@@ -98,6 +105,30 @@ CCustomLayoutWidget* CHierarchicalLayoutWidget::createCustomWidget()
 	m_customWidgetMap.insert(id, customLayoutWidgetPtr);
 
 	return customLayoutWidgetPtr;
+}
+
+
+void CHierarchicalLayoutWidget::SetBorderColor(const QColor &color)
+{
+	m_borderColor = color;
+}
+
+
+QColor CHierarchicalLayoutWidget::GetBorderColor() const
+{
+	return m_borderColor;
+}
+
+
+void CHierarchicalLayoutWidget::SetIsShowBox(bool isShowBox)
+{
+	m_isShowBox = isShowBox;
+}
+
+
+bool CHierarchicalLayoutWidget::GetIsShowBox() const
+{
+	return m_isShowBox;
 }
 
 
@@ -328,15 +359,20 @@ void CCustomLayoutWidget::paintEvent(QPaintEvent* eventPtr)
 	QPainter painter(this);
 
 	painter.save();
-	painter.setOpacity(0.7);
+	//painter.setOpacity(0.7);
 
-	QPen pen(QColor("gray"));
-	if (m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT){
-		pen.setStyle(Qt::DashLine);
+	if (m_hierarchicalLayoutWidget.GetIsShowBox() == true 
+		|| m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT){
+
+		QPen pen(m_hierarchicalLayoutWidget.GetBorderColor());
+
+		if (m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT) {
+			pen.setStyle(Qt::DashLine);
+		}
+
+		painter.setPen(pen);
+		painter.drawRect(rect().adjusted(0, 0, -1, -1));
 	}
-
-	painter.setPen(pen);
-	painter.drawRect(rect().adjusted(0, 0, -1, -1));
 }
 
 

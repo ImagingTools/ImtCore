@@ -47,6 +47,9 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(GuiViewOptionsList, iprm::IOptionsList, ExtractGuiViewOptionList);
 		I_ASSIGN(m_commandsProviderCompPtr, "UndoManagerCommands", "Undo manager commands providing commands functionality", false, "UndoManagerCommandsProvider");	
 		I_ASSIGN(m_layoutPtr, "LayoutModel", "Layout model", false, "LayoutManager");
+		I_ASSIGN(m_isShowBoxPtr, "IsShowBox", "Show box", true, true);
+		I_ASSIGN(m_isFixedLayoutPtr, "IsFixedLayout", "Fixed layout", true, true);
+		I_ASSIGN(m_colorBorderPtr, "BorderColor", "Border color", true, "#808080");
 		I_ASSIGN_MULTI_0(m_guiViewIdMultiAttrPtr, "ViewIds", "View ids to be used in layout creation", true);
 		I_ASSIGN_MULTI_0(m_guiViewMultiFactCompPtr, "ViewFactories", "View factories to create gui in layout", true);
 		// \todo think about icons for layout options widget
@@ -99,6 +102,9 @@ private:
 private:
 	I_REF(ibase::ICommandsProvider, m_commandsProviderCompPtr);
 	I_REF(imtgui::ILayout, m_layoutPtr);
+	I_ATTR(bool, m_isFixedLayoutPtr);
+	I_ATTR(bool, m_isShowBoxPtr);
+	I_ATTR(QByteArray, m_colorBorderPtr);
 	I_MULTIATTR(QByteArray, m_guiViewIdMultiAttrPtr);
 	I_MULTIFACT(iqtgui::IGuiObject, m_guiViewMultiFactCompPtr);
 	I_MULTIATTR(QString, m_guiViewNameMultiAttrPtr);

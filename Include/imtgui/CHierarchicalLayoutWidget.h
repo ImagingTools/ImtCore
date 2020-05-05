@@ -43,10 +43,15 @@ public:
 	CHierarchicalLayoutWidget(QWidget* parentPtr = Q_NULLPTR);
 
 	void SetViewMode(ViewMode viewMode);
+	CHierarchicalLayoutWidget::ViewMode GetViewMode();
 	void ClearAll();
 	void SetAdditionalNames(QStringList& additionalNames);
 	void CleanLayoutRecursive(QLayout* layoutPtr);
 	CCustomLayoutWidget* createCustomWidget();
+	void SetBorderColor(const QColor &color);
+	QColor GetBorderColor() const;
+	void SetIsShowBox(bool isShowBox);
+	bool GetIsShowBox() const;
 
 protected:
 	friend class CCustomLayoutWidget;
@@ -73,6 +78,8 @@ private:
 	CustomWidgetMap m_customWidgetMap;
 	ViewMode m_viewMode;
 	QStringList m_additionalNames;
+	QColor m_borderColor;
+	bool m_isShowBox;
 };
 
 
