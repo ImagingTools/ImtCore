@@ -386,6 +386,7 @@ void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 
 void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 {
+	PasswordEdit->setFocus();
 	if (m_loginCompPtr.IsValid()){
 		QString userName = UserEdit->text();
 		QString password = PasswordEdit->text();
@@ -429,6 +430,10 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 		}
 		else{
 			QMessageBox::warning(GetQtWidget(), tr("Error"), tr("Wrong password"));
+			if (m_keyEnterTimerId != 0){
+				killTimer(m_keyEnterTimerId);
+			}
+			m_keyEnterTimerId = startTimer(500);
 		}
 	}
 
