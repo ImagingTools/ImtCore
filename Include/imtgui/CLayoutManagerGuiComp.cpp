@@ -123,7 +123,6 @@ QWidget* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 void CLayoutManagerGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (m_layoutWidgetPtr != nullptr){
-
 		m_layoutWidgetPtr->ClearAll();
 		SplittersMap.clear();
 
@@ -153,7 +152,6 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeAlignTitle(const QByteArray&, const ILayout::AlignType&)), this, SLOT(OnChangeAlignTitle(const QByteArray&, const ILayout::AlignType&)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeSizes(const QByteArray&, const SizeList&)), this, SLOT(OnChangeSizes(const QByteArray&, const SizeList&)), Qt::DirectConnection);
 
-	
 	// check views attributes
 	Q_ASSERT_X(m_guiViewIdMultiAttrPtr.IsValid(), "CLayoutManagerGuiComp", "attribute ViewIds should be set");
 	Q_ASSERT_X(m_guiViewMultiFactCompPtr.IsValid(), "CLayoutManagerGuiComp", "attribute ViewFactories should be set");
@@ -164,9 +162,8 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 	// add undo manager commands provider
 	if (m_commandsProviderCompPtr.IsValid()){
 		const iqtgui::CHierarchicalCommand *commands = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_commandsProviderCompPtr->GetCommands());
-		for (int i = 0; i < commands->GetChildsCount(); i++)
-		{
-		    iqtgui::CHierarchicalCommand *command = dynamic_cast<iqtgui::CHierarchicalCommand*>(commands->GetChild(i));
+		for (int i = 0; i < commands->GetChildsCount(); i++){
+			iqtgui::CHierarchicalCommand *command = dynamic_cast<iqtgui::CHierarchicalCommand*>(commands->GetChild(i));
 			if (command != nullptr){
 				m_rootCommands.InsertChild(command);
 			}
@@ -196,10 +193,9 @@ void CLayoutManagerGuiComp::OnGuiRetranslate()
 
 	// File commands emptyIcon
 	m_startEndEditModeCommand.SetVisuals(tr("Edit Mode"), tr("Edit Mode"), tr("EditMode"), QIcon(":/Icons/Edit"));
-	m_clearCommand.SetVisuals(tr("Clear All"), tr("Clear All"), tr("ClearAll"), QIcon(":/Icons/ClearLayouts"));
+	m_clearCommand.SetVisuals(tr("Clear All"), tr("Clear All"), tr("ClearAll"), QIcon(":/Icons/Clear"));
 	m_loadCommand.SetVisuals(tr("Load"), tr("Load"), tr("Load"), QIcon(":/Icons/Load"));
 	m_saveCommand.SetVisuals(tr("Save"), tr("Save"), tr("Save"), QIcon(":/Icons/Save"));
-
 }
 
 
@@ -219,7 +215,6 @@ void CLayoutManagerGuiComp::OnClearAll()
 			rootLayoutPtr->Clear();
 		}
 	}
-
 }
 
 
@@ -264,15 +259,19 @@ void CLayoutManagerGuiComp::OnSave()
 
 void CLayoutManagerGuiComp::OnChangeTitle(const QByteArray& id, const QString& title)
 {
-	ILayout* rootLayoutPtr = GetObservedObject();
-	Q_ASSERT(rootLayoutPtr != nullptr);
+	// The title was already changed in the editor, therefore we don't need any UI-updates anymore,
+	// just set the new title value to the data model:
+	if (!IsUpdateBlocked()){
+		UpdateBlocker blockUpdates(this);
 
-	if (rootLayoutPtr != nullptr){
-		ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
-		if (childLayoutPtr != nullptr){
-			istd::CChangeGroup changeGroup(childLayoutPtr);
+		ILayout* rootLayoutPtr = GetObservedObject();
+		Q_ASSERT(rootLayoutPtr != nullptr);
 
-			childLayoutPtr->SetTitle(title);
+		if (rootLayoutPtr != nullptr){
+			ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
+			if (childLayoutPtr != nullptr){
+				childLayoutPtr->SetTitle(title);
+			}
 		}
 	}
 }

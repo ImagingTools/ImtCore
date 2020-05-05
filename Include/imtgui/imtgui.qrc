@@ -106,7 +106,7 @@
         <file alias="ManualProcessingHighlight">Resources/Icons/ManualProcessingHighlight.svg</file>
         <file alias="DetailedHighlight">Resources/Icons/DetailedHighlight.svg</file>
         <file alias="ProductionOverviewHighlight">Resources/Icons/ProductionOverviewHighlight.svg</file>
-        <file alias="ClearLayouts">Resources/Icons/ClearLayers.svg</file>
+        <file alias="ClearLayers">Resources/Icons/ClearLayers.svg</file>
         <file alias="SplitVertical">Resources/Icons/SplitVertical.svg</file>
         <file alias="SplitHorizontal">Resources/Icons/SplitHoryzontal.svg</file>
         <file alias="Widgets">Resources/Icons/Widgets.svg</file>
