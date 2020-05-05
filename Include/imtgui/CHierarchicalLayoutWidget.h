@@ -73,7 +73,6 @@ private:
 	CustomWidgetMap m_customWidgetMap;
 	ViewMode m_viewMode;
 	QStringList m_additionalNames;
-	//QByteArray m_rootId;
 };
 
 
@@ -90,7 +89,6 @@ public:
 	void SetHighLightPalette();
 	bool SetWidget(QWidget* widgetPtr);
 	QWidget* GetWidget();
-	void SetIsHaveChilds(bool source);
 	void SetName(QString name);
 	QString GetName();
 	void SetEditMode(bool isEditMode);
@@ -117,7 +115,6 @@ protected Q_SLOTS:
 	void OnAlignRight();
 	void OnChangeIcon();
 	void OnTitleChanged();
-	void OnTitleEdited(const QString& newText);
 
 private:
 	CHierarchicalLayoutWidget& m_hierarchicalLayoutWidget;
@@ -126,8 +123,6 @@ private:
 	QByteArray m_viewId;
 	QWidget* m_externalWidgetPtr;
 	ILayout::AlignType m_titleAlign;
-	QTimer m_editTitleTimer;
-
 };
 
 
