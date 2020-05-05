@@ -167,8 +167,15 @@ public:
 	*/
 	virtual ILayout* RemoveChild(const QByteArray& id) = 0;
 
+	/**
+		Split current layout and insert new sublayout.
+	*/
 	virtual void SplitLayout(ILayout::LayoutType type) = 0;
 
+	/**
+		Split current layout and insert new sublayout.
+	*/
+	virtual void CopyData(ILayout* source) = 0;
 };
 
 

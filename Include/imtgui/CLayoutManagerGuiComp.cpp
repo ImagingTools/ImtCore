@@ -59,13 +59,6 @@ const ibase::IHierarchicalCommand* CLayoutManagerGuiComp::GetCommands() const
 }
 
 
-bool CLayoutManagerGuiComp::Serialize(iser::IArchive& archive)
-{
-	return m_layoutWidgetPtr->Serialize(archive);
-//	return true;
-}
-
-
 // protected methods
 
 QWidget* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
@@ -344,43 +337,12 @@ void CLayoutManagerGuiComp::OnSplitHorizontal(const QByteArray& id)
 }
 
 
-void CLayoutManagerGuiComp::OnDelete()
-{
-	istd::IChangeable::ChangeSet changeSet(0);
-	istd::CChangeNotifier changeNotifier(this, &changeSet);
-
-	if (m_layoutWidgetPtr != nullptr){
-		m_layoutWidgetPtr->RemoveLayout(m_activeId);
-	}
-}
-
-
 void CLayoutManagerGuiComp::OnDeleteWidget(const QByteArray& id)
 {
 	ILayout* rootLayoutPtr = GetObservedObject();
 	Q_ASSERT(rootLayoutPtr != nullptr);
 
 	delete rootLayoutPtr->RemoveChild(id);
-}
-
-
-void CLayoutManagerGuiComp::OnClear()
-{
-	OnClearWidget(m_activeId);
-}
-
-
-void CLayoutManagerGuiComp::OnAddWidget()
-{
-	//QAction *action = qobject_cast<QAction*> (sender());
-	//if (action != nullptr){
-	//	int index = action->data().toInt();
-	//	istd::TSmartPtr<iqtgui::IGuiObject> newWidgetPtr(m_guiViewMultiFactCompPtr.CreateInstance(index));
-	//	if (newWidgetPtr->CreateGui(nullptr)){
-	//		m_layoutWidgetPtr->SetWidgetToItem(m_activeId, newWidgetPtr->GetWidget());
-	//		m_createdViewMap.insert(m_activeId, newWidgetPtr);
-	//	}
-	//}
 }
 
 
@@ -450,62 +412,6 @@ void CLayoutManagerGuiComp::OnSplitterMoveFinished()
 		}
 		++i;
 	}
-}
-
-void CLayoutManagerGuiComp::OnDropWidget(QByteArray id, QDropEvent* eventPtr)
-{
-	//const QMimeData* mimeDataPtr = eventPtr->mimeData();
-	//if (mimeDataPtr != nullptr){
-	//	QByteArray mimeData = mimeDataPtr->data("widget-item");
-	//	qDebug() << "drop event for id " << id << " with data = " << mimeData;
-
-	//	// gui views part
-	//	if (m_guiViewIdMultiAttrPtr.IsValid() && m_guiViewMultiFactCompPtr.IsValid() && m_guiViewNameMultiAttrPtr.IsValid()){
-	//		int minCount = qMin(m_guiViewIdMultiAttrPtr.GetCount(), m_guiViewMultiFactCompPtr.GetCount());
-	//		minCount = qMin(minCount, m_guiViewNameMultiAttrPtr.GetCount());
-	//		for (int i = 0; i < minCount; ++i){
-	//			if ((m_layoutWidgetPtr != nullptr) && (m_guiViewIdMultiAttrPtr[i] == mimeData)){
-	//				istd::TSmartPtr<iqtgui::IGuiObject> newWidgetPtr(m_guiViewMultiFactCompPtr.CreateInstance(i));
-	//				if (newWidgetPtr->CreateGui(nullptr)){
-	//					m_layoutWidgetPtr->SetWidgetToItem(id, newWidgetPtr->GetWidget());
-	//					m_createdViewMap.insert(id, newWidgetPtr);
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-}
-
-
-void CLayoutManagerGuiComp::OnOpenMenu(QByteArray id, QMouseEvent* eventPtr)
-{
-	m_activeId = id;
-	QMenu menu(GetQtWidget());
-//	menu.addAction("Clear All", this, &CLayoutManagerComp::OnClearAll);
-	//menu.addAction("Change Name", this, &CLayoutManagerComp::OnChangeName);
-	//menu.addAction("Split Vertical", this, &CLayoutManagerComp::OnSplitVertical);
-	//menu.addAction("Split Horizontal", this, &CLayoutManagerComp::OnSplitHorizontal);
-	//menu.addAction("Delete", this, &CLayoutManagerComp::OnDelete);
-	if (m_createdViewMap.contains(id)){
-		menu.addAction("Clear", this, &CLayoutManagerGuiComp::OnClear);
-	}
-	menu.addSeparator();
-
-	for (int i = 0; i < m_guiViewOptionsManager.GetOptionsCount(); i++){
-		QString name = m_guiViewOptionsManager.GetOptionName(i);
-		//QAction *action = menu.addAction("Insert " + name, this, &CLayoutManagerComp::OnAddWidget);
-		//action->setData(i);
-	}
-	menu.exec(eventPtr->globalPos());
-}
-
-
-void CLayoutManagerGuiComp::OnClearWidget(QByteArray id)
-{
-	Q_ASSERT(m_createdViewMap.contains(id));
-	m_layoutWidgetPtr->SetWidgetToItem(m_activeId, QByteArray(), nullptr);
-	m_createdViewMap[id]->DestroyGui();
-	m_createdViewMap.remove(id);
 }
 
 

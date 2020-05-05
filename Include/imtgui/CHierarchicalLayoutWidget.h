@@ -1,6 +1,7 @@
 #pragma once
 
 // Qt includes
+#include <QtCore/QTimer>
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
 #include <QtWidgets/QWidget>
@@ -31,25 +32,6 @@ public:
 	typedef QList<QByteArray> IdsList;
 	typedef QList<int> SizeList;
 
-	//enum LayoutType
-	//{
-	//	LT_NONE = 0,
-	//	LT_VERTICAL_SPLITTER,
-	//	LT_HORIZONTAL_SPLITTER,
-	//	LT_OBJECT,
-	//	LT_MERGE
-	//};
-
-	//I_DECLARE_ENUM(LayoutType, LT_NONE, LT_VERTICAL_SPLITTER, LT_HORIZONTAL_SPLITTER, LT_OBJECT, LT_MERGE);
-
-	//enum AlignType
-	//{
-	//	AT_LEFT = 0,
-	//	AT_RIGHT,
-	//	AT_H_CENTER
-	//};
-
-//	I_DECLARE_ENUM(AlignType, AT_LEFT, AT_RIGHT, AT_H_CENTER);
 
 	enum ViewMode
 	{
@@ -61,60 +43,15 @@ public:
 	CHierarchicalLayoutWidget(QWidget* parentPtr = Q_NULLPTR);
 
 	void SetViewMode(ViewMode viewMode);
-	bool SetRootItemId(const QByteArray& id);
-	bool SetLayoutToItem(const QByteArray& id, ILayout::LayoutType type, int count, IdsList* idsListPtr = NULL);
-	bool SetItemSizes(const QByteArray& id, const SizeList& sizeList);
-	bool SetWidgetToItem(const QByteArray& id, const QByteArray& viewId, QWidget* widgetPtr);
-
-	QByteArray GetRootItemId();
-	IdsList GetItemChildIdList(const QByteArray& id);
-	ILayout::LayoutType GetItemLayoutType(const QByteArray& id);
-	SizeList GetItemSizes(const QByteArray& id);
 	void ClearAll();
-	void ResetWidget();
-	void SetSplitterLayout(const QByteArray& id, Qt::Orientation orientation, int count, IdsList* idsListPtr = NULL);
-	void MergeLayout(const QByteArray& id);
-	void RemoveLayout(const QByteArray& id);
-	void SetName(const QByteArray& id, QString &name);
-	QString GetName(const QByteArray& id);
 	void SetAdditionalNames(QStringList& additionalNames);
-	bool Serialize(iser::IArchive& archive); // callbackFunc for get Widget
 	void CleanLayoutRecursive(QLayout* layoutPtr);
 	CCustomLayoutWidget* createCustomWidget();
 
 protected:
 	friend class CCustomLayoutWidget;
-	void OnDropEvent(const QByteArray& id, QDropEvent* eventPtr);
-	void OnMouseReleaseEvent(const QByteArray& id, QMouseEvent* eventPtr);
-	void OnSplitterMoved(const QByteArray& id, SizeList sizeList);
 
 private:
-	struct InternalItemData{
-		InternalItemData(QByteArray idIn, IdsList childItemsIn = IdsList(), ILayout::LayoutType layoutTypeIn = ILayout::LayoutType::LT_NONE, SizeList sizeListIn = SizeList())
-			:id(idIn),
-			childItems(childItemsIn),
-			layoutType(layoutTypeIn),
-			sizeList(sizeListIn)
-		{
-		}
-
-		QByteArray id;
-		IdsList childItems;
-		ILayout::LayoutType layoutType;
-		SizeList sizeList;
-
-		bool operator<(const InternalItemData& item){
-			return id < item.id;
-		}
-		bool operator==(const InternalItemData& item){
-			return id == item.id;
-		}
-	};
-
-private:
-	bool SerializeRecursive(iser::IArchive& archive, QWidget** widget);
-	void IdsListCollectChildIdsRecursive(const QByteArray& id, IdsList& idList);
-	InternalItemData* GetInternalItem(const QByteArray& id);
 
 Q_SIGNALS:
 	void EmitLayoutChanged(QByteArray id, ILayout::LayoutType type, int count);
@@ -134,10 +71,9 @@ Q_SIGNALS:
 private:
 	typedef QMap<QByteArray, CCustomLayoutWidget*> CustomWidgetMap;
 	CustomWidgetMap m_customWidgetMap;
-	QList<InternalItemData> m_internalItemList;
 	ViewMode m_viewMode;
 	QStringList m_additionalNames;
-	QByteArray m_rootId;
+	//QByteArray m_rootId;
 };
 
 
@@ -170,14 +106,8 @@ public:
 protected:
 	// reimplemented (QWidget)
 	virtual void paintEvent(QPaintEvent* eventPtr) Q_DECL_OVERRIDE;
-	virtual void dragEnterEvent(QDragEnterEvent* eventPtr) Q_DECL_OVERRIDE;
-	virtual void dragLeaveEvent(QDragLeaveEvent* eventPtr) Q_DECL_OVERRIDE;
-	virtual void dropEvent(QDropEvent* eventPtr) Q_DECL_OVERRIDE;
-	virtual void mouseReleaseEvent(QMouseEvent *eventPtr) Q_DECL_OVERRIDE;
 
 protected Q_SLOTS:
-	void OnSplitterMoved(int pos, int index);
-	void OnNamePosition();
 	void OnAddWidget();
 	void OnDeleteWidget();
 	void OnSplitVertical();
@@ -194,12 +124,10 @@ private:
 	CCustomLayoutWidget* m_parentCustomWidgetPtr;
 	QByteArray m_id;
 	QByteArray m_viewId;
-	QWidget* m_editPanelPtr;
 	QWidget* m_externalWidgetPtr;
-	QString m_name;
-	int m_titleSize;
-	bool m_isHaveChilds;
 	ILayout::AlignType m_titleAlign;
+	QTimer m_editTitleTimer;
+
 };
 
 

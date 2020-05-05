@@ -18,6 +18,7 @@
 
 // ImtCore includes
 #include <imtgui/ILayout.h>
+#include <imtgui/ILayout.h>
 #include <imtgui/CHierarchicalLayoutWidget.h>
 #include <GeneratedFiles/imtgui/ui_CLayoutManagerGuiComp.h>
 
@@ -57,9 +58,6 @@ public:
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const;
 
-	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive);
-
 protected:
 	QWidget* CreateCustomLayoutWidget(ILayout* layout);
 
@@ -76,9 +74,6 @@ protected:
 protected Q_SLOTS:
 	void OnSplitterMoved(int pos, int index);
 	void OnSplitterMoveFinished();
-	void OnDropWidget(QByteArray id, QDropEvent* eventPtr);
-	void OnOpenMenu(QByteArray id, QMouseEvent* eventPtr);
-	void OnClearWidget(QByteArray id);
 	void OnStartEndEditCommand();
 	void OnClearAll();
 	void OnLoad();
@@ -88,10 +83,7 @@ protected Q_SLOTS:
 	void OnChangeIcon(const QByteArray& id);
 	void OnSplitVertical(const QByteArray& id);
 	void OnSplitHorizontal(const QByteArray& id);
-	void OnDelete();
 	void OnDeleteWidget(const QByteArray& id);
-	void OnClear();
-	void OnAddWidget();
 	void OnAddWidget(const QByteArray& id, int index);
 	void OnAddWidgetByViewId(const QByteArray& id, const QByteArray& viewId);
 	void OnChangeSizes(const QByteArray& id, const SizeList& sizeList);
@@ -122,9 +114,6 @@ private:
 	iqtgui::CHierarchicalCommand m_saveCommand;
 
 	QTimer m_splitterTimer;
-	typedef istd::TSmartPtr<iqtgui::IGuiObject> GuiObjectDelPtr;
-	typedef QMap<QByteArray, GuiObjectDelPtr> GuiObjectMap;
-	GuiObjectMap m_createdViewMap;
 	QByteArray m_activeId;
 	QMap<QSplitter*, QByteArray> SplittersMap;
 
