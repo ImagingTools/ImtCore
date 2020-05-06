@@ -2,12 +2,11 @@
 
 
 // Qt includes
-#include <QDebug>
+#include <QtCore/QDebug>
 #include <QtCore/QRectF>
 #include <QtGui/QPen>
 #include <QtGui/QFont>
 #include <QtGui/QPainter>
-#include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
@@ -88,7 +87,7 @@ QRectF CTimeAxis::boundingRect() const
 }
 
 
-void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* /*widget*/)
 {
 	// Full rectangle of the axis:
 	QRectF axisRect = boundingRect();
@@ -112,7 +111,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 	QString beginTime = m_startDateTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
 	QString endTime = m_endDateTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
-	int labelWidth = option->fontMetrics.width(beginTime);
+	int labelWidth = option->fontMetrics.horizontalAdvance(beginTime);
 
 	double majorStepSize = 1.5 * labelWidth;
 	int majorTicksCount = 1 + int(0.5 + viewWidth / majorStepSize);

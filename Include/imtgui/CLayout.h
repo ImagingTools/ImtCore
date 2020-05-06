@@ -28,7 +28,6 @@ public:
 	virtual ~CLayout();
 
 	// reimplemented (imtgui::ILayout)
-	virtual void SetLayoutId(const QByteArray& id) Q_DECL_OVERRIDE;
 	virtual QByteArray GetLayoutId() const Q_DECL_OVERRIDE;
 	virtual void SetType(const LayoutType& type) Q_DECL_OVERRIDE;
 	virtual LayoutType GetType() const Q_DECL_OVERRIDE;
@@ -51,15 +50,15 @@ public:
 	virtual ILayout* TakeFirst() Q_DECL_OVERRIDE;
 	virtual ILayout* TakeLast() Q_DECL_OVERRIDE;
 	virtual void Clear() Q_DECL_OVERRIDE;
-	virtual ILayout* FindChild(const QByteArray& id) Q_DECL_OVERRIDE;
+	virtual ILayout* FindChild(const QByteArray& id) const Q_DECL_OVERRIDE;
 	virtual ILayout* RemoveChild(const QByteArray& id) Q_DECL_OVERRIDE;
 	virtual void SplitLayout(ILayout::LayoutType type) Q_DECL_OVERRIDE;
-	virtual void CopyData(ILayout* source) Q_DECL_OVERRIDE;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) Q_DECL_OVERRIDE;
 
 private:
+	void CopyData(ILayout* source);
 	bool InternalSerializeItemRecursive(iser::IArchive& archive);
 
 private:

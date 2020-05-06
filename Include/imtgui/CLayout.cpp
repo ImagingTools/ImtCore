@@ -42,12 +42,6 @@ CLayout::~CLayout()
 
 // reimplemented (imtgui::ILayout)
 
-void CLayout::SetLayoutId(const QByteArray& id)
-{
-	m_id = id;
-}
-
-
 QByteArray CLayout::GetLayoutId() const
 {
 	return m_id;
@@ -180,9 +174,12 @@ void CLayout::InsertChild(int index, ILayout* layout)
 	else{
 		m_childs.insert(index, layout);
 	}
+
 	CLayout* cLayout = dynamic_cast<CLayout*>(layout);
 	if (cLayout != nullptr){
 		cLayout->m_parent = this;
+
+		SetSlavePtr(cLayout);
 	}
 }
 
@@ -198,8 +195,10 @@ ILayout* CLayout::TakeChild(int index)
 	ILayout* retVal = nullptr;
 	if (index > -1 && index < m_childs.count()){
 		istd::CChangeNotifier changeNotifier(this);
+
 		retVal = m_childs.takeAt(index);
 	}
+
 	return retVal;
 }
 
@@ -219,9 +218,11 @@ ILayout* CLayout::TakeLast()
 void CLayout::Clear()
 {
 	istd::CChangeNotifier changeNotifier(this);
+
 	while (m_childs.count() > 0){
 		delete m_childs.takeAt(0);
 	}
+
 	m_icon = QPixmap();
 	m_title = "No name";
 	m_layoutType = LT_NONE;
@@ -231,11 +232,11 @@ void CLayout::Clear()
 }
 
 
-ILayout* CLayout::FindChild(const QByteArray& id)
+ILayout* CLayout::FindChild(const QByteArray& id) const
 {
 	ILayout* retVal = nullptr;
 	if (m_id == id){
-		return this;
+		return const_cast<CLayout*>(this);
 	}
 
 	for (ILayout* layout : m_childs){
@@ -279,7 +280,6 @@ ILayout* CLayout::RemoveChild(const QByteArray& id)
 							delete parentParent->m_childs.takeAt(index);
 							parentParent->InsertChild(index, layout);
 						}
-
 					}
 				}
 			}
@@ -296,44 +296,32 @@ ILayout* CLayout::RemoveChild(const QByteArray& id)
 
 void CLayout::SplitLayout(ILayout::LayoutType type)
 {
-	istd::CChangeGroup changeNotifier(this);
+	istd::CChangeGroup changeGroup(this);
 	
 	ILayout* parentLayoutPtr = GetParent();
+
 	if ((parentLayoutPtr != nullptr) && parentLayoutPtr->GetType() == ILayout::LT_NONE){
-		parentLayoutPtr->AppendChild(new CLayout());
+		parentLayoutPtr->AppendChild(new CLayout(this));
 	}
 	else{
 		// Create first sub-layout (copy from parent):
-		CLayout* newLayout = new CLayout(this);
-		newLayout->CopyData(this);
+		CLayout* leftLayoutPtr = new CLayout(this);
+		leftLayoutPtr->CopyData(this);
 
 		// Reset parent layout:
 		Clear();
-		SetLayoutId(QUuid::createUuid().toByteArray());
+
+		m_id = QUuid::createUuid().toByteArray();
 		
 		SetType(type);
-		AppendChild(newLayout);
+		AppendChild(leftLayoutPtr);
 
 		// Create second sub layout:
-		newLayout = new CLayout(this);
+		CLayout* rightLayout = new CLayout(this);
 
-		AppendChild(newLayout);
+		AppendChild(rightLayout);
 	}
 }
-
-void CLayout::CopyData(ILayout* source)
-{
-	istd::CChangeNotifier changeNotifier(this);
-
-	m_id = source->GetLayoutId();
-	m_layoutType = source->GetType();
-	m_alignType = source->GetTitleAlign();
-	m_title = source->GetTitle();
-	m_icon = source->GetIcon();
-	m_viewId = source->GetViewId();
-	m_sizes = source->GetSizes();
-}
-
 
 
 // reimplemented (iser::ISerializable)
@@ -347,6 +335,20 @@ bool CLayout::Serialize(iser::IArchive& archive)
 	}
 
 	return InternalSerializeItemRecursive(archive);
+}
+
+
+// private methods
+
+void CLayout::CopyData(ILayout* source)
+{
+	m_id = source->GetLayoutId();
+	m_layoutType = source->GetType();
+	m_alignType = source->GetTitleAlign();
+	m_title = source->GetTitle();
+	m_icon = source->GetIcon();
+	m_viewId = source->GetViewId();
+	m_sizes = source->GetSizes();
 }
 
 
