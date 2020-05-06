@@ -179,7 +179,7 @@ void CLayout::InsertChild(int index, ILayout* layout)
 	if (cLayout != nullptr){
 		cLayout->m_parent = this;
 
-		SetSlavePtr(cLayout);
+		cLayout->SetSlavePtr(this);
 	}
 }
 
