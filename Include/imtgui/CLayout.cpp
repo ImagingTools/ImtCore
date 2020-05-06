@@ -299,8 +299,7 @@ void CLayout::SplitLayout(ILayout::LayoutType type)
 	istd::CChangeGroup changeGroup(this);
 	
 	ILayout* parentLayoutPtr = GetParent();
-
-	if ((parentLayoutPtr != nullptr) && parentLayoutPtr->GetType() == ILayout::LT_NONE){
+	if ((parentLayoutPtr != nullptr) && parentLayoutPtr->GetType() == type){
 		parentLayoutPtr->AppendChild(new CLayout(this));
 	}
 	else{

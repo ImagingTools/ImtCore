@@ -116,6 +116,8 @@ private:
 	iqtgui::CHierarchicalCommand m_loadCommand;
 	iqtgui::CHierarchicalCommand m_saveCommand;
 
+	iqtgui::CHierarchicalCommand* m_undoCommands;
+
 	QTimer m_splitterTimer;
 	QByteArray m_activeId;
 	QMap<QSplitter*, QByteArray> SplittersMap;

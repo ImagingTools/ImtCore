@@ -174,7 +174,12 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 		for (int i = 0; i < commands->GetChildsCount(); i++){
 			iqtgui::CHierarchicalCommand *command = dynamic_cast<iqtgui::CHierarchicalCommand*>(commands->GetChild(i));
 			if (command != nullptr){
-				m_rootCommands.InsertChild(command);
+				m_undoCommands = command;
+				m_rootCommands.InsertChild(m_undoCommands);
+				for (int i = 0; i < m_undoCommands->GetChildsCount(); i++){
+					dynamic_cast<iqtgui::CHierarchicalCommand*>(m_undoCommands->GetChild(i))->setVisible(false);
+				}
+				break;
 			}
 		}
 	}
@@ -433,12 +438,19 @@ void CLayoutManagerGuiComp::OnStartEndEditCommand()
 				m_clearCommand.setVisible(true);
 				m_loadCommand.setVisible(true);
 				m_saveCommand.setVisible(true);
+				for (int i = 0; i < m_undoCommands->GetChildsCount(); i++){
+					dynamic_cast<iqtgui::CHierarchicalCommand*>(m_undoCommands->GetChild(i))->setVisible(true);
+				}
+
 			}
 			else{
 				m_layoutWidgetPtr->SetViewMode(CHierarchicalLayoutWidget::VM_NORMAL);
 				m_clearCommand.setVisible(false);
 				m_loadCommand.setVisible(false);
 				m_saveCommand.setVisible(false);
+				for (int i = 0; i < m_undoCommands->GetChildsCount(); i++){
+					dynamic_cast<iqtgui::CHierarchicalCommand*>(m_undoCommands->GetChild(i))->setVisible(false);
+				}
 
 			}
 
