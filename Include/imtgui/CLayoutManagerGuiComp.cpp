@@ -331,6 +331,8 @@ void CLayoutManagerGuiComp::OnSplitVertical(const QByteArray& id)
 	ILayout* rootLayoutPtr = GetObservedObject();
 	Q_ASSERT(rootLayoutPtr != nullptr);
 
+	istd::CChangeGroup changeGroup(rootLayoutPtr);
+
 	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
 	if (childLayoutPtr != nullptr){
 		childLayoutPtr->SplitLayout(ILayout::LT_VERTICAL_SPLITTER);
@@ -342,6 +344,8 @@ void CLayoutManagerGuiComp::OnSplitHorizontal(const QByteArray& id)
 {
 	ILayout* rootLayoutPtr = GetObservedObject();
 	Q_ASSERT(rootLayoutPtr != nullptr);
+
+	istd::CChangeGroup changeGroup(rootLayoutPtr);
 
 	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
 	if (childLayoutPtr != nullptr){
