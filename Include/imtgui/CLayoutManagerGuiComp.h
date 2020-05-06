@@ -71,9 +71,6 @@ protected:
 	virtual void OnGuiCreated();
 	virtual void OnGuiRetranslate(); 
 
-	// for finish moved splitter signal
-
-
 protected Q_SLOTS:
 	void OnSplitterMoved(int pos, int index);
 	void OnSplitterMoveFinished();
