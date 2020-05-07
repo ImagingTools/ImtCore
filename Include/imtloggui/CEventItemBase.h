@@ -7,7 +7,6 @@
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
 // ImtCore includes
-#include <imtloggui/IChartComponent.h>
 #include <ilog/IMessageConsumer.h>
 
 
