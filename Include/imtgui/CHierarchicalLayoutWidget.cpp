@@ -157,8 +157,9 @@ CCustomLayoutWidget::CCustomLayoutWidget(
 	connect(AlignCenter, &QToolButton::clicked, this, &CCustomLayoutWidget::OnAlignCenter);
 	connect(AlignRight, &QToolButton::clicked, this, &CCustomLayoutWidget::OnAlignRight);
 	connect(ChangeIconButton, &QToolButton::clicked, this, &CCustomLayoutWidget::OnChangeIcon);
+	connect(Settings, &QToolButton::clicked, this, &CCustomLayoutWidget::OnChangeSettings);
 	connect(TitleNameEdit, &QLineEdit::editingFinished, this, &CCustomLayoutWidget::OnTitleChanged);
-
+	
 	QAction *action;
 	for (int i = -1; i < m_hierarchicalLayoutWidget.m_additionalNames.count(); i++){
 		if (i < 0){
@@ -350,6 +351,12 @@ ILayout::AlignType CCustomLayoutWidget::GetTitleAlign()
 }
 
 
+void CCustomLayoutWidget::SetLayoutProperties(const ILayout::LayoutProperties &properties)
+{
+	m_properties = properties;
+}
+
+
 // protected methods
 
 // reimplemented (QWidget)
@@ -361,10 +368,12 @@ void CCustomLayoutWidget::paintEvent(QPaintEvent* eventPtr)
 	painter.save();
 	//painter.setOpacity(0.7);
 
-	if (m_hierarchicalLayoutWidget.GetIsShowBox() == true 
+//	if (m_hierarchicalLayoutWidget.GetIsShowBox() == true 
+	if (m_properties.isShowBox == true
 		|| m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT){
 
-		QPen pen(m_hierarchicalLayoutWidget.GetBorderColor());
+//		QPen pen(m_hierarchicalLayoutWidget.GetBorderColor());
+		QPen pen(m_properties.borderColor);
 
 		if (m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT) {
 			pen.setStyle(Qt::DashLine);
@@ -384,6 +393,18 @@ void CCustomLayoutWidget::OnAddWidget()
 		int index = actions.indexOf(action) - 1;
 		Q_EMIT m_hierarchicalLayoutWidget.EmitAddWidget(m_id, index);
 	}
+}
+
+
+void CCustomLayoutWidget::OnChangeSettings()
+{
+	CLayoutSettingsDialog settingsDialog;
+	settingsDialog.SetLayoutProperties(m_properties);
+	if (settingsDialog.exec() == QDialog::Accepted){
+		m_properties = settingsDialog.GetLayoutProperties();
+		Q_EMIT m_hierarchicalLayoutWidget.EmitChangeProperties(m_id, m_properties);
+	}
+
 }
 
 

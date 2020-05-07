@@ -12,6 +12,7 @@
 #include <iser/CXmlStringWriteArchive.h>
 #include <iser/CXmlStringReadArchive.h>
 #include <imtgui/ILayout.h>
+#include <imtgui/CLayoutSettingsDialog.h>
 
 
 namespace imtgui
@@ -72,6 +73,7 @@ Q_SIGNALS:
 	void EmitChangeAlignTitle(const QByteArray& id, const ILayout::AlignType& align);
 	void EmitChangeTitle(const QByteArray& id, const QString& title);
 	void EmitChangeSizes(const QByteArray& id, const SizeList& sizeList);
+	void EmitChangeProperties(const QByteArray& id, const ILayout::LayoutProperties& properties);
 
 private:
 	typedef QMap<QByteArray, CCustomLayoutWidget*> CustomWidgetMap;
@@ -107,6 +109,7 @@ public:
 	void SetViewId(const QByteArray &viewId);
 	void SetTitleAlign(const ILayout::AlignType &align);
 	ILayout::AlignType GetTitleAlign();
+    void SetLayoutProperties(const ILayout::LayoutProperties &properties);
 
 protected:
 	// reimplemented (QWidget)
@@ -114,6 +117,7 @@ protected:
 
 protected Q_SLOTS:
 	void OnAddWidget();
+	void OnChangeSettings();
 	void OnDeleteWidget();
 	void OnSplitVertical();
 	void OnSplitHorizontal();
@@ -130,6 +134,7 @@ private:
 	QByteArray m_viewId;
 	QWidget* m_externalWidgetPtr;
 	ILayout::AlignType m_titleAlign;
+	ILayout::LayoutProperties m_properties;
 };
 
 

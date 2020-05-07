@@ -41,6 +41,22 @@ public:
 
 	I_DECLARE_ENUM(AlignType, AT_LEFT, AT_RIGHT, AT_H_CENTER);
 
+	struct LayoutProperties
+	{
+		LayoutProperties()
+		{
+			isFixedLayout = true; isShowBox = true; borderColor = QColor("#808080");
+			minWidth = minHeight = 0; maxWidth = maxHeight = 16777215;
+		}
+		bool isFixedLayout;
+		bool isShowBox;
+		QColor borderColor;
+		int minWidth;
+		int maxWidth;
+		int minHeight;
+		int maxHeight;
+	};
+
 	/**
 		Get layout's ID.
 	*/
@@ -107,6 +123,16 @@ public:
 	virtual SizeList GetSizes() const = 0;
 
 	/**
+		Set layout's properties.
+	*/
+	virtual void SetLayoutProperties(const LayoutProperties &properties) = 0;
+
+	/**
+		Set layout's properties.
+	*/
+	virtual LayoutProperties GetLayoutProperties() const = 0;
+
+	/**
 		Get layout's parent.
 	*/
 	virtual ILayout* GetParent()  const = 0;
@@ -165,6 +191,7 @@ public:
 		Split current layout and insert new sublayout.
 	*/
 	virtual void SplitLayout(ILayout::LayoutType type) = 0;
+
 };
 
 

@@ -142,6 +142,21 @@ ILayout::SizeList CLayout::GetSizes() const
 }
 
 
+void CLayout::SetLayoutProperties(const LayoutProperties &properties)
+{
+	if (m_properties != properties) {
+		istd::CChangeNotifier changeNotifier(this);
+		m_properties = properties;
+	}
+}
+
+
+ILayout::LayoutProperties CLayout::GetLayoutProperties() const
+{
+	return m_properties;
+}
+
+
 ILayout* CLayout::GetParent() const
 {
 	return m_parent;
@@ -348,6 +363,7 @@ void CLayout::CopyData(ILayout* source)
 	m_icon = source->GetIcon();
 	m_viewId = source->GetViewId();
 	m_sizes = source->GetSizes();
+	m_properties = source->GetLayoutProperties();
 }
 
 
@@ -370,7 +386,8 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 		if (archive.IsStoring()){
 			QDataStream stream(&sizeListAsByteArray, QIODevice::WriteOnly);
 			SizeList sizeList = GetSizes();
-			stream << sizeList;
+			LayoutProperties properties = GetLayoutProperties();
+			stream << sizeList << properties;
 		}
 
 		retVal = retVal && archive.Process(sizeListAsByteArray);
@@ -378,8 +395,10 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 		if (!archive.IsStoring()) {
 			QDataStream stream(&sizeListAsByteArray, QIODevice::ReadWrite);
 			SizeList sizeList;
-			stream >> sizeList;
+			LayoutProperties properties;
+			stream >> sizeList >> properties;
 			SetSizes(sizeList);
+			SetLayoutProperties(properties);
 		}
 
 		retVal = retVal && archive.EndTag(layoutSizeListTag);
@@ -457,6 +476,37 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(layoutItemTag);
 
 	return retVal;
+}
+
+
+QDataStream &operator<<(QDataStream &dataStream, const ILayout::LayoutProperties &src)
+{
+	dataStream << src.isFixedLayout << src.isShowBox << src.borderColor;
+	dataStream << src.minWidth << src.maxWidth << src.minHeight << src.maxHeight;
+	return dataStream;
+}
+
+
+QDataStream &operator>>(QDataStream &dataStream, ILayout::LayoutProperties &src)
+{
+	dataStream >> src.isFixedLayout >> src.isShowBox >> src.borderColor;
+	dataStream >> src.minWidth >> src.maxWidth >> src.minHeight >> src.maxHeight;
+	return dataStream;
+}
+
+
+bool operator ==(const ILayout::LayoutProperties &left, const ILayout::LayoutProperties &right)
+{
+	bool retVal = (left.isFixedLayout == right.isFixedLayout) && (left.isShowBox == right.isShowBox);
+	retVal = retVal && (left.borderColor == right.borderColor);
+	retVal = retVal && (left.minWidth == right.minWidth) && (left.maxWidth == right.maxWidth);
+	retVal = retVal && (left.minHeight == right.minHeight) && (left.maxHeight == right.maxHeight);
+	return retVal;
+}
+
+bool operator !=(const ILayout::LayoutProperties &left, const ILayout::LayoutProperties &right)
+{
+	return !(left == right);
 }
 
 

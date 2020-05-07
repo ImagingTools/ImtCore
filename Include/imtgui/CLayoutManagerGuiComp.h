@@ -87,6 +87,7 @@ protected Q_SLOTS:
 	void OnAddWidget(const QByteArray& id, int index);
 	void OnAddWidgetByViewId(const QByteArray& id, const QByteArray& viewId);
 	void OnChangeSizes(const QByteArray& id, const SizeList& sizeList);
+	void OnChangeProperties(const QByteArray& id, const ILayout::LayoutProperties& properties);
 
 private:
 	// static template methods for subelement access

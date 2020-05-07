@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtCore/QMap>
 #include <QtCore/QList>
+#include <QtCore/QDataStream>
 #include <QtGui/QIcon>
 
 // ACF includes
@@ -41,6 +42,8 @@ public:
 	virtual QByteArray GetViewId() const Q_DECL_OVERRIDE;
 	virtual void SetSizes(const SizeList& sizes) Q_DECL_OVERRIDE;
 	virtual SizeList GetSizes() const Q_DECL_OVERRIDE;
+	virtual void SetLayoutProperties(const LayoutProperties &properties) Q_DECL_OVERRIDE;
+	virtual LayoutProperties GetLayoutProperties() const Q_DECL_OVERRIDE;
 	virtual ILayout* GetParent() const Q_DECL_OVERRIDE;
 	virtual int GetChildsCount() const Q_DECL_OVERRIDE;
 	virtual ILayout* GetChild(int index) const Q_DECL_OVERRIDE;
@@ -71,7 +74,16 @@ private:
 	QByteArray m_viewId;
 	CLayout* m_parent;
 	QList<ILayout*> m_childs;
+	LayoutProperties m_properties;
+
+//	QDataStream &operator<<(QDataStream &dataStream, LayoutProperties* src);
 };
+
+
+QDataStream &operator<<(QDataStream &dataStream, const ILayout::LayoutProperties &src);
+QDataStream &operator>>(QDataStream &dataStream, ILayout::LayoutProperties &src);
+bool operator ==(const ILayout::LayoutProperties &left, const ILayout::LayoutProperties &right);
+bool operator !=(const ILayout::LayoutProperties &left, const ILayout::LayoutProperties &right);
 
 
 } // namespace imtgui
