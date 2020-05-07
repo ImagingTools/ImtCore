@@ -25,20 +25,17 @@ public:
 	void setTimeAxis(CTimeAxis* timeAxisPtr);
 
 protected:
+	void OnAxisPositionChanged();
+
 	// reimplemented (QGraphicsView)
 	void mouseMoveEvent(QMouseEvent *event) override;
 	void mousePressEvent(QMouseEvent *event) override;
 	void wheelEvent(QWheelEvent *event) override;
 	void resizeEvent(QResizeEvent *event) override;
 
-signals:
-	void AxisPositionChanged();
-
 protected Q_SLOTS:
 	void rangeChanged(int min, int max);
 	void valueChanged(int value);
-
-	void OnAxisPositionChanged();
 
 private:
 	QRectF SceneVisibleRect() const;

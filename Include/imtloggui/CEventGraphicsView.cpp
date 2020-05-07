@@ -15,7 +15,6 @@ CEventGraphicsView::CEventGraphicsView(QWidget* parent)
 	: QGraphicsView(parent),
 	m_timeAxisPtr(nullptr)
 {
-	connect(this, &CEventGraphicsView::AxisPositionChanged, this, &CEventGraphicsView::OnAxisPositionChanged, Qt::QueuedConnection);
 	connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &CEventGraphicsView::rangeChanged);
 	connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::valueChanged);
 	connect(horizontalScrollBar(), &QScrollBar::rangeChanged, this, &CEventGraphicsView::rangeChanged);
@@ -30,6 +29,29 @@ void CEventGraphicsView::setTimeAxis(CTimeAxis* timeAxisPtr)
 
 
 // protected methods
+
+void CEventGraphicsView::OnAxisPositionChanged()
+{
+	if (m_timeAxisPtr == nullptr) {
+		return;
+	}
+
+	if (viewportTransform() != m_lastTransform) {
+		m_lastTransform = viewportTransform();
+
+		QRectF visibleRect = SceneVisibleRect();
+		m_timeAxisPtr->setPos(0, visibleRect.bottom() - m_timeAxisPtr->rect().height() / viewportTransform().m22());
+		QRectF rect = sceneRect();
+		if (m_timeAxisPtr != nullptr) {
+			rect.setLeft(m_timeAxisPtr->rect().left() - 100 / viewportTransform().m11());
+			rect.setRight(m_timeAxisPtr->rect().right() + 100 / viewportTransform().m11());
+			setSceneRect(rect);
+		}
+	}
+}
+
+
+// reimplemented (QGraphicsView)
 
 void CEventGraphicsView::mouseMoveEvent(QMouseEvent* event)
 {
@@ -64,7 +86,7 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 		}
 	}
 
-	Q_EMIT AxisPositionChanged();
+	OnAxisPositionChanged();
 }
 
 
@@ -78,34 +100,13 @@ void CEventGraphicsView::resizeEvent(QResizeEvent* event)
 
 void CEventGraphicsView::rangeChanged(int /*min*/, int /*max*/)
 {
-	Q_EMIT AxisPositionChanged();
+	OnAxisPositionChanged();
 }
 
 
 void CEventGraphicsView::valueChanged(int /*value*/)
 {
-	Q_EMIT AxisPositionChanged();
-}
-
-
-void CEventGraphicsView::OnAxisPositionChanged()
-{
-	if (m_timeAxisPtr == nullptr){
-		return;
-	}
-
-	if (viewportTransform() != m_lastTransform){
-		m_lastTransform = viewportTransform();
-
-		QRectF visibleRect = SceneVisibleRect();
-		m_timeAxisPtr->setPos(0, visibleRect.bottom() - m_timeAxisPtr->rect().height() / viewportTransform().m22());
-		QRectF rect = sceneRect();
-		if (m_timeAxisPtr != nullptr) {
-			rect.setLeft(m_timeAxisPtr->rect().left() - 100 / viewportTransform().m11());
-			rect.setRight(m_timeAxisPtr->rect().right() + 100 / viewportTransform().m11());
-			setSceneRect(rect);
-		}
-	}
+	OnAxisPositionChanged();
 }
 
 
