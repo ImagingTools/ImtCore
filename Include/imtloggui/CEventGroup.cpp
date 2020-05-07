@@ -21,34 +21,47 @@ CEventGroup::CEventGroup(QGraphicsItem *parent)
 }
 
 
-void CEventGroup::setColor(const QColor& color)
+const QByteArray& CEventGroup::GetGroupId()
 {
-	m_color = color;
+	return m_groupId;
 }
 
 
-// reimplemented (QGraphicsItem)
-
-QRectF CEventGroup::boundingRect() const
+CEventGroup::~CEventGroup()
 {
-	QRectF bounding = rect();
-	QPointF origin = bounding.bottomLeft();
-	
-	bounding.translate(-origin);
+	for (QGraphicsItem* eventPtr : m_events) {
+		scene()->removeItem(eventPtr);
+		delete eventPtr;
+	}
 
-	return bounding;
+	scene()->removeItem(this);
 }
 
 
-void CEventGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CEventGroup::SetGroupId(const QByteArray& groupId)
 {
-	QPen pen;
-	pen = QPen(Qt::darkGray, 0);
-	painter->setPen(pen);
-	painter->setBrush(m_color);
+	m_groupId = groupId;
+}
 
-	QRectF bounding = boundingRect();
-	painter->drawRect(bounding);
+
+void CEventGroup::SetTimeAxis(IEventScenePositionProvider *timeAxis)
+{
+	m_timeAxis = timeAxis;
+}
+
+
+void CEventGroup::AddEvent(CEventItemBase* event)
+{
+	QPointF origin(m_timeAxis->GetScenePosition(event->GetMessage()->GetInformationTimeStamp()), 0);
+	origin = mapFromScene(origin);
+	origin.setY(-100);
+
+	event->setParentItem(this);
+	event->setPos(origin);
+
+	scene()->addItem(event);
+
+	m_events.append(event);
 }
 
 

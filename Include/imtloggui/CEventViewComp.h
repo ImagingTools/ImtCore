@@ -5,18 +5,15 @@
 #include <QtWidgets/QGraphicsScene>
 
 // ACF includes
-#include <ilog/IMessageContainer.h>
 #include <ilog/IMessageConsumer.h>
 #include <iqtgui/TDesignerGuiCompBase.h>
 #include <iqtgui/TRestorableGuiWrap.h>
-#include <istd/CClassInfo.h>
-#include <istd/TComposedFactory.h>
-#include <istd/TSingleFactory.h>
 
 // ImtCore includes
 #include <imtbase/IMessageGroupInfoProvider.h>
 #include <imtloggui/CEventGraphicsView.h>
 #include <imtloggui/CTimeAxis.h>
+#include <imtloggui/CEventGroupManager.h>
 
 // Acula includes
 #include <GeneratedFiles/imtloggui/ui_CEventViewComp.h>
@@ -61,9 +58,10 @@ public:
 	virtual void OnComponentDestroyed() override;
 
 private:
-	QGraphicsScene *m_scenePtr;
-	CEventGraphicsView *m_viewPtr;
+	QGraphicsScene* m_scenePtr;
+	CEventGraphicsView* m_viewPtr;
 	CTimeAxis* m_timeAxisPtr;
+	CEventGroupManager* m_groupManagerPtr;
 
 	I_REF(imtbase::IMessageGroupInfoProvider, m_messageGroupInfoProviderCompPtr);
 };

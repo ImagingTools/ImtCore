@@ -6,27 +6,23 @@
 #include <QtWidgets/QGraphicsRectItem>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
+#include <imtloggui/IEventScenePositionProvider.h>
+
 
 namespace imtloggui
 {
 
 
-class CTimeAxis: public QGraphicsRectItem
+class CTimeAxis : public QGraphicsRectItem, virtual public IEventScenePositionProvider
 {
 public:
-	enum MsecConsts
-	{
-		MS_SECOND = 1000,
-		MS_MINUTE = 60000,
-		MS_HOUR = 3600000,
-		MS_DAY = 86400000
-	};
-
 	typedef QGraphicsRectItem BaseClass;
 
 	CTimeAxis(QGraphicsItem *parent = nullptr);
 
-	void setTimeSpan(const QDateTime& startDateTime, const QDateTime& endDateTime);
+	const QDateTime& getStartTimeSpan();
+	const QDateTime& getEndTimeSpan();
+	void setTimeRange(const QDateTime& firstEventTime, const QDateTime& lastEventTime);
 	bool setMinorTickCount(int count);
 	void setColor(const QColor& color);
 
@@ -34,9 +30,11 @@ public:
 	QRectF boundingRect() const override;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
+	// reimplemented (IEventScenePositionProvider)
+	virtual double GetScenePosition(const QDateTime& time) const override;
+
 signals:
-	void GeometryChanged(const QRectF& geometry);
-	void TimeSpanChanged(const QDateTime& startDateTime, const QDateTime& endDateTime);
+	void TimeRangeChanged();
 
 private:
 	QRectF SceneVisibleRect() const;

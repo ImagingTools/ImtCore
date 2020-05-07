@@ -3,33 +3,35 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
-#include <QtWidgets/QGraphicsRectItem>
+#include <QtWidgets/QGraphicsItemGroup>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
+// ImtCore includes
+#include <imtloggui/IEventScenePositionProvider.h>
+#include <imtloggui/CEventItemBase.h>
 
 namespace imtloggui
 {
 
 
-class CEventGroup: public QGraphicsRectItem
+class CEventGroup: public QGraphicsItemGroup
 {
 public:
-	typedef QGraphicsRectItem BaseClass;
+	typedef QGraphicsItemGroup BaseClass;
 
 	CEventGroup(QGraphicsItem *parent = nullptr);
+	~CEventGroup();
 
-	void setColor(const QColor& color);
+	const QByteArray& GetGroupId();
+	void SetGroupId(const QByteArray& groupId);
+	void SetTimeAxis(IEventScenePositionProvider *timeAxis);
 
-	// reimplemented (QGraphicsItem)
-	QRectF boundingRect() const override;
-	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
+	void AddEvent(CEventItemBase* event);
 
 private:
-	QRectF m_geometryRect;
-	QRectF m_boundingRect;
-
-	QColor m_color;
-	QList<QGraphicsItem*> m_sceneItems;
+	IEventScenePositionProvider* m_timeAxis;
+	QByteArray m_groupId;
+	QList<QGraphicsItem*> m_events;
 };
 
 

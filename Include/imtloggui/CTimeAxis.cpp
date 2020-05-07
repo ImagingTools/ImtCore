@@ -23,17 +23,31 @@ CTimeAxis::CTimeAxis(QGraphicsItem *parent)
 }
 
 
-void CTimeAxis::setTimeSpan(const QDateTime & startDateTime, const QDateTime & endDateTime)
+const QDateTime& CTimeAxis::getStartTimeSpan()
 {
-	m_startDateTime = startDateTime;
-	m_endDateTime = endDateTime;
+	return m_startDateTime;
+}
 
-	int secDiff = int(startDateTime.secsTo(endDateTime));
 
-	int width = qMax(1000, secDiff);
+const QDateTime& CTimeAxis::getEndTimeSpan()
+{
+	return m_endDateTime;
+}
 
-	setPos(0, 0);
-	setRect(0, 0, width, 40);
+
+void CTimeAxis::setTimeRange(const QDateTime& firstEventTime, const QDateTime& lastEventTime)
+{
+	if (m_startDateTime != firstEventTime || m_endDateTime != lastEventTime) {
+		m_startDateTime = firstEventTime;
+		m_endDateTime = lastEventTime;
+
+		int diff = firstEventTime.msecsTo(lastEventTime);
+
+		int width = qMax(1000000, diff);
+
+		setPos(0, 0);
+		setRect(0, 0, width/1000., 40);
+	}
 }
 
 
@@ -141,6 +155,13 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 			painter->drawText(labelRect, timeString);
 		}
 	}
+}
+
+
+// reimplemented (IEventScenePositionProvider)
+double CTimeAxis::GetScenePosition(const QDateTime& time) const
+{
+	return pos().x() + rect().width() * (time.toMSecsSinceEpoch() - m_startDateTime.toMSecsSinceEpoch()) / (m_endDateTime.toMSecsSinceEpoch() - m_startDateTime.toMSecsSinceEpoch());
 }
 
 
