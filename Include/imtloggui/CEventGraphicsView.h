@@ -15,6 +15,8 @@ namespace imtloggui
 
 class CEventGraphicsView: public QGraphicsView
 {
+	Q_OBJECT
+
 public:
 	typedef QGraphicsView BaseClass;
 
@@ -29,13 +31,20 @@ protected:
 	void wheelEvent(QWheelEvent *event) override;
 	void resizeEvent(QResizeEvent *event) override;
 
-	// reimplemented (QAbstractScrollArea)
-	bool viewportEvent(QEvent *event) override;
+signals:
+	void AxisPositionChanged();
+
+protected Q_SLOTS:
+	void rangeChanged(int min, int max);
+	void valueChanged(int value);
+
+	void OnAxisPositionChanged();
 
 private:
 	QRectF SceneVisibleRect() const;
 
 private:
+	QTransform m_lastTransform;
 	CTimeAxis* m_timeAxisPtr;
 };
 

@@ -76,7 +76,7 @@ QRectF CTimeAxis::boundingRect() const
 	// Left and right marings for the drawing the first and last tick labels:
 	axisRect.adjust(-100, 0, 100, 0);
 
-	double scale = scene()->views().first()->transform().m11();
+	double scale = scene()->views().first()->viewportTransform().m11();
 	
 	if (scale > 1){
 		axisRect.setLeft(origin.x() + (axisRect.left() - origin.x()) * scale);
@@ -102,7 +102,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 	// Current view transformation:
 	QGraphicsView* viewPtr = scene()->views().first();
-	QTransform viewTransform = viewPtr->transform();
+	QTransform viewTransform = viewPtr->viewportTransform();
 
 	quint64 timeRange = m_startDateTime.secsTo(m_endDateTime);
 
