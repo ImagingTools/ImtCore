@@ -4,9 +4,9 @@
 // Qt includes
 #include <QtCore/QDebug>
 #include <QtCore/QRectF>
-#include <QtGui/QPen>
 #include <QtGui/QFont>
 #include <QtGui/QPainter>
+#include <QtGui/QPen>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
@@ -15,43 +15,70 @@ namespace imtloggui
 {
 
 
-CTimeAxis::CTimeAxis(QGraphicsItem *parent)
-	: BaseClass(parent)
+CTimeAxis::CTimeAxis(QGraphicsItem* parent)
+	: BaseClass(parent),
+	QObject()
 {
 	setZValue(100000);
 	setFlags(ItemIgnoresTransformations);
+	m_startTime = QDateTime();
+	m_endTime = QDateTime();
 }
 
 
-const QDateTime& CTimeAxis::getStartTimeSpan()
+void CTimeAxis::setPos(const QPointF &origin)
 {
-	return m_startDateTime;
-}
-
-
-const QDateTime& CTimeAxis::getEndTimeSpan()
-{
-	return m_endDateTime;
-}
-
-
-void CTimeAxis::setTimeRange(const QDateTime& firstEventTime, const QDateTime& lastEventTime)
-{
-	if (m_startDateTime != firstEventTime || m_endDateTime != lastEventTime) {
-		m_startDateTime = firstEventTime;
-		m_endDateTime = lastEventTime;
-
-		int diff = firstEventTime.msecsTo(lastEventTime);
-
-		int width = qMax(1000000, diff);
-
-		setPos(0, 0);
-		setRect(0, 0, width/1000., 40);
+	if (origin != pos()){
+		BaseClass::setPos(origin);
+		Q_EMIT AxisChanged();
 	}
 }
 
 
-bool CTimeAxis::setMinorTickCount(int count)
+void CTimeAxis::setPos(double x, double y)
+{
+	setPos(QPointF(x, y));
+}
+
+
+const QDateTime& CTimeAxis::GetStartOfRange() const
+{
+	return m_startTime;
+}
+
+
+const QDateTime& CTimeAxis::GetEndOfRange() const
+{
+	return m_endTime;
+}
+
+
+void CTimeAxis::SetTimeRange(const QDateTime& firstEventTime, const QDateTime& lastEventTime)
+{
+	bool isAxisChanged = false;
+
+	if (m_startTime != firstEventTime || m_endTime != lastEventTime){
+
+		if (m_startTime != firstEventTime){
+			isAxisChanged = true;
+		}
+
+		m_startTime = firstEventTime;
+		m_endTime = lastEventTime;
+
+		int diff = firstEventTime.msecsTo(lastEventTime);
+
+		setPos(0, 0);
+		setRect(0, 0, diff / 1000., 40);
+	}
+
+	if (isAxisChanged){
+		Q_EMIT AxisChanged();
+	}
+}
+
+
+bool CTimeAxis::SetMinorTickCount(int count)
 {
 	if (count > 0){
 		m_minorTickCount = count;
@@ -62,7 +89,7 @@ bool CTimeAxis::setMinorTickCount(int count)
 }
 
 
-void CTimeAxis::setColor(const QColor& color)
+void CTimeAxis::SetColor(const QColor& color)
 {
 	m_color = color;
 }
@@ -114,17 +141,21 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 	painter->setBrush(Qt::darkGray);
 	painter->drawRect(axisRect);
 
+	if (!m_startTime.isValid() || !m_endTime.isValid()){
+		return;
+	}
+
 	// Current view transformation:
 	QGraphicsView* viewPtr = scene()->views().first();
 	QTransform viewTransform = viewPtr->viewportTransform();
 
-	quint64 timeRange = m_startDateTime.secsTo(m_endDateTime);
+	quint64 timeRange = m_startTime.secsTo(m_endTime);
 
 	double viewWidth = itemRect.width() * viewTransform.m11();
 	double secondsPerPixel = timeRange / viewWidth;
 
-	QString beginTime = m_startDateTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
-	QString endTime = m_endDateTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
+	QString beginTime = m_startTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
+	QString endTime = m_endTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
 	int labelWidth = option->fontMetrics.horizontalAdvance(beginTime);
 
 	double majorStepSize = 1.5 * labelWidth;
@@ -135,6 +166,10 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 	QRectF firstLabelRect = QRectF(-labelWidth / 2, axisRect.top() + axisRect.height() / 2, labelWidth, axisRect.height() / 2 - 2);
 	painter->drawText(firstLabelRect, beginTime);
 	painter->drawLine(QLineF(0, axisRect.top() + 1, 0, axisRect.bottom() - axisRect.height() / 1.5));
+
+	if (m_startTime == m_endTime){
+		return;
+	}
 
 	QRectF lastLabelRect = QRectF(itemRect.right() * viewTransform.m11() - labelWidth / 2, axisRect.top() + axisRect.height() / 2, labelWidth, axisRect.height() / 2 - 2);
 	painter->drawText(lastLabelRect, endTime);
@@ -147,7 +182,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 			double xPos = x * majorStepSize;
 			
 			int msOffset = secondsPerPixel * xPos * 1000;
-			QDateTime time = m_startDateTime.addMSecs(msOffset);
+			QDateTime time = m_startTime.addMSecs(msOffset);
 			QString timeString = time.toString("dd.MM.yyyy hh:mm:ss.zzz");
 
 			painter->drawLine(QLineF(xPos, axisRect.top() + 1, xPos, axisRect.bottom() - axisRect.height() / 1.5));
@@ -161,7 +196,13 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 // reimplemented (IEventScenePositionProvider)
 double CTimeAxis::GetScenePosition(const QDateTime& time) const
 {
-	return pos().x() + rect().width() * (time.toMSecsSinceEpoch() - m_startDateTime.toMSecsSinceEpoch()) / (m_endDateTime.toMSecsSinceEpoch() - m_startDateTime.toMSecsSinceEpoch());
+	if (m_startTime == m_endTime){
+		return pos().x();
+	}
+
+	double delta = time.toMSecsSinceEpoch() - m_startTime.toMSecsSinceEpoch();
+
+	return pos().x() + delta / 1000;
 }
 
 

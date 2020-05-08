@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QDebug>
+#include <QtCore/QDebug>
 #include <QtCore/QRectF>
 #include <QtGui/QPen>
 #include <QtGui/QPainter>
@@ -15,43 +15,20 @@ namespace imtloggui
 {
 
 
-CEventItemBase::CEventItemBase(QGraphicsItem *parent)
+CEventItemBase::CEventItemBase(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent)
 	: BaseClass(parent)
 {
+	m_messagePtr = message;
 }
 
 
-void CEventItemBase::SetColor(QColor color)
+QDateTime CEventItemBase::GetEventTimeStamp() const
 {
-	m_color = color;
-}
+	if (m_messagePtr.IsValid()){
+		return m_messagePtr->GetInformationTimeStamp();
+	}
 
-
-ilog::IMessageConsumer::MessagePtr CEventItemBase::GetMessage()
-{
-	return m_messagePtr;
-}
-
-
-void CEventItemBase::SetMessage(ilog::IMessageConsumer::MessagePtr messagePtr)
-{
-	m_messagePtr = messagePtr;
-}
-
-
-// reimplemented (QGraphicsItem)
-
-QRectF CEventItemBase::boundingRect() const
-{
-	return QRectF(-20,-20,40,40);
-}
-
-
-void CEventItemBase::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-	QBrush brush(m_color);
-	painter->setBrush(brush);
-	painter->drawEllipse(-20, -20, 40, 40);
+	return QDateTime();
 }
 
 

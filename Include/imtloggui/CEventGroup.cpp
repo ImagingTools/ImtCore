@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QDebug>
+#include <QtCore/QDebug>
 #include <QtCore/QRectF>
 #include <QtGui/QPen>
 #include <QtGui/QPainter>
@@ -15,7 +15,7 @@ namespace imtloggui
 {
 
 
-CEventGroup::CEventGroup(QGraphicsItem *parent)
+CEventGroup::CEventGroup(QGraphicsItem* parent)
 	: BaseClass(parent)
 {
 }
@@ -29,7 +29,7 @@ const QByteArray& CEventGroup::GetGroupId()
 
 CEventGroup::~CEventGroup()
 {
-	for (QGraphicsItem* eventPtr : m_events) {
+	for (QGraphicsItem* eventPtr : m_events){
 		scene()->removeItem(eventPtr);
 		delete eventPtr;
 	}
@@ -44,7 +44,7 @@ void CEventGroup::SetGroupId(const QByteArray& groupId)
 }
 
 
-void CEventGroup::SetTimeAxis(IEventScenePositionProvider *timeAxis)
+void CEventGroup::SetTimeAxis(IEventScenePositionProvider* timeAxis)
 {
 	m_timeAxis = timeAxis;
 }
@@ -52,7 +52,7 @@ void CEventGroup::SetTimeAxis(IEventScenePositionProvider *timeAxis)
 
 void CEventGroup::AddEvent(CEventItemBase* event)
 {
-	QPointF origin(m_timeAxis->GetScenePosition(event->GetMessage()->GetInformationTimeStamp()), 0);
+	QPointF origin(m_timeAxis->GetScenePosition(event->GetEventTimeStamp()), 0);
 	origin = mapFromScene(origin);
 	origin.setY(-100);
 

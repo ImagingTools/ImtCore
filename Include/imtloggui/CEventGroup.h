@@ -19,12 +19,12 @@ class CEventGroup: public QGraphicsItemGroup
 public:
 	typedef QGraphicsItemGroup BaseClass;
 
-	CEventGroup(QGraphicsItem *parent = nullptr);
+	CEventGroup(QGraphicsItem* parent = nullptr);
 	~CEventGroup();
 
 	const QByteArray& GetGroupId();
 	void SetGroupId(const QByteArray& groupId);
-	void SetTimeAxis(IEventScenePositionProvider *timeAxis);
+	void SetTimeAxis(IEventScenePositionProvider* timeAxis);
 
 	void AddEvent(CEventItemBase* event);
 

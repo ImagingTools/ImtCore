@@ -25,6 +25,7 @@ CEventGraphicsView::CEventGraphicsView(QWidget* parent)
 void CEventGraphicsView::setTimeAxis(CTimeAxis* timeAxisPtr)
 {
 	m_timeAxisPtr = timeAxisPtr;
+	OnAxisPositionChanged();
 }
 
 
@@ -32,17 +33,17 @@ void CEventGraphicsView::setTimeAxis(CTimeAxis* timeAxisPtr)
 
 void CEventGraphicsView::OnAxisPositionChanged()
 {
-	if (m_timeAxisPtr == nullptr) {
+	if (m_timeAxisPtr == nullptr){
 		return;
 	}
 
-	if (viewportTransform() != m_lastTransform) {
+	if (viewportTransform() != m_lastTransform){
 		m_lastTransform = viewportTransform();
 
 		QRectF visibleRect = SceneVisibleRect();
 		m_timeAxisPtr->setPos(0, visibleRect.bottom() - m_timeAxisPtr->rect().height() / viewportTransform().m22());
 		QRectF rect = sceneRect();
-		if (m_timeAxisPtr != nullptr) {
+		if (m_timeAxisPtr != nullptr){
 			rect.setLeft(m_timeAxisPtr->rect().left() - 100 / viewportTransform().m11());
 			rect.setRight(m_timeAxisPtr->rect().right() + 100 / viewportTransform().m11());
 			setSceneRect(rect);

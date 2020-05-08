@@ -20,7 +20,7 @@ class CEventGraphicsView: public QGraphicsView
 public:
 	typedef QGraphicsView BaseClass;
 
-	CEventGraphicsView(QWidget *parent = nullptr);
+	CEventGraphicsView(QWidget* parent = nullptr);
 
 	void setTimeAxis(CTimeAxis* timeAxisPtr);
 
@@ -28,10 +28,10 @@ protected:
 	void OnAxisPositionChanged();
 
 	// reimplemented (QGraphicsView)
-	void mouseMoveEvent(QMouseEvent *event) override;
-	void mousePressEvent(QMouseEvent *event) override;
-	void wheelEvent(QWheelEvent *event) override;
-	void resizeEvent(QResizeEvent *event) override;
+	void mouseMoveEvent(QMouseEvent* event) override;
+	void mousePressEvent(QMouseEvent* event) override;
+	void wheelEvent(QWheelEvent* event) override;
+	void resizeEvent(QResizeEvent* event) override;
 
 protected Q_SLOTS:
 	void rangeChanged(int min, int max);

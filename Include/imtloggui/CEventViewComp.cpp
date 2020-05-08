@@ -5,30 +5,19 @@
 #include <QtCore/QDebug>
 
 // ACF includes
-#include <iser/IObject.h>
 #include <ilog/CMessage.h>
 #include <ilog/CExtMessage.h>
+#include <iser/IObject.h>
 #include <iwidgets/iwidgets.h>
 
 // ImtCore includes
 #include <imtloggui/CEventGraphicsView.h>
-#include <imtloggui/CEventItemBase.h>
 #include <imtloggui/CEventGroup.h>
+#include <imtloggui/CGeneralEventItem.h>
 
 
 namespace imtloggui
 {
-
-
-// public methods
-
-CEventViewComp::CEventViewComp()
-{
-	// General group
-	//imtbase::IMessageGroupInfoProvider::GroupInfo info;
-	//info.name == tr("General");
-	//m_eventGroupManager.AddGroup(new CEventGroup(&m_eventGroupManager), info);
-}
 
 
 // reimplemented (ilog::IMessageConsumer)
@@ -42,32 +31,11 @@ bool CEventViewComp::IsMessageSupported(
 }
 
 
-void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& messagePtr)
+void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 {
 	imtbase::IMessageGroupInfoProvider::GroupInfo groupInfo;
-	if (m_messageGroupInfoProviderCompPtr.IsValid()) {
-		groupInfo = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfo(messagePtr.GetPtr());
-	}
-
-	CEventItemBase* eventPtr = new CEventItemBase();
-	eventPtr->setPos(m_timeAxisPtr->GetScenePosition(messagePtr->GetInformationTimeStamp()), -150);
-	eventPtr->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-	eventPtr->SetMessage(messagePtr);
-
-	if (messagePtr->GetInformationCategory() == istd::IInformationProvider::IC_NONE){
-		eventPtr->SetColor(Qt::darkGray);
-	}
-	else if (messagePtr->GetInformationCategory() == istd::IInformationProvider::IC_INFO){
-		eventPtr->SetColor(Qt::green);
-	}
-	else if (messagePtr->GetInformationCategory() == istd::IInformationProvider::IC_WARNING){
-		eventPtr->SetColor(Qt::yellow);
-	}
-	else if (messagePtr->GetInformationCategory() == istd::IInformationProvider::IC_ERROR){
-		eventPtr->SetColor(Qt::red);
-	}
-	else if (messagePtr->GetInformationCategory() == istd::IInformationProvider::IC_CRITICAL){
-		eventPtr->SetColor(Qt::black);
+	if (m_messageGroupInfoProviderCompPtr.IsValid()){
+		groupInfo = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfo(message.GetPtr());
 	}
 
 	CEventGroup* groupPtr = m_groupManagerPtr->GetGroup(groupInfo.groupId);
@@ -76,20 +44,34 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& messagePtr)
 	}
 
 	if (groupPtr != nullptr){
-		groupPtr->AddEvent(eventPtr);
+		if (m_timeAxisPtr != nullptr){
+			QDateTime eventTime = message->GetInformationTimeStamp();
+
+			if (!m_startTime.isValid()){
+				m_startTime = eventTime;
+				m_endTime = eventTime;
+				m_timeAxisPtr->SetTimeRange(m_startTime, m_endTime);
+			}
+			else if (eventTime > m_endTime){
+				m_endTime = eventTime;
+				m_timeAxisPtr->SetTimeRange(m_startTime, m_endTime);
+			}
+			else if (eventTime < m_startTime){
+				m_startTime = eventTime;
+				m_timeAxisPtr->SetTimeRange(m_startTime, m_endTime);
+			}
+
+			CGeneralEventItem* eventPtr = new CGeneralEventItem(message);
+
+			QPointF origin(m_timeAxisPtr->GetScenePosition(message->GetInformationTimeStamp()), -150);
+			eventPtr->setPos(origin);
+			eventPtr->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+
+			groupPtr->AddEvent(eventPtr);
+
+			m_viewPtr->update();
+		}
 	}
-}
-
-
-// reimplemented (iqtgui::TRestorableGuiWrap)
-
-void CEventViewComp::OnRestoreSettings(const QSettings& settings)
-{
-}
-
-
-void CEventViewComp::OnSaveSettings(QSettings& settings) const
-{
 }
 
 
@@ -101,18 +83,11 @@ void CEventViewComp::OnGuiCreated()
 
 	m_scenePtr = new QGraphicsScene(GetQtWidget());
 
-	QDateTime begin = QDateTime::currentDateTime();
-	QDateTime end;
-	end.setSecsSinceEpoch(begin.toSecsSinceEpoch() + 3600);
-
 	m_timeAxisPtr = new CTimeAxis();
-	m_timeAxisPtr->setColor(Qt::green);
-	m_timeAxisPtr->setTimeRange(begin, end);
-	m_timeAxisPtr->setMinorTickCount(12);
-
-	for (int i = 0; i <= 36; i++) {
-		m_scenePtr->addLine(i * 100, 0, i * 100, -100);
-	}
+	m_timeAxisPtr->SetColor(Qt::green);
+	m_timeAxisPtr->setRect(0, 0, 10, 40);
+	//m_timeAxisPtr->SetTimeRange(begin, end);
+	m_timeAxisPtr->SetMinorTickCount(12);
 
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
 	m_viewPtr->setScene(m_scenePtr);

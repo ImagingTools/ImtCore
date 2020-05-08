@@ -6,6 +6,7 @@
 #include <QtWidgets/QGraphicsRectItem>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
+// ImtCore includes
 #include <imtloggui/IEventScenePositionProvider.h>
 
 
@@ -13,38 +14,42 @@ namespace imtloggui
 {
 
 
-class CTimeAxis : public QGraphicsRectItem, virtual public IEventScenePositionProvider
+class CTimeAxis : public QObject, public QGraphicsRectItem, virtual public IEventScenePositionProvider
 {
+	Q_OBJECT
+
 public:
 	typedef QGraphicsRectItem BaseClass;
 
-	CTimeAxis(QGraphicsItem *parent = nullptr);
+	CTimeAxis(QGraphicsItem* parent = nullptr);
 
-	const QDateTime& getStartTimeSpan();
-	const QDateTime& getEndTimeSpan();
-	void setTimeRange(const QDateTime& firstEventTime, const QDateTime& lastEventTime);
-	bool setMinorTickCount(int count);
-	void setColor(const QColor& color);
+	void setPos(const QPointF& origin);
+	void setPos(double x, double y);
+
+	const QDateTime& GetStartOfRange() const;
+	const QDateTime& GetEndOfRange() const;
+	void SetTimeRange(const QDateTime& firstEventTime, const QDateTime& lastEventTime);
+	bool SetMinorTickCount(int count);
+	void SetColor(const QColor& color);
 
 	// reimplemented (QGraphicsRectItem)
-	QRectF boundingRect() const override;
-	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
+	virtual QRectF boundingRect() const override;
+	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
 	// reimplemented (IEventScenePositionProvider)
 	virtual double GetScenePosition(const QDateTime& time) const override;
 
-signals:
-	void TimeRangeChanged();
+Q_SIGNALS:
+	void AxisChanged();
 
 private:
 	QRectF SceneVisibleRect() const;
 
 private:
-	QDateTime m_startDateTime;
-	QDateTime m_endDateTime;
+	QDateTime m_startTime;
+	QDateTime m_endTime;
 	int m_minorTickCount;
 	QColor m_color;
-	QList<QGraphicsItem*> m_sceneItems;
 };
 
 

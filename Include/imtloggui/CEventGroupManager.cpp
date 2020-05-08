@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QDebug>
+#include <QtCore/QDebug>
 #include <QtCore/QRectF>
 #include <QtGui/QPen>
 #include <QtGui/QPainter>
@@ -15,7 +15,7 @@ namespace imtloggui
 {
 
 
-CEventGroupManager::CEventGroupManager(QGraphicsItem *parent)
+CEventGroupManager::CEventGroupManager(QGraphicsItem* parent)
 	: BaseClass(parent)
 {
 }
@@ -23,7 +23,7 @@ CEventGroupManager::CEventGroupManager(QGraphicsItem *parent)
 
 CEventGroupManager::~CEventGroupManager()
 {
-	for (CEventGroup* groupPtr : m_groups) {
+	for (CEventGroup* groupPtr : m_groups){
 		delete groupPtr;
 	}
 }
@@ -42,18 +42,22 @@ int CEventGroupManager::AddGroup(CEventGroup* groupPtr)
 }
 
 
-void CEventGroupManager::RemoveGroup(int index)
+bool CEventGroupManager::RemoveGroup(QByteArray groupId)
 {
-	if (index < m_groups.count()) {
-		m_groups.removeAt(index);
+	CEventGroup* groupPtr = GetGroup(groupId);
+	if (groupPtr != nullptr){
+		m_groups.removeOne(groupPtr);
+		return true;
 	}
+
+	return false;
 }
 
 
 CEventGroup* CEventGroupManager::GetGroup(QByteArray groupId)
 {
-	for (CEventGroup* groupPtr : m_groups) {
-		if (groupPtr->GetGroupId() == groupId) {
+	for (CEventGroup* groupPtr : m_groups){
+		if (groupPtr->GetGroupId() == groupId){
 			return groupPtr;
 		}
 	}
@@ -74,9 +78,15 @@ bool CEventGroupManager::MoveGroup(int fromIndex, int toIndex)
 }
 
 
-void CEventGroupManager::SetVisible(bool isVisible)
+bool CEventGroupManager::SetVisible(QByteArray groupId, bool isVisible)
 {
+	CEventGroup* groupPtr = GetGroup(groupId);
+	if (groupPtr != nullptr){
+		groupPtr->setVisible(isVisible);
+		return true;
+	}
 
+	return false;
 }
 
 
