@@ -67,7 +67,8 @@ void CEventGraphicsView::mousePressEvent(QMouseEvent* event)
 
 void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 {
-	QPointF scenePnt = mapToScene(event->pos());
+	const ViewportAnchor anchor = transformationAnchor();
+	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
 	if (event->modifiers() && Qt::Modifier::SHIFT){
 		if (event->delta() > 0){
@@ -85,6 +86,8 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 			scale(1 / 1.1, 1);
 		}
 	}
+
+	setTransformationAnchor(anchor);
 
 	OnAxisPositionChanged();
 }

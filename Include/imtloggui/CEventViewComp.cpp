@@ -110,6 +110,10 @@ void CEventViewComp::OnGuiCreated()
 	m_timeAxisPtr->setTimeRange(begin, end);
 	m_timeAxisPtr->setMinorTickCount(12);
 
+	for (int i = 0; i <= 36; i++) {
+		m_scenePtr->addLine(i * 100, 0, i * 100, -100);
+	}
+
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
 	m_viewPtr->setScene(m_scenePtr);
 	m_viewPtr->setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
