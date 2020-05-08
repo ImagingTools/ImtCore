@@ -63,6 +63,7 @@ public:
 private:
 	void CopyData(ILayout* source);
 	bool InternalSerializeItemRecursive(iser::IArchive& archive);
+	bool SerializeProperties(iser::IArchive& archive, LayoutProperties &properties);
 
 private:
 	SizeList m_sizes;

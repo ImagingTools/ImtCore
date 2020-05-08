@@ -381,25 +381,7 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 	retVal = retVal && I_SERIALIZE_ENUM(LayoutType, archive, m_layoutType);
 	retVal = retVal && archive.EndTag(layoutItemTypeTag);
 
-	QByteArray propertiesByteArray;
-	static iser::CArchiveTag propertiesTag("Properties", "Layout item properties");
-	retVal = retVal && archive.BeginTag(propertiesTag);
-	if (archive.IsStoring()) {
-		QDataStream stream(&propertiesByteArray, QIODevice::WriteOnly);
-		LayoutProperties properties = GetLayoutProperties();
-		stream << properties;
-	}
-
-	retVal = retVal && archive.Process(propertiesByteArray);
-
-	if (!archive.IsStoring()) {
-		QDataStream stream(&propertiesByteArray, QIODevice::ReadWrite);
-		LayoutProperties properties;
-		stream >> properties;
-		SetLayoutProperties(properties);
-	}
-	retVal = retVal && archive.EndTag(propertiesTag);
-
+	retVal = retVal && SerializeProperties(archive, m_properties);
 
 	QByteArray sizeListAsByteArray;
 	if ((m_layoutType == LayoutType::LT_HORIZONTAL_SPLITTER) || (m_layoutType == LayoutType::LT_VERTICAL_SPLITTER)){
@@ -497,6 +479,57 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 
 	return retVal;
 }
+
+
+bool CLayout::SerializeProperties(iser::IArchive& archive, LayoutProperties &properties)
+{
+	QByteArray propertiesByteArray;
+	static iser::CArchiveTag propertiesTag("Properties", "Layout item properties");
+	bool retVal = archive.BeginTag(propertiesTag);
+
+	static iser::CArchiveTag fixedLayoutTag("IsFixedLayout", "Fixed Layout");
+	retVal = retVal && archive.BeginTag(fixedLayoutTag);
+	retVal = retVal && archive.Process(properties.isFixedLayout);
+	retVal = retVal && archive.EndTag(fixedLayoutTag);
+
+	static iser::CArchiveTag showBoxTag("IsShowBox", "Show box");
+	retVal = retVal && archive.BeginTag(showBoxTag);
+	retVal = retVal && archive.Process(properties.isShowBox);
+	retVal = retVal && archive.EndTag(showBoxTag);
+
+	QString nameColor = properties.borderColor.name();
+	static iser::CArchiveTag borderColorTag("BorderColor", "Border color");
+	retVal = retVal && archive.BeginTag(borderColorTag);
+	retVal = retVal && archive.Process(nameColor);
+	retVal = retVal && archive.EndTag(borderColorTag);
+	if (!archive.IsStoring()){
+		properties.borderColor.setNamedColor(nameColor);
+	}
+
+	static iser::CArchiveTag minWidthTag("MinWidth", "Minimum width");
+	retVal = retVal && archive.BeginTag(minWidthTag);
+	retVal = retVal && archive.Process(properties.minWidth);
+	retVal = retVal && archive.EndTag(minWidthTag);
+
+	static iser::CArchiveTag maxWidthTag("MaxWidth", "Maximum width");
+	retVal = retVal && archive.BeginTag(maxWidthTag);
+	retVal = retVal && archive.Process(properties.maxWidth);
+	retVal = retVal && archive.EndTag(maxWidthTag);
+
+	static iser::CArchiveTag minHeightTag("MinHeight", "Minimum height");
+	retVal = retVal && archive.BeginTag(minHeightTag);
+	retVal = retVal && archive.Process(properties.minHeight);
+	retVal = retVal && archive.EndTag(minHeightTag);
+
+	static iser::CArchiveTag maxHeightTag("MaxHeight", "Maximum height");
+	retVal = retVal && archive.BeginTag(maxHeightTag);
+	retVal = retVal && archive.Process(properties.maxHeight);
+	retVal = retVal && archive.EndTag(maxHeightTag);
+
+	retVal = retVal && archive.EndTag(propertiesTag);
+	return retVal;
+}
+
 
 
 QDataStream &operator<<(QDataStream &dataStream, const ILayout::LayoutProperties &src)
