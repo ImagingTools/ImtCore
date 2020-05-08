@@ -71,22 +71,17 @@ QWidget* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 		customLayoutWidgetPtr->SetTitleAlign(layout->GetTitleAlign());
 		customLayoutWidgetPtr->SetName(layout->GetTitle());
 		customLayoutWidgetPtr->SetLayoutProperties(layout->GetLayoutProperties());
+
 		QByteArray viewId = layout->GetViewId();
 		if (!viewId.isEmpty()){
 			int index = m_guiViewIdMultiAttrPtr.FindValue(viewId);
-			if (index < 0){
-				//		m_layoutWidgetPtr->SetWidgetToItem(id, QByteArray(), nullptr);
-			}
-			else{
+			if (index >= 0){
 				istd::TSmartPtr<iqtgui::IGuiObject> newWidgetPtr(m_guiViewMultiFactCompPtr.CreateInstance(index));
 				if (newWidgetPtr->CreateGui(nullptr)){
 					customLayoutWidgetPtr->SetWidget(newWidgetPtr->GetWidget());
 					customLayoutWidgetPtr->SetViewId(viewId);
-					//m_layoutWidgetPtr->SetWidgetToItem(id, viewId, newWidgetPtr->GetWidget());
-					//m_createdViewMap.insert(layout->GetLayoutId(), newWidgetPtr);
 				}
 			}
-
 		}
 
 		retVal = customLayoutWidgetPtr;
@@ -99,16 +94,16 @@ QWidget* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 		SplittersMap.insert(splitterPtr, layout->GetLayoutId());
 
 		retVal = splitterPtr;
-		if (layout->GetType() == ILayout::LT_HORIZONTAL_SPLITTER) {
+		if (layout->GetType() == ILayout::LT_HORIZONTAL_SPLITTER){
 			splitterPtr->setOrientation(Qt::Horizontal);
 		}
-		else {
+		else{
 			splitterPtr->setOrientation(Qt::Vertical);
 		}
 			
 		for (int i = 0; i < layout->GetChildsCount(); i++){
 			ILayout* childLayoutPtr = layout->GetChild(i);
-			if (childLayoutPtr != nullptr) {
+			if (childLayoutPtr != nullptr){
 				splitterPtr->addWidget(CreateCustomLayoutWidget(childLayoutPtr));
 				if ( //m_isFixedLayoutPtr.IsValid()
 					//&& *m_isFixedLayoutPtr == true
@@ -384,7 +379,7 @@ void CLayoutManagerGuiComp::OnAddWidget(const QByteArray& id, int index)
 	}
 
 	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
-	if (childLayoutPtr != nullptr) {
+	if (childLayoutPtr != nullptr){
 		childLayoutPtr->SetViewId(viewId);
 	}
 
@@ -410,7 +405,7 @@ void CLayoutManagerGuiComp::OnChangeSizes(const QByteArray& id, const SizeList& 
 	Q_ASSERT(rootLayoutPtr != nullptr);
 
 	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
-	if (childLayoutPtr != nullptr) {
+	if (childLayoutPtr != nullptr){
 		childLayoutPtr->SetSizes(sizeList);
 	}
 }
@@ -423,7 +418,7 @@ void CLayoutManagerGuiComp::OnChangeProperties(const QByteArray& id, const ILayo
 
 	istd::CChangeGroup changeGroup(rootLayoutPtr);
 	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
-	if (childLayoutPtr != nullptr) {
+	if (childLayoutPtr != nullptr){
 		childLayoutPtr->SetLayoutProperties(properties);
 		ILayout* parentLayoutPtr = childLayoutPtr->GetParent();
 		if (parentLayoutPtr != nullptr){
@@ -445,7 +440,7 @@ void CLayoutManagerGuiComp::OnChangeProperties(const QByteArray& id, const ILayo
 void CLayoutManagerGuiComp::OnSplitterMoved(int /*pos*/, int /*index*/)
 {
 	QSplitter* splitterPtr = dynamic_cast<QSplitter*>(sender());
-	if (splitterPtr != NULL && SplittersMap.contains(splitterPtr)) {
+	if (splitterPtr != NULL && SplittersMap.contains(splitterPtr)){
 		m_activeId = SplittersMap.value(splitterPtr);
 		m_splitterTimer.stop();
 		m_splitterTimer.start(1000);
@@ -456,7 +451,7 @@ void CLayoutManagerGuiComp::OnSplitterMoved(int /*pos*/, int /*index*/)
 void CLayoutManagerGuiComp::OnSplitterMoveFinished()
 {
 	QMap<QSplitter*, QByteArray>::const_iterator i = SplittersMap.constBegin();
-	while (i != SplittersMap.constEnd()) {
+	while (i != SplittersMap.constEnd()){
 		if (i.value() == m_activeId){
 			QSplitter* splitterPtr = i.key();
 			OnChangeSizes(m_activeId, splitterPtr->sizes());
@@ -497,13 +492,13 @@ void CLayoutManagerGuiComp::OnStartEndEditCommand()
 			UpdateGui(changeSet);
 
 			//QMap<QSplitter*, QByteArray>::const_iterator iter = SplittersMap.constBegin();
-			//while (iter != SplittersMap.constEnd()) {
+			//while (iter != SplittersMap.constEnd()){
 			//	QSplitter* splitterPtr = iter.key();
-			//	for (int i = 0; i < splitterPtr->count(); i++) {
+			//	for (int i = 0; i < splitterPtr->count(); i++){
 			//		QSplitterHandle *hndl = splitterPtr->handle(i);
 			//		bool fixedSplitter = false;
 			//		if (actionPtr->isChecked() == false && m_isFixedLayoutPtr.IsValid() == true
-			//			&& *m_isFixedLayoutPtr == true) {
+			//			&& *m_isFixedLayoutPtr == true){
 			//			fixedSplitter = true;
 			//		}
 			//		hndl->setEnabled(!fixedSplitter);
