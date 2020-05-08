@@ -194,6 +194,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 
 // reimplemented (IEventScenePositionProvider)
+
 double CTimeAxis::GetScenePosition(const QDateTime& time) const
 {
 	if (m_startTime == m_endTime){
