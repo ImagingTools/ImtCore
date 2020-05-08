@@ -2,8 +2,7 @@
 
 
 // Qt includes
-#include <QDebug>
-#include <QGraphicsLineItem>
+#include <QtCore/QDebug>
 
 // ACF includes
 #include <iser/IObject.h>
