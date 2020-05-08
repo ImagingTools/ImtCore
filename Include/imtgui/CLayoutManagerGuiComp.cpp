@@ -157,6 +157,7 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitSplitVertical(const QByteArray&)), this, SLOT(OnSplitVertical(const QByteArray&)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitSplitHorizontal(const QByteArray&)), this, SLOT(OnSplitHorizontal(const QByteArray&)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeIcon(const QByteArray&)), this, SLOT(OnChangeIcon(const QByteArray&)), Qt::DirectConnection);
+	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitRemoveIcon(const QByteArray&)), this, SLOT(OnRemoveIcon(const QByteArray&)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeTitle(const QByteArray&, const QString&)), this, SLOT(OnChangeTitle(const QByteArray&, const QString&)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeAlignTitle(const QByteArray&, const ILayout::AlignType&)), this, SLOT(OnChangeAlignTitle(const QByteArray&, const ILayout::AlignType&)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeSizes(const QByteArray&, const SizeList&)), this, SLOT(OnChangeSizes(const QByteArray&, const SizeList&)), Qt::DirectConnection);
@@ -330,6 +331,18 @@ void CLayoutManagerGuiComp::OnChangeIcon(const QByteArray& id)
 }
 
 
+void CLayoutManagerGuiComp::OnRemoveIcon(const QByteArray& id)
+{
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
+
+		ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
+		if (childLayoutPtr != nullptr) {
+			childLayoutPtr->SetIcon(QPixmap());
+		}
+}
+
+
 void CLayoutManagerGuiComp::OnSplitVertical(const QByteArray& id)
 {
 	ILayout* rootLayoutPtr = GetObservedObject();
@@ -417,6 +430,7 @@ void CLayoutManagerGuiComp::OnChangeProperties(const QByteArray& id, const ILayo
 	Q_ASSERT(rootLayoutPtr != nullptr);
 
 	istd::CChangeGroup changeGroup(rootLayoutPtr);
+
 	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
 	if (childLayoutPtr != nullptr){
 		childLayoutPtr->SetLayoutProperties(properties);

@@ -146,6 +146,7 @@ void CLayout::SetLayoutProperties(const LayoutProperties &properties)
 {
 	if (m_properties != properties) {
 		istd::CChangeNotifier changeNotifier(this);
+
 		m_properties = properties;
 	}
 }
@@ -379,6 +380,27 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 
 	retVal = retVal && I_SERIALIZE_ENUM(LayoutType, archive, m_layoutType);
 	retVal = retVal && archive.EndTag(layoutItemTypeTag);
+
+	QByteArray propertiesByteArray;
+	static iser::CArchiveTag propertiesTag("Properties", "Layout item properties");
+	retVal = retVal && archive.BeginTag(propertiesTag);
+	if (archive.IsStoring()) {
+		QDataStream stream(&propertiesByteArray, QIODevice::WriteOnly);
+		LayoutProperties properties = GetLayoutProperties();
+		stream << properties;
+	}
+
+	retVal = retVal && archive.Process(propertiesByteArray);
+
+	if (!archive.IsStoring()) {
+		QDataStream stream(&propertiesByteArray, QIODevice::ReadWrite);
+		LayoutProperties properties;
+		stream >> properties;
+		SetLayoutProperties(properties);
+	}
+	retVal = retVal && archive.EndTag(propertiesTag);
+
+
 	QByteArray sizeListAsByteArray;
 	if ((m_layoutType == LayoutType::LT_HORIZONTAL_SPLITTER) || (m_layoutType == LayoutType::LT_VERTICAL_SPLITTER)){
 		static iser::CArchiveTag layoutSizeListTag("LayoutSizeList", "Layout item size list");
@@ -386,8 +408,7 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 		if (archive.IsStoring()){
 			QDataStream stream(&sizeListAsByteArray, QIODevice::WriteOnly);
 			SizeList sizeList = GetSizes();
-			LayoutProperties properties = GetLayoutProperties();
-			stream << sizeList << properties;
+			stream << sizeList;
 		}
 
 		retVal = retVal && archive.Process(sizeListAsByteArray);
@@ -396,9 +417,8 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 			QDataStream stream(&sizeListAsByteArray, QIODevice::ReadWrite);
 			SizeList sizeList;
 			LayoutProperties properties;
-			stream >> sizeList >> properties;
+			stream >> sizeList;
 			SetSizes(sizeList);
-			SetLayoutProperties(properties);
 		}
 
 		retVal = retVal && archive.EndTag(layoutSizeListTag);

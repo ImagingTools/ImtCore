@@ -399,7 +399,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="titleIcon">
+       <widget class="QLabel" name="TitleIcon">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -437,6 +437,23 @@
        </widget>
       </item>
       <item>
+       <widget class="QToolButton" name="RemoveIcon">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="imtgui.qrc">
+          <normaloff>:/Icons/Remove</normaloff>:/Icons/Remove</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLineEdit" name="TitleNameEdit">
         <property name="font">
          <font>
@@ -449,7 +466,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="titleName">
+       <widget class="QLabel" name="TitleName">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
           <horstretch>0</horstretch>

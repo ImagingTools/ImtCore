@@ -157,6 +157,7 @@ CCustomLayoutWidget::CCustomLayoutWidget(
 	connect(AlignCenter, &QToolButton::clicked, this, &CCustomLayoutWidget::OnAlignCenter);
 	connect(AlignRight, &QToolButton::clicked, this, &CCustomLayoutWidget::OnAlignRight);
 	connect(ChangeIconButton, &QToolButton::clicked, this, &CCustomLayoutWidget::OnChangeIcon);
+	connect(RemoveIcon, &QToolButton::clicked, this, &CCustomLayoutWidget::OnRemoveIcon);
 	connect(Settings, &QToolButton::clicked, this, &CCustomLayoutWidget::OnChangeSettings);
 	connect(TitleNameEdit, &QLineEdit::editingFinished, this, &CCustomLayoutWidget::OnTitleChanged);
 	
@@ -243,7 +244,7 @@ QWidget* CCustomLayoutWidget::GetWidget()
 
 void CCustomLayoutWidget::SetName(QString name)
 {
-	CCustomLayoutWidgetForm::titleName->setText(name);
+	CCustomLayoutWidgetForm::TitleName->setText(name);
 	CCustomLayoutWidgetForm::TitleNameEdit->setText(name);
 }
 
@@ -255,7 +256,7 @@ QString CCustomLayoutWidget::GetName()
 		retVal = CCustomLayoutWidgetForm::TitleNameEdit->text();
 	}
 	else{
-		retVal = CCustomLayoutWidgetForm::titleName->text();
+		retVal = CCustomLayoutWidgetForm::TitleName->text();
 	}
 	return retVal;
 }
@@ -267,17 +268,19 @@ void CCustomLayoutWidget::SetEditMode(bool isEditMode)
 		EditPanel->setVisible(true);
 		ChangeIconButton->setVisible(true);
 		TitleNameEdit->setVisible(true);
-		TitleNameEdit->setText(titleName->text());
-		titleIcon->setVisible(false);
-		titleName->setVisible(false);
+		TitleNameEdit->setText(TitleName->text());
+		TitleIcon->setVisible(false);
+		TitleName->setVisible(false);
+		RemoveIcon->setVisible(true);
 	}
 	else{
 		EditPanel->setVisible(false);
 		ChangeIconButton->setVisible(false);
 		TitleNameEdit->setVisible(false);
-		titleIcon->setVisible(true);
-		titleName->setVisible(true);
-		titleName->setText(TitleNameEdit->text());
+		TitleIcon->setVisible(true);
+		TitleName->setVisible(true);
+		TitleName->setText(TitleNameEdit->text());
+		RemoveIcon->setVisible(false);
 	}
 }
 
@@ -296,14 +299,14 @@ QByteArray CCustomLayoutWidget::GetId()
 
 QPixmap CCustomLayoutWidget::GetIcon()
 {
-	QPixmap pixmap = *titleIcon->pixmap();
+	QPixmap pixmap = *TitleIcon->pixmap();
 	return pixmap;
 }
 
 
 void CCustomLayoutWidget::SetIcon(const QPixmap &icon)
 {
-	titleIcon->setPixmap(icon);
+	TitleIcon->setPixmap(icon);
 
 	ChangeIconButton->setIcon(icon);
 }
@@ -353,6 +356,11 @@ ILayout::AlignType CCustomLayoutWidget::GetTitleAlign()
 
 void CCustomLayoutWidget::SetLayoutProperties(const ILayout::LayoutProperties &properties)
 {
+	setMinimumWidth(properties.minWidth);
+	setMaximumWidth(properties.maxWidth);
+	setMinimumHeight(properties.minHeight);
+	setMaximumHeight(properties.maxHeight);
+
 	m_properties = properties;
 }
 
@@ -456,6 +464,13 @@ void CCustomLayoutWidget::OnTitleChanged()
 
 	Q_EMIT m_hierarchicalLayoutWidget.EmitChangeTitle(m_id, newText);
 }
+
+
+void CCustomLayoutWidget::OnRemoveIcon()
+{
+	Q_EMIT m_hierarchicalLayoutWidget.EmitRemoveIcon(m_id);
+}
+
 
 
 } // namespace imtgui

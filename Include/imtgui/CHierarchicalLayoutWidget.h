@@ -70,6 +70,7 @@ Q_SIGNALS:
 	void EmitSplitVertical(const QByteArray& id);
 	void EmitSplitHorizontal(const QByteArray& id);
 	void EmitChangeIcon(const QByteArray& id);
+	void EmitRemoveIcon(const QByteArray& id);
 	void EmitChangeAlignTitle(const QByteArray& id, const ILayout::AlignType& align);
 	void EmitChangeTitle(const QByteArray& id, const QString& title);
 	void EmitChangeSizes(const QByteArray& id, const SizeList& sizeList);
@@ -126,6 +127,7 @@ protected Q_SLOTS:
 	void OnAlignRight();
 	void OnChangeIcon();
 	void OnTitleChanged();
+	void OnRemoveIcon();
 
 private:
 	CHierarchicalLayoutWidget& m_hierarchicalLayoutWidget;

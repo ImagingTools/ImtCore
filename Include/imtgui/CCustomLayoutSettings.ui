@@ -129,7 +129,7 @@
       <widget class="QLineEdit" name="MinWidth">
        <property name="maximumSize">
         <size>
-         <width>60</width>
+         <width>65</width>
          <height>16777215</height>
         </size>
        </property>
@@ -176,7 +176,7 @@
       <widget class="QLineEdit" name="MaxWidth">
        <property name="maximumSize">
         <size>
-         <width>60</width>
+         <width>65</width>
          <height>16777215</height>
         </size>
        </property>
@@ -220,7 +220,7 @@
       <widget class="QLineEdit" name="MinHeight">
        <property name="maximumSize">
         <size>
-         <width>60</width>
+         <width>65</width>
          <height>16777215</height>
         </size>
        </property>
@@ -264,7 +264,7 @@
       <widget class="QLineEdit" name="MaxHeight">
        <property name="maximumSize">
         <size>
-         <width>60</width>
+         <width>65</width>
          <height>16777215</height>
         </size>
        </property>
