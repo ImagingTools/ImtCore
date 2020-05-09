@@ -82,8 +82,7 @@ protected Q_SLOTS:
 	void OnChangeAlignTitle(const QByteArray& id, const ILayout::AlignType& align);
 	void OnChangeIcon(const QByteArray& id);
 	void OnRemoveIcon(const QByteArray& id);
-	void OnSplitVertical(const QByteArray& id);
-	void OnSplitHorizontal(const QByteArray& id);
+	void OnSplitLayout(const QByteArray& id, ILayout::LayoutType type, int width, int height);
 	void OnDeleteWidget(const QByteArray& id);
 	void OnAddWidget(const QByteArray& id, int index);
 	void OnAddWidgetByViewId(const QByteArray& id, const QByteArray& viewId);

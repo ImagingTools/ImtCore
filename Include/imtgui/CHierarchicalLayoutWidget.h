@@ -67,8 +67,7 @@ Q_SIGNALS:
 	void EmitAddWidget(const QByteArray& id, int index);
 	void EmitAddWidgetByViewId(const QByteArray& id, const QByteArray& viewId);
 	void EmitDeleteWidget(const QByteArray& id);
-	void EmitSplitVertical(const QByteArray& id);
-	void EmitSplitHorizontal(const QByteArray& id);
+	void EmitSplitLayout(const QByteArray& id, ILayout::LayoutType type, int width, int height);
 	void EmitChangeIcon(const QByteArray& id);
 	void EmitRemoveIcon(const QByteArray& id);
 	void EmitChangeAlignTitle(const QByteArray& id, const ILayout::AlignType& align);

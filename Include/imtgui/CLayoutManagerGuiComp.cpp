@@ -154,8 +154,7 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitAddWidget(const QByteArray&,int)), this, SLOT(OnAddWidget(const QByteArray&, int)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitAddWidgetByViewId(const QByteArray&, const QByteArray&)), this, SLOT(OnAddWidgetByViewId(const QByteArray&, const QByteArray&)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitDeleteWidget(const QByteArray&)), this, SLOT(OnDeleteWidget(const QByteArray&)), Qt::DirectConnection);
-	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitSplitVertical(const QByteArray&)), this, SLOT(OnSplitVertical(const QByteArray&)), Qt::DirectConnection);
-	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitSplitHorizontal(const QByteArray&)), this, SLOT(OnSplitHorizontal(const QByteArray&)), Qt::DirectConnection);
+	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitSplitLayout(const QByteArray&, ILayout::LayoutType, int, int)), this, SLOT(OnSplitLayout(const QByteArray&, ILayout::LayoutType, int, int)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeIcon(const QByteArray&)), this, SLOT(OnChangeIcon(const QByteArray&)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitRemoveIcon(const QByteArray&)), this, SLOT(OnRemoveIcon(const QByteArray&)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeTitle(const QByteArray&, const QString&)), this, SLOT(OnChangeTitle(const QByteArray&, const QString&)), Qt::DirectConnection);
@@ -181,8 +180,11 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 			if (command != nullptr){
 				m_undoCommands = command;
 				m_rootCommands.InsertChild(m_undoCommands);
-				for (int i = 0; i < m_undoCommands->GetChildsCount(); i++){
-					dynamic_cast<iqtgui::CHierarchicalCommand*>(m_undoCommands->GetChild(i))->setVisible(false);
+				for (int j = 0; j < m_undoCommands->GetChildsCount(); j++){
+					iqtgui::CHierarchicalCommand *commandChild = dynamic_cast<iqtgui::CHierarchicalCommand*>(m_undoCommands->GetChild(j));
+					if (commandChild != nullptr){
+						commandChild->setVisible(false);
+					}
 				}
 				break;
 			}
@@ -343,7 +345,7 @@ void CLayoutManagerGuiComp::OnRemoveIcon(const QByteArray& id)
 }
 
 
-void CLayoutManagerGuiComp::OnSplitVertical(const QByteArray& id)
+void CLayoutManagerGuiComp::OnSplitLayout(const QByteArray& id, ILayout::LayoutType type, int width, int height)
 {
 	ILayout* rootLayoutPtr = GetObservedObject();
 	Q_ASSERT(rootLayoutPtr != nullptr);
@@ -352,21 +354,7 @@ void CLayoutManagerGuiComp::OnSplitVertical(const QByteArray& id)
 
 	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
 	if (childLayoutPtr != nullptr){
-		childLayoutPtr->SplitLayout(ILayout::LT_VERTICAL_SPLITTER);
-	}
-}
-
-
-void CLayoutManagerGuiComp::OnSplitHorizontal(const QByteArray& id)
-{
-	ILayout* rootLayoutPtr = GetObservedObject();
-	Q_ASSERT(rootLayoutPtr != nullptr);
-
-	istd::CChangeGroup changeGroup(rootLayoutPtr);
-
-	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
-	if (childLayoutPtr != nullptr){
-		childLayoutPtr->SplitLayout(ILayout::LT_HORIZONTAL_SPLITTER);
+		childLayoutPtr->SplitLayout(type, width, height);
 	}
 }
 
@@ -437,13 +425,13 @@ void CLayoutManagerGuiComp::OnChangeProperties(const QByteArray& id, const ILayo
 		ILayout* parentLayoutPtr = childLayoutPtr->GetParent();
 		if (parentLayoutPtr != nullptr){
 			bool isFixedLayout = properties.isFixedLayout;
-			ILayout::LayoutProperties properties = parentLayoutPtr->GetLayoutProperties();
-			properties.isFixedLayout = isFixedLayout;
-			parentLayoutPtr->SetLayoutProperties(properties);
+			ILayout::LayoutProperties layoutProperties = parentLayoutPtr->GetLayoutProperties();
+			layoutProperties.isFixedLayout = isFixedLayout;
+			parentLayoutPtr->SetLayoutProperties(layoutProperties);
 			for (int i = 0; i < parentLayoutPtr->GetChildsCount(); i++){
-				properties = parentLayoutPtr->GetChild(i)->GetLayoutProperties();
-				properties.isFixedLayout = isFixedLayout;
-				parentLayoutPtr->GetChild(i)->SetLayoutProperties(properties);
+				layoutProperties = parentLayoutPtr->GetChild(i)->GetLayoutProperties();
+				layoutProperties.isFixedLayout = isFixedLayout;
+				parentLayoutPtr->GetChild(i)->SetLayoutProperties(layoutProperties);
 			}
 		}
 	}

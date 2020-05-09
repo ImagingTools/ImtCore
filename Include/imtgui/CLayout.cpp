@@ -310,7 +310,7 @@ ILayout* CLayout::RemoveChild(const QByteArray& id)
 
 
 
-void CLayout::SplitLayout(ILayout::LayoutType type)
+void CLayout::SplitLayout(ILayout::LayoutType type, int width, int height)
 {
 	istd::CChangeGroup changeGroup(this);
 	
@@ -335,6 +335,24 @@ void CLayout::SplitLayout(ILayout::LayoutType type)
 		CLayout* rightLayout = new CLayout(this);
 
 		AppendChild(rightLayout);
+
+		parentLayoutPtr = this;
+	}
+
+	ILayout::SizeList sizes;
+	int size = 0;
+	int count = parentLayoutPtr->GetChildsCount();
+	if (type == LT_VERTICAL_SPLITTER && count > 0 && height > 0) {
+		size = height / count;
+	}
+	if (type == LT_HORIZONTAL_SPLITTER && count > 0 && width > 0) {
+		size = width / count;
+	}
+	if (size > 0 && count > 0) {
+		for (int i = 0; i < count; i++) {
+			sizes << size;
+		}
+		parentLayoutPtr->SetSizes(sizes);
 	}
 }
 

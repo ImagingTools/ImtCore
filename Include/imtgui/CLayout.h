@@ -55,7 +55,7 @@ public:
 	virtual void Clear() Q_DECL_OVERRIDE;
 	virtual ILayout* FindChild(const QByteArray& id) const Q_DECL_OVERRIDE;
 	virtual ILayout* RemoveChild(const QByteArray& id) Q_DECL_OVERRIDE;
-	virtual void SplitLayout(ILayout::LayoutType type) Q_DECL_OVERRIDE;
+	virtual void SplitLayout(ILayout::LayoutType type, int width, int height) Q_DECL_OVERRIDE;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) Q_DECL_OVERRIDE;

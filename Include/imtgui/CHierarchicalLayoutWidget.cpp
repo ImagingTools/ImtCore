@@ -224,8 +224,8 @@ bool CCustomLayoutWidget::SetWidget(QWidget* widgetPtr)
 
 	// take care about external widget
 	if ((WidgetPanel->layout() != NULL) && (WidgetPanel->layout()->count() == 1) && (WidgetPanel->layout()->itemAt(0)->widget() != NULL)){
-		QWidget* widgetPtr = WidgetPanel->layout()->takeAt(0)->widget();
-		widgetPtr->setParent(NULL);
+		QWidget* takeWidgetPtr = WidgetPanel->layout()->takeAt(0)->widget();
+		takeWidgetPtr->setParent(NULL);
 	}
 
 	delete WidgetPanel->layout();
@@ -369,7 +369,7 @@ void CCustomLayoutWidget::SetLayoutProperties(const ILayout::LayoutProperties &p
 
 // reimplemented (QWidget)
 
-void CCustomLayoutWidget::paintEvent(QPaintEvent* eventPtr)
+void CCustomLayoutWidget::paintEvent(QPaintEvent* /*eventPtr*/)
 {
 	QPainter painter(this);
 
@@ -424,13 +424,13 @@ void CCustomLayoutWidget::OnDeleteWidget()
 
 void CCustomLayoutWidget::OnSplitVertical()
 {
-	Q_EMIT m_hierarchicalLayoutWidget.EmitSplitVertical(m_id);
+	Q_EMIT m_hierarchicalLayoutWidget.EmitSplitLayout(m_id, ILayout::LT_VERTICAL_SPLITTER, width(), height());
 }
 
 
 void CCustomLayoutWidget::OnSplitHorizontal()
 {
-	Q_EMIT m_hierarchicalLayoutWidget.EmitSplitHorizontal(m_id);
+	Q_EMIT m_hierarchicalLayoutWidget.EmitSplitLayout(m_id, ILayout::LT_HORIZONTAL_SPLITTER, width(), height());
 }
 
 
