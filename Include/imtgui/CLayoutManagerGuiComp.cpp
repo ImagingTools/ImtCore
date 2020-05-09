@@ -10,8 +10,8 @@
 
 // ACF includes
 #include <istd/CChangeGroup.h>
-#include <iser/CXmlStringWriteArchive.h>
-#include <iser/CXmlStringReadArchive.h>
+#include <ifile/CCompactXmlFileWriteArchive.h>
+#include <ifile/CCompactXmlFileReadArchive.h>
 
 
 namespace imtgui
@@ -215,8 +215,8 @@ void CLayoutManagerGuiComp::OnGuiRetranslate()
 	// File commands emptyIcon
 	m_startEndEditModeCommand.SetVisuals(tr("Edit Mode"), tr("Edit Mode"), tr("EditMode"), QIcon(":/Icons/Edit"));
 	m_clearCommand.SetVisuals(tr("Clear All"), tr("Clear All"), tr("ClearAll"), QIcon(":/Icons/Clear"));
-	m_loadCommand.SetVisuals(tr("Load"), tr("Load"), tr("Load"), QIcon(":/Icons/Load"));
-	m_saveCommand.SetVisuals(tr("Save"), tr("Save"), tr("Save"), QIcon(":/Icons/Save"));
+	m_loadCommand.SetVisuals(tr("Import"), tr("Import"), tr("Import"), QIcon(":/Icons/Load"));
+	m_saveCommand.SetVisuals(tr("Export"), tr("Export"), tr("Export"), QIcon(":/Icons/Save"));
 }
 
 
@@ -244,16 +244,13 @@ void CLayoutManagerGuiComp::OnLoad()
 	ILayout* rootLayoutPtr = GetObservedObject();
 	Q_ASSERT(rootLayoutPtr != nullptr);
 
-	QString fileName = QFileDialog::getOpenFileName(GetWidget(), tr("Open File"), QString(), QString("*.layout"));
+	QString fileName = QFileDialog::getOpenFileName(GetWidget(), tr("Import Layout"), QString(), QString("Layout Files (*.layout)"));
 	if (!fileName.isEmpty()){
-		QFile file(fileName);
-		if (file.open(QIODevice::ReadOnly)){
-			iser::CXmlStringReadArchive archive(file.readAll());
-			if ((rootLayoutPtr != nullptr) && rootLayoutPtr->Serialize(archive)){
-				// error
-			}
+		ifile::CCompactXmlFileReadArchive archive(fileName);
 
-			file.close();
+		bool retVal = rootLayoutPtr->Serialize(archive);
+		if (!retVal){
+			QMessageBox::critical(GetWidget(), tr("Import Layout..."), tr("Layout could not be imported"));
 		}
 	}
 }
@@ -264,15 +261,13 @@ void CLayoutManagerGuiComp::OnSave()
 	ILayout* rootLayoutPtr = GetObservedObject();
 	Q_ASSERT(rootLayoutPtr != nullptr);
 
-	QString fileName = QFileDialog::getSaveFileName(GetWidget(), tr("Save File"), QString(), QString("*.layout"));
+	QString fileName = QFileDialog::getSaveFileName(GetWidget(), tr("Export Layout"), QString(), QString("Layout Files (*.layout)"));
 	if (!fileName.isEmpty()){
-		iser::CXmlStringWriteArchive archive;
-		if (rootLayoutPtr != nullptr && rootLayoutPtr->Serialize(archive)){
-			QFile file(fileName);
-			if (file.open(QIODevice::WriteOnly)){
-				file.write(archive.GetString());
-				file.close();
-			}
+		ifile::CCompactXmlFileWriteArchive archive(fileName);
+
+		bool retVal = rootLayoutPtr->Serialize(archive);
+		if (!retVal){
+			QMessageBox::critical(GetWidget(), tr("Export Layout..."), tr("Layout could not be exported"));
 		}
 	}
 }

@@ -390,12 +390,8 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 {
 	bool retVal = true;
 
-	static iser::CArchiveTag layoutItemTag("LayoutItem", "Layout item");
-	retVal = retVal && archive.BeginTag(layoutItemTag);
-
-	static iser::CArchiveTag layoutItemTypeTag("LayoutItemType", "Layout item type");
+	static iser::CArchiveTag layoutItemTypeTag("LayoutItemType", "Layout item type", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(layoutItemTypeTag);
-
 	retVal = retVal && I_SERIALIZE_ENUM(LayoutType, archive, m_layoutType);
 	retVal = retVal && archive.EndTag(layoutItemTypeTag);
 
@@ -425,8 +421,10 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 
 		int childCount = GetChildsCount();
 
-		static iser::CArchiveTag childItemGroupTag("ChildItems", "Child items");
-		retVal = retVal && archive.BeginMultiTag(childItemGroupTag, layoutItemTag, childCount);
+		static iser::CArchiveTag childItemGroupTag("Sublayouts", "Child items");
+		static iser::CArchiveTag sublayoutItemTag("Sublayout", "Layout item");
+
+		retVal = retVal && archive.BeginMultiTag(childItemGroupTag, sublayoutItemTag, childCount);
 
 		if (!archive.IsStoring()){
 			while (m_childs.count() > 0){
@@ -442,34 +440,39 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 			else{
 				layout = new CLayout(this);
 			}
+
+			retVal = retVal && archive.BeginTag(sublayoutItemTag);
+
 			retVal = retVal && layout->InternalSerializeItemRecursive(archive);
 			if (!archive.IsStoring()){
 				AppendChild(layout);
 			}
+
+			retVal = retVal && archive.EndTag(sublayoutItemTag);
 		}
 
 		retVal = retVal && archive.EndTag(childItemGroupTag);
 	}
 	else{
-		static iser::CArchiveTag herrachicalWidget("HerarchicalWidget", "Herarchical widget");
-		retVal = retVal && archive.BeginTag(herrachicalWidget);
+		static iser::CArchiveTag herrachicalWidgetTag("HerarchicalWidget", "Herarchical widget", iser::CArchiveTag::TT_GROUP);
+		retVal = retVal && archive.BeginTag(herrachicalWidgetTag);
 
-		static iser::CArchiveTag herrachicalId("Id", "Herarchical id");
+		static iser::CArchiveTag herrachicalId("Id", "Herarchical id", iser::CArchiveTag::TT_LEAF, &herrachicalWidgetTag);
 		retVal = retVal && archive.BeginTag(herrachicalId);
 		retVal = retVal && archive.Process(m_id);
 		retVal = retVal && archive.EndTag(herrachicalId);
 
-		static iser::CArchiveTag herrachicalTitle("Title", "Herarchical title");
+		static iser::CArchiveTag herrachicalTitle("Title", "Herarchical title", iser::CArchiveTag::TT_LEAF, &herrachicalWidgetTag);
 		retVal = retVal && archive.BeginTag(herrachicalTitle);
 		retVal = retVal && archive.Process(m_title);
 		retVal = retVal && archive.EndTag(herrachicalTitle);
 
-		static iser::CArchiveTag herrachicalViewId("ViewId", "Herarchical viewId");
+		static iser::CArchiveTag herrachicalViewId("ViewId", "Herarchical viewId", iser::CArchiveTag::TT_LEAF, &herrachicalWidgetTag);
 		retVal = retVal && archive.BeginTag(herrachicalViewId);
 		retVal = retVal && archive.Process(m_viewId);
 		retVal = retVal && archive.EndTag(herrachicalViewId);
 
-		static iser::CArchiveTag herrachicalTitleAlign("Title Align", "Herarchical title align");
+		static iser::CArchiveTag herrachicalTitleAlign("Title Align", "Herarchical title align", iser::CArchiveTag::TT_LEAF, &herrachicalWidgetTag);
 		retVal = retVal && archive.BeginTag(herrachicalTitleAlign);
 		retVal = retVal && I_SERIALIZE_ENUM(AlignType, archive, m_alignType);
 		retVal = retVal && archive.EndTag(herrachicalTitleAlign);
@@ -480,20 +483,18 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 			stream << m_icon;
 		}
 
-		static iser::CArchiveTag herrachicalIcon("Icon", "Herarchical icon");
+		static iser::CArchiveTag herrachicalIcon("Icon", "Herarchical icon", iser::CArchiveTag::TT_LEAF, &herrachicalWidgetTag);
 		retVal = retVal && archive.BeginTag(herrachicalIcon);
 		retVal = retVal && archive.Process(iconAsByteArray);
 		retVal = retVal && archive.EndTag(herrachicalIcon);
 
-		retVal = retVal && archive.EndTag(herrachicalWidget);
+		retVal = retVal && archive.EndTag(herrachicalWidgetTag);
 
 		if (!archive.IsStoring()){
 			QDataStream stream(&iconAsByteArray, QIODevice::ReadWrite);
 			stream >> m_icon;
 		}
 	}
-
-	retVal = retVal && archive.EndTag(layoutItemTag);
 
 	return retVal;
 }
@@ -502,21 +503,21 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 bool CLayout::SerializeProperties(iser::IArchive& archive, LayoutProperties &properties)
 {
 	QByteArray propertiesByteArray;
-	static iser::CArchiveTag propertiesTag("Properties", "Layout item properties");
+	static iser::CArchiveTag propertiesTag("Properties", "Layout item properties", iser::CArchiveTag::TT_GROUP);
 	bool retVal = archive.BeginTag(propertiesTag);
 
-	static iser::CArchiveTag fixedLayoutTag("IsFixedLayout", "Fixed Layout");
+	static iser::CArchiveTag fixedLayoutTag("IsFixedLayout", "Fixed Layout", iser::CArchiveTag::TT_LEAF, &propertiesTag);
 	retVal = retVal && archive.BeginTag(fixedLayoutTag);
 	retVal = retVal && archive.Process(properties.isFixedLayout);
 	retVal = retVal && archive.EndTag(fixedLayoutTag);
 
-	static iser::CArchiveTag showBoxTag("IsShowBox", "Show box");
+	static iser::CArchiveTag showBoxTag("IsShowBox", "Show box", iser::CArchiveTag::TT_LEAF, &propertiesTag);
 	retVal = retVal && archive.BeginTag(showBoxTag);
 	retVal = retVal && archive.Process(properties.isShowBox);
 	retVal = retVal && archive.EndTag(showBoxTag);
 
 	QString nameColor = properties.borderColor.name();
-	static iser::CArchiveTag borderColorTag("BorderColor", "Border color");
+	static iser::CArchiveTag borderColorTag("BorderColor", "Border color", iser::CArchiveTag::TT_LEAF, &propertiesTag);
 	retVal = retVal && archive.BeginTag(borderColorTag);
 	retVal = retVal && archive.Process(nameColor);
 	retVal = retVal && archive.EndTag(borderColorTag);
@@ -524,27 +525,28 @@ bool CLayout::SerializeProperties(iser::IArchive& archive, LayoutProperties &pro
 		properties.borderColor.setNamedColor(nameColor);
 	}
 
-	static iser::CArchiveTag minWidthTag("MinWidth", "Minimum width");
+	static iser::CArchiveTag minWidthTag("MinWidth", "Minimum width", iser::CArchiveTag::TT_LEAF, &propertiesTag);
 	retVal = retVal && archive.BeginTag(minWidthTag);
 	retVal = retVal && archive.Process(properties.minWidth);
 	retVal = retVal && archive.EndTag(minWidthTag);
 
-	static iser::CArchiveTag maxWidthTag("MaxWidth", "Maximum width");
+	static iser::CArchiveTag maxWidthTag("MaxWidth", "Maximum width", iser::CArchiveTag::TT_LEAF, &propertiesTag);
 	retVal = retVal && archive.BeginTag(maxWidthTag);
 	retVal = retVal && archive.Process(properties.maxWidth);
 	retVal = retVal && archive.EndTag(maxWidthTag);
 
-	static iser::CArchiveTag minHeightTag("MinHeight", "Minimum height");
+	static iser::CArchiveTag minHeightTag("MinHeight", "Minimum height", iser::CArchiveTag::TT_LEAF, &propertiesTag);
 	retVal = retVal && archive.BeginTag(minHeightTag);
 	retVal = retVal && archive.Process(properties.minHeight);
 	retVal = retVal && archive.EndTag(minHeightTag);
 
-	static iser::CArchiveTag maxHeightTag("MaxHeight", "Maximum height");
+	static iser::CArchiveTag maxHeightTag("MaxHeight", "Maximum height", iser::CArchiveTag::TT_LEAF, &propertiesTag);
 	retVal = retVal && archive.BeginTag(maxHeightTag);
 	retVal = retVal && archive.Process(properties.maxHeight);
 	retVal = retVal && archive.EndTag(maxHeightTag);
 
 	retVal = retVal && archive.EndTag(propertiesTag);
+
 	return retVal;
 }
 

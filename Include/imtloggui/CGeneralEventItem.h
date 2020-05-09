@@ -11,8 +11,6 @@ namespace imtloggui
 
 class CGeneralEventItem: public CEventItemBase
 {
-	Q_DISABLE_COPY_MOVE(CGeneralEventItem);
-
 public:
 	typedef CEventItemBase BaseClass;
 
