@@ -227,7 +227,7 @@ void CLayoutManagerGuiComp::OnClearAll()
 
 	if (m_layoutWidgetPtr != nullptr){
 		QMessageBox msgBox;
-		msgBox.setText(tr("Do you want clear All views?"));
+		msgBox.setText(tr("Do you want clear all layout items?"));
 		msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 		msgBox.setDefaultButton(QMessageBox::Cancel);
 

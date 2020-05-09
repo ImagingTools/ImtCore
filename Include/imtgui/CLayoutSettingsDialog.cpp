@@ -7,9 +7,6 @@
 #include <QtWidgets/QColorDialog>
 
 
-// ACF includes
-
-
 namespace imtgui
 {
 
