@@ -323,11 +323,11 @@ void CLayout::SplitLayout(ILayout::LayoutType type, int width, int height)
 		CLayout* leftLayoutPtr = new CLayout(this);
 		leftLayoutPtr->CopyData(this);
 
+		m_id = QUuid::createUuid().toByteArray();
+
 		// Reset parent layout:
 		Clear();
 
-		m_id = QUuid::createUuid().toByteArray();
-		
 		SetType(type);
 		AppendChild(leftLayoutPtr);
 
@@ -398,6 +398,11 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 	retVal = retVal && SerializeProperties(archive, m_properties);
 
 	if ((m_layoutType == LayoutType::LT_HORIZONTAL_SPLITTER) || (m_layoutType == LayoutType::LT_VERTICAL_SPLITTER)){
+		static iser::CArchiveTag uuidTag("UUID", "UUID for the layout item", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(uuidTag);
+		retVal = retVal && archive.Process(m_id);
+		retVal = retVal && archive.EndTag(uuidTag);
+
 		static iser::CArchiveTag sizesTag("LayoutSizes", "Layout item size list", iser::CArchiveTag::TT_MULTIPLE);
 		static iser::CArchiveTag subSizeTag("Size", "Size for item", iser::CArchiveTag::TT_LEAF, &sizesTag);
 
