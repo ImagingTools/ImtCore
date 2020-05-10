@@ -399,27 +399,30 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 
 	QByteArray sizeListAsByteArray;
 	if ((m_layoutType == LayoutType::LT_HORIZONTAL_SPLITTER) || (m_layoutType == LayoutType::LT_VERTICAL_SPLITTER)){
-		if (archive.IsStoring()){
-			QDataStream stream(&sizeListAsByteArray, QIODevice::WriteOnly);
-			SizeList sizeList = GetSizes();
-			stream << sizeList;
+
+		static iser::CArchiveTag sizesTag("LayoutSizes", "Layout item size list");
+		static iser::CArchiveTag subSizeTag("Size", "Size for item");
+
+		SizeList sizeList = GetSizes(); 
+		if (!archive.IsStoring()){
+			sizeList.clear();
+		}
+		int countSize = sizeList.count();
+		retVal = retVal && archive.BeginMultiTag(sizesTag, subSizeTag, countSize);
+		for (int i = 0; i < countSize; i++) {
+			int size;
+			if (archive.IsStoring()){
+				size = sizeList.at(i);
+			}
+			retVal = retVal && archive.BeginTag(subSizeTag);
+			retVal = retVal && archive.Process(size);
+			retVal = retVal && archive.EndTag(subSizeTag);
+			if (!archive.IsStoring()){
+				sizeList.append(size);
+			}
 		}
 
-		QByteArray sizeListAsBase64 = sizeListAsByteArray.toBase64();
-		static iser::CArchiveTag layoutSizeListTag("LayoutSizeList", "Layout item size list");
-		retVal = retVal && archive.BeginTag(layoutSizeListTag);
-		retVal = retVal && archive.Process(sizeListAsBase64);
-		retVal = retVal && archive.EndTag(layoutSizeListTag);
-
-		if (!archive.IsStoring()) {
-			sizeListAsByteArray = QByteArray::fromBase64(sizeListAsBase64);
-			QDataStream stream(&sizeListAsByteArray, QIODevice::ReadWrite);
-			SizeList sizeList;
-			LayoutProperties properties;
-			stream >> sizeList;
-			SetSizes(sizeList);
-		}
-
+		retVal = retVal && archive.EndTag(sizesTag);
 
 		int childCount = GetChildsCount();
 
