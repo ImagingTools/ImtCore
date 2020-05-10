@@ -25,7 +25,7 @@ CLayoutSettingsDialog::CLayoutSettingsDialog(QWidget* parentPtr)
 void CLayoutSettingsDialog::SetLayoutProperties(const ILayout::LayoutProperties &properties)
 {
 	FixedLayouts->setChecked(properties.isFixedLayout);
-	ViewBox->setChecked(properties.isShowBox);
+	ViewBox->setChecked(properties.isBorderEnabled);
 	SetBorderColor(properties.borderColor);
 	QString string;
 	string.setNum(properties.minWidth);
@@ -43,7 +43,7 @@ ILayout::LayoutProperties CLayoutSettingsDialog::GetLayoutProperties() const
 {
 	ILayout::LayoutProperties retVal;
 	retVal.isFixedLayout = FixedLayouts->isChecked();
-	retVal.isShowBox = ViewBox->isChecked();
+	retVal.isBorderEnabled = ViewBox->isChecked();
 	retVal.borderColor = m_borderColor;
 	retVal.minWidth = MinWidth->text().toInt();
 	retVal.maxWidth = MaxWidth->text().toInt();

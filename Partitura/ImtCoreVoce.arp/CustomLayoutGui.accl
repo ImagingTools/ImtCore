@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4839" Description="ACF"/>
+            <Version Id="1" Number="2119" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="LayoutManager" X="225" Y="425" Note=""/>
+        <Element ComponentName="LayoutManagerGui" X="625" Y="125" Note=""/>
+        <Element ComponentName="UndoManager" X="625" Y="725" Note=""/>
+        <Element ComponentName="UndoManagerCommandsProvider" X="625" Y="425" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

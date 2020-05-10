@@ -169,8 +169,8 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 	Q_ASSERT_X((m_guiViewIdMultiAttrPtr.GetCount() == m_guiViewMultiFactCompPtr.GetCount()) &&
 		(m_guiViewNameMultiAttrPtr.GetCount() == m_guiViewMultiFactCompPtr.GetCount()), "CLayoutManagerGuiComp", "attributes ViewIds, ViewNames and ViewFactories should have the same count");
 
-	m_colorBorderPtr.IsValid() ? m_layoutWidgetPtr->SetBorderColor(QColor(QString(*m_colorBorderPtr))) : m_layoutWidgetPtr->SetBorderColor(QColor(QString("#808080")));
-	m_isShowBoxPtr.IsValid() ? m_layoutWidgetPtr->SetIsShowBox(*m_isShowBoxPtr) : m_layoutWidgetPtr->SetIsShowBox(true);
+	m_layoutWidgetPtr->SetBorderColor(QColor(QString(*m_colorBorderAttrPtr)));
+	m_layoutWidgetPtr->SetBorderEnabled(*m_isShowBoxAttrPtr);
 
 	// add undo manager commands provider
 	if (m_commandsProviderCompPtr.IsValid()){

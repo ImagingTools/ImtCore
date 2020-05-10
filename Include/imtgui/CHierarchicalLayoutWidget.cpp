@@ -120,13 +120,13 @@ QColor CHierarchicalLayoutWidget::GetBorderColor() const
 }
 
 
-void CHierarchicalLayoutWidget::SetIsShowBox(bool isShowBox)
+void CHierarchicalLayoutWidget::SetBorderEnabled(bool isBorderEnabled)
 {
-	m_isShowBox = isShowBox;
+	m_isShowBox = isBorderEnabled;
 }
 
 
-bool CHierarchicalLayoutWidget::GetIsShowBox() const
+bool CHierarchicalLayoutWidget::IsBorderEnabled() const
 {
 	return m_isShowBox;
 }
@@ -376,8 +376,8 @@ void CCustomLayoutWidget::paintEvent(QPaintEvent* /*eventPtr*/)
 	painter.save();
 	//painter.setOpacity(0.7);
 
-//	if (m_hierarchicalLayoutWidget.GetIsShowBox() == true 
-	if (m_properties.isShowBox == true
+//	if (m_hierarchicalLayoutWidget.IsBorderEnabled() == true 
+	if (m_properties.isBorderEnabled == true
 		|| m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT){
 
 //		QPen pen(m_hierarchicalLayoutWidget.GetBorderColor());

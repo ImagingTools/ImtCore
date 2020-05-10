@@ -51,8 +51,8 @@ public:
 	CCustomLayoutWidget* createCustomWidget();
 	void SetBorderColor(const QColor &color);
 	QColor GetBorderColor() const;
-	void SetIsShowBox(bool isShowBox);
-	bool GetIsShowBox() const;
+	void SetBorderEnabled(bool isBorderEnabled);
+	bool IsBorderEnabled() const;
 
 protected:
 	friend class CCustomLayoutWidget;

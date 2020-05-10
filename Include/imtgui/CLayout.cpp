@@ -524,7 +524,7 @@ bool CLayout::SerializeProperties(iser::IArchive& archive, LayoutProperties &pro
 
 	static iser::CArchiveTag showBoxTag("IsShowBox", "Show box", iser::CArchiveTag::TT_LEAF, &propertiesTag);
 	retVal = retVal && archive.BeginTag(showBoxTag);
-	retVal = retVal && archive.Process(properties.isShowBox);
+	retVal = retVal && archive.Process(properties.isBorderEnabled);
 	retVal = retVal && archive.EndTag(showBoxTag);
 
 	QString nameColor = properties.borderColor.name();
@@ -565,7 +565,7 @@ bool CLayout::SerializeProperties(iser::IArchive& archive, LayoutProperties &pro
 
 QDataStream &operator<<(QDataStream &dataStream, const ILayout::LayoutProperties &src)
 {
-	dataStream << src.isFixedLayout << src.isShowBox << src.borderColor;
+	dataStream << src.isFixedLayout << src.isBorderEnabled << src.borderColor;
 	dataStream << src.minWidth << src.maxWidth << src.minHeight << src.maxHeight;
 	return dataStream;
 }
@@ -573,7 +573,7 @@ QDataStream &operator<<(QDataStream &dataStream, const ILayout::LayoutProperties
 
 QDataStream &operator>>(QDataStream &dataStream, ILayout::LayoutProperties &src)
 {
-	dataStream >> src.isFixedLayout >> src.isShowBox >> src.borderColor;
+	dataStream >> src.isFixedLayout >> src.isBorderEnabled >> src.borderColor;
 	dataStream >> src.minWidth >> src.maxWidth >> src.minHeight >> src.maxHeight;
 	return dataStream;
 }
@@ -581,7 +581,7 @@ QDataStream &operator>>(QDataStream &dataStream, ILayout::LayoutProperties &src)
 
 bool operator ==(const ILayout::LayoutProperties &left, const ILayout::LayoutProperties &right)
 {
-	bool retVal = (left.isFixedLayout == right.isFixedLayout) && (left.isShowBox == right.isShowBox);
+	bool retVal = (left.isFixedLayout == right.isFixedLayout) && (left.isBorderEnabled == right.isBorderEnabled);
 	retVal = retVal && (left.borderColor == right.borderColor);
 	retVal = retVal && (left.minWidth == right.minWidth) && (left.maxWidth == right.maxWidth);
 	retVal = retVal && (left.minHeight == right.minHeight) && (left.maxHeight == right.maxHeight);

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4839" Description="ACF"/>
+            <Version Id="1" Number="2119" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Custom layout UI-manager</Description>
+    <Keywords>Layout</Keywords>
+    <ElementsList>
+        <Element Id="LayoutManager" PackageId="ImtGuiPck" ComponentId="LayoutManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="LayoutManagerGui" PackageId="ImtGuiPck" ComponentId="LayoutManagerGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultBorderColor" Type="Id" ExportId="DefaultBorderColor">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultFixedLayout" Type="Boolean" ExportId="DefaultFixedLayout">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LayoutManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultShowBox" Type="Boolean" ExportId="DefaultShowBox">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultStatusIcon" Type="String" ExportId="DefaultStatusIcon">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultStatusText" Type="Text" ExportId="DefaultStatusText">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UndoManagerCommands" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UndoManagerCommandsProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewFactories" Type="Factory[]" ExportId="ViewFactories">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewIds" Type="Id[]" ExportId="ViewIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewNames" Type="String[]" ExportId="ViewNames">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UndoManager" PackageId="BasePck" ComponentId="SerializedUndoManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LayoutManager"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UndoManagerCommandsProvider" PackageId="QtGuiPck" ComponentId="UndoManagerCommandsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="UndoManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UndoManager"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="ibase::ICommandsProvider" ComponentId="LayoutManagerGui"/>
+        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="LayoutManagerGui"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="LayoutManagerGui"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="VisualStatus" ComponentId="LayoutManagerGui/VisualStatus"/>
+    </ExportedComponents>
+</Acf>

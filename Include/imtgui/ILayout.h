@@ -45,11 +45,11 @@ public:
 	{
 		LayoutProperties()
 		{
-			isFixedLayout = true; isShowBox = true; borderColor = QColor("#808080");
+			isFixedLayout = true; isBorderEnabled = true; borderColor = QColor("#808080");
 			minWidth = minHeight = 0; maxWidth = maxHeight = 16777215;
 		}
 		bool isFixedLayout;
-		bool isShowBox;
+		bool isBorderEnabled;
 		QColor borderColor;
 		int minWidth;
 		int maxWidth;
