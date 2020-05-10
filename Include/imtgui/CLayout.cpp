@@ -399,17 +399,20 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 
 	QByteArray sizeListAsByteArray;
 	if ((m_layoutType == LayoutType::LT_HORIZONTAL_SPLITTER) || (m_layoutType == LayoutType::LT_VERTICAL_SPLITTER)){
-		static iser::CArchiveTag layoutSizeListTag("LayoutSizeList", "Layout item size list");
-		retVal = retVal && archive.BeginTag(layoutSizeListTag);
 		if (archive.IsStoring()){
 			QDataStream stream(&sizeListAsByteArray, QIODevice::WriteOnly);
 			SizeList sizeList = GetSizes();
 			stream << sizeList;
 		}
 
-		retVal = retVal && archive.Process(sizeListAsByteArray);
+		QByteArray sizeListAsBase64 = sizeListAsByteArray.toBase64();
+		static iser::CArchiveTag layoutSizeListTag("LayoutSizeList", "Layout item size list");
+		retVal = retVal && archive.BeginTag(layoutSizeListTag);
+		retVal = retVal && archive.Process(sizeListAsBase64);
+		retVal = retVal && archive.EndTag(layoutSizeListTag);
 
 		if (!archive.IsStoring()) {
+			sizeListAsByteArray = QByteArray::fromBase64(sizeListAsBase64);
 			QDataStream stream(&sizeListAsByteArray, QIODevice::ReadWrite);
 			SizeList sizeList;
 			LayoutProperties properties;
@@ -417,7 +420,6 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 			SetSizes(sizeList);
 		}
 
-		retVal = retVal && archive.EndTag(layoutSizeListTag);
 
 		int childCount = GetChildsCount();
 
@@ -483,14 +485,16 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 			stream << m_icon;
 		}
 
+		QByteArray iconAsBase64 = iconAsByteArray.toBase64();
 		static iser::CArchiveTag herrachicalIcon("Icon", "Herarchical icon", iser::CArchiveTag::TT_LEAF, &herrachicalWidgetTag);
 		retVal = retVal && archive.BeginTag(herrachicalIcon);
-		retVal = retVal && archive.Process(iconAsByteArray);
+		retVal = retVal && archive.Process(iconAsBase64);
 		retVal = retVal && archive.EndTag(herrachicalIcon);
 
 		retVal = retVal && archive.EndTag(herrachicalWidgetTag);
 
 		if (!archive.IsStoring()){
+			iconAsByteArray = QByteArray::fromBase64(iconAsBase64);
 			QDataStream stream(&iconAsByteArray, QIODevice::ReadWrite);
 			stream >> m_icon;
 		}
