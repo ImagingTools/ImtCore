@@ -21,8 +21,47 @@ namespace imt3dgui
 {
 
 
+class CView3dProviderCompAttr:
+		public iqtgui::TRestorableGuiWrap<iqtgui::TGuiComponentBase<COpenGLWidget>>
+{
+public:
+	typedef iqtgui::TRestorableGuiWrap<iqtgui::TGuiComponentBase<COpenGLWidget>> BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CView3dProviderCompAttr);
+		I_ASSIGN(m_showEditCommandsAttrPtr, "ShowEditCommands", "Show commands for editing the 3D-objects", true, false);
+		I_ASSIGN(m_showShowGridCommandAttrPtr, "ShowShowGridCommand", "Enable command for shoe/hide grid", true, false);
+		I_ASSIGN(m_showShowAxisCommandAttrPtr, "ShowShowAxisCommands", "Enable command for shoe/hide axis", true, false);
+		I_ASSIGN(m_showViewCommandsAttrPtr, "ShowViewCommands", "Show view commands", true, true);
+		I_ASSIGN(m_showViewModeCommandsAttrPtr, "ShowViewModeCommands", "Show view mode commands", true, false);
+		I_ASSIGN(m_showRotationModeCommandsAttrPtr, "ShowRotationModeCommands", "Show rotation mode commands", true, false);
+		I_ASSIGN(m_showViewpointCommandsAttrPtr, "ShowViewpointCommands", "Show view point commands", true, false);
+		I_ASSIGN(m_showZoomCommandsAttrPtr, "ShowZoomCommands", "Show zoom-in/zoom-out commands", true, true);
+		I_ASSIGN(m_useAntialiasingAttrPtr, "UseAntialiasing", "Use rendering antialiasing", true, true);
+		I_ASSIGN(m_useCullfaceAttrPtr, "UseCullFace", "Use cull face mode", true, true);
+		I_ASSIGN(m_useBlendAttrPtr, "UseBlend", "Use blending mode", true, true);
+		I_ASSIGN(m_defaultShowAxisAttrPtr, "ShowAxis", "If enabled, the axes are shown", true, true);
+		I_ASSIGN(m_defaultShowGridAttrPtr, "ShowGrid", "If enabled, the grid is shown", true, true);
+	I_END_COMPONENT
+
+protected:
+	I_ATTR(bool, m_showEditCommandsAttrPtr);
+	I_ATTR(bool, m_showShowGridCommandAttrPtr);
+	I_ATTR(bool, m_showShowAxisCommandAttrPtr);
+	I_ATTR(bool, m_showViewCommandsAttrPtr);
+	I_ATTR(bool, m_showViewModeCommandsAttrPtr);
+	I_ATTR(bool, m_showRotationModeCommandsAttrPtr);
+	I_ATTR(bool, m_showViewpointCommandsAttrPtr);
+	I_ATTR(bool, m_showZoomCommandsAttrPtr);
+	I_ATTR(bool, m_useAntialiasingAttrPtr);
+	I_ATTR(bool, m_useCullfaceAttrPtr);
+	I_ATTR(bool, m_useBlendAttrPtr);
+	I_ATTR(bool, m_defaultShowAxisAttrPtr);
+	I_ATTR(bool, m_defaultShowGridAttrPtr);
+};
+
+
 class CView3dProviderComp:
-			public iqtgui::TRestorableGuiWrap<iqtgui::TGuiComponentBase<COpenGLWidget>>,
+			public CView3dProviderCompAttr,
 			virtual public ibase::ICommandsProvider,
 			virtual public imt3dview::IScene3dProvider,
 			virtual public ISceneEventHandler
@@ -30,7 +69,7 @@ class CView3dProviderComp:
 	Q_OBJECT
 
 public:
-	typedef iqtgui::TRestorableGuiWrap<iqtgui::TGuiComponentBase<COpenGLWidget>> BaseClass;
+	typedef CView3dProviderCompAttr BaseClass;
 
 	enum CommandGroups
 	{
@@ -50,18 +89,7 @@ public:
 		I_REGISTER_INTERFACE(imt3dview::IScene3dProvider);
 		I_REGISTER_SUBELEMENT(Scene);
 		I_REGISTER_SUBELEMENT_INTERFACE(Scene, imt3dview::IScene3d, ExtractScene);
-		I_ASSIGN(m_showEditCommandsAttrPtr, "ShowEditCommands", "Show commands for editing the 3D-objects", true, false);
-		I_ASSIGN(m_showShowGridCommandAttrPtr, "ShowShowGridCommand", "Enable command for shoe/hide grid", true, false);
-		I_ASSIGN(m_showShowAxisCommandAttrPtr, "ShowShowAxisCommands", "Enable command for shoe/hide axis", true, false);
-		I_ASSIGN(m_showViewCommandsAttrPtr, "ShowViewCommands", "Show view commands", true, true);
-		I_ASSIGN(m_showViewModeCommandsAttrPtr, "ShowViewModeCommands", "Show view mode commands", true, false);
-		I_ASSIGN(m_showRotationModeCommandsAttrPtr, "ShowRotationModeCommands", "Show rotation mode commands", true, false);
-		I_ASSIGN(m_showViewpointCommandsAttrPtr, "ShowViewpointCommands", "Show view point commands", true, false);
-		I_ASSIGN(m_showZoomCommandsAttrPtr, "ShowZoomCommands", "Show zoom-in/zoom-out commands", true, true);
 		I_ASSIGN(m_cameraCompPtr, "Camera", "Camera", true, "Camera");
-		I_ASSIGN(m_useAntialiasingAttrPtr, "UseAntialiasing", "Use rendering antialiasing", true, true);
-		I_ASSIGN(m_useCullfaceAttrPtr, "UseCullFace", "Use cull face mode", true, true);
-		I_ASSIGN(m_useBlendAttrPtr, "UseBlend", "Use blending mode", true, true);
 	I_END_COMPONENT
 
 	CView3dProviderComp();
@@ -192,17 +220,7 @@ private:
 	iqtgui::CHierarchicalCommand m_viewModeCommand;
 	iqtgui::CHierarchicalCommand m_selectionModeCommand;
 
-	I_ATTR(bool, m_showEditCommandsAttrPtr);
-	I_ATTR(bool, m_showShowGridCommandAttrPtr);
-	I_ATTR(bool, m_showShowAxisCommandAttrPtr);
-	I_ATTR(bool, m_showViewCommandsAttrPtr);
-	I_ATTR(bool, m_showViewModeCommandsAttrPtr);
-	I_ATTR(bool, m_showRotationModeCommandsAttrPtr);
-	I_ATTR(bool, m_showViewpointCommandsAttrPtr);
-	I_ATTR(bool, m_showZoomCommandsAttrPtr);
-	I_ATTR(bool, m_useAntialiasingAttrPtr);
-	I_ATTR(bool, m_useCullfaceAttrPtr);
-	I_ATTR(bool, m_useBlendAttrPtr);
+protected:
 	I_REF(imt3dview::IScene3dCamera, m_cameraCompPtr);
 };
 
