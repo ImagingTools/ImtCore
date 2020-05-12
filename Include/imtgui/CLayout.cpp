@@ -283,7 +283,7 @@ ILayout* CLayout::RemoveChild(const QByteArray& id)
 					CLayout* parentParent = dynamic_cast<CLayout*>(parent->GetParent());
 					if (parentParent == nullptr){
 						parent->CopyData(layout);
-						parent->m_childs = layout->m_childs;
+						parent->m_childs.clear();
 						while (layout->GetChildsCount() > 0){
 							parent->InsertChild(0, layout->TakeLast());
 						}
