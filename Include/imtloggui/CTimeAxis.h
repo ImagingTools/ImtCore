@@ -21,6 +21,13 @@ class CTimeAxis : public QObject, public QGraphicsRectItem, virtual public IEven
 public:
 	typedef QGraphicsRectItem BaseClass;
 
+	// Quantization thresholds in secs
+	enum QuantizationThresholds
+	{
+		QUA_DAY = 86400 * 3,
+		QUA_MONTH = 86400 * 365,
+	};
+
 	CTimeAxis(QGraphicsItem* parent = nullptr);
 
 	void setPos(const QPointF& origin);
@@ -28,9 +35,10 @@ public:
 
 	const QDateTime& GetStartOfRange() const;
 	const QDateTime& GetEndOfRange() const;
-	void SetTimeRange(const QDateTime& firstEventTime, const QDateTime& lastEventTime);
 	bool SetMinorTickCount(int count);
 	void SetColor(const QColor& color);
+	void EnsureTimeRange(const QDateTime& time);
+	void AdaptTickPitch();
 
 	// reimplemented (QGraphicsRectItem)
 	virtual QRectF boundingRect() const override;
@@ -47,10 +55,16 @@ private:
 	QRectF SceneVisibleRect() const;
 
 private:
+	QDateTime m_baseTime;
+	QDateTime m_firstEvent;
+	QDateTime m_lastEvent;
 	QDateTime m_startTime;
 	QDateTime m_endTime;
 	int m_minorTickCount;
 	QColor m_color;
+
+	double m_majorTickPitch;
+	double m_minorTickPitch;
 };
 
 

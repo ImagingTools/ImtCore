@@ -38,18 +38,18 @@ void CEventGraphicsView::OnAxisPositionChanged()
 		return;
 	}
 
-//	if (viewportTransform() != m_lastTransform){
-		m_lastTransform = viewportTransform();
+	m_timeAxisPtr->AdaptTickPitch();
 
-		QRectF visibleRect = SceneVisibleRect();
-		m_timeAxisPtr->setPos(0, visibleRect.bottom() - m_timeAxisPtr->rect().height() / viewportTransform().m22());
-		QRectF rect = sceneRect();
-		if (m_timeAxisPtr != nullptr){
-			rect.setLeft(m_timeAxisPtr->rect().left() - 100 / viewportTransform().m11());
-			rect.setRight(m_timeAxisPtr->rect().right() + 100 / viewportTransform().m11());
-			setSceneRect(rect);
-		}
-//	}
+	m_lastTransform = viewportTransform();
+
+	QRectF visibleRect = SceneVisibleRect();
+	m_timeAxisPtr->setPos(0, visibleRect.bottom() - m_timeAxisPtr->rect().height() / viewportTransform().m22());
+	QRectF rect = sceneRect();
+	if (m_timeAxisPtr != nullptr){
+		rect.setLeft(m_timeAxisPtr->rect().left() - 100 / viewportTransform().m11());
+		rect.setRight(m_timeAxisPtr->rect().right() + 100 / viewportTransform().m11());
+		setSceneRect(rect);
+	}
 }
 
 

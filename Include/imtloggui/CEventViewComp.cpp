@@ -47,19 +47,7 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 		if (m_timeAxisPtr != nullptr){
 			QDateTime eventTime = message->GetInformationTimeStamp();
 
-			if (!m_startTime.isValid()){
-				m_startTime = eventTime;
-				m_endTime = eventTime;
-				m_timeAxisPtr->SetTimeRange(m_startTime, m_endTime);
-			}
-			else if (eventTime > m_endTime){
-				m_endTime = eventTime;
-				m_timeAxisPtr->SetTimeRange(m_startTime, m_endTime);
-			}
-			else if (eventTime < m_startTime){
-				m_startTime = eventTime;
-				m_timeAxisPtr->SetTimeRange(m_startTime, m_endTime);
-			}
+			m_timeAxisPtr->EnsureTimeRange(eventTime);
 
 			CGeneralEventItem* eventPtr = new CGeneralEventItem(message);
 
@@ -106,6 +94,10 @@ void CEventViewComp::OnGuiCreated()
 	m_groupManagerPtr->AddGroup(generalGroupPtr);
 
 	connect(this, &CEventViewComp::AxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
+	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
+	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime().addDays(4));
+	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime().addDays(1));
+	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime().addDays(-1));
 }
 
 

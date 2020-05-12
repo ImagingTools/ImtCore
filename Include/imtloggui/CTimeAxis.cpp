@@ -53,31 +53,6 @@ const QDateTime& CTimeAxis::GetEndOfRange() const
 }
 
 
-void CTimeAxis::SetTimeRange(const QDateTime& firstEventTime, const QDateTime& lastEventTime)
-{
-	bool isAxisChanged = false;
-
-	if (m_startTime != firstEventTime || m_endTime != lastEventTime){
-
-		if (m_startTime != firstEventTime){
-			isAxisChanged = true;
-		}
-
-		m_startTime = firstEventTime;
-		m_endTime = lastEventTime;
-
-		int diff = firstEventTime.msecsTo(lastEventTime);
-
-		setPos(0, 0);
-		setRect(0, 0, diff / 1000., 40);
-	}
-
-	if (isAxisChanged){
-		Q_EMIT AxisChanged();
-	}
-}
-
-
 bool CTimeAxis::SetMinorTickCount(int count)
 {
 	if (count > 0){
@@ -92,6 +67,76 @@ bool CTimeAxis::SetMinorTickCount(int count)
 void CTimeAxis::SetColor(const QColor& color)
 {
 	m_color = color;
+}
+
+
+void CTimeAxis::EnsureTimeRange(const QDateTime& time)
+{
+	if (!m_firstEvent.isValid()){
+		m_firstEvent = time;
+		m_lastEvent = time;
+		m_startTime = time;
+		m_endTime = time;
+	}
+
+	if (time < m_firstEvent){
+		m_firstEvent = time;
+	}
+
+	if (time > m_lastEvent){
+		m_lastEvent = time;
+	}
+
+	qint64 range = m_firstEvent.secsTo(m_lastEvent);
+
+	if (range > QUA_MONTH){
+		m_startTime.setDate(QDate(m_firstEvent.date().year(), 1, 1));
+		m_startTime.setTime(QTime(0, 0));
+
+		m_endTime.setDate(QDate(m_lastEvent.date().year(), 1, 1));
+		m_endTime.setTime(QTime(0, 0));
+		m_endTime = m_endTime.addMonths(1);
+	}
+	else if (range > QUA_DAY){
+		m_startTime.setDate(m_firstEvent.date());
+		m_startTime.setTime(QTime(0, 0));
+
+		m_endTime.setDate(m_lastEvent.date());
+		m_endTime.setTime(QTime(0, 0));
+		m_endTime = m_endTime.addDays(1);
+	}
+	else{
+		m_startTime.setDate(m_firstEvent.date());
+		m_startTime.setTime(QTime(m_firstEvent.time().hour(), 0));
+
+		m_endTime.setDate(m_lastEvent.date());
+		m_endTime.setTime(QTime(m_lastEvent.time().hour(), 0));
+		m_endTime = m_endTime.addSecs(3600);
+
+		if (!m_baseTime.isValid()){
+			m_baseTime = m_startTime;
+		}
+	}
+
+	qDebug() << "---------------------------------------------------------------------------------------";
+	qDebug() << "Inserted: " << time;
+	qDebug() << m_startTime;
+	qDebug() << m_endTime;
+
+	setRect(0, 0, m_startTime.secsTo(m_endTime), 40);
+	if (m_baseTime != m_startTime){
+		m_baseTime = m_startTime;
+		Q_EMIT AxisChanged();
+	}
+}
+
+
+void CTimeAxis::AdaptTickPitch()
+{
+	QRectF sceneVisibleRect = SceneVisibleRect();
+	QRectF visibleRect = rect().intersected(mapFromScene(sceneVisibleRect).boundingRect());
+
+	qDebug() << visibleRect;
 }
 
 
@@ -240,7 +285,15 @@ QDateTime CTimeAxis::GetTimeFromScenePosition(double position) const
 
 QRectF CTimeAxis::SceneVisibleRect() const
 {
-	QGraphicsView* viewPtr = scene()->views().first();
+	QGraphicsScene* scenePtr = scene();
+	if (scenePtr == nullptr){
+		return QRectF();
+	}
+
+	QGraphicsView* viewPtr = scenePtr->views().first();
+	if (viewPtr == nullptr){
+		return QRectF();
+	}
 
 	QRect viewportRect = viewPtr->viewport()->rect();
 

@@ -56,8 +56,8 @@ Q_SIGNALS:
 	void AxisPositionChanged();
 
 private:
-	QDateTime m_startTime;
-	QDateTime m_endTime;
+	//QDateTime m_startTime;
+	//QDateTime m_endTime;
 	QGraphicsScene* m_scenePtr;
 	CEventGraphicsView* m_viewPtr;
 	CTimeAxis* m_timeAxisPtr;
