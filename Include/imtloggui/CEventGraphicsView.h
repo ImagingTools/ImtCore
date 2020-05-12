@@ -24,9 +24,13 @@ public:
 
 	void setTimeAxis(CTimeAxis* timeAxisPtr);
 
-protected:
+Q_SIGNALS:
+	void AxisPositionChanged();
+
+public Q_SLOTS:
 	void OnAxisPositionChanged();
 
+protected:
 	// reimplemented (QGraphicsView)
 	void mouseMoveEvent(QMouseEvent* event) override;
 	void mousePressEvent(QMouseEvent* event) override;

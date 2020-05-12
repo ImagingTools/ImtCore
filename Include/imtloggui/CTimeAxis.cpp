@@ -130,20 +130,20 @@ QRectF CTimeAxis::boundingRect() const
 
 void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* /*widget*/)
 {
-	// Full rectangle of the axis:
-	QRectF axisRect = boundingRect();
-
-	// Logical rectangle for the defined time range:
-	QRectF itemRect = rect();
-
 	// Fill the full axis rectangle with the background color:
 	painter->setPen(Qt::transparent);
 	painter->setBrush(Qt::darkGray);
-	painter->drawRect(axisRect);
+	painter->drawRect(boundingRect());
 
 	if (!m_startTime.isValid() || !m_endTime.isValid()){
 		return;
 	}
+
+	// Full rectangle of the axis:
+	QRectF visibleRect = rect().intersected(SceneVisibleRect());
+
+	// Logical rectangle for the defined time range:
+	QRectF itemRect = rect();
 
 	// Current view transformation:
 	QGraphicsView* viewPtr = scene()->views().first();
@@ -163,17 +163,17 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 	painter->setPen(Qt::white);
 
-	QRectF firstLabelRect = QRectF(-labelWidth / 2, axisRect.top() + axisRect.height() / 2, labelWidth, axisRect.height() / 2 - 2);
+	QRectF firstLabelRect = QRectF(-labelWidth / 2, itemRect.top() + itemRect.height() / 2, labelWidth, itemRect.height() / 2 - 2);
 	painter->drawText(firstLabelRect, beginTime);
-	painter->drawLine(QLineF(0, axisRect.top() + 1, 0, axisRect.bottom() - axisRect.height() / 1.5));
+	painter->drawLine(QLineF(0, itemRect.top() + 1, 0, itemRect.bottom() - itemRect.height() / 1.5));
 
 	if (m_startTime == m_endTime){
 		return;
 	}
 
-	QRectF lastLabelRect = QRectF(itemRect.right() * viewTransform.m11() - labelWidth / 2, axisRect.top() + axisRect.height() / 2, labelWidth, axisRect.height() / 2 - 2);
+	QRectF lastLabelRect = QRectF(itemRect.right() * viewTransform.m11() - labelWidth / 2, itemRect.top() + itemRect.height() / 2, labelWidth, itemRect.height() / 2 - 2);
 	painter->drawText(lastLabelRect, endTime);
-	painter->drawLine(QLineF(itemRect.right() * viewTransform.m11(), axisRect.top() + 1, itemRect.right() * viewTransform.m11(), axisRect.bottom() - axisRect.height() / 1.5));
+	painter->drawLine(QLineF(itemRect.right() * viewTransform.m11(), itemRect.top() + 1, itemRect.right() * viewTransform.m11(), itemRect.bottom() - itemRect.height() / 1.5));
 
 	// Draw major ticks:
 	majorStepSize = viewWidth / double(majorTicksCount - 2);
@@ -185,8 +185,8 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 			QDateTime time = m_startTime.addMSecs(msOffset);
 			QString timeString = time.toString("dd.MM.yyyy hh:mm:ss.zzz");
 
-			painter->drawLine(QLineF(xPos, axisRect.top() + 1, xPos, axisRect.bottom() - axisRect.height() / 1.5));
-			QRectF labelRect = QRectF(xPos - labelWidth / 2, axisRect.top() + axisRect.height() / 2, labelWidth, axisRect.height() / 2 - 2);
+			painter->drawLine(QLineF(xPos, itemRect.top() + 1, xPos, itemRect.bottom() - itemRect.height() / 1.5));
+			QRectF labelRect = QRectF(xPos - labelWidth / 2, itemRect.top() + itemRect.height() / 2, labelWidth, itemRect.height() / 2 - 2);
 			painter->drawText(labelRect, timeString);
 		}
 	}
@@ -195,8 +195,16 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 // reimplemented (IEventScenePositionProvider)
 
-double CTimeAxis::GetScenePosition(const QDateTime& time) const
+double CTimeAxis::GetScenePositionFromTime(const QDateTime& time) const
 {
+	if (!m_startTime.isValid() || !m_endTime.isValid()){
+		return DBL_MIN;
+	}
+
+	if (time < m_startTime || time > m_endTime){
+		return DBL_MIN;
+	}
+
 	if (m_startTime == m_endTime){
 		return pos().x();
 	}
@@ -204,6 +212,27 @@ double CTimeAxis::GetScenePosition(const QDateTime& time) const
 	double delta = time.toMSecsSinceEpoch() - m_startTime.toMSecsSinceEpoch();
 
 	return pos().x() + delta / 1000;
+}
+
+QDateTime CTimeAxis::GetTimeFromScenePosition(double position) const
+{
+	if (!m_startTime.isValid() || !m_endTime.isValid()){
+		return QDateTime();
+	}
+
+	if (position < rect().left() || position > rect().right()){
+		return QDateTime();
+	}
+
+	if (m_startTime == m_endTime){
+		if (qFuzzyCompare(position, pos().x())){
+			return m_startTime;
+		}
+
+		return QDateTime();
+	}
+
+	return QDateTime::fromMSecsSinceEpoch(m_startTime.toMSecsSinceEpoch() + m_startTime.msecsTo(m_endTime) * (position - pos().x()) / rect().width());
 }
 
 

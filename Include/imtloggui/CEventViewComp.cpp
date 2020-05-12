@@ -63,13 +63,13 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 
 			CGeneralEventItem* eventPtr = new CGeneralEventItem(message);
 
-			QPointF origin(m_timeAxisPtr->GetScenePosition(message->GetInformationTimeStamp()), -150);
+			QPointF origin(m_timeAxisPtr->GetScenePositionFromTime(message->GetInformationTimeStamp()), -150);
 			eventPtr->setPos(origin);
 			eventPtr->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
 			groupPtr->AddEvent(eventPtr);
 
-			m_viewPtr->update();
+			Q_EMIT AxisPositionChanged();
 		}
 	}
 }
@@ -86,7 +86,6 @@ void CEventViewComp::OnGuiCreated()
 	m_timeAxisPtr = new CTimeAxis();
 	m_timeAxisPtr->SetColor(Qt::green);
 	m_timeAxisPtr->setRect(0, 0, 10, 40);
-	//m_timeAxisPtr->SetTimeRange(begin, end);
 	m_timeAxisPtr->SetMinorTickCount(12);
 
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
@@ -106,7 +105,7 @@ void CEventViewComp::OnGuiCreated()
 	generalGroupPtr->SetTimeAxis(m_timeAxisPtr);
 	m_groupManagerPtr->AddGroup(generalGroupPtr);
 
-	//m_viewPtr->setSceneRect(m_scenePtr->sceneRect());
+	connect(this, &CEventViewComp::AxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
 }
 
 

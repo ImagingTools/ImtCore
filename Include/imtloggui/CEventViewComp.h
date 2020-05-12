@@ -23,9 +23,11 @@ namespace imtloggui
 
 
 class CEventViewComp:
-			virtual public ilog::IMessageConsumer,
-			public iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp>
+			public iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp>,
+			virtual public ilog::IMessageConsumer
 {
+	Q_OBJECT
+
 public:
 	typedef iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp> BaseClass;
 	
@@ -49,6 +51,9 @@ public:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
+
+Q_SIGNALS:
+	void AxisPositionChanged();
 
 private:
 	QDateTime m_startTime;

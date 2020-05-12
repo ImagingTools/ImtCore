@@ -19,6 +19,7 @@ CEventGraphicsView::CEventGraphicsView(QWidget* parent)
 	connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::valueChanged);
 	connect(horizontalScrollBar(), &QScrollBar::rangeChanged, this, &CEventGraphicsView::rangeChanged);
 	connect(horizontalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::valueChanged);
+	connect(this, &CEventGraphicsView::AxisPositionChanged, this, &CEventGraphicsView::OnAxisPositionChanged, Qt::QueuedConnection);
 }
 
 
@@ -29,7 +30,7 @@ void CEventGraphicsView::setTimeAxis(CTimeAxis* timeAxisPtr)
 }
 
 
-// protected methods
+// public slots:
 
 void CEventGraphicsView::OnAxisPositionChanged()
 {
@@ -37,7 +38,7 @@ void CEventGraphicsView::OnAxisPositionChanged()
 		return;
 	}
 
-	if (viewportTransform() != m_lastTransform){
+//	if (viewportTransform() != m_lastTransform){
 		m_lastTransform = viewportTransform();
 
 		QRectF visibleRect = SceneVisibleRect();
@@ -48,9 +49,11 @@ void CEventGraphicsView::OnAxisPositionChanged()
 			rect.setRight(m_timeAxisPtr->rect().right() + 100 / viewportTransform().m11());
 			setSceneRect(rect);
 		}
-	}
+//	}
 }
 
+
+// protected methods
 
 // reimplemented (QGraphicsView)
 
@@ -97,6 +100,8 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 void CEventGraphicsView::resizeEvent(QResizeEvent* event)
 {
 	BaseClass::resizeEvent(event);
+
+	OnAxisPositionChanged();
 }
 
 

@@ -52,7 +52,7 @@ void CEventGroup::SetTimeAxis(IEventScenePositionProvider* timeAxis)
 
 void CEventGroup::AddEvent(CEventItemBase* event)
 {
-	QPointF origin(m_timeAxis->GetScenePosition(event->GetEventTimeStamp()), 0);
+	QPointF origin(m_timeAxis->GetScenePositionFromTime(event->GetEventTimeStamp()), 0);
 	origin = mapFromScene(origin);
 	origin.setY(-100);
 

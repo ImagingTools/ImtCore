@@ -19,7 +19,12 @@ public:
 	/**
 		Get scene position at axis X for gived time.
 	*/
-	virtual double GetScenePosition(const QDateTime& time) const = 0;
+	virtual double GetScenePositionFromTime(const QDateTime& time) const = 0;
+
+	/**
+		Get time for gived scene position at axis X.
+	*/
+	virtual QDateTime GetTimeFromScenePosition(double position) const = 0;
 };
 
 

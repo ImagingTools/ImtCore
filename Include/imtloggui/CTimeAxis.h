@@ -37,7 +37,8 @@ public:
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
 	// reimplemented (IEventScenePositionProvider)
-	virtual double GetScenePosition(const QDateTime& time) const override;
+	virtual double GetScenePositionFromTime(const QDateTime& time) const override;
+	virtual QDateTime GetTimeFromScenePosition(double position) const override;
 
 Q_SIGNALS:
 	void AxisChanged();
