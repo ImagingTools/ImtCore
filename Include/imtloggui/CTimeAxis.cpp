@@ -135,6 +135,7 @@ void CTimeAxis::AdaptTickPitch()
 {
 	QRectF sceneVisibleRect = SceneVisibleRect();
 	QRectF visibleRect = rect().intersected(mapFromScene(sceneVisibleRect).boundingRect());
+	double viewPortWidth = scene()->views().first()->viewport()->width();
 
 	qDebug() << visibleRect;
 }

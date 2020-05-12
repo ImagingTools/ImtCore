@@ -26,7 +26,6 @@ CEventGraphicsView::CEventGraphicsView(QWidget* parent)
 void CEventGraphicsView::setTimeAxis(CTimeAxis* timeAxisPtr)
 {
 	m_timeAxisPtr = timeAxisPtr;
-	OnAxisPositionChanged();
 }
 
 

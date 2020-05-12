@@ -94,10 +94,6 @@ void CEventViewComp::OnGuiCreated()
 	m_groupManagerPtr->AddGroup(generalGroupPtr);
 
 	connect(this, &CEventViewComp::AxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
-	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
-	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime().addDays(4));
-	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime().addDays(1));
-	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime().addDays(-1));
 }
 
 
