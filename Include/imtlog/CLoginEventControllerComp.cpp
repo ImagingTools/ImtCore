@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/IMessageGroupInfoProvider.h>
+#include <imtlog/IMessageGroupInfoProvider.h>
 
 
 namespace imtlog

@@ -9,7 +9,7 @@
 #include <iqtgui/TDesignerGuiCompBase.h>
 
 // ImtCore includes
-#include <imtbase/IMessageGroupInfoProvider.h>
+#include <imtlog/IMessageGroupInfoProvider.h>
 #include <imtloggui/CEventGraphicsView.h>
 #include <imtloggui/CEventGroupManager.h>
 #include <imtloggui/CTimeAxis.h>
