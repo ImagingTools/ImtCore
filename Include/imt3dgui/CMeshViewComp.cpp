@@ -163,13 +163,17 @@ void CMeshViewComp::OnRestoreSettings(const QSettings& settings)
 {
 	BaseClass::OnRestoreSettings(settings);
 
-	bool showGrid = settings.value("ShowGrid", true).toBool();
-	m_gridShape.SetVisible(showGrid);
-	GetShowGridCommand().setChecked(showGrid);
+	if (settings.contains("ShowGrid")){
+		bool showGrid = settings.value("ShowGrid").toBool();
+		m_gridShape.SetVisible(showGrid);
+		GetShowGridCommand().setChecked(showGrid);
+	}
 
-	bool showAxis = settings.value("ShowAxis", true).toBool();
-	m_axisShape.SetVisible(showAxis);
-	GetShowAxisCommand().setChecked(showAxis);
+	if (settings.contains("ShowAxis")){
+		bool showAxis = settings.value("ShowAxis").toBool();
+		m_axisShape.SetVisible(showAxis);
+		GetShowAxisCommand().setChecked(showAxis);
+	}
 }
 
 
