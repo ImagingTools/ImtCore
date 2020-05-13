@@ -99,6 +99,9 @@ void CEventViewComp::OnGuiCreated()
 
 void CEventViewComp::OnGuiDestroyed()
 {
+	disconnect(this, &CEventViewComp::AxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
+	m_viewPtr->setTimeAxis(nullptr);
+
 	delete m_groupManagerPtr;
 	delete m_viewPtr;
 	delete m_scenePtr;
