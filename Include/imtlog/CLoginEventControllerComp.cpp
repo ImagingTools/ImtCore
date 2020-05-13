@@ -13,7 +13,7 @@ namespace imtlog
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CLoginEventControllerComp::BeforeUpdate(imod::IModel* modelPtr)
+void CLoginEventControllerComp::BeforeUpdate(imod::IModel* /*modelPtr*/)
 {
 	iauth::ILogin* loginPtr = GetObjectPtr();
 	if (loginPtr == nullptr){
@@ -22,7 +22,7 @@ void CLoginEventControllerComp::BeforeUpdate(imod::IModel* modelPtr)
 
 	iauth::CUser *userPtr = loginPtr->GetLoggedUser();
 	if (userPtr != nullptr){
-		m_userName = userPtr->GetUserName();
+		m_lastUserName = userPtr->GetUserName();
 	}
 }
 
@@ -39,7 +39,7 @@ void CLoginEventControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& cha
 	}
 
 	if (changeSet.ContainsExplicit(iauth::ILogin::CF_LOGOUT)){
-		SendInfoMessage(imtbase::IMessageGroupInfoProvider::MI_USER_LOGOUT, m_userName, "LoginEventController");
+		SendInfoMessage(imtbase::IMessageGroupInfoProvider::MI_USER_LOGOUT, m_lastUserName, "LoginEventController");
 	}
 }
 

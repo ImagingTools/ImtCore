@@ -28,7 +28,7 @@ protected:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
-	QString m_userName;
+	QString m_lastUserName;
 };
 
 
