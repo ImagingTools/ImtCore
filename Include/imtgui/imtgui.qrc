@@ -153,6 +153,7 @@
         <file alias="Quality">Resources/Icons/Color/Quality.svg</file>
         <file alias="Report1">Resources/Icons/Color/Report1.svg</file>
         <file alias="Timeline">Resources/Icons/Color/Timeline.svg</file>
+        <file alias="Eye">Resources/Icons/Color/Eye.svg</file>
     </qresource>
     <qresource prefix="/Styles">
         <file alias="ImtLightStyle">Resources/Styles/ImtLightStyle.css</file>
