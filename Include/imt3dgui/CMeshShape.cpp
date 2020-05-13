@@ -20,7 +20,8 @@ const QVector3D CMeshShape::s_selectionColor(0.5, 0.0, 0.5);
 // public methods
 
 CMeshShape::CMeshShape()
-	:m_color(QVector3D(0.0, 1.0, 1.0))
+	:m_color(QVector3D(0.0, 1.0, 1.0)),
+	m_isInfoBoxEnabled(false)
 {
 }
 
@@ -139,6 +140,12 @@ void CMeshShape::DeleteSelection()
 }
 
 
+void CMeshShape::SetInfoBoxEnabled(bool isEnabled)
+{
+	m_isInfoBoxEnabled = isEnabled;
+}
+
+
 // protected methods
 
 // reimplement (imt3dgui::CShape3dBase)
@@ -179,21 +186,23 @@ void CMeshShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions
 
 void CMeshShape::Draw(QPainter& painter)
 {
-	QString text = QString("<b><p>Total vertices: %1</p>").arg(m_vertices.size());
-	text += QString("<p>Total faces: %1</p>").arg(m_indices.size() / 3);
-	text += QString("<p>Selected faces: %1</p></b>").arg(static_cast<int>(m_selectedIndicies.size() / 3));
+	if (m_isInfoBoxEnabled){
+		QString text = QString("<b><p>Total vertices: %1</p>").arg(m_vertices.size());
+		text += QString("<p>Total faces: %1</p>").arg(m_indices.size() / 3);
+		text += QString("<p>Selected faces: %1</p></b>").arg(static_cast<int>(m_selectedIndicies.size() / 3));
 
-	painter.save();
+		painter.save();
 
-	painter.setBrush(QBrush(QColor(240, 240, 240)));
-	painter.drawRoundedRect(10, 10, 300, 90, 3.0, 3.0);
-	painter.translate(15.0, 15.0);
+		painter.setBrush(QBrush(QColor(240, 240, 240)));
+		painter.drawRoundedRect(10, 10, 300, 90, 3.0, 3.0);
+		painter.translate(15.0, 15.0);
 
-	QTextDocument doc;
-	doc.setHtml(text);
-	doc.drawContents(&painter);
+		QTextDocument doc;
+		doc.setHtml(text);
+		doc.drawContents(&painter);
 
-	painter.restore();
+		painter.restore();
+	}
 }
 
 

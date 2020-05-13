@@ -22,6 +22,8 @@ void CMeshViewComp::OnGuiCreated()
 	if (scenePtr != NULL){
 		CMeshShape* meshShapePtr = dynamic_cast<CMeshShape*>(this);
 		Q_ASSERT(meshShapePtr != NULL);
+		meshShapePtr->SetInfoBoxEnabled(*m_showInfoBoxAttrPtr);
+
 		scenePtr->AddShapeToScene(meshShapePtr);
 
 		m_gridShape.SetGridValue(0.2);

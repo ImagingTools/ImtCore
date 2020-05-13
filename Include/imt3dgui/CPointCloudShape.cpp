@@ -24,7 +24,8 @@ const QVector3D CPointCloudShape::s_selectionColor(0.8, 0.8, 0.0);
 
 CPointCloudShape::CPointCloudShape()
 	:m_color(QVector3D(0.0, 0.8, 0.2)),
-	m_pointSize(3.0)
+	m_pointSize(3.0),
+	m_isInfoBoxEnabled(false)
 {
 }
 
@@ -152,6 +153,11 @@ void CPointCloudShape::DeleteSelection()
 }
 
 
+void CPointCloudShape::SetInfoBoxEnabled(bool isEnabled)
+{
+	m_isInfoBoxEnabled = isEnabled;
+}
+
 // protected methods
 
 // reimplement (imt3dgui::CShape3dBase)
@@ -200,20 +206,22 @@ void CPointCloudShape::Draw(QPainter& painter)
 		return;
 	}
 
-	QString text = QString("<b><p>Total vertices: %1</p>").arg(pointCloudPtr->GetPointsCount());
-	text += QString("<p>Selected vertices: %1</p></b>").arg(static_cast<int>(m_selectedVerticesIndicies.size()));
+	if (m_isInfoBoxEnabled){
+		QString text = QString("<b><p>Total vertices: %1</p>").arg(pointCloudPtr->GetPointsCount());
+		text += QString("<p>Selected vertices: %1</p></b>").arg(static_cast<int>(m_selectedVerticesIndicies.size()));
 
-	painter.save();
+		painter.save();
 
-	painter.setBrush(QBrush(QColor(240, 240, 240)));
-	painter.drawRoundedRect(10, 10, 300, 60, 3.0, 3.0);
-	painter.translate(15.0, 15.0);
+		painter.setBrush(QBrush(QColor(240, 240, 240)));
+		painter.drawRoundedRect(10, 10, 300, 60, 3.0, 3.0);
+		painter.translate(15.0, 15.0);
 
-	QTextDocument doc;
-	doc.setHtml(text);
-	doc.drawContents(&painter);
+		QTextDocument doc;
+		doc.setHtml(text);
+		doc.drawContents(&painter);
 
-	painter.restore();
+		painter.restore();
+	}
 }
 
 

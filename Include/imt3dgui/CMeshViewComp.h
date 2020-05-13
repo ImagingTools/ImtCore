@@ -24,6 +24,7 @@ public:
 	I_BEGIN_COMPONENT(CMeshViewComp);
 		I_REGISTER_INTERFACE(imod::IObserver);
 		I_REGISTER_INTERFACE(imod::IModelEditor);
+		I_ASSIGN(m_showInfoBoxAttrPtr, "ShowInfoBox", "Show info box if enabled", true, false);
 	I_END_COMPONENT
 
 protected:
@@ -54,6 +55,8 @@ private:
 	CGridShape m_gridShape;
 	CAxisShape m_axisShape;
 	CRulerShape m_rulerShape;
+
+	I_ATTR(bool, m_showInfoBoxAttrPtr);
 };
 
 

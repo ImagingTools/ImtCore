@@ -27,6 +27,7 @@ public:
 		I_REGISTER_INTERFACE(imod::IObserver);
 		I_REGISTER_INTERFACE(imod::IModelEditor);
 		I_ASSIGN(m_pointSizeAttrPtr, "PointSize", "Size of the point used for rendering of the 3D-points in the cloud view", true, 3.0);
+		I_ASSIGN(m_showInfoBoxAttrPtr, "ShowInfoBox", "Show info box if enabled", true, false);
 	I_END_COMPONENT
 
 protected:
@@ -59,6 +60,7 @@ private:
 	CRulerShape m_rulerShape;
 
 	I_ATTR(double, m_pointSizeAttrPtr);
+	I_ATTR(bool, m_showInfoBoxAttrPtr);
 };
 
 

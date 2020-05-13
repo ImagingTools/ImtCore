@@ -35,6 +35,7 @@ public:
 	void AllSelection();
 	void InvertSelection();
 	void DeleteSelection();
+	void SetInfoBoxEnabled(bool isEnabled = true);
 
 protected:
 	// reimplemented (imt3dview::CShape3dBase)
@@ -60,6 +61,7 @@ private:
 	QVector3D m_color;
 	float m_pointSize;
 	SelectedVerticesIndicies m_selectedVerticesIndicies;
+	bool m_isInfoBoxEnabled;
 
 	static const QVector3D s_selectionColor;
 };

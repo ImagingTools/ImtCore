@@ -24,6 +24,7 @@ void CPointCloudViewComp::OnGuiCreated()
 		Q_ASSERT(cloudShapePtr != NULL);
 
 		cloudShapePtr->SetPointSize(*m_pointSizeAttrPtr);
+		cloudShapePtr->SetInfoBoxEnabled(*m_showInfoBoxAttrPtr);
 
 		scenePtr->AddShapeToScene(cloudShapePtr);
 
