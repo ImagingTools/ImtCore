@@ -35,10 +35,11 @@ public:
 
 	const QDateTime& GetStartOfRange() const;
 	const QDateTime& GetEndOfRange() const;
-	bool SetMinorTickCount(int count);
 	void SetColor(const QColor& color);
 	void EnsureTimeRange(const QDateTime& time);
-	void AdaptTickPitch();
+	int GetMargin();
+	void CreateTimeItemTable();
+
 
 	// reimplemented (QGraphicsRectItem)
 	virtual QRectF boundingRect() const override;
@@ -51,8 +52,87 @@ public:
 Q_SIGNALS:
 	void AxisChanged();
 
+protected:
+	enum TickType
+	{
+		TT_MAJOR = 0,
+		TT_MINOR
+	};
+
+	enum TickInterval
+	{
+		TI_1MS = 0,
+		TI_10MS,
+		TI_100MS,
+
+		TI_1S,
+		TI_5S,
+		TI_15S,
+		TI_30S,
+
+		TI_1M,
+		TI_5M,
+		TI_15M,
+		TI_30M,
+
+		TI_1H,
+		TI_3H,
+		TI_6H,
+		TI_12H,
+
+		TI_DAY,
+		TI_WEEK,
+		TI_MONTH,
+		TI_QUARTER,
+		TI_YEAR,
+
+		TI_COUNT,
+		TI_NONE
+	};
+
+	struct TimeItemInfo
+	{
+		TickInterval majorTimeInterval;
+		TickInterval minorTimeInterval;
+		QString majorTimeFormat;
+	};
+
+	struct TickInfo
+	{
+		QDateTime time;
+		TickType type;
+		QString majorTimeFormat;
+	};
+
+	typedef QVector<TickInfo> Ticks;
+
+	struct	MinorItem
+	{
+		double scaleMin;
+		double distance;
+		TickInterval interval;
+	};
+
+	struct MajorItem
+	{
+		double scaleMin;
+		double scaleMax;
+		double distance;
+		TickInterval interval;
+		QString timeFormat;
+
+		QVector<MinorItem> minorItemTable;
+	};
+
+	QVector<MajorItem> m_majorItemTable;
+
+protected:
+	TimeItemInfo CalculateTimeItems(double scale) const;
+	Ticks GenerateTicks(const TimeItemInfo& timeItemInfo) const;
+
 private:
 	QRectF SceneVisibleRect() const;
+	virtual QDateTime GetTimeFromRectPosition(double position) const;
 
 private:
 	QDateTime m_baseTime;
@@ -60,11 +140,11 @@ private:
 	QDateTime m_lastEvent;
 	QDateTime m_startTime;
 	QDateTime m_endTime;
-	int m_minorTickCount;
 	QColor m_color;
+	QFontMetrics m_fontMetrics;
 
-	double m_majorTickPitch;
-	double m_minorTickPitch;
+	double m_minMinorTickStep;
+	double m_labelWidthFactor;
 };
 
 

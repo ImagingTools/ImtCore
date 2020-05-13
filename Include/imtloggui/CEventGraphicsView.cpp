@@ -37,8 +37,6 @@ void CEventGraphicsView::OnAxisPositionChanged()
 		return;
 	}
 
-	m_timeAxisPtr->AdaptTickPitch();
-
 	m_lastTransform = viewportTransform();
 
 	QRectF visibleRect = SceneVisibleRect();

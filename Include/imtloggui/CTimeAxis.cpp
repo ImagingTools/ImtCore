@@ -17,12 +17,17 @@ namespace imtloggui
 
 CTimeAxis::CTimeAxis(QGraphicsItem* parent)
 	: BaseClass(parent),
+	m_fontMetrics(QFont()),
+	m_labelWidthFactor(1.5),
+	m_minMinorTickStep(20),
 	QObject()
 {
 	setZValue(100000);
 	setFlags(ItemIgnoresTransformations);
 	m_startTime = QDateTime();
 	m_endTime = QDateTime();
+
+	CreateTimeItemTable();
 }
 
 
@@ -50,17 +55,6 @@ const QDateTime& CTimeAxis::GetStartOfRange() const
 const QDateTime& CTimeAxis::GetEndOfRange() const
 {
 	return m_endTime;
-}
-
-
-bool CTimeAxis::SetMinorTickCount(int count)
-{
-	if (count > 0){
-		m_minorTickCount = count;
-		return true;
-	}
-
-	return false;
 }
 
 
@@ -118,11 +112,6 @@ void CTimeAxis::EnsureTimeRange(const QDateTime& time)
 		}
 	}
 
-	qDebug() << "---------------------------------------------------------------------------------------";
-	qDebug() << "Inserted: " << time;
-	qDebug() << m_startTime;
-	qDebug() << m_endTime;
-
 	setRect(0, 0, m_startTime.secsTo(m_endTime), 40);
 	if (m_baseTime != m_startTime){
 		m_baseTime = m_startTime;
@@ -131,13 +120,102 @@ void CTimeAxis::EnsureTimeRange(const QDateTime& time)
 }
 
 
-void CTimeAxis::AdaptTickPitch()
+int CTimeAxis::GetMargin()
 {
-	QRectF sceneVisibleRect = SceneVisibleRect();
-	QRectF visibleRect = rect().intersected(mapFromScene(sceneVisibleRect).boundingRect());
-	double viewPortWidth = scene()->views().first()->viewport()->width();
+	return m_fontMetrics.horizontalAdvance("##.##.#### ##:##:##.###") / 2;
+}
 
-	qDebug() << visibleRect;
+
+void CTimeAxis::CreateTimeItemTable()
+{
+	m_majorItemTable.clear();
+
+	m_majorItemTable.reserve(TI_COUNT);
+	for (int i = 0; i < TI_COUNT; i++){
+		m_majorItemTable.append(MajorItem());
+	}
+
+	m_majorItemTable[TI_1MS].timeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
+	m_majorItemTable[TI_1MS].distance = 0.001;
+	m_majorItemTable[TI_10MS].timeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
+	m_majorItemTable[TI_10MS].distance = 0.01;
+	m_majorItemTable[TI_100MS].timeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
+	m_majorItemTable[TI_100MS].distance = 0.1;
+	
+	m_majorItemTable[TI_1S].timeFormat = "dd.MM.yyyy hh:mm:ss";
+	m_majorItemTable[TI_1S].distance = 1;
+	m_majorItemTable[TI_5S].timeFormat = "dd.MM.yyyy hh:mm:ss";
+	m_majorItemTable[TI_5S].distance = 5;
+	m_majorItemTable[TI_15S].timeFormat = "dd.MM.yyyy hh:mm:ss";
+	m_majorItemTable[TI_15S].distance = 15;
+	m_majorItemTable[TI_30S].timeFormat = "dd.MM.yyyy hh:mm:ss";
+	m_majorItemTable[TI_30S].distance = 30;
+
+	m_majorItemTable[TI_1M].timeFormat = "dd.MM.yyyy hh:mm";
+	m_majorItemTable[TI_1M].distance = 60;
+	m_majorItemTable[TI_5M].timeFormat = "dd.MM.yyyy hh:mm";
+	m_majorItemTable[TI_5M].distance = 300;
+	m_majorItemTable[TI_15M].timeFormat = "dd.MM.yyyy hh:mm";
+	m_majorItemTable[TI_15M].distance = 900;
+	m_majorItemTable[TI_30M].timeFormat = "dd.MM.yyyy hh:mm";
+	m_majorItemTable[TI_30M].distance = 1800;
+
+	m_majorItemTable[TI_1H].timeFormat = "dd.MM.yyyy hh:mm";
+	m_majorItemTable[TI_1H].distance = 3600;
+	m_majorItemTable[TI_3H].timeFormat = "dd.MM.yyyy hh:mm";
+	m_majorItemTable[TI_3H].distance = 10800;
+	m_majorItemTable[TI_6H].timeFormat = "dd.MM.yyyy hh:mm";
+	m_majorItemTable[TI_6H].distance = 21600;
+	m_majorItemTable[TI_12H].timeFormat = "dd.MM.yyyy hh:mm";
+	m_majorItemTable[TI_12H].distance = 43200;
+
+	m_majorItemTable[TI_DAY].timeFormat = "dd.MM.yyyy";
+	m_majorItemTable[TI_DAY].distance = 86400;
+	m_majorItemTable[TI_WEEK].timeFormat = "dd.MM.yyyy";
+	m_majorItemTable[TI_WEEK].distance = 604800;
+	m_majorItemTable[TI_MONTH].timeFormat = "MM.yyyy";
+	m_majorItemTable[TI_MONTH].distance = 2635200; // approximately
+	m_majorItemTable[TI_QUARTER].timeFormat = "MM.yyyy";
+	m_majorItemTable[TI_QUARTER].distance = 7905600; // approximately
+	m_majorItemTable[TI_YEAR].timeFormat = "yyyy";
+	m_majorItemTable[TI_YEAR].distance = 31536000; // approximately
+
+
+	m_majorItemTable[TI_1MS].scaleMax = DBL_MAX;
+	double labelWidth;
+
+	qDebug() << "````````````````````````````````````````````````````````````````````````````";
+
+	for (int i = 0; i < TI_COUNT; i++){
+		labelWidth = m_fontMetrics.horizontalAdvance(m_majorItemTable[i].timeFormat);
+		m_majorItemTable[i].scaleMin = labelWidth * m_labelWidthFactor / m_majorItemTable[i].distance;
+		m_majorItemTable[i].interval = (TickInterval)i;
+
+		qDebug() << "*** " << i;
+		qDebug() << m_majorItemTable[i].distance;
+		qDebug() << m_majorItemTable[i].scaleMin;
+
+		for (int j = 1; j <= 3; j++){
+			if (i - j < 0){
+				break;
+			}
+			MinorItem minorItem;
+
+			minorItem.distance = m_majorItemTable[i - j].distance;
+			minorItem.interval = m_majorItemTable[i - j].interval;
+			minorItem.scaleMin = m_minMinorTickStep / minorItem.distance;
+
+			qDebug() << j << ". " << minorItem.interval << minorItem.distance << minorItem.scaleMin;
+
+			m_majorItemTable[i].minorItemTable.append(minorItem);
+		}
+	}
+
+	m_majorItemTable[TI_YEAR].scaleMin = DBL_MIN;
+
+	for (int i = 1; i < TI_COUNT; i++){
+		m_majorItemTable[i].scaleMax = m_majorItemTable[i-1].scaleMin;
+	}
 }
 
 
@@ -176,6 +254,13 @@ QRectF CTimeAxis::boundingRect() const
 
 void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* /*widget*/)
 {
+	TimeItemInfo timeItemInfo = CalculateTimeItems(scene()->views().first()->viewportTransform().m11());
+	Ticks ticks = GenerateTicks(timeItemInfo);
+
+	if (m_fontMetrics != option->fontMetrics){
+		m_fontMetrics = option->fontMetrics;
+	}
+
 	// Fill the full axis rectangle with the background color:
 	painter->setPen(Qt::transparent);
 	painter->setBrush(Qt::darkGray);
@@ -202,7 +287,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 	QString beginTime = m_startTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
 	QString endTime = m_endTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
-	int labelWidth = option->fontMetrics.horizontalAdvance(beginTime);
+	int labelWidth = option->fontMetrics.horizontalAdvance("##.##.#### ##:##:##.###");
 
 	double majorStepSize = 1.5 * labelWidth;
 	int majorTicksCount = 1 + int(0.5 + viewWidth / majorStepSize);
@@ -281,6 +366,128 @@ QDateTime CTimeAxis::GetTimeFromScenePosition(double position) const
 	return QDateTime::fromMSecsSinceEpoch(m_startTime.toMSecsSinceEpoch() + m_startTime.msecsTo(m_endTime) * (position - pos().x()) / rect().width());
 }
 
+// protected methods
+
+
+CTimeAxis::TimeItemInfo CTimeAxis::CalculateTimeItems(double scale) const
+{
+	TimeItemInfo timeItemInfo;
+	timeItemInfo.minorTimeInterval = TI_NONE;
+
+	for (int i = 1; i < m_majorItemTable.count(); i++){
+		if (scale >= m_majorItemTable[i].scaleMin && scale < m_majorItemTable[i].scaleMax){
+			timeItemInfo.majorTimeInterval = m_majorItemTable[i].interval;
+			timeItemInfo.majorTimeFormat = m_majorItemTable[i].timeFormat;
+			
+			int minorTableSize = m_majorItemTable[i].minorItemTable.count();
+			for (int j = 0; j < minorTableSize; j++){
+				if (scale > m_majorItemTable[i].minorItemTable[minorTableSize - j - 1].scaleMin){
+					timeItemInfo.minorTimeInterval = m_majorItemTable[i].minorItemTable[minorTableSize - j - 1].interval;
+					break;
+				}
+			}
+
+			break;
+		}
+	}
+
+	switch (timeItemInfo.majorTimeInterval){
+		case TI_1MS:
+			qDebug() << "majorTimeInterval " << "TI_1MS"; break;
+		case TI_10MS:
+			qDebug() << "majorTimeInterval " << "TI_10MS"; break;
+		case TI_100MS:
+			qDebug() << "majorTimeInterval " << "TI_100MS"; break;
+		case TI_1S:
+			qDebug() << "majorTimeInterval " << "TI_1S"; break;
+		case TI_5S:
+			qDebug() << "majorTimeInterval " << "TI_5S"; break;
+		case TI_15S:
+			qDebug() << "majorTimeInterval " << "TI_15S"; break;
+		case TI_30S:
+			qDebug() << "majorTimeInterval " << "TI_30S"; break;
+		case TI_1M:
+			qDebug() << "majorTimeInterval " << "TI_1M"; break;
+		case TI_5M:
+			qDebug() << "majorTimeInterval " << "TI_5M"; break;
+		case TI_15M:
+			qDebug() << "majorTimeInterval " << "TI_15M"; break;
+		case TI_30M:
+			qDebug() << "majorTimeInterval " << "TI_30M"; break;
+		case TI_1H:
+			qDebug() << "majorTimeInterval " << "TI_1H"; break;
+		case TI_3H:
+			qDebug() << "majorTimeInterval " << "TI_3H"; break;
+		case TI_6H:
+			qDebug() << "majorTimeInterval " << "TI_6H"; break;
+		case TI_12H:
+			qDebug() << "majorTimeInterval " << "TI_12H"; break;
+		case TI_DAY:
+			qDebug() << "majorTimeInterval " << "TI_DAY"; break;
+		case TI_WEEK:
+			qDebug() << "majorTimeInterval " << "TI_WEEK"; break;
+		case TI_MONTH:
+			qDebug() << "majorTimeInterval " << "TI_MONTH"; break;
+		case TI_QUARTER:
+			qDebug() << "majorTimeInterval " << "TI_QUARTER"; break;
+		case TI_YEAR:
+			qDebug() << "majorTimeInterval " << "TI_YEAR"; break;
+	}
+
+	switch (timeItemInfo.minorTimeInterval){
+		case TI_1MS:
+			qDebug() << "minorTimeInterval " << "TI_1MS"; break;
+		case TI_10MS:
+			qDebug() << "minorTimeInterval " << "TI_10MS"; break;
+		case TI_100MS:
+			qDebug() << "minorTimeInterval " << "TI_100MS"; break;
+		case TI_1S:
+			qDebug() << "minorTimeInterval " << "TI_1S"; break;
+		case TI_5S:
+			qDebug() << "minorTimeInterval " << "TI_5S"; break;
+		case TI_15S:
+			qDebug() << "minorTimeInterval " << "TI_15S"; break;
+		case TI_30S:
+			qDebug() << "minorTimeInterval " << "TI_30S"; break;
+		case TI_1M:
+			qDebug() << "minorTimeInterval " << "TI_1M"; break;
+		case TI_5M:
+			qDebug() << "minorTimeInterval " << "TI_5M"; break;
+		case TI_15M:
+			qDebug() << "minorTimeInterval " << "TI_15M"; break;
+		case TI_30M:
+			qDebug() << "minorTimeInterval " << "TI_30M"; break;
+		case TI_1H:
+			qDebug() << "minorTimeInterval " << "TI_1H"; break;
+		case TI_3H:
+			qDebug() << "minorTimeInterval " << "TI_3H"; break;
+		case TI_6H:
+			qDebug() << "minorTimeInterval " << "TI_6H"; break;
+		case TI_12H:
+			qDebug() << "minorTimeInterval " << "TI_12H"; break;
+		case TI_DAY:
+			qDebug() << "minorTimeInterval " << "TI_DAY"; break;
+		case TI_WEEK:
+			qDebug() << "minorTimeInterval " << "TI_WEEK"; break;
+		case TI_MONTH:
+			qDebug() << "minorTimeInterval " << "TI_MONTH"; break;
+		case TI_QUARTER:
+			qDebug() << "minorTimeInterval " << "TI_QUARTER"; break;
+		case TI_YEAR:
+			qDebug() << "minorTimeInterval " << "TI_YEAR"; break;
+	}
+
+	return timeItemInfo;
+}
+
+
+CTimeAxis::Ticks CTimeAxis::GenerateTicks(const TimeItemInfo& timeItemInfo) const
+{
+	Ticks ticks;
+
+	return ticks;
+}
+
 
 // private methods
 
@@ -301,6 +508,28 @@ QRectF CTimeAxis::SceneVisibleRect() const
 	QRectF visibleSceneRect = viewPtr->mapToScene(viewportRect).boundingRect();
 
 	return visibleSceneRect;
+}
+
+
+QDateTime CTimeAxis::GetTimeFromRectPosition(double position) const
+{
+	if (!m_startTime.isValid() || !m_endTime.isValid()){
+		return QDateTime();
+	}
+
+	if (position < rect().left() || position > rect().right()){
+		return QDateTime();
+	}
+
+	if (m_startTime == m_endTime){
+		if (qFuzzyCompare(position, rect().left())){
+			return m_startTime;
+		}
+
+		return QDateTime();
+	}
+
+	return QDateTime::fromMSecsSinceEpoch(m_startTime.toMSecsSinceEpoch() + m_startTime.msecsTo(m_endTime) * (position - rect().left()) / rect().width());
 }
 
 

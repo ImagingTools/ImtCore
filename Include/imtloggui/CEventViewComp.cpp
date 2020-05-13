@@ -74,7 +74,6 @@ void CEventViewComp::OnGuiCreated()
 	m_timeAxisPtr = new CTimeAxis();
 	m_timeAxisPtr->SetColor(Qt::green);
 	m_timeAxisPtr->setRect(0, 0, 10, 40);
-	m_timeAxisPtr->SetMinorTickCount(12);
 
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
 	m_viewPtr->setScene(m_scenePtr);
@@ -94,6 +93,8 @@ void CEventViewComp::OnGuiCreated()
 	m_groupManagerPtr->AddGroup(generalGroupPtr);
 
 	connect(this, &CEventViewComp::AxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
+	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
+	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime().addDays(3));
 }
 
 
