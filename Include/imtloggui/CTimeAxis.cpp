@@ -297,9 +297,16 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 			double xPos = GetRectPositionFromTime(info.time) * GetCurrentScale();
 
 			painter->drawLine(QLineF(xPos, rect().top() + 1, xPos, itemRect.bottom() - itemRect.height() / 1.5));
-			QRectF labelRect = QRectF(xPos - labelWidth / 2, itemRect.top() + itemRect.height() / 2, labelWidth, itemRect.height() / 2 - 2);
 			QString labelText = info.time.toString(info.majorTimeFormat);
-			painter->drawText(labelRect.topLeft(), labelText);
+			
+			QTransform savedTransform = painter->transform();
+			QTransform newTransform = savedTransform;
+
+			newTransform.translate(xPos - labelWidth / 2, itemRect.top() + itemRect.height() * 3 / 4);
+				
+			painter->setTransform(newTransform);
+			painter->drawText(0, 0, labelText);
+			painter->setTransform(savedTransform);
 		}
 	}
 }
@@ -384,8 +391,6 @@ CTimeAxis::Ticks CTimeAxis::GenerateTicks(const TimeItemInfo& timeItemInfo) cons
 
 	QDateTime startMajorTime;
 	QDateTime startMinorTime;
-
-	qDebug() << "=======================================================";
 
 	switch (timeItemInfo.majorTimeInterval){
 		case TI_1MS:
