@@ -130,9 +130,11 @@ protected:
 	TimeItemInfo CalculateTimeItems(double scale) const;
 	Ticks GenerateTicks(const TimeItemInfo& timeItemInfo) const;
 
-private:
-	QRectF SceneVisibleRect() const;
-	virtual QDateTime GetTimeFromRectPosition(double position) const;
+	double GetCurrentScale() const;
+	QRectF GetSceneVisibleRect() const;
+
+	double GetRectPositionFromTime(const QDateTime& time) const;
+	QDateTime GetTimeFromRectPosition(double position) const;
 
 private:
 	QDateTime m_baseTime;
