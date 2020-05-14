@@ -183,8 +183,6 @@ void CTimeAxis::CreateTimeItemTable()
 	m_majorItemTable[TI_YEAR].timeFormat = "yyyy";
 	m_majorItemTable[TI_YEAR].distance = 31536000; // approximately
 
-
-	m_majorItemTable[TI_1MS].scaleMax = DBL_MAX;
 	double labelWidth;
 
 	for (int i = 0; i < TI_COUNT; i++){
@@ -211,6 +209,8 @@ void CTimeAxis::CreateTimeItemTable()
 	for (int i = 1; i < TI_COUNT; i++){
 		m_majorItemTable[i].scaleMax = m_majorItemTable[i-1].scaleMin;
 	}
+
+	m_majorItemTable[TI_1MS].scaleMax = DBL_MAX;
 }
 
 
@@ -236,7 +236,7 @@ QRectF CTimeAxis::boundingRect() const
 	// Left and right marings for the drawing the first and last tick labels:
 	axisRect.adjust(-100, 0, 100, 0);
 
-	double scale = scene()->views().first()->viewportTransform().m11();
+	double scale = GetCurrentScale();
 	
 	if (scale > 1){
 		axisRect.setLeft(origin.x() + (axisRect.left() - origin.x()) * scale);
@@ -262,28 +262,12 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 		return;
 	}
 
-	TimeItemInfo timeItemInfo = CalculateTimeItems(scene()->views().first()->viewportTransform().m11());
+	TimeItemInfo timeItemInfo = CalculateTimeItems(GetCurrentScale());
 	Ticks ticks = GenerateTicks(timeItemInfo);
-
-	// Full rectangle of the axis:
-	//QRectF visibleRect = rect().intersected(GetSceneVisibleRect());
 
 	// Logical rectangle for the defined time range:
 	QRectF itemRect = rect();
 
-	//// Current view transformation:
-	//QGraphicsView* viewPtr = scene()->views().first();
-	//QTransform viewTransform = viewPtr->viewportTransform();
-
-	//quint64 timeRange = m_startTime.secsTo(m_endTime);
-
-	//double viewWidth = itemRect.width() * viewTransform.m11();
-	//double secondsPerPixel = timeRange / viewWidth;
-
-	//QString beginTime = m_startTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
-	//QString endTime = m_endTime.toString("dd.MM.yyyy hh:mm:ss.zzz");
-	
-	
 	int labelWidth = 0;
 	for (TickInfo info : ticks){
 		if (info.type == TT_MAJOR){
@@ -292,22 +276,11 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 		}
 	}
 		
-	//double majorStepSize = 1.5 * labelWidth;
-	//int majorTicksCount = 1 + int(0.5 + viewWidth / majorStepSize);
-
 	painter->setPen(Qt::white);
-
-	//QRectF firstLabelRect = QRectF(-labelWidth / 2, itemRect.top() + itemRect.height() / 2, labelWidth, itemRect.height() / 2 - 2);
-	//painter->drawText(firstLabelRect, beginTime);
-	//painter->drawLine(QLineF(0, itemRect.top() + 1, 0, itemRect.bottom() - itemRect.height() / 1.5));
 
 	if (m_startTime == m_endTime){
 		return;
 	}
-
-	//QRectF lastLabelRect = QRectF(itemRect.right() * viewTransform.m11() - labelWidth / 2, itemRect.top() + itemRect.height() / 2, labelWidth, itemRect.height() / 2 - 2);
-	//painter->drawText(lastLabelRect, endTime);
-	//painter->drawLine(QLineF(itemRect.right() * viewTransform.m11(), itemRect.top() + 1, itemRect.right() * viewTransform.m11(), itemRect.bottom() - itemRect.height() / 1.5));
 
 	// Draw minor ticks:
 	for (TickInfo info : ticks){
@@ -326,7 +299,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 			painter->drawLine(QLineF(xPos, rect().top() + 1, xPos, itemRect.bottom() - itemRect.height() / 1.5));
 			QRectF labelRect = QRectF(xPos - labelWidth / 2, itemRect.top() + itemRect.height() / 2, labelWidth, itemRect.height() / 2 - 2);
 			QString labelText = info.time.toString(info.majorTimeFormat);
-			painter->drawText(labelRect, labelText);
+			painter->drawText(labelRect.topLeft(), labelText);
 		}
 	}
 }
@@ -374,15 +347,15 @@ QDateTime CTimeAxis::GetTimeFromScenePosition(double position) const
 	return QDateTime::fromMSecsSinceEpoch(m_startTime.toMSecsSinceEpoch() + m_startTime.msecsTo(m_endTime) * (position - pos().x()) / rect().width());
 }
 
-// protected methods
 
+// protected methods
 
 CTimeAxis::TimeItemInfo CTimeAxis::CalculateTimeItems(double scale) const
 {
 	TimeItemInfo timeItemInfo;
 	timeItemInfo.minorTimeInterval = TI_NONE;
 
-	for (int i = 1; i < m_majorItemTable.count(); i++){
+	for (int i = 0; i < m_majorItemTable.count(); i++){
 		if (scale >= m_majorItemTable[i].scaleMin && scale < m_majorItemTable[i].scaleMax){
 			timeItemInfo.majorTimeInterval = m_majorItemTable[i].interval;
 			timeItemInfo.majorTimeFormat = m_majorItemTable[i].timeFormat;
@@ -417,127 +390,127 @@ CTimeAxis::Ticks CTimeAxis::GenerateTicks(const TimeItemInfo& timeItemInfo) cons
 	switch (timeItemInfo.majorTimeInterval){
 		case TI_1MS:
 			startMajorTime = startTime;
-			qDebug() << "majorTimeInterval " << "TI_1MS"; break;
+			break;
 		case TI_10MS:
 			startMajorTime = imtbase::Get10MSecondBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_10MS"; break;
+			break;
 		case TI_100MS:
 			startMajorTime = imtbase::Get100MSecondBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_100MS"; break;
+			break;
 		case TI_1S:
 			startMajorTime = imtbase::GetSecondBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_1S"; break;
+			break;
 		case TI_5S:
 			startMajorTime = imtbase::Get5SecondBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_5S"; break;
+			break;
 		case TI_15S:
 			startMajorTime = imtbase::Get15SecondBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_15S"; break;
+			break;
 		case TI_30S:
 			startMajorTime = imtbase::Get30SecondBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_30S"; break;
+			break;
 		case TI_1M:
 			startMajorTime = imtbase::GetMinutesBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_1M"; break;
+			break;
 		case TI_5M:
 			startMajorTime = imtbase::Get5MinutesBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_5M"; break;
+			break;
 		case TI_15M:
 			startMajorTime = imtbase::Get15MinutesBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_15M"; break;
+			break;
 		case TI_30M:
 			startMajorTime = imtbase::Get30MinutesBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_30M"; break;
+			break;
 		case TI_1H:
 			startMajorTime = imtbase::GetHourBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_1H"; break;
+			break;
 		case TI_3H:
 			startMajorTime = imtbase::Get3HourBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_3H"; break;
+			break;
 		case TI_6H:
 			startMajorTime = imtbase::Get6HourBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_6H"; break;
+			break;
 		case TI_12H:
 			startMajorTime = imtbase::Get12HourBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_12H"; break;
+			break;
 		case TI_DAY:
 			startMajorTime = imtbase::GetDayBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_DAY"; break;
+			break;
 		case TI_WEEK:
 			startMajorTime = imtbase::GetWeekBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_WEEK"; break;
+			break;
 		case TI_MONTH:
 			startMajorTime = imtbase::GetMonthBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_MONTH"; break;
+			break;
 		case TI_QUARTER:
 			startMajorTime = imtbase::GetQuorterBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_QUARTER"; break;
+			break;
 		case TI_YEAR:
 			startMajorTime = imtbase::GetYearBegin(startTime);
-			qDebug() << "majorTimeInterval " << "TI_YEAR"; break;
+			break;
 	}
 
 	switch (timeItemInfo.minorTimeInterval){
 		case TI_1MS:
 			startMinorTime = startTime;
-			qDebug() << "minorTimeInterval " << "TI_1MS"; break;
+			break;
 		case TI_10MS:
 			startMinorTime = imtbase::Get10MSecondBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_10MS"; break;
+			break;
 		case TI_100MS:
 			startMinorTime = imtbase::Get100MSecondBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_100MS"; break;
+			break;
 		case TI_1S:
 			startMinorTime = imtbase::GetSecondBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_1S"; break;
+			break;
 		case TI_5S:
 			startMinorTime = imtbase::Get5SecondBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_5S"; break;
+			break;
 		case TI_15S:
 			startMinorTime = imtbase::Get15SecondBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_15S"; break;
+			break;
 		case TI_30S:
 			startMinorTime = imtbase::Get30SecondBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_30S"; break;
+			break;
 		case TI_1M:
 			startMinorTime = imtbase::GetMinutesBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_1M"; break;
+			break;
 		case TI_5M:
 			startMinorTime = imtbase::Get5MinutesBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_5M"; break;
+			break;
 		case TI_15M:
 			startMinorTime = imtbase::Get15MinutesBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_15M"; break;
+			break;
 		case TI_30M:
 			startMinorTime = imtbase::Get30MinutesBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_30M"; break;
+			break;
 		case TI_1H:
 			startMinorTime = imtbase::GetHourBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_1H"; break;
+			break;
 		case TI_3H:
 			startMinorTime = imtbase::Get3HourBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_3H"; break;
+			break;
 		case TI_6H:
 			startMinorTime = imtbase::Get6HourBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_6H"; break;
+			break;
 		case TI_12H:
 			startMinorTime = imtbase::Get12HourBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_12H"; break;
+			break;
 		case TI_DAY:
 			startMinorTime = imtbase::GetDayBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_DAY"; break;
+			break;
 		case TI_WEEK:
 			startMinorTime = imtbase::GetWeekBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_WEEK"; break;
+			break;
 		case TI_MONTH:
 			startMinorTime = imtbase::GetMonthBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_MONTH"; break;
+			break;
 		case TI_QUARTER:
 			startMinorTime = imtbase::GetQuorterBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_QUARTER"; break;
+			break;
 		case TI_YEAR:
 			startMinorTime = imtbase::GetYearBegin(startTime);
-			qDebug() << "minorTimeInterval " << "TI_YEAR"; break;
+			break;
 	}
 
 	QDateTime currentTime;
@@ -547,11 +520,6 @@ CTimeAxis::Ticks CTimeAxis::GenerateTicks(const TimeItemInfo& timeItemInfo) cons
 	currentTime = startMajorTime;
 
 	while (currentTime <= endTime){
-		//qDebug() << "*** ";
-		//qDebug() << startTime;
-		//qDebug() << currentTime;
-		//qDebug() << endTime;
-
 		if (currentTime >= startTime){
 			TickInfo info;
 			info.type = TT_MAJOR;
