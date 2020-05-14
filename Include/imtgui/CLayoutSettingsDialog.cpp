@@ -25,7 +25,7 @@ CLayoutSettingsDialog::CLayoutSettingsDialog(QWidget* parentPtr)
 void CLayoutSettingsDialog::SetLayoutProperties(const ILayout::LayoutProperties &properties)
 {
 	FixedLayouts->setChecked(properties.isFixedLayout);
-	ViewBox->setChecked(properties.isBorderEnabled);
+	BorderEnabled->setChecked(properties.isBorderEnabled);
 	SetBorderColor(properties.borderColor);
 	QString string;
 	string.setNum(properties.minWidth);
@@ -36,6 +36,14 @@ void CLayoutSettingsDialog::SetLayoutProperties(const ILayout::LayoutProperties 
 	MinHeight->setText(string);
 	string.setNum(properties.maxHeight);
 	MaxHeight->setText(string);
+	string.setNum(properties.leftMargin);
+	LeftMargin->setText(string);
+	string.setNum(properties.rightMargin);
+	RightMargin->setText(string);
+	string.setNum(properties.topMargin);
+	TopMargin->setText(string);
+	string.setNum(properties.bottomMargin);
+	BottomMargin->setText(string);
 }
 
 
@@ -43,12 +51,16 @@ ILayout::LayoutProperties CLayoutSettingsDialog::GetLayoutProperties() const
 {
 	ILayout::LayoutProperties retVal;
 	retVal.isFixedLayout = FixedLayouts->isChecked();
-	retVal.isBorderEnabled = ViewBox->isChecked();
+	retVal.isBorderEnabled = BorderEnabled->isChecked();
 	retVal.borderColor = m_borderColor;
 	retVal.minWidth = MinWidth->text().toInt();
 	retVal.maxWidth = MaxWidth->text().toInt();
 	retVal.minHeight = MinHeight->text().toInt();
 	retVal.maxHeight = MaxHeight->text().toInt();
+	retVal.leftMargin = LeftMargin->text().toInt();
+	retVal.rightMargin = RightMargin->text().toInt();
+	retVal.topMargin = TopMargin->text().toInt();
+	retVal.bottomMargin = BottomMargin->text().toInt();
 	return retVal;
 }
 

@@ -60,7 +60,7 @@ public:
 	virtual const ibase::IHierarchicalCommand* GetCommands() const;
 
 protected:
-	QWidget* CreateCustomLayoutWidget(ILayout* layout);
+	QLayout* CreateCustomLayoutWidget(ILayout* layout);
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet);

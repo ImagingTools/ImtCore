@@ -61,9 +61,9 @@ const ibase::IHierarchicalCommand* CLayoutManagerGuiComp::GetCommands() const
 
 // protected methods
 
-QWidget* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
+QLayout* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 {
-	QWidget* retVal = nullptr;
+	QLayout* retVal = new QVBoxLayout();
 	if (layout->GetType() == ILayout::LT_NONE){
 		CCustomLayoutWidget* customLayoutWidgetPtr = m_layoutWidgetPtr->createCustomWidget();
 		customLayoutWidgetPtr->SetId(layout->GetLayoutId());
@@ -84,7 +84,9 @@ QWidget* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 			}
 		}
 
-		retVal = customLayoutWidgetPtr;
+		retVal->addWidget(customLayoutWidgetPtr);
+		retVal->setContentsMargins(customLayoutWidgetPtr->LeftMargin(), customLayoutWidgetPtr->TopMargin(),
+			customLayoutWidgetPtr->RightMargin(), customLayoutWidgetPtr->BottomMargin());
 	}
 	else{
 		ILayout::LayoutProperties properties = layout->GetLayoutProperties();
@@ -93,7 +95,9 @@ QWidget* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 		connect(splitterPtr, SIGNAL(splitterMoved(int, int)), this, SLOT(OnSplitterMoved(int, int)));
 		SplittersMap.insert(splitterPtr, layout->GetLayoutId());
 
-		retVal = splitterPtr;
+		retVal->addWidget(splitterPtr);
+		retVal->setMargin(0);
+
 		if (layout->GetType() == ILayout::LT_HORIZONTAL_SPLITTER){
 			splitterPtr->setOrientation(Qt::Horizontal);
 		}
@@ -104,7 +108,9 @@ QWidget* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 		for (int i = 0; i < layout->GetChildsCount(); i++){
 			ILayout* childLayoutPtr = layout->GetChild(i);
 			if (childLayoutPtr != nullptr){
-				splitterPtr->addWidget(CreateCustomLayoutWidget(childLayoutPtr));
+				QWidget* widget = new QWidget();
+				widget->setLayout(CreateCustomLayoutWidget(childLayoutPtr));
+				splitterPtr->addWidget(widget);
 				if ( //m_isFixedLayoutPtr.IsValid()
 					//&& *m_isFixedLayoutPtr == true
 					properties.isFixedLayout == true
@@ -132,10 +138,10 @@ QWidget* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 void CLayoutManagerGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (m_layoutWidgetPtr != nullptr){
-		m_layoutWidgetPtr->ClearAll();
 		SplittersMap.clear();
 
-		m_layoutWidgetPtr->layout()->addWidget(CreateCustomLayoutWidget(GetObservedObject()));
+		m_layoutWidgetPtr->ClearAll();
+		m_layoutWidgetPtr->setLayout(CreateCustomLayoutWidget(GetObservedObject()));
 	}
 }
 

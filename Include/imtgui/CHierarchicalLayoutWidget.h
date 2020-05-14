@@ -110,6 +110,10 @@ public:
 	void SetTitleAlign(const ILayout::AlignType &align);
 	ILayout::AlignType GetTitleAlign();
     void SetLayoutProperties(const ILayout::LayoutProperties &properties);
+	int LeftMargin();
+	int RightMargin();
+	int TopMargin();
+	int BottomMargin();
 
 protected:
 	// reimplemented (QWidget)

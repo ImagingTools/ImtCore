@@ -37,9 +37,6 @@ CHierarchicalLayoutWidget::CHierarchicalLayoutWidget(QWidget* parentPtr)
 	m_isShowBox(true)
 {
 	setAutoFillBackground(true);
-	setLayout(new QVBoxLayout(this));
-	layout()->setMargin(0);
-
 	SetViewMode(VM_NORMAL);
 }
 
@@ -66,6 +63,7 @@ void CHierarchicalLayoutWidget::ClearAll()
 {
 	CleanLayoutRecursive(layout());
 	m_customWidgetMap.clear();
+	delete layout();
 }
 
 
@@ -362,6 +360,30 @@ void CCustomLayoutWidget::SetLayoutProperties(const ILayout::LayoutProperties &p
 	setMaximumHeight(properties.maxHeight);
 
 	m_properties = properties;
+}
+
+
+int CCustomLayoutWidget::LeftMargin()
+{
+	return m_properties.leftMargin;
+}
+
+
+int CCustomLayoutWidget::RightMargin()
+{
+	return m_properties.rightMargin;
+}
+
+
+int CCustomLayoutWidget::TopMargin()
+{
+	return m_properties.topMargin;
+}
+
+
+int CCustomLayoutWidget::BottomMargin()
+{
+	return m_properties.bottomMargin;
 }
 
 

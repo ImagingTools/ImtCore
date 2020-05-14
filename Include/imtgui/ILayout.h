@@ -46,7 +46,8 @@ public:
 		LayoutProperties()
 		{
 			isFixedLayout = true; isBorderEnabled = true; borderColor = QColor("#808080");
-			minWidth = minHeight = 0; maxWidth = maxHeight = 16777215;
+			minWidth = minHeight = 0; maxWidth = maxHeight = 16777215; 
+			leftMargin = rightMargin = topMargin = bottomMargin = 3;
 		}
 		bool isFixedLayout;
 		bool isBorderEnabled;
@@ -55,6 +56,11 @@ public:
 		int maxWidth;
 		int minHeight;
 		int maxHeight;
+
+		int leftMargin;
+		int rightMargin;
+		int topMargin;
+		int bottomMargin;
 	};
 
 	/**

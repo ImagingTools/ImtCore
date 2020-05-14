@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>291</width>
-    <height>319</height>
+    <width>302</width>
+    <height>362</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,9 +48,9 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QCheckBox" name="ViewBox">
+      <widget class="QCheckBox" name="BorderEnabled">
        <property name="text">
-        <string>View Box</string>
+        <string>Border Enabled</string>
        </property>
       </widget>
      </item>
@@ -68,7 +68,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QCheckBox" name="AllViewBox">
+      <widget class="QCheckBox" name="AllBorderEnabled">
        <property name="text">
         <string>All Layouts</string>
        </property>
@@ -295,6 +295,182 @@
      </item>
      <item>
       <widget class="QCheckBox" name="AllMaxHeight">
+       <property name="text">
+        <string>All Layouts</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QLineEdit" name="LeftMargin">
+       <property name="maximumSize">
+        <size>
+         <width>65</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Left Margin</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_8">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="AllLeftMargin">
+       <property name="text">
+        <string>All Layouts</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <widget class="QLineEdit" name="RightMargin">
+       <property name="maximumSize">
+        <size>
+         <width>65</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Right Margin</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_9">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="AllRightMargin">
+       <property name="text">
+        <string>All Layouts</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <item>
+      <widget class="QLineEdit" name="TopMargin">
+       <property name="maximumSize">
+        <size>
+         <width>65</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>Top Margin</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_10">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="AllTopMargin">
+       <property name="text">
+        <string>All Layouts</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <item>
+      <widget class="QLineEdit" name="BottomMargin">
+       <property name="maximumSize">
+        <size>
+         <width>65</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>Bottom Margin</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_11">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="AllBottomMargin">
        <property name="text">
         <string>All Layouts</string>
        </property>

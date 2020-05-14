@@ -245,6 +245,7 @@ void CLayout::Clear()
 	m_alignType = AT_LEFT;
 	m_viewId.clear();
 	m_sizes.clear();
+	m_properties = LayoutProperties();
 }
 
 
@@ -561,6 +562,26 @@ bool CLayout::SerializeProperties(iser::IArchive& archive, LayoutProperties &pro
 	retVal = retVal && archive.Process(properties.maxHeight);
 	retVal = retVal && archive.EndTag(maxHeightTag);
 
+	static iser::CArchiveTag leftMarginTag("LeftMargin", "Left margin", iser::CArchiveTag::TT_LEAF, &propertiesTag);
+	retVal = retVal && archive.BeginTag(leftMarginTag);
+	retVal = retVal && archive.Process(properties.leftMargin);
+	retVal = retVal && archive.EndTag(leftMarginTag);
+
+	static iser::CArchiveTag rightMarginTag("RightMargin", "Right margin", iser::CArchiveTag::TT_LEAF, &propertiesTag);
+	retVal = retVal && archive.BeginTag(rightMarginTag);
+	retVal = retVal && archive.Process(properties.rightMargin);
+	retVal = retVal && archive.EndTag(rightMarginTag);
+
+	static iser::CArchiveTag topMarginTag("TopMargin", "Top margin", iser::CArchiveTag::TT_LEAF, &propertiesTag);
+	retVal = retVal && archive.BeginTag(topMarginTag);
+	retVal = retVal && archive.Process(properties.topMargin);
+	retVal = retVal && archive.EndTag(topMarginTag);
+
+	static iser::CArchiveTag bottomMarginTag("BottomMargin", "Bottom margin", iser::CArchiveTag::TT_LEAF, &propertiesTag);
+	retVal = retVal && archive.BeginTag(bottomMarginTag);
+	retVal = retVal && archive.Process(properties.bottomMargin);
+	retVal = retVal && archive.EndTag(bottomMarginTag);
+
 	retVal = retVal && archive.EndTag(propertiesTag);
 
 	return retVal;
@@ -590,6 +611,8 @@ bool operator ==(const ILayout::LayoutProperties &left, const ILayout::LayoutPro
 	retVal = retVal && (left.borderColor == right.borderColor);
 	retVal = retVal && (left.minWidth == right.minWidth) && (left.maxWidth == right.maxWidth);
 	retVal = retVal && (left.minHeight == right.minHeight) && (left.maxHeight == right.maxHeight);
+	retVal = retVal && (left.leftMargin == right.leftMargin) && (left.rightMargin == right.rightMargin);
+	retVal = retVal && (left.topMargin == right.topMargin) && (left.bottomMargin == right.bottomMargin);
 	return retVal;
 }
 
