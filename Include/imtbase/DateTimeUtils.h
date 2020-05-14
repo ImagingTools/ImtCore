@@ -5,7 +5,7 @@
 #include <QtCore/QDateTime>
 
 
-namespace aculastatgui
+namespace imtbase
 {
 
 
@@ -371,4 +371,4 @@ inline QDateTime GetYearEnd(const QDateTime& dt)
 }
 
 
-} // namespace aculastatgui
+} // namespace imtbase
