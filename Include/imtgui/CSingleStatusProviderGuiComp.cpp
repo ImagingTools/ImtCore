@@ -23,6 +23,18 @@ void CSingleStatusProviderGuiComp::OnGuiCreated()
 }
 
 
+void CSingleStatusProviderGuiComp::OnGuiRetranslate()
+{
+	BaseClass::OnGuiRetranslate();
+
+	if (!IsUpdateBlocked()){
+		UpdateBlocker blockUpdate(this);
+
+		UpdateGui(istd::IChangeable::GetAnyChange());
+	}
+}
+
+
 // reimplemented (iqtgui::TGuiObserverWrap)
 
 void CSingleStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)

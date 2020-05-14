@@ -30,6 +30,7 @@ protected:
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
+	virtual void OnGuiRetranslate() override;
 
 private:
 	void UpdateCommonStatusGui(const istd::IInformationProvider& status);

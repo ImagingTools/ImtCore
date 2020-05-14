@@ -17,6 +17,18 @@ void CMultiStatusProviderGuiComp::OnGuiCreated()
 }
 
 
+void CMultiStatusProviderGuiComp::OnGuiRetranslate()
+{
+	BaseClass::OnGuiRetranslate();
+
+	if (!IsUpdateBlocked()){
+		UpdateBlocker blockUpdate(this);
+
+		UpdateGui(istd::IChangeable::GetAnyChange());
+	}
+}
+
+
 // reimplemented (iqtgui::TGuiObserverWrap)
 
 void CMultiStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
