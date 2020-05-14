@@ -428,13 +428,7 @@ void CCustomLayoutWidget::OnAddWidget()
 
 void CCustomLayoutWidget::OnChangeSettings()
 {
-	CLayoutSettingsDialog settingsDialog;
-	settingsDialog.SetLayoutProperties(m_properties);
-	if (settingsDialog.exec() == QDialog::Accepted){
-		m_properties = settingsDialog.GetLayoutProperties();
-		Q_EMIT m_hierarchicalLayoutWidget.EmitChangeProperties(m_id, m_properties);
-	}
-
+	Q_EMIT m_hierarchicalLayoutWidget.EmitChangeProperties(m_id);
 }
 
 

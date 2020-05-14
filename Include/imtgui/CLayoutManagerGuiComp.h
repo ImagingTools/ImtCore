@@ -85,7 +85,7 @@ protected Q_SLOTS:
 	void OnAddWidget(const QByteArray& id, int index);
 	void OnAddWidgetByViewId(const QByteArray& id, const QByteArray& viewId);
 	void OnChangeSizes(const QByteArray& id, const SizeList& sizeList);
-	void OnChangeProperties(const QByteArray& id, const ILayout::LayoutProperties& properties);
+	void OnChangeProperties(const QByteArray& id);
 
 private:
 	// static template methods for subelement access
@@ -94,6 +94,7 @@ private:
 	{
 		return &component.m_guiViewOptionsManager;
 	}
+	void SetAllProperties(ILayout* layout, const ILayout::LayoutProperties& properties, const CLayoutSettingsDialog& settingsDialog);
 
 private:
 	I_REF(ibase::ICommandsProvider, m_commandsProviderCompPtr);

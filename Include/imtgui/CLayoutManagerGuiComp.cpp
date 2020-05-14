@@ -166,7 +166,7 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeTitle(const QByteArray&, const QString&)), this, SLOT(OnChangeTitle(const QByteArray&, const QString&)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeAlignTitle(const QByteArray&, const ILayout::AlignType&)), this, SLOT(OnChangeAlignTitle(const QByteArray&, const ILayout::AlignType&)), Qt::DirectConnection);
 	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeSizes(const QByteArray&, const SizeList&)), this, SLOT(OnChangeSizes(const QByteArray&, const SizeList&)), Qt::DirectConnection);
-	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeProperties(const QByteArray&, const ILayout::LayoutProperties&)), this, SLOT(OnChangeProperties(const QByteArray&, const ILayout::LayoutProperties&)), Qt::DirectConnection);
+	QObject::connect(m_layoutWidgetPtr, SIGNAL(EmitChangeProperties(const QByteArray&)), this, SLOT(OnChangeProperties(const QByteArray&)), Qt::DirectConnection);
 	
 	// check views attributes
 	Q_ASSERT_X(m_guiViewIdMultiAttrPtr.IsValid(), "CLayoutManagerGuiComp", "attribute ViewIds should be set");
@@ -413,30 +413,101 @@ void CLayoutManagerGuiComp::OnChangeSizes(const QByteArray& id, const SizeList& 
 }
 
 
-void CLayoutManagerGuiComp::OnChangeProperties(const QByteArray& id, const ILayout::LayoutProperties& properties)
+void CLayoutManagerGuiComp::OnChangeProperties(const QByteArray& id)
 {
 	ILayout* rootLayoutPtr = GetObservedObject();
 	Q_ASSERT(rootLayoutPtr != nullptr);
 
-	istd::CChangeGroup changeGroup(rootLayoutPtr);
+	ILayout::LayoutProperties dialogProperties;
 
 	ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
 	if (childLayoutPtr != nullptr){
-		childLayoutPtr->SetLayoutProperties(properties);
-		ILayout* parentLayoutPtr = childLayoutPtr->GetParent();
-		if (parentLayoutPtr != nullptr){
-			bool isFixedLayout = properties.isFixedLayout;
-			ILayout::LayoutProperties layoutProperties = parentLayoutPtr->GetLayoutProperties();
-			layoutProperties.isFixedLayout = isFixedLayout;
-			parentLayoutPtr->SetLayoutProperties(layoutProperties);
-			for (int i = 0; i < parentLayoutPtr->GetChildsCount(); i++){
-				layoutProperties = parentLayoutPtr->GetChild(i)->GetLayoutProperties();
-				layoutProperties.isFixedLayout = isFixedLayout;
-				parentLayoutPtr->GetChild(i)->SetLayoutProperties(layoutProperties);
+		dialogProperties = childLayoutPtr->GetLayoutProperties();
+
+		CLayoutSettingsDialog settingsDialog;
+		settingsDialog.SetLayoutProperties(dialogProperties);
+		if (settingsDialog.exec() == QDialog::Accepted){
+			dialogProperties = settingsDialog.GetLayoutProperties();
+
+			istd::CChangeGroup changeGroup(rootLayoutPtr);
+
+			ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
+			if (childLayoutPtr != nullptr){
+				childLayoutPtr->SetLayoutProperties(dialogProperties);
+				ILayout* parentLayoutPtr = childLayoutPtr->GetParent();
+				if (parentLayoutPtr != nullptr){
+					bool isFixedLayout = dialogProperties.isFixedLayout;
+					ILayout::LayoutProperties layoutProperties = parentLayoutPtr->GetLayoutProperties();
+					layoutProperties.isFixedLayout = isFixedLayout;
+					parentLayoutPtr->SetLayoutProperties(layoutProperties);
+					for (int i = 0; i < parentLayoutPtr->GetChildsCount(); i++){
+						layoutProperties = parentLayoutPtr->GetChild(i)->GetLayoutProperties();
+						layoutProperties.isFixedLayout = isFixedLayout;
+						parentLayoutPtr->GetChild(i)->SetLayoutProperties(layoutProperties);
+					}
+				}
 			}
+
+			SetAllProperties(rootLayoutPtr, dialogProperties, settingsDialog);
 		}
 	}
 
+}
+
+
+void CLayoutManagerGuiComp::SetAllProperties(ILayout* layout, const ILayout::LayoutProperties& dialogProperties, const CLayoutSettingsDialog& settingsDialog)
+{
+	if (layout != nullptr){
+		ILayout::LayoutProperties properties = layout->GetLayoutProperties();
+		if (layout->GetType() == ILayout::LT_NONE){
+			if (settingsDialog.AllBorderColor->isChecked()){
+				properties.borderColor = dialogProperties.borderColor;
+			}
+			if (settingsDialog.AllBorderEnabled->isChecked()){
+				properties.isBorderEnabled = dialogProperties.isBorderEnabled;
+			}
+			if (settingsDialog.AllFixedLayouts->isChecked()){
+				properties.isFixedLayout = dialogProperties.isFixedLayout;
+			}
+			if (settingsDialog.AllMinWidth->isChecked()){
+				properties.minWidth = dialogProperties.minWidth;
+			}
+			if (settingsDialog.AllMaxWidth->isChecked()){
+				properties.maxWidth = dialogProperties.maxWidth;
+			}
+			if (settingsDialog.AllMinHeight->isChecked()){
+				properties.minHeight = dialogProperties.minHeight;
+			}
+			if (settingsDialog.AllMaxHeight->isChecked()){
+				properties.maxHeight = dialogProperties.maxHeight;
+			}
+			if (settingsDialog.AllLeftMargin->isChecked()){
+				properties.leftMargin = dialogProperties.leftMargin;
+			}
+			if (settingsDialog.AllRightMargin->isChecked()){
+				properties.rightMargin = dialogProperties.rightMargin;
+			}
+			if (settingsDialog.AllTopMargin->isChecked()){
+				properties.topMargin = dialogProperties.topMargin;
+			}
+			if (settingsDialog.AllBottomMargin->isChecked()){
+				properties.bottomMargin = dialogProperties.bottomMargin;
+			}
+			layout->SetLayoutProperties(properties);
+		}
+		else{
+			if (settingsDialog.AllFixedLayouts->isChecked()){
+				properties.isFixedLayout = dialogProperties.isFixedLayout;
+			}
+			layout->SetLayoutProperties(properties);
+
+			for (int i = 0; i < layout->GetChildsCount(); i++){
+				ILayout* childLayout = layout->GetChild(i);
+				SetAllProperties(childLayout, dialogProperties, settingsDialog);
+			}
+		}
+
+	}
 }
 
 

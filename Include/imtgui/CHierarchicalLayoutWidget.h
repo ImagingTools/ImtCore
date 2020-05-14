@@ -73,7 +73,7 @@ Q_SIGNALS:
 	void EmitChangeAlignTitle(const QByteArray& id, const ILayout::AlignType& align);
 	void EmitChangeTitle(const QByteArray& id, const QString& title);
 	void EmitChangeSizes(const QByteArray& id, const SizeList& sizeList);
-	void EmitChangeProperties(const QByteArray& id, const ILayout::LayoutProperties& properties);
+	void EmitChangeProperties(const QByteArray& id);
 
 private:
 	typedef QMap<QByteArray, CCustomLayoutWidget*> CustomWidgetMap;
