@@ -60,8 +60,8 @@ private:
 	QString m_source;
 	int m_flags;
 
-	I_ATTR(QString, m_defaultDescriptionAttrPtr);
-	I_ATTR(QString, m_defaultSourceAttrPtr);
+	I_TEXTATTR(m_defaultDescriptionAttrPtr);
+	I_TEXTATTR(m_defaultSourceAttrPtr);
 };
 
 

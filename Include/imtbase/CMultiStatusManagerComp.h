@@ -58,8 +58,8 @@ protected:
 	virtual void OnComponentCreated() override;
 
 protected:
-	I_ATTR(QString, m_defaultDescriptionAttrPtr);
-	I_ATTR(QString, m_defaultSourceAttrPtr);
+	I_TEXTATTR(m_defaultDescriptionAttrPtr);
+	I_TEXTATTR(m_defaultSourceAttrPtr);
 	I_MULTIREF(istd::IInformationProvider, m_informationProvidersCompPtr);
 	I_MULTIATTR(QByteArray, m_statusIdsAttrPtr);
 	I_MULTITEXTATTR(m_statusNamesAttrPtr);
