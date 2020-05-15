@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4839" Description="ACF"/>
-            <Version Id="1" Number="2119" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331009" Description="Qt Framework"/>
+            <Version Id="0" Number="4860" Description="ACF"/>
+            <Version Id="1" Number="2123" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331010" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Custom layout UI-manager</Description>
@@ -21,14 +21,17 @@
                     <AttributeInfo Id="DefaultBorderColor" Type="Id" ExportId="DefaultBorderColor">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DefaultBorderEnabled" Type="Boolean" ExportId="DefaultBorderEnabled">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultEditEnabled" Type="Boolean" ExportId="DefaultEditEnabled">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DefaultFixedLayout" Type="Boolean" ExportId="DefaultFixedLayout">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="LayoutManager"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultShowBox" Type="Boolean" ExportId="DefaultShowBox">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultStatusIcon" Type="String" ExportId="DefaultStatusIcon">
                         <Data IsEnabled="false"/>

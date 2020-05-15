@@ -174,9 +174,27 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 	Q_ASSERT_X(m_guiViewNameMultiAttrPtr.IsValid(), "CLayoutManagerGuiComp", "attribute ViewNames should be set");
 	Q_ASSERT_X((m_guiViewIdMultiAttrPtr.GetCount() == m_guiViewMultiFactCompPtr.GetCount()) &&
 		(m_guiViewNameMultiAttrPtr.GetCount() == m_guiViewMultiFactCompPtr.GetCount()), "CLayoutManagerGuiComp", "attributes ViewIds, ViewNames and ViewFactories should have the same count");
-
-	m_layoutWidgetPtr->SetBorderColor(QColor(QString(*m_colorBorderAttrPtr)));
-	m_layoutWidgetPtr->SetBorderEnabled(*m_isShowBoxAttrPtr);
+	ILayout* rootLayoutPtr = GetObservedObject();
+	Q_ASSERT(rootLayoutPtr != nullptr);
+	ILayout::LayoutProperties properties;
+	if (m_colorBorderAttrPtr.IsValid()){
+		properties = rootLayoutPtr->GetLayoutProperties();
+		properties.borderColor = QColor(QString(*m_colorBorderAttrPtr));
+		rootLayoutPtr->SetLayoutProperties(properties);
+	}
+	if (m_isBorderEnabledAttrPtr.IsValid()){
+		properties = rootLayoutPtr->GetLayoutProperties();
+		properties.isBorderEnabled = *m_isBorderEnabledAttrPtr;
+		rootLayoutPtr->SetLayoutProperties(properties);
+	}
+	if (m_isFixedLayoutAttrPtr.IsValid()){
+		properties = rootLayoutPtr->GetLayoutProperties();
+		properties.isFixedLayout = *m_isFixedLayoutAttrPtr;
+		rootLayoutPtr->SetLayoutProperties(properties);
+	}
+	if (m_isEditEnabledAttrPtr.IsValid()){
+		m_startEndEditModeCommand.setVisible(*m_isEditEnabledAttrPtr);
+	}
 
 	// add undo manager commands provider
 	if (m_commandsProviderCompPtr.IsValid()){
