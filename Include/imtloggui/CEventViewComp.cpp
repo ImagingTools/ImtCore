@@ -49,7 +49,7 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 
 			m_timeAxisPtr->EnsureTimeRange(eventTime);
 
-			ÑLoginEventItem* eventPtr = new ÑLoginEventItem(message);
+			CLoginEventItem* eventPtr = new CLoginEventItem(message);
 			eventPtr->SetIcons(QIcon(":/Icons/Lock"), QIcon(":/Icons/Unlock"));
 			eventPtr->SetIconSize(QSize(40, 40));
 

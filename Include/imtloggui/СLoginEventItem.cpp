@@ -14,27 +14,27 @@ namespace imtloggui
 
 // public methods
 
-ÑLoginEventItem::ÑLoginEventItem(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent)
+CLoginEventItem::CLoginEventItem(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent)
 	: BaseClass(message, parent)
 {
 	m_messagePtr = message;
 }
 
 
-void ÑLoginEventItem::SetFont(const QFont& font)
+void CLoginEventItem::SetFont(const QFont& font)
 {
 	m_font = font;
 }
 
 
-void ÑLoginEventItem::SetIcons(const QIcon& iconLogin, const QIcon& iconLogout)
+void CLoginEventItem::SetIcons(const QIcon& iconLogin, const QIcon& iconLogout)
 {
 	m_iconLogin = iconLogin;
 	m_iconLogout = iconLogout;
 }
 
 
-void ÑLoginEventItem::SetIconSize(const QSize& size)
+void CLoginEventItem::SetIconSize(const QSize& size)
 {
 	m_iconSize = size;
 }
@@ -42,7 +42,7 @@ void ÑLoginEventItem::SetIconSize(const QSize& size)
 
 // reimplemented (QGraphicsItem)
 
-QRectF ÑLoginEventItem::boundingRect() const
+QRectF CLoginEventItem::boundingRect() const
 {
 	QFontMetrics fontMetrics(m_font);
 
@@ -58,7 +58,7 @@ QRectF ÑLoginEventItem::boundingRect() const
 }
 
 
-void ÑLoginEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void CLoginEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	QFontMetrics fontMetrics(m_font);
 
