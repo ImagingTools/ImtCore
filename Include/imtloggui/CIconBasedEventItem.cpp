@@ -1,4 +1,4 @@
-#include <imtloggui/ÑIconBasedEventItem.h>
+#include <imtloggui/CIconBasedEventItem.h>
 
 
 // Qt includes

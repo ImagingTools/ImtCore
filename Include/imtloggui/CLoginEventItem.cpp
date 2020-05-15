@@ -1,4 +1,4 @@
-#include <imtloggui/ÑLoginEventItem.h>
+#include <imtloggui/CLoginEventItem.h>
 
 
 // Qt includes

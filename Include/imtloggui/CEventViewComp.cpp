@@ -13,7 +13,7 @@
 // ImtCore includes
 #include <imtloggui/CEventGraphicsView.h>
 #include <imtloggui/CEventGroup.h>
-#include <imtloggui/ÑLoginEventItem.h>
+#include <imtloggui/CLoginEventItem.h>
 
 
 namespace imtloggui
