@@ -12,12 +12,12 @@ namespace imtloggui
 {
 
 
-class ÑIconBasedEventItem: public CEventItemBase
+class CIconBasedEventItem: public CEventItemBase
 {
 public:
 	typedef CEventItemBase BaseClass;
 
-	ÑIconBasedEventItem(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent = nullptr);
+	CIconBasedEventItem(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent = nullptr);
 
 	void SetIcon(const QIcon& icon);
 	void SetIconSize(const QSize& size);
