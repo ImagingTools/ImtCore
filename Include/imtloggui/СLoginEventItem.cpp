@@ -1,0 +1,87 @@
+#include <imtloggui/ÑLoginEventItem.h>
+
+
+// Qt includes
+#include <QtGui/QPainter>
+
+// ImtCore includes
+#include <imtlog/IMessageGroupInfoProvider.h>
+
+
+namespace imtloggui
+{
+
+
+// public methods
+
+ÑLoginEventItem::ÑLoginEventItem(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent)
+	: BaseClass(message, parent)
+{
+	m_messagePtr = message;
+}
+
+
+void ÑLoginEventItem::SetFont(const QFont& font)
+{
+	m_font = font;
+}
+
+
+void ÑLoginEventItem::SetIcons(const QIcon& iconLogin, const QIcon& iconLogout)
+{
+	m_iconLogin = iconLogin;
+	m_iconLogout = iconLogout;
+}
+
+
+void ÑLoginEventItem::SetIconSize(const QSize& size)
+{
+	m_iconSize = size;
+}
+
+
+// reimplemented (QGraphicsItem)
+
+QRectF ÑLoginEventItem::boundingRect() const
+{
+	QFontMetrics fontMetrics(m_font);
+
+	QString user = m_messagePtr->GetInformationDescription();
+	
+	QRectF labelRect = fontMetrics.boundingRect(user);
+
+	QRectF rect(0, 0, m_iconSize.width() * 1.1, m_iconSize.height() * 1.1);
+	rect.setWidth(qMax(labelRect.width(), rect.width()));
+	rect.setHeight(labelRect.height() + rect.height());
+
+	return QRectF(-rect.width() / 2, -rect.height() / 2, rect.width(), rect.height());
+}
+
+
+void ÑLoginEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+	QFontMetrics fontMetrics(m_font);
+
+	QString user = m_messagePtr->GetInformationDescription();
+	QRectF labelRect = fontMetrics.boundingRect(user);
+	const QRectF bounding = boundingRect();
+
+	QIcon icon;
+
+	if (m_messagePtr->GetInformationId() == imtbase::IMessageGroupInfoProvider::MI_USER_LOGIN){
+		icon = m_iconLogin;
+	}
+
+	if (m_messagePtr->GetInformationId() == imtbase::IMessageGroupInfoProvider::MI_USER_LOGOUT){
+		icon = m_iconLogout;
+	}
+
+	painter->setRenderHint(QPainter::SmoothPixmapTransform);
+	painter->drawPixmap(QRect(bounding.left() + bounding.width() * 0.05, bounding.top() + bounding.height() * 0.05, m_iconSize.width(), m_iconSize.height()), icon.pixmap(m_iconSize));
+	painter->drawText(-labelRect.width() / 2,  bounding.top() + m_iconSize.height() * 1.4, user);
+}
+
+
+} // namespace imtloggui
+
+

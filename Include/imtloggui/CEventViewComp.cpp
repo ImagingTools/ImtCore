@@ -13,7 +13,7 @@
 // ImtCore includes
 #include <imtloggui/CEventGraphicsView.h>
 #include <imtloggui/CEventGroup.h>
-#include <imtloggui/CGeneralEventItem.h>
+#include <imtloggui/ÑLoginEventItem.h>
 
 
 namespace imtloggui
@@ -49,7 +49,9 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 
 			m_timeAxisPtr->EnsureTimeRange(eventTime);
 
-			CGeneralEventItem* eventPtr = new CGeneralEventItem(message);
+			ÑLoginEventItem* eventPtr = new ÑLoginEventItem(message);
+			eventPtr->SetIcons(QIcon(":/Icons/Lock"), QIcon(":/Icons/Unlock"));
+			eventPtr->SetIconSize(QSize(40, 40));
 
 			QPointF origin(m_timeAxisPtr->GetScenePositionFromTime(message->GetInformationTimeStamp()), -150);
 			eventPtr->setPos(origin);

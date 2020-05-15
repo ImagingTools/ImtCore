@@ -15,6 +15,8 @@ namespace imtloggui
 {
 
 
+// public methods
+
 CGeneralEventItem::CGeneralEventItem(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent)
 	: BaseClass(message, parent)
 {
