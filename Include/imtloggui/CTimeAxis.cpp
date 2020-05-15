@@ -388,6 +388,8 @@ CTimeAxis::Ticks CTimeAxis::GenerateTicks(const TimeItemInfo& timeItemInfo) cons
 	QRectF visibleRect = rect().intersected(GetSceneVisibleRect());
 	QDateTime startTime = GetTimeFromRectPosition(visibleRect.left());
 	QDateTime endTime = GetTimeFromRectPosition(visibleRect.right());
+	startTime = startTime.addMSecs((startTime.toMSecsSinceEpoch() - endTime.toMSecsSinceEpoch()) / 10);
+	endTime = endTime.addMSecs((endTime.toMSecsSinceEpoch() - startTime.toMSecsSinceEpoch()) / 10);
 
 	QDateTime startMajorTime;
 	QDateTime startMinorTime;
