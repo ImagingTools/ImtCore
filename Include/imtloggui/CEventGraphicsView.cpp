@@ -54,18 +54,6 @@ void CEventGraphicsView::OnAxisPositionChanged()
 
 // reimplemented (QGraphicsView)
 
-void CEventGraphicsView::mouseMoveEvent(QMouseEvent* event)
-{
-	BaseClass::mouseMoveEvent(event);
-}
-
-
-void CEventGraphicsView::mousePressEvent(QMouseEvent* event)
-{
-	BaseClass::mousePressEvent(event);
-}
-
-
 void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 {
 	const ViewportAnchor anchor = transformationAnchor();

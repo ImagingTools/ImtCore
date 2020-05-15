@@ -32,8 +32,6 @@ public Q_SLOTS:
 
 protected:
 	// reimplemented (QGraphicsView)
-	void mouseMoveEvent(QMouseEvent* event) override;
-	void mousePressEvent(QMouseEvent* event) override;
 	void wheelEvent(QWheelEvent* event) override;
 	void resizeEvent(QResizeEvent* event) override;
 

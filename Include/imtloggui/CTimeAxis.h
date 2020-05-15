@@ -40,7 +40,6 @@ public:
 	int GetMargin();
 	void CreateTimeItemTable();
 
-
 	// reimplemented (QGraphicsRectItem)
 	virtual QRectF boundingRect() const override;
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
@@ -59,7 +58,7 @@ protected:
 		TT_MINOR
 	};
 
-	enum TickInterval
+	enum TimeInterval
 	{
 		TI_1MS = 0,
 		TI_10MS,
@@ -90,48 +89,49 @@ protected:
 		TI_NONE
 	};
 
-	struct TimeItemInfo
+	struct IntervalsInfo
 	{
-		TickInterval majorTimeInterval;
-		TickInterval minorTimeInterval;
-		QString majorTimeFormat;
+		TimeInterval majorInterval;
+		TimeInterval minorInterval;
+		QString timeFormat;
 	};
 
 	struct TickInfo
 	{
-		QDateTime time;
 		TickType type;
-		QString majorTimeFormat;
+		QDateTime time;
+		QString timeFormat;
 	};
 
 	typedef QVector<TickInfo> Ticks;
 
-	struct	MinorItem
+	struct	MinorIntervalItem
 	{
 		double scaleMin;
 		double distance;
-		TickInterval interval;
+		TimeInterval interval;
 	};
 
-	struct MajorItem
+	struct MajorIntervalItem
 	{
 		double scaleMin;
 		double scaleMax;
 		double distance;
-		TickInterval interval;
+		TimeInterval interval;
 		QString timeFormat;
 
-		QVector<MinorItem> minorItemTable;
+		QVector<MinorIntervalItem> minorIntervals;
 	};
 
-	QVector<MajorItem> m_majorItemTable;
+	QVector<MajorIntervalItem> m_intervals;
 
 protected:
-	TimeItemInfo CalculateTimeItems(double scale) const;
-	Ticks GenerateTicks(const TimeItemInfo& timeItemInfo) const;
+	IntervalsInfo CalculateIntervals(double scale) const;
+	Ticks CalculateTicks(const IntervalsInfo& intervalsInfo) const;
 
 	double GetCurrentScale() const;
 	QRectF GetSceneVisibleRect() const;
+	QRectF GetAxisVisibleRect() const;
 
 	double GetRectPositionFromTime(const QDateTime& time) const;
 	QDateTime GetTimeFromRectPosition(double position) const;

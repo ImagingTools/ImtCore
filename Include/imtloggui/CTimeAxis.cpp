@@ -131,86 +131,86 @@ int CTimeAxis::GetMargin()
 
 void CTimeAxis::CreateTimeItemTable()
 {
-	m_majorItemTable.clear();
+	m_intervals.clear();
 
-	m_majorItemTable.reserve(TI_COUNT);
+	m_intervals.reserve(TI_COUNT);
 	for (int i = 0; i < TI_COUNT; i++){
-		m_majorItemTable.append(MajorItem());
+		m_intervals.append(MajorIntervalItem());
 	}
 
-	m_majorItemTable[TI_1MS].timeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
-	m_majorItemTable[TI_1MS].distance = 0.001;
-	m_majorItemTable[TI_10MS].timeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
-	m_majorItemTable[TI_10MS].distance = 0.01;
-	m_majorItemTable[TI_100MS].timeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
-	m_majorItemTable[TI_100MS].distance = 0.1;
+	m_intervals[TI_1MS].timeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
+	m_intervals[TI_1MS].distance = 0.001;
+	m_intervals[TI_10MS].timeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
+	m_intervals[TI_10MS].distance = 0.01;
+	m_intervals[TI_100MS].timeFormat = "dd.MM.yyyy hh:mm:ss.zzz";
+	m_intervals[TI_100MS].distance = 0.1;
 	
-	m_majorItemTable[TI_1S].timeFormat = "dd.MM.yyyy hh:mm:ss";
-	m_majorItemTable[TI_1S].distance = 1;
-	m_majorItemTable[TI_5S].timeFormat = "dd.MM.yyyy hh:mm:ss";
-	m_majorItemTable[TI_5S].distance = 5;
-	m_majorItemTable[TI_15S].timeFormat = "dd.MM.yyyy hh:mm:ss";
-	m_majorItemTable[TI_15S].distance = 15;
-	m_majorItemTable[TI_30S].timeFormat = "dd.MM.yyyy hh:mm:ss";
-	m_majorItemTable[TI_30S].distance = 30;
+	m_intervals[TI_1S].timeFormat = "dd.MM.yyyy hh:mm:ss";
+	m_intervals[TI_1S].distance = 1;
+	m_intervals[TI_5S].timeFormat = "dd.MM.yyyy hh:mm:ss";
+	m_intervals[TI_5S].distance = 5;
+	m_intervals[TI_15S].timeFormat = "dd.MM.yyyy hh:mm:ss";
+	m_intervals[TI_15S].distance = 15;
+	m_intervals[TI_30S].timeFormat = "dd.MM.yyyy hh:mm:ss";
+	m_intervals[TI_30S].distance = 30;
 
-	m_majorItemTable[TI_1M].timeFormat = "dd.MM.yyyy hh:mm";
-	m_majorItemTable[TI_1M].distance = 60;
-	m_majorItemTable[TI_5M].timeFormat = "dd.MM.yyyy hh:mm";
-	m_majorItemTable[TI_5M].distance = 300;
-	m_majorItemTable[TI_15M].timeFormat = "dd.MM.yyyy hh:mm";
-	m_majorItemTable[TI_15M].distance = 900;
-	m_majorItemTable[TI_30M].timeFormat = "dd.MM.yyyy hh:mm";
-	m_majorItemTable[TI_30M].distance = 1800;
+	m_intervals[TI_1M].timeFormat = "dd.MM.yyyy hh:mm";
+	m_intervals[TI_1M].distance = 60;
+	m_intervals[TI_5M].timeFormat = "dd.MM.yyyy hh:mm";
+	m_intervals[TI_5M].distance = 300;
+	m_intervals[TI_15M].timeFormat = "dd.MM.yyyy hh:mm";
+	m_intervals[TI_15M].distance = 900;
+	m_intervals[TI_30M].timeFormat = "dd.MM.yyyy hh:mm";
+	m_intervals[TI_30M].distance = 1800;
 
-	m_majorItemTable[TI_1H].timeFormat = "dd.MM.yyyy hh:mm";
-	m_majorItemTable[TI_1H].distance = 3600;
-	m_majorItemTable[TI_3H].timeFormat = "dd.MM.yyyy hh:mm";
-	m_majorItemTable[TI_3H].distance = 10800;
-	m_majorItemTable[TI_6H].timeFormat = "dd.MM.yyyy hh:mm";
-	m_majorItemTable[TI_6H].distance = 21600;
-	m_majorItemTable[TI_12H].timeFormat = "dd.MM.yyyy hh:mm";
-	m_majorItemTable[TI_12H].distance = 43200;
+	m_intervals[TI_1H].timeFormat = "dd.MM.yyyy hh:mm";
+	m_intervals[TI_1H].distance = 3600;
+	m_intervals[TI_3H].timeFormat = "dd.MM.yyyy hh:mm";
+	m_intervals[TI_3H].distance = 10800;
+	m_intervals[TI_6H].timeFormat = "dd.MM.yyyy hh:mm";
+	m_intervals[TI_6H].distance = 21600;
+	m_intervals[TI_12H].timeFormat = "dd.MM.yyyy hh:mm";
+	m_intervals[TI_12H].distance = 43200;
 
-	m_majorItemTable[TI_DAY].timeFormat = "dd.MM.yyyy";
-	m_majorItemTable[TI_DAY].distance = 86400;
-	m_majorItemTable[TI_WEEK].timeFormat = "dd.MM.yyyy";
-	m_majorItemTable[TI_WEEK].distance = 604800;
-	m_majorItemTable[TI_MONTH].timeFormat = "MM.yyyy";
-	m_majorItemTable[TI_MONTH].distance = 2635200; // approximately
-	m_majorItemTable[TI_QUARTER].timeFormat = "MM.yyyy";
-	m_majorItemTable[TI_QUARTER].distance = 7905600; // approximately
-	m_majorItemTable[TI_YEAR].timeFormat = "yyyy";
-	m_majorItemTable[TI_YEAR].distance = 31536000; // approximately
+	m_intervals[TI_DAY].timeFormat = "dd.MM.yyyy";
+	m_intervals[TI_DAY].distance = 86400;
+	m_intervals[TI_WEEK].timeFormat = "dd.MM.yyyy";
+	m_intervals[TI_WEEK].distance = 604800;
+	m_intervals[TI_MONTH].timeFormat = "MM.yyyy";
+	m_intervals[TI_MONTH].distance = 2635200; // approximately
+	m_intervals[TI_QUARTER].timeFormat = "MM.yyyy";
+	m_intervals[TI_QUARTER].distance = 7905600; // approximately
+	m_intervals[TI_YEAR].timeFormat = "yyyy";
+	m_intervals[TI_YEAR].distance = 31536000; // approximately
 
 	double labelWidth;
 
 	for (int i = 0; i < TI_COUNT; i++){
-		labelWidth = m_fontMetrics.horizontalAdvance(m_majorItemTable[i].timeFormat);
-		m_majorItemTable[i].scaleMin = labelWidth * m_labelWidthFactor / m_majorItemTable[i].distance;
-		m_majorItemTable[i].interval = (TickInterval)i;
+		labelWidth = m_fontMetrics.horizontalAdvance(m_intervals[i].timeFormat);
+		m_intervals[i].scaleMin = labelWidth * m_labelWidthFactor / m_intervals[i].distance;
+		m_intervals[i].interval = (TimeInterval)i;
 
 		for (int j = 1; j <= 3; j++){
 			if (i - j < 0){
 				break;
 			}
-			MinorItem minorItem;
 
-			minorItem.distance = m_majorItemTable[i - j].distance;
-			minorItem.interval = m_majorItemTable[i - j].interval;
-			minorItem.scaleMin = m_minMinorTickStep / minorItem.distance;
+			MinorIntervalItem minorInterval;
+			minorInterval.distance = m_intervals[i - j].distance;
+			minorInterval.interval = m_intervals[i - j].interval;
+			minorInterval.scaleMin = m_minMinorTickStep / minorInterval.distance;
 
-			m_majorItemTable[i].minorItemTable.append(minorItem);
+			m_intervals[i].minorIntervals.append(minorInterval);
 		}
 	}
 
-	m_majorItemTable[TI_YEAR].scaleMin = DBL_MIN;
+	m_intervals[TI_YEAR].scaleMin = DBL_MIN;
 
 	for (int i = 1; i < TI_COUNT; i++){
-		m_majorItemTable[i].scaleMax = m_majorItemTable[i-1].scaleMin;
+		m_intervals[i].scaleMax = m_intervals[i-1].scaleMin;
 	}
 
-	m_majorItemTable[TI_1MS].scaleMax = DBL_MAX;
+	m_intervals[TI_1MS].scaleMax = DBL_MAX;
 }
 
 
@@ -262,8 +262,8 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 		return;
 	}
 
-	TimeItemInfo timeItemInfo = CalculateTimeItems(GetCurrentScale());
-	Ticks ticks = GenerateTicks(timeItemInfo);
+	IntervalsInfo intervalsInfo = CalculateIntervals(GetCurrentScale());
+	Ticks ticks = CalculateTicks(intervalsInfo);
 
 	// Logical rectangle for the defined time range:
 	QRectF itemRect = rect();
@@ -271,7 +271,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 	int labelWidth = 0;
 	for (TickInfo info : ticks){
 		if (info.type == TT_MAJOR){
-			labelWidth = option->fontMetrics.horizontalAdvance(info.majorTimeFormat);
+			labelWidth = option->fontMetrics.horizontalAdvance(info.timeFormat);
 			break;
 		}
 	}
@@ -297,7 +297,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 			double xPos = GetRectPositionFromTime(info.time) * GetCurrentScale();
 
 			painter->drawLine(QLineF(xPos, rect().top() + 1, xPos, itemRect.bottom() - itemRect.height() / 1.5));
-			QString labelText = info.time.toString(info.majorTimeFormat);
+			QString labelText = info.time.toString(info.timeFormat);
 			
 			QTransform savedTransform = painter->transform();
 			QTransform newTransform = savedTransform;
@@ -357,20 +357,20 @@ QDateTime CTimeAxis::GetTimeFromScenePosition(double position) const
 
 // protected methods
 
-CTimeAxis::TimeItemInfo CTimeAxis::CalculateTimeItems(double scale) const
+CTimeAxis::IntervalsInfo CTimeAxis::CalculateIntervals(double scale) const
 {
-	TimeItemInfo timeItemInfo;
-	timeItemInfo.minorTimeInterval = TI_NONE;
+	IntervalsInfo timeItemInfo;
+	timeItemInfo.minorInterval = TI_NONE;
 
-	for (int i = 0; i < m_majorItemTable.count(); i++){
-		if (scale >= m_majorItemTable[i].scaleMin && scale < m_majorItemTable[i].scaleMax){
-			timeItemInfo.majorTimeInterval = m_majorItemTable[i].interval;
-			timeItemInfo.majorTimeFormat = m_majorItemTable[i].timeFormat;
+	for (int i = 0; i < m_intervals.count(); i++){
+		if (scale >= m_intervals[i].scaleMin && scale < m_intervals[i].scaleMax){
+			timeItemInfo.majorInterval = m_intervals[i].interval;
+			timeItemInfo.timeFormat = m_intervals[i].timeFormat;
 			
-			int minorTableSize = m_majorItemTable[i].minorItemTable.count();
+			int minorTableSize = m_intervals[i].minorIntervals.count();
 			for (int j = 0; j < minorTableSize; j++){
-				if (scale > m_majorItemTable[i].minorItemTable[minorTableSize - j - 1].scaleMin){
-					timeItemInfo.minorTimeInterval = m_majorItemTable[i].minorItemTable[minorTableSize - j - 1].interval;
+				if (scale > m_intervals[i].minorIntervals[minorTableSize - j - 1].scaleMin){
+					timeItemInfo.minorInterval = m_intervals[i].minorIntervals[minorTableSize - j - 1].interval;
 					break;
 				}
 			}
@@ -383,18 +383,19 @@ CTimeAxis::TimeItemInfo CTimeAxis::CalculateTimeItems(double scale) const
 }
 
 
-CTimeAxis::Ticks CTimeAxis::GenerateTicks(const TimeItemInfo& timeItemInfo) const
+CTimeAxis::Ticks CTimeAxis::CalculateTicks(const IntervalsInfo& intervalsInfo) const
 {
-	QRectF visibleRect = rect().intersected(GetSceneVisibleRect());
-	QDateTime startTime = GetTimeFromRectPosition(visibleRect.left());
-	QDateTime endTime = GetTimeFromRectPosition(visibleRect.right());
-	startTime = startTime.addMSecs((startTime.toMSecsSinceEpoch() - endTime.toMSecsSinceEpoch()) / 10);
-	endTime = endTime.addMSecs((endTime.toMSecsSinceEpoch() - startTime.toMSecsSinceEpoch()) / 10);
+	QRectF axisVisibleRect = GetAxisVisibleRect();
+
+	QDateTime startTime = GetTimeFromRectPosition(axisVisibleRect.left());
+	QDateTime endTime = GetTimeFromRectPosition(axisVisibleRect.right());
+	startTime = startTime.addMSecs((startTime.toMSecsSinceEpoch() - endTime.toMSecsSinceEpoch()) / 5);
+	endTime = endTime.addMSecs((endTime.toMSecsSinceEpoch() - startTime.toMSecsSinceEpoch()) / 5);
 
 	QDateTime startMajorTime;
 	QDateTime startMinorTime;
 
-	switch (timeItemInfo.majorTimeInterval){
+	switch (intervalsInfo.majorInterval){
 		case TI_1MS:
 			startMajorTime = startTime;
 			break;
@@ -457,7 +458,7 @@ CTimeAxis::Ticks CTimeAxis::GenerateTicks(const TimeItemInfo& timeItemInfo) cons
 			break;
 	}
 
-	switch (timeItemInfo.minorTimeInterval){
+	switch (intervalsInfo.minorInterval){
 		case TI_1MS:
 			startMinorTime = startTime;
 			break;
@@ -530,33 +531,33 @@ CTimeAxis::Ticks CTimeAxis::GenerateTicks(const TimeItemInfo& timeItemInfo) cons
 		if (currentTime >= startTime){
 			TickInfo info;
 			info.type = TT_MAJOR;
-			info.majorTimeFormat = m_majorItemTable[timeItemInfo.majorTimeInterval].timeFormat;
+			info.timeFormat = m_intervals[intervalsInfo.majorInterval].timeFormat;
 			info.time = currentTime;
 			ticks.append(info);
 		}
 
-		if (timeItemInfo.majorTimeInterval < TI_MONTH){
-			if (m_majorItemTable[timeItemInfo.majorTimeInterval].distance < 1){
-				currentTime = currentTime.addMSecs(m_majorItemTable[timeItemInfo.majorTimeInterval].distance * 1000);
+		if (intervalsInfo.majorInterval < TI_MONTH){
+			if (m_intervals[intervalsInfo.majorInterval].distance < 1){
+				currentTime = currentTime.addMSecs(m_intervals[intervalsInfo.majorInterval].distance * 1000);
 			}
 			else {
-				currentTime = currentTime.addSecs(m_majorItemTable[timeItemInfo.majorTimeInterval].distance);
+				currentTime = currentTime.addSecs(m_intervals[intervalsInfo.majorInterval].distance);
 			}
 		}
-		else if (timeItemInfo.majorTimeInterval == TI_MONTH){
+		else if (intervalsInfo.majorInterval == TI_MONTH){
 			currentTime = currentTime.addMonths(1);
 		}
-		else if (timeItemInfo.majorTimeInterval == TI_QUARTER){
+		else if (intervalsInfo.majorInterval == TI_QUARTER){
 			currentTime = currentTime.addMonths(3);
 		}
-		else if (timeItemInfo.majorTimeInterval == TI_YEAR){
+		else if (intervalsInfo.majorInterval == TI_YEAR){
 			currentTime = currentTime.addYears(1);
 		}
 	}
 
 	currentTime = startMinorTime;
 
-	if (timeItemInfo.minorTimeInterval != TI_NONE){
+	if (intervalsInfo.minorInterval != TI_NONE){
 		while (currentTime <= endTime){
 			if (currentTime >= startTime){
 				TickInfo info;
@@ -565,21 +566,21 @@ CTimeAxis::Ticks CTimeAxis::GenerateTicks(const TimeItemInfo& timeItemInfo) cons
 				ticks.append(info);
 			}
 
-			if (timeItemInfo.minorTimeInterval < TI_MONTH){
-				if (m_majorItemTable[timeItemInfo.minorTimeInterval].distance < 1){
-					currentTime = currentTime.addMSecs(m_majorItemTable[timeItemInfo.minorTimeInterval].distance * 1000);
+			if (intervalsInfo.minorInterval < TI_MONTH){
+				if (m_intervals[intervalsInfo.minorInterval].distance < 1){
+					currentTime = currentTime.addMSecs(m_intervals[intervalsInfo.minorInterval].distance * 1000);
 				}
 				else {
-					currentTime = currentTime.addSecs(m_majorItemTable[timeItemInfo.minorTimeInterval].distance);
+					currentTime = currentTime.addSecs(m_intervals[intervalsInfo.minorInterval].distance);
 				}
 			}
-			else if (timeItemInfo.minorTimeInterval == TI_MONTH){
+			else if (intervalsInfo.minorInterval == TI_MONTH){
 				currentTime = currentTime.addMonths(1);
 			}
-			else if (timeItemInfo.minorTimeInterval == TI_QUARTER){
+			else if (intervalsInfo.minorInterval == TI_QUARTER){
 				currentTime = currentTime.addMonths(3);
 			}
-			else if (timeItemInfo.minorTimeInterval == TI_YEAR){
+			else if (intervalsInfo.minorInterval == TI_YEAR){
 				currentTime = currentTime.addYears(1);
 			}
 		}
@@ -613,6 +614,19 @@ QRectF CTimeAxis::GetSceneVisibleRect() const
 
 	return visibleSceneRect;
 }
+
+
+QRectF CTimeAxis::GetAxisVisibleRect() const
+{
+	QRectF sceneVisibleRect = GetSceneVisibleRect();
+	QRectF axisRect = rect();
+	
+	axisRect.setTop(sceneVisibleRect.top());
+	axisRect.setBottom(sceneVisibleRect.bottom());
+
+	return axisRect.intersected(sceneVisibleRect);
+}
+
 
 double CTimeAxis::GetRectPositionFromTime(const QDateTime& time) const
 {
