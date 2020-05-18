@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QDebug>
 #include <QtGui/QPainter>
 
 // ImtCore includes
@@ -47,10 +48,9 @@ QRectF CLoginEventItem::boundingRect() const
 	QFontMetrics fontMetrics(m_font);
 
 	QString user = m_messagePtr->GetInformationDescription();
-	
 	QRectF labelRect = fontMetrics.boundingRect(user);
 
-	QRectF rect(0, 0, m_iconSize.width() * 1.1, m_iconSize.height() * 1.1);
+	QRectF rect(0, 0, m_iconSize.width(), m_iconSize.height());
 	rect.setWidth(qMax(labelRect.width(), rect.width()));
 	rect.setHeight(labelRect.height() + rect.height());
 
@@ -71,14 +71,13 @@ void CLoginEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 	if (m_messagePtr->GetInformationId() == imtbase::IMessageGroupInfoProvider::MI_USER_LOGIN){
 		icon = m_iconLogin;
 	}
-
-	if (m_messagePtr->GetInformationId() == imtbase::IMessageGroupInfoProvider::MI_USER_LOGOUT){
+	else if (m_messagePtr->GetInformationId() == imtbase::IMessageGroupInfoProvider::MI_USER_LOGOUT){
 		icon = m_iconLogout;
 	}
 
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
-	painter->drawPixmap(QRect(bounding.left() + bounding.width() * 0.05, bounding.top() + bounding.height() * 0.05, m_iconSize.width(), m_iconSize.height()), icon.pixmap(m_iconSize));
-	painter->drawText(-labelRect.width() / 2,  bounding.top() + m_iconSize.height() * 1.4, user);
+	painter->drawPixmap(QRect(-m_iconSize.width() / 2, bounding.top(), m_iconSize.width(), m_iconSize.height()), icon.pixmap(m_iconSize));
+	painter->drawText(labelRect.translated(QPointF(-labelRect.width() / 2, bounding.bottom() - labelRect.bottom())), user);
 }
 
 
