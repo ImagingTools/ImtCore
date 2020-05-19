@@ -11,7 +11,7 @@
 // ImtCore includes
 #include <imtlog/IMessageGroupInfoProvider.h>
 #include <imtloggui/CEventGraphicsView.h>
-#include <imtloggui/CEventGroupManager.h>
+#include <imtloggui/IEventGroupController.h>
 #include <imtloggui/CTimeAxis.h>
 
 // Acula includes
@@ -34,6 +34,7 @@ public:
 	I_BEGIN_COMPONENT(CEventViewComp);
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
 		I_ASSIGN(m_messageGroupInfoProviderCompPtr, "MessageGroupInfoProvider", "Message group info provider", false, "")
+		I_ASSIGN(m_groupControllerCompPtr, "EventGroupController", "Event group controller", true, "EventGroupController")
 	I_END_COMPONENT;
 
 	// reimplemented (ilog::IMessageConsumer)
@@ -56,14 +57,12 @@ Q_SIGNALS:
 	void AxisPositionChanged();
 
 private:
-	//QDateTime m_startTime;
-	//QDateTime m_endTime;
 	QGraphicsScene* m_scenePtr;
 	CEventGraphicsView* m_viewPtr;
 	CTimeAxis* m_timeAxisPtr;
-	CEventGroupManager* m_groupManagerPtr;
 
-	I_REF(imtbase::IMessageGroupInfoProvider, m_messageGroupInfoProviderCompPtr);
+	I_REF(IEventGroupController, m_groupControllerCompPtr);
+	I_REF(imtlog::IMessageGroupInfoProvider, m_messageGroupInfoProviderCompPtr);
 };
 
 

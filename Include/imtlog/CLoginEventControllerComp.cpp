@@ -35,11 +35,11 @@ void CLoginEventControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& cha
 	}
 
 	if (changeSet.ContainsExplicit(iauth::ILogin::CF_LOGIN)){
-		SendInfoMessage(imtbase::IMessageGroupInfoProvider::MI_USER_LOGIN, loginPtr->GetLoggedUser()->GetUserName(), "LoginEventController");
+		SendInfoMessage(imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN, loginPtr->GetLoggedUser()->GetUserName(), "LoginEventController");
 	}
 
 	if (changeSet.ContainsExplicit(iauth::ILogin::CF_LOGOUT)){
-		SendInfoMessage(imtbase::IMessageGroupInfoProvider::MI_USER_LOGOUT, m_lastUserName, "LoginEventController");
+		SendInfoMessage(imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT, m_lastUserName, "LoginEventController");
 	}
 }
 

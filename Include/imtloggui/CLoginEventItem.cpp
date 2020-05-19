@@ -64,20 +64,25 @@ void CLoginEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 
 	QString user = m_messagePtr->GetInformationDescription();
 	QRectF labelRect = fontMetrics.boundingRect(user);
+	labelRect.setWidth(labelRect.width() + 1);
 	const QRectF bounding = boundingRect();
 
 	QIcon icon;
 
-	if (m_messagePtr->GetInformationId() == imtbase::IMessageGroupInfoProvider::MI_USER_LOGIN){
+	if (m_messagePtr->GetInformationId() == imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN){
 		icon = m_iconLogin;
 	}
-	else if (m_messagePtr->GetInformationId() == imtbase::IMessageGroupInfoProvider::MI_USER_LOGOUT){
+	else if (m_messagePtr->GetInformationId() == imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT){
 		icon = m_iconLogout;
 	}
 
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
 	painter->drawPixmap(QRect(-m_iconSize.width() / 2, bounding.top(), m_iconSize.width(), m_iconSize.height()), icon.pixmap(m_iconSize));
+	//painter->setPen(Qt::red);
+	//painter->drawRect(labelRect.translated(QPointF(-labelRect.width() / 2, bounding.bottom() - labelRect.bottom())));
+	//painter->setPen(Qt::black);
 	painter->drawText(labelRect.translated(QPointF(-labelRect.width() / 2, bounding.bottom() - labelRect.bottom())), user);
+	qDebug() << labelRect;
 }
 
 

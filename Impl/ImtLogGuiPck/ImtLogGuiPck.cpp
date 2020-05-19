@@ -24,6 +24,24 @@ I_EXPORT_COMPONENT(
 			"Event View Log");
 
 
+I_EXPORT_COMPONENT(
+			LoginEventFactory,
+			"Login event factory",
+			"Login Logout Event Item Factory");
+
+
+I_EXPORT_COMPONENT(
+			EventGroupController,
+			"Event group controller",
+			"Event Group Controller");
+
+
+I_EXPORT_COMPONENT(
+			SingleLayerGroup,
+			"Single layer group",
+			"Event Group Single Layer");
+
+
 } // namespace ImtLogGuiPck
 
 

@@ -6,7 +6,7 @@
 #include <istd/IInformationProvider.h>
 
 
-namespace imtbase
+namespace imtlog
 {
 
 
@@ -17,7 +17,7 @@ public:
 	{
 		QString name;
 		QString description;
-		QByteArray groupId;
+		QByteArray id;
 	};
 
 	enum MessageId
@@ -35,6 +35,6 @@ public:
 };
 
 
-} // namespace imtbase
+} // namespace imtlog
 
 

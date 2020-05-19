@@ -12,8 +12,6 @@
 
 // ImtCore includes
 #include <imtloggui/CEventGraphicsView.h>
-#include <imtloggui/CEventGroup.h>
-#include <imtloggui/CLoginEventItem.h>
 
 
 namespace imtloggui
@@ -33,32 +31,21 @@ bool CEventViewComp::IsMessageSupported(
 
 void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 {
-	imtbase::IMessageGroupInfoProvider::GroupInfo groupInfo;
+	imtlog::IMessageGroupInfoProvider::GroupInfo groupInfo;
+	groupInfo.id = "General";
+	groupInfo.name = "General";
+
 	if (m_messageGroupInfoProviderCompPtr.IsValid()){
 		groupInfo = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfo(message.GetPtr());
 	}
 
-	CEventGroup* groupPtr = m_groupManagerPtr->GetGroup(groupInfo.groupId);
-	if (groupPtr == nullptr){
-		groupPtr = m_groupManagerPtr->GetGroup(QByteArray());
-	}
+	if (m_groupControllerCompPtr.IsValid()){
+		IEventItemController* eventItemControllerPtr = m_groupControllerCompPtr->AddGroup(groupInfo.id, groupInfo.name);
 
-	if (groupPtr != nullptr){
-		if (m_timeAxisPtr != nullptr){
-			QDateTime eventTime = message->GetInformationTimeStamp();
-
-			m_timeAxisPtr->EnsureTimeRange(eventTime);
-
-			CLoginEventItem* eventPtr = new CLoginEventItem(message);
-			eventPtr->SetIcons(QIcon(":/Icons/Lock"), QIcon(":/Icons/Unlock"));
-			eventPtr->SetIconSize(QSize(40, 40));
-
-			QPointF origin(m_timeAxisPtr->GetScenePositionFromTime(message->GetInformationTimeStamp()), -150);
-			eventPtr->setPos(origin);
-			eventPtr->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-
-			groupPtr->AddEvent(eventPtr);
-
+		if (eventItemControllerPtr != nullptr){
+			m_timeAxisPtr->EnsureTimeRange(message->GetInformationTimeStamp());
+			eventItemControllerPtr->AddEvent(message);
+	
 			Q_EMIT AxisPositionChanged();
 		}
 	}
@@ -83,18 +70,15 @@ void CEventViewComp::OnGuiCreated()
 	m_viewPtr->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
 	m_viewPtr->setTimeAxis(m_timeAxisPtr);
 	GetQtWidget()->layout()->addWidget(m_viewPtr);
-	
-	m_groupManagerPtr = new CEventGroupManager();
 
 	m_scenePtr->addItem(m_timeAxisPtr);
-	m_scenePtr->addItem(m_groupManagerPtr);
-
-	CEventGroup* generalGroupPtr = new CEventGroup();
-	generalGroupPtr->SetGroupId(QByteArray());
-	generalGroupPtr->SetTimeAxis(m_timeAxisPtr);
-	m_groupManagerPtr->AddGroup(generalGroupPtr);
 
 	connect(this, &CEventViewComp::AxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
+
+	if (m_groupControllerCompPtr.IsValid()){
+		m_groupControllerCompPtr->SetScene(m_scenePtr);
+		m_groupControllerCompPtr->SetTimeAxis(m_timeAxisPtr);
+	}
 }
 
 
@@ -103,7 +87,7 @@ void CEventViewComp::OnGuiDestroyed()
 	disconnect(this, &CEventViewComp::AxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
 	m_viewPtr->setTimeAxis(nullptr);
 
-	delete m_groupManagerPtr;
+	delete m_timeAxisPtr;
 	delete m_viewPtr;
 	delete m_scenePtr;
 
