@@ -1,13 +1,11 @@
 #pragma once
 
 
-// Qt includes
-#include <QtWidgets/QGraphicsItemGroup>
-
 // Acf includes
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
+#include <imtloggui/CEventGroupItem.h>
 #include <imtloggui/IEventItemFactory.h>
 #include <imtloggui/IEventItemController.h>
 
@@ -24,6 +22,8 @@ public:
 	I_BEGIN_COMPONENT(CSingleLayerGroupComp)
 		I_REGISTER_INTERFACE(IEventItemController);
 		I_ASSIGN(m_groupIdAttrPtr, "GroupId", "Group id", true, "");
+		I_ASSIGN(m_groupHeightAttrPtr, "Height", "Height", true, 150);
+		I_ASSIGN(m_groupColorAttrPtr, "Color", "Color", false, "#00000000");
 		I_ASSIGN_MULTI_0(m_eventItemFactoryCompPtr, "EventItemFactorys", "Event item factory components", false);
 	I_END_COMPONENT
 
@@ -46,14 +46,19 @@ public:
 
 	virtual void SetVisible(bool isVisible) const override;
 
+	virtual void TimeAxisChanged() override;
+	virtual void ViewPortChanged() override;
+
 private:
 	I_ATTR(QByteArray, m_groupIdAttrPtr);
+	I_ATTR(int, m_groupHeightAttrPtr);
+	I_ATTR(QByteArray, m_groupColorAttrPtr);
 	I_MULTIREF(IEventItemFactory, m_eventItemFactoryCompPtr);
 
 	QGraphicsScene* m_scenePtr;
 	const IEventScenePositionProvider* m_timeAxisPtr;
 
-	QGraphicsItemGroup* m_groupPtr;
+	CEventGroupItem* m_groupPtr;
 	QList<QGraphicsItem*> m_events;
 	QString m_groupName;
 };

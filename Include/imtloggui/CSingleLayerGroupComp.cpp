@@ -1,6 +1,10 @@
 #include <imtloggui/CSingleLayerGroupComp.h>
 
 
+// Qt includes
+#include <QtCore/QDebug>
+
+
 namespace imtloggui
 {
 
@@ -35,7 +39,16 @@ void CSingleLayerGroupComp::SetTimeAxis(const IEventScenePositionProvider* timeA
 bool CSingleLayerGroupComp::CreateGroupItem()
 {
 	if (m_groupPtr == nullptr && m_scenePtr != nullptr && m_timeAxisPtr != nullptr){
-		m_groupPtr = new QGraphicsItemGroup();
+		m_groupPtr = new CEventGroupItem();
+
+		if (m_groupColorAttrPtr.IsValid()){
+			m_groupPtr->SetBackgroundColor(QString(*m_groupColorAttrPtr));
+		}
+
+		if (m_groupHeightAttrPtr.IsValid()){
+			m_groupPtr->SetRect(QRectF(0, 0, 10000000, -*m_groupHeightAttrPtr));
+		}
+
 		m_scenePtr->addItem(m_groupPtr);
 	}
 
@@ -101,11 +114,16 @@ QGraphicsItem* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::Mes
 		origin = m_groupPtr->mapFromScene(origin);
 		origin.setY(-100);
 
-		itemPtr->setParentItem(m_groupPtr);
+		m_groupPtr->addToGroup(itemPtr);
 		itemPtr->setPos(origin);
 		itemPtr->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
 		m_scenePtr->addItem(itemPtr);
+
+		qDebug() << m_scenePtr->items().count() << m_groupPtr->childItems().count() << m_groupPtr->boundingRect();
+		for (QGraphicsItem* item : m_groupPtr->childItems()){
+			qDebug() << item->pos() << item->boundingRect();
+		}
 
 		m_events.append(itemPtr);
 
@@ -132,6 +150,18 @@ void CSingleLayerGroupComp::SetVisible(bool isVisible) const
 	if (m_groupPtr != nullptr){
 		m_groupPtr->setVisible(isVisible);
 	}
+}
+
+
+void CSingleLayerGroupComp::TimeAxisChanged()
+{
+
+}
+
+
+void CSingleLayerGroupComp::ViewPortChanged()
+{
+
 }
 
 

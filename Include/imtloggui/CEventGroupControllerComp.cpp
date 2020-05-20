@@ -117,6 +117,27 @@ bool CEventGroupControllerComp::SetVisible(QByteArray groupId, bool isVisible) c
 }
 
 
+void CEventGroupControllerComp::ViewPortChanged()
+{
+	if (m_groupRefsCompPtr.IsValid()){
+		for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
+			m_groupRefsCompPtr[i]->ViewPortChanged();
+		}
+	}
+}
+
+
+void CEventGroupControllerComp::TimeAxisChanged()
+{
+	if (m_groupRefsCompPtr.IsValid()){
+		for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
+			m_groupRefsCompPtr[i]->TimeAxisChanged();
+		}
+	}
+}
+
+
+
 } // namespace imtloggui
 
 

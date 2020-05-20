@@ -25,6 +25,7 @@ public:
 		I_ASSIGN(m_loginIcon, "LoginIcon", "Icon for login event", true, "");
 		I_ASSIGN(m_logoutIcon, "LogoutIcon", "Icon for logout event", true, "");
 		I_ASSIGN(m_iconSize, "IconSize", "Size of icons", true, 24);
+		I_ASSIGN(m_slaveEventFactoryCompPtr, "SlaveEventFactory", "Slave event item factory", false, "");
 	I_END_COMPONENT
 
 	// reimplemented (imtloggui::IEventItemFactory)
@@ -34,6 +35,7 @@ private:
 	I_ATTR(QByteArray, m_loginIcon);
 	I_ATTR(QByteArray, m_logoutIcon);
 	I_ATTR(int, m_iconSize);
+	I_REF(IEventItemFactory, m_slaveEventFactoryCompPtr);
 };
 
 

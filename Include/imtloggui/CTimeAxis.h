@@ -47,6 +47,8 @@ public:
 	// reimplemented (IEventScenePositionProvider)
 	virtual double GetScenePositionFromTime(const QDateTime& time) const override;
 	virtual QDateTime GetTimeFromScenePosition(double position) const override;
+	virtual QDateTime GetBeginTime() const;
+	virtual QDateTime GetEndTime() const;
 
 Q_SIGNALS:
 	void AxisChanged();

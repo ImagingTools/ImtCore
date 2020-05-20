@@ -44,6 +44,9 @@ public:
 
 	virtual bool SetVisible(QByteArray groupId, bool isVisible) const override;
 
+	virtual void TimeAxisChanged() override;
+	virtual void ViewPortChanged() override;
+
 private:
 	I_MULTIREF(IEventItemController, m_groupRefsCompPtr);
 	

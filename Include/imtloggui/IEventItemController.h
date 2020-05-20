@@ -32,6 +32,9 @@ public:
 	virtual void ClearEvents() = 0;
 
 	virtual void SetVisible(bool isVisible) const = 0;
+
+	virtual void TimeAxisChanged() = 0;
+	virtual void ViewPortChanged() = 0;
 };
 
 

@@ -27,6 +27,9 @@ public:
 	virtual QString GetGroupName(const QByteArray& groupId) const = 0;
 
 	virtual bool SetVisible(QByteArray groupId, bool isVisible) const = 0;
+
+	virtual void TimeAxisChanged() = 0;
+	virtual void ViewPortChanged() = 0;
 };
 
 

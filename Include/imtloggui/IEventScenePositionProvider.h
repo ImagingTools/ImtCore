@@ -25,6 +25,16 @@ public:
 		Get time for gived scene position at axis X.
 	*/
 	virtual QDateTime GetTimeFromScenePosition(double position) const = 0;
+
+	/**
+		Get begin time at axis X.
+	*/
+	virtual QDateTime GetBeginTime() const = 0;
+
+	/**
+		Get end time at axis X.
+	*/
+	virtual QDateTime GetEndTime() const = 0;
 };
 
 

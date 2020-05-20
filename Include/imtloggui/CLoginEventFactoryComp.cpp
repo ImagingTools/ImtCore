@@ -20,6 +20,10 @@ namespace imtloggui
 QGraphicsItem* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const
 {
 	if (message->GetInformationId() != imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN && message->GetInformationId() != imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT){
+		if (m_slaveEventFactoryCompPtr.IsValid()){
+			return m_slaveEventFactoryCompPtr->CreateInstance(message);
+		}
+
 		return nullptr;
 	}
 

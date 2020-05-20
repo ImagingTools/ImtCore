@@ -355,6 +355,18 @@ QDateTime CTimeAxis::GetTimeFromScenePosition(double position) const
 }
 
 
+QDateTime CTimeAxis::GetBeginTime() const
+{
+	return m_startTime;
+}
+
+
+QDateTime CTimeAxis::GetEndTime() const
+{
+	return m_endTime;
+}
+
+
 // protected methods
 
 CTimeAxis::IntervalsInfo CTimeAxis::CalculateIntervals(double scale) const
