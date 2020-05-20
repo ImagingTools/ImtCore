@@ -72,10 +72,6 @@ QRectF CEventGroupItem::boundingRect() const
 		itemRect.setRight(origin.x() + (itemRect.right() - origin.x()) * scale);
 	}
 
-	scale = GetCurrentScaleY();
-	double bottom = itemRect.bottom() * scale;
-	itemRect.setBottom(bottom);
-
 	return itemRect;
 }
 
