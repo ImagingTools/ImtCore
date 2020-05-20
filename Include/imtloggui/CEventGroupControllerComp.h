@@ -4,8 +4,6 @@
 // Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
-#include <QtWidgets/QGraphicsWidget>
-#include <QtWidgets/QGraphicsLinearLayout>
 
 // Acf includes
 #include <icomp/CComponentBase.h>
@@ -36,6 +34,10 @@ public:
 	virtual void SetScene(QGraphicsScene* scenePtr) override;
 	virtual void SetTimeAxis(const IEventScenePositionProvider* timeAxisPtr) override;
 
+	virtual bool CreateGraphicsItem() override;
+	virtual bool DestroyGraphicsItem() override;
+	virtual QGraphicsItem* GetGraphicsItem() override;
+
 	virtual QByteArrayList GetAvailableGroupList() const override;
 	virtual QByteArrayList GetActiveGroupList() const override;
 	virtual IEventItemController* GetGroup(const QByteArray& groupId) const override;
@@ -51,14 +53,13 @@ public:
 
 private:
 	I_MULTIREF(IEventItemController, m_groupRefsCompPtr);
+
+	QGraphicsItemGroup* m_graphicsItem;
 	
 	QMap<QByteArray, IEventItemController*> m_groups;
 
 	QGraphicsScene* m_scenePtr;
 	const IEventScenePositionProvider* m_timeAxisPtr;
-
-	QGraphicsWidget* m_containerPtr;
-	QGraphicsLinearLayout* m_layoutPtr;
 };
 
 

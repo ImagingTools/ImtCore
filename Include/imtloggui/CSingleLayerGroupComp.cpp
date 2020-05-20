@@ -12,7 +12,7 @@ namespace imtloggui
 CSingleLayerGroupComp::CSingleLayerGroupComp()
 	: m_scenePtr(nullptr),
 	m_timeAxisPtr(nullptr),
-	m_groupPtr(nullptr)
+	m_graphicsItem(nullptr)
 {
 }
 
@@ -20,7 +20,7 @@ CSingleLayerGroupComp::CSingleLayerGroupComp()
 void CSingleLayerGroupComp::SetScene(QGraphicsScene* scenePtr)
 {
 	if (m_scenePtr != nullptr){
-		DestroyGroupItem();
+		DestroyGraphicsItem();
 	}
 
 	m_scenePtr = scenePtr;
@@ -36,39 +36,45 @@ void CSingleLayerGroupComp::SetTimeAxis(const IEventScenePositionProvider* timeA
 }
 
 
-bool CSingleLayerGroupComp::CreateGroupItem()
+bool CSingleLayerGroupComp::CreateGraphicsItem()
 {
-	if (m_groupPtr == nullptr && m_scenePtr != nullptr && m_timeAxisPtr != nullptr){
-		m_groupPtr = new CEventGroupItem();
+	if (m_graphicsItem == nullptr && m_scenePtr != nullptr && m_timeAxisPtr != nullptr){
+		m_graphicsItem = new CEventGroupItem();
 
 		if (m_groupColorAttrPtr.IsValid()){
-			m_groupPtr->SetBackgroundColor(QString(*m_groupColorAttrPtr));
+			m_graphicsItem->SetBackgroundColor(QString(*m_groupColorAttrPtr));
 		}
 
 		if (m_groupHeightAttrPtr.IsValid()){
-			m_groupPtr->SetRect(QRectF(0, 0, 10000, -500 /**m_groupHeightAttrPtr*/));
+			m_graphicsItem->setRect(QRectF(0, 0, 10, -*m_groupHeightAttrPtr));
 		}
 
-		m_scenePtr->addItem(m_groupPtr);
+		m_scenePtr->addItem(m_graphicsItem);
 	}
 
 	return false;
 }
 
 
-bool CSingleLayerGroupComp::DestroyGroupItem()
+bool CSingleLayerGroupComp::DestroyGraphicsItem()
 {
-	if (m_groupPtr != nullptr && m_scenePtr != nullptr){
+	if (m_graphicsItem != nullptr && m_scenePtr != nullptr){
 		ClearEvents();
 
-		m_scenePtr->removeItem(m_groupPtr);
-		delete m_groupPtr;
-		m_groupPtr = nullptr;
+		m_scenePtr->removeItem(m_graphicsItem);
+		delete m_graphicsItem;
+		m_graphicsItem = nullptr;
 
 		return true;
 	}
 
 	return false;
+}
+
+
+QGraphicsItem* CSingleLayerGroupComp::GetGraphicsItem()
+{
+	return m_graphicsItem;
 }
 
 
@@ -82,6 +88,16 @@ QByteArray CSingleLayerGroupComp::GetGroupId() const
 }
 
 
+int CSingleLayerGroupComp::GetGroupHeight() const
+{
+	if (m_groupHeightAttrPtr.IsValid()){
+		return *m_groupHeightAttrPtr;
+	}
+
+	return 0;
+}
+
+
 QString CSingleLayerGroupComp::GetGroupName() const
 {
 	return m_groupName;
@@ -91,12 +107,15 @@ QString CSingleLayerGroupComp::GetGroupName() const
 void CSingleLayerGroupComp::SetGroupName(QString name)
 {
 	m_groupName = name;
+	if (m_graphicsItem != nullptr){
+		m_graphicsItem->SetGroupName(name);
+	}
 }
 
 
 QGraphicsItem* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr)
 {
-	if (m_eventItemFactoryCompPtr.IsValid() && m_groupPtr){
+	if (m_eventItemFactoryCompPtr.IsValid() && m_graphicsItem){
 		QGraphicsItem* itemPtr = nullptr;
 
 		for (int i = 0; i < m_eventItemFactoryCompPtr.GetCount(); i++){
@@ -111,17 +130,17 @@ QGraphicsItem* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::Mes
 		}
 
 		QPointF origin(m_timeAxisPtr->GetScenePositionFromTime(messagePtr->GetInformationTimeStamp()), 0);
-		origin = m_groupPtr->mapFromScene(origin);
+		origin = m_graphicsItem->mapFromScene(origin);
 		origin.setY(-100);
 
-		m_groupPtr->addToGroup(itemPtr);
+		itemPtr->setParentItem(m_graphicsItem);
 		itemPtr->setPos(origin);
 		itemPtr->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
 		m_scenePtr->addItem(itemPtr);
 
-		qDebug() << m_scenePtr->items().count() << m_groupPtr->childItems().count() << m_groupPtr->boundingRect();
-		for (QGraphicsItem* item : m_groupPtr->childItems()){
+		qDebug() << m_scenePtr->items().count() << m_graphicsItem->childItems().count() << m_graphicsItem->boundingRect();
+		for (QGraphicsItem* item : m_graphicsItem->childItems()){
 			qDebug() << item->pos() << item->boundingRect();
 		}
 
@@ -147,8 +166,8 @@ void CSingleLayerGroupComp::ClearEvents()
 
 void CSingleLayerGroupComp::SetVisible(bool isVisible) const
 {
-	if (m_groupPtr != nullptr){
-		m_groupPtr->setVisible(isVisible);
+	if (m_graphicsItem != nullptr){
+		m_graphicsItem->setVisible(isVisible);
 	}
 }
 
@@ -162,12 +181,6 @@ void CSingleLayerGroupComp::TimeAxisChanged()
 void CSingleLayerGroupComp::ViewPortChanged()
 {
 
-}
-
-
-QGraphicsLayoutItem* CSingleLayerGroupComp::GetGroupItem() const
-{
-	return m_groupPtr;
 }
 
 

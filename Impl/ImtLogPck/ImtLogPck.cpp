@@ -19,6 +19,11 @@ I_EXPORT_COMPONENT(
 			"Login event controller component",
 			"Login Event Controller");
 
+I_EXPORT_COMPONENT(
+			MessageGroupInfoProvider,
+			"Information provider for messages",
+			"Message Information Provider");
+
 
 } // namespace ImtLogPck
 

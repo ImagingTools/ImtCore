@@ -2,38 +2,37 @@
 
 
 // Qt includes
-#include <QtWidgets/QGraphicsItemGroup>
-#include <QtWidgets/QGraphicsLayoutItem>
-
-// ImtCore includes
-//#include <imtloggui/CEventItemBase.h>
+#include <QtWidgets/QGraphicsRectItem>
 
 
 namespace imtloggui
 {
 
 
-class CEventGroupItem: public QGraphicsLayoutItem, public QGraphicsItemGroup
+class CEventGroupItem: public QGraphicsRectItem
 {
 public:
-	typedef QGraphicsItemGroup BaseClass;
+	typedef QGraphicsRectItem BaseClass;
 
 	CEventGroupItem(QGraphicsItem* parent = nullptr);
 
 	void SetBackgroundColor(const QColor& color);
-	void SetRect(QRectF rect);
+	void SetGroupName(QString name);
 	void ViewPortChanged();
 
 	// reimplemented (QGraphicsItem)
 	virtual QRectF boundingRect() const override;
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
-	// reimplemented (QGraphicsLayoutItem)
-	virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
+private:
+	double GetCurrentScaleX() const;
+	double GetCurrentScaleY() const;
+	QRectF GetSceneVisibleRect() const;
+	QRectF GetItemVisibleRect() const;
 
 private:
 	QColor m_bgColor;
-	QRectF m_rect;
+	QString m_name;
 };
 
 

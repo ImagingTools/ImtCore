@@ -26,6 +26,7 @@ public:
 
 Q_SIGNALS:
 	void AxisPositionChanged();
+	void ViewPortChanged();
 
 public Q_SLOTS:
 	void OnAxisPositionChanged();
@@ -43,7 +44,6 @@ private:
 	QRectF SceneVisibleRect() const;
 
 private:
-	QTransform m_lastTransform;
 	CTimeAxis* m_timeAxisPtr;
 };
 

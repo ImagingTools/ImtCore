@@ -37,8 +37,6 @@ void CEventGraphicsView::OnAxisPositionChanged()
 		return;
 	}
 
-	m_lastTransform = viewportTransform();
-
 	QRectF visibleRect = SceneVisibleRect();
 	m_timeAxisPtr->setPos(0, visibleRect.bottom() - m_timeAxisPtr->rect().height() / viewportTransform().m22());
 	QRectF rect = sceneRect();
@@ -78,7 +76,8 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 
 	setTransformationAnchor(anchor);
 
-	OnAxisPositionChanged();
+	Q_EMIT AxisPositionChanged();
+	Q_EMIT ViewPortChanged();
 }
 
 
@@ -86,7 +85,8 @@ void CEventGraphicsView::resizeEvent(QResizeEvent* event)
 {
 	BaseClass::resizeEvent(event);
 
-	OnAxisPositionChanged();
+	Q_EMIT AxisPositionChanged();
+	Q_EMIT ViewPortChanged();
 }
 
 
@@ -94,13 +94,15 @@ void CEventGraphicsView::resizeEvent(QResizeEvent* event)
 
 void CEventGraphicsView::rangeChanged(int /*min*/, int /*max*/)
 {
-	OnAxisPositionChanged();
+	Q_EMIT AxisPositionChanged();
+	Q_EMIT ViewPortChanged();
 }
 
 
 void CEventGraphicsView::valueChanged(int /*value*/)
 {
-	OnAxisPositionChanged();
+	Q_EMIT AxisPositionChanged();
+	Q_EMIT ViewPortChanged();
 }
 
 

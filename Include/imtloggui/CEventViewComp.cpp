@@ -78,6 +78,8 @@ void CEventViewComp::OnGuiCreated()
 	if (m_groupControllerCompPtr.IsValid()){
 		m_groupControllerCompPtr->SetScene(m_scenePtr);
 		m_groupControllerCompPtr->SetTimeAxis(m_timeAxisPtr);
+		m_groupControllerCompPtr->CreateGraphicsItem();
+		connect(m_viewPtr, &CEventGraphicsView::ViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
 	}
 }
 
@@ -112,6 +114,12 @@ void CEventViewComp::OnComponentCreated()
 void CEventViewComp::OnComponentDestroyed()
 {
 	BaseClass::OnComponentDestroyed();
+}
+
+
+void CEventViewComp::OnViewPortChanged()
+{
+	m_groupControllerCompPtr->ViewPortChanged();
 }
 
 

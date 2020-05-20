@@ -56,6 +56,9 @@ public:
 Q_SIGNALS:
 	void AxisPositionChanged();
 
+public Q_SLOTS:
+	void OnViewPortChanged();
+
 private:
 	QGraphicsScene* m_scenePtr;
 	CEventGraphicsView* m_viewPtr;

@@ -1,10 +1,6 @@
 #include <imtloggui/CEventGroupControllerComp.h>
 
 
-// Qt includes
-#include <QtWidgets/QGraphicsLayoutItem>
-
-
 namespace imtloggui
 {
 
@@ -12,7 +8,7 @@ namespace imtloggui
 CEventGroupControllerComp::CEventGroupControllerComp()
 	: m_scenePtr(nullptr),
 	m_timeAxisPtr(nullptr),
-	m_layoutPtr(nullptr)
+	m_graphicsItem(nullptr)
 {
 }
 
@@ -20,15 +16,6 @@ CEventGroupControllerComp::CEventGroupControllerComp()
 void CEventGroupControllerComp::SetScene(QGraphicsScene* scenePtr)
 {
 	m_scenePtr = scenePtr;
-
-	if (m_scenePtr != nullptr){
-		m_layoutPtr = new QGraphicsLinearLayout(Qt::Vertical);
-		m_containerPtr = new QGraphicsWidget();
-		m_containerPtr->setLayout(m_layoutPtr);
-		m_scenePtr->addItem(m_containerPtr);
-		m_containerPtr->setPos(0, 0);
-		m_containerPtr->setGeometry(QRectF(0, 0, 100000, - 1000));
-	}
 }
 
 
@@ -38,12 +25,52 @@ void CEventGroupControllerComp::SetTimeAxis(const IEventScenePositionProvider* t
 }
 
 
+bool CEventGroupControllerComp::CreateGraphicsItem()
+{
+	if (m_graphicsItem == nullptr && m_scenePtr != nullptr && m_timeAxisPtr != nullptr){
+		m_graphicsItem = new QGraphicsItemGroup();
+
+		m_scenePtr->addItem(m_graphicsItem);
+	}
+
+	return false;
+}
+
+
+bool CEventGroupControllerComp::DestroyGraphicsItem()
+{
+	if (m_graphicsItem != nullptr && m_scenePtr != nullptr){
+	
+
+		for (IEventItemController* itemPtr : m_groups){
+			RemoveGroup(itemPtr->GetGroupId());
+		}
+		m_groups.clear();
+
+		m_scenePtr->removeItem(m_graphicsItem);
+		delete m_graphicsItem;
+		m_graphicsItem = nullptr;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+QGraphicsItem* CEventGroupControllerComp::GetGraphicsItem()
+{
+	return m_graphicsItem;
+}
+
+
 QByteArrayList CEventGroupControllerComp::GetAvailableGroupList() const
 {
 	QByteArrayList result;
 
-	if (m_groupRefsCompPtr.IsValid()){
-		for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
+	for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
+		IEventItemController* eventItemControllerPtr = m_groupRefsCompPtr[i];
+		if (eventItemControllerPtr != nullptr){
 			result.append(m_groupRefsCompPtr[i]->GetGroupId());
 		}
 	}
@@ -98,12 +125,15 @@ IEventItemController* CEventGroupControllerComp::CEventGroupControllerComp::AddG
 			eventItemController->SetGroupName(groupName);
 			eventItemController->SetScene(m_scenePtr);
 			eventItemController->SetTimeAxis(m_timeAxisPtr);
-			eventItemController->CreateGroupItem();
+			eventItemController->CreateGraphicsItem();
 
-			QGraphicsLayoutItem* layoutItemPtr = eventItemController->GetGroupItem();
-			if (layoutItemPtr != nullptr){
-				m_layoutPtr->addItem(layoutItemPtr);
+			int totalHeight = 0;
+			for (IEventItemController* item : m_groups){
+				totalHeight += item->GetGroupHeight();
 			}
+
+			eventItemController->GetGraphicsItem()->setParentItem(m_graphicsItem);
+			eventItemController->GetGraphicsItem()->setPos(0, -totalHeight);
 
 			m_groups[groupId] = eventItemController;
 		}
@@ -154,7 +184,6 @@ void CEventGroupControllerComp::TimeAxisChanged()
 		}
 	}
 }
-
 
 
 } // namespace imtloggui

@@ -21,8 +21,7 @@ CEventGroupItem::CEventGroupItem(QGraphicsItem* parent)
 	: BaseClass(parent)
 {
 	m_bgColor = QColor("#00000000");
-	m_rect = QRectF(0, 0, 0, 0);
-	setGraphicsItem(this);
+	m_name = "Noname";
 }
 
 
@@ -32,10 +31,9 @@ void CEventGroupItem::SetBackgroundColor(const QColor& color)
 }
 
 
-void CEventGroupItem::SetRect(QRectF rect)
+void CEventGroupItem::SetGroupName(QString name)
 {
-	prepareGeometryChange();
-	m_rect = rect;
+	m_name = name;
 }
 
 
@@ -55,7 +53,30 @@ void CEventGroupItem::ViewPortChanged()
 
 QRectF CEventGroupItem::boundingRect() const
 {
-	return m_rect;
+	QRectF visibleRect = GetSceneVisibleRect();
+	QRectF itemRect = rect();
+	QPointF origin = itemRect.bottomLeft();
+
+	if (visibleRect.left() < itemRect.left()){
+		itemRect.setLeft(visibleRect.left());
+	}
+
+	if (visibleRect.right() > itemRect.right()){
+		itemRect.setRight(visibleRect.right());
+	}
+
+	double scale = GetCurrentScaleX();
+	
+	if (scale > 1){
+		itemRect.setLeft(origin.x() + (itemRect.left() - origin.x()) * scale);
+		itemRect.setRight(origin.x() + (itemRect.right() - origin.x()) * scale);
+	}
+
+	scale = GetCurrentScaleY();
+	double bottom = itemRect.bottom() * scale;
+	itemRect.setBottom(bottom);
+
+	return itemRect;
 }
 
 
@@ -66,26 +87,56 @@ void CEventGroupItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 	painter->save();
 	painter->setBrush(brush);
 	painter->setPen(Qt::NoPen);
-	QRectF rect = geometry();
-	painter->drawRect(rect);
+	painter->drawRect(boundingRect());
 	painter->restore();
 
-	BaseClass::paint(painter, option, widget);
+	//BaseClass::paint(painter, option, widget);
 }
 
 
-// reimplemented (QGraphicsLayoutItem)
+// private methods
 
-QSizeF CEventGroupItem::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+double CEventGroupItem::GetCurrentScaleX() const
 {
-	switch (which){
-	case Qt::SizeHint::MinimumSize:
-	case Qt::SizeHint::MinimumDescent:
-	case Qt::SizeHint::PreferredSize:
-		return m_rect.size();
-	default:
-		return QSizeF(-1, -1);
+	return scene()->views().first()->viewportTransform().m11();
+}
+
+
+double CEventGroupItem::GetCurrentScaleY() const
+{
+	return scene()->views().first()->viewportTransform().m22();
+}
+
+
+QRectF CEventGroupItem::GetSceneVisibleRect() const
+{
+	QGraphicsScene* scenePtr = scene();
+	if (scenePtr == nullptr){
+		return QRectF();
 	}
+
+	QGraphicsView* viewPtr = scenePtr->views().first();
+	if (viewPtr == nullptr){
+		return QRectF();
+	}
+
+	QRect viewportRect = viewPtr->viewport()->rect();
+
+	QRectF visibleSceneRect = viewPtr->mapToScene(viewportRect).boundingRect();
+
+	return visibleSceneRect;
+}
+
+
+QRectF CEventGroupItem::GetItemVisibleRect() const
+{
+	QRectF sceneVisibleRect = GetSceneVisibleRect();
+	QRectF itemRect = rect();
+	
+	itemRect.setTop(sceneVisibleRect.top());
+	itemRect.setBottom(sceneVisibleRect.bottom());
+
+	return itemRect.intersected(sceneVisibleRect);
 }
 
 
