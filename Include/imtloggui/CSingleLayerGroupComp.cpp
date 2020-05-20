@@ -46,7 +46,7 @@ bool CSingleLayerGroupComp::CreateGroupItem()
 		}
 
 		if (m_groupHeightAttrPtr.IsValid()){
-			m_groupPtr->SetRect(QRectF(0, 0, 10000000, -*m_groupHeightAttrPtr));
+			m_groupPtr->SetRect(QRectF(0, 0, 10000, -500 /**m_groupHeightAttrPtr*/));
 		}
 
 		m_scenePtr->addItem(m_groupPtr);
@@ -162,6 +162,12 @@ void CSingleLayerGroupComp::TimeAxisChanged()
 void CSingleLayerGroupComp::ViewPortChanged()
 {
 
+}
+
+
+QGraphicsLayoutItem* CSingleLayerGroupComp::GetGroupItem() const
+{
+	return m_groupPtr;
 }
 
 

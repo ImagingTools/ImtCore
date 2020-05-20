@@ -1,13 +1,18 @@
 #include <imtloggui/CEventGroupControllerComp.h>
 
 
+// Qt includes
+#include <QtWidgets/QGraphicsLayoutItem>
+
+
 namespace imtloggui
 {
 
 
 CEventGroupControllerComp::CEventGroupControllerComp()
 	: m_scenePtr(nullptr),
-	m_timeAxisPtr(nullptr)
+	m_timeAxisPtr(nullptr),
+	m_layoutPtr(nullptr)
 {
 }
 
@@ -15,6 +20,15 @@ CEventGroupControllerComp::CEventGroupControllerComp()
 void CEventGroupControllerComp::SetScene(QGraphicsScene* scenePtr)
 {
 	m_scenePtr = scenePtr;
+
+	if (m_scenePtr != nullptr){
+		m_layoutPtr = new QGraphicsLinearLayout(Qt::Vertical);
+		m_containerPtr = new QGraphicsWidget();
+		m_containerPtr->setLayout(m_layoutPtr);
+		m_scenePtr->addItem(m_containerPtr);
+		m_containerPtr->setPos(0, 0);
+		m_containerPtr->setGeometry(QRectF(0, 0, 100000, - 1000));
+	}
 }
 
 
@@ -85,6 +99,11 @@ IEventItemController* CEventGroupControllerComp::CEventGroupControllerComp::AddG
 			eventItemController->SetScene(m_scenePtr);
 			eventItemController->SetTimeAxis(m_timeAxisPtr);
 			eventItemController->CreateGroupItem();
+
+			QGraphicsLayoutItem* layoutItemPtr = eventItemController->GetGroupItem();
+			if (layoutItemPtr != nullptr){
+				m_layoutPtr->addItem(layoutItemPtr);
+			}
 
 			m_groups[groupId] = eventItemController;
 		}

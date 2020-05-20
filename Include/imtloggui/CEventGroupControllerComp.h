@@ -4,6 +4,8 @@
 // Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
+#include <QtWidgets/QGraphicsWidget>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 // Acf includes
 #include <icomp/CComponentBase.h>
@@ -54,6 +56,9 @@ private:
 
 	QGraphicsScene* m_scenePtr;
 	const IEventScenePositionProvider* m_timeAxisPtr;
+
+	QGraphicsWidget* m_containerPtr;
+	QGraphicsLinearLayout* m_layoutPtr;
 };
 
 

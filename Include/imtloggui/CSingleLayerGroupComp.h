@@ -49,6 +49,8 @@ public:
 	virtual void TimeAxisChanged() override;
 	virtual void ViewPortChanged() override;
 
+	virtual QGraphicsLayoutItem* GetGroupItem() const;
+
 private:
 	I_ATTR(QByteArray, m_groupIdAttrPtr);
 	I_ATTR(int, m_groupHeightAttrPtr);

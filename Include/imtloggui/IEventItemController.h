@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtWidgets/QGraphicsLayoutItem>
 #include <QtWidgets/QGraphicsScene>
 
 // Acf includes
@@ -35,6 +36,8 @@ public:
 
 	virtual void TimeAxisChanged() = 0;
 	virtual void ViewPortChanged() = 0;
+
+	virtual QGraphicsLayoutItem* GetGroupItem() const = 0;
 };
 
 
