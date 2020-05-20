@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QObject>
 #include <QtCore/QDebug>
 #include <QtGui/QPainter>
 
@@ -56,7 +57,7 @@ QGraphicsItem* CIconBasedEventFactoryComp::CreateInstance(const ilog::IMessageCo
 	CIconBasedEventItem* eventPtr = new CIconBasedEventItem(message);
 	eventPtr->SetIcon(icon);
 	eventPtr->SetIconSize(QSize(iconSize, iconSize));
-	eventPtr->setToolTip(message->GetInformationDescription());
+	eventPtr->setToolTip(QObject::tr("Source" )+ ": "  + message->GetInformationSource() + "\n" + QObject::tr("Message" ) + ": " + message->GetInformationDescription());
 
 	return eventPtr;
 }
