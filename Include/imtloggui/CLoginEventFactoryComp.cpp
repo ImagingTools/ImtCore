@@ -17,6 +17,7 @@ namespace imtloggui
 // public methods
 
 // reimplemented (imtloggui::IEventItemFactory)
+
 QGraphicsItem* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const
 {
 	if (message->GetInformationId() != imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN && message->GetInformationId() != imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT){
