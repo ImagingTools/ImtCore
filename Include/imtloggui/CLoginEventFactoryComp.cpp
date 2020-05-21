@@ -31,16 +31,16 @@ QGraphicsItem* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsum
 	QIcon logoutIcon;
 	int iconSize = 24;
 	
-	if (m_loginIcon.IsValid()){
-		loginIcon = QIcon(*m_loginIcon);
+	if (m_loginIconAttrPtr.IsValid()){
+		loginIcon = QIcon(*m_loginIconAttrPtr);
 	}
 
-	if (m_logoutIcon.IsValid()){
-		logoutIcon = QIcon(*m_logoutIcon);
+	if (m_logoutIconAttrPtr.IsValid()){
+		logoutIcon = QIcon(*m_logoutIconAttrPtr);
 	}
 
-	if (m_iconSize.IsValid()){
-		iconSize = *m_iconSize;
+	if (m_iconSizeAttrPtr.IsValid()){
+		iconSize = *m_iconSizeAttrPtr;
 	}
 
 	CLoginEventItem* eventPtr = new CLoginEventItem(message);

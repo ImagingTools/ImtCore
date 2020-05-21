@@ -5,7 +5,7 @@
 #include <QtWidgets/QGraphicsRectItem>
 
 // ImtCore includes
-#include <imtloggui/CGroupLabelItem.h>
+//#include <imtloggui/CGroupLabelItem.h>
 
 
 namespace imtloggui
