@@ -226,6 +226,9 @@ double CEventGroupControllerComp::ViewPortChanged()
 	}
 
 	double minimumVerticalScale = m_viewPtr->viewport()->rect().height() / newSceneRect.height();
+	if (minimumVerticalScale < 1){
+		minimumVerticalScale = 1;
+	}
 	
 	if (totalHeight != 0 && m_minimumVerticalScale != minimumVerticalScale){
 		m_minimumVerticalScale = minimumVerticalScale;

@@ -1,4 +1,4 @@
-#include <imtloggui/CEventGraphicsView.h>
+ #include <imtloggui/CEventGraphicsView.h>
 
 
 // Qt includes
@@ -14,7 +14,8 @@ namespace imtloggui
 
 CEventGraphicsView::CEventGraphicsView(QWidget* parent)
 	: QGraphicsView(parent),
-	m_timeAxisPtr(nullptr)
+	m_timeAxisPtr(nullptr),
+	m_minimumVerticalScale(1)
 {
 	connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &CEventGraphicsView::rangeChanged);
 	connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::valueChanged);
