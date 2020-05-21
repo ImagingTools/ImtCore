@@ -41,6 +41,8 @@ bool CSingleLayerGroupComp::CreateGraphicsItem()
 	if (m_graphicsItem == nullptr && m_scenePtr != nullptr && m_timeAxisPtr != nullptr){
 		m_graphicsItem = new CEventGroupItem();
 
+		m_graphicsItem->SetGroupName(m_groupName);
+
 		if (m_groupColorAttrPtr.IsValid()){
 			m_graphicsItem->SetBackgroundColor(QString(*m_groupColorAttrPtr));
 		}
@@ -180,7 +182,9 @@ void CSingleLayerGroupComp::TimeAxisChanged()
 
 void CSingleLayerGroupComp::ViewPortChanged()
 {
-
+	if (m_graphicsItem != nullptr){
+		m_graphicsItem->ViewPortChanged();
+	}
 }
 
 

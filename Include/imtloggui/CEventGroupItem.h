@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtWidgets/QGraphicsRectItem>
 
+// ImtCore includes
+#include <imtloggui/CGroupLabelItem.h>
+
 
 namespace imtloggui
 {
@@ -15,6 +18,7 @@ public:
 	typedef QGraphicsRectItem BaseClass;
 
 	CEventGroupItem(QGraphicsItem* parent = nullptr);
+	~CEventGroupItem();
 
 	void SetBackgroundColor(const QColor& color);
 	void SetGroupName(QString name);
@@ -33,6 +37,7 @@ private:
 private:
 	QColor m_bgColor;
 	QString m_name;
+	//CGroupLabelItem* m_labelPtr;
 };
 
 

@@ -6,6 +6,7 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QStyleOptionGraphicsItem>
 
 // ImtCore includes
 //#include <imtlog/IMessageGroupInfoProvider.h>
@@ -22,6 +23,16 @@ CEventGroupItem::CEventGroupItem(QGraphicsItem* parent)
 {
 	m_bgColor = QColor("#00000000");
 	m_name = "Noname";
+	//m_labelPtr = new (CGroupLabelItem);
+	//m_labelPtr->setFlag(ItemIgnoresTransformations);
+	//m_labelPtr->setZValue(1000);
+}
+
+
+CEventGroupItem::~CEventGroupItem()
+{
+	//scene()->removeItem(m_labelPtr);
+	//delete m_labelPtr;
 }
 
 
@@ -34,18 +45,22 @@ void CEventGroupItem::SetBackgroundColor(const QColor& color)
 void CEventGroupItem::SetGroupName(QString name)
 {
 	m_name = name;
+	//m_labelPtr->SetText(name);
 }
 
 
 void CEventGroupItem::ViewPortChanged()
 {
-	//prepareGeometryChange();
+	update(mapFromScene(GetItemVisibleRect()).boundingRect());
+	qDebug() << mapFromScene(GetItemVisibleRect()).boundingRect();
+	
+	QRectF sceneVisibleRect = GetSceneVisibleRect();
+	
+	QPointF origin;
+	origin.setX(sceneVisibleRect.left());
+	origin.setY(mapToScene(pos()).y() + rect().height() / 2);
 
-	//QGraphicsView* viewPtr = scene()->views().first();
-	//QRect viewportRect = viewPtr->viewport()->rect();
-	//QRectF sceneVisibleRect = viewPtr->mapToScene(viewportRect).boundingRect();
-	//
-	//m_boundingRect = BaseClass::boundingRect();
+	//m_labelPtr->setPos(origin);
 }
 
 
@@ -53,6 +68,10 @@ void CEventGroupItem::ViewPortChanged()
 
 QRectF CEventGroupItem::boundingRect() const
 {
+	//if (m_labelPtr->scene() == nullptr && scene() != nullptr){
+	//	scene()->addItem(m_labelPtr);
+	//}
+
 	QRectF visibleRect = GetSceneVisibleRect();
 	QRectF itemRect = rect();
 	QPointF origin = itemRect.bottomLeft();
@@ -80,13 +99,26 @@ void CEventGroupItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 {
 	QBrush brush(m_bgColor);
 
+	double scaleX = GetCurrentScaleX();
+	double scaleY = GetCurrentScaleY();
+
 	painter->save();
 	painter->setBrush(brush);
 	painter->setPen(Qt::NoPen);
 	painter->drawRect(boundingRect());
 	painter->restore();
 
-	//BaseClass::paint(painter, option, widget);
+	QRectF sceneVisibleRect = GetSceneVisibleRect();
+	
+	QRectF labelRect = option->fontMetrics.boundingRect(m_name);
+	labelRect.setWidth(labelRect.width() + 1);
+
+	painter->setRenderHint(QPainter::SmoothPixmapTransform);
+
+	painter->translate(sceneVisibleRect.left(), rect().height() / 2);
+	painter->scale(1 / scaleX, 1 / scaleY);
+	painter->rotate(-90);
+	painter->drawText(QPointF(-labelRect.width() / 2, labelRect.height()), m_name);
 }
 
 
@@ -127,12 +159,9 @@ QRectF CEventGroupItem::GetSceneVisibleRect() const
 QRectF CEventGroupItem::GetItemVisibleRect() const
 {
 	QRectF sceneVisibleRect = GetSceneVisibleRect();
-	QRectF itemRect = rect();
+	QRectF itemVisibleRect = boundingRect().intersected(mapFromScene(sceneVisibleRect).boundingRect());
 	
-	itemRect.setTop(sceneVisibleRect.top());
-	itemRect.setBottom(sceneVisibleRect.bottom());
-
-	return itemRect.intersected(sceneVisibleRect);
+	return itemVisibleRect;
 }
 
 
