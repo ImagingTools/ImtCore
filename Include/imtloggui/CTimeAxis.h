@@ -30,9 +30,6 @@ public:
 
 	CTimeAxis(QGraphicsItem* parent = nullptr);
 
-	void setPos(const QPointF& origin);
-	void setPos(double x, double y);
-
 	const QDateTime& GetStartOfRange() const;
 	const QDateTime& GetEndOfRange() const;
 	void SetColor(const QColor& color);
@@ -43,6 +40,10 @@ public:
 	// reimplemented (QGraphicsRectItem)
 	virtual QRectF boundingRect() const override;
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+
+	// reimplemented (QGraphicsItem)
+	void setPos(const QPointF& origin);
+	void setPos(double x, double y);
 
 	// reimplemented (IEventScenePositionProvider)
 	virtual double GetScenePositionFromTime(const QDateTime& time) const override;

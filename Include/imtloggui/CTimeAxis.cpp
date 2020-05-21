@@ -19,33 +19,19 @@ namespace imtloggui
 
 
 CTimeAxis::CTimeAxis(QGraphicsItem* parent)
-	: BaseClass(parent),
+	:BaseClass(parent),
 	m_fontMetrics(QFont()),
 	m_labelWidthFactor(1.5),
-	m_minMinorTickStep(20),
-	QObject()
+	m_minMinorTickStep(20)
 {
 	setZValue(100000);
+
 	setFlags(ItemIgnoresTransformations);
+
 	m_startTime = QDateTime();
 	m_endTime = QDateTime();
 
 	CreateTimeItemTable();
-}
-
-
-void CTimeAxis::setPos(const QPointF &origin)
-{
-	if (origin != pos()){
-		BaseClass::setPos(origin);
-		Q_EMIT AxisChanged();
-	}
-}
-
-
-void CTimeAxis::setPos(double x, double y)
-{
-	setPos(QPointF(x, y));
 }
 
 
@@ -275,28 +261,34 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 			break;
 		}
 	}
-		
-	painter->setPen(Qt::white);
+
+	painter->setPen(Qt::cyan);
 
 	if (m_startTime == m_endTime){
 		return;
 	}
 
-	// Draw minor ticks:
+	// Draw ticks:
 	for (TickInfo info : ticks){
 		if (info.type == TT_MINOR){
 			double xPos = GetRectPositionFromTime(info.time) * GetCurrentScale();
+			if (xPos < 0){
+				continue;
+			}
 
+			painter->save();
+			painter->setPen(Qt::green);
 			painter->drawLine(QLineF(xPos, rect().top() + 1, xPos, rect().top() + itemRect.height() * 0.2));
+			painter->restore();
 		}
-	}
-
-	// Draw major ticks:
-	for (TickInfo info : ticks){
-		if (info.type == TT_MAJOR){
+		else if (info.type == TT_MAJOR){
 			double xPos = GetRectPositionFromTime(info.time) * GetCurrentScale();
-
+			if (xPos < 0){
+				continue;
+			}
+			
 			painter->drawLine(QLineF(xPos, rect().top() + 1, xPos, itemRect.bottom() - itemRect.height() / 1.5));
+			
 			QString labelText = info.time.toString(info.timeFormat);
 			
 			QTransform savedTransform = painter->transform();
@@ -309,6 +301,23 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 			painter->setTransform(savedTransform);
 		}
 	}
+}
+
+
+// reimplemented (QGraphicsItem)
+
+void CTimeAxis::setPos(const QPointF &origin)
+{
+	if (origin != pos()){
+		BaseClass::setPos(origin);
+		Q_EMIT AxisChanged();
+	}
+}
+
+
+void CTimeAxis::setPos(double x, double y)
+{
+	setPos(QPointF(x, y));
 }
 
 
@@ -643,11 +652,11 @@ QRectF CTimeAxis::GetAxisVisibleRect() const
 double CTimeAxis::GetRectPositionFromTime(const QDateTime& time) const
 {
 	if (!m_startTime.isValid() || !m_endTime.isValid()){
-		return DBL_MIN;
+		return -1;
 	}
 
 	if (time < m_startTime || time > m_endTime){
-		return DBL_MIN;
+		return -1;
 	}
 
 	if (m_startTime == m_endTime){
@@ -655,7 +664,7 @@ double CTimeAxis::GetRectPositionFromTime(const QDateTime& time) const
 			return rect().left();
 		}
 
-		return DBL_MIN;
+		return -1;
 	}
 
 	double delta = time.toMSecsSinceEpoch() - m_startTime.toMSecsSinceEpoch();
