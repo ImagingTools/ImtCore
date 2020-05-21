@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
+#include <QtCore/QObject>
 #include <QtCore/QMap>
 
 // Acf includes
@@ -18,8 +19,10 @@ namespace imtloggui
 {
 
 
-class CEventGroupControllerComp: public icomp::CComponentBase, virtual public IEventGroupController
+class CEventGroupControllerComp: public QObject, public icomp::CComponentBase, virtual public IEventGroupController
 {
+	Q_OBJECT
+
 public:
 	typedef icomp::CComponentBase BaseClass;
 
@@ -32,6 +35,7 @@ public:
 
 	// reimplemented (imtloggui::IEventGroupController)
 	virtual void SetScene(QGraphicsScene* scenePtr) override;
+	virtual void SetView(QGraphicsView* viewPtr) override;
 	virtual void SetTimeAxis(const IEventScenePositionProvider* timeAxisPtr) override;
 
 	virtual bool CreateGraphicsItem() override;
@@ -49,7 +53,10 @@ public:
 	virtual bool SetVisible(QByteArray groupId, bool isVisible) const override;
 
 	virtual void TimeAxisChanged() override;
-	virtual void ViewPortChanged() override;
+	virtual double ViewPortChanged() override;
+
+Q_SIGNALS:
+	void MinimumVerticalScaleChanged(double scale);
 
 private:
 	I_MULTIREF(IEventItemController, m_groupRefsCompPtr);
@@ -59,7 +66,10 @@ private:
 	QMap<QByteArray, IEventItemController*> m_groups;
 
 	QGraphicsScene* m_scenePtr;
+	QGraphicsView* m_viewPtr;
 	const IEventScenePositionProvider* m_timeAxisPtr;
+
+	double m_minimumVerticalScale;
 };
 
 

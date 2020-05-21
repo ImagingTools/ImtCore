@@ -1,14 +1,23 @@
 #include <imtloggui/CEventGroupControllerComp.h>
 
 
+// Qt includes
+#include <QtCore/QDebug>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QScrollBar>
+
+
 namespace imtloggui
 {
 
 
 CEventGroupControllerComp::CEventGroupControllerComp()
 	: m_scenePtr(nullptr),
+	m_viewPtr(nullptr),
 	m_timeAxisPtr(nullptr),
-	m_graphicsItem(nullptr)
+	m_graphicsItem(nullptr),
+	m_minimumVerticalScale(1)
 {
 }
 
@@ -16,6 +25,12 @@ CEventGroupControllerComp::CEventGroupControllerComp()
 void CEventGroupControllerComp::SetScene(QGraphicsScene* scenePtr)
 {
 	m_scenePtr = scenePtr;
+}
+
+
+void CEventGroupControllerComp::SetView(QGraphicsView* viewPtr)
+{
+	m_viewPtr = viewPtr;
 }
 
 
@@ -136,6 +151,18 @@ IEventItemController* CEventGroupControllerComp::AddGroup(const QByteArray& grou
 			eventItemController->GetGraphicsItem()->setPos(0, -totalHeight);
 
 			m_groups[groupId] = eventItemController;
+
+			QRectF sceneRect = m_scenePtr->sceneRect();
+
+			totalHeight = 0;
+			for (IEventItemController* item : m_groups){
+				totalHeight += item->GetGroupHeight();
+			}
+
+			sceneRect.setBottom(40 / m_viewPtr->viewportTransform().m22());
+			sceneRect.setTop(-totalHeight);
+
+			m_viewPtr->setSceneRect(sceneRect);
 		}
 	}
 
@@ -166,16 +193,6 @@ bool CEventGroupControllerComp::SetVisible(QByteArray groupId, bool isVisible) c
 }
 
 
-void CEventGroupControllerComp::ViewPortChanged()
-{
-	if (m_groupRefsCompPtr.IsValid()){
-		for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
-			m_groupRefsCompPtr[i]->ViewPortChanged();
-		}
-	}
-}
-
-
 void CEventGroupControllerComp::TimeAxisChanged()
 {
 	if (m_groupRefsCompPtr.IsValid()){
@@ -183,6 +200,40 @@ void CEventGroupControllerComp::TimeAxisChanged()
 			m_groupRefsCompPtr[i]->TimeAxisChanged();
 		}
 	}
+}
+
+
+double CEventGroupControllerComp::ViewPortChanged()
+{
+	if (m_groupRefsCompPtr.IsValid()){
+		for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
+			m_groupRefsCompPtr[i]->ViewPortChanged();
+		}
+	}
+
+	QRectF newSceneRect = m_viewPtr->sceneRect();
+
+	int totalHeight = 0;
+	for (IEventItemController* item : m_groups){
+		totalHeight += item->GetGroupHeight();
+	}
+
+	newSceneRect.setBottom(40 / m_viewPtr->viewportTransform().m22());
+	newSceneRect.setTop(-totalHeight);
+
+	if (m_viewPtr->sceneRect() != newSceneRect){
+		m_viewPtr->setSceneRect(newSceneRect);
+	}
+
+	double minimumVerticalScale = m_viewPtr->viewport()->rect().height() / newSceneRect.height();
+	
+	if (totalHeight != 0 && m_minimumVerticalScale != minimumVerticalScale){
+		m_minimumVerticalScale = minimumVerticalScale;
+		Q_EMIT MinimumVerticalScaleChanged(minimumVerticalScale);
+		return minimumVerticalScale;
+	}
+
+	return 0;
 }
 
 

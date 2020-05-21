@@ -8,9 +8,6 @@
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
-// ImtCore includes
-//#include <imtlog/IMessageGroupInfoProvider.h>
-
 
 namespace imtloggui
 {
@@ -23,16 +20,6 @@ CEventGroupItem::CEventGroupItem(QGraphicsItem* parent)
 {
 	m_bgColor = QColor("#00000000");
 	m_name = "Noname";
-	//m_labelPtr = new (CGroupLabelItem);
-	//m_labelPtr->setFlag(ItemIgnoresTransformations);
-	//m_labelPtr->setZValue(1000);
-}
-
-
-CEventGroupItem::~CEventGroupItem()
-{
-	//scene()->removeItem(m_labelPtr);
-	//delete m_labelPtr;
 }
 
 
@@ -45,21 +32,12 @@ void CEventGroupItem::SetBackgroundColor(const QColor& color)
 void CEventGroupItem::SetGroupName(QString name)
 {
 	m_name = name;
-	//m_labelPtr->SetText(name);
 }
 
 
 void CEventGroupItem::ViewPortChanged()
 {
 	update(GetItemVisibleRect());
-
-	//QRectF sceneVisibleRect = GetSceneVisibleRect();
-	
-	//QPointF origin;
-	//origin.setX(sceneVisibleRect.left());
-	//origin.setY(mapToScene(pos()).y() + rect().height() / 2);
-
-	//m_labelPtr->setPos(origin);
 }
 
 
@@ -67,10 +45,6 @@ void CEventGroupItem::ViewPortChanged()
 
 QRectF CEventGroupItem::boundingRect() const
 {
-	//if (m_labelPtr->scene() == nullptr && scene() != nullptr){
-	//	scene()->addItem(m_labelPtr);
-	//}
-
 	QRectF visibleRect = GetSceneVisibleRect();
 	QRectF itemRect = rect();
 	QPointF origin = itemRect.bottomLeft();
@@ -137,15 +111,7 @@ double CEventGroupItem::GetCurrentScaleY() const
 
 QRectF CEventGroupItem::GetSceneVisibleRect() const
 {
-	QGraphicsScene* scenePtr = scene();
-	if (scenePtr == nullptr){
-		return QRectF();
-	}
-
-	QGraphicsView* viewPtr = scenePtr->views().first();
-	if (viewPtr == nullptr){
-		return QRectF();
-	}
+	QGraphicsView* viewPtr = scene()->views().first();
 
 	QRect viewportRect = viewPtr->viewport()->rect();
 

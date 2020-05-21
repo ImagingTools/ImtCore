@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QDebug>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QScrollBar>
 
@@ -48,6 +49,17 @@ void CEventGraphicsView::OnAxisPositionChanged()
 }
 
 
+void CEventGraphicsView::OnMinimumVerticalScaleChanged(double minScale)
+{
+	m_minimumVerticalScale = minScale;
+
+	qDebug() << transform().m22() << minScale;
+	if (transform().m22() < minScale){
+		scale(1, minScale / transform().m22());
+	}
+}
+
+
 // protected methods
 
 // reimplemented (QGraphicsView)
@@ -62,7 +74,12 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 			scale(1, 1.1);
 		}
 		else{
-			scale(1, 1 / 1.1);
+			if (transform().m22() / 1.1 < m_minimumVerticalScale){
+				scale(1, m_minimumVerticalScale / transform().m22());
+			}
+			else{
+				scale(1, 1 / 1.1);
+			}
 		}
 	}
 	else{

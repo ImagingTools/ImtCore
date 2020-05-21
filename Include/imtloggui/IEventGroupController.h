@@ -16,6 +16,7 @@ class IEventGroupController
 {
 public:
 	virtual void SetScene(QGraphicsScene* scenePtr) = 0;
+	virtual void SetView(QGraphicsView* viewPtr) = 0;
 	virtual void SetTimeAxis(const IEventScenePositionProvider* timeAxisPtr) = 0;
 
 	virtual bool CreateGraphicsItem() = 0;
@@ -33,7 +34,7 @@ public:
 	virtual bool SetVisible(QByteArray groupId, bool isVisible) const = 0;
 
 	virtual void TimeAxisChanged() = 0;
-	virtual void ViewPortChanged() = 0;
+	virtual double ViewPortChanged() = 0;
 };
 
 

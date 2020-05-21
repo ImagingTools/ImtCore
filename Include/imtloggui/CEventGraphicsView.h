@@ -30,6 +30,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void OnAxisPositionChanged();
+	void OnMinimumVerticalScaleChanged(double minScale);
 
 protected:
 	// reimplemented (QGraphicsView)
@@ -45,6 +46,8 @@ private:
 
 private:
 	CTimeAxis* m_timeAxisPtr;
+
+	double m_minimumVerticalScale;
 };
 
 
