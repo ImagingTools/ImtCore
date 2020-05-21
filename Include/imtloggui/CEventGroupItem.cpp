@@ -51,14 +51,13 @@ void CEventGroupItem::SetGroupName(QString name)
 
 void CEventGroupItem::ViewPortChanged()
 {
-	update(mapFromScene(GetItemVisibleRect()).boundingRect());
-	qDebug() << mapFromScene(GetItemVisibleRect()).boundingRect();
+	update(GetItemVisibleRect());
+
+	//QRectF sceneVisibleRect = GetSceneVisibleRect();
 	
-	QRectF sceneVisibleRect = GetSceneVisibleRect();
-	
-	QPointF origin;
-	origin.setX(sceneVisibleRect.left());
-	origin.setY(mapToScene(pos()).y() + rect().height() / 2);
+	//QPointF origin;
+	//origin.setX(sceneVisibleRect.left());
+	//origin.setY(mapToScene(pos()).y() + rect().height() / 2);
 
 	//m_labelPtr->setPos(origin);
 }
