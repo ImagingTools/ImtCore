@@ -262,7 +262,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 		}
 	}
 
-	painter->setPen(Qt::cyan);
+	painter->setPen(Qt::yellow);
 
 	if (m_startTime == m_endTime){
 		return;
