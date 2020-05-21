@@ -1,9 +1,17 @@
 #include <imtlog/CMessageGroupInfoProviderComp.h>
 
 
+// Qt includes
+#include <QtCore/QObject>
+
+
 namespace imtlog
 {
 
+
+// public methods
+
+// reimplemented (IMessageGroupInfoProvider)
 
 IMessageGroupInfoProvider::GroupInfo CMessageGroupInfoProviderComp::GetMessageGroupInfo(const istd::IInformationProvider* messagePtr) const
 {
@@ -13,13 +21,13 @@ IMessageGroupInfoProvider::GroupInfo CMessageGroupInfoProviderComp::GetMessageGr
 	case MI_USER_LOGIN:
 	case MI_USER_LOGOUT:
 		groupInfo.id = "UserAction";
-		groupInfo.description = "UserAction";
-		groupInfo.name = "UserAction";
+		groupInfo.description = QObject::tr("User action event group");
+		groupInfo.name = QObject::tr("User Action");
 		break;
 	default:
 		groupInfo.id = "General";
-		groupInfo.description = "General group";
-		groupInfo.name = "General";
+		groupInfo.description = QObject::tr("General event group");
+		groupInfo.name = QObject::tr("General");
 	}
 	
 	return groupInfo;

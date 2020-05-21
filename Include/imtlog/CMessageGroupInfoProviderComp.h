@@ -9,9 +9,10 @@ namespace imtlog
 {
 
 
-class CMessageGroupInfoProviderComp: public IMessageGroupInfoProvider
+class CMessageGroupInfoProviderComp: virtual public IMessageGroupInfoProvider
 {
 public:
+	// reimplemented (IMessageGroupInfoProvider)
 	virtual GroupInfo GetMessageGroupInfo(const istd::IInformationProvider* messagePtr) const;
 };
 

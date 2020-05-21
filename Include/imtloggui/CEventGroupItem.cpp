@@ -82,8 +82,13 @@ void CEventGroupItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 	painter->restore();
 
 	QRectF sceneVisibleRect = GetSceneVisibleRect();
-	
-	QRectF labelRect = option->fontMetrics.boundingRect(m_name);
+
+	QFont font("Helvetica");
+	font.setPointSize(24);
+	QFontMetricsF metrics(font);
+	painter->setFont(font);
+
+	QRectF labelRect = metrics.boundingRect(m_name);
 	labelRect.setWidth(labelRect.width() + 1);
 
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
