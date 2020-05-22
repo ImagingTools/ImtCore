@@ -67,8 +67,7 @@ private:
 	QColor m_mouseOverSelectedTextColor;
 
 	QFontMetrics m_fontMetrics;
-
-};			 
+};
 
 
 } // namespace imtwidgets

@@ -1,6 +1,10 @@
 #pragma once
 
 
+
+// Qt includes
+#include <QtCore/QVector>
+
 // ACF includes
 #include <istd/IChangeable.h>
 #include <istd/IInformationProvider.h>
