@@ -33,7 +33,7 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 {
 	imtlog::IMessageGroupInfoProvider::GroupInfo groupInfo;
 	groupInfo.id = "General";
-	groupInfo.name = "General";
+	groupInfo.name = QObject::tr("General");
 
 	if (m_messageGroupInfoProviderCompPtr.IsValid()){
 		groupInfo = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfo(message.GetPtr());
@@ -81,6 +81,11 @@ void CEventViewComp::OnGuiCreated()
 		m_groupControllerCompPtr->SetTimeAxis(m_timeAxisPtr);
 		m_groupControllerCompPtr->CreateGraphicsItem();
 		connect(m_viewPtr, &CEventGraphicsView::ViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
+
+		if (m_messageGroupInfoProviderCompPtr.IsValid()){
+			imtlog::IMessageGroupInfoProvider::GroupInfos groupInfos = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfos();
+			m_groupControllerCompPtr->AddGroups(groupInfos);
+		}
 	}
 }
 
@@ -98,29 +103,11 @@ void CEventViewComp::OnGuiDestroyed()
 }
 
 
-void CEventViewComp::OnGuiRetranslate()
-{
-	BaseClass::OnGuiRetranslate();
-}
-
-
 // reimplemented (icomp::CComponentBase)
-
-void CEventViewComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-}
-
-
-void CEventViewComp::OnComponentDestroyed()
-{
-	BaseClass::OnComponentDestroyed();
-}
-
 
 void CEventViewComp::OnViewPortChanged()
 {
-	double minScale = m_groupControllerCompPtr->ViewPortChanged();
+	double minScale = m_groupControllerCompPtr->OnViewPortChanged();
 	if (minScale != 0){
 		m_viewPtr->OnMinimumVerticalScaleChanged(minScale);
 	}

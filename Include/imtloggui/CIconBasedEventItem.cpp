@@ -11,8 +11,8 @@ namespace imtloggui
 
 // public methods
 
-CIconBasedEventItem::CIconBasedEventItem(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent)
-	: BaseClass(message, parent)
+CIconBasedEventItem::CIconBasedEventItem(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent)
+	:BaseClass(message, parent)
 {
 	m_messagePtr = message;
 	setToolTip(m_messagePtr->GetInformationDescription());
@@ -39,7 +39,7 @@ QRectF CIconBasedEventItem::boundingRect() const
 }
 
 
-void CIconBasedEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void CIconBasedEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
 	painter->drawPixmap(boundingRect().toRect(), m_icon.pixmap(m_iconSize));

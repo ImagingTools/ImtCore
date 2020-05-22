@@ -15,8 +15,8 @@ namespace imtloggui
 {
 
 
-CEventItemBase::CEventItemBase(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent)
-	: BaseClass(parent)
+CEventItemBase::CEventItemBase(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent)
+	:BaseClass(parent)
 {
 	m_messagePtr = message;
 }

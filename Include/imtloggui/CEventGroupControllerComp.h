@@ -48,12 +48,13 @@ public:
 	virtual QString GetGroupName(const QByteArray& groupId) const override;
 
 	virtual IEventItemController* AddGroup(const QByteArray& groupId, const QString& groupName) override;
+	virtual void AddGroups(const imtlog::IMessageGroupInfoProvider::GroupInfos& groupInfos) override;
 	virtual bool RemoveGroup(const QByteArray& groupId) override;
 
-	virtual bool SetVisible(QByteArray groupId, bool isVisible) const override;
+	virtual bool SetVisible(const QByteArray& groupId, bool isVisible) const override;
 
-	virtual void TimeAxisChanged() override;
-	virtual double ViewPortChanged() override;
+	virtual void OnTimeAxisChanged() override;
+	virtual double OnViewPortChanged() override;
 
 Q_SIGNALS:
 	void MinimumVerticalScaleChanged(double scale);

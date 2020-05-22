@@ -41,15 +41,15 @@ public:
 	virtual int GetGroupHeight() const override;
 
 	virtual QString GetGroupName() const override;
-	virtual void SetGroupName(QString name) override;
+	virtual void SetGroupName(const QString& name) override;
 
 	virtual QGraphicsItem* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) override;
 	virtual void ClearEvents() override;
 
 	virtual void SetVisible(bool isVisible) const override;
 
-	virtual void TimeAxisChanged() override;
-	virtual void ViewPortChanged() override;
+	virtual void OnTimeAxisChanged() override;
+	virtual void OnViewPortChanged() override;
 
 private:
 	I_ATTR(QByteArray, m_groupIdAttrPtr);

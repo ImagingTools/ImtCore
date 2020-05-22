@@ -15,8 +15,8 @@ namespace imtloggui
 
 // public methods
 
-CLoginEventItem::CLoginEventItem(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent)
-	: BaseClass(message, parent)
+CLoginEventItem::CLoginEventItem(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent)
+	:BaseClass(message, parent)
 {
 	m_messagePtr = message;
 }
@@ -58,7 +58,7 @@ QRectF CLoginEventItem::boundingRect() const
 }
 
 
-void CLoginEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void CLoginEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
 	QFontMetrics fontMetrics(m_font);
 

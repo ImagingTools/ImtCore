@@ -269,9 +269,10 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 	}
 
 	// Draw ticks:
-	for (TickInfo info : ticks){
+	for (QDateTime time : ticks.keys()){
+		TickInfo info = ticks[time];
 		if (info.type == TT_MINOR){
-			double xPos = GetRectPositionFromTime(info.time) * GetCurrentScale();
+			double xPos = GetRectPositionFromTime(time) * GetCurrentScale();
 			if (xPos < 0){
 				continue;
 			}
@@ -282,14 +283,14 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 			painter->restore();
 		}
 		else if (info.type == TT_MAJOR){
-			double xPos = GetRectPositionFromTime(info.time) * GetCurrentScale();
+			double xPos = GetRectPositionFromTime(time) * GetCurrentScale();
 			if (xPos < 0){
 				continue;
 			}
 			
 			painter->drawLine(QLineF(xPos, rect().top() + 1, xPos, itemRect.bottom() - itemRect.height() / 1.5));
 			
-			QString labelText = info.time.toString(info.timeFormat);
+			QString labelText = time.toString(info.timeFormat);
 			
 			QTransform savedTransform = painter->transform();
 			QTransform newTransform = savedTransform;
@@ -553,8 +554,7 @@ CTimeAxis::Ticks CTimeAxis::CalculateTicks(const IntervalsInfo& intervalsInfo) c
 			TickInfo info;
 			info.type = TT_MAJOR;
 			info.timeFormat = m_intervals[intervalsInfo.majorInterval].timeFormat;
-			info.time = currentTime;
-			ticks.append(info);
+			ticks[currentTime] = info;
 		}
 
 		if (intervalsInfo.majorInterval < TI_MONTH){
@@ -581,10 +581,11 @@ CTimeAxis::Ticks CTimeAxis::CalculateTicks(const IntervalsInfo& intervalsInfo) c
 	if (intervalsInfo.minorInterval != TI_NONE){
 		while (currentTime <= endTime){
 			if (currentTime >= startTime){
-				TickInfo info;
-				info.type = TT_MINOR;
-				info.time = currentTime;
-				ticks.append(info);
+				if (!ticks.contains(currentTime)){
+					TickInfo info;
+					info.type = TT_MINOR;
+					ticks[currentTime] = info;
+				}
 			}
 
 			if (intervalsInfo.minorInterval < TI_MONTH){

@@ -17,7 +17,7 @@ public:
 	CEventGroupItem(QGraphicsItem* parent = nullptr);
 
 	void SetBackgroundColor(const QColor& color);
-	void SetGroupName(QString name);
+	void SetGroupName(const QString& name);
 	void ViewPortChanged();
 
 	// reimplemented (QGraphicsItem)
@@ -31,7 +31,7 @@ private:
 	QRectF GetItemVisibleRect() const;
 
 private:
-	QColor m_bgColor;
+	QColor m_backgroundColor;
 	QString m_name;
 };
 

@@ -10,7 +10,7 @@ namespace imtloggui
 
 
 CSingleLayerGroupComp::CSingleLayerGroupComp()
-	: m_scenePtr(nullptr),
+	:m_scenePtr(nullptr),
 	m_timeAxisPtr(nullptr),
 	m_graphicsItem(nullptr)
 {
@@ -106,7 +106,7 @@ QString CSingleLayerGroupComp::GetGroupName() const
 }
 
 
-void CSingleLayerGroupComp::SetGroupName(QString name)
+void CSingleLayerGroupComp::SetGroupName(const QString& name)
 {
 	m_groupName = name;
 	if (m_graphicsItem != nullptr){
@@ -133,7 +133,7 @@ QGraphicsItem* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::Mes
 
 		QPointF origin(m_timeAxisPtr->GetScenePositionFromTime(messagePtr->GetInformationTimeStamp()), 0);
 		origin = m_graphicsItem->mapFromScene(origin);
-		origin.setY(-100);
+		origin.setY(m_graphicsItem->rect().height() / 2);
 
 		itemPtr->setParentItem(m_graphicsItem);
 		itemPtr->setPos(origin);
@@ -174,13 +174,13 @@ void CSingleLayerGroupComp::SetVisible(bool isVisible) const
 }
 
 
-void CSingleLayerGroupComp::TimeAxisChanged()
+void CSingleLayerGroupComp::OnTimeAxisChanged()
 {
-
+	// TODO: Synchronize group with time axis
 }
 
 
-void CSingleLayerGroupComp::ViewPortChanged()
+void CSingleLayerGroupComp::OnViewPortChanged()
 {
 	if (m_graphicsItem != nullptr){
 		m_graphicsItem->ViewPortChanged();

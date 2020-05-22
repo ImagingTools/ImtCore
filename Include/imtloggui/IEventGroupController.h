@@ -5,6 +5,7 @@
 #include <ilog/IMessageConsumer.h>
 
 // ImtCore includes
+#include <imtlog/IMessageGroupInfoProvider.h>
 #include <imtloggui/IEventItemController.h>
 
 
@@ -24,6 +25,7 @@ public:
 	virtual QGraphicsItem* GetGraphicsItem() = 0;
 
 	virtual IEventItemController* AddGroup(const QByteArray& groupId, const QString& groupName) = 0;
+	virtual void AddGroups(const imtlog::IMessageGroupInfoProvider::GroupInfos& groupInfos) = 0;
 	virtual bool RemoveGroup(const QByteArray& groupId) = 0;
 
 	virtual QByteArrayList GetActiveGroupList() const = 0;
@@ -31,10 +33,10 @@ public:
 	virtual IEventItemController* GetGroup(const QByteArray& groupId) const = 0;
 	virtual QString GetGroupName(const QByteArray& groupId) const = 0;
 
-	virtual bool SetVisible(QByteArray groupId, bool isVisible) const = 0;
+	virtual bool SetVisible(const QByteArray& groupId, bool isVisible) const = 0;
 
-	virtual void TimeAxisChanged() = 0;
-	virtual double ViewPortChanged() = 0;
+	virtual void OnTimeAxisChanged() = 0;
+	virtual double OnViewPortChanged() = 0;
 };
 
 

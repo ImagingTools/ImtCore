@@ -14,7 +14,7 @@ class CGeneralEventItem: public CEventItemBase
 public:
 	typedef CEventItemBase BaseClass;
 
-	CGeneralEventItem(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent = nullptr);
+	CGeneralEventItem(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent = nullptr);
 
 	// reimplemented (QGraphicsItem)
 	virtual QRectF boundingRect() const override;

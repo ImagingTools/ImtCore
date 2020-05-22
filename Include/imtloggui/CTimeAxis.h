@@ -102,11 +102,10 @@ protected:
 	struct TickInfo
 	{
 		TickType type;
-		QDateTime time;
 		QString timeFormat;
 	};
 
-	typedef QVector<TickInfo> Ticks;
+	typedef QMap<QDateTime, TickInfo> Ticks;
 
 	struct	MinorIntervalItem
 	{

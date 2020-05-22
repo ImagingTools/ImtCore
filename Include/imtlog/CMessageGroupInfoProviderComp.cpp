@@ -33,6 +33,24 @@ IMessageGroupInfoProvider::GroupInfo CMessageGroupInfoProviderComp::GetMessageGr
 	return groupInfo;
 }
 
+IMessageGroupInfoProvider::GroupInfos CMessageGroupInfoProviderComp::GetMessageGroupInfos() const
+{
+	IMessageGroupInfoProvider::GroupInfos groupInfos;
+	GroupInfo groupInfo;
+
+	groupInfo.id = "UserAction";
+	groupInfo.description = QObject::tr("User action event group");
+	groupInfo.name = QObject::tr("User Action");
+	groupInfos.append(groupInfo);
+
+	groupInfo.id = "General";
+	groupInfo.description = QObject::tr("General event group");
+	groupInfo.name = QObject::tr("General");
+	groupInfos.append(groupInfo);
+
+	return groupInfos;
+}
+
 
 } // namespace imtlog
 

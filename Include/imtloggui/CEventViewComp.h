@@ -47,11 +47,7 @@ public:
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
-	virtual void OnGuiRetranslate() override;
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
 
 Q_SIGNALS:
 	void AxisPositionChanged();

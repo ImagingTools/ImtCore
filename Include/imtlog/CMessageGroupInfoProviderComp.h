@@ -13,7 +13,8 @@ class CMessageGroupInfoProviderComp: virtual public IMessageGroupInfoProvider
 {
 public:
 	// reimplemented (IMessageGroupInfoProvider)
-	virtual GroupInfo GetMessageGroupInfo(const istd::IInformationProvider* messagePtr) const;
+	virtual GroupInfo GetMessageGroupInfo(const istd::IInformationProvider* messagePtr) const override;
+	virtual GroupInfos GetMessageGroupInfos() const override;
 };
 
 

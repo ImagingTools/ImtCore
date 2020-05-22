@@ -17,8 +17,8 @@ namespace imtloggui
 
 // public methods
 
-CGeneralEventItem::CGeneralEventItem(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent)
-	: BaseClass(message, parent)
+CGeneralEventItem::CGeneralEventItem(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent)
+	:BaseClass(message, parent)
 {
 }
 
@@ -31,7 +31,7 @@ QRectF CGeneralEventItem::boundingRect() const
 }
 
 
-void CGeneralEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void CGeneralEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
 	QBrush brush;
 	istd::IInformationProvider::InformationCategory category = m_messagePtr->GetInformationCategory();

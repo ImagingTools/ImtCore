@@ -31,7 +31,10 @@ public:
 		MI_CHANGES_HARDWARE_PARAMETERS
 	};
 
+	typedef QVector<GroupInfo> GroupInfos;
+
 	virtual GroupInfo GetMessageGroupInfo(const istd::IInformationProvider* messagePtr) const = 0;
+	virtual GroupInfos GetMessageGroupInfos() const = 0;
 };
 
 

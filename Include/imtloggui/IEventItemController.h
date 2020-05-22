@@ -29,15 +29,15 @@ public:
 	virtual int GetGroupHeight() const = 0;
 
 	virtual QString GetGroupName() const = 0;
-	virtual void SetGroupName(QString name) = 0;
+	virtual void SetGroupName(const QString& name) = 0;
 
 	virtual QGraphicsItem* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) = 0;
 	virtual void ClearEvents() = 0;
 
 	virtual void SetVisible(bool isVisible) const = 0;
 
-	virtual void TimeAxisChanged() = 0;
-	virtual void ViewPortChanged() = 0;
+	virtual void OnTimeAxisChanged() = 0;
+	virtual void OnViewPortChanged() = 0;
 };
 
 

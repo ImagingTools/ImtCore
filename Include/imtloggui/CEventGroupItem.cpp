@@ -16,20 +16,20 @@ namespace imtloggui
 // public methods
 
 CEventGroupItem::CEventGroupItem(QGraphicsItem* parent)
-	: BaseClass(parent)
+	:BaseClass(parent)
 {
-	m_bgColor = QColor("#00000000");
-	m_name = "Noname";
+	m_backgroundColor = QColor("#00000000");
+	m_name = QObject::tr("Noname");
 }
 
 
 void CEventGroupItem::SetBackgroundColor(const QColor& color)
 {
-	m_bgColor = color;
+	m_backgroundColor = color;
 }
 
 
-void CEventGroupItem::SetGroupName(QString name)
+void CEventGroupItem::SetGroupName(const QString& name)
 {
 	m_name = name;
 }
@@ -68,9 +68,9 @@ QRectF CEventGroupItem::boundingRect() const
 }
 
 
-void CEventGroupItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void CEventGroupItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
-	QBrush brush(m_bgColor);
+	QBrush brush(m_backgroundColor);
 
 	double scaleX = GetCurrentScaleX();
 	double scaleY = GetCurrentScaleY();

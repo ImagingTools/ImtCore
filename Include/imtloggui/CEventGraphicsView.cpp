@@ -13,7 +13,7 @@ namespace imtloggui
 // public methods
 
 CEventGraphicsView::CEventGraphicsView(QWidget* parent)
-	: QGraphicsView(parent),
+	:QGraphicsView(parent),
 	m_timeAxisPtr(nullptr),
 	m_minimumVerticalScale(1)
 {

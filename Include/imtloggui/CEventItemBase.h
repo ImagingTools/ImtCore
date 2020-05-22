@@ -18,7 +18,7 @@ class CEventItemBase: public QGraphicsObject
 public:
 	typedef QGraphicsObject BaseClass;
 
-	CEventItemBase(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent = nullptr);
+	CEventItemBase(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent = nullptr);
 
 	QDateTime GetEventTimeStamp() const;
 

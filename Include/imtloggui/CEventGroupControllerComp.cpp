@@ -13,7 +13,7 @@ namespace imtloggui
 
 
 CEventGroupControllerComp::CEventGroupControllerComp()
-	: m_scenePtr(nullptr),
+	:m_scenePtr(nullptr),
 	m_viewPtr(nullptr),
 	m_timeAxisPtr(nullptr),
 	m_graphicsItem(nullptr),
@@ -128,45 +128,51 @@ IEventItemController* CEventGroupControllerComp::AddGroup(const QByteArray& grou
 
 	IEventItemController* eventItemController = nullptr;
 
-	if (m_groupRefsCompPtr.IsValid()){
-		for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
-			if (m_groupRefsCompPtr[i]->GetGroupId() == groupId){
-				eventItemController = m_groupRefsCompPtr[i];
-				break;
-			}
-		}
-
-		if (eventItemController != nullptr){
-			eventItemController->SetGroupName(groupName);
-			eventItemController->SetScene(m_scenePtr);
-			eventItemController->SetTimeAxis(m_timeAxisPtr);
-			eventItemController->CreateGraphicsItem();
-
-			int totalHeight = 0;
-			for (IEventItemController* item : m_groups){
-				totalHeight += item->GetGroupHeight();
-			}
-
-			eventItemController->GetGraphicsItem()->setParentItem(m_graphicsItem);
-			eventItemController->GetGraphicsItem()->setPos(0, -totalHeight);
-
-			m_groups[groupId] = eventItemController;
-
-			QRectF sceneRect = m_scenePtr->sceneRect();
-
-			totalHeight = 0;
-			for (IEventItemController* item : m_groups){
-				totalHeight += item->GetGroupHeight();
-			}
-
-			sceneRect.setBottom(40 / m_viewPtr->viewportTransform().m22());
-			sceneRect.setTop(-totalHeight);
-
-			m_viewPtr->setSceneRect(sceneRect);
+	for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
+		if (m_groupRefsCompPtr[i]->GetGroupId() == groupId){
+			eventItemController = m_groupRefsCompPtr[i];
+			break;
 		}
 	}
 
+	if (eventItemController != nullptr){
+		eventItemController->SetGroupName(groupName);
+		eventItemController->SetScene(m_scenePtr);
+		eventItemController->SetTimeAxis(m_timeAxisPtr);
+		eventItemController->CreateGraphicsItem();
+
+		int totalHeight = 0;
+		for (IEventItemController* item : m_groups){
+			totalHeight += item->GetGroupHeight();
+		}
+
+		eventItemController->GetGraphicsItem()->setParentItem(m_graphicsItem);
+		eventItemController->GetGraphicsItem()->setPos(0, -totalHeight);
+
+		m_groups[groupId] = eventItemController;
+
+		QRectF sceneRect = m_scenePtr->sceneRect();
+
+		totalHeight = 0;
+		for (IEventItemController* item : m_groups){
+			totalHeight += item->GetGroupHeight();
+		}
+
+		sceneRect.setBottom(40 / m_viewPtr->viewportTransform().m22());
+		sceneRect.setTop(-totalHeight);
+
+		m_viewPtr->setSceneRect(sceneRect);
+	}
+
 	return eventItemController;
+}
+
+
+void CEventGroupControllerComp::AddGroups(const imtlog::IMessageGroupInfoProvider::GroupInfos& groupInfos)
+{
+	for (const imtlog::IMessageGroupInfoProvider::GroupInfo groupInfo : groupInfos){
+		AddGroup(groupInfo.id, groupInfo.name);
+	}
 }
 
 
@@ -182,7 +188,7 @@ bool CEventGroupControllerComp::RemoveGroup(const QByteArray& groupId)
 }
 
 
-bool CEventGroupControllerComp::SetVisible(QByteArray groupId, bool isVisible) const
+bool CEventGroupControllerComp::SetVisible(const QByteArray& groupId, bool isVisible) const
 {
 	if (m_groups.contains(groupId)){
 		m_groups[groupId]->SetVisible(isVisible);
@@ -193,21 +199,21 @@ bool CEventGroupControllerComp::SetVisible(QByteArray groupId, bool isVisible) c
 }
 
 
-void CEventGroupControllerComp::TimeAxisChanged()
+void CEventGroupControllerComp::OnTimeAxisChanged()
 {
 	if (m_groupRefsCompPtr.IsValid()){
 		for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
-			m_groupRefsCompPtr[i]->TimeAxisChanged();
+			m_groupRefsCompPtr[i]->OnTimeAxisChanged();
 		}
 	}
 }
 
 
-double CEventGroupControllerComp::ViewPortChanged()
+double CEventGroupControllerComp::OnViewPortChanged()
 {
 	if (m_groupRefsCompPtr.IsValid()){
 		for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
-			m_groupRefsCompPtr[i]->ViewPortChanged();
+			m_groupRefsCompPtr[i]->OnViewPortChanged();
 		}
 	}
 

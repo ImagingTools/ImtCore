@@ -17,7 +17,7 @@ class CIconBasedEventItem: public CEventItemBase
 public:
 	typedef CEventItemBase BaseClass;
 
-	CIconBasedEventItem(ilog::IMessageConsumer::MessagePtr message, QGraphicsItem* parent = nullptr);
+	CIconBasedEventItem(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent = nullptr);
 
 	void SetIcon(const QIcon& icon);
 	void SetIconSize(const QSize& size);
