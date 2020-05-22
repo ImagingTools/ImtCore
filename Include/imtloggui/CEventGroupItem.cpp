@@ -20,24 +20,45 @@ CEventGroupItem::CEventGroupItem(QGraphicsItem* parent)
 {
 	m_backgroundColor = QColor("#00000000");
 	m_name = QObject::tr("Noname");
+	m_labelPtr = new CEventGroupLabelItem();
+	m_labelPtr->setZValue(1);
+}
+
+
+CEventGroupItem::~CEventGroupItem()
+{
+	if (scene() != nullptr){
+		scene()->removeItem(m_labelPtr);
+	}
+
+	delete m_labelPtr;
 }
 
 
 void CEventGroupItem::SetBackgroundColor(const QColor& color)
 {
 	m_backgroundColor = color;
+	m_labelPtr->SetBackgroundColor(color);
 }
 
 
 void CEventGroupItem::SetGroupName(const QString& name)
 {
 	m_name = name;
+	m_labelPtr->SetGroupName(name);
 }
 
 
-void CEventGroupItem::ViewPortChanged()
+void CEventGroupItem::OnViewPortChanged()
 {
 	update(GetItemVisibleRect());
+
+	QRectF visibleRect = GetSceneVisibleRect();
+	
+	QPointF labelOrigin(visibleRect.left(), pos().y() + rect().center().y());
+	if (m_labelPtr->pos() != labelOrigin){
+		m_labelPtr->setPos(labelOrigin);
+	}
 }
 
 
@@ -45,6 +66,11 @@ void CEventGroupItem::ViewPortChanged()
 
 QRectF CEventGroupItem::boundingRect() const
 {
+	if (m_labelPtr->scene() == nullptr){
+		scene()->addItem(m_labelPtr);
+		m_labelPtr->SetHeight(rect().height());
+	}
+
 	QRectF visibleRect = GetSceneVisibleRect();
 	QRectF itemRect = rect();
 	QPointF origin = itemRect.bottomLeft();
@@ -80,23 +106,6 @@ void CEventGroupItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /
 	painter->setPen(Qt::NoPen);
 	painter->drawRect(boundingRect());
 	painter->restore();
-
-	QRectF sceneVisibleRect = GetSceneVisibleRect();
-
-	QFont font("Helvetica");
-	font.setPointSize(24);
-	QFontMetricsF metrics(font);
-	painter->setFont(font);
-
-	QRectF labelRect = metrics.boundingRect(m_name);
-	labelRect.setWidth(labelRect.width() + 1);
-
-	painter->setRenderHint(QPainter::SmoothPixmapTransform);
-
-	painter->translate(sceneVisibleRect.left(), rect().height() / 2);
-	painter->scale(1 / scaleX, 1 / scaleY);
-	painter->rotate(-90);
-	painter->drawText(QPointF(-labelRect.width() / 2, labelRect.height()), m_name);
 }
 
 

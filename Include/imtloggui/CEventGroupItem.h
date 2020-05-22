@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtWidgets/QGraphicsRectItem>
 
+// ImtCore includes
+#include <imtloggui/CEventGroupLabelItem.h>
+
 
 namespace imtloggui
 {
@@ -15,10 +18,11 @@ public:
 	typedef QGraphicsRectItem BaseClass;
 
 	CEventGroupItem(QGraphicsItem* parent = nullptr);
+	~CEventGroupItem();
 
 	void SetBackgroundColor(const QColor& color);
 	void SetGroupName(const QString& name);
-	void ViewPortChanged();
+	void OnViewPortChanged();
 
 	// reimplemented (QGraphicsItem)
 	virtual QRectF boundingRect() const override;
@@ -33,6 +37,8 @@ private:
 private:
 	QColor m_backgroundColor;
 	QString m_name;
+
+	CEventGroupLabelItem* m_labelPtr;
 };
 
 

@@ -183,7 +183,7 @@ void CSingleLayerGroupComp::OnTimeAxisChanged()
 void CSingleLayerGroupComp::OnViewPortChanged()
 {
 	if (m_graphicsItem != nullptr){
-		m_graphicsItem->ViewPortChanged();
+		m_graphicsItem->OnViewPortChanged();
 	}
 }
 

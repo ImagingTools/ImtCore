@@ -63,6 +63,7 @@ void CEventViewComp::OnGuiCreated()
 	m_timeAxisPtr = new CTimeAxis();
 	m_timeAxisPtr->SetColor(Qt::green);
 	m_timeAxisPtr->setRect(0, 0, 10, 40);
+	m_timeAxisPtr->setZValue(2);
 
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
 	m_viewPtr->setScene(m_scenePtr);
