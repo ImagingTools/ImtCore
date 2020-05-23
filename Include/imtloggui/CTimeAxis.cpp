@@ -7,6 +7,7 @@
 #include <QtGui/QFont>
 #include <QtGui/QPainter>
 #include <QtGui/QPen>
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
@@ -241,7 +242,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 	// Fill the full axis rectangle with the background color:
 	painter->setPen(Qt::transparent);
-	painter->setBrush(Qt::darkGray);
+	painter->setBrush(QApplication::palette().color(QPalette::Background));
 	painter->drawRect(boundingRect());
 
 	if (!m_startTime.isValid() || !m_endTime.isValid()){
@@ -262,7 +263,8 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 		}
 	}
 
-	painter->setPen(Qt::yellow);
+	//	painter->setPen(QApplication::palette().color(QPalette::Text));
+	painter->setPen(QColor("#335777"));
 
 	if (m_startTime == m_endTime){
 		return;
@@ -277,10 +279,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 				continue;
 			}
 
-			painter->save();
-			painter->setPen(Qt::green);
 			painter->drawLine(QLineF(xPos, rect().top() + 1, xPos, rect().top() + itemRect.height() * 0.2));
-			painter->restore();
 		}
 		else if (info.type == TT_MAJOR){
 			double xPos = GetRectPositionFromTime(time) * GetCurrentScale();

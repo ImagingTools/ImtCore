@@ -32,22 +32,16 @@ public:
 	// reimplemented (imtloggui::IEventGroupController)
 	virtual void SetScene(QGraphicsScene* scenePtr) override;
 	virtual void SetTimeAxis(const IEventScenePositionProvider* timeAxisPtr) override;
-
 	virtual bool CreateGraphicsItem() override;
 	virtual bool DestroyGraphicsItem() override;
 	virtual QGraphicsItem* GetGraphicsItem();
-
 	virtual QByteArray GetGroupId() const override;
 	virtual int GetGroupHeight() const override;
-
 	virtual QString GetGroupName() const override;
 	virtual void SetGroupName(const QString& name) override;
-
 	virtual QGraphicsItem* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) override;
 	virtual void ClearEvents() override;
-
 	virtual void SetVisible(bool isVisible) const override;
-
 	virtual void OnTimeAxisChanged() override;
 	virtual void OnViewPortChanged() override;
 

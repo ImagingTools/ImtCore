@@ -18,6 +18,7 @@ namespace imtloggui
 // public methods
 
 // reimplemented (imtloggui::IEventItemFactory)
+
 QGraphicsItem* CIconBasedEventFactoryComp::CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const
 {
 	bool isIdFounded = false;

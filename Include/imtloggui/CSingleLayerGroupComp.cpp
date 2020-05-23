@@ -17,6 +17,8 @@ CSingleLayerGroupComp::CSingleLayerGroupComp()
 }
 
 
+// reimplemented (imtloggui::IEventGroupController)
+
 void CSingleLayerGroupComp::SetScene(QGraphicsScene* scenePtr)
 {
 	if (m_scenePtr != nullptr){
