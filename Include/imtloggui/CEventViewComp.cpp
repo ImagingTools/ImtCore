@@ -87,6 +87,11 @@ void CEventViewComp::OnGuiCreated()
 			imtlog::IMessageGroupInfoProvider::GroupInfos groupInfos = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfos();
 			m_groupControllerCompPtr->AddGroups(groupInfos);
 		}
+
+		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_scaleConstraintsCompPtr.GetPtr());
+		if (modelPtr != nullptr){
+			modelPtr->AttachObserver(this);
+		}
 	}
 }
 
@@ -104,14 +109,20 @@ void CEventViewComp::OnGuiDestroyed()
 }
 
 
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CEventViewComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+{
+	istd::CRange range = GetObservedObject()->GetNumericValueUnitInfo(0)->GetValueRange();
+	m_viewPtr->OnMinimumVerticalScaleChanged(range.GetMinValue());
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CEventViewComp::OnViewPortChanged()
 {
-	double minScale = m_groupControllerCompPtr->OnViewPortChanged();
-	if (minScale != 0){
-		m_viewPtr->OnMinimumVerticalScaleChanged(minScale);
-	}
+	m_groupControllerCompPtr->OnViewPortChanged();
 }
 
 

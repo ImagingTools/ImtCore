@@ -83,13 +83,6 @@ QRectF CEventGroupItem::boundingRect() const
 		itemRect.setRight(visibleRect.right());
 	}
 
-	double scale = GetCurrentScaleX();
-	
-	if (scale > 1){
-		itemRect.setLeft(origin.x() + (itemRect.left() - origin.x()) * scale);
-		itemRect.setRight(origin.x() + (itemRect.right() - origin.x()) * scale);
-	}
-
 	return itemRect;
 }
 

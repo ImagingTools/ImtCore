@@ -7,6 +7,9 @@
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QScrollBar>
 
+// Acf includes
+#include <istd/CChangeNotifier.h>
+
 
 namespace imtloggui
 {
@@ -209,7 +212,7 @@ void CEventGroupControllerComp::OnTimeAxisChanged()
 }
 
 
-double CEventGroupControllerComp::OnViewPortChanged()
+void CEventGroupControllerComp::OnViewPortChanged()
 {
 	if (m_groupRefsCompPtr.IsValid()){
 		for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
@@ -238,11 +241,143 @@ double CEventGroupControllerComp::OnViewPortChanged()
 	
 	if (totalHeight != 0 && m_minimumVerticalScale != minimumVerticalScale){
 		m_minimumVerticalScale = minimumVerticalScale;
-		Q_EMIT MinimumVerticalScaleChanged(minimumVerticalScale);
-		return minimumVerticalScale;
+		m_verticalScaleConstraints.SetMinScale(minimumVerticalScale);
+	}
+}
+
+
+// public methods of the embedded class VerticalScaleConstraints
+
+CEventGroupControllerComp::VerticalScaleConstraints::VerticalScaleConstraints()
+	:m_parentPtr(nullptr),
+	m_minVerticalScale(1)
+{
+}
+
+
+void CEventGroupControllerComp::VerticalScaleConstraints::SetParent(CEventGroupControllerComp* parentPtr)
+{
+	Q_ASSERT(parentPtr != nullptr);
+
+	m_parentPtr = parentPtr;
+}
+
+
+void CEventGroupControllerComp::VerticalScaleConstraints::SetMinScale(double scale)
+{
+	istd::CChangeNotifier notifier(this);
+	m_minVerticalScale = scale;
+}
+
+
+bool CEventGroupControllerComp::VerticalScaleConstraints::IsEqual(const IChangeable& object) const
+{
+	return false;
+}
+
+
+// reimplemented (imeas::INumericConstraints)
+
+const iprm::IOptionsList& CEventGroupControllerComp::VerticalScaleConstraints::GetValueListInfo() const
+{
+	return *this;
+}
+
+
+const imath::IUnitInfo* CEventGroupControllerComp::VerticalScaleConstraints::GetNumericValueUnitInfo(int index) const
+{
+	if (index == 0){
+		return this;
 	}
 
-	return 0;
+	return nullptr;
+}
+
+
+// reimplemented (iprm::IOptionsList)
+
+int CEventGroupControllerComp::VerticalScaleConstraints::GetOptionsFlags() const
+{
+	return SCF_NONE;
+}
+
+
+int CEventGroupControllerComp::VerticalScaleConstraints::GetOptionsCount() const
+{
+	return 1;
+}
+
+
+QString CEventGroupControllerComp::VerticalScaleConstraints::GetOptionName(int index) const
+{
+	if (index == 0){
+		return QObject::tr("MinimumVerticalScale");
+	}
+
+	return QString();
+}
+
+
+QString CEventGroupControllerComp::VerticalScaleConstraints::GetOptionDescription(int index) const
+{
+	return QString();
+}
+
+
+QByteArray CEventGroupControllerComp::VerticalScaleConstraints::GetOptionId(int index) const
+{
+	if (index == 0){
+		return "MinimumVerticalScale";
+	}
+
+	return QByteArray();
+}
+
+
+bool CEventGroupControllerComp::VerticalScaleConstraints::IsOptionEnabled(int index) const
+{
+	return (index == 0);
+}
+
+
+// reimplemented (imath::IUnitInfo)
+
+int CEventGroupControllerComp::VerticalScaleConstraints::GetUnitType() const
+{
+	return UT_RELATIVE;
+}
+
+
+QString CEventGroupControllerComp::VerticalScaleConstraints::GetUnitName() const
+{
+	return QObject::tr("Scale");
+}
+
+
+double CEventGroupControllerComp::VerticalScaleConstraints::GetDisplayMultiplicationFactor() const
+{
+	return 1;
+}
+
+
+istd::CRange CEventGroupControllerComp::VerticalScaleConstraints::GetValueRange() const
+{
+	istd::CRange range(m_minVerticalScale, DBL_MAX);
+	return range;
+}
+
+
+const imath::IDoubleManip& CEventGroupControllerComp::VerticalScaleConstraints::GetValueManip() const
+{
+	return *this;
+}
+
+
+// reimplemented (imath::IDoubleManip)
+
+int CEventGroupControllerComp::VerticalScaleConstraints::GetPrecision() const
+{
+	return 15;
 }
 
 

@@ -36,7 +36,7 @@ public:
 	virtual bool SetVisible(const QByteArray& groupId, bool isVisible) const = 0;
 
 	virtual void OnTimeAxisChanged() = 0;
-	virtual double OnViewPortChanged() = 0;
+	virtual void OnViewPortChanged() = 0;
 };
 
 
