@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QScrollBar>
 
@@ -54,7 +53,6 @@ void CEventGraphicsView::OnMinimumVerticalScaleChanged(double minScale)
 {
 	m_minimumVerticalScale = minScale;
 
-	qDebug() << transform().m22() << minScale;
 	if (transform().m22() < minScale){
 		scale(1, minScale / transform().m22());
 	}

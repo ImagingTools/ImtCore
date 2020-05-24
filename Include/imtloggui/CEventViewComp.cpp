@@ -1,9 +1,6 @@
 #include <imtloggui/CEventViewComp.h>
 
 
-// Qt includes
-#include <QtCore/QDebug>
-
 // ACF includes
 #include <ilog/CMessage.h>
 #include <ilog/CExtMessage.h>

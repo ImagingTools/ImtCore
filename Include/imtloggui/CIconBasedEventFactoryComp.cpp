@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtCore/QObject>
-#include <QtCore/QDebug>
 #include <QtGui/QPainter>
 
 // ImtCore includes

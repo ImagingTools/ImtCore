@@ -1,10 +1,6 @@
 #include <imtloggui/CSingleLayerGroupComp.h>
 
 
-// Qt includes
-#include <QtCore/QDebug>
-
-
 namespace imtloggui
 {
 
@@ -140,13 +136,6 @@ QGraphicsItem* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::Mes
 		itemPtr->setParentItem(m_graphicsItem);
 		itemPtr->setPos(origin);
 		itemPtr->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-
-		m_scenePtr->addItem(itemPtr);
-
-		qDebug() << m_scenePtr->items().count() << m_graphicsItem->childItems().count() << m_graphicsItem->boundingRect();
-		for (QGraphicsItem* item : m_graphicsItem->childItems()){
-			qDebug() << item->pos() << item->boundingRect();
-		}
 
 		m_events.append(itemPtr);
 

@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtCore/QRectF>
 #include <QtGui/QPen>
 #include <QtGui/QPainter>
