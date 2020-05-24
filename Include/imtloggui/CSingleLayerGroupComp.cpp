@@ -50,7 +50,7 @@ bool CSingleLayerGroupComp::CreateGraphicsItem()
 		}
 
 		if (m_groupHeightAttrPtr.IsValid()){
-			m_graphicsItem->setRect(QRectF(0, 0, 10, -*m_groupHeightAttrPtr));
+			m_graphicsItem->setRect(QRectF(0, 0, 0, -*m_groupHeightAttrPtr));
 		}
 
 		m_scenePtr->addItem(m_graphicsItem);
