@@ -26,7 +26,6 @@ namespace imtloggui
 
 class CEventViewComp:
 			public iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp>,
-			imod::TSingleModelObserverBase<imeas::INumericConstraints>,
 			virtual public ilog::IMessageConsumer
 {
 	Q_OBJECT
@@ -42,6 +41,8 @@ public:
 		I_ASSIGN(m_scaleConstraintsCompPtr, "VerticalScaleConstraints", "Vertical scale constraints", true, "");
 	I_END_COMPONENT;
 
+	CEventViewComp();
+
 	// reimplemented (ilog::IMessageConsumer)
 	virtual bool IsMessageSupported(
 				int messageCategory = -1,
@@ -53,14 +54,27 @@ public:
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 
-	// reimplemented (imod::CSingleModelObserverBase)
-	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+	class ScaleConstraintsObserver: public imod::TSingleModelObserverBase<imeas::INumericConstraints>
+	{
+	public:
+		ScaleConstraintsObserver(CEventViewComp& parent);
+
+	protected:
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+
+	private:
+		CEventViewComp& m_parent;
+	};
 
 Q_SIGNALS:
 	void AxisPositionChanged();
 
 public Q_SLOTS:
 	void OnViewPortChanged();
+
+private:
+	void UpdateVerticalRangeScale(const istd::CRange& range);
 
 private:
 	I_REF(IEventGroupController, m_groupControllerCompPtr);
@@ -70,6 +84,8 @@ private:
 	QGraphicsScene* m_scenePtr;
 	CEventGraphicsView* m_viewPtr;
 	CTimeAxis* m_timeAxisPtr;
+
+	ScaleConstraintsObserver m_scaleConstraintsObserver;
 };
 
 

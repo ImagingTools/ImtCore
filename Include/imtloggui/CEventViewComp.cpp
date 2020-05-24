@@ -15,6 +15,17 @@ namespace imtloggui
 {
 
 
+// public methods
+
+CEventViewComp::CEventViewComp()
+	:m_scenePtr(nullptr),
+	m_viewPtr(nullptr),
+	m_timeAxisPtr(nullptr),
+	m_scaleConstraintsObserver(*this)
+{
+}
+
+
 // reimplemented (ilog::IMessageConsumer)
 
 bool CEventViewComp::IsMessageSupported(
@@ -87,7 +98,7 @@ void CEventViewComp::OnGuiCreated()
 
 		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_scaleConstraintsCompPtr.GetPtr());
 		if (modelPtr != nullptr){
-			modelPtr->AttachObserver(this);
+			modelPtr->AttachObserver(&m_scaleConstraintsObserver);
 		}
 	}
 }
@@ -102,16 +113,13 @@ void CEventViewComp::OnGuiDestroyed()
 	delete m_viewPtr;
 	delete m_scenePtr;
 
+
+	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_scaleConstraintsCompPtr.GetPtr());
+	if (modelPtr != nullptr){
+		modelPtr->DetachObserver(&m_scaleConstraintsObserver);
+	}
+
 	BaseClass::OnGuiDestroyed();
-}
-
-
-// reimplemented (imod::CSingleModelObserverBase)
-
-void CEventViewComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
-{
-	istd::CRange range = GetObservedObject()->GetNumericValueUnitInfo(0)->GetValueRange();
-	m_viewPtr->OnMinimumVerticalScaleChanged(range.GetMinValue());
 }
 
 
@@ -120,6 +128,37 @@ void CEventViewComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 void CEventViewComp::OnViewPortChanged()
 {
 	m_groupControllerCompPtr->OnViewPortChanged();
+}
+
+
+// private methods
+
+void CEventViewComp::UpdateVerticalRangeScale(const istd::CRange & range)
+{
+	if (m_viewPtr != nullptr){
+		m_viewPtr->OnMinimumVerticalScaleChanged(range.GetMinValue());
+	}
+}
+
+
+// protected methods of the embedded class ScaleConstraintsObserver
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+CEventViewComp::ScaleConstraintsObserver::ScaleConstraintsObserver(CEventViewComp & parent)
+	:m_parent(parent)
+{
+}
+
+
+void CEventViewComp::ScaleConstraintsObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	imeas::INumericConstraints* constraintsPtr = GetObservedObject();
+	Q_ASSERT(constraintsPtr != nullptr);
+
+	istd::CRange range = constraintsPtr->GetNumericValueUnitInfo(0)->GetValueRange();
+
+	m_parent.UpdateVerticalRangeScale(range);
 }
 
 
