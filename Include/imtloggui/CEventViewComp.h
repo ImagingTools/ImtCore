@@ -5,9 +5,11 @@
 #include <QtWidgets/QGraphicsScene>
 
 // ACF includes
+#include <ibase/ICommandsProvider.h>
 #include <ilog/IMessageConsumer.h>
 #include <imeas/INumericConstraints.h>
 #include <imod/TSingleModelObserverBase.h>
+#include <iqtgui/CHierarchicalCommand.h>
 #include <iqtgui/TDesignerGuiCompBase.h>
 
 // ImtCore includes
@@ -36,6 +38,10 @@ public:
 	
 	I_BEGIN_COMPONENT(CEventViewComp);
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
+		I_REGISTER_SUBELEMENT(Commands);
+		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
+		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
+		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
 		I_ASSIGN(m_messageGroupInfoProviderCompPtr, "MessageGroupInfoProvider", "Message group info provider", false, "")
 		I_ASSIGN(m_groupControllerCompPtr, "EventGroupController", "Event group controller", true, "EventGroupController")
 		I_ASSIGN(m_scaleConstraintsCompPtr, "VerticalScaleConstraints", "Vertical scale constraints", true, "");
@@ -54,6 +60,23 @@ public:
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 
+Q_SIGNALS:
+	void AxisPositionChanged();
+
+public Q_SLOTS:
+	void OnViewPortChanged();
+
+private Q_SLOTS:
+	void OnMoveToFirstToggled();
+	void OnMoveToPreviousData();
+	void OnMoveToNextToggled();
+	void OnMoveToLastToggled();
+
+private:
+	void UpdateVerticalRangeScale(const istd::CRange& range);
+	void UpdateCommands();
+
+private:
 	class ScaleConstraintsObserver: public imod::TSingleModelObserverBase<imeas::INumericConstraints>
 	{
 	public:
@@ -67,19 +90,38 @@ public:
 		CEventViewComp& m_parent;
 	};
 
-Q_SIGNALS:
-	void AxisPositionChanged();
+	class Commands: virtual public ibase::ICommandsProvider
+	{
+	public:
+		Commands();
 
-public Q_SLOTS:
-	void OnViewPortChanged();
+		void SetParent(CEventViewComp* parentPtr);
 
-private:
-	void UpdateVerticalRangeScale(const istd::CRange& range);
+	protected:
+		// reimplemented (ibase::ICommandsProvider)
+		virtual const ibase::IHierarchicalCommand* GetCommands() const override;
+
+	private:
+		CEventViewComp* m_parentPtr;
+	};
+
+	template <typename InterfaceType>
+	static InterfaceType* ExtractCommands(CEventViewComp& component)
+	{
+		return &component.m_commands;
+	}
 
 private:
 	I_REF(IEventGroupController, m_groupControllerCompPtr);
 	I_REF(imtlog::IMessageGroupInfoProvider, m_messageGroupInfoProviderCompPtr);
 	I_REF(imeas::INumericConstraints, m_scaleConstraintsCompPtr);
+
+	imod::TModelWrap<Commands> m_commands;
+	iqtgui::CHierarchicalCommand m_rootCommands;
+	iqtgui::CHierarchicalCommand m_moveToFirstCommand;
+	iqtgui::CHierarchicalCommand m_moveToPreviousCommand;
+	iqtgui::CHierarchicalCommand m_moveToNextCommand;
+	iqtgui::CHierarchicalCommand m_moveToLastCommand;
 
 	QGraphicsScene* m_scenePtr;
 	CEventGraphicsView* m_viewPtr;

@@ -30,7 +30,7 @@ void CEventGraphicsView::setTimeAxis(CTimeAxis* timeAxisPtr)
 }
 
 
-// public slots:
+// public slots
 
 void CEventGraphicsView::OnAxisPositionChanged()
 {
