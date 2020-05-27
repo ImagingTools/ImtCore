@@ -16,15 +16,15 @@ CEventGraphicsView::CEventGraphicsView(QWidget* parent)
 	m_timeAxisPtr(nullptr),
 	m_minimumVerticalScale(1)
 {
-	connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &CEventGraphicsView::rangeChanged);
-	connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::valueChanged);
-	connect(horizontalScrollBar(), &QScrollBar::rangeChanged, this, &CEventGraphicsView::rangeChanged);
-	connect(horizontalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::valueChanged);
-	connect(this, &CEventGraphicsView::AxisPositionChanged, this, &CEventGraphicsView::OnAxisPositionChanged, Qt::QueuedConnection);
+	connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &CEventGraphicsView::OnRangeChanged);
+	connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::OnValueChanged);
+	connect(horizontalScrollBar(), &QScrollBar::rangeChanged, this, &CEventGraphicsView::OnRangeChanged);
+	connect(horizontalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::OnValueChanged);
+	connect(this, &CEventGraphicsView::EmitAxisPositionChanged, this, &CEventGraphicsView::OnAxisPositionChanged, Qt::QueuedConnection);
 }
 
 
-void CEventGraphicsView::setTimeAxis(CTimeAxis* timeAxisPtr)
+void CEventGraphicsView::SetTimeAxis(CTimeAxis* timeAxisPtr)
 {
 	m_timeAxisPtr = timeAxisPtr;
 }
@@ -92,8 +92,8 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 
 	setTransformationAnchor(anchor);
 
-	Q_EMIT AxisPositionChanged();
-	Q_EMIT ViewPortChanged();
+	Q_EMIT EmitAxisPositionChanged();
+	Q_EMIT EmitViewPortChanged();
 }
 
 
@@ -101,24 +101,24 @@ void CEventGraphicsView::resizeEvent(QResizeEvent* event)
 {
 	BaseClass::resizeEvent(event);
 
-	Q_EMIT AxisPositionChanged();
-	Q_EMIT ViewPortChanged();
+	Q_EMIT EmitAxisPositionChanged();
+	Q_EMIT EmitViewPortChanged();
 }
 
 
-// protected slots:
+// private slots:
 
-void CEventGraphicsView::rangeChanged(int /*min*/, int /*max*/)
+void CEventGraphicsView::OnRangeChanged(int /*min*/, int /*max*/)
 {
-	Q_EMIT AxisPositionChanged();
-	Q_EMIT ViewPortChanged();
+	Q_EMIT EmitAxisPositionChanged();
+	Q_EMIT EmitViewPortChanged();
 }
 
 
-void CEventGraphicsView::valueChanged(int /*value*/)
+void CEventGraphicsView::OnValueChanged(int /*value*/)
 {
-	Q_EMIT AxisPositionChanged();
-	Q_EMIT ViewPortChanged();
+	Q_EMIT EmitAxisPositionChanged();
+	Q_EMIT EmitViewPortChanged();
 }
 
 

@@ -29,7 +29,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtloggui::IEventItemFactory)
-	virtual QGraphicsItem* CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const override;
+	virtual CEventItemBase* CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const override;
 
 private:
 	I_MULTIATTR(int, m_idsAttrPtr);

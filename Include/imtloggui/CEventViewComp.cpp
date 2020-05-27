@@ -42,10 +42,10 @@ CEventViewComp::CEventViewComp()
 	m_moveToNextCommand.SetVisuals(tr("Next event"), tr("Next"), tr("Move to next event"), QIcon(":/Icons/Down"));
 	m_moveToLastCommand.SetVisuals(tr("Last event"), tr("Last"), tr("Move to last event"), QIcon(":/Icons/Redo"));
 
-	qDebug() << connect(&m_moveToFirstCommand, &QAction::toggled, this, &CEventViewComp::OnMoveToFirstToggled);
-	qDebug() << connect(&m_moveToPreviousCommand, &QAction::toggled, this, &CEventViewComp::OnMoveToPreviousData);
-	qDebug() << connect(&m_moveToNextCommand, &QAction::toggled, this, &CEventViewComp::OnMoveToNextToggled);
-	qDebug() << connect(&m_moveToLastCommand, &QAction::toggled, this, &CEventViewComp::OnMoveToLastToggled);
+	connect(&m_moveToFirstCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToFirstCommand);
+	connect(&m_moveToPreviousCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToPreviousCommand);
+	connect(&m_moveToNextCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToNextCommand);
+	connect(&m_moveToLastCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToLastCommand);
 }
 
 
@@ -77,7 +77,7 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 			m_timeAxisPtr->EnsureTimeRange(message->GetInformationTimeStamp());
 			eventItemControllerPtr->AddEvent(message);
 	
-			Q_EMIT AxisPositionChanged();
+			Q_EMIT EmitAxisPositionChanged();
 		}
 	}
 }
@@ -100,19 +100,19 @@ void CEventViewComp::OnGuiCreated()
 	m_viewPtr->setScene(m_scenePtr);
 	m_viewPtr->setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 	m_viewPtr->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
-	m_viewPtr->setTimeAxis(m_timeAxisPtr);
+	m_viewPtr->SetTimeAxis(m_timeAxisPtr);
 	GetQtWidget()->layout()->addWidget(m_viewPtr);
 
 	m_scenePtr->addItem(m_timeAxisPtr);
 
-	connect(this, &CEventViewComp::AxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
+	connect(this, &CEventViewComp::EmitAxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
 
 	if (m_groupControllerCompPtr.IsValid()){
 		m_groupControllerCompPtr->SetScene(m_scenePtr);
 		m_groupControllerCompPtr->SetView(m_viewPtr);
 		m_groupControllerCompPtr->SetTimeAxis(m_timeAxisPtr);
 		m_groupControllerCompPtr->CreateGraphicsItem();
-		connect(m_viewPtr, &CEventGraphicsView::ViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
+		connect(m_viewPtr, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
 
 		if (m_messageGroupInfoProviderCompPtr.IsValid()){
 			imtlog::IMessageGroupInfoProvider::GroupInfos groupInfos = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfos();
@@ -129,8 +129,8 @@ void CEventViewComp::OnGuiCreated()
 
 void CEventViewComp::OnGuiDestroyed()
 {
-	disconnect(this, &CEventViewComp::AxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
-	m_viewPtr->setTimeAxis(nullptr);
+	disconnect(this, &CEventViewComp::EmitAxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
+	m_viewPtr->SetTimeAxis(nullptr);
 
 	if (m_timeAxisPtr != nullptr){
 		delete m_timeAxisPtr;
@@ -158,36 +158,178 @@ void CEventViewComp::OnGuiDestroyed()
 void CEventViewComp::OnViewPortChanged()
 {
 	m_groupControllerCompPtr->OnViewPortChanged();
+
+	m_viewPtr->viewportTransform();
 }
 
 
 // private slots
 
-void CEventViewComp::OnMoveToFirstToggled()
+void CEventViewComp::OnMoveToFirstCommand()
 {
-	qDebug() << "First";
+	if (!m_groupControllerCompPtr.IsValid()){
+		return;
+	}
+
+	QDateTime time;
+	for (QByteArray id : m_groupControllerCompPtr->GetActiveGroupList()){
+		IEventItemController* groupPtr = m_groupControllerCompPtr->GetGroup(id);
+
+		const IEventItemController::EventMap* eventMap = groupPtr->GetEvents();
+
+		if (eventMap->isEmpty()){
+			continue;
+		}
+
+		if (!time.isValid() || time > eventMap->firstKey()){
+			time = eventMap->firstKey();
+		}
+	}
+
+	if (!time.isValid()){
+		return;
+	}
+
+	m_currentCommandTime = time;
+
+	MoveToTime(time);
 }
 
 
-void CEventViewComp::OnMoveToPreviousData()
+void CEventViewComp::OnMoveToPreviousCommand()
 {
-	qDebug() << "Previous";
+	if (!m_groupControllerCompPtr.IsValid() || m_timeAxisPtr == nullptr){
+		return;
+	}
+
+	QDateTime currentTime = m_timeAxisPtr->GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+
+	QDateTime time;
+	for (QByteArray id : m_groupControllerCompPtr->GetActiveGroupList()){
+		IEventItemController* groupPtr = m_groupControllerCompPtr->GetGroup(id);
+
+		const IEventItemController::EventMap* eventMap = groupPtr->GetEvents();
+
+		if (eventMap->isEmpty()){
+			continue;
+		}
+
+		IEventItemController::EventMap::const_iterator it = eventMap->lowerBound(currentTime);
+		if (it == eventMap->begin()){
+			continue;
+		}
+
+		it--;
+
+		if (!time.isValid() || time < it.key()){
+			time = it.key();
+		}
+	}
+
+	if (!time.isValid()){
+		return;
+	}
+
+	m_currentCommandTime = time;
+
+	MoveToTime(time);
 }
 
 
-void CEventViewComp::OnMoveToNextToggled()
+void CEventViewComp::OnMoveToNextCommand()
 {
-	qDebug() << "Next";
+	if (!m_groupControllerCompPtr.IsValid() || m_timeAxisPtr == nullptr){
+		return;
+	}
+
+	QDateTime currentTime = m_timeAxisPtr->GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+
+	QDateTime time;
+	for (QByteArray id : m_groupControllerCompPtr->GetActiveGroupList()){
+		IEventItemController* groupPtr = m_groupControllerCompPtr->GetGroup(id);
+
+		const IEventItemController::EventMap* eventMap = groupPtr->GetEvents();
+
+		if (eventMap->isEmpty()){
+			continue;
+		}
+
+		IEventItemController::EventMap::const_iterator it = eventMap->upperBound(currentTime);
+		if (it == eventMap->end()){
+			continue;
+		}
+
+		if (!time.isValid() || time > it.key()){
+			time = it.key();
+		}
+	}
+
+	if (!time.isValid()){
+		return;
+	}
+
+	m_currentCommandTime = time;
+
+	MoveToTime(time);
 }
 
 
-void CEventViewComp::OnMoveToLastToggled()
+void CEventViewComp::OnMoveToLastCommand()
 {
-	qDebug() << "Last";
+	if (!m_groupControllerCompPtr.IsValid()){
+		return;
+	}
+
+	QDateTime time;
+	for (QByteArray id : m_groupControllerCompPtr->GetActiveGroupList()){
+		IEventItemController* groupPtr = m_groupControllerCompPtr->GetGroup(id);
+
+		const IEventItemController::EventMap* eventMap = groupPtr->GetEvents();
+
+		if (eventMap->isEmpty()){
+			continue;
+		}
+
+		if (!time.isValid() || time < eventMap->lastKey()){
+			time = eventMap->lastKey();
+		}
+	}
+
+	if (!time.isValid()){
+		return;
+	}
+
+	m_currentCommandTime = time;
+
+	MoveToTime(time);
 }
 
 
 // private methods
+
+QRectF CEventViewComp::GetSceneVisibleRect() const
+{
+	if (m_viewPtr == nullptr){
+		return QRectF();
+	}
+
+	QRect viewportRect = m_viewPtr->viewport()->rect();
+
+	QRectF visibleSceneRect = m_viewPtr->mapToScene(viewportRect).boundingRect();
+
+	return visibleSceneRect;
+}
+
+
+double CEventViewComp::GetCurrentScaleX() const
+{
+	if (m_viewPtr != nullptr){
+		return m_viewPtr->viewportTransform().m11();
+	}
+
+	return 0;
+}
+
 
 void CEventViewComp::UpdateVerticalRangeScale(const istd::CRange & range)
 {
@@ -202,6 +344,28 @@ void CEventViewComp::UpdateCommands()
 	static istd::IChangeable::ChangeSet changes(ibase::ICommandsProvider::CF_COMMANDS);
 
 	istd::CChangeNotifier changeNotifier(&m_commands, &changes);
+}
+
+
+void CEventViewComp::MoveToTime(const QDateTime& time)
+{
+	double beginTime = m_timeAxisPtr->GetBeginTime().toSecsSinceEpoch();
+	double endTime = m_timeAxisPtr->GetEndTime().toSecsSinceEpoch();
+	double currentTime = time.toMSecsSinceEpoch()/1000.0;
+
+	if (currentTime <  beginTime || currentTime > endTime){
+		return;
+	}
+
+	double visibleTime = m_viewPtr->viewport()->rect().width() / GetCurrentScaleX();
+
+	if ((currentTime - beginTime > visibleTime / 2) && (endTime - currentTime > visibleTime / 2)){
+		double newViewPortPos = currentTime - visibleTime / 2;
+		QTransform matrix = m_viewPtr->viewportTransform();
+		matrix.translate((matrix.m31() - newViewPortPos) * GetCurrentScaleX(), 0);
+		//m_viewPtr->setTransform(matrix);
+		return;
+	}
 }
 
 

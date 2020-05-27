@@ -7,6 +7,9 @@
 // Qt includes
 #include <QtWidgets/QGraphicsItem>
 
+// ImtCore includes
+#include <imtloggui/CEventItemBase.h>
+
 
 namespace imtloggui
 {
@@ -19,7 +22,7 @@ namespace imtloggui
 class IEventItemFactory
 {
 public:
-	virtual QGraphicsItem* CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const = 0;
+	virtual CEventItemBase* CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const = 0;
 };
 
 

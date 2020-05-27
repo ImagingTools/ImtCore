@@ -30,8 +30,6 @@ public:
 
 	CTimeAxis(QGraphicsItem* parent = nullptr);
 
-	const QDateTime& GetStartOfRange() const;
-	const QDateTime& GetEndOfRange() const;
 	void SetColor(const QColor& color);
 	void EnsureTimeRange(const QDateTime& time);
 	int GetMargin();
@@ -50,9 +48,11 @@ public:
 	virtual QDateTime GetTimeFromScenePosition(double position) const override;
 	virtual QDateTime GetBeginTime() const;
 	virtual QDateTime GetEndTime() const;
+	virtual QDateTime GetVisibleBeginTime() const;
+	virtual QDateTime GetVisibleEndTime() const;
 
 Q_SIGNALS:
-	void AxisChanged();
+	void EmitAxisChanged();
 
 protected:
 	enum TickType

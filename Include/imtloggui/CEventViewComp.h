@@ -61,20 +61,23 @@ public:
 	virtual void OnGuiDestroyed() override;
 
 Q_SIGNALS:
-	void AxisPositionChanged();
+	void EmitAxisPositionChanged();
 
 public Q_SLOTS:
 	void OnViewPortChanged();
 
 private Q_SLOTS:
-	void OnMoveToFirstToggled();
-	void OnMoveToPreviousData();
-	void OnMoveToNextToggled();
-	void OnMoveToLastToggled();
+	void OnMoveToFirstCommand();
+	void OnMoveToPreviousCommand();
+	void OnMoveToNextCommand();
+	void OnMoveToLastCommand();
 
 private:
+	QRectF GetSceneVisibleRect() const;
+	double GetCurrentScaleX() const;
 	void UpdateVerticalRangeScale(const istd::CRange& range);
 	void UpdateCommands();
+	void MoveToTime(const QDateTime& time);
 
 private:
 	class ScaleConstraintsObserver: public imod::TSingleModelObserverBase<imeas::INumericConstraints>
@@ -128,6 +131,8 @@ private:
 	CTimeAxis* m_timeAxisPtr;
 
 	ScaleConstraintsObserver m_scaleConstraintsObserver;
+
+	QDateTime m_currentCommandTime;
 };
 
 

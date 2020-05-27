@@ -35,6 +35,16 @@ public:
 		Get end time at axis X.
 	*/
 	virtual QDateTime GetEndTime() const = 0;
+
+	/**
+		Get begin time at axis X for visible region.
+	*/
+	virtual QDateTime GetVisibleBeginTime() const = 0;
+
+	/**
+		Get end time at axis X for visible region.
+	*/
+	virtual QDateTime GetVisibleEndTime() const = 0;
 };
 
 

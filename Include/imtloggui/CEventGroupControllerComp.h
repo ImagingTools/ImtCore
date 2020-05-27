@@ -60,7 +60,7 @@ public:
 	virtual void OnViewPortChanged() override;
 
 Q_SIGNALS:
-	void MinimumVerticalScaleChanged(double scale);
+	void EmitMinimumVerticalScaleChanged(double scale);
 
 protected:
 	class VerticalScaleConstraints:
@@ -119,7 +119,8 @@ private:
 
 	QGraphicsItemGroup* m_graphicsItem;
 	
-	QMap<QByteArray, IEventItemController*> m_groups;
+	typedef QMap<QByteArray, IEventItemController*> GroupList;
+	GroupList m_groups;
 
 	QGraphicsScene* m_scenePtr;
 	QGraphicsView* m_viewPtr;

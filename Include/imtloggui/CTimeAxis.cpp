@@ -35,18 +35,6 @@ CTimeAxis::CTimeAxis(QGraphicsItem* parent)
 }
 
 
-const QDateTime& CTimeAxis::GetStartOfRange() const
-{
-	return m_startTime;
-}
-
-
-const QDateTime& CTimeAxis::GetEndOfRange() const
-{
-	return m_endTime;
-}
-
-
 void CTimeAxis::SetColor(const QColor& color)
 {
 	m_color = color;
@@ -104,7 +92,7 @@ void CTimeAxis::EnsureTimeRange(const QDateTime& time)
 	setRect(0, 0, m_startTime.secsTo(m_endTime), 40);
 	if (m_baseTime != m_startTime){
 		m_baseTime = m_startTime;
-		Q_EMIT AxisChanged();
+		Q_EMIT EmitAxisChanged();
 	}
 }
 
@@ -309,7 +297,7 @@ void CTimeAxis::setPos(const QPointF &origin)
 {
 	if (origin != pos()){
 		BaseClass::setPos(origin);
-		Q_EMIT AxisChanged();
+		Q_EMIT EmitAxisChanged();
 	}
 }
 
@@ -372,6 +360,22 @@ QDateTime CTimeAxis::GetBeginTime() const
 QDateTime CTimeAxis::GetEndTime() const
 {
 	return m_endTime;
+}
+
+
+QDateTime CTimeAxis::GetVisibleBeginTime() const
+{
+	QRectF axisVisibleRect = GetAxisVisibleRect();
+
+	return GetTimeFromRectPosition(axisVisibleRect.left());
+}
+
+
+QDateTime CTimeAxis::GetVisibleEndTime() const
+{
+	QRectF axisVisibleRect = GetAxisVisibleRect();
+
+	return GetTimeFromRectPosition(axisVisibleRect.right());
 }
 
 

@@ -1,6 +1,12 @@
 #include <imtloggui/CSingleLayerGroupComp.h>
 
 
+// Qt includes
+#include <QtCore/QDebug>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+
+
 namespace imtloggui
 {
 
@@ -94,7 +100,7 @@ int CSingleLayerGroupComp::GetGroupHeight() const
 		return *m_groupHeightAttrPtr;
 	}
 
-	return 0;
+	return 150;
 }
 
 
@@ -113,10 +119,16 @@ void CSingleLayerGroupComp::SetGroupName(const QString& name)
 }
 
 
-QGraphicsItem* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr)
+const IEventItemController::EventMap* CSingleLayerGroupComp::GetEvents() const
+{
+	return &m_events;
+}
+
+
+CEventItemBase* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr)
 {
 	if (m_eventItemFactoryCompPtr.IsValid() && m_graphicsItem){
-		QGraphicsItem* itemPtr = nullptr;
+		CEventItemBase* itemPtr = nullptr;
 
 		for (int i = 0; i < m_eventItemFactoryCompPtr.GetCount(); i++){
 			itemPtr = m_eventItemFactoryCompPtr[i]->CreateInstance(messagePtr);
@@ -137,7 +149,7 @@ QGraphicsItem* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::Mes
 		itemPtr->setPos(origin);
 		itemPtr->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
-		m_events.append(itemPtr);
+		m_events.insert(messagePtr->GetInformationTimeStamp() ,itemPtr);
 
 		return itemPtr;
 	}
@@ -176,6 +188,62 @@ void CSingleLayerGroupComp::OnViewPortChanged()
 	if (m_graphicsItem != nullptr){
 		m_graphicsItem->OnViewPortChanged();
 	}
+
+	ArrangeEvents();
+}
+
+
+// private methods
+
+double CSingleLayerGroupComp::GetCurrentScaleX() const
+{
+	if (m_scenePtr != nullptr){
+		return m_scenePtr->views().first()->viewportTransform().m11();
+	}
+
+	return 0;
+}
+
+
+double CSingleLayerGroupComp::GetCurrentScaleY() const
+{
+	if (m_scenePtr != nullptr){
+		return m_scenePtr->views().first()->viewportTransform().m22();
+	}
+
+	return 0;
+}
+
+
+void CSingleLayerGroupComp::ArrangeEvents()
+{
+	//if (m_events.isEmpty()){
+	//	return;
+	//}
+
+	//double scaleX = GetCurrentScaleX();
+	//double scaleY = GetCurrentScaleX();
+
+	//if (!(scaleX && scaleY)){
+	//	return;
+	//}
+
+	//double groupHeight = GetGroupHeight() * scaleY;
+
+	//QDateTime beginTime = m_timeAxisPtr->GetVisibleBeginTime();
+	//QDateTime endTime = m_timeAxisPtr->GetVisibleEndTime();
+
+	//EventMap::iterator beginIt = m_events.lowerBound(beginTime);
+	//EventMap::iterator endIt = m_events.upperBound(endTime);
+
+	//QRectF itemRect = m_events.first()->boundingRect();
+
+	//int rowCount = groupHeight / itemRect.height();
+	////double 
+	//
+	//for (EventMap::iterator it = beginIt; it != endIt; it++){
+	//	//qDebug() << it.key();
+	//}
 }
 
 

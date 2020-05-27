@@ -22,11 +22,11 @@ public:
 
 	CEventGraphicsView(QWidget* parent = nullptr);
 
-	void setTimeAxis(CTimeAxis* timeAxisPtr);
+	void SetTimeAxis(CTimeAxis* timeAxisPtr);
 
 Q_SIGNALS:
-	void AxisPositionChanged();
-	void ViewPortChanged();
+	void EmitAxisPositionChanged();
+	void EmitViewPortChanged();
 
 public Q_SLOTS:
 	void OnAxisPositionChanged();
@@ -37,9 +37,9 @@ protected:
 	void wheelEvent(QWheelEvent* event) override;
 	void resizeEvent(QResizeEvent* event) override;
 
-protected Q_SLOTS:
-	void rangeChanged(int min, int max);
-	void valueChanged(int value);
+private Q_SLOTS:
+	void OnRangeChanged(int min, int max);
+	void OnValueChanged(int value);
 
 private:
 	QRectF SceneVisibleRect() const;

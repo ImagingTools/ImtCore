@@ -86,7 +86,7 @@ QByteArrayList CEventGroupControllerComp::GetAvailableGroupList() const
 	QByteArrayList result;
 
 	for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
-		IEventItemController* eventItemControllerPtr = m_groupRefsCompPtr[i];
+		IEventItemController* eventItemControllerPtr = dynamic_cast<IEventItemController*>(m_groupRefsCompPtr[i]);
 		if (eventItemControllerPtr != nullptr){
 			result.append(m_groupRefsCompPtr[i]->GetGroupId());
 		}

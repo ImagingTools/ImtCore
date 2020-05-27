@@ -39,11 +39,17 @@ public:
 	virtual int GetGroupHeight() const override;
 	virtual QString GetGroupName() const override;
 	virtual void SetGroupName(const QString& name) override;
-	virtual QGraphicsItem* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) override;
+	virtual const EventMap* GetEvents() const override;
+	virtual CEventItemBase* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) override;
 	virtual void ClearEvents() override;
 	virtual void SetVisible(bool isVisible) const override;
 	virtual void OnTimeAxisChanged() override;
 	virtual void OnViewPortChanged() override;
+
+private:
+	double GetCurrentScaleX() const;
+	double GetCurrentScaleY() const;
+	void ArrangeEvents();
 
 private:
 	I_ATTR(QByteArray, m_groupIdAttrPtr);
@@ -55,8 +61,9 @@ private:
 	const IEventScenePositionProvider* m_timeAxisPtr;
 
 	CEventGroupItem* m_graphicsItem;
-	QList<QGraphicsItem*> m_events;
 	QString m_groupName;
+
+	EventMap m_events;
 };
 
 
