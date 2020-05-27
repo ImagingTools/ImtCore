@@ -44,7 +44,6 @@ public:
 	virtual void SetScene(QGraphicsScene* scenePtr) override;
 	virtual void SetView(QGraphicsView* viewPtr) override;
 	virtual void SetTimeAxis(const IEventScenePositionProvider* timeAxisPtr) override;
-
 	virtual bool CreateGraphicsItem() override;
 	virtual bool DestroyGraphicsItem() override;
 	virtual QGraphicsItem* GetGraphicsItem() override;
@@ -53,13 +52,10 @@ public:
 	virtual QByteArrayList GetActiveGroupList() const override;
 	virtual IEventItemController* GetGroup(const QByteArray& groupId) const override;
 	virtual QString GetGroupName(const QByteArray& groupId) const override;
-
 	virtual IEventItemController* AddGroup(const QByteArray& groupId, const QString& groupName) override;
 	virtual void AddGroups(const imtlog::IMessageGroupInfoProvider::GroupInfos& groupInfos) override;
 	virtual bool RemoveGroup(const QByteArray& groupId) override;
-
 	virtual bool SetVisible(const QByteArray& groupId, bool isVisible) const override;
-
 	virtual void OnTimeAxisChanged() override;
 	virtual void OnViewPortChanged() override;
 

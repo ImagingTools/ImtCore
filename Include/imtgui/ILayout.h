@@ -13,7 +13,7 @@ namespace imtgui
 {
 
 
-class ILayout : virtual public iser::ISerializable
+class ILayout: virtual public iser::ISerializable
 {
 public:
 	typedef QList<int> SizeList;
