@@ -26,7 +26,7 @@ public:
 
 Q_SIGNALS:
 	void EmitAxisPositionChanged();
-	void EmitViewPortChanged();
+	void EmitViewPortChanged(bool userAction);
 
 public Q_SLOTS:
 	void OnAxisPositionChanged();
@@ -34,8 +34,13 @@ public Q_SLOTS:
 
 protected:
 	// reimplemented (QGraphicsView)
-	void wheelEvent(QWheelEvent* event) override;
-	void resizeEvent(QResizeEvent* event) override;
+	virtual void wheelEvent(QWheelEvent* event) override;
+	virtual void resizeEvent(QResizeEvent* event) override;
+	virtual void mousePressEvent(QMouseEvent *event) override;
+	virtual void mouseReleaseEvent(QMouseEvent *event) override;
+
+	// reimplemented (QObject)
+	virtual bool eventFilter(QObject *, QEvent *) override;
 
 private Q_SLOTS:
 	void OnRangeChanged(int min, int max);
@@ -47,6 +52,7 @@ private:
 private:
 	CTimeAxis* m_timeAxisPtr;
 
+	double m_userAction;
 	double m_minimumVerticalScale;
 };
 

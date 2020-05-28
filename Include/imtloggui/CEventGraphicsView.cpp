@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QDebug>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QScrollBar>
 
@@ -14,13 +15,16 @@ namespace imtloggui
 CEventGraphicsView::CEventGraphicsView(QWidget* parent)
 	:QGraphicsView(parent),
 	m_timeAxisPtr(nullptr),
-	m_minimumVerticalScale(1)
+	m_minimumVerticalScale(1),
+	m_userAction(false)
 {
 	connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &CEventGraphicsView::OnRangeChanged);
 	connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::OnValueChanged);
 	connect(horizontalScrollBar(), &QScrollBar::rangeChanged, this, &CEventGraphicsView::OnRangeChanged);
 	connect(horizontalScrollBar(), &QScrollBar::valueChanged, this, &CEventGraphicsView::OnValueChanged);
 	connect(this, &CEventGraphicsView::EmitAxisPositionChanged, this, &CEventGraphicsView::OnAxisPositionChanged, Qt::QueuedConnection);
+
+	horizontalScrollBar()->installEventFilter(this);
 }
 
 
@@ -93,7 +97,7 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 	setTransformationAnchor(anchor);
 
 	Q_EMIT EmitAxisPositionChanged();
-	Q_EMIT EmitViewPortChanged();
+	Q_EMIT EmitViewPortChanged(true);
 }
 
 
@@ -102,7 +106,37 @@ void CEventGraphicsView::resizeEvent(QResizeEvent* event)
 	BaseClass::resizeEvent(event);
 
 	Q_EMIT EmitAxisPositionChanged();
-	Q_EMIT EmitViewPortChanged();
+	Q_EMIT EmitViewPortChanged(true);
+}
+
+
+void CEventGraphicsView::mousePressEvent(QMouseEvent *event)
+{
+	m_userAction = true;
+	BaseClass::mousePressEvent(event);
+}
+
+
+void CEventGraphicsView::mouseReleaseEvent(QMouseEvent *event)
+{
+	m_userAction = false;
+	BaseClass::mouseReleaseEvent(event);
+}
+
+
+// reimplemented (QObject)
+
+bool CEventGraphicsView::eventFilter(QObject* watched, QEvent* event)
+{
+	if (event->type() == QEvent::MouseButtonPress){
+		m_userAction = true;
+	}
+
+	if (event->type() == QEvent::MouseButtonRelease){
+		m_userAction = false;
+	}
+
+	return false;
 }
 
 
@@ -111,14 +145,14 @@ void CEventGraphicsView::resizeEvent(QResizeEvent* event)
 void CEventGraphicsView::OnRangeChanged(int /*min*/, int /*max*/)
 {
 	Q_EMIT EmitAxisPositionChanged();
-	Q_EMIT EmitViewPortChanged();
+	Q_EMIT EmitViewPortChanged(m_userAction);
 }
 
 
 void CEventGraphicsView::OnValueChanged(int /*value*/)
 {
 	Q_EMIT EmitAxisPositionChanged();
-	Q_EMIT EmitViewPortChanged();
+	Q_EMIT EmitViewPortChanged(m_userAction);
 }
 
 

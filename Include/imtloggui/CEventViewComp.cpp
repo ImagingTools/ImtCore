@@ -107,13 +107,13 @@ void CEventViewComp::OnGuiCreated()
 	m_scenePtr->addItem(m_timeAxisPtr);
 
 	connect(this, &CEventViewComp::EmitAxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
+	connect(m_viewPtr, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
 
 	if (m_groupControllerCompPtr.IsValid()){
 		m_groupControllerCompPtr->SetScene(m_scenePtr);
 		m_groupControllerCompPtr->SetView(m_viewPtr);
 		m_groupControllerCompPtr->SetTimeAxis(m_timeAxisPtr);
 		m_groupControllerCompPtr->CreateGraphicsItem();
-		connect(m_viewPtr, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
 
 		if (m_messageGroupInfoProviderCompPtr.IsValid()){
 			imtlog::IMessageGroupInfoProvider::GroupInfos groupInfos = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfos();
@@ -156,11 +156,13 @@ void CEventViewComp::OnGuiDestroyed()
 
 // public slots
 
-void CEventViewComp::OnViewPortChanged()
+void CEventViewComp::OnViewPortChanged(bool userAction)
 {
 	m_groupControllerCompPtr->OnViewPortChanged();
 
-	m_viewPtr->viewportTransform();
+	if (userAction){
+		m_currentCommandTime = QDateTime();
+	}
 }
 
 
@@ -203,7 +205,13 @@ void CEventViewComp::OnMoveToPreviousCommand()
 		return;
 	}
 
-	QDateTime currentTime = m_timeAxisPtr->GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+	QDateTime currentTime;
+	if (m_currentCommandTime.isValid()){
+		currentTime = m_currentCommandTime;
+	}
+	else{
+		currentTime = m_timeAxisPtr->GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+	}
 
 	QDateTime time;
 	for (QByteArray id : m_groupControllerCompPtr->GetActiveGroupList()){
@@ -243,7 +251,13 @@ void CEventViewComp::OnMoveToNextCommand()
 		return;
 	}
 
-	QDateTime currentTime = m_timeAxisPtr->GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+	QDateTime currentTime;
+	if (m_currentCommandTime.isValid()){
+		currentTime = m_currentCommandTime;
+	}
+	else{
+		currentTime = m_timeAxisPtr->GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+	}
 
 	QDateTime time;
 	for (QByteArray id : m_groupControllerCompPtr->GetActiveGroupList()){
