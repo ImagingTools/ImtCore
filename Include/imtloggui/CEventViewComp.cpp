@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QDebug>
+#include <QtWidgets/QScrollBar>
 
 // ACF includes
 #include <ilog/CMessage.h>
@@ -349,9 +350,9 @@ void CEventViewComp::UpdateCommands()
 
 void CEventViewComp::MoveToTime(const QDateTime& time)
 {
-	double beginTime = m_timeAxisPtr->GetBeginTime().toSecsSinceEpoch();
-	double endTime = m_timeAxisPtr->GetEndTime().toSecsSinceEpoch();
-	double currentTime = time.toMSecsSinceEpoch()/1000.0;
+	double beginTime = m_timeAxisPtr->GetBeginTime().toMSecsSinceEpoch() / 1000.0;
+	double endTime = m_timeAxisPtr->GetEndTime().toMSecsSinceEpoch() / 1000.0;
+	double currentTime = time.toMSecsSinceEpoch() / 1000.0;
 
 	if (currentTime <  beginTime || currentTime > endTime){
 		return;
@@ -360,11 +361,25 @@ void CEventViewComp::MoveToTime(const QDateTime& time)
 	double visibleTime = m_viewPtr->viewport()->rect().width() / GetCurrentScaleX();
 
 	if ((currentTime - beginTime > visibleTime / 2) && (endTime - currentTime > visibleTime / 2)){
-		double newViewPortPos = currentTime - visibleTime / 2;
-		QTransform matrix = m_viewPtr->viewportTransform();
-		matrix.translate((matrix.m31() - newViewPortPos) * GetCurrentScaleX(), 0);
-		//m_viewPtr->setTransform(matrix);
-		return;
+		QRectF rect = GetSceneVisibleRect();
+		double center = rect.center().x();
+		double newCenter = m_timeAxisPtr->GetScenePositionFromTime(time);
+
+		rect.translate(newCenter - center, 0);
+		m_viewPtr->ensureVisible(rect, 0, 0);
+	}
+	else{
+		double delta = qMin(currentTime - beginTime, endTime - currentTime);	
+
+		m_viewPtr->scale(GetSceneVisibleRect().width() / (2 * delta), 1);
+
+		QRectF rect = GetSceneVisibleRect();
+		double center = rect.center().x();
+		double newCenter = m_timeAxisPtr->GetScenePositionFromTime(time);
+
+		rect.setWidth(2 * delta);
+		rect.translate(newCenter - center, 0);
+		m_viewPtr->ensureVisible(rect, 0, 0);
 	}
 }
 
