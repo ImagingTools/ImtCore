@@ -1,6 +1,10 @@
 #pragma once
 
 
+// ACF includes
+#include <istd/IChangeable.h>
+
+
 namespace imtbase
 {
 

@@ -16,6 +16,7 @@
 #include <imtbase/CLocalizedHelpPathProviderComp.h>
 #include <imtbase/CCompositeObjectPersistenceComp.h>
 #include <imtbase/CParamsManagerAdapterComp.h>
+#include <imtbase/CCollectionObjectExtractorComp.h>
 
 
 /**
@@ -35,7 +36,7 @@ typedef icomp::TModelCompWrap<imtbase::COptionsListAdapterComp> OptionsListAdapt
 typedef imtbase::CLocalizedHelpPathProviderComp LocalizedHelpPathProvider;
 typedef imtbase::CCompositeObjectPersistenceComp CompositeObjectPersistence;
 typedef icomp::TModelCompWrap<imtbase::CParamsManagerAdapterComp> ParamsManagerAdapter;
-
+typedef imtbase::CCollectionObjectExtractorComp CollectionObjectExtractor;
 
 } // namespace ImtCorePck
 

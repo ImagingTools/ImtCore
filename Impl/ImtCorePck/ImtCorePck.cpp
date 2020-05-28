@@ -64,6 +64,11 @@ I_EXPORT_COMPONENT(
 			"Adapter of object collection to the parameter manager interface",
 			"Object Collection Params Manager Adapter");
 
+I_EXPORT_COMPONENT(
+			CollectionObjectExtractor,
+			"Collection-related object extractor",
+			"Object Collection Data Extractor");
+
 
 } // namespace ImtCorePck
 
