@@ -63,10 +63,8 @@ public:
 Q_SIGNALS:
 	void EmitAxisPositionChanged();
 
-public Q_SLOTS:
-	void OnViewPortChanged(bool userAction);
-
 private Q_SLOTS:
+	void OnViewPortChanged(bool userAction);
 	void OnMoveToFirstCommand();
 	void OnMoveToPreviousCommand();
 	void OnMoveToNextCommand();

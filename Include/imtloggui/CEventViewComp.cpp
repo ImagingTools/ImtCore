@@ -154,7 +154,7 @@ void CEventViewComp::OnGuiDestroyed()
 }
 
 
-// public slots
+// private slots
 
 void CEventViewComp::OnViewPortChanged(bool userAction)
 {
@@ -165,8 +165,6 @@ void CEventViewComp::OnViewPortChanged(bool userAction)
 	}
 }
 
-
-// private slots
 
 void CEventViewComp::OnMoveToFirstCommand()
 {

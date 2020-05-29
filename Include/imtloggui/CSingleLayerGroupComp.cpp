@@ -217,33 +217,77 @@ double CSingleLayerGroupComp::GetCurrentScaleY() const
 
 void CSingleLayerGroupComp::ArrangeEvents()
 {
-	//if (m_events.isEmpty()){
-	//	return;
-	//}
+	double scaleX = GetCurrentScaleX();
+	double scaleY = GetCurrentScaleY();
 
-	//double scaleX = GetCurrentScaleX();
-	//double scaleY = GetCurrentScaleX();
+	if (!(scaleX && scaleY)){
+		return;
+	}
 
-	//if (!(scaleX && scaleY)){
-	//	return;
-	//}
+	double groupHeight = GetGroupHeight() * scaleY; // in pixels
+	
+	QDateTime beginTime = m_timeAxisPtr->GetVisibleBeginTime();
+	QDateTime endTime = m_timeAxisPtr->GetVisibleEndTime();
 
-	//double groupHeight = GetGroupHeight() * scaleY;
+	EventMap::iterator beginIt = m_events.lowerBound(beginTime);
+	EventMap::iterator endIt = m_events.upperBound(endTime);
 
-	//QDateTime beginTime = m_timeAxisPtr->GetVisibleBeginTime();
-	//QDateTime endTime = m_timeAxisPtr->GetVisibleEndTime();
+	QList<CEventItemBase*> arrangedItems;
+	double arrangedHeight = 0;
 
-	//EventMap::iterator beginIt = m_events.lowerBound(beginTime);
-	//EventMap::iterator endIt = m_events.upperBound(endTime);
+	for (EventMap::iterator it = beginIt; it != endIt; it++){
+		CEventItemBase* currentPtr = it.value();
+		QRectF currentRect = currentPtr->boundingRect();
+		QPointF currentPos = currentPtr->pos();
 
-	//QRectF itemRect = m_events.first()->boundingRect();
+		// Current stairway is empty
+		if (arrangedItems.isEmpty()){
+			arrangedItems.append(currentPtr);
+			currentPos.ry() = (-groupHeight / 2) / scaleY;
+			currentPtr->setPos(currentPos);
+			arrangedHeight = currentRect.height();
+			continue;
+		}
 
-	//int rowCount = groupHeight / itemRect.height();
-	////double 
-	//
-	//for (EventMap::iterator it = beginIt; it != endIt; it++){
-	//	//qDebug() << it.key();
-	//}
+		CEventItemBase* lastPtr = arrangedItems.last();
+
+		// Distances in pixels
+		double posDist = (currentPos.x() - lastPtr->pos().x()) * scaleX;
+		double itemsDist = (currentRect.width() + lastPtr->boundingRect().width()) / 2;
+
+		// Ñurrent and previous items don't intersect along the x axis. Begin new stairway
+		if (posDist > itemsDist){
+			currentPos.ry() = (-groupHeight / 2) / scaleY;
+			currentPtr->setPos(currentPos);
+			arrangedHeight = currentRect.height();
+			arrangedItems.clear();
+			arrangedItems.append(currentPtr);
+			continue;
+		}
+
+		// Current stairway can grow up
+		if (arrangedHeight + currentRect.height() < groupHeight){
+			// Shift up stairway
+			for (CEventItemBase* itemPtr : arrangedItems){
+				QPointF pos = itemPtr->pos();
+				pos.ry() -= (currentRect.height() / 2) / scaleY;
+				itemPtr->setPos(pos);
+			}
+
+			currentPos.ry() = lastPtr->pos().y() + (lastPtr->boundingRect().height() / 2 + currentRect.height() / 2) / scaleY;
+			currentPtr->setPos(currentPos);
+			arrangedHeight += currentRect.height();
+			arrangedItems.append(currentPtr);
+			continue;
+		}
+
+		// Current stairway can't grow up. Begin new stairway
+		currentPos.ry() = (-groupHeight / 2) / scaleY;
+		currentPtr->setPos(currentPos);
+		arrangedHeight = currentRect.height();
+		arrangedItems.clear();
+		arrangedItems.append(currentPtr);
+	}
 }
 
 
