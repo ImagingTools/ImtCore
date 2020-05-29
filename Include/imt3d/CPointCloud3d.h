@@ -32,7 +32,6 @@ public:
 	virtual bool InsertPoints(
 				int pointsCount,
 				const void* dataPtr) override;
-	virtual void* GetData() const override;
 
 	// reimplemented (imt3d::IGridInfo)
 	istd::CIndex2d GetGridSize() const override;

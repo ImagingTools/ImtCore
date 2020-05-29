@@ -61,11 +61,6 @@ bool CPointCloud3d::InsertPoints(
 	return Append(pointsCount, dataPtr);
 }
 
-void* CPointCloud3d::GetData() const
-{
-	return m_dataPtr;
-}
-
 
 // reimplemented (imt3d::IGridInfo)
 

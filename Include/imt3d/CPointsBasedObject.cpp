@@ -76,7 +76,14 @@ const void* CPointsBasedObject::GetPointData(int pointIndex) const
 void* CPointsBasedObject::GetPointData(int pointIndex)
 {
 	const CPointsBasedObject* constThis = static_cast<const CPointsBasedObject*>(this);
+
 	return const_cast<void*>(constThis->GetPointData(pointIndex));
+}
+
+
+void* CPointsBasedObject::GetData() const
+{
+	return m_dataPtr;
 }
 
 

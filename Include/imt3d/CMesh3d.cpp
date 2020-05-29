@@ -128,6 +128,29 @@ bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, void* pointsD
 }
 
 
+bool CMesh3d::InsertData(int pointsCount, void * pointsDataPtr, const Indices& indices)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	int oldPointsSize = GetPointsCount();
+
+	if (BaseClass::Append(pointsCount, pointsDataPtr)){
+		Indices newIndices = indices;
+		for (std::vector<uint32_t>& face : newIndices){
+			for (uint32_t& i : face){
+				i += oldPointsSize;
+			}
+		}
+
+		m_indices.insert(m_indices.end(), newIndices.begin(), newIndices.end()); 
+
+		return true;
+	}
+
+	return false;
+}
+
+
 const IMesh3d::Indices& CMesh3d::GetIndices() const
 {
 	return m_indices;

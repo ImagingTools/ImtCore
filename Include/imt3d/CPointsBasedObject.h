@@ -26,6 +26,7 @@ public:
 	int GetPointsCount() const override;
 	const void* GetPointData(int pointIndex) const override;
 	void* GetPointData(int pointIndex) override;
+	virtual void* GetData() const override;
 
 	// reimplemented (imt3d::IObject3d)
 	bool IsEmpty() const override;

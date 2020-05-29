@@ -84,6 +84,11 @@ public:
 		Get read-only access to the point data buffer.
 	*/
 	virtual const void* GetPointData(int pointIndex) const = 0;
+
+	/**
+		Return pointer to the internal data buffer.
+	*/
+	virtual void* GetData() const = 0;
 };
 
 

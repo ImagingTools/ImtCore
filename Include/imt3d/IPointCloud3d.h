@@ -40,11 +40,6 @@ public:
 	virtual bool InsertPoints(
 				int pointsCount,
 				const void* dataPtr) = 0;
-
-	/**
-		Return pointer to actual data
-	*/
-	virtual void* GetData() const = 0;
 };
 
 
