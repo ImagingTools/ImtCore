@@ -19,7 +19,8 @@ namespace imt3d
 class IMesh3d: virtual public IPointsBasedObject
 {
 public:
-	typedef std::vector<std::vector<uint32_t>> Indices;
+	typedef std::vector<uint32_t> Face;
+	typedef std::vector<Face> Indices;
 
 	/**
 		Create mesh with specified point format.

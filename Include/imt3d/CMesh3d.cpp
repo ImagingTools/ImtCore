@@ -136,7 +136,7 @@ bool CMesh3d::InsertData(int pointsCount, void * pointsDataPtr, const Indices& i
 
 	if (BaseClass::Append(pointsCount, pointsDataPtr)){
 		Indices newIndices = indices;
-		for (std::vector<uint32_t>& face : newIndices){
+		for (Face& face : newIndices){
 			for (uint32_t& i : face){
 				i += oldPointsSize;
 			}
