@@ -131,7 +131,8 @@ protected:
 	IntervalsInfo CalculateIntervals(double scale) const;
 	Ticks CalculateTicks(const IntervalsInfo& intervalsInfo) const;
 
-	double GetCurrentScale() const;
+	double GetCurrentScaleX() const;
+	double GetCurrentScaleY() const;
 	QRectF GetSceneVisibleRect() const;
 	QRectF GetAxisVisibleRect() const;
 

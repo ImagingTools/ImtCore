@@ -26,8 +26,6 @@ CTimeAxis::CTimeAxis(QGraphicsItem* parent)
 {
 	setZValue(100000);
 
-	setFlags(ItemIgnoresTransformations);
-
 	m_startTime = QDateTime();
 	m_endTime = QDateTime();
 
@@ -208,14 +206,14 @@ QRectF CTimeAxis::boundingRect() const
 	axisRect.setBottom(rect().height());
 
 	// Left and right marings for the drawing the first and last tick labels:
-	axisRect.adjust(-100, 0, 100, 0);
+	axisRect.adjust(-100 / GetCurrentScaleX(), 0, 100 / GetCurrentScaleX(), 0);
 
-	double scale = GetCurrentScale();
-	
-	if (scale > 1){
-		axisRect.setLeft(origin.x() + (axisRect.left() - origin.x()) * scale);
-		axisRect.setRight(origin.x() + (axisRect.right() - origin.x()) * scale);
-	}
+	//double scale = GetCurrentScale();
+	//
+	//if (scale > 1){
+	//	axisRect.setLeft(origin.x() + (axisRect.left() - origin.x()) * scale);
+	//	axisRect.setRight(origin.x() + (axisRect.right() - origin.x()) * scale);
+	//}
 
 	return axisRect;
 }
@@ -236,7 +234,10 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 		return;
 	}
 
-	IntervalsInfo intervalsInfo = CalculateIntervals(GetCurrentScale());
+	double scaleX = GetCurrentScaleX();
+	double scaleY = GetCurrentScaleY();
+
+	IntervalsInfo intervalsInfo = CalculateIntervals(scaleX);
 	Ticks ticks = CalculateTicks(intervalsInfo);
 
 	// Logical rectangle for the defined time range:
@@ -250,8 +251,9 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 		}
 	}
 
-	//	painter->setPen(QApplication::palette().color(QPalette::Text));
-	painter->setPen(QColor("#335777"));
+	QPen pen(QBrush(), 1, Qt::SolidLine, Qt::FlatCap);
+	pen.setColor(QColor("#335777"));
+	painter->setPen(pen);
 
 	if (m_startTime == m_endTime){
 		return;
@@ -261,30 +263,35 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 	for (QDateTime time : ticks.keys()){
 		TickInfo info = ticks[time];
 		if (info.type == TT_MINOR){
-			double xPos = GetRectPositionFromTime(time) * GetCurrentScale();
+			double xPos = GetRectPositionFromTime(time);
 			if (xPos < 0){
 				continue;
 			}
 
-			painter->drawLine(QLineF(xPos, rect().top() + 1, xPos, rect().top() + itemRect.height() * 0.2));
+			pen.setWidthF(1 / scaleX);
+			painter->setPen(pen);
+			painter->drawLine(QLineF(xPos, (rect().top() + 1) / scaleY, xPos, (rect().top() + itemRect.height() * 0.2) / scaleY));
 		}
 		else if (info.type == TT_MAJOR){
-			double xPos = GetRectPositionFromTime(time) * GetCurrentScale();
+			double xPos = GetRectPositionFromTime(time);
 			if (xPos < 0){
 				continue;
 			}
 			
-			painter->drawLine(QLineF(xPos, rect().top() + 1, xPos, itemRect.bottom() - itemRect.height() / 1.5));
+			pen.setWidthF(3 / scaleX);
+			painter->setPen(pen);
+			painter->drawLine(QLineF(xPos, (rect().top() + 1) / scaleY, xPos, (itemRect.bottom() - itemRect.height() / 1.5) / scaleY));
 			
 			QString labelText = time.toString(info.timeFormat);
 			
 			QTransform savedTransform = painter->transform();
 			QTransform newTransform = savedTransform;
 
-			newTransform.translate(xPos - labelWidth / 2, itemRect.top() + itemRect.height() * 3 / 4);
-				
+			newTransform.translate(xPos, (itemRect.top() + itemRect.height() * 3 / 4) / scaleY);
+			newTransform.scale(1 / scaleX, 1 / scaleY);
+
 			painter->setTransform(newTransform);
-			painter->drawText(0, 0, labelText);
+			painter->drawText(-labelWidth / 2, 0, labelText);
 			painter->setTransform(savedTransform);
 		}
 	}
@@ -614,9 +621,15 @@ CTimeAxis::Ticks CTimeAxis::CalculateTicks(const IntervalsInfo& intervalsInfo) c
 }
 
 
-double CTimeAxis::GetCurrentScale() const
+double CTimeAxis::GetCurrentScaleX() const
 {
 	return scene()->views().first()->viewportTransform().m11();
+}
+
+
+double CTimeAxis::GetCurrentScaleY() const
+{
+	return scene()->views().first()->viewportTransform().m22();
 }
 
 
