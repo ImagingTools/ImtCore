@@ -1131,7 +1131,7 @@ bool CObjectCollectionViewComp::ItemProxyModel::filterAcceptsRow(int sourceRow, 
 
 // protected methods of the embedded class FocusDecorationFactory
 
-// reimplemented (iGraphicsEffectFactory)
+// reimplemented (IGraphicsEffectFactory)
 
 QGraphicsEffect* CObjectCollectionViewComp::FocusDecorationFactory::CreateInstance(const QByteArray& /*keyId*/) const
 {

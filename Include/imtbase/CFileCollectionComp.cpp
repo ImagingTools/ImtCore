@@ -733,7 +733,7 @@ QVariant CFileCollectionComp::GetElementInfo(const QByteArray& elementId, int in
 
 int CFileCollectionComp::GetSupportedOperations() const
 {
-	return SO_CLONE | SO_COMPARE | SO_COPY | SO_RESET;
+	return SO_CLONE | SO_COPY | SO_RESET;
 }
 
 
@@ -750,17 +750,6 @@ bool CFileCollectionComp::CopyFrom(const istd::IChangeable& object, Compatibilit
 		}
 
 		return true;
-	}
-
-	return false;
-}
-
-
-bool CFileCollectionComp::IsEqual(const IChangeable & object) const
-{
-	const CFileCollectionComp* sourcePtr = dynamic_cast<const CFileCollectionComp*>(&object);
-	if (sourcePtr != NULL){
-		return 0;//(m_files == sourcePtr->m_files);
 	}
 
 	return false;
