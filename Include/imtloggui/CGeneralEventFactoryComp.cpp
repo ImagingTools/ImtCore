@@ -54,7 +54,7 @@ CEventItemBase* CGeneralEventFactoryComp::CreateInstance(const ilog::IMessageCon
 		icon = QIcon(":/Icons/StateOk");
 		break;
 	case istd::IInformationProvider::IC_WARNING:
-		icon = QIcon(":/Icons/Warning");
+		icon = QIcon(":/Icons/StateWarning");
 		break;
 	case istd::IInformationProvider::IC_ERROR:
 		icon = QIcon(":/Icons/Error");
