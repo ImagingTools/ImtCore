@@ -7,3 +7,8 @@ INCLUDEPATH += $(IMTCOREDIR)/$$AUXINCLUDEDIR
 
 LIBS += -L$$PWD/../../Lib/$$COMPILER_DIR
 
+win32{
+	LIBS += -ladvapi32 -luser32
+}
+
+
