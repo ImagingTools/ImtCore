@@ -37,6 +37,12 @@ I_EXPORT_COMPONENT(
 
 
 I_EXPORT_COMPONENT(
+			GeneralEventFactory,
+			"General event factory",
+			"General Icon Event Item Factory");
+
+
+I_EXPORT_COMPONENT(
 			EventGroupController,
 			"Event group controller",
 			"Event Group Controller");
