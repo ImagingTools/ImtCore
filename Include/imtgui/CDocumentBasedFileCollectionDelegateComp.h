@@ -144,15 +144,11 @@ private:
 	I_REF(idoc::IDocumentManager, m_documentManagerCompPtr);
 	I_REF(imod::IModel, m_documentManagerModelCompPtr);
 
-
 	/**
 		View used for showing the information about the currently selected item.
 	*/
 	I_REF(iqtgui::IGuiObject, m_informationViewCompPtr);
 
-	/**
-
-	*/
 	ifile::IFileMetaInfoProvider::MetaInfoPtr m_selectedMetaInfoPtr;
 
 	typedef istd::TPointerVector<ICollectionViewDelegate::ObjectInfo> WorkingObjects;

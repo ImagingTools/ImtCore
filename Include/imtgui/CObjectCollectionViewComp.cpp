@@ -698,14 +698,16 @@ void CObjectCollectionViewComp::UpdateTypeStatus()
 {
 	for (int delegateIndex = 0; delegateIndex < m_viewDelegatesCompPtr.GetCount(); ++delegateIndex){
 		ICollectionViewDelegate* delegatePtr = m_viewDelegatesCompPtr[delegateIndex];
-		QByteArray delegateTypeId = delegatePtr->GetSupportedTypeId();
+		if (delegatePtr != nullptr){
+			QByteArray delegateTypeId = delegatePtr->GetSupportedTypeId();
 
-		for (int itemIndex = 0; itemIndex < TypeList->topLevelItemCount(); itemIndex++){
-			QByteArray itemTypeId = TypeList->topLevelItem(itemIndex)->data(0, DR_TYPE_ID).toByteArray();
-			if (delegateTypeId == itemTypeId){
-				TypeList->topLevelItem(itemIndex)->setIcon(0, delegatePtr->GetDocumentTypeStatus().GetStatusIcon());
-				TypeList->topLevelItem(itemIndex)->setToolTip(0, delegatePtr->GetDocumentTypeStatus().GetStatusText());
-				break;
+			for (int itemIndex = 0; itemIndex < TypeList->topLevelItemCount(); itemIndex++){
+				QByteArray itemTypeId = TypeList->topLevelItem(itemIndex)->data(0, DR_TYPE_ID).toByteArray();
+				if (delegateTypeId == itemTypeId){
+					TypeList->topLevelItem(itemIndex)->setIcon(0, delegatePtr->GetDocumentTypeStatus().GetStatusIcon());
+					TypeList->topLevelItem(itemIndex)->setToolTip(0, delegatePtr->GetDocumentTypeStatus().GetStatusText());
+					break;
+				}
 			}
 		}
 	}

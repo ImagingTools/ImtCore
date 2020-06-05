@@ -124,6 +124,8 @@ QString CEventGroupControllerComp::GetGroupName(const QByteArray& groupId) const
 
 IEventItemController* CEventGroupControllerComp::AddGroup(const QByteArray& groupId, const QString& groupName)
 {
+	return nullptr;
+
 	if (m_groups.contains(groupId)){
 		return m_groups[groupId];
 	}
