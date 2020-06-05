@@ -212,10 +212,12 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 				
 				istd::CRange depthRange(minValue, maxValue);
 
-				int lineBytesCount = inputBitmapPtr->GetLineBytesCount();
-
 				if (CreateDepthBitmap(depthRange, size)){
-					return BaseClass::CopyFrom(object, mode);
+					bool retVal = BaseClass::CopyFrom(object, mode);
+
+					EnsureMetaInfoCreated();
+
+					return retVal;
 				}
 			}
 		}
@@ -277,7 +279,12 @@ bool CDepthBitmap::ResetData(CompatibilityMode mode)
 	}
 
 	m_colorMapType = CMT_GRAY;
+
 	m_depthRange = istd::CRange();
+
+	SetCalibration(nullptr, false);
+
+	EnsureMetaInfoCreated();
 
 	return true;
 }
