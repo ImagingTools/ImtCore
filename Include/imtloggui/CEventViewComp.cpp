@@ -77,8 +77,6 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 		if (eventItemControllerPtr != nullptr){
 			m_timeAxisPtr->EnsureTimeRange(message->GetInformationTimeStamp());
 			eventItemControllerPtr->AddEvent(message);
-	
-			Q_EMIT EmitAxisPositionChanged();
 		}
 	}
 }
@@ -92,45 +90,70 @@ void CEventViewComp::OnGuiCreated()
 
 	m_scenePtr = new QGraphicsScene(GetQtWidget());
 
+	//m_containerPtr = new QGraphicsItemGroup();
+	//m_scenePtr->addItem(m_containerPtr);
+
 	m_timeAxisPtr = new CTimeAxis();
 	m_timeAxisPtr->SetColor(Qt::green);
-	m_timeAxisPtr->setRect(0, 0, 0, 40);
+	m_timeAxisPtr->setRect(0, 0, 100, 40);
 	m_timeAxisPtr->setZValue(2);
+
+	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
+	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime().addYears(10));
 
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
 	m_viewPtr->setScene(m_scenePtr);
 	m_viewPtr->setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-	m_viewPtr->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+	//m_viewPtr->setDragMode(QGraphicsView::ScrollHandDrag);
+	m_viewPtr->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_viewPtr->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_viewPtr->setMouseTracking(false);
 	m_viewPtr->SetTimeAxis(m_timeAxisPtr);
+	//m_viewPtr->SetContainer(m_containerPtr);
+
 	GetQtWidget()->layout()->addWidget(m_viewPtr);
 
-	m_scenePtr->addItem(m_timeAxisPtr);
+//	QGraphicsRectItem* rectPtr = m_scenePtr->addRect(0,0,20,20);
+//	rectPtr->setPos(10000000, 0);
 
-	connect(this, &CEventViewComp::EmitAxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
+//	m_containerPtr->addToGroup(rectPtr);
+
+	m_viewPtr->SetViewRect(QRectF(-10, -100, 50, 140));
+
+	m_scenePtr->addItem(m_timeAxisPtr);
+	//m_containerPtr->addToGroup(m_timeAxisPtr);
+
+	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisPosChanged, this, &CEventViewComp::OnAxisPosChanged);
+	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CEventViewComp::OnAxisBeginTimeChanged);
+	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisEndTimeChanged, this, &CEventViewComp::OnAxisEndTimeChanged);
 	connect(m_viewPtr, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
 
-	if (m_groupControllerCompPtr.IsValid()){
-		m_groupControllerCompPtr->SetScene(m_scenePtr);
-		m_groupControllerCompPtr->SetView(m_viewPtr);
-		m_groupControllerCompPtr->SetTimeAxis(m_timeAxisPtr);
-		m_groupControllerCompPtr->CreateGraphicsItem();
+	//if (m_groupControllerCompPtr.IsValid()){
+	//	m_groupControllerCompPtr->SetScene(m_scenePtr);
+	//	m_groupControllerCompPtr->SetView(m_viewPtr);
+	//	m_groupControllerCompPtr->SetTimeAxis(m_timeAxisPtr);
+	//	m_groupControllerCompPtr->CreateGraphicsItem();
 
-		if (m_messageGroupInfoProviderCompPtr.IsValid()){
-			imtlog::IMessageGroupInfoProvider::GroupInfos groupInfos = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfos();
-			m_groupControllerCompPtr->AddGroups(groupInfos);
-		}
+	//	if (m_messageGroupInfoProviderCompPtr.IsValid()){
+	//		imtlog::IMessageGroupInfoProvider::GroupInfos groupInfos = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfos();
+	//		m_groupControllerCompPtr->AddGroups(groupInfos);
+	//	}
 
-		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_scaleConstraintsCompPtr.GetPtr());
-		if (modelPtr != nullptr){
-			modelPtr->AttachObserver(&m_scaleConstraintsObserver);
-		}
-	}
+	//	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_scaleConstraintsCompPtr.GetPtr());
+	//	if (modelPtr != nullptr){
+	//		modelPtr->AttachObserver(&m_scaleConstraintsObserver);
+	//	}
+	//}
 }
 
 
 void CEventViewComp::OnGuiDestroyed()
 {
-	disconnect(this, &CEventViewComp::EmitAxisPositionChanged, m_viewPtr, &CEventGraphicsView::OnAxisPositionChanged);
+	disconnect(m_timeAxisPtr, &CTimeAxis::EmitAxisPosChanged, this, &CEventViewComp::OnAxisPosChanged);
+	disconnect(m_timeAxisPtr, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CEventViewComp::OnAxisBeginTimeChanged);
+	disconnect(m_timeAxisPtr, &CTimeAxis::EmitAxisEndTimeChanged, this, &CEventViewComp::OnAxisEndTimeChanged);
+	disconnect(m_viewPtr, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
+
 	m_viewPtr->SetTimeAxis(nullptr);
 
 	if (m_timeAxisPtr != nullptr){
@@ -158,11 +181,52 @@ void CEventViewComp::OnGuiDestroyed()
 
 void CEventViewComp::OnViewPortChanged(bool userAction)
 {
-	m_groupControllerCompPtr->OnViewPortChanged();
+	if (m_timeAxisPtr != nullptr){
+		QRectF visibleRect = m_viewPtr->GetSceneVisibleRect();
+		
+		m_timeAxisPtr->setPos(0, visibleRect.bottom() - m_timeAxisPtr->rect().height() / m_viewPtr->GetScaleY());
+		m_timeAxisPtr->OnViewPortChanged();
+
+		QRectF rect = m_viewPtr->sceneRect();
+
+		if (m_timeAxisPtr != nullptr){
+			rect.setLeft(m_timeAxisPtr->rect().left() - 100 / m_viewPtr->GetScaleX());
+			rect.setRight(m_timeAxisPtr->rect().right() + 100 / m_viewPtr->GetScaleX());
+			//m_viewPtr->SetViewRect(rect);
+		}
+	}
+
+	//if (m_groupControllerCompPtr.IsValid()){
+	//	m_groupControllerCompPtr->OnViewPortChanged();
+	//}
 
 	if (userAction){
 		m_currentCommandTime = QDateTime();
 	}
+}
+
+
+void CEventViewComp::OnAxisPosChanged()
+{
+
+}
+
+
+void CEventViewComp::OnAxisBeginTimeChanged()
+{
+
+}
+
+
+void CEventViewComp::OnAxisEndTimeChanged()
+{
+
+}
+
+
+void CEventViewComp::OnAxisReposition()
+{
+
 }
 
 
@@ -344,7 +408,7 @@ double CEventViewComp::GetCurrentScaleX() const
 }
 
 
-void CEventViewComp::UpdateVerticalRangeScale(const istd::CRange & range)
+void CEventViewComp::UpdateVerticalRangeScale(const istd::CRange & range) const
 {
 	if (m_viewPtr != nullptr){
 		m_viewPtr->OnMinimumVerticalScaleChanged(range.GetMinValue());

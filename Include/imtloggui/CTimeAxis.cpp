@@ -26,7 +26,7 @@ CTimeAxis::CTimeAxis(QGraphicsItem* parent)
 {
 	setZValue(100000);
 
-	m_startTime = QDateTime();
+	m_beginTime = QDateTime();
 	m_endTime = QDateTime();
 
 	CreateTimeItemTable();
@@ -44,8 +44,6 @@ void CTimeAxis::EnsureTimeRange(const QDateTime& time)
 	if (!m_firstEvent.isValid()){
 		m_firstEvent = time;
 		m_lastEvent = time;
-		m_startTime = time;
-		m_endTime = time;
 	}
 
 	if (time < m_firstEvent){
@@ -58,39 +56,54 @@ void CTimeAxis::EnsureTimeRange(const QDateTime& time)
 
 	qint64 range = m_firstEvent.secsTo(m_lastEvent);
 
-	if (range > QUA_MONTH){
-		m_startTime.setDate(QDate(m_firstEvent.date().year(), 1, 1));
-		m_startTime.setTime(QTime(0, 0));
+	QDateTime beginTime;
+	QDateTime endTime;
 
-		m_endTime.setDate(QDate(m_lastEvent.date().year(), 1, 1));
-		m_endTime.setTime(QTime(0, 0));
-		m_endTime = m_endTime.addMonths(1);
+	if (range > QUA_MONTH){
+		beginTime.setDate(QDate(m_firstEvent.date().year(), 1, 1));
+		beginTime.setTime(QTime(0, 0));
+
+		endTime.setDate(QDate(m_lastEvent.date().year(), 1, 1));
+		endTime.setTime(QTime(0, 0));
+		endTime = endTime.addMonths(1);
 	}
 	else if (range > QUA_DAY){
-		m_startTime.setDate(m_firstEvent.date());
-		m_startTime.setTime(QTime(0, 0));
+		beginTime.setDate(m_firstEvent.date());
+		beginTime.setTime(QTime(0, 0));
 
-		m_endTime.setDate(m_lastEvent.date());
-		m_endTime.setTime(QTime(0, 0));
-		m_endTime = m_endTime.addDays(1);
+		endTime.setDate(m_lastEvent.date());
+		endTime.setTime(QTime(0, 0));
+		endTime = endTime.addDays(1);
 	}
 	else{
-		m_startTime.setDate(m_firstEvent.date());
-		m_startTime.setTime(QTime(m_firstEvent.time().hour(), 0));
+		beginTime.setDate(m_firstEvent.date());
+		beginTime.setTime(QTime(m_firstEvent.time().hour(), 0));
 
-		m_endTime.setDate(m_lastEvent.date());
-		m_endTime.setTime(QTime(m_lastEvent.time().hour(), 0));
-		m_endTime = m_endTime.addSecs(3600);
-
-		if (!m_baseTime.isValid()){
-			m_baseTime = m_startTime;
-		}
+		endTime.setDate(m_lastEvent.date());
+		endTime.setTime(QTime(m_lastEvent.time().hour(), 0));
+		endTime = endTime.addSecs(3600);
 	}
 
-	setRect(0, 0, m_startTime.secsTo(m_endTime), 40);
-	if (m_baseTime != m_startTime){
-		m_baseTime = m_startTime;
-		Q_EMIT EmitAxisChanged();
+	bool isBeginTimeChanged = false;
+	bool isEndTimeChanged = false;
+
+	if (m_beginTime != beginTime){
+		m_beginTime = beginTime;
+		isBeginTimeChanged = true;
+	}
+
+	if (m_endTime != endTime){
+		m_endTime  = endTime;
+		isEndTimeChanged = true;
+	}
+
+	setRect(0, 0, m_beginTime.secsTo(m_endTime), 40);
+
+	if (isBeginTimeChanged){
+		Q_EMIT EmitAxisBeginTimeChanged();
+	}
+	else if (isEndTimeChanged){
+		Q_EMIT EmitAxisEndTimeChanged();
 	}
 }
 
@@ -186,34 +199,34 @@ void CTimeAxis::CreateTimeItemTable()
 }
 
 
+void CTimeAxis::OnViewPortChanged()
+{
+	prepareGeometryChange();
+}
+
+
 // reimplemented (QGraphicsRectItem)
 
 QRectF CTimeAxis::boundingRect() const
 {
-	QRectF visibleRect = GetSceneVisibleRect();
+	QRectF visibleRect = mapRectFromScene(GetSceneVisibleRect());
 	QRectF axisRect = rect();
-	QPointF origin = axisRect.bottomLeft();
 
-	if (visibleRect.left() < axisRect.left()){
+	//QPointF origin = axisRect.bottomLeft();
+
+	if (visibleRect.left() > axisRect.left()){
 		axisRect.setLeft(visibleRect.left());
 	}
 
-	if (visibleRect.right() > axisRect.right()){
+	if (visibleRect.right() < axisRect.right()){
 		axisRect.setRight(visibleRect.right());
 	}
 
-	axisRect.setTop(0);
-	axisRect.setBottom(rect().height());
+	//axisRect.setTop(0);
+	//axisRect.setBottom(rect().height());
 
-	// Left and right marings for the drawing the first and last tick labels:
-	axisRect.adjust(-100 / GetCurrentScaleX(), 0, 100 / GetCurrentScaleX(), 0);
-
-	//double scale = GetCurrentScale();
-	//
-	//if (scale > 1){
-	//	axisRect.setLeft(origin.x() + (axisRect.left() - origin.x()) * scale);
-	//	axisRect.setRight(origin.x() + (axisRect.right() - origin.x()) * scale);
-	//}
+	//// Left and right marings for the drawing the first and last tick labels:
+	//axisRect.adjust(-100 / GetCurrentScaleX(), 0, 100 / GetCurrentScaleX(), 0);
 
 	return axisRect;
 }
@@ -228,9 +241,10 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 	// Fill the full axis rectangle with the background color:
 	painter->setPen(Qt::transparent);
 	painter->setBrush(QApplication::palette().color(QPalette::Background));
-	painter->drawRect(boundingRect());
+	QRectF visibleRect = GetAxisVisibleRect();
+	painter->drawRect(visibleRect);
 
-	if (!m_startTime.isValid() || !m_endTime.isValid()){
+	if (!m_beginTime.isValid() || !m_endTime.isValid()){
 		return;
 	}
 
@@ -255,7 +269,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 	pen.setColor(QColor("#335777"));
 	painter->setPen(pen);
 
-	if (m_startTime == m_endTime){
+	if (m_beginTime == m_endTime){
 		return;
 	}
 
@@ -304,7 +318,7 @@ void CTimeAxis::setPos(const QPointF &origin)
 {
 	if (origin != pos()){
 		BaseClass::setPos(origin);
-		Q_EMIT EmitAxisChanged();
+		Q_EMIT EmitAxisPosChanged();
 	}
 }
 
@@ -319,26 +333,26 @@ void CTimeAxis::setPos(double x, double y)
 
 double CTimeAxis::GetScenePositionFromTime(const QDateTime& time) const
 {
-	if (!m_startTime.isValid() || !m_endTime.isValid()){
+	if (!m_beginTime.isValid() || !m_endTime.isValid()){
 		return DBL_MIN;
 	}
 
-	if (time < m_startTime || time > m_endTime){
+	if (time < m_beginTime || time > m_endTime){
 		return DBL_MIN;
 	}
 
-	if (m_startTime == m_endTime){
+	if (m_beginTime == m_endTime){
 		return pos().x();
 	}
 
-	double delta = time.toMSecsSinceEpoch() - m_startTime.toMSecsSinceEpoch();
+	double delta = time.toMSecsSinceEpoch() - m_beginTime.toMSecsSinceEpoch();
 
 	return pos().x() + delta / 1000;
 }
 
 QDateTime CTimeAxis::GetTimeFromScenePosition(double position) const
 {
-	if (!m_startTime.isValid() || !m_endTime.isValid()){
+	if (!m_beginTime.isValid() || !m_endTime.isValid()){
 		return QDateTime();
 	}
 
@@ -346,21 +360,21 @@ QDateTime CTimeAxis::GetTimeFromScenePosition(double position) const
 		return QDateTime();
 	}
 
-	if (m_startTime == m_endTime){
+	if (m_beginTime == m_endTime){
 		if (qFuzzyCompare(position, pos().x())){
-			return m_startTime;
+			return m_beginTime;
 		}
 
 		return QDateTime();
 	}
 
-	return QDateTime::fromMSecsSinceEpoch(m_startTime.toMSecsSinceEpoch() + m_startTime.msecsTo(m_endTime) * (position - pos().x()) / rect().width());
+	return QDateTime::fromMSecsSinceEpoch(m_beginTime.toMSecsSinceEpoch() + m_beginTime.msecsTo(m_endTime) * (position - pos().x()) / rect().width());
 }
 
 
 QDateTime CTimeAxis::GetBeginTime() const
 {
-	return m_startTime;
+	return m_beginTime;
 }
 
 
@@ -655,11 +669,11 @@ QRectF CTimeAxis::GetSceneVisibleRect() const
 
 QRectF CTimeAxis::GetAxisVisibleRect() const
 {
-	QRectF sceneVisibleRect = GetSceneVisibleRect();
+	QRectF sceneVisibleRect = mapRectFromScene(GetSceneVisibleRect());
 	QRectF axisRect = rect();
 	
-	axisRect.setTop(sceneVisibleRect.top());
-	axisRect.setBottom(sceneVisibleRect.bottom());
+	//axisRect.setTop(sceneVisibleRect.top());
+	//axisRect.setBottom(sceneVisibleRect.bottom());
 
 	return axisRect.intersected(sceneVisibleRect);
 }
@@ -667,23 +681,23 @@ QRectF CTimeAxis::GetAxisVisibleRect() const
 
 double CTimeAxis::GetRectPositionFromTime(const QDateTime& time) const
 {
-	if (!m_startTime.isValid() || !m_endTime.isValid()){
+	if (!m_beginTime.isValid() || !m_endTime.isValid()){
 		return -1;
 	}
 
-	if (time < m_startTime || time > m_endTime){
+	if (time < m_beginTime || time > m_endTime){
 		return -1;
 	}
 
-	if (m_startTime == m_endTime){
-		if (time == m_startTime){
+	if (m_beginTime == m_endTime){
+		if (time == m_beginTime){
 			return rect().left();
 		}
 
 		return -1;
 	}
 
-	double delta = time.toMSecsSinceEpoch() - m_startTime.toMSecsSinceEpoch();
+	double delta = time.toMSecsSinceEpoch() - m_beginTime.toMSecsSinceEpoch();
 
 	return rect().left() + delta / 1000;
 }
@@ -691,7 +705,7 @@ double CTimeAxis::GetRectPositionFromTime(const QDateTime& time) const
 
 QDateTime CTimeAxis::GetTimeFromRectPosition(double position) const
 {
-	if (!m_startTime.isValid() || !m_endTime.isValid()){
+	if (!m_beginTime.isValid() || !m_endTime.isValid()){
 		return QDateTime();
 	}
 
@@ -699,15 +713,15 @@ QDateTime CTimeAxis::GetTimeFromRectPosition(double position) const
 		return QDateTime();
 	}
 
-	if (m_startTime == m_endTime){
+	if (m_beginTime == m_endTime){
 		if (qFuzzyCompare(position, rect().left())){
-			return m_startTime;
+			return m_beginTime;
 		}
 
 		return QDateTime();
 	}
 
-	return QDateTime::fromMSecsSinceEpoch(m_startTime.toMSecsSinceEpoch() + m_startTime.msecsTo(m_endTime) * (position - rect().left()) / rect().width());
+	return QDateTime::fromMSecsSinceEpoch(m_beginTime.toMSecsSinceEpoch() + m_beginTime.msecsTo(m_endTime) * (position - rect().left()) / rect().width());
 }
 
 

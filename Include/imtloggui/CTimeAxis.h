@@ -34,6 +34,7 @@ public:
 	void EnsureTimeRange(const QDateTime& time);
 	int GetMargin();
 	void CreateTimeItemTable();
+	void OnViewPortChanged();
 
 	// reimplemented (QGraphicsRectItem)
 	virtual QRectF boundingRect() const override;
@@ -52,7 +53,9 @@ public:
 	virtual QDateTime GetVisibleEndTime() const;
 
 Q_SIGNALS:
-	void EmitAxisChanged();
+	void EmitAxisPosChanged();
+	void EmitAxisBeginTimeChanged();
+	void EmitAxisEndTimeChanged();
 
 protected:
 	enum TickType
@@ -140,10 +143,9 @@ protected:
 	QDateTime GetTimeFromRectPosition(double position) const;
 
 private:
-	QDateTime m_baseTime;
 	QDateTime m_firstEvent;
 	QDateTime m_lastEvent;
-	QDateTime m_startTime;
+	QDateTime m_beginTime;
 	QDateTime m_endTime;
 	QColor m_color;
 	QFontMetrics m_fontMetrics;

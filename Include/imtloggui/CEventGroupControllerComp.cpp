@@ -163,7 +163,7 @@ IEventItemController* CEventGroupControllerComp::AddGroup(const QByteArray& grou
 		sceneRect.setBottom(40 / m_viewPtr->viewportTransform().m22());
 		sceneRect.setTop(-totalHeight);
 
-		m_viewPtr->setSceneRect(sceneRect);
+		//m_viewPtr->setSceneRect(sceneRect);
 	}
 
 	return eventItemController;
@@ -230,7 +230,7 @@ void CEventGroupControllerComp::OnViewPortChanged()
 	newSceneRect.setTop(-totalHeight);
 
 	if (m_viewPtr->sceneRect() != newSceneRect){
-		m_viewPtr->setSceneRect(newSceneRect);
+		//m_viewPtr->setSceneRect(newSceneRect);
 	}
 
 	double minimumVerticalScale = m_viewPtr->viewport()->rect().height() / newSceneRect.height();

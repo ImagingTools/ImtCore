@@ -60,11 +60,12 @@ public:
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 
-Q_SIGNALS:
-	void EmitAxisPositionChanged();
-
 private Q_SLOTS:
 	void OnViewPortChanged(bool userAction);
+	void OnAxisPosChanged();
+	void OnAxisBeginTimeChanged();
+	void OnAxisEndTimeChanged();
+	void OnAxisReposition();
 	void OnMoveToFirstCommand();
 	void OnMoveToPreviousCommand();
 	void OnMoveToNextCommand();
@@ -73,7 +74,7 @@ private Q_SLOTS:
 private:
 	QRectF GetSceneVisibleRect() const;
 	double GetCurrentScaleX() const;
-	void UpdateVerticalRangeScale(const istd::CRange& range);
+	void UpdateVerticalRangeScale(const istd::CRange& range) const;
 	void UpdateCommands();
 	void MoveToTime(const QDateTime& time);
 
@@ -126,6 +127,7 @@ private:
 
 	QGraphicsScene* m_scenePtr;
 	CEventGraphicsView* m_viewPtr;
+	//QGraphicsItemGroup* m_containerPtr;
 	CTimeAxis* m_timeAxisPtr;
 
 	ScaleConstraintsObserver m_scaleConstraintsObserver;
