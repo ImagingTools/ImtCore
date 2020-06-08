@@ -268,6 +268,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 	QPen pen(QBrush(), 1, Qt::SolidLine, Qt::FlatCap);
 	pen.setColor(QColor("#335777"));
 	painter->setPen(pen);
+	painter->setBrush(QColor("#335777"));
 
 	if (m_beginTime == m_endTime){
 		return;
@@ -276,38 +277,34 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 	// Draw ticks:
 	for (QDateTime time : ticks.keys()){
 		TickInfo info = ticks[time];
-		if (info.type == TT_MINOR){
-			double xPos = GetRectPositionFromTime(time);
-			if (xPos < 0){
-				continue;
-			}
 
-			pen.setWidthF(1 / scaleX);
+		double xPos = GetRectPositionFromTime(time);
+		if (xPos < 0){
+			continue;
+		}
+
+		QTransform savedTransform = painter->transform();
+		QTransform newTransform = savedTransform;
+
+		newTransform.translate(xPos, 0);
+		newTransform.scale(1 / scaleX, 1 / scaleY);
+		painter->setTransform(newTransform);
+
+		if (info.type == TT_MINOR){
+			pen.setWidthF(1);
 			painter->setPen(pen);
-			painter->drawLine(QLineF(xPos, (rect().top() + 1) / scaleY, xPos, (rect().top() + itemRect.height() * 0.2) / scaleY));
+			painter->drawLine(0, rect().top() + 1, 0, rect().top() + itemRect.height() * 0.2);
 		}
 		else if (info.type == TT_MAJOR){
-			double xPos = GetRectPositionFromTime(time);
-			if (xPos < 0){
-				continue;
-			}
-			
-			pen.setWidthF(3 / scaleX);
-			painter->setPen(pen);
-			painter->drawLine(QLineF(xPos, (rect().top() + 1) / scaleY, xPos, (itemRect.bottom() - itemRect.height() / 1.5) / scaleY));
-			
 			QString labelText = time.toString(info.timeFormat);
 			
-			QTransform savedTransform = painter->transform();
-			QTransform newTransform = savedTransform;
-
-			newTransform.translate(xPos, (itemRect.top() + itemRect.height() * 3 / 4) / scaleY);
-			newTransform.scale(1 / scaleX, 1 / scaleY);
-
-			painter->setTransform(newTransform);
-			painter->drawText(-labelWidth / 2, 0, labelText);
-			painter->setTransform(savedTransform);
+			pen.setWidthF(3);
+			painter->setPen(pen);
+			painter->drawLine(0, rect().top() + 1, 0, itemRect.bottom() - itemRect.height() / 1.5);
+			painter->drawText(-labelWidth / 2, itemRect.height() * 3 / 4, labelText);
 		}
+
+		painter->setTransform(savedTransform);
 	}
 }
 
