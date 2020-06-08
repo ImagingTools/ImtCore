@@ -67,17 +67,6 @@ void CCompositeObjectViewComp::OnGuiModelDetached()
 	BaseClass::OnGuiModelDetached();
 }
 
-// reimplemented (iqtgui::TRestorableGuiWrap)
-
-void CCompositeObjectViewComp::OnRestoreSettings(const QSettings& /*settings*/)
-{
-}
-
-
-void CCompositeObjectViewComp::OnSaveSettings(QSettings& /*settings*/) const
-{
-}
-
 
 // private methods
 

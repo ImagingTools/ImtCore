@@ -19,15 +19,15 @@ namespace imtgui
 
 
 class CCompositeObjectViewComp:
-			public iqtgui::TRestorableGuiWrap<
-						iqtgui::TDesignerGuiObserverCompBase<Ui::CCompositeObjectViewComp, imtbase::IObjectCollection>>,
+			public iqtgui::TDesignerGuiObserverCompBase<
+						Ui::CCompositeObjectViewComp, imtbase::IObjectCollection>,
 			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 
 public:
-	typedef iqtgui::TRestorableGuiWrap<
-				iqtgui::TDesignerGuiObserverCompBase<Ui::CCompositeObjectViewComp, imtbase::IObjectCollection>> BaseClass;
+	typedef iqtgui::TDesignerGuiObserverCompBase<
+				Ui::CCompositeObjectViewComp, imtbase::IObjectCollection> BaseClass;
 
 	I_BEGIN_COMPONENT(CCompositeObjectViewComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
@@ -48,10 +48,6 @@ protected:
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelAttached() override;
 	virtual void OnGuiModelDetached() override;
-
-	// reimplemented (iqtgui::TRestorableGuiWrap)
-	virtual void OnRestoreSettings(const QSettings& settings) override;
-	virtual void OnSaveSettings(QSettings& settings) const override;
 
 private:
 	void CreateView();
