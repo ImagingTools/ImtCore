@@ -208,6 +208,8 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 				TypeList->hide();
 			}
 
+			QTreeWidgetItem* activeTypeItemPtr = nullptr;
+
 			for (int typeIndex = 0; typeIndex < typesCount; ++typeIndex){
 				QByteArray typeId = objectTypeInfoPtr->GetOptionId(typeIndex);
 				QString typeName = objectTypeInfoPtr->GetOptionName(typeIndex);
@@ -220,11 +222,11 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 				TypeList->addTopLevelItem(typeItemPtr);
 
 				if (lastTypeId == typeId){
-					typeItemPtr->setSelected(true);
+					activeTypeItemPtr = typeItemPtr;
 				}
 
 				if (lastTypeId.isEmpty() && (typeIndex == 0)){
-					typeItemPtr->setSelected(true);
+					activeTypeItemPtr = typeItemPtr;
 				}
 			}
 
@@ -257,6 +259,10 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 				columns[0]->setFlags(flags);
 
 				m_itemModel.appendRow(columns);
+			}
+
+			if (activeTypeItemPtr != nullptr){
+				activeTypeItemPtr->setSelected(true);
 			}
 		}
 	}
@@ -884,6 +890,12 @@ void CObjectCollectionViewComp::OnTypeChanged()
 	if (m_semaphoreCounter == 1){
 		RestoreItemsSelection();
 		RestoreColumnsSettings();
+	}
+	else{
+		if (!m_currentTypeId.isEmpty() && m_typeIdColumnsSettings.contains(m_currentTypeId)){
+			RestoreItemsSelection();
+			RestoreColumnsSettings();
+		}
 	}
 
 	if ((m_currentInformationViewPtr != nullptr) && m_currentInformationViewPtr->IsGuiCreated()){
