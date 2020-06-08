@@ -145,6 +145,7 @@ protected:
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 	virtual void OnGuiRetranslate() override;
+	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
 
 private Q_SLOTS:
 	void on_PageStack_currentChanged(int stackIndex);

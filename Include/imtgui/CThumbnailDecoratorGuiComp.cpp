@@ -294,6 +294,20 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 }
 
 
+void CThumbnailDecoratorGuiComp::OnTryClose(bool* ignoredPtr)
+{
+	if (ignoredPtr != nullptr){
+		if (!ExitButton->isEnabled()){
+			*ignoredPtr = true;
+			return;
+		}
+
+		*ignoredPtr = true;
+		on_ExitButton_clicked();
+	}
+}
+
+
 // private slots
 
 void CThumbnailDecoratorGuiComp::on_PageStack_currentChanged(int stackIndex)
