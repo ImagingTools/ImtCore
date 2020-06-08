@@ -275,7 +275,7 @@ void CObjectCollectionViewDelegate::SetupInsertCommand()
 void CObjectCollectionViewDelegate::OnLanguageChanged()
 {
 	m_insertCommand.SetVisuals(tr("Insert"), tr("New"), tr("Insert new document into the collection"), QIcon(":/Icons/Add"));
-	m_duplicateCommand.SetVisuals(tr("Dupplicate"), tr("Dupplicate"), tr("Duplicate selected objects"), QIcon(":/Icons/Duplicate"));
+	m_duplicateCommand.SetVisuals(tr("Duplicate"), tr("Duplicate"), tr("Duplicate selected objects"), QIcon(":/Icons/Duplicate"));
 	m_removeCommand.SetVisuals(tr("Remove"), tr("Remove"), tr("Remove selected document from the collection"), QIcon(":/Icons/Delete"));
 }
 
