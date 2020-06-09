@@ -40,7 +40,8 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_verticalFrameMargin(6),
 	m_itemDelegate(nullptr),
 	m_lastPageIndexForLoggedUser(-1),
-	m_keyEnterTimerId(0)
+	m_keyEnterTimerId(0),
+	m_isExitButtonPressed(false)
 {
 	m_rootCommands.InsertChild(&m_commands);
 	m_minItemSize = QSize(100, 50);
@@ -297,6 +298,11 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 void CThumbnailDecoratorGuiComp::OnTryClose(bool* ignoredPtr)
 {
 	if (ignoredPtr != nullptr){
+		if (m_isExitButtonPressed){
+			*ignoredPtr = false;
+			return;
+		}
+
 		if (!ExitButton->isEnabled()){
 			*ignoredPtr = true;
 			return;
@@ -344,6 +350,7 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 void CThumbnailDecoratorGuiComp::on_ExitButton_clicked()
 {
 	if (QMessageBox::question(GetWidget(), tr("Quit"), tr("Do you really want to quit?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes){
+		m_isExitButtonPressed = true;
 		QWidget* topWidgetPtr = GetWidget();
 		while (topWidgetPtr->parentWidget() != NULL){
 			topWidgetPtr = topWidgetPtr->parentWidget();
@@ -937,6 +944,54 @@ void CThumbnailDecoratorGuiComp::ProcessLogout()
 	}
 
 }
+
+
+bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
+{
+	//bool hasCloseRight = true;
+
+	//if (action == UA_APPLICATION_EXIT){
+	//	if (m_rightsCompPtr.IsValid()){
+	//		hasCloseRight = m_rightsCompPtr->HasRight(*m_closeRightIdAttrPtr, true);
+	//	
+	//		ExitButton->setEnabled(hasCloseRight);
+	//	}
+
+	//	bool isLogged = true;
+	//	if (m_loginCompPtr.IsValid()){
+	//		isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
+
+	//		ExitButton->setEnabled(hasCloseRight && isLogged);
+
+	//		LoginMode loginMode = GetLoginMode();
+	//		if (loginMode == LM_STRONG){
+	//			LoginControlButton->setEnabled(isLogged);
+
+	//			HomeButton->setEnabled(isLogged);
+	//		}
+	//		else{
+	//			LoginControlButton->setEnabled(PageStack->currentIndex() != LOGIN_PAGE_INDEX);
+
+	//			LoginControlButton->setIcon(isLogged ? QIcon(":/Icons/Lock") : QIcon(":/Icons/Unlock"));
+	//		}
+
+	//		UserEdit->setEnabled(!isLogged);
+	//		PasswordEdit->setEnabled(!isLogged);
+	//		LoginButton->setEnabled(!isLogged);
+
+	//		if (!isLogged){
+	//			m_autoLogoutTimer.stop();
+
+	//			qApp->removeEventFilter(this);
+	//		}
+	//	}
+
+	//	SettingsButton->setEnabled(isLogged);
+	//}
+
+	return false;
+}
+
 
 void CThumbnailDecoratorGuiComp::GetMenuLayout(const int count)
 {

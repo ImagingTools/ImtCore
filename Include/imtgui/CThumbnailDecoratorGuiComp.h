@@ -124,6 +124,12 @@ public:
 		LM_DEFAULT
 	};
 
+	enum UserAction
+	{
+		UA_APPLICATION_EXIT = 0,
+		UA_LOGIN,
+	};
+
 	CThumbnailDecoratorGuiComp();
 
 	// reimplemented (imtgui::IWidgetProvider)
@@ -172,6 +178,7 @@ private:
 	LoginMode GetLoginMode();
 	int GetAutoLogoutTime() const;
 	void ProcessLogout();
+	bool IsUserActionAllowed(UserAction action);
 
 	/**
 		Calculate layout of page thumbnails based on m_horizontalItemsViewAttrPtr and m_verticalItemsViewAttrPtr
@@ -305,6 +312,7 @@ private:
 	int m_lastPageIndexForLoggedUser;
 
 	int m_keyEnterTimerId;
+	bool m_isExitButtonPressed;
 };
 
 
