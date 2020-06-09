@@ -41,7 +41,7 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_itemDelegate(nullptr),
 	m_lastPageIndexForLoggedUser(-1),
 	m_keyEnterTimerId(0),
-	m_isExitButtonPressed(false)
+	m_isExitProcess(false)
 {
 	m_rootCommands.InsertChild(&m_commands);
 	m_minItemSize = QSize(100, 50);
@@ -298,18 +298,12 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 void CThumbnailDecoratorGuiComp::OnTryClose(bool* ignoredPtr)
 {
 	if (ignoredPtr != nullptr){
-		if (m_isExitButtonPressed){
-			*ignoredPtr = false;
-			return;
-		}
-
-		if (!ExitButton->isEnabled()){
-			*ignoredPtr = true;
-			return;
-		}
-
 		*ignoredPtr = true;
-		on_ExitButton_clicked();
+		if (!IsUserActionAllowed(UA_APPLICATION_EXIT)){
+			return;
+		}
+
+		ExitApplication();
 	}
 }
 
@@ -349,19 +343,7 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 
 void CThumbnailDecoratorGuiComp::on_ExitButton_clicked()
 {
-	if (QMessageBox::question(GetWidget(), tr("Quit"), tr("Do you really want to quit?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes){
-		m_isExitButtonPressed = true;
-		QWidget* topWidgetPtr = GetWidget();
-		while (topWidgetPtr->parentWidget() != NULL){
-			topWidgetPtr = topWidgetPtr->parentWidget();
-		}
-
-		if (topWidgetPtr != NULL){
-			topWidgetPtr->close();
-
-			qApp->quit();
-		}
-	}
+	ExitApplication();
 }
 
 
@@ -633,35 +615,15 @@ void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 
 void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 {
-	bool hasCloseRight = true;
-	if (m_rightsCompPtr.IsValid()){
-		hasCloseRight = m_rightsCompPtr->HasRight(*m_closeRightIdAttrPtr, true);
-		
-		ExitButton->setEnabled(hasCloseRight);
-	}
-
 	bool isLogged = true;
 	if (m_loginCompPtr.IsValid()){
 		isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
 
-		LoginButton->setEnabled(!isLogged);
-		ExitButton->setEnabled(hasCloseRight && isLogged);
-
 		LoginMode loginMode = GetLoginMode();
-		if (loginMode == LM_STRONG){
-			LoginControlButton->setEnabled(isLogged);
-
-			HomeButton->setEnabled(isLogged);
-		}
-		else{
-			LoginControlButton->setEnabled(PageStack->currentIndex() != LOGIN_PAGE_INDEX);
-
+		if (loginMode != LM_STRONG){
 			LoginControlButton->setIcon(isLogged ? QIcon(":/Icons/Lock") : QIcon(":/Icons/Unlock"));
 		}
 
-		UserEdit->setEnabled(!isLogged);
-		PasswordEdit->setEnabled(!isLogged);
-		UserEdit->setEnabled(!isLogged);
 		if (!isLogged){
 			m_autoLogoutTimer.stop();
 
@@ -669,7 +631,18 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 		}
 	}
 
-	SettingsButton->setEnabled(isLogged);
+	ExitButton->setEnabled(IsUserActionAllowed(UA_APPLICATION_EXIT));
+
+	LoginControlButton->setEnabled(IsUserActionAllowed(UA_LOGIN_CONTROL_ENABLED));
+
+	bool isLoginEnabled = IsUserActionAllowed(UA_LOGIN_ENABLED);
+	UserEdit->setEnabled(isLoginEnabled);
+	PasswordEdit->setEnabled(isLoginEnabled);
+	UserEdit->setEnabled(isLoginEnabled);
+	LoginButton->setEnabled(isLoginEnabled);
+
+	HomeButton->setEnabled(IsUserActionAllowed(UA_HOME_ENABLED));
+	SettingsButton->setEnabled(IsUserActionAllowed(UA_SETTINGS_ENEBLED));
 }
 
 
@@ -948,48 +921,60 @@ void CThumbnailDecoratorGuiComp::ProcessLogout()
 
 bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 {
-	//bool hasCloseRight = true;
+	bool hasCloseRight = true;
+	bool isLoginControlEnabled = false;
+	bool isLogged = true;
 
-	//if (action == UA_APPLICATION_EXIT){
-	//	if (m_rightsCompPtr.IsValid()){
-	//		hasCloseRight = m_rightsCompPtr->HasRight(*m_closeRightIdAttrPtr, true);
-	//	
-	//		ExitButton->setEnabled(hasCloseRight);
-	//	}
+	if (m_rightsCompPtr.IsValid()){
+		hasCloseRight = m_rightsCompPtr->HasRight(*m_closeRightIdAttrPtr, true);
+	}
 
-	//	bool isLogged = true;
-	//	if (m_loginCompPtr.IsValid()){
-	//		isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
+	if (m_loginCompPtr.IsValid()){
+		isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
 
-	//		ExitButton->setEnabled(hasCloseRight && isLogged);
+		hasCloseRight = hasCloseRight && isLogged;
 
-	//		LoginMode loginMode = GetLoginMode();
-	//		if (loginMode == LM_STRONG){
-	//			LoginControlButton->setEnabled(isLogged);
+		LoginMode loginMode = GetLoginMode();
+		if (loginMode == LM_STRONG){
+			isLoginControlEnabled = isLogged;
+		}
+		else{
+			isLoginControlEnabled = (PageStack->currentIndex() != LOGIN_PAGE_INDEX);
+		}
+	}
 
-	//			HomeButton->setEnabled(isLogged);
-	//		}
-	//		else{
-	//			LoginControlButton->setEnabled(PageStack->currentIndex() != LOGIN_PAGE_INDEX);
+	switch (action){
+	case UA_APPLICATION_EXIT:
+		return hasCloseRight && !m_isExitProcess;
+	case UA_SETTINGS_ENEBLED:
+	case UA_HOME_ENABLED:
+		return isLogged;
+	case UA_LOGIN_CONTROL_ENABLED:
+		return isLoginControlEnabled;
+	case UA_LOGIN_ENABLED:
+		return !isLogged;
+		
+	default:
+		return false;
+	}
+}
 
-	//			LoginControlButton->setIcon(isLogged ? QIcon(":/Icons/Lock") : QIcon(":/Icons/Unlock"));
-	//		}
 
-	//		UserEdit->setEnabled(!isLogged);
-	//		PasswordEdit->setEnabled(!isLogged);
-	//		LoginButton->setEnabled(!isLogged);
+void CThumbnailDecoratorGuiComp::ExitApplication()
+{
+	if (QMessageBox::question(GetWidget(), tr("Quit"), tr("Do you really want to quit?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes){
+		m_isExitProcess = true;
+		QWidget* topWidgetPtr = GetWidget();
+		while (topWidgetPtr->parentWidget() != NULL){
+			topWidgetPtr = topWidgetPtr->parentWidget();
+		}
 
-	//		if (!isLogged){
-	//			m_autoLogoutTimer.stop();
+		if (topWidgetPtr != NULL){
+			topWidgetPtr->close();
 
-	//			qApp->removeEventFilter(this);
-	//		}
-	//	}
-
-	//	SettingsButton->setEnabled(isLogged);
-	//}
-
-	return false;
+			qApp->quit();
+		}
+	}
 }
 
 

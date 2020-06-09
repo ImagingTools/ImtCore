@@ -127,7 +127,10 @@ public:
 	enum UserAction
 	{
 		UA_APPLICATION_EXIT = 0,
-		UA_LOGIN,
+		UA_LOGIN_CONTROL_ENABLED,
+		UA_LOGIN_ENABLED,
+		UA_HOME_ENABLED,
+		UA_SETTINGS_ENEBLED,
 	};
 
 	CThumbnailDecoratorGuiComp();
@@ -179,6 +182,7 @@ private:
 	int GetAutoLogoutTime() const;
 	void ProcessLogout();
 	bool IsUserActionAllowed(UserAction action);
+	void ExitApplication();
 
 	/**
 		Calculate layout of page thumbnails based on m_horizontalItemsViewAttrPtr and m_verticalItemsViewAttrPtr
@@ -312,7 +316,7 @@ private:
 	int m_lastPageIndexForLoggedUser;
 
 	int m_keyEnterTimerId;
-	bool m_isExitButtonPressed;
+	bool m_isExitProcess;
 };
 
 
