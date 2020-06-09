@@ -26,6 +26,31 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="AculaLoc" PackageId="QtPck" ComponentId="TranslationManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="LanguageIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>en_US</Value>
+                                <Value>de_DE</Value>
+                                <Value>ru_RU</Value>
+                                <Value>pl_PL</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SlaveTranslationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ImtLoc"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationFilePath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value=":/Translations"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationFilePrefix" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Acula"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ApplicationInfo" PackageId="BasePck" ComponentId="ApplicationInfo">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -105,7 +130,7 @@
                         <Data IsEnabled="true" Value="$(AppName) by $(CompanyName)"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TranslationManager"/>
+                        <Data IsEnabled="true" Value="AculaLoc"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TrayIconsCommands" Type="Reference" ExportId="TrayIconsCommands">
                         <Data IsEnabled="false"/>
@@ -118,6 +143,31 @@
                     </AttributeInfo>
                     <AttributeInfo Id="UseTrayIcon" Type="Boolean" ExportId="UseTrayIcon">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ImtLoc" PackageId="QtPck" ComponentId="TranslationManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="LanguageIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>en_US</Value>
+                                <Value>de_DE</Value>
+                                <Value>ru_RU</Value>
+                                <Value>pl_PL</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SlaveTranslationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AcfSolutionsLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationFilePath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value=":/Translations"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationFilePrefix" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="ImtCore"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -280,31 +330,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="VersionNames" Type="Text[]" ExportId="SplashVersionNames">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TranslationManager" PackageId="QtPck" ComponentId="TranslationManager">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="LanguageIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>en_US</Value>
-                                <Value>de_DE</Value>
-                                <Value>ru_RU</Value>
-                                <Value>pl_PL</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SlaveTranslationManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="AcfSolutionsLocalization"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationFilePath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value=":/Translations"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationFilePrefix" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="ImtCore"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

@@ -8,16 +8,17 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AcfSolutionsLocalization" X="275" Y="375" Note=""/>
+        <Element ComponentName="AcfSolutionsLocalization" X="250" Y="450" Note=""/>
+        <Element ComponentName="AculaLoc" X="250" Y="250" Note=""/>
         <Element ComponentName="ApplicationInfo" X="1050" Y="125" Note=""/>
-        <Element ComponentName="CommandsMultiplexer" X="300" Y="525" Note=""/>
+        <Element ComponentName="CommandsMultiplexer" X="300" Y="625" Note=""/>
         <Element ComponentName="GuiApplication" X="575" Y="250" Note=""/>
+        <Element ComponentName="ImtLoc" X="250" Y="350" Note=""/>
         <Element ComponentName="MainGui" X="575" Y="375" Note=""/>
         <Element ComponentName="MenuPanelVisibility" X="575" Y="625" Note=""/>
         <Element ComponentName="Pages" X="575" Y="525" Note=""/>
         <Element ComponentName="SettingsProvider" X="825" Y="525" Note=""/>
         <Element ComponentName="SplashScreen" X="575" Y="125" Note=""/>
-        <Element ComponentName="TranslationManager" X="275" Y="250" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
