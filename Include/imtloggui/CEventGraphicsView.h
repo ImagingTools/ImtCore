@@ -29,9 +29,11 @@ public:
 	double GetScaleX() const;
 	double GetScaleY() const;
 
-	void SetViewRect(QRectF rect);
+	QRectF GetSceneRect();
+	void SetSceneRect(const QRectF& rect);
+	void SetViewRect(const QRectF& rect);
 	void MoveViewRect(double dX, double dY);
-	void ScaleViewRect(QPointF center, double scaleX, double scaleY);
+	void ScaleViewRect(const QPointF& center, double scaleX, double scaleY);
 
 Q_SIGNALS:
 	void EmitViewPortChanged(bool userAction);
@@ -52,6 +54,7 @@ private Q_SLOTS:
 	void OnValueChanged(int value);
 
 private:
+	void ValidateViewRect();
 	void UpdateViewRect();
 
 private:
@@ -61,7 +64,9 @@ private:
 
 	double m_userAction;
 	double m_minimumVerticalScale;
+	QRectF m_sceneRect;
 	QRectF m_viewRect;
+
 	//QGraphicsItem* m_containerPtr;
 };
 

@@ -43,7 +43,9 @@ public:
 	virtual CEventItemBase* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) override;
 	virtual void ClearEvents() override;
 	virtual void SetVisible(bool isVisible) const override;
-	virtual void OnTimeAxisChanged() override;
+	virtual void OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos) override;
+	virtual void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) override;
+	virtual void OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) override;
 	virtual void OnViewPortChanged() override;
 
 private:

@@ -16,6 +16,7 @@
 #include <imtloggui/IEventGroupController.h>
 #include <imtloggui/IEventItemController.h>
 #include <imtloggui/IEventScenePositionProvider.h>
+#include <imtloggui/CEventGraphicsView.h>
 
 
 namespace imtloggui
@@ -42,7 +43,7 @@ public:
 
 	// reimplemented (imtloggui::IEventGroupController)
 	virtual void SetScene(QGraphicsScene* scenePtr) override;
-	virtual void SetView(QGraphicsView* viewPtr) override;
+	virtual void SetView(CEventGraphicsView* viewPtr) override;
 	virtual void SetTimeAxis(const IEventScenePositionProvider* timeAxisPtr) override;
 	virtual bool CreateGraphicsItem() override;
 	virtual bool DestroyGraphicsItem() override;
@@ -56,7 +57,9 @@ public:
 	virtual void AddGroups(const imtlog::IMessageGroupInfoProvider::GroupInfos& groupInfos) override;
 	virtual bool RemoveGroup(const QByteArray& groupId) override;
 	virtual bool SetVisible(const QByteArray& groupId, bool isVisible) const override;
-	virtual void OnTimeAxisChanged() override;
+	virtual void OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos) override;
+	virtual void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) override;
+	virtual void OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) override;
 	virtual void OnViewPortChanged() override;
 
 Q_SIGNALS:
@@ -123,7 +126,7 @@ private:
 	GroupList m_groups;
 
 	QGraphicsScene* m_scenePtr;
-	QGraphicsView* m_viewPtr;
+	CEventGraphicsView* m_viewPtr;
 	const IEventScenePositionProvider* m_timeAxisPtr;
 
 	double m_minimumVerticalScale;

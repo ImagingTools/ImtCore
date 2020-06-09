@@ -40,7 +40,9 @@ public:
 
 	virtual void SetVisible(bool isVisible) const = 0;
 
-	virtual void OnTimeAxisChanged() = 0;
+	virtual void OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos) = 0;
+	virtual void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) = 0;
+	virtual void OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) = 0;
 	virtual void OnViewPortChanged() = 0;
 };
 

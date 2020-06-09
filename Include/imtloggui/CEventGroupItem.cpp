@@ -55,9 +55,12 @@ void CEventGroupItem::OnViewPortChanged()
 	QRectF visibleRect = GetSceneVisibleRect();
 	
 	QPointF labelOrigin(visibleRect.left(), pos().y() + rect().center().y());
-	if (m_labelPtr->pos() != labelOrigin){
-		m_labelPtr->setPos(labelOrigin);
-	}
+	//if (m_labelPtr->pos() != labelOrigin){
+	m_labelPtr->setPos(-1000000000, 0);
+	m_labelPtr->setPos(labelOrigin);
+//}
+
+	prepareGeometryChange();
 }
 
 
@@ -70,9 +73,8 @@ QRectF CEventGroupItem::boundingRect() const
 		m_labelPtr->SetHeight(rect().height());
 	}
 
-	QRectF visibleRect = GetSceneVisibleRect();
-	QRectF itemRect = rect();
-	QPointF origin = itemRect.bottomLeft();
+	QRectF visibleRect = mapRectFromScene(GetSceneVisibleRect());
+	QRectF itemRect = rect().intersected(visibleRect);
 
 	if (visibleRect.left() < itemRect.left()){
 		itemRect.setLeft(visibleRect.left());
@@ -89,9 +91,6 @@ QRectF CEventGroupItem::boundingRect() const
 void CEventGroupItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
 	QBrush brush(m_backgroundColor);
-
-	double scaleX = GetCurrentScaleX();
-	double scaleY = GetCurrentScaleY();
 
 	painter->save();
 	painter->setBrush(brush);
@@ -129,9 +128,10 @@ QRectF CEventGroupItem::GetSceneVisibleRect() const
 
 QRectF CEventGroupItem::GetItemVisibleRect() const
 {
-	QRectF sceneVisibleRect = GetSceneVisibleRect();
-	QRectF itemVisibleRect = boundingRect().intersected(mapFromScene(sceneVisibleRect).boundingRect());
-	
+	QRectF sceneVisibleRect = mapRectFromScene(GetSceneVisibleRect());
+	//QRectF itemVisibleRect = boundingRect().intersected(mapFromScene(sceneVisibleRect).boundingRect());
+	QRectF itemVisibleRect = rect().intersected(sceneVisibleRect);
+
 	return itemVisibleRect;
 }
 

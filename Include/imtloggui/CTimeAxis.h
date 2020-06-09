@@ -53,9 +53,9 @@ public:
 	virtual QDateTime GetVisibleEndTime() const;
 
 Q_SIGNALS:
-	void EmitAxisPosChanged();
-	void EmitAxisBeginTimeChanged();
-	void EmitAxisEndTimeChanged();
+	void EmitAxisPosChanged(const QPointF& oldPos, const QPointF& newPos);
+	void EmitAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime);
+	void EmitAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime);
 
 protected:
 	enum TickType
@@ -137,7 +137,7 @@ protected:
 	double GetCurrentScaleX() const;
 	double GetCurrentScaleY() const;
 	QRectF GetSceneVisibleRect() const;
-	QRectF GetAxisVisibleRect() const;
+	QRectF GetItemVisibleRect() const;
 
 	double GetRectPositionFromTime(const QDateTime& time) const;
 	QDateTime GetTimeFromRectPosition(double position) const;

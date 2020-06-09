@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <imtlog/IMessageGroupInfoProvider.h>
 #include <imtloggui/IEventItemController.h>
+#include <imtloggui/CEventGraphicsView.h>
 
 
 namespace imtloggui
@@ -17,7 +18,7 @@ class IEventGroupController
 {
 public:
 	virtual void SetScene(QGraphicsScene* scenePtr) = 0;
-	virtual void SetView(QGraphicsView* viewPtr) = 0;
+	virtual void SetView(CEventGraphicsView* viewPtr) = 0;
 	virtual void SetTimeAxis(const IEventScenePositionProvider* timeAxisPtr) = 0;
 
 	virtual bool CreateGraphicsItem() = 0;
@@ -35,7 +36,9 @@ public:
 
 	virtual bool SetVisible(const QByteArray& groupId, bool isVisible) const = 0;
 
-	virtual void OnTimeAxisChanged() = 0;
+	virtual void OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos) = 0;
+	virtual void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) = 0;
+	virtual void OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) = 0;
 	virtual void OnViewPortChanged() = 0;
 };
 

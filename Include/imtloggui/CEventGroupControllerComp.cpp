@@ -30,7 +30,7 @@ void CEventGroupControllerComp::SetScene(QGraphicsScene* scenePtr)
 }
 
 
-void CEventGroupControllerComp::SetView(QGraphicsView* viewPtr)
+void CEventGroupControllerComp::SetView(CEventGraphicsView* viewPtr)
 {
 	m_viewPtr = viewPtr;
 }
@@ -124,8 +124,6 @@ QString CEventGroupControllerComp::GetGroupName(const QByteArray& groupId) const
 
 IEventItemController* CEventGroupControllerComp::AddGroup(const QByteArray& groupId, const QString& groupName)
 {
-	return nullptr;
-
 	if (m_groups.contains(groupId)){
 		return m_groups[groupId];
 	}
@@ -150,12 +148,13 @@ IEventItemController* CEventGroupControllerComp::AddGroup(const QByteArray& grou
 			totalHeight += item->GetGroupHeight();
 		}
 
-		eventItemController->GetGraphicsItem()->setParentItem(m_graphicsItem);
+		//eventItemController->GetGraphicsItem()->setParentItem(m_graphicsItem);
 		eventItemController->GetGraphicsItem()->setPos(0, -totalHeight);
+		m_graphicsItem->addToGroup(eventItemController->GetGraphicsItem());
 
 		m_groups[groupId] = eventItemController;
 
-		QRectF sceneRect = m_scenePtr->sceneRect();
+		QRectF sceneRect = m_viewPtr->GetSceneRect();
 
 		totalHeight = 0;
 		for (IEventItemController* item : m_groups){
@@ -165,7 +164,7 @@ IEventItemController* CEventGroupControllerComp::AddGroup(const QByteArray& grou
 		sceneRect.setBottom(40 / m_viewPtr->viewportTransform().m22());
 		sceneRect.setTop(-totalHeight);
 
-		//m_viewPtr->setSceneRect(sceneRect);
+		m_viewPtr->SetSceneRect(sceneRect);
 	}
 
 	return eventItemController;
@@ -203,11 +202,31 @@ bool CEventGroupControllerComp::SetVisible(const QByteArray& groupId, bool isVis
 }
 
 
-void CEventGroupControllerComp::OnTimeAxisChanged()
+void CEventGroupControllerComp::OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos)
+{
+	QDateTime beginTime = m_timeAxisPtr->GetBeginTime();
+	QPointF pos = m_graphicsItem->pos();
+	pos.setX(m_timeAxisPtr->GetScenePositionFromTime(beginTime));
+
+	m_graphicsItem->setPos(pos);
+}
+
+
+void CEventGroupControllerComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
 {
 	if (m_groupRefsCompPtr.IsValid()){
 		for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
-			m_groupRefsCompPtr[i]->OnTimeAxisChanged();
+			m_groupRefsCompPtr[i]->OnAxisBeginTimeChanged(oldTime, newTime);
+		}
+	}
+}
+
+
+void CEventGroupControllerComp::OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
+{
+	if (m_groupRefsCompPtr.IsValid()){
+		for (int i = 0; i < m_groupRefsCompPtr.GetCount(); i++){
+			m_groupRefsCompPtr[i]->OnAxisEndTimeChanged(oldTime, newTime);
 		}
 	}
 }
@@ -221,7 +240,7 @@ void CEventGroupControllerComp::OnViewPortChanged()
 		}
 	}
 
-	QRectF newSceneRect = m_viewPtr->sceneRect();
+	QRectF newSceneRect = m_viewPtr->GetSceneRect();
 
 	int totalHeight = 0;
 	for (IEventItemController* item : m_groups){
@@ -231,8 +250,8 @@ void CEventGroupControllerComp::OnViewPortChanged()
 	newSceneRect.setBottom(40 / m_viewPtr->viewportTransform().m22());
 	newSceneRect.setTop(-totalHeight);
 
-	if (m_viewPtr->sceneRect() != newSceneRect){
-		//m_viewPtr->setSceneRect(newSceneRect);
+	if (m_viewPtr->GetSceneRect() != newSceneRect){
+		m_viewPtr->SetSceneRect(newSceneRect);
 	}
 
 	double minimumVerticalScale = m_viewPtr->viewport()->rect().height() / newSceneRect.height();

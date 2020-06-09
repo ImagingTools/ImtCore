@@ -98,27 +98,19 @@ void CEventViewComp::OnGuiCreated()
 	m_timeAxisPtr->setRect(0, 0, 100, 40);
 	m_timeAxisPtr->setZValue(2);
 
-	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
-	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime().addYears(10));
-
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
 	m_viewPtr->setScene(m_scenePtr);
 	m_viewPtr->setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-	//m_viewPtr->setDragMode(QGraphicsView::ScrollHandDrag);
 	m_viewPtr->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_viewPtr->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_viewPtr->setMouseTracking(false);
 	m_viewPtr->SetTimeAxis(m_timeAxisPtr);
+
 	//m_viewPtr->SetContainer(m_containerPtr);
 
 	GetQtWidget()->layout()->addWidget(m_viewPtr);
 
-//	QGraphicsRectItem* rectPtr = m_scenePtr->addRect(0,0,20,20);
-//	rectPtr->setPos(10000000, 0);
-
-//	m_containerPtr->addToGroup(rectPtr);
-
-	m_viewPtr->SetViewRect(QRectF(-10, -100, 50, 140));
+	//_containerPtr->addToGroup(rectPtr);
 
 	m_scenePtr->addItem(m_timeAxisPtr);
 	//m_containerPtr->addToGroup(m_timeAxisPtr);
@@ -128,22 +120,26 @@ void CEventViewComp::OnGuiCreated()
 	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisEndTimeChanged, this, &CEventViewComp::OnAxisEndTimeChanged);
 	connect(m_viewPtr, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
 
-	//if (m_groupControllerCompPtr.IsValid()){
-	//	m_groupControllerCompPtr->SetScene(m_scenePtr);
-	//	m_groupControllerCompPtr->SetView(m_viewPtr);
-	//	m_groupControllerCompPtr->SetTimeAxis(m_timeAxisPtr);
-	//	m_groupControllerCompPtr->CreateGraphicsItem();
+	if (m_groupControllerCompPtr.IsValid()){
+		m_groupControllerCompPtr->SetScene(m_scenePtr);
+		m_groupControllerCompPtr->SetView(m_viewPtr);
+		m_groupControllerCompPtr->SetTimeAxis(m_timeAxisPtr);
+		m_groupControllerCompPtr->CreateGraphicsItem();
 
-	//	if (m_messageGroupInfoProviderCompPtr.IsValid()){
-	//		imtlog::IMessageGroupInfoProvider::GroupInfos groupInfos = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfos();
-	//		m_groupControllerCompPtr->AddGroups(groupInfos);
-	//	}
+		if (m_messageGroupInfoProviderCompPtr.IsValid()){
+			imtlog::IMessageGroupInfoProvider::GroupInfos groupInfos = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfos();
+			m_groupControllerCompPtr->AddGroups(groupInfos);
+		}
 
-	//	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_scaleConstraintsCompPtr.GetPtr());
-	//	if (modelPtr != nullptr){
-	//		modelPtr->AttachObserver(&m_scaleConstraintsObserver);
-	//	}
-	//}
+		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_scaleConstraintsCompPtr.GetPtr());
+		if (modelPtr != nullptr){
+			modelPtr->AttachObserver(&m_scaleConstraintsObserver);
+		}
+	}
+
+	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
+
+	m_viewPtr->SetViewRect(QRectF(-10, -600, 50, 640));
 }
 
 
@@ -187,18 +183,18 @@ void CEventViewComp::OnViewPortChanged(bool userAction)
 		m_timeAxisPtr->setPos(0, visibleRect.bottom() - m_timeAxisPtr->rect().height() / m_viewPtr->GetScaleY());
 		m_timeAxisPtr->OnViewPortChanged();
 
-		QRectF rect = m_viewPtr->sceneRect();
+		QRectF rect = m_viewPtr->GetSceneRect();
 
 		if (m_timeAxisPtr != nullptr){
 			rect.setLeft(m_timeAxisPtr->rect().left() - 100 / m_viewPtr->GetScaleX());
 			rect.setRight(m_timeAxisPtr->rect().right() + 100 / m_viewPtr->GetScaleX());
-			//m_viewPtr->SetViewRect(rect);
+			m_viewPtr->SetSceneRect(rect);
 		}
 	}
 
-	//if (m_groupControllerCompPtr.IsValid()){
-	//	m_groupControllerCompPtr->OnViewPortChanged();
-	//}
+	if (m_groupControllerCompPtr.IsValid()){
+		m_groupControllerCompPtr->OnViewPortChanged();
+	}
 
 	if (userAction){
 		m_currentCommandTime = QDateTime();
@@ -206,27 +202,34 @@ void CEventViewComp::OnViewPortChanged(bool userAction)
 }
 
 
-void CEventViewComp::OnAxisPosChanged()
+void CEventViewComp::OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos)
 {
-
+	if (m_groupControllerCompPtr.IsValid()){
+		m_groupControllerCompPtr->OnAxisPosChanged(oldPos, newPos);
+	}
 }
 
 
-void CEventViewComp::OnAxisBeginTimeChanged()
+void CEventViewComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
 {
-
+	if(!oldTime.isValid()){
+		QRectF rect = m_viewPtr->GetSceneRect();
+		rect.setLeft(m_timeAxisPtr->rect().left() - 100);
+		rect.setRight(m_timeAxisPtr->rect().right() + 100);
+		m_viewPtr->SetSceneRect(rect);
+	}
+	 
+	if (m_groupControllerCompPtr.IsValid()){
+		m_groupControllerCompPtr->OnAxisBeginTimeChanged(oldTime, newTime);
+	}
 }
 
 
-void CEventViewComp::OnAxisEndTimeChanged()
+void CEventViewComp::OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
 {
-
-}
-
-
-void CEventViewComp::OnAxisReposition()
-{
-
+	if (m_groupControllerCompPtr.IsValid()){
+		m_groupControllerCompPtr->OnAxisEndTimeChanged(oldTime, newTime);
+	}
 }
 
 
@@ -442,7 +445,7 @@ void CEventViewComp::MoveToTime(const QDateTime& time)
 		double newCenter = m_timeAxisPtr->GetScenePositionFromTime(time);
 
 		rect.translate(newCenter - center, 0);
-		m_viewPtr->ensureVisible(rect, 0, 0);
+		m_viewPtr->SetViewRect(rect);
 	}
 	else{
 		double delta = qMin(currentTime - beginTime, endTime - currentTime);	
@@ -455,7 +458,7 @@ void CEventViewComp::MoveToTime(const QDateTime& time)
 
 		rect.setWidth(2 * delta);
 		rect.translate(newCenter - center, 0);
-		m_viewPtr->ensureVisible(rect, 0, 0);
+		m_viewPtr->SetViewRect(rect);
 	}
 }
 

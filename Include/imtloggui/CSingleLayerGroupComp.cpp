@@ -177,9 +177,27 @@ void CSingleLayerGroupComp::SetVisible(bool isVisible) const
 }
 
 
-void CSingleLayerGroupComp::OnTimeAxisChanged()
+void CSingleLayerGroupComp::OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos)
 {
-	// TODO: Synchronize group with time axis
+
+}
+
+
+void CSingleLayerGroupComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
+{
+	double width = (m_timeAxisPtr->GetEndTime().toMSecsSinceEpoch() - m_timeAxisPtr->GetBeginTime().toMSecsSinceEpoch()) / 1000.;
+	if (m_graphicsItem != nullptr){
+		m_graphicsItem->setRect(QRectF(0, 0, width, -*m_groupHeightAttrPtr));
+	}
+}
+
+
+void CSingleLayerGroupComp::OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
+{
+	double width = (m_timeAxisPtr->GetEndTime().toMSecsSinceEpoch() - m_timeAxisPtr->GetBeginTime().toMSecsSinceEpoch()) / 1000.;
+	if (m_graphicsItem != nullptr){
+		m_graphicsItem->setRect(QRectF(0, 0, width, -*m_groupHeightAttrPtr));
+	}
 }
 
 

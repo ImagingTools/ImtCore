@@ -50,8 +50,8 @@ QRectF CEventGroupLabelItem::boundingRect() const
 	QRectF bounding;
 	QFontMetrics metrics(m_font);
 	
-	bounding.setTop(-m_height / 2);
-	bounding.setBottom(m_height / 2);
+	bounding.setTop(m_height / 2);
+	bounding.setBottom(-m_height / 2);
 	bounding.setLeft(0);
 	bounding.setRight(metrics.boundingRect("Gg").height() / scene()->views().first()->viewportTransform().m11());
 

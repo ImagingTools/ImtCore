@@ -62,10 +62,9 @@ public:
 
 private Q_SLOTS:
 	void OnViewPortChanged(bool userAction);
-	void OnAxisPosChanged();
-	void OnAxisBeginTimeChanged();
-	void OnAxisEndTimeChanged();
-	void OnAxisReposition();
+	void OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos);
+	void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime);
+	void OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime);
 	void OnMoveToFirstCommand();
 	void OnMoveToPreviousCommand();
 	void OnMoveToNextCommand();

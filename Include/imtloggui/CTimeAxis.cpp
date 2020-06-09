@@ -41,6 +41,9 @@ void CTimeAxis::SetColor(const QColor& color)
 
 void CTimeAxis::EnsureTimeRange(const QDateTime& time)
 {
+	QDateTime oldBeginTime = m_beginTime;
+	QDateTime oldEndTime = m_endTime;
+
 	if (!m_firstEvent.isValid()){
 		m_firstEvent = time;
 		m_lastEvent = time;
@@ -97,13 +100,15 @@ void CTimeAxis::EnsureTimeRange(const QDateTime& time)
 		isEndTimeChanged = true;
 	}
 
-	setRect(0, 0, m_beginTime.secsTo(m_endTime), 40);
+	QRectF newRect(0, 0, m_beginTime.secsTo(m_endTime), 40);
+	setRect(newRect);
 
 	if (isBeginTimeChanged){
-		Q_EMIT EmitAxisBeginTimeChanged();
+		Q_EMIT EmitAxisBeginTimeChanged(oldBeginTime, m_beginTime);
 	}
-	else if (isEndTimeChanged){
-		Q_EMIT EmitAxisEndTimeChanged();
+
+	if (isEndTimeChanged){
+		Q_EMIT EmitAxisEndTimeChanged(oldEndTime, m_endTime);
 	}
 }
 
@@ -210,16 +215,16 @@ void CTimeAxis::OnViewPortChanged()
 QRectF CTimeAxis::boundingRect() const
 {
 	QRectF visibleRect = mapRectFromScene(GetSceneVisibleRect());
-	QRectF axisRect = rect();
+	QRectF itemRect = rect().intersected(visibleRect);
 
 	//QPointF origin = axisRect.bottomLeft();
 
-	if (visibleRect.left() > axisRect.left()){
-		axisRect.setLeft(visibleRect.left());
+	if (visibleRect.left() < itemRect.left()){
+		itemRect.setLeft(visibleRect.left());
 	}
 
-	if (visibleRect.right() < axisRect.right()){
-		axisRect.setRight(visibleRect.right());
+	if (visibleRect.right() > itemRect.right()){
+		itemRect.setRight(visibleRect.right());
 	}
 
 	//axisRect.setTop(0);
@@ -228,7 +233,7 @@ QRectF CTimeAxis::boundingRect() const
 	//// Left and right marings for the drawing the first and last tick labels:
 	//axisRect.adjust(-100 / GetCurrentScaleX(), 0, 100 / GetCurrentScaleX(), 0);
 
-	return axisRect;
+	return itemRect;
 }
 
 
@@ -241,8 +246,8 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 	// Fill the full axis rectangle with the background color:
 	painter->setPen(Qt::transparent);
 	painter->setBrush(QApplication::palette().color(QPalette::Background));
-	QRectF visibleRect = GetAxisVisibleRect();
-	painter->drawRect(visibleRect);
+	QRectF visibleRect = GetItemVisibleRect();
+	painter->drawRect(boundingRect());
 
 	if (!m_beginTime.isValid() || !m_endTime.isValid()){
 		return;
@@ -313,9 +318,11 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 void CTimeAxis::setPos(const QPointF &origin)
 {
+	QPointF oldPos = pos();
+
 	if (origin != pos()){
 		BaseClass::setPos(origin);
-		Q_EMIT EmitAxisPosChanged();
+		Q_EMIT EmitAxisPosChanged(oldPos, origin);
 	}
 }
 
@@ -383,7 +390,7 @@ QDateTime CTimeAxis::GetEndTime() const
 
 QDateTime CTimeAxis::GetVisibleBeginTime() const
 {
-	QRectF axisVisibleRect = GetAxisVisibleRect();
+	QRectF axisVisibleRect = GetItemVisibleRect();
 
 	return GetTimeFromRectPosition(axisVisibleRect.left());
 }
@@ -391,7 +398,7 @@ QDateTime CTimeAxis::GetVisibleBeginTime() const
 
 QDateTime CTimeAxis::GetVisibleEndTime() const
 {
-	QRectF axisVisibleRect = GetAxisVisibleRect();
+	QRectF axisVisibleRect = GetItemVisibleRect();
 
 	return GetTimeFromRectPosition(axisVisibleRect.right());
 }
@@ -427,10 +434,14 @@ CTimeAxis::IntervalsInfo CTimeAxis::CalculateIntervals(double scale) const
 
 CTimeAxis::Ticks CTimeAxis::CalculateTicks(const IntervalsInfo& intervalsInfo) const
 {
-	QRectF axisVisibleRect = GetAxisVisibleRect();
+	QRectF sceneVisibleRect = mapRectFromScene(GetSceneVisibleRect());
+	QRectF itemVisibleRect = rect();
+	itemVisibleRect.setTop(sceneVisibleRect.top());
+	itemVisibleRect.setBottom(sceneVisibleRect.bottom());
+	itemVisibleRect = itemVisibleRect.intersected(sceneVisibleRect);
 
-	QDateTime startTime = GetTimeFromRectPosition(axisVisibleRect.left());
-	QDateTime endTime = GetTimeFromRectPosition(axisVisibleRect.right());
+	QDateTime startTime = GetTimeFromRectPosition(itemVisibleRect.left());
+	QDateTime endTime = GetTimeFromRectPosition(itemVisibleRect.right());
 	startTime = startTime.addMSecs((startTime.toMSecsSinceEpoch() - endTime.toMSecsSinceEpoch()) / 5);
 	endTime = endTime.addMSecs((endTime.toMSecsSinceEpoch() - startTime.toMSecsSinceEpoch()) / 5);
 
@@ -570,7 +581,7 @@ CTimeAxis::Ticks CTimeAxis::CalculateTicks(const IntervalsInfo& intervalsInfo) c
 	currentTime = startMajorTime;
 
 	while (currentTime <= endTime){
-		if (currentTime >= startTime){
+ 		if (currentTime >= startTime){
 			TickInfo info;
 			info.type = TT_MAJOR;
 			info.timeFormat = m_intervals[intervalsInfo.majorInterval].timeFormat;
@@ -664,15 +675,15 @@ QRectF CTimeAxis::GetSceneVisibleRect() const
 }
 
 
-QRectF CTimeAxis::GetAxisVisibleRect() const
+QRectF CTimeAxis::GetItemVisibleRect() const
 {
 	QRectF sceneVisibleRect = mapRectFromScene(GetSceneVisibleRect());
-	QRectF axisRect = rect();
-	
-	//axisRect.setTop(sceneVisibleRect.top());
-	//axisRect.setBottom(sceneVisibleRect.bottom());
+	QRectF itemVisibleRect = rect().intersected(sceneVisibleRect);
 
-	return axisRect.intersected(sceneVisibleRect);
+	//itemVisibleRect.setTop(sceneVisibleRect.top());
+	//itemVisibleRect.setBottom(sceneVisibleRect.bottom());
+
+	return itemVisibleRect;
 }
 
 
