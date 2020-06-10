@@ -206,7 +206,9 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 					}
 				}
 
-				Q_ASSERT_X(maxValue >= minValue, "CDepthBitmap::CopyFrom", "Invalid depth range");
+				if (!size.IsZero()){
+					Q_ASSERT_X(maxValue >= minValue, "CDepthBitmap::CopyFrom", "Invalid depth range");
+				}
 	
 				istd::CChangeNotifier changeNotifier(this);
 				
