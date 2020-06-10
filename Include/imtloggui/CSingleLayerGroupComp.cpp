@@ -14,7 +14,8 @@ namespace imtloggui
 CSingleLayerGroupComp::CSingleLayerGroupComp()
 	:m_scenePtr(nullptr),
 	m_timeAxisPtr(nullptr),
-	m_graphicsItem(nullptr)
+	m_graphicsItem(nullptr),
+	m_itemGroup(nullptr)
 {
 }
 
@@ -56,6 +57,9 @@ bool CSingleLayerGroupComp::CreateGraphicsItem()
 		}
 
 		m_scenePtr->addItem(m_graphicsItem);
+
+		m_itemGroup = new QGraphicsItemGroup();
+		m_scenePtr->addItem(m_itemGroup);
 	}
 
 	return false;
@@ -145,7 +149,7 @@ CEventItemBase* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::Me
 		origin = m_graphicsItem->mapFromScene(origin);
 		origin.setY(m_graphicsItem->rect().height() / 2);
 
-		itemPtr->setParentItem(m_graphicsItem);
+		itemPtr->setParentItem(m_itemGroup);
 		itemPtr->setPos(origin);
 		itemPtr->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
@@ -188,6 +192,11 @@ void CSingleLayerGroupComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, con
 	double width = (m_timeAxisPtr->GetEndTime().toMSecsSinceEpoch() - m_timeAxisPtr->GetBeginTime().toMSecsSinceEpoch()) / 1000.;
 	if (m_graphicsItem != nullptr){
 		m_graphicsItem->setRect(QRectF(0, 0, width, -*m_groupHeightAttrPtr));
+	}
+
+	if (oldTime.isValid()){
+		double shift = (oldTime.toMSecsSinceEpoch() - newTime.toMSecsSinceEpoch()) / 1000.;
+		m_itemGroup->setPos(m_itemGroup->pos().x() + shift, 0);
 	}
 }
 

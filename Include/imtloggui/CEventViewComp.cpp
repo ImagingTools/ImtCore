@@ -137,9 +137,8 @@ void CEventViewComp::OnGuiCreated()
 		}
 	}
 
-	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
-
-	m_viewPtr->SetViewRect(QRectF(-10, -600, 50, 640));
+	//m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
+	//m_viewPtr->SetViewRect(QRectF(-10000, -10000, 20000, 20000));
 }
 
 
@@ -214,13 +213,27 @@ void CEventViewComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDat
 {
 	if(!oldTime.isValid()){
 		QRectF rect = m_viewPtr->GetSceneRect();
+
 		rect.setLeft(m_timeAxisPtr->rect().left() - 100);
 		rect.setRight(m_timeAxisPtr->rect().right() + 100);
 		m_viewPtr->SetSceneRect(rect);
+		m_viewPtr->SetViewRect(rect);
+		m_currentCommandTime = QDateTime();
 	}
 	 
 	if (m_groupControllerCompPtr.IsValid()){
 		m_groupControllerCompPtr->OnAxisBeginTimeChanged(oldTime, newTime);
+	}
+
+	if (m_viewPtr != nullptr){
+		QRectF rect = m_viewPtr->GetSceneRect();
+		rect.setLeft(m_timeAxisPtr->rect().left() - 100 / m_viewPtr->GetScaleX());
+		rect.setRight(m_timeAxisPtr->rect().right() + 100 / m_viewPtr->GetScaleX());
+		m_viewPtr->SetSceneRect(rect);
+
+		double shift = (oldTime.toMSecsSinceEpoch() - newTime.toMSecsSinceEpoch()) / 1000.;
+		QRectF viewRect = m_viewPtr->GetViewRect().translated(shift, 0);
+		m_viewPtr->SetViewRect(viewRect);
 	}
 }
 

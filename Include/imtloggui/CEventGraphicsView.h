@@ -31,9 +31,8 @@ public:
 
 	QRectF GetSceneRect();
 	void SetSceneRect(const QRectF& rect);
+	QRectF GetViewRect();
 	void SetViewRect(const QRectF& rect);
-	void MoveViewRect(double dX, double dY);
-	void ScaleViewRect(const QPointF& center, double scaleX, double scaleY);
 
 Q_SIGNALS:
 	void EmitViewPortChanged(bool userAction);
@@ -49,11 +48,9 @@ protected:
 	virtual void mousePressEvent(QMouseEvent *event) override;
 	virtual void mouseReleaseEvent(QMouseEvent *event) override;
 
-private Q_SLOTS:
-	void OnRangeChanged(int min, int max);
-	void OnValueChanged(int value);
-
 private:
+	void MoveViewRect(double dX, double dY);
+	void ScaleViewRect(const QPointF& center, double scaleX, double scaleY);
 	void ValidateViewRect();
 	void UpdateViewRect();
 

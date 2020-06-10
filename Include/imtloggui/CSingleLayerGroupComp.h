@@ -63,6 +63,7 @@ private:
 	const IEventScenePositionProvider* m_timeAxisPtr;
 
 	CEventGroupItem* m_graphicsItem;
+	QGraphicsItemGroup* m_itemGroup;
 	QString m_groupName;
 
 	EventMap m_events;
