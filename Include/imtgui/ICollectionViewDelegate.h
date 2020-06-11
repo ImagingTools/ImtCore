@@ -81,6 +81,13 @@ public:
 		quint16 minWidth;
 		quint16 maxWidth;
 	};
+	
+	struct SummaryInformation
+	{
+		QString text;
+		QIcon icon;
+		QVariant sortValue;
+	};
 
 	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) = 0;
 
@@ -139,7 +146,7 @@ public:
 	/**
 		Get summary information of a given type for a given object.
 	*/
-	virtual QVariantList GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const = 0;
+	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const = 0;
 
 	/**
 		Get summary information header info of a given type for a given object.

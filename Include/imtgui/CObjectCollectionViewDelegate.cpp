@@ -162,19 +162,22 @@ const imtbase::ICollectionInfo& CObjectCollectionViewDelegate::GetSummaryInforma
 }
 
 
-QVariantList CObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+ICollectionViewDelegate::SummaryInformation CObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
 {
-	QVariantList result;
+	SummaryInformation result;
 
 	if (m_collectionPtr != nullptr){
 		if (informationId == QByteArray("Name")){
-			result.append(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME));
+			result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			result.sortValue = result.text;
 		}
 		else if (informationId == QByteArray("Type")){
-			result.append(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_TYPE_NAME));
+			result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_TYPE_NAME).toByteArray();
+			result.sortValue = result.text;
 		}
 		else if (informationId == QByteArray("Description")){
-			result.append(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION));
+			result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+			result.sortValue = result.text;
 		}
 	}
 

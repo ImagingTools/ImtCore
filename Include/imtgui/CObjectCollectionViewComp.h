@@ -53,7 +53,8 @@ public:
 	enum DataRole
 	{
 		DR_TYPE_ID = Qt::UserRole,
-		DR_OBJECT_ID
+		DR_OBJECT_ID,
+		DR_SORT_VALUE
 	};
 
 	enum ModelId
@@ -62,12 +63,7 @@ public:
 		MI_LAST = MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE + 1000
 	};
 
-	struct MetaInfoItem
-	{
-		QString text;
-		QIcon icon;
-	};
-	typedef QVector<MetaInfoItem> ObjectMetaInfo;
+	typedef QVector<ICollectionViewDelegate::SummaryInformation> ObjectMetaInfo;
 
 	CObjectCollectionViewComp();
 

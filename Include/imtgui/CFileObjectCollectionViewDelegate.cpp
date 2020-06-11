@@ -76,27 +76,32 @@ bool CFileObjectCollectionViewDelegate::ExportObject(const QByteArray& objectId,
 }
 
 
-QVariantList CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+ICollectionViewDelegate::SummaryInformation CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
 {
-	QVariantList result;
+	SummaryInformation result;
 
 	if (m_collectionPtr != nullptr){
 		idoc::CStandardDocumentMetaInfo metaInfo;
 		if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
 			if (informationId == QByteArray("Name")){
-				result.append(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME));
+				result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+				result.sortValue = result.text;
 			}
 			else if (informationId == QByteArray("TypeId")){
-				result.append(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_TYPE_ID));
+				result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_TYPE_ID).toByteArray();
+				result.sortValue = result.text;
 			}
 			else if (informationId == QByteArray("Description")){
-				result.append(m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString());
+				result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+				result.sortValue = result.text;
 			}
 			else if (informationId == QByteArray("Added")){
-				result.append(metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME));
+				result.sortValue = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME);
+				result.text = result.sortValue.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 			}
 			else if (informationId == QByteArray("ModificationTime")){
-				result.append(metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME));
+				result.sortValue = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME);
+				result.text = result.sortValue.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 			}
 		}
 	}

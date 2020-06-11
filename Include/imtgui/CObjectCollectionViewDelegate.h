@@ -60,7 +60,7 @@ public:
 	virtual bool UpdateObject(const QByteArray& objectId, const istd::IChangeable& contents) const override;
 	virtual bool RenameObject(const QByteArray& objectId, const QString& newName) const override;
 	virtual const imtbase::ICollectionInfo& GetSummaryInformationTypes() const override;
-	virtual QVariantList GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
+	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
 	virtual HeaderInfo GetSummaryInformationHeaderInfo(const QByteArray& informationId) const override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
 	virtual iqtgui::IGuiObject* GetInformationView() const override;

@@ -240,11 +240,12 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 					continue;
 				}
 
-				for (MetaInfoItem metaInfoItem : metaInfo){
+				for (ICollectionViewDelegate::SummaryInformation metaInfoItem : metaInfo){
 					QStandardItem* column = new QStandardItem(metaInfoItem.text);
 					if (!metaInfoItem.icon.isNull()){
 						column->setIcon(metaInfoItem.icon);
 					}
+					column->setData(metaInfoItem.sortValue, DR_SORT_VALUE);
 
 					columns.append(column);
 				}
@@ -266,6 +267,8 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			}
 		}
 	}
+
+	m_proxyModelPtr->setSortRole(DR_SORT_VALUE);
 
 	UpdateCommands();
 
@@ -469,28 +472,8 @@ CObjectCollectionViewComp::ObjectMetaInfo CObjectCollectionViewComp::GetMetaInfo
 	ObjectMetaInfo result;
 
 	for (QByteArray fieldId : fieldIds){
-		MetaInfoItem metaInfo;
-
-		QVariantList summaryInfo = viewDelegate.GetSummaryInformation(itemId, fieldId);
-		
-		for (QVariant item : summaryInfo){
-			switch (item.type()){
-			case QVariant::ByteArray:
-				metaInfo.text = item.toByteArray();
-				break;
-			case QVariant::String:
-				metaInfo.text =  item.toString();
-				break;
-			case QVariant::DateTime:
-				metaInfo.text = item.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-				break;
-			case QVariant::Icon:
-				metaInfo.icon = item.value<QIcon>();
-				break;
-			}
-		}
-
-		result.append(metaInfo);
+		ICollectionViewDelegate::SummaryInformation summaryInfo = viewDelegate.GetSummaryInformation(itemId, fieldId);
+		result.append(summaryInfo);
 	}
 
 	return result;
