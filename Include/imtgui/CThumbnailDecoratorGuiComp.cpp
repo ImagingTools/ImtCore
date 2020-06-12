@@ -923,6 +923,7 @@ bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 {
 	bool hasCloseRight = true;
 	bool isLoginControlEnabled = false;
+	bool isHomeEnabled = true;
 	bool isLogged = true;
 
 	if (m_rightsCompPtr.IsValid()){
@@ -937,6 +938,7 @@ bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 		LoginMode loginMode = GetLoginMode();
 		if (loginMode == LM_STRONG){
 			isLoginControlEnabled = isLogged;
+			isHomeEnabled = isLogged;
 		}
 		else{
 			isLoginControlEnabled = (PageStack->currentIndex() != LOGIN_PAGE_INDEX);
@@ -948,7 +950,7 @@ bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 		return hasCloseRight && !m_isExitProcess;
 	case UA_SETTINGS_ENEBLED:
 	case UA_HOME_ENABLED:
-		return isLogged;
+		return isHomeEnabled;
 	case UA_LOGIN_CONTROL_ENABLED:
 		return isLoginControlEnabled;
 	case UA_LOGIN_ENABLED:
