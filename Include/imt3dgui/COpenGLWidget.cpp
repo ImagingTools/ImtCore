@@ -416,10 +416,9 @@ void COpenGLWidget::OnZoomOut()
 
 void COpenGLWidget::OnInternalTimer()
 {
-	QElapsedTimer timer;
-	timer.start();
-
-	update();
+	if (isVisible()){
+		update();
+	}
 }
 
 

@@ -39,23 +39,23 @@ void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QBy
 
 		if (!selectedPageId.isEmpty()){
 			if (m_pagesInfoMap.contains(selectedPageId)){
+				QByteArray parentPageId = m_pagesInfoMap[selectedPageId].parentPageId;
+				while (!parentPageId.isEmpty()){
+					PageInfo subPageInfo = m_pagesInfoMap[parentPageId];
+					iprm::ISelectionParam* subSelectionParamPtr = const_cast<iprm::ISelectionParam*>(subPageInfo.selectionPtr);
+					Q_ASSERT(subSelectionParamPtr != nullptr);
+
+					subSelectionParamPtr->SetSelectedOptionIndex(subPageInfo.pageIndex);
+					
+					parentPageId = m_pagesInfoMap[parentPageId].parentPageId;
+				}
+				
 				PageInfo currentPageInfo = m_pagesInfoMap[selectedPageId];
 
-				iprm::ISelectionParam *currentSelectionParamPtr = const_cast<iprm::ISelectionParam*>(currentPageInfo.selectionPtr);
+				iprm::ISelectionParam* currentSelectionParamPtr = const_cast<iprm::ISelectionParam*>(currentPageInfo.selectionPtr);
 				Q_ASSERT(currentSelectionParamPtr != nullptr);
 
 				currentSelectionParamPtr->SetSelectedOptionIndex(currentPageInfo.pageIndex);
-
-				QByteArray pageId = m_pagesInfoMap[selectedPageId].parentPageId;
-				while (!pageId.isEmpty()){
-					currentPageInfo = m_pagesInfoMap[pageId];
-					currentSelectionParamPtr = const_cast<iprm::ISelectionParam*>(currentPageInfo.selectionPtr);
-					Q_ASSERT(currentSelectionParamPtr != nullptr);
-
-					currentSelectionParamPtr->SetSelectedOptionIndex(currentPageInfo.pageIndex);
-					
-					pageId = m_pagesInfoMap[pageId].parentPageId;
-				}
 			}
 		}
 	}

@@ -797,10 +797,16 @@ void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selecti
 
 void CThumbnailDecoratorGuiComp::UpdatePageState()
 {
+	QString pageTitle;
+
 	if (m_pagesCompPtr.IsValid()){
 		const iprm::IOptionsList* pageListPtr = m_pagesCompPtr->GetSelectionConstraints();
 		int pagesCount = pageListPtr->GetOptionsCount();
 		int selectedPageIndex = m_pagesCompPtr->GetSelectedOptionIndex();
+
+		if (selectedPageIndex >= 0){
+			pageTitle = pageListPtr->GetOptionName(selectedPageIndex);
+		}
 
 		const iqtgui::IMultiVisualStatusProvider* pageVisualStatusProviderPtr = dynamic_cast<const iqtgui::IMultiVisualStatusProvider*>(m_pagesCompPtr.GetPtr());
 
@@ -842,6 +848,11 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 
 					const iprm::IOptionsList* subPageListPtr = subMenuPtr->GetSelectionConstraints();
 					if (subPageListPtr != NULL){
+						int selectedSubPageIndex = subMenuPtr->GetSelectedOptionIndex();
+						if (selectedSubPageIndex >=0){
+							pageTitle = subPageListPtr->GetOptionName(selectedSubPageIndex);
+						}
+
 						for (MenuItemInfoMap::Iterator subPageIter = m_subPageItemMap.begin(); subPageIter != m_subPageItemMap.end(); ++subPageIter){
 							int subPageIndex = subPageIter.value().pageIndex;
 
@@ -860,6 +871,10 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 				}
 			}
 		}
+	}
+
+	if (!pageTitle.isEmpty()){
+		CurrentPageLabel->setText(pageTitle);
 	}
 }
 
@@ -915,7 +930,6 @@ void CThumbnailDecoratorGuiComp::ProcessLogout()
 			}
 		}
 	}
-
 }
 
 
