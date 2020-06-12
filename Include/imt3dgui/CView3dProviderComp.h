@@ -31,15 +31,12 @@ public:
 		I_ASSIGN(m_showViewCommandsAttrPtr, "ShowViewCommands", "Show view commands", true, true);
 		I_ASSIGN(m_showEditCommandsAttrPtr, "ShowEditCommands", "Show commands for editing the 3D-objects", true, true);
 		I_ASSIGN(m_showRotationCommandsAttrPtr, "ShowRotationModeCommands", "Show rotation mode commands", true, true);
-
 		I_ASSIGN(m_showZoomCommandsAttrPtr, "ShowZoomCommands", "Show zoom-in/zoom-out commands", true, true);
 		I_ASSIGN(m_showSceneDecorationsCommandsAttrPtr, "ShowSceneDecorationsCommands", "Show grid/axis/ruler commands", true, true);
 		I_ASSIGN(m_showViewpointCommandsAttrPtr, "ShowViewpointCommands", "Show view point commands", true, true);
 		I_ASSIGN(m_showViewModeCommandsAttrPtr, "ShowViewModeCommands", "Show view mode commands", true, true);
-
 		I_ASSIGN(m_showZoomInCommandAttrPtr, "ShowShowZoomInCommand", "Enable command for zoom-in", true, false);
 		I_ASSIGN(m_showZoomOutCommandAttrPtr, "ShowShowZoomOutCommand", "Enable command for zoom-out", true, false);
-
 		I_ASSIGN(m_showShowGridCommandAttrPtr, "ShowShowGridCommand", "Enable command for show/hide grid", true, false);
 		I_ASSIGN(m_showShowAxisCommandAttrPtr, "ShowShowAxisCommands", "Enable command for show/hide axis", true, false);
 		I_ASSIGN(m_showShowRulerCommandAttrPtr, "ShowShowRulerCommands", "Enable command for show/hide ruler", true, false);
@@ -50,7 +47,6 @@ protected:
 	I_ATTR(bool, m_showViewCommandsAttrPtr);
 	I_ATTR(bool, m_showEditCommandsAttrPtr);
 	I_ATTR(bool, m_showRotationCommandsAttrPtr);
-
 	I_ATTR(bool, m_showZoomCommandsAttrPtr);
 	I_ATTR(bool, m_showSceneDecorationsCommandsAttrPtr);
 	I_ATTR(bool, m_showViewpointCommandsAttrPtr);
@@ -79,7 +75,6 @@ public:
 		I_ASSIGN(m_showSetViewFromBottomCommandAttrPtr, "ShowSetViewFromBottomCommand", "Enable command for view from bottom", true, false);
 		I_ASSIGN(m_showSetViewFromBackCommandAttrPtr, "ShowSetViewFromBackCommand", "Enable command for view from back", true, false);
 		I_ASSIGN(m_showResetViewCommandAttrPtr, "ShowResetViewCommand", "Enable command for reset view", true, false);
-
 		I_ASSIGN(m_showPointSelectionCommandAttrPtr, "ShowPointSelectionCommand", "Enable command for point selection", true, false);
 		I_ASSIGN(m_showBoxSelectionCommandAttrPtr, "ShowBoxSelectionCommand", "Enable command for box selection", true, false);
 		I_ASSIGN(m_showCircleSelectionCommandAttrPtr, "ShowCircleSelectionCommand", "Enable command for circle selection", true, false);
@@ -120,10 +115,8 @@ public:
 		I_ASSIGN(m_showRotationAroundXCommandAttrPtr, "ShowRotationAroundXCommand", "Enable command for rotation around axis X", true, false);
 		I_ASSIGN(m_showRotationAroundYCommandAttrPtr, "ShowRotationAroundYCommand", "Enable command for rotation around axis Y", true, false);
 		I_ASSIGN(m_showRotationAroundZCommandAttrPtr, "ShowRotationAroundZCommand", "Enable command for rotation around axis Z", true, false);
-
 		I_ASSIGN(m_showViewModeCommandAttrPtr, "ShowViewModeCommand", "Show view mode command", true, false);
 		I_ASSIGN(m_showSelectionModeCommandAttrPtr, "ShowSelectionModeCommand", "Show selection mode command", true, false);
-
 		I_ASSIGN(m_defaultsUseAntialiasingAttrPtr, "UseAntialiasing", "Use rendering antialiasing", true, true);
 		I_ASSIGN(m_defaultsUseCullfaceAttrPtr, "UseCullFace", "Use cull face mode", true, true);
 		I_ASSIGN(m_defaultsUseBlendAttrPtr, "UseBlend", "Use blending mode", true, true);
