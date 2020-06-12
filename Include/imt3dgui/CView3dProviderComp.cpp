@@ -232,40 +232,72 @@ void CView3dProviderComp::OnGuiCreated()
 	static ChangeSet commandsChanged(ibase::ICommandsProvider::CF_COMMANDS);
 	istd::CChangeNotifier changeNotifier(this, &commandsChanged);
 
-	if (*m_showShowGridCommandAttrPtr){
-		m_viewCommands.InsertChild(&m_showGridCommand);
-		m_showGridCommand.setChecked(true);
-	}
+	if (*m_showSceneDecorationsCommandsAttrPtr){
+		if (*m_showShowGridCommandAttrPtr){
+			m_viewCommands.InsertChild(&m_showGridCommand);
+			m_showGridCommand.setChecked(true);
+		}
 
-	if (*m_showShowAxisCommandAttrPtr){
-		m_viewCommands.InsertChild(&m_showAxisCommand);
-		m_showAxisCommand.setChecked(true);
-	}
+		if (*m_showShowAxisCommandAttrPtr){
+			m_viewCommands.InsertChild(&m_showAxisCommand);
+			m_showAxisCommand.setChecked(true);
+		}
 
-	m_viewCommands.InsertChild(&m_showRulerCommand);
+		if (*m_showShowRulerCommandAttrPtr){
+			m_viewCommands.InsertChild(&m_showRulerCommand);
+			m_showRulerCommand.setChecked(true);
+		}
+	}
 
 	if (*m_showViewCommandsAttrPtr){
 		if (*m_showViewModeCommandsAttrPtr){
-			m_viewCommands.InsertChild(&m_viewModeCommand);
-			m_viewCommands.InsertChild(&m_selectionModeCommand);
+			if (*m_showViewModeCommandAttrPtr){
+				m_viewCommands.InsertChild(&m_viewModeCommand);
+			}
+			if (*m_showSelectionModeCommandAttrPtr){
+				m_viewCommands.InsertChild(&m_selectionModeCommand);
+			}
 		}
 
-		if (*m_showRotationModeCommandsAttrPtr){
+		if (*m_showRotationCommandsAttrPtr){
+			if (*m_showFreeRotationCommandAttrPtr){
+				m_rotationCommands.InsertChild(&m_freeRotationCommand);
+			}
+			if (*m_showRotationAroundXCommandAttrPtr){
+				m_rotationCommands.InsertChild(&m_rotationAroundXCommand);
+			}
+			if (*m_showRotationAroundYCommandAttrPtr){
+				m_rotationCommands.InsertChild(&m_rotationAroundYCommand);
+			}
+			if (*m_showRotationAroundYCommandAttrPtr){
+				m_rotationCommands.InsertChild(&m_rotationAroundZCommand);
+			}
+
 			m_viewCommands.InsertChild(&m_rotationCommands);
-			m_rotationCommands.InsertChild(&m_freeRotationCommand);
-			m_rotationCommands.InsertChild(&m_rotationAroundXCommand);
-			m_rotationCommands.InsertChild(&m_rotationAroundYCommand);
-			m_rotationCommands.InsertChild(&m_rotationAroundZCommand);
 		}
 
 		if (*m_showViewpointCommandsAttrPtr){
-			m_viewCommands.InsertChild(&m_resetViewCommand);
-			m_viewCommands.InsertChild(&m_setViewFromRightCommand);
-			m_viewCommands.InsertChild(&m_setViewFromFrontCommand);
-			m_viewCommands.InsertChild(&m_setViewFromTopCommand);
-			m_viewCommands.InsertChild(&m_setViewFromLeftCommand);
-			m_viewCommands.InsertChild(&m_setViewFromBottomCommand);
-			m_viewCommands.InsertChild(&m_setViewFromBackCommand);
+			if (*m_showResetViewCommandAttrPtr){
+				m_viewCommands.InsertChild(&m_resetViewCommand);
+			}
+			if (*m_showSetViewFromRightCommandAttrPtr){
+				m_viewCommands.InsertChild(&m_setViewFromRightCommand);
+			}
+			if (*m_showSetViewFromFrontCommandAttrPtr){
+				m_viewCommands.InsertChild(&m_setViewFromFrontCommand);
+			}
+			if (*m_showSetViewFromTopCommandAttrPtr){
+				m_viewCommands.InsertChild(&m_setViewFromTopCommand);
+			}
+			if (*m_showSetViewFromLeftCommandAttrPtr){
+				m_viewCommands.InsertChild(&m_setViewFromLeftCommand);
+			}
+			if (*m_showSetViewFromBottomCommandAttrPtr){
+				m_viewCommands.InsertChild(&m_setViewFromBottomCommand);
+			}
+			if (*m_showSetViewFromBackCommandAttrPtr){
+				m_viewCommands.InsertChild(&m_setViewFromBackCommand);
+			}
 		}
 
 		m_viewModeCommand.setChecked(true);
@@ -281,19 +313,23 @@ void CView3dProviderComp::OnGuiCreated()
 	}
 
 	if (*m_showZoomCommandsAttrPtr){
-		m_viewCommands.InsertChild(&m_zoomInCommand);
-		m_viewCommands.InsertChild(&m_zoomOutCommand);
+		if (*m_showZoomInCommandAttrPtr){
+			m_viewCommands.InsertChild(&m_zoomInCommand);
+		}
+		if (*m_showZoomOutCommandAttrPtr){
+			m_viewCommands.InsertChild(&m_zoomOutCommand);
+		}
 	}
 
 	m_viewCommands.InsertChild(&m_useAntialiasingCommand);
 	m_viewCommands.InsertChild(&m_useCullFaceCommand);
 
-	m_useAntialiasingCommand.setChecked(*m_useAntialiasingAttrPtr);
-	m_useCullFaceCommand.setChecked(*m_useCullfaceAttrPtr);
+	m_useAntialiasingCommand.setChecked(*m_defaultsUseAntialiasingAttrPtr);
+	m_useCullFaceCommand.setChecked(*m_defaultsUseCullfaceAttrPtr);
 
-	widgetPtr->SetRenderHint(COpenGLWidget::RH_ANTIALIASING, *m_useAntialiasingAttrPtr);
-	widgetPtr->SetRenderHint(COpenGLWidget::RH_CULLFACE, *m_useCullfaceAttrPtr);
-	widgetPtr->SetRenderHint(COpenGLWidget::RH_BLEND, *m_useBlendAttrPtr);
+	widgetPtr->SetRenderHint(COpenGLWidget::RH_ANTIALIASING, *m_defaultsUseAntialiasingAttrPtr);
+	widgetPtr->SetRenderHint(COpenGLWidget::RH_CULLFACE, *m_defaultsUseCullfaceAttrPtr);
+	widgetPtr->SetRenderHint(COpenGLWidget::RH_BLEND, *m_defaultsUseBlendAttrPtr);
 
 	if (m_viewCommands.GetChildsCount() > 0){
 		m_rootCommands.InsertChild(&m_viewCommands);
@@ -305,13 +341,28 @@ void CView3dProviderComp::OnGuiCreated()
 		m_invertSelectionCommand.setShortcut(Qt::Key_Asterisk);
 		m_allSelectionCommand.setShortcut(Qt::CTRL + Qt::Key_A);
 
-		m_editCommands.InsertChild(&m_pointSelectionCommand);
-		m_editCommands.InsertChild(&m_boxSelectionCommand);
-		m_editCommands.InsertChild(&m_circleSelectionCommand);
-		m_editCommands.InsertChild(&m_clearSelectionCommand);
-		m_editCommands.InsertChild(&m_allSelectionCommand);
-		m_editCommands.InsertChild(&m_invertSelectionCommand);
-		m_editCommands.InsertChild(&m_deleteSelectionCommand);
+		if (*m_showPointSelectionCommandAttrPtr){
+			m_editCommands.InsertChild(&m_pointSelectionCommand);
+		}
+		if (*m_showBoxSelectionCommandAttrPtr){
+			m_editCommands.InsertChild(&m_boxSelectionCommand);
+		}
+		if (*m_showCircleSelectionCommandAttrPtr){
+			m_editCommands.InsertChild(&m_circleSelectionCommand);
+		}
+		if (*m_showClearSelectionCommandAttrPtr){
+			m_editCommands.InsertChild(&m_clearSelectionCommand);
+		}
+		if (*m_showAllSelectionCommandAttrPtr){
+			m_editCommands.InsertChild(&m_allSelectionCommand);
+		}
+		if (*m_showInvertSelectionCommandAttrPtr){
+			m_editCommands.InsertChild(&m_invertSelectionCommand);
+		}
+		if (*m_showDeleteSelectionCommandAttrPtr){
+			m_editCommands.InsertChild(&m_deleteSelectionCommand);
+		}
+
 		m_rootCommands.InsertChild(&m_editCommands);
 	}
 }

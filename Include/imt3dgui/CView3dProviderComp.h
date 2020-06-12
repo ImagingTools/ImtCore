@@ -21,47 +21,138 @@ namespace imt3dgui
 {
 
 
-class CView3dProviderCompAttr:
+class CView3dProviderCompAttrPart1:
 		public iqtgui::TRestorableGuiWrap<iqtgui::TGuiComponentBase<COpenGLWidget>>
 {
 public:
 	typedef iqtgui::TRestorableGuiWrap<iqtgui::TGuiComponentBase<COpenGLWidget>> BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CView3dProviderCompAttr);
-		I_ASSIGN(m_showEditCommandsAttrPtr, "ShowEditCommands", "Show commands for editing the 3D-objects", true, false);
-		I_ASSIGN(m_showShowGridCommandAttrPtr, "ShowShowGridCommand", "Enable command for shoe/hide grid", true, false);
-		I_ASSIGN(m_showShowAxisCommandAttrPtr, "ShowShowAxisCommands", "Enable command for shoe/hide axis", true, false);
+	I_BEGIN_BASE_COMPONENT(CView3dProviderCompAttrPart1);
 		I_ASSIGN(m_showViewCommandsAttrPtr, "ShowViewCommands", "Show view commands", true, true);
-		I_ASSIGN(m_showViewModeCommandsAttrPtr, "ShowViewModeCommands", "Show view mode commands", true, false);
-		I_ASSIGN(m_showRotationModeCommandsAttrPtr, "ShowRotationModeCommands", "Show rotation mode commands", true, false);
-		I_ASSIGN(m_showViewpointCommandsAttrPtr, "ShowViewpointCommands", "Show view point commands", true, false);
+		I_ASSIGN(m_showEditCommandsAttrPtr, "ShowEditCommands", "Show commands for editing the 3D-objects", true, true);
+		I_ASSIGN(m_showRotationCommandsAttrPtr, "ShowRotationModeCommands", "Show rotation mode commands", true, true);
+
 		I_ASSIGN(m_showZoomCommandsAttrPtr, "ShowZoomCommands", "Show zoom-in/zoom-out commands", true, true);
-		I_ASSIGN(m_useAntialiasingAttrPtr, "UseAntialiasing", "Use rendering antialiasing", true, true);
-		I_ASSIGN(m_useCullfaceAttrPtr, "UseCullFace", "Use cull face mode", true, true);
-		I_ASSIGN(m_useBlendAttrPtr, "UseBlend", "Use blending mode", true, true);
+		I_ASSIGN(m_showSceneDecorationsCommandsAttrPtr, "ShowSceneDecorationsCommands", "Show grid/axis/ruler commands", true, true);
+		I_ASSIGN(m_showViewpointCommandsAttrPtr, "ShowViewpointCommands", "Show view point commands", true, true);
+		I_ASSIGN(m_showViewModeCommandsAttrPtr, "ShowViewModeCommands", "Show view mode commands", true, true);
+
+		I_ASSIGN(m_showZoomInCommandAttrPtr, "ShowShowZoomInCommand", "Enable command for zoom-in", true, false);
+		I_ASSIGN(m_showZoomOutCommandAttrPtr, "ShowShowZoomOutCommand", "Enable command for zoom-out", true, false);
+
+		I_ASSIGN(m_showShowGridCommandAttrPtr, "ShowShowGridCommand", "Enable command for show/hide grid", true, false);
+		I_ASSIGN(m_showShowAxisCommandAttrPtr, "ShowShowAxisCommands", "Enable command for show/hide axis", true, false);
+		I_ASSIGN(m_showShowRulerCommandAttrPtr, "ShowShowRulerCommands", "Enable command for show/hide ruler", true, false);
+	I_END_COMPONENT
+
+protected:
+	// show commands
+	I_ATTR(bool, m_showViewCommandsAttrPtr);
+	I_ATTR(bool, m_showEditCommandsAttrPtr);
+	I_ATTR(bool, m_showRotationCommandsAttrPtr);
+
+	I_ATTR(bool, m_showZoomCommandsAttrPtr);
+	I_ATTR(bool, m_showSceneDecorationsCommandsAttrPtr);
+	I_ATTR(bool, m_showViewpointCommandsAttrPtr);
+	I_ATTR(bool, m_showViewModeCommandsAttrPtr);
+
+	// show zoom commands
+	I_ATTR(bool, m_showZoomInCommandAttrPtr);
+	I_ATTR(bool, m_showZoomOutCommandAttrPtr);
+
+	// show scene decorations commands
+	I_ATTR(bool, m_showShowGridCommandAttrPtr);
+	I_ATTR(bool, m_showShowAxisCommandAttrPtr);
+	I_ATTR(bool, m_showShowRulerCommandAttrPtr);
+};
+
+class CView3dProviderCompAttrPart2: public CView3dProviderCompAttrPart1
+{
+public:
+	typedef CView3dProviderCompAttrPart1 BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CView3dProviderCompAttrPart2);
+		I_ASSIGN(m_showSetViewFromRightCommandAttrPtr, "ShowSetViewFromRightCommand", "Enable command for view from right", true, false);
+		I_ASSIGN(m_showSetViewFromFrontCommandAttrPtr, "ShowSetViewFromRightCommand", "Enable command for view from front", true, false);
+		I_ASSIGN(m_showSetViewFromTopCommandAttrPtr, "ShowSetViewFromTopCommand", "Enable command for view from top", true, false);
+		I_ASSIGN(m_showSetViewFromLeftCommandAttrPtr, "ShowSetViewFromLeftCommand", "Enable command for view from left", true, false);
+		I_ASSIGN(m_showSetViewFromBottomCommandAttrPtr, "ShowSetViewFromBottomCommand", "Enable command for view from bottom", true, false);
+		I_ASSIGN(m_showSetViewFromBackCommandAttrPtr, "ShowSetViewFromBackCommand", "Enable command for view from back", true, false);
+		I_ASSIGN(m_showResetViewCommandAttrPtr, "ShowResetViewCommand", "Enable command for reset view", true, false);
+
+		I_ASSIGN(m_showPointSelectionCommandAttrPtr, "ShowPointSelectionCommand", "Enable command for point selection", true, false);
+		I_ASSIGN(m_showBoxSelectionCommandAttrPtr, "ShowBoxSelectionCommand", "Enable command for box selection", true, false);
+		I_ASSIGN(m_showCircleSelectionCommandAttrPtr, "ShowCircleSelectionCommand", "Enable command for circle selection", true, false);
+		I_ASSIGN(m_showClearSelectionCommandAttrPtr, "ShowClearSelectionCommand", "Enable command for clear selection", true, false);
+		I_ASSIGN(m_showAllSelectionCommandAttrPtr, "ShowAllSelectionCommand", "Enable command for all selection", true, false);
+		I_ASSIGN(m_showInvertSelectionCommandAttrPtr, "ShowInvertSelectionCommand", "Enable command for invert selection", true, false);
+		I_ASSIGN(m_showDeleteSelectionCommandAttrPtr, "ShowDeleteSelectionCommand", "Enable command for delete selection", true, false);
+	I_END_COMPONENT
+
+protected:
+	// show viewpoint commands
+	I_ATTR(bool, m_showSetViewFromRightCommandAttrPtr);
+	I_ATTR(bool, m_showSetViewFromFrontCommandAttrPtr);
+	I_ATTR(bool, m_showSetViewFromTopCommandAttrPtr);
+	I_ATTR(bool, m_showSetViewFromLeftCommandAttrPtr);
+	I_ATTR(bool, m_showSetViewFromBottomCommandAttrPtr);
+	I_ATTR(bool, m_showSetViewFromBackCommandAttrPtr);
+	I_ATTR(bool, m_showResetViewCommandAttrPtr);
+
+	// show selection commands
+	I_ATTR(bool, m_showPointSelectionCommandAttrPtr);
+	I_ATTR(bool, m_showBoxSelectionCommandAttrPtr);
+	I_ATTR(bool, m_showCircleSelectionCommandAttrPtr);
+	I_ATTR(bool, m_showClearSelectionCommandAttrPtr);
+	I_ATTR(bool, m_showAllSelectionCommandAttrPtr);
+	I_ATTR(bool, m_showInvertSelectionCommandAttrPtr);
+	I_ATTR(bool, m_showDeleteSelectionCommandAttrPtr);
+};
+
+
+class CView3dProviderCompAttrPart3: public CView3dProviderCompAttrPart2
+{
+public:
+	typedef CView3dProviderCompAttrPart2 BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CView3dProviderCompAttrPart3);
+		I_ASSIGN(m_showFreeRotationCommandAttrPtr, "ShowFreeRotationCommand", "Enable command for free rotation", true, false);
+		I_ASSIGN(m_showRotationAroundXCommandAttrPtr, "ShowRotationAroundXCommand", "Enable command for rotation around axis X", true, false);
+		I_ASSIGN(m_showRotationAroundYCommandAttrPtr, "ShowRotationAroundYCommand", "Enable command for rotation around axis Y", true, false);
+		I_ASSIGN(m_showRotationAroundZCommandAttrPtr, "ShowRotationAroundZCommand", "Enable command for rotation around axis Z", true, false);
+
+		I_ASSIGN(m_showViewModeCommandAttrPtr, "ShowViewModeCommand", "Show view mode command", true, false);
+		I_ASSIGN(m_showSelectionModeCommandAttrPtr, "ShowSelectionModeCommand", "Show selection mode command", true, false);
+
+		I_ASSIGN(m_defaultsUseAntialiasingAttrPtr, "UseAntialiasing", "Use rendering antialiasing", true, true);
+		I_ASSIGN(m_defaultsUseCullfaceAttrPtr, "UseCullFace", "Use cull face mode", true, true);
+		I_ASSIGN(m_defaultsUseBlendAttrPtr, "UseBlend", "Use blending mode", true, true);
 		I_ASSIGN(m_defaultShowAxisAttrPtr, "ShowAxis", "If enabled, the axes are shown", true, true);
 		I_ASSIGN(m_defaultShowGridAttrPtr, "ShowGrid", "If enabled, the grid is shown", true, true);
 	I_END_COMPONENT
 
 protected:
-	I_ATTR(bool, m_showEditCommandsAttrPtr);
-	I_ATTR(bool, m_showShowGridCommandAttrPtr);
-	I_ATTR(bool, m_showShowAxisCommandAttrPtr);
-	I_ATTR(bool, m_showViewCommandsAttrPtr);
-	I_ATTR(bool, m_showViewModeCommandsAttrPtr);
-	I_ATTR(bool, m_showRotationModeCommandsAttrPtr);
-	I_ATTR(bool, m_showViewpointCommandsAttrPtr);
-	I_ATTR(bool, m_showZoomCommandsAttrPtr);
-	I_ATTR(bool, m_useAntialiasingAttrPtr);
-	I_ATTR(bool, m_useCullfaceAttrPtr);
-	I_ATTR(bool, m_useBlendAttrPtr);
+	// show rotation commands
+	I_ATTR(bool, m_showFreeRotationCommandAttrPtr);
+	I_ATTR(bool, m_showRotationAroundXCommandAttrPtr);
+	I_ATTR(bool, m_showRotationAroundYCommandAttrPtr);
+	I_ATTR(bool, m_showRotationAroundZCommandAttrPtr);
+
+	// show view mode commands
+	I_ATTR(bool, m_showViewModeCommandAttrPtr);
+	I_ATTR(bool, m_showSelectionModeCommandAttrPtr);
+
+	// defaults
+	I_ATTR(bool, m_defaultsUseAntialiasingAttrPtr);
+	I_ATTR(bool, m_defaultsUseCullfaceAttrPtr);
+	I_ATTR(bool, m_defaultsUseBlendAttrPtr);
 	I_ATTR(bool, m_defaultShowAxisAttrPtr);
 	I_ATTR(bool, m_defaultShowGridAttrPtr);
 };
 
 
 class CView3dProviderComp:
-			public CView3dProviderCompAttr,
+			public CView3dProviderCompAttrPart3,
 			virtual public ibase::ICommandsProvider,
 			virtual public imt3dview::IScene3dProvider,
 			virtual public ISceneEventHandler
@@ -69,7 +160,7 @@ class CView3dProviderComp:
 	Q_OBJECT
 
 public:
-	typedef CView3dProviderCompAttr BaseClass;
+	typedef CView3dProviderCompAttrPart3 BaseClass;
 
 	enum CommandGroups
 	{
@@ -197,11 +288,11 @@ private:
 	iqtgui::CHierarchicalCommand m_setViewFromBackCommand;
 	iqtgui::CHierarchicalCommand m_resetViewCommand;
 
-	// rendering
+	// rendering commands
 	iqtgui::CHierarchicalCommand m_useAntialiasingCommand;
 	iqtgui::CHierarchicalCommand m_useCullFaceCommand;
 
-	// selection
+	// selection commands
 	iqtgui::CHierarchicalCommand m_pointSelectionCommand;
 	iqtgui::CHierarchicalCommand m_boxSelectionCommand;
 	iqtgui::CHierarchicalCommand m_circleSelectionCommand;
@@ -210,13 +301,13 @@ private:
 	iqtgui::CHierarchicalCommand m_invertSelectionCommand;
 	iqtgui::CHierarchicalCommand m_deleteSelectionCommand;
 
-	// rotation
+	// rotation commands
 	iqtgui::CHierarchicalCommand m_freeRotationCommand;
 	iqtgui::CHierarchicalCommand m_rotationAroundXCommand;
 	iqtgui::CHierarchicalCommand m_rotationAroundYCommand;
 	iqtgui::CHierarchicalCommand m_rotationAroundZCommand;
 
-	// view mode
+	// view mode commands
 	iqtgui::CHierarchicalCommand m_viewModeCommand;
 	iqtgui::CHierarchicalCommand m_selectionModeCommand;
 
