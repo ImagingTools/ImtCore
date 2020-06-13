@@ -113,6 +113,8 @@
         <file alias="AlignCenter">Resources/Icons/AlignCenter.svg</file>
         <file alias="AlignLeft">Resources/Icons/AlignLeft.svg</file>
         <file alias="AlignRight">Resources/Icons/AlignRight.svg</file>
+        <file alias="SpaceBox3d">Resources/Icons/SpaceBox3d.svg</file>
+        <file alias="SpaceBox3dFilled">Resources/Icons/SpaceBox3dFilled.svg</file>
     </qresource>
     <qresource prefix="/ColorIcons">
         <file alias="Workflow">Resources/Icons/Color/Workflow.svg</file>
@@ -154,6 +156,8 @@
         <file alias="Report1">Resources/Icons/Color/Report1.svg</file>
         <file alias="Timeline">Resources/Icons/Color/Timeline.svg</file>
         <file alias="Eye">Resources/Icons/Color/Eye.svg</file>
+        <file alias="Nozzle">Resources/Icons/Color/Nozzle.svg</file>
+        <file alias="NozzleHighlight">Resources/Icons/Color/NozzleHighlight.svg</file>
     </qresource>
     <qresource prefix="/Styles">
         <file alias="ImtLightStyle">Resources/Styles/ImtLightStyle.css</file>
