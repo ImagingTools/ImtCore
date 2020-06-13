@@ -273,7 +273,9 @@ void CView3dProviderComp::OnGuiCreated()
 				m_rotationCommands.InsertChild(&m_rotationAroundZCommand);
 			}
 
-			m_viewCommands.InsertChild(&m_rotationCommands);
+			if (m_rotationCommands.GetChildsCount() > 0){
+				m_viewCommands.InsertChild(&m_rotationCommands);
+			}
 		}
 
 		if (*m_showViewpointCommandsAttrPtr){
