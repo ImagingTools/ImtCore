@@ -1245,6 +1245,7 @@ void CThumbnailDecoratorGuiComp::PageModelObserver::OnModelChanged(int modelId, 
 	}
 
 	m_parent.UpdatePageState();
+	m_parent.UpdateCommands();
 }
 
 

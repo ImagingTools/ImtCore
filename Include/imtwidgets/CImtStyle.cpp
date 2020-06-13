@@ -266,7 +266,7 @@ QSize CImtStyle::sizeFromContents(QStyle::ContentsType type, const QStyleOption 
 		if (toolbutton->toolButtonStyle == Qt::ToolButtonTextUnderIcon){
 			int iconWidth = toolbutton->iconSize.width();
 
-			size.setWidth(3 * iconWidth);
+			size.setWidth(qMax(size.width(), 3 * iconWidth));
 		}
 	}
 	return size;
