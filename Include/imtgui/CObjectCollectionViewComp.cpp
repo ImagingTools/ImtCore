@@ -191,7 +191,6 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 		QByteArray lastTypeId = m_currentTypeId;
 
 		TypeList->clear();
-		ItemList->setProperty("ItemView", true);
 
 		m_itemModel.clear();
 		m_itemModel.setColumnCount(0);
@@ -299,6 +298,8 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 
 void CObjectCollectionViewComp::OnGuiCreated()
 {
+	ItemList->setProperty("ItemView", true);
+
 	m_proxyModelPtr = new ItemProxyModel(this);
 	m_proxyModelPtr->setSourceModel(&m_itemModel);
 	m_proxyModelPtr->setFilterKeyColumn(0);
