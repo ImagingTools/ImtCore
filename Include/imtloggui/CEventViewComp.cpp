@@ -63,6 +63,11 @@ bool CEventViewComp::IsMessageSupported(
 
 void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 {
+	if (!IsGuiCreated()){
+		m_messageList.append(message);
+		return;
+	}
+
 	imtlog::IMessageGroupInfoProvider::GroupInfo groupInfo;
 	groupInfo.id = "General";
 	groupInfo.name = QObject::tr("General");
@@ -136,6 +141,12 @@ void CEventViewComp::OnGuiCreated()
 			modelPtr->AttachObserver(&m_scaleConstraintsObserver);
 		}
 	}
+
+	for (const ilog::IMessageConsumer::MessagePtr& message : m_messageList)
+	{	
+		AddMessage(message);
+	}
+	m_messageList.clear();
 
 	//m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
 	//m_viewPtr->SetViewRect(QRectF(-10000, -10000, 20000, 20000));

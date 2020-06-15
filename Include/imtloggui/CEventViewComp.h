@@ -132,6 +132,8 @@ private:
 	ScaleConstraintsObserver m_scaleConstraintsObserver;
 
 	QDateTime m_currentCommandTime;
+
+	QList<ilog::IMessageConsumer::MessagePtr> m_messageList;
 };
 
 
