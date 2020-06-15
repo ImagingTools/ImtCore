@@ -165,6 +165,8 @@ void CFileObjectCollectionViewDelegate::OnImport()
 				tr("Import File"),
 				QString(),
 				CreateFileFilter(ifile::IFilePersistence::QF_LOAD));
+
+	m_lastImportedObjectId.clear();
 	if (!files.isEmpty()){
 		for (const QString& filePath : files){
 			QByteArray typeId = m_selectedTypeId;
@@ -172,8 +174,8 @@ void CFileObjectCollectionViewDelegate::OnImport()
 				FindTypeIdFromFile(filePath);
 			}
 
-			QByteArray importedId = ImportObject(typeId, filePath);
-			if (importedId.isEmpty()){
+			m_lastImportedObjectId = ImportObject(typeId, filePath);
+			if (m_lastImportedObjectId.isEmpty()){
 				QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be imported"));
 			}
 		}

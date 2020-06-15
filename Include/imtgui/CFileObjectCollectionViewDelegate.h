@@ -50,6 +50,9 @@ protected Q_SLOTS:
 	virtual void OnExport();
 
 protected:
+	QByteArray m_lastImportedObjectId;
+
+protected:
 	QByteArray FindTypeIdFromFile(const QString& filePath) const;
 	const ifile::IFileTypeInfo* FindFileInfo(const QByteArray& typeId) const;
 	QString CreateFileFilter(int flags) const;
