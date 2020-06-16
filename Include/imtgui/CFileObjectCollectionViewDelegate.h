@@ -39,6 +39,8 @@ public:
 	virtual bool IsCommandSupported(int commandId) const override;
 
 protected:
+	virtual void OnImportObject(const QByteArray& objectId);
+
 	// reimplemented (CObjectCollectionViewDelegate)
 	virtual void SetupCommands() override;
 
@@ -48,9 +50,6 @@ protected:
 protected Q_SLOTS:
 	virtual void OnImport();
 	virtual void OnExport();
-
-protected:
-	QByteArray m_lastImportedObjectId;
 
 protected:
 	QByteArray FindTypeIdFromFile(const QString& filePath) const;

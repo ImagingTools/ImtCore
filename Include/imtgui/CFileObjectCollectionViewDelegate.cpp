@@ -118,6 +118,11 @@ bool CFileObjectCollectionViewDelegate::IsCommandSupported(int commandId) const
 
 // protected methods
 
+void CFileObjectCollectionViewDelegate::OnImportObject(const QByteArray& objectId)
+{
+}
+
+
 // reimplemented (CFileObjectCollectionViewDelegate)
 
 void CFileObjectCollectionViewDelegate::SetupCommands()
@@ -166,7 +171,6 @@ void CFileObjectCollectionViewDelegate::OnImport()
 				QString(),
 				CreateFileFilter(ifile::IFilePersistence::QF_LOAD));
 
-	m_lastImportedObjectId.clear();
 	if (!files.isEmpty()){
 		for (const QString& filePath : files){
 			QByteArray typeId = m_selectedTypeId;
@@ -174,9 +178,12 @@ void CFileObjectCollectionViewDelegate::OnImport()
 				FindTypeIdFromFile(filePath);
 			}
 
-			m_lastImportedObjectId = ImportObject(typeId, filePath);
-			if (m_lastImportedObjectId.isEmpty()){
+			QByteArray objectId = ImportObject(typeId, filePath);
+			if (objectId.isEmpty()){
 				QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be imported"));
+			}
+			else{
+				OnImportObject(objectId);
 			}
 		}
 	}

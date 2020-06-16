@@ -71,6 +71,8 @@ public:
 protected:
 	virtual void SetupCommands();
 	virtual void SetupInsertCommand();
+	virtual bool IsNameUnique(const QString& name);
+	virtual void OnDuplicateObject(const QByteArray& sourceObjectId, const QByteArray& destinationObjectId);
 
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;

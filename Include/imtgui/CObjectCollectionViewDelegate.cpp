@@ -273,6 +273,27 @@ void CObjectCollectionViewDelegate::SetupInsertCommand()
 }
 
 
+bool CObjectCollectionViewDelegate::IsNameUnique(const QString& name)
+{
+	Q_ASSERT(m_collectionPtr != nullptr);
+
+	imtbase::ICollectionInfo::Ids ids = m_collectionPtr->GetElementIds();
+	for (const QByteArray& id : ids){
+		QString itemName = m_collectionPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
+		if (name == itemName){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+void CObjectCollectionViewDelegate::OnDuplicateObject(const QByteArray& sourceObjectId, const QByteArray& destinationObjectId)
+{
+}
+
+
 // reimplemented (ibase::TLocalizableWrap)
 
 void CObjectCollectionViewDelegate::OnLanguageChanged()
@@ -317,8 +338,18 @@ void CObjectCollectionViewDelegate::OnDuplicate()
 
 			QByteArray objectId = this->CObjectCollectionViewDelegate::CreateNewObject(m_collectionPtr->GetObjectTypeId(selectedItemId), sourceDataPtr.GetPtr());
 			if (!objectId.isEmpty()){
-				m_collectionPtr->SetObjectName(objectId, QString("Copy of %1").arg(sourceName));
+				QString copyName = QString("Copy of %1").arg(sourceName);
+				QString newName = copyName;
+				int counter = 0;
+				while (!IsNameUnique(newName)){
+					counter++;
+					newName = copyName + QString(" - %1").arg(counter);
+				}
+
+				m_collectionPtr->SetObjectName(objectId, newName);
 				m_collectionPtr->SetObjectDescription(objectId, sourceDescription);
+
+				OnDuplicateObject(selectedItemId, objectId);
 			}
 		}
 	}

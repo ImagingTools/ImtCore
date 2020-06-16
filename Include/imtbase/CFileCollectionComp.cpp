@@ -1035,7 +1035,7 @@ QString CFileCollectionComp::CalculateFolderPathInRepository(
 				int count = 0;
 				QString newDirPath = targetDirPath;
 				while (QFileInfo::exists(newDirPath)){
-					newDirPath = QString("%1_%2").arg(targetDirPath).arg(++count);
+					newDirPath = QString("%1 - %2").arg(targetDirPath).arg(++count);
 				}
 
 				if (newDirPath != targetDirPath){
