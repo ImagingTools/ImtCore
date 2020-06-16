@@ -155,7 +155,7 @@ QPushButton#LoadWorkflowButton
 
 QToolBar[ImtToolBar=true]
 {
-	qproperty-iconSize: 26px;
+	qproperty-iconSize: 24px;
 }
 
 QTableView[ImtMenu=true]
