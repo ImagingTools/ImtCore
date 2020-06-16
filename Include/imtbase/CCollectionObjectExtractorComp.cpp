@@ -15,6 +15,8 @@ QByteArrayList CCollectionObjectExtractorComp::GetSupportedObjectIds(const istd:
 	if (collectionPtr != nullptr){
 		return collectionPtr->GetElementIds().toList();
 	}
+
+	return QByteArrayList();
 }
 
 

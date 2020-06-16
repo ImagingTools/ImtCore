@@ -490,17 +490,17 @@
     <message>
         <location line="+3"/>
         <source>Narrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Zu schmall</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Wide</source>
-        <translation type="unfinished"></translation>
+        <translation>Zu breit</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Beyond area</source>
-        <translation type="unfinished"></translation>
+        <translation>Außerhalb des Bereichsdefinition</translation>
     </message>
     <message>
         <location line="+133"/>
@@ -1127,77 +1127,77 @@
     <message>
         <location filename="../../../Include/imtgui/CLayoutManagerGuiComp.cpp" line="+240"/>
         <source>Edit Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Bearbeitungsmodus</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>EditMode</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Clear All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alles entfernen</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>ClearAll</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importieren</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportieren</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Do you want clear all layout items?</source>
-        <translation type="unfinished"></translation>
+        <translation>Wollen Sie wirklich alle Layout-Elemente entfernen?</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Import Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout importieren</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Import Layout...</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout importieren...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Layout could not be imported</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout konnte nicht importiert werden</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Export Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout exportieren</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Export Layout...</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout exportieren...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Layout could not be exported</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout konnte nicht exportiert werden</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Open Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild laden</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Image Files (*.png *.jpg *.bmp *.ico *.svg)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilddateien (*.png *.jpg *.bmp *.ico *.svg)</translation>
     </message>
 </context>
 <context>
@@ -1264,7 +1264,7 @@
     <message>
         <location line="+1"/>
         <source>Duplicate selected objects</source>
-        <translation>Ausgewählte Objekte dupplizieren</translation>
+        <translation>Ausgewählte Objekte duplizieren</translation>
     </message>
     <message>
         <location line="-155"/>
@@ -1275,7 +1275,7 @@
     <message>
         <location line="-1"/>
         <source>Duplicate</source>
-        <translation>Dupplizieren</translation>
+        <translation>Duplizieren</translation>
     </message>
     <message>
         <location line="+20"/>
