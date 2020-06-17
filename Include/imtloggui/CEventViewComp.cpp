@@ -3,12 +3,11 @@
 
 // Qt includes
 #include <QtCore/QDebug>
-#include <QtWidgets/QScrollBar>
 
 // ACF includes
+#include <iser/IObject.h>
 #include <ilog/CMessage.h>
 #include <ilog/CExtMessage.h>
-#include <iser/IObject.h>
 #include <iwidgets/iwidgets.h>
 
 // ImtCore includes
