@@ -58,7 +58,7 @@ bool CSingleLayerGroupComp::CreateGraphicsItem()
 
 		m_scenePtr->addItem(m_graphicsItem);
 
-		m_itemGroup = new QGraphicsItemGroup();
+		m_itemGroup = new QGraphicsItemGroup(m_graphicsItem);
 		m_scenePtr->addItem(m_itemGroup);
 	}
 

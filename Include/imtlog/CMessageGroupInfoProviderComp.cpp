@@ -48,6 +48,11 @@ IMessageGroupInfoProvider::GroupInfos CMessageGroupInfoProviderComp::GetMessageG
 	groupInfo.name = QObject::tr("General");
 	groupInfos.append(groupInfo);
 
+	groupInfo.id = "Production";
+	groupInfo.description = QObject::tr("Production event group");
+	groupInfo.name = QObject::tr("Production");
+	groupInfos.append(groupInfo);
+
 	return groupInfos;
 }
 

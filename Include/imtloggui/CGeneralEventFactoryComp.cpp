@@ -1,12 +1,7 @@
 #include <imtloggui/CGeneralEventFactoryComp.h>
 
 
-// Qt includes
-#include <QtCore/QObject>
-#include <QtGui/QPainter>
-
 // ImtCore includes
-#include <imtlog/IMessageGroupInfoProvider.h>
 #include <imtloggui/CIconBasedEventItem.h>
 
 
@@ -20,27 +15,8 @@ namespace imtloggui
 
 CEventItemBase* CGeneralEventFactoryComp::CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const
 {
-	bool isIdFounded = false;
-
-	if (m_idsAttrPtr.GetCount() == 0){
-		isIdFounded  = true;
-	}
-	else {
-		for (int i = 0; i < m_idsAttrPtr.GetCount(); i++){
-			if (message->GetInformationId() == m_idsAttrPtr[i]){
-				isIdFounded = true;
-				break;
-			}
-		}
-	}
-
-	if (!isIdFounded){
-		if (m_slaveEventFactoryCompPtr.IsValid()){
-			return m_slaveEventFactoryCompPtr->CreateInstance(message);
-		}
-		else{
-			return nullptr;
-		}
+	if (!IsSupportedMessageId(message->GetInformationId())){
+		return CreateInstanceWithSlaveFactory(message);
 	}
 
 	QIcon icon;

@@ -1,11 +1,7 @@
 #include <imtloggui/CLoginEventFactoryComp.h>
 
 
-// Qt includes
-#include <QtGui/QPainter>
-
 // ImtCore includes
-#include <imtlog/IMessageGroupInfoProvider.h>
 #include <imtloggui/CLoginEventItem.h>
 
 
@@ -19,12 +15,8 @@ namespace imtloggui
 
 CEventItemBase* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const
 {
-	if (message->GetInformationId() != imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN && message->GetInformationId() != imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT){
-		if (m_slaveEventFactoryCompPtr.IsValid()){
-			return m_slaveEventFactoryCompPtr->CreateInstance(message);
-		}
-
-		return nullptr;
+	if (!IsSupportedMessageId(message->GetInformationId())){
+		return CreateInstanceWithSlaveFactory(message);
 	}
 
 	QIcon loginIcon;
