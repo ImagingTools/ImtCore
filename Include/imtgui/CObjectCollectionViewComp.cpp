@@ -769,12 +769,14 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 
 	if (selectedIndexes.count() == 1){
 		menu.addSeparator();
-		actionEditDescription = menu.addAction(tr("Set Description..."));
+		if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_EDIT_DESCRIPTION)){
+			actionEditDescription = menu.addAction(tr("Set Description..."));
+			connect(actionEditDescription, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDescription);
+		}
 		if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_RENAME)){
 			actionRename = menu.addAction(tr("Rename..."));
 			connect(actionRename, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRename);
 		}
-		connect(actionEditDescription, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDescription);
 	}
 
 	menu.exec(ItemList->viewport()->mapToGlobal(point));

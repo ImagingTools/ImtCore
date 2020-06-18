@@ -42,6 +42,7 @@ public:
 		CI_DUPLICATE,
 		CI_REMOVE,
 		CI_RENAME,
+		CI_EDIT_DESCRIPTION,
 
 		CI_USER = BaseClass::CI_USER + 100
 	};
