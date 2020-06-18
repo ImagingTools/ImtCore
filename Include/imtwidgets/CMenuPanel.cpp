@@ -657,7 +657,7 @@ void CMenuPanel::leaveEvent(QEvent* /*event*/)
 	}
 
 	if (m_animationWidth.state() == QPropertyAnimation::Stopped){
-		StartTimer();
+		StartTimer(100);
 	}
 
 	m_animationAction = AA_COLLAPSE;
@@ -829,10 +829,11 @@ void CMenuPanel::CheckButtonsVisible()
 }
 
 
-void CMenuPanel::StartTimer()
+void CMenuPanel::StartTimer(int time)
 {
 	StopTimer();
-	m_animationTimerIdentifier = startTimer(m_animationDelay);
+
+	m_animationTimerIdentifier = startTimer(time < 0 ? m_animationDelay : time);
 }
 
 

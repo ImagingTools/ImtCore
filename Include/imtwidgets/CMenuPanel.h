@@ -148,7 +148,7 @@ private:
 	int CalculateMaxItemWith();
 	void CheckButtonsVisible();
 	
-	void StartTimer();
+	void StartTimer(int time = -1);
 	void StopTimer();
 	void StartAnimation();
 	void StopAnimation();
