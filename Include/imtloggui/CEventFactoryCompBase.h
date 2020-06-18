@@ -27,6 +27,9 @@ protected:
 	bool IsSupportedMessageId(int messageId) const;
 	CEventItemBase* CreateInstanceWithSlaveFactory(const ilog::IMessageConsumer::MessagePtr& message) const;
 
+	// reimplemented (imtloggui::IEventItemFactory)
+	virtual QVector<int> GetSupportedMessageIds() const override;
+
 private:
 	I_MULTIATTR(int, m_idsAttrPtr);
 	I_REF(IEventItemFactory, m_slaveEventFactoryCompPtr);

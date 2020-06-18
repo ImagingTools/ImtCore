@@ -37,6 +37,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(VerticalScaleConstraints, imod::IModel, ExtractVerticalScaleConstraints);
 		I_REGISTER_SUBELEMENT_INTERFACE(VerticalScaleConstraints, imeas::INumericConstraints, ExtractVerticalScaleConstraints);
 		I_ASSIGN_MULTI_0(m_groupRefsCompPtr, "EventGroups", "Event groups components", false);
+		I_ASSIGN(m_generalGroupRefCompPtr, "GeneralGroup", "General event group component", false, "");
 	I_END_COMPONENT
 
 	CEventGroupControllerComp();
@@ -49,18 +50,21 @@ public:
 	virtual bool DestroyGraphicsItem() override;
 	virtual QGraphicsItem* GetGraphicsItem() override;
 
+	virtual IEventItemController* AddGroup(const QByteArray& groupId) override;
+	virtual bool RemoveGroup(const QByteArray& groupId) override;
 	virtual QByteArrayList GetAvailableGroupList() const override;
 	virtual QByteArrayList GetActiveGroupList() const override;
 	virtual IEventItemController* GetGroup(const QByteArray& groupId) const override;
-	virtual QString GetGroupName(const QByteArray& groupId) const override;
-	virtual IEventItemController* AddGroup(const QByteArray& groupId, const QString& groupName) override;
-	virtual void AddGroups(const imtlog::IMessageGroupInfoProvider::GroupInfos& groupInfos) override;
-	virtual bool RemoveGroup(const QByteArray& groupId) override;
-	virtual bool SetVisible(const QByteArray& groupId, bool isVisible) const override;
+
+	virtual CEventItemBase* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) override;
+
 	virtual void OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos) override;
 	virtual void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) override;
 	virtual void OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) override;
 	virtual void OnViewPortChanged() override;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 Q_SIGNALS:
 	void EmitMinimumVerticalScaleChanged(double scale);
@@ -117,10 +121,11 @@ protected:
 
 private:
 	I_MULTIREF(IEventItemController, m_groupRefsCompPtr);
+	I_REF(IEventItemController, m_generalGroupRefCompPtr);
 
 	imod::TModelWrap<VerticalScaleConstraints> m_verticalScaleConstraints;
 
-	QGraphicsItemGroup* m_graphicsItem;
+	QGraphicsItemGroup* m_graphicsItemPtr;
 	
 	typedef QMap<QByteArray, IEventItemController*> GroupList;
 	GroupList m_groups;
@@ -130,6 +135,8 @@ private:
 	const IEventScenePositionProvider* m_timeAxisPtr;
 
 	double m_minimumVerticalScale;
+
+	QMap<QByteArray, QVector<int>> m_messageIdMap;
 };
 
 

@@ -21,10 +21,11 @@ public:
 	
 	I_BEGIN_COMPONENT(CSingleLayerGroupComp)
 		I_REGISTER_INTERFACE(IEventItemController);
-		I_ASSIGN(m_groupIdAttrPtr, "GroupId", "Group id", true, "");
+		I_ASSIGN(m_groupIdAttrPtr, "GroupId", "Group id", true, "Group");
+		I_ASSIGN(m_groupNameAttrPtr, "GroupName", "Group name", true, "Group");
 		I_ASSIGN(m_groupHeightAttrPtr, "Height", "Height", true, 150);
 		I_ASSIGN(m_groupColorAttrPtr, "Color", "Color", false, "#00000000");
-		I_ASSIGN_MULTI_0(m_eventItemFactoryCompPtr, "EventItemFactorys", "Event item factory components", false);
+		I_ASSIGN(m_eventItemFactoryCompPtr, "EventItemFactory", "Event item factory component", false, "");
 	I_END_COMPONENT
 
 	CSingleLayerGroupComp();
@@ -34,19 +35,27 @@ public:
 	virtual void SetTimeAxis(const IEventScenePositionProvider* timeAxisPtr) override;
 	virtual bool CreateGraphicsItem() override;
 	virtual bool DestroyGraphicsItem() override;
-	virtual QGraphicsItem* GetGraphicsItem();
+	virtual QGraphicsItem* GetGraphicsItem() override;
+
 	virtual QByteArray GetGroupId() const override;
 	virtual int GetGroupHeight() const override;
 	virtual QString GetGroupName() const override;
 	virtual void SetGroupName(const QString& name) override;
+
+	virtual QVector<int> GetSupportedMessageIds() const override;
 	virtual const EventMap* GetEvents() const override;
 	virtual CEventItemBase* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) override;
 	virtual void ClearEvents() override;
+
 	virtual void SetVisible(bool isVisible) const override;
+
 	virtual void OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos) override;
 	virtual void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) override;
 	virtual void OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) override;
 	virtual void OnViewPortChanged() override;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 private:
 	double GetCurrentScaleX() const;
@@ -55,15 +64,16 @@ private:
 
 private:
 	I_ATTR(QByteArray, m_groupIdAttrPtr);
+	I_ATTR(QString, m_groupNameAttrPtr);
 	I_ATTR(int, m_groupHeightAttrPtr);
 	I_ATTR(QByteArray, m_groupColorAttrPtr);
-	I_MULTIREF(IEventItemFactory, m_eventItemFactoryCompPtr);
+	I_REF(IEventItemFactory, m_eventItemFactoryCompPtr);
 
 	QGraphicsScene* m_scenePtr;
 	const IEventScenePositionProvider* m_timeAxisPtr;
 
-	CEventGroupItem* m_graphicsItem;
-	QGraphicsItemGroup* m_itemGroup;
+	CEventGroupItem* m_graphicsItemPtr;
+	QGraphicsItemGroup* m_itemGroupPtr;
 	QString m_groupName;
 
 	EventMap m_events;

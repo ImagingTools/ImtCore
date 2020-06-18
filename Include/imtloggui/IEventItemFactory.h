@@ -4,9 +4,6 @@
 // Acf includes
 #include <ilog/IMessageConsumer.h>
 
-// Qt includes
-#include <QtWidgets/QGraphicsItem>
-
 // ImtCore includes
 #include <imtloggui/CEventItemBase.h>
 
@@ -22,6 +19,7 @@ namespace imtloggui
 class IEventItemFactory
 {
 public:
+	virtual QVector<int> GetSupportedMessageIds() const = 0;
 	virtual CEventItemBase* CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const = 0;
 };
 

@@ -36,6 +36,26 @@ CEventItemBase* CEventFactoryCompBase::CreateInstanceWithSlaveFactory(const ilog
 }
 
 
+// reimplemented (imtloggui::IEventItemFactory)
+
+QVector<int> CEventFactoryCompBase::GetSupportedMessageIds() const
+{
+	QVector<int> ids;
+
+	if (m_idsAttrPtr.IsValid()){
+		for (int i = 0; i < m_idsAttrPtr.GetCount(); i++){
+			ids.append(m_idsAttrPtr[i]);
+		}
+	}
+
+	if (m_slaveEventFactoryCompPtr.IsValid()){
+		ids.append(m_slaveEventFactoryCompPtr->GetSupportedMessageIds());
+	}
+
+	return ids;
+}
+
+
 } // namespace imtloggui
 
 

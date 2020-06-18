@@ -53,11 +53,6 @@ I_EXPORT_COMPONENT(
 			"Single layer group",
 			"Event Group Single Layer");
 
-I_EXPORT_COMPONENT(
-		ProducingPartEventFactory,
-		"Part producing event factory",
-		"Part Producing Event Item Factory");
-
 
 } // namespace ImtLogGuiPck
 

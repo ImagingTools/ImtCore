@@ -12,7 +12,6 @@
 #include <imtloggui/CGeneralEventFactoryComp.h>
 #include <imtloggui/CEventGroupControllerComp.h>
 #include <imtloggui/CSingleLayerGroupComp.h>
-#include <imtloggui/CProducingPartEventFactoryComp.h>
 
 
 /**
@@ -28,7 +27,6 @@ typedef imtloggui::CIconBasedEventFactoryComp IconBasedEventFactory;
 typedef imtloggui::CGeneralEventFactoryComp GeneralEventFactory;
 typedef imtloggui::CEventGroupControllerComp EventGroupController;
 typedef imtloggui::CSingleLayerGroupComp SingleLayerGroup;
-typedef imtloggui::CProducingPartEventFactoryComp ProducingPartEventFactory;
 
 
 } // namespace ImtLogGuiPck

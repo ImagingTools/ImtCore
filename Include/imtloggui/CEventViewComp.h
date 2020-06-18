@@ -13,7 +13,6 @@
 #include <iqtgui/TDesignerGuiCompBase.h>
 
 // ImtCore includes
-#include <imtlog/IMessageGroupInfoProvider.h>
 #include <imtloggui/CEventGraphicsView.h>
 #include <imtloggui/CTimeAxis.h>
 #include <imtloggui/IEventGroupController.h>
@@ -42,7 +41,6 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
-		I_ASSIGN(m_messageGroupInfoProviderCompPtr, "MessageGroupInfoProvider", "Message group info provider", false, "")
 		I_ASSIGN(m_groupControllerCompPtr, "EventGroupController", "Event group controller", true, "EventGroupController")
 		I_ASSIGN(m_scaleConstraintsCompPtr, "VerticalScaleConstraints", "Vertical scale constraints", true, "");
 	I_END_COMPONENT;
@@ -114,7 +112,6 @@ private:
 
 private:
 	I_REF(IEventGroupController, m_groupControllerCompPtr);
-	I_REF(imtlog::IMessageGroupInfoProvider, m_messageGroupInfoProviderCompPtr);
 	I_REF(imeas::INumericConstraints, m_scaleConstraintsCompPtr);
 
 	imod::TModelWrap<Commands> m_commands;
@@ -126,7 +123,6 @@ private:
 
 	QGraphicsScene* m_scenePtr;
 	CEventGraphicsView* m_viewPtr;
-	//QGraphicsItemGroup* m_containerPtr;
 	CTimeAxis* m_timeAxisPtr;
 
 	ScaleConstraintsObserver m_scaleConstraintsObserver;

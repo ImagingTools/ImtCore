@@ -67,21 +67,9 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 		return;
 	}
 
-	imtlog::IMessageGroupInfoProvider::GroupInfo groupInfo;
-	groupInfo.id = "General";
-	groupInfo.name = QObject::tr("General");
-
-	if (m_messageGroupInfoProviderCompPtr.IsValid()){
-		groupInfo = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfo(message.GetPtr());
-	}
-
 	if (m_groupControllerCompPtr.IsValid()){
-		IEventItemController* eventItemControllerPtr = m_groupControllerCompPtr->AddGroup(groupInfo.id, groupInfo.name);
-
-		if (eventItemControllerPtr != nullptr){
-			m_timeAxisPtr->EnsureTimeRange(message->GetInformationTimeStamp());
-			eventItemControllerPtr->AddEvent(message);
-		}
+		m_timeAxisPtr->EnsureTimeRange(message->GetInformationTimeStamp());
+		m_groupControllerCompPtr->AddEvent(message);
 	}
 }
 
@@ -93,9 +81,6 @@ void CEventViewComp::OnGuiCreated()
 	BaseClass::OnGuiCreated();
 
 	m_scenePtr = new QGraphicsScene(GetQtWidget());
-
-	//m_containerPtr = new QGraphicsItemGroup();
-	//m_scenePtr->addItem(m_containerPtr);
 
 	m_timeAxisPtr = new CTimeAxis();
 	m_timeAxisPtr->SetColor(Qt::green);
@@ -110,14 +95,9 @@ void CEventViewComp::OnGuiCreated()
 	m_viewPtr->setMouseTracking(false);
 	m_viewPtr->SetTimeAxis(m_timeAxisPtr);
 
-	//m_viewPtr->SetContainer(m_containerPtr);
-
 	GetQtWidget()->layout()->addWidget(m_viewPtr);
 
-	//_containerPtr->addToGroup(rectPtr);
-
 	m_scenePtr->addItem(m_timeAxisPtr);
-	//m_containerPtr->addToGroup(m_timeAxisPtr);
 
 	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisPosChanged, this, &CEventViewComp::OnAxisPosChanged);
 	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CEventViewComp::OnAxisBeginTimeChanged);
@@ -130,9 +110,9 @@ void CEventViewComp::OnGuiCreated()
 		m_groupControllerCompPtr->SetTimeAxis(m_timeAxisPtr);
 		m_groupControllerCompPtr->CreateGraphicsItem();
 
-		if (m_messageGroupInfoProviderCompPtr.IsValid()){
-			imtlog::IMessageGroupInfoProvider::GroupInfos groupInfos = m_messageGroupInfoProviderCompPtr->GetMessageGroupInfos();
-			m_groupControllerCompPtr->AddGroups(groupInfos);
+		QByteArrayList groupIds = m_groupControllerCompPtr->GetAvailableGroupList();
+		for (QByteArray id : groupIds){
+			m_groupControllerCompPtr->AddGroup(id);
 		}
 
 		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_scaleConstraintsCompPtr.GetPtr());
@@ -146,9 +126,6 @@ void CEventViewComp::OnGuiCreated()
 		AddMessage(message);
 	}
 	m_messageList.clear();
-
-	//m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
-	//m_viewPtr->SetViewRect(QRectF(-10000, -10000, 20000, 20000));
 }
 
 
