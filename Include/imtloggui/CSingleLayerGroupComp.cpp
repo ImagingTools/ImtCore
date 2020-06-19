@@ -309,15 +309,15 @@ void CSingleLayerGroupComp::ArrangeEvents()
 		}
 
 		// Current stairway can grow up
-		if (arrangedHeight + currentRect.height() < groupHeight){
+		if (arrangedHeight + (currentRect.height() + *m_verticalSpaceingAttrPtr) < groupHeight){
 			// Shift up stairway
 			for (CEventItemBase* itemPtr : arrangedItems){
 				QPointF pos = itemPtr->pos();
-				pos.ry() -= (currentRect.height() / 2) / scaleY;
+				pos.ry() -= ((currentRect.height() + *m_verticalSpaceingAttrPtr) / 2) / scaleY;
 				itemPtr->setPos(pos);
 			}
 
-			currentPos.ry() = lastPtr->pos().y() + (lastPtr->boundingRect().height() / 2 + currentRect.height() / 2) / scaleY;
+			currentPos.ry() = lastPtr->pos().y() + (lastPtr->boundingRect().height() / 2 + (currentRect.height() + *m_verticalSpaceingAttrPtr)/ 2) / scaleY;
 			currentPtr->setPos(currentPos);
 			arrangedHeight += currentRect.height();
 			arrangedItems.append(currentPtr);

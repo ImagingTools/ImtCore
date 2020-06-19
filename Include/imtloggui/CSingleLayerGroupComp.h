@@ -24,6 +24,7 @@ public:
 		I_ASSIGN(m_groupIdAttrPtr, "GroupId", "Group id", true, "Group");
 		I_ASSIGN(m_groupNameAttrPtr, "GroupName", "Group name", true, "Group");
 		I_ASSIGN(m_groupHeightAttrPtr, "Height", "Height", true, 150);
+		I_ASSIGN(m_verticalSpaceingAttrPtr, "VerticalSpaceing", "Vertical spaceing between neighboring events", true, 10);
 		I_ASSIGN(m_groupColorAttrPtr, "Color", "Color", false, "#00000000");
 		I_ASSIGN(m_eventItemFactoryCompPtr, "EventItemFactory", "Event item factory component", false, "");
 	I_END_COMPONENT
@@ -66,6 +67,7 @@ private:
 	I_ATTR(QByteArray, m_groupIdAttrPtr);
 	I_ATTR(QString, m_groupNameAttrPtr);
 	I_ATTR(int, m_groupHeightAttrPtr);
+	I_ATTR(int, m_verticalSpaceingAttrPtr);
 	I_ATTR(QByteArray, m_groupColorAttrPtr);
 	I_REF(IEventItemFactory, m_eventItemFactoryCompPtr);
 
