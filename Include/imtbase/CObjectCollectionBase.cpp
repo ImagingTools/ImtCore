@@ -145,11 +145,11 @@ bool CObjectCollectionBase::GetObjectData(const QByteArray& objectId, DataPtr& d
 }
 
 
-bool CObjectCollectionBase::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object)
+bool CObjectCollectionBase::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode)
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
-			return objectInfo.objectPtr->CopyFrom(object);
+			return objectInfo.objectPtr->CopyFrom(object, mode);
 		}
 	}
 

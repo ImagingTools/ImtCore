@@ -484,7 +484,7 @@ bool CFileCollectionComp::GetObjectData(const QByteArray& objectId, DataPtr& dat
 }
 
 
-bool CFileCollectionComp::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object)
+bool CFileCollectionComp::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const ifile::IFilePersistence* persistencePtr = GetPersistenceForResource(GetObjectTypeId(objectId));
 	if (persistencePtr == nullptr){

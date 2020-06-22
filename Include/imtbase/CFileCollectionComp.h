@@ -97,7 +97,7 @@ public:
 	virtual bool RemoveObject(const QByteArray& objectId) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
-	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object) override;
+	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
 	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
