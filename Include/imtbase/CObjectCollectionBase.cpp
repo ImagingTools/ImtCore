@@ -271,7 +271,7 @@ int CObjectCollectionBase::GetSupportedOperations() const
 }
 
 
-bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 {
 	const CObjectCollectionBase* sourcePtr = dynamic_cast<const CObjectCollectionBase*>(&object);
 	if (sourcePtr != nullptr){
@@ -301,7 +301,7 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 			else{
 				const istd::IChangeable* dataPtr = sourcePtr->GetObjectPtr(sourceObjectInfo.id);
 				if (dataPtr != nullptr){
-					if (!targetObjectInfoPtr->objectPtr->CopyFrom(*dataPtr)){
+					if (!targetObjectInfoPtr->objectPtr->CopyFrom(*dataPtr, mode)){
 						return false;
 					}
 				}
