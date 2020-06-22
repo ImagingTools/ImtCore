@@ -351,7 +351,20 @@ bool CDepthBitmap::ConvertToQImage(QImage& result) const
 					outputLinePtr[x] = rgbValue;
 				}
 				else{
-					outputLinePtr[x] = qRgb(192, 192, 192);
+					if (false){
+						outputLinePtr[x] = qRgb(192, 192, 192);
+					}
+					else{
+						int outOfRangeValue = 0;
+						if (inputValue > m_depthRange.GetMaxValue()){
+							outOfRangeValue = 255;
+						}
+						else if (inputValue < m_depthRange.GetMinValue()){
+							outOfRangeValue = 0;
+						}
+
+						outputLinePtr[x] = qRgb(outOfRangeValue, outOfRangeValue, outOfRangeValue);
+					}
 				}
 			}
 		}
