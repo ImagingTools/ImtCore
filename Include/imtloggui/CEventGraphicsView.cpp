@@ -84,6 +84,12 @@ void CEventGraphicsView::SetViewRect(const QRectF& rect)
 }
 
 
+const QMargins& CEventGraphicsView::GetMargins()
+{
+	return m_margins;
+}
+
+
 void CEventGraphicsView::SetMargins(const QMargins& margins)
 {
 	m_margins = margins;

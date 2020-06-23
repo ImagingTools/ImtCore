@@ -58,6 +58,9 @@ public:
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 
+Q_SIGNALS:
+	void UpdateSceneRect();
+
 private Q_SLOTS:
 	void OnViewPortChanged(bool userAction);
 	void OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos);
@@ -67,8 +70,8 @@ private Q_SLOTS:
 	void OnMoveToPreviousCommand();
 	void OnMoveToNextCommand();
 	void OnMoveToLastCommand();
-
 	void OnSelectionChanged();
+	void OnUpdateSceneRect();
 
 private:
 	QRectF GetSceneVisibleRect() const;

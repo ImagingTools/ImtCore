@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QDebug>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QScrollBar>
@@ -128,7 +129,7 @@ IEventItemController* CEventGroupControllerComp::AddGroup(const QByteArray& grou
 			totalHeight += item->GetGroupHeight();
 		}
 
-		sceneRect.setBottom(40 / m_viewPtr->viewportTransform().m22());
+		sceneRect.setBottom(0);
 		sceneRect.setTop(-totalHeight);
 
 		m_viewPtr->SetSceneRect(sceneRect);
@@ -262,21 +263,22 @@ void CEventGroupControllerComp::OnViewPortChanged()
 		m_generalGroupRefCompPtr->OnViewPortChanged();
 	}
 
-	QRectF newSceneRect = m_viewPtr->GetSceneRect();
+	//QRectF newSceneRect = m_viewPtr->GetSceneRect();
 
 	int totalHeight = 0;
 	for (IEventItemController* item : m_groups){
 		totalHeight += item->GetGroupHeight();
 	}
 
-	newSceneRect.setBottom(40 / m_viewPtr->viewportTransform().m22());
-	newSceneRect.setTop(-totalHeight);
+	//newSceneRect.setBottom(40 / m_viewPtr->viewportTransform().m22());
+	//newSceneRect.setTop(-totalHeight);
 
-	if (m_viewPtr->GetSceneRect() != newSceneRect){
-		m_viewPtr->SetSceneRect(newSceneRect);
-	}
+	//if (m_viewPtr->GetSceneRect() != newSceneRect){
+	//	m_viewPtr->SetSceneRect(newSceneRect);
+	//}
 
-	double minimumVerticalScale = m_viewPtr->viewport()->rect().height() / newSceneRect.height();
+	QMargins viewMargins = m_viewPtr->GetMargins();
+	double minimumVerticalScale = m_viewPtr->viewport()->rect().height() / (m_viewPtr->GetSceneRect().height() + viewMargins.bottom() + viewMargins.top());
 	if (minimumVerticalScale < 1){
 		minimumVerticalScale = 1;
 	}

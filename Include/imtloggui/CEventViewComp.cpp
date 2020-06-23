@@ -83,6 +83,7 @@ void CEventViewComp::OnGuiCreated()
 
 	m_scenePtr = new QGraphicsScene(GetQtWidget());
 	connect(m_scenePtr, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
+	connect(this, &CEventViewComp::UpdateSceneRect, this, &CEventViewComp::OnUpdateSceneRect);
 
 	m_timeAxisPtr = new CTimeAxis();
 	m_timeAxisPtr->SetColor(Qt::green);
@@ -96,6 +97,7 @@ void CEventViewComp::OnGuiCreated()
 	m_viewPtr->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_viewPtr->setMouseTracking(false);
 	m_viewPtr->SetTimeAxis(m_timeAxisPtr);
+	m_viewPtr->SetMargins(QMargins(70, 0, 70, 40));
 
 	QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(GetQtWidget()->layout());//->addWidget(m_viewPtr);
 	layoutPtr->insertWidget(0, m_viewPtr);
@@ -135,6 +137,8 @@ void CEventViewComp::OnGuiCreated()
 		AddMessage(message);
 	}
 	m_messageList.clear();
+
+	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
 }
 
 
@@ -176,15 +180,15 @@ void CEventViewComp::OnViewPortChanged(bool userAction)
 		QRectF visibleRect = m_viewPtr->GetSceneVisibleRect();
 		
 		m_timeAxisPtr->setPos(0, visibleRect.bottom() - m_timeAxisPtr->rect().height() / m_viewPtr->GetScaleY());
-		m_timeAxisPtr->OnViewPortChanged();
+		//m_timeAxisPtr->OnViewPortChanged();
 
-		QRectF rect = m_viewPtr->GetSceneRect();
+		//QRectF rect = m_viewPtr->GetSceneRect();
 
-		if (m_timeAxisPtr != nullptr){
-			rect.setLeft(m_timeAxisPtr->rect().left() - 100 / m_viewPtr->GetScaleX());
-			rect.setRight(m_timeAxisPtr->rect().right() + 100 / m_viewPtr->GetScaleX());
-			m_viewPtr->SetSceneRect(rect);
-		}
+		//if (m_timeAxisPtr != nullptr){
+		//	rect.setLeft(m_timeAxisPtr->rect().left() - 100 / m_viewPtr->GetScaleX());
+		//	rect.setRight(m_timeAxisPtr->rect().right() + 100 / m_viewPtr->GetScaleX());
+		//	m_viewPtr->SetSceneRect(rect);
+		//}
 	}
 
 	if (m_groupControllerCompPtr.IsValid()){
@@ -210,9 +214,10 @@ void CEventViewComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDat
 	if(!oldTime.isValid()){
 		QRectF rect = m_viewPtr->GetSceneRect();
 
-		rect.setLeft(m_timeAxisPtr->rect().left() - 100);
-		rect.setRight(m_timeAxisPtr->rect().right() + 100);
+		rect.setLeft(m_timeAxisPtr->rect().left());
+		rect.setRight(m_timeAxisPtr->rect().right());
 		m_viewPtr->SetSceneRect(rect);
+		rect.adjust(0, 0, 0, 40);
 		m_viewPtr->SetViewRect(rect);
 		m_currentCommandTime = QDateTime();
 	}
@@ -223,8 +228,8 @@ void CEventViewComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDat
 
 	if (m_viewPtr != nullptr){
 		QRectF rect = m_viewPtr->GetSceneRect();
-		rect.setLeft(m_timeAxisPtr->rect().left() - 100 / m_viewPtr->GetScaleX());
-		rect.setRight(m_timeAxisPtr->rect().right() + 100 / m_viewPtr->GetScaleX());
+		rect.setLeft(m_timeAxisPtr->rect().left());
+		rect.setRight(m_timeAxisPtr->rect().right());
 		m_viewPtr->SetSceneRect(rect);
 
 		double shift = (oldTime.toMSecsSinceEpoch() - newTime.toMSecsSinceEpoch()) / 1000.;
@@ -406,6 +411,12 @@ void CEventViewComp::OnSelectionChanged()
 			}
 		}
 	}
+}
+
+
+void CEventViewComp::OnUpdateSceneRect()
+{
+
 }
 
 

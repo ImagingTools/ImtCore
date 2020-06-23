@@ -34,7 +34,6 @@ public:
 	void EnsureTimeRange(const QDateTime& time);
 	int GetMargin();
 	void CreateTimeItemTable();
-	void OnViewPortChanged();
 
 	// reimplemented (QGraphicsRectItem)
 	virtual QRectF boundingRect() const override;

@@ -34,6 +34,7 @@ public:
 	QRectF GetViewRect();
 	void SetViewRect(const QRectF& rect);
 
+	const QMargins& GetMargins();
 	void SetMargins(const QMargins& margins);
 
 Q_SIGNALS:

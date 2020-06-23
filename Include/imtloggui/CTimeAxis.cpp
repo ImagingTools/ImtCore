@@ -204,12 +204,6 @@ void CTimeAxis::CreateTimeItemTable()
 }
 
 
-void CTimeAxis::OnViewPortChanged()
-{
-	prepareGeometryChange();
-}
-
-
 // reimplemented (QGraphicsRectItem)
 
 QRectF CTimeAxis::boundingRect() const
