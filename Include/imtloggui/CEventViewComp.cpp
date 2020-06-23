@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QDebug>
+#include <QtWidgets/QLabel>
 
 // ACF includes
 #include <iser/IObject.h>
@@ -81,11 +82,12 @@ void CEventViewComp::OnGuiCreated()
 	BaseClass::OnGuiCreated();
 
 	m_scenePtr = new QGraphicsScene(GetQtWidget());
+	connect(m_scenePtr, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
 
 	m_timeAxisPtr = new CTimeAxis();
 	m_timeAxisPtr->SetColor(Qt::green);
 	m_timeAxisPtr->setRect(0, 0, 100, 40);
-	m_timeAxisPtr->setZValue(2);
+	m_timeAxisPtr->setZValue(101);
 
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
 	m_viewPtr->setScene(m_scenePtr);
@@ -95,7 +97,14 @@ void CEventViewComp::OnGuiCreated()
 	m_viewPtr->setMouseTracking(false);
 	m_viewPtr->SetTimeAxis(m_timeAxisPtr);
 
-	GetQtWidget()->layout()->addWidget(m_viewPtr);
+	QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(GetQtWidget()->layout());//->addWidget(m_viewPtr);
+	layoutPtr->insertWidget(0, m_viewPtr);
+	layoutPtr->setStretch(0, 90);
+	layoutPtr->setStretch(1, 10);
+	MetaInfoPanel->hide();
+	if (MetaInfoPanel->layout() == nullptr){
+		MetaInfoPanel->setLayout(new QGridLayout());
+	}
 
 	m_scenePtr->addItem(m_timeAxisPtr);
 
@@ -385,6 +394,21 @@ void CEventViewComp::OnMoveToLastCommand()
 }
 
 
+void CEventViewComp::OnSelectionChanged()
+{
+	QList<QGraphicsItem*> items = m_scenePtr->selectedItems();
+	MetaInfoPanel->hide();
+	if (!items.isEmpty()){
+		CEventItemBase* itemPtr = dynamic_cast<CEventItemBase*>(items[0]);
+		if (itemPtr != nullptr){
+			if (UpdateMetaInfoPanel(itemPtr)){
+				MetaInfoPanel->show();
+			}
+		}
+	}
+}
+
+
 // private methods
 
 QRectF CEventViewComp::GetSceneVisibleRect() const
@@ -460,6 +484,49 @@ void CEventViewComp::MoveToTime(const QDateTime& time)
 		rect.translate(newCenter - center, 0);
 		m_viewPtr->SetViewRect(rect);
 	}
+}
+
+
+bool CEventViewComp::UpdateMetaInfoPanel(const CEventItemBase* eventItem)
+{
+	iwidgets::ClearLayout(MetaInfoPanel->layout());
+
+	if (eventItem == nullptr){
+		return false;
+	}
+
+	QGridLayout* layoutPtr = dynamic_cast<QGridLayout*>(MetaInfoPanel->layout());
+	if (layoutPtr != nullptr){
+		CEventItemBase::MetaInfo metaInfo = eventItem->GetMetaInfo();
+		if (metaInfo.isEmpty()){
+			return false;
+		}
+
+		for (CEventItemBase::MetaInfoItem metaInfoItem : metaInfo){
+			QLabel* labelKeyPtr = new QLabel(metaInfoItem.key, MetaInfoPanel);
+			labelKeyPtr->setStyleSheet("font-size: 12px; font: bold; color: #88b8e3");
+
+			QLabel* labelValuePtr = new QLabel(metaInfoItem.value, MetaInfoPanel);
+			labelValuePtr->setStyleSheet("font-size: 9px; color: gray");
+			labelValuePtr->setWordWrap(true);
+
+			layoutPtr->addWidget(labelKeyPtr, layoutPtr->rowCount(), 0, 1, 1);
+			layoutPtr->addWidget(labelValuePtr, layoutPtr->rowCount(), 0, 1, 1);
+
+			QSpacerItem* delimeter = new QSpacerItem(10, 5);
+			layoutPtr->addItem(delimeter, layoutPtr->rowCount(), 0, 1, 1);
+		}
+
+		layoutPtr->setColumnMinimumWidth(0, 10);
+		layoutPtr->setColumnStretch(0, 1);
+		layoutPtr->setColumnStretch(1, 100);
+		layoutPtr->setColumnStretch(1, 100);
+		layoutPtr->addItem(new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding), layoutPtr->rowCount(), 0);
+
+		return true;
+	}
+
+	return false;
 }
 
 

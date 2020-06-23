@@ -18,7 +18,7 @@ CEventGroupControllerComp::CEventGroupControllerComp()
 	:m_scenePtr(nullptr),
 	m_viewPtr(nullptr),
 	m_timeAxisPtr(nullptr),
-	m_graphicsItemPtr(nullptr),
+	m_itemGroupPtr(nullptr),
 	m_minimumVerticalScale(1)
 {
 }
@@ -46,10 +46,10 @@ void CEventGroupControllerComp::SetTimeAxis(const IEventScenePositionProvider* t
 
 bool CEventGroupControllerComp::CreateGraphicsItem()
 {
-	if (m_graphicsItemPtr == nullptr && m_scenePtr != nullptr && m_timeAxisPtr != nullptr){
-		m_graphicsItemPtr = new QGraphicsItemGroup();
+	if (m_itemGroupPtr == nullptr && m_scenePtr != nullptr && m_timeAxisPtr != nullptr){
+		m_itemGroupPtr = new CGraphicsItemGroup();
 
-		m_scenePtr->addItem(m_graphicsItemPtr);
+		m_scenePtr->addItem(m_itemGroupPtr);
 	}
 
 	return false;
@@ -58,7 +58,7 @@ bool CEventGroupControllerComp::CreateGraphicsItem()
 
 bool CEventGroupControllerComp::DestroyGraphicsItem()
 {
-	if (m_graphicsItemPtr != nullptr && m_scenePtr != nullptr){
+	if (m_itemGroupPtr != nullptr && m_scenePtr != nullptr){
 	
 
 		for (IEventItemController* itemPtr : m_groups){
@@ -66,9 +66,9 @@ bool CEventGroupControllerComp::DestroyGraphicsItem()
 		}
 		m_groups.clear();
 
-		m_scenePtr->removeItem(m_graphicsItemPtr);
-		delete m_graphicsItemPtr;
-		m_graphicsItemPtr = nullptr;
+		m_scenePtr->removeItem(m_itemGroupPtr);
+		delete m_itemGroupPtr;
+		m_itemGroupPtr = nullptr;
 
 		return true;
 	}
@@ -79,7 +79,7 @@ bool CEventGroupControllerComp::DestroyGraphicsItem()
 
 QGraphicsItem* CEventGroupControllerComp::GetGraphicsItem()
 {
-	return m_graphicsItemPtr;
+	return m_itemGroupPtr;
 }
 
 
@@ -117,7 +117,7 @@ IEventItemController* CEventGroupControllerComp::AddGroup(const QByteArray& grou
 		}
 
 		eventItemController->GetGraphicsItem()->setPos(0, -totalHeight);
-		m_graphicsItemPtr->addToGroup(eventItemController->GetGraphicsItem());
+		eventItemController->GetGraphicsItem()->setParentItem(m_itemGroupPtr);
 
 		m_groups[groupId] = eventItemController;
 
@@ -215,10 +215,10 @@ CEventItemBase* CEventGroupControllerComp::AddEvent(const ilog::IMessageConsumer
 void CEventGroupControllerComp::OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos)
 {
 	QDateTime beginTime = m_timeAxisPtr->GetBeginTime();
-	QPointF pos = m_graphicsItemPtr->pos();
+	QPointF pos = m_itemGroupPtr->pos();
 	pos.setX(m_timeAxisPtr->GetScenePositionFromTime(beginTime));
 
-	m_graphicsItemPtr->setPos(pos);
+	m_itemGroupPtr->setPos(pos);
 }
 
 

@@ -34,6 +34,8 @@ public:
 	QRectF GetViewRect();
 	void SetViewRect(const QRectF& rect);
 
+	void SetMargins(const QMargins& margins);
+
 Q_SIGNALS:
 	void EmitViewPortChanged(bool userAction);
 
@@ -63,6 +65,7 @@ private:
 	double m_minimumVerticalScale;
 	QRectF m_sceneRect;
 	QRectF m_viewRect;
+	QMargins m_margins;
 
 	//QGraphicsItem* m_containerPtr;
 };

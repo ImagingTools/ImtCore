@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtWidgets/QGraphicsObject>
+#include <QtWidgets/QGraphicsItem>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
 // ImtCore includes
@@ -13,17 +13,28 @@ namespace imtloggui
 {
 
 
-class CEventItemBase: public QGraphicsObject
+class CEventItemBase: public QGraphicsItem
 {
 public:
-	typedef QGraphicsObject BaseClass;
+	typedef QGraphicsItem BaseClass;
+
+	struct MetaInfoItem
+	{
+		QString key;
+		QString value;
+	};
+	typedef QVector<MetaInfoItem> MetaInfo;
 
 	CEventItemBase(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent = nullptr);
 
 	QDateTime GetEventTimeStamp() const;
+	const MetaInfo& GetMetaInfo() const;
+	void AddMetaInfo(const MetaInfoItem& metaInfoItem);
+	void AddMetaInfo(const QString& key, const QString& value);
 
 protected:
 	ilog::IMessageConsumer::MessagePtr m_messagePtr;
+	MetaInfo m_metaInfo;
 };
 
 

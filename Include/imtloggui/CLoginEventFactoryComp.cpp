@@ -39,6 +39,11 @@ CEventItemBase* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsu
 	eventPtr->SetIcons(loginIcon, logoutIcon);
 	eventPtr->SetIconSize(QSize(iconSize, iconSize));
 
+	CLoginEventItem::MetaInfoItem metaInfoItem;
+	metaInfoItem.key = QObject::tr("User name");
+	metaInfoItem.value = message->GetInformationDescription();
+	eventPtr->AddMetaInfo(metaInfoItem);
+
 	return eventPtr;
 }
 

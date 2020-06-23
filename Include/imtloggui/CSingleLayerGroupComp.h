@@ -5,9 +5,10 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/CEventGroupItem.h>
 #include <imtloggui/IEventItemFactory.h>
 #include <imtloggui/IEventItemController.h>
+#include <imtloggui/CEventGroupItem.h>
+#include <imtloggui/CGraphicsItemGroup.h>
 
 
 namespace imtloggui
@@ -75,7 +76,7 @@ private:
 	const IEventScenePositionProvider* m_timeAxisPtr;
 
 	CEventGroupItem* m_graphicsItemPtr;
-	QGraphicsItemGroup* m_itemGroupPtr;
+	CGraphicsItemGroup* m_itemGroupPtr;
 	QString m_groupName;
 
 	EventMap m_events;

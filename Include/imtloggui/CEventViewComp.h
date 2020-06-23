@@ -68,12 +68,16 @@ private Q_SLOTS:
 	void OnMoveToNextCommand();
 	void OnMoveToLastCommand();
 
+	void OnSelectionChanged();
+
 private:
 	QRectF GetSceneVisibleRect() const;
 	double GetCurrentScaleX() const;
 	void UpdateVerticalRangeScale(const istd::CRange& range) const;
 	void UpdateCommands();
 	void MoveToTime(const QDateTime& time);
+
+	bool UpdateMetaInfoPanel(const CEventItemBase* eventItem);
 
 private:
 	class ScaleConstraintsObserver: public imod::TSingleModelObserverBase<imeas::INumericConstraints>

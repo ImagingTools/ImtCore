@@ -20,7 +20,7 @@ CEventGroupItem::CEventGroupItem(QGraphicsItem* parent)
 	m_backgroundColor = QColor("#00000000");
 	m_name = QObject::tr("Noname");
 	m_labelPtr = new CEventGroupLabelItem();
-	m_labelPtr->setZValue(1);
+	m_labelPtr->setZValue(100);
 }
 
 

@@ -31,6 +31,27 @@ QDateTime CEventItemBase::GetEventTimeStamp() const
 }
 
 
+const CEventItemBase::MetaInfo& CEventItemBase::GetMetaInfo() const
+{
+	return m_metaInfo;
+}
+
+
+void CEventItemBase::AddMetaInfo(const MetaInfoItem& metaInfoItem)
+{
+	m_metaInfo.append(metaInfoItem);
+}
+
+
+void CEventItemBase::AddMetaInfo(const QString& key, const QString& value)
+{
+	MetaInfoItem metaInfoItem;
+	metaInfoItem.key = key;
+	metaInfoItem.value = value;
+	m_metaInfo.append(metaInfoItem);
+}
+
+
 } // namespace imtloggui
 
 

@@ -84,6 +84,14 @@ void CEventGraphicsView::SetViewRect(const QRectF& rect)
 }
 
 
+void CEventGraphicsView::SetMargins(const QMargins& margins)
+{
+	m_margins = margins;
+
+	ValidateViewRect();
+}
+
+
 // public slots
 
 void CEventGraphicsView::OnMinimumVerticalScaleChanged(double minScale)
@@ -188,6 +196,7 @@ void CEventGraphicsView::mousePressEvent(QMouseEvent *event)
 void CEventGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
 	BaseClass::mouseReleaseEvent(event);
+
 	m_userAction = false;
 }
 
@@ -236,28 +245,34 @@ void CEventGraphicsView::ScaleViewRect(const QPointF& center, double scaleX, dou
 
 void CEventGraphicsView::ValidateViewRect()
 {
-	if (m_viewRect.width() > m_sceneRect.width()){
-		m_viewRect.setWidth(m_sceneRect.width());
+	double scaleX = GetScaleX();
+	double scaleY = GetScaleY();
+
+	QMarginsF margins = QMarginsF(m_margins.left() / scaleX, m_margins.top() / scaleY, m_margins.right() / scaleX, m_margins.bottom() / scaleY);
+	QRectF sceneRect = m_sceneRect.marginsAdded(margins);
+
+	if (m_viewRect.width() > sceneRect.width()){
+		m_viewRect.setWidth(sceneRect.width());
 	}
 
-	if (m_viewRect.height() > m_sceneRect.height()){
-		m_viewRect.setHeight(m_sceneRect.height());
+	if (m_viewRect.height() > sceneRect.height()){
+		m_viewRect.setHeight(sceneRect.height());
 	}
 
-	if (m_viewRect.top() < m_sceneRect.top()){
-		m_viewRect.translate(0, m_sceneRect.top() - m_viewRect.top());
+	if (m_viewRect.top() < sceneRect.top()){
+		m_viewRect.translate(0, sceneRect.top() - m_viewRect.top());
 	}
 
-	if (m_viewRect.bottom() > m_sceneRect.bottom()){
-		m_viewRect.translate(0, m_sceneRect.bottom() - m_viewRect.bottom());
+	if (m_viewRect.bottom() > sceneRect.bottom()){
+		m_viewRect.translate(0, sceneRect.bottom() - m_viewRect.bottom());
 	}
 
-	if (m_viewRect.left() < m_sceneRect.left()){
-		m_viewRect.translate(m_sceneRect.left() - m_viewRect.left(), 0);
+	if (m_viewRect.left() < sceneRect.left()){
+		m_viewRect.translate(sceneRect.left() - m_viewRect.left(), 0);
 	}
 
-	if (m_viewRect.right() > m_sceneRect.right()){
-		m_viewRect.translate(m_sceneRect.right() - m_viewRect.right(), 0);
+	if (m_viewRect.right() > sceneRect.right()){
+		m_viewRect.translate(sceneRect.right() - m_viewRect.right(), 0);
 	}
 }
 
@@ -270,11 +285,6 @@ void CEventGraphicsView::UpdateViewRect()
 	matrix.scale(viewport()->rect().width() / m_viewRect.width(), viewport()->rect().height() / m_viewRect.height());
 
 	setTransform(matrix);
-
-	//scene()->update(m_viewRect);	
-
-	//qDebug() << QString::number(m_containerPtr->pos().x(), 'f', 30) << m_viewRect << transform();
-	//qDebug() << viewportTransform();
 }
 
 

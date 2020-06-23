@@ -59,8 +59,7 @@ bool CSingleLayerGroupComp::CreateGraphicsItem()
 
 		m_scenePtr->addItem(m_graphicsItemPtr);
 
-		m_itemGroupPtr = new QGraphicsItemGroup(m_graphicsItemPtr);
-		m_scenePtr->addItem(m_itemGroupPtr);
+		m_itemGroupPtr = new CGraphicsItemGroup(m_graphicsItemPtr);
 	}
 
 	return false;
@@ -157,7 +156,7 @@ CEventItemBase* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::Me
 
 		itemPtr->setParentItem(m_itemGroupPtr);
 		itemPtr->setPos(origin);
-		itemPtr->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+		itemPtr->setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemIsSelectable);
 
 		m_events.insert(messagePtr->GetInformationTimeStamp() ,itemPtr);
 

@@ -17,6 +17,7 @@
 #include <imtloggui/IEventItemController.h>
 #include <imtloggui/IEventScenePositionProvider.h>
 #include <imtloggui/CEventGraphicsView.h>
+#include <imtloggui/CGraphicsItemGroup.h>
 
 
 namespace imtloggui
@@ -125,7 +126,7 @@ private:
 
 	imod::TModelWrap<VerticalScaleConstraints> m_verticalScaleConstraints;
 
-	QGraphicsItemGroup* m_graphicsItemPtr;
+	CGraphicsItemGroup* m_itemGroupPtr;
 	
 	typedef QMap<QByteArray, IEventItemController*> GroupList;
 	GroupList m_groups;
