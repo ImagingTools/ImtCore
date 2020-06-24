@@ -217,7 +217,6 @@ void CEventViewComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDat
 		rect.setLeft(m_timeAxisPtr->rect().left());
 		rect.setRight(m_timeAxisPtr->rect().right());
 		m_viewPtr->SetSceneRect(rect);
-		rect.adjust(0, 0, 0, 40);
 		m_viewPtr->SetViewRect(rect);
 		m_currentCommandTime = QDateTime();
 	}
@@ -226,7 +225,7 @@ void CEventViewComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDat
 		m_groupControllerCompPtr->OnAxisBeginTimeChanged(oldTime, newTime);
 	}
 
-	if (m_viewPtr != nullptr){
+	if (oldTime.isValid()){
 		QRectF rect = m_viewPtr->GetSceneRect();
 		rect.setLeft(m_timeAxisPtr->rect().left());
 		rect.setRight(m_timeAxisPtr->rect().right());

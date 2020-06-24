@@ -160,12 +160,6 @@ void CEventGraphicsView::resizeEvent(QResizeEvent* event)
 {
 	BaseClass::resizeEvent(event);
 
-	if (m_timeAxisPtr != nullptr){
-		m_sceneRect.setLeft(0);
-		m_sceneRect.setRight((m_timeAxisPtr->GetEndTime().toMSecsSinceEpoch() - m_timeAxisPtr->GetBeginTime().toMSecsSinceEpoch())/ 1000.);
-		m_viewRect = m_sceneRect;
-	}
-
 	ValidateViewRect();
 	UpdateViewRect();
 
