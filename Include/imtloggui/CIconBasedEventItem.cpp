@@ -43,6 +43,11 @@ void CIconBasedEventItem::paint(QPainter* painter, const QStyleOptionGraphicsIte
 {
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
 	painter->drawPixmap(boundingRect().toRect(), m_icon.pixmap(m_iconSize));
+
+	if (isSelected()){
+		painter->setPen(QPen(Qt::red, 1));
+		painter->drawRoundedRect(boundingRect().adjusted(-2, -2, 2, 2), 2, 2);
+	}
 }
 
 

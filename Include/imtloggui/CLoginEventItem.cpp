@@ -75,6 +75,11 @@ void CLoginEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
 	painter->drawPixmap(QRect(-m_iconSize.width() / 2, bounding.top(), m_iconSize.width(), m_iconSize.height()), icon.pixmap(m_iconSize));
 	painter->drawText(labelRect.translated(QPointF(-labelRect.width() / 2, bounding.bottom() - labelRect.bottom())), user);
+
+	if (isSelected()){
+		painter->setPen(QPen(Qt::red, 1));
+		painter->drawRoundedRect(bounding.adjusted(-2, -2, 2, 2), 2, 2);
+	}
 }
 
 

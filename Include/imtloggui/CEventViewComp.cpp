@@ -99,7 +99,7 @@ void CEventViewComp::OnGuiCreated()
 	m_viewPtr->SetTimeAxis(m_timeAxisPtr);
 	m_viewPtr->SetMargins(QMargins(70, 0, 70, 40));
 
-	QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(GetQtWidget()->layout());//->addWidget(m_viewPtr);
+	QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(GetQtWidget()->layout());
 	layoutPtr->insertWidget(0, m_viewPtr);
 	layoutPtr->setStretch(0, 90);
 	layoutPtr->setStretch(1, 10);
@@ -411,6 +411,8 @@ void CEventViewComp::OnSelectionChanged()
 			}
 		}
 	}
+
+	m_scenePtr->update(m_viewPtr->GetViewRect().toRect());
 }
 
 
@@ -528,10 +530,6 @@ bool CEventViewComp::UpdateMetaInfoPanel(const CEventItemBase* eventItem)
 			layoutPtr->addItem(delimeter, layoutPtr->rowCount(), 0, 1, 1);
 		}
 
-		layoutPtr->setColumnMinimumWidth(0, 10);
-		layoutPtr->setColumnStretch(0, 1);
-		layoutPtr->setColumnStretch(1, 100);
-		layoutPtr->setColumnStretch(1, 100);
 		layoutPtr->addItem(new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding), layoutPtr->rowCount(), 0);
 
 		return true;
