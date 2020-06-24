@@ -5,6 +5,7 @@
 #include <QtGui/QIcon>
 
 // ImtCore includes
+#include <imtlog/IMessageGroupInfoProvider.h>
 #include <imtloggui/CEventItemBase.h>
 
 

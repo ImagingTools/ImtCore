@@ -59,7 +59,13 @@ bool CSingleLayerGroupComp::CreateGraphicsItem()
 
 		m_scenePtr->addItem(m_graphicsItemPtr);
 
+
 		m_itemGroupPtr = new CGraphicsItemGroup(m_graphicsItemPtr);
+		qDebug() << m_graphicsItemPtr->boundingRect();
+		qDebug() << m_graphicsItemPtr->childrenBoundingRect();
+		qDebug() << m_itemGroupPtr->boundingRect();
+		qDebug() << m_itemGroupPtr->childrenBoundingRect();
+		qDebug() << m_graphicsItemPtr->childrenBoundingRect();
 	}
 
 	return false;

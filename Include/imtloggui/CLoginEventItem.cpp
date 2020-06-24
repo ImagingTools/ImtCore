@@ -4,9 +4,6 @@
 // Qt includes
 #include <QtGui/QPainter>
 
-// ImtCore includes
-#include <imtlog/IMessageGroupInfoProvider.h>
-
 
 namespace imtloggui
 {

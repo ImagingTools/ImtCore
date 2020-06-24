@@ -39,10 +39,15 @@ CEventItemBase* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsu
 	eventPtr->SetIcons(loginIcon, logoutIcon);
 	eventPtr->SetIconSize(QSize(iconSize, iconSize));
 
-	CLoginEventItem::MetaInfoItem metaInfoItem;
-	metaInfoItem.key = QObject::tr("User name");
-	metaInfoItem.value = message->GetInformationDescription();
-	eventPtr->AddMetaInfo(metaInfoItem);
+	switch (message->GetInformationId()){
+	case imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN:
+		eventPtr->AddMetaInfo(QObject::tr("Action"), QObject::tr("Login"));
+		break;
+	case imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT:
+		eventPtr->AddMetaInfo(QObject::tr("Action"), QObject::tr("Logout"));
+		break;
+	}
+	eventPtr->AddMetaInfo(QObject::tr("User name"), message->GetInformationDescription());
 
 	return eventPtr;
 }

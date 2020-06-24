@@ -118,7 +118,11 @@ IEventItemController* CEventGroupControllerComp::AddGroup(const QByteArray& grou
 		}
 
 		eventItemController->GetGraphicsItem()->setPos(0, -totalHeight);
+		qDebug() << "-------------------";
+		qDebug() << eventItemController->GetGraphicsItem()->boundingRect();
+		qDebug() << m_itemGroupPtr->childrenBoundingRect();
 		eventItemController->GetGraphicsItem()->setParentItem(m_itemGroupPtr);
+		qDebug() << m_itemGroupPtr->childrenBoundingRect();
 
 		m_groups[groupId] = eventItemController;
 

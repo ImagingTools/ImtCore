@@ -120,6 +120,7 @@ void CEventViewComp::OnGuiCreated()
 		m_groupControllerCompPtr->SetView(m_viewPtr);
 		m_groupControllerCompPtr->SetTimeAxis(m_timeAxisPtr);
 		m_groupControllerCompPtr->CreateGraphicsItem();
+		qDebug() << m_groupControllerCompPtr->GetGraphicsItem()->childrenBoundingRect();
 
 		QByteArrayList groupIds = m_groupControllerCompPtr->GetAvailableGroupList();
 		for (QByteArray id : groupIds){
