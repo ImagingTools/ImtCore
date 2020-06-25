@@ -291,7 +291,7 @@ void CSingleLayerGroupComp::ArrangeEvents()
 		// Current stairway is empty
 		if (arrangedItems.isEmpty()){
 			arrangedItems.append(currentPtr);
-			currentPos.ry() = (-groupHeight / 2) / scaleY;
+			currentPos.ry() = -GetGroupHeight() / 2;
 			currentPtr->setPos(currentPos);
 			arrangedHeight = currentRect.height();
 			continue;
@@ -301,10 +301,10 @@ void CSingleLayerGroupComp::ArrangeEvents()
 
 		// Distances in pixels
 		double posDist = (currentPos.x() - lastPtr->pos().x()) * scaleX;
-		double itemsDist = (currentRect.width() + lastPtr->boundingRect().width()) / 2;
+		double widthHalfSum = (currentRect.width() + lastPtr->boundingRect().width()) / 2;
 
 		// Ñurrent and previous items don't intersect along the x axis. Begin new stairway
-		if (posDist > itemsDist){
+		if (posDist > widthHalfSum){
 			currentPos.ry() = (-groupHeight / 2) / scaleY;
 			currentPtr->setPos(currentPos);
 			arrangedHeight = currentRect.height();
@@ -314,7 +314,7 @@ void CSingleLayerGroupComp::ArrangeEvents()
 		}
 
 		// Current stairway can grow up
-		if (arrangedHeight + (currentRect.height() + *m_verticalSpaceingAttrPtr) < groupHeight){
+		if (arrangedHeight + (currentRect.height() + 3 * (*m_verticalSpaceingAttrPtr)) < groupHeight){
 			// Shift up stairway
 			for (CEventItemBase* itemPtr : arrangedItems){
 				QPointF pos = itemPtr->pos();
@@ -322,15 +322,15 @@ void CSingleLayerGroupComp::ArrangeEvents()
 				itemPtr->setPos(pos);
 			}
 
-			currentPos.ry() = lastPtr->pos().y() + (lastPtr->boundingRect().height() / 2 + (currentRect.height() + *m_verticalSpaceingAttrPtr)/ 2) / scaleY;
+			currentPos.ry() = lastPtr->pos().y() + (lastPtr->boundingRect().height() / 2 + *m_verticalSpaceingAttrPtr + currentRect.height() / 2) / scaleY;
 			currentPtr->setPos(currentPos);
-			arrangedHeight += currentRect.height();
+			arrangedHeight += *m_verticalSpaceingAttrPtr + currentRect.height();
 			arrangedItems.append(currentPtr);
 			continue;
 		}
 
 		// Current stairway can't grow up. Begin new stairway
-		currentPos.ry() = (-groupHeight / 2) / scaleY;
+		currentPos.ry() = -GetGroupHeight() / 2;
 		currentPtr->setPos(currentPos);
 		arrangedHeight = currentRect.height();
 		arrangedItems.clear();
