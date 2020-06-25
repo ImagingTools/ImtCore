@@ -166,6 +166,8 @@ CEventItemBase* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::Me
 
 		m_events.insert(messagePtr->GetInformationTimeStamp() ,itemPtr);
 
+		ArrangeEvents();
+
 		return itemPtr;
 	}
 
