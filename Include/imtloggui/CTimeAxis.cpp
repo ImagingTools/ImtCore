@@ -211,8 +211,6 @@ QRectF CTimeAxis::boundingRect() const
 	QRectF visibleRect = mapRectFromScene(GetSceneVisibleRect());
 	QRectF itemRect = rect().intersected(visibleRect);
 
-	//QPointF origin = axisRect.bottomLeft();
-
 	if (visibleRect.left() < itemRect.left()){
 		itemRect.setLeft(visibleRect.left());
 	}
@@ -220,12 +218,6 @@ QRectF CTimeAxis::boundingRect() const
 	if (visibleRect.right() > itemRect.right()){
 		itemRect.setRight(visibleRect.right());
 	}
-
-	//axisRect.setTop(0);
-	//axisRect.setBottom(rect().height());
-
-	//// Left and right marings for the drawing the first and last tick labels:
-	//axisRect.adjust(-100 / GetCurrentScaleX(), 0, 100 / GetCurrentScaleX(), 0);
 
 	return itemRect;
 }
@@ -673,9 +665,6 @@ QRectF CTimeAxis::GetItemVisibleRect() const
 {
 	QRectF sceneVisibleRect = mapRectFromScene(GetSceneVisibleRect());
 	QRectF itemVisibleRect = rect().intersected(sceneVisibleRect);
-
-	//itemVisibleRect.setTop(sceneVisibleRect.top());
-	//itemVisibleRect.setBottom(sceneVisibleRect.bottom());
 
 	return itemVisibleRect;
 }

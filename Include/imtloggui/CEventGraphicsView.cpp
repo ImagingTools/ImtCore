@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QScrollBar>
 
@@ -16,8 +15,7 @@ CEventGraphicsView::CEventGraphicsView(QWidget* parent)
 	:QGraphicsView(parent),
 	m_timeAxisPtr(nullptr),
 	m_minimumVerticalScale(1),
-	m_userAction(false)//,
-	//m_containerPtr(nullptr)
+	m_userAction(false)
 {
 }
 
@@ -25,12 +23,6 @@ CEventGraphicsView::CEventGraphicsView(QWidget* parent)
 void CEventGraphicsView::SetTimeAxis(CTimeAxis* timeAxisPtr)
 {
 	m_timeAxisPtr = timeAxisPtr;
-}
-
-
-void CEventGraphicsView::SetContainer(QGraphicsItem* containerPtr)
-{
-	//m_containerPtr= containerPtr;
 }
 
 
@@ -42,13 +34,13 @@ QRectF CEventGraphicsView::GetSceneVisibleRect() const
 
 double CEventGraphicsView::GetScaleX() const
 {
-	return viewportTransform().m11();
+	return viewport()->rect().width() / m_viewRect.width();
 }
 
 
 double CEventGraphicsView::GetScaleY() const
 {
-	return viewportTransform().m22();
+	return viewport()->rect().height() / m_viewRect.height();
 }
 
 
@@ -61,7 +53,9 @@ QRectF CEventGraphicsView::GetSceneRect()
 void CEventGraphicsView::SetSceneRect(const QRectF& rect)
 {
 	m_sceneRect = rect;
+
 	ValidateViewRect();
+	UpdateViewRect();
 }
 
 
@@ -74,11 +68,8 @@ QRectF CEventGraphicsView::GetViewRect()
 void CEventGraphicsView::SetViewRect(const QRectF& rect)
 {
 	m_viewRect = rect;
+
 	ValidateViewRect();
-
-	//m_containerPtr->setPos(-m_viewRect.left(), 0);
-	//m_viewRect.translate(-m_viewRect.left(), 0);
-
 	UpdateViewRect();
 	Q_EMIT EmitViewPortChanged(false);
 }
@@ -95,6 +86,7 @@ void CEventGraphicsView::SetMargins(const QMargins& margins)
 	m_margins = margins;
 
 	ValidateViewRect();
+	UpdateViewRect();
 }
 
 
@@ -104,9 +96,26 @@ void CEventGraphicsView::OnMinimumVerticalScaleChanged(double minScale)
 {
 	m_minimumVerticalScale = minScale;
 
-	if (viewportTransform().m22() < minScale){
-		scale(1, minScale / viewportTransform().m22());
+	ValidateViewRect();
+	UpdateViewRect();
+}
+
+
+void CEventGraphicsView::OnShowAll()
+{
+	double viewWidth = m_sceneRect.width() / (1 - (double)(m_margins.left() + m_margins.right()) / viewport()->rect().width());
+	double viewHeight = m_sceneRect.height() / (1 - (double)(m_margins.top() + m_margins.bottom()) / viewport()->rect().height());
+
+	double scaleY = viewport()->rect().height() / viewHeight;
+	if (scaleY < m_minimumVerticalScale){
+		viewHeight = viewport()->rect().height() / m_minimumVerticalScale;
 	}
+
+	m_viewRect = QRectF(m_sceneRect.bottomRight(), QSizeF(viewWidth, viewHeight));
+
+	ValidateViewRect();
+	UpdateViewRect();
+	Q_EMIT EmitViewPortChanged(true);
 }
 
 
@@ -116,12 +125,8 @@ void CEventGraphicsView::OnMinimumVerticalScaleChanged(double minScale)
 
 void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 {
-	//const ViewportAnchor anchor = transformationAnchor();
-	//setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-
-	QRectF rect = sceneRect();
-	double scaleX = viewportTransform().m11();
-	double scaleY = viewportTransform().m22();
+	double scaleX = GetScaleX();
+	double scaleY = GetScaleY();
 
 	if (event->modifiers() && Qt::Modifier::SHIFT){
 		if (event->delta() > 0){
@@ -151,8 +156,6 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 	}
 
 	Q_EMIT EmitViewPortChanged(true);
-
-	//setTransformationAnchor(anchor);
 }
 
 
@@ -175,7 +178,7 @@ void CEventGraphicsView::mouseMoveEvent(QMouseEvent *event)
 		QPointF delta = m_lockedScenePoint - event->pos();
 		m_lockedScenePoint = event->pos();
 
-		MoveViewRect(delta.x() / viewportTransform().m11(), delta.y() / viewportTransform().m22());
+		MoveViewRect(delta.x() / GetScaleX(), delta.y() / GetScaleY());
 
 		event->accept();
 	}
@@ -205,14 +208,6 @@ void CEventGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 
 void CEventGraphicsView::MoveViewRect(double dX, double dY)
 {
-	//QPointF containerOrigin = m_containerPtr->pos();
-	//qDebug() << "*** " << containerOrigin;
-
-	//containerOrigin.rx() -= dX;
-
-	//m_containerPtr->setPos(1000000000000, 0);
-	//m_containerPtr->setPos(containerOrigin);
-	//m_viewRect.translate(0, dY);
 	m_viewRect.translate(dX, dY);
 
 	ValidateViewRect();
@@ -233,12 +228,6 @@ void CEventGraphicsView::ScaleViewRect(const QPointF& center, double scaleX, dou
 	}
 
 	ValidateViewRect();
-	//QPointF containerOrigin = m_containerPtr->pos();
-
-	//containerOrigin.rx() -= m_viewRect.left();
-	//m_containerPtr->setPos(containerOrigin);
-	//m_viewRect.translate(-m_viewRect.left(), 0);
-
 	UpdateViewRect();
 }
 
@@ -282,7 +271,7 @@ void CEventGraphicsView::UpdateViewRect()
 	setSceneRect(m_viewRect);
 	QTransform matrix;
 	matrix.translate(m_viewRect.topLeft().x(), m_viewRect.topLeft().y());
-	matrix.scale(viewport()->rect().width() / m_viewRect.width(), viewport()->rect().height() / m_viewRect.height());
+	matrix.scale(GetScaleX(), GetScaleY());
 
 	setTransform(matrix);
 }

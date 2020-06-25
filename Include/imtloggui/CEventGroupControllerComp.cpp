@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QDebug>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QScrollBar>
@@ -118,11 +117,7 @@ IEventItemController* CEventGroupControllerComp::AddGroup(const QByteArray& grou
 		}
 
 		eventItemController->GetGraphicsItem()->setPos(0, -totalHeight);
-		qDebug() << "-------------------";
-		qDebug() << eventItemController->GetGraphicsItem()->boundingRect();
-		qDebug() << m_itemGroupPtr->childrenBoundingRect();
 		eventItemController->GetGraphicsItem()->setParentItem(m_itemGroupPtr);
-		qDebug() << m_itemGroupPtr->childrenBoundingRect();
 
 		m_groups[groupId] = eventItemController;
 
@@ -267,19 +262,10 @@ void CEventGroupControllerComp::OnViewPortChanged()
 		m_generalGroupRefCompPtr->OnViewPortChanged();
 	}
 
-	//QRectF newSceneRect = m_viewPtr->GetSceneRect();
-
 	int totalHeight = 0;
 	for (IEventItemController* item : m_groups){
 		totalHeight += item->GetGroupHeight();
 	}
-
-	//newSceneRect.setBottom(40 / m_viewPtr->viewportTransform().m22());
-	//newSceneRect.setTop(-totalHeight);
-
-	//if (m_viewPtr->GetSceneRect() != newSceneRect){
-	//	m_viewPtr->SetSceneRect(newSceneRect);
-	//}
 
 	QMargins viewMargins = m_viewPtr->GetMargins();
 	double minimumVerticalScale = m_viewPtr->viewport()->rect().height() / (m_viewPtr->GetSceneRect().height() + viewMargins.bottom() + viewMargins.top());

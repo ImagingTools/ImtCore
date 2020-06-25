@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtWidgets/QLabel>
 
 // ACF includes
@@ -82,13 +81,12 @@ void CEventViewComp::OnGuiCreated()
 	BaseClass::OnGuiCreated();
 
 	m_scenePtr = new QGraphicsScene(GetQtWidget());
-	connect(m_scenePtr, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
-	connect(this, &CEventViewComp::UpdateSceneRect, this, &CEventViewComp::OnUpdateSceneRect);
 
 	m_timeAxisPtr = new CTimeAxis();
 	m_timeAxisPtr->SetColor(Qt::green);
 	m_timeAxisPtr->setRect(0, 0, 100, 40);
 	m_timeAxisPtr->setZValue(101);
+	m_scenePtr->addItem(m_timeAxisPtr);
 
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
 	m_viewPtr->setScene(m_scenePtr);
@@ -108,19 +106,18 @@ void CEventViewComp::OnGuiCreated()
 		MetaInfoPanel->setLayout(new QGridLayout());
 	}
 
-	m_scenePtr->addItem(m_timeAxisPtr);
-
+	connect(m_scenePtr, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
 	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisPosChanged, this, &CEventViewComp::OnAxisPosChanged);
 	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CEventViewComp::OnAxisBeginTimeChanged);
 	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisEndTimeChanged, this, &CEventViewComp::OnAxisEndTimeChanged);
 	connect(m_viewPtr, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
+	connect(this, &CEventViewComp::EmitShowAll, m_viewPtr, &CEventGraphicsView::OnShowAll, Qt::QueuedConnection);
 
 	if (m_groupControllerCompPtr.IsValid()){
 		m_groupControllerCompPtr->SetScene(m_scenePtr);
 		m_groupControllerCompPtr->SetView(m_viewPtr);
 		m_groupControllerCompPtr->SetTimeAxis(m_timeAxisPtr);
 		m_groupControllerCompPtr->CreateGraphicsItem();
-		qDebug() << m_groupControllerCompPtr->GetGraphicsItem()->childrenBoundingRect();
 
 		QByteArrayList groupIds = m_groupControllerCompPtr->GetAvailableGroupList();
 		for (QByteArray id : groupIds){
@@ -133,13 +130,17 @@ void CEventViewComp::OnGuiCreated()
 		}
 	}
 
-	for (const ilog::IMessageConsumer::MessagePtr& message : m_messageList)
-	{	
-		AddMessage(message);
+	if (m_messageList.isEmpty()){
+		m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
 	}
-	m_messageList.clear();
+	else{
+		for (const ilog::IMessageConsumer::MessagePtr& message : m_messageList)
+		{
+			AddMessage(message);
+		}
 
-	m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
+		m_messageList.clear();
+	}
 }
 
 
@@ -181,15 +182,6 @@ void CEventViewComp::OnViewPortChanged(bool userAction)
 		QRectF visibleRect = m_viewPtr->GetSceneVisibleRect();
 		
 		m_timeAxisPtr->setPos(0, visibleRect.bottom() - m_timeAxisPtr->rect().height() / m_viewPtr->GetScaleY());
-		//m_timeAxisPtr->OnViewPortChanged();
-
-		//QRectF rect = m_viewPtr->GetSceneRect();
-
-		//if (m_timeAxisPtr != nullptr){
-		//	rect.setLeft(m_timeAxisPtr->rect().left() - 100 / m_viewPtr->GetScaleX());
-		//	rect.setRight(m_timeAxisPtr->rect().right() + 100 / m_viewPtr->GetScaleX());
-		//	m_viewPtr->SetSceneRect(rect);
-		//}
 	}
 
 	if (m_groupControllerCompPtr.IsValid()){
@@ -220,6 +212,7 @@ void CEventViewComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDat
 		m_viewPtr->SetSceneRect(rect);
 		m_viewPtr->SetViewRect(rect);
 		m_currentCommandTime = QDateTime();
+		Q_EMIT EmitShowAll();
 	}
 	 
 	if (m_groupControllerCompPtr.IsValid()){
@@ -441,7 +434,7 @@ QRectF CEventViewComp::GetSceneVisibleRect() const
 double CEventViewComp::GetCurrentScaleX() const
 {
 	if (m_viewPtr != nullptr){
-		return m_viewPtr->viewportTransform().m11();
+		return m_viewPtr->GetScaleX();
 	}
 
 	return 0;

@@ -55,10 +55,8 @@ void CEventGroupItem::OnViewPortChanged()
 	QRectF visibleRect = GetSceneVisibleRect();
 	
 	QPointF labelOrigin(visibleRect.left(), pos().y() + rect().center().y());
-	//if (m_labelPtr->pos() != labelOrigin){
 	m_labelPtr->setPos(-1000000000, 0);
 	m_labelPtr->setPos(labelOrigin);
-//}
 
 	prepareGeometryChange();
 }
@@ -129,7 +127,6 @@ QRectF CEventGroupItem::GetSceneVisibleRect() const
 QRectF CEventGroupItem::GetItemVisibleRect() const
 {
 	QRectF sceneVisibleRect = mapRectFromScene(GetSceneVisibleRect());
-	//QRectF itemVisibleRect = boundingRect().intersected(mapFromScene(sceneVisibleRect).boundingRect());
 	QRectF itemVisibleRect = rect().intersected(sceneVisibleRect);
 
 	return itemVisibleRect;

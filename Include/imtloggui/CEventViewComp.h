@@ -59,7 +59,7 @@ public:
 	virtual void OnGuiDestroyed() override;
 
 Q_SIGNALS:
-	void UpdateSceneRect();
+	void EmitShowAll();
 
 private Q_SLOTS:
 	void OnViewPortChanged(bool userAction);

@@ -23,7 +23,6 @@ public:
 	CEventGraphicsView(QWidget* parent = nullptr);
 
 	void SetTimeAxis(CTimeAxis* timeAxisPtr);
-	void SetContainer(QGraphicsItem* containerPtr);
 
 	QRectF GetSceneVisibleRect() const;
 	double GetScaleX() const;
@@ -42,6 +41,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void OnMinimumVerticalScaleChanged(double minScale);
+	void OnShowAll();
 
 protected:
 	// reimplemented (QGraphicsView)
@@ -67,8 +67,6 @@ private:
 	QRectF m_sceneRect;
 	QRectF m_viewRect;
 	QMargins m_margins;
-
-	//QGraphicsItem* m_containerPtr;
 };
 
 
