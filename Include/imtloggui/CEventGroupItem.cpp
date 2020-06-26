@@ -115,9 +115,7 @@ double CEventGroupItem::GetCurrentScaleY() const
 QRectF CEventGroupItem::GetSceneVisibleRect() const
 {
 	QGraphicsView* viewPtr = scene()->views().first();
-
 	QRect viewportRect = viewPtr->viewport()->rect();
-
 	QRectF visibleSceneRect = viewPtr->mapToScene(viewportRect).boundingRect();
 
 	return visibleSceneRect;

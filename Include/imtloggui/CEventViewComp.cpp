@@ -82,19 +82,11 @@ void CEventViewComp::OnGuiCreated()
 
 	m_scenePtr = new QGraphicsScene(GetQtWidget());
 
-	m_timeAxisPtr = new CTimeAxis();
-	m_timeAxisPtr->SetColor(Qt::green);
-	m_timeAxisPtr->setRect(0, 0, 100, 40);
-	m_timeAxisPtr->setZValue(101);
-	m_scenePtr->addItem(m_timeAxisPtr);
-
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
 	m_viewPtr->setScene(m_scenePtr);
 	m_viewPtr->setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 	m_viewPtr->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_viewPtr->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_viewPtr->setMouseTracking(false);
-	m_viewPtr->SetTimeAxis(m_timeAxisPtr);
 	m_viewPtr->SetMargins(QMargins(70, 0, 70, 40));
 
 	QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(GetQtWidget()->layout());
@@ -105,6 +97,14 @@ void CEventViewComp::OnGuiCreated()
 	if (MetaInfoPanel->layout() == nullptr){
 		MetaInfoPanel->setLayout(new QGridLayout());
 	}
+
+	m_timeAxisPtr = new CTimeAxis();
+	m_timeAxisPtr->SetColor(Qt::green);
+	m_timeAxisPtr->setRect(0, 0, 100, 40);
+	m_timeAxisPtr->setZValue(101);
+	m_scenePtr->addItem(m_timeAxisPtr);
+
+	m_viewPtr->SetTimeAxis(m_timeAxisPtr);
 
 	connect(m_scenePtr, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
 	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisPosChanged, this, &CEventViewComp::OnAxisPosChanged);
@@ -146,10 +146,12 @@ void CEventViewComp::OnGuiCreated()
 
 void CEventViewComp::OnGuiDestroyed()
 {
+	disconnect(m_scenePtr, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
 	disconnect(m_timeAxisPtr, &CTimeAxis::EmitAxisPosChanged, this, &CEventViewComp::OnAxisPosChanged);
 	disconnect(m_timeAxisPtr, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CEventViewComp::OnAxisBeginTimeChanged);
 	disconnect(m_timeAxisPtr, &CTimeAxis::EmitAxisEndTimeChanged, this, &CEventViewComp::OnAxisEndTimeChanged);
 	disconnect(m_viewPtr, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
+	disconnect(this, &CEventViewComp::EmitShowAll, m_viewPtr, &CEventGraphicsView::OnShowAll);
 
 	m_viewPtr->SetTimeAxis(nullptr);
 
