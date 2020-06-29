@@ -215,19 +215,15 @@ QTreeWidget[TabSimulation=true]::item:first:selected
     border-top: 1px white;
 }
 
-QTreeView[ItemView=true]::item
-{
-	color: #335777;
-	padding-top: 0.9em;
-	padding-bottom: 0.9em;
+QTreeView[ItemView=true]::item {
+    color: #335777;
+    height: 25px;
 }
 
-QTreeView[ItemView=true]::item::selected
-{
-	color: #335777;
-	padding-top: 0.9em;
-	padding-bottom: 0.9em;
-	background-color: #aad5ff;
+QTreeView[ItemView=true]::item::selected {
+    color: #335777;
+    height: 25px;
+    background-color: #aad5ff;
 }
 
 QComboBox::item:selected 
