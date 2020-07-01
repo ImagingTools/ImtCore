@@ -1,6 +1,10 @@
 #pragma once
 
 
+// ACF includes
+#include <iauth/ILogin.h>
+#include <ilog/IMessageConsumer.h>
+
 // ImtCore includes
 #include <imtgui/CDocumentWorkspaceGuiCompBase.h>
 #include <GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h>
@@ -22,6 +26,8 @@ public:
 	typedef imtgui::CDocumentWorkspaceGuiCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDocumentWorkspaceGuiComp);
+		I_ASSIGN(m_loginCompPtr, "Login", "Login component", false, "");
+		I_ASSIGN(m_logCompPtr, "Log", "Message consumer component", false, "");
 	I_END_COMPONENT;
 
 protected:
@@ -106,6 +112,9 @@ private:
 		iqtgui::CHierarchicalCommand m_redoCommand;
 		iqtgui::CHierarchicalCommand m_closeCommand;
 	};
+
+	I_REF(iauth::ILogin, m_loginCompPtr);
+	I_REF(ilog::IMessageConsumer, m_logCompPtr);
 };
 
 

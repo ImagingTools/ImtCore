@@ -78,9 +78,9 @@ I_EXPORT_COMPONENT(
 			"LayoutManager model");
 
 I_EXPORT_COMPONENT(
-	LayoutManagerGui,
-	"LayoutManagerGui component",
-	"LayoutManagerGui page");
+			LayoutManagerGui,
+			"LayoutManagerGui component",
+			"LayoutManagerGui page");
 
 I_EXPORT_COMPONENT(
 			CompositeObjectView,
@@ -91,6 +91,11 @@ I_EXPORT_COMPONENT(
 			ImageContoursExtender,
 			"Image contours extender component",
 			"Image Contours Contour Extender View Observer");
+
+I_EXPORT_COMPONENT(
+			ApplicationChangedEventFactory,
+			"Application changed message factory",
+			"Application Changed Message Factory");
 
 
 } // namespace ImtGuiPck
