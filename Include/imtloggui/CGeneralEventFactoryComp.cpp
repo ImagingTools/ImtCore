@@ -19,12 +19,10 @@ CEventItemBase* CGeneralEventFactoryComp::CreateInstance(const ilog::IMessageCon
 		return CreateInstanceWithSlaveFactory(message);
 	}
 
+	QString status;
 	QIcon icon;
 	int iconSize = 24;
 
-	QString status;
-	
-	
 	switch (message->GetInformationCategory()){
 	case istd::IInformationProvider::IC_NONE:
 		icon = QIcon(":/Icons/StateUnknown");
@@ -55,7 +53,8 @@ CEventItemBase* CGeneralEventFactoryComp::CreateInstance(const ilog::IMessageCon
 	CIconBasedEventItem* eventPtr = new CIconBasedEventItem(message);
 	eventPtr->SetIcon(icon);
 	eventPtr->SetIconSize(QSize(iconSize, iconSize));
-	eventPtr->setToolTip(QObject::tr("Source" )+ ": "  + message->GetInformationSource()
+	eventPtr->setToolTip(
+				QObject::tr("Source" )+ ": "  + message->GetInformationSource()
 				+ QObject::tr("\nMessage" ) + ": " + message->GetInformationDescription()
 				+ QObject::tr("\nStatus") + ": " + status);
 	eventPtr->AddMetaInfo(QObject::tr("Source"), message->GetInformationSource());

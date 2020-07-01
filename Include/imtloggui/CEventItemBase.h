@@ -29,7 +29,6 @@ public:
 
 	QDateTime GetEventTimeStamp() const;
 	const MetaInfo& GetMetaInfo() const;
-	void AddMetaInfo(const MetaInfoItem& metaInfoItem);
 	void AddMetaInfo(const QString& key, const QString& value);
 
 protected:

@@ -37,12 +37,6 @@ const CEventItemBase::MetaInfo& CEventItemBase::GetMetaInfo() const
 }
 
 
-void CEventItemBase::AddMetaInfo(const MetaInfoItem& metaInfoItem)
-{
-	m_metaInfo.append(metaInfoItem);
-}
-
-
 void CEventItemBase::AddMetaInfo(const QString& key, const QString& value)
 {
 	MetaInfoItem metaInfoItem;
