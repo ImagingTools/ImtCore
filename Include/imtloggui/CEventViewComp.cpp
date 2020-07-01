@@ -24,6 +24,8 @@ CEventViewComp::CEventViewComp()
 	:m_scenePtr(nullptr),
 	m_viewPtr(nullptr),
 	m_timeAxisPtr(nullptr),
+	m_splitterPtr(nullptr),
+	m_metaInfoPanelPtr(nullptr),
 	m_scaleConstraintsObserver(*this),
 	m_rootCommands("", 100, ibase::ICommand::CF_GLOBAL_MENU),
 	m_moveToFirstCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
@@ -89,13 +91,19 @@ void CEventViewComp::OnGuiCreated()
 	m_viewPtr->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_viewPtr->SetMargins(QMargins(70, 0, 70, 40));
 
+	m_splitterPtr = new QSplitter();
+	m_metaInfoPanelPtr = new QWidget();
+
 	QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(GetQtWidget()->layout());
-	layoutPtr->insertWidget(0, m_viewPtr);
-	layoutPtr->setStretch(0, 90);
-	layoutPtr->setStretch(1, 10);
-	MetaInfoPanel->hide();
-	if (MetaInfoPanel->layout() == nullptr){
-		MetaInfoPanel->setLayout(new QGridLayout());
+
+	layoutPtr->insertWidget(0, m_splitterPtr);
+	m_splitterPtr->addWidget(m_viewPtr);
+	m_splitterPtr->addWidget(m_metaInfoPanelPtr);
+	m_splitterPtr->setStretchFactor(0, 9);
+	m_splitterPtr->setStretchFactor(0, 1);
+	m_metaInfoPanelPtr->hide();
+	if (m_metaInfoPanelPtr->layout() == nullptr){
+		m_metaInfoPanelPtr->setLayout(new QGridLayout());
 	}
 
 	m_timeAxisPtr = new CTimeAxis();
@@ -397,12 +405,12 @@ void CEventViewComp::OnMoveToLastCommand()
 void CEventViewComp::OnSelectionChanged()
 {
 	QList<QGraphicsItem*> items = m_scenePtr->selectedItems();
-	MetaInfoPanel->hide();
+	m_metaInfoPanelPtr->hide();
 	if (!items.isEmpty()){
 		CEventItemBase* itemPtr = dynamic_cast<CEventItemBase*>(items[0]);
 		if (itemPtr != nullptr){
 			if (UpdateMetaInfoPanel(itemPtr)){
-				MetaInfoPanel->show();
+				m_metaInfoPanelPtr->show();
 			}
 		}
 	}
@@ -497,13 +505,13 @@ void CEventViewComp::MoveToTime(const QDateTime& time)
 
 bool CEventViewComp::UpdateMetaInfoPanel(const CEventItemBase* eventItem)
 {
-	iwidgets::ClearLayout(MetaInfoPanel->layout());
+	iwidgets::ClearLayout(m_metaInfoPanelPtr->layout());
 
 	if (eventItem == nullptr){
 		return false;
 	}
 
-	QGridLayout* layoutPtr = dynamic_cast<QGridLayout*>(MetaInfoPanel->layout());
+	QGridLayout* layoutPtr = dynamic_cast<QGridLayout*>(m_metaInfoPanelPtr->layout());
 	if (layoutPtr != nullptr){
 		CEventItemBase::MetaInfo metaInfo = eventItem->GetMetaInfo();
 		if (metaInfo.isEmpty()){
@@ -511,11 +519,18 @@ bool CEventViewComp::UpdateMetaInfoPanel(const CEventItemBase* eventItem)
 		}
 
 		for (CEventItemBase::MetaInfoItem metaInfoItem : metaInfo){
-			QLabel* labelKeyPtr = new QLabel(metaInfoItem.key, MetaInfoPanel);
-			labelKeyPtr->setStyleSheet("font-size: 12px; font: bold; color: #88b8e3");
+			QLabel* labelKeyPtr = new QLabel(metaInfoItem.key, m_metaInfoPanelPtr);
+			QFont keyLabelFont;
+			keyLabelFont.setPixelSize(12);
+			keyLabelFont.setBold(true);
+			labelKeyPtr->setFont(keyLabelFont);
+			labelKeyPtr->setStyleSheet("color: #88b8e3");
 
-			QLabel* labelValuePtr = new QLabel(metaInfoItem.value, MetaInfoPanel);
-			labelValuePtr->setStyleSheet("font-size: 9px; color: gray");
+			QFont valueLabelFont;
+			valueLabelFont.setPixelSize(9);
+			QLabel* labelValuePtr = new QLabel(metaInfoItem.value, m_metaInfoPanelPtr);
+			labelValuePtr->setFont(valueLabelFont);
+			labelValuePtr->setStyleSheet("color: gray");
 			labelValuePtr->setWordWrap(true);
 
 			layoutPtr->addWidget(labelKeyPtr, layoutPtr->rowCount(), 0, 1, 1);

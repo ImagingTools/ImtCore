@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QSplitter>
 
 // ACF includes
 #include <ibase/ICommandsProvider.h>
@@ -137,6 +138,9 @@ private:
 	QDateTime m_currentCommandTime;
 
 	QList<ilog::IMessageConsumer::MessagePtr> m_messageList;
+
+	QSplitter* m_splitterPtr;
+	QWidget* m_metaInfoPanelPtr;
 };
 
 
