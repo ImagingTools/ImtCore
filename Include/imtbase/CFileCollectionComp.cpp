@@ -40,7 +40,7 @@ CFileCollectionComp::CFileCollectionComp()
 const ifile::IFileResourceTypeConstraints* CFileCollectionComp::GetFileTypeConstraints() const
 {
 	if (!m_resourceFileTypesCompPtr.IsValid() || !m_resourceTypesCompPtr.IsValid()){
-		return NULL;
+		return nullptr;
 	}
 
 	return &m_resourceTypeConstraints;
@@ -126,7 +126,6 @@ QByteArray CFileCollectionComp::InsertFile(
 			const QString& objectDescription,
 			const QByteArray& proposedObjectId)
 {
-
 	static QByteArray emptyId;
 
 	QWriteLocker locker(&m_collectionLock);
@@ -344,7 +343,7 @@ QByteArray CFileCollectionComp::InsertNewObject(
 {
 	istd::TOptDelPtr<const istd::IChangeable> newObjectPtr;
 
-	if (defaultValuePtr != NULL){
+	if (defaultValuePtr != nullptr){
 		newObjectPtr.SetPtr(defaultValuePtr, false);
 	}
 	else{
@@ -353,7 +352,7 @@ QByteArray CFileCollectionComp::InsertNewObject(
 
 	if (newObjectPtr.IsValid()){
 		const ifile::IFilePersistence* persistencePtr = GetPersistenceForResource(typeId);
-		if (persistencePtr != NULL){
+		if (persistencePtr != nullptr){
 			QStringList supportedExts;
 			persistencePtr->GetFileExtensions(supportedExts, defaultValuePtr, ifile::IFilePersistence::QF_SAVE);
 
@@ -740,7 +739,7 @@ int CFileCollectionComp::GetSupportedOperations() const
 bool CFileCollectionComp::CopyFrom(const istd::IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CFileCollectionComp* sourcePtr = dynamic_cast<const CFileCollectionComp*>(&object);
-	if (sourcePtr != NULL){
+	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
 		{
@@ -833,7 +832,7 @@ const ifile::IFilePersistence* CFileCollectionComp::GetPersistenceForResource(co
 		return m_objectPersistenceListCompPtr[factoryIndex];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -888,7 +887,7 @@ istd::IChangeable* CFileCollectionComp::CreateObjectFromFile(const QString& file
 	istd::IChangeable* retVal = CreateDataObject(typeId);
 	if (retVal != nullptr){
 		const ifile::IFilePersistence* filePersistenceCompPtr = GetPersistenceForResource(typeId);
-		if (filePersistenceCompPtr != NULL){
+		if (filePersistenceCompPtr != nullptr){
 			int loadState = filePersistenceCompPtr->LoadFromFile(*retVal, filePath);
 			if (loadState == ifile::IFilePersistence::OS_OK){
 				return retVal;
@@ -962,7 +961,7 @@ void CFileCollectionComp::UpdateItemMetaInfo(CollectionItem& item) const
 bool CFileCollectionComp::SaveMetaInfo(const idoc::IDocumentMetaInfo& metaInfo, const QString& filePath) const
 {
 	const iser::ISerializable* serializablePtr = dynamic_cast<const iser::ISerializable*>(&metaInfo);
-	if (serializablePtr != NULL){
+	if (serializablePtr != nullptr){
 		ifile::CCompactXmlFileWriteArchive archive(filePath, m_versionInfoCompPtr.GetPtr());
 
 		return (const_cast<iser::ISerializable*>(serializablePtr))->Serialize(archive);
@@ -976,7 +975,7 @@ bool CFileCollectionComp::LoadFileMetaInfo(idoc::IDocumentMetaInfo& metaInfo, co
 {
 	if (QFile::exists(filePath)){
 		iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(&metaInfo);
-		if (serializablePtr != NULL){
+		if (serializablePtr != nullptr){
 			ifile::CCompactXmlFileReadArchive archive(filePath, m_versionInfoCompPtr.GetPtr());
 
 			return serializablePtr->Serialize(archive);
@@ -1043,7 +1042,7 @@ QString CFileCollectionComp::CalculateFolderPathInRepository(
 
 					SendWarningMessage(0, warning);
 
-					if (messageConsumerPtr != NULL){
+					if (messageConsumerPtr != nullptr){
 						messageConsumerPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_WARNING, 0, warning, "File Collection")));
 					}
 				}
@@ -1178,7 +1177,7 @@ bool CFileCollectionComp::InsertFileIntoRepository(
 
 		SendErrorMessage(0, errorMessage);
 
-		if (messageConsumerPtr != NULL){
+		if (messageConsumerPtr != nullptr){
 			messageConsumerPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0,  errorMessage, "File Collection")));
 		}
 
@@ -1372,7 +1371,7 @@ void CFileCollectionComp::OnSync()
 // public methods of the embedded class ResourceTypeConstraints
 
 CFileCollectionComp::ResourceTypeConstraints::ResourceTypeConstraints()
-	:m_parentPtr(NULL)
+	:m_parentPtr(nullptr)
 {
 }
 
@@ -1385,17 +1384,17 @@ void CFileCollectionComp::ResourceTypeConstraints::SetParent(CFileCollectionComp
 
 // reimplemented (IFileResourceTypeConstraints)
 
-const ifile::IFileTypeInfo* CFileCollectionComp::ResourceTypeConstraints::GetFileTypeInfo(int resourceTypeIndex) const
+const ifile::IFileTypeInfo* CFileCollectionComp::ResourceTypeConstraints::GetFileTypeInfo(int typeIndex) const
 {
-	Q_ASSERT(m_parentPtr != NULL);
+	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
-	Q_ASSERT(resourceTypeIndex >= 0);
+	Q_ASSERT(typeIndex >= 0);
 
-	if (resourceTypeIndex < m_parentPtr->m_resourceFileTypesCompPtr.GetCount()){
-		return m_parentPtr->m_resourceFileTypesCompPtr[resourceTypeIndex];
+	if (typeIndex < m_parentPtr->m_resourceFileTypesCompPtr.GetCount()){
+		return m_parentPtr->m_resourceFileTypesCompPtr[typeIndex];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1403,7 +1402,7 @@ const ifile::IFileTypeInfo* CFileCollectionComp::ResourceTypeConstraints::GetFil
 
 int CFileCollectionComp::ResourceTypeConstraints::GetOptionsFlags() const
 {
-	Q_ASSERT(m_parentPtr != NULL);
+	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
 
 	return m_parentPtr->m_resourceTypesCompPtr->GetOptionsFlags();
@@ -1412,7 +1411,7 @@ int CFileCollectionComp::ResourceTypeConstraints::GetOptionsFlags() const
 
 int CFileCollectionComp::ResourceTypeConstraints::GetOptionsCount() const
 {
-	Q_ASSERT(m_parentPtr != NULL);
+	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
 
 	return m_parentPtr->m_resourceTypesCompPtr->GetOptionsCount();
@@ -1421,7 +1420,7 @@ int CFileCollectionComp::ResourceTypeConstraints::GetOptionsCount() const
 
 QString CFileCollectionComp::ResourceTypeConstraints::GetOptionName(int index) const
 {
-	Q_ASSERT(m_parentPtr != NULL);
+	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
 
 	return m_parentPtr->m_resourceTypesCompPtr->GetOptionName(index);
@@ -1430,7 +1429,7 @@ QString CFileCollectionComp::ResourceTypeConstraints::GetOptionName(int index) c
 
 QString CFileCollectionComp::ResourceTypeConstraints::GetOptionDescription(int index) const
 {
-	Q_ASSERT(m_parentPtr != NULL);
+	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
 
 	return m_parentPtr->m_resourceTypesCompPtr->GetOptionDescription(index);
@@ -1439,7 +1438,7 @@ QString CFileCollectionComp::ResourceTypeConstraints::GetOptionDescription(int i
 
 QByteArray CFileCollectionComp::ResourceTypeConstraints::GetOptionId(int index) const
 {
-	Q_ASSERT(m_parentPtr != NULL);
+	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
 
 	return m_parentPtr->m_resourceTypesCompPtr->GetOptionId(index);
@@ -1448,7 +1447,7 @@ QByteArray CFileCollectionComp::ResourceTypeConstraints::GetOptionId(int index) 
 
 bool CFileCollectionComp::ResourceTypeConstraints::IsOptionEnabled(int index) const
 {
-	Q_ASSERT(m_parentPtr != NULL);
+	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
 
 	return m_parentPtr->m_resourceTypesCompPtr->IsOptionEnabled(index);
@@ -1516,7 +1515,7 @@ bool CFileCollectionComp::CollectionItem::Serialize(iser::IArchive& archive)
 bool CFileCollectionComp::CollectionItem::CopyFrom(const istd::IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CollectionItem* sourceItemPtr = dynamic_cast<const CollectionItem*>(&object);
-	if (sourceItemPtr != NULL){
+	if (sourceItemPtr != nullptr){
 		fileId = sourceItemPtr->fileId;
 		filePathInRepository = sourceItemPtr->filePathInRepository;
 		sourceFilePath = sourceItemPtr->sourceFilePath;

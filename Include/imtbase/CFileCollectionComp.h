@@ -74,7 +74,7 @@ public:
 				const QString& targetFilePath) const override;
 	virtual QByteArray InsertFile(
 				const QString& localFilePath,
-				const QByteArray& resourceTypeId = QByteArray(),
+				const QByteArray& typeId = QByteArray(),
 				const QString& resourceName = QString(),
 				const QString& resourceDescription = QString(),
 				const QByteArray& resourceId = QByteArray()) override;
@@ -186,14 +186,14 @@ protected:
 	static RepositoryInfo GetRepositoryInfo();
 
 	/**
-		Create data object for the given resource type.
+		Create data object for the given type.
 	*/
-	virtual istd::IChangeable* CreateDataObject(const QByteArray& resourceTypeId) const;
+	virtual istd::IChangeable* CreateDataObject(const QByteArray& typeId) const;
 
 	/**
 		Get persistence object for the related resource type.
 	*/
-	virtual const ifile::IFilePersistence* GetPersistenceForResource(const QByteArray& resourceTypeId) const;
+	virtual const ifile::IFilePersistence* GetPersistenceForResource(const QByteArray& typeId) const;
 
 	/**
 		Get the index of the file by file ID.
@@ -216,7 +216,7 @@ protected:
 	/**
 		Create object data from the file.
 	*/
-	virtual istd::IChangeable* CreateObjectFromFile(const QString& filePath, const QByteArray& resourceTypeId) const;
+	virtual istd::IChangeable* CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const;
 
 	/**
 		Create meta-info object for a given file in the file collection.
@@ -251,7 +251,7 @@ protected:
 	virtual QString CalculateFolderPathInRepository(
 				const QString& localFilePath,
 				const QString& resourceName,
-				const QByteArray& resourceTypeId,
+				const QByteArray& typeId,
 				bool useSubfolder,
 				bool useNameCounting,
 				ilog::IMessageConsumer* messageConsumerPtr) const;
@@ -299,7 +299,7 @@ private:
 	bool InsertFileIntoRepository(
 				const QString& filePath,
 				const QString& resourceName,
-				const QByteArray& resourceTypeId,
+				const QByteArray& typeId,
 				ilog::IMessageConsumer* messageConsumerPtr,
 				QString& filePathInRepository);
 
