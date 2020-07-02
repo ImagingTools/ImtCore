@@ -94,8 +94,17 @@ QWidget#TotalCounterFrame, QWidget#WarningsCounterFrame
     background: #ffffff;
 }
 
-QLabel[Header=true]
-{
+QLabel[ProductionApplicationName=true] {
+    font-size: 24pt;
+    color: #335777;
+}
+
+QLabel[ProductionTime=true] {
+    font-size: 12pt;
+    color: #335777;
+}
+
+QLabel[Header=true] {
     font-size: 12pt;
     color: #88b8e3;
 }
