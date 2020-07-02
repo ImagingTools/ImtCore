@@ -97,8 +97,7 @@ void CDocumentWorkspaceGuiComp::OnSaveDocument()
 	if (SaveDocument(-1, false, &fileMap, false, &ignoredFlag)){
 		UpdateAllTitles();
 
-		if (m_logCompPtr.IsValid())
-		{
+		if (m_logCompPtr.IsValid()){
 			SingleDocumentData* infoPtr = nullptr;
 			infoPtr = GetActiveDocumentInfo();
 
