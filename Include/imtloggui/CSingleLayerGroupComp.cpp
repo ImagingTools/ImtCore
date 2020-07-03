@@ -151,7 +151,7 @@ CEventItemBase* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::Me
 		}
 
 		QPointF origin(m_timeAxisPtr->GetScenePositionFromTime(messagePtr->GetInformationTimeStamp()), 0);
-		origin = m_graphicsItemPtr->mapFromScene(origin);
+		origin = m_itemGroupPtr->mapFromScene(origin);
 		origin.setY(m_graphicsItemPtr->rect().height() / 2);
 
 		itemPtr->setParentItem(m_itemGroupPtr);

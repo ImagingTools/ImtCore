@@ -308,7 +308,9 @@ void CTimeAxis::setPos(const QPointF &origin)
 
 	if (origin != pos()){
 		BaseClass::setPos(origin);
-		Q_EMIT EmitAxisPosChanged(oldPos, origin);
+		if (oldPos.x() != origin.x()){
+			Q_EMIT EmitAxisPosChanged(oldPos, origin);
+		}
 	}
 }
 

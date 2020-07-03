@@ -216,20 +216,15 @@ void CEventViewComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDat
 {
 	if(!oldTime.isValid()){
 		QRectF rect = m_viewPtr->GetSceneRect();
-
 		rect.setLeft(m_timeAxisPtr->rect().left());
 		rect.setRight(m_timeAxisPtr->rect().right());
 		m_viewPtr->SetSceneRect(rect);
 		m_viewPtr->SetViewRect(rect);
 		m_currentCommandTime = QDateTime();
+
 		Q_EMIT EmitShowAll();
 	}
-	 
-	if (m_groupControllerCompPtr.IsValid()){
-		m_groupControllerCompPtr->OnAxisBeginTimeChanged(oldTime, newTime);
-	}
-
-	if (oldTime.isValid()){
+	else{
 		QRectF rect = m_viewPtr->GetSceneRect();
 		rect.setLeft(m_timeAxisPtr->rect().left());
 		rect.setRight(m_timeAxisPtr->rect().right());
@@ -239,11 +234,20 @@ void CEventViewComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDat
 		QRectF viewRect = m_viewPtr->GetViewRect().translated(shift, 0);
 		m_viewPtr->SetViewRect(viewRect);
 	}
+
+	if (m_groupControllerCompPtr.IsValid()){
+		m_groupControllerCompPtr->OnAxisBeginTimeChanged(oldTime, newTime);
+	}
 }
 
 
 void CEventViewComp::OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
 {
+	QRectF rect = m_viewPtr->GetSceneRect();
+	rect.setLeft(m_timeAxisPtr->rect().left());
+	rect.setRight(m_timeAxisPtr->rect().right());
+	m_viewPtr->SetSceneRect(rect);
+
 	if (m_groupControllerCompPtr.IsValid()){
 		m_groupControllerCompPtr->OnAxisEndTimeChanged(oldTime, newTime);
 	}
