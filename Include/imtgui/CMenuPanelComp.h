@@ -72,7 +72,8 @@ public:
 		I_ASSIGN(m_physicalResolutionAttrPtr, "PhysicalResolution", "Physical monitor resolution", true, 3.5);
 
 		I_ASSIGN(m_indentAttrPtr, "Indent", "Item indentation", true, 20);
-		I_ASSIGN(m_itemHeightAttrPtr, "ItemHeight", "Item Height", true, 7);
+		I_ASSIGN(m_itemHeightAttrPtr, "ItemHeight", "Item Height", true, 15);
+		I_ASSIGN(m_fontHeightAttrPtr, "FontHeight", "Font Height", true, 3.5);
 		I_ASSIGN(m_iconSizeRatioAttrPtr, "IconSizeRatio", "Icon size ratio relative to item height", true, 1.1);
 		I_ASSIGN(m_iconSizeHoverRatioAttrPtr, "IconSizeHoverRatio", "Icon size ratio under mouse (relative to item normal size)", true, 1.1);
 
@@ -170,8 +171,9 @@ private:
 	// Widget attributes:
 	I_ATTR(double, m_physicalResolutionAttrPtr);
 
-	I_ATTR(int, m_indentAttrPtr);
-	I_ATTR(int, m_itemHeightAttrPtr);
+	I_ATTR(double, m_indentAttrPtr);
+	I_ATTR(double, m_itemHeightAttrPtr);
+	I_ATTR(double, m_fontHeightAttrPtr);
 	I_ATTR(double, m_iconSizeRatioAttrPtr);
 	I_ATTR(double, m_iconSizeHoverRatioAttrPtr);
 
@@ -180,8 +182,9 @@ private:
 	I_ATTR(double, m_rightPaddingAttrPtr);
 	I_ATTR(double, m_iconToTextPaddingAttrPtr);
 
-	int m_indent;
+	double m_indent;
 	double m_itemHeight;
+	double m_fontHeight;
 
 	double m_topPadding;
 	double m_leftPadding;
@@ -189,7 +192,8 @@ private:
 	double m_iconToTextPadding;
 
 	double m_resolutionX;
-	double m_resolutionY; 
+	double m_resolutionY;
+	double m_scale;
 
 private:
 	bool IsPageEnabled(const QByteArray& pageId) const;

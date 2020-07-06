@@ -74,6 +74,7 @@ public:
 
 	virtual void SetItemIndent(int indent);
 	virtual void SetItemHeight(int height);
+	virtual void SetFontHeight(int height);
 	virtual void SetIconSizeRatio(double ratio);
 	virtual void SetIconSizeHoverRatio(double ratio);
 

@@ -23,7 +23,8 @@ CMenuPanelComp::CMenuPanelComp()
 	m_monitorInfoObserver(*this),
 	m_menuPanelVisibilityObserver(*this),
 	m_resolutionX(3.5),
-	m_resolutionY(3.5)
+	m_resolutionY(3.5),
+	m_scale(0)
 {
 	m_subselectionModelIndex = 0;
 	m_visualStatusModelIndex = 0;
@@ -74,7 +75,8 @@ void CMenuPanelComp::OnGuiCreated()
 	}
 	
 	m_indent = m_indentAttrPtr.IsValid() ?	*m_indentAttrPtr : 5;
-	m_itemHeight = m_itemHeightAttrPtr.IsValid() ? *m_itemHeightAttrPtr : 7;
+	m_itemHeight = m_itemHeightAttrPtr.IsValid() ? *m_itemHeightAttrPtr : 15;
+	m_fontHeight = m_fontHeightAttrPtr.IsValid() ? *m_fontHeightAttrPtr : 7;
 	m_iconSizeRatioAttrPtr.IsValid() ? widgetPtr->SetIconSizeRatio(*m_iconSizeRatioAttrPtr) : 1.1;
 	m_iconSizeHoverRatioAttrPtr.IsValid() ? widgetPtr->SetIconSizeHoverRatio(*m_iconSizeHoverRatioAttrPtr) : 1.1;
 
@@ -354,11 +356,13 @@ void CMenuPanelComp::UpdateMonitorsInfo()
 {
 
 	double resolutionX = m_monitorInfoProviderPtr->GetPhysicalResolutionX(0);
-	double resolutionY = m_monitorInfoProviderPtr->GetPhysicalResolutionX(0);
+	double resolutionY = m_monitorInfoProviderPtr->GetPhysicalResolutionY(0);
+	double scale = m_monitorInfoProviderPtr->GetScaling(0);
 
 	if (resolutionX != 0 && resolutionY != 0){
 		m_resolutionX = resolutionX;
 		m_resolutionY = resolutionY;
+		m_scale = scale;
 	}
 
 	UpdateWidgetSizeAttributes();
@@ -376,6 +380,7 @@ void CMenuPanelComp::UpdateWidgetSizeAttributes()
 
 	menuPanelPtr->SetItemIndent(ceil(m_indent * m_resolutionX));
 	menuPanelPtr->SetItemHeight(ceil(m_itemHeight * m_resolutionY));
+	menuPanelPtr->SetFontHeight(ceil(m_fontHeight * m_resolutionY));
 
 	menuPanelPtr->SetItemVerticalPadding(ceil(m_topPadding * m_resolutionY));
 	menuPanelPtr->SetItemLeftPadding(ceil(m_leftPadding * m_resolutionX));

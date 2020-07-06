@@ -377,6 +377,17 @@ void CMenuPanel::SetItemHeight(int height)
 }
 
 
+void CMenuPanel::SetFontHeight(int height)
+{
+	QFont font = PageTree->font();
+	font.setPixelSize(height);
+	PageTree->setFont(font);
+	m_delegatePtr->SetFontMetrics(PageTree->fontMetrics());
+
+	AfterSizesChanged();
+}
+
+
 void CMenuPanel::SetIconSizeRatio(double ratio)
 {
 	m_delegatePtr->SetIconSizeRatio(ratio);
