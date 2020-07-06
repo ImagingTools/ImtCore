@@ -28,6 +28,7 @@ public:
 	I_BEGIN_COMPONENT(CDocumentWorkspaceGuiComp);
 		I_ASSIGN(m_loginCompPtr, "Login", "Login component", false, "");
 		I_ASSIGN(m_logCompPtr, "Log", "Message consumer component", false, "");
+		I_ASSIGN(m_tabStyleSheetPropertyAttrPtr, "TabStyleSheetProperty", "Enable a stylesheet with a property for the tab", true, "");
 	I_END_COMPONENT;
 
 protected:
@@ -36,11 +37,14 @@ protected:
 				istd::IPolymorphic* viewPtr,
 				QWidget* parentWidgetPtr,
 				const SingleDocumentData& documentData,
-				const ifile::IFilePersistence* persistencePtr);
+				const ifile::IFilePersistence* persistencePtr) override;
 
 	// reimplemented (idoc::CMultiDocumentManagerBase)
-	virtual QString GetSaveFilePath(const QByteArray& documentTypeId, const istd::IChangeable* dataObjectPtr, const QString& currentFilePath) const;
-	virtual QStringList GetOpenFilePaths(const QByteArray* documentTypeIdPtr = NULL) const;
+	virtual QString GetSaveFilePath(const QByteArray& documentTypeId, const istd::IChangeable* dataObjectPtr, const QString& currentFilePath) const override;
+	virtual QStringList GetOpenFilePaths(const QByteArray* documentTypeIdPtr = NULL) const override;
+
+	// reimplemented (iqt:CGuiComponentBase)
+	virtual void OnGuiCreated() override;
 
 protected Q_SLOTS:
 	void OnSaveDocument();
@@ -113,6 +117,7 @@ private:
 		iqtgui::CHierarchicalCommand m_closeCommand;
 	};
 
+	I_ATTR(QByteArray, m_tabStyleSheetPropertyAttrPtr);
 	I_REF(iauth::ILogin, m_loginCompPtr);
 	I_REF(ilog::IMessageConsumer, m_logCompPtr);
 };

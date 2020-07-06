@@ -5,6 +5,7 @@
 #include <QtGui/QRegExpValidator>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
+#include <QtWidgets/QTabBar>
 #include <QtWidgets/QToolBar>
 
 // ACF includes
@@ -84,6 +85,18 @@ QStringList CDocumentWorkspaceGuiComp::GetOpenFilePaths(const QByteArray* /*docu
 	QStringList files;
 
 	return files;
+}
+
+
+// reimplemented (iqt:CGuiComponentBase)
+
+void CDocumentWorkspaceGuiComp::OnGuiCreated()
+{
+	BaseClass::OnGuiCreated();
+
+	if (!(*m_tabStyleSheetPropertyAttrPtr).isEmpty()){
+		Tabs->tabBar()->setProperty(*m_tabStyleSheetPropertyAttrPtr, true);
+	}
 }
 
 

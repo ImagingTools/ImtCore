@@ -271,60 +271,60 @@ QHeaderView::section
 	font-weight: bold;
 }
 
-QTabBar::tab
+QTabBar::tab[CollectionView=true]
 {
     background: transparent;
     min-width: 8ex;
     padding: 2px;
 }
 
-QTabBar::tab:selected
+QTabBar::tab:selected[CollectionView=true]
 {
     background: white;
 }
 
-QTabBar::tab::top
+QTabBar::tab::top[CollectionView=true]
 {
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
 }
 
-QTabBar::tab::top:!selected
+QTabBar::tab::top:!selected[CollectionView=true]
 {
-    margin-bottom: 2px; 
+    margin-bottom: 2px;
 }
 
-QTabBar::tab::left
+QTabBar::tab::left[CollectionView=true]
 {
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
 }
 
-QTabBar::tab::left:!selected
+QTabBar::tab::left:!selected[CollectionView=true]
 {
-    margin-right: 2px; 
+    margin-right: 2px;
 }
 
-QTabBar::tab::right
+QTabBar::tab::right[CollectionView=true]
 {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
 
-QTabBar::tab::right:!selected
+QTabBar::tab::right:!selected[CollectionView=true]
 {
-    margin-left: 2px; 
+    margin-left: 2px;
 }
 
-QTabBar::tab::bottom
+QTabBar::tab::bottom[CollectionView=true]
 {
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
 }
 
-QTabBar::tab::bottom:!selected
+QTabBar::tab::bottom:!selected[CollectionView=true]
 {
-    margin-top: 2px; 
+    margin-top: 2px;
 }
 
 

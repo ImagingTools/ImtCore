@@ -90,7 +90,7 @@ protected:
 	virtual void OnDropEvent(QDropEvent* dropEventPtr);
 
 	// reimplemented (imod::CMultiModelDispatcherBase)
-	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet);
+	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (idoc::CMultiDocumentManagerBase)
 	virtual istd::IChangeable* OpenSingleDocument(
@@ -100,8 +100,8 @@ protected:
 				QByteArray& documentTypeId,
 				bool beQuiet,
 				bool* ignoredPtr,
-				ibase::IProgressManager* progressManagerPtr);
-	virtual void SetActiveView(istd::IPolymorphic* viewPtr);
+				ibase::IProgressManager* progressManagerPtr) override;
+	virtual void SetActiveView(istd::IPolymorphic* viewPtr) override;
 
 	// reimplemented (idoc::IDocumentManager)
 	virtual bool InsertNewDocument(
@@ -110,29 +110,29 @@ protected:
 				const QByteArray& viewTypeId = "",
 				istd::IChangeable** newDocumentPtr = NULL,
 				bool beQuiet = false,
-				bool* ignoredPtr = NULL);
+				bool* ignoredPtr = NULL) override;
 
 	// reimplemented (idoc::CMultiDocumentManagerBase)
-	virtual void CloseAllDocuments();
-	virtual QStringList GetOpenFilePaths(const QByteArray* documentTypeIdPtr = NULL) const;
-	virtual void OnViewRegistered(istd::IPolymorphic* viewPtr, const SingleDocumentData& documentData);
-	virtual void OnViewRemoved(istd::IPolymorphic* viewPtr);
-	virtual bool QueryDocumentSave(const SingleDocumentData& info, bool* ignoredPtr);
+	virtual void CloseAllDocuments() override;
+	virtual QStringList GetOpenFilePaths(const QByteArray* documentTypeIdPtr = NULL) const override;
+	virtual void OnViewRegistered(istd::IPolymorphic* viewPtr, const SingleDocumentData& documentData) override;
+	virtual void OnViewRemoved(istd::IPolymorphic* viewPtr) override;
+	virtual bool QueryDocumentSave(const SingleDocumentData& info, bool* ignoredPtr) override;
 
 	// reimplemented (iqt:CGuiComponentBase)
-	virtual void OnGuiCreated();
-	virtual void OnGuiDestroyed();
-	virtual void OnRetranslate();
-	virtual void OnGuiRetranslate();
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiDestroyed() override;
+	virtual void OnRetranslate() override;
+	virtual void OnGuiRetranslate() override;
 
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
+	virtual void OnComponentCreated() override;
 
 	// reimplemented (istd:IChangeable)
-	virtual void OnEndChanges(const ChangeSet& changeSet);
+	virtual void OnEndChanges(const ChangeSet& changeSet) override;
 
 	// reimplemented (QObject)
-	virtual bool eventFilter(QObject* sourcePtr, QEvent* eventPtr);
+	virtual bool eventFilter(QObject* sourcePtr, QEvent* eventPtr) override;
 
 	// abstract methods
 	virtual IDocumentViewDecorator* CreateDocumentViewDecorator(
