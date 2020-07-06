@@ -271,16 +271,24 @@ QHeaderView::section
 	font-weight: bold;
 }
 
+
+QTabBar[CollectionView=true]
+{
+    min-width: 50ex;
+    padding: 2px;
+}
+
 QTabBar::tab[CollectionView=true]
 {
     background: transparent;
-    min-width: 8ex;
+    min-width: 50ex;
     padding: 2px;
 }
 
 QTabBar::tab:selected[CollectionView=true]
 {
     background: white;
+    font: bold;	
 }
 
 QTabBar::tab::top[CollectionView=true]
