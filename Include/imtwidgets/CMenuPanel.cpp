@@ -22,16 +22,15 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	:QWidget(parent),
 	m_maxWidth(0),
 	m_minWidth(0),
-	m_indent(20),
+	m_indent(0),
 	m_animationAction(AA_NONE),
 	m_animationTimerIdentifier(0),
-	m_animationDelay(100),
-	m_animationDuration(100),
+	m_animationDelay(0),
+	m_animationDuration(0),
 	m_mainWidgetPtr(nullptr),
 	m_leftFramePtr(parent),
 	m_parentWidgetPtr(nullptr),
-	m_shadowPtr(nullptr),
-	m_delegatePtr(nullptr)
+	m_shadowPtr(nullptr)
 {
 	setupUi(this);
 
@@ -365,32 +364,25 @@ bool CMenuPanel::SetPageName(const QByteArray& pageId, const QString& pageName)
 void CMenuPanel::SetItemIndent(int indent)
 {
 	m_indent = indent;
-	m_delegatePtr->SetMaxIndent(indent);
+	m_delegatePtr->SetIndent(indent);
 	AfterSizesChanged();
 }
 
 
 void CMenuPanel::SetItemHeight(int height)
 {
+	m_cachedItemHeight = height;
 	m_delegatePtr->SetItemHeight(height);
-	AfterSizesChanged();
-}
-
-
-void CMenuPanel::SetFontHeight(int height)
-{
-	QFont font = PageTree->font();
-	font.setPixelSize(height);
-	PageTree->setFont(font);
-	m_delegatePtr->SetFontMetrics(PageTree->fontMetrics());
-
+	UpdateFontSize();
 	AfterSizesChanged();
 }
 
 
 void CMenuPanel::SetIconSizeRatio(double ratio)
 {
+	m_cachedIconSizeRatio = ratio;
 	m_delegatePtr->SetIconSizeRatio(ratio);
+	UpdateFontSize();
 	AfterSizesChanged();
 }
 
@@ -398,6 +390,13 @@ void CMenuPanel::SetIconSizeRatio(double ratio)
 void CMenuPanel::SetIconSizeHoverRatio(double ratio)
 {
 	m_delegatePtr->SetIconSizeHoverRatio(ratio);
+}
+
+
+void CMenuPanel::SetFontSizeRatio(double ratio)
+{
+	m_cachedFontSizeRatio = ratio;	
+	UpdateFontSize();
 	AfterSizesChanged();
 }
 
@@ -405,7 +404,6 @@ void CMenuPanel::SetIconSizeHoverRatio(double ratio)
 void CMenuPanel::SetItemVerticalPadding(int padding)
 {
 	m_delegatePtr->SetTopPadding(padding);
-	AfterSizesChanged();
 }
 
 
@@ -436,15 +434,15 @@ void CMenuPanel::SetItemTextColor(QColor color)
 }
 
 
-void CMenuPanel::SetItemSelectedColor(QColor color)
-{
-	m_delegatePtr->SetSelectedColor(color);
-}
-
-
 void CMenuPanel::SetItemSelectedContourColor(QColor color)
 {
 	m_delegatePtr->SetSelectedContourColor(color);
+}
+
+
+void CMenuPanel::SetItemSelectedColor(QColor color)
+{
+	m_delegatePtr->SetSelectedColor(color);
 }
 
 
@@ -532,6 +530,15 @@ void CMenuPanel::CollapsePanelImmideatly()
 	}
 
 	m_delegatePtr->setProperty("indent", 0);
+}
+
+
+void CMenuPanel::UpdateFontSize()
+{
+	QFont font = PageTree->font();
+	font.setPixelSize(m_cachedItemHeight * m_cachedIconSizeRatio * m_cachedFontSizeRatio);
+	PageTree->setFont(font);
+	m_delegatePtr->SetFontMetrics(PageTree->fontMetrics());
 }
 
 

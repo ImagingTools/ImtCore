@@ -40,8 +40,8 @@ public:
 		I_ASSIGN(m_mouseOverTextColorAttrPtr, "MouseOverTextColor", "Item under mouse text color", true, "#808080");
 		I_ASSIGN(m_mouseOverSelectedTextColorAttrPtr, "MouseOverSelectedTextColor", "Selected item under mouse text color ", true, "#808080");
 
-		I_ASSIGN(m_animationDelayAttrPtr, "AnimationDelay", "Animation delay", true, 500);
-		I_ASSIGN(m_animationDurationAttrPtr, "AnimationDuration", "Animation duration", true, 300);
+		I_ASSIGN(m_animationDelayAttrPtr, "AnimationDelay", "Animation delay", true, 800);
+		I_ASSIGN(m_animationDurationAttrPtr, "AnimationDuration", "Animation duration", true, 150);
 	I_END_COMPONENT;
 
 protected:
@@ -65,22 +65,27 @@ public:
 
 	I_BEGIN_COMPONENT(CMenuPanelComp);
 		I_ASSIGN(m_menuPanelVisibilityCompPtr, "MenuPanelVisibility", "Menu panel visibility status", false, "MenuPanelVisibility");
+		I_ASSIGN_TO(m_menuPanelVisibilityModelCompPtr, m_menuPanelVisibilityCompPtr, false);
 		I_ASSIGN(m_widgetProviderCompPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
 		I_ASSIGN(m_monitorInfoProviderPtr, "MonitorInfoProvider", "Monitor info provider (count, size, resolution, etc.)", false, "MonitorInfoProvider");
-		I_ASSIGN(m_isShowOverAttrPtr, "ShowOver", "Show expanded menu over the underlaying widget", false, true);
+		I_ASSIGN_TO(m_monitorInfoProviderModelPtr, m_monitorInfoProviderPtr, false);
+		I_ASSIGN(m_isShowOverAttrPtr, "ShowOver", "Show expanded menu over the underlaying widget", true, true);
 
+		// Widget attributes
 		I_ASSIGN(m_physicalResolutionAttrPtr, "PhysicalResolution", "Physical monitor resolution", true, 3.5);
 
-		I_ASSIGN(m_indentAttrPtr, "Indent", "Item indentation", true, 20);
+		// Size attributes
+		I_ASSIGN(m_indentAttrPtr, "Indent", "Item indentation", true, 6);
 		I_ASSIGN(m_itemHeightAttrPtr, "ItemHeight", "Item Height", true, 15);
-		I_ASSIGN(m_fontHeightAttrPtr, "FontHeight", "Font Height", true, 3.5);
-		I_ASSIGN(m_iconSizeRatioAttrPtr, "IconSizeRatio", "Icon size ratio relative to item height", true, 1.1);
-		I_ASSIGN(m_iconSizeHoverRatioAttrPtr, "IconSizeHoverRatio", "Icon size ratio under mouse (relative to item normal size)", true, 1.1);
+		I_ASSIGN(m_iconSizeRatioAttrPtr, "IconSizeRatio", "Icon size ratio relative to item height", true, 1);
+		I_ASSIGN(m_iconSizeHoverRatioAttrPtr, "IconSizeHoverRatio", "Icon size ratio under mouse (relative to item normal size)", true, 1.2);
+		I_ASSIGN(m_fontSizeRatioAttrPtr, "FontSizeRatio", "Font pixel size ratio relative to icon size", true, 0.3);
 
-		I_ASSIGN(m_topPaddingAttrPtr, "TopPadding", "Top panel padding", true, 5);
-		I_ASSIGN(m_leftPaddingAttrPtr, "LeftPadding", "Left item padding", true, 5);
+		// Padding attributes
+		I_ASSIGN(m_topPaddingAttrPtr, "TopPadding", "Top panel padding", true, 1);
+		I_ASSIGN(m_leftPaddingAttrPtr, "LeftPadding", "Left item padding", true, 0);
 		I_ASSIGN(m_rightPaddingAttrPtr, "RightPadding", "Right item padding", true, 20);
-		I_ASSIGN(m_iconToTextPaddingAttrPtr, "IconToTextPadding", "Icon to text item padding", true, 5);
+		I_ASSIGN(m_iconToTextPaddingAttrPtr, "IconToTextPadding", "Icon to text item padding", true, 1);
 	I_END_COMPONENT;
 
 	CMenuPanelComp();
@@ -164,32 +169,28 @@ private:
 	MenuPanelVisibility m_menuPanelVisibilityObserver;
 
 	I_REF(iprm::IEnableableParam, m_menuPanelVisibilityCompPtr);
+	I_REF(imod::IModel, m_menuPanelVisibilityModelCompPtr);
 	I_REF(imtgui::IWidgetProvider, m_widgetProviderCompPtr);
 	I_REF(imtgui::IMonitorInfoProvider, m_monitorInfoProviderPtr);
+	I_REF(imod::IModel, m_monitorInfoProviderModelPtr);
+
 	I_ATTR(bool, m_isShowOverAttrPtr);
 
-	// Widget attributes:
+	// Widget attributes
 	I_ATTR(double, m_physicalResolutionAttrPtr);
 
+	// Size attributes
 	I_ATTR(double, m_indentAttrPtr);
 	I_ATTR(double, m_itemHeightAttrPtr);
-	I_ATTR(double, m_fontHeightAttrPtr);
 	I_ATTR(double, m_iconSizeRatioAttrPtr);
 	I_ATTR(double, m_iconSizeHoverRatioAttrPtr);
+	I_ATTR(double, m_fontSizeRatioAttrPtr);
 
+	// Size attributes
 	I_ATTR(double, m_topPaddingAttrPtr);
 	I_ATTR(double, m_leftPaddingAttrPtr);
 	I_ATTR(double, m_rightPaddingAttrPtr);
 	I_ATTR(double, m_iconToTextPaddingAttrPtr);
-
-	double m_indent;
-	double m_itemHeight;
-	double m_fontHeight;
-
-	double m_topPadding;
-	double m_leftPadding;
-	double m_rightPadding;
-	double m_iconToTextPadding;
 
 	double m_resolutionX;
 	double m_resolutionY;

@@ -21,7 +21,7 @@ public:
 
 	void SetFontMetrics(const QFontMetrics& fontMetrics);
 
-	void SetMaxIndent(int indent);
+	void SetIndent(int indent);
 	void SetItemHeight(int height);
 	void SetIconSizeRatio(double ratio);
 	void SetIconSizeHoverRatio(double ratio);
@@ -45,7 +45,7 @@ protected:
 	virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
 private:
-	int m_maxIndent;
+	int m_indent;
 	int m_height;
 
 	double m_iconSizeRatio;

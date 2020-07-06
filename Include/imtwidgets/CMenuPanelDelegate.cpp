@@ -18,20 +18,23 @@ namespace imtwidgets
 CMenuPanelDelegate::CMenuPanelDelegate(QTreeView* menuPanelPtr)
 	:QStyledItemDelegate(menuPanelPtr),
 	m_fontMetrics(QFontMetrics(QFont())),
-	m_maxIndent(20),
-	m_height(16),
+	m_indent(0),
+	m_height(0),
 	m_iconSizeRatio(1),
-	
+	m_iconSizeHoverRatio(1),
+
 	m_topPadding(0),
 	m_leftPadding(0),
 	m_rightPadding(0),
 	m_iconToTextPadding(0),
 	
+	m_textColor(QColor(0, 0, 0)),
+	m_selectedContourColor(QColor(0, 0, 0)),
 	m_selectedColor(QColor(0, 0, 0)),
 	m_mouseOverColor(QColor(0, 0, 0)),
 	m_mouseOverSelectedColor(QColor(0, 0, 0)),
-	m_selectedContourColor(QColor(0, 0, 0)),
-	m_textColor(QColor(0, 0, 0))
+	m_mouseOverTextColor(QColor(0, 0, 0)),
+	m_mouseOverSelectedTextColor(QColor(0, 0, 0))
 {
 }
 
@@ -48,9 +51,9 @@ void CMenuPanelDelegate::SetFontMetrics(const QFontMetrics& fontMetrics)
 	m_fontMetrics = fontMetrics;
 }
 
-void CMenuPanelDelegate::SetMaxIndent(int indent)
+void CMenuPanelDelegate::SetIndent(int indent)
 {
-	m_maxIndent = indent;
+	m_indent = indent;
 }
 
 
@@ -185,10 +188,10 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const
 		}
 	}
 
-	int offset = -m_maxIndent;
+	int offset = -m_indent;
 	QModelIndex currentIndex = index;
 	while (currentIndex.isValid()){
-		offset += m_maxIndent;
+		offset += m_indent;
 		currentIndex = currentIndex.parent();
 	}
 

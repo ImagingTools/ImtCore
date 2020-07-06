@@ -74,9 +74,9 @@ public:
 
 	virtual void SetItemIndent(int indent);
 	virtual void SetItemHeight(int height);
-	virtual void SetFontHeight(int height);
 	virtual void SetIconSizeRatio(double ratio);
 	virtual void SetIconSizeHoverRatio(double ratio);
+	virtual void SetFontSizeRatio(double ratio);
 
 	virtual void SetItemVerticalPadding(int padding);
 	virtual void SetItemLeftPadding(int padding);
@@ -84,8 +84,8 @@ public:
 	virtual void SetItemIconToTextPadding(int padding);
 
 	virtual void SetItemTextColor(QColor color);
-	virtual void SetItemSelectedColor(QColor color);
 	virtual void SetItemSelectedContourColor(QColor color);
+	virtual void SetItemSelectedColor(QColor color);
 	virtual void SetItemMouseOverColor(QColor color);
 	virtual void SetItemMouseOverSelectedColor(QColor color);
 	virtual void SetItemMouseOverTextColor(QColor color);
@@ -97,6 +97,8 @@ public:
 	virtual void SetMainWidget(QWidget* mainWidget);
 
 	virtual void CollapsePanelImmideatly();
+
+	virtual void UpdateFontSize();
 
 Q_SIGNALS:
 	/**
@@ -121,6 +123,10 @@ protected:
 	virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
+	int m_cachedItemHeight;
+	double m_cachedIconSizeRatio;
+	double m_cachedFontSizeRatio;
+
 	int m_minWidth;
 	int m_maxWidth;
 	int m_indent;
