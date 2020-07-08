@@ -86,7 +86,6 @@ void CEventViewComp::OnGuiCreated()
 	QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(GetQtWidget()->layout());
 
 	m_splitterPtr = new QSplitter();
-	m_splitterPtr->setChildrenCollapsible(false);
 	layoutPtr->insertWidget(0, m_splitterPtr);
 
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
@@ -101,6 +100,7 @@ void CEventViewComp::OnGuiCreated()
 	m_splitterPtr->addWidget(m_panelsStackPtr);
 	m_splitterPtr->setStretchFactor(0, 9);
 	m_splitterPtr->setStretchFactor(0, 1);
+	m_splitterPtr->setCollapsible(0, false);
 
 	m_summaryInfoPanelPtr = new QWidget();
 	if (m_summaryInfoPanelPtr->layout() == nullptr){
