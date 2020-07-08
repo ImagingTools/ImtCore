@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QSplitter>
+#include <QtWidgets/QStackedWidget>
 
 // ACF includes
 #include <ibase/ICommandsProvider.h>
@@ -81,6 +82,7 @@ private:
 	void UpdateCommands();
 	void MoveToTime(const QDateTime& time);
 
+	void UpdateSummaryInfoPanel();
 	bool UpdateMetaInfoPanel(const CEventItemBase* eventItem);
 
 private:
@@ -129,9 +131,9 @@ private:
 	iqtgui::CHierarchicalCommand m_moveToNextCommand;
 	iqtgui::CHierarchicalCommand m_moveToLastCommand;
 
-	QGraphicsScene* m_scenePtr;
+	QGraphicsScene m_scene;
 	CEventGraphicsView* m_viewPtr;
-	CTimeAxis* m_timeAxisPtr;
+	CTimeAxis m_timeAxis;
 
 	ScaleConstraintsObserver m_scaleConstraintsObserver;
 
@@ -140,6 +142,8 @@ private:
 	QList<ilog::IMessageConsumer::MessagePtr> m_messageList;
 
 	QSplitter* m_splitterPtr;
+	QStackedWidget* m_panelsStackPtr;
+	QWidget* m_summaryInfoPanelPtr;
 	QWidget* m_metaInfoPanelPtr;
 };
 

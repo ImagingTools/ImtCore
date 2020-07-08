@@ -21,10 +21,10 @@ namespace imtloggui
 // public methods
 
 CEventViewComp::CEventViewComp()
-	:m_scenePtr(nullptr),
-	m_viewPtr(nullptr),
-	m_timeAxisPtr(nullptr),
+	: m_viewPtr(nullptr),
 	m_splitterPtr(nullptr),
+	m_panelsStackPtr(nullptr),
+	m_summaryInfoPanelPtr(nullptr),
 	m_metaInfoPanelPtr(nullptr),
 	m_scaleConstraintsObserver(*this),
 	m_rootCommands("", 100, ibase::ICommand::CF_GLOBAL_MENU),
@@ -70,8 +70,9 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 	}
 
 	if (m_groupControllerCompPtr.IsValid()){
-		m_timeAxisPtr->EnsureTimeRange(message->GetInformationTimeStamp());
+		m_timeAxis.EnsureTimeRange(message->GetInformationTimeStamp());
 		m_groupControllerCompPtr->AddEvent(message);
+		UpdateSummaryInfoPanel();
 	}
 }
 
@@ -82,49 +83,55 @@ void CEventViewComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	m_scenePtr = new QGraphicsScene(GetQtWidget());
+	QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(GetQtWidget()->layout());
+
+	m_splitterPtr = new QSplitter();
+	m_splitterPtr->setChildrenCollapsible(false);
+	layoutPtr->insertWidget(0, m_splitterPtr);
 
 	m_viewPtr = new CEventGraphicsView(GetQtWidget());
-	m_viewPtr->setScene(m_scenePtr);
+	m_viewPtr->setScene(&m_scene);
 	m_viewPtr->setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 	m_viewPtr->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_viewPtr->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_viewPtr->SetMargins(QMargins(70, 0, 70, 40));
-
-	m_splitterPtr = new QSplitter();
-	m_metaInfoPanelPtr = new QWidget();
-
-	QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(GetQtWidget()->layout());
-
-	layoutPtr->insertWidget(0, m_splitterPtr);
 	m_splitterPtr->addWidget(m_viewPtr);
-	m_splitterPtr->addWidget(m_metaInfoPanelPtr);
+
+	m_panelsStackPtr = new QStackedWidget(GetQtWidget());
+	m_splitterPtr->addWidget(m_panelsStackPtr);
 	m_splitterPtr->setStretchFactor(0, 9);
 	m_splitterPtr->setStretchFactor(0, 1);
-	m_metaInfoPanelPtr->hide();
-	if (m_metaInfoPanelPtr->layout() == nullptr){
-		m_metaInfoPanelPtr->setLayout(new QGridLayout());
+
+	m_summaryInfoPanelPtr = new QWidget();
+	if (m_summaryInfoPanelPtr->layout() == nullptr){
+		m_summaryInfoPanelPtr->setLayout(new QVBoxLayout());
 	}
+	m_panelsStackPtr->addWidget(m_summaryInfoPanelPtr);
 
-	m_timeAxisPtr = new CTimeAxis();
-	m_timeAxisPtr->SetColor(Qt::green);
-	m_timeAxisPtr->setRect(0, 0, 100, 40);
-	m_timeAxisPtr->setZValue(101);
-	m_scenePtr->addItem(m_timeAxisPtr);
+	m_metaInfoPanelPtr = new QWidget();
+	if (m_metaInfoPanelPtr->layout() == nullptr){
+		m_metaInfoPanelPtr->setLayout(new QVBoxLayout());
+	}
+	m_panelsStackPtr->addWidget(m_metaInfoPanelPtr);
 
-	m_viewPtr->SetTimeAxis(m_timeAxisPtr);
+	m_panelsStackPtr->setCurrentIndex(0);
 
-	connect(m_scenePtr, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
-	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisPosChanged, this, &CEventViewComp::OnAxisPosChanged);
-	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CEventViewComp::OnAxisBeginTimeChanged);
-	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisEndTimeChanged, this, &CEventViewComp::OnAxisEndTimeChanged);
+	m_timeAxis.SetColor(Qt::green);
+	m_timeAxis.setRect(0, 0, 100, 40);
+	m_timeAxis.setZValue(101);
+	m_scene.addItem(&m_timeAxis);
+
+	connect(&m_scene, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
+	connect(&m_timeAxis, &CTimeAxis::EmitAxisPosChanged, this, &CEventViewComp::OnAxisPosChanged);
+	connect(&m_timeAxis, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CEventViewComp::OnAxisBeginTimeChanged);
+	connect(&m_timeAxis, &CTimeAxis::EmitAxisEndTimeChanged, this, &CEventViewComp::OnAxisEndTimeChanged);
 	connect(m_viewPtr, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
 	connect(this, &CEventViewComp::EmitShowAll, m_viewPtr, &CEventGraphicsView::OnShowAll, Qt::QueuedConnection);
 
 	if (m_groupControllerCompPtr.IsValid()){
-		m_groupControllerCompPtr->SetScene(m_scenePtr);
+		m_groupControllerCompPtr->SetScene(&m_scene);
 		m_groupControllerCompPtr->SetView(m_viewPtr);
-		m_groupControllerCompPtr->SetTimeAxis(m_timeAxisPtr);
+		m_groupControllerCompPtr->SetTimeAxis(&m_timeAxis);
 		m_groupControllerCompPtr->CreateGraphicsItem();
 
 		QByteArrayList groupIds = m_groupControllerCompPtr->GetAvailableGroupList();
@@ -138,8 +145,10 @@ void CEventViewComp::OnGuiCreated()
 		}
 	}
 
+	UpdateSummaryInfoPanel();
+
 	if (m_messageList.isEmpty()){
-		m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
+		m_timeAxis.EnsureTimeRange(QDateTime::currentDateTime());
 	}
 	else{
 		for (const ilog::IMessageConsumer::MessagePtr& message : m_messageList)
@@ -154,27 +163,16 @@ void CEventViewComp::OnGuiCreated()
 
 void CEventViewComp::OnGuiDestroyed()
 {
-	disconnect(m_scenePtr, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
-	disconnect(m_timeAxisPtr, &CTimeAxis::EmitAxisPosChanged, this, &CEventViewComp::OnAxisPosChanged);
-	disconnect(m_timeAxisPtr, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CEventViewComp::OnAxisBeginTimeChanged);
-	disconnect(m_timeAxisPtr, &CTimeAxis::EmitAxisEndTimeChanged, this, &CEventViewComp::OnAxisEndTimeChanged);
+	disconnect(&m_scene, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
+	disconnect(&m_timeAxis, &CTimeAxis::EmitAxisPosChanged, this, &CEventViewComp::OnAxisPosChanged);
+	disconnect(&m_timeAxis, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CEventViewComp::OnAxisBeginTimeChanged);
+	disconnect(&m_timeAxis, &CTimeAxis::EmitAxisEndTimeChanged, this, &CEventViewComp::OnAxisEndTimeChanged);
 	disconnect(m_viewPtr, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
 	disconnect(this, &CEventViewComp::EmitShowAll, m_viewPtr, &CEventGraphicsView::OnShowAll);
-
-	m_viewPtr->SetTimeAxis(nullptr);
-
-	if (m_timeAxisPtr != nullptr){
-		delete m_timeAxisPtr;
-	}
 
 	if (m_viewPtr != nullptr){
 		delete m_viewPtr;
 	}
-
-	if (m_scenePtr != nullptr){
-		delete m_scenePtr;
-	}
-
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_scaleConstraintsCompPtr.GetPtr());
 	if (modelPtr != nullptr){
 		modelPtr->DetachObserver(&m_scaleConstraintsObserver);
@@ -188,11 +186,9 @@ void CEventViewComp::OnGuiDestroyed()
 
 void CEventViewComp::OnViewPortChanged(bool userAction)
 {
-	if (m_timeAxisPtr != nullptr){
-		QRectF visibleRect = m_viewPtr->GetSceneVisibleRect();
-		
-		m_timeAxisPtr->setPos(0, visibleRect.bottom() - m_timeAxisPtr->rect().height() / m_viewPtr->GetScaleY());
-	}
+	QRectF visibleRect = m_viewPtr->GetSceneVisibleRect();
+
+	m_timeAxis.setPos(0, visibleRect.bottom() - m_timeAxis.rect().height() / m_viewPtr->GetScaleY());
 
 	if (m_groupControllerCompPtr.IsValid()){
 		m_groupControllerCompPtr->OnViewPortChanged();
@@ -216,8 +212,8 @@ void CEventViewComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDat
 {
 	if(!oldTime.isValid()){
 		QRectF rect = m_viewPtr->GetSceneRect();
-		rect.setLeft(m_timeAxisPtr->rect().left());
-		rect.setRight(m_timeAxisPtr->rect().right());
+		rect.setLeft(m_timeAxis.rect().left());
+		rect.setRight(m_timeAxis.rect().right());
 		m_viewPtr->SetSceneRect(rect);
 		m_viewPtr->SetViewRect(rect);
 		m_currentCommandTime = QDateTime();
@@ -226,8 +222,8 @@ void CEventViewComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDat
 	}
 	else{
 		QRectF rect = m_viewPtr->GetSceneRect();
-		rect.setLeft(m_timeAxisPtr->rect().left());
-		rect.setRight(m_timeAxisPtr->rect().right());
+		rect.setLeft(m_timeAxis.rect().left());
+		rect.setRight(m_timeAxis.rect().right());
 		m_viewPtr->SetSceneRect(rect);
 
 		double shift = (oldTime.toMSecsSinceEpoch() - newTime.toMSecsSinceEpoch()) / 1000.;
@@ -244,8 +240,8 @@ void CEventViewComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDat
 void CEventViewComp::OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
 {
 	QRectF rect = m_viewPtr->GetSceneRect();
-	rect.setLeft(m_timeAxisPtr->rect().left());
-	rect.setRight(m_timeAxisPtr->rect().right());
+	rect.setLeft(m_timeAxis.rect().left());
+	rect.setRight(m_timeAxis.rect().right());
 	m_viewPtr->SetSceneRect(rect);
 
 	if (m_groupControllerCompPtr.IsValid()){
@@ -287,7 +283,7 @@ void CEventViewComp::OnMoveToFirstCommand()
 
 void CEventViewComp::OnMoveToPreviousCommand()
 {
-	if (!m_groupControllerCompPtr.IsValid() || m_timeAxisPtr == nullptr){
+	if (!m_groupControllerCompPtr.IsValid()){
 		return;
 	}
 
@@ -296,7 +292,7 @@ void CEventViewComp::OnMoveToPreviousCommand()
 		currentTime = m_currentCommandTime;
 	}
 	else{
-		currentTime = m_timeAxisPtr->GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+		currentTime = m_timeAxis.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
 	}
 
 	QDateTime time;
@@ -333,7 +329,7 @@ void CEventViewComp::OnMoveToPreviousCommand()
 
 void CEventViewComp::OnMoveToNextCommand()
 {
-	if (!m_groupControllerCompPtr.IsValid() || m_timeAxisPtr == nullptr){
+	if (!m_groupControllerCompPtr.IsValid()){
 		return;
 	}
 
@@ -342,7 +338,7 @@ void CEventViewComp::OnMoveToNextCommand()
 		currentTime = m_currentCommandTime;
 	}
 	else{
-		currentTime = m_timeAxisPtr->GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+		currentTime = m_timeAxis.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
 	}
 
 	QDateTime time;
@@ -408,18 +404,18 @@ void CEventViewComp::OnMoveToLastCommand()
 
 void CEventViewComp::OnSelectionChanged()
 {
-	QList<QGraphicsItem*> items = m_scenePtr->selectedItems();
-	m_metaInfoPanelPtr->hide();
+	QList<QGraphicsItem*> items = m_scene.selectedItems();
+	m_panelsStackPtr->setCurrentIndex(0);
 	if (!items.isEmpty()){
 		CEventItemBase* itemPtr = dynamic_cast<CEventItemBase*>(items[0]);
 		if (itemPtr != nullptr){
 			if (UpdateMetaInfoPanel(itemPtr)){
-				m_metaInfoPanelPtr->show();
+				m_panelsStackPtr->setCurrentIndex(1);
 			}
 		}
 	}
 
-	m_scenePtr->update(m_viewPtr->GetViewRect().toRect());
+	m_scene.update(m_viewPtr->GetViewRect().toRect());
 }
 
 
@@ -473,8 +469,8 @@ void CEventViewComp::UpdateCommands()
 
 void CEventViewComp::MoveToTime(const QDateTime& time)
 {
-	double beginTime = m_timeAxisPtr->GetBeginTime().toMSecsSinceEpoch() / 1000.0;
-	double endTime = m_timeAxisPtr->GetEndTime().toMSecsSinceEpoch() / 1000.0;
+	double beginTime = m_timeAxis.GetBeginTime().toMSecsSinceEpoch() / 1000.0;
+	double endTime = m_timeAxis.GetEndTime().toMSecsSinceEpoch() / 1000.0;
 	double currentTime = time.toMSecsSinceEpoch() / 1000.0;
 
 	if (currentTime <  beginTime || currentTime > endTime){
@@ -486,7 +482,7 @@ void CEventViewComp::MoveToTime(const QDateTime& time)
 	if ((currentTime - beginTime > visibleTime / 2) && (endTime - currentTime > visibleTime / 2)){
 		QRectF rect = GetSceneVisibleRect();
 		double center = rect.center().x();
-		double newCenter = m_timeAxisPtr->GetScenePositionFromTime(time);
+		double newCenter = m_timeAxis.GetScenePositionFromTime(time);
 
 		rect.translate(newCenter - center, 0);
 		m_viewPtr->SetViewRect(rect);
@@ -498,11 +494,77 @@ void CEventViewComp::MoveToTime(const QDateTime& time)
 
 		QRectF rect = GetSceneVisibleRect();
 		double center = rect.center().x();
-		double newCenter = m_timeAxisPtr->GetScenePositionFromTime(time);
+		double newCenter = m_timeAxis.GetScenePositionFromTime(time);
 
 		rect.setWidth(2 * delta);
 		rect.translate(newCenter - center, 0);
 		m_viewPtr->SetViewRect(rect);
+	}
+}
+
+
+void CEventViewComp::UpdateSummaryInfoPanel()
+{
+	iwidgets::ClearLayout(m_summaryInfoPanelPtr->layout());
+
+	QVBoxLayout* layoutPtr = dynamic_cast<QVBoxLayout*>(m_summaryInfoPanelPtr->layout());
+	if (layoutPtr != nullptr){
+		if (m_groupControllerCompPtr.IsValid()){
+			QByteArrayList groupIds = m_groupControllerCompPtr->GetActiveGroupList();
+			for (QByteArray id : groupIds){
+				IEventItemController* groupPtr = m_groupControllerCompPtr->GetGroup(id);
+
+				QLabel* nameLabelPtr = new QLabel(groupPtr->GetGroupName());
+				QFont groupNameFont;
+				groupNameFont.setPixelSize(12);
+				groupNameFont.setBold(true);
+				nameLabelPtr->setStyleSheet("color: #88b8e3");
+				nameLabelPtr->setFont(groupNameFont);
+				layoutPtr->addWidget(nameLabelPtr);
+
+				for (int i = 0; i < 5; i++){
+					QHBoxLayout* categoryLayoutPtr = new QHBoxLayout();
+
+					QIcon icon;
+
+					switch (i){
+					case istd::IInformationProvider::IC_NONE:
+						icon = QIcon(":/Icons/StateUnknown");
+						break;
+					case istd::IInformationProvider::IC_INFO:
+						icon = QIcon(":/Icons/StateOk");
+						break;
+					case istd::IInformationProvider::IC_WARNING:
+						icon = QIcon(":/Icons/StateWarning");
+						break;
+					case istd::IInformationProvider::IC_ERROR:
+						icon = QIcon(":/Icons/Error");
+						break;
+					case istd::IInformationProvider::IC_CRITICAL:
+						icon = QIcon(":/Icons/StateInvalid");
+						break;
+					}
+
+					QPixmap pixmap = icon.pixmap(16);
+					QLabel* iconPtr = new QLabel();
+					iconPtr->setPixmap(pixmap);
+					categoryLayoutPtr->addWidget(iconPtr,1 );
+
+					QLabel* countLabelPtr = new QLabel(QString("%1 ").arg(groupPtr->GetEventCount((istd::IInformationProvider::InformationCategory)i)) + tr("Events"));
+					QFont countLabelFont;
+					countLabelFont.setPixelSize(9);
+					countLabelPtr->setStyleSheet("color: gray");
+					countLabelPtr->setFont(countLabelFont);
+					categoryLayoutPtr->addWidget(countLabelPtr, 1000);
+
+					layoutPtr->addLayout(categoryLayoutPtr);
+				}
+
+				layoutPtr->addSpacing(10);
+			}
+		}
+
+		layoutPtr->addStretch();
 	}
 }
 
@@ -515,7 +577,7 @@ bool CEventViewComp::UpdateMetaInfoPanel(const CEventItemBase* eventItem)
 		return false;
 	}
 
-	QGridLayout* layoutPtr = dynamic_cast<QGridLayout*>(m_metaInfoPanelPtr->layout());
+	QVBoxLayout* layoutPtr = dynamic_cast<QVBoxLayout*>(m_metaInfoPanelPtr->layout());
 	if (layoutPtr != nullptr){
 		CEventItemBase::MetaInfo metaInfo = eventItem->GetMetaInfo();
 		if (metaInfo.isEmpty()){
@@ -537,14 +599,13 @@ bool CEventViewComp::UpdateMetaInfoPanel(const CEventItemBase* eventItem)
 			labelValuePtr->setStyleSheet("color: gray");
 			labelValuePtr->setWordWrap(true);
 
-			layoutPtr->addWidget(labelKeyPtr, layoutPtr->rowCount(), 0, 1, 1);
-			layoutPtr->addWidget(labelValuePtr, layoutPtr->rowCount(), 0, 1, 1);
+			layoutPtr->addWidget(labelKeyPtr);
+			layoutPtr->addWidget(labelValuePtr);
 
-			QSpacerItem* delimeter = new QSpacerItem(10, 5);
-			layoutPtr->addItem(delimeter, layoutPtr->rowCount(), 0, 1, 1);
+			layoutPtr->addSpacing(10);
 		}
 
-		layoutPtr->addItem(new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding), layoutPtr->rowCount(), 0);
+		layoutPtr->addStretch();
 
 		return true;
 	}

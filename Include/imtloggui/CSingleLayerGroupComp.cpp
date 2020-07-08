@@ -141,6 +141,12 @@ const IEventItemController::EventMap* CSingleLayerGroupComp::GetEvents() const
 }
 
 
+int CSingleLayerGroupComp::GetEventCount(istd::IInformationProvider::InformationCategory category)
+{
+	return m_eventCount[category];
+}
+
+
 CEventItemBase* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr)
 {
 	if (m_eventItemFactoryCompPtr.IsValid() && m_graphicsItemPtr){
@@ -159,6 +165,7 @@ CEventItemBase* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::Me
 		itemPtr->setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemIsSelectable);
 
 		m_events.insert(messagePtr->GetInformationTimeStamp() ,itemPtr);
+		m_eventCount[messagePtr->GetInformationCategory()]++;
 
 		ArrangeEvents();
 
@@ -185,12 +192,6 @@ void CSingleLayerGroupComp::SetVisible(bool isVisible) const
 	if (m_graphicsItemPtr != nullptr){
 		m_graphicsItemPtr->setVisible(isVisible);
 	}
-}
-
-
-void CSingleLayerGroupComp::OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos)
-{
-
 }
 
 

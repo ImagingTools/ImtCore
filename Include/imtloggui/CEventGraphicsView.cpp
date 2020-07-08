@@ -13,16 +13,9 @@ namespace imtloggui
 
 CEventGraphicsView::CEventGraphicsView(QWidget* parent)
 	:QGraphicsView(parent),
-	m_timeAxisPtr(nullptr),
 	m_minimumVerticalScale(1),
 	m_userAction(false)
 {
-}
-
-
-void CEventGraphicsView::SetTimeAxis(CTimeAxis* timeAxisPtr)
-{
-	m_timeAxisPtr = timeAxisPtr;
 }
 
 

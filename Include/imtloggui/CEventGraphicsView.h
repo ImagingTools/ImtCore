@@ -22,8 +22,6 @@ public:
 
 	CEventGraphicsView(QWidget* parent = nullptr);
 
-	void SetTimeAxis(CTimeAxis* timeAxisPtr);
-
 	QRectF GetSceneVisibleRect() const;
 	double GetScaleX() const;
 	double GetScaleY() const;
@@ -58,8 +56,6 @@ private:
 	void UpdateViewRect();
 
 private:
-	CTimeAxis* m_timeAxisPtr;
-
 	QPointF m_lockedScenePoint;
 
 	double m_userAction;

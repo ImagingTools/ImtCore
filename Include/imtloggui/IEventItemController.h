@@ -34,12 +34,12 @@ public:
 
 	virtual QVector<int> GetSupportedMessageIds() const = 0;
 	virtual const EventMap* GetEvents() const = 0;
+	virtual int GetEventCount(istd::IInformationProvider::InformationCategory category) = 0;
 	virtual CEventItemBase* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) = 0;
 	virtual void ClearEvents() = 0;
 
 	virtual void SetVisible(bool isVisible) const = 0;
 
-	virtual void OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos) = 0;
 	virtual void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) = 0;
 	virtual void OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) = 0;
 	virtual void OnViewPortChanged() = 0;
