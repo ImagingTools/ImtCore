@@ -144,7 +144,7 @@ private:
 	QWidget* m_mainWidgetPtr;
 	QWidget* m_parentWidgetPtr;
 
-	CMenuPanelDelegate* m_delegatePtr;
+	CMenuPanelDelegate m_delegatePtr;
 
 	QGraphicsDropShadowEffect* m_shadowPtr;
 
