@@ -4,31 +4,31 @@
 <context>
     <name>Attribute</name>
     <message>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/EagleView/CEagleView.cpp" line="+67"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+51"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/EagleView/CEagleView.cpp" line="+71"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+57"/>
         <source>Report</source>
         <translation>Bericht</translation>
     </message>
     <message>
-        <location line="-2"/>
+        <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Report Files</source>
         <translation>Berichte</translation>
     </message>
     <message>
-        <location line="-28"/>
+        <location line="-36"/>
         <source>3D-Viewer</source>
         <translation>3D-Viewer</translation>
     </message>
     <message>
-        <location line="+32"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-28"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
         <translation>(C) 2018 ImagingToolsGmbH. Alle Rechte vorbehalten</translation>
     </message>
     <message>
-        <location line="-26"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
         <source>STL</source>
         <translation></translation>
     </message>
@@ -85,16 +85,16 @@
         <translation>Maximale Anzahl von nächsten Nachbarn</translation>
     </message>
     <message>
-        <location line="-22"/>
-        <location line="+32"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
+        <location line="-28"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-22"/>
         <source>ImtCore</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-34"/>
-        <location line="+32"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location line="-8"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
         <source>ImagingTools GmbH</source>
         <translation></translation>
     </message>
@@ -335,7 +335,7 @@
     <message>
         <location filename="../../../Include/imtloggui/CEventViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CEventViewComp.h" line="+48"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtloggui/ui_CEventViewComp.h" line="+48"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtloggui/ui_CEventViewComp.h" line="+42"/>
         <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CEventViewComp.h" line="+48"/>
         <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtloggui/ui_CEventViewComp.h" line="+48"/>
         <source>Form</source>
@@ -639,12 +639,21 @@
     <message>
         <location line="-17"/>
         <location line="+18"/>
-        <location filename="../../../Include/imtloggui/CEventViewComp.cpp" line="+73"/>
         <source>General</source>
         <translation>Allgemein</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtloggui/CEventGroupControllerComp.cpp" line="+334"/>
+        <location line="+4"/>
+        <source>Production event group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Production</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtloggui/CEventGroupControllerComp.cpp" line="+361"/>
         <source>MinimumVerticalScale</source>
         <translation></translation>
     </message>
@@ -660,16 +669,97 @@
         <translation>Unbenannt</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtloggui/CGeneralEventFactoryComp.cpp" line="+74"/>
-        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+60"/>
+        <location filename="../../../Include/imtloggui/CGeneralEventFactoryComp.cpp" line="+29"/>
+        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+28"/>
+        <source>UNKNOWN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
+        <source>WARNING</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
+        <source>ERROR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
+        <source>CRITICAL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <location line="+3"/>
+        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+16"/>
+        <location line="+3"/>
         <source>Source</source>
         <translation>Quelle</translation>
     </message>
     <message>
-        <location line="+0"/>
-        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+0"/>
+        <location line="-2"/>
+        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="-2"/>
+        <source>
+Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+1"/>
+        <source>
+Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+2"/>
         <source>Message</source>
         <translation>Beschreibung</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+1"/>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtgui/CApplicationChangedEventFactoryComp.cpp" line="+27"/>
+        <location line="+2"/>
+        <source>Application name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1"/>
+        <location line="+2"/>
+        <location filename="../../../Include/imtloggui/CLoginEventFactoryComp.cpp" line="+50"/>
+        <source>User name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtloggui/CLoginEventFactoryComp.cpp" line="-6"/>
+        <location line="+3"/>
+        <source>Action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-3"/>
+        <source>Login</source>
+        <translation type="unfinished">Einloggen</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Logout</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -948,7 +1038,7 @@
 <context>
     <name>imtbase::CFileCollectionComp</name>
     <message>
-        <location filename="../../../Include/imtbase/CFileCollectionComp.cpp" line="+1042"/>
+        <location filename="../../../Include/imtbase/CFileCollectionComp.cpp" line="+1041"/>
         <source>Input file name %1 renamed to %2</source>
         <translation>Datei %1 umbenannt in %2</translation>
     </message>
@@ -987,7 +1077,7 @@
 <context>
     <name>imtgui::CDocumentWorkspaceGuiComp</name>
     <message>
-        <location filename="../../../Include/imtgui/CDocumentWorkspaceGuiComp.cpp" line="+46"/>
+        <location filename="../../../Include/imtgui/CDocumentWorkspaceGuiComp.cpp" line="+48"/>
         <source>Document Name</source>
         <translation>Name des Dokuments</translation>
     </message>
@@ -1013,7 +1103,17 @@
         <translation>Name des Dokuments kann nicht leer sein!</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="+55"/>
+        <source>Login info not available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>No user logged in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+21"/>
         <source>File could not be saved!</source>
         <translation>Datei konnte nicht gespeichert werden!</translation>
     </message>
@@ -1289,17 +1389,17 @@
         <translation>Entfernen</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Set Description...</source>
         <translation>Beschreibung setzen...</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+4"/>
         <source>Rename...</source>
         <translation>Umbenennen...</translation>
     </message>
     <message>
-        <location line="+154"/>
+        <location line="+153"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
@@ -1410,7 +1510,7 @@
 <context>
     <name>imtloggui::CEventViewComp</name>
     <message>
-        <location filename="../../../Include/imtloggui/CEventViewComp.cpp" line="-32"/>
+        <location filename="../../../Include/imtloggui/CEventViewComp.cpp" line="+42"/>
         <source>First event</source>
         <translation>Erstes Erreignis</translation>
     </message>
@@ -1468,6 +1568,11 @@
         <location line="+0"/>
         <source>Move to last event</source>
         <translation>Zum letzten Erreignis navigieren</translation>
+    </message>
+    <message>
+        <location line="+507"/>
+        <source>Events</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

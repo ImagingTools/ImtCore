@@ -151,8 +151,7 @@ void CEventViewComp::OnGuiCreated()
 		m_timeAxis.EnsureTimeRange(QDateTime::currentDateTime());
 	}
 	else{
-		for (const ilog::IMessageConsumer::MessagePtr& message : m_messageList)
-		{
+		for (const ilog::IMessageConsumer::MessagePtr& message : m_messageList){
 			AddMessage(message);
 		}
 
@@ -173,6 +172,7 @@ void CEventViewComp::OnGuiDestroyed()
 	if (m_viewPtr != nullptr){
 		delete m_viewPtr;
 	}
+
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_scaleConstraintsCompPtr.GetPtr());
 	if (modelPtr != nullptr){
 		modelPtr->DetachObserver(&m_scaleConstraintsObserver);
@@ -421,7 +421,6 @@ void CEventViewComp::OnSelectionChanged()
 
 void CEventViewComp::OnUpdateSceneRect()
 {
-
 }
 
 
