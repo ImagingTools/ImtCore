@@ -20,6 +20,19 @@ namespace imtloggui
 class CViewModel: virtual public IViewModel, virtual public IViewRectProvider
 {
 public:
+	enum ChangeFlags
+	{
+		CF_SCENE_RECT = 0,
+		CF_VIEW_RECT,
+		CF_MARGINS,
+		CF_SCALE_X_RANGE,
+		CF_SCALE_Y_RANGE,
+		CF_SCALE_X,
+		CF_SCALE_Y
+	};
+
+	void ShowAll();
+
 	// reimplemented (imtloggui::IViewModel)
 	virtual QRectF GetSceneRect() const override;
 	virtual bool SetSceneRect(const QRectF& rect) override;
@@ -37,6 +50,30 @@ public:
 
 	// reimplemented (imtloggui::IViewRectProvider)
 	virtual QRectF GetViewRect() const override;
+
+private:
+	void UpdateViewRect();
+	void OnViewRectChanged();
+
+private:
+	class CViewRectChangeNotifier
+	{
+	public:
+		explicit CViewRectChangeNotifier(CViewModel* parent);
+		~CViewRectChangeNotifier();
+
+	private :
+		CViewModel* m_parentPtr;
+		QRectF m_viewRect;	
+	};
+
+private:
+	QRectF m_sceneRect;
+	QRectF m_viewRect;
+	QRect m_viewPortRect;
+	QMargins m_margins;
+	istd::CRange m_scaleXRange;
+	istd::CRange m_scaleYRange;
 };
 
 
