@@ -12,7 +12,7 @@ namespace imtloggui
 /**
 	Interface for view controller.
 */
-class IViewController: virtual public istd::IPolymorphic
+class IGraphicsViewController: virtual public istd::IPolymorphic
 {
 public:
 	/**

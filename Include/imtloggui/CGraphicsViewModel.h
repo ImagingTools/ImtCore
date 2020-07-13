@@ -6,8 +6,7 @@
 #include <iqtgui/CGuiComponentBase.h>
 
 // ImtBase includes
-#include <imtloggui/IViewModel.h>
-#include <imtloggui/IViewRectProvider.h>
+#include <imtloggui/IGraphicsViewModel.h>
 
 // Qt includes
 #include <QtWidgets/QGraphicsView>
@@ -17,7 +16,7 @@ namespace imtloggui
 {
 
 
-class CViewModel: virtual public IViewModel, virtual public IViewRectProvider
+class CGraphicsViewModel: virtual public IGraphicsViewModel
 {
 public:
 	enum ChangeFlags
@@ -59,11 +58,11 @@ private:
 	class CViewRectChangeNotifier
 	{
 	public:
-		explicit CViewRectChangeNotifier(CViewModel* parent);
+		explicit CViewRectChangeNotifier(CGraphicsViewModel* parent);
 		~CViewRectChangeNotifier();
 
 	private :
-		CViewModel* m_parentPtr;
+		CGraphicsViewModel* m_parentPtr;
 		QRectF m_viewRect;	
 	};
 

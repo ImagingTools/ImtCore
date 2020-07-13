@@ -54,6 +54,12 @@ I_EXPORT_COMPONENT(
 			"Event Group Single Layer");
 
 
+I_EXPORT_COMPONENT(
+			GraphicsView,
+			"Graphics view",
+			"Graphics View");
+
+
 } // namespace ImtLogGuiPck
 
 

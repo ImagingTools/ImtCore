@@ -1,4 +1,4 @@
- #include <imtloggui/CViewModel.h>
+ #include <imtloggui/CGraphicsViewModel.h>
 
 
 // ACF includes
@@ -14,7 +14,7 @@ namespace imtloggui
 
 // public methods
 
-void CViewModel::ShowAll()
+void CGraphicsViewModel::ShowAll()
 {
 	CViewRectChangeNotifier viewRectChangeNotifier(this);
 
@@ -26,13 +26,13 @@ void CViewModel::ShowAll()
 }
 
 
-QRectF CViewModel::GetSceneRect() const
+QRectF CGraphicsViewModel::GetSceneRect() const
 {
 	return m_sceneRect;
 }
 
 
-bool CViewModel::SetSceneRect(const QRectF& rect)
+bool CGraphicsViewModel::SetSceneRect(const QRectF& rect)
 {
 	if (m_sceneRect != rect){
 		CViewRectChangeNotifier viewRectChangeNotifier(this);
@@ -48,7 +48,7 @@ bool CViewModel::SetSceneRect(const QRectF& rect)
 }
 
 
-bool CViewModel::SetViewRect(const QRectF& rect)
+bool CGraphicsViewModel::SetViewRect(const QRectF& rect)
 {
 	if (m_viewRect != rect){
 		CViewRectChangeNotifier viewRectChangeNotifier(this);
@@ -63,13 +63,13 @@ bool CViewModel::SetViewRect(const QRectF& rect)
 }
 
 
-QMargins CViewModel::GetMargins() const
+QMargins CGraphicsViewModel::GetMargins() const
 {
 	return m_margins;
 }
 
 
-bool CViewModel::SetMargins(const QMargins& margins)
+bool CGraphicsViewModel::SetMargins(const QMargins& margins)
 {
 	if (m_margins != margins){
 		CViewRectChangeNotifier viewRectChangeNotifier(this);
@@ -85,31 +85,31 @@ bool CViewModel::SetMargins(const QMargins& margins)
 }
 
 
-double CViewModel::GetScaleX() const
+double CGraphicsViewModel::GetScaleX() const
 {
 	return m_viewPortRect.width() / m_viewRect.width();
 }
 
 
-double CViewModel::GetScaleY() const
+double CGraphicsViewModel::GetScaleY() const
 {
 	return m_viewPortRect.height() / m_viewRect.height();
 }
 
 
-istd::CRange CViewModel::GetScaleXRange() const
+istd::CRange CGraphicsViewModel::GetScaleXRange() const
 {
 	return m_scaleXRange;
 }
 
 
-istd::CRange CViewModel::GetScaleYRange() const
+istd::CRange CGraphicsViewModel::GetScaleYRange() const
 {
 	return m_scaleYRange;
 }
 
 
-bool CViewModel::SetScaleXRange(const istd::CRange& range)
+bool CGraphicsViewModel::SetScaleXRange(const istd::CRange& range)
 {
 	if (range.IsValidNonEmpty() && range.GetMinValue() > 0){
 		CViewRectChangeNotifier viewRectChangeNotifier(this);
@@ -125,7 +125,7 @@ bool CViewModel::SetScaleXRange(const istd::CRange& range)
 }
 
 
-bool CViewModel::SetScaleYRange(const istd::CRange& range)
+bool CGraphicsViewModel::SetScaleYRange(const istd::CRange& range)
 {
 	if (range.IsValidNonEmpty() && range.GetMinValue() > 0){
 		CViewRectChangeNotifier viewRectChangeNotifier(this);
@@ -141,7 +141,7 @@ bool CViewModel::SetScaleYRange(const istd::CRange& range)
 }
 
 
-bool CViewModel::Scroll(const QPointF& delta, bool inPercents)
+bool CGraphicsViewModel::Scroll(const QPointF& delta, bool inPercents)
 {
 	CViewRectChangeNotifier viewRectChangeNotifier(this);
 
@@ -152,7 +152,7 @@ bool CViewModel::Scroll(const QPointF& delta, bool inPercents)
 }
 
 
-bool CViewModel::Zoom(const QPointF& factors, const QPointF& zoomOrigin)
+bool CGraphicsViewModel::Zoom(const QPointF& factors, const QPointF& zoomOrigin)
 {
 	CViewRectChangeNotifier viewRectChangeNotifier(this);
 
@@ -178,7 +178,7 @@ bool CViewModel::Zoom(const QPointF& factors, const QPointF& zoomOrigin)
 }
 
 
-QRectF CViewModel::GetViewRect() const
+QRectF CGraphicsViewModel::GetViewRect() const
 {
 	return m_viewRect;
 }
@@ -186,7 +186,7 @@ QRectF CViewModel::GetViewRect() const
 
 // private methods
 
-void CViewModel::UpdateViewRect()
+void CGraphicsViewModel::UpdateViewRect()
 {
 	CViewRectChangeNotifier notifier(this);
 
@@ -245,7 +245,7 @@ void CViewModel::UpdateViewRect()
 }
 
 
-void CViewModel::OnViewRectChanged()
+void CGraphicsViewModel::OnViewRectChanged()
 {
 	istd::CChangeNotifier notifier(this, &istd::IChangeable::ChangeSet(CF_VIEW_RECT));
 }
@@ -253,7 +253,7 @@ void CViewModel::OnViewRectChanged()
 
 // public methods of embedded CViewRectChangeNotifier
 
-CViewModel::CViewRectChangeNotifier::CViewRectChangeNotifier(CViewModel* parent)
+CGraphicsViewModel::CViewRectChangeNotifier::CViewRectChangeNotifier(CGraphicsViewModel* parent)
 	: m_parentPtr(parent)
 {
 	Q_ASSERT(m_parentPtr != nullptr);
@@ -264,7 +264,7 @@ CViewModel::CViewRectChangeNotifier::CViewRectChangeNotifier(CViewModel* parent)
 }
 
 
-CViewModel::CViewRectChangeNotifier::~CViewRectChangeNotifier()
+CGraphicsViewModel::CViewRectChangeNotifier::~CViewRectChangeNotifier()
 {
 	if (m_parentPtr != nullptr){
 		if (m_viewRect != m_parentPtr->GetViewRect()){

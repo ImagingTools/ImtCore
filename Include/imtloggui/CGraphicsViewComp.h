@@ -7,8 +7,8 @@
 
 
 // ImtCore includes
-#include <imtloggui/IViewController.h>
-#include <imtloggui/CViewModel.h>
+#include <imtloggui/IGraphicsViewController.h>
+#include <imtloggui/CGraphicsViewModel.h>
 
 
 namespace imtloggui
@@ -17,15 +17,15 @@ namespace imtloggui
 
 class CGraphicsViewComp:
 			public iqtgui::CGuiComponentBase,
-			virtual public imtloggui::IViewController
+			virtual public imtloggui::IGraphicsViewController
 {
 public:
 	typedef iqtgui::CGuiComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGraphicsViewComp)
-		I_REGISTER_SUBELEMENT(CViewModel);
-		I_REGISTER_SUBELEMENT_INTERFACE(CViewModel, IViewModel, ExtractViewModel);
-		I_REGISTER_SUBELEMENT_INTERFACE(CViewModel, imod::IModel, ExtractViewModel);
+		I_REGISTER_SUBELEMENT(CGraphicsViewModel);
+		I_REGISTER_SUBELEMENT_INTERFACE(CGraphicsViewModel, IGraphicsViewModel, ExtractViewModel);
+		I_REGISTER_SUBELEMENT_INTERFACE(CGraphicsViewModel, imod::IModel, ExtractViewModel);
 	I_END_COMPONENT
 
 	// reimplemented (imtloggui::IViewController)
@@ -53,7 +53,7 @@ private:
 	}
 
 private:
-	imod::TModelWrap<CViewModel> m_viewModel;
+	imod::TModelWrap<CGraphicsViewModel> m_viewModel;
 	QPointF m_zoomFactors;
 	QPointF m_percentageScrollingSteps;
 	QPointF m_lockedScenePoint;

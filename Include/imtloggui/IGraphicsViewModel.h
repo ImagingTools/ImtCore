@@ -18,7 +18,7 @@ namespace imtloggui
 /**
 	Interface for view model
 */
-class IViewModel: virtual public IViewRectProvider
+class IGraphicsViewModel: virtual public IViewRectProvider
 {
 public:
 	/**

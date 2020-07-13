@@ -64,8 +64,7 @@ void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QBy
 
 void CMenuPanelComp::OnGuiCreated()
 {
-	imtwidgets::CMenuPanel* widgetPtr = dynamic_cast<imtwidgets::CMenuPanel*>(GetWidget());
-	Q_ASSERT(widgetPtr != nullptr);
+	imtwidgets::CMenuPanel* widgetPtr = GetQtWidget();
 
 	if (m_widgetProviderCompPtr.IsValid() && m_isShowOverAttrPtr.IsValid() && *m_isShowOverAttrPtr){
 		widgetPtr->SetMainWidget(m_widgetProviderCompPtr->GetWidgetPtr(QByteArray()));
@@ -96,6 +95,8 @@ void CMenuPanelComp::OnGuiCreated()
 		m_resolutionY = *m_physicalResolutionAttrPtr;
 		m_scale = 1;
 		UpdateWidgetSizeAttributes();
+
+		//panelPtr->SetActivePage(FindSelectedItem());
 	}
 
 	if (m_menuPanelVisibilityModelCompPtr.IsValid()){

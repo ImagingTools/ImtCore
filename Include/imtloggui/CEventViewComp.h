@@ -18,6 +18,7 @@
 #include <imtloggui/CEventGraphicsView.h>
 #include <imtloggui/CTimeAxis.h>
 #include <imtloggui/IEventGroupController.h>
+#include <imtloggui/IGraphicsViewModel.h>
 
 // Acula includes
 #include <GeneratedFiles/imtloggui/ui_CEventViewComp.h>
@@ -44,6 +45,8 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
 		I_ASSIGN(m_groupControllerCompPtr, "EventGroupController", "Event group controller", true, "EventGroupController")
+		I_ASSIGN(m_graphicsViewModelCompPtr, "GraphicsViewModel", "Graphics view model", true, "GraphicsViewModel");
+		I_ASSIGN(m_graphicsViewCompPtr, "GraphicsView", "Graphics view", true, "GraphicsView");
 		I_ASSIGN(m_scaleConstraintsCompPtr, "VerticalScaleConstraints", "Vertical scale constraints", true, "");
 	I_END_COMPONENT;
 
@@ -122,6 +125,8 @@ private:
 
 private:
 	I_REF(IEventGroupController, m_groupControllerCompPtr);
+	I_REF(IGraphicsViewModel, m_graphicsViewModelCompPtr);
+	I_REF(iqtgui::IGuiObject, m_graphicsViewCompPtr);
 	I_REF(imeas::INumericConstraints, m_scaleConstraintsCompPtr);
 
 	imod::TModelWrap<Commands> m_commands;
