@@ -24,7 +24,7 @@ public:
 
 	I_BEGIN_COMPONENT(CGraphicsViewComp)
 		I_REGISTER_SUBELEMENT(CViewModel);
-		I_REGISTER_SUBELEMENT_INTERFACE(CViewModel, IViewRectProvider, ExtractViewModel);
+		I_REGISTER_SUBELEMENT_INTERFACE(CViewModel, IViewModel, ExtractViewModel);
 		I_REGISTER_SUBELEMENT_INTERFACE(CViewModel, imod::IModel, ExtractViewModel);
 	I_END_COMPONENT
 
