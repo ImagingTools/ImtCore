@@ -13,24 +13,9 @@ namespace imtloggui
 /**
 	Interface for group controller
 */
-class IGroupsController: virtual public istd::IPolymorphic
+class IGroupController: virtual public IGraphicsItemController
 {
 public:
-	/**
-		Create and add composed group graphics item to scene
-	*/
-	virtual QGraphicsItem* CreateGraphicsItem() = 0;
-
-	/**
-		Remove from scene and destroy composed group graphics item
-	*/
-	virtual void DestroyGraphicsItem() = 0;
-
-	/**
-		Get composed group graphics item
-	*/
-	virtual QGraphicsItem* GetGraphicsItem() const = 0;
-
 	/**
 		Get group ids connected to group controller
 	*/

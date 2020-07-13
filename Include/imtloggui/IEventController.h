@@ -3,9 +3,9 @@
 
 // Acf includes
 #include <ilog/IMessageConsumer.h>
-#include <istd/IPolymorphic.h>
 
 // ImtCore includes
+#include <imtloggui/IGraphicsItemController.h>
 #include <imtloggui/CEventItemBase.h>
 
 
@@ -14,28 +14,13 @@ namespace imtloggui
 
 
 /**
-	Interface for event controller
+	Interface for event controller (group of events)
 */
-class IEventController: virtual public istd::IPolymorphic
+class IEventController: virtual public IGraphicsItemController
 {
 public:
 	typedef QMultiMap<QDateTime, CEventItemBase*> EventMap;
 	typedef QVector<int> MessageIds;
-
-	/**
-		Create and add group graphics item to scene
-	*/
-	virtual QGraphicsItem* CreateGraphicsItem() = 0;
-
-	/**
-		Remove and destroy group graphics item from scene
-	*/
-	virtual void DestroyGraphicsItem() = 0;
-
-	/**
-		Get group graphics item
-	*/
-	virtual QGraphicsItem* GetGraphicsItem() const = 0;
 
 	/**
 		Get group id
@@ -50,7 +35,7 @@ public:
 	/**
 		Get group minimum height in pixels on screen
 	*/
-	virtual int GetGroupMinimalHeight() const = 0;
+	virtual int GetGroupMinimumHeight() const = 0;
 
 	/**
 		Get message ids supported by group
@@ -58,22 +43,22 @@ public:
 	virtual MessageIds GetSupportedMessageIds() const = 0;
 
 	/**
-		Get events
+		Get events added to group
 	*/
 	virtual const EventMap* GetEvents() const = 0;
 
 	/**
-		Get event count with gived category
+		Get event count with gived information category
 	*/
 	virtual int GetEventCount(istd::IInformationProvider::InformationCategory category) = 0;
 
 	/**
-		Add event for gived message
+		Add event to group for gived message
 	*/
 	virtual CEventItemBase* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) = 0;
 
 	/**
-		Remova all events
+		Remova all events from group
 	*/
 	virtual void ClearEvents() = 0;
 };
