@@ -1163,6 +1163,8 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 
 				m_mainToolBar->addAction(placeholderAction);
 				m_mainToolBar->addSeparator();
+
+				CommandsMenuButton->setEnabled(false);
 			}
 		}
 	}
