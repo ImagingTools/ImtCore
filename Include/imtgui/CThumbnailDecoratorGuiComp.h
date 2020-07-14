@@ -6,6 +6,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QProcess>
 #include <QtWidgets/QListView>
+#include <QtWidgets/QMenu>
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QStandardItem>
 
@@ -165,6 +166,7 @@ private Q_SLOTS:
 	void on_LoginButton_clicked();
 	void on_LoginControlButton_clicked();
 	void on_SettingsButton_clicked();
+	void on_CommandsMenuButton_clicked();
 	void on_LogButton_clicked();
 	void on_KeyboardButton_clicked();
 	void Logout();
@@ -197,6 +199,7 @@ private:
 	void UpdateMaxSize();
 	void UpdateMinSize();
 	void UpdateCommands();
+	int SetupCommandsMenu(const iqtgui::CHierarchicalCommand& command, QMenu& result, int& prevGroupId);
 	void ShowKeyboard();
 	void HideKeyboard();
 	void SetKeyboardCommandPath();
@@ -309,6 +312,8 @@ private:
 
 	QToolBar* m_mainToolBar;
 	QTimer m_autoLogoutTimer;
+
+	QMenu m_commandsMenu;
 
 	istd::TDelPtr<QProcess> m_keyboardProcessPtr;
 	QString m_winKeyboardPath;

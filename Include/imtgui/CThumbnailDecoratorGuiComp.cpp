@@ -176,6 +176,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		CurrentPageToolBarFrame->layout()->addWidget(m_mainToolBar);
 	}
 
+	m_commandsMenu.setProperty("CommandsMenu", true);
+
 	if (m_leftMenuPanelGuiCompPtr.IsValid()){
 		m_leftMenuPanelGuiCompPtr->CreateGui(MenuPanelFrame);
 	}
@@ -469,6 +471,21 @@ void CThumbnailDecoratorGuiComp::on_SettingsButton_clicked()
 			on_PageList_clicked(itemPtr->index());
 		}
 	}
+}
+
+
+void CThumbnailDecoratorGuiComp::on_CommandsMenuButton_clicked()
+{
+	QPoint origin = CommandsMenuButton->geometry().center();
+	origin.rx() -= m_commandsMenu.sizeHint().width() / 2;
+	origin.ry() = m_mainToolBar->geometry().bottom();
+
+	int delta = GetQtWidget()->rect().width() - (origin.x() + m_commandsMenu.sizeHint().width());
+	if (delta < 5){
+		origin.rx() -= (5 - delta);
+	}
+
+	m_commandsMenu.exec(GetQtWidget()->mapToGlobal(origin));
 }
 
 
@@ -1131,10 +1148,14 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 	if (m_commandsProviderCompPtr.IsValid()){
 		if (m_mainToolBar != nullptr){
 			m_mainToolBar->clear();
+			m_commandsMenu.clear();
 	
 			commandsPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_commandsProviderCompPtr->GetCommands());
 			if (commandsPtr != nullptr){
 				iqtgui::CCommandTools::SetupToolbar(*commandsPtr, *m_mainToolBar);
+				int group = ibase::ICommand::GI_NONE;
+				SetupCommandsMenu(*commandsPtr, m_commandsMenu, group);
+				CommandsMenuButton->setEnabled(!m_commandsMenu.isEmpty());
 			}
 			else{
 				QAction* placeholderAction = new QAction(QIcon("/"), "");
@@ -1145,6 +1166,58 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 			}
 		}
 	}
+}
+
+
+int CThumbnailDecoratorGuiComp::SetupCommandsMenu(const iqtgui::CHierarchicalCommand& command, QMenu& result, int& prevGroupId)
+{
+	int childsCount = command.GetChildsCount();
+
+	QMap<int, QActionGroup*> groups;
+
+	for (int i = 0; i < childsCount; ++i){
+		iqtgui::CHierarchicalCommand* hierarchicalPtr = const_cast<iqtgui::CHierarchicalCommand*>(
+			dynamic_cast<const iqtgui::CHierarchicalCommand*>(command.GetChild(i)));
+
+		if (hierarchicalPtr != NULL){
+			int groupId = hierarchicalPtr->GetGroupId();
+
+			if (hierarchicalPtr->GetChildsCount() > 0){
+				SetupCommandsMenu(*hierarchicalPtr, result, prevGroupId);
+			}
+			else{
+				int flags = hierarchicalPtr->GetStaticFlags();
+				QString actionName = hierarchicalPtr->GetName();
+
+				if ((flags & ibase::ICommand::CF_TOOLBAR) == 0){
+					if (groupId != prevGroupId){
+						if (!m_commandsMenu.isEmpty()){
+							result.addSeparator();
+						}
+					}
+
+					result.addAction(hierarchicalPtr);
+
+					if ((flags & ibase::ICommand::CF_EXCLUSIVE) != 0){
+						QActionGroup*& groupPtr = groups[hierarchicalPtr->GetGroupId()];
+						if (groupPtr == NULL){
+							groupPtr = new QActionGroup(&result);
+							groupPtr->setExclusive(true);
+						}
+
+						groupPtr->addAction(hierarchicalPtr);
+						hierarchicalPtr->setCheckable(true);
+					}
+
+					if (groupId != ibase::ICommand::GI_NONE){
+						prevGroupId = groupId;
+					}
+				}
+			}
+		}
+	}
+
+	return prevGroupId;
 }
 
 
