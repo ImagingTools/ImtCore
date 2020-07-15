@@ -4,16 +4,15 @@
 // Qt includes
 #include <QtCore/QDateTime>
 
+// ACF includes
+#include <istd/IPolymorphic.h>
+
 
 namespace imtloggui
 {
 
 
-/**
-	Interface for the document view decorator.
-	View decorator is used for some extended (decorated) presentation of a document view.
-*/
-class IEventScenePositionProvider
+class IEventScenePositionProvider: virtual public istd::IPolymorphic
 {
 public:
 	/**
