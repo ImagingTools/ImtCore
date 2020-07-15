@@ -31,6 +31,7 @@ protected:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (QGraphicsView)
+	virtual void resizeEvent(QResizeEvent *event) override;
 	virtual void mouseMoveEvent(QMouseEvent *event) override;
 	virtual void mousePressEvent(QMouseEvent *event) override;
 	virtual void mouseReleaseEvent(QMouseEvent *event) override;
@@ -39,6 +40,7 @@ protected:
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
 
 Q_SIGNALS:
+	void EmitResizeEvent(QResizeEvent *event);
 	void EmitMouseMoveEvent(QMouseEvent *event);
 	void EmitMousePressEvent(QMouseEvent *event);
 	void EmitMouseReleaseEvent(QMouseEvent *event);

@@ -15,13 +15,13 @@ namespace imtloggui
 /**
 	Interface for scene provider
 */
-class ISceneProvider: virtual public istd::IPolymorphic
+class IGraphicsSceneProvider: virtual public istd::IPolymorphic
 {
 public:
 	/**
 		Get graphics scene
 	*/
-	virtual QGraphicsScene* GetScene() const = 0;
+	virtual QGraphicsScene* GetScene() = 0;
 };
 
 

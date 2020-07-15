@@ -10,6 +10,9 @@ namespace imtloggui
 CGraphicsView::CGraphicsView(QWidget *parent)
 	: QGraphicsView(parent)
 {
+	setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform); 
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
 // protected methods
@@ -35,6 +38,12 @@ void CGraphicsView::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 
 
 // reimplemented (QGraphicsView)
+
+void CGraphicsView::resizeEvent(QResizeEvent *event)
+{
+	Q_EMIT EmitResizeEvent(event);
+}
+
 
 void CGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {

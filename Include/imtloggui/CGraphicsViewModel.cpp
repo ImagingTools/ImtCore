@@ -18,8 +18,8 @@ void CGraphicsViewModel::ShowAll()
 {
 	CViewRectChangeNotifier viewRectChangeNotifier(this);
 
-	double viewWidth = m_sceneRect.width() / (1 - (double)(m_margins.left() + m_margins.right()) / m_viewPortRect.width());
-	double viewHeight = m_sceneRect.height() / (1 - (double)(m_margins.top() + m_margins.bottom()) / m_viewPortRect.height());
+	double viewWidth = m_sceneRect.width() / (1 - (double)(m_margins.left() + m_margins.right()) / m_viewPortSize.width());
+	double viewHeight = m_sceneRect.height() / (1 - (double)(m_margins.top() + m_margins.bottom()) / m_viewPortSize.height());
 	m_viewRect = QRectF(m_sceneRect.bottomRight(), QSizeF(viewWidth, viewHeight));
 
 	UpdateViewRect();
@@ -63,6 +63,27 @@ bool CGraphicsViewModel::SetViewRect(const QRectF& rect)
 }
 
 
+QSize CGraphicsViewModel::GetViewPortSize() const
+{
+	return m_viewPortSize;
+}
+
+
+bool CGraphicsViewModel::SetViewPortSize(const QSize& size)
+{
+	if (m_viewPortSize != size){
+		CViewRectChangeNotifier viewRectChangeNotifier(this);
+
+		m_viewPortSize = size;
+		UpdateViewRect();
+
+		return true;
+	}
+
+	return false;
+}
+
+
 QMargins CGraphicsViewModel::GetMargins() const
 {
 	return m_margins;
@@ -87,13 +108,13 @@ bool CGraphicsViewModel::SetMargins(const QMargins& margins)
 
 double CGraphicsViewModel::GetScaleX() const
 {
-	return m_viewPortRect.width() / m_viewRect.width();
+	return m_viewPortSize.width() / m_viewRect.width();
 }
 
 
 double CGraphicsViewModel::GetScaleY() const
 {
-	return m_viewPortRect.height() / m_viewRect.height();
+	return m_viewPortSize.height() / m_viewRect.height();
 }
 
 
@@ -141,43 +162,6 @@ bool CGraphicsViewModel::SetScaleYRange(const istd::CRange& range)
 }
 
 
-bool CGraphicsViewModel::Scroll(const QPointF& delta, bool inPercents)
-{
-	CViewRectChangeNotifier viewRectChangeNotifier(this);
-
-	m_viewRect.translate(delta);
-	UpdateViewRect();
-
-	return true;
-}
-
-
-bool CGraphicsViewModel::Zoom(const QPointF& factors, const QPointF& zoomOrigin)
-{
-	CViewRectChangeNotifier viewRectChangeNotifier(this);
-
-	double factorX = factors.x();
-	double factorY = factors.y();
-
-	if (factorX == 1 || factorX == 0){
-		return false;
-	}
-
-	if (factorY == 1 || factorY == 0){
-		return false;
-	}
-
-	m_viewRect.setLeft((m_viewRect.left() - zoomOrigin.x()) / factorX + zoomOrigin.x());
-	m_viewRect.setRight((m_viewRect.right() - zoomOrigin.x()) / factorX + zoomOrigin.x());
-	m_viewRect.setTop((m_viewRect.top() - zoomOrigin.y()) / factorY + zoomOrigin.y());
-	m_viewRect.setBottom((m_viewRect.bottom() - zoomOrigin.y()) / factorY + zoomOrigin.y());
-
-	UpdateViewRect();
-
-	return true;
-}
-
-
 QRectF CGraphicsViewModel::GetViewRect() const
 {
 	return m_viewRect;
@@ -196,19 +180,19 @@ void CGraphicsViewModel::UpdateViewRect()
 	double scaleY = GetScaleY();
 
 	if (scaleX < m_scaleXRange.GetMinValue()){
-		m_viewRect.setWidth(m_viewPortRect.width() / m_scaleXRange.GetMinValue());
+		m_viewRect.setWidth(m_viewPortSize.width() / m_scaleXRange.GetMinValue());
 	}
 
 	if (scaleX > m_scaleYRange.GetMaxValue()){
-		m_viewRect.setWidth(m_viewPortRect.width() / m_scaleXRange.GetMaxValue());
+		m_viewRect.setWidth(m_viewPortSize.width() / m_scaleXRange.GetMaxValue());
 	}
 
 	if (scaleY < m_scaleYRange.GetMinValue()){
-		m_viewRect.setHeight(m_viewPortRect.height() / m_scaleYRange.GetMinValue());
+		m_viewRect.setHeight(m_viewPortSize.height() / m_scaleYRange.GetMinValue());
 	}
 
 	if (scaleY > m_scaleYRange.GetMaxValue()){
-		m_viewRect.setHeight(m_viewPortRect.height() / m_scaleYRange.GetMaxValue());
+		m_viewRect.setHeight(m_viewPortSize.height() / m_scaleYRange.GetMaxValue());
 	}
 
 	scaleX = GetScaleX();

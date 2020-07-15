@@ -13,16 +13,22 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IViewController)
 
-QPointF CGraphicsViewComp::GetZoomFactors() const
+double CGraphicsViewComp::GetZoomFactorX() const
 {
-	return m_zoomFactors;
+	return m_zoomFactorX;
+}
+
+double CGraphicsViewComp::GetZoomFactorY() const
+{
+	return m_zoomFactorY;
 }
 
 
-bool CGraphicsViewComp::SetZoomFactors(const QPointF& factors)
+bool CGraphicsViewComp::SetZoomFactors(double zoomFactorX, double zoomFactorY)
 {
-	if (factors.x() > 0 && factors.y() > 0){
-		m_zoomFactors = factors;
+	if (zoomFactorX > 0 && zoomFactorY > 0){
+		m_zoomFactorX = zoomFactorX;
+		m_zoomFactorY = zoomFactorY;
 		return true;
 	}
 
@@ -30,20 +36,56 @@ bool CGraphicsViewComp::SetZoomFactors(const QPointF& factors)
 }
 
 
-QPointF CGraphicsViewComp::GetPercentageScrollingSteps() const
+double CGraphicsViewComp::GetPercentageScrollingStepX() const
 {
-	return m_percentageScrollingSteps;
+	return m_percentageScrollingStepX;
 }
 
 
-bool CGraphicsViewComp::SetPercentageScrollingSteps(const QPointF& steps)
+double CGraphicsViewComp::GetPercentageScrollingStepY() const
 {
-	if (steps.x() > 0 && steps.x() <= 100 && steps.y() > 0 && steps.y() <= 100){
-		m_percentageScrollingSteps = steps;
+	return m_percentageScrollingStepY;
+}
+
+
+bool CGraphicsViewComp::SetPercentageScrollingSteps(double scrollingStepX, double scrollingStepY)
+{
+	if (scrollingStepX > 0 && scrollingStepX <= 100 && scrollingStepY > 0 && scrollingStepY <= 100){
+		m_percentageScrollingStepX = scrollingStepX;
+		m_percentageScrollingStepY = scrollingStepY;
 		return true;
 	}
 
 	return false;
+}
+
+
+bool CGraphicsViewComp::Scroll(double dx, double dy)
+{
+	QRectF viewRect = m_viewModel.GetViewRect();
+	viewRect.translate(dx, dy);
+	return m_viewModel.SetViewRect(viewRect);
+}
+
+
+bool CGraphicsViewComp::Zoom(const QPointF& zoomOrigin, double zoomFactorX, double zoomFactorY)
+{
+	QRectF viewRect = m_viewModel.GetViewRect();
+
+	if (zoomFactorX <= 0){
+		return false;
+	}
+
+	if (zoomFactorY <= 0){
+		return false;
+	}
+
+	viewRect.setLeft((viewRect.left() - zoomOrigin.x()) / zoomFactorX + zoomOrigin.x());
+	viewRect.setRight((viewRect.right() - zoomOrigin.x()) / zoomFactorX + zoomOrigin.x());
+	viewRect.setTop((viewRect.top() - zoomOrigin.y()) / zoomFactorY + zoomOrigin.y());
+	viewRect.setBottom((viewRect.bottom() - zoomOrigin.y()) / zoomFactorY + zoomOrigin.y());
+
+	return m_viewModel.SetViewRect(viewRect);
 }
 
 
@@ -52,14 +94,28 @@ QWidget* CGraphicsViewComp::CreateQtWidget(QWidget* parentPtr)
 	Q_ASSERT(!IsGuiCreated());
 
 	CGraphicsView* widgetPtr = new CGraphicsView(parentPtr);
-
 	m_viewModel.AttachObserver(widgetPtr);
 
 	return widgetPtr;
 }
 
 
+void CGraphicsViewComp::OnGuiCreated()
+{
+	if (m_graphicsSceneProviderCompPtr.IsValid()){
+		CGraphicsView* viewPtr = dynamic_cast<CGraphicsView*>(GetWidget());
+		viewPtr->setScene(m_graphicsSceneProviderCompPtr->GetScene());
+	}
+}
+
+
 // private slots
+
+void CGraphicsViewComp::OnResizeEvent(QResizeEvent *event)
+{
+	m_viewModel.SetViewPortSize(event->size());
+}
+
 
 void CGraphicsViewComp::OnMouseMoveEvent(QMouseEvent *event)
 {
@@ -69,7 +125,7 @@ void CGraphicsViewComp::OnMouseMoveEvent(QMouseEvent *event)
 		QPointF newlockedScenePoint = viewPtr->mapToScene(event->pos());
 		QPointF delta = m_lockedScenePoint - newlockedScenePoint;
 
-		m_viewModel.Scroll(delta);
+		Scroll(delta.x(), delta.y());
 
 		m_lockedScenePoint = newlockedScenePoint;
 	}
@@ -96,18 +152,18 @@ void CGraphicsViewComp::OnWheelEvent(QWheelEvent* event)
 
 	if (event->modifiers() && Qt::Modifier::SHIFT){
 		if (event->delta() > 0){
-			m_viewModel.Zoom(QPointF(m_zoomFactors.x(), 1), viewPtr->mapToScene(event->pos()));
+			Zoom(dynamic_cast<QGraphicsView*>(sender())->mapToScene(event->pos()), m_zoomFactorX, 1);
 		}
 		else{
-			m_viewModel.Zoom(QPointF(1 / m_zoomFactors.x(), 1), viewPtr->mapToScene(event->pos()));
+			Zoom(dynamic_cast<QGraphicsView*>(sender())->mapToScene(event->pos()), 1 / m_zoomFactorX, 1);
 		}
 	}
 	else{
 		if (event->delta() > 0){
-			m_viewModel.Zoom(QPointF(1, m_zoomFactors.y()), viewPtr->mapToScene(event->pos()));
+			Zoom(dynamic_cast<QGraphicsView*>(sender())->mapToScene(event->pos()), 1, m_zoomFactorY);
 		}
 		else{
-			m_viewModel.Zoom(QPointF(1, 1 / m_zoomFactors.y()), viewPtr->mapToScene(event->pos()));
+			Zoom(dynamic_cast<QGraphicsView*>(sender())->mapToScene(event->pos()), 1, 1 / m_zoomFactorY);
 		}
 	}
 }
@@ -115,7 +171,40 @@ void CGraphicsViewComp::OnWheelEvent(QWheelEvent* event)
 
 void CGraphicsViewComp::OnKeyPressEvent(QKeyEvent *event)
 {
+	QRectF viewRect = m_viewModel.GetViewRect();
 
+	switch (event->key()){
+	case Qt::Key_Plus:
+		{
+			Zoom(viewRect.center(), m_zoomFactorX, m_zoomFactorY);
+		}
+		break;
+	case Qt::Key_Minus:
+		{
+			Zoom(viewRect.center(), 1 / m_zoomFactorX, 1 / m_zoomFactorY);
+		}
+		break;
+	case Qt::Key_Left:
+		{
+			Scroll(-viewRect.width() * m_percentageScrollingStepX, 0);
+		}
+		break;
+	case Qt::Key_Right:
+		{
+			Scroll(viewRect.width() * m_percentageScrollingStepX, 0);
+		}
+		break;
+	case Qt::Key_Up:
+		{
+			Scroll(0, -viewRect.height() * m_percentageScrollingStepY);
+		}
+		break;
+	case Qt::Key_Down:
+		{
+			Scroll(0, viewRect.height() * m_percentageScrollingStepY);
+		}
+		break;
+	}
 }
 
 

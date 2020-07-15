@@ -36,6 +36,8 @@ public:
 	virtual QRectF GetSceneRect() const override;
 	virtual bool SetSceneRect(const QRectF& rect) override;
 	virtual bool SetViewRect(const QRectF& rect) override;
+	virtual QSize GetViewPortSize() const override;
+	virtual bool SetViewPortSize(const QSize& size) override;
 	virtual QMargins GetMargins() const override;
 	virtual bool SetMargins(const QMargins& margins) override;
 	virtual double GetScaleX() const override;
@@ -44,8 +46,6 @@ public:
 	virtual istd::CRange GetScaleYRange() const override;
 	virtual bool SetScaleXRange(const istd::CRange& range) override;
 	virtual bool SetScaleYRange(const istd::CRange& range) override;
-	virtual bool Scroll(const QPointF& delta, bool inPercents = false) override;
-	virtual bool Zoom(const QPointF& factors, const QPointF& zoomOrigin) override;
 
 	// reimplemented (imtloggui::IViewRectProvider)
 	virtual QRectF GetViewRect() const override;
@@ -69,7 +69,7 @@ private:
 private:
 	QRectF m_sceneRect;
 	QRectF m_viewRect;
-	QRect m_viewPortRect;
+	QSize m_viewPortSize;
 	QMargins m_margins;
 	istd::CRange m_scaleXRange;
 	istd::CRange m_scaleYRange;

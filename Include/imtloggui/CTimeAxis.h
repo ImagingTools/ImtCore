@@ -28,6 +28,14 @@ public:
 		QUA_MONTH = 86400 * 365,
 	};
 
+	enum ChangeFlags
+	{
+		CF_POSITION = 0,
+		CF_BEGIN_VALUE,
+		CF_END_VALUE,
+		CF_SCALE
+	};
+
 	CTimeAxis(QGraphicsItem* parent = nullptr);
 
 	void SetColor(const QColor& color);

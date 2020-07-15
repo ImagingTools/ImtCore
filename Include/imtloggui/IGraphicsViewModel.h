@@ -37,6 +37,16 @@ public:
 	virtual bool SetViewRect(const QRectF& rect) = 0;
 
 	/**
+		Get viewport size
+	*/
+	virtual QSize GetViewPortSize() const = 0;
+
+	/**
+		Set viewport size
+	*/
+	virtual bool SetViewPortSize(const QSize& size) = 0;
+
+	/**
 		Get scene margins visualized by the view in pixels
 	*/
 	virtual QMargins GetMargins() const = 0;
@@ -63,18 +73,6 @@ public:
 	*/
 	virtual bool SetScaleXRange(const istd::CRange& range) = 0;
 	virtual bool SetScaleYRange(const istd::CRange& range) = 0;
-
-	/**
-		Scroll view
-		If inPercents = false scrolling in scene coordinates 
-		If inPercents = true scrolling in percents of viewrect size
-	*/
-	virtual bool Scroll(const QPointF& delta, bool inPercents = false) = 0;
-
-	/**
-		Zoom view
-	*/
-	virtual bool Zoom(const QPointF& factors, const QPointF& zoomOrigin) = 0;
 };
 
 

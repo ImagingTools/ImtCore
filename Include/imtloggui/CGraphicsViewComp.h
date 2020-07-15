@@ -8,6 +8,7 @@
 
 // ImtCore includes
 #include <imtloggui/IGraphicsViewController.h>
+#include <imtloggui/IGraphicsSceneProvider.h>
 #include <imtloggui/CGraphicsViewModel.h>
 
 
@@ -26,18 +27,25 @@ public:
 		I_REGISTER_SUBELEMENT(CGraphicsViewModel);
 		I_REGISTER_SUBELEMENT_INTERFACE(CGraphicsViewModel, IGraphicsViewModel, ExtractViewModel);
 		I_REGISTER_SUBELEMENT_INTERFACE(CGraphicsViewModel, imod::IModel, ExtractViewModel);
+		I_ASSIGN(m_graphicsSceneProviderCompPtr, "GraphicsSceneProvider", "Graphics scene provider", true, "");
 	I_END_COMPONENT
 
 	// reimplemented (imtloggui::IViewController)
-	virtual QPointF GetZoomFactors() const override;
-	virtual bool SetZoomFactors(const QPointF& factors) override;
-	virtual QPointF GetPercentageScrollingSteps() const override;
-	virtual bool SetPercentageScrollingSteps(const QPointF& steps) override;
+	virtual double GetZoomFactorX() const override;
+	virtual double GetZoomFactorY() const override;
+	virtual bool SetZoomFactors(double zoomFactorX, double zoomFactorY) override;
+	virtual double GetPercentageScrollingStepX() const override;
+	virtual double GetPercentageScrollingStepY() const override;
+	virtual bool SetPercentageScrollingSteps(double scrollingStepX, double scrollingStepY) override;
+	virtual bool Scroll(double dx, double dy) override;
+	virtual bool Zoom(const QPointF& zoomOrigin, double zoomFactorX, double zoomFactorY) override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual QWidget* CreateQtWidget(QWidget* parentPtr);
+	virtual void OnGuiCreated();
 
 private Q_SLOTS:
+	void OnResizeEvent(QResizeEvent *event);
 	void OnMouseMoveEvent(QMouseEvent *event);
 	void OnMousePressEvent(QMouseEvent *event);
 	void OnMouseReleaseEvent(QMouseEvent *event);
@@ -53,9 +61,13 @@ private:
 	}
 
 private:
+	I_REF(IGraphicsSceneProvider, m_graphicsSceneProviderCompPtr);
+
 	imod::TModelWrap<CGraphicsViewModel> m_viewModel;
-	QPointF m_zoomFactors;
-	QPointF m_percentageScrollingSteps;
+	double m_zoomFactorX;
+	double m_zoomFactorY;
+	double m_percentageScrollingStepX;
+	double m_percentageScrollingStepY;
 	QPointF m_lockedScenePoint;
 };
 
