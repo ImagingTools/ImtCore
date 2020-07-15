@@ -461,7 +461,7 @@
         <location line="+82"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Commands</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+20"/>
@@ -1413,7 +1413,7 @@ Status</source>
     <message>
         <location line="+0"/>
         <source>Enter new object name</source>
-        <translation></translation>
+        <translation>Enter new product name</translation>
     </message>
     <message>
         <location line="+30"/>
