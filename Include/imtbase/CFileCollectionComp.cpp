@@ -29,7 +29,8 @@ namespace imtbase
 
 CFileCollectionComp::CFileCollectionComp()
 	:m_collectionLock(QReadWriteLock::Recursive),
-	m_directoryBlocked(false)
+	m_directoryBlocked(false),
+	m_readerThread(this)
 {
 	m_resourceTypeConstraints.SetParent(this);
 }
@@ -1122,13 +1123,7 @@ void CFileCollectionComp::OnComponentCreated()
 		}
 	}
 
-	QWriteLocker lock(&m_collectionLock);
-	
-	istd::CChangeNotifier changeNotifier(this);
-
-	ReadCollectionItems(m_files);
-
-	lock.unlock();
+	ReadCollectionItems();
 
 	if (*m_pollFileSystemAttrPtr && !path.isEmpty()){
 		connect(&m_syncTimer, &QTimer::timeout, this, &CFileCollectionComp::OnSync);
@@ -1232,56 +1227,15 @@ QString CFileCollectionComp::SaveCollectionItem(const CollectionItem& collection
 }
 
 
-void CFileCollectionComp::ReadCollectionItems(Files& files) const
+void CFileCollectionComp::ReadCollectionItems()
 {
-	files.clear();
-
-	QString repositoryRootPath = GetCollectionRootFolder();
-	QDir repositoryRootDir(repositoryRootPath);
-
-	QFileInfoList repositoryFiles;
-	ifile::CFileListProviderComp::CreateFileList(repositoryRootDir, 0, 2, QStringList() << QString("*.%1").arg(GetRepositoryInfo().dataFileSuffix), QDir::Name, repositoryFiles);
-
-	for (int fileIndex = 0; fileIndex < repositoryFiles.count(); ++fileIndex){
-		QString itemFilePath = repositoryFiles[fileIndex].absoluteFilePath();
-
-		ifile::CCompactXmlFileReadArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
-		CollectionItem fileItem(GetCollectionRootFolder());
-
-		if (!fileItem.Serialize(archive)){
-			SendErrorMessage(0, QString("Collection item could not be loaded from '%1'").arg(itemFilePath));
-
-			continue;
-		}
-
-		QFileInfo repositoryFileInfo(fileItem.filePathInRepository);
-		if (repositoryFileInfo.exists()){
-			if (!fileItem.contentsMetaInfoPtr.IsValid()){
-				imtbase::IMetaInfoCreator::MetaInfoPtr retVal;
-
-				if (m_metaInfoCreatorMap.contains(fileItem.typeId)){
-					m_metaInfoCreatorMap[fileItem.typeId]->CreateMetaInfo(nullptr, fileItem.typeId, retVal);
-				}
-
-				if (!retVal.IsValid()){
-					retVal.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
-				}
-
-				Q_ASSERT(retVal.IsValid());
-
-				fileItem.contentsMetaInfoPtr = retVal;
-			}
-
-			if (fileItem.contentsMetaInfoPtr.IsValid()){
-				LoadFileMetaInfo(*fileItem.contentsMetaInfoPtr, GetMetaInfoFilePath(fileItem));
-
-				files.push_back(fileItem);
-			}
-		}
-		else{
-			SendErrorMessage(0, QString("File '%1' doesn't exist. Collection item was automatically removed").arg(fileItem.filePathInRepository));
+	if (m_progressManagerListCompPtr.IsValid()){
+		for (int i = 0; i < m_progressManagerListCompPtr.GetCount(); i++){
+			m_progressManagerListCompPtr[i]->BeginProgressSession("FileCollection", "");
 		}
 	}
+
+	m_readerThread.start();
 }
 
 
@@ -1352,18 +1306,38 @@ QString CFileCollectionComp::CalculateShortWindowsFileName(const QString& fileNa
 }
 
 
+void CFileCollectionComp::OnReaderProgress(int progress)
+{
+	if (m_progressManagerListCompPtr.IsValid()){
+		for (int i = 0; i < m_progressManagerListCompPtr.GetCount(); i++){
+			m_progressManagerListCompPtr[i]->OnProgress(0, progress);
+		}
+	}
+}
+
+
+void CFileCollectionComp::OnReaderFinished()
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	QWriteLocker locker(&m_collectionLock);
+	m_files.append(m_readerFiles);
+	locker.unlock();
+	
+	if (m_progressManagerListCompPtr.IsValid()){
+		for (int i = 0; i < m_progressManagerListCompPtr.GetCount(); i++){
+			m_progressManagerListCompPtr[i]->EndProgressSession(0);
+		}
+	}
+}
+
+
 // private slots
 
 void CFileCollectionComp::OnSync()
 {
 	if (!m_directoryBlocked){
-		QWriteLocker lock(&m_collectionLock);
-	
-		istd::CChangeNotifier changeNotifier(this);
-
-		ReadCollectionItems(m_files);
-
-		lock.unlock();
+		ReadCollectionItems();
 	}
 }
 
@@ -1451,6 +1425,80 @@ bool CFileCollectionComp::ResourceTypeConstraints::IsOptionEnabled(int index) co
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
 
 	return m_parentPtr->m_resourceTypesCompPtr->IsOptionEnabled(index);
+}
+
+
+// public methods of embedded class ReaderThread
+
+CFileCollectionComp::ReaderThread::ReaderThread(CFileCollectionComp* parentPtr)
+	:m_parentPtr(parentPtr)
+{
+}
+
+
+// private methods of embedded class ReaderThread
+
+// reimplemented (QThread)
+
+void CFileCollectionComp::ReaderThread::run()
+{
+	QString repositoryRootPath = m_parentPtr->GetCollectionRootFolder();
+	QDir repositoryRootDir(repositoryRootPath);
+
+	QFileInfoList repositoryFiles;
+	ifile::CFileListProviderComp::CreateFileList(repositoryRootDir, 0, 2, QStringList() << QString("*.%1").arg(GetRepositoryInfo().dataFileSuffix), QDir::Name, repositoryFiles);
+
+	int progress = 0;
+	int repositoryFilesCount = repositoryFiles.count();
+
+	for (int fileIndex = 0; fileIndex < repositoryFilesCount; ++fileIndex){
+		QString itemFilePath = repositoryFiles[fileIndex].absoluteFilePath();
+
+		ifile::CCompactXmlFileReadArchive archive(itemFilePath, m_parentPtr->m_versionInfoCompPtr.GetPtr());
+		CollectionItem fileItem(m_parentPtr->GetCollectionRootFolder());
+
+		if (!fileItem.Serialize(archive)){
+			m_parentPtr->SendErrorMessage(0, QString("Collection item could not be loaded from '%1'").arg(itemFilePath));
+
+			continue;
+		}
+
+		QFileInfo repositoryFileInfo(fileItem.filePathInRepository);
+		if (repositoryFileInfo.exists()){
+			if (!fileItem.contentsMetaInfoPtr.IsValid()){
+				imtbase::IMetaInfoCreator::MetaInfoPtr retVal;
+
+				if (m_parentPtr->m_metaInfoCreatorMap.contains(fileItem.typeId)){
+					m_parentPtr->m_metaInfoCreatorMap[fileItem.typeId]->CreateMetaInfo(nullptr, fileItem.typeId, retVal);
+				}
+
+				if (!retVal.IsValid()){
+					retVal.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
+				}
+
+				Q_ASSERT(retVal.IsValid());
+
+				fileItem.contentsMetaInfoPtr = retVal;
+			}
+
+			if (fileItem.contentsMetaInfoPtr.IsValid()){
+				m_parentPtr->LoadFileMetaInfo(*fileItem.contentsMetaInfoPtr, m_parentPtr->GetMetaInfoFilePath(fileItem));
+
+				m_parentPtr->m_readerFiles.push_back(fileItem);
+			}
+		}
+		else{
+			m_parentPtr->SendErrorMessage(0, QString("File '%1' doesn't exist. Collection item was automatically removed").arg(fileItem.filePathInRepository));
+		}
+
+		int currentProgress = fileIndex * 100 / repositoryFilesCount;
+		if (progress != currentProgress){
+			progress = currentProgress;
+			QMetaObject::invokeMethod(m_parentPtr, "OnReaderProgress", Qt::QueuedConnection, Q_ARG(int, progress));
+		}
+	}
+
+	QMetaObject::invokeMethod(m_parentPtr, "OnReaderFinished", Qt::QueuedConnection);
 }
 
 

@@ -10,6 +10,7 @@
 #include <QtCore/QTimer>
 
 // ACF includes
+#include <ibase/IProgressManager.h>
 #include <istd/TSmartPtr.h>
 #include <iser/ISerializable.h>
 #include <imod/TModelWrap.h>
@@ -59,6 +60,7 @@ public:
 		I_ASSIGN_MULTI_0(m_objectPersistenceListCompPtr, "ObjectPersistenceList", "List of persistence components used for data object loading", false);
 		I_ASSIGN_MULTI_0(m_objectFactoryListCompPtr, "ObjectFactoryList", "List of factories used for data object instance creation", false);
 		I_ASSIGN_MULTI_0(m_metaInfoCreatorListCompPtr, "MetaInfoCreatorList", "List of meta-info creators related to the object types", false);
+		I_ASSIGN_MULTI_0(m_progressManagerListCompPtr, "ProgressManagerList", "List of progress manager components", false);
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
 		I_ASSIGN(m_createFolderOnStartAttrPtr, "CreateRepositoryFolder", "Ensure that the file collection folder is created on the start", true, true);
 		I_ASSIGN(m_pollFileSystemAttrPtr, "PollFileSystem", "If enabled, the collection folder will be observed and the items will be re-read on changes in the folder structure", true, false);
@@ -293,6 +295,21 @@ protected:
 
 	typedef imod::TModelWrap<ResourceTypeConstraints> ResourceTypeConstraintsModel;
 
+	class ReaderThread: public QThread
+	{
+	public:
+		explicit ReaderThread(CFileCollectionComp* parentPtr);
+
+	private:
+		// reimplemented (QThread)
+		virtual void run() override;
+
+	private:
+		CFileCollectionComp* m_parentPtr;
+	};
+
+	friend class ReaderThread;
+
 private:
 	typedef QList<CollectionItem> Files;
 
@@ -311,12 +328,15 @@ private:
 	/**
 		Read file collection contents.
 	*/
-	void ReadCollectionItems(Files& files) const;
+	void ReadCollectionItems();
 
 	QString GetTempDirectory() const;
 	QString GetDataItemFilePath(const CollectionItem& repositoryFile) const;
 	QString GetMetaInfoFilePath(const CollectionItem& repositoryFile) const;
 	QString CalculateShortWindowsFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const;
+
+	Q_INVOKABLE void OnReaderProgress(int progress);
+	Q_INVOKABLE void OnReaderFinished();
 
 private Q_SLOTS:
 	void OnSync();
@@ -324,7 +344,9 @@ private Q_SLOTS:
 private:
 	QTimer m_syncTimer;
 	mutable bool m_directoryBlocked;
-
+	ReaderThread m_readerThread;
+	Files m_readerFiles;
+	
 	class DirectoryBlocker
 	{
 	public:
@@ -397,6 +419,11 @@ private:
 		List of meta-info creators related to registered resource types.
 	*/
 	I_MULTIREF(imtbase::IMetaInfoCreator, m_metaInfoCreatorListCompPtr);
+
+	/**
+		Consumers of the progress information
+	*/
+	I_MULTIREF(ibase::IProgressManager, m_progressManagerListCompPtr);
 
 	/**
 		Provider of the version information for the entire system.

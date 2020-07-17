@@ -2,8 +2,10 @@
 
 
 // Qt includes
+#include <QtCore/QThread>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QPropertyAnimation>
+#include <QtGui/QStandardItem>
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QShortcut>
@@ -11,6 +13,7 @@
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>
 #include <ibase/ICommandsProvider.h>
+#include <ibase/IProgressManager.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <iqtgui/TRestorableGuiWrap.h>
 #include <iqtgui/CHierarchicalCommand.h>
@@ -30,8 +33,8 @@ class CObjectCollectionViewComp:
 			public iqtgui::TRestorableGuiWrap<
 						iqtgui::TDesignerGuiObserverCompBase<
 									Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>,
-	private imod::CMultiModelDispatcherBase
-			
+	private imod::CMultiModelDispatcherBase,
+	virtual public ibase::IProgressManager
 {
 	Q_OBJECT
 public:
@@ -39,8 +42,10 @@ public:
 				iqtgui::TDesignerGuiObserverCompBase<
 							Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>> BaseClass;
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
+	typedef ibase::IProgressManager BaseClass3;
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
+		I_REGISTER_INTERFACE(ibase::IProgressManager);
 		I_REGISTER_SUBELEMENT(Commands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
@@ -66,6 +71,15 @@ public:
 	typedef QVector<ICollectionViewDelegate::SummaryInformation> ObjectMetaInfo;
 
 	CObjectCollectionViewComp();
+
+	// reimplemented (ibase::IProgressManager)
+	virtual int BeginProgressSession(
+				const QByteArray& progressId,
+				const QString& description,
+				bool isCancelable = false) override;
+	virtual void EndProgressSession(int sessionId) override;
+	virtual void OnProgress(int sessionId, double currentProgress) override;
+	virtual bool IsCanceled(int sessionId) const override;
 
 protected:
 	ICollectionViewDelegate& GetViewDelegateRef(const QByteArray& typeId);
@@ -140,6 +154,23 @@ protected:
 		virtual KeyList GetFactoryKeys() const;
 	};
 
+	class UpdateThread: public QThread
+	{
+	public:
+		explicit UpdateThread(CObjectCollectionViewComp* parentPtr);
+		void SetModels(QStandardItemModel* typeModelPtr, QStandardItemModel* itemModelPtr);
+
+	private:
+		virtual void run() override;
+
+	private:
+		CObjectCollectionViewComp* m_parentPtr;
+		QStandardItemModel* m_typeModelPtr;
+		QStandardItemModel* m_itemModelPtr;
+	};
+
+	friend class ReaderThread;
+
 private:
 	void UpdateCommands();
 
@@ -155,6 +186,10 @@ private:
 	void RestoreItemsSelection();
 
 	void UpdateTypeStatus();
+
+	void StartUpdate();
+	Q_INVOKABLE void OnUpdateProgress(int progress);
+	Q_INVOKABLE void OnUpdateFinished();
 
 	bool eventFilter(QObject *object, QEvent *event);
 
@@ -201,6 +236,10 @@ private:
 
 	int m_semaphoreCounter;
 
+	UpdateThread m_updateThread;
+	bool m_isUpdateRunning;
+	bool m_isUpdatePending;
+
 	QShortcut* m_searchShortCutPtr;
 	QShortcut* m_escShortCutPtr;
 	QShortcut* m_delShortCutPtr;
@@ -209,7 +248,10 @@ private:
 	FocusDecorationFactory m_graphicsEffectFactory;
 	QPropertyAnimation* m_filterPanelAnimationPtr;
 
-	QStandardItemModel m_itemModel;
+	QStandardItemModel *m_itemModelPtr;
+	QStandardItemModel m_itemModel1;
+	QStandardItemModel m_itemModel2;
+	QStandardItemModel m_typeModel;
 
 	imod::TModelWrap<CObjectCollectionViewDelegate> m_defaultViewDelegate;
 
