@@ -169,8 +169,6 @@ protected:
 		QStandardItemModel* m_itemModelPtr;
 	};
 
-	friend class ReaderThread;
-
 private:
 	void UpdateCommands();
 

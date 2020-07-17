@@ -308,8 +308,6 @@ protected:
 		CFileCollectionComp* m_parentPtr;
 	};
 
-	friend class ReaderThread;
-
 private:
 	typedef QList<CollectionItem> Files;
 

@@ -657,11 +657,6 @@ void CObjectCollectionViewComp::StartUpdate()
 			m_updateThread.SetModels(&m_typeModel, &m_itemModel1);
 		}
 
-		Message->setText(tr("Update..."));
-		Progress->setValue(0);
-		Message->show();
-		Progress->show();
-
 		m_isUpdateRunning = true;
 		m_updateThread.start();
 	}
