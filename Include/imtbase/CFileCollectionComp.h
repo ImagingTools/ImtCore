@@ -310,8 +310,19 @@ protected:
 
 	enum ReaderThreadState
 	{
+		/*
+			Reader thread is idle
+		*/
 		RTS_IDLE = 0,
+
+		/*
+			Reader thread is running
+		*/
 		RTS_READING,
+
+		/*
+			Reader thread is running and next run is pending
+		*/
 		RTS_PENDING
 	};
 

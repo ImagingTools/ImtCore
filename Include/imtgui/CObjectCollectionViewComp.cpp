@@ -32,8 +32,7 @@ CObjectCollectionViewComp::CObjectCollectionViewComp()
 	:m_semaphoreCounter(0),
 	m_currentInformationViewPtr(nullptr),
 	m_updateThread(this),
-	m_isUpdateRunning(false),
-	m_isUpdatePending(false)
+	m_updateThreadState(UTS_IDLE)
 {
 	m_commands.SetParent(this);
 }
@@ -646,10 +645,7 @@ void CObjectCollectionViewComp::RestoreItemsSelection()
 
 void CObjectCollectionViewComp::StartUpdate()
 {
-	if (m_isUpdateRunning){
-		m_isUpdatePending = true;
-	}
-	else{
+	if (m_updateThreadState == UTS_IDLE){
 		if (m_proxyModelPtr->sourceModel() == &m_itemModel1){
 			m_updateThread.SetModels(&m_typeModel, &m_itemModel2);
 		}
@@ -657,8 +653,11 @@ void CObjectCollectionViewComp::StartUpdate()
 			m_updateThread.SetModels(&m_typeModel, &m_itemModel1);
 		}
 
-		m_isUpdateRunning = true;
+		m_updateThreadState = UTS_RUNNING;
 		m_updateThread.start();
+	}
+	else{
+		m_updateThreadState == UTS_PENDING;
 	}
 }
 
@@ -732,10 +731,12 @@ void CObjectCollectionViewComp::OnUpdateFinished()
 
 	UpdateTypeStatus();
 
-	m_isUpdateRunning = false;
-	if (m_isUpdatePending){
-		m_isUpdatePending = false;
+	if (m_updateThreadState == UTS_PENDING){
+		m_updateThreadState = UTS_IDLE;
 		StartUpdate();
+	}
+	else{
+		m_updateThreadState = UTS_IDLE;
 	}
 }
 

@@ -170,6 +170,24 @@ protected:
 	};
 
 private:
+	enum UpdateThreadState
+	{
+		/*
+			Update thread is idle
+		*/
+		UTS_IDLE = 0,
+
+		/*
+			Update thread is running
+		*/
+		UTS_RUNNING,
+
+		/*
+			Update thread is running and next run is pending
+		*/
+		UTS_PENDING
+	};
+
 	void UpdateCommands();
 
 	QVector<QByteArray> GetMetaInfoIds(const QByteArray &typeId) const;
@@ -235,8 +253,7 @@ private:
 	int m_semaphoreCounter;
 
 	UpdateThread m_updateThread;
-	bool m_isUpdateRunning;
-	bool m_isUpdatePending;
+	UpdateThreadState m_updateThreadState;
 
 	QShortcut* m_searchShortCutPtr;
 	QShortcut* m_escShortCutPtr;

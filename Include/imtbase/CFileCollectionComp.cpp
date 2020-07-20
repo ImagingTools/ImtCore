@@ -1338,11 +1338,12 @@ void CFileCollectionComp::OnReaderFinished()
 	}
 
 	if (m_readerState == RTS_PENDING){
+		m_readerState = RTS_IDLE;
 		StartReader();
-		return;
 	}
-
-	m_readerState = RTS_IDLE;
+	else{
+		m_readerState = RTS_IDLE;
+	}
 }
 
 
