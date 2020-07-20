@@ -31,7 +31,7 @@ CFileCollectionComp::CFileCollectionComp()
 	:m_collectionLock(QReadWriteLock::Recursive),
 	m_directoryBlocked(false),
 	m_readerThread(this),
-	m_readerState(RTS_STOPPED)
+	m_readerState(RTS_IDLE)
 {
 	m_resourceTypeConstraints.SetParent(this);
 }
@@ -182,7 +182,7 @@ QByteArray CFileCollectionComp::InsertFile(
 
 	QString targetResourceName = objectName.isEmpty() ? inputFileInfo.completeBaseName() : objectName;
 
-	if (!InsertFileIntoRepository(localFilePath, targetResourceName, typeId, nullptr, targetFilePath)){
+	if (!InsertFileIntoCollection(localFilePath, targetResourceName, typeId, nullptr, targetFilePath)){
 		return emptyId;
 	}
 
@@ -1146,7 +1146,7 @@ void CFileCollectionComp::OnComponentDestroyed()
 
 // private methods
 
-bool CFileCollectionComp::InsertFileIntoRepository(
+bool CFileCollectionComp::InsertFileIntoCollection(
 			const QString& filePath,
 			const QString& objectName,
 			const QByteArray& typeId,
@@ -1297,16 +1297,14 @@ QString CFileCollectionComp::CalculateShortWindowsFileName(const QString& fileNa
 
 void CFileCollectionComp::StartReader()
 {
-	if (m_readerState == RTS_STOPPED){
+	if (m_readerState == RTS_IDLE){
 		if (m_progressManagerListCompPtr.IsValid()){
 			for (int i = 0; i < m_progressManagerListCompPtr.GetCount(); i++){
-				m_progressManagerListCompPtr[i]->BeginProgressSession("FileCollection", "");
+				m_progressManagerListCompPtr[i]->BeginProgressSession("FileCollection", "Start reading file collection");
 			}
 		}
 
-		m_readerState = RTS_READING;
 		m_readerThread.start();
-		return;
 	}
 
 	m_readerState = RTS_PENDING;
@@ -1342,7 +1340,7 @@ void CFileCollectionComp::OnReaderFinished()
 		return;
 	}
 
-	m_readerState = RTS_STOPPED;
+	m_readerState = RTS_IDLE;
 }
 
 

@@ -310,7 +310,7 @@ protected:
 
 	enum ReaderThreadState
 	{
-		RTS_STOPPED = 0,
+		RTS_IDLE = 0,
 		RTS_READING,
 		RTS_PENDING
 	};
@@ -318,7 +318,7 @@ protected:
 private:
 	typedef QList<CollectionItem> Files;
 
-	bool InsertFileIntoRepository(
+	bool InsertFileIntoCollection(
 				const QString& filePath,
 				const QString& resourceName,
 				const QByteArray& typeId,
@@ -329,7 +329,6 @@ private:
 		Write a file collection item to file system
 	*/
 	QString SaveCollectionItem(const CollectionItem& repositoryItem) const;
-
 	QString GetTempDirectory() const;
 	QString GetDataItemFilePath(const CollectionItem& repositoryFile) const;
 	QString GetMetaInfoFilePath(const CollectionItem& repositoryFile) const;
