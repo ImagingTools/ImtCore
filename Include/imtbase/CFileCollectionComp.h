@@ -308,6 +308,13 @@ protected:
 		CFileCollectionComp* m_parentPtr;
 	};
 
+	enum ReaderThreadState
+	{
+		RTS_STOPPED = 0,
+		RTS_READING,
+		RTS_PENDING
+	};
+
 private:
 	typedef QList<CollectionItem> Files;
 
@@ -323,16 +330,12 @@ private:
 	*/
 	QString SaveCollectionItem(const CollectionItem& repositoryItem) const;
 
-	/**
-		Read file collection contents.
-	*/
-	void ReadCollectionItems();
-
 	QString GetTempDirectory() const;
 	QString GetDataItemFilePath(const CollectionItem& repositoryFile) const;
 	QString GetMetaInfoFilePath(const CollectionItem& repositoryFile) const;
 	QString CalculateShortWindowsFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const;
 
+	void StartReader();
 	Q_INVOKABLE void OnReaderProgress(int progress);
 	Q_INVOKABLE void OnReaderFinished();
 
@@ -344,6 +347,7 @@ private:
 	mutable bool m_directoryBlocked;
 	ReaderThread m_readerThread;
 	Files m_readerFiles;
+	ReaderThreadState m_readerState;
 	
 	class DirectoryBlocker
 	{

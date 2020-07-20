@@ -30,7 +30,8 @@ namespace imtbase
 CFileCollectionComp::CFileCollectionComp()
 	:m_collectionLock(QReadWriteLock::Recursive),
 	m_directoryBlocked(false),
-	m_readerThread(this)
+	m_readerThread(this),
+	m_readerState(RTS_STOPPED)
 {
 	m_resourceTypeConstraints.SetParent(this);
 }
@@ -1123,7 +1124,7 @@ void CFileCollectionComp::OnComponentCreated()
 		}
 	}
 
-	ReadCollectionItems();
+	StartReader();
 
 	if (*m_pollFileSystemAttrPtr && !path.isEmpty()){
 		connect(&m_syncTimer, &QTimer::timeout, this, &CFileCollectionComp::OnSync);
@@ -1227,18 +1228,6 @@ QString CFileCollectionComp::SaveCollectionItem(const CollectionItem& collection
 }
 
 
-void CFileCollectionComp::ReadCollectionItems()
-{
-	if (m_progressManagerListCompPtr.IsValid()){
-		for (int i = 0; i < m_progressManagerListCompPtr.GetCount(); i++){
-			m_progressManagerListCompPtr[i]->BeginProgressSession("FileCollection", "");
-		}
-	}
-
-	m_readerThread.start();
-}
-
-
 QString CFileCollectionComp::GetTempDirectory() const
 {
 	return QDir::tempPath();
@@ -1306,6 +1295,24 @@ QString CFileCollectionComp::CalculateShortWindowsFileName(const QString& fileNa
 }
 
 
+void CFileCollectionComp::StartReader()
+{
+	if (m_readerState == RTS_STOPPED){
+		if (m_progressManagerListCompPtr.IsValid()){
+			for (int i = 0; i < m_progressManagerListCompPtr.GetCount(); i++){
+				m_progressManagerListCompPtr[i]->BeginProgressSession("FileCollection", "");
+			}
+		}
+
+		m_readerState = RTS_READING;
+		m_readerThread.start();
+		return;
+	}
+
+	m_readerState = RTS_PENDING;
+}
+
+
 void CFileCollectionComp::OnReaderProgress(int progress)
 {
 	if (m_progressManagerListCompPtr.IsValid()){
@@ -1329,6 +1336,13 @@ void CFileCollectionComp::OnReaderFinished()
 			m_progressManagerListCompPtr[i]->EndProgressSession(0);
 		}
 	}
+
+	if (m_readerState == RTS_PENDING){
+		StartReader();
+		return;
+	}
+
+	m_readerState = RTS_STOPPED;
 }
 
 
@@ -1337,7 +1351,7 @@ void CFileCollectionComp::OnReaderFinished()
 void CFileCollectionComp::OnSync()
 {
 	if (!m_directoryBlocked){
-		ReadCollectionItems();
+		StartReader();
 	}
 }
 
