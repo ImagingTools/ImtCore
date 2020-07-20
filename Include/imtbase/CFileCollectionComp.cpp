@@ -1304,10 +1304,12 @@ void CFileCollectionComp::StartReader()
 			}
 		}
 
+		m_readerState = RTS_READING;
 		m_readerThread.start();
 	}
-
-	m_readerState = RTS_PENDING;
+	else{
+		m_readerState = RTS_PENDING;
+	}
 }
 
 
