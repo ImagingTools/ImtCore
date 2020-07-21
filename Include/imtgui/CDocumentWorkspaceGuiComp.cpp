@@ -88,6 +88,37 @@ QStringList CDocumentWorkspaceGuiComp::GetOpenFilePaths(const QByteArray* /*docu
 }
 
 
+void CDocumentWorkspaceGuiComp::OnDocumentSaved()
+{
+	if (m_logCompPtr.IsValid()){
+		SingleDocumentData* infoPtr = nullptr;
+		infoPtr = GetActiveDocumentInfo();
+
+		if (!infoPtr->filePath.isEmpty()){
+			QString userName = tr("Login info not available");
+			if (m_loginCompPtr.IsValid()){
+				userName = tr("No user logged in");
+
+				iauth::CUser *userPtr = m_loginCompPtr->GetLoggedUser();
+				if (userPtr != nullptr){
+					userName = userPtr->GetUserName();
+				}
+			}
+
+			CApplicationChangedEvent::ApplicationChangesInfo info;
+			QFileInfo fileInfo(infoPtr->filePath);
+
+			info.applicationName = fileInfo.completeBaseName();
+			info.userName = userName;
+
+			m_logCompPtr->AddMessage(
+				ilog::IMessageConsumer::MessagePtr(
+					new CApplicationChangedEvent(info, istd::IInformationProvider::IC_INFO, "Application changed", "Document workspace")));
+		}
+	}
+}
+
+
 // reimplemented (iqt:CGuiComponentBase)
 
 void CDocumentWorkspaceGuiComp::OnGuiCreated()
@@ -109,33 +140,6 @@ void CDocumentWorkspaceGuiComp::OnSaveDocument()
 	bool ignoredFlag = false;
 	if (SaveDocument(-1, false, &fileMap, false, &ignoredFlag)){
 		UpdateAllTitles();
-
-		if (m_logCompPtr.IsValid()){
-			SingleDocumentData* infoPtr = nullptr;
-			infoPtr = GetActiveDocumentInfo();
-
-			if (!infoPtr->filePath.isEmpty()){
-				QString userName = tr("Login info not available");
-				if (m_loginCompPtr.IsValid()){
-					userName = tr("No user logged in");
-
-					iauth::CUser *userPtr = m_loginCompPtr->GetLoggedUser();
-					if (userPtr != nullptr){
-						userName = userPtr->GetUserName();
-					}
-				}
-
-				CApplicationChangedEvent::ApplicationChangesInfo info;
-				QFileInfo fileInfo(infoPtr->filePath);
-
-				info.applicationName = fileInfo.completeBaseName();
-				info.userName = userName;
-
-				m_logCompPtr->AddMessage(
-					ilog::IMessageConsumer::MessagePtr(
-						new CApplicationChangedEvent(info, istd::IInformationProvider::IC_INFO, "Application changed", "Document workspace")));
-			}
-		}
 	}
 	else if (!ignoredFlag){
 		QMessageBox::critical(NULL, "", tr("File could not be saved!"));
