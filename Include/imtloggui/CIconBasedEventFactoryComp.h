@@ -22,7 +22,7 @@ public:
 	// reimplemented (imtloggui::IEventItemFactory)
 	virtual CEventItemBase* CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const override;
 
-private:
+protected:
 	I_ATTR(QByteArray, m_iconAttrPtr);
 	I_ATTR(int, m_iconSizeAttrPtr);
 };
