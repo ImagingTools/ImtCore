@@ -74,6 +74,8 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 		m_groupControllerCompPtr->AddEvent(message);
 		UpdateSummaryInfoPanel();
 	}
+
+	UpdateCommands();
 }
 
 
@@ -157,6 +159,8 @@ void CEventViewComp::OnGuiCreated()
 
 		m_messageList.clear();
 	}
+
+	UpdateCommands();
 }
 
 
@@ -197,6 +201,8 @@ void CEventViewComp::OnViewPortChanged(bool userAction)
 	if (userAction){
 		m_currentCommandTime = QDateTime();
 	}
+
+	UpdateCommands();
 }
 
 
@@ -276,8 +282,9 @@ void CEventViewComp::OnMoveToFirstCommand()
 	}
 
 	m_currentCommandTime = time;
-
 	MoveToTime(time);
+
+	UpdateCommands();
 }
 
 
@@ -322,8 +329,9 @@ void CEventViewComp::OnMoveToPreviousCommand()
 	}
 
 	m_currentCommandTime = time;
-
 	MoveToTime(time);
+
+	UpdateCommands();
 }
 
 
@@ -366,8 +374,9 @@ void CEventViewComp::OnMoveToNextCommand()
 	}
 
 	m_currentCommandTime = time;
-
 	MoveToTime(time);
+
+	UpdateCommands();
 }
 
 
@@ -397,8 +406,9 @@ void CEventViewComp::OnMoveToLastCommand()
 	}
 
 	m_currentCommandTime = time;
-
 	MoveToTime(time);
+
+	UpdateCommands();
 }
 
 
@@ -460,9 +470,49 @@ void CEventViewComp::UpdateVerticalRangeScale(const istd::CRange & range) const
 
 void CEventViewComp::UpdateCommands()
 {
-	static istd::IChangeable::ChangeSet changes(ibase::ICommandsProvider::CF_COMMANDS);
+	//static istd::IChangeable::ChangeSet changes(ibase::ICommandsProvider::CF_COMMANDS);
+	//istd::CChangeNotifier changeNotifier(&m_commands, &changes);
 
-	istd::CChangeNotifier changeNotifier(&m_commands, &changes);
+	if (!m_groupControllerCompPtr.IsValid()){
+		return;
+	}
+
+	QDateTime currentTime;
+	if (m_currentCommandTime.isValid()){
+		currentTime = m_currentCommandTime;
+	}
+	else{
+		currentTime = m_timeAxis.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+	}
+
+	bool enablePrev = false;
+	bool enableNext = false;
+
+	for (QByteArray id : m_groupControllerCompPtr->GetActiveGroupList()){
+		IEventItemController* groupPtr = m_groupControllerCompPtr->GetGroup(id);
+
+		const IEventItemController::EventMap* eventMap = groupPtr->GetEvents();
+
+		if (eventMap->isEmpty()){
+			continue;
+		}
+
+		IEventItemController::EventMap::const_iterator it;
+		it = eventMap->lowerBound(currentTime);
+		if (it != eventMap->begin()){
+			enablePrev = true;
+		}
+
+		it = eventMap->upperBound(currentTime);
+		if (it != eventMap->end()){
+			enableNext = true;
+		}
+	}
+
+	m_moveToFirstCommand.SetEnabled(enablePrev);
+	m_moveToPreviousCommand.SetEnabled(enablePrev);
+	m_moveToNextCommand.SetEnabled(enableNext);
+	m_moveToLastCommand.SetEnabled(enableNext);
 }
 
 
