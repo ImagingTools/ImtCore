@@ -94,26 +94,28 @@ void CDocumentWorkspaceGuiComp::OnDocumentSaved()
 		SingleDocumentData* infoPtr = nullptr;
 		infoPtr = GetActiveDocumentInfo();
 
-		if (!infoPtr->filePath.isEmpty()){
-			QString userName = tr("Login info not available");
-			if (m_loginCompPtr.IsValid()){
-				userName = tr("No user logged in");
+		if (infoPtr != nullptr){
+			if (!infoPtr->filePath.isEmpty()){
+				QString userName = tr("Login info not available");
+				if (m_loginCompPtr.IsValid()){
+					userName = tr("No user logged in");
 
-				iauth::CUser *userPtr = m_loginCompPtr->GetLoggedUser();
-				if (userPtr != nullptr){
-					userName = userPtr->GetUserName();
+					iauth::CUser *userPtr = m_loginCompPtr->GetLoggedUser();
+					if (userPtr != nullptr){
+						userName = userPtr->GetUserName();
+					}
 				}
+
+				CApplicationChangedEvent::ApplicationChangesInfo info;
+				QFileInfo fileInfo(infoPtr->filePath);
+
+				info.applicationName = fileInfo.completeBaseName();
+				info.userName = userName;
+
+				m_logCompPtr->AddMessage(
+					ilog::IMessageConsumer::MessagePtr(
+						new CApplicationChangedEvent(info, istd::IInformationProvider::IC_INFO, "Application changed", "Document workspace")));
 			}
-
-			CApplicationChangedEvent::ApplicationChangesInfo info;
-			QFileInfo fileInfo(infoPtr->filePath);
-
-			info.applicationName = fileInfo.completeBaseName();
-			info.userName = userName;
-
-			m_logCompPtr->AddMessage(
-				ilog::IMessageConsumer::MessagePtr(
-					new CApplicationChangedEvent(info, istd::IInformationProvider::IC_INFO, "Application changed", "Document workspace")));
 		}
 	}
 }

@@ -78,6 +78,9 @@ public:
 	// reimplemented (iqtgui::IGuiObject)
 	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
 
+	// reimplemented (idoc::IDocumentManager)
+	virtual void SetActiveView(istd::IPolymorphic* viewPtr) override;
+
 protected:
 	int GetFixedWindowsCount() const;
 	void UpdateAllTitles();
@@ -101,7 +104,6 @@ protected:
 				bool beQuiet,
 				bool* ignoredPtr,
 				ibase::IProgressManager* progressManagerPtr) override;
-	virtual void SetActiveView(istd::IPolymorphic* viewPtr) override;
 
 	// reimplemented (idoc::IDocumentManager)
 	virtual bool InsertNewDocument(

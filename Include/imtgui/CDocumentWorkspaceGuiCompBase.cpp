@@ -58,6 +58,65 @@ void CDocumentWorkspaceGuiCompBase::OnTryClose(bool* ignoredPtr)
 }
 
 
+// reimplemented (idoc::IDocumentManager)
+
+void CDocumentWorkspaceGuiCompBase::SetActiveView(istd::IPolymorphic* viewPtr)
+{
+	if (viewPtr != GetActiveView()){
+		istd::CChangeGroup selectorChangeGroup(&m_documentList);
+
+		m_isUpdateBlocked = true;
+
+		BaseClass::SetActiveView(viewPtr);
+
+		static istd::IChangeable::ChangeSet commandsChangeSet(ibase::ICommandsProvider::CF_COMMANDS);
+
+		idoc::CMultiDocumentManagerBase::SingleDocumentData* activeDocumentInfoPtr = GetDocumentInfoFromView(*viewPtr);
+		if (activeDocumentInfoPtr == nullptr){
+			m_documentList.SetSelectedOptionIndex(iprm::ISelectionParam::NO_SELECTION);
+		}
+		else{
+			m_documentList.SetSelectedOptionIndex(GetDocumentIndex(*activeDocumentInfoPtr));
+		}
+
+		int pageIndex = -1;
+		int viewIndex = 0;
+		for (; viewIndex < m_fixedTabs.size(); viewIndex++){
+			if (viewPtr == m_fixedTabs[viewIndex]){
+				pageIndex = viewIndex;
+
+				m_currentDocumentName.SetName("");
+
+				break;
+			}
+		}
+
+		if (pageIndex < 0){
+			int tabsCount = Tabs->count();
+			for (; viewIndex < tabsCount; viewIndex++){
+				IDocumentViewDecorator* documentViewPtr = dynamic_cast<IDocumentViewDecorator*>(Tabs->widget(viewIndex));
+				Q_ASSERT(documentViewPtr != nullptr);
+
+				if (viewPtr == documentViewPtr->GetView()){
+					pageIndex = viewIndex;
+
+					m_currentDocumentName.SetName(documentViewPtr->GetTitle());
+
+					break;
+				}
+			}
+		}
+
+		if (pageIndex >= 0){
+			m_previousTabIndex = Tabs->currentIndex();
+			Tabs->setCurrentIndex(pageIndex);
+		}
+
+		m_isUpdateBlocked = false;
+	}
+}
+
+
 // protected members
 
 int CDocumentWorkspaceGuiCompBase::GetFixedWindowsCount() const
@@ -276,63 +335,6 @@ istd::IChangeable* CDocumentWorkspaceGuiCompBase::OpenSingleDocument(
 	}
 
 	return BaseClass::OpenSingleDocument(filePath, createView, viewTypeId, documentTypeId, beQuiet, ignoredPtr, progressManagerPtr);
-}
-
-
-void CDocumentWorkspaceGuiCompBase::SetActiveView(istd::IPolymorphic* viewPtr)
-{
-	if (viewPtr != GetActiveView()){
-		istd::CChangeGroup selectorChangeGroup(&m_documentList);
-
-		m_isUpdateBlocked = true;
-
-		BaseClass::SetActiveView(viewPtr);
-
-		static istd::IChangeable::ChangeSet commandsChangeSet(ibase::ICommandsProvider::CF_COMMANDS);
-
-		idoc::CMultiDocumentManagerBase::SingleDocumentData* activeDocumentInfoPtr = GetDocumentInfoFromView(*viewPtr);
-		if (activeDocumentInfoPtr == nullptr){
-			m_documentList.SetSelectedOptionIndex(iprm::ISelectionParam::NO_SELECTION);
-		}
-		else{
-			m_documentList.SetSelectedOptionIndex(GetDocumentIndex(*activeDocumentInfoPtr));
-		}
-
-		int pageIndex = -1;
-		int viewIndex = 0;
-		for (; viewIndex < m_fixedTabs.size(); viewIndex++){
-			if (viewPtr == m_fixedTabs[viewIndex]){
-				pageIndex = viewIndex;
-
-				m_currentDocumentName.SetName("");
-
-				break;
-			}
-		}
-
-		if (pageIndex < 0){
-			int tabsCount = Tabs->count();
-			for (; viewIndex < tabsCount; viewIndex++){
-				IDocumentViewDecorator* documentViewPtr = dynamic_cast<IDocumentViewDecorator*>(Tabs->widget(viewIndex));
-				Q_ASSERT(documentViewPtr != nullptr);
-
-				if (viewPtr == documentViewPtr->GetView()){
-					pageIndex = viewIndex;
-
-					m_currentDocumentName.SetName(documentViewPtr->GetTitle());
-
-					break;
-				}
-			}
-		}
-
-		if (pageIndex >= 0){
-			m_previousTabIndex = Tabs->currentIndex();
-			Tabs->setCurrentIndex(pageIndex);
-		}
-
-		m_isUpdateBlocked = false;
-	}
 }
 
 

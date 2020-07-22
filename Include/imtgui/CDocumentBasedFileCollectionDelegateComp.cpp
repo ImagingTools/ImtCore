@@ -75,6 +75,58 @@ QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(
 }
 
 
+void CDocumentBasedFileCollectionDelegateComp::RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const
+{
+	if (objectIds.isEmpty()){
+		return;
+	}
+
+	if (QMessageBox::question(NULL, tr("Remove"), tr("Remove selected document from the collection"), QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes){
+		return;
+	}
+
+	if (m_collectionPtr != nullptr){
+		istd::CChangeGroup changeGroup(m_collectionPtr);
+
+		for (const QByteArray& id : objectIds){
+			bool isRemoveAccepted = false;
+
+			for (int i = 0; i < m_workingObjects.GetCount(); i++){
+				ObjectInfo* objectInfoPtr = m_workingObjects.GetAt(i);
+				bool isFound = false;
+
+				if (id == objectInfoPtr->uuid){
+					for (int docIndex = 0; m_documentManagerCompPtr->GetDocumentsCount(); docIndex++){
+						idoc::IDocumentManager::DocumentInfo documentInfo;
+						if (objectInfoPtr->objectPtr == &m_documentManagerCompPtr->GetDocumentFromIndex(docIndex, &documentInfo)){
+							if (documentInfo.isDirty){
+								QString message = QString("Document \"%1\" was changed and can't be removed").arg(objectInfoPtr->name);
+								QMessageBox::warning(NULL, "", message, QMessageBox::Ok);
+							}
+							else{
+								m_documentManagerCompPtr->CloseDocument(docIndex, true);
+								isRemoveAccepted = true;
+							}
+
+							isFound = true;
+							break;
+						}
+					}
+				}
+
+				if (isFound){
+					break;
+				}
+			}
+
+			if (isRemoveAccepted){
+				m_collectionPtr->RemoveObject(id);
+			}
+		}
+	}
+}
+
+
 void CDocumentBasedFileCollectionDelegateComp::UpdateItemSelection(
 			const imtbase::ICollectionInfo::Ids& selectedItems,
 			const QByteArray& selectedTypeId)
@@ -118,19 +170,31 @@ bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(
 	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
+	ObjectInfo* objectInfoPtr = nullptr;
 	bool isAlreadyOpened = false;
 	for (int i = 0; i < m_workingObjects.GetCount(); ++i){
 		if (m_workingObjects.GetAt(i)->uuid == objectId){
 			isAlreadyOpened = true;
+			objectInfoPtr = m_workingObjects.GetAt(i);
 			break;
 		}
 	}
 
 	if (isAlreadyOpened){
+		int count = m_documentManagerCompPtr->GetDocumentsCount();
+		for (int i = 0; i < count; i++){
+			if (objectInfoPtr->objectPtr == &m_documentManagerCompPtr->GetDocumentFromIndex(i)){
+				istd::IPolymorphic* viewPtr = m_documentManagerCompPtr->GetViewFromIndex(i, 0);
+				if (viewPtr != nullptr){
+					m_documentManagerCompPtr->SetActiveView(viewPtr);
+				}
+			}
+		}
+
 		return false;
 	}
 
-	ObjectInfo* objectInfoPtr = new ObjectInfo;
+	objectInfoPtr = new ObjectInfo;
 	objectInfoPtr->typeId = m_collectionPtr->GetObjectTypeId(objectId);
 	objectInfoPtr->name = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
@@ -143,6 +207,7 @@ bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(
 	istd::CSystem::EnsurePathExists(tempPath);
 
 	QString tempFilePath = tempPath + "/ " + objectInfoPtr->name + "." + QFileInfo(fileInfo.fileName).suffix();
+	objectInfoPtr->tempFilePath = tempFilePath;
 
 	QString targetFilePath = fileCollectionPtr->GetFile(objectId, tempFilePath);
 	if (!targetFilePath.isEmpty()){
