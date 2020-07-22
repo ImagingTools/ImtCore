@@ -89,7 +89,7 @@ void CDocumentBasedFileCollectionDelegateComp::RemoveObjects(const imtbase::ICol
 		istd::CChangeGroup changeGroup(m_collectionPtr);
 
 		for (const QByteArray& id : objectIds){
-			bool isRemoveAccepted = false;
+			bool isRemoveAccepted = true;
 
 			for (int i = 0; i < m_workingObjects.GetCount(); i++){
 				ObjectInfo* objectInfoPtr = m_workingObjects.GetAt(i);
@@ -100,12 +100,12 @@ void CDocumentBasedFileCollectionDelegateComp::RemoveObjects(const imtbase::ICol
 						idoc::IDocumentManager::DocumentInfo documentInfo;
 						if (objectInfoPtr->objectPtr == &m_documentManagerCompPtr->GetDocumentFromIndex(docIndex, &documentInfo)){
 							if (documentInfo.isDirty){
-								QString message = QString("Document \"%1\" was changed and can't be removed").arg(objectInfoPtr->name);
+								QString message = QString("Document \"%1\" is currently being edited and cannot be deleted").arg(objectInfoPtr->name);
 								QMessageBox::warning(NULL, "", message, QMessageBox::Ok);
+								isRemoveAccepted = false;
 							}
 							else{
 								m_documentManagerCompPtr->CloseDocument(docIndex, true);
-								isRemoveAccepted = true;
 							}
 
 							isFound = true;
