@@ -100,7 +100,7 @@ void CDocumentBasedFileCollectionDelegateComp::RemoveObjects(const imtbase::ICol
 						idoc::IDocumentManager::DocumentInfo documentInfo;
 						if (objectInfoPtr->objectPtr == &m_documentManagerCompPtr->GetDocumentFromIndex(docIndex, &documentInfo)){
 							if (documentInfo.isDirty){
-								QString message = QString("Document \"%1\" is currently being edited and cannot be deleted").arg(objectInfoPtr->name);
+								QString message = tr("Document \"%1\" is currently being edited and cannot be deleted").arg(objectInfoPtr->name);
 								QMessageBox::warning(NULL, "", message, QMessageBox::Ok);
 								isRemoveAccepted = false;
 							}
