@@ -318,7 +318,7 @@ protected:
 		/*
 			Reader thread is running
 		*/
-		RTS_READING,
+		RTS_RUNNING,
 
 		/*
 			Reader thread is running and next run is pending
@@ -348,6 +348,7 @@ private:
 	void StartReader();
 	Q_INVOKABLE void OnReaderProgress(int progress);
 	Q_INVOKABLE void OnReaderFinished();
+	Q_INVOKABLE void OnReaderInterrupted();
 
 private Q_SLOTS:
 	void OnSync();

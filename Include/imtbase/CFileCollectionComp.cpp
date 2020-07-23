@@ -1136,6 +1136,9 @@ void CFileCollectionComp::OnComponentCreated()
 
 void CFileCollectionComp::OnComponentDestroyed()
 {
+	m_readerThread.requestInterruption();
+	m_readerThread.wait();
+
 	m_collectionLock.lockForWrite();
 	m_files.clear();
 	m_collectionLock.unlock();
@@ -1304,7 +1307,7 @@ void CFileCollectionComp::StartReader()
 			}
 		}
 
-		m_readerState = RTS_READING;
+		m_readerState = RTS_RUNNING;
 		m_readerThread.start();
 	}
 	else{
@@ -1344,6 +1347,11 @@ void CFileCollectionComp::OnReaderFinished()
 	else{
 		m_readerState = RTS_IDLE;
 	}
+}
+
+
+void CFileCollectionComp::OnReaderInterrupted()
+{
 }
 
 
@@ -1467,6 +1475,10 @@ void CFileCollectionComp::ReaderThread::run()
 	int repositoryFilesCount = repositoryFiles.count();
 
 	for (int fileIndex = 0; fileIndex < repositoryFilesCount; ++fileIndex){
+		if (isInterruptionRequested()){
+			break;
+		}
+
 		QString itemFilePath = repositoryFiles[fileIndex].absoluteFilePath();
 
 		ifile::CCompactXmlFileReadArchive archive(itemFilePath, m_parentPtr->m_versionInfoCompPtr.GetPtr());
@@ -1513,7 +1525,12 @@ void CFileCollectionComp::ReaderThread::run()
 		}
 	}
 
-	QMetaObject::invokeMethod(m_parentPtr, "OnReaderFinished", Qt::QueuedConnection);
+	if (isInterruptionRequested()){
+		QMetaObject::invokeMethod(m_parentPtr, "OnReaderInterrupted", Qt::QueuedConnection);
+	}
+	else{
+		QMetaObject::invokeMethod(m_parentPtr, "OnReaderFinished", Qt::QueuedConnection);
+	}
 }
 
 
