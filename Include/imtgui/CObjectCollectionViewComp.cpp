@@ -657,7 +657,7 @@ void CObjectCollectionViewComp::StartUpdate()
 		m_updateThread.start();
 	}
 	else{
-		m_updateThreadState == UTS_PENDING;
+		m_updateThreadState = UTS_PENDING;
 	}
 }
 
