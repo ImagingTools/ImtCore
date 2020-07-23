@@ -37,14 +37,52 @@ namespace imtbase
 	*<b>Subfolder</b>: Each file will be placed into a separate folder. This folder contains the data file itself, file collection description file, and the meta-info file.
 	\ingroup Collection
 */
-class CFileCollectionComp:
+class CFileCollectionCompBase:
 			public QObject,
-			public ilog::CLoggerComponentBase,
-			virtual public IFileObjectCollection
+			public ilog::CLoggerComponentBase
+{
+public:
+	typedef ilog::CLoggerComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CFileCollectionCompBase)
+		I_ASSIGN_MULTI_0(m_resourceFileTypesCompPtr, "FileTypeInfos", "List of file type infos for corresponding resource type", false);
+		I_ASSIGN_MULTI_0(m_objectPersistenceListCompPtr, "ObjectPersistenceList", "List of persistence components used for data object loading", false);
+		I_ASSIGN_MULTI_0(m_objectFactoryListCompPtr, "ObjectFactoryList", "List of factories used for data object instance creation", false);
+		I_ASSIGN_MULTI_0(m_metaInfoCreatorListCompPtr, "MetaInfoCreatorList", "List of meta-info creators related to the object types", false);
+		I_ASSIGN_MULTI_0(m_progressManagerListCompPtr, "ProgressManagerList", "List of progress manager components", false);
+	I_END_COMPONENT;
+
+	/**
+		List of file type infos related to registered resource types.
+	*/
+	I_MULTIREF(ifile::IFileTypeInfo, m_resourceFileTypesCompPtr);
+
+	/**
+		List of file persistence components related to registered resource types.
+	*/
+	I_MULTIREF(ifile::IFilePersistence, m_objectPersistenceListCompPtr);
+
+	/**
+		List of data object factories related to registered resource types.
+	*/
+	I_MULTIFACT(istd::IChangeable, m_objectFactoryListCompPtr);
+
+	/**
+		List of meta-info creators related to registered resource types.
+	*/
+	I_MULTIREF(imtbase::IMetaInfoCreator, m_metaInfoCreatorListCompPtr);
+
+	/**
+		Consumers of the progress information
+	*/
+	I_MULTIREF(ibase::IProgressManager, m_progressManagerListCompPtr);
+};
+
+class CFileCollectionComp: public CFileCollectionCompBase, virtual public IFileObjectCollection
 {
 	Q_OBJECT
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef CFileCollectionCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFileCollectionComp)
 		I_REGISTER_INTERFACE(IFileObjectCollection);
@@ -55,15 +93,12 @@ public:
 		I_ASSIGN(m_repositoryPathCompPtr, "RepositoryPath", "Path to the file collection folder", false, "RepositoryPath");
 		I_ASSIGN(m_isCalculateCheckSumAttrPtr, "IsCalculateCheckSum", "Calculate check sums for the file", true, true);
 		I_ASSIGN(m_resourceTypesCompPtr, "ResourceTypes", "List of supported resource types", false, "ResourceTypes");
-		I_ASSIGN_MULTI_0(m_resourceFileTypesCompPtr, "FileTypeInfos", "List of file type infos for corresponding resource type", false);
 		I_ASSIGN(m_useSubfolderAttrPtr, "UseSubfolder", "If set, for each input file a subfolder with the corresponding file name will be created", true, false);
-		I_ASSIGN_MULTI_0(m_objectPersistenceListCompPtr, "ObjectPersistenceList", "List of persistence components used for data object loading", false);
-		I_ASSIGN_MULTI_0(m_objectFactoryListCompPtr, "ObjectFactoryList", "List of factories used for data object instance creation", false);
-		I_ASSIGN_MULTI_0(m_metaInfoCreatorListCompPtr, "MetaInfoCreatorList", "List of meta-info creators related to the object types", false);
-		I_ASSIGN_MULTI_0(m_progressManagerListCompPtr, "ProgressManagerList", "List of progress manager components", false);
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
 		I_ASSIGN(m_createFolderOnStartAttrPtr, "CreateRepositoryFolder", "Ensure that the file collection folder is created on the start", true, true);
 		I_ASSIGN(m_pollFileSystemAttrPtr, "PollFileSystem", "If enabled, the collection folder will be observed and the items will be re-read on changes in the folder structure", true, false);
+		I_ASSIGN(m_pollingPeriodAttrPtr, "PollingPeriod", "Period of file system polling (seconds)", true, 1);
+		I_ASSIGN(m_asynchronousReadingAttrPtr, "AsynchronousReading", "If enabled, the collection will reading asynchronously", true, false);
 	I_END_COMPONENT;
 
 	CFileCollectionComp();
@@ -308,24 +343,6 @@ protected:
 		CFileCollectionComp* m_parentPtr;
 	};
 
-	enum ReaderThreadState
-	{
-		/*
-			Reader thread is idle
-		*/
-		RTS_IDLE = 0,
-
-		/*
-			Reader thread is running
-		*/
-		RTS_RUNNING,
-
-		/*
-			Reader thread is running and next run is pending
-		*/
-		RTS_PENDING
-	};
-
 private:
 	typedef QList<CollectionItem> Files;
 
@@ -345,6 +362,10 @@ private:
 	QString GetMetaInfoFilePath(const CollectionItem& repositoryFile) const;
 	QString CalculateShortWindowsFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const;
 
+	void SyncRead();
+	void GetRepositoryFileList(QFileInfoList& fileList);
+	void ReadItem(Files& filesPtr, const QString& itemFilePath);
+
 	void StartReader();
 	Q_INVOKABLE void OnReaderProgress(int progress);
 	Q_INVOKABLE void OnReaderFinished();
@@ -358,7 +379,6 @@ private:
 	mutable bool m_directoryBlocked;
 	ReaderThread m_readerThread;
 	Files m_readerFiles;
-	ReaderThreadState m_readerState;
 	
 	class DirectoryBlocker
 	{
@@ -414,31 +434,6 @@ private:
 	I_REF(iprm::IOptionsList, m_resourceTypesCompPtr);
 	
 	/**
-		List of file type infos related to registered resource types.
-	*/
-	I_MULTIREF(ifile::IFileTypeInfo, m_resourceFileTypesCompPtr);
-
-	/**
-		List of file persistence components related to registered resource types.
-	*/
-	I_MULTIREF(ifile::IFilePersistence, m_objectPersistenceListCompPtr);
-
-	/**
-		List of data object factories related to registered resource types.
-	*/
-	I_MULTIFACT(istd::IChangeable, m_objectFactoryListCompPtr);
-
-	/**
-		List of meta-info creators related to registered resource types.
-	*/
-	I_MULTIREF(imtbase::IMetaInfoCreator, m_metaInfoCreatorListCompPtr);
-
-	/**
-		Consumers of the progress information
-	*/
-	I_MULTIREF(ibase::IProgressManager, m_progressManagerListCompPtr);
-
-	/**
 		Provider of the version information for the entire system.
 	*/
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
@@ -455,8 +450,19 @@ private:
 
 	/**
 		Poll changes in file system to get automatic updates if an external process do some changes in the file collection.
+		Polling is disabled if asynchronous loading is enabled
 	*/
 	I_ATTR(bool, m_pollFileSystemAttrPtr);
+
+	/**
+		Polling period (seconds).
+	*/
+	I_ATTR(int, m_pollingPeriodAttrPtr);
+
+	/**
+		Asynchronous collection loading on dedicated thread
+	*/
+	I_ATTR(bool, m_asynchronousReadingAttrPtr);
 };
 
 
