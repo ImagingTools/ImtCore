@@ -1442,7 +1442,7 @@ Status</source>
     <message>
         <location line="+0"/>
         <source>Insert new document into the collection</source>
-        <translation></translation>
+        <translation>Insert new file into the database</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1453,7 +1453,7 @@ Status</source>
         <location line="-179"/>
         <location line="+180"/>
         <source>Remove selected document from the collection</source>
-        <translation></translation>
+        <translation>Remove selected file from the database</translation>
     </message>
     <message>
         <location line="-1"/>
@@ -1464,7 +1464,7 @@ Status</source>
         <location line="+20"/>
         <location line="+47"/>
         <source>New document could not be created</source>
-        <translation></translation>
+        <translation>New file could not be created</translation>
     </message>
     <message>
         <location line="-246"/>
@@ -1476,7 +1476,7 @@ Status</source>
         <location line="+19"/>
         <location line="+47"/>
         <source>Collection</source>
-        <translation></translation>
+        <translation>Database</translation>
     </message>
 </context>
 <context>
