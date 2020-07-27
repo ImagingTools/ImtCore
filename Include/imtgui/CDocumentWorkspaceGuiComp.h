@@ -42,7 +42,6 @@ protected:
 	// reimplemented (idoc::CMultiDocumentManagerBase)
 	virtual QString GetSaveFilePath(const QByteArray& documentTypeId, const istd::IChangeable* dataObjectPtr, const QString& currentFilePath) const override;
 	virtual QStringList GetOpenFilePaths(const QByteArray* documentTypeIdPtr = NULL) const override;
-	virtual void OnDocumentSaved();
 
 	// reimplemented (iqt:CGuiComponentBase)
 	virtual void OnGuiCreated() override;

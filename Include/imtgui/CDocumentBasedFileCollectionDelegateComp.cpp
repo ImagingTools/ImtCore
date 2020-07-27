@@ -307,6 +307,14 @@ void CDocumentBasedFileCollectionDelegateComp::InitializeVisualStatus()
 }
 
 
+void CDocumentBasedFileCollectionDelegateComp::OnDocumentSaved(const imtbase::ICollectionInfo::Id& objectId)
+{
+	if (m_eventHandlerCompPtr.IsValid()){
+		m_eventHandlerCompPtr->OnUpdate(objectId);
+	}
+}
+
+
 // protected slots
 
 void CDocumentBasedFileCollectionDelegateComp::OnEdit()
@@ -407,12 +415,21 @@ int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::SaveToFile
 							objectInfoPtr->name = objectName;
 							objectInfoPtr->description = description;
 
+							m_parent.OnDocumentSaved(objectId);
+
 							return OS_OK;
 						}
+
+						return OS_FAILED;
 					}
 					// An existing object in the collection should be updated:
 					else{
-						return m_parent.UpdateObject(objectInfoPtr->uuid, data) ? OS_OK : OS_FAILED;
+						if (m_parent.UpdateObject(objectInfoPtr->uuid, data)){
+							m_parent.OnDocumentSaved(objectInfoPtr->uuid);
+							return OS_OK;
+						}
+
+						return OS_FAILED;
 					}
 				}
 			}
