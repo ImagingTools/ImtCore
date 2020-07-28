@@ -50,6 +50,7 @@ public:
 		I_ASSIGN_MULTI_0(m_objectFactoryListCompPtr, "ObjectFactoryList", "List of factories used for data object instance creation", false);
 		I_ASSIGN_MULTI_0(m_metaInfoCreatorListCompPtr, "MetaInfoCreatorList", "List of meta-info creators related to the object types", false);
 		I_ASSIGN_MULTI_0(m_progressManagerListCompPtr, "ProgressManagerList", "List of progress manager components", false);
+		I_ASSIGN_MULTI_0(m_eventHandlerListCompPtr, "EventHandlerList", "List of event handler components", false);
 	I_END_COMPONENT;
 
 	/**
@@ -76,6 +77,11 @@ public:
 		Consumers of the progress information
 	*/
 	I_MULTIREF(ibase::IProgressManager, m_progressManagerListCompPtr);
+
+	/**
+		Event handlers
+	*/
+	I_MULTIREF(imtbase::IObjectCollectionEventHandler, m_eventHandlerListCompPtr);
 };
 
 class CFileCollectionComp: public CFileCollectionCompBase, virtual public IFileObjectCollection
@@ -138,6 +144,8 @@ public:
 	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
 	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
+	virtual bool RegisterEventHandler(IObjectCollectionEventHandler* eventHandler) override;
+	virtual bool UnRegisterEventHandler(IObjectCollectionEventHandler* eventHandler) override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
@@ -345,6 +353,7 @@ protected:
 
 private:
 	typedef QList<CollectionItem> Files;
+	typedef QList<IObjectCollectionEventHandler*> EventHandlerList;
 
 	bool InsertFileIntoCollection(
 				const QString& filePath,
@@ -402,6 +411,8 @@ private:
 		Collection data.
 	*/
 	mutable Files m_files;
+
+	EventHandlerList m_eventHandlerList;
 
 	/**
 		Supported types of the objects in the collection.

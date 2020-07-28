@@ -193,6 +193,29 @@ void CObjectCollectionBase::SetObjectEnabled(const QByteArray& objectId, bool is
 }
 
 
+bool CObjectCollectionBase::RegisterEventHandler(IObjectCollectionEventHandler* eventHandler)
+{
+	if (!m_eventHandlerList.contains(eventHandler)){
+		m_eventHandlerList.append(eventHandler);
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CObjectCollectionBase::UnRegisterEventHandler(IObjectCollectionEventHandler* eventHandler)
+{
+	int index = m_eventHandlerList.indexOf(eventHandler, 0);
+	if (index >= 0){
+		m_eventHandlerList.removeAt(index);
+		return true;
+	}
+
+	return false;
+}
+
+
 // reimplemented (IObjectCollectionInfo)
 
 bool CObjectCollectionBase::GetCollectionItemMetaInfo(const QByteArray& /*objectId*/, idoc::IDocumentMetaInfo& /*metaInfo*/) const

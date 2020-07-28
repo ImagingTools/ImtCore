@@ -206,7 +206,7 @@ bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(
 
 	istd::CSystem::EnsurePathExists(tempPath);
 
-	QString tempFilePath = tempPath + "/ " + objectInfoPtr->name + "." + QFileInfo(fileInfo.fileName).suffix();
+	QString tempFilePath = tempPath + "/" + objectInfoPtr->name + "." + QFileInfo(fileInfo.fileName).suffix();
 	objectInfoPtr->tempFilePath = tempFilePath;
 
 	QString targetFilePath = fileCollectionPtr->GetFile(objectId, tempFilePath);
@@ -303,14 +303,6 @@ void CDocumentBasedFileCollectionDelegateComp::InitializeVisualStatus()
 				break;
 			}
 		}
-	}
-}
-
-
-void CDocumentBasedFileCollectionDelegateComp::OnDocumentSaved(const imtbase::ICollectionInfo::Id& objectId)
-{
-	if (m_eventHandlerCompPtr.IsValid()){
-		m_eventHandlerCompPtr->OnUpdate(objectId);
 	}
 }
 
@@ -415,8 +407,6 @@ int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::SaveToFile
 							objectInfoPtr->name = objectName;
 							objectInfoPtr->description = description;
 
-							m_parent.OnDocumentSaved(objectId);
-
 							return OS_OK;
 						}
 
@@ -425,7 +415,6 @@ int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::SaveToFile
 					// An existing object in the collection should be updated:
 					else{
 						if (m_parent.UpdateObject(objectInfoPtr->uuid, data)){
-							m_parent.OnDocumentSaved(objectInfoPtr->uuid);
 							return OS_OK;
 						}
 

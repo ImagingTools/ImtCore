@@ -10,7 +10,6 @@
 #include <iqtgui/IIconProvider.h>
 
 // ImtCore includes
-#include <imtbase/IObjectCollectionEventHandler.h>
 #include <imtgui/CFileObjectCollectionViewDelegate.h>
 
 
@@ -43,7 +42,6 @@ public:
 		I_ASSIGN(m_documentManagerCompPtr, "DocumentManager", "Document manager", true, "DocumentManager");
 		I_ASSIGN_TO(m_documentManagerModelCompPtr, m_documentManagerCompPtr, true);
 		I_ASSIGN(m_informationViewCompPtr, "InformationView", "information view", false, "InformationView");
-		I_ASSIGN(m_eventHandlerCompPtr, "CollectionEventHandler", "Collection event handler", false, "");
 	I_END_COMPONENT;
 
 	enum CommandGroup
@@ -131,7 +129,6 @@ private:
 	}
 
 	void InitializeVisualStatus();
-	void OnDocumentSaved(const imtbase::ICollectionInfo::Id& objectId);
 
 private:
 	I_ATTR(QByteArray, m_objectTypeIdAttrPtr);
@@ -147,8 +144,6 @@ private:
 	*/
 	I_REF(idoc::IDocumentManager, m_documentManagerCompPtr);
 	I_REF(imod::IModel, m_documentManagerModelCompPtr);
-
-	I_REF(imtbase::IObjectCollectionEventHandler, m_eventHandlerCompPtr);
 
 	/**
 		View used for showing the information about the currently selected item.

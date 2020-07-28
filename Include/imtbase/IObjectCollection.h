@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionInfo.h>
+#include <imtbase/IObjectCollectionEventHandler.h>
 
 
 namespace imtbase
@@ -178,6 +179,16 @@ public:
 		Enable/Disable element with the given ID.
 	*/
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) = 0;
+
+	/**
+		Add an event handler to the notification list
+	*/
+	virtual bool RegisterEventHandler(IObjectCollectionEventHandler* eventHandler) = 0;
+
+	/**
+		Remove an event handler from the notification list
+	*/
+	virtual bool UnRegisterEventHandler(IObjectCollectionEventHandler* eventHandler) = 0;
 };
 
 

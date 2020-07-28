@@ -20,6 +20,9 @@
 #include <ifile/IFileResourceTypeConstraints.h>
 #include <ilog/CMessage.h>
 
+// ImtCore includes
+#include <imtbase/CObjectCollectionUpdateEvent.h>
+
 
 namespace imtbase
 {
@@ -97,7 +100,7 @@ QString CFileCollectionComp::GetFile(
 			if (outputFilePath.isEmpty()){
 				QString fileExtension = QFileInfo(filePathInRepository).suffix();
 
-				outputFilePath =  GetTempDirectory() + "/" + QFileInfo(filePathInRepository).completeBaseName() + "_" + QUuid::createUuid().toString() + "." + fileExtension;
+				outputFilePath =  GetTempDirectory() + "/ImtCore/" + QFileInfo(filePathInRepository).completeBaseName() + "_" + QUuid::createUuid().toString() + "." + fileExtension;
 			}
 
 			if (filePathInRepository == outputFilePath){
@@ -357,10 +360,14 @@ QByteArray CFileCollectionComp::InsertNewObject(
 			QStringList supportedExts;
 			persistencePtr->GetFileExtensions(supportedExts, defaultValuePtr, ifile::IFilePersistence::QF_SAVE);
 
-			QString tempFilePath = QDir::tempPath() + "/" + QUuid::createUuid().toString() + "." + supportedExts[0];
+			QString tempFilePath = GetTempDirectory() + "/ImtCore/" + QUuid::createUuid().toString() + "." + supportedExts[0];
 
 			if (persistencePtr->SaveToFile(*newObjectPtr, tempFilePath) == ifile::IFilePersistence::OS_OK){
-				return InsertFile(tempFilePath, typeId, name, QString(), proposedObjectId);
+				QByteArray retval = InsertFile(tempFilePath, typeId, name, QString(), proposedObjectId);
+
+				QFile::remove(tempFilePath);
+
+				return retval;
 			}
 		}
 	}
@@ -498,10 +505,16 @@ bool CFileCollectionComp::SetObjectData(const QByteArray& objectId, const istd::
 
 	QString extension = extensions.isEmpty() ? QString() : extensions[0];
 
-	QString tempFilePath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString() + "." + extension;
+	QString tempFilePath = GetTempDirectory() + "/ImtCore/" + QUuid::createUuid().toString() + "." + extension;
 
 	if (persistencePtr->SaveToFile(object, tempFilePath) == ifile::IFilePersistence::OS_OK){
 		bool retVal = UpdateFile(tempFilePath, objectId);
+		if (retVal){
+			for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+				CObjectCollectionUpdateEvent event(objectId);
+				eventHandlerPtr->OnEvent(this, &event);
+			}
+		}
 
 		QFile::remove(tempFilePath);
 
@@ -637,6 +650,29 @@ void CFileCollectionComp::SetObjectDescription(const QByteArray& objectId, const
 
 void CFileCollectionComp::SetObjectEnabled(const QByteArray& /*objectId*/, bool /*isEnabled*/)
 {
+}
+
+
+bool CFileCollectionComp::RegisterEventHandler(IObjectCollectionEventHandler* eventHandler)
+{
+	if (!m_eventHandlerList.contains(eventHandler)){
+		m_eventHandlerList.append(eventHandler);
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CFileCollectionComp::UnRegisterEventHandler(IObjectCollectionEventHandler* eventHandler)
+{
+	int index = m_eventHandlerList.indexOf(eventHandler, 0);
+	if (index >= 0){
+		m_eventHandlerList.removeAt(index);
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -1134,11 +1170,19 @@ void CFileCollectionComp::OnComponentCreated()
 			m_syncTimer.start(*m_pollingPeriodAttrPtr * 1000);
 		}
 	}
+
+	if (m_eventHandlerListCompPtr.IsValid()){
+		for (int i = 0; i < m_eventHandlerListCompPtr.GetCount(); i++){
+			RegisterEventHandler(m_eventHandlerListCompPtr[i]);
+		}
+	}
 }
 
 
 void CFileCollectionComp::OnComponentDestroyed()
 {
+	m_eventHandlerList.clear();
+
 	m_readerThread.requestInterruption();
 	m_readerThread.wait();
 
