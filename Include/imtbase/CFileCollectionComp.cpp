@@ -664,7 +664,7 @@ bool CFileCollectionComp::RegisterEventHandler(IObjectCollectionEventHandler* ev
 }
 
 
-bool CFileCollectionComp::UnRegisterEventHandler(IObjectCollectionEventHandler* eventHandler)
+bool CFileCollectionComp::UnregisterEventHandler(IObjectCollectionEventHandler* eventHandler)
 {
 	int index = m_eventHandlerList.indexOf(eventHandler, 0);
 	if (index >= 0){

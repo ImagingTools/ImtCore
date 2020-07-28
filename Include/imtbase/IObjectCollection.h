@@ -188,7 +188,7 @@ public:
 	/**
 		Remove an event handler from the notification list
 	*/
-	virtual bool UnRegisterEventHandler(IObjectCollectionEventHandler* eventHandler) = 0;
+	virtual bool UnregisterEventHandler(IObjectCollectionEventHandler* eventHandler) = 0;
 };
 
 

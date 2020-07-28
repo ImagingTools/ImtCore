@@ -44,7 +44,7 @@ public:
 	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
 	virtual bool RegisterEventHandler(IObjectCollectionEventHandler* eventHandler) override;
-	virtual bool UnRegisterEventHandler(IObjectCollectionEventHandler* eventHandler) override;
+	virtual bool UnregisterEventHandler(IObjectCollectionEventHandler* eventHandler) override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;

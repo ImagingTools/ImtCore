@@ -204,7 +204,7 @@ bool CObjectCollectionBase::RegisterEventHandler(IObjectCollectionEventHandler* 
 }
 
 
-bool CObjectCollectionBase::UnRegisterEventHandler(IObjectCollectionEventHandler* eventHandler)
+bool CObjectCollectionBase::UnregisterEventHandler(IObjectCollectionEventHandler* eventHandler)
 {
 	int index = m_eventHandlerList.indexOf(eventHandler, 0);
 	if (index >= 0){
