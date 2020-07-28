@@ -441,7 +441,7 @@ void CMenuPanelComp::MonitorsInfoObserver::OnUpdate(const istd::IChangeable::Cha
 }
 
 
-// protected methods of embedded class MenuPanelVisibility
+// public methods of embedded class MenuPanelVisibility
 
 CMenuPanelComp::MenuPanelVisibility::MenuPanelVisibility(CMenuPanelComp& parent)
 	:m_parent(parent)
@@ -449,7 +449,7 @@ CMenuPanelComp::MenuPanelVisibility::MenuPanelVisibility(CMenuPanelComp& parent)
 }
 
 
-// reimplemented (imod::CMultiModelDispatcherBase)
+// reimplemented (imod::CSingleModelObserverBase)
 
 void CMenuPanelComp::MenuPanelVisibility::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
