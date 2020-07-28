@@ -17,7 +17,6 @@
 
 // ImtCore includes
 #include <imtgui/IDocumentViewConstraints.h>
-#include <imtgui/CApplicationChangedEvent.h>
 
 
 namespace imtgui

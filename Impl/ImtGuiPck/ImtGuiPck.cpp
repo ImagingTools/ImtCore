@@ -92,11 +92,6 @@ I_EXPORT_COMPONENT(
 			"Image contours extender component",
 			"Image Contours Contour Extender View Observer");
 
-I_EXPORT_COMPONENT(
-			ApplicationChangedEventFactory,
-			"Application changed message factory",
-			"Application Changed Message Factory");
-
 
 } // namespace ImtGuiPck
 
