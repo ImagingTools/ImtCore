@@ -86,7 +86,7 @@ private:
 	void MoveToTime(const QDateTime& time);
 
 	void UpdateSummaryInfoPanel();
-	bool UpdateMetaInfoPanel(const CEventItemBase* eventItem);
+	bool UpdateMetaInfoPanel(const IEventItem* eventItem);
 
 private:
 	class ScaleConstraintsObserver: public imod::TSingleModelObserverBase<imeas::INumericConstraints>

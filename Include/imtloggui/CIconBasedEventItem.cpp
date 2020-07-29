@@ -14,8 +14,6 @@ namespace imtloggui
 CIconBasedEventItem::CIconBasedEventItem(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent)
 	:BaseClass(message, parent)
 {
-	m_messagePtr = message;
-	setToolTip(m_messagePtr->GetInformationDescription());
 }
 
 

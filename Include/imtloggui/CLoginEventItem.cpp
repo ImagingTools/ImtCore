@@ -14,7 +14,6 @@ namespace imtloggui
 CLoginEventItem::CLoginEventItem(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent)
 	:BaseClass(message, parent)
 {
-	m_messagePtr = message;
 }
 
 
@@ -43,7 +42,7 @@ QRectF CLoginEventItem::boundingRect() const
 {
 	QFontMetrics fontMetrics(m_font);
 
-	QString user = m_messagePtr->GetInformationDescription();
+	QString user = GetInformationProvider()->GetInformationDescription();
 	QRectF labelRect = fontMetrics.boundingRect(user);
 
 	QRectF rect(0, 0, m_iconSize.width(), m_iconSize.height());
@@ -58,17 +57,20 @@ void CLoginEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /
 {
 	QFontMetrics fontMetrics(m_font);
 
-	QString user = m_messagePtr->GetInformationDescription();
+	const istd::IInformationProvider* informationProviderPtr = GetInformationProvider();
+	Q_ASSERT(informationProviderPtr != nullptr);
+
+	QString user = informationProviderPtr->GetInformationDescription();
 	QRectF labelRect = fontMetrics.boundingRect(user);
 	labelRect.setWidth(labelRect.width() + 1);
 	const QRectF bounding = boundingRect();
 
 	QIcon icon;
 
-	if (m_messagePtr->GetInformationId() == imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN){
+	if (informationProviderPtr->GetInformationId() == imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN){
 		icon = m_iconLogin;
 	}
-	else if (m_messagePtr->GetInformationId() == imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT){
+	else if (informationProviderPtr->GetInformationId() == imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT){
 		icon = m_iconLogout;
 	}
 

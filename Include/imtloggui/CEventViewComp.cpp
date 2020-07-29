@@ -417,7 +417,7 @@ void CEventViewComp::OnSelectionChanged()
 	QList<QGraphicsItem*> items = m_scene.selectedItems();
 	m_panelsStackPtr->setCurrentIndex(0);
 	if (!items.isEmpty()){
-		CEventItemBase* itemPtr = dynamic_cast<CEventItemBase*>(items[0]);
+		IEventItem* itemPtr = dynamic_cast<IEventItem*>(items[0]);
 		if (itemPtr != nullptr){
 			if (UpdateMetaInfoPanel(itemPtr)){
 				m_panelsStackPtr->setCurrentIndex(1);
@@ -618,7 +618,7 @@ void CEventViewComp::UpdateSummaryInfoPanel()
 }
 
 
-bool CEventViewComp::UpdateMetaInfoPanel(const CEventItemBase* eventItem)
+bool CEventViewComp::UpdateMetaInfoPanel(const IEventItem* eventItem)
 {
 	iwidgets::ClearLayout(m_metaInfoPanelPtr->layout());
 
@@ -628,12 +628,12 @@ bool CEventViewComp::UpdateMetaInfoPanel(const CEventItemBase* eventItem)
 
 	QVBoxLayout* layoutPtr = dynamic_cast<QVBoxLayout*>(m_metaInfoPanelPtr->layout());
 	if (layoutPtr != nullptr){
-		CEventItemBase::MetaInfo metaInfo = eventItem->GetMetaInfo();
+		IEventItem::MetaInfo metaInfo = eventItem->GetMetaInfo();
 		if (metaInfo.isEmpty()){
 			return false;
 		}
 
-		for (CEventItemBase::MetaInfoItem metaInfoItem : metaInfo){
+		for (IEventItem::MetaInfoItem metaInfoItem : metaInfo){
 			QLabel* labelKeyPtr = new QLabel(metaInfoItem.key, m_metaInfoPanelPtr);
 			QFont keyLabelFont;
 			keyLabelFont.setPixelSize(12);
