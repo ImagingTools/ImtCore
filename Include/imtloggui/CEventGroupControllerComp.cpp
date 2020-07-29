@@ -185,15 +185,15 @@ IEventItemController* CEventGroupControllerComp::GetGroup(const QByteArray& grou
 }
 
 
-CEventItemBase* CEventGroupControllerComp::AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr)
+IEventItem* CEventGroupControllerComp::AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr)
 {
 	for (QByteArray groupId : m_messageIdMap.keys()){
 		if (m_messageIdMap[groupId].contains(messagePtr->GetInformationId())){
 			IEventItemController* groupPtr = GetGroup(groupId);
 			if (groupPtr != nullptr){
-				CEventItemBase* eventPtr = groupPtr->AddEvent(messagePtr);
-				if (eventPtr != nullptr){
-					return eventPtr;
+				IEventItem* eventItemPtr = groupPtr->AddEvent(messagePtr);
+				if (eventItemPtr != nullptr){
+					return eventItemPtr;
 				}
 
 				break;

@@ -13,7 +13,7 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IEventItemFactory)
 
-CEventItemBase* CIconBasedEventFactoryComp::CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const
+IEventItem* CIconBasedEventFactoryComp::CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const
 {
 	if (!IsSupportedMessageId(message->GetInformationId())){
 		return CreateInstanceWithSlaveFactory(message);
@@ -52,15 +52,18 @@ CEventItemBase* CIconBasedEventFactoryComp::CreateInstance(const ilog::IMessageC
 	CIconBasedEventItem* eventPtr = new CIconBasedEventItem(message);
 	eventPtr->SetIcon(icon);
 	eventPtr->SetIconSize(QSize(iconSize, iconSize));
-  	eventPtr->setToolTip(
-				QObject::tr("Source") + ": " + message->GetInformationSource()
-				+ QObject::tr("\nMessage") + ": " + message->GetInformationDescription()
-				+ QObject::tr("\nStatus") + ": " + status);
-	eventPtr->AddMetaInfo(QObject::tr("Source"), message->GetInformationSource());
-	eventPtr->AddMetaInfo(QObject::tr("Message"), message->GetInformationDescription());
-	eventPtr->AddMetaInfo(QObject::tr("Status"), status);
+
+	SetItemMetaInfo(eventPtr);
 
 	return eventPtr;
+}
+
+
+// protected methods
+
+void CIconBasedEventFactoryComp::SetItemMetaInfo(IEventItem* eventItem) const
+{
+	BaseClass::SetItemMetaInfo(eventItem);
 }
 
 

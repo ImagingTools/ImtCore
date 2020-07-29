@@ -47,7 +47,7 @@ public:
 	virtual QVector<int> GetSupportedMessageIds() const override;
 	virtual const EventMap* GetEvents() const override;
 	virtual int GetEventCount(istd::IInformationProvider::InformationCategory category) override;
-	virtual CEventItemBase* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) override;
+	virtual IEventItem* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) override;
 	virtual void ClearEvents() override;
 
 	virtual void SetVisible(bool isVisible) const override;

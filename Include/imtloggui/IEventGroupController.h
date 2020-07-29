@@ -29,7 +29,7 @@ public:
 	virtual QByteArrayList GetActiveGroupList() const = 0;
 	virtual IEventItemController* GetGroup(const QByteArray& groupId) const = 0;
 
-	virtual CEventItemBase* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) = 0;
+	virtual IEventItem* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) = 0;
 
 	virtual void OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos) = 0;
 	virtual void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) = 0;

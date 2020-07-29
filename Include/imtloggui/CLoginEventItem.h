@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtGui/QIcon>
+#include <QtGui/QFont>
 
 // ImtCore includes
 #include <imtlog/IMessageGroupInfoProvider.h>

@@ -147,29 +147,31 @@ int CSingleLayerGroupComp::GetEventCount(istd::IInformationProvider::Information
 }
 
 
-CEventItemBase* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr)
+IEventItem* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr)
 {
 	if (m_eventItemFactoryCompPtr.IsValid() && m_graphicsItemPtr){
-		CEventItemBase* itemPtr = m_eventItemFactoryCompPtr->CreateInstance(messagePtr);
-
-		if (itemPtr == nullptr){
+		IEventItem* eventItemPtr = m_eventItemFactoryCompPtr->CreateInstance(messagePtr);
+		if (eventItemPtr == nullptr){
 			return nullptr;
 		}
+
+		QGraphicsItem* graphicsItemPtr = dynamic_cast<QGraphicsItem*>(eventItemPtr);
+		Q_ASSERT(graphicsItemPtr != nullptr);
 
 		QPointF origin(m_timeAxisPtr->GetScenePositionFromTime(messagePtr->GetInformationTimeStamp()), 0);
 		origin = m_itemGroupPtr->mapFromScene(origin);
 		origin.setY(m_graphicsItemPtr->rect().height() / 2);
 
-		itemPtr->setParentItem(m_itemGroupPtr);
-		itemPtr->setPos(origin);
-		itemPtr->setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemIsSelectable);
+		graphicsItemPtr->setParentItem(m_itemGroupPtr);
+		graphicsItemPtr->setPos(origin);
+		graphicsItemPtr->setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemIsSelectable);
 
-		m_events.insert(messagePtr->GetInformationTimeStamp() ,itemPtr);
+		m_events.insert(messagePtr->GetInformationTimeStamp(), eventItemPtr);
 		m_eventCount[messagePtr->GetInformationCategory()]++;
 
 		ArrangeEvents();
 
-		return itemPtr;
+		return eventItemPtr;
 	}
 
 	return nullptr;
@@ -178,9 +180,12 @@ CEventItemBase* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::Me
 
 void CSingleLayerGroupComp::ClearEvents()
 {
-	for (QGraphicsItem* item : m_events){
-		m_scenePtr->removeItem(item);
-		delete item;
+	for (IEventItem* eventItemPtr : m_events){
+		QGraphicsItem* graphicsItemPtr = dynamic_cast<QGraphicsItem*>(eventItemPtr);
+		Q_ASSERT(graphicsItemPtr != nullptr);
+
+		m_scenePtr->removeItem(graphicsItemPtr);
+		delete graphicsItemPtr;
 	}
 
 	m_events.clear();
@@ -277,24 +282,27 @@ void CSingleLayerGroupComp::ArrangeEvents()
 	EventMap::iterator beginIt = m_events.lowerBound(beginTime);
 	EventMap::iterator endIt = m_events.upperBound(endTime);
 
-	QList<CEventItemBase*> arrangedItems;
+	QList<IEventItem*> arrangedItems;
 	double arrangedHeight = 0;
 
 	for (EventMap::iterator it = beginIt; it != endIt; it++){
-		CEventItemBase* currentPtr = it.value();
+		QGraphicsItem* currentPtr = dynamic_cast<QGraphicsItem*>(it.value());
+		Q_ASSERT(currentPtr != nullptr);
+
 		QRectF currentRect = currentPtr->boundingRect();
 		QPointF currentPos = currentPtr->pos();
 
 		// Current stairway is empty
 		if (arrangedItems.isEmpty()){
-			arrangedItems.append(currentPtr);
+			arrangedItems.append(it.value());
 			currentPos.ry() = -GetGroupHeight() / 2;
 			currentPtr->setPos(currentPos);
 			arrangedHeight = currentRect.height();
 			continue;
 		}
 
-		CEventItemBase* lastPtr = arrangedItems.last();
+		QGraphicsItem* lastPtr = dynamic_cast<QGraphicsItem*>(arrangedItems.last());
+		Q_ASSERT(lastPtr != nullptr);
 
 		// Distances in pixels
 		double posDist = (currentPos.x() - lastPtr->pos().x()) * scaleX;
@@ -306,23 +314,26 @@ void CSingleLayerGroupComp::ArrangeEvents()
 			currentPtr->setPos(currentPos);
 			arrangedHeight = currentRect.height();
 			arrangedItems.clear();
-			arrangedItems.append(currentPtr);
+			arrangedItems.append(it.value());
 			continue;
 		}
 
 		// Current stairway can grow up
 		if (arrangedHeight + (currentRect.height() + 3 * (*m_verticalSpaceingAttrPtr)) < groupHeight){
 			// Shift up stairway
-			for (CEventItemBase* itemPtr : arrangedItems){
-				QPointF pos = itemPtr->pos();
+			for (QList<IEventItem*>::iterator arrangedIt = arrangedItems.begin(); arrangedIt != arrangedItems.end(); arrangedIt++){
+				QGraphicsItem* arrangedPtr = dynamic_cast<QGraphicsItem*>(*arrangedIt);
+				Q_ASSERT(arrangedPtr != nullptr);
+
+				QPointF pos = arrangedPtr->pos();
 				pos.ry() -= ((currentRect.height() + *m_verticalSpaceingAttrPtr) / 2) / scaleY;
-				itemPtr->setPos(pos);
+				arrangedPtr->setPos(pos);
 			}
 
 			currentPos.ry() = lastPtr->pos().y() + (lastPtr->boundingRect().height() / 2 + *m_verticalSpaceingAttrPtr + currentRect.height() / 2) / scaleY;
 			currentPtr->setPos(currentPos);
 			arrangedHeight += *m_verticalSpaceingAttrPtr + currentRect.height();
-			arrangedItems.append(currentPtr);
+			arrangedItems.append(it.value());
 			continue;
 		}
 
@@ -331,7 +342,7 @@ void CSingleLayerGroupComp::ArrangeEvents()
 		currentPtr->setPos(currentPos);
 		arrangedHeight = currentRect.height();
 		arrangedItems.clear();
-		arrangedItems.append(currentPtr);
+		arrangedItems.append(it.value());
 	}
 }
 

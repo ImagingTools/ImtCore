@@ -57,7 +57,7 @@ public:
 	virtual QByteArrayList GetActiveGroupList() const override;
 	virtual IEventItemController* GetGroup(const QByteArray& groupId) const override;
 
-	virtual CEventItemBase* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) override;
+	virtual IEventItem* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) override;
 
 	virtual void OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos) override;
 	virtual void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) override;

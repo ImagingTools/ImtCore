@@ -20,7 +20,10 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtloggui::IEventItemFactory)
-	virtual CEventItemBase* CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const override;
+	virtual IEventItem* CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const override;
+
+protected:
+	virtual void SetItemMetaInfo(IEventItem* eventItem) const override;
 
 protected:
 	I_ATTR(QByteArray, m_iconAttrPtr);

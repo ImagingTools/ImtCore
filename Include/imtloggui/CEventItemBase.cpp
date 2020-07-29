@@ -14,6 +14,8 @@ namespace imtloggui
 {
 
 
+// public methods
+
 CEventItemBase::CEventItemBase(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent)
 	:BaseClass(parent)
 {
@@ -21,13 +23,11 @@ CEventItemBase::CEventItemBase(const ilog::IMessageConsumer::MessagePtr& message
 }
 
 
-QDateTime CEventItemBase::GetEventTimeStamp() const
-{
-	if (m_messagePtr.IsValid()){
-		return m_messagePtr->GetInformationTimeStamp();
-	}
+// reimplemented (imtloggui::IEventItem)
 
-	return QDateTime();
+const istd::IInformationProvider* CEventItemBase::GetInformationProvider() const
+{
+	return m_messagePtr.GetPtr();
 }
 
 
@@ -37,12 +37,58 @@ const CEventItemBase::MetaInfo& CEventItemBase::GetMetaInfo() const
 }
 
 
-void CEventItemBase::AddMetaInfo(const QString& key, const QString& value)
+void CEventItemBase::SetMetaInfo(const QString& key, const QString& value)
 {
 	MetaInfoItem metaInfoItem;
 	metaInfoItem.key = key;
 	metaInfoItem.value = value;
+
+	for (int i = 0; i < m_metaInfo.count(); i++){
+		if (m_metaInfo[i].key == key){
+			if (m_metaInfo[i].value != value){
+				m_metaInfo[i].value = value;
+
+				UpdateToolTip();
+			}
+			return;
+		}
+	}
+
 	m_metaInfo.append(metaInfoItem);
+
+	UpdateToolTip();
+}
+
+
+void CEventItemBase::RemoveMetaInfo(const QString& key)
+{
+	for (int i = 0; i < m_metaInfo.count(); i++){
+		if (m_metaInfo[i].key == key){
+			m_metaInfo.remove(i);
+
+			UpdateToolTip();
+
+			return;
+		}
+	}
+}
+
+
+// protected methods
+
+void CEventItemBase::UpdateToolTip()
+{
+	QString toolTip;
+
+	for (MetaInfoItem metaInfoItem : m_metaInfo){
+		toolTip += metaInfoItem.key + ": " + metaInfoItem.value + "\n";
+	}
+
+	if (!toolTip.isEmpty()){
+		toolTip.chop(1);
+	}
+
+	setToolTip(toolTip);
 }
 
 

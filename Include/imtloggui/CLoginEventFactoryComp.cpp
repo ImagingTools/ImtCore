@@ -1,6 +1,8 @@
 #include <imtloggui/CLoginEventFactoryComp.h>
 
 
+// ImtLog
+
 // ImtCore includes
 #include <imtloggui/CLoginEventItem.h>
 
@@ -13,7 +15,7 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IEventItemFactory)
 
-CEventItemBase* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const
+IEventItem* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const
 {
 	if (!IsSupportedMessageId(message->GetInformationId())){
 		return CreateInstanceWithSlaveFactory(message);
@@ -39,17 +41,35 @@ CEventItemBase* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsu
 	eventPtr->SetIcons(loginIcon, logoutIcon);
 	eventPtr->SetIconSize(QSize(iconSize, iconSize));
 
-	switch (message->GetInformationId()){
-	case imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN:
-		eventPtr->AddMetaInfo(QObject::tr("Action"), QObject::tr("Login"));
-		break;
-	case imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT:
-		eventPtr->AddMetaInfo(QObject::tr("Action"), QObject::tr("Logout"));
-		break;
-	}
-	eventPtr->AddMetaInfo(QObject::tr("User name"), message->GetInformationDescription());
+	SetItemMetaInfo(eventPtr);
 
 	return eventPtr;
+}
+
+
+// protected methods
+
+void CLoginEventFactoryComp::SetItemMetaInfo(IEventItem* eventItem) const
+{
+	Q_ASSERT(eventItem != nullptr);
+
+	BaseClass::SetItemMetaInfo(eventItem);
+
+	eventItem->SetMetaInfo(QObject::tr("Message"), "");
+
+	const istd::IInformationProvider* informationProviderPtr = eventItem->GetInformationProvider();
+	Q_ASSERT(informationProviderPtr != nullptr);
+
+	switch (informationProviderPtr->GetInformationId()){
+	case imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN:
+		eventItem->SetMetaInfo(QObject::tr("Action"), QObject::tr("Login"));
+		break;
+	case imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT:
+		eventItem->SetMetaInfo(QObject::tr("Action"), QObject::tr("Logout"));
+		break;
+	}
+
+	eventItem->SetMetaInfo(QObject::tr("User name"), informationProviderPtr->GetInformationDescription());
 }
 
 
