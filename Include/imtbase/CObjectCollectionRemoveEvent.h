@@ -8,15 +8,13 @@
 namespace imtbase
 {
 
-/**
-	Interface for object collection events
-*/
-class CObjectCollectionUpdateEvent: public CObjectCollectionEventBase
+
+class CObjectCollectionRemoveEvent: public CObjectCollectionEventBase
 {
 public:
 	typedef CObjectCollectionEventBase BaseClass;
 
-	explicit CObjectCollectionUpdateEvent(const QByteArray& itemId);
+	explicit CObjectCollectionRemoveEvent(const QByteArray& itemId);
 };
 
 

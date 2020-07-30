@@ -21,7 +21,11 @@
 #include <ilog/CMessage.h>
 
 // ImtCore includes
-#include <imtbase/CObjectCollectionUpdateEvent.h>
+#include <imtbase/CObjectCollectionInsertEvent.h>
+#include <imtbase/CObjectCollectionUpdateDataEvent.h>
+#include <imtbase/CObjectCollectionRemoveEvent.h>
+#include <imtbase/CObjectCollectionUpdateNameEvent.h>
+#include <imtbase/CObjectCollectionUpdateDescriptionEvent.h>
 
 
 namespace imtbase
@@ -217,6 +221,11 @@ QByteArray CFileCollectionComp::InsertFile(
 
 		locker.unlock();
 
+		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+			CObjectCollectionInsertEvent event(fileId);
+			eventHandlerPtr->OnEvent(this, &event);
+		}
+
 		return fileId;
 	}
 	else{
@@ -282,6 +291,11 @@ bool CFileCollectionComp::UpdateFile(
 		}
 
 		locker.unlock();
+
+		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+			CObjectCollectionUpdateDataEvent event(objectId);
+			eventHandlerPtr->OnEvent(this, &event);
+		}
 
 		return true;
 	}
@@ -446,6 +460,11 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 			repositoryDataLocker.unlock();
 		}
 
+		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+			CObjectCollectionRemoveEvent event(objectId);
+			eventHandlerPtr->OnEvent(this, &event);
+		}
+
 		return true;
 	}
 	else{
@@ -509,12 +528,6 @@ bool CFileCollectionComp::SetObjectData(const QByteArray& objectId, const istd::
 
 	if (persistencePtr->SaveToFile(object, tempFilePath) == ifile::IFilePersistence::OS_OK){
 		bool retVal = UpdateFile(tempFilePath, objectId);
-		if (retVal){
-			for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-				CObjectCollectionUpdateEvent event(objectId);
-				eventHandlerPtr->OnEvent(this, &event);
-			}
-		}
 
 		QFile::remove(tempFilePath);
 
@@ -615,6 +628,11 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 
 			locker.unlock();
 
+			for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+				CObjectCollectionUpdateNameEvent event(objectId, objectName);
+				eventHandlerPtr->OnEvent(this, &event);
+			}
+
 			return;
 		}
 
@@ -643,6 +661,11 @@ void CFileCollectionComp::SetObjectDescription(const QByteArray& objectId, const
 			SaveCollectionItem(item);
 
 			locker.unlock();
+
+			for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+				CObjectCollectionUpdateDescriptionEvent event(objectId, objectDescription);
+				eventHandlerPtr->OnEvent(this, &event);
+			}
 		}
 	}
 }
@@ -1347,7 +1370,7 @@ QString CFileCollectionComp::CalculateShortWindowsFileName(const QString& fileNa
 
 void CFileCollectionComp::SyncRead()
 {
-	istd::CChangeNotifier changeNotifier(this);
+	istd::CChangeNotifier changeNotifier(this, &istd::IChangeable::GetAllChanges());
 
 	QFileInfoList fileList;
 	GetRepositoryFileList(fileList);
@@ -1435,7 +1458,7 @@ void CFileCollectionComp::OnReaderProgress(int progress)
 
 void CFileCollectionComp::OnReaderFinished()
 {
-	istd::CChangeNotifier changeNotifier(this);
+	istd::CChangeNotifier changeNotifier(this, &istd::IChangeable::GetAllChanges());
 
 	QWriteLocker locker(&m_collectionLock);
 	m_files.append(m_readerFiles);

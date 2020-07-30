@@ -20,7 +20,6 @@ public:
 	virtual QByteArray GetItemId() const override;
 
 private:
-
 	QByteArray m_itemId;
 };
 
