@@ -21,6 +21,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IObjectCollectionEventHandler.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
 #include <GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h>
 
@@ -34,7 +35,8 @@ class CObjectCollectionViewComp:
 						iqtgui::TDesignerGuiObserverCompBase<
 									Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>,
 	private imod::CMultiModelDispatcherBase,
-	virtual public ibase::IProgressManager
+	virtual public ibase::IProgressManager,
+	virtual public imtbase::IObjectCollectionEventHandler
 {
 	Q_OBJECT
 public:
@@ -46,6 +48,7 @@ public:
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
 		I_REGISTER_INTERFACE(ibase::IProgressManager);
+		I_REGISTER_INTERFACE(imtbase::IObjectCollectionEventHandler);
 		I_REGISTER_SUBELEMENT(Commands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
@@ -71,6 +74,9 @@ public:
 	typedef QVector<ICollectionViewDelegate::SummaryInformation> ObjectMetaInfo;
 
 	CObjectCollectionViewComp();
+
+	// reimplemented (imtbase::IObjectCollectionEventHandler)
+	virtual void OnEvent(const imtbase::IObjectCollection* objectCollection, const imtbase::IObjectCollectionEvent* event);
 
 	// reimplemented (ibase::IProgressManager)
 	virtual int BeginProgressSession(
@@ -193,6 +199,9 @@ private:
 	QVector<QByteArray> GetMetaInfoIds(const QByteArray &typeId) const;
 	QStringList GetMetaInfoHeaders(const QByteArray &typeId) const;
 	ObjectMetaInfo GetMetaInfo(const QByteArray &itemId, const QByteArray &typeId) const;
+
+	void UpdateItem(const imtbase::IObjectCollectionInfo::Id& objectId, QStandardItemModel* modelPtr);
+	void RemoveItem(const imtbase::IObjectCollectionInfo::Id& objectId);
 
 	void EnsureColumnsSettingsSynchronized() const;
 	void RestoreColumnsSettings();

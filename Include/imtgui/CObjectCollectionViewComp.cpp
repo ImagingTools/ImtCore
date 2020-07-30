@@ -21,6 +21,13 @@
 #include <iqtgui/CCommandTools.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
+// ImtCore includes
+#include <imtbase/CObjectCollectionInsertEvent.h>
+#include <imtbase/CObjectCollectionUpdateDataEvent.h>
+#include <imtbase/CObjectCollectionRemoveEvent.h>
+#include <imtbase/CObjectCollectionUpdateNameEvent.h>
+#include <imtbase/CObjectCollectionUpdateDescriptionEvent.h>
+
 
 namespace imtgui
 {
@@ -38,12 +45,47 @@ CObjectCollectionViewComp::CObjectCollectionViewComp()
 }
 
 
+// reimplemented (imtbase::IObjectCollectionEventHandler)
+void CObjectCollectionViewComp::OnEvent(const imtbase::IObjectCollection* /*objectCollection*/, const imtbase::IObjectCollectionEvent* event)
+{
+	const imtbase::CObjectCollectionInsertEvent* insertEventPtr = dynamic_cast<const imtbase::CObjectCollectionInsertEvent*>(event);
+	if (insertEventPtr != nullptr){
+		UpdateItem(insertEventPtr->GetItemId(), m_itemModelPtr);
+		return;
+	}
+
+	const imtbase::CObjectCollectionUpdateDataEvent* updateDataEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateDataEvent*>(event);
+	if (updateDataEventPtr != nullptr){
+		UpdateItem(updateDataEventPtr->GetItemId(), m_itemModelPtr);
+		return;
+	}
+
+	const imtbase::CObjectCollectionRemoveEvent* removeEventPtr = dynamic_cast<const imtbase::CObjectCollectionRemoveEvent*>(event);
+	if (removeEventPtr != nullptr){
+		RemoveItem(removeEventPtr->GetItemId());
+		return;
+	}
+
+	const imtbase::CObjectCollectionUpdateNameEvent* updateNameEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateNameEvent*>(event);
+	if (updateNameEventPtr != nullptr){
+		UpdateItem(updateNameEventPtr->GetItemId(), m_itemModelPtr);
+		return;
+	}
+
+	const imtbase::CObjectCollectionUpdateDescriptionEvent* updateDescriptionEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateDescriptionEvent*>(event);
+	if (updateDescriptionEventPtr != nullptr){
+		UpdateItem(updateDescriptionEventPtr->GetItemId(), m_itemModelPtr);
+		return;
+	}
+}
+
+
 // reimplemented (ibase::IProgressManager)
 
 int CObjectCollectionViewComp::BeginProgressSession(
-			const QByteArray& progressId,
-			const QString& description,
-			bool isCancelable)
+			const QByteArray& /*progressId*/,
+			const QString& /*description*/,
+			bool /*isCancelable*/)
 {
 	if (IsGuiCreated()){
 		Message->setText(tr("Reading collection..."));
@@ -55,7 +97,7 @@ int CObjectCollectionViewComp::BeginProgressSession(
 }
 
 
-void CObjectCollectionViewComp::EndProgressSession(int sessionId)
+void CObjectCollectionViewComp::EndProgressSession(int /*sessionId*/)
 {
 	if (IsGuiCreated()){
 		Progress->setValue(0);
@@ -65,7 +107,7 @@ void CObjectCollectionViewComp::EndProgressSession(int sessionId)
 }
 
 
-void CObjectCollectionViewComp::OnProgress(int sessionId, double currentProgress)
+void CObjectCollectionViewComp::OnProgress(int /*sessionId*/, double currentProgress)
 {
 	if (IsGuiCreated()){
 		Message->setText(tr("Reading collection..."));
@@ -75,7 +117,7 @@ void CObjectCollectionViewComp::OnProgress(int sessionId, double currentProgress
 	}
 }
 
-bool CObjectCollectionViewComp::IsCanceled(int sessionId) const
+bool CObjectCollectionViewComp::IsCanceled(int /*sessionId*/) const
 {
 	return false;
 }
@@ -102,17 +144,16 @@ const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const 
 
 void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 {
-	QByteArray columnSettingsKey = *m_columnSettingsKeyAttrPtr;
-	if (columnSettingsKey.isEmpty()){
+	if ((*m_columnSettingsKeyAttrPtr).isEmpty()){
 		return;
 	}
 
-	QByteArray key("ObjectCollectionViewColumnsSettings/" + columnSettingsKey);
-	if (!settings.contains(key)){
+	QByteArray settingsKey("ObjectCollectionViewColumnsSettings/" + *m_columnSettingsKeyAttrPtr);
+	if (!settings.contains(settingsKey)){
 		return;
 	}
 	
-	QVariant settingsValue = settings.value(key);
+	QVariant settingsValue = settings.value(settingsKey);
 	if (settingsValue.type() != QVariant::ByteArray){
 		return;
 	}
@@ -180,8 +221,7 @@ void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 
 void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 {
-	QByteArray columnSettingsKey = *m_columnSettingsKeyAttrPtr;
-	if (columnSettingsKey.isEmpty()){
+	if ((*m_columnSettingsKeyAttrPtr).isEmpty()){
 		return;
 	}
 
@@ -216,7 +256,7 @@ void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 
 	settings.beginGroup("ObjectCollectionViewColumnsSettings");
 
-	settings.setValue(columnSettingsKey, data);
+	settings.setValue(*m_columnSettingsKeyAttrPtr, data);
 
 	settings.endGroup();
 }
@@ -224,9 +264,11 @@ void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
-void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 {
-	StartUpdate();
+	if (changeSet.Contains(istd::IChangeable::CF_ALL_DATA)){
+		StartUpdate();
+	}
 }
 
 
@@ -244,6 +286,8 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 	for (ViewDelegateMap::Iterator iter = m_viewDelegateMap.begin(); iter != m_viewDelegateMap.end(); ++iter){
 		iter.value()->InitializeDelegate(objectPtr, this);
 	}
+
+	StartUpdate();
 }
 
 
@@ -440,6 +484,77 @@ CObjectCollectionViewComp::ObjectMetaInfo CObjectCollectionViewComp::GetMetaInfo
 	}
 
 	return result;
+}
+
+
+void CObjectCollectionViewComp::UpdateItem(const imtbase::IObjectCollectionInfo::Id& objectId, QStandardItemModel* modelPtr)
+{
+	imtbase::IObjectCollection* objectCollectionPtr = GetObservedObject();
+	Q_ASSERT(objectCollectionPtr != nullptr);
+
+	int row = -1;
+	for (int i = 0; i < modelPtr->rowCount(); i++){
+		if (modelPtr->item(i)->data(DR_OBJECT_ID) == objectId){
+			row = i;
+			break;
+		}
+	}
+
+	QByteArray itemTypeId = objectCollectionPtr->GetObjectTypeId(objectId);
+
+	ObjectMetaInfo metaInfo = GetMetaInfo(objectId, itemTypeId);
+	if (metaInfo.isEmpty()){
+		return;
+	}
+
+	QList<QStandardItem*> columns;
+
+	//for (ICollectionViewDelegate::SummaryInformation metaInfoItem : metaInfo){
+	for (int i = 0; i < metaInfo.count(); i++){
+		if (row == -1){
+			QStandardItem* column = new QStandardItem(metaInfo[i].text);
+
+			column->setData(metaInfo[i].sortValue, DR_SORT_VALUE);
+			if (!metaInfo[i].icon.isNull()){
+				column->setIcon(metaInfo[i].icon);
+			}
+
+			columns.append(column);
+		}
+		else{
+			QStandardItem* column = modelPtr->item(row, i);
+
+			column->setText(metaInfo[i].text);
+			column->setData(metaInfo[i].sortValue, DR_SORT_VALUE);
+			if (!metaInfo[i].icon.isNull()){
+				column->setIcon(metaInfo[i].icon);
+			}
+		}
+	}
+
+	if (row == -1){
+		Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+		if (objectCollectionPtr->GetSupportedOperations() & imtbase::IObjectCollection::OF_SUPPORT_RENAME){
+			flags |= Qt::ItemIsEditable;
+		}
+
+		columns[0]->setData(objectId, DR_OBJECT_ID);
+		columns[0]->setData(objectCollectionPtr->GetElementInfo(objectId, imtbase::IObjectCollectionInfo::EIT_TYPE_ID), DR_TYPE_ID);
+		columns[0]->setFlags(flags);
+
+		modelPtr->appendRow(columns);
+	}
+}
+
+
+void CObjectCollectionViewComp::RemoveItem(const imtbase::IObjectCollectionInfo::Id& objectId)
+{
+	for (int i = 0; i < m_itemModelPtr->rowCount(); i++){
+		if (m_itemModelPtr->item(i)->data(DR_OBJECT_ID) == objectId){
+			m_itemModelPtr->removeRow(i);
+			break;
+		}
+	}
 }
 
 
@@ -855,7 +970,7 @@ void CObjectCollectionViewComp::OnSectionResized(int logicalIndex, int /*oldSize
 }
 
 
-void CObjectCollectionViewComp::OnSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex)
+void CObjectCollectionViewComp::OnSectionMoved(int logicalIndex, int /*oldVisualIndex*/, int /*newVisualIndex*/)
 {
 	if (m_semaphoreCounter > 0){
 		return;
@@ -880,10 +995,10 @@ void CObjectCollectionViewComp::OnSectionMoved(int logicalIndex, int oldVisualIn
 		QHeaderView *headerPtr = ItemList->header();
 
 		for (int i = 0; i < ids.count(); i++){
-			int logicalIndex = headerPtr->logicalIndex(i);
+			int index = headerPtr->logicalIndex(i);
 
-			if (!infos[logicalIndex].isFixed){
-				movable.enqueue(logicalIndex);
+			if (!infos[index].isFixed){
+				movable.enqueue(index);
 			}
 		}
 
@@ -1263,36 +1378,7 @@ void CObjectCollectionViewComp::UpdateThread::run()
 			int count = collectionItemIds.count();
 
 			for (int i = 0; i < count; i++){
-				QByteArray itemId = collectionItemIds[i];
-				QByteArray itemTypeId = objectCollectionPtr->GetObjectTypeId(itemId);
-
-				QList<QStandardItem*> columns;
-				ObjectMetaInfo metaInfo = m_parentPtr->GetMetaInfo(itemId, itemTypeId);
-
-				if (metaInfo.isEmpty()){
-					continue;
-				}
-
-				for (ICollectionViewDelegate::SummaryInformation metaInfoItem : metaInfo){
-					QStandardItem* column = new QStandardItem(metaInfoItem.text);
-					if (!metaInfoItem.icon.isNull()){
-						column->setIcon(metaInfoItem.icon);
-					}
-					column->setData(metaInfoItem.sortValue, DR_SORT_VALUE);
-
-					columns.append(column);
-				}
-
-				Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-				if (objectCollectionPtr->GetSupportedOperations() & imtbase::IObjectCollection::OF_SUPPORT_RENAME){
-					flags |= Qt::ItemIsEditable;
-				}
-
-				columns[0]->setData(itemId, DR_OBJECT_ID);
-				columns[0]->setData(objectCollectionPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_TYPE_ID), DR_TYPE_ID);
-				columns[0]->setFlags(flags);
-
-				m_itemModelPtr->appendRow(columns);
+				m_parentPtr->UpdateItem(collectionItemIds[i], m_itemModelPtr);
 
 				int currentProgress = i * 100 / count;
 				if (progress != currentProgress){

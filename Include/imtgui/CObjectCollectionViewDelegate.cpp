@@ -328,7 +328,7 @@ void CObjectCollectionViewDelegate::OnDuplicate()
 {
 	Q_ASSERT(m_collectionPtr != nullptr);
 
-	imtbase::ICollectionInfo::Ids selectedIds = m_selectedItemIds;
+	imtbase::ICollectionInfo::Ids selectedIds(m_selectedItemIds);
 
 	for (const QByteArray& selectedItemId : selectedIds){
 		imtbase::IObjectCollection::DataPtr sourceDataPtr;
@@ -358,7 +358,11 @@ void CObjectCollectionViewDelegate::OnDuplicate()
 
 void CObjectCollectionViewDelegate::OnRemove()
 {
-	RemoveObjects(m_selectedItemIds);
+	Q_ASSERT(m_collectionPtr != nullptr);
+
+	imtbase::ICollectionInfo::Ids selectedIds(m_selectedItemIds);
+
+	RemoveObjects(selectedIds);
 }
 
 
