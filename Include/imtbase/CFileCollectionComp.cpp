@@ -221,8 +221,8 @@ QByteArray CFileCollectionComp::InsertFile(
 
 		locker.unlock();
 
+		CObjectCollectionInsertEvent event(fileId);
 		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-			CObjectCollectionInsertEvent event(fileId);
 			eventHandlerPtr->OnEvent(this, &event);
 		}
 
@@ -292,8 +292,8 @@ bool CFileCollectionComp::UpdateFile(
 
 		locker.unlock();
 
+		CObjectCollectionUpdateDataEvent event(objectId);
 		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-			CObjectCollectionUpdateDataEvent event(objectId);
 			eventHandlerPtr->OnEvent(this, &event);
 		}
 
@@ -460,8 +460,8 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 			repositoryDataLocker.unlock();
 		}
 
+		CObjectCollectionRemoveEvent event(objectId);
 		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-			CObjectCollectionRemoveEvent event(objectId);
 			eventHandlerPtr->OnEvent(this, &event);
 		}
 
@@ -628,8 +628,8 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 
 			locker.unlock();
 
+			CObjectCollectionUpdateNameEvent event(objectId, objectName);
 			for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-				CObjectCollectionUpdateNameEvent event(objectId, objectName);
 				eventHandlerPtr->OnEvent(this, &event);
 			}
 
@@ -662,8 +662,8 @@ void CFileCollectionComp::SetObjectDescription(const QByteArray& objectId, const
 
 			locker.unlock();
 
+			CObjectCollectionUpdateDescriptionEvent event(objectId, objectDescription);
 			for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-				CObjectCollectionUpdateDescriptionEvent event(objectId, objectDescription);
 				eventHandlerPtr->OnEvent(this, &event);
 			}
 		}
