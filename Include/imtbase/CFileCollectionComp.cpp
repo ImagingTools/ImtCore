@@ -221,9 +221,9 @@ QByteArray CFileCollectionComp::InsertFile(
 
 		locker.unlock();
 
-		CObjectCollectionInsertEvent event(fileId);
+		IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr(new CObjectCollectionInsertEvent(fileId));
 		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-			eventHandlerPtr->OnEvent(this, &event);
+			eventHandlerPtr->OnObjectCollectionEventAsync(this, eventPtr);
 		}
 
 		return fileId;
@@ -292,9 +292,9 @@ bool CFileCollectionComp::UpdateFile(
 
 		locker.unlock();
 
-		CObjectCollectionUpdateDataEvent event(objectId);
+		IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr(new CObjectCollectionUpdateDataEvent(objectId));
 		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-			eventHandlerPtr->OnEvent(this, &event);
+			eventHandlerPtr->OnObjectCollectionEventAsync(this, eventPtr);
 		}
 
 		return true;
@@ -460,9 +460,9 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 			repositoryDataLocker.unlock();
 		}
 
-		CObjectCollectionRemoveEvent event(objectId);
+		IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr(new CObjectCollectionRemoveEvent(objectId));
 		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-			eventHandlerPtr->OnEvent(this, &event);
+			eventHandlerPtr->OnObjectCollectionEventAsync(this, eventPtr);
 		}
 
 		return true;
@@ -628,9 +628,9 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 
 			locker.unlock();
 
-			CObjectCollectionUpdateNameEvent event(objectId, objectName);
+			IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr(new CObjectCollectionUpdateNameEvent(objectId, objectName));
 			for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-				eventHandlerPtr->OnEvent(this, &event);
+				eventHandlerPtr->OnObjectCollectionEventAsync(this, eventPtr);
 			}
 
 			return;
@@ -662,9 +662,9 @@ void CFileCollectionComp::SetObjectDescription(const QByteArray& objectId, const
 
 			locker.unlock();
 
-			CObjectCollectionUpdateDescriptionEvent event(objectId, objectDescription);
+			IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr(new CObjectCollectionUpdateDescriptionEvent(objectId, objectDescription));
 			for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-				eventHandlerPtr->OnEvent(this, &event);
+				eventHandlerPtr->OnObjectCollectionEventAsync(this, eventPtr);
 			}
 		}
 	}

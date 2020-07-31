@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <istd/IPolymorphic.h>
+#include <istd/TSmartPtr.h>
 
 
 namespace imtbase
@@ -17,7 +18,12 @@ class IObjectCollectionEvent;
 class IObjectCollectionEventHandler: virtual public istd::IPolymorphic
 {
 public:
-	virtual void OnEvent(const IObjectCollection* objectCollection, const IObjectCollectionEvent* event) = 0;
+	typedef const imtbase::IObjectCollection* ObjectCollectionPtr;
+	typedef istd::TSmartPtr<IObjectCollectionEvent> ObjectCollectionEventPtr;
+
+	virtual void OnObjectCollectionEventAsync(
+				ObjectCollectionPtr objectCollectionPtr,
+				ObjectCollectionEventPtr eventPtr) = 0;
 };
 
 

@@ -39,44 +39,21 @@ CObjectCollectionViewComp::CObjectCollectionViewComp()
 	:m_semaphoreCounter(0),
 	m_currentInformationViewPtr(nullptr),
 	m_updateThread(this),
-	m_updateThreadState(UTS_IDLE)
+	m_updateThreadState(UTS_IDLE),
+	m_itemModelPtr(&m_itemModel1)
 {
 	m_commands.SetParent(this);
 }
 
 
 // reimplemented (imtbase::IObjectCollectionEventHandler)
-void CObjectCollectionViewComp::OnEvent(const imtbase::IObjectCollection* /*objectCollection*/, const imtbase::IObjectCollectionEvent* event)
+void CObjectCollectionViewComp::OnObjectCollectionEventAsync(
+			imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
+			imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr)
 {
-	const imtbase::CObjectCollectionInsertEvent* insertEventPtr = dynamic_cast<const imtbase::CObjectCollectionInsertEvent*>(event);
-	if (insertEventPtr != nullptr){
-		UpdateItem(insertEventPtr->GetItemId(), m_itemModelPtr);
-		return;
-	}
+	QMetaObject::invokeMethod(this, "OnObjectCollectionEventSync", Q_ARG(imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr, objectCollectionPtr), Q_ARG(imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr, eventPtr));
 
-	const imtbase::CObjectCollectionUpdateDataEvent* updateDataEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateDataEvent*>(event);
-	if (updateDataEventPtr != nullptr){
-		UpdateItem(updateDataEventPtr->GetItemId(), m_itemModelPtr);
-		return;
-	}
-
-	const imtbase::CObjectCollectionRemoveEvent* removeEventPtr = dynamic_cast<const imtbase::CObjectCollectionRemoveEvent*>(event);
-	if (removeEventPtr != nullptr){
-		RemoveItem(removeEventPtr->GetItemId());
-		return;
-	}
-
-	const imtbase::CObjectCollectionUpdateNameEvent* updateNameEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateNameEvent*>(event);
-	if (updateNameEventPtr != nullptr){
-		UpdateItem(updateNameEventPtr->GetItemId(), m_itemModelPtr);
-		return;
-	}
-
-	const imtbase::CObjectCollectionUpdateDescriptionEvent* updateDescriptionEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateDescriptionEvent*>(event);
-	if (updateDescriptionEventPtr != nullptr){
-		UpdateItem(updateDescriptionEventPtr->GetItemId(), m_itemModelPtr);
-		return;
-	}
+	BaseClass::OnObjectCollectionEventAsync(objectCollectionPtr, eventPtr);
 }
 
 
@@ -859,6 +836,42 @@ void CObjectCollectionViewComp::OnUpdateFinished()
 }
 
 
+void CObjectCollectionViewComp::OnObjectCollectionEventSync(
+			imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
+			imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr)
+{
+	const imtbase::CObjectCollectionInsertEvent* insertEventPtr = dynamic_cast<const imtbase::CObjectCollectionInsertEvent*>(eventPtr.GetPtr());
+	if (insertEventPtr != nullptr){
+		UpdateItem(insertEventPtr->GetItemId(), m_itemModelPtr);
+		return;
+	}
+
+	const imtbase::CObjectCollectionUpdateDataEvent* updateDataEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateDataEvent*>(eventPtr.GetPtr());
+	if (updateDataEventPtr != nullptr){
+		UpdateItem(updateDataEventPtr->GetItemId(), m_itemModelPtr);
+		return;
+	}
+
+	const imtbase::CObjectCollectionRemoveEvent* removeEventPtr = dynamic_cast<const imtbase::CObjectCollectionRemoveEvent*>(eventPtr.GetPtr());
+	if (removeEventPtr != nullptr){
+		RemoveItem(removeEventPtr->GetItemId());
+		return;
+	}
+
+	const imtbase::CObjectCollectionUpdateNameEvent* updateNameEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateNameEvent*>(eventPtr.GetPtr());
+	if (updateNameEventPtr != nullptr){
+		UpdateItem(updateNameEventPtr->GetItemId(), m_itemModelPtr);
+		return;
+	}
+
+	const imtbase::CObjectCollectionUpdateDescriptionEvent* updateDescriptionEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateDescriptionEvent*>(eventPtr.GetPtr());
+	if (updateDescriptionEventPtr != nullptr){
+		UpdateItem(updateDescriptionEventPtr->GetItemId(), m_itemModelPtr);
+		return;
+	}
+}
+
+
 void CObjectCollectionViewComp::UpdateTypeStatus()
 {
 	for (int delegateIndex = 0; delegateIndex < m_viewDelegatesCompPtr.GetCount(); ++delegateIndex){
@@ -1331,7 +1344,9 @@ istd::IFactoryInfo::KeyList CObjectCollectionViewComp::FocusDecorationFactory::G
 // public methods of embedded class UpdateThread
 
 CObjectCollectionViewComp::UpdateThread::UpdateThread(CObjectCollectionViewComp* parentPtr)
-	:m_parentPtr(parentPtr)
+	:m_parentPtr(parentPtr),
+	m_typeModelPtr(nullptr),
+	m_itemModelPtr(nullptr)
 {
 }
 
@@ -1351,6 +1366,8 @@ void CObjectCollectionViewComp::UpdateThread::run()
 {
 	imtbase::IObjectCollection* objectCollectionPtr = m_parentPtr->GetObservedObject();
 	Q_ASSERT(objectCollectionPtr != nullptr);
+	Q_ASSERT(m_typeModelPtr != nullptr);
+	Q_ASSERT(m_itemModelPtr != nullptr);
 
 	{
 		m_typeModelPtr->clear();

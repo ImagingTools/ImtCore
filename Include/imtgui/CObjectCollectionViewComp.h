@@ -21,7 +21,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtbase/IObjectCollectionEventHandler.h>
+#include <imtbase/TObjectCollectionEventHandlerCompWrap.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
 #include <GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h>
 
@@ -31,20 +31,20 @@ namespace imtgui
 
 
 class CObjectCollectionViewComp:
-			public iqtgui::TRestorableGuiWrap<
-						iqtgui::TDesignerGuiObserverCompBase<
-									Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>,
-	private imod::CMultiModelDispatcherBase,
-	virtual public ibase::IProgressManager,
-	virtual public imtbase::IObjectCollectionEventHandler
+			public imtbase::TObjectCollectionEventHandlerCompWrap<
+						iqtgui::TRestorableGuiWrap<
+									iqtgui::TDesignerGuiObserverCompBase<
+												Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>>,
+			public imod::CMultiModelDispatcherBase,
+			virtual public ibase::IProgressManager
 {
 	Q_OBJECT
 public:
-	typedef iqtgui::TRestorableGuiWrap<
-				iqtgui::TDesignerGuiObserverCompBase<
-							Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>> BaseClass;
+	typedef imtbase::TObjectCollectionEventHandlerCompWrap<
+				iqtgui::TRestorableGuiWrap<
+							iqtgui::TDesignerGuiObserverCompBase<
+										Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>> BaseClass;
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
-	typedef ibase::IProgressManager BaseClass3;
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
 		I_REGISTER_INTERFACE(ibase::IProgressManager);
@@ -76,7 +76,9 @@ public:
 	CObjectCollectionViewComp();
 
 	// reimplemented (imtbase::IObjectCollectionEventHandler)
-	virtual void OnEvent(const imtbase::IObjectCollection* objectCollection, const imtbase::IObjectCollectionEvent* event);
+	virtual void OnObjectCollectionEventAsync(
+				imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
+				imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr) override;
 
 	// reimplemented (ibase::IProgressManager)
 	virtual int BeginProgressSession(
@@ -215,6 +217,10 @@ private:
 	void StartUpdate();
 	Q_INVOKABLE void OnUpdateProgress(int progress);
 	Q_INVOKABLE void OnUpdateFinished();
+
+	Q_INVOKABLE void OnObjectCollectionEventSync(
+				imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
+				imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr);
 
 	bool eventFilter(QObject *object, QEvent *event);
 
