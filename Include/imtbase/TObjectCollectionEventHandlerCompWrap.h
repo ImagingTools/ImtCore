@@ -51,6 +51,6 @@ Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr);
 Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr);
 
 
-} // namespace aculainspgui
+} // namespace imtbase
 
 
