@@ -75,8 +75,8 @@ public:
 
 	CObjectCollectionViewComp();
 
-	// reimplemented (imtbase::IObjectCollectionEventHandler)
-	virtual void OnObjectCollectionEventAsync(
+	// reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
+	virtual void ProcessCollectionEvent(
 				imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
 				imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr) override;
 

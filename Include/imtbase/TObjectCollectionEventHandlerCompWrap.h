@@ -53,11 +53,6 @@ void TObjectCollectionEventHandlerCompWrap<Base>::OnObjectCollectionEventAsync(
 }
 
 
-// MOVE TO Async implementation
-Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr);
-Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr);
-
-
 typedef imtbase::TObjectCollectionEventHandlerCompWrap<icomp::CComponentBase> CObjectCollectionEventHandlerCompBase;
 
 

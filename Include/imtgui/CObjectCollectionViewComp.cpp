@@ -46,14 +46,12 @@ CObjectCollectionViewComp::CObjectCollectionViewComp()
 }
 
 
-// reimplemented (imtbase::IObjectCollectionEventHandler)
-void CObjectCollectionViewComp::OnObjectCollectionEventAsync(
+// reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
+void CObjectCollectionViewComp::ProcessCollectionEvent(
 			imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
 			imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr)
 {
 	QMetaObject::invokeMethod(this, "OnObjectCollectionEventSync", Q_ARG(imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr, objectCollectionPtr), Q_ARG(imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr, eventPtr));
-
-	BaseClass::OnObjectCollectionEventAsync(objectCollectionPtr, eventPtr);
 }
 
 
@@ -1408,6 +1406,10 @@ void CObjectCollectionViewComp::UpdateThread::run()
 
 	QMetaObject::invokeMethod(m_parentPtr, "OnUpdateFinished", Qt::QueuedConnection);
 }
+
+
+Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr);
+Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr);
 
 
 } // namespace imtgui
