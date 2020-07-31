@@ -32,6 +32,10 @@ public:
 				ObjectCollectionPtr objectCollectionPtr,
 				ObjectCollectionEventPtr eventPtr) override;
 
+protected:
+	virtual void ProcessCollectionEvent(
+				ObjectCollectionPtr objectCollectionPtr,
+				ObjectCollectionEventPtr eventPtr) = 0;
 private:
 	I_REF(IObjectCollectionEventHandler, m_slaveEventHandlerCompPtr);
 };
@@ -41,12 +45,15 @@ void TObjectCollectionEventHandlerCompWrap<Base>::OnObjectCollectionEventAsync(
 			ObjectCollectionPtr objectCollectionPtr,
 			ObjectCollectionEventPtr eventPtr)
 {
+	ProcessCollectionEvent(objectCollectionPtr, eventPtr);
+
 	if (m_slaveEventHandlerCompPtr.IsValid()){
 		m_slaveEventHandlerCompPtr->OnObjectCollectionEventAsync(objectCollectionPtr, eventPtr);
 	}
 }
 
 
+// MOVE TO Async implementation
 Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr);
 Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr);
 
