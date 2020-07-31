@@ -5,7 +5,7 @@
 #include <QtCore/QMetaType>
 
 // ACF includes
-#include <icomp/IComponent.h>
+#include <icomp/CComponentBase.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionEventHandler.h>
