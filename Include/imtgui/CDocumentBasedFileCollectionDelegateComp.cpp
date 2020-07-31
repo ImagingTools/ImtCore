@@ -62,7 +62,7 @@ QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(
 		objectInfoPtr->typeId = typeId;
 
 		if (m_documentManagerCompPtr->InsertNewDocument(typeId, true, "", &objectInfoPtr->objectPtr)){
-			m_workingObjects.PushBack(objectInfoPtr);
+			m_openedDocuments.PushBack(objectInfoPtr);
 
 			return "Default";
 		}
@@ -91,8 +91,8 @@ void CDocumentBasedFileCollectionDelegateComp::RemoveObjects(const imtbase::ICol
 		for (const QByteArray& id : objectIds){
 			bool isRemoveAccepted = true;
 
-			for (int i = 0; i < m_workingObjects.GetCount(); i++){
-				ObjectInfo* objectInfoPtr = m_workingObjects.GetAt(i);
+			for (int i = 0; i < m_openedDocuments.GetCount(); i++){
+				ObjectInfo* objectInfoPtr = m_openedDocuments.GetAt(i);
 				bool isFound = false;
 
 				if (id == objectInfoPtr->uuid){
@@ -172,10 +172,10 @@ bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(
 
 	ObjectInfo* objectInfoPtr = nullptr;
 	bool isAlreadyOpened = false;
-	for (int i = 0; i < m_workingObjects.GetCount(); ++i){
-		if (m_workingObjects.GetAt(i)->uuid == objectId){
+	for (int i = 0; i < m_openedDocuments.GetCount(); ++i){
+		if (m_openedDocuments.GetAt(i)->uuid == objectId){
 			isAlreadyOpened = true;
-			objectInfoPtr = m_workingObjects.GetAt(i);
+			objectInfoPtr = m_openedDocuments.GetAt(i);
 			break;
 		}
 	}
@@ -207,12 +207,11 @@ bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(
 	istd::CSystem::EnsurePathExists(tempPath);
 
 	QString tempFilePath = tempPath + "/" + objectInfoPtr->name + "." + QFileInfo(fileInfo.fileName).suffix();
-	objectInfoPtr->tempFilePath = tempFilePath;
 
 	QString targetFilePath = fileCollectionPtr->GetFile(objectId, tempFilePath);
 	if (!targetFilePath.isEmpty()){
 		if (m_documentManagerCompPtr->OpenDocument(&objectInfoPtr->typeId, &targetFilePath, true, viewTypeId, &objectInfoPtr->objectPtr)){
-			m_workingObjects.PushBack(objectInfoPtr);
+			m_openedDocuments.PushBack(objectInfoPtr);
 
 			QDir tempDir(tempPath);
 			tempDir.removeRecursively();
@@ -279,7 +278,7 @@ void CDocumentBasedFileCollectionDelegateComp::OnComponentCreated()
 
 void CDocumentBasedFileCollectionDelegateComp::OnComponentDestroyed()
 {
-	m_workingObjects.Reset();
+	m_openedDocuments.Reset();
 
 	if (m_documentManagerModelCompPtr.IsValid()){
 		m_documentManagerModelCompPtr->DetachObserver(&m_documentManagerObserver);
@@ -347,23 +346,7 @@ int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::LoadFromFi
 		QStringList extensions;
 		if (m_parent.m_filePersistenceCompPtr->GetFileExtensions(extensions, &data, ifile::IFileTypeInfo::QF_LOAD)){
 			if (extensions.contains(fileExtension, Qt::CaseInsensitive)){
-				int retVal = m_parent.m_filePersistenceCompPtr->LoadFromFile(data, filePath, progressManagerPtr);
-				if (retVal == ifile::IFilePersistence::OS_OK){
-					for (int documentIndex = 0; documentIndex < m_parent.m_workingObjects.GetCount(); ++documentIndex){
-						ICollectionViewDelegate::ObjectInfo* objectInfoPtr = m_parent.m_workingObjects.GetAt(documentIndex);
-						Q_ASSERT(objectInfoPtr != NULL);
-
-						if (filePath == objectInfoPtr->tempFilePath){
-							idoc::IDocumentMetaInfo* documentMetaInfoPtr = CompCastPtr<idoc::IDocumentMetaInfo>(&data);
-							if (documentMetaInfoPtr != NULL){
-								documentMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectInfoPtr->description);
-								documentMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE, objectInfoPtr->name);
-							}
-						}
-					}
-
-					return retVal;
-				}
+				return m_parent.m_filePersistenceCompPtr->LoadFromFile(data, filePath, progressManagerPtr);
 			}
 		}
 	}
@@ -375,51 +358,45 @@ int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::LoadFromFi
 int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::SaveToFile(
 			const istd::IChangeable& data,
 			const QString& filePath,
-			ibase::IProgressManager* progressManagerPtr) const
+			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	if (m_parent.m_collectionPtr != NULL){
-		for (int i = 0; i < m_parent.m_workingObjects.GetCount(); ++i){
-			ICollectionViewDelegate::ObjectInfo* objectInfoPtr = m_parent.m_workingObjects.GetAt(i);
+		for (int i = 0; i < m_parent.m_openedDocuments.GetCount(); ++i){
+			ICollectionViewDelegate::ObjectInfo* objectInfoPtr = m_parent.m_openedDocuments.GetAt(i);
 			Q_ASSERT(objectInfoPtr != nullptr);
 
 			if (objectInfoPtr->objectPtr == &data){
 				QString fileExtension = QFileInfo(filePath).suffix();
 				QByteArray typeId = objectInfoPtr->typeId;
 
-				QString tempFilePath = QDir::tempPath() + "/" + QUuid::createUuid().toString() + "." + fileExtension;
-				objectInfoPtr->tempFilePath = tempFilePath;
+				QString objectName = QFileInfo(filePath).completeBaseName();
 
-				int saveState = m_parent.m_filePersistenceCompPtr->SaveToFile(data, tempFilePath, progressManagerPtr);
-				if (saveState == ifile::IFilePersistence::OS_OK){
-					QString objectName = QFileInfo(filePath).completeBaseName();
-
-					// If the object-ID is empty, we have to insert a new instance to the collection:
-					if (objectInfoPtr->uuid.isEmpty()){
-						QString description;
-						const idoc::IDocumentMetaInfo* documentMetaInfoPtr = CompCastPtr<idoc::IDocumentMetaInfo>(&data);
-						if (documentMetaInfoPtr != NULL){
-							description = documentMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
-						}
-
-						QByteArray objectId = m_parent.m_collectionPtr->InsertNewObject(typeId, objectName, description, &data);
-						if (!objectId.isEmpty()){
-							objectInfoPtr->uuid = objectId;
-							objectInfoPtr->name = objectName;
-							objectInfoPtr->description = description;
-
-							return OS_OK;
-						}
-
-						return OS_FAILED;
+				// If the object-ID is empty, we have to insert a new instance to the collection:
+				if (objectInfoPtr->uuid.isEmpty()){
+					QString description;
+					const idoc::IDocumentMetaInfo* documentMetaInfoPtr = CompCastPtr<idoc::IDocumentMetaInfo>(&data);
+					if (documentMetaInfoPtr != NULL){
+						description = documentMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
 					}
-					// An existing object in the collection should be updated:
-					else{
-						if (m_parent.UpdateObject(objectInfoPtr->uuid, data)){
-							return OS_OK;
-						}
 
-						return OS_FAILED;
+					QByteArray objectId = m_parent.m_collectionPtr->InsertNewObject(typeId, objectName, description, &data);
+					if (!objectId.isEmpty()){
+						objectInfoPtr->uuid = objectId;
+						objectInfoPtr->name = objectName;
+						objectInfoPtr->description = description;
+
+						return OS_OK;
 					}
+
+					return OS_FAILED;
+				}
+				// An existing object in the collection should be updated:
+				else{
+					if (m_parent.UpdateObject(objectInfoPtr->uuid, data)){
+						return OS_OK;
+					}
+
+					return OS_FAILED;
 				}
 			}
 		}
@@ -433,8 +410,8 @@ int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::SaveToFile
 
 bool CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr, int flags, bool doAppend) const
 {
-	for (int i = 0; i < m_parent.m_workingObjects.GetCount(); ++i){
-		const ICollectionViewDelegate::ObjectInfo* documentInfoPtr = m_parent.m_workingObjects.GetAt(i);
+	for (int i = 0; i < m_parent.m_openedDocuments.GetCount(); ++i){
+		const ICollectionViewDelegate::ObjectInfo* documentInfoPtr = m_parent.m_openedDocuments.GetAt(i);
 		Q_ASSERT(documentInfoPtr != NULL);
 
 		if ((dataObjectPtr != NULL) && (dataObjectPtr == documentInfoPtr->objectPtr) && m_parent.m_filePersistenceCompPtr.IsValid()){
@@ -469,8 +446,8 @@ void CDocumentBasedFileCollectionDelegateComp::DocumentManagerObserver::OnUpdate
 	if (changeSet.ContainsExplicit(idoc::IDocumentManager::CF_DOCUMENT_REMOVED)){
 		int documentsCount = m_parent.m_documentManagerCompPtr->GetDocumentsCount();
 
-		for (int i = 0; i < m_parent.m_workingObjects.GetCount(); ++i){
-			const istd::IChangeable* dataPtr = m_parent.m_workingObjects.GetAt(i)->objectPtr;
+		for (int i = 0; i < m_parent.m_openedDocuments.GetCount(); ++i){
+			const istd::IChangeable* dataPtr = m_parent.m_openedDocuments.GetAt(i)->objectPtr;
 
 			bool wasFound = false;
 			for (int documentIndex = 0; documentIndex < documentsCount; ++documentIndex){
@@ -482,7 +459,7 @@ void CDocumentBasedFileCollectionDelegateComp::DocumentManagerObserver::OnUpdate
 			}
 
 			if (!wasFound){
-				m_parent.m_workingObjects.RemoveAt(i);
+				m_parent.m_openedDocuments.RemoveAt(i);
 			}
 		}
 	}

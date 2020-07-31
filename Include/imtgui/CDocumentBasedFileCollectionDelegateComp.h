@@ -150,15 +150,17 @@ private:
 	*/
 	I_REF(iqtgui::IGuiObject, m_informationViewCompPtr);
 
+private:
 	ifile::IFileMetaInfoProvider::MetaInfoPtr m_selectedMetaInfoPtr;
 
-	typedef istd::TPointerVector<ICollectionViewDelegate::ObjectInfo> WorkingObjects;
-	mutable WorkingObjects m_workingObjects;
+	iqtgui::CHierarchicalCommand m_editContentsCommand;
 
 	ObjectPersistenceProxy m_collectionPersistence;
+
 	DocumentManagerObserver m_documentManagerObserver;
 
-	iqtgui::CHierarchicalCommand m_editContentsCommand;
+	typedef istd::TPointerVector<ICollectionViewDelegate::ObjectInfo> OpenedDocuments;
+	mutable OpenedDocuments m_openedDocuments;
 };
 
 

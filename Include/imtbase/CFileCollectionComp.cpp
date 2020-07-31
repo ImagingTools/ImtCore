@@ -372,7 +372,15 @@ QByteArray CFileCollectionComp::InsertNewObject(
 			QStringList supportedExts;
 			persistencePtr->GetFileExtensions(supportedExts, defaultValuePtr, ifile::IFilePersistence::QF_SAVE);
 
-			QString tempFilePath = GetTempDirectory() + "/ImtCore/" + QUuid::createUuid().toString() + "." + supportedExts[0];
+			QString targetFolder = GetTempDirectory() + "/ImtCore";
+
+			if (!istd::CSystem::EnsurePathExists(targetFolder)){
+				SendErrorMessage(0, QString(QObject::tr("Target folder '%1' could not be created")).arg(targetFolder));
+
+				return QByteArray();
+			}
+
+			QString tempFilePath = targetFolder + "/" + QUuid::createUuid().toString() + "." + supportedExts[0];
 
 			if (persistencePtr->SaveToFile(*newObjectPtr, tempFilePath) == ifile::IFilePersistence::OS_OK){
 				QByteArray retval = InsertFile(tempFilePath, typeId, name, QString(), proposedObjectId);
@@ -380,6 +388,9 @@ QByteArray CFileCollectionComp::InsertNewObject(
 				QFile::remove(tempFilePath);
 
 				return retval;
+			}
+			else{
+				SendErrorMessage(0, QString(QObject::tr("File could not be saved into '%1'")).arg(tempFilePath));
 			}
 		}
 	}

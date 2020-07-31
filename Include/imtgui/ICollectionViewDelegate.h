@@ -65,7 +65,6 @@ public:
 		QString description;
 		QByteArray typeId;
 		QString typeName;
-		QString tempFilePath;
 	};
 
 	struct HeaderInfo
