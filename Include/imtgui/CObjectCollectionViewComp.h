@@ -76,7 +76,7 @@ public:
 	CObjectCollectionViewComp();
 
 	// reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
-	virtual void ProcessCollectionEvent(
+	virtual void ProcessObjectCollectionEvent(
 				imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
 				imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr) override;
 
@@ -218,7 +218,7 @@ private:
 	Q_INVOKABLE void OnUpdateProgress(int progress);
 	Q_INVOKABLE void OnUpdateFinished();
 
-	Q_INVOKABLE void OnObjectCollectionEventSync(
+	Q_INVOKABLE void ProcessObjectCollectionEventSync(
 				imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
 				imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr);
 

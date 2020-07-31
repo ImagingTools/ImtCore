@@ -22,10 +22,8 @@
 
 // ImtCore includes
 #include <imtbase/CObjectCollectionInsertEvent.h>
-#include <imtbase/CObjectCollectionUpdateDataEvent.h>
+#include <imtbase/CObjectCollectionUpdateEvent.h>
 #include <imtbase/CObjectCollectionRemoveEvent.h>
-#include <imtbase/CObjectCollectionUpdateNameEvent.h>
-#include <imtbase/CObjectCollectionUpdateDescriptionEvent.h>
 
 
 namespace imtbase
@@ -223,7 +221,7 @@ QByteArray CFileCollectionComp::InsertFile(
 
 		IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr(new CObjectCollectionInsertEvent(fileId));
 		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-			eventHandlerPtr->OnObjectCollectionEventAsync(this, eventPtr);
+			eventHandlerPtr->OnObjectCollectionEvent(this, eventPtr);
 		}
 
 		return fileId;
@@ -292,9 +290,9 @@ bool CFileCollectionComp::UpdateFile(
 
 		locker.unlock();
 
-		IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr(new CObjectCollectionUpdateDataEvent(objectId));
+		IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr(new CObjectCollectionUpdateEvent(objectId, CObjectCollectionUpdateEvent::UT_DATA));
 		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-			eventHandlerPtr->OnObjectCollectionEventAsync(this, eventPtr);
+			eventHandlerPtr->OnObjectCollectionEvent(this, eventPtr);
 		}
 
 		return true;
@@ -462,7 +460,7 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 
 		IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr(new CObjectCollectionRemoveEvent(objectId));
 		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-			eventHandlerPtr->OnObjectCollectionEventAsync(this, eventPtr);
+			eventHandlerPtr->OnObjectCollectionEvent(this, eventPtr);
 		}
 
 		return true;
@@ -628,9 +626,9 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 
 			locker.unlock();
 
-			IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr(new CObjectCollectionUpdateNameEvent(objectId, objectName));
+			IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr(new CObjectCollectionUpdateEvent(objectId, CObjectCollectionUpdateEvent::UT_NAME));
 			for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-				eventHandlerPtr->OnObjectCollectionEventAsync(this, eventPtr);
+				eventHandlerPtr->OnObjectCollectionEvent(this, eventPtr);
 			}
 
 			return;
@@ -662,9 +660,9 @@ void CFileCollectionComp::SetObjectDescription(const QByteArray& objectId, const
 
 			locker.unlock();
 
-			IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr(new CObjectCollectionUpdateDescriptionEvent(objectId, objectDescription));
+			IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr(new CObjectCollectionUpdateEvent(objectId, CObjectCollectionUpdateEvent::UT_DESCRIPTION));
 			for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-				eventHandlerPtr->OnObjectCollectionEventAsync(this, eventPtr);
+				eventHandlerPtr->OnObjectCollectionEvent(this, eventPtr);
 			}
 		}
 	}

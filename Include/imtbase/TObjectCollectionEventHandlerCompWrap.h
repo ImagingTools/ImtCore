@@ -28,12 +28,12 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtbase::IObjectCollectionEventHandler)
-	virtual void OnObjectCollectionEventAsync(
+	virtual void OnObjectCollectionEvent(
 				ObjectCollectionPtr objectCollectionPtr,
 				ObjectCollectionEventPtr eventPtr) override;
 
 protected:
-	virtual void ProcessCollectionEvent(
+	virtual void ProcessObjectCollectionEvent(
 				ObjectCollectionPtr objectCollectionPtr,
 				ObjectCollectionEventPtr eventPtr) = 0;
 private:
@@ -41,19 +41,23 @@ private:
 };
 
 template <class Base>
-void TObjectCollectionEventHandlerCompWrap<Base>::OnObjectCollectionEventAsync(
+void TObjectCollectionEventHandlerCompWrap<Base>::OnObjectCollectionEvent(
 			ObjectCollectionPtr objectCollectionPtr,
 			ObjectCollectionEventPtr eventPtr)
 {
-	ProcessCollectionEvent(objectCollectionPtr, eventPtr);
+	ProcessObjectCollectionEvent(objectCollectionPtr, eventPtr);
 
 	if (m_slaveEventHandlerCompPtr.IsValid()){
-		m_slaveEventHandlerCompPtr->OnObjectCollectionEventAsync(objectCollectionPtr, eventPtr);
+		m_slaveEventHandlerCompPtr->OnObjectCollectionEvent(objectCollectionPtr, eventPtr);
 	}
 }
 
 
 typedef imtbase::TObjectCollectionEventHandlerCompWrap<icomp::CComponentBase> CObjectCollectionEventHandlerCompBase;
+
+
+Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr)
+Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr)
 
 
 } // namespace imtbase

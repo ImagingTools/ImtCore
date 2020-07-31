@@ -21,7 +21,7 @@ public:
 	typedef const imtbase::IObjectCollection* ObjectCollectionPtr;
 	typedef istd::TSmartPtr<IObjectCollectionEvent> ObjectCollectionEventPtr;
 
-	virtual void OnObjectCollectionEventAsync(
+	virtual void OnObjectCollectionEvent(
 				ObjectCollectionPtr objectCollectionPtr,
 				ObjectCollectionEventPtr eventPtr) = 0;
 };

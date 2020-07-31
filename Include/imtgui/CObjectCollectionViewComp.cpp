@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QMetaType>
 #include <QtCore/QUuid>
 #include <QtCore/QQueue>
 #include <QtCore/QDir>
@@ -23,10 +24,8 @@
 
 // ImtCore includes
 #include <imtbase/CObjectCollectionInsertEvent.h>
-#include <imtbase/CObjectCollectionUpdateDataEvent.h>
+#include <imtbase/CObjectCollectionUpdateEvent.h>
 #include <imtbase/CObjectCollectionRemoveEvent.h>
-#include <imtbase/CObjectCollectionUpdateNameEvent.h>
-#include <imtbase/CObjectCollectionUpdateDescriptionEvent.h>
 
 
 namespace imtgui
@@ -47,11 +46,11 @@ CObjectCollectionViewComp::CObjectCollectionViewComp()
 
 
 // reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
-void CObjectCollectionViewComp::ProcessCollectionEvent(
+void CObjectCollectionViewComp::ProcessObjectCollectionEvent(
 			imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
 			imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr)
 {
-	QMetaObject::invokeMethod(this, "OnObjectCollectionEventSync", Q_ARG(imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr, objectCollectionPtr), Q_ARG(imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr, eventPtr));
+	QMetaObject::invokeMethod(this, "ProcessObjectCollectionEventSync", Q_ARG(imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr, objectCollectionPtr), Q_ARG(imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr, eventPtr));
 }
 
 
@@ -834,7 +833,7 @@ void CObjectCollectionViewComp::OnUpdateFinished()
 }
 
 
-void CObjectCollectionViewComp::OnObjectCollectionEventSync(
+void CObjectCollectionViewComp::ProcessObjectCollectionEventSync(
 			imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
 			imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr)
 {
@@ -844,27 +843,15 @@ void CObjectCollectionViewComp::OnObjectCollectionEventSync(
 		return;
 	}
 
-	const imtbase::CObjectCollectionUpdateDataEvent* updateDataEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateDataEvent*>(eventPtr.GetPtr());
-	if (updateDataEventPtr != nullptr){
-		UpdateItem(updateDataEventPtr->GetItemId(), m_itemModelPtr);
+	const imtbase::CObjectCollectionUpdateEvent* updateEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateEvent*>(eventPtr.GetPtr());
+	if (updateEventPtr != nullptr){
+		UpdateItem(updateEventPtr->GetItemId(), m_itemModelPtr);
 		return;
 	}
 
 	const imtbase::CObjectCollectionRemoveEvent* removeEventPtr = dynamic_cast<const imtbase::CObjectCollectionRemoveEvent*>(eventPtr.GetPtr());
 	if (removeEventPtr != nullptr){
 		RemoveItem(removeEventPtr->GetItemId());
-		return;
-	}
-
-	const imtbase::CObjectCollectionUpdateNameEvent* updateNameEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateNameEvent*>(eventPtr.GetPtr());
-	if (updateNameEventPtr != nullptr){
-		UpdateItem(updateNameEventPtr->GetItemId(), m_itemModelPtr);
-		return;
-	}
-
-	const imtbase::CObjectCollectionUpdateDescriptionEvent* updateDescriptionEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateDescriptionEvent*>(eventPtr.GetPtr());
-	if (updateDescriptionEventPtr != nullptr){
-		UpdateItem(updateDescriptionEventPtr->GetItemId(), m_itemModelPtr);
 		return;
 	}
 }
@@ -1406,10 +1393,6 @@ void CObjectCollectionViewComp::UpdateThread::run()
 
 	QMetaObject::invokeMethod(m_parentPtr, "OnUpdateFinished", Qt::QueuedConnection);
 }
-
-
-Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr);
-Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr);
 
 
 } // namespace imtgui
