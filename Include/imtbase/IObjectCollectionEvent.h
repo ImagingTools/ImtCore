@@ -2,7 +2,7 @@
 
 
 // ACF includes
-#include <istd/IPolymorphic.h>
+#include <istd/IChangeable.h>
 
 
 namespace imtbase
@@ -12,7 +12,7 @@ namespace imtbase
 /**
 	Interface for object collection events
 */
-class IObjectCollectionEvent: virtual public istd::IPolymorphic
+class IObjectCollectionEvent: virtual public istd::IChangeable
 {
 public:
 	virtual QByteArray GetItemId() const = 0;

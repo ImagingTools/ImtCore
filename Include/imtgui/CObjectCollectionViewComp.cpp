@@ -46,11 +46,17 @@ CObjectCollectionViewComp::CObjectCollectionViewComp()
 
 
 // reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
+
 void CObjectCollectionViewComp::ProcessObjectCollectionEvent(
-			imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
-			imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr)
+			const imtbase::IObjectCollection* objectCollectionPtr,
+			const imtbase::IObjectCollectionEvent* eventPtr)
 {
-	QMetaObject::invokeMethod(this, "ProcessObjectCollectionEventSync", Q_ARG(imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr, objectCollectionPtr), Q_ARG(imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr, eventPtr));
+	istd::TSmartPtr<const imtbase::IObjectCollectionEvent> clonePtr(dynamic_cast<const imtbase::IObjectCollectionEvent*>(eventPtr->CloneMe()));
+	Q_ASSERT(clonePtr.IsValid());
+
+	QMetaObject::invokeMethod(this, "ProcessObjectCollectionEventSync",
+				Q_ARG(ObjectCollectionPtr, objectCollectionPtr),
+				Q_ARG(ObjectCollectionEventPtr, clonePtr));
 }
 
 
@@ -834,8 +840,8 @@ void CObjectCollectionViewComp::OnUpdateFinished()
 
 
 void CObjectCollectionViewComp::ProcessObjectCollectionEventSync(
-			imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
-			imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr)
+			ObjectCollectionPtr /*objectCollectionPtr*/,
+			ObjectCollectionEventPtr eventPtr)
 {
 	const imtbase::CObjectCollectionInsertEvent* insertEventPtr = dynamic_cast<const imtbase::CObjectCollectionInsertEvent*>(eventPtr.GetPtr());
 	if (insertEventPtr != nullptr){

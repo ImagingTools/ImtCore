@@ -77,8 +77,8 @@ public:
 
 	// reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
 	virtual void ProcessObjectCollectionEvent(
-				imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
-				imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr) override;
+				const imtbase::IObjectCollection* objectCollectionPtr,
+				const imtbase::IObjectCollectionEvent* eventPtr) override;
 
 	// reimplemented (ibase::IProgressManager)
 	virtual int BeginProgressSession(
@@ -219,8 +219,8 @@ private:
 	Q_INVOKABLE void OnUpdateFinished();
 
 	Q_INVOKABLE void ProcessObjectCollectionEventSync(
-				imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr objectCollectionPtr,
-				imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr eventPtr);
+				ObjectCollectionPtr objectCollectionPtr,
+				ObjectCollectionEventPtr eventPtr);
 
 	bool eventFilter(QObject *object, QEvent *event);
 

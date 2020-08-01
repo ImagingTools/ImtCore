@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
+#include <istd/TSmartPtr.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionEventHandler.h>
@@ -22,28 +23,42 @@ class TObjectCollectionEventHandlerCompWrap:
 public:
 	typedef Base BaseClass;
 
+	typedef const imtbase::IObjectCollection* ObjectCollectionPtr;
+	typedef istd::TSmartPtr<const imtbase::IObjectCollectionEvent> ObjectCollectionEventPtr;
+
 	I_BEGIN_BASE_COMPONENT(TObjectCollectionEventHandlerCompWrap);
 		I_REGISTER_INTERFACE(IObjectCollectionEventHandler);
 		I_ASSIGN(m_slaveEventHandlerCompPtr, "SlaveEventHandler", "Slave object collection event handler", false, "");
 	I_END_COMPONENT;
 
+	TObjectCollectionEventHandlerCompWrap();
+
 	// reimplemented (imtbase::IObjectCollectionEventHandler)
 	virtual void OnObjectCollectionEvent(
-				ObjectCollectionPtr objectCollectionPtr,
-				ObjectCollectionEventPtr eventPtr) override;
+				const imtbase::IObjectCollection* objectCollectionPtr,
+				const imtbase::IObjectCollectionEvent* eventPtr) override;
 
 protected:
 	virtual void ProcessObjectCollectionEvent(
-				ObjectCollectionPtr objectCollectionPtr,
-				ObjectCollectionEventPtr eventPtr) = 0;
+				const imtbase::IObjectCollection* objectCollectionPtr,
+				const imtbase::IObjectCollectionEvent* eventPtr) = 0;
 private:
 	I_REF(IObjectCollectionEventHandler, m_slaveEventHandlerCompPtr);
 };
 
+
+template <class Base>
+TObjectCollectionEventHandlerCompWrap<Base>::TObjectCollectionEventHandlerCompWrap()
+{
+	qRegisterMetaType<ObjectCollectionPtr>("ObjectCollectionPtr");
+	qRegisterMetaType<ObjectCollectionEventPtr>("ObjectCollectionEventPtr");
+}
+
+
 template <class Base>
 void TObjectCollectionEventHandlerCompWrap<Base>::OnObjectCollectionEvent(
-			ObjectCollectionPtr objectCollectionPtr,
-			ObjectCollectionEventPtr eventPtr)
+			const imtbase::IObjectCollection* objectCollectionPtr,
+			const imtbase::IObjectCollectionEvent* eventPtr)
 {
 	ProcessObjectCollectionEvent(objectCollectionPtr, eventPtr);
 
@@ -54,10 +69,6 @@ void TObjectCollectionEventHandlerCompWrap<Base>::OnObjectCollectionEvent(
 
 
 typedef imtbase::TObjectCollectionEventHandlerCompWrap<icomp::CComponentBase> CObjectCollectionEventHandlerCompBase;
-
-
-Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionPtr)
-Q_DECLARE_METATYPE(imtbase::IObjectCollectionEventHandler::ObjectCollectionEventPtr)
 
 
 } // namespace imtbase

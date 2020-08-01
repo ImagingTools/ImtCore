@@ -18,12 +18,9 @@ class IObjectCollectionEvent;
 class IObjectCollectionEventHandler: virtual public istd::IPolymorphic
 {
 public:
-	typedef const imtbase::IObjectCollection* ObjectCollectionPtr;
-	typedef istd::TSmartPtr<IObjectCollectionEvent> ObjectCollectionEventPtr;
-
 	virtual void OnObjectCollectionEvent(
-				ObjectCollectionPtr objectCollectionPtr,
-				ObjectCollectionEventPtr eventPtr) = 0;
+				const imtbase::IObjectCollection* objectCollectionPtr,
+				const imtbase::IObjectCollectionEvent* eventPtr) = 0;
 };
 
 
