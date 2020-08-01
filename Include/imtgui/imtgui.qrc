@@ -115,6 +115,8 @@
         <file alias="AlignRight">Resources/Icons/AlignRight.svg</file>
         <file alias="SpaceBox3d">Resources/Icons/SpaceBox3d.svg</file>
         <file alias="SpaceBox3dFilled">Resources/Icons/SpaceBox3dFilled.svg</file>
+        <file alias="Left">Resources/Icons/Left.svg</file>
+        <file alias="Right">Resources/Icons/Right.svg</file>
     </qresource>
     <qresource prefix="/ColorIcons">
         <file alias="Workflow">Resources/Icons/Color/Workflow.svg</file>

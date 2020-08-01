@@ -173,6 +173,8 @@ private Q_SLOTS:
 	void on_KeyboardButton_clicked();
 	void Logout();
 	void OnVirtualKeyboardStateChanged(QProcess::ProcessState state);
+	void on_BackPageButton_clicked();
+	void on_NextPageButton_clicked();
 
 private:
 	void ShowLoginPage();

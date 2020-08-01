@@ -150,7 +150,11 @@
         </Element>
         <Element Id="PageNavigationController" PackageId="ImtGuiPck" ComponentId="PageNavigationController">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="PageModel" Type="Reference" ExportId="MainPageModel">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="Pages" PackageId="ImtGuiPck" ComponentId="ThumbnailDecoratorGui">

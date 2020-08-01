@@ -95,8 +95,6 @@ void CMenuPanelComp::OnGuiCreated()
 		m_resolutionY = *m_physicalResolutionAttrPtr;
 		m_scale = 1;
 		UpdateWidgetSizeAttributes();
-
-		//panelPtr->SetActivePage(FindSelectedItem());
 	}
 
 	if (m_menuPanelVisibilityModelCompPtr.IsValid()){
@@ -286,7 +284,7 @@ QByteArray CMenuPanelComp::FindSelectedItem()
 	iprm::ISelectionParam* selectionPtr = GetObservedObject();
 	Q_ASSERT(selectionPtr != nullptr);
 
-	QString selectedPageId;
+	QByteArray selectedPageId;
 
 	while (selectionPtr != nullptr){
 		int selectedIndex = selectionPtr->GetSelectedOptionIndex();
@@ -300,7 +298,7 @@ QByteArray CMenuPanelComp::FindSelectedItem()
 		}
 	}
 
-	return QByteArray(selectedPageId.toLatin1());
+	return selectedPageId;
 }
 
 
@@ -326,7 +324,6 @@ void CMenuPanelComp::UpdatePageState()
 
 void CMenuPanelComp::UpdateMonitorsInfo()
 {
-
 	double resolutionX = m_monitorInfoProviderPtr->GetPhysicalResolutionX(0);
 	double resolutionY = m_monitorInfoProviderPtr->GetPhysicalResolutionY(0);
 	double scale = m_monitorInfoProviderPtr->GetScaling(0);
@@ -335,6 +332,11 @@ void CMenuPanelComp::UpdateMonitorsInfo()
 		m_resolutionX = resolutionX;
 		m_resolutionY = resolutionY;
 		m_scale = scale;
+	}
+	else{
+		m_resolutionX = *m_physicalResolutionAttrPtr;
+		m_resolutionY = *m_physicalResolutionAttrPtr;
+		m_scale = 1;
 	}
 
 	UpdateWidgetSizeAttributes();

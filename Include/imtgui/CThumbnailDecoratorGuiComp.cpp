@@ -524,6 +524,26 @@ void CThumbnailDecoratorGuiComp::OnVirtualKeyboardStateChanged(QProcess::Process
 }
 
 
+void CThumbnailDecoratorGuiComp::on_BackPageButton_clicked()
+{
+	Q_ASSERT(m_pageNavigationControllerCompPtr.IsValid());
+
+	if (m_pageNavigationControllerCompPtr->IsPreviousPageAvailable()){
+		m_pageNavigationControllerCompPtr->GoBack();
+	}
+}
+
+
+void CThumbnailDecoratorGuiComp::on_NextPageButton_clicked()
+{
+	Q_ASSERT(m_pageNavigationControllerCompPtr.IsValid());
+
+	if (m_pageNavigationControllerCompPtr->IsNextPageAvailable()){
+		m_pageNavigationControllerCompPtr->GoForward();
+	}
+}
+
+
 // private methods
 
 void CThumbnailDecoratorGuiComp::ShowLoginPage()
@@ -817,6 +837,11 @@ void CThumbnailDecoratorGuiComp::CreateMenu(const iprm::ISelectionParam* selecti
 void CThumbnailDecoratorGuiComp::UpdatePageState()
 {
 	QString pageTitle;
+
+	if (m_pageNavigationControllerCompPtr.IsValid()){
+		NextPageButton->setEnabled(m_pageNavigationControllerCompPtr->IsNextPageAvailable());
+		BackPageButton->setEnabled(m_pageNavigationControllerCompPtr->IsPreviousPageAvailable());
+	}
 
 	if (m_pagesCompPtr.IsValid()){
 		const iprm::IOptionsList* pageListPtr = m_pagesCompPtr->GetSelectionConstraints();
