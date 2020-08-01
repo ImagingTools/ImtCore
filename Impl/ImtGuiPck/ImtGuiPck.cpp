@@ -92,6 +92,11 @@ I_EXPORT_COMPONENT(
 			"Image contours extender component",
 			"Image Contours Contour Extender View Observer");
 
+I_EXPORT_COMPONENT(
+			PageNavigationController,
+			"Controller for page navigation",
+			"Menu Page Navigation");
+
 
 } // namespace ImtGuiPck
 

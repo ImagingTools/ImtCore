@@ -23,6 +23,7 @@
 
 // ImtCore includes
 #include <imtgui/IWidgetProvider.h>
+#include <imtgui/IPageNavigationController.h>
 #include <imtgui/CThumbPageItemGuiDelegate.h>
 #include <GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h>
 
@@ -103,6 +104,7 @@ public:
 		I_ASSIGN_TO(m_rightsModelCompPtr, m_rightsCompPtr, false);
 		I_ASSIGN(m_autoLogoutMinutesCompPtr, "AutoLogoutTime", "Parameter to control automatical logout interval. Setting of this parameter overrides 'AutoLogoutMinutes' value", false, "AutoLogoutTime");
 		I_ASSIGN(m_leftMenuPanelGuiCompPtr, "LeftMenuPanel", "Left menu panel", false, "LeftMenuPanel");
+		I_ASSIGN(m_pageNavigationControllerCompPtr, "NavigationController", "Page navigation controller", false, "NavigationController");
 	I_END_COMPONENT;
 
 	enum
@@ -309,6 +311,7 @@ private:
 	I_REF(imod::IModel, m_rightsModelCompPtr);
 	I_REF(imeas::INumericValue, m_autoLogoutMinutesCompPtr);
 	I_REF(iqtgui::IGuiObject, m_leftMenuPanelGuiCompPtr);
+	I_REF(imtgui::IPageNavigationController, m_pageNavigationControllerCompPtr);
 
 	QToolBar* m_mainToolBar;
 	QTimer m_autoLogoutTimer;

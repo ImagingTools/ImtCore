@@ -168,6 +168,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
+	NavigationControlFrame->setVisible(m_pageNavigationControllerCompPtr.IsValid());
+
 	if (m_mainToolBar == nullptr){
 		m_mainToolBar = new QToolBar(CurrentPageToolBarFrame);
 		m_mainToolBar->setProperty("ImtToolBar", true);
