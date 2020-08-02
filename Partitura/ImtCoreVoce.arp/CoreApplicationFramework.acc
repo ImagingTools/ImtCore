@@ -172,6 +172,9 @@
                     <AttributeInfo Id="Commands" Type="Reference" ExportId="PageCommands">
                         <Data IsEnabled="true" Value="CommandsMultiplexer"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="Dashboard" Type="Reference" ExportId="Dashboard">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DefaultPageIndex" Type="Integer" ExportId="DefaultPageIndex">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

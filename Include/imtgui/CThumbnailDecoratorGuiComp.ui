@@ -362,6 +362,26 @@
        </widget>
       </item>
       <item>
+       <widget class="QToolButton" name="DashboardButton">
+        <property name="text">
+         <string>Dashboard</string>
+        </property>
+        <property name="icon">
+         <iconset resource="imtgui.qrc">
+          <normaloff>:/Icons/Dashboard</normaloff>:/Icons/Dashboard</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QToolButton" name="ExitButton">
         <property name="text">
          <string>Quit</string>

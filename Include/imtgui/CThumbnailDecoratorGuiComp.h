@@ -105,6 +105,7 @@ public:
 		I_ASSIGN(m_autoLogoutMinutesCompPtr, "AutoLogoutTime", "Parameter to control automatical logout interval. Setting of this parameter overrides 'AutoLogoutMinutes' value", false, "AutoLogoutTime");
 		I_ASSIGN(m_leftMenuPanelGuiCompPtr, "LeftMenuPanel", "Left menu panel", false, "LeftMenuPanel");
 		I_ASSIGN(m_pageNavigationControllerCompPtr, "NavigationController", "Page navigation controller", false, "NavigationController");
+		I_ASSIGN(m_dashboardGuiCompPtr, "Dashboard", "Dashboard UI", false, "Dashboard");
 	I_END_COMPONENT;
 
 	enum
@@ -175,6 +176,7 @@ private Q_SLOTS:
 	void OnVirtualKeyboardStateChanged(QProcess::ProcessState state);
 	void on_BackPageButton_clicked();
 	void on_NextPageButton_clicked();
+	void on_DashboardButton_clicked();
 
 private:
 	void ShowLoginPage();
@@ -314,6 +316,7 @@ private:
 	I_REF(imeas::INumericValue, m_autoLogoutMinutesCompPtr);
 	I_REF(iqtgui::IGuiObject, m_leftMenuPanelGuiCompPtr);
 	I_REF(imtgui::IPageNavigationController, m_pageNavigationControllerCompPtr);
+	I_REF(iqtgui::IGuiObject, m_dashboardGuiCompPtr);
 
 	QToolBar* m_mainToolBar;
 	QTimer m_autoLogoutTimer;

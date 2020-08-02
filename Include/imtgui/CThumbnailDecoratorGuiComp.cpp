@@ -169,6 +169,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	BaseClass::OnGuiCreated();
 
 	NavigationControlFrame->setVisible(m_pageNavigationControllerCompPtr.IsValid());
+	DashboardButton->setVisible(m_dashboardGuiCompPtr.IsValid());
 
 	if (m_mainToolBar == nullptr){
 		m_mainToolBar = new QToolBar(CurrentPageToolBarFrame);
@@ -255,6 +256,10 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 {
+	if (m_dashboardGuiCompPtr.IsValid() && m_dashboardGuiCompPtr->IsGuiCreated()){
+		m_dashboardGuiCompPtr->DestroyGui();
+	}
+
 	if (m_pagesWidgetCompPtr.IsValid() && m_pagesWidgetCompPtr->IsGuiCreated()){
 		m_pagesWidgetCompPtr->DestroyGui();
 	}
@@ -540,6 +545,26 @@ void CThumbnailDecoratorGuiComp::on_NextPageButton_clicked()
 
 	if (m_pageNavigationControllerCompPtr->IsNextPageAvailable()){
 		m_pageNavigationControllerCompPtr->GoForward();
+	}
+}
+
+
+void CThumbnailDecoratorGuiComp::on_DashboardButton_clicked()
+{
+	Q_ASSERT(m_dashboardGuiCompPtr.IsValid());
+
+	if (!m_dashboardGuiCompPtr->IsGuiCreated()){
+		m_dashboardGuiCompPtr->CreateGui(nullptr);
+	}
+
+	if (m_dashboardGuiCompPtr->IsGuiCreated()){
+		bool isVisible = m_dashboardGuiCompPtr->GetWidget()->isVisible();
+		if (!isVisible){
+			m_dashboardGuiCompPtr->GetWidget()->showFullScreen();
+		}
+		else{
+			m_dashboardGuiCompPtr->GetWidget()->hide();
+		}
 	}
 }
 

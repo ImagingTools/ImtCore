@@ -121,6 +121,7 @@
         <file alias="MoveLast">Resources/Icons/MoveLast.svg</file>
         <file alias="Expand">Resources/Icons/Expand.svg</file>
         <file alias="Collapse">Resources/Icons/Collapse.svg</file>
+        <file alias="Dashboard">Resources/Icons/Dashboard.svg</file>
     </qresource>
     <qresource prefix="/ColorIcons">
         <file alias="Workflow">Resources/Icons/Color/Workflow.svg</file>

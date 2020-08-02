@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4860" Description="ACF"/>
+            <Version Id="0" Number="4876" Description="ACF"/>
             <Version Id="1" Number="2123" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331010" Description="Qt Framework"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Custom layout UI-manager</Description>
@@ -30,7 +30,7 @@
                     <AttributeInfo Id="DefaultFixedLayout" Type="Boolean" ExportId="DefaultFixedLayout">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="">
+                    <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="DefaultModel">
                         <Data IsEnabled="true" Value="LayoutManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultStatusIcon" Type="String" ExportId="DefaultStatusIcon">
@@ -80,6 +80,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="LayoutManagerGui"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="LayoutManager" ComponentId="LayoutManager"/>
         <Component ExportedId="VisualStatus" ComponentId="LayoutManagerGui/VisualStatus"/>
     </ExportedComponents>
 </Acf>
