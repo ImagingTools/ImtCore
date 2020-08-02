@@ -616,6 +616,7 @@ bool operator ==(const ILayout::LayoutProperties &left, const ILayout::LayoutPro
 	return retVal;
 }
 
+
 bool operator !=(const ILayout::LayoutProperties &left, const ILayout::LayoutProperties &right)
 {
 	return !(left == right);

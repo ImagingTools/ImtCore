@@ -76,10 +76,12 @@ QLayout* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 		if (!viewId.isEmpty()){
 			int index = m_guiViewIdMultiAttrPtr.FindValue(viewId);
 			if (index >= 0){
-				istd::TSmartPtr<iqtgui::IGuiObject> newWidgetPtr(m_guiViewMultiFactCompPtr.CreateInstance(index));
-				if (newWidgetPtr->CreateGui(nullptr)){
-					customLayoutWidgetPtr->SetWidget(newWidgetPtr->GetWidget());
+				istd::TSmartPtr<iqtgui::IGuiObject> guiPtr(m_guiViewMultiFactCompPtr.CreateInstance(index));
+				if (guiPtr->CreateGui(nullptr)){
+					customLayoutWidgetPtr->SetWidget(guiPtr->GetWidget());
 					customLayoutWidgetPtr->SetViewId(viewId);
+
+					m_guiObjects.push_back(guiPtr);
 				}
 			}
 		}
@@ -140,7 +142,10 @@ void CLayoutManagerGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*chan
 	if (m_layoutWidgetPtr != nullptr){
 		SplittersMap.clear();
 
+		RemoveAllGuiComponents();
+
 		m_layoutWidgetPtr->ClearAll();
+
 		m_layoutWidgetPtr->setLayout(CreateCustomLayoutWidget(GetObservedObject()));
 	}
 }
@@ -232,6 +237,14 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 }
 
 
+void CLayoutManagerGuiComp::OnGuiDestroyed()
+{
+	RemoveAllGuiComponents();
+
+	BaseClass::OnGuiDestroyed();
+}
+
+
 void CLayoutManagerGuiComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
@@ -241,6 +254,81 @@ void CLayoutManagerGuiComp::OnGuiRetranslate()
 	m_clearCommand.SetVisuals(tr("Clear All"), tr("Clear All"), tr("ClearAll"), QIcon(":/Icons/Clear"));
 	m_loadCommand.SetVisuals(tr("Import"), tr("Import"), tr("Import"), QIcon(":/Icons/Load"));
 	m_saveCommand.SetVisuals(tr("Export"), tr("Export"), tr("Export"), QIcon(":/Icons/Save"));
+}
+
+
+// protected slots
+
+void CLayoutManagerGuiComp::OnSplitterMoved(int /*pos*/, int /*index*/)
+{
+	QSplitter* splitterPtr = dynamic_cast<QSplitter*>(sender());
+	if (splitterPtr != NULL && SplittersMap.contains(splitterPtr)){
+		m_activeId = SplittersMap.value(splitterPtr);
+		m_splitterTimer.stop();
+		m_splitterTimer.start(1000);
+	}
+}
+
+
+void CLayoutManagerGuiComp::OnSplitterMoveFinished()
+{
+	QMap<QSplitter*, QByteArray>::const_iterator i = SplittersMap.constBegin();
+	while (i != SplittersMap.constEnd()){
+		if (i.value() == m_activeId){
+			QSplitter* splitterPtr = i.key();
+			OnChangeSizes(m_activeId, splitterPtr->sizes());
+			break;
+		}
+		++i;
+	}
+}
+
+
+void CLayoutManagerGuiComp::OnStartEndEditCommand()
+{
+	if (m_layoutWidgetPtr != nullptr){
+		QAction* actionPtr = dynamic_cast<QAction*>(sender());
+		if (actionPtr != nullptr){
+			if (actionPtr->isChecked()){
+				m_layoutWidgetPtr->SetViewMode(CHierarchicalLayoutWidget::VM_EDIT);
+				m_clearCommand.setVisible(true);
+				m_loadCommand.setVisible(true);
+				m_saveCommand.setVisible(true);
+				for (int i = 0; i < m_undoCommands->GetChildsCount(); i++){
+					dynamic_cast<iqtgui::CHierarchicalCommand*>(m_undoCommands->GetChild(i))->setVisible(true);
+				}
+
+			}
+			else{
+				m_layoutWidgetPtr->SetViewMode(CHierarchicalLayoutWidget::VM_NORMAL);
+				m_clearCommand.setVisible(false);
+				m_loadCommand.setVisible(false);
+				m_saveCommand.setVisible(false);
+				for (int i = 0; i < m_undoCommands->GetChildsCount(); i++){
+					dynamic_cast<iqtgui::CHierarchicalCommand*>(m_undoCommands->GetChild(i))->setVisible(false);
+				}
+
+			}
+
+			const istd::IChangeable::ChangeSet changeSet;
+			UpdateGui(changeSet);
+
+			//QMap<QSplitter*, QByteArray>::const_iterator iter = SplittersMap.constBegin();
+			//while (iter != SplittersMap.constEnd()){
+			//	QSplitter* splitterPtr = iter.key();
+			//	for (int i = 0; i < splitterPtr->count(); i++){
+			//		QSplitterHandle *hndl = splitterPtr->handle(i);
+			//		bool fixedSplitter = false;
+			//		if (actionPtr->isChecked() == false && m_isFixedLayoutPtr.IsValid() == true
+			//			&& *m_isFixedLayoutPtr == true){
+			//			fixedSplitter = true;
+			//		}
+			//		hndl->setEnabled(!fixedSplitter);
+			//	}
+			//	++iter;
+			//}
+		}
+	}
 }
 
 
@@ -260,6 +348,8 @@ void CLayoutManagerGuiComp::OnClearAll()
 			rootLayoutPtr->Clear();
 		}
 	}
+
+	RemoveAllGuiComponents();
 }
 
 
@@ -469,9 +559,10 @@ void CLayoutManagerGuiComp::OnChangeProperties(const QByteArray& id)
 			SetAllProperties(rootLayoutPtr, dialogProperties, settingsDialog);
 		}
 	}
-
 }
 
+
+// private methods
 
 void CLayoutManagerGuiComp::SetAllProperties(ILayout* layout, const ILayout::LayoutProperties& dialogProperties, const CLayoutSettingsDialog& settingsDialog)
 {
@@ -529,77 +620,17 @@ void CLayoutManagerGuiComp::SetAllProperties(ILayout* layout, const ILayout::Lay
 }
 
 
-void CLayoutManagerGuiComp::OnSplitterMoved(int /*pos*/, int /*index*/)
+void CLayoutManagerGuiComp::RemoveAllGuiComponents()
 {
-	QSplitter* splitterPtr = dynamic_cast<QSplitter*>(sender());
-	if (splitterPtr != NULL && SplittersMap.contains(splitterPtr)){
-		m_activeId = SplittersMap.value(splitterPtr);
-		m_splitterTimer.stop();
-		m_splitterTimer.start(1000);
-	}
-}
-
-
-void CLayoutManagerGuiComp::OnSplitterMoveFinished()
-{
-	QMap<QSplitter*, QByteArray>::const_iterator i = SplittersMap.constBegin();
-	while (i != SplittersMap.constEnd()){
-		if (i.value() == m_activeId){
-			QSplitter* splitterPtr = i.key();
-			OnChangeSizes(m_activeId, splitterPtr->sizes());
-			break;
-		}
-		++i;
-	}
-}
-
-
-void CLayoutManagerGuiComp::OnStartEndEditCommand()
-{
-	if (m_layoutWidgetPtr != nullptr){
-		QAction* actionPtr = dynamic_cast<QAction*>(sender());
-		if (actionPtr != nullptr){
-			if (actionPtr->isChecked()){
-				m_layoutWidgetPtr->SetViewMode(CHierarchicalLayoutWidget::VM_EDIT);
-				m_clearCommand.setVisible(true);
-				m_loadCommand.setVisible(true);
-				m_saveCommand.setVisible(true);
-				for (int i = 0; i < m_undoCommands->GetChildsCount(); i++){
-					dynamic_cast<iqtgui::CHierarchicalCommand*>(m_undoCommands->GetChild(i))->setVisible(true);
-				}
-
-			}
-			else{
-				m_layoutWidgetPtr->SetViewMode(CHierarchicalLayoutWidget::VM_NORMAL);
-				m_clearCommand.setVisible(false);
-				m_loadCommand.setVisible(false);
-				m_saveCommand.setVisible(false);
-				for (int i = 0; i < m_undoCommands->GetChildsCount(); i++){
-					dynamic_cast<iqtgui::CHierarchicalCommand*>(m_undoCommands->GetChild(i))->setVisible(false);
-				}
-
-			}
-
-			const istd::IChangeable::ChangeSet changeSet;
-			UpdateGui(changeSet);
-
-			//QMap<QSplitter*, QByteArray>::const_iterator iter = SplittersMap.constBegin();
-			//while (iter != SplittersMap.constEnd()){
-			//	QSplitter* splitterPtr = iter.key();
-			//	for (int i = 0; i < splitterPtr->count(); i++){
-			//		QSplitterHandle *hndl = splitterPtr->handle(i);
-			//		bool fixedSplitter = false;
-			//		if (actionPtr->isChecked() == false && m_isFixedLayoutPtr.IsValid() == true
-			//			&& *m_isFixedLayoutPtr == true){
-			//			fixedSplitter = true;
-			//		}
-			//		hndl->setEnabled(!fixedSplitter);
-			//	}
-			//	++iter;
-			//}
+	for (GuiObjectPtr guiPtr : m_guiObjects){
+		if (guiPtr->IsGuiCreated()){
+			guiPtr->DestroyGui();
 		}
 	}
+
+	m_guiObjects.clear();
 }
+
 
 
 } // namespace imtgui

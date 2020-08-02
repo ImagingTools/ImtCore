@@ -58,17 +58,18 @@ public:
 	CLayoutManagerGuiComp();
 
 	// reimplemented (ibase::ICommandsProvider)
-	virtual const ibase::IHierarchicalCommand* GetCommands() const;
+	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 protected:
 	QLayout* CreateCustomLayoutWidget(ILayout* layout);
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
-	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet);
+	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
-	virtual void OnGuiCreated();
-	virtual void OnGuiRetranslate(); 
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiDestroyed() override;
+	virtual void OnGuiRetranslate() override;
 
 protected Q_SLOTS:
 	void OnSplitterMoved(int pos, int index);
@@ -95,7 +96,10 @@ private:
 	{
 		return &component.m_guiViewOptionsManager;
 	}
+
+private:
 	void SetAllProperties(ILayout* layout, const ILayout::LayoutProperties& properties, const CLayoutSettingsDialog& settingsDialog);
+	void RemoveAllGuiComponents();
 
 private:
 	I_REF(ibase::ICommandsProvider, m_commandsProviderCompPtr);
@@ -125,6 +129,11 @@ private:
 	QMap<QSplitter*, QByteArray> SplittersMap;
 
 	iprm::COptionsManager m_guiViewOptionsManager;
+
+	typedef istd::TSmartPtr<iqtgui::IGuiObject> GuiObjectPtr;
+	typedef QVector<GuiObjectPtr> GuiObjects;
+
+	GuiObjects m_guiObjects;
 };
 
 

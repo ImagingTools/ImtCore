@@ -197,7 +197,6 @@ public:
 		Split current layout and insert new sublayout.
 	*/
 	virtual void SplitLayout(ILayout::LayoutType type, int width, int height) = 0;
-
 };
 
 
