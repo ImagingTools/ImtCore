@@ -117,6 +117,10 @@
         <file alias="SpaceBox3dFilled">Resources/Icons/SpaceBox3dFilled.svg</file>
         <file alias="Left">Resources/Icons/Left.svg</file>
         <file alias="Right">Resources/Icons/Right.svg</file>
+        <file alias="MoveFirst">Resources/Icons/MoveFirst.svg</file>
+        <file alias="MoveLast">Resources/Icons/MoveLast.svg</file>
+        <file alias="Expand">Resources/Icons/Expand.svg</file>
+        <file alias="Collapse">Resources/Icons/Collapse.svg</file>
     </qresource>
     <qresource prefix="/ColorIcons">
         <file alias="Workflow">Resources/Icons/Color/Workflow.svg</file>

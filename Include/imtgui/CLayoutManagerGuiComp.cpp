@@ -87,8 +87,12 @@ QLayout* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 		}
 
 		retVal->addWidget(customLayoutWidgetPtr);
-		retVal->setContentsMargins(customLayoutWidgetPtr->LeftMargin(), customLayoutWidgetPtr->TopMargin(),
-			customLayoutWidgetPtr->RightMargin(), customLayoutWidgetPtr->BottomMargin());
+
+		retVal->setContentsMargins(
+					customLayoutWidgetPtr->LeftMargin(),
+					customLayoutWidgetPtr->TopMargin(),
+					customLayoutWidgetPtr->RightMargin(),
+					customLayoutWidgetPtr->BottomMargin());
 	}
 	else{
 		ILayout::LayoutProperties properties = layout->GetLayoutProperties();
@@ -113,12 +117,12 @@ QLayout* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 				QWidget* widget = new QWidget();
 				widget->setLayout(CreateCustomLayoutWidget(childLayoutPtr));
 				splitterPtr->addWidget(widget);
-				if ( //m_isFixedLayoutPtr.IsValid()
-					//&& *m_isFixedLayoutPtr == true
-					properties.isFixedLayout == true
-					&& m_layoutWidgetPtr->GetViewMode() == CHierarchicalLayoutWidget::VM_NORMAL){
-					QSplitterHandle *hndl = splitterPtr->handle(i);
-					hndl->setEnabled(false);
+				if ( properties.isFixedLayout && (m_layoutWidgetPtr->GetViewMode() == CHierarchicalLayoutWidget::VM_NORMAL)){
+					QSplitterHandle* splitterHandlerPtr = splitterPtr->handle(i);
+					if (splitterHandlerPtr != nullptr){
+						splitterHandlerPtr->setEnabled(false);
+					}
+
 					splitterPtr->setHandleWidth(0);
 				}
 			}
@@ -127,8 +131,6 @@ QLayout* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 		if (sizes.count() >= splitterPtr->count()){
 			splitterPtr->setSizes(layout->GetSizes());
 		}
-
-		
 	}
 
 	return retVal;
