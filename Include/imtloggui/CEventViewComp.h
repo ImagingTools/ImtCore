@@ -147,6 +147,10 @@ private:
 
 	QList<ilog::IMessageConsumer::MessagePtr> m_messageList;
 
+	IEventItemController::EventMap m_eventMap;
+	IEventItemController::EventMap::const_iterator m_navigationIterator;
+	bool m_isNavigationIteratorValid;
+
 	QSplitter* m_splitterPtr;
 	QStackedWidget* m_panelsStackPtr;
 	QWidget* m_summaryInfoPanelPtr;

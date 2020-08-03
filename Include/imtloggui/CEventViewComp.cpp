@@ -31,7 +31,8 @@ CEventViewComp::CEventViewComp()
 	m_moveToFirstCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
 	m_moveToPreviousCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
 	m_moveToNextCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
-	m_moveToLastCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR)
+	m_moveToLastCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
+	m_isNavigationIteratorValid(false)
 {
 	m_commands.SetParent(this);
 	m_rootCommands.InsertChild(&m_moveToFirstCommand);
@@ -66,7 +67,10 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 
 	if (m_groupControllerCompPtr.IsValid()){
 		m_timeAxis.EnsureTimeRange(message->GetInformationTimeStamp());
-		m_groupControllerCompPtr->AddEvent(message);
+		IEventItem* eventItemPtr =  m_groupControllerCompPtr->AddEvent(message);
+		if (eventItemPtr != nullptr){
+			m_eventMap.insert(message->GetInformationTimeStamp(), eventItemPtr);
+		}
 		UpdateSummaryInfoPanel();
 	}
 
@@ -206,6 +210,7 @@ void CEventViewComp::OnViewPortChanged(bool userAction)
 
 	if (userAction){
 		m_currentCommandTime = QDateTime();
+		m_isNavigationIteratorValid = false;
 	}
 
 	UpdateCommands();
@@ -264,157 +269,93 @@ void CEventViewComp::OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateT
 
 void CEventViewComp::OnMoveToFirstCommand()
 {
-	if (!m_groupControllerCompPtr.IsValid()){
-		return;
-	}
+	if (!m_eventMap.isEmpty()){
+		m_navigationIterator = m_eventMap.cbegin();
+		m_isNavigationIteratorValid = true;
 
-	QDateTime time;
-	for (QByteArray id : m_groupControllerCompPtr->GetActiveGroupList()){
-		IEventItemController* groupPtr = m_groupControllerCompPtr->GetGroup(id);
-
-		const IEventItemController::EventMap* eventMap = groupPtr->GetEvents();
-
-		if (eventMap->isEmpty()){
-			continue;
+		QGraphicsItem* graphicsItem = dynamic_cast<QGraphicsItem*>(m_navigationIterator.value());
+		if (graphicsItem != nullptr){
+			MoveToTime(m_navigationIterator.key());
+			m_scene.clearSelection();
+			graphicsItem->setSelected(true);
 		}
 
-		if (!time.isValid() || time > eventMap->firstKey()){
-			time = eventMap->firstKey();
-		}
+		UpdateCommands();
 	}
-
-	if (!time.isValid()){
-		return;
-	}
-
-	m_currentCommandTime = time;
-	MoveToTime(time);
-
-	UpdateCommands();
 }
 
 
 void CEventViewComp::OnMoveToPreviousCommand()
 {
-	if (!m_groupControllerCompPtr.IsValid()){
-		return;
-	}
+	if (!m_eventMap.isEmpty()){
+		if (m_isNavigationIteratorValid){
+			if (m_navigationIterator == m_eventMap.cbegin()){
+				return;
+			}
 
-	QDateTime currentTime;
-	if (m_currentCommandTime.isValid()){
-		currentTime = m_currentCommandTime;
-	}
-	else{
-		currentTime = m_timeAxis.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
-	}
-
-	QDateTime time;
-	for (QByteArray id : m_groupControllerCompPtr->GetActiveGroupList()){
-		IEventItemController* groupPtr = m_groupControllerCompPtr->GetGroup(id);
-
-		const IEventItemController::EventMap* eventMap = groupPtr->GetEvents();
-
-		if (eventMap->isEmpty()){
-			continue;
+			m_navigationIterator--;
+		}
+		else{
+			QDateTime time = m_timeAxis.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+			m_navigationIterator = --m_eventMap.lowerBound(time);
+			m_isNavigationIteratorValid = true;
 		}
 
-		IEventItemController::EventMap::const_iterator it = eventMap->lowerBound(currentTime);
-		if (it == eventMap->begin()){
-			continue;
+		QGraphicsItem* graphicsItem = dynamic_cast<QGraphicsItem*>(m_navigationIterator.value());
+		if (graphicsItem != nullptr){
+			MoveToTime(m_navigationIterator.key());
+			m_scene.clearSelection();
+			graphicsItem->setSelected(true);
 		}
 
-		it--;
-
-		if (!time.isValid() || time < it.key()){
-			time = it.key();
-		}
+		UpdateCommands();
 	}
-
-	if (!time.isValid()){
-		return;
-	}
-
-	m_currentCommandTime = time;
-	MoveToTime(time);
-
-	UpdateCommands();
 }
 
 
 void CEventViewComp::OnMoveToNextCommand()
 {
-	if (!m_groupControllerCompPtr.IsValid()){
-		return;
-	}
+	if (!m_eventMap.isEmpty()){
+		if (m_isNavigationIteratorValid){
+			if (m_navigationIterator == --m_eventMap.cend()){
+				return;
+			}
 
-	QDateTime currentTime;
-	if (m_currentCommandTime.isValid()){
-		currentTime = m_currentCommandTime;
-	}
-	else{
-		currentTime = m_timeAxis.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
-	}
-
-	QDateTime time;
-	for (QByteArray id : m_groupControllerCompPtr->GetActiveGroupList()){
-		IEventItemController* groupPtr = m_groupControllerCompPtr->GetGroup(id);
-
-		const IEventItemController::EventMap* eventMap = groupPtr->GetEvents();
-
-		if (eventMap->isEmpty()){
-			continue;
+			m_navigationIterator++;
+		}
+		else{
+			QDateTime time = m_timeAxis.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+			m_navigationIterator = m_eventMap.lowerBound(time);
+			m_isNavigationIteratorValid = true;
 		}
 
-		IEventItemController::EventMap::const_iterator it = eventMap->upperBound(currentTime);
-		if (it == eventMap->end()){
-			continue;
+		QGraphicsItem* graphicsItem = dynamic_cast<QGraphicsItem*>(m_navigationIterator.value());
+		if (graphicsItem != nullptr){
+			MoveToTime(m_navigationIterator.key());
+			m_scene.clearSelection();
+			graphicsItem->setSelected(true);
 		}
 
-		if (!time.isValid() || time > it.key()){
-			time = it.key();
-		}
+		UpdateCommands();
 	}
-
-	if (!time.isValid()){
-		return;
-	}
-
-	m_currentCommandTime = time;
-	MoveToTime(time);
-
-	UpdateCommands();
 }
 
 
 void CEventViewComp::OnMoveToLastCommand()
 {
-	if (!m_groupControllerCompPtr.IsValid()){
-		return;
-	}
+	if (!m_eventMap.isEmpty()){
+		m_navigationIterator = --m_eventMap.cend();
+		m_isNavigationIteratorValid = true;
 
-	QDateTime time;
-	for (QByteArray id : m_groupControllerCompPtr->GetActiveGroupList()){
-		IEventItemController* groupPtr = m_groupControllerCompPtr->GetGroup(id);
-
-		const IEventItemController::EventMap* eventMap = groupPtr->GetEvents();
-
-		if (eventMap->isEmpty()){
-			continue;
+		QGraphicsItem* graphicsItem = dynamic_cast<QGraphicsItem*>(m_navigationIterator.value());
+		if (graphicsItem != nullptr){
+			MoveToTime(m_navigationIterator.key());
+			m_scene.clearSelection();
+			graphicsItem->setSelected(true);
 		}
 
-		if (!time.isValid() || time < eventMap->lastKey()){
-			time = eventMap->lastKey();
-		}
+		UpdateCommands();
 	}
-
-	if (!time.isValid()){
-		return;
-	}
-
-	m_currentCommandTime = time;
-	MoveToTime(time);
-
-	UpdateCommands();
 }
 
 
@@ -476,49 +417,45 @@ void CEventViewComp::UpdateVerticalRangeScale(const istd::CRange & range) const
 
 void CEventViewComp::UpdateCommands()
 {
-	//static istd::IChangeable::ChangeSet changes(ibase::ICommandsProvider::CF_COMMANDS);
-	//istd::CChangeNotifier changeNotifier(&m_commands, &changes);
-
-	if (!m_groupControllerCompPtr.IsValid()){
-		return;
-	}
-
 	QDateTime currentTime;
-	if (m_currentCommandTime.isValid()){
-		currentTime = m_currentCommandTime;
-	}
-	else{
-		currentTime = m_timeAxis.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
-	}
+	currentTime = m_timeAxis.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
 
 	bool enablePrev = false;
 	bool enableNext = false;
 
-	for (QByteArray id : m_groupControllerCompPtr->GetActiveGroupList()){
-		IEventItemController* groupPtr = m_groupControllerCompPtr->GetGroup(id);
+	if (!m_eventMap.isEmpty()){
+		const IEventItemController::EventMap::const_iterator itBegin = m_eventMap.cbegin();
+		const IEventItemController::EventMap::const_iterator itEnd = --m_eventMap.cend();
 
-		const IEventItemController::EventMap* eventMap = groupPtr->GetEvents();
+		if (m_isNavigationIteratorValid){
+			if (m_navigationIterator != itBegin){
+				enablePrev = true;
+			}
+			
+			if (m_navigationIterator != itEnd){
+				enableNext = true;
+			}
+		}
+		else{
+			if (currentTime >= itBegin.key()){
+				enablePrev = true;
+			}
 
-		if (eventMap->isEmpty()){
-			continue;
+			if (currentTime <= itEnd.key()){
+				enableNext = true;
+			}
 		}
 
-		IEventItemController::EventMap::const_iterator it;
-		it = eventMap->lowerBound(currentTime);
-		if (it != eventMap->begin()){
-			enablePrev = true;
-		}
-
-		it = eventMap->upperBound(currentTime);
-		if (it != eventMap->end()){
-			enableNext = true;
-		}
+		m_moveToFirstCommand.SetEnabled(true);
+		m_moveToLastCommand.SetEnabled(true);
+	}
+	else{
+		m_moveToFirstCommand.SetEnabled(false);
+		m_moveToLastCommand.SetEnabled(false);
 	}
 
-	m_moveToFirstCommand.SetEnabled(enablePrev);
 	m_moveToPreviousCommand.SetEnabled(enablePrev);
 	m_moveToNextCommand.SetEnabled(enableNext);
-	m_moveToLastCommand.SetEnabled(enableNext);
 }
 
 

@@ -159,7 +159,7 @@ void CEventGraphicsView::resizeEvent(QResizeEvent* event)
 	ValidateViewRect();
 	UpdateViewRect();
 
-	Q_EMIT EmitViewPortChanged(true);
+	Q_EMIT EmitViewPortChanged(false);
 }
 
 
