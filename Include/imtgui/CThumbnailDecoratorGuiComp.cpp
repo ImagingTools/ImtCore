@@ -170,6 +170,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 	NavigationControlFrame->setVisible(m_pageNavigationControllerCompPtr.IsValid());
 	DashboardButton->setVisible(m_dashboardGuiCompPtr.IsValid());
+	DashboardButton->setShortcut(Qt::CTRL + Qt::Key_D);
 
 	if (m_mainToolBar == nullptr){
 		m_mainToolBar = new QToolBar(CurrentPageToolBarFrame);
@@ -554,16 +555,15 @@ void CThumbnailDecoratorGuiComp::on_DashboardButton_clicked()
 	Q_ASSERT(m_dashboardGuiCompPtr.IsValid());
 
 	if (!m_dashboardGuiCompPtr->IsGuiCreated()){
-		m_dashboardGuiCompPtr->CreateGui(nullptr);
+		m_dashboardGuiCompPtr->CreateGui(DashBoardFrame);
 	}
 
 	if (m_dashboardGuiCompPtr->IsGuiCreated()){
-		bool isVisible = m_dashboardGuiCompPtr->GetWidget()->isVisible();
-		if (!isVisible){
-			m_dashboardGuiCompPtr->GetWidget()->showFullScreen();
+		if (ViewStack->currentIndex() == 1){
+			ViewStack->setCurrentIndex(0);
 		}
-		else{
-			m_dashboardGuiCompPtr->GetWidget()->hide();
+		else if (ViewStack->currentIndex() == 0){
+			ViewStack->setCurrentIndex(1);
 		}
 	}
 }
