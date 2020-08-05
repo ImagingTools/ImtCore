@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtlog/CLoginEventControllerComp.h>
 #include <imtlog/CMessageGroupInfoProviderComp.h>
+#include <imtlog/CEventHistoryControllerComp.h>
 
 
 /**
@@ -20,6 +21,7 @@ namespace ImtLogPck
 
 typedef ibase::TModelObserverCompWrap<imtlog::CLoginEventControllerComp> LoginEventController;
 typedef icomp::TMakeComponentWrap<imtlog::CMessageGroupInfoProviderComp, imtlog::IMessageGroupInfoProvider> MessageGroupInfoProvider;
+typedef imtlog::CEventHistoryControllerComp EventHistoryController;
 
 
 } // namespace ImtLogPck

@@ -24,6 +24,10 @@ I_EXPORT_COMPONENT(
 			"Information provider for messages",
 			"Message Information Provider");
 
+I_EXPORT_COMPONENT(
+			EventHistoryController,
+			"History for events",
+			"Event Log History Controller");
 
 } // namespace ImtLogPck
 
