@@ -130,6 +130,12 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 					m_keyEnterTimerId = startTimer(500);
 				}
 			}
+
+			if (pressedKey == Qt::Key_Escape){
+				if (ViewStack->currentIndex() == 1){
+					ViewStack->setCurrentIndex(0);
+				}
+			}
 		}
 	}
 
@@ -168,8 +174,12 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
+	if (m_dashboardGuiCompPtr.IsValid()){
+		m_dashboardGuiCompPtr->CreateGui(DashBoardFrame);
+	}
+
 	NavigationControlFrame->setVisible(m_pageNavigationControllerCompPtr.IsValid());
-	DashboardButton->setVisible(m_dashboardGuiCompPtr.IsValid());
+	DashboardButton->setVisible(m_dashboardGuiCompPtr.IsValid() && m_dashboardGuiCompPtr->IsGuiCreated());
 	DashboardButton->setShortcut(Qt::CTRL + Qt::Key_D);
 
 	if (m_mainToolBar == nullptr){
@@ -553,10 +563,6 @@ void CThumbnailDecoratorGuiComp::on_NextPageButton_clicked()
 void CThumbnailDecoratorGuiComp::on_DashboardButton_clicked()
 {
 	Q_ASSERT(m_dashboardGuiCompPtr.IsValid());
-
-	if (!m_dashboardGuiCompPtr->IsGuiCreated()){
-		m_dashboardGuiCompPtr->CreateGui(DashBoardFrame);
-	}
 
 	if (m_dashboardGuiCompPtr->IsGuiCreated()){
 		if (ViewStack->currentIndex() == 1){
