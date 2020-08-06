@@ -75,10 +75,8 @@ public:
 
 	CObjectCollectionViewComp();
 
-	// reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
-	virtual void ProcessObjectCollectionEvent(
-				const imtbase::IObjectCollection* objectCollectionPtr,
-				const imtbase::IObjectCollectionEvent* eventPtr) override;
+	// reimplemented (imtbase::IObjectCollectionEventHandler)
+	virtual void OnCollectionConnected(const imtbase::IObjectCollection* objectCollectionPtr) override;
 
 	// reimplemented (ibase::IProgressManager)
 	virtual int BeginProgressSession(
@@ -92,6 +90,11 @@ public:
 protected:
 	ICollectionViewDelegate& GetViewDelegateRef(const QByteArray& typeId);
 	const ICollectionViewDelegate& GetViewDelegate(const QByteArray& typeId) const;
+
+	// reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
+	virtual void ProcessObjectCollectionEvent(
+				const imtbase::IObjectCollection* objectCollectionPtr,
+				const imtbase::IObjectCollectionEvent* eventPtr) override;
 
 	// reimplemented (iqtgui::TRestorableGuiWrap)
 	virtual void OnRestoreSettings(const QSettings& settings) override;
@@ -309,6 +312,8 @@ private:
 	I_MULTIREF(ICollectionViewDelegate, m_viewDelegatesCompPtr);
 	I_ATTR(bool, m_showCommandsToolBarAttrPtr);
 	I_ATTR(QByteArray, m_columnSettingsKeyAttrPtr);
+
+	bool m_eventBasedUpdateEnabled;
 };
 
 

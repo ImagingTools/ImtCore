@@ -84,7 +84,10 @@ public:
 	I_MULTIREF(imtbase::IObjectCollectionEventHandler, m_eventHandlerListCompPtr);
 };
 
-class CFileCollectionComp: public CFileCollectionCompBase, virtual public IFileObjectCollection
+
+class CFileCollectionComp:
+			public CFileCollectionCompBase,
+			virtual public IFileObjectCollection
 {
 	Q_OBJECT
 public:

@@ -37,6 +37,8 @@ public:
 	virtual void OnObjectCollectionEvent(
 				const imtbase::IObjectCollection* objectCollectionPtr,
 				const imtbase::IObjectCollectionEvent* eventPtr) override;
+	virtual void OnCollectionConnected(const imtbase::IObjectCollection* objectCollectionPtr) override;
+	virtual void OnCollectionDisconnected(const imtbase::IObjectCollection* objectCollectionPtr) override;
 
 protected:
 	virtual void ProcessObjectCollectionEvent(
@@ -65,6 +67,18 @@ void TObjectCollectionEventHandlerCompWrap<Base>::OnObjectCollectionEvent(
 	if (m_slaveEventHandlerCompPtr.IsValid()){
 		m_slaveEventHandlerCompPtr->OnObjectCollectionEvent(objectCollectionPtr, eventPtr);
 	}
+}
+
+
+template <class Base>
+void TObjectCollectionEventHandlerCompWrap<Base>::OnCollectionConnected(const imtbase::IObjectCollection* /*objectCollectionPtr*/)
+{
+}
+
+
+template <class Base>
+void TObjectCollectionEventHandlerCompWrap<Base>::OnCollectionDisconnected(const imtbase::IObjectCollection* /*objectCollectionPtr*/)
+{
 }
 
 

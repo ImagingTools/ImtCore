@@ -689,6 +689,9 @@ bool CFileCollectionComp::RegisterEventHandler(IObjectCollectionEventHandler* ev
 {
 	if (!m_eventHandlerList.contains(eventHandler)){
 		m_eventHandlerList.append(eventHandler);
+
+		eventHandler->OnCollectionConnected(this);
+
 		return true;
 	}
 
@@ -700,7 +703,10 @@ bool CFileCollectionComp::UnregisterEventHandler(IObjectCollectionEventHandler* 
 {
 	int index = m_eventHandlerList.indexOf(eventHandler, 0);
 	if (index >= 0){
+		eventHandler->OnCollectionDisconnected(this);
+
 		m_eventHandlerList.removeAt(index);
+
 		return true;
 	}
 

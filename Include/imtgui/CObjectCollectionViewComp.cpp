@@ -39,24 +39,18 @@ CObjectCollectionViewComp::CObjectCollectionViewComp()
 	m_currentInformationViewPtr(nullptr),
 	m_updateThread(this),
 	m_updateThreadState(UTS_IDLE),
-	m_itemModelPtr(&m_itemModel1)
+	m_itemModelPtr(&m_itemModel1),
+	m_eventBasedUpdateEnabled(false)
 {
 	m_commands.SetParent(this);
 }
 
 
-// reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
+// reimplemented (imtbase::IObjectCollectionEventHandler)
 
-void CObjectCollectionViewComp::ProcessObjectCollectionEvent(
-			const imtbase::IObjectCollection* objectCollectionPtr,
-			const imtbase::IObjectCollectionEvent* eventPtr)
+void CObjectCollectionViewComp::OnCollectionConnected(const imtbase::IObjectCollection* /*objectCollectionPtr*/)
 {
-	istd::TSmartPtr<const imtbase::IObjectCollectionEvent> clonePtr(dynamic_cast<const imtbase::IObjectCollectionEvent*>(eventPtr->CloneMe()));
-	Q_ASSERT(clonePtr.IsValid());
-
-	QMetaObject::invokeMethod(this, "ProcessObjectCollectionEventSync",
-				Q_ARG(ObjectCollectionPtr, objectCollectionPtr),
-				Q_ARG(ObjectCollectionEventPtr, clonePtr));
+	m_eventBasedUpdateEnabled = true;
 }
 
 
@@ -117,6 +111,23 @@ ICollectionViewDelegate & CObjectCollectionViewComp::GetViewDelegateRef(const QB
 const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const QByteArray& typeId) const
 {
 	return (const_cast<CObjectCollectionViewComp*>(this))->GetViewDelegateRef(typeId);
+}
+
+
+// reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
+
+void CObjectCollectionViewComp::ProcessObjectCollectionEvent(
+			const imtbase::IObjectCollection* objectCollectionPtr,
+			const imtbase::IObjectCollectionEvent* eventPtr)
+{
+	istd::TSmartPtr<const imtbase::IObjectCollectionEvent> clonePtr(dynamic_cast<const imtbase::IObjectCollectionEvent*>(eventPtr->CloneMe()));
+	Q_ASSERT(clonePtr.IsValid());
+
+	QMetaObject::invokeMethod(
+			this,
+			"ProcessObjectCollectionEventSync",
+			Q_ARG(ObjectCollectionPtr, objectCollectionPtr),
+			Q_ARG(ObjectCollectionEventPtr, clonePtr));
 }
 
 
@@ -246,7 +257,7 @@ void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 
 void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 {
-	if (changeSet.Contains(istd::IChangeable::CF_ALL_DATA)){
+	if (changeSet.Contains(istd::IChangeable::CF_ALL_DATA) || !m_eventBasedUpdateEnabled){
 		StartUpdate();
 	}
 }
