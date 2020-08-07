@@ -3,11 +3,16 @@
 
 // Qt includes
 #include <QtCore/QThread>
+#include <QtCore/QQueue>
+#include <QtCore/QTimer>
 
 // ACF includes
+#include <ibase/TRuntimeStatusHanderCompWrap.h>
 #include <ifile/IFileNameParam.h>
 #include <ilog/CMessageContainer.h>
 #include <ilog/TLoggerCompWrap.h>
+#include <iser/IVersionInfo.h>
+#include <istd/TRange.h>
 
 // ImtCore includes
 #include <imtfile/IFileCompression.h>
@@ -19,19 +24,21 @@ namespace imtlog
 
 class CEventHistoryControllerComp:
 			public QObject,
-			public ilog::CLoggerComponentBase,
+			public ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase>,
 			virtual public ilog::IMessageConsumer
 {
 	Q_OBJECT
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CEventHistoryControllerComp)
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
-		I_ASSIGN(m_repositoryPathCompPtr, "RepositoryPath", "Path to the event history folder", true, "");
+		I_ASSIGN(m_logFolderCompPtr, "LogFolder", "Path to the event history folder", true, "");
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "");
 		I_ASSIGN(m_slaveMessageConsumerCompPtr, "SlaveMessageConsumer", "Slave message consumer", false, "");
-		I_ASSIGN(m_flushingIntervalAttrPtr, "FlushingInterval", "Flushing interval for history in seconds", true, 5);
+		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
+		I_ASSIGN(m_containerTimeDurationAttrPtr, "ContainerTimeRangeDuration", "Container time range duration in seconds", true, 600);
+		I_ASSIGN(m_containerWriteDelayAttrPtr, "ContainerWriteDelay", "Delay before sending the message container for writig in seconds", true, 300);
 		I_ASSIGN(m_containerNameFormatAttrPtr, "ContainerNameFormat", "Container name format", true, "dd.MM.yyyy hh-mm-ss.zzz");
 		I_ASSIGN(m_containerExtensionAttrPtr, "ContainerFileExtension", "Container file extension", true, "xml");
 		I_ASSIGN(m_archiveNameFormatAttrPtr, "ArchiveNameFormat", "Archive name format", true, "dd.MM.yyyy");
@@ -47,23 +54,20 @@ public:
 				const istd::IInformationProvider* messagePtr = NULL) const override;
 	virtual void AddMessage(const MessagePtr& messagePtr) override;
 
+	// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
+	virtual void OnSystemShutdown() override;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
-
-protected:
-	// reimplemented (QObject)
-	virtual void timerEvent(QTimerEvent *event) override;
 
 private:
-	struct IntervalContainer
+	enum ControllerState
 	{
-		ilog::CMessageContainer messageContainer;
-		QDateTime beginTime;
-		QDateTime endTime;
+		CS_OK = 0,
+		CS_INIT,
+		CS_SHUTDOWN,
+		CS_FAILED
 	};
-	typedef QSharedPointer<IntervalContainer> IntervalContainerPtr;
-	typedef QList<IntervalContainerPtr> IntervalContainerQueue;
 
 	enum ThreadState
 	{
@@ -83,13 +87,57 @@ private:
 		TS_PENDING
 	};
 
+
+	struct TimeRange
+	{
+		QDateTime beginTime;
+		QDateTime endTime;
+	};
+
+	class EventContainer:
+				virtual public ilog::IMessageContainer,
+				virtual public ilog::IMessageConsumer
+	{
+	public:
+		const QDateTime& GetBeginTime();
+		void SetBeginTime(const QDateTime& time);
+
+		const QDateTime& GetEndTime();
+		void SetEndTime(const QDateTime& time);
+
+		int GetMessagesCount();
+
+		// reimplemented (ilog::IMessageConsumer)
+		virtual bool IsMessageSupported(
+					int messageCategory = -1,
+					int messageId = -1,
+					const istd::IInformationProvider* messagePtr = NULL) const override;
+		virtual void AddMessage(const MessagePtr& messagePtr) override;
+
+		// reimplemented (ilog::IMessageContainer)
+		virtual int GetWorstCategory() const override;
+		virtual Messages GetMessages() const override;
+		virtual void ClearMessages() override;
+
+		// reimplemented (iser::ISerializable)
+		bool Serialize(iser::IArchive & archive) override;
+
+	private:
+		mutable QMutex m_mutex;
+
+		ilog::CMessageContainer m_messageContainer;
+		QDateTime m_beginTime;
+		QDateTime m_endTime;
+	};
+	typedef QSharedPointer<EventContainer> EventContainerPtr;
+	typedef QQueue<EventContainerPtr> EventContainerQueue;
+
 	class Reader: public QThread
 	{
 	public:
 		explicit Reader(CEventHistoryControllerComp* parentPtr);
 
 	private:
-		void DisableHistory();
 		void ImportFromDirs(const QStringList& dirList);
 		void ImportFromFiles(const QStringList& fileList);
 
@@ -98,7 +146,6 @@ private:
 
 	private:
 		CEventHistoryControllerComp* m_parentPtr;
-		bool m_isInterrupted;
 	};
 
 	class Writer: public QThread
@@ -107,57 +154,52 @@ private:
 		explicit Writer(CEventHistoryControllerComp* parentPtr);
 
 	private:
-		void DisableHistory();
-
 		// reimplemented (QThread)
 		virtual void run() override;
 
 	private:
 		CEventHistoryControllerComp* m_parentPtr;
-		bool m_isInterrupted;
 	};
 
-private:
-	void StartDayTimer();
-	void StartIntervalTimer();
-	bool IsCurrentInterval(const QDateTime& timestamp);
-	bool IsCurrentDay(const QDateTime& timestamp);
-	void CloseInterval();
-	bool SerializeContainer(IntervalContainerPtr intervalContainerPtr, iser::IArchive& archive);
+private Q_SLOTS:
+	void OnContainerCheckTimer();
 
-	Q_INVOKABLE void AddMessageSync(const MessagePtr messagePtr);
-	Q_INVOKABLE void DisableHistory();
+private:
+	EventContainerPtr GetContainerForMessage(const MessagePtr& messagePtr);
+	TimeRange CalculateContainerTimeRange(const QDateTime& lastContainerEndTime);
+	void PrepareWorkingContainers();
+	bool SerializeContainer(EventContainerPtr containerPtr, iser::IArchive& archive);
+	
 
 	void StartReader();
 	Q_INVOKABLE void OnReaderFinished();
-	Q_INVOKABLE void OnReaderInterrupted();
-	Q_INVOKABLE void OnContainerReadComplete(IntervalContainerPtr intervalContainerPtr);
+	Q_INVOKABLE void OnContainerReadComplete(EventContainerPtr containerPtr);
 
 	void StartWriter();
 	Q_INVOKABLE void OnWriterFinished();
-	Q_INVOKABLE void OnWriterInterrupted();
 
 private:
-	QDateTime m_startedAt;
-	bool m_isHistoryActive;
+	QDateTime m_systemStartTime;
+	ControllerState m_controllerState;
 
 	Reader m_reader;
 	Writer m_writer;
 	ThreadState m_readerState;
 	ThreadState m_writerState;
 
-	QMutex m_queueMutex;
+	QTimer m_containerCheckTimer;
 
-	int m_idDayTimer;
-	int m_idIntervalTimer;
+	EventContainerQueue m_workingQueue;
+	EventContainerQueue m_writingQueue;
+	QMutex m_workingQueueMutex;
+	QMutex m_writingQueueMutex;
 
-	IntervalContainerPtr m_containerPtr;
-	IntervalContainerQueue m_containerQueue;
-
-	I_REF(ifile::IFileNameParam, m_repositoryPathCompPtr);
+	I_REF(ifile::IFileNameParam, m_logFolderCompPtr);
 	I_REF(imtfile::IFileCompression, m_compressorCompPtr);
 	I_REF(ilog::IMessageConsumer, m_slaveMessageConsumerCompPtr);
-	I_ATTR(int, m_flushingIntervalAttrPtr);
+	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
+	I_ATTR(int, m_containerTimeDurationAttrPtr);
+	I_ATTR(int, m_containerWriteDelayAttrPtr);
 	I_ATTR(QString, m_containerNameFormatAttrPtr);
 	I_ATTR(QString, m_containerExtensionAttrPtr);
 	I_ATTR(QString, m_archiveNameFormatAttrPtr);
