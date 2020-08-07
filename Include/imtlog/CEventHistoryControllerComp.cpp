@@ -73,8 +73,8 @@ void CEventHistoryControllerComp::OnSystemShutdown()
 	m_reader.wait();
 
 	{
-		QMutexLocker workLocker(&m_workingQueueMutex);
-		QMutexLocker writeLocker(&m_writingQueueMutex);
+		QMutexLocker workingQueueLocker(&m_workingQueueMutex);
+		QMutexLocker writingQueueLocker(&m_writingQueueMutex);
 
 		while (!m_workingQueue.isEmpty()){
 			EventContainerPtr containerPtr = m_workingQueue.dequeue();
@@ -123,8 +123,8 @@ void CEventHistoryControllerComp::OnComponentCreated()
 
 void CEventHistoryControllerComp::OnContainerCheckTimer()
 {
-	QMutexLocker workQueueLocker(&m_workingQueueMutex);
-	QMutexLocker writeQueueLocker(&m_writingQueueMutex);
+	QMutexLocker workingQueueLocker(&m_workingQueueMutex);
+	QMutexLocker writingQueueLocker(&m_writingQueueMutex);
 
 	while (!m_workingQueue.isEmpty()){
 		if (m_workingQueue.head()->GetEndTime().addSecs(*m_containerWriteDelayAttrPtr) < QDateTime::currentDateTime()){
@@ -140,8 +140,8 @@ void CEventHistoryControllerComp::OnContainerCheckTimer()
 		break;
 	}
 
-	workQueueLocker.unlock();
-	writeQueueLocker.unlock();
+	workingQueueLocker.unlock();
+	writingQueueLocker.unlock();
 
 	PrepareWorkingContainers();
 }
@@ -154,7 +154,7 @@ CEventHistoryControllerComp::EventContainerPtr CEventHistoryControllerComp::GetC
 {
 	QDateTime time = messagePtr->GetInformationTimeStamp();
 
-	QMutexLocker workingLocker(&m_workingQueueMutex);
+	QMutexLocker workingQueueLocker(&m_workingQueueMutex);
 
 	for (EventContainerPtr containerPtr : m_workingQueue){
 		if (time >= containerPtr->GetBeginTime() && time <= containerPtr->GetEndTime()){
@@ -187,7 +187,7 @@ CEventHistoryControllerComp::TimeRange CEventHistoryControllerComp::CalculateCon
 
 void CEventHistoryControllerComp::PrepareWorkingContainers()
 {
-	QMutexLocker locker(&m_workingQueueMutex);
+	QMutexLocker workingQueueLocker(&m_workingQueueMutex);
 	
 	TimeRange timeRange;
 
@@ -524,25 +524,25 @@ CEventHistoryControllerComp::Writer::Writer(CEventHistoryControllerComp* parentP
 void CEventHistoryControllerComp::Writer::run()
 {
 	while (true){
-		QMutexLocker locker(&m_parentPtr->m_writingQueueMutex);
+		QMutexLocker writingQueueLocker(&m_parentPtr->m_writingQueueMutex);
 
 		if (m_parentPtr->m_writingQueue.isEmpty()){
 			break;
 		}
 
 		EventContainerPtr containerPtr = m_parentPtr->m_writingQueue.first();
-		locker.unlock();
+		writingQueueLocker.unlock();
 
 		if (containerPtr.isNull()){
 			m_parentPtr->SendErrorMessage(0, tr("Skipped event container with nullptr in the queue"));
-			locker.relock();
+			writingQueueLocker.relock();
 			m_parentPtr->m_writingQueue.removeFirst();
 			continue;
 		}
 
 		if (containerPtr->GetMessagesCount() == 0){
 			m_parentPtr->SendErrorMessage(0, tr("Skipped empty event container")); 
-			locker.relock();
+			writingQueueLocker.relock();
 			m_parentPtr->m_writingQueue.removeFirst();
 			continue;
 		}
@@ -611,7 +611,7 @@ void CEventHistoryControllerComp::Writer::run()
 			m_parentPtr->SendErrorMessage(0, tr("Cannot create temporary folder. Event container skipped"));			
 		}
 
-		locker.relock();
+		writingQueueLocker.relock();
 		m_parentPtr->m_writingQueue.removeFirst();
 	}
 
