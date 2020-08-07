@@ -37,6 +37,8 @@ public:
 	virtual const MetaInfo& GetMetaInfo() const = 0;
 	virtual void SetMetaInfo(const QString& key, const QString& value) = 0;
 	virtual void RemoveMetaInfo(const QString& key) = 0;
+	virtual const QColor& GetBackgroundColor(const QColor& color) = 0;
+	virtual void SetBackgroundColor(const QColor& color) = 0;
 };
 
 

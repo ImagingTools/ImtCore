@@ -25,6 +25,8 @@ public:
 	virtual const MetaInfo& GetMetaInfo() const override;
 	virtual void SetMetaInfo(const QString& key, const QString& value) override;
 	virtual void RemoveMetaInfo(const QString& key) override;
+	virtual const QColor& GetBackgroundColor(const QColor& color) override;
+	virtual void SetBackgroundColor(const QColor& color) override;
 
 protected:
 	void UpdateToolTip();
@@ -32,6 +34,7 @@ protected:
 private:
 	ilog::IMessageConsumer::MessagePtr m_messagePtr;
 	MetaInfo m_metaInfo;
+	QColor m_backgroundColor;
 };
 
 
