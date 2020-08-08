@@ -165,7 +165,7 @@ void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
 bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::LoadPluginDirectory(const QString& pluginDirectoryPath)
 {
-    ilog::CLoggerBase::SendInfoMessage(0, QString("Looking for the plug-ins in '%1'").arg(pluginDirectoryPath));
+	ilog::CLoggerBase::SendInfoMessage(0, QString("Looking for the plug-ins in '%1'").arg(pluginDirectoryPath));
 
 	if (!pluginDirectoryPath.isEmpty() && QFileInfo(pluginDirectoryPath).exists()){
 		QDir pluginsDirectory(pluginDirectoryPath);
@@ -176,7 +176,7 @@ bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 #ifdef Q_OS_WIN
 			SetDllDirectory(pluginPath.absolutePath().toStdWString().c_str());
 #endif
-            ilog::CLoggerBase::SendInfoMessage(0, QString("Load: '%1'").arg(pluginPath.canonicalFilePath()));
+			ilog::CLoggerBase::SendInfoMessage(0, QString("Load: '%1'").arg(pluginPath.canonicalFilePath()));
 
 			QLibrary library(pluginPath.canonicalFilePath());
 			if (library.load()){
@@ -193,16 +193,16 @@ bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 							m_plugins.push_back(pluginInfo);
 						}
 						else{
-                            ilog::CLoggerBase::SendInfoMessage(0, QString("Plug-in initialization failed for: '%1'").arg(pluginPath.canonicalFilePath()));
+							ilog::CLoggerBase::SendInfoMessage(0, QString("Plug-in initialization failed for: '%1'").arg(pluginPath.canonicalFilePath()));
 						}
 					}
 				}
 				else{
-                    ilog::CLoggerBase::SendErrorMessage(0, QString("Plug-in entry point was not found: '%1'").arg(pluginPath.canonicalFilePath()).arg(library.errorString()));
+					ilog::CLoggerBase::SendErrorMessage(0, QString("Plug-in entry point was not found: '%1'").arg(pluginPath.canonicalFilePath()).arg(library.errorString()));
 				}
 			}
 			else{
-                ilog::CLoggerBase::SendErrorMessage(0, QString("%1").arg(library.errorString()));
+				ilog::CLoggerBase::SendErrorMessage(0, QString("%1").arg(library.errorString()));
 			}
 		}
 
@@ -246,7 +246,7 @@ void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 {
 	m_settingsObserver.EnsureModelDetached();
 
-    for (typename Plugins::iterator iter = m_plugins.begin(); iter != m_plugins.end(); ++iter){
+	for (typename Plugins::iterator iter = m_plugins.begin(); iter != m_plugins.end(); ++iter){
 		iter->destroyFunc(iter->pluginPtr);
 	}
 
