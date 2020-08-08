@@ -28,7 +28,7 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(TObjectCollectionEventHandlerCompWrap);
 		I_REGISTER_INTERFACE(IObjectCollectionEventHandler);
-		I_ASSIGN(m_slaveEventHandlerCompPtr, "SlaveEventHandler", "Slave object collection event handler", false, "");
+		I_ASSIGN(m_slaveEventHandlerCompPtr, "SlaveEventHandler", "Slave object collection event handler", false, "SlaveEventHandler");
 	I_END_COMPONENT;
 
 	TObjectCollectionEventHandlerCompWrap();
