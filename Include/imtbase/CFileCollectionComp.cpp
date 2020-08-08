@@ -577,7 +577,7 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 			QString newPhysicalName = objectName;
 #if _WIN32
 			QString newFullName = objectName + "." + fileInfo.suffix();
-			newPhysicalName = CalculateShortWindowsFileName(newFullName, QFileInfo(newFullName), "");
+			newPhysicalName = CalculateShortFileName(newFullName, QFileInfo(newFullName), "");
 			newPhysicalName = QFileInfo(newPhysicalName).completeBaseName();
 #endif
 			QString newFileName = newPhysicalName + "." + fileInfo.suffix();
@@ -1094,8 +1094,7 @@ QString CFileCollectionComp::CalculateFolderPathInRepository(
 
 		if (useSubfolder){
 			QString subfolderName = objectName;
-#ifdef _WIN32
-			// shortened on Win?
+#ifdef Q_OS_WIN
 			if (inputFileInfo.fileName() == objectName){
 				subfolderName = inputFileInfo.completeBaseName();
 			}
@@ -1146,16 +1145,17 @@ QString CFileCollectionComp::CalculateTargetFilePath(
 			targetFileName = dirName + "." + inputFileInfo.suffix();
 		}
 
-#ifdef _WIN32
-		targetFileName = CalculateShortWindowsFileName(targetFileName, inputFileInfo, "");
+#ifdef Q_OS_WIN
+		targetFileName = CalculateShortFileName(targetFileName, inputFileInfo, "");
 #endif
 		targetFilePath = targetFolderPath + QString("/") + targetFileName;
 	}
 	else{
 		QString uuidPrefix = QUuid::createUuid().toString() + QString(" - ");
 		QString targetFileName = uuidPrefix + inputFileInfo.fileName();
-#ifdef _WIN32
-		targetFileName = CalculateShortWindowsFileName(targetFileName, inputFileInfo, uuidPrefix);
+
+#ifdef Q_OS_WIN
+		targetFileName = CalculateShortFileName(targetFileName, inputFileInfo, uuidPrefix);
 #endif
 		targetFilePath = targetFolderPath + QString("/") + targetFileName;
 	}
@@ -1355,24 +1355,23 @@ QString CFileCollectionComp::GetMetaInfoFilePath(const CollectionItem& repositor
 }
 
 
-QString CFileCollectionComp::CalculateShortWindowsFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const
+QString CFileCollectionComp::CalculateShortFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const
 {
-	int extensionLength = GetRepositoryInfo().dataFileSuffix.size() + 1;
+	const int maxFileNameLength = 255;
 
-	if (fileName.size() + extensionLength > 255){
-		int shortenedFilenameSize = 255 - extensionLength - prefix.size();
+	int fileSuffixSize = GetRepositoryInfo().dataFileSuffix.size() + 1;
 
-		QString shortenedFilename = fileInfo.fileName().mid(0, shortenedFilenameSize - (fileInfo.suffix().size() + 1));
-		shortenedFilename.chop(1);
-		shortenedFilename.append("~.").append(fileInfo.suffix());
-		shortenedFilename.prepend(prefix);
+	if (fileName.size() + fileSuffixSize > maxFileNameLength){
+		int reducedNameSize = maxFileNameLength - fileSuffixSize - prefix.size();
 
-		Q_ASSERT(shortenedFilename.size() <= 255 - extensionLength);
+		QString reducedFileName = fileInfo.fileName().mid(0, reducedNameSize - (fileInfo.suffix().size() + 1));
+		reducedFileName.chop(1);
+		reducedFileName.append("~.").append(fileInfo.suffix());
+		reducedFileName.prepend(prefix);
 
-#if _DEBUG
-		SendInfoMessage(0, QString("File storage name shortened (too long on Windows), from '%1' to '%2'").arg(fileName).arg(shortenedFilename));
-#endif
-		return shortenedFilename;
+		Q_ASSERT(reducedFileName.size() <= maxFileNameLength - fileSuffixSize);
+
+		return reducedFileName;
 	}
 	else{
 		return fileName;

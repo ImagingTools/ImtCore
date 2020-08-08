@@ -4,6 +4,7 @@
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
+#include <istd/CChangeGroup.h>
 
 
 namespace imtbase
@@ -36,10 +37,10 @@ bool CObjectCollectionUpdateEvent::CopyFrom(const IChangeable& object, Compatibi
 {
 	const CObjectCollectionUpdateEvent* sourcePtr = dynamic_cast<const CObjectCollectionUpdateEvent*>(&object);
 	if (sourcePtr != nullptr){
-		if (BaseClass::GetSupportedOperations() & SO_COPY){
-			if (!BaseClass::CopyFrom(object, mode)){
-				return false;
-			}
+		istd::CChangeGroup changeGroup(this);
+
+		if (!BaseClass::CopyFrom(object, mode)){
+			return false;
 		}
 
 		if (m_updateType != sourcePtr->m_updateType){

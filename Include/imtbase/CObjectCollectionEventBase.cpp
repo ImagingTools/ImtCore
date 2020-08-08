@@ -12,10 +12,6 @@ namespace imtbase
 
 // public methods
 
-CObjectCollectionEventBase::CObjectCollectionEventBase()
-{
-}
-
 CObjectCollectionEventBase::CObjectCollectionEventBase(const QByteArray& itemId)
 	:m_itemId(itemId)
 {
@@ -34,7 +30,7 @@ QByteArray CObjectCollectionEventBase::GetItemId() const
 
 int CObjectCollectionEventBase::GetSupportedOperations() const
 {
-	return (SO_COPY | SO_COMPARE | SO_CLONE);
+	return SO_COPY | SO_COMPARE | SO_CLONE;
 }
 
 

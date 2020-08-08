@@ -14,12 +14,9 @@ class CObjectCollectionRemoveEvent: public CObjectCollectionEventBase
 public:
 	typedef CObjectCollectionEventBase BaseClass;
 
-	CObjectCollectionRemoveEvent();
-	CObjectCollectionRemoveEvent(const QByteArray& itemId);
+	CObjectCollectionRemoveEvent(const QByteArray& itemId = QByteArray());
 
 	// reimplemented (istd::IChangeable)
-	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual bool IsEqual(const IChangeable& object) const override;
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 };
 

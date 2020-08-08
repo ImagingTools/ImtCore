@@ -8,14 +8,14 @@
 namespace imtbase
 {
 
+
 /**
-	Interface for object collection events
+	Interface for object collection events.
 */
 class CObjectCollectionEventBase: virtual public IObjectCollectionEvent
 {
 public:
-	CObjectCollectionEventBase();
-	CObjectCollectionEventBase(const QByteArray& itemId);
+	CObjectCollectionEventBase(const QByteArray& itemId = QByteArray());
 
 	// reimplemented (imtbase::IObjectCollectionEvent)
 	virtual QByteArray GetItemId() const override;
