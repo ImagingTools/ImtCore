@@ -2,23 +2,20 @@
 
 
 // Qt includes
-#include <QtCore/QDir>
 #include <QtCore/QUuid>
+#include <QtCore/QDir>
 
 // ACF includes
 #include <istd/TOptDelPtr.h>
 #include <istd/CChangeNotifier.h>
-#include <istd/CChangeGroup.h>
-#include <istd/CCrcCalculator.h>
 #include <istd/CSystem.h>
+#include <istd/CCrcCalculator.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
-#include <iser/CPrimitiveTypesSerializer.h>
-#include <ifile/CCompactXmlFileWriteArchive.h>
-#include <ifile/CCompactXmlFileReadArchive.h>
-#include <ifile/CFileListProviderComp.h>
-#include <ifile/IFileResourceTypeConstraints.h>
 #include <ilog/CMessage.h>
+#include <ifile/CFileListProviderComp.h>
+#include <ifile/CCompactXmlFileReadArchive.h>
+#include <ifile/CCompactXmlFileWriteArchive.h>
 
 // ImtCore includes
 #include <imtbase/CObjectCollectionInsertEvent.h>
