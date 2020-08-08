@@ -19,8 +19,7 @@ class IFileCollectionInfo: virtual public istd::IChangeable
 {
 public:
 	/**
-		Get location of the file repository.
-		\return Path to the repository location or an empty string if no central location exists.
+		Get path to the root folder of the file collection.
 	*/
 	virtual QString GetCollectionRootFolder() const = 0;
 };

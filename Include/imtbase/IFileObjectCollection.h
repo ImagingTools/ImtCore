@@ -18,7 +18,7 @@ namespace imtbase
 
 
 /**
-	Common interface for a object collection stored in the of files.
+	Common interface for a object collection where the objects are stored in the file system.
 	\ingroup Collection
 */
 class IFileObjectCollection: virtual public IObjectCollection, virtual public IFileCollectionInfo

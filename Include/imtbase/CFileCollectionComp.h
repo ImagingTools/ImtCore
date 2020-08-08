@@ -104,7 +104,6 @@ public:
 		I_ASSIGN(m_resourceTypesCompPtr, "ResourceTypes", "List of supported resource types", false, "ResourceTypes");
 		I_ASSIGN(m_useSubfolderAttrPtr, "UseSubfolder", "If set, for each input file a subfolder with the corresponding file name will be created", true, false);
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
-		I_ASSIGN(m_createFolderOnStartAttrPtr, "CreateRepositoryFolder", "Ensure that the file collection folder is created on the start", true, true);
 		I_ASSIGN(m_pollFileSystemAttrPtr, "PollFileSystem", "If enabled, the collection folder will be observed and the items will be re-read on changes in the folder structure", true, false);
 		I_ASSIGN(m_pollingPeriodAttrPtr, "PollingPeriod", "Period of file system polling (seconds)", true, 1);
 		I_ASSIGN(m_asynchronousReadingAttrPtr, "AsynchronousReading", "If enabled, the collection will reading asynchronously", true, false);
@@ -456,11 +455,6 @@ private:
 		If set, for each input file a subfolder with the corresponding file name will be created.
 	*/
 	I_ATTR(bool, m_useSubfolderAttrPtr);
-
-	/**
-		Ensure that the file collection folder is created on starting.
-	*/
-	I_ATTR(bool, m_createFolderOnStartAttrPtr);
 
 	/**
 		Poll changes in file system to get automatic updates if an external process do some changes in the file collection.

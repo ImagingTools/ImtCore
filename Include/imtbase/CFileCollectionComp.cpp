@@ -1188,8 +1188,8 @@ void CFileCollectionComp::OnComponentCreated()
 
 		path = m_repositoryPathCompPtr->GetPath();
 		if (!path.isEmpty()){
-			if (*m_createFolderOnStartAttrPtr && !istd::CSystem::EnsurePathExists(path)){
-				SendCriticalMessage(0, QString("File repository could not be created in '%1'").arg(path));
+			if (!istd::CSystem::EnsurePathExists(path)){
+				SendCriticalMessage(0, QString("Root folder for the file collection could not be created in '%1'").arg(path));
 			}
 		}
 	}
