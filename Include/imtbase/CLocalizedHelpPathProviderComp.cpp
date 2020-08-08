@@ -73,7 +73,7 @@ QString CLocalizedHelpPathProviderComp::GetPathForLocale(int languageIndex) cons
 			QNetworkRequest request;
 
 			request.setUrl(QUrl(url));
-			request.setRawHeader("User-Agent", "MyAppName/1.0 (Nokia; Qt)");
+			request.setRawHeader("User-Agent", "Help Manager/1.0");
 			request.setRawHeader("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
 			request.setRawHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 			request.setRawHeader("Accept-Language", "en-us,en;q=0.5");

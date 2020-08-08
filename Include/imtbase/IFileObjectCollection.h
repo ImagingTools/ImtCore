@@ -25,41 +25,41 @@ class IFileObjectCollection: virtual public IObjectCollection, virtual public IF
 {
 public:
 	/**
-		Information related to the file inside the repository
+		Information related to the file item in the file collection.
 	*/
 	struct FileInfo
 	{
 		/**
-			Path to the file inside of the repository folder.
-		*/
-		QString filePath;
-
-		/**
-			Name to the file inside of the repository folder.
+			Name of the file in the collection folder.
 		*/
 		QString fileName;
 
 		/**
-			Last modification time.
+			Path to the file inside of the collection folder.
+		*/
+		QString filePath;
+
+		/**
+			Timestamp of the last file modification.
 		*/
 		QDateTime lastModified;
 	};
 
 	/**
 		Get type contraints describing each supported type of a resource.
-		\return	Type constraints, if available or \c NULL, if no type constraints were defined.
+		\return	Type constraints, if available or \c nullptr, if no type constraints were defined.
 	*/
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const = 0;
 
 	/**
 		Get file information related to a object
-		\param objectId	ID of the file in the repository
+		\param objectId	ID of the file in the collection
 		\return	Related informations \sa FileInfo
 	*/
 	virtual FileInfo GetFileInfo(const QByteArray& objectId) const = 0;
 
 	/**
-		Get file from the repository.
+		Get file from the collection.
 		\param objectId				ID of the file object.
 		\param targetFilePath		Path to the location where the file should be stored. If the path is empty, the implementation should define the location of the file automatically.
 		\return Path to the file on the local system or an empty string if the operation has been failed.
@@ -67,7 +67,7 @@ public:
 	virtual QString GetFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const = 0;
 
 	/**
-		Add a file to the repository 
+		Add a file to the collection 
 		\param filePath				Path to the file.
 		\param objectTypeId			Type-ID of the file object. \sa GetFileTypeConstraints
 		\param objectName			Name of the file object used for human readable representation. If no name was set, the file name will be used.
@@ -83,9 +83,9 @@ public:
 				const QByteArray& proposedObjectId = QByteArray()) = 0;
 
 	/**
-		Update file in the repository.
+		Update file in the collection.
 		\param filePath		Path to the file containing the new data content.
-		\param objectId		ID of the object to be updated in the repository.
+		\param objectId		ID of the object to be updated in the collection.
 		\return \c true if the file object was successfully updated or \c false otherwise.
 	*/
 	virtual bool UpdateFile(const QString& filePath, const QByteArray& objectId) = 0;
