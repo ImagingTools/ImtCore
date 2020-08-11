@@ -50,9 +50,9 @@ CEventViewComp::CEventViewComp()
 // reimplemented (ilog::IMessageConsumer)
 
 bool CEventViewComp::IsMessageSupported(
-			int /*messageCategory*/,
-			int /*messageId*/,
-			const istd::IInformationProvider* /*messagePtr*/) const
+			int messageCategory,
+			int messageId,
+			const istd::IInformationProvider* messagePtr) const
 {
 	return true;
 }
@@ -60,6 +60,8 @@ bool CEventViewComp::IsMessageSupported(
 
 void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 {
+	BaseClass::AddMessage(message);
+
 	if (!IsGuiCreated()){
 		m_messageList.append(message);
 		return;

@@ -11,14 +11,15 @@
 #include <ilog/IMessageConsumer.h>
 #include <imeas/INumericConstraints.h>
 #include <imod/TSingleModelObserverBase.h>
-#include <iqtgui/CHierarchicalCommand.h>
+#include <ilog/TMessageDelegatorComp.h>
 #include <iqtgui/TDesignerGuiCompBase.h>
+#include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
-#include <imtloggui/CEventGraphicsView.h>
-#include <imtloggui/CTimeAxis.h>
 #include <imtloggui/IEventGroupController.h>
 #include <imtloggui/IGraphicsViewModel.h>
+#include <imtloggui/CEventGraphicsView.h>
+#include <imtloggui/CTimeAxis.h>
 
 // Acula includes
 #include <GeneratedFiles/imtloggui/ui_CEventViewComp.h>
@@ -29,14 +30,13 @@ namespace imtloggui
 
 
 class CEventViewComp:
-			public iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp>,
+			public ilog::TMessageDelegatorComp<iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp>>,
 			virtual public ilog::IMessageConsumer
 {
 	Q_OBJECT
 
 public:
-	typedef iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp> BaseClass;
-	typedef imod::TSingleModelObserverBase<imeas::INumericConstraints> BaseClass2;
+	typedef public ilog::TMessageDelegatorComp<iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp>> BaseClass;
 	
 	I_BEGIN_COMPONENT(CEventViewComp);
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
