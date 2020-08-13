@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtWidgets/QLabel>
+#include <QtCore/QDebug>
 
 // ACF includes
 #include <iser/IObject.h>
@@ -44,6 +45,7 @@ CEventViewComp::CEventViewComp()
 	connect(&m_moveToPreviousCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToPreviousCommand);
 	connect(&m_moveToNextCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToNextCommand);
 	connect(&m_moveToLastCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToLastCommand);
+	m_messageProcessingTimer.callOnTimeout(this, &CEventViewComp::OnMessageProcessingTimer);
 }
 
 
@@ -62,21 +64,8 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 {
 	BaseClass::AddMessage(message);
 
-	if (!IsGuiCreated()){
-		m_messageList.append(message);
-		return;
-	}
-
-	if (m_groupControllerCompPtr.IsValid()){
-		m_timeAxis.EnsureTimeRange(message->GetInformationTimeStamp());
-		IEventItem* eventItemPtr =  m_groupControllerCompPtr->AddEvent(message);
-		if (eventItemPtr != nullptr){
-			m_eventMap.insert(message->GetInformationTimeStamp(), eventItemPtr);
-		}
-		UpdateSummaryInfoPanel();
-	}
-
-	UpdateCommands();
+	QMutexLocker locker(&m_messageListMutex);
+	m_messageList.append(message);
 }
 
 
@@ -150,18 +139,12 @@ void CEventViewComp::OnGuiCreated()
 
 	UpdateSummaryInfoPanel();
 
-	if (m_messageList.isEmpty()){
-		m_timeAxis.EnsureTimeRange(QDateTime::currentDateTime());
-	}
-	else{
-		for (const ilog::IMessageConsumer::MessagePtr& message : m_messageList){
-			AddMessage(message);
-		}
-
-		m_messageList.clear();
-	}
+	m_timeAxis.EnsureTimeRange(QDateTime::currentDateTime());
 
 	UpdateCommands();
+
+	m_messageProcessingTimer.setInterval(100);
+	m_messageProcessingTimer.start();
 }
 
 
@@ -195,6 +178,16 @@ void CEventViewComp::OnGuiRetranslate()
 	m_moveToPreviousCommand.SetVisuals(tr("Previous event"), tr("Previous"), tr("Move to previous event"), QIcon(":/Icons/Left"));
 	m_moveToNextCommand.SetVisuals(tr("Next event"), tr("Next"), tr("Move to next event"), QIcon(":/Icons/Right"));
 	m_moveToLastCommand.SetVisuals(tr("Last event"), tr("Last"), tr("Move to last event"), QIcon(":/Icons/MoveLast"));
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CEventViewComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	m_slaveMessageConsumerCompPtr.EnsureInitialized();
 }
 
 
@@ -380,6 +373,39 @@ void CEventViewComp::OnSelectionChanged()
 
 void CEventViewComp::OnUpdateSceneRect()
 {
+}
+
+
+void CEventViewComp::OnMessageProcessingTimer()
+{
+	if (IsGuiCreated()){
+		if (m_groupControllerCompPtr.IsValid()){
+			QMutexLocker locker(&m_messageListMutex);
+			while (m_messageList.count()){
+				MessagePtr message = m_messageList.takeFirst();
+				locker.unlock();
+
+				QDateTime dt = QDateTime::currentDateTime();
+				m_timeAxis.EnsureTimeRange(message->GetInformationTimeStamp());
+				qDebug() << "Enure time: " << QDateTime::currentDateTime().toMSecsSinceEpoch() - dt.toMSecsSinceEpoch();
+
+				dt = QDateTime::currentDateTime();
+				IEventItem* eventItemPtr = m_groupControllerCompPtr->AddEvent(message);
+				qDebug() << "Create item: " << QDateTime::currentDateTime().toMSecsSinceEpoch() - dt.toMSecsSinceEpoch();
+
+				if (eventItemPtr != nullptr){
+					m_eventMap.insert(message->GetInformationTimeStamp(), eventItemPtr);
+				}
+				//UpdateSummaryInfoPanel();
+			}
+
+			UpdateCommands();
+		}
+		else{
+			QMutexLocker locker(&m_messageListMutex);
+			m_messageList.clear();
+		}
+	}
 }
 
 

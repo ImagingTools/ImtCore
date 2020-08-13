@@ -29,6 +29,12 @@ I_EXPORT_COMPONENT(
 			"History for events",
 			"Event Log History Controller");
 
+I_EXPORT_COMPONENT(
+			MultithreadMessageGenerator,
+			"Multithread message generator",
+			"Threads Message Generator Log");
+
+
 } // namespace ImtLogPck
 
 

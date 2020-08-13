@@ -2,6 +2,8 @@
 
 
 // Qt includes
+#include <QtCore/QTimer>
+#include <QtCore/QMutexLocker>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QStackedWidget>
@@ -64,6 +66,9 @@ public:
 	virtual void OnGuiDestroyed() override;
 	virtual void OnGuiRetranslate() override;
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
 Q_SIGNALS:
 	void EmitShowAll();
 
@@ -78,6 +83,7 @@ private Q_SLOTS:
 	void OnMoveToLastCommand();
 	void OnSelectionChanged();
 	void OnUpdateSceneRect();
+	void OnMessageProcessingTimer();
 
 private:
 	QRectF GetSceneVisibleRect() const;
@@ -145,8 +151,6 @@ private:
 
 	QDateTime m_currentCommandTime;
 
-	QList<ilog::IMessageConsumer::MessagePtr> m_messageList;
-
 	IEventItemController::EventMap m_eventMap;
 	IEventItemController::EventMap::const_iterator m_navigationIterator;
 	bool m_isNavigationIteratorValid;
@@ -155,6 +159,10 @@ private:
 	QStackedWidget* m_panelsStackPtr;
 	QWidget* m_summaryInfoPanelPtr;
 	QWidget* m_metaInfoPanelPtr;
+
+	QList<ilog::IMessageConsumer::MessagePtr> m_messageList;
+	QTimer m_messageProcessingTimer;
+	QMutex m_messageListMutex;
 };
 
 

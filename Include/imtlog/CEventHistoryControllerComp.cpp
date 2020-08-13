@@ -46,6 +46,8 @@ bool CEventHistoryControllerComp::IsMessageSupported(
 
 void CEventHistoryControllerComp::AddMessage(const MessagePtr& messagePtr)
 {
+	BaseClass::AddMessage(messagePtr);
+
 	if (m_controllerState == CS_OK){
 		EventContainerPtr containerPtr = GetContainerForMessage(messagePtr);
 		if (containerPtr.isNull()){
@@ -54,10 +56,6 @@ void CEventHistoryControllerComp::AddMessage(const MessagePtr& messagePtr)
 		else{
 			containerPtr->AddMessage(messagePtr);
 		}
-	}
-
-	if (m_slaveMessageConsumerCompPtr.IsValid()){
-		m_slaveMessageConsumerCompPtr->AddMessage(messagePtr);
 	}
 }
 
@@ -92,9 +90,16 @@ void CEventHistoryControllerComp::OnSystemShutdown()
 }
 
 
+// reimplemented (icomp::CComponentBase)
+
 void CEventHistoryControllerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	m_logFolderCompPtr.EnsureInitialized();
+	m_slaveMessageConsumerCompPtr.EnsureInitialized();
+	m_compressorCompPtr.EnsureInitialized();
+	m_versionInfoCompPtr.EnsureInitialized();
 
 	if (!m_logFolderCompPtr.IsValid() || (m_logFolderCompPtr->GetPathType() != ifile::IFileNameParam::PT_DIRECTORY)){
 		m_controllerState = CS_FAILED;

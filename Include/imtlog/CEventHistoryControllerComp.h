@@ -7,12 +7,13 @@
 #include <QtCore/QTimer>
 
 // ACF includes
-#include <ibase/TRuntimeStatusHanderCompWrap.h>
-#include <ifile/IFileNameParam.h>
-#include <ilog/CMessageContainer.h>
-#include <ilog/TLoggerCompWrap.h>
 #include <iser/IVersionInfo.h>
+#include <ifile/IFileNameParam.h>
 #include <istd/TRange.h>
+#include <ilog/TLoggerCompWrap.h>
+#include <ilog/TMessageDelegatorComp.h>
+#include <ibase/TRuntimeStatusHanderCompWrap.h>
+#include <ilog/CMessageContainer.h>
 
 // ImtCore includes
 #include <imtfile/IFileCompression.h>
@@ -24,18 +25,19 @@ namespace imtlog
 
 class CEventHistoryControllerComp:
 			public QObject,
-			public ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase>,
+			public ibase::TRuntimeStatusHanderCompWrap<
+						ilog::TMessageDelegatorComp<ilog::CLoggerComponentBase>>,
 			virtual public ilog::IMessageConsumer
 {
 	Q_OBJECT
 public:
-	typedef ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase> BaseClass;
+	typedef ibase::TRuntimeStatusHanderCompWrap<
+				ilog::TMessageDelegatorComp<ilog::CLoggerComponentBase>> BaseClass;
 
 	I_BEGIN_COMPONENT(CEventHistoryControllerComp)
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
 		I_ASSIGN(m_logFolderCompPtr, "LogFolder", "Path to the event history folder", true, "");
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "");
-		I_ASSIGN(m_slaveMessageConsumerCompPtr, "SlaveMessageConsumer", "Slave message consumer", false, "");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
 		I_ASSIGN(m_containerTimeDurationAttrPtr, "ContainerTimeRangeDuration", "Container time range duration in seconds", true, 600);
 		I_ASSIGN(m_containerWriteDelayAttrPtr, "ContainerWriteDelay", "Delay before sending the message container for writig in seconds", true, 300);
@@ -196,7 +198,6 @@ private:
 
 	I_REF(ifile::IFileNameParam, m_logFolderCompPtr);
 	I_REF(imtfile::IFileCompression, m_compressorCompPtr);
-	I_REF(ilog::IMessageConsumer, m_slaveMessageConsumerCompPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 	I_ATTR(int, m_containerTimeDurationAttrPtr);
 	I_ATTR(int, m_containerWriteDelayAttrPtr);
