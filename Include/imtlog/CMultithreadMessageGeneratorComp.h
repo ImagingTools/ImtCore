@@ -16,13 +16,13 @@ namespace imtlog
 {
 
 
-class ÑMultithreadMessageGeneratorComp:
+class CMultithreadMessageGeneratorComp:
 			public ilog::TLoggerCompWrap<icomp::CComponentBase>
 {
 public:
 	typedef ilog::TLoggerCompWrap<icomp::CComponentBase> BaseClass;
 
-	I_BEGIN_COMPONENT(ÑMultithreadMessageGeneratorComp);
+	I_BEGIN_COMPONENT(CMultithreadMessageGeneratorComp);
 		I_ASSIGN(m_threadCountAttrPtr, "ThreadCount", "Thread count", true, 1);
 		I_ASSIGN(m_messagesFrequencyAttrPtr, "Frequency", "Messages per second", true, 1);
 	I_END_COMPONENT;
@@ -39,7 +39,7 @@ private:
 	class MessageGeneratorThread: public QThread
 	{
 	public:
-		explicit MessageGeneratorThread(ÑMultithreadMessageGeneratorComp* parentPtr);
+		explicit MessageGeneratorThread(CMultithreadMessageGeneratorComp* parentPtr);
 		void Start();
 		void Interrupt();
 		void SetFrequency(double frequency);
@@ -62,7 +62,7 @@ private:
 		void GenerateTimings(Timings& timings);
 
 	private:
-		ÑMultithreadMessageGeneratorComp* m_parentPtr;
+		CMultithreadMessageGeneratorComp* m_parentPtr;
 		ThreadState m_state;
 		QMutex m_mutex;
 		int m_frequency;

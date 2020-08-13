@@ -1,4 +1,4 @@
-#include <imtlog/ÑMultithreadMessageGeneratorComp.h>
+#include <imtlog/CMultithreadMessageGeneratorComp.h>
 
 
 // Qt includes
@@ -14,7 +14,7 @@ namespace imtlog
 
 // public methods
 
-void ÑMultithreadMessageGeneratorComp::Start()
+void CMultithreadMessageGeneratorComp::Start()
 {
 	int threadCount = *m_threadCountAttrPtr;
 	int frequency = *m_messagesFrequencyAttrPtr;
@@ -36,7 +36,7 @@ void ÑMultithreadMessageGeneratorComp::Start()
 }
 
 
-void ÑMultithreadMessageGeneratorComp::Stop()
+void CMultithreadMessageGeneratorComp::Stop()
 {
 	for (int i = 0; i < m_threads.count(); i++){
 		m_threads[i]->Interrupt();
@@ -51,7 +51,7 @@ void ÑMultithreadMessageGeneratorComp::Stop()
 // protected methods
 
 // reimplemented (icomp::CComponentBase)
-void ÑMultithreadMessageGeneratorComp::OnComponentCreated()
+void CMultithreadMessageGeneratorComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
@@ -59,7 +59,7 @@ void ÑMultithreadMessageGeneratorComp::OnComponentCreated()
 }
 
 
-void ÑMultithreadMessageGeneratorComp::OnComponentDestroyed()
+void CMultithreadMessageGeneratorComp::OnComponentDestroyed()
 {
 	Stop();
 
@@ -69,13 +69,13 @@ void ÑMultithreadMessageGeneratorComp::OnComponentDestroyed()
 
 // public methods of embedded class ÑMessageGeneratorThread
 
-ÑMultithreadMessageGeneratorComp::MessageGeneratorThread::MessageGeneratorThread(ÑMultithreadMessageGeneratorComp* parentPtr)
+CMultithreadMessageGeneratorComp::MessageGeneratorThread::MessageGeneratorThread(CMultithreadMessageGeneratorComp* parentPtr)
 	:m_parentPtr(parentPtr),
 	m_state(TS_IDLE)
 {
 }
 
-void ÑMultithreadMessageGeneratorComp::MessageGeneratorThread::Start()
+void CMultithreadMessageGeneratorComp::MessageGeneratorThread::Start()
 {
 	QMutexLocker statusLocker(&m_mutex);
 
@@ -87,13 +87,13 @@ void ÑMultithreadMessageGeneratorComp::MessageGeneratorThread::Start()
 }
 
 
-void ÑMultithreadMessageGeneratorComp::MessageGeneratorThread::Interrupt()
+void CMultithreadMessageGeneratorComp::MessageGeneratorThread::Interrupt()
 {
 	requestInterruption();
 }
 
 
-void ÑMultithreadMessageGeneratorComp::MessageGeneratorThread::SetFrequency(double frequency)
+void CMultithreadMessageGeneratorComp::MessageGeneratorThread::SetFrequency(double frequency)
 {
 	m_frequency = frequency;
 }
@@ -103,7 +103,7 @@ void ÑMultithreadMessageGeneratorComp::MessageGeneratorThread::SetFrequency(doub
 
 // reimplemented (QThread)
 
-void ÑMultithreadMessageGeneratorComp::MessageGeneratorThread::run()
+void CMultithreadMessageGeneratorComp::MessageGeneratorThread::run()
 {
 	while (!isInterruptionRequested()){
 		Timings timings;
@@ -135,7 +135,7 @@ void ÑMultithreadMessageGeneratorComp::MessageGeneratorThread::run()
 
 // protected methods of embedded class MessageGeneratorThread
 
-void ÑMultithreadMessageGeneratorComp::MessageGeneratorThread::GenerateTimings(ÑMultithreadMessageGeneratorComp::MessageGeneratorThread::Timings& timings)
+void CMultithreadMessageGeneratorComp::MessageGeneratorThread::GenerateTimings(CMultithreadMessageGeneratorComp::MessageGeneratorThread::Timings& timings)
 {
 	timings.clear();
 
