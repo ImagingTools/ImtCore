@@ -385,18 +385,13 @@ void CEventViewComp::OnMessageProcessingTimer()
 				MessagePtr message = m_messageList.takeFirst();
 				locker.unlock();
 
-				QDateTime dt = QDateTime::currentDateTime();
 				m_timeAxis.EnsureTimeRange(message->GetInformationTimeStamp());
-				qDebug() << "Enure time: " << QDateTime::currentDateTime().toMSecsSinceEpoch() - dt.toMSecsSinceEpoch();
 
-				dt = QDateTime::currentDateTime();
 				IEventItem* eventItemPtr = m_groupControllerCompPtr->AddEvent(message);
-				qDebug() << "Create item: " << QDateTime::currentDateTime().toMSecsSinceEpoch() - dt.toMSecsSinceEpoch();
-
 				if (eventItemPtr != nullptr){
 					m_eventMap.insert(message->GetInformationTimeStamp(), eventItemPtr);
 				}
-				//UpdateSummaryInfoPanel();
+				UpdateSummaryInfoPanel();
 			}
 
 			UpdateCommands();

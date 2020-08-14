@@ -64,6 +64,7 @@ void CEventGraphicsView::SetViewRect(const QRectF& rect)
 
 	ValidateViewRect();
 	UpdateViewRect();
+
 	Q_EMIT EmitViewPortChanged(false);
 }
 
