@@ -60,6 +60,12 @@ I_EXPORT_COMPONENT(
 			"Graphics View");
 
 
+I_EXPORT_COMPONENT(
+			EventStatisticsView,
+			"Events statistics view",
+			"Event Statistics View Message Group");
+
+
 } // namespace ImtLogGuiPck
 
 

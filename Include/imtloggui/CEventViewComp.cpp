@@ -25,7 +25,6 @@ CEventViewComp::CEventViewComp()
 	: m_viewPtr(nullptr),
 	m_splitterPtr(nullptr),
 	m_panelsStackPtr(nullptr),
-	m_summaryInfoPanelPtr(nullptr),
 	m_metaInfoPanelPtr(nullptr),
 	m_scaleConstraintsObserver(*this),
 	m_rootCommands("", 100, ibase::ICommand::CF_GLOBAL_MENU),
@@ -94,11 +93,11 @@ void CEventViewComp::OnGuiCreated()
 	m_splitterPtr->setStretchFactor(0, 1);
 	m_splitterPtr->setCollapsible(0, false);
 
-	m_summaryInfoPanelPtr = new QWidget();
-	if (m_summaryInfoPanelPtr->layout() == nullptr){
-		m_summaryInfoPanelPtr->setLayout(new QVBoxLayout());
+	if (m_statisticsViewCompPtr.IsValid()){
+		m_statisticsPanelPtr = new QWidget(GetQtWidget());
+		m_statisticsViewCompPtr->CreateGui(m_statisticsPanelPtr);
+		m_panelsStackPtr->addWidget(m_statisticsViewCompPtr->GetWidget());
 	}
-	m_panelsStackPtr->addWidget(m_summaryInfoPanelPtr);
 
 	m_metaInfoPanelPtr = new QWidget();
 	if (m_metaInfoPanelPtr->layout() == nullptr){
@@ -136,8 +135,6 @@ void CEventViewComp::OnGuiCreated()
 			modelPtr->AttachObserver(&m_scaleConstraintsObserver);
 		}
 	}
-
-	UpdateSummaryInfoPanel();
 
 	m_timeAxis.EnsureTimeRange(QDateTime::currentDateTime());
 
@@ -391,7 +388,6 @@ void CEventViewComp::OnMessageProcessingTimer()
 				if (eventItemPtr != nullptr){
 					m_eventMap.insert(message->GetInformationTimeStamp(), eventItemPtr);
 				}
-				UpdateSummaryInfoPanel();
 			}
 
 			UpdateCommands();
@@ -514,72 +510,6 @@ void CEventViewComp::MoveToTime(const QDateTime& time)
 		rect.setWidth(2 * delta);
 		rect.translate(newCenter - center, 0);
 		m_viewPtr->SetViewRect(rect);
-	}
-}
-
-
-void CEventViewComp::UpdateSummaryInfoPanel()
-{
-	iwidgets::ClearLayout(m_summaryInfoPanelPtr->layout());
-
-	QVBoxLayout* layoutPtr = dynamic_cast<QVBoxLayout*>(m_summaryInfoPanelPtr->layout());
-	if (layoutPtr != nullptr){
-		if (m_groupControllerCompPtr.IsValid()){
-			QByteArrayList groupIds = m_groupControllerCompPtr->GetActiveGroupList();
-			for (QByteArray id : groupIds){
-				IEventItemController* groupPtr = m_groupControllerCompPtr->GetGroup(id);
-
-				QLabel* nameLabelPtr = new QLabel(groupPtr->GetGroupName());
-				QFont groupNameFont;
-				groupNameFont.setPixelSize(12);
-				groupNameFont.setBold(true);
-				nameLabelPtr->setStyleSheet("color: #88b8e3");
-				nameLabelPtr->setFont(groupNameFont);
-				layoutPtr->addWidget(nameLabelPtr);
-
-				for (int i = 0; i < 5; i++){
-					QHBoxLayout* categoryLayoutPtr = new QHBoxLayout();
-
-					QIcon icon;
-
-					switch (i){
-					case istd::IInformationProvider::IC_NONE:
-						icon = QIcon(":/Icons/StateUnknown");
-						break;
-					case istd::IInformationProvider::IC_INFO:
-						icon = QIcon(":/Icons/StateOk");
-						break;
-					case istd::IInformationProvider::IC_WARNING:
-						icon = QIcon(":/Icons/StateWarning");
-						break;
-					case istd::IInformationProvider::IC_ERROR:
-						icon = QIcon(":/Icons/Error");
-						break;
-					case istd::IInformationProvider::IC_CRITICAL:
-						icon = QIcon(":/Icons/StateInvalid");
-						break;
-					}
-
-					QPixmap pixmap = icon.pixmap(16);
-					QLabel* iconPtr = new QLabel();
-					iconPtr->setPixmap(pixmap);
-					categoryLayoutPtr->addWidget(iconPtr,1 );
-
-					QLabel* countLabelPtr = new QLabel(QString("%1 ").arg(groupPtr->GetEventCount((istd::IInformationProvider::InformationCategory)i)) + tr("Events"));
-					QFont countLabelFont;
-					countLabelFont.setPixelSize(9);
-					countLabelPtr->setStyleSheet("color: gray");
-					countLabelPtr->setFont(countLabelFont);
-					categoryLayoutPtr->addWidget(countLabelPtr, 1000);
-
-					layoutPtr->addLayout(categoryLayoutPtr);
-				}
-
-				layoutPtr->addSpacing(10);
-			}
-		}
-
-		layoutPtr->addStretch();
 	}
 }
 

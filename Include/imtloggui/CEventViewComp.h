@@ -49,6 +49,7 @@ public:
 		I_ASSIGN(m_groupControllerCompPtr, "EventGroupController", "Event group controller", true, "EventGroupController")
 		I_ASSIGN(m_graphicsViewModelCompPtr, "GraphicsViewModel", "Graphics view model", true, "GraphicsViewModel");
 		I_ASSIGN(m_graphicsViewCompPtr, "GraphicsView", "Graphics view", true, "GraphicsView");
+		I_ASSIGN(m_statisticsViewCompPtr, "EventStatisticsView", "Event statistics for groups", true, "EventStatisticsView");
 		I_ASSIGN(m_scaleConstraintsCompPtr, "VerticalScaleConstraints", "Vertical scale constraints", true, "");
 	I_END_COMPONENT;
 
@@ -91,8 +92,6 @@ private:
 	void UpdateVerticalRangeScale(const istd::CRange& range) const;
 	void UpdateCommands();
 	void MoveToTime(const QDateTime& time);
-
-	void UpdateSummaryInfoPanel();
 	bool UpdateMetaInfoPanel(const IEventItem* eventItem);
 
 private:
@@ -134,6 +133,7 @@ private:
 	I_REF(IEventGroupController, m_groupControllerCompPtr);
 	I_REF(IGraphicsViewModel, m_graphicsViewModelCompPtr);
 	I_REF(iqtgui::IGuiObject, m_graphicsViewCompPtr);
+	I_REF(iqtgui::IGuiObject, m_statisticsViewCompPtr);
 	I_REF(imeas::INumericConstraints, m_scaleConstraintsCompPtr);
 
 	imod::TModelWrap<Commands> m_commands;
@@ -157,7 +157,7 @@ private:
 
 	QSplitter* m_splitterPtr;
 	QStackedWidget* m_panelsStackPtr;
-	QWidget* m_summaryInfoPanelPtr;
+	QWidget* m_statisticsPanelPtr;
 	QWidget* m_metaInfoPanelPtr;
 
 	QList<ilog::IMessageConsumer::MessagePtr> m_messageList;

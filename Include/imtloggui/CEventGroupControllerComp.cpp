@@ -132,6 +132,11 @@ IEventItemController* CEventGroupControllerComp::AddGroup(const QByteArray& grou
 		sceneRect.setTop(-totalHeight);
 
 		m_viewPtr->SetSceneRect(sceneRect);
+
+		m_eventStatisticsProvider.InsertGroup(
+					groupId,
+					eventItemController->GetGroupName(),
+					m_groups.count());
 	}
 
 	return eventItemController;
@@ -143,6 +148,9 @@ bool CEventGroupControllerComp::RemoveGroup(const QByteArray& groupId)
 	if (m_groups.contains(groupId)){
 		delete m_groups[groupId];
 		m_groups.remove(groupId);
+
+		m_eventStatisticsProvider.RemoveGroup(groupId);
+
 		return true;
 	}
 
@@ -193,6 +201,8 @@ IEventItem* CEventGroupControllerComp::AddEvent(const ilog::IMessageConsumer::Me
 			if (groupPtr != nullptr){
 				IEventItem* eventItemPtr = groupPtr->AddEvent(messagePtr);
 				if (eventItemPtr != nullptr){
+					m_eventStatisticsProvider.IncrementCategoryCounter(groupId, messagePtr->GetInformationCategory());
+
 					return eventItemPtr;
 				}
 
@@ -204,7 +214,12 @@ IEventItem* CEventGroupControllerComp::AddEvent(const ilog::IMessageConsumer::Me
 	if (m_generalGroupRefCompPtr.IsValid()){
 		IEventItemController* groupPtr = GetGroup(m_generalGroupRefCompPtr->GetGroupId());
 		if (groupPtr != nullptr){
-			return groupPtr->AddEvent(messagePtr);
+			IEventItem* eventItemPtr = groupPtr->AddEvent(messagePtr);
+			if (eventItemPtr != nullptr){
+				m_eventStatisticsProvider.IncrementCategoryCounter(m_generalGroupRefCompPtr->GetGroupId(), messagePtr->GetInformationCategory());
+			}
+
+			return eventItemPtr;
 		}
 	}
 
@@ -312,7 +327,7 @@ void CEventGroupControllerComp::VerticalScaleConstraints::SetParent(CEventGroupC
 
 void CEventGroupControllerComp::VerticalScaleConstraints::SetMinScale(double scale)
 {
-	istd::CChangeNotifier notifier(this);
+	istd::CChangeNotifier changeNotifier(this);
 	m_minVerticalScale = scale;
 }
 
@@ -425,6 +440,206 @@ const imath::IDoubleManip& CEventGroupControllerComp::VerticalScaleConstraints::
 int CEventGroupControllerComp::VerticalScaleConstraints::GetPrecision() const
 {
 	return 15;
+}
+
+
+// public methods of the embedded class EventStatisticsProvider
+
+bool CEventGroupControllerComp::EventStatisticsProvider::InsertGroup(const QByteArray& groupId, const QString& groupName, int position)
+{
+	int index = GetGroupIndex(groupId);
+
+	if (index < 0){
+		istd::IChangeable::ChangeSet changeSet(IEventStatisticsProvider::CF_GROUPS, IEventStatisticsProvider::CF_COUNTERS);
+		istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+		GroupListItem group;
+		group.id = groupId;
+		group.name = groupName;
+		group.enabled = true;
+		m_groups.insert(position, group);
+
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CEventGroupControllerComp::EventStatisticsProvider::RemoveGroup(const QByteArray& groupId)
+{
+	int index = GetGroupIndex(groupId);
+
+	if (index >= 0){
+		istd::IChangeable::ChangeSet changeSet(IEventStatisticsProvider::CF_GROUPS);
+		istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+		m_groups.removeAt(index);
+
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CEventGroupControllerComp::EventStatisticsProvider::SetGroupName(const QByteArray& groupId, const QString& groupName)
+{
+	int index = GetGroupIndex(groupId);
+
+	if (index >= 0){
+		if (m_groups[index].name != groupName){
+			istd::IChangeable::ChangeSet changeSet(IEventStatisticsProvider::CF_GROUPS);
+			istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+			m_groups[index].name = groupName;
+			
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+bool CEventGroupControllerComp::EventStatisticsProvider::SetGroupPosition(const QByteArray& groupId, int position)
+{
+	int index = GetGroupIndex(groupId);
+
+	if (index >= 0){
+		if (index != position){
+			istd::IChangeable::ChangeSet changeSet(IEventStatisticsProvider::CF_GROUPS);
+			istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+			m_groups.move(index, position);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool CEventGroupControllerComp::EventStatisticsProvider::SetGroupEnabled(const QByteArray& groupId, bool enabled)
+{
+	int index = GetGroupIndex(groupId);
+
+	if (index >= 0){
+		if (m_groups[index].enabled != enabled){
+			istd::IChangeable::ChangeSet changeSet(IEventStatisticsProvider::CF_GROUPS);
+			istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+			m_groups[index].enabled = enabled;
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+bool CEventGroupControllerComp::EventStatisticsProvider::IncrementCategoryCounter(
+	const QByteArray& groupId,
+	istd::IInformationProvider::InformationCategory category)
+{
+	int index = GetGroupIndex(groupId);
+
+	if (index >= 0){
+		istd::IChangeable::ChangeSet changeSet(IEventStatisticsProvider::CF_COUNTERS);
+		istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+		m_groups[index].counters[category]++;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+
+bool CEventGroupControllerComp::EventStatisticsProvider::SetCategoryCounter(
+			const QByteArray& groupId,
+			istd::IInformationProvider::InformationCategory category,
+			qint64 counter)
+{
+	int index = GetGroupIndex(groupId);
+
+	if (index >= 0){
+		istd::IChangeable::ChangeSet changeSet(IEventStatisticsProvider::CF_COUNTERS);
+		istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+		m_groups[index].counters[category] = counter;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+// reimplemented (imtloggui::IEventGroupStatisticsProvider)
+
+qint64 CEventGroupControllerComp::EventStatisticsProvider::GetCategoryCounter(const QByteArray& groupId, istd::IInformationProvider::InformationCategory category)
+{
+	int index = GetGroupIndex(groupId);
+
+	if (index >= 0){
+		return m_groups[index].counters[category];
+	}
+
+	return -1;
+}
+
+
+// reimplemented (imtbase::ICollectionInfo)
+
+imtbase::ICollectionInfo::Ids CEventGroupControllerComp::EventStatisticsProvider::GetElementIds() const
+{
+	Ids retVal;
+
+	for (int i = 0; i < m_groups.count(); i++){
+		retVal.append(m_groups[i].id);
+	}
+
+	return retVal;
+}
+
+
+QVariant CEventGroupControllerComp::EventStatisticsProvider::GetElementInfo(const QByteArray& elementId, int infoType) const
+{
+	QVariant retVal;
+
+	int index = GetGroupIndex(elementId);
+	if (index < 0){
+		return retVal;
+	}
+
+	switch (infoType){
+	case EIT_NAME:
+		retVal = m_groups[index].name;
+		break;
+	case EIT_ENABLED:
+		retVal = m_groups[index].enabled;
+		break;
+	}
+
+	return retVal;
+}
+
+
+// private methods of the embedded class EventStatisticsProvider
+
+int CEventGroupControllerComp::EventStatisticsProvider::GetGroupIndex(const QByteArray& groupId) const
+{
+	for (int i = 0; i < m_groups.count(); i++){
+		if (m_groups[i].id == groupId){
+			return i;
+		}
+	}
+
+	return -1;
 }
 
 

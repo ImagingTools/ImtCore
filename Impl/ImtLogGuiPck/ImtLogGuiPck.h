@@ -13,6 +13,7 @@
 #include <imtloggui/CEventGroupControllerComp.h>
 #include <imtloggui/CSingleLayerGroupComp.h>
 #include <imtloggui/CGraphicsViewComp.h>
+#include <imtloggui/CEventStatisticsViewComp.h>
 
 
 /**
@@ -29,6 +30,7 @@ typedef imtloggui::CGeneralEventFactoryComp GeneralEventFactory;
 typedef imtloggui::CEventGroupControllerComp EventGroupController;
 typedef imtloggui::CSingleLayerGroupComp SingleLayerGroup;
 typedef imtloggui::CGraphicsViewComp GraphicsView;
+typedef imtloggui::CEventStatisticsViewComp EventStatisticsView;
 
 
 } // namespace ImtLogGuiPck
