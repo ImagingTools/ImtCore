@@ -14,6 +14,7 @@
 #include <imeas/INumericConstraints.h>
 #include <imod/TSingleModelObserverBase.h>
 #include <ilog/TMessageDelegatorComp.h>
+#include <iqtgui/TRestorableGuiWrap.h>
 #include <iqtgui/TDesignerGuiCompBase.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
@@ -32,13 +33,16 @@ namespace imtloggui
 
 
 class CEventViewComp:
-			public ilog::TMessageDelegatorComp<iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp>>,
+			public iqtgui::TRestorableGuiWrap<
+						ilog::TMessageDelegatorComp<
+									iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp>>>,
 			virtual public ilog::IMessageConsumer
 {
 	Q_OBJECT
-
 public:
-	typedef public ilog::TMessageDelegatorComp<iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp>> BaseClass;
+	typedef iqtgui::TRestorableGuiWrap<
+				ilog::TMessageDelegatorComp<
+							iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp>>> BaseClass;
 	
 	I_BEGIN_COMPONENT(CEventViewComp);
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
@@ -61,6 +65,10 @@ public:
 				int messageId = -1,
 				const istd::IInformationProvider* messagePtr = nullptr) const override;
 	virtual void AddMessage(const IMessageConsumer::MessagePtr& message) override;
+
+	// reimplemented (iqtgui::TRestorableGuiWrap)
+	virtual void OnRestoreSettings(const QSettings& settings) override;
+	virtual void OnSaveSettings(QSettings& settings) const override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;

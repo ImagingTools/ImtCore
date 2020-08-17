@@ -68,6 +68,45 @@ void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
 }
 
 
+// reimplemented (iqtgui::TRestorableGuiWrap)
+
+void CEventViewComp::OnRestoreSettings(const QSettings& settings)
+{
+	int viewWidth = 0;
+	int rightPanelWidth = 0;
+
+	QByteArray settingsKey("EventViewSettings/EventViewWidth");
+	if (settings.contains(settingsKey)){
+		QVariant settingsValue = settings.value(settingsKey);
+		if (settingsValue.type() == QVariant::Int){
+			viewWidth = settingsValue.toInt();
+		}
+	}
+
+	settingsKey = "EventViewSettings/RightPanelWidth";
+	if (settings.contains(settingsKey)){
+		QVariant settingsValue = settings.value(settingsKey);
+		if (settingsValue.type() == QVariant::Int){
+			rightPanelWidth = settingsValue.toInt();
+		}
+	}
+
+	if (viewWidth > 0 && rightPanelWidth >= 0){
+		QList<int> sizes = {viewWidth, rightPanelWidth};
+		m_splitterPtr->setSizes(sizes);
+	}
+}
+
+
+void CEventViewComp::OnSaveSettings(QSettings& settings) const
+{
+	settings.beginGroup("EventViewSettings");
+	settings.setValue("EventViewWidth", m_splitterPtr->sizes()[0]);
+	settings.setValue("RightPanelWidth", m_splitterPtr->sizes()[1]);
+	settings.endGroup();
+}
+
+
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CEventViewComp::OnGuiCreated()
