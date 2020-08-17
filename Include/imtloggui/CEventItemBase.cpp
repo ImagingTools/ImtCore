@@ -16,10 +16,10 @@ namespace imtloggui
 
 // public methods
 
-CEventItemBase::CEventItemBase(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent)
-	:BaseClass(parent)
+void CEventItemBase::SetParams(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parentPtr)
 {
 	m_messagePtr = message;
+	setParentItem(parentPtr);
 }
 
 
@@ -85,6 +85,59 @@ void CEventItemBase::SetBackgroundColor(const QColor& color)
 	m_backgroundColor = color;
 }
 
+
+// reimplemented (idoc::IDocumentMetaInfo)
+
+idoc::IDocumentMetaInfo::MetaInfoTypes CEventItemBase::GetMetaInfoTypes(bool allowReadOnly) const
+{
+	MetaInfoTypes types;
+
+	for (int i = 0; i < m_metaInfo.count(); i++){
+		types.insert(i + idoc::IDocumentMetaInfo::MIT_USER);
+	}
+
+	return types;
+}
+
+
+QVariant CEventItemBase::GetMetaInfo(int metaInfoType) const
+{
+	metaInfoType -= idoc::IDocumentMetaInfo::MIT_USER;
+	if (metaInfoType >= 0 && metaInfoType < m_metaInfo.count()){
+		return m_metaInfo[metaInfoType].value;
+	}
+
+	return QVariant();
+}
+
+
+bool CEventItemBase::SetMetaInfo(int metaInfoType, const QVariant& metaInfo)
+{
+	return false;
+}
+
+
+QString CEventItemBase::GetMetaInfoName(int metaInfoType) const
+{
+	metaInfoType -= idoc::IDocumentMetaInfo::MIT_USER;
+	if (metaInfoType >= 0 && metaInfoType < m_metaInfo.count()){
+		return m_metaInfo[metaInfoType].key;
+	}
+
+	return QString();
+}
+
+
+QString CEventItemBase::GetMetaInfoDescription(int metaInfoType) const
+{
+	return QString();
+}
+
+
+bool CEventItemBase::IsMetaInfoWritable(int metaInfoType) const
+{
+	return false;
+}
 
 
 // protected methods

@@ -2,7 +2,7 @@
 
 
 // ACF includes
-#include <istd/IPolymorphic.h>
+#include <istd/IChangeable.h>
 
 // ImtCore includes
 #include <ilog/IMessageConsumer.h>
@@ -15,7 +15,7 @@ namespace imtloggui
 /**
 	Interface for event item
 */
-class IEventItem: virtual public istd::IPolymorphic
+class IEventItem: virtual public istd::IChangeable
 {
 public:
 	struct MetaInfoItem

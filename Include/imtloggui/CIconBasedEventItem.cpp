@@ -11,12 +11,6 @@ namespace imtloggui
 
 // public methods
 
-CIconBasedEventItem::CIconBasedEventItem(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent)
-	:BaseClass(message, parent)
-{
-}
-
-
 void CIconBasedEventItem::SetIcon(const QIcon& icon)
 {
 	m_icon = icon;

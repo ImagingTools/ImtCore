@@ -65,6 +65,11 @@ I_EXPORT_COMPONENT(
 			"Events statistics view",
 			"Event Statistics View Message Group");
 
+I_EXPORT_COMPONENT(
+			EventItemMetaInfoView,
+			"Viewer for event items metainfo",
+			"Event View Metainfo Items");
+
 
 } // namespace ImtLogGuiPck
 

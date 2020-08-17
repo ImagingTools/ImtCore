@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtWidgets/QGraphicsItem>
 
+// ACF includes
+#include <idoc/IDocumentMetaInfo.h>
+
 // ImtCore includes
 #include <ilog/IMessageConsumer.h>
 #include <imtloggui/IEventItem.h>
@@ -13,12 +16,15 @@ namespace imtloggui
 {
 
 
-class CEventItemBase: public QGraphicsItem, virtual public IEventItem
+class CEventItemBase:
+			public QGraphicsItem,
+			virtual public idoc::IDocumentMetaInfo,
+			virtual public IEventItem
 {
 public:
 	typedef QGraphicsItem BaseClass;
 
-	CEventItemBase(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent = nullptr);
+	void SetParams(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parentPtr = nullptr);
 
 	// reimplemented (imtloggui::IEventItem)
 	virtual const istd::IInformationProvider* GetInformationProvider() const override;
@@ -27,6 +33,14 @@ public:
 	virtual void RemoveMetaInfo(const QString& key) override;
 	virtual const QColor& GetBackgroundColor(const QColor& color) override;
 	virtual void SetBackgroundColor(const QColor& color) override;
+
+	// reimplemented (idoc::IDocumentMetaInfo)
+	virtual MetaInfoTypes GetMetaInfoTypes(bool allowReadOnly = true) const override;
+	virtual QVariant GetMetaInfo(int metaInfoType) const override;
+	virtual bool SetMetaInfo(int metaInfoType, const QVariant& metaInfo) override;
+	virtual QString GetMetaInfoName(int metaInfoType) const override;
+	virtual QString GetMetaInfoDescription(int metaInfoType) const override;
+	virtual bool IsMetaInfoWritable(int metaInfoType) const override;
 
 protected:
 	void UpdateToolTip();

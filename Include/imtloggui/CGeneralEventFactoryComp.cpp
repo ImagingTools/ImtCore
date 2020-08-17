@@ -1,5 +1,7 @@
 #include <imtloggui/CGeneralEventFactoryComp.h>
 
+// ACF includes
+#include <imod/TModelWrap.h>
 
 // ImtCore includes
 #include <imtloggui/CIconBasedEventItem.h>
@@ -44,7 +46,8 @@ IEventItem* CGeneralEventFactoryComp::CreateInstance(const ilog::IMessageConsume
 		iconSize = *m_iconSizeAttrPtr;
 	}
 
-	CIconBasedEventItem* eventPtr = new CIconBasedEventItem(message);
+	CIconBasedEventItem* eventPtr = new imod::TModelWrap<CIconBasedEventItem>();
+	eventPtr->SetParams(message);
 	eventPtr->SetIcon(icon);
 	eventPtr->SetIconSize(QSize(iconSize, iconSize));
 

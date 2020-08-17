@@ -17,6 +17,7 @@
 #include <iqtgui/TRestorableGuiWrap.h>
 #include <iqtgui/TDesignerGuiCompBase.h>
 #include <iqtgui/CHierarchicalCommand.h>
+#include <imod/CModelProxy.h>
 
 // ImtCore includes
 #include <imtloggui/IEventGroupController.h>
@@ -54,6 +55,7 @@ public:
 		I_ASSIGN(m_graphicsViewModelCompPtr, "GraphicsViewModel", "Graphics view model", true, "GraphicsViewModel");
 		I_ASSIGN(m_graphicsViewCompPtr, "GraphicsView", "Graphics view", true, "GraphicsView");
 		I_ASSIGN(m_statisticsViewCompPtr, "EventStatisticsView", "Event statistics for groups", true, "EventStatisticsView");
+		I_ASSIGN(m_metainfoViewCompPtr, "EventItemMetaInfoView", "Event metainfo viewer", true, "EventItemMetaInfoView");
 		I_ASSIGN(m_scaleConstraintsCompPtr, "VerticalScaleConstraints", "Vertical scale constraints", true, "");
 	I_END_COMPONENT;
 
@@ -142,6 +144,7 @@ private:
 	I_REF(IGraphicsViewModel, m_graphicsViewModelCompPtr);
 	I_REF(iqtgui::IGuiObject, m_graphicsViewCompPtr);
 	I_REF(iqtgui::IGuiObject, m_statisticsViewCompPtr);
+	I_REF(iqtgui::IGuiObject, m_metainfoViewCompPtr);
 	I_REF(imeas::INumericConstraints, m_scaleConstraintsCompPtr);
 
 	imod::TModelWrap<Commands> m_commands;
@@ -162,6 +165,8 @@ private:
 	IEventItemController::EventMap m_eventMap;
 	IEventItemController::EventMap::const_iterator m_navigationIterator;
 	bool m_isNavigationIteratorValid;
+
+	imod::CModelProxy m_modelProxy;
 
 	QSplitter* m_splitterPtr;
 	QStackedWidget* m_panelsStackPtr;

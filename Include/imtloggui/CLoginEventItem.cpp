@@ -11,12 +11,6 @@ namespace imtloggui
 
 // public methods
 
-CLoginEventItem::CLoginEventItem(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent)
-	:BaseClass(message, parent)
-{
-}
-
-
 void CLoginEventItem::SetFont(const QFont& font)
 {
 	m_font = font;

@@ -19,8 +19,6 @@ class CLoginEventItem: public CEventItemBase
 public:
 	typedef CEventItemBase BaseClass;
 
-	CLoginEventItem(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parent = nullptr);
-
 	void SetFont(const QFont& font);
 	void SetIcons(const QIcon& iconLogin, const QIcon& iconLogout);
 	void SetIconSize(const QSize& size);

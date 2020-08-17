@@ -1,7 +1,8 @@
 #include <imtloggui/CLoginEventFactoryComp.h>
 
 
-// ImtLog
+// ACF includes
+#include <imod/TModelWrap.h>
 
 // ImtCore includes
 #include <imtloggui/CLoginEventItem.h>
@@ -37,7 +38,8 @@ IEventItem* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsumer:
 		iconSize = *m_iconSizeAttrPtr;
 	}
 
-	CLoginEventItem* eventPtr = new CLoginEventItem(message);
+	CLoginEventItem* eventPtr = new imod::TModelWrap<CLoginEventItem>();
+	eventPtr->SetParams(message);
 	eventPtr->SetIcons(loginIcon, logoutIcon);
 	eventPtr->SetIconSize(QSize(iconSize, iconSize));
 

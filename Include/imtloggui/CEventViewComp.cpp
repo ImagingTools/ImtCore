@@ -25,6 +25,7 @@ CEventViewComp::CEventViewComp()
 	: m_viewPtr(nullptr),
 	m_splitterPtr(nullptr),
 	m_panelsStackPtr(nullptr),
+	m_statisticsPanelPtr(nullptr),
 	m_metaInfoPanelPtr(nullptr),
 	m_scaleConstraintsObserver(*this),
 	m_rootCommands("", 100, ibase::ICommand::CF_GLOBAL_MENU),
@@ -128,8 +129,7 @@ void CEventViewComp::OnGuiCreated()
 
 	m_panelsStackPtr = new QStackedWidget(GetQtWidget());
 	m_splitterPtr->addWidget(m_panelsStackPtr);
-	m_splitterPtr->setStretchFactor(0, 9);
-	m_splitterPtr->setStretchFactor(0, 1);
+	m_splitterPtr->setStretchFactor(0, 100);
 	m_splitterPtr->setCollapsible(0, false);
 
 	if (m_statisticsViewCompPtr.IsValid()){
@@ -138,11 +138,16 @@ void CEventViewComp::OnGuiCreated()
 		m_panelsStackPtr->addWidget(m_statisticsViewCompPtr->GetWidget());
 	}
 
-	m_metaInfoPanelPtr = new QWidget();
-	if (m_metaInfoPanelPtr->layout() == nullptr){
-		m_metaInfoPanelPtr->setLayout(new QVBoxLayout());
+	if (m_metainfoViewCompPtr.IsValid()){
+		m_metaInfoPanelPtr = new QWidget(GetQtWidget());
+		m_metainfoViewCompPtr->CreateGui(m_metaInfoPanelPtr);
+		m_panelsStackPtr->addWidget(m_metainfoViewCompPtr->GetWidget());
+
+		imod::IObserver* observerPtr = dynamic_cast<imod::IObserver*>(m_metainfoViewCompPtr.GetPtr());
+		if (observerPtr != nullptr){
+			m_modelProxy.AttachObserver(observerPtr);
+		}
 	}
-	m_panelsStackPtr->addWidget(m_metaInfoPanelPtr);
 
 	m_panelsStackPtr->setCurrentIndex(0);
 
@@ -393,16 +398,21 @@ void CEventViewComp::OnMoveToLastCommand()
 void CEventViewComp::OnSelectionChanged()
 {
 	QList<QGraphicsItem*> items = m_scene.selectedItems();
-	m_panelsStackPtr->setCurrentIndex(0);
 	if (!items.isEmpty()){
 		IEventItem* itemPtr = dynamic_cast<IEventItem*>(items[0]);
 		if (itemPtr != nullptr){
-			if (UpdateMetaInfoPanel(itemPtr)){
+			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(itemPtr);
+			if (modelPtr != nullptr){
+				m_modelProxy.SetModelPtr(modelPtr);
 				m_panelsStackPtr->setCurrentIndex(1);
+				m_scene.update(m_viewPtr->GetViewRect().toRect());
+				return;
 			}
 		}
 	}
 
+	m_panelsStackPtr->setCurrentIndex(0);
+	m_modelProxy.SetModelPtr(nullptr);
 	m_scene.update(m_viewPtr->GetViewRect().toRect());
 }
 
