@@ -6,25 +6,25 @@
 #include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
-#include <GeneratedFiles/imtgui/ui_CFileCollectionMetaInfoViewComp.h>
+#include <GeneratedFiles/imtgui/ui_CObjectCollectionMetaInfoViewComp.h>
 
 
 namespace imtgui
 {
 
 
-class CFileCollectionMetaInfoViewComp:
+class CObjectCollectionMetaInfoViewComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CFileCollectionMetaInfoViewComp,
+						Ui::CObjectCollectionMetaInfoViewComp,
 						idoc::IDocumentMetaInfo>
 {
 	Q_OBJECT
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CFileCollectionMetaInfoViewComp,
+				Ui::CObjectCollectionMetaInfoViewComp,
 				idoc::IDocumentMetaInfo> BaseClass;
 
-	I_BEGIN_COMPONENT(CFileCollectionMetaInfoViewComp);
+	I_BEGIN_COMPONENT(CObjectCollectionMetaInfoViewComp);
 	I_END_COMPONENT;
 
 protected:

@@ -13,7 +13,7 @@
 #include <imtgui/CFileObjectCollectionViewDelegate.h>
 #include <imtgui/CDocumentBasedFileCollectionDelegateComp.h>
 #include <imtgui/CDocumentWorkspaceGuiComp.h>
-#include <imtgui/CFileCollectionMetaInfoViewComp.h>
+#include <imtgui/CObjectCollectionMetaInfoViewComp.h>
 #include <imtgui/CDelegatedCommandsProviderComp.h>
 #include <imtgui/CMenuPanelComp.h>
 #include <imtgui/CMonitorInfoProviderComp.h>
@@ -39,7 +39,7 @@ typedef imtgui::CObjectCollectionViewComp ObjectCollectionView;
 typedef icomp::TMakeComponentWrap<imtgui::CFileObjectCollectionViewDelegate, imtgui::ICollectionViewDelegate> FileObjectCollectionViewDelegate;
 typedef imtgui::CDocumentBasedFileCollectionDelegateComp DocumentBasedFileCollectionDelegate;
 typedef icomp::TModelCompWrap<imtgui::CDocumentWorkspaceGuiComp> DocumentWorkspaceGui;
-typedef imtgui::CFileCollectionMetaInfoViewComp FileCollectionMetaInfoView;
+typedef imtgui::CObjectCollectionMetaInfoViewComp ObjectCollectionMetaInfoView;
 typedef imtgui::CDelegatedCommandsProviderComp DelegatedCommandsProvider;
 typedef imtgui::CMenuPanelComp MenuPanel;
 typedef icomp::TModelCompWrap<imtgui::CMonitorInfoProviderComp> MonitorInfoProvider;

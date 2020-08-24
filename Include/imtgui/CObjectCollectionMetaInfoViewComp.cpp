@@ -1,4 +1,4 @@
-#include <imtgui/CFileCollectionMetaInfoViewComp.h>
+#include <imtgui/CObjectCollectionMetaInfoViewComp.h>
 
 
 // Qt includes
@@ -17,7 +17,7 @@ namespace imtgui
 
 // protected methods
 
-void CFileCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
+void CObjectCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 {
 	idoc::IDocumentMetaInfo* metaInfoPtr = GetObservedObject();
 	Q_ASSERT(metaInfoPtr != nullptr);
@@ -56,7 +56,7 @@ void CFileCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 			break;
 		}
 
-		if (type != imtbase::IFileObjectCollection::MIT_PREVIEW_THUMBNAIL){
+		if (type != imtbase::IObjectCollection::MIT_PREVIEW_THUMBNAIL){
 			QLabel* labelNamePtr = new QLabel(name, GetWidget());
 			labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: #88b8e3");
 
@@ -78,7 +78,7 @@ void CFileCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
-void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CObjectCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	iwidgets::ClearLayout(InfoWidget->layout());
 
@@ -99,7 +99,7 @@ void CFileCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeS
 
 // reimplemented (iqtgui::CGuiComponentBase)
 
-void CFileCollectionMetaInfoViewComp::OnGuiCreated()
+void CObjectCollectionMetaInfoViewComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
@@ -120,7 +120,7 @@ void CFileCollectionMetaInfoViewComp::OnGuiCreated()
 }
 
 
-void CFileCollectionMetaInfoViewComp::OnGuiRetranslate()
+void CObjectCollectionMetaInfoViewComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
@@ -132,7 +132,7 @@ void CFileCollectionMetaInfoViewComp::OnGuiRetranslate()
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
-void CFileCollectionMetaInfoViewComp::OnGuiModelDetached()
+void CObjectCollectionMetaInfoViewComp::OnGuiModelDetached()
 {
 	iwidgets::ClearLayout(InfoWidget->layout());
 
