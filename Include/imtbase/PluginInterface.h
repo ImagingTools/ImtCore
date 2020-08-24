@@ -13,14 +13,14 @@
 
 #ifndef QT_NO_DEBUG
 	#define IMT_CREATE_PLUGIN_INSTANCE_FUNCTION(suffix) CreatePluginInstanceDebug_##suffix
-    #define IMT_CREATE_PLUGIN_INSTANCE_FUNCTION_NAME(suffix) IMT_MAKE_STRING(CreatePluginInstanceDebug##suffix)
+	#define IMT_CREATE_PLUGIN_INSTANCE_FUNCTION_NAME(suffix) IMT_MAKE_STRING(CreatePluginInstanceDebug##suffix)
 #define IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION(suffix) DestroyPluginInstanceDebug_##suffix
-    #define IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION_NAME(suffix) IMT_MAKE_STRING(DestroyPluginInstanceDebug_##suffix)
+	#define IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION_NAME(suffix) IMT_MAKE_STRING(DestroyPluginInstanceDebug_##suffix)
 #else // !QT_NO_DEBUG
 	#define IMT_CREATE_PLUGIN_INSTANCE_FUNCTION(suffix) CreatePluginInstance_##suffix
-    #define IMT_CREATE_PLUGIN_INSTANCE_FUNCTION_NAME(suffix) IMT_MAKE_STRING(CreatePluginInstance_##suffix)
+	#define IMT_CREATE_PLUGIN_INSTANCE_FUNCTION_NAME(suffix) IMT_MAKE_STRING(CreatePluginInstance_##suffix)
 	#define IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION(suffix) DestroyPluginInstance_##suffix
-    #define IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION_NAME(suffix) IMT_MAKE_STRING(DestroyPluginInstance_##suffix)
+	#define IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION_NAME(suffix) IMT_MAKE_STRING(DestroyPluginInstance_##suffix)
 #endif // !QT_NO_DEBUG
 
 
