@@ -147,7 +147,7 @@ void CDocumentBasedFileCollectionDelegateComp::UpdateItemSelection(
 	if (m_informationViewCompPtr.IsValid() && (selectedItems.count() == 1)){
 		imod::IObserver* observerPtr = dynamic_cast<imod::IObserver*>(m_informationViewCompPtr.GetPtr());
 		if (observerPtr != nullptr){
-			imtbase::IFileObjectCollection* collectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+			imtbase::IObjectCollection* collectionPtr = dynamic_cast<imtbase::IObjectCollection*>(m_collectionPtr);
 			if (collectionPtr->GetDataMetaInfo(selectedItems[0], m_selectedMetaInfoPtr)){
 				imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_selectedMetaInfoPtr.GetPtr());
 				if (modelPtr != nullptr){

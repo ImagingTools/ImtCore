@@ -7,6 +7,9 @@
 // ACF includes
 #include <iwidgets/iwidgets.h>
 
+// ImtCore includes
+#include <imtbase/IObjectCollection.h>
+
 
 namespace imtgui
 {
@@ -45,7 +48,7 @@ void CFileCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 			textValue = QString("%1").arg(value.toLongLong(), 8, 16, QChar('0')).toUpper();
 			break;
 
-		case imtbase::IFileObjectCollection::MIT_PREVIEW_THUMBNAIL:
+		case imtbase::IObjectCollection::MIT_PREVIEW_THUMBNAIL:
 			QPixmap pixmap;
 			pixmap.convertFromImage(value.value<QImage>());
 			PreviewPixmap->setPixmap(pixmap.scaledToWidth(250));

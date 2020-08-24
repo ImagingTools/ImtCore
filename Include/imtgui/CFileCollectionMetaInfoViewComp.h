@@ -6,7 +6,6 @@
 #include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
-#include <imtbase/IFileObjectCollection.h>
 #include <GeneratedFiles/imtgui/ui_CFileCollectionMetaInfoViewComp.h>
 
 
