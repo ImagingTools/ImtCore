@@ -19,7 +19,7 @@ namespace imtloggui
 class IEventItemController
 {
 public:
-	typedef QMultiMap<QDateTime, IEventItem*> EventMap;
+	typedef QMultiMap<QDateTime, IItemBase*> EventMap;
 
 	virtual void SetScene(QGraphicsScene* scenePtr) = 0;
 	virtual void SetTimeAxis(const IEventScenePositionProvider* timeAxisPtr) = 0;

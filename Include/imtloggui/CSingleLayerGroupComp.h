@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <imtloggui/IEventItemFactory.h>
 #include <imtloggui/IEventItemController.h>
+#include <imtloggui/IClusterItem.h>
 #include <imtloggui/CEventGroupItem.h>
 #include <imtloggui/CGraphicsItemGroup.h>
 
@@ -63,6 +64,7 @@ private:
 	double GetCurrentScaleX() const;
 	double GetCurrentScaleY() const;
 	void ArrangeEvents();
+	void CreateClusters();
 
 private:
 	I_ATTR(QByteArray, m_groupIdAttrPtr);
@@ -81,6 +83,10 @@ private:
 
 	EventMap m_events;
 	QMap<istd::IInformationProvider::InformationCategory, int> m_eventCount;
+
+	QList<IItemBase*> m_visibleItems;
+	QList<IItemBase*> m_visibleClusters;
+	QTransform m_lastTransform;
 };
 
 

@@ -2,8 +2,12 @@
 
 
 // Qt includes
+#include <QDebug>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
+
+// ImtCore includes
+#include <imtloggui/CClusterItem.h>
 
 
 namespace imtloggui
@@ -165,11 +169,13 @@ IEventItem* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::Messag
 		graphicsItemPtr->setParentItem(m_itemGroupPtr);
 		graphicsItemPtr->setPos(origin);
 		graphicsItemPtr->setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemIsSelectable);
+		graphicsItemPtr->setVisible(false);
 
 		m_events.insert(messagePtr->GetInformationTimeStamp(), eventItemPtr);
 		m_eventCount[messagePtr->GetInformationCategory()]++;
 
-		ArrangeEvents();
+		CreateClusters();
+		//ArrangeEvents();
 
 		return eventItemPtr;
 	}
@@ -180,7 +186,7 @@ IEventItem* CSingleLayerGroupComp::AddEvent(const ilog::IMessageConsumer::Messag
 
 void CSingleLayerGroupComp::ClearEvents()
 {
-	for (IEventItem* eventItemPtr : m_events){
+	for (IItemBase* eventItemPtr : m_events){
 		QGraphicsItem* graphicsItemPtr = dynamic_cast<QGraphicsItem*>(eventItemPtr);
 		Q_ASSERT(graphicsItemPtr != nullptr);
 
@@ -229,7 +235,8 @@ void CSingleLayerGroupComp::OnViewPortChanged()
 		m_graphicsItemPtr->OnViewPortChanged();
 	}
 
-	ArrangeEvents();
+	CreateClusters();
+	//ArrangeEvents();
 }
 
 
@@ -282,7 +289,7 @@ void CSingleLayerGroupComp::ArrangeEvents()
 	EventMap::iterator beginIt = m_events.lowerBound(beginTime);
 	EventMap::iterator endIt = m_events.upperBound(endTime);
 
-	QList<IEventItem*> arrangedItems;
+	QList<IItemBase*> arrangedItems;
 	double arrangedHeight = 0;
 
 	for (EventMap::iterator it = beginIt; it != endIt; it++){
@@ -321,7 +328,7 @@ void CSingleLayerGroupComp::ArrangeEvents()
 		// Current stairway can grow up
 		if (arrangedHeight + (currentRect.height() + 3 * (*m_verticalSpaceingAttrPtr)) < groupHeight){
 			// Shift up stairway
-			for (QList<IEventItem*>::iterator arrangedIt = arrangedItems.begin(); arrangedIt != arrangedItems.end(); arrangedIt++){
+			for (QList<IItemBase*>::iterator arrangedIt = arrangedItems.begin(); arrangedIt != arrangedItems.end(); arrangedIt++){
 				QGraphicsItem* arrangedPtr = dynamic_cast<QGraphicsItem*>(*arrangedIt);
 				Q_ASSERT(arrangedPtr != nullptr);
 
@@ -344,6 +351,156 @@ void CSingleLayerGroupComp::ArrangeEvents()
 		arrangedItems.clear();
 		arrangedItems.append(it.value());
 	}
+}
+
+
+void CSingleLayerGroupComp::CreateClusters()
+{
+	QTransform transform  = m_scenePtr->views()[0]->transform();
+
+	QDateTime beginView = m_timeAxisPtr->GetVisibleBeginTime();
+	QDateTime endView = m_timeAxisPtr->GetVisibleEndTime();
+	qint64 msecs = endView.toMSecsSinceEpoch() - beginView.toMSecsSinceEpoch();
+	QDateTime begin = beginView.addMSecs(-msecs);
+	QDateTime end = endView.addMSecs(msecs);
+
+
+	EventMap::iterator it;
+	EventMap::const_iterator itEnd;
+	QList<IItemBase*>::iterator itVisible;
+	QList<IItemBase*>::const_iterator itVisibleEnd;
+
+
+	//CClusterItem* cp = new CClusterItem;
+	//cp->setPos(0, 0);
+	//cp->setParentItem(m_graphicsItemPtr);
+
+	//if (m_lastTransform.m11() != transform.m11()){
+		for (IItemBase* clusterPtr : m_visibleClusters){
+			QGraphicsItem* giClusterPtr = dynamic_cast<QGraphicsItem*>(clusterPtr);
+
+			for(QGraphicsItem* giItemPtr : giClusterPtr->childItems()){
+				IEventItem* itemPtr = dynamic_cast<IEventItem*>(giItemPtr);
+				m_events.insert(itemPtr->GetInformationProvider()->GetInformationTimeStamp(), itemPtr);
+			}
+
+			dynamic_cast<IClusterItem*>(clusterPtr)->DetachAll();
+
+			delete giClusterPtr;
+		}
+
+		for (IItemBase* itemPtr : m_visibleItems){
+			QGraphicsItem* graphicsItemPtr = dynamic_cast<QGraphicsItem*>(itemPtr);
+			graphicsItemPtr->setVisible(false);
+		}
+
+		m_visibleClusters.clear();
+		m_visibleItems.clear();
+
+	//}
+	//else {
+	//	itVisible = m_visibleClusters.begin();
+	//	while(itVisible != m_visibleClusters.end()){
+	//		if (itVisible.key() < begin || itVisible.key() > end){
+	//			QGraphicsItem* giClusterPtr = dynamic_cast<QGraphicsItem*>(itVisible.value());
+	//			m_scenePtr->removeItem(giClusterPtr);
+	//			delete giClusterPtr;
+
+	//			itVisible = m_visibleClusters.erase(itVisible);
+	//			continue;
+	//		}
+
+	//		itVisible++;
+	//	}
+
+	//	itVisible = m_visibleItems.begin();
+	//	while (itVisible != m_visibleItems.end()){
+	//		if (itVisible.key() < begin || itVisible.key() > end){
+	//			QGraphicsItem* giClusterPtr = dynamic_cast<QGraphicsItem*>(itVisible.value());
+	//			giClusterPtr->setVisible(false);
+
+	//			itVisible = m_visibleItems.erase(itVisible);
+	//			continue;
+	//		}
+
+	//		itVisible++;
+	//	}
+	//}
+
+	it = m_events.lowerBound(begin);
+	itEnd = m_events.upperBound(end);
+
+	double scale = transform.m11();
+
+	while (it != itEnd){
+		bool processNextIt = false;
+
+		itVisible = m_visibleClusters.begin();
+		while (itVisible != m_visibleClusters.end()){
+			if (it.value()->CollidesWithItem(*itVisible, scale)){
+				CClusterItem* clusterPtr = dynamic_cast<CClusterItem*>(*itVisible);
+				clusterPtr->Attach(dynamic_cast<IEventItem*>(it.value()));
+
+				it = m_events.erase(it);
+
+				processNextIt = true;				
+				break;
+			}
+
+			itVisible++;
+		}
+
+		if (processNextIt){
+			continue;
+		}
+
+		itVisible = m_visibleItems.begin();
+		while (itVisible != m_visibleItems.end()){
+			if (it.value()->CollidesWithItem(*itVisible, scale)){
+				CClusterItem* clusterPtr = new CClusterItem();
+				QGraphicsItem* giVisiblePtr = dynamic_cast<QGraphicsItem*>(*itVisible);
+				m_visibleClusters.append(clusterPtr);
+
+				clusterPtr->SetParams(QSize(100, 100));
+				clusterPtr->setParentItem(m_itemGroupPtr);
+				clusterPtr->setFlags(QGraphicsItem::ItemIgnoresTransformations | QGraphicsItem::ItemIsSelectable);
+
+				double giX = giVisiblePtr->pos().x();
+				double giX1 = dynamic_cast<QGraphicsItem*>(it.value())->pos().x();
+				double giW = giVisiblePtr->boundingRect().width();
+ 				clusterPtr->setPos(
+					giX -
+					(giW / 2) / scale +
+					(100 / 2) / scale,
+					giVisiblePtr->pos().y());
+
+				qDebug() << clusterPtr->pos();
+
+				clusterPtr->Attach(dynamic_cast<IEventItem*>(it.value()));
+				clusterPtr->Attach(dynamic_cast<IEventItem*>(*itVisible));
+
+				m_visibleItems.erase(itVisible);
+				m_events.remove(dynamic_cast<IEventItem*>(*itVisible)->GetInformationProvider()->GetInformationTimeStamp(), *itVisible);
+				it = m_events.erase(it);
+
+				processNextIt = true;
+				break;
+			}
+
+			itVisible++;
+		}
+
+		if (processNextIt){
+			continue;
+		}
+
+		dynamic_cast<QGraphicsItem*>(it.value())->setVisible(true);
+		m_visibleItems.append(it.value());
+		
+		it++;
+	}
+
+	m_lastTransform = m_scenePtr->views()[0]->transform();
 }
 
 

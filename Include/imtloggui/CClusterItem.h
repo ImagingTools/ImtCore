@@ -2,8 +2,7 @@
 
 
 // ImtCore includes
-#include <ilog/IMessageConsumer.h>
-#include <imtloggui/IEventItem.h>
+#include <imtloggui/IClusterItem.h>
 #include <imtloggui/CItemBase.h>
 
 
@@ -11,20 +10,19 @@ namespace imtloggui
 {
 
 
-class CEventItemBase:
+class CClusterItem:
 			public CItemBase,
-			virtual public IEventItem
+			virtual public IClusterItem
 {
 public:
 	typedef CItemBase BaseClass;
 
-	void SetParams(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parentPtr = nullptr);
+	CClusterItem();
 
-	// reimplemented (imtloggui::IEventItem)
-	virtual const istd::IInformationProvider* GetInformationProvider() const override;
-	virtual const MetaInfo& GetMetaInfo() const override;
-	virtual void SetMetaInfo(const QString& key, const QString& value) override;
-	virtual void RemoveMetaInfo(const QString& key) override;
+	// reimplemented (imtloggui::IEventItemCluster)
+	virtual void SetParams(const QSize& size) override;
+	virtual void Attach(IEventItem* itemPtr) override;
+	virtual void DetachAll() override;
 
 	// reimplemented (idoc::IDocumentMetaInfo)
 	virtual MetaInfoTypes GetMetaInfoTypes(bool allowReadOnly = true) const override;
@@ -34,12 +32,14 @@ public:
 	virtual QString GetMetaInfoDescription(int metaInfoType) const override;
 	virtual bool IsMetaInfoWritable(int metaInfoType) const override;
 
-protected:
-	void UpdateToolTip();
+	// reimplemented (QGraphicsItem)
+	virtual QRectF boundingRect() const override;
+	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
 private:
-	ilog::IMessageConsumer::MessagePtr m_messagePtr;
-	MetaInfo m_metaInfo;
+	QRect m_rect;
+
+	quint32 m_counters[5];	
 };
 
 

@@ -50,15 +50,11 @@ void CEventGroupItem::SetGroupName(const QString& name)
 
 void CEventGroupItem::OnViewPortChanged()
 {
-	update(GetItemVisibleRect());
-
 	QRectF visibleRect = GetSceneVisibleRect();
-	
+
 	QPointF labelOrigin(visibleRect.left(), pos().y() + rect().center().y());
 	m_labelPtr->setPos(-1000000000, 0);
 	m_labelPtr->setPos(labelOrigin);
-
-	prepareGeometryChange();
 }
 
 
@@ -90,11 +86,9 @@ void CEventGroupItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /
 {
 	QBrush brush(m_backgroundColor);
 
-	painter->save();
 	painter->setBrush(brush);
 	painter->setPen(Qt::NoPen);
 	painter->drawRect(boundingRect());
-	painter->restore();
 }
 
 

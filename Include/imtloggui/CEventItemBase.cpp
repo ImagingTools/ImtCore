@@ -74,18 +74,6 @@ void CEventItemBase::RemoveMetaInfo(const QString& key)
 }
 
 
-const QColor& CEventItemBase::GetBackgroundColor(const QColor& color)
-{
-	return m_backgroundColor;
-}
-
-
-void CEventItemBase::SetBackgroundColor(const QColor& color)
-{
-	m_backgroundColor = color;
-}
-
-
 // reimplemented (idoc::IDocumentMetaInfo)
 
 idoc::IDocumentMetaInfo::MetaInfoTypes CEventItemBase::GetMetaInfoTypes(bool allowReadOnly) const
