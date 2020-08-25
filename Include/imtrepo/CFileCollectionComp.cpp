@@ -1,4 +1,4 @@
-#include <imtbase/CFileCollectionComp.h>
+#include <imtrepo/CFileCollectionComp.h>
 
 
 // Qt includes
@@ -23,7 +23,7 @@
 #include <imtbase/CObjectCollectionRemoveEvent.h>
 
 
-namespace imtbase
+namespace imtrepo
 {
 
 
@@ -216,8 +216,8 @@ QByteArray CFileCollectionComp::InsertFile(
 
 		locker.unlock();
 
-		CObjectCollectionInsertEvent event(fileId);
-		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+		imtbase::CObjectCollectionInsertEvent event(fileId);
+		for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
 			eventHandlerPtr->OnObjectCollectionEvent(this, &event);
 		}
 
@@ -287,8 +287,8 @@ bool CFileCollectionComp::UpdateFile(
 
 		locker.unlock();
 
-		CObjectCollectionUpdateEvent event(objectId, CObjectCollectionUpdateEvent::UT_DATA);
-		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+		imtbase::CObjectCollectionUpdateEvent event(objectId, imtbase::CObjectCollectionUpdateEvent::UT_DATA);
+		for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
 			eventHandlerPtr->OnObjectCollectionEvent(this, &event);
 		}
 
@@ -466,8 +466,8 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 			repositoryDataLocker.unlock();
 		}
 
-		CObjectCollectionRemoveEvent event(objectId);
-		for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+		imtbase::CObjectCollectionRemoveEvent event(objectId);
+		for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
 			eventHandlerPtr->OnObjectCollectionEvent(this, &event);
 		}
 
@@ -634,8 +634,8 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 
 			locker.unlock();
 
-			CObjectCollectionUpdateEvent event(objectId, CObjectCollectionUpdateEvent::UT_NAME);
-			for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+			imtbase::CObjectCollectionUpdateEvent event(objectId, imtbase::CObjectCollectionUpdateEvent::UT_NAME);
+			for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
 				eventHandlerPtr->OnObjectCollectionEvent(this, &event);
 			}
 
@@ -668,8 +668,8 @@ void CFileCollectionComp::SetObjectDescription(const QByteArray& objectId, const
 
 			locker.unlock();
 
-			CObjectCollectionUpdateEvent event(objectId, CObjectCollectionUpdateEvent::UT_DESCRIPTION);
-			for (IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+			imtbase::CObjectCollectionUpdateEvent event(objectId, imtbase::CObjectCollectionUpdateEvent::UT_DESCRIPTION);
+			for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
 				eventHandlerPtr->OnObjectCollectionEvent(this, &event);
 			}
 		}
@@ -682,7 +682,7 @@ void CFileCollectionComp::SetObjectEnabled(const QByteArray& /*objectId*/, bool 
 }
 
 
-bool CFileCollectionComp::RegisterEventHandler(IObjectCollectionEventHandler* eventHandler)
+bool CFileCollectionComp::RegisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler)
 {
 	if (!m_eventHandlerList.contains(eventHandler)){
 		m_eventHandlerList.append(eventHandler);
@@ -696,7 +696,7 @@ bool CFileCollectionComp::RegisterEventHandler(IObjectCollectionEventHandler* ev
 }
 
 
-bool CFileCollectionComp::UnregisterEventHandler(IObjectCollectionEventHandler* eventHandler)
+bool CFileCollectionComp::UnregisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler)
 {
 	int index = m_eventHandlerList.indexOf(eventHandler, 0);
 	if (index >= 0){
@@ -738,7 +738,7 @@ const iprm::IOptionsList* CFileCollectionComp::GetObjectTypesInfo() const
 }
 
 
-IObjectCollectionInfo::Id CFileCollectionComp::GetObjectTypeId(const QByteArray & objectId) const
+imtbase::IObjectCollectionInfo::Id CFileCollectionComp::GetObjectTypeId(const QByteArray & objectId) const
 {
 	m_collectionLock.lockForRead();
 
@@ -757,7 +757,7 @@ IObjectCollectionInfo::Id CFileCollectionComp::GetObjectTypeId(const QByteArray 
 
 // reimplemented (ICollectionInfo)
 
-ICollectionInfo::Ids CFileCollectionComp::GetElementIds() const
+imtbase::ICollectionInfo::Ids CFileCollectionComp::GetElementIds() const
 {
 	Ids retVal;
 
@@ -1708,6 +1708,6 @@ bool CFileCollectionComp::CollectionItem::CopyFrom(const istd::IChangeable& obje
 }
 
 
-} // namespace imtbase
+} // namespace imtrepo
 
 

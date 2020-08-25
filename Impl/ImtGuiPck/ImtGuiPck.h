@@ -10,8 +10,6 @@
 #include <imtgui/CSingleStatusProviderGuiComp.h>
 #include <imtgui/CMultiStatusProviderGuiComp.h>
 #include <imtgui/CObjectCollectionViewComp.h>
-#include <imtgui/CFileObjectCollectionViewDelegate.h>
-#include <imtgui/CDocumentBasedFileCollectionDelegateComp.h>
 #include <imtgui/CDocumentWorkspaceGuiComp.h>
 #include <imtgui/CObjectCollectionMetaInfoViewComp.h>
 #include <imtgui/CDelegatedCommandsProviderComp.h>
@@ -36,8 +34,6 @@ typedef imtgui::CThumbnailDecoratorGuiComp ThumbnailDecoratorGui;
 typedef imtgui::CSingleStatusProviderGuiComp SingleStatusProviderGui;
 typedef imtgui::CMultiStatusProviderGuiComp MultiStatusProviderGui;
 typedef imtgui::CObjectCollectionViewComp ObjectCollectionView;
-typedef icomp::TMakeComponentWrap<imtgui::CFileObjectCollectionViewDelegate, imtgui::ICollectionViewDelegate> FileObjectCollectionViewDelegate;
-typedef imtgui::CDocumentBasedFileCollectionDelegateComp DocumentBasedFileCollectionDelegate;
 typedef icomp::TModelCompWrap<imtgui::CDocumentWorkspaceGuiComp> DocumentWorkspaceGui;
 typedef imtgui::CObjectCollectionMetaInfoViewComp ObjectCollectionMetaInfoView;
 typedef imtgui::CDelegatedCommandsProviderComp DelegatedCommandsProvider;

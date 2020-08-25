@@ -38,16 +38,6 @@ I_EXPORT_COMPONENT(
 			"Object Collection View");
 
 I_EXPORT_COMPONENT(
-			FileObjectCollectionViewDelegate,
-			"View delegate for a file-based collection",
-			"Object Collection File Delegate View");
-
-I_EXPORT_COMPONENT(
-			DocumentBasedFileCollectionDelegate,
-			"View delegate for a file collection using document manager for the data operations",
-			"Object Collection File Delegate View Document MDI");
-
-I_EXPORT_COMPONENT(
 			DocumentWorkspaceGui,
 			"Standard document workspace",
 			"Workspace Tabs View Document File MDI");

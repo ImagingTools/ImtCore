@@ -1,4 +1,4 @@
-#include <imtgui/CFileObjectCollectionViewDelegate.h>
+#include <imtrepogui/CFileObjectCollectionViewDelegate.h>
 
 
 // Qt includes
@@ -11,10 +11,10 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
-#include <imtbase/IFileObjectCollection.h>
+#include <imtrepo/IFileObjectCollection.h>
 
 
-namespace imtgui
+namespace imtrepogui
 {
 
 
@@ -54,7 +54,7 @@ void CFileObjectCollectionViewDelegate::UpdateItemSelection(const imtbase::IColl
 
 QByteArray CFileObjectCollectionViewDelegate::ImportObject(const QByteArray& typeId, const QString& sourcePath) const
 {
-	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
 	return fileCollectionPtr->InsertFile(sourcePath, typeId);
@@ -67,7 +67,7 @@ bool CFileObjectCollectionViewDelegate::ExportObject(const QByteArray& objectId,
 		return false;
 	}
 
-	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
 	QString resultPath = fileCollectionPtr->GetFile(objectId, targetPath);
@@ -76,7 +76,7 @@ bool CFileObjectCollectionViewDelegate::ExportObject(const QByteArray& objectId,
 }
 
 
-ICollectionViewDelegate::SummaryInformation CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+imtgui::ICollectionViewDelegate::SummaryInformation CFileObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
 {
 	SummaryInformation result;
 
@@ -129,7 +129,7 @@ void CFileObjectCollectionViewDelegate::SetupCommands()
 {
 	BaseClass::SetupCommands();
 
-	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	if (fileCollectionPtr != nullptr){
 		connect(&m_importCommand, SIGNAL(triggered()), this, SLOT(OnImport()));
 		connect(&m_exportCommand, SIGNAL(triggered()), this, SLOT(OnExport()));
@@ -160,7 +160,7 @@ void CFileObjectCollectionViewDelegate::OnLanguageChanged()
 
 void CFileObjectCollectionViewDelegate::OnImport()
 {
-	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
 	istd::CChangeGroup changeGroup(fileCollectionPtr);
@@ -192,7 +192,7 @@ void CFileObjectCollectionViewDelegate::OnImport()
 
 void CFileObjectCollectionViewDelegate::OnExport()
 {
-	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
 	QByteArray typeId = fileCollectionPtr->GetObjectTypeId(m_selectedItemIds[0]);
@@ -231,7 +231,7 @@ QByteArray CFileObjectCollectionViewDelegate::FindTypeIdFromFile(const QString& 
 	QFileInfo fileInfo(filePath);
 	QString extension = fileInfo.suffix();
 
-	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
 	const ifile::IFileResourceTypeConstraints* fileConstraintsPtr = fileCollectionPtr->GetFileTypeConstraints();
@@ -253,7 +253,7 @@ QByteArray CFileObjectCollectionViewDelegate::FindTypeIdFromFile(const QString& 
 
 const ifile::IFileTypeInfo* CFileObjectCollectionViewDelegate::FindFileInfo(const QByteArray& typeId) const
 {
-	const imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<const imtbase::IFileObjectCollection*>(m_collectionPtr);
+	const imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<const imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
 	const ifile::IFileResourceTypeConstraints* fileConstraintsPtr = fileCollectionPtr->GetFileTypeConstraints();
@@ -270,7 +270,7 @@ const ifile::IFileTypeInfo* CFileObjectCollectionViewDelegate::FindFileInfo(cons
 
 QString CFileObjectCollectionViewDelegate::CreateFileFilter(int flags) const
 {
-	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
 	QStringList filters;
@@ -296,6 +296,6 @@ QString CFileObjectCollectionViewDelegate::CreateFileFilter(int flags) const
 }
 
 
-} // namespace imtgui
+} // namespace imtrepogui
 
 

@@ -25,11 +25,6 @@ I_EXPORT_COMPONENT(
 			"Object Data Model Collection Container Composition");
 
 I_EXPORT_COMPONENT(
-			FileCollection,
-			"File-based container of the objects",
-			"Object Collection File Data Model Repository");
-
-I_EXPORT_COMPONENT(
 			DelegatedObjectContainerSupplier,
 			"Delegated provider of a composite object (object container)",
 			"Delegator Object Data Model Composition Supplier Provider");

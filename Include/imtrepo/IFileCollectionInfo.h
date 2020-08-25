@@ -8,7 +8,7 @@
 #include <istd/IChangeable.h>
 
 
-namespace imtbase
+namespace imtrepo
 {
 
 
@@ -25,6 +25,6 @@ public:
 };
 
 
-} // namespace imtbase
+} // namespace imtrepo
 
 

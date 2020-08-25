@@ -1,4 +1,4 @@
-#include <imtgui/CDocumentBasedFileCollectionDelegateComp.h>
+#include <imtrepogui/CDocumentBasedFileCollectionDelegateComp.h>
 
 
 // Qt includes
@@ -12,10 +12,10 @@
 #include <ifilegui/CFileDialogLoaderComp.h>
 
 // ImtCore includes
-#include <imtbase/IFileObjectCollection.h>
+#include <imtrepo/IFileObjectCollection.h>
 
 
-namespace imtgui
+namespace imtrepogui
 {
 
 
@@ -167,7 +167,7 @@ bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(
 		return false;
 	}
 
-	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
 	ObjectInfo* objectInfoPtr = nullptr;
@@ -198,7 +198,7 @@ bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(
 	objectInfoPtr->typeId = m_collectionPtr->GetObjectTypeId(objectId);
 	objectInfoPtr->name = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
-	imtbase::IFileObjectCollection::FileInfo fileInfo = fileCollectionPtr->GetFileInfo(objectId);
+	imtrepo::IFileObjectCollection::FileInfo fileInfo = fileCollectionPtr->GetFileInfo(objectId);
 
 	objectInfoPtr->uuid = objectId;
 
@@ -241,7 +241,7 @@ void CDocumentBasedFileCollectionDelegateComp::SetupCommands()
 {
 	BaseClass2::SetupCommands();
 
-	imtbase::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtbase::IFileObjectCollection*>(m_collectionPtr);
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	if (fileCollectionPtr != nullptr){
 		connect(&m_editContentsCommand, SIGNAL(triggered()), this, SLOT(OnEdit()));
 		m_editCommands.InsertChild(&m_editContentsCommand);
@@ -466,6 +466,6 @@ void CDocumentBasedFileCollectionDelegateComp::DocumentManagerObserver::OnUpdate
 }
 
 
-} // namespace imtgui
+} // namespace imtrepogui
 
 

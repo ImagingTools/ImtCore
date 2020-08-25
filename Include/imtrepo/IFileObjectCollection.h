@@ -10,10 +10,10 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtbase/IFileCollectionInfo.h>
+#include <imtrepo/IFileCollectionInfo.h>
 
 
-namespace imtbase
+namespace imtrepo
 {
 
 
@@ -21,7 +21,7 @@ namespace imtbase
 	Common interface for a object collection where the objects are stored in the file system.
 	\ingroup Collection
 */
-class IFileObjectCollection: virtual public IObjectCollection, virtual public IFileCollectionInfo
+class IFileObjectCollection: virtual public imtbase::IObjectCollection, virtual public IFileCollectionInfo
 {
 public:
 	/**
@@ -92,6 +92,6 @@ public:
 };
 
 
-} // namespace imtbase
+} // namespace imtrepo
 
 

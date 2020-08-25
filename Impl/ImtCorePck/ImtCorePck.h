@@ -8,7 +8,6 @@
 // ImtCore includes
 #include <imtbase/TComponentFactoryComp.h>
 #include <imtbase/CObjectCollectionComp.h>
-#include <imtbase/CFileCollectionComp.h>
 #include <imtbase/CDelegatedObjectContainerSupplierComp.h>
 #include <imtbase/CMultiStatusManagerComp.h>
 #include <imtbase/CStatusManagerComp.h>
@@ -28,7 +27,6 @@ namespace ImtCorePck
 
 typedef imtbase::TComponentFactoryComp<iinsp::ISupplier> SupplierFactory;
 typedef icomp::TModelCompWrap<imtbase::CObjectCollectionComp> ObjectCollection;
-typedef icomp::TModelCompWrap<imtbase::CFileCollectionComp> FileCollection;
 typedef icomp::TModelCompWrap<imtbase::CDelegatedObjectContainerSupplierComp> DelegatedObjectContainerSupplier;
 typedef icomp::TModelCompWrap<imtbase::CMultiStatusManagerComp> MultiStatusManager;
 typedef icomp::TModelCompWrap<imtbase::CStatusManagerComp> StatusManager;

@@ -21,12 +21,12 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
-#include <imtbase/IFileObjectCollection.h>
-#include <imtbase/IFileCollectionInfo.h>
 #include <imtbase/IMetaInfoCreator.h>
+#include <imtrepo/IFileCollectionInfo.h>
+#include <imtrepo/IFileObjectCollection.h>
 
 
-namespace imtbase
+namespace imtrepo
 {
 
 
@@ -146,8 +146,8 @@ public:
 	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
 	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
-	virtual bool RegisterEventHandler(IObjectCollectionEventHandler* eventHandler) override;
-	virtual bool UnregisterEventHandler(IObjectCollectionEventHandler* eventHandler) override;
+	virtual bool RegisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler) override;
+	virtual bool UnregisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler) override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
@@ -355,7 +355,7 @@ protected:
 
 private:
 	typedef QList<CollectionItem> Files;
-	typedef QList<IObjectCollectionEventHandler*> EventHandlerList;
+	typedef QList<imtbase::IObjectCollectionEventHandler*> EventHandlerList;
 
 	bool InsertFileIntoCollection(
 				const QString& filePath,
@@ -474,6 +474,6 @@ private:
 };
 
 
-} // namespace imtbase
+} // namespace imtrepo
 
 

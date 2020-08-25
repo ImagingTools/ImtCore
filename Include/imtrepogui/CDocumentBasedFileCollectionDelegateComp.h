@@ -10,10 +10,10 @@
 #include <iqtgui/IIconProvider.h>
 
 // ImtCore includes
-#include <imtgui/CFileObjectCollectionViewDelegate.h>
+#include <imtrepogui/CFileObjectCollectionViewDelegate.h>
 
 
-namespace imtgui
+namespace imtrepogui
 {
 
 
@@ -164,6 +164,6 @@ private:
 };
 
 
-} // namespace imtgui
+} // namespace imtrepogui
 
 

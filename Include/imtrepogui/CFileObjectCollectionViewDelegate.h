@@ -8,7 +8,7 @@
 #include <imtgui/CObjectCollectionViewDelegate.h>
 
 
-namespace imtgui
+namespace imtrepogui
 {
 
 
@@ -16,7 +16,7 @@ namespace imtgui
 	View delegate for a file-based object collection.
 	\ingroup Collection
 */
-class CFileObjectCollectionViewDelegate: public CObjectCollectionViewDelegate
+class CFileObjectCollectionViewDelegate: public imtgui::CObjectCollectionViewDelegate
 {
 	Q_OBJECT
 public:
@@ -63,6 +63,6 @@ private:
 };
 
 
-} // namespace imtgui
+} // namespace imtrepogui
 
 
