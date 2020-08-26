@@ -18,10 +18,12 @@
 #include <ifile/IFileNameParam.h>
 #include <ifile/IFilePersistence.h>
 #include <ifile/IFileResourceTypeConstraints.h>
+#include <iauth/IRightsProvider.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtbase/IMetaInfoCreator.h>
+#include <imtrepo/IRevisionController.h>
 #include <imtrepo/IFileCollectionInfo.h>
 #include <imtrepo/IFileObjectCollection.h>
 
@@ -87,7 +89,8 @@ public:
 
 class CFileCollectionComp:
 			public CFileCollectionCompBase,
-			virtual public IFileObjectCollection
+			virtual public IFileObjectCollection,
+			virtual public IRevisionController
 {
 	Q_OBJECT
 public:
@@ -107,9 +110,17 @@ public:
 		I_ASSIGN(m_pollFileSystemAttrPtr, "PollFileSystem", "If enabled, the collection folder will be observed and the items will be re-read on changes in the folder structure", true, false);
 		I_ASSIGN(m_pollingPeriodAttrPtr, "PollingPeriod", "Period of file system polling (seconds)", true, 1);
 		I_ASSIGN(m_asynchronousReadingAttrPtr, "AsynchronousReading", "If enabled, the collection will reading asynchronously", true, false);
+		I_ASSIGN(m_isEnableRevisionHistoryAttrPtr, "IsEnableRevisionHistory", "Allow saving item revisions", true, false);
+		I_ASSIGN(m_rightsProviderCompPtr, "RightsProvider", "Rights provider", false, "RightsProvider");
+		I_ASSIGN(m_revertToRevisionRightIdAttrPtr, "RevertToRevisionRightId", "Revert to revision right id", true, "RevertToRevision");
 	I_END_COMPONENT;
 
 	CFileCollectionComp();
+
+	// reimplemented (IRevisionController)
+	virtual bool IsRevisionHistoryEnabled() const override;
+	virtual RevisionList GetRevisionList(const QByteArray& objectId) const override;
+	virtual bool RevertToRevision(const QByteArray& objectId, int revision) override;
 
 	// reimplemented (IFileObjectCollection)
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
@@ -128,7 +139,7 @@ public:
 				const QByteArray& resourceId) override;
 
 	// reimplemented (IFileCollectionInfo)
-	virtual QString GetCollectionRootFolder() const;
+	virtual QString GetCollectionRootFolder() const override;
 
 	// reimplemented (IObjectCollection)
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
@@ -177,10 +188,10 @@ protected:
 		}
 
 		// reimplement (iser::ISerializable)
-		virtual bool Serialize(iser::IArchive& archive);
+		virtual bool Serialize(iser::IArchive& archive) override;
 
 		// reimplement (istd::IChangeable)
-		virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS);
+		virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 	public:
 		/**
@@ -311,9 +322,11 @@ protected:
 				const QString& localFilePath,
 				bool useSubfolder) const;
 
+	virtual bool CreateFileRevision(const QByteArray& objectId);
+
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
-	virtual void OnComponentDestroyed();
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 protected:
 	class ResourceTypeConstraints: public ifile::IFileResourceTypeConstraints
@@ -324,15 +337,15 @@ protected:
 		void SetParent(CFileCollectionComp* parentPtr);
 
 		// reimplemented (ifile::IFileResourceTypeConstraints)
-		virtual const ifile::IFileTypeInfo* GetFileTypeInfo(int resourceTypeIndex) const;
+		virtual const ifile::IFileTypeInfo* GetFileTypeInfo(int resourceTypeIndex) const override;
 
 		// reimplemented (iprm::IOptionsList)
-		virtual int GetOptionsFlags() const;
-		virtual int GetOptionsCount() const;
-		virtual QString GetOptionName(int index) const;
-		virtual QString GetOptionDescription(int index) const;
-		virtual QByteArray GetOptionId(int index) const;
-		virtual bool IsOptionEnabled(int index) const;
+		virtual int GetOptionsFlags() const override;
+		virtual int GetOptionsCount() const override;
+		virtual QString GetOptionName(int index) const override;
+		virtual QString GetOptionDescription(int index) const override;
+		virtual QByteArray GetOptionId(int index) const override;
+		virtual bool IsOptionEnabled(int index) const override;
 
 	private:
 		CFileCollectionComp* m_parentPtr;
@@ -471,6 +484,17 @@ private:
 		Asynchronous collection loading on dedicated thread
 	*/
 	I_ATTR(bool, m_asynchronousReadingAttrPtr);
+
+	/**
+		Enable items changing history
+	*/
+	I_ATTR(bool, m_isEnableRevisionHistoryAttrPtr);
+
+	/**
+		Rights provider
+	*/
+	I_REF(iauth::IRightsProvider, m_rightsProviderCompPtr);
+	I_ATTR(QByteArray, m_revertToRevisionRightIdAttrPtr);
 };
 
 

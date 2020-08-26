@@ -26,6 +26,7 @@ public:
 	{
 		CI_IMPORT = BaseClass::CI_USER,
 		CI_EXPORT,
+		CI_REVERT,
 		CI_USER = BaseClass::CI_USER + 100
 	};
 
@@ -50,6 +51,7 @@ protected:
 protected Q_SLOTS:
 	virtual void OnImport();
 	virtual void OnExport();
+	virtual void OnRevert();
 
 protected:
 	QByteArray FindTypeIdFromFile(const QString& filePath) const;
@@ -60,6 +62,7 @@ private:
 	// commands
 	iqtgui::CHierarchicalCommand m_importCommand;
 	iqtgui::CHierarchicalCommand m_exportCommand;
+	iqtgui::CHierarchicalCommand m_revertCommand;
 };
 
 
