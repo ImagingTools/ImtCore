@@ -13,7 +13,7 @@ namespace imtbase
 
 
 /**
-	Interface for collection of references to objects which can be identified (e.g. in a storage) using their IDs.
+	Interface for collection of references to objects that can be identified (e.g. in some abstract storage) using their IDs.
 	\ingroup Collection
 */
 class IReferenceCollection:

@@ -56,8 +56,7 @@ QByteArray TGraphicsElement<Object2dType>::GetTypeName()
 
 	QByteArray baseTypeName = istd::CClassInfo::GetName<Object2dType>();
 
-	if (knownTypesMap.contains(baseTypeName))
-	{
+	if (knownTypesMap.contains(baseTypeName)){
 		return knownTypesMap[baseTypeName];
 	}
 

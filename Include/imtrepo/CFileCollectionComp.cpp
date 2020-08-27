@@ -440,6 +440,7 @@ bool CFileCollectionComp::UpdateFile(
 	return false;
 }
 
+
 // reimplemented (IFileCollectionInfo)
 
 QString CFileCollectionComp::GetCollectionRootFolder() const

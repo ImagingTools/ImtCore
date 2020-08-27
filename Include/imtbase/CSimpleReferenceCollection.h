@@ -13,7 +13,7 @@ namespace imtbase
 
 
 /**
-	Simple implementation of a object reference collection.
+	Simple implementation for a collection of object references.
 */
 class CSimpleReferenceCollection: virtual public IReferenceCollection
 {
