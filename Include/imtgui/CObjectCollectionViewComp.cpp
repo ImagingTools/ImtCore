@@ -857,12 +857,18 @@ void CObjectCollectionViewComp::ProcessObjectCollectionEventSync(
 	const imtbase::CObjectCollectionInsertEvent* insertEventPtr = dynamic_cast<const imtbase::CObjectCollectionInsertEvent*>(eventPtr.GetPtr());
 	if (insertEventPtr != nullptr){
 		UpdateItem(insertEventPtr->GetItemId(), m_itemModelPtr);
+		if (!m_itemsSelection.isEmpty()){
+			UpdateCommands();
+		}
 		return;
 	}
 
 	const imtbase::CObjectCollectionUpdateEvent* updateEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateEvent*>(eventPtr.GetPtr());
 	if (updateEventPtr != nullptr){
 		UpdateItem(updateEventPtr->GetItemId(), m_itemModelPtr);
+		if (!m_itemsSelection.isEmpty()){
+			UpdateCommands();
+		}
 		return;
 	}
 

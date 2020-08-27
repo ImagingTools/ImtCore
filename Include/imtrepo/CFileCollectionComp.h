@@ -15,6 +15,7 @@
 #include <iser/ISerializable.h>
 #include <imod/TModelWrap.h>
 #include <ilog/TLoggerCompWrap.h>
+#include <iauth/ILogin.h>
 #include <ifile/IFileNameParam.h>
 #include <ifile/IFilePersistence.h>
 #include <ifile/IFileResourceTypeConstraints.h>
@@ -26,6 +27,7 @@
 #include <imtrepo/IRevisionController.h>
 #include <imtrepo/IFileCollectionInfo.h>
 #include <imtrepo/IFileObjectCollection.h>
+#include <imtfile/IFileCompression.h>
 
 
 namespace imtrepo
@@ -53,6 +55,7 @@ public:
 		I_ASSIGN_MULTI_0(m_metaInfoCreatorListCompPtr, "MetaInfoCreatorList", "List of meta-info creators related to the object types", false);
 		I_ASSIGN_MULTI_0(m_progressManagerListCompPtr, "ProgressManagerList", "List of progress manager components", false);
 		I_ASSIGN_MULTI_0(m_eventHandlerListCompPtr, "EventHandlerList", "List of event handler components", false);
+		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "FileCompressor");
 	I_END_COMPONENT;
 
 	/**
@@ -84,6 +87,11 @@ public:
 		Event handlers
 	*/
 	I_MULTIREF(imtbase::IObjectCollectionEventHandler, m_eventHandlerListCompPtr);
+
+	/**
+		File compressor.
+	*/
+	I_REF(imtfile::IFileCompression, m_compressorCompPtr);
 };
 
 
@@ -112,15 +120,16 @@ public:
 		I_ASSIGN(m_asynchronousReadingAttrPtr, "AsynchronousReading", "If enabled, the collection will reading asynchronously", true, false);
 		I_ASSIGN(m_isEnableRevisionHistoryAttrPtr, "IsEnableRevisionHistory", "Allow saving item revisions", true, false);
 		I_ASSIGN(m_rightsProviderCompPtr, "RightsProvider", "Rights provider", false, "RightsProvider");
-		I_ASSIGN(m_revertToRevisionRightIdAttrPtr, "RevertToRevisionRightId", "Revert to revision right id", true, "RevertToRevision");
+		I_ASSIGN(m_restoreRevisionRightIdAttrPtr, "RestoreRevisionRightId", "Restore to revision right id", true, "RestoreRevision");
+		I_ASSIGN(m_loginProviderCompPtr, "Login", "Login component", false, "Login");
 	I_END_COMPONENT;
 
 	CFileCollectionComp();
 
 	// reimplemented (IRevisionController)
 	virtual bool IsRevisionHistoryEnabled() const override;
-	virtual RevisionList GetRevisionList(const QByteArray& objectId) const override;
-	virtual bool RevertToRevision(const QByteArray& objectId, int revision) override;
+	virtual RevisionInfoList GetRevisionInfoList(const QByteArray& objectId) const override;
+	virtual bool RestoreRevision(const QByteArray& objectId, int revision) override;
 
 	// reimplemented (IFileObjectCollection)
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
@@ -235,6 +244,16 @@ protected:
 		imtbase::IMetaInfoCreator::MetaInfoPtr contentsMetaInfoPtr;
 	};
 
+	class RevisionMetaInfo: public RevisionInfo, virtual public iser::ISerializable
+	{
+	public:
+		// reimplement (iser::ISerializable)
+		virtual bool Serialize(iser::IArchive& archive) override;
+
+		// reimplement (istd::IChangeable)
+		virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	};
+
 	struct RepositoryInfo
 	{
 		QString metaInfoFileSuffix;
@@ -322,7 +341,8 @@ protected:
 				const QString& localFilePath,
 				bool useSubfolder) const;
 
-	virtual bool CreateFileRevision(const QByteArray& objectId);
+	virtual QStringList DecomressRevisions(const QByteArray& objectId, const QString& path) const;
+	virtual bool CreateRevision(const QByteArray& objectId);
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -494,7 +514,12 @@ private:
 		Rights provider
 	*/
 	I_REF(iauth::IRightsProvider, m_rightsProviderCompPtr);
-	I_ATTR(QByteArray, m_revertToRevisionRightIdAttrPtr);
+	I_ATTR(QByteArray, m_restoreRevisionRightIdAttrPtr);
+
+	/**
+		Provider of logged in user.
+	*/
+	I_REF(iauth::ILogin, m_loginProviderCompPtr);
 };
 
 

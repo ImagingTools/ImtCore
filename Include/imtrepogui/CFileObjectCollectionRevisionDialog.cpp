@@ -9,28 +9,27 @@ CFileObjectCollectionRevisionDialog::CFileObjectCollectionRevisionDialog(QWidget
 	:QDialog(parent, Qt::WindowTitleHint)
 {
 	setupUi(this);
-	setWindowTitle(tr("Select revision"));
-	Revisions->setSelectionMode(QAbstractItemView::SingleSelection);
-	Revisions->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
 
-void CFileObjectCollectionRevisionDialog::SetRevisionList(const QVector<int>& revisions)
+void CFileObjectCollectionRevisionDialog::SetRevisionList(const imtrepo::IRevisionController::RevisionInfoList& revisions)
 {
 	for (int i = 0; i < revisions.count(); i++){
-		Revisions->insertRow(i);
+		Table->insertRow(i);
 
-		QTableWidgetItem* itemPtr = new QTableWidgetItem(QString::number(revisions[i]));
-		Revisions->setItem(i, 0, itemPtr);
+		Table->setItem(i, 0, new QTableWidgetItem(QString::number(revisions[i].revision)));
+		Table->setItem(i, 1, new QTableWidgetItem(revisions[i].timestamp.toString()));
+		Table->setItem(i, 2, new QTableWidgetItem(revisions[i].user));
+		Table->setItem(i, 3, new QTableWidgetItem(revisions[i].comment));
 	}
 }
 
 
 int CFileObjectCollectionRevisionDialog::GetSelectedRevision()
 {
-	QList<QTableWidgetItem*> selectedItems = Revisions->selectedItems();
+	QList<QTableWidgetItem*> selectedItems = Table->selectedItems();
 	if (!selectedItems.isEmpty()){
-		return Revisions->item(selectedItems[0]->row(), 0)->text().toInt();
+		return Table->item(selectedItems[0]->row(), 0)->text().toInt();
 	}
 
 	return -1;

@@ -23,7 +23,7 @@ namespace imtrepogui
 CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
 	:m_importCommand("Import", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_exportCommand("Export", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
-	m_revertCommand("Revert", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT)
+	m_restoreCommand("Restore", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT)
 {
 	m_summaryInformationTypes.ResetData();
 	m_summaryInformationHeaders.clear();
@@ -52,7 +52,20 @@ void CFileObjectCollectionViewDelegate::UpdateItemSelection(const imtbase::IColl
 	BaseClass::UpdateItemSelection(selectedItems, selectedTypeId);
 
 	m_exportCommand.setEnabled(selectedItems.count() == 1);
-	m_revertCommand.setEnabled(selectedItems.count() == 1);
+	m_restoreCommand.setEnabled(false);
+
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
+	Q_ASSERT(fileCollectionPtr != nullptr);
+
+	imtrepo::IRevisionController* revisionControllerPtr = dynamic_cast<imtrepo::IRevisionController*>(fileCollectionPtr);
+	if (revisionControllerPtr != nullptr){
+		if (m_selectedItemIds.count() == 1){
+			if (revisionControllerPtr->GetRevisionInfoList(m_selectedItemIds[0]).count() > 1){
+				m_restoreCommand.setEnabled(true);
+			}
+		}
+	}
+
 }
 
 
@@ -137,7 +150,7 @@ void CFileObjectCollectionViewDelegate::SetupCommands()
 	if (fileCollectionPtr != nullptr){
 		connect(&m_importCommand, SIGNAL(triggered()), this, SLOT(OnImport()));
 		connect(&m_exportCommand, SIGNAL(triggered()), this, SLOT(OnExport()));
-		connect(&m_revertCommand, SIGNAL(triggered()), this, SLOT(OnRevert()));
+		connect(&m_restoreCommand, SIGNAL(triggered()), this, SLOT(OnRestore()));
 
 		if (IsCommandSupported(CI_IMPORT)){
 			m_editCommands.InsertChild(&m_importCommand);
@@ -147,8 +160,8 @@ void CFileObjectCollectionViewDelegate::SetupCommands()
 			m_editCommands.InsertChild(&m_exportCommand);
 		}
 
-		if (IsCommandSupported(CI_REVERT)){
-			m_editCommands.InsertChild(&m_revertCommand);
+		if (IsCommandSupported(CI_RESTORE)){
+			m_editCommands.InsertChild(&m_restoreCommand);
 		}
 	}
 }
@@ -162,7 +175,7 @@ void CFileObjectCollectionViewDelegate::OnLanguageChanged()
 
 	m_importCommand.SetVisuals(tr("Import from File..."), tr("Import"), tr("Import existing file into the collection"), QIcon(":/Icons/Load"));
 	m_exportCommand.SetVisuals(tr("Export to File..."), tr("Export"), tr("Export data from the collection to a file"), QIcon(":/Icons/Export"));
-	m_revertCommand.SetVisuals(tr("Revert to revision..."), tr("Revert"), tr("Revert date in collection to revision"), QIcon(":/Icons/Undo"));
+	m_restoreCommand.SetVisuals(tr("Restore revision..."), tr("Restore"), tr("Restore data in collection to revision"), QIcon(":/Icons/Undo"));
 }
 
 
@@ -234,12 +247,31 @@ void CFileObjectCollectionViewDelegate::OnExport()
 }
 
 
-void CFileObjectCollectionViewDelegate::OnRevert()
+void CFileObjectCollectionViewDelegate::OnRestore()
 {
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
+	Q_ASSERT(fileCollectionPtr != nullptr);
+
 	imtrepo::IRevisionController* revisionControllerPtr = dynamic_cast<imtrepo::IRevisionController*>(m_collectionPtr);
 	Q_ASSERT(revisionControllerPtr != nullptr);
 
-	imtrepo::IRevisionController::RevisionList revisionList = revisionControllerPtr->GetRevisionList(m_selectedItemIds[0]);
+	idoc::CStandardDocumentMetaInfo metaInfo;
+	int currentRevision = -1;
+
+	if (fileCollectionPtr->GetCollectionItemMetaInfo(m_selectedItemIds[0], metaInfo)){
+		QVariant revision = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
+		if (revision.isValid()){
+			currentRevision = revision.toInt();
+		}
+	}
+
+	imtrepo::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(m_selectedItemIds[0]);
+	for (int i = 0; i < revisionList.count(); i++){
+		if (revisionList[i].revision == currentRevision){
+			revisionList.removeAt(i);
+			break;
+		}
+	}
 
 	CFileObjectCollectionRevisionDialog dialog;
 
@@ -247,7 +279,7 @@ void CFileObjectCollectionViewDelegate::OnRevert()
 	if (dialog.exec() == QDialog::Accepted){
 		int revision = dialog.GetSelectedRevision();
 		if (revision != -1){
-			revisionControllerPtr->RevertToRevision(m_selectedItemIds[0], revision);
+			revisionControllerPtr->RestoreRevision(m_selectedItemIds[0], revision);
 		}
 	}
 }
