@@ -388,52 +388,18 @@ int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::SaveToFile
 						objectInfoPtr->name = objectName;
 						objectInfoPtr->description = description;
 
+						CreateBackup(*m_parent.m_collectionPtr, objectInfoPtr->uuid);
+
 						return OS_OK;
 					}
-
-					return OS_FAILED;
 				}
 				// An existing object in the collection should be updated:
 				else{
-					const imtbase::IRevisionController* revisionControllerPtr = m_parent.m_collectionPtr->GetRevisionController();
-					if (revisionControllerPtr != nullptr){
-						imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_parent.m_collectionPtr, objectInfoPtr->uuid);
-
-						idoc::CStandardDocumentMetaInfo metaInfo;
-						m_parent.m_collectionPtr->GetCollectionItemMetaInfo(objectInfoPtr->uuid, metaInfo);
-						int revision = -1;
-						QVariant variant = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
-						if (variant.isValid()){
-							revision = variant.toInt();
-						}
-
-						bool isNotArchived = true;
-						for (int i = 0; i < revisionList.count(); i++){
-							if (revisionList[i].revision == revision){
-								isNotArchived = false;
-								break;
-							}
-						}
-
-						if (isNotArchived){
-							bool isOk;
-							QString comment = QInputDialog::getText(
-										nullptr,
-										tr("Revision comment"),
-										tr("Previous document revision not archived.\nPlease enter comment for backup"),
-										QLineEdit::Normal,
-										tr("").arg(revision),
-										&isOk);
-
-							revisionControllerPtr->BackupObject(*m_parent.m_collectionPtr, objectInfoPtr->uuid, comment);
-						}
-					}
-
 					if (m_parent.UpdateObject(objectInfoPtr->uuid, data)){
+						CreateBackup(*m_parent.m_collectionPtr, objectInfoPtr->uuid);
+
 						return OS_OK;
 					}
-
-					return OS_FAILED;
 				}
 			}
 		}
@@ -463,6 +429,26 @@ bool CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::GetFileEx
 QString CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::GetTypeDescription(const QString* /*extensionPtr*/) const
 {
 	return QString();
+}
+
+
+// private methods of the embedded class ObjectPersistenceProxy
+
+void CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::CreateBackup(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const
+{
+	const imtbase::IRevisionController* revisionControllerPtr = m_parent.m_collectionPtr->GetRevisionController();
+	if (revisionControllerPtr != nullptr){
+		bool isOk;
+		QString comment = QInputDialog::getText(
+					nullptr,
+					tr("Revision comment"),
+					tr("Please enter comment for revision backup"),
+					QLineEdit::Normal,
+					"",
+					&isOk);
+
+		revisionControllerPtr->BackupObject(*m_parent.m_collectionPtr, objectId, comment);
+	}
 }
 
 

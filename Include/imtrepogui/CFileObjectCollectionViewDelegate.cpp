@@ -296,19 +296,6 @@ void CFileObjectCollectionViewDelegate::OnRestore()
 	if (dialog.exec() == QDialog::Accepted){
 		int revision = dialog.GetSelectedRevision();
 		if (revision != -1){
-			if (isNotArchived){
-				bool isOk;
-				QString comment = QInputDialog::getText(
-							nullptr,
-							tr("Revision comment"),
-							tr("Current document revision not archived.\nPlease enter comment for backup"),
-							QLineEdit::Normal,
-							tr("").arg(revision),
-							&isOk);
-
-				revisionControllerPtr->BackupObject(*m_collectionPtr, m_selectedItemIds[0], comment);
-			}
-
 			revisionControllerPtr->RestoreObject(*m_collectionPtr, m_selectedItemIds[0], revision);
 		}
 	}

@@ -90,6 +90,9 @@ protected:
 		virtual QString GetTypeDescription(const QString* extensionPtr = NULL) const;
 
 	private:
+		void CreateBackup(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const;
+
+	private:
 		CDocumentBasedFileCollectionDelegateComp& m_parent;
 	};
 
