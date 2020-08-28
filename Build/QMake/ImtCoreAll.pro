@@ -4,6 +4,9 @@ include ($(ACFCONFIGDIR)/QMake/Solution.pri)
 SUBDIRS += imtbase
 imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
 
+SUBDIRS += imtwidgets
+imtwidgets.file = ../../Include/imtwidgets/QMake/imtwidgets.pro
+
 SUBDIRS += imtrest
 imtrest.file = ../../Include/imtrest/QMake/imtrest.pro
 
@@ -24,15 +27,13 @@ imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
 
 SUBDIRS += imtgui
 imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
+imtgui.depends = ../../Include/imtwidgets/QMake/imtwidgets.pro
 
 SUBDIRS += imtloggui
 imtloggui.file = ../../Include/imtloggui/QMake/imtloggui.pro
 
 SUBDIRS += imtlog
 imtlog.file = ../../Include/imtlog/QMake/imtlog.pro
-
-SUBDIRS += imtwidgets
-imtwidgets.file = ../../Include/imtwidgets/QMake/imtwidgets.pro
 
 SUBDIRS += imt3dview
 imt3dview.file = ../../Include/imt3dview/QMake/imt3dview.pro

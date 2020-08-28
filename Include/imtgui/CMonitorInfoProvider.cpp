@@ -1,17 +1,19 @@
 #include <imtgui/CMonitorInfoProvider.h>
 
-#include <windows.h>
-#include <winreg.h>
-#include <cstring>
 
+// STL includes
+#include <cstring>
 
 // Qt includes
 #include <QtCore/QSettings>
 #include <QtGui/QGuiApplication>
 
-
 // ACF includes
 #include <istd/CChangeNotifier.h>
+
+// Windows includes
+#include <windows.h>
+#include <winreg.h>
 
 
 namespace imtgui
@@ -27,12 +29,6 @@ CMonitorInfoProvider::CMonitorInfoProvider()
 	connect(qApp, &QGuiApplication::screenRemoved, this, &CMonitorInfoProvider::ScreenRemoved);
 
 	UpdateMonitorsInfo();
-}
-
-
-CMonitorInfoProvider::~CMonitorInfoProvider()
-{
-
 }
 
 

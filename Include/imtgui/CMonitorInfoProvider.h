@@ -36,7 +36,6 @@ public:
 
 public:
 	CMonitorInfoProvider();
-	~CMonitorInfoProvider();
 
 	// reimplemented (imtgui::IMonitorResolutionProvider)
 	virtual int GetMonitorsCount() const override;
