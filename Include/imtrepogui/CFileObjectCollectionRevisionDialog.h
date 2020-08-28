@@ -21,7 +21,7 @@ class CFileObjectCollectionRevisionDialog:
 public:
 	explicit CFileObjectCollectionRevisionDialog(QWidget *parent = nullptr);
 
-	void SetRevisionList(const imtbase::IRevisionController::RevisionInfoList& revisions);
+	void SetRevisionList(const imtbase::IRevisionController::RevisionInfoList& revisions, int currentRevision);
 	int GetSelectedRevision();
 };
 

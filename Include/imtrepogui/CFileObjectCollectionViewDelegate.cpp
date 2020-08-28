@@ -278,21 +278,12 @@ void CFileObjectCollectionViewDelegate::OnRestore()
 
 	imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_collectionPtr, m_selectedItemIds[0]);
 
-	bool isNotArchived = true;
-	for (int i = 0; i < revisionList.count(); i++){
-		if (revisionList[i].revision == currentRevision){
-			isNotArchived = false;
-			revisionList.removeAt(i);
-			break;
-		}
-	}
-
 	CFileObjectCollectionRevisionDialog dialog;
 
-	dialog.SetRevisionList(revisionList);
+	dialog.SetRevisionList(revisionList, currentRevision);
 	if (dialog.exec() == QDialog::Accepted){
 		int revision = dialog.GetSelectedRevision();
-		if (revision != -1){
+		if (revision != -1 && revision != currentRevision){
 			revisionControllerPtr->RestoreObject(*m_collectionPtr, m_selectedItemIds[0], revision);
 		}
 	}

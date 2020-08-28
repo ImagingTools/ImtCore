@@ -438,14 +438,29 @@ void CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::CreateBac
 {
 	const imtbase::IRevisionController* revisionControllerPtr = m_parent.m_collectionPtr->GetRevisionController();
 	if (revisionControllerPtr != nullptr){
-		bool isOk;
-		QString comment = QInputDialog::getText(
-					nullptr,
-					tr("Revision comment"),
-					tr("Please enter comment for revision backup"),
-					QLineEdit::Normal,
-					"",
-					&isOk);
+		idoc::CStandardDocumentMetaInfo metaInfo;
+		m_parent.m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo);
+		QVariant variant = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
+		
+		QString revision = -1;
+		if (variant.isValid()){
+			revision = variant.toInt();
+		}
+
+		QString comment;
+		if (revision == 1){
+			comment = tr("Initial Revision");
+		}
+		else {
+			bool isOk;
+			comment = QInputDialog::getText(
+						nullptr,
+						tr("Revision comment"),
+						tr("Please enter comment for revision backup"),
+						QLineEdit::Normal,
+						"",
+						&isOk);
+		}
 
 		revisionControllerPtr->BackupObject(*m_parent.m_collectionPtr, objectId, comment);
 	}

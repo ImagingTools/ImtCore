@@ -12,7 +12,7 @@ CFileObjectCollectionRevisionDialog::CFileObjectCollectionRevisionDialog(QWidget
 }
 
 
-void CFileObjectCollectionRevisionDialog::SetRevisionList(const imtbase::IRevisionController::RevisionInfoList& revisions)
+void CFileObjectCollectionRevisionDialog::SetRevisionList(const imtbase::IRevisionController::RevisionInfoList& revisions, int currentRevision)
 {
 	for (int i = 0; i < revisions.count(); i++){
 		Table->insertRow(i);
@@ -21,6 +21,15 @@ void CFileObjectCollectionRevisionDialog::SetRevisionList(const imtbase::IRevisi
 		Table->setItem(i, 1, new QTableWidgetItem(revisions[i].timestamp.toString()));
 		Table->setItem(i, 2, new QTableWidgetItem(revisions[i].user));
 		Table->setItem(i, 3, new QTableWidgetItem(revisions[i].comment));
+
+		if (revisions[i].revision == currentRevision){
+			QFont font = Table->item(i, 0)->font();
+			font.setBold(true);
+			Table->item(i, 0)->setFont(font);
+			Table->item(i, 1)->setFont(font);
+			Table->item(i, 2)->setFont(font);
+			Table->item(i, 3)->setFont(font);
+		}
 	}
 }
 
