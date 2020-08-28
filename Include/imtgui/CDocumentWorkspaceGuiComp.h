@@ -14,10 +14,6 @@ namespace imtgui
 {
 
 
-/**
-	Default implementation of tab-based document workspace.
-	For the content visualization and editing the standard view decorator is used.
-*/
 class CDocumentWorkspaceGuiComp: public imtgui::CDocumentWorkspaceGuiCompBase
 {
 	Q_OBJECT
@@ -26,8 +22,8 @@ public:
 	typedef imtgui::CDocumentWorkspaceGuiCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDocumentWorkspaceGuiComp);
-		I_ASSIGN(m_loginCompPtr, "Login", "Login component", false, "");
-		I_ASSIGN(m_logCompPtr, "Log", "Message consumer component", false, "");
+		I_ASSIGN(m_loginCompPtr, "Login", "Login component", false, "Login");
+		I_ASSIGN(m_logCompPtr, "Log", "Message consumer component", false, "Log");
 		I_ASSIGN(m_tabStyleSheetPropertyAttrPtr, "TabStyleSheetProperty", "Enable a stylesheet with a property for the tab", true, "");
 	I_END_COMPONENT;
 

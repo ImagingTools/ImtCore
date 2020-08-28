@@ -27,10 +27,7 @@ namespace imtgui
 {
 
 
-/**
-	Base implementation of tab-based document workspace.
-	The workspace can contains additional fixed UI-tabs.
-*/
+
 class CDocumentWorkspaceGuiCompBase:
 			public iqtdoc::TQtDocumentManagerWrap<
 						idoc::CMultiDocumentManagerBase,
