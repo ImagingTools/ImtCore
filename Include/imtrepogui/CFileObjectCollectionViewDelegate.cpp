@@ -192,7 +192,7 @@ void CFileObjectCollectionViewDelegate::OnLanguageChanged()
 
 	m_importCommand.SetVisuals(tr("Import from File..."), tr("Import"), tr("Import existing file into the collection"), QIcon(":/Icons/Load"));
 	m_exportCommand.SetVisuals(tr("Export to File..."), tr("Export"), tr("Export data from the collection to a file"), QIcon(":/Icons/Export"));
-	m_restoreCommand.SetVisuals(tr("Restore revision..."), tr("Restore"), tr("Restore data in collection to revision"), QIcon(":/Icons/Undo"));
+	m_restoreCommand.SetVisuals(tr("Restore revision..."), tr("Restore"), tr("Restore data from backup"), QIcon(":/Icons/Undo"));
 }
 
 
@@ -298,7 +298,13 @@ void CFileObjectCollectionViewDelegate::OnRestore()
 		if (revision != -1){
 			if (isNotArchived){
 				bool isOk;
-				QString comment = QInputDialog::getText(nullptr, tr("Revision comment"), tr("Current document revision not archived.\nPlease enter comment for backup."), QLineEdit::Normal, "", &isOk);
+				QString comment = QInputDialog::getText(
+							nullptr,
+							tr("Revision comment"),
+							tr("Current document revision not archived.\nPlease enter comment for backup"),
+							QLineEdit::Normal,
+							tr("").arg(revision),
+							&isOk);
 
 				revisionControllerPtr->BackupObject(*m_collectionPtr, m_selectedItemIds[0], comment);
 			}

@@ -417,7 +417,13 @@ int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::SaveToFile
 
 						if (isNotArchived){
 							bool isOk;
-							QString comment = QInputDialog::getText(nullptr, tr("Revision comment"), tr("Previous document revision not archived.\nPlease enter comment for backup."), QLineEdit::Normal, "", &isOk);
+							QString comment = QInputDialog::getText(
+										nullptr,
+										tr("Revision comment"),
+										tr("Previous document revision not archived.\nPlease enter comment for backup"),
+										QLineEdit::Normal,
+										tr("").arg(revision),
+										&isOk);
 
 							revisionControllerPtr->BackupObject(*m_parent.m_collectionPtr, objectInfoPtr->uuid, comment);
 						}

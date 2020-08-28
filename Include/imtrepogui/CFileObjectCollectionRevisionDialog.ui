@@ -41,7 +41,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Timestamp</string>
+       <string>Backup time</string>
       </property>
      </column>
      <column>

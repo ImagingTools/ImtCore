@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtCore/QUuid>
 #include <QtCore/QDir>
 
@@ -437,8 +436,8 @@ QByteArray CFileCollectionComp::InsertFile(
 	collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
 	collectionItem.metaInfo.SetMetaInfo(MIT_INSERTION_TIME, QDateTime::currentDateTime());
 	collectionItem.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
-	collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION, 0);
-	collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_LAST_REVISION, 0);
+	collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION, 1);
+	collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_LAST_REVISION, 1);
 
 	QString savedPath = SaveCollectionItem(collectionItem);
 	if (!savedPath.isEmpty()){
@@ -1485,9 +1484,7 @@ int CFileCollectionComp::GetLastRevisionInArchive(const QByteArray& objectId) co
 
 int CFileCollectionComp::CalculateNextRevision(const QByteArray& objectId) const
 {
-	int itemRevision = -1;
 	int index = GetFileIndexById(objectId);
-
 	if (index >= 0){
 		QVariant revision = m_files[index].metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_LAST_REVISION);
 		if (revision.isValid()){
@@ -1495,9 +1492,7 @@ int CFileCollectionComp::CalculateNextRevision(const QByteArray& objectId) const
 		}
 	}
 
-	int lastRevisionInArchive = GetLastRevisionInArchive(objectId);
-
-	return lastRevisionInArchive + 1;
+	return GetLastRevisionInArchive(objectId) + 1;
 }
 
 
