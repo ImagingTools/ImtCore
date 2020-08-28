@@ -279,7 +279,7 @@ void CFileObjectCollectionViewDelegate::OnRestore()
 	if (dialog.exec() == QDialog::Accepted){
 		int revision = dialog.GetSelectedRevision();
 		if (revision != -1){
-			revisionControllerPtr->RestoreRevision(m_selectedItemIds[0], revision);
+			revisionControllerPtr->RestoreObject(m_selectedItemIds[0], revision);
 		}
 	}
 }

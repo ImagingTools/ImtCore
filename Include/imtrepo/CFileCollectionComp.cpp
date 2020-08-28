@@ -43,18 +43,6 @@ CFileCollectionComp::CFileCollectionComp()
 
 // reimplemented (IRevisionController)
 
-bool CFileCollectionComp::IsRevisionHistoryEnabled() const
-{
-	if (*m_isEnableRevisionHistoryAttrPtr){
-		if (m_compressorCompPtr.IsValid()){
-			return true;
-		}
-	}
-
-	return false;
-}
-
-
 IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionInfoList(const QByteArray& objectId) const
 {
 	RevisionInfoList retVal;
@@ -91,7 +79,7 @@ IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionInfoList(c
 }
 
 
-bool CFileCollectionComp::RestoreRevision(const QByteArray& objectId, int revision)
+bool CFileCollectionComp::RestoreObject(const QByteArray& objectId, int revision)
 {
 	if (!*m_isEnableRevisionHistoryAttrPtr){
 		return false;
@@ -205,6 +193,12 @@ bool CFileCollectionComp::RestoreRevision(const QByteArray& objectId, int revisi
 
 	tempDir.removeRecursively();
 	return false;
+}
+
+
+bool CFileCollectionComp::BackupObject(const QByteArray& objectId)
+{
+	return CreateRevision(objectId);
 }
 
 

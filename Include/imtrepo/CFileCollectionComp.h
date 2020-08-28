@@ -120,16 +120,16 @@ public:
 		I_ASSIGN(m_asynchronousReadingAttrPtr, "AsynchronousReading", "If enabled, the collection will reading asynchronously", true, false);
 		I_ASSIGN(m_isEnableRevisionHistoryAttrPtr, "IsEnableRevisionHistory", "Allow saving item revisions", true, false);
 		I_ASSIGN(m_rightsProviderCompPtr, "RightsProvider", "Rights provider", false, "RightsProvider");
-		I_ASSIGN(m_restoreRevisionRightIdAttrPtr, "RestoreRevisionRightId", "Restore to revision right id", true, "RestoreRevision");
+		I_ASSIGN(m_restoreRevisionRightIdAttrPtr, "RestoreRevisionRightId", "Restore to revision right id", true, "RestoreObject");
 		I_ASSIGN(m_loginProviderCompPtr, "Login", "Login component", false, "Login");
 	I_END_COMPONENT;
 
 	CFileCollectionComp();
 
 	// reimplemented (IRevisionController)
-	virtual bool IsRevisionHistoryEnabled() const override;
 	virtual RevisionInfoList GetRevisionInfoList(const QByteArray& objectId) const override;
-	virtual bool RestoreRevision(const QByteArray& objectId, int revision) override;
+	virtual bool RestoreObject(const QByteArray& objectId, int revision) override;
+	virtual bool BackupObject(const QByteArray& objectId) override;
 
 	// reimplemented (IFileObjectCollection)
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
