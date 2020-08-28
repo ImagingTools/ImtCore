@@ -343,13 +343,13 @@ bool CCompositeObjectPersistenceComp::SerializeBundleMetaInfo(QVector<BundleElem
 }
 
 
-bool CCompositeObjectPersistenceComp::LoadAdditionalData(istd::IChangeable& data, const QString& path) const
+bool CCompositeObjectPersistenceComp::LoadAdditionalData(istd::IChangeable& /*data*/, const QString& /*path*/) const
 {
 	return true;
 }
 
 
-bool CCompositeObjectPersistenceComp::SaveAdditionalData(const istd::IChangeable& data, const QString& path) const
+bool CCompositeObjectPersistenceComp::SaveAdditionalData(const istd::IChangeable& /*data*/, const QString& /*path*/) const
 {
 	return true;
 }

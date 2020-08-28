@@ -22,7 +22,7 @@ void CStaticObjectCollection::SetObject(const QByteArray& objectId, istd::IChang
 
 
 QByteArray CStaticObjectCollection::RegisterObject(
-			const QByteArray& objectId,
+			const QByteArray& /*objectId*/,
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
@@ -50,18 +50,18 @@ QByteArray CStaticObjectCollection::RegisterObject(
 
 // reimplemented (IObjectCollection)
 
-int CStaticObjectCollection::GetOperationFlags(const QByteArray & objectId) const
+int CStaticObjectCollection::GetOperationFlags(const QByteArray & /*objectId*/) const
 {
 	return OF_SUPPORT_EDIT | OF_SUPPORT_RENAME;
 }
 
 
 QByteArray CStaticObjectCollection::InsertNewObject(
-			const QByteArray& typeId,
-			const QString& name,
-			const QString& description,
-			const istd::IChangeable* defaultValuePtr,
-			const QByteArray& proposedObjectId)
+			const QByteArray& /*typeId*/,
+			const QString& /*name*/,
+			const QString& /*description*/,
+			const istd::IChangeable* /*defaultValuePtr*/,
+			const QByteArray& /*proposedObjectId*/)
 {
 	return QByteArray();
 }
@@ -88,7 +88,7 @@ istd::IChangeable* CStaticObjectCollection::CloneMe(CompatibilityMode mode) cons
 
 // protected methods
 
-istd::IChangeable* CStaticObjectCollection::CreateObjectInstance(const QByteArray& typeId) const
+istd::IChangeable* CStaticObjectCollection::CreateObjectInstance(const QByteArray& /*typeId*/) const
 {
 	return nullptr;
 }
