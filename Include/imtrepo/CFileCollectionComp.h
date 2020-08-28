@@ -126,10 +126,10 @@ public:
 
 	CFileCollectionComp();
 
-	// reimplemented (IRevisionController)
-	virtual RevisionInfoList GetRevisionInfoList(const QByteArray& objectId) const override;
-	virtual bool RestoreObject(const QByteArray& objectId, int revision) const override;
-	virtual bool BackupObject(const QByteArray& objectId, const QString& userComment = QString()) const override;
+	// reimplemented (imtbase::IRevisionController)
+	virtual RevisionInfoList GetRevisionInfoList(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const override;
+	virtual bool RestoreObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision) const override;
+	virtual int BackupObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& userComment = QString()) const override;
 
 	// reimplemented (IFileObjectCollection)
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
@@ -151,7 +151,7 @@ public:
 	virtual QString GetCollectionRootFolder() const override;
 
 	// reimplemented (IObjectCollection)
-	virtual const IRevisionController* GetRevisionController() const override;
+	virtual const imtbase::IRevisionController* GetRevisionController() const override;
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
 	virtual bool GetDataMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const override;
 	virtual QByteArray InsertNewObject(
@@ -244,7 +244,7 @@ protected:
 		imtbase::IMetaInfoCreator::MetaInfoPtr contentsMetaInfoPtr;
 	};
 
-	class RevisionMetaInfo: public RevisionInfo, virtual public iser::ISerializable
+	class RevisionMetaInfo: public imtbase::IRevisionController::RevisionInfo , virtual public iser::ISerializable
 	{
 	public:
 		// reimplement (iser::ISerializable)
@@ -342,7 +342,8 @@ protected:
 				bool useSubfolder) const;
 
 	virtual QStringList DecomressRevisions(const QByteArray& objectId, const QString& path) const;
-	virtual bool CreateRevision(const QByteArray& objectId, const QString& userComment) const;
+	virtual int GetLastRevisionInArchive(const QByteArray& objectId) const;
+	virtual int CalculateNextRevision(const QByteArray& objectId) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

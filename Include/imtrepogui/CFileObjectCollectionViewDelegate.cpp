@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QFileDialog>
+#include <QtWidgets/QInputDialog>
 
 // ACF includes
 #include <istd/CChangeGroup.h>
@@ -54,10 +55,30 @@ void CFileObjectCollectionViewDelegate::UpdateItemSelection(const imtbase::IColl
 	m_exportCommand.setEnabled(selectedItems.count() == 1);
 	m_restoreCommand.setEnabled(false);
 
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
+	Q_ASSERT(fileCollectionPtr != nullptr);
+
 	const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
 	if (revisionControllerPtr != nullptr){
 		if (m_selectedItemIds.count() == 1){
-			if (revisionControllerPtr->GetRevisionInfoList(m_selectedItemIds[0]).count() > 1){
+			int revision = -1;
+			idoc::CStandardDocumentMetaInfo metaInfo;
+			if (fileCollectionPtr->GetCollectionItemMetaInfo(m_selectedItemIds[0], metaInfo)){
+				QVariant variant = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
+				if (variant.isValid()){
+					revision = variant.toInt();
+				}
+			}
+
+			imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_collectionPtr, m_selectedItemIds[0]);
+			for (int i = 0; i < revisionList.count(); i++){
+				if (revisionList[i].revision == revision){
+					revisionList.removeAt(i);
+					break;
+				}
+			}
+
+			if (revisionList.count() > 0){
 				m_restoreCommand.setEnabled(true);
 			}
 		}
@@ -258,9 +279,12 @@ void CFileObjectCollectionViewDelegate::OnRestore()
 		}
 	}
 
-	imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(m_selectedItemIds[0]);
+	imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_collectionPtr, m_selectedItemIds[0]);
+
+	bool isNotArchived = true;
 	for (int i = 0; i < revisionList.count(); i++){
 		if (revisionList[i].revision == currentRevision){
+			isNotArchived = false;
 			revisionList.removeAt(i);
 			break;
 		}
@@ -272,7 +296,14 @@ void CFileObjectCollectionViewDelegate::OnRestore()
 	if (dialog.exec() == QDialog::Accepted){
 		int revision = dialog.GetSelectedRevision();
 		if (revision != -1){
-			revisionControllerPtr->RestoreObject(m_selectedItemIds[0], revision);
+			if (isNotArchived){
+				bool isOk;
+				QString comment = QInputDialog::getText(nullptr, tr("Revision comment"), tr("Current document revision not archived.\nPlease enter comment for backup."), QLineEdit::Normal, "", &isOk);
+
+				revisionControllerPtr->BackupObject(*m_collectionPtr, m_selectedItemIds[0], comment);
+			}
+
+			revisionControllerPtr->RestoreObject(*m_collectionPtr, m_selectedItemIds[0], revision);
 		}
 	}
 }

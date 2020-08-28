@@ -5,13 +5,16 @@
 #include <QtCore/QUuid>
 #include <QtCore/QDir>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QInputDialog>
 
 // ACF includes
 #include <istd/CChangeGroup.h>
 #include <istd/CSystem.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
 #include <ifilegui/CFileDialogLoaderComp.h>
 
 // ImtCore includes
+#include <imtbase/IRevisionController.h>
 #include <imtrepo/IFileObjectCollection.h>
 
 
@@ -392,6 +395,34 @@ int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::SaveToFile
 				}
 				// An existing object in the collection should be updated:
 				else{
+					const imtbase::IRevisionController* revisionControllerPtr = m_parent.m_collectionPtr->GetRevisionController();
+					if (revisionControllerPtr != nullptr){
+						imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_parent.m_collectionPtr, objectInfoPtr->uuid);
+
+						idoc::CStandardDocumentMetaInfo metaInfo;
+						m_parent.m_collectionPtr->GetCollectionItemMetaInfo(objectInfoPtr->uuid, metaInfo);
+						int revision = -1;
+						QVariant variant = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
+						if (variant.isValid()){
+							revision = variant.toInt();
+						}
+
+						bool isNotArchived = true;
+						for (int i = 0; i < revisionList.count(); i++){
+							if (revisionList[i].revision == revision){
+								isNotArchived = false;
+								break;
+							}
+						}
+
+						if (isNotArchived){
+							bool isOk;
+							QString comment = QInputDialog::getText(nullptr, tr("Revision comment"), tr("Previous document revision not archived.\nPlease enter comment for backup."), QLineEdit::Normal, "", &isOk);
+
+							revisionControllerPtr->BackupObject(*m_parent.m_collectionPtr, objectInfoPtr->uuid, comment);
+						}
+					}
+
 					if (m_parent.UpdateObject(objectInfoPtr->uuid, data)){
 						return OS_OK;
 					}
