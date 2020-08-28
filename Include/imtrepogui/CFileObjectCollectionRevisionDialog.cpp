@@ -29,7 +29,13 @@ void CFileObjectCollectionRevisionDialog::SetRevisionList(const imtbase::IRevisi
 			Table->item(i, 1)->setFont(font);
 			Table->item(i, 2)->setFont(font);
 			Table->item(i, 3)->setFont(font);
+			Table->item(i, 0)->setFlags(Qt::NoItemFlags);
+			Table->item(i, 1)->setFlags(Qt::NoItemFlags);
+			Table->item(i, 2)->setFlags(Qt::NoItemFlags);
+			Table->item(i, 3)->setFlags(Qt::NoItemFlags);
 		}
+
+		Table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
 	}
 }
 
