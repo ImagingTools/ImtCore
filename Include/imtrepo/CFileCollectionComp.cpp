@@ -129,35 +129,34 @@ bool CFileCollectionComp::RestoreRevision(const QByteArray& objectId, int revisi
 
 	QStringList revisionPathList = DecomressRevisions(objectId, tempPath);
 
-	int lastRev = -1;
-
 	QWriteLocker writeLocker(&m_collectionLock);
 
 	if (!revisionPathList.isEmpty()){
 		QVector<RevisionMetaInfo> revisionMetaInfoList;
 
 		for (int i = 0; i < revisionPathList.count(); i++){
-			RevisionMetaInfo revisionMetaInfo;
-			ifile::CCompactXmlFileReadArchive archive(revisionPathList[i] + "/revision.meta", m_versionInfoCompPtr.GetPtr());
-			if (revisionMetaInfo.Serialize(archive)){
-				if (revisionMetaInfo.revision == revision){
-					QString revisionDataFilePath = revisionPathList[i] + "/object.data";
-					QString revisionItemFilePath = revisionPathList[i] + "/object.item";
-					QString revisionMetaFilePath = revisionPathList[i] + "/object.meta";
+			QString objectDataFilePath = revisionPathList[i] + "/object.data";
+			QString objectItemFilePath = revisionPathList[i] + "/object.item";
+			QString objectMetaFilePath = revisionPathList[i] + "/object.meta";
+			QString revisionMetaFilePath = revisionPathList[i] + "/revision.meta";
 
-					ifile::CCompactXmlFileReadArchive archive(revisionItemFilePath, m_versionInfoCompPtr.GetPtr());
-					CollectionItem revisionItem("");
+			if (QFile::exists(objectDataFilePath) && QFile::exists(objectItemFilePath) && QFile::exists(objectMetaFilePath)){
+				RevisionMetaInfo revisionMetaInfo;
+				ifile::CCompactXmlFileReadArchive revisionMetaArchive(revisionMetaFilePath, m_versionInfoCompPtr.GetPtr());
+				if (revisionMetaInfo.Serialize(revisionMetaArchive)){
+					if (revisionMetaInfo.revision == revision){
+						ifile::CCompactXmlFileReadArchive revisionItemArchive(objectItemFilePath, m_versionInfoCompPtr.GetPtr());
+						CollectionItem revisionItem("");
 
-					if (!revisionItem.Serialize(archive)){
-						SendErrorMessage(0, QString("Collection item could not be loaded from '%1'").arg(revisionItemFilePath));
-						return false;
-					}
+						if (!revisionItem.Serialize(revisionItemArchive)){
+							SendErrorMessage(0, QString("Collection item could not be loaded from '%1'").arg(objectItemFilePath));
+							return false;
+						}
 
-					if (QFile::exists(revisionItemFilePath) && QFile::exists(revisionItemFilePath) && QFile::exists(revisionMetaFilePath)){
 						QString itemMetaFilePath = GetMetaInfoFilePath(m_files[fileIndex]);;
 
-						istd::CSystem::FileCopy(revisionDataFilePath, item.filePathInRepository, true);
-						istd::CSystem::FileCopy(revisionMetaFilePath, itemMetaFilePath, true);
+						istd::CSystem::FileCopy(objectDataFilePath, item.filePathInRepository, true);
+						istd::CSystem::FileCopy(objectMetaFilePath, itemMetaFilePath, true);
 
 						if (!item.contentsMetaInfoPtr.IsValid()){
 							imtbase::IMetaInfoCreator::MetaInfoPtr retVal;
@@ -175,7 +174,14 @@ bool CFileCollectionComp::RestoreRevision(const QByteArray& objectId, int revisi
 							item.contentsMetaInfoPtr = retVal;
 						}
 
+						int lastRevInItem = item.metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_LAST_REVISION).toInt();
+						int lastRevInRevisionItem = revisionItem.metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_LAST_REVISION).toInt();
+
 						item.metaInfo.CopyFrom(revisionItem.metaInfo);
+						if (lastRevInItem > lastRevInRevisionItem){
+							item.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_LAST_REVISION, lastRevInItem);
+						}
+
 						SaveCollectionItem(item);
 
 						if (item.contentsMetaInfoPtr.IsValid()){
@@ -190,15 +196,15 @@ bool CFileCollectionComp::RestoreRevision(const QByteArray& objectId, int revisi
 						}
 
 						tempDir.removeRecursively();
-						return false;
+						return true;
 					}
 				}
 			}
 		}
 	}
 
-	writeLocker.unlock();
-
+	tempDir.removeRecursively();
+	return false;
 }
 
 
@@ -1418,7 +1424,7 @@ bool CFileCollectionComp::CreateRevision(const QByteArray& objectId)
 
 	QStringList revisionPathList = DecomressRevisions(objectId, tempPath);
 
-	int lastRev = -1;
+	int lastRevInArchive = -1;
 
 	if (!revisionPathList.isEmpty()){
 		QVector<RevisionMetaInfo> revisionMetaInfoList;
@@ -1427,8 +1433,8 @@ bool CFileCollectionComp::CreateRevision(const QByteArray& objectId)
 			RevisionMetaInfo revisionMetaInfo;
 			ifile::CCompactXmlFileReadArchive archive(revisionPathList[i] + "/revision.meta", m_versionInfoCompPtr.GetPtr());
 			if (revisionMetaInfo.Serialize(archive)){
-				if (lastRev < revisionMetaInfo.revision){
-					lastRev = revisionMetaInfo.revision;
+				if (lastRevInArchive < revisionMetaInfo.revision){
+					lastRevInArchive = revisionMetaInfo.revision;
 				}
 			}
 		}
@@ -1442,7 +1448,18 @@ bool CFileCollectionComp::CreateRevision(const QByteArray& objectId)
 		return false;
 	}
 
+	int lastRev = -1;
+	QVariant lastRevStored = item.metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_LAST_REVISION);
+	if (lastRevStored.isValid()){
+		lastRev = lastRevStored.toInt();
+	}
+	
+	if (lastRevInArchive > lastRev){
+		lastRev = lastRevInArchive;
+	}
+
 	item.metaInfo.SetMetaInfo(IFileObjectCollection::MIT_REVISION, lastRev + 1);
+	item.metaInfo.SetMetaInfo(IFileObjectCollection::MIT_LAST_REVISION, lastRev + 1);
 
 	SaveCollectionItem(item);
 
@@ -1464,7 +1481,7 @@ bool CFileCollectionComp::CreateRevision(const QByteArray& objectId)
 				}
 
 				bool isOk;
-				revisionMetaInfo.comment = QInputDialog::getText(nullptr, tr("Enter comment for revision"), tr(""), QLineEdit::Normal, "", &isOk);
+				revisionMetaInfo.comment = QInputDialog::getText(nullptr, tr("Revision comment"), tr("Please enter comment for revision"), QLineEdit::Normal, "", &isOk);
 
 				ifile::CCompactXmlFileWriteArchive archive(newRevisionPath + "/revision.meta", m_versionInfoCompPtr.GetPtr());
 				if (revisionMetaInfo.Serialize(archive)){
