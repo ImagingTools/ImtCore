@@ -12,6 +12,9 @@ namespace imtbase
 {
 
 
+class IObjectCollection;
+
+
 class IRevisionController: virtual public istd::IPolymorphic
 {
 public:
@@ -25,9 +28,20 @@ public:
 	
 	typedef QVector<RevisionInfo> RevisionInfoList;
 
-	virtual RevisionInfoList GetRevisionInfoList(const QByteArray& objectId) const = 0;
-	virtual bool RestoreObject(const QByteArray& objectId, int revision) const = 0;
-	virtual bool BackupObject(const QByteArray& objectId, const QString& userComment = QString())  const = 0;
+	/**
+		Get list of revisions for a given data object in the collection.
+	*/
+	virtual RevisionInfoList GetRevisionInfoList(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const = 0;
+
+	/**
+		Restore the data of an object in the collection from a given revision.
+	*/
+	virtual bool RestoreObject(const imtbase::IObjectCollection& collection const QByteArray& objectId, int revision) const = 0;
+
+	/**
+		\return Revision of the saved object of the operation was successfull, or a negative value otherwise.
+	*/
+	virtual int BackupObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& userComment = QString())  const = 0;
 };
 
 
