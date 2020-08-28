@@ -129,7 +129,7 @@ public:
 	// reimplemented (IRevisionController)
 	virtual RevisionInfoList GetRevisionInfoList(const QByteArray& objectId) const override;
 	virtual bool RestoreObject(const QByteArray& objectId, int revision) const override;
-	virtual bool BackupObject(const QByteArray& objectId) const override;
+	virtual bool BackupObject(const QByteArray& objectId, const QString& userComment = QString()) const override;
 
 	// reimplemented (IFileObjectCollection)
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
@@ -342,7 +342,7 @@ protected:
 				bool useSubfolder) const;
 
 	virtual QStringList DecomressRevisions(const QByteArray& objectId, const QString& path) const;
-	virtual bool CreateRevision(const QByteArray& objectId) const;
+	virtual bool CreateRevision(const QByteArray& objectId, const QString& userComment) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

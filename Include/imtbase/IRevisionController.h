@@ -27,7 +27,7 @@ public:
 
 	virtual RevisionInfoList GetRevisionInfoList(const QByteArray& objectId) const = 0;
 	virtual bool RestoreObject(const QByteArray& objectId, int revision) const = 0;
-	virtual bool BackupObject(const QByteArray& objectId)  const = 0;
+	virtual bool BackupObject(const QByteArray& objectId, const QString& userComment = QString())  const = 0;
 };
 
 

@@ -5,7 +5,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QUuid>
 #include <QtCore/QDir>
-#include <QtWidgets/QInputDialog>
+// #include <QtWidgets/QInputDialog>
 
 // ACF includes
 #include <istd/TOptDelPtr.h>
@@ -196,9 +196,9 @@ bool CFileCollectionComp::RestoreObject(const QByteArray& objectId, int revision
 }
 
 
-bool CFileCollectionComp::BackupObject(const QByteArray& objectId) const
+bool CFileCollectionComp::BackupObject(const QByteArray& objectId, const QString& userComment) const
 {
-	return CreateRevision(objectId);
+	return CreateRevision(objectId, userComment);
 }
 
 
@@ -385,7 +385,7 @@ QByteArray CFileCollectionComp::InsertFile(
 			eventHandlerPtr->OnObjectCollectionEvent(this, &event);
 		}
 
-		CreateRevision(fileId);
+		CreateRevision(fileId, QByteArray());
 
 		return fileId;
 	}
@@ -458,7 +458,7 @@ bool CFileCollectionComp::UpdateFile(
 			eventHandlerPtr->OnObjectCollectionEvent(this, &event);
 		}
 
-		CreateRevision(objectId);
+		CreateRevision(objectId, QString());
 
 		return true;
 	}
@@ -1378,7 +1378,7 @@ QStringList CFileCollectionComp::DecomressRevisions(const QByteArray& objectId, 
 }
 
 
-bool CFileCollectionComp::CreateRevision(const QByteArray& objectId) const
+bool CFileCollectionComp::CreateRevision(const QByteArray& objectId, const QString& userComment) const
 {
 	if (!*m_isEnableRevisionHistoryAttrPtr){
 		return false;
@@ -1469,7 +1469,8 @@ bool CFileCollectionComp::CreateRevision(const QByteArray& objectId) const
 				}
 
 				bool isOk;
-				revisionMetaInfo.comment = QInputDialog::getText(nullptr, tr("Revision comment"), tr("Please enter comment for revision"), QLineEdit::Normal, "", &isOk);
+				revisionMetaInfo.comment = userComment;
+//				QInputDialog::getText(nullptr, tr("Revision comment"), tr("Please enter comment for revision"), QLineEdit::Normal, "", &isOk);
 
 				ifile::CCompactXmlFileWriteArchive archive(newRevisionPath + "/revision.meta", m_versionInfoCompPtr.GetPtr());
 				if (revisionMetaInfo.Serialize(archive)){
