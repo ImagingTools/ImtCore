@@ -13,6 +13,9 @@ namespace imtbase
 {
 
 
+class IRevisionController;
+
+
 /**
 	Common interface for a data object collection.
 	\ingroup Collection
@@ -112,6 +115,12 @@ public:
 	};
 
 	I_DECLARE_FLAGS(OperationalFlags, OF_SUPPORT_RENAME, OF_SUPPORT_INSERT, OF_SUPPORT_DELETE, OF_SUPPORT_EDIT, OF_SUPPORT_USING, OF_ALL);
+
+
+	/**
+		Get access to the revision controller of the collection, if available.
+	*/
+	virtual const IRevisionController* GetRevisionController() const = 0;
 
 	/**
 		Get binary flags describing the possible operations on the single object or on the whole collection.

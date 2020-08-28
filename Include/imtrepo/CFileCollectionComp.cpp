@@ -41,9 +41,9 @@ CFileCollectionComp::CFileCollectionComp()
 }
 
 
-// reimplemented (IRevisionController)
+// reimplemented (imtbase::IRevisionController)
 
-IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionInfoList(const QByteArray& objectId) const
+imtbase::IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionInfoList(const QByteArray& objectId) const
 {
 	RevisionInfoList retVal;
 
@@ -79,7 +79,7 @@ IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionInfoList(c
 }
 
 
-bool CFileCollectionComp::RestoreObject(const QByteArray& objectId, int revision)
+bool CFileCollectionComp::RestoreObject(const QByteArray& objectId, int revision) const
 {
 	if (!*m_isEnableRevisionHistoryAttrPtr){
 		return false;
@@ -196,7 +196,7 @@ bool CFileCollectionComp::RestoreObject(const QByteArray& objectId, int revision
 }
 
 
-bool CFileCollectionComp::BackupObject(const QByteArray& objectId)
+bool CFileCollectionComp::BackupObject(const QByteArray& objectId) const
 {
 	return CreateRevision(objectId);
 }
@@ -484,6 +484,12 @@ QString CFileCollectionComp::GetCollectionRootFolder() const
 
 
 // reimplemented (IObjectCollection)
+
+const imtbase::IRevisionController * CFileCollectionComp::GetRevisionController() const
+{
+	return this;
+}
+
 
 int CFileCollectionComp::GetOperationFlags(const QByteArray& /*objectId*/) const
 {
@@ -973,7 +979,7 @@ QVariant CFileCollectionComp::GetElementInfo(const QByteArray& elementId, int in
 
 int CFileCollectionComp::GetSupportedOperations() const
 {
-	return SO_CLONE | SO_COPY | SO_RESET;
+	return SO_COPY | SO_RESET;
 }
 
 
@@ -993,18 +999,6 @@ bool CFileCollectionComp::CopyFrom(const istd::IChangeable& object, Compatibilit
 	}
 
 	return false;
-}
-
-
-istd::IChangeable* CFileCollectionComp::CloneMe(CompatibilityMode mode) const
-{
-	istd::TDelPtr<CFileCollectionComp> clonePtr(new CFileCollectionComp());
-
-	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
-	}
-
-	return nullptr;
 }
 
 
@@ -1384,7 +1378,7 @@ QStringList CFileCollectionComp::DecomressRevisions(const QByteArray& objectId, 
 }
 
 
-bool CFileCollectionComp::CreateRevision(const QByteArray& objectId)
+bool CFileCollectionComp::CreateRevision(const QByteArray& objectId) const
 {
 	if (!*m_isEnableRevisionHistoryAttrPtr){
 		return false;

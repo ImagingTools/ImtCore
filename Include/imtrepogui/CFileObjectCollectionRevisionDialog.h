@@ -5,7 +5,7 @@
 #include <QtWidgets/QDialog>
 
 // ImtCore includes
-#include <imtrepo/IRevisionController.h>
+#include <imtbase/IRevisionController.h>
 #include <GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h>
 
 
@@ -21,7 +21,7 @@ class CFileObjectCollectionRevisionDialog:
 public:
 	explicit CFileObjectCollectionRevisionDialog(QWidget *parent = nullptr);
 
-	void SetRevisionList(const imtrepo::IRevisionController::RevisionInfoList& revisions);
+	void SetRevisionList(const imtbase::IRevisionController::RevisionInfoList& revisions);
 	int GetSelectedRevision();
 };
 

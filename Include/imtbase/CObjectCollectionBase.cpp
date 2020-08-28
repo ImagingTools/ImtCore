@@ -29,6 +29,12 @@ CObjectCollectionBase::~CObjectCollectionBase()
 
 // reimplemented (IObjectCollection)
 
+const imtbase::IRevisionController* CObjectCollectionBase::GetRevisionController() const
+{
+	return nullptr;
+}
+
+
 int CObjectCollectionBase::GetOperationFlags(const QByteArray& objectId) const
 {
 	if (!objectId.isEmpty()){

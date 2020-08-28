@@ -28,6 +28,7 @@ public:
 	virtual ~CObjectCollectionBase();
 
 	// reimplemented (IObjectCollection)
+	virtual const IRevisionController* GetRevisionController() const override;
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
 	virtual bool GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const override;
 	virtual QByteArray InsertNewObject(

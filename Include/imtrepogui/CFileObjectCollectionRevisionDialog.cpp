@@ -12,7 +12,7 @@ CFileObjectCollectionRevisionDialog::CFileObjectCollectionRevisionDialog(QWidget
 }
 
 
-void CFileObjectCollectionRevisionDialog::SetRevisionList(const imtrepo::IRevisionController::RevisionInfoList& revisions)
+void CFileObjectCollectionRevisionDialog::SetRevisionList(const imtbase::IRevisionController::RevisionInfoList& revisions)
 {
 	for (int i = 0; i < revisions.count(); i++){
 		Table->insertRow(i);

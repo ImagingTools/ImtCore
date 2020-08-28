@@ -24,7 +24,7 @@
 
 // ImtCore includes
 #include <imtbase/IMetaInfoCreator.h>
-#include <imtrepo/IRevisionController.h>
+#include <imtbase/IRevisionController.h>
 #include <imtrepo/IFileCollectionInfo.h>
 #include <imtrepo/IFileObjectCollection.h>
 #include <imtfile/IFileCompression.h>
@@ -98,7 +98,7 @@ public:
 class CFileCollectionComp:
 			public CFileCollectionCompBase,
 			virtual public IFileObjectCollection,
-			virtual public IRevisionController
+			virtual protected imtbase::IRevisionController
 {
 	Q_OBJECT
 public:
@@ -128,8 +128,8 @@ public:
 
 	// reimplemented (IRevisionController)
 	virtual RevisionInfoList GetRevisionInfoList(const QByteArray& objectId) const override;
-	virtual bool RestoreObject(const QByteArray& objectId, int revision) override;
-	virtual bool BackupObject(const QByteArray& objectId) override;
+	virtual bool RestoreObject(const QByteArray& objectId, int revision) const override;
+	virtual bool BackupObject(const QByteArray& objectId) const override;
 
 	// reimplemented (IFileObjectCollection)
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
@@ -151,6 +151,7 @@ public:
 	virtual QString GetCollectionRootFolder() const override;
 
 	// reimplemented (IObjectCollection)
+	virtual const IRevisionController* GetRevisionController() const override;
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
 	virtual bool GetDataMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const override;
 	virtual QByteArray InsertNewObject(
@@ -181,7 +182,6 @@ public:
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
@@ -342,7 +342,7 @@ protected:
 				bool useSubfolder) const;
 
 	virtual QStringList DecomressRevisions(const QByteArray& objectId, const QString& path) const;
-	virtual bool CreateRevision(const QByteArray& objectId);
+	virtual bool CreateRevision(const QByteArray& objectId) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

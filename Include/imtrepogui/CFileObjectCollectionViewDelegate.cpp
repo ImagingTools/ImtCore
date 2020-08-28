@@ -11,8 +11,8 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
+#include <imtbase/IRevisionController.h>
 #include <imtrepo/IFileObjectCollection.h>
-#include <imtrepo/IRevisionController.h>
 #include <imtrepogui/CFileObjectCollectionRevisionDialog.h>
 
 
@@ -54,10 +54,7 @@ void CFileObjectCollectionViewDelegate::UpdateItemSelection(const imtbase::IColl
 	m_exportCommand.setEnabled(selectedItems.count() == 1);
 	m_restoreCommand.setEnabled(false);
 
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	Q_ASSERT(fileCollectionPtr != nullptr);
-
-	imtrepo::IRevisionController* revisionControllerPtr = dynamic_cast<imtrepo::IRevisionController*>(fileCollectionPtr);
+	const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
 	if (revisionControllerPtr != nullptr){
 		if (m_selectedItemIds.count() == 1){
 			if (revisionControllerPtr->GetRevisionInfoList(m_selectedItemIds[0]).count() > 1){
@@ -65,7 +62,6 @@ void CFileObjectCollectionViewDelegate::UpdateItemSelection(const imtbase::IColl
 			}
 		}
 	}
-
 }
 
 
@@ -135,7 +131,7 @@ bool CFileObjectCollectionViewDelegate::IsCommandSupported(int commandId) const
 
 // protected methods
 
-void CFileObjectCollectionViewDelegate::OnImportObject(const QByteArray& objectId)
+void CFileObjectCollectionViewDelegate::OnImportObject(const QByteArray& /*objectId*/)
 {
 }
 
@@ -249,23 +245,20 @@ void CFileObjectCollectionViewDelegate::OnExport()
 
 void CFileObjectCollectionViewDelegate::OnRestore()
 {
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	Q_ASSERT(fileCollectionPtr != nullptr);
-
-	imtrepo::IRevisionController* revisionControllerPtr = dynamic_cast<imtrepo::IRevisionController*>(m_collectionPtr);
+	const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
 	Q_ASSERT(revisionControllerPtr != nullptr);
 
 	idoc::CStandardDocumentMetaInfo metaInfo;
 	int currentRevision = -1;
 
-	if (fileCollectionPtr->GetCollectionItemMetaInfo(m_selectedItemIds[0], metaInfo)){
+	if (m_collectionPtr->GetCollectionItemMetaInfo(m_selectedItemIds[0], metaInfo)){
 		QVariant revision = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
 		if (revision.isValid()){
 			currentRevision = revision.toInt();
 		}
 	}
 
-	imtrepo::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(m_selectedItemIds[0]);
+	imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(m_selectedItemIds[0]);
 	for (int i = 0; i < revisionList.count(); i++){
 		if (revisionList[i].revision == currentRevision){
 			revisionList.removeAt(i);
