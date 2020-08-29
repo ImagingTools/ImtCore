@@ -48,6 +48,7 @@ void CGridShape::UpdateShapeGeometry()
 		m_vertices.push_back(Vertex(QVector3D(m_gridValue * i, -m_gridValue * m_count, 0.0)));
 		m_vertices.push_back(Vertex(QVector3D(m_gridValue * i, m_gridValue * m_count, 0.0)));
 	}
+
 	for(int i = -m_count; i <= m_count; ++i){
 		m_vertices.push_back(Vertex(QVector3D(-m_gridValue * m_count, m_gridValue * i, 0.0)));
 		m_vertices.push_back(Vertex(QVector3D(m_gridValue * m_count, m_gridValue * i, 0.0)));

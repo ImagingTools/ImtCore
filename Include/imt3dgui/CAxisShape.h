@@ -1,6 +1,9 @@
 #pragma once
 
 
+// ACF includes
+#include <istd/TRange.h>
+
 // ImtCore includes
 #include <imt3dgui/CShape3dBase.h>
 
@@ -18,6 +21,7 @@ public:
 	~CAxisShape();
 
 	void SetAxisLength(double axisLength);
+	void SetAxisRange(const istd::CRange& range);
 
 protected:
 	// reimplement (imt3dgui::CShape3dBase)
@@ -35,6 +39,7 @@ private:
 
 private:
 	double m_axisLength;
+	istd::CRange m_axisRange;
 	static const float s_zoomFontFactor;
 };
 
