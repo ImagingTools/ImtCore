@@ -1,8 +1,8 @@
 #include <imt3dgui/CRulerShape.h>
 
 
+// ImtCore includes
 #include <imt3dgui/CPointCloudShape.h>
-#include <imod/IModel.h>
 
 
 namespace imt3dgui
