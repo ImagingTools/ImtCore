@@ -307,7 +307,7 @@ void COpenGLWidget::initializeGL()
 
 void COpenGLWidget::resizeGL(int w, int h)
 {
-	if (m_cameraPtr){
+	if (m_cameraPtr != nullptr){
 		m_cameraPtr->SetViewPortSize(QSize(w, h));
 	}
 

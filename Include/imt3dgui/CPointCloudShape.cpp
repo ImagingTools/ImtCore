@@ -296,7 +296,6 @@ void CPointCloudShape::UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& poi
 			continue;
 		}
 
-
 		QVector3D color = m_color;
 
 		if (format == imt3d::IPointsBasedObject::PF_XYZW_RGBA_32){
@@ -377,3 +376,5 @@ bool CPointCloudShape::IsPointWithin(const QPoint& point, const QRect& rect, boo
 
 
 } // namespace imt3dgui
+
+
