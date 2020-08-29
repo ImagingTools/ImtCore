@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtWidgets/QWidget>
-
 // ACF includes
 #include <ibase/ICommandsProvider.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>

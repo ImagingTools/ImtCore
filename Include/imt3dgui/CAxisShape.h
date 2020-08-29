@@ -18,7 +18,6 @@ class CAxisShape: public CShape3dBase
 
 public:
 	CAxisShape();
-	~CAxisShape();
 
 	void SetAxisLength(double axisLength);
 	void SetAxisRange(const istd::CRange& range);

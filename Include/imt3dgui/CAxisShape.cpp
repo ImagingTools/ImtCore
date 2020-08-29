@@ -18,11 +18,6 @@ CAxisShape::CAxisShape()
 }
 
 
-CAxisShape::~CAxisShape()
-{
-}
-
-
 void CAxisShape::SetAxisLength(double axisLength)
 {
 	Q_ASSERT(axisLength > 0.0);
