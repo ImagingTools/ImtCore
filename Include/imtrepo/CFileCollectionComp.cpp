@@ -130,6 +130,9 @@ bool CFileCollectionComp::RestoreObject(const imtbase::IObjectCollection& /*coll
 				RevisionMetaInfo revisionMetaInfo;
 				ifile::CCompactXmlFileReadArchive revisionMetaArchive(revisionMetaFilePath, m_versionInfoCompPtr.GetPtr());
 				if (revisionMetaInfo.Serialize(revisionMetaArchive)){
+					static ChangeSet changes(CF_UPDATED);
+					istd::CChangeNotifier changeNotifier(const_cast<CFileCollectionComp*>(this), &changes);
+
 					if (revisionMetaInfo.revision == revision){
 						ifile::CCompactXmlFileReadArchive revisionItemArchive(objectItemFilePath, m_versionInfoCompPtr.GetPtr());
 						CollectionItem revisionItem("");
@@ -179,6 +182,7 @@ bool CFileCollectionComp::RestoreObject(const imtbase::IObjectCollection& /*coll
 						}
 
 						tempDir.removeRecursively();
+
 						return true;
 					}
 				}
@@ -198,6 +202,8 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& /*collec
 	}
 
 	if (!m_compressorCompPtr.IsValid()){
+		SendCriticalMessage(0, "Compression component was not set. Backup is not possible", "File Repository");
+
 		return false;
 	}
 

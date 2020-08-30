@@ -121,7 +121,7 @@ public:
 		I_ASSIGN(m_isEnableRevisionHistoryAttrPtr, "IsEnableRevisionHistory", "Allow saving item revisions", true, false);
 		I_ASSIGN(m_rightsProviderCompPtr, "RightsProvider", "Rights provider", false, "RightsProvider");
 		I_ASSIGN(m_restoreRevisionRightIdAttrPtr, "RestoreRevisionRightId", "Restore to revision right id", true, "RestoreObject");
-		I_ASSIGN(m_loginProviderCompPtr, "Login", "Login component", false, "Login");
+		I_ASSIGN(m_loginProviderCompPtr, "Login", "Provider of login data used for revision management", false, "Login");
 	I_END_COMPONENT;
 
 	CFileCollectionComp();

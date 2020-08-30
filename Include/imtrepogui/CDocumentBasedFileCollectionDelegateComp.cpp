@@ -436,13 +436,15 @@ QString CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::GetTyp
 
 void CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::CreateBackup(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const
 {
+	Q_ASSERT(m_parent.m_collectionPtr == &collection);
+
 	const imtbase::IRevisionController* revisionControllerPtr = m_parent.m_collectionPtr->GetRevisionController();
 	if (revisionControllerPtr != nullptr){
 		idoc::CStandardDocumentMetaInfo metaInfo;
 		m_parent.m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo);
 		QVariant variant = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
 		
-		QString revision = -1;
+		int revision = -1;
 		if (variant.isValid()){
 			revision = variant.toInt();
 		}
