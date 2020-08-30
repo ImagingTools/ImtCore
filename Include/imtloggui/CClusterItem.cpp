@@ -166,7 +166,7 @@ void CClusterItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 	painter->drawText(labelRect, Qt::AlignLeft | Qt::AlignVCenter, QObject::tr("%1 Events").arg(m_counters[0]));
 
 	ellipse.translate(0, height + space);
-	path.clear();
+	path = QPainterPath();
 	path.addEllipse(ellipse);
 	painter->fillPath(path, Qt::green);
 	painter->drawEllipse(ellipse);
@@ -175,7 +175,7 @@ void CClusterItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 	painter->drawText(labelRect, Qt::AlignLeft | Qt::AlignVCenter, QObject::tr("%1 Events").arg(m_counters[1]));
 
 	ellipse.translate(0, height + space);
-	path.clear();
+	path = QPainterPath();
 	path.addEllipse(ellipse);
 	painter->fillPath(path, Qt::yellow);
 	painter->drawEllipse(ellipse);
@@ -184,7 +184,7 @@ void CClusterItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 	painter->drawText(labelRect, Qt::AlignLeft | Qt::AlignVCenter, QObject::tr("%1 Events").arg(m_counters[2]));
 
 	ellipse.translate(0, height + space);
-	path.clear();
+	path = QPainterPath();
 	path.addEllipse(ellipse);
 	painter->fillPath(path, Qt::red);
 	painter->drawEllipse(ellipse);
@@ -193,7 +193,7 @@ void CClusterItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* opti
 	painter->drawText(labelRect, Qt::AlignLeft | Qt::AlignVCenter, QObject::tr("%1 Events").arg(m_counters[3]));
 
 	ellipse.translate(0, height + space);
-	path.clear();
+	path = QPainterPath();
 	path.addEllipse(ellipse);
 	painter->fillPath(path, Qt::darkRed);
 	painter->drawEllipse(ellipse);
