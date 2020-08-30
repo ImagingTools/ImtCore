@@ -457,8 +457,8 @@ void CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::CreateBac
 			bool isOk;
 			comment = QInputDialog::getText(
 						nullptr,
-						tr("Revision comment"),
-						tr("Please enter comment for revision backup"),
+						tr("Comment your changes"),
+						tr("Please enter comment for your changes"),
 						QLineEdit::Normal,
 						"",
 						&isOk);
