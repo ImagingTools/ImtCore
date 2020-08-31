@@ -158,10 +158,10 @@ QSize CMonitorInfoProvider::RetrievePhysicalSize(QString monitorId)
 		if (monitorId == QString::fromStdWString(ddAdapter.DeviceName)){
 			while (EnumDisplayDevices(ddAdapter.DeviceName, monitorIndex, &ddMonitor, 0) && !isMonitorFound){
 				if (ddMonitor.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMonitor.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)){
-					QString monitorId = QString::fromStdWString(ddMonitor.DeviceID);
-					int index1 = monitorId.indexOf('\\');
-					int index2 = monitorId.indexOf('\\', index1 + 1);
-					monitorId = monitorId.mid(index1 + 1, index2 - index1 - 1);
+					QString deviceId = QString::fromStdWString(ddMonitor.DeviceID);
+					int index1 = deviceId.indexOf('\\');
+					int index2 = deviceId.indexOf('\\', index1 + 1);
+					deviceId = deviceId.mid(index1 + 1, index2 - index1 - 1);
 
 					QString displayKey = "SYSTEM\\CurrentControlSet\\Enum\\DISPLAY";
 					QSettings registry("HKEY_LOCAL_MACHINE\\" + displayKey, QSettings::NativeFormat);
@@ -169,7 +169,7 @@ QSize CMonitorInfoProvider::RetrievePhysicalSize(QString monitorId)
 
 					QString edidKey;
 					for (QString key : keys){
-						if (key.contains(monitorId) && key.contains("EDID")){
+						if (key.contains(deviceId) && key.contains("EDID")){
 							edidKey = key;
 							break;
 						}

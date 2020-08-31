@@ -102,13 +102,13 @@ QByteArray CObjectCollectionViewDelegate::CreateNewObject(const QByteArray& type
 }
 
 
-QByteArray CObjectCollectionViewDelegate::ImportObject(const QByteArray& typeId, const QString& sourcePath) const
+QByteArray CObjectCollectionViewDelegate::ImportObject(const QByteArray& /*typeId*/, const QString& /*sourcePath*/) const
 {
 	return QByteArray();
 }
 
 
-bool CObjectCollectionViewDelegate::ExportObject(const QByteArray& objectId, const QString& targetPath) const
+bool CObjectCollectionViewDelegate::ExportObject(const QByteArray& /*objectId*/, const QString& /*targetPath*/) const
 {
 	return false;
 }

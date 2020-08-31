@@ -34,7 +34,7 @@ int CObjectCollectionEventBase::GetSupportedOperations() const
 }
 
 
-bool CObjectCollectionEventBase::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CObjectCollectionEventBase::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CObjectCollectionEventBase* sourcePtr = dynamic_cast<const CObjectCollectionEventBase*>(&object);
 	if (sourcePtr != nullptr){

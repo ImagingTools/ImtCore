@@ -47,7 +47,7 @@ bool CHttpRootHandlerComp::ProcessRequest(const IRequest& request) const
 
 // protected methods
 
-IRequestHandler* CHttpRootHandlerComp::FindRequestHandler(const QByteArray& commandId) const
+IRequestHandler* CHttpRootHandlerComp::FindRequestHandler(const QByteArray& /*commandId*/) const
 {
 	return nullptr;
 }

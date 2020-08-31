@@ -48,6 +48,8 @@ bool CImageContoursExtender::AddItems(imod::IObserver* observerPtr, const istd::
 		shapeViewPtr->ConnectShape(shapePtr);
 		m_shapes[observerPtr].append(shapePtr);
 	}
+
+	return true;
 }
 
 

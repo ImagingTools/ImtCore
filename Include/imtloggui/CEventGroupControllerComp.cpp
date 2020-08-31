@@ -227,7 +227,7 @@ IEventItem* CEventGroupControllerComp::AddEvent(const ilog::IMessageConsumer::Me
 }
 
 
-void CEventGroupControllerComp::OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos)
+void CEventGroupControllerComp::OnAxisPosChanged(const QPointF& /*oldPos*/, const QPointF& /*newPos*/)
 {
 	QDateTime beginTime = m_timeAxisPtr->GetBeginTime();
 	QPointF pos = m_itemGroupPtr->pos();
