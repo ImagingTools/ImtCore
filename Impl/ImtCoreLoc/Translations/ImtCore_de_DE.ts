@@ -16,18 +16,18 @@
         <translation>Berichte</translation>
     </message>
     <message>
-        <location line="-30"/>
+        <location line="-26"/>
         <source>3D-Viewer</source>
         <translation>3D-Viewer</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+28"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
         <translation>(C) 2018 ImagingToolsGmbH. Alle Rechte vorbehalten</translation>
     </message>
     <message>
-        <location line="-28"/>
+        <location line="-26"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
         <source>STL</source>
         <translation></translation>
@@ -85,15 +85,15 @@
         <translation>Maximale Anzahl von nächsten Nachbarn</translation>
     </message>
     <message>
-        <location line="-24"/>
-        <location line="+34"/>
+        <location line="-26"/>
+        <location line="+36"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
         <source>ImtCore</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-32"/>
-        <location line="+28"/>
+        <location line="-34"/>
+        <location line="+32"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
         <source>ImagingTools GmbH</source>
         <translation></translation>
@@ -337,7 +337,7 @@
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtloggui/ui_CEventStatisticsViewComp.h" line="+55"/>
         <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtloggui/ui_CEventStatisticsViewComp.h" line="+55"/>
         <source>ScrollArea</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -348,6 +348,39 @@
         <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtloggui/ui_CEventViewComp.h" line="+41"/>
         <source>Form</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>CFileObjectCollectionRevisionDialog</name>
+    <message>
+        <location filename="../../../Include/imtrepogui/CFileObjectCollectionRevisionDialog.ui" line="+14"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h" line="+75"/>
+        <source>Select revision</source>
+        <translation>Revision auswählen</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h" line="+2"/>
+        <source>Revision</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h" line="+2"/>
+        <source>Backup time</source>
+        <translation>Zeitpunkt der Archivierung</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h" line="+2"/>
+        <source>User</source>
+        <translation>Benutzer</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h" line="+2"/>
+        <source>Comment</source>
+        <translation>Kommentar</translation>
     </message>
 </context>
 <context>
@@ -367,7 +400,7 @@
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionMetaInfoViewComp.h" line="+76"/>
         <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionMetaInfoViewComp.h" line="+76"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -405,7 +438,7 @@
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -518,7 +551,7 @@
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Dashboard</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+20"/>
@@ -716,27 +749,50 @@
         <translation>OK</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location filename="../../../Include/imtloggui/CClusterItem.cpp" line="+79"/>
+        <location line="+87"/>
+        <location line="+9"/>
+        <location line="+9"/>
+        <location line="+9"/>
+        <location line="+9"/>
+        <source>%1 Events</source>
+        <translation>%1 Erreignisse</translation>
+    </message>
+    <message>
+        <location line="-105"/>
+        <source>NONE</source>
+        <translation>KEINE</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>INFO</source>
+        <translation>INFO</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location filename="../../../Include/imtloggui/CEventFactoryCompBase.cpp" line="+3"/>
         <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
         <source>WARNING</source>
         <translation>WARNUNG</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+2"/>
+        <location filename="../../../Include/imtloggui/CEventFactoryCompBase.cpp" line="+3"/>
         <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
         <source>ERROR</source>
         <translation>FEHLER</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+2"/>
+        <location filename="../../../Include/imtloggui/CEventFactoryCompBase.cpp" line="+3"/>
         <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
         <source>CRITICAL</source>
         <translation>SYSTEMFEHLER</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location filename="../../../Include/imtloggui/CEventFactoryCompBase.cpp" line="+12"/>
         <source>Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeit</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -776,14 +832,24 @@
         <translation>Ausloggen</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtbase/CFileCollectionComp.cpp" line="+375"/>
+        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="+55"/>
+        <location line="+57"/>
+        <location line="+122"/>
+        <location line="+393"/>
+        <location line="+811"/>
+        <location line="+26"/>
         <source>Target folder &apos;%1&apos; could not be created</source>
-        <translation type="unfinished"></translation>
+        <translation>Zielverzeichnis &apos;%1&apos; konnte nicht erstellt werden</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="-822"/>
         <source>File could not be saved into &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Datei konnte nicht in das Verzeicfhnis &apos;%1&apos; gespeichert werden</translation>
+    </message>
+    <message>
+        <location line="+802"/>
+        <source>Revision &apos;%1&apos; could not be decompressed</source>
+        <translation>Archivdaten &apos;%1&apos; konnten nicht entpackt werden</translation>
     </message>
 </context>
 <context>
@@ -1060,57 +1126,11 @@
     </message>
 </context>
 <context>
-    <name>imtbase::CFileCollectionComp</name>
-    <message>
-        <location filename="../../../Include/imtbase/CFileCollectionComp.cpp" line="+722"/>
-        <source>Input file name %1 renamed to %2</source>
-        <translation>Datei %1 umbenannt in %2</translation>
-    </message>
-</context>
-<context>
     <name>imtgui::CCustomLayoutWidget</name>
     <message>
         <location filename="../../../Include/imtgui/CHierarchicalLayoutWidget.cpp" line="+165"/>
         <source>Empty</source>
         <translation>Leer</translation>
-    </message>
-</context>
-<context>
-    <name>imtgui::CDocumentBasedFileCollectionDelegateComp</name>
-    <message>
-        <location filename="../../../Include/imtgui/CDocumentBasedFileCollectionDelegateComp.cpp" line="+70"/>
-        <source>Collection Manager</source>
-        <translation>Datenverwaltung</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>The file could not be created</source>
-        <translation>Datei konnte nicht erzeugt werden</translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>Remove</source>
-        <translation type="unfinished">Entfernen</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Remove selected document from the collection</source>
-        <translation type="unfinished">Ausgewählten Dokument entfernen</translation>
-    </message>
-    <message>
-        <location line="+19"/>
-        <source>Document &quot;%1&quot; is currently being edited and cannot be deleted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+160"/>
-        <source>Edit</source>
-        <translation>Bearbeiten</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Edit existing object</source>
-        <translation>Ein bestehendes Objekt bearbeiten</translation>
     </message>
 </context>
 <context>
@@ -1243,91 +1263,6 @@
     </message>
 </context>
 <context>
-    <name>imtgui::CFileObjectCollectionViewDelegate</name>
-    <message>
-        <location filename="../../../Include/imtgui/CFileObjectCollectionViewDelegate.cpp" line="+31"/>
-        <source>Type</source>
-        <translation>Typ</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Description</source>
-        <translation>Beschreibung</translation>
-    </message>
-    <message>
-        <location line="+120"/>
-        <source>Import from File...</source>
-        <translation>Datei-Import...</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Import</source>
-        <translation>Import</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Import existing file into the collection</source>
-        <translation>Eine bestehnde Datei importieren</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Export to File...</source>
-        <translation>Datei-Export...</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Export</source>
-        <translation>Export</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Export data from the collection to a file</source>
-        <translation>Datei exportieren</translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>Import File</source>
-        <translation>Datei-Import</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <location line="+38"/>
-        <source>Collection</source>
-        <translation>Datenbank</translation>
-    </message>
-    <message>
-        <location line="-38"/>
-        <source>Document could not be imported</source>
-        <translation>Datei konnte nicht importiert werden</translation>
-    </message>
-    <message>
-        <location line="+38"/>
-        <source>Document could not be exported</source>
-        <translation>Datei konnte nicht exportiert werden</translation>
-    </message>
-    <message>
-        <location line="-14"/>
-        <location line="+85"/>
-        <source>All known documents (%1)</source>
-        <translation>Alle bekannte Dateitypen (%1)</translation>
-    </message>
-    <message>
-        <location line="-255"/>
-        <source>Added</source>
-        <translation>Hinzugefügt</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Last Modified</source>
-        <translation>Bearbeitet</translation>
-    </message>
-    <message>
-        <location line="+175"/>
-        <source>Export File</source>
-        <translation>Datei-Export</translation>
-    </message>
-</context>
-<context>
     <name>imtgui::CLayoutManagerGuiComp</name>
     <message>
         <location filename="../../../Include/imtgui/CLayoutManagerGuiComp.cpp" line="+255"/>
@@ -1411,15 +1346,15 @@
         <location filename="../../../Include/imtgui/CObjectCollectionViewComp.cpp" line="+65"/>
         <location line="+22"/>
         <source>Reading collection...</source>
-        <translation type="unfinished"></translation>
+        <translation>Datenbank lesen...</translation>
     </message>
     <message>
         <location line="+689"/>
         <source>Update...</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualsierung...</translation>
     </message>
     <message>
-        <location line="+176"/>
+        <location line="+182"/>
         <source>Edit...</source>
         <translation>Bearbeiten...</translation>
     </message>
@@ -1685,6 +1620,167 @@
         <location line="+0"/>
         <source>Move to last event</source>
         <translation>Zum letzten Erreignis navigieren</translation>
+    </message>
+</context>
+<context>
+    <name>imtrepo::CFileCollectionComp</name>
+    <message>
+        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="-92"/>
+        <source>Input file name %1 renamed to %2</source>
+        <translation type="unfinished">Datei %1 umbenannt in %2</translation>
+    </message>
+</context>
+<context>
+    <name>imtrepogui::CDocumentBasedFileCollectionDelegateComp</name>
+    <message>
+        <location filename="../../../Include/imtrepogui/CDocumentBasedFileCollectionDelegateComp.cpp" line="+73"/>
+        <source>Collection Manager</source>
+        <translation>Datenverwaltung</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>The file could not be created</source>
+        <translation>Datei konnte nicht erzeugt werden</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Remove</source>
+        <translation>Entfernen</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Remove selected document from the collection</source>
+        <translation>Ausgewählten Dokument entfernen</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Document &quot;%1&quot; is currently being edited and cannot be deleted</source>
+        <translation>Dokument &apos;%1&apos; wird gerade bearbetet und kann nicht gelöscht werden</translation>
+    </message>
+    <message>
+        <location line="+160"/>
+        <source>Edit</source>
+        <translation>Bearbeiten</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Edit existing object</source>
+        <translation>Ein bestehendes Objekt bearbeiten</translation>
+    </message>
+    <message>
+        <location line="+188"/>
+        <source>Initial Revision</source>
+        <translation>Initiale Revision</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Comment your changes</source>
+        <translation>Kommentar</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Please enter comment for your changes</source>
+        <translation>Bitte geben Sie den Kommentar für Ihre Änderungen ein</translation>
+    </message>
+</context>
+<context>
+    <name>imtrepogui::CFileObjectCollectionViewDelegate</name>
+    <message>
+        <location filename="../../../Include/imtrepogui/CFileObjectCollectionViewDelegate.cpp" line="+35"/>
+        <source>Type</source>
+        <translation>Typ</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Description</source>
+        <translation>Beschreibung</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Added</source>
+        <translation>Hinzugefügt</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Last Modified</source>
+        <translation>Bearbeitet</translation>
+    </message>
+    <message>
+        <location line="+146"/>
+        <source>Import from File...</source>
+        <translation>Datei-Import...</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Import</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Import existing file into the collection</source>
+        <translation>Eine bestehnde Datei importieren</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Export to File...</source>
+        <translation>Datei-Export...</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Export</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Export data from the collection to a file</source>
+        <translation>Datei exportieren</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Restore revision...</source>
+        <translation>Aus dem Archiv wiederherstellen...</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Restore</source>
+        <translation>Wiederherstellen</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Restore data from backup</source>
+        <translation>Daten aus dem Archiv wiederherstellen</translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Import File</source>
+        <translation>Datei-Import</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <location line="+38"/>
+        <source>Collection</source>
+        <translation>Datenbank</translation>
+    </message>
+    <message>
+        <location line="-38"/>
+        <source>Document could not be imported</source>
+        <translation>Datei konnte nicht importiert werden</translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <location line="+114"/>
+        <source>All known documents (%1)</source>
+        <translation>Alle bekannte Dateitypen (%1)</translation>
+    </message>
+    <message>
+        <location line="-106"/>
+        <source>Export File</source>
+        <translation>Datei-Export</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Document could not be exported</source>
+        <translation>Datei konnte nicht exportiert werden</translation>
     </message>
 </context>
 <context>
