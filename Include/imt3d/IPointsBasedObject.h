@@ -1,13 +1,7 @@
 #pragma once
 
 
-#ifdef COMPILER_NAME_CLANG
-    #include <mm_malloc.h>
-#endif
-#ifdef COMPILER_NAME_GCC
-    #include <mm_malloc.h>
-#endif
-#ifdef COMPILER_NAME_GPP
+#if COMPILER_NAME == GCC
     #include <mm_malloc.h>
 #endif
 

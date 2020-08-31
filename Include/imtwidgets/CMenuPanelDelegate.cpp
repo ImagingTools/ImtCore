@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QtMath>
 #include <QtGui/QPainter>
 
 // ImtCore includes

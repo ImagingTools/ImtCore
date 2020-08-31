@@ -1,6 +1,13 @@
 #include <imtgui/CMonitorInfoProvider.h>
 
 
+#ifdef Q_OS_WINDOWS
+	// Windows includes
+	#include <windows.h>
+	#include <winreg.h>
+#endif
+
+
 // STL includes
 #include <cstring>
 
@@ -10,10 +17,6 @@
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
-
-// Windows includes
-#include <windows.h>
-#include <winreg.h>
 
 
 namespace imtgui
@@ -143,6 +146,7 @@ QSize CMonitorInfoProvider::RetrievePhysicalSize(QString monitorId)
 {
 	QSize size;
 
+#ifdef Q_OS_WINDOWS
 	DISPLAY_DEVICE ddAdapter;
 	ddAdapter.cb = sizeof(ddAdapter);
 	int adapterIndex = 0;
@@ -203,6 +207,7 @@ QSize CMonitorInfoProvider::RetrievePhysicalSize(QString monitorId)
 		ddAdapter.cb = sizeof(ddAdapter);
 		adapterIndex++;
 	}
+#endif
 
 	return size;
 }

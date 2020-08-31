@@ -1,6 +1,9 @@
 #include <imtloggui/CEventGroupControllerComp.h>
 
 
+// STD includes
+#include <float.h>
+
 // Qt includes
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>

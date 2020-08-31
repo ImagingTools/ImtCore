@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtGui/QkeyEvent>
+#include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QWheelEvent>
 #include <QtWidgets/QGraphicsView>

@@ -1,6 +1,9 @@
 #include <imtloggui/CTimeAxis.h>
 
 
+// STD includes
+#include <float.h>
+
 // Qt includes
 #include <QtCore/QRectF>
 #include <QtGui/QFont>
