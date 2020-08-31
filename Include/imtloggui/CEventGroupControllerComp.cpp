@@ -327,12 +327,15 @@ void CEventGroupControllerComp::VerticalScaleConstraints::SetParent(CEventGroupC
 
 void CEventGroupControllerComp::VerticalScaleConstraints::SetMinScale(double scale)
 {
-	istd::CChangeNotifier changeNotifier(this);
-	m_minVerticalScale = scale;
+	if (m_minVerticalScale != scale){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_minVerticalScale = scale;
+	}
 }
 
 
-bool CEventGroupControllerComp::VerticalScaleConstraints::IsEqual(const IChangeable& object) const
+bool CEventGroupControllerComp::VerticalScaleConstraints::IsEqual(const IChangeable& /*object*/) const
 {
 	return false;
 }
@@ -380,7 +383,7 @@ QString CEventGroupControllerComp::VerticalScaleConstraints::GetOptionName(int i
 }
 
 
-QString CEventGroupControllerComp::VerticalScaleConstraints::GetOptionDescription(int index) const
+QString CEventGroupControllerComp::VerticalScaleConstraints::GetOptionDescription(int /*index*/) const
 {
 	return QString();
 }
