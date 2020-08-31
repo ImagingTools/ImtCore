@@ -1,8 +1,10 @@
 #pragma once
 
 
-#if COMPILER_NAME == GCC
-    #include <mm_malloc.h>
+#ifdef COMPILER_NAME
+	#if COMPILER_NAME == GCC
+	    #include <mm_malloc.h>
+	#endif
 #endif
 
 
