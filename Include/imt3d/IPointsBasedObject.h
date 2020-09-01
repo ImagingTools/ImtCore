@@ -1,10 +1,16 @@
 #pragma once
 
 
-#ifdef COMPILER_NAME
-	#if COMPILER_NAME == GCC
-	    #include <mm_malloc.h>
-	#endif
+// STD includes
+
+#ifdef __GNUC__
+	#include <mm_malloc.h>
+#endif
+#ifdef __MINGW32__
+	#include <mm_malloc.h>
+#endif
+#ifdef __MINGW64__
+	#include <mm_malloc.h>
 #endif
 
 
