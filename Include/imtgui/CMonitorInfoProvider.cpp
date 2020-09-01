@@ -93,6 +93,39 @@ double CMonitorInfoProvider::GetScaling(int index) const
 }
 
 
+// protected methods
+
+void CMonitorInfoProvider::UpdateMonitorsInfo()
+{
+	for (MonitorInfo info : m_monitors){
+		info.screenPtr->disconnect(this);
+	}
+
+	m_monitors.clear();
+
+	QList<QScreen*> screenList = QGuiApplication::screens();
+	for (QScreen* screen : screenList){
+		MonitorInfo info;
+		info.screenPtr = screen;
+		info.size = RetrievePhysicalSize(screen->name());
+		info.geometry = screen->geometry();
+		if (info.size.width() != 0 && info.size.height() != 0){
+			info.resolutionX = (double)info.geometry.width() / info.size.width();
+			info.resolutionY = (double)info.geometry.height() / info.size.height();
+		}
+		else{
+			info.resolutionX = 0;
+			info.resolutionY = 0;
+		}
+
+		connect(screen, &QScreen::logicalDotsPerInchChanged, this, &CMonitorInfoProvider::LogicalDotsPerInchChanged);
+		connect(screen, &QScreen::orientationChanged, this, &CMonitorInfoProvider::OrientationChanged);
+
+		m_monitors.append(info);
+	}
+}
+
+
 // private slots
 
 void CMonitorInfoProvider::PrimaryScreenChanged(QScreen* /*screen*/)
@@ -144,7 +177,11 @@ void CMonitorInfoProvider::OrientationChanged(Qt::ScreenOrientation /*orientatio
 
 QSize CMonitorInfoProvider::RetrievePhysicalSize(QString monitorId)
 {
-	QSize size;
+	if (m_physicalSize.width() > 0 && m_physicalSize.height() > 0){
+		return m_physicalSize;
+	}
+
+	QSize size(500, 281);
 
 #ifdef Q_OS_WINDOWS
 	DISPLAY_DEVICE ddAdapter;
@@ -210,37 +247,6 @@ QSize CMonitorInfoProvider::RetrievePhysicalSize(QString monitorId)
 #endif
 
 	return size;
-}
-
-
-void CMonitorInfoProvider::UpdateMonitorsInfo()
-{
-	for (MonitorInfo info : m_monitors){
-		info.screenPtr->disconnect(this);
-	}
-
-	m_monitors.clear();
-
-	QList<QScreen*> screenList = QGuiApplication::screens();
-	for (QScreen* screen : screenList){
-		MonitorInfo info;
-		info.screenPtr = screen;
-		info.size = RetrievePhysicalSize(screen->name());
-		info.geometry = screen->geometry();
-		if (info.size.width() != 0 && info.size.height() != 0){
-			info.resolutionX = (double)info.geometry.width() / info.size.width();
-			info.resolutionY = (double)info.geometry.height() / info.size.height();
-		}
-		else{
-			info.resolutionX = 0;
-			info.resolutionY = 0;
-		}
-
-		connect(screen, &QScreen::logicalDotsPerInchChanged, this, &CMonitorInfoProvider::LogicalDotsPerInchChanged);
-		connect(screen, &QScreen::orientationChanged, this, &CMonitorInfoProvider::OrientationChanged);
-
-		m_monitors.append(info);
-	}
 }
 
 

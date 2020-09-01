@@ -45,6 +45,12 @@ public:
 	virtual QRect GetGeometry(int index) const override;
 	virtual double GetScaling(int index) const override;
 
+protected:
+	void UpdateMonitorsInfo();
+
+protected:
+	QSize m_physicalSize;
+
 private Q_SLOTS:
 	void PrimaryScreenChanged(QScreen* screen);
 	void ScreenAdded(QScreen* screen);
@@ -67,7 +73,6 @@ private:
 
 private:
 	QSize RetrievePhysicalSize(QString monitorId);
-	void UpdateMonitorsInfo();
 };
 
 
