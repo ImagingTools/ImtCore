@@ -22,16 +22,30 @@ CClusterItem::CClusterItem()
 	for (int i = 0; i < 5; i++){
 		m_counters[i] = 0;
 	}
+
+	AddMetaInfo(MIT_NONE_COUNTER, QObject::tr("NONE"), true);
+	AddMetaInfo(MIT_INFO_COUNTER, QObject::tr("INFO"), true);
+	AddMetaInfo(MIT_WARNING_COUNTER, QObject::tr("WARNING"), true);
+	AddMetaInfo(MIT_ERROR_COUNTER, QObject::tr("ERROR"), true);
+	AddMetaInfo(MIT_CRITICAL_COUNTER, QObject::tr("CRITICAL"), true);
+
+	SetMetaInfo(MIT_NONE_COUNTER, QString("0 Events"));
+	SetMetaInfo(MIT_INFO_COUNTER, QString("0 Events"));
+	SetMetaInfo(MIT_WARNING_COUNTER, QString("0 Events"));
+	SetMetaInfo(MIT_ERROR_COUNTER, QString("0 Events"));
+	SetMetaInfo(MIT_CRITICAL_COUNTER, QString("0 Events"));
+}
+
+
+void CClusterItem::SetParams(const QSize& size, QGraphicsItem *parent)
+{
+	BaseClass::SetParams(parent);
+
+	m_rect = QRect(-size.width() / 2., -size.height() / 2., size.width(), size.height());
 }
 
 
 // reimplemented (imtloggui::IEventItemCluster)
-
-void CClusterItem::SetParams(const QSize& size)
-{
-	m_rect = QRect(-size.width() / 2., -size.height() / 2., size.width(), size.height());
-}
-
 
 void CClusterItem::Attach(IEventItem* itemPtr)
 {
@@ -42,7 +56,26 @@ void CClusterItem::Attach(IEventItem* itemPtr)
 	graphicsItemPtr->setPos(this->mapFromScene(pos));
 	graphicsItemPtr->setVisible(false);
 
-	m_counters[itemPtr->GetInformationProvider()->GetInformationCategory()]++;
+	int category = itemPtr->GetInformationProvider()->GetInformationCategory();
+	m_counters[category]++;
+
+	switch (category){
+	case istd::IInformationProvider::IC_NONE:
+		SetMetaInfo(MIT_NONE_COUNTER, QString("%1 Events").arg(m_counters[category]));
+		break;
+	case istd::IInformationProvider::IC_INFO:
+		SetMetaInfo(MIT_INFO_COUNTER, QString("%1 Events").arg(m_counters[category]));
+		break;
+	case istd::IInformationProvider::IC_WARNING:
+		SetMetaInfo(MIT_WARNING_COUNTER, QString("%1 Events").arg(m_counters[category]));
+		break;
+	case istd::IInformationProvider::IC_ERROR:
+		SetMetaInfo(MIT_ERROR_COUNTER, QString("%1 Events").arg(m_counters[category]));
+		break;
+	case istd::IInformationProvider::IC_CRITICAL:
+		SetMetaInfo(MIT_CRITICAL_COUNTER, QString("%1 Events").arg(m_counters[category]));
+		break;
+	}
 }
 
 
@@ -57,70 +90,6 @@ void CClusterItem::DetachAll()
 }
 
 
-// reimplemented (idoc::IDocumentMetaInfo)
-
-idoc::IDocumentMetaInfo::MetaInfoTypes CClusterItem::GetMetaInfoTypes(bool allowReadOnly) const
-{
-	MetaInfoTypes types{
-				idoc::IDocumentMetaInfo::MIT_USER + 0,
-				idoc::IDocumentMetaInfo::MIT_USER + 1,
-				idoc::IDocumentMetaInfo::MIT_USER + 2,
-				idoc::IDocumentMetaInfo::MIT_USER + 3,
-				idoc::IDocumentMetaInfo::MIT_USER + 4};
-
-	return types;
-}
-
-
-QVariant CClusterItem::GetMetaInfo(int metaInfoType) const
-{
-	metaInfoType -= idoc::IDocumentMetaInfo::MIT_USER;
-	if (metaInfoType >= 0 && metaInfoType < 5){
-		QObject::tr("%1 Events").arg(m_counters[metaInfoType]);
-	}
-
-	return QVariant();
-}
-
-
-bool CClusterItem::SetMetaInfo(int metaInfoType, const QVariant& metaInfo)
-{
-	return false;
-}
-
-
-QString CClusterItem::GetMetaInfoName(int metaInfoType) const
-{
-	metaInfoType -= idoc::IDocumentMetaInfo::MIT_USER;
-	switch (metaInfoType){
-	case 0:
-		return QObject::tr("NONE");
-	case 1:
-		return QObject::tr("INFO");
-	case 2:
-		return QObject::tr("WARNING");
-	case 3:
-		return QObject::tr("ERROR");
-	case 4:
-		return QObject::tr("CRITICAL");
-	default:
-		return QString();
-	}
-}
-
-
-QString CClusterItem::GetMetaInfoDescription(int metaInfoType) const
-{
-	return QString();
-}
-
-
-bool CClusterItem::IsMetaInfoWritable(int metaInfoType) const
-{
-	return false;
-}
-
-
 // reimplemented (QGraphicsItem)
 
 QRectF CClusterItem::boundingRect() const
@@ -129,21 +98,31 @@ QRectF CClusterItem::boundingRect() const
 }
 
 
-void CClusterItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void CClusterItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
 	painter->setRenderHints(0);
 
 	painter->fillRect(m_rect, Qt::white);
 
 	painter->save();
-	painter->setPen(QPen(Qt::black, 2));
+	if (isSelected()){
+		painter->setPen(QPen(Qt::red, 2));
+	}
+	else{
+		painter->setPen(QPen(Qt::black, 2));
+	}
 	painter->drawRoundedRect(m_rect, 2, 2);
 	painter->restore();
 
 	QPen pen;
 	QBrush brush;
 
-	pen.setColor(Qt::black);
+	if (isSelected()){
+		pen.setColor(Qt::red);
+	}
+	else{
+		pen.setColor(Qt::black);
+	}
 	brush.setColor(Qt::gray);
 
 	painter->setPen(pen);

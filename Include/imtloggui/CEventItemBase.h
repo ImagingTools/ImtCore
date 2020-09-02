@@ -18,28 +18,23 @@ class CEventItemBase:
 public:
 	typedef CItemBase BaseClass;
 
+	enum MetaInfoType
+	{
+		MIT_TIMESTAMP = idoc::IDocumentMetaInfo::MIT_USER + 100,
+		MIT_SOURCE,
+		MIT_MESSAGE,
+		MIT_STATUS,
+	};
+
+	CEventItemBase();
+
 	void SetParams(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parentPtr = nullptr);
 
 	// reimplemented (imtloggui::IEventItem)
 	virtual const istd::IInformationProvider* GetInformationProvider() const override;
-	virtual const MetaInfo& GetMetaInfo() const override;
-	virtual void SetMetaInfo(const QString& key, const QString& value) override;
-	virtual void RemoveMetaInfo(const QString& key) override;
-
-	// reimplemented (idoc::IDocumentMetaInfo)
-	virtual MetaInfoTypes GetMetaInfoTypes(bool allowReadOnly = true) const override;
-	virtual QVariant GetMetaInfo(int metaInfoType) const override;
-	virtual bool SetMetaInfo(int metaInfoType, const QVariant& metaInfo) override;
-	virtual QString GetMetaInfoName(int metaInfoType) const override;
-	virtual QString GetMetaInfoDescription(int metaInfoType) const override;
-	virtual bool IsMetaInfoWritable(int metaInfoType) const override;
-
-protected:
-	void UpdateToolTip();
 
 private:
 	ilog::IMessageConsumer::MessagePtr m_messagePtr;
-	MetaInfo m_metaInfo;
 };
 
 

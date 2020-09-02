@@ -1,6 +1,10 @@
 #include <imtloggui/CEventFactoryCompBase.h>
 
 
+// ImtCore includes
+#include <imtloggui/CEventItemBase.h>
+
+
 namespace imtloggui
 {
 
@@ -92,10 +96,10 @@ void CEventFactoryCompBase::SetItemMetaInfo(IEventItem* eventItem) const
 		timestamp = informationProviderPtr->GetInformationTimeStamp().toString(*m_timestampFormatCompPtr);
 	}
 
-	eventItem->SetMetaInfo(QObject::tr("Timestamp"), timestamp);
-	eventItem->SetMetaInfo(QObject::tr("Source"), informationProviderPtr->GetInformationSource());
-	eventItem->SetMetaInfo(QObject::tr("Message"), informationProviderPtr->GetInformationDescription());
-	eventItem->SetMetaInfo(QObject::tr("Status"), status);
+	eventItem->SetMetaInfo(CEventItemBase::MIT_TIMESTAMP, timestamp);
+	eventItem->SetMetaInfo(CEventItemBase::MIT_SOURCE, informationProviderPtr->GetInformationSource());
+	eventItem->SetMetaInfo(CEventItemBase::MIT_MESSAGE, informationProviderPtr->GetInformationDescription());
+	eventItem->SetMetaInfo(CEventItemBase::MIT_STATUS, status);
 }
 
 

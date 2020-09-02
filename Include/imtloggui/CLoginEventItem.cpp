@@ -11,6 +11,13 @@ namespace imtloggui
 
 // public methods
 
+CLoginEventItem::CLoginEventItem()
+{
+	AddMetaInfo(MIT_ACTION, QObject::tr("Action"), true);
+	AddMetaInfo(MIT_USER_NAME, QObject::tr("User name"), true);
+}
+
+
 void CLoginEventItem::SetFont(const QFont& font)
 {
 	m_font = font;

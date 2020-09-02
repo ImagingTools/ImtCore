@@ -57,21 +57,21 @@ void CLoginEventFactoryComp::SetItemMetaInfo(IEventItem* eventItem) const
 
 	BaseClass::SetItemMetaInfo(eventItem);
 
-	eventItem->SetMetaInfo(QObject::tr("Message"), "");
+	eventItem->SetMetaInfo(CLoginEventItem::MIT_MESSAGE, QObject::tr("Message"));
 
 	const istd::IInformationProvider* informationProviderPtr = eventItem->GetInformationProvider();
 	Q_ASSERT(informationProviderPtr != nullptr);
 
 	switch (informationProviderPtr->GetInformationId()){
 	case imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN:
-		eventItem->SetMetaInfo(QObject::tr("Action"), QObject::tr("Login"));
+		eventItem->SetMetaInfo(CLoginEventItem::MIT_ACTION, QObject::tr("Login"));
 		break;
 	case imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT:
-		eventItem->SetMetaInfo(QObject::tr("Action"), QObject::tr("Logout"));
+		eventItem->SetMetaInfo(CLoginEventItem::MIT_ACTION, QObject::tr("Logout"));
 		break;
 	}
 
-	eventItem->SetMetaInfo(QObject::tr("User name"), informationProviderPtr->GetInformationDescription());
+	eventItem->SetMetaInfo(CLoginEventItem::MIT_USER_NAME, informationProviderPtr->GetInformationDescription());
 }
 
 

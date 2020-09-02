@@ -10,12 +10,11 @@ namespace imtloggui
 
 
 /**
-	Interface for event item
+	Interface for cluster item
 */
-class IClusterItem: virtual public IItemBase
+class IClusterItem:	virtual public IItemBase
 {
 public:
-	virtual void SetParams(const QSize& size) = 0;
 	virtual void Attach(IEventItem* itemPtr) = 0;
 	virtual void DetachAll() = 0;
 };

@@ -52,9 +52,9 @@ CEventViewComp::CEventViewComp()
 // reimplemented (ilog::IMessageConsumer)
 
 bool CEventViewComp::IsMessageSupported(
-			int messageCategory,
-			int messageId,
-			const istd::IInformationProvider* messagePtr) const
+			int /*messageCategory*/,
+			int /*messageId*/,
+			const istd::IInformationProvider* /*messagePtr*/) const
 {
 	return true;
 }
@@ -399,7 +399,7 @@ void CEventViewComp::OnSelectionChanged()
 {
 	QList<QGraphicsItem*> items = m_scene.selectedItems();
 	if (!items.isEmpty()){
-		IEventItem* itemPtr = dynamic_cast<IEventItem*>(items[0]);
+		IItemBase* itemPtr = dynamic_cast<IItemBase*>(items[0]);
 		if (itemPtr != nullptr){
 			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(itemPtr);
 			if (modelPtr != nullptr){
@@ -573,13 +573,9 @@ bool CEventViewComp::UpdateMetaInfoPanel(const IEventItem* eventItem)
 
 	QVBoxLayout* layoutPtr = dynamic_cast<QVBoxLayout*>(m_metaInfoPanelPtr->layout());
 	if (layoutPtr != nullptr){
-		IEventItem::MetaInfo metaInfo = eventItem->GetMetaInfo();
-		if (metaInfo.isEmpty()){
-			return false;
-		}
-
-		for (IEventItem::MetaInfoItem metaInfoItem : metaInfo){
-			QLabel* labelKeyPtr = new QLabel(metaInfoItem.key, m_metaInfoPanelPtr);
+		idoc::IDocumentMetaInfo::MetaInfoTypes types = eventItem->GetMetaInfoTypes();
+		for (int type : types){
+			QLabel* labelKeyPtr = new QLabel(eventItem->GetMetaInfoName(type), m_metaInfoPanelPtr);
 			QFont keyLabelFont;
 			keyLabelFont.setPixelSize(12);
 			keyLabelFont.setBold(true);
@@ -588,7 +584,7 @@ bool CEventViewComp::UpdateMetaInfoPanel(const IEventItem* eventItem)
 
 			QFont valueLabelFont;
 			valueLabelFont.setPixelSize(9);
-			QLabel* labelValuePtr = new QLabel(metaInfoItem.value, m_metaInfoPanelPtr);
+			QLabel* labelValuePtr = new QLabel(eventItem->GetMetaInfo(type).toString(), m_metaInfoPanelPtr);
 			labelValuePtr->setFont(valueLabelFont);
 			labelValuePtr->setStyleSheet("color: gray");
 			labelValuePtr->setWordWrap(true);

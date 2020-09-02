@@ -19,6 +19,14 @@ class CLoginEventItem: public CEventItemBase
 public:
 	typedef CEventItemBase BaseClass;
 
+	enum MetaInfoType
+	{
+		MIT_ACTION = idoc::IDocumentMetaInfo::MIT_USER + 200,
+		MIT_USER_NAME
+	};
+
+	CLoginEventItem();
+
 	void SetFont(const QFont& font);
 	void SetIcons(const QIcon& iconLogin, const QIcon& iconLogout);
 	void SetIconSize(const QSize& size);

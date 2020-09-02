@@ -18,26 +18,10 @@ namespace imtloggui
 class IEventItem: virtual public IItemBase
 {
 public:
-	struct MetaInfoItem
-	{
-		QString key;
-		QString value;
-	};
-
-	typedef QVector<MetaInfoItem> MetaInfo;
-
 	/**
 		Get pointer to source message
 	*/
 	virtual const istd::IInformationProvider* GetInformationProvider() const = 0;
-
-	/**
-		Methods for meta info manipulating.
-		Meta info is used to display tooltips or in other viewers
-	*/
-	virtual const MetaInfo& GetMetaInfo() const = 0;
-	virtual void SetMetaInfo(const QString& key, const QString& value) = 0;
-	virtual void RemoveMetaInfo(const QString& key) = 0;
 };
 
 
