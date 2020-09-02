@@ -65,6 +65,7 @@ private:
 	double GetCurrentScaleY() const;
 	void ArrangeEvents();
 	void CreateClusters();
+	void UpdateClusters();
 
 private:
 	I_ATTR(QByteArray, m_groupIdAttrPtr);
@@ -87,6 +88,11 @@ private:
 	QList<IItemBase*> m_visibleItems;
 	QList<IItemBase*> m_visibleClusters;
 	QTransform m_lastTransform;
+	QDateTime m_beginTime;
+	QDateTime m_endTime;
+
+
+	
 };
 
 
