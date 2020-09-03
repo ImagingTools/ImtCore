@@ -198,13 +198,13 @@ bool CFileCollectionComp::RestoreObject(const imtbase::IObjectCollection& /*coll
 int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& /*collection*/, const QByteArray& objectId, const QString& userComment) const
 {
 	if (!*m_isEnableRevisionHistoryAttrPtr){
-		return false;
+		return -1;
 	}
 
 	if (!m_compressorCompPtr.IsValid()){
 		SendCriticalMessage(0, "Compression component was not set. Backup is not possible", "File Repository");
 
-		return false;
+		return -1;
 	}
 
 	QReadLocker readLocker(&m_collectionLock);
@@ -232,7 +232,7 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& /*collec
 
 	if (!istd::CSystem::EnsurePathExists(tempPath)){
 		SendErrorMessage(0, QString(QObject::tr("Target folder '%1' could not be created")).arg(tempPath));
-		return false;
+		return -1;
 	}
 
 	readLocker.relock();

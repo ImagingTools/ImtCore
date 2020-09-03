@@ -110,6 +110,10 @@ protected:
 	};
 
 protected:
+	// reimplemented (CFileObjectCollectionViewDelegate)
+	virtual bool IsRestoreAllowed(const QByteArray& objectId) override;
+	virtual void AfterRestore(const QByteArray& objectId, bool isRestoreSuccessful) override;
+
 	// reimplemented (CObjectCollectionViewDelegate)
 	virtual void SetupCommands() override;
 	virtual void SetupInsertCommand() override;
@@ -164,6 +168,8 @@ private:
 
 	typedef istd::TPointerVector<ICollectionViewDelegate::ObjectInfo> OpenedDocuments;
 	mutable OpenedDocuments m_openedDocuments;
+
+	QByteArray m_closedForRestoreId;
 };
 
 

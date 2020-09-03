@@ -41,6 +41,9 @@ public:
 
 protected:
 	virtual void OnImportObject(const QByteArray& objectId);
+	virtual bool IsRestoreAllowed(const QByteArray& objectId);
+	virtual void BeforeRestore(const QByteArray& objectId);
+	virtual void AfterRestore(const QByteArray& objectId, bool isRestoreSuccessful);
 
 	// reimplemented (CObjectCollectionViewDelegate)
 	virtual void SetupCommands() override;

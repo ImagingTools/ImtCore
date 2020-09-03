@@ -240,6 +240,39 @@ iqtgui::IGuiObject* CDocumentBasedFileCollectionDelegateComp::GetInformationView
 
 // reimplemented (CObjectCollectionViewDelegate)
 
+bool CDocumentBasedFileCollectionDelegateComp::IsRestoreAllowed(const QByteArray& objectId)
+{
+	for (int i = 0; i < m_openedDocuments.GetCount(); i++){
+		ObjectInfo* objectInfoPtr = m_openedDocuments.GetAt(i);
+		if (objectInfoPtr->uuid == objectId){
+			for (int docIndex = 0; m_documentManagerCompPtr->GetDocumentsCount(); docIndex++){
+				idoc::IDocumentManager::DocumentInfo documentInfo;
+				if (objectInfoPtr->objectPtr == &m_documentManagerCompPtr->GetDocumentFromIndex(docIndex, &documentInfo)){
+					bool retVal = m_documentManagerCompPtr->CloseDocument(docIndex, false);
+					if (retVal){
+						m_closedForRestoreId = objectId;
+					}
+
+					return retVal;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+
+void CDocumentBasedFileCollectionDelegateComp::AfterRestore(const QByteArray& objectId, bool isRestoreSuccessful)
+{
+	if (!m_closedForRestoreId.isEmpty()){
+		OpenDocumentEditor(objectId);
+	}
+
+	m_closedForRestoreId.clear();
+}
+
+
 void CDocumentBasedFileCollectionDelegateComp::SetupCommands()
 {
 	BaseClass2::SetupCommands();

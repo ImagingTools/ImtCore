@@ -154,6 +154,22 @@ void CFileObjectCollectionViewDelegate::OnImportObject(const QByteArray& /*objec
 }
 
 
+bool CFileObjectCollectionViewDelegate::IsRestoreAllowed(const QByteArray& objectId)
+{
+	return true;
+}
+
+
+void CFileObjectCollectionViewDelegate::BeforeRestore(const QByteArray& objectId)
+{
+}
+
+
+void CFileObjectCollectionViewDelegate::AfterRestore(const QByteArray& objectId, bool isRestoreSuccessful)
+{
+}
+
+
 // reimplemented (CFileObjectCollectionViewDelegate)
 
 void CFileObjectCollectionViewDelegate::SetupCommands()
@@ -265,6 +281,7 @@ void CFileObjectCollectionViewDelegate::OnRestore()
 {
 	const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
 	Q_ASSERT(revisionControllerPtr != nullptr);
+	Q_ASSERT(m_selectedItemIds.count() > 0);
 
 	idoc::CStandardDocumentMetaInfo metaInfo;
 	int currentRevision = -1;
@@ -284,7 +301,11 @@ void CFileObjectCollectionViewDelegate::OnRestore()
 	if (dialog.exec() == QDialog::Accepted){
 		int revision = dialog.GetSelectedRevision();
 		if (revision != -1 && revision != currentRevision){
-			revisionControllerPtr->RestoreObject(*m_collectionPtr, m_selectedItemIds[0], revision);
+			if (IsRestoreAllowed(m_selectedItemIds[0])){
+				BeforeRestore(m_selectedItemIds[0]);
+				bool isRestored = revisionControllerPtr->RestoreObject(*m_collectionPtr, m_selectedItemIds[0], revision);
+				AfterRestore(m_selectedItemIds[0], isRestored);
+			}
 		}
 	}
 }
