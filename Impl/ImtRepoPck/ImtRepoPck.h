@@ -10,7 +10,7 @@
 
 
 /**
-	ImtCorePck package
+	ImtRepoPck package
 */
 namespace ImtRepoPck
 {
