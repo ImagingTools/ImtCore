@@ -372,7 +372,8 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 
 void CThumbnailDecoratorGuiComp::on_ExitButton_clicked()
 {
-	ExitApplication();
+	bool ignoredPtr;
+	OnTryClose(&ignoredPtr);
 }
 
 
