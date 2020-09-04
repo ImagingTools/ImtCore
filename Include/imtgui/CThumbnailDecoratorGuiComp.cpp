@@ -323,6 +323,15 @@ void CThumbnailDecoratorGuiComp::OnTryClose(bool* ignoredPtr)
 			return;
 		}
 
+		bool ignored = false;
+		if (m_pagesWidgetCompPtr.IsValid()){
+			m_pagesWidgetCompPtr->OnTryClose(&ignored);
+		}
+
+		if (ignored){
+			return;
+		}
+
 		ExitApplication();
 	}
 }
