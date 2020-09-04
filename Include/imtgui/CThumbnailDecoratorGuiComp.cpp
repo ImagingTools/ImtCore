@@ -323,16 +323,18 @@ void CThumbnailDecoratorGuiComp::OnTryClose(bool* ignoredPtr)
 			return;
 		}
 
-		bool ignored = false;
-		if (m_pagesWidgetCompPtr.IsValid()){
-			m_pagesWidgetCompPtr->OnTryClose(&ignored);
-		}
+		if (QMessageBox::question(GetWidget(), tr("Quit"), tr("Do you really want to quit?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes){
+			bool ignored = false;
+			if (m_pagesWidgetCompPtr.IsValid()){
+				m_pagesWidgetCompPtr->OnTryClose(&ignored);
+			}
 
-		if (ignored){
-			return;
-		}
+			if (ignored){
+				return;
+			}
 
-		ExitApplication();
+			ExitApplication();
+		}
 	}
 }
 
@@ -1063,18 +1065,16 @@ bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 
 void CThumbnailDecoratorGuiComp::ExitApplication()
 {
-	if (QMessageBox::question(GetWidget(), tr("Quit"), tr("Do you really want to quit?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes){
-		m_isExitProcess = true;
-		QWidget* topWidgetPtr = GetWidget();
-		while (topWidgetPtr->parentWidget() != NULL){
-			topWidgetPtr = topWidgetPtr->parentWidget();
-		}
+	m_isExitProcess = true;
+	QWidget* topWidgetPtr = GetWidget();
+	while (topWidgetPtr->parentWidget() != NULL){
+		topWidgetPtr = topWidgetPtr->parentWidget();
+	}
 
-		if (topWidgetPtr != NULL){
-			topWidgetPtr->close();
+	if (topWidgetPtr != NULL){
+		topWidgetPtr->close();
 
-			qApp->quit();
-		}
+		qApp->quit();
 	}
 }
 

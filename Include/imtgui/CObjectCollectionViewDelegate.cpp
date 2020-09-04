@@ -8,6 +8,8 @@
 #include <istd/CChangeGroup.h>
 #include <istd/CChangeNotifier.h>
 
+// ImtCore includes
+#include <imtbase/IRevisionController.h>
 
 namespace imtgui
 {
@@ -350,6 +352,11 @@ void CObjectCollectionViewDelegate::OnDuplicate()
 				m_collectionPtr->SetObjectDescription(objectId, sourceDescription);
 
 				OnDuplicateObject(selectedItemId, objectId);
+
+				const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
+				if (revisionControllerPtr != nullptr){
+					revisionControllerPtr->BackupObject(*m_collectionPtr, objectId, tr("Initial Revision"));
+				}
 			}
 		}
 	}

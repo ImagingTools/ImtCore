@@ -214,17 +214,24 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& /*collec
 		return -1;
 	}
 
-	CollectionItem& item = m_files[fileIndex];
+	CollectionItem& collectionItem = m_files[fileIndex];
 
 	readLocker.unlock();
 
-	int revision = item.metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION).toInt();
+
+	int revision = CalculateNextRevision(objectId);
+
+	collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION, revision);
+	collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_LAST_REVISION, revision);
+	collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
+
+	SaveCollectionItem(collectionItem);
 
 	if (revision <= GetLastRevisionInArchive(objectId)){
 		return -1;
 	}
 
-	QFileInfo info(item.filePathInRepository);
+	QFileInfo info(collectionItem.filePathInRepository);
 	QString revisionsPath = info.absolutePath() + "/Revisions/";
 
 	QString tempPath = GetTempDirectory() + "/ImtCore/" + QUuid::createUuid().toString();
@@ -442,8 +449,8 @@ QByteArray CFileCollectionComp::InsertFile(
 	collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
 	collectionItem.metaInfo.SetMetaInfo(MIT_INSERTION_TIME, QDateTime::currentDateTime());
 	collectionItem.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
-	collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION, 1);
-	collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_LAST_REVISION, 1);
+	collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION, 0);
+	collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_LAST_REVISION, 0);
 
 	QString savedPath = SaveCollectionItem(collectionItem);
 	if (!savedPath.isEmpty()){
@@ -509,12 +516,6 @@ bool CFileCollectionComp::UpdateFile(
 		if (!QFile::setPermissions(targetFilePath, QFile::WriteGroup)){
 			SendErrorMessage(0, QString("Permissions for the file '%1' could not be set").arg(targetFilePath));
 		}
-
-		int revision = CalculateNextRevision(objectId);
-
-		collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION, revision);
-		collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_LAST_REVISION, revision);
-		collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
 
 		locker.relock();
 
