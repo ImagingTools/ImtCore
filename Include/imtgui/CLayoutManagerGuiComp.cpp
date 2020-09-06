@@ -99,7 +99,7 @@ QLayout* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 		
 		QSplitter* splitterPtr = new QSplitter();
 		connect(splitterPtr, SIGNAL(splitterMoved(int, int)), this, SLOT(OnSplitterMoved(int, int)));
-		SplittersMap.insert(splitterPtr, layout->GetLayoutId());
+		m_splitterMap.insert(splitterPtr, layout->GetLayoutId());
 
 		retVal->addWidget(splitterPtr);
 		retVal->setMargin(0);
@@ -142,7 +142,7 @@ QLayout* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 void CLayoutManagerGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (m_layoutWidgetPtr != nullptr){
-		SplittersMap.clear();
+		m_splitterMap.clear();
 
 		RemoveAllGuiComponents();
 
@@ -264,8 +264,8 @@ void CLayoutManagerGuiComp::OnGuiRetranslate()
 void CLayoutManagerGuiComp::OnSplitterMoved(int /*pos*/, int /*index*/)
 {
 	QSplitter* splitterPtr = dynamic_cast<QSplitter*>(sender());
-	if (splitterPtr != NULL && SplittersMap.contains(splitterPtr)){
-		m_activeId = SplittersMap.value(splitterPtr);
+	if (splitterPtr != NULL && m_splitterMap.contains(splitterPtr)){
+		m_activeId = m_splitterMap.value(splitterPtr);
 		m_splitterTimer.stop();
 		m_splitterTimer.start(1000);
 	}
@@ -274,8 +274,8 @@ void CLayoutManagerGuiComp::OnSplitterMoved(int /*pos*/, int /*index*/)
 
 void CLayoutManagerGuiComp::OnSplitterMoveFinished()
 {
-	QMap<QSplitter*, QByteArray>::const_iterator i = SplittersMap.constBegin();
-	while (i != SplittersMap.constEnd()){
+	QMap<QSplitter*, QByteArray>::const_iterator i = m_splitterMap.constBegin();
+	while (i != m_splitterMap.constEnd()){
 		if (i.value() == m_activeId){
 			QSplitter* splitterPtr = i.key();
 			OnChangeSizes(m_activeId, splitterPtr->sizes());
@@ -315,8 +315,8 @@ void CLayoutManagerGuiComp::OnStartEndEditCommand()
 			const istd::IChangeable::ChangeSet changeSet;
 			UpdateGui(changeSet);
 
-			//QMap<QSplitter*, QByteArray>::const_iterator iter = SplittersMap.constBegin();
-			//while (iter != SplittersMap.constEnd()){
+			//QMap<QSplitter*, QByteArray>::const_iterator iter = m_splitterMap.constBegin();
+			//while (iter != m_splitterMap.constEnd()){
 			//	QSplitter* splitterPtr = iter.key();
 			//	for (int i = 0; i < splitterPtr->count(); i++){
 			//		QSplitterHandle *hndl = splitterPtr->handle(i);

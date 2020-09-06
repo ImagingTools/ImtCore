@@ -126,7 +126,7 @@ private:
 
 	QTimer m_splitterTimer;
 	QByteArray m_activeId;
-	QMap<QSplitter*, QByteArray> SplittersMap;
+	QMap<QSplitter*, QByteArray> m_splitterMap;
 
 	iprm::COptionsManager m_guiViewOptionsManager;
 
