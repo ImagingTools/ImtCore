@@ -254,8 +254,8 @@ void CLayoutManagerGuiComp::OnGuiRetranslate()
 	// File commands emptyIcon
 	m_startEndEditModeCommand.SetVisuals(tr("Edit Mode"), tr("Edit Mode"), tr("EditMode"), QIcon(":/Icons/Edit"));
 	m_clearCommand.SetVisuals(tr("Clear All"), tr("Clear All"), tr("ClearAll"), QIcon(":/Icons/Clear"));
-	m_loadCommand.SetVisuals(tr("Import"), tr("Import"), tr("Import"), QIcon(":/Icons/Load"));
-	m_saveCommand.SetVisuals(tr("Export"), tr("Export"), tr("Export"), QIcon(":/Icons/Save"));
+	m_loadCommand.SetVisuals(tr("Import"), tr("Import"), tr("Import"), QIcon(":/Icons/Import"));
+	m_saveCommand.SetVisuals(tr("Export"), tr("Export"), tr("Export"), QIcon(":/Icons/Export"));
 }
 
 
