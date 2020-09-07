@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtGui/QRegExpValidator>
 #include <QtWidgets/QMessageBox>
 
 // ACF includes
@@ -149,9 +150,15 @@ bool CObjectCollectionViewDelegate::UpdateObject(const QByteArray& objectId, con
 bool CObjectCollectionViewDelegate::RenameObject(const QByteArray& objectId, const QString& newName) const
 {
 	if (m_collectionPtr != nullptr){
-		m_collectionPtr->SetObjectName(objectId, newName);
+		QRegExpValidator inputValidator(QRegExp("^[\\w,\\s-]+"));
+		int pos;
+		QString name = newName;
+		if (inputValidator.validate(name, pos) == QValidator::Acceptable){
+			m_collectionPtr->SetObjectName(objectId, newName);
+			return true;
+		}
 
-		return true;
+		QMessageBox::critical(NULL, tr("Error"), tr("The document name contains some not allowed characters"));
 	}
 
 	return false;
