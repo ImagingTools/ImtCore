@@ -18,7 +18,7 @@ void CFileObjectCollectionRevisionDialog::SetRevisionList(const imtbase::IRevisi
 		Table->insertRow(i);
 
 		Table->setItem(i, 0, new QTableWidgetItem(QString::number(revisions[i].revision)));
-		Table->setItem(i, 1, new QTableWidgetItem(revisions[i].timestamp.toString()));
+		Table->setItem(i, 1, new QTableWidgetItem(revisions[i].timestamp.toString("dd.MM.yyyy hh:mm:ss")));
 		Table->setItem(i, 2, new QTableWidgetItem(revisions[i].user));
 		Table->setItem(i, 3, new QTableWidgetItem(revisions[i].comment));
 
@@ -33,6 +33,17 @@ void CFileObjectCollectionRevisionDialog::SetRevisionList(const imtbase::IRevisi
 			Table->item(i, 1)->setFlags(Qt::NoItemFlags);
 			Table->item(i, 2)->setFlags(Qt::NoItemFlags);
 			Table->item(i, 3)->setFlags(Qt::NoItemFlags);
+		}
+
+		if (!revisions[i].isArchivePresent){
+			Table->item(i, 0)->setTextColor(Qt::red);
+			Table->item(i, 1)->setTextColor(Qt::red);
+			Table->item(i, 2)->setTextColor(Qt::red);
+			Table->item(i, 3)->setTextColor(Qt::red);
+			Table->item(i, 0)->setToolTip(tr("Revision package not found"));
+			Table->item(i, 1)->setToolTip(tr("Revision package not found"));
+			Table->item(i, 2)->setToolTip(tr("Revision package not found"));
+			Table->item(i, 3)->setToolTip(tr("Revision package not found"));
 		}
 
 		Table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);

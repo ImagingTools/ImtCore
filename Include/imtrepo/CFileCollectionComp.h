@@ -249,9 +249,20 @@ protected:
 	public:
 		// reimplement (iser::ISerializable)
 		virtual bool Serialize(iser::IArchive& archive) override;
+	};
 
-		// reimplement (istd::IChangeable)
-		virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	struct RevisionsContentsItem: public imtbase::IRevisionController::RevisionInfo
+	{
+		QString path;
+	};
+
+	typedef QMap<int, RevisionsContentsItem> RevisionsContentsMap;
+
+	class RevisionsContents: public RevisionsContentsMap, virtual public iser::ISerializable
+	{
+	public:
+		// reimplement (iser::ISerializable)
+		virtual bool Serialize(iser::IArchive& archive) override;
 	};
 
 	struct RepositoryInfo
@@ -341,9 +352,9 @@ protected:
 				const QString& localFilePath,
 				bool useSubfolder) const;
 
-	virtual QStringList DecomressRevisions(const QByteArray& objectId, const QString& path) const;
-	virtual int GetLastRevisionInArchive(const QByteArray& objectId) const;
-	virtual int CalculateNextRevision(const QByteArray& objectId) const;
+	virtual bool LoadRevisionsContents(const QByteArray& objectId, RevisionsContents& revisionsContents) const;
+	virtual bool SaveRevisionsContents(const QByteArray& objectId, RevisionsContents& revisionsContents) const;
+	virtual bool CreateRevisionsContents(const QByteArray& objectId) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

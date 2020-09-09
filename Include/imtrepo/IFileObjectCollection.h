@@ -30,11 +30,6 @@ public:
 			Current element revision.
 		*/
 		MIT_REVISION = idoc::IDocumentMetaInfo::MIT_USER + 20000,
-
-		/**
-			Last created used element revision
-		*/
-		MIT_LAST_REVISION
 	};
 
 	/**

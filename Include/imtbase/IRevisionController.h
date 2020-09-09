@@ -25,8 +25,13 @@ public:
 		QString user;
 		QString comment;
 	};
+
+	struct RevisionInfoListItem: public RevisionInfo
+	{
+		bool isArchivePresent;
+	};
 	
-	typedef QVector<RevisionInfo> RevisionInfoList;
+	typedef QVector<RevisionInfoListItem> RevisionInfoList;
 
 	/**
 		Get list of revisions available for restore for a given data object in the collection.

@@ -483,7 +483,7 @@ void CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::CreateBac
 		}
 
 		QString comment;
-		if (revision == 0){
+		if (revision == -1){
 			comment = tr("Initial Revision");
 		}
 		else {
