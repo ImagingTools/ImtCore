@@ -28,7 +28,7 @@ public:
 
 	struct RevisionInfoListItem: public RevisionInfo
 	{
-		bool isArchivePresent;
+		bool isRevisionAvailable;
 	};
 	
 	typedef QVector<RevisionInfoListItem> RevisionInfoList;
@@ -47,6 +47,11 @@ public:
 		\return Revision of the saved object of the operation was successfull, or a negative value otherwise.
 	*/
 	virtual int BackupObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& userComment = QString()) const = 0;
+
+	/**
+		Exporting object data of a given revision from a collection to a file
+	*/
+	virtual bool ExportObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision, const QString& filePath) const = 0;
 };
 
 

@@ -66,9 +66,9 @@ imtbase::IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionI
 				RevisionsContentsItem revisionsContentsItem = revisionsContents.value(key);
 				*dynamic_cast<RevisionInfo*>(&revisionInfoListItem) = *dynamic_cast<RevisionInfo*>(&revisionsContentsItem);
 
-				revisionInfoListItem.isArchivePresent = false;
+				revisionInfoListItem.isRevisionAvailable = false;
 				if (QFile::exists(itemPath + "/Revisions/" + revisionsContentsItem.path)){
-					revisionInfoListItem.isArchivePresent = true;
+					revisionInfoListItem.isRevisionAvailable = true;
 				}
 
 				retVal.append(revisionInfoListItem);
@@ -303,6 +303,59 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& /*collec
 
 	tempDir.removeRecursively();
 	return -1;
+}
+
+
+bool CFileCollectionComp::ExportObject(const imtbase::IObjectCollection& /*collection*/, const QByteArray& objectId, int revision, const QString& filePath) const
+{
+	if (!m_compressorCompPtr.IsValid()){
+		return false;
+	}
+
+	RevisionsContents revisionsContents;
+	if (LoadRevisionsContents(objectId, revisionsContents)){
+		if (!revisionsContents.isEmpty()){
+			if (revisionsContents.contains(revision)){
+				RevisionsContentsItem& revisionsContentsItem = revisionsContents[revision];
+
+				QReadLocker locker(&m_collectionLock);
+
+				int fileIndex = GetFileIndexById(objectId);
+				if (fileIndex >= 0){
+					CollectionItem& item = m_files[fileIndex];
+					QFileInfo info(item.filePathInRepository);
+					QString itemPath = info.absolutePath();
+
+					QString revisionPath = itemPath + "/Revisions/" + revisionsContentsItem.path;
+					if (QFile::exists(revisionPath)){
+						QString tempPath = GetTempDirectory() + "/ImtCore/" + QUuid::createUuid().toString();
+						QDir tempDir(tempPath);
+
+						if (istd::CSystem::EnsurePathExists(tempPath)){
+							if (m_compressorCompPtr->DecompressFolder(revisionPath, tempPath)){
+								QString objectFilePath = tempPath + "/object.data";
+								if (QFile::exists(objectFilePath)){
+									bool retVal = istd::CSystem::FileCopy(objectFilePath, filePath, true);
+									tempDir.removeRecursively();
+									return retVal;
+								}
+								else{
+									SendErrorMessage(0, QString(QObject::tr("Revision '%1' does not contain object data file")).arg(revisionPath));
+								}
+							}
+							else{
+								SendErrorMessage(0, QString(QObject::tr("Revision '%1' could not be decompressed")).arg(revisionPath));
+							}
+						}
+
+						tempDir.removeRecursively();
+					}
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 

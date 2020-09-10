@@ -59,7 +59,8 @@ protected Q_SLOTS:
 protected:
 	QByteArray FindTypeIdFromFile(const QString& filePath) const;
 	const ifile::IFileTypeInfo* FindFileInfo(const QByteArray& typeId) const;
-	QString CreateFileFilter(int flags) const;
+	QString CreateFileImportFilter() const;
+	QString CreateFileExportFilter(const QByteArray& objectId) const;
 
 private:
 	// commands

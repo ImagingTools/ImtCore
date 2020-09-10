@@ -21,8 +21,24 @@ class CFileObjectCollectionRevisionDialog:
 public:
 	explicit CFileObjectCollectionRevisionDialog(QWidget *parent = nullptr);
 
-	void SetRevisionList(const imtbase::IRevisionController::RevisionInfoList& revisions, int currentRevision);
+	void SetParams(
+				const imtbase::IRevisionController::RevisionInfoList& revisions,
+				int currentRevision,
+				const imtbase::IRevisionController* revisionControllerPtr,
+				const QByteArray& objectId,
+				const QString& fileName,
+				const QString& filter);
 	int GetSelectedRevision();
+
+private Q_SLOTS:
+	void OnCustomContextMenuRequested(const QPoint &point);
+	void OnExport();
+
+private:
+	const imtbase::IRevisionController* m_revisionControllerPtr;
+	QByteArray m_objectId;
+	QString m_fileName;
+	QString m_filter;
 };
 
 

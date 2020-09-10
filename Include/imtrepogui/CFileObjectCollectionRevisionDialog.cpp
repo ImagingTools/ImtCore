@@ -1,6 +1,12 @@
 #include <imtrepogui/CFileObjectCollectionRevisionDialog.h>
 
 
+// Qt includes
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
+
+
 namespace imtrepogui
 {
 
@@ -9,10 +15,18 @@ CFileObjectCollectionRevisionDialog::CFileObjectCollectionRevisionDialog(QWidget
 	:QDialog(parent, Qt::WindowTitleHint)
 {
 	setupUi(this);
+	Table->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(Table, &QTableWidget::customContextMenuRequested, this, &CFileObjectCollectionRevisionDialog::OnCustomContextMenuRequested);
 }
 
 
-void CFileObjectCollectionRevisionDialog::SetRevisionList(const imtbase::IRevisionController::RevisionInfoList& revisions, int currentRevision)
+void CFileObjectCollectionRevisionDialog::SetParams(
+			const imtbase::IRevisionController::RevisionInfoList& revisions,
+			int currentRevision,
+			const imtbase::IRevisionController* revisionControllerPtr,
+			const QByteArray& objectId,
+			const QString& fileName,
+			const QString& filter)
 {
 	for (int i = 0; i < revisions.count(); i++){
 		Table->insertRow(i);
@@ -29,13 +43,9 @@ void CFileObjectCollectionRevisionDialog::SetRevisionList(const imtbase::IRevisi
 			Table->item(i, 1)->setFont(font);
 			Table->item(i, 2)->setFont(font);
 			Table->item(i, 3)->setFont(font);
-			Table->item(i, 0)->setFlags(Qt::NoItemFlags);
-			Table->item(i, 1)->setFlags(Qt::NoItemFlags);
-			Table->item(i, 2)->setFlags(Qt::NoItemFlags);
-			Table->item(i, 3)->setFlags(Qt::NoItemFlags);
 		}
 
-		if (!revisions[i].isArchivePresent){
+		if (!revisions[i].isRevisionAvailable){
 			Table->item(i, 0)->setTextColor(Qt::red);
 			Table->item(i, 1)->setTextColor(Qt::red);
 			Table->item(i, 2)->setTextColor(Qt::red);
@@ -48,6 +58,11 @@ void CFileObjectCollectionRevisionDialog::SetRevisionList(const imtbase::IRevisi
 
 		Table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
 	}
+
+	m_revisionControllerPtr = revisionControllerPtr;
+	m_objectId = objectId;
+	m_fileName = fileName;
+	m_filter = filter;
 }
 
 
@@ -59,6 +74,52 @@ int CFileObjectCollectionRevisionDialog::GetSelectedRevision()
 	}
 
 	return -1;
+}
+
+
+// private slots
+
+void CFileObjectCollectionRevisionDialog::OnCustomContextMenuRequested(const QPoint &point)
+{
+	QList<QTableWidgetItem*> selectedItems = Table->selectedItems();
+	if (selectedItems.isEmpty()){
+		return;
+	}
+
+	QAction* actionRestore;
+	QMenu menu(Table);
+
+	actionRestore = menu.addAction(QIcon(":/Icons/Export"), tr("Export"));
+	connect(actionRestore, &QAction::triggered, this, &CFileObjectCollectionRevisionDialog::OnExport);
+
+	menu.exec(Table->viewport()->mapToGlobal(point));
+}
+
+
+void CFileObjectCollectionRevisionDialog::OnExport()
+{
+	if (m_revisionControllerPtr != nullptr){
+		int revision = -1;
+
+		QList<QTableWidgetItem*> selectedItems = Table->selectedItems();
+		if (!selectedItems.isEmpty()){
+			revision = Table->item(selectedItems[0]->row(), 0)->text().toInt();
+		}
+
+		if (revision != -1){
+			QString filePath = QFileDialog::getSaveFileName(
+						this,
+						tr("Export File"),
+						QString("%1 (revision %2)").arg(m_fileName).arg(revision),
+						m_filter);
+
+			if (!filePath.isEmpty()){
+				if (!m_revisionControllerPtr->ExportObject(*(imtbase::IObjectCollection*)nullptr, m_objectId, revision, filePath)){
+					QMessageBox::critical(this, tr("Collection"), tr("Document could not be exported"));
+				}
+			}
+		}
+	}
 }
 
 

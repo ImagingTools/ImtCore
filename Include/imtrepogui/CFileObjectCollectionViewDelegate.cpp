@@ -88,7 +88,15 @@ QByteArray CFileObjectCollectionViewDelegate::ImportObject(const QByteArray& typ
 	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
-	return fileCollectionPtr->InsertFile(sourcePath, typeId);
+	QByteArray objectId = fileCollectionPtr->InsertFile(sourcePath, typeId);
+	if (!objectId.isEmpty()){
+		const imtbase::IRevisionController* revisionControllerPtr = fileCollectionPtr->GetRevisionController();
+		if (revisionControllerPtr != nullptr){
+			revisionControllerPtr->BackupObject(*fileCollectionPtr, objectId, tr("Initial Revision"));
+		}
+	}
+
+	return objectId;
 }
 
 
@@ -222,7 +230,7 @@ void CFileObjectCollectionViewDelegate::OnImport()
 				(m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr,
 				tr("Import File"),
 				QString(),
-				CreateFileFilter(ifile::IFilePersistence::QF_LOAD));
+				CreateFileImportFilter());
 
 	if (!files.isEmpty()){
 		for (const QString& filePath : files){
@@ -248,30 +256,17 @@ void CFileObjectCollectionViewDelegate::OnExport()
 	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
-	QByteArray typeId = fileCollectionPtr->GetObjectTypeId(m_selectedItemIds[0]);
-	const ifile::IFileTypeInfo* fileInfoPtr = FindFileInfo(typeId);
+	if (!m_selectedItemIds.isEmpty()){
+		QString filePath = QFileDialog::getSaveFileName(
+					(m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr,
+					tr("Export File"),
+					QString(),
+					CreateFileExportFilter(m_selectedItemIds[0]));
 
-	QStringList filters;
-	QStringList allExt;
-
-	if (fileInfoPtr != nullptr){
-		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileInfoPtr, nullptr, -1, allExt, filters, false);
-		if (allExt.size() > 1){
-			filters.prepend(tr("All known documents (%1)").arg("*." + allExt.join(" *.")));
-		}
-	}
-
-	istd::CChangeGroup changeGroup(fileCollectionPtr);
-
-	QString filePath = QFileDialog::getSaveFileName(
-				(m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr,
-				tr("Export File"),
-				QString(),
-				filters.join(";;"));
-
-	if (!filePath.isEmpty()){
-		if (!ExportObject(m_selectedItemIds[0], filePath)){
-			QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be exported"));
+		if (!filePath.isEmpty()){
+			if (!ExportObject(m_selectedItemIds[0], filePath)){
+				QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be exported"));
+			}
 		}
 	}
 }
@@ -279,32 +274,44 @@ void CFileObjectCollectionViewDelegate::OnExport()
 
 void CFileObjectCollectionViewDelegate::OnRestore()
 {
-	const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
-	Q_ASSERT(revisionControllerPtr != nullptr);
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
+	Q_ASSERT(fileCollectionPtr != nullptr);
 	Q_ASSERT(m_selectedItemIds.count() > 0);
 
-	idoc::CStandardDocumentMetaInfo metaInfo;
-	int currentRevision = -1;
+	const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
+	if (revisionControllerPtr != nullptr){
+		idoc::CStandardDocumentMetaInfo metaInfo;
+		int currentRevision = -1;
 
-	if (m_collectionPtr->GetCollectionItemMetaInfo(m_selectedItemIds[0], metaInfo)){
-		QVariant revision = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
-		if (revision.isValid()){
-			currentRevision = revision.toInt();
+		if (m_collectionPtr->GetCollectionItemMetaInfo(m_selectedItemIds[0], metaInfo)){
+			QVariant revision = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
+			if (revision.isValid()){
+				currentRevision = revision.toInt();
+			}
 		}
-	}
 
-	imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_collectionPtr, m_selectedItemIds[0]);
+		imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_collectionPtr, m_selectedItemIds[0]);
 
-	CFileObjectCollectionRevisionDialog dialog;
+		QString fileName = fileCollectionPtr->GetElementInfo(m_selectedItemIds[0], imtbase::IObjectCollectionInfo::EIT_NAME).toString();
 
-	dialog.SetRevisionList(revisionList, currentRevision);
-	if (dialog.exec() == QDialog::Accepted){
-		int revision = dialog.GetSelectedRevision();
-		if (revision != -1 && revision != currentRevision){
-			if (IsRestoreAllowed(m_selectedItemIds[0])){
-				BeforeRestore(m_selectedItemIds[0]);
-				bool isRestored = revisionControllerPtr->RestoreObject(*m_collectionPtr, m_selectedItemIds[0], revision);
-				AfterRestore(m_selectedItemIds[0], isRestored);
+		CFileObjectCollectionRevisionDialog dialog;
+
+		dialog.SetParams(
+					revisionList,
+					currentRevision,
+					revisionControllerPtr,
+					m_selectedItemIds[0],
+					fileName,
+					CreateFileExportFilter(m_selectedItemIds[0]));
+
+		if (dialog.exec() == QDialog::Accepted){
+			int revision = dialog.GetSelectedRevision();
+			if (revision != -1 && revision != currentRevision){
+				if (IsRestoreAllowed(m_selectedItemIds[0])){
+					BeforeRestore(m_selectedItemIds[0]);
+					bool isRestored = revisionControllerPtr->RestoreObject(*m_collectionPtr, m_selectedItemIds[0], revision);
+					AfterRestore(m_selectedItemIds[0], isRestored);
+				}
 			}
 		}
 	}
@@ -355,7 +362,7 @@ const ifile::IFileTypeInfo* CFileObjectCollectionViewDelegate::FindFileInfo(cons
 }
 
 
-QString CFileObjectCollectionViewDelegate::CreateFileFilter(int flags) const
+QString CFileObjectCollectionViewDelegate::CreateFileImportFilter() const
 {
 	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
@@ -375,8 +382,27 @@ QString CFileObjectCollectionViewDelegate::CreateFileFilter(int flags) const
 		}
 	}
 
-	if ((allExt.size() > 1) && ((flags & ifile::IFilePersistence::QF_SAVE) == 0)){
+	if (allExt.size() > 1){
 		filters.prepend(tr("All known documents (%1)").arg("*." + allExt.join(" *.")));
+	}
+
+	return filters.join(";;");
+}
+
+
+QString CFileObjectCollectionViewDelegate::CreateFileExportFilter(const QByteArray& objectId) const
+{
+	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
+	Q_ASSERT(fileCollectionPtr != nullptr);
+
+	QStringList filters;
+	QStringList allExt;
+
+	QByteArray typeId = fileCollectionPtr->GetObjectTypeId(objectId);
+	const ifile::IFileTypeInfo* fileInfoPtr = FindFileInfo(typeId);
+
+	if (fileInfoPtr != nullptr){
+		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileInfoPtr, nullptr, -1, allExt, filters, false);
 	}
 
 	return filters.join(";;");
