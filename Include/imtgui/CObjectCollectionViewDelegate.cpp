@@ -150,11 +150,11 @@ bool CObjectCollectionViewDelegate::UpdateObject(const QByteArray& objectId, con
 bool CObjectCollectionViewDelegate::RenameObject(const QByteArray& objectId, const QString& newName) const
 {
 	if (m_collectionPtr != nullptr){
-		QRegExpValidator inputValidator(QRegExp("^[\\w,\\s-]+"));
+		QRegExpValidator inputValidator(QRegExp("^[^\\\\/:\\*\\?\"\\<\\>\\|\\+]+$"));
 		int pos;
-		QString name = newName;
+		QString name = newName.trimmed();
 		if (inputValidator.validate(name, pos) == QValidator::Acceptable){
-			m_collectionPtr->SetObjectName(objectId, newName);
+			m_collectionPtr->SetObjectName(objectId, name);
 			return true;
 		}
 

@@ -44,13 +44,13 @@ QString CDocumentWorkspaceGuiComp::GetSaveFilePath(const QByteArray& documentTyp
 	QInputDialog nameDialog(GetWidget());
 
 	bool isAccepted;
-	QString resourceName = nameDialog.getText(GetWidget(), tr("Document Name"), tr("Please enter the name of the document:"), QLineEdit::Normal, QString(), &isAccepted);
+	QString resourceName = nameDialog.getText(GetWidget(), tr("Document Name"), tr("Please enter the name of the document:"), QLineEdit::Normal, QString(), &isAccepted).trimmed();
 	if (!isAccepted){
 		return QString();
 	}
 
 	if (!resourceName.isEmpty()){
-		QRegExpValidator inputValidator(QRegExp("^[\\w,\\s-]+"));
+		QRegExpValidator inputValidator(QRegExp("^[^\\\\/:\\*\\?\"\\<\\>\\|\\+]+$"));
 		int pos;
 		if (inputValidator.validate(resourceName, pos) != QValidator::Acceptable){
 			QMessageBox::critical(NULL, tr("Error"), tr("The document name contains some not allowed characters"));
