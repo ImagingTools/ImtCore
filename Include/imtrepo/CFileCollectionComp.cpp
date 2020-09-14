@@ -1489,11 +1489,13 @@ bool CFileCollectionComp::LoadRevisionsContents(const QByteArray& objectId, Revi
 		QString revisionArchiveContentsPath = info.absolutePath() + "/Revisions/contents.xml";
 
 		if (!QFile::exists(revisionArchiveContentsPath)){
-			SendErrorMessage(0, QString(QObject::tr("Revision contents file '%1' not exists")).arg(revisionArchiveContentsPath));
+			SendVerboseMessage(QString(QObject::tr("Revision contents file '%1' not exists")).arg(revisionArchiveContentsPath));
+
 			return false;
 		}
 
 		ifile::CCompactXmlFileReadArchive archive(revisionArchiveContentsPath, m_versionInfoCompPtr.GetPtr());
+
 		return revisionsContents.Serialize(archive);
 	}
 
