@@ -29,7 +29,7 @@ CEventHistoryControllerComp::CEventHistoryControllerComp()
 	qRegisterMetaType<MessagePtr>("MessagePtr");
 	qRegisterMetaType<EventContainerPtr>("EventContainerPtr");
 
-	m_containerCheckTimer.callOnTimeout(this, &CEventHistoryControllerComp::OnContainerCheckTimer);
+	connect(&m_containerCheckTimer, &QTimer::timeout, this, &CEventHistoryControllerComp::OnContainerCheckTimer);
 }
 
 

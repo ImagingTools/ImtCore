@@ -3,7 +3,7 @@
 
 
 // Qt includes
-#include <QtMath>
+#include <QtCore/QtMath>
 
 
 namespace imt3dview
@@ -80,14 +80,12 @@ void CTrackballCameraComp::RotateTo(const QPoint& pointFrom, const QPoint& point
 			rotationAngle = (pointTo - pointFrom).x() * s_rotationSpeed;
 		}
 	}
-	else
-	{
+	else{
 		// no rotation axis specified, do free rotation
 		QVector3D point3dFrom = GetTrackballVector(pointFrom);
 		QVector3D point3dTo = GetTrackballVector(pointTo);
 
-		if ((point3dFrom - point3dTo).length() > FLT_MIN)
-		{
+		if ((point3dFrom - point3dTo).length() > FLT_MIN){
 			rotationAxis = QVector3D::crossProduct(point3dFrom, point3dTo);
 			rotationAngle = qRadiansToDegrees(std::asin(rotationAxis.length())) * s_rotationSpeed;
 
@@ -134,10 +132,12 @@ QVector3D CTrackballCameraComp::GetTrackballVector(const QPoint& point2d) const
 
 	float sqrZ = 1.0f - QVector3D::dotProduct(point3d, point3d);
 
-	if (sqrZ > 0.0f)
+	if (sqrZ > 0.0f){
 		point3d.setZ(std::sqrt(sqrZ));
-	else
+	}
+	else{
 		point3d.normalize();
+	}
 
 	return point3d;
 }

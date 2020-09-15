@@ -45,7 +45,7 @@ CEventViewComp::CEventViewComp()
 	connect(&m_moveToPreviousCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToPreviousCommand);
 	connect(&m_moveToNextCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToNextCommand);
 	connect(&m_moveToLastCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToLastCommand);
-	m_messageProcessingTimer.callOnTimeout(this, &CEventViewComp::OnMessageProcessingTimer);
+	connect(&m_messageProcessingTimer, &QTimer::timeout, this, &CEventViewComp::OnMessageProcessingTimer);
 }
 
 
