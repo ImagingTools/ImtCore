@@ -53,13 +53,6 @@ I_EXPORT_COMPONENT(
 			"Single layer group",
 			"Event Group Single Layer");
 
-
-I_EXPORT_COMPONENT(
-			GraphicsView,
-			"Graphics view",
-			"Graphics View");
-
-
 I_EXPORT_COMPONENT(
 			EventStatisticsView,
 			"Events statistics view",

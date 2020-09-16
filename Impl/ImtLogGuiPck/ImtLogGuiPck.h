@@ -12,7 +12,6 @@
 #include <imtloggui/CGeneralEventFactoryComp.h>
 #include <imtloggui/CEventGroupControllerComp.h>
 #include <imtloggui/CSingleLayerGroupComp.h>
-#include <imtloggui/CGraphicsViewComp.h>
 #include <imtloggui/CEventStatisticsViewComp.h>
 #include <imtloggui/CEventItemMetaInfoViewComp.h>
 
@@ -30,7 +29,6 @@ typedef imtloggui::CIconBasedEventFactoryComp IconBasedEventFactory;
 typedef imtloggui::CGeneralEventFactoryComp GeneralEventFactory;
 typedef imtloggui::CEventGroupControllerComp EventGroupController;
 typedef imtloggui::CSingleLayerGroupComp SingleLayerGroup;
-typedef imtloggui::CGraphicsViewComp GraphicsView;
 typedef imtloggui::CEventStatisticsViewComp EventStatisticsView;
 typedef imtloggui::CEventItemMetaInfoViewComp EventItemMetaInfoView;
 
