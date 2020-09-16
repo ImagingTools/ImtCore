@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtlog/IMessageGroupInfoProvider.h>
+#include <imtlog/CLoginEvent.h>
 
 
 namespace imtlog
@@ -35,11 +35,23 @@ void CLoginEventControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& cha
 	}
 
 	if (changeSet.ContainsExplicit(iauth::ILogin::CF_LOGIN)){
-		SendInfoMessage(imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN, loginPtr->GetLoggedUser()->GetUserName());
+		CLoginEvent::LoginEventInfo info;
+		info.action = CLoginEvent::ACT_LOGIN;
+		info.userName = loginPtr->GetLoggedUser()->GetUserName();
+
+		CLoginEvent* event = new CLoginEvent(info, istd::IInformationProvider::IC_INFO);
+
+		SendUserMessage(event);
 	}
 
 	if (changeSet.ContainsExplicit(iauth::ILogin::CF_LOGOUT)){
-		SendInfoMessage(imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT, m_lastUserName);
+		CLoginEvent::LoginEventInfo info;
+		info.action = CLoginEvent::ACT_LOGOUT;
+		info.userName = m_lastUserName;
+
+		CLoginEvent* event = new CLoginEvent(info, istd::IInformationProvider::IC_INFO);
+
+		SendUserMessage(event);
 	}
 }
 

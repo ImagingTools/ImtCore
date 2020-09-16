@@ -20,11 +20,6 @@ I_EXPORT_COMPONENT(
 			"Login Event Controller");
 
 I_EXPORT_COMPONENT(
-			MessageGroupInfoProvider,
-			"Information provider for messages",
-			"Message Information Provider");
-
-I_EXPORT_COMPONENT(
 			EventHistoryController,
 			"History for events",
 			"Event Log History Controller");

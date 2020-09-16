@@ -5,6 +5,7 @@
 #include <imod/TModelWrap.h>
 
 // ImtCore includes
+#include <imtlog/CLoginEvent.h>
 #include <imtloggui/CLoginEventItem.h>
 
 
@@ -38,40 +39,17 @@ IEventItem* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsumer:
 		iconSize = *m_iconSizeAttrPtr;
 	}
 
-	CLoginEventItem* eventPtr = new imod::TModelWrap<CLoginEventItem>();
-	eventPtr->SetParams(message);
-	eventPtr->SetIcons(loginIcon, logoutIcon);
-	eventPtr->SetIconSize(QSize(iconSize, iconSize));
+	const imtlog::CLoginEvent* eventPtr = dynamic_cast<const imtlog::CLoginEvent*>(message.GetPtr());
+	Q_ASSERT(eventPtr != nullptr);
 
-	SetItemMetaInfo(eventPtr);
+	CLoginEventItem* itemPtr = new imod::TModelWrap<CLoginEventItem>();
+	itemPtr->SetParams(
+		loginIcon,
+		logoutIcon,
+		QSize(iconSize, iconSize),
+		message);
 
-	return eventPtr;
-}
-
-
-// protected methods
-
-void CLoginEventFactoryComp::SetItemMetaInfo(IEventItem* eventItem) const
-{
-	Q_ASSERT(eventItem != nullptr);
-
-	BaseClass::SetItemMetaInfo(eventItem);
-
-	eventItem->SetMetaInfo(CLoginEventItem::MIT_MESSAGE, QObject::tr("Message"));
-
-	const istd::IInformationProvider* informationProviderPtr = eventItem->GetInformationProvider();
-	Q_ASSERT(informationProviderPtr != nullptr);
-
-	switch (informationProviderPtr->GetInformationId()){
-	case imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN:
-		eventItem->SetMetaInfo(CLoginEventItem::MIT_ACTION, QObject::tr("Login"));
-		break;
-	case imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT:
-		eventItem->SetMetaInfo(CLoginEventItem::MIT_ACTION, QObject::tr("Logout"));
-		break;
-	}
-
-	eventItem->SetMetaInfo(CLoginEventItem::MIT_USER_NAME, informationProviderPtr->GetInformationDescription());
+	return itemPtr;
 }
 
 

@@ -26,12 +26,15 @@ public:
 		MIT_STATUS,
 	};
 
-	CEventItemBase();
-
 	void SetParams(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parentPtr = nullptr);
 
 	// reimplemented (imtloggui::IEventItem)
 	virtual const istd::IInformationProvider* GetInformationProvider() const override;
+
+	// reimplemented (idoc::IDocumentMetaInfo)
+	virtual MetaInfoTypes GetMetaInfoTypes(bool allowReadOnly = true) const override;
+	virtual QVariant GetMetaInfo(int metaInfoType) const override;
+	virtual QString GetMetaInfoName(int metaInfoType) const override;
 
 private:
 	ilog::IMessageConsumer::MessagePtr m_messagePtr;

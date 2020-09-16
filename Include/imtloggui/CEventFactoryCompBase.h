@@ -31,8 +31,6 @@ protected:
 	bool IsSupportedMessageId(int messageId) const;
 	IEventItem* CreateInstanceWithSlaveFactory(const ilog::IMessageConsumer::MessagePtr& message) const;
 	
-	virtual void SetItemMetaInfo(IEventItem* eventItem) const;
-
 private:
 	I_MULTIATTR(int, m_messageIdListAttrPtr);
 	I_REF(IEventItemFactory, m_slaveEventFactoryCompPtr);

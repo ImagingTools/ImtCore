@@ -17,8 +17,11 @@ class CIconBasedEventItem: public CEventItemBase
 public:
 	typedef CEventItemBase BaseClass;
 
-	void SetIcon(const QIcon& icon);
-	void SetIconSize(const QSize& size);
+	void SetParams(
+				const QIcon& icon,
+				const QSize& iconSize,
+				const ilog::IMessageConsumer::MessagePtr& message,
+				QGraphicsItem* parentPtr = nullptr);
 
 	// reimplemented (QGraphicsItem)
 	virtual QRectF boundingRect() const override;

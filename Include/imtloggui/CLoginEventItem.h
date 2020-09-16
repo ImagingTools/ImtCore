@@ -6,7 +6,6 @@
 #include <QtGui/QFont>
 
 // ImtCore includes
-#include <imtlog/IMessageGroupInfoProvider.h>
 #include <imtloggui/CEventItemBase.h>
 
 
@@ -25,11 +24,17 @@ public:
 		MIT_USER_NAME
 	};
 
-	CLoginEventItem();
+	void SetParams(
+				const QIcon& iconLogin,
+				const QIcon& iconLogout,
+				const QSize& iconSize,
+				const ilog::IMessageConsumer::MessagePtr& message,
+				QGraphicsItem* parentPtr = nullptr);
 
-	void SetFont(const QFont& font);
-	void SetIcons(const QIcon& iconLogin, const QIcon& iconLogout);
-	void SetIconSize(const QSize& size);
+	// reimplemented (idoc::IDocumentMetaInfo)
+	virtual MetaInfoTypes GetMetaInfoTypes(bool allowReadOnly = true) const override;
+	virtual QVariant GetMetaInfo(int metaInfoType) const override;
+	virtual QString GetMetaInfoName(int metaInfoType) const override;
 
 	// reimplemented (QGraphicsItem)
 	virtual QRectF boundingRect() const override;

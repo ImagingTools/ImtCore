@@ -61,48 +61,6 @@ IEventItem* CEventFactoryCompBase::CreateInstanceWithSlaveFactory(const ilog::IM
 }
 
 
-void CEventFactoryCompBase::SetItemMetaInfo(IEventItem* eventItem) const
-{
-	Q_ASSERT(eventItem != nullptr);
-
-	const istd::IInformationProvider* informationProviderPtr = eventItem->GetInformationProvider();
-	Q_ASSERT(informationProviderPtr != nullptr);
-
-	QString status;
-
-	switch (informationProviderPtr->GetInformationCategory()){
-	case istd::IInformationProvider::IC_NONE:
-		status = QObject::tr("UNKNOWN");
-		break;
-	case istd::IInformationProvider::IC_INFO:
-		status = QObject::tr("OK");
-		break;
-	case istd::IInformationProvider::IC_WARNING:
-		status = QObject::tr("WARNING");
-		break;
-	case istd::IInformationProvider::IC_ERROR:
-		status = QObject::tr("ERROR");
-		break;
-	case istd::IInformationProvider::IC_CRITICAL:
-		status = QObject::tr("CRITICAL");
-		break;
-	}
-
-	QString timestamp;
-	if((*m_timestampFormatCompPtr).isEmpty()){
-		timestamp = informationProviderPtr->GetInformationTimeStamp().toString();
-	}
-	else{
-		timestamp = informationProviderPtr->GetInformationTimeStamp().toString(*m_timestampFormatCompPtr);
-	}
-
-	eventItem->SetMetaInfo(CEventItemBase::MIT_TIMESTAMP, timestamp);
-	eventItem->SetMetaInfo(CEventItemBase::MIT_SOURCE, informationProviderPtr->GetInformationSource());
-	eventItem->SetMetaInfo(CEventItemBase::MIT_MESSAGE, informationProviderPtr->GetInformationDescription());
-	eventItem->SetMetaInfo(CEventItemBase::MIT_STATUS, status);
-}
-
-
 } // namespace imtloggui
 
 

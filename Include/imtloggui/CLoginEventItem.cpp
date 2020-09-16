@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtGui/QPainter>
 
+// ImtCore includes
+#include <imtlog/CLoginEvent.h>
+
 
 namespace imtloggui
 {
@@ -11,29 +14,66 @@ namespace imtloggui
 
 // public methods
 
-CLoginEventItem::CLoginEventItem()
+void CLoginEventItem::SetParams(
+			const QIcon& iconLogin,
+			const QIcon& iconLogout,
+			const QSize& iconSize,
+			const ilog::IMessageConsumer::MessagePtr& message,
+			QGraphicsItem* parentPtr)
 {
-	AddMetaInfo(MIT_ACTION, QObject::tr("Action"), true);
-	AddMetaInfo(MIT_USER_NAME, QObject::tr("User name"), true);
-}
+	BaseClass::SetParams(message, parentPtr);
 
-
-void CLoginEventItem::SetFont(const QFont& font)
-{
-	m_font = font;
-}
-
-
-void CLoginEventItem::SetIcons(const QIcon& iconLogin, const QIcon& iconLogout)
-{
 	m_iconLogin = iconLogin;
 	m_iconLogout = iconLogout;
+	m_iconSize = iconSize;
 }
 
 
-void CLoginEventItem::SetIconSize(const QSize& size)
+// reimplemented (idoc::IDocumentMetaInfo)
+
+idoc::IDocumentMetaInfo::MetaInfoTypes CLoginEventItem::GetMetaInfoTypes(bool allowReadOnly) const
 {
-	m_iconSize = size;
+	idoc::IDocumentMetaInfo::MetaInfoTypes types = BaseClass::GetMetaInfoTypes();
+	if (allowReadOnly){
+		types.insert(MIT_ACTION);
+		types.insert(MIT_USER_NAME);
+	}
+
+	return types;
+}
+
+
+QVariant CLoginEventItem::GetMetaInfo(int metaInfoType) const
+{
+	const imtlog::CLoginEvent* eventPtr = dynamic_cast<const imtlog::CLoginEvent*>(GetInformationProvider());
+	Q_ASSERT(eventPtr != nullptr);
+
+	switch (metaInfoType){
+	case MIT_ACTION:
+		if (eventPtr->GetLoginEventInfo().action == imtlog::CLoginEvent::ACT_LOGIN){
+			return QObject::tr("Login");
+		}
+		else if (eventPtr->GetLoginEventInfo().action == imtlog::CLoginEvent::ACT_LOGOUT){
+			return QObject::tr("Logout");
+		}
+	case MIT_USER_NAME:
+		return eventPtr->GetLoginEventInfo().userName;
+	default:
+		return BaseClass::GetMetaInfo(metaInfoType);
+	}
+}
+
+
+QString CLoginEventItem::GetMetaInfoName(int metaInfoType) const
+{
+	switch (metaInfoType){
+	case MIT_ACTION:
+		return QObject::tr("Action");
+	case MIT_USER_NAME:
+		return QObject::tr("User name");
+	default:
+		return BaseClass::GetMetaInfoName(metaInfoType);
+	}
 }
 
 
@@ -56,22 +96,28 @@ QRectF CLoginEventItem::boundingRect() const
 
 void CLoginEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
+	const imtlog::CLoginEvent* eventPtr = dynamic_cast<const imtlog::CLoginEvent*>(GetInformationProvider());
+	if (eventPtr == nullptr){
+		return;
+	}
+
+	if (painter->font().key() != m_font.key()){
+		m_font = painter->font();
+	}
+
 	QFontMetrics fontMetrics(m_font);
 
-	const istd::IInformationProvider* informationProviderPtr = GetInformationProvider();
-	Q_ASSERT(informationProviderPtr != nullptr);
-
-	QString user = informationProviderPtr->GetInformationDescription();
+	QString user = eventPtr->GetLoginEventInfo().userName;
 	QRectF labelRect = fontMetrics.boundingRect(user);
 	labelRect.setWidth(labelRect.width() + 1);
 	const QRectF bounding = boundingRect();
 
 	QIcon icon;
 
-	if (informationProviderPtr->GetInformationId() == imtlog::IMessageGroupInfoProvider::MI_USER_LOGIN){
+	if (eventPtr->GetLoginEventInfo().action == imtlog::CLoginEvent::ACT_LOGIN){
 		icon = m_iconLogin;
 	}
-	else if (informationProviderPtr->GetInformationId() == imtlog::IMessageGroupInfoProvider::MI_USER_LOGOUT){
+	else if (eventPtr->GetLoginEventInfo().action == imtlog::CLoginEvent::ACT_LOGOUT){
 		icon = m_iconLogout;
 	}
 

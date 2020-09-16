@@ -52,22 +52,10 @@ IEventItem* CIconBasedEventFactoryComp::CreateInstance(const ilog::IMessageConsu
 		iconSize = *m_iconSizeAttrPtr;
 	}
 
-	CIconBasedEventItem* eventPtr = new imod::TModelWrap<CIconBasedEventItem>();
-	eventPtr->SetParams(message);
-	eventPtr->SetIcon(icon);
-	eventPtr->SetIconSize(QSize(iconSize, iconSize));
+	CIconBasedEventItem* itemPtr = new imod::TModelWrap<CIconBasedEventItem>();
+	itemPtr->SetParams(icon, QSize(iconSize, iconSize), message);
 
-	SetItemMetaInfo(eventPtr);
-
-	return eventPtr;
-}
-
-
-// protected methods
-
-void CIconBasedEventFactoryComp::SetItemMetaInfo(IEventItem* eventItem) const
-{
-	BaseClass::SetItemMetaInfo(eventItem);
+	return itemPtr;
 }
 
 

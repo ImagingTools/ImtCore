@@ -22,18 +22,6 @@ CClusterItem::CClusterItem()
 	for (int i = 0; i < 5; i++){
 		m_counters[i] = 0;
 	}
-
-	AddMetaInfo(MIT_NONE_COUNTER, QObject::tr("NONE"), true);
-	AddMetaInfo(MIT_INFO_COUNTER, QObject::tr("INFO"), true);
-	AddMetaInfo(MIT_WARNING_COUNTER, QObject::tr("WARNING"), true);
-	AddMetaInfo(MIT_ERROR_COUNTER, QObject::tr("ERROR"), true);
-	AddMetaInfo(MIT_CRITICAL_COUNTER, QObject::tr("CRITICAL"), true);
-
-	SetMetaInfo(MIT_NONE_COUNTER, QString("0 Events"));
-	SetMetaInfo(MIT_INFO_COUNTER, QString("0 Events"));
-	SetMetaInfo(MIT_WARNING_COUNTER, QString("0 Events"));
-	SetMetaInfo(MIT_ERROR_COUNTER, QString("0 Events"));
-	SetMetaInfo(MIT_CRITICAL_COUNTER, QString("0 Events"));
 }
 
 
@@ -86,6 +74,56 @@ void CClusterItem::DetachAll()
 		itemPtr->setParentItem(parentItem());
 		itemPtr->setPos(parentItem()->mapFromScene(pos));
 		itemPtr->setVisible(false);
+	}
+}
+
+
+// reimplemented (idoc::IDocumentMetaInfo)
+
+idoc::IDocumentMetaInfo::MetaInfoTypes CClusterItem::GetMetaInfoTypes(bool allowReadOnly) const
+{
+	if (allowReadOnly){
+		return {MIT_NONE_COUNTER, MIT_INFO_COUNTER, MIT_WARNING_COUNTER, MIT_ERROR_COUNTER, MIT_CRITICAL_COUNTER};
+	}
+
+	return {};
+}
+
+
+QVariant CClusterItem::GetMetaInfo(int metaInfoType) const
+{
+	switch (metaInfoType){
+	case MIT_NONE_COUNTER:
+		return QString("%1 Events").arg(m_counters[0]);
+	case MIT_INFO_COUNTER:
+		return QString("%1 Events").arg(m_counters[1]);
+	case MIT_WARNING_COUNTER:
+		return QString("%1 Events").arg(m_counters[2]);
+	case MIT_ERROR_COUNTER:
+		return QString("%1 Events").arg(m_counters[3]);
+	case MIT_CRITICAL_COUNTER:
+		return QString("%1 Events").arg(m_counters[4]);
+	default:
+		return QVariant();
+	}
+}
+
+
+QString CClusterItem::GetMetaInfoName(int metaInfoType) const
+{
+	switch (metaInfoType){
+	case MIT_NONE_COUNTER:
+		return QObject::tr("NONE");
+	case MIT_INFO_COUNTER:
+		return QObject::tr("INFO");
+	case MIT_WARNING_COUNTER:
+		return QObject::tr("WARNING");
+	case MIT_ERROR_COUNTER:
+		return QObject::tr("ERROR");
+	case MIT_CRITICAL_COUNTER:
+		return QObject::tr("CRITICAL");
+	default:
+		return QString();
 	}
 }
 

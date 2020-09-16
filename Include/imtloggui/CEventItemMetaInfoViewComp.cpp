@@ -35,7 +35,18 @@ void CEventItemMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /
 				continue;
 			}
 
-			QString value = metaInfoPtr->GetMetaInfo(type).toString();
+			QVariant var = metaInfoPtr->GetMetaInfo(type);
+			QString value;
+			if (var.type() == QVariant::DateTime){
+				value = metaInfoPtr->GetMetaInfo(type).toDateTime().toString("dd.MM.yyyy HH:mm:ss.zzz");
+			}
+			else{
+				value = var.toString();
+			}
+
+			if (value.isEmpty()){
+				continue;
+			}
 
 			QLabel* labelNamePtr = new QLabel(name, GetWidget());
 			labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: #88b8e3");

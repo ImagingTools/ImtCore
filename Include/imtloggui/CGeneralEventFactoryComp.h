@@ -21,9 +21,6 @@ public:
 	// reimplemented (imtloggui::IEventItemFactory)
 	virtual IEventItem* CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const override;
 
-protected:
-	virtual void SetItemMetaInfo(IEventItem* eventItem) const override;
-
 private:
 	I_ATTR(int, m_iconSizeAttrPtr);
 };
