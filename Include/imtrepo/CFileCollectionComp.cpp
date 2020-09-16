@@ -281,11 +281,6 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& /*collec
 					archive.Flush();
 					QString revisionPath = revisionsPath + QString("/%1.zip").arg(newRevision);
 					if (m_compressorCompPtr->CompressFolder(tempPath, revisionPath, false)){
-						imtbase::CObjectCollectionUpdateEvent event(objectId, imtbase::CObjectCollectionUpdateEvent::UT_DATA);
-						for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-							eventHandlerPtr->OnObjectCollectionEvent(this, &event);
-						}
-
 						RevisionsContentsItem revisionsContentsItem;
 						*dynamic_cast<RevisionInfo*>(&revisionsContentsItem) = *dynamic_cast<RevisionInfo*>(&revisionMetaInfo);
 						revisionsContentsItem.path = QDir(revisionsPath).relativeFilePath(revisionPath);
