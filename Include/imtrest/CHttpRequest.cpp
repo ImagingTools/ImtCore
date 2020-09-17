@@ -170,7 +170,7 @@ int CHttpRequest::OnHeaderValue(http_parser* httpParser, const char* at, size_t 
 	QByteArray headerValue = QByteArray(at, int(length));
 	requestPtr->m_headers[requestPtr->m_lastHeader] = headerValue;
 
-	if (requestPtr->m_lastHeader.compare(QByteArrayLiteral("host"), Qt::CaseInsensitive) == 0){
+	if (requestPtr->m_lastHeader == "host"){
 		CHttpRequest::ParseUrl(at, length, true,requestPtr->m_url);
 	}
 

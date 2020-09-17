@@ -44,7 +44,7 @@ extern "C" IMT_PLUGIN_FUNCTION_EXPORT void IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION(
 	IMT_DECLARE_PLUGIN_INTERFACE(PluginType, PluginInterface);\
 	PluginInterface* IMT_CREATE_PLUGIN_INSTANCE_FUNCTION(PluginType)()\
 	{\
-		return new PluginImplementation(#PluginName);\
+		return new PluginImplementation(#PluginName, #PluginType);\
 	}\
 	void IMT_DESTROY_PLUGIN_INSTANCE_FUNCTION(PluginType)(PluginInterface* pluginInstancePtr)\
 	{\

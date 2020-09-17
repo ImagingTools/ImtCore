@@ -16,9 +16,14 @@ class IPluginInfo: virtual public istd::IPolymorphic
 {
 public:
 	/**
-		Get the name of the Plug-In.
+		Get the name of the plug-in.
 	*/
 	virtual QString GetPluginName() const = 0;
+
+	/**
+		Get the type-ID of the plug-in.
+	*/
+	virtual QByteArray GetPluginTypeId() const = 0;
 };
 
 

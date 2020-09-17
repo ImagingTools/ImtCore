@@ -39,6 +39,7 @@ public:
 		I_ASSIGN(m_pluginPathIdAttrPtr, "PluginPathId", "ID of the plugin path parameter in the parameter set", true, "PluginPath");
 		I_ASSIGN(m_defaultPluginPathIdAttrPtr, "DefaultPluginPathId", "ID of the default plug-in path parameter in the settings", true, "DefaultPluginPath");
 		I_ASSIGN(m_pluginExtensionAttrPtr, "PluginFileExtension", "File extension for the plugin DLL", true, "dll");
+		I_ASSIGN(m_pluginTypeIdAttrPtr, "PluginTypeId", "Type-ID of supported plugins", true, "");
 	I_END_COMPONENT;
 
 	TPluginManagerCompBase(const QByteArray& createMethodName, const QByteArray& destroyMethodName);
@@ -100,6 +101,7 @@ private:
 	I_ATTR(QByteArray, m_pluginPathIdAttrPtr);
 	I_ATTR(QByteArray, m_defaultPluginPathIdAttrPtr);
 	I_ATTR(QByteArray, m_pluginExtensionAttrPtr);
+	I_ATTR(QByteArray, m_pluginTypeIdAttrPtr);
 
 	QByteArray m_createMethodName;
 	QByteArray m_destroyMethodName;
@@ -184,16 +186,18 @@ bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 				if (createPluginFunc != NULL){
 					istd::TDelPtr<PluginInterface> pluginInstancePtr = createPluginFunc();
 					if (pluginInstancePtr.IsValid()){
-						PluginInfo pluginInfo;
-						pluginInfo.pluginPath = pluginPath.canonicalFilePath();
-						pluginInfo.pluginPtr = pluginInstancePtr.PopPtr();
-						pluginInfo.destroyFunc = (DestroyFunction)library.resolve(m_destroyMethodName);
+						if (pluginInstancePtr->GetPluginTypeId() == *m_pluginTypeIdAttrPtr){
+							PluginInfo pluginInfo;
+							pluginInfo.pluginPath = pluginPath.canonicalFilePath();
+							pluginInfo.pluginPtr = pluginInstancePtr.PopPtr();
+							pluginInfo.destroyFunc = (DestroyFunction)library.resolve(m_destroyMethodName);
 
-						if (InitializePlugin(pluginInfo.pluginPtr)){
-							m_plugins.push_back(pluginInfo);
-						}
-						else{
-							ilog::CLoggerBase::SendInfoMessage(0, QString("Plug-in initialization failed for: '%1'").arg(pluginPath.canonicalFilePath()));
+							if (InitializePlugin(pluginInfo.pluginPtr)){
+								m_plugins.push_back(pluginInfo);
+							}
+							else{
+								ilog::CLoggerBase::SendInfoMessage(0, QString("Plug-in initialization failed for: '%1'").arg(pluginPath.canonicalFilePath()));
+							}
 						}
 					}
 				}

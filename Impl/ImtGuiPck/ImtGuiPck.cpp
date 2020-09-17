@@ -18,6 +18,11 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
+			GuiComponentFactory,
+			"Factor for a GUI component",
+			"UI GUI Factory");
+
+I_EXPORT_COMPONENT(
 			ThumbnailDecoratorGui,
 			"Thumbnail selection page view component",
 			"Menu Thumbnail Selection Page");
