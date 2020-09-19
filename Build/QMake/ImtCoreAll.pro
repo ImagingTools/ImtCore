@@ -47,6 +47,9 @@ imtfile.file = ../../Include/imtfile/QMake/imtfile.pro
 SUBDIRS += imtzip
 imtzip.file = ../../Include/imtzip/QMake/imtzip.pro
 
+SUBDIRS += imtpy
+imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
+
 # Component packages
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
@@ -102,6 +105,10 @@ Imt3dGuiPck.depends = imt3dview imt3dgui
 SUBDIRS += ImtZipPck
 ImtZipPck.file = ../../Impl/ImtZipPck/QMake/ImtZipPck.pro
 ImtZipPck.depends = imtzip
+
+SUBDIRS += ImtPyPck
+ImtPyPck.file = ../../Impl/ImtPyPck/QMake/ImtPyPck.pro
+ImtPyPck.depends = imtpy
 
 # Application
 !linux{
