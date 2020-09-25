@@ -5,6 +5,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
+#include <imtbase/CCollectionInfo.h>
 #include <imtloggui/IEventItemFactory.h>
 #include <imtloggui/IEventItemController.h>
 #include <imtloggui/IClusterItem.h>
@@ -33,12 +34,8 @@ public:
 
 	CSingleLayerGroupComp();
 
-	// reimplemented (imtloggui::IEventGroupController)
-	virtual void SetScene(QGraphicsScene* scenePtr) override;
+	// reimplemented (imtloggui::IEventItemController)
 	virtual void SetTimeAxis(const IEventScenePositionProvider* timeAxisPtr) override;
-	virtual bool CreateGraphicsItem() override;
-	virtual bool DestroyGraphicsItem() override;
-	virtual QGraphicsItem* GetGraphicsItem() override;
 
 	virtual QByteArray GetGroupId() const override;
 	virtual int GetGroupHeight() const override;
@@ -48,24 +45,11 @@ public:
 	virtual QVector<int> GetSupportedMessageIds() const override;
 	virtual const EventMap* GetEvents() const override;
 	virtual int GetEventCount(istd::IInformationProvider::InformationCategory category) override;
-	virtual IEventItem* AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) override;
+	virtual bool AddEvent(const ilog::IMessageConsumer::MessagePtr& messagePtr) override;
 	virtual void ClearEvents() override;
-
-	virtual void SetVisible(bool isVisible) const override;
-
-	virtual void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) override;
-	virtual void OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime) override;
-	virtual void OnViewPortChanged() override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
-
-private:
-	double GetCurrentScaleX() const;
-	double GetCurrentScaleY() const;
-	void ArrangeEvents();
-	void CreateClusters();
-	void UpdateClusters();
 
 private:
 	I_ATTR(QByteArray, m_groupIdAttrPtr);
@@ -75,24 +59,19 @@ private:
 	I_ATTR(QByteArray, m_groupColorAttrPtr);
 	I_REF(IEventItemFactory, m_eventItemFactoryCompPtr);
 
-	QGraphicsScene* m_scenePtr;
 	const IEventScenePositionProvider* m_timeAxisPtr;
 
-	CEventGroupItem* m_graphicsItemPtr;
-	CGraphicsItemGroup* m_itemGroupPtr;
 	QString m_groupName;
 
 	EventMap m_events;
 	QMap<istd::IInformationProvider::InformationCategory, int> m_eventCount;
 
-	QList<IItemBase*> m_visibleItems;
-	QList<IItemBase*> m_visibleClusters;
 	QTransform m_lastTransform;
 	QDateTime m_beginTime;
 	QDateTime m_endTime;
 
 
-	
+	imtbase::CCollectionInfo m_representationsInfo;
 };
 
 

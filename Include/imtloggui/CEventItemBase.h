@@ -30,6 +30,7 @@ public:
 
 	// reimplemented (imtloggui::IEventItem)
 	virtual const istd::IInformationProvider* GetInformationProvider() const override;
+	virtual const ilog::IMessageConsumer::MessagePtr GetMessage() const override;
 
 	// reimplemented (idoc::IDocumentMetaInfo)
 	virtual MetaInfoTypes GetMetaInfoTypes(bool allowReadOnly = true) const override;

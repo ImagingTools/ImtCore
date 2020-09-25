@@ -22,6 +22,7 @@ public:
 		Get pointer to source message
 	*/
 	virtual const istd::IInformationProvider* GetInformationProvider() const = 0;
+	virtual const ilog::IMessageConsumer::MessagePtr GetMessage() const = 0;
 };
 
 

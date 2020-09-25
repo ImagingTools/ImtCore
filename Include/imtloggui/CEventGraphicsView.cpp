@@ -5,6 +5,10 @@
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QScrollBar>
 
+// ACF includes
+#include <istd/CChangeNotifier.h>
+
+
 namespace imtloggui
 {
 
@@ -19,7 +23,15 @@ CEventGraphicsView::CEventGraphicsView(QWidget* parent)
 }
 
 
-QRectF CEventGraphicsView::GetSceneVisibleRect() const
+// reimplemented (imtloggui::IViewPropertyProvider)
+
+QRectF CEventGraphicsView::GetSceneRect() const
+{
+	return m_sceneRect;
+}
+
+
+QRectF CEventGraphicsView::GetViewRect() const
 {
 	return m_viewRect;
 }
@@ -27,73 +39,113 @@ QRectF CEventGraphicsView::GetSceneVisibleRect() const
 
 double CEventGraphicsView::GetScaleX() const
 {
+	QRect rect = viewport()->rect();
+
 	return viewport()->rect().width() / m_viewRect.width();
 }
 
 
 double CEventGraphicsView::GetScaleY() const
 {
+	QRect rect = viewport()->rect();
+
 	return viewport()->rect().height() / m_viewRect.height();
 }
 
 
-QRectF CEventGraphicsView::GetSceneRect()
-{
-	return m_sceneRect;
-}
-
-
-void CEventGraphicsView::SetSceneRect(const QRectF& rect)
-{
-	m_sceneRect = rect;
-
-	ValidateViewRect();
-	UpdateViewRect();
-}
-
-
-QRectF CEventGraphicsView::GetViewRect()
-{
-	return m_viewRect;
-}
-
-
-void CEventGraphicsView::SetViewRect(const QRectF& rect)
-{
-	m_viewRect = rect;
-
-	ValidateViewRect();
-	UpdateViewRect();
-
-	Q_EMIT EmitViewPortChanged(false);
-}
-
-
-const QMargins& CEventGraphicsView::GetMargins()
+QMargins CEventGraphicsView::GetMargins() const
 {
 	return m_margins;
 }
 
 
-void CEventGraphicsView::SetMargins(const QMargins& margins)
+istd::CRange CEventGraphicsView::GetScaleRangeX() const
 {
-	m_margins = margins;
+	return m_scaleRangeX;
+}
+
+
+istd::CRange CEventGraphicsView::GetScaleRangeY() const
+{
+	return m_scaleRangeY;
+}
+
+// reimplemented (imtloggui::IViewPropertyManager)
+
+bool CEventGraphicsView::SetSceneRect(const QRectF& rect)
+{
+	if (rect != m_sceneRect){
+		istd::CChangeNotifier notifier(this);
+
+		m_sceneRect = rect;
+
+		ValidateViewRect();
+		UpdateViewRect();
+
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CEventGraphicsView::SetViewRect(const QRectF& rect)
+{
+	if (rect != m_viewRect){
+		istd::CChangeNotifier notifier(this);
+
+		m_viewRect = rect;
+
+		ValidateViewRect();
+		UpdateViewRect();
+
+		Q_EMIT EmitViewPortChanged(false);
+	}
+
+	return false;
+}
+
+
+bool CEventGraphicsView::SetMargins(const QMargins& margins)
+{
+	if (margins != m_margins){
+		istd::CChangeNotifier notifier(this);
+
+		m_margins = margins;
+
+		ValidateViewRect();
+		UpdateViewRect();
+
+		return true;
+	}
+
+	return false;	
+}
+
+
+bool CEventGraphicsView::SetScaleRangeX(const istd::CRange& range)
+{
+	m_scaleRangeX = range;
 
 	ValidateViewRect();
 	UpdateViewRect();
+
+	return true;
+}
+
+
+bool CEventGraphicsView::SetScaleRangeY(const istd::CRange& range)
+{
+	m_scaleRangeX = range;
+
+	ValidateViewRect();
+	UpdateViewRect();
+
+	return true;
 }
 
 
 // public slots
-
-void CEventGraphicsView::OnMinimumVerticalScaleChanged(double minScale)
-{
-	m_minimumVerticalScale = minScale;
-
-	ValidateViewRect();
-	UpdateViewRect();
-}
-
 
 void CEventGraphicsView::OnShowAll()
 {
@@ -119,6 +171,8 @@ void CEventGraphicsView::OnShowAll()
 
 void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 {
+	istd::CChangeNotifier notifier(this);
+
 	double scaleX = GetScaleX();
 	double scaleY = GetScaleY();
 
@@ -155,6 +209,8 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 
 void CEventGraphicsView::resizeEvent(QResizeEvent* event)
 {
+	istd::CChangeNotifier notifier(this);
+
 	BaseClass::resizeEvent(event);
 
 	ValidateViewRect();
@@ -166,6 +222,8 @@ void CEventGraphicsView::resizeEvent(QResizeEvent* event)
 
 void CEventGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
+	istd::CChangeNotifier notifier(this);
+
 	BaseClass::mouseMoveEvent(event);
 
 	if (event->buttons() & Qt::LeftButton){

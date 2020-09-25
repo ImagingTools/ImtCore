@@ -32,6 +32,13 @@ const istd::IInformationProvider* CEventItemBase::GetInformationProvider() const
 }
 
 
+const ilog::IMessageConsumer::MessagePtr CEventItemBase::GetMessage() const
+{
+	return m_messagePtr;
+}
+
+
+
 // reimplemented (idoc::IDocumentMetaInfo)
 
 idoc::IDocumentMetaInfo::MetaInfoTypes CEventItemBase::GetMetaInfoTypes(bool allowReadOnly) const

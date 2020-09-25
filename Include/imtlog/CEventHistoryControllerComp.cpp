@@ -33,6 +33,66 @@ CEventHistoryControllerComp::CEventHistoryControllerComp()
 }
 
 
+// reimplemented (imtlog::IEventTimeRangeFilter)
+
+IEventTimeRangeFilter::TimeRange CEventHistoryControllerComp::GetEventTimeRangeFilter() const
+{
+	return m_filterTimeRange;
+}
+
+
+bool CEventHistoryControllerComp::SetEventTimeRangeFilter(const IEventTimeRangeFilter::TimeRange& timeRange)
+{
+	if (timeRange.beginTime <= timeRange.endTime){
+		m_filterTimeRange = timeRange;
+		return true;
+	}
+
+	return false;
+}
+
+
+void CEventHistoryControllerComp::ClearEventTimeRangeFilter()
+{
+	m_filterTimeRange.beginTime = QDateTime();
+	m_filterTimeRange.endTime = QDateTime();
+}
+
+
+// reimplemented (ilog::IMessageContainer)
+
+int CEventHistoryControllerComp::GetWorstCategory() const
+{
+	return -1;
+}
+
+
+ilog::IMessageContainer::Messages CEventHistoryControllerComp::GetMessages() const
+{
+	return ilog::IMessageContainer::Messages();
+}
+
+
+void CEventHistoryControllerComp::ClearMessages()
+{
+	return;
+}
+
+
+// reimplemented (iser::ISerializable)
+
+bool CEventHistoryControllerComp::Serialize(iser::IArchive& archive)
+{
+	return false;
+}
+
+
+quint32 CEventHistoryControllerComp::GetMinimalVersion(int versionId) const
+{
+	return 0;
+}
+
+
 // reimplemented (ilog::IMessageConsumer)
 
 bool CEventHistoryControllerComp::IsMessageSupported(

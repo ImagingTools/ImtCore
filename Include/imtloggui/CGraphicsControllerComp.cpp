@@ -1,0 +1,178 @@
+#include <imtloggui/CGraphicsControllerComp.h>
+
+
+// Qt includes
+#include <QtGui/QPen>
+
+
+namespace imtloggui
+{
+
+
+// public methods
+
+CGraphicsControllerComp::CGraphicsControllerComp()
+{
+	m_viewPropertyObserver.SetParent(this);
+}
+
+// reimplemented (imtloggui::IGraphicsItemProvider)
+
+IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetGraphicsItems() const
+{
+	GraphicsItemList items;
+
+	if (!m_groupProviderCompPtr.IsValid()){
+	}
+
+	return items;
+
+
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CGraphicsControllerComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	m_timeAxis.setPos(0, 0);
+	m_timeAxis.SetColor(Qt::green);
+	m_timeAxis.setRect(0, 0, 100, 40);
+	m_timeAxis.setZValue(101);
+	m_timeAxis.EnsureTimeRange(QDateTime::currentDateTime());
+	m_staticItemsProvider.AddItem(&m_timeAxis);
+
+	int sceneHeight = 0;
+
+	if (m_groupProviderCompPtr.IsValid()){
+		imtbase::ICollectionInfo::Ids ids = m_groupProviderCompPtr->GetElementIds();
+
+		for (int i = 0; i < ids.count(); i++){
+			QColor color(Qt::gray);
+			if (i % 2){
+				color = QColor(Qt::lightGray);
+			}
+			color.setAlpha(170);
+
+			QGraphicsRectItem* rectPtr = new QGraphicsRectItem();
+			rectPtr->setRect(0, 0, 100, 300);
+			rectPtr->setBrush(QBrush(color));
+			rectPtr->setPen(QPen(Qt::transparent));
+			rectPtr->setPos(0, -300 - i * 300);
+			m_staticItemsProvider.AddItem(rectPtr);
+
+			CEventGroupLabelItem* labelPtr = new CEventGroupLabelItem();
+			QString name = m_groupProviderCompPtr->GetElementInfo(ids[i], imtbase::ICollectionInfo::EIT_NAME).toString();
+			labelPtr->SetBackgroundColor(color);
+			labelPtr->SetGroupName(name);
+			labelPtr->SetHeight(300);
+			sceneHeight += 300;
+			labelPtr->setPos(0, -150 - i * 300);
+			m_staticItemsProvider.AddItem(labelPtr);
+
+			GroupItem groupItem;
+			groupItem.backgroundPtr = rectPtr;
+			groupItem.labelPtr = labelPtr;
+			m_groupItemList.append(groupItem);
+		}
+	}
+
+	if (m_viewPropertyModelCompPtr.IsValid()){
+		m_viewPropertyModelCompPtr->AttachObserver(&m_viewPropertyObserver);
+	}
+
+	if (m_viewPropertyManagerCompPtr.IsValid()){
+		m_viewPropertyManagerCompPtr->SetSceneRect(QRectF(0, -sceneHeight, 3600, sceneHeight));
+		m_viewPropertyManagerCompPtr->SetViewRect(QRectF(0, -sceneHeight, 3600, sceneHeight));
+		m_viewPropertyManagerCompPtr->SetMargins(QMargins(70, 0, 70, 40));
+		m_viewPropertyManagerCompPtr->SetScaleRangeX(istd::CRange(0, 1000));
+		m_viewPropertyManagerCompPtr->SetScaleRangeY(istd::CRange(0, 1000));
+	}
+}
+
+
+// private methods
+
+void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& changeSet)
+{
+	QRectF viewRect = propertyPtr->GetViewRect();
+	m_timeAxis.setPos(0, viewRect.bottom() - m_timeAxis.rect().height() / propertyPtr->GetScaleY());
+
+	for (int i = 0; i < m_groupItemList.count(); i++){
+		QRectF rect = m_groupItemList[i].backgroundPtr->rect();
+		rect.setWidth(viewRect.width());
+		m_groupItemList[i].backgroundPtr->setRect(rect);
+		m_groupItemList[i].backgroundPtr->setPos(viewRect.x(), m_groupItemList[i].backgroundPtr->pos().y());
+		m_groupItemList[i].labelPtr->setPos(viewRect.x(), m_groupItemList[i].labelPtr->pos().y());
+	}
+}
+
+
+// public methods of the embedded class ViewPropertyObserver
+
+CGraphicsControllerComp::ViewPropertyObserver::ViewPropertyObserver()
+	:m_parent(nullptr)
+{
+}
+
+void CGraphicsControllerComp::ViewPropertyObserver::SetParent(CGraphicsControllerComp* parent)
+{
+	m_parent = parent;
+}
+
+
+// protected methods of the embedded class ViewPropertyObserver
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CGraphicsControllerComp::ViewPropertyObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+{
+	m_parent->OnViewPropertyUpdate(GetObservedObject(), changeSet);
+}
+
+
+// public methods of the embedded class StaticItemsProvider
+
+bool CGraphicsControllerComp::StaticItemsProvider::AddItem(QGraphicsItem* itemPtr)
+{
+	if (!m_items.contains(itemPtr)){
+		istd::CChangeNotifier notifier(this);
+
+		m_items.append(itemPtr);
+
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CGraphicsControllerComp::StaticItemsProvider::RemoveItem(QGraphicsItem* itemPtr)
+{
+	if (m_items.contains(itemPtr)){
+		istd::CChangeNotifier notifier(this);
+
+		m_items.removeOne(itemPtr);
+
+		return true;
+	}
+
+	return false;
+}
+
+
+// protected methods of the embedded class StaticItemsProvider
+
+// reimplemented (imtloggui::IGraphicsItemProvider)
+
+IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::StaticItemsProvider::GetGraphicsItems() const
+{
+	return m_items;
+}
+
+
+} // namespace imtloggui
+
+

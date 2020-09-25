@@ -17,6 +17,7 @@
 
 // ImtCore includes
 #include <imtfile/IFileCompression.h>
+#include <imtlog/IEventTimeRangeFilter.h>
 
 
 namespace imtlog
@@ -27,7 +28,10 @@ class CEventHistoryControllerComp:
 			public QObject,
 			public ibase::TRuntimeStatusHanderCompWrap<
 						ilog::TMessageDelegatorComp<ilog::CLoggerComponentBase>>,
-			virtual public ilog::IMessageConsumer
+			virtual public ilog::IMessageConsumer,
+			virtual public ilog::IMessageContainer,
+			virtual public imtlog::IEventTimeRangeFilter
+
 {
 	Q_OBJECT
 public:
@@ -48,6 +52,20 @@ public:
 	I_END_COMPONENT;
 
 	CEventHistoryControllerComp();
+
+	// reimplemented (imtlog::IEventTimeRangeFilter)
+	virtual TimeRange GetEventTimeRangeFilter() const override;
+	virtual bool SetEventTimeRangeFilter(const TimeRange& timeRange) override;
+	virtual void ClearEventTimeRangeFilter() override;
+
+	// reimplemented (ilog::IMessageContainer)
+	virtual int GetWorstCategory() const override;
+	virtual Messages GetMessages() const override;
+	virtual void ClearMessages() override;
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
+	virtual quint32 GetMinimalVersion(int versionId) const override;
 
 	// reimplemented (ilog::IMessageConsumer)
 	virtual bool IsMessageSupported(
@@ -89,13 +107,6 @@ private:
 		TS_PENDING
 	};
 
-
-	struct TimeRange
-	{
-		QDateTime beginTime;
-		QDateTime endTime;
-	};
-
 	class EventContainer:
 				virtual public ilog::IMessageContainer,
 				virtual public ilog::IMessageConsumer
@@ -131,6 +142,7 @@ private:
 		QDateTime m_beginTime;
 		QDateTime m_endTime;
 	};
+
 	typedef QSharedPointer<EventContainer> EventContainerPtr;
 	typedef QQueue<EventContainerPtr> EventContainerQueue;
 
@@ -171,7 +183,6 @@ private:
 	TimeRange CalculateContainerTimeRange(const QDateTime& lastContainerEndTime);
 	void PrepareWorkingContainers();
 	bool SerializeContainer(EventContainerPtr containerPtr, iser::IArchive& archive);
-	
 
 	void StartReader();
 	Q_INVOKABLE void OnReaderFinished();
@@ -195,6 +206,8 @@ private:
 	EventContainerQueue m_writingQueue;
 	QMutex m_workingQueueMutex;
 	QMutex m_writingQueueMutex;
+
+	TimeRange m_filterTimeRange;
 
 	I_REF(ifile::IFileNameParam, m_logFolderCompPtr);
 	I_REF(imtfile::IFileCompression, m_compressorCompPtr);

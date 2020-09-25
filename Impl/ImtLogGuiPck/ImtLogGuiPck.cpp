@@ -63,6 +63,36 @@ I_EXPORT_COMPONENT(
 			"Viewer for event items metainfo",
 			"Event View Metainfo Items");
 
+I_EXPORT_COMPONENT(
+			GraphicsController,
+			"Graphics item controller for EventView",
+			"Event View Graphics Item Controller");
+
+I_EXPORT_COMPONENT(
+			RepresentationItemsFactory,
+			"Factory for representation items",
+			"Representation Items Factory");
+
+I_EXPORT_COMPONENT(
+			GroupProvider,
+			"Events group provider",
+			"Events Group Provider");
+
+I_EXPORT_COMPONENT(
+			Group,
+			"Events group",
+			"Events Group Layer Provider");
+
+I_EXPORT_COMPONENT(
+			Layer,
+			"Group layer",
+			"Events Group Layer Representation Provider");
+
+I_EXPORT_COMPONENT(
+			Representation,
+			"Events representation",
+			"Events Representation");
+
 
 } // namespace ImtLogGuiPck
 

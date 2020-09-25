@@ -21,6 +21,7 @@
 
 // ImtCore includes
 #include <imtloggui/IEventGroupController.h>
+#include <imtloggui/IGraphicsItemProvider.h>
 #include <imtloggui/CEventGraphicsView.h>
 #include <imtloggui/CTimeAxis.h>
 
@@ -50,10 +51,16 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
+		I_REGISTER_SUBELEMENT(GraphicsView);
+		I_REGISTER_SUBELEMENT_INTERFACE(GraphicsView, IViewPropertyProvider, ExtractGraphicsView);
+		I_REGISTER_SUBELEMENT_INTERFACE(GraphicsView, imod::IModel, ExtractGraphicsView);
+		I_REGISTER_SUBELEMENT_INTERFACE(GraphicsView, IViewPropertyManager, ExtractGraphicsView);
 		I_ASSIGN(m_groupControllerCompPtr, "EventGroupController", "Event group controller", true, "EventGroupController")
 		I_ASSIGN(m_statisticsViewCompPtr, "EventStatisticsView", "Event statistics for groups", true, "EventStatisticsView");
 		I_ASSIGN(m_metainfoViewCompPtr, "EventItemMetaInfoView", "Event metainfo viewer", true, "EventItemMetaInfoView");
-		I_ASSIGN(m_scaleConstraintsCompPtr, "VerticalScaleConstraints", "Vertical scale constraints", true, "");
+		I_ASSIGN(m_itemProviderCompPtr, "ItemProvider", "Graphics item provider", true, "ItemProvider");
+		I_ASSIGN(m_staticItemProviderCompPtr, "StaticItemProvider", "Static item provider", true, "StaticItemProvider");
+		I_ASSIGN_TO(m_staticItemProviderModelCompPtr, m_staticItemProviderCompPtr, true);
 	I_END_COMPONENT;
 
 	CEventViewComp();
@@ -82,7 +89,6 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void OnViewPortChanged(bool userAction);
-	void OnAxisPosChanged(const QPointF& oldPos, const QPointF& newPos);
 	void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime);
 	void OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime);
 	void OnMoveToFirstCommand();
@@ -90,29 +96,44 @@ private Q_SLOTS:
 	void OnMoveToNextCommand();
 	void OnMoveToLastCommand();
 	void OnSelectionChanged();
-	void OnUpdateSceneRect();
 	void OnMessageProcessingTimer();
 
 private:
 	QRectF GetSceneVisibleRect() const;
 	double GetCurrentScaleX() const;
-	void UpdateVerticalRangeScale(const istd::CRange& range) const;
 	void UpdateCommands();
 	void MoveToTime(const QDateTime& time);
 	bool UpdateMetaInfoPanel(const IEventItem* eventItem);
 
 private:
-	class ScaleConstraintsObserver: public imod::TSingleModelObserverBase<imeas::INumericConstraints>
+	class ItemsObserver: public imod::TSingleModelObserverBase<IGraphicsItemProvider>
 	{
 	public:
-		ScaleConstraintsObserver(CEventViewComp& parent);
+		ItemsObserver();
+
+		void SetParent(CEventViewComp* parent);
 
 	protected:
 		// reimplemented (imod::CSingleModelObserverBase)
 		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	private:
-		CEventViewComp& m_parent;
+		CEventViewComp* m_parent;
+	};
+
+	class StaticItemsObserver: public imod::TSingleModelObserverBase<IGraphicsItemProvider>
+	{
+	public:
+		StaticItemsObserver();
+
+		void SetParent(CEventViewComp* parent);
+
+	protected:
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+
+	private:
+		CEventViewComp* m_parent;
 	};
 
 	class Commands: virtual public ibase::ICommandsProvider
@@ -136,11 +157,22 @@ private:
 		return &component.m_commands;
 	}
 
+	template <typename InterfaceType>
+	static InterfaceType* ExtractGraphicsView(CEventViewComp& component)
+	{
+		return &component.m_view;
+	}
+
 private:
 	I_REF(IEventGroupController, m_groupControllerCompPtr);
 	I_REF(iqtgui::IGuiObject, m_statisticsViewCompPtr);
 	I_REF(iqtgui::IGuiObject, m_metainfoViewCompPtr);
 	I_REF(imeas::INumericConstraints, m_scaleConstraintsCompPtr);
+	I_REF(imtloggui::IGraphicsItemProvider, m_itemProviderCompPtr);
+	I_REF(imtloggui::IGraphicsItemProvider, m_staticItemProviderCompPtr);
+	I_REF(imod::IModel, m_staticItemProviderModelCompPtr);
+
+	StaticItemsObserver m_staticItemObserver;
 
 	imod::TModelWrap<Commands> m_commands;
 	iqtgui::CHierarchicalCommand m_rootCommands;
@@ -150,10 +182,8 @@ private:
 	iqtgui::CHierarchicalCommand m_moveToLastCommand;
 
 	QGraphicsScene m_scene;
-	CEventGraphicsView* m_viewPtr;
+	imod::TModelWrap<CEventGraphicsView> m_view;
 	CTimeAxis m_timeAxis;
-
-	ScaleConstraintsObserver m_scaleConstraintsObserver;
 
 	QDateTime m_currentCommandTime;
 
