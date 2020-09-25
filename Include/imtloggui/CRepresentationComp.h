@@ -31,7 +31,7 @@ public:
 	virtual QString GetName() const override;
 	virtual QString GetDescription() const override;
 
-	virtual RepresentationObjectPtr GetRepresentation(
+	virtual RepresentationObjectPtr GetRepresentationObject(
 				const ilog::IMessageContainer::Messages& messages,
 				const TimeRange& timeRange) const override;
 

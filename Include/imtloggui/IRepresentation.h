@@ -27,7 +27,7 @@ public:
 	virtual QString GetName() const = 0;
 	virtual QString GetDescription() const = 0;
 
-	virtual RepresentationObjectPtr GetRepresentation(
+	virtual RepresentationObjectPtr GetRepresentationObject(
 				const ilog::IMessageContainer::Messages& messages,
 				const TimeRange& timeRange) const = 0;
 };

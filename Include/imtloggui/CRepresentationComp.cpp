@@ -25,7 +25,7 @@ QString CRepresentationComp::GetDescription() const
 }
 
 
-IRepresentation::RepresentationObjectPtr CRepresentationComp::GetRepresentation(
+IRepresentation::RepresentationObjectPtr CRepresentationComp::GetRepresentationObject(
 			const ilog::IMessageContainer::Messages& messages,
 			const IRepresentation::TimeRange& timeRange) const
 {
