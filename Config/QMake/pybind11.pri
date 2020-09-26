@@ -1,7 +1,7 @@
 INCLUDEPATH += $$PWD/../../../3rdParty/pybind11/include
-INCLUDEPATH += $$(PYTHONDIR)/include
+INCLUDEPATH += $$(PYTHON38DIR)/include
 
-LIBS += $$(PYTHONDIR)/libs/Python37.lib
+LIBS += $$(PYTHON38DIR)/libs/Python38.lib
 
 QMAKE_CXXFLAGS += /bigobj
 

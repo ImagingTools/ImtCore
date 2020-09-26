@@ -1154,7 +1154,7 @@
     <message>
         <location line="-6"/>
         <source>The document name contains some not allowed characters</source>
-        <translation>The product bane contains some not allowed characters</translation>
+        <translation>The product name contains some not allowed characters</translation>
     </message>
     <message>
         <location line="+6"/>
