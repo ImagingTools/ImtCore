@@ -10,7 +10,7 @@
 #include <iattr/IAttributesManager.h>
 
 // ImtCore includes
-#include <imtpy/IScriptManager.h>
+#include <imtpy/IScriptRunner.h>
 
 
 namespace imtpy
@@ -34,12 +34,12 @@ public:
 		Create script object for a given file.
 		The method returns an UUID for the created script instance or an empty ID, if the operation failed.
 	*/
-	virtual QByteArray AddScript(const QString& scriptFilePath, IScriptManager* managerPtr) = 0;
+	virtual QByteArray RegisterScript(const QString& scriptFilePath, IScriptRunner* runnerPtr = nullptr) = 0;
 
 	/**
 		Remove all script-related data from the engine.
 	*/
-	virtual void RemoveScript(const QByteArray& scriptId) = 0;
+	virtual void UnregisterScript(const QByteArray& scriptId) = 0;
 
 	/**
 		Get access to the provider of the meta informations for the script attributes.

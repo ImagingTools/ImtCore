@@ -34,8 +34,8 @@ public:
 	// reimplemented (IScriptEngine)
 	virtual bool InitializeEngine(const iprm::IParamsSet* paramsPtr = nullptr) override;
 	virtual const iprm::IOptionsList& GetScriptInfoList() const override;
-	virtual QByteArray AddScript(const QString& scriptFilePath, IScriptManager* managerPtr) override;
-	virtual void RemoveScript(const QByteArray& scriptId) override;
+	virtual QByteArray RegisterScript(const QString& scriptFilePath, IScriptRunner* runnerPtr = nullptr) override;
+	virtual void UnregisterScript(const QByteArray& scriptId) override;
 	virtual const iattr::IAttributesMetaInfoProvider* GetAttributeMetaInfoManager(const QByteArray& scriptId) const override;
 	virtual iattr::IAttributesProvider* GetAttributeManager(const QByteArray& scriptId) const override;
 	virtual bool SetAttributeValue(const QByteArray& scriptId, const QByteArray& attributeId, const iser::IObject* valuePtr) override;
@@ -74,8 +74,8 @@ private:
 	Scripts m_scripts;
 	iprm::COptionsManager m_scriptInfoList;
 
-	typedef QMap<QByteArray, IScriptManager*> IScriptManagerMap;
-	IScriptManagerMap m_scriptManagerMap;
+	typedef QMap<QByteArray, IScriptRunner*> ScriptManagerMap;
+	ScriptManagerMap m_scriptManagerMap;
 
 	I_ATTR(QByteArray, m_rootFolderParamIdAttrPtr);
 	I_REF(iprm::IParamsSet, m_defaultParamsCompPtr);

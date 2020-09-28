@@ -23,7 +23,7 @@ namespace imtpy
 /**
 	Common interface for the management of the scripts
 */
-class IScriptManager: virtual public istd::IPolymorphic
+class IScriptRunner: virtual public istd::IPolymorphic
 {
 public:
 	/**

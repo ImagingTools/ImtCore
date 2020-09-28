@@ -39,7 +39,7 @@ bool CPythonScriptEngineComp::InitializeEngine(const iprm::IParamsSet* paramsPtr
 		QFileInfoList scriptFiles;
 		if (ifile::CFileListProviderComp::CreateFileList(QDir(rootFolderPath), 0, 1, QStringList() << "*.py", QDir::Name, scriptFiles)){
 			for (int i = 0; i < scriptFiles.count(); ++i){
-				QByteArray scriptId = AddScript(scriptFiles[i].absoluteFilePath(), nullptr);
+				QByteArray scriptId = RegisterScript(scriptFiles[i].absoluteFilePath());
 				if (!scriptId.isEmpty()){
 					m_scriptInfoList.InsertOption(scriptFiles[i].baseName(), scriptId, scriptFiles[i].absoluteFilePath());
 				}
@@ -57,7 +57,7 @@ const iprm::IOptionsList& CPythonScriptEngineComp::GetScriptInfoList() const
 }
 
 
-QByteArray CPythonScriptEngineComp::AddScript(const QString& scriptFilePath, IScriptManager* managerPtr)
+QByteArray CPythonScriptEngineComp::RegisterScript(const QString& scriptFilePath, IScriptRunner* runnerPtr)
 {
 	if (QFileInfo(scriptFilePath).exists()){
 		istd::CChangeNotifier changeNotifier(this);
@@ -67,16 +67,15 @@ QByteArray CPythonScriptEngineComp::AddScript(const QString& scriptFilePath, ISc
 		scriptPtr->moduleName = QFileInfo(scriptFilePath).baseName();
 
 		bool retVal = false;
-		if ((managerPtr != nullptr) && managerPtr->SetupScriptMetaInfo(scriptPtr->filePath, *scriptPtr, scriptPtr->functionName)){
+		
+		if ((runnerPtr != nullptr) && runnerPtr->SetupScriptMetaInfo(scriptPtr->filePath, *scriptPtr, scriptPtr->functionName)){
 			retVal = true;
 		}
 
 		if (retVal){
-			Q_ASSERT(managerPtr != nullptr);
-
-			m_scriptManagerMap[scriptPtr->uuid] = managerPtr;
-
 			AddSearchPath(QFileInfo(scriptFilePath).absolutePath());
+
+			m_scriptManagerMap[scriptPtr->uuid] = runnerPtr;
 
 			m_scripts.push_back(scriptPtr);
 
@@ -88,7 +87,7 @@ QByteArray CPythonScriptEngineComp::AddScript(const QString& scriptFilePath, ISc
 }
 
 
-void CPythonScriptEngineComp::RemoveScript(const QByteArray& scriptId)
+void CPythonScriptEngineComp::UnregisterScript(const QByteArray& scriptId)
 {
 	for (int i = 0; i < m_scripts.count(); ++i){
 		if (m_scripts[i]->uuid == scriptId){
@@ -169,11 +168,11 @@ int CPythonScriptEngineComp::ExecuteScript(
 
 		Q_ASSERT(m_scriptManagerMap.contains(scriptId));
 
-		IScriptManager* managerPtr = m_scriptManagerMap[scriptId];
-		if (managerPtr != nullptr){
+		IScriptRunner* runnerPtr = m_scriptManagerMap[scriptId];
+		if (runnerPtr != nullptr){
 			CPythonOutputRedirector pythonOutputRedirector;
 
-			bool success = managerPtr->RunMethod(*scriptPtr, moduleInstance, scriptPtr->functionName, scriptPtr->filePath);
+			bool success = runnerPtr->RunMethod(*scriptPtr, moduleInstance, scriptPtr->functionName, scriptPtr->filePath);
 
 			QString errorMessageBuffer = QString::fromStdString(pythonOutputRedirector.GetErrorOutput());
 			QStringList errorMessages = errorMessageBuffer.split("\n");
