@@ -3,7 +3,7 @@
 
 // ImtCore Includes
 #include <imtbase/ICollectionInfo.h>
-#include <imtloggui/ILayer.h>
+#include <imtloggui/IRepresentationFactoryProvider.h>
 
 
 namespace imtloggui
@@ -13,7 +13,7 @@ namespace imtloggui
 class ILayerProvider: virtual public imtbase::ICollectionInfo
 {
 public:
-	virtual ILayer* GetLayer(const QByteArray& id) const = 0;
+	virtual IRepresentationFactoryProvider* GetRepresentationFactoryProvider(const QByteArray& id) const = 0;
 };
 
 

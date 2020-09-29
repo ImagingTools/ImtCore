@@ -13,8 +13,9 @@
 namespace imtloggui
 {
 
+// IVisualRepresentationViewFactory
 
-class IRepresentationItemsFactory: virtual public istd::IPolymorphic
+class IRepresentationViewFactory: virtual public istd::IPolymorphic
 {
 public:
 	struct TimeRange

@@ -6,10 +6,12 @@ namespace imtloggui
 
 
 // reimplemented (imtloggui::IGroupProvider)
-IGroup* CGroupProviderComp::GetGroup(const QByteArray& id) const
+
+ILayerProvider* CGroupProviderComp::GetLayerProvider(const QByteArray& id) const
 {
-	if (m_groups.contains(id)){
-		return m_groups[id];
+	int index = GetIndex(id);
+	if (index >= 0){
+		return m_layerProvidersCompPtr[index];
 	}
 
 	return nullptr;
@@ -20,18 +22,30 @@ IGroup* CGroupProviderComp::GetGroup(const QByteArray& id) const
 
 imtbase::ICollectionInfo::Ids CGroupProviderComp::GetElementIds() const
 {
-	return m_groups.keys().toVector();
+	int count = GetCount();
+
+	imtbase::ICollectionInfo::Ids retVal;
+	for (int i = 0; i < count; i++){
+		retVal.append(m_idAttrPtr[i]);
+	}		
+
+	return retVal;
 }
 
 
 QVariant CGroupProviderComp::GetElementInfo(const QByteArray& elementId, int infoType) const
 {
+	int index = GetIndex(elementId);
+
 	QVariant retVal;
 
-	if (m_groups.contains(elementId)){
+	if (index >= 0){
 		switch (infoType){
 		case EIT_NAME:
-			retVal = m_groups[elementId]-> GetName();
+			retVal = m_nameAttrPtr[index];
+			break;
+		case EIT_COLOR:
+			retVal = m_colourAttrPtr[index];
 			break;
 		}
 	}
@@ -40,18 +54,29 @@ QVariant CGroupProviderComp::GetElementInfo(const QByteArray& elementId, int inf
 }
 
 
-// reimplemented (icomp::CComponentBase)
-void CGroupProviderComp::OnComponentCreated()
+// private methods
+
+int CGroupProviderComp::GetCount() const
 {
-	BaseClass::OnComponentCreated();
+	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
+	count = qMin(count, m_colourAttrPtr.GetCount());
+	count = qMin(count, m_layerProvidersCompPtr.GetCount());
 
-	if (m_generalGroupCompPtr.IsValid()){
-		m_groups[m_generalGroupCompPtr->GetId()] = m_generalGroupCompPtr.GetPtr();
+	return count;
+}
+
+
+int CGroupProviderComp::GetIndex(const QByteArray& id) const
+{
+	int count = GetCount();
+
+	for (int i = 0; i < count; i++){
+		if (m_idAttrPtr[i] == id){
+			return i;
+		}
 	}
 
-	for (int i = 0; i < m_groupsCompPtr.GetCount(); i++){
-		m_groups[m_groupsCompPtr[i]->GetId()] = m_groupsCompPtr[i];
-	}
+	return -1;
 }
 
 

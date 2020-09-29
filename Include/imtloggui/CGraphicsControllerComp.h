@@ -8,12 +8,11 @@
 
 // ImtCore includes
 #include <imtloggui/IGraphicsItemProvider.h>
-#include <imtloggui/IGraphicsController.h>
 #include <imtloggui/IViewPropertyProvider.h>
 #include <imtloggui/IViewPropertyManager.h>
 #include <imtloggui/IGroupProvider.h>
 #include <imtloggui/IEventScenePositionProvider.h>
-#include <imtloggui/IRepresentationItemsFactory.h>
+#include <imtloggui/IRepresentationViewFactory.h>
 #include <imtloggui/CTimeAxis.h>
 #include <imtloggui/CEventGroupLabelItem.h>
 
@@ -37,7 +36,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(StaticItemsProvider, IGraphicsItemProvider, ExtractStaticItemsProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(StaticItemsProvider, imod::IModel, ExtractStaticItemsProvider);
 		I_ASSIGN(m_groupProviderCompPtr, "GroupProvider", "Event groups provider", false, "GroupProvider");
-		I_ASSIGN(m_itemsFactoryCompPtr, "RepresentationItemsFactory", "Representation items factory", true, "RepresentationItemsFactory");
+		I_ASSIGN(m_representationViewFactoryCompPtr, "RepresentationViewFactory", "Representation view factory", true, "RepresentationViewFactory");
 		I_ASSIGN(m_viewPropertyProviderCompPtr, "GraphicsViewPropertyProvider", "Graphics view property provider", true, "GraphicsViewPropertyProvider");
 		I_ASSIGN_TO(m_viewPropertyModelCompPtr, m_viewPropertyProviderCompPtr, true);
 		I_ASSIGN_TO(m_viewPropertyManagerCompPtr, m_viewPropertyProviderCompPtr, true);
@@ -109,7 +108,7 @@ private:
 private:
 	I_REF(IGroupProvider, m_groupProviderCompPtr);
 	I_REF(IEventScenePositionProvider, m_positionProviderCompPtr);
-	I_REF(IRepresentationItemsFactory, m_itemsFactoryCompPtr);
+	I_REF(IRepresentationViewFactory, m_representationViewFactoryCompPtr);
 	I_REF(IViewPropertyProvider, m_viewPropertyProviderCompPtr);
 	I_REF(imod::IModel, m_viewPropertyModelCompPtr);
 	I_REF(IViewPropertyManager, m_viewPropertyManagerCompPtr);

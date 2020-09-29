@@ -414,26 +414,26 @@ void CEventViewComp::OnSelectionChanged()
 void CEventViewComp::OnMessageProcessingTimer()
 {
 	if (IsGuiCreated()){
-		if (m_groupControllerCompPtr.IsValid()){
-			QMutexLocker locker(&m_messageListMutex);
-			while (m_messageList.count()){
-				MessagePtr message = m_messageList.takeFirst();
-				locker.unlock();
+		//if (m_groupControllerCompPtr.IsValid()){
+		//	QMutexLocker locker(&m_messageListMutex);
+		//	while (m_messageList.count()){
+		//		MessagePtr message = m_messageList.takeFirst();
+		//		locker.unlock();
 
-				m_timeAxis.EnsureTimeRange(message->GetInformationTimeStamp());
+		//		m_timeAxis.EnsureTimeRange(message->GetInformationTimeStamp());
 
-				IEventItem* eventItemPtr = m_groupControllerCompPtr->AddEvent(message);
-				if (eventItemPtr != nullptr){
-					//m_eventMap.insert(message->GetInformationTimeStamp(), eventItemPtr);
-				}
-			}
+		//		IEventItem* eventItemPtr = m_groupControllerCompPtr->AddEvent(message);
+		//		if (eventItemPtr != nullptr){
+		//			//m_eventMap.insert(message->GetInformationTimeStamp(), eventItemPtr);
+		//		}
+		//	}
 
-			UpdateCommands();
-		}
-		else{
-			QMutexLocker locker(&m_messageListMutex);
-			m_messageList.clear();
-		}
+		//	UpdateCommands();
+		//}
+		//else{
+		//	QMutexLocker locker(&m_messageListMutex);
+		//	m_messageList.clear();
+		//}
 	}
 }
 
@@ -621,9 +621,28 @@ void CEventViewComp::StaticItemsObserver::SetParent(CEventViewComp* parent)
 
 void CEventViewComp::StaticItemsObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	IGraphicsItemProvider::GraphicsItemList itemList = GetObservedObject()->GetGraphicsItems();
-	for (int i = 0; i < itemList.count(); i++){
-		m_parent->m_scene.addItem(itemList[i]);
+	if (m_parent != nullptr){
+		IGraphicsItemProvider::GraphicsItemList itemList = GetObservedObject()->GetGraphicsItems();
+	
+		QList<QGraphicsItem*> remainItems;
+		for (int i = 0; i < m_items.count(); i++){
+			if (itemList.contains(m_items[i])){
+				remainItems.append(m_items[i]);
+			}
+			else {
+				m_parent->m_scene.removeItem(m_items[i]);
+				delete m_items[i];
+			}
+		}
+
+		for (int i = 0; i < itemList.count(); i++){
+			if (!remainItems.contains(itemList[i])){
+				m_parent->m_scene.addItem(itemList[i]);
+				remainItems.append(itemList[i]);
+			}
+		}
+
+		m_items = remainItems;
 	}
 }
 

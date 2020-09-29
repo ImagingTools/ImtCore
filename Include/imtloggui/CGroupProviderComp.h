@@ -22,25 +22,29 @@ public:
 
 	I_BEGIN_COMPONENT(CGroupProviderComp)
 		I_REGISTER_INTERFACE(IGroupProvider);
-		I_ASSIGN_MULTI_0(m_groupsCompPtr, "EventGroups", "Event group components", false);
-		I_ASSIGN(m_generalGroupCompPtr, "GeneralEventGroup", "General event group component", false, "General");
+		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
+		I_ASSIGN_MULTI_0(m_idAttrPtr, "GroupIds", "Group ids", false);
+		I_ASSIGN_MULTI_0(m_nameAttrPtr, "GroupNames", "Group names", false);
+		I_ASSIGN_MULTI_0(m_colourAttrPtr, "GroupBgColor", "Group background color", false);
+		I_ASSIGN_MULTI_0(m_layerProvidersCompPtr, "LayerProviders", "Layer providers", false);
 	I_END_COMPONENT
 
 	// reimplemented (imtloggui::IGroupProvider)
-	virtual IGroup* GetGroup(const QByteArray& id) const override;
+	virtual ILayerProvider* GetLayerProvider(const QByteArray& id) const override;
 
 	// reimplemented (imtbase::ICollectionInfo)
 	virtual Ids GetElementIds() const override;
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
+private:
+	int GetCount() const;
+	int GetIndex(const QByteArray& id) const;
 
 private:
-	I_MULTIREF(IGroup, m_groupsCompPtr);
-	I_REF(IGroup, m_generalGroupCompPtr);
-
-	QMap<QByteArray, IGroup*> m_groups;
+	I_MULTIATTR(QByteArray, m_idAttrPtr);
+	I_MULTIATTR(QString, m_nameAttrPtr);
+	I_MULTIATTR(QByteArray, m_colourAttrPtr);
+	I_MULTIREF(ILayerProvider, m_layerProvidersCompPtr);
 };
 
 

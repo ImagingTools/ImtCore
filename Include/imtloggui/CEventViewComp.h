@@ -20,7 +20,7 @@
 #include <imod/CModelProxy.h>
 
 // ImtCore includes
-#include <imtloggui/IEventGroupController.h>
+#include <imtloggui/IEventItem.h>
 #include <imtloggui/IGraphicsItemProvider.h>
 #include <imtloggui/CEventGraphicsView.h>
 #include <imtloggui/CTimeAxis.h>
@@ -55,7 +55,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(GraphicsView, IViewPropertyProvider, ExtractGraphicsView);
 		I_REGISTER_SUBELEMENT_INTERFACE(GraphicsView, imod::IModel, ExtractGraphicsView);
 		I_REGISTER_SUBELEMENT_INTERFACE(GraphicsView, IViewPropertyManager, ExtractGraphicsView);
-		I_ASSIGN(m_groupControllerCompPtr, "EventGroupController", "Event group controller", true, "EventGroupController")
+		//I_ASSIGN(m_groupControllerCompPtr, "EventGroupController", "Event group controller", true, "EventGroupController")
 		I_ASSIGN(m_statisticsViewCompPtr, "EventStatisticsView", "Event statistics for groups", true, "EventStatisticsView");
 		I_ASSIGN(m_metainfoViewCompPtr, "EventItemMetaInfoView", "Event metainfo viewer", true, "EventItemMetaInfoView");
 		I_ASSIGN(m_itemProviderCompPtr, "ItemProvider", "Graphics item provider", true, "ItemProvider");
@@ -134,6 +134,8 @@ private:
 
 	private:
 		CEventViewComp* m_parent;
+
+		QList<QGraphicsItem*> m_items;
 	};
 
 	class Commands: virtual public ibase::ICommandsProvider
@@ -164,7 +166,7 @@ private:
 	}
 
 private:
-	I_REF(IEventGroupController, m_groupControllerCompPtr);
+	//I_REF(IEventGroupController, m_groupControllerCompPtr);
 	I_REF(iqtgui::IGuiObject, m_statisticsViewCompPtr);
 	I_REF(iqtgui::IGuiObject, m_metainfoViewCompPtr);
 	I_REF(imeas::INumericConstraints, m_scaleConstraintsCompPtr);
@@ -187,8 +189,8 @@ private:
 
 	QDateTime m_currentCommandTime;
 
-	IEventItemController::EventMap m_eventMap;
-	IEventItemController::EventMap::const_iterator m_navigationIterator;
+	//IEventItemController::EventMap m_eventMap;
+	//IEventItemController::EventMap::const_iterator m_navigationIterator;
 	bool m_isNavigationIteratorValid;
 
 	imod::CModelProxy m_modelProxy;

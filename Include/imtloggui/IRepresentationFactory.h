@@ -13,7 +13,7 @@ namespace imtloggui
 {
 
 
-class IRepresentation: virtual public istd::IPolymorphic
+class IRepresentationFactory: virtual public istd::IPolymorphic
 {
 public:
 	typedef istd::TSmartPtr<istd::IChangeable> RepresentationObjectPtr;
@@ -23,11 +23,7 @@ public:
 		QDateTime endTime;
 	};
 
-	virtual QByteArray GetId() const = 0;
-	virtual QString GetName() const = 0;
-	virtual QString GetDescription() const = 0;
-
-	virtual RepresentationObjectPtr GetRepresentationObject(
+	virtual RepresentationObjectPtr CreateRepresentationObject(
 				const ilog::IMessageContainer::Messages& messages,
 				const TimeRange& timeRange) const = 0;
 };

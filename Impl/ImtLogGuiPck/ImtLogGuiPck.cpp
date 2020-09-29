@@ -41,18 +41,6 @@ I_EXPORT_COMPONENT(
 			"General event factory",
 			"General Icon Event Item Factory");
 
-
-I_EXPORT_COMPONENT(
-			EventGroupController,
-			"Event group controller",
-			"Event Group Controller");
-
-
-I_EXPORT_COMPONENT(
-			SingleLayerGroup,
-			"Single layer group",
-			"Event Group Single Layer");
-
 I_EXPORT_COMPONENT(
 			EventStatisticsView,
 			"Events statistics view",
@@ -69,29 +57,29 @@ I_EXPORT_COMPONENT(
 			"Event View Graphics Item Controller");
 
 I_EXPORT_COMPONENT(
-			RepresentationItemsFactory,
-			"Factory for representation items",
-			"Representation Items Factory");
-
-I_EXPORT_COMPONENT(
 			GroupProvider,
 			"Events group provider",
 			"Events Group Provider");
 
 I_EXPORT_COMPONENT(
-			Group,
-			"Events group",
-			"Events Group Layer Provider");
+			LayerProvider,
+			"Layer provider",
+			"Layer Provider");
 
 I_EXPORT_COMPONENT(
-			Layer,
-			"Group layer",
-			"Events Group Layer Representation Provider");
+			RepresentationFactoryProvider,
+			"Representation factory provider",
+			"Representation Factory Provider");
 
 I_EXPORT_COMPONENT(
-			Representation,
-			"Events representation",
-			"Events Representation");
+			RepresentationItemsFactory,
+			"Representation items factory",
+			"Representation Items Factory");
+
+I_EXPORT_COMPONENT(
+			RepresentationViewFactory,
+			"Representation view factory",
+			"Representation View Factory");
 
 
 } // namespace ImtLogGuiPck

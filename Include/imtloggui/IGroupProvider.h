@@ -3,7 +3,7 @@
 
 // ImtCore Includes
 #include <imtbase/ICollectionInfo.h>
-#include <imtloggui/IGroup.h>
+#include <imtloggui/ILayerProvider.h>
 
 
 namespace imtloggui
@@ -13,7 +13,12 @@ namespace imtloggui
 class IGroupProvider: virtual public imtbase::ICollectionInfo
 {
 public:
-	virtual IGroup* GetGroup(const QByteArray& id) const = 0;
+	enum ElementInfoType
+	{
+		EIT_COLOR = imtbase::ICollectionInfo::EIT_USER
+	};
+
+	virtual ILayerProvider* GetLayerProvider(const QByteArray& id) const = 0;
 };
 
 

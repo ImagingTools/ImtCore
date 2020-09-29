@@ -11,28 +11,23 @@ namespace imtloggui
 
 // public methods
 
-// reimplemented (imtloggui::IRepresentationItemsFactory)
+// reimplemented (imtloggui::IRepresentationFactory)
 
-IRepresentationItemsFactory::GraphicsItemList CRepresentationItemsFactoryComp::CreateGraphicItems(const istd::IChangeable* objectPtr) const
+IRepresentationFactory::RepresentationObjectPtr CRepresentationItemsFactoryComp::CreateRepresentationObject(
+			const ilog::IMessageContainer::Messages& messages,
+			const TimeRange& timeRange) const
 {
-	GraphicsItemList itemList;
+	ilog::CMessageContainer* messageContainerPtr = new ilog::CMessageContainer();
+	RepresentationObjectPtr retVal(messageContainerPtr);
 
-	if (m_eventItemFactoryCompPtr.IsValid() && m_positionProviderCompPtr.IsValid()){
-		const ilog::CMessageContainer* messageContainerPtr = dynamic_cast<const ilog::CMessageContainer*>(objectPtr);
-		if (messageContainerPtr != nullptr){
-			ilog::CMessageContainer::Messages messages = messageContainerPtr->GetMessages();
-			for (int i = 0; i < messages.count(); i++){
-				IEventItem* itemPtr = m_eventItemFactoryCompPtr->CreateInstance(messages[i]);
-				QGraphicsItem* graphicsItemPtr = dynamic_cast<QGraphicsItem*>(itemPtr);
-				if (graphicsItemPtr != nullptr){
-					graphicsItemPtr->setPos(m_positionProviderCompPtr->GetScenePositionFromTime(messages[i]->GetInformationTimeStamp()), 0);
-					itemList.append(graphicsItemPtr);
-				}
-			}
+	for (int i = 0; i < messages.count(); i++){
+		QDateTime timestamp = messages[i]->GetInformationTimeStamp();
+		if (timeRange.beginTime <= timestamp && timestamp <= timeRange.endTime){
+			messageContainerPtr->AddMessage(messages[i]);
 		}
 	}
 
-	return itemList;
+	return retVal;
 }
 
 

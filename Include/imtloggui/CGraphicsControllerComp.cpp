@@ -50,11 +50,8 @@ void CGraphicsControllerComp::OnComponentCreated()
 		imtbase::ICollectionInfo::Ids ids = m_groupProviderCompPtr->GetElementIds();
 
 		for (int i = 0; i < ids.count(); i++){
-			QColor color(Qt::gray);
-			if (i % 2){
-				color = QColor(Qt::lightGray);
-			}
-			color.setAlpha(170);
+			QString name = m_groupProviderCompPtr->GetElementInfo(ids[i], imtbase::ICollectionInfo::EIT_NAME).toString();
+			QColor color(m_groupProviderCompPtr->GetElementInfo(ids[i], IGroupProvider::EIT_COLOR).toString());
 
 			QGraphicsRectItem* rectPtr = new QGraphicsRectItem();
 			rectPtr->setRect(0, 0, 100, 300);
@@ -64,7 +61,6 @@ void CGraphicsControllerComp::OnComponentCreated()
 			m_staticItemsProvider.AddItem(rectPtr);
 
 			CEventGroupLabelItem* labelPtr = new CEventGroupLabelItem();
-			QString name = m_groupProviderCompPtr->GetElementInfo(ids[i], imtbase::ICollectionInfo::EIT_NAME).toString();
 			labelPtr->SetBackgroundColor(color);
 			labelPtr->SetGroupName(name);
 			labelPtr->SetHeight(300);
