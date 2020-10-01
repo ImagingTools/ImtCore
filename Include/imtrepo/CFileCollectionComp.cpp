@@ -245,6 +245,11 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& /*collec
 
 	SaveCollectionItem(collectionItem);
 
+	imtbase::CObjectCollectionUpdateEvent event(objectId, imtbase::CObjectCollectionUpdateEvent::UT_DATA);
+	for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+		eventHandlerPtr->OnObjectCollectionEvent(this, &event);
+	}
+
 	QFileInfo info(collectionItem.filePathInRepository);
 	QString revisionsPath = info.absolutePath() + "/Revisions/";
 
