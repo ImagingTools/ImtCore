@@ -5,6 +5,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QPushButton>
 
 
 namespace imtrepogui
@@ -28,6 +29,8 @@ void CFileObjectCollectionRevisionDialog::SetParams(
 			const QString& fileName,
 			const QString& filter)
 {
+	ButtonBox->button(QDialogButtonBox::Ok)->setText(tr("Restore"));
+
 	for (int i = 0; i < revisions.count(); i++){
 		Table->insertRow(i);
 
