@@ -158,6 +158,16 @@ public:
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const = 0;
 
 	/**
+		Get opened document count
+	*/
+	virtual int GetOpenedDocumentCount() const = 0;
+
+	/**
+		Get object info for opened document with given index
+	*/
+	virtual ObjectInfo GetObjectInfo(int index) const = 0;
+
+	/**
 		Get access to the information view.
 		Information widget will show the information about currently selected item(s).
 		\sa UpdateItemSelection

@@ -212,6 +212,18 @@ bool CObjectCollectionViewDelegate::OpenDocumentEditor(const QByteArray& /*objec
 }
 
 
+int CObjectCollectionViewDelegate::GetOpenedDocumentCount() const
+{
+	return 0;
+}
+
+
+ICollectionViewDelegate::ObjectInfo CObjectCollectionViewDelegate::GetObjectInfo(int index) const
+{
+	return ICollectionViewDelegate::ObjectInfo();
+}
+
+
 iqtgui::IGuiObject* CObjectCollectionViewDelegate::GetInformationView() const
 {
 	return nullptr;

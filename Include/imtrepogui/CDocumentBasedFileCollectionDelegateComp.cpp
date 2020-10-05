@@ -230,6 +230,18 @@ bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(
 }
 
 
+int CDocumentBasedFileCollectionDelegateComp::GetOpenedDocumentCount() const
+{
+	return m_openedDocuments.GetCount();
+}
+
+
+imtgui::ICollectionViewDelegate::ObjectInfo CDocumentBasedFileCollectionDelegateComp::GetObjectInfo(int index) const
+{
+	return *m_openedDocuments.GetAt(index);
+}
+
+
 iqtgui::IGuiObject* CDocumentBasedFileCollectionDelegateComp::GetInformationView() const
 {
 	return m_informationViewCompPtr.GetPtr();
