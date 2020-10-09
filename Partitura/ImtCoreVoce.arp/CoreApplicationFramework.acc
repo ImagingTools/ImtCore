@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4876" Description="ACF"/>
+            <Version Id="0" Number="4881" Description="ACF"/>
             <Version Id="1" Number="2123" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331009" Description="Qt Framework"/>
+            <Version Id="1023" Number="331008" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>ImagingTools application framework</Description>
@@ -76,7 +76,7 @@
                     <AttributeInfo Id="MainGui" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="MainGui"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SplashScreen" Type="Reference" ExportId="">
+                    <AttributeInfo Id="SplashScreen" Type="Reference" ExportId="SplashScreen">
                         <Data IsEnabled="true" Value="SplashScreen"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SplashTime" Type="Real" ExportId="SplashTime">
