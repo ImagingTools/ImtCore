@@ -161,7 +161,7 @@ void CEventViewComp::OnGuiCreated()
 	//connect(&m_timeAxis, &CTimeAxis::EmitAxisPosChanged, this, &CEventViewComp::OnAxisPosChanged);
 	//connect(&m_timeAxis, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CEventViewComp::OnAxisBeginTimeChanged);
 	//connect(&m_timeAxis, &CTimeAxis::EmitAxisEndTimeChanged, this, &CEventViewComp::OnAxisEndTimeChanged);
-	//connect(&m_view, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
+	connect(&m_view, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
 	//connect(this, &CEventViewComp::EmitShowAll, &m_view, &CEventGraphicsView::OnShowAll, Qt::QueuedConnection);
 
 	//if (m_groupControllerCompPtr.IsValid()){
@@ -238,7 +238,27 @@ void CEventViewComp::OnComponentCreated()
 
 void CEventViewComp::OnViewPortChanged(bool userAction)
 {
-	QRectF visibleRect = m_view.GetViewRect();
+	if (m_itemProviderCompPtr.IsValid()){
+		IGraphicsItemProvider::GraphicsItemList items = m_itemProviderCompPtr->GetGraphicsItems();
+
+		QTime time;
+		time.start();
+
+		for (QGraphicsItem* item : m_dynamicItems){
+			m_scene.removeItem(item);
+			delete item;
+		}
+		
+		for (QGraphicsItem* item : items){
+			m_scene.addItem(item);
+		}
+
+		qDebug() << "Remove &  add items to scene" << time.elapsed();
+
+		m_dynamicItems = items;
+	}
+
+	//QRectF visibleRect = m_view.GetViewRect();
 
 	//m_timeAxis.setPos(0, visibleRect.bottom() - m_timeAxis.rect().height() / m_view.GetScaleY());
 
@@ -246,12 +266,12 @@ void CEventViewComp::OnViewPortChanged(bool userAction)
 	//	m_groupControllerCompPtr->OnViewPortChanged();
 	//}
 
-	if (userAction){
-		m_currentCommandTime = QDateTime();
-		m_isNavigationIteratorValid = false;
-	}
+	//if (userAction){
+	//	m_currentCommandTime = QDateTime();
+	//	m_isNavigationIteratorValid = false;
+	//}
 
-	UpdateCommands();
+	//UpdateCommands();
 }
 
 

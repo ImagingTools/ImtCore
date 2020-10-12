@@ -18,6 +18,7 @@
 // ImtCore includes
 #include <imtfile/IFileCompression.h>
 #include <imtlog/IEventTimeRangeFilter.h>
+#include <imtlog/ITimeRangeProvider.h>
 
 
 namespace imtlog
@@ -30,8 +31,8 @@ class CEventHistoryControllerComp:
 						ilog::TMessageDelegatorComp<ilog::CLoggerComponentBase>>,
 			virtual public ilog::IMessageConsumer,
 			virtual public ilog::IMessageContainer,
-			virtual public imtlog::IEventTimeRangeFilter
-
+			virtual public imtlog::IEventTimeRangeFilter,
+			virtual public imtlog::ITimeRangeProvider
 {
 	Q_OBJECT
 public:
@@ -40,6 +41,9 @@ public:
 
 	I_BEGIN_COMPONENT(CEventHistoryControllerComp)
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
+		I_REGISTER_INTERFACE(ilog::IMessageContainer);
+		I_REGISTER_INTERFACE(imtlog::IEventTimeRangeFilter);
+		I_REGISTER_INTERFACE(imtlog::ITimeRangeProvider);
 		I_ASSIGN(m_logFolderCompPtr, "LogFolder", "Path to the event history folder", true, "");
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
@@ -53,9 +57,12 @@ public:
 
 	CEventHistoryControllerComp();
 
+	// reimplemented (imtlog::ITimeRangeProvider)
+	virtual CTimeRange GetTimeRange() const override;
+
 	// reimplemented (imtlog::IEventTimeRangeFilter)
-	virtual TimeRange GetEventTimeRangeFilter() const override;
-	virtual bool SetEventTimeRangeFilter(const TimeRange& timeRange) override;
+	virtual imtlog::CTimeRange GetEventTimeRangeFilter() const override;
+	virtual bool SetEventTimeRangeFilter(const imtlog::CTimeRange& timeRange) override;
 	virtual void ClearEventTimeRangeFilter() override;
 
 	// reimplemented (ilog::IMessageContainer)
@@ -180,9 +187,14 @@ private Q_SLOTS:
 
 private:
 	EventContainerPtr GetContainerForMessage(const MessagePtr& messagePtr);
-	TimeRange CalculateContainerTimeRange(const QDateTime& lastContainerEndTime);
+	imtlog::CTimeRange CalculateContainerTimeRange(const QDateTime& lastContainerEndTime);
 	void PrepareWorkingContainers();
-	bool SerializeContainer(EventContainerPtr containerPtr, iser::IArchive& archive);
+	bool SerializeContainer(EventContainerPtr containerPtr, iser::IArchive& archive) const;
+	QList<EventContainerPtr> ImportContainersFromFile(const QString& file) const;
+	CTimeRange GetArchiveTimeRange() const;
+
+	Messages ImportMessagesFromFiles(const QStringList& fileList, const CTimeRange& timeRange) const;
+	Messages ImportMessagesFromDirs(const QStringList& dirList, const CTimeRange& timeRange) const;
 
 	void StartReader();
 	Q_INVOKABLE void OnReaderFinished();
@@ -207,7 +219,8 @@ private:
 	QMutex m_workingQueueMutex;
 	QMutex m_writingQueueMutex;
 
-	TimeRange m_filterTimeRange;
+	CTimeRange m_filterTimeRange;
+	CTimeRange m_archiveTimeRange;
 
 	I_REF(ifile::IFileNameParam, m_logFolderCompPtr);
 	I_REF(imtfile::IFileCompression, m_compressorCompPtr);

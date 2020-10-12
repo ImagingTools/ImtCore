@@ -14,18 +14,41 @@ namespace imtloggui
 CGraphicsControllerComp::CGraphicsControllerComp()
 {
 	m_viewPropertyObserver.SetParent(this);
+	m_timeRangeObserver.SetParent(this);
 }
 
 // reimplemented (imtloggui::IGraphicsItemProvider)
 
 IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetGraphicsItems() const
 {
-	GraphicsItemList items;
+	GraphicsItemList retVal;
 
-	if (!m_groupProviderCompPtr.IsValid()){
+	if (m_groupProviderCompPtr.IsValid()){
+		imtbase::ICollectionInfo::Ids groupIds = m_groupProviderCompPtr->GetElementIds();
+		for (int i = 0; i < groupIds.count(); i++){
+			ILayerProvider* layerProvider = m_groupProviderCompPtr->GetLayerProvider(groupIds[i]);
+			imtbase::ICollectionInfo::Ids layerIds = layerProvider->GetElementIds();
+			IRepresentationFactoryProvider* representationProvider = layerProvider->GetRepresentationFactoryProvider(layerIds[0]);
+			imtbase::ICollectionInfo::Ids factoryIds = representationProvider->GetElementIds();
+			IRepresentationFactory* representation = representationProvider->GetRepresentationFactory(factoryIds[0]);
+
+			QDateTime begin = m_timeAxis.GetVisibleBeginTime();
+			QDateTime end = m_timeAxis.GetVisibleEndTime();
+
+			if (m_representationViewFactoryCompPtr.IsValid()){
+				IGraphicsItemProvider::GraphicsItemList items = m_representationViewFactoryCompPtr->CreateGraphicItems(
+							representation->CreateRepresentationObject(
+										imtlog::CTimeRange(begin, end)).GetPtr());
+				for (int j = 0; j < items.count(); j++){
+					items[j]->setPos(items[j]->pos().x(), -150 - i*300);
+				}
+
+				retVal.append(items);
+			}
+		}
 	}
 
-	return items;
+	return retVal;
 
 
 }
@@ -41,7 +64,6 @@ void CGraphicsControllerComp::OnComponentCreated()
 	m_timeAxis.SetColor(Qt::green);
 	m_timeAxis.setRect(0, 0, 100, 40);
 	m_timeAxis.setZValue(101);
-	m_timeAxis.EnsureTimeRange(QDateTime::currentDateTime());
 	m_staticItemsProvider.AddItem(&m_timeAxis);
 
 	int sceneHeight = 0;
@@ -86,6 +108,10 @@ void CGraphicsControllerComp::OnComponentCreated()
 		m_viewPropertyManagerCompPtr->SetScaleRangeX(istd::CRange(0, 1000));
 		m_viewPropertyManagerCompPtr->SetScaleRangeY(istd::CRange(0, 1000));
 	}
+
+	if (m_timeRangeModelCompPtr.IsValid()){
+		m_timeRangeModelCompPtr->AttachObserver(&m_timeRangeObserver);
+	}
 }
 
 
@@ -126,6 +152,40 @@ void CGraphicsControllerComp::ViewPropertyObserver::SetParent(CGraphicsControlle
 void CGraphicsControllerComp::ViewPropertyObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	m_parent->OnViewPropertyUpdate(GetObservedObject(), changeSet);
+}
+
+
+// public methods of the embedded class TimeRangeObserver
+
+CGraphicsControllerComp::TimeRangeObserver::TimeRangeObserver()
+	:m_parent(nullptr)
+{
+}
+
+void CGraphicsControllerComp::TimeRangeObserver::SetParent(CGraphicsControllerComp* parent)
+{
+	m_parent = parent;
+}
+
+
+// protected methods of the embedded class ViewPropertyObserver
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CGraphicsControllerComp::TimeRangeObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+{
+	imtlog::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
+
+	if (timeRange.GetBeginTime().isValid()){
+		m_parent->m_timeAxis.EnsureTimeRange(timeRange.GetBeginTime());
+		m_parent->m_timeAxis.EnsureTimeRange(timeRange.GetEndTime());
+
+		if (m_parent->m_viewPropertyProviderCompPtr.IsValid()){
+			QRectF rect = m_parent->m_viewPropertyProviderCompPtr->GetSceneRect();
+			rect.setWidth(m_parent->m_timeAxis.rect().width());
+			m_parent->m_viewPropertyManagerCompPtr->SetSceneRect(rect);
+		}
+	}
 }
 
 

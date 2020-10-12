@@ -7,6 +7,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
+#include <imtlog/ITimeRangeProvider.h>
 #include <imtloggui/IGraphicsItemProvider.h>
 #include <imtloggui/IViewPropertyProvider.h>
 #include <imtloggui/IViewPropertyManager.h>
@@ -40,6 +41,8 @@ public:
 		I_ASSIGN(m_viewPropertyProviderCompPtr, "GraphicsViewPropertyProvider", "Graphics view property provider", true, "GraphicsViewPropertyProvider");
 		I_ASSIGN_TO(m_viewPropertyModelCompPtr, m_viewPropertyProviderCompPtr, true);
 		I_ASSIGN_TO(m_viewPropertyManagerCompPtr, m_viewPropertyProviderCompPtr, true);
+		I_ASSIGN(m_timeRangeProviderCompPtr, "TimeRangeProvider", "Time range provider for time axis", true, "TimeRangeProvider");
+		I_ASSIGN_TO(m_timeRangeModelCompPtr, m_timeRangeProviderCompPtr, true);
 	I_END_COMPONENT
 
 	CGraphicsControllerComp();
@@ -82,6 +85,21 @@ private:
 		CGraphicsControllerComp* m_parent;
 	};
 
+	class TimeRangeObserver: public imod::TSingleModelObserverBase<imtlog::ITimeRangeProvider>
+	{
+	public:
+		TimeRangeObserver();
+
+		void SetParent(CGraphicsControllerComp* parent);
+
+	protected:
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+
+	private:
+		CGraphicsControllerComp* m_parent;
+	};
+
 	class StaticItemsProvider:
 				virtual public istd::IChangeable,
 				virtual public IGraphicsItemProvider
@@ -95,7 +113,7 @@ private:
 		virtual GraphicsItemList GetGraphicsItems() const override;
 
 	private:
-		QList<QGraphicsItem*> m_items;
+		IGraphicsItemProvider::GraphicsItemList m_items;
 	};
 
 	struct GroupItem
@@ -112,10 +130,13 @@ private:
 	I_REF(IViewPropertyProvider, m_viewPropertyProviderCompPtr);
 	I_REF(imod::IModel, m_viewPropertyModelCompPtr);
 	I_REF(IViewPropertyManager, m_viewPropertyManagerCompPtr);
+	I_REF(imtlog::ITimeRangeProvider, m_timeRangeProviderCompPtr);
+	I_REF(imod::IModel, m_timeRangeModelCompPtr);
 
 	CTimeAxis m_timeAxis;
 
 	ViewPropertyObserver m_viewPropertyObserver;
+	TimeRangeObserver m_timeRangeObserver;
 	imod::TModelWrap<StaticItemsProvider> m_staticItemsProvider;
 
 	QList<GroupItem> m_groupItemList;

@@ -1,5 +1,6 @@
 #include <imtloggui/CRepresentationViewFactoryComp.h>
 
+#include <qdebug>
 
 // ACF includes
 #include <ilog/CMessageContainer.h>
@@ -17,6 +18,9 @@ IRepresentationViewFactory::GraphicsItemList CRepresentationViewFactoryComp::Cre
 {
 	GraphicsItemList itemList;
 
+	QTime time;
+	time.start();
+
 	if (m_eventItemFactoryCompPtr.IsValid() && m_positionProviderCompPtr.IsValid()){
 		const ilog::CMessageContainer* messageContainerPtr = dynamic_cast<const ilog::CMessageContainer*>(objectPtr);
 		if (messageContainerPtr != nullptr){
@@ -25,12 +29,16 @@ IRepresentationViewFactory::GraphicsItemList CRepresentationViewFactoryComp::Cre
 				IEventItem* itemPtr = m_eventItemFactoryCompPtr->CreateInstance(messages[i]);
 				QGraphicsItem* graphicsItemPtr = dynamic_cast<QGraphicsItem*>(itemPtr);
 				if (graphicsItemPtr != nullptr){
+					graphicsItemPtr->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIgnoresTransformations);
 					graphicsItemPtr->setPos(m_positionProviderCompPtr->GetScenePositionFromTime(messages[i]->GetInformationTimeStamp()), 0);
 					itemList.append(graphicsItemPtr);
 				}
 			}
 		}
 	}
+
+	qDebug() << "Create items" << time.elapsed();
+
 
 	return itemList;
 }

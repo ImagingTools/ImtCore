@@ -8,6 +8,9 @@
 #include <istd/TSmartPtr.h>
 #include <ilog/IMessageContainer.h>
 
+// ImtCore includes
+#include <imtlog/CTimeRange.h>
+
 
 namespace imtloggui
 {
@@ -17,15 +20,8 @@ class IRepresentationFactory: virtual public istd::IPolymorphic
 {
 public:
 	typedef istd::TSmartPtr<istd::IChangeable> RepresentationObjectPtr;
-	struct TimeRange
-	{
-		QDateTime beginTime;
-		QDateTime endTime;
-	};
 
-	virtual RepresentationObjectPtr CreateRepresentationObject(
-				const ilog::IMessageContainer::Messages& messages,
-				const TimeRange& timeRange) const = 0;
+	virtual RepresentationObjectPtr CreateRepresentationObject(const imtlog::CTimeRange& timeRange) const = 0;
 };
 
 

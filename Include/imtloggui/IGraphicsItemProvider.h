@@ -16,7 +16,7 @@ namespace imtloggui
 class IGraphicsItemProvider: virtual public istd::IPolymorphic
 {
 public:
-	typedef QList<QGraphicsItem*> GraphicsItemList;
+	typedef QVector<QGraphicsItem*> GraphicsItemList;
 
 	virtual GraphicsItemList GetGraphicsItems() const = 0;
 };

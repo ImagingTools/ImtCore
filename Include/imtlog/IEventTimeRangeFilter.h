@@ -7,6 +7,9 @@
 // ACF includes
 #include <istd/IPolymorphic.h>
 
+// ImtCore includes
+#include <imtlog/CTimeRange.h>
+
 
 namespace imtlog
 {
@@ -15,14 +18,8 @@ namespace imtlog
 class IEventTimeRangeFilter: virtual public istd::IPolymorphic
 {
 public:
-	struct TimeRange
-	{
-		QDateTime beginTime;
-		QDateTime endTime;
-	};
-
-	virtual TimeRange GetEventTimeRangeFilter() const = 0;
-	virtual bool SetEventTimeRangeFilter(const TimeRange& timeRange) = 0;
+	virtual imtlog::CTimeRange GetEventTimeRangeFilter() const = 0;
+	virtual bool SetEventTimeRangeFilter(const imtlog::CTimeRange & timeRange) = 0;
 	virtual void ClearEventTimeRangeFilter() = 0;
 };
 

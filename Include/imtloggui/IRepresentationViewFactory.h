@@ -13,18 +13,11 @@
 namespace imtloggui
 {
 
-// IVisualRepresentationViewFactory
 
 class IRepresentationViewFactory: virtual public istd::IPolymorphic
 {
 public:
-	struct TimeRange
-	{
-		QDateTime beginTime;
-		QDateTime endTime;
-	};
-
-	typedef QVector<const QGraphicsItem*> GraphicsItemList;
+	typedef QVector<QGraphicsItem*> GraphicsItemList;
 
 	virtual GraphicsItemList CreateGraphicItems(const istd::IChangeable* objectPtr) const = 0;
 };

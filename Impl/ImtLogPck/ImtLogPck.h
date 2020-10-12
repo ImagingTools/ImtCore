@@ -19,7 +19,7 @@ namespace ImtLogPck
 
 
 typedef ibase::TModelObserverCompWrap<imtlog::CLoginEventControllerComp> LoginEventController;
-typedef imtlog::CEventHistoryControllerComp EventHistoryController;
+typedef icomp::TModelCompWrap<imtlog::CEventHistoryControllerComp> EventHistoryController;
 
 
 } // namespace ImtLogPck

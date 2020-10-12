@@ -203,6 +203,8 @@ private:
 	QList<ilog::IMessageConsumer::MessagePtr> m_messageList;
 	QTimer m_messageProcessingTimer;
 	QMutex m_messageListMutex;
+
+	IGraphicsItemProvider::GraphicsItemList m_dynamicItems;
 };
 
 
