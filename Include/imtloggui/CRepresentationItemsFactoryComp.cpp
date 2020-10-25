@@ -16,20 +16,23 @@ namespace imtloggui
 // reimplemented (imtloggui::IRepresentationFactory)
 
 IRepresentationFactory::RepresentationObjectPtr CRepresentationItemsFactoryComp::CreateRepresentationObject(
-			const imtlog::CTimeRange& timeRange) const
+			const imtlog::CTimeRange& timeRange, const QList<int>& messageIdFilter) const
 {
 	ilog::CMessageContainer* messageContainerPtr = new ilog::CMessageContainer();
 	RepresentationObjectPtr retVal(messageContainerPtr);
 
 	if (m_timeRangeFilterCompPtr.IsValid()){
 		m_timeRangeFilterCompPtr->SetEventTimeRangeFilter(timeRange);
-		if (m_messageContainerCompPtr.IsValid()){
-			QTime time;
-			time.start();
-			ilog::IMessageContainer::Messages messages = m_messageContainerCompPtr->GetMessages();
-			qDebug() << "Get messages" << time.elapsed() << messages.count();
-			for (ilog::IMessageConsumer::MessagePtr message : messages){
-				messageContainerPtr->AddMessage(message);
+		if (m_messageIdFilterCompPtr.IsValid()) {
+			m_messageIdFilterCompPtr->SetEventMessageIdFilter(messageIdFilter);
+			if (m_messageContainerCompPtr.IsValid()) {
+				QTime time;
+				time.start();
+				ilog::IMessageContainer::Messages messages = m_messageContainerCompPtr->GetMessages();
+				qDebug() << "Get messages" << time.elapsed() << messages.count();
+				for (ilog::IMessageConsumer::MessagePtr message : messages) {
+					messageContainerPtr->AddMessage(message);
+				}
 			}
 		}
 	}

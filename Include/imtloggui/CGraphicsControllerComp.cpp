@@ -38,7 +38,7 @@ IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetGraphicsItem
 			if (m_representationViewFactoryCompPtr.IsValid()){
 				IGraphicsItemProvider::GraphicsItemList items = m_representationViewFactoryCompPtr->CreateGraphicItems(
 							representation->CreateRepresentationObject(
-										imtlog::CTimeRange(begin, end)).GetPtr());
+								imtlog::CTimeRange(begin, end), layerProvider->GetMessageIdList()).GetPtr());
 				for (int j = 0; j < items.count(); j++){
 					items[j]->setPos(items[j]->pos().x(), -150 - i*300);
 				}

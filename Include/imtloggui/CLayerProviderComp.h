@@ -23,6 +23,7 @@ public:
 	I_BEGIN_COMPONENT(CLayerProviderComp)
 		I_REGISTER_INTERFACE(ILayerProvider);
 		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
+		I_ASSIGN_MULTI_0(m_messageIdListAttrPtr, "MessageIdList", "Supported message id's. Empty list for any", false);
 		I_ASSIGN_MULTI_0(m_idAttrPtr, "LayerIds", "Layer ids", false);
 		I_ASSIGN_MULTI_0(m_nameAttrPtr, "LayerNames", "Layer names", false);
 		I_ASSIGN_MULTI_0(m_factoryProviderCompPtr, "RepresentationFactoryProviders", "Representation factory providers", false);
@@ -30,6 +31,7 @@ public:
 
 	// reimplemented (imtloggui::ILayerProvider)
 	virtual IRepresentationFactoryProvider* GetRepresentationFactoryProvider(const QByteArray& id) const override;
+	virtual QList<int> GetMessageIdList() const override;
 
 	// reimplemented (imtbase::ICollectionInfo)
 	virtual Ids GetElementIds() const override;
@@ -40,6 +42,7 @@ private:
 	int GetIndex(const QByteArray& id) const;
 
 private:
+	I_MULTIATTR(int, m_messageIdListAttrPtr);
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
 	I_MULTIREF(IRepresentationFactoryProvider, m_factoryProviderCompPtr);

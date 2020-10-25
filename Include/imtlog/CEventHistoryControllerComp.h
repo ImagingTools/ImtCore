@@ -18,6 +18,7 @@
 // ImtCore includes
 #include <imtfile/IFileCompression.h>
 #include <imtlog/IEventTimeRangeFilter.h>
+#include <imtlog/IEventMessageIdFilter.h>
 #include <imtlog/ITimeRangeProvider.h>
 
 
@@ -32,6 +33,7 @@ class CEventHistoryControllerComp:
 			virtual public ilog::IMessageConsumer,
 			virtual public ilog::IMessageContainer,
 			virtual public imtlog::IEventTimeRangeFilter,
+			virtual public imtlog::IEventMessageIdFilter,
 			virtual public imtlog::ITimeRangeProvider
 {
 	Q_OBJECT
@@ -43,6 +45,7 @@ public:
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
 		I_REGISTER_INTERFACE(ilog::IMessageContainer);
 		I_REGISTER_INTERFACE(imtlog::IEventTimeRangeFilter);
+		I_REGISTER_INTERFACE(imtlog::IEventMessageIdFilter);
 		I_REGISTER_INTERFACE(imtlog::ITimeRangeProvider);
 		I_ASSIGN(m_logFolderCompPtr, "LogFolder", "Path to the event history folder", true, "");
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "");
@@ -64,6 +67,11 @@ public:
 	virtual imtlog::CTimeRange GetEventTimeRangeFilter() const override;
 	virtual bool SetEventTimeRangeFilter(const imtlog::CTimeRange& timeRange) override;
 	virtual void ClearEventTimeRangeFilter() override;
+
+	// reimplemented (imtlog::IEventMessagesIdFilter)
+	virtual QList<int> GetEventMessageIdFilter() const override;
+	virtual bool SetEventMessageIdFilter(const QList<int>& messageIdList) override;
+	virtual void ClearEventMessageIdFilter() override;
 
 	// reimplemented (ilog::IMessageContainer)
 	virtual int GetWorstCategory() const override;
@@ -193,7 +201,7 @@ private:
 	QList<EventContainerPtr> ImportContainersFromFile(const QString& file) const;
 	CTimeRange GetArchiveTimeRange() const;
 
-	Messages ImportMessagesFromFiles(const QStringList& fileList, const CTimeRange& timeRange) const;
+	Messages ImportMessagesFromFiles(const QStringList& fileList, const CTimeRange& timeRange, const QList<int> & messageIdList) const;
 	Messages ImportMessagesFromDirs(const QStringList& dirList, const CTimeRange& timeRange) const;
 
 	void StartReader();
@@ -220,6 +228,7 @@ private:
 	QMutex m_writingQueueMutex;
 
 	CTimeRange m_filterTimeRange;
+	QList<int> m_filterMessageIdList;
 	CTimeRange m_archiveTimeRange;
 
 	I_REF(ifile::IFileNameParam, m_logFolderCompPtr);

@@ -40,7 +40,6 @@ CTimeRange CEventHistoryControllerComp::GetTimeRange() const
 	return m_archiveTimeRange;
 }
 
-
 // reimplemented (imtlog::IEventTimeRangeFilter)
 
 imtlog::CTimeRange CEventHistoryControllerComp::GetEventTimeRangeFilter() const
@@ -60,6 +59,28 @@ bool CEventHistoryControllerComp::SetEventTimeRangeFilter(const imtlog::CTimeRan
 void CEventHistoryControllerComp::ClearEventTimeRangeFilter()
 {
 	m_filterTimeRange = CTimeRange();
+}
+
+
+// reimplemented (imtlog::IEventMessagesIdFilter)
+
+QList<int> CEventHistoryControllerComp::GetEventMessageIdFilter() const
+{
+	return m_filterMessageIdList;
+}
+
+
+bool CEventHistoryControllerComp::SetEventMessageIdFilter(const QList<int>& messageIdList)
+{
+	m_filterMessageIdList = messageIdList;
+
+	return true;
+}
+
+
+void CEventHistoryControllerComp::ClearEventMessageIdFilter()
+{
+	m_filterMessageIdList.clear();
 }
 
 
@@ -104,7 +125,7 @@ ilog::IMessageContainer::Messages CEventHistoryControllerComp::GetMessages() con
 			}
 		}
 
-		return ImportMessagesFromFiles(actualFileList, m_filterTimeRange);
+		return ImportMessagesFromFiles(actualFileList, m_filterTimeRange, m_filterMessageIdList);
 	}
 	else{
 		//QStringList dirList = repositoryDir.entryList(
@@ -522,7 +543,7 @@ CTimeRange CEventHistoryControllerComp::GetArchiveTimeRange() const
 }
 
 
-ilog::IMessageContainer::Messages CEventHistoryControllerComp::ImportMessagesFromFiles(const QStringList& fileList, const CTimeRange& timeRange) const
+ilog::IMessageContainer::Messages CEventHistoryControllerComp::ImportMessagesFromFiles(const QStringList& fileList, const CTimeRange& timeRange, const QList<int> & messageIdList) const
 {
 	ilog::IMessageContainer::Messages retVal;
 
@@ -547,8 +568,12 @@ ilog::IMessageContainer::Messages CEventHistoryControllerComp::ImportMessagesFro
 						ilog::IMessageContainer::Messages messages = containerPtr->GetMessages();
 						for (int i = 0; i < messages.count(); i++){
 							QDateTime timestamp = messages[i]->GetInformationTimeStamp();
+							int id = messages[i]->GetInformationId();
 							if (timeRange.GetBeginTime() <= timestamp && timestamp <= timeRange.GetEndTime()){
-								retVal.append(messages[i]);
+								if(messageIdList.isEmpty() || messageIdList.contains(id))
+								{
+									retVal.append(messages[i]);
+								}
 							}
 						}
 					}
