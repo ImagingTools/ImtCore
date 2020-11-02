@@ -25,6 +25,7 @@ IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetGraphicsItem
 
 	if (m_groupProviderCompPtr.IsValid()){
 		imtbase::ICollectionInfo::Ids groupIds = m_groupProviderCompPtr->GetElementIds();
+		QList<int> allGroupsMessageIds;
 		for (int i = 0; i < groupIds.count(); i++){
 			ILayerProvider* layerProvider = m_groupProviderCompPtr->GetLayerProvider(groupIds[i]);
 			imtbase::ICollectionInfo::Ids layerIds = layerProvider->GetElementIds();
@@ -35,10 +36,28 @@ IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetGraphicsItem
 			QDateTime begin = m_timeAxis.GetVisibleBeginTime();
 			QDateTime end = m_timeAxis.GetVisibleEndTime();
 
+			if (i != groupIds.count() - 1){
+				allGroupsMessageIds.append(layerProvider->GetMessageIdList());
+			}
+
 			if (m_representationViewFactoryCompPtr.IsValid()){
-				IGraphicsItemProvider::GraphicsItemList items = m_representationViewFactoryCompPtr->CreateGraphicItems(
-							representation->CreateRepresentationObject(
-								imtlog::CTimeRange(begin, end), layerProvider->GetMessageIdList()).GetPtr());
+				istd::TSmartPtr<istd::IChangeable> representationObject;
+
+				if (i == groupIds.count() - 1){
+					representationObject = representation->CreateRepresentationObject(
+								imtlog::CTimeRange(begin, end),
+								allGroupsMessageIds,
+								imtlog::IEventMessageIdFilter::M_EXCEPT);
+				}
+				else{
+					representationObject = representation->CreateRepresentationObject(
+								imtlog::CTimeRange(begin, end),
+								layerProvider->GetMessageIdList(),
+								imtlog::IEventMessageIdFilter::M_ACCEPT);
+				}
+
+				IGraphicsItemProvider::GraphicsItemList items = m_representationViewFactoryCompPtr->CreateGraphicItems(representationObject.GetPtr());
+
 				for (int j = 0; j < items.count(); j++){
 					items[j]->setPos(items[j]->pos().x(), -150 - i*300);
 				}

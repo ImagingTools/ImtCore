@@ -9,6 +9,7 @@
 #include <ilog/IMessageContainer.h>
 
 // ImtCore includes
+#include <imtlog/IEventMessageIdFilter.h>
 #include <imtlog/CTimeRange.h>
 
 
@@ -21,7 +22,10 @@ class IRepresentationFactory: virtual public istd::IPolymorphic
 public:
 	typedef istd::TSmartPtr<istd::IChangeable> RepresentationObjectPtr;
 
-	virtual RepresentationObjectPtr CreateRepresentationObject(const imtlog::CTimeRange& timeRange, const QList<int>& messageIdFilter) const = 0;
+	virtual RepresentationObjectPtr CreateRepresentationObject(
+				const imtlog::CTimeRange& timeRange,
+				const QList<int>& messageIdFilter,
+				imtlog::IEventMessageIdFilter::Mode mode) const = 0;
 };
 
 

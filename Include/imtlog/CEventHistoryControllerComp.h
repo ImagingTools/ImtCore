@@ -69,6 +69,8 @@ public:
 	virtual void ClearEventTimeRangeFilter() override;
 
 	// reimplemented (imtlog::IEventMessagesIdFilter)
+	virtual Mode GetEventMessageIdFilterMode() const override;
+	virtual void SetEventMessageIdFilterMode(Mode mode) override;
 	virtual QList<int> GetEventMessageIdFilter() const override;
 	virtual bool SetEventMessageIdFilter(const QList<int>& messageIdList) override;
 	virtual void ClearEventMessageIdFilter() override;
@@ -228,6 +230,7 @@ private:
 	QMutex m_writingQueueMutex;
 
 	CTimeRange m_filterTimeRange;
+	IEventMessageIdFilter::Mode m_filterMessageIdMode;
 	QList<int> m_filterMessageIdList;
 	CTimeRange m_archiveTimeRange;
 

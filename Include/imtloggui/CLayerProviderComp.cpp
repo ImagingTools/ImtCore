@@ -21,11 +21,12 @@ IRepresentationFactoryProvider* CLayerProviderComp::GetRepresentationFactoryProv
 QList<int> CLayerProviderComp::GetMessageIdList() const
 {
 	QList<int> retVal;
+
 	int count = m_messageIdListAttrPtr.GetCount();
-	for (int i = 0; i < count; i++)
-	{
+	for (int i = 0; i < count; i++){
 		retVal.append(m_messageIdListAttrPtr[i]);
 	}
+
 	return retVal;
 }
 

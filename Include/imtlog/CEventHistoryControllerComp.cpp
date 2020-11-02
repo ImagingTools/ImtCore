@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QUuid>
 
@@ -24,7 +23,8 @@ CEventHistoryControllerComp::CEventHistoryControllerComp()
 	m_writer(this),
 	m_readerState(TS_IDLE),
 	m_writerState(TS_IDLE),
-	m_controllerState(CS_INIT)
+	m_controllerState(CS_INIT),
+	m_filterMessageIdMode(IEventMessageIdFilter::M_EXCEPT)
 {
 	qRegisterMetaType<MessagePtr>("MessagePtr");
 	qRegisterMetaType<EventContainerPtr>("EventContainerPtr");
@@ -39,6 +39,7 @@ CTimeRange CEventHistoryControllerComp::GetTimeRange() const
 {
 	return m_archiveTimeRange;
 }
+
 
 // reimplemented (imtlog::IEventTimeRangeFilter)
 
@@ -64,6 +65,18 @@ void CEventHistoryControllerComp::ClearEventTimeRangeFilter()
 
 // reimplemented (imtlog::IEventMessagesIdFilter)
 
+imtlog::IEventMessageIdFilter::Mode CEventHistoryControllerComp::GetEventMessageIdFilterMode() const
+{
+	return m_filterMessageIdMode;
+}
+
+
+void CEventHistoryControllerComp::SetEventMessageIdFilterMode(imtlog::IEventMessageIdFilter::Mode mode)
+{
+	m_filterMessageIdMode = mode;
+}
+
+
 QList<int> CEventHistoryControllerComp::GetEventMessageIdFilter() const
 {
 	return m_filterMessageIdList;
@@ -80,6 +93,7 @@ bool CEventHistoryControllerComp::SetEventMessageIdFilter(const QList<int>& mess
 
 void CEventHistoryControllerComp::ClearEventMessageIdFilter()
 {
+	m_filterMessageIdMode = M_EXCEPT;
 	m_filterMessageIdList.clear();
 }
 
@@ -570,9 +584,15 @@ ilog::IMessageContainer::Messages CEventHistoryControllerComp::ImportMessagesFro
 							QDateTime timestamp = messages[i]->GetInformationTimeStamp();
 							int id = messages[i]->GetInformationId();
 							if (timeRange.GetBeginTime() <= timestamp && timestamp <= timeRange.GetEndTime()){
-								if(messageIdList.isEmpty() || messageIdList.contains(id))
-								{
-									retVal.append(messages[i]);
+								if (m_filterMessageIdMode == M_ACCEPT){
+									if (messageIdList.contains(id)){
+										retVal.append(messages[i]);
+									}
+								}
+								else{
+									if (!messageIdList.contains(id)){
+										retVal.append(messages[i]);
+									}
 								}
 							}
 						}

@@ -12,7 +12,6 @@ namespace imtloggui
 
 class ILayerProvider: virtual public imtbase::ICollectionInfo
 {
-
 public:
 	virtual IRepresentationFactoryProvider* GetRepresentationFactoryProvider(const QByteArray& id) const = 0;
 	virtual QList<int> GetMessageIdList() const = 0;

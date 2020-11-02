@@ -27,10 +27,13 @@ public:
 		I_ASSIGN(m_messageContainerCompPtr, "MessageContainer", "Message container", true, "");
 		I_ASSIGN(m_timeRangeFilterCompPtr, "TimeRangeFilter", "Time range filter", true, "");
 		I_ASSIGN(m_messageIdFilterCompPtr, "MessageIdFilter", "Message Id list filter", true, "");
-		I_END_COMPONENT
+	I_END_COMPONENT
 
 	// reimplemented (imtloggui::IRepresentationViewFactory)
-	virtual RepresentationObjectPtr CreateRepresentationObject(const imtlog::CTimeRange& timeRange, const QList<int>& messageIdFilter) const override;
+	virtual RepresentationObjectPtr CreateRepresentationObject(
+				const imtlog::CTimeRange& timeRange,
+				const QList<int>& messageIdList,
+				imtlog::IEventMessageIdFilter::Mode mode) const override;
 
 private:
 	I_REF(ilog::IMessageContainer, m_messageContainerCompPtr);
