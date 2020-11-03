@@ -81,6 +81,11 @@ I_EXPORT_COMPONENT(
 			"Representation view factory",
 			"Representation View Factory");
 
+I_EXPORT_COMPONENT(
+			RepresentationIntervalStatisticsFactory,
+			"Representation interval statistics factory",
+			"Representation Interval Statistics Factory");
+
 
 } // namespace ImtLogGuiPck
 

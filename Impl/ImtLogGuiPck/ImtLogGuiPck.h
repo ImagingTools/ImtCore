@@ -19,6 +19,7 @@
 #include <imtloggui/CRepresentationFactoryProviderComp.h>
 #include <imtloggui/CRepresentationItemsFactoryComp.h>
 #include <imtloggui/CRepresentationViewFactoryComp.h>
+#include <imtloggui/CRepresentationIntervalStatisticsFactoryComp.h>
 
 
 /**
@@ -41,6 +42,7 @@ typedef imtloggui::CLayerProviderComp LayerProvider;
 typedef imtloggui::CRepresentationFactoryProviderComp RepresentationFactoryProvider;
 typedef imtloggui::CRepresentationItemsFactoryComp RepresentationItemsFactory;
 typedef imtloggui::CRepresentationViewFactoryComp RepresentationViewFactory;
+typedef imtloggui::CRepresentationIntervalStatisticsFactoryComp RepresentationIntervalStatisticsFactory;
 
 
 } // namespace ImtLogGuiPck

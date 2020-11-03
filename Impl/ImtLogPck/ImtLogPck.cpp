@@ -24,6 +24,11 @@ I_EXPORT_COMPONENT(
 			"History for events",
 			"Event Log History Controller");
 
+I_EXPORT_COMPONENT(
+			Storage,
+			"Storage for objects",
+			"Event Log Cache Storage Object");
+
 
 } // namespace ImtLogPck
 
