@@ -24,7 +24,8 @@ CEventHistoryControllerComp::CEventHistoryControllerComp()
 	m_readerState(TS_IDLE),
 	m_writerState(TS_IDLE),
 	m_controllerState(CS_INIT),
-	m_filterMessageIdMode(IEventMessageIdFilter::M_EXCEPT)
+	m_filterMessageIdMode(IEventMessageIdFilter::M_EXCEPT),
+	m_messageCache(this, 3)
 {
 	qRegisterMetaType<MessagePtr>("MessagePtr");
 	qRegisterMetaType<EventContainerPtr>("EventContainerPtr");
@@ -112,44 +113,24 @@ ilog::IMessageContainer::Messages CEventHistoryControllerComp::GetMessages() con
 		return ilog::IMessageContainer::Messages();
 	}
 
-	QDate startDate = m_filterTimeRange.GetBeginTime().date();
-	QDate endDate = m_filterTimeRange.GetEndTime().date();
-	QStringList dateList;
-
-	while (startDate <= endDate){
-		dateList.append(startDate.toString(*m_archiveNameFormatAttrPtr));
-		startDate = startDate.addDays(1);
-	}
-
-	QDir repositoryDir(m_logFolderCompPtr->GetPath());
-
-	if (m_compressorCompPtr.IsValid()){
-		QStringList fileList = repositoryDir.entryList(
-			QDir::Files | QDir::NoSymLinks,
-			QDir::Time | QDir::Reversed);
-
-		QStringList actualFileList;
-
-		for (int i = 0; i < fileList.count(); i++){
-			for (int j = 0; j < dateList.count(); j++){
-				if (fileList[i].contains(dateList[j])){
-					actualFileList.append(fileList[i]);
-					break;
-				}
-			}
+	ilog::IMessageContainer::Messages messages = m_messageCache.GetMessages(m_filterTimeRange);
+	ilog::IMessageContainer::Messages::iterator it = messages.begin();
+	while (it != messages.end()){
+		QDateTime timeStamp = it->GetPtr()->GetInformationTimeStamp();
+		if (m_filterMessageIdMode == M_ACCEPT && m_filterMessageIdList.contains(it->GetPtr()->GetInformationId())){
+			it++;
+			continue;
 		}
 
-		return ImportMessagesFromFiles(actualFileList, m_filterTimeRange, m_filterMessageIdList);
-	}
-	else{
-		//QStringList dirList = repositoryDir.entryList(
-		//	QDir::AllDirs | QDir::NoSymLinks | QDir::NoDotAndDotDot,
-		//	QDir::Time | QDir::Reversed);
+		if (m_filterMessageIdMode == M_EXCEPT && !m_filterMessageIdList.contains(it->GetPtr()->GetInformationId())){
+			it++;
+			continue;
+		}
 
-		//ImportMessagesFromDirs(dirList, m_filterTimeRange);
+		it = messages.erase(it);
 	}
 
-	return ilog::IMessageContainer::Messages();
+	return messages;
 }
 
 
@@ -194,6 +175,7 @@ void CEventHistoryControllerComp::AddMessage(const MessagePtr& messagePtr)
 			SendWarningMessage(0, QString("Event container for message at \"%1\" not found").arg(messagePtr->GetInformationTimeStamp().toString()));
 		}
 		else{
+			m_messageCache.AddMessage(messagePtr);
 			containerPtr->AddMessage(messagePtr);
 
 			QDateTime timestamp = messagePtr->GetInformationTimeStamp();
@@ -219,6 +201,7 @@ void CEventHistoryControllerComp::AddMessage(const MessagePtr& messagePtr)
 
 
 // reimplemented (ibase::TRuntimeStatusHanderCompWrap)
+
 void CEventHistoryControllerComp::OnSystemShutdown()
 {
 	m_controllerState = CS_SHUTDOWN;
@@ -278,12 +261,12 @@ void CEventHistoryControllerComp::OnComponentCreated()
 
 	PrepareWorkingContainers();
 
-	m_controllerState = CS_OK;
+	m_messageCache.Init();
 
 	m_systemStartTime = QDateTime::currentDateTime();
 	m_containerCheckTimer.start(1000);
 
-	StartReader();
+	m_controllerState = CS_OK;
 }
 
 
@@ -554,76 +537,6 @@ CTimeRange CEventHistoryControllerComp::GetArchiveTimeRange() const
 	}
 
 	return CTimeRange(begin, end);
-}
-
-
-ilog::IMessageContainer::Messages CEventHistoryControllerComp::ImportMessagesFromFiles(const QStringList& fileList, const CTimeRange& timeRange, const QList<int> & messageIdList) const
-{
-	ilog::IMessageContainer::Messages retVal;
-
-	for (QString fileItem : fileList){
-		QDir tempDir = QDir::tempPath();
-		QString uuid = QUuid::createUuid().toString();
-		if (tempDir.mkpath("ImtCore/" + uuid)){
-			tempDir.cd("ImtCore/" + uuid);
-
-			if (m_compressorCompPtr->DecompressFolder(
-				m_logFolderCompPtr->GetPath() + "/" + fileItem,
-				tempDir.path())){
-				QStringList containerFileList = tempDir.entryList(
-					QDir::Files | QDir::NoSymLinks,
-					QDir::Time | QDir::Reversed);
-
-				for (QString containerFileItem : containerFileList){
-					EventContainerPtr containerPtr(new EventContainer);
-
-					ifile::CCompactXmlFileReadArchive xmlArchive(tempDir.path() + "/" + containerFileItem, m_versionInfoCompPtr.GetPtr());
-					if (SerializeContainer(containerPtr, xmlArchive)){
-						ilog::IMessageContainer::Messages messages = containerPtr->GetMessages();
-						for (int i = 0; i < messages.count(); i++){
-							QDateTime timestamp = messages[i]->GetInformationTimeStamp();
-							int id = messages[i]->GetInformationId();
-							if (timeRange.GetBeginTime() <= timestamp && timestamp <= timeRange.GetEndTime()){
-								if (m_filterMessageIdMode == M_ACCEPT){
-									if (messageIdList.contains(id)){
-										retVal.append(messages[i]);
-									}
-								}
-								else{
-									if (!messageIdList.contains(id)){
-										retVal.append(messages[i]);
-									}
-								}
-							}
-						}
-					}
-					else{
-						SendErrorMessage(
-							0, tr("Unable to deserialize event container \"%1\". Event container skipped")
-							.arg(containerFileItem));
-					}
-				}
-			}
-			else{
-				SendErrorMessage(
-					0, tr("Unable to decompress event archive \"%1\". Event archive skipped")
-					.arg(fileItem));
-			}
-
-			tempDir.removeRecursively();
-		}
-		else{
-			SendErrorMessage(0, tr("Unable to create temporary directory"));
-		}
-	}
-
-	return retVal;
-}
-
-
-ilog::IMessageContainer::Messages CEventHistoryControllerComp::ImportMessagesFromDirs(const QStringList& dirList, const CTimeRange& timeRange) const
-{
-	return ilog::IMessageContainer::Messages();
 }
 
 
@@ -957,6 +870,147 @@ void CEventHistoryControllerComp::Writer::run()
 
 	QMetaObject::invokeMethod(m_parentPtr, "OnWriterFinished", Qt::QueuedConnection);
 }
+
+
+// public methods of embedded class MessageCache
+
+CEventHistoryControllerComp::MessageCache::MessageCache(CEventHistoryControllerComp* parentPtr, int cacheDaySize)
+{
+	m_parentPtr = parentPtr;
+	m_cacheDayCount = cacheDaySize;
+}
+
+
+// private methods of embedded class MessageCache
+
+void CEventHistoryControllerComp::MessageCache::Init()
+{
+	QDir repositoryDir(m_parentPtr->m_logFolderCompPtr->GetPath());
+	QDate date = QDate::currentDate();
+	QString fileName = date.toString(*(m_parentPtr->m_archiveNameFormatAttrPtr)) + '.' + *m_parentPtr->m_archiveExtensionAttrPtr;
+
+	m_2dayCache.enqueue(istd::TSmartPtr<CacheItem>(new CacheItem));
+	m_2dayCache.enqueue(istd::TSmartPtr<CacheItem>(new CacheItem));
+	m_2dayCache.last()->date = date;
+
+	if (m_parentPtr->m_compressorCompPtr.IsValid()){
+		QFileInfoList fileInfoList = repositoryDir.entryInfoList(
+			QDir::Files | QDir::NoSymLinks,
+			QDir::Time | QDir::Reversed);
+
+		for (QFileInfo fileInfo : fileInfoList){
+			if (fileInfo.fileName() == fileName){
+				QList<EventContainerPtr> containers = m_parentPtr->ImportContainersFromFile(fileInfo.absoluteFilePath());
+				for (EventContainerPtr container : containers){
+					m_2dayCache.last()->messages.append(container->GetMessages());
+				}
+			}
+		}
+	}
+}
+
+
+void CEventHistoryControllerComp::MessageCache::AddMessage(const MessagePtr& messagePtr)
+{
+	QDate date = messagePtr->GetInformationTimeStamp().date();
+
+	if (m_2dayCache.last()->date != date){
+		m_2dayCache.dequeue();
+		m_2dayCache.enqueue(istd::TSmartPtr<CacheItem>(new CacheItem));
+		m_2dayCache.last()->date = date;
+	}
+
+	m_2dayCache.last()->messages.append(messagePtr);
+
+	Q_ASSERT(m_2dayCache.count() == 2);
+}
+
+
+ilog::IMessageContainer::Messages CEventHistoryControllerComp::MessageCache::GetMessages(const imtlog::CTimeRange& timeRange) const
+{
+	if (m_parentPtr == nullptr){
+		return ilog::IMessageContainer::Messages();
+	}
+
+	ilog::IMessageContainer::Messages messages;
+
+	QDate startDate = timeRange.GetBeginTime().date();
+	QDate endDate = timeRange.GetEndTime().date();
+	QStringList dateList;
+
+	QDate date = startDate;
+	while (date <= endDate){
+		if (m_2dayCache.first()->date == date){
+			messages.append(m_2dayCache.first()->messages);
+			date = date.addDays(1);
+			continue;
+		}
+
+		if (m_2dayCache.last()->date == date){
+			messages.append(m_2dayCache.last()->messages);
+			date = date.addDays(1);
+			continue;
+		}
+
+		bool isFound = false;
+		for (const CacheItemPtr& item : m_cache){
+			if (item->date == date){
+				messages.append(item->messages);
+				isFound = true;
+				break;
+			}
+		}
+
+		if (!isFound){
+			QDir repositoryDir(m_parentPtr->m_logFolderCompPtr->GetPath());
+			QString fileName = date.toString(*(m_parentPtr->m_archiveNameFormatAttrPtr)) + '.' + *m_parentPtr->m_archiveExtensionAttrPtr;
+
+			if (m_parentPtr->m_compressorCompPtr.IsValid()){
+				QFileInfoList fileInfoList = repositoryDir.entryInfoList(
+					QDir::Files | QDir::NoSymLinks,
+					QDir::Time | QDir::Reversed);
+
+				for (QFileInfo fileInfo : fileInfoList){
+					if (fileInfo.fileName() == fileName){
+						QList<EventContainerPtr> containers = m_parentPtr->ImportContainersFromFile(fileInfo.absoluteFilePath());
+
+						CacheItemPtr itemPtr = istd::TSmartPtr<CacheItem>(new CacheItem);
+						itemPtr->date = date;
+						for (EventContainerPtr container : containers){
+							itemPtr->messages.append(container->GetMessages());
+						}
+
+						while (m_cache.size() >= m_cacheDayCount){
+							m_cache.dequeue();
+						}
+
+						m_cache.enqueue(itemPtr);
+
+						messages.append(itemPtr->messages);
+
+						break;
+					}
+				}
+			}
+		}
+
+		date = date.addDays(1);
+	}
+
+	ilog::IMessageContainer::Messages::iterator it = messages.begin();
+	while (it != messages.end()){
+		QDateTime timeStamp = it->GetPtr()->GetInformationTimeStamp();
+		if (timeStamp < timeRange.GetBeginTime() || timeStamp > timeRange.GetEndTime()){
+			it = messages.erase(it);
+		}
+		else{
+			it++;
+		}
+	}
+
+	return messages;
+}
+
 
 } // namespace imtlog
 

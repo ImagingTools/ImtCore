@@ -192,6 +192,30 @@ private:
 		CEventHistoryControllerComp* m_parentPtr;
 	};
 
+	class MessageCache
+	{
+	public:
+		explicit MessageCache(CEventHistoryControllerComp* parentPtr, int cacheDayCount);
+
+		void Init();
+		void AddMessage(const MessagePtr& messagePtr);
+		Messages GetMessages(const imtlog::CTimeRange& timeRange) const;
+
+	private:
+		CEventHistoryControllerComp* m_parentPtr;
+
+		struct CacheItem
+		{
+			QDate date;
+			ilog::IMessageContainer::Messages messages;
+		};
+		typedef istd::TSmartPtr<CacheItem> CacheItemPtr;
+
+		int m_cacheDayCount;
+		mutable QQueue<CacheItemPtr> m_cache;
+		mutable QQueue<CacheItemPtr> m_2dayCache;
+	};
+
 private Q_SLOTS:
 	void OnContainerCheckTimer();
 
@@ -203,8 +227,6 @@ private:
 	QList<EventContainerPtr> ImportContainersFromFile(const QString& file) const;
 	CTimeRange GetArchiveTimeRange() const;
 
-	Messages ImportMessagesFromFiles(const QStringList& fileList, const CTimeRange& timeRange, const QList<int> & messageIdList) const;
-	Messages ImportMessagesFromDirs(const QStringList& dirList, const CTimeRange& timeRange) const;
 
 	void StartReader();
 	Q_INVOKABLE void OnReaderFinished();
@@ -233,6 +255,8 @@ private:
 	IEventMessageIdFilter::Mode m_filterMessageIdMode;
 	QList<int> m_filterMessageIdList;
 	CTimeRange m_archiveTimeRange;
+
+	MessageCache m_messageCache;
 
 	I_REF(ifile::IFileNameParam, m_logFolderCompPtr);
 	I_REF(imtfile::IFileCompression, m_compressorCompPtr);
