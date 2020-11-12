@@ -270,7 +270,7 @@ template <typename PointType>
 void CPointCloudShape::UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& pointCloud, const istd::IChangeable::ChangeSet& changeSet)
 {
 	bool appendData = changeSet.ContainsExplicit(imt3d::IPointsBasedObject::CF_APPEND);
-	int lastIndex = m_vertices.size() - 1;
+	int lastIndex = m_vertices.empty() ? 0 : m_vertices.size() - 1;
 
 	if (!appendData){
 		m_vertices.clear();
@@ -293,7 +293,7 @@ void CPointCloudShape::UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& poi
 	imt3d::IPointsBasedObject::PointFormat format = pointCloud.GetPointFormat();
 
 	// update vertices
-	for (int i = 0; i < pointCloudSize; ++i){
+	for (int i = lastIndex; i < pointCloudSize; ++i){
 		const PointType* pointDataPtr = static_cast<const PointType*>(pointCloud.GetPointData(i));
 		Q_ASSERT(pointDataPtr != nullptr);
 

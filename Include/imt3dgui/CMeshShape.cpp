@@ -250,6 +250,13 @@ void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh, const ist
 	int meshSize = mesh.GetPointsCount();
 	const imt3d::IMesh3d::Indices& indices = mesh.GetIndices();
 
+	if (meshSize <= 0 || indices.empty()){
+		m_vertices.clear();
+		m_indices.clear();
+
+		return;
+	}
+
 	bool appendData = changeSet.ContainsExplicit(imt3d::IPointsBasedObject::CF_APPEND);
 	int lastIndex = m_vertices.size() - 1;
 
@@ -262,13 +269,6 @@ void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh, const ist
 
 	m_vertices.reserve(meshSize);
 	m_indices.reserve(static_cast<int>(indices.size() * indices.front().size()));
-
-	if (meshSize <= 0 || indices.empty()){
-		m_vertices.clear();
-		m_indices.clear();
-
-		return;
-	}
 
 	imt3d::IPointsBasedObject::PointFormat format = mesh.GetPointFormat();
 
