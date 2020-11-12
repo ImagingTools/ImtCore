@@ -25,10 +25,10 @@ public:
 
 protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
+	virtual void OnGuiModelAttached() override;
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
-	virtual void OnGuiCreated() override;
 	virtual void OnGuiRetranslate() override;
 
 private:
@@ -41,3 +41,5 @@ private:
 
 
 } // namespace imtgui
+
+

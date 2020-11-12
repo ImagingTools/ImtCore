@@ -7,35 +7,21 @@ namespace imtgui
 
 // protected methods
 
-// reimplemented (iqtgui::CGuiComponentBase)
+// reimplemented (iqtgui::TGuiObserverWrap)
 
-void CSingleStatusProviderGuiComp::OnGuiCreated()
+void CSingleStatusProviderGuiComp::OnGuiModelAttached()
 {
-	BaseClass::OnGuiCreated();
+	BaseClass::OnGuiModelAttached();
 
 	const istd::IInformationProvider* informationProviderPtr = GetObjectPtr();
-	Q_ASSERT(informationProviderPtr != nullptr);
+	if (informationProviderPtr != nullptr){
+		QWidget* widgetPtr = GetWidget();
+		Q_ASSERT(widgetPtr != nullptr);
 
-	QWidget* widgetPtr = GetWidget();
-	Q_ASSERT(widgetPtr != nullptr);
-
-	widgetPtr->setToolTip(informationProviderPtr->GetInformationDescription());
-}
-
-
-void CSingleStatusProviderGuiComp::OnGuiRetranslate()
-{
-	BaseClass::OnGuiRetranslate();
-
-	if (!IsUpdateBlocked()){
-		UpdateBlocker blockUpdate(this);
-
-		UpdateGui(istd::IChangeable::GetAnyChange());
+		widgetPtr->setToolTip(informationProviderPtr->GetInformationDescription());
 	}
 }
 
-
-// reimplemented (iqtgui::TGuiObserverWrap)
 
 void CSingleStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
@@ -60,6 +46,22 @@ void CSingleStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 	}
 }
 
+
+// reimplemented (iqtgui::CGuiComponentBase)
+
+void CSingleStatusProviderGuiComp::OnGuiRetranslate()
+{
+	BaseClass::OnGuiRetranslate();
+
+	if (!IsUpdateBlocked()){
+		UpdateBlocker blockUpdate(this);
+
+		UpdateGui(istd::IChangeable::GetAnyChange());
+	}
+}
+
+
+// private static methods
 
 QIcon CSingleStatusProviderGuiComp::GetStatusIcon(istd::IInformationProvider::InformationCategory status)
 {
