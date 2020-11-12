@@ -102,7 +102,8 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath, bool ensureNormalExists)
 
 bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, const Indices& indices)
 {
-	istd::CChangeNotifier changeNotifier(this);
+	static ChangeSet createChangeSet(CF_CREATE);
+	istd::CChangeNotifier changeNotifier(this, &createChangeSet);
 
 	bool retVal = Create(pointFormat, pointsCount, nullptr, true);
 
@@ -116,7 +117,8 @@ bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, const Indices
 
 bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, void* pointsDataPtr, bool copyPointsDataFlag, const Indices& indices)
 {
-	istd::CChangeNotifier changeNotifier(this);
+	static ChangeSet createChangeSet(CF_CREATE);
+	istd::CChangeNotifier changeNotifier(this, &createChangeSet);
 
 	bool retVal = Create(pointFormat, pointsCount, pointsDataPtr, copyPointsDataFlag);
 
@@ -130,7 +132,8 @@ bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, void* pointsD
 
 bool CMesh3d::InsertData(int pointsCount, void * pointsDataPtr, const Indices& indices)
 {
-	istd::CChangeNotifier changeNotifier(this);
+	static ChangeSet appendChangeSet(CF_APPEND);
+	istd::CChangeNotifier changeNotifier(this, &appendChangeSet);
 
 	int oldPointsSize = GetPointsCount();
 

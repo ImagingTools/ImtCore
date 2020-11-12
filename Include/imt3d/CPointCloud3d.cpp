@@ -22,7 +22,8 @@ namespace imt3d
 
 bool CPointCloud3d::CreateCloud(PointFormat pointFormat, int pointsCount, const istd::CIndex2d* gridSizePtr)
 {
-	istd::CChangeNotifier changeNotifier(this);
+	static ChangeSet createChangeSet(CF_CREATE);
+	istd::CChangeNotifier changeNotifier(this, &createChangeSet);
 
 	bool retVal = Create(pointFormat, pointsCount, nullptr, true);
 
@@ -40,7 +41,8 @@ bool CPointCloud3d::CreateCloud(PointFormat pointFormat,
 			bool copyData,
 			const istd::CIndex2d* gridSizePtr)
 {
-	istd::CChangeNotifier changeNotifier(this);
+	static ChangeSet createChangeSet(CF_CREATE);
+	istd::CChangeNotifier changeNotifier(this, &createChangeSet);
 
 	bool retVal = Create(pointFormat, pointsCount, dataPtr, copyData);
 
@@ -56,7 +58,8 @@ bool CPointCloud3d::InsertPoints(
 			int pointsCount,
 			const void* dataPtr)
 {
-	istd::CChangeNotifier changeNotifier(this);
+	static ChangeSet appendChangeSet(CF_APPEND);
+	istd::CChangeNotifier changeNotifier(this, &appendChangeSet);
 
 	return Append(pointsCount, dataPtr);
 }

@@ -162,7 +162,7 @@ void CPointCloudShape::SetInfoBoxEnabled(bool isEnabled)
 
 // reimplement (imt3dgui::CShape3dBase)
 
-void CPointCloudShape::UpdateShapeGeometry()
+void CPointCloudShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet)
 {
 	imt3d::IPointCloud3d* pointCloudPtr = dynamic_cast<imt3d::IPointCloud3d*>(GetObservedModel());
 	if (!pointCloudPtr){
@@ -171,19 +171,19 @@ void CPointCloudShape::UpdateShapeGeometry()
 
 	switch (pointCloudPtr->GetPointFormat()){
 		case imt3d::IPointsBasedObject::PF_XYZ_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyz32>(*pointCloudPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyz32>(*pointCloudPtr, changeSet);
 		case imt3d::IPointsBasedObject::PF_XYZ_64:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyz64>(*pointCloudPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyz64>(*pointCloudPtr, changeSet);
 		case imt3d::IPointsBasedObject::PF_XYZW_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzw32>(*pointCloudPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzw32>(*pointCloudPtr, changeSet);
 		case imt3d::IPointsBasedObject::PF_XYZ_ABC_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*pointCloudPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*pointCloudPtr, changeSet);
 		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*pointCloudPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*pointCloudPtr, changeSet);
 		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*pointCloudPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*pointCloudPtr, changeSet);
 		case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*pointCloudPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*pointCloudPtr, changeSet);
 	}
 }
 
@@ -267,14 +267,23 @@ void CPointCloudShape::SetRectSelection(const QRect& selectionRect, bool isCircl
 
 
 template <typename PointType>
-void CPointCloudShape::UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& pointCloud)
+void CPointCloudShape::UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& pointCloud, const istd::IChangeable::ChangeSet& changeSet)
 {
-	m_vertices.clear();
-	m_indices.clear();
+	bool appendData = changeSet.ContainsExplicit(imt3d::IPointsBasedObject::CF_APPEND);
+	int lastIndex = m_vertices.size() - 1;
+
+	if (!appendData){
+		m_vertices.clear();
+		m_indices.clear();
+
+		lastIndex = 0;
+	}
 
 	int pointCloudSize = pointCloud.GetPointsCount();
-
 	if (pointCloudSize <= 0){
+		m_vertices.clear();
+		m_indices.clear();
+
 		return;
 	}
 

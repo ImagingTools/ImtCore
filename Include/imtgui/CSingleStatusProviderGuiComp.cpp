@@ -56,7 +56,7 @@ void CSingleStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 		DescriptionLabel->setText(informationProviderPtr->GetInformationDescription());
 	}
 	else{
-		DescriptionLabel->hide();
+		DescriptionLabel->hide();  
 	}
 }
 

@@ -230,7 +230,7 @@ void CShape3dBase::OnContextInitialized(QOpenGLContext* contextPtr)
 		Q_ASSERT(m_vertexBuffer.isCreated());
 		Q_ASSERT(m_indexBuffer.isCreated());
 
-		UpdateGeometry();
+		UpdateGeometry(istd::IChangeable::GetAllChanges());
 	}
 }
 
@@ -244,9 +244,9 @@ void CShape3dBase::OnContextDestroyed(QOpenGLContext* /*contextPtr*/)
 
 // protected methods
 
-void CShape3dBase::UpdateGeometry()
+void CShape3dBase::UpdateGeometry(const istd::IChangeable::ChangeSet& changeSet)
 {
-	UpdateShapeGeometry();
+	UpdateShapeGeometry(changeSet);
 
 	UploadGeometry(true, m_vertices, m_vertexBuffer);
 	UploadGeometry(true, m_indices, m_indexBuffer);
@@ -305,10 +305,10 @@ QVector3D CShape3dBase::WindowToModel(const QPoint& windowCoordinate, float z) c
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CShape3dBase::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CShape3dBase::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	if (IsValid()){
-		UpdateGeometry();
+		UpdateGeometry(changeSet);
 	}
 }
 

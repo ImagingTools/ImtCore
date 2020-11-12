@@ -66,11 +66,11 @@ protected:
 
 protected:
 	// to be implemented in descendants
-	virtual void UpdateShapeGeometry() = 0;
+	virtual void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) = 0;
 	virtual void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) = 0;
 
 protected:
-	void UpdateGeometry();
+	void UpdateGeometry(const istd::IChangeable::ChangeSet& changeSet);
 	QMatrix4x4 GetModelMatrix() const;
 	QPoint ModelToWindow(const QVector3D& modelCoordinate) const;
 	QVector3D WindowToModel(const QPoint& windowCoordinate, float z) const;

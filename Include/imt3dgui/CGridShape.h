@@ -22,7 +22,7 @@ public:
 
 protected:
 	// reimplement (imt3dgui::CShape3dBase)
-	void UpdateShapeGeometry() override;
+	void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
 	void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
 
 	// reimplement (imt3dgui::IShape3d)

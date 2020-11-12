@@ -38,7 +38,7 @@ public:
 
 protected:
 	// reimplemented (imt3dgui::CShape3dBase)
-	void UpdateShapeGeometry() override;
+	void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
 	void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
 
 	// reimplemented (imt3dview::IDrawable)
@@ -53,7 +53,7 @@ private:
 	typedef std::set<int> Indices;
 
 	void SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection);
-	template <typename PointType> void UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh);
+	template <typename PointType> void UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh, const istd::IChangeable::ChangeSet& changeSet);
 	template <typename PointType> void DeleteSelectionHelper(imt3d::IMesh3d& mesh);
 	static bool IsPointWithin(const QPoint& point, const QRect& rect, bool isCircle);
 	bool GetFacePointIntersection(const QPoint& point, Indices& intersectedIndicies) const;

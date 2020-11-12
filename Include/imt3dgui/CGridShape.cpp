@@ -39,7 +39,7 @@ void CGridShape::SetCount(int count)
 
 // reimplement (imt3dgui::CShape3dBase)
 
-void CGridShape::UpdateShapeGeometry()
+void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet)
 {
 	m_vertices.clear();
 	m_vertices.reserve(m_count * 2 + 1);

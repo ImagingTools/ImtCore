@@ -39,7 +39,7 @@ public:
 
 protected:
 	// reimplemented (imt3dview::CShape3dBase)
-	void UpdateShapeGeometry() override;
+	void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
 	void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
 
 	// reimplemented (imt3dview::IDrawable)
@@ -51,7 +51,7 @@ protected:
 
 private:
 	void SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection);
-	template <typename PointType> void UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& pointCloud);
+	template <typename PointType> void UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& pointCloud, const istd::IChangeable::ChangeSet& changeSet);
 	template <typename PointType> void DeleteSelectionHelper(imt3d::IPointCloud3d& pointCloud);
 	static bool IsPointWithin(const QPoint& point, const QRect& rect, bool isCircle);
 

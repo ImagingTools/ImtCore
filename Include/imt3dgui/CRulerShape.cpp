@@ -126,7 +126,7 @@ bool CRulerShape::OnMouseRelease(QMouseEvent& /*e*/)
 
 // reimplemented (imt3dgui::CShape3dBase)
 
-void CRulerShape::UpdateShapeGeometry()
+void CRulerShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet)
 {
 	m_vertices.clear();
 

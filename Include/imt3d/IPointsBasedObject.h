@@ -28,6 +28,12 @@ namespace imt3d
 class IPointsBasedObject : virtual public imt3d::IObject3d
 {
 public:
+	enum ChangeFlags
+	{
+		CF_CREATE = 20000,
+		CF_APPEND
+	};
+
 	enum PointFormat
 	{
 		PF_XYZ_32 = 0,					// 3 float point coordinates

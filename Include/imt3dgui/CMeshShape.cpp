@@ -150,7 +150,7 @@ void CMeshShape::SetInfoBoxEnabled(bool isEnabled)
 
 // reimplement (imt3dgui::CShape3dBase)
 
-void CMeshShape::UpdateShapeGeometry()
+void CMeshShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet)
 {
 	imt3d::IMesh3d* meshPtr = dynamic_cast<imt3d::IMesh3d*>(GetObservedModel());
 	if (!meshPtr){
@@ -159,19 +159,19 @@ void CMeshShape::UpdateShapeGeometry()
 
 	switch (meshPtr->GetPointFormat()){
 		case imt3d::IPointsBasedObject::PF_XYZ_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyz32>(*meshPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyz32>(*meshPtr, changeSet);
 		case imt3d::IPointsBasedObject::PF_XYZ_64:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyz64>(*meshPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyz64>(*meshPtr, changeSet);
 		case imt3d::IPointsBasedObject::PF_XYZW_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzw32>(*meshPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzw32>(*meshPtr, changeSet);
 		case imt3d::IPointsBasedObject::PF_XYZ_ABC_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*meshPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*meshPtr, changeSet);
 		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*meshPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*meshPtr, changeSet);
 		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormalRgba32>(*meshPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormalRgba32>(*meshPtr, changeSet);
 		case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*meshPtr);
+			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*meshPtr, changeSet);
 	}
 }
 
@@ -245,22 +245,35 @@ void CMeshShape::SetRectSelection(const QRect& selectionRect, bool isCircle, boo
 
 
 template <typename PointType>
-void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh)
+void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh, const istd::IChangeable::ChangeSet& changeSet)
 {
 	int meshSize = mesh.GetPointsCount();
 	const imt3d::IMesh3d::Indices& indices = mesh.GetIndices();
 
-	m_vertices.clear();
+	bool appendData = changeSet.ContainsExplicit(imt3d::IPointsBasedObject::CF_APPEND);
+	int lastIndex = m_vertices.size() - 1;
+
+	if (!appendData){
+		m_vertices.clear();
+		m_indices.clear();
+
+		lastIndex = 0;
+	}
+
 	m_vertices.reserve(meshSize);
+	m_indices.reserve(static_cast<int>(indices.size() * indices.front().size()));
 
 	if (meshSize <= 0 || indices.empty()){
+		m_vertices.clear();
+		m_indices.clear();
+
 		return;
 	}
 
 	imt3d::IPointsBasedObject::PointFormat format = mesh.GetPointFormat();
 
 	// update vertices and normals
-	for (int i = 0; i < meshSize; ++i){
+	for (int i = lastIndex; i < meshSize; ++i){
 		const PointType* pointDataPtr = static_cast<const PointType*>(mesh.GetPointData(i));
 		Q_ASSERT(pointDataPtr != nullptr);
 
@@ -296,10 +309,7 @@ void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh)
 		}
 
 	// update indices
-	m_indices.clear();
-	m_indices.reserve(static_cast<int>(indices.size() * indices.front().size()));
-
-	for (int i = 0; i < indices.size(); ++i){
+	for (int i = lastIndex; i < indices.size(); ++i){
 		const std::vector<uint32_t>& index = indices[i];
 
 		for (int j = 0; j < index.size(); ++j){
