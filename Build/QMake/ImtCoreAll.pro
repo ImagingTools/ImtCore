@@ -50,6 +50,9 @@ imtzip.file = ../../Include/imtzip/QMake/imtzip.pro
 SUBDIRS += imtpy
 imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
 
+SUBDIRS += imtqml
+imtqml.file = ../../Include/imtqml/QMake/imtqml.pro
+
 # Component packages
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
