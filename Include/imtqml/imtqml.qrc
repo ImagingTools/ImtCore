@@ -1,4 +1,6 @@
 <RCC>
-    <qresource prefix="/Scripts">
+    <qresource prefix="/qml">
+        <file alias="MainWindow.qml">Resources/qml/MainWindow.qml</file>
+        <file alias="WrapItem.qml">Resources/qml/WrapItem.qml</file>
     </qresource>
 </RCC>
