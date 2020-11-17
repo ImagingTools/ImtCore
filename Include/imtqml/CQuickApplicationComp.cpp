@@ -1,25 +1,3 @@
-/********************************************************************************
-**
-**	Copyright (C) 2007-2017 Witold Gantzke & Kirill Lepskiy
-**
-**	This file is part of the ACF Toolkit.
-**
-**	This file may be used under the terms of the GNU Lesser
-**	General Public License version 2.1 as published by the Free Software
-**	Foundation and appearing in the file LicenseLGPL.txt included in the
-**	packaging of this file.  Please review the following information to
-**	ensure the GNU Lesser General Public License version 2.1 requirements
-**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-**	If you are unsure which license is appropriate for your use, please
-**	contact us at info@imagingtools.de.
-**
-** 	See http://www.ilena.org or write info@imagingtools.de for further
-** 	information about the ACF.
-**
-********************************************************************************/
-
-
 #include <imtqml/CQuickApplicationComp.h>
 
 
@@ -28,18 +6,10 @@
 #include <QtCore/QTimer>
 #include <QtCore/QtGlobal>
 #include <QtGui/QIcon>
-
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlApplicationEngine>
+#include <QtQuick/QQuickView>
 #include <QtQuickWidgets/QQuickWidget>
-#include <QQuickView>
-//#if QT_VERSION >= 0x050000
-//#include <QtWidgets/QApplication>
-//#include <QtWidgets/QVBoxLayout>
-//#else
-//#include <QtGui/QApplication>
-//#include <QtGui/QVBoxLayout>
-//#endif
 
 #if defined (Q_OS_WIN)
 	#if QT_VERSION >= 0x050500
@@ -75,11 +45,11 @@ CQuickApplicationComp::CQuickApplicationComp()
 
 const imtqml::IQuickObject* CQuickApplicationComp::GetApplicationItem() const
 {
-    if (m_mainQuickCompPtr.IsValid()){
-        return m_mainQuickCompPtr.GetPtr();
-    }
+	if (m_mainQuickCompPtr.IsValid()){
+		return m_mainQuickCompPtr.GetPtr();
+	}
 
-    return NULL;
+	return nullptr;
 }
 
 
@@ -114,56 +84,19 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 {
 	int retVal = -1;
 
-     //Q_INIT_RESOURCE(imtgui);
-
 	if (BaseClass::InitializeApplication(argc, argv)){
 		m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_STARTING);
 
-//		TryShowSplashScreen();
-
-//        QQmlEngine engine;
-        QQmlApplicationEngine engine;
-        engine.addImportPath("qrc:/");
-        engine.addImportPath("qrc:/qml");
-        engine.load(QUrl("qrc:/qml/MainWindow.qml"));
-//        QQuickView *view = new QQuickView;
-//        view->setSource(QUrl("qrc:/qml/MainWindow.qml"));
-//        view->show();
+		QQmlApplicationEngine engine;
+		engine.addImportPath("qrc:/");
+		engine.addImportPath("qrc:/qml");
+		engine.load(QUrl("qrc:/qml/MainWindow.qml"));
 
 		if (m_allowApplicationCloseModelCompPtr.IsValid()){
 			m_allowApplicationCloseModelCompPtr->AttachObserver(this);
 		}
 
-        if (m_mainQuickCompPtr.IsValid()){
-//            m_mainQuickCompPtr.GetPtr()->CreateItem(&engine);
-
-
-//			if (m_frameSpaceSizeAttrPtr.IsValid()){
-//                m_mainWindowPtr.SetPtr(new QWidget());
-
-//                QVBoxLayout* frameLayout = new QVBoxLayout(m_mainWindowPtr.GetPtr());
-
-//				frameLayout->setMargin(*m_frameSpaceSizeAttrPtr);
-
-//				// Create application's main widget:
-//                m_mainGuiCompPtr->CreateGui(m_mainWindowPtr.GetPtr());
-//			}
-//			else{
-//				m_mainGuiCompPtr->CreateGui(NULL);
-
-//                m_mainWindowPtr.SetPtr(m_mainGuiCompPtr->GetWidget());
-//			}
-
-
-//			QString operationSystemName = istd::CSystem::GetOperationSystemName();
-//            m_mainWindowPtr->setProperty("OperatingSystem", operationSystemName);
-
-//#if defined(Q_OS_OSX)
-//			m_mainWidgetPtr->setAttribute(Qt::WA_MacNormalSize, true);
-//#endif
-
-//            m_mainWindowPtr->setWindowTitle(QCoreApplication::applicationName());
-//            m_mainWindowPtr->setWindowIcon(QApplication::windowIcon());
+		if (m_mainQuickCompPtr.IsValid()){
 		}
 
 		HideSplashScreen();
@@ -194,37 +127,12 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 			m_trayIconPtr->setVisible(true);
 		}
 
-//        if (m_mainWindowPtr.IsValid()){
-//            m_defaultWidgetFlags = m_mainWindowPtr->windowFlags();
+		QTimer::singleShot(0, this, SLOT(OnEventLoopStarted()));
 
-//			UpdateMainWidgetDecorations();
+		// Start application loop:
+		retVal = QGuiApplication::exec();
 
-//			ShowWindow();
-
-//            m_lastWidgetGeometry = m_mainWindowPtr->geometry();
-
-//			QTimer::singleShot(0, this, SLOT(OnEventLoopStarted()));
-
-//			// Start application loop:
-//			retVal = QApplication::exec();
-
-//			m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_SHUTDOWN);
-
-//			Q_ASSERT(m_mainGuiCompPtr.IsValid());
-//			m_mainGuiCompPtr->DestroyGui();
-
-//            m_mainWindowPtr.Reset();
-//		}
-//		else{
-//			if (m_trayIconPtr.IsValid()){
-				QTimer::singleShot(0, this, SLOT(OnEventLoopStarted()));
-
-				// Start application loop:
-                retVal = QGuiApplication::exec();
-
-				m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_SHUTDOWN);
-//			}
-//		}
+		m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_SHUTDOWN);
 	}
 
 	if (m_trayIconPtr.IsValid()){
@@ -252,19 +160,6 @@ QString CQuickApplicationComp::GetHelpText() const
 
 void CQuickApplicationComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-//    if (m_mainWindowPtr.IsValid()){
-//        m_lastWidgetGeometry = m_mainWindowPtr->geometry();
-
-//		UpdateMainWidgetDecorations();
-
-//		ShowWindow();
-
-//        if (		!m_mainWindowPtr->isMaximized() &&
-//                    !m_mainWindowPtr->isMinimized() &&
-//                    !m_mainWindowPtr->isFullScreen()){
-//            m_mainWindowPtr->setGeometry(m_lastWidgetGeometry);
-//		}
-//	}
 }
 
 
@@ -282,66 +177,11 @@ void CQuickApplicationComp::OnComponentDestroyed()
 
 void CQuickApplicationComp::UpdateMainWidgetDecorations()
 {
-//    if (m_allowApplicationCloseCompPtr.IsValid() && m_mainWindowPtr.IsValid()){
-//		Qt::WindowFlags windowFlags = m_defaultWidgetFlags;
-
-//		if (!m_allowApplicationCloseCompPtr->IsEnabled()){
-//            windowFlags = (m_mainWindowPtr->windowFlags() | Qt::CustomizeWindowHint) & ~Qt::WindowCloseButtonHint;
-//		}
-
-//        if (windowFlags != m_mainWindowPtr->windowFlags()){
-//            m_mainWindowPtr->setWindowFlags(windowFlags);
-//		}
-//	}
 }
 
 
 void CQuickApplicationComp::ShowWindow()
 {
-//    Q_ASSERT(m_mainWindowPtr.IsValid());
-
-//	int uiStartMode = 0;
-//	if (m_uiStartModeAttrPtr.IsValid()){
-//		uiStartMode = *m_uiStartModeAttrPtr;
-//	}
-
-//	bool usedFullscreenBorder = false;
-
-//#if defined (Q_OS_WIN)
-//	#if QT_VERSION >= 0x050500
-//		usedFullscreenBorder = *m_useFullScreenBorderOnWindowsAttrPtr;
-//	#endif
-//#endif
-//	QWindow* windowHandle = NULL;
-
-//	switch (uiStartMode){
-//		case 1:
-//#if QT_VERSION >= 0x050500
-//			windowHandle = m_mainWidgetPtr->windowHandle();
-//#if defined (Q_OS_WIN)
-//			if (windowHandle != NULL){
-//				QWindowsWindowFunctions::setHasBorderInFullScreen(windowHandle, usedFullscreenBorder);
-//			}
-//#endif
-//#if QT_VERSION >= 0x050000
-//			// workaround to go full screen after start (Windows, Qt 5.6 - 5.10)
-//			m_mainWidgetPtr->showMaximized();
-//#endif
-//#endif
-//            m_mainWindowPtr->showFullScreen();
-//			break;
-
-//		case 2:
-//            m_mainWindowPtr->showMinimized();
-//			break;
-
-//		case 3:
-//            m_mainWindowPtr->showMaximized();
-//			break;
-
-//		default:
-//            m_mainWindowPtr->show();
-//	}
 }
 
 
@@ -359,15 +199,7 @@ void CQuickApplicationComp::OnEventLoopStarted()
 
 void CQuickApplicationComp::OnQuit()
 {
-//    if (m_mainWindowPtr.IsValid()){
-//        m_mainWindowPtr->close();
-//	}
-//	else{
-//		QCoreApplication::quit();
-//	}
-
-    QCoreApplication::quit();
-
+	QCoreApplication::quit();
 }
 
 

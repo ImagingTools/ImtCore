@@ -14,23 +14,24 @@ namespace ImtQmlPck
 
 I_EXPORT_PACKAGE(
 			"ImtQmlPck",
-			"ImagingTools core framework Qml-component package",
+			"Package for QML-related components",
 			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
-            QuickApplication,
-            "Main entry point for Qt Quick applications using GUI object as main window",
-            "Application Main Entry Start Begin Quick" IM_TAG("Application"));
+			QuickApplication,
+			"Main entry point for Qt Quick applications using GUI object as main window",
+			"Application Main Quick QML");
 
 I_EXPORT_COMPONENT(
-            QuickObject,
-            "Base graphics object for QuickApplication",
-            "Base graphics object for QuickApplication" IM_TAG("QuickObject"));
+			QuickObject,
+			"Base graphics object for QuickApplication",
+			"Quick QML");
 
 I_EXPORT_COMPONENT(
-            GuiQuickWrap,
-            "Container object for QuickObject",
-            "Container object for QuickObject" IM_TAG("GuiQuickWrap"));
+			GuiQuickWrap,
+			"Container object for QuickObject",
+			"Quick QML");
+
 
 } // namespace ImtQmlPck
 
