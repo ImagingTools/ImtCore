@@ -4,14 +4,14 @@
 // Qt includes
 #include <QtGui/QGuiApplication>
 #include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QPushButton>
 
 
 namespace imtqml
 {
 
 CGuiQuickWrapComp::CGuiQuickWrapComp()
-	:m_quickWidget(nullptr),
-	m_layout(nullptr)
+	:m_quickWidget(nullptr)
 {
 }
 
@@ -39,9 +39,13 @@ bool CGuiQuickWrapComp::CreateGui(QWidget *parentPtr)
 	}
 
 	if (parentPtr != nullptr){
-		m_layout = new QVBoxLayout(parentPtr);
+		if (parentPtr != NULL) {
+			QLayout* layoutPtr = parentPtr->layout();
 
-		m_layout->addWidget(m_quickWidget);
+			if (layoutPtr != NULL) {
+				layoutPtr->addWidget(m_quickWidget);
+			}
+		}
 	}
 
 	return  m_quickWidget != nullptr;
@@ -52,10 +56,6 @@ bool CGuiQuickWrapComp::DestroyGui()
 {
 	if (m_quickWidget != nullptr){
 		m_quickWidget->deleteLater();
-	}
-
-	if (m_layout != nullptr){
-		m_layout->deleteLater();
 	}
 
 	return true;

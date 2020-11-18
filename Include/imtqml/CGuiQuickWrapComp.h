@@ -10,6 +10,8 @@
 #include <icomp/CComponentBase.h>
 #include <imtqml/IQuickObject.h>
 #include <iqtgui/IGuiObject.h>
+#include <iqtgui/TGuiComponentBase.h>
+
 
 
 namespace imtqml
@@ -44,7 +46,6 @@ protected:
 	I_REF(imtqml::IQuickObject, m_quickCompPtr);
 
 	QQuickWidget *m_quickWidget;
-	QVBoxLayout *m_layout;
 };
 
 
