@@ -38,13 +38,11 @@ bool CGuiQuickWrapComp::CreateGui(QWidget *parentPtr)
 		}
 	}
 
-	if (parentPtr != nullptr){
-		if (parentPtr != NULL) {
-			QLayout* layoutPtr = parentPtr->layout();
+	if (parentPtr != nullptr) {
+		QLayout* layoutPtr = parentPtr->layout();
 
-			if (layoutPtr != NULL) {
-				layoutPtr->addWidget(m_quickWidget);
-			}
+		if (layoutPtr != nullptr) {
+			layoutPtr->addWidget(m_quickWidget);
 		}
 	}
 
