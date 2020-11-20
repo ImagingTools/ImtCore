@@ -1,6 +1,5 @@
 #pragma once
 
-
 // Qt includes
 #include <QtCore/QtGlobal>
 #include <QtQuick/QQuickItem>
@@ -47,5 +46,6 @@ protected:
 
 
 } // namespace imtqml
+
 
 

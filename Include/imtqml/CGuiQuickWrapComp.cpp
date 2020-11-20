@@ -30,6 +30,7 @@ bool CGuiQuickWrapComp::CreateGui(QWidget *parentPtr)
 		imtqml::IQuickObject *quickObject = m_quickCompPtr.GetPtr();
 		if (m_quickWidget == nullptr){
 			m_quickWidget = new QQuickWidget(parentPtr);
+			m_quickWidget->setContentsMargins(0, 0, 0, 0);
 			m_quickWidget->setSource(QUrl::fromLocalFile((":/qml/WrapItem.qml")));
 
 			quickObject->CreateItem(m_quickWidget->rootObject());
