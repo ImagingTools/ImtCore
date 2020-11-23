@@ -5,20 +5,20 @@
 #include <QtWidgets/QGraphicsItem.h>
 
 // ACF Includes
-#include <istd/IPolymorphic.h>
-#include <istd/TSmartPtr.h>
+#include <istd/IChangeable.h>
 
 
 namespace imtloggui
 {
 
 
-class IGraphicsItemProvider: virtual public istd::IPolymorphic
+class IGraphicsItemProvider: virtual public istd::IChangeable
 {
 public:
-	typedef QVector<QGraphicsItem*> GraphicsItemList;
+	typedef QList<QGraphicsItem*> GraphicsItemList;
 
-	virtual GraphicsItemList GetGraphicsItems() const = 0;
+	virtual GraphicsItemList GetAddedItems() const = 0;
+	virtual GraphicsItemList GetRemovedItems() const = 0;
 };
 
 

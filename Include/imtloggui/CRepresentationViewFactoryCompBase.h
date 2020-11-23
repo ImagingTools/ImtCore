@@ -1,15 +1,11 @@
 #pragma once
 
 
-// Qt includes
-#include <QtWidgets/QGraphicsItem>
-
 // Acf includes
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
 #include <imtloggui/IRepresentationViewFactory.h>
-#include <imtloggui/IEventItemFactory.h>
 #include <imtloggui/IEventScenePositionProvider.h>
 
 
@@ -17,25 +13,22 @@ namespace imtloggui
 {
 
 
-class CRepresentationViewFactoryComp:
+class CRepresentationViewFactoryCompBase:
 			public icomp::CComponentBase,
 			virtual public IRepresentationViewFactory
 {
 public:
 	typedef CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationViewFactoryComp)
+	I_BEGIN_BASE_COMPONENT(CRepresentationViewFactoryCompBase)
 		I_REGISTER_INTERFACE(IRepresentationViewFactory);
 		I_ASSIGN(m_positionProviderCompPtr, "ScenePositionProvider", "Scene position provider", true, "ScenePositionProvider");
-		I_ASSIGN(m_eventItemFactoryCompPtr, "EventItemFactory", "Event item factory component", false, "");
+		I_ASSIGN(m_slaveFactoryCompPtr, "SlaveViewFactory", "Slave view factory", false, "");
 	I_END_COMPONENT
 
-	// reimplemented (imtloggui::IRepresentationViewFactory)
-	virtual GraphicsItemList CreateGraphicItems(const istd::IChangeable* objectPtr) const override;
-
-private:
+protected:
 	I_REF(IEventScenePositionProvider, m_positionProviderCompPtr);
-	I_REF(IEventItemFactory, m_eventItemFactoryCompPtr);
+	I_REF(IRepresentationViewFactory, m_slaveFactoryCompPtr);
 };
 
 

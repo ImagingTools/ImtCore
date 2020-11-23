@@ -1,6 +1,8 @@
 #include <imtloggui/CGraphicsControllerComp.h>
 
 
+#include <qdebug>
+
 // Qt includes
 #include <QtGui/QPen>
 
@@ -17,59 +19,22 @@ CGraphicsControllerComp::CGraphicsControllerComp()
 	m_timeRangeObserver.SetParent(this);
 }
 
+
 // reimplemented (imtloggui::IGraphicsItemProvider)
 
-IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetGraphicsItems() const
+IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetAddedItems() const
 {
-	GraphicsItemList retVal;
-
-	if (m_groupProviderCompPtr.IsValid()){
-		imtbase::ICollectionInfo::Ids groupIds = m_groupProviderCompPtr->GetElementIds();
-		QList<int> allGroupsMessageIds;
-		for (int i = 0; i < groupIds.count(); i++){
-			ILayerProvider* layerProvider = m_groupProviderCompPtr->GetLayerProvider(groupIds[i]);
-			imtbase::ICollectionInfo::Ids layerIds = layerProvider->GetElementIds();
-			IRepresentationFactoryProvider* representationProvider = layerProvider->GetRepresentationFactoryProvider(layerIds[0]);
-			imtbase::ICollectionInfo::Ids factoryIds = representationProvider->GetElementIds();
-			IRepresentationFactory* representation = representationProvider->GetRepresentationFactory(factoryIds[0]);
-
-			QDateTime begin = m_timeAxis.GetVisibleBeginTime();
-			QDateTime end = m_timeAxis.GetVisibleEndTime();
-
-			if (i != groupIds.count() - 1){
-				allGroupsMessageIds.append(layerProvider->GetMessageIdList());
-			}
-
-			if (m_representationViewFactoryCompPtr.IsValid()){
-				istd::TSmartPtr<istd::IChangeable> representationObject;
-
-				if (i == groupIds.count() - 1){
-					representationObject = representation->CreateRepresentationObject(
-								imtlog::CTimeRange(begin, end),
-								allGroupsMessageIds,
-								imtlog::IEventMessageIdFilter::M_EXCEPT);
-				}
-				else{
-					representationObject = representation->CreateRepresentationObject(
-								imtlog::CTimeRange(begin, end),
-								layerProvider->GetMessageIdList(),
-								imtlog::IEventMessageIdFilter::M_ACCEPT);
-				}
-
-				IGraphicsItemProvider::GraphicsItemList items = m_representationViewFactoryCompPtr->CreateGraphicItems(representationObject.GetPtr());
-
-				for (int j = 0; j < items.count(); j++){
-					items[j]->setPos(items[j]->pos().x(), -150 - i*300);
-				}
-
-				retVal.append(items);
-			}
-		}
-	}
-
-	return retVal;
+	QList<QGraphicsItem*> items = m_addedItems;
+	m_addedItems.clear();
+	return items;
+}
 
 
+IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetRemovedItems() const
+{
+	QList<QGraphicsItem*> items = m_removedItems;
+	m_removedItems.clear();
+	return items;
 }
 
 
@@ -79,11 +44,15 @@ void CGraphicsControllerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	m_timeAxis.setPos(0, 0);
-	m_timeAxis.SetColor(Qt::green);
-	m_timeAxis.setRect(0, 0, 100, 40);
-	m_timeAxis.setZValue(101);
-	m_staticItemsProvider.AddItem(&m_timeAxis);
+	istd::CChangeNotifier notifier(this);
+
+	m_timeAxisPtr = new CTimeAxis();
+	m_timeAxisPtr->setPos(0, 0);
+	m_timeAxisPtr->SetColor(Qt::green);
+	m_timeAxisPtr->setRect(0, 0, 100, 40);
+	m_timeAxisPtr->setZValue(101);
+	//m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
+	m_addedItems.append(m_timeAxisPtr);
 
 	int sceneHeight = 0;
 
@@ -99,7 +68,7 @@ void CGraphicsControllerComp::OnComponentCreated()
 			rectPtr->setBrush(QBrush(color));
 			rectPtr->setPen(QPen(Qt::transparent));
 			rectPtr->setPos(0, -300 - i * 300);
-			m_staticItemsProvider.AddItem(rectPtr);
+			m_addedItems.append(rectPtr);
 
 			CEventGroupLabelItem* labelPtr = new CEventGroupLabelItem();
 			labelPtr->SetBackgroundColor(color);
@@ -107,7 +76,7 @@ void CGraphicsControllerComp::OnComponentCreated()
 			labelPtr->SetHeight(300);
 			sceneHeight += 300;
 			labelPtr->setPos(0, -150 - i * 300);
-			m_staticItemsProvider.AddItem(labelPtr);
+			m_addedItems.append(labelPtr);
 
 			GroupItem groupItem;
 			groupItem.backgroundPtr = rectPtr;
@@ -139,7 +108,7 @@ void CGraphicsControllerComp::OnComponentCreated()
 void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& changeSet)
 {
 	QRectF viewRect = propertyPtr->GetViewRect();
-	m_timeAxis.setPos(0, viewRect.bottom() - m_timeAxis.rect().height() / propertyPtr->GetScaleY());
+	m_timeAxisPtr->setPos(0, viewRect.bottom() - m_timeAxisPtr->rect().height() / propertyPtr->GetScaleY());
 
 	for (int i = 0; i < m_groupItemList.count(); i++){
 		QRectF rect = m_groupItemList[i].backgroundPtr->rect();
@@ -147,6 +116,81 @@ void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* proper
 		m_groupItemList[i].backgroundPtr->setRect(rect);
 		m_groupItemList[i].backgroundPtr->setPos(viewRect.x(), m_groupItemList[i].backgroundPtr->pos().y());
 		m_groupItemList[i].labelPtr->setPos(viewRect.x(), m_groupItemList[i].labelPtr->pos().y());
+	}
+
+	if (m_groupProviderCompPtr.IsValid()){
+		imtbase::ICollectionInfo::Ids groupIds = m_groupProviderCompPtr->GetElementIds();
+		QList<int> allGroupsMessageIds;
+
+		GraphicsItemList items;
+
+		for (int i = 0; i < groupIds.count(); i++){
+			ILayerProvider* layerProvider = m_groupProviderCompPtr->GetLayerProvider(groupIds[i]);
+			imtbase::ICollectionInfo::Ids layerIds = layerProvider->GetElementIds();
+			IRepresentationFactoryProvider* representationProvider = layerProvider->GetRepresentationFactoryProvider(layerIds[0]);
+			imtbase::ICollectionInfo::Ids factoryIds = representationProvider->GetElementIds();
+			IRepresentationFactory* representation = representationProvider->GetRepresentationFactory(factoryIds[0]);
+
+			QDateTime begin = m_timeAxisPtr->GetVisibleBeginTime();
+			QDateTime end = m_timeAxisPtr->GetVisibleEndTime();
+
+			if (i != groupIds.count() - 1){
+				allGroupsMessageIds.append(layerProvider->GetMessageIdList());
+			}
+
+			if (m_representationViewFactoryCompPtr.IsValid()){
+				istd::TSmartPtr<istd::IChangeable> representationObject;
+
+				if (i == groupIds.count() - 1){
+					representationObject = representation->CreateRepresentationObject(
+								imtlog::CTimeRange(begin, end),
+								allGroupsMessageIds,
+								imtlog::IEventMessageIdFilter::M_EXCEPT);
+				}
+				else{
+					representationObject = representation->CreateRepresentationObject(
+								imtlog::CTimeRange(begin, end),
+								layerProvider->GetMessageIdList(),
+								imtlog::IEventMessageIdFilter::M_ACCEPT);
+				}
+
+			
+				GraphicsItemList groupItems;
+				if (representationObject.IsValid()){
+					groupItems += m_representationViewFactoryCompPtr->CreateGraphicItems(representationObject, groupIds[i]);
+				}
+
+				for (int j = 0; j < groupItems.count(); j++){
+					if (!m_items.contains(groupItems[j])){
+						groupItems[j]->setPos(groupItems[j]->pos().x(), -150 - i*300);
+					}
+				}
+
+				items += groupItems;
+			}
+		}
+
+		GraphicsItemList::iterator it = m_items.begin();
+		while(it != m_items.end()){
+			if (!items.contains(*it)){
+				m_removedItems.append(*it);
+				it = m_items.erase(it);
+				continue;
+			}
+
+			it++;
+		}
+
+		for (int i = 0; i < items.count(); i++){
+			if (!m_items.contains(items[i])){
+				m_addedItems.append(items[i]);
+				m_items.append(items[i]);
+			}
+		}
+
+		if (m_addedItems.count() != 0 || m_removedItems.count() != 0){
+			istd::CChangeNotifier notifier(this);
+		}
 	}
 }
 
@@ -196,55 +240,15 @@ void CGraphicsControllerComp::TimeRangeObserver::OnUpdate(const istd::IChangeabl
 	imtlog::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
 
 	if (timeRange.GetBeginTime().isValid()){
-		m_parent->m_timeAxis.EnsureTimeRange(timeRange.GetBeginTime());
-		m_parent->m_timeAxis.EnsureTimeRange(timeRange.GetEndTime());
+		m_parent->m_timeAxisPtr->EnsureTimeRange(timeRange.GetBeginTime());
+		m_parent->m_timeAxisPtr->EnsureTimeRange(timeRange.GetEndTime());
 
 		if (m_parent->m_viewPropertyProviderCompPtr.IsValid()){
 			QRectF rect = m_parent->m_viewPropertyProviderCompPtr->GetSceneRect();
-			rect.setWidth(m_parent->m_timeAxis.rect().width());
+			rect.setWidth(m_parent->m_timeAxisPtr->rect().width());
 			m_parent->m_viewPropertyManagerCompPtr->SetSceneRect(rect);
 		}
 	}
-}
-
-
-// public methods of the embedded class StaticItemsProvider
-
-bool CGraphicsControllerComp::StaticItemsProvider::AddItem(QGraphicsItem* itemPtr)
-{
-	if (!m_items.contains(itemPtr)){
-		istd::CChangeNotifier notifier(this);
-
-		m_items.append(itemPtr);
-
-		return true;
-	}
-
-	return false;
-}
-
-
-bool CGraphicsControllerComp::StaticItemsProvider::RemoveItem(QGraphicsItem* itemPtr)
-{
-	if (m_items.contains(itemPtr)){
-		istd::CChangeNotifier notifier(this);
-
-		m_items.removeOne(itemPtr);
-
-		return true;
-	}
-
-	return false;
-}
-
-
-// protected methods of the embedded class StaticItemsProvider
-
-// reimplemented (imtloggui::IGraphicsItemProvider)
-
-IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::StaticItemsProvider::GetGraphicsItems() const
-{
-	return m_items;
 }
 
 

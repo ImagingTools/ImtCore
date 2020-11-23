@@ -17,9 +17,9 @@ namespace imtloggui
 class IRepresentationViewFactory: virtual public istd::IPolymorphic
 {
 public:
-	typedef QVector<QGraphicsItem*> GraphicsItemList;
+	typedef QList<QGraphicsItem*> GraphicsItemList;
 
-	virtual GraphicsItemList CreateGraphicItems(const istd::IChangeable* objectPtr) const = 0;
+	virtual GraphicsItemList CreateGraphicItems(const istd::TSmartPtr<istd::IChangeable> objectPtr, const QByteArray& groupId) const = 0;
 };
 
 

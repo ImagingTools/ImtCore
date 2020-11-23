@@ -1,5 +1,6 @@
  #include <imtloggui/CEventGraphicsView.h>
 
+#include <qdebug>
 
 // Qt includes
 #include <QtGui/QMouseEvent>
@@ -222,18 +223,23 @@ void CEventGraphicsView::resizeEvent(QResizeEvent* event)
 
 void CEventGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-	istd::CChangeNotifier notifier(this);
+	QTime time;
+	time.start();
+	{
+		istd::CChangeNotifier notifier(this);
 
-	BaseClass::mouseMoveEvent(event);
+		BaseClass::mouseMoveEvent(event);
 
-	if (event->buttons() & Qt::LeftButton){
-		QPointF delta = m_lockedScenePoint - event->pos();
-		m_lockedScenePoint = event->pos();
+		if (event->buttons() & Qt::LeftButton){
+			QPointF delta = m_lockedScenePoint - event->pos();
+			m_lockedScenePoint = event->pos();
 
-		MoveViewRect(delta.x() / GetScaleX(), delta.y() / GetScaleY());
+			MoveViewRect(delta.x() / GetScaleX(), delta.y() / GetScaleY());
 
-		event->accept();
+			event->accept();
+		}
 	}
+	qDebug() << time.elapsed();
 
 	Q_EMIT EmitViewPortChanged(true);
 }

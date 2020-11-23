@@ -13,14 +13,14 @@ namespace imtloggui
 {
 
 
-class CLayerProviderComp:
+class CGroupComp:
 			public icomp::CComponentBase,
 			virtual public ILayerProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CLayerProviderComp)
+	I_BEGIN_COMPONENT(CGroupComp)
 		I_REGISTER_INTERFACE(ILayerProvider);
 		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
 		I_ASSIGN_MULTI_0(m_messageIdListAttrPtr, "MessageIdList", "Supported message id's. Empty list for any", false);

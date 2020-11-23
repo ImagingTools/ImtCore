@@ -13,13 +13,13 @@
 #include <imtloggui/CEventStatisticsViewComp.h>
 #include <imtloggui/CEventItemMetaInfoViewComp.h>
 #include <imtloggui/CGraphicsControllerComp.h>
-#include <imtloggui/CRepresentationItemsFactoryComp.h>
 #include <imtloggui/CGroupProviderComp.h>
-#include <imtloggui/CLayerProviderComp.h>
-#include <imtloggui/CRepresentationFactoryProviderComp.h>
-#include <imtloggui/CRepresentationItemsFactoryComp.h>
-#include <imtloggui/CRepresentationViewFactoryComp.h>
-#include <imtloggui/CRepresentationIntervalStatisticsFactoryComp.h>
+#include <imtloggui/CGroupComp.h>
+#include <imtloggui/CLayerComp.h>
+#include <imtloggui/CRepresentationEventsFactoryComp.h>
+#include <imtloggui/CRepresentationEventsViewFactoryComp.h>
+#include <imtloggui/CRepresentationProductionSpeedFactoryComp.h>
+#include <imtloggui/CRepresentationProductionSpeedViewFactoryComp.h>
 
 
 /**
@@ -35,14 +35,14 @@ typedef imtloggui::CIconBasedEventFactoryComp IconBasedEventFactory;
 typedef imtloggui::CGeneralEventFactoryComp GeneralEventFactory;
 typedef imtloggui::CEventStatisticsViewComp EventStatisticsView;
 typedef imtloggui::CEventItemMetaInfoViewComp EventItemMetaInfoView;
-typedef imtloggui::CGraphicsControllerComp GraphicsController;
-typedef imtloggui::CRepresentationItemsFactoryComp RepresentationItemsFactory;
+typedef icomp::TModelCompWrap<imtloggui::CGraphicsControllerComp> GraphicsController;
 typedef imtloggui::CGroupProviderComp GroupProvider;
-typedef imtloggui::CLayerProviderComp LayerProvider;
-typedef imtloggui::CRepresentationFactoryProviderComp RepresentationFactoryProvider;
-typedef imtloggui::CRepresentationItemsFactoryComp RepresentationItemsFactory;
-typedef imtloggui::CRepresentationViewFactoryComp RepresentationViewFactory;
-typedef imtloggui::CRepresentationIntervalStatisticsFactoryComp RepresentationIntervalStatisticsFactory;
+typedef imtloggui::CGroupComp Group;
+typedef imtloggui::CLayerComp Layer;
+typedef imtloggui::CRepresentationEventsFactoryComp RepresentationEventsFactory;
+typedef imtloggui::CRepresentationEventsViewFactoryComp RepresentationEventsViewFactory;
+typedef imtloggui::CRepresentationProductionSpeedFactoryComp RepresentationProductionSpeedFactory;
+typedef imtloggui::CRepresentationProductionSpeedViewFactoryComp RepresentationProductionSpeedViewFactory;
 
 
 } // namespace ImtLogGuiPck

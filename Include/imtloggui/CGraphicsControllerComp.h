@@ -33,9 +33,6 @@ public:
 		I_REGISTER_INTERFACE(IGraphicsItemProvider);
 		I_REGISTER_SUBELEMENT(ScenePositionProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(ScenePositionProvider, IEventScenePositionProvider, ExtractPositionProvider);
-		I_REGISTER_SUBELEMENT(StaticItemsProvider);
-		I_REGISTER_SUBELEMENT_INTERFACE(StaticItemsProvider, IGraphicsItemProvider, ExtractStaticItemsProvider);
-		I_REGISTER_SUBELEMENT_INTERFACE(StaticItemsProvider, imod::IModel, ExtractStaticItemsProvider);
 		I_ASSIGN(m_groupProviderCompPtr, "GroupProvider", "Event groups provider", false, "GroupProvider");
 		I_ASSIGN(m_representationViewFactoryCompPtr, "RepresentationViewFactory", "Representation view factory", true, "RepresentationViewFactory");
 		I_ASSIGN(m_viewPropertyProviderCompPtr, "GraphicsViewPropertyProvider", "Graphics view property provider", true, "GraphicsViewPropertyProvider");
@@ -48,7 +45,8 @@ public:
 	CGraphicsControllerComp();
 
 	// reimplemented (imtloggui::IGraphicsItemProvider)
-	virtual GraphicsItemList GetGraphicsItems() const override;
+	virtual GraphicsItemList GetAddedItems() const override;
+	virtual GraphicsItemList GetRemovedItems() const override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -60,15 +58,9 @@ private:
 	template <typename InterfaceType>
 	static InterfaceType* ExtractPositionProvider(CGraphicsControllerComp& component)
 	{
-		return &component.m_timeAxis;
+		return component.m_timeAxisPtr;
 	}
 
-	template <typename InterfaceType>
-	static InterfaceType* ExtractStaticItemsProvider(CGraphicsControllerComp& component)
-	{
-		return &component.m_staticItemsProvider;
-	}
-	
 private:
 	class ViewPropertyObserver: public imod::TSingleModelObserverBase<IViewPropertyProvider>
 	{
@@ -100,22 +92,6 @@ private:
 		CGraphicsControllerComp* m_parent;
 	};
 
-	class StaticItemsProvider:
-				virtual public istd::IChangeable,
-				virtual public IGraphicsItemProvider
-	{
-	public:
-		bool AddItem(QGraphicsItem* itemPtr);
-		bool RemoveItem(QGraphicsItem* itemPtr);
-
-	protected:
-		// reimplemented (imtloggui::IGraphicsItemProvider)
-		virtual GraphicsItemList GetGraphicsItems() const override;
-
-	private:
-		IGraphicsItemProvider::GraphicsItemList m_items;
-	};
-
 	struct GroupItem
 	{
 		QByteArray id;
@@ -133,13 +109,16 @@ private:
 	I_REF(imtlog::ITimeRangeProvider, m_timeRangeProviderCompPtr);
 	I_REF(imod::IModel, m_timeRangeModelCompPtr);
 
-	CTimeAxis m_timeAxis;
+	CTimeAxis* m_timeAxisPtr;
 
 	ViewPropertyObserver m_viewPropertyObserver;
 	TimeRangeObserver m_timeRangeObserver;
-	imod::TModelWrap<StaticItemsProvider> m_staticItemsProvider;
 
 	QList<GroupItem> m_groupItemList;
+	GraphicsItemList m_items;
+	mutable GraphicsItemList m_addedItems;
+	mutable GraphicsItemList m_removedItems;
+	
 };
 
 

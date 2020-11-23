@@ -31,7 +31,8 @@ CEventViewComp::CEventViewComp()
 	m_moveToPreviousCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
 	m_moveToNextCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
 	m_moveToLastCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
-	m_isNavigationIteratorValid(false)
+	m_graphicsItemObserver(this)
+	//m_isNavigationIteratorValid(false)
 {
 	m_commands.SetParent(this);
 	m_rootCommands.InsertChild(&m_moveToFirstCommand);
@@ -43,27 +44,6 @@ CEventViewComp::CEventViewComp()
 	connect(&m_moveToPreviousCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToPreviousCommand);
 	connect(&m_moveToNextCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToNextCommand);
 	connect(&m_moveToLastCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToLastCommand);
-	connect(&m_messageProcessingTimer, &QTimer::timeout, this, &CEventViewComp::OnMessageProcessingTimer);
-}
-
-
-// reimplemented (ilog::IMessageConsumer)
-
-bool CEventViewComp::IsMessageSupported(
-			int /*messageCategory*/,
-			int /*messageId*/,
-			const istd::IInformationProvider* /*messagePtr*/) const
-{
-	return true;
-}
-
-
-void CEventViewComp::AddMessage(const IMessageConsumer::MessagePtr& message)
-{
-	BaseClass::AddMessage(message);
-
-	//QMutexLocker locker(&m_messageListMutex);
-	//m_messageList.append(message);
 }
 
 
@@ -112,10 +92,6 @@ void CEventViewComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	//if (m_graphicsItemProviderCompPtr.IsValid()){
-	//	m_graphicsItemProviderCompPtr->GetGraphicsItems();
-	//}
-
 	QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(GetQtWidget()->layout());
 
 	m_splitterPtr = new QSplitter();
@@ -152,62 +128,19 @@ void CEventViewComp::OnGuiCreated()
 
 	m_panelsStackPtr->setCurrentIndex(0);
 
-	//m_timeAxis.SetColor(Qt::green);
-	//m_timeAxis.setRect(0, 0, 100, 40);
-	//m_timeAxis.setZValue(101);
-	//m_scene.addItem(&m_timeAxis);
-
 	connect(&m_scene, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
-	//connect(&m_timeAxis, &CTimeAxis::EmitAxisPosChanged, this, &CEventViewComp::OnAxisPosChanged);
-	//connect(&m_timeAxis, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CEventViewComp::OnAxisBeginTimeChanged);
-	//connect(&m_timeAxis, &CTimeAxis::EmitAxisEndTimeChanged, this, &CEventViewComp::OnAxisEndTimeChanged);
-	connect(&m_view, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
-	//connect(this, &CEventViewComp::EmitShowAll, &m_view, &CEventGraphicsView::OnShowAll, Qt::QueuedConnection);
 
-	//if (m_groupControllerCompPtr.IsValid()){
-	//	m_groupControllerCompPtr->SetScene(&m_scene);
-	//	m_groupControllerCompPtr->SetView(&m_view);
-	//	m_groupControllerCompPtr->SetTimeAxis(&m_timeAxis);
-	//	m_groupControllerCompPtr->CreateGraphicsItem();
-
-	//	QByteArrayList groupIds = m_groupControllerCompPtr->GetAvailableGroupList();
-	//	for (QByteArray id : groupIds){
-	//		m_groupControllerCompPtr->AddGroup(id);
-	//	}
-
-	//	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_scaleConstraintsCompPtr.GetPtr());
-	//	if (modelPtr != nullptr){
-	//		modelPtr->AttachObserver(&m_scaleConstraintsObserver);
-	//	}
-	//}
-
-	//m_timeAxis.EnsureTimeRange(QDateTime::currentDateTime());
-
-	if (m_staticItemProviderCompPtr.IsValid()){
-		m_staticItemObserver.SetParent(this);
-		m_staticItemProviderModelCompPtr->AttachObserver(&m_staticItemObserver);
+	if (m_itemProviderModelCompPtr.IsValid()){
+		m_itemProviderModelCompPtr->AttachObserver(&m_graphicsItemObserver);
 	}
 
 	UpdateCommands();
-
-	m_messageProcessingTimer.setInterval(100);
-	m_messageProcessingTimer.start();
 }
 
 
 void CEventViewComp::OnGuiDestroyed()
 {
 	disconnect(&m_scene, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
-	//disconnect(&m_timeAxis, &CTimeAxis::EmitAxisPosChanged, this, &CEventViewComp::OnAxisPosChanged);
-	//disconnect(&m_timeAxis, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CEventViewComp::OnAxisBeginTimeChanged);
-	//disconnect(&m_timeAxis, &CTimeAxis::EmitAxisEndTimeChanged, this, &CEventViewComp::OnAxisEndTimeChanged);
-	//disconnect(&m_view, &CEventGraphicsView::EmitViewPortChanged, this, &CEventViewComp::OnViewPortChanged);
-	//disconnect(this, &CEventViewComp::EmitShowAll, &m_view, &CEventGraphicsView::OnShowAll);
-
-	//imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_scaleConstraintsCompPtr.GetPtr());
-	//if (modelPtr != nullptr){
-	//	modelPtr->DetachObserver(&m_scaleConstraintsObserver);
-	//}
 
 	BaseClass::OnGuiDestroyed();
 }
@@ -229,93 +162,10 @@ void CEventViewComp::OnGuiRetranslate()
 void CEventViewComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-
-	m_slaveMessageConsumerCompPtr.EnsureInitialized();
 }
 
 
 // private slots
-
-void CEventViewComp::OnViewPortChanged(bool userAction)
-{
-	if (m_itemProviderCompPtr.IsValid()){
-		IGraphicsItemProvider::GraphicsItemList items = m_itemProviderCompPtr->GetGraphicsItems();
-
-		QTime time;
-		time.start();
-
-		for (QGraphicsItem* item : m_dynamicItems){
-			m_scene.removeItem(item);
-			delete item;
-		}
-		
-		for (QGraphicsItem* item : items){
-			m_scene.addItem(item);
-		}
-
-		qDebug() << "Remove &  add items to scene" << time.elapsed();
-
-		m_dynamicItems = items;
-	}
-
-	//QRectF visibleRect = m_view.GetViewRect();
-
-	//m_timeAxis.setPos(0, visibleRect.bottom() - m_timeAxis.rect().height() / m_view.GetScaleY());
-
-	//if (m_groupControllerCompPtr.IsValid()){
-	//	m_groupControllerCompPtr->OnViewPortChanged();
-	//}
-
-	//if (userAction){
-	//	m_currentCommandTime = QDateTime();
-	//	m_isNavigationIteratorValid = false;
-	//}
-
-	//UpdateCommands();
-}
-
-
-void CEventViewComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
-{
-	if(!oldTime.isValid()){
-		QRectF rect = m_view.GetSceneRect();
-		rect.setLeft(m_timeAxis.rect().left());
-		rect.setRight(m_timeAxis.rect().right());
-		m_view.SetSceneRect(rect);
-		m_view.SetViewRect(rect);
-		m_currentCommandTime = QDateTime();
-
-		Q_EMIT EmitShowAll();
-	}
-	else{
-		QRectF rect = m_view.GetSceneRect();
-		rect.setLeft(m_timeAxis.rect().left());
-		rect.setRight(m_timeAxis.rect().right());
-		m_view.SetSceneRect(rect);
-
-		double shift = (oldTime.toMSecsSinceEpoch() - newTime.toMSecsSinceEpoch()) / 1000.;
-		QRectF viewRect = m_view.GetViewRect().translated(shift, 0);
-		m_view.SetViewRect(viewRect);
-	}
-
-	//if (m_groupControllerCompPtr.IsValid()){
-	//	m_groupControllerCompPtr->OnAxisBeginTimeChanged(oldTime, newTime);
-	//}
-}
-
-
-void CEventViewComp::OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
-{
-	QRectF rect = m_view.GetSceneRect();
-	rect.setLeft(m_timeAxis.rect().left());
-	rect.setRight(m_timeAxis.rect().right());
-	m_view.SetSceneRect(rect);
-
-	//if (m_groupControllerCompPtr.IsValid()){
-	//	m_groupControllerCompPtr->OnAxisEndTimeChanged(oldTime, newTime);
-	//}
-}
-
 
 void CEventViewComp::OnMoveToFirstCommand()
 {
@@ -346,7 +196,7 @@ void CEventViewComp::OnMoveToPreviousCommand()
 	//		m_navigationIterator--;
 	//	}
 	//	else{
-	//		QDateTime time = m_timeAxis.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+	//		QDateTime time = m_timeAxisPtr.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
 	//		m_navigationIterator = --m_eventMap.lowerBound(time);
 	//		m_isNavigationIteratorValid = true;
 	//	}
@@ -374,7 +224,7 @@ void CEventViewComp::OnMoveToNextCommand()
 	//		m_navigationIterator++;
 	//	}
 	//	else{
-	//		QDateTime time = m_timeAxis.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+	//		QDateTime time = m_timeAxisPtr.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
 	//		m_navigationIterator = m_eventMap.lowerBound(time);
 	//		m_isNavigationIteratorValid = true;
 	//	}
@@ -431,33 +281,6 @@ void CEventViewComp::OnSelectionChanged()
 }
 
 
-void CEventViewComp::OnMessageProcessingTimer()
-{
-	if (IsGuiCreated()){
-		//if (m_groupControllerCompPtr.IsValid()){
-		//	QMutexLocker locker(&m_messageListMutex);
-		//	while (m_messageList.count()){
-		//		MessagePtr message = m_messageList.takeFirst();
-		//		locker.unlock();
-
-		//		m_timeAxis.EnsureTimeRange(message->GetInformationTimeStamp());
-
-		//		IEventItem* eventItemPtr = m_groupControllerCompPtr->AddEvent(message);
-		//		if (eventItemPtr != nullptr){
-		//			//m_eventMap.insert(message->GetInformationTimeStamp(), eventItemPtr);
-		//		}
-		//	}
-
-		//	UpdateCommands();
-		//}
-		//else{
-		//	QMutexLocker locker(&m_messageListMutex);
-		//	m_messageList.clear();
-		//}
-	}
-}
-
-
 // private methods
 
 QRectF CEventViewComp::GetSceneVisibleRect() const
@@ -479,7 +302,7 @@ double CEventViewComp::GetCurrentScaleX() const
 void CEventViewComp::UpdateCommands()
 {
 	//QDateTime currentTime;
-	//currentTime = m_timeAxis.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
+	//currentTime = m_timeAxisPtr.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
 
 	//bool enablePrev = false;
 	//bool enableNext = false;
@@ -522,37 +345,37 @@ void CEventViewComp::UpdateCommands()
 
 void CEventViewComp::MoveToTime(const QDateTime& time)
 {
-	double beginTime = m_timeAxis.GetBeginTime().toMSecsSinceEpoch() / 1000.0;
-	double endTime = m_timeAxis.GetEndTime().toMSecsSinceEpoch() / 1000.0;
-	double currentTime = time.toMSecsSinceEpoch() / 1000.0;
+	//double beginTime = m_timeAxisPtr.GetBeginTime().toMSecsSinceEpoch() / 1000.0;
+	//double endTime = m_timeAxisPtr.GetEndTime().toMSecsSinceEpoch() / 1000.0;
+	//double currentTime = time.toMSecsSinceEpoch() / 1000.0;
 
-	if (currentTime <  beginTime || currentTime > endTime){
-		return;
-	}
+	//if (currentTime <  beginTime || currentTime > endTime){
+	//	return;
+	//}
 
-	double visibleTime = m_view.viewport()->rect().width() / GetCurrentScaleX();
+	//double visibleTime = m_view.viewport()->rect().width() / GetCurrentScaleX();
 
-	if ((currentTime - beginTime > visibleTime / 2) && (endTime - currentTime > visibleTime / 2)){
-		QRectF rect = GetSceneVisibleRect();
-		double center = rect.center().x();
-		double newCenter = m_timeAxis.GetScenePositionFromTime(time);
+	//if ((currentTime - beginTime > visibleTime / 2) && (endTime - currentTime > visibleTime / 2)){
+	//	QRectF rect = GetSceneVisibleRect();
+	//	double center = rect.center().x();
+	//	double newCenter = m_timeAxisPtr.GetScenePositionFromTime(time);
 
-		rect.translate(newCenter - center, 0);
-		m_view.SetViewRect(rect);
-	}
-	else{
-		double delta = qMin(currentTime - beginTime, endTime - currentTime);	
+	//	rect.translate(newCenter - center, 0);
+	//	m_view.SetViewRect(rect);
+	//}
+	//else{
+	//	double delta = qMin(currentTime - beginTime, endTime - currentTime);	
 
-		m_view.scale(GetSceneVisibleRect().width() / (2 * delta), 1);
+	//	m_view.scale(GetSceneVisibleRect().width() / (2 * delta), 1);
 
-		QRectF rect = GetSceneVisibleRect();
-		double center = rect.center().x();
-		double newCenter = m_timeAxis.GetScenePositionFromTime(time);
+	//	QRectF rect = GetSceneVisibleRect();
+	//	double center = rect.center().x();
+	//	double newCenter = m_timeAxisPtr.GetScenePositionFromTime(time);
 
-		rect.setWidth(2 * delta);
-		rect.translate(newCenter - center, 0);
-		m_view.SetViewRect(rect);
-	}
+	//	rect.setWidth(2 * delta);
+	//	rect.translate(newCenter - center, 0);
+	//	m_view.SetViewRect(rect);
+	//}
 }
 
 
@@ -623,15 +446,9 @@ void CEventViewComp::ItemsObserver::OnUpdate(const istd::IChangeable::ChangeSet&
 
 // public methods of the embedded class StaticItemsProvider
 
-CEventViewComp::StaticItemsObserver::StaticItemsObserver()
-	:m_parent(nullptr)
+CEventViewComp::GraphicsItemsObserver::GraphicsItemsObserver(CEventViewComp* parent)
+	:m_parent(parent)
 {
-}
-
-
-void CEventViewComp::StaticItemsObserver::SetParent(CEventViewComp* parent)
-{
-	m_parent = parent;
 }
 
 
@@ -639,30 +456,26 @@ void CEventViewComp::StaticItemsObserver::SetParent(CEventViewComp* parent)
 
 // reimplemented (imtloggui::IGraphicsItemProvider)
 
-void CEventViewComp::StaticItemsObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CEventViewComp::GraphicsItemsObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	if (m_parent != nullptr){
-		IGraphicsItemProvider::GraphicsItemList itemList = GetObservedObject()->GetGraphicsItems();
-	
-		QList<QGraphicsItem*> remainItems;
-		for (int i = 0; i < m_items.count(); i++){
-			if (itemList.contains(m_items[i])){
-				remainItems.append(m_items[i]);
-			}
-			else {
-				m_parent->m_scene.removeItem(m_items[i]);
-				delete m_items[i];
+		QList<QGraphicsItem*> sceneItems = m_parent->m_scene.items();
+
+		for (QGraphicsItem* itemPtr : GetObservedObject()->GetRemovedItems()){
+			if (sceneItems.contains(itemPtr)){
+				m_parent->m_scene.removeItem(itemPtr);
+				delete itemPtr;
+				sceneItems.removeOne(itemPtr);
 			}
 		}
 
-		for (int i = 0; i < itemList.count(); i++){
-			if (!remainItems.contains(itemList[i])){
-				m_parent->m_scene.addItem(itemList[i]);
-				remainItems.append(itemList[i]);
+		for (QGraphicsItem* itemPtr : GetObservedObject()->GetAddedItems()){
+			if (!sceneItems.contains(itemPtr)){
+				m_parent->m_scene.addItem(itemPtr);
 			}
 		}
 
-		m_items = remainItems;
+		qDebug() << "Items on scene: " << m_parent->m_scene.items().count();
 	}
 }
 

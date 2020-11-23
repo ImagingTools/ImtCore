@@ -19,6 +19,7 @@
 #include <imtfile/IFileCompression.h>
 #include <imtlog/IEventTimeRangeFilter.h>
 #include <imtlog/IEventMessageIdFilter.h>
+#include <imtlog/IMessageHistoryContainer.h>
 #include <imtlog/ITimeRangeProvider.h>
 
 
@@ -31,7 +32,7 @@ class CEventHistoryControllerComp:
 			public ibase::TRuntimeStatusHanderCompWrap<
 						ilog::TMessageDelegatorComp<ilog::CLoggerComponentBase>>,
 			virtual public ilog::IMessageConsumer,
-			virtual public ilog::IMessageContainer,
+			virtual public imtlog::IMessageHistoryContainer,
 			virtual public imtlog::IEventTimeRangeFilter,
 			virtual public imtlog::IEventMessageIdFilter,
 			virtual public imtlog::ITimeRangeProvider
@@ -43,7 +44,7 @@ public:
 
 	I_BEGIN_COMPONENT(CEventHistoryControllerComp)
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
-		I_REGISTER_INTERFACE(ilog::IMessageContainer);
+		I_REGISTER_INTERFACE(imtlog::IMessageHistoryContainer);
 		I_REGISTER_INTERFACE(imtlog::IEventTimeRangeFilter);
 		I_REGISTER_INTERFACE(imtlog::IEventMessageIdFilter);
 		I_REGISTER_INTERFACE(imtlog::ITimeRangeProvider);
@@ -75,7 +76,7 @@ public:
 	virtual bool SetEventMessageIdFilter(const QList<int>& messageIdList) override;
 	virtual void ClearEventMessageIdFilter() override;
 
-	// reimplemented (ilog::IMessageContainer)
+	// reimplemented (imtlog::IMessageHistoryContainer)
 	virtual int GetWorstCategory() const override;
 	virtual Messages GetMessages() const override;
 	virtual void ClearMessages() override;
@@ -124,9 +125,7 @@ private:
 		TS_PENDING
 	};
 
-	class EventContainer:
-				virtual public ilog::IMessageContainer,
-				virtual public ilog::IMessageConsumer
+	class EventContainer: virtual public imtlog::IMessageHistoryContainer
 	{
 	public:
 		const QDateTime& GetBeginTime();
@@ -136,15 +135,9 @@ private:
 		void SetEndTime(const QDateTime& time);
 
 		int GetMessagesCount();
+		void AddMessage(const MessagePtr& messagePtr, quint64 id);
 
-		// reimplemented (ilog::IMessageConsumer)
-		virtual bool IsMessageSupported(
-					int messageCategory = -1,
-					int messageId = -1,
-					const istd::IInformationProvider* messagePtr = NULL) const override;
-		virtual void AddMessage(const MessagePtr& messagePtr) override;
-
-		// reimplemented (ilog::IMessageContainer)
+		// reimplemented (imtlog::IMessageHistoryContainer)
 		virtual int GetWorstCategory() const override;
 		virtual Messages GetMessages() const override;
 		virtual void ClearMessages() override;
@@ -156,6 +149,7 @@ private:
 		mutable QMutex m_mutex;
 
 		ilog::CMessageContainer m_messageContainer;
+		QList<quint64> m_messageIds;
 		QDateTime m_beginTime;
 		QDateTime m_endTime;
 	};
@@ -198,22 +192,16 @@ private:
 		explicit MessageCache(CEventHistoryControllerComp* parentPtr, int cacheDayCount);
 
 		void Init();
-		void AddMessage(const MessagePtr& messagePtr);
+		void AddMessage(const MessagePtr& messagePtr, uint64_t id);
 		Messages GetMessages(const imtlog::CTimeRange& timeRange) const;
 
 	private:
 		CEventHistoryControllerComp* m_parentPtr;
 
-		struct CacheItem
-		{
-			QDate date;
-			ilog::IMessageContainer::Messages messages;
-		};
-		typedef istd::TSmartPtr<CacheItem> CacheItemPtr;
-
 		int m_cacheDayCount;
-		mutable QQueue<CacheItemPtr> m_cache;
-		mutable QQueue<CacheItemPtr> m_2dayCache;
+		mutable QMap<QDate, imtlog::IMessageHistoryContainer::Messages> m_cache;
+		mutable QQueue<QDate> m_cacheQueue;
+		mutable QMap<QDate, imtlog::IMessageHistoryContainer::Messages> m_2dayCache;
 	};
 
 private Q_SLOTS:
@@ -223,9 +211,8 @@ private:
 	EventContainerPtr GetContainerForMessage(const MessagePtr& messagePtr);
 	imtlog::CTimeRange CalculateContainerTimeRange(const QDateTime& lastContainerEndTime);
 	void PrepareWorkingContainers();
-	bool SerializeContainer(EventContainerPtr containerPtr, iser::IArchive& archive) const;
 	QList<EventContainerPtr> ImportContainersFromFile(const QString& file) const;
-	CTimeRange GetArchiveTimeRange() const;
+	void Init();
 
 
 	void StartReader();
@@ -255,6 +242,7 @@ private:
 	IEventMessageIdFilter::Mode m_filterMessageIdMode;
 	QList<int> m_filterMessageIdList;
 	CTimeRange m_archiveTimeRange;
+	uint64_t m_messageId;
 
 	MessageCache m_messageCache;
 

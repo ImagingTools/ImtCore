@@ -38,7 +38,6 @@ const ilog::IMessageConsumer::MessagePtr CEventItemBase::GetMessage() const
 }
 
 
-
 // reimplemented (idoc::IDocumentMetaInfo)
 
 idoc::IDocumentMetaInfo::MetaInfoTypes CEventItemBase::GetMetaInfoTypes(bool allowReadOnly) const

@@ -1,8 +1,11 @@
-#include <imtloggui/CRepresentationItemsFactoryComp.h>
+#include <imtloggui/CRepresentationEventsFactoryComp.h>
 
 
-// ACF includes
-#include <ilog/CMessageContainer.h>
+// Acf includes
+#include <istd/TSmartPtr.h>
+
+// ImtCore includes
+#include <imtloggui/CRepresentationEventsObject.h>
 
 
 namespace imtloggui
@@ -13,13 +16,12 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IRepresentationFactory)
 
-IRepresentationFactory::RepresentationObjectPtr CRepresentationItemsFactoryComp::CreateRepresentationObject(
+IRepresentationFactory::RepresentationObjectPtr CRepresentationEventsFactoryComp::CreateRepresentationObject(
 			const imtlog::CTimeRange& timeRange,
 			const QList<int>& messageIdList,
 			imtlog::IEventMessageIdFilter::Mode mode) const
 {
-	ilog::CMessageContainer* messageContainerPtr = new ilog::CMessageContainer();
-	RepresentationObjectPtr retVal(messageContainerPtr);
+	CRepresentationEventsObject* retVal = new CRepresentationEventsObject();
 
 	if (m_timeRangeFilterCompPtr.IsValid()){
 		m_timeRangeFilterCompPtr->SetEventTimeRangeFilter(timeRange);
@@ -27,16 +29,15 @@ IRepresentationFactory::RepresentationObjectPtr CRepresentationItemsFactoryComp:
 			m_messageIdFilterCompPtr->SetEventMessageIdFilterMode(mode);
 			m_messageIdFilterCompPtr->SetEventMessageIdFilter(messageIdList);
 			if (m_messageContainerCompPtr.IsValid()){
-				ilog::IMessageContainer::Messages messages = m_messageContainerCompPtr->GetMessages();
-				for (ilog::IMessageConsumer::MessagePtr message : messages){
-					messageContainerPtr->AddMessage(message);
+				imtlog::IMessageHistoryContainer::Messages messages = m_messageContainerCompPtr->GetMessages();
+				for (imtlog::IMessageHistoryContainer::Message message : messages){
+					retVal->append(message);
 				}
 			}
 		}
 	}
 
-
-	return retVal;
+	return istd::TSmartPtr<istd::IChangeable>(retVal);
 }
 
 

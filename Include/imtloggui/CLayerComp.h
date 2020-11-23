@@ -13,14 +13,14 @@ namespace imtloggui
 {
 
 
-class CRepresentationFactoryProviderComp:
+class CLayerComp:
 			public icomp::CComponentBase,
 			virtual public IRepresentationFactoryProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationFactoryProviderComp)
+	I_BEGIN_COMPONENT(CLayerComp)
 		I_REGISTER_INTERFACE(IRepresentationFactoryProvider);
 		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
 		I_ASSIGN_MULTI_0(m_idAttrPtr, "RepresentationFactoryIds", "Representation factory ids", false);

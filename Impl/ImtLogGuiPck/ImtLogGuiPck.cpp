@@ -62,29 +62,34 @@ I_EXPORT_COMPONENT(
 			"Events Group Provider");
 
 I_EXPORT_COMPONENT(
-			LayerProvider,
-			"Layer provider",
-			"Layer Provider");
+			Group,
+			"Group",
+			"Event Group Layer Provider");
 
 I_EXPORT_COMPONENT(
-			RepresentationFactoryProvider,
-			"Representation factory provider",
-			"Representation Factory Provider");
+			Layer,
+			"Layer",
+			"Layer Representation Provider");
 
 I_EXPORT_COMPONENT(
-			RepresentationItemsFactory,
-			"Representation items factory",
-			"Representation Items Factory");
+			RepresentationEventsFactory,
+			"Representation events factory",
+			"Representation Events Factory");
 
 I_EXPORT_COMPONENT(
-			RepresentationViewFactory,
-			"Representation view factory",
-			"Representation View Factory");
+			RepresentationEventsViewFactory,
+			"Representation events view factory",
+			"Representation Events View Factory");
 
 I_EXPORT_COMPONENT(
-			RepresentationIntervalStatisticsFactory,
-			"Representation interval statistics factory",
-			"Representation Interval Statistics Factory");
+			RepresentationProductionSpeedFactory,
+			"Representation production speed factory",
+			"Representation Production Speed Factory");
+
+I_EXPORT_COMPONENT(
+			RepresentationProductionSpeedViewFactory,
+			"Representation production speed view factory",
+			"Representation Production Speed View Factory");
 
 
 } // namespace ImtLogGuiPck

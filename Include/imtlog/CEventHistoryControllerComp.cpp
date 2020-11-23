@@ -1,5 +1,6 @@
 #include <imtlog/CEventHistoryControllerComp.h>
 
+#include <qdebug>
 
 // Qt includes
 #include <QtCore/QDir>
@@ -25,7 +26,8 @@ CEventHistoryControllerComp::CEventHistoryControllerComp()
 	m_writerState(TS_IDLE),
 	m_controllerState(CS_INIT),
 	m_filterMessageIdMode(IEventMessageIdFilter::M_EXCEPT),
-	m_messageCache(this, 3)
+	m_messageCache(this, 3),
+	m_messageId(0)
 {
 	qRegisterMetaType<MessagePtr>("MessagePtr");
 	qRegisterMetaType<EventContainerPtr>("EventContainerPtr");
@@ -107,22 +109,22 @@ int CEventHistoryControllerComp::GetWorstCategory() const
 }
 
 
-ilog::IMessageContainer::Messages CEventHistoryControllerComp::GetMessages() const
+imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::GetMessages() const
 {
 	if (!m_filterTimeRange.IsValid()){
-		return ilog::IMessageContainer::Messages();
+		return imtlog::IMessageHistoryContainer::Messages();
 	}
 
-	ilog::IMessageContainer::Messages messages = m_messageCache.GetMessages(m_filterTimeRange);
-	ilog::IMessageContainer::Messages::iterator it = messages.begin();
+	imtlog::IMessageHistoryContainer::Messages messages = m_messageCache.GetMessages(m_filterTimeRange);
+	imtlog::IMessageHistoryContainer::Messages::iterator it = messages.begin();
 	while (it != messages.end()){
-		QDateTime timeStamp = it->GetPtr()->GetInformationTimeStamp();
-		if (m_filterMessageIdMode == M_ACCEPT && m_filterMessageIdList.contains(it->GetPtr()->GetInformationId())){
+		QDateTime timeStamp = it->messagePtr->GetInformationTimeStamp();
+		if (m_filterMessageIdMode == M_ACCEPT && m_filterMessageIdList.contains(it->messagePtr->GetInformationId())){
 			it++;
 			continue;
 		}
 
-		if (m_filterMessageIdMode == M_EXCEPT && !m_filterMessageIdList.contains(it->GetPtr()->GetInformationId())){
+		if (m_filterMessageIdMode == M_EXCEPT && !m_filterMessageIdList.contains(it->messagePtr->GetInformationId())){
 			it++;
 			continue;
 		}
@@ -175,8 +177,9 @@ void CEventHistoryControllerComp::AddMessage(const MessagePtr& messagePtr)
 			SendWarningMessage(0, QString("Event container for message at \"%1\" not found").arg(messagePtr->GetInformationTimeStamp().toString()));
 		}
 		else{
-			m_messageCache.AddMessage(messagePtr);
-			containerPtr->AddMessage(messagePtr);
+			m_messageCache.AddMessage(messagePtr, m_messageId);
+			containerPtr->AddMessage(messagePtr, m_messageId);
+			m_messageId++;
 
 			QDateTime timestamp = messagePtr->GetInformationTimeStamp();
 
@@ -256,7 +259,7 @@ void CEventHistoryControllerComp::OnComponentCreated()
 
 	{
 		istd::CChangeNotifier notifier(this);
-		m_archiveTimeRange = GetArchiveTimeRange();
+		Init();
 	}
 
 	PrepareWorkingContainers();
@@ -356,47 +359,6 @@ void CEventHistoryControllerComp::PrepareWorkingContainers()
 }
 
 
-bool CEventHistoryControllerComp::SerializeContainer(EventContainerPtr containerPtr, iser::IArchive& archive) const
-{
-	int messageCount = containerPtr->GetMessagesCount();
-
-	QDateTime beginTime;
-	QDateTime endTime;
-
-	if (archive.IsStoring()){
-		beginTime = containerPtr->GetBeginTime();
-		endTime = containerPtr->GetEndTime();
-	}
-	else{
-		messageCount = 0;
-
-		containerPtr->ClearMessages();
-	}
-
-	static iser::CArchiveTag beginTimeTag("BeginTime", "Container begin time", iser::CArchiveTag::TT_LEAF);
-	static iser::CArchiveTag endTimeTag("EndTime", "Container end time", iser::CArchiveTag::TT_LEAF);
-
-	bool retVal = true;
-
-	retVal = retVal && archive.BeginTag(beginTimeTag);
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, beginTime);
-	retVal = retVal && archive.EndTag(beginTimeTag);
-
-	retVal = retVal && archive.BeginTag(endTimeTag);
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, endTime);
-	retVal = retVal && archive.EndTag(endTimeTag);
-
-	if (!archive.IsStoring()){
-		containerPtr->SetBeginTime(beginTime);
-		containerPtr->SetEndTime(endTime);
-	}
-
-	retVal = retVal && containerPtr->Serialize(archive);
-
-	return retVal;
-}
-
-
 QList<CEventHistoryControllerComp::EventContainerPtr> CEventHistoryControllerComp::ImportContainersFromFile(const QString& file) const
 {
 	QList<CEventHistoryControllerComp::EventContainerPtr> retVal;
@@ -415,7 +377,7 @@ QList<CEventHistoryControllerComp::EventContainerPtr> CEventHistoryControllerCom
 				EventContainerPtr containerPtr(new EventContainer);
 
 				ifile::CCompactXmlFileReadArchive xmlArchive(tempDir.path() + "/" + containerFileItem, m_versionInfoCompPtr.GetPtr());
-				if (SerializeContainer(containerPtr, xmlArchive)){
+				if (containerPtr->Serialize(xmlArchive)){
 					retVal.append(containerPtr);
 				}
 				else{
@@ -438,7 +400,7 @@ QList<CEventHistoryControllerComp::EventContainerPtr> CEventHistoryControllerCom
 }
 
 
-CTimeRange CEventHistoryControllerComp::GetArchiveTimeRange() const
+void CEventHistoryControllerComp::Init()
 {
 	QDir repositoryDir(m_logFolderCompPtr->GetPath());
 	QDateTime begin;
@@ -477,9 +439,13 @@ CTimeRange CEventHistoryControllerComp::GetArchiveTimeRange() const
 			QDateTime tmpEnd;
 
 			for (int i = 0; i < containers.count(); i++){
-				ilog::IMessageContainer::Messages messages = containers[i]->GetMessages();
+				Messages messages = containers[i]->GetMessages();
 				for (int j = 0; j < messages.count(); j++){
-					QDateTime timestamp = messages[j]->GetInformationTimeStamp();
+					QDateTime timestamp = messages[j].messagePtr->GetInformationTimeStamp();
+
+					if (m_messageId < messages[j].id){
+						m_messageId = messages[j].id;
+					}
 
 					if (!tmpBegin.isValid()){
 						tmpBegin = timestamp;
@@ -501,9 +467,13 @@ CTimeRange CEventHistoryControllerComp::GetArchiveTimeRange() const
 				containers = ImportContainersFromFile(endFileInfo.absoluteFilePath());
 
 				for (int i = 0; i < containers.count(); i++){
-					ilog::IMessageContainer::Messages messages = containers[i]->GetMessages();
+					Messages messages = containers[i]->GetMessages();
 					for (int j = 0; j < messages.count(); j++){
-						QDateTime timestamp = messages[j]->GetInformationTimeStamp();
+						QDateTime timestamp = messages[j].messagePtr->GetInformationTimeStamp();
+
+						if (m_messageId < messages[j].id){
+							m_messageId = messages[j].id;
+						}
 
 						if (!tmpBegin.isValid()){
 							tmpBegin = timestamp;
@@ -525,6 +495,7 @@ CTimeRange CEventHistoryControllerComp::GetArchiveTimeRange() const
 			if (tmpBegin.isValid()){
 				begin = tmpBegin;
 				end = tmpEnd;
+				m_messageId++;
 			}
 		}
 	}
@@ -536,7 +507,7 @@ CTimeRange CEventHistoryControllerComp::GetArchiveTimeRange() const
 		//ImportMessagesFromDirs(dirList, m_filterTimeRange);
 	}
 
-	return CTimeRange(begin, end);
+	m_archiveTimeRange = CTimeRange(begin, end);
 }
 
 
@@ -554,13 +525,7 @@ void CEventHistoryControllerComp::OnReaderFinished()
 
 void CEventHistoryControllerComp::OnContainerReadComplete(EventContainerPtr containerPtr)
 {
-	if (m_slaveMessageConsumerCompPtr.IsValid()){
-		if (containerPtr->GetEndTime() < m_systemStartTime){
-			for (ilog::IMessageConsumer::MessagePtr messagePtr : containerPtr->GetMessages()){
-				m_slaveMessageConsumerCompPtr->AddMessage(messagePtr);
-			}
-		}
-	}
+
 }
 
 
@@ -625,26 +590,16 @@ int CEventHistoryControllerComp::EventContainer::GetMessagesCount()
 }
 
 
-// reimplemented (ilog::IMessageConsumer)
-
-bool CEventHistoryControllerComp::EventContainer::IsMessageSupported(
-			int messageCategory,
-			int messageId,
-			const istd::IInformationProvider* messagePtr) const
-{
-	QMutexLocker locker(&m_mutex);
-	return m_messageContainer.IsMessageSupported(messageCategory, messageId, messagePtr);
-}
-
-
-void CEventHistoryControllerComp::EventContainer::AddMessage(const MessagePtr& messagePtr)
+void CEventHistoryControllerComp::EventContainer::AddMessage(const MessagePtr& messagePtr, quint64 id)
 {
 	QMutexLocker locker(&m_mutex);
 	m_messageContainer.AddMessage(messagePtr);
+	m_messageIds.prepend(id);
+	Q_ASSERT(m_messageContainer.GetMessagesCount() == m_messageIds.count());
 }
 
 
-// reimplemented (ilog::IMessageContainer)
+// reimplemented (imtlog::IMessageHistoryContainer)
 
 int CEventHistoryControllerComp::EventContainer::GetWorstCategory() const
 {
@@ -653,10 +608,23 @@ int CEventHistoryControllerComp::EventContainer::GetWorstCategory() const
 }
 
 
-ilog::IMessageContainer::Messages CEventHistoryControllerComp::EventContainer::GetMessages() const
+imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::EventContainer::GetMessages() const
 {
 	QMutexLocker locker(&m_mutex);
-	return m_messageContainer.GetMessages();
+	Q_ASSERT(m_messageContainer.GetMessagesCount() == m_messageIds.count());
+
+	ilog::IMessageContainer::Messages container = m_messageContainer.GetMessages();
+
+	Messages retVal;
+	retVal.reserve(container.count());
+	for (int i = container.count() - 1; i >= 0; i--){
+		Message message;
+		message.id = m_messageIds[i];
+		message.messagePtr = container[i];
+		retVal.append(message);
+	}
+
+	return retVal;
 }
 
 
@@ -664,6 +632,7 @@ void CEventHistoryControllerComp::EventContainer::ClearMessages()
 {
 	QMutexLocker locker(&m_mutex);
 	m_messageContainer.ClearMessages();
+	m_messageIds.clear();
 }
 
 
@@ -671,8 +640,76 @@ void CEventHistoryControllerComp::EventContainer::ClearMessages()
 
 bool CEventHistoryControllerComp::EventContainer::Serialize(iser::IArchive& archive)
 {
+	Q_ASSERT(m_messageContainer.GetMessagesCount() == m_messageIds.count());
+
 	QMutexLocker locker(&m_mutex);
-	return m_messageContainer.Serialize(archive);
+
+	int messageCount = m_messageContainer.GetMessagesCount();
+	int idsCount = m_messageIds.count();
+
+	QDateTime beginTime;
+	QDateTime endTime;
+
+	if (archive.IsStoring()){
+		beginTime = m_beginTime;
+		endTime = m_endTime;
+	}
+	else{
+		messageCount = 0;
+		idsCount = 0;
+		m_messageContainer.ClearMessages();
+		m_messageIds.clear();
+	}
+
+	bool retVal = true;
+
+	static iser::CArchiveTag beginTimeTag("BeginTime", "Container begin time", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag endTimeTag("EndTime", "Container end time", iser::CArchiveTag::TT_LEAF);
+
+	retVal = retVal && archive.BeginTag(beginTimeTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, beginTime);
+	retVal = retVal && archive.EndTag(beginTimeTag);
+
+	retVal = retVal && archive.BeginTag(endTimeTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, endTime);
+	retVal = retVal && archive.EndTag(endTimeTag);
+
+	if (!archive.IsStoring()){
+		m_beginTime = beginTime;
+		m_endTime = endTime;
+	}
+
+	retVal = retVal && m_messageContainer.Serialize(archive);
+
+	static iser::CArchiveTag idsTag("MessageIds", "", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag idTag("Id", "", iser::CArchiveTag::TT_LEAF);
+
+	retVal = retVal && archive.BeginMultiTag(idsTag, idTag, idsCount);
+
+	uint64_t id;
+
+	if (archive.IsStoring()){
+		for (int i = 0; i < m_messageIds.count(); i++){
+			retVal = retVal && archive.BeginTag(idTag);
+			retVal = retVal && archive.Process(m_messageIds[i]);
+			retVal = retVal && archive.EndTag(idTag);
+		}
+	}
+	else{
+		m_messageIds.reserve(idsCount);
+		for (int i = 0; i < idsCount; i++){
+			retVal = retVal && archive.BeginTag(idTag);
+			retVal = retVal && archive.Process(id);
+			retVal = retVal && archive.EndTag(idTag);
+			m_messageIds.append(id);
+		}
+	}
+
+	retVal = retVal && archive.EndTag(idsTag);
+
+	Q_ASSERT(m_messageContainer.GetMessagesCount() == m_messageIds.count());
+
+	return retVal;
 }
 
 
@@ -705,7 +742,7 @@ void CEventHistoryControllerComp::Reader::ImportFromDirs(const QStringList& arch
 			EventContainerPtr containerPtr(new EventContainer);
 
 			ifile::CCompactXmlFileReadArchive xmlArchive(currentDir.path() + "/" + containerFileItem, m_parentPtr->m_versionInfoCompPtr.GetPtr());
-			if (m_parentPtr->SerializeContainer(containerPtr, xmlArchive)){
+			if (containerPtr->Serialize(xmlArchive)){
 				QMetaObject::invokeMethod(
 					m_parentPtr, "OnContainerReadComplete", Qt::QueuedConnection,
 					Q_ARG(EventContainerPtr, containerPtr));
@@ -826,7 +863,7 @@ void CEventHistoryControllerComp::Writer::run()
 			}
 
 			ifile::CCompactXmlFileWriteArchive xmlArchive(containerPath, m_parentPtr->m_versionInfoCompPtr.GetPtr());
-			if (!m_parentPtr->SerializeContainer(containerPtr, xmlArchive)){
+			if (!containerPtr->Serialize(xmlArchive)){
 				m_parentPtr->SendErrorMessage(
 							0, tr("Unable to serialize event container with begin time \"%1\". Event container skipped")
 							.arg(containerPtr->GetBeginTime().toString("dd.MM.yyyy hh-mm-ss.zzz")));
@@ -889,9 +926,8 @@ void CEventHistoryControllerComp::MessageCache::Init()
 	QDate date = QDate::currentDate();
 	QString fileName = date.toString(*(m_parentPtr->m_archiveNameFormatAttrPtr)) + '.' + *m_parentPtr->m_archiveExtensionAttrPtr;
 
-	m_2dayCache.enqueue(istd::TSmartPtr<CacheItem>(new CacheItem));
-	m_2dayCache.enqueue(istd::TSmartPtr<CacheItem>(new CacheItem));
-	m_2dayCache.last()->date = date;
+	m_2dayCache[QDate::fromJulianDay(0)] = imtlog::IMessageHistoryContainer::Messages();
+	m_2dayCache[date] = imtlog::IMessageHistoryContainer::Messages();
 
 	if (m_parentPtr->m_compressorCompPtr.IsValid()){
 		QFileInfoList fileInfoList = repositoryDir.entryInfoList(
@@ -902,7 +938,7 @@ void CEventHistoryControllerComp::MessageCache::Init()
 			if (fileInfo.fileName() == fileName){
 				QList<EventContainerPtr> containers = m_parentPtr->ImportContainersFromFile(fileInfo.absoluteFilePath());
 				for (EventContainerPtr container : containers){
-					m_2dayCache.last()->messages.append(container->GetMessages());
+					m_2dayCache.last().append(container->GetMessages());
 				}
 			}
 		}
@@ -910,29 +946,34 @@ void CEventHistoryControllerComp::MessageCache::Init()
 }
 
 
-void CEventHistoryControllerComp::MessageCache::AddMessage(const MessagePtr& messagePtr)
+void CEventHistoryControllerComp::MessageCache::AddMessage(const MessagePtr& messagePtr, uint64_t id)
 {
 	QDate date = messagePtr->GetInformationTimeStamp().date();
 
-	if (m_2dayCache.last()->date != date){
-		m_2dayCache.dequeue();
-		m_2dayCache.enqueue(istd::TSmartPtr<CacheItem>(new CacheItem));
-		m_2dayCache.last()->date = date;
+	Q_ASSERT(m_2dayCache.size() == 2);
+
+	if (m_2dayCache.lastKey() != date){
+		m_2dayCache.remove(m_2dayCache.lastKey());
+		m_2dayCache[date] = imtlog::IMessageHistoryContainer::Messages();
 	}
 
-	m_2dayCache.last()->messages.append(messagePtr);
+	Q_ASSERT(m_2dayCache.size() == 2);
 
-	Q_ASSERT(m_2dayCache.count() == 2);
+	imtlog::IMessageHistoryContainer::Message message;
+	message.id = id;
+	message.messagePtr = messagePtr;
+
+	m_2dayCache.last().append(message);
 }
 
 
-ilog::IMessageContainer::Messages CEventHistoryControllerComp::MessageCache::GetMessages(const imtlog::CTimeRange& timeRange) const
+imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::MessageCache::GetMessages(const imtlog::CTimeRange& timeRange) const
 {
 	if (m_parentPtr == nullptr){
-		return ilog::IMessageContainer::Messages();
+		return imtlog::IMessageHistoryContainer::Messages();
 	}
 
-	ilog::IMessageContainer::Messages messages;
+	imtlog::IMessageHistoryContainer::Messages retVal;
 
 	QDate startDate = timeRange.GetBeginTime().date();
 	QDate endDate = timeRange.GetEndTime().date();
@@ -940,22 +981,22 @@ ilog::IMessageContainer::Messages CEventHistoryControllerComp::MessageCache::Get
 
 	QDate date = startDate;
 	while (date <= endDate){
-		if (m_2dayCache.first()->date == date){
-			messages.append(m_2dayCache.first()->messages);
+		if (m_2dayCache.lastKey() == date){
+			retVal.append(m_2dayCache.last());
 			date = date.addDays(1);
 			continue;
 		}
 
-		if (m_2dayCache.last()->date == date){
-			messages.append(m_2dayCache.last()->messages);
+		if (m_2dayCache.firstKey() == date){
+			retVal.append(m_2dayCache.first());
 			date = date.addDays(1);
 			continue;
 		}
 
 		bool isFound = false;
-		for (const CacheItemPtr& item : m_cache){
-			if (item->date == date){
-				messages.append(item->messages);
+		for (const QDate& cachedDate : m_cache.keys()){
+			if (cachedDate == date){
+				retVal.append(m_cache[cachedDate]);
 				isFound = true;
 				break;
 			}
@@ -974,19 +1015,29 @@ ilog::IMessageContainer::Messages CEventHistoryControllerComp::MessageCache::Get
 					if (fileInfo.fileName() == fileName){
 						QList<EventContainerPtr> containers = m_parentPtr->ImportContainersFromFile(fileInfo.absoluteFilePath());
 
-						CacheItemPtr itemPtr = istd::TSmartPtr<CacheItem>(new CacheItem);
-						itemPtr->date = date;
+						imtlog::IMessageHistoryContainer::Messages messages;
 						for (EventContainerPtr container : containers){
-							itemPtr->messages.append(container->GetMessages());
+							imtlog::IMessageHistoryContainer::Messages msgs = container->GetMessages();
+
+							Q_ASSERT(msgs.count() > 0);
+
+							messages.reserve(messages.count() + msgs.count());
+							for (int i = msgs.count() - 1; i >= 0; i--){
+								messages.append(msgs[i]);
+							}
 						}
+
+						Q_ASSERT(m_cache.size() == m_cacheQueue.size());
 
 						while (m_cache.size() >= m_cacheDayCount){
-							m_cache.dequeue();
+							m_cache.remove(m_cacheQueue.dequeue());
 						}
 
-						m_cache.enqueue(itemPtr);
+						m_cache[date] = messages;
+						m_cacheQueue.enqueue(date);
 
-						messages.append(itemPtr->messages);
+
+						retVal.append(messages);
 
 						break;
 					}
@@ -997,18 +1048,18 @@ ilog::IMessageContainer::Messages CEventHistoryControllerComp::MessageCache::Get
 		date = date.addDays(1);
 	}
 
-	ilog::IMessageContainer::Messages::iterator it = messages.begin();
-	while (it != messages.end()){
-		QDateTime timeStamp = it->GetPtr()->GetInformationTimeStamp();
+	imtlog::IMessageHistoryContainer::Messages::iterator it = retVal.begin();
+	while (it != retVal.end()){
+		QDateTime timeStamp = it->messagePtr->GetInformationTimeStamp();
 		if (timeStamp < timeRange.GetBeginTime() || timeStamp > timeRange.GetEndTime()){
-			it = messages.erase(it);
+			it = retVal.erase(it);
 		}
 		else{
 			it++;
 		}
 	}
 
-	return messages;
+	return retVal;
 }
 
 

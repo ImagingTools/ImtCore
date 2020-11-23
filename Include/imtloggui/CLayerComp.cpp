@@ -1,4 +1,4 @@
-#include <imtloggui/CLayerProviderComp.h>
+#include <imtloggui/CLayerComp.h>
 
 
 namespace imtloggui
@@ -7,33 +7,20 @@ namespace imtloggui
 
 // reimplemented (imtloggui::ILayerProvider)
 
-IRepresentationFactoryProvider* CLayerProviderComp::GetRepresentationFactoryProvider(const QByteArray& id) const
+IRepresentationFactory* CLayerComp::GetRepresentationFactory(const QByteArray& id) const
 {
 	int index = GetIndex(id);
 	if (index >= 0){
-		return m_factoryProviderCompPtr[index];
+		return m_factoriesCompPtr[index];
 	}
 
 	return nullptr;
 }
 
 
-QList<int> CLayerProviderComp::GetMessageIdList() const
-{
-	QList<int> retVal;
-
-	int count = m_messageIdListAttrPtr.GetCount();
-	for (int i = 0; i < count; i++){
-		retVal.append(m_messageIdListAttrPtr[i]);
-	}
-
-	return retVal;
-}
-
-
 // reimplemented (imtbase::ICollectionInfo)
 
-imtbase::ICollectionInfo::Ids CLayerProviderComp::GetElementIds() const
+imtbase::ICollectionInfo::Ids CLayerComp::GetElementIds() const
 {
 	int count = GetCount();
 
@@ -46,7 +33,7 @@ imtbase::ICollectionInfo::Ids CLayerProviderComp::GetElementIds() const
 }
 
 
-QVariant CLayerProviderComp::GetElementInfo(const QByteArray& elementId, int infoType) const
+QVariant CLayerComp::GetElementInfo(const QByteArray& elementId, int infoType) const
 {
 	int index = GetIndex(elementId);
 
@@ -66,13 +53,13 @@ QVariant CLayerProviderComp::GetElementInfo(const QByteArray& elementId, int inf
 
 // private methods
 
-int CLayerProviderComp::GetCount() const
+int CLayerComp::GetCount() const
 {
 	return qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
 }
 
 
-int CLayerProviderComp::GetIndex(const QByteArray& id) const
+int CLayerComp::GetIndex(const QByteArray& id) const
 {
 	int count = GetCount();
 
