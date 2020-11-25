@@ -109,11 +109,6 @@ protected:
 	*/
 	I_ATTR(bool, m_useFullScreenBorderOnWindowsAttrPtr);
 
-	/**
-		\note The main widget must be deleted manually.
-		For the main widget the deffered deleting in CGuiComponentBase::DestroyGui doesn't work, 
-		because it is called after leaving the main loop.
-	*/
 	Qt::WindowFlags m_defaultWidgetFlags;
 	QRect m_lastWidgetGeometry;
 

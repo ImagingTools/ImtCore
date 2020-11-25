@@ -142,6 +142,10 @@ void CEventViewComp::OnGuiDestroyed()
 {
 	disconnect(&m_scene, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
 
+	if (m_statisticsViewCompPtr.IsValid() && m_statisticsViewCompPtr->IsGuiCreated()){
+		m_statisticsViewCompPtr->DestroyGui();
+	}
+
 	BaseClass::OnGuiDestroyed();
 }
 
