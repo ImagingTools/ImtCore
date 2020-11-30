@@ -90,7 +90,7 @@ ImtGuiPck.file = ../../Impl/ImtGuiPck/QMake/ImtGuiPck.pro
 ImtGuiPck.depends = imt3d imt3proc imtgui
 
 SUBDIRS += ImtQmlPck
-ImtGuiPck.file = ../../Impl/ImtQmlPck/QMake/ImtQmlPck.pro
+ImtQmlPck.file = ../../Impl/ImtQmlPck/QMake/ImtQmlPck.pro
 
 SUBDIRS += ImtLogPck
 ImtLogPck.file = ../../Impl/ImtLogPck/QMake/ImtLogPck.pro
