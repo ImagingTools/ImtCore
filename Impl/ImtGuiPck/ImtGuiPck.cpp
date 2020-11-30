@@ -92,6 +92,11 @@ I_EXPORT_COMPONENT(
 			"Controller for page navigation",
 			"Menu Page Navigation");
 
+I_EXPORT_COMPONENT(
+			PageSwitcher,
+			"Page switcher",
+			"Page Switch Login");
+
 
 } // namespace ImtGuiPck
 

@@ -21,7 +21,7 @@
 #include <imtgui/CCompositeObjectViewComp.h>
 #include <imtgui/CImageContoursExtender.h>
 #include <imtgui/CPageNavigationControllerComp.h>
-
+#include <imtgui/CPageSwitcherComp.h>
 
 
 /**
@@ -46,6 +46,7 @@ typedef icomp::TModelCompWrap<imtgui::CLayoutManagerGuiComp> LayoutManagerGui;
 typedef imtgui::CCompositeObjectViewComp CompositeObjectView;
 typedef imtgui::CImageContoursExtender ImageContoursExtender;
 typedef icomp::TModelCompWrap<imtgui::CPageNavigationControllerComp> PageNavigationController;
+typedef ibase::TModelObserverCompWrap<imtgui::CPageSwitcherComp> PageSwitcher;
 
 
 } // namespace ImtGuiPck
