@@ -14,6 +14,23 @@ namespace imtloggui
 
 // public methods
 
+// reimplemented (ilog::IMessageConsumer)
+
+bool CRepresentationProductionSpeedFactoryComp::IsMessageSupported(
+			int messageCategory,
+			int messageId,
+			const istd::IInformationProvider* messagePtr) const
+{
+	return messageId == 19780000;
+}
+
+
+void CRepresentationProductionSpeedFactoryComp::AddMessage(const MessagePtr& messagePtr)
+{
+
+}
+
+
 // reimplemented (imtloggui::IRepresentationFactory)
 
 IRepresentationFactory::RepresentationObjectPtr CRepresentationProductionSpeedFactoryComp::CreateRepresentationObject(
@@ -37,8 +54,7 @@ IRepresentationFactory::RepresentationObjectPtr CRepresentationProductionSpeedFa
 			return m_modelPtr;
 		}
 
-		QDateTime dt = messages.front().messagePtr->GetInformationTimeStamp();
-		qint64 beginTime = dt.toMSecsSinceEpoch();
+		qint64 beginTime = messages.front().messagePtr->GetInformationTimeStamp().toMSecsSinceEpoch();
 		qint64 endTime = messages.back().messagePtr->GetInformationTimeStamp().toMSecsSinceEpoch();
 		qint64 granularity = *m_granularityAttrPtr * 1000;
 		beginTime += -(beginTime % granularity);
@@ -86,6 +102,8 @@ IRepresentationFactory::RepresentationObjectPtr CRepresentationProductionSpeedFa
 	return istd::TSmartPtr<istd::IChangeable>(m_modelPtr);
 }
 
+
+// reimplemented (icomp::CComponentBase)
 
 void CRepresentationProductionSpeedFactoryComp::OnComponentCreated()
 {

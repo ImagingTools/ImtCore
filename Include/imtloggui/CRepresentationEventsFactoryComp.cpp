@@ -30,7 +30,7 @@ IRepresentationFactory::RepresentationObjectPtr CRepresentationEventsFactoryComp
 			m_messageIdFilterCompPtr->SetEventMessageIdFilter(messageIdList);
 			if (m_messageContainerCompPtr.IsValid()){
 				imtlog::IMessageHistoryContainer::Messages messages = m_messageContainerCompPtr->GetMessages();
-				for (imtlog::IMessageHistoryContainer::Message message : messages){
+				for (imtlog::IMessageHistoryConsumer::Message message : messages){
 					retVal->append(message);
 				}
 			}

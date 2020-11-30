@@ -33,7 +33,7 @@ public:
 
 private:
 	uint64_t m_granularity;
-	std::vector<StatisticsItem> m_timeline;
+	StatisticsTimeline m_timeline;
 };
 
 

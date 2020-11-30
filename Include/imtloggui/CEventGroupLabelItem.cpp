@@ -20,7 +20,7 @@ CEventGroupLabelItem::CEventGroupLabelItem(QGraphicsItem* parent)
 	m_backgroundColor = QColor("#00000000");
 	m_name = QObject::tr("Noname");
 	m_font = QFont("Helvetica");
-	m_font.setPointSize(24);
+	m_font.setPointSize(20);
 }
 
 
@@ -53,7 +53,7 @@ QRectF CEventGroupLabelItem::boundingRect() const
 	bounding.setTop(m_height / 2);
 	bounding.setBottom(-m_height / 2);
 	bounding.setLeft(0);
-	bounding.setRight(metrics.boundingRect("Gg").height() / scene()->views().first()->viewportTransform().m11());
+	bounding.setRight(metrics.boundingRect("Gg").height() * 1.2 / scene()->views().first()->viewportTransform().m11());
 
 	return bounding; 
 }
@@ -61,6 +61,9 @@ QRectF CEventGroupLabelItem::boundingRect() const
 
 void CEventGroupLabelItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
+	double scaleX = scene()->views().first()->viewportTransform().m11();
+	double scaleY = scene()->views().first()->viewportTransform().m22();
+
 	QBrush brush(m_backgroundColor);
 
 	painter->save();
@@ -75,14 +78,12 @@ void CEventGroupLabelItem::paint(QPainter* painter, const QStyleOptionGraphicsIt
 	QRectF labelRect = metrics.boundingRect(m_name);
 	labelRect.setWidth(labelRect.width() + 1);
 	labelRect.translate(QPointF(0, 0) - labelRect.center());
-	labelRect.translate(0, labelRect.height() / 2);
+	labelRect.translate(0, labelRect.height() * 1.2 / 2);
 
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
 
 	painter->rotate(-90);
 
-	double scaleX = scene()->views().first()->viewportTransform().m11();
-	double scaleY = scene()->views().first()->viewportTransform().m22();
 	painter->scale(1 / scaleY, 1 / scaleX);
 	painter->drawText(labelRect, Qt::AlignCenter, m_name);
 }

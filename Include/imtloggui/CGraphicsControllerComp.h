@@ -23,9 +23,12 @@ namespace imtloggui
 
 
 class CGraphicsControllerComp:
+			public QObject,
 			public icomp::CComponentBase,
 			virtual public IGraphicsItemProvider
 {
+	Q_OBJECT
+
 public:
 	typedef icomp::CComponentBase BaseClass;
 
@@ -50,6 +53,10 @@ public:
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+
+private Q_SLOTS:
+	void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime);
+	void OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime);
 
 private:
 	void OnViewPropertyUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& changeSet);
@@ -97,6 +104,7 @@ private:
 		QByteArray id;
 		CEventGroupLabelItem* labelPtr;
 		QGraphicsRectItem* backgroundPtr;
+		GraphicsItemList sptrs;
 	};
 
 private:
@@ -110,6 +118,7 @@ private:
 	I_REF(imod::IModel, m_timeRangeModelCompPtr);
 
 	CTimeAxis* m_timeAxisPtr;
+	GraphicsItem m_timeAxisSPtr;
 
 	ViewPropertyObserver m_viewPropertyObserver;
 	TimeRangeObserver m_timeRangeObserver;

@@ -179,6 +179,13 @@ void CEventHistoryControllerComp::AddMessage(const MessagePtr& messagePtr)
 		else{
 			m_messageCache.AddMessage(messagePtr, m_messageId);
 			containerPtr->AddMessage(messagePtr, m_messageId);
+			if (m_syncSlaveMessageConsumerCompPtr.IsValid()){
+				QMetaObject::invokeMethod(
+					this, "OnAddMessage", Qt::AutoConnection,
+					Q_ARG(const MessagePtr&, messagePtr),
+					Q_ARG(uint64_t, m_messageId));
+			}
+
 			m_messageId++;
 
 			QDateTime timestamp = messagePtr->GetInformationTimeStamp();
@@ -298,6 +305,16 @@ void CEventHistoryControllerComp::OnContainerCheckTimer()
 	writingQueueLocker.unlock();
 
 	PrepareWorkingContainers();
+}
+
+
+void CEventHistoryControllerComp::OnAddMessage(const MessagePtr& messagePtr, uint64_t id)
+{
+	imtlog::IMessageHistoryConsumer::MessagePtr msgPtr;
+	msgPtr.SetPtr(new imtlog::IMessageHistoryConsumer::Message);
+	msgPtr->id = id;
+	msgPtr->messagePtr = messagePtr;
+	m_syncSlaveMessageConsumerCompPtr->AddMessage(msgPtr);
 }
 
 
@@ -618,7 +635,7 @@ imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::EventCon
 	Messages retVal;
 	retVal.reserve(container.count());
 	for (int i = container.count() - 1; i >= 0; i--){
-		Message message;
+		IMessageHistoryConsumer::Message message;
 		message.id = m_messageIds[i];
 		message.messagePtr = container[i];
 		retVal.append(message);
@@ -959,7 +976,7 @@ void CEventHistoryControllerComp::MessageCache::AddMessage(const MessagePtr& mes
 
 	Q_ASSERT(m_2dayCache.size() == 2);
 
-	imtlog::IMessageHistoryContainer::Message message;
+	imtlog::IMessageHistoryConsumer::Message message;
 	message.id = id;
 	message.messagePtr = messagePtr;
 
@@ -982,13 +999,23 @@ imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::MessageC
 	QDate date = startDate;
 	while (date <= endDate){
 		if (m_2dayCache.lastKey() == date){
-			retVal.append(m_2dayCache.last());
+			//retVal.append(m_2dayCache.last());
+			imtlog::IMessageHistoryContainer::Messages messages = m_2dayCache.last();
+			for (int i = messages.count() - 1; i >= 0; i--){
+				retVal.append(messages[i]);
+			}
+
 			date = date.addDays(1);
 			continue;
 		}
 
 		if (m_2dayCache.firstKey() == date){
-			retVal.append(m_2dayCache.first());
+			//retVal.append(m_2dayCache.first());
+			imtlog::IMessageHistoryContainer::Messages messages = m_2dayCache.last();
+			for (int i = messages.count() - 1; i >= 0; i--){
+				retVal.append(messages[i]);
+			}
+
 			date = date.addDays(1);
 			continue;
 		}
@@ -997,6 +1024,7 @@ imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::MessageC
 		for (const QDate& cachedDate : m_cache.keys()){
 			if (cachedDate == date){
 				retVal.append(m_cache[cachedDate]);
+
 				isFound = true;
 				break;
 			}
@@ -1021,10 +1049,11 @@ imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::MessageC
 
 							Q_ASSERT(msgs.count() > 0);
 
-							messages.reserve(messages.count() + msgs.count());
-							for (int i = msgs.count() - 1; i >= 0; i--){
-								messages.append(msgs[i]);
-							}
+							//messages.reserve(messages.count() + msgs.count());
+							//for (int i = msgs.count() - 1; i >= 0; i--){
+								//messages.append(msgs[i]);
+							//}
+							messages.append(msgs);
 						}
 
 						Q_ASSERT(m_cache.size() == m_cacheQueue.size());
@@ -1035,7 +1064,6 @@ imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::MessageC
 
 						m_cache[date] = messages;
 						m_cacheQueue.enqueue(date);
-
 
 						retVal.append(messages);
 

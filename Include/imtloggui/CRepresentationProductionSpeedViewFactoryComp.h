@@ -31,7 +31,7 @@ public:
 	virtual GraphicsItemList CreateGraphicItems(const istd::TSmartPtr<istd::IChangeable> objectPtr, const QByteArray& groupId) const override;
 
 private:
-	mutable QMap<QByteArray, CProductionSpeedItem*> m_items;
+	mutable QMap<QByteArray, GraphicsItem> m_items;
 };
 
 

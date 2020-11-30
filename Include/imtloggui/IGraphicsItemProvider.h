@@ -6,6 +6,7 @@
 
 // ACF Includes
 #include <istd/IChangeable.h>
+#include <istd/TSmartPtr.h>
 
 
 namespace imtloggui
@@ -15,7 +16,8 @@ namespace imtloggui
 class IGraphicsItemProvider: virtual public istd::IChangeable
 {
 public:
-	typedef QList<QGraphicsItem*> GraphicsItemList;
+	typedef istd::TSmartPtr<QGraphicsItem> GraphicsItem;
+	typedef QList<GraphicsItem> GraphicsItemList;
 
 	virtual GraphicsItemList GetAddedItems() const = 0;
 	virtual GraphicsItemList GetRemovedItems() const = 0;

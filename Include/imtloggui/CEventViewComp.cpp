@@ -94,15 +94,16 @@ void CEventViewComp::OnGuiCreated()
 
 	QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(GetQtWidget()->layout());
 
-	m_splitterPtr = new QSplitter();
+	m_splitterPtr = new QSplitter(GetQtWidget());
 	layoutPtr->insertWidget(0, m_splitterPtr);
 
-	m_view.setParent(GetQtWidget());
-	m_view.setScene(&m_scene);
-	m_view.setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-	m_view.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_view.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_splitterPtr->addWidget(&m_view);
+	m_viewPtr = new imod::TModelWrap<CEventGraphicsView>();
+	m_viewPtr->setParent(GetQtWidget());
+	m_viewPtr->setScene(&m_scene);
+	m_viewPtr->setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+	m_viewPtr->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_viewPtr->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_splitterPtr->addWidget(m_viewPtr);
 
 	m_panelsStackPtr = new QStackedWidget(GetQtWidget());
 	m_splitterPtr->addWidget(m_panelsStackPtr);
@@ -142,8 +143,17 @@ void CEventViewComp::OnGuiDestroyed()
 {
 	disconnect(&m_scene, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
 
+	m_graphicsItemObserver.EnsureModelDetached();
+	for (QGraphicsItem* itemPtr : m_scene.items()){
+		m_scene.removeItem(itemPtr);
+	}
+
 	if (m_statisticsViewCompPtr.IsValid() && m_statisticsViewCompPtr->IsGuiCreated()){
 		m_statisticsViewCompPtr->DestroyGui();
+	}
+
+	if (m_metainfoViewCompPtr.IsValid() && m_metainfoViewCompPtr->IsGuiCreated()){
+		m_metainfoViewCompPtr->DestroyGui();
 	}
 
 	BaseClass::OnGuiDestroyed();
@@ -273,7 +283,7 @@ void CEventViewComp::OnSelectionChanged()
 			if (modelPtr != nullptr){
 				m_modelProxy.SetModelPtr(modelPtr);
 				m_panelsStackPtr->setCurrentIndex(1);
-				m_scene.update(m_view.GetViewRect().toRect());
+				m_scene.update(m_viewPtr->GetViewRect().toRect());
 				return;
 			}
 		}
@@ -281,7 +291,7 @@ void CEventViewComp::OnSelectionChanged()
 
 	m_panelsStackPtr->setCurrentIndex(0);
 	m_modelProxy.SetModelPtr(nullptr);
-	m_scene.update(m_view.GetViewRect().toRect());
+	m_scene.update(m_viewPtr->GetViewRect().toRect());
 }
 
 
@@ -289,9 +299,9 @@ void CEventViewComp::OnSelectionChanged()
 
 QRectF CEventViewComp::GetSceneVisibleRect() const
 {
-	QRect viewportRect = m_view.viewport()->rect();
+	QRect viewportRect = m_viewPtr->viewport()->rect();
 
-	QRectF visibleSceneRect = m_view.mapToScene(viewportRect).boundingRect();
+	QRectF visibleSceneRect = m_viewPtr->mapToScene(viewportRect).boundingRect();
 
 	return visibleSceneRect;
 }
@@ -299,7 +309,7 @@ QRectF CEventViewComp::GetSceneVisibleRect() const
 
 double CEventViewComp::GetCurrentScaleX() const
 {
-	return m_view.GetScaleX();
+	return m_viewPtr->GetScaleX();
 }
 
 
@@ -357,7 +367,7 @@ void CEventViewComp::MoveToTime(const QDateTime& time)
 	//	return;
 	//}
 
-	//double visibleTime = m_view.viewport()->rect().width() / GetCurrentScaleX();
+	//double visibleTime = m_viewPtr->viewport()->rect().width() / GetCurrentScaleX();
 
 	//if ((currentTime - beginTime > visibleTime / 2) && (endTime - currentTime > visibleTime / 2)){
 	//	QRectF rect = GetSceneVisibleRect();
@@ -365,12 +375,12 @@ void CEventViewComp::MoveToTime(const QDateTime& time)
 	//	double newCenter = m_timeAxisPtr.GetScenePositionFromTime(time);
 
 	//	rect.translate(newCenter - center, 0);
-	//	m_view.SetViewRect(rect);
+	//	m_viewPtr->SetViewRect(rect);
 	//}
 	//else{
 	//	double delta = qMin(currentTime - beginTime, endTime - currentTime);	
 
-	//	m_view.scale(GetSceneVisibleRect().width() / (2 * delta), 1);
+	//	m_viewPtr->scale(GetSceneVisibleRect().width() / (2 * delta), 1);
 
 	//	QRectF rect = GetSceneVisibleRect();
 	//	double center = rect.center().x();
@@ -378,7 +388,7 @@ void CEventViewComp::MoveToTime(const QDateTime& time)
 
 	//	rect.setWidth(2 * delta);
 	//	rect.translate(newCenter - center, 0);
-	//	m_view.SetViewRect(rect);
+	//	m_viewPtr->SetViewRect(rect);
 	//}
 }
 
@@ -463,23 +473,21 @@ CEventViewComp::GraphicsItemsObserver::GraphicsItemsObserver(CEventViewComp* par
 void CEventViewComp::GraphicsItemsObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	if (m_parent != nullptr){
-		QList<QGraphicsItem*> sceneItems = m_parent->m_scene.items();
-
-		for (QGraphicsItem* itemPtr : GetObservedObject()->GetRemovedItems()){
-			if (sceneItems.contains(itemPtr)){
-				m_parent->m_scene.removeItem(itemPtr);
-				delete itemPtr;
-				sceneItems.removeOne(itemPtr);
+		for (IGraphicsItemProvider::GraphicsItem item : GetObservedObject()->GetRemovedItems()){
+			if (m_items.contains(item)){
+				m_parent->m_scene.removeItem(item.GetPtr());
+				m_items.removeOne(item);
 			}
 		}
 
-		for (QGraphicsItem* itemPtr : GetObservedObject()->GetAddedItems()){
-			if (!sceneItems.contains(itemPtr)){
-				m_parent->m_scene.addItem(itemPtr);
+		for (IGraphicsItemProvider::GraphicsItem item : GetObservedObject()->GetAddedItems()){
+			if (!m_items.contains(item)){
+				m_parent->m_scene.addItem(item.GetPtr());
+				m_items.append(item);
 			}
 		}
 
-		qDebug() << "Items on scene: " << m_parent->m_scene.items().count();
+		qDebug() << "Items on scene: " << m_items.count();
 	}
 }
 

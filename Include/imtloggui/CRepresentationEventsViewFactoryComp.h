@@ -31,7 +31,7 @@ public:
 private:
 	I_REF(IEventItemFactory, m_eventItemFactoryCompPtr);
 
-	mutable QMap<QByteArray, QMap<uint64_t, IEventItem*>> m_items;
+	mutable QMap<QByteArray, QMap<uint64_t, GraphicsItem>> m_items;
 };
 
 

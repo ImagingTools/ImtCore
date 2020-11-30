@@ -24,7 +24,7 @@ CGraphicsControllerComp::CGraphicsControllerComp()
 
 IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetAddedItems() const
 {
-	QList<QGraphicsItem*> items = m_addedItems;
+	GraphicsItemList items = m_addedItems;
 	m_addedItems.clear();
 	return items;
 }
@@ -32,7 +32,7 @@ IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetAddedItems()
 
 IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetRemovedItems() const
 {
-	QList<QGraphicsItem*> items = m_removedItems;
+	GraphicsItemList items = m_removedItems;
 	m_removedItems.clear();
 	return items;
 }
@@ -50,9 +50,12 @@ void CGraphicsControllerComp::OnComponentCreated()
 	m_timeAxisPtr->setPos(0, 0);
 	m_timeAxisPtr->SetColor(Qt::green);
 	m_timeAxisPtr->setRect(0, 0, 100, 40);
-	m_timeAxisPtr->setZValue(101);
+	m_timeAxisPtr->setZValue(10);
 	//m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
-	m_addedItems.append(m_timeAxisPtr);
+	m_timeAxisSPtr.SetPtr(m_timeAxisPtr);
+	m_addedItems.append(m_timeAxisSPtr);
+	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CGraphicsControllerComp::OnAxisBeginTimeChanged);
+	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisEndTimeChanged, this, &CGraphicsControllerComp::OnAxisEndTimeChanged);
 
 	int sceneHeight = 0;
 
@@ -68,7 +71,7 @@ void CGraphicsControllerComp::OnComponentCreated()
 			rectPtr->setBrush(QBrush(color));
 			rectPtr->setPen(QPen(Qt::transparent));
 			rectPtr->setPos(0, -300 - i * 300);
-			m_addedItems.append(rectPtr);
+			rectPtr->setZValue(0);
 
 			CEventGroupLabelItem* labelPtr = new CEventGroupLabelItem();
 			labelPtr->SetBackgroundColor(color);
@@ -76,12 +79,16 @@ void CGraphicsControllerComp::OnComponentCreated()
 			labelPtr->SetHeight(300);
 			sceneHeight += 300;
 			labelPtr->setPos(0, -150 - i * 300);
-			m_addedItems.append(labelPtr);
+			labelPtr->setZValue(9);
 
 			GroupItem groupItem;
 			groupItem.backgroundPtr = rectPtr;
 			groupItem.labelPtr = labelPtr;
+			groupItem.sptrs.append(GraphicsItem(rectPtr));
+			groupItem.sptrs.append(GraphicsItem(labelPtr));
 			m_groupItemList.append(groupItem);
+
+			m_addedItems.append(groupItem.sptrs);
 		}
 	}
 
@@ -103,6 +110,20 @@ void CGraphicsControllerComp::OnComponentCreated()
 }
 
 
+// private slots
+
+void CGraphicsControllerComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
+{
+
+}
+
+
+void CGraphicsControllerComp::OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
+{
+
+}
+
+
 // private methods
 
 void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& changeSet)
@@ -118,7 +139,9 @@ void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* proper
 		m_groupItemList[i].labelPtr->setPos(viewRect.x(), m_groupItemList[i].labelPtr->pos().y());
 	}
 
-	if (m_groupProviderCompPtr.IsValid()){
+	qint64 span = m_timeAxisPtr->GetVisibleBeginTime().msecsTo(m_timeAxisPtr->GetVisibleEndTime());
+
+	if (m_groupProviderCompPtr.IsValid() && span > 0){
 		imtbase::ICollectionInfo::Ids groupIds = m_groupProviderCompPtr->GetElementIds();
 		QList<int> allGroupsMessageIds;
 
@@ -127,7 +150,8 @@ void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* proper
 		for (int i = 0; i < groupIds.count(); i++){
 			ILayerProvider* layerProvider = m_groupProviderCompPtr->GetLayerProvider(groupIds[i]);
 			imtbase::ICollectionInfo::Ids layerIds = layerProvider->GetElementIds();
-			IRepresentationFactoryProvider* representationProvider = layerProvider->GetRepresentationFactoryProvider(layerIds[0]);
+			QByteArray id = layerProvider->GetIdForTimeSpan(span);
+			IRepresentationFactoryProvider* representationProvider = layerProvider->GetRepresentationFactoryProvider(id);
 			imtbase::ICollectionInfo::Ids factoryIds = representationProvider->GetElementIds();
 			IRepresentationFactory* representation = representationProvider->GetRepresentationFactory(factoryIds[0]);
 
@@ -163,6 +187,7 @@ void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* proper
 				for (int j = 0; j < groupItems.count(); j++){
 					if (!m_items.contains(groupItems[j])){
 						groupItems[j]->setPos(groupItems[j]->pos().x(), -150 - i*300);
+						groupItems[j]->setZValue(1);
 					}
 				}
 

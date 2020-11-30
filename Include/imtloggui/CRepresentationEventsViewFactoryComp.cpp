@@ -40,21 +40,18 @@ IRepresentationViewFactory::GraphicsItemList CRepresentationEventsViewFactoryCom
 				IEventItem* itemPtr;
 
 				if (m_items[groupId].contains(representationObjectPtr->at(i).id)){
-					itemPtr = m_items[groupId][representationObjectPtr->at(i).id];
-					QGraphicsItem* graphicsItemPtr = dynamic_cast<QGraphicsItem*>(itemPtr);
-					if (graphicsItemPtr != nullptr){
-						itemList.append(graphicsItemPtr);
-					}
+					itemList.append(m_items[groupId][representationObjectPtr->at(i).id]);
 				}
 				else{
 					itemPtr = m_eventItemFactoryCompPtr->CreateInstance(representationObjectPtr->at(i).messagePtr);
-					QGraphicsItem* graphicsItemPtr = dynamic_cast<QGraphicsItem*>(itemPtr);
-					if (graphicsItemPtr != nullptr){
+					if (itemPtr != nullptr){
+						QGraphicsItem* graphicsItemPtr = dynamic_cast<QGraphicsItem*>(itemPtr);
 						graphicsItemPtr->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIgnoresTransformations);
 						graphicsItemPtr->setPos(m_positionProviderCompPtr->GetScenePositionFromTime(representationObjectPtr->at(i).messagePtr->GetInformationTimeStamp()), 0);
-						itemList.append(graphicsItemPtr);
+						GraphicsItem item(graphicsItemPtr);
+						itemList.append(item);
+						m_items[groupId][representationObjectPtr->at(i).id] = item;
 					}
-					m_items[groupId][representationObjectPtr->at(i).id] = itemPtr;
 				}
 			}
 		}

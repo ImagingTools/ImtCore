@@ -8,7 +8,9 @@
 #include <istd/IInformationProvider.h>
 #include <istd/TIHierarchical.h>
 #include <iser/ISerializable.h>
-#include <ilog/IMessageConsumer.h>
+
+// ImtCore includes
+#include <imtlog/IMessageHistoryConsumer.h>
 
 
 namespace imtlog
@@ -18,13 +20,7 @@ namespace imtlog
 class IMessageHistoryContainer: virtual public iser::ISerializable
 {
 public:
-	struct Message
-	{
-		uint64_t id;
-		istd::TSmartPtr<const istd::IInformationProvider> messagePtr;
-	};
-
-	typedef QList<Message> Messages;
+	typedef QList<IMessageHistoryConsumer::Message> Messages;
 
 	virtual int GetWorstCategory() const = 0;
 	virtual Messages GetMessages() const = 0;

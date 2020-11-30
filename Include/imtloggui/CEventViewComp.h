@@ -117,7 +117,7 @@ private:
 	private:
 		CEventViewComp* m_parent;
 
-		QList<QGraphicsItem*> m_items;
+		IGraphicsItemProvider::GraphicsItemList m_items;
 	};
 
 	class Commands: virtual public ibase::ICommandsProvider
@@ -144,7 +144,7 @@ private:
 	template <typename InterfaceType>
 	static InterfaceType* ExtractGraphicsView(CEventViewComp& component)
 	{
-		return &component.m_view;
+		return component.m_viewPtr;
 	}
 
 private:
@@ -163,7 +163,7 @@ private:
 	iqtgui::CHierarchicalCommand m_moveToLastCommand;
 
 	QGraphicsScene m_scene;
-	imod::TModelWrap<CEventGraphicsView> m_view;
+	imod::TModelWrap<CEventGraphicsView>* m_viewPtr;
 	GraphicsItemsObserver m_graphicsItemObserver;
 
 	QDateTime m_currentCommandTime;

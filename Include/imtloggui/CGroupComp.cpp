@@ -31,6 +31,30 @@ QList<int> CGroupComp::GetMessageIdList() const
 }
 
 
+QByteArray CGroupComp::GetIdForTimeSpan(uint64_t msecs) const
+{
+	QByteArray retVal;
+		
+	if (m_arrangedIds.isEmpty()){
+		return retVal;
+	}
+
+	if (msecs < m_arrangedIds.firstKey()){
+		return m_arrangedIds.first();
+	}
+
+	QList<uint64_t> keys = m_arrangedIds.keys();
+	uint64_t foundKey = m_arrangedIds.firstKey();
+	for (int i = 0; i < keys.count(); i++){
+		if (keys[i] < msecs){
+			foundKey = keys[i];
+		}
+	}
+
+	return m_arrangedIds[foundKey];
+}
+
+
 // reimplemented (imtbase::ICollectionInfo)
 
 imtbase::ICollectionInfo::Ids CGroupComp::GetElementIds() const
@@ -57,6 +81,9 @@ QVariant CGroupComp::GetElementInfo(const QByteArray& elementId, int infoType) c
 		case EIT_NAME:
 			retVal = m_nameAttrPtr[index];
 			break;
+		case EIT_MIN_TIME_SPAN:
+			retVal = m_minTimeSpanAttrPtr[index];
+			break;
 		}
 	}
 
@@ -64,11 +91,30 @@ QVariant CGroupComp::GetElementInfo(const QByteArray& elementId, int infoType) c
 }
 
 
+// reimplemented (icomp::CComponentBase)
+
+void CGroupComp::OnComponentCreated()
+{
+	for (int i = 0; i < GetCount(); i++){
+		Q_ASSERT(!m_arrangedIds.contains(m_minTimeSpanAttrPtr[i]));
+
+		m_arrangedIds[m_minTimeSpanAttrPtr[i]] = m_idAttrPtr[i];
+	}
+
+	if (!m_arrangedIds.isEmpty()){
+		QByteArray id = m_arrangedIds.first();
+		m_arrangedIds.remove(m_arrangedIds.firstKey());
+		m_arrangedIds[0] = id;
+	}
+}
+
+
 // private methods
 
 int CGroupComp::GetCount() const
 {
-	return qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
+	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
+	return qMin(count, m_minTimeSpanAttrPtr.GetCount());
 }
 
 

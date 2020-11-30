@@ -29,10 +29,12 @@ public:
 	// reimplemented (QGraphicsItem)
 	virtual QRectF boundingRect() const override;
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+	virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
 
 private:
 	istd::TSmartPtr<istd::IChangeable> m_modelPtr;
 	IEventScenePositionProvider* m_positionProviderPtr;
+	QList<QRectF> m_nodes;
 };
 
 
