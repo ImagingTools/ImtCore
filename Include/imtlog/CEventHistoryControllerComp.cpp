@@ -117,7 +117,6 @@ imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::GetMessa
 	imtlog::IMessageHistoryContainer::Messages messages = m_messageCache.GetMessages(m_filterTimeRange);
 	imtlog::IMessageHistoryContainer::Messages::iterator it = messages.begin();
 	while (it != messages.end()){
-		QDateTime timeStamp = it->messagePtr->GetInformationTimeStamp();
 		if (m_filterMessageIdMode == M_ACCEPT && m_filterMessageIdList.contains(it->messagePtr->GetInformationId())){
 			it++;
 			continue;
@@ -995,16 +994,21 @@ imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::MessageC
 
 	imtlog::IMessageHistoryContainer::Messages retVal;
 
-	QDate startDate = timeRange.GetBeginTime().date();
-	QDate endDate = timeRange.GetEndTime().date();
+	QDateTime begin = timeRange.GetBeginTime();
+	QDateTime end = timeRange.GetEndTime();
+	QDate beginDate = begin.date();
+	QDate endDate = end.date();
 	QStringList dateList;
 
-	QDate date = startDate;
+	QDate date = beginDate;
 	while (date <= endDate){
 		if (m_2dayCache.lastKey() == date){
 			imtlog::IMessageHistoryContainer::Messages messages = m_2dayCache.last();
-			for (int i = messages.count() - 1; i >= 0; i--){
-				retVal.append(messages[i]);
+			for (int i = 0; i < messages.count(); i++){
+				QDateTime timeStamp = messages[i].messagePtr->GetInformationTimeStamp();
+				if (begin <= timeStamp && timeStamp <= end){
+					retVal.append(messages[i]);
+				}
 			}
 
 			date = date.addDays(1);
@@ -1013,8 +1017,11 @@ imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::MessageC
 
 		if (m_2dayCache.firstKey() == date){
 			imtlog::IMessageHistoryContainer::Messages messages = m_2dayCache.last();
-			for (int i = messages.count() - 1; i >= 0; i--){
-				retVal.append(messages[i]);
+			for (int i = 0; i < messages.count(); i++){
+				QDateTime timeStamp = messages[i].messagePtr->GetInformationTimeStamp();
+				if (begin <= timeStamp && timeStamp <= end){
+					retVal.append(messages[i]);
+				}
 			}
 
 			date = date.addDays(1);
@@ -1062,7 +1069,12 @@ imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::MessageC
 						m_cache[date] = messages;
 						m_cacheQueue.enqueue(date);
 
-						retVal.append(messages);
+						for (int i = 0; i < messages.count(); i++){
+							QDateTime timeStamp = messages[i].messagePtr->GetInformationTimeStamp();
+							if (begin <= timeStamp && timeStamp <= end){
+								retVal.append(messages);
+							}
+						}
 
 						break;
 					}
