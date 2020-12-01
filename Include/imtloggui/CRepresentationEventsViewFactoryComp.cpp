@@ -39,7 +39,9 @@ IRepresentationViewFactory::GraphicsItemList CRepresentationEventsViewFactoryCom
 				IEventItem* itemPtr;
 
 				if (m_items[groupId].contains(representationObjectPtr->at(i).id)){
-					itemList.append(m_items[groupId][representationObjectPtr->at(i).id]);
+					GraphicsItem item = m_items[groupId][representationObjectPtr->at(i).id];
+					itemList.append(item);
+					item->setPos(m_positionProviderCompPtr->GetScenePositionFromTime(representationObjectPtr->at(i).messagePtr->GetInformationTimeStamp()), item->pos().y());
 				}
 				else{
 					itemPtr = m_eventItemFactoryCompPtr->CreateInstance(representationObjectPtr->at(i).messagePtr);
