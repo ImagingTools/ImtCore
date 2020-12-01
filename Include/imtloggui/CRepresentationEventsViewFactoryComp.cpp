@@ -1,6 +1,5 @@
 #include <imtloggui/CRepresentationEventsViewFactoryComp.h>
 
-#include <qdebug>
 
 // ACF includes
 #include <imtloggui/CRepresentationEventsObject.h>

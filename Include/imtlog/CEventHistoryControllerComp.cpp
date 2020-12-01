@@ -1,6 +1,5 @@
 #include <imtlog/CEventHistoryControllerComp.h>
 
-#include <qdebug>
 
 // Qt includes
 #include <QtCore/QDir>
@@ -179,7 +178,7 @@ void CEventHistoryControllerComp::AddMessage(const MessagePtr& messagePtr)
 		else{
 			m_messageCache.AddMessage(messagePtr, m_messageId);
 			containerPtr->AddMessage(messagePtr, m_messageId);
-			if (m_syncSlaveMessageConsumerCompPtr.IsValid()){
+			if (m_messageHistoryConsumerCompPtr.GetCount() > 0){
 				QMetaObject::invokeMethod(
 					this, "OnAddMessage", Qt::AutoConnection,
 					Q_ARG(const MessagePtr&, messagePtr),
@@ -314,7 +313,10 @@ void CEventHistoryControllerComp::OnAddMessage(const MessagePtr& messagePtr, uin
 	msgPtr.SetPtr(new imtlog::IMessageHistoryConsumer::Message);
 	msgPtr->id = id;
 	msgPtr->messagePtr = messagePtr;
-	m_syncSlaveMessageConsumerCompPtr->AddMessage(msgPtr);
+
+	for (int i = 0; i < m_messageHistoryConsumerCompPtr.GetCount(); i++){
+		m_messageHistoryConsumerCompPtr[i]->AddMessage(msgPtr);
+	}
 }
 
 
@@ -737,6 +739,7 @@ CEventHistoryControllerComp::Reader::Reader(CEventHistoryControllerComp* parentP
 {
 }
 
+
 // private methods of embedded class Reader
 
 void CEventHistoryControllerComp::Reader::ImportFromDirs(const QStringList& archiveDirList)
@@ -999,7 +1002,6 @@ imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::MessageC
 	QDate date = startDate;
 	while (date <= endDate){
 		if (m_2dayCache.lastKey() == date){
-			//retVal.append(m_2dayCache.last());
 			imtlog::IMessageHistoryContainer::Messages messages = m_2dayCache.last();
 			for (int i = messages.count() - 1; i >= 0; i--){
 				retVal.append(messages[i]);
@@ -1010,7 +1012,6 @@ imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::MessageC
 		}
 
 		if (m_2dayCache.firstKey() == date){
-			//retVal.append(m_2dayCache.first());
 			imtlog::IMessageHistoryContainer::Messages messages = m_2dayCache.last();
 			for (int i = messages.count() - 1; i >= 0; i--){
 				retVal.append(messages[i]);
@@ -1049,10 +1050,6 @@ imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::MessageC
 
 							Q_ASSERT(msgs.count() > 0);
 
-							//messages.reserve(messages.count() + msgs.count());
-							//for (int i = msgs.count() - 1; i >= 0; i--){
-								//messages.append(msgs[i]);
-							//}
 							messages.append(msgs);
 						}
 

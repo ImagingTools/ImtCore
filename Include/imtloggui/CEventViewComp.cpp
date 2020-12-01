@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtWidgets/QLabel>
-#include <QtCore/QDebug>
 
 // ACF includes
 #include <iser/IObject.h>
@@ -486,8 +485,6 @@ void CEventViewComp::GraphicsItemsObserver::OnUpdate(const istd::IChangeable::Ch
 				m_items.append(item);
 			}
 		}
-
-		qDebug() << "Items on scene: " << m_items.count();
 	}
 }
 

@@ -1,8 +1,6 @@
 #include <imtloggui/CGraphicsControllerComp.h>
 
 
-#include <qdebug>
-
 // Qt includes
 #include <QtGui/QPen>
 

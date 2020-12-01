@@ -58,7 +58,7 @@ public:
 		I_ASSIGN(m_containerExtensionAttrPtr, "ContainerFileExtension", "Container file extension", true, "xml");
 		I_ASSIGN(m_archiveNameFormatAttrPtr, "ArchiveNameFormat", "Archive name format", true, "dd.MM.yyyy");
 		I_ASSIGN(m_archiveExtensionAttrPtr, "ArchiveFileExtension", "Archive file extension", true, "arc");
-		I_ASSIGN(m_syncSlaveMessageConsumerCompPtr, "SyncSlaveMessageConsumer", "Synchronized slave message consumer", false, "SyncSlaveMessageConsumer");
+		I_ASSIGN_MULTI_0(m_messageHistoryConsumerCompPtr, "MessageHistoryConsumer", "Message history consumer", false);
 	I_END_COMPONENT;
 
 	CEventHistoryControllerComp();
@@ -252,7 +252,7 @@ private:
 	I_REF(ifile::IFileNameParam, m_logFolderCompPtr);
 	I_REF(imtfile::IFileCompression, m_compressorCompPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
-	I_REF(IMessageHistoryConsumer, m_syncSlaveMessageConsumerCompPtr);
+	I_MULTIREF(IMessageHistoryConsumer, m_messageHistoryConsumerCompPtr);
 	I_ATTR(int, m_containerTimeDurationAttrPtr);
 	I_ATTR(int, m_containerWriteDelayAttrPtr);
 	I_ATTR(QString, m_containerNameFormatAttrPtr);
