@@ -34,7 +34,6 @@ IRepresentationViewFactory::GraphicsItemList CRepresentationEventsViewFactoryCom
 				}
 			}
 
-
 			for (int i = 0; i < representationObjectPtr->count(); i++){
 				IEventItem* itemPtr;
 
