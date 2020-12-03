@@ -103,6 +103,8 @@ void CDepthBitmap::ResetImage()
 	BaseClass::ResetImage();
 
 	CDepthBitmap::ResetData();
+
+	InvalidateCache(istd::IChangeable::GetNoChanges());
 }
 
 
@@ -113,6 +115,8 @@ void CDepthBitmap::ClearImage()
 	BaseClass::ClearImage();
 
 	CDepthBitmap::ResetData();
+
+	InvalidateCache(istd::IChangeable::GetNoChanges());
 }
 
 
