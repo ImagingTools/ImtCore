@@ -111,12 +111,6 @@ void CMenuPanel::SetActivePage(const QByteArray& pageId)
 	PageTree->selectionModel()->clear();
 	PageTree->setCurrentIndex(index);
 
-	if (pageId.isEmpty()){
-		StopTimer();
-		m_animationAction = AA_EXPAND;
-		StartAnimation();
-	}
-
 	if (!prevIndex.isValid() && index.isValid()){
 		StopTimer();
 		m_animationAction = AA_COLLAPSE;

@@ -624,13 +624,13 @@ void CThumbnailDecoratorGuiComp::ShowHomePage()
 		}
 	}
 
+	PageStack->setCurrentIndex(HOME_PAGE_INDEX);
+	PageList->clearSelection();
+
 	if (m_pagesCompPtr.IsValid()){
 		m_pagesCompPtr->SetSelectedOptionIndex(-1);
 	}
 
-	PageStack->setCurrentIndex(HOME_PAGE_INDEX);
-	PageList->clearSelection();
-	
 	m_subPageItemMap.clear();
 	SubPages->clear();
 
@@ -688,6 +688,15 @@ void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 	UpdateLoginButtonsState();
 
 	HomeButton->setEnabled(true);
+
+	if (PageStack->currentIndex() == HOME_PAGE_INDEX){
+		MenuPanelFrame->hide();
+		m_leftMenuPanelGuiCompPtr->GetWidget()->hide();
+	}
+	else{
+		MenuPanelFrame->show();
+		m_leftMenuPanelGuiCompPtr->GetWidget()->show();
+	}
 
 	if (m_menuPanelVisibilityCompPtr.IsValid()){
 		m_menuPanelVisibilityCompPtr->SetEnabled(true);
