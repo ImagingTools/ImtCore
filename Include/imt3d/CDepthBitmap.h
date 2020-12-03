@@ -57,6 +57,10 @@ public:
 	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size) override;
 	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size, void * dataPtr, bool releaseFlag, int linesDifference = 0) override;
 
+	// reimplemented (iimg::IRasterImage)
+	virtual void ResetImage() override;
+	virtual void ClearImage() override;
+
 	// reimplemented (i2d::CObject2dBase)
 	virtual void SetCalibration(const i2d::ICalibration2d* calibrationPtr, bool releaseFlag) override;
 

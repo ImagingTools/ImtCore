@@ -4,6 +4,7 @@
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
+#include <istd/CChangeGroup.h>
 #include <iser/CArchiveTag.h>
 #include <iser/CMemoryReadArchive.h>
 #include <iser/CMemoryWriteArchive.h>
@@ -90,6 +91,28 @@ bool CDepthBitmap::CreateDepthBitmap(const istd::CRange& depthRange, const istd:
 	}
 
 	return false;
+}
+
+
+// reimplemented (iimg::IRasterImage)
+
+void CDepthBitmap::ResetImage()
+{
+	istd::CChangeGroup changeGroup(this);
+
+	BaseClass::ResetImage();
+
+	CDepthBitmap::ResetData();
+}
+
+
+void CDepthBitmap::ClearImage()
+{
+	istd::CChangeGroup changeGroup(this);
+
+	BaseClass::ClearImage();
+
+	CDepthBitmap::ResetData();
 }
 
 
