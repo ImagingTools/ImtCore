@@ -79,15 +79,29 @@ protected:
 };
 
 
+class CThumbnailDecoratorGuiCompAttr2: public CThumbnailDecoratorGuiCompAttr
+{
+public:
+	typedef CThumbnailDecoratorGuiCompAttr BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CThumbnailDecoratorGuiCompAttr2);
+		I_ASSIGN(m_hideMenuPanelOnHomePageAttrPtr, "HIdeMenuPanelOnHomePage", "Hide menu panel when home page is active", true, "true");
+	I_END_COMPONENT;
+
+protected:
+	I_ATTR(bool, m_hideMenuPanelOnHomePageAttrPtr);
+};
+
+
 class CThumbnailDecoratorGuiComp:
-			public CThumbnailDecoratorGuiCompAttr,
+			public CThumbnailDecoratorGuiCompAttr2,
 			public virtual ibase::ICommandsProvider,
 			virtual public IWidgetProvider
 {
 	Q_OBJECT
 
 public:
-	typedef CThumbnailDecoratorGuiCompAttr BaseClass;
+	typedef CThumbnailDecoratorGuiCompAttr2 BaseClass;
 
 	I_BEGIN_COMPONENT(CThumbnailDecoratorGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);

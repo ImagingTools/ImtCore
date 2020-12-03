@@ -608,10 +608,6 @@ void CThumbnailDecoratorGuiComp::ShowLoginPage()
 	UpdateLoginButtonsState();
 
 	CurrentPageLabel->setText(tr("Login"));
-
-	if (m_menuPanelVisibilityCompPtr.IsValid()){
-		m_menuPanelVisibilityCompPtr->SetEnabled(false);
-	}
 }
 
 
@@ -639,10 +635,6 @@ void CThumbnailDecoratorGuiComp::ShowHomePage()
 	UpdateLoginButtonsState();
 
 	CurrentPageLabel->setText(*m_welcomeTextAttrPtr);
-
-	if (m_menuPanelVisibilityCompPtr.IsValid()){
-		m_menuPanelVisibilityCompPtr->SetEnabled(true);
-	}
 }
 
 
@@ -689,17 +681,32 @@ void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 
 	HomeButton->setEnabled(true);
 
-	if (PageStack->currentIndex() == HOME_PAGE_INDEX){
-		MenuPanelFrame->hide();
-		m_leftMenuPanelGuiCompPtr->GetWidget()->hide();
-	}
-	else{
-		MenuPanelFrame->show();
-		m_leftMenuPanelGuiCompPtr->GetWidget()->show();
+	// Check menu panel visibility
+	bool showMenuPanel = false;
+
+	if (!m_menuPanelVisibilityCompPtr.IsValid() || (m_menuPanelVisibilityCompPtr.IsValid() && m_menuPanelVisibilityCompPtr->IsEnabled())){
+		if (PageStack->currentIndex() == HOME_PAGE_INDEX){
+			if (!*m_hideMenuPanelOnHomePageAttrPtr){
+				showMenuPanel = true;
+			}
+		}
+		else if (PageStack->currentIndex() == 0){
+		}
+		else{
+			showMenuPanel = true;
+		}
 	}
 
-	if (m_menuPanelVisibilityCompPtr.IsValid()){
-		m_menuPanelVisibilityCompPtr->SetEnabled(true);
+	// Show/hide menu panel
+	MenuPanelFrame->setVisible(showMenuPanel);
+
+	QWidget* menuPanelWidgetPtr = nullptr;
+	if (m_leftMenuPanelGuiCompPtr.IsValid()){
+		menuPanelWidgetPtr = m_leftMenuPanelGuiCompPtr->GetWidget();
+	}
+
+	if (menuPanelWidgetPtr != nullptr){
+		menuPanelWidgetPtr->setVisible(showMenuPanel);
 	}
 }
 
