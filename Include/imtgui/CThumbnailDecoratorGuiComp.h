@@ -85,7 +85,7 @@ public:
 	typedef CThumbnailDecoratorGuiCompAttr BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CThumbnailDecoratorGuiCompAttr2);
-		I_ASSIGN(m_hideMenuPanelOnHomePageAttrPtr, "HideMenuPanelOnHomePage", "Hide menu panel when home page is active", true, "true");
+		I_ASSIGN(m_hideMenuPanelOnHomePageAttrPtr, "HideMenuPanelOnHomePage", "Hide menu panel when home page is active", true, true);
 	I_END_COMPONENT;
 
 protected:
