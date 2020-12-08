@@ -3,37 +3,37 @@
 
 // Qt includes
 #include <QtCore/QDateTime.h>
+#include <QtCore/QMap.h>
 
 // Acf includes
 #include <istd/IChangeable.h>
 
 // ImtCore includes
 #include <imtbase/IEventStatistics.h>
+#include <imtlog/IMessageHistoryConsumer.h>
+#include <imtlog/IMessageHistoryContainer.h>
 
 
 namespace imtloggui
 {
 
 
-class CRepresentationProductionSpeedModel:
-			virtual public istd::IChangeable,
-			virtual public imtbase::IEventStatistics
+class CRepresentationProductionSpeedModel: virtual public istd::IChangeable
 {
 public:
-	typedef istd::IChangeable BaseClass;
+	typedef QMap<qint64, imtbase::IEventStatistics::EventsInfo> Timeline;
 
-	CRepresentationProductionSpeedModel(uint64_t granularity);
-	uint64_t GetGranularity();
+	CRepresentationProductionSpeedModel(quint64 granularity);
+	quint64 GetGranularity() const;
+	const Timeline& GetTimeline() const;
+	quint64 GetMaxCount() const;
 	void ClearStatistics();
-	void AddStatisticsItem(const StatisticsItem& item);
-
-	// reimplemented (imtbase::IEventStatistics)
-	virtual uint64_t GetStatisticsItemCount() const override;
-	virtual const StatisticsItem& GetStatisticsItem(uint64_t index) const override;
-
+	void AddMessage(const imtlog::IMessageHistoryConsumer::Message& message);
+	
 private:
-	uint64_t m_granularity;
-	StatisticsTimeline m_timeline;
+	quint64 m_maxCount;
+	quint64 m_granularity;
+	Timeline m_timeline;
 };
 
 

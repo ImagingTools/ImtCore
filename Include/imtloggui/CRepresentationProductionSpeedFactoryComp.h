@@ -11,6 +11,7 @@
 // ImtCore includes
 #include <imtlog/IEventTimeRangeFilter.h>
 #include <imtlog/IEventMessageIdFilter.h>
+#include <imtlog/ITimeRangeProvider.h>
 #include <imtlog/IMessageHistoryContainer.h>
 #include <imtlog/IMessageHistoryConsumer.h>
 #include <imtlog/IStorage.h>
@@ -37,6 +38,7 @@ public:
 		I_ASSIGN(m_messageContainerCompPtr, "MessageContainer", "Message container", true, "MessageContainer");
 		I_ASSIGN_TO(m_timeRangeFilterCompPtr, m_messageContainerCompPtr, true);
 		I_ASSIGN_TO(m_messageIdFilterCompPtr, m_messageContainerCompPtr, true);
+		I_ASSIGN_TO(m_timeRangeProviderCompPtr, m_messageContainerCompPtr, true);
 		I_ASSIGN(m_storageCompPtr, "Storage", "Storage", false, "Storage");
 	I_END_COMPONENT
 
@@ -61,6 +63,7 @@ private:
 	I_REF(imtlog::IMessageHistoryContainer, m_messageContainerCompPtr);
 	I_REF(imtlog::IEventTimeRangeFilter, m_timeRangeFilterCompPtr);
 	I_REF(imtlog::IEventMessageIdFilter, m_messageIdFilterCompPtr);
+	I_REF(imtlog::ITimeRangeProvider, m_timeRangeProviderCompPtr);
 	I_REF(imtlog::IStorage, m_storageCompPtr);
 
 	istd::TSmartPtr<istd::IChangeable> m_modelPtr;

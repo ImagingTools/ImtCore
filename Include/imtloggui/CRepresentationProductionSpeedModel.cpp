@@ -7,47 +7,89 @@ namespace imtloggui
 
 // public methods
 
-CRepresentationProductionSpeedModel::CRepresentationProductionSpeedModel(uint64_t granularity)
-	:m_granularity(granularity)
+CRepresentationProductionSpeedModel::CRepresentationProductionSpeedModel(quint64 granularity)
+	:m_maxCount(0),
+	m_granularity(granularity)
 {
 }
 
 
-uint64_t CRepresentationProductionSpeedModel::GetGranularity()
+quint64 CRepresentationProductionSpeedModel::GetGranularity() const
 {
 	return m_granularity;
+}
+
+
+const CRepresentationProductionSpeedModel::Timeline& CRepresentationProductionSpeedModel::GetTimeline() const
+{
+	return m_timeline;
+}
+
+
+quint64 CRepresentationProductionSpeedModel::GetMaxCount() const
+{
+	return m_maxCount;
 }
 
 
 void CRepresentationProductionSpeedModel::ClearStatistics()
 {
 	m_timeline.clear();
+	m_maxCount = 0;
 }
 
 
-void CRepresentationProductionSpeedModel::AddStatisticsItem(const StatisticsItem& item)
+void CRepresentationProductionSpeedModel::AddMessage(const imtlog::IMessageHistoryConsumer::Message& message)
 {
+	if (message.messagePtr->GetInformationId() != 19780000){
+		return;
+	}
+
+	qint64 timeStamp = message.messagePtr->GetInformationTimeStamp().toMSecsSinceEpoch();
+	qint64 beginTime = timeStamp;
+	beginTime -= beginTime % m_granularity;
+
+	Q_ASSERT(m_granularity > 0);
+
 	if (m_timeline.size() > 0){
-		Q_ASSERT(m_timeline.back().time + m_granularity == item.time);
-		m_timeline.push_back(item);
+		Q_ASSERT(m_timeline.lastKey() < timeStamp);
 	}
-	else{
-		m_timeline.push_back(item);
+
+	if (m_timeline.size() == 0){
+		imtbase::IEventStatistics::EventsInfo item;
+		m_timeline[beginTime] = item;
 	}
-}
+	else if (m_timeline.lastKey() != beginTime){
+		imtbase::IEventStatistics::EventsInfo item;
+		m_timeline[beginTime] = item;
+	}
 
 
-// reimplemented (imtbase::IEventStatistics)
+	imtbase::IEventStatistics::EventsInfo& info = m_timeline.last();
 
-quint64 CRepresentationProductionSpeedModel::GetStatisticsItemCount() const
-{
-	return m_timeline.size();
-}
+	switch (message.messagePtr->GetInformationCategory()){
+	case istd::IInformationProvider::IC_INFO:
+		info.oks++;
+		info.count++;
+		break;
+	case istd::IInformationProvider::IC_WARNING:
+		info.warnings++;
+		info.count++;
+		break;
+	case istd::IInformationProvider::IC_ERROR:
+		info.noks++;
+		info.count++;
+		break;
+	case istd::IInformationProvider::IC_NONE:
+	case istd::IInformationProvider::IC_CRITICAL:
+		info.errors++;
+		info.count++;
+		break;
+	}
 
-
-const imtbase::IEventStatistics::StatisticsItem& CRepresentationProductionSpeedModel::GetStatisticsItem(uint64_t index) const
-{
-	return m_timeline.at(index);
+	if (m_maxCount < info.count){
+		m_maxCount = info.count;
+	}
 }
 
 

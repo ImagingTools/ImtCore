@@ -27,7 +27,14 @@ bool CRepresentationProductionSpeedFactoryComp::IsMessageSupported(
 
 void CRepresentationProductionSpeedFactoryComp::AddMessage(const MessagePtr& messagePtr)
 {
+	if (messagePtr->messagePtr->GetInformationId() != 19780000){
+		return;
+	}
 
+	CRepresentationProductionSpeedModel* modelPtr = dynamic_cast<CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr());
+	Q_ASSERT(modelPtr != nullptr);
+
+	modelPtr->AddMessage(*messagePtr.GetPtr());
 }
 
 
@@ -38,68 +45,7 @@ IRepresentationFactory::RepresentationObjectPtr CRepresentationProductionSpeedFa
 			const QList<int>& messageIdList,
 			imtlog::IEventMessageIdFilter::Mode mode) const
 {
-	if (m_messageContainerCompPtr.IsValid() && m_timeRangeFilterCompPtr.IsValid() && m_messageIdFilterCompPtr.IsValid()){
-		m_timeRangeFilterCompPtr->SetEventTimeRangeFilter(timeRange);
-		m_messageIdFilterCompPtr->SetEventMessageIdFilterMode(imtlog::IEventMessageIdFilter::M_ACCEPT);
-		m_messageIdFilterCompPtr->SetEventMessageIdFilter({19780000});
-
-		imtlog::IMessageHistoryContainer::Messages messages = m_messageContainerCompPtr->GetMessages();
-
-		CRepresentationProductionSpeedModel* modelPtr =
-					const_cast<CRepresentationProductionSpeedModel*>(
-								dynamic_cast<const CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr()));
-		
-		modelPtr->ClearStatistics();
-		if (messages.isEmpty()){
-			return m_modelPtr;
-		}
-
-		qint64 beginTime = messages.front().messagePtr->GetInformationTimeStamp().toMSecsSinceEpoch();
-		qint64 endTime = messages.back().messagePtr->GetInformationTimeStamp().toMSecsSinceEpoch();
-		qint64 granularity = *m_granularityAttrPtr * 1000;
-		beginTime += -(beginTime % granularity);
-		endTime += -(endTime % granularity) + granularity;
-
-		Q_ASSERT((endTime - beginTime) % granularity == 0);
-		qint64 count = (endTime - beginTime) / granularity;
-
-		imtlog::IMessageHistoryContainer::Messages::const_iterator it = messages.constBegin();
-
-		for (int i = 0; i < count; i++){
-			imtbase::IEventStatistics::StatisticsItem item;
-			int64_t itemBeginTime = beginTime + granularity * i;
-			int64_t itemEndTime = itemBeginTime + granularity;
-			item.time = itemBeginTime;
-
-			while (it != messages.end() && it->messagePtr->GetInformationTimeStamp().toMSecsSinceEpoch() < itemEndTime){
-				switch (it->messagePtr->GetInformationCategory()){
-				case istd::IInformationProvider::IC_INFO:
-					item.info.oks++;
-					item.info.count++;
-					break;
-				case istd::IInformationProvider::IC_WARNING:
-					item.info.warnings++;
-					item.info.count++;
-					break;
-				case istd::IInformationProvider::IC_ERROR:
-					item.info.noks++;
-					item.info.count++;
-					break;
-				case istd::IInformationProvider::IC_NONE:
-				case istd::IInformationProvider::IC_CRITICAL:
-					item.info.errors++;
-					item.info.count++;
-					break;
-				}
-
-				it++;
-			}
-
-			modelPtr->AddStatisticsItem(item);
-		}
-	}
-
-	return istd::TSmartPtr<istd::IChangeable>(m_modelPtr);
+	return m_modelPtr;
 }
 
 
@@ -107,7 +53,22 @@ IRepresentationFactory::RepresentationObjectPtr CRepresentationProductionSpeedFa
 
 void CRepresentationProductionSpeedFactoryComp::OnComponentCreated()
 {
-	m_modelPtr = istd::TSmartPtr<istd::IChangeable>(new CRepresentationProductionSpeedModel(*m_granularityAttrPtr * 1000));
+	CRepresentationProductionSpeedModel* modelPtr = new CRepresentationProductionSpeedModel(*m_granularityAttrPtr * 1000);
+	m_modelPtr = istd::TSmartPtr<istd::IChangeable>(modelPtr);
+
+	if (m_timeRangeProviderCompPtr.IsValid() && m_timeRangeFilterCompPtr.IsValid() && m_messageIdFilterCompPtr.IsValid()){
+		imtlog::CTimeRange timeRange = m_timeRangeProviderCompPtr->GetTimeRange();
+
+		m_timeRangeFilterCompPtr->SetEventTimeRangeFilter(timeRange);
+		m_messageIdFilterCompPtr->SetEventMessageIdFilterMode(imtlog::IEventMessageIdFilter::M_ACCEPT);
+		m_messageIdFilterCompPtr->SetEventMessageIdFilter({19780000});
+
+		imtlog::IMessageHistoryContainer::Messages messages = m_messageContainerCompPtr->GetMessages();
+
+		for (imtlog::IMessageHistoryConsumer::Message message : messages){
+			modelPtr->AddMessage(message);
+		}
+	}
 }
 
 

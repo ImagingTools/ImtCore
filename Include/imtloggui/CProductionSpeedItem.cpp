@@ -2,7 +2,9 @@
 
 
 // Qt includes
+#include <QtCore/QDebug>
 #include <QtGui/QPainter>
+#include <QtWidgets/QToolTip>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGraphicsSceneHoverEvent>
@@ -16,7 +18,8 @@ namespace imtloggui
 
 CProductionSpeedItem::CProductionSpeedItem(QGraphicsItem* parent)
 	:BaseClass(parent),
-	m_positionProviderPtr(nullptr)
+	m_positionProviderPtr(nullptr),
+	m_hTimer(0)
 {
 }
 
@@ -49,53 +52,66 @@ QRectF CProductionSpeedItem::boundingRect() const
 
 void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
+	Q_ASSERT(m_positionProviderPtr != nullptr);
+
+	QTime t;
+	t.start();
+
 	CRepresentationProductionSpeedModel* modelPtr = dynamic_cast<CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr()); 
 	if (modelPtr == nullptr || m_positionProviderPtr == nullptr){
 		return;
 	}
 
-	int count = modelPtr->GetStatisticsItemCount();
-	if (count == 0){
-		return;
-	}
+	const imtloggui::CRepresentationProductionSpeedModel::Timeline& timeline = modelPtr->GetTimeline();
+	QList<qint64> timelineKeys = timeline.keys();
 
+	QRectF visibleRect = mapFromScene(scene()->views()[0]->mapToScene(scene()->views()[0]->viewport()->rect())).boundingRect();
 	double scaleX = scene()->views().first()->viewportTransform().m11();
 	double scaleY = scene()->views().first()->viewportTransform().m22();
 
-	double granularity = modelPtr->GetGranularity() / 1000;
-	uint64_t beginTime = modelPtr->GetStatisticsItem(0).time;
-	double beginX = mapFromScene(m_positionProviderPtr->GetScenePositionFromTime(QDateTime::fromMSecsSinceEpoch(beginTime)), 0).x();
-
-	uint64_t max = 0;
-	for (int i = 0; i < count; i++){
-		if (max < modelPtr->GetStatisticsItem(i).info.count){
-			max = modelPtr->GetStatisticsItem(i).info.count;
-		}
-	}
+	double granularity = modelPtr->GetGranularity();
+	double granularityS = modelPtr->GetGranularity() / 1000.;
+	qint64 beginTime = m_positionProviderPtr->GetVisibleBeginTime().toMSecsSinceEpoch();
+	beginTime -= beginTime % modelPtr->GetGranularity();
+	qint64 endTime = m_positionProviderPtr->GetVisibleEndTime().toMSecsSinceEpoch();
 
 	QRectF r = rect();
 
 	QVector<QPointF> points;
-	points.reserve(count + 5);
+	points.reserve((endTime - beginTime) / granularity  + 10);
 
 	m_nodes.clear();
-	m_nodes.reserve(count);
+	m_nodes.reserve((endTime - beginTime) / granularity + 5);
 
-	QRectF visibleRect = mapFromScene(scene()->views()[0]->mapToScene(scene()->views()[0]->viewport()->rect())).boundingRect();
-	points.append(QPointF(visibleRect.x(), r.bottom()));
-	points.append(QPointF(0, r.bottom()));
+	
+	//points.append(QPointF(visibleRect.x(), r.bottom()));
+	//points.append(QPointF(0, r.bottom()));
 
-	for (int i = 0; i < count; i++){
-		double relativeY = modelPtr->GetStatisticsItem(i).info.count * 1.0 / max;
-		QPointF pnt = QPointF(i * granularity, (r.bottom() - (r.bottom() - r.top()) * relativeY));
-		points.append(pnt);
+	quint64 max = modelPtr->GetMaxCount();
+	
+	qint64 curTime = beginTime;
+	double curPos = mapFromScene(m_positionProviderPtr->GetScenePositionFromTime(QDateTime::fromMSecsSinceEpoch(beginTime)), 0).x();
 
-		m_nodes.append(QRectF(pnt.x() - 5, pnt.y() - 5, 10, 10));
+	while (curTime < endTime){
+		double relativeY = 0;
+		if (timeline.contains(curTime)){
+			relativeY= timeline[curTime].count * 1.0 / max;
+		}
+
+		QPointF pnt1 = QPointF(curPos, (r.bottom() - (r.bottom() - r.top()) * relativeY));
+		QPointF pnt2 = QPointF(curPos + granularityS, (r.bottom() - (r.bottom() - r.top()) * relativeY));
+		points.append(pnt1);
+		points.append(pnt2);
+
+		m_nodes.append(QRectF((pnt1.x() + pnt2.x()) / 2 - 5, pnt1.y() - 5, 10, 10));
+
+		curTime += granularity;
+		curPos += granularityS;
 	}
 
-	points.append(QPointF(points.last().x() + granularity, r.bottom()));
-	points.append(QPointF(visibleRect.right(), r.bottom()));
-	points.append(QPointF(visibleRect.left(), r.bottom()));
+	points.append(QPointF(points.last().x(), r.bottom()));
+	points.append(QPointF(points.first().x(), r.bottom()));
+	points.append(points.first());
 
 	QTransform savedTransform = painter->transform();
 	QTransform transform;
@@ -104,7 +120,8 @@ void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsIt
 	painter->setPen(Qt::transparent);
 	QLinearGradient grad(0, r.bottom(), 0, r.top());
 	grad.setColorAt(0, QColor("#1BFFFF00"));
-	grad.setColorAt(1, QColor("#9BFFFF00"));
+	grad.setColorAt(0.5, QColor("#9BFFFF00"));
+	grad.setColorAt(1, QColor("#FFFF8000"));
 	painter->setBrush(grad);
 	painter->drawPolygon(points.data(), points.count());
 
@@ -115,30 +132,42 @@ void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsIt
 	pen.setJoinStyle(Qt::RoundJoin);
 	painter->setPen(pen);
 
-	for (int i = 0; i < 3 + count; i++){
+	quint64 count = points.count() - 3;
+	QPointF prevPnt;
+	prevPnt.rx() = -1;
+	for (int i = 0; i < count; i += 2){
 		transform = savedTransform;
 		transform.translate(points[i].x(), 0);
 		transform.scale(1 / scaleX, 1 / scaleY);
 		painter->setTransform(transform);
+
+		if (prevPnt.x() == -1){
+			prevPnt = QPointF(0, r.bottom());
+		}
+
 		painter->drawLine(
-					0, points[i].y() * scaleY,
-					(points[i + 1].x() - points[i].x()) * scaleX, points[i + 1].y() * scaleY);
+			0, points[i].y() * scaleY,
+			prevPnt.x() * scaleX, prevPnt.y() * scaleY);
+		painter->drawLine(
+			0, points[i].y() * scaleY,
+			(points[i + 1].x() - points[i].x()) * scaleX, points[i].y() * scaleY);
+		prevPnt = QPointF(0, points[i + 1].y());
 	}
 
-	pen.setColor(Qt::transparent);
-	pen.setWidth(2);
-	painter->setPen(pen);
-	painter->setBrush(QColor("#500000FF"));
+	//pen.setColor(Qt::transparent);
+	//pen.setWidth(2);
+	//painter->setPen(pen);
+	//painter->setBrush(QColor("#500000FF"));
 
-	for (int i = 2; i < 2 + count; i++){
-		transform = savedTransform;
-		transform.translate(points[i].x(), points[i].y());
-		transform.scale(1 / scaleX, 1 / scaleY);
-		painter->setTransform(transform);
-		painter->drawEllipse(QRectF(
-			-5, -5,
-			10, 10));
-	}
+	//for (int i = 2; i < 2 + count; i++){
+	//	transform = savedTransform;
+	//	transform.translate(points[i].x(), points[i].y());
+	//	transform.scale(1 / scaleX, 1 / scaleY);
+	//	painter->setTransform(transform);
+	//	painter->drawEllipse(QRectF(
+	//		-5, -5,
+	//		10, 10));
+	//}
 
 	painter->setPen(QPen(Qt::black));
 	painter->setBrush(Qt::transparent);
@@ -176,11 +205,15 @@ void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsIt
 	painter->setPen(QPen(Qt::black));
 	painter->setBrush(Qt::transparent);
 	painter->drawText(rectT, Qt::AlignCenter, textT);
+
+	qDebug() << t.elapsed();
 }
 
 
 void CProductionSpeedItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
+	Q_ASSERT(m_positionProviderPtr != nullptr);
+
 	CRepresentationProductionSpeedModel* modelPtr = dynamic_cast<CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr());
 	if (modelPtr == nullptr || m_positionProviderPtr == nullptr){
 		setToolTip("");
@@ -191,25 +224,44 @@ void CProductionSpeedItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 	double scaleX = scene()->views().first()->viewportTransform().m11();
 	double scaleY = scene()->views().first()->viewportTransform().m22();
 
-	for (int i = 0; i < m_nodes.count(); i++){
-		QRectF rect = m_nodes[i];
-		QPointF pnt = rect.center();
-		rect.setLeft(pnt.x() - 5 / scaleX);
-		rect.setRight(pnt.x() + 5 / scaleX);
-		rect.setTop(pnt.y() - 5 / scaleY);
-		rect.setBottom(pnt.y() + 5 / scaleY);
+	const imtloggui::CRepresentationProductionSpeedModel::Timeline& timeline = modelPtr->GetTimeline();
+	QList<qint64> timelineKeys = timeline.keys();
+	quint64 count = timelineKeys.size();
 
-		if (rect.contains(pos)){
-			QString tooltip = QObject::tr("%1 pcs/h").arg(modelPtr->GetStatisticsItem(i).info.count * 360000. / modelPtr->GetGranularity());
-			if (toolTip() != tooltip){
-				setToolTip(tooltip);
-			}
+	QString tooltip;
+	qint64 timestamp = m_positionProviderPtr->GetTimeFromScenePosition(mapToScene(pos).x()).toMSecsSinceEpoch();
+	timestamp -= timestamp % modelPtr->GetGranularity();
 
-			return;
-		}
+	if (timeline.contains(timestamp) ){
+		tooltip = QObject::tr("%1 pcs/h").arg(timeline[timestamp].count * 360000. / modelPtr->GetGranularity());
+	}
+	else{
+		tooltip = QObject::tr("0 pcs/h");
 	}
 
-	setToolTip("");
+	//if (m_hTimer != 0){
+	//	killTimer(m_hTimer);
+	//}
+
+	//m_hTimer = startTimer(1000);
+	//QPointF posScn = mapToScene(pos);
+	//poss = scene()->views()[0]->mapToGlobal(poss);
+
+	//QToolTip::showText(poss, tooltip, nullptr, QRect(), 1000);
+	setToolTip(tooltip);
+	//qDebug() << "Set";
+}
+
+
+void CProductionSpeedItem::timerEvent(QTimerEvent *event)
+{
+	//if (m_hTimer){
+	//	killTimer(m_hTimer);
+	//}
+	//m_hTimer = 0;
+
+	//setToolTip("");
+	//qDebug() << "Clear";
 }
 
 

@@ -33,12 +33,20 @@ IRepresentationViewFactory::GraphicsItemList CRepresentationProductionSpeedViewF
 		return {};
 	}
 
+	if (modelPtr->GetTimeline().size() == 0){
+		return {};
+	}
+
+	Q_ASSERT(m_positionProviderCompPtr.IsValid());
+	double begin = m_positionProviderCompPtr->GetScenePositionFromTime(m_positionProviderCompPtr->GetBeginTime());
+	double end = m_positionProviderCompPtr->GetScenePositionFromTime(m_positionProviderCompPtr->GetEndTime());
+	uint64_t width = end - begin;
+
 	if (m_items.contains(groupId)){
 		CProductionSpeedItem* itemPtr = dynamic_cast<CProductionSpeedItem*>(m_items[groupId].GetPtr());
 		if (itemPtr->GetModel().GetPtr() == modelPtr){
-			if (modelPtr->GetStatisticsItemCount() > 0){
-				itemPtr->setPos(m_positionProviderCompPtr->GetScenePositionFromTime(QDateTime::fromMSecsSinceEpoch(modelPtr->GetStatisticsItem(0).time)), itemPtr->y());
-				uint64_t width = modelPtr->GetStatisticsItemCount() * modelPtr->GetGranularity();
+			if (modelPtr->GetTimeline().count() > 0){
+				itemPtr->setPos(begin, itemPtr->y());
 				itemPtr->setRect(QRectF(0, -120, width, 240));
 
 				return {m_items[groupId]};
@@ -48,17 +56,8 @@ IRepresentationViewFactory::GraphicsItemList CRepresentationProductionSpeedViewF
 		m_items.remove(groupId);
 	}
 
-	if (!m_positionProviderCompPtr.IsValid()){
-		return {};
-	}
-
-	if (modelPtr->GetStatisticsItemCount() == 0){
-		return {};
-	}
-
 	CProductionSpeedItem* itemPtr = new CProductionSpeedItem();
-	itemPtr->setPos(m_positionProviderCompPtr->GetScenePositionFromTime(QDateTime::fromMSecsSinceEpoch(modelPtr->GetStatisticsItem(0).time)), 0);
-	uint64_t width = modelPtr->GetStatisticsItemCount() * modelPtr->GetGranularity();
+	itemPtr->setPos(begin, 0);
 	itemPtr->setRect(QRectF(0, -120, width, 240));
 	itemPtr->SetModel(objectPtr);
 	itemPtr->SetScenePositionProvider(m_positionProviderCompPtr.GetPtr());
