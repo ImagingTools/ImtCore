@@ -1,6 +1,9 @@
 #include <imtloggui/CEventItemMetaInfoViewComp.h>
 
 
+// STD includes
+#include <algorithm>
+
 // Qt includes
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QVBoxLayout>
@@ -27,7 +30,7 @@ void CEventItemMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /
 		Q_ASSERT(metaInfoPtr != nullptr);
 
 		QList<int> types = metaInfoPtr->GetMetaInfoTypes().toList();
-		qSort(types);
+		std::sort(types.begin(), types.end());
 
 		for (int type : types){
 			QString name = metaInfoPtr->GetMetaInfoName(type);

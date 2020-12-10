@@ -14,9 +14,9 @@ namespace imtloggui
 // reimplemented (imtloggui::IRepresentationFactory)
 
 IRepresentationFactory::RepresentationObjectPtr CRepresentationIntervalStatisticsFactoryComp::CreateRepresentationObject(
-			const imtlog::CTimeRange& timeRange,
-			const QList<int>& messageIdList,
-			imtlog::IEventMessageIdFilter::Mode mode) const
+			const imtlog::CTimeRange& /*timeRange*/,
+			const QList<int>& /*messageIdList*/,
+			imtlog::IEventMessageIdFilter::Mode /*mode*/) const
 {
 	return IRepresentationFactory::RepresentationObjectPtr();
 }

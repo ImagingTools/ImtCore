@@ -4,7 +4,6 @@
 // Qt includes
 #include <QtCore/QDebug>
 #include <QtGui/QPainter>
-#include <QtWidgets/QToolTip>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGraphicsSceneHoverEvent>
@@ -18,8 +17,7 @@ namespace imtloggui
 
 CProductionSpeedItem::CProductionSpeedItem(QGraphicsItem* parent)
 	:BaseClass(parent),
-	m_positionProviderPtr(nullptr),
-	m_hTimer(0)
+	m_positionProviderPtr(nullptr)
 {
 }
 
@@ -80,13 +78,6 @@ void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsIt
 	QVector<QPointF> points;
 	points.reserve((endTime - beginTime) / granularity  + 10);
 
-	m_nodes.clear();
-	m_nodes.reserve((endTime - beginTime) / granularity + 5);
-
-	
-	//points.append(QPointF(visibleRect.x(), r.bottom()));
-	//points.append(QPointF(0, r.bottom()));
-
 	quint64 max = modelPtr->GetMaxCount();
 	
 	qint64 curTime = beginTime;
@@ -102,8 +93,6 @@ void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsIt
 		QPointF pnt2 = QPointF(curPos + granularityS, (r.bottom() - (r.bottom() - r.top()) * relativeY));
 		points.append(pnt1);
 		points.append(pnt2);
-
-		m_nodes.append(QRectF((pnt1.x() + pnt2.x()) / 2 - 5, pnt1.y() - 5, 10, 10));
 
 		curTime += granularity;
 		curPos += granularityS;
@@ -153,21 +142,6 @@ void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsIt
 			(points[i + 1].x() - points[i].x()) * scaleX, points[i].y() * scaleY);
 		prevPnt = QPointF(0, points[i + 1].y());
 	}
-
-	//pen.setColor(Qt::transparent);
-	//pen.setWidth(2);
-	//painter->setPen(pen);
-	//painter->setBrush(QColor("#500000FF"));
-
-	//for (int i = 2; i < 2 + count; i++){
-	//	transform = savedTransform;
-	//	transform.translate(points[i].x(), points[i].y());
-	//	transform.scale(1 / scaleX, 1 / scaleY);
-	//	painter->setTransform(transform);
-	//	painter->drawEllipse(QRectF(
-	//		-5, -5,
-	//		10, 10));
-	//}
 
 	painter->setPen(QPen(Qt::black));
 	painter->setBrush(Qt::transparent);
@@ -221,12 +195,8 @@ void CProductionSpeedItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 	}
 
 	QPointF pos = event->pos();
-	double scaleX = scene()->views().first()->viewportTransform().m11();
-	double scaleY = scene()->views().first()->viewportTransform().m22();
 
 	const imtloggui::CRepresentationProductionSpeedModel::Timeline& timeline = modelPtr->GetTimeline();
-	QList<qint64> timelineKeys = timeline.keys();
-	quint64 count = timelineKeys.size();
 
 	QString tooltip;
 	qint64 timestamp = m_positionProviderPtr->GetTimeFromScenePosition(mapToScene(pos).x()).toMSecsSinceEpoch();
@@ -239,32 +209,11 @@ void CProductionSpeedItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 		tooltip = QObject::tr("0 pcs/h");
 	}
 
-	//if (m_hTimer != 0){
-	//	killTimer(m_hTimer);
-	//}
-
-	//m_hTimer = startTimer(1000);
-	//QPointF posScn = mapToScene(pos);
-	//poss = scene()->views()[0]->mapToGlobal(poss);
-
-	//QToolTip::showText(poss, tooltip, nullptr, QRect(), 1000);
-	setToolTip(tooltip);
-	//qDebug() << "Set";
-}
-
-
-void CProductionSpeedItem::timerEvent(QTimerEvent *event)
-{
-	//if (m_hTimer){
-	//	killTimer(m_hTimer);
-	//}
-	//m_hTimer = 0;
-
-	//setToolTip("");
-	//qDebug() << "Clear";
+	QGraphicsView *viewPtr = scene()->views()[0];
+	viewPtr->setToolTipDuration(1000);
+	viewPtr->setToolTip(tooltip);
 }
 
 
 } // namespace imtloggui
-
 

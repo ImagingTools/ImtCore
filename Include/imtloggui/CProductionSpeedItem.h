@@ -16,11 +16,8 @@ namespace imtloggui
 {
 
 
-class CProductionSpeedItem:
-			public QObject,
-			public QGraphicsRectItem
+class CProductionSpeedItem:	public QGraphicsRectItem
 {
-	Q_OBJECT
 public:
 	typedef QGraphicsRectItem BaseClass;
 
@@ -34,14 +31,9 @@ public:
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 	virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
 
-	// reimplemented (QObject)
-	virtual void timerEvent(QTimerEvent *event) override;
-
 private:
 	istd::TSmartPtr<istd::IChangeable> m_modelPtr;
 	IEventScenePositionProvider* m_positionProviderPtr;
-	QList<QRectF> m_nodes;
-	int m_hTimer;
 };
 
 

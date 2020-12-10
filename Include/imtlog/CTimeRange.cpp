@@ -104,7 +104,7 @@ bool CTimeRange::SetTimeRange(const QDateTime& begin, const QDateTime& end)
 }
 
 
-CTimeRange CTimeRange::Intersect(const CTimeRange& other) const
+CTimeRange CTimeRange::Intersect(const CTimeRange& /*other*/) const
 {
 	return CTimeRange();
 

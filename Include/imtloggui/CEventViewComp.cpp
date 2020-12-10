@@ -356,7 +356,7 @@ void CEventViewComp::UpdateCommands()
 }
 
 
-void CEventViewComp::MoveToTime(const QDateTime& time)
+void CEventViewComp::MoveToTime(const QDateTime& /*time*/)
 {
 	//double beginTime = m_timeAxisPtr.GetBeginTime().toMSecsSinceEpoch() / 1000.0;
 	//double endTime = m_timeAxisPtr.GetEndTime().toMSecsSinceEpoch() / 1000.0;
@@ -451,7 +451,7 @@ void CEventViewComp::ItemsObserver::SetParent(CEventViewComp* parent)
 
 // reimplemented (imtloggui::IGraphicsItemProvider)
 
-void CEventViewComp::ItemsObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CEventViewComp::ItemsObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 
 }
@@ -469,7 +469,7 @@ CEventViewComp::GraphicsItemsObserver::GraphicsItemsObserver(CEventViewComp* par
 
 // reimplemented (imtloggui::IGraphicsItemProvider)
 
-void CEventViewComp::GraphicsItemsObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CEventViewComp::GraphicsItemsObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (m_parent != nullptr){
 		for (IGraphicsItemProvider::GraphicsItem item : GetObservedObject()->GetRemovedItems()){

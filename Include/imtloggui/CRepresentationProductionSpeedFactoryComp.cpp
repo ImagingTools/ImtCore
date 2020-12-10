@@ -17,9 +17,9 @@ namespace imtloggui
 // reimplemented (ilog::IMessageConsumer)
 
 bool CRepresentationProductionSpeedFactoryComp::IsMessageSupported(
-			int messageCategory,
+			int /*messageCategory*/,
 			int messageId,
-			const istd::IInformationProvider* messagePtr) const
+			const istd::IInformationProvider* /*messagePtr*/) const
 {
 	return messageId == 19780000;
 }
@@ -41,9 +41,9 @@ void CRepresentationProductionSpeedFactoryComp::AddMessage(const MessagePtr& mes
 // reimplemented (imtloggui::IRepresentationFactory)
 
 IRepresentationFactory::RepresentationObjectPtr CRepresentationProductionSpeedFactoryComp::CreateRepresentationObject(
-			const imtlog::CTimeRange& timeRange,
-			const QList<int>& messageIdList,
-			imtlog::IEventMessageIdFilter::Mode mode) const
+			const imtlog::CTimeRange& /*timeRange*/,
+			const QList<int>& /*messageIdList*/,
+			imtlog::IEventMessageIdFilter::Mode /*mode*/) const
 {
 	return m_modelPtr;
 }

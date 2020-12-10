@@ -36,7 +36,7 @@ bool CItemBase::CollidesWithItem(const IItemBase* otherPtr, double scale) const
 }
 
 
-bool CItemBase::SetMetaInfo(int metaInfoType, const QVariant& metaInfo)
+bool CItemBase::SetMetaInfo(int /*metaInfoType*/, const QVariant& /*metaInfo*/)
 {
 	return false;
 }
@@ -48,7 +48,7 @@ QString CItemBase::GetMetaInfoDescription(int /*metaInfoType*/) const
 }
 
 
-bool CItemBase::IsMetaInfoWritable(int metaInfoType) const
+bool CItemBase::IsMetaInfoWritable(int /*metaInfoType*/) const
 {
 	return false;
 }

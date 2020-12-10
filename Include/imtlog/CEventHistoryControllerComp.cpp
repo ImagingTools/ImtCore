@@ -142,13 +142,13 @@ void CEventHistoryControllerComp::ClearMessages()
 
 // reimplemented (iser::ISerializable)
 
-bool CEventHistoryControllerComp::Serialize(iser::IArchive& archive)
+bool CEventHistoryControllerComp::Serialize(iser::IArchive& /*archive*/)
 {
 	return false;
 }
 
 
-quint32 CEventHistoryControllerComp::GetMinimalVersion(int versionId) const
+quint32 CEventHistoryControllerComp::GetMinimalVersion(int /*versionId*/) const
 {
 	return 0;
 }
@@ -157,9 +157,9 @@ quint32 CEventHistoryControllerComp::GetMinimalVersion(int versionId) const
 // reimplemented (ilog::IMessageConsumer)
 
 bool CEventHistoryControllerComp::IsMessageSupported(
-			int messageCategory,
-			int messageId,
-			const istd::IInformationProvider* messagePt) const
+			int /*messageCategory*/,
+			int /*messageId*/,
+			const istd::IInformationProvider* /*messagePt*/) const
 {
 	return true;
 }

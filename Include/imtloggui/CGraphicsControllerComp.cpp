@@ -110,13 +110,13 @@ void CGraphicsControllerComp::OnComponentCreated()
 
 // private slots
 
-void CGraphicsControllerComp::OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
+void CGraphicsControllerComp::OnAxisBeginTimeChanged(const QDateTime& /*oldTime*/, const QDateTime& /*newTime*/)
 {
 
 }
 
 
-void CGraphicsControllerComp::OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime)
+void CGraphicsControllerComp::OnAxisEndTimeChanged(const QDateTime& /*oldTime*/, const QDateTime& /*newTime*/)
 {
 
 }
@@ -124,7 +124,7 @@ void CGraphicsControllerComp::OnAxisEndTimeChanged(const QDateTime& oldTime, con
 
 // private methods
 
-void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& changeSet)
+void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	QRectF viewRect = propertyPtr->GetViewRect();
 	m_timeAxisPtr->setPos(0, viewRect.bottom() - m_timeAxisPtr->rect().height() / propertyPtr->GetScaleY());
@@ -258,7 +258,7 @@ void CGraphicsControllerComp::TimeRangeObserver::SetParent(CGraphicsControllerCo
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CGraphicsControllerComp::TimeRangeObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CGraphicsControllerComp::TimeRangeObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	imtlog::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
 
