@@ -97,7 +97,7 @@ void CGraphicsControllerComp::OnComponentCreated()
 	if (m_viewPropertyManagerCompPtr.IsValid()){
 		m_viewPropertyManagerCompPtr->SetSceneRect(QRectF(0, -sceneHeight, 3600, sceneHeight));
 		m_viewPropertyManagerCompPtr->SetViewRect(QRectF(0, -sceneHeight, 3600, sceneHeight));
-		m_viewPropertyManagerCompPtr->SetMargins(QMargins(70, 0, 70, 40));
+		m_viewPropertyManagerCompPtr->SetMargins(QMargins(70, 0, 200, 40));
 		m_viewPropertyManagerCompPtr->SetScaleRangeX(istd::CRange(0, 1000));
 		m_viewPropertyManagerCompPtr->SetScaleRangeY(istd::CRange(0, 1000));
 	}

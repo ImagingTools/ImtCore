@@ -16,15 +16,22 @@ namespace imtloggui
 {
 
 
-class CProductionSpeedItem: public QGraphicsRectItem
+class CProductionQualityItem: public QGraphicsRectItem
 {
 public:
 	typedef QGraphicsRectItem BaseClass;
 
-	CProductionSpeedItem(QGraphicsItem* parent = nullptr);
+	enum Style
+	{
+		S_Bar = 0,
+		S_Polyline
+	};
+
+	CProductionQualityItem(QGraphicsItem* parent = nullptr);
 	istd::TSmartPtr<istd::IChangeable> GetModel();
 	void SetModel(istd::TSmartPtr<istd::IChangeable> modelPtr);
 	void SetScenePositionProvider(IEventScenePositionProvider* providerPtr);
+	void SetStyle(Style style);
 
 	// reimplemented (QGraphicsItem)
 	virtual QRectF boundingRect() const override;
@@ -32,8 +39,18 @@ public:
 	virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
 
 private:
+	bool IsEmptyInterval(int i);
+
+private:
 	istd::TSmartPtr<istd::IChangeable> m_modelPtr;
 	IEventScenePositionProvider* m_positionProviderPtr;
+
+	QVector<QPointF> m_okPoints;
+	QVector<QPointF> m_warningPoints;
+	QVector<QPointF> m_nokPoints;
+	QVector<QPointF> m_errorsPoints;
+
+	Style m_style;
 };
 
 

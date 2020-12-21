@@ -5,6 +5,7 @@
 #include <float.h>
 
 // Qt includes
+#include <QtCore/QDebug>
 #include <QtCore/QRectF>
 #include <QtGui/QFont>
 #include <QtGui/QPainter>
@@ -228,6 +229,9 @@ QRectF CTimeAxis::boundingRect() const
 
 void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* /*widget*/)
 {
+	QTime t;
+	t.start();
+
 	if (m_fontMetrics != option->fontMetrics){
 		m_fontMetrics = option->fontMetrics;
 	}
@@ -300,6 +304,8 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 		painter->setTransform(savedTransform);
 	}
+
+	//qDebug() << t.elapsed();
 }
 
 
@@ -332,9 +338,9 @@ double CTimeAxis::GetScenePositionFromTime(const QDateTime& time) const
 		return DBL_MIN;
 	}
 
-	if (time < m_beginTime || time > m_endTime){
-		return DBL_MIN;
-	}
+	//if (time < m_beginTime || time > m_endTime){
+	//	return DBL_MIN;
+	//}
 
 	if (m_beginTime == m_endTime){
 		return pos().x();
@@ -351,9 +357,9 @@ QDateTime CTimeAxis::GetTimeFromScenePosition(double position) const
 		return QDateTime();
 	}
 
-	if (position < rect().left() || position > rect().right()){
-		return QDateTime();
-	}
+	//if (position < rect().left() || position > rect().right()){
+	//	return QDateTime();
+	//}
 
 	if (m_beginTime == m_endTime){
 		if (qFuzzyCompare(position, pos().x())){
@@ -705,9 +711,9 @@ QDateTime CTimeAxis::GetTimeFromRectPosition(double position) const
 		return QDateTime();
 	}
 
-	if (position < rect().left() || position > rect().right()){
-		return QDateTime();
-	}
+	//if (position < rect().left() || position > rect().right()){
+	//	return QDateTime();
+	//}
 
 	if (m_beginTime == m_endTime){
 		if (qFuzzyCompare(position, rect().left())){

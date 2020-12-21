@@ -91,6 +91,10 @@ void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsIt
 
 		QPointF pnt1 = QPointF(curPos, (r.bottom() - (r.bottom() - r.top()) * relativeY));
 		QPointF pnt2 = QPointF(curPos + granularityS, (r.bottom() - (r.bottom() - r.top()) * relativeY));
+		if (curTime + granularity > endTime){
+			pnt2.rx() -= ((curTime + granularity) - endTime) / 1000.;
+		}
+
 		points.append(pnt1);
 		points.append(pnt2);
 
@@ -180,7 +184,7 @@ void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsIt
 	painter->setBrush(Qt::transparent);
 	painter->drawText(rectT, Qt::AlignCenter, textT);
 
-	qDebug() << t.elapsed();
+	qDebug() << t.elapsed() << "speed item";
 }
 
 

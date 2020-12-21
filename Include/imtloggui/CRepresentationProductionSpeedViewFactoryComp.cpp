@@ -9,6 +9,7 @@
 
 // ImtCore includes
 #include <imtloggui/CProductionSpeedItem.h>
+#include <imtloggui/CProductionQualityItem.h>
 #include <imtloggui/CRepresentationProductionSpeedFactoryComp.h>
 
 
@@ -43,7 +44,8 @@ IRepresentationViewFactory::GraphicsItemList CRepresentationProductionSpeedViewF
 	uint64_t width = end - begin;
 
 	if (m_items.contains(groupId)){
-		CProductionSpeedItem* itemPtr = dynamic_cast<CProductionSpeedItem*>(m_items[groupId].GetPtr());
+		//CProductionSpeedItem* itemPtr = dynamic_cast<CProductionSpeedItem*>(m_items[groupId].GetPtr());
+		CProductionQualityItem* itemPtr = dynamic_cast<CProductionQualityItem*>(m_items[groupId].GetPtr());
 		if (itemPtr->GetModel().GetPtr() == modelPtr){
 			if (modelPtr->GetTimeline().count() > 0){
 				itemPtr->setPos(begin, itemPtr->y());
@@ -56,7 +58,7 @@ IRepresentationViewFactory::GraphicsItemList CRepresentationProductionSpeedViewF
 		m_items.remove(groupId);
 	}
 
-	CProductionSpeedItem* itemPtr = new CProductionSpeedItem();
+	CProductionQualityItem* itemPtr = new CProductionQualityItem();
 	itemPtr->setPos(begin, 0);
 	itemPtr->setRect(QRectF(0, -120, width, 240));
 	itemPtr->SetModel(objectPtr);

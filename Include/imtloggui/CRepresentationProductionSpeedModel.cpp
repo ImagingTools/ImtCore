@@ -32,6 +32,12 @@ quint64 CRepresentationProductionSpeedModel::GetMaxCount() const
 }
 
 
+const CRepresentationProductionSpeedModel::MaxCounters& CRepresentationProductionSpeedModel::GetMaxCounters() const
+{
+	return m_maxCounters;
+}
+
+
 void CRepresentationProductionSpeedModel::ClearStatistics()
 {
 	m_timeline.clear();
@@ -64,31 +70,46 @@ void CRepresentationProductionSpeedModel::AddMessage(const imtlog::IMessageHisto
 		m_timeline[beginTime] = item;
 	}
 
-
 	imtbase::IEventStatistics::EventsInfo& info = m_timeline.last();
 
 	switch (message.messagePtr->GetInformationCategory()){
 	case istd::IInformationProvider::IC_INFO:
 		info.oks++;
 		info.count++;
+		if (m_maxCounters.oks < info.oks){
+			m_maxCounters.oks = info.oks;
+		}
 		break;
 	case istd::IInformationProvider::IC_WARNING:
 		info.warnings++;
 		info.count++;
+		if (m_maxCounters.warnings < info.warnings){
+			m_maxCounters.warnings = info.warnings;
+		}
 		break;
 	case istd::IInformationProvider::IC_ERROR:
 		info.noks++;
 		info.count++;
+		if (m_maxCounters.noks < info.noks){
+			m_maxCounters.noks = info.noks;
+		}
 		break;
 	case istd::IInformationProvider::IC_NONE:
 	case istd::IInformationProvider::IC_CRITICAL:
 		info.errors++;
 		info.count++;
+		if (m_maxCounters.errors < info.errors){
+			m_maxCounters.errors = info.errors;
+		}
 		break;
 	}
 
 	if (m_maxCount < info.count){
 		m_maxCount = info.count;
+	}
+
+	if (m_maxCounters.noksErrors < info.noks + info.errors){
+		m_maxCounters.noksErrors = info.noks + info.errors;
 	}
 }
 
