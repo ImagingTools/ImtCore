@@ -6,7 +6,7 @@
 #include <QtCore/QRect.h>
 
 // ACF includes
-#include <istd/IPolymorphic.h>
+#include <istd/IChangeable.h>
 #include <istd/TRange.h>
 
 
@@ -14,7 +14,7 @@ namespace imtloggui
 {
 
 
-class IViewPropertyProvider: virtual public istd::IPolymorphic
+class IViewPropertyProvider: virtual public istd::IChangeable
 {
 public:
 	virtual QRectF GetSceneRect() const = 0;

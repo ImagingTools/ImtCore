@@ -1,20 +1,16 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QMargins.h>
-#include <QtCore/QRect.h>
-
-// ACF includes
-#include <istd/IPolymorphic.h>
-#include <istd/TRange.h>
+// ImtCore includes
+#include <imtloggui/IViewPropertyProvider.h>
 
 
 namespace imtloggui
 {
 
 
-class IViewPropertyManager: virtual public istd::IPolymorphic
+class IViewPropertyManager: virtual public IViewPropertyProvider
+
 {
 public:
 	virtual bool SetSceneRect(const QRectF& rect) = 0;

@@ -5,12 +5,8 @@
 #include <QtCore/QDateTime>
 #include <QtWidgets/QGraphicsView>
 
-// ACF includes
-#include <istd/IChangeable.h>
-
 // ImtCore includes
 #include <imtloggui/CTimeAxis.h>
-#include <imtloggui/IViewPropertyProvider.h>
 #include <imtloggui/IViewPropertyManager.h>
 
 
@@ -20,8 +16,6 @@ namespace imtloggui
 
 class CEventGraphicsView:
 			public QGraphicsView,
-			virtual public istd::IChangeable,
-			virtual public IViewPropertyProvider,
 			virtual public IViewPropertyManager
 {
 	Q_OBJECT
