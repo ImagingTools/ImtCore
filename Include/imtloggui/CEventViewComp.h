@@ -9,12 +9,14 @@
 #include <QtWidgets/QStackedWidget>
 
 // ACF includes
+#include <ibase/ICommandsProvider.h>
 #include <ilog/IMessageConsumer.h>
 #include <imeas/INumericConstraints.h>
 #include <imod/TSingleModelObserverBase.h>
 #include <ilog/TMessageDelegatorComp.h>
 #include <iqtgui/TRestorableGuiWrap.h>
 #include <iqtgui/TDesignerGuiCompBase.h>
+#include <iqtgui/CHierarchicalCommand.h>
 #include <imod/CModelProxy.h>
 
 // ImtCore includes
@@ -42,6 +44,10 @@ public:
 	
 	I_BEGIN_COMPONENT(CEventViewComp);
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
+		I_REGISTER_SUBELEMENT(Commands);
+		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
+		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
+		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
 		I_REGISTER_SUBELEMENT(GraphicsView);
 		I_REGISTER_SUBELEMENT_INTERFACE(GraphicsView, IViewPropertyProvider, ExtractGraphicsView);
 		I_REGISTER_SUBELEMENT_INTERFACE(GraphicsView, imod::IModel, ExtractGraphicsView);
@@ -61,6 +67,7 @@ public:
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
+	virtual void OnGuiRetranslate() override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -69,7 +76,14 @@ Q_SIGNALS:
 	void EmitShowAll();
 
 private Q_SLOTS:
+	void OnMoveToFirstCommand();
+	void OnMoveToPreviousCommand();
+	void OnMoveToNextCommand();
+	void OnMoveToLastCommand();
+	void OnZoomInCommand();
+	void OnZoomOutCommand();
 	void OnSelectionChanged();
+
 
 private:
 	QRectF GetSceneVisibleRect() const;
@@ -109,6 +123,27 @@ private:
 		IGraphicsItemProvider::GraphicsItemList m_items;
 	};
 
+	class Commands: virtual public ibase::ICommandsProvider
+	{
+	public:
+		Commands();
+
+		void SetParent(CEventViewComp* parentPtr);
+
+	protected:
+		// reimplemented (ibase::ICommandsProvider)
+		virtual const ibase::IHierarchicalCommand* GetCommands() const override;
+
+	private:
+		CEventViewComp* m_parentPtr;
+	};
+
+	template <typename InterfaceType>
+	static InterfaceType* ExtractCommands(CEventViewComp& component)
+	{
+		return &component.m_commands;
+	}
+
 	template <typename InterfaceType>
 	static InterfaceType* ExtractGraphicsView(CEventViewComp& component)
 	{
@@ -123,8 +158,18 @@ private:
 	I_REF(imtloggui::IGraphicsItemProvider, m_itemProviderCompPtr);
 	I_REF(imod::IModel, m_itemProviderModelCompPtr);
 
+	imod::TModelWrap<Commands> m_commands;
+	iqtgui::CHierarchicalCommand m_rootCommands;
+	iqtgui::CHierarchicalCommand m_moveToFirstCommand;
+	iqtgui::CHierarchicalCommand m_moveToPreviousCommand;
+	iqtgui::CHierarchicalCommand m_moveToNextCommand;
+	iqtgui::CHierarchicalCommand m_moveToLastCommand;
+	iqtgui::CHierarchicalCommand m_zoomInCommand;
+	iqtgui::CHierarchicalCommand m_zoomOutCommand;
+
 	QGraphicsScene m_scene;
 	imod::TModelWrap<CEventGraphicsView>* m_viewPtr;
+	double m_scaleFactor;
 	GraphicsItemsObserver m_graphicsItemObserver;
 
 	QDateTime m_currentCommandTime;

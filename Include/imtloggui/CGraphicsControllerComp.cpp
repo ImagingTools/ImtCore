@@ -12,30 +12,9 @@ namespace imtloggui
 // public methods
 
 CGraphicsControllerComp::CGraphicsControllerComp()
-	:m_rootCommands("", 100, ibase::ICommand::CF_GLOBAL_MENU),
-	m_moveToFirstCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
-	m_moveToPreviousCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
-	m_moveToNextCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
-	m_moveToLastCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR)
 {
 	m_viewPropertyObserver.SetParent(this);
 	m_timeRangeObserver.SetParent(this);
-
-	m_moveToFirstCommand.SetVisuals(tr("First event"), tr("First"), tr("Move to first event"), QIcon(":/Icons/MoveFirst"));
-	m_moveToPreviousCommand.SetVisuals(tr("Previous event"), tr("Previous"), tr("Move to previous event"), QIcon(":/Icons/Left"));
-	m_moveToNextCommand.SetVisuals(tr("Next event"), tr("Next"), tr("Move to next event"), QIcon(":/Icons/Right"));
-	m_moveToLastCommand.SetVisuals(tr("Last event"), tr("Last"), tr("Move to last event"), QIcon(":/Icons/MoveLast"));
-
-	m_commands.SetParent(this);
-	m_rootCommands.InsertChild(&m_moveToFirstCommand);
-	m_rootCommands.InsertChild(&m_moveToPreviousCommand);
-	m_rootCommands.InsertChild(&m_moveToNextCommand);
-	m_rootCommands.InsertChild(&m_moveToLastCommand);
-
-	connect(&m_moveToFirstCommand, &QAction::triggered, this, &CGraphicsControllerComp::OnMoveToFirstCommand);
-	connect(&m_moveToPreviousCommand, &QAction::triggered, this, &CGraphicsControllerComp::OnMoveToPreviousCommand);
-	connect(&m_moveToNextCommand, &QAction::triggered, this, &CGraphicsControllerComp::OnMoveToNextCommand);
-	connect(&m_moveToLastCommand, &QAction::triggered, this, &CGraphicsControllerComp::OnMoveToLastCommand);
 }
 
 
@@ -54,17 +33,6 @@ IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetRemovedItems
 	GraphicsItemList items = m_removedItems;
 	m_removedItems.clear();
 	return items;
-}
-
-
-// reimplemented (ibase::TLocalizableWrap)
-
-void CGraphicsControllerComp::OnLanguageChanged()
-{
-	m_moveToFirstCommand.SetVisuals(tr("First event"), tr("First"), tr("Move to first event"), QIcon(":/Icons/MoveFirst"));
-	m_moveToPreviousCommand.SetVisuals(tr("Previous event"), tr("Previous"), tr("Move to previous event"), QIcon(":/Icons/Left"));
-	m_moveToNextCommand.SetVisuals(tr("Next event"), tr("Next"), tr("Move to next event"), QIcon(":/Icons/Right"));
-	m_moveToLastCommand.SetVisuals(tr("Last event"), tr("Last"), tr("Move to last event"), QIcon(":/Icons/MoveLast"));
 }
 
 
@@ -151,98 +119,6 @@ void CGraphicsControllerComp::OnAxisBeginTimeChanged(const QDateTime& /*oldTime*
 void CGraphicsControllerComp::OnAxisEndTimeChanged(const QDateTime& /*oldTime*/, const QDateTime& /*newTime*/)
 {
 
-}
-
-
-void CGraphicsControllerComp::OnMoveToFirstCommand()
-{
-	//if (!m_eventMap.isEmpty()){
-	//	m_navigationIterator = m_eventMap.cbegin();
-	//	m_isNavigationIteratorValid = true;
-
-	//	QGraphicsItem* graphicsItem = dynamic_cast<QGraphicsItem*>(m_navigationIterator.value());
-	//	if (graphicsItem != nullptr){
-	//		MoveToTime(m_navigationIterator.key());
-	//		m_scene.clearSelection();
-	//		graphicsItem->setSelected(true);
-	//	}
-
-	//	UpdateCommands();
-	//}
-}
-
-
-void CGraphicsControllerComp::OnMoveToPreviousCommand()
-{
-	//if (!m_eventMap.isEmpty()){
-	//	if (m_isNavigationIteratorValid){
-	//		if (m_navigationIterator == m_eventMap.cbegin()){
-	//			return;
-	//		}
-
-	//		m_navigationIterator--;
-	//	}
-	//	else{
-	//		QDateTime time = m_timeAxisPtr.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
-	//		m_navigationIterator = --m_eventMap.lowerBound(time);
-	//		m_isNavigationIteratorValid = true;
-	//	}
-
-	//	QGraphicsItem* graphicsItem = dynamic_cast<QGraphicsItem*>(m_navigationIterator.value());
-	//	if (graphicsItem != nullptr){
-	//		MoveToTime(m_navigationIterator.key());
-	//		m_scene.clearSelection();
-	//		graphicsItem->setSelected(true);
-	//	}
-
-	//	UpdateCommands();
-	//}
-}
-
-
-void CGraphicsControllerComp::OnMoveToNextCommand()
-{
-	//if (!m_eventMap.isEmpty()){
-	//	if (m_isNavigationIteratorValid){
-	//		if (m_navigationIterator == --m_eventMap.cend()){
-	//			return;
-	//		}
-
-	//		m_navigationIterator++;
-	//	}
-	//	else{
-	//		QDateTime time = m_timeAxisPtr.GetTimeFromScenePosition(GetSceneVisibleRect().center().x());
-	//		m_navigationIterator = m_eventMap.lowerBound(time);
-	//		m_isNavigationIteratorValid = true;
-	//	}
-
-	//	QGraphicsItem* graphicsItem = dynamic_cast<QGraphicsItem*>(m_navigationIterator.value());
-	//	if (graphicsItem != nullptr){
-	//		MoveToTime(m_navigationIterator.key());
-	//		m_scene.clearSelection();
-	//		graphicsItem->setSelected(true);
-	//	}
-
-	//	UpdateCommands();
-	//}
-}
-
-
-void CGraphicsControllerComp::OnMoveToLastCommand()
-{
-	//if (!m_eventMap.isEmpty()){
-	//	m_navigationIterator = --m_eventMap.cend();
-	//	m_isNavigationIteratorValid = true;
-
-	//	QGraphicsItem* graphicsItem = dynamic_cast<QGraphicsItem*>(m_navigationIterator.value());
-	//	if (graphicsItem != nullptr){
-	//		MoveToTime(m_navigationIterator.key());
-	//		m_scene.clearSelection();
-	//		graphicsItem->setSelected(true);
-	//	}
-
-	//	UpdateCommands();
-	//}
 }
 
 
@@ -396,32 +272,6 @@ void CGraphicsControllerComp::TimeRangeObserver::OnUpdate(const istd::IChangeabl
 			m_parent->m_viewPropertyManagerCompPtr->SetSceneRect(rect);
 		}
 	}
-}
-
-
-// public methods of the embedded class Commands
-
-CGraphicsControllerComp::Commands::Commands()
-	:m_parentPtr(nullptr)
-{
-}
-
-
-void CGraphicsControllerComp::Commands::SetParent(CGraphicsControllerComp* parentPtr)
-{
-	Q_ASSERT(parentPtr != nullptr);
-
-	m_parentPtr = parentPtr;
-}
-
-
-// reimplemented (ibase::ICommandsProvider)
-
-const ibase::IHierarchicalCommand* CGraphicsControllerComp::Commands::GetCommands() const
-{
-	Q_ASSERT(m_parentPtr != nullptr);
-
-	return &m_parentPtr->m_rootCommands;
 }
 
 
