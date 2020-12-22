@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <ibase/ICommandsProvider.h>
+#include <ibase/TLocalizableWrap.h>
 #include <imod/TSingleModelObserverBase.h>
 #include <imod/TModelWrap.h>
 #include <icomp/CComponentBase.h>
@@ -26,13 +27,13 @@ namespace imtloggui
 
 class CGraphicsControllerComp:
 			public QObject,
-			public icomp::CComponentBase,
+			public ibase::TLocalizableWrap<icomp::CComponentBase>,
 			virtual public IGraphicsItemProvider
 {
 	Q_OBJECT
 
 public:
-	typedef icomp::CComponentBase BaseClass;
+	typedef ibase::TLocalizableWrap<icomp::CComponentBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CGraphicsControllerComp)
 		I_REGISTER_INTERFACE(IGraphicsItemProvider);
@@ -56,6 +57,10 @@ public:
 	// reimplemented (imtloggui::IGraphicsItemProvider)
 	virtual GraphicsItemList GetAddedItems() const override;
 	virtual GraphicsItemList GetRemovedItems() const override;
+
+	// reimplemented (ibase::TLocalizableWrap)
+	virtual void OnLanguageChanged() override;
+
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
