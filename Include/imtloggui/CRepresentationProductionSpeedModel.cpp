@@ -52,22 +52,23 @@ void CRepresentationProductionSpeedModel::AddMessage(const imtlog::IMessageHisto
 	}
 
 	qint64 timeStamp = message.messagePtr->GetInformationTimeStamp().toMSecsSinceEpoch();
-	qint64 beginTime = timeStamp;
-	beginTime -= beginTime % m_granularity;
 
 	Q_ASSERT(m_granularity > 0);
 
 	if (m_timeline.size() > 0){
-		Q_ASSERT(m_timeline.lastKey() < timeStamp);
+		Q_ASSERT(m_timeline.lastKey() <= timeStamp);
 	}
 
 	if (m_timeline.size() == 0){
 		imtbase::IEventStatistics::EventsInfo item;
-		m_timeline[beginTime] = item;
+		m_timeline[timeStamp] = item;
 	}
-	else if (m_timeline.lastKey() != beginTime){
-		imtbase::IEventStatistics::EventsInfo item;
-		m_timeline[beginTime] = item;
+	else{
+		qint64 beginTime = CalculateIntervalBeginTime(timeStamp);
+		if (m_timeline.lastKey() != beginTime){
+			imtbase::IEventStatistics::EventsInfo item;
+			m_timeline[beginTime] = item;
+		}
 	}
 
 	imtbase::IEventStatistics::EventsInfo& info = m_timeline.last();
@@ -111,6 +112,23 @@ void CRepresentationProductionSpeedModel::AddMessage(const imtlog::IMessageHisto
 	if (m_maxCounters.noksErrors < info.noks + info.errors){
 		m_maxCounters.noksErrors = info.noks + info.errors;
 	}
+}
+
+
+qint64 CRepresentationProductionSpeedModel::CalculateIntervalBeginTime(qint64 timeStamp)
+{
+	if (m_timeline.empty()){
+		return timeStamp;
+	}
+
+	qint64 beginG = timeStamp - timeStamp % m_granularity;
+	qint64 deltaXG = m_timeline.firstKey() % m_granularity;
+	qint64 beginX = beginG + deltaXG;
+	if (timeStamp < beginX){
+		beginX -= m_granularity;
+	}
+
+	return beginX;
 }
 
 

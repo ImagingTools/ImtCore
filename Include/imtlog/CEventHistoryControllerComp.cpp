@@ -387,11 +387,18 @@ QList<CEventHistoryControllerComp::EventContainerPtr> CEventHistoryControllerCom
 		tempDir.cd("ImtCore/" + uuid);
 
 		if (m_compressorCompPtr->DecompressFolder(file,	tempDir.path())){
-			QStringList containerFileList = tempDir.entryList(
-				QDir::Files | QDir::NoSymLinks,
-				QDir::Time | QDir::Reversed);
+			QStringList containerFileList = tempDir.entryList(QDir::Files | QDir::NoSymLinks);
+			QMap<qint64, QString> containerFileMap;
 
-			for (QString containerFileItem : containerFileList){
+			for (QString containerFile : containerFileList){
+				QFileInfo info(containerFile);
+				QDateTime timeStamp = QDateTime::fromString(info.completeBaseName(), *m_containerNameFormatAttrPtr);
+				if (timeStamp.isValid()){
+					containerFileMap[timeStamp.toMSecsSinceEpoch()] = containerFile;
+				}
+			}
+
+			for (QString containerFileItem : containerFileMap){
 				EventContainerPtr containerPtr(new EventContainer);
 
 				ifile::CCompactXmlFileReadArchive xmlArchive(tempDir.path() + "/" + containerFileItem, m_versionInfoCompPtr.GetPtr());
@@ -1072,7 +1079,7 @@ imtlog::IMessageHistoryContainer::Messages CEventHistoryControllerComp::MessageC
 						for (int i = 0; i < messages.count(); i++){
 							QDateTime timeStamp = messages[i].messagePtr->GetInformationTimeStamp();
 							if (begin <= timeStamp && timeStamp <= end){
-								retVal.append(messages);
+								retVal.append(messages[i]);
 							}
 						}
 

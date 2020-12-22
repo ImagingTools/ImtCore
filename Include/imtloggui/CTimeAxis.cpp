@@ -5,7 +5,6 @@
 #include <float.h>
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtCore/QRectF>
 #include <QtGui/QFont>
 #include <QtGui/QPainter>
@@ -229,9 +228,6 @@ QRectF CTimeAxis::boundingRect() const
 
 void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* /*widget*/)
 {
-	QTime t;
-	t.start();
-
 	if (m_fontMetrics != option->fontMetrics){
 		m_fontMetrics = option->fontMetrics;
 	}
@@ -304,8 +300,6 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 		painter->setTransform(savedTransform);
 	}
-
-	//qDebug() << t.elapsed();
 }
 
 

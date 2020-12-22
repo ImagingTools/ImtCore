@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtGui/QPainter>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
@@ -51,9 +50,6 @@ QRectF CProductionSpeedItem::boundingRect() const
 void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
 	Q_ASSERT(m_positionProviderPtr != nullptr);
-
-	QTime t;
-	t.start();
 
 	CRepresentationProductionSpeedModel* modelPtr = dynamic_cast<CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr()); 
 	if (modelPtr == nullptr || m_positionProviderPtr == nullptr){
@@ -183,8 +179,6 @@ void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsIt
 	painter->setPen(QPen(Qt::black));
 	painter->setBrush(Qt::transparent);
 	painter->drawText(rectT, Qt::AlignCenter, textT);
-
-	qDebug() << t.elapsed() << "speed item";
 }
 
 

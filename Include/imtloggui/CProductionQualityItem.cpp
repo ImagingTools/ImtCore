@@ -1,7 +1,6 @@
 #include <imtloggui/CProductionQualityItem.h>
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtGui/QPainter>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
@@ -58,9 +57,6 @@ void CProductionQualityItem::paint(QPainter* painter, const QStyleOptionGraphics
 {
 	Q_ASSERT(m_positionProviderPtr != nullptr);
 
-	QTime t;
-	t.start();
-
 	CRepresentationProductionSpeedModel* modelPtr = dynamic_cast<CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr()); 
 	if (modelPtr == nullptr || m_positionProviderPtr == nullptr){
 		return;
@@ -76,10 +72,10 @@ void CProductionQualityItem::paint(QPainter* painter, const QStyleOptionGraphics
 
 	double granularity = modelPtr->GetGranularity();
 	double granularityS = modelPtr->GetGranularity() / 1000.;
-	qint64 beginTime = m_positionProviderPtr->GetVisibleBeginTime().toMSecsSinceEpoch();
-	beginTime -= beginTime % (qint64)granularity;
+	qint64 beginTime = modelPtr->CalculateIntervalBeginTime(m_positionProviderPtr->GetVisibleBeginTime().toMSecsSinceEpoch());
+	qint64 endTime = modelPtr->CalculateIntervalBeginTime(m_positionProviderPtr->GetVisibleEndTime().toMSecsSinceEpoch());
 	beginTime -= modelPtr->GetGranularity();
-	qint64 endTime = m_positionProviderPtr->GetVisibleEndTime().toMSecsSinceEpoch();
+	beginTime += modelPtr->GetGranularity();
 
 	QRectF r = rect();
 
@@ -101,10 +97,15 @@ void CProductionQualityItem::paint(QPainter* painter, const QStyleOptionGraphics
 
 		if (m_style == S_Bar){
 			if (timeline.contains(curTime)){
-				relativeOks = timeline[curTime].oks * 1. / timeline[curTime].count;
-				relativeWarnings = timeline[curTime].warnings * 1. / timeline[curTime].count;
-				relativeNoks = timeline[curTime].noks * 1. / timeline[curTime].count;
-				relativeErrors = timeline[curTime].errors * 1. / timeline[curTime].count;
+				Q_ASSERT(!((timeline[curTime].oks > 0 ||
+							timeline[curTime].warnings > 0 ||
+							timeline[curTime].noks > 0 ||
+							timeline[curTime].errors > 0) ^ (timeline[curTime].count > 0)));
+
+				relativeOks = timeline[curTime].count > 0 ? timeline[curTime].oks * 1. / timeline[curTime].count : 0;
+				relativeWarnings = timeline[curTime].count > 0 ? timeline[curTime].warnings * 1. / timeline[curTime].count : 0;
+				relativeNoks = timeline[curTime].count > 0 ? timeline[curTime].noks * 1. / timeline[curTime].count : 0;
+				relativeErrors = timeline[curTime].count > 0 ? timeline[curTime].errors * 1. / timeline[curTime].count : 0;
 			}
 
 			m_okPoints.append(QPointF(curPos + granularityS / 2, r.height() * relativeOks));
@@ -240,66 +241,67 @@ void CProductionQualityItem::paint(QPainter* painter, const QStyleOptionGraphics
 
 			double offset = r.bottom();
 
-			QLinearGradient gradient;
+			//QLinearGradient gradient;
+
+			double barLeftSide = -granularityS / 2  + 3 / scaleX / 2;
+			double barWitdh = granularityS - 3 / scaleX;
 
 			if (m_okPoints[i].y() > 0){
-				gradient = QLinearGradient(0, offset, 0, (offset - m_okPoints[i].y()));
-				gradient.setColorAt(0, QColor("#1000FF00"));
-				gradient.setColorAt(1, QColor("#FF00FF00"));
-				painter->setBrush(gradient);
+				//gradient = QLinearGradient(0, offset, 0, (offset - m_okPoints[i].y()));
+				//gradient.setColorAt(0, QColor("#1000FF00"));
+				//gradient.setColorAt(1, QColor("#FF00FF00"));
+				painter->setBrush(Qt::green);
 				painter->setPen(pen);
 				painter->drawRect(QRectF(
-					-granularityS * 0.45, offset,
-					granularityS * 0.9, -m_okPoints[i].y()));
+					barLeftSide, offset,
+					barWitdh, -m_okPoints[i].y()));
 
 				offset -= m_okPoints[i].y();
 			}
 
 			if (m_warningPoints[i].y() > 0){
-				gradient = QLinearGradient(0, offset, 0, (offset - m_warningPoints[i].y()));
-				gradient.setColorAt(0, QColor("#10FFFF00"));
-				gradient.setColorAt(1, QColor("#FFFFFF00"));
-				painter->setBrush(gradient);
+				//gradient = QLinearGradient(0, offset, 0, (offset - m_warningPoints[i].y()));
+				//gradient.setColorAt(0, QColor("#10FFFF00"));
+				//gradient.setColorAt(1, QColor("#FFFFFF00"));
+				painter->setBrush(Qt::yellow);
 				painter->setPen(pen);
 				painter->drawRect(QRectF(
-					-granularityS * 0.45, offset,
-					granularityS * 0.9, -m_warningPoints[i].y()));
+					barLeftSide, offset,
+					barWitdh, -m_warningPoints[i].y()));
 
 				offset -= m_warningPoints[i].y();
 			}
 
 			if (m_nokPoints[i].y() > 0){
-				gradient = QLinearGradient(0, offset, 0, (offset - m_nokPoints[i].y()));
-				gradient.setColorAt(0, QColor("#10FF0000"));
-				gradient.setColorAt(1, QColor("#FFFF0000"));
-				painter->setBrush(gradient);
+				//gradient = QLinearGradient(0, offset, 0, (offset - m_nokPoints[i].y()));
+				//gradient.setColorAt(0, QColor("#10FF0000"));
+				//gradient.setColorAt(1, QColor("#FFFF0000"));
+				painter->setBrush(Qt::red);
 				painter->setPen(pen);
 				painter->drawRect(QRectF(
-					-granularityS * 0.45, offset,
-					granularityS * 0.9, -m_nokPoints[i].y()));
+					barLeftSide, offset,
+					barWitdh, -m_nokPoints[i].y()));
 
 				offset -= m_nokPoints[i].y();
 			}
 
 			if (m_errorsPoints[i].y() > 0){
-				gradient = QLinearGradient(0, offset, 0, (offset - m_errorsPoints[i].y()));
-				gradient.setColorAt(0, QColor("#10A00000"));
-				gradient.setColorAt(1, QColor("#FFA00000"));
-				painter->setBrush(gradient);
+				//gradient = QLinearGradient(0, offset, 0, (offset - m_errorsPoints[i].y()));
+				//gradient.setColorAt(0, QColor("#10A00000"));
+				//gradient.setColorAt(1, QColor("#FFA00000"));
+				painter->setBrush(Qt::darkRed);
 				painter->setPen(pen);
 				painter->drawRect(QRectF(
-					-granularityS * 0.45, offset,
-					granularityS * 0.9, -m_errorsPoints[i].y()));
+					barLeftSide, offset,
+					barWitdh, -m_errorsPoints[i].y()));
 			}
 
-			if (!IsEmptyInterval(i)){
-				pen.setColor(Qt::black);
-				painter->setPen(pen);
-				painter->setBrush(Qt::transparent);
-				painter->drawRect(QRectF(
-					-granularityS * 0.45, r.top(),
-					granularityS * 0.9, r.height()));
-			}
+			pen.setColor(Qt::black);
+			painter->setPen(pen);
+			painter->setBrush(Qt::transparent);
+			painter->drawRect(QRectF(
+				barLeftSide, r.top(),
+				barWitdh, r.height()));
 		}
 	}
 
@@ -423,8 +425,6 @@ void CProductionQualityItem::paint(QPainter* painter, const QStyleOptionGraphics
 	painter->setBrush(Qt::green);
 	painter->drawRoundedRect(rect, 3, 3);
 	painter->drawText(rect, Qt::AlignVCenter | Qt::AlignHCenter, "Oks");
-
-	qDebug() << t.elapsed() << "speed item";
 }
 
 
@@ -443,15 +443,15 @@ void CProductionQualityItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 	const imtloggui::CRepresentationProductionSpeedModel::Timeline& timeline = modelPtr->GetTimeline();
 
 	QString tooltip;
-	qint64 timestamp = m_positionProviderPtr->GetTimeFromScenePosition(mapToScene(pos).x()).toMSecsSinceEpoch();
-	timestamp -= timestamp % modelPtr->GetGranularity();
+	qint64 timeStamp = m_positionProviderPtr->GetTimeFromScenePosition(mapToScene(pos).x()).toMSecsSinceEpoch();
+	qint64 beginTime = modelPtr->CalculateIntervalBeginTime(timeStamp);
 
-	if (timeline.contains(timestamp) ){
-		tooltip = QObject::tr("Oks: %1\nWarnings: %2\nNoks: %3\n Errors: %4")
-					.arg(timeline[timestamp].oks)
-					.arg(timeline[timestamp].warnings)
-					.arg(timeline[timestamp].noks)
-					.arg(timeline[timestamp].errors);
+	if (timeline.contains(beginTime) ){
+		tooltip = QObject::tr("Oks: %1\nWarnings: %2\nNoks: %3\nErrors: %4")
+					.arg(timeline[beginTime].oks)
+					.arg(timeline[beginTime].warnings)
+					.arg(timeline[beginTime].noks)
+					.arg(timeline[beginTime].errors);
 	}
 	else{
 		tooltip = QObject::tr("Oks: 0\nWarnings: 0\nNoks: 0\nErrors: 0");

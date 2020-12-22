@@ -47,11 +47,13 @@ public:
 	const MaxCounters& GetMaxCounters() const;
 	void ClearStatistics();
 	void AddMessage(const imtlog::IMessageHistoryConsumer::Message& message);
-	
+	qint64 CalculateIntervalBeginTime(qint64 timeStamp);
+
 private:
 	quint64 m_maxCount;
 	MaxCounters m_maxCounters;
-	quint64 m_granularity;
+	qint64 m_granularity;
+	qint64 m_beginTimeStamp;
 	Timeline m_timeline;
 };
 
