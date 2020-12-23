@@ -21,17 +21,17 @@ class CProductionQualityItem: public QGraphicsRectItem
 public:
 	typedef QGraphicsRectItem BaseClass;
 
-	enum Style
+	enum DrawStyle
 	{
-		S_Bar = 0,
-		S_Polyline
+		DS_BAR = 0,
+		DS_POLYLINE
 	};
 
 	CProductionQualityItem(QGraphicsItem* parent = nullptr);
 	istd::TSmartPtr<istd::IChangeable> GetModel();
 	void SetModel(istd::TSmartPtr<istd::IChangeable> modelPtr);
 	void SetScenePositionProvider(IEventScenePositionProvider* providerPtr);
-	void SetStyle(Style style);
+	void SetStyle(DrawStyle style);
 
 	// reimplemented (QGraphicsItem)
 	virtual QRectF boundingRect() const override;
@@ -40,6 +40,10 @@ public:
 
 private:
 	bool IsEmptyInterval(int i);
+	void PreparePointArrays();
+	void DrawBars(QPainter* painter);
+	void DrawPolylines(QPainter* painter);
+	void DrawLegend(QPainter* painter);
 
 private:
 	istd::TSmartPtr<istd::IChangeable> m_modelPtr;
@@ -50,7 +54,7 @@ private:
 	QVector<QPointF> m_nokPoints;
 	QVector<QPointF> m_errorsPoints;
 
-	Style m_style;
+	DrawStyle m_style;
 };
 
 
