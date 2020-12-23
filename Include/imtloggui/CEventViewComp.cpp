@@ -33,6 +33,7 @@ CEventViewComp::CEventViewComp()
 	m_moveToLastCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
 	m_zoomInCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
 	m_zoomOutCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
+	m_zoomReset("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
 	m_graphicsItemObserver(this),
 	m_scaleFactor(1.2)
 {
@@ -43,6 +44,10 @@ CEventViewComp::CEventViewComp()
 	m_rootCommands.InsertChild(&m_moveToLastCommand);
 	m_rootCommands.InsertChild(&m_zoomInCommand);
 	m_rootCommands.InsertChild(&m_zoomOutCommand);
+	m_rootCommands.InsertChild(&m_zoomReset);
+
+	m_zoomInCommand.setAutoRepeat(true);
+	m_zoomOutCommand.setAutoRepeat(true);
 
 	connect(&m_moveToFirstCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToFirstCommand);
 	connect(&m_moveToPreviousCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToPreviousCommand);
@@ -50,6 +55,7 @@ CEventViewComp::CEventViewComp()
 	connect(&m_moveToLastCommand, &QAction::triggered, this, &CEventViewComp::OnMoveToLastCommand);
 	connect(&m_zoomInCommand, &QAction::triggered, this, &CEventViewComp::OnZoomInCommand);
 	connect(&m_zoomOutCommand, &QAction::triggered, this, &CEventViewComp::OnZoomOutCommand);
+	connect(&m_zoomReset, &QAction::triggered, this, &CEventViewComp::OnZoomReset);
 }
 
 
@@ -176,6 +182,7 @@ void CEventViewComp::OnGuiRetranslate()
 	m_moveToLastCommand.SetVisuals(tr("Last event"), tr("Last"), tr("Move to last event"), QIcon(":/Icons/MoveLast"));
 	m_zoomInCommand.SetVisuals(tr("Zoom in"), tr("ZoomIn"), tr("Zoom in"), QIcon(":/Icons/ZoomIn"));
 	m_zoomOutCommand.SetVisuals(tr("Zoom out"), tr("ZoomOut"), tr("Zoom out"), QIcon(":/Icons/ZoomOut"));
+	m_zoomReset.SetVisuals(tr("Zoom reset"), tr("ZoomReset"), tr("Zoom reset"), QIcon(":/Icons/ZoomOut"));
 }
 
 
@@ -306,6 +313,12 @@ void CEventViewComp::OnZoomOutCommand()
 	rect = rect.marginsAdded(margins);
 
 	m_viewPtr->SetViewRect(rect);
+}
+
+
+void CEventViewComp::OnZoomReset()
+{
+	m_viewPtr->SetViewRect(m_viewPtr->GetSceneRect());
 }
 
 

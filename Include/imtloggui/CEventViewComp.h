@@ -82,6 +82,7 @@ private Q_SLOTS:
 	void OnMoveToLastCommand();
 	void OnZoomInCommand();
 	void OnZoomOutCommand();
+	void OnZoomReset();
 	void OnSelectionChanged();
 
 
@@ -166,6 +167,7 @@ private:
 	iqtgui::CHierarchicalCommand m_moveToLastCommand;
 	iqtgui::CHierarchicalCommand m_zoomInCommand;
 	iqtgui::CHierarchicalCommand m_zoomOutCommand;
+	iqtgui::CHierarchicalCommand m_zoomReset;
 
 	QGraphicsScene m_scene;
 	imod::TModelWrap<CEventGraphicsView>* m_viewPtr;

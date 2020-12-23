@@ -18,6 +18,32 @@ CGraphicsControllerComp::CGraphicsControllerComp()
 }
 
 
+// reimplemented (imtloggui::IEventNavigationController)
+
+void CGraphicsControllerComp::JumpToFirstEvent() const
+{
+
+}
+
+
+void CGraphicsControllerComp::JumpToPreviousEvent() const
+{
+
+}
+
+
+void CGraphicsControllerComp::JumpToNextEvent() const
+{
+
+}
+
+
+void CGraphicsControllerComp::JumpToLastEvent() const
+{
+
+}
+
+
 // reimplemented (imtloggui::IGraphicsItemProvider)
 
 IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetAddedItems() const

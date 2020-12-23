@@ -12,6 +12,7 @@
 #include <imtloggui/IViewPropertyProvider.h>
 #include <imtloggui/IViewPropertyManager.h>
 #include <imtloggui/IGroupProvider.h>
+#include <imtloggui/IEventNavigationController.h>
 #include <imtloggui/IEventScenePositionProvider.h>
 #include <imtloggui/IRepresentationViewFactory.h>
 #include <imtloggui/CTimeAxis.h>
@@ -25,7 +26,8 @@ namespace imtloggui
 class CGraphicsControllerComp:
 			public QObject,
 			public icomp::CComponentBase,
-			virtual public IGraphicsItemProvider
+			virtual public IGraphicsItemProvider,
+			virtual public IEventNavigationController
 {
 	Q_OBJECT
 
@@ -34,6 +36,7 @@ public:
 
 	I_BEGIN_COMPONENT(CGraphicsControllerComp)
 		I_REGISTER_INTERFACE(IGraphicsItemProvider);
+		I_REGISTER_INTERFACE(IEventNavigationController);
 		I_REGISTER_SUBELEMENT(ScenePositionProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(ScenePositionProvider, IEventScenePositionProvider, ExtractPositionProvider);
 		I_ASSIGN(m_groupProviderCompPtr, "GroupProvider", "Event groups provider", false, "GroupProvider");
@@ -46,6 +49,12 @@ public:
 	I_END_COMPONENT
 
 	CGraphicsControllerComp();
+
+	// reimplemented (imtloggui::IEventNavigationController)
+	virtual void JumpToFirstEvent() const override;
+	virtual void JumpToPreviousEvent() const override;
+	virtual void JumpToNextEvent() const override;
+	virtual void JumpToLastEvent() const override;
 
 	// reimplemented (imtloggui::IGraphicsItemProvider)
 	virtual GraphicsItemList GetAddedItems() const override;

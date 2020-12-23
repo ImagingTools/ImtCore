@@ -243,8 +243,8 @@ void CProductionQualityItem::paint(QPainter* painter, const QStyleOptionGraphics
 
 			//QLinearGradient gradient;
 
-			double barLeftSide = -granularityS / 2  + 3 / scaleX / 2;
-			double barWitdh = granularityS - 3 / scaleX;
+			double barLeftSide = -granularityS / 2  - 1 / scaleX;
+			double barWitdh = granularityS + 1 / scaleX;
 
 			if (m_okPoints[i].y() > 0){
 				//gradient = QLinearGradient(0, offset, 0, (offset - m_okPoints[i].y()));
@@ -296,12 +296,12 @@ void CProductionQualityItem::paint(QPainter* painter, const QStyleOptionGraphics
 					barWitdh, -m_errorsPoints[i].y()));
 			}
 
-			pen.setColor(Qt::black);
-			painter->setPen(pen);
-			painter->setBrush(Qt::transparent);
-			painter->drawRect(QRectF(
-				barLeftSide, r.top(),
-				barWitdh, r.height()));
+			//pen.setColor(Qt::black);
+			//painter->setPen(pen);
+			//painter->setBrush(Qt::transparent);
+			//painter->drawRect(QRectF(
+			//	barLeftSide, r.top(),
+			//	barWitdh, r.height()));
 		}
 	}
 
