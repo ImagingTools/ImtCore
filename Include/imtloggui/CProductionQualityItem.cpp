@@ -62,7 +62,7 @@ void CProductionQualityItem::paint(QPainter* painter, const QStyleOptionGraphics
 
 	Q_ASSERT(m_positionProviderPtr != nullptr);
 
-	CRepresentationProductionSpeedModel* modelPtr = dynamic_cast<CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr()); 
+	CRepresentationProductionModel* modelPtr = dynamic_cast<CRepresentationProductionModel*>(m_modelPtr.GetPtr());
 	if (modelPtr == nullptr || m_positionProviderPtr == nullptr){
 		return;
 	}
@@ -85,7 +85,7 @@ void CProductionQualityItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
 	Q_ASSERT(m_positionProviderPtr != nullptr);
 
-	CRepresentationProductionSpeedModel* modelPtr = dynamic_cast<CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr());
+	CRepresentationProductionModel* modelPtr = dynamic_cast<CRepresentationProductionModel*>(m_modelPtr.GetPtr());
 	if (modelPtr == nullptr || m_positionProviderPtr == nullptr){
 		setToolTip("");
 		return;
@@ -93,7 +93,7 @@ void CProductionQualityItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 
 	QPointF pos = event->pos();
 
-	const imtloggui::CRepresentationProductionSpeedModel::Timeline& timeline = modelPtr->GetTimeline();
+	const imtloggui::CRepresentationProductionModel::Timeline& timeline = modelPtr->GetTimeline();
 
 	QString tooltip;
 	qint64 timeStamp = m_positionProviderPtr->GetTimeFromScenePosition(mapToScene(pos).x()).toMSecsSinceEpoch();
@@ -124,11 +124,11 @@ bool CProductionQualityItem::IsEmptyInterval(int i)
 
 void CProductionQualityItem::PreparePointArrays()
 {
-	CRepresentationProductionSpeedModel* modelPtr = dynamic_cast<CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr());
+	CRepresentationProductionModel* modelPtr = dynamic_cast<CRepresentationProductionModel*>(m_modelPtr.GetPtr());
 
-	const imtloggui::CRepresentationProductionSpeedModel::Timeline& timeline = modelPtr->GetTimeline();
+	const imtloggui::CRepresentationProductionModel::Timeline& timeline = modelPtr->GetTimeline();
 	quint64 max = modelPtr->GetMaxCount();
-	const CRepresentationProductionSpeedModel::MaxCounters& maxCounters = modelPtr->GetMaxCounters();
+	const CRepresentationProductionModel::MaxCounters& maxCounters = modelPtr->GetMaxCounters();
 
 	qint64 beginTime = modelPtr->CalculateIntervalBeginTime(m_positionProviderPtr->GetVisibleBeginTime().toMSecsSinceEpoch());
 	qint64 endTime = modelPtr->CalculateIntervalBeginTime(m_positionProviderPtr->GetVisibleEndTime().toMSecsSinceEpoch());
@@ -214,7 +214,7 @@ void CProductionQualityItem::PreparePointArrays()
 
 void CProductionQualityItem::DrawBars(QPainter* painter)
 {
-	CRepresentationProductionSpeedModel* modelPtr = dynamic_cast<CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr());
+	CRepresentationProductionModel* modelPtr = dynamic_cast<CRepresentationProductionModel*>(m_modelPtr.GetPtr());
 
 	double scaleX = scene()->views().first()->viewportTransform().m11();
 	double scaleY = scene()->views().first()->viewportTransform().m22();
@@ -376,7 +376,7 @@ void CProductionQualityItem::DrawBars(QPainter* painter)
 
 void CProductionQualityItem::DrawPolylines(QPainter* painter)
 {
-	CRepresentationProductionSpeedModel* modelPtr = dynamic_cast<CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr());
+	CRepresentationProductionModel* modelPtr = dynamic_cast<CRepresentationProductionModel*>(m_modelPtr.GetPtr());
 
 	QRectF r = rect();
 
@@ -462,7 +462,7 @@ void CProductionQualityItem::DrawPolylines(QPainter* painter)
 
 void CProductionQualityItem::DrawLegend(QPainter* painter)
 {
-	CRepresentationProductionSpeedModel* modelPtr = dynamic_cast<CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr());
+	CRepresentationProductionModel* modelPtr = dynamic_cast<CRepresentationProductionModel*>(m_modelPtr.GetPtr());
 
 	QRectF visibleRect = mapFromScene(scene()->views()[0]->mapToScene(scene()->views()[0]->viewport()->rect())).boundingRect();
 	QRectF r = rect();

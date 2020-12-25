@@ -18,8 +18,8 @@
 #include <imtloggui/CLayerComp.h>
 #include <imtloggui/CRepresentationEventsFactoryComp.h>
 #include <imtloggui/CRepresentationEventsViewFactoryComp.h>
-#include <imtloggui/CRepresentationProductionSpeedFactoryComp.h>
-#include <imtloggui/CRepresentationProductionSpeedViewFactoryComp.h>
+#include <imtloggui/CRepresentationProductionFactoryComp.h>
+#include <imtloggui/CRepresentationProductionViewFactoryComp.h>
 
 
 /**
@@ -41,8 +41,8 @@ typedef imtloggui::CGroupComp Group;
 typedef imtloggui::CLayerComp Layer;
 typedef imtloggui::CRepresentationEventsFactoryComp RepresentationEventsFactory;
 typedef imtloggui::CRepresentationEventsViewFactoryComp RepresentationEventsViewFactory;
-typedef imtloggui::CRepresentationProductionSpeedFactoryComp RepresentationProductionSpeedFactory;
-typedef imtloggui::CRepresentationProductionSpeedViewFactoryComp RepresentationProductionSpeedViewFactory;
+typedef imtloggui::CRepresentationProductionFactoryComp RepresentationProductionFactory;
+typedef imtloggui::CRepresentationProductionViewFactoryComp RepresentationProductionSpeedViewFactory;
 
 
 } // namespace ImtLogGuiPck

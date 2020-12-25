@@ -51,12 +51,12 @@ void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsIt
 {
 	Q_ASSERT(m_positionProviderPtr != nullptr);
 
-	CRepresentationProductionSpeedModel* modelPtr = dynamic_cast<CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr()); 
+	CRepresentationProductionModel* modelPtr = dynamic_cast<CRepresentationProductionModel*>(m_modelPtr.GetPtr());
 	if (modelPtr == nullptr || m_positionProviderPtr == nullptr){
 		return;
 	}
 
-	const imtloggui::CRepresentationProductionSpeedModel::Timeline& timeline = modelPtr->GetTimeline();
+	const imtloggui::CRepresentationProductionModel::Timeline& timeline = modelPtr->GetTimeline();
 	QList<qint64> timelineKeys = timeline.keys();
 
 	QRectF visibleRect = mapFromScene(scene()->views()[0]->mapToScene(scene()->views()[0]->viewport()->rect())).boundingRect();
@@ -186,7 +186,7 @@ void CProductionSpeedItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
 	Q_ASSERT(m_positionProviderPtr != nullptr);
 
-	CRepresentationProductionSpeedModel* modelPtr = dynamic_cast<CRepresentationProductionSpeedModel*>(m_modelPtr.GetPtr());
+	CRepresentationProductionModel* modelPtr = dynamic_cast<CRepresentationProductionModel*>(m_modelPtr.GetPtr());
 	if (modelPtr == nullptr || m_positionProviderPtr == nullptr){
 		setToolTip("");
 		return;
@@ -194,7 +194,7 @@ void CProductionSpeedItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 
 	QPointF pos = event->pos();
 
-	const imtloggui::CRepresentationProductionSpeedModel::Timeline& timeline = modelPtr->GetTimeline();
+	const imtloggui::CRepresentationProductionModel::Timeline& timeline = modelPtr->GetTimeline();
 
 	QString tooltip;
 	qint64 timestamp = m_positionProviderPtr->GetTimeFromScenePosition(mapToScene(pos).x()).toMSecsSinceEpoch();

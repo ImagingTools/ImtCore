@@ -23,7 +23,7 @@ IRepresentationViewFactory::GraphicsItemList CRepresentationEventsViewFactoryCom
 			for (uint64_t id : m_items[groupId].keys()){
 				uint64_t foundId = ULLONG_MAX;
 				for (int i = 0; i < representationObjectPtr->count(); i++){
-					if (representationObjectPtr->at(i).id == id){
+					if (representationObjectPtr->at(i)->id == id){
 						foundId = id;
 						break;
 					}
@@ -37,20 +37,20 @@ IRepresentationViewFactory::GraphicsItemList CRepresentationEventsViewFactoryCom
 			for (int i = 0; i < representationObjectPtr->count(); i++){
 				IEventItem* itemPtr;
 
-				if (m_items[groupId].contains(representationObjectPtr->at(i).id)){
-					GraphicsItem item = m_items[groupId][representationObjectPtr->at(i).id];
+				if (m_items[groupId].contains(representationObjectPtr->at(i)->id)){
+					GraphicsItem item = m_items[groupId][representationObjectPtr->at(i)->id];
 					itemList.append(item);
-					item->setPos(m_positionProviderCompPtr->GetScenePositionFromTime(representationObjectPtr->at(i).messagePtr->GetInformationTimeStamp()), item->pos().y());
+					item->setPos(m_positionProviderCompPtr->GetScenePositionFromTime(representationObjectPtr->at(i)->messagePtr->GetInformationTimeStamp()), item->pos().y());
 				}
 				else{
-					itemPtr = m_eventItemFactoryCompPtr->CreateInstance(representationObjectPtr->at(i).messagePtr);
+					itemPtr = m_eventItemFactoryCompPtr->CreateInstance(representationObjectPtr->at(i)->messagePtr);
 					if (itemPtr != nullptr){
 						QGraphicsItem* graphicsItemPtr = dynamic_cast<QGraphicsItem*>(itemPtr);
 						graphicsItemPtr->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIgnoresTransformations);
-						graphicsItemPtr->setPos(m_positionProviderCompPtr->GetScenePositionFromTime(representationObjectPtr->at(i).messagePtr->GetInformationTimeStamp()), 0);
+						graphicsItemPtr->setPos(m_positionProviderCompPtr->GetScenePositionFromTime(representationObjectPtr->at(i)->messagePtr->GetInformationTimeStamp()), 0);
 						GraphicsItem item(graphicsItemPtr);
 						itemList.append(item);
-						m_items[groupId][representationObjectPtr->at(i).id] = item;
+						m_items[groupId][representationObjectPtr->at(i)->id] = item;
 					}
 				}
 			}

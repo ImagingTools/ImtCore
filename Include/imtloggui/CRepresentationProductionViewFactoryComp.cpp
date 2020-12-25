@@ -1,4 +1,4 @@
-#include <imtloggui/CRepresentationProductionSpeedViewFactoryComp.h>
+#include <imtloggui/CRepresentationProductionViewFactoryComp.h>
 
 // Qt includes
 #include <QtCore/QRect>
@@ -10,7 +10,7 @@
 // ImtCore includes
 #include <imtloggui/CProductionSpeedItem.h>
 #include <imtloggui/CProductionQualityItem.h>
-#include <imtloggui/CRepresentationProductionSpeedFactoryComp.h>
+#include <imtloggui/CRepresentationProductionFactoryComp.h>
 
 
 namespace imtloggui
@@ -21,10 +21,10 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IRepresentationViewFactory)
 
-IRepresentationViewFactory::GraphicsItemList CRepresentationProductionSpeedViewFactoryComp::CreateGraphicItems(const istd::TSmartPtr<istd::IChangeable> objectPtr, const QByteArray& groupId) const
+IRepresentationViewFactory::GraphicsItemList CRepresentationProductionViewFactoryComp::CreateGraphicItems(const istd::TSmartPtr<istd::IChangeable> objectPtr, const QByteArray& groupId) const
 {
-	CRepresentationProductionSpeedModel* modelPtr = const_cast<CRepresentationProductionSpeedModel*>(
-					dynamic_cast<const CRepresentationProductionSpeedModel*>(objectPtr.GetPtr()));
+	CRepresentationProductionModel* modelPtr = const_cast<CRepresentationProductionModel*>(
+					dynamic_cast<const CRepresentationProductionModel*>(objectPtr.GetPtr()));
 
 	if (modelPtr == nullptr){
 		if (m_slaveFactoryCompPtr.IsValid()){

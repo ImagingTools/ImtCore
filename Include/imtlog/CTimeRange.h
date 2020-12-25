@@ -21,6 +21,7 @@ public:
 	bool SetBeginTime(const QDateTime& time);
 	bool SetEndTime(const QDateTime& time);
 	bool SetTimeRange(const QDateTime& begin, const QDateTime& end);
+	bool Contains(const QDateTime& time) const;
 	CTimeRange Intersect(const CTimeRange& other) const;
 
 private:

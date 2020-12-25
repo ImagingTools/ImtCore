@@ -11,14 +11,13 @@
 // ImtCore includes
 #include <imtbase/IEventStatistics.h>
 #include <imtlog/IMessageHistoryConsumer.h>
-#include <imtlog/IMessageHistoryContainer.h>
 
 
 namespace imtloggui
 {
 
 
-class CRepresentationProductionSpeedModel: virtual public istd::IChangeable
+class CRepresentationProductionModel: virtual public istd::IChangeable
 {
 public:
 	typedef QMap<qint64, imtbase::IEventStatistics::EventsInfo> Timeline;
@@ -40,7 +39,7 @@ public:
 		}
 	};
 
-	CRepresentationProductionSpeedModel(quint64 granularity);
+	CRepresentationProductionModel(quint64 granularity);
 	quint64 GetGranularity() const;
 	const Timeline& GetTimeline() const;
 	quint64 GetMaxCount() const;

@@ -9,7 +9,7 @@
 
 // ImtCore includes
 #include <imtloggui/IEventScenePositionProvider.h>
-#include <imtloggui/CRepresentationProductionSpeedModel.h>
+#include <imtloggui/CRepresentationProductionModel.h>
 
 
 namespace imtloggui

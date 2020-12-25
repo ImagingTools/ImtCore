@@ -19,12 +19,12 @@ namespace imtloggui
 {
 
 
-class CRepresentationProductionSpeedViewFactoryComp: public imtloggui::CRepresentationViewFactoryCompBase
+class CRepresentationProductionViewFactoryComp: public imtloggui::CRepresentationViewFactoryCompBase
 {
 public:
 	typedef CRepresentationViewFactoryCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationProductionSpeedViewFactoryComp)
+	I_BEGIN_COMPONENT(CRepresentationProductionViewFactoryComp)
 	I_END_COMPONENT
 
 	// reimplemented (imtloggui::IRepresentationViewFactory)

@@ -1,8 +1,11 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QDateTime.h>
+
 // Acf includes
-#include <ilog/IMessageContainer.h> 
+#include <ilog/IMessageContainer.h>
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
@@ -10,24 +13,32 @@
 #include <imtlog/IMessageFilter.h>
 #include <imtlog/IMessageHistoryProvider.h>
 #include <imtlog/IStorage.h>
+#include <imtloggui/CRepresentationProductionModel.h>
 
 
 namespace imtloggui
 {
 
 
-class CRepresentationEventsFactoryComp:
+class CRepresentationProductionFactoryComp:
 			public icomp::CComponentBase,
-			virtual public IRepresentationFactory
+			virtual public IRepresentationFactory,
+			virtual public imtlog::IMessageHistoryConsumer
 {
 public:
 	typedef CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationEventsFactoryComp)
+	I_BEGIN_COMPONENT(CRepresentationProductionFactoryComp)
 		I_REGISTER_INTERFACE(IRepresentationFactory);
+		I_REGISTER_INTERFACE(IMessageHistoryConsumer);
+		I_ASSIGN(m_granularityAttrPtr, "Granularity", "Statistics time granularity in seconds", true, 60);
 		I_ASSIGN(m_messageHistoryProviderCompPtr, "MessageHistoryProvider", "Message history provider", true, "");
 		I_ASSIGN(m_storageCompPtr, "Storage", "Storage", true, "Storage");
 	I_END_COMPONENT
+
+	// reimplemented (imtlog::IMessageHistoryConsumer)
+	virtual bool IsMessageSupported(const istd::IInformationProvider* messagePtr = nullptr) const override;
+	virtual void AddMessage(const MessagePtr& messagePtr) override;
 
 	// reimplemented (imtloggui::IRepresentationViewFactory)
 	virtual RepresentationObjectPtr CreateRepresentationObject(
@@ -35,32 +46,15 @@ public:
 				const QList<int>& messageIdList,
 				imtlog::IMessageFilter::FilterMode filterMode) const override;
 
-private:
-	class Filter: public imtlog::IMessageFilter
-	{
-	public:
-		Filter(const imtlog::CTimeRange& timeRange, const QList<int>& messageIdList, FilterMode filterMode)
-			:m_timeRange(timeRange),
-			m_messageIdList(messageIdList),
-			m_filterMode(filterMode)
-		{
-		}
-
-		// reimplemented (imtlog::IMessageFilter)
-		bool IsMessageAccepted(const istd::IInformationProvider* messagePtr = nullptr) const override;
-
-		// reimplemented (imtlog::ITimeRangeProvider)
-		imtlog::CTimeRange GetTimeRange() const override;
-
-	private:
-		imtlog::CTimeRange m_timeRange;
-		QList<int> m_messageIdList;
-		imtlog::IMessageFilter::FilterMode m_filterMode;
-	};
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 private:
+	I_ATTR(int, m_granularityAttrPtr);
 	I_REF(imtlog::IMessageHistoryProvider, m_messageHistoryProviderCompPtr);
 	I_REF(imtlog::IStorage, m_storageCompPtr);
+
+	istd::TSmartPtr<istd::IChangeable> m_modelPtr;
 };
 
 

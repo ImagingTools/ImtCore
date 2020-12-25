@@ -82,14 +82,14 @@ I_EXPORT_COMPONENT(
 			"Representation Events View Factory");
 
 I_EXPORT_COMPONENT(
-			RepresentationProductionSpeedFactory,
-			"Representation production speed factory",
-			"Representation Production Speed Factory");
+			RepresentationProductionFactory,
+			"Representation production factory",
+			"Representation Production Factory");
 
 I_EXPORT_COMPONENT(
 			RepresentationProductionSpeedViewFactory,
-			"Representation production speed view factory",
-			"Representation Production Speed View Factory");
+			"Representation production view factory",
+			"Representation Production View Factory");
 
 
 } // namespace ImtLogGuiPck

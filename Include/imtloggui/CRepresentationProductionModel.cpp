@@ -1,4 +1,4 @@
-#include <imtloggui/CRepresentationProductionSpeedModel.h>
+#include <imtloggui/CRepresentationProductionModel.h>
 
 
 namespace imtloggui
@@ -7,45 +7,45 @@ namespace imtloggui
 
 // public methods
 
-CRepresentationProductionSpeedModel::CRepresentationProductionSpeedModel(quint64 granularity)
+	CRepresentationProductionModel::CRepresentationProductionModel(quint64 granularity)
 	:m_maxCount(0),
 	m_granularity(granularity)
 {
 }
 
 
-quint64 CRepresentationProductionSpeedModel::GetGranularity() const
+quint64 CRepresentationProductionModel::GetGranularity() const
 {
 	return m_granularity;
 }
 
 
-const CRepresentationProductionSpeedModel::Timeline& CRepresentationProductionSpeedModel::GetTimeline() const
+const CRepresentationProductionModel::Timeline& CRepresentationProductionModel::GetTimeline() const
 {
 	return m_timeline;
 }
 
 
-quint64 CRepresentationProductionSpeedModel::GetMaxCount() const
+quint64 CRepresentationProductionModel::GetMaxCount() const
 {
 	return m_maxCount;
 }
 
 
-const CRepresentationProductionSpeedModel::MaxCounters& CRepresentationProductionSpeedModel::GetMaxCounters() const
+const CRepresentationProductionModel::MaxCounters& CRepresentationProductionModel::GetMaxCounters() const
 {
 	return m_maxCounters;
 }
 
 
-void CRepresentationProductionSpeedModel::ClearStatistics()
+void CRepresentationProductionModel::ClearStatistics()
 {
 	m_timeline.clear();
 	m_maxCount = 0;
 }
 
 
-void CRepresentationProductionSpeedModel::AddMessage(const imtlog::IMessageHistoryConsumer::Message& message)
+void CRepresentationProductionModel::AddMessage(const imtlog::IMessageHistoryConsumer::Message& message)
 {
 	if (message.messagePtr->GetInformationId() != 19780000){
 		return;
@@ -115,7 +115,7 @@ void CRepresentationProductionSpeedModel::AddMessage(const imtlog::IMessageHisto
 }
 
 
-qint64 CRepresentationProductionSpeedModel::CalculateIntervalBeginTime(qint64 timeStamp)
+qint64 CRepresentationProductionModel::CalculateIntervalBeginTime(qint64 timeStamp)
 {
 	if (m_timeline.empty()){
 		return timeStamp;

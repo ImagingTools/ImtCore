@@ -1,14 +1,9 @@
 #pragma once
 
 
-// Qt includes
-//#include <QtCore/QList>
-
 // ACF includes
 #include <istd/IInformationProvider.h>
-#include <istd/TIHierarchical.h>
-#include <iser/ISerializable.h>
-#include <ilog/IMessageConsumer.h>
+#include <istd/TSmartPtr.h>
 
 
 namespace imtlog
@@ -25,11 +20,9 @@ public:
 	};
 
 	typedef istd::TSmartPtr<Message> MessagePtr;
+	typedef QList<IMessageHistoryConsumer::MessagePtr> Messages;
 
-	virtual bool IsMessageSupported(
-				int messageCategory = -1,
-				int messageId = -1,
-				const istd::IInformationProvider* messagePtr = NULL) const = 0;
+	virtual bool IsMessageSupported(const istd::IInformationProvider* messagePtr = nullptr) const = 0;
 	virtual void AddMessage(const MessagePtr& messagePtr) = 0;
 };
 

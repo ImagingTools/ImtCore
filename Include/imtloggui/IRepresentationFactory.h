@@ -9,7 +9,7 @@
 #include <ilog/IMessageContainer.h>
 
 // ImtCore includes
-#include <imtlog/IEventMessageIdFilter.h>
+#include <imtlog/IMessageFilter.h>
 #include <imtlog/CTimeRange.h>
 
 
@@ -25,7 +25,7 @@ public:
 	virtual RepresentationObjectPtr CreateRepresentationObject(
 				const imtlog::CTimeRange& timeRange,
 				const QList<int>& messageIdFilter,
-				imtlog::IEventMessageIdFilter::Mode mode) const = 0;
+				imtlog::IMessageFilter::FilterMode filterMode) const = 0;
 };
 
 
