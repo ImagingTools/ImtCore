@@ -1,7 +1,7 @@
 #pragma once
 
 
-// ACF includes
+// ImtCore includes
 #include <imtbase/ICollectionInfo.h>
 
 
