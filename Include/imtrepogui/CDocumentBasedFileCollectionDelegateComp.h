@@ -58,8 +58,6 @@ public:
 	virtual void RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const override;
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
-	virtual int GetOpenedDocumentCount() const override;
-	virtual ObjectInfo GetObjectInfo(int index) const override;
 	virtual iqtgui::IGuiObject* GetInformationView() const override;
 
 protected:

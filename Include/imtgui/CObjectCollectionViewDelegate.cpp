@@ -212,18 +212,6 @@ bool CObjectCollectionViewDelegate::OpenDocumentEditor(const QByteArray& /*objec
 }
 
 
-int CObjectCollectionViewDelegate::GetOpenedDocumentCount() const
-{
-	return 0;
-}
-
-
-ICollectionViewDelegate::ObjectInfo CObjectCollectionViewDelegate::GetObjectInfo(int index) const
-{
-	return ICollectionViewDelegate::ObjectInfo();
-}
-
-
 iqtgui::IGuiObject* CObjectCollectionViewDelegate::GetInformationView() const
 {
 	return nullptr;
@@ -310,7 +298,7 @@ bool CObjectCollectionViewDelegate::IsNameUnique(const QString& name)
 }
 
 
-void CObjectCollectionViewDelegate::OnDuplicateObject(const QByteArray& sourceObjectId, const QByteArray& destinationObjectId)
+void CObjectCollectionViewDelegate::OnDuplicateObject(const QByteArray& /*sourceObjectId*/, const QByteArray& /*destinationObjectId*/)
 {
 }
 
@@ -326,7 +314,8 @@ void CObjectCollectionViewDelegate::OnLanguageChanged()
 
 
 // reimplemented (imtgui::ICollectionViewDelegate)
-bool CObjectCollectionViewDelegate::IsCommandSupported(int commandId) const
+
+bool CObjectCollectionViewDelegate::IsCommandSupported(int /*commandId*/) const
 {
 	return true;
 }

@@ -64,8 +64,6 @@ public:
 	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
 	virtual HeaderInfo GetSummaryInformationHeaderInfo(const QByteArray& informationId) const override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
-	virtual int GetOpenedDocumentCount() const override;
-	virtual ObjectInfo GetObjectInfo(int index) const override;
 	virtual iqtgui::IGuiObject* GetInformationView() const override;
 
 	// reimplemented (ibase::ICommandsProvider)
