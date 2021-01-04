@@ -1197,7 +1197,7 @@ istd::IChangeable* CFileCollectionComp::CreateDataObject(const QByteArray& typeI
 		return m_objectFactoryListCompPtr.CreateInstance(factoryIndex);
 	}
 
-	return nullptr;
+	return nullptr;	
 }
 
 
