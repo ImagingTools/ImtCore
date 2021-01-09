@@ -796,9 +796,10 @@ void CObjectCollectionViewComp::OnUpdateFinished()
 			TypeList->hide();
 		}
 
+		QByteArray lastTypeId = m_currentTypeId;
+
 		TypeList->clear();
 		QTreeWidgetItem* activeTypeItemPtr = nullptr;
-		QByteArray lastTypeId = m_currentTypeId;
 
 		for (int i = 0; i < m_typeModel.rowCount(); i++){
 			QStandardItem* itemPtr = m_typeModel.item(i, 0);
@@ -1053,8 +1054,6 @@ void CObjectCollectionViewComp::OnTypeChanged()
 	}
 
 	m_proxyModelPtr->setFilterFixedString(m_currentTypeId);
-
-	UpdateCommands();
 	
 	QStringList headerLabels;
 	headerLabels.append(GetMetaInfoHeaders(m_currentTypeId));
@@ -1100,6 +1099,8 @@ void CObjectCollectionViewComp::OnTypeChanged()
 	if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_REMOVE)){
 		connect(m_delShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnDelShortCut);
 	}
+
+	UpdateCommands();
 }
 
 
