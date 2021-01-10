@@ -8,8 +8,8 @@
 
 // ACF includes
 #include <istd/CChangeGroup.h>
-#include <ifilegui/CFileDialogLoaderComp.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
+#include <ifilegui/CFileDialogLoaderComp.h>
 
 // ImtCore includes
 #include <imtbase/IRevisionController.h>
