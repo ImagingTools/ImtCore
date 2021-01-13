@@ -7,10 +7,10 @@
 
 // Acf includes
 #include <istd/IChangeable.h>
+#include <ilog/IMessageConsumer.h>
 
 // ImtCore includes
 #include <imtbase/IEventStatistics.h>
-#include <imtlog/IMessageHistoryConsumer.h>
 
 
 namespace imtloggui
@@ -45,7 +45,7 @@ public:
 	quint64 GetMaxCount() const;
 	const MaxCounters& GetMaxCounters() const;
 	void ClearStatistics();
-	void AddMessage(const imtlog::IMessageHistoryConsumer::Message& message);
+	void AddMessage(const ilog::IMessageConsumer::MessagePtr& message);
 	qint64 CalculateIntervalBeginTime(qint64 timeStamp);
 
 private:

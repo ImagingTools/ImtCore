@@ -193,13 +193,13 @@ void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* proper
 					representationObject = representation->CreateRepresentationObject(
 								imtlog::CTimeRange(begin, end),
 								allGroupsMessageIds,
-								imtlog::IMessageFilter::FM_EXCLUDE);
+								imtlog::IEventFilter::FM_EXCLUDE);
 				}
 				else{
 					representationObject = representation->CreateRepresentationObject(
 								imtlog::CTimeRange(begin, end),
 								layerProvider->GetMessageIdList(),
-								imtlog::IMessageFilter::FM_INCLUDE);
+								imtlog::IEventFilter::FM_INCLUDE);
 				}
 
 			

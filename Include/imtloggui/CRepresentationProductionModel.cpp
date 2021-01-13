@@ -45,13 +45,13 @@ void CRepresentationProductionModel::ClearStatistics()
 }
 
 
-void CRepresentationProductionModel::AddMessage(const imtlog::IMessageHistoryConsumer::Message& message)
+void CRepresentationProductionModel::AddMessage(const ilog::IMessageConsumer::MessagePtr& message)
 {
-	if (message.messagePtr->GetInformationId() != 19780000){
+	if (message->GetInformationId() != 19780000){
 		return;
 	}
 
-	qint64 timeStamp = message.messagePtr->GetInformationTimeStamp().toMSecsSinceEpoch();
+	qint64 timeStamp = message->GetInformationTimeStamp().toMSecsSinceEpoch();
 
 	Q_ASSERT(m_granularity > 0);
 
@@ -73,7 +73,7 @@ void CRepresentationProductionModel::AddMessage(const imtlog::IMessageHistoryCon
 
 	imtbase::IEventStatistics::EventsInfo& info = m_timeline.last();
 
-	switch (message.messagePtr->GetInformationCategory()){
+	switch (message->GetInformationCategory()){
 	case istd::IInformationProvider::IC_INFO:
 		info.oks++;
 		info.count++;

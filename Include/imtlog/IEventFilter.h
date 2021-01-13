@@ -13,7 +13,7 @@ namespace imtlog
 {
 
 
-class IMessageFilter: virtual public ITimeRangeProvider
+class IEventFilter: virtual public ITimeRangeProvider
 {
 public:
 	enum FilterMode
@@ -23,6 +23,7 @@ public:
 	};
 
 	virtual bool IsMessageAccepted(const istd::IInformationProvider* messagePtr = nullptr) const = 0;
+	virtual QVector<int> GetMessageIds() const = 0;
 };
 
 

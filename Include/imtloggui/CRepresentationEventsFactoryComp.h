@@ -7,8 +7,8 @@
 
 // ImtCore includes
 #include <imtloggui/IRepresentationFactory.h>
-#include <imtlog/IMessageFilter.h>
-#include <imtlog/IMessageHistoryProvider.h>
+#include <imtlog/IEventFilter.h>
+#include <imtlog/IEventProvider.h>
 #include <imtlog/IStorage.h>
 
 
@@ -33,10 +33,10 @@ public:
 	virtual RepresentationObjectPtr CreateRepresentationObject(
 				const imtlog::CTimeRange& timeRange,
 				const QList<int>& messageIdList,
-				imtlog::IMessageFilter::FilterMode filterMode) const override;
+				imtlog::IEventFilter::FilterMode filterMode) const override;
 
 private:
-	class Filter: public imtlog::IMessageFilter
+	class Filter: public imtlog::IEventFilter
 	{
 	public:
 		Filter(const imtlog::CTimeRange& timeRange, const QList<int>& messageIdList, FilterMode filterMode)
@@ -55,11 +55,11 @@ private:
 	private:
 		imtlog::CTimeRange m_timeRange;
 		QList<int> m_messageIdList;
-		imtlog::IMessageFilter::FilterMode m_filterMode;
+		imtlog::IEventFilter::FilterMode m_filterMode;
 	};
 
 private:
-	I_REF(imtlog::IMessageHistoryProvider, m_messageHistoryProviderCompPtr);
+	I_REF(imtlog::IEventProvider, m_messageHistoryProviderCompPtr);
 	I_REF(imtlog::IStorage, m_storageCompPtr);
 };
 

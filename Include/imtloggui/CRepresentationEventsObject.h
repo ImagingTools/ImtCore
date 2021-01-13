@@ -5,14 +5,14 @@
 #include <istd/IChangeable.h>
 
 // ImtCore includes
-#include <imtlog/CMessageHistoryContainer.h>
+#include <imtlog/CEventContainer.h>
 
 
 namespace imtloggui
 {
 
 
-class CRepresentationEventsObject: public imtlog::CMessageHistoryContainer::Messages, virtual public istd::IChangeable
+class CRepresentationEventsObject: public imtlog::CEventContainer::Messages, virtual public istd::IChangeable
 {
 
 };

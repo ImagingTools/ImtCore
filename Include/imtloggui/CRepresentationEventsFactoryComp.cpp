@@ -19,14 +19,15 @@ namespace imtloggui
 IRepresentationFactory::RepresentationObjectPtr CRepresentationEventsFactoryComp::CreateRepresentationObject(
 			const imtlog::CTimeRange& timeRange,
 			const QList<int>& messageIdList,
-			imtlog::IMessageFilter::FilterMode filterMode) const
+			imtlog::IEventFilter::FilterMode filterMode) const
 {
 	CRepresentationEventsObject* retVal = new CRepresentationEventsObject();
 
 	if (m_messageHistoryProviderCompPtr.IsValid()){
-		Filter filter(timeRange, messageIdList, filterMode);
+		imtlog::IEventProvider::EventFilterPtr filterPtr =
+					imtlog::IEventProvider::EventFilterPtr(new Filter(timeRange, messageIdList, filterMode));
 
-		imtlog::IMessageHistoryConsumer::Messages messages = m_messageHistoryProviderCompPtr->GetMessages(&filter);
+		ilog::IMessageContainer::Messages messages = m_messageHistoryProviderCompPtr->GetEvents(filterPtr)->GetMessages();
 		retVal->append(messages);
 	}
 
@@ -40,7 +41,7 @@ IRepresentationFactory::RepresentationObjectPtr CRepresentationEventsFactoryComp
 
 bool CRepresentationEventsFactoryComp::Filter::IsMessageAccepted(const istd::IInformationProvider* messagePtr) const
 {
-	if (m_timeRange.IsValid() && !m_timeRange.Contains(messagePtr->GetInformationTimeStamp())){
+	if (m_timeRange.IsClosed() && !m_timeRange.Contains(messagePtr->GetInformationTimeStamp())){
 		return false;
 	}
 

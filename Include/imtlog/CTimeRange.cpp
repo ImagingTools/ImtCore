@@ -30,9 +30,21 @@ CTimeRange::CTimeRange(const QDateTime& begin, const QDateTime& end)
 }
 
 
-bool CTimeRange::IsValid() const
+bool CTimeRange::IsNull() const
 {
-	return m_begin.isValid() || m_end.isValid();
+	return !(m_begin.isValid() || m_end.isValid());
+}
+
+
+bool CTimeRange::IsClosed() const
+{
+	return m_begin.isValid() && m_end.isValid();
+}
+
+
+bool CTimeRange::IsOpened() const
+{
+	return m_begin.isValid() != m_end.isValid();
 }
 
 
@@ -50,14 +62,14 @@ const QDateTime& CTimeRange::GetEndTime() const
 
 bool CTimeRange::SetBeginTime(const QDateTime& time)
 {
-	if (m_begin.isValid()){
-		if (m_begin > time){
-			m_begin = time;
-			return true;
-		}
+	//if (m_begin.isValid()){
+	//	if (m_begin > time){
+	//		m_begin = time;
+	//		return true;
+	//	}
 
-		return false;
-	}
+	//	return false;
+	//}
 	
 	m_begin = time;
 
@@ -67,14 +79,14 @@ bool CTimeRange::SetBeginTime(const QDateTime& time)
 
 bool CTimeRange::SetEndTime(const QDateTime& time)
 {
-	if (m_end.isValid()){
-		if (m_end < time){
-			m_end = time;
-			return true;
-		}
+	//if (m_end.isValid()){
+	//	if (m_end < time){
+	//		m_end = time;
+	//		return true;
+	//	}
 
-		return false;
-	}
+	//	return false;
+	//}
 
 	m_end = time;
 
@@ -115,11 +127,25 @@ bool CTimeRange::Contains(const QDateTime& time) const
 }
 
 
+void CTimeRange::Ensure(const QDateTime& time)
+{
+	if (IsNull()){
+		m_begin = time;
+		m_end = time;
+		return;
+	}
+
+	if (IsClosed()){
+		
+	}
+}
+
+
 CTimeRange CTimeRange::Intersect(const CTimeRange& other) const
 {
 	Q_ASSERT(m_begin.isValid() && m_end.isValid() && other.m_begin.isValid() && other.m_end.isValid());
 
-	if (!IsValid() || !other.IsValid()){
+	if (!IsClosed() || !other.IsClosed()){
 		return CTimeRange();
 	}
 	
@@ -144,6 +170,12 @@ CTimeRange CTimeRange::Intersect(const CTimeRange& other) const
 	}
 
 	return CTimeRange();
+}
+
+
+bool CTimeRange::operator==(const CTimeRange& other) const
+{
+	return (m_begin == other.m_begin && m_end == other.m_end);
 }
 
 
