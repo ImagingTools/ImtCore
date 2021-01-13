@@ -22,26 +22,23 @@ namespace imtlog
 {
 
 
-class CEventHistoryGroupReadAccessor: public ilog::CLoggerBase
+class CEventHistoryGroupReader: public ilog::CLoggerBase
 {
-
 public:
 	typedef istd::TSmartPtr<CEventContainer> EventContainerPtr;
 	typedef QList<EventContainerPtr> EventContainerList;
 	typedef istd::TSmartPtr<EventContainerList> EventContainerListPtr;
 
-	CEventHistoryGroupReadAccessor(
+	CEventHistoryGroupReader(
 				QString groupDir,
 				QString containerExtension,
 				QString archiveExtension,
 				iser::IVersionInfo* versionInfoPtr,
 				imtfile::IFileCompression* compressorPtr);
 
-	CTimeRange GetGroupTimeRange() const;
-	EventContainerListPtr GetContainers(const CTimeRange& timeRange) const;
-
-protected:
-	virtual bool IsInterruptionRequested() const;
+	CTimeRange ReadGroupTimeRange() const;
+	EventContainerListPtr ReadContainers(const CTimeRange& timeRange) const;
+	virtual void Cancel();
 
 private:
 	QMap<QDate, QString> GetDirMap(const QString& dirPath) const;
@@ -54,6 +51,7 @@ private:
 	QString m_archiveExtension;
 	iser::IVersionInfo* m_versionInfoPtr;
 	imtfile::IFileCompression* m_compressorPtr;
+	bool m_isCanceled;
 };
 
 

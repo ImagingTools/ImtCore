@@ -21,7 +21,7 @@
 #include <imtfile/IFileCompression.h>
 #include <imtlog/IEventProvider.h>
 #include <imtlog/CEventContainer.h>
-#include <imtlog/CEventHistoryGroupReadAccessor.h>
+#include <imtlog/CEventHistoryGroupReader.h>
 
 
 namespace imtlog
@@ -112,58 +112,62 @@ private:
 		EventHistoryGroupPersistenceParams m_params;
 	};
 
-	class Reader: public QThread, public CEventHistoryGroupReadAccessor
+	class CReadJobController: public QThread
 	{
 	public:
 		typedef QThread BaseClass;
 
-		explicit Reader(
-				QString groupDir,
-				QString containerExtension,
-				QString archiveExtension,
-				iser::IVersionInfo* versionInfoPtr,
-				imtfile::IFileCompression* compressorPtr);
+		enum JobStatus
+		{
+			JS_NONE,
+			JS_WAITING,
+			JS_RUNNING,
+			JS_FINISHED
+		};
 
-		bool Start(const CTimeRange& timeRange);
-		CEventHistoryGroupReadAccessor::EventContainerListPtr GetResult();
+		struct Job
+		{
+			Job()
+				:jobStatus(JS_NONE)
+			{
+			}
+
+			CEventHistoryGroupReader::EventContainerListPtr resultContainerListPtr;
+			IEventProvider::EventFilterPtr filterPtr;
+			QByteArray uuid;
+			istd::TSmartPtr<CEventHistoryGroupReader> readerPtr;
+			JobStatus jobStatus;
+		};
+
+		typedef QList<Job> JobList;
+
+		CReadJobController();
+
+		QByteArray AddJob(
+					EventFilterPtr filterPtr,
+					QString groupDir,
+					QString containerExtension,
+					QString archiveExtension,
+					iser::IVersionInfo* versionInfoPtr,
+					imtfile::IFileCompression* compressorPtr);
+
+		EventFilterPtr GetFilter(const QByteArray& jobId);
+		bool GetResult(const QByteArray& jobId, ilog::CMessageContainer& resultMessages) const;
 
 	protected:
-		void start(Priority = InheritPriority);
-		void terminate();
-		void quit();
-
-	protected:
-		// reimplemented (CEventHistoryGroupReadAccessor)
-		virtual bool IsInterruptionRequested() const override;
-
 		// reimplemented (QThread)
 		virtual void run() override;
 
 	private:
-		CTimeRange m_timeRange;
-		CEventHistoryGroupReadAccessor::EventContainerListPtr m_containerListPtr;
+		JobList m_jobList;
 	};
-
-	typedef istd::TSmartPtr<Reader> ReaderPtr;
-
-	struct Job
-	{
-		typedef imod::TModelWrap<ilog::CMessageContainer> Container;
-
-		IEventProvider::EventContainerPtr containerPtr;
-		IEventProvider::EventFilterPtr filterPtr;
-		ReaderPtr readerPtr;
-		QString uuid;
-	};
-
-	typedef istd::TSmartPtr<Job> JobPtr;
 
 private Q_SLOTS:
 	void OnTimer();
-	void OnJobFinished();
+	void OnJobFinished(const QByteArray& jobId);
 
 private:
-	CEventHistoryGroupReadAccessor::EventContainerPtr GetContainerForMessage(const QDateTime& timestamp);
+	CEventHistoryGroupReader::EventContainerPtr GetContainerForMessage(const QDateTime& timestamp);
 
 	void StartWriter();
 	Q_INVOKABLE void OnWriterFinished();
@@ -177,17 +181,20 @@ private:
 	mutable CTimeRange m_archiveTimeRange;
 	mutable QQueue<EventContainerPtr> m_cache;
 
-	CEventHistoryGroupReadAccessor::EventContainerList m_workingQueue;
-	CEventHistoryGroupReadAccessor::EventContainerList m_writingQueue;
+	CEventHistoryGroupReader::EventContainerList m_workingQueue;
+	CEventHistoryGroupReader::EventContainerList m_writingQueue;
 	QMutex m_workingQueueMutex;
 	QMutex m_writingQueueMutex;
 
 	Writer m_writer;
 	ThreadState m_writerState;
 
-	Reader m_syncReader;
+	mutable CReadJobController m_readJobController;
+	CEventHistoryGroupReader m_completeGroupReader;
 
-	mutable QMap<Reader*, JobPtr> m_jobs;
+	typedef istd::TSmartPtr<imod::TModelWrap<ilog::CMessageContainer>> MessageContainerPtr;
+
+	mutable QMap<QByteArray, MessageContainerPtr> m_jobs;
 	mutable QMutex m_jobMutex;
 };
 

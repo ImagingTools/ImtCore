@@ -2,7 +2,7 @@
 
 
 // ACF includes
-#include <ilog/IMessageContainer.h>
+#include <ilog/CMessageContainer.h>
 #include <istd/TSmartPtr.h>
 
 // ImtCore includes
@@ -23,7 +23,7 @@ public:
 	};
 
 	typedef istd::TSmartPtr<IEventFilter> EventFilterPtr;
-	typedef istd::TSmartPtr<ilog::IMessageContainer> EventContainerPtr;
+	typedef istd::TSmartPtr<ilog::CMessageContainer> EventContainerPtr;
 
 	virtual EventContainerPtr GetEvents(EventFilterPtr filterPtr) const = 0;
 };

@@ -26,7 +26,7 @@ CEventHistoryGroupController::CEventHistoryGroupController(
 	m_persistenceParams(persistenceParams),
 	m_writer(this),
 	m_writerState(TS_IDLE),
-	m_syncReader(
+	m_completeGroupReader(
 				persistenceParams.repositoryDir + "/" + m_persistenceParams.groupDir,
 				persistenceParams.containerExtension,
 				persistenceParams.archiveExtension,
@@ -43,16 +43,14 @@ CEventHistoryGroupController::CEventHistoryGroupController(
 	m_writer.SetParams(persistenceParams);
 
 	m_state = CS_OK;
+
+	connect(&m_readJobController, &CReadJobController::JobFinished, this, &CEventHistoryGroupController::OnJobFinished);
 }
 
 
 void CEventHistoryGroupController::OnSystemShutdown()
 {
 	m_state = CS_SHUTDOWN;
-
-	//for (ReaderPtr readerPtr : m_readers){
-	//	readerPtr->requestInterruption();
-	//}
 
 	m_timer.stop();
 
@@ -61,7 +59,7 @@ void CEventHistoryGroupController::OnSystemShutdown()
 		QMutexLocker writingQueueLocker(&m_writingQueueMutex);
 
 		while (!m_workingQueue.isEmpty()){
-			CEventHistoryGroupReadAccessor::EventContainerPtr containerPtr = m_workingQueue.takeFirst();
+			CEventHistoryGroupReader::EventContainerPtr containerPtr = m_workingQueue.takeFirst();
 			if (!containerPtr->GetMessages().isEmpty()){
 				containerPtr->SetTimeRange(containerPtr->GetMessagesTimeRange());
 				m_writingQueue.append(containerPtr);
@@ -79,7 +77,7 @@ void CEventHistoryGroupController::OnSystemShutdown()
 CTimeRange CEventHistoryGroupController::GetTimeRange() const
 {
 	if (m_archiveTimeRange.IsNull()){
-		m_archiveTimeRange = m_syncReader.GetGroupTimeRange();
+		m_archiveTimeRange = m_completeGroupReader.ReadGroupTimeRange();
 	}
 
 	return m_archiveTimeRange;
@@ -90,95 +88,22 @@ CTimeRange CEventHistoryGroupController::GetTimeRange() const
 
 IEventProvider::EventContainerPtr CEventHistoryGroupController::GetEvents(IEventProvider::EventFilterPtr filterPtr) const
 {
-
-	JobPtr jobPtr(new Job);
-	jobPtr->containerPtr.SetPtr(new Job::Container);
-	jobPtr->filterPtr = filterPtr;
-	jobPtr->readerPtr.SetPtr(new Reader(
+	QByteArray jobId = m_readJobController.AddJob(
+				filterPtr,
 				m_persistenceParams.repositoryDir + "/" + m_persistenceParams.groupDir,
 				m_persistenceParams.containerExtension,
 				m_persistenceParams.archiveExtension,
 				m_persistenceParams.versionInfoPtr,
-				m_persistenceParams.compressorPtr));
-	jobPtr->uuid = QUuid::createUuid().toString();
-
-	qDebug() << connect(jobPtr->readerPtr.GetPtr(), &Reader::finished, this, &CEventHistoryGroupController::OnJobFinished);
-
-	{
-		QMutexLocker locker(&m_jobMutex);
-		m_jobs[jobPtr->readerPtr.GetPtr()] = jobPtr;
+				m_persistenceParams.compressorPtr);
+	if (jobId.isEmpty()){
+		return IEventProvider::EventContainerPtr();
 	}
 
-	jobPtr->readerPtr->Start(filterPtr->GetTimeRange());	
-	
-	return jobPtr->containerPtr;
+	EventContainerPtr eventContainerPtr(new imod::TModelWrap<ilog::CMessageContainer>);
 
-	//return IEventProvider::EventContainerPtr();
+	m_jobs[jobId] = eventContainerPtr;
 
-	//IEventProvider::EventContainerPtr retVal =
-	//			IEventProvider::EventContainerPtr(new CEventContainer);
-
-	//CTimeRange timeRange = filterPtr->GetTimeRange();
-	//QDateTime begin = timeRange.GetBeginTime();
-	//QDateTime end = timeRange.GetEndTime();
-	//QDate beginDate = begin.date();
-	//QDate endDate = end.date();
-	//QStringList dateList;
-
-	////if (m_cacheTimeRange == timeRange){
-	////	//for (MessageHistoryContainerPtr containerPtr : m_cache){
-	////	//	imtlog::CMessageHistoryContainer::Messages messages = containerPtr->GetEvents();
-	////	//	for (int j = 0; j < messages.count(); j++){
-	////	//		QDateTime timeStamp = messages[j]->messagePtr->GetInformationTimeStamp();
-	////	//		if (timeRange.Contains(timeStamp)){
-	////	//			if (filterPtr->IsMessageAccepted(messages[j]->messagePtr.GetPtr())){
-	////	//				retVal.append(messages[j]);
-	////	//			}
-	////	//		}
-	////	//	}
-	////	//}
-
-	////	return retVal;
-	////}
-
-	////m_cacheTimeRange = timeRange;
-	//m_cache.clear();
-
-	//QMap<QDate, QString> dirMap = GetHistoryDirMap();
-	//QList<QDate> dirMapKeys = dirMap.keys();
-
-	//if (dirMap.isEmpty()){
-	//	return retVal;
-	//}
-
-	//QDate date = beginDate;
-	//while (date <= endDate){
-	//	if (dirMap.contains(date)){
-	//		QMap<QDateTime, QString> fileMap = GetHistoryFileMap(dirMap[date]);
-	//		QList<QDateTime> fileMapKeys = fileMap.keys();
-
-	//		for (int i = 0; i < fileMapKeys.count(); i++){
-	//			CEventHistoryGroupReadAccessor::EventContainerPtr container = ImportContainer(fileMap[fileMapKeys[i]]);
-	//			if (timeRange.Intersect(container->GetTimeRange()).IsClosed()){
-	//				m_cache.append(container);
-	//				ilog::CMessageContainer::Messages messages = container->GetMessages();
-
-	//				for (int j = 0; j < messages.count(); j++){
-	//					QDateTime timeStamp = messages[j]->GetInformationTimeStamp();
-	//					if (timeRange.Contains(timeStamp)){
-	//						if (filterPtr->IsMessageAccepted(messages[j].GetPtr())){
-	//							retVal->AddMessage(messages[j]);
-	//						}
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-
-	//	date = date.addDays(1);
-	//}
-
-	//return retVal;
+	return eventContainerPtr;
 }
 
 
@@ -198,7 +123,7 @@ void CEventHistoryGroupController::AddMessage(const MessagePtr& messagePtr)
 	if (m_state == CS_OK){
 		QDateTime timestamp = messagePtr->GetInformationTimeStamp();
 
-		CEventHistoryGroupReadAccessor::EventContainerPtr containerPtr = GetContainerForMessage(timestamp);
+		CEventHistoryGroupReader::EventContainerPtr containerPtr = GetContainerForMessage(timestamp);
 		containerPtr->AddMessage(messagePtr);
 
 		if (m_archiveTimeRange.GetBeginTime().isValid()){
@@ -225,7 +150,8 @@ void CEventHistoryGroupController::AddMessage(const MessagePtr& messagePtr)
 void CEventHistoryGroupController::SetLogPtr(ilog::IMessageConsumer* logPtr)
 {
 	BaseClass::SetLogPtr(logPtr);
-	m_syncReader.SetLogPtr(logPtr);
+
+	m_completeGroupReader.SetLogPtr(logPtr);
 }
 
 
@@ -236,16 +162,16 @@ void CEventHistoryGroupController::OnTimer()
 	QMutexLocker workingQueueLocker(&m_workingQueueMutex);
 	QMutexLocker writingQueueLocker(&m_writingQueueMutex);
 
-	for (CEventHistoryGroupReadAccessor::EventContainerPtr containerPtr : m_workingQueue){
+	for (CEventHistoryGroupReader::EventContainerPtr containerPtr : m_workingQueue){
 		Q_ASSERT(containerPtr->GetMessagesCount() > 0);
 		if (containerPtr->GetTimeRange().GetEndTime().addSecs(m_controllerParams.writeDelay) < QDateTime::currentDateTime()){
 
 		}
 	}
 
-	CEventHistoryGroupReadAccessor::EventContainerList::iterator it = m_workingQueue.begin();
+	CEventHistoryGroupReader::EventContainerList::iterator it = m_workingQueue.begin();
 	while (it != m_workingQueue.end()){
-		CEventHistoryGroupReadAccessor::EventContainerPtr containerPtr = *it;
+		CEventHistoryGroupReader::EventContainerPtr containerPtr = *it;
 
 		if (containerPtr->GetTimeRange().GetEndTime().addSecs(m_controllerParams.writeDelay) < QDateTime::currentDateTime()){
 			containerPtr->SetTimeRange(containerPtr->GetMessagesTimeRange());
@@ -266,54 +192,28 @@ void CEventHistoryGroupController::OnTimer()
 }
 
 
-void CEventHistoryGroupController::OnJobFinished()
+void CEventHistoryGroupController::OnJobFinished(const QByteArray& jobId)
 {
-	Reader* readerPtr = dynamic_cast<Reader*>(sender());
-	Q_ASSERT(readerPtr != nullptr);
+	MessageContainerPtr resultContainerPtr;
 
-	JobPtr jobPtr;
 	{
 		QMutexLocker locker(&m_jobMutex);
-		Q_ASSERT(m_jobs.contains(readerPtr));
-		jobPtr = m_jobs.take(readerPtr);
+
+		Q_ASSERT(m_jobs.contains(jobId));
+		resultContainerPtr = m_jobs.take(jobId);
 	}
 
-	Job::Container* containerPtr = dynamic_cast<Job::Container*>(jobPtr->containerPtr.GetPtr());
-
-	CEventHistoryGroupReadAccessor::EventContainerListPtr resultContainerListPtr = jobPtr->readerPtr->GetResult();
-	if (resultContainerListPtr.IsValid()){
-		istd::IChangeable::ChangeSet set(IEventProvider::RS_OK);
-		istd::CChangeGroup notifier(containerPtr, &set);
-
-		for (int i = 0; i < resultContainerListPtr->count(); i++){
-			CEventHistoryGroupReadAccessor::EventContainerPtr resultContainerPtr = resultContainerListPtr->at(i);
-
-			ilog::IMessageContainer::Messages messages = resultContainerPtr->GetMessages();
-			for (int j = messages.count() - 1; i >= 0; i--){
-				if (jobPtr->filterPtr->GetTimeRange().Contains(messages[j]->GetInformationTimeStamp())){
-					if (jobPtr->filterPtr->IsMessageAccepted(messages[j].GetPtr())){
-						containerPtr->AddMessage(messages[j]);
-					}
-				}
-			}
-		}
-
-		return;	
-	}
-
-	istd::IChangeable::ChangeSet set(IEventProvider::RS_CANCELED);
-	istd::CChangeGroup notifier(containerPtr, &set);
-	containerPtr->ClearMessages();
+	m_readJobController.GetResult(jobId, *resultContainerPtr);
 }
 
 
 // private methods
 
-CEventHistoryGroupReadAccessor::EventContainerPtr CEventHistoryGroupController::GetContainerForMessage(const QDateTime& timestamp)
+CEventHistoryGroupReader::EventContainerPtr CEventHistoryGroupController::GetContainerForMessage(const QDateTime& timestamp)
 {
 	QMutexLocker workingQueueLocker(&m_workingQueueMutex);
 
-	for (CEventHistoryGroupReadAccessor::EventContainerPtr containerPtr : m_workingQueue){
+	for (CEventHistoryGroupReader::EventContainerPtr containerPtr : m_workingQueue){
 		if (containerPtr->GetTimeRange().Contains(timestamp)){
 			return containerPtr;
 		}
@@ -325,7 +225,7 @@ CEventHistoryGroupReadAccessor::EventContainerPtr CEventHistoryGroupController::
 
 	// Prepare new container
 
-	CEventHistoryGroupReadAccessor::EventContainerPtr containerPtr(new CEventContainer);
+	CEventHistoryGroupReader::EventContainerPtr containerPtr(new CEventContainer);
 
 	QDateTime beginTime = timestamp;
 	QDateTime endTime = beginTime.addMSecs(m_controllerParams.containerDuration * 1000 - 1);
@@ -398,7 +298,7 @@ void CEventHistoryGroupController::Writer::run()
 			break;
 		}
 
-		CEventHistoryGroupReadAccessor::EventContainerPtr containerPtr;
+		CEventHistoryGroupReader::EventContainerPtr containerPtr;
 		{
 			QMutexLocker writingQueueLocker(&m_parentPtr->m_writingQueueMutex);
 			containerPtr = m_parentPtr->m_writingQueue.takeFirst();
@@ -470,74 +370,78 @@ void CEventHistoryGroupController::Writer::run()
 
 // public methods of embedded class Reader
 
-CEventHistoryGroupController::Reader::Reader(
+CEventHistoryGroupController::CReadJobController::CReadJobController()
+{
+}
+
+
+QByteArray CEventHistoryGroupController::CReadJobController::AddJob(
+			EventFilterPtr filterPtr,
 			QString groupDir,
 			QString containerExtension,
 			QString archiveExtension,
 			iser::IVersionInfo* versionInfoPtr,
 			imtfile::IFileCompression* compressorPtr)
-	:CEventHistoryGroupReadAccessor(
+{
+	Job newJob;
+	newJob.uuid = QUuid::createUuid().toByteArray();
+	newJob.filterPtr = filterPtr;
+	newJob.readerPtr.SetPtr(new CEventHistoryGroupReader(
 				groupDir,
 				containerExtension,
 				archiveExtension,
 				versionInfoPtr,
-				compressorPtr)
-{
-}
+				compressorPtr));
+	newJob.jobStatus = JS_WAITING;
 
-// protected slots:
+	// MUTEX!!!
+	m_jobList.push_back(newJob);
 
-void CEventHistoryGroupController::Reader::start(Priority)
-{
-}
-
-
-void CEventHistoryGroupController::Reader::terminate()
-{
+	return newJob.uuid;
 }
 
 
-void CEventHistoryGroupController::Reader::quit()
+IEventProvider::EventFilterPtr CEventHistoryGroupController::CReadJobController::GetFilter(const QByteArray & jobId)
 {
+	return EventFilterPtr();
 }
 
 
-// protected methods of embedded class Reader
-
-bool CEventHistoryGroupController::Reader::IsInterruptionRequested() const
+bool CEventHistoryGroupController::CReadJobController::GetResult(const QByteArray& jobId, ilog::CMessageContainer& resultMessages) const
 {
-	return isInterruptionRequested();
-}
+	for (const Job& jobItem : m_jobList){
+		if (jobItem.uuid == jobId && jobItem.jobStatus == JS_FINISHED){
+			if (jobItem.resultContainerListPtr.IsValid()){
+				static istd::IChangeable::ChangeSet changeSet(IEventProvider::RS_OK);
+				istd::CChangeGroup notifier(&resultMessages, &changeSet);
 
+				for (int i = 0; i < jobItem.resultContainerListPtr->count(); i++){
+					CEventHistoryGroupReader::EventContainerPtr resultContainerPtr = jobItem.resultContainerListPtr->at(i);
 
-bool CEventHistoryGroupController::Reader::Start(const CTimeRange& timeRange)
-{
-	if (!isRunning()){
-		m_timeRange = timeRange;
-		BaseClass::start();
-		return true;
+					ilog::IMessageContainer::Messages messages = resultContainerPtr->GetMessages();
+					for (int j = messages.count() - 1; i >= 0; i--){
+						if (jobItem.filterPtr.IsValid()){
+							if (jobItem.filterPtr->GetTimeRange().Contains(messages[j]->GetInformationTimeStamp()) && jobItem.filterPtr->IsMessageAccepted(messages[j].GetPtr())){
+								resultMessages.AddMessage(messages[j]);
+							}
+						}
+						else{
+							resultMessages.AddMessage(messages[j]);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	return false;
 }
 
 
-CEventHistoryGroupReadAccessor::EventContainerListPtr CEventHistoryGroupController::Reader::GetResult()
-{
-	if (!isRunning()){
-		EventContainerListPtr();
-	};
-
-	return m_containerListPtr;
-}
-
-
 // reimplemented (QThread)
 
-void CEventHistoryGroupController::Reader::run()
+void CEventHistoryGroupController::CReadJobController::run()
 {
-	m_containerListPtr.Reset();
-	m_containerListPtr = GetContainers(m_timeRange);
 }
 
 

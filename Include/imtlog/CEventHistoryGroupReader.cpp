@@ -1,4 +1,4 @@
-#include <imtlog/CEventHistoryGroupReadAccessor.h>
+#include <imtlog/CEventHistoryGroupReader.h>
 
 
 // Qt includes
@@ -19,7 +19,7 @@ namespace imtlog
 
 // public methods
 
-CEventHistoryGroupReadAccessor::CEventHistoryGroupReadAccessor(
+CEventHistoryGroupReader::CEventHistoryGroupReader(
 			QString groupDir,
 			QString containerExtension,
 			QString archiveExtension,
@@ -29,12 +29,13 @@ CEventHistoryGroupReadAccessor::CEventHistoryGroupReadAccessor(
 	m_containerExtension(containerExtension),
 	m_archiveExtension(archiveExtension),
 	m_versionInfoPtr(versionInfoPtr),
-	m_compressorPtr(compressorPtr)
+	m_compressorPtr(compressorPtr),
+	m_isCanceled(false)
 {
 }
 
 
-CTimeRange CEventHistoryGroupReadAccessor::GetGroupTimeRange() const
+CTimeRange CEventHistoryGroupReader::ReadGroupTimeRange() const
 {
 	Q_ASSERT(!m_groupDir.isEmpty());
 	Q_ASSERT(!m_containerExtension.isEmpty());
@@ -90,7 +91,6 @@ CTimeRange CEventHistoryGroupReadAccessor::GetGroupTimeRange() const
 				}
 			}
 		}
-
 	}
 
 	Q_ASSERT(begin.isValid() == end.isValid());
@@ -99,7 +99,7 @@ CTimeRange CEventHistoryGroupReadAccessor::GetGroupTimeRange() const
 }
 
 
-CEventHistoryGroupReadAccessor::EventContainerListPtr CEventHistoryGroupReadAccessor::GetContainers(const CTimeRange& timeRange) const
+CEventHistoryGroupReader::EventContainerListPtr CEventHistoryGroupReader::ReadContainers(const CTimeRange& timeRange) const
 {
 	Q_ASSERT(!m_groupDir.isEmpty());
 	Q_ASSERT(!m_containerExtension.isEmpty());
@@ -127,7 +127,7 @@ CEventHistoryGroupReadAccessor::EventContainerListPtr CEventHistoryGroupReadAcce
 			QList<QDateTime> fileMapKeys = fileMap.keys();
 
 			for (int i = 0; i < fileMapKeys.count(); i++){
-				if (IsInterruptionRequested()){
+				if (m_isCanceled){
 					return EventContainerListPtr();
 				}
 
@@ -152,17 +152,16 @@ CEventHistoryGroupReadAccessor::EventContainerListPtr CEventHistoryGroupReadAcce
 }
 
 
-// protected methods
-
-bool CEventHistoryGroupReadAccessor::IsInterruptionRequested() const
+void CEventHistoryGroupReader::Cancel()
 {
-	return false;
+	m_isCanceled = true;
 }
+
 
 
 // private methods
 
-QMap<QDate, QString> CEventHistoryGroupReadAccessor::GetDirMap(const QString& dirPath) const
+QMap<QDate, QString> CEventHistoryGroupReader::GetDirMap(const QString& dirPath) const
 {
 	QMap<QDate, QString> map;
 
@@ -181,7 +180,7 @@ QMap<QDate, QString> CEventHistoryGroupReadAccessor::GetDirMap(const QString& di
 }
 
 
-QMap<QDateTime, QString> CEventHistoryGroupReadAccessor::GetFileMap(const QString& dirPath) const
+QMap<QDateTime, QString> CEventHistoryGroupReader::GetFileMap(const QString& dirPath) const
 {
 	QMap<QDateTime, QString> map;
 
@@ -200,7 +199,7 @@ QMap<QDateTime, QString> CEventHistoryGroupReadAccessor::GetFileMap(const QStrin
 }
 
 
-CEventHistoryGroupReadAccessor::EventContainerPtr CEventHistoryGroupReadAccessor::ImportContainer(const QString& filePath) const
+CEventHistoryGroupReader::EventContainerPtr CEventHistoryGroupReader::ImportContainer(const QString& filePath) const
 {
 	EventContainerPtr containerPtr;
 
