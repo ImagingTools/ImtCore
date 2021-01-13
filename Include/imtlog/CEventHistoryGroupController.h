@@ -194,7 +194,7 @@ private:
 
 	typedef istd::TSmartPtr<imod::TModelWrap<ilog::CMessageContainer>> MessageContainerPtr;
 
-	mutable QMap<QByteArray, MessageContainerPtr> m_jobs;
+	mutable QMap<QByteArray, EventContainerPtr> m_jobs;
 	mutable QMutex m_jobMutex;
 };
 

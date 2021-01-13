@@ -194,7 +194,7 @@ void CEventHistoryGroupController::OnTimer()
 
 void CEventHistoryGroupController::OnJobFinished(const QByteArray& jobId)
 {
-	MessageContainerPtr resultContainerPtr;
+	EventContainerPtr resultContainerPtr;
 
 	{
 		QMutexLocker locker(&m_jobMutex);
