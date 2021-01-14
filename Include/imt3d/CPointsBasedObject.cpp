@@ -107,19 +107,28 @@ void CPointsBasedObject::MoveCenterTo(const i3d::CVector3d& position)
 {
 	switch (m_pointFormat){
 		case IPointsBasedObject::PF_XYZ_32:
-			return TMoveCenterTo<PointXyz32>(position);
+			TMoveCenterTo<PointXyz32>(position);
+			break;
 		case IPointsBasedObject::PF_XYZ_64:
-			return TMoveCenterTo<PointXyz64>(position);
+			TMoveCenterTo<PointXyz64>(position);
+			break;
 		case IPointsBasedObject::PF_XYZW_32:
-			return TMoveCenterTo<PointXyzw32>(position);
+			TMoveCenterTo<PointXyzw32>(position);
+			break;
 		case IPointsBasedObject::PF_XYZ_ABC_32:
-			return TMoveCenterTo<PointXyzAbc32>(position);
+			TMoveCenterTo<PointXyzAbc32>(position);
+			break;
 		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-			return TMoveCenterTo<IPointsBasedObject::PointXyzwNormal32>(position);
+			TMoveCenterTo<IPointsBasedObject::PointXyzwNormal32>(position);
+			break;
 		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-			return TMoveCenterTo<IPointsBasedObject::PointXyzwNormalRgba32>(position);
+			TMoveCenterTo<IPointsBasedObject::PointXyzwNormalRgba32>(position);
+			break;
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
-			return TMoveCenterTo<IPointsBasedObject::PointXyzwRgba32>(position);
+			TMoveCenterTo<IPointsBasedObject::PointXyzwRgba32>(position);
+			break;
+		default:
+			break;
 	}
 }
 
@@ -281,11 +290,12 @@ bool CPointsBasedObject::Create(PointFormat pointFormat, int pointsCount, void* 
 	m_pointFormat = pointFormat;
 	m_pointsCount = pointsCount;
 	m_dataOwner = copyData;
+	bool result = true;
 
 	if (m_dataOwner){
-		CreateInternalBuffer();
+		result = CreateInternalBuffer();
 
-		if (dataPtr) {
+		if (dataPtr && result) {
 			int dataSize = GetDataSize();
 			memcpy(m_dataPtr, dataPtr, dataSize);
 		}
@@ -297,7 +307,7 @@ bool CPointsBasedObject::Create(PointFormat pointFormat, int pointsCount, void* 
 	}
 
 	m_bufferSize = GetDataSize();
-	return true;
+	return result;
 }
 
 
@@ -318,6 +328,10 @@ bool CPointsBasedObject::Append(int pointsCount, const void* dataPtr)
 	if (newBufferSize > m_bufferSize) {
 		m_bufferSize = 2 * newBufferSize;
 		m_dataPtr = static_cast<quint8*>(realloc(m_dataPtr, m_bufferSize));
+
+		if (m_dataPtr == nullptr) {
+			return false;
+		}
 	}
 
 	memcpy(m_dataPtr + oldBufferSize, dataPtr, appendSize);
@@ -333,7 +347,7 @@ int CPointsBasedObject::GetDataSize() const
 }
 
 
-void CPointsBasedObject::CreateInternalBuffer()
+bool CPointsBasedObject::CreateInternalBuffer()
 {
 	switch (m_pointFormat){
 		case IPointsBasedObject::PF_XYZ_32:
@@ -350,21 +364,27 @@ void CPointsBasedObject::CreateInternalBuffer()
 			return AllocateObjectBuffer<PointXyzwNormalRgba32>();
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
 			return AllocateObjectBuffer<PointXyzwRgba32>();
+		default:
+			return false;
 	}
 }
 
 
 template <typename PointType>
-void CPointsBasedObject::AllocateObjectBuffer()
+bool CPointsBasedObject::AllocateObjectBuffer()
 {
 	FreeData();
 
 	int dataSize = GetDataSize();
 	if (dataSize > 0){
-		AllocateInternal<PointType>(dataSize, m_dataPtr);
+		if (!AllocateInternal<PointType>(dataSize, m_dataPtr)) {
+			return false;
+		}
 
 		m_dataOwner = true;
 	}
+
+	return true;
 }
 
 
@@ -385,9 +405,9 @@ bool CPointsBasedObject::AllocateData(int size, quint8*& buffer)
 			return AllocateInternal<PointXyzwNormalRgba32>(size, buffer);
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
 			return AllocateInternal<PointXyzwRgba32>(size, buffer);
+		default:
+			return false;
 	}
-
-	return false;
 }
 
 
@@ -395,19 +415,28 @@ void CPointsBasedObject::FreeData()
 {
 	switch (m_pointFormat){
 		case IPointsBasedObject::PF_XYZ_32:
-			return TFreeData<PointXyz32>();
+			TFreeData<PointXyz32>();
+			break;
 		case IPointsBasedObject::PF_XYZ_64:
-			return TFreeData<PointXyz64>();
+			TFreeData<PointXyz64>();
+			break;
 		case IPointsBasedObject::PF_XYZW_32:
-			return TFreeData<PointXyzw32>();
+			TFreeData<PointXyzw32>();
+			break;
 		case IPointsBasedObject::PF_XYZ_ABC_32:
-			return TFreeData<PointXyzAbc32>();
+			TFreeData<PointXyzAbc32>();
+			break;
 		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-			return TFreeData<PointXyzwNormal32>();
+			TFreeData<PointXyzwNormal32>();
+			break;
 		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-			return TFreeData<PointXyzwNormalRgba32>();
+			TFreeData<PointXyzwNormalRgba32>();
+			break;
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
-			return TFreeData<PointXyzwRgba32>();
+			TFreeData<PointXyzwRgba32>();
+			break;
+		default:
+			break;
 	}
 }
 
@@ -435,19 +464,28 @@ void CPointsBasedObject::EnsureCenterCalculated() const
 {
 	switch (m_pointFormat){
 		case IPointsBasedObject::PF_XYZ_32:
-			return TEnsureCenterCalculated<PointXyz32>();
+			TEnsureCenterCalculated<PointXyz32>();
+			break;
 		case IPointsBasedObject::PF_XYZ_64:
-			return TEnsureCenterCalculated<PointXyz64>();
+			TEnsureCenterCalculated<PointXyz64>();
+			break;
 		case IPointsBasedObject::PF_XYZW_32:
-			return TEnsureCenterCalculated<PointXyzw32>();
+			TEnsureCenterCalculated<PointXyzw32>();
+			break;
 		case IPointsBasedObject::PF_XYZ_ABC_32:
-			return TEnsureCenterCalculated<PointXyzAbc32>();
+			TEnsureCenterCalculated<PointXyzAbc32>();
+			break;
 		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-			return TEnsureCenterCalculated<PointXyzwNormal32>();
+			TEnsureCenterCalculated<PointXyzwNormal32>();
+			break;
 		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-			return TEnsureCenterCalculated<PointXyzwNormalRgba32>();
+			TEnsureCenterCalculated<PointXyzwNormalRgba32>();
+			break;
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
-			return TEnsureCenterCalculated<PointXyzwRgba32>();
+			TEnsureCenterCalculated<PointXyzwRgba32>();
+			break;
+		default:
+			break;
 	}
 }
 
@@ -475,19 +513,28 @@ void CPointsBasedObject::EnsureCuboidCalculated() const
 {
 	switch (m_pointFormat){
 		case IPointsBasedObject::PF_XYZ_32:
-			return TEnsureCuboidCalculated<PointXyz32>();
+			TEnsureCuboidCalculated<PointXyz32>();
+			break;
 		case IPointsBasedObject::PF_XYZ_64:
-			return TEnsureCuboidCalculated<PointXyz64>();
+			TEnsureCuboidCalculated<PointXyz64>();
+			break;
 		case IPointsBasedObject::PF_XYZW_32:
-			return TEnsureCuboidCalculated<PointXyzw32>();
+			TEnsureCuboidCalculated<PointXyzw32>();
+			break;
 		case IPointsBasedObject::PF_XYZ_ABC_32:
-			return TEnsureCuboidCalculated<PointXyzAbc32>();
+			TEnsureCuboidCalculated<PointXyzAbc32>();
+			break;
 		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-			return TEnsureCuboidCalculated<PointXyzwNormal32>();
+			TEnsureCuboidCalculated<PointXyzwNormal32>();
+			break;
 		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-			return TEnsureCuboidCalculated<PointXyzwNormalRgba32>();
+			TEnsureCuboidCalculated<PointXyzwNormalRgba32>();
+			break;
 		case IPointsBasedObject::PF_XYZW_RGBA_32:
-			return TEnsureCuboidCalculated<PointXyzwRgba32>();
+			TEnsureCuboidCalculated<PointXyzwRgba32>();
+			break;
+		default:
+			break;
 	}
 }
 
@@ -603,7 +650,7 @@ bool CPointsBasedObject::AllocateInternal(int size, quint8*& buffer)
 {
 	buffer = reinterpret_cast<quint8*>(malloc(size*sizeof(PointType)));
 
-	return true;
+	return buffer != nullptr;
 }
 
 

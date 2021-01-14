@@ -48,7 +48,7 @@ protected:
 	bool Create(PointFormat pointFormat, int pointsCount, void* dataPtr, bool copyData);
 	bool Append(int pointsCount, const void* dataPtr);
 	int GetDataSize() const;
-	void CreateInternalBuffer();
+	bool CreateInternalBuffer();
 	bool AllocateData(int size, quint8*& buffer);
 	void FreeData();
 	void EnsureCenterCalculated() const;
@@ -57,7 +57,7 @@ protected:
 	template <typename PointType> PointType*
 	TGetPointData(int pointIndex, bool validOnly = false) const;
 	template <typename PointType>
-	void AllocateObjectBuffer();
+	bool AllocateObjectBuffer();
 	template <typename PointType> void TFreeData();
 	template <typename PointType> bool TIsPointValid(const PointType& pointData) const;
 	template <typename PointType> void TEnsureCenterCalculated() const;
