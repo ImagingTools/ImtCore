@@ -226,6 +226,13 @@ bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(
 	QDir tempDir(tempPath);
 	tempDir.removeRecursively();
 
+	if (m_collectionPtr != nullptr){
+		QVariant documentName = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME);
+		if (documentName.isValid()){
+			QMessageBox::critical(nullptr, "", tr("Document \"%1\"could not be opened").arg(documentName.toString()));
+		}
+	}
+
 	return false;
 }
 
@@ -347,16 +354,7 @@ void CDocumentBasedFileCollectionDelegateComp::InitializeVisualStatus()
 void CDocumentBasedFileCollectionDelegateComp::OnEdit()
 {
 	for (const QByteArray& objectId : m_selectedItemIds){
-		if (!OpenDocumentEditor(objectId)){
-			QVariant documentName;
-			if (m_collectionPtr != nullptr){
-				documentName = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME);
-			}
-
-			if (documentName.isValid()){
-				QMessageBox::critical(nullptr, "", tr("Document \"%1\"could not be opened").arg(documentName.toString()));
-			}
-		}
+		OpenDocumentEditor(objectId);
 	}
 }
 
