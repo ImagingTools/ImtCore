@@ -92,6 +92,12 @@ bool CRepresentationProductionFactoryComp::Filter::IsMessageAccepted(const istd:
 }
 
 
+QList<int> CRepresentationProductionFactoryComp::Filter::GetGroupMessageIds() const
+{
+	return m_messageIdList;
+}
+
+
 // reimplemented (imtlog::ITimeRangeProvider)
 
 imtlog::CTimeRange CRepresentationProductionFactoryComp::Filter::GetTimeRange() const

@@ -22,8 +22,6 @@ namespace imtlog
 CEventHistoryControllerComp::CEventHistoryControllerComp()
 	:m_controllerState(CS_INIT)
 {
-	qRegisterMetaType<MessagePtr>("MessagePtr");
-	qRegisterMetaType<EventContainerPtr>("EventContainerPtr");
 }
 
 
@@ -39,7 +37,31 @@ CTimeRange CEventHistoryControllerComp::GetTimeRange() const
 
 IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(IEventProvider::EventFilterPtr filterPtr) const
 {
-	return IEventProvider::EventContainerPtr();
+	EventHistoryGroupControllerPtr groupPtr;
+
+	QList<int> ids = filterPtr->GetGroupMessageIds();
+	for (int i = 0; i < ids.count(); i++){
+		groupPtr = GetGroupForMessageId(ids[i]);
+		if (groupPtr.IsValid()){
+			break;
+		}
+	}
+
+	if (!groupPtr.IsValid()){
+		groupPtr = m_groups[0].groupPtr;
+	}
+
+	QMutexLocker locker(&m_requestMutex);
+
+	QByteArray uuid = groupPtr->RequestEvents(filterPtr);
+
+	RequestMapItem item;
+	item.resultEventsPtr.SetPtr(new ilog::CMessageContainer());
+	item.groupPtr = groupPtr;
+
+	m_requests[uuid] = item;
+
+	return item.resultEventsPtr;
 }
 
 
@@ -60,12 +82,13 @@ void CEventHistoryControllerComp::AddMessage(const MessagePtr& messagePtr)
 
 	if (m_controllerState == CS_OK){
 		int id = messagePtr->GetInformationId();
-		if (m_groupsMap.contains(id)){
-			m_groupsMap[id]->AddMessage(messagePtr);
+
+		EventHistoryGroupControllerPtr groupPtr = GetGroupForMessageId(id);
+		if (!groupPtr.IsValid()){
+			groupPtr = m_groups[0].groupPtr;
 		}
-		else{
-			m_generalGroup->AddMessage(messagePtr);
-		}
+
+		groupPtr->AddMessage(messagePtr);
 	}
 }
 
@@ -76,8 +99,8 @@ void CEventHistoryControllerComp::OnSystemShutdown()
 {
 	m_controllerState = CS_SHUTDOWN;
 
-	for (EventHistoryGroupControllerPtr group : m_groups){
-		group->OnSystemShutdown();
+	for (GroupListItem& item : m_groups){
+		item.groupPtr->OnSystemShutdown();
 	}
 }
 
@@ -113,12 +136,13 @@ void CEventHistoryControllerComp::OnComponentCreated()
 	EventHistoryGroupControllerParams cParams;
 	EventHistoryGroupPersistenceParams pParams;
 	EventHistoryGroupControllerPtr groupPtr;
+	CTimeRange gTimeRange;
+	GroupListItem item;
 
 	cParams.containerDuration = 15;
 	cParams.writeDelay = 5;
 	cParams.removeDelay = 10;
 
-	CTimeRange gTimeRange;
 
 	pParams.repositoryDir = m_logFolderCompPtr->GetPath();
 	pParams.groupDir = "UserActions";
@@ -130,8 +154,11 @@ void CEventHistoryControllerComp::OnComponentCreated()
 	groupPtr.SetPtr(new CEventHistoryGroupController(cParams, pParams));
 	groupPtr->SetLogPtr(GetLogPtr());
 	gTimeRange = groupPtr->GetTimeRange();
-	m_groups.append(groupPtr);
-	m_groupsMap[100000000] = groupPtr;
+
+	item.messageIds.clear();
+	item.messageIds.append(100000000);
+	item.groupPtr = groupPtr;
+	m_groups.append(item);
 
 	if (!m_archiveTimeRange.IsClosed()){
 		m_archiveTimeRange = gTimeRange;
@@ -150,9 +177,12 @@ void CEventHistoryControllerComp::OnComponentCreated()
 	groupPtr.SetPtr(new CEventHistoryGroupController(cParams, pParams));
 	groupPtr->SetLogPtr(GetLogPtr());
 	gTimeRange = groupPtr->GetTimeRange();
-	m_groups.append(groupPtr);
-	m_groupsMap[19780000] = groupPtr;
-	m_groupsMap[100000001] = groupPtr;
+
+	item.messageIds.clear();
+	item.messageIds.append(1000000001);
+	item.messageIds.append(19780000);
+	item.groupPtr = groupPtr;
+	m_groups.append(item);
 
 	if (!m_archiveTimeRange.IsClosed()){
 		m_archiveTimeRange = gTimeRange;
@@ -171,8 +201,10 @@ void CEventHistoryControllerComp::OnComponentCreated()
 	groupPtr.SetPtr(new CEventHistoryGroupController(cParams, pParams));
 	groupPtr->SetLogPtr(GetLogPtr());
 	gTimeRange = groupPtr->GetTimeRange();
-	m_groups.append(groupPtr);
-	m_generalGroup = groupPtr;
+
+	item.messageIds.clear();
+	item.groupPtr = groupPtr;
+	m_groups.prepend(item);
 
 	if (!m_archiveTimeRange.IsClosed()){
 		m_archiveTimeRange = gTimeRange;
@@ -188,6 +220,33 @@ void CEventHistoryControllerComp::OnComponentCreated()
 	}
 
 	m_controllerState = CS_OK;
+}
+
+
+// public slots
+
+void CEventHistoryControllerComp::OnRequestFinished(QByteArray requestId)
+{
+	QMutexLocker locker(&m_requestMutex);
+
+	if (m_requests.contains(requestId)){
+		m_requests[requestId].groupPtr->PopResult(requestId, *m_requests[requestId].resultEventsPtr);
+		m_requests.remove(requestId);
+	}
+}
+
+
+// private methods
+
+CEventHistoryControllerComp::EventHistoryGroupControllerPtr CEventHistoryControllerComp::GetGroupForMessageId(int messageId) const
+{
+	for (const GroupListItem& item : m_groups){
+		if (item.messageIds.contains(messageId)){
+			return item.groupPtr;
+		}
+	}
+	
+	return EventHistoryGroupControllerPtr();
 }
 
 

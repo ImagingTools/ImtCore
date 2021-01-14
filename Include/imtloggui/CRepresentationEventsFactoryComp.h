@@ -47,10 +47,11 @@ private:
 		}
 
 		// reimplemented (imtlog::IMessageFilter)
-		bool IsMessageAccepted(const istd::IInformationProvider* messagePtr = nullptr) const override;
+		virtual bool IsMessageAccepted(const istd::IInformationProvider* messagePtr = nullptr) const override;
+		virtual QList<int> GetGroupMessageIds() const override;
 
 		// reimplemented (imtlog::ITimeRangeProvider)
-		imtlog::CTimeRange GetTimeRange() const override;
+		virtual imtlog::CTimeRange GetTimeRange() const override;
 
 	private:
 		imtlog::CTimeRange m_timeRange;

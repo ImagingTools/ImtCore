@@ -39,9 +39,6 @@ CEventHistoryGroupController::CEventHistoryGroupController(
 		persistenceParams.versionInfoPtr,
 		persistenceParams.compressorPtr)
 {
-	qRegisterMetaType<MessagePtr>("MessagePtr");
-	qRegisterMetaType<EventContainerPtr>("EventContainerPtr");
-
 	m_timer.setInterval(1000);
 	connect(&m_timer, &QTimer::timeout, this, &CEventHistoryGroupController::OnTimer);
 	m_timer.start();
@@ -78,6 +75,29 @@ void CEventHistoryGroupController::OnSystemShutdown()
 }
 
 
+QByteArray CEventHistoryGroupController::RequestEvents(IEventProvider::EventFilterPtr filterPtr) const
+{
+	return m_readJobController.AddJob(filterPtr);
+}
+
+
+bool CEventHistoryGroupController::IsValidRequestId(const QByteArray& requestId) const
+{
+	return m_readJobController.IsValidJobId(requestId);
+}
+
+
+IEventProvider::EventFilterPtr CEventHistoryGroupController::GetFilter(const QByteArray& requestId) const
+{
+	return m_readJobController.GetFilter(requestId);
+}
+
+
+bool CEventHistoryGroupController::PopResult(const QByteArray& requestId, ilog::CMessageContainer& resultEvents) const
+{
+	return m_readJobController.PopResult(requestId, resultEvents);
+}
+
 // reimplemented (imtlog::ITimeRangeProvider)
 
 CTimeRange CEventHistoryGroupController::GetTimeRange() const
@@ -87,23 +107,6 @@ CTimeRange CEventHistoryGroupController::GetTimeRange() const
 	}
 
 	return m_archiveTimeRange;
-}
-
-
-// reimplemented (imtlog::IMessageFilter)
-
-IEventProvider::EventContainerPtr CEventHistoryGroupController::GetEvents(IEventProvider::EventFilterPtr filterPtr) const
-{
-	QByteArray jobId = m_readJobController.AddJob(filterPtr);
-	if (jobId.isEmpty()){
-		return IEventProvider::EventContainerPtr();
-	}
-
-	EventContainerPtr eventContainerPtr(new imod::TModelWrap<ilog::CMessageContainer>);
-
-	m_jobs[jobId] = eventContainerPtr;
-
-	return eventContainerPtr;
 }
 
 
@@ -194,16 +197,7 @@ void CEventHistoryGroupController::OnTimer()
 
 void CEventHistoryGroupController::OnJobFinished(const QByteArray& jobId)
 {
-	EventContainerPtr resultContainerPtr;
-
-	{
-		QMutexLocker locker(&m_jobMutex);
-
-		Q_ASSERT(m_jobs.contains(jobId));
-		resultContainerPtr = m_jobs.take(jobId);
-	}
-
-	m_readJobController.PopResult(jobId, *resultContainerPtr);
+	Q_EMIT RequestFinished(jobId);
 }
 
 

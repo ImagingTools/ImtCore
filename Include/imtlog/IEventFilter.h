@@ -23,7 +23,10 @@ public:
 	};
 
 	virtual bool IsMessageAccepted(const istd::IInformationProvider* messagePtr = nullptr) const = 0;
-	virtual QVector<int> GetMessageIds() const = 0;
+
+	// Message ids list for search corresponding group
+	// Filtering messages by id is implemented by the IsMessageAccepted method
+	virtual QList<int> GetGroupMessageIds() const = 0;
 };
 
 

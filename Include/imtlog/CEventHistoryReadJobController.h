@@ -55,7 +55,7 @@ public:
 
 	bool IsValidJobId(const QByteArray& jobId) const;
 	IEventProvider::EventFilterPtr GetFilter(const QByteArray& jobId) const;
-	bool PopResult(const QByteArray& jobId, ilog::CMessageContainer& resultMessages);
+	bool PopResult(const QByteArray& jobId, ilog::CMessageContainer& resultEvents);
 
 Q_SIGNALS:
 	void JobFinished(QByteArray jobId);

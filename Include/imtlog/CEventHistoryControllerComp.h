@@ -69,6 +69,14 @@ public:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
+public Q_SLOTS:
+	void OnRequestFinished(QByteArray requestId);
+
+private:
+	typedef istd::TSmartPtr<CEventHistoryGroupController> EventHistoryGroupControllerPtr;
+
+	EventHistoryGroupControllerPtr GetGroupForMessageId(int messageId) const;
+
 private:
 	enum ControllerState
 	{
@@ -78,18 +86,17 @@ private:
 		CS_FAILED
 	};
 
-	typedef istd::TSmartPtr<CEventHistoryGroupController> EventHistoryGroupControllerPtr;
-
-	class Job:
-				public imod::CMultiModelDispatcherBase,
-				public imod::IModel
+	struct GroupListItem
 	{
-		
-
+		QList<int> messageIds;
+		EventHistoryGroupControllerPtr groupPtr;
 	};
 
-private:
-
+	struct RequestMapItem
+	{
+		IEventProvider::EventContainerPtr resultEventsPtr;
+		EventHistoryGroupControllerPtr groupPtr;
+	};
 
 private:
 	I_REF(ifile::IFileNameParam, m_logFolderCompPtr);
@@ -101,9 +108,11 @@ private:
 
 	CTimeRange m_archiveTimeRange;
 
-	QMap<int, EventHistoryGroupControllerPtr> m_groupsMap;
-	QList<EventHistoryGroupControllerPtr> m_groups;
-	EventHistoryGroupControllerPtr m_generalGroup;
+	// First item should be GeneralGroup
+	QList<GroupListItem> m_groups;
+
+	mutable QMap<QByteArray, RequestMapItem> m_requests;
+	mutable QMutex m_requestMutex;
 };
 
 

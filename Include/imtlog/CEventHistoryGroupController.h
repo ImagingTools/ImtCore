@@ -52,7 +52,6 @@ class CEventHistoryGroupController:
 			public QObject,
 			virtual public ilog::CLoggerBase,
 			virtual public ilog::IMessageConsumer,
-			virtual public IEventProvider,
 			virtual public ITimeRangeProvider
 {
 	Q_OBJECT
@@ -65,11 +64,14 @@ public:
 
 	void OnSystemShutdown();
 
+	QByteArray RequestEvents(IEventProvider::EventFilterPtr filterPtr) const;
+
+	bool IsValidRequestId(const QByteArray& requestId) const;
+	IEventProvider::EventFilterPtr GetFilter(const QByteArray& requestId) const;
+	bool PopResult(const QByteArray& requestId, ilog::CMessageContainer& resultEvents) const;
+
 	// reimplemented (imtlog::ITimeRangeProvider)
 	virtual CTimeRange GetTimeRange() const override;
-
-	// reimplemented (imtlog::IEventProvider)
-	virtual IEventProvider::EventContainerPtr GetEvents(IEventProvider::EventFilterPtr filterPtr) const override;
 
 	// reimplemented (ilog::IMessageConsumer)
 	virtual bool IsMessageSupported(
@@ -80,6 +82,9 @@ public:
 
 	// reimplemented (ilog::ILoggable)
 	virtual void SetLogPtr(ilog::IMessageConsumer* logPtr);
+
+Q_SIGNALS:
+	void RequestFinished(QByteArray requestId);
 
 private:
 	enum ControllerState
@@ -130,7 +135,7 @@ private:
 	QTimer m_timer;
 
 	mutable CTimeRange m_archiveTimeRange;
-	mutable QQueue<EventContainerPtr> m_cache;
+	mutable QQueue<IEventProvider::EventContainerPtr> m_cache;
 
 	CEventHistoryGroupReader::EventContainerList m_workingQueue;
 	CEventHistoryGroupReader::EventContainerList m_writingQueue;
@@ -142,11 +147,6 @@ private:
 
 	mutable CEventHistoryReadJobController m_readJobController;
 	CEventHistoryGroupReader m_completeGroupReader;
-
-	typedef istd::TSmartPtr<imod::TModelWrap<ilog::CMessageContainer>> MessageContainerPtr;
-
-	mutable QMap<QByteArray, EventContainerPtr> m_jobs;
-	mutable QMutex m_jobMutex;
 };
 
 

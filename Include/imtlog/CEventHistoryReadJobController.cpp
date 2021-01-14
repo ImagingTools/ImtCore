@@ -75,7 +75,7 @@ IEventProvider::EventFilterPtr CEventHistoryReadJobController::GetFilter(const Q
 }
 
 
-bool CEventHistoryReadJobController::PopResult(const QByteArray& jobId, ilog::CMessageContainer& resultMessages)
+bool CEventHistoryReadJobController::PopResult(const QByteArray& jobId, ilog::CMessageContainer& resultEvents)
 {
 	QMutexLocker locker(&m_jobMutex);
 
@@ -84,13 +84,13 @@ bool CEventHistoryReadJobController::PopResult(const QByteArray& jobId, ilog::CM
 		if ((*it).uuid == jobId && (*it).status == JS_FINISHED){
 			if ((*it).eventContainerPtr.IsValid()){
 				static istd::IChangeable::ChangeSet changeSet(IEventProvider::RS_OK);
-				istd::CChangeGroup notifier(&resultMessages, &changeSet);
+				istd::CChangeGroup notifier(&resultEvents, &changeSet);
 
-				resultMessages.CopyFrom(*(*it).eventContainerPtr);
+				resultEvents.CopyFrom(*(*it).eventContainerPtr);
 			}
 			else{
 				static istd::IChangeable::ChangeSet changeSet(IEventProvider::RS_CANCELED);
-				istd::CChangeGroup notifier(&resultMessages, &changeSet);
+				istd::CChangeGroup notifier(&resultEvents, &changeSet);
 			}
 
 			m_jobList.erase(it);
