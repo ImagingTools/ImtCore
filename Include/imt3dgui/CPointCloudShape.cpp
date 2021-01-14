@@ -62,7 +62,7 @@ void CPointCloudShape::SetPointSelection(const QPoint& selectionPoint, bool clea
 		}
 	}
 
-	UploadGeometry(false, m_vertices, m_vertexBuffer);
+	UpdateGeometry(m_vertices, m_vertexBuffer);
 }
 
 
@@ -90,7 +90,7 @@ void CPointCloudShape::ClearSelection()
 
 	m_selectedVerticesIndicies.clear();
 
-	UploadGeometry(false, m_vertices, m_vertexBuffer);
+	UpdateGeometry(m_vertices, m_vertexBuffer);
 }
 
 
@@ -102,7 +102,7 @@ void CPointCloudShape::AllSelection()
 		m_vertices[i].color = s_selectionColor;
 	}
 
-	UploadGeometry(false, m_vertices, m_vertexBuffer);
+	UpdateGeometry(m_vertices, m_vertexBuffer);
 }
 
 
@@ -123,7 +123,7 @@ void CPointCloudShape::InvertSelection()
 		}
 	}
 
-	UploadGeometry(false, m_vertices, m_vertexBuffer);
+	UpdateGeometry(m_vertices, m_vertexBuffer);
 }
 
 
@@ -262,7 +262,7 @@ void CPointCloudShape::SetRectSelection(const QRect& selectionRect, bool isCircl
 		}
 	}
 
-	UploadGeometry(false, m_vertices, m_vertexBuffer);
+	UpdateGeometry(m_vertices, m_vertexBuffer);
 }
 
 

@@ -248,8 +248,8 @@ void CShape3dBase::UpdateGeometry(const istd::IChangeable::ChangeSet& changeSet)
 {
 	UpdateShapeGeometry(changeSet);
 
-	UploadGeometry(true, m_vertices, m_vertexBuffer);
-	UploadGeometry(true, m_indices, m_indexBuffer);
+	CreateGeometry(m_vertices, m_vertexBuffer);
+	CreateGeometry(m_indices, m_indexBuffer);
 }
 
 

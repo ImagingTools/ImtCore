@@ -76,18 +76,21 @@ protected:
 	QVector3D WindowToModel(const QPoint& windowCoordinate, float z) const;
 
 	template <typename TDataVector>
-	void UploadGeometry(bool reallocate, const TDataVector& dataVector, QOpenGLBuffer& dataBuffer)
+	void CreateGeometry(const TDataVector& dataVector, QOpenGLBuffer& dataBuffer)
 	{
 		if (!dataVector.isEmpty() && dataBuffer.isCreated()){
 			dataBuffer.bind();
+			dataBuffer.allocate(dataVector.data(), dataVector.count() * sizeof(dataVector.first()));
+			dataBuffer.release();
+		}
+	}
 
-			if (reallocate){
-				dataBuffer.allocate(dataVector.data(), dataVector.count() * sizeof(dataVector.first()));
-			}
-			else{
-				dataBuffer.write(0, dataVector.data(), dataVector.count() * sizeof(dataVector.first()));
-			}
-
+	template <typename TDataVector>
+	void UpdateGeometry(const TDataVector& dataVector, QOpenGLBuffer& dataBuffer)
+	{
+		if (!dataVector.isEmpty() && dataBuffer.isCreated()) {
+			dataBuffer.bind();
+			dataBuffer.write(0, dataVector.data(), dataVector.count() * sizeof(dataVector.first()));
 			dataBuffer.release();
 		}
 	}

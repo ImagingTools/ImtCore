@@ -67,7 +67,7 @@ void CMeshShape::ClearSelection()
 		vertex.color = m_color;
 	}
 
-	UploadGeometry(false, m_vertices, m_vertexBuffer);
+	UpdateGeometry(m_vertices, m_vertexBuffer);
 }
 
 
@@ -83,7 +83,7 @@ void CMeshShape::AllSelection()
 		vertex.color = s_selectionColor;
 	}
 
-	UploadGeometry(false, m_vertices, m_vertexBuffer);
+	UpdateGeometry(m_vertices, m_vertexBuffer);
 }
 
 
@@ -110,7 +110,7 @@ void CMeshShape::InvertSelection()
 		}
 	}
 
-	UploadGeometry(false, m_vertices, m_vertexBuffer);
+	UpdateGeometry(m_vertices, m_vertexBuffer);
 }
 
 
@@ -258,13 +258,15 @@ void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh, const ist
 	}
 
 	bool appendData = changeSet.ContainsExplicit(imt3d::IPointsBasedObject::CF_APPEND);
-	int lastIndex = m_vertices.size() - 1;
+	int lastVertexIndex = m_vertices.empty() ? 0 : m_vertices.size() - 1;
+	int lastIndIndex = m_indices.empty() ? 0 : m_indices.size() - 1;
 
 	if (!appendData){
 		m_vertices.clear();
 		m_indices.clear();
 
-		lastIndex = 0;
+		lastVertexIndex = 0;
+		lastIndIndex = 0;
 	}
 
 	m_vertices.reserve(meshSize);
@@ -273,7 +275,7 @@ void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh, const ist
 	imt3d::IPointsBasedObject::PointFormat format = mesh.GetPointFormat();
 
 	// update vertices and normals
-	for (int i = lastIndex; i < meshSize; ++i){
+	for (int i = lastVertexIndex; i < meshSize; ++i){
 		const PointType* pointDataPtr = static_cast<const PointType*>(mesh.GetPointData(i));
 		Q_ASSERT(pointDataPtr != nullptr);
 
@@ -309,7 +311,7 @@ void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh, const ist
 		}
 
 	// update indices
-	for (int i = lastIndex; i < indices.size(); ++i){
+	for (int i = lastIndIndex; i < indices.size(); ++i){
 		const std::vector<uint32_t>& index = indices[i];
 
 		for (int j = 0; j < index.size(); ++j){
@@ -553,7 +555,7 @@ void CMeshShape::SelectVertices(Indices& intersectedIndicies, bool clearPrevious
 	}
 
 	// upload new geometry
-	UploadGeometry(false, m_vertices, m_vertexBuffer);
+	UpdateGeometry(m_vertices, m_vertexBuffer);
 }
 
 

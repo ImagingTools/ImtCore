@@ -54,7 +54,7 @@ bool CRulerShape::OnMousePress(QMouseEvent& e)
 				m_vertices[rulerVertexIndex + 0].position = newPos;
 				m_vertices[rulerVertexIndex + 2].position = newPos;
 
-				UploadGeometry(false, m_vertices, m_vertexBuffer);
+				UpdateGeometry(m_vertices, m_vertexBuffer);
 			}
 		}
 
@@ -67,7 +67,7 @@ bool CRulerShape::OnMousePress(QMouseEvent& e)
 	if (m_movingVertexIndex >= 0){
 		m_vertices[m_movingVertexIndex + 2].color = s_selectionColor;
 
-		UploadGeometry(false, m_vertices, m_vertexBuffer);
+		UpdateGeometry(m_vertices, m_vertexBuffer);
 
 		return true;
 	}
@@ -94,7 +94,7 @@ bool CRulerShape::OnMouseMove(QMouseEvent& e)
 		m_vertices[m_movingVertexIndex + 0].position += posDiff;
 		m_vertices[m_movingVertexIndex + 2].position += posDiff;
 
-		UploadGeometry(false, m_vertices, m_vertexBuffer);
+		UpdateGeometry(m_vertices, m_vertexBuffer);
 
 		retVal = true;
 	}
@@ -112,7 +112,7 @@ bool CRulerShape::OnMouseRelease(QMouseEvent& /*e*/)
 
 		m_movingVertexIndex = -1;
 
-		UploadGeometry(false, m_vertices, m_vertexBuffer);
+		UpdateGeometry(m_vertices, m_vertexBuffer);
 
 		return true;
 	}
