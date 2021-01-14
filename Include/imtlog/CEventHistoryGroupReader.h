@@ -30,11 +30,11 @@ public:
 	typedef istd::TSmartPtr<EventContainerList> EventContainerListPtr;
 
 	CEventHistoryGroupReader(
-				QString groupDir,
-				QString containerExtension,
-				QString archiveExtension,
-				iser::IVersionInfo* versionInfoPtr,
-				imtfile::IFileCompression* compressorPtr);
+				const QString& groupDir,
+				const QString& containerExtension,
+				const QString& archiveExtension,
+				const iser::IVersionInfo* versionInfoPtr,
+				const imtfile::IFileCompression* compressorPtr);
 
 	CTimeRange ReadGroupTimeRange() const;
 	EventContainerListPtr ReadContainers(const CTimeRange& timeRange) const;
@@ -46,11 +46,11 @@ private:
 	EventContainerPtr ImportContainer(const QString& filePath) const;
 
 private:
-	QString m_groupDir;
-	QString m_containerExtension;
-	QString m_archiveExtension;
-	iser::IVersionInfo* m_versionInfoPtr;
-	imtfile::IFileCompression* m_compressorPtr;
+	const QString& m_groupDir;
+	const QString& m_containerExtension;
+	const QString& m_archiveExtension;
+	const iser::IVersionInfo* m_versionInfoPtr;
+	const imtfile::IFileCompression* m_compressorPtr;
 	bool m_isCanceled;
 };
 

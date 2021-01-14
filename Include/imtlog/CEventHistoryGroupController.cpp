@@ -31,7 +31,13 @@ CEventHistoryGroupController::CEventHistoryGroupController(
 				persistenceParams.containerExtension,
 				persistenceParams.archiveExtension,
 				persistenceParams.versionInfoPtr,
-				persistenceParams.compressorPtr)
+				persistenceParams.compressorPtr),
+	m_readJobController(
+		persistenceParams.repositoryDir + "/" + m_persistenceParams.groupDir,
+		persistenceParams.containerExtension,
+		persistenceParams.archiveExtension,
+		persistenceParams.versionInfoPtr,
+		persistenceParams.compressorPtr)
 {
 	qRegisterMetaType<MessagePtr>("MessagePtr");
 	qRegisterMetaType<EventContainerPtr>("EventContainerPtr");
@@ -44,7 +50,7 @@ CEventHistoryGroupController::CEventHistoryGroupController(
 
 	m_state = CS_OK;
 
-	connect(&m_readJobController, &CReadJobController::JobFinished, this, &CEventHistoryGroupController::OnJobFinished);
+	connect(&m_readJobController, &CEventHistoryReadJobController::JobFinished, this, &CEventHistoryGroupController::OnJobFinished);
 }
 
 
@@ -88,13 +94,7 @@ CTimeRange CEventHistoryGroupController::GetTimeRange() const
 
 IEventProvider::EventContainerPtr CEventHistoryGroupController::GetEvents(IEventProvider::EventFilterPtr filterPtr) const
 {
-	QByteArray jobId = m_readJobController.AddJob(
-				filterPtr,
-				m_persistenceParams.repositoryDir + "/" + m_persistenceParams.groupDir,
-				m_persistenceParams.containerExtension,
-				m_persistenceParams.archiveExtension,
-				m_persistenceParams.versionInfoPtr,
-				m_persistenceParams.compressorPtr);
+	QByteArray jobId = m_readJobController.AddJob(filterPtr);
 	if (jobId.isEmpty()){
 		return IEventProvider::EventContainerPtr();
 	}
@@ -365,83 +365,6 @@ void CEventHistoryGroupController::Writer::run()
 	}
 
 	QMetaObject::invokeMethod(m_parentPtr, "OnWriterFinished", Qt::QueuedConnection);
-}
-
-
-// public methods of embedded class Reader
-
-CEventHistoryGroupController::CReadJobController::CReadJobController()
-{
-}
-
-
-QByteArray CEventHistoryGroupController::CReadJobController::AddJob(
-			EventFilterPtr filterPtr,
-			QString groupDir,
-			QString containerExtension,
-			QString archiveExtension,
-			iser::IVersionInfo* versionInfoPtr,
-			imtfile::IFileCompression* compressorPtr)
-{
-	Job newJob;
-	newJob.uuid = QUuid::createUuid().toByteArray();
-	newJob.filterPtr = filterPtr;
-	newJob.readerPtr.SetPtr(new CEventHistoryGroupReader(
-				groupDir,
-				containerExtension,
-				archiveExtension,
-				versionInfoPtr,
-				compressorPtr));
-	newJob.jobStatus = JS_WAITING;
-
-	// MUTEX!!!
-	m_jobList.push_back(newJob);
-
-	return newJob.uuid;
-}
-
-
-IEventProvider::EventFilterPtr CEventHistoryGroupController::CReadJobController::GetFilter(const QByteArray & jobId)
-{
-	return EventFilterPtr();
-}
-
-
-bool CEventHistoryGroupController::CReadJobController::GetResult(const QByteArray& jobId, ilog::CMessageContainer& resultMessages) const
-{
-	for (const Job& jobItem : m_jobList){
-		if (jobItem.uuid == jobId && jobItem.jobStatus == JS_FINISHED){
-			if (jobItem.resultContainerListPtr.IsValid()){
-				static istd::IChangeable::ChangeSet changeSet(IEventProvider::RS_OK);
-				istd::CChangeGroup notifier(&resultMessages, &changeSet);
-
-				for (int i = 0; i < jobItem.resultContainerListPtr->count(); i++){
-					CEventHistoryGroupReader::EventContainerPtr resultContainerPtr = jobItem.resultContainerListPtr->at(i);
-
-					ilog::IMessageContainer::Messages messages = resultContainerPtr->GetMessages();
-					for (int j = messages.count() - 1; i >= 0; i--){
-						if (jobItem.filterPtr.IsValid()){
-							if (jobItem.filterPtr->GetTimeRange().Contains(messages[j]->GetInformationTimeStamp()) && jobItem.filterPtr->IsMessageAccepted(messages[j].GetPtr())){
-								resultMessages.AddMessage(messages[j]);
-							}
-						}
-						else{
-							resultMessages.AddMessage(messages[j]);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return false;
-}
-
-
-// reimplemented (QThread)
-
-void CEventHistoryGroupController::CReadJobController::run()
-{
 }
 
 

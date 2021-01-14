@@ -20,11 +20,11 @@ namespace imtlog
 // public methods
 
 CEventHistoryGroupReader::CEventHistoryGroupReader(
-			QString groupDir,
-			QString containerExtension,
-			QString archiveExtension,
-			iser::IVersionInfo* versionInfoPtr,
-			imtfile::IFileCompression* compressorPtr)
+			const QString& groupDir,
+			const QString& containerExtension,
+			const QString& archiveExtension,
+			const iser::IVersionInfo* versionInfoPtr,
+			const imtfile::IFileCompression* compressorPtr)
 	:m_groupDir(groupDir),
 	m_containerExtension(containerExtension),
 	m_archiveExtension(archiveExtension),
