@@ -42,7 +42,7 @@ public:
 		IEventProvider::EventContainerPtr eventContainerPtr;
 	};
 
-	typedef QList<Job*> JobList;
+	typedef QList<Job> JobList;
 
 	explicit CEventHistoryReadJobController(
 				QString groupDir,
@@ -55,7 +55,7 @@ public:
 
 	bool IsValidJobId(const QByteArray& jobId) const;
 	IEventProvider::EventFilterPtr GetFilter(const QByteArray& jobId) const;
-	bool GetResult(const QByteArray& jobId, ilog::CMessageContainer& resultMessages);
+	bool PopResult(const QByteArray& jobId, ilog::CMessageContainer& resultMessages);
 
 Q_SIGNALS:
 	void JobFinished(QByteArray jobId);
@@ -65,8 +65,8 @@ protected:
 	virtual void run() override;
 
 private:
-	Job* GetJob(const QByteArray& jobId) const;
-	void ProcessJob(Job* jobPtr);
+	Job GetJob(const QByteArray& jobId) const;
+	void ProcessJob(Job& job);
 
 private:
 	JobList m_jobList;

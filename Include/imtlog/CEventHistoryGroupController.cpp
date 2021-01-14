@@ -203,7 +203,7 @@ void CEventHistoryGroupController::OnJobFinished(const QByteArray& jobId)
 		resultContainerPtr = m_jobs.take(jobId);
 	}
 
-	m_readJobController.GetResult(jobId, *resultContainerPtr);
+	m_readJobController.PopResult(jobId, *resultContainerPtr);
 }
 
 
