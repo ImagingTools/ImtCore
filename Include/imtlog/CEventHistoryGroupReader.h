@@ -46,9 +46,9 @@ private:
 	EventContainerPtr ImportContainer(const QString& filePath) const;
 
 private:
-	const QString& m_groupDir;
-	const QString& m_containerExtension;
-	const QString& m_archiveExtension;
+	const QString m_groupDir;
+	const QString m_containerExtension;
+	const QString m_archiveExtension;
 	const iser::IVersionInfo* m_versionInfoPtr;
 	const imtfile::IFileCompression* m_compressorPtr;
 	bool m_isCanceled;
