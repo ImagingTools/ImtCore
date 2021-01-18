@@ -19,6 +19,7 @@ public:
 	typedef istd::TSmartPtr<QGraphicsItem> GraphicsItem;
 	typedef QList<GraphicsItem> GraphicsItemList;
 
+	virtual GraphicsItemList GetItems() const = 0;
 	virtual GraphicsItemList GetAddedItems() const = 0;
 	virtual GraphicsItemList GetRemovedItems() const = 0;
 };

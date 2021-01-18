@@ -4,14 +4,14 @@
 // Qt includes
 #include <QtWidgets/QGraphicsItem>
 
-// Acf includes
+// ACF includes
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/IRepresentationViewFactory.h>
+#include <imtloggui/IRepresentationView.h>
 #include <imtloggui/IEventItemFactory.h>
 #include <imtloggui/IEventScenePositionProvider.h>
-#include <imtloggui/CRepresentationViewFactoryCompBase.h>
+#include <imtloggui/CRepresentationViewCompBase.h>
 #include <imtloggui/CProductionSpeedItem.h>
 
 
@@ -19,16 +19,17 @@ namespace imtloggui
 {
 
 
-class CRepresentationProductionViewFactoryComp: public imtloggui::CRepresentationViewFactoryCompBase
+class CRepresentationProductionViewComp: public CRepresentationViewCompBase
 {
 public:
-	typedef CRepresentationViewFactoryCompBase BaseClass;
+	typedef CRepresentationViewCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationProductionViewFactoryComp)
+	I_BEGIN_COMPONENT(CRepresentationProductionViewComp)
 	I_END_COMPONENT
 
 	// reimplemented (imtloggui::IRepresentationViewFactory)
-	virtual GraphicsItemList CreateGraphicItems(const istd::TSmartPtr<istd::IChangeable> objectPtr, const QByteArray& groupId) const override;
+	virtual bool SetModelPtr(imod::IModel* modelPtr) override;
+	virtual GraphicsItemList GetGraphicItems() const override;
 
 private:
 	mutable QMap<QByteArray, GraphicsItem> m_items;

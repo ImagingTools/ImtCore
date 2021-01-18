@@ -46,6 +46,12 @@ void CGraphicsControllerComp::JumpToLastEvent() const
 
 // reimplemented (imtloggui::IGraphicsItemProvider)
 
+IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetItems() const
+{
+	return IGraphicsItemProvider::GraphicsItemList();
+}
+
+
 IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetAddedItems() const
 {
 	GraphicsItemList items = m_addedItems;
@@ -88,7 +94,7 @@ void CGraphicsControllerComp::OnComponentCreated()
 
 		for (int i = 0; i < ids.count(); i++){
 			QString name = m_groupProviderCompPtr->GetElementInfo(ids[i], imtbase::ICollectionInfo::EIT_NAME).toString();
-			QColor color(m_groupProviderCompPtr->GetElementInfo(ids[i], IGroupProvider::EIT_COLOR).toString());
+			QColor color; //m_groupProviderCompPtr->GetElementInfo(ids[i], IGroupProvider::EIT_COLOR).toString());
 
 			QGraphicsRectItem* rectPtr = new QGraphicsRectItem();
 			rectPtr->setRect(0, 0, 100, 300);
@@ -175,9 +181,9 @@ void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* proper
 			ILayerProvider* layerProvider = m_groupProviderCompPtr->GetLayerProvider(groupIds[i]);
 			imtbase::ICollectionInfo::Ids layerIds = layerProvider->GetElementIds();
 			QByteArray id = layerProvider->GetIdForTimeSpan(span);
-			IRepresentationFactoryProvider* representationProvider = layerProvider->GetRepresentationFactoryProvider(id);
+			IRepresentationProvider* representationProvider;// = layerProvider->GetRepresentationFactoryProvider(id);
 			imtbase::ICollectionInfo::Ids factoryIds = representationProvider->GetElementIds();
-			IRepresentationFactory* representation = representationProvider->GetRepresentationFactory(factoryIds[0]);
+			IRepresentation* representation;// = representationProvider->GetRepresentationFactory(factoryIds[0]);
 
 			QDateTime begin = m_timeAxisPtr->GetVisibleBeginTime();
 			QDateTime end = m_timeAxisPtr->GetVisibleEndTime();
@@ -186,37 +192,37 @@ void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* proper
 				allGroupsMessageIds.append(layerProvider->GetMessageIdList());
 			}
 
-			if (m_representationViewFactoryCompPtr.IsValid()){
-				istd::TSmartPtr<istd::IChangeable> representationObject;
+			//if (m_representationViewCompPtr.IsValid()){
+			//	istd::TSmartPtr<istd::IChangeable> representationObject;
 
-				if (i == groupIds.count() - 1){
-					representationObject = representation->CreateRepresentationObject(
-								imtlog::CTimeRange(begin, end),
-								allGroupsMessageIds,
-								imtlog::IEventFilter::FM_EXCLUDE);
-				}
-				else{
-					representationObject = representation->CreateRepresentationObject(
-								imtlog::CTimeRange(begin, end),
-								layerProvider->GetMessageIdList(),
-								imtlog::IEventFilter::FM_INCLUDE);
-				}
+			//	if (i == groupIds.count() - 1){
+			//		representationObject = representation->CreateRepresentationObject(
+			//					imtlog::CTimeRange(begin, end),
+			//					allGroupsMessageIds,
+			//					imtlog::IEventFilter::FM_EXCLUDE);
+			//	}
+			//	else{
+			//		representationObject = representation->CreateRepresentationObject(
+			//					imtlog::CTimeRange(begin, end),
+			//					layerProvider->GetMessageIdList(),
+			//					imtlog::IEventFilter::FM_INCLUDE);
+			//	}
 
-			
-				GraphicsItemList groupItems;
-				if (representationObject.IsValid()){
-					groupItems += m_representationViewFactoryCompPtr->CreateGraphicItems(representationObject, groupIds[i]);
-				}
+			//
+			//	GraphicsItemList groupItems;
+			//	if (representationObject.IsValid()){
+			//		//groupItems += m_representationViewFactoryCompPtr->CreateGraphicItems(representationObject, groupIds[i]);
+			//	}
 
-				for (int j = 0; j < groupItems.count(); j++){
-					if (!m_items.contains(groupItems[j])){
-						groupItems[j]->setPos(groupItems[j]->pos().x(), -150 - i*300);
-						groupItems[j]->setZValue(1);
-					}
-				}
+			//	for (int j = 0; j < groupItems.count(); j++){
+			//		if (!m_items.contains(groupItems[j])){
+			//			groupItems[j]->setPos(groupItems[j]->pos().x(), -150 - i*300);
+			//			groupItems[j]->setZValue(1);
+			//		}
+			//	}
 
-				items += groupItems;
-			}
+			//	items += groupItems;
+			//}
 		}
 
 		GraphicsItemList::iterator it = m_items.begin();

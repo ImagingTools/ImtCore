@@ -6,7 +6,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/IRepresentationFactory.h>
+#include <imtloggui/CRepresentationCompBase.h>
 #include <imtlog/IEventFilter.h>
 #include <imtlog/IEventProvider.h>
 #include <imtlog/IStorage.h>
@@ -16,24 +16,25 @@ namespace imtloggui
 {
 
 
-class CRepresentationEventsFactoryComp:
-			public icomp::CComponentBase,
-			virtual public IRepresentationFactory
+class CRepresentationEventsComp: public CRepresentationCompBase
 {
 public:
-	typedef CComponentBase BaseClass;
+	typedef CRepresentationCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationEventsFactoryComp)
-		I_REGISTER_INTERFACE(IRepresentationFactory);
-		I_ASSIGN(m_messageHistoryProviderCompPtr, "MessageHistoryProvider", "Message history provider", true, "");
-		I_ASSIGN(m_storageCompPtr, "Storage", "Storage", true, "Storage");
+	I_BEGIN_COMPONENT(CRepresentationEventsComp)
 	I_END_COMPONENT
 
-	// reimplemented (imtloggui::IRepresentationViewFactory)
-	virtual RepresentationObjectPtr CreateRepresentationObject(
-				const imtlog::CTimeRange& timeRange,
-				const QList<int>& messageIdList,
-				imtlog::IEventFilter::FilterMode filterMode) const override;
+	// reimplemented (ilog::IMessageConsumer)
+	virtual bool IsMessageSupported(
+				int messageCategory = -1,
+				int messageId = -1,
+				const istd::IInformationProvider* messagePtr = nullptr) const override;
+	virtual void AddMessage(const MessagePtr& messagePtr) override;
+
+	// reimplemented (imtloggui::IRepresentation)
+
+	// reimplemented (icomp::CComponentBase)
+	//virtual void OnComponentCreated() override;
 
 private:
 	class Filter: public imtlog::IEventFilter
@@ -60,8 +61,7 @@ private:
 	};
 
 private:
-	I_REF(imtlog::IEventProvider, m_messageHistoryProviderCompPtr);
-	I_REF(imtlog::IStorage, m_storageCompPtr);
+	mutable istd::TSmartPtr<istd::IChangeable> m_modelPtr;
 };
 
 

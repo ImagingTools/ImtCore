@@ -9,12 +9,14 @@
 // ImtCore includes
 #include <imtlog/ITimeRangeProvider.h>
 #include <imtloggui/IGraphicsItemProvider.h>
+#include <imtloggui/IRepresentationViewChangeNotifier.h>
 #include <imtloggui/IViewPropertyProvider.h>
 #include <imtloggui/IViewPropertyManager.h>
 #include <imtloggui/IGroupProvider.h>
+#include <imtloggui/IGroupViewProvider.h>
 #include <imtloggui/IEventNavigationController.h>
 #include <imtloggui/IEventScenePositionProvider.h>
-#include <imtloggui/IRepresentationViewFactory.h>
+#include <imtloggui/IRepresentationView.h>
 #include <imtloggui/CTimeAxis.h>
 #include <imtloggui/CEventGroupLabelItem.h>
 
@@ -40,7 +42,7 @@ public:
 		I_REGISTER_SUBELEMENT(ScenePositionProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(ScenePositionProvider, IEventScenePositionProvider, ExtractPositionProvider);
 		I_ASSIGN(m_groupProviderCompPtr, "GroupProvider", "Event groups provider", false, "GroupProvider");
-		I_ASSIGN(m_representationViewFactoryCompPtr, "RepresentationViewFactory", "Representation view factory", true, "RepresentationViewFactory");
+		I_ASSIGN(m_groupViewProviderCompPtr, "GroupViewProvider", "Event groups view provider", false, "GroupProvider");
 		I_ASSIGN(m_viewPropertyProviderCompPtr, "GraphicsViewPropertyProvider", "Graphics view property provider", true, "GraphicsViewPropertyProvider");
 		I_ASSIGN_TO(m_viewPropertyModelCompPtr, m_viewPropertyProviderCompPtr, true);
 		I_ASSIGN_TO(m_viewPropertyManagerCompPtr, m_viewPropertyProviderCompPtr, true);
@@ -57,6 +59,7 @@ public:
 	virtual void JumpToLastEvent() const override;
 
 	// reimplemented (imtloggui::IGraphicsItemProvider)
+	virtual GraphicsItemList GetItems() const override;
 	virtual GraphicsItemList GetAddedItems() const override;
 	virtual GraphicsItemList GetRemovedItems() const override;
 
@@ -108,6 +111,8 @@ private:
 		CGraphicsControllerComp* m_parent;
 	};
 
+	//class 
+
 	struct GroupItem
 	{
 		QByteArray id;
@@ -118,8 +123,8 @@ private:
 
 private:
 	I_REF(IGroupProvider, m_groupProviderCompPtr);
+	I_REF(IGroupViewProvider, m_groupViewProviderCompPtr);
 	I_REF(IEventScenePositionProvider, m_positionProviderCompPtr);
-	I_REF(IRepresentationViewFactory, m_representationViewFactoryCompPtr);
 	I_REF(IViewPropertyProvider, m_viewPropertyProviderCompPtr);
 	I_REF(imod::IModel, m_viewPropertyModelCompPtr);
 	I_REF(IViewPropertyManager, m_viewPropertyManagerCompPtr);

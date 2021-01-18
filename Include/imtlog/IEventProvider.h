@@ -23,7 +23,7 @@ public:
 	};
 
 	typedef istd::TSmartPtr<IEventFilter> EventFilterPtr;
-	typedef istd::TSmartPtr<ilog::CMessageContainer> EventContainerPtr;
+	typedef istd::TSmartPtr<ilog::IMessageContainer> EventContainerPtr;
 
 	virtual EventContainerPtr GetEvents(EventFilterPtr filterPtr) const = 0;
 };

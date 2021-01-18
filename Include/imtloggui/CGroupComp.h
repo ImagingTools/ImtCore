@@ -6,7 +6,6 @@
 
 // ImtCore includes
 #include <imtloggui/ILayerProvider.h>
-#include <imtloggui/IRepresentationFactoryProvider.h>
 
 
 namespace imtloggui
@@ -26,12 +25,12 @@ public:
 		I_ASSIGN_MULTI_0(m_messageIdListAttrPtr, "MessageIdList", "Supported message id's. Empty list for any", false);
 		I_ASSIGN_MULTI_0(m_idAttrPtr, "LayerIds", "Layer ids", false);
 		I_ASSIGN_MULTI_0(m_nameAttrPtr, "LayerNames", "Layer names", false);
-		I_ASSIGN_MULTI_0(m_factoryProviderCompPtr, "RepresentationFactoryProviders", "Representation factory providers", false);
 		I_ASSIGN_MULTI_0(m_minTimeSpanAttrPtr, "MinimumTimeSpan", "Minimum visual time span for layer", false);
+		I_ASSIGN_MULTI_0(m_providerCompPtr, "RepresentationProviders", "Representation providers", false);
 	I_END_COMPONENT
 
 	// reimplemented (imtloggui::ILayerProvider)
-	virtual IRepresentationFactoryProvider* GetRepresentationFactoryProvider(const QByteArray& id) const override;
+	virtual IRepresentationProvider* GetRepresentationProvider(const QByteArray& id) const override;
 	virtual QList<int> GetMessageIdList() const override;
 	virtual QByteArray GetIdForTimeSpan(uint64_t msecs) const override;
 
@@ -51,7 +50,7 @@ private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
 	I_MULTIATTR(double, m_minTimeSpanAttrPtr);
-	I_MULTIREF(IRepresentationFactoryProvider, m_factoryProviderCompPtr);
+	I_MULTIREF(IRepresentationProvider, m_providerCompPtr);
 
 	QMap<uint64_t, QByteArray> m_arrangedIds;
 };

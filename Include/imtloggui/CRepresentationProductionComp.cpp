@@ -1,4 +1,4 @@
-#include <imtloggui/CRepresentationProductionFactoryComp.h>
+#include <imtloggui/CRepresentationProductionComp.h>
 
 
 // ACF includes
@@ -17,7 +17,7 @@ namespace imtloggui
 
 // reimplemented (ilog::IMessageConsumer)
 
-bool CRepresentationProductionFactoryComp::IsMessageSupported(
+bool CRepresentationProductionComp::IsMessageSupported(
 			int messageCategory,
 			int messageId,
 			const istd::IInformationProvider* messagePtr) const
@@ -26,13 +26,13 @@ bool CRepresentationProductionFactoryComp::IsMessageSupported(
 }
 
 
-void CRepresentationProductionFactoryComp::AddMessage(const MessagePtr& messagePtr)
+void CRepresentationProductionComp::AddMessage(const MessagePtr& messagePtr)
 {
 	if (messagePtr->GetInformationId() != 19780000){
 		return;
 	}
 
-	CRepresentationProductionFactoryComp* modelPtr = dynamic_cast<CRepresentationProductionFactoryComp*>(m_modelPtr.GetPtr());
+	CRepresentationProductionComp* modelPtr = dynamic_cast<CRepresentationProductionComp*>(m_modelPtr.GetPtr());
 	Q_ASSERT(modelPtr != nullptr);
 
 	modelPtr->AddMessage(messagePtr);
@@ -41,18 +41,18 @@ void CRepresentationProductionFactoryComp::AddMessage(const MessagePtr& messageP
 
 // reimplemented (imtloggui::IRepresentationFactory)
 
-IRepresentationFactory::RepresentationObjectPtr CRepresentationProductionFactoryComp::CreateRepresentationObject(
-			const imtlog::CTimeRange& timeRange,
-			const QList<int>& messageIdList,
-			imtlog::IEventFilter::FilterMode filterMode) const
-{
-	return m_modelPtr;
-}
+//IRepresentation::RepresentationObjectPtr CRepresentationProductionComp::CreateRepresentationObject(
+//			const imtlog::CTimeRange& timeRange,
+//			const QList<int>& messageIdList,
+//			imtlog::IEventFilter::FilterMode filterMode) const
+//{
+//	return m_modelPtr;
+//}
 
 
 // reimplemented (icomp::CComponentBase)
 
-void CRepresentationProductionFactoryComp::OnComponentCreated()
+void CRepresentationProductionComp::OnComponentCreated()
 {
 	CRepresentationProductionModel* modelPtr = new CRepresentationProductionModel(*m_granularityAttrPtr * 1000);
 	m_modelPtr = istd::TSmartPtr<istd::IChangeable>(modelPtr);
@@ -62,7 +62,7 @@ void CRepresentationProductionFactoryComp::OnComponentCreated()
 	imtlog::IEventProvider::EventFilterPtr filterPtr =
 				imtlog::IEventProvider::EventFilterPtr(new Filter(m_timeRangeProviderCompPtr->GetTimeRange(), {19780000}, imtlog::IEventFilter::FM_INCLUDE));
 
-	imtlog::IEventProvider::EventContainerPtr container = m_messageHistoryProviderCompPtr->GetEvents(filterPtr);
+	imtlog::IEventProvider::EventContainerPtr container = m_eventProviderCompPtr->GetEvents(filterPtr);
 
 	for (ilog::IMessageConsumer::MessagePtr message : container->GetMessages()){
 		modelPtr->AddMessage(message);
@@ -74,7 +74,7 @@ void CRepresentationProductionFactoryComp::OnComponentCreated()
 
 // reimplemented (imtlog::IMessageFilter)
 
-bool CRepresentationProductionFactoryComp::Filter::IsMessageAccepted(const istd::IInformationProvider* messagePtr) const
+bool CRepresentationProductionComp::Filter::IsMessageAccepted(const istd::IInformationProvider* messagePtr) const
 {
 	if (m_timeRange.IsClosed() && !m_timeRange.Contains(messagePtr->GetInformationTimeStamp())){
 		return false;
@@ -92,7 +92,7 @@ bool CRepresentationProductionFactoryComp::Filter::IsMessageAccepted(const istd:
 }
 
 
-QList<int> CRepresentationProductionFactoryComp::Filter::GetGroupMessageIds() const
+QList<int> CRepresentationProductionComp::Filter::GetGroupMessageIds() const
 {
 	return m_messageIdList;
 }
@@ -100,7 +100,7 @@ QList<int> CRepresentationProductionFactoryComp::Filter::GetGroupMessageIds() co
 
 // reimplemented (imtlog::ITimeRangeProvider)
 
-imtlog::CTimeRange CRepresentationProductionFactoryComp::Filter::GetTimeRange() const
+imtlog::CTimeRange CRepresentationProductionComp::Filter::GetTimeRange() const
 {
 	return m_timeRange;
 }

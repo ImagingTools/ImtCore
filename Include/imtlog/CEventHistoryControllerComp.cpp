@@ -230,7 +230,7 @@ void CEventHistoryControllerComp::OnRequestFinished(QByteArray requestId)
 	QMutexLocker locker(&m_requestMutex);
 
 	if (m_requests.contains(requestId)){
-		m_requests[requestId].groupPtr->PopResult(requestId, *m_requests[requestId].resultEventsPtr);
+		m_requests[requestId].groupPtr->PopResult(requestId, *(dynamic_cast<ilog::CMessageContainer*>(m_requests[requestId].resultEventsPtr.GetPtr())));
 		m_requests.remove(requestId);
 	}
 }

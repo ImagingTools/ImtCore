@@ -1,8 +1,4 @@
-#include <imtloggui/CRepresentationEventsViewFactoryComp.h>
-
-
-// ACF includes
-#include <imtloggui/CRepresentationEventsObject.h>
+#include <imtloggui/CRepresentationEventsViewComp.h>
 
 
 namespace imtloggui
@@ -13,7 +9,13 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IRepresentationViewFactory)
 
-IRepresentationViewFactory::GraphicsItemList CRepresentationEventsViewFactoryComp::CreateGraphicItems(const istd::TSmartPtr<istd::IChangeable> objectPtr, const QByteArray& groupId) const
+bool CRepresentationEventsViewComp::SetModelPtr(imod::IModel* modelPtr)
+{
+	return false;
+}
+
+
+IRepresentationView::GraphicsItemList CRepresentationEventsViewComp::GetGraphicItems() const
 {
 	GraphicsItemList itemList;
 

@@ -169,11 +169,11 @@ void CEventHistoryReadJobController::ProcessJob(Job& job)
 				if (job.filterPtr.IsValid()){
 					if(		job.filterPtr->GetTimeRange().Contains(messages[i]->GetInformationTimeStamp()) &&
 							job.filterPtr->IsMessageAccepted(messages[i].GetPtr())){
-						job.eventContainerPtr->AddMessage(messages[i]);
+						dynamic_cast<ilog::CMessageContainer*>(job.eventContainerPtr.GetPtr())->AddMessage(messages[i]);
 					}
 				}
 				else{
-					job.eventContainerPtr->AddMessage(messages[i]);
+					dynamic_cast<ilog::CMessageContainer*>(job.eventContainerPtr.GetPtr())->AddMessage(messages[i]);
 				}
 			}
 

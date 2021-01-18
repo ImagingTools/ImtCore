@@ -6,36 +6,27 @@
 
 // Acf includes
 #include <ilog/IMessageContainer.h>
-#include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/IRepresentationFactory.h>
+#include <imtloggui/IRepresentation.h>
 #include <imtlog/IEventFilter.h>
 #include <imtlog/IEventProvider.h>
 #include <imtlog/IStorage.h>
 #include <imtlog/ITimeRangeProvider.h>
-#include <imtloggui/CRepresentationProductionModel.h>
+#include <imtloggui/CRepresentationCompBase.h>
 
 
 namespace imtloggui
 {
 
 
-class CRepresentationProductionFactoryComp:
-			public icomp::CComponentBase,
-			virtual public IRepresentationFactory,
-			virtual public ilog::IMessageConsumer
+class CRepresentationProductionComp: public CRepresentationCompBase
 {
 public:
-	typedef CComponentBase BaseClass;
+	typedef CRepresentationCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationProductionFactoryComp)
-		I_REGISTER_INTERFACE(IRepresentationFactory);
-		I_REGISTER_INTERFACE(IMessageConsumer);
+	I_BEGIN_COMPONENT(CRepresentationProductionComp)
 		I_ASSIGN(m_granularityAttrPtr, "Granularity", "Statistics time granularity in seconds", true, 60);
-		I_ASSIGN(m_messageHistoryProviderCompPtr, "MessageHistoryProvider", "Message history provider", true, "");
-		I_ASSIGN_TO(m_timeRangeProviderCompPtr, m_messageHistoryProviderCompPtr, true);
-		I_ASSIGN(m_storageCompPtr, "Storage", "Storage", true, "Storage");
 	I_END_COMPONENT
 
 	// reimplemented (ilog::IMessageConsumer)
@@ -45,11 +36,8 @@ public:
 				const istd::IInformationProvider* messagePtr = nullptr) const override;
 	virtual void AddMessage(const MessagePtr& messagePtr) override;
 
-	// reimplemented (imtloggui::IRepresentationViewFactory)
-	virtual RepresentationObjectPtr CreateRepresentationObject(
-				const imtlog::CTimeRange& timeRange,
-				const QList<int>& messageIdList,
-				imtlog::IEventFilter::FilterMode filterMode) const override;
+	// reimplemented (imtloggui::IRepresentation)
+
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -80,9 +68,6 @@ private:
 
 private:
 	I_ATTR(int, m_granularityAttrPtr);
-	I_REF(imtlog::IEventProvider, m_messageHistoryProviderCompPtr);
-	I_REF(imtlog::ITimeRangeProvider, m_timeRangeProviderCompPtr);
-	I_REF(imtlog::IStorage, m_storageCompPtr);
 
 	istd::TSmartPtr<istd::IChangeable> m_modelPtr;
 };

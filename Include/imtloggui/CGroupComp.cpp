@@ -7,11 +7,12 @@ namespace imtloggui
 
 // reimplemented (imtloggui::ILayerProvider)
 
-IRepresentationFactoryProvider* CGroupComp::GetRepresentationFactoryProvider(const QByteArray& id) const
+IRepresentationProvider* CGroupComp::GetRepresentationProvider(const QByteArray& id) const
 {
 	int index = GetIndex(id);
+
 	if (index >= 0){
-		return m_factoryProviderCompPtr[index];
+		return m_providerCompPtr[index];
 	}
 
 	return nullptr;

@@ -1,4 +1,4 @@
-#include <imtloggui/CRepresentationViewFactoryCompBase.h>
+#include <imtloggui/CRepresentationCompBase.h>
 
 
 namespace imtloggui

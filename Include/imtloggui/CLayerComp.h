@@ -5,8 +5,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/IRepresentationFactoryProvider.h>
-#include <imtloggui/IRepresentationFactory.h>
+#include <imtloggui/IRepresentationProvider.h>
 
 
 namespace imtloggui
@@ -15,21 +14,21 @@ namespace imtloggui
 
 class CLayerComp:
 			public icomp::CComponentBase,
-			virtual public IRepresentationFactoryProvider
+			virtual public IRepresentationProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CLayerComp)
-		I_REGISTER_INTERFACE(IRepresentationFactoryProvider);
+		I_REGISTER_INTERFACE(IRepresentationProvider);
 		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
-		I_ASSIGN_MULTI_0(m_idAttrPtr, "RepresentationFactoryIds", "Representation factory ids", false);
-		I_ASSIGN_MULTI_0(m_nameAttrPtr, "RepresentationFactoryNames", "Representation factory names", false);
-		I_ASSIGN_MULTI_0(m_factoriesCompPtr, "RepresentationFactories", "Representation factories", false);
+		I_ASSIGN_MULTI_0(m_idAttrPtr, "RepresentationIds", "Representation ids", false);
+		I_ASSIGN_MULTI_0(m_nameAttrPtr, "RepresentationNames", "Representation names", false);
+		I_ASSIGN_MULTI_0(m_representationCompPtr, "Representations", "Representations", false);
 	I_END_COMPONENT
 
 	// reimplemented (imtloggui::IRepresentationFactoryProvider)
-	virtual IRepresentationFactory* GetRepresentationFactory(const QByteArray& id) const override;
+	virtual IRepresentation* GetRepresentation(const QByteArray& id) const override;
 
 	// reimplemented (imtbase::ICollectionInfo)
 	virtual Ids GetElementIds() const override;
@@ -42,7 +41,7 @@ private:
 private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
-	I_MULTIREF(IRepresentationFactory, m_factoriesCompPtr);
+	I_MULTIREF(IRepresentation, m_representationCompPtr);
 };
 
 

@@ -4,29 +4,32 @@
 // Qt includes
 #include <QtWidgets/QGraphicsItem>
 
-// Acf includes
+// ACF includes
 #include <icomp/CComponentBase.h>
+#include <imod/TSingleModelObserverBase.h>
 
 // ImtCore includes
+#include <imtloggui/IEventItem.h>
 #include <imtloggui/IEventItemFactory.h>
-#include <imtloggui/CRepresentationViewFactoryCompBase.h>
+#include <imtloggui/CRepresentationViewCompBase.h>
 
 
 namespace imtloggui
 {
 
 
-class CRepresentationEventsViewFactoryComp: public imtloggui::CRepresentationViewFactoryCompBase
+class CRepresentationEventsViewComp: public imtloggui::CRepresentationViewCompBase
 {
 public:
-	typedef CRepresentationViewFactoryCompBase BaseClass;
+	typedef CRepresentationViewCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationEventsViewFactoryComp)
+	I_BEGIN_COMPONENT(CRepresentationEventsViewComp)
 		I_ASSIGN(m_eventItemFactoryCompPtr, "EventItemFactory", "Event item factory component", false, "");
 	I_END_COMPONENT
 
-	// reimplemented (imtloggui::IRepresentationViewFactory)
-	virtual GraphicsItemList CreateGraphicItems(const istd::TSmartPtr<istd::IChangeable> objectPtr, const QByteArray& groupId) const override;
+	// reimplemented (imtloggui::IRepresentationView)
+	virtual bool SetModelPtr(imod::IModel* modelPtr) override;
+	virtual GraphicsItemList GetGraphicItems() const override;
 
 private:
 	I_REF(IEventItemFactory, m_eventItemFactoryCompPtr);

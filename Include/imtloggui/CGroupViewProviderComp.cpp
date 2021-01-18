@@ -1,4 +1,4 @@
-#include <imtloggui/CGroupProviderComp.h>
+#include <imtloggui/CGroupViewProviderComp.h>
 
 
 namespace imtloggui
@@ -7,7 +7,7 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IGroupProvider)
 
-ILayerProvider* CGroupProviderComp::GetLayerProvider(const QByteArray& id) const
+ILayerViewProvider* CGroupViewProviderComp::GetLayerViewProvider(const QByteArray& id) const
 {
 	int index = GetIndex(id);
 	if (index >= 0){
@@ -20,7 +20,7 @@ ILayerProvider* CGroupProviderComp::GetLayerProvider(const QByteArray& id) const
 
 // reimplemented (imtbase::ICollectionInfo)
 
-imtbase::ICollectionInfo::Ids CGroupProviderComp::GetElementIds() const
+imtbase::ICollectionInfo::Ids CGroupViewProviderComp::GetElementIds() const
 {
 	int count = GetCount();
 
@@ -33,36 +33,24 @@ imtbase::ICollectionInfo::Ids CGroupProviderComp::GetElementIds() const
 }
 
 
-QVariant CGroupProviderComp::GetElementInfo(const QByteArray& elementId, int infoType) const
+QVariant CGroupViewProviderComp::GetElementInfo(const QByteArray& elementId, int infoType) const
 {
-	int index = GetIndex(elementId);
-
-	QVariant retVal;
-
-	if (index >= 0){
-		switch (infoType){
-		case EIT_NAME:
-			retVal = m_nameAttrPtr[index];
-			break;
-		}
-	}
-
-	return retVal;
+	return QVariant();
 }
 
 
 // private methods
 
-int CGroupProviderComp::GetCount() const
+int CGroupViewProviderComp::GetCount() const
 {
-	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
+	int count = qMin(m_idAttrPtr.GetCount(), m_colourAttrPtr.GetCount());
 	count = qMin(count, m_providersCompPtr.GetCount());
 
 	return count;
 }
 
 
-int CGroupProviderComp::GetIndex(const QByteArray& id) const
+int CGroupViewProviderComp::GetIndex(const QByteArray& id) const
 {
 	int count = GetCount();
 
