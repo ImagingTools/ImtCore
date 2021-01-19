@@ -1,8 +1,8 @@
 #pragma once
 
 
-// ACF Includes
-#include <imod/IModel.h>
+// ACF includes
+#include <istd/IChangeable.h>
 #include <imod/IObserver.h>
 
 
@@ -12,7 +12,6 @@ namespace imtloggui
 
 class IRepresentation: virtual public istd::IChangeable
 {
-	virtual imod::IModel* GetRepresentationModel() = 0;
 	virtual imod::IObserver* GetTimeRangeObserver() = 0;
 };
 

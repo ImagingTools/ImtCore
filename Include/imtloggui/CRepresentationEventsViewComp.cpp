@@ -7,17 +7,11 @@ namespace imtloggui
 
 // public methods
 
-// reimplemented (imtloggui::IRepresentationViewFactory)
+// reimplemented (imtloggui::IRepresentationView)
 
-bool CRepresentationEventsViewComp::SetModelPtr(imod::IModel* modelPtr)
+imod::IObserver* CRepresentationEventsViewComp::GetRepresentationObserver()
 {
-	return false;
-}
-
-
-IRepresentationView::GraphicsItemList CRepresentationEventsViewComp::GetGraphicItems() const
-{
-	GraphicsItemList itemList;
+	//GraphicsItemList itemList;
 
 	//const CRepresentationEventsObject* representationObjectPtr = dynamic_cast<const CRepresentationEventsObject*>(objectPtr.GetPtr());
 	//if (representationObjectPtr != nullptr){
@@ -64,7 +58,27 @@ IRepresentationView::GraphicsItemList CRepresentationEventsViewComp::GetGraphicI
 	//	}
 	//}
 
-	return itemList;
+	return nullptr;
+}
+
+
+// reimplemented (imtloggui::IRepresentationView)
+
+IGraphicsItemProvider::GraphicsItemList CRepresentationEventsViewComp::GetItems() const
+{
+	return GraphicsItemList();
+}
+
+
+IGraphicsItemProvider::GraphicsItemList CRepresentationEventsViewComp::GetAddedItems() const
+{
+	return GraphicsItemList();
+}
+
+
+IGraphicsItemProvider::GraphicsItemList CRepresentationEventsViewComp::GetRemovedItems() const
+{
+	return GraphicsItemList();
 }
 
 

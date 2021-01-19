@@ -5,7 +5,8 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/ILayerViewProvider.h>
+#include <imtloggui/IGroupView.h>
+#include <imtloggui/CProviderBase.h>
 
 
 namespace imtloggui
@@ -14,23 +15,28 @@ namespace imtloggui
 
 class CGroupViewComp:
 			public icomp::CComponentBase,
-			virtual public ILayerViewProvider
+			public CProviderBase,
+			virtual public IGroupView
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGroupViewComp)
-		I_REGISTER_INTERFACE(ILayerViewProvider);
-		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
+		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
+		I_REGISTER_INTERFACE(IGroupView);
 		I_ASSIGN_MULTI_0(m_idAttrPtr, "LayerIds", "Layer ids", false);
-		I_ASSIGN_MULTI_0(m_providerCompPtr, "RepresentationViewProviders", "Representation factory view providers", false);
+		I_ASSIGN(m_colorAttrPtr, "GroupBgColor", "Group view background color", false, "");
+		I_ASSIGN_MULTI_0(m_layerViewCompPtr, "RepresentationViewProviders", "Representation factory view providers", false);
 	I_END_COMPONENT
 
-	// reimplemented (imtloggui::ILayerProvider)
-	virtual IRepresentationViewProvider* GetRepresentationViewProvider(const QByteArray& id) const override;
+	// reimplemented (imtloggui::IGroupView)
+	virtual QColor GetBackgroundColor() const override;
+
+	// reimplemented (imtbase::IObjectCollection)
+	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 
 	// reimplemented (imtbase::ICollectionInfo)
-	virtual Ids GetElementIds() const override;
+	virtual imtbase::ICollectionInfo::Ids GetElementIds() const override;
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
 
 private:
@@ -39,7 +45,9 @@ private:
 
 private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
-	I_MULTIREF(IRepresentationViewProvider, m_providerCompPtr);
+	I_MULTIATTR(QString, m_nameAttrPtr);
+	I_ATTR(QString, m_colorAttrPtr);
+	I_MULTIREF(imtbase::IObjectCollection, m_layerViewCompPtr);
 };
 
 

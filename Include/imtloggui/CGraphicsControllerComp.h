@@ -13,7 +13,7 @@
 //#include <imtloggui/IChangeNotifier.h>
 #include <imtloggui/IViewPropertyProvider.h>
 #include <imtloggui/IViewPropertyManager.h>
-#include <imtloggui/IGroupViewProvider.h>
+//#include <imtloggui/IGroupViewProvider.h>
 #include <imtloggui/IEventNavigationController.h>
 #include <imtloggui/IEventScenePositionProvider.h>
 #include <imtloggui/IRepresentationView.h>

@@ -1,26 +1,21 @@
 #pragma once
 
 
-// Qt Includes
-#include <QtWidgets/QGraphicsItem.h>
+// ACF includes
+#include <imod/IObserver.h>
 
-// ACF Includes
-#include <istd/TSmartPtr.h>
-#include <imod/IModel.h>
+// ImtCore includes
+#include <imtloggui/IGraphicsItemProvider.h>
 
 
 namespace imtloggui
 {
 
 
-class IRepresentationView: virtual public istd::IPolymorphic
+class IRepresentationView: virtual public IGraphicsItemProvider
 {
 public:
-	typedef istd::TSmartPtr<QGraphicsItem> GraphicsItem;
-	typedef QList<GraphicsItem> GraphicsItemList;
-
-	virtual bool SetModelPtr(imod::IModel* modelPtr) = 0;
-	virtual GraphicsItemList GetGraphicItems() const = 0;
+	virtual imod::IObserver* GetRepresentationObserver() = 0;
 };
 
 

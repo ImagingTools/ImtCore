@@ -7,11 +7,11 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IGroupProvider)
 
-ILayerViewProvider* CGroupViewProviderComp::GetLayerViewProvider(const QByteArray& id) const
+const istd::IChangeable* CGroupViewProviderComp::GetObjectPtr(const QByteArray& objectId) const
 {
-	int index = GetIndex(id);
+	int index = GetIndex(objectId);
 	if (index >= 0){
-		return m_providersCompPtr[index];
+		return m_groupViewCompPtr[index];
 	}
 
 	return nullptr;
@@ -35,7 +35,19 @@ imtbase::ICollectionInfo::Ids CGroupViewProviderComp::GetElementIds() const
 
 QVariant CGroupViewProviderComp::GetElementInfo(const QByteArray& elementId, int infoType) const
 {
-	return QVariant();
+	int index = GetIndex(elementId);
+
+	QVariant retVal;
+
+	if (index >= 0){
+		switch (infoType){
+		case EIT_NAME:
+			retVal = m_nameAttrPtr[index];
+			break;
+		}
+	}
+
+	return retVal;
 }
 
 
@@ -43,8 +55,8 @@ QVariant CGroupViewProviderComp::GetElementInfo(const QByteArray& elementId, int
 
 int CGroupViewProviderComp::GetCount() const
 {
-	int count = qMin(m_idAttrPtr.GetCount(), m_colourAttrPtr.GetCount());
-	count = qMin(count, m_providersCompPtr.GetCount());
+	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
+	count = qMin(count, m_groupViewCompPtr.GetCount());
 
 	return count;
 }

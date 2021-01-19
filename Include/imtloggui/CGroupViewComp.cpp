@@ -1,17 +1,32 @@
 #include <imtloggui/CGroupViewComp.h>
 
+// Qt includes
+#include <QtGui/QColor>
+
 
 namespace imtloggui
 {
 
 
-// reimplemented (imtloggui::IViewLayerProvider)
-
-IRepresentationViewProvider* CGroupViewComp::GetRepresentationViewProvider(const QByteArray& id) const
+QColor CGroupViewComp::GetBackgroundColor() const
 {
-	int index = GetIndex(id);
+	QColor color(Qt::transparent);
+
+	if (m_colorAttrPtr.IsValid()){
+		color = QColor(*m_colorAttrPtr);
+	}
+
+	return color;
+}
+
+
+// reimplemented (imtbase::IObjectCollection)
+
+const istd::IChangeable* CGroupViewComp::GetObjectPtr(const QByteArray& objectId) const
+{
+	int index = GetIndex(objectId);
 	if (index >= 0){
-		return m_providerCompPtr[index];
+		return m_layerViewCompPtr[index];
 	}
 
 	return nullptr;
@@ -22,7 +37,7 @@ IRepresentationViewProvider* CGroupViewComp::GetRepresentationViewProvider(const
 
 imtbase::ICollectionInfo::Ids CGroupViewComp::GetElementIds() const
 {
-	int count = qMin(m_idAttrPtr.GetCount(), m_providerCompPtr.GetCount());
+	int count = qMin(m_idAttrPtr.GetCount(), m_layerViewCompPtr.GetCount());
 
 	imtbase::ICollectionInfo::Ids retVal;
 	for (int i = 0; i < count; i++){
@@ -35,7 +50,19 @@ imtbase::ICollectionInfo::Ids CGroupViewComp::GetElementIds() const
 
 QVariant CGroupViewComp::GetElementInfo(const QByteArray& elementId, int infoType) const
 {
-	return QVariant();
+	int index = GetIndex(elementId);
+
+	QVariant retVal;
+
+	if (index >= 0){
+		switch (infoType){
+		case EIT_NAME:
+			retVal = m_nameAttrPtr[index];
+			break;
+		}
+	}
+
+	return retVal;
 }
 
 
@@ -43,7 +70,8 @@ QVariant CGroupViewComp::GetElementInfo(const QByteArray& elementId, int infoTyp
 
 int CGroupViewComp::GetCount() const
 {
-	return qMin(m_idAttrPtr.GetCount(), m_providerCompPtr.GetCount());
+	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
+	return qMin(count, m_layerViewCompPtr.GetCount());
 }
 
 

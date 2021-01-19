@@ -1,7 +1,7 @@
 #pragma once
 
 
-// Acf includes
+// ACF includes
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
@@ -22,13 +22,12 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CRepresentationViewCompBase)
 		I_REGISTER_INTERFACE(IRepresentationView);
+		I_REGISTER_INTERFACE(IGraphicsItemProvider);
 		I_ASSIGN(m_positionProviderCompPtr, "ScenePositionProvider", "Scene position provider", true, "ScenePositionProvider");
-		//I_ASSIGN(m_slaveFactoryCompPtr, "SlaveViewFactory", "Slave view factory", false, "");
 	I_END_COMPONENT
 
 protected:
 	I_REF(IEventScenePositionProvider, m_positionProviderCompPtr);
-	//I_REF(IRepresentationView, m_representationViewCompPtr);
 };
 
 

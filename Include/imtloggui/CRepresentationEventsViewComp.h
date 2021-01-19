@@ -1,15 +1,11 @@
 #pragma once
 
 
-// Qt includes
-#include <QtWidgets/QGraphicsItem>
-
 // ACF includes
 #include <icomp/CComponentBase.h>
 #include <imod/TSingleModelObserverBase.h>
 
 // ImtCore includes
-#include <imtloggui/IEventItem.h>
 #include <imtloggui/IEventItemFactory.h>
 #include <imtloggui/CRepresentationViewCompBase.h>
 
@@ -28,8 +24,12 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtloggui::IRepresentationView)
-	virtual bool SetModelPtr(imod::IModel* modelPtr) override;
-	virtual GraphicsItemList GetGraphicItems() const override;
+	virtual imod::IObserver* GetRepresentationObserver() override;
+
+	// reimplemented (imtloggui::IRepresentationView)
+	virtual GraphicsItemList GetItems() const override;
+	virtual GraphicsItemList GetAddedItems() const override;
+	virtual GraphicsItemList GetRemovedItems() const override;
 
 private:
 	I_REF(IEventItemFactory, m_eventItemFactoryCompPtr);

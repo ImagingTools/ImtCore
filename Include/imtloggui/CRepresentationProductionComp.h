@@ -30,7 +30,6 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtloggui::IRepresentation)
-	virtual imod::IModel* GetRepresentationModel() override;
 	virtual imod::IObserver* GetTimeRangeObserver() override;
 
 	// reimplemented (ilog::IMessageConsumer)

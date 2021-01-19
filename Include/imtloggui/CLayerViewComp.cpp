@@ -7,9 +7,11 @@ namespace imtloggui
 
 // reimplemented (imtloggui::ILayerProvider)
 
-IRepresentationView* CLayerViewComp::GetRepresentationView(const QByteArray& id) const
+// reimplemented (imtbase::IObjectCollection)
+
+const istd::IChangeable* CLayerViewComp::GetObjectPtr(const QByteArray& objectId) const
 {
-	int index = GetIndex(id);
+	int index = GetIndex(objectId);
 	if (index >= 0){
 		return m_representationViewCompPtr[index];
 	}
@@ -35,7 +37,19 @@ imtbase::ICollectionInfo::Ids CLayerViewComp::GetElementIds() const
 
 QVariant CLayerViewComp::GetElementInfo(const QByteArray& elementId, int infoType) const
 {
-	return QVariant();
+	int index = GetIndex(elementId);
+
+	QVariant retVal;
+
+	if (index >= 0){
+		switch (infoType){
+		case EIT_NAME:
+			retVal = m_nameAttrPtr[index];
+			break;
+		}
+	}
+
+	return retVal;
 }
 
 
@@ -43,7 +57,8 @@ QVariant CLayerViewComp::GetElementInfo(const QByteArray& elementId, int infoTyp
 
 int CLayerViewComp::GetCount() const
 {
-	return qMin(m_idAttrPtr.GetCount(), m_representationViewCompPtr.GetCount());
+	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
+	return qMin(count, m_representationViewCompPtr.GetCount());
 }
 
 

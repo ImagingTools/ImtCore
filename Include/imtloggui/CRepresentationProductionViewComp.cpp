@@ -19,16 +19,16 @@ namespace imtloggui
 
 // public methods
 
-// reimplemented (imtloggui::IRepresentationViewFactory)
+// reimplemented (imtloggui::IRepresentationView)
 
-bool CRepresentationProductionViewComp::SetModelPtr(imod::IModel* modelPtr)
+imod::IObserver* CRepresentationProductionViewComp::GetRepresentationObserver()
 {
-	return false;
+	return nullptr;
 }
 
 
-IRepresentationView::GraphicsItemList CRepresentationProductionViewComp::GetGraphicItems() const
-{
+//IRepresentationView::GraphicsItemList CRepresentationProductionViewComp::GetGraphicItems() const
+//{
 	//CRepresentationProductionModel* modelPtr = const_cast<CRepresentationProductionModel*>(
 	//				dynamic_cast<const CRepresentationProductionModel*>(objectPtr.GetPtr()));
 
@@ -74,7 +74,27 @@ IRepresentationView::GraphicsItemList CRepresentationProductionViewComp::GetGrap
 	//GraphicsItem item(itemPtr);
 	//m_items[groupId] = item;
 
-	return {}; //{item};
+//	return {}; //{item};
+//}
+
+
+// reimplemented (imtloggui::IRepresentationView)
+
+IGraphicsItemProvider::GraphicsItemList CRepresentationProductionViewComp::GetItems() const
+{
+	return GraphicsItemList();
+}
+
+
+IGraphicsItemProvider::GraphicsItemList CRepresentationProductionViewComp::GetAddedItems() const
+{
+	return GraphicsItemList();
+}
+
+
+IGraphicsItemProvider::GraphicsItemList CRepresentationProductionViewComp::GetRemovedItems() const
+{
+	return GraphicsItemList();
 }
 
 

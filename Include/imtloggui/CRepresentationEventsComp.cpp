@@ -14,12 +14,6 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IRepresentation)
 
-imod::IModel* CRepresentationEventsComp::GetRepresentationModel()
-{
-	return nullptr;
-}
-
-
 imod::IObserver* CRepresentationEventsComp::GetTimeRangeObserver()
 {
 	return nullptr;
@@ -30,10 +24,10 @@ imod::IObserver* CRepresentationEventsComp::GetTimeRangeObserver()
 
 bool CRepresentationEventsComp::IsMessageSupported(
 	int /*messageCategory*/,
-	int messageId,
+	int /*messageId*/,
 	const istd::IInformationProvider* messagePtr) const
 {
-	return (messageId && (messagePtr->GetInformationId() == 19780000));
+	return messagePtr->GetInformationId() == 19780000;
 }
 
 

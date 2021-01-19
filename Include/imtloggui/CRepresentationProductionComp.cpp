@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtlog/IEventProvider.h>
-#include <imtloggui/CRepresentationProductionModel.h>
+//#include <imtloggui/CRepresentationProductionModel.h>
 
 
 namespace imtloggui
@@ -17,12 +17,6 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IRepresentation)
 
-imod::IModel* CRepresentationProductionComp::GetRepresentationModel()
-{
-	return nullptr;
-}
-
-
 imod::IObserver* CRepresentationProductionComp::GetTimeRangeObserver()
 {
 	return nullptr;
@@ -32,8 +26,8 @@ imod::IObserver* CRepresentationProductionComp::GetTimeRangeObserver()
 // reimplemented (ilog::IMessageConsumer)
 
 bool CRepresentationProductionComp::IsMessageSupported(
-			int messageCategory,
-			int messageId,
+			int /*messageCategory*/,
+			int /*messageId*/,
 			const istd::IInformationProvider* messagePtr) const
 {
 	return messagePtr->GetInformationId() == 19780000;
