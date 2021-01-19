@@ -5,11 +5,25 @@ namespace imtloggui
 {
 
 
-// reimplemented (imtloggui::ILayerProvider)
+// public methods
 
-IRepresentation* CLayerComp::GetRepresentation(const QByteArray& id) const
+// reimplemented (imtloggui::ILayer)
+
+uint64_t CLayerComp::GetMinimumTimespan() const
 {
-	int index = GetIndex(id);
+	if (*m_minTimespanAttrPtr > 0){
+		return *m_minTimespanAttrPtr;
+	}
+	else{
+		return 1000;
+	}
+}
+
+// reimplemented (imtbase::IObjectCollection)
+
+const istd::IChangeable* CLayerComp::GetObjectPtr(const QByteArray& objectId) const
+{
+	int index = GetIndex(objectId);
 	if (index >= 0){
 		return m_representationCompPtr[index];
 	}
@@ -55,7 +69,8 @@ QVariant CLayerComp::GetElementInfo(const QByteArray& elementId, int infoType) c
 
 int CLayerComp::GetCount() const
 {
-	return qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
+	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
+	return qMin(count, m_representationCompPtr.GetCount());
 }
 
 

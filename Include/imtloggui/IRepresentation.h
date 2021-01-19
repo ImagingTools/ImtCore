@@ -1,25 +1,19 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QDateTime.h>
-
 // ACF Includes
-#include <istd/TSmartPtr.h>
-#include <ilog/IMessageContainer.h>
-
-// ImtCore includes
-#include <imtlog/IEventFilter.h>
-#include <imtlog/CTimeRange.h>
+#include <imod/IModel.h>
+#include <imod/IObserver.h>
 
 
 namespace imtloggui
 {
 
 
-class IRepresentation: virtual public istd::IPolymorphic
+class IRepresentation: virtual public istd::IChangeable
 {
-
+	virtual imod::IModel* GetRepresentationModel() = 0;
+	virtual imod::IObserver* GetTimeRangeObserver() = 0;
 };
 
 

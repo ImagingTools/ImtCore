@@ -24,6 +24,10 @@ public:
 	I_BEGIN_COMPONENT(CRepresentationEventsComp)
 	I_END_COMPONENT
 
+	// reimplemented (imtloggui::IRepresentation)
+	virtual imod::IModel* GetRepresentationModel() override;
+	virtual imod::IObserver* GetTimeRangeObserver() override;
+
 	// reimplemented (ilog::IMessageConsumer)
 	virtual bool IsMessageSupported(
 				int messageCategory = -1,
@@ -31,10 +35,8 @@ public:
 				const istd::IInformationProvider* messagePtr = nullptr) const override;
 	virtual void AddMessage(const MessagePtr& messagePtr) override;
 
-	// reimplemented (imtloggui::IRepresentation)
-
 	// reimplemented (icomp::CComponentBase)
-	//virtual void OnComponentCreated() override;
+	virtual void OnComponentCreated() override;
 
 private:
 	class Filter: public imtlog::IEventFilter

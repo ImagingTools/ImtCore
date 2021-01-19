@@ -18,6 +18,14 @@ CGraphicsControllerComp::CGraphicsControllerComp()
 }
 
 
+// reimplemented (imtloggui::ITimeRangeProvider)
+
+//imtlog::CTimeRange CGraphicsControllerComp::GetTimeRange() const
+//{
+//	return imtlog::CTimeRange(m_timeAxisPtr->GetVisibleBeginTime(), m_timeAxisPtr->GetVisibleEndTime());
+//}
+
+
 // reimplemented (imtloggui::IEventNavigationController)
 
 void CGraphicsControllerComp::JumpToFirstEvent() const
@@ -178,18 +186,18 @@ void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* proper
 		GraphicsItemList items;
 
 		for (int i = 0; i < groupIds.count(); i++){
-			ILayerProvider* layerProvider = m_groupProviderCompPtr->GetLayerProvider(groupIds[i]);
-			imtbase::ICollectionInfo::Ids layerIds = layerProvider->GetElementIds();
-			QByteArray id = layerProvider->GetIdForTimeSpan(span);
-			IRepresentationProvider* representationProvider;// = layerProvider->GetRepresentationFactoryProvider(id);
-			imtbase::ICollectionInfo::Ids factoryIds = representationProvider->GetElementIds();
-			IRepresentation* representation;// = representationProvider->GetRepresentationFactory(factoryIds[0]);
+			//ILayerProvider* layerProvider;// = m_groupProviderCompPtr->GetLayerProvider(groupIds[i]);
+			//imtbase::ICollectionInfo::Ids layerIds = layerProvider->GetElementIds();
+			//QByteArray id = layerProvider->GetIdForTimeSpan(span);
+			//IRepresentationProvider* representationProvider;// = layerProvider->GetRepresentationFactoryProvider(id);
+			//imtbase::ICollectionInfo::Ids factoryIds = representationProvider->GetElementIds();
+			//IRepresentation* representation;// = representationProvider->GetRepresentationFactory(factoryIds[0]);
 
 			QDateTime begin = m_timeAxisPtr->GetVisibleBeginTime();
 			QDateTime end = m_timeAxisPtr->GetVisibleEndTime();
 
 			if (i != groupIds.count() - 1){
-				allGroupsMessageIds.append(layerProvider->GetMessageIdList());
+				//allGroupsMessageIds.append(layerProvider->GetMessageIdList());
 			}
 
 			//if (m_representationViewCompPtr.IsValid()){

@@ -15,6 +15,20 @@ namespace imtloggui
 
 // public methods
 
+// reimplemented (imtloggui::IRepresentation)
+
+imod::IModel* CRepresentationProductionComp::GetRepresentationModel()
+{
+	return nullptr;
+}
+
+
+imod::IObserver* CRepresentationProductionComp::GetTimeRangeObserver()
+{
+	return nullptr;
+}
+
+
 // reimplemented (ilog::IMessageConsumer)
 
 bool CRepresentationProductionComp::IsMessageSupported(
@@ -54,19 +68,19 @@ void CRepresentationProductionComp::AddMessage(const MessagePtr& messagePtr)
 
 void CRepresentationProductionComp::OnComponentCreated()
 {
-	CRepresentationProductionModel* modelPtr = new CRepresentationProductionModel(*m_granularityAttrPtr * 1000);
-	m_modelPtr = istd::TSmartPtr<istd::IChangeable>(modelPtr);
+	//CRepresentationProductionModel* modelPtr = new CRepresentationProductionModel(*m_granularityAttrPtr * 1000);
+	//m_modelPtr = istd::TSmartPtr<istd::IChangeable>(modelPtr);
 
-	imtlog::CTimeRange timeRange = m_timeRangeProviderCompPtr->GetTimeRange();
+	//imtlog::CTimeRange timeRange = m_timeRangeProviderCompPtr->GetTimeRange();
 
-	imtlog::IEventProvider::EventFilterPtr filterPtr =
-				imtlog::IEventProvider::EventFilterPtr(new Filter(m_timeRangeProviderCompPtr->GetTimeRange(), {19780000}, imtlog::IEventFilter::FM_INCLUDE));
+	//imtlog::IEventProvider::EventFilterPtr filterPtr =
+	//			imtlog::IEventProvider::EventFilterPtr(new Filter(m_timeRangeProviderCompPtr->GetTimeRange(), {19780000}, imtlog::IEventFilter::FM_INCLUDE));
 
-	imtlog::IEventProvider::EventContainerPtr container = m_eventProviderCompPtr->GetEvents(filterPtr);
+	//imtlog::IEventProvider::EventContainerPtr container = m_eventProviderCompPtr->GetEvents(filterPtr);
 
-	for (ilog::IMessageConsumer::MessagePtr message : container->GetMessages()){
-		modelPtr->AddMessage(message);
-	}
+	//for (ilog::IMessageConsumer::MessagePtr message : container->GetMessages()){
+	//	modelPtr->AddMessage(message);
+	//}
 }
 
 

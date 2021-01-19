@@ -5,7 +5,8 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/IGroupProvider.h>
+#include <imtloggui/IGroup.h>
+#include <imtloggui/CProviderBase.h>
 
 
 namespace imtloggui
@@ -14,21 +15,20 @@ namespace imtloggui
 
 class CGroupProviderComp:
 			public icomp::CComponentBase,
-			virtual public IGroupProvider
+			public CProviderBase
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGroupProviderComp)
-		I_REGISTER_INTERFACE(IGroupProvider);
-		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
+		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
 		I_ASSIGN_MULTI_0(m_idAttrPtr, "GroupIds", "Group ids", false);
 		I_ASSIGN_MULTI_0(m_nameAttrPtr, "GroupNames", "Group names", false);
-		I_ASSIGN_MULTI_0(m_providersCompPtr, "LayerProviders", "Layer providers", false);
+		I_ASSIGN_MULTI_0(m_groupCompPtr, "Groups", "Groups", false);
 	I_END_COMPONENT
 
-	// reimplemented (imtloggui::IGroupProvider)
-	virtual ILayerProvider* GetLayerProvider(const QByteArray& id) const override;
+	// reimplemented (imtbase::IObjectCollection)
+	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 
 	// reimplemented (imtbase::ICollectionInfo)
 	virtual Ids GetElementIds() const override;
@@ -41,7 +41,7 @@ private:
 private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
-	I_MULTIREF(ILayerProvider, m_providersCompPtr);
+	I_MULTIREF(IGroup, m_groupCompPtr);
 };
 
 

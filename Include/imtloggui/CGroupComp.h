@@ -5,7 +5,9 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/ILayerProvider.h>
+#include <imtloggui/IGroup.h>
+#include <imtloggui/ILayer.h>
+#include <imtloggui/CProviderBase.h>
 
 
 namespace imtloggui
@@ -14,28 +16,30 @@ namespace imtloggui
 
 class CGroupComp:
 			public icomp::CComponentBase,
-			virtual public ILayerProvider
+			public CProviderBase,
+			virtual public IGroup
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGroupComp)
-		I_REGISTER_INTERFACE(ILayerProvider);
-		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
-		I_ASSIGN_MULTI_0(m_messageIdListAttrPtr, "MessageIdList", "Supported message id's. Empty list for any", false);
+		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
+		I_REGISTER_INTERFACE(IGroup);
 		I_ASSIGN_MULTI_0(m_idAttrPtr, "LayerIds", "Layer ids", false);
 		I_ASSIGN_MULTI_0(m_nameAttrPtr, "LayerNames", "Layer names", false);
-		I_ASSIGN_MULTI_0(m_minTimeSpanAttrPtr, "MinimumTimeSpan", "Minimum visual time span for layer", false);
-		I_ASSIGN_MULTI_0(m_providerCompPtr, "RepresentationProviders", "Representation providers", false);
+		I_ASSIGN_MULTI_0(m_messageIdListAttrPtr, "MessageIdList", "Supported message id's. Empty list for any", false);
+		I_ASSIGN_MULTI_0(m_layerCompPtr, "Layers", "Layers", false);
 	I_END_COMPONENT
 
-	// reimplemented (imtloggui::ILayerProvider)
-	virtual IRepresentationProvider* GetRepresentationProvider(const QByteArray& id) const override;
-	virtual QList<int> GetMessageIdList() const override;
-	virtual QByteArray GetIdForTimeSpan(uint64_t msecs) const override;
+	// reimplemented (imtloggui::IGroup)
+	virtual QList<int> GetSupportedMessageIds() const override;
+	virtual QByteArray GetLayerIdForTimespan(uint64_t timespan) const override;
+
+	// reimplemented (imtbase::IObjectCollection)
+	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 
 	// reimplemented (imtbase::ICollectionInfo)
-	virtual Ids GetElementIds() const override;
+	virtual imtbase::ICollectionInfo::Ids GetElementIds() const override;
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
 
 	// reimplemented (icomp::CComponentBase)
@@ -46,11 +50,10 @@ private:
 	int GetIndex(const QByteArray& id) const;
 
 private:
-	I_MULTIATTR(int, m_messageIdListAttrPtr);
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
-	I_MULTIATTR(double, m_minTimeSpanAttrPtr);
-	I_MULTIREF(IRepresentationProvider, m_providerCompPtr);
+	I_MULTIATTR(int, m_messageIdListAttrPtr);
+	I_MULTIREF(ILayer, m_layerCompPtr);
 
 	QMap<uint64_t, QByteArray> m_arrangedIds;
 };

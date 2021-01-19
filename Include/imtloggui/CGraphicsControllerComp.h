@@ -7,12 +7,12 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
+#include <imtbase/IObjectCollection.h>
 #include <imtlog/ITimeRangeProvider.h>
 #include <imtloggui/IGraphicsItemProvider.h>
-#include <imtloggui/IRepresentationViewChangeNotifier.h>
+//#include <imtloggui/IChangeNotifier.h>
 #include <imtloggui/IViewPropertyProvider.h>
 #include <imtloggui/IViewPropertyManager.h>
-#include <imtloggui/IGroupProvider.h>
 #include <imtloggui/IGroupViewProvider.h>
 #include <imtloggui/IEventNavigationController.h>
 #include <imtloggui/IEventScenePositionProvider.h>
@@ -30,6 +30,7 @@ class CGraphicsControllerComp:
 			public icomp::CComponentBase,
 			virtual public IGraphicsItemProvider,
 			virtual public IEventNavigationController
+			//virtual public imtlog::ITimeRangeProvider
 {
 	Q_OBJECT
 
@@ -39,6 +40,7 @@ public:
 	I_BEGIN_COMPONENT(CGraphicsControllerComp)
 		I_REGISTER_INTERFACE(IGraphicsItemProvider);
 		I_REGISTER_INTERFACE(IEventNavigationController);
+		//I_REGISTER_INTERFACE(imtlog::ITimeRangeProvider);
 		I_REGISTER_SUBELEMENT(ScenePositionProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(ScenePositionProvider, IEventScenePositionProvider, ExtractPositionProvider);
 		I_ASSIGN(m_groupProviderCompPtr, "GroupProvider", "Event groups provider", false, "GroupProvider");
@@ -51,6 +53,9 @@ public:
 	I_END_COMPONENT
 
 	CGraphicsControllerComp();
+
+	// reimplemented (imtloggui::ITimeRangeProvider)
+	//imtlog::CTimeRange GetTimeRange() const override;
 
 	// reimplemented (imtloggui::IEventNavigationController)
 	virtual void JumpToFirstEvent() const override;
@@ -122,8 +127,8 @@ private:
 	};
 
 private:
-	I_REF(IGroupProvider, m_groupProviderCompPtr);
-	I_REF(IGroupViewProvider, m_groupViewProviderCompPtr);
+	I_REF(imtbase::IObjectCollection, m_groupProviderCompPtr);
+	I_REF(imtbase::IObjectCollection, m_groupViewProviderCompPtr);
 	I_REF(IEventScenePositionProvider, m_positionProviderCompPtr);
 	I_REF(IViewPropertyProvider, m_viewPropertyProviderCompPtr);
 	I_REF(imod::IModel, m_viewPropertyModelCompPtr);

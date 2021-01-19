@@ -5,13 +5,13 @@ namespace imtloggui
 {
 
 
-// reimplemented (imtloggui::IGroupProvider)
+// reimplemented (imtbase::IObjectCollection)
 
-ILayerProvider* CGroupProviderComp::GetLayerProvider(const QByteArray& id) const
+const istd::IChangeable* CGroupProviderComp::GetObjectPtr(const QByteArray& objectId) const
 {
-	int index = GetIndex(id);
+	int index = GetIndex(objectId);
 	if (index >= 0){
-		return m_providersCompPtr[index];
+		return m_groupCompPtr[index];
 	}
 
 	return nullptr;
@@ -56,7 +56,7 @@ QVariant CGroupProviderComp::GetElementInfo(const QByteArray& elementId, int inf
 int CGroupProviderComp::GetCount() const
 {
 	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
-	count = qMin(count, m_providersCompPtr.GetCount());
+	count = qMin(count, m_groupCompPtr.GetCount());
 
 	return count;
 }

@@ -12,14 +12,28 @@ namespace imtloggui
 
 // public methods
 
+// reimplemented (imtloggui::IRepresentation)
+
+imod::IModel* CRepresentationEventsComp::GetRepresentationModel()
+{
+	return nullptr;
+}
+
+
+imod::IObserver* CRepresentationEventsComp::GetTimeRangeObserver()
+{
+	return nullptr;
+}
+
+
 // reimplemented (ilog::IMessageConsumer)
 
 bool CRepresentationEventsComp::IsMessageSupported(
-	int messageCategory,
+	int /*messageCategory*/,
 	int messageId,
 	const istd::IInformationProvider* messagePtr) const
 {
-	return messagePtr->GetInformationId() == 19780000;
+	return (messageId && (messagePtr->GetInformationId() == 19780000));
 }
 
 
@@ -66,11 +80,11 @@ void CRepresentationEventsComp::AddMessage(const MessagePtr& messagePtr)
 
 // reimplemented (icomp::CComponentBase)
 
-//void CRepresentationEventsComp::OnComponentCreated()
-//{
-//	//CRepresentationEventsObject* modelPtr = new CRepresentationEventsObject();
-//	//m_modelPtr = istd::TSmartPtr<istd::IChangeable>(modelPtr);
-//}
+void CRepresentationEventsComp::OnComponentCreated()
+{
+	//CRepresentationEventsObject* modelPtr = new CRepresentationEventsObject();
+	//m_modelPtr = istd::TSmartPtr<istd::IChangeable>(modelPtr);
+}
 
 
 // public methods of the embedded class Filter

@@ -5,21 +5,11 @@ namespace imtloggui
 {
 
 
-// reimplemented (imtloggui::ILayerProvider)
+// public methods
 
-IRepresentationProvider* CGroupComp::GetRepresentationProvider(const QByteArray& id) const
-{
-	int index = GetIndex(id);
+// reimplemented (imtloggui::IGroup)
 
-	if (index >= 0){
-		return m_providerCompPtr[index];
-	}
-
-	return nullptr;
-}
-
-
-QList<int> CGroupComp::GetMessageIdList() const
+QList<int> CGroupComp::GetSupportedMessageIds() const
 {
 	QList<int> retVal;
 
@@ -32,27 +22,41 @@ QList<int> CGroupComp::GetMessageIdList() const
 }
 
 
-QByteArray CGroupComp::GetIdForTimeSpan(uint64_t msecs) const
+QByteArray CGroupComp::GetLayerIdForTimespan(uint64_t timespan) const
 {
 	QByteArray retVal;
-		
+
 	if (m_arrangedIds.isEmpty()){
 		return retVal;
 	}
 
-	if (msecs < m_arrangedIds.firstKey()){
+	if (timespan < m_arrangedIds.firstKey()){
 		return m_arrangedIds.first();
 	}
 
 	QList<uint64_t> keys = m_arrangedIds.keys();
 	uint64_t foundKey = m_arrangedIds.firstKey();
 	for (int i = 0; i < keys.count(); i++){
-		if (keys[i] < msecs){
+		if (keys[i] < timespan){
 			foundKey = keys[i];
 		}
 	}
 
 	return m_arrangedIds[foundKey];
+}
+
+
+// reimplemented (imtbase::IObjectCollection)
+
+const istd::IChangeable* CGroupComp::GetObjectPtr(const QByteArray& objectId) const
+{
+	int index = GetIndex(objectId);
+
+	if (index >= 0){
+		return m_layerCompPtr[index];
+	}
+
+	return nullptr;
 }
 
 
@@ -82,9 +86,6 @@ QVariant CGroupComp::GetElementInfo(const QByteArray& elementId, int infoType) c
 		case EIT_NAME:
 			retVal = m_nameAttrPtr[index];
 			break;
-		case EIT_MIN_TIME_SPAN:
-			retVal = m_minTimeSpanAttrPtr[index];
-			break;
 		}
 	}
 
@@ -97,9 +98,9 @@ QVariant CGroupComp::GetElementInfo(const QByteArray& elementId, int infoType) c
 void CGroupComp::OnComponentCreated()
 {
 	for (int i = 0; i < GetCount(); i++){
-		Q_ASSERT(!m_arrangedIds.contains(m_minTimeSpanAttrPtr[i]));
+		Q_ASSERT(!m_arrangedIds.contains(m_layerCompPtr[i]->GetMinimumTimespan()));
 
-		m_arrangedIds[m_minTimeSpanAttrPtr[i]] = m_idAttrPtr[i];
+		m_arrangedIds[m_layerCompPtr[i]->GetMinimumTimespan()] = m_idAttrPtr[i];
 	}
 
 	if (!m_arrangedIds.isEmpty()){
@@ -115,7 +116,7 @@ void CGroupComp::OnComponentCreated()
 int CGroupComp::GetCount() const
 {
 	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
-	return qMin(count, m_minTimeSpanAttrPtr.GetCount());
+	return qMin(count, m_layerCompPtr.GetCount());
 }
 
 
