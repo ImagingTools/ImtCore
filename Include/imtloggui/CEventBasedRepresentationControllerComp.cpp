@@ -27,7 +27,7 @@ void CEventBasedRepresentationControllerComp::BuildRepresentation(
 
 		CEventFilter filter;
 
-		ilog::IMessageContainer::Messages messages = eventProvider.GetEvents(&filter, &timeRange);//, filterParams)->GetMessages(); // TODO: CHECK POINTER!!!
+		ilog::IMessageContainer::Messages messages = eventProvider.GetEvents(&filter, &timeRange)->GetMessages(); // TODO: CHECK POINTER!!!
 	
 		istd::CChangeGroup notifier(representationModelPtr);
 
