@@ -14,12 +14,12 @@ namespace imtloggui
 {
 
 
-class CRepresentationEventsViewComp: public imtloggui::CRepresentationViewCompBase
+class CEventBasedRepresentationViewComp: public imtloggui::CRepresentationViewCompBase
 {
 public:
 	typedef CRepresentationViewCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationEventsViewComp)
+	I_BEGIN_COMPONENT(CEventBasedRepresentationViewComp)
 		I_ASSIGN(m_eventItemFactoryCompPtr, "EventItemFactory", "Event item factory component", false, "");
 	I_END_COMPONENT
 

@@ -1,4 +1,4 @@
-#include <imtloggui/CRepresentationProductionViewComp.h>
+#include <imtloggui/CProductionRepresentationViewComp.h>
 
 // Qt includes
 #include <QtCore/QRect>
@@ -10,7 +10,7 @@
 // ImtCore includes
 #include <imtloggui/CProductionSpeedItem.h>
 #include <imtloggui/CProductionQualityItem.h>
-#include <imtloggui/CRepresentationProductionControllerComp.h>
+#include <imtloggui/CProductionRepresentationControllerComp.h>
 
 
 namespace imtloggui
@@ -21,13 +21,13 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IRepresentationView)
 
-imod::IObserver* CRepresentationProductionViewComp::GetRepresentationObserver()
+imod::IObserver* CProductionRepresentationViewComp::GetRepresentationObserver()
 {
 	return nullptr;
 }
 
 
-//IRepresentationView::GraphicsItemList CRepresentationProductionViewComp::GetGraphicItems() const
+//IRepresentationView::GraphicsItemList CProductionRepresentationViewComp::GetGraphicItems() const
 //{
 	//CRepresentationProductionModel* modelPtr = const_cast<CRepresentationProductionModel*>(
 	//				dynamic_cast<const CRepresentationProductionModel*>(objectPtr.GetPtr()));
@@ -80,19 +80,19 @@ imod::IObserver* CRepresentationProductionViewComp::GetRepresentationObserver()
 
 // reimplemented (imtloggui::IRepresentationView)
 
-IGraphicsItemProvider::GraphicsItemList CRepresentationProductionViewComp::GetItems() const
+IGraphicsItemProvider::GraphicsItemList CProductionRepresentationViewComp::GetItems() const
 {
 	return GraphicsItemList();
 }
 
 
-IGraphicsItemProvider::GraphicsItemList CRepresentationProductionViewComp::GetAddedItems() const
+IGraphicsItemProvider::GraphicsItemList CProductionRepresentationViewComp::GetAddedItems() const
 {
 	return GraphicsItemList();
 }
 
 
-IGraphicsItemProvider::GraphicsItemList CRepresentationProductionViewComp::GetRemovedItems() const
+IGraphicsItemProvider::GraphicsItemList CProductionRepresentationViewComp::GetRemovedItems() const
 {
 	return GraphicsItemList();
 }

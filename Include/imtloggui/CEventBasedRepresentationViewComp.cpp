@@ -1,4 +1,4 @@
-#include <imtloggui/CRepresentationEventsViewComp.h>
+#include <imtloggui/CEventBasedRepresentationViewComp.h>
 
 
 namespace imtloggui
@@ -9,7 +9,7 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IRepresentationView)
 
-imod::IObserver* CRepresentationEventsViewComp::GetRepresentationObserver()
+imod::IObserver* CEventBasedRepresentationViewComp::GetRepresentationObserver()
 {
 	//GraphicsItemList itemList;
 
@@ -64,19 +64,19 @@ imod::IObserver* CRepresentationEventsViewComp::GetRepresentationObserver()
 
 // reimplemented (imtloggui::IRepresentationView)
 
-IGraphicsItemProvider::GraphicsItemList CRepresentationEventsViewComp::GetItems() const
+IGraphicsItemProvider::GraphicsItemList CEventBasedRepresentationViewComp::GetItems() const
 {
 	return GraphicsItemList();
 }
 
 
-IGraphicsItemProvider::GraphicsItemList CRepresentationEventsViewComp::GetAddedItems() const
+IGraphicsItemProvider::GraphicsItemList CEventBasedRepresentationViewComp::GetAddedItems() const
 {
 	return GraphicsItemList();
 }
 
 
-IGraphicsItemProvider::GraphicsItemList CRepresentationEventsViewComp::GetRemovedItems() const
+IGraphicsItemProvider::GraphicsItemList CEventBasedRepresentationViewComp::GetRemovedItems() const
 {
 	return GraphicsItemList();
 }

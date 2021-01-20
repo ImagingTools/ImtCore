@@ -22,7 +22,6 @@ public:
 
 	I_BEGIN_COMPONENT(CGroupProviderComp)
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
-		I_REGISTER_INTERFACE(imtlog::IGroupMessageIdsProvider);
 		I_ASSIGN_MULTI_0(m_idAttrPtr, "GroupIds", "Group ids", false);
 		I_ASSIGN_MULTI_0(m_nameAttrPtr, "GroupNames", "Group names", false);
 		I_ASSIGN_MULTI_0(m_groupCompPtr, "Groups", "Groups", false);

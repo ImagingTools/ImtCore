@@ -18,18 +18,18 @@ namespace imtloggui
 {
 
 
-class CRepresentationProductionModelComp:
+class CProductionRepresentationComp:
 			public icomp::CComponentBase,
 			virtual public istd::IChangeable
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationProductionModelComp)
+	I_BEGIN_COMPONENT(CProductionRepresentationComp)
 		//I_REGISTER_INTERFACE(imtbase::IEventStatistics);
 	I_END_COMPONENT
 
-	CRepresentationProductionModelComp();
+	CProductionRepresentationComp();
 
 	typedef QMap<qint64, imtbase::IEventStatistics::EventsInfo> Timeline;
 
@@ -51,7 +51,7 @@ public:
 		}
 	};
 
-	CRepresentationProductionModelComp(quint64 granularity);
+	CProductionRepresentationComp(quint64 granularity);
 	quint64 GetGranularity() const;
 	const Timeline& GetTimeline() const;
 	quint64 GetMaxCount() const;

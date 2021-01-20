@@ -5,14 +5,17 @@
 #include <QtCore/QSet>
 
 // ACF includes
-#include <istd/IPolymorphic.h>
+#include <istd/IChangeable.h>
+
+// ImtCore includes
+#include <imtlog/CTimeRange.h>
 
 
 namespace imtlog
 {
 
 
-class IMessageFilterParams: virtual public istd::IPolymorphic
+class IMessageFilterParams: virtual public istd::IChangeable
 {
 public:
 	enum FilterMode
@@ -26,6 +29,9 @@ public:
 
 	virtual QSet<int> GetMessageFilterIds() const = 0;
 	virtual void SetMessageFilterIds(const QSet<int>& ids) = 0;
+
+	virtual imtlog::CTimeRange GetFilterTimeRange() const = 0;
+	virtual void SetFilterTimeRange(const imtlog::CTimeRange timeRange) = 0;
 };
 
 

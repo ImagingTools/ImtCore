@@ -1,4 +1,4 @@
-#include <imtloggui/CRepresentationProductionModelComp.h>
+#include <imtloggui/CProductionRepresentationComp.h>
 
 
 namespace imtloggui
@@ -7,51 +7,51 @@ namespace imtloggui
 
 // public methods
 
-CRepresentationProductionModelComp::CRepresentationProductionModelComp()
+CProductionRepresentationComp::CProductionRepresentationComp()
 {
 
 }
 
 
-CRepresentationProductionModelComp::CRepresentationProductionModelComp(quint64 granularity)
+CProductionRepresentationComp::CProductionRepresentationComp(quint64 granularity)
 	:m_maxCount(0),
 	m_granularity(granularity)
 {
 }
 
 
-quint64 CRepresentationProductionModelComp::GetGranularity() const
+quint64 CProductionRepresentationComp::GetGranularity() const
 {
 	return m_granularity;
 }
 
 
-const CRepresentationProductionModelComp::Timeline& CRepresentationProductionModelComp::GetTimeline() const
+const CProductionRepresentationComp::Timeline& CProductionRepresentationComp::GetTimeline() const
 {
 	return m_timeline;
 }
 
 
-quint64 CRepresentationProductionModelComp::GetMaxCount() const
+quint64 CProductionRepresentationComp::GetMaxCount() const
 {
 	return m_maxCount;
 }
 
 
-const CRepresentationProductionModelComp::MaxCounters& CRepresentationProductionModelComp::GetMaxCounters() const
+const CProductionRepresentationComp::MaxCounters& CProductionRepresentationComp::GetMaxCounters() const
 {
 	return m_maxCounters;
 }
 
 
-void CRepresentationProductionModelComp::ClearStatistics()
+void CProductionRepresentationComp::ClearStatistics()
 {
 	m_timeline.clear();
 	m_maxCount = 0;
 }
 
 
-void CRepresentationProductionModelComp::AddMessage(const ilog::IMessageConsumer::MessagePtr& message)
+void CProductionRepresentationComp::AddMessage(const ilog::IMessageConsumer::MessagePtr& message)
 {
 	if (message->GetInformationId() != 19780000){
 		return;
@@ -121,7 +121,7 @@ void CRepresentationProductionModelComp::AddMessage(const ilog::IMessageConsumer
 }
 
 
-qint64 CRepresentationProductionModelComp::CalculateIntervalBeginTime(qint64 timeStamp)
+qint64 CProductionRepresentationComp::CalculateIntervalBeginTime(qint64 timeStamp)
 {
 	if (m_timeline.empty()){
 		return timeStamp;

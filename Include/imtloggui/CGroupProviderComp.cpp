@@ -7,18 +7,6 @@ namespace imtloggui
 
 // public methods
 
-// reimplemented (imtlog::IGroupMessageIdsProvider)
-
-bool CGroupProviderComp::GetGroupMessageIds(const QByteArray& groupId, QSet<int>& messageIds) const
-{
-	if (m_groupMessageIdsProviderCompPtr.IsValid()){
-		return m_groupMessageIdsProviderCompPtr->GetGroupMessageIds(groupId, messageIds);
-	}
-
-	return false;
-}
-
-
 // reimplemented (imtbase::IObjectCollection)
 
 const istd::IChangeable* CGroupProviderComp::GetObjectPtr(const QByteArray& objectId) const

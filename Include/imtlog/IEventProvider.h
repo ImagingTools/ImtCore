@@ -26,7 +26,6 @@ public:
 
 	virtual EventContainerPtr GetEvents(
 				const IEventFilter* filterPtr = nullptr,
-				const imtlog::CTimeRange* timeRangePtr = nullptr,
 				const IMessageFilterParams* filterParamsPtr = nullptr) const = 0;
 };
 

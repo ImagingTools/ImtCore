@@ -15,12 +15,12 @@ namespace imtloggui
 {
 
 
-class CRepresentationProductionViewComp: public CRepresentationViewCompBase
+class CProductionRepresentationViewComp: public CRepresentationViewCompBase
 {
 public:
 	typedef CRepresentationViewCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationProductionViewComp)
+	I_BEGIN_COMPONENT(CProductionRepresentationViewComp)
 	I_END_COMPONENT
 
 	// reimplemented (imtloggui::IRepresentationView)

@@ -1,9 +1,11 @@
-#include <imtloggui/CEventBasedRepresentationControllerComp.h>
+#include <imtloggui/CProductionRepresentationControllerComp.h>
 
 
 // ACF includes
 #include <istd/CChangeGroup.h>
-#include <ilog/CMessageContainer.h>
+
+// ImtCore includes
+#include <imtloggui/CProductionRepresentationComp.h>
 
 
 namespace imtloggui
@@ -12,20 +14,20 @@ namespace imtloggui
 
 // protected methods
 
-void CEventBasedRepresentationControllerComp::BuildRepresentation(
+void CProductionRepresentationControllerComp::BuildRepresentation(
 			istd::IChangeable& representation,
 			const imtlog::IEventProvider& eventProvider,
 			const imtlog::IEventFilter* eventFilterPtr,
 			const imtlog::IMessageFilterParams* messageFilterParamsPtr) const
 {
-	ilog::CMessageContainer* representationModelPtr = dynamic_cast<ilog::CMessageContainer*>(&representation);
+	CProductionRepresentationComp* representationModelPtr = dynamic_cast<CProductionRepresentationComp*>(&representation);
 	if (representationModelPtr != nullptr){
 		if (eventFilterPtr != nullptr && messageFilterParamsPtr != nullptr){
 			ilog::IMessageContainer::Messages messages = eventProvider.GetEvents(eventFilterPtr, messageFilterParamsPtr)->GetMessages();
-	
+
 			istd::CChangeGroup notifier(representationModelPtr);
 
-			representationModelPtr->ClearMessages();
+			representationModelPtr->ClearStatistics();
 
 			for (int i = messages.count() - 1; i >= 0; i--){
 				representationModelPtr->AddMessage(messages[i]);
@@ -33,6 +35,8 @@ void CEventBasedRepresentationControllerComp::BuildRepresentation(
 		}
 	}
 }
+
+
 
 
 } // namespace imtloggui
