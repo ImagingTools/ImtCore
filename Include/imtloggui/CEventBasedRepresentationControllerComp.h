@@ -26,27 +26,14 @@ protected:
 				const imtlog::ITimeRangeProvider* timeRangeProviderPtr) const override;
 
 private:
-	class Filter: public imtlog::IEventFilter
+	class CEventFilter: public imtlog::IEventFilter
 	{
 	public:
-		Filter(const imtlog::CTimeRange& timeRange, const QList<int>& messageIdList, FilterMode filterMode)
-			:m_timeRange(timeRange),
-			m_messageIdList(messageIdList),
-			m_filterMode(filterMode)
-		{
-		}
-
 		// reimplemented (imtlog::IEventFilter)
-		virtual bool IsMessageAccepted(const istd::IInformationProvider* messagePtr = nullptr) const override;
-		virtual QList<int> GetGroupMessageIds() const override;
-
-		// reimplemented (imtlog::ITimeRangeProvider)
-		virtual imtlog::CTimeRange GetTimeRange() const override;
-
-	private:
-		imtlog::CTimeRange m_timeRange;
-		QList<int> m_messageIdList;
-		imtlog::IEventFilter::FilterMode m_filterMode;
+		virtual bool IsMessageAccepted(
+					const istd::IInformationProvider& message,
+					const imtlog::CTimeRange* timeRangePtr,
+					const imtlog::IMessageFilterParams* filterParamsPtr) const override;
 	};
 };
 

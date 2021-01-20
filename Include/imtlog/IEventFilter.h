@@ -17,11 +17,10 @@ namespace imtlog
 class IEventFilter: virtual public istd::IPolymorphic
 {
 public:
-
 	virtual bool IsMessageAccepted(
 				const istd::IInformationProvider& message, 
 				const imtlog::CTimeRange* timeRangePtr,
-				const IMessageFilterParams* idFilterParamsPtr) const = 0;
+				const IMessageFilterParams* filterParamsPtr) const = 0;
 };
 
 

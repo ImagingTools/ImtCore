@@ -33,15 +33,23 @@ CTimeRange CEventHistoryControllerComp::GetTimeRange() const
 }
 
 
-// reimplemented (imtlog::IMessageFilter)
+// reimplemented (imtlog::IEventProvider)
 
-IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(IEventProvider::EventFilterPtr filterPtr) const
+IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
+			const IEventFilter* filterPtr,
+			const imtlog::CTimeRange* timeRangePtr,
+			const IMessageFilterParams* filterParamsPtr) const
 {
 	EventHistoryGroupControllerPtr groupPtr;
 
-	QList<int> ids = filterPtr->GetGroupMessageIds();
-	for (int i = 0; i < ids.count(); i++){
-		groupPtr = GetGroupForMessageId(ids[i]);
+	QSet<int> messageIds;
+	
+	if (filterParamsPtr != nullptr){
+		messageIds = filterParamsPtr->GetMessageFilterIds();
+	}
+
+	for (int i = 0; i < messageIds.count(); i++){
+		groupPtr = GetGroupForMessageId(messageIds[i]);
 		if (groupPtr.IsValid()){
 			break;
 		}

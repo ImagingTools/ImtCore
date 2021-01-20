@@ -53,8 +53,11 @@ public:
 	// reimplemented (imtlog::ITimeRangeProvider)
 	virtual CTimeRange GetTimeRange() const override;
 
-	// reimplemented (imtlog::IEventHistoryProvider)
-	virtual IEventProvider::EventContainerPtr GetEvents(IEventProvider::EventFilterPtr filterPtr) const override;
+	// reimplemented (imtlog::IEventProvider)
+	virtual IEventProvider::EventContainerPtr GetEvents(
+				const IEventFilter* filterPtr = nullptr,
+				const imtlog::CTimeRange* timeRangePtr = nullptr,
+				const IMessageFilterParams* filterParamsPtr = nullptr) const override;
 
 	// reimplemented (ilog::IMessageConsumer)
 	virtual bool IsMessageSupported(

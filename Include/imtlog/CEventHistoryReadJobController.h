@@ -9,6 +9,7 @@
 #include <imtfile/IFileCompression.h>
 #include <imtlog/IEventProvider.h>
 #include <imtlog/CEventHistoryGroupReader.h>
+#include <imtlog/CMessageFilterParams.h>
 
 
 namespace imtlog
@@ -38,7 +39,9 @@ public:
 
 		JobStatus status;
 		QByteArray uuid;
-		IEventProvider::EventFilterPtr filterPtr;
+		const imtlog::IEventFilter* filterPtr;
+		imtlog::CMessageFilterParams filterParams;
+		imtlog::CTimeRange timeRange;
 		IEventProvider::EventContainerPtr eventContainerPtr;
 	};
 
@@ -51,10 +54,10 @@ public:
 				iser::IVersionInfo* versionInfoPtr,
 				imtfile::IFileCompression* compressorPtr);
 
-	QByteArray AddJob(IEventProvider::EventFilterPtr filterPtr);
+	QByteArray AddJob(const IEventFilter* filterPtr, const CTimeRange& timeRange, const CMessageFilterParams& filterParams);
 
 	bool IsValidJobId(const QByteArray& jobId) const;
-	IEventProvider::EventFilterPtr GetFilter(const QByteArray& jobId) const;
+	const IEventFilter* GetFilter(const QByteArray& jobId) const;
 	bool PopResult(const QByteArray& jobId, ilog::CMessageContainer& resultEvents);
 
 Q_SIGNALS:

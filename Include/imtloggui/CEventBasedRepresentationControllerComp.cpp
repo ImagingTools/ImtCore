@@ -25,12 +25,9 @@ void CEventBasedRepresentationControllerComp::BuildRepresentation(
 			timeRange = timeRangeProviderPtr->GetTimeRange();
 		}
 
-		QList<int> messageIds;
-		imtlog::IEventFilter::FilterMode filterMode;
+		CEventFilter filter;
 
-		imtlog::IEventProvider::EventFilterPtr filterPtr = imtlog::IEventProvider::EventFilterPtr(new Filter(timeRange, messageIds, filterMode));
-
-		ilog::IMessageContainer::Messages messages = eventProvider.GetEvents(filterPtr)->GetMessages(); // TODO: CHECK POINTER!!!
+		ilog::IMessageContainer::Messages messages = eventProvider.GetEvents(&filter, &timeRange);//, filterParams)->GetMessages(); // TODO: CHECK POINTER!!!
 	
 		istd::CChangeGroup notifier(representationModelPtr);
 
@@ -47,37 +44,29 @@ void CEventBasedRepresentationControllerComp::BuildRepresentation(
 
 // reimplemented (imtlog::IMessageFilter)
 
-bool CEventBasedRepresentationControllerComp::Filter::IsMessageAccepted(const istd::IInformationProvider* messagePtr) const
+bool CEventBasedRepresentationControllerComp::CEventFilter::IsMessageAccepted(
+			const istd::IInformationProvider & message,
+			const imtlog::CTimeRange* timeRangePtr,
+			const imtlog::IMessageFilterParams * filterParamsPtr) const
 {
-	if (m_timeRange.IsClosed() && !m_timeRange.Contains(messagePtr->GetInformationTimeStamp())){
+	if ((timeRangePtr != nullptr) && timeRangePtr->IsClosed() && !timeRangePtr->Contains(message.GetInformationTimeStamp())){
 		return false;
 	}
 
-	if (m_filterMode == FM_INCLUDE && !m_messageIdList.contains(messagePtr->GetInformationId())){
-		return false;
-	}
+	if (filterParamsPtr != nullptr){
+		int filterMode = filterParamsPtr->GetFilterMode();
 
-	if (m_filterMode == FM_EXCLUDE && m_messageIdList.contains(messagePtr->GetInformationId())){
-		return false;
+		if (filterMode == imtlog::IMessageFilterParams::FM_INCLUDE && !filterParamsPtr->GetMessageFilterIds().contains(message.GetInformationId())){
+			return false;
+		}
+
+		if (filterMode == imtlog::IMessageFilterParams::FM_EXCLUDE && filterParamsPtr->GetMessageFilterIds().contains(message.GetInformationId())){
+			return false;
+		}
 	}
 
 	return true;
 }
-
-
-QList<int> CEventBasedRepresentationControllerComp::Filter::GetGroupMessageIds() const
-{
-	return m_messageIdList;
-}
-
-
-// reimplemented (imtlog::ITimeRangeProvider)
-
-imtlog::CTimeRange CEventBasedRepresentationControllerComp::Filter::GetTimeRange() const
-{
-	return m_timeRange;
-}
-
 
 } // namespace imtloggui
 

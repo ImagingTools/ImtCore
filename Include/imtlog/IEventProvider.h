@@ -22,10 +22,12 @@ public:
 		RS_CANCELED
 	};
 
-	typedef istd::TSmartPtr<IEventFilter> EventFilterPtr;
 	typedef istd::TSmartPtr<ilog::IMessageContainer> EventContainerPtr;
 
-	virtual EventContainerPtr GetEvents(EventFilterPtr filterPtr) const = 0;
+	virtual EventContainerPtr GetEvents(
+				const IEventFilter* filterPtr = nullptr,
+				const imtlog::CTimeRange* timeRangePtr = nullptr,
+				const IMessageFilterParams* filterParamsPtr = nullptr) const = 0;
 };
 
 
