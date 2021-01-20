@@ -7,6 +7,8 @@
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
+#include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
 
 
 namespace imtbase
@@ -289,6 +291,85 @@ QVariant CObjectCollectionBase::GetElementInfo(const QByteArray& elementId, int 
 	}
 
 	return QVariant();
+}
+
+
+bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
+{
+	int objectCount = m_objects.count();
+
+	if (!archive.IsStoring()){
+		objectCount = 0;
+
+		m_objects.clear();
+	}
+
+	static iser::CArchiveTag objectListTag("ObjectsList", "List of objects", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag objectTag("Object", "Object item", iser::CArchiveTag::TT_GROUP, &objectListTag);
+
+	bool retVal = true;
+
+	retVal = retVal && archive.BeginMultiTag(objectListTag, objectTag, objectCount);
+
+	for (int i = 0; i < objectCount; i++){
+		retVal = retVal && archive.BeginTag(objectTag);
+
+		ObjectInfo elementInfo;
+		if (archive.IsStoring()){
+			elementInfo = m_objects[i];
+		}
+
+		static iser::CArchiveTag objectIdTag("ID", "Object ID", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(objectIdTag);
+		retVal = retVal && archive.Process(elementInfo.id);
+		retVal = retVal && archive.EndTag(objectIdTag);
+
+
+		static iser::CArchiveTag descriptionTag("Description", "Object description", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(descriptionTag);
+		retVal = retVal && archive.Process(elementInfo.description);
+		retVal = retVal && archive.EndTag(descriptionTag);
+
+		static iser::CArchiveTag typeIdTag("TypeId", "Object type-ID", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(typeIdTag);
+		retVal = retVal && archive.Process(elementInfo.typeId);
+		retVal = retVal && archive.EndTag(typeIdTag);
+
+		static iser::CArchiveTag objectNameTag("Name", "Object name", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(objectNameTag);
+		retVal = retVal && archive.Process(elementInfo.name);
+		retVal = retVal && archive.EndTag(objectNameTag);
+
+		static iser::CArchiveTag objectDescriptionTag("Description", "Object description", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(objectDescriptionTag);
+		retVal = retVal && archive.Process(elementInfo.description);
+		retVal = retVal && archive.EndTag(objectDescriptionTag);
+
+
+		static iser::CArchiveTag objectDataTag("Data", "Object data", iser::CArchiveTag::TT_WEAK, &objectTag);
+		retVal = retVal && archive.BeginTag(objectDataTag);
+	
+		if (!archive.IsStoring()){
+			elementInfo.objectPtr.SetPtr(CreateObjectInstance(elementInfo.typeId));
+		}
+
+		iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(elementInfo.objectPtr.GetPtr());
+		if (serializablePtr != nullptr){
+			retVal = retVal && serializablePtr->Serialize(archive);
+		}
+
+		retVal = retVal && archive.EndTag(objectDataTag);
+
+		if (retVal && !archive.IsStoring()){
+			m_objects.append(elementInfo);
+		}
+
+		retVal = retVal && archive.EndTag(objectTag);
+	}
+
+	retVal = retVal && archive.EndTag(objectListTag);
+
+	return retVal;
 }
 
 

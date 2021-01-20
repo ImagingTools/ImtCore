@@ -8,6 +8,7 @@
 // ACF includes
 #include <istd/TOptDelPtr.h>
 #include <imod/CModelUpdateBridge.h>
+#include <iser/ISerializable.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
@@ -21,7 +22,7 @@ namespace imtbase
 	Basic implementation of a general data object collection.
 	\ingroup Collection
 */
-class CObjectCollectionBase: virtual public IObjectCollection
+class CObjectCollectionBase: virtual public IObjectCollection, virtual public iser::ISerializable
 {
 public:
 	CObjectCollectionBase();
@@ -55,6 +56,9 @@ public:
 	// reimplemented (ICollectionInfo)
 	virtual Ids GetElementIds() const override;
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
+
+	// (reimplemented from ISerializable)
+	virtual bool Serialize(iser::IArchive & archive) override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
