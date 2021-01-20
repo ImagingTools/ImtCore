@@ -17,7 +17,7 @@ namespace imtloggui
 class CLayerComp:
 			public icomp::CComponentBase,
 			public CProviderBase,
-			virtual public ILayer			
+			virtual public ILayer
 {
 public:
 	typedef icomp::CComponentBase BaseClass;

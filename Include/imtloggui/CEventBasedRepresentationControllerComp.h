@@ -1,38 +1,29 @@
 #pragma once
 
 
-// Acf includes
-#include <ilog/IMessageContainer.h> 
-#include <icomp/CComponentBase.h>
-
 // ImtCore includes
 #include <imtloggui/CRepresentationControllerCompBase.h>
 #include <imtlog/IEventFilter.h>
-#include <imtlog/IEventProvider.h>
-#include <imtlog/IStorage.h>
 
 
 namespace imtloggui
 {
 
 
-class CRepresentationEventsControllerComp: public CRepresentationControllerCompBase
+class CEventBasedRepresentationControllerComp: public CRepresentationControllerCompBase
 {
 public:
 	typedef CRepresentationControllerCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationEventsControllerComp)
+	I_BEGIN_COMPONENT(CEventBasedRepresentationControllerComp)
 	I_END_COMPONENT
 
-	// reimplemented (ilog::IMessageConsumer)
-	virtual bool IsMessageSupported(
-				int messageCategory = -1,
-				int messageId = -1,
-				const istd::IInformationProvider* messagePtr = nullptr) const override;
-	virtual void AddMessage(const MessagePtr& messagePtr) override;
-
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
+protected:
+	// reimplemented (CRepresentationControllerCompBase)
+	virtual void BuildRepresentation(
+				istd::IChangeable& representation,
+				const imtlog::IEventProvider& eventProvider,
+				const imtlog::ITimeRangeProvider* timeRangeProviderPtr) const override;
 
 private:
 	class Filter: public imtlog::IEventFilter
@@ -45,7 +36,7 @@ private:
 		{
 		}
 
-		// reimplemented (imtlog::IMessageFilter)
+		// reimplemented (imtlog::IEventFilter)
 		virtual bool IsMessageAccepted(const istd::IInformationProvider* messagePtr = nullptr) const override;
 		virtual QList<int> GetGroupMessageIds() const override;
 
@@ -57,9 +48,6 @@ private:
 		QList<int> m_messageIdList;
 		imtlog::IEventFilter::FilterMode m_filterMode;
 	};
-
-private:
-	mutable istd::TSmartPtr<istd::IChangeable> m_modelPtr;
 };
 
 

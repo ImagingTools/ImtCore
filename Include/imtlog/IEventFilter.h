@@ -7,26 +7,21 @@
 
 // ImtCore includes
 #include <imtlog/ITimeRangeProvider.h>
+#include <imtlog/IMessageFilterParams.h>
 
 
 namespace imtlog
 {
 
 
-class IEventFilter: virtual public ITimeRangeProvider
+class IEventFilter: virtual public istd::IPolymorphic
 {
 public:
-	enum FilterMode
-	{
-		FM_INCLUDE = 0,
-		FM_EXCLUDE
-	};
 
-	virtual bool IsMessageAccepted(const istd::IInformationProvider* messagePtr = nullptr) const = 0;
-
-	// Message ids list for search corresponding group
-	// Filtering messages by id is implemented by the IsMessageAccepted method
-	virtual QList<int> GetGroupMessageIds() const = 0;
+	virtual bool IsMessageAccepted(
+				const istd::IInformationProvider& message, 
+				const imtlog::CTimeRange* timeRangePtr,
+				const IMessageFilterParams* idFilterParamsPtr) const = 0;
 };
 
 

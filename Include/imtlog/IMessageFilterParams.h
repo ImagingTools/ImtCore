@@ -12,7 +12,7 @@ namespace imtlog
 {
 
 
-class IMessageIdFilter: virtual public istd::IPolymorphic
+class IMessageFilterParams: virtual public istd::IPolymorphic
 {
 public:
 	enum FilterMode
@@ -21,10 +21,11 @@ public:
 		FM_EXCLUDE
 	};
 
+	virtual FilterMode GetFilterMode() const = 0;
+	virtual void SetFilterMode(FilterMode mode) = 0;
+
 	virtual QSet<int> GetMessageFilterIds() const = 0;
-	virtual FilterMode GetMessageFilterMode() const = 0;
 	virtual void SetMessageFilterIds(const QSet<int>& ids) = 0;
-	virtual void SetMessageFilterMode(FilterMode mode) = 0;
 };
 
 

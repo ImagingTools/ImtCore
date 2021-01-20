@@ -30,7 +30,6 @@ class CGraphicsControllerComp:
 			public icomp::CComponentBase,
 			virtual public IGraphicsItemProvider,
 			virtual public IEventNavigationController
-			//virtual public imtlog::ITimeRangeProvider
 {
 	Q_OBJECT
 
@@ -40,24 +39,22 @@ public:
 	I_BEGIN_COMPONENT(CGraphicsControllerComp)
 		I_REGISTER_INTERFACE(IGraphicsItemProvider);
 		I_REGISTER_INTERFACE(IEventNavigationController);
-		//I_REGISTER_INTERFACE(imtlog::ITimeRangeProvider);
 		I_REGISTER_SUBELEMENT(ScenePositionProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(ScenePositionProvider, IEventScenePositionProvider, ExtractPositionProvider);
 		I_REGISTER_SUBELEMENT(VisibleTimeRangeProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, imtlog::ITimeRangeProvider, ExtractVisibleTimeRangeProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, istd::IChangeable, ExtractVisibleTimeRangeProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, imod::IModel, ExtractVisibleTimeRangeProvider);
 		I_ASSIGN(m_groupProviderCompPtr, "GroupProvider", "Event groups provider", false, "GroupProvider");
 		I_ASSIGN(m_groupViewProviderCompPtr, "GroupViewProvider", "Event groups view provider", false, "GroupProvider");
 		I_ASSIGN(m_viewPropertyProviderCompPtr, "GraphicsViewPropertyProvider", "Graphics view property provider", true, "GraphicsViewPropertyProvider");
 		I_ASSIGN_TO(m_viewPropertyModelCompPtr, m_viewPropertyProviderCompPtr, true);
 		I_ASSIGN_TO(m_viewPropertyManagerCompPtr, m_viewPropertyProviderCompPtr, true);
-		I_ASSIGN(m_timeRangeProviderCompPtr, "TimeRangeProvider", "Time range provider for time axis", true, "TimeRangeProvider");
+		I_ASSIGN(m_timeRangeProviderCompPtr, "EventHistoryTimeRangeProvider", "Time range provider for the time axis of the whole event history", true, "EventHistoryTimeRangeProvider");
 		I_ASSIGN_TO(m_timeRangeModelCompPtr, m_timeRangeProviderCompPtr, true);
 	I_END_COMPONENT
 
 	CGraphicsControllerComp();
-
-	// reimplemented (imtloggui::ITimeRangeProvider)
-	//imtlog::CTimeRange GetTimeRange() const override;
 
 	// reimplemented (imtloggui::IEventNavigationController)
 	virtual void JumpToFirstEvent() const override;
@@ -169,7 +166,7 @@ private:
 	QList<GroupItem> m_groupItemList;
 	GraphicsItemList m_items;
 	mutable GraphicsItemList m_addedItems;
-	mutable GraphicsItemList m_removedItems;	
+	mutable GraphicsItemList m_removedItems;
 };
 
 
