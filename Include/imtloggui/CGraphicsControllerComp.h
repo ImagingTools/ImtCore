@@ -43,6 +43,8 @@ public:
 		//I_REGISTER_INTERFACE(imtlog::ITimeRangeProvider);
 		I_REGISTER_SUBELEMENT(ScenePositionProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(ScenePositionProvider, IEventScenePositionProvider, ExtractPositionProvider);
+		I_REGISTER_SUBELEMENT(VisibleTimeRangeProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, imtlog::ITimeRangeProvider, ExtractVisibleTimeRangeProvider);
 		I_ASSIGN(m_groupProviderCompPtr, "GroupProvider", "Event groups provider", false, "GroupProvider");
 		I_ASSIGN(m_groupViewProviderCompPtr, "GroupViewProvider", "Event groups view provider", false, "GroupProvider");
 		I_ASSIGN(m_viewPropertyProviderCompPtr, "GraphicsViewPropertyProvider", "Graphics view property provider", true, "GraphicsViewPropertyProvider");
@@ -76,6 +78,7 @@ private Q_SLOTS:
 	void OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime);
 
 private:
+	void CreateGroupsTable();
 	void OnViewPropertyUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& changeSet);
 
 private:
@@ -83,6 +86,12 @@ private:
 	static InterfaceType* ExtractPositionProvider(CGraphicsControllerComp& component)
 	{
 		return component.m_timeAxisPtr;
+	}
+
+	template <typename InterfaceType>
+	static InterfaceType* ExtractVisibleTimeRangeProvider(CGraphicsControllerComp& component)
+	{
+		return &component.m_visibleTimeRangeProvider;
 	}
 
 private:
@@ -116,7 +125,21 @@ private:
 		CGraphicsControllerComp* m_parent;
 	};
 
-	//class 
+	class TimeRangeProvider: public imtlog::ITimeRangeProvider
+	{
+	public:
+		TimeRangeProvider();
+
+		void SetParent(CGraphicsControllerComp* parent);
+		void SetTimeRange(const imtlog::CTimeRange& timeRange);
+
+		// reimplemented (imtlog::ITimeRangeProvider)
+		virtual imtlog::CTimeRange GetTimeRange() const override;
+
+	private:
+		CGraphicsControllerComp* m_parent;
+		imtlog::CTimeRange m_timeRange;
+	};
 
 	struct GroupItem
 	{
@@ -141,12 +164,12 @@ private:
 
 	ViewPropertyObserver m_viewPropertyObserver;
 	TimeRangeObserver m_timeRangeObserver;
+	imod::TModelWrap<TimeRangeProvider> m_visibleTimeRangeProvider;
 
 	QList<GroupItem> m_groupItemList;
 	GraphicsItemList m_items;
 	mutable GraphicsItemList m_addedItems;
-	mutable GraphicsItemList m_removedItems;
-	
+	mutable GraphicsItemList m_removedItems;	
 };
 
 

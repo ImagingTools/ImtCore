@@ -1,11 +1,11 @@
 #pragma once
 
 
-// Acf includes
+// ACF includes
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/IGroup.h>
+#include <imtloggui/ILayerFinder.h>
 #include <imtloggui/CProviderBase.h>
 
 
@@ -22,6 +22,7 @@ public:
 
 	I_BEGIN_COMPONENT(CGroupProviderComp)
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
+		I_REGISTER_INTERFACE(imtlog::IGroupMessageIdsProvider);
 		I_ASSIGN_MULTI_0(m_idAttrPtr, "GroupIds", "Group ids", false);
 		I_ASSIGN_MULTI_0(m_nameAttrPtr, "GroupNames", "Group names", false);
 		I_ASSIGN_MULTI_0(m_groupCompPtr, "Groups", "Groups", false);
@@ -41,7 +42,7 @@ private:
 private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
-	I_MULTIREF(IGroup, m_groupCompPtr);
+	I_MULTIREF(imtbase::IObjectCollection, m_groupCompPtr);
 };
 
 

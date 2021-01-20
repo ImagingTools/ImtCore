@@ -109,22 +109,22 @@ imtbase::ICollectionInfo::Id CProviderBase::GetObjectTypeId(const QByteArray& /*
 
 // reimplemented (istd::IChangeable)
 
-int CProviderBase::GetSupportedOperations() const
-{
-	return SO_NONE;
-}
-
-
-bool CProviderBase::CopyFrom(const IChangeable& /*object*/, CompatibilityMode /*mode*/)
-{
-	return false;
-}
-
-
-bool CProviderBase::ResetData(CompatibilityMode /*mode*/)
-{
-	return false;
-}
+//int CProviderBase::GetSupportedOperations() const
+//{
+//	return SO_NONE;
+//}
+//
+//
+//bool CProviderBase::CopyFrom(const IChangeable& /*object*/, CompatibilityMode /*mode*/)
+//{
+//	return false;
+//}
+//
+//
+//bool CProviderBase::ResetData(CompatibilityMode /*mode*/)
+//{
+//	return false;
+//}
 
 
 } // namespace imtloggui

@@ -6,7 +6,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/CRepresentationCompBase.h>
+#include <imtloggui/CRepresentationControllerCompBase.h>
 #include <imtlog/IEventFilter.h>
 #include <imtlog/IEventProvider.h>
 #include <imtlog/IStorage.h>
@@ -16,16 +16,13 @@ namespace imtloggui
 {
 
 
-class CRepresentationEventsComp: public CRepresentationCompBase
+class CRepresentationEventsControllerComp: public CRepresentationControllerCompBase
 {
 public:
-	typedef CRepresentationCompBase BaseClass;
+	typedef CRepresentationControllerCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationEventsComp)
+	I_BEGIN_COMPONENT(CRepresentationEventsControllerComp)
 	I_END_COMPONENT
-
-	// reimplemented (imtloggui::IRepresentation)
-	virtual imod::IObserver* GetTimeRangeObserver() override;
 
 	// reimplemented (ilog::IMessageConsumer)
 	virtual bool IsMessageSupported(

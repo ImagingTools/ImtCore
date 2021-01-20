@@ -10,7 +10,7 @@
 // ImtCore includes
 #include <imtloggui/CProductionSpeedItem.h>
 #include <imtloggui/CProductionQualityItem.h>
-#include <imtloggui/CRepresentationProductionComp.h>
+#include <imtloggui/CRepresentationProductionControllerComp.h>
 
 
 namespace imtloggui

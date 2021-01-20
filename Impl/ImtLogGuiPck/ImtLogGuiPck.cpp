@@ -87,24 +87,34 @@ I_EXPORT_COMPONENT(
 			"Layer Representation View Provider");
 
 I_EXPORT_COMPONENT(
-			RepresentationEvents,
-			"Representation events factory",
-			"Representation Events Factory");
+			RepresentationEventsController,
+			"Representation events controller",
+			"Representation Events Controller");
+
+I_EXPORT_COMPONENT(
+			RepresentationEventsModel,
+			"Representation events model",
+			"Representation Events Model");
 
 I_EXPORT_COMPONENT(
 			RepresentationEventsView,
-			"Representation events view factory",
-			"Representation Events View Factory");
+			"Representation events view",
+			"Representation Events View");
 
 I_EXPORT_COMPONENT(
-			RepresentationProduction,
-			"Representation production factory",
-			"Representation Production Factory");
+			RepresentationProductionController,
+			"Representation production controller",
+			"Representation Production Controller");
+
+I_EXPORT_COMPONENT(
+			RepresentationProductionModel,
+			"Representation production model",
+			"Representation Production model");
 
 I_EXPORT_COMPONENT(
 			RepresentationProductionView,
-			"Representation production view factory",
-			"Representation Production View Factory");
+			"Representation production view",
+			"Representation Production View");
 
 
 } // namespace ImtLogGuiPck

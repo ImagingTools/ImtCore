@@ -1,14 +1,17 @@
 #pragma once
 
 
+// Acf includes
+#include <istd/IPolymorphic.h>
+
+
 namespace imtloggui
 {
 
 
-class IGroup: virtual public istd::IChangeable
+class ILayerFinder: virtual public istd::IPolymorphic
 {
 public:
-	virtual QList<int> GetSupportedMessageIds() const = 0;
 	virtual QByteArray GetLayerIdForTimespan(uint64_t timespan) const = 0;
 };
 

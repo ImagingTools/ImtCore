@@ -19,9 +19,11 @@
 #include <imtloggui/CGroupViewProviderComp.h>
 #include <imtloggui/CGroupViewComp.h>
 #include <imtloggui/CLayerViewComp.h>
-#include <imtloggui/CRepresentationEventsComp.h>
+#include <imtloggui/CRepresentationEventsControllerComp.h>
+#include <imtloggui/CRepresentationEventsModelComp.h>
 #include <imtloggui/CRepresentationEventsViewComp.h>
-#include <imtloggui/CRepresentationProductionComp.h>
+#include <imtloggui/CRepresentationProductionControllerComp.h>
+#include <imtloggui/CRepresentationProductionModelComp.h>
 #include <imtloggui/CRepresentationProductionViewComp.h>
 
 
@@ -45,10 +47,12 @@ typedef imtloggui::CLayerComp Layer;
 typedef imtloggui::CGroupViewProviderComp GroupViewProvider;
 typedef imtloggui::CGroupViewComp GroupView;
 typedef imtloggui::CLayerViewComp LayerView;
-typedef imtloggui::CRepresentationEventsComp RepresentationEvents;
-typedef imtloggui::CRepresentationEventsViewComp RepresentationEventsView;
-typedef imtloggui::CRepresentationProductionComp RepresentationProduction;
-typedef imtloggui::CRepresentationProductionViewComp RepresentationProductionView;
+typedef imtloggui::CRepresentationEventsControllerComp RepresentationEventsController;
+typedef icomp::TModelCompWrap<imtloggui::CRepresentationEventsModelComp> RepresentationEventsModel;
+typedef icomp::TModelCompWrap<imtloggui::CRepresentationEventsViewComp> RepresentationEventsView;
+typedef imtloggui::CRepresentationProductionControllerComp RepresentationProductionController;
+typedef icomp::TModelCompWrap<imtloggui::CRepresentationProductionModelComp> RepresentationProductionModel;
+typedef icomp::TModelCompWrap<imtloggui::CRepresentationProductionViewComp> RepresentationProductionView;
 
 
 } // namespace ImtLogGuiPck

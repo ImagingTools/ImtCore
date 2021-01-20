@@ -29,6 +29,11 @@ I_EXPORT_COMPONENT(
 			"Storage for objects",
 			"Event Log Cache Storage Object");
 
+I_EXPORT_COMPONENT(
+			GroupMessageIdsProvider,
+			"Group message ids provider",
+			"Group Message Id Provider");
+
 
 } // namespace ImtLogPck
 

@@ -13,24 +13,21 @@
 #include <imtlog/IEventProvider.h>
 #include <imtlog/IStorage.h>
 #include <imtlog/ITimeRangeProvider.h>
-#include <imtloggui/CRepresentationCompBase.h>
+#include <imtloggui/CRepresentationControllerCompBase.h>
 
 
 namespace imtloggui
 {
 
 
-class CRepresentationProductionComp: public CRepresentationCompBase
+class CRepresentationProductionControllerComp: public CRepresentationControllerCompBase
 {
 public:
-	typedef CRepresentationCompBase BaseClass;
+	typedef CRepresentationControllerCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CRepresentationProductionComp)
+	I_BEGIN_COMPONENT(CRepresentationProductionControllerComp)
 		I_ASSIGN(m_granularityAttrPtr, "Granularity", "Statistics time granularity in seconds", true, 60);
 	I_END_COMPONENT
-
-	// reimplemented (imtloggui::IRepresentation)
-	virtual imod::IObserver* GetTimeRangeObserver() override;
 
 	// reimplemented (ilog::IMessageConsumer)
 	virtual bool IsMessageSupported(

@@ -1,4 +1,4 @@
-#include <imtloggui/CRepresentationEventsComp.h>
+#include <imtloggui/CRepresentationEventsControllerComp.h>
 
 
 // Acf includes
@@ -12,17 +12,9 @@ namespace imtloggui
 
 // public methods
 
-// reimplemented (imtloggui::IRepresentation)
-
-imod::IObserver* CRepresentationEventsComp::GetTimeRangeObserver()
-{
-	return nullptr;
-}
-
-
 // reimplemented (ilog::IMessageConsumer)
 
-bool CRepresentationEventsComp::IsMessageSupported(
+bool CRepresentationEventsControllerComp::IsMessageSupported(
 	int /*messageCategory*/,
 	int /*messageId*/,
 	const istd::IInformationProvider* messagePtr) const
@@ -31,7 +23,7 @@ bool CRepresentationEventsComp::IsMessageSupported(
 }
 
 
-void CRepresentationEventsComp::AddMessage(const MessagePtr& messagePtr)
+void CRepresentationEventsControllerComp::AddMessage(const MessagePtr& messagePtr)
 {
 	if (messagePtr->GetInformationId() != 19780000){
 		return;
@@ -46,7 +38,7 @@ void CRepresentationEventsComp::AddMessage(const MessagePtr& messagePtr)
 
 // reimplemented (imtloggui::IRepresentationFactory)
 
-//IRepresentation::RepresentationObjectPtr CRepresentationEventsComp::CreateRepresentationObject(
+//IRepresentation::RepresentationObjectPtr CRepresentationEventsControllerComp::CreateRepresentationObject(
 //			const imtlog::CTimeRange& timeRange,
 //			const QList<int>& messageIdList,
 //			imtlog::IEventFilter::FilterMode filterMode) const
@@ -74,7 +66,7 @@ void CRepresentationEventsComp::AddMessage(const MessagePtr& messagePtr)
 
 // reimplemented (icomp::CComponentBase)
 
-void CRepresentationEventsComp::OnComponentCreated()
+void CRepresentationEventsControllerComp::OnComponentCreated()
 {
 	//CRepresentationEventsObject* modelPtr = new CRepresentationEventsObject();
 	//m_modelPtr = istd::TSmartPtr<istd::IChangeable>(modelPtr);
@@ -85,7 +77,7 @@ void CRepresentationEventsComp::OnComponentCreated()
 
 // reimplemented (imtlog::IMessageFilter)
 
-bool CRepresentationEventsComp::Filter::IsMessageAccepted(const istd::IInformationProvider* messagePtr) const
+bool CRepresentationEventsControllerComp::Filter::IsMessageAccepted(const istd::IInformationProvider* messagePtr) const
 {
 	if (m_timeRange.IsClosed() && !m_timeRange.Contains(messagePtr->GetInformationTimeStamp())){
 		return false;
@@ -103,7 +95,7 @@ bool CRepresentationEventsComp::Filter::IsMessageAccepted(const istd::IInformati
 }
 
 
-QList<int> CRepresentationEventsComp::Filter::GetGroupMessageIds() const
+QList<int> CRepresentationEventsControllerComp::Filter::GetGroupMessageIds() const
 {
 	return m_messageIdList;
 }
@@ -111,7 +103,7 @@ QList<int> CRepresentationEventsComp::Filter::GetGroupMessageIds() const
 
 // reimplemented (imtlog::ITimeRangeProvider)
 
-imtlog::CTimeRange CRepresentationEventsComp::Filter::GetTimeRange() const
+imtlog::CTimeRange CRepresentationEventsControllerComp::Filter::GetTimeRange() const
 {
 	return m_timeRange;
 }

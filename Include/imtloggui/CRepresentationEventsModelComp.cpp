@@ -1,4 +1,4 @@
-#include <imtloggui/CRepresentationCompBase.h>
+#include <imtloggui/CRepresentationEventsModelComp.h>
 
 
 namespace imtloggui
@@ -6,4 +6,5 @@ namespace imtloggui
 
 
 } // namespace imtloggui
+
 

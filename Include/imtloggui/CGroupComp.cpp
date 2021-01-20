@@ -9,19 +9,6 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IGroup)
 
-QList<int> CGroupComp::GetSupportedMessageIds() const
-{
-	QList<int> retVal;
-
-	int count = m_messageIdListAttrPtr.GetCount();
-	for (int i = 0; i < count; i++){
-		retVal.append(m_messageIdListAttrPtr[i]);
-	}
-
-	return retVal;
-}
-
-
 QByteArray CGroupComp::GetLayerIdForTimespan(uint64_t timespan) const
 {
 	QByteArray retVal;
@@ -98,9 +85,9 @@ QVariant CGroupComp::GetElementInfo(const QByteArray& elementId, int infoType) c
 void CGroupComp::OnComponentCreated()
 {
 	for (int i = 0; i < GetCount(); i++){
-		Q_ASSERT(!m_arrangedIds.contains(m_layerCompPtr[i]->GetMinimumTimespan()));
+		Q_ASSERT(!m_arrangedIds.contains(m_minTimespanAttrPtr[i]));
 
-		m_arrangedIds[m_layerCompPtr[i]->GetMinimumTimespan()] = m_idAttrPtr[i];
+		m_arrangedIds[m_minTimespanAttrPtr[i]] = m_idAttrPtr[i];
 	}
 
 	if (!m_arrangedIds.isEmpty()){

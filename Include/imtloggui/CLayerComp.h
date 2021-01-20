@@ -49,7 +49,7 @@ private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
 	I_ATTR(double, m_minTimespanAttrPtr);
-	I_MULTIREF(IRepresentation, m_representationCompPtr);
+	I_MULTIREF(istd::IChangeable, m_representationCompPtr);
 };
 
 

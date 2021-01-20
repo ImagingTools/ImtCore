@@ -4,6 +4,11 @@
 // Qt includes
 #include <QtGui/QPen>
 
+// ImtCore includes
+//#include <imtloggui/IGroup.h>
+//#include <imtloggui/ILayer.h>
+#include <imtloggui/IRepresentation.h>
+
 
 namespace imtloggui
 {
@@ -164,6 +169,22 @@ void CGraphicsControllerComp::OnAxisEndTimeChanged(const QDateTime& /*oldTime*/,
 
 // private methods
 
+void CGraphicsControllerComp::CreateGroupsTable()
+{
+	if (m_groupProviderCompPtr.IsValid() && m_groupViewProviderCompPtr.IsValid()){
+		QVector<QByteArray> groupIds = m_groupProviderCompPtr->GetElementIds();
+		QVector<QByteArray> groupViewIds = m_groupViewProviderCompPtr->GetElementIds();
+		for (int groupIdCounter = 0; groupIdCounter < groupIds.count(); groupIdCounter++){
+			if (groupViewIds.contains(groupIds[groupIdCounter])){
+				//const IGroup* groupPtr = dynamic_cast<const IGroup*>(m_groupProviderCompPtr->GetObjectPtr(groupIds[groupIdCounter]));
+				//const IGroup* groupViewPtr = dynamic_cast<const IGroup*>(m_groupViewProviderCompPtr->GetObjectPtr(groupIds[groupIdCounter]));
+
+			}			
+		}
+	}
+}
+
+
 void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	QRectF viewRect = propertyPtr->GetViewRect();
@@ -294,7 +315,7 @@ void CGraphicsControllerComp::TimeRangeObserver::SetParent(CGraphicsControllerCo
 }
 
 
-// protected methods of the embedded class ViewPropertyObserver
+// protected methods of the embedded class TimeRangeObserver
 
 // reimplemented (imod::CSingleModelObserverBase)
 
@@ -312,6 +333,34 @@ void CGraphicsControllerComp::TimeRangeObserver::OnUpdate(const istd::IChangeabl
 			m_parent->m_viewPropertyManagerCompPtr->SetSceneRect(rect);
 		}
 	}
+}
+
+
+// public methods of the embedded class TimeRangeProvider
+
+CGraphicsControllerComp::TimeRangeProvider::TimeRangeProvider()
+	:m_parent(nullptr)
+{
+}
+
+void CGraphicsControllerComp::TimeRangeProvider::SetParent(CGraphicsControllerComp* parent)
+{
+	m_parent = parent;
+}
+
+
+void CGraphicsControllerComp::TimeRangeProvider::SetTimeRange(const imtlog::CTimeRange& timeRange)
+{
+	istd::CChangeNotifier notifier(this);
+	m_timeRange = timeRange;
+}
+
+
+// reimplemented (imtlog::ITimeRangeProvider)
+
+imtlog::CTimeRange CGraphicsControllerComp::TimeRangeProvider::GetTimeRange() const
+{
+	return m_timeRange;
 }
 
 

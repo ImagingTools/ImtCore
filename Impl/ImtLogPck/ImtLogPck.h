@@ -10,6 +10,7 @@
 #include <imtlog/CLoginEventControllerComp.h>
 #include <imtlog/CEventHistoryControllerComp.h>
 #include <imtlog/CStorageComp.h>
+#include <imtlog/CGroupMessageIdsProviderComp.h>
 
 
 /**
@@ -22,6 +23,7 @@ namespace ImtLogPck
 typedef ibase::TModelObserverCompWrap<imtlog::CLoginEventControllerComp> LoginEventController;
 typedef icomp::TModelCompWrap<imtlog::CEventHistoryControllerComp> EventHistoryController;
 typedef imtlog::CStorageComp Storage;
+typedef imtlog::CGroupMessageIdsProviderComp GroupMessageIdsProvider;
 
 
 } // namespace ImtLogPck
