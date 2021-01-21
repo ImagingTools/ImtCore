@@ -1,11 +1,11 @@
 #pragma once
 
 
-// ACF includes
+// Acf includes
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/IRepresentationView.h>
+#include <imtloggui/IGraphicsItemProvider.h>
 #include <imtloggui/IEventScenePositionProvider.h>
 
 
@@ -15,13 +15,12 @@ namespace imtloggui
 
 class CRepresentationViewCompBase:
 			public icomp::CComponentBase,
-			virtual public IRepresentationView
+			public IGraphicsItemProvider
 {
 public:
 	typedef CComponentBase BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CRepresentationViewCompBase)
-		I_REGISTER_INTERFACE(IRepresentationView);
 		I_REGISTER_INTERFACE(IGraphicsItemProvider);
 		I_ASSIGN(m_positionProviderCompPtr, "ScenePositionProvider", "Scene position provider", true, "ScenePositionProvider");
 	I_END_COMPONENT

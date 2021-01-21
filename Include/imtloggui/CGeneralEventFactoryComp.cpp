@@ -1,6 +1,6 @@
 #include <imtloggui/CGeneralEventFactoryComp.h>
 
-// ACF includes
+// Acf includes
 #include <imod/TModelWrap.h>
 
 // ImtCore includes

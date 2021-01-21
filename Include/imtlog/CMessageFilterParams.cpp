@@ -10,6 +10,15 @@ namespace imtlog
 {
 
 
+// public methods
+
+
+CMessageFilterParams::CMessageFilterParams()
+{
+	ResetData();
+}
+
+
 CMessageFilterParams::FilterMode CMessageFilterParams::GetFilterMode() const
 {
 	return m_mode;

@@ -5,78 +5,56 @@ namespace imtloggui
 {
 
 
-// public methods
+// protected methods
 
-// reimplemented (imtloggui::IGroup)
+// reimplemented (imod::CSingleModelObserverBase)
 
-QByteArray CGroupComp::GetLayerIdForTimespan(uint64_t timespan) const
+void CGroupComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	QByteArray retVal;
-
 	if (m_arrangedIds.isEmpty()){
-		return retVal;
+		m_representationProxy.SetModelPtr(nullptr);
+		return;
 	}
+
+	imtlog::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
+	if (!timeRange.IsClosed()){
+		m_representationProxy.SetModelPtr(nullptr);
+		return;
+	}
+
+	uint64_t timespan = timeRange.GetEndTime().toMSecsSinceEpoch() - timeRange.GetBeginTime().toMSecsSinceEpoch();
+	QByteArray layerId;
 
 	if (timespan < m_arrangedIds.firstKey()){
-		return m_arrangedIds.first();
+		layerId = m_arrangedIds.first();
 	}
-
-	QList<uint64_t> keys = m_arrangedIds.keys();
-	uint64_t foundKey = m_arrangedIds.firstKey();
-	for (int i = 0; i < keys.count(); i++){
-		if (keys[i] < timespan){
-			foundKey = keys[i];
+	else{
+		QList<uint64_t> keys = m_arrangedIds.keys();
+		uint64_t foundKey = m_arrangedIds.firstKey();
+		for (int i = 0; i < keys.count(); i++){
+			if (keys[i] < timespan){
+				foundKey = keys[i];
+			}
 		}
+
+		layerId = m_arrangedIds[foundKey];
+	}
+	
+	if (layerId.isEmpty()){
+		m_representationProxy.SetModelPtr(nullptr);
 	}
 
-	return m_arrangedIds[foundKey];
-}
+	if (GetElementIds().count() > 0){
+		Q_ASSERT(!layerId.isEmpty());
 
+		imod::IModel* modelPtr =
+					const_cast<imod::IModel*>(
+								dynamic_cast<const imod::IModel*>(BaseClass2::GetObjectPtr("")));
 
-// reimplemented (imtbase::IObjectCollection)
+		m_representationProxy.SetModelPtr(modelPtr);
 
-const istd::IChangeable* CGroupComp::GetObjectPtr(const QByteArray& objectId) const
-{
-	int index = GetIndex(objectId);
-
-	if (index >= 0){
-		return m_layerCompPtr[index];
+		return;
 	}
-
-	return nullptr;
-}
-
-
-// reimplemented (imtbase::ICollectionInfo)
-
-imtbase::ICollectionInfo::Ids CGroupComp::GetElementIds() const
-{
-	int count = GetCount();
-
-	imtbase::ICollectionInfo::Ids retVal;
-	for (int i = 0; i < count; i++){
-		retVal.append(m_idAttrPtr[i]);
-	}
-
-	return retVal;
-}
-
-
-QVariant CGroupComp::GetElementInfo(const QByteArray& elementId, int infoType) const
-{
-	int index = GetIndex(elementId);
-
-	QVariant retVal;
-
-	if (index >= 0){
-		switch (infoType){
-		case EIT_NAME:
-			retVal = m_nameAttrPtr[index];
-			break;
-		}
-	}
-
-	return retVal;
 }
 
 
@@ -84,9 +62,14 @@ QVariant CGroupComp::GetElementInfo(const QByteArray& elementId, int infoType) c
 
 void CGroupComp::OnComponentCreated()
 {
-	for (int i = 0; i < GetCount(); i++){
+	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
+	count = qMin(count, m_minTimespanAttrPtr.GetCount());
+	count = qMin(count, m_layerCompPtr.GetCount());
+
+	for (int i = 0; i < count; i++){
 		Q_ASSERT(!m_arrangedIds.contains(m_minTimespanAttrPtr[i]));
 
+		RegisterObject(m_idAttrPtr[i], "", m_nameAttrPtr[i], "", m_layerCompPtr[i]);
 		m_arrangedIds[m_minTimespanAttrPtr[i]] = m_idAttrPtr[i];
 	}
 
@@ -95,29 +78,6 @@ void CGroupComp::OnComponentCreated()
 		m_arrangedIds.remove(m_arrangedIds.firstKey());
 		m_arrangedIds[0] = id;
 	}
-}
-
-
-// private methods
-
-int CGroupComp::GetCount() const
-{
-	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
-	return qMin(count, m_layerCompPtr.GetCount());
-}
-
-
-int CGroupComp::GetIndex(const QByteArray& id) const
-{
-	int count = GetCount();
-
-	for (int i = 0; i < count; i++){
-		if (m_idAttrPtr[i] == id){
-			return i;
-		}
-	}
-
-	return -1;
 }
 
 

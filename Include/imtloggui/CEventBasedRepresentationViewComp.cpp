@@ -9,8 +9,8 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IRepresentationView)
 
-imod::IObserver* CEventBasedRepresentationViewComp::GetRepresentationObserver()
-{
+//imod::IObserver* CEventBasedRepresentationViewComp::GetRepresentationObserver()
+//{
 	//GraphicsItemList itemList;
 
 	//const CRepresentationEventsObject* representationObjectPtr = dynamic_cast<const CRepresentationEventsObject*>(objectPtr.GetPtr());
@@ -58,8 +58,8 @@ imod::IObserver* CEventBasedRepresentationViewComp::GetRepresentationObserver()
 	//	}
 	//}
 
-	return nullptr;
-}
+//	return nullptr;
+//}
 
 
 // reimplemented (imtloggui::IRepresentationView)

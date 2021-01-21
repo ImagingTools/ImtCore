@@ -7,84 +7,47 @@ namespace imtloggui
 
 // public methods
 
-// reimplemented (imtloggui::ILayer)
+// reimplemented (icomp::CComponentBase)
 
-uint64_t CLayerComp::GetMinimumTimespan() const
+QByteArray CLayerComp::GetActiveRepresentationId() const
 {
-	if (*m_minTimespanAttrPtr > 0){
-		return *m_minTimespanAttrPtr;
-	}
-	else{
-		return 1000;
-	}
-}
-
-// reimplemented (imtbase::IObjectCollection)
-
-const istd::IChangeable* CLayerComp::GetObjectPtr(const QByteArray& objectId) const
-{
-	int index = GetIndex(objectId);
-	if (index >= 0){
-		return m_representationCompPtr[index];
-	}
-
-	return nullptr;
+	return m_activerRepresentationId;
 }
 
 
-// reimplemented (imtbase::ICollectionInfo)
-
-imtbase::ICollectionInfo::Ids CLayerComp::GetElementIds() const
+bool CLayerComp::SetActiveRepresentationId(const QByteArray& representationId)
 {
-	int count = GetCount();
+	if (GetElementIds().contains(representationId)){
+		m_activerRepresentationId = representationId;
+		imod::IModel* modelPtr =
+					const_cast<imod::IModel*>(
+								dynamic_cast<const imod::IModel*>(GetObjectPtr(m_activerRepresentationId)));
 
-	imtbase::ICollectionInfo::Ids retVal;
-	for (int i = 0; i < count; i++){
-		retVal.append(m_idAttrPtr[i]);
+		m_representationProxy.SetModelPtr(modelPtr);
+
+		return true;
 	}
 
-	return retVal;
+	return false;
 }
 
 
-QVariant CLayerComp::GetElementInfo(const QByteArray& elementId, int infoType) const
-{
-	int index = GetIndex(elementId);
+// protected methods
 
-	QVariant retVal;
+// reimplemented (icomp::CComponentBase)
 
-	if (index >= 0){
-		switch (infoType){
-		case EIT_NAME:
-			retVal = m_nameAttrPtr[index];
-			break;
-		}
-	}
-
-	return retVal;
-}
-
-
-// private methods
-
-int CLayerComp::GetCount() const
+void CLayerComp::OnComponentCreated()
 {
 	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
-	return qMin(count, m_representationCompPtr.GetCount());
-}
-
-
-int CLayerComp::GetIndex(const QByteArray& id) const
-{
-	int count = GetCount();
+	count = qMin(count, m_representationCompPtr.GetCount());
 
 	for (int i = 0; i < count; i++){
-		if (m_idAttrPtr[i] == id){
-			return i;
-		}
+		RegisterObject(m_idAttrPtr[i], "", m_nameAttrPtr[i], "", m_representationCompPtr[i]);
 	}
 
-	return -1;
+	if (count > 0){
+		SetActiveRepresentationId(m_idAttrPtr[0]);
+	}
 }
 
 

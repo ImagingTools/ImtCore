@@ -2,12 +2,13 @@
 
 
 // Acf includes
+#include <imod/TSingleModelObserverBase.h>
+#include <imod/CModelProxy.h>
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/ILayer.h>
-#include <imtloggui/IRepresentation.h>
-#include <imtloggui/CProviderBase.h>
+#include <imtloggui/ILayerController.h>
+#include <imtbase/CStaticObjectCollection.h>
 
 
 namespace imtloggui
@@ -16,40 +17,43 @@ namespace imtloggui
 
 class CLayerComp:
 			public icomp::CComponentBase,
-			public CProviderBase,
-			virtual public ILayer
+			public imtbase::CStaticObjectCollection,
+			virtual public imtloggui::ILayerController
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CLayerComp)
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
-		I_REGISTER_INTERFACE(ILayer);
+		I_REGISTER_SUBELEMENT(RepresentationProxy);
+		I_REGISTER_SUBELEMENT_INTERFACE(RepresentationProxy, imod::IModel, ExtractRepresentationProxy);
 		I_ASSIGN_MULTI_0(m_idAttrPtr, "RepresentationIds", "Representation ids", false);
 		I_ASSIGN_MULTI_0(m_nameAttrPtr, "RepresentationNames", "Representation names", false);
-		I_ASSIGN(m_minTimespanAttrPtr, "MinimumTimespan", "Minimum visual timespan for layer", true, 1000);
 		I_ASSIGN_MULTI_0(m_representationCompPtr, "Representations", "Representations", false);
 	I_END_COMPONENT
 
-	// reimplemented (imtloggui::ILayer)
-	virtual uint64_t GetMinimumTimespan() const override;
+	// reimplemented (icomp::CComponentBase)
+	virtual QByteArray GetActiveRepresentationId() const override;
+	virtual bool SetActiveRepresentationId(const QByteArray& representationId) override;
 
-	// reimplemented (imtbase::IObjectCollection)
-	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
-
-	// reimplemented (imtbase::ICollectionInfo)
-	virtual Ids GetElementIds() const override;
-	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
+protected:
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 private:
-	int GetCount() const;
-	int GetIndex(const QByteArray& id) const;
+	template <typename InterfaceType>
+	static InterfaceType* ExtractRepresentationProxy(CLayerComp& component)
+	{
+		return &component.m_representationProxy;
+	}
 
 private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
-	I_ATTR(double, m_minTimespanAttrPtr);
 	I_MULTIREF(istd::IChangeable, m_representationCompPtr);
+
+	QByteArray m_activerRepresentationId;
+	imod::CModelProxy m_representationProxy;
 };
 
 

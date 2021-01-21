@@ -1,12 +1,11 @@
 #pragma once
 
 
-// ACF includes
+// Acf includes
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/ILayerFinder.h>
-#include <imtloggui/CProviderBase.h>
+#include <imtbase/CStaticObjectCollection.h>
 
 
 namespace imtloggui
@@ -15,7 +14,7 @@ namespace imtloggui
 
 class CGroupProviderComp:
 			public icomp::CComponentBase,
-			public CProviderBase
+			public imtbase::CStaticObjectCollection
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -27,16 +26,9 @@ public:
 		I_ASSIGN_MULTI_0(m_groupCompPtr, "Groups", "Groups", false);
 	I_END_COMPONENT
 
-	// reimplemented (imtbase::IObjectCollection)
-	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
-
-	// reimplemented (imtbase::ICollectionInfo)
-	virtual Ids GetElementIds() const override;
-	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
-
-private:
-	int GetCount() const;
-	int GetIndex(const QByteArray& id) const;
+protected:
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);

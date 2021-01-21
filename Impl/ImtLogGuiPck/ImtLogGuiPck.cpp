@@ -72,47 +72,37 @@ I_EXPORT_COMPONENT(
 			"Layer Representation Provider");
 
 I_EXPORT_COMPONENT(
-			GroupViewProvider,
-			"Events group view provider",
-			"Events Group View Provider");
-
-I_EXPORT_COMPONENT(
 			GroupView,
 			"GroupView",
 			"Event Group Layer View Provider");
 
 I_EXPORT_COMPONENT(
-			LayerView,
-			"LayerView",
-			"Layer Representation View Provider");
-
-I_EXPORT_COMPONENT(
-			RepresentationEventsController,
+			EventBasedRepresentationController,
 			"Representation events controller",
 			"Representation Events Controller");
 
 I_EXPORT_COMPONENT(
-			RepresentationEventsModel,
+			EventBasedRepresentation,
 			"Representation events model",
 			"Representation Events Model");
 
 I_EXPORT_COMPONENT(
-			RepresentationEventsView,
+			EventBasedRepresentationView,
 			"Representation events view",
 			"Representation Events View");
 
 I_EXPORT_COMPONENT(
-			RepresentationProductionController,
+			ProductionRepresentationController,
 			"Representation production controller",
 			"Representation Production Controller");
 
 I_EXPORT_COMPONENT(
-			RepresentationProductionModel,
+			ProductionRepresentation,
 			"Representation production model",
 			"Representation Production model");
 
 I_EXPORT_COMPONENT(
-			RepresentationProductionView,
+			ProductionRepresentationView,
 			"Representation production view",
 			"Representation Production View");
 

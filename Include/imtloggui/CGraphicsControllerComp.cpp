@@ -7,8 +7,6 @@
 // ImtCore includes
 //#include <imtloggui/IGroup.h>
 //#include <imtloggui/ILayer.h>
-#include <imtloggui/IRepresentation.h>
-
 
 namespace imtloggui
 {

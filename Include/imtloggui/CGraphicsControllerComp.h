@@ -1,7 +1,7 @@
 #pragma once
 
 
-// ACF includes
+// Acf includes
 #include <imod/TSingleModelObserverBase.h>
 #include <imod/TModelWrap.h>
 #include <icomp/CComponentBase.h>
@@ -10,13 +10,10 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtlog/ITimeRangeProvider.h>
 #include <imtloggui/IGraphicsItemProvider.h>
-//#include <imtloggui/IChangeNotifier.h>
 #include <imtloggui/IViewPropertyProvider.h>
 #include <imtloggui/IViewPropertyManager.h>
-//#include <imtloggui/IGroupViewProvider.h>
 #include <imtloggui/IEventNavigationController.h>
 #include <imtloggui/IEventScenePositionProvider.h>
-#include <imtloggui/IRepresentationView.h>
 #include <imtloggui/CTimeAxis.h>
 #include <imtloggui/CEventGroupLabelItem.h>
 

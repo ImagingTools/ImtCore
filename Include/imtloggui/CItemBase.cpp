@@ -1,7 +1,7 @@
 #include <imtloggui/CItemBase.h>
 
 
-// ACF includes
+// Acf includes
 #include <istd/CChangeNotifier.h>
 
 

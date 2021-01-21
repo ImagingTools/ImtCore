@@ -1,7 +1,7 @@
 #pragma once
 
 
-// ACF includes
+// Acf includes
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <idoc/IDocumentMetaInfo.h>
 

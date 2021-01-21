@@ -64,10 +64,12 @@ public:
 
 	void OnSystemShutdown();
 
-	QByteArray RequestEvents(IEventProvider::EventFilterPtr filterPtr) const;
+	QByteArray RequestEvents(
+				const IEventFilter* filterPtr,
+				const IMessageFilterParams* filterParamsPtr) const;
 
 	bool IsValidRequestId(const QByteArray& requestId) const;
-	IEventProvider::EventFilterPtr GetFilter(const QByteArray& requestId) const;
+	bool GetFilter(const QByteArray& jobId, IEventFilter** eventFilterPtr, IMessageFilterParams* messageFilterParams) const;
 	bool PopResult(const QByteArray& requestId, ilog::CMessageContainer& resultEvents) const;
 
 	// reimplemented (imtlog::ITimeRangeProvider)

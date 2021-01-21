@@ -37,39 +37,40 @@ CTimeRange CEventHistoryControllerComp::GetTimeRange() const
 
 IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
 			const IEventFilter* filterPtr,
-			const imtlog::CTimeRange* timeRangePtr,
 			const IMessageFilterParams* filterParamsPtr) const
 {
-	EventHistoryGroupControllerPtr groupPtr;
+	//EventHistoryGroupControllerPtr groupPtr;
 
-	QSet<int> messageIds;
-	
-	if (filterParamsPtr != nullptr){
-		messageIds = filterParamsPtr->GetMessageFilterIds();
-	}
+	//QSet<int> messageIds;
+	//
+	//if (filterParamsPtr != nullptr){
+	//	messageIds = filterParamsPtr->GetMessageFilterIds();
+	//}
 
-	for (int i = 0; i < messageIds.count(); i++){
-		groupPtr = GetGroupForMessageId(messageIds[i]);
-		if (groupPtr.IsValid()){
-			break;
-		}
-	}
+	//for (int i = 0; i < messageIds.count(); i++){
+	//	groupPtr = GetGroupForMessageId(messageIds[i]);
+	//	if (groupPtr.IsValid()){
+	//		break;
+	//	}
+	//}
 
-	if (!groupPtr.IsValid()){
-		groupPtr = m_groups[0].groupPtr;
-	}
+	//if (!groupPtr.IsValid()){
+	//	groupPtr = m_groups[0].groupPtr;
+	//}
 
-	QMutexLocker locker(&m_requestMutex);
+	//QMutexLocker locker(&m_requestMutex);
 
-	QByteArray uuid = groupPtr->RequestEvents(filterPtr);
+	//QByteArray uuid = groupPtr->RequestEvents(filterPtr);
 
-	RequestMapItem item;
-	item.resultEventsPtr.SetPtr(new ilog::CMessageContainer());
-	item.groupPtr = groupPtr;
+	//RequestMapItem item;
+	//item.resultEventsPtr.SetPtr(new ilog::CMessageContainer());
+	//item.groupPtr = groupPtr;
 
-	m_requests[uuid] = item;
+	//m_requests[uuid] = item;
 
-	return item.resultEventsPtr;
+	//return item.resultEventsPtr;
+
+	return EventContainerPtr();
 }
 
 

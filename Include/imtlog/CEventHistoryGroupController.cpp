@@ -75,9 +75,11 @@ void CEventHistoryGroupController::OnSystemShutdown()
 }
 
 
-QByteArray CEventHistoryGroupController::RequestEvents(IEventProvider::EventFilterPtr filterPtr) const
+QByteArray CEventHistoryGroupController::RequestEvents(
+			const IEventFilter* filterPtr,
+			const IMessageFilterParams* filterParamsPtr) const
 {
-	return m_readJobController.AddJob(filterPtr);
+	return m_readJobController.AddJob(filterPtr, filterParamsPtr);
 }
 
 
@@ -87,9 +89,9 @@ bool CEventHistoryGroupController::IsValidRequestId(const QByteArray& requestId)
 }
 
 
-IEventProvider::EventFilterPtr CEventHistoryGroupController::GetFilter(const QByteArray& requestId) const
+bool CEventHistoryGroupController::GetFilter(const QByteArray& jobId, IEventFilter** eventFilterPtr, IMessageFilterParams* messageFilterParamsPtr) const
 {
-	return m_readJobController.GetFilter(requestId);
+	return m_readJobController.GetFilter(jobId, eventFilterPtr, messageFilterParamsPtr);
 }
 
 

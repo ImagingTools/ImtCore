@@ -1,7 +1,7 @@
 #pragma once
 
 
-// ACF includes
+// Acf includes
 #include <icomp/CComponentBase.h>
 #include <imod/TSingleModelObserverBase.h>
 
@@ -22,9 +22,6 @@ public:
 	I_BEGIN_COMPONENT(CEventBasedRepresentationViewComp)
 		I_ASSIGN(m_eventItemFactoryCompPtr, "EventItemFactory", "Event item factory component", false, "");
 	I_END_COMPONENT
-
-	// reimplemented (imtloggui::IRepresentationView)
-	virtual imod::IObserver* GetRepresentationObserver() override;
 
 	// reimplemented (imtloggui::IRepresentationView)
 	virtual GraphicsItemList GetItems() const override;

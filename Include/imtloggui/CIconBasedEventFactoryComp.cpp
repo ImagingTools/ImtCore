@@ -1,7 +1,7 @@
 #include <imtloggui/CIconBasedEventFactoryComp.h>
 
 
-// ACF includes
+// Acf includes
 #include <imod/TModelWrap.h>
 
 // ImtCore includes

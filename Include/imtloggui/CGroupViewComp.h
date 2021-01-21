@@ -5,49 +5,31 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/IGroupView.h>
-#include <imtloggui/CProviderBase.h>
+#include <imtloggui/IGroupVisualSettingsProvider.h>
+#include <imtloggui/CGroupComp.h>
 
 
 namespace imtloggui
 {
 
 
-class CGroupViewComp:
-			public icomp::CComponentBase,
-			public CProviderBase,
-			virtual public IGroupView
+class CGroupViewComp: public CGroupComp, virtual public  IGroupVisualSettingsProvider
 {
 public:
-	typedef icomp::CComponentBase BaseClass;
+	typedef CGroupComp BaseClass;
 
 	I_BEGIN_COMPONENT(CGroupViewComp)
-		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
-		I_REGISTER_INTERFACE(IGroupView);
-		I_ASSIGN_MULTI_0(m_idAttrPtr, "LayerIds", "Layer ids", false);
-		I_ASSIGN(m_colorAttrPtr, "GroupBgColor", "Group view background color", false, "");
-		I_ASSIGN_MULTI_0(m_layerViewCompPtr, "RepresentationViewProviders", "Representation factory view providers", false);
+		I_ASSIGN(m_colorAttrPtr, "BackgroundColor", "Group background color", false, "#080808");
+		I_ASSIGN(m_heightAttrPtr, "Height", "Group pixel height", false, 200);
 	I_END_COMPONENT
 
-	// reimplemented (imtloggui::IGroupView)
+	// reimplemented (imtloggui::IGroupVisualSettingsProvider)
 	virtual QColor GetBackgroundColor() const override;
-
-	// reimplemented (imtbase::IObjectCollection)
-	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
-
-	// reimplemented (imtbase::ICollectionInfo)
-	virtual imtbase::ICollectionInfo::Ids GetElementIds() const override;
-	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
+	virtual int GetHeight() const override;
 
 private:
-	int GetCount() const;
-	int GetIndex(const QByteArray& id) const;
-
-private:
-	I_MULTIATTR(QByteArray, m_idAttrPtr);
-	I_MULTIATTR(QString, m_nameAttrPtr);
 	I_ATTR(QString, m_colorAttrPtr);
-	I_MULTIREF(imtbase::IObjectCollection, m_layerViewCompPtr);
+	I_ATTR(int, m_heightAttrPtr);
 };
 
 

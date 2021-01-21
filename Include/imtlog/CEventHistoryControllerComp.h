@@ -56,7 +56,6 @@ public:
 	// reimplemented (imtlog::IEventProvider)
 	virtual IEventProvider::EventContainerPtr GetEvents(
 				const IEventFilter* filterPtr = nullptr,
-				const imtlog::CTimeRange* timeRangePtr = nullptr,
 				const IMessageFilterParams* filterParamsPtr = nullptr) const override;
 
 	// reimplemented (ilog::IMessageConsumer)

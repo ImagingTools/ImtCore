@@ -12,6 +12,8 @@ namespace imtlog
 class CMessageFilterParams: virtual public IMessageFilterParams
 {
 public:
+	CMessageFilterParams();
+
 	// reimplemented (imtlog::IMessageFilterParams)
 	virtual FilterMode GetFilterMode() const override;
 	virtual void SetFilterMode(FilterMode mode) override;

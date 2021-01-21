@@ -3,7 +3,7 @@
 // Qt includes
 #include <QtCore/QRect>
 
-// ACF includes
+// Acf includes
 #include <ilog/CMessageContainer.h>
 #include <imeas/CGeneralDataSequence.h>
 
@@ -18,14 +18,6 @@ namespace imtloggui
 
 
 // public methods
-
-// reimplemented (imtloggui::IRepresentationView)
-
-imod::IObserver* CProductionRepresentationViewComp::GetRepresentationObserver()
-{
-	return nullptr;
-}
-
 
 //IRepresentationView::GraphicsItemList CProductionRepresentationViewComp::GetGraphicItems() const
 //{

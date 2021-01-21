@@ -1,7 +1,7 @@
 #include <imtloggui/CEventStatisticsViewComp.h>
 
 
-// ACF includes
+// Acf includes
 #include <iwidgets/iwidgets.h>
 
 

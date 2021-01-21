@@ -5,7 +5,7 @@
 #include <QtCore/QMargins.h>
 #include <QtCore/QRect.h>
 
-// ACF includes
+// Acf includes
 #include <istd/IChangeable.h>
 #include <istd/TRange.h>
 

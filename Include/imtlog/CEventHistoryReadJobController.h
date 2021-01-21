@@ -41,7 +41,6 @@ public:
 		QByteArray uuid;
 		const imtlog::IEventFilter* filterPtr;
 		imtlog::CMessageFilterParams filterParams;
-		imtlog::CTimeRange timeRange;
 		IEventProvider::EventContainerPtr eventContainerPtr;
 	};
 
@@ -54,10 +53,10 @@ public:
 				iser::IVersionInfo* versionInfoPtr,
 				imtfile::IFileCompression* compressorPtr);
 
-	QByteArray AddJob(const IEventFilter* filterPtr, const CTimeRange& timeRange, const CMessageFilterParams& filterParams);
+	QByteArray AddJob(const IEventFilter* filterPtr, const IMessageFilterParams* filterParamsPtr);
 
 	bool IsValidJobId(const QByteArray& jobId) const;
-	const IEventFilter* GetFilter(const QByteArray& jobId) const;
+	bool GetFilter(const QByteArray& jobId, IEventFilter** eventFilterPtr, IMessageFilterParams* messageFilterParamsPtr) const;
 	bool PopResult(const QByteArray& jobId, ilog::CMessageContainer& resultEvents);
 
 Q_SIGNALS:

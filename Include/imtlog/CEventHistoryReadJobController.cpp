@@ -30,15 +30,14 @@ CEventHistoryReadJobController::CEventHistoryReadJobController(
 }
 
 
-QByteArray CEventHistoryReadJobController::AddJob(const IEventFilter* filterPtr, const CTimeRange& timeRange, const CMessageFilterParams& filterParams)
+QByteArray CEventHistoryReadJobController::AddJob(const IEventFilter* filterPtr, const IMessageFilterParams* filterParamsPtr)
 {
-	Job newJob;;
+	Job newJob;
 
 	newJob.status = JS_WAITING;
 	newJob.uuid = QUuid::createUuid().toByteArray();
 	newJob.filterPtr = filterPtr;
-	newJob.timeRange = timeRange;
-	newJob.filterParams = filterParams;
+	newJob.filterParams.CopyFrom(*filterParamsPtr);
 
 	QMutexLocker locker(&m_jobMutex);
 
@@ -63,17 +62,19 @@ bool CEventHistoryReadJobController::IsValidJobId(const QByteArray& jobId) const
 }
 
 
-const imtlog::IEventFilter* CEventHistoryReadJobController::GetFilter(const QByteArray & jobId) const
+bool CEventHistoryReadJobController::GetFilter(const QByteArray & jobId, IEventFilter** eventFilterPtr, IMessageFilterParams* messageFilterParamsPtr) const
 {
 	QMutexLocker locker(&m_jobMutex);
 
 	for (int i = 0; i < m_jobList.count(); i++){
 		if (m_jobList[i].uuid == jobId){
-			return m_jobList[i].filterPtr;
+			*eventFilterPtr = const_cast<IEventFilter*>(m_jobList[i].filterPtr);
+			messageFilterParamsPtr->CopyFrom(m_jobList[i].filterParams);
+			return true;
 		}
 	}
 
-	return nullptr;
+	return false;
 }
 
 
@@ -159,7 +160,7 @@ void CEventHistoryReadJobController::ProcessJob(Job& job)
 				m_versionInfoPtr,
 				m_compressorPtr);
 
-	CEventHistoryGroupReader::EventContainerListPtr containerListPtr = m_reader.ReadContainers(job.timeRange);
+	CEventHistoryGroupReader::EventContainerListPtr containerListPtr = m_reader.ReadContainers(job.filterParams.GetFilterTimeRange());
 
 	if (containerListPtr.IsValid()){
 		job.eventContainerPtr.SetPtr(new ilog::CMessageContainer());
@@ -169,8 +170,8 @@ void CEventHistoryReadJobController::ProcessJob(Job& job)
 			ilog::IMessageContainer::Messages messages = (*it)->GetMessages();
 			for (int i = messages.count() - 1; i >= 0; i--){
 				if (job.filterPtr != nullptr){
-					if(		job.timeRange.Contains(messages[i]->GetInformationTimeStamp()) &&
-							job.filterPtr->IsMessageAccepted(*messages[i], &job.timeRange, &job.filterParams)){
+					if(		job.filterParams.GetFilterTimeRange().Contains(messages[i]->GetInformationTimeStamp()) &&
+							job.filterPtr->IsMessageAccepted(*messages[i], &job.filterParams)){
 						dynamic_cast<ilog::CMessageContainer*>(job.eventContainerPtr.GetPtr())->AddMessage(messages[i]);
 					}
 				}
