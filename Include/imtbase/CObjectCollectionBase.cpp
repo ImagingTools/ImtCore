@@ -324,7 +324,6 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.Process(elementInfo.id);
 		retVal = retVal && archive.EndTag(objectIdTag);
 
-
 		static iser::CArchiveTag descriptionTag("Description", "Object description", iser::CArchiveTag::TT_LEAF, &objectTag);
 		retVal = retVal && archive.BeginTag(descriptionTag);
 		retVal = retVal && archive.Process(elementInfo.description);
@@ -345,15 +344,20 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.Process(elementInfo.description);
 		retVal = retVal && archive.EndTag(objectDescriptionTag);
 
-
-		static iser::CArchiveTag objectDataTag("Data", "Object data", iser::CArchiveTag::TT_WEAK, &objectTag);
+		static iser::CArchiveTag objectDataTag("Data", "Object data", iser::CArchiveTag::TT_GROUP, &objectTag);
 		retVal = retVal && archive.BeginTag(objectDataTag);
-	
+
+		istd::IChangeable* objectPtr = nullptr;
 		if (!archive.IsStoring()){
 			elementInfo.objectPtr.SetPtr(CreateObjectInstance(elementInfo.typeId));
+
+			objectPtr = elementInfo.objectPtr.GetPtr();
+		}
+		else{
+			objectPtr = m_objects[i].objectPtr.GetPtr();
 		}
 
-		iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(elementInfo.objectPtr.GetPtr());
+		iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(objectPtr);
 		if (serializablePtr != nullptr){
 			retVal = retVal && serializablePtr->Serialize(archive);
 		}
