@@ -4,12 +4,15 @@
 // Qt includes
 #include <QtGui/QColor>
 
+// ACF includes
+#include <istd/IChangeable.h>
+
 
 namespace imtloggui
 {
 
 
-class IGroupVisualSettingsProvider: virtual public istd::IChangeable
+class IGroupVisualSettings: virtual public istd::IChangeable
 {
 public:
 	virtual QColor GetBackgroundColor() const = 0;

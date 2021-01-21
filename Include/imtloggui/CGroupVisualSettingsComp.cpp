@@ -1,4 +1,4 @@
-#include <imtloggui/CGroupViewComp.h>
+#include <imtloggui/CGroupVisualSettingsComp.h>
 
 // Qt includes
 #include <QtGui/QColor>
@@ -10,9 +10,9 @@ namespace imtloggui
 
 // public methods
 
-// reimplemented (imtloggui::IGroupVisualSettingsProvider)
+// reimplemented (imtloggui::IGroupVisualSettings)
 
-QColor CGroupViewComp::GetBackgroundColor() const
+QColor CGroupVisualSettingsComp::GetBackgroundColor() const
 {
 	if (m_colorAttrPtr.IsValid()){
 		return QColor(*m_colorAttrPtr);
@@ -22,7 +22,7 @@ QColor CGroupViewComp::GetBackgroundColor() const
 }
 
 
-int CGroupViewComp::GetHeight() const
+int CGroupVisualSettingsComp::GetHeight() const
 {
 	if (m_colorAttrPtr.IsValid()){
 		return *m_heightAttrPtr;

@@ -23,18 +23,15 @@ I_EXPORT_COMPONENT(
 			"Event view component",
 			"Event View Log");
 
-
 I_EXPORT_COMPONENT(
 			LoginEventFactory,
 			"Login event factory",
 			"Login Logout Event Item Factory");
 
-
 I_EXPORT_COMPONENT(
 			IconBasedEventFactory,
 			"Icon based event factory",
 			"Icon Event Item Factory");
-
 
 I_EXPORT_COMPONENT(
 			GeneralEventFactory,
@@ -72,8 +69,8 @@ I_EXPORT_COMPONENT(
 			"Layer Representation Provider");
 
 I_EXPORT_COMPONENT(
-			GroupView,
-			"GroupView",
+			GroupVisualSettings,
+			"Visual settings for an event group",
 			"Event Group Layer View Provider");
 
 I_EXPORT_COMPONENT(

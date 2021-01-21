@@ -42,11 +42,11 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, imtlog::ITimeRangeProvider, ExtractVisibleTimeRangeProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, istd::IChangeable, ExtractVisibleTimeRangeProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, imod::IModel, ExtractVisibleTimeRangeProvider);
-		I_ASSIGN(m_groupProviderCompPtr, "GroupProvider", "Event groups provider", false, "GroupProvider");
-		I_ASSIGN(m_groupViewProviderCompPtr, "GroupViewProvider", "Event groups view provider", false, "GroupProvider");
-		I_ASSIGN(m_viewPropertyProviderCompPtr, "GraphicsViewPropertyProvider", "Graphics view property provider", true, "GraphicsViewPropertyProvider");
-		I_ASSIGN_TO(m_viewPropertyModelCompPtr, m_viewPropertyProviderCompPtr, true);
-		I_ASSIGN_TO(m_viewPropertyManagerCompPtr, m_viewPropertyProviderCompPtr, true);
+		I_ASSIGN(m_groupViewProviderCompPtr, "GroupViewProvider", "Event groups view provider", true, "GroupViewProvider");
+		I_ASSIGN(m_groupViewVisualSettingsCompPtr, "GroupVisualSettingsCollection", "Collection of visual settings for group view", false, "GroupVisualSettingsCollection");
+		I_ASSIGN(m_viewportGeometryProviderCompPtr, "ViewportGeometryProvider", "Graphics view property provider", true, "ViewportGeometryProvider");
+		I_ASSIGN_TO(m_viewportGeometryManagerModelCompPtr, m_viewportGeometryProviderCompPtr, true);
+		I_ASSIGN_TO(m_viewportGeometryManagerCompPtr, m_viewportGeometryProviderCompPtr, true);
 		I_ASSIGN(m_timeRangeProviderCompPtr, "EventHistoryTimeRangeProvider", "Time range provider for the time axis of the whole event history", true, "EventHistoryTimeRangeProvider");
 		I_ASSIGN_TO(m_timeRangeModelCompPtr, m_timeRangeProviderCompPtr, true);
 	I_END_COMPONENT
@@ -89,10 +89,10 @@ private:
 	}
 
 private:
-	class ViewPropertyObserver: public imod::TSingleModelObserverBase<IViewPropertyProvider>
+	class ViewportObserver: public imod::TSingleModelObserverBase<IViewPropertyProvider>
 	{
 	public:
-		ViewPropertyObserver();
+		ViewportObserver();
 
 		void SetParent(CGraphicsControllerComp* parent);
 
@@ -144,19 +144,19 @@ private:
 	};
 
 private:
-	I_REF(imtbase::IObjectCollection, m_groupProviderCompPtr);
 	I_REF(imtbase::IObjectCollection, m_groupViewProviderCompPtr);
+	I_REF(imtbase::IObjectCollection, m_groupViewVisualSettingsCompPtr);
 	I_REF(IEventScenePositionProvider, m_positionProviderCompPtr);
-	I_REF(IViewPropertyProvider, m_viewPropertyProviderCompPtr);
-	I_REF(imod::IModel, m_viewPropertyModelCompPtr);
-	I_REF(IViewPropertyManager, m_viewPropertyManagerCompPtr);
+	I_REF(IViewPropertyProvider, m_viewportGeometryProviderCompPtr);
+	I_REF(imod::IModel, m_viewportGeometryManagerModelCompPtr);
+	I_REF(IViewPropertyManager, m_viewportGeometryManagerCompPtr);
 	I_REF(imtlog::ITimeRangeProvider, m_timeRangeProviderCompPtr);
 	I_REF(imod::IModel, m_timeRangeModelCompPtr);
 
 	CTimeAxis* m_timeAxisPtr;
 	GraphicsItem m_timeAxisSPtr;
 
-	ViewPropertyObserver m_viewPropertyObserver;
+	ViewportObserver m_viewportObserver;
 	TimeRangeObserver m_timeRangeObserver;
 	imod::TModelWrap<TimeRangeProvider> m_visibleTimeRangeProvider;
 

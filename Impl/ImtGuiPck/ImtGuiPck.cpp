@@ -97,6 +97,11 @@ I_EXPORT_COMPONENT(
 			"Page switcher",
 			"Page Switch Login");
 
+I_EXPORT_COMPONENT(
+			ObjectCollectionViewDelegate,
+			"Standard collection view delegate",
+			"Delegate Document View Collection");
+
 
 } // namespace ImtGuiPck
 

@@ -16,7 +16,7 @@ namespace imtloggui
 
 CGraphicsControllerComp::CGraphicsControllerComp()
 {
-	m_viewPropertyObserver.SetParent(this);
+	m_viewportObserver.SetParent(this);
 	m_timeRangeObserver.SetParent(this);
 }
 
@@ -66,7 +66,9 @@ IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetItems() cons
 IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetAddedItems() const
 {
 	GraphicsItemList items = m_addedItems;
+
 	m_addedItems.clear();
+
 	return items;
 }
 
@@ -74,7 +76,9 @@ IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetAddedItems()
 IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetRemovedItems() const
 {
 	GraphicsItemList items = m_removedItems;
+
 	m_removedItems.clear();
+
 	return items;
 }
 
@@ -100,12 +104,12 @@ void CGraphicsControllerComp::OnComponentCreated()
 
 	int sceneHeight = 0;
 
-	if (m_groupProviderCompPtr.IsValid()){
-		imtbase::ICollectionInfo::Ids ids = m_groupProviderCompPtr->GetElementIds();
+	if (m_groupViewProviderCompPtr.IsValid()){
+		imtbase::ICollectionInfo::Ids ids = m_groupViewProviderCompPtr->GetElementIds();
 
 		for (int i = 0; i < ids.count(); i++){
-			QString name = m_groupProviderCompPtr->GetElementInfo(ids[i], imtbase::ICollectionInfo::EIT_NAME).toString();
-			QColor color; //m_groupProviderCompPtr->GetElementInfo(ids[i], IGroupProvider::EIT_COLOR).toString());
+			QString name = m_groupViewProviderCompPtr->GetElementInfo(ids[i], imtbase::ICollectionInfo::EIT_NAME).toString();
+			QColor color; //m_groupViewProviderCompPtr->GetElementInfo(ids[i], IGroupProvider::EIT_COLOR).toString());
 
 			QGraphicsRectItem* rectPtr = new QGraphicsRectItem();
 			rectPtr->setRect(0, 0, 100, 300);
@@ -133,16 +137,16 @@ void CGraphicsControllerComp::OnComponentCreated()
 		}
 	}
 
-	if (m_viewPropertyModelCompPtr.IsValid()){
-		m_viewPropertyModelCompPtr->AttachObserver(&m_viewPropertyObserver);
+	if (m_viewportGeometryManagerModelCompPtr.IsValid()){
+		m_viewportGeometryManagerModelCompPtr->AttachObserver(&m_viewportObserver);
 	}
 
-	if (m_viewPropertyManagerCompPtr.IsValid()){
-		m_viewPropertyManagerCompPtr->SetSceneRect(QRectF(0, -sceneHeight, 3600, sceneHeight));
-		m_viewPropertyManagerCompPtr->SetViewRect(QRectF(0, -sceneHeight, 3600, sceneHeight));
-		m_viewPropertyManagerCompPtr->SetMargins(QMargins(70, 0, 200, 40));
-		m_viewPropertyManagerCompPtr->SetScaleRangeX(istd::CRange(0, 1000));
-		m_viewPropertyManagerCompPtr->SetScaleRangeY(istd::CRange(0, 1000));
+	if (m_viewportGeometryManagerCompPtr.IsValid()){
+		m_viewportGeometryManagerCompPtr->SetSceneRect(QRectF(0, -sceneHeight, 3600, sceneHeight));
+		m_viewportGeometryManagerCompPtr->SetViewRect(QRectF(0, -sceneHeight, 3600, sceneHeight));
+		m_viewportGeometryManagerCompPtr->SetMargins(QMargins(70, 0, 200, 40));
+		m_viewportGeometryManagerCompPtr->SetScaleRangeX(istd::CRange(0, 1000));
+		m_viewportGeometryManagerCompPtr->SetScaleRangeY(istd::CRange(0, 1000));
 	}
 
 	if (m_timeRangeModelCompPtr.IsValid()){
@@ -169,12 +173,12 @@ void CGraphicsControllerComp::OnAxisEndTimeChanged(const QDateTime& /*oldTime*/,
 
 void CGraphicsControllerComp::CreateGroupsTable()
 {
-	if (m_groupProviderCompPtr.IsValid() && m_groupViewProviderCompPtr.IsValid()){
-		QVector<QByteArray> groupIds = m_groupProviderCompPtr->GetElementIds();
+	if (m_groupViewProviderCompPtr.IsValid() && m_groupViewProviderCompPtr.IsValid()){
+		QVector<QByteArray> groupIds = m_groupViewProviderCompPtr->GetElementIds();
 		QVector<QByteArray> groupViewIds = m_groupViewProviderCompPtr->GetElementIds();
 		for (int groupIdCounter = 0; groupIdCounter < groupIds.count(); groupIdCounter++){
 			if (groupViewIds.contains(groupIds[groupIdCounter])){
-				//const IGroup* groupPtr = dynamic_cast<const IGroup*>(m_groupProviderCompPtr->GetObjectPtr(groupIds[groupIdCounter]));
+				//const IGroup* groupPtr = dynamic_cast<const IGroup*>(m_groupViewProviderCompPtr->GetObjectPtr(groupIds[groupIdCounter]));
 				//const IGroup* groupViewPtr = dynamic_cast<const IGroup*>(m_groupViewProviderCompPtr->GetObjectPtr(groupIds[groupIdCounter]));
 
 			}			
@@ -198,58 +202,17 @@ void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* proper
 
 	qint64 span = m_timeAxisPtr->GetVisibleBeginTime().msecsTo(m_timeAxisPtr->GetVisibleEndTime());
 
-	if (m_groupProviderCompPtr.IsValid() && span > 0){
-		imtbase::ICollectionInfo::Ids groupIds = m_groupProviderCompPtr->GetElementIds();
-		QList<int> allGroupsMessageIds;
-
+	if (m_groupViewProviderCompPtr.IsValid() && span > 0){
 		GraphicsItemList items;
 
+		imtbase::ICollectionInfo::Ids groupIds = m_groupViewProviderCompPtr->GetElementIds();
 		for (int i = 0; i < groupIds.count(); i++){
-			//ILayerProvider* layerProvider;// = m_groupProviderCompPtr->GetLayerProvider(groupIds[i]);
-			//imtbase::ICollectionInfo::Ids layerIds = layerProvider->GetElementIds();
-			//QByteArray id = layerProvider->GetIdForTimeSpan(span);
-			//IRepresentationProvider* representationProvider;// = layerProvider->GetRepresentationFactoryProvider(id);
-			//imtbase::ICollectionInfo::Ids factoryIds = representationProvider->GetElementIds();
-			//IRepresentation* representation;// = representationProvider->GetRepresentationFactory(factoryIds[0]);
-
-			QDateTime begin = m_timeAxisPtr->GetVisibleBeginTime();
-			QDateTime end = m_timeAxisPtr->GetVisibleEndTime();
-
-			if (i != groupIds.count() - 1){
-				//allGroupsMessageIds.append(layerProvider->GetMessageIdList());
+			QByteArray groupId = groupIds[i];
+			const imtloggui::IGraphicsItemProvider* groupItemsProviderPtr = dynamic_cast<const imtloggui::IGraphicsItemProvider*>(m_groupViewProviderCompPtr->GetObjectPtr(groupId));
+			if (groupItemsProviderPtr != nullptr){
+				items += groupItemsProviderPtr->GetItems();
 			}
 
-			//if (m_representationViewCompPtr.IsValid()){
-			//	istd::TSmartPtr<istd::IChangeable> representationObject;
-
-			//	if (i == groupIds.count() - 1){
-			//		representationObject = representation->CreateRepresentationObject(
-			//					imtlog::CTimeRange(begin, end),
-			//					allGroupsMessageIds,
-			//					imtlog::IEventFilter::FM_EXCLUDE);
-			//	}
-			//	else{
-			//		representationObject = representation->CreateRepresentationObject(
-			//					imtlog::CTimeRange(begin, end),
-			//					layerProvider->GetMessageIdList(),
-			//					imtlog::IEventFilter::FM_INCLUDE);
-			//	}
-
-			//
-			//	GraphicsItemList groupItems;
-			//	if (representationObject.IsValid()){
-			//		//groupItems += m_representationViewFactoryCompPtr->CreateGraphicItems(representationObject, groupIds[i]);
-			//	}
-
-			//	for (int j = 0; j < groupItems.count(); j++){
-			//		if (!m_items.contains(groupItems[j])){
-			//			groupItems[j]->setPos(groupItems[j]->pos().x(), -150 - i*300);
-			//			groupItems[j]->setZValue(1);
-			//		}
-			//	}
-
-			//	items += groupItems;
-			//}
 		}
 
 		GraphicsItemList::iterator it = m_items.begin();
@@ -277,24 +240,24 @@ void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* proper
 }
 
 
-// public methods of the embedded class ViewPropertyObserver
+// public methods of the embedded class ViewportObserver
 
-CGraphicsControllerComp::ViewPropertyObserver::ViewPropertyObserver()
+CGraphicsControllerComp::ViewportObserver::ViewportObserver()
 	:m_parent(nullptr)
 {
 }
 
-void CGraphicsControllerComp::ViewPropertyObserver::SetParent(CGraphicsControllerComp* parent)
+void CGraphicsControllerComp::ViewportObserver::SetParent(CGraphicsControllerComp* parent)
 {
 	m_parent = parent;
 }
 
 
-// protected methods of the embedded class ViewPropertyObserver
+// protected methods of the embedded class ViewportObserver
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CGraphicsControllerComp::ViewPropertyObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CGraphicsControllerComp::ViewportObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	m_parent->OnViewPropertyUpdate(GetObservedObject(), changeSet);
 }
@@ -325,10 +288,10 @@ void CGraphicsControllerComp::TimeRangeObserver::OnUpdate(const istd::IChangeabl
 		m_parent->m_timeAxisPtr->EnsureTimeRange(timeRange.GetBeginTime());
 		m_parent->m_timeAxisPtr->EnsureTimeRange(timeRange.GetEndTime());
 
-		if (m_parent->m_viewPropertyProviderCompPtr.IsValid()){
-			QRectF rect = m_parent->m_viewPropertyProviderCompPtr->GetSceneRect();
+		if (m_parent->m_viewportGeometryProviderCompPtr.IsValid()){
+			QRectF rect = m_parent->m_viewportGeometryProviderCompPtr->GetSceneRect();
 			rect.setWidth(m_parent->m_timeAxisPtr->rect().width());
-			m_parent->m_viewPropertyManagerCompPtr->SetSceneRect(rect);
+			m_parent->m_viewportGeometryManagerCompPtr->SetSceneRect(rect);
 		}
 	}
 }

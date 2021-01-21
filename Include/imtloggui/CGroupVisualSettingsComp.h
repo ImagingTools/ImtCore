@@ -1,29 +1,28 @@
 #pragma once
 
 
-// Acf includes
+// ACF includes
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtloggui/IGroupVisualSettingsProvider.h>
-#include <imtloggui/CGroupComp.h>
+#include <imtloggui/IGroupVisualSettings.h>
 
 
 namespace imtloggui
 {
 
 
-class CGroupViewComp: public CGroupComp, virtual public  IGroupVisualSettingsProvider
+class CGroupVisualSettingsComp: public icomp::CComponentBase, virtual public  IGroupVisualSettings
 {
 public:
-	typedef CGroupComp BaseClass;
+	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CGroupViewComp)
+	I_BEGIN_COMPONENT(CGroupVisualSettingsComp)
 		I_ASSIGN(m_colorAttrPtr, "BackgroundColor", "Group background color", false, "#080808");
 		I_ASSIGN(m_heightAttrPtr, "Height", "Group pixel height", false, 200);
 	I_END_COMPONENT
 
-	// reimplemented (imtloggui::IGroupVisualSettingsProvider)
+	// reimplemented (imtloggui::IGroupVisualSettings)
 	virtual QColor GetBackgroundColor() const override;
 	virtual int GetHeight() const override;
 

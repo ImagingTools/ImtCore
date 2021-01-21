@@ -10,7 +10,6 @@ namespace imtloggui
 
 
 class IViewPropertyManager: virtual public IViewPropertyProvider
-
 {
 public:
 	virtual bool SetSceneRect(const QRectF& rect) = 0;

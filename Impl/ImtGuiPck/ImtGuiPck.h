@@ -11,6 +11,7 @@
 #include <imtgui/CSingleStatusProviderGuiComp.h>
 #include <imtgui/CMultiStatusProviderGuiComp.h>
 #include <imtgui/CObjectCollectionViewComp.h>
+#include <imtgui/CObjectCollectionViewDelegate.h>
 #include <imtgui/CDocumentWorkspaceGuiComp.h>
 #include <imtgui/CObjectCollectionMetaInfoViewComp.h>
 #include <imtgui/CDelegatedCommandsProviderComp.h>
@@ -47,7 +48,7 @@ typedef imtgui::CCompositeObjectViewComp CompositeObjectView;
 typedef imtgui::CImageContoursExtender ImageContoursExtender;
 typedef icomp::TModelCompWrap<imtgui::CPageNavigationControllerComp> PageNavigationController;
 typedef ibase::TModelObserverCompWrap<imtgui::CPageSwitcherComp> PageSwitcher;
-
+typedef icomp::TMakeComponentWrap<imtgui::CObjectCollectionViewDelegate, imtgui::ICollectionViewDelegate> ObjectCollectionViewDelegate;
 
 } // namespace ImtGuiPck
 
