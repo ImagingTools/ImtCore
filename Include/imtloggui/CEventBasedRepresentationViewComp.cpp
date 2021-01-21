@@ -7,8 +7,6 @@ namespace imtloggui
 
 // public methods
 
-// reimplemented (imtloggui::IRepresentationView)
-
 //imod::IObserver* CEventBasedRepresentationViewComp::GetRepresentationObserver()
 //{
 	//GraphicsItemList itemList;
@@ -62,7 +60,7 @@ namespace imtloggui
 //}
 
 
-// reimplemented (imtloggui::IRepresentationView)
+// reimplemented (imtloggui::IGraphicsItemProvider)
 
 IGraphicsItemProvider::GraphicsItemList CEventBasedRepresentationViewComp::GetItems() const
 {

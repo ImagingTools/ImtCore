@@ -48,7 +48,6 @@ protected:
 private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
-	I_MULTIATTR(double, m_minTimespanAttrPtr);
 	I_MULTIREF(imtbase::IObjectCollection, m_layerViewsCompPtr);
 };
 

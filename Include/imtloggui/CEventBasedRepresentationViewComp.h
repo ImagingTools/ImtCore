@@ -23,7 +23,7 @@ public:
 		I_ASSIGN(m_eventItemFactoryCompPtr, "EventItemFactory", "Event item factory component", false, "");
 	I_END_COMPONENT
 
-	// reimplemented (imtloggui::IRepresentationView)
+	// reimplemented (imtloggui::IGraphicsItemProvider)
 	virtual GraphicsItemList GetItems() const override;
 	virtual GraphicsItemList GetAddedItems() const override;
 	virtual GraphicsItemList GetRemovedItems() const override;
