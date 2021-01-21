@@ -5,8 +5,8 @@
 #include <QtGui/QPen>
 
 // ImtCore includes
-//#include <imtloggui/IGroup.h>
-//#include <imtloggui/ILayer.h>
+#include <imtloggui/IGroupVisualSettings.h>
+
 
 namespace imtloggui
 {
@@ -97,13 +97,22 @@ void CGraphicsControllerComp::OnComponentCreated()
 
 		for (int i = 0; i < ids.count(); i++){
 			QString name = m_groupViewProviderCompPtr->GetElementInfo(ids[i], imtbase::ICollectionInfo::EIT_NAME).toString();
-			QColor color; //m_groupViewProviderCompPtr->GetElementInfo(ids[i], IGroupProvider::EIT_COLOR).toString());
+			
+			QColor color;
+			int height = 0;
+			if (m_groupViewVisualSettingsCompPtr.IsValid()){
+				const imtloggui::IGroupVisualSettings* groupSettingsPtr = dynamic_cast<const imtloggui::IGroupVisualSettings*>(m_groupViewVisualSettingsCompPtr->GetObjectPtr(ids[i]));
+				if (groupSettingsPtr != nullptr){
+					color = groupSettingsPtr->GetBackgroundColor();
+					height = groupSettingsPtr->GetHeight();
+				}
+			}
 
 			QGraphicsRectItem* rectPtr = new QGraphicsRectItem();
-			rectPtr->setRect(0, 0, 100, 300);
+			rectPtr->setRect(0, 0, 100, height);
 			rectPtr->setBrush(QBrush(color));
 			rectPtr->setPen(QPen(Qt::transparent));
-			rectPtr->setPos(0, -300 - i * 300);
+			rectPtr->setPos(0, -height - i * height);
 			rectPtr->setZValue(0);
 
 			CEventGroupLabelItem* labelPtr = new CEventGroupLabelItem();
@@ -111,7 +120,7 @@ void CGraphicsControllerComp::OnComponentCreated()
 			labelPtr->SetGroupName(name);
 			labelPtr->SetHeight(300);
 			sceneHeight += 300;
-			labelPtr->setPos(0, -150 - i * 300);
+			labelPtr->setPos(0, -height / 2 - i * height);
 			labelPtr->setZValue(9);
 
 			GroupItem groupItem;
