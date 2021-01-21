@@ -21,37 +21,25 @@ CGraphicsControllerComp::CGraphicsControllerComp()
 }
 
 
-// reimplemented (imtloggui::ITimeRangeProvider)
-
-//imtlog::CTimeRange CGraphicsControllerComp::GetTimeRange() const
-//{
-//	return imtlog::CTimeRange(m_timeAxisPtr->GetVisibleBeginTime(), m_timeAxisPtr->GetVisibleEndTime());
-//}
-
-
 // reimplemented (imtloggui::IEventNavigationController)
 
 void CGraphicsControllerComp::JumpToFirstEvent() const
 {
-
 }
 
 
 void CGraphicsControllerComp::JumpToPreviousEvent() const
 {
-
 }
 
 
 void CGraphicsControllerComp::JumpToNextEvent() const
 {
-
 }
 
 
 void CGraphicsControllerComp::JumpToLastEvent() const
 {
-
 }
 
 
@@ -159,13 +147,11 @@ void CGraphicsControllerComp::OnComponentCreated()
 
 void CGraphicsControllerComp::OnAxisBeginTimeChanged(const QDateTime& /*oldTime*/, const QDateTime& /*newTime*/)
 {
-
 }
 
 
 void CGraphicsControllerComp::OnAxisEndTimeChanged(const QDateTime& /*oldTime*/, const QDateTime& /*newTime*/)
 {
-
 }
 
 
@@ -175,13 +161,7 @@ void CGraphicsControllerComp::CreateGroupsTable()
 {
 	if (m_groupViewProviderCompPtr.IsValid() && m_groupViewProviderCompPtr.IsValid()){
 		QVector<QByteArray> groupIds = m_groupViewProviderCompPtr->GetElementIds();
-		QVector<QByteArray> groupViewIds = m_groupViewProviderCompPtr->GetElementIds();
 		for (int groupIdCounter = 0; groupIdCounter < groupIds.count(); groupIdCounter++){
-			if (groupViewIds.contains(groupIds[groupIdCounter])){
-				//const IGroup* groupPtr = dynamic_cast<const IGroup*>(m_groupViewProviderCompPtr->GetObjectPtr(groupIds[groupIdCounter]));
-				//const IGroup* groupViewPtr = dynamic_cast<const IGroup*>(m_groupViewProviderCompPtr->GetObjectPtr(groupIds[groupIdCounter]));
-
-			}			
 		}
 	}
 }
