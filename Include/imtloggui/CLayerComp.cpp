@@ -7,7 +7,7 @@ namespace imtloggui
 
 // public methods
 
-// reimplemented (icomp::CComponentBase)
+// reimplemented (imtloggui::ILayerController)
 
 QByteArray CLayerComp::GetActiveRepresentationId() const
 {
@@ -17,18 +17,23 @@ QByteArray CLayerComp::GetActiveRepresentationId() const
 
 bool CLayerComp::SetActiveRepresentationId(const QByteArray& representationId)
 {
+	istd::CChangeNotifier changeNotifier(this);
+
 	if (GetElementIds().contains(representationId)){
 		m_activerRepresentationId = representationId;
-		imod::IModel* modelPtr =
-					const_cast<imod::IModel*>(
-								dynamic_cast<const imod::IModel*>(GetObjectPtr(m_activerRepresentationId)));
-
-		m_representationProxy.SetModelPtr(modelPtr);
 
 		return true;
 	}
 
 	return false;
+}
+
+
+// reimplemented (imtbase::IObjectProvider)
+
+const istd::IChangeable* CLayerComp::GetDataObject() const
+{
+	return GetObjectPtr(m_activerRepresentationId);
 }
 
 

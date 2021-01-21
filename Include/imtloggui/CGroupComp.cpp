@@ -1,6 +1,10 @@
 #include <imtloggui/CGroupComp.h>
 
 
+// ImtCore includes
+#include <imtbase/IObjectProvider.h>
+
+
 namespace imtloggui
 {
 
@@ -47,13 +51,12 @@ void CGroupComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 	if (GetElementIds().count() > 0){
 		Q_ASSERT(!layerId.isEmpty());
 
-		imod::IModel* modelPtr =
-					const_cast<imod::IModel*>(
-								dynamic_cast<const imod::IModel*>(BaseClass2::GetObjectPtr("")));
+		const imtbase::IObjectProvider* activeRepresentationProviderPtr = dynamic_cast<const imtbase::IObjectProvider*>(BaseClass2::GetObjectPtr(layerId));
+		if (activeRepresentationProviderPtr != nullptr){
+			imod::IModel* modelPtr =const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(activeRepresentationProviderPtr->GetDataObject()));
 
-		m_representationProxy.SetModelPtr(modelPtr);
-
-		return;
+			m_representationProxy.SetModelPtr(modelPtr);
+		}
 	}
 }
 
