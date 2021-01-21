@@ -54,7 +54,6 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
 		I_ASSIGN_MULTI_0(m_viewDelegatesCompPtr, "ViewDelegates", "List of view delegates (corresponding with the object type) used for the collection", false);
-		I_ASSIGN(m_showCommandsToolBarAttrPtr, "ShowToolBar", "If enabled the command tool bar will be shown", true, true);
 		I_ASSIGN(m_columnSettingsKeyAttrPtr, "ColumnSettingsKey", "Registry/INI file key for storing column settings", true, "");
 	I_END_COMPONENT;
 
@@ -310,7 +309,6 @@ private:
 		List of collection view delegates.
 	*/
 	I_MULTIREF(ICollectionViewDelegate, m_viewDelegatesCompPtr);
-	I_ATTR(bool, m_showCommandsToolBarAttrPtr);
 	I_ATTR(QByteArray, m_columnSettingsKeyAttrPtr);
 
 	bool m_eventBasedUpdateEnabled;

@@ -232,6 +232,10 @@ void CObjectCollectionViewDelegate::SetupCommands()
 {
 	SetupInsertCommand();
 
+	disconnect(&m_insertCommand, SIGNAL(triggered()), this, SLOT(OnInsert()));
+	disconnect(&m_duplicateCommand, SIGNAL(triggered()), this, SLOT(OnDuplicate()));
+	disconnect(&m_removeCommand, SIGNAL(triggered()), this, SLOT(OnRemove()));
+
 	m_rootCommands.ResetChilds();
 	m_editCommands.ResetChilds();
 
@@ -260,6 +264,10 @@ void CObjectCollectionViewDelegate::SetupCommands()
 void CObjectCollectionViewDelegate::SetupInsertCommand()
 {
 	if (m_collectionPtr != nullptr){
+		if (m_insertNewDocumentMenuPtr != nullptr){
+			QObject::disconnect(m_insertNewDocumentMenuPtr.GetPtr(), SIGNAL(triggered(QAction*)), this, SLOT(OnAddMenuOptionClicked(QAction*)));
+		}
+
 		m_insertNewDocumentMenuPtr.SetPtr(new QMenu);
 
 		const iprm::IOptionsList* typesPtr = m_collectionPtr->GetObjectTypesInfo();

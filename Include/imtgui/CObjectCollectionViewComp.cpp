@@ -337,6 +337,10 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	connect(ItemList->header(), &QHeaderView::sectionMoved, this, &CObjectCollectionViewComp::OnSectionMoved);
 
 	BaseClass::OnGuiCreated();
+
+	if (m_currentInformationViewPtr == nullptr){
+		RightPanel->setVisible(false);
+	}
 }
 
 
@@ -1047,6 +1051,8 @@ void CObjectCollectionViewComp::OnTypeChanged()
 	SaveItemsSelection();
 
 	m_currentTypeId.clear();
+
+	RightPanel->setVisible(true);
 
 	QList<QTreeWidgetItem*> selectedItems = TypeList->selectedItems();
 	if (!selectedItems.isEmpty()){
