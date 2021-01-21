@@ -73,7 +73,7 @@ private Q_SLOTS:
 
 private:
 	void CreateGroupsTable();
-	void OnViewPropertyUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& changeSet);
+	void OnViewportGeometryUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& changeSet);
 
 private:
 	template <typename InterfaceType>

@@ -187,7 +187,7 @@ void CGraphicsControllerComp::CreateGroupsTable()
 }
 
 
-void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CGraphicsControllerComp::OnViewportGeometryUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	QRectF viewRect = propertyPtr->GetViewRect();
 	m_timeAxisPtr->setPos(0, viewRect.bottom() - m_timeAxisPtr->rect().height() / propertyPtr->GetScaleY());
@@ -212,7 +212,6 @@ void CGraphicsControllerComp::OnViewPropertyUpdate(IViewPropertyProvider* proper
 			if (groupItemsProviderPtr != nullptr){
 				items += groupItemsProviderPtr->GetItems();
 			}
-
 		}
 
 		GraphicsItemList::iterator it = m_items.begin();
@@ -259,7 +258,7 @@ void CGraphicsControllerComp::ViewportObserver::SetParent(CGraphicsControllerCom
 
 void CGraphicsControllerComp::ViewportObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	m_parent->OnViewPropertyUpdate(GetObservedObject(), changeSet);
+	m_parent->OnViewportGeometryUpdate(GetObservedObject(), changeSet);
 }
 
 
