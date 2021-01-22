@@ -2,9 +2,12 @@
 
 
 // Acf includes
+#include <iprm/IOptionsList.h>
+#include <iprm/ISelectionParam.h>
 #include <imod/TSingleModelObserverBase.h>
-#include <imod/CModelProxy.h>
 #include <icomp/CComponentBase.h>
+#include <imod/CModelProxy.h>
+#include <imod/CModelUpdateBridge.h>
 
 // ImtCore includes
 #include <imtlog/ITimeRangeProvider.h>
@@ -18,7 +21,9 @@ namespace imtloggui
 class CGroupComp:
 			public icomp::CComponentBase,
 			public imtbase::CStaticObjectCollection,
-			public imod::TSingleModelObserverBase<imtlog::ITimeRangeProvider>
+			public imod::TSingleModelObserverBase<imtlog::ITimeRangeProvider>,
+			virtual public iprm::IOptionsList,
+			virtual public iprm::ISelectionParam
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -34,6 +39,22 @@ public:
 		I_ASSIGN_MULTI_0(m_layerCompPtr, "Layers", "Layers", false);
 		I_ASSIGN(m_timeRangeProviderCompPtr, "TimeRangeProvider", "TimeRangeProvider", false, "TimeRangeProvider");
 	I_END_COMPONENT
+
+	CGroupComp();
+
+	// reimplemented (iprm::ISelectionParam)
+	virtual const IOptionsList* GetSelectionConstraints() const override;
+	virtual int GetSelectedOptionIndex() const override;
+	virtual bool SetSelectedOptionIndex(int index) override;
+	virtual ISelectionParam* GetSubselection(int index) const override;
+
+	// reimplemented (iprm::IOptionsList)
+	virtual int GetOptionsFlags() const override;
+	virtual int GetOptionsCount() const override;
+	virtual QString GetOptionName(int index) const override;
+	virtual QString GetOptionDescription(int index) const override;
+	virtual QByteArray GetOptionId(int index) const override;
+	virtual bool IsOptionEnabled(int index) const override;
 
 protected:
 	// reimplemented (imod::CSingleModelObserverBase)
@@ -57,7 +78,9 @@ private:
 	I_REF(imtlog::ITimeRangeProvider, m_timeRangeProviderCompPtr);
 
 	QMap<uint64_t, QByteArray> m_arrangedIds;
+	imod::CModelUpdateBridge m_layerUpdateBridge;
 	imod::CModelProxy m_representationProxy;
+	int m_selectedOptionIndex;
 };
 
 

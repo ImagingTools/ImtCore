@@ -2,13 +2,15 @@
 
 
 // ACF includes
+#include <iprm/IOptionsList.h>
+#include <iprm/ISelectionParam.h>
 #include <imod/TSingleModelObserverBase.h>
 #include <icomp/CComponentBase.h>
-#include <iprm/ISelectionParam.h>
+#include <imod/CModelUpdateBridge.h>
 
 // ImtCore includes
-#include <imtbase/CStaticObjectCollection.h>
 #include <imtloggui/IGraphicsItemProvider.h>
+#include <imtbase/CStaticObjectCollection.h>
 
 
 namespace imtloggui
@@ -18,12 +20,14 @@ namespace imtloggui
 class CGroupViewComp:
 			public icomp::CComponentBase,
 			public imtbase::CStaticObjectCollection,
-			virtual public imtloggui::IGraphicsItemProvider,
-			public imod::TSingleModelObserverBase<iprm::ISelectionParam> // Observes the active layer index in the group data model
+			public imod::TSingleModelObserverBase<iprm::ISelectionParam>,
+			virtual public imtloggui::IGraphicsItemProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 	typedef public imtbase::CStaticObjectCollection BaseClass2;
+
+	CGroupViewComp();
 
 	I_BEGIN_COMPONENT(CGroupViewComp)
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
@@ -49,6 +53,8 @@ private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
 	I_MULTIREF(imtbase::IObjectCollection, m_layerViewsCompPtr);
+
+	imod::CModelUpdateBridge m_representationViewUpdateBridge;
 };
 
 

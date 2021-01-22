@@ -2,8 +2,6 @@
 
 
 // ACF includes
-#include <imod/TSingleModelObserverBase.h>
-#include <imod/CModelProxy.h>
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
@@ -48,7 +46,7 @@ private:
 	I_MULTIATTR(QString, m_nameAttrPtr);
 	I_MULTIREF(istd::IChangeable, m_representationCompPtr);
 
-	QByteArray m_activerRepresentationId;
+	QByteArray m_activeRepresentationId;
 };
 
 

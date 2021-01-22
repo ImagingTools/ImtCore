@@ -12,7 +12,7 @@ namespace imtloggui
 {
 
 
-class CGroupVisualSettingsComp: public icomp::CComponentBase, virtual public  IGroupVisualSettings
+class CGroupVisualSettingsComp: public icomp::CComponentBase, virtual public IGroupVisualSettings
 {
 public:
 	typedef icomp::CComponentBase BaseClass;

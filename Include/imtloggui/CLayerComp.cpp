@@ -11,18 +11,18 @@ namespace imtloggui
 
 QByteArray CLayerComp::GetActiveRepresentationId() const
 {
-	return m_activerRepresentationId;
+	return m_activeRepresentationId;
 }
 
 
 bool CLayerComp::SetActiveRepresentationId(const QByteArray& representationId)
 {
-	istd::CChangeNotifier changeNotifier(this);
-
 	if (GetElementIds().contains(representationId)){
-		m_activerRepresentationId = representationId;
-
-		return true;
+		if (m_activeRepresentationId != representationId){
+			istd::CChangeNotifier changeNotifier(this);
+			m_activeRepresentationId = representationId;
+			return true;
+		}
 	}
 
 	return false;
@@ -33,7 +33,7 @@ bool CLayerComp::SetActiveRepresentationId(const QByteArray& representationId)
 
 const istd::IChangeable* CLayerComp::GetDataObject() const
 {
-	return GetObjectPtr(m_activerRepresentationId);
+	return GetObjectPtr(m_activeRepresentationId);
 }
 
 
