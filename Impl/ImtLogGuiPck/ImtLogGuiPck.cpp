@@ -69,6 +69,16 @@ I_EXPORT_COMPONENT(
 			"Layer Representation Provider");
 
 I_EXPORT_COMPONENT(
+			GroupView,
+			"GroupView",
+			"Event Group View Layer Provider");
+
+I_EXPORT_COMPONENT(
+			LayerView,
+			"LayerView",
+			"Layer View Representation Provider");
+
+I_EXPORT_COMPONENT(
 			GroupVisualSettings,
 			"Visual settings for an event group",
 			"Event Group Layer View Provider");

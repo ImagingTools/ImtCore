@@ -17,6 +17,8 @@
 #include <imtloggui/CGroupProviderComp.h>
 #include <imtloggui/CGroupComp.h>
 #include <imtloggui/CLayerComp.h>
+#include <imtloggui/CGroupViewComp.h>
+#include <imtloggui/CLayerViewComp.h>
 #include <imtloggui/CGroupVisualSettingsComp.h>
 #include <imtloggui/CEventBasedRepresentationControllerComp.h>
 #include <imtloggui/CEventBasedRepresentationViewComp.h>
@@ -42,6 +44,8 @@ typedef icomp::TModelCompWrap<imtloggui::CGraphicsControllerComp> GraphicsContro
 typedef icomp::TModelCompWrap<imtloggui::CGroupProviderComp> GroupProvider;
 typedef icomp::TModelCompWrap<imtloggui::CGroupComp> Group;
 typedef icomp::TModelCompWrap<imtloggui::CLayerComp> Layer;
+typedef icomp::TModelCompWrap<imtloggui::CGroupViewComp> GroupView;
+typedef imtloggui::CLayerViewComp LayerView;
 typedef imtloggui::CGroupVisualSettingsComp GroupVisualSettings;
 typedef imtloggui::CEventBasedRepresentationControllerComp EventBasedRepresentationController;
 typedef icomp::TModelCompWrap<
