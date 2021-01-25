@@ -22,7 +22,7 @@ void CStaticObjectCollection::SetObject(const QByteArray& objectId, istd::IChang
 
 
 QByteArray CStaticObjectCollection::RegisterObject(
-			const QByteArray& /*objectId*/,
+			const QByteArray& objectId,
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
@@ -35,6 +35,11 @@ QByteArray CStaticObjectCollection::RegisterObject(
 	info.name = name;
 	info.typeId = typeId;
 	info.flags = OF_SUPPORT_RENAME | OF_SUPPORT_EDIT;
+	if (!objectId.isEmpty()){
+		if (GetObjectInfo(objectId) == nullptr){
+			info.id = objectId;
+		}
+	}
 
 	istd::CChangeNotifier changeNotifier(this);
 
