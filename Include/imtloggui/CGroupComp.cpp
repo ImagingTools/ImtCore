@@ -11,12 +11,6 @@ namespace imtloggui
 
 // public methods
 
-CGroupComp::CGroupComp()
-	:m_selectedOptionIndex(-1),
-	m_layerUpdateBridge(this)
-{
-}
-
 // reimplemented (iprm::ISelectionParam)
 
 const iprm::IOptionsList* CGroupComp::GetSelectionConstraints() const
@@ -27,7 +21,7 @@ const iprm::IOptionsList* CGroupComp::GetSelectionConstraints() const
 
 int CGroupComp::GetSelectedOptionIndex() const
 {
-	return m_selectedOptionIndex;
+	return GetElementIds().indexOf(m_activeLayerId);
 }
 
 
@@ -70,6 +64,11 @@ QString CGroupComp::GetOptionName(int index) const
 
 QString CGroupComp::GetOptionDescription(int index) const
 {
+	ICollectionInfo::Ids ids = GetElementIds();
+	if (index >= 0 && index < ids.count()){
+		return GetElementInfo(ids[index], EIT_DESCRIPTION).toString();
+	}
+
 	return QString();
 }
 
@@ -89,7 +88,7 @@ bool CGroupComp::IsOptionEnabled(int index) const
 {
 	ICollectionInfo::Ids ids = GetElementIds();
 	if (index >= 0 && index < ids.count()){
-		true;
+		return true;
 	}
 
 	return false;
@@ -103,19 +102,25 @@ bool CGroupComp::IsOptionEnabled(int index) const
 void CGroupComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (m_arrangedIds.isEmpty()){
+		if (!m_activeLayerId.isEmpty()){
+			istd::CChangeNotifier notifier(this);
+			m_activeLayerId.clear();
+		}
+
 		return;
 	}
 
 	imtlog::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
 	if (!timeRange.IsClosed()){
-		istd::CChangeNotifier notifier(this);
-		m_selectedOptionIndex = -1;
-		m_representationProxy.SetModelPtr(nullptr);
+		if (!m_activeLayerId.isEmpty()){
+			istd::CChangeNotifier notifier(this);
+			m_activeLayerId.clear();
+		}
+
 		return;
 	}
 
 	uint64_t timespan = timeRange.GetEndTime().toMSecsSinceEpoch() - timeRange.GetBeginTime().toMSecsSinceEpoch();
-	QByteArray layerId;
 
 	QList<uint64_t> keys = m_arrangedIds.keys();
 	uint64_t foundKey = m_arrangedIds.firstKey();
@@ -125,21 +130,11 @@ void CGroupComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 		}
 	}
 
-	layerId = m_arrangedIds[foundKey];
+	QByteArray newLayerId = m_arrangedIds[foundKey];
 
-	int newSelectedIndex = iprm::FindOptionIndexById(layerId, *this);
-	if (newSelectedIndex != m_selectedOptionIndex){
+	if (m_activeLayerId != newLayerId){
 		istd::CChangeNotifier notifier(this);
-
-		m_selectedOptionIndex = newSelectedIndex;
-
-		imod::IModel* modelPtr = nullptr;
-		const imtbase::IObjectProvider* activeLayerPtr = dynamic_cast<const imtbase::IObjectProvider*>(BaseClass2::GetObjectPtr(layerId));
-		if (activeLayerPtr != nullptr){
-			modelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(activeLayerPtr->GetDataObject()));
-		}
-
-		m_representationProxy.SetModelPtr(modelPtr);
+		m_activeLayerId = newLayerId;
 	}
 }
 
@@ -164,15 +159,7 @@ void CGroupComp::OnComponentCreated()
 		m_arrangedIds.remove(m_arrangedIds.firstKey());
 		m_arrangedIds[0] = id;
 
-		m_selectedOptionIndex = 0;
-
-		imod::IModel* modelPtr = nullptr;
-		const imtbase::IObjectProvider* activeLayerPtr = dynamic_cast<const imtbase::IObjectProvider*>(BaseClass2::GetObjectPtr(m_arrangedIds[0]));
-		if (activeLayerPtr != nullptr){
-			modelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(activeLayerPtr->GetDataObject()));
-		}
-
-		m_representationProxy.SetModelPtr(modelPtr);
+		m_activeLayerId = id;
 	}
 }
 

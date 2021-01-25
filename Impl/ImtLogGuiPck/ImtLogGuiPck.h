@@ -15,6 +15,7 @@
 #include <imtloggui/CEventItemMetaInfoViewComp.h>
 #include <imtloggui/CGraphicsControllerComp.h>
 #include <imtloggui/CGroupProviderComp.h>
+#include <imtloggui/CGroupViewProviderComp.h>
 #include <imtloggui/CGroupComp.h>
 #include <imtloggui/CLayerComp.h>
 #include <imtloggui/CGroupViewComp.h>
@@ -42,10 +43,11 @@ typedef imtloggui::CEventStatisticsViewComp EventStatisticsView;
 typedef imtloggui::CEventItemMetaInfoViewComp EventItemMetaInfoView;
 typedef icomp::TModelCompWrap<imtloggui::CGraphicsControllerComp> GraphicsController;
 typedef icomp::TModelCompWrap<imtloggui::CGroupProviderComp> GroupProvider;
+typedef imtloggui::CGroupViewProviderComp GroupViewProvider;
 typedef icomp::TModelCompWrap<imtloggui::CGroupComp> Group;
 typedef icomp::TModelCompWrap<imtloggui::CLayerComp> Layer;
 typedef icomp::TModelCompWrap<imtloggui::CGroupViewComp> GroupView;
-typedef imtloggui::CLayerViewComp LayerView;
+typedef icomp::TModelCompWrap<imtloggui::CLayerViewComp> LayerView;
 typedef imtloggui::CGroupVisualSettingsComp GroupVisualSettings;
 typedef imtloggui::CEventBasedRepresentationControllerComp EventBasedRepresentationController;
 typedef icomp::TModelCompWrap<

@@ -6,8 +6,6 @@
 #include <iprm/ISelectionParam.h>
 #include <imod/TSingleModelObserverBase.h>
 #include <icomp/CComponentBase.h>
-#include <imod/CModelProxy.h>
-#include <imod/CModelUpdateBridge.h>
 
 // ImtCore includes
 #include <imtlog/ITimeRangeProvider.h>
@@ -31,16 +29,14 @@ public:
 
 	I_BEGIN_COMPONENT(CGroupComp)
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
-		I_REGISTER_SUBELEMENT(RepresentationProxy);
-		I_REGISTER_SUBELEMENT_INTERFACE(RepresentationProxy, imod::IModel, ExtractRepresentationProxy);
+		I_REGISTER_INTERFACE(iprm::IOptionsList);
+		I_REGISTER_INTERFACE(iprm::ISelectionParam);
 		I_ASSIGN_MULTI_0(m_idAttrPtr, "LayerIds", "Layer ids", false);
 		I_ASSIGN_MULTI_0(m_nameAttrPtr, "LayerNames", "Layer names", false);
 		I_ASSIGN_MULTI_0(m_minTimespanAttrPtr, "LayerMinTimespan", "Minimum timespan for layer", false);
 		I_ASSIGN_MULTI_0(m_layerCompPtr, "Layers", "Layers", false);
 		I_ASSIGN(m_timeRangeProviderCompPtr, "TimeRangeProvider", "TimeRangeProvider", false, "TimeRangeProvider");
 	I_END_COMPONENT
-
-	CGroupComp();
 
 	// reimplemented (iprm::ISelectionParam)
 	virtual const IOptionsList* GetSelectionConstraints() const override;
@@ -64,13 +60,6 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-	template <typename InterfaceType>
-	static InterfaceType* ExtractRepresentationProxy(CGroupComp& component)
-	{
-		return &component.m_representationProxy;
-	}
-
-private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
 	I_MULTIATTR(double, m_minTimespanAttrPtr);
@@ -78,9 +67,8 @@ private:
 	I_REF(imtlog::ITimeRangeProvider, m_timeRangeProviderCompPtr);
 
 	QMap<uint64_t, QByteArray> m_arrangedIds;
-	imod::CModelUpdateBridge m_layerUpdateBridge;
-	imod::CModelProxy m_representationProxy;
-	int m_selectedOptionIndex;
+
+	QByteArray m_activeLayerId;
 };
 
 

@@ -1,12 +1,13 @@
 #pragma once
 
 
-// ACF includes
+// Acf includes
+#include <iprm/IOptionsList.h>
+#include <iprm/ISelectionParam.h>
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
 #include <imtloggui/ILayerController.h>
-#include <imtbase/IObjectProvider.h>
 #include <imtbase/CStaticObjectCollection.h>
 
 
@@ -17,14 +18,19 @@ namespace imtloggui
 class CLayerComp:
 			public icomp::CComponentBase,
 			public imtbase::CStaticObjectCollection,
-			virtual public imtloggui::ILayerController,
-			virtual public imtbase::IObjectProvider
+			virtual public iprm::IOptionsList,
+			virtual public iprm::ISelectionParam,
+			virtual public imtloggui::ILayerController
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
+	typedef imtbase::CStaticObjectCollection BaseClass2;
 
 	I_BEGIN_COMPONENT(CLayerComp)
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
+		I_REGISTER_INTERFACE(iprm::IOptionsList);
+		I_REGISTER_INTERFACE(iprm::ISelectionParam);
+		I_REGISTER_INTERFACE(imtloggui::ILayerController);
 		I_ASSIGN_MULTI_0(m_idAttrPtr, "RepresentationIds", "Representation ids", false);
 		I_ASSIGN_MULTI_0(m_nameAttrPtr, "RepresentationNames", "Representation names", false);
 		I_ASSIGN_MULTI_0(m_representationCompPtr, "Representations", "Representations", false);
@@ -34,8 +40,19 @@ public:
 	virtual QByteArray GetActiveRepresentationId() const override;
 	virtual bool SetActiveRepresentationId(const QByteArray& representationId) override;
 
-	// reimplemented (imtbase::IObjectProvider)
-	virtual const istd::IChangeable* GetDataObject() const override;
+	// reimplemented (iprm::ISelectionParam)
+	virtual const IOptionsList* GetSelectionConstraints() const override;
+	virtual int GetSelectedOptionIndex() const override;
+	virtual bool SetSelectedOptionIndex(int index) override;
+	virtual ISelectionParam* GetSubselection(int index) const override;
+
+	// reimplemented (iprm::IOptionsList)
+	virtual int GetOptionsFlags() const override;
+	virtual int GetOptionsCount() const override;
+	virtual QString GetOptionName(int index) const override;
+	virtual QString GetOptionDescription(int index) const override;
+	virtual QByteArray GetOptionId(int index) const override;
+	virtual bool IsOptionEnabled(int index) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

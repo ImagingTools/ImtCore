@@ -21,21 +21,21 @@ class CGroupViewComp:
 			public icomp::CComponentBase,
 			public imtbase::CStaticObjectCollection,
 			public imod::TSingleModelObserverBase<iprm::ISelectionParam>,
-			virtual public imtloggui::IGraphicsItemProvider
+			virtual public IGraphicsItemProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-	typedef public imtbase::CStaticObjectCollection BaseClass2;
-
-	CGroupViewComp();
+	typedef imtbase::CStaticObjectCollection BaseClass2;
 
 	I_BEGIN_COMPONENT(CGroupViewComp)
-		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
-		I_REGISTER_INTERFACE(imtloggui::IGraphicsItemProvider);
-		I_ASSIGN_MULTI_0(m_idAttrPtr, "LayerIds", "Layer ids", false);
-		I_ASSIGN_MULTI_0(m_nameAttrPtr, "LayerNames", "Layer names", false);
+		I_REGISTER_INTERFACE(IObjectCollection);
+		I_REGISTER_INTERFACE(IGraphicsItemProvider);
+		I_ASSIGN_MULTI_0(m_idAttrPtr, "LayerViewIds", "Layer view ids", false);
+		I_ASSIGN_MULTI_0(m_nameAttrPtr, "LayerViewNames", "Layer view names", false);
 		I_ASSIGN_MULTI_0(m_layerViewsCompPtr, "LayerViews", "Layer views", true);
 	I_END_COMPONENT
+
+	CGroupViewComp();
 
 	// reimplemented (imtloggui::IGraphicsItemProvider)
 	virtual GraphicsItemList GetItems() const override;
@@ -50,11 +50,14 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
+	const IGraphicsItemProvider* GetActiveLayerView() const;
+
+private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
-	I_MULTIREF(imtbase::IObjectCollection, m_layerViewsCompPtr);
+	I_MULTIREF(IObjectCollection, m_layerViewsCompPtr);
 
-	imod::CModelUpdateBridge m_representationViewUpdateBridge;
+	imod::CModelUpdateBridge m_updateBridge;
 };
 
 

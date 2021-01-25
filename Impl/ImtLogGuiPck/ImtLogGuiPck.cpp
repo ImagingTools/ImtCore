@@ -59,6 +59,11 @@ I_EXPORT_COMPONENT(
 			"Events Group Provider");
 
 I_EXPORT_COMPONENT(
+			GroupViewProvider,
+			"Events group view provider",
+			"Events Group View Provider");
+
+I_EXPORT_COMPONENT(
 			Group,
 			"Group",
 			"Event Group Layer Provider");
