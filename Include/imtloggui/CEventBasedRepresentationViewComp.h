@@ -28,6 +28,10 @@ public:
 	virtual GraphicsItemList GetAddedItems() const override;
 	virtual GraphicsItemList GetRemovedItems() const override;
 
+protected:
+	// reimplemented (imod::CSingleModelObserverBase)
+	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
+
 private:
 	I_REF(IEventItemFactory, m_eventItemFactoryCompPtr);
 

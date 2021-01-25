@@ -499,7 +499,7 @@ void CEventViewComp::ItemsObserver::SetParent(CEventViewComp* parent)
 
 // protected methods of the embedded class StaticItemsProvider
 
-// reimplemented (imtloggui::IGraphicsItemProvider)
+// reimplemented (imod::CSingleModelObserverBase)
 
 void CEventViewComp::ItemsObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {

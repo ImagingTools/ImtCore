@@ -80,6 +80,16 @@ IGraphicsItemProvider::GraphicsItemList CEventBasedRepresentationViewComp::GetRe
 }
 
 
+// protected methods
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CEventBasedRepresentationViewComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+{
+
+}
+
+
 } // namespace imtloggui
 
 

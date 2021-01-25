@@ -90,6 +90,16 @@ IGraphicsItemProvider::GraphicsItemList CProductionRepresentationViewComp::GetRe
 }
 
 
+// protected methods
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CProductionRepresentationViewComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+{
+
+}
+
+
 } // namespace imtloggui
 
 

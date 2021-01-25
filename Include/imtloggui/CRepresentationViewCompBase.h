@@ -3,6 +3,7 @@
 
 // Acf includes
 #include <icomp/CComponentBase.h>
+#include <imod/TSingleModelObserverBase.h>
 
 // ImtCore includes
 #include <imtloggui/IGraphicsItemProvider.h>
@@ -15,6 +16,7 @@ namespace imtloggui
 
 class CRepresentationViewCompBase:
 			public icomp::CComponentBase,
+			public imod::TSingleModelObserverBase<istd::IChangeable>,
 			public IGraphicsItemProvider
 {
 public:
