@@ -35,7 +35,7 @@ namespace ImtLogGuiPck
 {
 
 
-typedef imtloggui::CEventViewComp EventView;
+typedef icomp::TModelCompWrap<imtloggui::CEventViewComp> EventView;
 typedef imtloggui::CLoginEventFactoryComp LoginEventFactory;
 typedef imtloggui::CIconBasedEventFactoryComp IconBasedEventFactory;
 typedef imtloggui::CGeneralEventFactoryComp GeneralEventFactory;

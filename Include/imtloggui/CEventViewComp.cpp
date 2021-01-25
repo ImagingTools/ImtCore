@@ -35,7 +35,8 @@ CEventViewComp::CEventViewComp()
 	m_zoomOutCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
 	m_zoomReset("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
 	m_graphicsItemObserver(this),
-	m_scaleFactor(1.2)
+	m_scaleFactor(1.2),
+	m_viewPtr(nullptr)
 {
 	m_commands.SetParent(this);
 	m_rootCommands.InsertChild(&m_moveToFirstCommand);
@@ -56,6 +57,139 @@ CEventViewComp::CEventViewComp()
 	connect(&m_zoomInCommand, &QAction::triggered, this, &CEventViewComp::OnZoomInCommand);
 	connect(&m_zoomOutCommand, &QAction::triggered, this, &CEventViewComp::OnZoomOutCommand);
 	connect(&m_zoomReset, &QAction::triggered, this, &CEventViewComp::OnZoomReset);
+}
+
+
+// reimplemented (imtloggui::IViewPropertyProvider)
+
+QRectF CEventViewComp::GetSceneRect() const
+{
+	if (m_viewPtr != nullptr){
+		return m_viewPtr->GetSceneRect();
+	}
+
+	return QRectF();
+}
+
+
+QRectF CEventViewComp::GetViewRect() const
+{
+	if (m_viewPtr != nullptr){
+		return m_viewPtr->GetViewRect();
+	}
+
+	return QRectF();
+}
+
+QMargins CEventViewComp::GetMargins() const
+{
+	if (m_viewPtr != nullptr){
+		return m_viewPtr->GetMargins();
+	}
+
+	return QMargins();
+}
+
+
+istd::CRange CEventViewComp::GetScaleRangeX() const
+{
+	if (m_viewPtr != nullptr){
+		return m_viewPtr->GetScaleRangeX();
+	}
+
+	return istd::CRange();
+}
+
+
+istd::CRange CEventViewComp::GetScaleRangeY() const
+{
+	if (m_viewPtr != nullptr){
+		return m_viewPtr->GetScaleRangeY();
+	}
+
+	return istd::CRange();
+}
+
+
+double CEventViewComp::GetScaleX() const
+{
+	if (m_viewPtr != nullptr){
+		return m_viewPtr->GetScaleX();
+	}
+
+	return 0.0;
+}
+
+
+double CEventViewComp::GetScaleY() const
+{
+	if (m_viewPtr != nullptr){
+		return m_viewPtr->GetScaleY();
+	}
+
+	return 0.0;
+}
+
+
+// reimplemented (imtloggui::IViewPropertyManager)
+
+bool CEventViewComp::SetSceneRect(const QRectF & rect)
+{
+	if (m_viewPtr != nullptr){
+		return m_viewPtr->SetSceneRect(rect);
+	}
+
+	m_sceneRect = rect;
+
+	return false;
+}
+
+
+bool CEventViewComp::SetViewRect(const QRectF & rect)
+{
+	if (m_viewPtr != nullptr){
+		return m_viewPtr->SetViewRect(rect);
+	}
+
+	m_viewRect = rect;
+
+	return false;
+}
+
+
+bool CEventViewComp::SetMargins(const QMargins & margins)
+{
+	if (m_viewPtr != nullptr){
+		return m_viewPtr->SetMargins(margins);
+	}
+	
+	m_margins = margins;
+
+	return false;
+}
+
+
+bool CEventViewComp::SetScaleRangeX(const istd::CRange & range)
+{
+	if (m_viewPtr != nullptr){
+		return m_viewPtr->SetScaleRangeX(range);
+	}
+	
+	m_scaleRangeX = range;
+
+	return false;
+}
+
+
+bool CEventViewComp::SetScaleRangeY(const istd::CRange & range)
+{
+	if (m_viewPtr != nullptr){
+		return m_viewPtr->SetScaleRangeY(range);
+	}
+
+	m_scaleRangeY = range;
+
+	return false;
 }
 
 
@@ -109,7 +243,16 @@ void CEventViewComp::OnGuiCreated()
 	m_splitterPtr = new QSplitter(GetQtWidget());
 	layoutPtr->insertWidget(0, m_splitterPtr);
 
-	m_viewPtr = new imod::TModelWrap<CEventGraphicsView>();
+	m_viewPtr = new istd::TChangeDelegator<imod::TModelWrap<CEventGraphicsView>>();
+	m_viewPtr->SetSceneRect(m_sceneRect);
+	m_viewPtr->SetViewRect(m_viewRect);
+	m_viewPtr->SetMargins(m_margins);
+	m_viewPtr->SetScaleRangeX(m_scaleRangeX);
+	m_viewPtr->SetScaleRangeY(m_scaleRangeY);
+
+	// Bind changes of the underlaying view to this object:
+	m_viewPtr->SetSlavePtr(this);
+
 	m_viewPtr->setParent(GetQtWidget());
 	m_viewPtr->setScene(&m_scene);
 	m_viewPtr->setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
