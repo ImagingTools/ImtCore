@@ -119,6 +119,8 @@ bool CLayerComp::IsOptionEnabled(int index) const
 
 void CLayerComp::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
 	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
 	count = qMin(count, m_representationCompPtr.GetCount());
 

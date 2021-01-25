@@ -72,6 +72,8 @@ void CGroupViewComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 
 void CGroupViewComp::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
 	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
 	count = qMin(count, m_layerViewsCompPtr.GetCount());
 

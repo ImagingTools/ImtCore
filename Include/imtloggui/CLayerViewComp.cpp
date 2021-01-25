@@ -72,6 +72,8 @@ void CLayerViewComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 
 void CLayerViewComp::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
 	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
 	count = qMin(count, m_representationViewCompPtr.GetCount());
 

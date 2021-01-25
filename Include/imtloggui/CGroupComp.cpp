@@ -143,6 +143,8 @@ void CGroupComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 
 void CGroupComp::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
 	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
 	count = qMin(count, m_minTimespanAttrPtr.GetCount());
 	count = qMin(count, m_layerCompPtr.GetCount());

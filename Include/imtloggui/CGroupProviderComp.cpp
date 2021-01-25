@@ -11,6 +11,8 @@ namespace imtloggui
 
 void CGroupProviderComp::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
 	int count = qMin(m_idAttrPtr.GetCount(), m_nameAttrPtr.GetCount());
 	count = qMin(count, m_groupCompPtr.GetCount());
 
