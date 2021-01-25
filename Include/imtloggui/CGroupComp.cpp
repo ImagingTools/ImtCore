@@ -110,14 +110,18 @@ void CGroupComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 		return;
 	}
 
-	imtlog::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
-	if (!timeRange.IsClosed()){
-		if (!m_activeLayerId.isEmpty()){
-			istd::CChangeNotifier notifier(this);
-			m_activeLayerId.clear();
-		}
+	imtlog::CTimeRange timeRange;
+	
+	if (m_timeRangeProviderCompPtr.IsValid()){
+		timeRange = m_timeRangeProviderCompPtr->GetTimeRange();
+		if (!timeRange.IsClosed()){
+			if (!m_activeLayerId.isEmpty()){
+				istd::CChangeNotifier notifier(this);
+				m_activeLayerId.clear();
+			}
 
-		return;
+			return;
+		}
 	}
 
 	uint64_t timespan = timeRange.GetEndTime().toMSecsSinceEpoch() - timeRange.GetBeginTime().toMSecsSinceEpoch();
@@ -163,6 +167,20 @@ void CGroupComp::OnComponentCreated()
 
 		m_activeLayerId = id;
 	}
+
+	if (m_timeRangeProviderCompPtr.IsValid() && m_timeRangeProviderModelCompPtr.IsValid()){
+		m_timeRangeProviderModelCompPtr->AttachObserver(this);
+	}
+}
+
+
+void CGroupComp::OnComponentDestroyed()
+{
+	if (m_timeRangeProviderModelCompPtr.IsValid() && m_timeRangeProviderModelCompPtr->IsAttached(this)){
+		m_timeRangeProviderModelCompPtr->DetachObserver(this);
+	}
+
+	BaseClass::OnComponentDestroyed();
 }
 
 

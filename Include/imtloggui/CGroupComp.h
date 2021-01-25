@@ -19,7 +19,7 @@ namespace imtloggui
 class CGroupComp:
 			public icomp::CComponentBase,
 			public imtbase::CStaticObjectCollection,
-			public imod::TSingleModelObserverBase<imtlog::ITimeRangeProvider>,
+			protected imod::TSingleModelObserverBase<imtlog::ITimeRangeProvider>,
 			virtual public iprm::IOptionsList,
 			virtual public iprm::ISelectionParam
 {
@@ -35,7 +35,8 @@ public:
 		I_ASSIGN_MULTI_0(m_nameAttrPtr, "LayerNames", "Layer names", false);
 		I_ASSIGN_MULTI_0(m_minTimespanAttrPtr, "LayerMinTimespan", "Minimum timespan for layer", false);
 		I_ASSIGN_MULTI_0(m_layerCompPtr, "Layers", "Layers", false);
-		I_ASSIGN(m_timeRangeProviderCompPtr, "TimeRangeProvider", "TimeRangeProvider", false, "TimeRangeProvider");
+		I_ASSIGN(m_timeRangeProviderCompPtr, "TimeRangeProvider", "TimeRangeProvider", true, "TimeRangeProvider");
+		I_ASSIGN_TO(m_timeRangeProviderModelCompPtr, m_timeRangeProviderCompPtr, true);
 	I_END_COMPONENT
 
 	// reimplemented (iprm::ISelectionParam)
@@ -58,6 +59,7 @@ protected:
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
@@ -65,6 +67,7 @@ private:
 	I_MULTIATTR(double, m_minTimespanAttrPtr);
 	I_MULTIREF(imtbase::IObjectCollection, m_layerCompPtr);
 	I_REF(imtlog::ITimeRangeProvider, m_timeRangeProviderCompPtr);
+	I_REF(imod::IModel, m_timeRangeProviderModelCompPtr);
 
 	QMap<uint64_t, QByteArray> m_arrangedIds;
 
