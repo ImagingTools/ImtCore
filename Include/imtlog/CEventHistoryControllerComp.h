@@ -122,6 +122,8 @@ private:
 
 	mutable QMap<QByteArray, RequestMapItem> m_requests;
 	mutable QMutex m_requestMutex;
+
+	ilog::CMessageContainer m_log;
 };
 
 

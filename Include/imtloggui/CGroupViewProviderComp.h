@@ -30,9 +30,11 @@ public:
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 private:
 	void ConnectObserversToModels();
+	void DisonnectObserversFromModels();
 
 private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);

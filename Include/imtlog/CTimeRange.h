@@ -28,6 +28,7 @@ public:
 	CTimeRange Intersect(const CTimeRange& other) const;
 
 	bool operator==(const CTimeRange& other) const;
+	bool operator!=(const CTimeRange& other) const;
 
 private:
 	QDateTime m_begin;

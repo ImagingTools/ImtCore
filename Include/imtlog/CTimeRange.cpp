@@ -136,7 +136,13 @@ void CTimeRange::Ensure(const QDateTime& time)
 	}
 
 	if (IsClosed()){
-		
+		if (time < m_begin){
+			m_begin = time;
+		}
+
+		if (time > m_end){
+			m_end = time;
+		}
 	}
 }
 
@@ -176,6 +182,12 @@ CTimeRange CTimeRange::Intersect(const CTimeRange& other) const
 bool CTimeRange::operator==(const CTimeRange& other) const
 {
 	return (m_begin == other.m_begin && m_end == other.m_end);
+}
+
+
+bool CTimeRange::operator!=(const CTimeRange& other) const
+{
+	return (m_begin != other.m_begin || m_end != other.m_end);
 }
 
 

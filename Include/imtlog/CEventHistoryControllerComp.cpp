@@ -39,6 +39,24 @@ IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
 			const IEventFilter* filterPtr,
 			const IMessageFilterParams* filterParamsPtr) const
 {
+	if (filterPtr == nullptr || filterParamsPtr == nullptr){
+		return IEventProvider::EventContainerPtr();
+	}
+
+	ilog::CMessageContainer* containerPtr = new ilog::CMessageContainer();
+
+	ilog::IMessageContainer::Messages messages = m_log.GetMessages();
+	for (int i = messages.count() - 1; i >= 0; i--){
+		if (filterPtr->IsMessageAccepted(*messages[i], filterParamsPtr)){
+			containerPtr->AddMessage(messages[i]);
+		}
+	}
+
+	return IEventProvider::EventContainerPtr(containerPtr);
+
+	//QSet<int> messageIds = filterParamsPtr->GetMessageFilterIds();
+
+
 	//EventHistoryGroupControllerPtr groupPtr;
 
 	//QSet<int> messageIds;
@@ -90,6 +108,15 @@ void CEventHistoryControllerComp::AddMessage(const MessagePtr& messagePtr)
 	BaseClass::AddMessage(messagePtr);
 
 	if (m_controllerState == CS_OK){
+
+		istd::CChangeNotifier notifier(this);
+		m_log.AddMessage(messagePtr);
+		m_archiveTimeRange.Ensure(messagePtr->GetInformationTimeStamp());
+
+		return;
+		
+		// !!!
+
 		int id = messagePtr->GetInformationId();
 
 		EventHistoryGroupControllerPtr groupPtr = GetGroupForMessageId(id);

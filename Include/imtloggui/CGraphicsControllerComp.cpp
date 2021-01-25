@@ -166,20 +166,12 @@ void CGraphicsControllerComp::OnAxisEndTimeChanged(const QDateTime& /*oldTime*/,
 
 // private methods
 
-void CGraphicsControllerComp::CreateGroupsTable()
-{
-	if (m_groupViewProviderCompPtr.IsValid() && m_groupViewProviderCompPtr.IsValid()){
-		QVector<QByteArray> groupIds = m_groupViewProviderCompPtr->GetElementIds();
-		for (int groupIdCounter = 0; groupIdCounter < groupIds.count(); groupIdCounter++){
-		}
-	}
-}
-
-
 void CGraphicsControllerComp::OnViewportGeometryUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	QRectF viewRect = propertyPtr->GetViewRect();
 	m_timeAxisPtr->setPos(0, viewRect.bottom() - m_timeAxisPtr->rect().height() / propertyPtr->GetScaleY());
+
+	m_visibleTimeRangeProvider.SetTimeRange(imtlog::CTimeRange(m_timeAxisPtr->GetVisibleBeginTime(), m_timeAxisPtr->GetVisibleEndTime()));
 
 	for (int i = 0; i < m_groupItemList.count(); i++){
 		QRectF rect = m_groupItemList[i].backgroundPtr->rect();
@@ -300,8 +292,10 @@ void CGraphicsControllerComp::TimeRangeProvider::SetParent(CGraphicsControllerCo
 
 void CGraphicsControllerComp::TimeRangeProvider::SetTimeRange(const imtlog::CTimeRange& timeRange)
 {
-	istd::CChangeNotifier notifier(this);
-	m_timeRange = timeRange;
+	if (m_timeRange != timeRange){
+		istd::CChangeNotifier notifier(this);
+		m_timeRange = timeRange;
+	}
 }
 
 

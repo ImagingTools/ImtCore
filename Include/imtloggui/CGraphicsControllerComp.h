@@ -72,7 +72,6 @@ private Q_SLOTS:
 	void OnAxisEndTimeChanged(const QDateTime& oldTime, const QDateTime& newTime);
 
 private:
-	void CreateGroupsTable();
 	void OnViewportGeometryUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& changeSet);
 
 private:

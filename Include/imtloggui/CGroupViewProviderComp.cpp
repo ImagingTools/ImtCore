@@ -25,6 +25,14 @@ void CGroupViewProviderComp::OnComponentCreated()
 }
 
 
+void CGroupViewProviderComp::OnComponentDestroyed()
+{
+	DisonnectObserversFromModels();
+
+	BaseClass::OnComponentDestroyed();
+}
+
+
 // private methods
 
 void CGroupViewProviderComp::ConnectObserversToModels()
@@ -60,6 +68,10 @@ void CGroupViewProviderComp::ConnectObserversToModels()
 		const imtbase::IObjectCollection* layerViewCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
 					GetObjectPtr(groupId));
 
+		if (layerCollectionPtr == nullptr || layerViewCollectionPtr == nullptr){
+			continue;
+		}
+
 		QVector<QByteArray> layerIds = layerCollectionPtr->GetElementIds();
 		QVector<QByteArray> layerViewIds = layerViewCollectionPtr->GetElementIds();
 		for (int layerIndex = 0; layerIndex < layerIds.count(); layerIndex++){
@@ -86,6 +98,10 @@ void CGroupViewProviderComp::ConnectObserversToModels()
 			const imtbase::IObjectCollection* representationViewCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
 						layerViewCollectionPtr->GetObjectPtr(layerId));
 
+			if (representationCollectionPtr == nullptr || representationViewCollectionPtr == nullptr){
+				continue;
+			}
+
 			QVector<QByteArray> representationIds = representationCollectionPtr->GetElementIds();
 			QVector<QByteArray> representationViewIds = representationViewCollectionPtr->GetElementIds();
 			for (int representationIndex = 0; representationIndex < representationIds.count(); representationIndex++){
@@ -108,6 +124,67 @@ void CGroupViewProviderComp::ConnectObserversToModels()
 			}
 		}
 	}	
+}
+
+
+void CGroupViewProviderComp::DisonnectObserversFromModels()
+{
+	if (!m_groupProviderCompPtr.IsValid()){
+		return;
+	}
+
+	// Iteration over groups
+	QVector<QByteArray> groupIds = m_groupProviderCompPtr->GetElementIds();
+	for (int groupIndex = 0; groupIndex < groupIds.count(); groupIndex++){
+		QByteArray groupId = groupIds[groupIndex];
+
+		imod::IModel* groupModelPtr = dynamic_cast<imod::IModel*>(
+			const_cast<istd::IChangeable*>(m_groupProviderCompPtr->GetObjectPtr(groupId)));
+
+		if (groupModelPtr != nullptr){
+			groupModelPtr->DetachAllObservers();
+		}
+
+		// Iteration over layers
+		const imtbase::IObjectCollection* layerCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
+					m_groupProviderCompPtr->GetObjectPtr(groupId));
+
+		if (layerCollectionPtr == nullptr){
+			continue;
+		}
+
+		QVector<QByteArray> layerIds = layerCollectionPtr->GetElementIds();
+		for (int layerIndex = 0; layerIndex < layerIds.count(); layerIndex++){
+			QByteArray layerId = layerIds[layerIndex];
+
+			imod::IModel* layerModelPtr = dynamic_cast<imod::IModel*>(
+						const_cast<istd::IChangeable*>(layerCollectionPtr->GetObjectPtr(layerId)));
+
+			if (layerModelPtr != nullptr){
+				layerModelPtr->DetachAllObservers();
+			}
+
+			// Iteration over representations
+			const imtbase::IObjectCollection* representationCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
+						layerCollectionPtr->GetObjectPtr(layerId));
+
+			if (representationCollectionPtr == nullptr){
+				continue;
+			}
+
+			QVector<QByteArray> representationIds = representationCollectionPtr->GetElementIds();
+			for (int representationIndex = 0; representationIndex < representationIds.count(); representationIndex++){
+				QByteArray representationId = representationIds[representationIndex];
+
+				imod::IModel* representationModelPtr = dynamic_cast<imod::IModel*>(
+					const_cast<istd::IChangeable*>(representationCollectionPtr->GetObjectPtr(representationId)));
+
+				if (representationModelPtr != nullptr){
+					representationModelPtr->DetachAllObservers();
+				}
+			}
+		}
+	}
 }
 
 
