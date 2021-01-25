@@ -62,13 +62,13 @@ IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
 
 	//QByteArray uuid = groupPtr->RequestEvents(filterPtr);
 
-	//RequestMapItem item;
-	//item.resultEventsPtr.SetPtr(new ilog::CMessageContainer());
-	//item.groupPtr = groupPtr;
+	//RequestMapItem groupItem;
+	//groupItem.resultEventsPtr.SetPtr(new ilog::CMessageContainer());
+	//groupItem.groupPtr = groupPtr;
 
-	//m_requests[uuid] = item;
+	//m_requests[uuid] = groupItem;
 
-	//return item.resultEventsPtr;
+	//return groupItem.resultEventsPtr;
 
 	return EventContainerPtr();
 }
@@ -111,6 +111,10 @@ void CEventHistoryControllerComp::OnSystemShutdown()
 	for (GroupListItem& item : m_groups){
 		item.groupPtr->OnSystemShutdown();
 	}
+
+	if (m_generalGroupPtr.IsValid()){
+		m_generalGroupPtr->OnSystemShutdown();
+	}
 }
 
 
@@ -142,89 +146,57 @@ void CEventHistoryControllerComp::OnComponentCreated()
 
 	m_compressorCompPtr.EnsureInitialized();
 
-	EventHistoryGroupControllerParams cParams;
-	EventHistoryGroupPersistenceParams pParams;
-	EventHistoryGroupControllerPtr groupPtr;
-	CTimeRange gTimeRange;
-	GroupListItem item;
+	if (m_groupProviderCompPtr.IsValid()){
+		imtbase::ICollectionInfo::Ids groupIds = m_groupProviderCompPtr->GetElementIds();
+		for (int i = 0; i < groupIds.count(); i++){
+			QSet<int> messageIds;
 
-	cParams.containerDuration = 15;
-	cParams.writeDelay = 5;
-	cParams.removeDelay = 10;
+			Q_ASSERT(m_groupMessageIdProviderCompPtr->GetGroupMessageIds(groupIds[i], messageIds));
 
+			EventHistoryGroupControllerParams cParams;
+			cParams.containerDuration = 10;
+			cParams.writeDelay = 5;
+			cParams.removeDelay = 10;
 
-	pParams.repositoryDir = m_logFolderCompPtr->GetPath();
-	pParams.groupDir = "UserActions";
-	pParams.containerExtension = "xml";
-	pParams.archiveExtension = "arc";
- 	pParams.versionInfoPtr = m_versionInfoCompPtr.GetPtr();
-	pParams.compressorPtr = m_compressorCompPtr.GetPtr();
+			EventHistoryGroupPersistenceParams pParams;
+			pParams.repositoryDir = m_logFolderCompPtr->GetPath();
+			pParams.groupDir = m_groupProviderCompPtr->GetElementInfo(groupIds[i], imtbase::ICollectionInfo::EIT_NAME).toString();
+			pParams.containerExtension = "xml";
+			pParams.archiveExtension = "arc";
+			pParams.versionInfoPtr = m_versionInfoCompPtr.GetPtr();
+			pParams.compressorPtr = m_compressorCompPtr.GetPtr();
 
-	groupPtr.SetPtr(new CEventHistoryGroupController(cParams, pParams));
-	groupPtr->SetLogPtr(GetLogPtr());
-	gTimeRange = groupPtr->GetTimeRange();
+			EventHistoryGroupControllerPtr groupPtr(new CEventHistoryGroupController(cParams, pParams));
+			groupPtr->SetLogPtr(GetLogPtr());
 
-	item.messageIds.clear();
-	item.messageIds.append(100000000);
-	item.groupPtr = groupPtr;
-	m_groups.append(item);
+			CTimeRange gTimeRange = groupPtr->GetTimeRange();
+			qDebug() << gTimeRange.GetBeginTime();
+			qDebug() << gTimeRange.GetEndTime();
 
-	if (!m_archiveTimeRange.IsClosed()){
-		m_archiveTimeRange = gTimeRange;
-	}
-	else{
-		if (gTimeRange.GetBeginTime() < m_archiveTimeRange.GetBeginTime()){
-			m_archiveTimeRange.SetBeginTime(gTimeRange.GetBeginTime());
-		}
+			if (!m_archiveTimeRange.IsClosed()){
+				m_archiveTimeRange = gTimeRange;
+			}
+			else{
+				if (gTimeRange.GetBeginTime() < m_archiveTimeRange.GetBeginTime()){
+					m_archiveTimeRange.SetBeginTime(gTimeRange.GetBeginTime());
+				}
 
-		if (gTimeRange.GetEndTime() > m_archiveTimeRange.GetEndTime()){
-			m_archiveTimeRange.SetEndTime(gTimeRange.GetEndTime());
-		}
-	}
-	
-	pParams.groupDir = "Production";
-	groupPtr.SetPtr(new CEventHistoryGroupController(cParams, pParams));
-	groupPtr->SetLogPtr(GetLogPtr());
-	gTimeRange = groupPtr->GetTimeRange();
+				if (gTimeRange.GetEndTime() > m_archiveTimeRange.GetEndTime()){
+					m_archiveTimeRange.SetEndTime(gTimeRange.GetEndTime());
+				}
+			}
 
-	item.messageIds.clear();
-	item.messageIds.append(1000000001);
-	item.messageIds.append(19780000);
-	item.groupPtr = groupPtr;
-	m_groups.append(item);
+			if (messageIds.isEmpty()){
+				Q_ASSERT(!m_generalGroupPtr.IsValid());
+				m_generalGroupPtr = groupPtr;
+			}
+			else{
+				GroupListItem groupItem;
 
-	if (!m_archiveTimeRange.IsClosed()){
-		m_archiveTimeRange = gTimeRange;
-	}
-	else{
-		if (gTimeRange.GetBeginTime() < m_archiveTimeRange.GetBeginTime()){
-			m_archiveTimeRange.SetBeginTime(gTimeRange.GetBeginTime());
-		}
-
-		if (gTimeRange.GetEndTime() > m_archiveTimeRange.GetEndTime()){
-			m_archiveTimeRange.SetEndTime(gTimeRange.GetEndTime());
-		}
-	}
-
-	pParams.groupDir = "General";
-	groupPtr.SetPtr(new CEventHistoryGroupController(cParams, pParams));
-	groupPtr->SetLogPtr(GetLogPtr());
-	gTimeRange = groupPtr->GetTimeRange();
-
-	item.messageIds.clear();
-	item.groupPtr = groupPtr;
-	m_groups.prepend(item);
-
-	if (!m_archiveTimeRange.IsClosed()){
-		m_archiveTimeRange = gTimeRange;
-	}
-	else{
-		if (gTimeRange.GetBeginTime() < m_archiveTimeRange.GetBeginTime()){
-			m_archiveTimeRange.SetBeginTime(gTimeRange.GetBeginTime());
-		}
-
-		if (gTimeRange.GetEndTime() > m_archiveTimeRange.GetEndTime()){
-			m_archiveTimeRange.SetEndTime(gTimeRange.GetEndTime());
+				groupItem.messageIds = messageIds;
+				groupItem.groupPtr = groupPtr;
+				m_groups.append(groupItem);
+			}
 		}
 	}
 
@@ -249,13 +221,14 @@ void CEventHistoryControllerComp::OnRequestFinished(QByteArray requestId)
 
 CEventHistoryControllerComp::EventHistoryGroupControllerPtr CEventHistoryControllerComp::GetGroupForMessageId(int messageId) const
 {
-	for (const GroupListItem& item : m_groups){
-		if (item.messageIds.contains(messageId)){
-			return item.groupPtr;
+	for (const GroupListItem& groupItem : m_groups){
+		if (groupItem.messageIds.contains(messageId)){
+			return groupItem.groupPtr;
 		}
 	}
 	
-	return EventHistoryGroupControllerPtr();
+	Q_ASSERT(m_generalGroupPtr.IsValid());
+	return m_generalGroupPtr;
 }
 
 

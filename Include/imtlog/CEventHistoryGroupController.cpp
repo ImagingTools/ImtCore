@@ -72,6 +72,9 @@ void CEventHistoryGroupController::OnSystemShutdown()
 
 	StartWriter();
 	m_writer.wait();
+
+	m_readJobController.requestInterruption();
+	m_readJobController.wait();
 }
 
 
@@ -167,28 +170,27 @@ void CEventHistoryGroupController::OnTimer()
 	QMutexLocker workingQueueLocker(&m_workingQueueMutex);
 	QMutexLocker writingQueueLocker(&m_writingQueueMutex);
 
-	for (CEventHistoryGroupReader::EventContainerPtr containerPtr : m_workingQueue){
-		Q_ASSERT(containerPtr->GetMessagesCount() > 0);
-		if (containerPtr->GetTimeRange().GetEndTime().addSecs(m_controllerParams.writeDelay) < QDateTime::currentDateTime()){
-
-		}
-	}
-
 	CEventHistoryGroupReader::EventContainerList::iterator it = m_workingQueue.begin();
 	while (it != m_workingQueue.end()){
 		CEventHistoryGroupReader::EventContainerPtr containerPtr = *it;
 
+		Q_ASSERT(containerPtr->GetMessagesCount() > 0);
+
 		if (containerPtr->GetTimeRange().GetEndTime().addSecs(m_controllerParams.writeDelay) < QDateTime::currentDateTime()){
 			containerPtr->SetTimeRange(containerPtr->GetMessagesTimeRange());
 			m_writingQueue.append(containerPtr);
-		}
-
-		if (containerPtr->GetTimeRange().GetEndTime().addSecs(m_controllerParams.removeDelay) < QDateTime::currentDateTime()){
 			it = m_workingQueue.erase(it);
-			continue;
 		}
 
-		it++;
+		// TODO: review caching
+		//if (containerPtr->GetTimeRange().GetEndTime().addSecs(m_controllerParams.removeDelay) < QDateTime::currentDateTime()){
+		//	it = m_workingQueue.erase(it);
+		//	continue;
+		//}
+
+		if (it != m_workingQueue.end()){
+			it++;
+		}
 	}
 
 	if (!m_writingQueue.isEmpty()){

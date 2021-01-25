@@ -22,7 +22,7 @@ public:
 	I_BEGIN_COMPONENT(CGroupMessageIdsProviderComp)
 		I_REGISTER_INTERFACE(IGroupMessageIdsProvider);
 		I_TASSIGN_MULTI_0(m_idsAttrPtr, "MessageIdList", "Message id list", false);
-		I_ASSIGN(m_groupIdAttrPtr, "GroupId", "Group id", false, "");
+		I_ASSIGN(m_groupIdAttrPtr, "GroupId", "Group id", true, "");
 		I_ASSIGN(m_slaveAttrPtr, "SlaveProvider", "Slave group message ids provider", false, "");
 	I_END_COMPONENT
 

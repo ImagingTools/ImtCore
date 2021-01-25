@@ -7,7 +7,7 @@
 #include <QtCore/QQueue>
 #include <QtCore/QTimer>
 
-// ACF includes
+// Acf includes
 #include <iser/IVersionInfo.h>
 #include <ifile/IFileNameParam.h>
 #include <ilog/TLoggerCompWrap.h>
@@ -15,7 +15,9 @@
 #include <ibase/TRuntimeStatusHanderCompWrap.h>
 
 // ImtCore includes
+#include <imtbase/IObjectCollection.h>
 #include <imtfile/IFileCompression.h>
+#include <imtlog/IGroupMessageIdsProvider.h>
 #include <imtlog/ITimeRangeProvider.h>
 #include <imtlog/IEventProvider.h>
 #include <imtlog/CEventContainer.h>
@@ -43,9 +45,12 @@ public:
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
 		I_REGISTER_INTERFACE(IEventProvider);
 		I_REGISTER_INTERFACE(ITimeRangeProvider);
+		I_REGISTER_INTERFACE(IGroupMessageIdsProvider);
 		I_ASSIGN(m_logFolderCompPtr, "LogFolder", "Path to the event history folder", true, "");
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
+		I_ASSIGN(m_groupProviderCompPtr, "GroupProvider", "Group provider", true, "GroupProvider");
+		I_ASSIGN_TO(m_groupMessageIdProviderCompPtr, m_groupProviderCompPtr, true);
 	I_END_COMPONENT;
 
 	CEventHistoryControllerComp();
@@ -90,7 +95,7 @@ private:
 
 	struct GroupListItem
 	{
-		QList<int> messageIds;
+		QSet<int> messageIds;
 		EventHistoryGroupControllerPtr groupPtr;
 	};
 
@@ -104,13 +109,15 @@ private:
 	I_REF(ifile::IFileNameParam, m_logFolderCompPtr);
 	I_REF(imtfile::IFileCompression, m_compressorCompPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
+	I_REF(imtbase::IObjectCollection, m_groupProviderCompPtr);
+	I_REF(IGroupMessageIdsProvider, m_groupMessageIdProviderCompPtr);
 
 	QDateTime m_systemStartTime;
 	ControllerState m_controllerState;
 
 	CTimeRange m_archiveTimeRange;
 
-	// First item should be GeneralGroup
+	EventHistoryGroupControllerPtr m_generalGroupPtr;
 	QList<GroupListItem> m_groups;
 
 	mutable QMap<QByteArray, RequestMapItem> m_requests;

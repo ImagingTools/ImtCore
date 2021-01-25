@@ -15,6 +15,7 @@ void CGroupViewProviderComp::OnComponentCreated()
 	count = qMin(count, m_groupViewCompPtr.GetCount());
 
 	for (int i = 0; i < count; i++){
+		Q_ASSERT(!GetElementIds().contains(m_idAttrPtr[i]));
 		RegisterObject(m_idAttrPtr[i], "", m_nameAttrPtr[i], "", m_groupViewCompPtr[i]);
 	}
 
@@ -41,9 +42,9 @@ void CGroupViewProviderComp::ConnectObserversToModels()
 		}
 
 		imod::IModel* groupModelPtr = dynamic_cast<imod::IModel*>(
-			const_cast<istd::IChangeable*>(m_groupProviderCompPtr->GetObjectPtr(groupId)));
+					const_cast<istd::IChangeable*>(m_groupProviderCompPtr->GetObjectPtr(groupId)));
 		imod::IObserver* groupObserverPtr = dynamic_cast<imod::IObserver*>(
-			const_cast<istd::IChangeable*>(GetObjectPtr(groupId)));
+					const_cast<istd::IChangeable*>(GetObjectPtr(groupId)));
 			
 		if (groupModelPtr == nullptr || groupObserverPtr == nullptr){
 			continue;
@@ -52,10 +53,10 @@ void CGroupViewProviderComp::ConnectObserversToModels()
 		groupModelPtr->AttachObserver(groupObserverPtr);
 
 		// Iteration over layers
-		const imtbase::IObjectCollection* layerCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>
-			(m_groupProviderCompPtr->GetObjectPtr(groupId));
-		const imtbase::IObjectCollection* layerViewCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>
-			(GetObjectPtr(groupId));
+		const imtbase::IObjectCollection* layerCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
+					m_groupProviderCompPtr->GetObjectPtr(groupId));
+		const imtbase::IObjectCollection* layerViewCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
+					GetObjectPtr(groupId));
 
 		QVector<QByteArray> layerIds = layerCollectionPtr->GetElementIds();
 		QVector<QByteArray> layerViewIds = layerViewCollectionPtr->GetElementIds();
@@ -67,9 +68,9 @@ void CGroupViewProviderComp::ConnectObserversToModels()
 			}
 
 			imod::IModel* layerModelPtr = dynamic_cast<imod::IModel*>(
-				const_cast<istd::IChangeable*>(layerCollectionPtr->GetObjectPtr(layerId)));
+						const_cast<istd::IChangeable*>(layerCollectionPtr->GetObjectPtr(layerId)));
 			imod::IObserver* layerObserverPtr = dynamic_cast<imod::IObserver*>(
-				const_cast<istd::IChangeable*>(layerViewCollectionPtr->GetObjectPtr(layerId)));
+						const_cast<istd::IChangeable*>(layerViewCollectionPtr->GetObjectPtr(layerId)));
 
 			if (layerModelPtr == nullptr || layerObserverPtr == nullptr){
 				continue;
@@ -78,10 +79,10 @@ void CGroupViewProviderComp::ConnectObserversToModels()
 			layerModelPtr->AttachObserver(layerObserverPtr);
 
 			// Iteration over representations
-			const imtbase::IObjectCollection* representationCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>
-				(layerCollectionPtr->GetObjectPtr(layerId));
-			const imtbase::IObjectCollection* representationViewCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>
-				(layerViewCollectionPtr->GetObjectPtr(layerId));
+			const imtbase::IObjectCollection* representationCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
+						layerCollectionPtr->GetObjectPtr(layerId));
+			const imtbase::IObjectCollection* representationViewCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
+						layerViewCollectionPtr->GetObjectPtr(layerId));
 
 			QVector<QByteArray> representationIds = representationCollectionPtr->GetElementIds();
 			QVector<QByteArray> representationViewIds = representationViewCollectionPtr->GetElementIds();
@@ -93,9 +94,9 @@ void CGroupViewProviderComp::ConnectObserversToModels()
 				}
 
 				imod::IModel* representationModelPtr = dynamic_cast<imod::IModel*>(
-					const_cast<istd::IChangeable*>(representationCollectionPtr->GetObjectPtr(representationId)));
+							const_cast<istd::IChangeable*>(representationCollectionPtr->GetObjectPtr(representationId)));
 				imod::IObserver* representationObserverPtr = dynamic_cast<imod::IObserver*>(
-					const_cast<istd::IChangeable*>(representationViewCollectionPtr->GetObjectPtr(representationId)));
+							const_cast<istd::IChangeable*>(representationViewCollectionPtr->GetObjectPtr(representationId)));
 
 				if (representationModelPtr == nullptr || representationObserverPtr == nullptr){
 					continue;

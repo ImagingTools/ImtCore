@@ -55,7 +55,7 @@ private:
 private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
-	I_MULTIREF(IObjectCollection, m_representationViewCompPtr);
+	I_MULTIREF(IGraphicsItemProvider, m_representationViewCompPtr);
 
 	imod::CModelUpdateBridge m_updateBridge;
 };

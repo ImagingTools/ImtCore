@@ -149,7 +149,7 @@ void CGroupComp::OnComponentCreated()
 
 	for (int i = 0; i < count; i++){
 		Q_ASSERT(!m_arrangedIds.contains(m_minTimespanAttrPtr[i]));
-
+		Q_ASSERT(!GetElementIds().contains(m_idAttrPtr[i]));
 		RegisterObject(m_idAttrPtr[i], "", m_nameAttrPtr[i], "", m_layerCompPtr[i]);
 		m_arrangedIds[m_minTimespanAttrPtr[i]] = m_idAttrPtr[i];
 	}

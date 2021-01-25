@@ -76,6 +76,7 @@ void CGroupViewComp::OnComponentCreated()
 	count = qMin(count, m_layerViewsCompPtr.GetCount());
 
 	for (int i = 0; i < count; i++){
+		Q_ASSERT(!GetElementIds().contains(m_idAttrPtr[i]));
 		RegisterObject(m_idAttrPtr[i], "", m_nameAttrPtr[i], "", m_layerViewsCompPtr[i]);
 	}
 }
