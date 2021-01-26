@@ -11,6 +11,7 @@
 #include <imtlog/CEventHistoryControllerComp.h>
 #include <imtlog/CStorageComp.h>
 #include <imtlog/CGroupMessageIdsProviderComp.h>
+#include <imtlog/CEventFilterComp.h>
 
 
 /**
@@ -24,6 +25,7 @@ typedef ibase::TModelObserverCompWrap<imtlog::CLoginEventControllerComp> LoginEv
 typedef icomp::TModelCompWrap<imtlog::CEventHistoryControllerComp> EventHistoryController;
 typedef imtlog::CStorageComp Storage;
 typedef imtlog::CGroupMessageIdsProviderComp GroupMessageIdsProvider;
+typedef imtlog::CEventFilterComp EventFilter;
 
 
 } // namespace ImtLogPck

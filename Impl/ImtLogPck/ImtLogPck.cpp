@@ -34,6 +34,12 @@ I_EXPORT_COMPONENT(
 			"Group message ids provider",
 			"Group Message Id Provider");
 
+I_EXPORT_COMPONENT(
+			EventFilter,
+			"Event filter",
+			"Event Filter");
+
+
 
 } // namespace ImtLogPck
 

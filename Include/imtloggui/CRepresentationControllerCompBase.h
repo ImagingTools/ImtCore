@@ -19,7 +19,7 @@ namespace imtloggui
 
 class CRepresentationControllerCompBase:
 			public icomp::CComponentBase,
-			public imod::TSingleModelObserverBase<imtlog::ITimeRangeProvider>
+			protected imod::TSingleModelObserverBase<imtlog::ITimeRangeProvider>
 {
 public:
 	typedef CComponentBase BaseClass;
@@ -28,6 +28,7 @@ public:
 		I_REGISTER_INTERFACE(imod::IObserver);
 		I_ASSIGN(m_eventProviderCompPtr, "EventProvider", "Event provider", true, "EventProvider");
 		I_ASSIGN(m_timeRangeProviderCompPtr, "TimeRangeProvider", "TimeRangeProvider", false, "TimeRangeProvider");
+		I_ASSIGN_TO(m_timeRangeProviderModelCompPtr, m_timeRangeProviderCompPtr, true);
 		I_ASSIGN(m_representationCompPtr, "RepresentationData", "Representation data model", true, "RepresentationData");
 		I_ASSIGN(m_eventFilterCompPtr, "EventFilter", "Event filter", false, "EventFilter");
 		I_ASSIGN(m_messageFilterParamsCompPtr, "MessageFilterParams", "Message filter params", false, "MessageFilterParams");
@@ -40,6 +41,10 @@ protected:
 				const imtlog::IEventFilter* eventFilterPtr,
 				const imtlog::IMessageFilterParams* messageFilterParamsPtr) const = 0;
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated();
+	virtual void OnComponentDestroyed();
+
 private:
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
@@ -47,6 +52,7 @@ private:
 protected:
 	I_REF(imtlog::IEventProvider, m_eventProviderCompPtr);
 	I_REF(imtlog::ITimeRangeProvider, m_timeRangeProviderCompPtr);
+	I_REF(imod::IModel, m_timeRangeProviderModelCompPtr);
 	I_REF(istd::IChangeable, m_representationCompPtr);
 	I_REF(imtlog::IEventFilter, m_eventFilterCompPtr);
 	I_REF(imtlog::IMessageFilterParams, m_messageFilterParamsCompPtr);

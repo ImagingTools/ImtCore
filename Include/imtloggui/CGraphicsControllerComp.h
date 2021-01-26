@@ -3,6 +3,7 @@
 
 // Acf includes
 #include <imod/TSingleModelObserverBase.h>
+#include <imod/CMultiModelDispatcherBase.h>
 #include <imod/TModelWrap.h>
 #include <icomp/CComponentBase.h>
 
@@ -42,6 +43,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, imtlog::ITimeRangeProvider, ExtractVisibleTimeRangeProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, istd::IChangeable, ExtractVisibleTimeRangeProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, imod::IModel, ExtractVisibleTimeRangeProvider);
+		I_ASSIGN(m_groupProviderCompPtr, "GroupProvider", "Event groups provider", true, "GroupProvider");
 		I_ASSIGN(m_groupViewProviderCompPtr, "GroupViewProvider", "Event groups view provider", true, "GroupViewProvider");
 		I_ASSIGN(m_groupViewVisualSettingsCompPtr, "GroupVisualSettingsCollection", "Collection of visual settings for group view", false, "GroupVisualSettingsCollection");
 		I_ASSIGN(m_viewportGeometryProviderCompPtr, "ViewportGeometryProvider", "Graphics view property provider", true, "ViewportGeometryProvider");
@@ -66,6 +68,7 @@ public:
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 private Q_SLOTS:
 	void OnAxisBeginTimeChanged(const QDateTime& oldTime, const QDateTime& newTime);
@@ -73,6 +76,9 @@ private Q_SLOTS:
 
 private:
 	void OnViewportGeometryUpdate(IViewPropertyProvider* propertyPtr, const istd::IChangeable::ChangeSet& changeSet);
+	void ConnectObserversToModels();
+	void DisconnectObserversFromModels();
+	void OnGroupChanged(int modelId);
 
 private:
 	template <typename InterfaceType>
@@ -142,7 +148,24 @@ private:
 		GraphicsItemList sptrs;
 	};
 
+	class GroupsDispatcher: public imod::CMultiModelDispatcherBase
+	{
+	public:
+		GroupsDispatcher(CGraphicsControllerComp* parentPtr)
+			:m_parentPtr(parentPtr)
+		{
+		}
+
+	protected:
+		// reimplemented (imod::CMultiModelDispatcherBase)
+		virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+
+	private:
+		CGraphicsControllerComp* m_parentPtr;
+	};
+
 private:
+	I_REF(imtbase::IObjectCollection, m_groupProviderCompPtr);
 	I_REF(imtbase::IObjectCollection, m_groupViewProviderCompPtr);
 	I_REF(imtbase::IObjectCollection, m_groupViewVisualSettingsCompPtr);
 	I_REF(IEventScenePositionProvider, m_positionProviderCompPtr);
@@ -158,6 +181,8 @@ private:
 	ViewportObserver m_viewportObserver;
 	TimeRangeObserver m_timeRangeObserver;
 	imod::TModelWrap<TimeRangeProvider> m_visibleTimeRangeProvider;
+
+	GroupsDispatcher m_groupDispatcher;
 
 	QList<GroupItem> m_groupItemList;
 	GraphicsItemList m_items;

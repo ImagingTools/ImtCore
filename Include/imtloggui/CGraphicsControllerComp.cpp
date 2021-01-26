@@ -15,6 +15,7 @@ namespace imtloggui
 // public methods
 
 CGraphicsControllerComp::CGraphicsControllerComp()
+	:m_groupDispatcher(this)
 {
 	m_viewportObserver.SetParent(this);
 	m_timeRangeObserver.SetParent(this);
@@ -97,7 +98,6 @@ void CGraphicsControllerComp::OnComponentCreated()
 
 		for (int i = 0; i < ids.count(); i++){
 			QString name = m_groupViewProviderCompPtr->GetElementInfo(ids[i], imtbase::ICollectionInfo::EIT_NAME).toString();
-			
 			QColor color(Qt::GlobalColor(Qt::magenta + i));
 			int height = 300;
 			if (m_groupViewVisualSettingsCompPtr.IsValid()){
@@ -131,6 +131,12 @@ void CGraphicsControllerComp::OnComponentCreated()
 			m_groupItemList.append(groupItem);
 
 			m_addedItems.append(groupItem.sptrs);
+
+			imod::IModel* groupModelPtr = dynamic_cast<imod::IModel*>(
+						const_cast<istd::IChangeable*>(m_groupViewProviderCompPtr->GetObjectPtr(ids[i])));
+			if (groupModelPtr != nullptr){
+				m_groupDispatcher.RegisterModel(groupModelPtr, i);
+			}
 		}
 	}
 
@@ -149,6 +155,22 @@ void CGraphicsControllerComp::OnComponentCreated()
 	if (m_timeRangeModelCompPtr.IsValid()){
 		m_timeRangeModelCompPtr->AttachObserver(&m_timeRangeObserver);
 	}
+
+	if (m_groupProviderCompPtr.IsValid() && m_groupViewProviderCompPtr.IsValid()){
+		ConnectObserversToModels();
+	}
+}
+
+
+void CGraphicsControllerComp::OnComponentDestroyed()
+{
+	m_groupDispatcher.UnregisterAllModels();
+
+	if (m_groupProviderCompPtr.IsValid()){
+		DisconnectObserversFromModels();
+	}
+
+	BaseClass::OnComponentDestroyed();
 }
 
 
@@ -217,6 +239,157 @@ void CGraphicsControllerComp::OnViewportGeometryUpdate(IViewPropertyProvider* pr
 			istd::CChangeNotifier notifier(this);
 		}
 	}
+}
+
+
+void CGraphicsControllerComp::ConnectObserversToModels()
+{
+	// Iteration over groups
+	QVector<QByteArray> groupIds = m_groupProviderCompPtr->GetElementIds();
+	QVector<QByteArray> groupViewIds = m_groupViewProviderCompPtr->GetElementIds();
+	for (int groupIndex = 0; groupIndex < groupIds.count(); groupIndex++){
+		QByteArray groupId = groupIds[groupIndex];
+
+		if (!groupViewIds.contains(groupId)){
+			continue;
+		}
+
+		imod::IModel* groupModelPtr = dynamic_cast<imod::IModel*>(
+			const_cast<istd::IChangeable*>(m_groupProviderCompPtr->GetObjectPtr(groupId)));
+		imod::IObserver* groupObserverPtr = dynamic_cast<imod::IObserver*>(
+			const_cast<istd::IChangeable*>(m_groupViewProviderCompPtr->GetObjectPtr(groupId)));
+
+		if (groupModelPtr == nullptr || groupObserverPtr == nullptr){
+			continue;
+		}
+
+		groupModelPtr->AttachObserver(groupObserverPtr);
+
+		// Iteration over layers
+		const imtbase::IObjectCollection* layerCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
+			m_groupProviderCompPtr->GetObjectPtr(groupId));
+		const imtbase::IObjectCollection* layerViewCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
+			m_groupViewProviderCompPtr->GetObjectPtr(groupId));
+
+		if (layerCollectionPtr == nullptr || layerViewCollectionPtr == nullptr){
+			continue;
+		}
+
+		QVector<QByteArray> layerIds = layerCollectionPtr->GetElementIds();
+		QVector<QByteArray> layerViewIds = layerViewCollectionPtr->GetElementIds();
+		for (int layerIndex = 0; layerIndex < layerIds.count(); layerIndex++){
+			QByteArray layerId = layerIds[layerIndex];
+
+			if (!layerViewIds.contains(layerId)){
+				continue;
+			}
+
+			imod::IModel* layerModelPtr = dynamic_cast<imod::IModel*>(
+				const_cast<istd::IChangeable*>(layerCollectionPtr->GetObjectPtr(layerId)));
+			imod::IObserver* layerObserverPtr = dynamic_cast<imod::IObserver*>(
+				const_cast<istd::IChangeable*>(layerViewCollectionPtr->GetObjectPtr(layerId)));
+
+			if (layerModelPtr == nullptr || layerObserverPtr == nullptr){
+				continue;
+			}
+
+			layerModelPtr->AttachObserver(layerObserverPtr);
+
+			// Iteration over representations
+			const imtbase::IObjectCollection* representationCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
+				layerCollectionPtr->GetObjectPtr(layerId));
+			const imtbase::IObjectCollection* representationViewCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
+				layerViewCollectionPtr->GetObjectPtr(layerId));
+
+			if (representationCollectionPtr == nullptr || representationViewCollectionPtr == nullptr){
+				continue;
+			}
+
+			QVector<QByteArray> representationIds = representationCollectionPtr->GetElementIds();
+			QVector<QByteArray> representationViewIds = representationViewCollectionPtr->GetElementIds();
+			for (int representationIndex = 0; representationIndex < representationIds.count(); representationIndex++){
+				QByteArray representationId = representationIds[representationIndex];
+
+				if (!representationViewIds.contains(representationId)){
+					continue;
+				}
+
+				imod::IModel* representationModelPtr = dynamic_cast<imod::IModel*>(
+					const_cast<istd::IChangeable*>(representationCollectionPtr->GetObjectPtr(representationId)));
+				imod::IObserver* representationObserverPtr = dynamic_cast<imod::IObserver*>(
+					const_cast<istd::IChangeable*>(representationViewCollectionPtr->GetObjectPtr(representationId)));
+
+				if (representationModelPtr == nullptr || representationObserverPtr == nullptr){
+					continue;
+				}
+
+				representationModelPtr->AttachObserver(representationObserverPtr);
+			}
+		}
+	}
+}
+
+
+void CGraphicsControllerComp::DisconnectObserversFromModels()
+{
+	// Iteration over groups
+	QVector<QByteArray> groupIds = m_groupProviderCompPtr->GetElementIds();
+	for (int groupIndex = 0; groupIndex < groupIds.count(); groupIndex++){
+		QByteArray groupId = groupIds[groupIndex];
+
+		imod::IModel* groupModelPtr = dynamic_cast<imod::IModel*>(
+			const_cast<istd::IChangeable*>(m_groupProviderCompPtr->GetObjectPtr(groupId)));
+
+		if (groupModelPtr != nullptr){
+			groupModelPtr->DetachAllObservers();
+		}
+
+		// Iteration over layers
+		const imtbase::IObjectCollection* layerCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
+			m_groupProviderCompPtr->GetObjectPtr(groupId));
+
+		if (layerCollectionPtr == nullptr){
+			continue;
+		}
+
+		QVector<QByteArray> layerIds = layerCollectionPtr->GetElementIds();
+		for (int layerIndex = 0; layerIndex < layerIds.count(); layerIndex++){
+			QByteArray layerId = layerIds[layerIndex];
+
+			imod::IModel* layerModelPtr = dynamic_cast<imod::IModel*>(
+				const_cast<istd::IChangeable*>(layerCollectionPtr->GetObjectPtr(layerId)));
+
+			if (layerModelPtr != nullptr){
+				layerModelPtr->DetachAllObservers();
+			}
+
+			// Iteration over representations
+			const imtbase::IObjectCollection* representationCollectionPtr = dynamic_cast<const imtbase::IObjectCollection*>(
+				layerCollectionPtr->GetObjectPtr(layerId));
+
+			if (representationCollectionPtr == nullptr){
+				continue;
+			}
+
+			QVector<QByteArray> representationIds = representationCollectionPtr->GetElementIds();
+			for (int representationIndex = 0; representationIndex < representationIds.count(); representationIndex++){
+				QByteArray representationId = representationIds[representationIndex];
+
+				imod::IModel* representationModelPtr = dynamic_cast<imod::IModel*>(
+					const_cast<istd::IChangeable*>(representationCollectionPtr->GetObjectPtr(representationId)));
+
+				if (representationModelPtr != nullptr){
+					representationModelPtr->DetachAllObservers();
+				}
+			}
+		}
+	}
+}
+
+
+void CGraphicsControllerComp::OnGroupChanged(int modelId)
+{
+
 }
 
 
@@ -305,6 +478,19 @@ imtlog::CTimeRange CGraphicsControllerComp::TimeRangeProvider::GetTimeRange() co
 {
 	return m_timeRange;
 }
+
+
+// protected methods of the embedded class GroupsDispatcher
+
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CGraphicsControllerComp::GroupsDispatcher::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+{
+	if (m_parentPtr != nullptr){
+		m_parentPtr->OnGroupChanged(modelId);
+	}
+}
+
 
 
 } // namespace imtloggui
