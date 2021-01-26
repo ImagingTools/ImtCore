@@ -1052,8 +1052,6 @@ void CObjectCollectionViewComp::OnTypeChanged()
 
 	m_currentTypeId.clear();
 
-	RightPanel->setVisible(true);
-
 	QList<QTreeWidgetItem*> selectedItems = TypeList->selectedItems();
 	if (!selectedItems.isEmpty()){
 		m_currentTypeId = selectedItems[0]->data(0, DR_TYPE_ID).toByteArray();
@@ -1093,6 +1091,8 @@ void CObjectCollectionViewComp::OnTypeChanged()
 		m_currentInformationViewPtr = GetViewDelegateRef(m_currentTypeId).GetInformationView();
 		if (m_currentInformationViewPtr != nullptr){
 			m_currentInformationViewPtr->CreateGui(RightPanel);
+
+			RightPanel->setVisible(true);
 		}
 	}
 

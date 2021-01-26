@@ -98,7 +98,7 @@ I_EXPORT_COMPONENT(
 			"Page Switch Login");
 
 I_EXPORT_COMPONENT(
-			ObjectCollectionViewDelegate,
+			StandardCollectionDelegate,
 			"Standard collection view delegate",
 			"Delegate Document View Collection");
 
