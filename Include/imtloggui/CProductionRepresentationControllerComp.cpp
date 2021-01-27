@@ -38,27 +38,23 @@ void CProductionRepresentationControllerComp::OnComponentCreated()
 
 void CProductionRepresentationControllerComp::BuildRepresentation(
 			istd::IChangeable& representation,
-			const imtlog::IEventProvider& eventProvider,
-			const imtlog::IEventFilter* eventFilterPtr,
-			const imtlog::IMessageFilterParams* messageFilterParamsPtr) const
+			imtlog::IEventProvider::EventContainerPtr containerPtr,
+			const imtlog::CTimeRange& /*timeRange*/) const
 {
 	CProductionRepresentationComp* representationPtr = dynamic_cast<CProductionRepresentationComp*>(&representation);
 	if (representationPtr != nullptr){
-		if (eventFilterPtr != nullptr && messageFilterParamsPtr != nullptr){
-			ilog::IMessageContainer::Messages messages = eventProvider.GetEvents(eventFilterPtr, messageFilterParamsPtr)->GetMessages();
+		istd::CChangeNotifier notifier(representationPtr);
 
-			istd::CChangeNotifier notifier(representationPtr);
+		representationPtr->ClearStatistics();
 
-			representationPtr->ClearStatistics();
-
+		if (containerPtr.IsValid()){
+			ilog::IMessageContainer::Messages messages = containerPtr->GetMessages();
 			for (int i = messages.count() - 1; i >= 0; i--){
 				representationPtr->AddMessage(messages[i]);
 			}
 		}
 	}
 }
-
-
 
 
 } // namespace imtloggui

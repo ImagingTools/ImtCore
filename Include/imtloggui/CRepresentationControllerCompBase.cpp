@@ -20,11 +20,14 @@ CRepresentationControllerCompBase::CRepresentationControllerCompBase()
 void CRepresentationControllerCompBase::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (m_representationCompPtr.IsValid() && m_eventProviderCompPtr.IsValid()){
-		BuildRepresentation(
-					*m_representationCompPtr,
-					*m_eventProviderCompPtr,
-					m_eventFilterCompPtr.GetPtr(),
-					m_messageFilterParamsCompPtr.GetPtr());
+		imtlog::CTimeRange timeRange;
+		if (m_messageFilterParamsCompPtr.IsValid()){
+			timeRange = m_messageFilterParamsCompPtr->GetFilterTimeRange();
+		}
+
+		imtlog::IEventProvider::EventContainerPtr containerPtr = m_eventProviderCompPtr->GetEvents(m_eventFilterCompPtr.GetPtr(), m_messageFilterParamsCompPtr.GetPtr());
+
+		BuildRepresentation(*m_representationCompPtr, containerPtr, timeRange);
 	}
 }
 
@@ -71,11 +74,14 @@ CRepresentationControllerCompBase::EventProviderObserver::EventProviderObserver(
 void CRepresentationControllerCompBase::EventProviderObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (m_parent.m_representationCompPtr.IsValid() && m_parent.m_eventProviderCompPtr.IsValid()){
-		m_parent.BuildRepresentation(
-					*m_parent.m_representationCompPtr,
-					*m_parent.m_eventProviderCompPtr,
-					m_parent.m_eventFilterCompPtr.GetPtr(),
-					m_parent.m_messageFilterParamsCompPtr.GetPtr());
+		imtlog::CTimeRange timeRange;
+		if (m_parent.m_messageFilterParamsCompPtr.IsValid()){
+			timeRange = m_parent.m_messageFilterParamsCompPtr->GetFilterTimeRange();
+		}
+
+		imtlog::IEventProvider::EventContainerPtr containerPtr = m_parent.m_eventProviderCompPtr->GetEvents(m_parent.m_eventFilterCompPtr.GetPtr(), m_parent.m_messageFilterParamsCompPtr.GetPtr());
+
+		m_parent.BuildRepresentation(*m_parent.m_representationCompPtr,containerPtr, timeRange);
 	}
 }
 

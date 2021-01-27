@@ -25,9 +25,8 @@ protected:
 	// reimplemented (CRepresentationControllerCompBase)
 	virtual void BuildRepresentation(
 				istd::IChangeable& representation,
-				const imtlog::IEventProvider& eventProvider,
-				const imtlog::IEventFilter* eventFilterPtr,
-				const imtlog::IMessageFilterParams* messageFilterParamsPtr) const override;
+				imtlog::IEventProvider::EventContainerPtr containerPtr,
+				const imtlog::CTimeRange& timeRange) const override;
 
 private:
 	I_ATTR(int, m_granularityAttrPtr);

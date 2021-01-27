@@ -1259,6 +1259,7 @@ void CObjectCollectionViewComp::OnEscShortCut()
 	m_filterPanelAnimationPtr->start();
 	GetQtWidget()->setFocus();
 	FilterEdit->clear();
+
 	OnFilterChanged("");
 }
 

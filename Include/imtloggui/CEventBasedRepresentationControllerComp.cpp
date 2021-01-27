@@ -13,19 +13,18 @@ namespace imtloggui
 // protected methods
 
 void CEventBasedRepresentationControllerComp::BuildRepresentation(
-			istd::IChangeable& representation,
-			const imtlog::IEventProvider& eventProvider,
-			const imtlog::IEventFilter* eventFilterPtr,
-			const imtlog::IMessageFilterParams* messageFilterParamsPtr) const
+				istd::IChangeable& representation,
+				imtlog::IEventProvider::EventContainerPtr containerPtr,
+				const imtlog::CTimeRange& /*timeRange*/) const
 {
 	ilog::CMessageContainer* representationModelPtr = dynamic_cast<ilog::CMessageContainer*>(&representation);
-	if (representationModelPtr != nullptr){
-		if (eventFilterPtr != nullptr && messageFilterParamsPtr != nullptr){
-			ilog::IMessageContainer::Messages messages = eventProvider.GetEvents(eventFilterPtr, messageFilterParamsPtr)->GetMessages();
-	
-			istd::CChangeGroup notifier(representationModelPtr);
+	if (representationModelPtr != nullptr){	
+		istd::CChangeGroup notifier(representationModelPtr);
 
-			representationModelPtr->ClearMessages();
+		representationModelPtr->ClearMessages();
+
+		if (containerPtr.IsValid()){
+			ilog::IMessageContainer::Messages messages = containerPtr->GetMessages();
 
 			for (int i = messages.count() - 1; i >= 0; i--){
 				representationModelPtr->AddMessage(messages[i]);

@@ -40,9 +40,8 @@ public:
 protected:
 	virtual void BuildRepresentation(
 				istd::IChangeable& representation,
-				const imtlog::IEventProvider& eventProvider,
-				const imtlog::IEventFilter* eventFilterPtr,
-				const imtlog::IMessageFilterParams* messageFilterParamsPtr) const = 0;
+				imtlog::IEventProvider::EventContainerPtr containerPtr,
+				const imtlog::CTimeRange& timeRange) const = 0;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated();
