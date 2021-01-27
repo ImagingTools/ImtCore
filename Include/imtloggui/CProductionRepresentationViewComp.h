@@ -33,7 +33,7 @@ protected:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
 
 private:
-	mutable QMap<QByteArray, GraphicsItem> m_items;
+	mutable GraphicsItem m_item;
 };
 
 

@@ -8,15 +8,15 @@ namespace imtloggui
 // public methods
 
 CProductionRepresentationComp::CProductionRepresentationComp()
+	:m_maxCount(0)
 {
-
 }
 
 
-CProductionRepresentationComp::CProductionRepresentationComp(quint64 granularity)
-	:m_maxCount(0),
-	m_granularity(granularity)
+void CProductionRepresentationComp::SetGranularity(quint64 granularity)
 {
+	m_granularity = granularity;
+	ClearStatistics();
 }
 
 
@@ -48,6 +48,7 @@ void CProductionRepresentationComp::ClearStatistics()
 {
 	m_timeline.clear();
 	m_maxCount = 0;
+	m_maxCounters = MaxCounters();
 }
 
 

@@ -18,6 +18,9 @@ public:
 		I_ASSIGN(m_granularityAttrPtr, "Granularity", "Statistics time granularity in seconds", true, 60);
 	I_END_COMPONENT
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated();
+
 protected:
 	// reimplemented (CRepresentationControllerCompBase)
 	virtual void BuildRepresentation(

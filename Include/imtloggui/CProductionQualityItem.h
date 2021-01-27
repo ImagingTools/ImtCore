@@ -5,12 +5,11 @@
 #include <QtWidgets/QGraphicsRectItem>
 
 // Acf includes
+#include <istd/IChangeable.h>
 #include <istd/TSmartPtr.h>
 
 // ImtCore includes
 #include <imtloggui/IEventScenePositionProvider.h>
-//#include <imtloggui/CRepresentationProductionModel.h>
-#include <istd/IChangeable.h>
 
 
 namespace imtloggui
@@ -29,8 +28,8 @@ public:
 	};
 
 	CProductionQualityItem(QGraphicsItem* parent = nullptr);
-	istd::TSmartPtr<istd::IChangeable> GetModel();
-	void SetModel(istd::TSmartPtr<istd::IChangeable> modelPtr);
+	istd::IChangeable* GetModel();
+	void SetModel(istd::IChangeable* modelPtr);
 	void SetScenePositionProvider(IEventScenePositionProvider* providerPtr);
 	void SetStyle(DrawStyle style);
 
@@ -47,7 +46,7 @@ private:
 	void DrawLegend(QPainter* painter);
 
 private:
-	istd::TSmartPtr<istd::IChangeable> m_modelPtr;
+	istd::IChangeable* m_modelPtr;
 	IEventScenePositionProvider* m_positionProviderPtr;
 
 	QVector<QPointF> m_okPoints;

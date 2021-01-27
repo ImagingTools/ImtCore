@@ -51,8 +51,8 @@ public:
 		}
 	};
 
-	CProductionRepresentationComp(quint64 granularity);
 	quint64 GetGranularity() const;
+	void SetGranularity(quint64 granularity);
 	const Timeline& GetTimeline() const;
 	quint64 GetMaxCount() const;
 	const MaxCounters& GetMaxCounters() const;
@@ -64,7 +64,6 @@ private:
 	quint64 m_maxCount;
 	MaxCounters m_maxCounters;
 	qint64 m_granularity;
-	qint64 m_beginTimeStamp;
 	Timeline m_timeline;
 };
 

@@ -96,7 +96,8 @@ void CGraphicsControllerComp::InitScene()
 
 		for (int i = 0; i < ids.count(); i++){
 			QString name = m_groupViewProviderCompPtr->GetElementInfo(ids[i], imtbase::ICollectionInfo::EIT_NAME).toString();
-			QColor color(Qt::GlobalColor(Qt::magenta + i));
+			//QColor color(Qt::GlobalColor(Qt::magenta + i));
+			QColor color(Qt::gray);
 			int height = 300;
 			if (m_groupViewVisualSettingsCompPtr.IsValid()){
 				const imtloggui::IGroupVisualSettings* groupSettingsPtr = dynamic_cast<const imtloggui::IGroupVisualSettings*>(m_groupViewVisualSettingsCompPtr->GetObjectPtr(ids[i]));
@@ -384,10 +385,10 @@ void CGraphicsControllerComp::OnGroupChanged(int modelId)
 				m_addedItems.append(items[i]);
 				m_groupItems[groupId].append(items[i]);
 
-				QPointF newPos = m_groupStaticItems[groupId].backgroundPtr->mapFromScene(items[i]->pos());
-				newPos.ry() = m_groupStaticItems[groupId].backgroundPtr->rect().height() / 2;
+				QPointF newPos = items[i]->pos();
+				newPos.ry() = m_groupStaticItems[groupId].backgroundPtr->pos().y() + m_groupStaticItems[groupId].backgroundPtr->rect().height() / 2;
 
-				items[i]->setParentItem(m_groupStaticItems[groupId].backgroundPtr);
+				//items[i]->setParentItem(m_groupStaticItems[groupId].backgroundPtr);
 				items[i]->setPos(newPos);
 			}
 		}
