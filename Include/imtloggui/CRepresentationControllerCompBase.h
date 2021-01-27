@@ -27,12 +27,15 @@ public:
 	I_BEGIN_BASE_COMPONENT(CRepresentationControllerCompBase)
 		I_REGISTER_INTERFACE(imod::IObserver);
 		I_ASSIGN(m_eventProviderCompPtr, "EventProvider", "Event provider", true, "EventProvider");
+		I_ASSIGN_TO(m_eventProviderModelCompPtr, m_eventProviderCompPtr, true);
 		I_ASSIGN(m_timeRangeProviderCompPtr, "TimeRangeProvider", "TimeRangeProvider", false, "TimeRangeProvider");
 		I_ASSIGN_TO(m_timeRangeProviderModelCompPtr, m_timeRangeProviderCompPtr, true);
 		I_ASSIGN(m_representationCompPtr, "RepresentationData", "Representation data model", true, "RepresentationData");
 		I_ASSIGN(m_eventFilterCompPtr, "EventFilter", "Event filter", false, "EventFilter");
 		I_ASSIGN(m_messageFilterParamsCompPtr, "MessageFilterParams", "Message filter params", false, "MessageFilterParams");
 	I_END_COMPONENT
+
+	CRepresentationControllerCompBase();
 
 protected:
 	virtual void BuildRepresentation(
@@ -49,13 +52,29 @@ private:
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
+private:
+	class EventProviderObserver: public imod::TSingleModelObserverBase<imtlog::IEventProvider>
+	{
+	public:
+		EventProviderObserver(CRepresentationControllerCompBase& parent);
+	protected:
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+	private:
+		CRepresentationControllerCompBase& m_parent;
+	};
+
 protected:
 	I_REF(imtlog::IEventProvider, m_eventProviderCompPtr);
+	I_REF(imod::IModel, m_eventProviderModelCompPtr);
 	I_REF(imtlog::ITimeRangeProvider, m_timeRangeProviderCompPtr);
 	I_REF(imod::IModel, m_timeRangeProviderModelCompPtr);
 	I_REF(istd::IChangeable, m_representationCompPtr);
 	I_REF(imtlog::IEventFilter, m_eventFilterCompPtr);
 	I_REF(imtlog::IMessageFilterParams, m_messageFilterParamsCompPtr);
+
+private:
+	EventProviderObserver m_eventProviderObserver;
 };
 
 

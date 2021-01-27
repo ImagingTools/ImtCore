@@ -5,7 +5,15 @@ namespace imtloggui
 {
 
 
-// private methods
+// public methods
+
+CRepresentationControllerCompBase::CRepresentationControllerCompBase()
+	:m_eventProviderObserver(*this)
+{
+}
+
+
+// protected methods
 
 // reimplemented (imod::CSingleModelObserverBase)
 
@@ -30,6 +38,10 @@ void CRepresentationControllerCompBase::OnComponentCreated()
 	if (m_timeRangeProviderCompPtr.IsValid() && m_timeRangeProviderModelCompPtr.IsValid()){
 		m_timeRangeProviderModelCompPtr->AttachObserver(this);
 	}
+
+	if (m_eventProviderCompPtr.IsValid() && m_eventProviderModelCompPtr.IsValid()){
+		m_eventProviderModelCompPtr->AttachObserver(&m_eventProviderObserver);
+	}
 }
 
 
@@ -39,9 +51,33 @@ void CRepresentationControllerCompBase::OnComponentDestroyed()
 		m_timeRangeProviderModelCompPtr->DetachObserver(this);
 	}
 
+	if (m_eventProviderCompPtr.IsValid() && m_eventProviderModelCompPtr->IsAttached(this)){
+		m_eventProviderModelCompPtr->DetachObserver(&m_eventProviderObserver);
+	}
+
 	BaseClass::OnComponentDestroyed();
 }
 
+
+
+CRepresentationControllerCompBase::EventProviderObserver::EventProviderObserver(CRepresentationControllerCompBase & parent)
+	:m_parent(parent)
+{
+}
+
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CRepresentationControllerCompBase::EventProviderObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	if (m_parent.m_representationCompPtr.IsValid() && m_parent.m_eventProviderCompPtr.IsValid()){
+		m_parent.BuildRepresentation(
+					*m_parent.m_representationCompPtr,
+					*m_parent.m_eventProviderCompPtr,
+					m_parent.m_eventFilterCompPtr.GetPtr(),
+					m_parent.m_messageFilterParamsCompPtr.GetPtr());
+	}
+}
 
 } // namespace imtloggui
 

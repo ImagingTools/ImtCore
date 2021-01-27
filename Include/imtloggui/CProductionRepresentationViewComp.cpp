@@ -73,6 +73,7 @@ void CProductionRepresentationViewComp::OnUpdate(const istd::IChangeable::Change
 			if (representationPtr->GetTimeline().count() > 0){
 				itemPtr->setPos(begin, itemPtr->y());
 				itemPtr->setRect(QRectF(0, -120, width, 240));
+				itemPtr->update();
 				return;
 			}
 		}
