@@ -41,8 +41,6 @@ void CEventBasedRepresentationViewComp::OnUpdate(const istd::IChangeable::Change
 
 	const ilog::IMessageContainer* representationObjectPtr = dynamic_cast<const ilog::IMessageContainer*>(GetObservedObject());
 	if (representationObjectPtr != nullptr){
-		istd::CChangeNotifier notifier(this);
-
 		ilog::IMessageContainer::Messages messages = representationObjectPtr->GetMessages();
 
 		if (m_eventItemFactoryCompPtr.IsValid() && m_positionProviderCompPtr.IsValid()){
@@ -62,6 +60,8 @@ void CEventBasedRepresentationViewComp::OnUpdate(const istd::IChangeable::Change
 				}
 			}
 		}
+
+		Q_EMIT EmitRepresentationUpdated();
 	}
 }
 

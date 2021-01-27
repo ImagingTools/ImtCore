@@ -74,6 +74,8 @@ void CProductionRepresentationViewComp::OnUpdate(const istd::IChangeable::Change
 				itemPtr->setPos(begin, itemPtr->y());
 				itemPtr->setRect(QRectF(0, -120, width, 240));
 				itemPtr->update();
+				Q_EMIT EmitRepresentationUpdated();
+
 				return;
 			}
 		}
@@ -91,6 +93,8 @@ void CProductionRepresentationViewComp::OnUpdate(const istd::IChangeable::Change
 	itemPtr->setAcceptHoverEvents(true);
 
 	m_item.SetPtr(itemPtr);
+
+	Q_EMIT EmitRepresentationUpdated();
 }
 
 
