@@ -81,9 +81,10 @@ void CRepresentationControllerCompBase::EventProviderObserver::OnUpdate(const is
 
 		imtlog::IEventProvider::EventContainerPtr containerPtr = m_parent.m_eventProviderCompPtr->GetEvents(m_parent.m_eventFilterCompPtr.GetPtr(), m_parent.m_messageFilterParamsCompPtr.GetPtr());
 
-		m_parent.BuildRepresentation(*m_parent.m_representationCompPtr,containerPtr, timeRange);
+		m_parent.BuildRepresentation(*m_parent.m_representationCompPtr, containerPtr, timeRange);
 	}
 }
+
 
 } // namespace imtloggui
 
