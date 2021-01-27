@@ -24,7 +24,6 @@ public:
 		I_ASSIGN_MULTI_0(m_idAttrPtr, "GroupViewIds", "Group view ids", false);
 		I_ASSIGN_MULTI_0(m_nameAttrPtr, "GroupViewNames", "Group view names", false);
 		I_ASSIGN_MULTI_0(m_groupViewCompPtr, "GroupViews", "Groups", false);
-		I_ASSIGN(m_groupProviderCompPtr, "GroupProvider", "Group provider", false, "GroupProvider");
 	I_END_COMPONENT
 
 protected:
@@ -35,7 +34,6 @@ private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
 	I_MULTIREF(IObjectCollection, m_groupViewCompPtr);
-	I_REF(IObjectCollection, m_groupProviderCompPtr);
 };
 
 

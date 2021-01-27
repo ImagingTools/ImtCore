@@ -72,12 +72,10 @@ IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetRemovedItems
 }
 
 
-// reimplemented (icomp::CComponentBase)
+// reimplemented (imtloggui::IGraphicsController)
 
-void CGraphicsControllerComp::OnComponentCreated()
+void CGraphicsControllerComp::InitScene()
 {
-	BaseClass::OnComponentCreated();
-
 	istd::CChangeNotifier notifier(this);
 
 	m_timeAxisPtr = new CTimeAxis();
@@ -126,14 +124,13 @@ void CGraphicsControllerComp::OnComponentCreated()
 			GroupItem groupItem;
 			groupItem.backgroundPtr = rectPtr;
 			groupItem.labelPtr = labelPtr;
-			groupItem.sptrs.append(GraphicsItem(rectPtr));
-			groupItem.sptrs.append(GraphicsItem(labelPtr));
 			m_groupItemList.append(groupItem);
 
-			m_addedItems.append(groupItem.sptrs);
+			m_addedItems.append(GraphicsItem(rectPtr));
+			m_addedItems.append(GraphicsItem(labelPtr));
 
 			imod::IModel* groupModelPtr = dynamic_cast<imod::IModel*>(
-						const_cast<istd::IChangeable*>(m_groupViewProviderCompPtr->GetObjectPtr(ids[i])));
+				const_cast<istd::IChangeable*>(m_groupViewProviderCompPtr->GetObjectPtr(ids[i])));
 			if (groupModelPtr != nullptr){
 				m_groupDispatcher.RegisterModel(groupModelPtr, i);
 			}
@@ -156,9 +153,15 @@ void CGraphicsControllerComp::OnComponentCreated()
 		m_timeRangeModelCompPtr->AttachObserver(&m_timeRangeObserver);
 	}
 
-	if (m_groupProviderCompPtr.IsValid() && m_groupViewProviderCompPtr.IsValid()){
-		ConnectObserversToModels();
-	}
+	ConnectObserversToModels();
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CGraphicsControllerComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
 }
 
 
@@ -201,43 +204,6 @@ void CGraphicsControllerComp::OnViewportGeometryUpdate(IViewPropertyProvider* pr
 		m_groupItemList[i].backgroundPtr->setRect(rect);
 		m_groupItemList[i].backgroundPtr->setPos(viewRect.x(), m_groupItemList[i].backgroundPtr->pos().y());
 		m_groupItemList[i].labelPtr->setPos(viewRect.x(), m_groupItemList[i].labelPtr->pos().y());
-	}
-
-	qint64 span = m_timeAxisPtr->GetVisibleBeginTime().msecsTo(m_timeAxisPtr->GetVisibleEndTime());
-
-	if (m_groupViewProviderCompPtr.IsValid() && span > 0){
-		GraphicsItemList items;
-
-		imtbase::ICollectionInfo::Ids groupIds = m_groupViewProviderCompPtr->GetElementIds();
-		for (int i = 0; i < groupIds.count(); i++){
-			QByteArray groupId = groupIds[i];
-			const imtloggui::IGraphicsItemProvider* groupItemsProviderPtr = dynamic_cast<const imtloggui::IGraphicsItemProvider*>(m_groupViewProviderCompPtr->GetObjectPtr(groupId));
-			if (groupItemsProviderPtr != nullptr){
-				items += groupItemsProviderPtr->GetItems();
-			}
-		}
-
-		GraphicsItemList::iterator it = m_items.begin();
-		while(it != m_items.end()){
-			if (!items.contains(*it)){
-				m_removedItems.append(*it);
-				it = m_items.erase(it);
-				continue;
-			}
-
-			it++;
-		}
-
-		for (int i = 0; i < items.count(); i++){
-			if (!m_items.contains(items[i])){
-				m_addedItems.append(items[i]);
-				m_items.append(items[i]);
-			}
-		}
-
-		if (m_addedItems.count() != 0 || m_removedItems.count() != 0){
-			istd::CChangeNotifier notifier(this);
-		}
 	}
 }
 
@@ -389,7 +355,40 @@ void CGraphicsControllerComp::DisconnectObserversFromModels()
 
 void CGraphicsControllerComp::OnGroupChanged(int modelId)
 {
+	qint64 span = m_timeAxisPtr->GetVisibleBeginTime().msecsTo(m_timeAxisPtr->GetVisibleEndTime());
 
+	if (m_groupViewProviderCompPtr.IsValid() && span > 0){
+		GraphicsItemList items;
+
+		imtbase::ICollectionInfo::Ids groupIds = m_groupViewProviderCompPtr->GetElementIds();
+		QByteArray groupId = groupIds[modelId];
+		const imtloggui::IGraphicsItemProvider* groupItemsProviderPtr = dynamic_cast<const imtloggui::IGraphicsItemProvider*>(m_groupViewProviderCompPtr->GetObjectPtr(groupId));
+		if (groupItemsProviderPtr != nullptr){
+			items += groupItemsProviderPtr->GetItems();
+		}
+
+		GraphicsItemList::iterator it = m_items.begin();
+		while (it != m_items.end()){
+			if (!items.contains(*it)){
+				m_removedItems.append(*it);
+				it = m_items.erase(it);
+				continue;
+			}
+
+			it++;
+		}
+
+		for (int i = 0; i < items.count(); i++){
+			if (!m_items.contains(items[i])){
+				m_addedItems.append(items[i]);
+				m_items.append(items[i]);
+			}
+		}
+
+		if (m_addedItems.count() != 0 || m_removedItems.count() != 0){
+			istd::CChangeNotifier notifier(this);
+		}
+	}
 }
 
 

@@ -10,6 +10,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtlog/ITimeRangeProvider.h>
+#include <imtloggui/IGraphicsController.h>
 #include <imtloggui/IGraphicsItemProvider.h>
 #include <imtloggui/IViewPropertyProvider.h>
 #include <imtloggui/IViewPropertyManager.h>
@@ -26,6 +27,7 @@ namespace imtloggui
 class CGraphicsControllerComp:
 			public QObject,
 			public icomp::CComponentBase,
+			virtual public IGraphicsController,
 			virtual public IGraphicsItemProvider,
 			virtual public IEventNavigationController
 {
@@ -35,6 +37,7 @@ public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGraphicsControllerComp)
+		I_REGISTER_INTERFACE(IGraphicsController);
 		I_REGISTER_INTERFACE(IGraphicsItemProvider);
 		I_REGISTER_INTERFACE(IEventNavigationController);
 		I_REGISTER_SUBELEMENT(ScenePositionProvider);
@@ -65,6 +68,9 @@ public:
 	virtual GraphicsItemList GetItems() const override;
 	virtual GraphicsItemList GetAddedItems() const override;
 	virtual GraphicsItemList GetRemovedItems() const override;
+
+	// reimplemented (imtloggui::IGraphicsController)
+	virtual void InitScene() override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -145,7 +151,6 @@ private:
 		QByteArray id;
 		CEventGroupLabelItem* labelPtr;
 		QGraphicsRectItem* backgroundPtr;
-		GraphicsItemList sptrs;
 	};
 
 	class GroupsDispatcher: public imod::CMultiModelDispatcherBase

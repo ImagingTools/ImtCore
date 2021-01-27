@@ -291,6 +291,10 @@ void CEventViewComp::OnGuiCreated()
 	}
 
 	UpdateCommands();
+
+	if (m_graphicsControllerCompPtr.IsValid()){
+		m_graphicsControllerCompPtr->InitScene();
+	}
 }
 
 

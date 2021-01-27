@@ -22,6 +22,7 @@
 
 // ImtCore includes
 #include <imtloggui/IEventItem.h>
+#include <imtloggui/IGraphicsController.h>
 #include <imtloggui/IGraphicsItemProvider.h>
 #include <imtloggui/CEventGraphicsView.h>
 #include <imtloggui/CTimeAxis.h>
@@ -54,6 +55,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
 		I_ASSIGN(m_statisticsViewCompPtr, "EventStatisticsView", "Event statistics for groups", true, "EventStatisticsView");
 		I_ASSIGN(m_metainfoViewCompPtr, "EventItemMetaInfoView", "Event metainfo viewer", true, "EventItemMetaInfoView");
+		I_ASSIGN(m_graphicsControllerCompPtr, "GraphicsController", "Graphics controller", true, "GraphicsController");
 		I_ASSIGN(m_itemProviderCompPtr, "ItemProvider", "Graphics item provider", true, "ItemProvider");
 		I_ASSIGN_TO(m_itemProviderModelCompPtr, m_itemProviderCompPtr, true);
 	I_END_COMPONENT;
@@ -166,6 +168,7 @@ private:
 	I_REF(iqtgui::IGuiObject, m_statisticsViewCompPtr);
 	I_REF(iqtgui::IGuiObject, m_metainfoViewCompPtr);
 	I_REF(imeas::INumericConstraints, m_scaleConstraintsCompPtr);
+	I_REF(imtloggui::IGraphicsController, m_graphicsControllerCompPtr);
 	I_REF(imtloggui::IGraphicsItemProvider, m_itemProviderCompPtr);
 	I_REF(imod::IModel, m_itemProviderModelCompPtr);
 

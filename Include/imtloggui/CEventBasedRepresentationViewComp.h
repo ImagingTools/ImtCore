@@ -35,7 +35,7 @@ protected:
 private:
 	I_REF(IEventItemFactory, m_eventItemFactoryCompPtr);
 
-	mutable QMap<uint64_t, GraphicsItem> m_items;
+	GraphicsItemList m_itemList;
 };
 
 
