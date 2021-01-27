@@ -124,7 +124,7 @@ void CGraphicsControllerComp::InitScene()
 			GroupItem groupItem;
 			groupItem.backgroundPtr = rectPtr;
 			groupItem.labelPtr = labelPtr;
-			m_groupItemList.append(groupItem);
+			m_groupStaticItems[ids[i]] = groupItem;
 
 			m_addedItems.append(GraphicsItem(rectPtr));
 			m_addedItems.append(GraphicsItem(labelPtr));
@@ -198,12 +198,13 @@ void CGraphicsControllerComp::OnViewportGeometryUpdate(IViewPropertyProvider* pr
 
 	m_visibleTimeRangeProvider.SetTimeRange(imtlog::CTimeRange(m_timeAxisPtr->GetVisibleBeginTime(), m_timeAxisPtr->GetVisibleEndTime()));
 
-	for (int i = 0; i < m_groupItemList.count(); i++){
-		QRectF rect = m_groupItemList[i].backgroundPtr->rect();
+	for (const QByteArray& key : m_groupStaticItems.keys()){
+		GroupItem& groupItem = m_groupStaticItems[key];
+		QRectF rect = groupItem.backgroundPtr->rect();
 		rect.setWidth(viewRect.width());
-		m_groupItemList[i].backgroundPtr->setRect(rect);
-		m_groupItemList[i].backgroundPtr->setPos(viewRect.x(), m_groupItemList[i].backgroundPtr->pos().y());
-		m_groupItemList[i].labelPtr->setPos(viewRect.x(), m_groupItemList[i].labelPtr->pos().y());
+		groupItem.backgroundPtr->setRect(rect);
+		groupItem.backgroundPtr->setPos(viewRect.x(), groupItem.backgroundPtr->pos().y());
+		groupItem.labelPtr->setPos(viewRect.x(), groupItem.labelPtr->pos().y());
 	}
 }
 
@@ -367,11 +368,11 @@ void CGraphicsControllerComp::OnGroupChanged(int modelId)
 			items += groupItemsProviderPtr->GetItems();
 		}
 
-		GraphicsItemList::iterator it = m_items.begin();
-		while (it != m_items.end()){
+		GraphicsItemList::iterator it = m_groupItems[groupId].begin();
+		while (it != m_groupItems[groupId].end()){
 			if (!items.contains(*it)){
 				m_removedItems.append(*it);
-				it = m_items.erase(it);
+				it = m_groupItems[groupId].erase(it);
 				continue;
 			}
 
@@ -379,9 +380,15 @@ void CGraphicsControllerComp::OnGroupChanged(int modelId)
 		}
 
 		for (int i = 0; i < items.count(); i++){
-			if (!m_items.contains(items[i])){
+			if (!m_groupItems[groupId].contains(items[i])){
 				m_addedItems.append(items[i]);
-				m_items.append(items[i]);
+				m_groupItems[groupId].append(items[i]);
+
+				QPointF newPos = m_groupStaticItems[groupId].backgroundPtr->mapFromScene(items[i]->pos());
+				newPos.ry() = m_groupStaticItems[groupId].backgroundPtr->rect().height() / 2;
+
+				items[i]->setParentItem(m_groupStaticItems[groupId].backgroundPtr);
+				items[i]->setPos(newPos);
 			}
 		}
 

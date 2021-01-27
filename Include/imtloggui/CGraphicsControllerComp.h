@@ -148,7 +148,6 @@ private:
 
 	struct GroupItem
 	{
-		QByteArray id;
 		CEventGroupLabelItem* labelPtr;
 		QGraphicsRectItem* backgroundPtr;
 	};
@@ -189,8 +188,8 @@ private:
 
 	GroupsDispatcher m_groupDispatcher;
 
-	QList<GroupItem> m_groupItemList;
-	GraphicsItemList m_items;
+	QMap<QByteArray, GroupItem> m_groupStaticItems;
+	QMap<QByteArray, GraphicsItemList>m_groupItems;
 	mutable GraphicsItemList m_addedItems;
 	mutable GraphicsItemList m_removedItems;
 };
