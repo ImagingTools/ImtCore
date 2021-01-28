@@ -43,7 +43,7 @@ IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
 		return IEventProvider::EventContainerPtr();
 	}
 
-	ilog::CMessageContainer* containerPtr = new ilog::CMessageContainer();
+	MessageContainer* containerPtr = new MessageContainer();
 
 	ilog::IMessageContainer::Messages messages = m_log.GetMessages();
 	for (int i = messages.count() - 1; i >= 0; i--){

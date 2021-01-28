@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QThread>
+
 // Acf includes
 #include <imod/TModelWrap.h>
 #include <imod/TSingleModelObserverBase.h>
@@ -11,6 +14,7 @@
 #include <imtlog/IEventProvider.h>
 #include <imtlog/IMessageFilterParams.h>
 #include <imtlog/ITimeRangeProvider.h>
+#include <imtloggui/CRepresentationControllerWorkerBase.h>
 
 
 namespace imtloggui
@@ -18,9 +22,11 @@ namespace imtloggui
 
 
 class CRepresentationControllerCompBase:
+			public QObject,
 			public icomp::CComponentBase,
 			protected imod::TSingleModelObserverBase<imtlog::ITimeRangeProvider>
 {
+	Q_OBJECT
 public:
 	typedef CComponentBase BaseClass;
 
@@ -43,25 +49,15 @@ protected:
 				imtlog::IEventProvider::EventContainerPtr containerPtr,
 				const imtlog::CTimeRange& timeRange) const = 0;
 
+	// reimplemented (imod::CSingleModelObserverBase)
+	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated();
 	virtual void OnComponentDestroyed();
 
-private:
-	// reimplemented (imod::CSingleModelObserverBase)
-	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
-
-private:
-	class EventProviderObserver: public imod::TSingleModelObserverBase<imtlog::IEventProvider>
-	{
-	public:
-		EventProviderObserver(CRepresentationControllerCompBase& parent);
-	protected:
-		// reimplemented (imod::CSingleModelObserverBase)
-		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
-	private:
-		CRepresentationControllerCompBase& m_parent;
-	};
+protected Q_SLOTS:
+	void OnWorkerThreadStarted();
 
 protected:
 	I_REF(imtlog::IEventProvider, m_eventProviderCompPtr);
@@ -73,7 +69,50 @@ protected:
 	I_REF(imtlog::IMessageFilterParams, m_messageFilterParamsCompPtr);
 
 private:
+	class EventProviderObserver: public imod::TSingleModelObserverBase<imtlog::IEventProvider>
+	{
+	public:
+		EventProviderObserver(CRepresentationControllerCompBase& parent);
+
+	protected:
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+	private:
+		CRepresentationControllerCompBase& m_parent;
+	};
+
+	class Worker:
+		public CRepresentationControllerWorkerBase,
+		protected imod::TSingleModelObserverBase<ilog::IMessageContainer>
+	{
+	public:
+		Worker(CRepresentationControllerCompBase& parent);
+
+		void AddJob(const imtlog::CTimeRange& timeRange);
+
+	protected:
+		// reimplemented (imtloggui::CRepresentationControllerWorkerBase)
+		virtual void OnNewJobAdded() override;
+		virtual void OnResultReady() override;
+
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+
+
+	private:
+		CRepresentationControllerCompBase& m_parent;
+		QList<imtlog::CTimeRange> m_jobs;
+		QMutex m_jobsMutex;
+
+		imtlog::IEventProvider::EventContainerPtr m_jobContainerPtr;
+		imtlog::CTimeRange m_jobTimeRange;
+	};
+
+private:
 	EventProviderObserver m_eventProviderObserver;
+
+	QThread m_workerThread;
+	Worker* m_workerObjectPtr;
 };
 
 

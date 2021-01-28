@@ -154,10 +154,10 @@ void CProductionQualityItem::PreparePointArrays()
 
 		if (m_style == DS_BAR){
 			if (timeline.contains(curTime)){
-				Q_ASSERT(!((timeline[curTime].oks > 0 ||
-							timeline[curTime].warnings > 0 ||
-							timeline[curTime].noks > 0 ||
-							timeline[curTime].errors > 0) ^ (timeline[curTime].count > 0)));
+				//Q_ASSERT(!((timeline[curTime].oks > 0 ||
+				//			timeline[curTime].warnings > 0 ||
+				//			timeline[curTime].noks > 0 ||
+				//			timeline[curTime].errors > 0) ^ (timeline[curTime].count > 0)));
 
 				relativeOks = timeline[curTime].count > 0 ? timeline[curTime].oks * 1. / timeline[curTime].count : 0;
 				relativeWarnings = timeline[curTime].count > 0 ? timeline[curTime].warnings * 1. / timeline[curTime].count : 0;
@@ -170,9 +170,9 @@ void CProductionQualityItem::PreparePointArrays()
 			m_nokPoints.append(QPointF(curPos + granularityS / 2, r.height() * relativeNoks));
 			m_errorsPoints.append(QPointF(curPos + granularityS / 2, r.height() * relativeErrors));
 
-			if (relativeOks != 0 || relativeWarnings != 0 || relativeNoks != 0 || relativeErrors != 0){
-				Q_ASSERT(fabs(relativeOks + relativeWarnings + relativeNoks + relativeErrors - 1) < DBL_EPSILON);
-			}
+			//if (relativeOks != 0 || relativeWarnings != 0 || relativeNoks != 0 || relativeErrors != 0){
+			//	Q_ASSERT(fabs(relativeOks + relativeWarnings + relativeNoks + relativeErrors - 1) < DBL_EPSILON);
+			//}
 		}
 
 		if (m_style == DS_POLYLINE){

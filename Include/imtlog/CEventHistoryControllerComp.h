@@ -85,6 +85,8 @@ private:
 	EventHistoryGroupControllerPtr GetGroupForMessageId(int messageId) const;
 
 private:
+	typedef imod::TModelWrap<ilog::CMessageContainer> MessageContainer;
+
 	enum ControllerState
 	{
 		CS_INIT = 0,
