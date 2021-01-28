@@ -56,9 +56,6 @@ protected:
 	virtual void OnComponentCreated();
 	virtual void OnComponentDestroyed();
 
-protected Q_SLOTS:
-	void OnWorkerThreadStarted();
-
 protected:
 	I_REF(imtlog::IEventProvider, m_eventProviderCompPtr);
 	I_REF(imod::IModel, m_eventProviderModelCompPtr);
@@ -67,6 +64,9 @@ protected:
 	I_REF(istd::IChangeable, m_representationCompPtr);
 	I_REF(imtlog::IEventFilter, m_eventFilterCompPtr);
 	I_REF(imtlog::IMessageFilterParams, m_messageFilterParamsCompPtr);
+
+private Q_SLOTS:
+	void OnTaskFinished(QByteArray taskId);
 
 private:
 	class EventProviderObserver: public imod::TSingleModelObserverBase<imtlog::IEventProvider>
@@ -81,38 +81,36 @@ private:
 		CRepresentationControllerCompBase& m_parent;
 	};
 
-	class Worker:
-		public CRepresentationControllerWorkerBase,
-		protected imod::TSingleModelObserverBase<ilog::IMessageContainer>
+	class CreateRepresentationTask:
+				public imod::TSingleModelObserverBase<ilog::IMessageContainer>,
+				public istd::IChangeable
 	{
 	public:
-		Worker(CRepresentationControllerCompBase& parent);
-
-		void AddJob(const imtlog::CTimeRange& timeRange);
+		imtlog::CTimeRange timeRange;
+		imtlog::IEventProvider* eventProviderPtr;
+		imtlog::IEventFilter* eventFilterPtr;
+		imtlog::IMessageFilterParams* messageFilterParamsPtr;
+		CRepresentationControllerCompBase* controllerPtr;
+		istd::IChangeable* representationPtr;
+		uint8_t updateCount;
 
 	protected:
-		// reimplemented (imtloggui::CRepresentationControllerWorkerBase)
-		virtual void OnNewJobAdded() override;
-		virtual void OnResultReady() override;
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override
+		{
+			updateCount++;
+		}
+	};
 
-		// reimplemented (imod::CSingleModelObserverBase)
-		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
-
-
-	private:
-		CRepresentationControllerCompBase& m_parent;
-		QList<imtlog::CTimeRange> m_jobs;
-		QMutex m_jobsMutex;
-
-		imtlog::IEventProvider::EventContainerPtr m_jobContainerPtr;
-		imtlog::CTimeRange m_jobTimeRange;
+	class Worker: public CWorker
+	{
+	protected:
+		virtual bool DoJob(TaskPtr& taskPtr) override;
 	};
 
 private:
 	EventProviderObserver m_eventProviderObserver;
 
-	QThread m_workerThread;
-	Worker* m_workerObjectPtr;
+	Worker m_workerObject;
 };
 
 
