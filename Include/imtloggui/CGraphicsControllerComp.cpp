@@ -390,6 +390,7 @@ void CGraphicsControllerComp::OnGroupChanged(int modelId)
 
 				//items[i]->setParentItem(m_groupStaticItems[groupId].backgroundPtr);
 				items[i]->setPos(newPos);
+				items[i]->update();
 			}
 		}
 

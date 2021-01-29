@@ -103,14 +103,22 @@ private:
 
 	class Worker: public CWorker
 	{
+	public:
+		Worker(CRepresentationControllerCompBase& parent);
+
 	protected:
-		virtual bool DoJob(TaskPtr& taskPtr) override;
+		virtual void run() override;
+
+	private:
+		CRepresentationControllerCompBase& m_parent;
 	};
 
 private:
 	EventProviderObserver m_eventProviderObserver;
 
-	Worker m_workerObject;
+	Worker m_worker;
+	imtlog::CTimeRange m_workerJob;
+	QMutex m_workerJobMutex;
 };
 
 

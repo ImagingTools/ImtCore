@@ -113,6 +113,13 @@ bool CTimeRange::SetTimeRange(const QDateTime& begin, const QDateTime& end)
 }
 
 
+void CTimeRange::Clear()
+{
+	m_begin = QDateTime();
+	m_end = QDateTime();
+}
+
+
 bool CTimeRange::Contains(const QDateTime& time) const
 {
 	if (m_begin.isValid() && time < m_begin){

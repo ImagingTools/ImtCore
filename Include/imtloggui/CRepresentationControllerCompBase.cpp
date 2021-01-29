@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtCore/QDebug>
 
+// ImtCore includes
+#include <imtlog/CEventHistoryResultContainer.h>
+
 
 namespace imtloggui
 {
@@ -12,9 +15,9 @@ namespace imtloggui
 // public methods
 
 CRepresentationControllerCompBase::CRepresentationControllerCompBase()
-	:m_eventProviderObserver(*this)
+	:m_eventProviderObserver(*this),
+	m_worker(*this)
 {
-	connect(&m_workerObject, &CWorker::TaskFinished, this, &CRepresentationControllerCompBase::OnTaskFinished);
 }
 
 
@@ -25,21 +28,14 @@ CRepresentationControllerCompBase::CRepresentationControllerCompBase()
 void CRepresentationControllerCompBase::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (m_representationCompPtr.IsValid() && m_eventProviderCompPtr.IsValid()){
-		//if (m_workerObjectPtr != nullptr){
-		//	m_workerObjectPtr->AddJob(GetObservedObject()->GetTimeRange());
-		//}
+		imtlog::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
 
-		CreateRepresentationTask* taskPtr = new CreateRepresentationTask();
-		taskPtr->timeRange = GetObservedObject()->GetTimeRange();
-		taskPtr->eventProviderPtr = m_eventProviderCompPtr.GetPtr();
-		taskPtr->eventFilterPtr = m_eventFilterCompPtr.GetPtr();
-		taskPtr->messageFilterParamsPtr = m_messageFilterParamsCompPtr.GetPtr();
-		taskPtr->controllerPtr = this;
-		taskPtr->representationPtr = m_representationCompPtr.GetPtr();
-		taskPtr->updateCount = 0;
-
-		m_workerObject.CancelAll();
-		m_workerObject.AddJob(istd::TSmartPtr<istd::IChangeable>(taskPtr));
+		if (timeRange.IsClosed()){
+			QMutexLocker locker(&m_workerJobMutex);
+			m_worker.requestInterruption();
+			m_workerJob = timeRange;
+			m_worker.Start();
+		}
 	}
 }
 
@@ -70,8 +66,8 @@ void CRepresentationControllerCompBase::OnTaskFinished(QByteArray taskId)
 
 void CRepresentationControllerCompBase::OnComponentDestroyed()
 {
-	m_workerObject.CancelAll();
-	m_workerObject.Wait();
+	m_worker.requestInterruption();
+	m_worker.wait();
 
 	if (m_timeRangeProviderModelCompPtr.IsValid() && m_timeRangeProviderModelCompPtr->IsAttached(this)){
 		m_timeRangeProviderModelCompPtr->DetachObserver(this);
@@ -101,17 +97,14 @@ void CRepresentationControllerCompBase::EventProviderObserver::OnUpdate(const is
 {
 	if (m_parent.m_representationCompPtr.IsValid() && m_parent.m_eventProviderCompPtr.IsValid()){
 		if (m_parent.m_timeRangeProviderCompPtr.IsValid()){
-			CreateRepresentationTask* taskPtr = new CreateRepresentationTask();
-			taskPtr->timeRange = m_parent.GetObservedObject()->GetTimeRange();
-			taskPtr->eventProviderPtr = m_parent.m_eventProviderCompPtr.GetPtr();
-			taskPtr->eventFilterPtr = m_parent.m_eventFilterCompPtr.GetPtr();
-			taskPtr->messageFilterParamsPtr = m_parent.m_messageFilterParamsCompPtr.GetPtr();
-			taskPtr->controllerPtr = &m_parent;
-			taskPtr->representationPtr = m_parent.m_representationCompPtr.GetPtr();
-			taskPtr->updateCount = 0;
+			imtlog::CTimeRange timeRange = m_parent.GetObservedObject()->GetTimeRange();
 
-			m_parent.m_workerObject.CancelAll();
-			m_parent.m_workerObject.AddJob(istd::TSmartPtr<istd::IChangeable>(taskPtr));
+			if (timeRange.IsClosed()){
+				QMutexLocker locker(&m_parent.m_workerJobMutex);
+				m_parent.m_worker.requestInterruption();
+				m_parent.m_workerJob = timeRange;
+				m_parent.m_worker.Start();
+			}
 		}
 	}
 }
@@ -119,117 +112,53 @@ void CRepresentationControllerCompBase::EventProviderObserver::OnUpdate(const is
 
 // protected methods of the embedded class Worker
 
-bool CRepresentationControllerCompBase::Worker::DoJob(TaskPtr& taskPtr)
+CRepresentationControllerCompBase::Worker::Worker(CRepresentationControllerCompBase& parent)
+	:m_parent(parent)
 {
-	CreateRepresentationTask* createRepresentationTaskPtr =
-				dynamic_cast<CreateRepresentationTask*>(taskPtr.GetPtr());
-
-	imtlog::IEventProvider::EventContainerPtr containerPtr;
-
-	if (createRepresentationTaskPtr->timeRange.IsClosed() &&
-		createRepresentationTaskPtr->eventProviderPtr != nullptr &&
-		createRepresentationTaskPtr->eventFilterPtr != nullptr &&
-		createRepresentationTaskPtr->messageFilterParamsPtr != nullptr)
-	{
-		createRepresentationTaskPtr->messageFilterParamsPtr->SetFilterTimeRange(
-					createRepresentationTaskPtr->timeRange);
-		containerPtr = createRepresentationTaskPtr->eventProviderPtr->GetEvents(
-					createRepresentationTaskPtr->eventFilterPtr,
-					createRepresentationTaskPtr->messageFilterParamsPtr);
-	}
-
-	if (containerPtr.IsValid()){
-		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(containerPtr.GetPtr());
-		modelPtr->AttachObserver(createRepresentationTaskPtr);
-
-		while (createRepresentationTaskPtr->updateCount == 0){
-			sleep(1);
-		}
-
-		createRepresentationTaskPtr->controllerPtr->BuildRepresentation(
-					*createRepresentationTaskPtr->representationPtr,
-					containerPtr,
-					createRepresentationTaskPtr->timeRange);
-
-		return true;
-	}
-
-	return false;
-
-	//if (!m_jobContainerPtr.IsValid()){
-	//	if (!m_jobs.isEmpty()){
-	//		m_jobTimeRange = m_jobs.back();
-
-	//		if (m_parent.m_eventFilterCompPtr.IsValid() && m_parent.m_messageFilterParamsCompPtr.IsValid()){
-	//			m_parent.m_messageFilterParamsCompPtr->SetFilterTimeRange(m_jobTimeRange);
-	//			if (m_parent.m_eventProviderCompPtr.IsValid()){
-	//				m_jobContainerPtr = m_parent.m_eventProviderCompPtr->GetEvents(
-	//					m_parent.m_eventFilterCompPtr.GetPtr(),
-	//					m_parent.m_messageFilterParamsCompPtr.GetPtr());
-
-	//				imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_jobContainerPtr.GetPtr());
-	//				if (modelPtr != nullptr){
-	//					modelPtr->AttachObserver(this);
-	//				}
-	//				else{
-	//					m_jobContainerPtr.SetPtr(nullptr);
-	//				}
-	//			}
-	//		}
-
-	//		m_jobs.clear();
-	//	}
-	//}
 }
 
-// reimplemented (imtloggui::CRepresentationControllerWorkerBase)
 
-//void CRepresentationControllerCompBase::Worker::OnNewJobAdded()
-//{
-//	QMutexLocker locker(&m_jobsMutex);
-//	if (!m_jobContainerPtr.IsValid()){
-//		if (!m_jobs.isEmpty()){
-//			m_jobTimeRange = m_jobs.back();
-//
-//			if (m_parent.m_eventFilterCompPtr.IsValid() && m_parent.m_messageFilterParamsCompPtr.IsValid()){
-//				m_parent.m_messageFilterParamsCompPtr->SetFilterTimeRange(m_jobTimeRange);
-//				if (m_parent.m_eventProviderCompPtr.IsValid()){
-//					m_jobContainerPtr = m_parent.m_eventProviderCompPtr->GetEvents(
-//						m_parent.m_eventFilterCompPtr.GetPtr(),
-//						m_parent.m_messageFilterParamsCompPtr.GetPtr());
-//
-//					imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_jobContainerPtr.GetPtr());
-//					if (modelPtr != nullptr){
-//						modelPtr->AttachObserver(this);
-//					}
-//					else{
-//						m_jobContainerPtr.SetPtr(nullptr);
-//					}
-//				}
-//			}
-//
-//			m_jobs.clear();
-//		}
-//	}
-//}
+void CRepresentationControllerCompBase::Worker::run()
+{
+	bool isFinished = false;
 
+	while (!isFinished){
+		QMutexLocker locker(&m_parent.m_workerJobMutex);
+		imtlog::CTimeRange jobTimeRange = m_parent.m_workerJob;
+		m_parent.m_workerJob.Clear();
+		locker.unlock();
 
-//void CRepresentationControllerCompBase::Worker::OnResultReady()
-//{
-//	m_parent.BuildRepresentation(*m_parent.m_representationCompPtr, m_jobContainerPtr, m_jobTimeRange);
-//
-//	QMutexLocker locker(&m_jobsMutex);
-//	m_jobContainerPtr.SetPtr(nullptr);
-//	Q_EMIT EmitNewJobAdded();
-//}
-//
-//
-//// reimplemented (imod::CSingleModelObserverBase)
-//
-//void CRepresentationControllerCompBase::Worker::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
-//{
-//	Q_EMIT EmitResultReady();
-//}
+		if (jobTimeRange.IsClosed()){
+			m_parent.m_messageFilterParamsCompPtr->SetFilterTimeRange(jobTimeRange);
+
+			imtlog::IEventProvider::EventContainerPtr containerPtr = m_parent.m_eventProviderCompPtr->GetEvents(
+						m_parent.m_eventFilterCompPtr.GetPtr(),
+						m_parent.m_messageFilterParamsCompPtr.GetPtr());
+
+			if (containerPtr.IsValid()){
+				imtlog::CEventHistoryResultContainer* eventHistoryResultContainer =
+							dynamic_cast<imtlog::CEventHistoryResultContainer*>(containerPtr.GetPtr());
+
+				while (!eventHistoryResultContainer->IsClosed() && !isFinished){
+					msleep(1);
+					if (isInterruptionRequested()){
+						isFinished = true;
+					}
+				}
+
+				if (!isFinished){
+					m_parent.BuildRepresentation(
+								*m_parent.m_representationCompPtr,
+								containerPtr,
+								jobTimeRange);
+				}
+			}
+		}
+		else{
+			isFinished = true;
+		}
+	}
+}
 
 
 } // namespace imtloggui

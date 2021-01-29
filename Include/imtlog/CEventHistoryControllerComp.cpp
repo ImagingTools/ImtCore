@@ -6,11 +6,12 @@
 #include <QtCore/QDir>
 #include <QtCore/QUuid>
 
-// ACF includes
+// Acf includes
 #include <ifile/CCompactXmlFileWriteArchive.h>
 #include <ifile/CCompactXmlFileReadArchive.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 #include <istd/CSystem.h>
+#include <istd/CChangeGroup.h>
 
 
 namespace imtlog
@@ -43,13 +44,19 @@ IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
 		return IEventProvider::EventContainerPtr();
 	}
 
-	MessageContainer* containerPtr = new MessageContainer();
+	CEventHistoryResultContainer* containerPtr = new CEventHistoryResultContainer();
 
-	ilog::IMessageContainer::Messages messages = m_log.GetMessages();
-	for (int i = messages.count() - 1; i >= 0; i--){
-		if (filterPtr->IsMessageAccepted(*messages[i], filterParamsPtr)){
-			containerPtr->AddMessage(messages[i]);
+	{
+		istd::CChangeGroup notifier(containerPtr);
+
+		ilog::IMessageContainer::Messages messages = m_log.GetMessages();
+		for (int i = messages.count() - 1; i >= 0; i--){
+			if (filterPtr->IsMessageAccepted(*messages[i], filterParamsPtr)){
+				containerPtr->AddMessage(messages[i]);
+			}
 		}
+
+		containerPtr->Close();
 	}
 
 	return IEventProvider::EventContainerPtr(containerPtr);

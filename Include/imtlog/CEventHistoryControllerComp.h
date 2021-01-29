@@ -21,6 +21,7 @@
 #include <imtlog/ITimeRangeProvider.h>
 #include <imtlog/IEventProvider.h>
 #include <imtlog/CEventContainer.h>
+#include <imtlog/CEventHistoryResultContainer.h>
 #include <imtlog/CEventHistoryGroupController.h>
 
 
@@ -85,8 +86,6 @@ private:
 	EventHistoryGroupControllerPtr GetGroupForMessageId(int messageId) const;
 
 private:
-	typedef imod::TModelWrap<ilog::CMessageContainer> MessageContainer;
-
 	enum ControllerState
 	{
 		CS_INIT = 0,
