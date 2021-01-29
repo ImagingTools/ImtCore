@@ -24,21 +24,27 @@ IEventItem* CGeneralEventFactoryComp::CreateInstance(const ilog::IMessageConsume
 	QIcon icon;
 	int iconSize = 24;
 
+	static QIcon noneIcon = QIcon(":/Icons/StateUnknown");
+	static QIcon okIcon(":/Icons/StateOk");
+	static QIcon warningIcon(":/Icons/StateWarning");
+	static QIcon errorIcon(":/Icons/Error");
+	static QIcon invalidIcon(":/Icons/StateInvalid");
+
 	switch (message->GetInformationCategory()){
 	case istd::IInformationProvider::IC_NONE:
-		icon = QIcon(":/Icons/StateUnknown");
+		icon = noneIcon;
 		break;
 	case istd::IInformationProvider::IC_INFO:
-		icon = QIcon(":/Icons/StateOk");
+		icon = okIcon;
 		break;
 	case istd::IInformationProvider::IC_WARNING:
-		icon = QIcon(":/Icons/StateWarning");
+		icon = warningIcon;
 		break;
 	case istd::IInformationProvider::IC_ERROR:
-		icon = QIcon(":/Icons/Error");
+		icon = errorIcon;
 		break;
 	case istd::IInformationProvider::IC_CRITICAL:
-		icon = QIcon(":/Icons/StateInvalid");
+		icon = invalidIcon;
 		break;
 	}
 
