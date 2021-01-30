@@ -52,12 +52,11 @@ IGraphicsItemProvider::GraphicsItemList CProductionRepresentationViewComp::GetRe
 void CProductionRepresentationViewComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	CProductionRepresentationComp* representationPtr = dynamic_cast<CProductionRepresentationComp*>(GetObservedObject());
-
 	if (representationPtr == nullptr){
 		return;
 	}
 
-	if (representationPtr->GetTimeline().size() == 0){
+	if (representationPtr->GetTimeline().isEmpty()){
 		return;
 	}
 
