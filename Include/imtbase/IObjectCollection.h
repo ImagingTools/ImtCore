@@ -167,12 +167,12 @@ public:
 	/**
 		Get object data instance for the entry with the given ID.
 	*/
-	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const = 0;
+	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const = 0;
 
 	/**
 		Set data for the entry with the given ID.
 	*/
-	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) = 0;
+	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) = 0;
 
 	/**
 		Set name of the element with the given ID.

@@ -76,7 +76,7 @@ QByteArray CStaticObjectCollection::InsertNewObject(
 
 int CStaticObjectCollection::GetSupportedOperations() const
 {
-	return SO_CLONE | SO_COPY | SO_RESET;
+	return SO_CLONE | BaseClass::GetSupportedOperations();
 }
 
 

@@ -60,6 +60,6 @@ public:
 };
 
 
-} // namespace aculastat
+} // namespace imtbase
 
 

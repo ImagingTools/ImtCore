@@ -381,7 +381,7 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 
 int CObjectCollectionBase::GetSupportedOperations() const
 {
-	return SO_CLONE | SO_COPY | SO_RESET;
+	return SO_COPY | SO_RESET;
 }
 
 
