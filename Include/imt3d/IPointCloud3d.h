@@ -18,10 +18,7 @@ public:
 	/**
 		Create point cloud with specified point format.
 	*/
-	virtual bool CreateCloud(
-				PointFormat pointFormat,
-				int pointsCount,
-				const istd::CIndex2d* gridSizePtr = nullptr) = 0;
+	virtual bool CreateCloud(PointFormat pointFormat) = 0;
 
 	/**
 		Create point cloud with specified point format using external data buffer.
@@ -29,8 +26,7 @@ public:
 	virtual bool CreateCloud(
 				PointFormat pointFormat,
 				int pointsCount,
-				void* dataPtr,
-				bool copyData,
+				const void* dataPtr,
 				const istd::CIndex2d* gridSizePtr = nullptr) = 0;
 
 	/**

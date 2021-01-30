@@ -362,7 +362,7 @@ void CPointCloudShape::DeleteSelectionHelper(imt3d::IPointCloud3d& pointCloud)
 		}
 	}
 
-	pointCloud.CreateCloud(pointFormat, remainingPointsCount, pointsDataPtr, true, gridSize.IsZero() ? nullptr : &gridSize);
+	pointCloud.CreateCloud(pointFormat, remainingPointsCount, pointsDataPtr, gridSize.IsZero() ? nullptr : &gridSize);
 
 	m_selectedVerticesIndicies.clear();
 }

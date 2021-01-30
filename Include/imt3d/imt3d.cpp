@@ -54,7 +54,7 @@ bool ConvertDepthImageToCloud(const IDepthBitmap& bitmap, IPointCloud3d& pointCl
 
 	istd::CIndex2d* gridSizePtr = isOrganized ? &bitmapSize : nullptr;
 
-	return pointCloud.CreateCloud(IPointsBasedObject::PF_XYZ_32, pointsCount, pointsDataPtr, true, gridSizePtr);
+	return pointCloud.CreateCloud(IPointsBasedObject::PF_XYZ_32, pointsCount, pointsDataPtr, gridSizePtr);
 }
 
 

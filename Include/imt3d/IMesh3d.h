@@ -25,14 +25,14 @@ public:
 	/**
 		Create mesh with specified point format.
 	*/
-	virtual bool CreateMesh(PointFormat pointFormat, int pointsCount, const Indices& indices) = 0;
+	virtual bool CreateMesh(PointFormat pointFormat) = 0;
 
 	/**
 		Create mesh with specified point format using external data buffer.
 	*/
-	virtual bool CreateMesh(PointFormat pointFormat, int pointsCount, void* pointsDataPtr, bool copyPointsDataFlag, const Indices& indices) = 0;
+	virtual bool CreateMesh(PointFormat pointFormat, int pointsCount, const void* pointsDataPtr, const Indices& indices) = 0;
 
-	virtual bool InsertData(int pointsCount, void* pointsDataPtr, const Indices& indices) = 0;
+	virtual bool InsertData(int pointsCount, const void* pointsDataPtr, const Indices& indices) = 0;
 
 	/**
 		Get mesh indices.

@@ -24,6 +24,10 @@ void CObjectCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 
 	idoc::IDocumentMetaInfo::MetaInfoTypes types = metaInfoPtr->GetMetaInfoTypes();
 	for (int type : types){
+		if (m_ignoreIdsAttrPtr.FindValue(type) >= 0){
+			continue;
+		}
+
 		QString name = metaInfoPtr->GetMetaInfoName(type);
 		if (name.isEmpty()){
 			continue;

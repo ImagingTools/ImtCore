@@ -23,11 +23,10 @@ public:
 	typedef CPointsBasedObject BaseClass;
 
 	// reimplemented (imt3d::IPointCloud3d)
-	bool CreateCloud(PointFormat pointFormat, int pointsCount, const istd::CIndex2d* gridSizePtr = nullptr) override;
+	bool CreateCloud(PointFormat pointFormat) override;
 	bool CreateCloud(PointFormat pointFormat,
 			int pointsCount,
-			void* dataPtr,
-			bool copyData,
+			const void* dataPtr,
 			const istd::CIndex2d* gridSizePtr = nullptr) override;
 	virtual bool InsertPoints(
 				int pointsCount,

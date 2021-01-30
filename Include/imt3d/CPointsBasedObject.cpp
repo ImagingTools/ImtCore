@@ -19,19 +19,11 @@ namespace imt3d
 // public methods
 
 CPointsBasedObject::CPointsBasedObject()
-	:m_dataPtr(nullptr),
-	m_dataOwner(false),
-	m_pointFormat(PointFormat::PF_XYZ_32),
+	: m_pointFormat(PointFormat::PF_XYZ_32),
 	m_pointsCount(0),
-	m_bufferSize(0),
 	m_isCenterCalculationValid(false),
 	m_isCuboidCalculationValid(false)
 {
-}
-
-CPointsBasedObject::~CPointsBasedObject()
-{
-	FreeData();
 }
 
 
@@ -81,11 +73,16 @@ void* CPointsBasedObject::GetPointData(int pointIndex)
 }
 
 
-void* CPointsBasedObject::GetData() const
+void* CPointsBasedObject::GetData()
 {
-	return m_dataPtr;
+	return m_data.data();
 }
 
+
+const void* CPointsBasedObject::GetData() const
+{
+	return m_data.data();
+}
 
 // reimplemented (imt3d::IObject3d)
 
@@ -160,18 +157,19 @@ bool CPointsBasedObject::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(pointsCountTag);
 
 	// data
-	int dataSize = GetDataSize();
 
 	if (archive.IsStoring()){
 		retVal = retVal && archive.BeginTag(dataTag);
-		retVal = retVal && archive.ProcessData(m_dataPtr, dataSize);
+		retVal = retVal && archive.ProcessData(m_data.data(), int(m_data.size()));
 		retVal = retVal && archive.EndTag(dataTag);
 	}
 	else{
-		CreateInternalBuffer();
+		int dataSize = GetDataSize();
+		m_data.clear();
+		m_data.resize(dataSize);
 
 		retVal = retVal && archive.BeginTag(dataTag);
-		retVal = retVal && archive.ProcessData(m_dataPtr, dataSize);
+		retVal = retVal && archive.ProcessData(m_data.data(), int(m_data.size()));
 		retVal = retVal && archive.EndTag(dataTag);
 	}
 
@@ -195,16 +193,8 @@ bool CPointsBasedObject::CopyFrom(const istd::IChangeable& object, istd::IChange
 
 		m_pointFormat = objectPtr->m_pointFormat;
 		m_pointsCount = objectPtr->m_pointsCount;
-
-		int dataSize = GetDataSize();
-
-		CreateInternalBuffer();
-
-		if (m_dataPtr){
-			memcpy(m_dataPtr, objectPtr->m_dataPtr, dataSize);
-
-			return true;
-		}
+		m_data = objectPtr->m_data;
+		return true;
 	}
 
 	return false;
@@ -216,8 +206,7 @@ bool CPointsBasedObject::IsEqual(const IChangeable & object) const
 	const CPointsBasedObject* sourcePtr = dynamic_cast<const CPointsBasedObject*>(&object);
 	if (sourcePtr != nullptr){
 		return ((GetDataSize() == sourcePtr->GetDataSize())
-				&& (memcmp(m_dataPtr, sourcePtr->m_dataPtr, GetDataSize()) == 0)
-				&& (m_dataOwner == sourcePtr->m_dataOwner)
+				&& (memcmp(m_data.data(), sourcePtr->m_data.data(), GetDataSize()) == 0)
 				&& (m_pointFormat == sourcePtr->m_pointFormat)
 				&& (m_pointsCount == sourcePtr->m_pointsCount)
 				&& (m_cloudCenter == sourcePtr->m_cloudCenter)
@@ -246,9 +235,7 @@ bool CPointsBasedObject::ResetData(istd::IChangeable::CompatibilityMode /*mode*/
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	FreeData();
-
-	m_dataOwner = false;
+	m_data.clear();
 	m_pointFormat = IPointsBasedObject::PF_XYZ_32;
 	m_pointsCount = 0;
 
@@ -264,15 +251,15 @@ bool CPointsBasedObject::ResetData(istd::IChangeable::CompatibilityMode /*mode*/
 // protected methods
 
 template <typename PointType>
-PointType* CPointsBasedObject::TGetPointData(int pointIndex, bool validOnly) const
+const PointType* CPointsBasedObject::TGetPointData(int pointIndex, bool validOnly) const
 {
 	Q_ASSERT(pointIndex >= 0 && pointIndex < m_pointsCount);
 
-	if (!m_dataPtr){
+	if (m_data.empty()){
 		return nullptr;
 	}
 
-	PointType* typedDataPtr = reinterpret_cast<PointType*>(m_dataPtr);
+	const PointType* typedDataPtr = reinterpret_cast<const PointType*>(m_data.data());
 	typedDataPtr += pointIndex;
 
 	if (validOnly && !TIsPointValid<PointType>(*typedDataPtr)){
@@ -282,59 +269,57 @@ PointType* CPointsBasedObject::TGetPointData(int pointIndex, bool validOnly) con
 	return typedDataPtr;
 }
 
-
-bool CPointsBasedObject::Create(PointFormat pointFormat, int pointsCount, void* dataPtr, bool copyData)
+template <typename PointType>
+PointType* CPointsBasedObject::TGetPointData(int pointIndex, bool validOnly)
 {
-	FreeData();
+	Q_ASSERT(pointIndex >= 0 && pointIndex < m_pointsCount);
 
+	if (m_data.empty()) {
+		return nullptr;
+	}
+
+	PointType* typedDataPtr = reinterpret_cast<PointType*>(m_data.data());
+	typedDataPtr += pointIndex;
+
+	if (validOnly && !TIsPointValid<PointType>(*typedDataPtr)) {
+		return nullptr;
+	}
+
+	return typedDataPtr;
+}
+
+bool CPointsBasedObject::Create(PointFormat pointFormat)
+{
+	m_data.clear();
+	m_pointsCount = 0;
 	m_pointFormat = pointFormat;
-	m_pointsCount = pointsCount;
-	m_dataOwner = copyData;
-	bool result = true;
 
-	if (m_dataOwner){
-		result = CreateInternalBuffer();
+	return true;
+}
 
-		if (dataPtr && result) {
-			int dataSize = GetDataSize();
-			memcpy(m_dataPtr, dataPtr, dataSize);
-		}
-	}
-	else{
-		if (dataPtr) {
-			m_dataPtr = static_cast<quint8*>(dataPtr);
-		}
+bool CPointsBasedObject::Create(PointFormat pointFormat, int pointsCount, const void* dataPtr)
+{
+	bool retval = true;
+	retval = retval && Create(pointFormat);
+
+	if (pointsCount > 0) {
+		retval = retval && Append(pointsCount, dataPtr);
 	}
 
-	m_bufferSize = GetDataSize();
-	return result;
+	return retval;
 }
 
 
 bool CPointsBasedObject::Append(int pointsCount, const void* dataPtr)
 {
-	if (pointsCount <= 0){
+	if (pointsCount <= 0 || dataPtr == nullptr){
 		return false;
 	}
 
-	if (!m_dataOwner){
-		return false;
-	}
-
-	int oldBufferSize = GetBufferSize(m_pointFormat, m_pointsCount);
 	int appendSize = GetBufferSize(m_pointFormat, pointsCount);
-	int newBufferSize = oldBufferSize + appendSize;
+	const uint8_t* bytesPtr = static_cast<const uint8_t*>(dataPtr);
 
-	if (newBufferSize > m_bufferSize) {
-		m_bufferSize = 2 * newBufferSize;
-		m_dataPtr = static_cast<quint8*>(realloc(m_dataPtr, m_bufferSize));
-
-		if (m_dataPtr == nullptr) {
-			return false;
-		}
-	}
-
-	memcpy(m_dataPtr + oldBufferSize, dataPtr, appendSize);
+	m_data.insert(m_data.end(), bytesPtr, bytesPtr + appendSize);
 	m_pointsCount += pointsCount;
 
 	return true;
@@ -344,112 +329,6 @@ bool CPointsBasedObject::Append(int pointsCount, const void* dataPtr)
 int CPointsBasedObject::GetDataSize() const
 {
 	return GetBufferSize(m_pointFormat, m_pointsCount);
-}
-
-
-bool CPointsBasedObject::CreateInternalBuffer()
-{
-	switch (m_pointFormat){
-		case IPointsBasedObject::PF_XYZ_32:
-			return AllocateObjectBuffer<PointXyz32>();
-		case IPointsBasedObject::PF_XYZ_64:
-			return AllocateObjectBuffer<PointXyz64>();
-		case IPointsBasedObject::PF_XYZW_32:
-			return AllocateObjectBuffer<PointXyzw32>();
-		case IPointsBasedObject::PF_XYZ_ABC_32:
-			return AllocateObjectBuffer<PointXyzAbc32>();
-		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-			return AllocateObjectBuffer<PointXyzwNormal32>();
-		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-			return AllocateObjectBuffer<PointXyzwNormalRgba32>();
-		case IPointsBasedObject::PF_XYZW_RGBA_32:
-			return AllocateObjectBuffer<PointXyzwRgba32>();
-		default:
-			return false;
-	}
-}
-
-
-template <typename PointType>
-bool CPointsBasedObject::AllocateObjectBuffer()
-{
-	FreeData();
-
-	int dataSize = GetDataSize();
-	if (dataSize > 0){
-		if (!AllocateInternal<PointType>(dataSize, m_dataPtr)) {
-			return false;
-		}
-
-		m_dataOwner = true;
-	}
-
-	return true;
-}
-
-
-bool CPointsBasedObject::AllocateData(int size, quint8*& buffer)
-{
-	switch (m_pointFormat){
-		case IPointsBasedObject::PF_XYZ_32:
-			return AllocateInternal<PointXyz32>(size, buffer);
-		case IPointsBasedObject::PF_XYZ_64:
-			return AllocateInternal<PointXyz64>(size, buffer);
-		case IPointsBasedObject::PF_XYZW_32:
-			return AllocateInternal<PointXyzw32>(size, buffer);
-		case IPointsBasedObject::PF_XYZ_ABC_32:
-			return AllocateInternal<PointXyzAbc32>(size, buffer);
-		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-			return AllocateInternal<PointXyzwNormal32>(size, buffer);
-		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-			return AllocateInternal<PointXyzwNormalRgba32>(size, buffer);
-		case IPointsBasedObject::PF_XYZW_RGBA_32:
-			return AllocateInternal<PointXyzwRgba32>(size, buffer);
-		default:
-			return false;
-	}
-}
-
-
-void CPointsBasedObject::FreeData()
-{
-	switch (m_pointFormat){
-		case IPointsBasedObject::PF_XYZ_32:
-			TFreeData<PointXyz32>();
-			break;
-		case IPointsBasedObject::PF_XYZ_64:
-			TFreeData<PointXyz64>();
-			break;
-		case IPointsBasedObject::PF_XYZW_32:
-			TFreeData<PointXyzw32>();
-			break;
-		case IPointsBasedObject::PF_XYZ_ABC_32:
-			TFreeData<PointXyzAbc32>();
-			break;
-		case IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-			TFreeData<PointXyzwNormal32>();
-			break;
-		case IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-			TFreeData<PointXyzwNormalRgba32>();
-			break;
-		case IPointsBasedObject::PF_XYZW_RGBA_32:
-			TFreeData<PointXyzwRgba32>();
-			break;
-		default:
-			break;
-	}
-}
-
-
-template <typename PointType>
-void CPointsBasedObject::TFreeData()
-{
-	if (m_dataOwner && m_dataPtr != nullptr){
-		free(m_dataPtr);
-	}
-
-	m_dataPtr = nullptr;
-	m_bufferSize = 0;
 }
 
 
@@ -644,15 +523,6 @@ void CPointsBasedObject::OnEndChanges(const ChangeSet& /*changes*/)
 
 
 // protected static methods
-
-template <typename PointType>
-bool CPointsBasedObject::AllocateInternal(int size, quint8*& buffer)
-{
-	buffer = reinterpret_cast<quint8*>(malloc(size*sizeof(PointType)));
-
-	return buffer != nullptr;
-}
-
 
 int CPointsBasedObject::GetBufferSize(PointFormat pointFormat, int pointsCount)
 {

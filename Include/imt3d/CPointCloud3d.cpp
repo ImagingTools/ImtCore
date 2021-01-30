@@ -20,31 +20,26 @@ namespace imt3d
 
 // reimplemented (IPointCloud3d)
 
-bool CPointCloud3d::CreateCloud(PointFormat pointFormat, int pointsCount, const istd::CIndex2d* gridSizePtr)
+bool CPointCloud3d::CreateCloud(PointFormat pointFormat)
 {
 	static ChangeSet createChangeSet(CF_CREATE);
 	istd::CChangeNotifier changeNotifier(this, &createChangeSet);
-
-	bool retVal = Create(pointFormat, pointsCount, nullptr, true);
-
-	if (retVal && (gridSizePtr != nullptr)){
-		m_gridSize = *gridSizePtr;
-	}
-
-	return retVal;
+	
+	m_gridSize.Clear();
+	return BaseClass::Create(pointFormat);
 }
 
 
 bool CPointCloud3d::CreateCloud(PointFormat pointFormat,
 			int pointsCount,
-			void* dataPtr,
-			bool copyData,
+			const void* dataPtr,
 			const istd::CIndex2d* gridSizePtr)
 {
 	static ChangeSet createChangeSet(CF_CREATE);
 	istd::CChangeNotifier changeNotifier(this, &createChangeSet);
 
-	bool retVal = Create(pointFormat, pointsCount, dataPtr, copyData);
+	m_gridSize.Clear();
+	bool retVal = Create(pointFormat, pointsCount, dataPtr);
 
 	if (retVal && gridSizePtr){
 		m_gridSize = *gridSizePtr;

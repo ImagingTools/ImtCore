@@ -96,16 +96,27 @@ bool CMesh3d::LoadFromStlFile(const QString& filePath, bool ensureNormalExists)
 		file.read(sizeof(quint16));
 	}
 
-	return Create(IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32, pointsCount, pointsDataPtr, true);
+	return Create(IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32, pointsCount, pointsDataPtr);
 }
 
 
-bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, const Indices& indices)
+bool CMesh3d::CreateMesh(PointFormat pointFormat)
 {
 	static ChangeSet createChangeSet(CF_CREATE);
 	istd::CChangeNotifier changeNotifier(this, &createChangeSet);
 
-	bool retVal = Create(pointFormat, pointsCount, nullptr, true);
+	m_indices.clear();
+
+	return BaseClass::Create(pointFormat);
+}
+
+
+bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, const void* pointsDataPtr, const Indices& indices)
+{
+	static ChangeSet createChangeSet(CF_CREATE);
+	istd::CChangeNotifier changeNotifier(this, &createChangeSet);
+
+	bool retVal = Create(pointFormat, pointsCount, pointsDataPtr);
 
 	if (retVal){
 		m_indices = indices;
@@ -115,22 +126,7 @@ bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, const Indices
 }
 
 
-bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, void* pointsDataPtr, bool copyPointsDataFlag, const Indices& indices)
-{
-	static ChangeSet createChangeSet(CF_CREATE);
-	istd::CChangeNotifier changeNotifier(this, &createChangeSet);
-
-	bool retVal = Create(pointFormat, pointsCount, pointsDataPtr, copyPointsDataFlag);
-
-	if (retVal){
-		m_indices = indices;
-	}
-
-	return retVal;
-}
-
-
-bool CMesh3d::InsertData(int pointsCount, void * pointsDataPtr, const Indices& indices)
+bool CMesh3d::InsertData(int pointsCount, const void * pointsDataPtr, const Indices& indices)
 {
 	static ChangeSet appendChangeSet(CF_APPEND);
 	istd::CChangeNotifier changeNotifier(this, &appendChangeSet);

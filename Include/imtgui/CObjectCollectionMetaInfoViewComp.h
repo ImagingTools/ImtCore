@@ -25,6 +25,7 @@ public:
 				idoc::IDocumentMetaInfo> BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionMetaInfoViewComp);
+		I_ASSIGN_MULTI_0(m_ignoreIdsAttrPtr, "IgnoreIds", "List of IDs to be ignored", false);
 	I_END_COMPONENT;
 
 protected:
@@ -37,6 +38,9 @@ protected:
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiRetranslate() override;
+
+private:
+	I_MULTIATTR(int, m_ignoreIdsAttrPtr);
 };
 
 

@@ -96,7 +96,12 @@ public:
 	/**
 		Return pointer to the internal data buffer.
 	*/
-	virtual void* GetData() const = 0;
+	virtual void* GetData() = 0;
+
+	/**
+		Return const pointer to the internal data buffer.
+	*/
+	virtual const void* GetData() const = 0;
 };
 
 

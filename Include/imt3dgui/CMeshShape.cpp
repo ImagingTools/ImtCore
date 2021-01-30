@@ -384,7 +384,7 @@ void CMeshShape::DeleteSelectionHelper(imt3d::IMesh3d& mesh)
 	m_selectedIndicies.clear();
 
 	// create new mesh
-	mesh.CreateMesh(mesh.GetPointFormat(), newPointsCount, newPointsDataPtr, true, newIndices);
+	mesh.CreateMesh(mesh.GetPointFormat(), newPointsCount, newPointsDataPtr, newIndices);
 }
 
 
