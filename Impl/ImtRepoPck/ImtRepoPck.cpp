@@ -19,6 +19,11 @@ I_EXPORT_COMPONENT(
 			"File-based container of the objects",
 			"Object Collection File Data Model Repository");
 
+I_EXPORT_COMPONENT(
+			FileTransformationController,
+			"Repository file transformation controller",
+			"Object Collection File Data Model Repository Revision Format");
+
 
 } // namespace ImtRepoPck
 

@@ -1592,6 +1592,64 @@ bool CFileCollectionComp::CreateRevisionsContents(const QByteArray& objectId) co
 }
 
 
+void CFileCollectionComp::UpdateRepositoryFormat()
+{
+	int currentRevision = 0;
+	int targetRevision = *m_revisionAttrPtr;
+	QString revisionFilePath;
+
+	if (m_repositoryPathCompPtr.IsValid()){
+		Q_ASSERT(m_repositoryPathCompPtr->GetPathType() == ifile::IFileNameParam::PT_DIRECTORY);
+
+		QString path = m_repositoryPathCompPtr->GetPath();
+		if (!path.isEmpty()){
+			if (!istd::CSystem::EnsurePathExists(path)){
+				SendCriticalMessage(0, QString("Root folder for the file collection could not be created in '%1'").arg(path));
+			}
+		}
+
+		revisionFilePath = path + "/Revision";
+
+		if (!QFileInfo(revisionFilePath).exists()){
+			QFile revisionFile(revisionFilePath);
+			QTextStream textStream(&revisionFile);
+
+			if (revisionFile.open(QIODevice::Text | QIODevice::ReadWrite)){
+				textStream << currentRevision;
+
+				revisionFile.close();
+			}
+		}
+		else{
+			QFile revisionFile(revisionFilePath);
+			QTextStream textStream(&revisionFile);
+
+			if (revisionFile.open(QIODevice::Text | QIODevice::ReadWrite)){
+				textStream >> currentRevision;
+
+				revisionFile.close();
+			}
+		}
+	}
+
+	if (targetRevision != currentRevision){
+		if (m_transformationControllerCompPtr.IsValid()){
+			bool retVal = m_transformationControllerCompPtr->TransformRepository(*this, currentRevision, targetRevision);
+			if (retVal){
+				QFile revisionFile(revisionFilePath);
+				QTextStream textStream(&revisionFile);
+
+				if (revisionFile.open(QIODevice::Text | QIODevice::ReadWrite)){
+					textStream << targetRevision;
+
+					revisionFile.close();
+				}
+			}
+		}
+	}
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CFileCollectionComp::OnComponentCreated()
@@ -1620,37 +1678,6 @@ void CFileCollectionComp::OnComponentCreated()
 				SendCriticalMessage(0, QString("Root folder for the file collection could not be created in '%1'").arg(path));
 			}
 		}
-
-		int currentRevision = 0;
-		int targetRevision = *m_revisionAttrPtr;
-
-		QString revisionFilePath = path + "/Revision";
-		if (!QFileInfo(revisionFilePath).exists()){
-			QFile revisionFile(revisionFilePath);
-			QTextStream textStream(&revisionFile);
-
-			if (revisionFile.open(QIODevice::Text | QIODevice::WriteOnly)){
-				textStream << targetRevision;
-
-				revisionFile.close();
-			}
-		}
-		else{
-			QFile revisionFile(revisionFilePath);
-			QTextStream textStream(&revisionFile);
-
-			if (revisionFile.open(QIODevice::Text | QIODevice::WriteOnly)){
-				textStream >> currentRevision;
-
-				revisionFile.close();
-			}
-		}
-
-		if (targetRevision != currentRevision){
-			if (m_transformationControllerCompPtr.IsValid()){
-				m_transformationControllerCompPtr->TransformRepository(*this, currentRevision, targetRevision);
-			}
-		}
 	}
 
 	if (*m_asynchronousReadingAttrPtr){
@@ -1658,6 +1685,8 @@ void CFileCollectionComp::OnComponentCreated()
 	}
 	else{
 		SyncRead();
+
+		UpdateRepositoryFormat();
 
 		if (*m_pollFileSystemAttrPtr && !path.isEmpty()){
 			connect(&m_syncTimer, &QTimer::timeout, this, &CFileCollectionComp::OnSync);
@@ -1939,6 +1968,8 @@ void CFileCollectionComp::OnReaderFinished()
 			m_progressManagerListCompPtr[i]->EndProgressSession(0);
 		}
 	}
+
+	UpdateRepositoryFormat();
 }
 
 

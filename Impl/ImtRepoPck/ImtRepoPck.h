@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtrepo/CFileCollectionComp.h>
+#include <imtrepo/CFileTransformationControllerComp.h>
 
 
 /**
@@ -17,6 +18,7 @@ namespace ImtRepoPck
 
 
 typedef icomp::TModelCompWrap<imtrepo::CFileCollectionComp> FileCollection;
+typedef imtrepo::CFileTransformationControllerComp FileTransformationController;
 
 
 } // namespace ImtRepoPck

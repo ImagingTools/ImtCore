@@ -401,6 +401,8 @@ protected:
 	virtual bool SaveRevisionsContents(const QByteArray& objectId, RevisionsContents& revisionsContents) const;
 	virtual bool CreateRevisionsContents(const QByteArray& objectId) const;
 
+	virtual void UpdateRepositoryFormat();
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
