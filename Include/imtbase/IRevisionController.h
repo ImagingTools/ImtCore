@@ -20,38 +20,56 @@ class IRevisionController: virtual public istd::IPolymorphic
 public:
 	struct RevisionInfo
 	{
+		RevisionInfo()
+			:revision(-1),
+			collectonRevision(-1),
+			isRevisionAvailable(false)
+		{
+		}
+
 		int revision;
+
+		/**
+			Revision of the whole collection at time of the backup creation.
+		*/
+		int collectonRevision;
 		QDateTime timestamp;
 		QString user;
 		QString comment;
-	};
-
-	struct RevisionInfoListItem: public RevisionInfo
-	{
 		bool isRevisionAvailable;
 	};
-	
-	typedef QVector<RevisionInfoListItem> RevisionInfoList;
+
+	typedef QVector<RevisionInfo> RevisionInfoList;
 
 	/**
 		Get list of revisions available for restore for a given data object in the collection.
 	*/
-	virtual RevisionInfoList GetRevisionInfoList(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const = 0;
+	virtual RevisionInfoList GetRevisionInfoList(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId) const = 0;
 
 	/**
 		Restore the data of an object in the collection from a given revision.
 	*/
-	virtual bool RestoreObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision) const = 0;
+	virtual bool RestoreObject(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId, int revision) const = 0;
 
 	/**
-		\return Revision of the saved object of the operation was successfull, or a negative value otherwise.
+		\return Revision of the saved object if the operation was successfull, or a negative value otherwise.
 	*/
-	virtual int BackupObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& userComment = QString()) const = 0;
+	virtual int BackupObject(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId, const QString& userComment = QString()) const = 0;
 
 	/**
 		Exporting object data of a given revision from a collection to a file
 	*/
-	virtual bool ExportObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision, const QString& filePath) const = 0;
+	virtual bool ExportObject(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				int revision,
+				const QString& filePath) const = 0;
 };
 
 

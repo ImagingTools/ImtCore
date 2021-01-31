@@ -19,6 +19,7 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 
 // ImtCore includes
+#include <imtcore/Version.h>
 #include <imtbase/CObjectCollectionInsertEvent.h>
 #include <imtbase/CObjectCollectionUpdateEvent.h>
 #include <imtbase/CObjectCollectionRemoveEvent.h>
@@ -62,9 +63,9 @@ imtbase::IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionI
 			QString itemPath = info.absolutePath();
 
 			for (int key : revisionsContents.keys()){
-				RevisionInfoListItem revisionInfoListItem;
+				RevisionInfo revisionInfoListItem;
 				RevisionsContentsItem revisionsContentsItem = revisionsContents.value(key);
-				*dynamic_cast<RevisionInfo*>(&revisionInfoListItem) = *dynamic_cast<RevisionInfo*>(&revisionsContentsItem);
+				revisionInfoListItem = revisionsContentsItem;
 
 				revisionInfoListItem.isRevisionAvailable = false;
 				if (QFile::exists(itemPath + "/Revisions/" + revisionsContentsItem.path)){
@@ -2162,6 +2163,15 @@ bool CFileCollectionComp::RevisionMetaInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(commentTag);
 	retVal = retVal && archive.Process(comment);
 	retVal = retVal && archive.EndTag(commentTag);
+
+	quint32 imtCoreVersion = 0xffffffff;
+	bool imtCoreVersionExists = archive.GetVersionInfo().GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion);
+	if ((archive.IsStoring() || imtCoreVersionExists) && (imtCoreVersion >= 2663)){
+		static iser::CArchiveTag collectionRevisionTag("CollectionRevision", "Collection revision");
+		retVal = retVal && archive.BeginTag(collectionRevisionTag);
+		retVal = retVal && archive.Process(collectonRevision);
+		retVal = retVal && archive.EndTag(collectionRevisionTag);
+	}
 
 	return retVal;
 }

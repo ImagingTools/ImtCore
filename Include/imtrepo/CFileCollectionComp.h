@@ -530,7 +530,7 @@ private:
 	I_ATTR(QByteArray, m_restoreRevisionRightIdAttrPtr);
 
 	/**
-		Provider of logged in user.
+		Provider of the logged user.
 	*/
 	I_REF(iauth::ILogin, m_loginProviderCompPtr);
 };
