@@ -11,6 +11,7 @@ namespace imtbase
 
 /**
 	Interface for object collection events
+	\ingroup Collection
 */
 class IObjectCollectionEvent: virtual public istd::IChangeable
 {

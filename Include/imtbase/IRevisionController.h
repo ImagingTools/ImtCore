@@ -15,6 +15,10 @@ namespace imtbase
 class IObjectCollection;
 
 
+/**
+	Common interface for management revisions of the objects and the whole object collection.
+	\ingroup Collection
+*/
 class IRevisionController: virtual public istd::IPolymorphic
 {
 public:
@@ -53,14 +57,17 @@ public:
 	*/
 	virtual bool RestoreObject(
 				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId, int revision) const = 0;
+				const QByteArray& objectId,
+				int revision) const = 0;
 
 	/**
+		Create backup of the given object in the collection.
 		\return Revision of the saved object if the operation was successfull, or a negative value otherwise.
 	*/
 	virtual int BackupObject(
 				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId, const QString& userComment = QString()) const = 0;
+				const QByteArray& objectId,
+				const QString& userComment = QString()) const = 0;
 
 	/**
 		Exporting object data of a given revision from a collection to a file

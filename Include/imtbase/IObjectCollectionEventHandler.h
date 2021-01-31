@@ -16,6 +16,7 @@ class IObjectCollectionEvent;
 
 /**
 	Interface for object collection event handler
+	\ingroup Collection
 */
 class IObjectCollectionEventHandler: virtual public istd::IPolymorphic
 {

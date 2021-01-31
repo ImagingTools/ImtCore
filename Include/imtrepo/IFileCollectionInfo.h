@@ -14,6 +14,7 @@ namespace imtrepo
 
 /**
 	Interface for describing the properties of a file collection.
+	\ingroup Collection
 */
 class IFileCollectionInfo: virtual public istd::IChangeable
 {
