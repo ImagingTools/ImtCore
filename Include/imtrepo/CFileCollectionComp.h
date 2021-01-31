@@ -465,11 +465,11 @@ private:
 	QString GetMetaInfoFilePath(const CollectionItem& repositoryFile) const;
 	QString CalculateShortFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const;
 
-	void SyncRead();
+	void ReadRepositoryItems();
 	void GetRepositoryFileList(QFileInfoList& fileList);
 	void ReadItem(Files& filesPtr, const QString& itemFilePath);
 
-	void StartReader();
+	void StartRepositoryLoader();
 	Q_INVOKABLE void OnReaderProgress(int progress);
 	Q_INVOKABLE void OnReaderFinished();
 	Q_INVOKABLE void OnReaderInterrupted();

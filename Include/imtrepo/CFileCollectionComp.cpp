@@ -1681,15 +1681,16 @@ void CFileCollectionComp::OnComponentCreated()
 	}
 
 	if (*m_asynchronousReadingAttrPtr){
-		StartReader();
+		StartRepositoryLoader();
 	}
 	else{
-		SyncRead();
+		ReadRepositoryItems();
 
 		UpdateRepositoryFormat();
 
 		if (*m_pollFileSystemAttrPtr && !path.isEmpty()){
 			connect(&m_syncTimer, &QTimer::timeout, this, &CFileCollectionComp::OnSync);
+
 			m_syncTimer.start(*m_pollingPeriodAttrPtr * 1000);
 		}
 	}
@@ -1867,7 +1868,7 @@ QString CFileCollectionComp::CalculateShortFileName(const QString& fileName, con
 }
 
 
-void CFileCollectionComp::SyncRead()
+void CFileCollectionComp::ReadRepositoryItems()
 {
 	istd::CChangeNotifier changeNotifier(this, &istd::IChangeable::GetAllChanges());
 
@@ -1933,7 +1934,7 @@ void CFileCollectionComp::ReadItem(Files& filesPtr, const QString& itemFilePath)
 }
 
 
-void CFileCollectionComp::StartReader()
+void CFileCollectionComp::StartRepositoryLoader()
 {
 	if (m_progressManagerListCompPtr.IsValid()){
 		for (int i = 0; i < m_progressManagerListCompPtr.GetCount(); i++){
@@ -1983,7 +1984,7 @@ void CFileCollectionComp::OnReaderInterrupted()
 void CFileCollectionComp::OnSync()
 {
 	if (!m_directoryBlocked){
-		SyncRead();
+		ReadRepositoryItems();
 	}
 }
 
