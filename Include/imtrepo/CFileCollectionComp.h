@@ -25,9 +25,10 @@
 // ImtCore includes
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/IRevisionController.h>
+#include <imtfile/IFileCompression.h>
 #include <imtrepo/IFileCollectionInfo.h>
 #include <imtrepo/IFileObjectCollection.h>
-#include <imtfile/IFileCompression.h>
+#include <imtrepo/IRepositoryTransformationController.h>
 
 
 namespace imtrepo
@@ -56,6 +57,14 @@ public:
 		I_ASSIGN_MULTI_0(m_progressManagerListCompPtr, "ProgressManagerList", "List of progress manager components", false);
 		I_ASSIGN_MULTI_0(m_eventHandlerListCompPtr, "EventHandlerList", "List of event handler components", false);
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "FileCompressor");
+		I_ASSIGN(m_isCalculateCheckSumAttrPtr, "IsCalculateCheckSum", "Calculate check sums for the file", true, true);
+		I_ASSIGN(m_useSubfolderAttrPtr, "UseSubfolder", "If set, for each input file a subfolder with the corresponding file name will be created", true, false);
+		I_ASSIGN(m_pollFileSystemAttrPtr, "PollFileSystem", "If enabled, the collection folder will be observed and the items will be re-read on changes in the folder structure", true, false);
+		I_ASSIGN(m_pollingPeriodAttrPtr, "PollingPeriod", "Period of file system polling (seconds)", true, 1);
+		I_ASSIGN(m_asynchronousReadingAttrPtr, "AsynchronousReading", "If enabled, the collection will reading asynchronously", true, false);
+		I_ASSIGN(m_isEnableRevisionHistoryAttrPtr, "IsEnableRevisionHistory", "Allow saving item revisions", true, false);
+		I_ASSIGN(m_restoreRevisionRightIdAttrPtr, "RestoreRevisionRightId", "Restore to revision right id", true, "RestoreObject");
+		I_ASSIGN(m_revisionAttrPtr, "RepositoryRevision", "Revision number of the whole repository", true, 0);
 	I_END_COMPONENT;
 
 	/**
@@ -92,6 +101,47 @@ public:
 		File compressor.
 	*/
 	I_REF(imtfile::IFileCompression, m_compressorCompPtr);
+
+	/**
+		Calculate checkSum for files
+	*/
+	I_ATTR(bool, m_isCalculateCheckSumAttrPtr);
+
+	/**
+		If set, for each input file a subfolder with the corresponding file name will be created.
+	*/
+	I_ATTR(bool, m_useSubfolderAttrPtr);
+
+	/**
+		Poll changes in file system to get automatic updates if an external process do some changes in the file collection.
+		Polling is disabled if asynchronous loading is enabled
+	*/
+	I_ATTR(bool, m_pollFileSystemAttrPtr);
+
+	/**
+		Polling period (seconds).
+	*/
+	I_ATTR(int, m_pollingPeriodAttrPtr);
+
+	/**
+		Asynchronous collection loading on dedicated thread
+	*/
+	I_ATTR(bool, m_asynchronousReadingAttrPtr);
+
+	/**
+		Enable items changing history
+	*/
+	I_ATTR(bool, m_isEnableRevisionHistoryAttrPtr);
+
+	/**
+		Right-ID for accessing revision controller.
+	*/
+	I_ATTR(QByteArray, m_restoreRevisionRightIdAttrPtr);
+
+	/**
+		Whole repository revision.
+	*/
+	I_ATTR(int, m_revisionAttrPtr);
 };
 
 
@@ -110,18 +160,12 @@ public:
 		I_REGISTER_INTERFACE(IObjectCollection);
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(ICollectionInfo);
-		I_ASSIGN(m_repositoryPathCompPtr, "RepositoryPath", "Path to the file collection folder", false, "RepositoryPath");
-		I_ASSIGN(m_isCalculateCheckSumAttrPtr, "IsCalculateCheckSum", "Calculate check sums for the file", true, true);
-		I_ASSIGN(m_resourceTypesCompPtr, "ResourceTypes", "List of supported resource types", false, "ResourceTypes");
-		I_ASSIGN(m_useSubfolderAttrPtr, "UseSubfolder", "If set, for each input file a subfolder with the corresponding file name will be created", true, false);
-		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
-		I_ASSIGN(m_pollFileSystemAttrPtr, "PollFileSystem", "If enabled, the collection folder will be observed and the items will be re-read on changes in the folder structure", true, false);
-		I_ASSIGN(m_pollingPeriodAttrPtr, "PollingPeriod", "Period of file system polling (seconds)", true, 1);
-		I_ASSIGN(m_asynchronousReadingAttrPtr, "AsynchronousReading", "If enabled, the collection will reading asynchronously", true, false);
-		I_ASSIGN(m_isEnableRevisionHistoryAttrPtr, "IsEnableRevisionHistory", "Allow saving item revisions", true, false);
 		I_ASSIGN(m_rightsProviderCompPtr, "RightsProvider", "Rights provider", false, "RightsProvider");
-		I_ASSIGN(m_restoreRevisionRightIdAttrPtr, "RestoreRevisionRightId", "Restore to revision right id", true, "RestoreObject");
+		I_ASSIGN(m_repositoryPathCompPtr, "RepositoryPath", "Path to the file collection folder", false, "RepositoryPath");
+		I_ASSIGN(m_resourceTypesCompPtr, "ResourceTypes", "List of supported resource types", false, "ResourceTypes");
+		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
 		I_ASSIGN(m_loginProviderCompPtr, "Login", "Provider of login data used for revision management", false, "Login");
+		I_ASSIGN(m_transformationControllerCompPtr, "TransformationController", "Controller for down- and upgrade of the repository data", false, "TransformationController");
 	I_END_COMPONENT;
 
 	CFileCollectionComp();
@@ -483,11 +527,6 @@ private:
 	I_REF(ifile::IFileNameParam, m_repositoryPathCompPtr);
 
 	/**
-		Calculate checkSum for files
-	*/
-	I_ATTR(bool, m_isCalculateCheckSumAttrPtr);
-
-	/**
 		List of supported resource types.
 	*/
 	I_REF(iprm::IOptionsList, m_resourceTypesCompPtr);
@@ -498,41 +537,19 @@ private:
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 
 	/**
-		If set, for each input file a subfolder with the corresponding file name will be created.
-	*/
-	I_ATTR(bool, m_useSubfolderAttrPtr);
-
-	/**
-		Poll changes in file system to get automatic updates if an external process do some changes in the file collection.
-		Polling is disabled if asynchronous loading is enabled
-	*/
-	I_ATTR(bool, m_pollFileSystemAttrPtr);
-
-	/**
-		Polling period (seconds).
-	*/
-	I_ATTR(int, m_pollingPeriodAttrPtr);
-
-	/**
-		Asynchronous collection loading on dedicated thread
-	*/
-	I_ATTR(bool, m_asynchronousReadingAttrPtr);
-
-	/**
-		Enable items changing history
-	*/
-	I_ATTR(bool, m_isEnableRevisionHistoryAttrPtr);
-
-	/**
 		Rights provider
 	*/
 	I_REF(iauth::IRightsProvider, m_rightsProviderCompPtr);
-	I_ATTR(QByteArray, m_restoreRevisionRightIdAttrPtr);
 
 	/**
 		Provider of the logged user.
 	*/
 	I_REF(iauth::ILogin, m_loginProviderCompPtr);
+
+	/**
+		Upgrade and downgrade controller for the file repository.
+	*/
+	I_REF(IRepositoryTransformationController, m_transformationControllerCompPtr);
 };
 
 

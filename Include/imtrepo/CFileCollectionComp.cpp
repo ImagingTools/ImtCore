@@ -1620,6 +1620,37 @@ void CFileCollectionComp::OnComponentCreated()
 				SendCriticalMessage(0, QString("Root folder for the file collection could not be created in '%1'").arg(path));
 			}
 		}
+
+		int currentRevision = 0;
+		int targetRevision = *m_revisionAttrPtr;
+
+		QString revisionFilePath = path + "/Revision";
+		if (!QFileInfo(revisionFilePath).exists()){
+			QFile revisionFile(revisionFilePath);
+			QTextStream textStream(&revisionFile);
+
+			if (revisionFile.open(QIODevice::Text | QIODevice::WriteOnly)){
+				textStream << targetRevision;
+
+				revisionFile.close();
+			}
+		}
+		else{
+			QFile revisionFile(revisionFilePath);
+			QTextStream textStream(&revisionFile);
+
+			if (revisionFile.open(QIODevice::Text | QIODevice::WriteOnly)){
+				textStream >> currentRevision;
+
+				revisionFile.close();
+			}
+		}
+
+		if (targetRevision != currentRevision){
+			if (m_transformationControllerCompPtr.IsValid()){
+				m_transformationControllerCompPtr->TransformRepository(*this, currentRevision, targetRevision);
+			}
+		}
 	}
 
 	if (*m_asynchronousReadingAttrPtr){
