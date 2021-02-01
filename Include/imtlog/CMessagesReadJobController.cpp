@@ -66,22 +66,6 @@ bool CMessagesReadJobController::IsValidJobId(const QByteArray& jobId) const
 }
 
 
-bool CMessagesReadJobController::GetFilter(const QByteArray & jobId, IEventFilter** eventFilterPtr, IMessageFilterParams* messageFilterParamsPtr) const
-{
-	QMutexLocker locker(&m_jobMutex);
-
-	for (int i = 0; i < m_jobList.count(); i++){
-		if (m_jobList[i].uuid == jobId){
-			*eventFilterPtr = const_cast<IEventFilter*>(m_jobList[i].filterPtr);
-			messageFilterParamsPtr->CopyFrom(m_jobList[i].filterParams);
-			return true;
-		}
-	}
-
-	return false;
-}
-
-
 bool CMessagesReadJobController::PopResult(const QByteArray& jobId, ilog::CMessageContainer& resultEvents)
 {
 	QMutexLocker locker(&m_jobMutex);
@@ -140,20 +124,6 @@ void CMessagesReadJobController::run()
 
 
 // private methods
-
-CMessagesReadJobController::Job CMessagesReadJobController::GetJob(const QByteArray& jobId) const
-{
-	QMutexLocker locker(&m_jobMutex);
-
-	for (int i = 0; i < m_jobList.count(); i++){
-		if (m_jobList[i].uuid == jobId){
-			return m_jobList[i];
-		}
-	}
-
-	return Job();
-}
-
 
 void CMessagesReadJobController::ProcessJob(Job& job)
 {

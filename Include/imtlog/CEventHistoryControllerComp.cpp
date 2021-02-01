@@ -64,7 +64,7 @@ IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
 
 	request.containerPtr.SetPtr(containerPtr.PopPtr());
 	for (int id : ids){
-		request.readIds.insert(m_controllers[id]->GetEvents(filterPtr, filterParamsPtr));
+		request.readIds.insert(m_controllers[id]->AddJob(filterPtr, filterParamsPtr));
 	}
 	m_requests.append(request);
 

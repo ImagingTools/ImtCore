@@ -100,7 +100,7 @@ void CMessagesController::OnSystemShutdown()
 }
 
 
-QByteArray CMessagesController::GetEvents(
+QByteArray CMessagesController::AddJob(
 			const IEventFilter* filterPtr,
 			const IMessageFilterParams* filterParamsPtr) const
 {
@@ -111,12 +111,6 @@ QByteArray CMessagesController::GetEvents(
 bool CMessagesController::IsValidResultId(const QByteArray& requestId) const
 {
 	return m_readJobController.IsValidJobId(requestId);
-}
-
-
-bool CMessagesController::GetFilter(const QByteArray& jobId, IEventFilter** eventFilterPtr, IMessageFilterParams* messageFilterParamsPtr) const
-{
-	return m_readJobController.GetFilter(jobId, eventFilterPtr, messageFilterParamsPtr);
 }
 
 

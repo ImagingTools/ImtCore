@@ -60,7 +60,6 @@ public:
 	QByteArray AddJob(const IEventFilter* filterPtr, const IMessageFilterParams* filterParamsPtr);
 
 	bool IsValidJobId(const QByteArray& jobId) const;
-	bool GetFilter(const QByteArray& jobId, IEventFilter** eventFilterPtr, IMessageFilterParams* messageFilterParamsPtr) const;
 	bool PopResult(const QByteArray& jobId, ilog::CMessageContainer& resultEvents);
 
 Q_SIGNALS:
@@ -71,7 +70,6 @@ protected:
 	virtual void run() override;
 
 private:
-	Job GetJob(const QByteArray& jobId) const;
 	void ProcessJob(Job& job);
 
 private:
