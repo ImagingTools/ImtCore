@@ -3,17 +3,18 @@
 
 // Qt includes
 #include <QtCore/QThread>
+#include <QtCore/QMutex>
 
 
-namespace imtloggui
+namespace imtlog
 {
 
 
-class CWorker: public QThread
+class CWorkerBase: public QThread
 {
 	Q_OBJECT
 public:
-	CWorker();
+	CWorkerBase();
 
 	void Start();
 
@@ -29,9 +30,10 @@ private:
 	};
 
 	ThreadState m_state;
+	QMutex m_stateMutex;
 };
 
 
-} // namespace imtloggui
+} // namespace imtlog
 
 

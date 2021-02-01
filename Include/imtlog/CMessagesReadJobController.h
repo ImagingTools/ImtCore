@@ -5,10 +5,13 @@
 #include <QtCore/QDebug>
 #include <QtCore/QThread>
 
+// Acf includes
+#include <ilog/IMessageConsumer.h>
+
 // ImtCore includes
 #include <imtfile/IFileCompression.h>
 #include <imtlog/IEventProvider.h>
-#include <imtlog/CEventHistoryGroupReader.h>
+#include <imtlog/CMessagesReader.h>
 #include <imtlog/CMessageFilterParams.h>
 
 
@@ -16,7 +19,7 @@ namespace imtlog
 {
 
 
-class CEventHistoryReadJobController: public QThread
+class CMessagesReadJobController: public QThread
 {
 	Q_OBJECT
 public:
@@ -46,12 +49,13 @@ public:
 
 	typedef QList<Job> JobList;
 
-	explicit CEventHistoryReadJobController(
-				QString groupDir,
+	explicit CMessagesReadJobController(
+				QString dir,
 				QString containerExtension,
 				QString archiveExtension,
 				iser::IVersionInfo* versionInfoPtr,
-				imtfile::IFileCompression* compressorPtr);
+				imtfile::IFileCompression* compressorPtr,
+				ilog::IMessageConsumer* logPtr);
 
 	QByteArray AddJob(const IEventFilter* filterPtr, const IMessageFilterParams* filterParamsPtr);
 
@@ -74,11 +78,13 @@ private:
 	JobList m_jobList;
 	mutable QMutex m_jobMutex;
 
-	const QString m_groupDir;
+	const QString m_dir;
 	const QString m_containerExtension;
 	const QString m_archiveExtension;
 	const iser::IVersionInfo* m_versionInfoPtr;
 	const imtfile::IFileCompression* m_compressorPtr;
+
+	ilog::IMessageConsumer* m_logPtr;
 };
 
 

@@ -1,13 +1,14 @@
-#include <imtlog/CEventHistoryGroupReader.h>
+#include <imtlog/CMessagesReader.h>
 
 
 // Qt includes
 #include <QtCore/QDir>
 #include <QtCore/QUuid>
 
-// ACF includes
+// Acf includes
 #include <ifile/CCompactXmlFileReadArchive.h>
 #include <istd/CSystem.h>
+#include <ilog/CMessage.h>
 
 // ImtCore includes
 #include <imtlog/CEventContainer.h>
@@ -19,25 +20,27 @@ namespace imtlog
 
 // public methods
 
-CEventHistoryGroupReader::CEventHistoryGroupReader(
-			const QString& groupDir,
+CMessagesReader::CMessagesReader(
+			const QString& dir,
 			const QString& containerExtension,
 			const QString& archiveExtension,
 			const iser::IVersionInfo* versionInfoPtr,
-			const imtfile::IFileCompression* compressorPtr)
-	:m_groupDir(groupDir),
+			const imtfile::IFileCompression* compressorPtr,
+			ilog::IMessageConsumer* logPtr)
+	:m_dir(dir),
 	m_containerExtension(containerExtension),
 	m_archiveExtension(archiveExtension),
 	m_versionInfoPtr(versionInfoPtr),
 	m_compressorPtr(compressorPtr),
-	m_isCanceled(false)
+	m_isCanceled(false),
+	m_logPtr(logPtr)
 {
 }
 
 
-CTimeRange CEventHistoryGroupReader::ReadGroupTimeRange() const
+CTimeRange CMessagesReader::ReadTimeRange() const
 {
-	Q_ASSERT(!m_groupDir.isEmpty());
+	Q_ASSERT(!m_dir.isEmpty());
 	Q_ASSERT(!m_containerExtension.isEmpty());
 	Q_ASSERT(!m_archiveExtension.isEmpty());
 	Q_ASSERT(m_versionInfoPtr != nullptr);
@@ -45,7 +48,7 @@ CTimeRange CEventHistoryGroupReader::ReadGroupTimeRange() const
 	QDateTime begin;
 	QDateTime end;
 
-	QMap<QDate, QString> dirMap = GetDirMap(m_groupDir);
+	QMap<QDate, QString> dirMap = GetDirMap(m_dir);
 
 	if (!dirMap.isEmpty()){
 		QMap<QDate, QString>::const_iterator itDate;
@@ -99,9 +102,9 @@ CTimeRange CEventHistoryGroupReader::ReadGroupTimeRange() const
 }
 
 
-CEventHistoryGroupReader::EventContainerListPtr CEventHistoryGroupReader::ReadContainers(const CTimeRange& timeRange) const
+CMessagesReader::EventContainerListPtr CMessagesReader::ReadContainers(const CTimeRange& timeRange) const
 {
-	Q_ASSERT(!m_groupDir.isEmpty());
+	Q_ASSERT(!m_dir.isEmpty());
 	Q_ASSERT(!m_containerExtension.isEmpty());
 	Q_ASSERT(!m_archiveExtension.isEmpty());
 	Q_ASSERT(m_versionInfoPtr != nullptr);
@@ -114,7 +117,7 @@ CEventHistoryGroupReader::EventContainerListPtr CEventHistoryGroupReader::ReadCo
 	QDate endDate = end.date();
 	QStringList dateList;
 
-	QMap<QDate, QString> dirMap = GetDirMap(m_groupDir);
+	QMap<QDate, QString> dirMap = GetDirMap(m_dir);
 
 	if (dirMap.isEmpty()){
 		return retVal;
@@ -152,7 +155,7 @@ CEventHistoryGroupReader::EventContainerListPtr CEventHistoryGroupReader::ReadCo
 }
 
 
-void CEventHistoryGroupReader::Cancel()
+void CMessagesReader::Cancel()
 {
 	m_isCanceled = true;
 }
@@ -161,7 +164,16 @@ void CEventHistoryGroupReader::Cancel()
 
 // private methods
 
-QMap<QDate, QString> CEventHistoryGroupReader::GetDirMap(const QString& dirPath) const
+void CMessagesReader::SendErrorMessage(const QString& message) const
+{
+	if (m_logPtr != nullptr){
+		ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, message, "imtlog::CMessageReader"));
+		m_logPtr->AddMessage(messagePtr);
+	}
+}
+
+
+QMap<QDate, QString> CMessagesReader::GetDirMap(const QString& dirPath) const
 {
 	QMap<QDate, QString> map;
 
@@ -180,7 +192,7 @@ QMap<QDate, QString> CEventHistoryGroupReader::GetDirMap(const QString& dirPath)
 }
 
 
-QMap<QDateTime, QString> CEventHistoryGroupReader::GetFileMap(const QString& dirPath) const
+QMap<QDateTime, QString> CMessagesReader::GetFileMap(const QString& dirPath) const
 {
 	QMap<QDateTime, QString> map;
 
@@ -199,7 +211,7 @@ QMap<QDateTime, QString> CEventHistoryGroupReader::GetFileMap(const QString& dir
 }
 
 
-CEventHistoryGroupReader::EventContainerPtr CEventHistoryGroupReader::ImportContainer(const QString& filePath) const
+CMessagesReader::EventContainerPtr CMessagesReader::ImportContainer(const QString& filePath) const
 {
 	EventContainerPtr containerPtr;
 
@@ -214,7 +226,7 @@ CEventHistoryGroupReader::EventContainerPtr CEventHistoryGroupReader::ImportCont
 
 	if (info.suffix() == m_archiveExtension){
 		if (m_compressorPtr == nullptr){
-			SendErrorMessage(0, QObject::tr("No compressor component. Load history container failed"));
+			SendErrorMessage(QObject::tr("No compressor component. Load history container failed"));
 			return containerPtr;
 		}
 
@@ -224,7 +236,7 @@ CEventHistoryGroupReader::EventContainerPtr CEventHistoryGroupReader::ImportCont
 			}
 		}
 		else{
-			SendErrorMessage(0, QObject::tr("Cannot create temporary folder. Load history container failed"));
+			SendErrorMessage(QObject::tr("Cannot create temporary folder. Load history container failed"));
 		}
 	}
 
@@ -236,7 +248,7 @@ CEventHistoryGroupReader::EventContainerPtr CEventHistoryGroupReader::ImportCont
 	containerPtr.SetPtr(new CEventContainer);
 	if (!containerPtr->Serialize(xmlArchive)){
 		containerPtr.Reset();
-		SendErrorMessage(0, QObject::tr("Unable to deserialize history container \"%1\". History container skipped").arg(containerPath));
+		SendErrorMessage(QObject::tr("Unable to deserialize history container \"%1\". History container skipped").arg(containerPath));
 	}
 
 	if (QDir(tempDir).exists()){

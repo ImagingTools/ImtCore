@@ -14,7 +14,7 @@
 #include <imtlog/IEventProvider.h>
 #include <imtlog/IMessageFilterParams.h>
 #include <imtlog/ITimeRangeProvider.h>
-#include <imtloggui/CRepresentationControllerWorkerBase.h>
+#include <imtlog/CWorkerBase.h>
 
 
 namespace imtloggui
@@ -101,7 +101,7 @@ private:
 		}
 	};
 
-	class Worker: public CWorker
+	class Worker: public imtlog::CWorkerBase
 	{
 	public:
 		Worker(CRepresentationControllerCompBase& parent);

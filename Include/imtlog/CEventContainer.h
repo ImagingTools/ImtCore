@@ -15,15 +15,13 @@ namespace imtlog
 {
 
 
-class CEventContainer:
-			public ilog::CMessageContainer
+class CEventContainer: protected ilog::CMessageContainer
 {
 public:
 	typedef ilog::CMessageContainer BaseClass;
 
-	const CTimeRange GetMessagesTimeRange() const;
-	const CTimeRange& GetTimeRange() const;
-	bool SetTimeRange(const CTimeRange& timeRange);
+	int GetMessagesCount() const;
+	const CTimeRange GetTimeRange() const;
 
 	// reimplemented (ilog::IMessageContainer)
 	virtual int GetWorstCategory() const override;
@@ -42,8 +40,6 @@ public:
 
 private:
 	mutable QMutex m_mutex;
-
-	CTimeRange m_timeRange;
 };
 
 

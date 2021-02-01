@@ -44,58 +44,31 @@ IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
 		return IEventProvider::EventContainerPtr();
 	}
 
-	CEventHistoryResultContainer* containerPtr = new CEventHistoryResultContainer();
+	QSet<int> ids;
 
-	{
-		istd::CChangeGroup notifier(containerPtr);
-
-		ilog::IMessageContainer::Messages messages = m_log.GetMessages();
-		for (int i = messages.count() - 1; i >= 0; i--){
-			if (filterPtr->IsMessageAccepted(*messages[i], filterParamsPtr)){
-				containerPtr->AddMessage(messages[i]);
-			}
-		}
-
-		containerPtr->Close();
+	if (filterParamsPtr->GetFilterMode() == imtlog::IMessageFilterParams::FM_INCLUDE){
+		ids = m_controllers.keys().toSet() & filterParamsPtr->GetMessageFilterIds();
+	}
+	else{
+		ids = m_controllers.keys().toSet() - filterParamsPtr->GetMessageFilterIds();
 	}
 
-	return IEventProvider::EventContainerPtr(containerPtr);
+	istd::TOptDelPtr<CEventHistoryResultContainer> containerPtr(new CEventHistoryResultContainer());
+	if (ids.isEmpty()){
+		containerPtr->Close();
+		return IEventProvider::EventContainerPtr(containerPtr.PopPtr());
+	}
 
-	//QSet<int> messageIds = filterParamsPtr->GetMessageFilterIds();
+	QMutexLocker locker(&m_requestMutex);
+	ReadRequest request;
 
+	request.containerPtr.SetPtr(containerPtr.PopPtr());
+	for (int id : ids){
+		request.readIds.insert(m_controllers[id]->GetEvents(filterPtr, filterParamsPtr));
+	}
+	m_requests.append(request);
 
-	//EventHistoryGroupControllerPtr groupPtr;
-
-	//QSet<int> messageIds;
-	//
-	//if (filterParamsPtr != nullptr){
-	//	messageIds = filterParamsPtr->GetMessageFilterIds();
-	//}
-
-	//for (int i = 0; i < messageIds.count(); i++){
-	//	groupPtr = GetGroupForMessageId(messageIds[i]);
-	//	if (groupPtr.IsValid()){
-	//		break;
-	//	}
-	//}
-
-	//if (!groupPtr.IsValid()){
-	//	groupPtr = m_groups[0].groupPtr;
-	//}
-
-	//QMutexLocker locker(&m_requestMutex);
-
-	//QByteArray uuid = groupPtr->RequestEvents(filterPtr);
-
-	//RequestMapItem groupItem;
-	//groupItem.resultEventsPtr.SetPtr(new ilog::CMessageContainer());
-	//groupItem.groupPtr = groupPtr;
-
-	//m_requests[uuid] = groupItem;
-
-	//return groupItem.resultEventsPtr;
-
-	return EventContainerPtr();
+	return request.containerPtr;
 }
 
 
@@ -115,23 +88,18 @@ void CEventHistoryControllerComp::AddMessage(const MessagePtr& messagePtr)
 	BaseClass::AddMessage(messagePtr);
 
 	if (m_controllerState == CS_OK){
-
 		istd::CChangeNotifier notifier(this);
-		m_log.AddMessage(messagePtr);
 		m_archiveTimeRange.Ensure(messagePtr->GetInformationTimeStamp());
-
-		return;
-		
-		// !!!
 
 		int id = messagePtr->GetInformationId();
 
-		EventHistoryGroupControllerPtr groupPtr = GetGroupForMessageId(id);
-		if (!groupPtr.IsValid()){
-			groupPtr = m_groups[0].groupPtr;
+		if (m_controllers.contains(id)){
+			m_controllers[id]->AddMessage(messagePtr);
 		}
-
-		groupPtr->AddMessage(messagePtr);
+		else{
+			InitializeMessagesController(id);
+			m_controllers[id]->AddMessage(messagePtr);
+		}
 	}
 }
 
@@ -142,12 +110,8 @@ void CEventHistoryControllerComp::OnSystemShutdown()
 {
 	m_controllerState = CS_SHUTDOWN;
 
-	for (GroupListItem& item : m_groups){
-		item.groupPtr->OnSystemShutdown();
-	}
-
-	if (m_generalGroupPtr.IsValid()){
-		m_generalGroupPtr->OnSystemShutdown();
+	for (MessagesControllerPtr& controllerPtr : m_controllers){
+		controllerPtr->OnSystemShutdown();
 	}
 }
 
@@ -180,89 +144,110 @@ void CEventHistoryControllerComp::OnComponentCreated()
 
 	m_compressorCompPtr.EnsureInitialized();
 
-	if (m_groupProviderCompPtr.IsValid()){
-		imtbase::ICollectionInfo::Ids groupIds = m_groupProviderCompPtr->GetElementIds();
-		for (int i = 0; i < groupIds.count(); i++){
-			QSet<int> messageIds;
-
-			Q_ASSERT(m_groupMessageIdProviderCompPtr->GetGroupMessageIds(groupIds[i], messageIds));
-
-			EventHistoryGroupControllerParams cParams;
-			cParams.containerDuration = 10;
-			cParams.writeDelay = 5;
-			cParams.removeDelay = 10;
-
-			EventHistoryGroupPersistenceParams pParams;
-			pParams.repositoryDir = m_logFolderCompPtr->GetPath();
-			pParams.groupDir = m_groupProviderCompPtr->GetElementInfo(groupIds[i], imtbase::ICollectionInfo::EIT_NAME).toString();
-			pParams.containerExtension = "xml";
-			pParams.archiveExtension = "arc";
-			pParams.versionInfoPtr = m_versionInfoCompPtr.GetPtr();
-			pParams.compressorPtr = m_compressorCompPtr.GetPtr();
-
-			EventHistoryGroupControllerPtr groupPtr(new CEventHistoryGroupController(cParams, pParams));
-			groupPtr->SetLogPtr(GetLogPtr());
-
-			CTimeRange gTimeRange = groupPtr->GetTimeRange();
-			qDebug() << gTimeRange.GetBeginTime();
-			qDebug() << gTimeRange.GetEndTime();
-
-			if (!m_archiveTimeRange.IsClosed()){
-				m_archiveTimeRange = gTimeRange;
-			}
-			else{
-				if (gTimeRange.GetBeginTime() < m_archiveTimeRange.GetBeginTime()){
-					m_archiveTimeRange.SetBeginTime(gTimeRange.GetBeginTime());
-				}
-
-				if (gTimeRange.GetEndTime() > m_archiveTimeRange.GetEndTime()){
-					m_archiveTimeRange.SetEndTime(gTimeRange.GetEndTime());
-				}
-			}
-
-			if (messageIds.isEmpty()){
-				Q_ASSERT(!m_generalGroupPtr.IsValid());
-				m_generalGroupPtr = groupPtr;
-			}
-			else{
-				GroupListItem groupItem;
-
-				groupItem.messageIds = messageIds;
-				groupItem.groupPtr = groupPtr;
-				m_groups.append(groupItem);
-			}
-		}
-	}
+	InitializeHistoryController();
 
 	m_controllerState = CS_OK;
 }
 
 
-// public slots
+// private methods
 
-void CEventHistoryControllerComp::OnRequestFinished(QByteArray requestId)
+void CEventHistoryControllerComp::InitializeHistoryController()
 {
-	QMutexLocker locker(&m_requestMutex);
+	QDir dir(m_logFolderCompPtr->GetPath());
+	QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot);
 
-	if (m_requests.contains(requestId)){
-		m_requests[requestId].groupPtr->PopResult(requestId, *(dynamic_cast<ilog::CMessageContainer*>(m_requests[requestId].resultEventsPtr.GetPtr())));
-		m_requests.remove(requestId);
+	for (int i = 0; i < list.count(); i++){
+		QString dirName = list[i].fileName();
+		bool ok;
+		int id = dirName.toInt(&ok);
+		if (ok){
+			InitializeMessagesController(id);
+
+			CTimeRange timeRange = m_controllers[id]->GetTimeRange();
+			m_archiveTimeRange.Ensure(m_archiveTimeRange.GetBeginTime());
+			m_archiveTimeRange.Ensure(m_archiveTimeRange.GetEndTime());
+		}
 	}
 }
 
 
-// private methods
-
-CEventHistoryControllerComp::EventHistoryGroupControllerPtr CEventHistoryControllerComp::GetGroupForMessageId(int messageId) const
+void CEventHistoryControllerComp::InitializeMessagesController(int id)
 {
-	for (const GroupListItem& groupItem : m_groups){
-		if (groupItem.messageIds.contains(messageId)){
-			return groupItem.groupPtr;
+	int maxMessageCount = -1;
+	int savingPeriod = -1;
+	int cachingTime = -1;
+
+	if (m_messagesControllerParamsProviderCompPtr.IsValid()){
+		maxMessageCount = m_messagesControllerParamsProviderCompPtr->GetMaxContainerMessageCount(id);
+		savingPeriod = m_messagesControllerParamsProviderCompPtr->GetContainerSavingPeriod(id);
+		cachingTime = m_messagesControllerParamsProviderCompPtr->GetContainerCachingTime(id);
+	}
+
+	if (maxMessageCount < 0 || savingPeriod < 0 || cachingTime < 0){
+		maxMessageCount = *m_defaultMaxContainerMessageCountAttrPtr;
+		savingPeriod = *m_defaultContainerSavingPeriodAttrPtr;
+		cachingTime = *m_defaultContainerCachingTimeAttrPtr;
+	}
+
+	MessagesControllerPtr controllerPtr(new CMessagesController(
+				id,
+				maxMessageCount,
+				savingPeriod,
+				cachingTime,
+				m_logFolderCompPtr->GetPath() + "/" + QString("%1").arg(id),
+				"xml", "arc",
+				m_versionInfoCompPtr.GetPtr(),
+				m_compressorCompPtr.GetPtr(),
+				GetLogPtr()));
+
+	m_controllers[id] = controllerPtr;
+
+	connect(controllerPtr.GetPtr(), &CMessagesController::ReadFinished, this, &CEventHistoryControllerComp::OnReadFinished, Qt::QueuedConnection);
+}
+
+
+// private slots
+
+void CEventHistoryControllerComp::OnReadFinished(QByteArray requestId)
+{
+	bool isFound = false;
+
+	QMutexLocker locker(&m_requestMutex);
+	for (int i = 0; i < m_requests.count() && !isFound; i++){
+		if (m_requests[i].readIds.contains(requestId)){
+			for (MessagesControllerPtr& controllerPtr : m_controllers){
+				if (controllerPtr->IsValidResultId(requestId)){
+					m_requests[i].readIds.remove(requestId);
+					ilog::CMessageContainer container;
+					if (controllerPtr->PopResult(requestId, container)){
+						ilog::IMessageContainer::Messages messages = container.GetMessages();
+						for (ilog::IMessageConsumer::MessagePtr& messagePtr : messages){
+							m_requests[i].events.insert(messagePtr->GetInformationTimeStamp().toMSecsSinceEpoch(), messagePtr);
+						}
+
+						if (m_requests[i].readIds.isEmpty()){
+							istd::CChangeGroup changeGroup(m_requests[i].containerPtr.GetPtr());
+
+							CEventHistoryResultContainer* eventHistoryResultContainerPtr =
+								dynamic_cast<CEventHistoryResultContainer*>(m_requests[i].containerPtr.GetPtr());
+
+							QMultiMap<qint64, ilog::IMessageConsumer::MessagePtr>::const_iterator it = m_requests[i].events.cbegin();
+							while (it != m_requests[i].events.cend()){
+								eventHistoryResultContainerPtr->AddMessage(*it);
+								eventHistoryResultContainerPtr->Close();
+							}
+
+							m_requests.removeAt(i);
+						}
+					}
+
+					isFound = true;
+					break;
+				}
+			}
 		}
 	}
-	
-	Q_ASSERT(m_generalGroupPtr.IsValid());
-	return m_generalGroupPtr;
 }
 
 

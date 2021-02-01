@@ -6,6 +6,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QQueue>
 #include <QtCore/QTimer>
+#include <QtCore/QMultiMap>
 
 // Acf includes
 #include <iser/IVersionInfo.h>
@@ -20,9 +21,10 @@
 #include <imtlog/IGroupMessageIdsProvider.h>
 #include <imtlog/ITimeRangeProvider.h>
 #include <imtlog/IEventProvider.h>
+#include <imtlog/IMessagesControllerParamsProvider.h>
 #include <imtlog/CEventContainer.h>
 #include <imtlog/CEventHistoryResultContainer.h>
-#include <imtlog/CEventHistoryGroupController.h>
+#include <imtlog/CMessagesController.h>
 
 
 namespace imtlog
@@ -47,11 +49,13 @@ public:
 		I_REGISTER_INTERFACE(IEventProvider);
 		I_REGISTER_INTERFACE(ITimeRangeProvider);
 		I_REGISTER_INTERFACE(IGroupMessageIdsProvider);
+		I_ASSIGN(m_defaultMaxContainerMessageCountAttrPtr, "DefaultMaxContainerMessageCount", "Default max message count stored in container", true, 1000);
+		I_ASSIGN(m_defaultContainerSavingPeriodAttrPtr, "DefaultContainerSavingPeriod", "Default period in seconds of saving the container until the maximum number of messages is reached", true, 60);
+		I_ASSIGN(m_defaultContainerCachingTimeAttrPtr, "ContainerCachingTime", "The time the container was in the cache after closing", true, 3600);
 		I_ASSIGN(m_logFolderCompPtr, "LogFolder", "Path to the event history folder", true, "");
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
-		I_ASSIGN(m_groupProviderCompPtr, "GroupProvider", "Group provider", true, "GroupProvider");
-		I_ASSIGN_TO(m_groupMessageIdProviderCompPtr, m_groupProviderCompPtr, true);
+		I_ASSIGN(m_messagesControllerParamsProviderCompPtr, "MessagesControllerParamsProvider", "Message controller params provider", false, "");
 	I_END_COMPONENT;
 
 	CEventHistoryControllerComp();
@@ -77,15 +81,16 @@ public:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
-public Q_SLOTS:
-	void OnRequestFinished(QByteArray requestId);
+private:
+	void InitializeHistoryController();
+	void InitializeMessagesController(int id);
+
+private Q_SLOTS:
+	void OnReadFinished(QByteArray requestId);
 
 private:
-	typedef istd::TSmartPtr<CEventHistoryGroupController> EventHistoryGroupControllerPtr;
+	typedef istd::TSmartPtr<CMessagesController> MessagesControllerPtr;
 
-	EventHistoryGroupControllerPtr GetGroupForMessageId(int messageId) const;
-
-private:
 	enum ControllerState
 	{
 		CS_INIT = 0,
@@ -94,34 +99,29 @@ private:
 		CS_FAILED
 	};
 
-	struct GroupListItem
+	struct ReadRequest
 	{
-		QSet<int> messageIds;
-		EventHistoryGroupControllerPtr groupPtr;
-	};
-
-	struct RequestMapItem
-	{
-		IEventProvider::EventContainerPtr resultEventsPtr;
-		EventHistoryGroupControllerPtr groupPtr;
+		IEventProvider::EventContainerPtr containerPtr;
+		QMultiMap<qint64, ilog::IMessageConsumer::MessagePtr> events;
+		QSet<QByteArray> readIds;
 	};
 
 private:
+	I_ATTR(int, m_defaultMaxContainerMessageCountAttrPtr);
+	I_ATTR(int, m_defaultContainerSavingPeriodAttrPtr);
+	I_ATTR(int, m_defaultContainerCachingTimeAttrPtr);
 	I_REF(ifile::IFileNameParam, m_logFolderCompPtr);
 	I_REF(imtfile::IFileCompression, m_compressorCompPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
-	I_REF(imtbase::IObjectCollection, m_groupProviderCompPtr);
-	I_REF(IGroupMessageIdsProvider, m_groupMessageIdProviderCompPtr);
-
+	I_REF(IMessagesControllerParamsProvider, m_messagesControllerParamsProviderCompPtr);
 	QDateTime m_systemStartTime;
 	ControllerState m_controllerState;
 
 	CTimeRange m_archiveTimeRange;
 
-	EventHistoryGroupControllerPtr m_generalGroupPtr;
-	QList<GroupListItem> m_groups;
+	QMap<int, MessagesControllerPtr> m_controllers;
 
-	mutable QMap<QByteArray, RequestMapItem> m_requests;
+	mutable QList<ReadRequest> m_requests;
 	mutable QMutex m_requestMutex;
 
 	ilog::CMessageContainer m_log;

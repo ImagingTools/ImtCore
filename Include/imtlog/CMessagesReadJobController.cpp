@@ -1,4 +1,4 @@
-#include <imtlog/CEventHistoryReadJobController.h>
+#include <imtlog/CMessagesReadJobController.h>
 
 
 // Qt includes
@@ -14,23 +14,25 @@ namespace imtlog
 
 // public methods
 
-CEventHistoryReadJobController::CEventHistoryReadJobController(
-			QString groupDir,
+CMessagesReadJobController::CMessagesReadJobController(
+			QString dir,
 			QString containerExtension,
 			QString archiveExtension,
 			iser::IVersionInfo* versionInfoPtr,
-			imtfile::IFileCompression* compressorPtr)
-	:m_groupDir(groupDir),
+			imtfile::IFileCompression* compressorPtr,
+			ilog::IMessageConsumer* logPtr)
+	:m_dir(dir),
 	m_containerExtension(containerExtension),
 	m_archiveExtension(archiveExtension),
 	m_versionInfoPtr(versionInfoPtr),
-	m_compressorPtr(compressorPtr)
+	m_compressorPtr(compressorPtr),
+	m_logPtr(logPtr)
 {
 	start();
 }
 
 
-QByteArray CEventHistoryReadJobController::AddJob(const IEventFilter* filterPtr, const IMessageFilterParams* filterParamsPtr)
+QByteArray CMessagesReadJobController::AddJob(const IEventFilter* filterPtr, const IMessageFilterParams* filterParamsPtr)
 {
 	Job newJob;
 
@@ -47,7 +49,7 @@ QByteArray CEventHistoryReadJobController::AddJob(const IEventFilter* filterPtr,
 }
 
 
-bool CEventHistoryReadJobController::IsValidJobId(const QByteArray& jobId) const
+bool CMessagesReadJobController::IsValidJobId(const QByteArray& jobId) const
 {
 	QMutexLocker locker(&m_jobMutex);
 
@@ -56,13 +58,15 @@ bool CEventHistoryReadJobController::IsValidJobId(const QByteArray& jobId) const
 		if ((*it).uuid == jobId){
 			return true;
 		}
+
+		it++;
 	}
 
 	return false;
 }
 
 
-bool CEventHistoryReadJobController::GetFilter(const QByteArray & jobId, IEventFilter** eventFilterPtr, IMessageFilterParams* messageFilterParamsPtr) const
+bool CMessagesReadJobController::GetFilter(const QByteArray & jobId, IEventFilter** eventFilterPtr, IMessageFilterParams* messageFilterParamsPtr) const
 {
 	QMutexLocker locker(&m_jobMutex);
 
@@ -78,7 +82,7 @@ bool CEventHistoryReadJobController::GetFilter(const QByteArray & jobId, IEventF
 }
 
 
-bool CEventHistoryReadJobController::PopResult(const QByteArray& jobId, ilog::CMessageContainer& resultEvents)
+bool CMessagesReadJobController::PopResult(const QByteArray& jobId, ilog::CMessageContainer& resultEvents)
 {
 	QMutexLocker locker(&m_jobMutex);
 
@@ -100,6 +104,8 @@ bool CEventHistoryReadJobController::PopResult(const QByteArray& jobId, ilog::CM
 
 			return true;
 		}
+
+		it++;
 	}
 
 	return false;
@@ -108,7 +114,7 @@ bool CEventHistoryReadJobController::PopResult(const QByteArray& jobId, ilog::CM
 
 // reimplemented (QThread)
 
-void CEventHistoryReadJobController::run()
+void CMessagesReadJobController::run()
 {
 	while (!isInterruptionRequested()){
 		Job workingJob;
@@ -135,7 +141,7 @@ void CEventHistoryReadJobController::run()
 
 // private methods
 
-CEventHistoryReadJobController::Job CEventHistoryReadJobController::GetJob(const QByteArray& jobId) const
+CMessagesReadJobController::Job CMessagesReadJobController::GetJob(const QByteArray& jobId) const
 {
 	QMutexLocker locker(&m_jobMutex);
 
@@ -149,23 +155,24 @@ CEventHistoryReadJobController::Job CEventHistoryReadJobController::GetJob(const
 }
 
 
-void CEventHistoryReadJobController::ProcessJob(Job& job)
+void CMessagesReadJobController::ProcessJob(Job& job)
 {
 	job.status = JS_RUNNING;
 
-	CEventHistoryGroupReader m_reader(
-				m_groupDir,
+	CMessagesReader m_reader(
+				m_dir,
 				m_containerExtension,
 				m_archiveExtension,
 				m_versionInfoPtr,
-				m_compressorPtr);
+				m_compressorPtr,
+				m_logPtr);
 
-	CEventHistoryGroupReader::EventContainerListPtr containerListPtr = m_reader.ReadContainers(job.filterParams.GetFilterTimeRange());
+	CMessagesReader::EventContainerListPtr containerListPtr = m_reader.ReadContainers(job.filterParams.GetFilterTimeRange());
 
 	if (containerListPtr.IsValid()){
 		job.eventContainerPtr.SetPtr(new ilog::CMessageContainer());
 
-		CEventHistoryGroupReader::EventContainerList::const_iterator it = containerListPtr->begin();
+		CMessagesReader::EventContainerList::const_iterator it = containerListPtr->begin();
 		while (it != containerListPtr->end()){
 			ilog::IMessageContainer::Messages messages = (*it)->GetMessages();
 			for (int i = messages.count() - 1; i >= 0; i--){
