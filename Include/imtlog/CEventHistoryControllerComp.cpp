@@ -44,6 +44,23 @@ IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
 		return IEventProvider::EventContainerPtr();
 	}
 
+	CEventHistoryResultContainer* containerPtr = new CEventHistoryResultContainer();
+
+	{
+		istd::CChangeGroup notifier(containerPtr);
+
+		ilog::IMessageContainer::Messages messages = m_log.GetMessages();
+		for (int i = messages.count() - 1; i >= 0; i--){
+			if (filterPtr->IsMessageAccepted(*messages[i], filterParamsPtr)){
+				containerPtr->AddMessage(messages[i]);
+			}
+		}
+
+		containerPtr->Close();
+	}
+
+	return IEventProvider::EventContainerPtr(containerPtr);
+
 	QSet<int> ids;
 
 	if (filterParamsPtr->GetFilterMode() == imtlog::IMessageFilterParams::FM_INCLUDE){
@@ -53,16 +70,16 @@ IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
 		ids = m_controllers.keys().toSet() - filterParamsPtr->GetMessageFilterIds();
 	}
 
-	istd::TOptDelPtr<CEventHistoryResultContainer> containerPtr(new CEventHistoryResultContainer());
+	//istd::TOptDelPtr<CEventHistoryResultContainer> containerPtr(new CEventHistoryResultContainer());
 	if (ids.isEmpty()){
 		containerPtr->Close();
-		return IEventProvider::EventContainerPtr(containerPtr.PopPtr());
+		//return IEventProvider::EventContainerPtr(containerPtr.PopPtr());
 	}
 
 	QMutexLocker locker(&m_requestMutex);
 	ReadRequest request;
 
-	request.containerPtr.SetPtr(containerPtr.PopPtr());
+	//request.containerPtr.SetPtr(containerPtr.PopPtr());
 	for (int id : ids){
 		request.readIds.insert(m_controllers[id]->AddJob(filterPtr, filterParamsPtr));
 	}
@@ -89,6 +106,12 @@ void CEventHistoryControllerComp::AddMessage(const MessagePtr& messagePtr)
 
 	if (m_controllerState == CS_OK){
 		istd::CChangeNotifier notifier(this);
+		m_log.AddMessage(messagePtr);
+		m_archiveTimeRange.Ensure(messagePtr->GetInformationTimeStamp());
+
+		return;
+
+		//istd::CChangeNotifier notifier(this);
 		m_archiveTimeRange.Ensure(messagePtr->GetInformationTimeStamp());
 
 		int id = messagePtr->GetInformationId();
