@@ -19,6 +19,7 @@ namespace imtloggui
 class CScenographerBase:
 			public imtbase::CStaticObjectCollection,
 			public imod::TSingleModelObserverBase<iprm::ISelectionParam>,
+			virtual public istd::IChangeable,
 			virtual public IScenographer
 {
 public:

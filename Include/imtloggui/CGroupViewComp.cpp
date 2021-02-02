@@ -36,7 +36,10 @@ void CGroupViewComp::OnComponentCreated()
 
 	for (int i = 0; i < count; i++){
 		Q_ASSERT(!GetElementIds().contains(m_idAttrPtr[i]));
-		RegisterObject(m_idAttrPtr[i], "", m_nameAttrPtr[i], "", m_layerViewsCompPtr[i]);
+		istd::IChangeable* objectPtr = dynamic_cast<istd::IChangeable*>(m_layerViewsCompPtr[i]);
+		if (objectPtr != nullptr){
+			RegisterObject(m_idAttrPtr[i], "", m_nameAttrPtr[i], "", objectPtr);
+		}
 	}
 }
 

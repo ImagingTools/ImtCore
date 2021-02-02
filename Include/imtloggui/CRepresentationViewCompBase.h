@@ -25,6 +25,7 @@ class CRepresentationViewCompBase:
 			public QObject,
 			public icomp::CComponentBase,
 			public imod::TSingleModelObserverBase<iprm::ISelectionParam>,
+			virtual public istd::IChangeable,
 			virtual public IScenographer
 {
 	Q_OBJECT

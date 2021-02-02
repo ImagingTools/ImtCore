@@ -2,14 +2,14 @@
 
 
 // Acf includes
-#include <istd/IChangeable.h>
+#include <istd/IPolymorphic.h>
 
 
 namespace imtloggui
 {
 
 
-class IScenographer: virtual public istd::IChangeable
+class IScenographer: virtual public istd::IPolymorphic
 {
 public:
 	enum GraphicsItemDataKeys
