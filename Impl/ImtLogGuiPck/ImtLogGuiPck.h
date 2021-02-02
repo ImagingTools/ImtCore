@@ -41,7 +41,7 @@ typedef imtloggui::CIconBasedEventFactoryComp IconBasedEventFactory;
 typedef imtloggui::CGeneralEventFactoryComp GeneralEventFactory;
 typedef imtloggui::CEventStatisticsViewComp EventStatisticsView;
 typedef imtloggui::CEventItemMetaInfoViewComp EventItemMetaInfoView;
-typedef icomp::TModelCompWrap<imtloggui::CGraphicsControllerComp> GraphicsController;
+typedef imtloggui::CGraphicsControllerComp GraphicsController;
 typedef icomp::TModelCompWrap<imtloggui::CGroupProviderComp> GroupProvider;
 typedef imtloggui::CGroupViewProviderComp GroupViewProvider;
 typedef icomp::TModelCompWrap<imtloggui::CGroupComp> Group;

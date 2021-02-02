@@ -23,7 +23,7 @@
 // ImtCore includes
 #include <imtloggui/IEventItem.h>
 #include <imtloggui/IGraphicsController.h>
-#include <imtloggui/IGraphicsItemProvider.h>
+#include <imtloggui/IGraphicsSceneProvider.h>
 #include <imtloggui/CEventGraphicsView.h>
 #include <imtloggui/CTimeAxis.h>
 
@@ -38,7 +38,8 @@ namespace imtloggui
 class CEventViewComp:
 			public iqtgui::TRestorableGuiWrap<
 						iqtgui::TDesignerGuiCompBase<Ui::CEventViewComp>>,
-			virtual public IViewPropertyManager
+			virtual public IViewPropertyManager,
+			virtual public IGraphicsSceneProvider
 {
 	Q_OBJECT
 public:
@@ -49,6 +50,7 @@ public:
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
 		I_REGISTER_INTERFACE(IViewPropertyManager);
 		I_REGISTER_INTERFACE(IViewPropertyProvider);
+		I_REGISTER_INTERFACE(IGraphicsSceneProvider);
 		I_REGISTER_SUBELEMENT(Commands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
@@ -56,11 +58,12 @@ public:
 		I_ASSIGN(m_statisticsViewCompPtr, "EventStatisticsView", "Event statistics for groups", true, "EventStatisticsView");
 		I_ASSIGN(m_metainfoViewCompPtr, "EventItemMetaInfoView", "Event metainfo viewer", true, "EventItemMetaInfoView");
 		I_ASSIGN(m_graphicsControllerCompPtr, "GraphicsController", "Graphics controller", true, "GraphicsController");
-		I_ASSIGN(m_itemProviderCompPtr, "ItemProvider", "Graphics item provider", true, "ItemProvider");
-		I_ASSIGN_TO(m_itemProviderModelCompPtr, m_itemProviderCompPtr, true);
 	I_END_COMPONENT;
 
 	CEventViewComp();
+
+	// reimplemented (imtloggui::IGraphicsSceneProvider)
+	virtual QGraphicsScene* GetGraphicsScene() override;
 
 	// reimplemented (imtloggui::IViewPropertyProvider)
 	virtual QRectF GetSceneRect() const override;
@@ -112,36 +115,6 @@ private:
 	bool UpdateMetaInfoPanel(const IEventItem* eventItem);
 
 private:
-	class ItemsObserver: public imod::TSingleModelObserverBase<IGraphicsItemProvider>
-	{
-	public:
-		ItemsObserver();
-
-		void SetParent(CEventViewComp* parent);
-
-	protected:
-		// reimplemented (imod::CSingleModelObserverBase)
-		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
-
-	private:
-		CEventViewComp* m_parent;
-	};
-
-	class GraphicsItemsObserver: public imod::TSingleModelObserverBase<IGraphicsItemProvider>
-	{
-	public:
-		GraphicsItemsObserver(CEventViewComp* parent);
-
-	protected:
-		// reimplemented (imod::CSingleModelObserverBase)
-		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
-
-	private:
-		CEventViewComp* m_parent;
-
-		IGraphicsItemProvider::GraphicsItemList m_items;
-	};
-
 	class Commands: virtual public ibase::ICommandsProvider
 	{
 	public:
@@ -167,10 +140,7 @@ private:
 	//I_REF(IEventGroupController, m_groupControllerCompPtr);
 	I_REF(iqtgui::IGuiObject, m_statisticsViewCompPtr);
 	I_REF(iqtgui::IGuiObject, m_metainfoViewCompPtr);
-	I_REF(imeas::INumericConstraints, m_scaleConstraintsCompPtr);
 	I_REF(imtloggui::IGraphicsController, m_graphicsControllerCompPtr);
-	I_REF(imtloggui::IGraphicsItemProvider, m_itemProviderCompPtr);
-	I_REF(imod::IModel, m_itemProviderModelCompPtr);
 
 	imod::TModelWrap<Commands> m_commands;
 	iqtgui::CHierarchicalCommand m_rootCommands;
@@ -185,13 +155,8 @@ private:
 	QGraphicsScene m_scene;
 	istd::TChangeDelegator<imod::TModelWrap<CEventGraphicsView>>* m_viewPtr;
 	double m_scaleFactor;
-	GraphicsItemsObserver m_graphicsItemObserver;
 
 	QDateTime m_currentCommandTime;
-
-	//IEventItemController::EventMap m_eventMap;
-	//IEventItemController::EventMap::const_iterator m_navigationIterator;
-	//bool m_isNavigationIteratorValid;
 
 	imod::CModelProxy m_modelProxy;
 
@@ -204,7 +169,6 @@ private:
 	QRectF m_viewRect;
 	QMargins m_margins;
 	istd::CRange m_scaleRangeX;
-	istd::CRange m_scaleRangeY;
 };
 
 

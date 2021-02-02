@@ -34,7 +34,6 @@ CEventViewComp::CEventViewComp()
 	m_zoomInCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
 	m_zoomOutCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
 	m_zoomReset("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR),
-	m_graphicsItemObserver(this),
 	m_scaleFactor(1.2),
 	m_viewPtr(nullptr)
 {
@@ -57,6 +56,14 @@ CEventViewComp::CEventViewComp()
 	connect(&m_zoomInCommand, &QAction::triggered, this, &CEventViewComp::OnZoomInCommand);
 	connect(&m_zoomOutCommand, &QAction::triggered, this, &CEventViewComp::OnZoomOutCommand);
 	connect(&m_zoomReset, &QAction::triggered, this, &CEventViewComp::OnZoomReset);
+}
+
+
+// reimplemented (imtloggui::ISceneProvider)
+
+QGraphicsScene* CEventViewComp::GetGraphicsScene()
+{
+	return &m_scene;
 }
 
 
@@ -181,14 +188,8 @@ bool CEventViewComp::SetScaleRangeX(const istd::CRange & range)
 }
 
 
-bool CEventViewComp::SetScaleRangeY(const istd::CRange & range)
+bool CEventViewComp::SetScaleRangeY(const istd::CRange & /*range*/)
 {
-	if (m_viewPtr != nullptr){
-		return m_viewPtr->SetScaleRangeY(range);
-	}
-
-	m_scaleRangeY = range;
-
 	return false;
 }
 
@@ -248,7 +249,6 @@ void CEventViewComp::OnGuiCreated()
 	m_viewPtr->SetViewRect(m_viewRect);
 	m_viewPtr->SetMargins(m_margins);
 	m_viewPtr->SetScaleRangeX(m_scaleRangeX);
-	m_viewPtr->SetScaleRangeY(m_scaleRangeY);
 
 	// Bind changes of the underlaying view to this object:
 	m_viewPtr->SetSlavePtr(this);
@@ -286,10 +286,6 @@ void CEventViewComp::OnGuiCreated()
 
 	connect(&m_scene, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
 
-	if (m_itemProviderModelCompPtr.IsValid()){
-		m_itemProviderModelCompPtr->AttachObserver(&m_graphicsItemObserver);
-	}
-
 	UpdateCommands();
 
 	if (m_graphicsControllerCompPtr.IsValid()){
@@ -301,11 +297,6 @@ void CEventViewComp::OnGuiCreated()
 void CEventViewComp::OnGuiDestroyed()
 {
 	disconnect(&m_scene, &QGraphicsScene::selectionChanged, this, &CEventViewComp::OnSelectionChanged);
-
-	m_graphicsItemObserver.EnsureModelDetached();
-	for (QGraphicsItem* itemPtr : m_scene.items()){
-		m_scene.removeItem(itemPtr);
-	}
 
 	if (m_statisticsViewCompPtr.IsValid() && m_statisticsViewCompPtr->IsGuiCreated()){
 		m_statisticsViewCompPtr->DestroyGui();
@@ -627,62 +618,6 @@ bool CEventViewComp::UpdateMetaInfoPanel(const IEventItem* eventItem)
 	}
 
 	return false;
-}
-
-
-// public methods of the embedded class StaticItemsProvider
-
-CEventViewComp::ItemsObserver::ItemsObserver()
-	:m_parent(nullptr)
-{
-}
-
-
-void CEventViewComp::ItemsObserver::SetParent(CEventViewComp* parent)
-{
-	m_parent = parent;
-}
-
-
-// protected methods of the embedded class StaticItemsProvider
-
-// reimplemented (imod::CSingleModelObserverBase)
-
-void CEventViewComp::ItemsObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
-{
-
-}
-
-
-// public methods of the embedded class StaticItemsProvider
-
-CEventViewComp::GraphicsItemsObserver::GraphicsItemsObserver(CEventViewComp* parent)
-	:m_parent(parent)
-{
-}
-
-
-// protected methods of the embedded class StaticItemsProvider
-
-// reimplemented (imtloggui::IGraphicsItemProvider)
-
-void CEventViewComp::GraphicsItemsObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
-{
-	if (m_parent != nullptr){
-		for (IGraphicsItemProvider::GraphicsItem item : GetObservedObject()->GetRemovedItems()){
-			if (m_items.contains(item)){
-				m_parent->m_scene.removeItem(item.GetPtr());
-				m_items.removeOne(item);
-			}
-		}
-
-		for (IGraphicsItemProvider::GraphicsItem item : GetObservedObject()->GetAddedItems()){
-			if (!m_items.contains(item)){
-				m_parent->m_scene.addItem(item.GetPtr());
-				m_items.append(item);
-			}
-		}
-	}
 }
 
 

@@ -9,35 +9,13 @@ namespace imtloggui
 {
 
 
-// public methods
-
-// reimplemented (imtloggui::IGraphicsItemProvider)
-
-IGraphicsItemProvider::GraphicsItemList CEventBasedRepresentationViewComp::GetItems() const
-{
-	return m_itemList;
-}
-
-
-IGraphicsItemProvider::GraphicsItemList CEventBasedRepresentationViewComp::GetAddedItems() const
-{
-	return GraphicsItemList();
-}
-
-
-IGraphicsItemProvider::GraphicsItemList CEventBasedRepresentationViewComp::GetRemovedItems() const
-{
-	return GraphicsItemList();
-}
-
-
 // protected methods
 
 // reimplemented (imod::CSingleModelObserverBase)
 
 void CEventBasedRepresentationViewComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	m_itemList.clear();
+	GraphicsItemList items;
 
 	const ilog::IMessageContainer* representationObjectPtr = dynamic_cast<const ilog::IMessageContainer*>(GetObservedObject());
 	if (representationObjectPtr != nullptr){
@@ -55,11 +33,14 @@ void CEventBasedRepresentationViewComp::OnUpdate(const istd::IChangeable::Change
 					graphicsItemPtr->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIgnoresTransformations);
 					graphicsItemPtr->setPos(m_positionProviderCompPtr->GetScenePositionFromTime(messageTimeStamp), 0);
 
-					GraphicsItem item(graphicsItemPtr);
-					m_itemList.append(item);
+					items.push_back(GraphicsItemPtr(graphicsItemPtr));
 				}
 			}
 		}
+
+		QMutexLocker locker(&m_generatedItemsMutex);
+		m_generatedItems = items;
+		locker.unlock();
 
 		Q_EMIT EmitRepresentationUpdated();
 	}

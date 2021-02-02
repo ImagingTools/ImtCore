@@ -11,7 +11,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtlog/ITimeRangeProvider.h>
 #include <imtloggui/IGraphicsController.h>
-#include <imtloggui/IGraphicsItemProvider.h>
+#include <imtloggui/IGraphicsSceneProvider.h>
 #include <imtloggui/IViewPropertyProvider.h>
 #include <imtloggui/IViewPropertyManager.h>
 #include <imtloggui/IEventNavigationController.h>
@@ -28,7 +28,6 @@ class CGraphicsControllerComp:
 			public QObject,
 			public icomp::CComponentBase,
 			virtual public IGraphicsController,
-			virtual public IGraphicsItemProvider,
 			virtual public IEventNavigationController
 {
 	Q_OBJECT
@@ -38,7 +37,6 @@ public:
 
 	I_BEGIN_COMPONENT(CGraphicsControllerComp)
 		I_REGISTER_INTERFACE(IGraphicsController);
-		I_REGISTER_INTERFACE(IGraphicsItemProvider);
 		I_REGISTER_INTERFACE(IEventNavigationController);
 		I_REGISTER_SUBELEMENT(ScenePositionProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(ScenePositionProvider, IEventScenePositionProvider, ExtractPositionProvider);
@@ -46,6 +44,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, imtlog::ITimeRangeProvider, ExtractVisibleTimeRangeProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, istd::IChangeable, ExtractVisibleTimeRangeProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, imod::IModel, ExtractVisibleTimeRangeProvider);
+		I_ASSIGN(m_graphicsSceneProviderCompPtr, "GraphicsSceneProvider", "Graphics scene provider", true, "GraphicsSceneProvider");
 		I_ASSIGN(m_groupProviderCompPtr, "GroupProvider", "Event groups provider", true, "GroupProvider");
 		I_ASSIGN(m_groupViewProviderCompPtr, "GroupViewProvider", "Event groups view provider", true, "GroupViewProvider");
 		I_ASSIGN(m_groupViewVisualSettingsCompPtr, "GroupVisualSettingsCollection", "Collection of visual settings for group view", false, "GroupVisualSettingsCollection");
@@ -63,11 +62,6 @@ public:
 	virtual void JumpToPreviousEvent() const override;
 	virtual void JumpToNextEvent() const override;
 	virtual void JumpToLastEvent() const override;
-
-	// reimplemented (imtloggui::IGraphicsItemProvider)
-	virtual GraphicsItemList GetItems() const override;
-	virtual GraphicsItemList GetAddedItems() const override;
-	virtual GraphicsItemList GetRemovedItems() const override;
 
 	// reimplemented (imtloggui::IGraphicsController)
 	virtual void InitScene() override;
@@ -87,6 +81,9 @@ private:
 	void OnGroupChanged(int modelId);
 
 private:
+	typedef istd::TSmartPtr<QGraphicsItem> GraphicsItemPtr;
+	typedef QList<GraphicsItemPtr> GraphicsItemList;
+
 	template <typename InterfaceType>
 	static InterfaceType* ExtractPositionProvider(CGraphicsControllerComp& component)
 	{
@@ -172,6 +169,7 @@ private:
 	I_REF(imtbase::IObjectCollection, m_groupProviderCompPtr);
 	I_REF(imtbase::IObjectCollection, m_groupViewProviderCompPtr);
 	I_REF(imtbase::IObjectCollection, m_groupViewVisualSettingsCompPtr);
+	I_REF(IGraphicsSceneProvider, m_graphicsSceneProviderCompPtr);
 	I_REF(IEventScenePositionProvider, m_positionProviderCompPtr);
 	I_REF(IViewPropertyProvider, m_viewportGeometryProviderCompPtr);
 	I_REF(imod::IModel, m_viewportGeometryManagerModelCompPtr);
@@ -180,7 +178,6 @@ private:
 	I_REF(imod::IModel, m_timeRangeModelCompPtr);
 
 	CTimeAxis* m_timeAxisPtr;
-	GraphicsItem m_timeAxisSPtr;
 
 	ViewportObserver m_viewportObserver;
 	TimeRangeObserver m_timeRangeObserver;
@@ -189,9 +186,6 @@ private:
 	GroupsDispatcher m_groupDispatcher;
 
 	QMap<QByteArray, GroupItem> m_groupStaticItems;
-	QMap<QByteArray, GraphicsItemList>m_groupItems;
-	mutable GraphicsItemList m_addedItems;
-	mutable GraphicsItemList m_removedItems;
 };
 
 

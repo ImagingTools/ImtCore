@@ -23,17 +23,13 @@ public:
 	I_BEGIN_COMPONENT(CProductionRepresentationViewComp)
 	I_END_COMPONENT
 
-	// reimplemented (imtloggui::IRepresentationView)
-	virtual GraphicsItemList GetItems() const override;
-	virtual GraphicsItemList GetAddedItems() const override;
-	virtual GraphicsItemList GetRemovedItems() const override;
-
 protected:
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
 
-private:
-	mutable GraphicsItem m_item;
+protected:
+	// reimplemented (imtloggui::CRepresentationViewCompBase)
+	virtual void OnRepresentationUpdated() override;
 };
 
 

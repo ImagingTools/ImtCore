@@ -5,66 +5,23 @@ namespace imtloggui
 {
 
 
-// public methods
-
-CLayerViewComp::CLayerViewComp()
-	:m_updateBridge(this)
-{
-}
-
-
-// reimplemented (imtloggui::IGraphicsItemProvider)
-
-IGraphicsItemProvider::GraphicsItemList CLayerViewComp::GetItems() const
-{
-	const imtloggui::IGraphicsItemProvider* representationViewPtr = GetActiveRepresentationView();
-
-	if (representationViewPtr != nullptr){
-		return representationViewPtr->GetItems();
-	}
-
-	return IGraphicsItemProvider::GraphicsItemList();
-}
-
-
-IGraphicsItemProvider::GraphicsItemList CLayerViewComp::GetAddedItems() const
-{
-	const imtloggui::IGraphicsItemProvider* representationViewPtr = GetActiveRepresentationView();
-
-	if (representationViewPtr != nullptr){
-		return representationViewPtr->GetAddedItems();
-	}
-
-	return IGraphicsItemProvider::GraphicsItemList();
-}
-
-
-IGraphicsItemProvider::GraphicsItemList CLayerViewComp::GetRemovedItems() const
-{
-	const imtloggui::IGraphicsItemProvider* representationViewPtr = GetActiveRepresentationView();
-
-	if (representationViewPtr != nullptr){
-		return representationViewPtr->GetRemovedItems();
-	}
-
-	return IGraphicsItemProvider::GraphicsItemList();
-}
-
-
 // protected methods
 
-// reimplemented (imod::CSingleModelObserverBase)
+// reimplemented (imtloggui::CScenographerBase)
 
-void CLayerViewComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+IScenographer* CLayerViewComp::GetActiveElement()
 {
-	m_updateBridge.EnsureModelsDetached();
+	if (IsModelAttached()){
+		const iprm::IOptionsList* optionListPtr = GetObservedObject()->GetSelectionConstraints();
+		QByteArray activeLayerId = optionListPtr->GetOptionId(GetObservedObject()->GetSelectedOptionIndex());
 
-	imod::IModel* modelPtr = const_cast<imod::IModel*>(
-				dynamic_cast<const imod::IModel*>(GetActiveRepresentationView()));
-
-	if (modelPtr = nullptr){
-		modelPtr->AttachObserver(&m_updateBridge);
+		if (GetElementIds().contains(activeLayerId)){
+			return dynamic_cast<IScenographer*>(
+				const_cast<istd::IChangeable*>(BaseClass2::BaseClass::GetObjectPtr(activeLayerId)));
+		}
 	}
+
+	return nullptr;
 }
 
 
@@ -81,23 +38,6 @@ void CLayerViewComp::OnComponentCreated()
 		Q_ASSERT(!GetElementIds().contains(m_idAttrPtr[i]));
 		RegisterObject(m_idAttrPtr[i], "", m_nameAttrPtr[i], "", m_representationViewCompPtr[i]);
 	}
-}
-
-
-// private methods
-
-const IGraphicsItemProvider* CLayerViewComp::GetActiveRepresentationView() const
-{
-	if (IsModelAttached()){
-		const iprm::IOptionsList* optionListPtr = GetObservedObject()->GetSelectionConstraints();
-		QByteArray activeRepresentationViewId = optionListPtr->GetOptionId(GetObservedObject()->GetSelectedOptionIndex());
-
-		if (GetElementIds().contains(activeRepresentationViewId)){
-			return dynamic_cast<const IGraphicsItemProvider*>(BaseClass2::GetObjectPtr(activeRepresentationViewId));				
-		}
-	}
-
-	return nullptr;
 }
 
 

@@ -15,8 +15,8 @@ public:
 	virtual bool SetSceneRect(const QRectF& rect) = 0;
 	virtual bool SetViewRect(const QRectF& rect) = 0;
 	virtual bool SetMargins(const QMargins& margins) = 0;
-	virtual bool SetScaleRangeX(const istd::CRange& scaleX) = 0;
-	virtual bool SetScaleRangeY(const istd::CRange& scaleY) = 0;
+	virtual bool SetScaleRangeX(const istd::CRange& range) = 0;
+	virtual bool SetScaleRangeY(const istd::CRange& range) = 0;
 };
 
 

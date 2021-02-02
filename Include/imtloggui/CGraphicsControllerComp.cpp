@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtloggui/IGroupVisualSettings.h>
+#include <imtloggui/IScenographer.h>
 
 
 namespace imtloggui
@@ -44,48 +45,25 @@ void CGraphicsControllerComp::JumpToLastEvent() const
 }
 
 
-// reimplemented (imtloggui::IGraphicsItemProvider)
-
-IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetItems() const
-{
-	return IGraphicsItemProvider::GraphicsItemList();
-}
-
-
-IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetAddedItems() const
-{
-	GraphicsItemList items = m_addedItems;
-
-	m_addedItems.clear();
-
-	return items;
-}
-
-
-IGraphicsItemProvider::GraphicsItemList CGraphicsControllerComp::GetRemovedItems() const
-{
-	GraphicsItemList items = m_removedItems;
-
-	m_removedItems.clear();
-
-	return items;
-}
-
-
 // reimplemented (imtloggui::IGraphicsController)
 
 void CGraphicsControllerComp::InitScene()
 {
-	istd::CChangeNotifier notifier(this);
+	if (!m_graphicsSceneProviderCompPtr.IsValid()){
+		return;
+	}
+
+	QGraphicsScene* scenePtr = m_graphicsSceneProviderCompPtr->GetGraphicsScene();
+	if (scenePtr == nullptr){
+		return;
+	}
 
 	m_timeAxisPtr = new CTimeAxis();
 	m_timeAxisPtr->setPos(0, 0);
 	m_timeAxisPtr->SetColor(Qt::green);
 	m_timeAxisPtr->setRect(0, 0, 100, 40);
 	m_timeAxisPtr->setZValue(10);
-	//m_timeAxisPtr->EnsureTimeRange(QDateTime::currentDateTime());
-	m_timeAxisSPtr.SetPtr(m_timeAxisPtr);
-	m_addedItems.append(m_timeAxisSPtr);
+	scenePtr->addItem(m_timeAxisPtr);
 	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisBeginTimeChanged, this, &CGraphicsControllerComp::OnAxisBeginTimeChanged);
 	connect(m_timeAxisPtr, &CTimeAxis::EmitAxisEndTimeChanged, this, &CGraphicsControllerComp::OnAxisEndTimeChanged);
 
@@ -127,8 +105,8 @@ void CGraphicsControllerComp::InitScene()
 			groupItem.labelPtr = labelPtr;
 			m_groupStaticItems[ids[i]] = groupItem;
 
-			m_addedItems.append(GraphicsItem(rectPtr));
-			m_addedItems.append(GraphicsItem(labelPtr));
+			scenePtr->addItem(rectPtr);
+			scenePtr->addItem(labelPtr);
 
 			imod::IModel* groupModelPtr = dynamic_cast<imod::IModel*>(
 				const_cast<istd::IChangeable*>(m_groupViewProviderCompPtr->GetObjectPtr(ids[i])));
@@ -357,45 +335,33 @@ void CGraphicsControllerComp::DisconnectObserversFromModels()
 
 void CGraphicsControllerComp::OnGroupChanged(int modelId)
 {
+	if (!m_graphicsSceneProviderCompPtr.IsValid()){
+		return;
+	}
+
+	QGraphicsScene* scenePtr = m_graphicsSceneProviderCompPtr->GetGraphicsScene();
+	if (scenePtr == nullptr){
+		return;
+	}
+
 	qint64 span = m_timeAxisPtr->GetVisibleBeginTime().msecsTo(m_timeAxisPtr->GetVisibleEndTime());
 
 	if (m_groupViewProviderCompPtr.IsValid() && span > 0){
-		GraphicsItemList items;
-
 		imtbase::ICollectionInfo::Ids groupIds = m_groupViewProviderCompPtr->GetElementIds();
 		QByteArray groupId = groupIds[modelId];
-		const imtloggui::IGraphicsItemProvider* groupItemsProviderPtr = dynamic_cast<const imtloggui::IGraphicsItemProvider*>(m_groupViewProviderCompPtr->GetObjectPtr(groupId));
-		if (groupItemsProviderPtr != nullptr){
-			items += groupItemsProviderPtr->GetItems();
-		}
 
-		GraphicsItemList::iterator it = m_groupItems[groupId].begin();
-		while (it != m_groupItems[groupId].end()){
-			if (!items.contains(*it)){
-				m_removedItems.append(*it);
-				it = m_groupItems[groupId].erase(it);
+		for (QGraphicsItem* itemPtr : scenePtr->items()){
+			QVariant data = itemPtr->data(IScenographer::DK_GROUP_ID);
+			if (data.type() != QVariant::ByteArray){
 				continue;
 			}
 
-			it++;
-		}
-
-		for (int i = 0; i < items.count(); i++){
-			if (!m_groupItems[groupId].contains(items[i])){
-				m_addedItems.append(items[i]);
-				m_groupItems[groupId].append(items[i]);
-
-				QPointF newPos = items[i]->pos();
+			if (data.toByteArray() == groupId){
+				QPointF newPos = itemPtr->pos();
 				newPos.ry() = m_groupStaticItems[groupId].backgroundPtr->pos().y() + m_groupStaticItems[groupId].backgroundPtr->rect().height() / 2;
-
-				//items[i]->setParentItem(m_groupStaticItems[groupId].backgroundPtr);
-				items[i]->setPos(newPos);
-				items[i]->update();
+				itemPtr->setPos(newPos);
+				itemPtr->update();
 			}
-		}
-
-		if (m_addedItems.count() != 0 || m_removedItems.count() != 0){
-			istd::CChangeNotifier notifier(this);
 		}
 	}
 }

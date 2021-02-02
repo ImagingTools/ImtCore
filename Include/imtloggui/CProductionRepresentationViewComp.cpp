@@ -19,32 +19,6 @@ namespace imtloggui
 {
 
 
-// public methods
-
-// reimplemented (imtloggui::IRepresentationView)
-
-IGraphicsItemProvider::GraphicsItemList CProductionRepresentationViewComp::GetItems() const
-{
-	if (m_item.IsValid()){
-		return {m_item};
-	}
-
-	return GraphicsItemList();
-}
-
-
-IGraphicsItemProvider::GraphicsItemList CProductionRepresentationViewComp::GetAddedItems() const
-{
-	return GraphicsItemList();
-}
-
-
-IGraphicsItemProvider::GraphicsItemList CProductionRepresentationViewComp::GetRemovedItems() const
-{
-	return GraphicsItemList();
-}
-
-
 // protected methods
 
 // reimplemented (imod::CSingleModelObserverBase)
@@ -60,40 +34,52 @@ void CProductionRepresentationViewComp::OnUpdate(const istd::IChangeable::Change
 		return;
 	}
 
+	QMutexLocker locker(&m_generatedItemsMutex);
+	if (!m_generatedItems.isEmpty()){
+		CProductionQualityItem* itemPtr = dynamic_cast<CProductionQualityItem*>(m_generatedItems.first().GetPtr());
+		//CProductionSpeedItem* itemPtr = dynamic_cast<CProductionSpeedItem*>(m_item.GetPtr());
+		m_generatedItems.push_back(GraphicsItemPtr(itemPtr));
+		locker.unlock();
+
+		Q_EMIT EmitRepresentationUpdated();
+		return;
+	}
+	locker.unlock();
+
+	CProductionQualityItem* itemPtr = new CProductionQualityItem();
+	//CProductionSpeedItem* itemPtr = new CProductionSpeedItem();
+	itemPtr->setZValue(5);
+	itemPtr->SetModel(representationPtr);
+	itemPtr->SetScenePositionProvider(m_positionProviderCompPtr.GetPtr());
+	itemPtr->setAcceptHoverEvents(true);
+
+	locker.relock();
+	m_generatedItems.push_back(GraphicsItemPtr(itemPtr));
+	locker.unlock();
+
+	Q_EMIT EmitRepresentationUpdated();
+}
+
+
+// reimplemented (imtloggui::CRepresentationViewCompBase)
+
+void CProductionRepresentationViewComp::OnRepresentationUpdated()
+{
+	CProductionQualityItem* itemPtr = dynamic_cast<CProductionQualityItem*>(m_generatedItems.first().GetPtr());
+	CProductionRepresentationComp* representationPtr = dynamic_cast<CProductionRepresentationComp*>(itemPtr->GetModel());
+
 	Q_ASSERT(m_positionProviderCompPtr.IsValid());
 	double begin = m_positionProviderCompPtr->GetScenePositionFromTime(m_positionProviderCompPtr->GetBeginTime());
 	double end = m_positionProviderCompPtr->GetScenePositionFromTime(m_positionProviderCompPtr->GetEndTime());
 	uint64_t width = end - begin;
 
-	if (m_item.IsValid()){
-		CProductionQualityItem* itemPtr = dynamic_cast<CProductionQualityItem*>(m_item.GetPtr());
-		//CProductionSpeedItem* itemPtr = dynamic_cast<CProductionSpeedItem*>(m_item.GetPtr());
-		if (itemPtr->GetModel() == representationPtr){
-			if (representationPtr->GetTimeline().count() > 0){
-				itemPtr->setPos(begin, itemPtr->y());
-				itemPtr->setRect(QRectF(0, -120, width, 240));
-				itemPtr->update();
-				Q_EMIT EmitRepresentationUpdated();
-
-				return;
-			}
-		}
+	if (representationPtr->GetTimeline().count() > 0){
+		itemPtr->setPos(begin, 0);
+		itemPtr->setRect(QRectF(0, -120, width, 240));
+		itemPtr->update();
 	}
 
-	//imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(representationPtr);
-
-	CProductionQualityItem* itemPtr = new CProductionQualityItem();
-	//CProductionSpeedItem* itemPtr = new CProductionSpeedItem();
-	itemPtr->setPos(begin, 0);
-	itemPtr->setZValue(5);
-	itemPtr->setRect(QRectF(0, -120, width, 240));
-	itemPtr->SetModel(representationPtr);
-	itemPtr->SetScenePositionProvider(m_positionProviderCompPtr.GetPtr());
-	itemPtr->setAcceptHoverEvents(true);
-
-	m_item.SetPtr(itemPtr);
-
-	Q_EMIT EmitRepresentationUpdated();
+	BaseClass::OnRepresentationUpdated();
 }
 
 

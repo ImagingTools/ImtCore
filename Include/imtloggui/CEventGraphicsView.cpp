@@ -175,34 +175,18 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 	istd::CChangeNotifier notifier(this);
 
 	double scaleX = GetScaleX();
-	double scaleY = GetScaleY();
 
-	//if (event->modifiers() && Qt::Modifier::SHIFT){
-	//	if (event->delta() > 0){
-	//		ScaleViewRect(mapToScene(event->pos()), 1, 1.1);
-	//	}
-	//	else{
-	//		if (scaleY / 1.1 < m_minimumVerticalScale){
-	//			ScaleViewRect(mapToScene(event->pos()), 1, m_minimumVerticalScale / scaleY);
-	//		}
-	//		else{
-	//			ScaleViewRect(mapToScene(event->pos()), 1, 1 / 1.1);
-	//		}
-	//	}
-	//}
-	//else{
-		if (event->delta() > 0){
-			if (scaleX * 1.1 > 500000){
-				ScaleViewRect(mapToScene(event->pos()), 500000 / scaleX, 1);
-			}
-			else{
-				ScaleViewRect(mapToScene(event->pos()), 1 * 1.1, 1);
-			}
+	if (event->delta() > 0){
+		if (scaleX * 1.1 > 500000){
+			ScaleViewRect(mapToScene(event->pos()), 500000 / scaleX, 1);
 		}
 		else{
-			ScaleViewRect(mapToScene(event->pos()), 1 / 1.1, 1);
+			ScaleViewRect(mapToScene(event->pos()), 1 * 1.1, 1);
 		}
-	//}
+	}
+	else{
+		ScaleViewRect(mapToScene(event->pos()), 1 / 1.1, 1);
+	}
 
 	Q_EMIT EmitViewPortChanged(true);
 }
