@@ -351,7 +351,7 @@ void CGraphicsControllerComp::OnGroupChanged(int modelId)
 		QByteArray groupId = groupIds[modelId];
 
 		for (QGraphicsItem* itemPtr : scenePtr->items()){
-			QVariant data = itemPtr->data(IScenographer::DK_GROUP_ID);
+			QVariant data = itemPtr->data(0);
 			if (data.type() != QVariant::ByteArray){
 				continue;
 			}

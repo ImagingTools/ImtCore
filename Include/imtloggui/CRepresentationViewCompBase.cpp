@@ -20,72 +20,96 @@ CRepresentationViewCompBase::CRepresentationViewCompBase()
 
 // reimplemented (imtloggui::IScenographer)
 
-void CRepresentationViewCompBase::SetItemsSceneId(const QByteArray& sceneId)
+void CRepresentationViewCompBase::AddItemsToScene()
 {
 	Q_ASSERT(QThread::currentThread() == qApp->thread());
 
-	m_itemsSceneId = sceneId;
-
-	for (GraphicsItemPtr itemPtr : m_itemsOnScene){
-		itemPtr->setData(DK_GROUP_ID, m_itemsSceneId);
-	}
-}
-
-
-void CRepresentationViewCompBase::ActivateGraphicsItems()
-{
-	Q_ASSERT(QThread::currentThread() == qApp->thread());
-
+	QGraphicsScene* scenePtr = nullptr;
 	if (m_graphicsSceneProviderCompPtr.IsValid()){
-		// Additional integrity check
+		scenePtr = m_graphicsSceneProviderCompPtr->GetGraphicsScene();
+	}
+
+	if (scenePtr != nullptr){
 		if (!m_isActivated){
 			Q_ASSERT(m_itemsOnScene.isEmpty());
 		}
 
-		QGraphicsScene* scenePtr = m_graphicsSceneProviderCompPtr->GetGraphicsScene();
-		if (scenePtr != nullptr){
-			UpdateView(scenePtr);
-
+		if (!m_isActivated){
 			m_isActivated = true;
+
+			UpdateItemsOnScene(scenePtr);
+
+			EndChanges(istd::IChangeable::GetAnyChange());
 		}
 	}
 }
 
 
-void CRepresentationViewCompBase::DeactivateGraphicsItems()
+void CRepresentationViewCompBase::RemoveItemsFromScene()
 {
 	Q_ASSERT(QThread::currentThread() == qApp->thread());
 
+	QGraphicsScene* scenePtr = nullptr;
 	if (m_graphicsSceneProviderCompPtr.IsValid()){
-		// Additional integrity check
+		scenePtr = m_graphicsSceneProviderCompPtr->GetGraphicsScene();
+	}
+
+	if (scenePtr != nullptr){
 		if (!m_isActivated){
 			Q_ASSERT(m_itemsOnScene.isEmpty());
 		}
 
-		QGraphicsScene* scenePtr = m_graphicsSceneProviderCompPtr->GetGraphicsScene();
-		if (scenePtr != nullptr){
+		if (m_isActivated){
+			m_isActivated = false;
+
 			for (GraphicsItemPtr itemPtr : m_itemsOnScene){
 				scenePtr->removeItem(itemPtr.GetPtr());
 			}
 
 			m_itemsOnScene.clear();
-
-			m_isActivated = false;
 		}
 	}
 }
 
 
+// reimplemented (iprm::IIdParam)
+
+QByteArray CRepresentationViewCompBase::GetId() const
+{
+	return m_groupId;
+}
+
+
+void CRepresentationViewCompBase::SetId(const QByteArray& id)
+{
+	Q_ASSERT(QThread::currentThread() == qApp->thread());
+
+	m_groupId = id;
+
+	for (GraphicsItemPtr itemPtr : m_itemsOnScene){
+		itemPtr->setData(0, m_groupId);
+	}
+}
+
+
+// reimplemented (iser::ISerializable)
+
+bool CRepresentationViewCompBase::Serialize(iser::IArchive& archive)
+{
+	return false;
+}
+
+
 // protected methods
 
-void CRepresentationViewCompBase::UpdateView(QGraphicsScene* scenePtr)
+void CRepresentationViewCompBase::UpdateItemsOnScene(QGraphicsScene* scenePtr)
 {
 	QMutexLocker locker(&m_generatedItemsMutex);
 	GraphicsItemList generatedItems = m_generatedItems;
 	locker.unlock();
 
-	GraphicsItemList removedItems = GetRemovedItemList();
-	GraphicsItemList addedItems = GetAddedItemList();
+	GraphicsItemList removedItems = GetRemovedItems();
+	GraphicsItemList addedItems = GetAddedItems();
 
 	for (GraphicsItemPtr itemPtr : removedItems){
 		scenePtr->removeItem(itemPtr.GetPtr());
@@ -93,7 +117,7 @@ void CRepresentationViewCompBase::UpdateView(QGraphicsScene* scenePtr)
 
 	for (GraphicsItemPtr itemPtr : addedItems){
 		scenePtr->addItem(itemPtr.GetPtr());
-		itemPtr->setData(DK_GROUP_ID, m_itemsSceneId);
+		itemPtr->setData(0, m_groupId);
 	}
 
 	m_itemsOnScene = generatedItems;
@@ -102,7 +126,7 @@ void CRepresentationViewCompBase::UpdateView(QGraphicsScene* scenePtr)
 
 // protected methods
 
-CRepresentationViewCompBase::GraphicsItemList CRepresentationViewCompBase::GetAddedItemList()
+CRepresentationViewCompBase::GraphicsItemList CRepresentationViewCompBase::GetAddedItems()
 {
 	GraphicsItemList retVal;
 
@@ -116,7 +140,7 @@ CRepresentationViewCompBase::GraphicsItemList CRepresentationViewCompBase::GetAd
 }
 
 
-CRepresentationViewCompBase::GraphicsItemList CRepresentationViewCompBase::GetRemovedItemList()
+CRepresentationViewCompBase::GraphicsItemList CRepresentationViewCompBase::GetRemovedItems()
 {
 	GraphicsItemList retVal;
 
@@ -136,20 +160,18 @@ void CRepresentationViewCompBase::OnRepresentationUpdated()
 {
 	Q_ASSERT(QThread::currentThread() == qApp->thread());
 
-	if (m_graphicsSceneProviderCompPtr.IsValid()){
-		if (m_isActivated){
-			QGraphicsScene* scenePtr = m_graphicsSceneProviderCompPtr->GetGraphicsScene();
-			if (scenePtr != nullptr){
-				UpdateView(scenePtr);
-			}
+	if (m_isActivated){
+		QGraphicsScene* scenePtr = nullptr;
+		if (m_graphicsSceneProviderCompPtr.IsValid()){
+			scenePtr = m_graphicsSceneProviderCompPtr->GetGraphicsScene();
 		}
-		else{
-			// Additional integrity check
-			Q_ASSERT(m_itemsOnScene.isEmpty());
+
+		if (scenePtr != nullptr){
+			UpdateItemsOnScene(scenePtr);
+
+			EndChanges(istd::IChangeable::GetAnyChange());
 		}
 	}
-
-	EndChanges(istd::IChangeable::GetAnyChange());
 }
 
 
