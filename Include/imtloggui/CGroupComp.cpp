@@ -103,7 +103,8 @@ void CGroupComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (m_arrangedIds.isEmpty()){
 		if (!m_activeLayerId.isEmpty()){
-			istd::CChangeNotifier notifier(this);
+			istd::IChangeable::ChangeSet changeSet(iprm::ISelectionParam::CF_SELECTION_CHANGED);
+			istd::CChangeNotifier notifier(this, &changeSet);
 			m_activeLayerId.clear();
 		}
 
@@ -116,7 +117,8 @@ void CGroupComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 		timeRange = m_timeRangeProviderCompPtr->GetTimeRange();
 		if (!timeRange.IsClosed()){
 			if (!m_activeLayerId.isEmpty()){
-				istd::CChangeNotifier notifier(this);
+				istd::IChangeable::ChangeSet changeSet(iprm::ISelectionParam::CF_SELECTION_CHANGED);
+				istd::CChangeNotifier notifier(this, &changeSet);
 				m_activeLayerId.clear();
 			}
 
@@ -137,7 +139,8 @@ void CGroupComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 	QByteArray newLayerId = m_arrangedIds[foundKey];
 
 	if (m_activeLayerId != newLayerId){
-		istd::CChangeNotifier notifier(this);
+		istd::IChangeable::ChangeSet changeSet(iprm::ISelectionParam::CF_SELECTION_CHANGED);
+		istd::CChangeNotifier notifier(this, &changeSet);
 		m_activeLayerId = newLayerId;
 	}
 }

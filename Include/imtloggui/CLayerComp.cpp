@@ -19,7 +19,8 @@ bool CLayerComp::SetActiveRepresentationId(const QByteArray& representationId)
 {
 	if (GetElementIds().contains(representationId)){
 		if (m_activeRepresentationId != representationId){
-			istd::CChangeNotifier changeNotifier(this);
+			istd::IChangeable::ChangeSet changeSet(iprm::ISelectionParam::CF_SELECTION_CHANGED);
+			istd::CChangeNotifier notifier(this, &changeSet);
 			m_activeRepresentationId = representationId;
 			return true;
 		}

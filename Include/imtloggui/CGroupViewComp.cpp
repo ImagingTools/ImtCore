@@ -1,6 +1,10 @@
 #include <imtloggui/CGroupViewComp.h>
 
 
+#include <QDebug>
+#include <QThread>
+
+
 // Acf includes
 #include <imod/IModel.h>
 #include <iprm/IEnableableParam.h>
@@ -62,7 +66,11 @@ QByteArray CGroupViewComp::GetSelectedLayerId()
 
 void CGroupViewComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	if (!changeSet.Contains(istd::IChangeable::CF_DELEGATED)){
+	if (changeSet.Contains(iprm::ISelectionParam::CF_SELECTION_CHANGED)){
+		if (qApp->thread() != QThread::currentThread()){
+			return;
+		}
+
 		m_updateBridge.EnsureModelsDetached();
 
 		QByteArray selectedLayerId = GetSelectedLayerId();
