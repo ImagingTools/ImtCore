@@ -350,7 +350,8 @@ void CGraphicsControllerComp::OnGroupChanged(int modelId)
 		imtbase::ICollectionInfo::Ids groupIds = m_groupViewProviderCompPtr->GetElementIds();
 		QByteArray groupId = groupIds[modelId];
 
-		for (QGraphicsItem* itemPtr : scenePtr->items()){
+		QList<QGraphicsItem*> items = scenePtr->items();
+		for (QGraphicsItem* itemPtr : items){
 			QVariant data = itemPtr->data(0);
 			if (data.type() != QVariant::ByteArray){
 				continue;

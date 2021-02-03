@@ -62,7 +62,7 @@ QByteArray CGroupViewComp::GetSelectedLayerId()
 
 void CGroupViewComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	if (changeSet.Contains(iprm::ISelectionParam::CF_SELECTION_CHANGED)){
+	if (!changeSet.Contains(istd::IChangeable::CF_DELEGATED)){
 		m_updateBridge.EnsureModelsDetached();
 
 		QByteArray selectedLayerId = GetSelectedLayerId();

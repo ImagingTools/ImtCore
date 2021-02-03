@@ -105,7 +105,7 @@ QByteArray CLayerViewComp::GetSelectedRepresentationViewId()
 
 void CLayerViewComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	if (changeSet.Contains(iprm::ISelectionParam::CF_SELECTION_CHANGED) && m_isEnabled){
+	if (!changeSet.Contains(istd::IChangeable::CF_DELEGATED) && m_isEnabled){
 		m_updateBridge.EnsureModelsDetached();
 
 		QByteArray selectedRepresentationViewId = GetSelectedRepresentationViewId();

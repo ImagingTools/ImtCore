@@ -38,7 +38,7 @@ void CProductionRepresentationViewComp::OnUpdate(const istd::IChangeable::Change
 	if (!m_generatedItems.isEmpty()){
 		CProductionQualityItem* itemPtr = dynamic_cast<CProductionQualityItem*>(m_generatedItems.first().GetPtr());
 		//CProductionSpeedItem* itemPtr = dynamic_cast<CProductionSpeedItem*>(m_item.GetPtr());
-		m_generatedItems.push_back(GraphicsItemPtr(itemPtr));
+		//m_generatedItems.push_back(GraphicsItemPtr(itemPtr));
 		locker.unlock();
 
 		Q_EMIT EmitRepresentationUpdated();
@@ -76,7 +76,7 @@ void CProductionRepresentationViewComp::OnRepresentationUpdated()
 	if (representationPtr->GetTimeline().count() > 0){
 		itemPtr->setPos(begin, 0);
 		itemPtr->setRect(QRectF(0, -120, width, 240));
-		itemPtr->update();
+		itemPtr->setData(0, m_groupId);
 	}
 
 	BaseClass::OnRepresentationUpdated();

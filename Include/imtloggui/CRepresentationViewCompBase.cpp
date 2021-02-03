@@ -37,9 +37,8 @@ void CRepresentationViewCompBase::AddItemsToScene()
 		if (!m_isActivated){
 			m_isActivated = true;
 
+			istd::CChangeNotifier notifier(this);
 			UpdateItemsOnScene(scenePtr);
-
-			EndChanges(istd::IChangeable::GetAnyChange());
 		}
 	}
 }
@@ -130,9 +129,9 @@ CRepresentationViewCompBase::GraphicsItemList CRepresentationViewCompBase::GetAd
 {
 	GraphicsItemList retVal;
 
-	for (int i = 0; i < m_itemsOnScene.count(); i++){
-		if (!m_generatedItems.contains(m_itemsOnScene[i])){
-			retVal.push_back(m_itemsOnScene[i]);
+	for (int i = 0; i < m_generatedItems.count(); i++){
+		if (!m_itemsOnScene.contains(m_generatedItems[i])){
+			retVal.push_back(m_generatedItems[i]);
 		}
 	}
 
@@ -143,10 +142,10 @@ CRepresentationViewCompBase::GraphicsItemList CRepresentationViewCompBase::GetAd
 CRepresentationViewCompBase::GraphicsItemList CRepresentationViewCompBase::GetRemovedItems()
 {
 	GraphicsItemList retVal;
-
-	for (int i = 0; i < m_generatedItems.count(); i++){
-		if (!m_itemsOnScene.contains(m_generatedItems[i])){
-			retVal.push_back(m_generatedItems[i]);
+	
+	for (int i = 0; i < m_itemsOnScene.count(); i++){
+		if (!m_generatedItems.contains(m_itemsOnScene[i])){
+			retVal.push_back(m_itemsOnScene[i]);
 		}
 	}
 
@@ -167,9 +166,8 @@ void CRepresentationViewCompBase::OnRepresentationUpdated()
 		}
 
 		if (scenePtr != nullptr){
+			istd::CChangeNotifier notifier(this);
 			UpdateItemsOnScene(scenePtr);
-
-			EndChanges(istd::IChangeable::GetAnyChange());
 		}
 	}
 }
