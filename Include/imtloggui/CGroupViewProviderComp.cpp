@@ -1,6 +1,10 @@
 #include <imtloggui/CGroupViewProviderComp.h>
 
 
+// Acf includes
+#include <iprm/IIdParam.h>
+
+
 namespace imtloggui
 {
 
@@ -18,7 +22,12 @@ void CGroupViewProviderComp::OnComponentCreated()
 
 	for (int i = 0; i < count; i++){
 		Q_ASSERT(!GetElementIds().contains(m_idAttrPtr[i]));
-		RegisterObject(m_idAttrPtr[i], "", m_nameAttrPtr[i], "", m_groupViewCompPtr[i]);
+
+		iprm::IIdParam* idParamPtr = dynamic_cast<iprm::IIdParam*>(m_groupViewCompPtr[i]);
+		if (idParamPtr != nullptr){
+			RegisterObject(m_idAttrPtr[i], "", m_nameAttrPtr[i], "", m_groupViewCompPtr[i]);
+			idParamPtr->SetId(m_idAttrPtr[i]);
+		}
 	}
 }
 
