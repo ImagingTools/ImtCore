@@ -18,6 +18,7 @@ CRepresentationControllerCompBase::CRepresentationControllerCompBase()
 	:m_eventProviderObserver(*this),
 	m_worker(*this)
 {
+	connect(this, &CRepresentationControllerCompBase::EmitRepresentationCreated, this, &CRepresentationControllerCompBase::OnRepresentationCreated, Qt::QueuedConnection);
 }
 
 
@@ -31,9 +32,14 @@ void CRepresentationControllerCompBase::OnUpdate(const istd::IChangeable::Change
 		imtlog::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
 
 		if (timeRange.IsClosed()){
-			QMutexLocker locker(&m_workerJobMutex);
 			m_worker.requestInterruption();
-			m_workerJob = timeRange;
+
+			{
+				QMutexLocker locker(&m_workingDataMutex);
+
+				m_workingTimeRange = timeRange;
+			}
+
 			m_worker.Start();
 		}
 	}
@@ -58,9 +64,8 @@ void CRepresentationControllerCompBase::OnComponentCreated()
 
 // private slots
 
-void CRepresentationControllerCompBase::OnTaskFinished(QByteArray taskId)
+void CRepresentationControllerCompBase::OnRepresentationCreated()
 {
-	//qDebug() << taskId;
 }
 
 
@@ -100,9 +105,14 @@ void CRepresentationControllerCompBase::EventProviderObserver::OnUpdate(const is
 			imtlog::CTimeRange timeRange = m_parent.GetObservedObject()->GetTimeRange();
 
 			if (timeRange.IsClosed()){
-				QMutexLocker locker(&m_parent.m_workerJobMutex);
 				m_parent.m_worker.requestInterruption();
-				m_parent.m_workerJob = timeRange;
+
+				{
+					QMutexLocker locker(&m_parent.m_workingDataMutex);
+
+					m_parent.m_workingTimeRange = timeRange;
+				}
+
 				m_parent.m_worker.Start();
 			}
 		}
@@ -115,17 +125,30 @@ void CRepresentationControllerCompBase::EventProviderObserver::OnUpdate(const is
 CRepresentationControllerCompBase::Worker::Worker(CRepresentationControllerCompBase& parent)
 	:m_parent(parent)
 {
+	m_workingRepresentationPtr.SetPtr(parent.m_representationFactPtr.CreateComponent());
 }
 
 
 void CRepresentationControllerCompBase::Worker::run()
 {
+	if (!m_workingRepresentationPtr.IsValid()){
+		return;
+	}
+
+	istd::IChangeable* workingInstancePtr = m_parent.m_representationFactPtr.ExtractInterface(m_workingRepresentationPtr.GetPtr());
+	if (workingInstancePtr == nullptr){
+		return;
+	}
+
 	bool isFinished = false;
 
 	while (!isFinished){
-		QMutexLocker locker(&m_parent.m_workerJobMutex);
-		imtlog::CTimeRange jobTimeRange = m_parent.m_workerJob;
-		m_parent.m_workerJob.Clear();
+		QMutexLocker locker(&m_parent.m_workingDataMutex);
+
+		imtlog::CTimeRange jobTimeRange = m_parent.m_workingTimeRange;
+
+		m_parent.m_workingTimeRange.Clear();
+
 		locker.unlock();
 
 		if (jobTimeRange.IsClosed()){
@@ -136,11 +159,12 @@ void CRepresentationControllerCompBase::Worker::run()
 						m_parent.m_messageFilterParamsCompPtr.GetPtr());
 
 			if (containerPtr.IsValid()){
-				imtlog::CEventHistoryResultContainer* eventHistoryResultContainer =
-							dynamic_cast<imtlog::CEventHistoryResultContainer*>(containerPtr.GetPtr());
+				imtlog::CEventHistoryResultContainer* eventHistoryResultContainerPtr = dynamic_cast<imtlog::CEventHistoryResultContainer*>(containerPtr.GetPtr());
+				Q_ASSERT(eventHistoryResultContainerPtr != nullptr);
 
-				while (!eventHistoryResultContainer->IsClosed() && !isFinished){
+				while (!eventHistoryResultContainerPtr->IsClosed() && !isFinished){
 					msleep(1);
+
 					if (isInterruptionRequested()){
 						isFinished = true;
 					}
@@ -148,9 +172,11 @@ void CRepresentationControllerCompBase::Worker::run()
 
 				if (!isFinished){
 					m_parent.BuildRepresentation(
-								*m_parent.m_representationCompPtr,
+								*workingInstancePtr,
 								containerPtr,
 								jobTimeRange);
+
+					Q_EMIT m_parent.EmitRepresentationCreated();
 				}
 			}
 		}

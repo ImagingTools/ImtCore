@@ -39,6 +39,7 @@ public:
 		I_ASSIGN(m_representationCompPtr, "RepresentationData", "Representation data model", true, "RepresentationData");
 		I_ASSIGN(m_eventFilterCompPtr, "EventFilter", "Event filter", false, "EventFilter");
 		I_ASSIGN(m_messageFilterParamsCompPtr, "MessageFilterParams", "Message filter params", false, "MessageFilterParams");
+		I_ASSIGN(m_representationFactPtr, "RepresentationFactory", "Factory used for creation of the working instance", true, "RepresentationFactory");
 	I_END_COMPONENT
 
 	CRepresentationControllerCompBase();
@@ -64,9 +65,13 @@ protected:
 	I_REF(istd::IChangeable, m_representationCompPtr);
 	I_REF(imtlog::IEventFilter, m_eventFilterCompPtr);
 	I_REF(imtlog::IMessageFilterParams, m_messageFilterParamsCompPtr);
+	I_FACT(istd::IChangeable, m_representationFactPtr);
+
+Q_SIGNALS:
+	void EmitRepresentationCreated();
 
 private Q_SLOTS:
-	void OnTaskFinished(QByteArray taskId);
+	void OnRepresentationCreated();
 
 private:
 	class EventProviderObserver: public imod::TSingleModelObserverBase<imtlog::IEventProvider>
@@ -81,26 +86,6 @@ private:
 		CRepresentationControllerCompBase& m_parent;
 	};
 
-	class CreateRepresentationTask:
-				public imod::TSingleModelObserverBase<ilog::IMessageContainer>,
-				public istd::IChangeable
-	{
-	public:
-		imtlog::CTimeRange timeRange;
-		imtlog::IEventProvider* eventProviderPtr;
-		imtlog::IEventFilter* eventFilterPtr;
-		imtlog::IMessageFilterParams* messageFilterParamsPtr;
-		CRepresentationControllerCompBase* controllerPtr;
-		istd::IChangeable* representationPtr;
-		uint8_t updateCount;
-
-	protected:
-		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override
-		{
-			updateCount++;
-		}
-	};
-
 	class Worker: public imtlog::CWorkerBase
 	{
 	public:
@@ -111,14 +96,15 @@ private:
 
 	private:
 		CRepresentationControllerCompBase& m_parent;
+		istd::TDelPtr<icomp::IComponent> m_workingRepresentationPtr;
 	};
 
 private:
 	EventProviderObserver m_eventProviderObserver;
 
 	Worker m_worker;
-	imtlog::CTimeRange m_workerJob;
-	QMutex m_workerJobMutex;
+	imtlog::CTimeRange m_workingTimeRange;
+	QMutex m_workingDataMutex;
 };
 
 
