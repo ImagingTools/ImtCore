@@ -365,7 +365,7 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(objectDataTag);
 
 		if (retVal && !archive.IsStoring()){
-			m_objects.append(elementInfo);
+			InsertObjectIntoCollection(elementInfo);
 		}
 
 		retVal = retVal && archive.EndTag(objectTag);

@@ -74,8 +74,12 @@ void CGraphicsControllerComp::InitScene()
 
 		for (int i = 0; i < ids.count(); i++){
 			QString name = m_groupViewProviderCompPtr->GetElementInfo(ids[i], imtbase::ICollectionInfo::EIT_NAME).toString();
-			//QColor color(Qt::GlobalColor(Qt::magenta + i));
-			QColor color(Qt::gray);
+			QColor color(Qt::white);
+
+			if (i % 2 != 0){
+				color = QColor(230, 230, 230);
+			}
+
 			int height = 300;
 			if (m_groupViewVisualSettingsCompPtr.IsValid()){
 				const imtloggui::IGroupVisualSettings* groupSettingsPtr = dynamic_cast<const imtloggui::IGroupVisualSettings*>(m_groupViewVisualSettingsCompPtr->GetObjectPtr(ids[i]));
