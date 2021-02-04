@@ -34,39 +34,18 @@ void CProductionRepresentationViewComp::OnUpdate(const istd::IChangeable::Change
 		return;
 	}
 
-	QMutexLocker locker(&m_generatedItemsMutex);
-	if (!m_generatedItems.isEmpty()){
-		CProductionQualityItem* itemPtr = dynamic_cast<CProductionQualityItem*>(m_generatedItems.first().GetPtr());
-		//CProductionSpeedItem* itemPtr = dynamic_cast<CProductionSpeedItem*>(m_item.GetPtr());
-		//m_generatedItems.push_back(GraphicsItemPtr(itemPtr));
-		locker.unlock();
+	if (m_generatedItems.isEmpty()){
+		CProductionQualityItem* itemPtr = new CProductionQualityItem();
+		//CProductionSpeedItem* itemPtr = new CProductionSpeedItem();
+		itemPtr->setZValue(5);
+		itemPtr->SetModel(representationPtr);
+		itemPtr->SetScenePositionProvider(m_positionProviderCompPtr.GetPtr());
+		itemPtr->setAcceptHoverEvents(true);
 
-		Q_EMIT EmitRepresentationUpdated();
-		return;
+		m_generatedItems.push_back(GraphicsItemPtr(itemPtr));
 	}
-	locker.unlock();
 
-	CProductionQualityItem* itemPtr = new CProductionQualityItem();
-	//CProductionSpeedItem* itemPtr = new CProductionSpeedItem();
-	itemPtr->setZValue(5);
-	itemPtr->SetModel(representationPtr);
-	itemPtr->SetScenePositionProvider(m_positionProviderCompPtr.GetPtr());
-	itemPtr->setAcceptHoverEvents(true);
-
-	locker.relock();
-	m_generatedItems.push_back(GraphicsItemPtr(itemPtr));
-	locker.unlock();
-
-	Q_EMIT EmitRepresentationUpdated();
-}
-
-
-// reimplemented (imtloggui::CRepresentationViewCompBase)
-
-void CProductionRepresentationViewComp::OnRepresentationUpdated()
-{
 	CProductionQualityItem* itemPtr = dynamic_cast<CProductionQualityItem*>(m_generatedItems.first().GetPtr());
-	CProductionRepresentationComp* representationPtr = dynamic_cast<CProductionRepresentationComp*>(itemPtr->GetModel());
 
 	Q_ASSERT(m_positionProviderCompPtr.IsValid());
 	double begin = m_positionProviderCompPtr->GetScenePositionFromTime(m_positionProviderCompPtr->GetBeginTime());
@@ -79,7 +58,7 @@ void CProductionRepresentationViewComp::OnRepresentationUpdated()
 		itemPtr->setData(0, m_groupId);
 	}
 
-	BaseClass::OnRepresentationUpdated();
+	BaseClass::OnUpdate(changeSet);
 }
 
 

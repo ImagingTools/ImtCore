@@ -14,7 +14,6 @@ namespace imtloggui
 CRepresentationViewCompBase::CRepresentationViewCompBase()
 	:m_isActivated(false)
 {
-	connect(this, &CRepresentationViewCompBase::EmitRepresentationUpdated, this, &CRepresentationViewCompBase::OnRepresentationUpdated, Qt::QueuedConnection);
 }
 
 
@@ -103,10 +102,6 @@ bool CRepresentationViewCompBase::Serialize(iser::IArchive& archive)
 
 void CRepresentationViewCompBase::UpdateItemsOnScene(QGraphicsScene* scenePtr)
 {
-	QMutexLocker locker(&m_generatedItemsMutex);
-	GraphicsItemList generatedItems = m_generatedItems;
-	locker.unlock();
-
 	GraphicsItemList removedItems = GetRemovedItems();
 	GraphicsItemList addedItems = GetAddedItems();
 
@@ -119,7 +114,7 @@ void CRepresentationViewCompBase::UpdateItemsOnScene(QGraphicsScene* scenePtr)
 		itemPtr->setData(0, m_groupId);
 	}
 
-	m_itemsOnScene = generatedItems;
+	m_itemsOnScene = m_generatedItems;
 }
 
 
@@ -153,9 +148,9 @@ CRepresentationViewCompBase::GraphicsItemList CRepresentationViewCompBase::GetRe
 }
 
 
-// protected slots:
+// reimplemented (imod::CSingleModelObserverBase)
 
-void CRepresentationViewCompBase::OnRepresentationUpdated()
+void CRepresentationViewCompBase::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	Q_ASSERT(QThread::currentThread() == qApp->thread());
 

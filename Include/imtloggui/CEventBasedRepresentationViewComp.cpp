@@ -13,9 +13,9 @@ namespace imtloggui
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CEventBasedRepresentationViewComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CEventBasedRepresentationViewComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	GraphicsItemList items;
+	m_generatedItems.clear();
 
 	const ilog::IMessageContainer* representationObjectPtr = dynamic_cast<const ilog::IMessageContainer*>(GetObservedObject());
 	if (representationObjectPtr != nullptr){
@@ -33,16 +33,12 @@ void CEventBasedRepresentationViewComp::OnUpdate(const istd::IChangeable::Change
 					graphicsItemPtr->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIgnoresTransformations);
 					graphicsItemPtr->setPos(m_positionProviderCompPtr->GetScenePositionFromTime(messageTimeStamp), 0);
 
-					items.push_back(GraphicsItemPtr(graphicsItemPtr));
+					m_generatedItems.push_back(GraphicsItemPtr(graphicsItemPtr));
 				}
 			}
 		}
 
-		QMutexLocker locker(&m_generatedItemsMutex);
-		m_generatedItems = items;
-		locker.unlock();
-
-		Q_EMIT EmitRepresentationUpdated();
+		BaseClass::OnUpdate(changeSet);
 	}
 }
 

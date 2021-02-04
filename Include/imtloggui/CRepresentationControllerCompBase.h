@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QThread>
+#include <QtCore/QQueue>
 
 // Acf includes
 #include <imod/TModelWrap.h>
@@ -74,6 +75,8 @@ private Q_SLOTS:
 	void OnRepresentationCreated();
 
 private:
+	typedef istd::TSmartPtr<icomp::IComponent> RepresentationCompPtr;
+
 	class EventProviderObserver: public imod::TSingleModelObserverBase<imtlog::IEventProvider>
 	{
 	public:
@@ -86,7 +89,7 @@ private:
 		CRepresentationControllerCompBase& m_parent;
 	};
 
-	class Worker: public imtlog::CWorkerBase
+	class Worker: public QThread
 	{
 	public:
 		Worker(CRepresentationControllerCompBase& parent);
@@ -96,15 +99,16 @@ private:
 
 	private:
 		CRepresentationControllerCompBase& m_parent;
-		istd::TDelPtr<icomp::IComponent> m_workingRepresentationPtr;
 	};
 
 private:
 	EventProviderObserver m_eventProviderObserver;
 
 	Worker m_worker;
-	imtlog::CTimeRange m_workingTimeRange;
-	QMutex m_workingDataMutex;
+	QQueue<imtlog::CTimeRange> m_workerQueue;
+	QMutex m_workerQueueMutex;
+	QQueue<RepresentationCompPtr> m_representationQueue;
+	QMutex m_representationQueueMutex;
 };
 
 

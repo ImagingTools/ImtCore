@@ -55,9 +55,6 @@ public:
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
-Q_SIGNALS:
-	void EmitRepresentationUpdated();
-
 public:
 	typedef istd::TSmartPtr<QGraphicsItem> GraphicsItemPtr;
 	typedef QList<GraphicsItemPtr> GraphicsItemList;
@@ -67,8 +64,8 @@ protected:
 	GraphicsItemList GetAddedItems();
 	GraphicsItemList GetRemovedItems();
 
-protected Q_SLOTS:
-	virtual void OnRepresentationUpdated();
+	// reimplemented (imod::CSingleModelObserverBase)
+	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 protected:
 	I_REF(IGraphicsSceneProvider, m_graphicsSceneProviderCompPtr);
@@ -79,7 +76,6 @@ protected:
 
 	GraphicsItemList m_itemsOnScene;
 	GraphicsItemList m_generatedItems;
-	QMutex m_generatedItemsMutex;
 };
 
 

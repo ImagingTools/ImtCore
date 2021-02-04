@@ -26,10 +26,6 @@ public:
 protected:
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
-
-protected:
-	// reimplemented (imtloggui::CRepresentationViewCompBase)
-	virtual void OnRepresentationUpdated() override;
 };
 
 

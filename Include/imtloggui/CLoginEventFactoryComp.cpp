@@ -40,16 +40,18 @@ IEventItem* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsumer:
 	}
 
 	const imtlog::CLoginEvent* eventPtr = dynamic_cast<const imtlog::CLoginEvent*>(message.GetPtr());
-	Q_ASSERT(eventPtr != nullptr);
+	if (eventPtr != nullptr){
+		CLoginEventItem* itemPtr = new imod::TModelWrap<CLoginEventItem>();
+		itemPtr->SetParams(
+			loginIcon,
+			logoutIcon,
+			QSize(iconSize, iconSize),
+			message);
 
-	CLoginEventItem* itemPtr = new imod::TModelWrap<CLoginEventItem>();
-	itemPtr->SetParams(
-		loginIcon,
-		logoutIcon,
-		QSize(iconSize, iconSize),
-		message);
+		return itemPtr;
+	}
 
-	return itemPtr;
+	return nullptr;
 }
 
 

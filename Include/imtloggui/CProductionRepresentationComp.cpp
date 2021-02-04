@@ -139,6 +139,26 @@ qint64 CProductionRepresentationComp::CalculateIntervalBeginTime(qint64 timeStam
 }
 
 
+// reimplemented (istd::IChangeable)
+
+bool CProductionRepresentationComp::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+{
+	const CProductionRepresentationComp* sourcePtr = dynamic_cast<const CProductionRepresentationComp*>(&object);
+	if (sourcePtr != nullptr){
+		istd::CChangeNotifier notifier(this);
+
+		m_maxCount = sourcePtr->m_maxCount;
+		m_maxCounters = sourcePtr->m_maxCounters;
+		m_granularity = sourcePtr->m_granularity;
+		m_timeline = sourcePtr->m_timeline;
+
+		return true;
+	}
+
+	return false;
+}
+
+
 } // namespace imtloggui
 
 

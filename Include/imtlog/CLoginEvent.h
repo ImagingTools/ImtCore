@@ -48,6 +48,10 @@ public:
 	// reimplemented (iser::IObject)
 	virtual QByteArray GetFactoryId() const override;
 
+	// reimplemented (istd::IChangeable)
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+
 public:
 	static QByteArray GetTypeId();
 

@@ -47,6 +47,13 @@ void CProductionRepresentationControllerComp::BuildRepresentation(
 
 		representationPtr->ClearStatistics();
 
+		if (m_granularityAttrPtr.IsValid()){
+			representationPtr->SetGranularity(*m_granularityAttrPtr);
+		}
+		else{
+			representationPtr->SetGranularity(60);
+		}
+
 		if (containerPtr.IsValid()){
 			ilog::IMessageContainer::Messages messages = containerPtr->GetMessages();
 			for (int i = messages.count() - 1; i >= 0; i--){

@@ -70,6 +70,32 @@ QByteArray CLoginEvent::GetFactoryId() const
 }
 
 
+// reimplemented (istd::IChangeable)
+
+bool CLoginEvent::CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode)
+{
+	const CLoginEvent* sourcePtr = dynamic_cast<const CLoginEvent*>(&object);
+	if (sourcePtr != nullptr){
+		m_loginEventInfo = sourcePtr->m_loginEventInfo;
+		return true;
+	}
+
+	return false;
+}
+
+
+istd::IChangeable* CLoginEvent::CloneMe(istd::IChangeable::CompatibilityMode mode) const
+{
+	return new CLoginEvent(
+				m_loginEventInfo,
+				m_category,
+				m_text,
+				m_source,
+				m_flags,
+				&m_timeStamp);
+}
+
+
 // public static methods
 
 QByteArray CLoginEvent::GetTypeId()

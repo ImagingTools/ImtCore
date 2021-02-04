@@ -32,7 +32,21 @@ public:
 	CProductionRepresentationComp();
 
 	typedef QMap<qint64, imtbase::IEventStatistics::EventsInfo> Timeline;
+	struct MaxCounters;
 
+	quint64 GetGranularity() const;
+	void SetGranularity(quint64 granularity);
+	const Timeline& GetTimeline() const;
+	quint64 GetMaxCount() const;
+	const MaxCounters& GetMaxCounters() const;
+	void ClearStatistics();
+	void AddMessage(const ilog::IMessageConsumer::MessagePtr& message);
+	qint64 CalculateIntervalBeginTime(qint64 timeStamp);
+
+	// reimplemented (istd::IChangeable)
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+
+public:
 	struct MaxCounters
 	{
 		quint64 oks;
@@ -50,15 +64,6 @@ public:
 		{
 		}
 	};
-
-	quint64 GetGranularity() const;
-	void SetGranularity(quint64 granularity);
-	const Timeline& GetTimeline() const;
-	quint64 GetMaxCount() const;
-	const MaxCounters& GetMaxCounters() const;
-	void ClearStatistics();
-	void AddMessage(const ilog::IMessageConsumer::MessagePtr& message);
-	qint64 CalculateIntervalBeginTime(qint64 timeStamp);
 
 private:
 	quint64 m_maxCount;
