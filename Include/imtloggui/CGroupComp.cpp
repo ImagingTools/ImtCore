@@ -1,6 +1,9 @@
 #include <imtloggui/CGroupComp.h>
 
 
+// Acf includes
+#include <iprm/IEnableableParam.h>
+
 // ImtCore includes
 #include <imtbase/IObjectProvider.h>
 
@@ -102,12 +105,7 @@ bool CGroupComp::IsOptionEnabled(int index) const
 void CGroupComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (m_arrangedIds.isEmpty()){
-		if (!m_activeLayerId.isEmpty()){
-			istd::IChangeable::ChangeSet changeSet(iprm::ISelectionParam::CF_SELECTION_CHANGED);
-			istd::CChangeNotifier notifier(this, &changeSet);
-			m_activeLayerId.clear();
-		}
-
+		SetActiveLayer(QByteArray());
 		return;
 	}
 
@@ -116,12 +114,7 @@ void CGroupComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 	if (m_timeRangeProviderCompPtr.IsValid()){
 		timeRange = m_timeRangeProviderCompPtr->GetTimeRange();
 		if (!timeRange.IsClosed()){
-			if (!m_activeLayerId.isEmpty()){
-				istd::IChangeable::ChangeSet changeSet(iprm::ISelectionParam::CF_SELECTION_CHANGED);
-				istd::CChangeNotifier notifier(this, &changeSet);
-				m_activeLayerId.clear();
-			}
-
+			SetActiveLayer(QByteArray());
 			return;
 		}
 	}
@@ -138,11 +131,7 @@ void CGroupComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 
 	QByteArray newLayerId = m_arrangedIds[foundKey];
 
-	if (m_activeLayerId != newLayerId){
-		istd::IChangeable::ChangeSet changeSet(iprm::ISelectionParam::CF_SELECTION_CHANGED);
-		istd::CChangeNotifier notifier(this, &changeSet);
-		m_activeLayerId = newLayerId;
-	}
+	SetActiveLayer(newLayerId);
 }
 
 
@@ -168,7 +157,7 @@ void CGroupComp::OnComponentCreated()
 		m_arrangedIds.remove(m_arrangedIds.firstKey());
 		m_arrangedIds[0] = id;
 
-		m_activeLayerId = id;
+		SetActiveLayer(id);
 	}
 
 	if (m_timeRangeProviderCompPtr.IsValid() && m_timeRangeProviderModelCompPtr.IsValid()){
@@ -184,6 +173,34 @@ void CGroupComp::OnComponentDestroyed()
 	}
 
 	BaseClass::OnComponentDestroyed();
+}
+
+
+// private mothods
+
+void CGroupComp::SetActiveLayer(const QByteArray& layerId)
+{
+	if (m_activeLayerId != layerId){
+		ICollectionInfo::Ids ids = GetElementIds();
+		if (ids.contains(layerId)){
+			istd::IChangeable::ChangeSet changeSet(iprm::ISelectionParam::CF_SELECTION_CHANGED);
+			istd::CChangeNotifier notifier(this, &changeSet);
+			m_activeLayerId = layerId;
+
+			for (QByteArray& objectId : ids){
+				iprm::IEnableableParam* enableableParamPtr = dynamic_cast<iprm::IEnableableParam*>(
+							const_cast<istd::IChangeable*>(BaseClass2::GetObjectPtr(objectId)));
+				Q_ASSERT(enableableParamPtr != nullptr);
+
+				if (objectId == m_activeLayerId){
+					enableableParamPtr->SetEnabled(true);
+				}
+				else{
+					enableableParamPtr->SetEnabled(false);
+				}
+			}
+		}
+	}
 }
 
 

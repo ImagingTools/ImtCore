@@ -16,9 +16,40 @@ namespace imtloggui
 
 CRepresentationControllerCompBase::CRepresentationControllerCompBase()
 	:m_eventProviderObserver(*this),
-	m_worker(*this)
+	m_worker(*this),
+	m_isEnabled(false)
 {
 	connect(this, &CRepresentationControllerCompBase::EmitRepresentationCreated, this, &CRepresentationControllerCompBase::OnRepresentationCreated, Qt::QueuedConnection);
+}
+
+
+// reimplemented (iprm::IEnableableParam)
+
+bool CRepresentationControllerCompBase::IsEnabled() const
+{
+	return m_isEnabled;
+}
+
+
+bool CRepresentationControllerCompBase::IsEnablingAllowed() const
+{
+	return true;
+}
+
+
+bool CRepresentationControllerCompBase::SetEnabled(bool isEnabled)
+{
+	m_isEnabled = isEnabled;
+
+	return true;
+}
+
+
+// reimplemented (iser::ISerializable)
+
+bool CRepresentationControllerCompBase::Serialize(iser::IArchive& /*archive*/)
+{
+	return false;
 }
 
 
@@ -28,12 +59,14 @@ CRepresentationControllerCompBase::CRepresentationControllerCompBase()
 
 void CRepresentationControllerCompBase::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	if (m_representationCompPtr.IsValid() && m_eventProviderCompPtr.IsValid()){
-		imtlog::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
+	if (m_isEnabled){
+		if (m_representationCompPtr.IsValid() && m_eventProviderCompPtr.IsValid()){
+			imtlog::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
 
-		if (timeRange.IsClosed()){
-			QMutexLocker locker(&m_workerQueueMutex);
-			m_workerQueue.enqueue(timeRange);
+			if (timeRange.IsClosed()){
+				QMutexLocker locker(&m_workerQueueMutex);
+				m_workerQueue.enqueue(timeRange);
+			}
 		}
 	}
 }
@@ -111,13 +144,15 @@ CRepresentationControllerCompBase::EventProviderObserver::EventProviderObserver(
 
 void CRepresentationControllerCompBase::EventProviderObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	if (m_parent.m_representationCompPtr.IsValid() && m_parent.m_eventProviderCompPtr.IsValid()){
-		if (m_parent.m_timeRangeProviderCompPtr.IsValid()){
-			imtlog::CTimeRange timeRange = m_parent.GetObservedObject()->GetTimeRange();
+	if (m_parent.m_isEnabled){
+		if (m_parent.m_representationCompPtr.IsValid() && m_parent.m_eventProviderCompPtr.IsValid()){
+			if (m_parent.m_timeRangeProviderCompPtr.IsValid()){
+				imtlog::CTimeRange timeRange = m_parent.GetObservedObject()->GetTimeRange();
 
-			if (timeRange.IsClosed()){
-				QMutexLocker locker(&m_parent.m_workerQueueMutex);
-				m_parent.m_workerQueue.enqueue(timeRange);
+				if (timeRange.IsClosed()){
+					QMutexLocker locker(&m_parent.m_workerQueueMutex);
+					m_parent.m_workerQueue.enqueue(timeRange);
+				}
 			}
 		}
 	}

@@ -62,6 +62,9 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 private:
+	void SetActiveLayer(const QByteArray& layerId);
+
+private:
 	I_MULTIATTR(QByteArray, m_idAttrPtr);
 	I_MULTIATTR(QString, m_nameAttrPtr);
 	I_MULTIATTR(double, m_minTimespanAttrPtr);

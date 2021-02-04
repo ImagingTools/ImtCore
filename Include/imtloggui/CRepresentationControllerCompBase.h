@@ -6,6 +6,7 @@
 #include <QtCore/QQueue>
 
 // Acf includes
+#include <iprm/IEnableableParam.h>
 #include <imod/TModelWrap.h>
 #include <imod/TSingleModelObserverBase.h>
 #include <icomp/CComponentBase.h>
@@ -25,7 +26,8 @@ namespace imtloggui
 class CRepresentationControllerCompBase:
 			public QObject,
 			public icomp::CComponentBase,
-			protected imod::TSingleModelObserverBase<imtlog::ITimeRangeProvider>
+			protected imod::TSingleModelObserverBase<imtlog::ITimeRangeProvider>,
+			virtual public iprm::IEnableableParam
 {
 	Q_OBJECT
 public:
@@ -33,6 +35,7 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CRepresentationControllerCompBase)
 		I_REGISTER_INTERFACE(imod::IObserver);
+		I_REGISTER_INTERFACE(iprm::IEnableableParam);
 		I_ASSIGN(m_eventProviderCompPtr, "EventProvider", "Event provider", true, "EventProvider");
 		I_ASSIGN_TO(m_eventProviderModelCompPtr, m_eventProviderCompPtr, true);
 		I_ASSIGN(m_timeRangeProviderCompPtr, "TimeRangeProvider", "TimeRangeProvider", false, "TimeRangeProvider");
@@ -44,6 +47,14 @@ public:
 	I_END_COMPONENT
 
 	CRepresentationControllerCompBase();
+
+	// reimplemented (iprm::IEnableableParam)
+	virtual bool IsEnabled() const override;
+	virtual bool IsEnablingAllowed() const override;
+	virtual bool SetEnabled(bool isEnabled = true) override;
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 protected:
 	virtual void BuildRepresentation(
@@ -109,6 +120,8 @@ private:
 	QMutex m_workerQueueMutex;
 	QQueue<RepresentationCompPtr> m_representationQueue;
 	QMutex m_representationQueueMutex;
+
+	bool m_isEnabled;
 };
 
 
