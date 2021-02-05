@@ -56,6 +56,8 @@ CEventViewComp::CEventViewComp()
 	connect(&m_zoomInCommand, &QAction::triggered, this, &CEventViewComp::OnZoomInCommand);
 	connect(&m_zoomOutCommand, &QAction::triggered, this, &CEventViewComp::OnZoomOutCommand);
 	connect(&m_zoomReset, &QAction::triggered, this, &CEventViewComp::OnZoomReset);
+
+	m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 }
 
 
