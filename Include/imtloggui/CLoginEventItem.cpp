@@ -15,17 +15,14 @@ namespace imtloggui
 // public methods
 
 void CLoginEventItem::SetParams(
-			const QIcon& iconLogin,
-			const QIcon& iconLogout,
-			const QSize& iconSize,
-			const ilog::IMessageConsumer::MessagePtr& message,
+			const QPixmap& iconLogin,
+			const QPixmap& iconLogout,
+			const ilog::IMessageConsumer::MessagePtr& messagePtr,
 			QGraphicsItem* parentPtr)
 {
-	BaseClass::SetParams(message, parentPtr);
-
+	BaseClass::SetParams(messagePtr, parentPtr);
 	m_iconLogin = iconLogin;
 	m_iconLogout = iconLogout;
-	m_iconSize = iconSize;
 }
 
 
@@ -81,16 +78,31 @@ QString CLoginEventItem::GetMetaInfoName(int metaInfoType) const
 
 QRectF CLoginEventItem::boundingRect() const
 {
-	QFontMetrics fontMetrics(m_font);
+	if (m_boundingRect.isNull()){
+		const imtlog::CLoginEvent* eventPtr = dynamic_cast<const imtlog::CLoginEvent*>(GetInformationProvider());
+		Q_ASSERT(eventPtr != nullptr);
 
-	QString user = GetInformationProvider()->GetInformationDescription();
-	QRectF labelRect = fontMetrics.boundingRect(user);
+		QFontMetrics fontMetrics(m_font);
 
-	QRectF rect(0, 0, m_iconSize.width(), m_iconSize.height());
-	rect.setWidth(qMax(labelRect.width(), rect.width()));
-	rect.setHeight(labelRect.height() + rect.height());
+		QString user = eventPtr->GetLoginEventInfo().userName;
+		m_labelRect = fontMetrics.boundingRect(user);
 
-	return QRectF(-rect.width() / 2, -rect.height() / 2, rect.width(), rect.height());
+		QRectF rect;
+
+		if (eventPtr->GetLoginEventInfo().action == imtlog::CLoginEvent::ACT_LOGIN){
+			rect = m_iconLogin.rect();
+		}
+		else{
+			rect = m_iconLogout.rect();
+		}
+
+		rect.setWidth(qMax(m_labelRect.width(), rect.width()));
+		rect.setHeight(m_labelRect.height() + rect.height());
+
+		m_boundingRect = QRectF(-rect.width() / 2, -rect.height() / 2, rect.width(), rect.height());
+	}
+
+	return m_boundingRect;
 }
 
 
@@ -105,14 +117,9 @@ void CLoginEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /
 		m_font = painter->font();
 	}
 
-	QFontMetrics fontMetrics(m_font);
-
 	QString user = eventPtr->GetLoginEventInfo().userName;
-	QRectF labelRect = fontMetrics.boundingRect(user);
-	labelRect.setWidth(labelRect.width() + 1);
-	const QRectF bounding = boundingRect();
 
-	QIcon icon;
+	QPixmap icon;
 
 	if (eventPtr->GetLoginEventInfo().action == imtlog::CLoginEvent::ACT_LOGIN){
 		icon = m_iconLogin;
@@ -121,13 +128,15 @@ void CLoginEventItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /
 		icon = m_iconLogout;
 	}
 
-	painter->setRenderHint(QPainter::SmoothPixmapTransform);
-	painter->drawPixmap(QRect(-m_iconSize.width() / 2, bounding.top(), m_iconSize.width(), m_iconSize.height()), icon.pixmap(m_iconSize));
-	painter->drawText(labelRect.translated(QPointF(-labelRect.width() / 2, bounding.bottom() - labelRect.bottom())), user);
+	QPointF pixmapPos= m_boundingRect.topLeft();
+	pixmapPos.rx() += ((m_boundingRect.width() - icon.width()) / 2);
+
+	painter->drawPixmap(pixmapPos, icon);
+	painter->drawText(m_labelRect.translated(QPointF(-m_labelRect.width() / 2, m_boundingRect.bottom() - m_labelRect.bottom())), user);
 
 	if (isSelected()){
 		painter->setPen(QPen(Qt::red, 1));
-		painter->drawRoundedRect(bounding.adjusted(-2, -2, 2, 2), 2, 2);
+		painter->drawRoundedRect(m_boundingRect.adjusted(-2, -2, 2, 2), 2, 2);
 	}
 }
 

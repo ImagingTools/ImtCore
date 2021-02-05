@@ -16,11 +16,10 @@ namespace imtloggui
 
 // public methods
 
-void CEventItemBase::SetParams(const ilog::IMessageConsumer::MessagePtr& message, QGraphicsItem* parentPtr)
+void CEventItemBase::SetParams(const ilog::IMessageConsumer::MessagePtr& messagePtr, QGraphicsItem* parentPtr)
 {
-	BaseClass::SetParams(parentPtr);
-
-	m_messagePtr = message;
+	BaseClass::setParentItem(parentPtr);
+	m_messagePtr = messagePtr;
 }
 
 
@@ -80,6 +79,12 @@ QVariant CEventItemBase::GetMetaInfo(int metaInfoType) const
 }
 
 
+bool CEventItemBase::SetMetaInfo(int /*metaInfoType*/, const QVariant& /*metaInfo*/)
+{
+	return false;
+}
+
+
 QString CEventItemBase::GetMetaInfoName(int metaInfoType) const
 {
 	switch (metaInfoType){
@@ -94,6 +99,18 @@ QString CEventItemBase::GetMetaInfoName(int metaInfoType) const
 	default:
 		return QString();
 	}
+}
+
+
+QString CEventItemBase::GetMetaInfoDescription(int /*metaInfoType*/) const
+{
+	return QString();
+}
+
+
+bool CEventItemBase::IsMetaInfoWritable(int /*metaInfoType*/) const
+{
+	return false;
 }
 
 

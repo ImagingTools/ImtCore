@@ -1,6 +1,9 @@
 #include <imtloggui/CIconBasedEventFactoryComp.h>
 
 
+// Qt includes
+#include <QtGui/QIcon>
+
 // Acf includes
 #include <imod/TModelWrap.h>
 
@@ -16,44 +19,26 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IEventItemFactory)
 
-IEventItem* CIconBasedEventFactoryComp::CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const
+IEventItem* CIconBasedEventFactoryComp::CreateInstance(const ilog::IMessageConsumer::MessagePtr& messagePtr) const
 {
-	if (!IsSupportedMessageId(message->GetInformationId())){
-		return CreateInstanceWithSlaveFactory(message);
+	if (!IsSupportedMessageId(messagePtr->GetInformationId())){
+		return CreateInstanceWithSlaveFactory(messagePtr);
 	}
 
-	QString status;
-	QIcon icon;
 	int iconSize = 24;
-	
-	switch (message->GetInformationCategory()){
-	case istd::IInformationProvider::IC_NONE:
-		status = QObject::tr("UNKNOWN");
-		break;
-	case istd::IInformationProvider::IC_INFO:
-		status = QObject::tr("OK");
-		break;
-	case istd::IInformationProvider::IC_WARNING:
-		status = QObject::tr("WARNING");
-		break;
-	case istd::IInformationProvider::IC_ERROR:
-		status = QObject::tr("ERROR");
-		break;
-	case istd::IInformationProvider::IC_CRITICAL:
-		status = QObject::tr("CRITICAL");
-		break;
-	}
-
-	if (m_iconAttrPtr.IsValid()){
-		icon = QIcon(*m_iconAttrPtr);
-	}
 
 	if (m_iconSizeAttrPtr.IsValid()){
 		iconSize = *m_iconSizeAttrPtr;
 	}
 
+	if (m_icon.isNull()){
+		if (m_iconAttrPtr.IsValid()){
+			m_icon = QIcon(*m_iconAttrPtr).pixmap(iconSize);
+		}
+	}
+
 	CIconBasedEventItem* itemPtr = new imod::TModelWrap<CIconBasedEventItem>();
-	itemPtr->SetParams(icon, QSize(iconSize, iconSize), message);
+	itemPtr->SetParams(m_icon, messagePtr);
 
 	return itemPtr;
 }

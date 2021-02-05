@@ -2,10 +2,8 @@
 
 
 // Acf includes
+#include <idoc/IDocumentMetaInfo.h>
 #include <ilog/IMessageConsumer.h>
-
-// ImtCore includes
-#include <imtloggui/IItemBase.h>
 
 
 namespace imtloggui
@@ -15,7 +13,7 @@ namespace imtloggui
 /**
 	Interface for event item
 */
-class IEventItem: virtual public IItemBase
+class IEventItem: virtual public idoc::IDocumentMetaInfo
 {
 public:
 	/**

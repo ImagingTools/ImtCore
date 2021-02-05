@@ -1,6 +1,9 @@
 #include <imtloggui/CLoginEventFactoryComp.h>
 
 
+// Qt includes
+#include <QtGui/QIcon>
+
 // Acf includes
 #include <imod/TModelWrap.h>
 
@@ -17,36 +20,37 @@ namespace imtloggui
 
 // reimplemented (imtloggui::IEventItemFactory)
 
-IEventItem* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsumer::MessagePtr& message) const
+IEventItem* CLoginEventFactoryComp::CreateInstance(const ilog::IMessageConsumer::MessagePtr& messagePtr) const
 {
-	if (!IsSupportedMessageId(message->GetInformationId())){
-		return CreateInstanceWithSlaveFactory(message);
+	if (!IsSupportedMessageId(messagePtr->GetInformationId())){
+		return CreateInstanceWithSlaveFactory(messagePtr);
 	}
 
-	QIcon loginIcon;
-	QIcon logoutIcon;
 	int iconSize = 24;
-	
-	if (m_loginIconAttrPtr.IsValid()){
-		loginIcon = QIcon(*m_loginIconAttrPtr);
-	}
-
-	if (m_logoutIconAttrPtr.IsValid()){
-		logoutIcon = QIcon(*m_logoutIconAttrPtr);
-	}
 
 	if (m_iconSizeAttrPtr.IsValid()){
 		iconSize = *m_iconSizeAttrPtr;
 	}
 
-	const imtlog::CLoginEvent* eventPtr = dynamic_cast<const imtlog::CLoginEvent*>(message.GetPtr());
+	if (m_loginIcon.isNull()){
+		if (m_loginIconAttrPtr.IsValid()){
+			m_loginIcon = QIcon(*m_loginIconAttrPtr).pixmap(iconSize);
+		}
+	}
+
+	if (m_logoutIcon.isNull()){
+		if (m_logoutIconAttrPtr.IsValid()){
+			m_logoutIcon = QIcon(*m_logoutIconAttrPtr).pixmap(iconSize);
+		}
+	}
+
+	const imtlog::CLoginEvent* eventPtr = dynamic_cast<const imtlog::CLoginEvent*>(messagePtr.GetPtr());
 	if (eventPtr != nullptr){
 		CLoginEventItem* itemPtr = new imod::TModelWrap<CLoginEventItem>();
 		itemPtr->SetParams(
-			loginIcon,
-			logoutIcon,
-			QSize(iconSize, iconSize),
-			message);
+					m_loginIcon,
+					m_logoutIcon,
+					messagePtr);
 
 		return itemPtr;
 	}

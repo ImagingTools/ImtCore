@@ -2,8 +2,9 @@
 
 
 // Qt includes
-#include <QtGui/QIcon>
+#include <QtCore/QRect>
 #include <QtGui/QFont>
+#include <QtGui/QPixmap>
 
 // ImtCore includes
 #include <imtloggui/CEventItemBase.h>
@@ -25,10 +26,9 @@ public:
 	};
 
 	void SetParams(
-				const QIcon& iconLogin,
-				const QIcon& iconLogout,
-				const QSize& iconSize,
-				const ilog::IMessageConsumer::MessagePtr& message,
+				const QPixmap& iconLogin,
+				const QPixmap& iconLogout,
+				const ilog::IMessageConsumer::MessagePtr& messagePtr,
 				QGraphicsItem* parentPtr = nullptr);
 
 	// reimplemented (idoc::IDocumentMetaInfo)
@@ -42,9 +42,10 @@ public:
 
 private:
 	QFont m_font;
-	QIcon m_iconLogin;
-	QIcon m_iconLogout;
-	QSize m_iconSize;
+	QPixmap m_iconLogin;
+	QPixmap m_iconLogout;
+	mutable QRectF m_boundingRect;
+	mutable QRectF m_labelRect;
 };
 
 

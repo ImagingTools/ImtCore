@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtGui/QIcon>
+#include <QtGui/QPixmap>
 
 // ImtCore includes
 #include <imtloggui/CEventItemBase.h>
@@ -18,9 +18,8 @@ public:
 	typedef CEventItemBase BaseClass;
 
 	void SetParams(
-				const QIcon& icon,
-				const QSize& iconSize,
-				const ilog::IMessageConsumer::MessagePtr& message,
+				const QPixmap& icon,
+				const ilog::IMessageConsumer::MessagePtr& messagePtr,
 				QGraphicsItem* parentPtr = nullptr);
 
 	// reimplemented (QGraphicsItem)
@@ -28,8 +27,8 @@ public:
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
 protected:
-	QIcon m_icon;
-	QSize m_iconSize;
+	QPixmap m_icon;
+	mutable QRectF m_boundingRect;
 };
 
 
