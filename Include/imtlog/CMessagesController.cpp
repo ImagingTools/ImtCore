@@ -108,15 +108,15 @@ QByteArray CMessagesController::AddJob(
 }
 
 
-bool CMessagesController::IsValidResultId(const QByteArray& requestId) const
+bool CMessagesController::IsJobExists(const QByteArray& requestId) const
 {
-	return m_readJobController.IsValidJobId(requestId);
+	return m_readJobController.IsJobExists(requestId);
 }
 
 
-bool CMessagesController::PopResult(const QByteArray& requestId, ilog::CMessageContainer& resultEvents) const
+bool CMessagesController::TakeJobResult(const QByteArray& requestId, CMessagesReader::EventContainerPtr& resultEvents) const
 {
-	return m_readJobController.PopResult(requestId, resultEvents);
+	return m_readJobController.TakeJobResult(requestId, resultEvents);
 }
 
 

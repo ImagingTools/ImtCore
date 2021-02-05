@@ -58,8 +58,8 @@ public:
 				const IEventFilter* filterPtr,
 				const IMessageFilterParams* filterParamsPtr) const;
 
-	bool IsValidResultId(const QByteArray& requestId) const;
-	bool PopResult(const QByteArray& requestId, ilog::CMessageContainer& resultEvents) const;
+	bool IsJobExists(const QByteArray& jobId) const;
+	bool TakeJobResult(const QByteArray& jobId, CMessagesReader::EventContainerPtr& resultEvents) const;
 
 	// reimplemented (imtlog::ITimeRangeProvider)
 	virtual CTimeRange GetTimeRange() const override;

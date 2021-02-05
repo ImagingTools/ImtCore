@@ -2,11 +2,11 @@
 
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtCore/QThread>
 
 // Acf includes
 #include <ilog/IMessageConsumer.h>
+#include <ilog/CMessageContainer.h>
 
 // ImtCore includes
 #include <imtfile/IFileCompression.h>
@@ -44,7 +44,7 @@ public:
 		QByteArray uuid;
 		const imtlog::IEventFilter* filterPtr;
 		imtlog::CMessageFilterParams filterParams;
-		IEventProvider::EventContainerPtr eventContainerPtr;
+		CMessagesReader::EventContainerPtr containerPtr;
 	};
 
 	typedef QList<Job> JobList;
@@ -59,8 +59,8 @@ public:
 
 	QByteArray AddJob(const IEventFilter* filterPtr, const IMessageFilterParams* filterParamsPtr);
 
-	bool IsValidJobId(const QByteArray& jobId) const;
-	bool PopResult(const QByteArray& jobId, ilog::CMessageContainer& resultEvents);
+	bool IsJobExists(const QByteArray& jobId) const;
+	bool TakeJobResult(const QByteArray& jobId, CMessagesReader::EventContainerPtr& resultEvents);
 
 Q_SIGNALS:
 	void JobFinished(QByteArray jobId);

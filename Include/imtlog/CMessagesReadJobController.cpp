@@ -49,7 +49,7 @@ QByteArray CMessagesReadJobController::AddJob(const IEventFilter* filterPtr, con
 }
 
 
-bool CMessagesReadJobController::IsValidJobId(const QByteArray& jobId) const
+bool CMessagesReadJobController::IsJobExists(const QByteArray& jobId) const
 {
 	QMutexLocker locker(&m_jobMutex);
 
@@ -66,24 +66,14 @@ bool CMessagesReadJobController::IsValidJobId(const QByteArray& jobId) const
 }
 
 
-bool CMessagesReadJobController::PopResult(const QByteArray& jobId, ilog::CMessageContainer& resultEvents)
+bool CMessagesReadJobController::TakeJobResult(const QByteArray& jobId, CMessagesReader::EventContainerPtr& resultEvents)
 {
 	QMutexLocker locker(&m_jobMutex);
 
 	JobList::iterator it = m_jobList.begin();
 	while(it != m_jobList.end()){
-		if ((*it).uuid == jobId && (*it).status == JS_FINISHED){
-			if ((*it).eventContainerPtr.IsValid()){
-				static istd::IChangeable::ChangeSet changeSet(IEventProvider::RS_OK);
-				istd::CChangeGroup notifier(&resultEvents, &changeSet);
-
-				resultEvents.CopyFrom(*(*it).eventContainerPtr);
-			}
-			else{
-				static istd::IChangeable::ChangeSet changeSet(IEventProvider::RS_CANCELED);
-				istd::CChangeGroup notifier(&resultEvents, &changeSet);
-			}
-
+		if (it->uuid == jobId && it->status == JS_FINISHED){
+			resultEvents = it->containerPtr;
 			m_jobList.erase(it);
 
 			return true;
@@ -140,7 +130,7 @@ void CMessagesReadJobController::ProcessJob(Job& job)
 	CMessagesReader::EventContainerListPtr containerListPtr = m_reader.ReadContainers(job.filterParams.GetFilterTimeRange());
 
 	if (containerListPtr.IsValid()){
-		job.eventContainerPtr.SetPtr(new ilog::CMessageContainer());
+		job.containerPtr.SetPtr(new CEventContainer());
 
 		CMessagesReader::EventContainerList::const_iterator it = containerListPtr->begin();
 		while (it != containerListPtr->end()){
@@ -149,11 +139,11 @@ void CMessagesReadJobController::ProcessJob(Job& job)
 				if (job.filterPtr != nullptr){
 					if(		job.filterParams.GetFilterTimeRange().Contains(messages[i]->GetInformationTimeStamp()) &&
 							job.filterPtr->IsMessageAccepted(*messages[i], &job.filterParams)){
-						dynamic_cast<ilog::CMessageContainer*>(job.eventContainerPtr.GetPtr())->AddMessage(messages[i]);
+						job.containerPtr->AddMessage(messages[i]);
 					}
 				}
 				else{
-					dynamic_cast<ilog::CMessageContainer*>(job.eventContainerPtr.GetPtr())->AddMessage(messages[i]);
+					job.containerPtr->AddMessage(messages[i]);
 				}
 			}
 
