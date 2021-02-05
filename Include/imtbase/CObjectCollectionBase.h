@@ -102,10 +102,15 @@ protected:
 	typedef QList<IObjectCollectionEventHandler*> EventHandlerList;
 
 protected:
+	// abstract methods
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const = 0;
+	virtual void DestroyObjectInstance(istd::IChangeable* objectPtr) const = 0;
+
+protected:
 	virtual bool InsertObjectIntoCollection(const ObjectInfo& info);
 	virtual int GetItemDefaultFlags() const;
 	ObjectInfo* GetObjectInfo(const QByteArray& id) const;
+	virtual void RemoveAllObjects();
 
 private:
 	imod::CModelUpdateBridge m_modelUpdateBridge;

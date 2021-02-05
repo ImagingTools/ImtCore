@@ -99,6 +99,11 @@ istd::IChangeable* CStaticObjectCollection::CreateObjectInstance(const QByteArra
 }
 
 
+void CStaticObjectCollection::DestroyObjectInstance(istd::IChangeable* /*objectPtr*/) const
+{
+}
+
+
 } // namespace imtbase
 
 

@@ -28,6 +28,27 @@ istd::IChangeable* CObjectCollectionComp::CreateObjectInstance(const QByteArray&
 }
 
 
+void CObjectCollectionComp::DestroyObjectInstance(istd::IChangeable* objectPtr) const
+{
+	if (objectPtr != nullptr){
+		icomp::IComponent* componentPtr = dynamic_cast<icomp::IComponent*>(objectPtr);
+		if (componentPtr != nullptr){
+			const icomp::ICompositeComponent* parentComponentPtr = nullptr;
+			while ((parentComponentPtr = componentPtr->GetParentComponent(true)) != nullptr){
+				componentPtr = const_cast<icomp::ICompositeComponent*>(parentComponentPtr);
+			}
+
+			if (componentPtr != nullptr){
+				delete componentPtr;
+			}
+		}
+		else{
+			delete objectPtr;
+		}
+	}
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CObjectCollectionComp::OnComponentCreated()
@@ -83,6 +104,14 @@ void CObjectCollectionComp::OnComponentCreated()
 			m_typesInfo.InsertOption(m_typeNamesAttrPtr[i], typeId);
 		}
 	}
+}
+
+
+void CObjectCollectionComp::OnComponentDestroyed()
+{
+	RemoveAllObjects();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 

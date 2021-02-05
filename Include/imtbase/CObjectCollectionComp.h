@@ -47,9 +47,11 @@ public:
 protected:
 	// reimplemented (CObjectCollectionBase)
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override;
+	virtual void DestroyObjectInstance(istd::IChangeable* objectPtr) const override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 private:
 	I_MULTIFACT(istd::IChangeable, m_objectFactoriesCompPtr);

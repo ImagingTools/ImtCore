@@ -42,6 +42,7 @@ public:
 protected:
 	// reimplemented (CObjectCollectionBase)
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const;
+	virtual void DestroyObjectInstance(istd::IChangeable* objectPtr) const override;
 };
 
 

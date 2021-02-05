@@ -25,7 +25,7 @@ CObjectCollectionBase::CObjectCollectionBase()
 
 CObjectCollectionBase::~CObjectCollectionBase()
 {
-	m_modelUpdateBridge.EnsureModelsDetached();
+	RemoveAllObjects();
 }
 
 
@@ -106,6 +106,8 @@ bool CObjectCollectionBase::RemoveObject(const QByteArray& objectId)
 			}
 
 			istd::CChangeNotifier changeNotifier(this);
+
+			DestroyObjectInstance((*iter).objectPtr.GetPtr());
 
 			m_objects.erase(iter);
 
@@ -298,10 +300,12 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 {
 	int objectCount = m_objects.count();
 
+	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+
 	if (!archive.IsStoring()){
 		objectCount = 0;
 
-		m_objects.clear();
+		RemoveAllObjects();
 	}
 
 	static iser::CArchiveTag objectListTag("ObjectsList", "List of objects", iser::CArchiveTag::TT_MULTIPLE);
@@ -349,7 +353,7 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 
 		istd::IChangeable* objectPtr = nullptr;
 		if (!archive.IsStoring()){
-			elementInfo.objectPtr.SetPtr(CreateObjectInstance(elementInfo.typeId));
+			elementInfo.objectPtr.SetPtr(CreateObjectInstance(elementInfo.typeId), true);
 
 			objectPtr = elementInfo.objectPtr.GetPtr();
 		}
@@ -480,9 +484,7 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 
 bool CObjectCollectionBase::ResetData(CompatibilityMode /*mode*/)
 {
-	istd::CChangeNotifier changeNotifier(this);
-
-	m_objects.clear();
+	RemoveAllObjects();
 
 	return true;
 }
@@ -524,6 +526,22 @@ CObjectCollectionBase::ObjectInfo* CObjectCollectionBase::GetObjectInfo(const QB
 	}
 
 	return nullptr;
+}
+
+
+void CObjectCollectionBase::RemoveAllObjects()
+{
+	m_modelUpdateBridge.EnsureModelsDetached();
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	for (ObjectInfo& info : m_objects){
+		if (info.objectPtr.IsToRelase()){
+			DestroyObjectInstance(info.objectPtr.PopPtr());
+		}
+	}
+
+	m_objects.clear();
 }
 
 
