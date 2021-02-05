@@ -7,6 +7,7 @@
 #include <QtCore/QQueue>
 #include <QtCore/QTimer>
 #include <QtCore/QMultiMap>
+#include <QtCore/QMutex>
 
 // Acf includes
 #include <iser/IVersionInfo.h>
@@ -124,7 +125,8 @@ private:
 	mutable QList<ReadRequest> m_requests;
 	mutable QMutex m_requestMutex;
 
-	ilog::CMessageContainer m_log;
+	imtlog::CEventContainer m_log;
+	mutable QMutex m_logMutex;
 };
 
 

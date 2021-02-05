@@ -464,7 +464,7 @@ void CEventViewComp::OnSelectionChanged()
 {
 	QList<QGraphicsItem*> items = m_scene.selectedItems();
 	if (!items.isEmpty()){
-		IItemBase* itemPtr = dynamic_cast<IItemBase*>(items[0]);
+		IEventItem* itemPtr = dynamic_cast<IEventItem*>(items[0]);
 		if (itemPtr != nullptr){
 			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(itemPtr);
 			if (modelPtr != nullptr){

@@ -102,6 +102,8 @@ bool CRepresentationViewCompBase::Serialize(iser::IArchive& archive)
 
 void CRepresentationViewCompBase::UpdateItemsOnScene(QGraphicsScene* scenePtr)
 {
+	Q_ASSERT(QThread::currentThread() == qApp->thread());
+
 	GraphicsItemList removedItems = GetRemovedItems();
 	GraphicsItemList addedItems = GetAddedItems();
 

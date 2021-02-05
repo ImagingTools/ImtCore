@@ -49,7 +49,10 @@ IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
 	{
 		istd::CChangeGroup notifier(containerPtr);
 
+		QMutexLocker locker(&m_logMutex);
 		ilog::IMessageContainer::Messages messages = m_log.GetMessages();
+		locker.unlock();
+
 		for (int i = messages.count() - 1; i >= 0; i--){
 			if (filterPtr->IsMessageAccepted(*messages[i], filterParamsPtr)){
 				containerPtr->AddMessage(messages[i]);
@@ -106,7 +109,11 @@ void CEventHistoryControllerComp::AddMessage(const MessagePtr& messagePtr)
 
 	if (m_controllerState == CS_OK){
 		istd::CChangeNotifier notifier(this);
+
+		QMutexLocker locker(&m_logMutex);
 		m_log.AddMessage(messagePtr);
+		locker.unlock();
+
 		m_archiveTimeRange.Ensure(messagePtr->GetInformationTimeStamp());
 
 		return;
@@ -240,11 +247,11 @@ void CEventHistoryControllerComp::OnReadFinished(QByteArray requestId)
 	for (int i = 0; i < m_requests.count() && !isFound; i++){
 		if (m_requests[i].readIds.contains(requestId)){
 			for (MessagesControllerPtr& controllerPtr : m_controllers){
-				if (controllerPtr->IsValidResultId(requestId)){
+				if (controllerPtr->IsJobExists(requestId)){
 					m_requests[i].readIds.remove(requestId);
-					ilog::CMessageContainer container;
-					if (controllerPtr->PopResult(requestId, container)){
-						ilog::IMessageContainer::Messages messages = container.GetMessages();
+					CMessagesReader::EventContainerPtr containerPtr;
+					if (controllerPtr->TakeJobResult(requestId, containerPtr)){
+						ilog::IMessageContainer::Messages messages = containerPtr->GetMessages();
 						for (ilog::IMessageConsumer::MessagePtr& messagePtr : messages){
 							m_requests[i].events.insert(messagePtr->GetInformationTimeStamp().toMSecsSinceEpoch(), messagePtr);
 						}
@@ -253,7 +260,7 @@ void CEventHistoryControllerComp::OnReadFinished(QByteArray requestId)
 							istd::CChangeGroup changeGroup(m_requests[i].containerPtr.GetPtr());
 
 							CEventHistoryResultContainer* eventHistoryResultContainerPtr =
-								dynamic_cast<CEventHistoryResultContainer*>(m_requests[i].containerPtr.GetPtr());
+										dynamic_cast<CEventHistoryResultContainer*>(m_requests[i].containerPtr.GetPtr());
 
 							QMultiMap<qint64, ilog::IMessageConsumer::MessagePtr>::const_iterator it = m_requests[i].events.cbegin();
 							while (it != m_requests[i].events.cend()){
