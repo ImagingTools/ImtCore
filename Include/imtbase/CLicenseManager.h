@@ -6,6 +6,9 @@
 #include <QtCore/QString>
 #include <QtCore/QDateTime>
 
+// ACF includes
+#include <iprm/COptionsManager.h>
+
 // ImtCore includes
 #include <imtbase/ILicenseInfoProvider.h>
 #include <imtbase/CObjectCollection.h>
@@ -68,6 +71,8 @@ public:
 
 protected:
 	CObjectCollection m_licenses;
+
+	iprm::COptionsManager m_types;
 };
 
 

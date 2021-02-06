@@ -27,6 +27,9 @@
         <Element Id="ObjectCollectionView" PackageId="ImtGuiPck" ComponentId="ObjectCollectionView">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="ObjectCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -77,6 +80,7 @@
         <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="ComposedGui"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="Commands" ComponentId="ObjectCollectionView/Commands"/>
         <Component ExportedId="VisualStatus" ComponentId="ComposedGui/VisualStatus"/>
     </ExportedComponents>
 </Acf>

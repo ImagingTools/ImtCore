@@ -21,6 +21,8 @@ static QByteArray s_objectTypeId = "LicenseInfo";
 CLicenseManager::CLicenseManager()
 {
 	m_licenses.RegisterFactory(new istd::TSingleFactory<istd::IChangeable, CLicenseInfo>(s_objectTypeId), true);
+
+	m_types.InsertOption("License Info", s_objectTypeId);
 }
 
 
@@ -133,7 +135,7 @@ bool CLicenseManager::GetCollectionItemMetaInfo(const QByteArray& objectId, idoc
 
 const iprm::IOptionsList* CLicenseManager::GetObjectTypesInfo() const
 {
-	return m_licenses.GetObjectTypesInfo();
+	return &m_types;
 }
 
 

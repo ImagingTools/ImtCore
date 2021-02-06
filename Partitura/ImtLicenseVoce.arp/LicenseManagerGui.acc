@@ -15,7 +15,29 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="LicenseManagerGui" PackageId="ImtCollectionVoce" ComponentId="ObjectCollectionView">
+        <Element Id="ObjectCollectionView" PackageId="ImtGuiPck" ComponentId="ObjectCollectionView">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="Licenses">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultStatusIcon" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value=":/Icons/CameraFlash"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewDelegates" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>StandardCollectionDelegate</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="StandardCollectionDelegate" PackageId="ImtGuiPck" ComponentId="StandardCollectionDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ObjectEditor" Type="Reference" ExportId="">
@@ -24,21 +46,18 @@
                     <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="LicenseInfo"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imod::IModelEditor" ComponentId="LicenseManagerGui"/>
-        <Interface InterfaceId="imod::IObserver" ComponentId="LicenseManagerGui"/>
-        <Interface InterfaceId="imtbase::IObjectCollectionEventHandler" ComponentId="LicenseManagerGui"/>
-        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="LicenseManagerGui"/>
+        <Interface InterfaceId="imod::IModelEditor" ComponentId="ObjectCollectionView"/>
+        <Interface InterfaceId="imod::IObserver" ComponentId="ObjectCollectionView"/>
+        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="ObjectCollectionView"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="VisualStatus" ComponentId="LicenseManagerGui/VisualStatus"/>
+        <Component ExportedId="Commands" ComponentId="ObjectCollectionView/Commands"/>
+        <Component ExportedId="VisualStatus" ComponentId="ObjectCollectionView/VisualStatus"/>
     </ExportedComponents>
 </Acf>
