@@ -17,13 +17,13 @@ namespace imtbase
 
 CLicenseManager::CLicenseManager()
 {
-	m_licenses.RegisterFactory(new istd::TSingleFactory<istd::IChangeable, CLicenseInfo>("LicenseInfo"), true);
+	m_licenses.RegisterFactory(new istd::TSingleFactory<istd::IChangeable, CLicenseInfo>(""), true);
 }
 
 
 // reimplemented (imtbase::ILicenseInfoProvider)
 
-const imtbase::ICollectionInfo & CLicenseManager::GetLicenseList() const
+const imtbase::ICollectionInfo& CLicenseManager::GetLicenseList() const
 {
 	return m_licenses;
 }
