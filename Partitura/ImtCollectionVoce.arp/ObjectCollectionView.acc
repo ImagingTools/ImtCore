@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4851" Description="ACF"/>
+            <Version Id="1" Number="2122" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ComposedGui" PackageId="QtGuiPck" ComponentId="ComposedGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Guis" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ToolBar</Value>
+                                <Value>ObjectCollectionView</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ObjectCollectionView" PackageId="ImtGuiPck" ComponentId="ObjectCollectionView">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewDelegates" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>StandardCollectionDelegate</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="StandardCollectionDelegate" PackageId="ImtGuiPck" ComponentId="StandardCollectionDelegate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectEditor" Type="Reference" ExportId="ObjectEditor">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="ObjectTypeId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ToolBar" PackageId="QtGuiPck" ComponentId="CommandsToolBar">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ButtonStyle" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="3"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ObjectCollectionView/Commands"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconSize" Type="Integer" ExportId="IconSize">
+                        <Data IsEnabled="true" Value="24"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="ibase::IProgressManager" ComponentId="ObjectCollectionView"/>
+        <Interface InterfaceId="imod::IModelEditor" ComponentId="ObjectCollectionView"/>
+        <Interface InterfaceId="imod::IObserver" ComponentId="ObjectCollectionView"/>
+        <Interface InterfaceId="imtbase::IObjectCollectionEventHandler" ComponentId="ObjectCollectionView"/>
+        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="ComposedGui"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>
