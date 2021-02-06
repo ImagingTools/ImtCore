@@ -35,6 +35,20 @@ const imtbase::ILicenseInfo* CLicenseManager::GetLicenseInfo(const QByteArray& l
 }
 
 
+// reimplemented (iser::ISerializable)
+
+bool CLicenseManager::Serialize(iser::IArchive& archive)
+{
+	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
+
+	static iser::CArchiveTag licensesTag("LicenseContainer", "Container of licenses", iser::CArchiveTag::TT_GROUP);
+	bool retVal = archive.BeginTag(licensesTag);
+	retVal = retVal && m_licenses.Serialize(archive);
+	retVal = retVal && archive.EndTag(licensesTag);
+
+	return retVal;
+}
+
 // reimplemented (istd::IChangeable)
 
 bool CLicenseManager::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)

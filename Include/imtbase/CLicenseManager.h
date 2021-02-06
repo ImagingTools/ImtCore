@@ -18,7 +18,9 @@ namespace imtbase
 /**
 	Common status manager implementation.
 */
-class CLicenseManager: virtual public imtbase::ILicenseInfoProvider
+class CLicenseManager:
+			virtual public imtbase::ILicenseInfoProvider,
+			virtual public iser::ISerializable
 {
 public:
 	CLicenseManager();
@@ -26,6 +28,9 @@ public:
 	// reimplemented (imtbase::ILicenseInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetLicenseList() const override;
 	virtual const imtbase::ILicenseInfo* GetLicenseInfo(const QByteArray & licenseId) const override;
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented (istd::IChangeable)
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
