@@ -72,7 +72,7 @@ bool CLicenseManager::RemoveObject(const QByteArray& objectId)
 }
 
 
-const istd::IChangeable * CLicenseManager::GetObjectPtr(const QByteArray& objectId) const
+const istd::IChangeable* CLicenseManager::GetObjectPtr(const QByteArray& objectId) const
 {
 	return m_licenses.GetObjectPtr(objectId);
 }
