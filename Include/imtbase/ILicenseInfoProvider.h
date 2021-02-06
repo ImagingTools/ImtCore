@@ -13,6 +13,10 @@ class ILicenseInfo;
 class ICollectionInfo;
 
 
+/**
+	Common interface for a provider of licenses.
+	\ingroup License Management
+*/
 class ILicenseInfoProvider: virtual public istd::IChangeable
 {
 public:
