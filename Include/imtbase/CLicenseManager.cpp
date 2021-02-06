@@ -13,11 +13,14 @@ namespace imtbase
 {
 
 
+static QByteArray s_objectTypeId = "LicenseInfo";
+
+
 // public methods
 
 CLicenseManager::CLicenseManager()
 {
-	m_licenses.RegisterFactory(new istd::TSingleFactory<istd::IChangeable, CLicenseInfo>(""), true);
+	m_licenses.RegisterFactory(new istd::TSingleFactory<istd::IChangeable, CLicenseInfo>(s_objectTypeId), true);
 }
 
 
@@ -134,9 +137,9 @@ const iprm::IOptionsList* CLicenseManager::GetObjectTypesInfo() const
 }
 
 
-ICollectionInfo::Id CLicenseManager::GetObjectTypeId(const QByteArray & objectId) const
+ICollectionInfo::Id CLicenseManager::GetObjectTypeId(const QByteArray& /*objectId*/) const
 {
-	return m_licenses.GetObjectTypeId(objectId);
+	return s_objectTypeId;
 }
 
 

@@ -16,6 +16,7 @@
 #include <imtbase/CCompositeObjectPersistenceComp.h>
 #include <imtbase/CParamsManagerAdapterComp.h>
 #include <imtbase/CCollectionObjectExtractorComp.h>
+#include <imtbase/CLicenseManager.h>
 
 
 /**
@@ -35,6 +36,14 @@ typedef imtbase::CLocalizedHelpPathProviderComp LocalizedHelpPathProvider;
 typedef imtbase::CCompositeObjectPersistenceComp CompositeObjectPersistence;
 typedef icomp::TModelCompWrap<imtbase::CParamsManagerAdapterComp> ParamsManagerAdapter;
 typedef imtbase::CCollectionObjectExtractorComp CollectionObjectExtractor;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtbase::CLicenseManager,
+						imtbase::ILicenseInfoProvider,
+						imtbase::IObjectCollection,
+						imtbase::IObjectCollectionInfo,
+						imtbase::ICollectionInfo,
+						iser::ISerializable>> LicenseManager;
 
 } // namespace ImtCorePck
 

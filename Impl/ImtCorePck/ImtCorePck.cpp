@@ -64,6 +64,11 @@ I_EXPORT_COMPONENT(
 			"Collection-related object extractor",
 			"Object Collection Data Extractor");
 
+I_EXPORT_COMPONENT(
+			LicenseManager,
+			"Management of licenses",
+			"License Manager Container Collection");
+
 
 } // namespace ImtCorePck
 
