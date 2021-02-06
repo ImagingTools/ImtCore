@@ -20,6 +20,9 @@ class ICollectionInfo;
 class ILicenseInfoProvider: virtual public istd::IChangeable
 {
 public:
+	/**
+		Get information about the list of available licenses.
+	*/
 	virtual const imtbase::ICollectionInfo& GetLicenseList() const = 0;
 
 	/**
