@@ -102,6 +102,11 @@ I_EXPORT_COMPONENT(
 			"Standard collection view delegate",
 			"Delegate Document View Collection");
 
+I_EXPORT_COMPONENT(
+			LicenseInfoEditorGui,
+			"License info editor",
+			"License Info");
+
 
 } // namespace ImtGuiPck
 

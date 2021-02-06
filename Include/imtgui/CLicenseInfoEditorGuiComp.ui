@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CLicenseInfoEditorGuiComp</class>
+ <widget class="QWidget" name="CLicenseInfoEditorGuiComp">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>497</width>
+    <height>272</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Main Window</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QToolBar[ImtToolBar=true] &gt; QToolButton
+{
+	min-width: 4em;
+}
+
+QWidget[ImtTopFrame=true] &gt; QWidget
+{
+	color: #335777;
+}
+
+QWidget[ImtTopFrame=true] &gt; QWidget:disabled
+{
+	color: palette(disabled);
+}
+
+
+QToolBar[ImtToolBar=true]
+{
+	qproperty-iconSize: 24px;
+}
+
+
+QWidget[ImtTopFrame=true]
+{
+	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                 stop: 0 rgb(235,235,238), stop: 0.9 rgb(220,220,223),
+                                 stop: 0.97 rgb(220,220,223), stop: 1.0 rgb(190,190,193));
+	border-bottom: 1px solid  rgb(170,170,170);
+	min-height: 5em;
+}
+
+
+QWidget#BottomFrame
+{
+	background: rgb(230,230,230);	
+}
+
+QTableView[ImtMenu=true]
+{
+	color: qpalette(background);
+	background: qpalette(background);
+	font-weight: bold;
+	text-align: center;
+}
+
+QTableView[ImtMenu=true]::item
+{
+	font-weight: bold;
+	text-align: center;
+}
+
+/*
+	Tab simulation using tree widget
+*/
+QTreeWidget[TabSimulation=true]
+{
+	background: rgb(230,230,230);
+	font-weight: bold;
+	text-align: left;
+}
+
+
+QTreeWidget[TabSimulation=true]::item 
+{
+    border: 0px none transparent;
+    padding-top: 0.7em;
+    padding-bottom: 0.7em;
+}
+
+QTreeWidget[TabSimulation=true]::item:first
+{
+    padding-left: 5px;
+}
+
+
+QTreeWidget[TabSimulation=true]::item:last
+{
+    padding-right: 15px;
+}
+
+QTreeWidget[TabSimulation=true]::item:selected 
+{
+    background-color: rgb(255, 255, 255);
+}
+
+QTreeWidget[TabSimulation=true]::item:!selected:hover 
+{
+	background-color: #dedede;
+}
+
+
+
+QTreeWidget[TabSimulation=true]::item:first:selected
+{
+    border-top: 1px white;
+}
+
+
+
+QAbstractItemView[TabSimulation=true]
+{
+    outline: 0;
+}
+
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="NameGroup">
+     <property name="title">
+      <string>License Name</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLineEdit" name="NameEdit"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="IdGroup">
+     <property name="title">
+      <string>License-ID</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLineEdit" name="IdEdit"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="PackageGroup">
+     <property name="title">
+      <string>License Package</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QComboBox" name="PackageCombo"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="ExpireGroup">
+     <property name="title">
+      <string>Valid Until</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QDateEdit" name="ExpiredDate"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="imtgui.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -8,7 +8,8 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="LicenseManagerGui" X="600" Y="325" Note=""/>
+        <Element ComponentName="LicenseInfoEditorGui" X="527" Y="402" Note=""/>
+        <Element ComponentName="LicenseManagerGui" X="525" Y="275" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

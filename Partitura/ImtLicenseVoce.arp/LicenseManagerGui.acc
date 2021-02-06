@@ -10,11 +10,16 @@
     <Description>UI for license management</Description>
     <Keywords>License</Keywords>
     <ElementsList>
+        <Element Id="LicenseInfoEditorGui" PackageId="ImtGuiPck" ComponentId="LicenseInfoEditorGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="LicenseManagerGui" PackageId="ImtCollectionVoce" ComponentId="ObjectCollectionView">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ObjectEditor" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="LicenseInfoEditor"/>
+                        <Data IsEnabled="true" Value="LicenseInfoEditorGui"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="LicenseInfo"/>
@@ -27,6 +32,13 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces/>
-    <ExportedComponents/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModelEditor" ComponentId="LicenseManagerGui"/>
+        <Interface InterfaceId="imod::IObserver" ComponentId="LicenseManagerGui"/>
+        <Interface InterfaceId="imtbase::IObjectCollectionEventHandler" ComponentId="LicenseManagerGui"/>
+        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="LicenseManagerGui"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="VisualStatus" ComponentId="LicenseManagerGui/VisualStatus"/>
+    </ExportedComponents>
 </Acf>
