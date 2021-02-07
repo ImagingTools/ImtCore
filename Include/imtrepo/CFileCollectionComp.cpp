@@ -635,6 +635,16 @@ QString CFileCollectionComp::GetCollectionRootFolder() const
 }
 
 
+IFileCollectionInfo::FileCollectionLayout CFileCollectionComp::GetCollectionFileLayout() const
+{
+	if (*m_useSubfolderAttrPtr){
+		return FCL_FOLDER;
+	}
+
+	return FCL_FLAT;
+}
+
+
 // reimplemented (IObjectCollection)
 
 const imtbase::IRevisionController * CFileCollectionComp::GetRevisionController() const

@@ -194,6 +194,7 @@ public:
 
 	// reimplemented (IFileCollectionInfo)
 	virtual QString GetCollectionRootFolder() const override;
+	virtual FileCollectionLayout GetCollectionFileLayout() const override;
 
 	// reimplemented (IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
