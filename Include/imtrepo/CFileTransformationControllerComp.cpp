@@ -89,7 +89,7 @@ bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollectio
 
 			// TODO: prepare backup of the file structure!
 
-			if (!step.transformationPtr->TransformFile(filePath, step.from, step.to)){
+			if (!step.transformationPtr->TransformFile(IRepositoryFileTransformaton::RFT_CONTENT, filePath, step.from, step.to)){
 				SendErrorMessage(0, QString("Repository file '%1' could not be transformed").arg(filePath));
 
 				// TODO: execute rollback of the whole folder structure!
