@@ -7,6 +7,8 @@
 #include <QtCore/QDateTime>
 
 // ACF includes
+#include <imod/TModelWrap.h>
+#include <imod/CModelUpdateBridge.h>
 #include <iprm/COptionsManager.h>
 
 // ImtCore includes
@@ -28,6 +30,7 @@ class CLicenseManager:
 {
 public:
 	CLicenseManager();
+	virtual ~CLicenseManager();
 
 	// reimplemented (imtbase::ILicenseInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetLicenseList() const override;
@@ -70,7 +73,9 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	CObjectCollection m_licenses;
+	imod::TModelWrap<CObjectCollection> m_licenses;
+
+	imod::CModelUpdateBridge m_updateBridge;
 
 	iprm::COptionsManager m_types;
 };

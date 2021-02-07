@@ -46,7 +46,7 @@
         <Element Id="StandardCollectionDelegate" PackageId="ImtGuiPck" ComponentId="StandardCollectionDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ObjectEditor" Type="Reference" ExportId="ObjectEditor">
+                    <AttributeInfo Id="EditDialog" Type="Reference" ExportId="EditDialog">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="ObjectTypeId">

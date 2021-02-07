@@ -11,7 +11,6 @@
 #include <istd/CChangeGroup.h>
 #include <istd/CSystem.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
-#include <iqtgui/CGuiComponentDialog.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
@@ -51,25 +50,19 @@ bool CStandardCollectionDelegateComp::InitializeDelegate(
 
 bool CStandardCollectionDelegateComp::OpenDocumentEditor(
 			const QByteArray& objectId,
-			const QByteArray& viewTypeId) const
+			const QByteArray& /*viewTypeId*/) const
 {
-	if (!m_objectGuiCompPtr.IsValid() || !m_objectObserverCompPtr.IsValid()){
-		return false;
-	}
-
 	if (m_collectionPtr != nullptr){
-		const imod::IModel* modelPtr = dynamic_cast<const imod::IModel*>(m_collectionPtr->GetObjectPtr(objectId));
+		imod::IModel* modelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(m_collectionPtr->GetObjectPtr(objectId)));
 		if (modelPtr != nullptr){
-			if ((const_cast<imod::IModel*>(modelPtr))->AttachObserver(m_objectObserverCompPtr.GetPtr())){
-				iqtgui::CGuiComponentDialog editorDialog(m_objectGuiCompPtr.GetPtr(), QDialogButtonBox::Close);
-				editorDialog.SetDialogGeometry(0.15);
-				editorDialog.setWindowTitle(tr("Edit"));
+			if (m_editDialogCompPtr.IsValid() && m_editDialogObserverCompPtr.IsValid()){
+				if (modelPtr->AttachObserver(m_editDialogObserverCompPtr.GetPtr())){
+					m_editDialogCompPtr->ExecuteDialog(nullptr);
 
-				editorDialog.exec();
+					modelPtr->DetachObserver(m_editDialogObserverCompPtr.GetPtr());
 
-				(const_cast<imod::IModel*>(modelPtr))->DetachObserver(m_objectObserverCompPtr.GetPtr());
-
-				return true;
+					return true;
+				}
 			}
 		}
 	}

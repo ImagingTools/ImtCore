@@ -65,6 +65,11 @@ I_EXPORT_COMPONENT(
 			"Object Collection Data Extractor");
 
 I_EXPORT_COMPONENT(
+			LicenseInfo,
+			"Single license information",
+			"License Information");
+
+I_EXPORT_COMPONENT(
 			LicenseManager,
 			"Management of licenses",
 			"License Manager Container Collection");

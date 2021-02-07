@@ -8,9 +8,11 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="LicenseInfoEditorGui" X="550" Y="500" Note=""/>
-        <Element ComponentName="ObjectCollectionView" X="550" Y="200" Note=""/>
-        <Element ComponentName="StandardCollectionDelegate" X="550" Y="350" Note=""/>
+        <Element ComponentName="LicenseInfo" X="1100" Y="625" Note=""/>
+        <Element ComponentName="LicenseInfoEditorGui" X="575" Y="625" Note=""/>
+        <Element ComponentName="ModelDialogGui" X="825" Y="450" Note=""/>
+        <Element ComponentName="ObjectCollectionView" X="825" Y="100" Note=""/>
+        <Element ComponentName="StandardCollectionDelegate" X="825" Y="250" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

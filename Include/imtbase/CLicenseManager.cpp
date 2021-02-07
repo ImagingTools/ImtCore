@@ -19,10 +19,19 @@ static QByteArray s_objectTypeId = "LicenseInfo";
 // public methods
 
 CLicenseManager::CLicenseManager()
+	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
 {
-	m_licenses.RegisterFactory(new istd::TSingleFactory<istd::IChangeable, CLicenseInfo>(s_objectTypeId), true);
+	m_licenses.AttachObserver(&m_updateBridge);
+
+	m_licenses.RegisterFactory(new istd::TSingleFactory<istd::IChangeable, imod::TModelWrap<CLicenseInfo>>(s_objectTypeId), true);
 
 	m_types.InsertOption("License Info", s_objectTypeId);
+}
+
+
+CLicenseManager::~CLicenseManager()
+{
+	m_updateBridge.EnsureModelsDetached();
 }
 
 

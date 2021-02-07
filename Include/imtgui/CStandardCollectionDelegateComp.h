@@ -2,12 +2,10 @@
 
 
 // ACF includes
-#include <imod/TSingleModelObserverBase.h>
 #include <icomp/CComponentBase.h>
-#include <ifile/IFilePersistence.h>
 #include <ifile/IFileMetaInfoProvider.h>
-#include <idoc/IDocumentManager.h>
 #include <iqtgui/IIconProvider.h>
+#include <iqtgui/IDialog.h>
 
 // ImtCore includes
 #include <imtgui/CObjectCollectionViewDelegate.h>
@@ -34,8 +32,8 @@ public:
 		I_REGISTER_INTERFACE(imtgui::ICollectionViewDelegate);
 		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "Type-ID supported by this delegate", true, "ObjectTypeId");
 		I_ASSIGN(m_statusIconsProviderCompPtr, "StatusIcons", "Icons for delegate visual status", false, "StatusIcons");
-		I_ASSIGN(m_objectGuiCompPtr, "ObjectEditor", "Editor of the collection objects", false, "ObjectEditor");
-		I_ASSIGN_TO(m_objectObserverCompPtr, m_objectGuiCompPtr, false);
+		I_ASSIGN(m_editDialogCompPtr, "EditDialog", "Dialog used for editing the collection items", false, "EditDialog");
+		I_ASSIGN_TO(m_editDialogObserverCompPtr, m_editDialogCompPtr, true);
 	I_END_COMPONENT;
 
 	CStandardCollectionDelegateComp();
@@ -66,8 +64,8 @@ private:
 	I_ATTR(QByteArray, m_objectTypeIdAttrPtr);
 	I_REF(iqtgui::IIconProvider, m_statusIconsProviderCompPtr);
 
-	I_REF(iqtgui::IGuiObject, m_objectGuiCompPtr);
-	I_REF(imod::IObserver, m_objectObserverCompPtr);
+	I_REF(iqtgui::IDialog, m_editDialogCompPtr);
+	I_REF(imod::IObserver, m_editDialogObserverCompPtr);
 
 private:
 	ifile::IFileMetaInfoProvider::MetaInfoPtr m_selectedMetaInfoPtr;
