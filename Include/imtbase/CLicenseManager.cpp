@@ -182,6 +182,7 @@ bool CLicenseManager::Serialize(iser::IArchive& archive)
 	return retVal;
 }
 
+
 // reimplemented (istd::IChangeable)
 
 bool CLicenseManager::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
