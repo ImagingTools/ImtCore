@@ -51,9 +51,9 @@ protected:
 private:
 	I_MULTIATTR(QByteArray, m_rightIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_licenseIdAttrPtr);
-	I_REF(ILicenseInfoProvider, m_licenseInfoProviderCompPtr);
+	I_REF(imtbase::ILicenseInfoProvider, m_licenseInfoProviderCompPtr);
 	I_REF(imod::IModel, m_licenseInfoProviderModelCompPtr);
-	I_REF(IRightsProvider, m_slaveProviderCompPtr);
+	I_REF(iauth::IRightsProvider, m_slaveProviderCompPtr);
 	I_REF(imod::IModel, m_slaveProviderModelCompPtr);
 
 	QMap<QByteArray, QByteArray> m_rightsMap;
