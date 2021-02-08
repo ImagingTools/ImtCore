@@ -13,13 +13,17 @@
 #endif
 
 // ACF includes
-#include <imod/IModel.h>
-#include <imod/CSingleModelObserverBase.h>
-#include <iprm/IParamsManager.h>
-#include <iprm/IOptionsList.h>
-#include <iprm/TParamsPtr.h>
 #include <ifile/IFileNameParam.h>
+#include <imod/IModel.h>
+#include <iprm/IOptionsList.h>
+#include <iprm/IParamsManager.h>
 #include <ilog/TLoggerCompWrap.h>
+#include <iprm/TParamsPtr.h>
+#include <imod/CSingleModelObserverBase.h>
+#include <istd/CChangeGroup.h>
+
+// ImtCore includes
+#include <imtbase/CPluginMonitor.h>
 
 
 namespace imtbase
@@ -33,6 +37,10 @@ public:
 	typedef BaseComponentClass BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(TPluginManagerCompBase);
+		I_REGISTER_SUBELEMENT(PluginMonitor);
+		I_REGISTER_SUBELEMENT_INTERFACE(PluginMonitor, IPluginMonitor, ExtractPluginMonitor);
+		I_REGISTER_SUBELEMENT_INTERFACE(PluginMonitor, istd::IChangeable, ExtractPluginMonitor);
+		I_REGISTER_SUBELEMENT_INTERFACE(PluginMonitor, imod::IModel, ExtractPluginMonitor);
 		I_ASSIGN(m_settingsCompPtr, "Settings", "Plugin settings", true, "Settings");
 		I_ASSIGN_TO(m_settingsModelCompPtr, m_settingsCompPtr, true);
 		I_ASSIGN(m_pluginPathsManagerIdAttrPtr, "PluginPathsManagerId", "ID of the plugin path manager parameter in the application settings", true, "PluginPathsManager");
@@ -78,6 +86,12 @@ protected:
 		TPluginManagerCompBase& m_parent;
 	};
 
+	template <typename InterfaceType>
+	static InterfaceType* ExtractPluginMonitor(TPluginManagerCompBase& component)
+	{
+		return &component.m_pluginMonitor;
+	}
+
 protected:
 	struct PluginInfo
 	{
@@ -93,6 +107,7 @@ protected:
 
 	typedef QList<PluginInfo> Plugins;
 	Plugins m_plugins;
+	imod::TModelWrap<CPluginMonitor> m_pluginMonitor;
 
 private:
 	I_REF(iprm::IParamsSet, m_settingsCompPtr);
@@ -126,6 +141,8 @@ TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseCom
 template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
 void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::LoadPlugins()
 {
+	m_pluginMonitor.ResetData();
+
 	if (m_settingsCompPtr.IsValid()){
 		// Load default plug-in directory:
 		iprm::TParamsPtr<ifile::IFileNameParam> defaultPluginPathParamPtr(m_settingsCompPtr.GetPtr(), *m_defaultPluginPathIdAttrPtr);
@@ -167,6 +184,8 @@ void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
 bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::LoadPluginDirectory(const QString& pluginDirectoryPath)
 {
+	istd::CChangeGroup changeGroup(&m_pluginMonitor);
+
 	ilog::CLoggerBase::SendInfoMessage(0, QString("Looking for the plug-ins in '%1'").arg(pluginDirectoryPath));
 
 	if (!pluginDirectoryPath.isEmpty() && QFileInfo(pluginDirectoryPath).exists()){
@@ -180,12 +199,20 @@ bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 #endif
 			ilog::CLoggerBase::SendInfoMessage(0, QString("Load: '%1'").arg(pluginPath.canonicalFilePath()));
 
+			CSimpleStatus status;
+			status.SetInformationId(0);
+			status.SetInformationSource(pluginPath.canonicalFilePath());
+			status.SetInformationTimeStamp(QDateTime::currentDateTime());
+			QString pluginName;
+
 			QLibrary library(pluginPath.canonicalFilePath());
 			if (library.load()){
 				CreateFunction createPluginFunc = (CreateFunction)library.resolve(m_createMethodName);
 				if (createPluginFunc != NULL){
 					istd::TDelPtr<PluginInterface> pluginInstancePtr = createPluginFunc();
 					if (pluginInstancePtr.IsValid()){
+						pluginName = pluginInstancePtr->GetPluginName();
+
 						if (pluginInstancePtr->GetPluginTypeId() == *m_pluginTypeIdAttrPtr){
 							PluginInfo pluginInfo;
 							pluginInfo.pluginPath = pluginPath.canonicalFilePath();
@@ -194,20 +221,46 @@ bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 
 							if (InitializePlugin(pluginInfo.pluginPtr)){
 								m_plugins.push_back(pluginInfo);
+
+								status.SetInformationCategory(istd::IInformationProvider::IC_INFO);
+								status.SetInformationDescription(QObject::tr("Plug-in loaded"));
 							}
 							else{
 								ilog::CLoggerBase::SendInfoMessage(0, QString("Plug-in initialization failed for: '%1'").arg(pluginPath.canonicalFilePath()));
+
+								status.SetInformationCategory(istd::IInformationProvider::IC_ERROR);
+								status.SetInformationDescription(QObject::tr("Plug-in initialization failed"));
 							}
 						}
+						else{
+							status.SetInformationCategory(istd::IInformationProvider::IC_WARNING);
+							status.SetInformationDescription(QObject::tr("Plug-in unsupported type ID"));
+						}
+					}
+					else{
+						status.SetInformationCategory(istd::IInformationProvider::IC_ERROR);
+						status.SetInformationDescription(QObject::tr("Plug-in instance creation failed"));
 					}
 				}
 				else{
-					ilog::CLoggerBase::SendErrorMessage(0, QString("Plug-in entry point was not found: '%1'").arg(pluginPath.canonicalFilePath()).arg(library.errorString()));
+					ilog::CLoggerBase::SendErrorMessage(0, QString("Plug-in entry point was not found: '%1'. %2").arg(pluginPath.canonicalFilePath()).arg(library.errorString()));
+
+					status.SetInformationCategory(istd::IInformationProvider::IC_ERROR);
+					status.SetInformationDescription(QObject::tr("Plug-in entry point was not found: '%1'").arg(library.errorString()));
 				}
 			}
 			else{
 				ilog::CLoggerBase::SendErrorMessage(0, QString("%1").arg(library.errorString()));
+
+				status.SetInformationCategory(istd::IInformationProvider::IC_ERROR);
+				status.SetInformationDescription(QObject::tr("%1").arg(library.errorString()));
 			}
+
+			m_pluginMonitor.InsertNewObject(
+						"PluginStatus",
+						pluginName,
+						status.GetInformationDescription(),
+						&status);
 		}
 
 		return true;
