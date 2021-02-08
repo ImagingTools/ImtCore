@@ -77,13 +77,13 @@ void CLicenseInfoEditorGuiComp::on_IdEdit_editingFinished()
 }
 
 
-void CLicenseInfoEditorGuiComp::on_PackageCombo_currentTextChanged(const QString &text)
+void CLicenseInfoEditorGuiComp::on_PackageCombo_currentTextChanged(const QString& /*text*/)
 {
 	DoUpdateModel();
 }
 
 
-void CLicenseInfoEditorGuiComp::on_ExpiredDate_dateTimeChanged(const QDateTime &datetime)
+void CLicenseInfoEditorGuiComp::on_ExpiredDate_dateTimeChanged(const QDateTime& /*datetime*/)
 {
 	DoUpdateModel();
 }
