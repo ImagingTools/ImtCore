@@ -52,11 +52,11 @@ void CLicenseBasedRightsProviderComp::OnComponentCreated()
 		m_rightsMap[m_rightIdAttrPtr[i]] = m_licenseIdAttrPtr[i];
 	}
 
-	if (m_licenseInfoProviderModelCompPtr.IsValid()){
+	if (m_licenseInfoProviderCompPtr.IsValid() && m_licenseInfoProviderModelCompPtr.IsValid()){
 		m_licenseInfoProviderModelCompPtr->AttachObserver(&m_updateBridge);
 	}
 
-	if (m_slaveProviderModelCompPtr.IsValid()){
+	if (m_slaveProviderCompPtr.IsValid() && m_slaveProviderModelCompPtr.IsValid()){
 		m_slaveProviderModelCompPtr->AttachObserver(&m_updateBridge);
 	}
 }
@@ -65,6 +65,8 @@ void CLicenseBasedRightsProviderComp::OnComponentCreated()
 void CLicenseBasedRightsProviderComp::OnComponentDestroyed()
 {
 	m_updateBridge.EnsureModelsDetached();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 
