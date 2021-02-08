@@ -31,9 +31,9 @@ public:
 		I_ASSIGN_MULTI_0(m_rightIdAttrPtr, "RightIds", "List of rights IDs", false);
 		I_ASSIGN_MULTI_0(m_licenseIdAttrPtr, "LicenseIds", "List of the corresponds license IDs", false);
 		I_ASSIGN(m_licenseInfoProviderCompPtr, "LicenseInfoProvider", "License info provider", false, "LicenseInfoProvider");
-		I_ASSIGN_TO(m_licenseInfoProviderModelCompPtr, m_licenseInfoProviderCompPtr, true);
+		I_ASSIGN_TO(m_licenseInfoProviderModelCompPtr, m_licenseInfoProviderCompPtr, false);
 		I_ASSIGN(m_slaveProviderCompPtr, "SlaveProvider", "Slave rights provider", false, "SlaveProvider");
-		I_ASSIGN_TO(m_slaveProviderModelCompPtr, m_slaveProviderCompPtr, true);
+		I_ASSIGN_TO(m_slaveProviderModelCompPtr, m_slaveProviderCompPtr, false);
 	I_END_COMPONENT;
 
 	CLicenseBasedRightsProviderComp();
