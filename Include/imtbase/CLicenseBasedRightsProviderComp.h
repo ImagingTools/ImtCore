@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
@@ -25,9 +26,8 @@ public:
 
 	I_BEGIN_COMPONENT(CLicenseBasedRightsProviderComp);
 		I_REGISTER_INTERFACE(IRightsProvider);
-		I_ASSIGN_MULTI_0(m_rightIdAttrPtr, "RightIds", "List of rights id", false);
-		I_ASSIGN_MULTI_0(m_licenseIdAttrPtr, "LicenseIds", "List of the corresponds license id", false);
-		I_ASSIGN(m_defaultRightAttrPtr, "DefaultRight", "Default rights enabled", false, false);
+		I_ASSIGN_MULTI_0(m_rightIdAttrPtr, "RightIds", "List of rights IDs", false);
+		I_ASSIGN_MULTI_0(m_licenseIdAttrPtr, "LicenseIds", "List of the corresponds license IDs", false);
 		I_ASSIGN(m_licenseInfoProviderCompPtr, "LicenseInfoProvider", "License info provider", false, "LicenseInfoProvider");
 		I_ASSIGN(m_slaveProviderCompPtr, "SlaveProvider", "Slave rights provider", false, "SlaveProvider");
 	I_END_COMPONENT;
@@ -44,7 +44,6 @@ protected:
 private:
 	I_MULTIATTR(QByteArray, m_rightIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_licenseIdAttrPtr);
-	I_ATTR(bool, m_defaultRightAttrPtr);
 	I_REF(ILicenseInfoProvider, m_licenseInfoProviderCompPtr);
 	I_REF(IRightsProvider, m_slaveProviderCompPtr);
 

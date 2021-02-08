@@ -19,6 +19,7 @@ void CLicenseInfo::SetLicenseName(const QString& licenseName)
 {
 	if (m_licenseName != licenseName){
 		istd::CChangeNotifier notifier(this);
+
 		m_licenseName = licenseName;
 	}
 }
@@ -28,6 +29,7 @@ void CLicenseInfo::SetLicenseId(const QByteArray& licenseId)
 {
 	if (m_licenseId != licenseId){
 		istd::CChangeNotifier notifier(this);
+
 		m_licenseId = licenseId;
 	}
 }
@@ -37,6 +39,7 @@ void CLicenseInfo::SetPackageId(const QByteArray& packageId)
 {
 	if (m_packageId != packageId){
 		istd::CChangeNotifier notifier(this);
+
 		m_packageId = packageId;
 	}
 }
@@ -45,6 +48,7 @@ void CLicenseInfo::SetExpiration(const QDateTime& expirationTime)
 {
 	if (m_expirationTime != expirationTime){
 		istd::CChangeNotifier notifier(this);
+
 		m_expirationTime = expirationTime;
 	}
 }
@@ -130,6 +134,7 @@ bool CLicenseInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 
 	return false;
 }
+
 
 istd::IChangeable* CLicenseInfo::CloneMe(CompatibilityMode mode) const
 {
