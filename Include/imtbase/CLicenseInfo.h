@@ -24,6 +24,11 @@ namespace imtbase
 class CLicenseInfo: virtual public imtbase::ILicenseInfo
 {
 public:
+	void SetLicenseName(const QString& licenseName);
+	void SetLicenseId(const QByteArray& licenseId);
+	void SetPackageId(const QByteArray& packageId);
+	void SetExpiration(const QDateTime& expirationTime);
+
 	// reimplemented (imtbase::ILicenseInfo)
 	virtual QString GetLicenseName() const override;
 	virtual QByteArray GetLicenseId() const override;

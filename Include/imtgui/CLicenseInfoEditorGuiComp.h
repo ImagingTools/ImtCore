@@ -33,6 +33,13 @@ protected:
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelAttached() override;
 	virtual void OnGuiModelDetached() override;
+	virtual void UpdateModel() const;
+
+private Q_SLOTS:
+	void on_NameEdit_editingFinished();
+	void on_IdEdit_editingFinished();
+	void on_PackageCombo_currentTextChanged(const QString &text);
+	void on_ExpiredDate_dateTimeChanged(const QDateTime &datetime);
 };
 
 
