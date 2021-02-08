@@ -9,6 +9,14 @@ namespace imtbase
 {
 
 
+// public methods
+
+CLicenseBasedRightsProviderComp::CLicenseBasedRightsProviderComp()
+	:m_updateBridge(this)
+{
+}
+
+
 // reimplemented (iauth::IRightsProvider)
 
 bool CLicenseBasedRightsProviderComp::HasRight(
@@ -26,7 +34,7 @@ bool CLicenseBasedRightsProviderComp::HasRight(
 		return m_slaveProviderCompPtr->HasRight(operationId, beQuiet);
 	}
 
-	return m_defaultRightAttrPtr.IsValid() && *m_defaultRightAttrPtr;
+	return false;
 }
 
 
@@ -43,6 +51,20 @@ void CLicenseBasedRightsProviderComp::OnComponentCreated()
 		Q_ASSERT(!m_rightsMap.contains(m_rightIdAttrPtr[i]));
 		m_rightsMap[m_rightIdAttrPtr[i]] = m_licenseIdAttrPtr[i];
 	}
+
+	if (m_licenseInfoProviderModelCompPtr.IsValid()){
+		m_licenseInfoProviderModelCompPtr->AttachObserver(&m_updateBridge);
+	}
+
+	if (m_slaveProviderModelCompPtr.IsValid()){
+		m_slaveProviderModelCompPtr->AttachObserver(&m_updateBridge);
+	}
+}
+
+
+void CLicenseBasedRightsProviderComp::OnComponentDestroyed()
+{
+	m_updateBridge.EnsureModelsDetached();
 }
 
 
