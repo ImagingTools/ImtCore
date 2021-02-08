@@ -5,7 +5,7 @@
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
-#include <imtbase/ILicenseInfo.h>
+#include <imtbase/CLicenseInfo.h>
 
 
 namespace imtgui
@@ -56,7 +56,7 @@ void CLicenseInfoEditorGuiComp::UpdateModel() const
 
 	licenseInfo.SetLicenseName(NameEdit->text());
 	licenseInfo.SetLicenseId(IdEdit->text().toUtf8());
-	licenseInfo.SetPackageId(NameEdit->text().toUtf8());
+	// TODO: package id combo
 	licenseInfo.SetExpiration(QDateTime(ExpiredDate->date(), QTime(0,0)));
 
 	licenseInfoPtr->CopyFrom(licenseInfo);
