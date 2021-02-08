@@ -18,6 +18,7 @@
 #include <imtbase/CCollectionObjectExtractorComp.h>
 #include <imtbase/CLicenseInfo.h>
 #include <imtbase/CLicenseManager.h>
+#include <imtbase/CLicenseBasedRightsProviderComp.h>
 
 
 /**
@@ -50,8 +51,9 @@ typedef icomp::TModelCompWrap<
 						imtbase::IObjectCollectionInfo,
 						imtbase::ICollectionInfo,
 						iser::ISerializable>> LicenseManager;
+typedef imtbase::CLicenseBasedRightsProviderComp LicenseBasedRightsProvider;
+
 
 } // namespace ImtCorePck
-
 
 

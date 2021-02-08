@@ -74,6 +74,11 @@ I_EXPORT_COMPONENT(
 			"Management of licenses",
 			"License Manager Container Collection");
 
+I_EXPORT_COMPONENT(
+			LicenseBasedRightsProvider,
+			"License based rights provider",
+			"License Rights Provider");
+
 
 } // namespace ImtCorePck
 
