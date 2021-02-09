@@ -299,6 +299,8 @@ void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 
 	m_plugins.clear();
 
+	m_pluginMonitor.ResetData();
+
 	BaseClass::OnComponentDestroyed();
 }
 
