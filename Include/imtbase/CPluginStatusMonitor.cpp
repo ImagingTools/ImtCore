@@ -8,9 +8,6 @@
 #include <iser/CArchiveTag.h>
 #include <istd/CChangeNotifier.h>
 
-// ImtCore includes
-#include <imtbase/CSimpleStatus.h>
-
 
 namespace imtbase
 {
@@ -19,8 +16,8 @@ namespace imtbase
 // public methods
 
 CPluginStatusMonitor::CPluginStatusMonitor()
+	:BaseClass("PluginStatus", "Plugin status collection", "PluginStatusCollection")
 {
-	m_collection.RegisterFactory(new istd::TSingleFactory<istd::IChangeable, imod::TModelWrap<CSimpleStatus>>("PluginStatus"), true);
 }
 
 
@@ -49,14 +46,15 @@ void CPluginStatusMonitor::OnPluginStatusChanged(
 	status.SetInformationId(0);
 	status.SetInformationSource(pluginPath);
 	status.SetInformationCategory(category);
+	status.SetInformationDescription(statusMessage);
 	status.SetInformationTimeStamp(QDateTime::currentDateTime());
 
 	QByteArray pluginId;
 
-	imtbase::ICollectionInfo::Ids ids = m_collection.GetElementIds();
+	imtbase::ICollectionInfo::Ids ids = GetElementIds();
 	for (QByteArray& id : ids){
 		istd::IInformationProvider* informationProviderPtr = dynamic_cast<istd::IInformationProvider*>(
-					const_cast<istd::IChangeable*>(m_collection.GetObjectPtr(id)));
+					const_cast<istd::IChangeable*>(GetObjectPtr(id)));
 
 		Q_ASSERT(informationProviderPtr != nullptr);
 
@@ -67,19 +65,20 @@ void CPluginStatusMonitor::OnPluginStatusChanged(
 	}
 
 	if (pluginId.isEmpty()){
-		pluginId = m_collection.InsertNewObject(
+		pluginId = InsertNewObject(
 					"PluginStatus",
 					pluginName,
-					statusMessage,
+					"",
 					&status);
-
-		Q_ASSERT(pluginId.isEmpty());
 	}
 	else{
-		Q_ASSERT(const_cast<istd::IChangeable*>(m_collection.GetObjectPtr(pluginId))->CopyFrom(status));
+		SetObjectName(pluginId, pluginName);
+		const_cast<istd::IChangeable*>(GetObjectPtr(pluginId))->CopyFrom(status);
 	}
 
-	m_pluginTypeIds[pluginId] = pluginTypeId;
+	if (!pluginId.isEmpty()){
+		m_pluginTypeIds[pluginId] = pluginTypeId;
+	}
 }
 
 
@@ -87,13 +86,13 @@ void CPluginStatusMonitor::OnPluginStatusChanged(
 
 const imtbase::ICollectionInfo& CPluginStatusMonitor::GetStatusList() const
 {
-	return m_collection;
+	return *this;
 }
 
 
 const istd::IInformationProvider* CPluginStatusMonitor::GetStatus(const QByteArray& pluginId) const
 {
-	return dynamic_cast<const istd::IInformationProvider*>(m_collection.GetObjectPtr(pluginId));
+	return dynamic_cast<const istd::IInformationProvider*>(GetObjectPtr(pluginId));
 }
 
 

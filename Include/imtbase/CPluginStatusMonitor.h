@@ -3,16 +3,22 @@
 
 // ImtCore includes
 #include <imtbase/IPluginStatusMonitor.h>
-#include <imtbase/CObjectCollection.h>
+#include <imtbase/TAggergatedObjectCollectionWrap.h>
+
+// ImtCore includes
+#include <imtbase/CSimpleStatus.h>
 
 
 namespace imtbase
 {
 
 
-class CPluginStatusMonitor: virtual public istd::IChangeable, virtual public IPluginStatusMonitor
+class CPluginStatusMonitor:
+			public TAggergatedObjectCollectionWrap<IPluginStatusMonitor, CSimpleStatus>
 {
 public:
+	typedef TAggergatedObjectCollectionWrap<IPluginStatusMonitor, CSimpleStatus> BaseClass;
+
 	CPluginStatusMonitor();
 
 	// reimplemented (imtbase::IPluginMonitor)
@@ -29,7 +35,6 @@ public:
 	virtual const istd::IInformationProvider* GetStatus(const QByteArray& statusId) const override;
 
 private:
-	CObjectCollection m_collection;
 	QMap<QByteArray, QByteArray> m_pluginTypeIds;
 };
 

@@ -1381,11 +1381,10 @@ void CObjectCollectionViewComp::UpdateThread::SetModels(QStandardItemModel* type
 void CObjectCollectionViewComp::UpdateThread::run()
 {
 	imtbase::IObjectCollection* objectCollectionPtr = m_parentPtr->GetObservedObject();
-	Q_ASSERT(objectCollectionPtr != nullptr);
-	Q_ASSERT(m_typeModelPtr != nullptr);
-	Q_ASSERT(m_itemModelPtr != nullptr);
+	if (objectCollectionPtr != nullptr){
+		Q_ASSERT(m_typeModelPtr != nullptr);
+		Q_ASSERT(m_itemModelPtr != nullptr);
 
-	{
 		m_typeModelPtr->clear();
 		m_itemModelPtr->clear();
 		m_itemModelPtr->setColumnCount(0);

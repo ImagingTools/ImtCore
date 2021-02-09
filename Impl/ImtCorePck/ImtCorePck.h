@@ -56,6 +56,7 @@ typedef imtbase::CLicenseBasedRightsProviderComp LicenseBasedRightsProvider;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtbase::CPluginStatusMonitor,
+						imtbase::IObjectCollection,
 						imtbase::IPluginStatusMonitor>> PluginStatusMonitor;
 
 } // namespace ImtCorePck

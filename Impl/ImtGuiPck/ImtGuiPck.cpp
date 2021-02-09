@@ -112,6 +112,11 @@ I_EXPORT_COMPONENT(
 			"Plugin status viewer",
 			"Plugin Status View");
 
+I_EXPORT_COMPONENT(
+			PluginStatusMonitorViewDelegate,
+			"Plugin status monitor view delegate",
+			"Delegate View Collection Plugin Status");
+
 
 } // namespace ImtGuiPck
 
