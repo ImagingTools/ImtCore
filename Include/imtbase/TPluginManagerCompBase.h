@@ -221,12 +221,21 @@ bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 						}
 						else{
 							category = istd::IInformationProvider::IC_WARNING;
-							statusMessage = QObject::tr("Plug-in unsupported type ID");
+							statusMessage = QObject::tr("Plug-in unsupported type-ID");
 						}
 					}
 					else{
 						category = istd::IInformationProvider::IC_ERROR;
 						statusMessage = QObject::tr("Plug-in instance creation failed");
+					}
+
+					if (m_pluginStatusMonitorCompPtr.IsValid()) {
+						m_pluginStatusMonitorCompPtr->OnPluginStatusChanged(
+									pluginPath.canonicalFilePath(),
+									pluginName,
+									pluginTypeId,
+									category,
+									statusMessage);
 					}
 				}
 				else{
@@ -241,16 +250,6 @@ bool TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, Ba
 
 				category = istd::IInformationProvider::IC_ERROR;
 				statusMessage = QObject::tr("%1").arg(library.errorString());
-			}
-
-
-			if (m_pluginStatusMonitorCompPtr.IsValid()){
-				m_pluginStatusMonitorCompPtr->OnPluginStatusChanged(
-							pluginPath.canonicalFilePath(),
-							pluginName,
-							pluginTypeId,
-							category,
-							statusMessage);
 			}
 		}
 

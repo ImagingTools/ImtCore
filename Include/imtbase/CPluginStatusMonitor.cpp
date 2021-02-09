@@ -71,10 +71,6 @@ void CPluginStatusMonitor::OnPluginStatusChanged(
 					"",
 					&status);
 	}
-	else{
-		SetObjectName(pluginId, pluginName);
-		const_cast<istd::IChangeable*>(GetObjectPtr(pluginId))->CopyFrom(status);
-	}
 
 	if (!pluginId.isEmpty()){
 		m_pluginTypeIds[pluginId] = pluginTypeId;

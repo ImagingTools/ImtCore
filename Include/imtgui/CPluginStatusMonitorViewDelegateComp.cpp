@@ -16,22 +16,22 @@ namespace imtgui
 CPluginStatusMonitorViewDelegateComp::CPluginStatusMonitorViewDelegateComp()
 	:m_collectionPtr(nullptr)
 {
-	m_summaryInformationTypes.InsertItem("Status", "Status", "");
+	m_summaryInformationTypes.InsertItem("Status", tr("Status"), "");
 	m_summaryInformationHeaders["Status"] = HeaderInfo(true);
 
-	m_summaryInformationTypes.InsertItem("Timestamp", "Timestamp", "");
+	m_summaryInformationTypes.InsertItem("Timestamp", tr("Time"), "");
 	m_summaryInformationHeaders["Timestamp"] = HeaderInfo(false);
 
-	m_summaryInformationTypes.InsertItem("Name", "Name", "");
+	m_summaryInformationTypes.InsertItem("Name", tr("Name"), "");
 	m_summaryInformationHeaders["Name"] = HeaderInfo(false);
 
-	m_summaryInformationTypes.InsertItem("TypeId", "TypeId", "");
+	m_summaryInformationTypes.InsertItem("TypeId", tr("Type"), "");
 	m_summaryInformationHeaders["TypeId"] = HeaderInfo(false);
 
-	m_summaryInformationTypes.InsertItem("Path", "Path", "");
+	m_summaryInformationTypes.InsertItem("Path", tr("Path"), "");
 	m_summaryInformationHeaders["Path"] = HeaderInfo(false);
 
-	m_summaryInformationTypes.InsertItem("StatusMessage", "Status message", "");
+	m_summaryInformationTypes.InsertItem("StatusMessage", tr("Message"), "");
 	m_summaryInformationHeaders["StatusMessage"] = HeaderInfo(false);
 }
 
@@ -124,7 +124,6 @@ ICollectionViewDelegate::SummaryInformation CPluginStatusMonitorViewDelegateComp
 	static QIcon warning(":/Icons/StateWarning");
 	static QIcon error(":/Icons/Error");
 	static QIcon critical(":/Icons/StateInvalid");
-
 
 	if (m_collectionPtr != nullptr){
 		istd::IInformationProvider* informationProviderPtr = dynamic_cast<istd::IInformationProvider*>(
@@ -240,6 +239,7 @@ bool CPluginStatusMonitorViewDelegateComp::IsCommandSupported(int /*commandId*/)
 void CPluginStatusMonitorViewDelegateComp::VisualStatus::SetStatusIcon(const QIcon &statusIcon)
 {
 	istd::CChangeNotifier changeNotifier(this);
+
 	m_statusIcon = statusIcon;
 }
 
@@ -248,6 +248,7 @@ void CPluginStatusMonitorViewDelegateComp::VisualStatus::SetStatusText(const QSt
 {
 	if (m_statusText != statusText){
 		istd::CChangeNotifier changeNotifier(this);
+
 		m_statusText = statusText;
 	}
 }
