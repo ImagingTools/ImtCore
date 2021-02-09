@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4892" Description="ACF"/>
+            <Version Id="1" Number="2134" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ObjectCollectionView" PackageId="ImtGuiPck" ComponentId="ObjectCollectionView">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PluginStatusMonitor"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewDelegates" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PluginStatusMonitorViewDelegate</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PluginStatusMonitor" PackageId="ImtCorePck" ComponentId="PluginStatusMonitor">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="PluginStatusMonitorViewDelegate" PackageId="ImtGuiPck" ComponentId="PluginStatusMonitorViewDelegate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="PluginStatusMonitor"/>
+        <Interface InterfaceId="imtbase::IPluginStatusMonitor" ComponentId="PluginStatusMonitor"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="PluginStatusMonitor"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="PluginStatusMonitor"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="Gui" ComponentId="ObjectCollectionView"/>
+        <Component ExportedId="VisualStatus" ComponentId="ObjectCollectionView/VisualStatus"/>
+    </ExportedComponents>
+</Acf>

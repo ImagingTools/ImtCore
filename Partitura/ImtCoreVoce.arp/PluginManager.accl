@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4892" Description="ACF"/>
+            <Version Id="1" Number="2134" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ObjectCollectionView" X="600" Y="225" Note=""/>
+        <Element ComponentName="PluginStatusMonitor" X="600" Y="125" Note=""/>
+        <Element ComponentName="PluginStatusMonitorViewDelegate" X="600" Y="325" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
