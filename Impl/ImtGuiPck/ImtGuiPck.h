@@ -24,6 +24,7 @@
 #include <imtgui/CPageNavigationControllerComp.h>
 #include <imtgui/CPageSwitcherComp.h>
 #include <imtgui/CLicenseInfoEditorGuiComp.h>
+#include <imtgui/CPluginStatusViewerComp.h>
 
 
 /**
@@ -51,6 +52,7 @@ typedef icomp::TModelCompWrap<imtgui::CPageNavigationControllerComp> PageNavigat
 typedef ibase::TModelObserverCompWrap<imtgui::CPageSwitcherComp> PageSwitcher;
 typedef imtgui::CStandardCollectionDelegateComp StandardCollectionDelegate;
 typedef imtgui::CLicenseInfoEditorGuiComp LicenseInfoEditorGui;
+typedef imtgui::CPluginStatusViewerComp PluginStatusViewer;
 
 
 } // namespace ImtGuiPck

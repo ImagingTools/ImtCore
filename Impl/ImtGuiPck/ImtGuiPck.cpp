@@ -107,6 +107,11 @@ I_EXPORT_COMPONENT(
 			"License info editor",
 			"License Info");
 
+I_EXPORT_COMPONENT(
+			PluginStatusViewer,
+			"Plugin status viewer",
+			"Plugin Status View");
+
 
 } // namespace ImtGuiPck
 
