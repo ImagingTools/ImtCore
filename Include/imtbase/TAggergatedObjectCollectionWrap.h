@@ -12,6 +12,8 @@
 #include <imod/TModelWrap.h>
 #include <imod/CModelUpdateBridge.h>
 #include <iprm/COptionsManager.h>
+#include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
 
 // ImtCore includes
 #include <imtbase/CObjectCollection.h>
