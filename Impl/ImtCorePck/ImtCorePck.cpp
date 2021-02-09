@@ -79,6 +79,11 @@ I_EXPORT_COMPONENT(
 			"License based rights provider",
 			"License Rights Provider");
 
+I_EXPORT_COMPONENT(
+			PluginStatusMonitor,
+			"Plugin status monitor",
+			"Plugin Status Monitor");
+
 
 } // namespace ImtCorePck
 

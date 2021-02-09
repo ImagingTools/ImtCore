@@ -7,20 +7,30 @@ namespace imtgui
 
 // protected methods
 
+// reimplemented (icomp::CComponentBase)
+
+void CPluginStatusViewerComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	SetStatusText("PluginStatusViewer");
+	SetStatusIcon(QIcon(":/Icons/StateOk"));
+}
+
 // reimplemented (iqtgui::TGuiObserverWrap)
 
 void CPluginStatusViewerComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	Table->clearContents();
 
-	imtbase::IPluginMonitor* pluginMonitorPtr = GetObservedObject();
-	Q_ASSERT(pluginMonitorPtr != nullptr);
+	imtbase::IPluginStatusMonitor* pluginStatusMonitorPtr = GetObservedObject();
+	Q_ASSERT(pluginStatusMonitorPtr != nullptr);
 
-	const imtbase::ICollectionInfo& collectionInfo = pluginMonitorPtr->GetPluginList();
+	const imtbase::ICollectionInfo& collectionInfo = pluginStatusMonitorPtr->GetStatusList();
 
 	imtbase::ICollectionInfo::Ids ids = collectionInfo.GetElementIds();
 	for (QByteArray id : ids){
-		const istd::IInformationProvider* statusPtr = pluginMonitorPtr->GetPluginStatus(id);
+		const istd::IInformationProvider* statusPtr = pluginStatusMonitorPtr->GetStatus(id);
 		if (statusPtr != nullptr){
 			QString name = collectionInfo.GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
 			QString description = collectionInfo.GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();

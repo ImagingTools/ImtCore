@@ -19,6 +19,7 @@
 #include <imtbase/CLicenseInfo.h>
 #include <imtbase/CLicenseManager.h>
 #include <imtbase/CLicenseBasedRightsProviderComp.h>
+#include <imtbase/CPluginStatusMonitor.h>
 
 
 /**
@@ -52,7 +53,10 @@ typedef icomp::TModelCompWrap<
 						imtbase::ICollectionInfo,
 						iser::ISerializable>> LicenseManager;
 typedef imtbase::CLicenseBasedRightsProviderComp LicenseBasedRightsProvider;
-
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtbase::CPluginStatusMonitor,
+						imtbase::IPluginStatusMonitor>> PluginStatusMonitor;
 
 } // namespace ImtCorePck
 
