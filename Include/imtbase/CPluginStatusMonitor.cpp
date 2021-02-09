@@ -18,7 +18,7 @@ namespace imtbase
 
 // public methods
 
-	CPluginStatusMonitor::CPluginStatusMonitor()
+CPluginStatusMonitor::CPluginStatusMonitor()
 {
 	m_collection.RegisterFactory(new istd::TSingleFactory<istd::IChangeable, imod::TModelWrap<CSimpleStatus>>("PluginStatus"), true);
 }
