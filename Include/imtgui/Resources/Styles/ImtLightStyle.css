@@ -228,12 +228,11 @@ QTreeWidget[TabSimulation=true]::item:first:selected
 
 QTreeView[ItemView=true]::item {
     color: #335777;
-    height: 25px;
+    height: 30px;
 }
 
 QTreeView[ItemView=true]::item::selected {
     color: #335777;
-    height: 25px;
     background-color: #aad5ff;
 }
 

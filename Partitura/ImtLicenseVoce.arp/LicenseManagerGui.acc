@@ -50,8 +50,8 @@
                     <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="Licenses">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultStatusIcon" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value=":/Icons/CameraFlash"/>
+                    <AttributeInfo Id="DefaultStatusIcon" Type="String" ExportId="DefaultStatusIcon">
+                        <Data IsEnabled="true" Value=":/Icons/Lock"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
                         <Data IsEnabled="false"/>

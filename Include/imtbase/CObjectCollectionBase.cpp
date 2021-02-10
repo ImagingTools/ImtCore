@@ -107,7 +107,7 @@ bool CObjectCollectionBase::RemoveObject(const QByteArray& objectId)
 
 			istd::CChangeNotifier changeNotifier(this);
 
-			DestroyObjectInstance((*iter).objectPtr.GetPtr());
+			DestroyObjectInstance((*iter).objectPtr.PopPtr());
 
 			m_objects.erase(iter);
 
