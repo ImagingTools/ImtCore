@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4900" Description="ACF"/>
+            <Version Id="0" Number="4902" Description="ACF"/>
             <Version Id="1" Number="2135" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>UI for license management</Description>
@@ -18,6 +18,18 @@
         <Element Id="LicenseInfoEditorGui" PackageId="ImtGuiPck" ComponentId="LicenseInfoEditorGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="LicenseManagerDelegate" PackageId="ImtGuiPck" ComponentId="LicenseManagerDelegate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EditDialog" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ModelDialogGui"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="LicenseInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="ModelDialogGui" PackageId="QtGuiPck" ComponentId="ModelDialogGui">
@@ -59,21 +71,9 @@
                     <AttributeInfo Id="ViewDelegates" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>StandardCollectionDelegate</Value>
+                                <Value>LicenseManagerDelegate</Value>
                             </Values>
                         </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="StandardCollectionDelegate" PackageId="ImtGuiPck" ComponentId="StandardCollectionDelegate">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EditDialog" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ModelDialogGui"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="LicenseInfo"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

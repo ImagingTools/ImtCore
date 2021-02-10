@@ -1,0 +1,103 @@
+#include <imtgui/CLicenseManagerDelegateComp.h>
+
+
+// Qt includes
+#include <QtCore/QUuid>
+
+// ImtCore includes
+#include <imtbase/CLicenseInfo.h>
+
+
+namespace imtgui
+{
+
+
+// reimplemented (ICollectionViewDelegate)
+
+QByteArray CLicenseManagerDelegateComp::CreateNewObject(const QByteArray& typeId, const istd::IChangeable* /*defaultDataPtr*/) const
+{
+	if (m_collectionPtr != nullptr){
+		imtbase::CLicenseInfo licenseInfo;
+		licenseInfo.SetLicenseId("LicenseId");
+		licenseInfo.SetLicenseName("LicenseName");
+		licenseInfo.SetPackageId("PackageId");
+		licenseInfo.SetExpiration(QDateTime());
+
+		return m_collectionPtr->InsertNewObject(typeId, tr("New"), QString(), &licenseInfo);
+	}
+
+	return QByteArray();
+}
+
+
+ICollectionViewDelegate::SummaryInformation CLicenseManagerDelegateComp::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+{
+	SummaryInformation result;
+
+	const imtbase::ILicenseInfo* licenseInfoPtr = dynamic_cast<const imtbase::ILicenseInfo*>(m_collectionPtr->GetObjectPtr(objectId));
+
+	if (licenseInfoPtr != nullptr){
+		if (informationId == QByteArray("LicenseId")){
+			result.text = licenseInfoPtr->GetLicenseId();
+			result.sortValue = result.text;
+		}
+		else if (informationId == QByteArray("PackageId")){
+			result.text = licenseInfoPtr->GetPackageId();
+			result.sortValue = result.text;
+		}
+		else if (informationId == QByteArray("LicenseName")){
+			result.text = licenseInfoPtr->GetLicenseName();
+			result.sortValue = result.text;
+		}
+		else if (informationId == QByteArray("Expired")){
+			QDateTime dateTime = licenseInfoPtr->GetExpiration();
+
+			if (dateTime.isValid()){
+				result.text = dateTime.date().toString("dd.MM.yyyy");
+				result.sortValue = licenseInfoPtr->GetExpiration().toSecsSinceEpoch();
+			}
+			else{
+				result.text = tr("Unlimited");
+				result.sortValue = tr("Unlimited");
+			}
+		}
+	}
+
+	return result;
+}
+
+
+// protected methods
+
+// reimplemented (icomp::CComponentBase)
+
+void CLicenseManagerDelegateComp::OnComponentCreated()
+{
+	SetupSummaryInformation();
+}
+
+
+// reimplemented (CObjectCollectionViewDelegate)
+
+void CLicenseManagerDelegateComp::SetupSummaryInformation()
+{
+	m_summaryInformationTypes.ResetData();
+	m_summaryInformationHeaders.clear();
+
+	m_summaryInformationTypes.InsertItem("LicenseName", tr("License name"), "");
+	m_summaryInformationHeaders["LicenseName"] = HeaderInfo(true);
+
+	m_summaryInformationTypes.InsertItem("LicenseId", tr("License ID"), "");
+	m_summaryInformationHeaders["LicenseId"] = HeaderInfo(true);
+
+	m_summaryInformationTypes.InsertItem("PackageId", tr("Package ID"), "");
+	m_summaryInformationHeaders["PackageId"] = HeaderInfo(false);
+
+	m_summaryInformationTypes.InsertItem("Expired", tr("Expired"), "");
+	m_summaryInformationHeaders["Expired"] = HeaderInfo(false);
+}
+
+
+} // namespace imtgui
+
+

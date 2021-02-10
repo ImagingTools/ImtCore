@@ -40,6 +40,7 @@ private Q_SLOTS:
 	void on_IdEdit_editingFinished();
 	void on_PackageCombo_currentTextChanged(const QString &text);
 	void on_ExpiredDate_dateTimeChanged(const QDateTime &datetime);
+	void on_ExpireGroup_toggled(bool on);
 };
 
 

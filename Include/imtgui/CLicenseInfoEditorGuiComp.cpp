@@ -31,7 +31,14 @@ void CLicenseInfoEditorGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	NameEdit->setText(licenseInfoPtr->GetLicenseName());
 	IdEdit->setText(licenseInfoPtr->GetLicenseId());
 	// TODO: package id combo
-	ExpiredDate->setDateTime(licenseInfoPtr->GetExpiration());
+
+	if (licenseInfoPtr->GetExpiration().isValid()){
+		ExpireGroup->setChecked(true);
+		ExpiredDate->setDateTime(licenseInfoPtr->GetExpiration());
+	}
+	else{
+		ExpireGroup->setChecked(false);
+	}
 }
 
 
@@ -57,7 +64,12 @@ void CLicenseInfoEditorGuiComp::UpdateModel() const
 	licenseInfo.SetLicenseName(NameEdit->text());
 	licenseInfo.SetLicenseId(IdEdit->text().toUtf8());
 	// TODO: package id combo
-	licenseInfo.SetExpiration(QDateTime(ExpiredDate->date(), QTime(0,0)));
+	if (ExpireGroup->isChecked()){
+		licenseInfo.SetExpiration(QDateTime(ExpiredDate->date(), QTime(0,0)));
+	}
+	else{
+		licenseInfo.SetExpiration(QDateTime());
+	}
 
 	licenseInfoPtr->CopyFrom(licenseInfo);
 }
@@ -84,6 +96,12 @@ void CLicenseInfoEditorGuiComp::on_PackageCombo_currentTextChanged(const QString
 
 
 void CLicenseInfoEditorGuiComp::on_ExpiredDate_dateTimeChanged(const QDateTime& /*datetime*/)
+{
+	DoUpdateModel();
+}
+
+
+void CLicenseInfoEditorGuiComp::on_ExpireGroup_toggled(bool /*on*/)
 {
 	DoUpdateModel();
 }

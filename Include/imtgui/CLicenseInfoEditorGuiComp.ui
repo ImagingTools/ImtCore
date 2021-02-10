@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>497</width>
-    <height>272</height>
+    <width>343</width>
+    <height>360</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -173,6 +173,9 @@ QAbstractItemView[TabSimulation=true]
     <widget class="QGroupBox" name="ExpireGroup">
      <property name="title">
       <string>Valid Until</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_5">
       <item>

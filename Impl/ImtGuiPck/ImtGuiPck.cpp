@@ -117,6 +117,11 @@ I_EXPORT_COMPONENT(
 			"Plugin status monitor view delegate",
 			"Delegate View Collection Plugin Status");
 
+I_EXPORT_COMPONENT(
+			LicenseManagerDelegate,
+			"License manager delegate",
+			"License Manager Delegate");
+
 
 } // namespace ImtGuiPck
 
