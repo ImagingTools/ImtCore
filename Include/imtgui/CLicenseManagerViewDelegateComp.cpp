@@ -84,8 +84,6 @@ void CLicenseManagerViewDelegateComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	SetupSummaryInformation();
-
-	BaseClass::OnComponentCreated();
 }
 
 
