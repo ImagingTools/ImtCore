@@ -73,6 +73,13 @@ bool CStandardCollectionDelegateComp::OpenDocumentEditor(
 
 // protected methods
 
+void CStandardCollectionDelegateComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	SetupSummaryInformation();
+}
+
 // reimplemented (CObjectCollectionViewDelegate)
 
 void CStandardCollectionDelegateComp::SetupCommands()

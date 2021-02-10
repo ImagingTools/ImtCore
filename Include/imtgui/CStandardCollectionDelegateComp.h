@@ -44,6 +44,9 @@ public:
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
 
 protected:
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
 	// reimplemented (CObjectCollectionViewDelegate)
 	virtual void SetupCommands() override;
 

@@ -315,6 +315,8 @@ void CDocumentBasedFileCollectionDelegateComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
+	SetupSummaryInformation();
+
 	if (m_documentManagerModelCompPtr.IsValid()){
 		m_documentManagerModelCompPtr->AttachObserver(&m_documentManagerObserver);
 	}

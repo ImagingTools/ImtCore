@@ -81,6 +81,8 @@ ICollectionViewDelegate::SummaryInformation CLicenseManagerViewDelegateComp::Get
 
 void CLicenseManagerViewDelegateComp::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
 	SetupSummaryInformation();
 
 	BaseClass::OnComponentCreated();
