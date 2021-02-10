@@ -67,6 +67,9 @@ void CPluginStatusMonitor::OnPluginStatusChanged(
 					"",
 					&status);
 	}
+	else{
+		SetObjectData(pluginId, status);
+	}
 
 	if (!pluginId.isEmpty()){
 		m_pluginTypeIds[pluginId] = pluginTypeId;
