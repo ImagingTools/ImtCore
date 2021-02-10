@@ -26,7 +26,7 @@
 #include <imtgui/CLicenseInfoEditorGuiComp.h>
 #include <imtgui/CPluginStatusViewerComp.h>
 #include <imtgui/CPluginStatusMonitorViewDelegateComp.h>
-#include <imtgui/CLicenseManagerDelegateComp.h>
+#include <imtgui/CLicenseManagerViewDelegateComp.h>
 
 
 /**
@@ -56,7 +56,7 @@ typedef imtgui::CStandardCollectionDelegateComp StandardCollectionDelegate;
 typedef imtgui::CLicenseInfoEditorGuiComp LicenseInfoEditorGui;
 typedef imtgui::CPluginStatusViewerComp PluginStatusViewer;
 typedef imtgui::CPluginStatusMonitorViewDelegateComp PluginStatusMonitorViewDelegate;
-typedef imtgui::CLicenseManagerDelegateComp LicenseManagerDelegate;
+typedef imtgui::CLicenseManagerViewDelegateComp LicenseManagerViewDelegate;
 
 
 } // namespace ImtGuiPck

@@ -18,13 +18,16 @@ namespace imtgui
 /**
 	\ingroup Collection
 */
-class CLicenseManagerDelegateComp: public CStandardCollectionDelegateComp
+class CLicenseManagerViewDelegateComp: public CStandardCollectionDelegateComp
 {
 	Q_OBJECT
 public:
 	typedef CStandardCollectionDelegateComp BaseClass;
 
-	I_BEGIN_COMPONENT(CLicenseManagerDelegateComp);
+	I_BEGIN_COMPONENT(CLicenseManagerViewDelegateComp);
+		I_ASSIGN(m_defaultLicenseNameAttrPtr, "DefaultLicenseName", "Default license name", false, "");
+		I_ASSIGN(m_defaultLicenseIdAttrPtr, "DefaultLicenseId", "Default license ID", false, "");
+		I_ASSIGN(m_defaultPackageIdAttrPtr, "DefaultPackageId", "Default package ID", false, "");
 	I_END_COMPONENT;
 
 	// reimplemented (ICollectionViewDelegate)
@@ -37,6 +40,11 @@ protected:
 
 	// reimplemented (CObjectCollectionViewDelegate)
 	virtual void SetupSummaryInformation() override;
+
+private:
+	I_ATTR(QString, m_defaultLicenseNameAttrPtr);
+	I_ATTR(QByteArray, m_defaultLicenseIdAttrPtr);
+	I_ATTR(QByteArray, m_defaultPackageIdAttrPtr);
 };
 
 

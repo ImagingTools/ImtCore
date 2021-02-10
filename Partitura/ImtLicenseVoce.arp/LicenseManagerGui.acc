@@ -20,7 +20,7 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="LicenseManagerDelegate" PackageId="ImtGuiPck" ComponentId="LicenseManagerDelegate">
+        <Element Id="LicenseManagerViewDelegate" PackageId="ImtGuiPck" ComponentId="LicenseManagerViewDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="EditDialog" Type="Reference" ExportId="">
@@ -71,7 +71,7 @@
                     <AttributeInfo Id="ViewDelegates" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>LicenseManagerDelegate</Value>
+                                <Value>LicenseManagerViewDelegate</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

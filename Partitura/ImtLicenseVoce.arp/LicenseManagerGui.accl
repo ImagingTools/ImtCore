@@ -10,7 +10,7 @@
     <PositionMap>
         <Element ComponentName="LicenseInfo" X="1100" Y="625" Note=""/>
         <Element ComponentName="LicenseInfoEditorGui" X="575" Y="625" Note=""/>
-        <Element ComponentName="LicenseManagerDelegate" X="825" Y="275" Note=""/>
+        <Element ComponentName="LicenseManagerViewDelegate" X="829" Y="278" Note=""/>
         <Element ComponentName="ModelDialogGui" X="825" Y="450" Note=""/>
         <Element ComponentName="ObjectCollectionView" X="825" Y="100" Note=""/>
     </PositionMap>

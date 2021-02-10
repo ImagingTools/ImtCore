@@ -1,4 +1,4 @@
-#include <imtgui/CLicenseManagerDelegateComp.h>
+#include <imtgui/CLicenseManagerViewDelegateComp.h>
 
 
 // Qt includes
@@ -14,14 +14,22 @@ namespace imtgui
 
 // reimplemented (ICollectionViewDelegate)
 
-QByteArray CLicenseManagerDelegateComp::CreateNewObject(const QByteArray& typeId, const istd::IChangeable* /*defaultDataPtr*/) const
+QByteArray CLicenseManagerViewDelegateComp::CreateNewObject(const QByteArray& typeId, const istd::IChangeable* /*defaultDataPtr*/) const
 {
 	if (m_collectionPtr != nullptr){
 		imtbase::CLicenseInfo licenseInfo;
-		licenseInfo.SetLicenseId("LicenseId");
-		licenseInfo.SetLicenseName("LicenseName");
-		licenseInfo.SetPackageId("PackageId");
-		licenseInfo.SetExpiration(QDateTime());
+
+		if (m_defaultLicenseNameAttrPtr.IsValid()){
+			licenseInfo.SetLicenseName(*m_defaultLicenseNameAttrPtr);
+		}
+
+		if (m_defaultLicenseIdAttrPtr.IsValid()){
+			licenseInfo.SetLicenseId(*m_defaultLicenseIdAttrPtr);
+		}
+
+		if (m_defaultPackageIdAttrPtr.IsValid()){
+			licenseInfo.SetPackageId(*m_defaultPackageIdAttrPtr);
+		}
 
 		return m_collectionPtr->InsertNewObject(typeId, tr("New"), QString(), &licenseInfo);
 	}
@@ -30,7 +38,7 @@ QByteArray CLicenseManagerDelegateComp::CreateNewObject(const QByteArray& typeId
 }
 
 
-ICollectionViewDelegate::SummaryInformation CLicenseManagerDelegateComp::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+ICollectionViewDelegate::SummaryInformation CLicenseManagerViewDelegateComp::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
 {
 	SummaryInformation result;
 
@@ -71,7 +79,7 @@ ICollectionViewDelegate::SummaryInformation CLicenseManagerDelegateComp::GetSumm
 
 // reimplemented (icomp::CComponentBase)
 
-void CLicenseManagerDelegateComp::OnComponentCreated()
+void CLicenseManagerViewDelegateComp::OnComponentCreated()
 {
 	SetupSummaryInformation();
 }
@@ -79,7 +87,7 @@ void CLicenseManagerDelegateComp::OnComponentCreated()
 
 // reimplemented (CObjectCollectionViewDelegate)
 
-void CLicenseManagerDelegateComp::SetupSummaryInformation()
+void CLicenseManagerViewDelegateComp::SetupSummaryInformation()
 {
 	m_summaryInformationTypes.ResetData();
 	m_summaryInformationHeaders.clear();
