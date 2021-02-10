@@ -65,11 +65,13 @@ public:
 	virtual HeaderInfo GetSummaryInformationHeaderInfo(const QByteArray& informationId) const override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
 	virtual iqtgui::IGuiObject* GetInformationView() const override;
+	virtual bool IsCommandSupported(int commandId) const override;
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 protected:
+	virtual void SetupSummaryInformation();
 	virtual void SetupCommands();
 	virtual void SetupInsertCommand();
 	virtual bool IsNameUnique(const QString& name);
@@ -77,9 +79,6 @@ protected:
 
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
-
-	// reimplemented (imtgui::ICollectionViewDelegate)
-	virtual bool IsCommandSupported(int commandId) const override;
 
 protected:
 	class VisualStatus: virtual public iqtgui::IVisualStatus

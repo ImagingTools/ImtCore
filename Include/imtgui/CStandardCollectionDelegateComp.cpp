@@ -21,7 +21,7 @@ namespace imtgui
 
 
 CStandardCollectionDelegateComp::CStandardCollectionDelegateComp()
-	:m_editContentsCommand("Edit", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 1982)
+	:m_editContentsCommand(tr("Edit"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 1982)
 {
 }
 
@@ -96,20 +96,6 @@ void CStandardCollectionDelegateComp::OnLanguageChanged()
 	BaseClass2::OnLanguageChanged();
 
 	m_editContentsCommand.SetVisuals(tr("Edit"), tr("Edit"), tr("Edit existing object"), QIcon(":/Icons/Edit"));
-}
-
-
-// reimplemented (icomp::CComponentBase)
-
-void CStandardCollectionDelegateComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-}
-
-
-void CStandardCollectionDelegateComp::OnComponentDestroyed()
-{
-	BaseClass::OnComponentDestroyed();
 }
 
 

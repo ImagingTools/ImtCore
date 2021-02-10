@@ -51,7 +51,7 @@ public:
 
 	CDocumentBasedFileCollectionDelegateComp();
 
-	// reimplemented (ICollectionViewDelegate)
+	// reimplemented (imtgui::ICollectionViewDelegate)
 	virtual QByteArray GetSupportedTypeId() const override;
 	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;
 	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
@@ -110,11 +110,11 @@ protected:
 	};
 
 protected:
-	// reimplemented (CFileObjectCollectionViewDelegate)
+	// reimplemented (imtrepogui::CFileObjectCollectionViewDelegate)
 	virtual bool IsRestoreAllowed(const QByteArray& objectId) override;
 	virtual void AfterRestore(const QByteArray& objectId, bool isRestoreSuccessful) override;
 
-	// reimplemented (CObjectCollectionViewDelegate)
+	// reimplemented (imtgui::CObjectCollectionViewDelegate)
 	virtual void SetupCommands() override;
 	virtual void SetupInsertCommand() override;
 

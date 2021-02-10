@@ -17,20 +17,13 @@ namespace imtgui
 
 
 CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
-	:m_editCommands("&Edit", 100),
-	m_insertCommand("New", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
-	m_duplicateCommand("Duplicate", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
-	m_removeCommand("Remove", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
+	:m_editCommands(tr("&Edit"), 100),
+	m_insertCommand(tr("New"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
+	m_duplicateCommand(tr("Duplicate"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
+	m_removeCommand(tr("Remove"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_collectionPtr(nullptr)
 {
-	m_summaryInformationTypes.InsertItem("Name", "Name", "");
-	m_summaryInformationHeaders["Name"] = HeaderInfo(true);
-
-	m_summaryInformationTypes.InsertItem("Type", "Type", "");
-	m_summaryInformationHeaders["Type"] = HeaderInfo(false);
-
-	m_summaryInformationTypes.InsertItem("Description", "Description", "");
-	m_summaryInformationHeaders["Description"] = HeaderInfo(false);
+	SetupSummaryInformation();
 }
 
 
@@ -218,6 +211,12 @@ iqtgui::IGuiObject* CObjectCollectionViewDelegate::GetInformationView() const
 }
 
 
+bool CObjectCollectionViewDelegate::IsCommandSupported(int /*commandId*/) const
+{
+	return true;
+}
+
+
 // reimplemented (ibase::ICommandsProvider)
 
 const ibase::IHierarchicalCommand* CObjectCollectionViewDelegate::GetCommands() const
@@ -227,6 +226,22 @@ const ibase::IHierarchicalCommand* CObjectCollectionViewDelegate::GetCommands() 
 
 
 // protected methods
+
+void CObjectCollectionViewDelegate::SetupSummaryInformation()
+{
+	m_summaryInformationTypes.ResetData();
+	m_summaryInformationHeaders.clear();
+
+	m_summaryInformationTypes.InsertItem("Name", tr("Name"), "");
+	m_summaryInformationHeaders["Name"] = HeaderInfo(true);
+
+	m_summaryInformationTypes.InsertItem("Type", tr("Type"), "");
+	m_summaryInformationHeaders["Type"] = HeaderInfo(false);
+
+	m_summaryInformationTypes.InsertItem("Description", tr("Description"), "");
+	m_summaryInformationHeaders["Description"] = HeaderInfo(false);
+}
+
 
 void CObjectCollectionViewDelegate::SetupCommands()
 {
@@ -315,17 +330,11 @@ void CObjectCollectionViewDelegate::OnDuplicateObject(const QByteArray& /*source
 
 void CObjectCollectionViewDelegate::OnLanguageChanged()
 {
+	SetupSummaryInformation();
+
 	m_insertCommand.SetVisuals(tr("Insert"), tr("New"), tr("Insert new document into the collection"), QIcon(":/Icons/Add"));
 	m_duplicateCommand.SetVisuals(tr("Duplicate"), tr("Duplicate"), tr("Duplicate selected objects"), QIcon(":/Icons/Duplicate"));
 	m_removeCommand.SetVisuals(tr("Remove"), tr("Remove"), tr("Remove selected document from the collection"), QIcon(":/Icons/Delete"));
-}
-
-
-// reimplemented (imtgui::ICollectionViewDelegate)
-
-bool CObjectCollectionViewDelegate::IsCommandSupported(int /*commandId*/) const
-{
-	return true;
 }
 
 

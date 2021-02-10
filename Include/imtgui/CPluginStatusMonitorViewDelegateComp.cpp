@@ -16,23 +16,6 @@ namespace imtgui
 CPluginStatusMonitorViewDelegateComp::CPluginStatusMonitorViewDelegateComp()
 	:m_collectionPtr(nullptr)
 {
-	m_summaryInformationTypes.InsertItem("Status", tr("Status"), "");
-	m_summaryInformationHeaders["Status"] = HeaderInfo(true);
-
-	m_summaryInformationTypes.InsertItem("Timestamp", tr("Time"), "");
-	m_summaryInformationHeaders["Timestamp"] = HeaderInfo(false);
-
-	m_summaryInformationTypes.InsertItem("Name", tr("Name"), "");
-	m_summaryInformationHeaders["Name"] = HeaderInfo(false);
-
-	m_summaryInformationTypes.InsertItem("TypeId", tr("Type"), "");
-	m_summaryInformationHeaders["TypeId"] = HeaderInfo(false);
-
-	m_summaryInformationTypes.InsertItem("Path", tr("Path"), "");
-	m_summaryInformationHeaders["Path"] = HeaderInfo(false);
-
-	m_summaryInformationTypes.InsertItem("StatusMessage", tr("Message"), "");
-	m_summaryInformationHeaders["StatusMessage"] = HeaderInfo(false);
 }
 
 
@@ -156,7 +139,7 @@ ICollectionViewDelegate::SummaryInformation CPluginStatusMonitorViewDelegateComp
 					break;
 				}
 			}
-			else if (informationId == QByteArray("Timestamp")){
+			else if (informationId == QByteArray("LoadedAt")){
 				result.text = informationProviderPtr->GetInformationTimeStamp().toString("dd.MM.yyyy hh:mm:ss");
 				result.sortValue = informationProviderPtr->GetInformationTimeStamp();
 			}
@@ -207,6 +190,12 @@ iqtgui::IGuiObject* CPluginStatusMonitorViewDelegateComp::GetInformationView() c
 }
 
 
+bool CPluginStatusMonitorViewDelegateComp::IsCommandSupported(int /*commandId*/) const
+{
+	return false;
+}
+
+
 // reimplemented (ibase::ICommandsProvider)
 
 const ibase::IHierarchicalCommand* CPluginStatusMonitorViewDelegateComp::GetCommands() const
@@ -217,18 +206,54 @@ const ibase::IHierarchicalCommand* CPluginStatusMonitorViewDelegateComp::GetComm
 
 // protected methods
 
+void CPluginStatusMonitorViewDelegateComp::SetupSummaryInformation()
+{
+	m_summaryInformationTypes.ResetData();
+	m_summaryInformationHeaders.clear();
+
+	m_summaryInformationTypes.InsertItem("Status", tr("Status"), "");
+	m_summaryInformationHeaders["Status"] = HeaderInfo(true);
+
+	if (*m_enabledNameAttrPtr){
+		m_summaryInformationTypes.InsertItem("Name", tr("Name"), "");
+		m_summaryInformationHeaders["Name"] = HeaderInfo(false);
+	}
+
+	if (*m_enabledPathAttrPtr){
+		m_summaryInformationTypes.InsertItem("Path", tr("Path"), "");
+		m_summaryInformationHeaders["Path"] = HeaderInfo(false);
+	}
+
+	if (*m_enabledLoadedAtAttrPtr){
+		m_summaryInformationTypes.InsertItem("LoadedAt", tr("Loaded at"), "");
+		m_summaryInformationHeaders["LoadedAt"] = HeaderInfo(false);
+	}
+
+	if (*m_enabledMessageAttrPtr){
+		m_summaryInformationTypes.InsertItem("StatusMessage", tr("Message"), "");
+		m_summaryInformationHeaders["StatusMessage"] = HeaderInfo(false);
+	}
+
+	if (*m_enabledTypeIdAttrPtr){
+		m_summaryInformationTypes.InsertItem("TypeId", tr("Type ID"), "");
+		m_summaryInformationHeaders["TypeId"] = HeaderInfo(false);
+	}
+}
+
+
 // reimplemented (ibase::TLocalizableWrap)
 
 void CPluginStatusMonitorViewDelegateComp::OnLanguageChanged()
 {
+	SetupSummaryInformation();
 }
 
 
-// reimplemented (imtgui::ICollectionViewDelegate)
+// reimplemented (icomp::CComponentBase)
 
-bool CPluginStatusMonitorViewDelegateComp::IsCommandSupported(int /*commandId*/) const
+void CPluginStatusMonitorViewDelegateComp::OnComponentCreated()
 {
-	return false;
+	SetupSummaryInformation();
 }
 
 

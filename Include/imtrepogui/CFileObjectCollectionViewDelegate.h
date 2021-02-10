@@ -37,7 +37,6 @@ public:
 	virtual QByteArray ImportObject(const QByteArray& typeId, const QString& sourcePath = QString()) const override;
 	virtual bool ExportObject(const QByteArray& objectId, const QString& targetPath = QString()) const override;
 	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
-	virtual bool IsCommandSupported(int commandId) const override;
 
 protected:
 	virtual void OnImportObject(const QByteArray& objectId);
@@ -45,7 +44,8 @@ protected:
 	virtual void BeforeRestore(const QByteArray& objectId);
 	virtual void AfterRestore(const QByteArray& objectId, bool isRestoreSuccessful);
 
-	// reimplemented (CObjectCollectionViewDelegate)
+	// reimplemented (imtgui::CObjectCollectionViewDelegate)
+	virtual void SetupSummaryInformation() override;
 	virtual void SetupCommands() override;
 
 	// reimplemented (ibase::TLocalizableWrap)

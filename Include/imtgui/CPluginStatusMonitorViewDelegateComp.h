@@ -32,6 +32,11 @@ public:
 
 	I_BEGIN_COMPONENT(CPluginStatusMonitorViewDelegateComp);
 		I_REGISTER_INTERFACE(imtgui::ICollectionViewDelegate);
+		I_ASSIGN(m_enabledNameAttrPtr, "EnableName", "Enable name column", true, true);
+		I_ASSIGN(m_enabledPathAttrPtr, "EnablePath", "Enable path column", true, true);
+		I_ASSIGN(m_enabledLoadedAtAttrPtr, "EnableLoadedAt", "Enable loaded at column", true, true);
+		I_ASSIGN(m_enabledMessageAttrPtr, "EnableMessage", "Enable message column", true, true);
+		I_ASSIGN(m_enabledTypeIdAttrPtr, "EnableTypeId", "Enable type id column", true, true);
 	I_END_COMPONENT;
 
 	CPluginStatusMonitorViewDelegateComp();
@@ -52,15 +57,19 @@ public:
 	virtual HeaderInfo GetSummaryInformationHeaderInfo(const QByteArray& informationId) const override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
 	virtual iqtgui::IGuiObject* GetInformationView() const override;
+	virtual bool IsCommandSupported(int commandId) const override;
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
+protected:
+	virtual void SetupSummaryInformation();
+
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
 
-	// reimplemented (imtgui::ICollectionViewDelegate)
-	virtual bool IsCommandSupported(int commandId) const override;
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 protected:
 	class VisualStatus: virtual public iqtgui::IVisualStatus
@@ -79,6 +88,12 @@ protected:
 	};
 
 protected:
+	I_ATTR(bool, m_enabledNameAttrPtr);
+	I_ATTR(bool, m_enabledPathAttrPtr);
+	I_ATTR(bool, m_enabledLoadedAtAttrPtr);
+	I_ATTR(bool, m_enabledMessageAttrPtr);
+	I_ATTR(bool, m_enabledTypeIdAttrPtr);
+
 	imtbase::IObjectCollection* m_collectionPtr;
 	iqtgui::IGuiObject* m_parentGuiPtr;
 

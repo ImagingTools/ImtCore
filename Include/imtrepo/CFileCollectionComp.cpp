@@ -1697,12 +1697,6 @@ void CFileCollectionComp::OnComponentCreated()
 		ReadRepositoryItems();
 
 		UpdateRepositoryFormat();
-
-		if (*m_pollFileSystemAttrPtr && !path.isEmpty()){
-			connect(&m_syncTimer, &QTimer::timeout, this, &CFileCollectionComp::OnSync);
-
-			m_syncTimer.start(*m_pollingPeriodAttrPtr * 1000);
-		}
 	}
 
 	if (m_eventHandlerListCompPtr.IsValid()){
@@ -1986,16 +1980,6 @@ void CFileCollectionComp::OnReaderFinished()
 
 void CFileCollectionComp::OnReaderInterrupted()
 {
-}
-
-
-// private slots
-
-void CFileCollectionComp::OnSync()
-{
-	if (!m_directoryBlocked){
-		ReadRepositoryItems();
-	}
 }
 
 

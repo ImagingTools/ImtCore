@@ -50,10 +50,6 @@ protected:
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
-
 protected Q_SLOTS:
 	virtual void OnEdit();
 

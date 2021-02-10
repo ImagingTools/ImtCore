@@ -25,7 +25,7 @@ namespace imtrepogui
 CDocumentBasedFileCollectionDelegateComp::CDocumentBasedFileCollectionDelegateComp()
 	:m_collectionPersistence(*this),
 	m_documentManagerObserver(*this),
-	m_editContentsCommand("Edit", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_DOCUMENT_MANAGER)
+	m_editContentsCommand(tr("Edit"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_DOCUMENT_MANAGER)
 {
 }
 
@@ -245,7 +245,7 @@ iqtgui::IGuiObject* CDocumentBasedFileCollectionDelegateComp::GetInformationView
 
 // protected methods
 
-// reimplemented (CObjectCollectionViewDelegate)
+// reimplemented (imtrepogui::CFileObjectCollectionViewDelegate)
 
 bool CDocumentBasedFileCollectionDelegateComp::IsRestoreAllowed(const QByteArray& objectId)
 {
@@ -279,6 +279,8 @@ void CDocumentBasedFileCollectionDelegateComp::AfterRestore(const QByteArray& ob
 	m_closedForRestoreId.clear();
 }
 
+
+// reimplemented (imtgui::CObjectCollectionViewDelegate)
 
 void CDocumentBasedFileCollectionDelegateComp::SetupCommands()
 {

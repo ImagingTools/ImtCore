@@ -59,8 +59,6 @@ public:
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "FileCompressor");
 		I_ASSIGN(m_isCalculateCheckSumAttrPtr, "IsCalculateCheckSum", "Calculate check sums for the file", true, true);
 		I_ASSIGN(m_useSubfolderAttrPtr, "UseSubfolder", "If set, for each input file a subfolder with the corresponding file name will be created", true, false);
-		I_ASSIGN(m_pollFileSystemAttrPtr, "PollFileSystem", "If enabled, the collection folder will be observed and the items will be re-read on changes in the folder structure", true, false);
-		I_ASSIGN(m_pollingPeriodAttrPtr, "PollingPeriod", "Period of file system polling (seconds)", true, 1);
 		I_ASSIGN(m_asynchronousReadingAttrPtr, "AsynchronousReading", "If enabled, the collection will reading asynchronously", true, false);
 		I_ASSIGN(m_isEnableRevisionHistoryAttrPtr, "IsEnableRevisionHistory", "Allow saving item revisions", true, false);
 		I_ASSIGN(m_restoreRevisionRightIdAttrPtr, "RestoreRevisionRightId", "Restore to revision right id", true, "RestoreObject");
@@ -475,11 +473,7 @@ private:
 	Q_INVOKABLE void OnReaderFinished();
 	Q_INVOKABLE void OnReaderInterrupted();
 
-private Q_SLOTS:
-	void OnSync();
-
 private:
-	QTimer m_syncTimer;
 	mutable bool m_directoryBlocked;
 	ReaderThread m_readerThread;
 	Files m_readerFiles;

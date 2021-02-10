@@ -960,8 +960,10 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 	QAction* actionRemove;
 	QMenu menu(ItemList);
 
-	actionEditDocument = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit..."));
-	connect(actionEditDocument, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDocument);
+	if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_EDIT)){
+		actionEditDocument = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit..."));
+		connect(actionEditDocument, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDocument);
+	}
 
 	if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_REMOVE)){
 		actionRemove = menu.addAction(QIcon(":/Icons/Remove"), tr("Remove"));
@@ -969,7 +971,10 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 	}
 
 	if (selectedIndexes.count() == 1){
-		menu.addSeparator();
+		if (menu.actions().count() > 0){
+			menu.addSeparator();
+		}
+
 		if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_EDIT_DESCRIPTION)){
 			actionEditDescription = menu.addAction(tr("Set Description..."));
 			connect(actionEditDescription, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDescription);
@@ -980,7 +985,9 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 		}
 	}
 
-	menu.exec(ItemList->viewport()->mapToGlobal(point));
+	if (menu.actions().count() > 0){
+		menu.exec(ItemList->viewport()->mapToGlobal(point));
+	}
 }
 
 

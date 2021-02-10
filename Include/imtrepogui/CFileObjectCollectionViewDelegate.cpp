@@ -22,27 +22,11 @@ namespace imtrepogui
 
 
 CFileObjectCollectionViewDelegate::CFileObjectCollectionViewDelegate()
-	:m_importCommand("Import", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
-	m_exportCommand("Export", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
-	m_restoreCommand("Restore", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT)
+	:m_importCommand(tr("Import"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
+	m_exportCommand(tr("Export"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
+	m_restoreCommand(tr("Restore"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT)
 {
-	m_summaryInformationTypes.ResetData();
-	m_summaryInformationHeaders.clear();
-
-	m_summaryInformationTypes.InsertItem("Name", "Name", "");
-	m_summaryInformationHeaders["Name"] = HeaderInfo(true);
-
-	m_summaryInformationTypes.InsertItem(QByteArray("TypeId"), tr("Type"), "");
-	m_summaryInformationHeaders["TypeId"] = HeaderInfo(false);
-
-	m_summaryInformationTypes.InsertItem(QByteArray("Description"), tr("Description"), "");
-	m_summaryInformationHeaders["Description"] = HeaderInfo(false);
-
-	m_summaryInformationTypes.InsertItem(QByteArray("Added"), tr("Added"), "");
-	m_summaryInformationHeaders["Added"] = HeaderInfo(false);
-
-	m_summaryInformationTypes.InsertItem(QByteArray("ModificationTime"), tr("Last Modified"), "");
-	m_summaryInformationHeaders["ModificationTime"] = HeaderInfo(false);
+	SetupSummaryInformation();
 }
 
 
@@ -149,12 +133,6 @@ imtgui::ICollectionViewDelegate::SummaryInformation CFileObjectCollectionViewDel
 }
 
 
-bool CFileObjectCollectionViewDelegate::IsCommandSupported(int commandId) const
-{
-	return BaseClass::IsCommandSupported(commandId);
-}
-
-
 // protected methods
 
 void CFileObjectCollectionViewDelegate::OnImportObject(const QByteArray& /*objectId*/)
@@ -178,7 +156,29 @@ void CFileObjectCollectionViewDelegate::AfterRestore(const QByteArray& objectId,
 }
 
 
-// reimplemented (CFileObjectCollectionViewDelegate)
+// reimplemented (imtgui::CObjectCollectionViewDelegate)
+
+void CFileObjectCollectionViewDelegate::SetupSummaryInformation()
+{
+	m_summaryInformationTypes.ResetData();
+	m_summaryInformationHeaders.clear();
+
+	m_summaryInformationTypes.InsertItem("Name", tr("Name"), "");
+	m_summaryInformationHeaders["Name"] = HeaderInfo(true);
+
+	m_summaryInformationTypes.InsertItem(QByteArray("TypeId"), tr("Type"), "");
+	m_summaryInformationHeaders["TypeId"] = HeaderInfo(false);
+
+	m_summaryInformationTypes.InsertItem(QByteArray("Description"), tr("Description"), "");
+	m_summaryInformationHeaders["Description"] = HeaderInfo(false);
+
+	m_summaryInformationTypes.InsertItem(QByteArray("Added"), tr("Added"), "");
+	m_summaryInformationHeaders["Added"] = HeaderInfo(false);
+
+	m_summaryInformationTypes.InsertItem(QByteArray("ModificationTime"), tr("Last Modified"), "");
+	m_summaryInformationHeaders["ModificationTime"] = HeaderInfo(false);
+}
+
 
 void CFileObjectCollectionViewDelegate::SetupCommands()
 {
