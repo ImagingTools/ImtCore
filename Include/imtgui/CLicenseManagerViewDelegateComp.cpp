@@ -31,7 +31,7 @@ QByteArray CLicenseManagerViewDelegateComp::CreateNewObject(const QByteArray& ty
 			licenseInfo.SetPackageId(*m_defaultPackageIdAttrPtr);
 		}
 
-		return m_collectionPtr->InsertNewObject(typeId, tr("New"), QString(), &licenseInfo);
+		return m_collectionPtr->InsertNewObject(typeId, tr("New License"), QString(), &licenseInfo);
 	}
 
 	return QByteArray();
@@ -57,7 +57,7 @@ ICollectionViewDelegate::SummaryInformation CLicenseManagerViewDelegateComp::Get
 			result.text = licenseInfoPtr->GetLicenseName();
 			result.sortValue = result.text;
 		}
-		else if (informationId == QByteArray("Expired")){
+		else if (informationId == QByteArray("Expiration")){
 			QDateTime dateTime = licenseInfoPtr->GetExpiration();
 
 			if (dateTime.isValid()){
@@ -82,6 +82,8 @@ ICollectionViewDelegate::SummaryInformation CLicenseManagerViewDelegateComp::Get
 void CLicenseManagerViewDelegateComp::OnComponentCreated()
 {
 	SetupSummaryInformation();
+
+	BaseClass::OnComponentCreated();
 }
 
 
@@ -92,17 +94,17 @@ void CLicenseManagerViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.ResetData();
 	m_summaryInformationHeaders.clear();
 
-	m_summaryInformationTypes.InsertItem("LicenseName", tr("License name"), "");
+	m_summaryInformationTypes.InsertItem("LicenseName", tr("License Name"), "");
 	m_summaryInformationHeaders["LicenseName"] = HeaderInfo(true);
 
-	m_summaryInformationTypes.InsertItem("LicenseId", tr("License ID"), "");
+	m_summaryInformationTypes.InsertItem("LicenseId", tr("License-ID"), "");
 	m_summaryInformationHeaders["LicenseId"] = HeaderInfo(true);
 
-	m_summaryInformationTypes.InsertItem("PackageId", tr("Package ID"), "");
+	m_summaryInformationTypes.InsertItem("PackageId", tr("Package-ID"), "");
 	m_summaryInformationHeaders["PackageId"] = HeaderInfo(false);
 
-	m_summaryInformationTypes.InsertItem("Expired", tr("Expired"), "");
-	m_summaryInformationHeaders["Expired"] = HeaderInfo(false);
+	m_summaryInformationTypes.InsertItem("Expiration", tr("Expiration"), "");
+	m_summaryInformationHeaders["Expiration"] = HeaderInfo(false);
 }
 
 
