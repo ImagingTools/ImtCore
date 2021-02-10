@@ -253,6 +253,8 @@ void CPluginStatusMonitorViewDelegateComp::OnLanguageChanged()
 
 void CPluginStatusMonitorViewDelegateComp::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
 	SetupSummaryInformation();
 }
 
