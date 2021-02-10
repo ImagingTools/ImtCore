@@ -14,6 +14,16 @@ namespace imtgui
 
 // reimplemented (ICollectionViewDelegate)
 
+void CLicenseManagerViewDelegateComp::UpdateItemSelection(
+			const imtbase::ICollectionInfo::Ids& selectedItems,
+			const QByteArray& selectedTypeId)
+{
+	BaseClass2::UpdateItemSelection(selectedItems, selectedTypeId);
+
+	m_editContentsCommand.setEnabled(selectedItems.count() == 1);
+}
+
+
 QByteArray CLicenseManagerViewDelegateComp::CreateNewObject(const QByteArray& typeId, const istd::IChangeable* /*defaultDataPtr*/) const
 {
 	if (m_collectionPtr != nullptr){

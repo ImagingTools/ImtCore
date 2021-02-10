@@ -56,6 +56,9 @@ protected:
 protected Q_SLOTS:
 	virtual void OnEdit();
 
+protected:
+	iqtgui::CHierarchicalCommand m_editContentsCommand;
+
 private:
 	void InitializeVisualStatus();
 
@@ -68,8 +71,6 @@ private:
 
 private:
 	ifile::IFileMetaInfoProvider::MetaInfoPtr m_selectedMetaInfoPtr;
-
-	iqtgui::CHierarchicalCommand m_editContentsCommand;
 };
 
 
