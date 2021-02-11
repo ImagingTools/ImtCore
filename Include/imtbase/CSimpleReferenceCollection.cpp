@@ -189,11 +189,7 @@ istd::IChangeable* CSimpleReferenceCollection::CloneMe(CompatibilityMode mode) c
 
 bool CSimpleReferenceCollection::ResetData(CompatibilityMode /*mode*/)
 {
-	istd::CChangeNotifier changeNotifier(this);
-
-	m_references.clear();
-
-	return true;
+	return RemoveAllReferences();
 }
 
 
