@@ -13,7 +13,7 @@ namespace imtrepo
 
 
 /**
-	Interface for describing the properties of a file collection.
+	Interface for describing the structure of a file-based collection.
 	\ingroup FileRepository
 */
 class IFileCollectionInfo: virtual public istd::IChangeable
@@ -35,6 +35,9 @@ public:
 		FCL_FOLDER
 	};
 
+	/**
+		Get information about a type of the file collection layout.
+	*/
 	virtual FileCollectionLayout GetCollectionFileLayout() const = 0;
 
 	/**
