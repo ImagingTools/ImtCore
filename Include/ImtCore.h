@@ -44,7 +44,7 @@ File collections are specializations of imtbase::IObjectCollection interfrace.
 /**
 \defgroup LicenseManagement License Management
 \section Motivation Motivation
-Often you want that the user of your product has a limited acess to the implemented software features. Common approach hier is to use a licensing mechanism, that manages those access rights.
+In many applications it is desirable that the user only has limited access to the implemented software functions. A licensing mechanism that manages these access rights is often used for this purpose.
 \section Concept
 1. Definition of license data
 2. Provide management of license collections
