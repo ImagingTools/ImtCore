@@ -14,11 +14,16 @@ class IFileObjectCollection;
 
 
 /**
+	Interface defining the transformation of a file inside of the repository structure during repository conversion procedure.
 	\ingroup Collection
+	\ingroup FileRepository
 */
 class IRepositoryFileTransformaton: public istd::IPolymorphic
 {
 public:
+	/**
+		Type of file in the repository' internal layout.
+	*/
 	enum RepositoryFileType
 	{
 		/**

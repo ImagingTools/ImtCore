@@ -3,21 +3,12 @@
 
 
 /**
-	Namespace containing interfaces and implementations for the data model definitions and related business logic controller of the Adamant engine.
+	Namespace containing interfaces and implementations for python-related components
 */
-namespace adammodel
+namespace imtpy
 {
 
 
-enum
-{
-	/**
-		Base change flag for the Adamant data models
-	*/
-	CF_ADAMANT_BASE = 0x80000000
-};
-
-
-} // namespace adammodel
+} // namespace imtpy
 
 

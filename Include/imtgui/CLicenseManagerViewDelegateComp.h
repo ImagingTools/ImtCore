@@ -1,12 +1,6 @@
 #pragma once
 
 
-// ACF includes
-#include <icomp/CComponentBase.h>
-#include <ifile/IFileMetaInfoProvider.h>
-#include <iqtgui/IIconProvider.h>
-#include <iqtgui/IDialog.h>
-
 // ImtCore includes
 #include <imtgui/CStandardCollectionDelegateComp.h>
 
@@ -16,6 +10,8 @@ namespace imtgui
 
 
 /**
+	View delegate implementation related to the license info visualization and editing.
+	\ingroup LicenseManagement
 	\ingroup Collection
 */
 class CLicenseManagerViewDelegateComp: public CStandardCollectionDelegateComp

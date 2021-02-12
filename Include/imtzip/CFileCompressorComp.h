@@ -12,6 +12,9 @@ namespace imtzip
 {
 
 
+/**
+	Component realization of the file compressor/decompressor.
+*/
 class CFileCompressorComp: public icomp::CComponentBase, public imtzip::CFileCompressor
 {
 public:

@@ -41,6 +41,7 @@ namespace imtrepo
 	*<b>Plain</b>:In this mode the data file and related description files will be simply placed into the file collection folder.
 	*<b>Subfolder</b>: Each file will be placed into a separate folder. This folder contains the data file itself, file collection description file, and the meta-info file.
 	\ingroup Collection
+	\ingroup FileRepository
 */
 class CFileCollectionCompBase:
 			public QObject,

@@ -12,7 +12,8 @@ namespace imtbase
 
 
 /**
-	License manager implementation.
+	Common implementation of a license manager.
+	\ingroup LicenseManagement
 */
 class CLicenseManager: public TAggergatedObjectCollectionWrap<imtbase::ILicenseInfoProvider, CLicenseInfo>
 {

@@ -20,6 +20,7 @@ namespace imtrepo
 /**
 	Common interface for a object collection where the objects are stored in the file system.
 	\ingroup Collection
+	\ingroup FileRepository
 */
 class IFileObjectCollection: virtual public imtbase::IObjectCollection, virtual public IFileCollectionInfo
 {

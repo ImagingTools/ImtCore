@@ -5,8 +5,8 @@
 \defgroup ImtCore ImagingTools Core SDK
 \mainpage
 \section Introduction
-Core SDK is an extension framework for ACF.
-The main goal of this SDK is the implementation of extensions for core components and interfaces using for realization of the business logic,
+ImagingTools Core SDK is an extension framework for ACF.
+The main goal of this framework is the implementation of components and interfaces using for realization of the business logic,
 which can find a general application in every software product.
 */
 
@@ -27,15 +27,30 @@ The basic interface for access to information about a collection is imtbase::ICo
 This simple interface allows querying all existing IDs of the elements in the collection.
 If the IDs of elements are known, the properties (descriptions) of these elements can be accessed (via these IDs)
 For a collection itself, we don't have a general interface.
-Instead, there are interfaces for certain types of collections.
-The most important one is - imtbase::IObjectCollection.
+Instead, there are interfaces for certain types of collections, the most important one is - imtbase::IObjectCollection.
 This interface describes the collection of data objects, that is, objects that implement directly or indirectly the istd::IChangeable interface.
 "Concrete" collection interfaces can offer their specialized extensions to the imtbase::ICollectionInfo interface.
 There is a suitable imtbase::IObjectCollectionInfo interface for imtbase::IObjectCollection
 */
 
+
 /**
-\defgroup DataManagement Data Management
+\defgroup FileRepository File Repository
 \section Motivation Motivation
-\section Example Examples
+In the document-oriented application you need persistence of the documents or another grouped application data. File-based document repository is a way to do it.
+File collections are specializations of imtbase::IObjectCollection interfrace.
 */
+
+/**
+\defgroup LicenseManagement License Management
+\section Motivation Motivation
+Often you want that the user of your product has a limited acess to the implemented software features. Common approach hier is to use a licensing mechanism, that manages those access rights.
+\section Concept
+1. Definition of license data
+2. Provide management of license collections
+3. License check using (via binding more general interface iauth::IRightsProvider)
+4. Low level license generation (Encryption, Decryption)
+5. Device persistence of license data.
+*/
+
+

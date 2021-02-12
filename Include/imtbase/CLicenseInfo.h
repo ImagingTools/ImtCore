@@ -19,7 +19,9 @@ namespace imtbase
 
 
 /**
-	Common status manager implementation.
+	Common implementation of the information about a license.
+	\sa ILicenseInfo
+	\ingroup LicenseManagement
 */
 class CLicenseInfo: virtual public imtbase::ILicenseInfo
 {

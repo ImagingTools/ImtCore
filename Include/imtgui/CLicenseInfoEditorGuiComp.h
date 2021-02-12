@@ -13,6 +13,10 @@ namespace imtgui
 {
 
 
+/**
+	Editor for the license info.
+	\ingroup LicenseManagement
+*/
 class CLicenseInfoEditorGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
 						Ui::CLicenseInfoEditorGuiComp, imtbase::ILicenseInfo>

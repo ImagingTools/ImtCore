@@ -16,7 +16,7 @@ namespace imtbase
 
 /**
 	Common information about a license.
-	\ingroup License Management
+	\ingroup LicenseManagement
 */
 class ILicenseInfo: virtual public iser::IObject
 {

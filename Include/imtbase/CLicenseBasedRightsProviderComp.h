@@ -5,7 +5,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 
-// Acf includes
+// ACF includes
 #include <iauth/IRightsProvider.h>
 #include <imod/IModel.h>
 #include <icomp/CComponentBase.h>
@@ -19,9 +19,13 @@ namespace imtbase
 {
 
 
+/**
+	Realization of the acess right logic based on the license management.
+	\ingroup LicenseManagement
+*/
 class CLicenseBasedRightsProviderComp:
 			public icomp::CComponentBase,
-			public iauth::IRightsProvider
+			virtual public iauth::IRightsProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;

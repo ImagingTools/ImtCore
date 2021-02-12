@@ -14,7 +14,10 @@ class IFileObjectCollection;
 
 
 /**
+	Interface for transformation repository from the repository format into another.
+	The transformation interface supports both directions: upgrade and downgrade of repository data and internal layout.
 	\ingroup Collection
+	\ingroup FileRepository
 */
 class IRepositoryTransformationController: virtual public istd::IPolymorphic
 {

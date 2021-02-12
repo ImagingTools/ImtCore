@@ -13,6 +13,10 @@ namespace imtrepo
 {
 
 
+/**
+	File repository transformation controller.
+	\ingroup FileRepository
+*/
 class CFileTransformationControllerComp:
 			public ilog::CLoggerComponentBase,
 			virtual public IRepositoryTransformationController
