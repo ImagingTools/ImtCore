@@ -23,10 +23,8 @@
 #include <imtgui/CImageContoursExtender.h>
 #include <imtgui/CPageNavigationControllerComp.h>
 #include <imtgui/CPageSwitcherComp.h>
-#include <imtgui/CLicenseInfoEditorGuiComp.h>
 #include <imtgui/CPluginStatusViewerComp.h>
 #include <imtgui/CPluginStatusMonitorViewDelegateComp.h>
-#include <imtgui/CLicenseManagerViewDelegateComp.h>
 
 
 /**
@@ -53,10 +51,8 @@ typedef imtgui::CImageContoursExtender ImageContoursExtender;
 typedef icomp::TModelCompWrap<imtgui::CPageNavigationControllerComp> PageNavigationController;
 typedef ibase::TModelObserverCompWrap<imtgui::CPageSwitcherComp> PageSwitcher;
 typedef imtgui::CStandardCollectionDelegateComp StandardCollectionDelegate;
-typedef imtgui::CLicenseInfoEditorGuiComp LicenseInfoEditorGui;
 typedef imtgui::CPluginStatusViewerComp PluginStatusViewer;
 typedef imtgui::CPluginStatusMonitorViewDelegateComp PluginStatusMonitorViewDelegate;
-typedef imtgui::CLicenseManagerViewDelegateComp LicenseManagerViewDelegate;
 
 
 } // namespace ImtGuiPck

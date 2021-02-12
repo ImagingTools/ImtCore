@@ -16,9 +16,6 @@
 #include <imtbase/CCompositeObjectPersistenceComp.h>
 #include <imtbase/CParamsManagerAdapterComp.h>
 #include <imtbase/CCollectionObjectExtractorComp.h>
-#include <imtbase/CLicenseInfo.h>
-#include <imtbase/CLicenseManager.h>
-#include <imtbase/CLicenseBasedRightsProviderComp.h>
 #include <imtbase/CPluginStatusMonitor.h>
 
 
@@ -39,20 +36,6 @@ typedef imtbase::CLocalizedHelpPathProviderComp LocalizedHelpPathProvider;
 typedef imtbase::CCompositeObjectPersistenceComp CompositeObjectPersistence;
 typedef icomp::TModelCompWrap<imtbase::CParamsManagerAdapterComp> ParamsManagerAdapter;
 typedef imtbase::CCollectionObjectExtractorComp CollectionObjectExtractor;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtbase::CLicenseInfo,
-						imtbase::ILicenseInfo,
-						iser::ISerializable>> LicenseInfo;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtbase::CLicenseManager,
-						imtbase::ILicenseInfoProvider,
-						imtbase::IObjectCollection,
-						imtbase::IObjectCollectionInfo,
-						imtbase::ICollectionInfo,
-						iser::ISerializable>> LicenseManager;
-typedef imtbase::CLicenseBasedRightsProviderComp LicenseBasedRightsProvider;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtbase::CPluginStatusMonitor,

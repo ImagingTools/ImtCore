@@ -1,14 +1,14 @@
-#include <imtgui/CLicenseInfoEditorGuiComp.h>
+#include <imtlicgui/CLicenseInfoEditorGuiComp.h>
 
 
 // Acf includes
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
-#include <imtbase/CLicenseInfo.h>
+#include <imtlic/CLicenseInfo.h>
 
 
-namespace imtgui
+namespace imtlicgui
 {
 
 
@@ -25,7 +25,7 @@ CLicenseInfoEditorGuiComp::CLicenseInfoEditorGuiComp()
 
 void CLicenseInfoEditorGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	imtbase::ILicenseInfo* licenseInfoPtr = GetObservedObject();
+	imtlic::ILicenseInfo* licenseInfoPtr = GetObservedObject();
 	Q_ASSERT(licenseInfoPtr != nullptr);
 
 	NameEdit->setText(licenseInfoPtr->GetLicenseName());
@@ -56,10 +56,10 @@ void CLicenseInfoEditorGuiComp::OnGuiModelDetached()
 
 void CLicenseInfoEditorGuiComp::UpdateModel() const
 {
-	imtbase::ILicenseInfo* licenseInfoPtr = GetObservedObject();
+	imtlic::ILicenseInfo* licenseInfoPtr = GetObservedObject();
 	Q_ASSERT(licenseInfoPtr != nullptr);
 
-	imtbase::CLicenseInfo licenseInfo;
+	imtlic::CLicenseInfo licenseInfo;
 
 	licenseInfo.SetLicenseName(NameEdit->text());
 	licenseInfo.SetLicenseId(IdEdit->text().toUtf8());
@@ -107,6 +107,6 @@ void CLicenseInfoEditorGuiComp::on_ExpireGroup_toggled(bool /*on*/)
 }
 
 
-} // namespace imtgui
+} // namespace imtlicgui
 
 

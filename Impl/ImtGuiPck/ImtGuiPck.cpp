@@ -103,11 +103,6 @@ I_EXPORT_COMPONENT(
 			"Delegate Document View Collection");
 
 I_EXPORT_COMPONENT(
-			LicenseInfoEditorGui,
-			"License info editor",
-			"License Info");
-
-I_EXPORT_COMPONENT(
 			PluginStatusViewer,
 			"Plugin status viewer",
 			"Plugin Status View");
@@ -116,11 +111,6 @@ I_EXPORT_COMPONENT(
 			PluginStatusMonitorViewDelegate,
 			"Plugin status monitor view delegate",
 			"Delegate View Collection Plugin Status");
-
-I_EXPORT_COMPONENT(
-			LicenseManagerViewDelegate,
-			"License manager view delegate",
-			"License Manager View Delegate");
 
 
 } // namespace ImtGuiPck

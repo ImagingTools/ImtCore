@@ -10,7 +10,7 @@
 #include <iser/IObject.h>
 
 
-namespace imtbase
+namespace imtlic
 {
 
 
@@ -44,6 +44,6 @@ public:
 };
 
 
-} // namespace imtbase
+} // namespace imtlic
 
 

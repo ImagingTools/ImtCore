@@ -1,11 +1,11 @@
-#include <imtbase/CLicenseBasedRightsProviderComp.h>
+#include <imtlic/CLicenseBasedRightsProviderComp.h>
 
 
 // ImtCore includes
-#include <imtbase/ILicenseInfo.h>
+#include <imtlic/ILicenseInfo.h>
 
 
-namespace imtbase
+namespace imtlic
 {
 
 
@@ -70,6 +70,6 @@ void CLicenseBasedRightsProviderComp::OnComponentDestroyed()
 }
 
 
-} // namespace imtbase
+} // namespace imtlic
 
 

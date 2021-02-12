@@ -1,4 +1,4 @@
-TARGET = imtrepo
+TARGET = imtlic
 
 include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)

@@ -13,7 +13,7 @@ namespace imtbase
 
 
 /**
-	Component for language-related help path access.
+	Component for localization-related help path access.
 */
 class CLocalizedHelpPathProviderComp:
 			public icomp::CComponentBase,

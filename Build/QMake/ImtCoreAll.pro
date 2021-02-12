@@ -53,10 +53,24 @@ imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
 SUBDIRS += imtqml
 imtqml.file = ../../Include/imtqml/QMake/imtqml.pro
 
+SUBDIRS += imtlic
+imtlic.file = ../../Include/imtlic/QMake/imtlic.pro
+
+SUBDIRS += imtlicgui
+imtlicgui.file = ../../Include/imtlicgui/QMake/imtlicgui.pro
+
 # Component packages
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
 ImtCorePck.depends = imtbase
+
+SUBDIRS += ImtLicensePck
+ImtLicensePck.file = ../../Impl/ImtLicensePck/QMake/ImtLicensePck.pro
+ImtLicensePck.depends = imtbase
+
+SUBDIRS += ImtLicenseGuiPck
+ImtLicenseGuiPck.file = ../../Impl/ImtLicenseGuiPck/QMake/ImtLicenseGuiPck.pro
+ImtLicenseGuiPck.depends = imtbase imtlic imtlicgui
 
 SUBDIRS += ImtRestPck
 ImtRestPck.file = ../../Impl/ImtRestPck/QMake/ImtRestPck.pro

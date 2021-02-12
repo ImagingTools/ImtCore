@@ -11,10 +11,10 @@
 #include <iser/CArchiveTag.h>
 
 // ImtCore includes
-#include <imtbase/ILicenseInfo.h>
+#include <imtlic/ILicenseInfo.h>
 
 
-namespace imtbase
+namespace imtlic
 {
 
 
@@ -23,7 +23,7 @@ namespace imtbase
 	\sa ILicenseInfo
 	\ingroup LicenseManagement
 */
-class CLicenseInfo: virtual public imtbase::ILicenseInfo
+class CLicenseInfo: virtual public imtlic::ILicenseInfo
 {
 public:
 	void SetLicenseName(const QString& licenseName);
@@ -31,7 +31,7 @@ public:
 	void SetPackageId(const QByteArray& packageId);
 	void SetExpiration(const QDateTime& expirationTime);
 
-	// reimplemented (imtbase::ILicenseInfo)
+	// reimplemented (imtlic::ILicenseInfo)
 	virtual QString GetLicenseName() const override;
 	virtual QByteArray GetLicenseId() const override;
 	virtual QByteArray GetPackageId() const override;
@@ -54,6 +54,6 @@ protected:
 };
 
 
-} // namespace imtbase
+} // namespace imtlic
 
 

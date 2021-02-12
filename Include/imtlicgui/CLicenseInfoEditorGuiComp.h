@@ -5,11 +5,11 @@
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
-#include <imtbase/ILicenseInfo.h>
+#include <imtlic/ILicenseInfo.h>
 #include <GeneratedFiles/imtgui/ui_CLicenseInfoEditorGuiComp.h>
 
 
-namespace imtgui
+namespace imtlicgui
 {
 
 
@@ -19,13 +19,13 @@ namespace imtgui
 */
 class CLicenseInfoEditorGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CLicenseInfoEditorGuiComp, imtbase::ILicenseInfo>
+						Ui::CLicenseInfoEditorGuiComp, imtlic::ILicenseInfo>
 {
 	Q_OBJECT
 
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CLicenseInfoEditorGuiComp, imtbase::ILicenseInfo> BaseClass;
+				Ui::CLicenseInfoEditorGuiComp, imtlic::ILicenseInfo> BaseClass;
 
 	I_BEGIN_COMPONENT(CLicenseInfoEditorGuiComp);
 	I_END_COMPONENT;
@@ -48,6 +48,6 @@ private Q_SLOTS:
 };
 
 
-} // namespace imtgui
+} // namespace imtlicgui
 
 

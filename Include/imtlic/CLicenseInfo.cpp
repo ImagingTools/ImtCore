@@ -1,4 +1,4 @@
-#include <imtbase/CLicenseInfo.h>
+#include <imtlic/CLicenseInfo.h>
 
 
 // ACF includes
@@ -9,7 +9,7 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 
 
-namespace imtbase
+namespace imtlic
 {
 
 
@@ -54,7 +54,7 @@ void CLicenseInfo::SetExpiration(const QDateTime& expirationTime)
 }
 
 
-// reimplemented (imtbase::ILicenseInfo)
+// reimplemented (imtlic::ILicenseInfo)
 
 QString CLicenseInfo::GetLicenseName() const
 {
@@ -120,7 +120,7 @@ int CLicenseInfo::GetSupportedOperations() const
 
 bool CLicenseInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const ILicenseInfo* sourcePtr = dynamic_cast<const imtbase::ILicenseInfo*>(&object);
+	const imtlic::ILicenseInfo* sourcePtr = dynamic_cast<const imtlic::ILicenseInfo*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
@@ -160,6 +160,6 @@ bool CLicenseInfo::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-} // namespace imtbase
+} // namespace imtlic
 
 

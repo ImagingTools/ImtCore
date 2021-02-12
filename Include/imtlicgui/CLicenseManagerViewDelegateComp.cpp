@@ -1,18 +1,20 @@
-#include <imtgui/CLicenseManagerViewDelegateComp.h>
+#include <imtlicgui/CLicenseManagerViewDelegateComp.h>
 
 
 // Qt includes
 #include <QtCore/QUuid>
 
 // ImtCore includes
-#include <imtbase/CLicenseInfo.h>
+#include <imtlic/CLicenseInfo.h>
 
 
-namespace imtgui
+namespace imtlicgui
 {
 
 
-// reimplemented (ICollectionViewDelegate)
+// public methods
+
+// reimplemented (imtgui::ICollectionViewDelegate)
 
 void CLicenseManagerViewDelegateComp::UpdateItemSelection(
 			const imtbase::ICollectionInfo::Ids& selectedItems,
@@ -27,7 +29,7 @@ void CLicenseManagerViewDelegateComp::UpdateItemSelection(
 QByteArray CLicenseManagerViewDelegateComp::CreateNewObject(const QByteArray& typeId, const istd::IChangeable* /*defaultDataPtr*/) const
 {
 	if (m_collectionPtr != nullptr){
-		imtbase::CLicenseInfo licenseInfo;
+		imtlic::CLicenseInfo licenseInfo;
 
 		if (m_defaultLicenseNameAttrPtr.IsValid()){
 			licenseInfo.SetLicenseName(*m_defaultLicenseNameAttrPtr);
@@ -48,11 +50,11 @@ QByteArray CLicenseManagerViewDelegateComp::CreateNewObject(const QByteArray& ty
 }
 
 
-ICollectionViewDelegate::SummaryInformation CLicenseManagerViewDelegateComp::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+imtgui::ICollectionViewDelegate::SummaryInformation CLicenseManagerViewDelegateComp::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
 {
 	SummaryInformation result;
 
-	const imtbase::ILicenseInfo* licenseInfoPtr = dynamic_cast<const imtbase::ILicenseInfo*>(m_collectionPtr->GetObjectPtr(objectId));
+	const imtlic::ILicenseInfo* licenseInfoPtr = dynamic_cast<const imtlic::ILicenseInfo*>(m_collectionPtr->GetObjectPtr(objectId));
 
 	if (licenseInfoPtr != nullptr){
 		if (informationId == QByteArray("LicenseId")){
@@ -118,6 +120,6 @@ void CLicenseManagerViewDelegateComp::SetupSummaryInformation()
 }
 
 
-} // namespace imtgui
+} // namespace imtlicgui
 
 

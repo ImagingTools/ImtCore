@@ -5,7 +5,7 @@
 #include <imtgui/CStandardCollectionDelegateComp.h>
 
 
-namespace imtgui
+namespace imtlicgui
 {
 
 
@@ -14,11 +14,11 @@ namespace imtgui
 	\ingroup LicenseManagement
 	\ingroup Collection
 */
-class CLicenseManagerViewDelegateComp: public CStandardCollectionDelegateComp
+class CLicenseManagerViewDelegateComp: public imtgui::CStandardCollectionDelegateComp
 {
 	Q_OBJECT
 public:
-	typedef CStandardCollectionDelegateComp BaseClass;
+	typedef imtgui::CStandardCollectionDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CLicenseManagerViewDelegateComp);
 		I_ASSIGN(m_defaultLicenseNameAttrPtr, "DefaultLicenseName", "Default license name", false, "");
@@ -26,7 +26,7 @@ public:
 		I_ASSIGN(m_defaultPackageIdAttrPtr, "DefaultPackageId", "Default package ID", false, "");
 	I_END_COMPONENT;
 
-	// reimplemented (ICollectionViewDelegate)
+	// reimplemented (imtgui::ICollectionViewDelegate)
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
 	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
@@ -45,6 +45,6 @@ private:
 };
 
 
-} // namespace imtgui
+} // namespace imtlicgui
 
 
