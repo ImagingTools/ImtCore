@@ -20,7 +20,7 @@ I_EXPORT_COMPONENT(
 			"License Information");
 
 I_EXPORT_COMPONENT(
-			LicenseManager,
+			LicenseInfoManager,
 			"Management of licenses",
 			"License Manager Rights Dongle Featuring Container Collection");
 

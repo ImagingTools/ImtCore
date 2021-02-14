@@ -15,12 +15,12 @@ namespace imtlic
 	Common implementation of a license manager.
 	\ingroup LicenseManagement
 */
-class CLicenseManager: public imtbase::TAggergatedObjectCollectionWrap<imtlic::ILicenseInfoProvider, CLicenseInfo>
+class CLicenseInfoManager: public imtbase::TAggergatedObjectCollectionWrap<imtlic::ILicenseInfoProvider, CLicenseInfo>
 {
 public:
 	typedef imtbase::TAggergatedObjectCollectionWrap<imtlic::ILicenseInfoProvider, CLicenseInfo> BaseClass;
 	
-	CLicenseManager();
+	CLicenseInfoManager();
 
 	// reimplemented (imtbase::ILicenseInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetLicenseList() const override;

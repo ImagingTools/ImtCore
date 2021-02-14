@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtlic/CLicenseInfo.h>
-#include <imtlic/CLicenseManager.h>
+#include <imtlic/CLicenseInfoManager.h>
 #include <imtlic/CLicenseBasedRightsProviderComp.h>
 
 
@@ -25,12 +25,12 @@ typedef icomp::TModelCompWrap<
 						iser::ISerializable>> LicenseInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
-						imtlic::CLicenseManager,
+						imtlic::CLicenseInfoManager,
 						imtlic::ILicenseInfoProvider,
 						imtbase::IObjectCollection,
 						imtbase::IObjectCollectionInfo,
 						imtbase::ICollectionInfo,
-						iser::ISerializable>> LicenseManager;
+						iser::ISerializable>> LicenseInfoManager;
 typedef imtlic::CLicenseBasedRightsProviderComp LicenseBasedRightsProvider;
 
 

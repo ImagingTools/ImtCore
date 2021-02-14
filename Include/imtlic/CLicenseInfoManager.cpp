@@ -1,4 +1,4 @@
-#include <imtlic/CLicenseManager.h>
+#include <imtlic/CLicenseInfoManager.h>
 
 
 namespace imtlic
@@ -7,7 +7,7 @@ namespace imtlic
 
 // public methods
 
-CLicenseManager::CLicenseManager()
+CLicenseInfoManager::CLicenseInfoManager()
 	:BaseClass("LicenseInfo", "License Info", "Licenses")
 {
 }
@@ -15,13 +15,13 @@ CLicenseManager::CLicenseManager()
 
 // reimplemented (imtlic::ILicenseInfoProvider)
 
-const imtbase::ICollectionInfo& CLicenseManager::GetLicenseList() const
+const imtbase::ICollectionInfo& CLicenseInfoManager::GetLicenseList() const
 {
 	return m_collection;
 }
 
 
-const imtlic::ILicenseInfo* CLicenseManager::GetLicenseInfo(const QByteArray& licenseId) const
+const imtlic::ILicenseInfo* CLicenseInfoManager::GetLicenseInfo(const QByteArray& licenseId) const
 {
 	return dynamic_cast<const imtlic::ILicenseInfo*>(m_collection.GetObjectPtr(licenseId));
 }
