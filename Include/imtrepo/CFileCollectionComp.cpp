@@ -360,6 +360,48 @@ bool CFileCollectionComp::ExportObject(const imtbase::IObjectCollection& /*colle
 }
 
 
+// reimplemented (IRepositoryItemInfoProvider)
+
+IRepositoryItemInfoProvider::ItemIds CFileCollectionComp::GetRepositoryItemIds() const
+{
+	m_repositoryItems.clear();
+
+	QFileInfoList fileList;
+	GetRepositoryFileList(fileList);
+
+	for (QFileInfo& file : fileList){
+		m_repositoryItems[QUuid::createUuid().toByteArray()] = file.absolutePath() + "/" + file.completeBaseName();
+	}
+
+	return m_repositoryItems.keys();
+}
+
+
+IRepositoryItemInfoProvider::FileIds CFileCollectionComp::GetRepositoryItemFileIds(const QByteArray& itemId) const
+{
+	FileIds ids = {FI_ITEM_INFO, FI_DATA, FI_DATA_METAINFO};
+
+	return ids;
+}
+
+
+QString CFileCollectionComp::GetRepositoryItemFilePath(const QByteArray& itemId, IRepositoryItemInfoProvider::FileId fileId) const
+{
+	if (m_repositoryItems.contains(itemId)){
+		switch(fileId){
+		case FI_ITEM_INFO:
+			return m_repositoryItems[itemId] + ".item";
+		case FI_DATA:
+			return m_repositoryItems[itemId] + "." + GetRepositoryInfo().dataFileSuffix;
+		case FI_DATA_METAINFO:
+			return m_repositoryItems[itemId] + "." + GetRepositoryInfo().metaInfoFileSuffix;
+		}
+	}
+
+	return QString();
+}
+
+
 // reimplemented (IFileObjectCollection)
 
 const ifile::IFileResourceTypeConstraints* CFileCollectionComp::GetFileTypeConstraints() const
@@ -1889,7 +1931,7 @@ void CFileCollectionComp::ReadRepositoryItems()
 }
 
 
-void CFileCollectionComp::GetRepositoryFileList(QFileInfoList& fileList)
+void CFileCollectionComp::GetRepositoryFileList(QFileInfoList& fileList) const
 {
 	QString repositoryRootPath = GetCollectionRootFolder();
 	QDir repositoryRootDir(repositoryRootPath);

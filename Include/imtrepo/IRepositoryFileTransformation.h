@@ -11,6 +11,7 @@ namespace imtrepo
 
 
 class IFileObjectCollection;
+class IRepositoryItemInfoProvider;
 
 
 /**
@@ -51,7 +52,7 @@ public:
 	/**
 		Execute the file transformation for the given revision range.
 	*/
-	virtual bool TransformFile(RepositoryFileType fileType, const QString& filePath, int fromRevision, int toRevision) const = 0;
+	virtual bool TransformFile(const IRepositoryItemInfoProvider& infoProvider, const QByteArray& itemId, int fromRevision, int toRevision) const = 0;
 };
 
 

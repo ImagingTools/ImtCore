@@ -28,6 +28,7 @@
 #include <imtfile/IFileCompression.h>
 #include <imtrepo/IFileCollectionInfo.h>
 #include <imtrepo/IFileObjectCollection.h>
+#include <imtrepo/IRepositoryItemInfoProvider.h>
 #include <imtrepo/IRepositoryTransformationController.h>
 
 
@@ -147,6 +148,7 @@ public:
 class CFileCollectionComp:
 			public CFileCollectionCompBase,
 			virtual public IFileObjectCollection,
+			virtual public IRepositoryItemInfoProvider,
 			virtual protected imtbase::IRevisionController
 {
 	Q_OBJECT
@@ -174,6 +176,11 @@ public:
 	virtual bool RestoreObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision) const override;
 	virtual int BackupObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& userComment = QString()) const override;
 	virtual bool ExportObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision, const QString& filePath) const override;
+
+	// reimplemented (IRepositoryItemInfoProvider)
+	virtual ItemIds GetRepositoryItemIds() const override;
+	virtual FileIds GetRepositoryItemFileIds(const QByteArray& itemId) const override;
+	virtual QString GetRepositoryItemFilePath(const QByteArray& itemId, FileId fileId) const override;
 
 	// reimplemented (IFileObjectCollection)
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
@@ -466,7 +473,7 @@ private:
 	QString CalculateShortFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const;
 
 	void ReadRepositoryItems();
-	void GetRepositoryFileList(QFileInfoList& fileList);
+	void GetRepositoryFileList(QFileInfoList& fileList) const;
 	void ReadItem(Files& filesPtr, const QString& itemFilePath);
 
 	void StartRepositoryLoader();
@@ -478,7 +485,9 @@ private:
 	mutable bool m_directoryBlocked;
 	ReaderThread m_readerThread;
 	Files m_readerFiles;
-	
+
+	mutable QMap<QByteArray, QString> m_repositoryItems;
+
 	class DirectoryBlocker
 	{
 	public:
