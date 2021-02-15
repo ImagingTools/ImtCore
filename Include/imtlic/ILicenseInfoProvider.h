@@ -37,6 +37,6 @@ public:
 };
 
 
-} // namespace imtbase
+} // namespace imtlic
 
 
