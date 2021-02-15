@@ -115,9 +115,9 @@ bool CProductLicensingInfo::CopyFrom(const IChangeable& object, CompatibilityMod
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_licenses.CopyFrom(sourcePtr->GetLicenseList());
-		m_productId = sourcePtr->GetProductId();
-		m_productName = sourcePtr->GetName();
+		m_licenses.CopyFrom(sourcePtr->m_licenses);
+		m_productId = sourcePtr->m_productId;
+		m_productName = sourcePtr->m_productName;
 
 		return true;
 	}

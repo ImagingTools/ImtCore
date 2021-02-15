@@ -1,40 +1,49 @@
 #pragma once
 
 
+// ACF includes
+#include <iser/IObject.h>
+
 // ImtCore includes
-#include <imtlic/IProductInfo.h>
+#include <imtlic/ILicenseInfoProvider.h>
 
 
 namespace imtlic
 {
 
 
+class IProductInfo;
+
+
 /**
 	Common interface for a product instance. A product instance is the result of the product installation by the customer.
 	\ingroup LicenseManagement
 */
-class IProductInstanceInfo: virtual public IProductInfo
+class IProductInstanceInfo: virtual public imtlic::ILicenseInfoProvider, virtual public iser::IObject
 {
 public:
+	/**
+		Create new instance of a given product.
+	*/
+	virtual void CreateProductInstance(
+				const imtlic::IProductInfo& product,
+				const QByteArray& instanceId,
+				const QByteArray& customerId) = 0;
+
+	/**
+		Get related product-ID.
+	*/
+	virtual QByteArray GetProductId() const = 0;
+
 	/**
 		Get the unique-ID of this product instance.
 	*/
 	virtual QByteArray GetProductInstanceId() const = 0;
 
 	/**
-		Set ID of the product instance.
-	*/
-	virtual void SetProductInstanceId(const QByteArray& instanceId) = 0;
-
-	/**
 		Get the customer-ID if available.
 	*/
 	virtual QByteArray GetCustomerId() const = 0;
-
-	/**
-		Set ID of the customer.
-	*/
-	virtual void SetCustomerId(const QByteArray& customerId) = 0;
 };
 
 
