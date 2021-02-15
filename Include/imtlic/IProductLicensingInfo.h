@@ -10,9 +10,8 @@ namespace imtlic
 {
 
 
-
 /**
-	Common interface for access available licenses of a product.
+	Common interface for access all available licenses of a product.
 	\ingroup LicenseManagement
 */
 class IProductLicensingInfo: virtual public ILicenseInfoProvider, virtual public IProductInfo

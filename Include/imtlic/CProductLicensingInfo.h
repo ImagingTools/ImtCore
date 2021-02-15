@@ -21,6 +21,7 @@ public:
 	// reimplemented (imtlic::IProductInfo)
 	virtual const IProductInfo* GetProductFamilyInfo() const override;
 	virtual QByteArray GetProductId() const override;
+	virtual void SetProductId(const QByteArray& productId) override;
 
 	// reimplemented (imtlic::ILicenseInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetLicenseList() const override;

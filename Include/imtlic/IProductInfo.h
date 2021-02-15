@@ -28,6 +28,11 @@ public:
 		Get a unique ID of this product.
 	*/
 	virtual QByteArray GetProductId() const = 0;
+
+	/**
+		Set product-ID.
+	*/
+	virtual void SetProductId(const QByteArray& productId) = 0;
 };
 
 

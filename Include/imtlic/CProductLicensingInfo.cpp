@@ -6,7 +6,6 @@
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
-#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtlic
@@ -26,6 +25,16 @@ const IProductInfo* CProductLicensingInfo::GetProductFamilyInfo() const
 QByteArray CProductLicensingInfo::GetProductId() const
 {
 	return m_productId;
+}
+
+
+void CProductLicensingInfo::SetProductId(const QByteArray& productId)
+{
+	if (m_productId != productId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_productId = productId;
+	}
 }
 
 

@@ -25,10 +25,13 @@ class IProductLicensingInfo;
 class IProductLicensingInfoProvider: virtual public istd::IChangeable
 {
 public:
+	/**
+		Get list of all available products.
+	*/
 	virtual const imtbase::ICollectionInfo& GetProductList() const = 0;
 
 	/**
-		Get license information for a given product.
+		Get license information for a given product. All available licenses are returned.
 	*/
 	virtual const imtlic::IProductLicensingInfo* GetProductLicenses(const QByteArray& productId) const = 0;
 };
