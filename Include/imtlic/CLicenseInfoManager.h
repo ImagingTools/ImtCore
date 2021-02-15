@@ -3,8 +3,8 @@
 
 // ImtCore includes
 #include <imtbase/TAggergatedObjectCollectionWrap.h>
-#include <imtlic/CLicenseInfo.h>
 #include <imtlic/ILicenseInfoProvider.h>
+#include <imtlic/CLicenseInfo.h>
 
 
 namespace imtlic

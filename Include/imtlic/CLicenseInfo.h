@@ -1,15 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QByteArray>
-#include <QtCore/QString>
-#include <QtCore/QDateTime>
-
-// ACF includes
-#include <iser/IArchive.h>
-#include <iser/CArchiveTag.h>
-
 // ImtCore includes
 #include <imtlic/ILicenseInfo.h>
 
