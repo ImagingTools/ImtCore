@@ -25,7 +25,7 @@ public:
 	/**
 		Create new instance of a given product.
 	*/
-	virtual void CreateProductInstance(
+	virtual void SetupProductInstance(
 				const imtlic::IProductInfo& product,
 				const QByteArray& instanceId,
 				const QByteArray& customerId) = 0;
