@@ -377,23 +377,23 @@ IRepositoryItemInfoProvider::ItemIds CFileCollectionComp::GetRepositoryItemIds()
 }
 
 
-IRepositoryItemInfoProvider::FileIds CFileCollectionComp::GetRepositoryItemFileIds(const QByteArray& itemId) const
+IRepositoryItemInfoProvider::RepositoryFileTypes CFileCollectionComp::GetRepositoryItemFileIds(const QByteArray& itemId) const
 {
-	FileIds ids = {FI_ITEM_INFO, FI_DATA, FI_DATA_METAINFO};
+	RepositoryFileTypes ids = {RFT_INFO, RFT_DATA, RFT_DATA_METAINFO};
 
 	return ids;
 }
 
 
-QString CFileCollectionComp::GetRepositoryItemFilePath(const QByteArray& itemId, IRepositoryItemInfoProvider::FileId fileId) const
+QString CFileCollectionComp::GetRepositoryItemFilePath(const QByteArray& itemId, IRepositoryItemInfoProvider::RepositoryFileType fileId) const
 {
 	if (m_repositoryItems.contains(itemId)){
 		switch(fileId){
-		case FI_ITEM_INFO:
+		case RFT_INFO:
 			return m_repositoryItems[itemId] + ".item";
-		case FI_DATA:
+		case RFT_DATA:
 			return m_repositoryItems[itemId] + "." + GetRepositoryInfo().dataFileSuffix;
-		case FI_DATA_METAINFO:
+		case RFT_DATA_METAINFO:
 			return m_repositoryItems[itemId] + "." + GetRepositoryInfo().metaInfoFileSuffix;
 		}
 	}

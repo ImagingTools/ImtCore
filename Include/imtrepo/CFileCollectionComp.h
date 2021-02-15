@@ -179,8 +179,8 @@ public:
 
 	// reimplemented (IRepositoryItemInfoProvider)
 	virtual ItemIds GetRepositoryItemIds() const override;
-	virtual FileIds GetRepositoryItemFileIds(const QByteArray& itemId) const override;
-	virtual QString GetRepositoryItemFilePath(const QByteArray& itemId, FileId fileId) const override;
+	virtual RepositoryFileTypes GetRepositoryItemFileIds(const QByteArray& itemId) const override;
+	virtual QString GetRepositoryItemFilePath(const QByteArray& itemId, RepositoryFileType fileId) const override;
 
 	// reimplemented (IFileObjectCollection)
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;

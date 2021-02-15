@@ -135,9 +135,9 @@ bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollectio
 
 		for (int stepIndex = 0; stepIndex < transformations.count() && !isFailed; stepIndex++){
 			if (stepIndex == 0){
-				IRepositoryItemInfoProvider::FileIds fileIds = m_itemInfoProvider->GetRepositoryItemFileIds(m_repositoryItemIds[itemIndex]);
+				IRepositoryItemInfoProvider::RepositoryFileTypes fileIds = m_itemInfoProvider->GetRepositoryItemFileIds(m_repositoryItemIds[itemIndex]);
 
-				for (FileId fileId : fileIds){
+				for (RepositoryFileType fileId : fileIds){
 					QString filePath = m_itemInfoProvider->GetRepositoryItemFilePath(m_repositoryItemIds[itemIndex], fileId);
 					if (!filePath.isEmpty()){
 						if (!istd::CSystem::FileCopy(filePath, filePath + ".new", true)){
@@ -145,7 +145,7 @@ bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollectio
 							break;
 						}
 
-						if (fileId == FI_ITEM_INFO){
+						if (fileId == RFT_INFO){
 							itemInfo = filePath;
 						}
 					}
@@ -258,8 +258,8 @@ bool CFileTransformationControllerComp::CleanupTrasformation(IFileObjectCollecti
 	bool retVal = true;
 		
 	for (const QByteArray& itemId : m_repositoryItemIds){
-		IRepositoryItemInfoProvider::FileIds fileIds = infoProvider->GetRepositoryItemFileIds(itemId);
-		for (IRepositoryItemInfoProvider::FileId fileId : fileIds){
+		IRepositoryItemInfoProvider::RepositoryFileTypes fileIds = infoProvider->GetRepositoryItemFileIds(itemId);
+		for (IRepositoryItemInfoProvider::RepositoryFileType fileId : fileIds){
 			QString filePath = infoProvider->GetRepositoryItemFilePath(itemId, fileId) + ".new";
 			QFile file(filePath);
 
@@ -284,17 +284,17 @@ IRepositoryItemInfoProvider::ItemIds CFileTransformationControllerComp::GetRepos
 }
 
 
-IRepositoryItemInfoProvider::FileIds CFileTransformationControllerComp::GetRepositoryItemFileIds(const QByteArray& itemId) const
+IRepositoryItemInfoProvider::RepositoryFileTypes CFileTransformationControllerComp::GetRepositoryItemFileIds(const QByteArray& itemId) const
 {
 	if (m_itemInfoProvider != nullptr){
 		return m_itemInfoProvider->GetRepositoryItemFileIds(itemId);
 	}
 
-	return FileIds();
+	return RepositoryFileTypes();
 }
 
 
-QString CFileTransformationControllerComp::GetRepositoryItemFilePath(const QByteArray& itemId, IRepositoryItemInfoProvider::FileId fileId) const
+QString CFileTransformationControllerComp::GetRepositoryItemFilePath(const QByteArray& itemId, IRepositoryItemInfoProvider::RepositoryFileType fileId) const
 {
 	if (m_itemInfoProvider != nullptr){
 		QString filePath = m_itemInfoProvider->GetRepositoryItemFilePath(itemId, fileId);
