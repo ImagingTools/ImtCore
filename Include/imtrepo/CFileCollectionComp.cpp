@@ -34,7 +34,8 @@ namespace imtrepo
 CFileCollectionComp::CFileCollectionComp()
 	:m_collectionLock(QReadWriteLock::Recursive),
 	m_directoryBlocked(false),
-	m_readerThread(this)
+	m_readerThread(this),
+	m_itemInfoProvider(*this)
 {
 	m_resourceTypeConstraints.SetParent(this);
 }
@@ -357,48 +358,6 @@ bool CFileCollectionComp::ExportObject(const imtbase::IObjectCollection& /*colle
 	}
 
 	return false;
-}
-
-
-// reimplemented (IRepositoryItemInfoProvider)
-
-IRepositoryItemInfoProvider::ItemIds CFileCollectionComp::GetRepositoryItemIds() const
-{
-	m_repositoryItems.clear();
-
-	QFileInfoList fileList;
-	GetRepositoryFileList(fileList);
-
-	for (QFileInfo& file : fileList){
-		m_repositoryItems[QUuid::createUuid().toByteArray()] = file.absolutePath() + "/" + file.completeBaseName();
-	}
-
-	return m_repositoryItems.keys();
-}
-
-
-IRepositoryItemInfoProvider::RepositoryFileTypes CFileCollectionComp::GetRepositoryItemFileIds(const QByteArray& itemId) const
-{
-	RepositoryFileTypes ids = {RFT_INFO, RFT_DATA, RFT_DATA_METAINFO};
-
-	return ids;
-}
-
-
-QString CFileCollectionComp::GetRepositoryItemFilePath(const QByteArray& itemId, IRepositoryItemInfoProvider::RepositoryFileType fileId) const
-{
-	if (m_repositoryItems.contains(itemId)){
-		switch(fileId){
-		case RFT_INFO:
-			return m_repositoryItems[itemId] + ".item";
-		case RFT_DATA:
-			return m_repositoryItems[itemId] + "." + GetRepositoryInfo().dataFileSuffix;
-		case RFT_DATA_METAINFO:
-			return m_repositoryItems[itemId] + "." + GetRepositoryInfo().metaInfoFileSuffix;
-		}
-	}
-
-	return QString();
 }
 
 
@@ -1686,7 +1645,7 @@ void CFileCollectionComp::UpdateRepositoryFormat()
 
 	if (targetRevision != currentRevision){
 		if (m_transformationControllerCompPtr.IsValid()){
-			bool retVal = m_transformationControllerCompPtr->TransformRepository(*this, currentRevision, targetRevision);
+			bool retVal = m_transformationControllerCompPtr->TransformRepository(currentRevision, targetRevision);
 			if (retVal){
 				QFile revisionFile(revisionFilePath);
 				QTextStream textStream(&revisionFile);
@@ -2022,6 +1981,102 @@ void CFileCollectionComp::OnReaderFinished()
 
 void CFileCollectionComp::OnReaderInterrupted()
 {
+}
+
+
+// public methods of the embedded class RepositoryItemInfo
+
+void CFileCollectionComp::RepositoryItemInfo::SetRepositoryItemFilePath(RepositoryFileType fileId, const QString& filePath)
+{
+	m_files[int(fileId)] = filePath;
+}
+
+
+// reimplemented (IRepositoryItemInfo)
+
+IRepositoryItemInfo::RepositoryFileTypes CFileCollectionComp::RepositoryItemInfo::GetRepositoryItemFileTypes() const
+{
+	IRepositoryItemInfo::RepositoryFileTypes types;
+
+	for (int type : m_files.keys()){
+		types.insert((RepositoryFileType)type);
+	}
+
+	return types;
+}
+
+
+QString CFileCollectionComp::RepositoryItemInfo::GetRepositoryItemFilePath(RepositoryFileType fileId) const
+{
+	if (m_files.contains(fileId)){
+		return m_files[fileId];
+	}
+
+	return QString();
+}
+
+
+// public methods of the embedded class RepositoryItemInfoProvider
+
+CFileCollectionComp::RepositoryItemInfoProvider::RepositoryItemInfoProvider(CFileCollectionComp& parent)
+	:m_parent(parent)
+{
+	QFileInfoList fileList;
+	m_parent.GetRepositoryFileList(fileList);
+
+	for (QFileInfo& file : fileList){
+		QString itemBasePath = file.absolutePath() + "/" + file.completeBaseName();
+
+		RepositoryItemInfo itemInfo;
+		itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_INFO, itemBasePath + ".item");
+		itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_DATA, itemBasePath + "." + m_parent.GetRepositoryInfo().dataFileSuffix);
+		itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_INFO, itemBasePath + "." + m_parent.GetRepositoryInfo().metaInfoFileSuffix);
+
+		Item item;
+		item.id = QUuid::createUuid().toByteArray();
+		item.itemInfo = itemInfo;
+
+		m_repositoryItems.append(item);
+	}
+}
+
+
+// reimplemented (IRepositoryItemInfoProvider)
+
+const imtbase::ICollectionInfo& CFileCollectionComp::RepositoryItemInfoProvider::GetRepositoryItems()
+{
+	return *this;
+}
+
+
+const IRepositoryItemInfo* CFileCollectionComp::RepositoryItemInfoProvider::GetRepositoryItemInfo(const QByteArray& itemId) const
+{
+	for (const Item& item : m_repositoryItems){
+		if (item.id == itemId){
+			return &item.itemInfo;
+		}
+	}
+
+	return nullptr;
+}
+
+
+// reimplemented (imtbase::ICollectionInfo)
+
+imtbase::ICollectionInfo::Ids CFileCollectionComp::RepositoryItemInfoProvider::GetElementIds() const
+{
+	imtbase::ICollectionInfo::Ids ids;
+	for (const Item& item : m_repositoryItems){
+		ids.append(item.id);
+	}
+
+	return ids;
+}
+
+
+QVariant CFileCollectionComp::RepositoryItemInfoProvider::GetElementInfo(const QByteArray& /*elementId*/, int /*infoType*/) const
+{
+	return QVariant();
 }
 
 

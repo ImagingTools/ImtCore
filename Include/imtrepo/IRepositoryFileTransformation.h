@@ -52,7 +52,7 @@ public:
 	/**
 		Execute the file transformation for the given revision range.
 	*/
-	virtual bool TransformFile(const IRepositoryItemInfoProvider& infoProvider, const QByteArray& itemId, int fromRevision, int toRevision) const = 0;
+	virtual bool TransformFile(const IRepositoryItemInfo& repositoryIteminfo, int fromRevision, int toRevision) const = 0;
 };
 
 

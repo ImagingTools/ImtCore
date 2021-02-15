@@ -25,7 +25,7 @@ public:
 	/**
 		Apply transformation to a repository. Transformation can be an update or an upgrade of the collection.
 	*/
-	virtual bool TransformRepository(IFileObjectCollection& repository, int fromRevision, int toRevision) const = 0;
+	virtual bool TransformRepository(int fromRevision, int toRevision) const = 0;
 };
 
 

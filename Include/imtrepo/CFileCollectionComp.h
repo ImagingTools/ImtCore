@@ -148,7 +148,6 @@ public:
 class CFileCollectionComp:
 			public CFileCollectionCompBase,
 			virtual public IFileObjectCollection,
-			virtual public IRepositoryItemInfoProvider,
 			virtual protected imtbase::IRevisionController
 {
 	Q_OBJECT
@@ -156,6 +155,8 @@ public:
 	typedef CFileCollectionCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFileCollectionComp)
+		I_REGISTER_SUBELEMENT(RepositoryItemInfoProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE(RepositoryItemInfoProvider, IRepositoryItemInfoProvider, ExtractRepositoryItemInfoProvider);
 		I_REGISTER_INTERFACE(IFileObjectCollection);
 		I_REGISTER_INTERFACE(IFileCollectionInfo);
 		I_REGISTER_INTERFACE(IObjectCollection);
@@ -176,11 +177,6 @@ public:
 	virtual bool RestoreObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision) const override;
 	virtual int BackupObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& userComment = QString()) const override;
 	virtual bool ExportObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision, const QString& filePath) const override;
-
-	// reimplemented (IRepositoryItemInfoProvider)
-	virtual ItemIds GetRepositoryItemIds() const override;
-	virtual RepositoryFileTypes GetRepositoryItemFileIds(const QByteArray& itemId) const override;
-	virtual QString GetRepositoryItemFilePath(const QByteArray& itemId, RepositoryFileType fileId) const override;
 
 	// reimplemented (IFileObjectCollection)
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
@@ -237,6 +233,52 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
+	class RepositoryItemInfo: virtual public IRepositoryItemInfo
+	{
+	public:
+		virtual void SetRepositoryItemFilePath(RepositoryFileType fileId, const QString& filePath);
+
+		// reimplemented (IRepositoryItemInfo)
+		virtual RepositoryFileTypes GetRepositoryItemFileTypes() const override;
+		virtual QString GetRepositoryItemFilePath(RepositoryFileType fileId) const override;
+
+	private:
+		QMap<int, QString> m_files;
+	};
+
+	class RepositoryItemInfoProvider:
+				virtual public imtbase::ICollectionInfo,
+				virtual public IRepositoryItemInfoProvider
+	{
+	public:
+		RepositoryItemInfoProvider(CFileCollectionComp& parent);
+
+		// reimplemented (IRepositoryItemInfoProvider)
+		virtual const imtbase::ICollectionInfo& GetRepositoryItems() override;
+		virtual const IRepositoryItemInfo* GetRepositoryItemInfo(const QByteArray& itemId) const override;
+
+		// reimplemented (imtbase::ICollectionInfo)
+		virtual Ids GetElementIds() const override;
+		virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
+
+	private:
+		struct Item
+		{
+			QByteArray id;
+			RepositoryItemInfo itemInfo;
+		};
+
+	private:
+		CFileCollectionComp& m_parent;
+		QList<Item> m_repositoryItems;
+	};
+
+	template <typename InterfaceType>
+	static InterfaceType* ExtractRepositoryItemInfoProvider(CFileCollectionComp& component)
+	{
+		return &component.m_itemInfoProvider;
+	}
+
 	/**
 		Internal structure representing the file item in the collection.
 	*/
@@ -486,8 +528,6 @@ private:
 	ReaderThread m_readerThread;
 	Files m_readerFiles;
 
-	mutable QMap<QByteArray, QString> m_repositoryItems;
-
 	class DirectoryBlocker
 	{
 	public:
@@ -510,6 +550,8 @@ private:
 		Collection data.
 	*/
 	mutable Files m_files;
+
+	RepositoryItemInfoProvider m_itemInfoProvider;
 
 	EventHandlerList m_eventHandlerList;
 

@@ -21,27 +21,20 @@ namespace imtrepo
 
 // public methods
 
-CFileTransformationControllerComp::CFileTransformationControllerComp()
-	:m_itemInfoProvider(nullptr)
-{
-}
-
-
 // reimplemented (IRepositoryTransformationController)
 
-bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollection& repository, int fromRevision, int toRevision) const
+bool CFileTransformationControllerComp::TransformRepository(int fromRevision, int toRevision) const
 {
-	m_itemInfoProvider = dynamic_cast<IRepositoryItemInfoProvider*>(&repository);
-	if (m_itemInfoProvider == nullptr){
+	if (!m_repositoryItemInfoProviderCompPtr.IsValid() || !m_repositoryCompPtr.IsValid()){
 		return false;
 	}
 
 	bool isOk;
-	TransformationState transformationState = GetTransformationState(repository, isOk);
+	TransformationState transformationState = GetTransformationState(isOk);
 
 	if (transformationState == TS_REPLACING){
-		if (ApplyNewRevision(repository)){
-			if (SetTransformationState(repository, TS_IDLE)){
+		if (ApplyNewRevision()){
+			if (SetTransformationState(TS_IDLE)){
 				return true;
 			}
 
@@ -51,8 +44,7 @@ bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollectio
 		return false;
 	}
 
-	m_repositoryItemIds = m_itemInfoProvider->GetRepositoryItemIds();
-	if (!CleanupTrasformation(repository)){
+	if (!CleanupTrasformation()){
 		return false;
 	}
 
@@ -124,59 +116,72 @@ bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollectio
 		}
 	}
 
-	if (SetTransformationState(repository, TS_IN_PROGRESS)){
+	if (SetTransformationState(TS_IN_PROGRESS)){
 		return false;
 	}
 
 	bool isFailed = false;
 
-	for (int itemIndex = 0; itemIndex < m_repositoryItemIds.count() && !isFailed; itemIndex++){
+	imtbase::ICollectionInfo::Ids repositoryItemIds = m_repositoryItemInfoProviderCompPtr->GetRepositoryItems().GetElementIds();
+
+	for (int itemIndex = 0; itemIndex < repositoryItemIds.count() && !isFailed; itemIndex++){
 		QFileInfo itemInfo;
 
-		for (int stepIndex = 0; stepIndex < transformations.count() && !isFailed; stepIndex++){
-			if (stepIndex == 0){
-				IRepositoryItemInfoProvider::RepositoryFileTypes fileIds = m_itemInfoProvider->GetRepositoryItemFileIds(m_repositoryItemIds[itemIndex]);
+		const IRepositoryItemInfo* repositoryItemInfoPtr = m_repositoryItemInfoProviderCompPtr->GetRepositoryItemInfo(repositoryItemIds[itemIndex]);
 
-				for (RepositoryFileType fileId : fileIds){
-					QString filePath = m_itemInfoProvider->GetRepositoryItemFilePath(m_repositoryItemIds[itemIndex], fileId);
-					if (!filePath.isEmpty()){
-						if (!istd::CSystem::FileCopy(filePath, filePath + ".new", true)){
-							isFailed = true;
-							break;
-						}
+		if (repositoryItemInfoPtr != nullptr){
+			IRepositoryItemInfo::RepositoryFileTypes fileIds = repositoryItemInfoPtr->GetRepositoryItemFileTypes();
 
-						if (fileId == RFT_INFO){
-							itemInfo = filePath;
-						}
+			RepositoryItemInfo repositoryItemInfo;
+
+			for (IRepositoryItemInfo::RepositoryFileType fileId : fileIds){
+				QString filePath = repositoryItemInfoPtr->GetRepositoryItemFilePath(fileId);
+				if (!filePath.isEmpty()){
+					if (!istd::CSystem::FileCopy(filePath, filePath + ".new", true)){
+						isFailed = true;
+						break;
+					}
+
+					repositoryItemInfo.m_files[fileId] = filePath + ".new";
+
+					if (fileId == IRepositoryItemInfo::RFT_INFO){
+						itemInfo = filePath;
 					}
 				}
 			}
 
-			const TransformationStep& step = transformations[stepIndex];
 
-			if (!step.transformationPtr->TransformFile(*this, m_repositoryItemIds[itemIndex], step.from, step.to)){
-				SendErrorMessage(0, QString("Repository file '%1' could not be transformed").arg(itemInfo.absoluteFilePath()));
+			for (int stepIndex = 0; stepIndex < transformations.count() && !isFailed; stepIndex++){
+				const TransformationStep& step = transformations[stepIndex];
 
-				isFailed = true;
-				break;
+				if (!step.transformationPtr->TransformFile(repositoryItemInfo, step.from, step.to)){
+					SendErrorMessage(0, QString("Repository file '%1' could not be transformed").arg(itemInfo.absoluteFilePath()));
+
+					isFailed = true;
+					break;
+				}
 			}
+		}
+		else{
+			isFailed = true;
+			break;
 		}
 	}
 
 	if (isFailed){
-		CleanupTrasformation(repository);
-		SetTransformationState(repository, TS_IDLE);
+		CleanupTrasformation();
+		SetTransformationState(TS_IDLE);
 
 		return false;
 	}
 
-	if (SetTransformationState(repository, TS_REPLACING)){
+	if (SetTransformationState(TS_REPLACING)){
 		return false;
 	}
 
-	if (ApplyNewRevision(repository)){
-		CleanupTrasformation(repository);
-		if (SetTransformationState(repository, TS_IDLE)){
+	if (ApplyNewRevision()){
+		CleanupTrasformation();
+		if (SetTransformationState(TS_IDLE)){
 			return true;
 		}
 	}
@@ -187,9 +192,10 @@ bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollectio
 
 // protected methods
 
-CFileTransformationControllerComp::TransformationState CFileTransformationControllerComp::GetTransformationState(IFileObjectCollection& repository, bool &isOk) const
+CFileTransformationControllerComp::TransformationState CFileTransformationControllerComp::GetTransformationState(bool &isOk) const
 {
-	QFile stateFile(repository.GetCollectionRootFolder() + "/TransformationState");
+	QString rootFolder = m_repositoryCompPtr->GetCollectionRootFolder();
+	QFile stateFile(rootFolder + "/TransformationState");
 	QTextStream textStream(&stateFile);
 
 	if (stateFile.exists()){
@@ -209,9 +215,10 @@ CFileTransformationControllerComp::TransformationState CFileTransformationContro
 }
 
 
-bool CFileTransformationControllerComp::SetTransformationState(IFileObjectCollection& repository, TransformationState state) const
+bool CFileTransformationControllerComp::SetTransformationState(TransformationState state) const
 {
-	QFile stateFile(repository.GetCollectionRootFolder() + "/TransformationState");
+	QString rootFolder = m_repositoryCompPtr->GetCollectionRootFolder();
+	QFile stateFile(rootFolder + "/TransformationState");
 	QTextStream textStream(&stateFile);
 
 	if (stateFile.exists()){
@@ -231,10 +238,12 @@ bool CFileTransformationControllerComp::SetTransformationState(IFileObjectCollec
 }
 
 
-bool CFileTransformationControllerComp::ApplyNewRevision(IFileObjectCollection& repository) const
+bool CFileTransformationControllerComp::ApplyNewRevision() const
 {
+	QString rootFolder = m_repositoryCompPtr->GetCollectionRootFolder();
+
 	QFileInfoList fileList;
-	ifile::CFileListProviderComp::CreateFileList(repository.GetCollectionRootFolder(), 0, 1, {"*.new"}, QDir::NoSort, fileList);
+	ifile::CFileListProviderComp::CreateFileList(rootFolder, 0, 1, {"*.new"}, QDir::NoSort, fileList);
 
 	for (const QFileInfo& file : fileList){
 		QString filePath = file.filePath();
@@ -248,27 +257,29 @@ bool CFileTransformationControllerComp::ApplyNewRevision(IFileObjectCollection& 
 }
 
 
-bool CFileTransformationControllerComp::CleanupTrasformation(IFileObjectCollection& repository) const
+bool CFileTransformationControllerComp::CleanupTrasformation() const
 {
-	IRepositoryItemInfoProvider* infoProvider = dynamic_cast<IRepositoryItemInfoProvider*>(&repository);
-	if (infoProvider == nullptr){
-		return false;
-	}
-
 	bool retVal = true;
-		
-	for (const QByteArray& itemId : m_repositoryItemIds){
-		IRepositoryItemInfoProvider::RepositoryFileTypes fileIds = infoProvider->GetRepositoryItemFileIds(itemId);
-		for (IRepositoryItemInfoProvider::RepositoryFileType fileId : fileIds){
-			QString filePath = infoProvider->GetRepositoryItemFilePath(itemId, fileId) + ".new";
-			QFile file(filePath);
 
-			if (file.exists()){
-				if (!file.remove()){
-					retVal = false;
+	imtbase::ICollectionInfo::Ids itemIds = m_repositoryItemInfoProviderCompPtr->GetRepositoryItems().GetElementIds();
+
+	for (const QByteArray& itemId : itemIds){
+		const IRepositoryItemInfo* itemInfoPtr = m_repositoryItemInfoProviderCompPtr->GetRepositoryItemInfo(itemId);
+		if (itemInfoPtr != nullptr){
+			IRepositoryItemInfo::RepositoryFileTypes fileIds = itemInfoPtr->GetRepositoryItemFileTypes();
+			for (IRepositoryItemInfo::RepositoryFileType fileId : fileIds){
+				QString filePath = itemInfoPtr->GetRepositoryItemFilePath(fileId) + ".new";
+				QFile file(filePath);
+
+				if (file.exists()){
+					if (!file.remove()){
+						retVal = false;
+					}
 				}
 			}
-
+		}
+		else{
+			retVal = false;
 		}
 	}
 
@@ -276,31 +287,26 @@ bool CFileTransformationControllerComp::CleanupTrasformation(IFileObjectCollecti
 }
 
 
-// reimplemented (IRepositoryItemInfoProvider)
+// public methods of the embedded class RepositoryItemInfo
 
-IRepositoryItemInfoProvider::ItemIds CFileTransformationControllerComp::GetRepositoryItemIds() const
+// reimplemented (IRepositoryItemInfo)
+
+IRepositoryItemInfo::RepositoryFileTypes CFileTransformationControllerComp::RepositoryItemInfo::GetRepositoryItemFileTypes() const
 {
-	return m_repositoryItemIds;
-}
+	IRepositoryItemInfo::RepositoryFileTypes types;
 
-
-IRepositoryItemInfoProvider::RepositoryFileTypes CFileTransformationControllerComp::GetRepositoryItemFileIds(const QByteArray& itemId) const
-{
-	if (m_itemInfoProvider != nullptr){
-		return m_itemInfoProvider->GetRepositoryItemFileIds(itemId);
+	for (int type : m_files.keys()){
+		types.insert((RepositoryFileType)type);
 	}
 
-	return RepositoryFileTypes();
+	return types;
 }
 
 
-QString CFileTransformationControllerComp::GetRepositoryItemFilePath(const QByteArray& itemId, IRepositoryItemInfoProvider::RepositoryFileType fileId) const
+QString CFileTransformationControllerComp::RepositoryItemInfo::GetRepositoryItemFilePath(RepositoryFileType fileId) const
 {
-	if (m_itemInfoProvider != nullptr){
-		QString filePath = m_itemInfoProvider->GetRepositoryItemFilePath(itemId, fileId);
-		if (!filePath.isEmpty()){
-			return filePath + ".new";
-		}
+	if (m_files.contains(fileId)){
+		return m_files[fileId];
 	}
 
 	return QString();
