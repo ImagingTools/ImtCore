@@ -4,8 +4,9 @@
 // Qt includes
 #include <QtCore/QVector>
 
-// Acula includes
+// ImtCore includes
 #include <imtbase/IReferenceCollection.h>
+#include <imtbase/IObjectCollection.h>
 
 
 namespace imtbase
@@ -18,6 +19,18 @@ namespace imtbase
 class CSimpleReferenceCollection: virtual public IReferenceCollection
 {
 public:
+	CSimpleReferenceCollection();
+
+	/**
+		Register the source object collection.
+	*/
+	void RegisterSourceCollection(const imtbase::IObjectCollection* sourceCollectionInfoPtr);
+
+	/**
+		Get access to the source object collection.
+	*/
+	const imtbase::IObjectCollection* GetSourceCollection() const;
+
 	// reimplemented (IReferenceCollection)
 	virtual bool InsertReference(const Id& objectId) override;
 	virtual bool RemoveReference(const Id& objectId) override;
@@ -65,6 +78,8 @@ private:
 	typedef QVector<Reference> References;
 	
 	References m_references;
+
+	const imtbase::IObjectCollection* m_sourceCollectionInfoPtr;
 };
 
 

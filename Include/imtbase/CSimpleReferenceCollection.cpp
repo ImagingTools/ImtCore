@@ -14,6 +14,24 @@ namespace imtbase
 
 // public methods
 
+CSimpleReferenceCollection::CSimpleReferenceCollection()
+	:m_sourceCollectionInfoPtr(nullptr)
+{
+}
+
+
+void CSimpleReferenceCollection::RegisterSourceCollection(const imtbase::IObjectCollection* sourceCollectionInfoPtr)
+{
+	m_sourceCollectionInfoPtr = sourceCollectionInfoPtr;
+}
+
+
+const imtbase::IObjectCollection* CSimpleReferenceCollection::GetSourceCollection() const
+{
+	return m_sourceCollectionInfoPtr;
+}
+
+
 // reimplemented (IReferenceCollection)
 
 bool CSimpleReferenceCollection::InsertReference(const Id& objectId)
@@ -22,6 +40,11 @@ bool CSimpleReferenceCollection::InsertReference(const Id& objectId)
 
 	Reference reference;
 	reference.id = objectId;
+
+	if (m_sourceCollectionInfoPtr != nullptr){
+		reference.description = m_sourceCollectionInfoPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+		reference.name = m_sourceCollectionInfoPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+	}
 
 	m_references.push_back(reference);
 

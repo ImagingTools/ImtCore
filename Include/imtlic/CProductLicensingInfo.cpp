@@ -82,7 +82,7 @@ bool CProductLicensingInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	static iser::CArchiveTag productIdTag("ProductId", "ID of the prodict", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag productIdTag("ProductId", "ID of the product", iser::CArchiveTag::TT_LEAF);
 	bool retVal = archive.BeginTag(productIdTag);
 	retVal = retVal && archive.Process(m_productId);
 	retVal = retVal && archive.EndTag(productIdTag);

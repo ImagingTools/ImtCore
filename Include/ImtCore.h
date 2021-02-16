@@ -49,8 +49,10 @@ In many applications it is desirable that the user only has limited access to th
 1. Definition of license data
 2. Provide management of license collections
 3. License check using (via binding more general interface iauth::IRightsProvider)
-4. Low level license generation (Encryption, Decryption)
+4. Low-level license key generation (Encryption)
 5. Device persistence of license data.
+6. File-based peristence of license data.
+7. Diagnostics information about the license status in the application
 */
 
 

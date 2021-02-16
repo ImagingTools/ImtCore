@@ -31,6 +31,19 @@ public:
 				const QByteArray& customerId) = 0;
 
 	/**
+		Add a license to this product instance.
+		\param licenseId	ID of the license to be added to the product. The license should be available in the license collection related to the product.
+		\note Full information about the license is managed by the product licensing info, the license-ID is used only as a link to the license information.
+		\sa IProductLicensingInfo
+	*/
+	virtual void AddLicense(const QByteArray& licenseId) = 0;
+
+	/**
+		Remove an existing license from this product instance.
+	*/
+	virtual void RemoveLicense(const QByteArray& licenseId) = 0;
+
+	/**
 		Get related product-ID.
 	*/
 	virtual QByteArray GetProductId() const = 0;
