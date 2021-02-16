@@ -154,7 +154,6 @@ bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollectio
 				}
 			}
 
-
 			for (int stepIndex = 0; stepIndex < transformations.count() && !isFailed; stepIndex++){
 				const TransformationStep& step = transformations[stepIndex];
 
