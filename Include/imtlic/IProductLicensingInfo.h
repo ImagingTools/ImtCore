@@ -16,7 +16,6 @@ namespace imtlic
 */
 class IProductLicensingInfo: virtual public ILicenseInfoProvider, virtual public IProductInfo
 {
-public:
 };
 
 

@@ -12,7 +12,7 @@ namespace imtlic
 
 
 /**
-	Common implementation of a license manager.
+	Whole products and licenses of the universe.
 	\ingroup LicenseManagement
 */
 class CLicensingSystem: public imtbase::TAggergatedObjectCollectionWrap<imtlic::IProductLicensingInfoProvider, CProductLicensingInfo>

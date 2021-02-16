@@ -23,7 +23,7 @@ class IProductInstanceInfo: virtual public imtlic::ILicenseInfoProvider, virtual
 {
 public:
 	/**
-		Create new instance of a given product.
+		Setup the instance of a given product.
 	*/
 	virtual void SetupProductInstance(
 				const imtlic::IProductInfo& product,

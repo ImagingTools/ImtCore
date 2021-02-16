@@ -12,7 +12,7 @@ namespace imtlic
 
 
 /**
-	Common implementation of a license manager.
+	Common implementation of a license container.
 	\ingroup LicenseManagement
 */
 class CLicenseInfoManager: public imtbase::TAggergatedObjectCollectionWrap<imtlic::ILicenseInfoProvider, CLicenseInfo>

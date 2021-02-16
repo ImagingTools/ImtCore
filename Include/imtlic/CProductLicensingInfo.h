@@ -11,7 +11,7 @@ namespace imtlic
 
 
 /**
-	Information about the available licenses of a product.
+	Information about a product and all available related licenses.
 	\sa ILicenseInfo
 	\ingroup LicenseManagement
 */

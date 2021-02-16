@@ -10,7 +10,7 @@ namespace imtlic
 
 
 /**
-	Common implementation of the information about a license.
+	Common implementation of the information about a single license.
 	\sa ILicenseInfo
 	\ingroup LicenseManagement
 */
