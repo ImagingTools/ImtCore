@@ -148,8 +148,8 @@ public:
 class CFileCollectionComp:
 			public CFileCollectionCompBase,
 			virtual public IFileObjectCollection,
-			virtual protected imtbase::IRevisionController,
-			virtual protected IRepositoryItemInfoProvider
+			virtual public IRepositoryItemInfoProvider,
+			virtual protected imtbase::IRevisionController
 {
 	Q_OBJECT
 public:

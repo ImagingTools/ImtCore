@@ -26,7 +26,7 @@ namespace imtrepo
 bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollection& repository, int fromRevision, int toRevision) const
 {
 	IRepositoryItemInfoProvider* itemInfoProviderPtr = dynamic_cast<IRepositoryItemInfoProvider*>(&repository);
-	if (itemInfoProviderPtr != nullptr){
+	if (itemInfoProviderPtr == nullptr){
 		return false;
 	}
 
@@ -122,7 +122,7 @@ bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollectio
 		}
 	}
 
-	if (SetTransformationState(repository, TS_IN_PROGRESS)){
+	if (!SetTransformationState(repository, TS_IN_PROGRESS)){
 		return false;
 	}
 
@@ -179,7 +179,7 @@ bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollectio
 		return false;
 	}
 
-	if (SetTransformationState(repository, TS_REPLACING)){
+	if (!SetTransformationState(repository, TS_REPLACING)){
 		return false;
 	}
 
@@ -245,13 +245,7 @@ bool CFileTransformationControllerComp::SetTransformationState(IFileObjectCollec
 	QFile stateFile(repository.GetCollectionRootFolder() + "/TransformationState");
 	QTextStream textStream(&stateFile);
 
-	if (stateFile.exists()){
-		if (!stateFile.remove()){
-			return false;
-		}
-	}
-
-	if (stateFile.open(QIODevice::Text | QIODevice::WriteOnly)){
+	if (stateFile.open(QIODevice::Text | QIODevice::WriteOnly | QIODevice::Truncate)){
 		textStream << (int)state;
 		stateFile.close();
 
@@ -270,7 +264,11 @@ bool CFileTransformationControllerComp::ReplaceWithTransformedItems(IFileObjectC
 	for (const QFileInfo& file : fileList){
 		QString filePath = file.filePath();
 		QString newFilePath = filePath.chopped(4);
-		if (!istd::CSystem::FileMove(filePath, newFilePath, true)){
+		if (!istd::CSystem::FileCopy(filePath, newFilePath, true)){
+			return false;
+		}
+
+		if (!QFile(filePath).remove()){
 			return false;
 		}
 	}
