@@ -10,7 +10,7 @@ namespace imtlic
 
 
 /**
-	Implementation of access to an encrypted license key based on cryptographic hash.
+	Implementation of access to an encrypted license key based on the cryptographic hash.
 	\ingroup LicenseManagement
 */
 class CLicenseKeyProvider: virtual public imtlic::IEncyptedLicenseKeyProvider

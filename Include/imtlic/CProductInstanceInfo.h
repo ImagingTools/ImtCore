@@ -11,8 +11,8 @@ namespace imtlic
 
 
 /**
-	Information about a product and all available related licenses.
-	\sa ILicenseInfo
+	Common implementation of IProductInstanceInfo interface.
+	\sa IProductInstanceInfo
 	\ingroup LicenseManagement
 */
 class CProductInstanceInfo: virtual public imtlic::IProductInstanceInfo

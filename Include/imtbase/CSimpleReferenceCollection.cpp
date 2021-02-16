@@ -135,7 +135,7 @@ QVariant CSimpleReferenceCollection::GetElementInfo(const QByteArray& elementId,
 
 bool CSimpleReferenceCollection::Serialize(iser::IArchive& archive)
 {
-	istd::CChangeNotifier changePtr(archive.IsStoring() ? NULL : this);
+	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
 	bool retVal = true;
 

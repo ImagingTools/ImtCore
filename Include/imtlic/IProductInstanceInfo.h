@@ -17,6 +17,8 @@ class IProductInfo;
 
 /**
 	Common interface for a product instance. A product instance is the result of the product installation by the customer.
+	A product instance can have a subset of the defined product licenses and is therefore a provider of actually available licenses for the current instance.
+	There is no license validation logic yet at this level. It is only an overview of the registered licenses in the specified product installation.
 	\ingroup LicenseManagement
 */
 class IProductInstanceInfo: virtual public imtlic::ILicenseInfoProvider, virtual public iser::IObject
