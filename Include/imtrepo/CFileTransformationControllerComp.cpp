@@ -23,18 +23,24 @@ namespace imtrepo
 
 // reimplemented (IRepositoryTransformationController)
 
-bool CFileTransformationControllerComp::TransformRepository(int fromRevision, int toRevision) const
+bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollection& repository, int fromRevision, int toRevision) const
 {
-	if (!m_repositoryItemInfoProviderCompPtr.IsValid() || !m_repositoryCompPtr.IsValid()){
+	IRepositoryItemInfoProvider* itemInfoProviderPtr = dynamic_cast<IRepositoryItemInfoProvider*>(&repository);
+	if (itemInfoProviderPtr != nullptr){
 		return false;
 	}
 
+	imtbase::ICollectionInfo::Ids repositoryItemIds = GetRepositoryItemIds(repository);
+	if (repositoryItemIds.isEmpty()){
+		return true;
+	}
+
 	bool isOk;
-	TransformationState transformationState = GetTransformationState(isOk);
+	TransformationState transformationState = GetTransformationState(repository, isOk);
 
 	if (transformationState == TS_REPLACING){
-		if (ApplyNewRevision()){
-			if (SetTransformationState(TS_IDLE)){
+		if (ReplaceWithTransformedItems(repository)){
+			if (SetTransformationState(repository, TS_IDLE)){
 				return true;
 			}
 
@@ -44,7 +50,7 @@ bool CFileTransformationControllerComp::TransformRepository(int fromRevision, in
 		return false;
 	}
 
-	if (!CleanupTrasformation()){
+	if (!CleanupTrasformation(repository)){
 		return false;
 	}
 
@@ -58,7 +64,7 @@ bool CFileTransformationControllerComp::TransformRepository(int fromRevision, in
 	istd::CIntRange availableRange(0, 0);
 
 	for (int i = 0; i < m_transformationsCompPtr.GetCount(); ++i){
-		const IRepositoryFileTransformaton* transformationPtr = m_transformationsCompPtr[i];
+		const IRepositoryFileTransformation* transformationPtr = m_transformationsCompPtr[i];
 		if (transformationPtr != nullptr){
 			istd::CIntRange transformationRange = transformationPtr->GetSupportedRevisionRange();
 
@@ -76,13 +82,13 @@ bool CFileTransformationControllerComp::TransformRepository(int fromRevision, in
 	{
 		int from = -1;
 		int to = -1;
-		const IRepositoryFileTransformaton* transformationPtr = nullptr;
+		const IRepositoryFileTransformation* transformationPtr = nullptr;
 	};
 
 	QVector<TransformationStep> transformations;
 
 	for (int i = 0; i < m_transformationsCompPtr.GetCount(); ++i){
-		const IRepositoryFileTransformaton* transformationPtr = m_transformationsCompPtr[i];
+		const IRepositoryFileTransformation* transformationPtr = m_transformationsCompPtr[i];
 
 		if (transformationPtr != nullptr){
 			istd::CIntRange transformationRange = transformationPtr->GetSupportedRevisionRange();
@@ -116,18 +122,16 @@ bool CFileTransformationControllerComp::TransformRepository(int fromRevision, in
 		}
 	}
 
-	if (SetTransformationState(TS_IN_PROGRESS)){
+	if (SetTransformationState(repository, TS_IN_PROGRESS)){
 		return false;
 	}
 
 	bool isFailed = false;
 
-	imtbase::ICollectionInfo::Ids repositoryItemIds = m_repositoryItemInfoProviderCompPtr->GetRepositoryItems().GetElementIds();
-
 	for (int itemIndex = 0; itemIndex < repositoryItemIds.count() && !isFailed; itemIndex++){
 		QFileInfo itemInfo;
 
-		const IRepositoryItemInfo* repositoryItemInfoPtr = m_repositoryItemInfoProviderCompPtr->GetRepositoryItemInfo(repositoryItemIds[itemIndex]);
+		const IRepositoryItemInfo* repositoryItemInfoPtr = GetRepositoryItemInfo(repository, repositoryItemIds[itemIndex]);
 
 		if (repositoryItemInfoPtr != nullptr){
 			IRepositoryItemInfo::RepositoryFileTypes fileIds = repositoryItemInfoPtr->GetRepositoryItemFileTypes();
@@ -169,19 +173,19 @@ bool CFileTransformationControllerComp::TransformRepository(int fromRevision, in
 	}
 
 	if (isFailed){
-		CleanupTrasformation();
-		SetTransformationState(TS_IDLE);
+		CleanupTrasformation(repository);
+		SetTransformationState(repository, TS_IDLE);
 
 		return false;
 	}
 
-	if (SetTransformationState(TS_REPLACING)){
+	if (SetTransformationState(repository, TS_REPLACING)){
 		return false;
 	}
 
-	if (ApplyNewRevision()){
-		CleanupTrasformation();
-		if (SetTransformationState(TS_IDLE)){
+	if (ReplaceWithTransformedItems(repository)){
+		CleanupTrasformation(repository);
+		if (SetTransformationState(repository, TS_IDLE)){
 			return true;
 		}
 	}
@@ -192,10 +196,31 @@ bool CFileTransformationControllerComp::TransformRepository(int fromRevision, in
 
 // protected methods
 
-CFileTransformationControllerComp::TransformationState CFileTransformationControllerComp::GetTransformationState(bool &isOk) const
+imtbase::ICollectionInfo::Ids CFileTransformationControllerComp::GetRepositoryItemIds(IFileObjectCollection& repository) const
 {
-	QString rootFolder = m_repositoryCompPtr->GetCollectionRootFolder();
-	QFile stateFile(rootFolder + "/TransformationState");
+	IRepositoryItemInfoProvider* itemInfoProviderPtr = dynamic_cast<IRepositoryItemInfoProvider*>(&repository);
+	if (itemInfoProviderPtr != nullptr){
+		return itemInfoProviderPtr->GetRepositoryItems().GetElementIds();
+	}
+
+	return imtbase::ICollectionInfo::Ids();
+}
+
+
+const IRepositoryItemInfo* CFileTransformationControllerComp::GetRepositoryItemInfo(IFileObjectCollection& repository, const QByteArray& itemId) const
+{
+	IRepositoryItemInfoProvider* itemInfoProviderPtr = dynamic_cast<IRepositoryItemInfoProvider*>(&repository);
+	if (itemInfoProviderPtr != nullptr){
+		return itemInfoProviderPtr->GetRepositoryItemInfo(itemId);
+	}
+
+	return nullptr;
+}
+
+
+CFileTransformationControllerComp::TransformationState CFileTransformationControllerComp::GetTransformationState(IFileObjectCollection& repository, bool &isOk) const
+{
+	QFile stateFile(repository.GetCollectionRootFolder() + "/TransformationState");
 	QTextStream textStream(&stateFile);
 
 	if (stateFile.exists()){
@@ -215,10 +240,9 @@ CFileTransformationControllerComp::TransformationState CFileTransformationContro
 }
 
 
-bool CFileTransformationControllerComp::SetTransformationState(TransformationState state) const
+bool CFileTransformationControllerComp::SetTransformationState(IFileObjectCollection& repository, TransformationState state) const
 {
-	QString rootFolder = m_repositoryCompPtr->GetCollectionRootFolder();
-	QFile stateFile(rootFolder + "/TransformationState");
+	QFile stateFile(repository.GetCollectionRootFolder() + "/TransformationState");
 	QTextStream textStream(&stateFile);
 
 	if (stateFile.exists()){
@@ -238,12 +262,10 @@ bool CFileTransformationControllerComp::SetTransformationState(TransformationSta
 }
 
 
-bool CFileTransformationControllerComp::ApplyNewRevision() const
+bool CFileTransformationControllerComp::ReplaceWithTransformedItems(IFileObjectCollection& repository) const
 {
-	QString rootFolder = m_repositoryCompPtr->GetCollectionRootFolder();
-
 	QFileInfoList fileList;
-	ifile::CFileListProviderComp::CreateFileList(rootFolder, 0, 1, {"*.new"}, QDir::NoSort, fileList);
+	ifile::CFileListProviderComp::CreateFileList(repository.GetCollectionRootFolder(), 0, 1, {"*.new"}, QDir::NoSort, fileList);
 
 	for (const QFileInfo& file : fileList){
 		QString filePath = file.filePath();
@@ -257,14 +279,14 @@ bool CFileTransformationControllerComp::ApplyNewRevision() const
 }
 
 
-bool CFileTransformationControllerComp::CleanupTrasformation() const
+bool CFileTransformationControllerComp::CleanupTrasformation(IFileObjectCollection& repository) const
 {
 	bool retVal = true;
 
-	imtbase::ICollectionInfo::Ids itemIds = m_repositoryItemInfoProviderCompPtr->GetRepositoryItems().GetElementIds();
+	imtbase::ICollectionInfo::Ids itemIds = GetRepositoryItemIds(repository);
 
 	for (const QByteArray& itemId : itemIds){
-		const IRepositoryItemInfo* itemInfoPtr = m_repositoryItemInfoProviderCompPtr->GetRepositoryItemInfo(itemId);
+		const IRepositoryItemInfo* itemInfoPtr = GetRepositoryItemInfo(repository, itemId);
 		if (itemInfoPtr != nullptr){
 			IRepositoryItemInfo::RepositoryFileTypes fileIds = itemInfoPtr->GetRepositoryItemFileTypes();
 			for (IRepositoryItemInfo::RepositoryFileType fileId : fileIds){

@@ -24,6 +24,11 @@ I_EXPORT_COMPONENT(
 			"Repository file transformation controller",
 			"Object Collection File Data Model Repository Revision Format");
 
+I_EXPORT_COMPONENT(
+			RepositoryFileTransformationCompBase,
+			"Base repository file transformation",
+			"Collection File Data Model Repository Revision Format Tanformation");
+
 
 } // namespace ImtRepoPck
 

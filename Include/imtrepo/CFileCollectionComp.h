@@ -148,15 +148,14 @@ public:
 class CFileCollectionComp:
 			public CFileCollectionCompBase,
 			virtual public IFileObjectCollection,
-			virtual protected imtbase::IRevisionController
+			virtual protected imtbase::IRevisionController,
+			virtual protected IRepositoryItemInfoProvider
 {
 	Q_OBJECT
 public:
 	typedef CFileCollectionCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFileCollectionComp)
-		I_REGISTER_SUBELEMENT(RepositoryItemInfoProvider);
-		I_REGISTER_SUBELEMENT_INTERFACE(RepositoryItemInfoProvider, IRepositoryItemInfoProvider, ExtractRepositoryItemInfoProvider);
 		I_REGISTER_INTERFACE(IFileObjectCollection);
 		I_REGISTER_INTERFACE(IFileCollectionInfo);
 		I_REGISTER_INTERFACE(IObjectCollection);
@@ -171,6 +170,10 @@ public:
 	I_END_COMPONENT;
 
 	CFileCollectionComp();
+
+	// reimplemented (IRepositoryItemInfoProvider)
+	virtual const imtbase::ICollectionInfo& GetRepositoryItems() override;
+	virtual const IRepositoryItemInfo* GetRepositoryItemInfo(const QByteArray& itemId) const override;
 
 	// reimplemented (imtbase::IRevisionController)
 	virtual RevisionInfoList GetRevisionInfoList(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const override;
@@ -253,6 +256,8 @@ protected:
 	public:
 		RepositoryItemInfoProvider(CFileCollectionComp& parent);
 
+		bool UpdateItems();
+
 		// reimplemented (IRepositoryItemInfoProvider)
 		virtual const imtbase::ICollectionInfo& GetRepositoryItems() override;
 		virtual const IRepositoryItemInfo* GetRepositoryItemInfo(const QByteArray& itemId) const override;
@@ -272,12 +277,6 @@ protected:
 		CFileCollectionComp& m_parent;
 		QList<Item> m_repositoryItems;
 	};
-
-	template <typename InterfaceType>
-	static InterfaceType* ExtractRepositoryItemInfoProvider(CFileCollectionComp& component)
-	{
-		return &component.m_itemInfoProvider;
-	}
 
 	/**
 		Internal structure representing the file item in the collection.

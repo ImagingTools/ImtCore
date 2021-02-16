@@ -28,13 +28,11 @@ public:
 
 	I_BEGIN_COMPONENT(CFileTransformationControllerComp);
 		I_REGISTER_INTERFACE(IRepositoryTransformationController);
-		I_ASSIGN(m_repositoryCompPtr, "Repository", "Repositor of items for transformation", true, "Repository");
-		I_ASSIGN(m_repositoryItemInfoProviderCompPtr, "RepositoryItemInfoProvider", "Provider of items for transformation", true, "RepositoryItemInfoProvider");
 		I_ASSIGN_MULTI_0(m_transformationsCompPtr, "FileTransformations", "List of file transformations", true);
 	I_END_COMPONENT;
 
 	// reimplemented (IRepositoryTransformationController)
-	virtual bool TransformRepository(int fromRevision, int toRevision) const override;
+	virtual bool TransformRepository(IFileObjectCollection& repository, int fromRevision, int toRevision) const override;
 
 protected:
 	enum TransformationState
@@ -55,15 +53,15 @@ protected:
 	};
 
 protected:
-	TransformationState GetTransformationState(bool &isOk) const;
-	bool SetTransformationState(TransformationState state) const;
-	bool ApplyNewRevision() const;
-	bool CleanupTrasformation() const;
+	imtbase::ICollectionInfo::Ids GetRepositoryItemIds(IFileObjectCollection& repository) const;
+	const IRepositoryItemInfo* GetRepositoryItemInfo(IFileObjectCollection& repository, const QByteArray& itemId) const;
+	TransformationState GetTransformationState(IFileObjectCollection& repository, bool &isOk) const;
+	bool SetTransformationState(IFileObjectCollection& repository, TransformationState state) const;
+	bool ReplaceWithTransformedItems(IFileObjectCollection& repository) const;
+	bool CleanupTrasformation(IFileObjectCollection& repository) const;
 
 protected:
-	I_REF(IFileCollectionInfo, m_repositoryCompPtr);
-	I_REF(IRepositoryItemInfoProvider, m_repositoryItemInfoProviderCompPtr);
-	I_MULTIREF(IRepositoryFileTransformaton, m_transformationsCompPtr);
+	I_MULTIREF(IRepositoryFileTransformation, m_transformationsCompPtr);
 };
 
 

@@ -41,6 +41,20 @@ CFileCollectionComp::CFileCollectionComp()
 }
 
 
+// reimplemented (IRepositoryItemInfoProvider)
+
+const imtbase::ICollectionInfo& CFileCollectionComp::GetRepositoryItems()
+{
+	return m_itemInfoProvider;
+}
+
+
+const IRepositoryItemInfo* CFileCollectionComp::GetRepositoryItemInfo(const QByteArray& itemId) const
+{
+	return m_itemInfoProvider.GetRepositoryItemInfo(itemId);
+}
+
+
 // reimplemented (imtbase::IRevisionController)
 
 imtbase::IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionInfoList(const imtbase::IObjectCollection& /*collection*/, const QByteArray& objectId) const
@@ -1645,7 +1659,7 @@ void CFileCollectionComp::UpdateRepositoryFormat()
 
 	if (targetRevision != currentRevision){
 		if (m_transformationControllerCompPtr.IsValid()){
-			bool retVal = m_transformationControllerCompPtr->TransformRepository(currentRevision, targetRevision);
+			bool retVal = m_transformationControllerCompPtr->TransformRepository(*this, currentRevision, targetRevision);
 			if (retVal){
 				QFile revisionFile(revisionFilePath);
 				QTextStream textStream(&revisionFile);
@@ -2021,6 +2035,12 @@ QString CFileCollectionComp::RepositoryItemInfo::GetRepositoryItemFilePath(Repos
 CFileCollectionComp::RepositoryItemInfoProvider::RepositoryItemInfoProvider(CFileCollectionComp& parent)
 	:m_parent(parent)
 {
+	UpdateItems();
+}
+
+
+bool CFileCollectionComp::RepositoryItemInfoProvider::UpdateItems()
+{
 	QFileInfoList fileList;
 	m_parent.GetRepositoryFileList(fileList);
 
@@ -2038,6 +2058,8 @@ CFileCollectionComp::RepositoryItemInfoProvider::RepositoryItemInfoProvider(CFil
 
 		m_repositoryItems.append(item);
 	}
+
+	return true;
 }
 
 
