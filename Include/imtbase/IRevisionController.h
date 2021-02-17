@@ -25,8 +25,8 @@ public:
 	struct RevisionInfo
 	{
 		RevisionInfo()
-			:revision(-1),
-			collectonRevision(-1),
+			:revision(0),
+			collectonRevision(0),
 			isRevisionAvailable(false)
 		{
 		}

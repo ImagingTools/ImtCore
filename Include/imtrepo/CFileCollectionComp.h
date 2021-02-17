@@ -28,6 +28,7 @@
 #include <imtfile/IFileCompression.h>
 #include <imtrepo/IFileCollectionInfo.h>
 #include <imtrepo/IFileObjectCollection.h>
+#include <imtrepo/IRepositoryFileTransformationStepsProvider.h>
 #include <imtrepo/IRepositoryItemInfoProvider.h>
 #include <imtrepo/IRepositoryTransformationController.h>
 
@@ -167,6 +168,7 @@ public:
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
 		I_ASSIGN(m_loginProviderCompPtr, "Login", "Provider of login data used for revision management", false, "Login");
 		I_ASSIGN(m_transformationControllerCompPtr, "TransformationController", "Controller for down- and upgrade of the repository data", false, "TransformationController");
+		I_ASSIGN_TO(m_transformationStepsProviderCompPtr, m_transformationControllerCompPtr, true);
 	I_END_COMPONENT;
 
 	CFileCollectionComp();
@@ -449,7 +451,11 @@ protected:
 	virtual bool SaveRevisionsContents(const QByteArray& objectId, RevisionsContents& revisionsContents) const;
 	virtual bool CreateRevisionsContents(const QByteArray& objectId) const;
 
-	virtual void UpdateRepositoryFormat();
+	/**
+		Update the version of the repository if necessary.
+		\return \c true if the revision was changed, or \c false otherwise.
+	*/
+	virtual bool UpdateRepositoryFormat();
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -598,6 +604,11 @@ private:
 		Upgrade and downgrade controller for the file repository.
 	*/
 	I_REF(IRepositoryTransformationController, m_transformationControllerCompPtr);
+
+	/**
+		Upgrade and downgrade controller for the file repository.
+	*/
+	I_REF(IRepositoryFileTransformationStepsProvider, m_transformationStepsProviderCompPtr);
 };
 
 

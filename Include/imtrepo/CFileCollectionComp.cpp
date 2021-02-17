@@ -132,6 +132,7 @@ bool CFileCollectionComp::RestoreObject(const imtbase::IObjectCollection& /*coll
 		if (revisionsContents.contains(revision)){
 			if (!istd::CSystem::EnsurePathExists(tempPath)){
 				SendErrorMessage(0, QString(QObject::tr("Target folder '%1' could not be created")).arg(tempPath));
+
 				tempDir.removeRecursively();
 				return false;
 			}
@@ -141,6 +142,7 @@ bool CFileCollectionComp::RestoreObject(const imtbase::IObjectCollection& /*coll
 			QString revisionPath = revisionsPath + "/" + revisionsContents[revision].path;
 			if (!m_compressorCompPtr->DecompressFolder(revisionPath, tempPath)){
 				SendErrorMessage(0, QString(QObject::tr("Revision '%1' could not be decompressed")).arg(revisionPath));
+
 				tempDir.removeRecursively();
 				return false;
 			}
@@ -163,7 +165,42 @@ bool CFileCollectionComp::RestoreObject(const imtbase::IObjectCollection& /*coll
 
 						if (!revisionItem.Serialize(revisionItemArchive)){
 							SendErrorMessage(0, QString("Collection item could not be loaded from '%1'").arg(objectItemFilePath));
+
+							tempDir.removeRecursively();
 							return false;
+						}
+
+						if (revisionMetaInfo.collectonRevision != *m_revisionAttrPtr){
+							bool isTransformationOk = false;
+
+							do{
+								if (m_transformationStepsProviderCompPtr.IsValid()){
+									IRepositoryFileTransformationStepsProvider::TransformationSteps steps =
+												m_transformationStepsProviderCompPtr->GetTransformationSteps(revisionMetaInfo.collectonRevision, *m_revisionAttrPtr);
+
+									if (steps.isEmpty()){
+										break;
+									}
+
+									for (const IRepositoryFileTransformationStepsProvider::TransformationStep& step : steps){
+										RepositoryItemInfo repositoryItemInfo;
+										repositoryItemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_INFO, objectItemFilePath);
+										repositoryItemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_DATA, objectDataFilePath);
+										repositoryItemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_DATA_METAINFO, objectMetaFilePath);
+
+										if (!step.transformationPtr->TransformFile(repositoryItemInfo, step.from, step.to)){
+											break;
+										}
+									}
+								}
+
+								isTransformationOk = true;
+							} while (0);
+
+							if (!isTransformationOk){
+								tempDir.removeRecursively();
+								return false;
+							}
 						}
 
 						QString itemMetaFilePath = GetMetaInfoFilePath(m_files[fileIndex]);
@@ -203,7 +240,6 @@ bool CFileCollectionComp::RestoreObject(const imtbase::IObjectCollection& /*coll
 						}
 
 						tempDir.removeRecursively();
-
 						return true;
 					}
 				}
@@ -290,6 +326,7 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& /*collec
 				revisionMetaInfo.revision = newRevision;
 				revisionMetaInfo.timestamp = QDateTime::currentDateTime();
 				revisionMetaInfo.comment = userComment;
+				revisionMetaInfo.collectonRevision = *m_revisionAttrPtr;
 				if (m_loginProviderCompPtr.IsValid()){
 					iauth::CUser* userPtr = m_loginProviderCompPtr->GetLoggedUser();
 					if (userPtr != nullptr){
@@ -662,7 +699,7 @@ IFileCollectionInfo::FileCollectionLayout CFileCollectionComp::GetCollectionFile
 
 // reimplemented (IObjectCollection)
 
-const imtbase::IRevisionController * CFileCollectionComp::GetRevisionController() const
+const imtbase::IRevisionController* CFileCollectionComp::GetRevisionController() const
 {
 	return this;
 }
@@ -1617,10 +1654,10 @@ bool CFileCollectionComp::CreateRevisionsContents(const QByteArray& objectId) co
 }
 
 
-void CFileCollectionComp::UpdateRepositoryFormat()
+bool CFileCollectionComp::UpdateRepositoryFormat()
 {
 	int currentRevision = 0;
-	int targetRevision = *m_revisionAttrPtr;
+	int targetRevision = 2; //.*m_revisionAttrPtr;
 	QString revisionFilePath;
 
 	if (m_repositoryPathCompPtr.IsValid()){
@@ -1668,10 +1705,14 @@ void CFileCollectionComp::UpdateRepositoryFormat()
 					textStream << targetRevision;
 
 					revisionFile.close();
+
+					return true;
 				}
 			}
 		}
 	}
+
+	return false;
 }
 
 
@@ -1705,13 +1746,25 @@ void CFileCollectionComp::OnComponentCreated()
 		}
 	}
 
-	if (*m_asynchronousReadingAttrPtr){
-		StartRepositoryLoader();
-	}
-	else{
+	m_itemInfoProvider.UpdateItems();
+	if (UpdateRepositoryFormat()){
 		ReadRepositoryItems();
 
-		UpdateRepositoryFormat();
+		const imtbase::IRevisionController* revisionControllerPtr = GetRevisionController();
+		if (revisionControllerPtr != nullptr){
+			imtbase::ICollectionInfo::Ids ids = GetElementIds();
+			for (const QByteArray& id : ids){
+				revisionControllerPtr->BackupObject(*this, id, tr("Revision number updated to %1").arg(*m_revisionAttrPtr));
+			}
+		}
+	}
+	else{
+		if (*m_asynchronousReadingAttrPtr){
+			StartRepositoryLoader();
+		}
+		else{
+			ReadRepositoryItems();
+		}
 	}
 
 	if (m_eventHandlerListCompPtr.IsValid()){
@@ -1988,8 +2041,6 @@ void CFileCollectionComp::OnReaderFinished()
 			m_progressManagerListCompPtr[i]->EndProgressSession(0);
 		}
 	}
-
-	UpdateRepositoryFormat();
 }
 
 
@@ -2035,7 +2086,6 @@ QString CFileCollectionComp::RepositoryItemInfo::GetRepositoryItemFilePath(Repos
 CFileCollectionComp::RepositoryItemInfoProvider::RepositoryItemInfoProvider(CFileCollectionComp& parent)
 	:m_parent(parent)
 {
-	UpdateItems();
 }
 
 
@@ -2048,9 +2098,9 @@ bool CFileCollectionComp::RepositoryItemInfoProvider::UpdateItems()
 		QString itemBasePath = file.absolutePath() + "/" + file.completeBaseName();
 
 		RepositoryItemInfo itemInfo;
-		itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_INFO, itemBasePath + ".item");
-		itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_DATA, itemBasePath + "." + m_parent.GetRepositoryInfo().dataFileSuffix);
-		itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_INFO, itemBasePath + "." + m_parent.GetRepositoryInfo().metaInfoFileSuffix);
+		itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_INFO, itemBasePath + '.' + m_parent.GetRepositoryInfo().dataFileSuffix);
+		itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_DATA, itemBasePath);
+		itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_DATA_METAINFO, itemBasePath + "." + m_parent.GetRepositoryInfo().metaInfoFileSuffix);
 
 		Item item;
 		item.id = QUuid::createUuid().toByteArray();

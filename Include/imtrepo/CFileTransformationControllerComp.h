@@ -9,6 +9,7 @@
 #include <imtrepo/IRepositoryTransformationController.h>
 #include <imtrepo/IRepositoryItemInfoProvider.h>
 #include <imtrepo/IRepositoryFileTransformation.h>
+#include <imtrepo/IRepositoryFileTransformationStepsProvider.h>
 
 
 namespace imtrepo
@@ -21,7 +22,8 @@ namespace imtrepo
 */
 class CFileTransformationControllerComp:
 			public ilog::CLoggerComponentBase,
-			virtual public IRepositoryTransformationController
+			virtual public IRepositoryTransformationController,
+			virtual public IRepositoryFileTransformationStepsProvider
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
@@ -30,6 +32,9 @@ public:
 		I_REGISTER_INTERFACE(IRepositoryTransformationController);
 		I_ASSIGN_MULTI_0(m_transformationsCompPtr, "FileTransformations", "List of file transformations", true);
 	I_END_COMPONENT;
+
+	// reimplemented (IRepositoryFileTransformationStepsProvider)
+	virtual TransformationSteps GetTransformationSteps(int fromRevision, int toRevision) const override;
 
 	// reimplemented (IRepositoryTransformationController)
 	virtual bool TransformRepository(IFileObjectCollection& repository, int fromRevision, int toRevision) const override;

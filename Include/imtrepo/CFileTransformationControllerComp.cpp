@@ -21,10 +21,83 @@ namespace imtrepo
 
 // public methods
 
+// reimplemented (IRepositoryFileTransformationStepsProvider)
+
+IRepositoryFileTransformationStepsProvider::TransformationSteps CFileTransformationControllerComp::GetTransformationSteps(int fromRevision, int toRevision) const
+{
+	TransformationSteps steps;
+
+	istd::CIntRange range(fromRevision, toRevision);
+	range.Validate();
+
+	istd::CIntRange availableRange(0, 0);
+
+	for (int i = 0; i < m_transformationsCompPtr.GetCount(); ++i){
+		const IRepositoryFileTransformation* transformationPtr = m_transformationsCompPtr[i];
+		if (transformationPtr != nullptr){
+			istd::CIntRange transformationRange = transformationPtr->GetSupportedRevisionRange();
+
+			availableRange.Unite(transformationRange);
+		}
+	}
+
+	if (!availableRange.Contains(range)){
+		return steps;
+	}
+
+	bool isUpgrade = (fromRevision < toRevision);
+
+	for (int i = 0; i < m_transformationsCompPtr.GetCount(); ++i){
+		const IRepositoryFileTransformation* transformationPtr = m_transformationsCompPtr[i];
+
+		if (transformationPtr != nullptr){
+			istd::CIntRange transformationRange = transformationPtr->GetSupportedRevisionRange();
+
+			int startRevision = range.GetMinValue();
+			int stopRevision = range.GetMaxValue();
+
+			while (startRevision != stopRevision){
+				istd::CIntRange checkRange(startRevision, stopRevision);
+
+				if (transformationRange.Contains(checkRange)){
+					TransformationStep step;
+					step.from = isUpgrade ? checkRange.GetMinValue() : checkRange.GetMaxValue();
+					step.to = isUpgrade ? checkRange.GetMaxValue() : checkRange.GetMinValue();
+					step.transformationPtr = transformationPtr;
+
+					if (isUpgrade){
+						steps.push_back(step);
+					}
+					else{
+						steps.push_front(step);
+					}
+
+					range.SetMinValue(checkRange.GetMaxValue());
+
+					break;
+				}
+
+				stopRevision--;
+			}
+		}
+	}
+
+	if (steps.first().from != fromRevision || steps.last().to != toRevision){
+		steps.clear();
+	}
+
+	return steps;
+}
+
+
 // reimplemented (IRepositoryTransformationController)
 
 bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollection& repository, int fromRevision, int toRevision) const
 {
+	if (fromRevision == toRevision){
+		return true;
+	}
+
 	IRepositoryItemInfoProvider* itemInfoProviderPtr = dynamic_cast<IRepositoryItemInfoProvider*>(&repository);
 	if (itemInfoProviderPtr == nullptr){
 		return false;
@@ -54,72 +127,14 @@ bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollectio
 		return false;
 	}
 
-	if (fromRevision == toRevision){
-		return true;
-	}
+	TransformationSteps transformations = GetTransformationSteps(fromRevision, toRevision);
 
-	istd::CIntRange range(fromRevision, toRevision);
-	range.Validate();
-
-	istd::CIntRange availableRange(0, 0);
-
-	for (int i = 0; i < m_transformationsCompPtr.GetCount(); ++i){
-		const IRepositoryFileTransformation* transformationPtr = m_transformationsCompPtr[i];
-		if (transformationPtr != nullptr){
-			istd::CIntRange transformationRange = transformationPtr->GetSupportedRevisionRange();
-
-			availableRange.Unite(transformationRange);
-		}
-	}
-
-	if (!availableRange.Contains(range)){
+	if (transformations.isEmpty()){
 		return false;
 	}
 
-	bool isUpgrade = (fromRevision < toRevision);
-
-	struct TransformationStep
-	{
-		int from = -1;
-		int to = -1;
-		const IRepositoryFileTransformation* transformationPtr = nullptr;
-	};
-
-	QVector<TransformationStep> transformations;
-
-	for (int i = 0; i < m_transformationsCompPtr.GetCount(); ++i){
-		const IRepositoryFileTransformation* transformationPtr = m_transformationsCompPtr[i];
-
-		if (transformationPtr != nullptr){
-			istd::CIntRange transformationRange = transformationPtr->GetSupportedRevisionRange();
-
-			int startRevision = range.GetMinValue();
-			int stopRevision = range.GetMaxValue();
-
-			while (startRevision != stopRevision){
-				istd::CIntRange checkRange(startRevision, stopRevision);
-
-				if (transformationRange.Contains(checkRange)){
-					TransformationStep step;
-					step.from = isUpgrade ? checkRange.GetMinValue() : checkRange.GetMaxValue();
-					step.to = isUpgrade ? checkRange.GetMaxValue() : checkRange.GetMinValue();
-					step.transformationPtr = transformationPtr;
-
-					if (isUpgrade){
-						transformations.push_back(step);
-					}
-					else{
-						transformations.push_front(step);
-					}
-
-					range.SetMinValue(checkRange.GetMaxValue());
-
-					break;
-				}
-
-				stopRevision--;
-			}
-		}
+	if (transformations.first().from != fromRevision || transformations.last().to != toRevision){
+		return false;
 	}
 
 	if (!SetTransformationState(repository, TS_IN_PROGRESS)){
