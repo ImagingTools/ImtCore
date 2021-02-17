@@ -53,6 +53,13 @@ In many applications it is desirable that the user only has limited access to th
 5. Device persistence of license data.
 6. File-based peristence of license data.
 7. Diagnostics information about the license status in the application
+
+We define following types of license data:
+1. List of all product variants. This includes the overview of all available products and the associated licenses.
+2. List of product installations.
+3. Encrypted information file containing all license keys for a given product installation.
+
+Each product application has knowledge about all available product licenses and 
+activate them by reading and validating the license keys from the license file containing license keys.
+The license keys will be defined by Product Manager before shipping of the installation setup to the customer.
 */
-
-
