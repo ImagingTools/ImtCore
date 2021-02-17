@@ -168,7 +168,7 @@ public:
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
 		I_ASSIGN(m_loginProviderCompPtr, "Login", "Provider of login data used for revision management", false, "Login");
 		I_ASSIGN(m_transformationControllerCompPtr, "TransformationController", "Controller for down- and upgrade of the repository data", false, "TransformationController");
-		I_ASSIGN_TO(m_transformationStepsProviderCompPtr, m_transformationControllerCompPtr, true);
+		I_ASSIGN(m_transformationStepsProviderCompPtr, "FileTranformationStepsProvider", "Transformation steps provider for the file in the repository", false, "FileTranformationStepsProvider");
 	I_END_COMPONENT;
 
 	CFileCollectionComp();
@@ -606,7 +606,7 @@ private:
 	I_REF(IRepositoryTransformationController, m_transformationControllerCompPtr);
 
 	/**
-		Upgrade and downgrade controller for the file repository.
+		Transformation steps provider for the file in the repository.
 	*/
 	I_REF(IRepositoryFileTransformationStepsProvider, m_transformationStepsProviderCompPtr);
 };

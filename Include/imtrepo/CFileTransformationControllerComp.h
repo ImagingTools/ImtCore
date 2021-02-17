@@ -30,6 +30,7 @@ public:
 
 	I_BEGIN_COMPONENT(CFileTransformationControllerComp);
 		I_REGISTER_INTERFACE(IRepositoryTransformationController);
+		I_REGISTER_INTERFACE(IRepositoryFileTransformationStepsProvider);
 		I_ASSIGN_MULTI_0(m_transformationsCompPtr, "FileTransformations", "List of file transformations", true);
 	I_END_COMPONENT;
 

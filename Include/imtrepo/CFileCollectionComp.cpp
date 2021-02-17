@@ -160,16 +160,6 @@ bool CFileCollectionComp::RestoreObject(const imtbase::IObjectCollection& /*coll
 					istd::CChangeNotifier changeNotifier(const_cast<CFileCollectionComp*>(this), &changes);
 
 					if (revisionMetaInfo.revision == revision){
-						ifile::CCompactXmlFileReadArchive revisionItemArchive(objectItemFilePath, m_versionInfoCompPtr.GetPtr());
-						CollectionItem revisionItem("");
-
-						if (!revisionItem.Serialize(revisionItemArchive)){
-							SendErrorMessage(0, QString("Collection item could not be loaded from '%1'").arg(objectItemFilePath));
-
-							tempDir.removeRecursively();
-							return false;
-						}
-
 						if (revisionMetaInfo.collectonRevision != *m_revisionAttrPtr){
 							bool isTransformationOk = false;
 
@@ -201,6 +191,15 @@ bool CFileCollectionComp::RestoreObject(const imtbase::IObjectCollection& /*coll
 								tempDir.removeRecursively();
 								return false;
 							}
+						}
+
+						ifile::CCompactXmlFileReadArchive revisionItemArchive(objectItemFilePath, m_versionInfoCompPtr.GetPtr());
+						CollectionItem revisionItem("");
+						if (!revisionItem.Serialize(revisionItemArchive)){
+							SendErrorMessage(0, QString("Collection item could not be loaded from '%1'").arg(objectItemFilePath));
+
+							tempDir.removeRecursively();
+							return false;
 						}
 
 						QString itemMetaFilePath = GetMetaInfoFilePath(m_files[fileIndex]);
@@ -1657,7 +1656,7 @@ bool CFileCollectionComp::CreateRevisionsContents(const QByteArray& objectId) co
 bool CFileCollectionComp::UpdateRepositoryFormat()
 {
 	int currentRevision = 0;
-	int targetRevision = 2; //.*m_revisionAttrPtr;
+	int targetRevision = *m_revisionAttrPtr;
 	QString revisionFilePath;
 
 	if (m_repositoryPathCompPtr.IsValid()){
