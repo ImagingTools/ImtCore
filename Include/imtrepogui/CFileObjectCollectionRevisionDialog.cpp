@@ -24,6 +24,7 @@ CFileObjectCollectionRevisionDialog::CFileObjectCollectionRevisionDialog(QWidget
 void CFileObjectCollectionRevisionDialog::SetParams(
 			const imtbase::IRevisionController::RevisionInfoList& revisions,
 			int currentRevision,
+			const imtbase::IObjectCollection* collectionPtr, 
 			const imtbase::IRevisionController* revisionControllerPtr,
 			const QByteArray& objectId,
 			const QString& fileName,
@@ -49,6 +50,7 @@ void CFileObjectCollectionRevisionDialog::SetParams(
 		}
 
 		if (!revisions[i].isRevisionAvailable){
+			m_unavailableRevisions.insert(revisions[i].revision);
 			Table->item(i, 0)->setTextColor(Qt::red);
 			Table->item(i, 1)->setTextColor(Qt::red);
 			Table->item(i, 2)->setTextColor(Qt::red);
@@ -62,6 +64,7 @@ void CFileObjectCollectionRevisionDialog::SetParams(
 		Table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
 	}
 
+	m_collectionPtr = collectionPtr;
 	m_revisionControllerPtr = revisionControllerPtr;
 	m_objectId = objectId;
 	m_fileName = fileName;
@@ -86,6 +89,10 @@ void CFileObjectCollectionRevisionDialog::OnCustomContextMenuRequested(const QPo
 {
 	QList<QTableWidgetItem*> selectedItems = Table->selectedItems();
 	if (selectedItems.isEmpty()){
+		return;
+	}
+
+	if (m_unavailableRevisions.contains(Table->item(selectedItems[0]->row(), 0)->text().toInt())){
 		return;
 	}
 
@@ -117,7 +124,7 @@ void CFileObjectCollectionRevisionDialog::OnExport()
 						m_filter);
 
 			if (!filePath.isEmpty()){
-				if (!m_revisionControllerPtr->ExportObject(*(imtbase::IObjectCollection*)nullptr, m_objectId, revision, filePath)){
+				if (!m_revisionControllerPtr->ExportObject(*m_collectionPtr, m_objectId, revision, filePath)){
 					QMessageBox::critical(this, tr("Collection"), tr("Document could not be exported"));
 				}
 			}

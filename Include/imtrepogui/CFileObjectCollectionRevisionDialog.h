@@ -24,6 +24,7 @@ public:
 	void SetParams(
 				const imtbase::IRevisionController::RevisionInfoList& revisions,
 				int currentRevision,
+				const imtbase::IObjectCollection* collectionPtr,
 				const imtbase::IRevisionController* revisionControllerPtr,
 				const QByteArray& objectId,
 				const QString& fileName,
@@ -35,10 +36,12 @@ private Q_SLOTS:
 	void OnExport();
 
 private:
+	const imtbase::IObjectCollection* m_collectionPtr;
 	const imtbase::IRevisionController* m_revisionControllerPtr;
 	QByteArray m_objectId;
 	QString m_fileName;
 	QString m_filter;
+	QSet<int> m_unavailableRevisions;
 };
 
 

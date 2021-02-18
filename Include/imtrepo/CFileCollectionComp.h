@@ -179,8 +179,10 @@ public:
 
 	// reimplemented (imtbase::IRevisionController)
 	virtual RevisionInfoList GetRevisionInfoList(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const override;
-	virtual bool RestoreObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision) const override;
-	virtual int BackupObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& userComment = QString()) const override;
+	virtual int BackupObject(imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& userComment = QString()) const override;
+	virtual bool RestoreObject(imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision) const override;
+	virtual bool RemoveRevision(imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision) const override;
+	virtual bool RemoveRevisions(imtbase::IObjectCollection& collection, const QByteArray& objectId) const override;
 	virtual bool ExportObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision, const QString& filePath) const override;
 
 	// reimplemented (IFileObjectCollection)
@@ -202,6 +204,7 @@ public:
 	// reimplemented (IFileCollectionInfo)
 	virtual QString GetCollectionRootFolder() const override;
 	virtual FileCollectionLayout GetCollectionFileLayout() const override;
+	virtual int GetRepositoryRevision() const override;
 
 	// reimplemented (IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
@@ -339,16 +342,18 @@ protected:
 		imtbase::IMetaInfoCreator::MetaInfoPtr contentsMetaInfoPtr;
 	};
 
-	class RevisionMetaInfo: public imtbase::IRevisionController::RevisionInfo , virtual public iser::ISerializable
-	{
-	public:
-		// reimplement (iser::ISerializable)
-		virtual bool Serialize(iser::IArchive& archive) override;
-	};
-
 	struct RevisionsContentsItem: public imtbase::IRevisionController::RevisionInfo
 	{
-		QString path;
+		RevisionsContentsItem()
+			:repositoryRevision(0)
+		{
+		}
+
+		/**
+			Revision of the whole collection at time of the backup creation.
+		*/
+		int repositoryRevision;
+		QString fileName;
 	};
 
 	typedef QMap<int, RevisionsContentsItem> RevisionsContentsMap;
@@ -447,15 +452,15 @@ protected:
 				const QString& localFilePath,
 				bool useSubfolder) const;
 
-	virtual bool LoadRevisionsContents(const QByteArray& objectId, RevisionsContents& revisionsContents) const;
-	virtual bool SaveRevisionsContents(const QByteArray& objectId, RevisionsContents& revisionsContents) const;
-	virtual bool CreateRevisionsContents(const QByteArray& objectId) const;
+	virtual bool LoadRevisionsContents(const IFileObjectCollection& collection, const QByteArray& objectId, RevisionsContents& revisionsContents) const;
+	virtual bool SaveRevisionsContents(const IFileObjectCollection& collection, const QByteArray& objectId, RevisionsContents& revisionsContents) const;
 
 	/**
 		Update the version of the repository if necessary.
 		\return \c true if the revision was changed, or \c false otherwise.
 	*/
 	virtual bool UpdateRepositoryFormat();
+	virtual bool TransformRepositoryItem(const RepositoryItemInfo& repositoryItemInfo, int fromRepositoryRevision, int toRepositoryRevision) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

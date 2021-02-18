@@ -44,14 +44,17 @@ void CFileObjectCollectionViewDelegate::UpdateItemSelection(const imtbase::IColl
 		if (m_selectedItemIds.count() == 1){
 			int revision = -1;
 			idoc::CStandardDocumentMetaInfo metaInfo;
-			if (m_collectionPtr->GetCollectionItemMetaInfo(m_selectedItemIds[0], metaInfo)){
+
+			QByteArray objectId = m_selectedItemIds[0];
+
+			if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
 				QVariant variant = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
 				if (variant.isValid()){
 					revision = variant.toInt();
 				}
 			}
 
-			imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_collectionPtr, m_selectedItemIds[0]);
+			imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_collectionPtr, objectId);
 			for (int i = 0; i < revisionList.count(); i++){
 				if (revisionList[i].revision == revision){
 					revisionList.removeAt(i);
@@ -257,14 +260,16 @@ void CFileObjectCollectionViewDelegate::OnExport()
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
 	if (!m_selectedItemIds.isEmpty()){
+		QByteArray objectId = m_selectedItemIds[0];
+
 		QString filePath = QFileDialog::getSaveFileName(
 					(m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr,
 					tr("Export File"),
 					QString(),
-					CreateFileExportFilter(m_selectedItemIds[0]));
+					CreateFileExportFilter(objectId));
 
 		if (!filePath.isEmpty()){
-			if (!ExportObject(m_selectedItemIds[0], filePath)){
+			if (!ExportObject(objectId, filePath)){
 				QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be exported"));
 			}
 		}
@@ -283,34 +288,37 @@ void CFileObjectCollectionViewDelegate::OnRestore()
 		idoc::CStandardDocumentMetaInfo metaInfo;
 		int currentRevision = -1;
 
-		if (m_collectionPtr->GetCollectionItemMetaInfo(m_selectedItemIds[0], metaInfo)){
+		QByteArray objectId = m_selectedItemIds[0];
+
+		if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
 			QVariant revision = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
 			if (revision.isValid()){
 				currentRevision = revision.toInt();
 			}
 		}
 
-		imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_collectionPtr, m_selectedItemIds[0]);
+		imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_collectionPtr, objectId);
 
-		QString fileName = fileCollectionPtr->GetElementInfo(m_selectedItemIds[0], imtbase::IObjectCollectionInfo::EIT_NAME).toString();
+		QString fileName = fileCollectionPtr->GetElementInfo(objectId, imtbase::IObjectCollectionInfo::EIT_NAME).toString();
 
 		CFileObjectCollectionRevisionDialog dialog;
 
 		dialog.SetParams(
 					revisionList,
 					currentRevision,
+					m_collectionPtr,
 					revisionControllerPtr,
-					m_selectedItemIds[0],
+					objectId,
 					fileName,
-					CreateFileExportFilter(m_selectedItemIds[0]));
+					CreateFileExportFilter(objectId));
 
 		if (dialog.exec() == QDialog::Accepted){
 			int revision = dialog.GetSelectedRevision();
 			if (revision != -1 && revision != currentRevision){
-				if (IsRestoreAllowed(m_selectedItemIds[0])){
-					BeforeRestore(m_selectedItemIds[0]);
-					bool isRestored = revisionControllerPtr->RestoreObject(*m_collectionPtr, m_selectedItemIds[0], revision);
-					AfterRestore(m_selectedItemIds[0], isRestored);
+				if (IsRestoreAllowed(objectId)){
+					BeforeRestore(objectId);
+					bool isRestored = revisionControllerPtr->RestoreObject(*m_collectionPtr, objectId, revision);
+					AfterRestore(objectId, isRestored);
 				}
 			}
 		}

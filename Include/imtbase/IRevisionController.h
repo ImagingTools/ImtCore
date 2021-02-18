@@ -26,17 +26,11 @@ public:
 	{
 		RevisionInfo()
 			:revision(0),
-			collectonRevision(0),
 			isRevisionAvailable(false)
 		{
 		}
 
 		int revision;
-
-		/**
-			Revision of the whole collection at time of the backup creation.
-		*/
-		int collectonRevision;
 		QDateTime timestamp;
 		QString user;
 		QString comment;
@@ -53,21 +47,36 @@ public:
 				const QByteArray& objectId) const = 0;
 
 	/**
+	Create backup of the given object in the collection.
+	\return Revision of the saved object if the operation was successfull, or a negative value otherwise.
+*/
+	virtual int BackupObject(
+				imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const QString& userComment = QString()) const = 0;
+
+	/**
 		Restore the data of an object in the collection from a given revision.
 	*/
 	virtual bool RestoreObject(
-				const imtbase::IObjectCollection& collection,
+				imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				int revision) const = 0;
 
 	/**
-		Create backup of the given object in the collection.
-		\return Revision of the saved object if the operation was successfull, or a negative value otherwise.
+		Remove revisions of an object in the collection.
 	*/
-	virtual int BackupObject(
-				const imtbase::IObjectCollection& collection,
+	virtual bool RemoveRevision(
+				imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
-				const QString& userComment = QString()) const = 0;
+				int revision) const = 0;
+
+	/**
+		Remove all revisions of an object with given id.
+	*/
+	virtual bool RemoveRevisions(
+				imtbase::IObjectCollection& collection,
+				const QByteArray& objectId) const = 0;
 
 	/**
 		Exporting object data of a given revision from a collection to a file

@@ -44,6 +44,11 @@ public:
 		Get path to the root folder of the file collection.
 	*/
 	virtual QString GetCollectionRootFolder() const = 0;
+
+	/**
+		Get repository revision.
+	*/
+	virtual int GetRepositoryRevision() const = 0;
 };
 
 
