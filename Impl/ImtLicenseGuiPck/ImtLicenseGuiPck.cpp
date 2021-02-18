@@ -12,7 +12,7 @@ namespace ImtLicenseGuiPck
 I_EXPORT_PACKAGE(
 			"ImtLicenseGuiPck",
 			"ImagingTools license management UI-component package",
-			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
 			LicenseInfoEditorGui,

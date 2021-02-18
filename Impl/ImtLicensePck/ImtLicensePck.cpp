@@ -12,7 +12,7 @@ namespace ImtLicensePck
 I_EXPORT_PACKAGE(
 			"ImtLicensePck",
 			"ImagingTools license management component package",
-			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
 			LicenseInfo,
@@ -28,6 +28,11 @@ I_EXPORT_COMPONENT(
 			LicenseBasedRightsProvider,
 			"License based rights provider",
 			"License Rights Dongle Featuring Licensing Key");
+
+I_EXPORT_COMPONENT(
+			ProductCollection,
+			"Definition of all product licenses",
+			"License Products System");
 
 
 } // namespace ImtLicensePck

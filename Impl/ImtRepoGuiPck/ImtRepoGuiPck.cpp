@@ -15,7 +15,7 @@ namespace ImtRepoGuiPck
 I_EXPORT_PACKAGE(
 			"ImtGuiPck",
 			"ImagingTools core framework UI-component package",
-			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
 			FileObjectCollectionViewDelegate,

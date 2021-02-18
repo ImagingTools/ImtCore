@@ -15,7 +15,7 @@ namespace ImtQmlPck
 I_EXPORT_PACKAGE(
 			"ImtQmlPck",
 			"Package for QML-related components",
-			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
 			QuickApplication,

@@ -13,7 +13,7 @@ namespace ImtReportPck
 I_EXPORT_PACKAGE(
 			"ImtReportGuiPck",
 			"ImagingTools report component package",
-			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools") "Report");
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools") "Report");
 
 I_EXPORT_COMPONENT(
 			ReportDocument,

@@ -12,7 +12,7 @@ namespace ImtLogPck
 I_EXPORT_PACKAGE(
 			"ImtLogPck",
 			"ImagingTools log framework component package",
-			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
 			LoginEventController,

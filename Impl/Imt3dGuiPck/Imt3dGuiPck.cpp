@@ -14,7 +14,7 @@ namespace Imt3dGuiPck
 I_EXPORT_PACKAGE(
 			"Imt3dGuiPck",
 			"ImagingTools 3D-geometry UI-component package",
-			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
 			View3dProvider,

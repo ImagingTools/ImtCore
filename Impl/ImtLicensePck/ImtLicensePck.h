@@ -9,6 +9,7 @@
 #include <imtlic/CLicenseInfo.h>
 #include <imtlic/CLicenseInfoManager.h>
 #include <imtlic/CLicenseBasedRightsProviderComp.h>
+#include <imtlic/CProductCollection.h>
 
 
 /**
@@ -32,6 +33,12 @@ typedef icomp::TModelCompWrap<
 						imtbase::ICollectionInfo,
 						iser::ISerializable>> LicenseInfoManager;
 typedef imtlic::CLicenseBasedRightsProviderComp LicenseBasedRightsProvider;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtlic::CProductCollection,
+						imtlic::ILicenseInfoProvider,
+						imtlic::IProductLicensingInfo,
+						imtlic::IProductInfo>> ProductCollection;
 
 
 } // namespace ImtLicensePck

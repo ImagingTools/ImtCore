@@ -1,4 +1,4 @@
-#include <imtlic/CLicensingSystem.h>
+#include <imtlic/CProductCollection.h>
 
 
 namespace imtlic
@@ -7,7 +7,7 @@ namespace imtlic
 
 // public methods
 
-CLicensingSystem::CLicensingSystem()
+CProductCollection::CProductCollection()
 	:BaseClass("ProductLicensingInfo", "Product Licensing", "ProductLicenses")
 {
 }
@@ -15,13 +15,13 @@ CLicensingSystem::CLicensingSystem()
 
 // reimplemented (imtbase::IProductLicensingInfoProvider)
 
-const imtbase::ICollectionInfo& CLicensingSystem::GetProductList() const
+const imtbase::ICollectionInfo& CProductCollection::GetProductList() const
 {
 	return m_collection;
 }
 
 
-const imtlic::IProductLicensingInfo* CLicensingSystem::GetProductLicenses(const QByteArray & productId) const
+const imtlic::IProductLicensingInfo* CProductCollection::GetProductLicenses(const QByteArray & productId) const
 {
 	return dynamic_cast<const imtlic::IProductLicensingInfo*>(m_collection.GetObjectPtr(productId));
 }

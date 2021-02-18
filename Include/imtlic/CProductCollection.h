@@ -15,12 +15,12 @@ namespace imtlic
 	Whole products and licenses of the universe.
 	\ingroup LicenseManagement
 */
-class CLicensingSystem: public imtbase::TAggergatedObjectCollectionWrap<imtlic::IProductLicensingInfoProvider, CProductLicensingInfo>
+class CProductCollection: public imtbase::TAggergatedObjectCollectionWrap<imtlic::IProductLicensingInfoProvider, CProductLicensingInfo>
 {
 public:
 	typedef imtbase::TAggergatedObjectCollectionWrap<imtlic::IProductLicensingInfoProvider, CProductLicensingInfo> BaseClass;
 	
-	CLicensingSystem();
+	CProductCollection();
 
 	// reimplemented (imtbase::IProductLicensingInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetProductList() const override;

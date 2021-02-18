@@ -12,7 +12,7 @@ namespace ImtRestPck
 I_EXPORT_PACKAGE(
 			"ImtRestPck",
 			"REST-based communication component package",
-			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
 			TcpServer,

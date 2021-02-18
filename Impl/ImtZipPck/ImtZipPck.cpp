@@ -12,7 +12,7 @@ namespace ImtZipPck
 I_EXPORT_PACKAGE(
 			"ImtZipPck",
 			"Zip compression package",
-			IM_PROJECT("\"ImagingTools Core\"") IM_COMPANY("ImagingTools"));
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
 			FileCompressor,
