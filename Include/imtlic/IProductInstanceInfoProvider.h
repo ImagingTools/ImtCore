@@ -26,12 +26,12 @@ class IProductInstanceInfoProvider: virtual public istd::IChangeable
 {
 public:
 	/**
-		Get list of all available products.
+		Get list of all available product instances.
 	*/
 	virtual const imtbase::ICollectionInfo& GetProductInstanceList() const = 0;
 
 	/**
-		Get license information for a given product. All available licenses are returned.
+		Get information for a product installation instance.
 	*/
 	virtual const imtlic::IProductInstanceInfo* GetProductInstance(const QByteArray& instanceId) const = 0;
 };
