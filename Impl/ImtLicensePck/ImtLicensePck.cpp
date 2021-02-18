@@ -34,6 +34,11 @@ I_EXPORT_COMPONENT(
 			"Definition of all product licenses",
 			"License Products System");
 
+I_EXPORT_COMPONENT(
+			ProductInstanceCollection,
+			"List of all installed product instances",
+			"License Products Installations");
+
 
 } // namespace ImtLicensePck
 
