@@ -71,8 +71,7 @@ imtbase::IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionI
 		return revisionInfoList;
 	}
 
-	QString objectName = collection.GetElementInfo(objectId, EIT_NAME).toString();
-	QString revisionsPath = collectionPtr->GetCollectionRootFolder() + "/" + objectName + "/Revisions";
+	QString revisionsPath = QFileInfo(collectionPtr->GetFileInfo(objectId).filePath).path() + "/Revisions";
 
 	for (int key : revisionsContents.keys()){
 		RevisionInfo revisionInfoListItem;
@@ -98,8 +97,7 @@ int CFileCollectionComp::BackupObject(imtbase::IObjectCollection& collection, co
 		return -1;
 	}
 
-	QString objectName = collection.GetElementInfo(objectId, EIT_NAME).toString();
-	QString revisionsPath = collectionPtr->GetCollectionRootFolder() + "/" + objectName + "/Revisions";
+	QString revisionsPath = QFileInfo(collectionPtr->GetFileInfo(objectId).filePath).path() + "/Revisions";
 
 	if (istd::CSystem::EnsurePathExists(revisionsPath)){
 		int newRevision = 0;
@@ -217,8 +215,7 @@ bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection& collection, 
 	RevisionsContents revisionsContents;
 	if (LoadRevisionsContents(*collectionPtr, objectId, revisionsContents)){
 		if (revisionsContents.contains(revision)){
-			QString objectName = collection.GetElementInfo(objectId, EIT_NAME).toString();
-			QString revisionsPath = collectionPtr->GetCollectionRootFolder() + "/" + objectName + "/Revisions";
+			QString revisionsPath = QFileInfo(collectionPtr->GetFileInfo(objectId).filePath).path() + "/Revisions";
 			QString revisionFilePath = revisionsPath + "/" + revisionsContents[revision].path;
 
 			if (QFile(revisionFilePath).exists()){
@@ -314,8 +311,7 @@ bool CFileCollectionComp::ExportObject(const imtbase::IObjectCollection& collect
 	RevisionsContents revisionsContents;
 	if (LoadRevisionsContents(*collectionPtr, objectId, revisionsContents)){
 		if (revisionsContents.contains(revision)){
-			QString objectName = collection.GetElementInfo(objectId, EIT_NAME).toString();
-			QString revisionsPath = collectionPtr->GetCollectionRootFolder() + "/" + objectName + "/Revisions";
+			QString revisionsPath = QFileInfo(collectionPtr->GetFileInfo(objectId).filePath).path() + "/Revisions";
 			QString revisionFilePath = revisionsPath + "/" + revisionsContents[revision].path;
 
 			if (QFile(revisionFilePath).exists()){
@@ -1502,7 +1498,7 @@ QString CFileCollectionComp::CalculateTargetFilePath(
 bool CFileCollectionComp::LoadRevisionsContents(const IFileObjectCollection& collection, const QByteArray& objectId, RevisionsContents& revisionsContents) const
 {
 	QString objectName = collection.GetElementInfo(objectId, EIT_NAME).toString();
-	QString revisionsContentsPath = collection.GetCollectionRootFolder() + "/" + objectName + "/Revisions/contents.xml";
+	QString revisionsContentsPath = QFileInfo(collection.GetFileInfo(objectId).filePath).path() + "/Revisions/contents.xml";
 
 	ifile::CCompactXmlFileReadArchive archive(revisionsContentsPath, m_versionInfoCompPtr.GetPtr());
 	return revisionsContents.Serialize(archive);
@@ -1512,7 +1508,7 @@ bool CFileCollectionComp::LoadRevisionsContents(const IFileObjectCollection& col
 bool CFileCollectionComp::SaveRevisionsContents(const IFileObjectCollection& collection, const QByteArray& objectId, RevisionsContents& revisionsContents) const
 {
 	QString objectName = collection.GetElementInfo(objectId, EIT_NAME).toString();
-	QString revisionsContentsPath = collection.GetCollectionRootFolder() + "/" + objectName + "/Revisions/contents.xml";
+	QString revisionsContentsPath = QFileInfo(collection.GetFileInfo(objectId).filePath).path() + "/Revisions/contents.xml";
 
 	ifile::CCompactXmlFileWriteArchive archive(revisionsContentsPath, m_versionInfoCompPtr.GetPtr());
 	return revisionsContents.Serialize(archive);
