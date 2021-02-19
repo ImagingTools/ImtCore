@@ -12,6 +12,7 @@ namespace imtrepo
 
 class IRepositoryItemInfo;
 
+
 /**
 	Interface defining the transformation of a file inside of the repository structure during repository conversion procedure.
 	\ingroup Collection
