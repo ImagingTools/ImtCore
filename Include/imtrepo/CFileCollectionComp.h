@@ -181,8 +181,6 @@ public:
 	virtual RevisionInfoList GetRevisionInfoList(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const override;
 	virtual int BackupObject(imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& userComment = QString()) const override;
 	virtual bool RestoreObject(imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision) const override;
-	virtual bool RemoveRevision(imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision) const override;
-	virtual bool RemoveRevisions(imtbase::IObjectCollection& collection, const QByteArray& objectId) const override;
 	virtual bool ExportObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision, const QString& filePath) const override;
 
 	// reimplemented (IFileObjectCollection)
@@ -353,7 +351,7 @@ protected:
 			Revision of the whole collection at time of the backup creation.
 		*/
 		int repositoryRevision;
-		QString fileName;
+		QString path;
 	};
 
 	typedef QMap<int, RevisionsContentsItem> RevisionsContentsMap;

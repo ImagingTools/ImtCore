@@ -64,21 +64,6 @@ public:
 				int revision) const = 0;
 
 	/**
-		Remove revisions of an object in the collection.
-	*/
-	virtual bool RemoveRevision(
-				imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
-				int revision) const = 0;
-
-	/**
-		Remove all revisions of an object with given id.
-	*/
-	virtual bool RemoveRevisions(
-				imtbase::IObjectCollection& collection,
-				const QByteArray& objectId) const = 0;
-
-	/**
 		Exporting object data of a given revision from a collection to a file
 	*/
 	virtual bool ExportObject(
