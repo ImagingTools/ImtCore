@@ -30,6 +30,11 @@ I_EXPORT_COMPONENT(
 			"License Rights Dongle Featuring Licensing Key");
 
 I_EXPORT_COMPONENT(
+			ProductLicensingInfo,
+			"Definition of the licensing model of a product",
+			"License Product");
+
+I_EXPORT_COMPONENT(
 			ProductCollection,
 			"Definition of all product licenses",
 			"License Products System");

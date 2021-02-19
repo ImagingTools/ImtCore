@@ -8,7 +8,7 @@ namespace imtlic
 // public methods
 
 CProductCollection::CProductCollection()
-	:BaseClass("ProductLicensingInfo", "Product Licensing", "ProductLicenses")
+	:BaseClass("ProductLicensingInfo", "Product Licensing", "ProductLicensingInfo")
 {
 }
 

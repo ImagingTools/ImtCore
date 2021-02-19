@@ -10,38 +10,9 @@
     <Description>UI for license management</Description>
     <Keywords>License</Keywords>
     <ElementsList>
-        <Element Id="LicenseInfo" PackageId="ImtLicensePck" ComponentId="LicenseInfo">
+        <Element Id="LicenseInfo" PackageId="ImtLicensePck" ComponentId="ProductLicensingInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="LicenseInfoEditorGui" PackageId="ImtLicenseGuiPck" ComponentId="LicenseInfoEditorGui">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="LicenseManagerViewDelegate" PackageId="ImtLicenseGuiPck" ComponentId="LicenseManagerViewDelegate">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultLicenseId" Type="Id" ExportId="DefaultLicenseId">
-                        <Data IsEnabled="true" Value="00.0000"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultLicenseName" Type="String" ExportId="DefaultLicenseName">
-                        <Data IsEnabled="true" Value="Standard"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultPackageId" Type="Id" ExportId="DefaultPackageId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EditDialog" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ModelDialogGui"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="LicenseInfo"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="StatusIcons" Type="Reference" ExportId="StatusIcons">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="ModelDialogGui" PackageId="QtGuiPck" ComponentId="ModelDialogGui">
@@ -54,7 +25,7 @@
                         <Data IsEnabled="true" Value="Edit License"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Gui" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="LicenseInfoEditorGui"/>
+                        <Data IsEnabled="true" Value="ProductLicensingInfoEditor"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MenuName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Edit License"/>
@@ -71,7 +42,7 @@
         <Element Id="ObjectCollectionView" PackageId="ImtGuiPck" ComponentId="ObjectCollectionView">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="Licenses">
+                    <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="Products">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultStatusIcon" Type="String" ExportId="DefaultStatusIcon">
@@ -83,9 +54,29 @@
                     <AttributeInfo Id="ViewDelegates" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>LicenseManagerViewDelegate</Value>
+                                <Value>ViewDelegate</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ProductLicensingInfoEditor" PackageId="ImtLicenseGuiPck" ComponentId="LicenseInfoEditorGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="ViewDelegate" PackageId="ImtGuiPck" ComponentId="StandardCollectionDelegate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EditDialog" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ModelDialogGui"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="ProductLicensingInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StatusIcons" Type="Reference" ExportId="StatusIcons">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

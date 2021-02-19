@@ -9,10 +9,10 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="LicenseInfo" X="900" Y="600" Note=""/>
-        <Element ComponentName="LicenseInfoEditorGui" X="225" Y="600" Note=""/>
-        <Element ComponentName="LicenseManagerViewDelegate" X="550" Y="275" Note=""/>
         <Element ComponentName="ModelDialogGui" X="550" Y="450" Note=""/>
         <Element ComponentName="ObjectCollectionView" X="550" Y="125" Note=""/>
+        <Element ComponentName="ProductLicensingInfoEditor" X="225" Y="600" Note=""/>
+        <Element ComponentName="ViewDelegate" X="550" Y="275" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
