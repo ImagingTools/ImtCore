@@ -14,6 +14,14 @@ namespace imtlic
 
 // public methods
 
+// reimplemented (imtlic::IProductLicensingInfo)
+
+const imtbase::ICollectionInfo* CProductLicensingInfo::GetProductList() const
+{
+	return nullptr;
+}
+
+
 // reimplemented (imtlic::IProductInfo)
 
 const IProductInfo* CProductLicensingInfo::GetProductFamilyInfo() const

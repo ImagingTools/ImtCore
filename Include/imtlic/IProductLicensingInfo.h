@@ -16,6 +16,11 @@ namespace imtlic
 */
 class IProductLicensingInfo: virtual public ILicenseInfoProvider, virtual public IProductInfo
 {
+public:
+	/**
+		Get the list of all available products.
+	*/
+	virtual const imtbase::ICollectionInfo* GetProductList() const = 0;
 };
 
 

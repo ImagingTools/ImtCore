@@ -18,6 +18,9 @@ namespace imtlic
 class CProductLicensingInfo: virtual public imtlic::IProductLicensingInfo
 {
 public:
+	// reimplemented (imtlic::IProductLicensingInfo)
+	virtual const imtbase::ICollectionInfo* GetProductList() const override;
+
 	// reimplemented (imtlic::IProductInfo)
 	virtual const IProductInfo* GetProductFamilyInfo() const override;
 	virtual QByteArray GetProductId() const override;
