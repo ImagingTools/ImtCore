@@ -1,9 +1,6 @@
 #include <imtlic/CProductLicensingInfoMetaInfoCreatorComp.h>
 
 
-// Qt includes
-#include <QtGui/QIcon>
-
 // ACF includes
 #include <imod/TModelWrap.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
@@ -13,6 +10,7 @@
 #include <imtlic/ILicenseInfo.h>
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtlic/IProductLicensingInfoProvider.h>
+
 
 namespace imtlic
 {
