@@ -25,7 +25,7 @@ public:
 	virtual QString GetMetaInfoName(int metaInfoType) const override
 	{
 		switch (metaInfoType){
-		case IProductLicensingInfoProvider::MIT_LICENSES_NAME_LIST:
+		case IProductLicensingInfoProvider::MIT_LICENSES_INFO_LIST:
 			return QObject::tr("Licenses");
 		}
 
@@ -78,7 +78,7 @@ bool CProductLicensingInfoMetaInfoCreatorComp::CreateMetaInfo(
 
 	retVal.chop(1);
 
-	metaInfoPtr->SetMetaInfo(IProductLicensingInfoProvider::MIT_LICENSES_NAME_LIST, retVal);
+	metaInfoPtr->SetMetaInfo(IProductLicensingInfoProvider::MIT_LICENSES_INFO_LIST, retVal);
 
 	return true;
 }
