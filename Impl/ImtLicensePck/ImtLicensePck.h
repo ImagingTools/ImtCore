@@ -53,11 +53,6 @@ typedef icomp::TModelCompWrap<
 						imtlic::CProductInstanceCollection,
 						imtlic::IProductInstanceInfoProvider,
 						iser::ISerializable>> ProductInstanceCollection;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtlic::CProductLicensingInfo,
-						imtlic::IProductLicensingInfo,
-						iser::ISerializable>> ProductLicensingInfo;
 
 
 } // namespace ImtLicensePck
