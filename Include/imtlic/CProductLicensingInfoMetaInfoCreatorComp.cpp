@@ -74,8 +74,8 @@ bool CProductLicensingInfoMetaInfoCreatorComp::CreateMetaInfo(
 
 	imtbase::ICollectionInfo::Ids ids = productLicensingInfoPtr->GetLicenseList().GetElementIds();
 	for (imtbase::ICollectionInfo::Id id : ids){
-		const imtlic::ILicenseInfo* licenseInfotPtr = productLicensingInfoPtr->GetLicenseInfo(id);
-		retVal += licenseInfotPtr->GetLicenseName() + "\n";
+		const imtlic::ILicenseInfo* licenseInfoPtr = productLicensingInfoPtr->GetLicenseInfo(id);
+		retVal += licenseInfoPtr->GetLicenseName() + " (" + licenseInfoPtr->GetLicenseId() + ")" + "\n";
 	}
 
 	retVal.chop(1);
