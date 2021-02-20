@@ -15,9 +15,13 @@ namespace imtlic
 	\sa ILicenseInfo
 	\ingroup LicenseManagement
 */
-class CProductLicensingInfo: virtual public imtlic::IProductLicensingInfo
+class CProductLicensingInfo: 
+			virtual public imtlic::IProductLicensingInfo,
+			public CLicenseInfoManager
 {
 public:
+	typedef CLicenseInfoManager BaseClass;
+
 	// reimplemented (imtlic::IProductLicensingInfo)
 	virtual const imtbase::ICollectionInfo* GetProductList() const override;
 
@@ -25,10 +29,6 @@ public:
 	virtual const IProductInfo* GetProductFamilyInfo() const override;
 	virtual QByteArray GetProductId() const override;
 	virtual void SetProductId(const QByteArray& productId) override;
-
-	// reimplemented (imtlic::ILicenseInfoProvider)
-	virtual const imtbase::ICollectionInfo& GetLicenseList() const override;
-	virtual const imtlic::ILicenseInfo* GetLicenseInfo(const QByteArray& licenseId) const override;
 
 	// reimplemented (iprm::INameParam)
 	virtual const QString& GetName() const override;
@@ -45,7 +45,6 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	CLicenseInfoManager m_licenses;
 	QString m_productName;
 	QByteArray m_productId;
 };

@@ -46,20 +46,6 @@ void CProductLicensingInfo::SetProductId(const QByteArray& productId)
 }
 
 
-// reimplemented (imtlic::ILicenseInfoProvider)
-
-const imtbase::ICollectionInfo& CProductLicensingInfo::GetLicenseList() const
-{
-	return m_licenses;
-}
-
-
-const imtlic::ILicenseInfo* CProductLicensingInfo::GetLicenseInfo(const QByteArray& licenseId) const
-{
-	return m_licenses.GetLicenseInfo(licenseId);
-}
-
-
 // reimplemented (iprm::INameParam)
 
 const QString& CProductLicensingInfo::GetName() const
@@ -100,10 +86,7 @@ bool CProductLicensingInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_productName);
 	retVal = retVal && archive.EndTag(productNameTag);
 
-	static iser::CArchiveTag licensesTag("Licenses", "List of product licenses", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(licensesTag);
-	retVal = retVal && m_licenses.Serialize(archive);
-	retVal = retVal && archive.EndTag(licensesTag);
+	retVal = retVal && BaseClass::Serialize(archive);
 
 	return retVal;
 }
@@ -123,11 +106,12 @@ bool CProductLicensingInfo::CopyFrom(const IChangeable& object, CompatibilityMod
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_licenses.CopyFrom(sourcePtr->m_licenses);
-		m_productId = sourcePtr->m_productId;
-		m_productName = sourcePtr->m_productName;
+		if (BaseClass::CopyFrom(*sourcePtr)){
+			m_productId = sourcePtr->m_productId;
+			m_productName = sourcePtr->m_productName;
 
-		return true;
+			return true;
+		}
 	}
 
 	return false;
@@ -149,7 +133,7 @@ bool CProductLicensingInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_licenses.ResetData();
+	BaseClass::ResetData();
 
 	m_productId.clear();
 

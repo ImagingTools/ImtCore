@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <ibase/ICommandsProvider.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
@@ -19,7 +20,8 @@ namespace imtlicgui
 */
 class CProductLicensingInfoGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CProductLicensingInfoGuiComp, imtlic::IProductLicensingInfo>
+						Ui::CProductLicensingInfoGuiComp, imtlic::IProductLicensingInfo>,
+			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 
@@ -28,9 +30,15 @@ public:
 				Ui::CProductLicensingInfoGuiComp, imtlic::IProductLicensingInfo> BaseClass;
 
 	I_BEGIN_COMPONENT(CProductLicensingInfoGuiComp);
+		I_REGISTER_INTERFACE(ibase::ICommandsProvider)
+		I_ASSIGN(m_licenseCollectionGuiCompPtr, "LicenseCollectionView", "License collection view", true, "LicenseCollectionView");
+		I_ASSIGN_TO(m_licenseCollectionObserverCompPtr, m_licenseCollectionGuiCompPtr, true);
 	I_END_COMPONENT;
 
 	CProductLicensingInfoGuiComp();
+
+	// reimplemented (ibase::ICommandsProvider)
+	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
@@ -39,7 +47,9 @@ protected:
 	virtual void OnGuiModelDetached() override;
 	virtual void UpdateModel() const;
 
-private Q_SLOTS:
+private:
+	I_REF(iqtgui::IGuiObject, m_licenseCollectionGuiCompPtr);
+	I_REF(imod::IObserver, m_licenseCollectionObserverCompPtr);
 };
 
 
