@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtlicgui/CLicenseInfoEditorGuiComp.h>
+#include <imtlicgui/CProductLicensingInfoGuiComp.h>
 #include <imtlicgui/CLicenseManagerViewDelegateComp.h>
 
 
@@ -17,6 +18,7 @@ namespace ImtLicenseGuiPck
 {
 
 typedef imtlicgui::CLicenseInfoEditorGuiComp LicenseInfoEditorGui;
+typedef imtlicgui::CProductLicensingInfoGuiComp ProductLicensingInfoGui;
 typedef imtlicgui::CLicenseManagerViewDelegateComp LicenseManagerViewDelegate;
 
 

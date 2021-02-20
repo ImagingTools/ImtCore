@@ -17,7 +17,12 @@ I_EXPORT_PACKAGE(
 I_EXPORT_COMPONENT(
 			LicenseInfoEditorGui,
 			"License info editor",
-			"License Info");
+			"License Info Editor");
+
+I_EXPORT_COMPONENT(
+			ProductLicensingInfoGui,
+			"Product License Info Editor",
+			"Product License Info Editor");
 
 I_EXPORT_COMPONENT(
 			LicenseManagerViewDelegate,

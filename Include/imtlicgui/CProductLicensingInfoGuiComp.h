@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtlic/ILicenseInfo.h>
-#include <GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h>
+#include <GeneratedFiles/imtlicgui/ui_CProductLicensingInfoGuiComp.h>
 
 
 namespace imtlicgui
@@ -17,20 +17,20 @@ namespace imtlicgui
 	Editor for the license info.
 	\ingroup LicenseManagement
 */
-class CLicenseInfoEditorGuiComp:
+class CProductLicensingInfoGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CLicenseInfoEditorGuiComp, imtlic::ILicenseInfo>
+						Ui::CProductLicensingInfoGuiComp, imtlic::ILicenseInfo>
 {
 	Q_OBJECT
 
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CLicenseInfoEditorGuiComp, imtlic::ILicenseInfo> BaseClass;
+				Ui::CProductLicensingInfoGuiComp, imtlic::ILicenseInfo> BaseClass;
 
-	I_BEGIN_COMPONENT(CLicenseInfoEditorGuiComp);
+	I_BEGIN_COMPONENT(CProductLicensingInfoGuiComp);
 	I_END_COMPONENT;
 
-	CLicenseInfoEditorGuiComp();
+	CProductLicensingInfoGuiComp();
 
 protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
@@ -40,11 +40,6 @@ protected:
 	virtual void UpdateModel() const;
 
 private Q_SLOTS:
-	void on_NameEdit_editingFinished();
-	void on_IdEdit_editingFinished();
-	void on_PackageCombo_currentTextChanged(const QString &text);
-	void on_ExpiredDate_dateTimeChanged(const QDateTime &datetime);
-	void on_ExpireGroup_toggled(bool on);
 };
 
 
