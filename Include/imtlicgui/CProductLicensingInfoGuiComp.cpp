@@ -1,11 +1,8 @@
 #include <imtlicgui/CProductLicensingInfoGuiComp.h>
 
 
-// Acf includes
+// ACF includes
 #include <istd/CChangeGroup.h>
-
-// ImtCore includes
-#include <imtlic/CLicenseInfo.h>
 
 
 namespace imtlicgui
@@ -25,7 +22,7 @@ CProductLicensingInfoGuiComp::CProductLicensingInfoGuiComp()
 
 void CProductLicensingInfoGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	//imtlic::ILicenseInfo* licenseInfoPtr = GetObservedObject();
+	//imtlic::IProductLicensingInfo* licenseInfoPtr = GetObservedObject();
 	//Q_ASSERT(licenseInfoPtr != nullptr);
 }
 
@@ -44,12 +41,10 @@ void CProductLicensingInfoGuiComp::OnGuiModelDetached()
 
 void CProductLicensingInfoGuiComp::UpdateModel() const
 {
-	//imtlic::ILicenseInfo* licenseInfoPtr = GetObservedObject();
+	//imtlic::IProductLicensingInfo* licenseInfoPtr = GetObservedObject();
 	//Q_ASSERT(licenseInfoPtr != nullptr);
 }
 
-
-// private slots
 
 } // namespace imtlicgui
 

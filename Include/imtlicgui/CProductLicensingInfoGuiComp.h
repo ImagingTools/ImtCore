@@ -5,7 +5,7 @@
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
-#include <imtlic/ILicenseInfo.h>
+#include <imtlic/IProductLicensingInfo.h>
 #include <GeneratedFiles/imtlicgui/ui_CProductLicensingInfoGuiComp.h>
 
 
@@ -14,18 +14,18 @@ namespace imtlicgui
 
 
 /**
-	Editor for the license info.
+	Editor for the product-related licensing.
 	\ingroup LicenseManagement
 */
 class CProductLicensingInfoGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CProductLicensingInfoGuiComp, imtlic::ILicenseInfo>
+						Ui::CProductLicensingInfoGuiComp, imtlic::IProductLicensingInfo>
 {
 	Q_OBJECT
 
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CProductLicensingInfoGuiComp, imtlic::ILicenseInfo> BaseClass;
+				Ui::CProductLicensingInfoGuiComp, imtlic::IProductLicensingInfo> BaseClass;
 
 	I_BEGIN_COMPONENT(CProductLicensingInfoGuiComp);
 	I_END_COMPONENT;
