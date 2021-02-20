@@ -1,4 +1,4 @@
-#include <imtrepogui/CDocumentBasedFileCollectionDelegateComp.h>
+#include <imtrepogui/CDocumentBasedFileCollectionViewDelegateComp.h>
 
 
 // Qt includes
@@ -22,7 +22,7 @@ namespace imtrepogui
 {
 
 
-CDocumentBasedFileCollectionDelegateComp::CDocumentBasedFileCollectionDelegateComp()
+CDocumentBasedFileCollectionViewDelegateComp::CDocumentBasedFileCollectionViewDelegateComp()
 	:m_collectionPersistence(*this),
 	m_documentManagerObserver(*this),
 	m_editContentsCommand(tr("Edit"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_DOCUMENT_MANAGER)
@@ -32,13 +32,13 @@ CDocumentBasedFileCollectionDelegateComp::CDocumentBasedFileCollectionDelegateCo
 
 // reimplemented (ICollectionViewDelegate)
 
-QByteArray CDocumentBasedFileCollectionDelegateComp::GetSupportedTypeId() const
+QByteArray CDocumentBasedFileCollectionViewDelegateComp::GetSupportedTypeId() const
 {
 	return *m_objectTypeIdAttrPtr;
 }
 
 
-bool CDocumentBasedFileCollectionDelegateComp::InitializeDelegate(
+bool CDocumentBasedFileCollectionViewDelegateComp::InitializeDelegate(
 			imtbase::IObjectCollection* collectionPtr,
 			iqtgui::IGuiObject* parentGuiPtr)
 {
@@ -52,7 +52,7 @@ bool CDocumentBasedFileCollectionDelegateComp::InitializeDelegate(
 }
 
 
-QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(
+QByteArray CDocumentBasedFileCollectionViewDelegateComp::CreateNewObject(
 			const QByteArray& typeId,
 			const istd::IChangeable* /*defaultDataPtr*/) const
 {
@@ -78,7 +78,7 @@ QByteArray CDocumentBasedFileCollectionDelegateComp::CreateNewObject(
 }
 
 
-void CDocumentBasedFileCollectionDelegateComp::RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const
+void CDocumentBasedFileCollectionViewDelegateComp::RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const
 {
 	if (objectIds.isEmpty()){
 		return;
@@ -130,7 +130,7 @@ void CDocumentBasedFileCollectionDelegateComp::RemoveObjects(const imtbase::ICol
 }
 
 
-void CDocumentBasedFileCollectionDelegateComp::UpdateItemSelection(
+void CDocumentBasedFileCollectionViewDelegateComp::UpdateItemSelection(
 			const imtbase::ICollectionInfo::Ids& selectedItems,
 			const QByteArray& selectedTypeId)
 {
@@ -162,7 +162,7 @@ void CDocumentBasedFileCollectionDelegateComp::UpdateItemSelection(
 }
 
 
-bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(
+bool CDocumentBasedFileCollectionViewDelegateComp::OpenDocumentEditor(
 			const QByteArray& objectId,
 			const QByteArray& viewTypeId) const
 {
@@ -237,7 +237,7 @@ bool CDocumentBasedFileCollectionDelegateComp::OpenDocumentEditor(
 }
 
 
-iqtgui::IGuiObject* CDocumentBasedFileCollectionDelegateComp::GetInformationView() const
+iqtgui::IGuiObject* CDocumentBasedFileCollectionViewDelegateComp::GetInformationView() const
 {
 	return m_informationViewCompPtr.GetPtr();
 }
@@ -247,7 +247,7 @@ iqtgui::IGuiObject* CDocumentBasedFileCollectionDelegateComp::GetInformationView
 
 // reimplemented (imtrepogui::CFileObjectCollectionViewDelegate)
 
-bool CDocumentBasedFileCollectionDelegateComp::IsRestoreAllowed(const QByteArray& objectId)
+bool CDocumentBasedFileCollectionViewDelegateComp::IsRestoreAllowed(const QByteArray& objectId)
 {
 	for (int i = 0; i < m_openedDocuments.GetCount(); i++){
 		ObjectInfo* objectInfoPtr = m_openedDocuments.GetAt(i);
@@ -270,7 +270,7 @@ bool CDocumentBasedFileCollectionDelegateComp::IsRestoreAllowed(const QByteArray
 }
 
 
-void CDocumentBasedFileCollectionDelegateComp::AfterRestore(const QByteArray& objectId, bool /*isRestoreSuccessful*/)
+void CDocumentBasedFileCollectionViewDelegateComp::AfterRestore(const QByteArray& objectId, bool /*isRestoreSuccessful*/)
 {
 	if (!m_closedForRestoreId.isEmpty()){
 		OpenDocumentEditor(objectId);
@@ -282,7 +282,7 @@ void CDocumentBasedFileCollectionDelegateComp::AfterRestore(const QByteArray& ob
 
 // reimplemented (imtgui::CObjectCollectionViewDelegate)
 
-void CDocumentBasedFileCollectionDelegateComp::SetupCommands()
+void CDocumentBasedFileCollectionViewDelegateComp::SetupCommands()
 {
 	BaseClass2::SetupCommands();
 
@@ -294,14 +294,14 @@ void CDocumentBasedFileCollectionDelegateComp::SetupCommands()
 }
 
 
-void CDocumentBasedFileCollectionDelegateComp::SetupInsertCommand()
+void CDocumentBasedFileCollectionViewDelegateComp::SetupInsertCommand()
 {
 }
 
 
 // reimplemented (ibase::TLocalizableWrap)
 
-void CDocumentBasedFileCollectionDelegateComp::OnLanguageChanged()
+void CDocumentBasedFileCollectionViewDelegateComp::OnLanguageChanged()
 {
 	BaseClass2::OnLanguageChanged();
 
@@ -311,7 +311,7 @@ void CDocumentBasedFileCollectionDelegateComp::OnLanguageChanged()
 
 // reimplemented (icomp::CComponentBase)
 
-void CDocumentBasedFileCollectionDelegateComp::OnComponentCreated()
+void CDocumentBasedFileCollectionViewDelegateComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
@@ -323,7 +323,7 @@ void CDocumentBasedFileCollectionDelegateComp::OnComponentCreated()
 }
 
 
-void CDocumentBasedFileCollectionDelegateComp::OnComponentDestroyed()
+void CDocumentBasedFileCollectionViewDelegateComp::OnComponentDestroyed()
 {
 	m_openedDocuments.Reset();
 
@@ -337,7 +337,7 @@ void CDocumentBasedFileCollectionDelegateComp::OnComponentDestroyed()
 
 // private methods
 
-void CDocumentBasedFileCollectionDelegateComp::InitializeVisualStatus()
+void CDocumentBasedFileCollectionViewDelegateComp::InitializeVisualStatus()
 {
 	m_visualStatus.SetStatusIcon(m_statusIconsProviderCompPtr->GetIcon(0));
 
@@ -355,7 +355,7 @@ void CDocumentBasedFileCollectionDelegateComp::InitializeVisualStatus()
 
 // protected slots
 
-void CDocumentBasedFileCollectionDelegateComp::OnEdit()
+void CDocumentBasedFileCollectionViewDelegateComp::OnEdit()
 {
 	for (const QByteArray& objectId : m_selectedItemIds){
 		OpenDocumentEditor(objectId);
@@ -365,7 +365,7 @@ void CDocumentBasedFileCollectionDelegateComp::OnEdit()
 
 // public methods of the embedded class ObjectPersistenceProxy
 
-CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::ObjectPersistenceProxy(CDocumentBasedFileCollectionDelegateComp& parent)
+CDocumentBasedFileCollectionViewDelegateComp::ObjectPersistenceProxy::ObjectPersistenceProxy(CDocumentBasedFileCollectionViewDelegateComp& parent)
 	:m_parent(parent)
 {
 }
@@ -373,7 +373,7 @@ CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::ObjectPersiste
 
 // reimplemented (ifile::IFilePersistence)
 
-bool CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::IsOperationSupported(
+bool CDocumentBasedFileCollectionViewDelegateComp::ObjectPersistenceProxy::IsOperationSupported(
 			const istd::IChangeable* /*dataObjectPtr*/,
 			const QString* /*filePathPtr*/,
 			int /*flags*/,
@@ -383,7 +383,7 @@ bool CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::IsOperati
 }
 
 
-int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::LoadFromFile(
+int CDocumentBasedFileCollectionViewDelegateComp::ObjectPersistenceProxy::LoadFromFile(
 			istd::IChangeable& data,
 			const QString& filePath,
 			ibase::IProgressManager* progressManagerPtr) const
@@ -402,7 +402,7 @@ int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::LoadFromFi
 }
 
 
-int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::SaveToFile(
+int CDocumentBasedFileCollectionViewDelegateComp::ObjectPersistenceProxy::SaveToFile(
 			const istd::IChangeable& data,
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
@@ -455,7 +455,7 @@ int CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::SaveToFile
 
 // reimplemented (ifile::IFileTypeInfo)
 
-bool CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr, int flags, bool doAppend) const
+bool CDocumentBasedFileCollectionViewDelegateComp::ObjectPersistenceProxy::GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr, int flags, bool doAppend) const
 {
 	for (int i = 0; i < m_parent.m_openedDocuments.GetCount(); ++i){
 		const ICollectionViewDelegate::ObjectInfo* documentInfoPtr = m_parent.m_openedDocuments.GetAt(i);
@@ -470,7 +470,7 @@ bool CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::GetFileEx
 }
 
 
-QString CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::GetTypeDescription(const QString* /*extensionPtr*/) const
+QString CDocumentBasedFileCollectionViewDelegateComp::ObjectPersistenceProxy::GetTypeDescription(const QString* /*extensionPtr*/) const
 {
 	return QString();
 }
@@ -478,7 +478,7 @@ QString CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::GetTyp
 
 // private methods of the embedded class ObjectPersistenceProxy
 
-void CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::CreateBackup(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const
+void CDocumentBasedFileCollectionViewDelegateComp::ObjectPersistenceProxy::CreateBackup(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const
 {
 	Q_ASSERT(m_parent.m_collectionPtr == &collection);
 
@@ -515,7 +515,7 @@ void CDocumentBasedFileCollectionDelegateComp::ObjectPersistenceProxy::CreateBac
 
 // public methods of the embedded class DocumentManagerObserver
 
-CDocumentBasedFileCollectionDelegateComp::DocumentManagerObserver::DocumentManagerObserver(CDocumentBasedFileCollectionDelegateComp& parent)
+CDocumentBasedFileCollectionViewDelegateComp::DocumentManagerObserver::DocumentManagerObserver(CDocumentBasedFileCollectionViewDelegateComp& parent)
 	:m_parent(parent)
 {
 }
@@ -523,7 +523,7 @@ CDocumentBasedFileCollectionDelegateComp::DocumentManagerObserver::DocumentManag
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CDocumentBasedFileCollectionDelegateComp::DocumentManagerObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CDocumentBasedFileCollectionViewDelegateComp::DocumentManagerObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	Q_ASSERT(m_parent.m_documentManagerCompPtr.IsValid());
 

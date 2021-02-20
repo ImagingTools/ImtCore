@@ -1,4 +1,4 @@
-#include <imtgui/CStandardCollectionDelegateComp.h>
+#include <imtgui/CStandardCollectionViewDelegateComp.h>
 
 
 // Qt includes
@@ -20,7 +20,7 @@ namespace imtgui
 {
 
 
-CStandardCollectionDelegateComp::CStandardCollectionDelegateComp()
+CStandardCollectionViewDelegateComp::CStandardCollectionViewDelegateComp()
 	:m_editContentsCommand(tr("Edit"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 1982)
 {
 }
@@ -28,13 +28,13 @@ CStandardCollectionDelegateComp::CStandardCollectionDelegateComp()
 
 // reimplemented (ICollectionViewDelegate)
 
-QByteArray CStandardCollectionDelegateComp::GetSupportedTypeId() const
+QByteArray CStandardCollectionViewDelegateComp::GetSupportedTypeId() const
 {
 	return *m_objectTypeIdAttrPtr;
 }
 
 
-bool CStandardCollectionDelegateComp::InitializeDelegate(
+bool CStandardCollectionViewDelegateComp::InitializeDelegate(
 			imtbase::IObjectCollection* collectionPtr,
 			iqtgui::IGuiObject* parentGuiPtr)
 {
@@ -48,7 +48,7 @@ bool CStandardCollectionDelegateComp::InitializeDelegate(
 }
 
 
-bool CStandardCollectionDelegateComp::OpenDocumentEditor(
+bool CStandardCollectionViewDelegateComp::OpenDocumentEditor(
 			const QByteArray& objectId,
 			const QByteArray& /*viewTypeId*/) const
 {
@@ -73,7 +73,7 @@ bool CStandardCollectionDelegateComp::OpenDocumentEditor(
 
 // protected methods
 
-void CStandardCollectionDelegateComp::OnComponentCreated()
+void CStandardCollectionViewDelegateComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
@@ -82,7 +82,7 @@ void CStandardCollectionDelegateComp::OnComponentCreated()
 
 // reimplemented (CObjectCollectionViewDelegate)
 
-void CStandardCollectionDelegateComp::SetupCommands()
+void CStandardCollectionViewDelegateComp::SetupCommands()
 {
 	BaseClass2::SetupCommands();
 
@@ -98,7 +98,7 @@ void CStandardCollectionDelegateComp::SetupCommands()
 
 // reimplemented (ibase::TLocalizableWrap)
 
-void CStandardCollectionDelegateComp::OnLanguageChanged()
+void CStandardCollectionViewDelegateComp::OnLanguageChanged()
 {
 	BaseClass2::OnLanguageChanged();
 
@@ -108,7 +108,7 @@ void CStandardCollectionDelegateComp::OnLanguageChanged()
 
 // private methods
 
-void CStandardCollectionDelegateComp::InitializeVisualStatus()
+void CStandardCollectionViewDelegateComp::InitializeVisualStatus()
 {
 	if (m_statusIconsProviderCompPtr.IsValid()){
 		m_visualStatus.SetStatusIcon(m_statusIconsProviderCompPtr->GetIcon(0));
@@ -128,7 +128,7 @@ void CStandardCollectionDelegateComp::InitializeVisualStatus()
 
 // protected slots
 
-void CStandardCollectionDelegateComp::OnEdit()
+void CStandardCollectionViewDelegateComp::OnEdit()
 {
 	for (const QByteArray& objectId : m_selectedItemIds){
 		OpenDocumentEditor(objectId);

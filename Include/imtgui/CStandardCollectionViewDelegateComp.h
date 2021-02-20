@@ -18,7 +18,7 @@ namespace imtgui
 /**
 	\ingroup Collection
 */
-class CStandardCollectionDelegateComp:
+class CStandardCollectionViewDelegateComp:
 			public CObjectCollectionViewDelegate,
 			public icomp::CComponentBase
 {
@@ -27,7 +27,7 @@ public:
 	typedef icomp::CComponentBase BaseClass;
 	typedef CObjectCollectionViewDelegate BaseClass2;
 
-	I_BEGIN_COMPONENT(CStandardCollectionDelegateComp);
+	I_BEGIN_COMPONENT(CStandardCollectionViewDelegateComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
 		I_REGISTER_INTERFACE(imtgui::ICollectionViewDelegate);
 		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "Type-ID supported by this delegate", true, "ObjectTypeId");
@@ -36,7 +36,7 @@ public:
 		I_ASSIGN_TO(m_editDialogObserverCompPtr, m_editDialogCompPtr, true);
 	I_END_COMPONENT;
 
-	CStandardCollectionDelegateComp();
+	CStandardCollectionViewDelegateComp();
 
 	// reimplemented (ICollectionViewDelegate)
 	virtual QByteArray GetSupportedTypeId() const override;

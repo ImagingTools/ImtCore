@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtrepogui/CFileObjectCollectionViewDelegate.h>
-#include <imtrepogui/CDocumentBasedFileCollectionDelegateComp.h>
+#include <imtrepogui/CDocumentBasedFileCollectionViewDelegateComp.h>
 
 
 /**
@@ -18,7 +18,7 @@ namespace ImtRepoGuiPck
 
 
 typedef icomp::TMakeComponentWrap<imtrepogui::CFileObjectCollectionViewDelegate, imtgui::ICollectionViewDelegate> FileObjectCollectionViewDelegate;
-typedef imtrepogui::CDocumentBasedFileCollectionDelegateComp DocumentBasedFileCollectionDelegate;
+typedef imtrepogui::CDocumentBasedFileCollectionViewDelegateComp DocumentBasedFileCollectionViewDelegate;
 
 
 } // namespace ImtRepoGuiPck

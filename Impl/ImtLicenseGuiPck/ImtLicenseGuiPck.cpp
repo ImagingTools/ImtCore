@@ -29,6 +29,11 @@ I_EXPORT_COMPONENT(
 			"License manager view delegate",
 			"License Manager View Delegate");
 
+I_EXPORT_COMPONENT(
+			ProductLicensingInfoCollectionViewDelegate,
+			"Product licensing info collection delegate",
+			"Product Licensing Info Collection Delegate");
+
 
 } // namespace ImtLicenseGuiPck
 

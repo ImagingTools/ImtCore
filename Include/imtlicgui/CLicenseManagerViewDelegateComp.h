@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtgui/CStandardCollectionDelegateComp.h>
+#include <imtgui/CStandardCollectionViewDelegateComp.h>
 
 
 namespace imtlicgui
@@ -14,11 +14,11 @@ namespace imtlicgui
 	\ingroup LicenseManagement
 	\ingroup Collection
 */
-class CLicenseManagerViewDelegateComp: public imtgui::CStandardCollectionDelegateComp
+class CLicenseManagerViewDelegateComp: public imtgui::CStandardCollectionViewDelegateComp
 {
 	Q_OBJECT
 public:
-	typedef imtgui::CStandardCollectionDelegateComp BaseClass;
+	typedef imtgui::CStandardCollectionViewDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CLicenseManagerViewDelegateComp);
 		I_ASSIGN(m_defaultLicenseNameAttrPtr, "DefaultLicenseName", "Default license name", false, "");
