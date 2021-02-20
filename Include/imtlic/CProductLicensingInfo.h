@@ -22,6 +22,8 @@ class CProductLicensingInfo:
 public:
 	typedef CLicenseInfoManager BaseClass;
 
+	CProductLicensingInfo();
+
 	// reimplemented (imtlic::IProductLicensingInfo)
 	virtual const imtbase::ICollectionInfo* GetProductList() const override;
 
@@ -45,6 +47,7 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
+	imtbase::ICollectionInfo* m_collectionInfoPtr;
 	QString m_productName;
 	QByteArray m_productId;
 };
