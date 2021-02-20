@@ -13,8 +13,7 @@ namespace imtlic
 
 
 /**
-	Common implementation of IProductLicensingInfo interface.
-	\sa ILicenseInfo
+	Component implementation of IProductLicensingInfo interface with reference to the list of all defined products.
 	\ingroup LicenseManagement
 */
 class CProductLicensingInfoComp:
@@ -25,13 +24,13 @@ public:
 	typedef icomp::CComponentBase BaseClass;
 	typedef CProductLicensingInfo BaseClass2;
 
-
 	I_BEGIN_COMPONENT(CProductLicensingInfoComp)
 		I_REGISTER_INTERFACE(INameParam);
 		I_REGISTER_INTERFACE(ILicenseInfoProvider);
 		I_REGISTER_INTERFACE(IProductInfo);
 		I_REGISTER_INTERFACE(IProductLicensingInfo);
-		I_ASSIGN(m_collectionInfoCompPtr, "ProductCollectionInfo", "Product collection info", true, "ProductCollection");
+		I_REGISTER_INTERFACE(iser::ISerializable);
+		I_ASSIGN(m_collectionInfoCompPtr, "ProductCollectionInfo", "Product collection info", false, "ProductCollection");
 	I_END_COMPONENT
 
 protected:

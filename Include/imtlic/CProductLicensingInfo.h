@@ -12,7 +12,6 @@ namespace imtlic
 
 /**
 	Common implementation of IProductLicensingInfo interface.
-	\sa ILicenseInfo
 	\ingroup LicenseManagement
 */
 class CProductLicensingInfo: 
@@ -47,7 +46,7 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	imtbase::ICollectionInfo* m_collectionInfoPtr;
+	imtbase::ICollectionInfo* m_productListPtr;
 	QString m_productName;
 	QByteArray m_productId;
 };
