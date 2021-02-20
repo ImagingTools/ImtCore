@@ -44,6 +44,11 @@ I_EXPORT_COMPONENT(
 			"List of all installed product instances",
 			"License Products Installations");
 
+I_EXPORT_COMPONENT(
+			ProductLicensingInfoMetaInfoCreator,
+			"Product licensing info metainfo creator",
+			"License Product Metainfo Creator");
+
 
 } // namespace ImtLicensePck
 

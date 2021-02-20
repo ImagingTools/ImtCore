@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <istd/IChangeable.h>
+#include <idoc/IDocumentMetaInfo.h>
 
 
 namespace imtbase
@@ -25,6 +26,14 @@ class IProductLicensingInfo;
 class IProductLicensingInfoProvider: virtual public istd::IChangeable
 {
 public:
+	enum MetaInfoTypes
+	{
+		/**
+			Produced date and tima given as a QDateTime.
+		*/
+		MIT_LICENSES_NAME_LIST = idoc::IDocumentMetaInfo::MIT_USER + 1,
+	};
+
 	/**
 		Get list of all available products.
 	*/

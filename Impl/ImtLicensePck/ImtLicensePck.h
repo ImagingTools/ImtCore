@@ -13,6 +13,7 @@
 #include <imtlic/CProductCollection.h>
 #include <imtlic/CProductInstanceCollection.h>
 #include <imtlic/CProductLicensingInfoComp.h>
+#include <imtlic/CProductLicensingInfoMetaInfoCreatorComp.h>
 
 
 /**
@@ -49,6 +50,7 @@ typedef icomp::TModelCompWrap<
 						imtlic::CProductInstanceCollection,
 						imtlic::IProductInstanceInfoProvider,
 						iser::ISerializable>> ProductInstanceCollection;
+typedef imtlic::CProductLicensingInfoMetaInfoCreatorComp ProductLicensingInfoMetaInfoCreator;
 
 
 } // namespace ImtLicensePck
