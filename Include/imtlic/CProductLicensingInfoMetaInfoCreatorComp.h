@@ -12,6 +12,9 @@ namespace imtlic
 {
 
 
+/**
+	Meta-info creator for the product' licensing information object.
+*/
 class CProductLicensingInfoMetaInfoCreatorComp:
 			public ilog::CLoggerComponentBase,
 			virtual public imtbase::IMetaInfoCreator
@@ -21,7 +24,7 @@ public:
 
 	I_BEGIN_COMPONENT(CProductLicensingInfoMetaInfoCreatorComp);
 		I_REGISTER_INTERFACE(imtbase::IMetaInfoCreator);
-		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "Type-ID of the document", true, "Application");
+		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "Type-ID of the document", true, "ProductLicensingInfo");
 	I_END_COMPONENT;
 
 protected:
