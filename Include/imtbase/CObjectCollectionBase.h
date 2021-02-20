@@ -104,10 +104,10 @@ protected:
 protected:
 	// abstract methods
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const = 0;
-	virtual void DestroyObjectInstance(istd::IChangeable* objectPtr) const = 0;
 
 protected:
 	virtual bool InsertObjectIntoCollection(const ObjectInfo& info);
+	virtual void DestroyObjectInstance(istd::IChangeable* objectPtr) const;
 	virtual int GetItemDefaultFlags() const;
 	ObjectInfo* GetObjectInfo(const QByteArray& id) const;
 	virtual void RemoveAllObjects();

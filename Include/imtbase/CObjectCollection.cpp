@@ -38,14 +38,6 @@ istd::IChangeable* CObjectCollection::CreateObjectInstance(const QByteArray& typ
 }
 
 
-void CObjectCollection::DestroyObjectInstance(istd::IChangeable* objectPtr) const
-{
-	if (objectPtr != nullptr){
-		delete objectPtr;
-	}
-}
-
-
 } // namespace imtbase
 
 

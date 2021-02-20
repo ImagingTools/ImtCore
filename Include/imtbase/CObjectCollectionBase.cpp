@@ -511,6 +511,14 @@ bool CObjectCollectionBase::InsertObjectIntoCollection(const ObjectInfo& info)
 }
 
 
+void CObjectCollectionBase::DestroyObjectInstance(istd::IChangeable* objectPtr) const
+{
+	if (objectPtr != nullptr){
+		delete objectPtr;
+	}
+}
+
+
 int CObjectCollectionBase::GetItemDefaultFlags() const
 {
 	return OF_ALL;
