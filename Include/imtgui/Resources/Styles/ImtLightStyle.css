@@ -279,6 +279,8 @@ QTabBar[CollectionView=true]
 
 QTabBar::tab[CollectionView=true]
 {
+    min-height: 30px;
+    font-size: 12px;
     background: transparent;
     min-width: 50ex;
     padding: 2px;
@@ -287,11 +289,17 @@ QTabBar::tab[CollectionView=true]
 QTabBar::tab:selected[CollectionView=true]
 {
     background: white;
-    font: bold;	
+    font: bold;
 }
 
-QTabBar::tab::top[CollectionView=true]
+QTabBar::tab:selected[CollectionView=true]
 {
+    color: white;
+    background-color: #88b8e3;
+}
+
+
+QTabBar::tab::top[CollectionView=true] {
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
 }
