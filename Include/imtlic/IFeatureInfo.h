@@ -29,11 +29,6 @@ public:
 		Get the feature name.
 	*/
 	virtual QString GetFeatureName() const = 0;
-
-	/**
-		List of licenses this license depends on.
-	*/
-	virtual QByteArrayList GetDependencyFeatureList() const = 0;
 };
 
 

@@ -37,16 +37,6 @@ public:
 		Get feature info.
 	*/
 	virtual const IFeatureInfo* GetFeatureInfo(const QByteArray& featureId) const = 0;
-
-	/**
-		Get parent feature group list.
-	*/
-	virtual const imtbase::ICollectionInfo* GetParentFeatureGroups() const = 0;
-
-	/**
-		Get parent feature group.
-	*/
-	virtual const IFeatureInfoProvider* GetParentFeatureGroup(const QByteArray& groupId) const = 0;
 };
 
 
