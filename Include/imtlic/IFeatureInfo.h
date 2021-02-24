@@ -7,6 +7,7 @@
 
 class QByteArray;
 class QByteArrayList;
+class QString;
 
 
 namespace imtlic
@@ -23,6 +24,11 @@ public:
 		Get the feature ID.
 	*/
 	virtual QByteArray GetFeatureId() const = 0;
+
+	/**
+		Get the feature name.
+	*/
+	virtual QString GetFeatureName() const = 0;
 
 	/**
 		List of licenses this license depends on.
