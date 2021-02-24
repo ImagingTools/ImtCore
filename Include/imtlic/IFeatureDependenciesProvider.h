@@ -20,7 +20,7 @@ class IFeatureDependenciesProvider: virtual public istd::IChangeable
 {
 public:
 	/**
-		Get list of licenses the given license depends on.
+		Get list of features the given feature depends on.
 	*/
 	virtual QByteArrayList GetFeatureDependencies(const QByteArray& featureId) const = 0;
 };
