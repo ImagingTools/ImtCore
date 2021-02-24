@@ -4,9 +4,10 @@
 // ACF includes
 #include <istd/IChangeable.h>
 
+
 class QByteArray;
 class QByteArrayList;
-class QString;
+
 
 namespace imtlic
 {
@@ -17,8 +18,6 @@ namespace imtlic
 */
 class IFeatureInfo: virtual public istd::IChangeable
 {
-
-
 public:
 	/**
 		Get the feature ID.
@@ -26,12 +25,7 @@ public:
 	virtual QByteArray GetFeatureId() const = 0;
 
 	/**
-		Get the feature name.
-	*/
-	virtual QString GetFeatureName() const = 0;
-
-	/**
-		Get dependents feature list.
+		List of licenses this license depends on.
 	*/
 	virtual QByteArrayList GetDependencyFeatureList() const = 0;
 };

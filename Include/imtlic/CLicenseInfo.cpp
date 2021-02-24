@@ -15,6 +15,14 @@ namespace imtlic
 
 // public methods
 
+// reimplemented (imtlic::ILicenseInfo)
+
+QString CLicenseInfo::GetLicenseName() const
+{
+	return m_licenseName;
+}
+
+
 void CLicenseInfo::SetLicenseName(const QString& licenseName)
 {
 	if (m_licenseName != licenseName){
@@ -22,6 +30,12 @@ void CLicenseInfo::SetLicenseName(const QString& licenseName)
 
 		m_licenseName = licenseName;
 	}
+}
+
+
+QByteArray CLicenseInfo::GetLicenseId() const
+{
+	return m_licenseId;
 }
 
 
@@ -35,14 +49,11 @@ void CLicenseInfo::SetLicenseId(const QByteArray& licenseId)
 }
 
 
-void CLicenseInfo::SetPackageId(const QByteArray& packageId)
+QDateTime CLicenseInfo::GetExpiration() const
 {
-	if (m_packageId != packageId){
-		istd::CChangeNotifier notifier(this);
-
-		m_packageId = packageId;
-	}
+	return m_expirationTime;
 }
+
 
 void CLicenseInfo::SetExpiration(const QDateTime& expirationTime)
 {
@@ -54,29 +65,19 @@ void CLicenseInfo::SetExpiration(const QDateTime& expirationTime)
 }
 
 
-// reimplemented (imtlic::ILicenseInfo)
-
-QString CLicenseInfo::GetLicenseName() const
+ILicenseInfo::FeatureIds CLicenseInfo::GetFeatures() const
 {
-	return m_licenseName;
+	return m_featureIds;
 }
 
 
-QByteArray CLicenseInfo::GetLicenseId() const
+void CLicenseInfo::SetFeatures(const FeatureIds& featureIds)
 {
-	return m_licenseId;
-}
+	if (m_featureIds != featureIds){
+		istd::CChangeNotifier notifier(this);
 
-
-QByteArray CLicenseInfo::GetPackageId() const
-{
-	return m_packageId;
-}
-
-
-QDateTime CLicenseInfo::GetExpiration() const
-{
-	return m_expirationTime;
+		m_featureIds = featureIds;
+	}
 }
 
 
@@ -96,15 +97,15 @@ bool CLicenseInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_licenseId);
 	retVal = retVal && archive.EndTag(licenseIdTag);
 
-	static iser::CArchiveTag packageIdTag("PackageId", "ID of the license package", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(packageIdTag);
-	retVal = retVal && archive.Process(m_packageId);
-	retVal = retVal && archive.EndTag(packageIdTag);
-
 	static iser::CArchiveTag expirationTimeTag("ExpirationTime", "Expired time stamp", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(expirationTimeTag);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_expirationTime);
 	retVal = retVal && archive.EndTag(expirationTimeTag);
+
+	static iser::CArchiveTag featureIdsTag("FeatureIds", "IDs of supported features", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(featureIdsTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_featureIds, "Features", "Feature");
+	retVal = retVal && archive.EndTag(featureIdsTag);
 
 	return retVal;
 }
@@ -126,8 +127,8 @@ bool CLicenseInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 
 		m_licenseName = sourcePtr->GetLicenseName();
 		m_licenseId = sourcePtr->GetLicenseId();
-		m_packageId = sourcePtr->GetPackageId();
 		m_expirationTime = sourcePtr->GetExpiration();
+		m_featureIds = sourcePtr->GetFeatures();
 
 		return true;
 	}
@@ -153,7 +154,7 @@ bool CLicenseInfo::ResetData(CompatibilityMode /*mode*/)
 
 	m_licenseName.clear();
 	m_licenseId.clear();
-	m_packageId.clear();
+	m_featureIds.clear();
 	m_expirationTime = QDateTime();
 
 	return true;

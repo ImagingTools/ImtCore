@@ -39,10 +39,6 @@ QByteArray CLicenseManagerViewDelegateComp::CreateNewObject(const QByteArray& ty
 			licenseInfo.SetLicenseId(*m_defaultLicenseIdAttrPtr);
 		}
 
-		if (m_defaultPackageIdAttrPtr.IsValid()){
-			licenseInfo.SetPackageId(*m_defaultPackageIdAttrPtr);
-		}
-
 		return m_collectionPtr->InsertNewObject(typeId, tr("New License"), QString(), &licenseInfo);
 	}
 
@@ -59,10 +55,6 @@ imtgui::ICollectionViewDelegate::SummaryInformation CLicenseManagerViewDelegateC
 	if (licenseInfoPtr != nullptr){
 		if (informationId == QByteArray("LicenseId")){
 			result.text = licenseInfoPtr->GetLicenseId();
-			result.sortValue = result.text;
-		}
-		else if (informationId == QByteArray("PackageId")){
-			result.text = licenseInfoPtr->GetPackageId();
 			result.sortValue = result.text;
 		}
 		else if (informationId == QByteArray("LicenseName")){
