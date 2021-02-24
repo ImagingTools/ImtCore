@@ -20,6 +20,7 @@ namespace imtlic
 
 
 class IFeatureInfo;
+class IFeatureDependenciesProvider;
 
 
 /**
@@ -37,6 +38,11 @@ public:
 		Get feature info.
 	*/
 	virtual const IFeatureInfo* GetFeatureInfo(const QByteArray& featureId) const = 0;
+
+	/**
+		Get access to the feature dependency information.
+	*/
+	virtual const IFeatureDependenciesProvider* GetDependenciesInfoProvider() const = 0;
 };
 
 
