@@ -4,14 +4,13 @@
 // ACF includes
 #include <istd/IChangeable.h>
 
+class QByteArray;
+class QByteArrayList;
+class QString;
 
 namespace imtlic
 {
 
-
-class QByteArray;
-class QByteArrayList;
-class QString;
 
 /**
 	Common information about a feature.
