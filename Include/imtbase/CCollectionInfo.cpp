@@ -177,7 +177,7 @@ bool CCollectionInfo::ResetData(CompatibilityMode /*mode*/)
 
 bool CCollectionInfo::Serialize(iser::IArchive& archive)
 {
-	istd::CChangeGroup changeGroup(archive.IsStoring() ? nullptr : this);
+	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
 	int itemCount = m_items.count();
 
@@ -188,9 +188,9 @@ bool CCollectionInfo::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	static iser::CArchiveTag collectionInfoTag("CollectionInfo", "Collection info", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag itemTag("Item", "Item", iser::CArchiveTag::TT_GROUP, &collectionInfoTag);
-	retVal = retVal && archive.BeginMultiTag(collectionInfoTag, itemTag, itemCount);
+	static iser::CArchiveTag itemsTag("Items", "List of collection items", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag itemTag("Item", "Item", iser::CArchiveTag::TT_GROUP, &itemsTag);
+	retVal = retVal && archive.BeginMultiTag(itemsTag, itemTag, itemCount);
 
 	for (int i = 0; i < itemCount; i++){
 		retVal = retVal && archive.BeginTag(itemTag);
@@ -228,7 +228,7 @@ bool CCollectionInfo::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(itemTag);
 	}
 
-	retVal = retVal && archive.EndTag(collectionInfoTag);
+	retVal = retVal && archive.EndTag(itemsTag);
 
 	return retVal;
 }

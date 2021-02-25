@@ -157,6 +157,7 @@ bool CFeatureInfoProvider::Serialize(iser::IArchive& archive)
 
 	static iser::CArchiveTag dependenciesTag("Dependencies", "Feature list", iser::CArchiveTag::TT_MULTIPLE);
 	static iser::CArchiveTag dependencyTag("Dependency", "Dependency", iser::CArchiveTag::TT_GROUP, &dependenciesTag);
+
 	retVal = retVal && archive.BeginMultiTag(dependenciesTag, dependencyTag, dependencyCount);
 
 	for (int dependencyIndex = 0; dependencyIndex < dependencyCount; dependencyIndex++){
@@ -172,32 +173,12 @@ bool CFeatureInfoProvider::Serialize(iser::IArchive& archive)
 			valueCount = value.count();
 		}
 
-		static iser::CArchiveTag keyTag("Key", "Key", iser::CArchiveTag::TT_LEAF, &dependencyTag);
+		static iser::CArchiveTag keyTag("FeatureId", "FeatureId", iser::CArchiveTag::TT_LEAF, &dependencyTag);
 		retVal = retVal && archive.BeginTag(keyTag);
 		retVal = retVal && archive.Process(key);
 		retVal = retVal && archive.EndTag(keyTag);
 
-		static iser::CArchiveTag valueTag("Value", "Value", iser::CArchiveTag::TT_MULTIPLE, &dependencyTag);
-		static iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_GROUP, &valueTag);
-		retVal = retVal && archive.BeginMultiTag(valueTag, idTag, valueCount);
-
-		for (int valueIndex = 0; valueIndex < valueCount; valueIndex++){
-			QByteArray id;
-
-			if (archive.IsStoring()){
-				id = value[valueIndex];
-			}
-
-			retVal = retVal && archive.BeginTag(idTag);
-			retVal = retVal && archive.Process(id);
-			retVal = retVal && archive.EndTag(idTag);
-
-			if (!archive.IsStoring()){
-				value.append(id);
-			}
-		}
-
-		retVal = retVal && archive.EndTag(valueTag);
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, value, "BaseFeatures", "BaseFeatureId");
 
 		if (!archive.IsStoring()){
 			m_dependencies[key] = value;
@@ -210,7 +191,7 @@ bool CFeatureInfoProvider::Serialize(iser::IArchive& archive)
 
 	static iser::CArchiveTag parentsTag("Parents", "Parent feature providers", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(parentsTag);
-	m_parents.Serialize(archive);
+	retVal = retVal && m_parents.Serialize(archive);
 	retVal = retVal && archive.EndTag(parentsTag);
 
 	return retVal;
