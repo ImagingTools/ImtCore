@@ -2,11 +2,7 @@
 
 
 // ACF includes
-#include <istd/IChangeable.h>
-
-
-class QByteArray;
-class QString;
+#include <iser/ISerializable.h>
 
 
 namespace imtbase
@@ -26,7 +22,7 @@ class IFeatureDependenciesProvider;
 /**
 	Common information about a feature group.
 */
-class IFeatureInfoProvider: virtual public istd::IChangeable
+class IFeatureInfoProvider: virtual public iser::ISerializable
 {
 public:
 	/**
@@ -43,6 +39,16 @@ public:
 		Get access to the feature dependency information.
 	*/
 	virtual const IFeatureDependenciesProvider* GetDependenciesInfoProvider() const = 0;
+
+	/**
+		Get parent feature info provider list.
+	*/
+	virtual const imtbase::ICollectionInfo* GetParentFeatureInfoProviderList() const = 0;
+
+	/**
+		Get parent feature info provider.
+	*/
+	virtual const IFeatureInfoProvider* GetParentFeatureInfoProvider(const QByteArray& parentId) const = 0;
 };
 
 

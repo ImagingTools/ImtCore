@@ -2,12 +2,7 @@
 
 
 // ACF includes
-#include <istd/IChangeable.h>
-
-
-class QByteArray;
-class QByteArrayList;
-class QString;
+#include <iser/ISerializable.h>
 
 
 namespace imtlic
@@ -17,7 +12,7 @@ namespace imtlic
 /**
 	Common information about a feature.
 */
-class IFeatureInfo: virtual public istd::IChangeable
+class IFeatureInfo: virtual public iser::ISerializable
 {
 public:
 	/**
