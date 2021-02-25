@@ -19,7 +19,7 @@ namespace imtlic
 // public methods
 
 CFeatureInfoProvider::CFeatureInfoProvider()
-	:BaseClass("FeatureInfo", "Feature info", "FeatureInfo"),
+	:BaseClass("FeatureInfo", "Feature info", "FeatureInfoProvider"),
 	m_ownerPtr(nullptr)
 {
 }
@@ -145,103 +145,72 @@ bool CFeatureInfoProvider::Serialize(iser::IArchive& archive)
 
 	bool retVal = BaseClass::Serialize(archive);
 
-	QByteArrayList ownFeatureIds = m_dependencies.keys();
-	int ownFeatureCount = ownFeatureIds.count();
+	QByteArrayList dependencyKeys = m_dependencies.keys();
+	int dependencyCount = dependencyKeys.count();
 
 	if (!archive.IsStoring()){
 		m_dependencies.clear();
 		m_parents.ResetData();
-		ownFeatureIds.clear();
-		ownFeatureCount = 0;
+		dependencyKeys.clear();
+		dependencyCount = 0;
 	}
 
-	static iser::CArchiveTag ownFeatureListTag("Dependencies", "Feature list", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag ownFeatureTag("Feature", "Feature", iser::CArchiveTag::TT_GROUP, &ownFeatureListTag);
-	retVal = retVal && archive.BeginMultiTag(ownFeatureListTag, ownFeatureTag, ownFeatureCount);
+	static iser::CArchiveTag dependenciesTag("Dependencies", "Feature list", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag dependencyTag("Dependency", "Dependency", iser::CArchiveTag::TT_GROUP, &dependenciesTag);
+	retVal = retVal && archive.BeginMultiTag(dependenciesTag, dependencyTag, dependencyCount);
 
-	for (int ownFeatureIndex = 0; ownFeatureIndex < ownFeatureCount; ownFeatureIndex++){
-		retVal = retVal && archive.BeginTag(ownFeatureTag);
+	for (int dependencyIndex = 0; dependencyIndex < dependencyCount; dependencyIndex++){
+		retVal = retVal && archive.BeginTag(dependencyTag);
 
-		QByteArray ownFeatureId;
-		if (archive.IsStoring()){
-			ownFeatureId = ownFeatureIds[ownFeatureIndex];
-		}
-
-		static iser::CArchiveTag ownFeatureIdTag("Id", "Feature ID", iser::CArchiveTag::TT_LEAF, &ownFeatureTag);
-		retVal = retVal && archive.BeginTag(ownFeatureIdTag);
-		retVal = retVal && archive.Process(ownFeatureId);
-		retVal = retVal && archive.EndTag(ownFeatureIdTag);
-
-		QByteArrayList featureIds;
-		int featureCount;
+		QByteArray key;
+		QByteArrayList value;
+		int valueCount = 0;
 
 		if (archive.IsStoring()){
-			featureIds = m_dependencies[ownFeatureId];
-			featureCount = featureIds.count();
+			key = dependencyKeys[dependencyIndex];
+			value = m_dependencies[key];
+			valueCount = value.count();
 		}
 
-		static iser::CArchiveTag dependenciesTag("DependsOn", "Dependency feature list", iser::CArchiveTag::TT_MULTIPLE, &ownFeatureTag);
-		static iser::CArchiveTag featureIdTag("Id", "Dependency feature ID", iser::CArchiveTag::TT_GROUP, &dependenciesTag);
-		retVal = retVal && archive.BeginMultiTag(dependenciesTag, featureIdTag, featureCount);
+		static iser::CArchiveTag keyTag("Key", "Key", iser::CArchiveTag::TT_LEAF, &dependencyTag);
+		retVal = retVal && archive.BeginTag(keyTag);
+		retVal = retVal && archive.Process(key);
+		retVal = retVal && archive.EndTag(keyTag);
 
-		for (int featureIdIndex = 0; featureIdIndex < featureCount; featureIdIndex++){
-			QByteArray featureId;
+		static iser::CArchiveTag valueTag("Value", "Value", iser::CArchiveTag::TT_MULTIPLE, &dependencyTag);
+		static iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_GROUP, &valueTag);
+		retVal = retVal && archive.BeginMultiTag(valueTag, idTag, valueCount);
+
+		for (int valueIndex = 0; valueIndex < valueCount; valueIndex++){
+			QByteArray id;
+
 			if (archive.IsStoring()){
-				featureId = featureIds[featureIdIndex];
+				id = value[valueIndex];
 			}
 
-			retVal = retVal && archive.BeginTag(featureIdTag);
-			retVal = retVal && archive.Process(featureId);
-			retVal = retVal && archive.EndTag(featureIdTag);
+			retVal = retVal && archive.BeginTag(idTag);
+			retVal = retVal && archive.Process(id);
+			retVal = retVal && archive.EndTag(idTag);
 
 			if (!archive.IsStoring()){
-				featureIds.append(featureId);
+				value.append(id);
 			}
 		}
 
-		retVal = retVal && archive.EndTag(dependenciesTag);
-
-		retVal = retVal && archive.EndTag(ownFeatureTag);
+		retVal = retVal && archive.EndTag(valueTag);
 
 		if (!archive.IsStoring()){
-			SetDependencies(ownFeatureId, featureIds);
-		}
-	}
-
-	retVal = retVal && archive.EndTag(ownFeatureListTag);
-
-	// parent ids
-	QByteArrayList parentIds;
-	int parentIdCount;
-
-	if (archive.IsStoring()){
-		parentIds = m_parents.GetElementIds().toList();
-		parentIdCount = parentIds.count();
-	}
-
-	static iser::CArchiveTag parentsTag("Parents", "Parent feature providers", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag parentIdTag("Id", "Parent feature provider ID", iser::CArchiveTag::TT_GROUP, &parentsTag);
-	retVal = retVal && archive.BeginMultiTag(parentsTag, parentIdTag, parentIdCount);
-
-	for (int parentIdIndex = 0; parentIdIndex < parentIdCount; parentIdIndex++){
-		QByteArray parentId;
-		if (archive.IsStoring()){
-			parentId = parentIds[parentIdIndex];
+			m_dependencies[key] = value;
 		}
 
-		retVal = retVal && archive.BeginTag(parentIdTag);
-		retVal = retVal && archive.Process(parentId);
-		retVal = retVal && archive.EndTag(parentIdTag);
-
-		if (!archive.IsStoring()){
-			parentIds.append(parentId);
-		}
+		retVal = retVal && archive.EndTag(dependencyTag);
 	}
 
-	if (!archive.IsStoring()){
-		SetParents(parentIds);
-	}
+	retVal = retVal && archive.EndTag(dependenciesTag);
 
+	static iser::CArchiveTag parentsTag("Parents", "Parent feature providers", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(parentsTag);
+	m_parents.Serialize(archive);
 	retVal = retVal && archive.EndTag(parentsTag);
 
 	return retVal;

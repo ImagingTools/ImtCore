@@ -40,7 +40,7 @@ public:
 	virtual bool Serialize(iser::IArchive& archive) override;
 
 protected:
-	imtbase::IObjectCollection* m_ownerPtr;
+	const imtbase::IObjectCollection* m_ownerPtr;
 
 private:
 	QMap<QByteArray, QByteArrayList> m_dependencies;
