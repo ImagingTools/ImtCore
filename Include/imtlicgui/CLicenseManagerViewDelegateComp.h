@@ -23,7 +23,6 @@ public:
 	I_BEGIN_COMPONENT(CLicenseManagerViewDelegateComp);
 		I_ASSIGN(m_defaultLicenseNameAttrPtr, "DefaultLicenseName", "Default license name", false, "");
 		I_ASSIGN(m_defaultLicenseIdAttrPtr, "DefaultLicenseId", "Default license ID", false, "");
-		I_ASSIGN(m_defaultPackageIdAttrPtr, "DefaultPackageId", "Default package ID", false, "");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgui::ICollectionViewDelegate)
@@ -41,7 +40,6 @@ protected:
 private:
 	I_ATTR(QString, m_defaultLicenseNameAttrPtr);
 	I_ATTR(QByteArray, m_defaultLicenseIdAttrPtr);
-	I_ATTR(QByteArray, m_defaultPackageIdAttrPtr);
 };
 
 

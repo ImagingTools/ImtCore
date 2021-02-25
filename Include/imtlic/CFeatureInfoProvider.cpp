@@ -43,10 +43,10 @@ void CFeatureInfoProvider::SetParents(const QByteArrayList& parentIds)
 {
 	istd::CChangeNotifier notifier(this);
 
-	m_parentCollectionInfo.ResetData();
+	m_parents.ResetData();
 
 	for (const QByteArray& parentId : parentIds){
-		m_parentCollectionInfo.InsertItem(parentId, "", "");
+		m_parents.InsertItem(parentId, "", "");
 	}
 }
 
@@ -111,14 +111,14 @@ const IFeatureDependenciesProvider* CFeatureInfoProvider::GetDependenciesInfoPro
 
 const imtbase::ICollectionInfo* CFeatureInfoProvider::GetParentFeatureInfoProviderList() const
 {
-	return &m_parentCollectionInfo;
+	return &m_parents;
 }
 
 
 const IFeatureInfoProvider* CFeatureInfoProvider::GetParentFeatureInfoProvider(const QByteArray& parentId) const
 {
 	if (m_ownerPtr != nullptr){
-		if (m_parentCollectionInfo.GetElementIds().contains(parentId)){
+		if (m_parents.GetElementIds().contains(parentId)){
 			imtbase::ICollectionInfo::Ids featureInfoProviderIds = m_ownerPtr->GetElementIds();
 			for (const QByteArray& featureInfoProviderId : featureInfoProviderIds){
 				IFeatureInfoProvider* featureInfoProviderPtr = dynamic_cast<IFeatureInfoProvider*>(
@@ -143,19 +143,14 @@ bool CFeatureInfoProvider::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeGroup changeGroup(archive.IsStoring() ? nullptr : this);
 
-	bool retVal = true;
-
-	static iser::CArchiveTag featureCollectionTag("Features", "Dependency feature ID", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(featureCollectionTag);
-	m_collection.Serialize(archive);
-	retVal = retVal && archive.EndTag(featureCollectionTag);
+	bool retVal = BaseClass::Serialize(archive);
 
 	QByteArrayList ownFeatureIds = m_dependencies.keys();
 	int ownFeatureCount = ownFeatureIds.count();
 
 	if (!archive.IsStoring()){
 		m_dependencies.clear();
-		m_parentCollectionInfo.ResetData();
+		m_parents.ResetData();
 		ownFeatureIds.clear();
 		ownFeatureCount = 0;
 	}
@@ -220,7 +215,7 @@ bool CFeatureInfoProvider::Serialize(iser::IArchive& archive)
 	int parentIdCount;
 
 	if (archive.IsStoring()){
-		parentIds = m_parentCollectionInfo.GetElementIds().toList();
+		parentIds = m_parents.GetElementIds().toList();
 		parentIdCount = parentIds.count();
 	}
 

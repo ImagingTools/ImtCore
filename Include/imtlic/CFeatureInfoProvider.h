@@ -44,7 +44,7 @@ protected:
 
 private:
 	QMap<QByteArray, QByteArrayList> m_dependencies;
-	imtbase::CCollectionInfo m_parentCollectionInfo;
+	imtbase::CCollectionInfo m_parents;
 };
 
 
