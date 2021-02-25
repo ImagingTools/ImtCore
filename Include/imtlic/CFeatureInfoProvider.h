@@ -3,9 +3,9 @@
 
 // ImtCore includes
 #include <imtbase/TAggergatedObjectCollectionWrap.h>
+#include <imtbase/CCollectionInfo.h>
 #include <imtlic/IFeatureDependenciesProvider.h>
 #include <imtlic/IFeatureInfoProvider.h>
-#include <imtbase/CCollectionInfo.h>
 #include <imtlic/CFeatureInfo.h>
 
 
