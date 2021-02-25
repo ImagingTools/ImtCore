@@ -6,7 +6,7 @@
 
 // ACF includes
 #include <istd/TDelPtr.h>
-#include <istd/CChangeGroup.h>
+#include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
@@ -141,7 +141,7 @@ const IFeatureInfoProvider* CFeatureInfoProvider::GetParentFeatureInfoProvider(c
 
 bool CFeatureInfoProvider::Serialize(iser::IArchive& archive)
 {
-	istd::CChangeGroup changeGroup(archive.IsStoring() ? nullptr : this);
+	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
 	bool retVal = BaseClass::Serialize(archive);
 
