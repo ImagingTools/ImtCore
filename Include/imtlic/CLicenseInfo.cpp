@@ -15,6 +15,12 @@ namespace imtlic
 
 // public methods
 
+QByteArray CLicenseInfo::GetTypeId()
+{
+	return "LicenseInfo";
+}
+
+
 // reimplemented (imtlic::ILicenseInfo)
 
 QString CLicenseInfo::GetLicenseName() const
@@ -78,6 +84,14 @@ void CLicenseInfo::SetFeatures(const FeatureIds& featureIds)
 
 		m_featureIds = featureIds;
 	}
+}
+
+
+// reimplemented (iser::IObject)
+
+QByteArray CLicenseInfo::GetFactoryId() const
+{
+	return GetTypeId();
 }
 
 

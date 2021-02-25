@@ -8,7 +8,7 @@ namespace imtlic
 // public methods
 
 CLicenseInfoManager::CLicenseInfoManager()
-	:BaseClass("LicenseInfo", "License Info", "Licenses")
+	:BaseClass(CLicenseInfo::GetTypeId(), "License Info", "Licenses")
 {
 }
 

@@ -17,6 +17,8 @@ namespace imtlic
 class CLicenseInfo: virtual public imtlic::ILicenseInfo
 {
 public:
+	static QByteArray GetTypeId();
+
 	// reimplemented (imtlic::ILicenseInfo)
 	virtual QString GetLicenseName() const override;
 	void SetLicenseName(const QString& licenseName) override;
@@ -26,6 +28,9 @@ public:
 	void SetExpiration(const QDateTime& expirationTime) override;
 	virtual FeatureIds GetFeatures() const override;
 	virtual void SetFeatures(const FeatureIds& featureIds) override;
+
+	// reimplemented (iser::IObject)
+	virtual QByteArray GetFactoryId() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
