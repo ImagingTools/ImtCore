@@ -5,6 +5,10 @@
 #include <QtCore/QVector>
 #include <QtCore/QUuid>
 
+// ACF includes
+#include <iser/IArchive.h>
+#include <iser/ISerializable.h>
+
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
 
@@ -17,7 +21,9 @@ namespace imtbase
 	Implementation of a general collection information.
 	\ingroup Collection
 */
-class CCollectionInfo: virtual public ICollectionInfo
+class CCollectionInfo:
+			virtual public ICollectionInfo,
+			virtual public iser::ISerializable
 {
 public:
 	int GetItemIndex(const QByteArray& id) const;
@@ -36,6 +42,9 @@ public:
 	virtual bool IsEqual(const IChangeable& object) const;
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 protected:
 	struct Item

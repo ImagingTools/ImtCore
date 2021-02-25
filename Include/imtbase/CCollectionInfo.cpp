@@ -2,8 +2,10 @@
 
 
 // ACF includes
+#include <iser/CArchiveTag.h>
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
+#include <istd/CChangeGroup.h>
 
 
 namespace imtbase
@@ -169,6 +171,68 @@ bool CCollectionInfo::ResetData(CompatibilityMode /*mode*/)
 
 	return true;
 }
+
+
+// reimplemented (iser::ISerializable)
+
+bool CCollectionInfo::Serialize(iser::IArchive& archive)
+{
+	istd::CChangeGroup changeGroup(archive.IsStoring() ? nullptr : this);
+
+	int itemCount = m_items.count();
+
+	if (!archive.IsStoring()){
+		m_items.clear();
+		itemCount = 0;
+	}
+
+	bool retVal = true;
+
+	static iser::CArchiveTag collectionInfoTag("CollectionInfo", "Collection info", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag itemTag("Item", "Item", iser::CArchiveTag::TT_GROUP, &collectionInfoTag);
+	retVal = retVal && archive.BeginMultiTag(collectionInfoTag, itemTag, itemCount);
+
+	for (int i = 0; i < itemCount; i++){
+		retVal = retVal && archive.BeginTag(itemTag);
+
+		Item item;
+		if (archive.IsStoring()){
+			item = m_items[i];
+		}
+
+		static iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF, &itemTag);
+		retVal = retVal && archive.BeginTag(idTag);
+		retVal = retVal && archive.Process(item.id);
+		retVal = retVal && archive.EndTag(idTag);
+
+		static iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF, &itemTag);
+		retVal = retVal && archive.BeginTag(nameTag);
+		retVal = retVal && archive.Process(item.name);
+		retVal = retVal && archive.EndTag(nameTag);
+
+		static iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF, &itemTag);
+		retVal = retVal && archive.BeginTag(descriptionTag);
+		retVal = retVal && archive.Process(item.description);
+		retVal = retVal && archive.EndTag(descriptionTag);
+
+		static iser::CArchiveTag isEnabledTag("IsEnabled", "IsEnabled", iser::CArchiveTag::TT_LEAF, &itemTag);
+		retVal = retVal && archive.BeginTag(isEnabledTag);
+		retVal = retVal && archive.Process(item.isEnabled);
+		retVal = retVal && archive.EndTag(isEnabledTag);
+
+		if (!archive.IsStoring()){
+			InsertItem(item.id, item.name, item.description);
+			m_items.back().isEnabled = item.isEnabled;
+		}
+
+		retVal = retVal && archive.EndTag(itemTag);
+	}
+
+	retVal = retVal && archive.EndTag(collectionInfoTag);
+
+	return retVal;
+}
+
 
 } // namespace imtbase
 
