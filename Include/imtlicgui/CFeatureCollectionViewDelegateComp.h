@@ -9,14 +9,14 @@ namespace imtlicgui
 {
 
 
-class CFeatureInfoProviderCollectionViewDelegateComp:
+class CFeatureCollectionViewDelegateComp:
 			public imtrepogui::CDocumentBasedFileCollectionViewDelegateComp
 {
 	Q_OBJECT
 public:
 	typedef imtrepogui::CDocumentBasedFileCollectionViewDelegateComp BaseClass;
 
-	I_BEGIN_COMPONENT(CFeatureInfoProviderCollectionViewDelegateComp);
+	I_BEGIN_COMPONENT(CFeatureCollectionViewDelegateComp);
 	I_END_COMPONENT;
 
 protected:

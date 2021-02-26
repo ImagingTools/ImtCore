@@ -18,22 +18,22 @@ namespace imtlicgui
 	Editor for the product-related licensing.
 	\ingroup LicenseManagement
 */
-class CFeatureInfoProviderGuiComp:
+class CFeatureCollectionGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CFeatureInfoProviderGuiComp, imtlic::IFeatureInfoProvider>,
+						Ui::CFeatureCollectionGuiComp, imtlic::IFeatureInfoProvider>,
 			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CFeatureInfoProviderGuiComp, imtlic::IFeatureInfoProvider> BaseClass;
+				Ui::CFeatureCollectionGuiComp, imtlic::IFeatureInfoProvider> BaseClass;
 
-	I_BEGIN_COMPONENT(CFeatureInfoProviderGuiComp);
+	I_BEGIN_COMPONENT(CFeatureCollectionGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider)
 	I_END_COMPONENT;
 
-	CFeatureInfoProviderGuiComp();
+	CFeatureCollectionGuiComp();
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;

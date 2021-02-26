@@ -20,9 +20,9 @@ I_EXPORT_COMPONENT(
 			"License Info Editor");
 
 I_EXPORT_COMPONENT(
-			FeatureInfoProviderGui,
-			"Feature info provider editor",
-			"Feature License Info Editor Provider");
+			FeatureCollectionGui,
+			"Feature collection editor",
+			"Feature License Editor Collection");
 
 I_EXPORT_COMPONENT(
 			ProductLicensingInfoGui,
@@ -40,9 +40,9 @@ I_EXPORT_COMPONENT(
 			"Product Licensing Info Collection Delegate");
 
 I_EXPORT_COMPONENT(
-			FeatureInfoProviderCollectionViewDelegate,
-			"Feature info provider collection delegate",
-			"Feature Provider Licensing Info Collection Delegate");
+			FeatureCollectionViewDelegate,
+			"Feature collection view delegate",
+			"Feature Licensing Collection View Delegate");
 
 
 } // namespace ImtLicenseGuiPck

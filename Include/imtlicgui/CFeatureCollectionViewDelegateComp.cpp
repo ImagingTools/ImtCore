@@ -1,4 +1,4 @@
-#include <imtlicgui/CFeatureInfoProviderCollectionViewDelegateComp.h>
+#include <imtlicgui/CFeatureCollectionViewDelegateComp.h>
 
 
 namespace imtlicgui
@@ -9,7 +9,7 @@ namespace imtlicgui
 
 // reimplemented (imtgui::CObjectCollectionViewDelegate)
 
-void CFeatureInfoProviderCollectionViewDelegateComp::SetupSummaryInformation()
+void CFeatureCollectionViewDelegateComp::SetupSummaryInformation()
 {
 	BaseClass::SetupSummaryInformation();
 
