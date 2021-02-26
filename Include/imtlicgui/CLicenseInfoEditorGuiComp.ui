@@ -187,7 +187,7 @@ QAbstractItemView[TabSimulation=true]
   </layout>
  </widget>
  <resources>
-  <include location="imtgui.qrc"/>
+  <include location="../imtgui/imtgui.qrc"/>
  </resources>
  <connections/>
 </ui>
