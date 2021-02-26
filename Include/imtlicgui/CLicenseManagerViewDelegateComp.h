@@ -28,14 +28,21 @@ public:
 	// reimplemented (imtgui::ICollectionViewDelegate)
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
+	virtual bool RenameObject(const QByteArray& objectId, const QString& newName) const override;
 	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
 
 protected:
+	// reimplemented (imtgui::CObjectCollectionViewDelegate)
+	virtual void OnDuplicateObject(const QByteArray& sourceObjectId, const QByteArray& destinationObjectId) override;
+	
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
 	// reimplemented (CObjectCollectionViewDelegate)
 	virtual void SetupSummaryInformation() override;
+
+protected Q_SLOTS:
+	//virtual void OnDuplicateObject(const QByteArray& sourceObjectId, const QByteArray& destinationObjectId);
 
 private:
 	I_ATTR(QString, m_defaultLicenseNameAttrPtr);

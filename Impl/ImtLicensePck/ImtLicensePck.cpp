@@ -15,6 +15,16 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
+			FeatureInfo,
+			"Feature information",
+			"License Feature Information");
+
+I_EXPORT_COMPONENT(
+			FeatureInfoProvider,
+			"Feature info provider",
+			"License Feature Container Collection Info Provider");
+
+I_EXPORT_COMPONENT(
 			LicenseInfo,
 			"Single license information",
 			"License Information");

@@ -31,18 +31,47 @@ QByteArray CLicenseManagerViewDelegateComp::CreateNewObject(const QByteArray& ty
 	if (m_collectionPtr != nullptr){
 		imtlic::CLicenseInfo licenseInfo;
 
+		QString objectName;
+
 		if (m_defaultLicenseNameAttrPtr.IsValid()){
-			licenseInfo.SetLicenseName(*m_defaultLicenseNameAttrPtr);
+			objectName = GetUniqueName(*m_defaultLicenseNameAttrPtr);
 		}
+		else{
+			objectName = GetUniqueName(tr("New License"));
+		}
+
+		licenseInfo.SetLicenseName(objectName);
 
 		if (m_defaultLicenseIdAttrPtr.IsValid()){
 			licenseInfo.SetLicenseId(*m_defaultLicenseIdAttrPtr);
 		}
 
-		return m_collectionPtr->InsertNewObject(typeId, tr("New License"), QString(), &licenseInfo);
+		return m_collectionPtr->InsertNewObject(typeId, objectName, QString(), &licenseInfo);
 	}
 
 	return QByteArray();
+}
+
+
+bool CLicenseManagerViewDelegateComp::RenameObject(const QByteArray& objectId, const QString& newName) const
+{
+	QString name = GetUniqueName(newName);
+
+	if (BaseClass::RenameObject(objectId, name)){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		m_collectionPtr->GetObjectData(objectId, dataPtr);
+
+		imtlic::CLicenseInfo* licenseInfoPtr = dynamic_cast<imtlic::CLicenseInfo*>(dataPtr.GetPtr());
+		if (licenseInfoPtr != nullptr){
+			QString objectName = m_collectionPtr->GetElementInfo(objectId, imtbase::IObjectCollectionInfo::EIT_NAME).toString();
+			licenseInfoPtr->SetLicenseName(objectName);
+			m_collectionPtr->SetObjectData(objectId, *licenseInfoPtr);
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -81,6 +110,22 @@ imtgui::ICollectionViewDelegate::SummaryInformation CLicenseManagerViewDelegateC
 
 // protected methods
 
+// reimplemented (imtgui::CObjectCollectionViewDelegate)
+
+void CLicenseManagerViewDelegateComp::OnDuplicateObject(const QByteArray& /*sourceObjectId*/, const QByteArray& destinationObjectId)
+{
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	m_collectionPtr->GetObjectData(destinationObjectId, dataPtr);
+
+	imtlic::CLicenseInfo* licenseInfoPtr = dynamic_cast<imtlic::CLicenseInfo*>(dataPtr.GetPtr());
+	if (licenseInfoPtr != nullptr){
+		QString objectName = m_collectionPtr->GetElementInfo(destinationObjectId, imtbase::IObjectCollectionInfo::EIT_NAME).toString();
+		licenseInfoPtr->SetLicenseName(objectName);
+		m_collectionPtr->SetObjectData(destinationObjectId, *licenseInfoPtr);
+	}
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CLicenseManagerViewDelegateComp::OnComponentCreated()
@@ -110,6 +155,22 @@ void CLicenseManagerViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.InsertItem("Expiration", tr("Expiration"), "");
 	m_summaryInformationHeaders["Expiration"] = HeaderInfo(false);
 }
+
+
+// protected slots
+
+//QByteArray CLicenseManagerViewDelegateComp::OnInsert()
+//{
+//	QByteArray objectId = BaseClass::OnInsert();
+//
+//	return objectId;
+//}
+//
+//
+//void OnDuplicateObject(const QByteArray& sourceObjectId, const QByteArray& destinationObjectId)
+//{
+//
+//}
 
 
 } // namespace imtlicgui
