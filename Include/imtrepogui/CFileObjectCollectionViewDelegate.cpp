@@ -36,6 +36,7 @@ void CFileObjectCollectionViewDelegate::UpdateItemSelection(const imtbase::IColl
 {
 	BaseClass::UpdateItemSelection(selectedItems, selectedTypeId);
 
+	m_importCommand.setEnabled(m_insertCommand.IsEnabled());
 	m_exportCommand.setEnabled(selectedItems.count() == 1);
 	m_restoreCommand.setEnabled(false);
 

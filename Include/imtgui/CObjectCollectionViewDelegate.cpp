@@ -227,6 +227,36 @@ const ibase::IHierarchicalCommand* CObjectCollectionViewDelegate::GetCommands() 
 
 // protected methods
 
+bool CObjectCollectionViewDelegate::IsNameUnique(const QString& name) const
+{
+	Q_ASSERT(m_collectionPtr != nullptr);
+
+	imtbase::ICollectionInfo::Ids ids = m_collectionPtr->GetElementIds();
+	for (const QByteArray& id : ids){
+		QString itemName = m_collectionPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
+		if (name == itemName){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+QString CObjectCollectionViewDelegate::GetUniqueName(const QString& name) const
+{
+	QString uniqueName = name;
+
+	int counter = 0;
+	while (!IsNameUnique(uniqueName)){
+		counter++;
+		uniqueName = name + QString(" - %1").arg(counter);
+	}
+
+	return uniqueName;
+}
+
+
 void CObjectCollectionViewDelegate::SetupSummaryInformation()
 {
 	m_summaryInformationTypes.ResetData();
@@ -305,22 +335,6 @@ void CObjectCollectionViewDelegate::SetupInsertCommand()
 }
 
 
-bool CObjectCollectionViewDelegate::IsNameUnique(const QString& name)
-{
-	Q_ASSERT(m_collectionPtr != nullptr);
-
-	imtbase::ICollectionInfo::Ids ids = m_collectionPtr->GetElementIds();
-	for (const QByteArray& id : ids){
-		QString itemName = m_collectionPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
-		if (name == itemName){
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
 void CObjectCollectionViewDelegate::OnDuplicateObject(const QByteArray& /*sourceObjectId*/, const QByteArray& /*destinationObjectId*/)
 {
 }
@@ -366,12 +380,7 @@ void CObjectCollectionViewDelegate::OnDuplicate()
 			QByteArray objectId = this->CObjectCollectionViewDelegate::CreateNewObject(m_collectionPtr->GetObjectTypeId(selectedItemId), sourceDataPtr.GetPtr());
 			if (!objectId.isEmpty()){
 				QString copyName = QString("Copy of %1").arg(sourceName);
-				QString newName = copyName;
-				int counter = 0;
-				while (!IsNameUnique(newName)){
-					counter++;
-					newName = copyName + QString(" - %1").arg(counter);
-				}
+				QString newName = GetUniqueName(copyName);
 
 				m_collectionPtr->SetObjectName(objectId, newName);
 				m_collectionPtr->SetObjectDescription(objectId, sourceDescription);

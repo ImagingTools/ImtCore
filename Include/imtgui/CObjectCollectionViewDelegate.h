@@ -71,10 +71,12 @@ public:
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 protected:
+	bool IsNameUnique(const QString& name) const;
+	QString GetUniqueName(const QString& name) const;
+
 	virtual void SetupSummaryInformation();
 	virtual void SetupCommands();
 	virtual void SetupInsertCommand();
-	virtual bool IsNameUnique(const QString& name);
 	virtual void OnDuplicateObject(const QByteArray& sourceObjectId, const QByteArray& destinationObjectId);
 
 	// reimplemented (ibase::TLocalizableWrap)
