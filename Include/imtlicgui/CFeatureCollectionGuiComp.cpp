@@ -4,10 +4,12 @@
 // ACF includes
 #include <istd/CChangeGroup.h>
 
+// ImtCore includes
 #include <imtbase/CCollectionInfo.h>
 #include <imtlic/CFeatureCollection.h>
 #include <ifile/CCompactXmlFileWriteArchive.h>
 #include <ifile/CCompactXmlFileReadArchive.h>
+
 
 namespace imtlicgui
 {
