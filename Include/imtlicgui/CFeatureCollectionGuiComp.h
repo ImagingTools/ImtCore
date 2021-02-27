@@ -32,6 +32,7 @@ public:
 	I_BEGIN_COMPONENT(CFeatureCollectionGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
 		I_ASSIGN(m_objectCollectionViewCompPtr, "ObjectCollectionView", "Object collection view", true, "ObjectCollectionView");
+		I_ASSIGN_TO(m_objectCollectionObserverCompPtr, m_objectCollectionViewCompPtr, true);
 	I_END_COMPONENT;
 
 	CFeatureCollectionGuiComp();
@@ -65,6 +66,7 @@ private:
 
 private:
 	I_REF(iqtgui::IGuiObject, m_objectCollectionViewCompPtr);
+	I_REF(imod::IObserver, m_objectCollectionObserverCompPtr);
 };
 
 

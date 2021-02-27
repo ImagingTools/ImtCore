@@ -4,12 +4,6 @@
 // ACF includes
 #include <istd/CChangeGroup.h>
 
-// ImtCore includes
-#include <imtbase/CCollectionInfo.h>
-#include <imtlic/CFeatureCollection.h>
-#include <ifile/CCompactXmlFileWriteArchive.h>
-#include <ifile/CCompactXmlFileReadArchive.h>
-
 
 namespace imtlicgui
 {
@@ -18,8 +12,8 @@ namespace imtlicgui
 // public methods
 
 CFeatureCollectionGuiComp::CFeatureCollectionGuiComp()
-	:m_showCollectionEditorCommand("Show Collection Editor", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 1977),
-	m_showDependenciesEditorCommand("Show Feature Dependency Editor", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 1977)
+	:m_showCollectionEditorCommand("Show Collection Editor", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020),
+	m_showDependenciesEditorCommand("Show Feature Dependency Editor", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020)
 {
 	m_rootCommands.InsertChild(&m_showCollectionEditorCommand);
 	m_rootCommands.InsertChild(&m_showDependenciesEditorCommand);
@@ -44,19 +38,11 @@ const ibase::IHierarchicalCommand* CFeatureCollectionGuiComp::GetCommands() cons
 void CFeatureCollectionGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
-
-	if (m_objectCollectionViewCompPtr.IsValid()){
-		m_objectCollectionViewCompPtr->CreateGui(objectCollectionView);
-	}
 }
 
 
 void CFeatureCollectionGuiComp::OnGuiDestroyed()
 {
-	if (m_objectCollectionViewCompPtr.IsValid() && m_objectCollectionViewCompPtr->IsGuiCreated()){
-		m_objectCollectionViewCompPtr->DestroyGui();
-	}
-
 	BaseClass::OnGuiDestroyed();
 }
 
@@ -85,29 +71,31 @@ void CFeatureCollectionGuiComp::OnGuiModelAttached()
 {
 	BaseClass::OnGuiModelAttached();
 
-	//if (m_licenseCollectionGuiCompPtr.IsValid() && m_licenseCollectionObserverCompPtr.IsValid()){
-	//	imod::IModel* licensingInfoModelPtr = GetObservedModel();
-	//	Q_ASSERT(licensingInfoModelPtr != nullptr);
+	if (m_objectCollectionViewCompPtr.IsValid() && m_objectCollectionObserverCompPtr.IsValid()){
+		imod::IModel* modelPtr = GetObservedModel();
+		Q_ASSERT(modelPtr != nullptr);
 
-	//	if (licensingInfoModelPtr->AttachObserver(m_licenseCollectionObserverCompPtr.GetPtr())){
-	//		m_licenseCollectionGuiCompPtr->CreateGui(LicenseCollectionFrame);
-	//	}
-	//}
+		if (modelPtr->AttachObserver(m_objectCollectionObserverCompPtr.GetPtr())){
+			m_objectCollectionViewCompPtr->CreateGui(objectCollectionView);
+		}
+	}
 }
 
 
 void CFeatureCollectionGuiComp::OnGuiModelDetached()
 {
-	//if (m_licenseCollectionGuiCompPtr.IsValid() && m_licenseCollectionObserverCompPtr.IsValid()){
-	//	imod::IModel* licensingInfoModelPtr = GetObservedModel();
-	//	Q_ASSERT(licensingInfoModelPtr != nullptr);
+	if (m_objectCollectionViewCompPtr.IsValid() && m_objectCollectionObserverCompPtr.IsValid()){
+		imod::IModel* modelPtr = GetObservedModel();
+		Q_ASSERT(modelPtr != nullptr);
 
-	//	if (licensingInfoModelPtr->IsAttached(m_licenseCollectionObserverCompPtr.GetPtr())){
-	//		licensingInfoModelPtr->DetachObserver(m_licenseCollectionObserverCompPtr.GetPtr());
+		if (modelPtr->IsAttached(m_objectCollectionObserverCompPtr.GetPtr())){
+			modelPtr->DetachObserver(m_objectCollectionObserverCompPtr.GetPtr());
+		}
 
-	//		m_licenseCollectionGuiCompPtr->DestroyGui();
-	//	}
-	//}
+		if (m_objectCollectionViewCompPtr->IsGuiCreated()){
+			m_objectCollectionViewCompPtr->DestroyGui();
+		}
+	}
 
 	BaseClass::OnGuiModelDetached();
 }
