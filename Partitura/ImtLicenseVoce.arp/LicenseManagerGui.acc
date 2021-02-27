@@ -3,7 +3,7 @@
     <AcfHeader>
         <VersionInfos>
             <Version Id="0" Number="4902" Description="ACF"/>
-            <Version Id="1" Number="2135" Description="ACF-Solutions"/>
+            <Version Id="1" Number="2134" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331009" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -72,7 +72,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultStatusIcon" Type="String" ExportId="DefaultStatusIcon">
-                        <Data IsEnabled="true" Value=":/Icons/Lock"/>
+                        <Data IsEnabled="true" Value=":/Icons/License"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
                         <Data IsEnabled="false"/>

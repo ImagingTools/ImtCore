@@ -12,8 +12,8 @@ namespace imtlicgui
 // public methods
 
 CFeatureCollectionGuiComp::CFeatureCollectionGuiComp()
-	:m_showCollectionEditorCommand("Show Collection Editor", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020),
-	m_showDependenciesEditorCommand("Show Feature Dependency Editor", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020)
+	:m_showCollectionEditorCommand("Edit Feartures", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020),
+	m_showDependenciesEditorCommand("Edit Dependencies", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020)
 {
 	m_rootCommands.InsertChild(&m_showCollectionEditorCommand);
 	m_rootCommands.InsertChild(&m_showDependenciesEditorCommand);
@@ -51,8 +51,8 @@ void CFeatureCollectionGuiComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
-	m_showCollectionEditorCommand.SetVisuals(tr("Show Collection Editor"), tr("Collection Editor"), tr("Show Collection Editor"), QIcon(":/Icons/Lamp"));
-	m_showDependenciesEditorCommand.SetVisuals(tr("Show Feature Dependency Editor"), tr("Dependency Editor"), tr("Show Feature Dependency Editor"), QIcon(":/Icons/Lamp"));
+	m_showCollectionEditorCommand.SetVisuals(tr("Edit Features"), tr("Features"), tr("Show Feature List"), QIcon(":/ColorIcons/FeatureList"));
+	m_showDependenciesEditorCommand.SetVisuals(tr("Edit Dependencies"), tr("Dependencies"), tr("Show Feature Dependencies"), QIcon(":/ColorIcons/Dependencies"));
 
 	m_showCollectionEditorCommand.setChecked(true);
 }
@@ -76,7 +76,7 @@ void CFeatureCollectionGuiComp::OnGuiModelAttached()
 		Q_ASSERT(modelPtr != nullptr);
 
 		if (modelPtr->AttachObserver(m_objectCollectionObserverCompPtr.GetPtr())){
-			m_objectCollectionViewCompPtr->CreateGui(objectCollectionView);
+			m_objectCollectionViewCompPtr->CreateGui(FeatureList);
 		}
 	}
 }
@@ -112,13 +112,13 @@ void CFeatureCollectionGuiComp::UpdateModel() const
 
 void CFeatureCollectionGuiComp::OnShowCollectionEditor()
 {
-	pages->setCurrentIndex(0);
+	Pages->setCurrentIndex(0);
 }
 
 
 void CFeatureCollectionGuiComp::OnShowFeatureDependencyEditor()
 {
-	pages->setCurrentIndex(1);
+	Pages->setCurrentIndex(1);
 }
 
 

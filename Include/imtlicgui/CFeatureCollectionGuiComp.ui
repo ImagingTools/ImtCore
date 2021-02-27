@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Product Licensing</string>
+   <string>Feature Package</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
@@ -27,11 +27,11 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QStackedWidget" name="pages">
+    <widget class="QStackedWidget" name="Pages">
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="page1">
+     <widget class="QWidget" name="FeatureListPage">
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="spacing">
         <number>0</number>
@@ -49,11 +49,11 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QWidget" name="objectCollectionView" native="true"/>
+        <widget class="QWidget" name="FeatureList" native="true"/>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_2">
+     <widget class="QWidget" name="DependencyPage">
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QLabel" name="label">
