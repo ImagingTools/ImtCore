@@ -28,7 +28,7 @@ public:
 		I_REGISTER_INTERFACE(imtbase::IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
 		I_REGISTER_INTERFACE(iser::ISerializable);
-		I_ASSIGN(m_ownerCollectionCompPtr, "OwnerCollection", "Collection which contains this object", true, "");
+		I_ASSIGN(m_ownerCollectionCompPtr, "OwnerCollection", "Collection which contains this object", true, "OwnerCollection");
 	I_END_COMPONENT;
 
 protected:
