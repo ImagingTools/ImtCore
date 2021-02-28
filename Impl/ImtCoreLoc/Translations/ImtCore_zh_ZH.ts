@@ -1,34 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US">
+<TS version="2.1" language="ch_CH">
 <context>
     <name>Attribute</name>
     <message>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/EagleView/CEagleView.cpp" line="+65"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+51"/>
-        <source>Report</source>
-        <translation>Rapport</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <source>Report Files</source>
-        <translation>Rapports</translation>
-    </message>
-    <message>
-        <location line="-30"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/EagleView/CEagleView.cpp" line="+37"/>
         <source>3D-Viewer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+32"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
-        <translation>(C) 2018 ImagingTools GmbH. Tous droits réservés.</translation>
+        <location line="+2"/>
+        <location line="+34"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+59"/>
+        <source>ImtCore</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-26"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-28"/>
+        <location line="-32"/>
+        <location line="+30"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <source>ImagingTools GmbH</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-28"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
         <source>STL</source>
         <translation type="unfinished"></translation>
     </message>
@@ -85,18 +81,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-24"/>
-        <location line="+34"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
-        <source>ImtCore</source>
-        <translation></translation>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <source>Report</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-32"/>
-        <location line="+30"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
-        <source>ImagingTools GmbH</source>
-        <translation></translation>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <source>Report Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -326,7 +326,7 @@
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h" line="+2"/>
         <source>User</source>
-        <translation type="unfinished">Utilisateur</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
@@ -392,7 +392,7 @@
         <location filename="../../../Include/imtreportgui/CReportDocumentViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtreportgui/ui_CReportDocumentViewComp.h" line="+51"/>
         <source>Report</source>
-        <translation type="unfinished">Rapport</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -428,7 +428,7 @@
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+544"/>
         <source>Main Window</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+73"/>
@@ -438,13 +438,13 @@
         <location line="+1"/>
         <location line="+1"/>
         <source>...</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+35"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Welcome</source>
-        <translation>Bienvenue</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+82"/>
@@ -456,19 +456,19 @@
         <location line="+20"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Log</source>
-        <translation>Journal</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Log out</source>
-        <translation>Déconnexion</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Settings</source>
-        <translation>Paramètres</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
@@ -486,25 +486,25 @@
         <location line="+20"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Quit</source>
-        <translation>Quitter</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+206"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>User</source>
-        <translation>Utilisateur</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Password</source>
-        <translation>Mot de passe</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Login</source>
-        <translation>Connexion</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -546,64 +546,18 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../../Include/imtreport/CInspectionReportBuilderComp.cpp" line="+113"/>
-        <source>Gap</source>
+        <location filename="../../../Include/imtlog/CEventHistoryGroupReader.cpp" line="+237"/>
+        <source>No compressor component. Load history container failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Narrow</source>
+        <location line="+10"/>
+        <source>Cannot create temporary folder. Load history container failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Wide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Beyond area</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+133"/>
-        <source>Inspection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <location line="+46"/>
-        <source>Region</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-45"/>
-        <location line="+46"/>
-        <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
-    </message>
-    <message>
-        <location line="-45"/>
-        <location line="+46"/>
-        <source>Length</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-45"/>
-        <location line="+46"/>
-        <source>Value mm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-45"/>
-        <location line="+46"/>
-        <source>Tolerance mm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-45"/>
-        <location line="+46"/>
-        <source>Diff</source>
+        <location line="+12"/>
+        <source>Unable to deserialize history container &quot;%1&quot;. History container skipped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -662,19 +616,9 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtloggui/CLoginEventItem.cpp" line="+93"/>
-        <source>User name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-2"/>
-        <source>Action</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-17"/>
+        <location filename="../../../Include/imtloggui/CLoginEventItem.cpp" line="+74"/>
         <source>Login</source>
-        <translation type="unfinished">Connexion</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -682,49 +626,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="+139"/>
-        <location line="+142"/>
-        <location line="+441"/>
-        <location line="+816"/>
-        <location line="+40"/>
-        <source>Target folder &apos;%1&apos; could not be created</source>
+        <location line="+14"/>
+        <source>Action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-1214"/>
-        <source>Revision &apos;%1&apos; does not contain object data file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+373"/>
-        <source>File could not be saved into &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+776"/>
-        <source>Revision contents file &apos;%1&apos; not exists</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-1365"/>
-        <location line="+220"/>
-        <location line="+1216"/>
-        <source>Revision &apos;%1&apos; could not be decompressed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtlog/CEventHistoryGroupReader.cpp" line="+237"/>
-        <source>No compressor component. Load history container failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Cannot create temporary folder. Load history container failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>Unable to deserialize history container &quot;%1&quot;. History container skipped</source>
+        <location line="+2"/>
+        <source>User name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -766,6 +674,98 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtqml/CQuickApplicationCompBase.cpp" line="+181"/>
         <source>ACF application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="+139"/>
+        <location line="+142"/>
+        <location line="+441"/>
+        <location line="+816"/>
+        <location line="+40"/>
+        <source>Target folder &apos;%1&apos; could not be created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1430"/>
+        <location line="+220"/>
+        <location line="+1216"/>
+        <source>Revision &apos;%1&apos; could not be decompressed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1220"/>
+        <source>Revision &apos;%1&apos; does not contain object data file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+373"/>
+        <source>File could not be saved into &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+776"/>
+        <source>Revision contents file &apos;%1&apos; not exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtreport/CInspectionReportBuilderComp.cpp" line="+113"/>
+        <source>Gap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Narrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Wide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Beyond area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+133"/>
+        <source>Inspection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+46"/>
+        <source>Region</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-45"/>
+        <location line="+46"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-45"/>
+        <location line="+46"/>
+        <source>Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-45"/>
+        <location line="+46"/>
+        <source>Value mm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-45"/>
+        <location line="+46"/>
+        <source>Tolerance mm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-45"/>
+        <location line="+46"/>
+        <source>Diff</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -842,7 +842,7 @@ Errors: 0</source>
     <message>
         <location line="+0"/>
         <source>Grid</source>
-        <translation type="unfinished">Grille</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1109,7 +1109,7 @@ Errors: 0</source>
         <location line="+9"/>
         <location line="+6"/>
         <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-6"/>
@@ -1335,12 +1335,12 @@ Errors: 0</source>
     </message>
     <message>
         <location line="+155"/>
-        <source>Name</source>
+        <source>Enter new object name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
-        <source>Enter new object name</source>
+        <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1363,9 +1363,21 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-157"/>
+        <location line="-192"/>
+        <location line="+194"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-194"/>
+        <location line="+194"/>
+        <source>Remove selected document from the collection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-159"/>
         <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
@@ -1384,41 +1396,29 @@ Errors: 0</source>
     </message>
     <message>
         <location line="+1"/>
-        <source>Duplicate selected objects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+55"/>
-        <source>Initial Revision</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-248"/>
-        <location line="+194"/>
-        <source>Remove selected document from the collection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-1"/>
         <source>Duplicate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Duplicate selected objects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+21"/>
         <location line="+56"/>
+        <source>Collection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-56"/>
+        <location line="+56"/>
         <source>New document could not be created</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-270"/>
-        <location line="+194"/>
-        <source>Remove</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <location line="+56"/>
-        <source>Collection</source>
+        <location line="-22"/>
+        <source>Initial Revision</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1442,33 +1442,33 @@ Errors: 0</source>
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+317"/>
         <location line="+313"/>
         <source>Login</source>
-        <translation>Connexion</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-284"/>
         <source>Quit</source>
-        <translation>Quitter</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Do you really want to quit?</source>
-        <translation>Voulez-vous vraiment fermer l&apos;application ?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+141"/>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Wrong password</source>
-        <translation>Mot de passe incorrect</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+305"/>
         <location line="+154"/>
         <source>&lt;unnamed&gt;</source>
-        <translation>&lt;sans nom&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1623,13 +1623,13 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtqml/CQuickApplicationComp.cpp" line="+143"/>
         <source>Quit</source>
-        <translation type="unfinished">Quitter</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>imtrepo::CFileCollectionComp</name>
     <message>
-        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="-137"/>
+        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="-66"/>
         <source>Input file name %1 renamed to %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1817,18 +1817,18 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+142"/>
-        <source>All known documents (%1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-124"/>
+        <location line="+18"/>
         <source>Export File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Document could not be exported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+118"/>
+        <source>All known documents (%1)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1839,52 +1839,52 @@ Errors: 0</source>
         <location line="+5"/>
         <location line="+4"/>
         <source>Report document</source>
-        <translation>Rapport</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+49"/>
         <source>Export to PDF...</source>
-        <translation>Exporter au format PDF...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>PDF...</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Export current report to PDF file</source>
-        <translation>Exporter le rapport sous forme de fichier PDF</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Export to TIFF...</source>
-        <translation>Exporter au format TIFF...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TIFF...</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Export current report to TIFF file</source>
-        <translation>Exporter le rapport sous forme d&apos;image TIFF</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show/Hide Grid</source>
-        <translation>Afficher/masquer grille</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Grid</source>
-        <translation>Grille</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set grid visible/unvisible</source>
-        <translation>Grille visible/invisible</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

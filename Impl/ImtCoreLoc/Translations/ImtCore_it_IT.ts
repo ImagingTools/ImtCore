@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US">
+<TS version="2.1" language="it_IT">
 <context>
     <name>Attribute</name>
     <message>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/EagleView/CEagleView.cpp" line="+65"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+51"/>
         <source>Report</source>
-        <translation>Rapport</translation>
+        <translation>Rapporto</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Report Files</source>
-        <translation>Rapports</translation>
+        <translation>Rapporti</translation>
     </message>
     <message>
         <location line="-30"/>
         <source>3D-Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>3D Viewer</translation>
     </message>
     <message>
         <location line="+32"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
-        <translation>(C) 2018 ImagingTools GmbH. Tous droits réservés.</translation>
+        <translation>(C) 2018 ImagingToolsGmbH. Tutti i diritti sono riservati.</translation>
     </message>
     <message>
         <location line="-26"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-28"/>
         <source>STL</source>
-        <translation type="unfinished"></translation>
+        <translation>STL</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>OBJ</source>
-        <translation type="unfinished"></translation>
+        <translation>OBJ</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -46,57 +46,57 @@
         <location line="+2"/>
         <location line="+2"/>
         <source>rad</source>
-        <translation type="unfinished"></translation>
+        <translation>Raggio</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Search radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Raggio di ricerca</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Mu</source>
-        <translation type="unfinished"></translation>
+        <translation>Mu</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Minimum angle</source>
-        <translation type="unfinished"></translation>
+        <translation>Angolo minimo</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Maximum angle</source>
-        <translation type="unfinished"></translation>
+        <translation>Angolo massimo</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Maximum surface angle</source>
-        <translation type="unfinished"></translation>
+        <translation>Angolo massimo della superficie</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Maximum nearest neighbors</source>
-        <translation type="unfinished"></translation>
+        <translation>Numero massimo di vicini più adiacenti</translation>
     </message>
     <message>
         <location line="-24"/>
         <location line="+34"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
         <source>ImtCore</source>
-        <translation></translation>
+        <translation>ImtCore</translation>
     </message>
     <message>
         <location line="-32"/>
         <location line="+30"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
         <source>ImagingTools GmbH</source>
-        <translation></translation>
+        <translation>ImagingTools GmbH</translation>
     </message>
 </context>
 <context>
@@ -105,7 +105,7 @@
         <location filename="../../../Include/imtgui/CCompositeObjectViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCompositeObjectViewComp.h" line="+156"/>
         <source>Main Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Finestra principale</translation>
     </message>
 </context>
 <context>
@@ -114,13 +114,13 @@
         <location filename="../../../Include/imtgui/CCustomLayoutSettings.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+379"/>
         <source>Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Dialogo</translation>
     </message>
     <message>
         <location line="+8"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+1"/>
         <source>Fixed Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout fissi</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -146,25 +146,25 @@
         <location line="+3"/>
         <location line="+3"/>
         <source>All Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Tutti i layout</translation>
     </message>
     <message>
         <location line="-422"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-28"/>
         <source>Border Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrare il bordo</translation>
     </message>
     <message>
         <location line="+34"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+2"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location line="+13"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+1"/>
         <source>Border Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Colore del bordo</translation>
     </message>
     <message>
         <location line="+37"/>
@@ -180,13 +180,14 @@
         <location line="+3"/>
         <location line="+3"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <location line="-301"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-20"/>
         <source>Min Width</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Larghezza minima</translatorcomment>
+        <translation>Larghezza minima</translation>
     </message>
     <message>
         <location line="+37"/>
@@ -194,49 +195,49 @@
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+2"/>
         <location line="+6"/>
         <source>16777215</source>
-        <translation type="unfinished"></translation>
+        <translation>16777215</translation>
     </message>
     <message>
         <location line="-81"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-5"/>
         <source>Max Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Larghezza massima</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Min Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Altezza miima</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Max Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Altezza massima</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Left Margin</source>
-        <translation type="unfinished"></translation>
+        <translation>Margine sinistro</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Right Margin</source>
-        <translation type="unfinished"></translation>
+        <translation>Margine destro</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Top Margin</source>
-        <translation type="unfinished"></translation>
+        <translation>Margine superiore</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Bottom Margin</source>
-        <translation type="unfinished"></translation>
+        <translation>Margine inferiore</translation>
     </message>
 </context>
 <context>
@@ -245,7 +246,7 @@
         <location filename="../../../Include/imtgui/CCustomLayoutWidgetForm.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="+280"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+97"/>
@@ -267,13 +268,13 @@
         <location line="+1"/>
         <location line="+3"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="-7"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="-1"/>
         <source>Set Icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostare immagine</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -281,7 +282,7 @@
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="+2"/>
         <location line="+1"/>
         <source>No Name</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Nessun Nome&gt;</translation>
     </message>
 </context>
 <context>
@@ -290,7 +291,7 @@
         <location filename="../../../Include/imtloggui/CEventStatisticsViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtloggui/ui_CEventStatisticsViewComp.h" line="+55"/>
         <source>ScrollArea</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -299,7 +300,7 @@
         <location filename="../../../Include/imtloggui/CEventViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtloggui/ui_CEventViewComp.h" line="+41"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -308,31 +309,31 @@
         <location filename="../../../Include/imtrepogui/CFileObjectCollectionRevisionDialog.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h" line="+75"/>
         <source>Select revision</source>
-        <translation type="unfinished"></translation>
+        <translation>Selezionare revisione</translation>
     </message>
     <message>
         <location line="+25"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h" line="+2"/>
         <source>Revision</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h" line="+2"/>
         <source>Backup time</source>
-        <translation type="unfinished"></translation>
+        <translation>Ora e data di archiviazione</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h" line="+2"/>
         <source>User</source>
-        <translation type="unfinished">Utilisateur</translation>
+        <translation>Utente</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h" line="+2"/>
         <source>Comment</source>
-        <translation type="unfinished"></translation>
+        <translation>Commento</translation>
     </message>
 </context>
 <context>
@@ -341,7 +342,7 @@
         <location filename="../../../Include/imtwidgets/CMenuPanel.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtwidgets/ui_CMenuPanel.h" line="+81"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -350,7 +351,7 @@
         <location filename="../../../Include/imtgui/CObjectCollectionMetaInfoViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionMetaInfoViewComp.h" line="+76"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -359,31 +360,31 @@
         <location filename="../../../Include/imtgui/CObjectCollectionViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+170"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+43"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+2"/>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+84"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>Enter some text to filter the item list</source>
-        <translation type="unfinished"></translation>
+        <translation>Inserire termine di ricerca</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiudere</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -392,7 +393,7 @@
         <location filename="../../../Include/imtreportgui/CReportDocumentViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtreportgui/ui_CReportDocumentViewComp.h" line="+51"/>
         <source>Report</source>
-        <translation type="unfinished">Rapport</translation>
+        <translation>Rapporto</translation>
     </message>
 </context>
 <context>
@@ -401,25 +402,25 @@
         <location filename="../../../Include/imtgui/CStandardDocumentViewDecorator.ui" line="+59"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+146"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Annullare</translation>
     </message>
     <message>
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripetere</translation>
     </message>
     <message>
         <location line="+70"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvare</translation>
     </message>
     <message>
         <location line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiudere</translation>
     </message>
 </context>
 <context>
@@ -444,67 +445,67 @@
         <location line="+35"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Welcome</source>
-        <translation>Bienvenue</translation>
+        <translation>Benvenuto</translation>
     </message>
     <message>
         <location line="+82"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Commands</source>
-        <translation type="unfinished"></translation>
+        <translation>Comandi</translation>
     </message>
     <message>
         <location line="+20"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Log</source>
-        <translation>Journal</translation>
+        <translation>Registro</translation>
     </message>
     <message>
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Log out</source>
-        <translation>Déconnexion</translation>
+        <translation>Logout</translation>
     </message>
     <message>
         <location line="+26"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Settings</source>
-        <translation>Paramètres</translation>
+        <translation>Impostazioni</translation>
     </message>
     <message>
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Tastiera</translation>
     </message>
     <message>
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Dashboard</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+20"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Quit</source>
-        <translation>Quitter</translation>
+        <translation>Terminare</translation>
     </message>
     <message>
         <location line="+206"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>User</source>
-        <translation>Utilisateur</translation>
+        <translation>Utente</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Password</source>
-        <translation>Mot de passe</translation>
+        <translation>Password</translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Login</source>
-        <translation>Connexion</translation>
+        <translation>Login</translation>
     </message>
 </context>
 <context>
@@ -513,19 +514,19 @@
         <location filename="../../../Include/imtwidgets/CToolButton.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+88"/>
         <source>Tool Button</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+33"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+1"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+35"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+1"/>
         <source>Add New Wizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuovo wizard</translation>
     </message>
 </context>
 <context>
@@ -534,13 +535,13 @@
         <location filename="../../../Include/imtgui/CMultiStatusProviderGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CMultiStatusProviderGuiComp.h" line="+92"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+25"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CMultiStatusProviderGuiComp.h" line="+1"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;StatusIcon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -548,138 +549,138 @@
     <message>
         <location filename="../../../Include/imtreport/CInspectionReportBuilderComp.cpp" line="+113"/>
         <source>Gap</source>
-        <translation type="unfinished"></translation>
+        <translation>Interruzione</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Narrow</source>
-        <translation type="unfinished"></translation>
+        <translation>stretto</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Wide</source>
-        <translation type="unfinished"></translation>
+        <translation>largo</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Beyond area</source>
-        <translation type="unfinished"></translation>
+        <translation>Fuori dal settore definito</translation>
     </message>
     <message>
         <location line="+133"/>
         <source>Inspection</source>
-        <translation type="unfinished"></translation>
+        <translation>Ispezione</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+46"/>
         <source>Region</source>
-        <translation type="unfinished"></translation>
+        <translation>Campo</translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
+        <translation>Errore</translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Lunghezza</translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Value mm</source>
-        <translation type="unfinished"></translation>
+        <translation>Valore mm</translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Tolerance mm</source>
-        <translation type="unfinished"></translation>
+        <translation>Tolleranza  mm</translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Diff</source>
-        <translation type="unfinished"></translation>
+        <translation>Differenza</translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CEventGroupLabelItem.cpp" line="+41"/>
         <source>Noname</source>
-        <translation type="unfinished"></translation>
+        <translation>Senza nome</translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CEventItemBase.cpp" line="+86"/>
         <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+51"/>
         <source>UNKNOWN</source>
-        <translation type="unfinished"></translation>
+        <translation>SCONOSCIUTO</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
         <source>WARNING</source>
-        <translation type="unfinished"></translation>
+        <translation>AVVISO</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
         <source>ERROR</source>
-        <translation type="unfinished"></translation>
+        <translation>ERRORE</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
         <source>CRITICAL</source>
-        <translation type="unfinished"></translation>
+        <translation>ERRORE DI SISTEMA</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation>Timbro dell&apos;ora</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Fonte</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Descrizione</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Stato</translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CLoginEventItem.cpp" line="+93"/>
         <source>User name</source>
-        <translation type="unfinished"></translation>
+        <translation>Utente</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Azione</translation>
     </message>
     <message>
         <location line="-17"/>
         <source>Login</source>
-        <translation type="unfinished">Connexion</translation>
+        <translation>Login</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Logout</source>
-        <translation type="unfinished"></translation>
+        <translation>Logout</translation>
     </message>
     <message>
         <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="+139"/>
@@ -688,44 +689,44 @@
         <location line="+816"/>
         <location line="+40"/>
         <source>Target folder &apos;%1&apos; could not be created</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è stato possibile creare la directory di destinazione &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="-1214"/>
         <source>Revision &apos;%1&apos; does not contain object data file</source>
-        <translation type="unfinished"></translation>
+        <translation>Revisione &apos;%1&apos; non contiene alcun file con dati dell&apos;oggetto</translation>
     </message>
     <message>
         <location line="+373"/>
         <source>File could not be saved into &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Non ê stato possibile salvare il file nella directory &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+776"/>
         <source>Revision contents file &apos;%1&apos; not exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Il file con i contenuti dell&apos;archvio &apos;%1&apos; non è disponibile</translation>
     </message>
     <message>
         <location line="-1365"/>
         <location line="+220"/>
         <location line="+1216"/>
         <source>Revision &apos;%1&apos; could not be decompressed</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è stato possibile decomprimere i contenuti dell&apos;archivio &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlog/CEventHistoryGroupReader.cpp" line="+237"/>
         <source>No compressor component. Load history container failed</source>
-        <translation type="unfinished"></translation>
+        <translation>La funzione compressore manca. Caricamento della cronologia fallito</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Cannot create temporary folder. Load history container failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è possibile creare la cartella temporanea. Caricamento della cronologia fallita</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Unable to deserialize history container &quot;%1&quot;. History container skipped</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è stato possibile elaborare la cronologia &quot;%1&quot;. Interrotto</translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CProductionQualityItem.cpp" line="+126"/>
@@ -733,7 +734,10 @@
 Warnings: %2
 Noks: %3
 Errors: %4</source>
-        <translation type="unfinished"></translation>
+        <translation>OK: %1
+Avvisi: %2
+NOK: %3
+Errori: %4</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -741,32 +745,35 @@ Errors: %4</source>
 Warnings: 0
 Noks: 0
 Errors: 0</source>
-        <translation type="unfinished"></translation>
+        <translation>OK: 0
+Avvisi: 0
+NOK: 0
+Errori: 0</translation>
     </message>
     <message>
         <location line="+373"/>
         <source>Oks</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Warnings</source>
-        <translation type="unfinished"></translation>
+        <translation>Avvisi</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Noks</source>
-        <translation type="unfinished"></translation>
+        <translation>NOK</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Errori</translation>
     </message>
     <message>
         <location filename="../../../Include/imtqml/CQuickApplicationCompBase.cpp" line="+181"/>
         <source>ACF application</source>
-        <translation type="unfinished"></translation>
+        <translation>Applicazione ACF</translation>
     </message>
 </context>
 <context>
@@ -774,22 +781,22 @@ Errors: 0</source>
     <message>
         <location filename="../../../3rdParty/quazip/quazip/quagzipfile.cpp" line="+60"/>
         <source>QIODevice::Append is not supported for GZIP</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Opening gzip for both reading and writing is not supported</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>You can open a gzip either for reading or for writing. Which is it?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Could not gzopen() file</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -797,12 +804,12 @@ Errors: 0</source>
     <message>
         <location filename="../../../3rdParty/quazip/quazip/quaziodevice.cpp" line="+188"/>
         <source>QIODevice::Append is not supported for QuaZIODevice</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>QIODevice::ReadWrite is not supported for QuaZIODevice</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -810,7 +817,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../3rdParty/quazip/quazip/quazipfile.cpp" line="+251"/>
         <source>ZIP/UNZIP API error %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -819,7 +826,7 @@ Errors: 0</source>
         <location filename="../../../Include/imtgui/CSingleStatusProviderGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CSingleStatusProviderGuiComp.h" line="+59"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Forma</translation>
     </message>
 </context>
 <context>
@@ -827,262 +834,262 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imt3dgui/CView3dProviderComp.cpp" line="+397"/>
         <source>Zoom in</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingrandire</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Zoom out</source>
-        <translation type="unfinished"></translation>
+        <translation>Rimpicciolire</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrare la griglia</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Grid</source>
-        <translation type="unfinished">Grille</translation>
+        <translation>Griglia</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show Axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrare gli assi</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Assi</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show Ruler</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrare lo strumento di misurazione</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Ruler</source>
-        <translation type="unfinished"></translation>
+        <translation>Strumento di misurazone</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Reset View</source>
-        <translation type="unfinished"></translation>
+        <translation>Resettare la visualizzazione</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Resettare</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Right View</source>
-        <translation type="unfinished"></translation>
+        <translation>Da destra</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation>da destra</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Front View</source>
-        <translation type="unfinished"></translation>
+        <translation>Frontale</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Front</source>
-        <translation type="unfinished"></translation>
+        <translation>Frontale</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Top View</source>
-        <translation type="unfinished"></translation>
+        <translation>Da sopra</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Top</source>
-        <translation type="unfinished"></translation>
+        <translation>Da sopra</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Left View</source>
-        <translation type="unfinished"></translation>
+        <translation>Da sinistra</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Da sinistra</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Bottom View</source>
-        <translation type="unfinished"></translation>
+        <translation>Da sotto</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Bottom</source>
-        <translation type="unfinished"></translation>
+        <translation>Da sotto</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Back View</source>
-        <translation type="unfinished"></translation>
+        <translation>Da dietro</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Da dietro</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Select Point</source>
-        <translation type="unfinished"></translation>
+        <translation>Selezionare punti</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Point Selection Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Punti</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Select Box</source>
-        <translation type="unfinished"></translation>
+        <translation>Selezionare la casella</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Box Selection Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Rettangolo</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Select Circle</source>
-        <translation type="unfinished"></translation>
+        <translation>Selezionare il cerchio</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Circle Selection Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Selezionel cerchio</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Clear Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Resettare la selezione</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>Resettare</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Select all</source>
-        <translation type="unfinished"></translation>
+        <translation>Selezionare tutto</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Invert Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Invertire la selezione</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Invert</source>
-        <translation type="unfinished"></translation>
+        <translation>Invertire</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancellare la selezione</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancellare</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Free Rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotazione libera</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Free Rotation Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Attivare la rotazione libera</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rotation around X-Axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotazione intorno all&apos;asse X</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>X-Rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotazione asse  X</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Rotation around X-Axis Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Attivare la rotazione asse X</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rotation around Y-Axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotazione intorno all&apos;asse Y</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Y-Rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotazione asse Y</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Rotation around Y-Axis Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotazione asse Y</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rotation around Z-Axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotazione intorno all&apos;asse Z</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Z-Rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotazione asse Z</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Rotation around Z-Axis Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotazione asse Z</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>View</source>
-        <translation type="unfinished"></translation>
+        <translation>Panoramica</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>View Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Modalità panoramica</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set View Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Selezionare la modalità panoramica</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Selezione</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Selection Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Modalità selezione</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Selection Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostare la modalità di selezione</translation>
     </message>
 </context>
 <context>
@@ -1090,7 +1097,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtgui/CHierarchicalLayoutWidget.cpp" line="+185"/>
         <source>Empty</source>
-        <translation type="unfinished"></translation>
+        <translation>Vuoto</translation>
     </message>
 </context>
 <context>
@@ -1098,93 +1105,93 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtgui/CDocumentWorkspaceGuiComp.cpp" line="+67"/>
         <source>Document Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome del documento</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Please enter the name of the document:</source>
-        <translation type="unfinished"></translation>
+        <translation>Inserire il nome del documento:</translation>
     </message>
     <message>
         <location line="+9"/>
         <location line="+6"/>
         <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
+        <translation>Errore</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>The document name contains some not allowed characters</source>
-        <translation type="unfinished"></translation>
+        <translation>Il nome del documento contiene caratteri non consentiti</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>The document name cannot be empty!</source>
-        <translation type="unfinished"></translation>
+        <translation>Il nome del documento non può essere vuoto!</translation>
     </message>
     <message>
         <location line="+51"/>
         <source>File could not be saved!</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è stato possibile salvare il file!</translation>
     </message>
     <message>
         <location line="+62"/>
         <source>&amp;Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Annullare</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Annullare</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Undo last document changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Annullare le ultime modifiche</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ripetere</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripetere</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Redo last document changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripetere le ultime modifiche</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiudere</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiudere</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Close the document</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiudere il documento</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Save</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Salvare</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvare</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Save the document changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvare le modifiche</translation>
     </message>
 </context>
 <context>
@@ -1193,33 +1200,33 @@ Errors: 0</source>
         <location filename="../../../Include/imtgui/CDocumentWorkspaceGuiCompBase.cpp" line="+168"/>
         <location line="+724"/>
         <source>&lt;no name&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;senza nome&gt;</translation>
     </message>
     <message>
         <location line="-716"/>
         <source>%1 &lt;%2&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>%1&lt;%2&gt;</translation>
     </message>
     <message>
         <location line="+337"/>
         <source>Close document</source>
-        <translation type="unfinished"></translation>
+        <translation>Chiudere il documento</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Do you want to save your changes made in document
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Si desidera salvare le modifiche nel documento %1</translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Tab %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pagina %1</translation>
     </message>
     <message>
         <location line="+223"/>
         <source>Document could not be opened</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è stato possibile aprire il documento</translation>
     </message>
 </context>
 <context>
@@ -1227,77 +1234,77 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtgui/CLayoutManagerGuiComp.cpp" line="+275"/>
         <source>Edit Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Modalità di modifica</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>EditMode</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Clear All</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare tutto</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>ClearAll</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importare</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Esportare</translation>
     </message>
     <message>
         <location line="+86"/>
         <source>Do you want clear all layout items?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vuole davvero eliminare tutti gli elementi del layout?</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Import Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Importare il layout</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Import Layout...</source>
-        <translation type="unfinished"></translation>
+        <translation>Importare il layout...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Layout could not be imported</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è stato possibile importare il layout</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Export Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Esportare il layout</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Export Layout...</source>
-        <translation type="unfinished"></translation>
+        <translation>Esportare il layout...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Layout could not be exported</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è stato possibile esportare il layout</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Open Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Caricare l&apos;immagine</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Image Files (*.png *.jpg *.bmp *.ico *.svg)</source>
-        <translation type="unfinished"></translation>
+        <translation>File di immagini (*.png *.jpg *.bmp *.ico *.svg)</translation>
     </message>
 </context>
 <context>
@@ -1306,52 +1313,52 @@ Errors: 0</source>
         <location filename="../../../Include/imtgui/CObjectCollectionViewComp.cpp" line="+85"/>
         <location line="+22"/>
         <source>Reading collection...</source>
-        <translation type="unfinished"></translation>
+        <translation>Leggere la banca dati...</translation>
     </message>
     <message>
         <location line="+693"/>
         <source>Update...</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiornamento...</translation>
     </message>
     <message>
         <location line="+183"/>
         <source>Edit...</source>
-        <translation type="unfinished"></translation>
+        <translation>Modificare...</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Set Description...</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostare la descrizione...</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation>Rinominare...</translation>
     </message>
     <message>
         <location line="+155"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Enter new object name</source>
-        <translation type="unfinished"></translation>
+        <translation>Inserire nuovo nome</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Enter object description</source>
-        <translation type="unfinished"></translation>
+        <translation>Inserire descrizione</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Descrizione</translation>
     </message>
 </context>
 <context>
@@ -1360,66 +1367,66 @@ Errors: 0</source>
         <location filename="../../../Include/imtgui/CObjectCollectionViewDelegate.cpp" line="+121"/>
         <location line="+217"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuovo</translation>
     </message>
     <message>
         <location line="-157"/>
         <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
+        <translation>Errore</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The document name contains some not allowed characters</source>
-        <translation type="unfinished"></translation>
+        <translation>Il nome del documento contiene caratteri non consentiti</translation>
     </message>
     <message>
         <location line="+157"/>
         <source>Insert</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuovo</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Insert new document into the collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungere nuovo documento</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Duplicate selected objects</source>
-        <translation type="unfinished"></translation>
+        <translation>Duplicare gli oggetti selezionati</translation>
     </message>
     <message>
         <location line="+55"/>
         <source>Initial Revision</source>
-        <translation type="unfinished"></translation>
+        <translation>Revisione iniziale</translation>
     </message>
     <message>
         <location line="-248"/>
         <location line="+194"/>
         <source>Remove selected document from the collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare il documento selezionato</translation>
     </message>
     <message>
         <location line="-1"/>
         <source>Duplicate</source>
-        <translation type="unfinished"></translation>
+        <translation>Duplicare</translation>
     </message>
     <message>
         <location line="+21"/>
         <location line="+56"/>
         <source>New document could not be created</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è stato possibile creare un nuovo documento</translation>
     </message>
     <message>
         <location line="-270"/>
         <location line="+194"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare</translation>
     </message>
     <message>
         <location line="+20"/>
         <location line="+56"/>
         <source>Collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Banca dati</translation>
     </message>
 </context>
 <context>
@@ -1428,12 +1435,12 @@ Errors: 0</source>
         <location filename="../../../Include/imtgui/CStandardCollectionDelegateComp.cpp" line="+86"/>
         <location line="+39"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Modificare</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Edit existing object</source>
-        <translation type="unfinished"></translation>
+        <translation>Modificare un oggetto esistente</translation>
     </message>
 </context>
 <context>
@@ -1442,33 +1449,33 @@ Errors: 0</source>
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+317"/>
         <location line="+313"/>
         <source>Login</source>
-        <translation>Connexion</translation>
+        <translation>Login</translation>
     </message>
     <message>
         <location line="-284"/>
         <source>Quit</source>
-        <translation>Quitter</translation>
+        <translation>Terminare</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Do you really want to quit?</source>
-        <translation>Voulez-vous vraiment fermer l&apos;application ?</translation>
+        <translation>Desidera terminare l&apos;applicazione?</translation>
     </message>
     <message>
         <location line="+141"/>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation>Errore</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Wrong password</source>
-        <translation>Mot de passe incorrect</translation>
+        <translation>Password errata</translation>
     </message>
     <message>
         <location line="+305"/>
         <location line="+154"/>
         <source>&lt;unnamed&gt;</source>
-        <translation>&lt;sans nom&gt;</translation>
+        <translation>&lt;senza nome&gt;</translation>
     </message>
 </context>
 <context>
@@ -1476,17 +1483,17 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtlog/CEventHistoryControllerComp.cpp" line="+184"/>
         <source>Log folder not specified. Event history disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Cartella del protocollo non indicata. Cronologia degli avvenimenti disattivata</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Unable access log folder. Event history disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è possibile accedere alla cartella del protocollo. Cronologia degli avvenimenti disattivata</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Unavailable version info provider. Event history disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Versione del provider di informazioni non disponibile. Cronologia degli avvenimenti disattivata</translation>
     </message>
 </context>
 <context>
@@ -1494,22 +1501,22 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtlog/CEventHistoryGroupController.cpp" line="+342"/>
         <source>Unable to serialize message history container &quot;%1&quot;. Event container skipped</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Unable to compress message history container &quot;%1&quot;. Event container skipped</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Unable to copy history archive to repository. Event container skipped</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Cannot create temporary folder. Event container skipped</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1522,7 +1529,7 @@ Errors: 0</source>
         <location line="+1"/>
         <location line="+1"/>
         <source>%1 Events</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Eventi</translation>
     </message>
 </context>
 <context>
@@ -1530,92 +1537,92 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtloggui/CEventViewComp.cpp" line="+346"/>
         <source>First event</source>
-        <translation type="unfinished"></translation>
+        <translation>Primo evento</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>First</source>
-        <translation type="unfinished"></translation>
+        <translation>Primo evento</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Move to first event</source>
-        <translation type="unfinished"></translation>
+        <translation>Navigare al primo evento</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Previous event</source>
-        <translation type="unfinished"></translation>
+        <translation>Evento precedente</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Evento precedente</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Move to previous event</source>
-        <translation type="unfinished"></translation>
+        <translation>Navigare all&apos;evento precedente</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Next event</source>
-        <translation type="unfinished"></translation>
+        <translation>Prossimo evento</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Prossimo evento</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Move to next event</source>
-        <translation type="unfinished"></translation>
+        <translation>Navigare al prossimo evento</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Last event</source>
-        <translation type="unfinished"></translation>
+        <translation>Ultimo evento</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Last</source>
-        <translation type="unfinished"></translation>
+        <translation>Ultimo evento</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Move to last event</source>
-        <translation type="unfinished"></translation>
+        <translation>Andare all&apos;ultimo evento</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Zoom in</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingrandire</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>ZoomIn</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Zoom out</source>
-        <translation type="unfinished"></translation>
+        <translation>Rimpicciolire</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>ZoomOut</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Zoom reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Resettare lo zoom</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>ZoomReset</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1623,7 +1630,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtqml/CQuickApplicationComp.cpp" line="+143"/>
         <source>Quit</source>
-        <translation type="unfinished">Quitter</translation>
+        <translation>Terminare</translation>
     </message>
 </context>
 <context>
@@ -1631,7 +1638,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="-137"/>
         <source>Input file name %1 renamed to %2</source>
-        <translation type="unfinished"></translation>
+        <translation>File %1 rinominato in %2</translation>
     </message>
 </context>
 <context>
@@ -1639,57 +1646,57 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtrepogui/CDocumentBasedFileCollectionDelegateComp.cpp" line="+93"/>
         <source>Collection Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestione dati</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The file could not be created</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è stato possibile creare il file</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Remove selected document from the collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminare il documento selezionato</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Document &quot;%1&quot; is currently being edited and cannot be deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Il documento &apos;%1&apos; è in fase di elaborazione e non può essere cancellato</translation>
     </message>
     <message>
         <location line="+126"/>
         <source>Document &quot;%1&quot;could not be opened</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è stato possibile aprire il documento&quot;%1&quot;</translation>
     </message>
     <message>
         <location line="+74"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Modificare</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Edit existing object</source>
-        <translation type="unfinished"></translation>
+        <translation>Modificar un oggetto esistente</translation>
     </message>
     <message>
         <location line="+188"/>
         <source>Initial Revision</source>
-        <translation type="unfinished"></translation>
+        <translation>Revisione iniziale</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Comment your changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Commento</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please enter comment for your changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Si prega di commentare le sue modifiche apportate</translation>
     </message>
 </context>
 <context>
@@ -1697,7 +1704,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtrepogui/CFileObjectCollectionRevisionDialog.cpp" line="+52"/>
         <source>Restore</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripristinare</translation>
     </message>
     <message>
         <location line="+24"/>
@@ -1705,27 +1712,27 @@ Errors: 0</source>
         <location line="+1"/>
         <location line="+1"/>
         <source>Revision package not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Set dati archivio non trovato</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Esportare</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Export File</source>
-        <translation type="unfinished"></translation>
+        <translation>Esportare il file</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Banca dati</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Document could not be exported</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è stato possibile esportare il file</translation>
     </message>
 </context>
 <context>
@@ -1733,103 +1740,103 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtrepogui/CFileObjectCollectionViewDelegate.cpp" line="+55"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Descrizione</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiunto</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Last Modified</source>
-        <translation type="unfinished"></translation>
+        <translation>Modificato</translation>
     </message>
     <message>
         <location line="+51"/>
         <source>Initial Revision</source>
-        <translation type="unfinished"></translation>
+        <translation>Revisione iniziale</translation>
     </message>
     <message>
         <location line="+119"/>
         <source>Import from File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Importazione file...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Import existing file into the collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Importare un file esistente</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Export to File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Esportare il file...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Export data from the collection to a file</source>
-        <translation type="unfinished"></translation>
+        <translation>Esportare il file</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Restore revision...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripristinare dall&apos;archivio...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Restore</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripristinare</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Restore data from backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripristinare dati dall&apos;archivio</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Import File</source>
-        <translation type="unfinished"></translation>
+        <translation>Importazione file</translation>
     </message>
     <message>
         <location line="+13"/>
         <location line="+24"/>
         <source>Collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Banca dati</translation>
     </message>
     <message>
         <location line="-24"/>
         <source>Document could not be imported</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è stato possibile importare il file</translation>
     </message>
     <message>
         <location line="+142"/>
         <source>All known documents (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tutti i tipi di file conosciuti(%1)</translation>
     </message>
     <message>
         <location line="-124"/>
         <source>Export File</source>
-        <translation type="unfinished"></translation>
+        <translation>Esportazione file</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Document could not be exported</source>
-        <translation type="unfinished"></translation>
+        <translation>Non è stato possibile esportare il file</translation>
     </message>
 </context>
 <context>
@@ -1839,12 +1846,12 @@ Errors: 0</source>
         <location line="+5"/>
         <location line="+4"/>
         <source>Report document</source>
-        <translation>Rapport</translation>
+        <translation>Rapporto</translation>
     </message>
     <message>
         <location line="+49"/>
         <source>Export to PDF...</source>
-        <translation>Exporter au format PDF...</translation>
+        <translation>Esportare in PDF...</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -1854,12 +1861,12 @@ Errors: 0</source>
     <message>
         <location line="+0"/>
         <source>Export current report to PDF file</source>
-        <translation>Exporter le rapport sous forme de fichier PDF</translation>
+        <translation>Esportare il report in un documento PDF</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Export to TIFF...</source>
-        <translation>Exporter au format TIFF...</translation>
+        <translation>Esportazione TIFF...</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -1869,22 +1876,22 @@ Errors: 0</source>
     <message>
         <location line="+0"/>
         <source>Export current report to TIFF file</source>
-        <translation>Exporter le rapport sous forme d&apos;image TIFF</translation>
+        <translation>Esportare il rapporto in un&apos;immagine TIFF</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show/Hide Grid</source>
-        <translation>Afficher/masquer grille</translation>
+        <translation>Mostrare/nascondere la griglia</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Grid</source>
-        <translation>Grille</translation>
+        <translation>Griglia</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set grid visible/unvisible</source>
-        <translation>Grille visible/invisible</translation>
+        <translation>Mostrare/nascondere la griglia</translation>
     </message>
 </context>
 </TS>

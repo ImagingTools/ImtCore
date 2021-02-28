@@ -1,0 +1,1 @@
+%QTDIR%\bin\lupdate.exe ..\..\..\ -target-language jp_JP -ts ImtCore_jp_JP.ts -recursive -locations relative

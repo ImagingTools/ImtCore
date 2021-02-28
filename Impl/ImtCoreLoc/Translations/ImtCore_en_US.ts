@@ -16,19 +16,19 @@
         <translation></translation>
     </message>
     <message>
-        <location line="-26"/>
+        <location line="-30"/>
         <source>3D-Viewer</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+32"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
         <translation></translation>
     </message>
     <message>
         <location line="-26"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-28"/>
         <source>STL</source>
         <translation></translation>
     </message>
@@ -85,16 +85,16 @@
         <translation></translation>
     </message>
     <message>
-        <location line="-26"/>
-        <location line="+36"/>
+        <location line="-24"/>
+        <location line="+34"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
         <source>ImtCore</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-34"/>
-        <location line="+32"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location line="-32"/>
+        <location line="+30"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
         <source>ImagingTools GmbH</source>
         <translation></translation>
     </message>
@@ -104,7 +104,6 @@
     <message>
         <location filename="../../../Include/imtgui/CCompositeObjectViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCompositeObjectViewComp.h" line="+156"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCompositeObjectViewComp.h" line="+156"/>
         <source>Main Window</source>
         <translation></translation>
     </message>
@@ -114,14 +113,12 @@
     <message>
         <location filename="../../../Include/imtgui/CCustomLayoutSettings.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+379"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+379"/>
         <source>Dialog</source>
         <translation></translation>
     </message>
     <message>
         <location line="+8"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+1"/>
         <source>Fixed Layouts</source>
         <translation></translation>
     </message>
@@ -148,38 +145,24 @@
         <location line="+3"/>
         <location line="+3"/>
         <location line="+3"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+1"/>
-        <location line="+2"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
         <source>All Layouts</source>
         <translation></translation>
     </message>
     <message>
         <location line="-422"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-28"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-28"/>
         <source>Border Enabled</source>
         <translation></translation>
     </message>
     <message>
         <location line="+34"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+2"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+2"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
         <location line="+13"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+1"/>
         <source>Border Color</source>
         <translation></translation>
     </message>
@@ -196,19 +179,12 @@
         <location line="+3"/>
         <location line="+3"/>
         <location line="+3"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+2"/>
-        <location line="+6"/>
-        <location line="+6"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
         <location line="-301"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-20"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-20"/>
         <source>Min Width</source>
         <translation></translation>
     </message>
@@ -217,57 +193,48 @@
         <location line="+88"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+2"/>
         <location line="+6"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+2"/>
-        <location line="+6"/>
         <source>16777215</source>
         <translation></translation>
     </message>
     <message>
         <location line="-81"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-5"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-5"/>
         <source>Max Width</source>
         <translation></translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Min Height</source>
         <translation></translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Max Height</source>
         <translation></translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Left Margin</source>
         <translation></translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Right Margin</source>
         <translation></translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Top Margin</source>
         <translation></translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Bottom Margin</source>
         <translation></translation>
     </message>
@@ -277,7 +244,6 @@
     <message>
         <location filename="../../../Include/imtgui/CCustomLayoutWidgetForm.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="+280"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="+280"/>
         <source>Form</source>
         <translation></translation>
     </message>
@@ -300,22 +266,12 @@
         <location line="+1"/>
         <location line="+1"/>
         <location line="+3"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="+1"/>
-        <location line="+1"/>
-        <location line="+1"/>
-        <location line="+1"/>
-        <location line="+1"/>
-        <location line="+1"/>
-        <location line="+1"/>
-        <location line="+1"/>
-        <location line="+3"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
         <location line="-7"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="-1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="-1"/>
         <source>Set Icon</source>
         <translation></translation>
     </message>
@@ -323,8 +279,6 @@
         <location line="+29"/>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="+2"/>
-        <location line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="+2"/>
         <location line="+1"/>
         <source>No Name</source>
         <translation></translation>
@@ -335,7 +289,6 @@
     <message>
         <location filename="../../../Include/imtloggui/CEventStatisticsViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtloggui/ui_CEventStatisticsViewComp.h" line="+55"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtloggui/ui_CEventStatisticsViewComp.h" line="+55"/>
         <source>ScrollArea</source>
         <translation></translation>
     </message>
@@ -345,7 +298,6 @@
     <message>
         <location filename="../../../Include/imtloggui/CEventViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtloggui/ui_CEventViewComp.h" line="+41"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtloggui/ui_CEventViewComp.h" line="+41"/>
         <source>Form</source>
         <translation></translation>
     </message>
@@ -388,7 +340,6 @@
     <message>
         <location filename="../../../Include/imtwidgets/CMenuPanel.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtwidgets/ui_CMenuPanel.h" line="+81"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtwidgets/ui_CMenuPanel.h" line="+81"/>
         <source>Form</source>
         <translation></translation>
     </message>
@@ -398,7 +349,6 @@
     <message>
         <location filename="../../../Include/imtgui/CObjectCollectionMetaInfoViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionMetaInfoViewComp.h" line="+76"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionMetaInfoViewComp.h" line="+76"/>
         <source>Form</source>
         <translation></translation>
     </message>
@@ -408,35 +358,30 @@
     <message>
         <location filename="../../../Include/imtgui/CObjectCollectionViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+170"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+170"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
         <location line="+43"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+2"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+2"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
         <location line="+84"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>Enter some text to filter the item list</source>
         <translation></translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>Close</source>
         <translation></translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>TextLabel</source>
         <translation></translation>
     </message>
@@ -446,7 +391,6 @@
     <message>
         <location filename="../../../Include/imtreportgui/CReportDocumentViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtreportgui/ui_CReportDocumentViewComp.h" line="+51"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtreportgui/ui_CReportDocumentViewComp.h" line="+51"/>
         <source>Report</source>
         <translation></translation>
     </message>
@@ -456,28 +400,24 @@
     <message>
         <location filename="../../../Include/imtgui/CStandardDocumentViewDecorator.ui" line="+59"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+146"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+146"/>
         <source>Undo</source>
         <translation></translation>
     </message>
     <message>
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Redo</source>
         <translation></translation>
     </message>
     <message>
         <location line="+70"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Save</source>
         <translation></translation>
     </message>
     <message>
         <location line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Close</source>
         <translation></translation>
     </message>
@@ -487,7 +427,6 @@
     <message>
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+544"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+544"/>
         <source>Main Window</source>
         <translation></translation>
     </message>
@@ -498,86 +437,72 @@
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <location line="+1"/>
         <location line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
-        <location line="+1"/>
-        <location line="+1"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
         <location line="+35"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Welcome</source>
         <translation></translation>
     </message>
     <message>
         <location line="+82"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Commands</source>
         <translation></translation>
     </message>
     <message>
         <location line="+20"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Log</source>
         <translation></translation>
     </message>
     <message>
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Log out</source>
         <translation></translation>
     </message>
     <message>
         <location line="+26"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Settings</source>
         <translation></translation>
     </message>
     <message>
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Keyboard</source>
         <translation></translation>
     </message>
     <message>
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Dashboard</source>
         <translation>Dashboard</translation>
     </message>
     <message>
         <location line="+20"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Quit</source>
         <translation></translation>
     </message>
     <message>
         <location line="+206"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>User</source>
         <translation></translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Password</source>
         <translation></translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Login</source>
         <translation></translation>
     </message>
@@ -587,21 +512,18 @@
     <message>
         <location filename="../../../Include/imtwidgets/CToolButton.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+88"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+88"/>
         <source>Tool Button</source>
         <translation></translation>
     </message>
     <message>
         <location line="+33"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+1"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
         <location line="+35"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+1"/>
         <source>Add New Wizard</source>
         <translation></translation>
     </message>
@@ -611,14 +533,12 @@
     <message>
         <location filename="../../../Include/imtgui/CMultiStatusProviderGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CMultiStatusProviderGuiComp.h" line="+92"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CMultiStatusProviderGuiComp.h" line="+92"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
         <location line="+25"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CMultiStatusProviderGuiComp.h" line="+1"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CMultiStatusProviderGuiComp.h" line="+1"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;StatusIcon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
@@ -626,7 +546,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../../Include/imtreport/CInspectionReportBuilderComp.cpp" line="+93"/>
+        <location filename="../../../Include/imtreport/CInspectionReportBuilderComp.cpp" line="+113"/>
         <source>Gap</source>
         <translation></translation>
     </message>
@@ -687,142 +607,72 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtlog/CMessageGroupInfoProviderComp.cpp" line="+24"/>
-        <location line="+18"/>
-        <source>User action event group</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="-17"/>
-        <location line="+18"/>
-        <source>User Action</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="-14"/>
-        <location line="+18"/>
-        <source>General event group</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="-17"/>
-        <location line="+18"/>
-        <source>General</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Production event group</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Production</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtloggui/CEventGroupControllerComp.cpp" line="+376"/>
-        <source>MinimumVerticalScale</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+39"/>
-        <source>Scale</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtloggui/CEventGroupItem.cpp" line="+21"/>
-        <location filename="../../../Include/imtloggui/CEventGroupLabelItem.cpp" line="+21"/>
+        <location filename="../../../Include/imtloggui/CEventGroupLabelItem.cpp" line="+41"/>
         <source>Noname</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtloggui/CEventFactoryCompBase.cpp" line="+71"/>
-        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+31"/>
+        <location filename="../../../Include/imtloggui/CEventItemBase.cpp" line="+86"/>
+        <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+51"/>
         <source>UNKNOWN</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+2"/>
         <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
         <source>OK</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtloggui/CClusterItem.cpp" line="+79"/>
-        <location line="+87"/>
-        <location line="+9"/>
-        <location line="+9"/>
-        <location line="+9"/>
-        <location line="+9"/>
-        <source>%1 Events</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="-105"/>
-        <source>NONE</source>
-        <translation></translation>
-    </message>
-    <message>
         <location line="+2"/>
-        <source>INFO</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <location filename="../../../Include/imtloggui/CEventFactoryCompBase.cpp" line="+3"/>
         <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
         <source>WARNING</source>
         <translation></translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../Include/imtloggui/CEventFactoryCompBase.cpp" line="+3"/>
         <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
         <source>ERROR</source>
         <translation></translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../Include/imtloggui/CEventFactoryCompBase.cpp" line="+3"/>
         <location filename="../../../Include/imtloggui/CIconBasedEventFactoryComp.cpp" line="+3"/>
         <source>CRITICAL</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtloggui/CEventFactoryCompBase.cpp" line="+12"/>
+        <location line="+13"/>
         <source>Timestamp</source>
         <translation>Zeit</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>Source</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <location filename="../../../Include/imtloggui/CLoginEventFactoryComp.cpp" line="+60"/>
+        <location line="+2"/>
         <source>Message</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+2"/>
         <source>Status</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtloggui/CLoginEventFactoryComp.cpp" line="+14"/>
+        <location filename="../../../Include/imtloggui/CLoginEventItem.cpp" line="+93"/>
         <source>User name</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-7"/>
-        <location line="+3"/>
+        <location line="-2"/>
         <source>Action</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-3"/>
+        <location line="-17"/>
         <source>Login</source>
         <translation></translation>
     </message>
@@ -832,24 +682,135 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="+55"/>
-        <location line="+57"/>
-        <location line="+122"/>
-        <location line="+393"/>
-        <location line="+811"/>
-        <location line="+26"/>
+        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="+139"/>
+        <location line="+142"/>
+        <location line="+441"/>
+        <location line="+816"/>
+        <location line="+40"/>
         <source>Target folder &apos;%1&apos; could not be created</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-822"/>
+        <location line="-1214"/>
+        <source>Revision &apos;%1&apos; does not contain object data file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+373"/>
         <source>File could not be saved into &apos;%1&apos;</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+802"/>
+        <location line="+776"/>
+        <source>Revision contents file &apos;%1&apos; not exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1365"/>
+        <location line="+220"/>
+        <location line="+1216"/>
         <source>Revision &apos;%1&apos; could not be decompressed</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtlog/CEventHistoryGroupReader.cpp" line="+237"/>
+        <source>No compressor component. Load history container failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Cannot create temporary folder. Load history container failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Unable to deserialize history container &quot;%1&quot;. History container skipped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtloggui/CProductionQualityItem.cpp" line="+126"/>
+        <source>Oks: %1
+Warnings: %2
+Noks: %3
+Errors: %4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Oks: 0
+Warnings: 0
+Noks: 0
+Errors: 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+373"/>
+        <source>Oks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Warnings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Noks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtqml/CQuickApplicationCompBase.cpp" line="+181"/>
+        <source>ACF application</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QuaGzipFile</name>
+    <message>
+        <location filename="../../../3rdParty/quazip/quazip/quagzipfile.cpp" line="+60"/>
+        <source>QIODevice::Append is not supported for GZIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Opening gzip for both reading and writing is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>You can open a gzip either for reading or for writing. Which is it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Could not gzopen() file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QuaZIODevice</name>
+    <message>
+        <location filename="../../../3rdParty/quazip/quazip/quaziodevice.cpp" line="+188"/>
+        <source>QIODevice::Append is not supported for QuaZIODevice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>QIODevice::ReadWrite is not supported for QuaZIODevice</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QuaZipFile</name>
+    <message>
+        <location filename="../../../3rdParty/quazip/quazip/quazipfile.cpp" line="+251"/>
+        <source>ZIP/UNZIP API error %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -857,7 +818,6 @@
     <message>
         <location filename="../../../Include/imtgui/CSingleStatusProviderGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CSingleStatusProviderGuiComp.h" line="+59"/>
-        <location filename="../../../Install/Temp/AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CSingleStatusProviderGuiComp.h" line="+59"/>
         <source>Form</source>
         <translation></translation>
     </message>
@@ -865,7 +825,7 @@
 <context>
     <name>imt3dgui::CView3dProviderComp</name>
     <message>
-        <location filename="../../../Include/imt3dgui/CView3dProviderComp.cpp" line="+377"/>
+        <location filename="../../../Include/imt3dgui/CView3dProviderComp.cpp" line="+397"/>
         <source>Zoom in</source>
         <translation></translation>
     </message>
@@ -1128,7 +1088,7 @@
 <context>
     <name>imtgui::CCustomLayoutWidget</name>
     <message>
-        <location filename="../../../Include/imtgui/CHierarchicalLayoutWidget.cpp" line="+165"/>
+        <location filename="../../../Include/imtgui/CHierarchicalLayoutWidget.cpp" line="+185"/>
         <source>Empty</source>
         <translation></translation>
     </message>
@@ -1136,7 +1096,7 @@
 <context>
     <name>imtgui::CDocumentWorkspaceGuiComp</name>
     <message>
-        <location filename="../../../Include/imtgui/CDocumentWorkspaceGuiComp.cpp" line="+47"/>
+        <location filename="../../../Include/imtgui/CDocumentWorkspaceGuiComp.cpp" line="+67"/>
         <source>Document Name</source>
         <translation>Product Name</translation>
     </message>
@@ -1230,7 +1190,7 @@
 <context>
     <name>imtgui::CDocumentWorkspaceGuiCompBase</name>
     <message>
-        <location filename="../../../Include/imtgui/CDocumentWorkspaceGuiCompBase.cpp" line="+148"/>
+        <location filename="../../../Include/imtgui/CDocumentWorkspaceGuiCompBase.cpp" line="+168"/>
         <location line="+724"/>
         <source>&lt;no name&gt;</source>
         <translation></translation>
@@ -1266,7 +1226,7 @@
 <context>
     <name>imtgui::CLayoutManagerGuiComp</name>
     <message>
-        <location filename="../../../Include/imtgui/CLayoutManagerGuiComp.cpp" line="+255"/>
+        <location filename="../../../Include/imtgui/CLayoutManagerGuiComp.cpp" line="+275"/>
         <source>Edit Mode</source>
         <translation></translation>
     </message>
@@ -1344,18 +1304,18 @@
 <context>
     <name>imtgui::CObjectCollectionViewComp</name>
     <message>
-        <location filename="../../../Include/imtgui/CObjectCollectionViewComp.cpp" line="+65"/>
+        <location filename="../../../Include/imtgui/CObjectCollectionViewComp.cpp" line="+85"/>
         <location line="+22"/>
         <source>Reading collection...</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+689"/>
+        <location line="+693"/>
         <source>Update...</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+182"/>
+        <location line="+183"/>
         <source>Edit...</source>
         <translation></translation>
     </message>
@@ -1375,7 +1335,7 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+153"/>
+        <location line="+155"/>
         <source>Name</source>
         <translation></translation>
     </message>
@@ -1398,13 +1358,23 @@
 <context>
     <name>imtgui::CObjectCollectionViewDelegate</name>
     <message>
-        <location filename="../../../Include/imtgui/CObjectCollectionViewDelegate.cpp" line="+98"/>
-        <location line="+203"/>
+        <location filename="../../../Include/imtgui/CObjectCollectionViewDelegate.cpp" line="+121"/>
+        <location line="+217"/>
         <source>New</source>
         <translation></translation>
     </message>
     <message>
+        <location line="-157"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location line="+0"/>
+        <source>The document name contains some not allowed characters</source>
+        <translation type="unfinished">The product name contains some not allowed characters</translation>
+    </message>
+    <message>
+        <location line="+157"/>
         <source>Insert</source>
         <translation></translation>
     </message>
@@ -1419,8 +1389,13 @@
         <translation></translation>
     </message>
     <message>
-        <location line="-179"/>
-        <location line="+180"/>
+        <location line="+55"/>
+        <source>Initial Revision</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-248"/>
+        <location line="+194"/>
         <source>Remove selected document from the collection</source>
         <translation>Remove selected file from the database</translation>
     </message>
@@ -1430,34 +1405,48 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+20"/>
-        <location line="+51"/>
+        <location line="+21"/>
+        <location line="+56"/>
         <source>New document could not be created</source>
         <translation>New file could not be created</translation>
     </message>
     <message>
-        <location line="-250"/>
-        <location line="+180"/>
+        <location line="-270"/>
+        <location line="+194"/>
         <source>Remove</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+19"/>
-        <location line="+51"/>
+        <location line="+20"/>
+        <location line="+56"/>
         <source>Collection</source>
         <translation>Database</translation>
     </message>
 </context>
 <context>
+    <name>imtgui::CStandardCollectionDelegateComp</name>
+    <message>
+        <location filename="../../../Include/imtgui/CStandardCollectionDelegateComp.cpp" line="+86"/>
+        <location line="+39"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Edit existing object</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>imtgui::CThumbnailDecoratorGuiComp</name>
     <message>
-        <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+297"/>
-        <location line="+301"/>
+        <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+317"/>
+        <location line="+313"/>
         <source>Login</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+458"/>
+        <location line="-284"/>
         <source>Quit</source>
         <translation></translation>
     </message>
@@ -1467,7 +1456,7 @@
         <translation></translation>
     </message>
     <message>
-        <location line="-601"/>
+        <location line="+141"/>
         <source>Error</source>
         <translation></translation>
     </message>
@@ -1477,7 +1466,7 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+289"/>
+        <location line="+305"/>
         <location line="+154"/>
         <source>&lt;unnamed&gt;</source>
         <translation></translation>
@@ -1486,7 +1475,7 @@
 <context>
     <name>imtlog::CEventHistoryControllerComp</name>
     <message>
-        <location filename="../../../Include/imtlog/CEventHistoryControllerComp.cpp" line="+106"/>
+        <location filename="../../../Include/imtlog/CEventHistoryControllerComp.cpp" line="+184"/>
         <source>Log folder not specified. Event history disabled</source>
         <translation></translation>
     </message>
@@ -1496,61 +1485,38 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+318"/>
-        <location line="+42"/>
-        <source>Unable to deserialize event container &quot;%1&quot;. Event container skipped</source>
-        <translation></translation>
+        <location line="+6"/>
+        <source>Unavailable version info provider. Event history disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>imtlog::CEventHistoryGroupController</name>
+    <message>
+        <location filename="../../../Include/imtlog/CEventHistoryGroupController.cpp" line="+342"/>
+        <source>Unable to serialize message history container &quot;%1&quot;. Event container skipped</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
-        <source>Unable to decompress event archive &quot;%1&quot;. Event archive skipped</source>
-        <translation></translation>
+        <location line="+14"/>
+        <source>Unable to compress message history container &quot;%1&quot;. Event container skipped</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
-        <source>Unable to create temporary directory</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+56"/>
-        <source>Skipped event container with nullptr in the queue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Skipped empty event container</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+25"/>
-        <source>Unable to decompress event archive &quot;%1&quot;. Day archive lost</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+9"/>
-        <source>Unable to serialize event container with begin time &quot;%1&quot;. Event container skipped</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Unable to compress event archive &quot;%1&quot;. Event container skipped. Day archive possibly lost</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Unable to copy event archive to log folder</source>
-        <translation></translation>
+        <location line="+15"/>
+        <source>Unable to copy history archive to repository. Event container skipped</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Cannot create temporary folder. Event container skipped</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>imtloggui::CEventStatisticsViewComp</name>
     <message>
-        <location filename="../../../Include/imtloggui/CEventStatisticsViewComp.cpp" line="+223"/>
+        <location filename="../../../Include/imtloggui/CEventStatisticsViewComp.cpp" line="+243"/>
         <location line="+21"/>
         <location line="+1"/>
         <location line="+1"/>
@@ -1563,7 +1529,7 @@
 <context>
     <name>imtloggui::CEventViewComp</name>
     <message>
-        <location filename="../../../Include/imtloggui/CEventViewComp.cpp" line="+218"/>
+        <location filename="../../../Include/imtloggui/CEventViewComp.cpp" line="+346"/>
         <source>First event</source>
         <translation></translation>
     </message>
@@ -1622,11 +1588,49 @@
         <source>Move to last event</source>
         <translation></translation>
     </message>
+    <message>
+        <location line="+1"/>
+        <source>Zoom in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>ZoomIn</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Zoom out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>ZoomOut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Zoom reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>ZoomReset</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>imtqml::CQuickApplicationComp</name>
+    <message>
+        <location filename="../../../Include/imtqml/CQuickApplicationComp.cpp" line="+143"/>
+        <source>Quit</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>imtrepo::CFileCollectionComp</name>
     <message>
-        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="-92"/>
+        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="-137"/>
         <source>Input file name %1 renamed to %2</source>
         <translation></translation>
     </message>
@@ -1634,7 +1638,7 @@
 <context>
     <name>imtrepogui::CDocumentBasedFileCollectionDelegateComp</name>
     <message>
-        <location filename="../../../Include/imtrepogui/CDocumentBasedFileCollectionDelegateComp.cpp" line="+73"/>
+        <location filename="../../../Include/imtrepogui/CDocumentBasedFileCollectionDelegateComp.cpp" line="+93"/>
         <source>Collection Manager</source>
         <translation></translation>
     </message>
@@ -1659,7 +1663,12 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+160"/>
+        <location line="+126"/>
+        <source>Document &quot;%1&quot;could not be opened</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+74"/>
         <source>Edit</source>
         <translation></translation>
     </message>
@@ -1685,9 +1694,45 @@
     </message>
 </context>
 <context>
+    <name>imtrepogui::CFileObjectCollectionRevisionDialog</name>
+    <message>
+        <location filename="../../../Include/imtrepogui/CFileObjectCollectionRevisionDialog.cpp" line="+52"/>
+        <source>Restore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <location line="+1"/>
+        <location line="+1"/>
+        <location line="+1"/>
+        <source>Revision package not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Export File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Collection</source>
+        <translation type="unfinished">Database</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Document could not be exported</source>
+        <translation type="unfinished">Product could not be exported</translation>
+    </message>
+</context>
+<context>
     <name>imtrepogui::CFileObjectCollectionViewDelegate</name>
     <message>
-        <location filename="../../../Include/imtrepogui/CFileObjectCollectionViewDelegate.cpp" line="+35"/>
+        <location filename="../../../Include/imtrepogui/CFileObjectCollectionViewDelegate.cpp" line="+55"/>
         <source>Type</source>
         <translation></translation>
     </message>
@@ -1707,7 +1752,12 @@
         <translation></translation>
     </message>
     <message>
-        <location line="+146"/>
+        <location line="+51"/>
+        <source>Initial Revision</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+119"/>
         <source>Import from File...</source>
         <translation></translation>
     </message>
@@ -1758,23 +1808,22 @@
     </message>
     <message>
         <location line="+13"/>
-        <location line="+38"/>
+        <location line="+24"/>
         <source>Collection</source>
         <translation>Database</translation>
     </message>
     <message>
-        <location line="-38"/>
+        <location line="-24"/>
         <source>Document could not be imported</source>
         <translation>Product could not be imported</translation>
     </message>
     <message>
-        <location line="+24"/>
-        <location line="+114"/>
+        <location line="+142"/>
         <source>All known documents (%1)</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-106"/>
+        <location line="-124"/>
         <source>Export File</source>
         <translation></translation>
     </message>
@@ -1787,7 +1836,7 @@
 <context>
     <name>imtreportgui::CReportDocumentViewComp</name>
     <message>
-        <location filename="../../../Include/imtreportgui/CReportDocumentViewComp.cpp" line="+73"/>
+        <location filename="../../../Include/imtreportgui/CReportDocumentViewComp.cpp" line="+93"/>
         <location line="+5"/>
         <location line="+4"/>
         <source>Report document</source>
