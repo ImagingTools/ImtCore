@@ -210,13 +210,13 @@ QTreeWidget[TabSimulation=true]::item:last
     padding-right: 15px;
 }
 
-QTreeWidget[TabSimulation=true]::item:selected 
+QTreeWidget[TabSimulation=true]::item:selected
 {
     background-color: rgb(255, 255, 255);
 	color: #335777;
 }
 
-QTreeWidget[TabSimulation=true]::item:!selected:hover 
+QTreeWidget[TabSimulation=true]::item:!selected:hover
 {
 	background-color: #dedede;
 }
@@ -283,7 +283,25 @@ QTabBar::tab[CollectionView=true]
 
 QTabBar::tab:selected[CollectionView=true] {
     color: #253f57;
-    background-color: #bfe2f5;
+    background-color: white;
+}
+
+
+QTabBar::tab::top:selected[CollectionView=true] {
+    border-bottom: 2px solid #eb6225;
+}
+
+QTabBar::tab::left:selected[CollectionView=true] {
+    border-left: 2px solid #eb6225;
+}
+
+
+QTabBar::tab::right:selected[CollectionView=true] {
+    border-left: 2px solid #eb6225;
+}
+
+QTabBar::tab::bottom:selected[CollectionView=true] {
+    border-bottom: 2px solid #f15a17;
 }
 
 
