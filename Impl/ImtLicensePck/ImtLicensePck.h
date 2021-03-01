@@ -7,14 +7,14 @@
 
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
-#include <imtlic/CFeatureCollectionComp.h>
+#include <imtlic/CFeaturePackageComp.h>
 #include <imtlic/CLicenseInfoManager.h>
 #include <imtlic/CLicenseBasedRightsProviderComp.h>
 #include <imtlic/CProductLicensingInfo.h>
 #include <imtlic/CProductCollection.h>
 #include <imtlic/CProductInstanceCollection.h>
 #include <imtlic/CProductLicensingInfoComp.h>
-#include <imtlic/CFeatureCollectonMetaInfoCreatorComp.h>
+#include <imtlic/CFeaturePackageMetaInfoCreatorComp.h>
 #include <imtlic/CProductLicensingInfoMetaInfoCreatorComp.h>
 
 
@@ -30,7 +30,7 @@ typedef icomp::TModelCompWrap<
 						imtlic::CFeatureInfo,
 						imtlic::IFeatureInfo,
 						iser::ISerializable>> FeatureInfo;
-typedef icomp::TModelCompWrap<imtlic::CFeatureCollectionComp> FeatureCollection;
+typedef icomp::TModelCompWrap<imtlic::CFeaturePackageComp> FeaturePackage;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtlic::CLicenseInfo,
@@ -58,7 +58,7 @@ typedef icomp::TModelCompWrap<
 						imtlic::CProductInstanceCollection,
 						imtlic::IProductInstanceInfoProvider,
 						iser::ISerializable>> ProductInstanceCollection;
-typedef imtlic::CFeatureCollectonMetaInfoCreatorComp FeatureCollectonMetaInfoCreator;
+typedef imtlic::CFeaturePackageMetaInfoCreatorComp FeaturePackageMetaInfoCreator;
 typedef imtlic::CProductLicensingInfoMetaInfoCreatorComp ProductLicensingInfoMetaInfoCreator;
 
 

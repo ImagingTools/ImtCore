@@ -1,4 +1,4 @@
-#include <imtlic/CFeatureCollection.h>
+#include <imtlic/CFeaturePackage.h>
 
 
 // Qt includes
@@ -18,14 +18,14 @@ namespace imtlic
 
 // public methods
 
-CFeatureCollection::CFeatureCollection()
+CFeaturePackage::CFeaturePackage()
 	:BaseClass("FeatureInfo", "Feature info", "FeatureInfoProvider"),
 	m_ownerPtr(nullptr)
 {
 }
 
 
-void CFeatureCollection::SetDependencies(const QByteArray& featureId, const QByteArrayList& dependentIds)
+void CFeaturePackage::SetDependencies(const QByteArray& featureId, const QByteArrayList& dependentIds)
 {
 	istd::CChangeNotifier notifier(this);
 
@@ -39,7 +39,7 @@ void CFeatureCollection::SetDependencies(const QByteArray& featureId, const QByt
 }
 
 
-void CFeatureCollection::SetParents(const QByteArrayList& parentIds)
+void CFeaturePackage::SetParents(const QByteArrayList& parentIds)
 {
 	istd::CChangeNotifier notifier(this);
 
@@ -53,7 +53,7 @@ void CFeatureCollection::SetParents(const QByteArrayList& parentIds)
 
 // reimplemented (IFeatureDependenciesProvider)
 
-QByteArrayList CFeatureCollection::GetFeatureDependencies(const QByteArray& featureId) const
+QByteArrayList CFeaturePackage::GetFeatureDependencies(const QByteArray& featureId) const
 {
 	if (m_dependencies.contains(featureId)){
 		return m_dependencies[featureId];
@@ -63,7 +63,7 @@ QByteArrayList CFeatureCollection::GetFeatureDependencies(const QByteArray& feat
 }
 
 
-const IFeatureInfoProvider* CFeatureCollection::GetDependencyContainer(const QByteArray& dependencyId) const
+const IFeatureInfoProvider* CFeaturePackage::GetDependencyContainer(const QByteArray& dependencyId) const
 {
 	if (m_ownerPtr != nullptr){
 		imtbase::ICollectionInfo::Ids featureInfoProviderIds = m_ownerPtr->GetElementIds();
@@ -91,31 +91,31 @@ const IFeatureInfoProvider* CFeatureCollection::GetDependencyContainer(const QBy
 
 // reimplemented (IFeatureInfoProvider)
 
-const imtbase::ICollectionInfo& CFeatureCollection::GetFeatureList() const
+const imtbase::ICollectionInfo& CFeaturePackage::GetFeatureList() const
 {
 	return m_collection;
 }
 
 
-const IFeatureInfo* CFeatureCollection::GetFeatureInfo(const QByteArray& featureId) const
+const IFeatureInfo* CFeaturePackage::GetFeatureInfo(const QByteArray& featureId) const
 {
 	return dynamic_cast<const IFeatureInfo*>(m_collection.GetObjectPtr(featureId));
 }
 
 
-const IFeatureDependenciesProvider* CFeatureCollection::GetDependenciesInfoProvider() const
+const IFeatureDependenciesProvider* CFeaturePackage::GetDependenciesInfoProvider() const
 {
 	return this;
 }
 
 
-const imtbase::ICollectionInfo* CFeatureCollection::GetParentFeatureInfoProviderList() const
+const imtbase::ICollectionInfo* CFeaturePackage::GetParentFeatureInfoProviderList() const
 {
 	return &m_parents;
 }
 
 
-const IFeatureInfoProvider* CFeatureCollection::GetParentFeatureInfoProvider(const QByteArray& parentId) const
+const IFeatureInfoProvider* CFeaturePackage::GetParentFeatureInfoProvider(const QByteArray& parentId) const
 {
 	if (m_ownerPtr != nullptr){
 		if (m_parents.GetElementIds().contains(parentId)){
@@ -139,7 +139,7 @@ const IFeatureInfoProvider* CFeatureCollection::GetParentFeatureInfoProvider(con
 
 // reimplemented (iser::ISerializable)
 
-bool CFeatureCollection::Serialize(iser::IArchive& archive)
+bool CFeaturePackage::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 

@@ -7,10 +7,12 @@
 
 // ImtCore includes
 #include <imtlicgui/CLicenseInfoEditorGuiComp.h>
-#include <imtlicgui/CFeatureCollectionGuiComp.h>
+#include <imtlicgui/CFeaturePackageGuiComp.h>
 #include <imtlicgui/CProductLicensingInfoGuiComp.h>
 #include <imtlicgui/CLicenseManagerViewDelegateComp.h>
 #include <imtlicgui/CFeatureCollectionViewDelegateComp.h>
+#include <imtlicgui/CFeatureInfoEditorGuiComp.h>
+#include <imtlicgui/CFeaturePackageViewDelegateComp.h>
 #include <imtlicgui/CProductLicensingInfoCollectionViewDelegateComp.h>
 
 
@@ -21,10 +23,12 @@ namespace ImtLicenseGuiPck
 {
 
 typedef imtlicgui::CLicenseInfoEditorGuiComp LicenseInfoEditorGui;
-typedef icomp::TModelCompWrap<imtlicgui::CFeatureCollectionGuiComp> FeatureCollectionGui;
+typedef icomp::TModelCompWrap<imtlicgui::CFeaturePackageGuiComp> FeaturePackageGui;
 typedef imtlicgui::CProductLicensingInfoGuiComp ProductLicensingInfoGui;
 typedef imtlicgui::CLicenseManagerViewDelegateComp LicenseManagerViewDelegate;
 typedef imtlicgui::CFeatureCollectionViewDelegateComp FeatureCollectionViewDelegate;
+typedef imtlicgui::CFeatureInfoEditorGuiComp FeatureInfoEditorGui;
+typedef imtlicgui::CFeaturePackageViewDelegateComp FeaturePackageViewDelegate;
 typedef imtlicgui::CProductLicensingInfoCollectionViewDelegateComp ProductLicensingInfoCollectionViewDelegate;
 
 

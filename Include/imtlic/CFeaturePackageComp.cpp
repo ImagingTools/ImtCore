@@ -1,4 +1,4 @@
-#include <imtlic/CFeatureCollectionComp.h>
+#include <imtlic/CFeaturePackageComp.h>
 
 
 namespace imtlic
@@ -9,7 +9,7 @@ namespace imtlic
 
 // reimplemented (icomp::CComponentBase)
 
-void CFeatureCollectionComp::OnComponentCreated()
+void CFeaturePackageComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 

@@ -1,4 +1,4 @@
-#include <imtlic/CFeatureCollectonMetaInfoCreatorComp.h>
+#include <imtlic/CFeaturePackageMetaInfoCreatorComp.h>
 
 
 // ACF includes
@@ -38,7 +38,7 @@ public:
 
 // reimplemented (imtbase::IMetaInfoCreator)
 
-imtbase::IMetaInfoCreator::TypeIds CFeatureCollectonMetaInfoCreatorComp::GetSupportedTypeIds() const
+imtbase::IMetaInfoCreator::TypeIds CFeaturePackageMetaInfoCreatorComp::GetSupportedTypeIds() const
 {
 	TypeIds retVal;
 
@@ -48,7 +48,7 @@ imtbase::IMetaInfoCreator::TypeIds CFeatureCollectonMetaInfoCreatorComp::GetSupp
 }
 
 
-bool CFeatureCollectonMetaInfoCreatorComp::CreateMetaInfo(
+bool CFeaturePackageMetaInfoCreatorComp::CreateMetaInfo(
 			const istd::IChangeable* dataPtr,
 			const QByteArray& typeId,
 			MetaInfoPtr& metaInfoPtr) const

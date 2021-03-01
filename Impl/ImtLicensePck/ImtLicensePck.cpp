@@ -20,9 +20,9 @@ I_EXPORT_COMPONENT(
 			"License Feature Information");
 
 I_EXPORT_COMPONENT(
-			FeatureCollection,
-			"Feature collection",
-			"License Feature Container Collection");
+			FeaturePackage,
+			"Feature package",
+			"License Feature Container Collection Package");
 
 I_EXPORT_COMPONENT(
 			LicenseInfo,
@@ -55,9 +55,9 @@ I_EXPORT_COMPONENT(
 			"License Products Installations");
 
 I_EXPORT_COMPONENT(
-			FeatureCollectonMetaInfoCreator,
-			"Feature collection metainfo creator",
-			"License Feature Metainfo Creator");
+			FeaturePackageMetaInfoCreator,
+			"Feature package metainfo creator",
+			"License Feature Package Metainfo Creator");
 
 I_EXPORT_COMPONENT(
 			ProductLicensingInfoMetaInfoCreator,

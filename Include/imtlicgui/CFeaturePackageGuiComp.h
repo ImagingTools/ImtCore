@@ -8,7 +8,7 @@
 
 // ImtCore includes
 #include <imtlic/IFeatureInfoProvider.h>
-#include <GeneratedFiles/imtlicgui/ui_CFeatureCollectionGuiComp.h>
+#include <GeneratedFiles/imtlicgui/ui_CFeaturePackageGuiComp.h>
 
 
 namespace imtlicgui
@@ -19,23 +19,23 @@ namespace imtlicgui
 	Editor for the product-related licensing.
 	\ingroup LicenseManagement
 */
-class CFeatureCollectionGuiComp:
+class CFeaturePackageGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CFeatureCollectionGuiComp, imtlic::IFeatureInfoProvider>,
+						Ui::CFeaturePackageGuiComp, imtlic::IFeatureInfoProvider>,
 			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CFeatureCollectionGuiComp, imtlic::IFeatureInfoProvider> BaseClass;
+				Ui::CFeaturePackageGuiComp, imtlic::IFeatureInfoProvider> BaseClass;
 
-	I_BEGIN_COMPONENT(CFeatureCollectionGuiComp);
+	I_BEGIN_COMPONENT(CFeaturePackageGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
 		I_ASSIGN(m_objectCollectionViewCompPtr, "ObjectCollectionView", "Object collection view", true, "ObjectCollectionView");
 		I_ASSIGN_TO(m_objectCollectionObserverCompPtr, m_objectCollectionViewCompPtr, true);
 	I_END_COMPONENT;
 
-	CFeatureCollectionGuiComp();
+	CFeaturePackageGuiComp();
 
 protected:
 	// reimplemented (ibase::ICommandsProvider)

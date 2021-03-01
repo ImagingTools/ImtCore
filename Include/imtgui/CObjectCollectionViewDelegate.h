@@ -89,13 +89,13 @@ protected:
 		void SetStatusIcon(const QIcon &statusIcon);
 		void SetStatusText(const QString &statusText);
 
-	private:
-		QIcon m_statusIcon;
-		QString m_statusText;
-
 		// reimplemented (IVisualStatus)
 		virtual QIcon GetStatusIcon() const override;
 		virtual QString GetStatusText() const override;
+
+	private:
+		QIcon m_statusIcon;
+		QString m_statusText;
 	};
 
 protected Q_SLOTS:

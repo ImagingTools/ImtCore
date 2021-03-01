@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtrepogui/CDocumentBasedFileCollectionViewDelegateComp.h>
+#include <imtgui/CStandardCollectionViewDelegateComp.h>
 
 
 namespace imtlicgui
@@ -10,14 +10,18 @@ namespace imtlicgui
 
 
 class CFeatureCollectionViewDelegateComp:
-			public imtrepogui::CDocumentBasedFileCollectionViewDelegateComp
+			public imtgui::CStandardCollectionViewDelegateComp
 {
 	Q_OBJECT
 public:
-	typedef imtrepogui::CDocumentBasedFileCollectionViewDelegateComp BaseClass;
+	typedef imtgui::CStandardCollectionViewDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CFeatureCollectionViewDelegateComp);
 	I_END_COMPONENT;
+
+	// reimplemented (imtgui::ICollectionViewDelegate)
+	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
+	virtual bool IsCommandSupported(int commandId) const override;
 
 protected:
 	// reimplemented (imtgui::CObjectCollectionViewDelegate)

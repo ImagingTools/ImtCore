@@ -15,14 +15,14 @@ namespace imtlic
 /**
 	Meta-info creator for the product' licensing information object.
 */
-class CFeatureCollectonMetaInfoCreatorComp:
+class CFeaturePackageMetaInfoCreatorComp:
 			public ilog::CLoggerComponentBase,
 			virtual public imtbase::IMetaInfoCreator
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CFeatureCollectonMetaInfoCreatorComp);
+	I_BEGIN_COMPONENT(CFeaturePackageMetaInfoCreatorComp);
 		I_REGISTER_INTERFACE(imtbase::IMetaInfoCreator);
 		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "Type-ID of the document", true, "ProductLicensingInfo");
 	I_END_COMPONENT;

@@ -1,4 +1,4 @@
-#include <imtlicgui/CFeatureCollectionGuiComp.h>
+#include <imtlicgui/CFeaturePackageGuiComp.h>
 
 
 // ACF includes
@@ -11,15 +11,15 @@ namespace imtlicgui
 
 // public methods
 
-CFeatureCollectionGuiComp::CFeatureCollectionGuiComp()
+CFeaturePackageGuiComp::CFeaturePackageGuiComp()
 	:m_showCollectionEditorCommand("Edit Feartures", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020),
 	m_showDependenciesEditorCommand("Edit Dependencies", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020)
 {
 	m_rootCommands.InsertChild(&m_showCollectionEditorCommand);
 	m_rootCommands.InsertChild(&m_showDependenciesEditorCommand);
 
-	connect(&m_showCollectionEditorCommand, &QAction::triggered, this, &CFeatureCollectionGuiComp::OnShowCollectionEditor);
-	connect(&m_showDependenciesEditorCommand, &QAction::triggered, this, &CFeatureCollectionGuiComp::OnShowFeatureDependencyEditor);
+	connect(&m_showCollectionEditorCommand, &QAction::triggered, this, &CFeaturePackageGuiComp::OnShowCollectionEditor);
+	connect(&m_showDependenciesEditorCommand, &QAction::triggered, this, &CFeaturePackageGuiComp::OnShowFeatureDependencyEditor);
 }
 
 
@@ -27,7 +27,7 @@ CFeatureCollectionGuiComp::CFeatureCollectionGuiComp()
 
 // reimplemented(ibase::ICommandsProvider)
 
-const ibase::IHierarchicalCommand* CFeatureCollectionGuiComp::GetCommands() const
+const ibase::IHierarchicalCommand* CFeaturePackageGuiComp::GetCommands() const
 {
 	return &m_rootCommands;
 }
@@ -35,19 +35,19 @@ const ibase::IHierarchicalCommand* CFeatureCollectionGuiComp::GetCommands() cons
 
 // reimplemented (iqtgui::CGuiComponentBase)
 
-void CFeatureCollectionGuiComp::OnGuiCreated()
+void CFeaturePackageGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 }
 
 
-void CFeatureCollectionGuiComp::OnGuiDestroyed()
+void CFeaturePackageGuiComp::OnGuiDestroyed()
 {
 	BaseClass::OnGuiDestroyed();
 }
 
 
-void CFeatureCollectionGuiComp::OnGuiRetranslate()
+void CFeaturePackageGuiComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
@@ -60,14 +60,14 @@ void CFeatureCollectionGuiComp::OnGuiRetranslate()
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
-void CFeatureCollectionGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CFeaturePackageGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	//imtlic::IProductLicensingInfo* licenseInfoPtr = GetObservedObject();
 	//Q_ASSERT(licenseInfoPtr != nullptr);
 }
 
 
-void CFeatureCollectionGuiComp::OnGuiModelAttached()
+void CFeaturePackageGuiComp::OnGuiModelAttached()
 {
 	BaseClass::OnGuiModelAttached();
 
@@ -82,7 +82,7 @@ void CFeatureCollectionGuiComp::OnGuiModelAttached()
 }
 
 
-void CFeatureCollectionGuiComp::OnGuiModelDetached()
+void CFeaturePackageGuiComp::OnGuiModelDetached()
 {
 	if (m_objectCollectionViewCompPtr.IsValid() && m_objectCollectionObserverCompPtr.IsValid()){
 		imod::IModel* modelPtr = GetObservedModel();
@@ -101,7 +101,7 @@ void CFeatureCollectionGuiComp::OnGuiModelDetached()
 }
 
 
-void CFeatureCollectionGuiComp::UpdateModel() const
+void CFeaturePackageGuiComp::UpdateModel() const
 {
 	//imtlic::IProductLicensingInfo* licenseInfoPtr = GetObservedObject();
 	//Q_ASSERT(licenseInfoPtr != nullptr);
@@ -110,13 +110,13 @@ void CFeatureCollectionGuiComp::UpdateModel() const
 
 // protected slots
 
-void CFeatureCollectionGuiComp::OnShowCollectionEditor()
+void CFeaturePackageGuiComp::OnShowCollectionEditor()
 {
 	Pages->setCurrentIndex(0);
 }
 
 
-void CFeatureCollectionGuiComp::OnShowFeatureDependencyEditor()
+void CFeaturePackageGuiComp::OnShowFeatureDependencyEditor()
 {
 	Pages->setCurrentIndex(1);
 }

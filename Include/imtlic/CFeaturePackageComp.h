@@ -10,18 +10,18 @@
 #include <imtlic/IFeatureInfoProvider.h>
 #include <imtbase/CCollectionInfo.h>
 #include <imtlic/CFeatureInfo.h>
-#include <imtlic/CFeatureCollection.h>
+#include <imtlic/CFeaturePackage.h>
 
 namespace imtlic
 {
 
 
-class CFeatureCollectionComp: public icomp::TMakeComponentWrap<CFeatureCollection>
+class CFeaturePackageComp: public icomp::TMakeComponentWrap<CFeaturePackage>
 {
 public:
-	typedef icomp::TMakeComponentWrap<CFeatureCollection> BaseClass;
+	typedef icomp::TMakeComponentWrap<CFeaturePackage> BaseClass;
 
-	I_BEGIN_COMPONENT(CFeatureCollectionComp);
+	I_BEGIN_COMPONENT(CFeaturePackageComp);
 		I_REGISTER_INTERFACE(IFeatureDependenciesProvider);
 		I_REGISTER_INTERFACE(IFeatureInfoProvider);
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);

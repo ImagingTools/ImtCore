@@ -13,14 +13,14 @@ namespace imtlic
 {
 
 
-class CFeatureCollection:
+class CFeaturePackage:
 			public imtbase::TAggergatedObjectCollectionWrap<IFeatureInfoProvider, CFeatureInfo>,
 			virtual public IFeatureDependenciesProvider
 {
 public:
 	typedef imtbase::TAggergatedObjectCollectionWrap<IFeatureInfoProvider, CFeatureInfo> BaseClass;
 
-	CFeatureCollection();
+	CFeaturePackage();
 
 	void SetDependencies(const QByteArray& featureId, const QByteArrayList& dependentIds);
 	void SetParents(const QByteArrayList& parentIds);

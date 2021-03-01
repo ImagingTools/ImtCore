@@ -416,7 +416,7 @@ void CObjectCollectionViewDelegate::OnAddMenuOptionClicked(QAction* action)
 }
 
 
-// private methods of the embedded class VisualStatus
+// public methods of the embedded class VisualStatus
 
 // reimplemented (IVisualStatus)
 
