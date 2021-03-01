@@ -30,7 +30,7 @@ public:
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(istd::IChangeable);
 		I_REGISTER_INTERFACE(istd::IPolymorphic);
-		I_ASSIGN(m_featurePackageCollectionCompPtr, "FeaturePackageCollection", "Feature packagec collection", true, "");
+		I_ASSIGN(m_featurePackageCollectionCompPtr, "FeaturePackageCollection", "Feature package collection", true, "");
 	I_END_COMPONENT
 
 protected:
