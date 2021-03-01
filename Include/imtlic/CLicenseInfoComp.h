@@ -22,7 +22,7 @@ class CLicenseInfoComp:
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-	typedef CLicenseInfoComp BaseClass2;
+	typedef CLicenseInfo BaseClass2;
 
 	I_BEGIN_COMPONENT(CLicenseInfoComp)
 		I_REGISTER_INTERFACE(ILicenseInfo);

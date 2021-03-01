@@ -12,6 +12,8 @@ namespace imtlic
 class CFeatureInfo: virtual public IFeatureInfo
 {
 public:
+	CFeatureInfo();
+
 	void SetFeatureId(const QByteArray& featureId);
 	void SetFeatureName(const QString& featureName);
 

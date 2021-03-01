@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
 #include <imtlic/CFeaturePackageComp.h>
+#include <imtlic/CLicenseInfoComp.h>
 #include <imtlic/CLicenseInfoManager.h>
 #include <imtlic/CLicenseBasedRightsProviderComp.h>
 #include <imtlic/CProductLicensingInfo.h>
@@ -31,11 +32,7 @@ typedef icomp::TModelCompWrap<
 						imtlic::IFeatureInfo,
 						iser::ISerializable>> FeatureInfo;
 typedef icomp::TModelCompWrap<imtlic::CFeaturePackageComp> FeaturePackage;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtlic::CLicenseInfo,
-						imtlic::ILicenseInfo,
-						iser::ISerializable>> LicenseInfo;
+typedef icomp::TModelCompWrap<imtlic::CLicenseInfoComp> LicenseInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtlic::CLicenseInfoManager,

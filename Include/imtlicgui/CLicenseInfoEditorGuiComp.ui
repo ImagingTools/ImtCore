@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>343</width>
-    <height>360</height>
+    <width>459</width>
+    <height>754</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -120,7 +120,7 @@ QAbstractItemView[TabSimulation=true]
 
 </string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -160,26 +160,20 @@ QAbstractItemView[TabSimulation=true]
    <item>
     <widget class="QGroupBox" name="PackageGroup">
      <property name="title">
-      <string>License Package</string>
+      <string>Features</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QComboBox" name="PackageCombo"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="ExpireGroup">
-     <property name="title">
-      <string>Valid Until</string>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_5">
-      <item>
-       <widget class="QDateEdit" name="ExpiredDate"/>
+       <widget class="QTreeWidget" name="Features">
+        <attribute name="headerVisible">
+         <bool>false</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
+       </widget>
       </item>
      </layout>
     </widget>

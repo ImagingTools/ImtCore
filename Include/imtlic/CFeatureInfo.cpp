@@ -13,6 +13,14 @@ namespace imtlic
 {
 
 
+// public methods
+
+CFeatureInfo::CFeatureInfo()
+	:m_name(QObject::tr("DefaultName"))
+{
+}
+
+
 void CFeatureInfo::SetFeatureId(const QByteArray& featureId)
 {
 	if (m_id != featureId){
