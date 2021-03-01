@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <iser/ISerializable.h>
+#include <idoc/IDocumentMetaInfo.h>
 
 
 namespace imtbase
@@ -25,6 +26,14 @@ class IFeatureDependenciesProvider;
 class IFeatureInfoProvider: virtual public iser::ISerializable
 {
 public:
+	enum MetaInfoTypes
+	{
+		/**
+			List of license infos given as QStringList.
+		*/
+		MIT_FEATURE_INFO_LIST = idoc::IDocumentMetaInfo::MIT_USER + 1,
+	};
+
 	/**
 		Get feature info list.
 	*/

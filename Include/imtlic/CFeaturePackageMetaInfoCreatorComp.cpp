@@ -7,9 +7,8 @@
 
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
-#include <imtlic/ILicenseInfo.h>
-#include <imtlic/IProductLicensingInfo.h>
-#include <imtlic/IProductLicensingInfoProvider.h>
+#include <imtlic/IFeatureInfo.h>
+#include <imtlic/IFeatureInfoProvider.h>
 
 
 namespace imtlic
@@ -25,8 +24,8 @@ public:
 	virtual QString GetMetaInfoName(int metaInfoType) const override
 	{
 		switch (metaInfoType){
-		case IProductLicensingInfoProvider::MIT_LICENSES_INFO_LIST:
-			return QObject::tr("Licenses");
+		case IFeatureInfoProvider::MIT_FEATURE_INFO_LIST:
+			return QObject::tr("Features");
 		}
 
 		return BaseClass::GetMetaInfoName(metaInfoType);
@@ -62,6 +61,23 @@ bool CFeaturePackageMetaInfoCreatorComp::CreateMetaInfo(
 	if (dataPtr == nullptr){
 		return true;
 	}
+
+	const imtlic::IFeatureInfoProvider* featurePckagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr);
+	if (featurePckagePtr == nullptr){
+		return false;
+	}
+
+	QString retVal;
+
+	imtbase::ICollectionInfo::Ids ids = featurePckagePtr->GetFeatureList().GetElementIds();
+	for (imtbase::ICollectionInfo::Id id : ids){
+		const imtlic::IFeatureInfo* featureInfoPtr = featurePckagePtr->GetFeatureInfo(id);
+		retVal += featureInfoPtr->GetFeatureName() + " (" + featureInfoPtr->GetFeatureId() + ")" + "\n";
+	}
+
+	retVal.chop(1);
+
+	metaInfoPtr->SetMetaInfo(IFeatureInfoProvider::MIT_FEATURE_INFO_LIST, retVal);
 
 	return true;
 }

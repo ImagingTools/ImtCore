@@ -21,11 +21,17 @@ QByteArray CLicenseInfo::GetTypeId()
 }
 
 
+CLicenseInfo::CLicenseInfo()
+	:m_featurePackageCollectionPtr(nullptr)
+{
+}
+
+
 // reimplemented (imtlic::ILicenseInfo)
 
 const imtbase::IObjectCollection* CLicenseInfo::GetFeaturePackages() const
 {
-	return nullptr;
+	return m_featurePackageCollectionPtr;
 }
 
 

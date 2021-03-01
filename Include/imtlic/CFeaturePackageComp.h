@@ -2,7 +2,7 @@
 
 
 // ACF includes
-#include <icomp/TMakeComponentWrap.h>
+#include <icomp/CComponentBase.h>
 
 // ImtCore includes
 #include <imtbase/TAggergatedObjectCollectionWrap.h>
@@ -16,10 +16,12 @@ namespace imtlic
 {
 
 
-class CFeaturePackageComp: public icomp::TMakeComponentWrap<CFeaturePackage>
+class CFeaturePackageComp:
+			public icomp::CComponentBase,
+			public CFeaturePackage
 {
 public:
-	typedef icomp::TMakeComponentWrap<CFeaturePackage> BaseClass;
+	typedef public icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFeaturePackageComp);
 		I_REGISTER_INTERFACE(IFeatureDependenciesProvider);

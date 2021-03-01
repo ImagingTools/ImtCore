@@ -2,6 +2,7 @@
 
 
 // ImtCore includes
+#include <imtbase/IObjectCollection.h>
 #include <imtlic/ILicenseInfo.h>
 
 
@@ -18,6 +19,8 @@ class CLicenseInfo: virtual public imtlic::ILicenseInfo
 {
 public:
 	static QByteArray GetTypeId();
+
+	CLicenseInfo();
 
 	// reimplemented (imtlic::ILicenseInfo)
 	virtual const imtbase::IObjectCollection* GetFeaturePackages() const override;
@@ -43,6 +46,7 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
+	imtbase::IObjectCollection* m_featurePackageCollectionPtr;
 	QString m_licenseName;
 	QByteArray m_licenseId;
 	QDateTime m_expirationTime;
