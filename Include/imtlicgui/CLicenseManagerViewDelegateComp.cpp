@@ -90,18 +90,18 @@ imtgui::ICollectionViewDelegate::SummaryInformation CLicenseManagerViewDelegateC
 			result.text = licenseInfoPtr->GetLicenseName();
 			result.sortValue = result.text;
 		}
-		else if (informationId == QByteArray("Expiration")){
-			QDateTime dateTime = licenseInfoPtr->GetExpiration();
+		//else if (informationId == QByteArray("Expiration")){
+		//	QDateTime dateTime = licenseInfoPtr->GetExpiration();
 
-			if (dateTime.isValid()){
-				result.text = dateTime.date().toString("dd.MM.yyyy");
-				result.sortValue = licenseInfoPtr->GetExpiration().toSecsSinceEpoch();
-			}
-			else{
-				result.text = tr("Unlimited");
-				result.sortValue = tr("Unlimited");
-			}
-		}
+		//	if (dateTime.isValid()){
+		//		result.text = dateTime.date().toString("dd.MM.yyyy");
+		//		result.sortValue = licenseInfoPtr->GetExpiration().toSecsSinceEpoch();
+		//	}
+		//	else{
+		//		result.text = tr("Unlimited");
+		//		result.sortValue = tr("Unlimited");
+		//	}
+		//}
 	}
 
 	return result;

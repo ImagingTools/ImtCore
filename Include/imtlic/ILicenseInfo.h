@@ -56,16 +56,6 @@ public:
 	virtual void SetLicenseId(const QByteArray& licenseId) = 0;
 
 	/**
-		Get expiration time for the license. An invalid time object means that the license has no time limitation.
-	*/
-	virtual QDateTime GetExpiration() const = 0;
-
-	/**
-		Set time of license expiration.
-	*/
-	virtual void SetExpiration(const QDateTime& expirationTime) = 0;
-
-	/**
 		Get the list of feature-IDs supported by this license.
 	*/
 	virtual FeatureIds GetFeatures() const = 0;

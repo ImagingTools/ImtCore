@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtlic/ILicenseInfo.h>
+#include <imtlic/ILicenseInstance.h>
 
 
 namespace imtlic
@@ -24,9 +24,9 @@ bool CLicenseBasedRightsProviderComp::HasRight(
 			bool beQuiet) const
 {
 	if (m_licenseInfoProviderCompPtr.IsValid() && m_rightsMap.contains(operationId)){
-		const ILicenseInfo* licenseInfoPtr = m_licenseInfoProviderCompPtr->GetLicenseInfo(m_rightsMap[operationId]);
-		if (licenseInfoPtr != nullptr){
-			return licenseInfoPtr->GetExpiration() < QDateTime::currentDateTime();
+		const ILicenseInstance* licenseInstancePtr = m_licenseInfoProviderCompPtr->GetLicenseInstance(m_rightsMap[operationId]);
+		if (licenseInstancePtr != nullptr){
+			return licenseInstancePtr->GetExpiration() < QDateTime::currentDateTime();
 		}
 	}
 

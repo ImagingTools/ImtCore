@@ -28,8 +28,6 @@ public:
 	void SetLicenseName(const QString& licenseName) override;
 	virtual QByteArray GetLicenseId() const override;
 	void SetLicenseId(const QByteArray& licenseId) override;
-	virtual QDateTime GetExpiration() const override;
-	void SetExpiration(const QDateTime& expirationTime) override;
 	virtual FeatureIds GetFeatures() const override;
 	virtual void SetFeatures(const FeatureIds& featureIds) override;
 
@@ -49,7 +47,6 @@ protected:
 	imtbase::IObjectCollection* m_featurePackageCollectionPtr;
 	QString m_licenseName;
 	QByteArray m_licenseId;
-	QDateTime m_expirationTime;
 	FeatureIds m_featureIds;
 };
 

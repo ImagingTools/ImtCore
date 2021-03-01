@@ -12,7 +12,7 @@
 #include <imod/CModelUpdateBridge.h>
 
 // ImtCore includes
-#include <imtlic/ILicenseInfoProvider.h>
+#include <imtlic/ILicenseInstanceProvider.h>
 
 
 namespace imtlic
@@ -55,7 +55,7 @@ protected:
 private:
 	I_MULTIATTR(QByteArray, m_rightIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_licenseIdAttrPtr);
-	I_REF(imtlic::ILicenseInfoProvider, m_licenseInfoProviderCompPtr);
+	I_REF(imtlic::ILicenseInstanceProvider, m_licenseInfoProviderCompPtr);
 	I_REF(imod::IModel, m_licenseInfoProviderModelCompPtr);
 	I_REF(iauth::IRightsProvider, m_slaveProviderCompPtr);
 	I_REF(imod::IModel, m_slaveProviderModelCompPtr);

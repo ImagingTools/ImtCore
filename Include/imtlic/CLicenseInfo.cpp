@@ -67,22 +67,6 @@ void CLicenseInfo::SetLicenseId(const QByteArray& licenseId)
 }
 
 
-QDateTime CLicenseInfo::GetExpiration() const
-{
-	return m_expirationTime;
-}
-
-
-void CLicenseInfo::SetExpiration(const QDateTime& expirationTime)
-{
-	if (m_expirationTime != expirationTime){
-		istd::CChangeNotifier notifier(this);
-
-		m_expirationTime = expirationTime;
-	}
-}
-
-
 ILicenseInfo::FeatureIds CLicenseInfo::GetFeatures() const
 {
 	return m_featureIds;
@@ -123,11 +107,6 @@ bool CLicenseInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_licenseId);
 	retVal = retVal && archive.EndTag(licenseIdTag);
 
-	static iser::CArchiveTag expirationTimeTag("ExpirationTime", "Expired time stamp", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(expirationTimeTag);
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_expirationTime);
-	retVal = retVal && archive.EndTag(expirationTimeTag);
-
 	static iser::CArchiveTag featureIdsTag("FeatureIds", "IDs of supported features", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(featureIdsTag);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_featureIds, "Features", "Feature");
@@ -153,7 +132,6 @@ bool CLicenseInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 
 		m_licenseName = sourcePtr->GetLicenseName();
 		m_licenseId = sourcePtr->GetLicenseId();
-		m_expirationTime = sourcePtr->GetExpiration();
 		m_featureIds = sourcePtr->GetFeatures();
 
 		return true;
@@ -181,7 +159,6 @@ bool CLicenseInfo::ResetData(CompatibilityMode /*mode*/)
 	m_licenseName.clear();
 	m_licenseId.clear();
 	m_featureIds.clear();
-	m_expirationTime = QDateTime();
 
 	return true;
 }

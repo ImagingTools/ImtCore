@@ -30,15 +30,14 @@ void CLicenseInfoEditorGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 
 	NameEdit->setText(licenseInfoPtr->GetLicenseName());
 	IdEdit->setText(licenseInfoPtr->GetLicenseId());
-	// TODO: package id combo
 
-	if (licenseInfoPtr->GetExpiration().isValid()){
-		ExpireGroup->setChecked(true);
-		ExpiredDate->setDateTime(licenseInfoPtr->GetExpiration());
-	}
-	else{
-		ExpireGroup->setChecked(false);
-	}
+	//if (licenseInfoPtr->GetExpiration().isValid()){
+	//	ExpireGroup->setChecked(true);
+	//	ExpiredDate->setDateTime(licenseInfoPtr->GetExpiration());
+	//}
+	//else{
+	//	ExpireGroup->setChecked(false);
+	//}
 }
 
 
@@ -59,19 +58,17 @@ void CLicenseInfoEditorGuiComp::UpdateModel() const
 	imtlic::ILicenseInfo* licenseInfoPtr = GetObservedObject();
 	Q_ASSERT(licenseInfoPtr != nullptr);
 
-	imtlic::CLicenseInfo licenseInfo;
+	istd::CChangeGroup changeGroup(licenseInfoPtr);
 
-	licenseInfo.SetLicenseName(NameEdit->text());
-	licenseInfo.SetLicenseId(IdEdit->text().toUtf8());
-	// TODO: package id combo
-	if (ExpireGroup->isChecked()){
-		licenseInfo.SetExpiration(QDateTime(ExpiredDate->date(), QTime(0,0)));
-	}
-	else{
-		licenseInfo.SetExpiration(QDateTime());
-	}
+	licenseInfoPtr->SetLicenseName(NameEdit->text());
+	licenseInfoPtr->SetLicenseId(IdEdit->text().toUtf8());
 
-	licenseInfoPtr->CopyFrom(licenseInfo);
+	//if (ExpireGroup->isChecked()){
+	//	licenseInfo.SetExpiration(QDateTime(ExpiredDate->date(), QTime(0,0)));
+	//}
+	//else{
+	//	licenseInfo.SetExpiration(QDateTime());
+	//}
 }
 
 
