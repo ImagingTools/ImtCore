@@ -23,6 +23,12 @@ QByteArray CLicenseInfo::GetTypeId()
 
 // reimplemented (imtlic::ILicenseInfo)
 
+const imtbase::IObjectCollection* CLicenseInfo::GetFeaturePackages() const
+{
+	return nullptr;
+}
+
+
 QString CLicenseInfo::GetLicenseName() const
 {
 	return m_licenseName;

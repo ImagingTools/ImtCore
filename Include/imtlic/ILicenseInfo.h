@@ -10,6 +10,12 @@
 #include <iser/IObject.h>
 
 
+namespace imtbase
+{
+	class IObjectCollection;
+}
+
+
 namespace imtlic
 {
 
@@ -22,6 +28,11 @@ class ILicenseInfo: virtual public iser::IObject
 {
 public:
 	typedef QByteArrayList FeatureIds;
+
+	/**
+		Get list of all available features for this license.
+	*/
+	virtual const imtbase::IObjectCollection* GetFeaturePackages() const = 0;
 
 	/**
 		Get human-readable name of the license.

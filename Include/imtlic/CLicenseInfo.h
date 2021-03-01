@@ -20,6 +20,7 @@ public:
 	static QByteArray GetTypeId();
 
 	// reimplemented (imtlic::ILicenseInfo)
+	virtual const imtbase::IObjectCollection* GetFeaturePackages() const override;
 	virtual QString GetLicenseName() const override;
 	void SetLicenseName(const QString& licenseName) override;
 	virtual QByteArray GetLicenseId() const override;
