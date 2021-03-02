@@ -107,10 +107,7 @@ bool CLicenseInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_licenseId);
 	retVal = retVal && archive.EndTag(licenseIdTag);
 
-	static iser::CArchiveTag featureIdsTag("FeatureIds", "IDs of supported features", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(featureIdsTag);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_featureIds, "Features", "Feature");
-	retVal = retVal && archive.EndTag(featureIdsTag);
 
 	return retVal;
 }
