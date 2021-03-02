@@ -4,7 +4,7 @@
 // Qt includes
 #include <QtWidgets/QGraphicsRectItem>
 
-// Acf includes
+// ACF includes
 #include <istd/TSmartPtr.h>
 
 // ImtCore includes

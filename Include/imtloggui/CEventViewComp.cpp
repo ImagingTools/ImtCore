@@ -5,7 +5,7 @@
 #include <QtWidgets/QLabel>
 #include <QtCore/QMargins>
 
-// Acf includes
+// ACF includes
 #include <iser/IObject.h>
 #include <ilog/CMessage.h>
 #include <ilog/CExtMessage.h>

@@ -3,7 +3,7 @@
 // Qt includes
 #include <QtCore/QRect>
 
-// Acf includes
+// ACF includes
 #include <ilog/CMessageContainer.h>
 #include <imeas/CGeneralDataSequence.h>
 

@@ -5,7 +5,7 @@
 #include <QThread>
 
 
-// Acf includes
+// ACF includes
 #include <imod/IModel.h>
 #include <iprm/IEnableableParam.h>
 

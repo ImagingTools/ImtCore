@@ -1,7 +1,7 @@
 #include <imtlicgui/CLicenseInfoEditorGuiComp.h>
 
 
-// Acf includes
+// ACF includes
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes

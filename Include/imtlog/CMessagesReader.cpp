@@ -5,7 +5,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QUuid>
 
-// Acf includes
+// ACF includes
 #include <ifile/CCompactXmlFileReadArchive.h>
 #include <istd/CSystem.h>
 #include <ilog/CMessage.h>

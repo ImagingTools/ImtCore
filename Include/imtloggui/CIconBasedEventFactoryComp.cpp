@@ -4,7 +4,7 @@
 // Qt includes
 #include <QtGui/QIcon>
 
-// Acf includes
+// ACF includes
 #include <imod/TModelWrap.h>
 
 // ImtCore includes

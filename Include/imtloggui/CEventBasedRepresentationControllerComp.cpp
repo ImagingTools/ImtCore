@@ -1,7 +1,7 @@
 #include <imtloggui/CEventBasedRepresentationControllerComp.h>
 
 
-// Acf includes
+// ACF includes
 #include <istd/CChangeGroup.h>
 #include <ilog/CMessageContainer.h>
 

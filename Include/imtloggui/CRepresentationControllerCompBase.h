@@ -5,7 +5,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QQueue>
 
-// Acf includes
+// ACF includes
 #include <iprm/IEnableableParam.h>
 #include <imod/TModelWrap.h>
 #include <imod/TSingleModelObserverBase.h>

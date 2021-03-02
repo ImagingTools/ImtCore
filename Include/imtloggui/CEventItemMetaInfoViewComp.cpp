@@ -8,7 +8,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QVBoxLayout>
 
-// Acf includes
+// ACF includes
 #include <iwidgets/iwidgets.h>
 
 

@@ -5,7 +5,7 @@
 #include <QtCore/QDateTime.h>
 #include <QtCore/QMap.h>
 
-// Acf includes
+// ACF includes
 #include <istd/IChangeable.h>
 #include <ilog/IMessageConsumer.h>
 #include <icomp/CComponentBase.h>

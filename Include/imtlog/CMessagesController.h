@@ -8,7 +8,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QSignalMapper>
 
-// Acf includes
+// ACF includes
 #include <iser/IVersionInfo.h>
 #include <ifile/IFileNameParam.h>
 #include <ilog/IMessageContainer.h>

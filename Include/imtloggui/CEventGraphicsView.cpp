@@ -5,7 +5,7 @@
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QScrollBar>
 
-// Acf includes
+// ACF includes
 #include <istd/CChangeNotifier.h>
 
 

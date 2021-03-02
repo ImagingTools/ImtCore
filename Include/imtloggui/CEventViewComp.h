@@ -8,7 +8,7 @@
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QStackedWidget>
 
-// Acf includes
+// ACF includes
 #include <ibase/ICommandsProvider.h>
 #include <ilog/IMessageConsumer.h>
 #include <imeas/INumericConstraints.h>

@@ -1,7 +1,7 @@
 #pragma once
 
 
-// Acf includes
+// ACF includes
 #include <ibase/ICommandsProvider.h>
 #include <imod/CModelProxy.h>
 #include <iqtgui/CHierarchicalCommand.h>

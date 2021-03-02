@@ -4,7 +4,7 @@
 // Qt includes
 #include <QtWidgets/QLabel>
 
-// Acf includes
+// ACF includes
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes

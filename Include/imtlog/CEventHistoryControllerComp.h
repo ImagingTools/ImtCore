@@ -9,7 +9,7 @@
 #include <QtCore/QMultiMap>
 #include <QtCore/QMutex>
 
-// Acf includes
+// ACF includes
 #include <iser/IVersionInfo.h>
 #include <ifile/IFileNameParam.h>
 #include <ilog/TLoggerCompWrap.h>

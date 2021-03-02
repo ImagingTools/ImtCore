@@ -1,7 +1,7 @@
 #include <imtlicgui/CFeatureInfoEditorGuiComp.h>
 
 
-// Acf includes
+// ACF includes
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes

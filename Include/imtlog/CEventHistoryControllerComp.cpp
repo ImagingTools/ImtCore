@@ -6,7 +6,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QUuid>
 
-// Acf includes
+// ACF includes
 #include <ifile/CCompactXmlFileWriteArchive.h>
 #include <ifile/CCompactXmlFileReadArchive.h>
 #include <iser/CPrimitiveTypesSerializer.h>

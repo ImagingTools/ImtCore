@@ -5,7 +5,7 @@
 #include <QtCore/QMutex>
 #include <QtWidgets/QGraphicsItem>
 
-// Acf includes
+// ACF includes
 #include <iprm/IEnableableParam.h>
 #include <iprm/IIdParam.h>
 #include <iprm/IOptionsList.h>

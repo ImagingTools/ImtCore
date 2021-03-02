@@ -4,7 +4,7 @@
 // Qt includes
 #include <QtCore/QThread>
 
-// Acf includes
+// ACF includes
 #include <ilog/IMessageConsumer.h>
 #include <ilog/CMessageContainer.h>
 

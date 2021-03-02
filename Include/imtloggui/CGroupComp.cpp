@@ -1,7 +1,7 @@
 #include <imtloggui/CGroupComp.h>
 
 
-// Acf includes
+// ACF includes
 #include <iprm/IEnableableParam.h>
 
 // ImtCore includes
