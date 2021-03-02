@@ -19,6 +19,9 @@ public:
 	I_BEGIN_COMPONENT(CFeaturePackageViewDelegateComp);
 	I_END_COMPONENT;
 
+	// reimplemented (ICollectionViewDelegate)
+	virtual bool IsCommandSupported(int commandId) const override;
+
 protected:
 	// reimplemented (imtgui::CObjectCollectionViewDelegate)
 	virtual void SetupSummaryInformation() override;
