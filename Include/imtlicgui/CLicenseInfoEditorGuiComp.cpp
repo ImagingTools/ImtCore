@@ -15,7 +15,10 @@ namespace imtlicgui
 // public methods
 
 CLicenseInfoEditorGuiComp::CLicenseInfoEditorGuiComp()
-	:m_collectionObserver(*this)
+	:m_collectionObserver(*this),
+	m_itemChangedSignalBlockCounter(0),
+	m_isGuiModelInitialized(false),
+	m_isCollectionRepresentationInitialized(false)
 {
 }
 
@@ -28,6 +31,9 @@ void CLicenseInfoEditorGuiComp::OnFeaturePackageCollectionUpdate()
 	imtbase::ICollectionInfo::Ids packageIds = collectionPtr->GetElementIds();
 
 	Features->clear();
+	m_collectionRepresentation.clear();
+
+	ItemChangedSignalBlocker blocker(&m_itemChangedSignalBlockCounter);
 
 	for (const QByteArray& packageId : packageIds){
 		imtbase::IObjectCollection::DataPtr packageDataPtr;
@@ -36,9 +42,8 @@ void CLicenseInfoEditorGuiComp::OnFeaturePackageCollectionUpdate()
 			if (packagePtr != nullptr){
 				QTreeWidgetItem* packageItemPtr = new QTreeWidgetItem({collectionPtr->GetElementInfo(packageId, imtbase::ICollectionInfo::EIT_NAME).toString()});
 				Features->addTopLevelItem(packageItemPtr);
-				packageItemPtr->setCheckState(0, Qt::PartiallyChecked);
-				packageItemPtr->setData(0, ID_ITEM_ID, packageId);
-				packageItemPtr->setData(0, ID_ITEM_TYPE, IT_PACKAGE);
+				packageItemPtr->setData(0, DR_ITEM_ID, packageId);
+				packageItemPtr->setData(0, DR_ITEM_TYPE, IT_PACKAGE);
 
 				imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetFeatureList().GetElementIds();
 				for (const QByteArray& featureId : featureIds){
@@ -46,57 +51,103 @@ void CLicenseInfoEditorGuiComp::OnFeaturePackageCollectionUpdate()
 					if (featureInfoPtr != nullptr){
 						QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({featureInfoPtr->GetFeatureName()});
 						packageItemPtr->addChild(featureItemPtr);
-						featureItemPtr->setCheckState(0, Qt::Unchecked);
-						featureItemPtr->setData(0, ID_ITEM_ID, featureId);
-						featureItemPtr->setData(0, ID_ITEM_TYPE, IT_FEATURE);
+						featureItemPtr->setData(0, DR_ITEM_ID, featureInfoPtr->GetFeatureId());
+						featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
+
+						m_collectionRepresentation[packageId].append(featureInfoPtr->GetFeatureId());
 					}
 				}
 			}
 		}
 	}
 
-	SynchronizeFeatureItems();
+	m_isCollectionRepresentationInitialized = true;
+
+	if (m_isGuiModelInitialized && m_isCollectionRepresentationInitialized){
+		RemoveMissingFeatures();
+		UpdateTreeItemCheckStates();
+		DoUpdateModel();
+	}
 }
 
 
-void CLicenseInfoEditorGuiComp::SynchronizeFeatureItems()
+void CLicenseInfoEditorGuiComp::UpdateTreeItemCheckStates()
 {
-	for (int i = 0; i < m_featureIds.count(); i++){
-		QTreeWidgetItem* itemPtr = FindChildItem(m_featureIds[i]);
-		if (itemPtr != nullptr){
-			itemPtr->setCheckState(0, Qt::Checked);
-		}
-		else{
-			m_featureIds.removeAt(i);
-			i = -1;
+	ItemChangedSignalBlocker blocker(&m_itemChangedSignalBlockCounter);
+
+	QByteArrayList packageIds = m_collectionRepresentation.keys();
+	for (const QByteArray& packageId : packageIds){
+		QByteArrayList featureIds = m_collectionRepresentation[packageId];
+		for (const QByteArray& featureId : featureIds){
+			QTreeWidgetItem* featureItemPtr = GetItem(featureId);
+			bool isFeaturePresent = m_featureIds.contains(featureId);
+			featureItemPtr->setCheckState(0, isFeaturePresent ? Qt::Checked : Qt::Unchecked);
 		}
 	}
 
-	for (int packageIndex = 0; packageIndex < Features->topLevelItemCount(); packageIndex++){
-		QTreeWidgetItem* packageItemPtr = Features->topLevelItem(packageIndex);
-		//packageItemPtr->setCheckState(0, Qt::Checked);
+	for (const QByteArray& packageId : packageIds){
+		bool isAllFeaturesChecked = true;
+		bool isAllFeaturesUnchecked = true;
 
-		for (int featureIndex = 0; featureIndex < packageItemPtr->childCount(); featureIndex++){
-			if (packageItemPtr->child(featureIndex)->checkState(0) == Qt::Unchecked){
-				//packageItemPtr->setCheckState(0, Qt::Unchecked);
-				break;
+		QByteArrayList featureIds = m_collectionRepresentation[packageId];
+		for (const QByteArray& featureId : featureIds){
+			QTreeWidgetItem* featureItemPtr = GetItem(featureId);
+			if (featureItemPtr->checkState(0) == Qt::Checked){
+				isAllFeaturesUnchecked = false;
+			}
+			else if (featureItemPtr->checkState(0) == Qt::Unchecked){
+				isAllFeaturesChecked = false;
+			}
+
+			QTreeWidgetItem* packageItemPtr = GetItem(packageId);
+			if (isAllFeaturesChecked){
+				packageItemPtr->setCheckState(0, Qt::Checked);
+			}
+			else if (isAllFeaturesUnchecked){
+				packageItemPtr->setCheckState(0, Qt::Unchecked);
+			}
+			else{
+				packageItemPtr->setCheckState(0, Qt::PartiallyChecked);
 			}
 		}
 	}
 }
 
 
-QTreeWidgetItem* CLicenseInfoEditorGuiComp::FindChildItem(const QByteArray& featureId)
+void CLicenseInfoEditorGuiComp::RemoveMissingFeatures()
+{
+	QByteArrayList allFeatureIds;
+
+	QByteArrayList packageIds = m_collectionRepresentation.keys();
+	for (const QByteArray& packageId : packageIds){
+		allFeatureIds.append(m_collectionRepresentation[packageId]);
+	}
+
+	QByteArrayList presentIds;
+
+	for (const QByteArray& featureId : m_featureIds){
+		if (allFeatureIds.contains(featureId)){
+			presentIds.append(featureId);
+		}
+	}
+
+	m_featureIds = presentIds;
+}
+
+
+QTreeWidgetItem* CLicenseInfoEditorGuiComp::GetItem(const QByteArray& itemId)
 {
 	int packageCount = Features->topLevelItemCount();
 	for (int packageIndex = 0; packageIndex < packageCount; packageIndex++){
 		QTreeWidgetItem* packageItemPtr = Features->topLevelItem(packageIndex);
+		if (packageItemPtr->data(0, DR_ITEM_ID).toByteArray() == itemId){
+			return packageItemPtr;
+		}
 
 		int featureCount = packageItemPtr->childCount();
 		for (int featureIndex = 0; featureIndex < featureCount; featureIndex++){
 			QTreeWidgetItem* featurteItemPtr = packageItemPtr->child(featureIndex);
-
-			if (featurteItemPtr->data(0, ID_ITEM_ID).toByteArray() == featureId){
+			if (featurteItemPtr->data(0, DR_ITEM_ID).toByteArray() == itemId){
 				return featurteItemPtr;
 			}
 		}
@@ -117,7 +168,13 @@ void CLicenseInfoEditorGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	IdEdit->setText(licenseInfoPtr->GetLicenseId());
 	m_featureIds = licenseInfoPtr->GetFeatures();
 
-	SynchronizeFeatureItems();
+	m_isGuiModelInitialized = true;
+
+	if (m_isGuiModelInitialized && m_isCollectionRepresentationInitialized){
+		RemoveMissingFeatures();
+		UpdateTreeItemCheckStates();
+		DoUpdateModel();
+	}
 }
 
 
@@ -153,6 +210,9 @@ void CLicenseInfoEditorGuiComp::OnGuiModelDetached()
 		}
 	}
 
+	m_isGuiModelInitialized = false;
+	m_isCollectionRepresentationInitialized = false;
+
 	BaseClass::OnGuiModelDetached();
 }
 
@@ -166,7 +226,7 @@ void CLicenseInfoEditorGuiComp::UpdateModel() const
 
 	licenseInfoPtr->SetLicenseName(NameEdit->text());
 	licenseInfoPtr->SetLicenseId(IdEdit->text().toUtf8());
-	licenseInfoPtr->GetFeatures();
+	licenseInfoPtr->SetFeatures(m_featureIds);
 }
 
 
@@ -186,13 +246,52 @@ void CLicenseInfoEditorGuiComp::on_IdEdit_editingFinished()
 
 void CLicenseInfoEditorGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, int column)
 {
-	//if (item->checkState(0) == Qt::Checked){
-	//	if ()
-	//}
-	//else if (item->checkState(0) == Qt::PartiallyChecked){
-	//	{
+	Q_ASSERT(m_itemChangedSignalBlockCounter >= 0);
 
-	//}
+	if (m_itemChangedSignalBlockCounter > 0){
+		return;
+	}
+
+	if (item->data(0, DR_ITEM_TYPE) == IT_PACKAGE){
+		Qt::CheckState state = item->checkState(0);
+
+		for (int i = 0; i < item->childCount(); i++){
+			QTreeWidgetItem* featureItemPtr = item->child(i);
+			QByteArray id = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
+
+			if (state == Qt::Checked){
+
+				if (!m_featureIds.contains(id)){
+					m_featureIds.append(id);
+				}
+			}
+			else{
+				if (m_featureIds.contains(id)){
+					m_featureIds.removeOne(id);
+				}
+			}
+		}
+	}
+	else{
+		QByteArray id = item->data(0, DR_ITEM_ID).toByteArray();
+
+		if (item->checkState(0) == Qt::Checked){
+			if (!m_featureIds.contains(id)){
+				m_featureIds.append(id);
+			}
+		}
+		else{
+			if (m_featureIds.contains(id)){
+				m_featureIds.removeOne(id);
+			}
+		}
+	}
+
+	if (m_isGuiModelInitialized && m_isCollectionRepresentationInitialized){
+		RemoveMissingFeatures();
+		UpdateTreeItemCheckStates();
+		DoUpdateModel();
+	}
 }
 
 

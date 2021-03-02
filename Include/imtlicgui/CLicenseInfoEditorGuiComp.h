@@ -36,10 +36,10 @@ public:
 	CLicenseInfoEditorGuiComp();
 
 protected:
-	enum ItemData
+	enum DataRole
 	{
-		ID_ITEM_ID = Qt::UserRole,
-		ID_ITEM_TYPE
+		DR_ITEM_ID = Qt::UserRole,
+		DR_ITEM_TYPE
 	};
 
 	enum ItemType
@@ -59,10 +59,34 @@ protected:
 		CLicenseInfoEditorGuiComp& m_parent;
 	};
 
+	class ItemChangedSignalBlocker
+	{
+	public:
+		ItemChangedSignalBlocker(int* counter)
+		{
+			m_counter = counter;
+
+			if (m_counter != nullptr){
+				(*m_counter)++;
+			}
+		}
+
+		~ItemChangedSignalBlocker()
+		{
+			if (m_counter != nullptr){
+				(*m_counter)--;
+			}
+		}
+
+	private:
+		int* m_counter;
+	};
+
 protected:
 	void OnFeaturePackageCollectionUpdate();
-	void SynchronizeFeatureItems();
-	QTreeWidgetItem* FindChildItem(const QByteArray& featureId);
+	void UpdateTreeItemCheckStates();
+	void RemoveMissingFeatures();
+	QTreeWidgetItem* GetItem(const QByteArray& itemId);
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
@@ -71,8 +95,16 @@ protected:
 	virtual void UpdateModel() const;
 
 protected:
-	FeaturePackageCollectionObserver m_collectionObserver;
+	bool m_isGuiModelInitialized;
+	bool m_isCollectionRepresentationInitialized;
+	int m_itemChangedSignalBlockCounter;
+
+	// License related members
 	QByteArrayList m_featureIds;
+
+	// Feature package collection related members
+	QMap<QByteArray, QByteArrayList> m_collectionRepresentation;
+	FeaturePackageCollectionObserver m_collectionObserver;
 
 private Q_SLOTS:
 	void on_NameEdit_editingFinished();
