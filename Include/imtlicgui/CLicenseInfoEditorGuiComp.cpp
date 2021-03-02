@@ -280,6 +280,22 @@ void CLicenseInfoEditorGuiComp::UpdateModel() const
 }
 
 
+// reimplemented (iqtgui::CGuiComponentBase)
+
+void CLicenseInfoEditorGuiComp::OnGuiCreated()
+{
+	BaseClass::OnGuiCreated();
+	connect(Features, &QTreeWidget::itemChanged, this, &CLicenseInfoEditorGuiComp::OnItemChanged, Qt::QueuedConnection);
+}
+
+
+void CLicenseInfoEditorGuiComp::OnGuiDestroyed()
+{
+	connect(Features, &QTreeWidget::itemChanged, this, &CLicenseInfoEditorGuiComp::OnItemChanged);
+	BaseClass::OnGuiDestroyed();
+}
+
+
 // private slots
 
 void CLicenseInfoEditorGuiComp::on_NameEdit_editingFinished()
@@ -330,6 +346,12 @@ void CLicenseInfoEditorGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, i
 		}
 	}
 
+	Q_EMIT EmitItemChanged();
+}
+
+
+void CLicenseInfoEditorGuiComp::OnItemChanged()
+{
 	if (m_isGuiModelInitialized && m_isCollectionRepresentationInitialized){
 		EnumerateMissingFeatures();
 		UpdateFeatureTree();

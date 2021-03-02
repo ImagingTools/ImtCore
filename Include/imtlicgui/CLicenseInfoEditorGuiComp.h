@@ -48,10 +48,18 @@ protected:
 	virtual void OnGuiModelDetached() override;
 	virtual void UpdateModel() const;
 
+	// reimplemented (iqtgui::CGuiComponentBase)
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiDestroyed() override;
+
+Q_SIGNALS:
+	void EmitItemChanged();
+
 private Q_SLOTS:
 	void on_NameEdit_editingFinished();
 	void on_IdEdit_editingFinished();
 	void on_Features_itemChanged(QTreeWidgetItem *item, int column);
+	void OnItemChanged();
 
 protected:
 	enum DataRole
