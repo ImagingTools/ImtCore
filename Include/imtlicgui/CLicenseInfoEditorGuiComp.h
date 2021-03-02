@@ -36,6 +36,24 @@ public:
 	CLicenseInfoEditorGuiComp();
 
 protected:
+	void OnFeaturePackageCollectionUpdate();
+	void EnumerateMissingFeatures();
+	void UpdateFeatureTree();
+	void UpdateFeatureTreeCheckStates();
+	QTreeWidgetItem* GetItem(const QByteArray& itemId);
+
+	// reimplemented (iqtgui::TGuiObserverWrap)
+	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
+	virtual void OnGuiModelAttached() override;
+	virtual void OnGuiModelDetached() override;
+	virtual void UpdateModel() const;
+
+private Q_SLOTS:
+	void on_NameEdit_editingFinished();
+	void on_IdEdit_editingFinished();
+	void on_Features_itemChanged(QTreeWidgetItem *item, int column);
+
+protected:
 	enum DataRole
 	{
 		DR_ITEM_ID = Qt::UserRole,
@@ -59,56 +77,26 @@ protected:
 		CLicenseInfoEditorGuiComp& m_parent;
 	};
 
-	class ItemChangedSignalBlocker
+	struct FeatureDescription
 	{
-	public:
-		ItemChangedSignalBlocker(int* counter)
-		{
-			m_counter = counter;
-
-			if (m_counter != nullptr){
-				(*m_counter)++;
-			}
-		}
-
-		~ItemChangedSignalBlocker()
-		{
-			if (m_counter != nullptr){
-				(*m_counter)--;
-			}
-		}
-
-	private:
-		int* m_counter;
+		QByteArray id;
+		QString name;
 	};
 
-protected:
-	void OnFeaturePackageCollectionUpdate();
-	void UpdateTreeItemCheckStates();
-	void RemoveMissingFeatures();
-	QTreeWidgetItem* GetItem(const QByteArray& itemId);
-
-	// reimplemented (iqtgui::TGuiObserverWrap)
-	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
-	virtual void OnGuiModelAttached() override;
-	virtual void OnGuiModelDetached() override;
-	virtual void UpdateModel() const;
-
-private Q_SLOTS:
-	void on_NameEdit_editingFinished();
-	void on_IdEdit_editingFinished();
-	void on_Features_itemChanged(QTreeWidgetItem *item, int column);
+	typedef QList<FeatureDescription> FeatureDescriptionList;
 
 protected:
 	bool m_isGuiModelInitialized;
 	bool m_isCollectionRepresentationInitialized;
-	int m_itemChangedSignalBlockCounter;
 
 	// License related members
 	QByteArrayList m_featureIds;
 
 	// Feature package collection related members
-	QMap<QByteArray, QByteArrayList> m_collectionRepresentation;
+	QMap<QByteArray, FeatureDescriptionList> m_packageFeatures;
+	QMap<QByteArray, QString> m_packageNames;
+	QByteArrayList m_missingFeatures;
+
 	FeaturePackageCollectionObserver m_collectionObserver;
 };
 
