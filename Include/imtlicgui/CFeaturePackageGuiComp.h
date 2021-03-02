@@ -56,13 +56,13 @@ protected Q_SLOTS:
 	virtual void OnShowCollectionEditor();
 	virtual void OnShowFeatureDependencyEditor();
 
+private:
+	void UpdateCommands();
+
 protected:
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_showCollectionEditorCommand;
 	iqtgui::CHierarchicalCommand m_showDependenciesEditorCommand;
-
-private:
-	void UpdateCommands();
 
 private:
 	I_REF(iqtgui::IGuiObject, m_objectCollectionViewCompPtr);

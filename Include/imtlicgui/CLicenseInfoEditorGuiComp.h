@@ -94,6 +94,11 @@ protected:
 	virtual void OnGuiModelDetached() override;
 	virtual void UpdateModel() const;
 
+private Q_SLOTS:
+	void on_NameEdit_editingFinished();
+	void on_IdEdit_editingFinished();
+	void on_Features_itemChanged(QTreeWidgetItem *item, int column);
+
 protected:
 	bool m_isGuiModelInitialized;
 	bool m_isCollectionRepresentationInitialized;
@@ -105,11 +110,6 @@ protected:
 	// Feature package collection related members
 	QMap<QByteArray, QByteArrayList> m_collectionRepresentation;
 	FeaturePackageCollectionObserver m_collectionObserver;
-
-private Q_SLOTS:
-	void on_NameEdit_editingFinished();
-	void on_IdEdit_editingFinished();
-	void on_Features_itemChanged(QTreeWidgetItem *item, int column);
 };
 
 

@@ -13,12 +13,12 @@ namespace imtlic
 
 
 /**
-	Component implementation of IProductLicensingInfo interface with reference to the list of all defined products.
+	Component implementation of ILicenseInfo interface with reference to the list of all defined products.
 	\ingroup LicenseManagement
 */
 class CLicenseInfoComp:
 			public icomp::CComponentBase,
-			virtual public CLicenseInfo
+			public CLicenseInfo
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -29,7 +29,6 @@ public:
 		I_REGISTER_INTERFACE(iser::IObject);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(istd::IChangeable);
-		I_REGISTER_INTERFACE(istd::IPolymorphic);
 		I_ASSIGN(m_featurePackageCollectionCompPtr, "FeaturePackageCollection", "Feature package collection", true, "");
 	I_END_COMPONENT
 
