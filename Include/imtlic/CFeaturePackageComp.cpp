@@ -14,7 +14,7 @@ void CFeaturePackageComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (m_ownerCollectionCompPtr.IsValid()){
-		m_ownerPtr = m_ownerCollectionCompPtr.GetPtr();
+		m_featurePackageCollectionPtr = m_ownerCollectionCompPtr.GetPtr();
 	}
 }
 

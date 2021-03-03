@@ -30,6 +30,7 @@ public:
 	virtual const IFeatureInfoProvider* GetDependencyContainer(const QByteArray& dependencyId) const override;
 
 	// reimplemented (IFeatureInfoProvider)
+	virtual const imtbase::IObjectCollection* GetFeaturePackages() const override;
 	virtual const imtbase::ICollectionInfo& GetFeatureList() const override;
 	virtual const IFeatureInfo* GetFeatureInfo(const QByteArray& featureId) const override;
 	virtual const IFeatureDependenciesProvider* GetDependenciesInfoProvider() const override;
@@ -40,7 +41,7 @@ public:
 	virtual bool Serialize(iser::IArchive& archive) override;
 
 protected:
-	const imtbase::IObjectCollection* m_ownerPtr;
+	const imtbase::IObjectCollection* m_featurePackageCollectionPtr;
 
 private:
 	QMap<QByteArray, QByteArrayList> m_dependencies;

@@ -9,6 +9,7 @@
 namespace imtbase
 {
 	class ICollectionInfo;
+	class IObjectCollection;
 }
 
 
@@ -33,6 +34,11 @@ public:
 		*/
 		MIT_FEATURE_INFO_LIST = idoc::IDocumentMetaInfo::MIT_USER + 1,
 	};
+
+	/**
+		Get list of all available feature packages.
+	*/
+	virtual const imtbase::IObjectCollection* GetFeaturePackages() const = 0;
 
 	/**
 		Get feature info list.

@@ -20,7 +20,7 @@ namespace imtlic
 
 CFeaturePackage::CFeaturePackage()
 	:BaseClass("FeatureInfo", "Feature info", "FeatureInfoProvider"),
-	m_ownerPtr(nullptr)
+	m_featurePackageCollectionPtr(nullptr)
 {
 }
 
@@ -65,11 +65,11 @@ QByteArrayList CFeaturePackage::GetFeatureDependencies(const QByteArray& feature
 
 const IFeatureInfoProvider* CFeaturePackage::GetDependencyContainer(const QByteArray& dependencyId) const
 {
-	if (m_ownerPtr != nullptr){
-		imtbase::ICollectionInfo::Ids featureInfoProviderIds = m_ownerPtr->GetElementIds();
+	if (m_featurePackageCollectionPtr != nullptr){
+		imtbase::ICollectionInfo::Ids featureInfoProviderIds = m_featurePackageCollectionPtr->GetElementIds();
 		for (const QByteArray& featureInfoProviderId : featureInfoProviderIds){
 			IFeatureInfoProvider* featureInfoProviderPtr = dynamic_cast<IFeatureInfoProvider*>(
-						const_cast<istd::IChangeable*>(m_ownerPtr->GetObjectPtr(featureInfoProviderId)));
+						const_cast<istd::IChangeable*>(m_featurePackageCollectionPtr->GetObjectPtr(featureInfoProviderId)));
 
 			if (featureInfoProviderPtr != nullptr){
 				const imtbase::ICollectionInfo::Ids& featureInfoIds = featureInfoProviderPtr->GetFeatureList().GetElementIds();
@@ -90,6 +90,12 @@ const IFeatureInfoProvider* CFeaturePackage::GetDependencyContainer(const QByteA
 
 
 // reimplemented (IFeatureInfoProvider)
+
+const imtbase::IObjectCollection* CFeaturePackage::GetFeaturePackages() const
+{
+	return m_featurePackageCollectionPtr;
+}
+
 
 const imtbase::ICollectionInfo& CFeaturePackage::GetFeatureList() const
 {
@@ -117,12 +123,12 @@ const imtbase::ICollectionInfo* CFeaturePackage::GetParentFeatureInfoProviderLis
 
 const IFeatureInfoProvider* CFeaturePackage::GetParentFeatureInfoProvider(const QByteArray& parentId) const
 {
-	if (m_ownerPtr != nullptr){
+	if (m_featurePackageCollectionPtr != nullptr){
 		if (m_parents.GetElementIds().contains(parentId)){
-			imtbase::ICollectionInfo::Ids featureInfoProviderIds = m_ownerPtr->GetElementIds();
+			imtbase::ICollectionInfo::Ids featureInfoProviderIds = m_featurePackageCollectionPtr->GetElementIds();
 			for (const QByteArray& featureInfoProviderId : featureInfoProviderIds){
 				IFeatureInfoProvider* featureInfoProviderPtr = dynamic_cast<IFeatureInfoProvider*>(
-							const_cast<istd::IChangeable*>(m_ownerPtr->GetObjectPtr(featureInfoProviderId)));
+							const_cast<istd::IChangeable*>(m_featurePackageCollectionPtr->GetObjectPtr(featureInfoProviderId)));
 
 				if (featureInfoProviderPtr != nullptr){
 					if (featureInfoProviderId == parentId){
