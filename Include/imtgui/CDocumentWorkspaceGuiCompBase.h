@@ -59,7 +59,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
 		I_ASSIGN(m_documentTemplateCompPtr, "DocumentTemplate", "Document template", true, "DocumentTemplate");
-		I_ASSIGN(m_tabsPositionAttrPtr, "TabsPosition", "Tabs position inside workspace (N, E, S, W)", true, "N");
+		I_ASSIGN(m_tabsPositionAttrPtr, "TabsPosition", "Tabs position inside workspace (0 - North, 1 - South, 2 - West, 3 - East)", true, 0);
 		I_ASSIGN_MULTI_0(m_fixedTabsCompPtr, "FixedViews", "List of fixed views", false);
 		I_ASSIGN_MULTI_0(m_fixedTabsNamesAttrPtr, "FixedViewNames", "List of names for the fixed views", false);
 		I_ASSIGN_MULTI_0(m_fixedVisualInfosCompPtr, "FixedVisualInfos", "List of additional visual infos related to the fixed views", false);
@@ -248,7 +248,7 @@ private:
 	int m_previousTabIndex;
 
 	I_REF(idoc::IDocumentTemplate, m_documentTemplateCompPtr);
-	I_ATTR(QString, m_tabsPositionAttrPtr);
+	I_ATTR(int, m_tabsPositionAttrPtr);
 	I_MULTIREF(iqtgui::IGuiObject, m_fixedTabsCompPtr);
 	I_MULTIREF(iqtgui::IVisualStatus, m_fixedVisualInfosCompPtr);
 	I_MULTITEXTATTR(m_fixedTabsNamesAttrPtr);

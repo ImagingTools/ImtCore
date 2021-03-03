@@ -512,16 +512,17 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	if (*m_tabsPositionAttrPtr == "E"){
-		Tabs->setTabPosition(QTabWidget::East);
-	}
-	else if (*m_tabsPositionAttrPtr == "S"){
+	switch (*m_tabsPositionAttrPtr){
+	case 1:
 		Tabs->setTabPosition(QTabWidget::South);
-	}
-	else if (*m_tabsPositionAttrPtr == "W"){
+		break;
+	case 2:
 		Tabs->setTabPosition(QTabWidget::West);
-	}
-	else{
+		break;
+	case 3:
+		Tabs->setTabPosition(QTabWidget::East);
+		break;
+	default:
 		Tabs->setTabPosition(QTabWidget::North);
 	}
 
