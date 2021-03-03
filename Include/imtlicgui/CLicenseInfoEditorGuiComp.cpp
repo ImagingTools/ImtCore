@@ -125,7 +125,7 @@ void CLicenseInfoEditorGuiComp::UpdateFeatureTree()
 		packageItemPtr->setForeground(0, QBrush(Qt::red));
 
 		for (const QByteArray& featureId : m_missingFeatures){
-			QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({QString("ID: %1").arg(QString(featureId))});
+			QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({tr("ID: %1").arg(QString(featureId))});
 			packageItemPtr->addChild(featureItemPtr);
 			featureItemPtr->setData(0, DR_ITEM_ID, featureId);
 			featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
