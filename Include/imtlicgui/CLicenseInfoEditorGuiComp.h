@@ -89,6 +89,7 @@ protected:
 	{
 		QByteArray id;
 		QString name;
+		QString description;
 	};
 
 	typedef QList<FeatureDescription> FeatureDescriptionList;

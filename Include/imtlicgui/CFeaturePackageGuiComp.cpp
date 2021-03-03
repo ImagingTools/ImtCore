@@ -76,7 +76,7 @@ void CFeaturePackageGuiComp::OnGuiModelAttached()
 		Q_ASSERT(modelPtr != nullptr);
 
 		if (modelPtr->AttachObserver(m_objectCollectionObserverCompPtr.GetPtr())){
-			m_objectCollectionViewCompPtr->CreateGui(FeatureList);
+			m_objectCollectionViewCompPtr->CreateGui(FeatureCollectionView);
 		}
 	}
 }

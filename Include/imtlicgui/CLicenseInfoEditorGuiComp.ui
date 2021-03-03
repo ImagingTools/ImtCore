@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>459</width>
-    <height>754</height>
+    <width>724</width>
+    <height>638</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -165,12 +165,31 @@ QAbstractItemView[TabSimulation=true]
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
        <widget class="QTreeWidget" name="Features">
+        <property name="columnCount">
+         <number>3</number>
+        </property>
         <attribute name="headerVisible">
-         <bool>false</bool>
+         <bool>true</bool>
+        </attribute>
+        <attribute name="headerMinimumSectionSize">
+         <number>50</number>
+        </attribute>
+        <attribute name="headerDefaultSectionSize">
+         <number>150</number>
         </attribute>
         <column>
          <property name="text">
-          <string notr="true">1</string>
+          <string notr="true">Feature Name</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string notr="true">Feature-ID</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string notr="true">Feature Description</string>
          </property>
         </column>
        </widget>

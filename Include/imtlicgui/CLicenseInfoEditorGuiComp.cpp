@@ -47,6 +47,7 @@ void CLicenseInfoEditorGuiComp::OnFeaturePackageCollectionUpdate()
 
 						featureDescription.id = featureInfoPtr->GetFeatureId();
 						featureDescription.name = featureInfoPtr->GetFeatureName();
+						featureDescription.description = packagePtr->GetFeatureList().GetElementInfo(featureId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 						featureDescriptionList.append(featureDescription);
 					}
@@ -106,7 +107,10 @@ void CLicenseInfoEditorGuiComp::UpdateFeatureTree()
 
 		FeatureDescriptionList featureDescriptionList = m_packageFeatures[packageId];
 		for (const FeatureDescription& featureDescription : featureDescriptionList){
-			QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({featureDescription.name});
+			QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({
+						featureDescription.name,
+						featureDescription.id,
+						featureDescription.description});
 			packageItemPtr->addChild(featureItemPtr);
 			featureItemPtr->setData(0, DR_ITEM_ID, featureDescription.id);
 			featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
