@@ -35,6 +35,9 @@ public:
 
 	CLicenseInfoEditorGuiComp();
 
+Q_SIGNALS:
+	void EmitItemChanged();
+
 protected:
 	void OnFeaturePackageCollectionUpdate();
 	void EnumerateMissingFeatures();
@@ -51,9 +54,6 @@ protected:
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
-
-Q_SIGNALS:
-	void EmitItemChanged();
 
 private Q_SLOTS:
 	void on_NameEdit_editingFinished();

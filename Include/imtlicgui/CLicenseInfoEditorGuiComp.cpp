@@ -291,13 +291,13 @@ void CLicenseInfoEditorGuiComp::UpdateModel() const
 void CLicenseInfoEditorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
-	connect(Features, &QTreeWidget::itemChanged, this, &CLicenseInfoEditorGuiComp::OnItemChanged, Qt::QueuedConnection);
+	connect(this, &CLicenseInfoEditorGuiComp::EmitItemChanged, this, &CLicenseInfoEditorGuiComp::OnItemChanged, Qt::QueuedConnection);
 }
 
 
 void CLicenseInfoEditorGuiComp::OnGuiDestroyed()
 {
-	disconnect(Features, &QTreeWidget::itemChanged, this, &CLicenseInfoEditorGuiComp::OnItemChanged);
+	disconnect(this, &CLicenseInfoEditorGuiComp::EmitItemChanged, this, &CLicenseInfoEditorGuiComp::OnItemChanged);
 	BaseClass::OnGuiDestroyed();
 }
 
