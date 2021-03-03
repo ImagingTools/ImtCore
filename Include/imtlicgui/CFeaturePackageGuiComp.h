@@ -7,6 +7,7 @@
 #include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
+#include <imtbase/IObjectCollection.h>
 #include <imtlic/IFeatureInfoProvider.h>
 #include <GeneratedFiles/imtlicgui/ui_CFeaturePackageGuiComp.h>
 
@@ -37,7 +38,17 @@ public:
 
 	CFeaturePackageGuiComp();
 
+Q_SIGNALS:
+	void EmitFeatureTreeItemChanged();
+
 protected:
+	void OnFeaturePackageCollectionUpdate();
+	void EnumerateMissingDependencies();
+	void UpdateFeatureList();
+	void UpdateFeatureTree();
+	void UpdateFeatureTreeCheckStates();
+	QTreeWidgetItem* GetItem(const QByteArray& itemId);
+
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
@@ -52,17 +63,62 @@ protected:
 	virtual void OnGuiModelDetached() override;
 	virtual void UpdateModel() const;
 
-protected Q_SLOTS:
+private Q_SLOTS:
+	void on_FeatureTree_itemChanged(QTreeWidgetItem *item, int column);
 	virtual void OnShowCollectionEditor();
 	virtual void OnShowFeatureDependencyEditor();
+	virtual void OnFeatureListSelectionChanged();
+	virtual void OnFeatureTreeItemChanged();
 
-private:
-	void UpdateCommands();
+protected:
+	enum DataRole
+	{
+		DR_ITEM_ID = Qt::UserRole,
+		DR_ITEM_TYPE
+	};
+
+	enum ItemType
+	{
+		IT_PACKAGE = 0,
+		IT_FEATURE
+	};
+
+	class FeaturePackageCollectionObserver: public imod::TSingleModelObserverBase<imtbase::IObjectCollection>
+	{
+	public:
+		FeaturePackageCollectionObserver(CFeaturePackageGuiComp& parent);
+
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+	private:
+		CFeaturePackageGuiComp& m_parent;
+	};
+
+	struct FeatureDescription
+	{
+		QByteArray id;
+		QString name;
+		QString description;
+	};
+
+	typedef QList<FeatureDescription> FeatureDescriptionList;
 
 protected:
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_showCollectionEditorCommand;
 	iqtgui::CHierarchicalCommand m_showDependenciesEditorCommand;
+
+	bool m_isGuiModelInitialized;
+	bool m_isCollectionRepresentationInitialized;
+
+	QByteArrayList m_dependencies;
+
+	// Feature package collection related members
+	QMap<QByteArray, FeatureDescriptionList> m_packageFeatures;
+	QMap<QByteArray, QString> m_packageNames;
+	QByteArrayList m_missingDependencies;
+
+	FeaturePackageCollectionObserver m_collectionObserver;
 
 private:
 	I_REF(iqtgui::IGuiObject, m_objectCollectionViewCompPtr);

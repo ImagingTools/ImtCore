@@ -98,7 +98,17 @@
         <widget class="QTreeWidget" name="FeatureTree">
          <column>
           <property name="text">
-           <string notr="true">1</string>
+           <string>Feature Name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Feature-ID</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Feature Description</string>
           </property>
          </column>
         </widget>
