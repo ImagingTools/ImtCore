@@ -244,6 +244,7 @@ void CLicenseInfoEditorGuiComp::OnGuiModelAttached()
 	imod::IModel* modelPtr = const_cast<imod::IModel*>(
 				dynamic_cast<const imod::IModel*>(
 							dynamic_cast<const imtbase::IObjectCollection*>(licenseInfoPtr->GetFeaturePackages())));
+
 	if (modelPtr != nullptr){
 		modelPtr->AttachObserver(&m_collectionObserver);
 	}
@@ -258,6 +259,7 @@ void CLicenseInfoEditorGuiComp::OnGuiModelDetached()
 	imod::IModel* modelPtr = const_cast<imod::IModel*>(
 				dynamic_cast<const imod::IModel*>(
 					dynamic_cast<const imtbase::IObjectCollection*>(licenseInfoPtr->GetFeaturePackages())));
+
 	if (modelPtr != nullptr){
 		if (modelPtr->IsAttached(&m_collectionObserver)){
 			modelPtr->DetachObserver(&m_collectionObserver);
