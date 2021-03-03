@@ -5,7 +5,7 @@
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
-#include <imtlic/IFeatureDependenciesProvider.h>
+#include <imtlic/IFeatureDependenciesManager.h>
 #include <imtlic/IFeatureInfo.h>
 
 namespace imtlicgui
@@ -357,18 +357,20 @@ void CFeaturePackageGuiComp::OnGuiModelDetached()
 
 void CFeaturePackageGuiComp::UpdateModel() const
 {
-	//QListWidgetItem* itemPtr = FeatureList->currentItem();
-	//if (itemPtr != nullptr){
-	//	QByteArray featureId = itemPtr->data(DR_ITEM_ID).toByteArray();
+	QListWidgetItem* itemPtr = FeatureList->currentItem();
+	if (itemPtr != nullptr){
+		QByteArray featureId = itemPtr->data(DR_ITEM_ID).toByteArray();
 
-	//	imtlic::IFeatureInfoProvider* featureInfoProviderPtr = GetObservedObject();
-	//	if (featureInfoProviderPtr != nullptr){
-	//		const imtlic::IFeatureDependenciesProvider* dependenciesProviderPtr = featureInfoProviderPtr->GetDependenciesInfoProvider();
-	//		if (dependenciesProviderPtr != nullptr){
-	//			QByteArrayList m_dependencies = dependenciesProviderPtr->SetFeatureDependencies(featureId);
-	//		}
-	//	}
-	//}
+		imtlic::IFeatureInfoProvider* featureInfoProviderPtr = GetObservedObject();
+		if (featureInfoProviderPtr != nullptr){
+			imtlic::IFeatureDependenciesManager* dependenciesManagerPtr = dynamic_cast<imtlic::IFeatureDependenciesManager*>(
+						const_cast<imtlic::IFeatureDependenciesProvider*>(featureInfoProviderPtr->GetDependenciesInfoProvider()));
+
+			if (dependenciesManagerPtr != nullptr){
+				dependenciesManagerPtr->SetFeatureDependencies(featureId, m_dependencies);
+			}
+		}
+	}
 }
 
 
@@ -438,7 +440,7 @@ void CFeaturePackageGuiComp::OnFeatureListSelectionChanged()
 		if (featureInfoProviderPtr != nullptr){
 			const imtlic::IFeatureDependenciesProvider* dependenciesProviderPtr = featureInfoProviderPtr->GetDependenciesInfoProvider();
 			if (dependenciesProviderPtr != nullptr){
-				QByteArrayList m_dependencies = dependenciesProviderPtr->GetFeatureDependencies(featureId);
+				m_dependencies = dependenciesProviderPtr->GetFeatureDependencies(featureId);
 			}
 		}
 	}

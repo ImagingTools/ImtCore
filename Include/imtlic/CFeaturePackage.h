@@ -4,7 +4,7 @@
 // ImtCore includes
 #include <imtbase/TAggergatedObjectCollectionWrap.h>
 #include <imtbase/CCollectionInfo.h>
-#include <imtlic/IFeatureDependenciesProvider.h>
+#include <imtlic/IFeatureDependenciesManager.h>
 #include <imtlic/IFeatureInfoProvider.h>
 #include <imtlic/CFeatureInfo.h>
 
@@ -15,15 +15,17 @@ namespace imtlic
 
 class CFeaturePackage:
 			public imtbase::TAggergatedObjectCollectionWrap<IFeatureInfoProvider, CFeatureInfo>,
-			virtual public IFeatureDependenciesProvider
+			virtual public IFeatureDependenciesManager
 {
 public:
 	typedef imtbase::TAggergatedObjectCollectionWrap<IFeatureInfoProvider, CFeatureInfo> BaseClass;
 
 	CFeaturePackage();
 
-	void SetDependencies(const QByteArray& featureId, const QByteArrayList& dependentIds);
 	void SetParents(const QByteArrayList& parentIds);
+
+	// reimplemented (IFeatureDependenciesManager)
+	void SetFeatureDependencies(const QByteArray& featureId, const QByteArrayList& dependentIds);
 
 	// reimplemented (IFeatureDependenciesProvider)
 	virtual QByteArrayList GetFeatureDependencies(const QByteArray& featureId) const override;

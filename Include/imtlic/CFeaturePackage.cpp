@@ -25,7 +25,21 @@ CFeaturePackage::CFeaturePackage()
 }
 
 
-void CFeaturePackage::SetDependencies(const QByteArray& featureId, const QByteArrayList& dependentIds)
+void CFeaturePackage::SetParents(const QByteArrayList& parentIds)
+{
+	istd::CChangeNotifier notifier(this);
+
+	m_parents.ResetData();
+
+	for (const QByteArray& parentId : parentIds){
+		m_parents.InsertItem(parentId, "", "");
+	}
+}
+
+
+// reimplemented (IFeatureDependenciesManager)
+
+void CFeaturePackage::SetFeatureDependencies(const QByteArray& featureId, const QByteArrayList& dependentIds)
 {
 	istd::CChangeNotifier notifier(this);
 
@@ -36,18 +50,6 @@ void CFeaturePackage::SetDependencies(const QByteArray& featureId, const QByteAr
 	}
 
 	m_dependencies[featureId] = dependentIds;
-}
-
-
-void CFeaturePackage::SetParents(const QByteArrayList& parentIds)
-{
-	istd::CChangeNotifier notifier(this);
-
-	m_parents.ResetData();
-
-	for (const QByteArray& parentId : parentIds){
-		m_parents.InsertItem(parentId, "", "");
-	}
 }
 
 
