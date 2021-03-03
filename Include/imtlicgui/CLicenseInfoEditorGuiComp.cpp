@@ -295,7 +295,7 @@ void CLicenseInfoEditorGuiComp::OnGuiCreated()
 
 void CLicenseInfoEditorGuiComp::OnGuiDestroyed()
 {
-	connect(Features, &QTreeWidget::itemChanged, this, &CLicenseInfoEditorGuiComp::OnItemChanged);
+	disconnect(Features, &QTreeWidget::itemChanged, this, &CLicenseInfoEditorGuiComp::OnItemChanged);
 	BaseClass::OnGuiDestroyed();
 }
 
