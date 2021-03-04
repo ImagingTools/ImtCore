@@ -149,11 +149,8 @@ void CLicenseManagerViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.InsertItem("LicenseId", tr("License-ID"), "");
 	m_summaryInformationHeaders["LicenseId"] = HeaderInfo(true);
 
-	m_summaryInformationTypes.InsertItem("PackageId", tr("Package-ID"), "");
-	m_summaryInformationHeaders["PackageId"] = HeaderInfo(false);
-
-	m_summaryInformationTypes.InsertItem("Expiration", tr("Expiration"), "");
-	m_summaryInformationHeaders["Expiration"] = HeaderInfo(false);
+	//m_summaryInformationTypes.InsertItem("Expiration", tr("Expiration"), "");
+	//m_summaryInformationHeaders["Expiration"] = HeaderInfo(false);
 }
 
 

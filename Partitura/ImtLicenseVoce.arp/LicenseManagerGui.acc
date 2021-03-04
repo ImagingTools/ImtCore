@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4902" Description="ACF"/>
+            <Version Id="0" Number="4900" Description="ACF"/>
             <Version Id="1" Number="2135" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331009" Description="Qt Framework"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>UI for license management</Description>
@@ -49,7 +49,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DialogSize" Type="Real" ExportId="">
-                        <Data IsEnabled="true" Value="0.15"/>
+                        <Data IsEnabled="true" Value="0.5"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DialogTitle" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Edit License"/>

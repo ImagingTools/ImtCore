@@ -72,7 +72,7 @@ bool CFeaturePackageMetaInfoCreatorComp::CreateMetaInfo(
 	imtbase::ICollectionInfo::Ids ids = featurePckagePtr->GetFeatureList().GetElementIds();
 	for (imtbase::ICollectionInfo::Id id : ids){
 		const imtlic::IFeatureInfo* featureInfoPtr = featurePckagePtr->GetFeatureInfo(id);
-		retVal += featureInfoPtr->GetFeatureName() + " (" + featureInfoPtr->GetFeatureId() + ")" + "\n";
+		retVal += featureInfoPtr->GetFeatureName() + "\n";
 	}
 
 	retVal.chop(1);

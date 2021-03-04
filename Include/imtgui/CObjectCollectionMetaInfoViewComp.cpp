@@ -65,7 +65,7 @@ void CObjectCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 			labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: #88b8e3");
 
 			QLabel* labelValuePtr = new QLabel(textValue, GetWidget());
-			labelValuePtr->setWordWrap(true);
+		//	labelValuePtr->setWordWrap(true);
 
 			layoutPtr->addWidget(labelNamePtr, layoutPtr->rowCount(), 0, 1, 1);
 			if (labelValuePtr != nullptr){
