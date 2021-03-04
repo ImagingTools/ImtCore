@@ -1,6 +1,9 @@
 #include <imtlicgui/CFeaturePackageGuiComp.h>
 
 
+// Qt includes
+#include <QtWidgets/QMessageBox>
+
 // ACF includes
 #include <istd/CChangeGroup.h>
 
@@ -108,9 +111,9 @@ void CFeaturePackageGuiComp::UpdateFeatureList()
 		for (QByteArray& id : ids){
 			const imtlic::IFeatureInfo* featureInfoPtr = featureInfoProviderPtr->GetFeatureInfo(id);
 			if (featureInfoPtr != nullptr){
-				QListWidgetItem* itemPtr = new QListWidgetItem(featureInfoPtr->GetFeatureName());
-				FeatureList->addItem(itemPtr);
-				itemPtr->setData(DR_ITEM_ID, featureInfoPtr->GetFeatureId());
+				QTreeWidgetItem* itemPtr = new QTreeWidgetItem({featureInfoPtr->GetFeatureName()});
+				FeatureList->addTopLevelItem(itemPtr);
+				itemPtr->setData(0, DR_ITEM_ID, featureInfoPtr->GetFeatureId());
 			}
 		}
 	}
@@ -123,8 +126,10 @@ void CFeaturePackageGuiComp::UpdateFeatureTree()
 
 	FeatureTree->clear();
 
-	QListWidgetItem* selectedItemPtr = FeatureList->currentItem();
+	QTreeWidgetItem* selectedItemPtr = FeatureList->currentItem();
 	if (selectedItemPtr != nullptr){
+		QByteArray selectedItemId = selectedItemPtr->data(0, DR_ITEM_ID).toByteArray();
+			
 		QByteArrayList packageIds = m_packageFeatures.keys();
 		for (const QByteArray& packageId : packageIds){
 			QTreeWidgetItem* packageItemPtr = new QTreeWidgetItem({m_packageNames[packageId]});
@@ -134,6 +139,10 @@ void CFeaturePackageGuiComp::UpdateFeatureTree()
 
 			FeatureDescriptionList featureDescriptionList = m_packageFeatures[packageId];
 			for (const FeatureDescription& featureDescription : featureDescriptionList){
+				if (featureDescription.id == selectedItemId){
+					continue;
+				}
+
 				QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({
 					featureDescription.name,
 					featureDescription.id,
@@ -250,6 +259,52 @@ QTreeWidgetItem* CFeaturePackageGuiComp::GetItem(const QByteArray& itemId)
 }
 
 
+CFeaturePackageGuiComp::DependencyMap CFeaturePackageGuiComp::BuildDependencyMap(const imtbase::IObjectCollection& packageCollection)
+{
+	CFeaturePackageGuiComp::DependencyMap dependencyMap;
+
+	imtbase::ICollectionInfo::Ids packageIds = packageCollection.GetElementIds();
+	for (const QByteArray& packageId : packageIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		packageCollection.GetObjectData(packageId, dataPtr);
+
+		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
+		if (packagePtr != nullptr){
+			const imtlic::IFeatureDependenciesProvider* dependenciesProvider = packagePtr->GetDependenciesInfoProvider();
+			if (dependenciesProvider != nullptr){
+				imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetFeatureList().GetElementIds();
+				for (const QByteArray& featureId : featureIds){
+					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureId);
+					if (featureInfoPtr != nullptr){
+						dependencyMap[featureInfoPtr->GetFeatureId()] = dependenciesProvider->GetFeatureDependencies(featureInfoPtr->GetFeatureId());
+					}
+				}
+			}
+		}
+	}
+
+	return dependencyMap;
+}
+
+
+bool CFeaturePackageGuiComp::HasDependency(const DependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId)
+{
+	if (dependencyMap.contains(fromFeatureId)){
+		if (dependencyMap[fromFeatureId].contains(toFeatureId)){
+			return true;
+		}
+
+		for (const QByteArray& featureId : dependencyMap[fromFeatureId]){
+			if (HasDependency(dependencyMap, featureId, toFeatureId)){
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
 // reimplemented(ibase::ICommandsProvider)
 
 const ibase::IHierarchicalCommand* CFeaturePackageGuiComp::GetCommands() const
@@ -264,7 +319,7 @@ void CFeaturePackageGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	connect(FeatureList, &QListWidget::itemSelectionChanged, this, &CFeaturePackageGuiComp::OnFeatureListSelectionChanged);
+	connect(FeatureList, &QTreeWidget::itemSelectionChanged, this, &CFeaturePackageGuiComp::OnFeatureListSelectionChanged);
 	connect(this, &CFeaturePackageGuiComp::EmitFeatureTreeItemChanged, this, &CFeaturePackageGuiComp::OnFeatureTreeItemChanged, Qt::QueuedConnection);
 }
 
@@ -272,7 +327,7 @@ void CFeaturePackageGuiComp::OnGuiCreated()
 void CFeaturePackageGuiComp::OnGuiDestroyed()
 {
 	disconnect(this, &CFeaturePackageGuiComp::EmitFeatureTreeItemChanged, this, &CFeaturePackageGuiComp::OnFeatureTreeItemChanged);
-	disconnect(FeatureList, &QListWidget::itemChanged, this, &CFeaturePackageGuiComp::OnFeatureListSelectionChanged);
+	disconnect(FeatureList, &QTreeWidget::itemSelectionChanged, this, &CFeaturePackageGuiComp::OnFeatureListSelectionChanged);
 
 	BaseClass::OnGuiDestroyed();
 }
@@ -357,9 +412,9 @@ void CFeaturePackageGuiComp::OnGuiModelDetached()
 
 void CFeaturePackageGuiComp::UpdateModel() const
 {
-	QListWidgetItem* itemPtr = FeatureList->currentItem();
+	QTreeWidgetItem* itemPtr = FeatureList->currentItem();
 	if (itemPtr != nullptr){
-		QByteArray featureId = itemPtr->data(DR_ITEM_ID).toByteArray();
+		QByteArray featureId = itemPtr->data(0, DR_ITEM_ID).toByteArray();
 
 		imtlic::IFeatureInfoProvider* featureInfoProviderPtr = GetObservedObject();
 		if (featureInfoProviderPtr != nullptr){
@@ -378,36 +433,70 @@ void CFeaturePackageGuiComp::UpdateModel() const
 
 void CFeaturePackageGuiComp::on_FeatureTree_itemChanged(QTreeWidgetItem *item, int column)
 {
+	DependencyMap dependencyMap;
+	imtbase::IObjectCollection* collectionPtr = m_collectionObserver.GetObjectPtr();
+	if (collectionPtr != nullptr){
+		dependencyMap = BuildDependencyMap(*collectionPtr);
+	}
+
+	QByteArray selectedItemId;
+	QTreeWidgetItem* selectedItemPtr = FeatureList->currentItem();
+	if (selectedItemPtr != nullptr){
+		selectedItemId = selectedItemPtr->data(0, DR_ITEM_ID).toByteArray();
+	}
+
 	if (item->data(0, DR_ITEM_TYPE) == IT_PACKAGE){
 		Qt::CheckState state = item->checkState(0);
 
 		for (int i = 0; i < item->childCount(); i++){
 			QTreeWidgetItem* featureItemPtr = item->child(i);
-			QByteArray id = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
+			QByteArray featureId = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
 
 			if (state == Qt::Checked){
-				if (!m_dependencies.contains(id)){
-					m_dependencies.append(id);
+				if (!m_dependencies.contains(featureId)){
+					if (!HasDependency(dependencyMap, featureId, selectedItemId)){
+						m_dependencies.append(featureId);
+					}
+					else{
+						QMessageBox::warning(
+									this->GetWidget(),
+									tr("Warning"),
+									tr("Feature with ID '%1' has a cyclic dependence on feature with ID '%2'")
+												.arg(QString(featureId))
+												.arg(QString(selectedItemId)));
+
+						break;
+					}
 				}
 			}
 			else{
-				if (m_dependencies.contains(id)){
-					m_dependencies.removeOne(id);
+				if (m_dependencies.contains(featureId)){
+					m_dependencies.removeOne(featureId);
 				}
 			}
 		}
 	}
 	else{
-		QByteArray id = item->data(0, DR_ITEM_ID).toByteArray();
+		QByteArray featureId = item->data(0, DR_ITEM_ID).toByteArray();
 
 		if (item->checkState(0) == Qt::Checked){
-			if (!m_dependencies.contains(id)){
-				m_dependencies.append(id);
+			if (!m_dependencies.contains(featureId)){
+				if (!HasDependency(dependencyMap, featureId, selectedItemId)){
+					m_dependencies.append(featureId);
+				}
+				else{
+					QMessageBox::warning(
+								this->GetWidget(),
+								tr("Warning"),
+								tr("Feature with ID '%1' has a cyclic dependence on feature with ID '%2'")
+											.arg(QString(featureId))
+											.arg(QString(selectedItemId)));
+				}
 			}
 		}
 		else{
-			if (m_dependencies.contains(id)){
-				m_dependencies.removeOne(id);
+			if (m_dependencies.contains(featureId)){
+				m_dependencies.removeOne(featureId);
 			}
 		}
 	}
@@ -432,9 +521,9 @@ void CFeaturePackageGuiComp::OnFeatureListSelectionChanged()
 {
 	m_dependencies.clear();
 
-	QListWidgetItem* itemPtr = FeatureList->currentItem();
+	QTreeWidgetItem* itemPtr = FeatureList->currentItem();
 	if (itemPtr != nullptr){
-		QByteArray featureId = itemPtr->data(DR_ITEM_ID).toByteArray();
+		QByteArray featureId = itemPtr->data(0, DR_ITEM_ID).toByteArray();
 
 		imtlic::IFeatureInfoProvider* featureInfoProviderPtr = GetObservedObject();
 		if (featureInfoProviderPtr != nullptr){

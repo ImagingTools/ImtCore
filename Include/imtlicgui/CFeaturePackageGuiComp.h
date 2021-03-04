@@ -42,12 +42,16 @@ Q_SIGNALS:
 	void EmitFeatureTreeItemChanged();
 
 protected:
+	typedef QMap<QByteArray, QByteArrayList> DependencyMap;
+
 	void OnFeaturePackageCollectionUpdate();
 	void EnumerateMissingDependencies();
 	void UpdateFeatureList();
 	void UpdateFeatureTree();
 	void UpdateFeatureTreeCheckStates();
 	QTreeWidgetItem* GetItem(const QByteArray& itemId);
+	DependencyMap BuildDependencyMap(const imtbase::IObjectCollection& packageCollection);
+	bool HasDependency(const DependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId);
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;

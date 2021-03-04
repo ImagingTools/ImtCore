@@ -206,6 +206,46 @@ bool CFeaturePackage::Serialize(iser::IArchive& archive)
 }
 
 
+// reimplemented (istd::IChangeable)
+
+bool CFeaturePackage::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	bool retVal = BaseClass::CopyFrom(object, mode);
+	if (!retVal){
+		return false;
+	}
+
+	const CFeaturePackage* sourcePtr = dynamic_cast<const CFeaturePackage*>(&object);
+	if (sourcePtr != nullptr){
+
+		m_dependencies = sourcePtr->m_dependencies;
+		m_parents = sourcePtr->m_parents;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CFeaturePackage::ResetData(CompatibilityMode mode)
+{
+	if (!BaseClass::ResetData(mode)){
+		return false;
+	}
+
+	if (!m_parents.ResetData(mode)){
+		return false;
+	}
+
+	m_dependencies.clear();
+
+	return true;
+}
+
+
 } // namespace imtlic
 
 

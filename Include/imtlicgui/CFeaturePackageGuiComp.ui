@@ -92,7 +92,13 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QListWidget" name="FeatureList"/>
+        <widget class="QTreeWidget" name="FeatureList">
+         <column>
+          <property name="text">
+           <string>Feature Name</string>
+          </property>
+         </column>
+        </widget>
        </item>
        <item>
         <widget class="QTreeWidget" name="FeatureTree">
