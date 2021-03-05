@@ -1,0 +1,54 @@
+#pragma once
+
+
+// ACF includes
+#include <iqtgui/TDesignerGuiObserverCompBase.h>
+
+// ImtCore includes
+#include <imtlic/IProductInstanceInfo.h>
+#include <GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h>
+
+
+namespace imtlicgui
+{
+
+
+/**
+	Editor for the license info.
+	\ingroup LicenseManagement
+*/
+class CProductInstanceInfoEditorComp:
+			public iqtgui::TDesignerGuiObserverCompBase<
+						Ui::CProductInstanceInfoEditorComp, imtlic::IProductInstanceInfo>
+{
+	Q_OBJECT
+
+public:
+	typedef iqtgui::TDesignerGuiObserverCompBase<
+				Ui::CProductInstanceInfoEditorComp, imtlic::IProductInstanceInfo> BaseClass;
+
+	I_BEGIN_COMPONENT(CProductInstanceInfoEditorComp);
+	I_END_COMPONENT;
+
+	CProductInstanceInfoEditorComp();
+
+protected:
+	// reimplemented (iqtgui::TGuiObserverWrap)
+	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
+	virtual void OnGuiModelAttached() override;
+	virtual void OnGuiModelDetached() override;
+	virtual void UpdateModel() const;
+
+	// reimplemented (iqtgui::CGuiComponentBase)
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiDestroyed() override;
+
+private Q_SLOTS:
+	void on_NameEdit_editingFinished();
+	void on_IdEdit_editingFinished();
+};
+
+
+} // namespace imtlicgui
+
+

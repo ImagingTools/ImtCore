@@ -19,10 +19,25 @@ namespace imtlic
 // public methods
 
 CProductInstanceInfo::CProductInstanceInfo()
+	:m_customerCollectionPtr(nullptr),
+	m_productCollectionPtr(nullptr)
 {
 }
 
+
 // reimplemented (imtlic::IProductInstanceInfo)
+
+const imtbase::IObjectCollection* CProductInstanceInfo::GetProductDatabase() const
+{
+	return m_productCollectionPtr;
+}
+
+
+const imtbase::IObjectCollection* CProductInstanceInfo::GetCustomerDatabase() const
+{
+	return m_customerCollectionPtr;
+}
+
 
 void CProductInstanceInfo::SetupProductInstance(
 			const imtlic::IProductInfo& product,
@@ -32,7 +47,6 @@ void CProductInstanceInfo::SetupProductInstance(
 	Q_ASSERT(!instanceId.isEmpty());
 	Q_ASSERT(!product.GetProductId().isEmpty());
 
-	m_productName = product.GetName();
 	m_productId = product.GetProductId();
 	m_customerId = customerId;
 	m_instanceId = instanceId;
@@ -113,11 +127,6 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_customerId);
 	retVal = retVal && archive.EndTag(customerIdTag);
 
-	static iser::CArchiveTag productNameTag("ProductName", "Name of the product", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(productNameTag);
-	retVal = retVal && archive.Process(m_productName);
-	retVal = retVal && archive.EndTag(productNameTag);
-
 	static iser::CArchiveTag licensesTag("Licenses", "List of product licenses", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(licensesTag);
 	retVal = retVal && m_licenses.Serialize(archive);
@@ -143,7 +152,6 @@ bool CProductInstanceInfo::CopyFrom(const IChangeable& object, CompatibilityMode
 
 		m_licenses.CopyFrom(sourcePtr->m_licenses);
 		m_productId = sourcePtr->m_productId;
-		m_productName = sourcePtr->m_productName;
 
 		return true;
 	}
@@ -170,8 +178,6 @@ bool CProductInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 	m_licenses.ResetData();
 
 	m_productId.clear();
-
-	m_productName.clear();
 
 	return true;
 }

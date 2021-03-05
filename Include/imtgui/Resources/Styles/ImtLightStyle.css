@@ -272,11 +272,14 @@ QHeaderView::section
 	font-weight: bold;
 }
 
+QTabBar {
+    background-color: rgb(230,230,232);
+}
 
 QTabBar::tab[CollectionView=true]
 {
     min-height: 30px;
-    background: transparent;
+    background-color: rgb(230,230,232);
     min-width: 50ex;
     padding: 2px;
 }

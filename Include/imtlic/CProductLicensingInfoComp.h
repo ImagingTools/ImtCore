@@ -30,7 +30,7 @@ public:
 		I_REGISTER_INTERFACE(IProductInfo);
 		I_REGISTER_INTERFACE(IProductLicensingInfo);
 		I_REGISTER_INTERFACE(iser::ISerializable);
-		I_ASSIGN(m_collectionInfoCompPtr, "ProductCollectionInfo", "Product collection info", false, "ProductCollection");
+		I_ASSIGN(m_productCollectionCompPtr, "ProductCollection", "Product database containing this object", false, "ProductCollection");
 	I_END_COMPONENT
 
 protected:
@@ -38,7 +38,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 protected:
-	I_REF(imtbase::ICollectionInfo, m_collectionInfoCompPtr);
+	I_REF(imtbase::ICollectionInfo, m_productCollectionCompPtr);
 };
 
 

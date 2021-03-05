@@ -54,6 +54,11 @@ I_EXPORT_COMPONENT(
 			"Feature package view delegate",
 			"Feature Licensing Collection Package View Delegate");
 
+I_EXPORT_COMPONENT(
+			ProductInstanceInfoEditor,
+			"Product instance editor",
+			"Licensing Product Instance Installation");
+
 
 } // namespace ImtLicenseGuiPck
 

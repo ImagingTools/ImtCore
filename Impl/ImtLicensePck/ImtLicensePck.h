@@ -13,6 +13,7 @@
 #include <imtlic/CLicenseBasedRightsProviderComp.h>
 #include <imtlic/CProductLicensingInfo.h>
 #include <imtlic/CProductCollection.h>
+#include <imtlic/CProductInstanceInfoComp.h>
 #include <imtlic/CProductInstanceCollection.h>
 #include <imtlic/CProductLicensingInfoComp.h>
 #include <imtlic/CFeaturePackageMetaInfoCreatorComp.h>
@@ -46,6 +47,7 @@ typedef icomp::TModelCompWrap<
 						imtlic::IProductLicensingInfo,
 						imtlic::IProductInfo,
 						iser::ISerializable>> ProductCollection;
+typedef icomp::TModelCompWrap<imtlic::CProductInstanceInfoComp> ProductInstanceInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtlic::CProductInstanceCollection,

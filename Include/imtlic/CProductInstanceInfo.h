@@ -21,6 +21,8 @@ public:
 	CProductInstanceInfo();
 
 	// reimplemented (imtlic::IProductInstanceInfo)
+	virtual const imtbase::IObjectCollection* GetProductDatabase() const override;
+	virtual const imtbase::IObjectCollection* GetCustomerDatabase() const override;
 	virtual void SetupProductInstance(
 				const imtlic::IProductInfo& product,
 				const QByteArray& instanceId,
@@ -46,10 +48,12 @@ public:
 
 protected:
 	imtbase::CSimpleReferenceCollection m_licenses;
-	QString m_productName;
 	QByteArray m_productId;
 	QByteArray m_customerId;
 	QByteArray m_instanceId;
+
+	const imtbase::IObjectCollection* m_customerCollectionPtr;
+	const imtbase::IObjectCollection* m_productCollectionPtr;
 };
 
 

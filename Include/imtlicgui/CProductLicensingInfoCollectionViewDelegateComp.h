@@ -25,6 +25,6 @@ protected:
 };
 
 
-} // namespace aculainspgui
+} // namespace imtlicgui
 
 

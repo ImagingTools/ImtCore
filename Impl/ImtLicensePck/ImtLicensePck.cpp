@@ -50,6 +50,11 @@ I_EXPORT_COMPONENT(
 			"License Products System");
 
 I_EXPORT_COMPONENT(
+			ProductInstanceInfo,
+			"Information about an installed instance of the product",
+			"License Product Instance Setup Info Installation");
+
+I_EXPORT_COMPONENT(
 			ProductInstanceCollection,
 			"List of all installed product instances",
 			"License Products Installations");

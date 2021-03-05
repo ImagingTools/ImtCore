@@ -141,6 +141,11 @@ CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::CollectionDocumentVi
 
 	setObjectName("DocumentView");
 
+	m_commands.InsertChild(&m_undoCommand);
+	m_commands.InsertChild(&m_redoCommand);
+	m_commands.InsertChild(&m_saveCommand);
+	m_commands.InsertChild(&m_closeCommand);
+
 	UndoButton->setEnabled(false);
 	RedoButton->setEnabled(false);
 	m_undoCommand.setEnabled(false);

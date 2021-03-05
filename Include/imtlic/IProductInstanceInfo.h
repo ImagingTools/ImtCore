@@ -8,6 +8,12 @@
 #include <imtlic/ILicenseInfoProvider.h>
 
 
+namespace imtbase
+{
+	class IObjectCollection;
+}
+
+
 namespace imtlic
 {
 
@@ -24,6 +30,16 @@ class IProductInfo;
 class IProductInstanceInfo: virtual public imtlic::ILicenseInfoProvider, virtual public iser::IObject
 {
 public:
+	/**
+		Get access to the product database.
+	*/
+	virtual const imtbase::IObjectCollection* GetProductDatabase() const = 0;
+
+	/**
+		Get access to the customer database.
+	*/
+	virtual const imtbase::IObjectCollection* GetCustomerDatabase() const = 0;
+
 	/**
 		Setup the instance of a given product.
 	*/
@@ -46,17 +62,21 @@ public:
 	virtual void RemoveLicense(const QByteArray& licenseId) = 0;
 
 	/**
-		Get related product-ID.
-	*/
-	virtual QByteArray GetProductId() const = 0;
-
-	/**
 		Get the unique-ID of this product instance.
 	*/
 	virtual QByteArray GetProductInstanceId() const = 0;
 
 	/**
-		Get the customer-ID if available.
+		Get related product-ID.
+		Additional informations about the product can be accessed using this ID in the product database.
+		\sa GetProductDatabase
+	*/
+	virtual QByteArray GetProductId() const = 0;
+
+	/**
+		Get customer-ID of this product instance.
+		Additional informations about the customer can be accessed using this ID in the customer database.
+		\sa GetCustomerDatabase
 	*/
 	virtual QByteArray GetCustomerId() const = 0;
 };
