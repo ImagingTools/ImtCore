@@ -252,7 +252,7 @@ QTreeWidgetItem* CFeatureDependencyEditorGuiBase::GetItem(const QByteArray& item
 
 CFeatureDependencyEditorGuiBase::DependencyMap CFeatureDependencyEditorGuiBase::BuildDependencyMap(const imtbase::IObjectCollection& packageCollection)
 {
-	CFeatureDependencyEditorGuiBase::DependencyMap dependencyMap;
+	DependencyMap dependencyMap;
 
 	imtbase::ICollectionInfo::Ids packageIds = packageCollection.GetElementIds();
 	for (const QByteArray& packageId : packageIds){
