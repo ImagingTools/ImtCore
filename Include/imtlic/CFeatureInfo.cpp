@@ -16,7 +16,8 @@ namespace imtlic
 // public methods
 
 CFeatureInfo::CFeatureInfo()
-	:m_name(QObject::tr("DefaultName"))
+	:m_name(QObject::tr("DefaultName")),
+	m_packagePtr(nullptr)
 {
 }
 
@@ -42,6 +43,12 @@ void CFeatureInfo::SetFeatureName(const QString& featureName)
 
 
 // reimplemented (IFeatureInfo)
+
+const imtlic::IFeatureInfoProvider* CFeatureInfo::GetFeaturePackage() const
+{
+	return m_packagePtr;
+}
+
 
 QByteArray CFeatureInfo::GetFeatureId() const
 {

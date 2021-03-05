@@ -18,7 +18,7 @@ namespace imtlicgui
 // public methods
 
 CFeaturePackageGuiComp::CFeaturePackageGuiComp()
-	:m_collectionObserver(*this),
+	:m_featurePackageProxy(*this),
 	m_showCollectionEditorCommand("Edit Feartures", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020),
 	m_showDependenciesEditorCommand("Edit Dependencies", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020)
 {
@@ -31,74 +31,6 @@ CFeaturePackageGuiComp::CFeaturePackageGuiComp()
 
 
 // protected methods
-
-void CFeaturePackageGuiComp::OnFeaturePackageCollectionUpdate()
-{
-	imtbase::IObjectCollection* collectionPtr = m_collectionObserver.GetObservedObject();
-	imtbase::ICollectionInfo::Ids packageIds = collectionPtr->GetElementIds();
-
-	FeatureTree->clear();
-	m_packageFeatures.clear();
-
-	for (const QByteArray& packageId : packageIds){
-		imtbase::IObjectCollection::DataPtr packageDataPtr;
-		if (collectionPtr->GetObjectData(packageId, packageDataPtr)){
-			imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<imtlic::IFeatureInfoProvider*>(packageDataPtr.GetPtr());
-			if (packagePtr != nullptr){
-				FeatureDescriptionList featureDescriptionList;
-
-				imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetFeatureList().GetElementIds();
-				for (const QByteArray& featureId : featureIds){
-					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureId);
-					if (featureInfoPtr != nullptr){
-						FeatureDescription featureDescription;
-
-						featureDescription.id = featureInfoPtr->GetFeatureId();
-						featureDescription.name = featureInfoPtr->GetFeatureName();
-						featureDescription.description = packagePtr->GetFeatureList().GetElementInfo(featureId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
-
-						featureDescriptionList.append(featureDescription);
-					}
-				}
-
-				m_packageFeatures[packageId] = featureDescriptionList;
-				m_packageNames[packageId] = collectionPtr->GetElementInfo(packageId, imtbase::ICollectionInfo::EIT_NAME).toString();
-			}
-		}
-	}
-
-	m_isCollectionRepresentationInitialized = true;
-
-	if (m_isGuiModelInitialized && m_isCollectionRepresentationInitialized){
-		EnumerateMissingDependencies();
-		UpdateFeatureTree();
-		UpdateFeatureTreeCheckStates();
-		DoUpdateModel();
-	}
-}
-
-
-void CFeaturePackageGuiComp::EnumerateMissingDependencies()
-{
-	QByteArrayList allFeatureIds;
-
-	QByteArrayList packageIds = m_packageFeatures.keys();
-	for (const QByteArray& packageId : packageIds){
-		FeatureDescriptionList featureDescriptionList = m_packageFeatures[packageId];
-		for (const FeatureDescription& featureDescription : featureDescriptionList){
-			allFeatureIds.append(featureDescription.id);
-		}
-	}
-
-	m_missingDependencies.clear();
-
-	for (const QByteArray& featureId : m_dependencies){
-		if (!allFeatureIds.contains(featureId)){
-			m_missingDependencies.push_back(featureId);
-		}
-	}
-}
-
 
 void CFeaturePackageGuiComp::UpdateFeatureList()
 {
@@ -120,188 +52,15 @@ void CFeaturePackageGuiComp::UpdateFeatureList()
 }
 
 
-void CFeaturePackageGuiComp::UpdateFeatureTree()
+void CFeaturePackageGuiComp::UpdateFeaturePackageModel()
 {
-	QSignalBlocker blocker(FeatureTree);
-
-	FeatureTree->clear();
-
-	QTreeWidgetItem* selectedItemPtr = FeatureList->currentItem();
-	if (selectedItemPtr != nullptr){
-		QByteArray selectedItemId = selectedItemPtr->data(0, DR_ITEM_ID).toByteArray();
-			
-		QByteArrayList packageIds = m_packageFeatures.keys();
-		for (const QByteArray& packageId : packageIds){
-			QTreeWidgetItem* packageItemPtr = new QTreeWidgetItem({m_packageNames[packageId]});
-			FeatureTree->addTopLevelItem(packageItemPtr);
-			packageItemPtr->setData(0, DR_ITEM_ID, packageId);
-			packageItemPtr->setData(0, DR_ITEM_TYPE, IT_PACKAGE);
-
-			FeatureDescriptionList featureDescriptionList = m_packageFeatures[packageId];
-			for (const FeatureDescription& featureDescription : featureDescriptionList){
-				if (featureDescription.id == selectedItemId){
-					continue;
-				}
-
-				QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({
-					featureDescription.name,
-					featureDescription.id,
-					featureDescription.description});
-				packageItemPtr->addChild(featureItemPtr);
-				featureItemPtr->setData(0, DR_ITEM_ID, featureDescription.id);
-				featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
-			}
-		}
-
-		if (!m_missingDependencies.isEmpty()){
-			QTreeWidgetItem* packageItemPtr = new QTreeWidgetItem({tr("Missing features")});
-			FeatureTree->addTopLevelItem(packageItemPtr);
-			packageItemPtr->setData(0, DR_ITEM_ID, "MISSING_FEATURES");
-			packageItemPtr->setData(0, DR_ITEM_TYPE, IT_PACKAGE);
-			packageItemPtr->setForeground(0, QBrush(Qt::red));
-
-			for (const QByteArray& featureId : m_missingDependencies){
-				QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({tr("ID: %1").arg(QString(featureId))});
-				packageItemPtr->addChild(featureItemPtr);
-				featureItemPtr->setData(0, DR_ITEM_ID, featureId);
-				featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
-				featureItemPtr->setForeground(0, QBrush(Qt::red));
-			}
-		}
-
-		FeatureTree->expandAll();
-	}
+	DoUpdateModel();
 }
 
 
-void CFeaturePackageGuiComp::UpdateFeatureTreeCheckStates()
+void CFeaturePackageGuiComp::FeatureTreeItemChanged()
 {
-	QSignalBlocker blocker(FeatureTree);
-
-	QByteArrayList packageIds = m_packageFeatures.keys();
-	for (const QByteArray& packageId : packageIds){
-		FeatureDescriptionList featureDescriptionList = m_packageFeatures[packageId];
-		for (const FeatureDescription& featureDescription : featureDescriptionList){
-			QTreeWidgetItem* featureItemPtr = GetItem(featureDescription.id);
-			if (featureItemPtr != nullptr){
-				bool isFeaturePresent = m_dependencies.contains(featureDescription.id);
-				featureItemPtr->setCheckState(0, isFeaturePresent ? Qt::Checked : Qt::Unchecked);
-			}
-		}
-	}
-
-	for (const QByteArray& packageId : packageIds){
-		bool isAllFeaturesChecked = true;
-		bool isAllFeaturesUnchecked = true;
-
-		FeatureDescriptionList featureDescriptionList = m_packageFeatures[packageId];
-		for (const FeatureDescription& featureDescription : featureDescriptionList){
-			QTreeWidgetItem* featureItemPtr = GetItem(featureDescription.id);
-			if (featureItemPtr != nullptr){
-				if (featureItemPtr->checkState(0) == Qt::Checked){
-					isAllFeaturesUnchecked = false;
-				}
-				else if (featureItemPtr->checkState(0) == Qt::Unchecked){
-					isAllFeaturesChecked = false;
-				}
-			}
-		}
-
-		QTreeWidgetItem* packageItemPtr = GetItem(packageId);
-		if (packageItemPtr != nullptr){
-			if (isAllFeaturesChecked){
-				packageItemPtr->setCheckState(0, Qt::Checked);
-			}
-			else if (isAllFeaturesUnchecked){
-				packageItemPtr->setCheckState(0, Qt::Unchecked);
-			}
-			else{
-				packageItemPtr->setCheckState(0, Qt::PartiallyChecked);
-			}
-		}
-	}
-
-	if (!m_missingDependencies.isEmpty()){
-		QTreeWidgetItem* packageItemPtr = GetItem("MISSING_FEATURES");
-		if (packageItemPtr != nullptr){
-			packageItemPtr->setCheckState(0, Qt::Checked);
-
-			for (const QByteArray& featureId : m_missingDependencies){
-				QTreeWidgetItem* featureItemPtr = GetItem(featureId);
-				if (featureItemPtr != nullptr){
-					featureItemPtr->setCheckState(0, Qt::Checked);
-				}
-			}
-		}
-	}
-}
-
-
-QTreeWidgetItem* CFeaturePackageGuiComp::GetItem(const QByteArray& itemId)
-{
-	int packageCount = FeatureTree->topLevelItemCount();
-	for (int packageIndex = 0; packageIndex < packageCount; packageIndex++){
-		QTreeWidgetItem* packageItemPtr = FeatureTree->topLevelItem(packageIndex);
-		if (packageItemPtr->data(0, DR_ITEM_ID).toByteArray() == itemId){
-			return packageItemPtr;
-		}
-
-		int featureCount = packageItemPtr->childCount();
-		for (int featureIndex = 0; featureIndex < featureCount; featureIndex++){
-			QTreeWidgetItem* featurteItemPtr = packageItemPtr->child(featureIndex);
-			if (featurteItemPtr->data(0, DR_ITEM_ID).toByteArray() == itemId){
-				return featurteItemPtr;
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-
-CFeaturePackageGuiComp::DependencyMap CFeaturePackageGuiComp::BuildDependencyMap(const imtbase::IObjectCollection& packageCollection)
-{
-	CFeaturePackageGuiComp::DependencyMap dependencyMap;
-
-	imtbase::ICollectionInfo::Ids packageIds = packageCollection.GetElementIds();
-	for (const QByteArray& packageId : packageIds){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		packageCollection.GetObjectData(packageId, dataPtr);
-
-		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
-		if (packagePtr != nullptr){
-			const imtlic::IFeatureDependenciesProvider* dependenciesProvider = packagePtr->GetDependenciesInfoProvider();
-			if (dependenciesProvider != nullptr){
-				imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetFeatureList().GetElementIds();
-				for (const QByteArray& featureId : featureIds){
-					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureId);
-					if (featureInfoPtr != nullptr){
-						dependencyMap[featureInfoPtr->GetFeatureId()] = dependenciesProvider->GetFeatureDependencies(featureInfoPtr->GetFeatureId());
-					}
-				}
-			}
-		}
-	}
-
-	return dependencyMap;
-}
-
-
-bool CFeaturePackageGuiComp::HasDependency(const DependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId)
-{
-	if (dependencyMap.contains(fromFeatureId)){
-		if (dependencyMap[fromFeatureId].contains(toFeatureId)){
-			return true;
-		}
-
-		for (const QByteArray& featureId : dependencyMap[fromFeatureId]){
-			if (HasDependency(dependencyMap, featureId, toFeatureId)){
-				return true;
-			}
-		}
-	}
-
-	return false;
+	Q_EMIT EmitFeatureTreeItemChanged();
 }
 
 
@@ -318,6 +77,11 @@ const ibase::IHierarchicalCommand* CFeaturePackageGuiComp::GetCommands() const
 void CFeaturePackageGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
+
+	m_treeWidgetPtr = FeatureTree;
+	if (m_packageCollectionObserver.IsModelAttached()){
+		OnFeaturePackageCollectionUpdate();
+	}
 
 	connect(FeatureList, &QTreeWidget::itemSelectionChanged, this, &CFeaturePackageGuiComp::OnFeatureListSelectionChanged);
 	connect(this, &CFeaturePackageGuiComp::EmitFeatureTreeItemChanged, this, &CFeaturePackageGuiComp::OnFeatureTreeItemChanged, Qt::QueuedConnection);
@@ -357,6 +121,20 @@ void CFeaturePackageGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 		UpdateFeatureTreeCheckStates();
 		DoUpdateModel();
 	}
+
+	if (!m_featureId.isEmpty()){
+		int count = FeatureList->topLevelItemCount();
+		for (int i = 0; i < count; i++){
+			QByteArray id = FeatureList->topLevelItem(i)->data(0, DR_ITEM_ID).toByteArray();
+			if (id == m_featureId){
+				FeatureList->setCurrentItem(FeatureList->topLevelItem(i));
+				return;
+			}
+		}
+	}
+
+	m_featureId.clear();
+	FeatureList->setCurrentItem(nullptr);
 }
 
 
@@ -376,7 +154,7 @@ void CFeaturePackageGuiComp::OnGuiModelAttached()
 					dynamic_cast<const imod::IModel*>(GetObservedObject()->GetFeaturePackages()));
 		
 		if (featurePackageCollectionModelPtr != nullptr){
-			featurePackageCollectionModelPtr->AttachObserver(&m_collectionObserver);
+			featurePackageCollectionModelPtr->AttachObserver(&m_packageCollectionObserver);
 		}
 	}
 }
@@ -389,8 +167,8 @@ void CFeaturePackageGuiComp::OnGuiModelDetached()
 					dynamic_cast<const imod::IModel*>(GetObservedObject()->GetFeaturePackages()));
 
 		if (featurePackageCollectionModelPtr != nullptr){
-			if (featurePackageCollectionModelPtr->IsAttached(&m_collectionObserver)){
-				featurePackageCollectionModelPtr->DetachObserver(&m_collectionObserver);
+			if (featurePackageCollectionModelPtr->IsAttached(&m_packageCollectionObserver)){
+				featurePackageCollectionModelPtr->DetachObserver(&m_packageCollectionObserver);
 			}
 		}
 
@@ -433,75 +211,7 @@ void CFeaturePackageGuiComp::UpdateModel() const
 
 void CFeaturePackageGuiComp::on_FeatureTree_itemChanged(QTreeWidgetItem *item, int column)
 {
-	DependencyMap dependencyMap;
-	imtbase::IObjectCollection* collectionPtr = m_collectionObserver.GetObjectPtr();
-	if (collectionPtr != nullptr){
-		dependencyMap = BuildDependencyMap(*collectionPtr);
-	}
-
-	QByteArray selectedItemId;
-	QTreeWidgetItem* selectedItemPtr = FeatureList->currentItem();
-	if (selectedItemPtr != nullptr){
-		selectedItemId = selectedItemPtr->data(0, DR_ITEM_ID).toByteArray();
-	}
-
-	if (item->data(0, DR_ITEM_TYPE) == IT_PACKAGE){
-		Qt::CheckState state = item->checkState(0);
-
-		for (int i = 0; i < item->childCount(); i++){
-			QTreeWidgetItem* featureItemPtr = item->child(i);
-			QByteArray featureId = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
-
-			if (state == Qt::Checked){
-				if (!m_dependencies.contains(featureId)){
-					if (!HasDependency(dependencyMap, featureId, selectedItemId)){
-						m_dependencies.append(featureId);
-					}
-					else{
-						QMessageBox::warning(
-									this->GetWidget(),
-									tr("Warning"),
-									tr("Feature with ID '%1' has a cyclic dependence on feature with ID '%2'")
-												.arg(QString(featureId))
-												.arg(QString(selectedItemId)));
-
-						break;
-					}
-				}
-			}
-			else{
-				if (m_dependencies.contains(featureId)){
-					m_dependencies.removeOne(featureId);
-				}
-			}
-		}
-	}
-	else{
-		QByteArray featureId = item->data(0, DR_ITEM_ID).toByteArray();
-
-		if (item->checkState(0) == Qt::Checked){
-			if (!m_dependencies.contains(featureId)){
-				if (!HasDependency(dependencyMap, featureId, selectedItemId)){
-					m_dependencies.append(featureId);
-				}
-				else{
-					QMessageBox::warning(
-								this->GetWidget(),
-								tr("Warning"),
-								tr("Feature with ID '%1' has a cyclic dependence on feature with ID '%2'")
-											.arg(QString(featureId))
-											.arg(QString(selectedItemId)));
-				}
-			}
-		}
-		else{
-			if (m_dependencies.contains(featureId)){
-				m_dependencies.removeOne(featureId);
-			}
-		}
-	}
-
-	Q_EMIT EmitFeatureTreeItemChanged();
+	BaseClass2::on_FeatureTree_itemChanged(item, column);
 }
 
 
@@ -520,10 +230,13 @@ void CFeaturePackageGuiComp::OnShowFeatureDependencyEditor()
 void CFeaturePackageGuiComp::OnFeatureListSelectionChanged()
 {
 	m_dependencies.clear();
+	m_featureId.clear();
 
 	QTreeWidgetItem* itemPtr = FeatureList->currentItem();
 	if (itemPtr != nullptr){
 		QByteArray featureId = itemPtr->data(0, DR_ITEM_ID).toByteArray();
+
+		m_featureId = featureId;
 
 		imtlic::IFeatureInfoProvider* featureInfoProviderPtr = GetObservedObject();
 		if (featureInfoProviderPtr != nullptr){
@@ -553,19 +266,102 @@ void CFeaturePackageGuiComp::OnFeatureTreeItemChanged()
 }
 
 
-// public methods of the embedded class FeaturePackageCollectionObserver
+// public methods of the embedded class DocumentList
 
-CFeaturePackageGuiComp::FeaturePackageCollectionObserver::FeaturePackageCollectionObserver(CFeaturePackageGuiComp& parent)
+CFeaturePackageGuiComp::FeaturePackageProxy::FeaturePackageProxy(CFeaturePackageGuiComp& parent)
 	:m_parent(parent)
 {
 }
 
 
-// reimplemented (imod::CSingleModelObserverBase)
+// reimplemented (imtlic::IFeatureInfoProvider)
 
-void CFeaturePackageGuiComp::FeaturePackageCollectionObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+const imtbase::IObjectCollection* CFeaturePackageGuiComp::FeaturePackageProxy::GetFeaturePackages() const
 {
-	m_parent.OnFeaturePackageCollectionUpdate();
+	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	if (featurePackagePtr != nullptr){
+		return featurePackagePtr->GetFeaturePackages();
+	}
+
+	return nullptr;
+}
+
+
+const imtbase::ICollectionInfo& CFeaturePackageGuiComp::FeaturePackageProxy::GetFeatureList() const
+{
+	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	if (featurePackagePtr != nullptr){
+		return featurePackagePtr->GetFeatureList();
+	}
+
+	return m_collectionInfo;
+}
+
+
+const imtlic::IFeatureInfo* CFeaturePackageGuiComp::FeaturePackageProxy::GetFeatureInfo(const QByteArray& featureId) const
+{
+	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	if (featurePackagePtr != nullptr){
+		return featurePackagePtr->GetFeatureInfo(featureId);
+	}
+
+	return nullptr;
+}
+
+
+const imtlic::IFeatureDependenciesProvider* CFeaturePackageGuiComp::FeaturePackageProxy::GetDependenciesInfoProvider() const
+{
+	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	if (featurePackagePtr != nullptr){
+		return featurePackagePtr->GetDependenciesInfoProvider();
+	}
+
+	return nullptr;
+}
+
+
+const imtbase::ICollectionInfo* CFeaturePackageGuiComp::FeaturePackageProxy::GetParentFeatureInfoProviderList() const
+{
+	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	if (featurePackagePtr != nullptr){
+		return featurePackagePtr->GetParentFeatureInfoProviderList();
+	}
+
+	return nullptr;
+}
+
+
+const imtlic::IFeatureInfoProvider* CFeaturePackageGuiComp::FeaturePackageProxy::GetParentFeatureInfoProvider(const QByteArray& parentId) const
+{
+	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	if (featurePackagePtr != nullptr){
+		return featurePackagePtr->GetParentFeatureInfoProvider(parentId);
+	}
+
+	return nullptr;
+}
+
+// reimplemented (iser::ISerializable)
+
+bool CFeaturePackageGuiComp::FeaturePackageProxy::Serialize(iser::IArchive& archive)
+{
+	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	if (featurePackagePtr != nullptr){
+		return featurePackagePtr->Serialize(archive);
+	}
+
+	return false;
+}
+
+
+quint32 CFeaturePackageGuiComp::FeaturePackageProxy::GetMinimalVersion(int versionId) const
+{
+	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	if (featurePackagePtr != nullptr){
+		return featurePackagePtr->GetMinimalVersion(versionId);
+	}
+
+	return iser::ISerializable::GetMinimalVersion(versionId);
 }
 
 

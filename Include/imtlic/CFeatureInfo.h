@@ -2,8 +2,8 @@
 
 
 // ImtCore includes
+#include <imtbase/IObjectCollection.h>
 #include <imtlic/IFeatureInfo.h>
-
 
 namespace imtlic
 {
@@ -18,6 +18,7 @@ public:
 	void SetFeatureName(const QString& featureName);
 
 	// reimplemented (IFeatureInfo)
+	virtual const imtlic::IFeatureInfoProvider* GetFeaturePackage() const override;
 	virtual QByteArray GetFeatureId() const override;
 	virtual QString GetFeatureName() const override;
 
@@ -32,6 +33,7 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
+	const imtlic::IFeatureInfoProvider* m_packagePtr;
 	QByteArray m_id;
 	QString m_name;
 };

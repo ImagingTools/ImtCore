@@ -6,7 +6,7 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
-#include <imtlic/CFeatureInfo.h>
+#include <imtlic/CFeatureInfoComp.h>
 #include <imtlic/CFeaturePackageComp.h>
 #include <imtlic/CLicenseInfoComp.h>
 #include <imtlic/CLicenseInfoManager.h>
@@ -26,11 +26,7 @@ namespace ImtLicensePck
 {
 
 
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtlic::CFeatureInfo,
-						imtlic::IFeatureInfo,
-						iser::ISerializable>> FeatureInfo;
+typedef icomp::TModelCompWrap<imtlic::CFeatureInfoComp> FeatureInfo;
 typedef icomp::TModelCompWrap<imtlic::CFeaturePackageComp> FeaturePackage;
 typedef icomp::TModelCompWrap<imtlic::CLicenseInfoComp> LicenseInfo;
 typedef icomp::TModelCompWrap<

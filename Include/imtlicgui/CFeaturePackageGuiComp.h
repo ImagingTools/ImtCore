@@ -8,7 +8,11 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/CCollectionInfo.h>
+#include <imtlic/IFeatureDependenciesProvider.h>
+#include <imtlic/IFeatureInfo.h>
 #include <imtlic/IFeatureInfoProvider.h>
+#include <imtlicgui/CFeatureDependencyEditorGuiBase.h>
 #include <GeneratedFiles/imtlicgui/ui_CFeaturePackageGuiComp.h>
 
 
@@ -17,21 +21,25 @@ namespace imtlicgui
 
 
 /**
-	Editor for the product-related licensing.
+	Editor for the feature packages.
 	\ingroup LicenseManagement
 */
 class CFeaturePackageGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
 						Ui::CFeaturePackageGuiComp, imtlic::IFeatureInfoProvider>,
+			protected CFeatureDependencyEditorGuiBase,
 			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
 				Ui::CFeaturePackageGuiComp, imtlic::IFeatureInfoProvider> BaseClass;
+	typedef CFeatureDependencyEditorGuiBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CFeaturePackageGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
+		I_REGISTER_SUBELEMENT(FeaturePackageProxy);
+		I_REGISTER_SUBELEMENT_INTERFACE(FeaturePackageProxy, imtlic::IFeatureInfoProvider, ExtractFeaturePackageProxy);
 		I_ASSIGN(m_objectCollectionViewCompPtr, "ObjectCollectionView", "Object collection view", true, "ObjectCollectionView");
 		I_ASSIGN_TO(m_objectCollectionObserverCompPtr, m_objectCollectionViewCompPtr, true);
 	I_END_COMPONENT;
@@ -42,16 +50,10 @@ Q_SIGNALS:
 	void EmitFeatureTreeItemChanged();
 
 protected:
-	typedef QMap<QByteArray, QByteArrayList> DependencyMap;
-
-	void OnFeaturePackageCollectionUpdate();
-	void EnumerateMissingDependencies();
 	void UpdateFeatureList();
-	void UpdateFeatureTree();
-	void UpdateFeatureTreeCheckStates();
-	QTreeWidgetItem* GetItem(const QByteArray& itemId);
-	DependencyMap BuildDependencyMap(const imtbase::IObjectCollection& packageCollection);
-	bool HasDependency(const DependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId);
+
+	virtual void UpdateFeaturePackageModel() override;
+	virtual void FeatureTreeItemChanged() override;
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
@@ -75,58 +77,43 @@ private Q_SLOTS:
 	virtual void OnFeatureTreeItemChanged();
 
 protected:
-	enum DataRole
-	{
-		DR_ITEM_ID = Qt::UserRole,
-		DR_ITEM_TYPE
-	};
-
-	enum ItemType
-	{
-		IT_PACKAGE = 0,
-		IT_FEATURE
-	};
-
-	class FeaturePackageCollectionObserver: public imod::TSingleModelObserverBase<imtbase::IObjectCollection>
+	class FeaturePackageProxy: virtual public imtlic::IFeatureInfoProvider
 	{
 	public:
-		FeaturePackageCollectionObserver(CFeaturePackageGuiComp& parent);
+		FeaturePackageProxy(CFeaturePackageGuiComp& parent);
 
-		// reimplemented (imod::CSingleModelObserverBase)
-		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+		// reimplemented (imtlic::IFeatureInfoProvider)
+		virtual const imtbase::IObjectCollection* GetFeaturePackages() const override;
+		virtual const imtbase::ICollectionInfo& GetFeatureList() const override;
+		virtual const imtlic::IFeatureInfo* GetFeatureInfo(const QByteArray& featureId) const override;
+		virtual const imtlic::IFeatureDependenciesProvider* GetDependenciesInfoProvider() const override;
+		virtual const imtbase::ICollectionInfo* GetParentFeatureInfoProviderList() const override;
+		virtual const IFeatureInfoProvider* GetParentFeatureInfoProvider(const QByteArray& parentId) const override;
+
+		// reimplemented (iser::ISerializable)
+		virtual bool Serialize(iser::IArchive& archive) override;
+		virtual quint32 GetMinimalVersion(int versionId) const override;
+
 	private:
 		CFeaturePackageGuiComp& m_parent;
+		imtbase::CCollectionInfo m_collectionInfo;
 	};
-
-	struct FeatureDescription
+	
+	template <class InterfaceType>
+	static InterfaceType* ExtractFeaturePackageProxy(CFeaturePackageGuiComp& component)
 	{
-		QByteArray id;
-		QString name;
-		QString description;
-	};
-
-	typedef QList<FeatureDescription> FeatureDescriptionList;
+		return &component.m_featurePackageProxy;
+	}
 
 protected:
+	I_REF(iqtgui::IGuiObject, m_objectCollectionViewCompPtr);
+	I_REF(imod::IObserver, m_objectCollectionObserverCompPtr);
+
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_showCollectionEditorCommand;
 	iqtgui::CHierarchicalCommand m_showDependenciesEditorCommand;
 
-	bool m_isGuiModelInitialized;
-	bool m_isCollectionRepresentationInitialized;
-
-	QByteArrayList m_dependencies;
-
-	// Feature package collection related members
-	QMap<QByteArray, FeatureDescriptionList> m_packageFeatures;
-	QMap<QByteArray, QString> m_packageNames;
-	QByteArrayList m_missingDependencies;
-
-	FeaturePackageCollectionObserver m_collectionObserver;
-
-private:
-	I_REF(iqtgui::IGuiObject, m_objectCollectionViewCompPtr);
-	I_REF(imod::IObserver, m_objectCollectionObserverCompPtr);
+	FeaturePackageProxy m_featurePackageProxy;
 };
 
 

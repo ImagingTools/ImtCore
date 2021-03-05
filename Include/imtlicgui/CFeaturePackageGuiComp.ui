@@ -97,7 +97,7 @@
           <string notr="true">QTreeView::item
 {
     color: #335777;
-    height: 30px;
+    height: 25px;
 }
 
 QTreeView::item::selected
@@ -128,7 +128,7 @@ QTreeView::branch::selected
           <string notr="true">QTreeView::item
 {
     color: #335777;
-    height: 30px;
+    height: 25px;
 }
 
 QTreeView::item::selected
