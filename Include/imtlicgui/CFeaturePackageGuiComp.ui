@@ -120,6 +120,16 @@ QTreeView::branch::selected
            <string>Feature Name</string>
           </property>
          </column>
+         <column>
+          <property name="text">
+           <string>Feature-ID</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Feature Description</string>
+          </property>
+         </column>
         </widget>
        </item>
        <item>
@@ -146,16 +156,6 @@ QTreeView::branch::selected
          <column>
           <property name="text">
            <string>Feature Name</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Feature-ID</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Feature Description</string>
           </property>
          </column>
         </widget>

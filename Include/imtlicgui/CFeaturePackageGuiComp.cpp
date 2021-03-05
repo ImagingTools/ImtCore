@@ -40,10 +40,13 @@ void CFeaturePackageGuiComp::UpdateFeatureList()
 	if (featureInfoProviderPtr != nullptr){
 		const imtbase::ICollectionInfo& collectionInfo = featureInfoProviderPtr->GetFeatureList();
 		imtbase::ICollectionInfo::Ids ids = collectionInfo.GetElementIds();
-		for (QByteArray& id : ids){
+		for (const QByteArray& id : ids){
 			const imtlic::IFeatureInfo* featureInfoPtr = featureInfoProviderPtr->GetFeatureInfo(id);
 			if (featureInfoPtr != nullptr){
-				QTreeWidgetItem* itemPtr = new QTreeWidgetItem({featureInfoPtr->GetFeatureName()});
+				QTreeWidgetItem* itemPtr = new QTreeWidgetItem({
+							featureInfoPtr->GetFeatureName(),
+							featureInfoPtr->GetFeatureId(),
+							collectionInfo.GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString()});
 				FeatureList->addTopLevelItem(itemPtr);
 				itemPtr->setData(0, DR_ITEM_ID, featureInfoPtr->GetFeatureId());
 			}
@@ -77,6 +80,11 @@ const ibase::IHierarchicalCommand* CFeaturePackageGuiComp::GetCommands() const
 void CFeaturePackageGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
+
+	FeatureTree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+	FeatureList->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+	FeatureList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+	FeatureList->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
 
 	m_treeWidgetPtr = FeatureTree;
 	if (m_packageCollectionObserver.IsModelAttached()){

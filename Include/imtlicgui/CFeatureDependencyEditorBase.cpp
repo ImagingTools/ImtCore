@@ -127,10 +127,7 @@ void CFeatureDependencyEditorBase::UpdateFeatureTree()
 				continue;
 			}
 
-			QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({
-				featureDescription.name,
-				featureDescription.id,
-				featureDescription.description});
+			QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({featureDescription.name});
 			packageItemPtr->addChild(featureItemPtr);
 			featureItemPtr->setData(0, DR_ITEM_ID, featureDescription.id);
 			featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
