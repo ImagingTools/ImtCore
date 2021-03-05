@@ -1,4 +1,4 @@
-#include <imtlicgui/CFeatureDependencyEditorGuiBase.h>
+#include <imtlicgui/CFeatureDependencyEditorBase.h>
 
 
 // Qt includes
@@ -17,7 +17,7 @@ namespace imtlicgui
 
 // public methods
 
-CFeatureDependencyEditorGuiBase::CFeatureDependencyEditorGuiBase()
+CFeatureDependencyEditorBase::CFeatureDependencyEditorBase()
 	:m_treeWidgetPtr(nullptr),
 	m_isGuiModelInitialized(false),
 	m_isCollectionRepresentationInitialized(false)
@@ -28,7 +28,7 @@ CFeatureDependencyEditorGuiBase::CFeatureDependencyEditorGuiBase()
 
 // protected methods
 
-void CFeatureDependencyEditorGuiBase::OnFeaturePackageCollectionUpdate()
+void CFeatureDependencyEditorBase::OnFeaturePackageCollectionUpdate()
 {
 	if (m_treeWidgetPtr == nullptr){
 		return;
@@ -78,7 +78,7 @@ void CFeatureDependencyEditorGuiBase::OnFeaturePackageCollectionUpdate()
 }
 
 
-void CFeatureDependencyEditorGuiBase::EnumerateMissingDependencies()
+void CFeatureDependencyEditorBase::EnumerateMissingDependencies()
 {
 	QByteArrayList allFeatureIds;
 
@@ -100,7 +100,7 @@ void CFeatureDependencyEditorGuiBase::EnumerateMissingDependencies()
 }
 
 
-void CFeatureDependencyEditorGuiBase::UpdateFeatureTree()
+void CFeatureDependencyEditorBase::UpdateFeatureTree()
 {
 	if (m_treeWidgetPtr == nullptr){
 		return;
@@ -157,7 +157,7 @@ void CFeatureDependencyEditorGuiBase::UpdateFeatureTree()
 }
 
 
-void CFeatureDependencyEditorGuiBase::UpdateFeatureTreeCheckStates()
+void CFeatureDependencyEditorBase::UpdateFeatureTreeCheckStates()
 {
 	if (m_treeWidgetPtr == nullptr){
 		return;
@@ -224,7 +224,7 @@ void CFeatureDependencyEditorGuiBase::UpdateFeatureTreeCheckStates()
 }
 
 
-QTreeWidgetItem* CFeatureDependencyEditorGuiBase::GetItem(const QByteArray& itemId)
+QTreeWidgetItem* CFeatureDependencyEditorBase::GetItem(const QByteArray& itemId)
 {
 	if (m_treeWidgetPtr == nullptr){
 		return nullptr;
@@ -250,7 +250,7 @@ QTreeWidgetItem* CFeatureDependencyEditorGuiBase::GetItem(const QByteArray& item
 }
 
 
-CFeatureDependencyEditorGuiBase::DependencyMap CFeatureDependencyEditorGuiBase::BuildDependencyMap(const imtbase::IObjectCollection& packageCollection)
+CFeatureDependencyEditorBase::DependencyMap CFeatureDependencyEditorBase::BuildDependencyMap(const imtbase::IObjectCollection& packageCollection)
 {
 	DependencyMap dependencyMap;
 
@@ -278,7 +278,7 @@ CFeatureDependencyEditorGuiBase::DependencyMap CFeatureDependencyEditorGuiBase::
 }
 
 
-bool CFeatureDependencyEditorGuiBase::HasDependency(const DependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId)
+bool CFeatureDependencyEditorBase::HasDependency(const DependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId)
 {
 	if (dependencyMap.contains(fromFeatureId)){
 		if (dependencyMap[fromFeatureId].contains(toFeatureId)){
@@ -296,7 +296,7 @@ bool CFeatureDependencyEditorGuiBase::HasDependency(const DependencyMap& depende
 }
 
 
-void CFeatureDependencyEditorGuiBase::on_FeatureTree_itemChanged(QTreeWidgetItem *item, int column)
+void CFeatureDependencyEditorBase::on_FeatureTree_itemChanged(QTreeWidgetItem *item, int column)
 {
 	DependencyMap dependencyMap;
 	imtbase::IObjectCollection* collectionPtr = m_packageCollectionObserver.GetObjectPtr();
@@ -366,13 +366,13 @@ void CFeatureDependencyEditorGuiBase::on_FeatureTree_itemChanged(QTreeWidgetItem
 
 // public methods of the embedded class FeaturePackageCollectionObserver
 
-CFeatureDependencyEditorGuiBase::FeaturePackageCollectionObserver::FeaturePackageCollectionObserver()
+CFeatureDependencyEditorBase::FeaturePackageCollectionObserver::FeaturePackageCollectionObserver()
 	:m_parentPtr(nullptr)
 {
 }
 
 
-void CFeatureDependencyEditorGuiBase::FeaturePackageCollectionObserver::SetParent(CFeatureDependencyEditorGuiBase* parentPtr)
+void CFeatureDependencyEditorBase::FeaturePackageCollectionObserver::SetParent(CFeatureDependencyEditorBase* parentPtr)
 {
 	m_parentPtr = parentPtr;
 }
@@ -380,7 +380,7 @@ void CFeatureDependencyEditorGuiBase::FeaturePackageCollectionObserver::SetParen
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CFeatureDependencyEditorGuiBase::FeaturePackageCollectionObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CFeatureDependencyEditorBase::FeaturePackageCollectionObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	m_parentPtr->OnFeaturePackageCollectionUpdate();
 }

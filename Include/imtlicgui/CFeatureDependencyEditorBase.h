@@ -21,10 +21,10 @@ namespace imtlicgui
 	Editor for the product-related licensing.
 	\ingroup LicenseManagement
 */
-class CFeatureDependencyEditorGuiBase: virtual public istd::IPolymorphic
+class CFeatureDependencyEditorBase: virtual public istd::IPolymorphic
 {
 public:
-	CFeatureDependencyEditorGuiBase();
+	CFeatureDependencyEditorBase();
 
 	virtual void FeatureTreeItemChanged() = 0;
 
@@ -61,12 +61,12 @@ protected:
 	public:
 		FeaturePackageCollectionObserver();
 
-		void SetParent(CFeatureDependencyEditorGuiBase* m_parentPtr);
+		void SetParent(CFeatureDependencyEditorBase* m_parentPtr);
 
 		// reimplemented (imod::CSingleModelObserverBase)
 		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 	private:
-		CFeatureDependencyEditorGuiBase* m_parentPtr;
+		CFeatureDependencyEditorBase* m_parentPtr;
 	};
 
 	struct FeatureDescription

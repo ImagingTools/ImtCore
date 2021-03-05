@@ -12,7 +12,7 @@
 #include <imtlic/IFeatureDependenciesProvider.h>
 #include <imtlic/IFeatureInfo.h>
 #include <imtlic/IFeatureInfoProvider.h>
-#include <imtlicgui/CFeatureDependencyEditorGuiBase.h>
+#include <imtlicgui/CFeatureDependencyEditorBase.h>
 #include <GeneratedFiles/imtlicgui/ui_CFeaturePackageGuiComp.h>
 
 
@@ -27,14 +27,14 @@ namespace imtlicgui
 class CFeaturePackageGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
 						Ui::CFeaturePackageGuiComp, imtlic::IFeatureInfoProvider>,
-			protected CFeatureDependencyEditorGuiBase,
+			protected CFeatureDependencyEditorBase,
 			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
 				Ui::CFeaturePackageGuiComp, imtlic::IFeatureInfoProvider> BaseClass;
-	typedef CFeatureDependencyEditorGuiBase BaseClass2;
+	typedef CFeatureDependencyEditorBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CFeaturePackageGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);

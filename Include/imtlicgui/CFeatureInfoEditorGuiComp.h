@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtlic/IFeatureInfo.h>
-#include <imtlicgui/CFeatureDependencyEditorGuiBase.h>
+#include <imtlicgui/CFeatureDependencyEditorBase.h>
 #include <GeneratedFiles/imtlicgui/ui_CFeatureInfoEditorGuiComp.h>
 
 
@@ -21,13 +21,13 @@ namespace imtlicgui
 class CFeatureInfoEditorGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
 						Ui::CFeatureInfoEditorGuiComp, imtlic::IFeatureInfo>,
-			protected CFeatureDependencyEditorGuiBase
+			protected CFeatureDependencyEditorBase
 {
 	Q_OBJECT
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
 				Ui::CFeatureInfoEditorGuiComp, imtlic::IFeatureInfo> BaseClass;
-	typedef CFeatureDependencyEditorGuiBase BaseClass2;
+	typedef CFeatureDependencyEditorBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CFeatureInfoEditorGuiComp);
 	I_END_COMPONENT;
