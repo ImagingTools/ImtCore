@@ -320,7 +320,7 @@ void CFeatureDependencyEditorGuiBase::on_FeatureTree_itemChanged(QTreeWidgetItem
 						QMessageBox::warning(
 									m_treeWidgetPtr,
 									QObject::tr("Warning"),
-									QObject::tr("Feature with ID '%1' has a cyclic dependence on feature with ID '%2'")
+									QObject::tr("Feature with ID '%1' depends on feature with ID '%2'")
 												.arg(QString(featureId))
 												.arg(QString(m_featureId)));
 
@@ -347,7 +347,7 @@ void CFeatureDependencyEditorGuiBase::on_FeatureTree_itemChanged(QTreeWidgetItem
 					QMessageBox::warning(
 								m_treeWidgetPtr,
 								QObject::tr("Warning"),
-								QObject::tr("Feature with ID '%1' has a cyclic dependence on feature with ID '%2'")
+								QObject::tr("Feature with ID '%1' depends on feature with ID '%2'")
 											.arg(QString(featureId))
 											.arg(QString(m_featureId)));
 				}
