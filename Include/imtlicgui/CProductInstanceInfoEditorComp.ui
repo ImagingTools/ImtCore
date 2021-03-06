@@ -30,7 +30,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QLineEdit" name="NameEdit"/>
+       <widget class="QLineEdit" name="ProductInstanceIdEdit"/>
       </item>
      </layout>
     </widget>
@@ -48,7 +48,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QComboBox" name="comboBox"/>
+       <widget class="QComboBox" name="CustomerCombo"/>
       </item>
      </layout>
     </widget>

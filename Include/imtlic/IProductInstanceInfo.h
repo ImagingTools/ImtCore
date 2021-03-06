@@ -44,7 +44,7 @@ public:
 		Setup the instance of a given product.
 	*/
 	virtual void SetupProductInstance(
-				const imtlic::IProductInfo& product,
+				const QByteArray& productId,
 				const QByteArray& instanceId,
 				const QByteArray& customerId) = 0;
 

@@ -40,14 +40,13 @@ const imtbase::IObjectCollection* CProductInstanceInfo::GetCustomerDatabase() co
 
 
 void CProductInstanceInfo::SetupProductInstance(
-			const imtlic::IProductInfo& product,
+			const QByteArray& productId,
 			const QByteArray& instanceId,
 			const QByteArray& customerId)
 {
-	Q_ASSERT(!instanceId.isEmpty());
-	Q_ASSERT(!product.GetProductId().isEmpty());
+	istd::CChangeNotifier changeNotifier(this);
 
-	m_productId = product.GetProductId();
+	m_productId = productId;
 	m_customerId = customerId;
 	m_instanceId = instanceId;
 }

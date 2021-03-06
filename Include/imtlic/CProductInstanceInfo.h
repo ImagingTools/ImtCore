@@ -24,7 +24,7 @@ public:
 	virtual const imtbase::IObjectCollection* GetProductDatabase() const override;
 	virtual const imtbase::IObjectCollection* GetCustomerDatabase() const override;
 	virtual void SetupProductInstance(
-				const imtlic::IProductInfo& product,
+				const QByteArray& productId,
 				const QByteArray& instanceId,
 				const QByteArray& customerId) override;
 	virtual void AddLicense(const QByteArray& licenseId) override;
