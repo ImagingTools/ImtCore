@@ -2,8 +2,9 @@
 
 
 // ImtCore includes
-#include <imtbase/CSimpleReferenceCollection.h>
+#include <imtbase/CCollectionInfo.h>
 #include <imtlic/IProductInstanceInfo.h>
+#include <imtlic/CLicenseInstance.h>
 
 
 namespace imtlic
@@ -27,7 +28,7 @@ public:
 				const QByteArray& productId,
 				const QByteArray& instanceId,
 				const QByteArray& customerId) override;
-	virtual void AddLicense(const QByteArray& licenseId) override;
+	virtual void AddLicense(const QByteArray& licenseId, const QDateTime& expirationDate = QDateTime()) override;
 	virtual void RemoveLicense(const QByteArray& licenseId) override;
 	virtual QByteArray GetProductId() const override;
 	virtual QByteArray GetProductInstanceId() const override;
@@ -47,10 +48,13 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	imtbase::CSimpleReferenceCollection m_licenses;
+	typedef QMap<QByteArray /*ID of the license definition in the product*/, CLicenseInstance> LicenseInstances;
+
 	QByteArray m_productId;
 	QByteArray m_customerId;
 	QByteArray m_instanceId;
+	LicenseInstances m_licenses;
+	imtbase::CCollectionInfo m_licenseContainerInfo;
 
 	const imtbase::IObjectCollection* m_customerCollectionPtr;
 	const imtbase::IObjectCollection* m_productCollectionPtr;

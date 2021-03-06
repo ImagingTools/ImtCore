@@ -9,7 +9,7 @@
 
 // ImtCore includes
 #include <imtlic/ILicenseInfo.h>
-#include <imtlic/IProductInfo.h>
+#include <imtlic/IProductLicensingInfo.h>
 
 
 namespace imtlic
@@ -52,11 +52,30 @@ void CProductInstanceInfo::SetupProductInstance(
 }
 
 
-void CProductInstanceInfo::AddLicense(const QByteArray & licenseId)
+void CProductInstanceInfo::AddLicense(const QByteArray& licenseId, const QDateTime& expirationDate)
 {
-	istd::CChangeNotifier changeNotifier(this);
+	if (m_productId.isEmpty()){
+		return;
+	}
 
-	m_licenses.InsertReference(licenseId);
+	if (m_productCollectionPtr != nullptr){
+		const imtlic::IProductLicensingInfo* licensingInfoPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(m_productCollectionPtr->GetObjectPtr(m_productId));
+		if (licensingInfoPtr != nullptr){
+			const imtlic::ILicenseInfo* linceInfoPtr = licensingInfoPtr->GetLicenseInfo(licenseId);
+			if (linceInfoPtr != nullptr){
+				istd::CChangeNotifier changeNotifier(this);
+
+				CLicenseInstance licenseInstance;
+				if (licenseInstance.CopyFrom(*linceInfoPtr)){
+					licenseInstance.SetExpiration(expirationDate);
+
+					m_licenses[licenseId] = licenseInstance;
+
+					m_licenseContainerInfo.InsertItem(licenseId, "", "");
+				}
+			}
+		}
+	}
 }
 
 
@@ -64,7 +83,9 @@ void CProductInstanceInfo::RemoveLicense(const QByteArray & licenseId)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_licenses.RemoveReference(licenseId);
+	m_licenses.remove(licenseId);
+
+	m_licenseContainerInfo.RemoveItem(licenseId);
 }
 
 
@@ -90,15 +111,16 @@ QByteArray CProductInstanceInfo::GetCustomerId() const
 
 const imtbase::ICollectionInfo& CProductInstanceInfo::GetLicenseList() const
 {
-	return m_licenses;
+	return m_licenseContainerInfo;
 }
 
 
 const imtlic::ILicenseInfo* CProductInstanceInfo::GetLicenseInfo(const QByteArray& licenseId) const
 {
-	const imtbase::IObjectCollection* licenseCollectionPtr = m_licenses.GetSourceCollection();
-	if (licenseCollectionPtr != nullptr){
-		return dynamic_cast<const imtlic::ILicenseInfo*>(licenseCollectionPtr->GetObjectPtr(licenseId));
+	if (m_licenses.contains(licenseId)){
+		const imtlic::ILicenseInfo& licenseInfo = m_licenses[licenseId];
+
+		return &licenseInfo;
 	}
 
 	return nullptr;
@@ -126,9 +148,44 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_customerId);
 	retVal = retVal && archive.EndTag(customerIdTag);
 
-	static iser::CArchiveTag licensesTag("Licenses", "List of product licenses", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(licensesTag);
-	retVal = retVal && m_licenses.Serialize(archive);
+	static iser::CArchiveTag licensesTag("Licenses", "List of licenses", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag licenseInstanceTag("LicenseInstance", "License instance", iser::CArchiveTag::TT_GROUP);
+
+	int licensesCount = m_licenses.count();
+
+	retVal = retVal && archive.BeginMultiTag(licensesTag, licenseInstanceTag, licensesCount);
+
+	if (!archive.IsStoring()){
+		m_licenses.clear();
+		m_licenseContainerInfo.ResetData();
+	}
+
+	for (int i = 0; i < licensesCount; ++i){
+		retVal = retVal && archive.BeginTag(licenseInstanceTag);
+
+		QByteArray licenseId;
+		static iser::CArchiveTag licenseIdTag("LicenseId", "ID of the license instance", iser::CArchiveTag::TT_LEAF);
+		retVal = archive.BeginTag(licenseIdTag);
+		retVal = retVal && archive.Process(licenseId);
+		retVal = retVal && archive.EndTag(licenseIdTag);
+
+		CLicenseInstance licenseData;
+		if (archive.IsStoring()){
+			licenseData.CopyFrom(m_licenses[licenseId]);
+		}
+		static iser::CArchiveTag licenseTag("LicenseData", "License data", iser::CArchiveTag::TT_LEAF);
+		retVal = archive.BeginTag(licenseTag);
+		retVal = retVal && licenseData.Serialize(archive);
+		retVal = retVal && archive.EndTag(licenseTag);
+
+		retVal = retVal && archive.EndTag(licenseInstanceTag);
+
+		if (!archive.IsStoring() && retVal){
+			m_licenses[licenseId] = licenseData;
+			m_licenseContainerInfo.InsertItem(licenseId, "", "");
+		}
+	}
+
 	retVal = retVal && archive.EndTag(licensesTag);
 
 	return retVal;
@@ -149,8 +206,11 @@ bool CProductInstanceInfo::CopyFrom(const IChangeable& object, CompatibilityMode
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_licenses.CopyFrom(sourcePtr->m_licenses);
 		m_productId = sourcePtr->m_productId;
+		m_customerId = sourcePtr->m_customerId;
+		m_instanceId= sourcePtr->m_instanceId;
+		m_licenses = sourcePtr->m_licenses;
+		m_licenseContainerInfo= sourcePtr->m_licenseContainerInfo;
 
 		return true;
 	}
@@ -174,9 +234,11 @@ bool CProductInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_licenses.ResetData();
-
 	m_productId.clear();
+	m_customerId.clear();
+	m_instanceId.clear();
+	m_licenses.clear();
+	m_licenseContainerInfo.ResetData();
 
 	return true;
 }

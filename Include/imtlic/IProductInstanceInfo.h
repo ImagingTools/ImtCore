@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QDateTime>
+
 // ACF includes
 #include <iser/IObject.h>
 
@@ -54,7 +57,7 @@ public:
 		\note Full information about the license is managed by the product licensing info, the license-ID is used only as a link to the license information.
 		\sa IProductLicensingInfo
 	*/
-	virtual void AddLicense(const QByteArray& licenseId) = 0;
+	virtual void AddLicense(const QByteArray& licenseId, const QDateTime& expirationDate = QDateTime()) = 0;
 
 	/**
 		Remove an existing license from this product instance.

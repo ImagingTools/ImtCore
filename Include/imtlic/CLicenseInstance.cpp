@@ -78,6 +78,18 @@ bool CLicenseInstance::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 			return true;
 		}
 	}
+	else{
+		const imtlic::ILicenseInfo* sourcePtr = dynamic_cast<const imtlic::ILicenseInfo*>(&object);
+		if (sourcePtr != nullptr){
+			istd::CChangeNotifier changeNotifier(this);
+
+			if (BaseClass::CopyFrom(object)){
+				m_expirationTime = QDateTime();
+
+				return true;
+			}
+		}
+	}
 
 	return false;
 }
