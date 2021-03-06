@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/TModelUpdateHandler.h>
 #include <imtlic/IFeatureInfoProvider.h>
 #include <imtlic/ILicenseInfo.h>
 #include <GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h>
@@ -39,7 +40,7 @@ Q_SIGNALS:
 	void EmitItemChanged();
 
 protected:
-	void OnFeaturePackageCollectionUpdate();
+	void OnFeaturePackageCollectionUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* collectionPtr);
 	void EnumerateMissingFeatures();
 	void UpdateFeatureTree();
 	void UpdateFeatureTreeCheckStates();
@@ -74,17 +75,6 @@ protected:
 		IT_FEATURE
 	};
 
-	class FeaturePackageCollectionObserver: public imod::TSingleModelObserverBase<imtbase::IObjectCollection>
-	{
-	public:
-		FeaturePackageCollectionObserver(CLicenseInfoEditorGuiComp& parent);
-
-		// reimplemented (imod::CSingleModelObserverBase)
-		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
-	private:
-		CLicenseInfoEditorGuiComp& m_parent;
-	};
-
 	struct FeatureDescription
 	{
 		QByteArray id;
@@ -106,7 +96,7 @@ protected:
 	QMap<QByteArray, QString> m_packageNames;
 	QByteArrayList m_missingFeatures;
 
-	FeaturePackageCollectionObserver m_collectionObserver;
+	imtbase::TModelUpdateHandler<imtbase::IObjectCollection, CLicenseInfoEditorGuiComp> m_collectionObserver;
 };
 
 

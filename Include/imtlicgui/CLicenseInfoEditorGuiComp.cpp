@@ -24,9 +24,10 @@ CLicenseInfoEditorGuiComp::CLicenseInfoEditorGuiComp()
 
 // protected methods
 
-void CLicenseInfoEditorGuiComp::OnFeaturePackageCollectionUpdate()
+void CLicenseInfoEditorGuiComp::OnFeaturePackageCollectionUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtbase::IObjectCollection* collectionPtr)
 {
-	imtbase::IObjectCollection* collectionPtr = m_collectionObserver.GetObservedObject();
+	Q_ASSERT(collectionPtr != nullptr);
+
 	imtbase::ICollectionInfo::Ids packageIds = collectionPtr->GetElementIds();
 
 	Features->clear();
@@ -240,14 +241,9 @@ void CLicenseInfoEditorGuiComp::OnGuiModelAttached()
 	Q_ASSERT(licenseInfoPtr != nullptr);
 
 	m_featureIds = licenseInfoPtr->GetFeatures();
-
-	imod::IModel* modelPtr = const_cast<imod::IModel*>(
-				dynamic_cast<const imod::IModel*>(
-							dynamic_cast<const imtbase::IObjectCollection*>(licenseInfoPtr->GetFeaturePackages())));
-
-	if (modelPtr != nullptr){
-		modelPtr->AttachObserver(&m_collectionObserver);
-	}
+	
+	bool retVal = m_collectionObserver.RegisterObject(licenseInfoPtr->GetFeaturePackages(), &CLicenseInfoEditorGuiComp::OnFeaturePackageCollectionUpdate);
+	Q_ASSERT(retVal);
 }
 
 
@@ -256,15 +252,7 @@ void CLicenseInfoEditorGuiComp::OnGuiModelDetached()
 	imtlic::ILicenseInfo* licenseInfoPtr = GetObservedObject();
 	Q_ASSERT(licenseInfoPtr != nullptr);
 
-	imod::IModel* modelPtr = const_cast<imod::IModel*>(
-				dynamic_cast<const imod::IModel*>(
-					dynamic_cast<const imtbase::IObjectCollection*>(licenseInfoPtr->GetFeaturePackages())));
-
-	if (modelPtr != nullptr){
-		if (modelPtr->IsAttached(&m_collectionObserver)){
-			modelPtr->DetachObserver(&m_collectionObserver);
-		}
-	}
+	m_collectionObserver.UnregisterAllObjects();
 
 	m_isGuiModelInitialized = false;
 	m_isCollectionRepresentationInitialized = false;
@@ -316,7 +304,7 @@ void CLicenseInfoEditorGuiComp::on_IdEdit_editingFinished()
 }
 
 
-void CLicenseInfoEditorGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, int column)
+void CLicenseInfoEditorGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, int /*column*/)
 {
 	if (item->data(0, DR_ITEM_TYPE) == IT_PACKAGE){
 		Qt::CheckState state = item->checkState(0);
@@ -364,22 +352,6 @@ void CLicenseInfoEditorGuiComp::OnItemChanged()
 		UpdateFeatureTreeCheckStates();
 		DoUpdateModel();
 	}
-}
-
-
-// public methods of the embedded class FeaturePackageCollectionObserver
-
-CLicenseInfoEditorGuiComp::FeaturePackageCollectionObserver::FeaturePackageCollectionObserver(CLicenseInfoEditorGuiComp& parent)
-	:m_parent(parent)
-{
-}
-
-
-// reimplemented (imod::CSingleModelObserverBase)
-
-void CLicenseInfoEditorGuiComp::FeaturePackageCollectionObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
-{
-	m_parent.OnFeaturePackageCollectionUpdate();
 }
 
 
