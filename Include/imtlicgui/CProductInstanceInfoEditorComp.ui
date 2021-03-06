@@ -86,20 +86,11 @@
       </size>
      </property>
      <property name="title">
-      <string>Licenses</string>
+      <string>License</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="QTreeWidget" name="LicenseTree">
-        <attribute name="headerVisible">
-         <bool>false</bool>
-        </attribute>
-        <column>
-         <property name="text">
-          <string>License</string>
-         </property>
-        </column>
-       </widget>
+       <widget class="QComboBox" name="LicenseCombo"/>
       </item>
      </layout>
     </widget>

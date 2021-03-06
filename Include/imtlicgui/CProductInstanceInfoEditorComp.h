@@ -35,8 +35,10 @@ public:
 	CProductInstanceInfoEditorComp();
 
 protected:
-	void OnProductLicensesUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* productCollectionPtr);
+	void OnProductsUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* productCollectionPtr);
+	void OnLicensesUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* productCollectionPtr);
 	void UpdateProductsCombo();
+	void UpdateLicensesCombo();
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
@@ -52,10 +54,11 @@ private Q_SLOTS:
 	void on_NameEdit_editingFinished();
 	void on_IdEdit_editingFinished();
 	void on_ProductCombo_currentIndexChanged(int index);
+	void on_LicenseCombo_currentIndexChanged(int index);
 
 private:
 	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CProductInstanceInfoEditorComp> m_productCollectionObserver;
-
+	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CProductInstanceInfoEditorComp> m_licenseCollectionObserver;
 };
 
 

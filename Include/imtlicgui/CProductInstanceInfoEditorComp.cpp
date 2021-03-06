@@ -4,6 +4,10 @@
 // ACF includes
 #include <istd/CChangeGroup.h>
 
+// ImtCore includes
+#include <imtlic/IProductLicensingInfo.h>
+#include <imtlic/ILicenseInfo.h>
+
 
 namespace imtlicgui
 {
@@ -12,24 +16,36 @@ namespace imtlicgui
 // public methods
 
 CProductInstanceInfoEditorComp::CProductInstanceInfoEditorComp()
-	:m_productCollectionObserver(*this)
+	:m_productCollectionObserver(*this),
+	m_licenseCollectionObserver(*this)
 {
 }
 
 
 // protected methods
 
-void CProductInstanceInfoEditorComp::OnProductLicensesUpdated(
+void CProductInstanceInfoEditorComp::OnProductsUpdated(
 			const istd::IChangeable::ChangeSet& /*changeSet*/,
 			const imtbase::IObjectCollection* /*productCollectionPtr*/)
 {
 	UpdateProductsCombo();
+	UpdateLicensesCombo();
+}
+
+
+void CProductInstanceInfoEditorComp::OnLicensesUpdated(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const imtbase::IObjectCollection* /*productCollectionPtr*/)
+{
+	UpdateLicensesCombo();
 }
 
 
 void CProductInstanceInfoEditorComp::UpdateProductsCombo()
 {
 	ProductCombo->clear();
+
+	m_licenseCollectionObserver.UnregisterAllObjects();
 
 	imtlic::IProductInstanceInfo* productInstanceInfoPtr = GetObservedObject();
 	Q_ASSERT(productInstanceInfoPtr != nullptr);
@@ -46,12 +62,58 @@ void CProductInstanceInfoEditorComp::UpdateProductsCombo()
 
 			if (selectedProductId == productId){
 				ProductCombo->setCurrentText(productName);
+
+				m_licenseCollectionObserver.RegisterObject(productsCollectionPtr->GetObjectPtr(productId), &CProductInstanceInfoEditorComp::OnLicensesUpdated);
 			}
 		}
 	}
 
 	if (selectedProductId.isEmpty()){
 		ProductCombo->setCurrentIndex(-1);
+	}
+}
+
+
+void CProductInstanceInfoEditorComp::UpdateLicensesCombo()
+{
+	LicenseCombo->clear();
+
+	bool licenseSelected = false;
+
+	imtlic::IProductInstanceInfo* productInstanceInfoPtr = GetObservedObject();
+	Q_ASSERT(productInstanceInfoPtr != nullptr);
+
+	const imtbase::IObjectCollection* productsCollectionPtr = productInstanceInfoPtr->GetProductDatabase();
+	if (productsCollectionPtr != nullptr){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (productsCollectionPtr->GetObjectData(productInstanceInfoPtr->GetProductId(), dataPtr)){
+			const imtlic::IProductLicensingInfo* licensingInfoPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
+			if (licensingInfoPtr != nullptr){
+				const imtbase::ICollectionInfo& licenseList = licensingInfoPtr->GetLicenseList();
+				const imtbase::IObjectCollectionInfo::Ids licenseIds = licenseList.GetElementIds();
+				for ( const QByteArray& licenseId : licenseIds){
+					const imtlic::ILicenseInfo* licenseInfoPtr = licensingInfoPtr->GetLicenseInfo(licenseId);
+					if (licenseInfoPtr != nullptr){
+						QString licenseName = licenseInfoPtr->GetLicenseName();
+
+						LicenseCombo->addItem(licenseName, licenseId);
+
+						const imtbase::ICollectionInfo& currentLicenses = productInstanceInfoPtr->GetLicenseList();
+						imtbase::ICollectionInfo::Ids currentLicenseIds = currentLicenses.GetElementIds();
+
+						if (currentLicenseIds.contains(licenseId)){
+							LicenseCombo->setCurrentText(licenseName);
+
+							licenseSelected = true;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (!licenseSelected){
+		LicenseCombo->setCurrentIndex(-1);
 	}
 }
 
@@ -64,6 +126,7 @@ void CProductInstanceInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSe
 	Q_ASSERT(productInstanceInfoPtr != nullptr);
 
 	UpdateProductsCombo();
+	UpdateLicensesCombo();
 }
 
 
@@ -74,7 +137,7 @@ void CProductInstanceInfoEditorComp::OnGuiModelAttached()
 	imtlic::IProductInstanceInfo* productInstanceInfoPtr = GetObservedObject();
 	Q_ASSERT(productInstanceInfoPtr != nullptr);
 
-	m_productCollectionObserver.RegisterObject(productInstanceInfoPtr->GetProductDatabase(), &CProductInstanceInfoEditorComp::OnProductLicensesUpdated);
+	m_productCollectionObserver.RegisterObject(productInstanceInfoPtr->GetProductDatabase(), &CProductInstanceInfoEditorComp::OnProductsUpdated);
 }
 
 
@@ -96,8 +159,14 @@ void CProductInstanceInfoEditorComp::UpdateModel() const
 	QByteArray currentProductId = ProductCombo->currentData().toByteArray();
 	QByteArray customerId = CustomerCombo->currentData().toByteArray();
 	QByteArray instanceId = ProductInstanceIdEdit->text().toUtf8();
+	QByteArray licenseId = LicenseCombo->currentData().toByteArray();
 
+	productInstanceInfoPtr->ResetData();
 	productInstanceInfoPtr->SetupProductInstance(currentProductId, instanceId, customerId);
+
+	if (!licenseId.isEmpty()){
+		productInstanceInfoPtr->AddLicense(licenseId);
+	}
 }
 
 
@@ -130,6 +199,18 @@ void CProductInstanceInfoEditorComp::on_IdEdit_editingFinished()
 
 
 void CProductInstanceInfoEditorComp::on_ProductCombo_currentIndexChanged(int /*index*/)
+{
+	DoUpdateModel();
+
+	if (!IsUpdateBlocked()){
+		UpdateBlocker updateBlocker(this);
+
+		UpdateLicensesCombo();
+	}
+}
+
+
+void CProductInstanceInfoEditorComp::on_LicenseCombo_currentIndexChanged(int /*index*/)
 {
 	DoUpdateModel();
 }

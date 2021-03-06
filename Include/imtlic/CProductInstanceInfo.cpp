@@ -59,19 +59,22 @@ void CProductInstanceInfo::AddLicense(const QByteArray& licenseId, const QDateTi
 	}
 
 	if (m_productCollectionPtr != nullptr){
-		const imtlic::IProductLicensingInfo* licensingInfoPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(m_productCollectionPtr->GetObjectPtr(m_productId));
-		if (licensingInfoPtr != nullptr){
-			const imtlic::ILicenseInfo* linceInfoPtr = licensingInfoPtr->GetLicenseInfo(licenseId);
-			if (linceInfoPtr != nullptr){
-				istd::CChangeNotifier changeNotifier(this);
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_productCollectionPtr->GetObjectData(m_productId, dataPtr)){
+			const imtlic::IProductLicensingInfo* licensingInfoPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
+			if (licensingInfoPtr != nullptr) {
+				const imtlic::ILicenseInfo* linceInfoPtr = licensingInfoPtr->GetLicenseInfo(licenseId);
+				if (linceInfoPtr != nullptr) {
+					istd::CChangeNotifier changeNotifier(this);
 
-				CLicenseInstance licenseInstance;
-				if (licenseInstance.CopyFrom(*linceInfoPtr)){
-					licenseInstance.SetExpiration(expirationDate);
+					CLicenseInstance licenseInstance;
+					if (licenseInstance.CopyFrom(*linceInfoPtr)) {
+						licenseInstance.SetExpiration(expirationDate);
 
-					m_licenses[licenseId] = licenseInstance;
+						m_licenses[licenseId] = licenseInstance;
 
-					m_licenseContainerInfo.InsertItem(licenseId, "", "");
+						m_licenseContainerInfo.InsertItem(licenseId, "", "");
+					}
 				}
 			}
 		}
@@ -150,6 +153,8 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 
 	static iser::CArchiveTag licensesTag("Licenses", "List of licenses", iser::CArchiveTag::TT_MULTIPLE);
 	static iser::CArchiveTag licenseInstanceTag("LicenseInstance", "License instance", iser::CArchiveTag::TT_GROUP);
+	static iser::CArchiveTag licenseIdTag("LicenseId", "ID of the license instance", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag licenseTag("LicenseData", "License data", iser::CArchiveTag::TT_GROUP);
 
 	int licensesCount = m_licenses.count();
 
@@ -160,29 +165,42 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 		m_licenseContainerInfo.ResetData();
 	}
 
-	for (int i = 0; i < licensesCount; ++i){
-		retVal = retVal && archive.BeginTag(licenseInstanceTag);
+	if (archive.IsStoring()){
+		for (LicenseInstances::ConstIterator iter = m_licenses.constBegin(); iter != m_licenses.constEnd(); ++iter){
+			retVal = retVal && archive.BeginTag(licenseInstanceTag);
 
-		QByteArray licenseId;
-		static iser::CArchiveTag licenseIdTag("LicenseId", "ID of the license instance", iser::CArchiveTag::TT_LEAF);
-		retVal = archive.BeginTag(licenseIdTag);
-		retVal = retVal && archive.Process(licenseId);
-		retVal = retVal && archive.EndTag(licenseIdTag);
+			QByteArray licenseId = iter.key();
+			retVal = archive.BeginTag(licenseIdTag);
+			retVal = retVal && archive.Process(licenseId);
+			retVal = retVal && archive.EndTag(licenseIdTag);
 
-		CLicenseInstance licenseData;
-		if (archive.IsStoring()){
-			licenseData.CopyFrom(m_licenses[licenseId]);
+			retVal = archive.BeginTag(licenseTag);
+			retVal = retVal && m_licenses[licenseId].Serialize(archive);
+			retVal = retVal && archive.EndTag(licenseTag);
+
+			retVal = retVal && archive.EndTag(licenseInstanceTag);
 		}
-		static iser::CArchiveTag licenseTag("LicenseData", "License data", iser::CArchiveTag::TT_LEAF);
-		retVal = archive.BeginTag(licenseTag);
-		retVal = retVal && licenseData.Serialize(archive);
-		retVal = retVal && archive.EndTag(licenseTag);
+	}
+	else{
+		for (int i = 0; i < licensesCount; ++i){
+			retVal = retVal && archive.BeginTag(licenseInstanceTag);
 
-		retVal = retVal && archive.EndTag(licenseInstanceTag);
+			QByteArray licenseId;
+			retVal = archive.BeginTag(licenseIdTag);
+			retVal = retVal && archive.Process(licenseId);
+			retVal = retVal && archive.EndTag(licenseIdTag);
 
-		if (!archive.IsStoring() && retVal){
-			m_licenses[licenseId] = licenseData;
-			m_licenseContainerInfo.InsertItem(licenseId, "", "");
+			CLicenseInstance licenseData;
+			retVal = archive.BeginTag(licenseTag);
+			retVal = retVal && licenseData.Serialize(archive);
+			retVal = retVal && archive.EndTag(licenseTag);
+
+			retVal = retVal && archive.EndTag(licenseInstanceTag);
+
+			if (retVal){
+				m_licenses[licenseId] = licenseData;
+				m_licenseContainerInfo.InsertItem(licenseId, "", "");
+			}
 		}
 	}
 
