@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtbase/TModelUpdateHandler.h>
+#include <imtbase/TModelUpdateBinder.h>
 #include <imtlic/IFeatureInfoProvider.h>
 #include <imtlic/ILicenseInfo.h>
 #include <GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h>
@@ -96,7 +96,7 @@ protected:
 	QMap<QByteArray, QString> m_packageNames;
 	QByteArrayList m_missingFeatures;
 
-	imtbase::TModelUpdateHandler<imtbase::IObjectCollection, CLicenseInfoEditorGuiComp> m_collectionObserver;
+	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CLicenseInfoEditorGuiComp> m_collectionObserver;
 };
 
 

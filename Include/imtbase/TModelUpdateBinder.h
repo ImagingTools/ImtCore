@@ -11,13 +11,13 @@ namespace imtbase
 
 
 template <typename ModelInterface, typename Parent>
-class TModelUpdateHandler: protected imod::CMultiModelDispatcherBase
+class TModelUpdateBinder: protected imod::CMultiModelDispatcherBase
 {
 public:
 	typedef typename void (Parent::*CallbackMethod)(const istd::IChangeable::ChangeSet& changeSet, const ModelInterface* objectPtr);
 	typedef imod::CMultiModelDispatcherBase BaseClass;
 
-	TModelUpdateHandler(Parent& parent);
+	TModelUpdateBinder(Parent& parent);
 
 	bool RegisterObject(const istd::IChangeable* dataPtr, CallbackMethod callbackMethod, int modelId = 0);
 	bool RegisterObject(istd::IChangeable* dataPtr, CallbackMethod callbackMethod, int modelId = 0);
@@ -36,21 +36,21 @@ private:
 
 
 template <typename ModelInterface, typename Parent>
-TModelUpdateHandler<ModelInterface, Parent>::TModelUpdateHandler(Parent& parent)
+TModelUpdateBinder<ModelInterface, Parent>::TModelUpdateBinder(Parent& parent)
 	:m_parent(parent)
 {
 }
 
 
 template <typename ModelInterface, typename Parent>
-bool TModelUpdateHandler<ModelInterface, Parent>::RegisterObject(const istd::IChangeable* dataPtr, CallbackMethod callbackMethod, int modelId)
+bool TModelUpdateBinder<ModelInterface, Parent>::RegisterObject(const istd::IChangeable* dataPtr, CallbackMethod callbackMethod, int modelId)
 {
 	return RegisterObject(const_cast<istd::IChangeable*>(dataPtr), callbackMethod, modelId);
 }
 
 
 template <typename ModelInterface, typename Parent>
-bool TModelUpdateHandler<ModelInterface, Parent>::RegisterObject(istd::IChangeable* dataPtr, CallbackMethod callbackMethod, int modelId)
+bool TModelUpdateBinder<ModelInterface, Parent>::RegisterObject(istd::IChangeable* dataPtr, CallbackMethod callbackMethod, int modelId)
 {
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(dataPtr);
 	if (modelPtr != nullptr){
@@ -66,7 +66,7 @@ bool TModelUpdateHandler<ModelInterface, Parent>::RegisterObject(istd::IChangeab
 
 
 template<typename ModelInterface, typename Parent>
-void TModelUpdateHandler<ModelInterface, Parent>::UnregisterObject(int modelId)
+void TModelUpdateBinder<ModelInterface, Parent>::UnregisterObject(int modelId)
 {
 	BaseClass::UnregisterModel(modelId);
 
@@ -75,7 +75,7 @@ void TModelUpdateHandler<ModelInterface, Parent>::UnregisterObject(int modelId)
 
 
 template<typename ModelInterface, typename Parent>
-void TModelUpdateHandler<ModelInterface, Parent>::UnregisterAllObjects()
+void TModelUpdateBinder<ModelInterface, Parent>::UnregisterAllObjects()
 {
 	BaseClass::UnregisterAllModels();
 
@@ -86,7 +86,7 @@ void TModelUpdateHandler<ModelInterface, Parent>::UnregisterAllObjects()
 // reimplemented (imod::CMultiModelDispatcherBase)
 
 template <typename ModelInterface, typename Parent>
-void TModelUpdateHandler<ModelInterface, Parent>::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void TModelUpdateBinder<ModelInterface, Parent>::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
 {
 	if (m_callbackMap.contains(modelId)){
 		const CallbackMethod& method = m_callbackMap[modelId];
