@@ -61,19 +61,21 @@ void CProductInstanceInfo::AddLicense(const QByteArray& licenseId, const QDateTi
 	if (m_productCollectionPtr != nullptr){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_productCollectionPtr->GetObjectData(m_productId, dataPtr)){
-			const imtlic::IProductLicensingInfo* licensingInfoPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
-			if (licensingInfoPtr != nullptr) {
-				const imtlic::ILicenseInfo* linceInfoPtr = licensingInfoPtr->GetLicenseInfo(licenseId);
-				if (linceInfoPtr != nullptr) {
-					istd::CChangeNotifier changeNotifier(this);
+			const imtlic::IProductLicensingInfo* productLicensingInfoPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
+			if (productLicensingInfoPtr != nullptr) {
+				const imtbase::ICollectionInfo& licenseList = productLicensingInfoPtr->GetLicenseList();
+				const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
+				for ( const QByteArray& collectionId : licenseCollectionIds){
+					const imtlic::ILicenseInfo* licenseInfoPtr = productLicensingInfoPtr->GetLicenseInfo(collectionId);
+					if (licenseInfoPtr != nullptr && (licenseId == licenseInfoPtr->GetLicenseId())){
+						CLicenseInstance licenseInstance;
+						if (licenseInstance.CopyFrom(*licenseInfoPtr)){
+							licenseInstance.SetExpiration(expirationDate);
 
-					CLicenseInstance licenseInstance;
-					if (licenseInstance.CopyFrom(*linceInfoPtr)) {
-						licenseInstance.SetExpiration(expirationDate);
+							m_licenses[licenseId] = licenseInstance;
 
-						m_licenses[licenseId] = licenseInstance;
-
-						m_licenseContainerInfo.InsertItem(licenseId, "", "");
+							m_licenseContainerInfo.InsertItem(licenseId, "", "");
+						}
 					}
 				}
 			}
@@ -100,13 +102,13 @@ QByteArray CProductInstanceInfo::GetProductId() const
 
 QByteArray CProductInstanceInfo::GetProductInstanceId() const
 {
-	return QByteArray();
+	return m_instanceId;
 }
 
 
 QByteArray CProductInstanceInfo::GetCustomerId() const
 {
-	return QByteArray();
+	return m_customerId;
 }
 
 
@@ -153,7 +155,6 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 
 	static iser::CArchiveTag licensesTag("Licenses", "List of licenses", iser::CArchiveTag::TT_MULTIPLE);
 	static iser::CArchiveTag licenseInstanceTag("LicenseInstance", "License instance", iser::CArchiveTag::TT_GROUP);
-	static iser::CArchiveTag licenseIdTag("LicenseId", "ID of the license instance", iser::CArchiveTag::TT_LEAF);
 	static iser::CArchiveTag licenseTag("LicenseData", "License data", iser::CArchiveTag::TT_GROUP);
 
 	int licensesCount = m_licenses.count();
@@ -166,16 +167,11 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 	}
 
 	if (archive.IsStoring()){
-		for (LicenseInstances::ConstIterator iter = m_licenses.constBegin(); iter != m_licenses.constEnd(); ++iter){
+		for (LicenseInstances::Iterator iter = m_licenses.begin(); iter != m_licenses.end(); ++iter){
 			retVal = retVal && archive.BeginTag(licenseInstanceTag);
 
-			QByteArray licenseId = iter.key();
-			retVal = archive.BeginTag(licenseIdTag);
-			retVal = retVal && archive.Process(licenseId);
-			retVal = retVal && archive.EndTag(licenseIdTag);
-
 			retVal = archive.BeginTag(licenseTag);
-			retVal = retVal && m_licenses[licenseId].Serialize(archive);
+			retVal = retVal && iter.value().Serialize(archive);
 			retVal = retVal && archive.EndTag(licenseTag);
 
 			retVal = retVal && archive.EndTag(licenseInstanceTag);
@@ -185,11 +181,6 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 		for (int i = 0; i < licensesCount; ++i){
 			retVal = retVal && archive.BeginTag(licenseInstanceTag);
 
-			QByteArray licenseId;
-			retVal = archive.BeginTag(licenseIdTag);
-			retVal = retVal && archive.Process(licenseId);
-			retVal = retVal && archive.EndTag(licenseIdTag);
-
 			CLicenseInstance licenseData;
 			retVal = archive.BeginTag(licenseTag);
 			retVal = retVal && licenseData.Serialize(archive);
@@ -198,8 +189,8 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 			retVal = retVal && archive.EndTag(licenseInstanceTag);
 
 			if (retVal){
-				m_licenses[licenseId] = licenseData;
-				m_licenseContainerInfo.InsertItem(licenseId, "", "");
+				m_licenses[licenseData.GetLicenseId()] = licenseData;
+				m_licenseContainerInfo.InsertItem(licenseData.GetLicenseId(), "", "");
 			}
 		}
 	}

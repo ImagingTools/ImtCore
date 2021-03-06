@@ -90,11 +90,14 @@ void CProductInstanceInfoEditorComp::UpdateLicensesCombo()
 			const imtlic::IProductLicensingInfo* licensingInfoPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
 			if (licensingInfoPtr != nullptr){
 				const imtbase::ICollectionInfo& licenseList = licensingInfoPtr->GetLicenseList();
-				const imtbase::IObjectCollectionInfo::Ids licenseIds = licenseList.GetElementIds();
-				for ( const QByteArray& licenseId : licenseIds){
-					const imtlic::ILicenseInfo* licenseInfoPtr = licensingInfoPtr->GetLicenseInfo(licenseId);
+				const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
+				for ( const QByteArray& collectionId : licenseCollectionIds){
+					const imtlic::ILicenseInfo* licenseInfoPtr = licensingInfoPtr->GetLicenseInfo(collectionId);
 					if (licenseInfoPtr != nullptr){
 						QString licenseName = licenseInfoPtr->GetLicenseName();
+						QByteArray licenseId = licenseInfoPtr->GetLicenseId();
+
+						licenseName += " (" + licenseId + ")";
 
 						LicenseCombo->addItem(licenseName, licenseId);
 
@@ -127,6 +130,8 @@ void CProductInstanceInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSe
 
 	UpdateProductsCombo();
 	UpdateLicensesCombo();
+
+	ProductInstanceIdEdit->setText(productInstanceInfoPtr->GetProductInstanceId());
 }
 
 
@@ -165,7 +170,12 @@ void CProductInstanceInfoEditorComp::UpdateModel() const
 	productInstanceInfoPtr->SetupProductInstance(currentProductId, instanceId, customerId);
 
 	if (!licenseId.isEmpty()){
-		productInstanceInfoPtr->AddLicense(licenseId);
+		QDateTime validUntil;
+		if (ExpireGroup->isChecked()){
+			validUntil = ValidUntilDate->dateTime();
+		}
+
+		productInstanceInfoPtr->AddLicense(licenseId, validUntil);
 	}
 }
 
@@ -186,13 +196,7 @@ void CProductInstanceInfoEditorComp::OnGuiDestroyed()
 
 // private slots
 
-void CProductInstanceInfoEditorComp::on_NameEdit_editingFinished()
-{
-	DoUpdateModel();
-}
-
-
-void CProductInstanceInfoEditorComp::on_IdEdit_editingFinished()
+void CProductInstanceInfoEditorComp::on_ProductInstanceIdEdit_editingFinished()
 {
 	DoUpdateModel();
 }
@@ -211,6 +215,18 @@ void CProductInstanceInfoEditorComp::on_ProductCombo_currentIndexChanged(int /*i
 
 
 void CProductInstanceInfoEditorComp::on_LicenseCombo_currentIndexChanged(int /*index*/)
+{
+	DoUpdateModel();
+}
+
+
+void CProductInstanceInfoEditorComp::on_ValidUntilDate_dateTimeChanged(const QDateTime& /*dateTime*/)
+{
+	DoUpdateModel();
+}
+
+
+void CProductInstanceInfoEditorComp::on_ExpireGroup_toggled(bool /*toggled*/)
 {
 	DoUpdateModel();
 }

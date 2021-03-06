@@ -228,7 +228,6 @@ void CLicenseInfoEditorGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 		EnumerateMissingFeatures();
 		UpdateFeatureTree();
 		UpdateFeatureTreeCheckStates();
-		DoUpdateModel();
 	}
 }
 
@@ -244,6 +243,8 @@ void CLicenseInfoEditorGuiComp::OnGuiModelAttached()
 	
 	bool retVal = m_collectionObserver.RegisterObject(licenseInfoPtr->GetFeaturePackages(), &CLicenseInfoEditorGuiComp::OnFeaturePackageCollectionUpdate);
 	Q_ASSERT(retVal);
+
+	OnFeaturePackageCollectionUpdate(istd::IChangeable::GetAnyChange(), licenseInfoPtr->GetFeaturePackages());
 }
 
 
