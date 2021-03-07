@@ -542,6 +542,7 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 	Tabs->tabBar()->setDrawBase(false);
 	Tabs->setTabsClosable(true);
 	Tabs->setElideMode(Qt::ElideMiddle);
+	Tabs->setIconSize(QSize(24, 24));
 
 	m_closeCurrentTabShortcutPtr = new QShortcut(GetQtWidget());
 	m_closeCurrentTabShortcutPtr->setKey(Qt::CTRL + Qt::Key_W);
