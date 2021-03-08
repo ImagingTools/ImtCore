@@ -11,6 +11,7 @@
 #include <imtlic/IFeatureDependenciesManager.h>
 #include <imtlic/IFeatureInfo.h>
 
+
 namespace imtlicgui
 {
 
@@ -260,11 +261,13 @@ CFeatureDependencyEditorBase::DependencyMap CFeatureDependencyEditorBase::BuildD
 		if (packagePtr != nullptr){
 			const imtlic::IFeatureDependenciesProvider* dependenciesProvider = packagePtr->GetDependenciesInfoProvider();
 			if (dependenciesProvider != nullptr){
-				imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetFeatureList().GetElementIds();
-				for (const QByteArray& featureId : featureIds){
-					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureId);
+				imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
+				for (const QByteArray& featureCollectionId : featureCollectionIds){
+					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
 					if (featureInfoPtr != nullptr){
-						dependencyMap[featureInfoPtr->GetFeatureId()] = dependenciesProvider->GetFeatureDependencies(featureInfoPtr->GetFeatureId());
+						QByteArray featureId = featureInfoPtr->GetFeatureId();
+
+						dependencyMap[featureId] = dependenciesProvider->GetFeatureDependencies(featureId);
 					}
 				}
 			}
