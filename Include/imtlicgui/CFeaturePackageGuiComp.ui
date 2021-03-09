@@ -84,7 +84,7 @@ QTreeView::branch::selected
       </property>
       <column>
        <property name="text">
-        <string>Feature Name</string>
+        <string>Functional Dependencies</string>
        </property>
       </column>
      </widget>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>605</width>
-    <height>637</height>
+    <width>347</width>
+    <height>130</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,43 +37,6 @@
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
        <widget class="QLineEdit" name="IdEdit"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="Dependencies">
-     <property name="title">
-      <string>Dependencies</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QTreeWidget" name="FeatureTree">
-        <property name="styleSheet">
-         <string notr="true">QTreeView::item
-{
-    color: #335777;
-    height: 25px;
-}
-
-QTreeView::item::selected
-{
-    color: #335777;
-    background-color: #e3eefa;
-}
-
-QTreeView::branch::selected
-{
-    background: #e3eefa;
-}
-</string>
-        </property>
-        <column>
-         <property name="text">
-          <string>Feature Name</string>
-         </property>
-        </column>
-       </widget>
       </item>
      </layout>
     </widget>
