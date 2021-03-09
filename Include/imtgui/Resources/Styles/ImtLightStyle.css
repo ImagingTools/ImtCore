@@ -226,32 +226,44 @@ QTreeWidget[TabSimulation=true]::item:first:selected
     border-top: 1px white;
 }
 
-QTreeView[ItemView=true]::item
-{
-    color: #335777;
-    height: 30px;
+
+QAbstractItemView {
+    outline: 0;
 }
 
-QTreeView[ItemView=true]::item::selected
+QAbstractItemView[NoFrame="true"]
+{
+    border: none;
+}
+
+QAbstractItemView::item
+{
+    height: 25px;
+}
+
+QAbstractItemView::item::selected
 {
     color: #335777;
     background-color: #e3eefa;
 }
+
+QAbstractItemView::branch::selected
+{
+    background: #e3eefa;
+}
+
+
+QTreeView[ItemView=true]::item
+{
+    height: 30px;
+}
+
 
 QComboBox::item:selected 
 {
  	color: white;
 }
 
-QAbstractItemView 
-{
-    outline: 0;
-}
-
-QAbstractItemView[NoFrame="true"]
-{
-	border: none;
-}
 
 QHeaderView
 {

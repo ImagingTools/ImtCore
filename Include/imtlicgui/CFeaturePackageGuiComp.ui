@@ -94,23 +94,7 @@
        <item>
         <widget class="QTreeWidget" name="FeatureList">
          <property name="styleSheet">
-          <string notr="true">QTreeView::item
-{
-    color: #335777;
-    height: 25px;
-}
-
-QTreeView::item::selected
-{
-    color: #335777;
-    background-color: #e3eefa;
-}
-
-QTreeView::branch::selected
-{
-    background: #e3eefa;
-}
-</string>
+          <string notr="true"/>
          </property>
          <property name="indentation">
           <number>0</number>
