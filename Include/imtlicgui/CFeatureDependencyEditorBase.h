@@ -26,8 +26,6 @@ class CFeatureDependencyEditorBase: virtual public istd::IPolymorphic
 public:
 	CFeatureDependencyEditorBase();
 
-	virtual void FeatureTreeItemChanged() = 0;
-
 protected:
 	typedef QMap<QByteArray, QByteArrayList> DependencyMap;
 
@@ -36,10 +34,11 @@ protected:
 	void UpdateFeatureTree();
 	void UpdateFeatureTreeCheckStates();
 	QTreeWidgetItem* GetItem(const QByteArray& itemId);
-	DependencyMap BuildDependencyMap(const imtbase::IObjectCollection& packageCollection);
+	void BuildDependencyMap(const imtbase::IObjectCollection& packageCollection);
 	bool HasDependency(const DependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId);
 
 	virtual void UpdateFeaturePackageModel() = 0;
+	virtual void FeatureTreeItemChanged() = 0;
 
 	void on_FeatureTree_itemChanged(QTreeWidgetItem *item, int column);
 
@@ -84,14 +83,20 @@ protected:
 	bool m_isGuiModelInitialized;
 	bool m_isCollectionRepresentationInitialized;
 
-	QByteArray m_featureId;
-	QByteArrayList m_dependencies;
 	FeaturePackageCollectionObserver m_packageCollectionObserver;
 
-	// Feature package collection related members
-	QMap<QByteArray, FeatureDescriptionList> m_packageFeatures;
-	QMap<QByteArray, QString> m_packageNames;
+	// Selected package related members
+	FeatureDescriptionList m_features;
+	DependencyMap m_dependencies;
 	QByteArrayList m_missingDependencies;
+
+	// Selected feature related members
+	QByteArray m_selectedFeatureId;
+
+	// Feature package collection related members
+	QMap<QByteArray, QString> m_packageNameMap;
+	QMap<QByteArray, FeatureDescriptionList> m_packageFeatureMap;
+	DependencyMap m_packageDependenciyMap;
 };
 
 

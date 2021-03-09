@@ -31,15 +31,17 @@ CFeatureDependencyEditorBase::CFeatureDependencyEditorBase()
 
 void CFeatureDependencyEditorBase::OnFeaturePackageCollectionUpdate()
 {
+	imtbase::IObjectCollection* collectionPtr = m_packageCollectionObserver.GetObservedObject();
+
+	BuildDependencyMap(*collectionPtr);
+
 	if (m_treeWidgetPtr == nullptr){
 		return;
 	}
 
-	imtbase::IObjectCollection* collectionPtr = m_packageCollectionObserver.GetObservedObject();
 	imtbase::ICollectionInfo::Ids packageIds = collectionPtr->GetElementIds();
 
-	m_treeWidgetPtr->clear();
-	m_packageFeatures.clear();
+	m_packageFeatureMap.clear();
 
 	for (const QByteArray& packageId : packageIds){
 		imtbase::IObjectCollection::DataPtr packageDataPtr;
@@ -62,8 +64,8 @@ void CFeatureDependencyEditorBase::OnFeaturePackageCollectionUpdate()
 					}
 				}
 
-				m_packageFeatures[packageId] = featureDescriptionList;
-				m_packageNames[packageId] = collectionPtr->GetElementInfo(packageId, imtbase::ICollectionInfo::EIT_NAME).toString();
+				m_packageFeatureMap[packageId] = featureDescriptionList;
+				m_packageNameMap[packageId] = collectionPtr->GetElementInfo(packageId, imtbase::ICollectionInfo::EIT_NAME).toString();
 			}
 		}
 	}
@@ -83,19 +85,27 @@ void CFeatureDependencyEditorBase::EnumerateMissingDependencies()
 {
 	QByteArrayList allFeatureIds;
 
-	QByteArrayList packageIds = m_packageFeatures.keys();
+	QByteArrayList packageIds = m_packageFeatureMap.keys();
 	for (const QByteArray& packageId : packageIds){
-		FeatureDescriptionList featureDescriptionList = m_packageFeatures[packageId];
+		FeatureDescriptionList featureDescriptionList = m_packageFeatureMap[packageId];
 		for (const FeatureDescription& featureDescription : featureDescriptionList){
 			allFeatureIds.append(featureDescription.id);
 		}
 	}
 
+	for (int i = 0; i < m_features.count(); i++){
+		if (!allFeatureIds.contains(m_features[i].id)){
+			allFeatureIds.append(m_features[i].id);
+		}
+	}
+
 	m_missingDependencies.clear();
 
-	for (const QByteArray& featureId : m_dependencies){
-		if (!allFeatureIds.contains(featureId)){
-			m_missingDependencies.push_back(featureId);
+	if (m_dependencies.contains(m_selectedFeatureId)){
+		for (const QByteArray& featureId : m_dependencies[m_selectedFeatureId]){
+			if (!allFeatureIds.contains(featureId)){
+				m_missingDependencies.push_back(featureId);
+			}
 		}
 	}
 }
@@ -111,26 +121,52 @@ void CFeatureDependencyEditorBase::UpdateFeatureTree()
 
 	m_treeWidgetPtr->clear();
 
-	if (m_featureId.isEmpty()){
+	if (m_selectedFeatureId == "NO_SELECTION"){
 		return;
 	}
 
-	QByteArrayList packageIds = m_packageFeatures.keys();
+	QByteArrayList packageIds = m_packageFeatureMap.keys();
 	for (const QByteArray& packageId : packageIds){
-		QTreeWidgetItem* packageItemPtr = new QTreeWidgetItem({m_packageNames[packageId]});
+		QTreeWidgetItem* packageItemPtr = new QTreeWidgetItem({m_packageNameMap[packageId]});
 		m_treeWidgetPtr->addTopLevelItem(packageItemPtr);
 		packageItemPtr->setData(0, DR_ITEM_ID, packageId);
 		packageItemPtr->setData(0, DR_ITEM_TYPE, IT_PACKAGE);
 
-		FeatureDescriptionList featureDescriptionList = m_packageFeatures[packageId];
+		FeatureDescriptionList featureDescriptionList = m_packageFeatureMap[packageId];
 		for (const FeatureDescription& featureDescription : featureDescriptionList){
-			if (featureDescription.id == m_featureId){
+			if (featureDescription.id == m_selectedFeatureId){
 				continue;
 			}
 
 			QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({featureDescription.name});
 			packageItemPtr->addChild(featureItemPtr);
 			featureItemPtr->setData(0, DR_ITEM_ID, featureDescription.id);
+			featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
+		}
+
+		if (packageItemPtr->childCount() == 0){
+			m_treeWidgetPtr->takeTopLevelItem(m_treeWidgetPtr->indexOfTopLevelItem(packageItemPtr));
+			delete packageItemPtr;
+		}
+	}
+
+	QTreeWidgetItem* unsavedFeaturesGroupItemPtr = nullptr;
+	for (int i = 0; i < m_features.count(); i++){
+		if (GetItem(m_features[i].id) == nullptr){
+			if (m_features[i].id == m_selectedFeatureId){
+				continue;
+			}
+
+			if (unsavedFeaturesGroupItemPtr == nullptr){
+				unsavedFeaturesGroupItemPtr = new QTreeWidgetItem({QObject::tr("Unsaved Features")});
+				m_treeWidgetPtr->addTopLevelItem(unsavedFeaturesGroupItemPtr);
+				unsavedFeaturesGroupItemPtr->setData(0, DR_ITEM_ID, "UNSAVED_FEATURES");
+				unsavedFeaturesGroupItemPtr->setData(0, DR_ITEM_TYPE, IT_PACKAGE);
+			}
+
+			QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({m_features[i].name});
+			unsavedFeaturesGroupItemPtr->addChild(featureItemPtr);
+			featureItemPtr->setData(0, DR_ITEM_ID, m_features[i].id);
 			featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
 		}
 	}
@@ -163,25 +199,26 @@ void CFeatureDependencyEditorBase::UpdateFeatureTreeCheckStates()
 
 	QSignalBlocker blocker(m_treeWidgetPtr);
 
-	QByteArrayList packageIds = m_packageFeatures.keys();
-	for (const QByteArray& packageId : packageIds){
-		FeatureDescriptionList featureDescriptionList = m_packageFeatures[packageId];
-		for (const FeatureDescription& featureDescription : featureDescriptionList){
-			QTreeWidgetItem* featureItemPtr = GetItem(featureDescription.id);
-			if (featureItemPtr != nullptr){
-				bool isFeaturePresent = m_dependencies.contains(featureDescription.id);
-				featureItemPtr->setCheckState(0, isFeaturePresent ? Qt::Checked : Qt::Unchecked);
-			}
+	for (int packageIndex = 0; packageIndex < m_treeWidgetPtr->topLevelItemCount(); packageIndex++){
+		QTreeWidgetItem* packageItemPtr = m_treeWidgetPtr->topLevelItem(packageIndex);
+		for (int featureIndex = 0; featureIndex < packageItemPtr->childCount(); featureIndex++){
+			QTreeWidgetItem* featureItemPtr = packageItemPtr->child(featureIndex);
+
+			QByteArray featureId = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
+
+			bool isFeaturePresent = m_dependencies[m_selectedFeatureId].contains(featureId);
+			featureItemPtr->setCheckState(0, isFeaturePresent ? Qt::Checked : Qt::Unchecked);
 		}
 	}
 
-	for (const QByteArray& packageId : packageIds){
+	for (int packageIndex = 0; packageIndex < m_treeWidgetPtr->topLevelItemCount(); packageIndex++){
+		QTreeWidgetItem* packageItemPtr = m_treeWidgetPtr->topLevelItem(packageIndex);
+
 		bool isAllFeaturesChecked = true;
 		bool isAllFeaturesUnchecked = true;
 
-		FeatureDescriptionList featureDescriptionList = m_packageFeatures[packageId];
-		for (const FeatureDescription& featureDescription : featureDescriptionList){
-			QTreeWidgetItem* featureItemPtr = GetItem(featureDescription.id);
+		for (int featureIndex = 0; featureIndex < packageItemPtr->childCount(); featureIndex++){
+			QTreeWidgetItem* featureItemPtr = packageItemPtr->child(featureIndex);
 			if (featureItemPtr != nullptr){
 				if (featureItemPtr->checkState(0) == Qt::Checked){
 					isAllFeaturesUnchecked = false;
@@ -192,7 +229,6 @@ void CFeatureDependencyEditorBase::UpdateFeatureTreeCheckStates()
 			}
 		}
 
-		QTreeWidgetItem* packageItemPtr = GetItem(packageId);
 		if (packageItemPtr != nullptr){
 			if (isAllFeaturesChecked){
 				packageItemPtr->setCheckState(0, Qt::Checked);
@@ -248,9 +284,9 @@ QTreeWidgetItem* CFeatureDependencyEditorBase::GetItem(const QByteArray& itemId)
 }
 
 
-CFeatureDependencyEditorBase::DependencyMap CFeatureDependencyEditorBase::BuildDependencyMap(const imtbase::IObjectCollection& packageCollection)
+void CFeatureDependencyEditorBase::BuildDependencyMap(const imtbase::IObjectCollection& packageCollection)
 {
-	DependencyMap dependencyMap;
+	m_packageDependenciyMap.clear();
 
 	imtbase::ICollectionInfo::Ids packageIds = packageCollection.GetElementIds();
 	for (const QByteArray& packageId : packageIds){
@@ -267,14 +303,12 @@ CFeatureDependencyEditorBase::DependencyMap CFeatureDependencyEditorBase::BuildD
 					if (featureInfoPtr != nullptr){
 						QByteArray featureId = featureInfoPtr->GetFeatureId();
 
-						dependencyMap[featureId] = dependenciesProvider->GetFeatureDependencies(featureId);
+						m_packageDependenciyMap[featureId] = dependenciesProvider->GetFeatureDependencies(featureId);
 					}
 				}
 			}
 		}
 	}
-
-	return dependencyMap;
 }
 
 
@@ -298,10 +332,10 @@ bool CFeatureDependencyEditorBase::HasDependency(const DependencyMap& dependency
 
 void CFeatureDependencyEditorBase::on_FeatureTree_itemChanged(QTreeWidgetItem *item, int column)
 {
-	DependencyMap dependencyMap;
 	imtbase::IObjectCollection* collectionPtr = m_packageCollectionObserver.GetObjectPtr();
-	if (collectionPtr != nullptr){
-		dependencyMap = BuildDependencyMap(*collectionPtr);
+
+	for (const QByteArray& id : m_dependencies.keys()){
+		m_packageDependenciyMap[id] = m_dependencies[id];
 	}
 
 	if (item->data(0, DR_ITEM_TYPE) == IT_PACKAGE){
@@ -312,9 +346,9 @@ void CFeatureDependencyEditorBase::on_FeatureTree_itemChanged(QTreeWidgetItem *i
 			QByteArray featureId = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
 
 			if (state == Qt::Checked){
-				if (!m_dependencies.contains(featureId)){
-					if (!HasDependency(dependencyMap, featureId, m_featureId)){
-						m_dependencies.append(featureId);
+				if (!m_dependencies[m_selectedFeatureId].contains(featureId)){
+					if (!HasDependency(m_packageDependenciyMap, featureId, m_selectedFeatureId)){
+						m_dependencies[m_selectedFeatureId].append(featureId);
 					}
 					else{
 						QMessageBox::warning(
@@ -322,15 +356,15 @@ void CFeatureDependencyEditorBase::on_FeatureTree_itemChanged(QTreeWidgetItem *i
 									QObject::tr("Warning"),
 									QObject::tr("Feature with ID '%1' depends on feature with ID '%2'")
 												.arg(QString(featureId))
-												.arg(QString(m_featureId)));
+												.arg(QString(m_selectedFeatureId)));
 
 						break;
 					}
 				}
 			}
 			else{
-				if (m_dependencies.contains(featureId)){
-					m_dependencies.removeOne(featureId);
+				if (m_dependencies[m_selectedFeatureId].contains(featureId)){
+					m_dependencies[m_selectedFeatureId].removeOne(featureId);
 				}
 			}
 		}
@@ -339,9 +373,9 @@ void CFeatureDependencyEditorBase::on_FeatureTree_itemChanged(QTreeWidgetItem *i
 		QByteArray featureId = item->data(0, DR_ITEM_ID).toByteArray();
 
 		if (item->checkState(0) == Qt::Checked){
-			if (!m_dependencies.contains(featureId)){
-				if (!HasDependency(dependencyMap, featureId, m_featureId)){
-					m_dependencies.append(featureId);
+			if (!m_dependencies[m_selectedFeatureId].contains(featureId)){
+				if (!HasDependency(m_packageDependenciyMap, featureId, m_selectedFeatureId)){
+					m_dependencies[m_selectedFeatureId].append(featureId);
 				}
 				else{
 					QMessageBox::warning(
@@ -349,13 +383,13 @@ void CFeatureDependencyEditorBase::on_FeatureTree_itemChanged(QTreeWidgetItem *i
 								QObject::tr("Warning"),
 								QObject::tr("Feature with ID '%1' depends on feature with ID '%2'")
 											.arg(QString(featureId))
-											.arg(QString(m_featureId)));
+											.arg(QString(m_selectedFeatureId)));
 				}
 			}
 		}
 		else{
-			if (m_dependencies.contains(featureId)){
-				m_dependencies.removeOne(featureId);
+			if (m_dependencies[m_selectedFeatureId].contains(featureId)){
+				m_dependencies[m_selectedFeatureId].removeOne(featureId);
 			}
 		}
 	}

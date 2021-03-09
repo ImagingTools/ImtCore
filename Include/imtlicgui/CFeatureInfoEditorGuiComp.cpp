@@ -43,16 +43,40 @@ void CFeatureInfoEditorGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	IdEdit->setText(featureInfoPtr->GetFeatureId());
 	NameEdit->setText(featureInfoPtr->GetFeatureName());
 
-	m_featureId = featureInfoPtr->GetFeatureId();
+	m_selectedFeatureId = featureInfoPtr->GetFeatureId();
+
+	m_features.clear();
 	m_dependencies.clear();
 
 	const imtlic::IFeatureInfoProvider* featureInfoProviderPtr = GetObservedObject()->GetFeaturePackage();
 	if (featureInfoProviderPtr != nullptr){
-		const imtlic::IFeatureDependenciesProvider* dependenciesProviderPtr = featureInfoProviderPtr->GetDependenciesInfoProvider();
-		if (dependenciesProviderPtr != nullptr){
-			m_dependencies = dependenciesProviderPtr->GetFeatureDependencies(m_featureId);
+		imtbase::ICollectionInfo::Ids ids = featureInfoProviderPtr->GetFeatureList().GetElementIds();
+
+		for (const QByteArray& id : ids){
+			const imtlic::IFeatureDependenciesProvider* dependenciesProviderPtr = featureInfoProviderPtr->GetDependenciesInfoProvider();
+			const imtlic::IFeatureInfo* featureInfoPtr = featureInfoProviderPtr->GetFeatureInfo(id);
+
+			if (featureInfoPtr != nullptr && dependenciesProviderPtr != nullptr){
+				QByteArray featureId = featureInfoPtr->GetFeatureId();
+				m_dependencies[featureId] = dependenciesProviderPtr->GetFeatureDependencies(featureId);
+
+				FeatureDescription desc;
+				desc.name = featureInfoPtr->GetFeatureName();
+				desc.id = featureId;
+				m_features.append(desc);
+			}
 		}
 	}
+
+	//m_dependencies.clear();
+
+	//const imtlic::IFeatureInfoProvider* featureInfoProviderPtr = GetObservedObject()->GetFeaturePackage();
+	//if (featureInfoProviderPtr != nullptr){
+	//	const imtlic::IFeatureDependenciesProvider* dependenciesProviderPtr = featureInfoProviderPtr->GetDependenciesInfoProvider();
+	//	if (dependenciesProviderPtr != nullptr){
+	//		m_dependencies[m_selectedFeatureId] = dependenciesProviderPtr->GetFeatureDependencies(m_selectedFeatureId);
+	//	}
+	//}
 
 	m_isGuiModelInitialized = true;
 
@@ -131,7 +155,7 @@ void CFeatureInfoEditorGuiComp::UpdateModel() const
 								featureInfoProviderPtr->GetDependenciesInfoProvider()));
 
 		if (dependenciesManagerPtr != nullptr){
-			dependenciesManagerPtr->SetFeatureDependencies(m_featureId, m_dependencies);
+			dependenciesManagerPtr->SetFeatureDependencies(m_selectedFeatureId, m_dependencies[m_selectedFeatureId]);
 		}
 	}
 }

@@ -52,6 +52,7 @@ Q_SIGNALS:
 protected:
 	void UpdateFeatureList();
 
+	// reimplemente (imtlicgui::CFeatureDependencyEditorBase)
 	virtual void UpdateFeaturePackageModel() override;
 	virtual void FeatureTreeItemChanged() override;
 

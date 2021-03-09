@@ -22,6 +22,8 @@ CFeaturePackageGuiComp::CFeaturePackageGuiComp()
 	m_showCollectionEditorCommand("Edit Feartures", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020),
 	m_showDependenciesEditorCommand("Edit Dependencies", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020)
 {
+	m_selectedFeatureId = "NO_SELECTION";
+
 	m_rootCommands.InsertChild(&m_showCollectionEditorCommand);
 	m_rootCommands.InsertChild(&m_showDependenciesEditorCommand);
 
@@ -122,6 +124,29 @@ void CFeaturePackageGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 {
 	m_isGuiModelInitialized = true;
 
+	m_features.clear();
+	m_dependencies.clear();
+
+	imtlic::IFeatureInfoProvider* featureInfoProviderPtr = GetObservedObject();
+	if (featureInfoProviderPtr != nullptr){
+		imtbase::ICollectionInfo::Ids ids = featureInfoProviderPtr->GetFeatureList().GetElementIds();
+
+		for (const QByteArray& id : ids){
+			const imtlic::IFeatureDependenciesProvider* dependenciesProviderPtr = featureInfoProviderPtr->GetDependenciesInfoProvider();
+			const imtlic::IFeatureInfo* featureInfoPtr = featureInfoProviderPtr->GetFeatureInfo(id);
+
+			if (featureInfoPtr != nullptr && dependenciesProviderPtr != nullptr){
+				QByteArray featureId = featureInfoPtr->GetFeatureId();
+				m_dependencies[featureId] = dependenciesProviderPtr->GetFeatureDependencies(featureId);
+
+				FeatureDescription desc;
+				desc.name = featureInfoPtr->GetFeatureName();
+				desc.id = featureId;
+				m_features.append(desc);
+			}
+		}
+	}
+
 	if (m_isGuiModelInitialized && m_isCollectionRepresentationInitialized){
 		EnumerateMissingDependencies();
 		UpdateFeatureList();
@@ -130,18 +155,18 @@ void CFeaturePackageGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 		DoUpdateModel();
 	}
 
-	if (!m_featureId.isEmpty()){
+	if (!m_selectedFeatureId.isEmpty()){
 		int count = FeatureList->topLevelItemCount();
 		for (int i = 0; i < count; i++){
 			QByteArray id = FeatureList->topLevelItem(i)->data(0, DR_ITEM_ID).toByteArray();
-			if (id == m_featureId){
+			if (id == m_selectedFeatureId){
 				FeatureList->setCurrentItem(FeatureList->topLevelItem(i));
 				return;
 			}
 		}
 	}
 
-	m_featureId.clear();
+	m_selectedFeatureId.clear();
 	FeatureList->setCurrentItem(nullptr);
 }
 
@@ -208,7 +233,7 @@ void CFeaturePackageGuiComp::UpdateModel() const
 						const_cast<imtlic::IFeatureDependenciesProvider*>(featureInfoProviderPtr->GetDependenciesInfoProvider()));
 
 			if (dependenciesManagerPtr != nullptr){
-				dependenciesManagerPtr->SetFeatureDependencies(featureId, m_dependencies);
+				dependenciesManagerPtr->SetFeatureDependencies(featureId, m_dependencies[featureId]);
 			}
 		}
 	}
@@ -237,22 +262,11 @@ void CFeaturePackageGuiComp::OnShowFeatureDependencyEditor()
 
 void CFeaturePackageGuiComp::OnFeatureListSelectionChanged()
 {
-	m_dependencies.clear();
-	m_featureId.clear();
+	m_selectedFeatureId = "NO_SELECTION";
 
 	QTreeWidgetItem* itemPtr = FeatureList->currentItem();
 	if (itemPtr != nullptr){
-		QByteArray featureId = itemPtr->data(0, DR_ITEM_ID).toByteArray();
-
-		m_featureId = featureId;
-
-		imtlic::IFeatureInfoProvider* featureInfoProviderPtr = GetObservedObject();
-		if (featureInfoProviderPtr != nullptr){
-			const imtlic::IFeatureDependenciesProvider* dependenciesProviderPtr = featureInfoProviderPtr->GetDependenciesInfoProvider();
-			if (dependenciesProviderPtr != nullptr){
-				m_dependencies = dependenciesProviderPtr->GetFeatureDependencies(featureId);
-			}
-		}
+		m_selectedFeatureId = itemPtr->data(0, DR_ITEM_ID).toByteArray();
 	}
 
 	if (m_isGuiModelInitialized && m_isCollectionRepresentationInitialized){
