@@ -19,43 +19,39 @@ namespace imtlicgui
 
 CFeaturePackageGuiComp::CFeaturePackageGuiComp()
 	:m_featurePackageProxy(*this),
-	m_showCollectionEditorCommand("Edit Feartures", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020),
-	m_showDependenciesEditorCommand("Edit Dependencies", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_EXCLUSIVE, 2020)
+	m_featureSelectionObserver(*this)
 {
 	m_selectedFeatureId = "NO_SELECTION";
-
-	m_rootCommands.InsertChild(&m_showCollectionEditorCommand);
-	m_rootCommands.InsertChild(&m_showDependenciesEditorCommand);
-
-	connect(&m_showCollectionEditorCommand, &QAction::triggered, this, &CFeaturePackageGuiComp::OnShowCollectionEditor);
-	connect(&m_showDependenciesEditorCommand, &QAction::triggered, this, &CFeaturePackageGuiComp::OnShowFeatureDependencyEditor);
 }
 
 
 // protected methods
 
-void CFeaturePackageGuiComp::UpdateFeatureList()
+void CFeaturePackageGuiComp::OnFeatureSelectionChanged()
 {
-	FeatureList->clear();
+	m_selectedFeatureId = "NO_SELECTION";
 
-	imtlic::IFeatureInfoProvider* featureInfoProviderPtr = GetObservedObject();
-	if (featureInfoProviderPtr != nullptr){
-		const imtbase::ICollectionInfo& collectionInfo = featureInfoProviderPtr->GetFeatureList();
-		imtbase::ICollectionInfo::Ids ids = collectionInfo.GetElementIds();
-		for (const QByteArray& id : ids){
-			const imtlic::IFeatureInfo* featureInfoPtr = featureInfoProviderPtr->GetFeatureInfo(id);
-			if (featureInfoPtr != nullptr){
-				QTreeWidgetItem* itemPtr = new QTreeWidgetItem({
-							featureInfoPtr->GetFeatureName(),
-							featureInfoPtr->GetFeatureId(),
-							collectionInfo.GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString()});
-				FeatureList->addTopLevelItem(itemPtr);
-				itemPtr->setData(0, DR_ITEM_ID, featureInfoPtr->GetFeatureId());
+	imtbase::IMultiSelection::Ids featureIds = m_featureSelectionObserver.GetObservedObject()->GetSelectedIds();
+	
+	if (featureIds.count() == 1){
+		imtlic::IFeatureInfoProvider* packagePtr = GetObservedObject();
+		if (packagePtr != nullptr){
+			const imtlic::IFeatureInfo* featurePtr = packagePtr->GetFeatureInfo(featureIds.first());
+			if (featurePtr != nullptr){
+				m_selectedFeatureId = featurePtr->GetFeatureId();
 			}
 		}
 	}
+
+	if (m_isGuiModelInitialized && m_isCollectionRepresentationInitialized){
+		EnumerateMissingDependencies();
+		UpdateFeatureTree();
+		UpdateFeatureTreeCheckStates();
+	}
 }
 
+
+// reimplemente (imtlicgui::CFeatureDependencyEditorBase)
 
 void CFeaturePackageGuiComp::UpdateFeaturePackageModel()
 {
@@ -73,7 +69,7 @@ void CFeaturePackageGuiComp::FeatureTreeItemChanged()
 
 const ibase::IHierarchicalCommand* CFeaturePackageGuiComp::GetCommands() const
 {
-	return &m_rootCommands;
+	return nullptr;
 }
 
 
@@ -84,16 +80,12 @@ void CFeaturePackageGuiComp::OnGuiCreated()
 	BaseClass::OnGuiCreated();
 
 	FeatureTree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-	FeatureList->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-	FeatureList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-	FeatureList->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
 
 	m_treeWidgetPtr = FeatureTree;
 	if (m_packageCollectionObserver.IsModelAttached()){
 		OnFeaturePackageCollectionUpdate();
 	}
 
-	connect(FeatureList, &QTreeWidget::itemSelectionChanged, this, &CFeaturePackageGuiComp::OnFeatureListSelectionChanged);
 	connect(this, &CFeaturePackageGuiComp::EmitFeatureTreeItemChanged, this, &CFeaturePackageGuiComp::OnFeatureTreeItemChanged, Qt::QueuedConnection);
 }
 
@@ -101,7 +93,6 @@ void CFeaturePackageGuiComp::OnGuiCreated()
 void CFeaturePackageGuiComp::OnGuiDestroyed()
 {
 	disconnect(this, &CFeaturePackageGuiComp::EmitFeatureTreeItemChanged, this, &CFeaturePackageGuiComp::OnFeatureTreeItemChanged);
-	disconnect(FeatureList, &QTreeWidget::itemSelectionChanged, this, &CFeaturePackageGuiComp::OnFeatureListSelectionChanged);
 
 	BaseClass::OnGuiDestroyed();
 }
@@ -110,11 +101,6 @@ void CFeaturePackageGuiComp::OnGuiDestroyed()
 void CFeaturePackageGuiComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
-
-	m_showCollectionEditorCommand.SetVisuals(tr("Edit Features"), tr("Features"), tr("Show Feature List"), QIcon(":/Icons/FeatureList"));
-	m_showDependenciesEditorCommand.SetVisuals(tr("Edit Dependencies"), tr("Dependencies"), tr("Show Feature Dependencies"), QIcon(":/Icons/Dependencies"));
-
-	m_showCollectionEditorCommand.setChecked(true);
 }
 
 
@@ -149,25 +135,10 @@ void CFeaturePackageGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 
 	if (m_isGuiModelInitialized && m_isCollectionRepresentationInitialized){
 		EnumerateMissingDependencies();
-		UpdateFeatureList();
 		UpdateFeatureTree();
 		UpdateFeatureTreeCheckStates();
 		DoUpdateModel();
 	}
-
-	if (!m_selectedFeatureId.isEmpty()){
-		int count = FeatureList->topLevelItemCount();
-		for (int i = 0; i < count; i++){
-			QByteArray id = FeatureList->topLevelItem(i)->data(0, DR_ITEM_ID).toByteArray();
-			if (id == m_selectedFeatureId){
-				FeatureList->setCurrentItem(FeatureList->topLevelItem(i));
-				return;
-			}
-		}
-	}
-
-	m_selectedFeatureId.clear();
-	FeatureList->setCurrentItem(nullptr);
 }
 
 
@@ -180,7 +151,7 @@ void CFeaturePackageGuiComp::OnGuiModelAttached()
 		Q_ASSERT(modelPtr != nullptr);
 
 		if (modelPtr->AttachObserver(m_objectCollectionObserverCompPtr.GetPtr())){
-			m_objectCollectionViewCompPtr->CreateGui(FeatureCollectionView);
+			m_objectCollectionViewCompPtr->CreateGui(FeatureList);
 		}
 
 		imod::IModel* featurePackageCollectionModelPtr = const_cast<imod::IModel*>(
@@ -189,6 +160,12 @@ void CFeaturePackageGuiComp::OnGuiModelAttached()
 		if (featurePackageCollectionModelPtr != nullptr){
 			featurePackageCollectionModelPtr->AttachObserver(&m_packageCollectionObserver);
 		}
+
+		imod::IModel* featureSelectionModelPtr = dynamic_cast<imod::IModel*>(m_objectCollectionViewCompPtr.GetPtr());
+
+		if (featureSelectionModelPtr != nullptr){
+			featureSelectionModelPtr->AttachObserver(&m_featureSelectionObserver);
+		}
 	}
 }
 
@@ -196,6 +173,10 @@ void CFeaturePackageGuiComp::OnGuiModelAttached()
 void CFeaturePackageGuiComp::OnGuiModelDetached()
 {
 	if (m_objectCollectionViewCompPtr.IsValid() && m_objectCollectionObserverCompPtr.IsValid()){
+		if (m_featureSelectionObserver.IsModelAttached()){
+			m_featureSelectionObserver.EnsureModelDetached();
+		}
+
 		imod::IModel* featurePackageCollectionModelPtr = const_cast<imod::IModel*>(
 					dynamic_cast<const imod::IModel*>(GetObservedObject()->GetFeaturePackages()));
 
@@ -223,17 +204,14 @@ void CFeaturePackageGuiComp::OnGuiModelDetached()
 
 void CFeaturePackageGuiComp::UpdateModel() const
 {
-	QTreeWidgetItem* itemPtr = FeatureList->currentItem();
-	if (itemPtr != nullptr){
-		QByteArray featureId = itemPtr->data(0, DR_ITEM_ID).toByteArray();
-
+	if (!m_selectedFeatureId.isEmpty()){
 		imtlic::IFeatureInfoProvider* featureInfoProviderPtr = GetObservedObject();
 		if (featureInfoProviderPtr != nullptr){
 			imtlic::IFeatureDependenciesManager* dependenciesManagerPtr = dynamic_cast<imtlic::IFeatureDependenciesManager*>(
 						const_cast<imtlic::IFeatureDependenciesProvider*>(featureInfoProviderPtr->GetDependenciesInfoProvider()));
 
 			if (dependenciesManagerPtr != nullptr){
-				dependenciesManagerPtr->SetFeatureDependencies(featureId, m_dependencies[featureId]);
+				dependenciesManagerPtr->SetFeatureDependencies(m_selectedFeatureId, m_dependencies[m_selectedFeatureId]);
 			}
 		}
 	}
@@ -248,35 +226,6 @@ void CFeaturePackageGuiComp::on_FeatureTree_itemChanged(QTreeWidgetItem *item, i
 }
 
 
-void CFeaturePackageGuiComp::OnShowCollectionEditor()
-{
-	Pages->setCurrentIndex(0);
-}
-
-
-void CFeaturePackageGuiComp::OnShowFeatureDependencyEditor()
-{
-	Pages->setCurrentIndex(1);
-}
-
-
-void CFeaturePackageGuiComp::OnFeatureListSelectionChanged()
-{
-	m_selectedFeatureId = "NO_SELECTION";
-
-	QTreeWidgetItem* itemPtr = FeatureList->currentItem();
-	if (itemPtr != nullptr){
-		m_selectedFeatureId = itemPtr->data(0, DR_ITEM_ID).toByteArray();
-	}
-
-	if (m_isGuiModelInitialized && m_isCollectionRepresentationInitialized){
-		EnumerateMissingDependencies();
-		UpdateFeatureTree();
-		UpdateFeatureTreeCheckStates();
-	}
-}
-
-
 void CFeaturePackageGuiComp::OnFeatureTreeItemChanged()
 {
 	if (m_isGuiModelInitialized && m_isCollectionRepresentationInitialized){
@@ -288,7 +237,7 @@ void CFeaturePackageGuiComp::OnFeatureTreeItemChanged()
 }
 
 
-// public methods of the embedded class DocumentList
+// public methods of the embedded class FeaturePackageProxy
 
 CFeaturePackageGuiComp::FeaturePackageProxy::FeaturePackageProxy(CFeaturePackageGuiComp& parent)
 	:m_parent(parent)
@@ -384,6 +333,22 @@ quint32 CFeaturePackageGuiComp::FeaturePackageProxy::GetMinimalVersion(int versi
 	}
 
 	return iser::ISerializable::GetMinimalVersion(versionId);
+}
+
+
+// public methods of the embedded class FeatureSelectionObserver
+
+CFeaturePackageGuiComp::FeatureSelectionObserver::FeatureSelectionObserver(CFeaturePackageGuiComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CFeaturePackageGuiComp::FeatureSelectionObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+{
+	m_parent.OnFeatureSelectionChanged();
 }
 
 

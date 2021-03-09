@@ -7,7 +7,6 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtbase/TModelUpdateBinder.h>
 #include <imtlic/IFeatureInfoProvider.h>
 #include <imtlic/ILicenseInfo.h>
 #include <GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h>
@@ -40,11 +39,16 @@ Q_SIGNALS:
 	void EmitItemChanged();
 
 protected:
-	void OnFeaturePackageCollectionUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* collectionPtr);
+	typedef QMap<QByteArray, QByteArrayList> DependencyMap;
+
+	void OnFeaturePackageCollectionUpdate();
 	void EnumerateMissingFeatures();
 	void UpdateFeatureTree();
 	void UpdateFeatureTreeCheckStates();
 	QTreeWidgetItem* GetItem(const QByteArray& itemId);
+	DependencyMap BuildDependencyMap(const imtbase::IObjectCollection& packageCollection);
+	void ActivateDependencies(const QByteArrayList& featureIds);
+
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
@@ -75,6 +79,17 @@ protected:
 		IT_FEATURE
 	};
 
+	class FeaturePackageCollectionObserver: public imod::TSingleModelObserverBase<imtbase::IObjectCollection>
+	{
+	public:
+		FeaturePackageCollectionObserver(CLicenseInfoEditorGuiComp& parent);
+
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+	private:
+		CLicenseInfoEditorGuiComp& m_parent;
+	};
+
 	struct FeatureDescription
 	{
 		QByteArray id;
@@ -96,7 +111,7 @@ protected:
 	QMap<QByteArray, QString> m_packageNames;
 	QByteArrayList m_missingFeatures;
 
-	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CLicenseInfoEditorGuiComp> m_collectionObserver;
+	FeaturePackageCollectionObserver m_collectionObserver;
 };
 
 

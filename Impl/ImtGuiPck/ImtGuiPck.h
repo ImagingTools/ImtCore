@@ -38,7 +38,7 @@ typedef imtbase::TComponentFactoryComp<iqtgui::IGuiObject> GuiComponentFactory;
 typedef imtgui::CThumbnailDecoratorGuiComp ThumbnailDecoratorGui;
 typedef imtgui::CSingleStatusProviderGuiComp SingleStatusProviderGui;
 typedef imtgui::CMultiStatusProviderGuiComp MultiStatusProviderGui;
-typedef imtgui::CObjectCollectionViewComp ObjectCollectionView;
+typedef icomp::TModelCompWrap<imtgui::CObjectCollectionViewComp> ObjectCollectionView;
 typedef icomp::TModelCompWrap<imtgui::CDocumentWorkspaceGuiComp> DocumentWorkspaceGui;
 typedef imtgui::CObjectCollectionMetaInfoViewComp ObjectCollectionMetaInfoView;
 typedef imtgui::CDelegatedCommandsProviderComp DelegatedCommandsProvider;

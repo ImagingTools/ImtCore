@@ -7,6 +7,7 @@
 #include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
+#include <imtbase/IMultiSelection.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/CCollectionInfo.h>
 #include <imtlic/IFeatureDependenciesProvider.h>
@@ -50,7 +51,7 @@ Q_SIGNALS:
 	void EmitFeatureTreeItemChanged();
 
 protected:
-	void UpdateFeatureList();
+	void virtual OnFeatureSelectionChanged();
 
 	// reimplemente (imtlicgui::CFeatureDependencyEditorBase)
 	virtual void UpdateFeaturePackageModel() override;
@@ -72,9 +73,6 @@ protected:
 
 private Q_SLOTS:
 	void on_FeatureTree_itemChanged(QTreeWidgetItem *item, int column);
-	virtual void OnShowCollectionEditor();
-	virtual void OnShowFeatureDependencyEditor();
-	virtual void OnFeatureListSelectionChanged();
 	virtual void OnFeatureTreeItemChanged();
 
 protected:
@@ -106,15 +104,30 @@ protected:
 		return &component.m_featurePackageProxy;
 	}
 
+	class FeatureSelectionObserver: public imod::TSingleModelObserverBase<imtbase::IMultiSelection>
+	{
+	public:
+		FeatureSelectionObserver(CFeaturePackageGuiComp& parent);
+
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+
+	private:
+		CFeaturePackageGuiComp& m_parent;
+	};
+
+	template <class InterfaceType>
+	static InterfaceType* ExtractFeatureSelection(CFeaturePackageGuiComp& component)
+	{
+		return &component.m_featureSelectionObserver;
+	}
+
 protected:
 	I_REF(iqtgui::IGuiObject, m_objectCollectionViewCompPtr);
 	I_REF(imod::IObserver, m_objectCollectionObserverCompPtr);
 
-	iqtgui::CHierarchicalCommand m_rootCommands;
-	iqtgui::CHierarchicalCommand m_showCollectionEditorCommand;
-	iqtgui::CHierarchicalCommand m_showDependenciesEditorCommand;
-
 	FeaturePackageProxy m_featurePackageProxy;
+	FeatureSelectionObserver m_featureSelectionObserver;
 };
 
 

@@ -17,9 +17,11 @@
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <iqtgui/TRestorableGuiWrap.h>
 #include <iqtgui/CHierarchicalCommand.h>
+#include <iser/IArchive.h>
 #include <iwidgets/CFocusDecorator.h>
 
 // ImtCore includes
+#include <imtbase/IMultiSelection.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/TObjectCollectionEventHandlerCompWrap.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
@@ -36,7 +38,8 @@ class CObjectCollectionViewComp:
 									iqtgui::TDesignerGuiObserverCompBase<
 												Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>>,
 			public imod::CMultiModelDispatcherBase,
-			virtual public ibase::IProgressManager
+			virtual public ibase::IProgressManager,
+			virtual public imtbase::IMultiSelection
 {
 	Q_OBJECT
 public:
@@ -48,6 +51,7 @@ public:
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
 		I_REGISTER_INTERFACE(ibase::IProgressManager);
+		I_REGISTER_INTERFACE(imtbase::IMultiSelection);
 		I_REGISTER_INTERFACE(imtbase::IObjectCollectionEventHandler);
 		I_REGISTER_SUBELEMENT(Commands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
@@ -77,6 +81,11 @@ public:
 	// reimplemented (imtbase::IObjectCollectionEventHandler)
 	virtual void OnCollectionConnected(const imtbase::IObjectCollection* objectCollectionPtr) override;
 
+	// reimplemented (imtbase::IMultiSelection)
+	virtual const iprm::IOptionsList* GetSelectionConstraints() const override;
+	virtual Ids GetSelectedIds() const override;
+	virtual bool SetSelectedIds(const Ids& selectedIds) override;
+
 	// reimplemented (ibase::IProgressManager)
 	virtual int BeginProgressSession(
 				const QByteArray& progressId,
@@ -85,6 +94,9 @@ public:
 	virtual void EndProgressSession(int sessionId) override;
 	virtual void OnProgress(int sessionId, double currentProgress) override;
 	virtual bool IsCanceled(int sessionId) const override;
+
+	// reimplemented (iser::ISerialize)
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 protected:
 	ICollectionViewDelegate& GetViewDelegateRef(const QByteArray& typeId);

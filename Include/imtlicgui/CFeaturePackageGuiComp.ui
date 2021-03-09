@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>803</width>
-    <height>495</height>
+    <width>949</width>
+    <height>620</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Feature Package</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -30,12 +30,18 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QStackedWidget" name="Pages">
-     <property name="currentIndex">
-      <number>0</number>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QWidget" name="FeatureListPage">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+     <widget class="QWidget" name="FeatureList" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -51,75 +57,11 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item>
-        <widget class="QWidget" name="FeatureCollectionView" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-         </layout>
-        </widget>
-       </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="DependencyPage">
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QTreeWidget" name="FeatureList">
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <property name="indentation">
-          <number>0</number>
-         </property>
-         <column>
-          <property name="text">
-           <string>Feature Name</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Feature-ID</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Feature Description</string>
-          </property>
-         </column>
-        </widget>
-       </item>
-       <item>
-        <widget class="QTreeWidget" name="FeatureTree">
-         <property name="styleSheet">
-          <string notr="true">QTreeView::item
+     <widget class="QTreeWidget" name="FeatureTree">
+      <property name="styleSheet">
+       <string notr="true">QTreeView::item
 {
     color: #335777;
     height: 25px;
@@ -136,15 +78,15 @@ QTreeView::branch::selected
     background: #e3eefa;
 }
 </string>
-         </property>
-         <column>
-          <property name="text">
-           <string>Feature Name</string>
-          </property>
-         </column>
-        </widget>
-       </item>
-      </layout>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <column>
+       <property name="text">
+        <string>Feature Name</string>
+       </property>
+      </column>
      </widget>
     </widget>
    </item>

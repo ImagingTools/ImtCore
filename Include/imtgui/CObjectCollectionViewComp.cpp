@@ -54,6 +54,26 @@ void CObjectCollectionViewComp::OnCollectionConnected(const imtbase::IObjectColl
 }
 
 
+// reimplemented (imtbase::IMultiSelection)
+
+const iprm::IOptionsList* CObjectCollectionViewComp::GetSelectionConstraints() const
+{
+	return nullptr;
+}
+
+
+imtbase::IMultiSelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
+{
+	return m_itemsSelection[m_currentTypeId].toVector();
+}
+
+
+bool CObjectCollectionViewComp::SetSelectedIds(const Ids& selectedIds)
+{
+	return false;
+}
+
+
 // reimplemented (ibase::IProgressManager)
 
 int CObjectCollectionViewComp::BeginProgressSession(
@@ -95,6 +115,15 @@ bool CObjectCollectionViewComp::IsCanceled(int /*sessionId*/) const
 {
 	return false;
 }
+
+
+// reimplemented (iser::ISerialize)
+
+bool CObjectCollectionViewComp::Serialize(iser::IArchive& archive)
+{
+	return false;
+}
+
 
 // protected methods
 
@@ -927,6 +956,8 @@ void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selec
 	if (m_semaphoreCounter > 0){
 		return;
 	}
+
+	istd::CChangeNotifier notifier(this);
 
 	SaveItemsSelection();
 	UpdateCommands();

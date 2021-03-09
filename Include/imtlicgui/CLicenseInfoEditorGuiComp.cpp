@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtlic/IFeatureInfo.h>
-
+#include <imtlic/IFeatureDependenciesProvider.h>
 
 namespace imtlicgui
 {
@@ -24,10 +24,9 @@ CLicenseInfoEditorGuiComp::CLicenseInfoEditorGuiComp()
 
 // protected methods
 
-void CLicenseInfoEditorGuiComp::OnFeaturePackageCollectionUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtbase::IObjectCollection* collectionPtr)
+void CLicenseInfoEditorGuiComp::OnFeaturePackageCollectionUpdate()
 {
-	Q_ASSERT(collectionPtr != nullptr);
-
+	imtbase::IObjectCollection* collectionPtr = m_collectionObserver.GetObservedObject();
 	imtbase::ICollectionInfo::Ids packageIds = collectionPtr->GetElementIds();
 
 	Features->clear();
@@ -211,6 +210,40 @@ QTreeWidgetItem* CLicenseInfoEditorGuiComp::GetItem(const QByteArray& itemId)
 }
 
 
+CLicenseInfoEditorGuiComp::DependencyMap CLicenseInfoEditorGuiComp::BuildDependencyMap(const imtbase::IObjectCollection& packageCollection)
+{
+	DependencyMap dependencyMap;
+
+	imtbase::ICollectionInfo::Ids packageIds = packageCollection.GetElementIds();
+	for (const QByteArray& packageId : packageIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		packageCollection.GetObjectData(packageId, dataPtr);
+
+		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
+		if (packagePtr != nullptr){
+			const imtlic::IFeatureDependenciesProvider* dependenciesProvider = packagePtr->GetDependenciesInfoProvider();
+			if (dependenciesProvider != nullptr){
+				imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetFeatureList().GetElementIds();
+				for (const QByteArray& featureId : featureIds){
+					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureId);
+					if (featureInfoPtr != nullptr){
+						dependencyMap[featureInfoPtr->GetFeatureId()] = dependenciesProvider->GetFeatureDependencies(featureInfoPtr->GetFeatureId());
+					}
+				}
+			}
+		}
+	}
+
+	return dependencyMap;
+}
+
+
+void CLicenseInfoEditorGuiComp::ActivateDependencies(const QByteArrayList& featureIds)
+{
+
+}
+
+
 // reimplemented (iqtgui::TGuiObserverWrap)
 
 void CLicenseInfoEditorGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
@@ -228,6 +261,7 @@ void CLicenseInfoEditorGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 		EnumerateMissingFeatures();
 		UpdateFeatureTree();
 		UpdateFeatureTreeCheckStates();
+		DoUpdateModel();
 	}
 }
 
@@ -240,11 +274,14 @@ void CLicenseInfoEditorGuiComp::OnGuiModelAttached()
 	Q_ASSERT(licenseInfoPtr != nullptr);
 
 	m_featureIds = licenseInfoPtr->GetFeatures();
-	
-	bool retVal = m_collectionObserver.RegisterObject(licenseInfoPtr->GetFeaturePackages(), &CLicenseInfoEditorGuiComp::OnFeaturePackageCollectionUpdate);
-	Q_ASSERT(retVal);
 
-	OnFeaturePackageCollectionUpdate(istd::IChangeable::GetAnyChange(), licenseInfoPtr->GetFeaturePackages());
+	imod::IModel* modelPtr = const_cast<imod::IModel*>(
+				dynamic_cast<const imod::IModel*>(
+							dynamic_cast<const imtbase::IObjectCollection*>(licenseInfoPtr->GetFeaturePackages())));
+
+	if (modelPtr != nullptr){
+		modelPtr->AttachObserver(&m_collectionObserver);
+	}
 }
 
 
@@ -253,7 +290,15 @@ void CLicenseInfoEditorGuiComp::OnGuiModelDetached()
 	imtlic::ILicenseInfo* licenseInfoPtr = GetObservedObject();
 	Q_ASSERT(licenseInfoPtr != nullptr);
 
-	m_collectionObserver.UnregisterAllObjects();
+	imod::IModel* modelPtr = const_cast<imod::IModel*>(
+				dynamic_cast<const imod::IModel*>(
+					dynamic_cast<const imtbase::IObjectCollection*>(licenseInfoPtr->GetFeaturePackages())));
+
+	if (modelPtr != nullptr){
+		if (modelPtr->IsAttached(&m_collectionObserver)){
+			modelPtr->DetachObserver(&m_collectionObserver);
+		}
+	}
 
 	m_isGuiModelInitialized = false;
 	m_isCollectionRepresentationInitialized = false;
@@ -305,8 +350,18 @@ void CLicenseInfoEditorGuiComp::on_IdEdit_editingFinished()
 }
 
 
-void CLicenseInfoEditorGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, int /*column*/)
+void CLicenseInfoEditorGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, int column)
 {
+	imtlic::ILicenseInfo* licenseInfoPtr = GetObservedObject();
+	Q_ASSERT(licenseInfoPtr != nullptr);
+	
+	DependencyMap dependencyMap;
+
+	const imtbase::IObjectCollection* packageCollectionPtr = licenseInfoPtr->GetFeaturePackages();
+	if (packageCollectionPtr != nullptr){
+		dependencyMap = BuildDependencyMap(*packageCollectionPtr);
+	}
+
 	if (item->data(0, DR_ITEM_TYPE) == IT_PACKAGE){
 		Qt::CheckState state = item->checkState(0);
 
@@ -353,6 +408,22 @@ void CLicenseInfoEditorGuiComp::OnItemChanged()
 		UpdateFeatureTreeCheckStates();
 		DoUpdateModel();
 	}
+}
+
+
+// public methods of the embedded class FeaturePackageCollectionObserver
+
+CLicenseInfoEditorGuiComp::FeaturePackageCollectionObserver::FeaturePackageCollectionObserver(CLicenseInfoEditorGuiComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CLicenseInfoEditorGuiComp::FeaturePackageCollectionObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+{
+	m_parent.OnFeaturePackageCollectionUpdate();
 }
 
 
