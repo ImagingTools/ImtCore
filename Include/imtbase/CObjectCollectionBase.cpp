@@ -343,11 +343,6 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.Process(elementInfo.name);
 		retVal = retVal && archive.EndTag(objectNameTag);
 
-		static iser::CArchiveTag objectDescriptionTag("Description", "Object description", iser::CArchiveTag::TT_LEAF, &objectTag);
-		retVal = retVal && archive.BeginTag(objectDescriptionTag);
-		retVal = retVal && archive.Process(elementInfo.description);
-		retVal = retVal && archive.EndTag(objectDescriptionTag);
-
 		static iser::CArchiveTag objectDataTag("Data", "Object data", iser::CArchiveTag::TT_GROUP, &objectTag);
 		retVal = retVal && archive.BeginTag(objectDataTag);
 
