@@ -132,7 +132,7 @@ void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 		}
 	}
 
-	LicenseInstancesEdit->setItemDelegateForColumn(1, &m_dateDelegate);
+	LicenseInstancesEdit->setItemDelegate(&m_dateDelegate);
 }
 
 
@@ -255,10 +255,6 @@ void CProductInstanceInfoEditorComp::on_ExpireGroup_toggled(bool /*toggled*/)
 
 void CProductInstanceInfoEditorComp::on_LicenseInstancesEdit_itemChanged(QTreeWidgetItem *item, int column)
 {
-	if (column == 1){
-		item->setText(1, item->data(1, Qt::UserRole).toDate().toString(Qt::DateFormat::SystemLocaleDate));
-	}
-
 	DoUpdateModel();
 }
 
@@ -300,6 +296,7 @@ void CProductInstanceInfoEditorComp::DateTimeDelegate::setModelData(QWidget* edi
 	if (dateEditPtr != nullptr){
 		if (index.column() == 1){
 			model->setData(index, dateEditPtr->dateTime(), Qt::UserRole);
+			model->setData(index, dateEditPtr->dateTime().date().toString(Qt::DateFormat::SystemLocaleDate), Qt::DisplayRole);
 		}
 	}
 }
@@ -307,8 +304,6 @@ void CProductInstanceInfoEditorComp::DateTimeDelegate::setModelData(QWidget* edi
 QSize CProductInstanceInfoEditorComp::DateTimeDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
 	QSize retVal = BaseClass::sizeHint(option, index);
-
-	retVal.setHeight(25);
 
 	return retVal;
 }
