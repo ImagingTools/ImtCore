@@ -30,6 +30,7 @@ public:
 				const QByteArray& customerId) override;
 	virtual void AddLicense(const QByteArray& licenseId, const QDateTime& expirationDate = QDateTime()) override;
 	virtual void RemoveLicense(const QByteArray& licenseId) override;
+	virtual void ClearLicenses() override;
 	virtual QByteArray GetProductId() const override;
 	virtual QByteArray GetProductInstanceId() const override;
 	virtual QByteArray GetCustomerId() const override;

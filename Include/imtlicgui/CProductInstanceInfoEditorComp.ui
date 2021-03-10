@@ -86,42 +86,30 @@
       </size>
      </property>
      <property name="title">
-      <string>License</string>
+      <string>Licenses</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="QComboBox" name="LicenseCombo"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="ExpireGroup">
-     <property name="maximumSize">
-      <size>
-       <width>400</width>
-       <height>16777200</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Valid Until</string>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_5">
-      <item>
-       <widget class="QDateTimeEdit" name="ValidUntilDate">
-        <property name="date">
-         <date>
-          <year>2022</year>
-          <month>1</month>
-          <day>1</day>
-         </date>
-        </property>
-        <property name="currentSectionIndex">
+       <widget class="QTreeWidget" name="LicenseInstancesEdit">
+        <property name="indentation">
          <number>0</number>
         </property>
+        <attribute name="headerMinimumSectionSize">
+         <number>50</number>
+        </attribute>
+        <attribute name="headerDefaultSectionSize">
+         <number>150</number>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>License Instance</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Expiration</string>
+         </property>
+        </column>
        </widget>
       </item>
      </layout>
@@ -145,22 +133,5 @@
  <resources>
   <include location="../imtgui/imtgui.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>ExpireGroup</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>ValidUntilDate</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>53</x>
-     <y>301</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>155</x>
-     <y>351</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

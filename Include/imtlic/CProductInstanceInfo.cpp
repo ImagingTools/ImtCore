@@ -94,6 +94,14 @@ void CProductInstanceInfo::RemoveLicense(const QByteArray & licenseId)
 }
 
 
+void CProductInstanceInfo::ClearLicenses()
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_licenses.clear();
+}
+
+
 QByteArray CProductInstanceInfo::GetProductId() const
 {
 	return m_productId;

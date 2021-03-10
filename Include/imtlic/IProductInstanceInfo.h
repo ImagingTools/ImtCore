@@ -65,6 +65,11 @@ public:
 	virtual void RemoveLicense(const QByteArray& licenseId) = 0;
 
 	/**
+		Remove all existing licenses from this product instance.
+	*/
+	virtual void ClearLicenses() = 0;
+
+	/**
 		Get the unique-ID of this product instance.
 	*/
 	virtual QByteArray GetProductInstanceId() const = 0;

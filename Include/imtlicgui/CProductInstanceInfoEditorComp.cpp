@@ -1,12 +1,19 @@
 #include <imtlicgui/CProductInstanceInfoEditorComp.h>
 
 
+// Qt includes
+#include <QtCore/QModelIndex>
+#include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QTreeWidgetItem>
+#include <QtWidgets/qdatetimeedit.h>
+
 // ACF includes
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtlic/ILicenseInfo.h>
+#include <imtlic/ILicenseInstance.h>
 
 
 namespace imtlicgui
@@ -29,7 +36,7 @@ void CProductInstanceInfoEditorComp::OnProductsUpdated(
 			const imtbase::IObjectCollection* /*productCollectionPtr*/)
 {
 	UpdateProductsCombo();
-	UpdateLicensesCombo();
+	UpdateLicenseInstancesEdit();
 }
 
 
@@ -37,7 +44,7 @@ void CProductInstanceInfoEditorComp::OnLicensesUpdated(
 			const istd::IChangeable::ChangeSet& /*changeSet*/,
 			const imtbase::IObjectCollection* /*productCollectionPtr*/)
 {
-	UpdateLicensesCombo();
+	UpdateLicenseInstancesEdit();
 }
 
 
@@ -74,11 +81,9 @@ void CProductInstanceInfoEditorComp::UpdateProductsCombo()
 }
 
 
-void CProductInstanceInfoEditorComp::UpdateLicensesCombo()
+void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 {
-	LicenseCombo->clear();
-
-	bool licenseSelected = false;
+	LicenseInstancesEdit->clear();
 
 	imtlic::IProductInstanceInfo* productInstanceInfoPtr = GetObservedObject();
 	Q_ASSERT(productInstanceInfoPtr != nullptr);
@@ -94,29 +99,36 @@ void CProductInstanceInfoEditorComp::UpdateLicensesCombo()
 				for ( const QByteArray& collectionId : licenseCollectionIds){
 					const imtlic::ILicenseInfo* licenseInfoPtr = licensingInfoPtr->GetLicenseInfo(collectionId);
 					if (licenseInfoPtr != nullptr){
+						const imtbase::ICollectionInfo& currentLicenses = productInstanceInfoPtr->GetLicenseInstances();
+						imtbase::ICollectionInfo::Ids currentLicenseIds = currentLicenses.GetElementIds();
+
 						QString licenseName = licenseInfoPtr->GetLicenseName();
 						QByteArray licenseId = licenseInfoPtr->GetLicenseId();
 
 						licenseName += " (" + licenseId + ")";
+						QString licenseNameText = QString(licenseName);
 
-						LicenseCombo->addItem(licenseName, licenseId);
-
-						const imtbase::ICollectionInfo& currentLicenses = productInstanceInfoPtr->GetLicenseInstances();
-						imtbase::ICollectionInfo::Ids currentLicenseIds = currentLicenses.GetElementIds();
+						QTreeWidgetItem* itemPtr = new QTreeWidgetItem({licenseNameText, ""});
+						itemPtr->setData(0, Qt::UserRole, licenseId);
 
 						if (currentLicenseIds.contains(licenseId)){
-							LicenseCombo->setCurrentText(licenseName);
+							itemPtr->setCheckState(0, Qt::Checked);
 
-							licenseSelected = true;
+							const imtlic::ILicenseInstance* licenseInstancePtr =  productInstanceInfoPtr->GetLicenseInstance(licenseId);
+							Q_ASSERT(licenseInstancePtr != nullptr);
+
+							itemPtr->setData(1, Qt::UserRole, licenseInstancePtr->GetExpiration());
 						}
+						else{
+							itemPtr->setCheckState(0, Qt::Unchecked);
+							itemPtr->setData(1, Qt::UserRole, QDateTime(QDate(2000, 1, 1), QTime(0, 0)));
+						}
+
+						LicenseInstancesEdit->addTopLevelItem(itemPtr);
 					}
 				}
 			}
 		}
-	}
-
-	if (!licenseSelected){
-		LicenseCombo->setCurrentIndex(-1);
 	}
 }
 
@@ -129,7 +141,7 @@ void CProductInstanceInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSe
 	Q_ASSERT(productInstanceInfoPtr != nullptr);
 
 	UpdateProductsCombo();
-	UpdateLicensesCombo();
+	UpdateLicenseInstancesEdit();
 
 	ProductInstanceIdEdit->setText(productInstanceInfoPtr->GetProductInstanceId());
 }
@@ -164,18 +176,21 @@ void CProductInstanceInfoEditorComp::UpdateModel() const
 	QByteArray currentProductId = ProductCombo->currentData().toByteArray();
 	QByteArray customerId = CustomerCombo->currentData().toByteArray();
 	QByteArray instanceId = ProductInstanceIdEdit->text().toUtf8();
-	QByteArray licenseId = LicenseCombo->currentData().toByteArray();
 
 	productInstanceInfoPtr->ResetData();
 	productInstanceInfoPtr->SetupProductInstance(currentProductId, instanceId, customerId);
 
-	if (!licenseId.isEmpty()){
-		QDateTime validUntil;
-		if (ExpireGroup->isChecked()){
-			validUntil = ValidUntilDate->dateTime();
-		}
+	productInstanceInfoPtr->ClearLicenses();
 
-		productInstanceInfoPtr->AddLicense(licenseId, validUntil);
+	int count = LicenseInstancesEdit->topLevelItemCount();
+	for (int i = 0; i < count; i++){
+		QTreeWidgetItem* itemPtr = LicenseInstancesEdit->topLevelItem(i);
+
+		if (itemPtr->checkState(0) == Qt::Checked){
+			QByteArray licenseId = itemPtr->data(0, Qt::UserRole).toByteArray();
+			QDateTime expiration = itemPtr->data(1, Qt::UserRole).toDateTime();
+			productInstanceInfoPtr->AddLicense(licenseId, expiration);
+		}
 	}
 }
 
@@ -185,6 +200,8 @@ void CProductInstanceInfoEditorComp::UpdateModel() const
 void CProductInstanceInfoEditorComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
+
+	LicenseInstancesEdit->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 
@@ -209,7 +226,7 @@ void CProductInstanceInfoEditorComp::on_ProductCombo_currentIndexChanged(int /*i
 	if (!IsUpdateBlocked()){
 		UpdateBlocker updateBlocker(this);
 
-		UpdateLicensesCombo();
+		UpdateLicenseInstancesEdit();
 	}
 }
 
@@ -227,6 +244,12 @@ void CProductInstanceInfoEditorComp::on_ValidUntilDate_dateTimeChanged(const QDa
 
 
 void CProductInstanceInfoEditorComp::on_ExpireGroup_toggled(bool /*toggled*/)
+{
+	DoUpdateModel();
+}
+
+
+void CProductInstanceInfoEditorComp::on_LicenseInstancesEdit_itemChanged(QTreeWidgetItem *item, int column)
 {
 	DoUpdateModel();
 }

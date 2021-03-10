@@ -38,7 +38,7 @@ protected:
 	void OnProductsUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* productCollectionPtr);
 	void OnLicensesUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* productCollectionPtr);
 	void UpdateProductsCombo();
-	void UpdateLicensesCombo();
+	void UpdateLicenseInstancesEdit();
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
@@ -56,6 +56,7 @@ private Q_SLOTS:
 	void on_LicenseCombo_currentIndexChanged(int index);
 	void on_ValidUntilDate_dateTimeChanged(const QDateTime& dateTime);
 	void on_ExpireGroup_toggled(bool toggled);
+	void on_LicenseInstancesEdit_itemChanged(QTreeWidgetItem *item, int column);
 
 private:
 	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CProductInstanceInfoEditorComp> m_productCollectionObserver;
