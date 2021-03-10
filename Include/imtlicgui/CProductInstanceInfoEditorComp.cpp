@@ -3,9 +3,8 @@
 
 // Qt includes
 #include <QtCore/QModelIndex>
-#include <QtWidgets/QStyledItemDelegate>
 #include <QtWidgets/QTreeWidgetItem>
-#include <QtWidgets/qdatetimeedit.h>
+#include <QtWidgets/QDateTimeEdit>
 
 // ACF includes
 #include <istd/CChangeGroup.h>
@@ -118,10 +117,12 @@ void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 							Q_ASSERT(licenseInstancePtr != nullptr);
 
 							itemPtr->setData(1, Qt::UserRole, licenseInstancePtr->GetExpiration());
+							itemPtr->setText(1, licenseInstancePtr->GetExpiration().date().toString(Qt::DateFormat::SystemLocaleDate));
 						}
 						else{
 							itemPtr->setCheckState(0, Qt::Unchecked);
 							itemPtr->setData(1, Qt::UserRole, QDateTime(QDate(2000, 1, 1), QTime(0, 0)));
+							itemPtr->setText(1, QDate(2000, 1, 1).toString(Qt::DateFormat::SystemLocaleDate));
 						}
 
 						LicenseInstancesEdit->addTopLevelItem(itemPtr);
@@ -130,6 +131,8 @@ void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 			}
 		}
 	}
+
+	LicenseInstancesEdit->setItemDelegateForColumn(1, &m_dateDelegate);
 }
 
 
@@ -185,6 +188,7 @@ void CProductInstanceInfoEditorComp::UpdateModel() const
 	int count = LicenseInstancesEdit->topLevelItemCount();
 	for (int i = 0; i < count; i++){
 		QTreeWidgetItem* itemPtr = LicenseInstancesEdit->topLevelItem(i);
+		itemPtr->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
 
 		if (itemPtr->checkState(0) == Qt::Checked){
 			QByteArray licenseId = itemPtr->data(0, Qt::UserRole).toByteArray();
@@ -251,7 +255,62 @@ void CProductInstanceInfoEditorComp::on_ExpireGroup_toggled(bool /*toggled*/)
 
 void CProductInstanceInfoEditorComp::on_LicenseInstancesEdit_itemChanged(QTreeWidgetItem *item, int column)
 {
+	if (column == 1){
+		item->setText(1, item->data(1, Qt::UserRole).toDate().toString(Qt::DateFormat::SystemLocaleDate));
+	}
+
 	DoUpdateModel();
+}
+
+
+// public methods of the embedded class DateTimeDelegate
+
+CProductInstanceInfoEditorComp::DateTimeDelegate::DateTimeDelegate(QObject *parent)
+	:BaseClass(parent)
+{
+}
+
+
+// reimplemented (QItemDelegate)
+
+QWidget* CProductInstanceInfoEditorComp::DateTimeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+	if (index.column() == 1){
+		return new QDateEdit(parent);
+	}
+
+	return nullptr;
+}
+
+
+void CProductInstanceInfoEditorComp::DateTimeDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
+{
+	QDateEdit* dateEditPtr = dynamic_cast<QDateEdit*>(editor);
+	if (dateEditPtr != nullptr){
+		if (index.column() == 1){
+			dateEditPtr->setDateTime(index.data(Qt::UserRole).toDateTime());
+		}
+	}
+}
+
+
+void CProductInstanceInfoEditorComp::DateTimeDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
+{
+	QDateEdit* dateEditPtr = dynamic_cast<QDateEdit*>(editor);
+	if (dateEditPtr != nullptr){
+		if (index.column() == 1){
+			model->setData(index, dateEditPtr->dateTime(), Qt::UserRole);
+		}
+	}
+}
+
+QSize CProductInstanceInfoEditorComp::DateTimeDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+	QSize retVal = BaseClass::sizeHint(option, index);
+
+	retVal.setHeight(25);
+
+	return retVal;
 }
 
 

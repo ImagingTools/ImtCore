@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtWidgets/QStyledItemDelegate>
+
 // ACF includes
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
@@ -13,6 +16,9 @@
 
 namespace imtlicgui
 {
+
+
+class DateTimeDelegate;
 
 
 /**
@@ -59,6 +65,23 @@ private Q_SLOTS:
 	void on_LicenseInstancesEdit_itemChanged(QTreeWidgetItem *item, int column);
 
 private:
+	class DateTimeDelegate: public QStyledItemDelegate
+	{
+	public:
+		typedef QStyledItemDelegate BaseClass;
+
+		DateTimeDelegate(QObject *parent = nullptr);
+
+		// reimplemented (QItemDelegate)
+		virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+		virtual void setEditorData(QWidget* editor, const QModelIndex& index) const override;
+		virtual void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override;
+		virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+	};
+
+private:
+	DateTimeDelegate m_dateDelegate;
+
 	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CProductInstanceInfoEditorComp> m_productCollectionObserver;
 	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CProductInstanceInfoEditorComp> m_licenseCollectionObserver;
 };
