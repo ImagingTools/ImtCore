@@ -18,6 +18,7 @@
 #include <imtlic/CProductLicensingInfoComp.h>
 #include <imtlic/CFeaturePackageMetaInfoCreatorComp.h>
 #include <imtlic/CProductLicensingInfoMetaInfoCreatorComp.h>
+#include <imtlic/CProductInstanceMetaInfoCreatorComp.h>
 
 
 /**
@@ -55,6 +56,7 @@ typedef icomp::TModelCompWrap<
 						iser::ISerializable>> ProductInstanceCollection;
 typedef imtlic::CFeaturePackageMetaInfoCreatorComp FeaturePackageMetaInfoCreator;
 typedef imtlic::CProductLicensingInfoMetaInfoCreatorComp ProductLicensingInfoMetaInfoCreator;
+typedef imtlic::CProductInstanceMetaInfoCreatorComp ProductInstanceMetaInfoCreator;
 
 
 } // namespace ImtLicensePck

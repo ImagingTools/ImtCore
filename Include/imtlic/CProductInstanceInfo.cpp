@@ -8,7 +8,7 @@
 #include <iser/CArchiveTag.h>
 
 // ImtCore includes
-#include <imtlic/ILicenseInfo.h>
+#include <imtlic/ILicenseInstance.h>
 #include <imtlic/IProductLicensingInfo.h>
 
 
@@ -114,18 +114,18 @@ QByteArray CProductInstanceInfo::GetCustomerId() const
 
 // reimplemented (imtlic::ILicenseInfoProvider)
 
-const imtbase::ICollectionInfo& CProductInstanceInfo::GetLicenseList() const
+const imtbase::ICollectionInfo& CProductInstanceInfo::GetLicenseInstances() const
 {
 	return m_licenseContainerInfo;
 }
 
 
-const imtlic::ILicenseInfo* CProductInstanceInfo::GetLicenseInfo(const QByteArray& licenseId) const
+const imtlic::ILicenseInstance* CProductInstanceInfo::GetLicenseInstance(const QByteArray& licenseId) const
 {
 	if (m_licenses.contains(licenseId)){
-		const imtlic::ILicenseInfo& licenseInfo = m_licenses[licenseId];
+		const imtlic::ILicenseInstance& licenseInstance = m_licenses[licenseId];
 
-		return &licenseInfo;
+		return &licenseInstance;
 	}
 
 	return nullptr;

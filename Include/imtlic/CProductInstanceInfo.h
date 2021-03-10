@@ -35,8 +35,8 @@ public:
 	virtual QByteArray GetCustomerId() const override;
 
 	// reimplemented (imtlic::ILicenseInfoProvider)
-	virtual const imtbase::ICollectionInfo& GetLicenseList() const override;
-	virtual const imtlic::ILicenseInfo* GetLicenseInfo(const QByteArray& licenseId) const override;
+	virtual const imtbase::ICollectionInfo& GetLicenseInstances() const override;
+	virtual const imtlic::ILicenseInstance* GetLicenseInstance(const QByteArray& licenseId) const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;

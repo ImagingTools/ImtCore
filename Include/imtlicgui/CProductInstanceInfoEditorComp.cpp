@@ -101,7 +101,7 @@ void CProductInstanceInfoEditorComp::UpdateLicensesCombo()
 
 						LicenseCombo->addItem(licenseName, licenseId);
 
-						const imtbase::ICollectionInfo& currentLicenses = productInstanceInfoPtr->GetLicenseList();
+						const imtbase::ICollectionInfo& currentLicenses = productInstanceInfoPtr->GetLicenseInstances();
 						imtbase::ICollectionInfo::Ids currentLicenseIds = currentLicenses.GetElementIds();
 
 						if (currentLicenseIds.contains(licenseId)){

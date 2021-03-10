@@ -8,7 +8,7 @@
 #include <iser/IObject.h>
 
 // ImtCore includes
-#include <imtlic/ILicenseInfoProvider.h>
+#include <imtlic/ILicenseInstanceProvider.h>
 
 
 namespace imtbase
@@ -30,7 +30,7 @@ class IProductInfo;
 	There is no license validation logic yet at this level. It is only an overview of the registered licenses in the specified product installation.
 	\ingroup LicenseManagement
 */
-class IProductInstanceInfo: virtual public imtlic::ILicenseInfoProvider, virtual public iser::IObject
+class IProductInstanceInfo: virtual public imtlic::ILicenseInstanceProvider, virtual public iser::IObject
 {
 public:
 	/**

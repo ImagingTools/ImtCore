@@ -26,7 +26,7 @@ public:
 
 	I_BEGIN_COMPONENT(CProductInstanceInfoComp)
 		I_REGISTER_INTERFACE(imtlic::IProductInstanceInfo);
-		I_REGISTER_INTERFACE(imtlic::ILicenseInfoProvider);
+		I_REGISTER_INTERFACE(imtlic::ILicenseInstanceProvider);
 		I_REGISTER_INTERFACE(iser::IObject);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(istd::IChangeable);

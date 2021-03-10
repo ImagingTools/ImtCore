@@ -69,6 +69,11 @@ I_EXPORT_COMPONENT(
 			"Product licensing info metainfo creator",
 			"License Product Metainfo Creator");
 
+I_EXPORT_COMPONENT(
+			ProductInstanceMetaInfoCreator,
+			"Product instance metainfo creator",
+			"License Product Instance Metainfo Creator");
+
 
 } // namespace ImtLicensePck
 

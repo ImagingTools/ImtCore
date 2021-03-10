@@ -25,6 +25,14 @@ class IProductInstanceInfo;
 class IProductInstanceInfoProvider: virtual public istd::IChangeable
 {
 public:
+	enum MetaInfoTypes
+	{
+		/**
+			List of license instance infos given as QStringList.
+		*/
+		MIT_LICENSE_INSTANCE_INFO_LIST = idoc::IDocumentMetaInfo::MIT_USER + 1,
+	};
+
 	/**
 		Get list of all available product instances.
 	*/
