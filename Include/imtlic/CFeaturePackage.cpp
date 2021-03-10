@@ -19,7 +19,7 @@ namespace imtlic
 // public methods
 
 CFeaturePackage::CFeaturePackage()
-	:BaseClass("FeatureInfo", "Feature info", "FeatureInfoProvider"),
+	:BaseClass("FeatureInfo", "Feature info", "Features"),
 	m_featurePackageCollectionPtr(nullptr)
 {
 }
