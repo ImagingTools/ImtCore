@@ -53,10 +53,10 @@ bool CProductInstanceMetaInfoCreatorComp::CreateMetaInfo(
 	imtbase::ICollectionInfo::Ids ids = productInstancePtr->GetLicenseInstances().GetElementIds();
 	for (imtbase::ICollectionInfo::Id id : ids){
 		const imtlic::ILicenseInstance* licenseInstancePtr = productInstancePtr->GetLicenseInstance(id);
-		//QDateTime expDate = licenseInstancePtr->GetExpiration();
-		//QString expDateStr = expDate.toString("dd.MM.yyyy");
+		QDateTime expirationDate = licenseInstancePtr->GetExpiration();
+		QString expirationDateText = expirationDate.toString("dd.MM.yyyy");
 		QString licenseName = licenseInstancePtr->GetLicenseName();
-		retVal +=  licenseName + /*QObject::tr("(Exp: %1)").arg(expDateStr) + */ "\n";
+		retVal +=  licenseName + QObject::tr(" (Valid until: %1)").arg(expirationDateText) + "\n";
 	}
 
 	retVal.chop(1);

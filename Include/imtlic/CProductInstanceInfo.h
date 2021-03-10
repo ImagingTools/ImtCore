@@ -48,7 +48,8 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	typedef QMap<QByteArray /*ID of the license definition in the product*/, CLicenseInstance> LicenseInstances;
+	typedef istd::TSmartPtr<CLicenseInstance> LicenseInstancePtr;
+	typedef QMap<QByteArray /*ID of the license definition in the product*/, LicenseInstancePtr> LicenseInstances;
 
 	QByteArray m_productId;
 	QByteArray m_customerId;

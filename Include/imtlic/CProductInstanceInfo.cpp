@@ -68,11 +68,11 @@ void CProductInstanceInfo::AddLicense(const QByteArray& licenseId, const QDateTi
 				for ( const QByteArray& collectionId : licenseCollectionIds){
 					const imtlic::ILicenseInfo* licenseInfoPtr = productLicensingInfoPtr->GetLicenseInfo(collectionId);
 					if (licenseInfoPtr != nullptr && (licenseId == licenseInfoPtr->GetLicenseId())){
-						CLicenseInstance licenseInstance;
-						if (licenseInstance.CopyFrom(*licenseInfoPtr)){
-							licenseInstance.SetExpiration(expirationDate);
+						LicenseInstancePtr licenseInstancePtr(new CLicenseInstance);
+						if (licenseInstancePtr->CopyFrom(*licenseInfoPtr)){
+							licenseInstancePtr->SetExpiration(expirationDate);
 
-							m_licenses[licenseId] = licenseInstance;
+							m_licenses[licenseId] = licenseInstancePtr;
 
 							m_licenseContainerInfo.InsertItem(licenseId, "", "");
 						}
@@ -123,9 +123,7 @@ const imtbase::ICollectionInfo& CProductInstanceInfo::GetLicenseInstances() cons
 const imtlic::ILicenseInstance* CProductInstanceInfo::GetLicenseInstance(const QByteArray& licenseId) const
 {
 	if (m_licenses.contains(licenseId)){
-		const imtlic::ILicenseInstance& licenseInstance = m_licenses[licenseId];
-
-		return &licenseInstance;
+		return m_licenses[licenseId].GetPtr();
 	}
 
 	return nullptr;
@@ -170,8 +168,10 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 		for (LicenseInstances::Iterator iter = m_licenses.begin(); iter != m_licenses.end(); ++iter){
 			retVal = retVal && archive.BeginTag(licenseInstanceTag);
 
+			Q_ASSERT(iter.value().IsValid());
+
 			retVal = archive.BeginTag(licenseTag);
-			retVal = retVal && iter.value().Serialize(archive);
+			retVal = retVal && iter.value()->Serialize(archive);
 			retVal = retVal && archive.EndTag(licenseTag);
 
 			retVal = retVal && archive.EndTag(licenseInstanceTag);
@@ -181,16 +181,16 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 		for (int i = 0; i < licensesCount; ++i){
 			retVal = retVal && archive.BeginTag(licenseInstanceTag);
 
-			CLicenseInstance licenseData;
+			LicenseInstancePtr licenseDataPtr(new CLicenseInstance);
 			retVal = archive.BeginTag(licenseTag);
-			retVal = retVal && licenseData.Serialize(archive);
+			retVal = retVal && licenseDataPtr->Serialize(archive);
 			retVal = retVal && archive.EndTag(licenseTag);
 
 			retVal = retVal && archive.EndTag(licenseInstanceTag);
 
 			if (retVal){
-				m_licenses[licenseData.GetLicenseId()] = licenseData;
-				m_licenseContainerInfo.InsertItem(licenseData.GetLicenseId(), "", "");
+				m_licenses[licenseDataPtr->GetLicenseId()] = licenseDataPtr;
+				m_licenseContainerInfo.InsertItem(licenseDataPtr->GetLicenseId(), "", "");
 			}
 		}
 	}
