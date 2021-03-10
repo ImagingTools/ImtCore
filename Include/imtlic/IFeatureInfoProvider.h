@@ -2,7 +2,6 @@
 
 
 // ACF includes
-#include <iser/ISerializable.h>
 #include <idoc/IDocumentMetaInfo.h>
 
 
@@ -22,9 +21,9 @@ class IFeatureDependenciesProvider;
 
 
 /**
-	Common information about a feature group.
+	Common interface for providing of features.
 */
-class IFeatureInfoProvider: virtual public iser::ISerializable
+class IFeatureInfoProvider: virtual public istd::IChangeable
 {
 public:
 	enum MetaInfoTypes

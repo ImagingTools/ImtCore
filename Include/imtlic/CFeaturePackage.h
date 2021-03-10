@@ -5,7 +5,7 @@
 #include <imtbase/TAggergatedObjectCollectionWrap.h>
 #include <imtbase/CCollectionInfo.h>
 #include <imtlic/IFeatureDependenciesManager.h>
-#include <imtlic/IFeatureInfoProvider.h>
+#include <imtlic/IFeaturePackage.h>
 #include <imtlic/CFeatureInfo.h>
 
 
@@ -14,18 +14,22 @@ namespace imtlic
 
 
 class CFeaturePackage:
-			public imtbase::TAggergatedObjectCollectionWrap<IFeatureInfoProvider, CFeatureInfo>,
+			public imtbase::TAggergatedObjectCollectionWrap<IFeaturePackage, CFeatureInfo>,
 			virtual public IFeatureDependenciesManager
 {
 public:
-	typedef imtbase::TAggergatedObjectCollectionWrap<IFeatureInfoProvider, CFeatureInfo> BaseClass;
+	typedef imtbase::TAggergatedObjectCollectionWrap<IFeaturePackage, CFeatureInfo> BaseClass;
 
 	CFeaturePackage();
 
 	void SetParents(const QByteArrayList& parentIds);
 
+	// reimplemented (IFeaturePackage)
+	virtual QByteArray GetPackageId() const override;
+	virtual void SetPackageId(const QByteArray& packageId) override;
+
 	// reimplemented (IFeatureDependenciesManager)
-	void SetFeatureDependencies(const QByteArray& featureId, const QByteArrayList& dependentIds);
+	void SetFeatureDependencies(const QByteArray& featureId, const QByteArrayList& dependentIds) override;
 
 	// reimplemented (IFeatureDependenciesProvider)
 	virtual QByteArrayList GetFeatureDependencies(const QByteArray& featureId) const override;
@@ -52,6 +56,7 @@ protected:
 private:
 	QMap<QByteArray, QByteArrayList> m_dependencies;
 	imtbase::CCollectionInfo m_parents;
+	QByteArray m_packageId;
 };
 
 

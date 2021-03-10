@@ -245,11 +245,33 @@ CFeaturePackageGuiComp::FeaturePackageProxy::FeaturePackageProxy(CFeaturePackage
 }
 
 
+// reimplemented (IFeaturePackage)
+
+QByteArray CFeaturePackageGuiComp::FeaturePackageProxy::GetPackageId() const
+{
+	imtlic::IFeaturePackage* featurePackagePtr = m_parent.GetObservedObject();
+	if (featurePackagePtr != nullptr){
+		return featurePackagePtr->GetPackageId();
+	}
+
+	return QByteArray();
+}
+
+
+void CFeaturePackageGuiComp::FeaturePackageProxy::SetPackageId(const QByteArray& packageId)
+{
+	imtlic::IFeaturePackage* featurePackagePtr = m_parent.GetObservedObject();
+	if (featurePackagePtr != nullptr){
+		featurePackagePtr->SetPackageId(packageId);
+	}
+}
+
+
 // reimplemented (imtlic::IFeatureInfoProvider)
 
 const imtbase::IObjectCollection* CFeaturePackageGuiComp::FeaturePackageProxy::GetFeaturePackages() const
 {
-	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	imtlic::IFeaturePackage* featurePackagePtr = m_parent.GetObservedObject();
 	if (featurePackagePtr != nullptr){
 		return featurePackagePtr->GetFeaturePackages();
 	}
@@ -260,7 +282,7 @@ const imtbase::IObjectCollection* CFeaturePackageGuiComp::FeaturePackageProxy::G
 
 const imtbase::ICollectionInfo& CFeaturePackageGuiComp::FeaturePackageProxy::GetFeatureList() const
 {
-	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	imtlic::IFeaturePackage* featurePackagePtr = m_parent.GetObservedObject();
 	if (featurePackagePtr != nullptr){
 		return featurePackagePtr->GetFeatureList();
 	}
@@ -271,7 +293,7 @@ const imtbase::ICollectionInfo& CFeaturePackageGuiComp::FeaturePackageProxy::Get
 
 const imtlic::IFeatureInfo* CFeaturePackageGuiComp::FeaturePackageProxy::GetFeatureInfo(const QByteArray& featureId) const
 {
-	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	imtlic::IFeaturePackage* featurePackagePtr = m_parent.GetObservedObject();
 	if (featurePackagePtr != nullptr){
 		return featurePackagePtr->GetFeatureInfo(featureId);
 	}
@@ -293,7 +315,7 @@ const imtlic::IFeatureDependenciesProvider* CFeaturePackageGuiComp::FeaturePacka
 
 const imtbase::ICollectionInfo* CFeaturePackageGuiComp::FeaturePackageProxy::GetParentFeatureInfoProviderList() const
 {
-	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	imtlic::IFeaturePackage* featurePackagePtr = m_parent.GetObservedObject();
 	if (featurePackagePtr != nullptr){
 		return featurePackagePtr->GetParentFeatureInfoProviderList();
 	}
@@ -304,7 +326,7 @@ const imtbase::ICollectionInfo* CFeaturePackageGuiComp::FeaturePackageProxy::Get
 
 const imtlic::IFeatureInfoProvider* CFeaturePackageGuiComp::FeaturePackageProxy::GetParentFeatureInfoProvider(const QByteArray& parentId) const
 {
-	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	imtlic::IFeaturePackage* featurePackagePtr = m_parent.GetObservedObject();
 	if (featurePackagePtr != nullptr){
 		return featurePackagePtr->GetParentFeatureInfoProvider(parentId);
 	}
@@ -316,7 +338,7 @@ const imtlic::IFeatureInfoProvider* CFeaturePackageGuiComp::FeaturePackageProxy:
 
 bool CFeaturePackageGuiComp::FeaturePackageProxy::Serialize(iser::IArchive& archive)
 {
-	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	imtlic::IFeaturePackage* featurePackagePtr = m_parent.GetObservedObject();
 	if (featurePackagePtr != nullptr){
 		return featurePackagePtr->Serialize(archive);
 	}
@@ -327,7 +349,7 @@ bool CFeaturePackageGuiComp::FeaturePackageProxy::Serialize(iser::IArchive& arch
 
 quint32 CFeaturePackageGuiComp::FeaturePackageProxy::GetMinimalVersion(int versionId) const
 {
-	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
+	imtlic::IFeaturePackage* featurePackagePtr = m_parent.GetObservedObject();
 	if (featurePackagePtr != nullptr){
 		return featurePackagePtr->GetMinimalVersion(versionId);
 	}
@@ -346,7 +368,7 @@ CFeaturePackageGuiComp::FeatureSelectionObserver::FeatureSelectionObserver(CFeat
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CFeaturePackageGuiComp::FeatureSelectionObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CFeaturePackageGuiComp::FeatureSelectionObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_parent.OnFeatureSelectionChanged();
 }

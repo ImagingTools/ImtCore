@@ -37,6 +37,24 @@ void CFeaturePackage::SetParents(const QByteArrayList& parentIds)
 }
 
 
+// reimplemented (IFeaturePackage)
+
+QByteArray CFeaturePackage::GetPackageId() const
+{
+	return m_packageId;
+}
+
+
+void CFeaturePackage::SetPackageId(const QByteArray& packageId)
+{
+	if (m_packageId != packageId){
+		istd::CChangeNotifier notifier(this);
+	
+		m_packageId = packageId;
+	}
+}
+
+
 // reimplemented (IFeatureDependenciesManager)
 
 void CFeaturePackage::SetFeatureDependencies(const QByteArray& featureId, const QByteArrayList& dependentIds)
@@ -152,6 +170,11 @@ bool CFeaturePackage::Serialize(iser::IArchive& archive)
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
 	bool retVal = BaseClass::Serialize(archive);
+
+	static iser::CArchiveTag packageIdTag("PackageId", "ID of the feature package", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(packageIdTag);
+	retVal = retVal && archive.Process(m_packageId);
+	retVal = retVal && archive.EndTag(packageIdTag);
 
 	QByteArrayList dependencyKeys = m_dependencies.keys();
 	int dependencyCount = dependencyKeys.count();

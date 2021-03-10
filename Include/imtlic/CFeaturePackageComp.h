@@ -26,6 +26,7 @@ public:
 	I_BEGIN_COMPONENT(CFeaturePackageComp);
 		I_REGISTER_INTERFACE(IFeatureDependenciesProvider);
 		I_REGISTER_INTERFACE(IFeatureInfoProvider);
+		I_REGISTER_INTERFACE(IFeaturePackage);
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
 		I_REGISTER_INTERFACE(imtbase::IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);

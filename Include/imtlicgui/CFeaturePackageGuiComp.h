@@ -12,7 +12,7 @@
 #include <imtbase/CCollectionInfo.h>
 #include <imtlic/IFeatureDependenciesProvider.h>
 #include <imtlic/IFeatureInfo.h>
-#include <imtlic/IFeatureInfoProvider.h>
+#include <imtlic/IFeaturePackage.h>
 #include <imtlicgui/CFeatureDependencyEditorBase.h>
 #include <GeneratedFiles/imtlicgui/ui_CFeaturePackageGuiComp.h>
 
@@ -27,14 +27,14 @@ namespace imtlicgui
 */
 class CFeaturePackageGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CFeaturePackageGuiComp, imtlic::IFeatureInfoProvider>,
+						Ui::CFeaturePackageGuiComp, imtlic::IFeaturePackage>,
 			protected CFeatureDependencyEditorBase,
 			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CFeaturePackageGuiComp, imtlic::IFeatureInfoProvider> BaseClass;
+				Ui::CFeaturePackageGuiComp, imtlic::IFeaturePackage> BaseClass;
 	typedef CFeatureDependencyEditorBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CFeaturePackageGuiComp);
@@ -76,10 +76,14 @@ private Q_SLOTS:
 	virtual void OnFeatureTreeItemChanged();
 
 protected:
-	class FeaturePackageProxy: virtual public imtlic::IFeatureInfoProvider
+	class FeaturePackageProxy: virtual public imtlic::IFeaturePackage
 	{
 	public:
 		FeaturePackageProxy(CFeaturePackageGuiComp& parent);
+
+		// reimplemented (IFeaturePackage)
+		virtual QByteArray GetPackageId() const override;
+		virtual void SetPackageId(const QByteArray& packageId) override;
 
 		// reimplemented (imtlic::IFeatureInfoProvider)
 		virtual const imtbase::IObjectCollection* GetFeaturePackages() const override;
