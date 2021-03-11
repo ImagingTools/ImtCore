@@ -7,22 +7,37 @@
 #endif
 
 
+class HandleInfo
+{
+public:
+	HandleInfo()
+		:handle(nullptr)
+
+	{
+	}
+
+	Qt::HANDLE handle;
+	QString title;
+};
+
+
+
 #ifdef Q_OS_WINDOWS
 BOOL CALLBACK FindHandleCallback(HWND windowHandle, LPARAM pParam)
 {
 	static const int maxBufferSize = 256;
 
-	CWindowManager* windowManagerPtr = (CWindowManager*)pParam;
+	HandleInfo* handleInfoPtr = (HandleInfo*)pParam;
 	char name[maxBufferSize];
 
-	if (windowManagerPtr != nullptr){
-		QString title = windowManagerPtr->GetTitle();
+	if (handleInfoPtr != nullptr){
+		QString title = handleInfoPtr->title;
 
 		GetWindowTextA(windowHandle, name, maxBufferSize - 1);
 
 		QString windowName(name);
 		if (title.compare(windowName, Qt::CaseInsensitive) == 0){
-			windowManagerPtr->SetHandle(windowHandle);
+			handleInfoPtr->handle = windowHandle;
 
 			return FALSE;
 		}
@@ -31,12 +46,6 @@ BOOL CALLBACK FindHandleCallback(HWND windowHandle, LPARAM pParam)
 	return TRUE;
 }
 #endif
-
-
-CWindowManager::CWindowManager() 
-	:m_handle(nullptr)
-{
-}
 
 
 qint64 CWindowManager::FindProcessIdByTitle(const QString& title)
@@ -125,10 +134,11 @@ Qt::HANDLE CWindowManager::FindHandleByTitle(const QString& title)
 	Qt::HANDLE handle = nullptr;
 
 #ifdef Q_OS_WINDOWS
-	m_title = title;
+	HandleInfo handleInfo;
+	handleInfo.title = title;
 
-	if (!EnumWindows((WNDENUMPROC)FindHandleCallback, (LPARAM)this)){
-		handle = m_handle;
+	if (!EnumWindows((WNDENUMPROC)FindHandleCallback, (LPARAM)&handleInfo)){
+		handle = handleInfo.handle;
 	}
 
 #endif
