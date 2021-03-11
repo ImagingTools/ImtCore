@@ -53,8 +53,6 @@ public:
 		I_ASSIGN(m_maximumFrameHeightAttrPtr, "MaximumFrameHeight", "Maximum height of thumbnail frame", false, 240);
 		I_ASSIGN(m_autoLogoutMinutesAttrPtr, "AutoLogoutMinutes", "Time intervall for the automatic logout", false, 60);
 		I_ASSIGN(m_defaultPageIndexAttrPtr, "DefaultPageIndex", "Index of the default (start) page", false, -1);
-		I_ASSIGN(m_settingsPageIndexAttrPtr, "SettingsPageIndex", "Index of the system settings page", false, -1);
-		I_ASSIGN(m_logPageIndexAttrPtr, "LogPageIndex", "Index of the system log page", false, -1);
 		I_ASSIGN(m_welcomeTextAttrPtr, "WelcomeText", "Welcome text on the start page", true, "Welcome");
 		I_ASSIGN(m_closeRightIdAttrPtr, "CloseRightId", "ID of the user right to close the application", true, "Close");
 		I_ASSIGN_MULTI_0(m_disablePageListViewIndexesAttrPtr, "DisablePageListViewIndexes", "List of page indexes where the page list view is not shown", false);
@@ -71,8 +69,6 @@ protected:
 	I_ATTR(int, m_maximumFrameHeightAttrPtr);
 	I_ATTR(int, m_autoLogoutMinutesAttrPtr);
 	I_ATTR(int, m_defaultPageIndexAttrPtr);
-	I_ATTR(int, m_settingsPageIndexAttrPtr);
-	I_ATTR(int, m_logPageIndexAttrPtr);
 	I_TEXTATTR(m_welcomeTextAttrPtr);
 	I_ATTR(QByteArray, m_closeRightIdAttrPtr);
 	I_MULTIATTR(int, m_disablePageListViewIndexesAttrPtr);
@@ -120,6 +116,7 @@ public:
 		I_ASSIGN(m_leftMenuPanelGuiCompPtr, "LeftMenuPanel", "Left menu panel", false, "LeftMenuPanel");
 		I_ASSIGN(m_pageNavigationControllerCompPtr, "NavigationController", "Page navigation controller", false, "NavigationController");
 		I_ASSIGN(m_dashboardGuiCompPtr, "Dashboard", "Dashboard UI", false, "Dashboard");
+		I_ASSIGN(m_additionalCommandsCompPtr, "AdditionalCommands", "Additional tool commands showed on the right side of the main tool bar", false, "AdditionalCommands");
 	I_END_COMPONENT;
 
 	enum
@@ -148,7 +145,6 @@ public:
 		UA_LOGIN_CONTROL_ENABLED,
 		UA_LOGIN_ENABLED,
 		UA_HOME_ENABLED,
-		UA_SETTINGS_ENEBLED,
 	};
 
 	CThumbnailDecoratorGuiComp();
@@ -182,9 +178,7 @@ private Q_SLOTS:
 	void on_HomeButton_clicked();
 	void on_LoginButton_clicked();
 	void on_LoginControlButton_clicked();
-	void on_SettingsButton_clicked();
 	void on_CommandsMenuButton_clicked();
-	void on_LogButton_clicked();
 	void on_KeyboardButton_clicked();
 	void Logout();
 	void OnVirtualKeyboardStateChanged(QProcess::ProcessState state);
@@ -333,8 +327,10 @@ private:
 	I_REF(iqtgui::IGuiObject, m_leftMenuPanelGuiCompPtr);
 	I_REF(imtgui::IPageNavigationController, m_pageNavigationControllerCompPtr);
 	I_REF(iqtgui::IGuiObject, m_dashboardGuiCompPtr);
+	I_REF(ibase::ICommandsProvider, m_additionalCommandsCompPtr);
 
 	QToolBar* m_mainToolBar;
+	QToolBar* m_additionalCommandsToolBar;
 	QTimer m_autoLogoutTimer;
 
 	QMenu m_commandsMenu;

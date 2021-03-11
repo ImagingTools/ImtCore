@@ -5,6 +5,10 @@
 #include <QtCore/QString>
 
 
+namespace imtwidgets
+{
+
+
 class CWindowSystem
 {
 public:
@@ -16,5 +20,8 @@ protected:
 	static Qt::HANDLE FindHandleByProcessId(qint64 processId);
 	static Qt::HANDLE FindHandleByTitle(const QString& title);
 };
+
+
+} // namespace imtwidgets
 
 

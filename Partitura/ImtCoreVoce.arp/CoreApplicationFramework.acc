@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4900" Description="ACF"/>
-            <Version Id="1" Number="2135" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="0" Number="4902" Description="ACF"/>
+            <Version Id="1" Number="2134" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331009" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>ImagingTools application framework</Description>
@@ -157,6 +157,9 @@
         <Element Id="Pages" PackageId="ImtGuiPck" ComponentId="ThumbnailDecoratorGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AdditionalCommands" Type="Reference" ExportId="AdditionalCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="AutoLogoutMinutes" Type="Integer" ExportId="AutoLogoutMinutes">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -178,6 +181,9 @@
                     <AttributeInfo Id="DisablePageListViewIndexes" Type="Integer[]" ExportId="DisablePageListViewIndexes">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="HideMenuPanelOnHomePage" Type="Boolean" ExportId="HideMenuPanelOnHomePage">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="HorizontalFrameMargin" Type="Integer" ExportId="HorizontalFrameMargin">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -188,9 +194,6 @@
                         <Data IsEnabled="true" Value="10"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LeftMenuPanel" Type="Reference" ExportId="LeftMenuPanel">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LogPageIndex" Type="Integer" ExportId="LogPageIndex">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Login" Type="Reference" ExportId="Login">
@@ -215,9 +218,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Rights" Type="Reference" ExportId="Rights">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SettingsPageIndex" Type="Integer" ExportId="SettingsPageIndex">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="">

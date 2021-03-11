@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>890</width>
+    <width>960</width>
     <height>611</height>
    </rect>
   </property>
@@ -269,6 +269,33 @@
            </spacer>
           </item>
           <item>
+           <widget class="QFrame" name="AdditionalCommandsFrame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+            </layout>
+           </widget>
+          </item>
+          <item>
            <widget class="QToolButton" name="CommandsMenuButton">
             <property name="text">
              <string>Commands</string>
@@ -289,29 +316,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="LogButton">
-            <property name="text">
-             <string>Log</string>
-            </property>
-            <property name="icon">
-             <iconset resource="imtgui.qrc">
-              <normaloff>:/Icons/Ok</normaloff>:/Icons/Ok</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="shortcut">
-             <string/>
-            </property>
-            <property name="autoRaise">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QToolButton" name="LoginControlButton">
             <property name="text">
              <string>Log out</string>
@@ -319,32 +323,6 @@
             <property name="icon">
              <iconset resource="imtgui.qrc">
               <normaloff>:/Icons/Lock</normaloff>:/Icons/Lock</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="shortcut">
-             <string/>
-            </property>
-            <property name="autoRaise">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="SettingsButton">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>Settings</string>
-            </property>
-            <property name="icon">
-             <iconset resource="imtgui.qrc">
-              <normaloff>:/Icons/Settings</normaloff>:/Icons/Settings</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -959,7 +937,6 @@
   <tabstop>SubPages</tabstop>
   <tabstop>HomeButton</tabstop>
   <tabstop>LoginControlButton</tabstop>
-  <tabstop>SettingsButton</tabstop>
   <tabstop>PageList</tabstop>
  </tabstops>
  <resources>

@@ -27,7 +27,8 @@ static const int s_minSpacing = 10;
 
 CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	:m_commands("&View", 100),
-	m_mainToolBar(NULL),
+	m_mainToolBar(nullptr),
+	m_additionalCommandsToolBar(nullptr),
 	m_commandsObserver(*this),
 	m_pageModelObserver(*this),
 	m_loginObserver(*this),
@@ -178,6 +179,22 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		m_dashboardGuiCompPtr->CreateGui(DashBoardFrame);
 	}
 
+	AdditionalCommandsFrame->setVisible(m_additionalCommandsCompPtr.IsValid());
+
+	if (m_additionalCommandsCompPtr.IsValid()){
+		const iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_additionalCommandsCompPtr->GetCommands());
+		if (commandPtr != nullptr){
+			if (m_additionalCommandsToolBar == nullptr){
+				m_additionalCommandsToolBar = new QToolBar(AdditionalCommandsFrame);
+				m_additionalCommandsToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
+				AdditionalCommandsFrame->layout()->addWidget(m_additionalCommandsToolBar);
+
+				iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_additionalCommandsToolBar);
+			}
+		}
+	}
+
 	NavigationControlFrame->setVisible(m_pageNavigationControllerCompPtr.IsValid());
 	DashboardButton->setVisible(m_dashboardGuiCompPtr.IsValid() && m_dashboardGuiCompPtr->IsGuiCreated());
 	DashboardButton->setShortcut(Qt::CTRL + Qt::Key_D);
@@ -249,9 +266,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	LoginControlButton->setVisible(m_loginCompPtr.IsValid());
 	
 	installEventFilter(this);
-
-	SettingsButton->setVisible(m_settingsPageIndexAttrPtr.IsValid());
-	LogButton->setVisible(m_logPageIndexAttrPtr.IsValid());
 
 	UpdateLoginButtonsState();
 
@@ -489,21 +503,6 @@ void CThumbnailDecoratorGuiComp::on_LoginControlButton_clicked()
 }
 
 
-void CThumbnailDecoratorGuiComp::on_SettingsButton_clicked()
-{
-	Q_ASSERT(m_settingsPageIndexAttrPtr.IsValid());
-
-	for (ItemInfoMap::Iterator itemIter = m_itemInfoMap.begin(); itemIter != m_itemInfoMap.end(); ++itemIter){
-		int pageIndex = itemIter.value().pageIndex;
-		if (pageIndex == *m_settingsPageIndexAttrPtr){
-			QStandardItem* itemPtr = itemIter.key();
-
-			on_PageList_clicked(itemPtr->index());
-		}
-	}
-}
-
-
 void CThumbnailDecoratorGuiComp::on_CommandsMenuButton_clicked()
 {
 	QPoint origin = CommandsMenuButton->geometry().center();
@@ -516,21 +515,6 @@ void CThumbnailDecoratorGuiComp::on_CommandsMenuButton_clicked()
 	}
 
 	m_commandsMenu.exec(GetQtWidget()->mapToGlobal(origin));
-}
-
-
-void CThumbnailDecoratorGuiComp::on_LogButton_clicked()
-{
-	Q_ASSERT(m_logPageIndexAttrPtr.IsValid());
-
-	for (ItemInfoMap::Iterator itemIter = m_itemInfoMap.begin(); itemIter != m_itemInfoMap.end(); ++itemIter){
-		int pageIndex = itemIter.value().pageIndex;
-		if (pageIndex == *m_logPageIndexAttrPtr){
-			QStandardItem* itemPtr = itemIter.key();
-
-			on_PageList_clicked(itemPtr->index());
-		}
-	}
 }
 
 
@@ -740,7 +724,6 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 	LoginButton->setEnabled(isLoginEnabled);
 
 	HomeButton->setEnabled(IsUserActionAllowed(UA_HOME_ENABLED));
-	SettingsButton->setEnabled(IsUserActionAllowed(UA_SETTINGS_ENEBLED));
 }
 
 
@@ -936,10 +919,6 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 						if (pageStatusPtr != nullptr){
 							itemPtr->setIcon(pageStatusPtr->GetStatusIcon());
 						}
-
-						if (m_logPageIndexAttrPtr.IsValid() && (pageIndex == *m_logPageIndexAttrPtr)){
-							LogButton->setIcon(pageStatusPtr->GetStatusIcon());
-						}
 					}
 				}
 			}
@@ -1065,7 +1044,6 @@ bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 	switch (action){
 	case UA_APPLICATION_EXIT:
 		return hasCloseRight && !m_isExitProcess;
-	case UA_SETTINGS_ENEBLED:
 	case UA_HOME_ENABLED:
 		return isHomeEnabled;
 	case UA_LOGIN_CONTROL_ENABLED:

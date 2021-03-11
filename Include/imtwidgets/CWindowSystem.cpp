@@ -1,10 +1,14 @@
 #include <imtwidgets/CWindowSystem.h>
 
-
+// Windows includes
 #ifdef Q_OS_WINDOWS
 	#include <windows.h>
 	#include <psapi.h>
 #endif
+
+
+namespace imtwidgets
+{
 
 
 class HandleInfo
@@ -182,4 +186,6 @@ void CWindowSystem::RaiseWindowByTitle(const QString& title)
 #endif
 }
 
+
+} // namespace imtwidgets
 

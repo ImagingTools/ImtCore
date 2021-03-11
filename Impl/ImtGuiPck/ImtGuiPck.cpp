@@ -112,6 +112,11 @@ I_EXPORT_COMPONENT(
 			"Plugin status monitor view delegate",
 			"Delegate View Collection Plugin Status");
 
+I_EXPORT_COMPONENT(
+			ApplicationSwitchCommand,
+			"Command for switching between applications",
+			"Command Application Switch Process Window");
+
 
 } // namespace ImtGuiPck
 
