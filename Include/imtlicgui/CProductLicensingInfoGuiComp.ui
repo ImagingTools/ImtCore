@@ -6,14 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>413</width>
-    <height>389</height>
+    <width>536</width>
+    <height>422</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Product Licensing</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -27,30 +30,67 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QFrame" name="LicenseCollectionFrame">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="spacing">
-       <number>0</number>
+     <widget class="QWidget" name="Licenses" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <property name="leftMargin">
-       <number>0</number>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+      </layout>
+     </widget>
+     <widget class="QTreeWidget" name="Features">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
       </property>
-      <property name="topMargin">
-       <number>0</number>
+      <property name="columnCount">
+       <number>3</number>
       </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-     </layout>
+      <attribute name="headerVisible">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="headerMinimumSectionSize">
+       <number>50</number>
+      </attribute>
+      <attribute name="headerDefaultSectionSize">
+       <number>150</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string notr="true">Feature Name</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string notr="true">Feature-ID</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string notr="true">Feature Description</string>
+       </property>
+      </column>
+     </widget>
     </widget>
    </item>
   </layout>
