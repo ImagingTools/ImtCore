@@ -3,9 +3,9 @@
 [Setup]
 AppVerName=$AcfProductName$ $AcfVersion:1$
 AppVersion=$AcfVersion:1$
-AppPublisher=Witold Gantzke & Kirill Lepskiy
-AppPublisherURL=http://www.ilena.org/
-AppName=ACF-Solutions
+AppPublisher=ImagingTools GmbH
+AppPublisherURL=www.imagingtools.cos
+AppName= ImagingTools Core SDK
 OutputBaseFilename=Setup_$AcfProductName$_$LICENSE_TYPE$_v$AcfVersion:1$_$CompilerName$
 
 DefaultDirName={pf}\ImagingTools\$AcfProductName$_v$AcfVersion:1$
@@ -20,8 +20,8 @@ UninstallDisplayName=$AcfProductName$ $AcfVersion:1$
 OutputDir=..\Setup
 LicenseFile=$LICENSE_INSTALL_PATH$
 VersionInfoDescription=$AcfProductName$ v. $AcfVersion:1$ ($AcfRawVersion:1$) by $AcfCompanyName$
-AppComments=Compiled using $CompilerName$, based on ACF v. $AcfVersion:0$ ($AcfRawVersion:0$) and QT $AcfVersion:1023$, see www.ilena.org to find out more about ACF-Solutions
-AppCopyright=Copyright (C) 2007-2015 Witold Gantzke and Kirill Lepskiy
+AppComments=Compiled using $CompilerName$, based on ACF v. $AcfVersion:0$ ($AcfRawVersion:0$) and QT $AcfVersion:1023$, see www.imagingtools.co to find out more about ImagingTools Core SDK
+AppCopyright=Copyright (C) 2017-2021 ImagingTools GmbH
 VersionInfoVersion=$AcfVersion:1$
 ChangesEnvironment=yes
 
