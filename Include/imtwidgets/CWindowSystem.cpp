@@ -1,4 +1,4 @@
-#include <imtwidgets/CWindowManager.h>
+#include <imtwidgets/CWindowSystem.h>
 
 
 #ifdef Q_OS_WINDOWS
@@ -48,7 +48,7 @@ BOOL CALLBACK FindHandleCallback(HWND windowHandle, LPARAM pParam)
 #endif
 
 
-qint64 CWindowManager::FindProcessIdByTitle(const QString& title)
+qint64 CWindowSystem::FindProcessIdByTitle(const QString& title)
 {
 	qint64 foundProcessId = 0;
 
@@ -93,7 +93,7 @@ qint64 CWindowManager::FindProcessIdByTitle(const QString& title)
 }
 
 
-Qt::HANDLE CWindowManager::FindHandleByProcessId(qint64 processId)
+Qt::HANDLE CWindowSystem::FindHandleByProcessId(qint64 processId)
 {
 	Qt::HANDLE handle = 0;
 
@@ -129,7 +129,7 @@ Qt::HANDLE CWindowManager::FindHandleByProcessId(qint64 processId)
 }
 
 
-Qt::HANDLE CWindowManager::FindHandleByTitle(const QString& title)
+Qt::HANDLE CWindowSystem::FindHandleByTitle(const QString& title)
 {
 	Qt::HANDLE handle = nullptr;
 
@@ -147,7 +147,7 @@ Qt::HANDLE CWindowManager::FindHandleByTitle(const QString& title)
 }
 
 
-void CWindowManager::RaiseWindowByProcessId(qint64 processId)
+void CWindowSystem::RaiseWindowByProcessId(qint64 processId)
 {
 #ifdef Q_OS_WINDOWS
 	HWND windowHandle = (HWND)FindHandleByProcessId(processId);
@@ -162,7 +162,7 @@ void CWindowManager::RaiseWindowByProcessId(qint64 processId)
 }
 
 
-void CWindowManager::RaiseWindowByTitle(const QString& title)
+void CWindowSystem::RaiseWindowByTitle(const QString& title)
 {
 #ifdef Q_OS_WINDOWS
 	HWND mainWindowHandle = (HWND)FindHandleByTitle(title);

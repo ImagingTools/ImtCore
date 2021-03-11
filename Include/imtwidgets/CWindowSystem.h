@@ -5,7 +5,7 @@
 #include <QtCore/QString>
 
 
-class CWindowManager
+class CWindowSystem
 {
 public:
 	static qint64 FindProcessIdByTitle(const QString& title);
