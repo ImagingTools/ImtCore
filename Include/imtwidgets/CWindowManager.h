@@ -18,7 +18,6 @@ public:
 	Qt::HANDLE GetHandle() {return m_handle;}
 	void SetHandle(Qt::HANDLE handle) {m_handle = handle;}
 	QString GetTitle() {return m_title;}
-	void SetTitle(QString title) {m_title = title;}
 
 protected:
 	Qt::HANDLE FindHandleByProcessId(qint64 processId);
