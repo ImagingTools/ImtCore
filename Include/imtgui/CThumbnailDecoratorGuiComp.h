@@ -243,6 +243,7 @@ private:
 	typedef QMap<QTreeWidgetItem*, ItemInfo> MenuItemInfoMap;
 	MenuItemInfoMap m_subPageItemMap;
 
+
 	class CommandsObserver: public imod::CMultiModelDispatcherBase
 	{
 	public:
@@ -257,6 +258,7 @@ private:
 		CThumbnailDecoratorGuiComp& m_parent;
 	};
 
+
 	class PageModelObserver: public imod::CMultiModelDispatcherBase
 	{
 	public:
@@ -268,7 +270,7 @@ private:
 	private:
 		CThumbnailDecoratorGuiComp& m_parent;
 	};
-	
+
 
 	class LoginObserver: public imod::CMultiModelDispatcherBase
 	{
