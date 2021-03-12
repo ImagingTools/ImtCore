@@ -88,9 +88,7 @@ const IFeatureInfoProvider* CFeaturePackage::GetDependencyContainer(const QByteA
 	if (m_featurePackageCollectionPtr != nullptr){
 		imtbase::ICollectionInfo::Ids featureInfoProviderIds = m_featurePackageCollectionPtr->GetElementIds();
 		for (const QByteArray& featureInfoProviderId : featureInfoProviderIds){
-			IFeatureInfoProvider* featureInfoProviderPtr = dynamic_cast<IFeatureInfoProvider*>(
-						const_cast<istd::IChangeable*>(m_featurePackageCollectionPtr->GetObjectPtr(featureInfoProviderId)));
-
+			const IFeatureInfoProvider* featureInfoProviderPtr = dynamic_cast<const IFeatureInfoProvider*>(m_featurePackageCollectionPtr->GetObjectPtr(featureInfoProviderId));
 			if (featureInfoProviderPtr != nullptr){
 				const imtbase::ICollectionInfo::Ids& featureInfoIds = featureInfoProviderPtr->GetFeatureList().GetElementIds();
 				for (const QByteArray& featureInfoId : featureInfoIds){
