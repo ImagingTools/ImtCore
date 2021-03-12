@@ -31,7 +31,20 @@ CProductLicensingInfoGuiComp::CProductLicensingInfoGuiComp()
 
 void CProductLicensingInfoGuiComp::OnItemStateChanged(const QByteArray& itemId, bool isChecked)
 {
-	
+	if (isChecked && !m_selectedFeatures.contains(itemId)){
+		m_selectedFeatures.append(itemId);
+
+		UpdateFeaturePackageCollectionProxy();
+		DoUpdateModel();
+	}
+
+	if (!isChecked && m_selectedFeatures.contains(itemId)){
+		m_selectedFeatures.removeOne(itemId);
+
+		UpdateFeaturePackageCollectionProxy();
+		DoUpdateModel();
+	}
+
 }
 
 
@@ -71,23 +84,17 @@ void CProductLicensingInfoGuiComp::OnGuiModelAttached()
 	BaseClass::OnGuiModelAttached();
 
 	if (m_objectCollectionViewCompPtr.IsValid() && m_objectCollectionObserverCompPtr.IsValid()){
-		imod::IModel* licensingInfoModelPtr = GetObservedModel();
-		Q_ASSERT(licensingInfoModelPtr != nullptr);
+		GetObservedModel()->AttachObserver(m_objectCollectionObserverCompPtr.GetPtr());
 
-		imod::IModel* featurePackageCollectionModelPtr = const_cast<imod::IModel*>(
-					dynamic_cast<const imod::IModel*>(m_featurePackageCollectionCompPtr.GetPtr()));
-		if (featurePackageCollectionModelPtr != nullptr){
-			m_featurePackageCollectionObserver.RegisterObject(m_featurePackageCollectionCompPtr.GetPtr(), &CProductLicensingInfoGuiComp::OnFeaturePackageCollectionUpdate);
-		}
+		m_licenseSelectionObserver.RegisterObject(
+					dynamic_cast<imtbase::IMultiSelection*>(m_objectCollectionViewCompPtr.GetPtr()),
+					&CProductLicensingInfoGuiComp::OnLicenseSelectionChanged);
+	}
 
-		if (licensingInfoModelPtr->AttachObserver(m_objectCollectionObserverCompPtr.GetPtr())){
-			m_objectCollectionViewCompPtr->CreateGui(Licenses);
-		}
-
-		imod::IModel* licenseSelectionModelPtr = dynamic_cast<imod::IModel*>(m_objectCollectionViewCompPtr.GetPtr());
-		if (licenseSelectionModelPtr != nullptr){
-			licenseSelectionModelPtr->AttachObserver(&m_licenseSelectionObserver);
-		}
+	if (m_featurePackageCollectionCompPtr.GetPtr()){
+		m_featurePackageCollectionObserver.RegisterObject(
+					m_featurePackageCollectionCompPtr.GetPtr(),
+					&CProductLicensingInfoGuiComp::OnFeaturePackageCollectionUpdate);
 	}
 
 	if (m_featureTreeCompPtr.IsValid() && m_featureTreeObserverCompPtr.IsValid()){
@@ -99,21 +106,11 @@ void CProductLicensingInfoGuiComp::OnGuiModelAttached()
 void CProductLicensingInfoGuiComp::OnGuiModelDetached()
 {
 	m_featurePackageCollectionProxy.DetachAllObservers();
+	m_featurePackageCollectionObserver.UnregisterAllObjects();
+	m_licenseSelectionObserver.UnregisterAllObjects();
 
 	if (m_objectCollectionViewCompPtr.IsValid() && m_objectCollectionObserverCompPtr.IsValid()){
-		imod::IModel* licensingInfoModelPtr = GetObservedModel();
-		Q_ASSERT(licensingInfoModelPtr != nullptr);
-
-		m_featurePackageCollectionObserver.UnregisterAllObjects();
-
-		if (licensingInfoModelPtr->IsAttached(m_objectCollectionObserverCompPtr.GetPtr())){
-			licensingInfoModelPtr->DetachObserver(m_objectCollectionObserverCompPtr.GetPtr());
-		}
-
-		imod::IModel* licenseSelectionModelPtr = dynamic_cast<imod::IModel*>(m_objectCollectionViewCompPtr.GetPtr());
-		if (licenseSelectionModelPtr != nullptr && licenseSelectionModelPtr->IsAttached(&m_licenseSelectionObserver)){
-			licenseSelectionModelPtr->DetachObserver(&m_licenseSelectionObserver);
-		}
+		GetObservedModel()->DetachObserver(m_objectCollectionObserverCompPtr.GetPtr());
 	}
 
 	BaseClass::OnGuiModelDetached();
@@ -206,12 +203,14 @@ void CProductLicensingInfoGuiComp::OnFeaturePackageCollectionUpdate(
 }
 
 
-void CProductLicensingInfoGuiComp::OnLicenseSelectionChanged()
+void CProductLicensingInfoGuiComp::OnLicenseSelectionChanged(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const imtbase::IMultiSelection* selectionPtr)
 {
 	m_selectedLicenseId.clear();
 	m_selectedFeatures.clear();
 
-	imtbase::IMultiSelection::Ids licenseIds = m_licenseSelectionObserver.GetObservedObject()->GetSelectedIds();
+	imtbase::IMultiSelection::Ids licenseIds = selectionPtr->GetSelectedIds();
 
 	if (licenseIds.count() == 1){
 		imtlic::IProductLicensingInfo* productLicensingInfo = GetObservedObject();
@@ -332,6 +331,11 @@ bool CProductLicensingInfoGuiComp::HasDependency(const FeatureDependencyMap& dep
 
 void CProductLicensingInfoGuiComp::UpdateFeaturePackageCollectionProxy()
 {
+	if (m_selectedLicenseId.isEmpty()){
+		m_featurePackageCollectionProxy.ResetData();
+		return;
+	}
+
 	m_featurePackageCollectionProxy.CopyFrom(m_featurePackageCollection);
 
 	EnumerateMissingFeatures();
@@ -363,7 +367,8 @@ void CProductLicensingInfoGuiComp::UpdateFeaturePackageCollectionProxy()
 					&missingPackage);
 	}
 
-	m_selectedFeaturesModel.SetSelectedIds(selectedFeatures.toVector());
+	m_featureSelectionModel.ResetData();
+	m_featureSelectionModel.SetSelectedIds(selectedFeatures.toVector());
 
 	// Disable dependent features
 	QByteArrayList disabledFeatures;
@@ -375,23 +380,8 @@ void CProductLicensingInfoGuiComp::UpdateFeaturePackageCollectionProxy()
 		}
 	}
 
-	m_disabledFeaturesModel.SetSelectedIds(disabledFeatures.toVector());
-}
-
-
-// public methods of the embedded class FeatureSelectionObserver
-
-CProductLicensingInfoGuiComp::LicenseSelectionObserver::LicenseSelectionObserver(CProductLicensingInfoGuiComp& parent)
-	:m_parent(parent)
-{
-}
-
-
-// reimplemented (imod::CSingleModelObserverBase)
-
-void CProductLicensingInfoGuiComp::LicenseSelectionObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
-{
-	m_parent.OnLicenseSelectionChanged();
+	m_featureStateModel.ResetData();
+	m_featureStateModel.SetSelectedIds(disabledFeatures.toVector());
 }
 
 

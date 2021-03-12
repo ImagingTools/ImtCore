@@ -5,7 +5,9 @@
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
+#include <imtbase/IMultiSelection.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/TModelUpdateBinder.h>
 #include <imtlicgui/IFeatureItemStateHandler.h>
 #include <GeneratedFiles/imtlicgui/ui_CFeatureTreeGuiComp.h>
 
@@ -25,7 +27,13 @@ public:
 	I_BEGIN_COMPONENT(CFeatureTreeGuiComp);
 		I_ASSIGN(m_showFeatureStatesAttrPtr, "ShowFeatureStates", "Show feature selection states", true, true);
 		I_ASSIGN(m_featureItemStateHandlerCompPtr, "FeatureItemStateHandler", "Feature item state handler", false, "");
+		I_ASSIGN(m_featureSelectionCompPtr, "FeatureSelectionModel", "Feature selection model", true, "FeatureSelectionModel");
+		I_ASSIGN_TO(m_featureSelectionModelCompPtr, m_featureSelectionCompPtr, true);
+		I_ASSIGN(m_featureStateCompPtr, "FeatureStateModel", "Feature state model", true, "FeatureStateModel");
+		I_ASSIGN_TO(m_featureStateModelCompPtr, m_featureStateCompPtr, true);
 	I_END_COMPONENT;
+
+	CFeatureTreeGuiComp();
 
 Q_SIGNALS:
 	void EmitFeatureItemStateChanged(const QByteArray& itemId, bool isChecked);
@@ -42,6 +50,13 @@ protected:
 
 private:
 	QTreeWidgetItem* FindItem(const QByteArray& itemId);
+
+	void OnFeatureSelectionChanged(
+				const istd::IChangeable::ChangeSet& /*changeSet*/,
+				const imtbase::IMultiSelection* selectionPtr);
+	void OnFeatureStateChanged(
+				const istd::IChangeable::ChangeSet& /*changeSet*/,
+				const imtbase::IMultiSelection* statePtr);
 
 private Q_SLOTS:
 	void OnFeatureItemStateChanged(const QByteArray& itemId, bool isChecked);
@@ -63,6 +78,13 @@ private:
 private:
 	I_ATTR(bool, m_showFeatureStatesAttrPtr);
 	I_REF(imtlicgui::IFeatureItemStateHandler, m_featureItemStateHandlerCompPtr);
+	I_REF(imtbase::IMultiSelection, m_featureSelectionCompPtr);
+	I_REF(imod::IModel, m_featureSelectionModelCompPtr);
+	I_REF(imtbase::IMultiSelection, m_featureStateCompPtr);
+	I_REF(imod::IModel, m_featureStateModelCompPtr);
+
+	imtbase::TModelUpdateBinder<imtbase::IMultiSelection, CFeatureTreeGuiComp> m_featureSelectionObserver;
+	imtbase::TModelUpdateBinder<imtbase::IMultiSelection, CFeatureTreeGuiComp> m_featureStateObserver;
 };
 
 

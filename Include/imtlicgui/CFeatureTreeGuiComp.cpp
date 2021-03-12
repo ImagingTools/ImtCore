@@ -5,7 +5,6 @@
 #include <QtWidgets/QTreeWidgetItem>
 
 // ImtCore includes
-#include <imtbase/IMultiSelection.h>
 #include <imtlic/IFeatureInfo.h>
 #include <imtlic/IFeaturePackage.h>
 
@@ -14,12 +13,23 @@ namespace imtlicgui
 {
 
 
+// public methods
+
+CFeatureTreeGuiComp::CFeatureTreeGuiComp()
+	:m_featureSelectionObserver(*this),
+	m_featureStateObserver(*this)
+{
+}
+
+
 // protected methods
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
 void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
+	QSignalBlocker blocker(Features);
+
 	Features->clear();
 
 	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
@@ -63,29 +73,6 @@ void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*change
 		}
 	}
 
-	//if (*m_showFeatureStatesAttrPtr){
-	//	imtbase::IMultiSelection::Ids selectedIds;
-	//		
-	//	imtbase::IMultiSelection* selectionPtr = dynamic_cast<imtbase::IMultiSelection*>(GetObservedObject());
-	//	if (selectionPtr != nullptr){
-	//		selectedIds = selectionPtr->GetSelectedIds();
-	//	}
-
-	//	int groupCount = Features->topLevelItemCount();
-	//	for (int groupIndex = 0; groupIndex < groupCount; groupIndex++){
-	//		QTreeWidgetItem* groupItemPtr = Features->topLevelItem(groupIndex);
-
-	//		int featureCount = groupItemPtr->childCount();
-	//		for (int featureIndex = 0; featureIndex < featureCount; featureIndex++){
-	//			QTreeWidgetItem* featureItemPtr = groupItemPtr->child(featureIndex);
-
-	//			QByteArray featureId = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
-	//			bool isFeatureSelected = selectedIds.contains(featureId);
-	//			featureItemPtr->setCheckState(0, isFeatureSelected ? Qt::Checked : Qt::Unchecked);
-	//		}
-	//	}
-	//}
-
 	Features->expandAll();
 }
 
@@ -93,11 +80,26 @@ void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*change
 void CFeatureTreeGuiComp::OnGuiModelAttached()
 {
 	BaseClass::OnGuiModelAttached();
+
+	if (m_featureSelectionCompPtr.IsValid() && m_featureSelectionModelCompPtr.IsValid()){
+		m_featureSelectionObserver.RegisterObject(
+					m_featureSelectionCompPtr.GetPtr(),
+					&CFeatureTreeGuiComp::OnFeatureSelectionChanged);
+	}
+
+	if (m_featureStateCompPtr.IsValid() && m_featureStateModelCompPtr.IsValid()){
+		m_featureStateObserver.RegisterObject(
+			m_featureStateCompPtr.GetPtr(),
+			&CFeatureTreeGuiComp::OnFeatureStateChanged);
+	}
 }
 
 
 void CFeatureTreeGuiComp::OnGuiModelDetached()
 {
+	m_featureStateObserver.UnregisterAllObjects();
+	m_featureSelectionObserver.UnregisterAllObjects();
+
 	BaseClass::OnGuiModelDetached();
 }
 
@@ -143,6 +145,59 @@ QTreeWidgetItem* CFeatureTreeGuiComp::FindItem(const QByteArray& itemId)
 	}
 
 	return nullptr;
+}
+
+
+void CFeatureTreeGuiComp::OnFeatureSelectionChanged(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const imtbase::IMultiSelection* selectionPtr)
+{
+	QSignalBlocker blocker(Features);
+
+	imtbase::IMultiSelection::Ids selectedIds = selectionPtr->GetSelectedIds();
+
+	if (*m_showFeatureStatesAttrPtr){
+		int groupCount = Features->topLevelItemCount();
+		for (int groupIndex = 0; groupIndex < groupCount; groupIndex++){
+			QTreeWidgetItem* groupItemPtr = Features->topLevelItem(groupIndex);
+
+			int featureCount = groupItemPtr->childCount();
+			for (int featureIndex = 0; featureIndex < featureCount; featureIndex++){
+				QTreeWidgetItem* featureItemPtr = groupItemPtr->child(featureIndex);
+
+				QByteArray featureId = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
+				bool isFeatureSelected = selectedIds.contains(featureId);
+				featureItemPtr->setCheckState(0, isFeatureSelected ? Qt::Checked : Qt::Unchecked);
+			}
+		}
+	}
+}
+
+
+void CFeatureTreeGuiComp::OnFeatureStateChanged(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const imtbase::IMultiSelection* statePtr)
+{
+	QSignalBlocker blocker(Features);
+
+	imtbase::IMultiSelection::Ids disabledIds = statePtr->GetSelectedIds();
+
+	if (*m_showFeatureStatesAttrPtr){
+		int groupCount = Features->topLevelItemCount();
+		for (int groupIndex = 0; groupIndex < groupCount; groupIndex++){
+			QTreeWidgetItem* groupItemPtr = Features->topLevelItem(groupIndex);
+
+			int featureCount = groupItemPtr->childCount();
+			for (int featureIndex = 0; featureIndex < featureCount; featureIndex++){
+				QTreeWidgetItem* featureItemPtr = groupItemPtr->child(featureIndex);
+
+				QByteArray featureId = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
+				if (disabledIds.contains(featureId)){
+					featureItemPtr->setFlags(featureItemPtr->flags() & (~Qt::ItemIsEnabled));
+				}
+			}
+		}
+	}
 }
 
 

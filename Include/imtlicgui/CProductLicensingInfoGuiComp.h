@@ -6,8 +6,8 @@
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
-#include <imtbase/CMultiSelection.h>
 #include <imtbase/TModelUpdateBinder.h>
+#include <imtbase/CMultiSelection.h>
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtlic/CFeaturePackageCollection.h>
 #include <imtlicgui/IFeatureItemStateHandler.h>
@@ -76,8 +76,10 @@ private:
 
 	void OnFeaturePackageCollectionUpdate(
 				const istd::IChangeable::ChangeSet& /*changeSet*/,
-				const imtbase::IObjectCollection* /*productCollectionPtr*/);
-	void OnLicenseSelectionChanged();
+				const imtbase::IObjectCollection* productCollectionPtr);
+	void OnLicenseSelectionChanged(
+				const istd::IChangeable::ChangeSet& /*changeSet*/,
+				const imtbase::IMultiSelection* selectionPtr);
 	void EnumerateDependencies(const QByteArrayList& featureIds);
 	void EnumerateMissingFeatures();
 	void BuildDependencyMap(const imtbase::IObjectCollection& packageCollection);
@@ -88,32 +90,13 @@ private:
 	template <typename InterfaceType>
 	static InterfaceType* ExtractSelectedFeatures(CProductLicensingInfoGuiComp& component)
 	{
-		return &component.m_selectedFeaturesModel;
+		return &component.m_featureSelectionModel;
 	}
 
 	template <typename InterfaceType>
 	static InterfaceType* ExtractDisabledFeatures(CProductLicensingInfoGuiComp& component)
 	{
-		return &component.m_disabledFeaturesModel;
-	}
-
-private:
-	class LicenseSelectionObserver: public imod::TSingleModelObserverBase<imtbase::IMultiSelection>
-	{
-	public:
-		LicenseSelectionObserver(CProductLicensingInfoGuiComp& parent);
-
-		// reimplemented (imod::CSingleModelObserverBase)
-		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
-
-	private:
-		CProductLicensingInfoGuiComp& m_parent;
-	};
-
-	template <class InterfaceType>
-	static InterfaceType* ExtractLicenseSelection(CProductLicensingInfoGuiComp& component)
-	{
-		return &component.m_licenseSelectionObserver;
+		return &component.m_featureStateModel;
 	}
 
 private:
@@ -126,15 +109,14 @@ private:
 	bool m_isGuiModelInitialized;
 	bool m_isCollectionRepresentationInitialized;
 
-	//FeaturePackageCollectionObserver m_featurePackageCollectionObserver;
 	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CProductLicensingInfoGuiComp> m_featurePackageCollectionObserver;
-	LicenseSelectionObserver m_licenseSelectionObserver;
+	imtbase::TModelUpdateBinder<imtbase::IMultiSelection, CProductLicensingInfoGuiComp> m_licenseSelectionObserver;
 
 	imod::TModelWrap<imtlic::CFeaturePackageCollection> m_featurePackageCollectionProxy;
 	imtlic::CFeaturePackageCollection m_featurePackageCollection;
 
-	imod::TModelWrap<imtbase::CMultiSelection> m_selectedFeaturesModel;
-	imod::TModelWrap<imtbase::CMultiSelection> m_disabledFeaturesModel;
+	imod::TModelWrap<imtbase::CMultiSelection> m_featureSelectionModel;
+	imod::TModelWrap<imtbase::CMultiSelection> m_featureStateModel;
 
 	// Selected license related members
 	QByteArray m_selectedLicenseId;
