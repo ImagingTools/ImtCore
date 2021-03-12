@@ -13,14 +13,11 @@ namespace imtbase
 {
 
 
-/**
-	\ingroup Main
-*/
-template <class InterfaceInterfaceType>
+template <class InterfaceType>
 class TCompPtr: protected CInterfaceManipBase
 {
 public:
-	InterfaceTypedef CInterfaceManipBase BaseClass;
+	typedef CInterfaceManipBase BaseClass;
 
 	TCompPtr();
 	
