@@ -40,7 +40,7 @@ void CApplicationSwitchCommandComp::OnComponentCreated()
 	m_rootMenuCommand.InsertChild(&m_mainMenuCommand);
 	m_mainMenuCommand.InsertChild(&m_switchCommand);
 
-	m_switchCommand.setVisible(m_processTitleAttrPtr.IsValid());
+	m_switchCommand.setVisible(m_executablePathCompPtr.IsValid());
 
 	connect(&m_switchCommand, SIGNAL(triggered()), this, SLOT(OnCommandActivated()));
 }
@@ -50,9 +50,15 @@ void CApplicationSwitchCommandComp::OnComponentCreated()
 
 void CApplicationSwitchCommandComp::OnCommandActivated()
 {
-	QString processTitle = *m_processTitleAttrPtr;
+	Q_ASSERT(m_executablePathCompPtr.IsValid());
 
-	imtwidgets::CWindowSystem::RaiseWindowByTitle(processTitle);
+	if (m_executablePathCompPtr.IsValid()){
+		QString executablePath = m_executablePathCompPtr->GetPath();
+
+		QString processTitle = QFileInfo(executablePath).baseName();
+
+		imtwidgets::CWindowSystem::RaiseWindowByTitle(processTitle);
+	}
 }
 
 
