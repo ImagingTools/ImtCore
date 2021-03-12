@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtlicgui/IItemSelectionChangeDelegate.h>
+#include <imtlicgui/IFeatureItemStateHandler.h>
 #include <GeneratedFiles/imtlicgui/ui_CFeatureTreeGuiComp.h>
 
 
@@ -24,13 +24,13 @@ public:
 
 	I_BEGIN_COMPONENT(CFeatureTreeGuiComp);
 		I_ASSIGN(m_showFeatureStatesAttrPtr, "ShowFeatureStates", "Show feature selection states", true, true);
-		I_ASSIGN(m_itemSelectionChangeDelegateCompPtr, "ItemSelectionChangeDelegate", "Delegate for item selection change", false, "");
+		I_ASSIGN(m_featureItemStateHandlerCompPtr, "FeatureItemStateHandler", "Feature item state handler", false, "");
 	I_END_COMPONENT;
 
 	CFeatureTreeGuiComp();
 
 Q_SIGNALS:
-	void EmitFeatureTreeItemChanged(const QByteArray& itemId, bool isChecked);
+	void EmitFeatureItemStateChanged(const QByteArray& itemId, bool isChecked);
 
 protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
@@ -46,7 +46,7 @@ private:
 	QTreeWidgetItem* FindItem(const QByteArray& itemId);
 
 private Q_SLOTS:
-	void OnFeatureTreeItemChanged(const QByteArray& itemId, bool isChecked);
+	void OnFeatureItemStateChanged(const QByteArray& itemId, bool isChecked);
 	void on_Features_itemChanged(QTreeWidgetItem *item, int column);
 
 private:
@@ -64,7 +64,7 @@ private:
 
 private:
 	I_ATTR(bool, m_showFeatureStatesAttrPtr);
-	I_REF(imtlicgui::IItemSelectionChangeDelegate, m_itemSelectionChangeDelegateCompPtr);
+	I_REF(imtlicgui::IFeatureItemStateHandler, m_featureItemStateHandlerCompPtr);
 };
 
 

@@ -37,7 +37,7 @@ void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*change
 
 				if (!featureCollectionIds.isEmpty()){
 					QString packageName = collectionPtr->GetElementInfo(packageCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
-					// TODO: QString packageId = packagePtr->GetPackageId();
+					// TODO: QByteArray packageId = packagePtr->GetPackageId();
 
 					QTreeWidgetItem* packageItemPtr = new QTreeWidgetItem({packageName});
 					Features->addTopLevelItem(packageItemPtr);
@@ -110,13 +110,13 @@ void CFeatureTreeGuiComp::OnGuiCreated()
 
 	Features->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
-	connect(this, &CFeatureTreeGuiComp::EmitFeatureTreeItemChanged, this, &CFeatureTreeGuiComp::OnFeatureTreeItemChanged, Qt::QueuedConnection);
+	connect(this, &CFeatureTreeGuiComp::EmitFeatureItemStateChanged, this, &CFeatureTreeGuiComp::OnFeatureItemStateChanged, Qt::QueuedConnection);
 }
 
 
 void CFeatureTreeGuiComp::OnGuiDestroyed()
 {
-	disconnect(this, &CFeatureTreeGuiComp::EmitFeatureTreeItemChanged, this, &CFeatureTreeGuiComp::OnFeatureTreeItemChanged);
+	disconnect(this, &CFeatureTreeGuiComp::EmitFeatureItemStateChanged, this, &CFeatureTreeGuiComp::OnFeatureItemStateChanged);
 
 	BaseClass::OnGuiDestroyed();
 }
@@ -148,10 +148,10 @@ QTreeWidgetItem* CFeatureTreeGuiComp::FindItem(const QByteArray& itemId)
 
 // private slots
 
-void CFeatureTreeGuiComp::OnFeatureTreeItemChanged(const QByteArray& itemId, bool isChecked)
+void CFeatureTreeGuiComp::OnFeatureItemStateChanged(const QByteArray& itemId, bool isChecked)
 {
-	if (m_itemSelectionChangeDelegateCompPtr.IsValid()){
-		m_itemSelectionChangeDelegateCompPtr->ItemSelectionChanged(itemId, isChecked);
+	if (m_featureItemStateHandlerCompPtr.IsValid()){
+		m_featureItemStateHandlerCompPtr->OnItemStateChanged(itemId, isChecked);
 	}
 }
 
@@ -159,7 +159,7 @@ void CFeatureTreeGuiComp::OnFeatureTreeItemChanged(const QByteArray& itemId, boo
 void CFeatureTreeGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, int column)
 {
 	if (column == 0 && item->data(0, DR_ITEM_TYPE) == IT_FEATURE){
-		Q_EMIT EmitFeatureTreeItemChanged(item->data(0, DR_ITEM_ID).toByteArray(), item->checkState(0) == Qt::Checked);
+		Q_EMIT EmitFeatureItemStateChanged(item->data(0, DR_ITEM_ID).toByteArray(), item->checkState(0) == Qt::Checked);
 	}
 }
 
