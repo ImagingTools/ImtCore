@@ -31,9 +31,7 @@ CProductLicensingInfoGuiComp::CProductLicensingInfoGuiComp()
 
 void CProductLicensingInfoGuiComp::OnItemStateChanged(const QByteArray& itemId, bool isChecked)
 {
-
 }
-
 
 
 // reimplemented (ibase::ICommandsProvider)
@@ -61,7 +59,7 @@ void CProductLicensingInfoGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 	const imtlic::ILicenseInfo* licenseInfoPtr = productLicensingInfoPtr->GetLicenseInfo(m_selectedLicenseId);
 	if (licenseInfoPtr != nullptr){
 		m_featurePackageCollectionProxy.SetSelectedIds(licenseInfoPtr->GetFeatures().toVector());
-	}	
+	}
 }
 
 

@@ -12,7 +12,6 @@ namespace imtlicgui
 /**
 	View delegate implementation related to the license info visualization and editing.
 	\ingroup LicenseManagement
-	\ingroup Collection
 */
 class CLicenseManagerViewDelegateComp: public imtgui::CStandardCollectionViewDelegateComp
 {
@@ -40,9 +39,6 @@ protected:
 
 	// reimplemented (CObjectCollectionViewDelegate)
 	virtual void SetupSummaryInformation() override;
-
-protected Q_SLOTS:
-	//virtual void OnDuplicateObject(const QByteArray& sourceObjectId, const QByteArray& destinationObjectId);
 
 private:
 	I_ATTR(QString, m_defaultLicenseNameAttrPtr);

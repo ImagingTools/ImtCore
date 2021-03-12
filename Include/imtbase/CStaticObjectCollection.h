@@ -18,7 +18,15 @@ class CStaticObjectCollection: public CObjectCollectionBase
 public:
 	typedef CObjectCollectionBase BaseClass;
 
+	/**
+		Replace an existing collection object with another one.
+	*/
 	virtual void SetObject(const QByteArray& objectId, istd::IChangeable* objectPtr);
+
+	/**
+		Register an existing object in the collection.
+		\note Object memory is not managed by the collection.
+	*/
 	virtual QByteArray RegisterObject(
 				const QByteArray& objectId,
 				const QByteArray& typeId,

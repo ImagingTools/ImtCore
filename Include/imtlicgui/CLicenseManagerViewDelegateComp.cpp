@@ -148,26 +148,7 @@ void CLicenseManagerViewDelegateComp::SetupSummaryInformation()
 
 	m_summaryInformationTypes.InsertItem("LicenseId", tr("License-ID"), "");
 	m_summaryInformationHeaders["LicenseId"] = HeaderInfo(true);
-
-	//m_summaryInformationTypes.InsertItem("Expiration", tr("Expiration"), "");
-	//m_summaryInformationHeaders["Expiration"] = HeaderInfo(false);
 }
-
-
-// protected slots
-
-//QByteArray CLicenseManagerViewDelegateComp::OnInsert()
-//{
-//	QByteArray objectId = BaseClass::OnInsert();
-//
-//	return objectId;
-//}
-//
-//
-//void OnDuplicateObject(const QByteArray& sourceObjectId, const QByteArray& destinationObjectId)
-//{
-//
-//}
 
 
 } // namespace imtlicgui
