@@ -63,28 +63,28 @@ void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*change
 		}
 	}
 
-	if (*m_showFeatureStatesAttrPtr){
-		imtbase::IMultiSelection::Ids selectedIds;
-			
-		imtbase::IMultiSelection* selectionPtr = dynamic_cast<imtbase::IMultiSelection*>(GetObservedObject());
-		if (selectionPtr != nullptr){
-			selectedIds = selectionPtr->GetSelectedIds();
-		}
+	//if (*m_showFeatureStatesAttrPtr){
+	//	imtbase::IMultiSelection::Ids selectedIds;
+	//		
+	//	imtbase::IMultiSelection* selectionPtr = dynamic_cast<imtbase::IMultiSelection*>(GetObservedObject());
+	//	if (selectionPtr != nullptr){
+	//		selectedIds = selectionPtr->GetSelectedIds();
+	//	}
 
-		int groupCount = Features->topLevelItemCount();
-		for (int groupIndex = 0; groupIndex < groupCount; groupIndex++){
-			QTreeWidgetItem* groupItemPtr = Features->topLevelItem(groupIndex);
+	//	int groupCount = Features->topLevelItemCount();
+	//	for (int groupIndex = 0; groupIndex < groupCount; groupIndex++){
+	//		QTreeWidgetItem* groupItemPtr = Features->topLevelItem(groupIndex);
 
-			int featureCount = groupItemPtr->childCount();
-			for (int featureIndex = 0; featureIndex < featureCount; featureIndex++){
-				QTreeWidgetItem* featureItemPtr = groupItemPtr->child(featureIndex);
+	//		int featureCount = groupItemPtr->childCount();
+	//		for (int featureIndex = 0; featureIndex < featureCount; featureIndex++){
+	//			QTreeWidgetItem* featureItemPtr = groupItemPtr->child(featureIndex);
 
-				QByteArray featureId = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
-				bool isFeatureSelected = selectedIds.contains(featureId);
-				featureItemPtr->setCheckState(0, isFeatureSelected ? Qt::Checked : Qt::Unchecked);
-			}
-		}
-	}
+	//			QByteArray featureId = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
+	//			bool isFeatureSelected = selectedIds.contains(featureId);
+	//			featureItemPtr->setCheckState(0, isFeatureSelected ? Qt::Checked : Qt::Unchecked);
+	//		}
+	//	}
+	//}
 
 	Features->expandAll();
 }

@@ -7,9 +7,8 @@
 
 // ImtCore includes
 #include <imtbase/IMultiSelection.h>
-#include <imtbase/IObjectCollection.h>
 #include <imtlic/IProductLicensingInfo.h>
-#include <imtlic/CFeaturePackageCollectionProxy.h>
+#include <imtlic/CFeaturePackageCollection.h>
 #include <imtlicgui/IFeatureItemStateHandler.h>
 #include <GeneratedFiles/imtlicgui/ui_CProductLicensingInfoGuiComp.h>
 
@@ -71,8 +70,8 @@ private:
 	void EnumerateDependencies(const QByteArrayList& featureIds);
 	void EnumerateMissingFeatures();
 	void BuildDependencyMap(const imtbase::IObjectCollection& packageCollection);
-	void ProcessChanges();
 
+	void UpdateFeaturePackageCollectionProxy();
 	void UpdateFeatureTreeItemEnableStates();
 	bool HasDependency(const FeatureDependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId);
 
@@ -119,10 +118,12 @@ private:
 	FeaturePackageCollectionObserver m_featurePackageCollectionObserver;
 	LicenseSelectionObserver m_licenseSelectionObserver;
 
-	imod::TModelWrap<imtlic::CFeaturePackageCollectionProxy> m_featurePackageCollectionProxy;
+	imod::TModelWrap<imtlic::CFeaturePackageCollection> m_featurePackageCollectionProxy;
+	imtlic::CFeaturePackageCollection m_featurePackageCollection;
 
 	// Selected license related members
 	QByteArray m_selectedLicenseId;
+	QByteArrayList m_selectedFeatures;
 	FeatureDependencyMap m_featureDependencyMap;
 };
 
