@@ -22,7 +22,9 @@ bool CFileCompressor::CompressFile(const QString& sourceFilePath, const QString&
 
 bool CFileCompressor::DecompressFile(const QString& sourceFilePath, const QString& targetFilePath) const
 {
-	return false;
+	QString filePath = JlCompress::extractFile(sourceFilePath, targetFilePath);
+	
+	return !filePath.isEmpty();
 }
 
 

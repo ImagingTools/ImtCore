@@ -463,7 +463,7 @@ imtlog::CTimeRange CGraphicsControllerComp::TimeRangeProvider::GetTimeRange() co
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CGraphicsControllerComp::GroupsDispatcher::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CGraphicsControllerComp::GroupsDispatcher::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (m_parentPtr != nullptr){
 		m_parentPtr->OnGroupChanged(modelId);

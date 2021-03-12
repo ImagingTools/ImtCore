@@ -141,7 +141,7 @@ qint64 CProductionRepresentationComp::CalculateIntervalBeginTime(qint64 timeStam
 
 // reimplemented (istd::IChangeable)
 
-bool CProductionRepresentationComp::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CProductionRepresentationComp::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CProductionRepresentationComp* sourcePtr = dynamic_cast<const CProductionRepresentationComp*>(&object);
 	if (sourcePtr != nullptr){

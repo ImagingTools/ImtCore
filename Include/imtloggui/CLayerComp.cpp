@@ -103,13 +103,13 @@ int CLayerComp::GetSelectedOptionIndex() const
 }
 
 
-bool CLayerComp::SetSelectedOptionIndex(int index)
+bool CLayerComp::SetSelectedOptionIndex(int /*index*/)
 {
 	return false;
 }
 
 
-iprm::ISelectionParam* CLayerComp::GetSubselection(int index) const
+iprm::ISelectionParam* CLayerComp::GetSubselection(int /*index*/) const
 {
 	return nullptr;
 }

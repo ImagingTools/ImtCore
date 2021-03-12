@@ -24,7 +24,6 @@ void CEventBasedRepresentationViewComp::OnUpdate(const istd::IChangeable::Change
 		if (m_eventItemFactoryCompPtr.IsValid() && m_positionProviderCompPtr.IsValid()){
 			for (int i = 0; i < messages.count(); i++){
 				IEventItem* itemPtr = nullptr;
-				int messageId = messages[i]->GetInformationId();
 				QDateTime messageTimeStamp = messages[i]->GetInformationTimeStamp();
 
 				itemPtr = m_eventItemFactoryCompPtr->CreateInstance(messages[i]);

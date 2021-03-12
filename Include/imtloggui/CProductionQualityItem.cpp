@@ -130,7 +130,6 @@ void CProductionQualityItem::PreparePointArrays()
 	CProductionRepresentationComp* modelPtr = dynamic_cast<CProductionRepresentationComp*>(m_modelPtr);
 
 	const imtloggui::CProductionRepresentationComp::Timeline& timeline = modelPtr->GetTimeline();
-	quint64 max = modelPtr->GetMaxCount();
 	const CProductionRepresentationComp::MaxCounters& maxCounters = modelPtr->GetMaxCounters();
 
 	qint64 beginTime = modelPtr->CalculateIntervalBeginTime(m_positionProviderPtr->GetVisibleBeginTime().toMSecsSinceEpoch());
@@ -141,7 +140,7 @@ void CProductionQualityItem::PreparePointArrays()
 	QRectF r = rect();
 
 	double granularity = modelPtr->GetGranularity();
-	double granularityS = modelPtr->GetGranularity() / 1000.;
+	double granularityInSecs = modelPtr->GetGranularity() / 1000.;
 
 	qint64 curTime = beginTime;
 	double curPos = mapFromScene(m_positionProviderPtr->GetScenePositionFromTime(QDateTime::fromMSecsSinceEpoch(curTime)), 0).x();
@@ -165,10 +164,10 @@ void CProductionQualityItem::PreparePointArrays()
 				relativeErrors = timeline[curTime].count > 0 ? timeline[curTime].errors * 1. / timeline[curTime].count : 0;
 			}
 
-			m_okPoints.append(QPointF(curPos + granularityS / 2, r.height() * relativeOks));
-			m_warningPoints.append(QPointF(curPos + granularityS / 2, r.height() * relativeWarnings));
-			m_nokPoints.append(QPointF(curPos + granularityS / 2, r.height() * relativeNoks));
-			m_errorsPoints.append(QPointF(curPos + granularityS / 2, r.height() * relativeErrors));
+			m_okPoints.append(QPointF(curPos + granularityInSecs / 2, r.height() * relativeOks));
+			m_warningPoints.append(QPointF(curPos + granularityInSecs / 2, r.height() * relativeWarnings));
+			m_nokPoints.append(QPointF(curPos + granularityInSecs / 2, r.height() * relativeNoks));
+			m_errorsPoints.append(QPointF(curPos + granularityInSecs / 2, r.height() * relativeErrors));
 
 			//if (relativeOks != 0 || relativeWarnings != 0 || relativeNoks != 0 || relativeErrors != 0){
 			//	Q_ASSERT(fabs(relativeOks + relativeWarnings + relativeNoks + relativeErrors - 1) < DBL_EPSILON);
@@ -183,10 +182,10 @@ void CProductionQualityItem::PreparePointArrays()
 				relativeErrors = maxCounters.errors > 0 ? timeline[curTime].errors * 1. / maxCounters.errors : 0;
 			}
 
-			QPointF pntOks = QPointF(curPos + granularityS / 2, r.bottom() - r.height() * relativeOks);
-			QPointF pntWarnings = QPointF(curPos + granularityS / 2, r.bottom() - r.height() * relativeWarnings);
-			QPointF pntNoks = QPointF(curPos + granularityS / 2, r.bottom() - r.height() * relativeNoks);
-			QPointF pntErrors = QPointF(curPos + granularityS / 2, r.bottom() - r.height() * relativeErrors);
+			QPointF pntOks = QPointF(curPos + granularityInSecs / 2, r.bottom() - r.height() * relativeOks);
+			QPointF pntWarnings = QPointF(curPos + granularityInSecs / 2, r.bottom() - r.height() * relativeWarnings);
+			QPointF pntNoks = QPointF(curPos + granularityInSecs / 2, r.bottom() - r.height() * relativeNoks);
+			QPointF pntErrors = QPointF(curPos + granularityInSecs / 2, r.bottom() - r.height() * relativeErrors);
 
 			m_okPoints.append(pntOks);
 			m_warningPoints.append(pntWarnings);
@@ -195,7 +194,7 @@ void CProductionQualityItem::PreparePointArrays()
 		}
 
 		curTime += granularity;
-		curPos += granularityS;
+		curPos += granularityInSecs;
 	}
 
 	if (m_style == DS_POLYLINE){
@@ -222,8 +221,7 @@ void CProductionQualityItem::DrawBars(QPainter* painter)
 	double scaleX = scene()->views().first()->viewportTransform().m11();
 	double scaleY = scene()->views().first()->viewportTransform().m22();
 
-	double granularity = modelPtr->GetGranularity();
-	double granularityS = modelPtr->GetGranularity() / 1000.;
+	double granularityInSecs = modelPtr->GetGranularity() / 1000.;
 
 	QRectF r = rect();
 
@@ -312,8 +310,8 @@ void CProductionQualityItem::DrawBars(QPainter* painter)
 
 		//QLinearGradient gradient;
 
-		double barLeftSide = -granularityS / 2 - 1 / scaleX;
-		double barWidth = granularityS + 1 / scaleX;
+		double barLeftSide = -granularityInSecs / 2 - 1 / scaleX;
+		double barWidth = granularityInSecs + 1 / scaleX;
 
 		if (m_okPoints[i].y() > 0){
 			//gradient = QLinearGradient(0, offset, 0, (offset - m_okPoints[i].y()));
@@ -379,8 +377,6 @@ void CProductionQualityItem::DrawBars(QPainter* painter)
 
 void CProductionQualityItem::DrawPolylines(QPainter* painter)
 {
-	CProductionRepresentationComp* modelPtr = dynamic_cast<CProductionRepresentationComp*>(m_modelPtr);
-
 	QRectF r = rect();
 
 	double scaleX = scene()->views().first()->viewportTransform().m11();
@@ -465,8 +461,6 @@ void CProductionQualityItem::DrawPolylines(QPainter* painter)
 
 void CProductionQualityItem::DrawLegend(QPainter* painter)
 {
-	CProductionRepresentationComp* modelPtr = dynamic_cast<CProductionRepresentationComp*>(m_modelPtr);
-
 	QRectF visibleRect = mapFromScene(scene()->views()[0]->mapToScene(scene()->views()[0]->viewport()->rect())).boundingRect();
 	QRectF r = rect();
 

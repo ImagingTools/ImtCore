@@ -28,13 +28,13 @@ int CGroupComp::GetSelectedOptionIndex() const
 }
 
 
-bool CGroupComp::SetSelectedOptionIndex(int index)
+bool CGroupComp::SetSelectedOptionIndex(int /*index*/)
 {
 	return false;
 }
 
 
-iprm::ISelectionParam* CGroupComp::GetSubselection(int index) const
+iprm::ISelectionParam* CGroupComp::GetSubselection(int /*index*/) const
 {
 	return nullptr;
 }
