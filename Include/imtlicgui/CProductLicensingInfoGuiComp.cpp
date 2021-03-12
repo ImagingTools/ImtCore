@@ -379,22 +379,6 @@ void CProductLicensingInfoGuiComp::UpdateFeaturePackageCollectionProxy()
 }
 
 
-// public methods of the embedded class FeaturePackageCollectionObserver
-
-CProductLicensingInfoGuiComp::FeaturePackageCollectionObserver::FeaturePackageCollectionObserver(CProductLicensingInfoGuiComp& parent)
-	:m_parent(parent)
-{
-}
-
-
-// reimplemented (imod::CSingleModelObserverBase)
-
-void CProductLicensingInfoGuiComp::FeaturePackageCollectionObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
-{
-	//m_parent.OnFeaturePackageCollectionUpdate();
-}
-
-
 // public methods of the embedded class FeatureSelectionObserver
 
 CProductLicensingInfoGuiComp::LicenseSelectionObserver::LicenseSelectionObserver(CProductLicensingInfoGuiComp& parent)

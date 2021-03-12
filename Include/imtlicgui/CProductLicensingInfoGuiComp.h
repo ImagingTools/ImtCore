@@ -98,17 +98,6 @@ private:
 	}
 
 private:
-	class FeaturePackageCollectionObserver: public imod::TSingleModelObserverBase<imtbase::IObjectCollection>
-	{
-	public:
-		FeaturePackageCollectionObserver(CProductLicensingInfoGuiComp& parent);
-
-		// reimplemented (imod::CSingleModelObserverBase)
-		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
-	private:
-		CProductLicensingInfoGuiComp& m_parent;
-	};
-
 	class LicenseSelectionObserver: public imod::TSingleModelObserverBase<imtbase::IMultiSelection>
 	{
 	public:
