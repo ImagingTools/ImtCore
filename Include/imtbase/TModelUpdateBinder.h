@@ -54,11 +54,12 @@ bool TModelUpdateBinder<ModelInterface, Parent>::RegisterObject(istd::IChangeabl
 {
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(dataPtr);
 	if (modelPtr != nullptr){
+		m_callbackMap[modelId] = callbackMethod;
 		if (BaseClass::RegisterModel(modelPtr, modelId)){
-			m_callbackMap[modelId] = callbackMethod;
-
 			return true;
 		}
+
+		m_callbackMap.remove(modelId);
 	}
 
 	return false;
