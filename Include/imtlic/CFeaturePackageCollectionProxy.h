@@ -5,7 +5,6 @@
 #include <imtbase/IMultiSelection.h>
 #include <imtbase/CStaticObjectCollection.h>
 #include <imtlic/IFeaturePackage.h>
-#include <imtlic/CFeaturePackage.h>
 
 
 namespace imtlic
