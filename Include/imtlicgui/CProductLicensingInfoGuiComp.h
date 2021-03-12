@@ -9,6 +9,7 @@
 #include <imtbase/IMultiSelection.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtlic/IProductLicensingInfo.h>
+#include <imtlicgui/CFeatureTreeManager.h>
 #include <GeneratedFiles/imtlicgui/ui_CProductLicensingInfoGuiComp.h>
 
 
@@ -23,6 +24,7 @@ namespace imtlicgui
 class CProductLicensingInfoGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
 						Ui::CProductLicensingInfoGuiComp, imtlic::IProductLicensingInfo>,
+			protected CFeatureTreeManager,
 			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
@@ -43,6 +45,9 @@ public:
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
+Q_SIGNALS:
+	void EmitFeatureTreeItemChanged();
+
 protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
@@ -53,52 +58,23 @@ protected:
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated();
 	virtual void OnGuiDestroyed();
-	virtual void OnGuiRetranslate() override;
 
 private:
-	typedef QMap<QByteArray, QByteArrayList> DependencyMap;
-
 	void OnFeaturePackageCollectionUpdate();
 	void OnLicenseSelectionChanged();
+	void EnumerateDependencies(const QByteArrayList& featureIds);
 	void EnumerateMissingFeatures();
-	void UpdateFeatureTree();
-	void UpdateFeatureTreeCheckStates();
-	QTreeWidgetItem* GetItem(const QByteArray& itemId);
 	void BuildDependencyMap(const imtbase::IObjectCollection& packageCollection);
-	bool HasDependency(const DependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId);
-	void ActivateDependencies(const QByteArrayList& featureIds);
+	void ProcessChanges();
+
+	void UpdateFeatureTreeItemEnableStates();
+	bool HasDependency(const FeatureDependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId);
 
 private Q_SLOTS:
+	void OnFeatureTreeItemChanged();
 	void on_Features_itemChanged(QTreeWidgetItem *item, int column);
 
 private:
-	enum DataRole
-	{
-		DR_ITEM_ID = Qt::UserRole,
-		DR_ITEM_TYPE
-	};
-
-	enum ItemType
-	{
-		IT_PACKAGE = 0,
-		IT_FEATURE
-	};
-
-	struct FeatureDescription
-	{
-		QByteArray id;
-		QString name;
-		QString description;
-	};
-
-	typedef QList<FeatureDescription> FeatureDescriptionList;
-
-	struct PackageDescription
-	{
-		FeatureDescriptionList features;
-		QString name;
-	};
-
 	class FeaturePackageCollectionObserver: public imod::TSingleModelObserverBase<imtbase::IObjectCollection>
 	{
 	public:
@@ -141,12 +117,7 @@ private:
 
 	// Selected license related members
 	QByteArray m_selectedLicenseId;
-	QByteArrayList m_featureIds;
-	QByteArrayList m_missingFeatureIds;
-
-	// Feature package collection related members
-	QMap<QByteArray, PackageDescription> m_packages;
-	DependencyMap m_packageDependenciyMap;
+	FeatureDependencyMap m_featureDependencyMap;
 };
 
 
