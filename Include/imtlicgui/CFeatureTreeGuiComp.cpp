@@ -14,9 +14,6 @@ namespace imtlicgui
 {
 
 
-// public methods
-
-
 // protected methods
 
 // reimplemented (iqtgui::TGuiObserverWrap)
@@ -29,36 +26,37 @@ void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*change
 	imtbase::ICollectionInfo::Ids packageCollectionIds = collectionPtr->GetElementIds();
 
 	for (const QByteArray& packageCollectionId : packageCollectionIds){
-		imtbase::IObjectCollection::DataPtr packageDataPtr;
-		if (collectionPtr->GetObjectData(packageCollectionId, packageDataPtr)){
-			imtlic::IFeaturePackage* packagePtr = dynamic_cast<imtlic::IFeaturePackage*>(packageDataPtr.GetPtr());
-			if (packagePtr != nullptr){
-				imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
+		const istd::IChangeable* constObjectPtr = collectionPtr->GetObjectPtr(packageCollectionId);
+		istd::IChangeable* objectPtr = const_cast<istd::IChangeable*>(constObjectPtr);
+		imtlic::IFeaturePackage* packagePtr = dynamic_cast<imtlic::IFeaturePackage*>(objectPtr);
 
-				if (!featureCollectionIds.isEmpty()){
-					QString packageName = collectionPtr->GetElementInfo(packageCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
-					// TODO: QByteArray packageId = packagePtr->GetPackageId();
+		if (packagePtr != nullptr){
+			imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
 
-					QTreeWidgetItem* packageItemPtr = new QTreeWidgetItem({packageName});
-					Features->addTopLevelItem(packageItemPtr);
-					packageItemPtr->setData(0, DR_ITEM_TYPE, IT_PACKAGE);
-					packageItemPtr->setData(0, DR_ITEM_ID, packageCollectionId);
-					if (*m_showFeatureStatesAttrPtr){
-						packageItemPtr->setFlags(packageItemPtr->flags() & (~Qt::ItemIsAutoTristate));
-					}
+			if (!featureCollectionIds.isEmpty()){
+				QString packageName = collectionPtr->GetElementInfo(packageCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
+				// TODO: QByteArray packageId = packagePtr->GetPackageId();
 
-					Features->addTopLevelItem(packageItemPtr);
+				QTreeWidgetItem* packageItemPtr = new QTreeWidgetItem({packageName});
+				Features->addTopLevelItem(packageItemPtr);
+				packageItemPtr->setData(0, DR_ITEM_TYPE, IT_PACKAGE);
+				packageItemPtr->setData(0, DR_ITEM_ID, packageCollectionId);
+				if (*m_showFeatureStatesAttrPtr){
+					packageItemPtr->setFlags(packageItemPtr->flags() | Qt::ItemIsAutoTristate);
+					packageItemPtr->setCheckState(0, Qt::Unchecked);
+				}
 
-					for (const QByteArray& featureCollectionId : featureCollectionIds){
-						const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
-						if (featureInfoPtr != nullptr){
-							QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({featureInfoPtr->GetFeatureName()});
-							packageItemPtr->addChild(featureItemPtr);
-							featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
-							featureItemPtr->setData(0, DR_ITEM_ID, featureInfoPtr->GetFeatureId());
+				Features->addTopLevelItem(packageItemPtr);
 
-							packageItemPtr->addChild(packageItemPtr);
-						}
+				for (const QByteArray& featureCollectionId : featureCollectionIds){
+					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
+					if (featureInfoPtr != nullptr){
+						QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({featureInfoPtr->GetFeatureName()});
+						packageItemPtr->addChild(featureItemPtr);
+						featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
+						featureItemPtr->setData(0, DR_ITEM_ID, featureInfoPtr->GetFeatureId());
+
+						packageItemPtr->addChild(packageItemPtr);
 					}
 				}
 			}
@@ -87,6 +85,8 @@ void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*change
 			}
 		}
 	}
+
+	Features->expandAll();
 }
 
 

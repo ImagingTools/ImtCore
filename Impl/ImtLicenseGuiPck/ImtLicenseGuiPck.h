@@ -15,6 +15,7 @@
 #include <imtlicgui/CFeaturePackageViewDelegateComp.h>
 #include <imtlicgui/CProductLicensingInfoCollectionViewDelegateComp.h>
 #include <imtlicgui/CProductInstanceInfoEditorComp.h>
+#include <imtlicgui/CFeatureTreeGuiComp.h>
 
 
 /**
@@ -32,6 +33,7 @@ typedef imtlicgui::CFeatureInfoEditorGuiComp FeatureInfoEditorGui;
 typedef imtlicgui::CFeaturePackageViewDelegateComp FeaturePackageViewDelegate;
 typedef imtlicgui::CProductLicensingInfoCollectionViewDelegateComp ProductLicensingInfoCollectionViewDelegate;
 typedef imtlicgui::CProductInstanceInfoEditorComp ProductInstanceInfoEditor;
+typedef imtlicgui::CFeatureTreeGuiComp FeatureTreeGui;
 
 
 } // namespace ImtLicenseGuiPck

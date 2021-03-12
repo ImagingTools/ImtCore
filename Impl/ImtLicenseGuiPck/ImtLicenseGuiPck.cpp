@@ -59,6 +59,11 @@ I_EXPORT_COMPONENT(
 			"Product instance editor",
 			"Licensing Product Instance Installation");
 
+I_EXPORT_COMPONENT(
+			FeatureTreeGui,
+			"Feature tree view",
+			"Licensing Feature Tree View Package");
+
 
 } // namespace ImtLicenseGuiPck
 

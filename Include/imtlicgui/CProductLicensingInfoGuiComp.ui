@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Product Licensing</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -41,7 +41,7 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -59,37 +59,30 @@
        </property>
       </layout>
      </widget>
-     <widget class="QTreeWidget" name="Features">
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+     <widget class="QWidget" name="Features" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <property name="columnCount">
-       <number>3</number>
-      </property>
-      <attribute name="headerVisible">
-       <bool>true</bool>
-      </attribute>
-      <attribute name="headerMinimumSectionSize">
-       <number>50</number>
-      </attribute>
-      <attribute name="headerDefaultSectionSize">
-       <number>150</number>
-      </attribute>
-      <column>
-       <property name="text">
-        <string notr="true">Feature Name</string>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
        </property>
-      </column>
-      <column>
-       <property name="text">
-        <string notr="true">Feature-ID</string>
+       <property name="leftMargin">
+        <number>0</number>
        </property>
-      </column>
-      <column>
-       <property name="text">
-        <string notr="true">Feature Description</string>
+       <property name="topMargin">
+        <number>0</number>
        </property>
-      </column>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+      </layout>
      </widget>
     </widget>
    </item>

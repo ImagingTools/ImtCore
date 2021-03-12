@@ -9,7 +9,8 @@
 #include <imtbase/IMultiSelection.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtlic/IProductLicensingInfo.h>
-#include <imtlicgui/CFeatureTreeManager.h>
+#include <imtlic/CFeaturePackageCollectionProxy.h>
+#include <imtlicgui/IFeatureItemStateHandler.h>
 #include <GeneratedFiles/imtlicgui/ui_CProductLicensingInfoGuiComp.h>
 
 
@@ -24,8 +25,8 @@ namespace imtlicgui
 class CProductLicensingInfoGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
 						Ui::CProductLicensingInfoGuiComp, imtlic::IProductLicensingInfo>,
-			protected CFeatureTreeManager,
-			virtual public ibase::ICommandsProvider
+			virtual public ibase::ICommandsProvider,
+			virtual public imtlicgui::IFeatureItemStateHandler
 {
 	Q_OBJECT
 
@@ -35,18 +36,21 @@ public:
 
 	I_BEGIN_COMPONENT(CProductLicensingInfoGuiComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider)
+		I_REGISTER_INTERFACE(imtlicgui::IFeatureItemStateHandler)
 		I_ASSIGN(m_featurePackageCollectionCompPtr, "FeaturePackageCollection", "Feature package collection", true, "");
 		I_ASSIGN(m_objectCollectionViewCompPtr, "ObjectCollectionView", "Object collection view", true, "ObjectCollectionView");
 		I_ASSIGN_TO(m_objectCollectionObserverCompPtr, m_objectCollectionViewCompPtr, true);
+		I_ASSIGN(m_featureTreeCompPtr, "FeatureTreeView", "Feature tree view", true, "FeatureTreeGui");
+		I_ASSIGN_TO(m_featureTreeObserverCompPtr, m_featureTreeCompPtr, true);
 	I_END_COMPONENT;
 
 	CProductLicensingInfoGuiComp();
 
+	// reimplemented (imtlicgui::IFeatureItemStateHandler)
+	virtual void OnItemStateChanged(const QByteArray& itemId, bool isChecked) override;
+	
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
-
-Q_SIGNALS:
-	void EmitFeatureTreeItemChanged();
 
 protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
@@ -60,6 +64,8 @@ protected:
 	virtual void OnGuiDestroyed();
 
 private:
+	typedef QMap<QByteArray, QByteArrayList> FeatureDependencyMap;
+
 	void OnFeaturePackageCollectionUpdate();
 	void OnLicenseSelectionChanged();
 	void EnumerateDependencies(const QByteArrayList& featureIds);
@@ -69,10 +75,6 @@ private:
 
 	void UpdateFeatureTreeItemEnableStates();
 	bool HasDependency(const FeatureDependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId);
-
-private Q_SLOTS:
-	void OnFeatureTreeItemChanged();
-	void on_Features_itemChanged(QTreeWidgetItem *item, int column);
 
 private:
 	class FeaturePackageCollectionObserver: public imod::TSingleModelObserverBase<imtbase::IObjectCollection>
@@ -108,12 +110,16 @@ private:
 	I_REF(imtbase::IObjectCollection, m_featurePackageCollectionCompPtr);
 	I_REF(iqtgui::IGuiObject, m_objectCollectionViewCompPtr);
 	I_REF(imod::IObserver, m_objectCollectionObserverCompPtr);
-	
+	I_REF(iqtgui::IGuiObject, m_featureTreeCompPtr);
+	I_REF(imod::IObserver, m_featureTreeObserverCompPtr);
+
 	bool m_isGuiModelInitialized;
 	bool m_isCollectionRepresentationInitialized;
 
 	FeaturePackageCollectionObserver m_featurePackageCollectionObserver;
 	LicenseSelectionObserver m_licenseSelectionObserver;
+
+	imod::TModelWrap<imtlic::CFeaturePackageCollectionProxy> m_featurePackageCollectionProxy;
 
 	// Selected license related members
 	QByteArray m_selectedLicenseId;

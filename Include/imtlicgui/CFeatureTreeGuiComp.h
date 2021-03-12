@@ -27,8 +27,6 @@ public:
 		I_ASSIGN(m_featureItemStateHandlerCompPtr, "FeatureItemStateHandler", "Feature item state handler", false, "");
 	I_END_COMPONENT;
 
-	CFeatureTreeGuiComp();
-
 Q_SIGNALS:
 	void EmitFeatureItemStateChanged(const QByteArray& itemId, bool isChecked);
 
