@@ -6,7 +6,8 @@
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
-#include <imtbase/IMultiSelection.h>
+#include <imtbase/CMultiSelection.h>
+#include <imtbase/TModelUpdateBinder.h>
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtlic/CFeaturePackageCollection.h>
 #include <imtlicgui/IFeatureItemStateHandler.h>
@@ -34,6 +35,14 @@ public:
 				Ui::CProductLicensingInfoGuiComp, imtlic::IProductLicensingInfo> BaseClass;
 
 	I_BEGIN_COMPONENT(CProductLicensingInfoGuiComp);
+		I_REGISTER_SUBELEMENT(SelectedFeatures)
+		I_REGISTER_SUBELEMENT_INTERFACE(SelectedFeatures, istd::IChangeable, ExtractSelectedFeatures)
+		I_REGISTER_SUBELEMENT_INTERFACE(SelectedFeatures, imod::IModel, ExtractSelectedFeatures)
+		I_REGISTER_SUBELEMENT_INTERFACE(SelectedFeatures, imtbase::IMultiSelection, ExtractSelectedFeatures)
+		I_REGISTER_SUBELEMENT(DisabledFeatures)
+		I_REGISTER_SUBELEMENT_INTERFACE(DisabledFeatures, istd::IChangeable, ExtractDisabledFeatures)
+		I_REGISTER_SUBELEMENT_INTERFACE(DisabledFeatures, imod::IModel, ExtractDisabledFeatures)
+		I_REGISTER_SUBELEMENT_INTERFACE(DisabledFeatures, imtbase::IMultiSelection, ExtractDisabledFeatures)
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider)
 		I_REGISTER_INTERFACE(imtlicgui::IFeatureItemStateHandler)
 		I_ASSIGN(m_featurePackageCollectionCompPtr, "FeaturePackageCollection", "Feature package collection", true, "");
@@ -65,15 +74,28 @@ protected:
 private:
 	typedef QMap<QByteArray, QByteArrayList> FeatureDependencyMap;
 
-	void OnFeaturePackageCollectionUpdate();
+	void OnFeaturePackageCollectionUpdate(
+				const istd::IChangeable::ChangeSet& /*changeSet*/,
+				const imtbase::IObjectCollection* /*productCollectionPtr*/);
 	void OnLicenseSelectionChanged();
 	void EnumerateDependencies(const QByteArrayList& featureIds);
 	void EnumerateMissingFeatures();
 	void BuildDependencyMap(const imtbase::IObjectCollection& packageCollection);
+	bool HasDependency(const FeatureDependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId);
 
 	void UpdateFeaturePackageCollectionProxy();
-	void UpdateFeatureTreeItemEnableStates();
-	bool HasDependency(const FeatureDependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId);
+
+	template <typename InterfaceType>
+	static InterfaceType* ExtractSelectedFeatures(CProductLicensingInfoGuiComp& component)
+	{
+		return &component.m_selectedFeaturesModel;
+	}
+
+	template <typename InterfaceType>
+	static InterfaceType* ExtractDisabledFeatures(CProductLicensingInfoGuiComp& component)
+	{
+		return &component.m_disabledFeaturesModel;
+	}
 
 private:
 	class FeaturePackageCollectionObserver: public imod::TSingleModelObserverBase<imtbase::IObjectCollection>
@@ -115,15 +137,20 @@ private:
 	bool m_isGuiModelInitialized;
 	bool m_isCollectionRepresentationInitialized;
 
-	FeaturePackageCollectionObserver m_featurePackageCollectionObserver;
+	//FeaturePackageCollectionObserver m_featurePackageCollectionObserver;
+	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CProductLicensingInfoGuiComp> m_featurePackageCollectionObserver;
 	LicenseSelectionObserver m_licenseSelectionObserver;
 
 	imod::TModelWrap<imtlic::CFeaturePackageCollection> m_featurePackageCollectionProxy;
 	imtlic::CFeaturePackageCollection m_featurePackageCollection;
 
+	imod::TModelWrap<imtbase::CMultiSelection> m_selectedFeaturesModel;
+	imod::TModelWrap<imtbase::CMultiSelection> m_disabledFeaturesModel;
+
 	// Selected license related members
 	QByteArray m_selectedLicenseId;
 	QByteArrayList m_selectedFeatures;
+	QByteArrayList m_missingFeatures;
 	FeatureDependencyMap m_featureDependencyMap;
 };
 

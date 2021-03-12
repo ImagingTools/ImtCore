@@ -31,6 +31,7 @@ CProductLicensingInfoGuiComp::CProductLicensingInfoGuiComp()
 
 void CProductLicensingInfoGuiComp::OnItemStateChanged(const QByteArray& itemId, bool isChecked)
 {
+	
 }
 
 
@@ -60,6 +61,8 @@ void CProductLicensingInfoGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 	if (licenseInfoPtr != nullptr){
 		m_selectedFeatures = licenseInfoPtr->GetFeatures();
 	}
+
+	UpdateFeaturePackageCollectionProxy();
 }
 
 
@@ -72,9 +75,9 @@ void CProductLicensingInfoGuiComp::OnGuiModelAttached()
 		Q_ASSERT(licensingInfoModelPtr != nullptr);
 
 		imod::IModel* featurePackageCollectionModelPtr = const_cast<imod::IModel*>(
-			dynamic_cast<const imod::IModel*>(m_featurePackageCollectionCompPtr.GetPtr()));
+					dynamic_cast<const imod::IModel*>(m_featurePackageCollectionCompPtr.GetPtr()));
 		if (featurePackageCollectionModelPtr != nullptr){
-			featurePackageCollectionModelPtr->AttachObserver(&m_featurePackageCollectionObserver);
+			m_featurePackageCollectionObserver.RegisterObject(m_featurePackageCollectionCompPtr.GetPtr(), &CProductLicensingInfoGuiComp::OnFeaturePackageCollectionUpdate);
 		}
 
 		if (licensingInfoModelPtr->AttachObserver(m_objectCollectionObserverCompPtr.GetPtr())){
@@ -101,7 +104,7 @@ void CProductLicensingInfoGuiComp::OnGuiModelDetached()
 		imod::IModel* licensingInfoModelPtr = GetObservedModel();
 		Q_ASSERT(licensingInfoModelPtr != nullptr);
 
-		m_featurePackageCollectionObserver.EnsureModelDetached();
+		m_featurePackageCollectionObserver.UnregisterAllObjects();
 
 		if (licensingInfoModelPtr->IsAttached(m_objectCollectionObserverCompPtr.GetPtr())){
 			licensingInfoModelPtr->DetachObserver(m_objectCollectionObserverCompPtr.GetPtr());
@@ -172,9 +175,10 @@ void CProductLicensingInfoGuiComp::OnGuiDestroyed()
 
 // private methods
 
-void CProductLicensingInfoGuiComp::OnFeaturePackageCollectionUpdate()
+void CProductLicensingInfoGuiComp::OnFeaturePackageCollectionUpdate(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const imtbase::IObjectCollection* collectionPtr)
 {
-	imtbase::IObjectCollection* collectionPtr = m_featurePackageCollectionObserver.GetObservedObject();
 	imtbase::ICollectionInfo::Ids packageCollectionIds = collectionPtr->GetElementIds();
 
 	BuildDependencyMap(*collectionPtr);
@@ -204,25 +208,23 @@ void CProductLicensingInfoGuiComp::OnFeaturePackageCollectionUpdate()
 
 void CProductLicensingInfoGuiComp::OnLicenseSelectionChanged()
 {
-	//m_selectedLicenseId.clear();
-	//m_selectedFeatures.clear();
-	//m_isFeatureTreeUpdateEnabled = false;
+	m_selectedLicenseId.clear();
+	m_selectedFeatures.clear();
 
-	//imtbase::IMultiSelection::Ids licenseIds = m_licenseSelectionObserver.GetObservedObject()->GetSelectedIds();
+	imtbase::IMultiSelection::Ids licenseIds = m_licenseSelectionObserver.GetObservedObject()->GetSelectedIds();
 
-	//if (licenseIds.count() == 1){
-	//	imtlic::IProductLicensingInfo* productLicensingInfo = GetObservedObject();
-	//	if (productLicensingInfo != nullptr){
-	//		const imtlic::ILicenseInfo* licenseInfo = productLicensingInfo->GetLicenseInfo(licenseIds.first());
-	//		if (licenseInfo != nullptr){
-	//			m_selectedLicenseId = licenseInfo->GetLicenseId();
-	//			m_selectedFeatures = licenseInfo->GetFeatures();
-	//			m_isFeatureTreeUpdateEnabled = true;
-	//		}
-	//	}
-	//}
+	if (licenseIds.count() == 1){
+		imtlic::IProductLicensingInfo* productLicensingInfo = GetObservedObject();
+		if (productLicensingInfo != nullptr){
+			const imtlic::ILicenseInfo* licenseInfo = productLicensingInfo->GetLicenseInfo(licenseIds.first());
+			if (licenseInfo != nullptr){
+				m_selectedLicenseId = licenseInfo->GetLicenseId();
+				m_selectedFeatures = licenseInfo->GetFeatures();
+			}
+		}
+	}
 
-	//ProcessChanges();
+	UpdateFeaturePackageCollectionProxy();
 }
 
 
@@ -251,63 +253,34 @@ void CProductLicensingInfoGuiComp::EnumerateDependencies(const QByteArrayList& f
 
 void CProductLicensingInfoGuiComp::EnumerateMissingFeatures()
 {
-	//QByteArrayList allFeatureIds;
+	QByteArrayList allFeatureIds;
 
-	//imtbase::ICollectionInfo::Ids packageCollectionIds = m_featurePackageCollection.GetElementIds();
+	imtbase::ICollectionInfo::Ids packageCollectionIds = m_featurePackageCollection.GetElementIds();
 
-	//for (const QByteArray& packageCollectionId : packageCollectionIds){
-	//	const istd::IChangeable* constObjectPtr = m_featurePackageCollection.GetObjectPtr(packageCollectionId);
-	//	istd::IChangeable* objectPtr = const_cast<istd::IChangeable*>(constObjectPtr);
-	//	imtlic::IFeaturePackage* packagePtr = dynamic_cast<imtlic::IFeaturePackage*>(objectPtr);
+	for (const QByteArray& packageCollectionId : packageCollectionIds){
+		const istd::IChangeable* constObjectPtr = m_featurePackageCollection.GetObjectPtr(packageCollectionId);
+		istd::IChangeable* objectPtr = const_cast<istd::IChangeable*>(constObjectPtr);
+		imtlic::IFeaturePackage* packagePtr = dynamic_cast<imtlic::IFeaturePackage*>(objectPtr);
 
-	//	if (packagePtr != nullptr){
-	//		imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
+		if (packagePtr != nullptr){
+			imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
 
-	//		for (const QByteArray& featureCollectionId : featureCollectionIds){
-	//			const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
-	//			if (featureInfoPtr != nullptr){
-	//				QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({featureInfoPtr->GetFeatureName()});
-	//				packageItemPtr->addChild(featureItemPtr);
-	//				featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
-	//				featureItemPtr->setData(0, DR_ITEM_ID, featureInfoPtr->GetFeatureId());
+			for (const QByteArray& featureCollectionId : featureCollectionIds){
+				const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
+				if (featureInfoPtr != nullptr){
+					allFeatureIds.append(featureInfoPtr->GetFeatureId());
+				}
+			}
+		}
+	}
 
-	//				packageItemPtr->addChild(packageItemPtr);
-	//			}
-	//		}
-	//	}
-	//}
+	m_missingFeatures.clear();
 
-	//
-	//QByteArrayList missingFeatureIds;
-
-	//for (const QByteArray& featureId : m_selectedFeatures){
-	//	if (!allFeatureIds.contains(featureId)){
-	//		m_missingFeatures.push_back(featureId);
-	//	}
-	//}
-}
-
-
-void CProductLicensingInfoGuiComp::UpdateFeatureTreeItemEnableStates()
-{
-	//QSignalBlocker blocker(Features);
-
-	//for (const QByteArray& fromId : m_selectedFeatures){
-	//	for (const QByteArray& toId : m_selectedFeatures){
-	//		if (HasDependency(m_featureDependencyMap, toId, fromId)){
-	//			QTreeWidgetItem* featureItemPtr = GetItem(fromId);
-	//			if (featureItemPtr != nullptr){
-	//				featureItemPtr->setFlags(featureItemPtr->flags() & (~Qt::ItemIsEnabled));
-	//			}
-	//		}
-	//	}
-	//}
-}
-
-
-void CProductLicensingInfoGuiComp::UpdateFeaturePackageCollectionProxy()
-{
-	m_featurePackageCollectionProxy.CopyFrom(m_featurePackageCollection);
+	for (const QByteArray& featureId : m_selectedFeatures){
+		if (!allFeatureIds.contains(featureId)){
+			m_missingFeatures.push_back(featureId);
+		}
+	}
 }
 
 
@@ -357,6 +330,55 @@ bool CProductLicensingInfoGuiComp::HasDependency(const FeatureDependencyMap& dep
 }
 
 
+void CProductLicensingInfoGuiComp::UpdateFeaturePackageCollectionProxy()
+{
+	m_featurePackageCollectionProxy.CopyFrom(m_featurePackageCollection);
+
+	EnumerateMissingFeatures();
+	EnumerateDependencies(m_selectedFeatures);
+
+	QByteArrayList selectedFeatures = m_selectedFeatures;
+
+	if (!m_missingFeatures.isEmpty()){
+		imtlic::CFeaturePackage missingPackage;
+		missingPackage.SetPackageId("MISSING_FEATURES");
+		
+		for (const QByteArray& featureId : m_missingFeatures){
+			imtlic::CFeatureInfo featureInfo;
+			featureInfo.SetFeatureId(featureId);
+			featureInfo.SetFeatureName(tr("ID: %1").arg(QString(featureId)));
+			missingPackage.InsertNewObject(
+						"FeatureInfo",
+						tr("ID: %1").arg(QString(featureId)),
+						"",
+						&featureInfo);
+
+			selectedFeatures.append(featureId);
+		}
+
+		m_featurePackageCollectionProxy.InsertNewObject(
+					"FeaturePackage",
+					tr("Missing features"),
+					"",
+					&missingPackage);
+	}
+
+	m_selectedFeaturesModel.SetSelectedIds(selectedFeatures.toVector());
+
+	// Disable dependent features
+	QByteArrayList disabledFeatures;
+	for (const QByteArray& fromId : m_selectedFeatures){
+		for (const QByteArray& toId : m_selectedFeatures){
+			if (HasDependency(m_featureDependencyMap, fromId, toId)){
+				disabledFeatures.append(toId);
+			}
+		}
+	}
+
+	m_disabledFeaturesModel.SetSelectedIds(disabledFeatures.toVector());
+}
+
+
 // public methods of the embedded class FeaturePackageCollectionObserver
 
 CProductLicensingInfoGuiComp::FeaturePackageCollectionObserver::FeaturePackageCollectionObserver(CProductLicensingInfoGuiComp& parent)
@@ -369,7 +391,7 @@ CProductLicensingInfoGuiComp::FeaturePackageCollectionObserver::FeaturePackageCo
 
 void CProductLicensingInfoGuiComp::FeaturePackageCollectionObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	m_parent.OnFeaturePackageCollectionUpdate();
+	//m_parent.OnFeaturePackageCollectionUpdate();
 }
 
 
