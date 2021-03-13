@@ -28,8 +28,6 @@ CFeatureTreeGuiComp::CFeatureTreeGuiComp()
 
 void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	QSignalBlocker blocker(Features);
-
 	Features->clear();
 
 	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
@@ -116,15 +114,11 @@ void CFeatureTreeGuiComp::OnGuiCreated()
 	BaseClass::OnGuiCreated();
 
 	Features->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-
-	connect(this, &CFeatureTreeGuiComp::EmitFeatureItemStateChanged, this, &CFeatureTreeGuiComp::OnFeatureItemStateChanged, Qt::QueuedConnection);
 }
 
 
 void CFeatureTreeGuiComp::OnGuiDestroyed()
 {
-	disconnect(this, &CFeatureTreeGuiComp::EmitFeatureItemStateChanged, this, &CFeatureTreeGuiComp::OnFeatureItemStateChanged);
-
 	BaseClass::OnGuiDestroyed();
 }
 
@@ -210,8 +204,12 @@ void CFeatureTreeGuiComp::OnFeatureStateChanged(
 
 void CFeatureTreeGuiComp::OnFeatureItemStateChanged(const QByteArray& itemId, bool isChecked)
 {
-	if (m_featureItemStateHandlerCompPtr.IsValid()){
-		m_featureItemStateHandlerCompPtr->OnItemStateChanged(itemId, isChecked);
+	if (!IsUpdateBlocked()){
+		UpdateBlocker updateBlocker(this);
+
+		if (m_featureItemStateHandlerCompPtr.IsValid()){
+			m_featureItemStateHandlerCompPtr->OnItemStateChanged(itemId, isChecked);
+		}
 	}
 }
 
@@ -219,7 +217,7 @@ void CFeatureTreeGuiComp::OnFeatureItemStateChanged(const QByteArray& itemId, bo
 void CFeatureTreeGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, int column)
 {
 	if (column == 0 && item->data(0, DR_ITEM_TYPE) == IT_FEATURE){
-		Q_EMIT EmitFeatureItemStateChanged(item->data(0, DR_ITEM_ID).toByteArray(), item->checkState(0) == Qt::Checked);
+		OnFeatureItemStateChanged(item->data(0, DR_ITEM_ID).toByteArray(), item->checkState(0) == Qt::Checked);
 	}
 }
 

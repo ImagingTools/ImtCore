@@ -35,9 +35,6 @@ public:
 
 	CFeatureTreeGuiComp();
 
-Q_SIGNALS:
-	void EmitFeatureItemStateChanged(const QByteArray& itemId, bool isChecked);
-
 protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
