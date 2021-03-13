@@ -417,10 +417,12 @@ void CCustomLayoutWidget::paintEvent(QPaintEvent* /*eventPtr*/)
 
 void CCustomLayoutWidget::OnAddWidget()
 {
-	QAction *action = dynamic_cast<QAction*>(sender());
-	if (action){
+	QAction* actionPtr = dynamic_cast<QAction*>(sender());
+	if (actionPtr != nullptr){
 		QList<QAction*> actions = AddWidgets->actions();
-		int index = actions.indexOf(action) - 1;
+
+		int index = actions.indexOf(actionPtr) - 1;
+
 		Q_EMIT m_hierarchicalLayoutWidget.EmitAddWidget(m_id, index);
 	}
 }
@@ -450,19 +452,19 @@ void CCustomLayoutWidget::OnSplitHorizontal()
 }
 
 
-void  CCustomLayoutWidget::OnAlignLeft()
+void CCustomLayoutWidget::OnAlignLeft()
 {
 	Q_EMIT m_hierarchicalLayoutWidget.EmitChangeAlignTitle(m_id, ILayout::AT_LEFT);
 }
 
 
-void  CCustomLayoutWidget::OnAlignCenter()
+void CCustomLayoutWidget::OnAlignCenter()
 {
 	Q_EMIT m_hierarchicalLayoutWidget.EmitChangeAlignTitle(m_id, ILayout::AT_H_CENTER);
 }
 
 
-void  CCustomLayoutWidget::OnAlignRight()
+void CCustomLayoutWidget::OnAlignRight()
 {
 	Q_EMIT m_hierarchicalLayoutWidget.EmitChangeAlignTitle(m_id, ILayout::AT_RIGHT);
 }
