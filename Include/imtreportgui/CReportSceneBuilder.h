@@ -17,6 +17,7 @@
 
 
 class QTableWidgetItem;
+class QAbstractGraphicsShapeItem;
 
 
 namespace imtreportgui

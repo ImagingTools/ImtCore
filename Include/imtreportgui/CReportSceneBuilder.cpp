@@ -140,7 +140,7 @@ void CReportSceneBuilder::CreateLabel(const imtreport::CTextLabelElement& pageEl
 		sceneElementPtr->setTextWidth(rect.width());
 
 	sceneElementPtr->setFont(ConvertToQFont(pageElement.GetFont()));
-	sceneElementPtr->setDefaultTextColor(pageElement.GetFillColor());
+	sceneElementPtr->setDefaultTextColor(pageElement.GetGraphicsAttributes().fillColor);
 
 	QTextOption option = sceneElementPtr->document()->defaultTextOption();
 	option.setAlignment(pageElement.GetAlignment());
@@ -308,9 +308,9 @@ qreal CReportSceneBuilder::GetTextTableRowHeight(const imtreport::CTextTable& ta
 
 void CReportSceneBuilder::SetShapePenAndBrush(const imtreport::IGraphicsElement& pageElement, QAbstractGraphicsShapeItem& sceneElement)
 {
-	QPen pen(pageElement.GetStrokeColor());
+	QPen pen(pageElement.GetGraphicsAttributes().strokeColor);
 
-	double strokeWidth = pageElement.GetStrokeWidth();
+	double strokeWidth = pageElement.GetGraphicsAttributes().strokeWidth;
 	if (strokeWidth >= 0){
 		pen.setWidthF(strokeWidth);
 	}
@@ -319,7 +319,7 @@ void CReportSceneBuilder::SetShapePenAndBrush(const imtreport::IGraphicsElement&
 	}
 
 	sceneElement.setPen(pen);
-	sceneElement.setBrush(pageElement.GetFillColor());
+	sceneElement.setBrush(pageElement.GetGraphicsAttributes().fillColor);
 }
 
 

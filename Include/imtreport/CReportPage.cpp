@@ -104,7 +104,11 @@ QByteArray CReportPage::AddRectangle(const i2d::CRectangle& rect, const QColor& 
 	element->SetRight(rect.GetRight());
 	element->SetTop(rect.GetTop());
 	element->SetBottom(rect.GetBottom());
-	element->SetFillColor(fillColor);
+
+	IGraphicsElement::GraphicsAttributes attributes;
+	attributes.fillColor = fillColor;
+
+	element->SetGraphicsAttributes(attributes);
 
 	return uuid;
 }
@@ -121,7 +125,10 @@ QByteArray CReportPage::AddPolygone(const QVector<i2d::CVector2d>& points, const
 		element->InsertNode(point);
 	}
 
-	element->SetFillColor(fillColor);
+	IGraphicsElement::GraphicsAttributes attributes;
+	attributes.fillColor = fillColor;
+
+	element->SetGraphicsAttributes(attributes);
 
 	return uuid;
 }

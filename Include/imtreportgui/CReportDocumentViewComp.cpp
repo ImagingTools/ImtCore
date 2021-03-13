@@ -6,6 +6,7 @@
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsRectItem>
 #include <QtGui/QScreen>
 
 // ImtCore includes

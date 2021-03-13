@@ -104,7 +104,7 @@ istd::IChangeable* TGraphicsElement<Object2dType>::CloneMe(CompatibilityMode mod
 		return clonePtr.PopPtr();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -118,9 +118,11 @@ typedef TGraphicsElement<CImageRectangle> CImageRectangleElement;
 class CTextLabelElement : public TGraphicsElement<CTextLabel>
 {
 public:
+	typedef TGraphicsElement<CTextLabel> BaseClass;
+
 	CTextLabelElement()
 	{
-		SetStrokeWidth(-1);
+		m_graphicsAttributes.strokeWidth = -1;
 	}
 };
 

@@ -12,64 +12,21 @@ namespace imtreport
 {
 
 
-CGraphicsElementBase::CGraphicsElementBase()
-	:m_fillColor(Qt::black),
-	m_strokeColor(Qt::black),
-	m_strokeWidth(0)
-{
-}
-
+// public methods
 
 // reimplemented (IGraphicsElement)
 
-QColor CGraphicsElementBase::GetFillColor() const
+IGraphicsElement::GraphicsAttributes CGraphicsElementBase::GetGraphicsAttributes() const
 {
-	return m_fillColor;
+	return m_graphicsAttributes;
 }
 
 
-void CGraphicsElementBase::SetFillColor(const QColor& fillColor)
+void CGraphicsElementBase::SetGraphicsAttributes(const GraphicsAttributes& graphicsAttributes)
 {
-	if (m_fillColor != fillColor)
-	{
-		istd::CChangeNotifier changeNotifier(this);
+	istd::CChangeNotifier changeNotifier(this);
 
-		m_fillColor = fillColor;
-	}
-}
-
-
-QColor CGraphicsElementBase::GetStrokeColor() const
-{
-	return m_strokeColor;
-}
-
-
-void CGraphicsElementBase::SetStrokeColor(const QColor& strokeColor)
-{
-	if (m_strokeColor != strokeColor)
-	{
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_strokeColor = strokeColor;
-	}
-}
-
-
-double CGraphicsElementBase::GetStrokeWidth() const
-{
-	return m_strokeWidth;
-}
-
-
-void CGraphicsElementBase::SetStrokeWidth(double strokeWidth)
-{
-	if (m_strokeWidth != strokeWidth)
-	{
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_strokeWidth = strokeWidth;
-	}
+	m_graphicsAttributes = graphicsAttributes;
 }
 
 
@@ -84,11 +41,11 @@ bool CGraphicsElementBase::Serialize(iser::IArchive& archive)
 	static iser::CArchiveTag fillColorTag("FillColor", "Color used for object filling", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(fillColorTag);
 
-	QRgb fillcColorValue = m_fillColor.rgba();
+	QRgb fillcColorValue = m_graphicsAttributes.fillColor.rgba();
 	retVal = retVal && archive.Process(fillcColorValue);
 	if (retVal && !archive.IsStoring())
 	{
-		m_fillColor.setRgba(fillcColorValue);
+		m_graphicsAttributes.fillColor.setRgba(fillcColorValue);
 	}
 
 	retVal = retVal && archive.EndTag(fillColorTag);
@@ -96,17 +53,17 @@ bool CGraphicsElementBase::Serialize(iser::IArchive& archive)
 	static iser::CArchiveTag strokeColorTag("StrokeColor", "Color used for object stroking", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(strokeColorTag);
 
-	QRgb strokeColorValue = m_strokeColor.rgba();
+	QRgb strokeColorValue = m_graphicsAttributes.strokeColor.rgba();
 	retVal = retVal && archive.Process(strokeColorValue);
 	if (retVal && !archive.IsStoring()){
-		m_strokeColor.setRgba(strokeColorValue);
+		m_graphicsAttributes.strokeColor.setRgba(strokeColorValue);
 	}
 
 	retVal = retVal && archive.EndTag(strokeColorTag);
 
 	static iser::CArchiveTag strokeWidthTag("StrokeWidth", "Width used for object stroking", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(strokeWidthTag);
-	retVal = retVal && archive.Process(m_strokeWidth);
+	retVal = retVal && archive.Process(m_graphicsAttributes.strokeWidth);
 	retVal = retVal && archive.EndTag(strokeWidthTag);
 
 	return retVal;
@@ -121,9 +78,7 @@ bool CGraphicsElementBase::CopyFrom(const istd::IChangeable& object, Compatibili
 	if (sourcePtr != NULL){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_fillColor = sourcePtr->m_fillColor;
-		m_strokeColor = sourcePtr->m_strokeColor;
-		m_strokeWidth = sourcePtr->m_strokeWidth;
+		m_graphicsAttributes = sourcePtr->m_graphicsAttributes;
 
 		return true;
 	}

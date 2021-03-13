@@ -15,15 +15,9 @@ namespace imtreport
 class CGraphicsElementBase: virtual public IGraphicsElement
 {
 public:
-	CGraphicsElementBase();
-
 	// reimplemented (IGraphicsElement)
-	virtual QColor GetFillColor() const;
-	virtual void SetFillColor(const QColor& fillColor);
-	virtual QColor GetStrokeColor() const;
-	virtual void SetStrokeColor(const QColor& strokeColor);
-	virtual double GetStrokeWidth() const;
-	virtual void SetStrokeWidth(double strokeWidth);
+	virtual GraphicsAttributes GetGraphicsAttributes() const override;
+	virtual void SetGraphicsAttributes(const GraphicsAttributes& graphicsAttributes) override;
 
 	// reimplemented (iser::ISerializeable)
 	virtual bool Serialize(iser::IArchive& archive);
@@ -31,10 +25,8 @@ public:
 	// reimplemented (istd::IChangeable)
 	virtual bool CopyFrom(const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS);
 
-private:
-	QColor m_fillColor;
-	QColor m_strokeColor;
-	double m_strokeWidth;
+protected:
+	GraphicsAttributes m_graphicsAttributes;
 };
 
 
