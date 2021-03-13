@@ -10,13 +10,20 @@
 extern void qt_blurImage(QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0);
 
 
-static QWindow *qt_getWindow(const QWidget *widget)
+static QWindow* GetWindowHandle(const QWidget* widgetPtr)
 {
-	return widget ? widget->window()->windowHandle() : 0;
+	if (widgetPtr != nullptr){
+		QWidget* windowPtr = widgetPtr->window();
+		if (windowPtr != nullptr){
+			return windowPtr->windowHandle();
+		}
+	}
+
+	return nullptr;
 }
 
 
-static void drawArrow(
+static void DrawArrow(
 			const QStyle* style,
 			const QStyleOptionToolButton* toolButtonStyleOptionPtr,
 			const QRect& rect,
@@ -84,6 +91,8 @@ void CImtStyle::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption * 
 
 void CImtStyle::drawControl(ControlElement element, const QStyleOption * option, QPainter * painter, const QWidget * widget) const
 {
+	const QStyleOptionToolButton* toolButtonStyleOptionPtr = qstyleoption_cast<const QStyleOptionToolButton *>(option);
+
 	switch (element){
 		case CE_ToolButtonLabel:
 			if (widget != nullptr){
@@ -98,7 +107,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 				return;
 			}
 
-			if (const QStyleOptionToolButton* toolButtonStyleOptionPtr = qstyleoption_cast<const QStyleOptionToolButton *>(option)){
+			if (toolButtonStyleOptionPtr != nullptr){
 				QRect rect = toolButtonStyleOptionPtr->rect;
 				int shiftX = 0;
 				int shiftY = 0;
@@ -128,7 +137,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 
 					QSize iconSize = pixmapRect.size().boundedTo(toolButtonStyleOptionPtr->iconSize);
 
-					pm = toolButtonStyleOptionPtr->icon.pixmap(qt_getWindow(widget), iconSize, mode, state);
+					pm = toolButtonStyleOptionPtr->icon.pixmap(GetWindowHandle(widget), iconSize, mode, state);
 
 					double deviceRatio = pm.devicePixelRatio();
 
@@ -205,12 +214,12 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							path = QPainterPath();
 							path.addRoundedRect(borderRect.adjusted(0, 0, 0, 0), 6, 6);
 
-							//if (toolButtonStyleOptionPtr->state & (State_Sunken | State_On)){
-							//	painter->fillPath(path, QColor(205, 205, 207));
-							//}
-//							else {
+							if (toolButtonStyleOptionPtr->state & (State_Sunken | State_On)){
+								painter->fillPath(path, QColor(106, 106, 108));
+							}
+							else {
 								painter->fillPath(path, QColor(245, 245, 247));
-//							}
+							}
 
 							painter->restore();
 
@@ -218,7 +227,7 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 						}
 					}
 					else{
-						drawArrow(proxy(), toolButtonStyleOptionPtr, pixmapRect, painter, widget);
+						DrawArrow(proxy(), toolButtonStyleOptionPtr, pixmapRect, painter, widget);
 					}
 
 					int alignment = Qt::TextShowMnemonic;
@@ -264,13 +273,16 @@ QRect CImtStyle::subElementRect(SubElement subElement, const QStyleOption * opti
 QSize CImtStyle::sizeFromContents(QStyle::ContentsType type, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const
 {
 	QSize size = BaseClass::sizeFromContents(type, option, contentsSize, widget);
-	if (const QStyleOptionToolButton* toolButtonStyleOptionPtr = qstyleoption_cast<const QStyleOptionToolButton *>(option)){
+
+	const QStyleOptionToolButton* toolButtonStyleOptionPtr = qstyleoption_cast<const QStyleOptionToolButton *>(option);
+	if (toolButtonStyleOptionPtr != nullptr) {
 		if (toolButtonStyleOptionPtr->toolButtonStyle == Qt::ToolButtonTextUnderIcon){
 			int iconWidth = toolButtonStyleOptionPtr->iconSize.width();
 
 			size.setWidth(qMax(size.width(), 3 * iconWidth));
 		}
 	}
+
 	return size;
 }
 
