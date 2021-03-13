@@ -51,6 +51,7 @@ void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*change
 				Features->addTopLevelItem(packageItemPtr);
 				packageItemPtr->setData(0, DR_ITEM_TYPE, IT_PACKAGE);
 				packageItemPtr->setData(0, DR_ITEM_ID, packageCollectionId);
+
 				if (*m_showFeatureStatesAttrPtr){
 					packageItemPtr->setFlags(packageItemPtr->flags() | Qt::ItemIsAutoTristate);
 					packageItemPtr->setCheckState(0, Qt::Unchecked);
@@ -62,11 +63,15 @@ void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*change
 					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
 					if (featureInfoPtr != nullptr){
 						QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({featureInfoPtr->GetFeatureName()});
-						packageItemPtr->addChild(featureItemPtr);
 						featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
 						featureItemPtr->setData(0, DR_ITEM_ID, featureInfoPtr->GetFeatureId());
 
-						packageItemPtr->addChild(packageItemPtr);
+						packageItemPtr->addChild(featureItemPtr);
+
+						if (*m_showFeatureStatesAttrPtr) {
+							featureItemPtr->setFlags(featureItemPtr->flags() | Qt::ItemIsAutoTristate);
+							featureItemPtr->setCheckState(0, Qt::Unchecked);
+						}
 					}
 				}
 			}
