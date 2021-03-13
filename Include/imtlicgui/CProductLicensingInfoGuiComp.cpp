@@ -331,43 +331,48 @@ bool CProductLicensingInfoGuiComp::HasDependency(const FeatureDependencyMap& dep
 
 void CProductLicensingInfoGuiComp::UpdateFeaturePackageCollectionProxy()
 {
-	if (m_selectedLicenseId.isEmpty()){
-		m_featurePackageCollectionProxy.ResetData();
-		return;
-	}
+	QByteArrayList selectedFeatures;
+	{
+		istd::CChangeGroup changeGroup(&m_featurePackageCollectionProxy);
 
-	m_featurePackageCollectionProxy.CopyFrom(m_featurePackageCollection);
+		if (m_selectedLicenseId.isEmpty()){
+			m_featurePackageCollectionProxy.ResetData();
 
-	EnumerateMissingFeatures();
-	EnumerateDependencies(m_selectedFeatures);
-
-	QByteArrayList selectedFeatures = m_selectedFeatures;
-
-	if (!m_missingFeatures.isEmpty()){
-		imtlic::CFeaturePackage missingPackage;
-		missingPackage.SetPackageId("MISSING_FEATURES");
-		
-		for (const QByteArray& featureId : m_missingFeatures){
-			imtlic::CFeatureInfo featureInfo;
-			featureInfo.SetFeatureId(featureId);
-			featureInfo.SetFeatureName(tr("ID: %1").arg(QString(featureId)));
-			missingPackage.InsertNewObject(
-						"FeatureInfo",
-						tr("ID: %1").arg(QString(featureId)),
-						"",
-						&featureInfo);
-
-			selectedFeatures.append(featureId);
+			return;
 		}
 
-		m_featurePackageCollectionProxy.InsertNewObject(
-					"FeaturePackage",
-					tr("Missing features"),
-					"",
-					&missingPackage);
+		m_featurePackageCollectionProxy.CopyFrom(m_featurePackageCollection);
+
+		EnumerateMissingFeatures();
+		EnumerateDependencies(m_selectedFeatures);
+		
+		selectedFeatures = m_selectedFeatures;
+
+		if (!m_missingFeatures.isEmpty()){
+			imtlic::CFeaturePackage missingPackage;
+			missingPackage.SetPackageId("MISSING_FEATURES");
+		
+			for (const QByteArray& featureId : m_missingFeatures){
+				imtlic::CFeatureInfo featureInfo;
+				featureInfo.SetFeatureId(featureId);
+				featureInfo.SetFeatureName(tr("ID: %1").arg(QString(featureId)));
+				missingPackage.InsertNewObject(
+							"FeatureInfo",
+							tr("ID: %1").arg(QString(featureId)),
+							"",
+							&featureInfo);
+
+				selectedFeatures.append(featureId);
+			}
+
+			m_featurePackageCollectionProxy.InsertNewObject(
+						"FeaturePackage",
+						tr("Missing features"),
+						"",
+						&missingPackage);
+		}
 	}
 
-	m_featureSelectionModel.ResetData();
 	m_featureSelectionModel.SetSelectedIds(selectedFeatures.toVector());
 
 	// Disable dependent features
@@ -380,7 +385,6 @@ void CProductLicensingInfoGuiComp::UpdateFeaturePackageCollectionProxy()
 		}
 	}
 
-	m_featureStateModel.ResetData();
 	m_featureStateModel.SetSelectedIds(disabledFeatures.toVector());
 }
 
