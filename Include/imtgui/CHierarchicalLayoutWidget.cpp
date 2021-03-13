@@ -405,7 +405,7 @@ void CCustomLayoutWidget::paintEvent(QPaintEvent* /*eventPtr*/)
 //		QPen pen(m_hierarchicalLayoutWidget.GetBorderColor());
 		QPen pen(m_properties.borderColor);
 
-		if (m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT) {
+		if (m_hierarchicalLayoutWidget.m_viewMode == CHierarchicalLayoutWidget::VM_EDIT){
 			pen.setStyle(Qt::DashLine);
 		}
 
