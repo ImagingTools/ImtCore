@@ -29,7 +29,7 @@ i2d::IObject2d* CGraphicsElementFactory::CreateInstance(const QByteArray& keyId)
 	else if (keyId == CTextTable::GetTypeName())
 		return new CTextTable();
 	else
-		return NULL;
+		return nullptr;
 }
 
 
@@ -37,14 +37,13 @@ i2d::IObject2d* CGraphicsElementFactory::CreateInstance(const QByteArray& keyId)
 
 CGraphicsElementFactory::KeyList CGraphicsElementFactory::GetFactoryKeys() const
 {
-	return
-	{
-		CRectangleElement::GetTypeName(),
-		CCircleElement::GetTypeName(),
-		CTextLabelElement::GetTypeName(),
-		CPolygonElement::GetTypeName(),
-		CLineElement::GetTypeName(),
-		CImageRectangleElement::GetTypeName()
+	return {
+				CRectangleElement::GetTypeName(),
+				CCircleElement::GetTypeName(),
+				CTextLabelElement::GetTypeName(),
+				CPolygonElement::GetTypeName(),
+				CLineElement::GetTypeName(),
+				CImageRectangleElement::GetTypeName()
 	};
 }
 
