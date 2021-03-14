@@ -66,7 +66,7 @@ public:
 	/**
 		Get account picture.
 	*/
-	virtual const iimg::IBitmap* GetAccountPicture() const = 0;
+	virtual const iimg::IBitmap& GetAccountPicture() const = 0;
 };
 
 
