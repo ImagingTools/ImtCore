@@ -1,4 +1,4 @@
-#pragma once = =
+#pragma once
 
 
 // ACF includes
@@ -21,8 +21,11 @@ class IAddress: virtual public iser::IObject
 {
 public:
 	virtual QString GetCity() const = 0;
+	virtual void SetCity(const QString& city) = 0;
 	virtual QString GetCountry() const = 0;
+	virtual void SetCountry(const QString& country) = 0;
 	virtual int GetPostalCode() const = 0;
+	virtual void SetPostalCode(int postalCode) = 0;
 };
 
 

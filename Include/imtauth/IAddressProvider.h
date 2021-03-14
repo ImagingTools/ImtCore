@@ -5,6 +5,12 @@
 #include <istd/IChangeable.h>
 
 
+namespace imtbase
+{
+	class ICollectionInfo;
+}
+
+
 namespace imtauth
 {
 
