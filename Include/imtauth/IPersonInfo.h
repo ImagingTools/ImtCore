@@ -12,6 +12,8 @@ namespace imtauth
 {
 
 
+class IAddressCollection;
+
 
 /**
 	Interface descibing a natural person.
@@ -34,18 +36,13 @@ public:
 		NFT_NICKNAME
 	};
 
-	enum ContactFieldType
-	{
-		CFT_PRIVATE,
-		CFT_BUSINESS
-	};
-
 	virtual GenderType GetGenderType() const = 0;
 	virtual void SetGenderType(GenderType genderType) = 0;
 	virtual QDate GetBirthday() const = 0;
 	virtual void SetBirthday(const QDate& birthday) = 0;
 	virtual QString GetNameField(NameFieldType) const = 0;
 	virtual void SetNameField(NameFieldType fieldType, const QString& value) = 0;
+	virtual const IAddressCollection* GetAddresses() const = 0;
 };
 
 

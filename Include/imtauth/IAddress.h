@@ -1,4 +1,4 @@
-#pragma once
+#pragma once = =
 
 
 // ACF includes
@@ -17,9 +17,12 @@ namespace imtauth
 	Interface descibing location of an object.
 	\ingroup Authentification
 */
-class ILocationInfo: virtual public iser::IObject
+class IAddress: virtual public iser::IObject
 {
 public:
+	virtual QString GetCity() const = 0;
+	virtual QString GetCountry() const = 0;
+	virtual int GetPostalCode() const = 0;
 };
 
 

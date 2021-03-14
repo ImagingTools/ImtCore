@@ -44,9 +44,14 @@ public:
 	virtual AccountType GetAccountType() const = 0;
 
 	/**
-		Get name of the account.
+	Get name of the account.
 	*/
 	virtual QString GetAccountName() const = 0;
+
+	/**
+		Get description of the account.
+	*/
+	virtual QString GetAccountDescription() const = 0;
 
 	/**
 		Get information about the person who owns and manages this account.
