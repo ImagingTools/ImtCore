@@ -1481,7 +1481,7 @@ void CObjectCollectionViewComp::ReadCollectionThread::run()
 {
 	m_parentPtr->ReadCollection(m_typeModelPtr, m_itemModelPtr);
 
-	QMetaObject::invokeMethod(m_parentPtr, "OnUpdateFinished", Qt::QueuedConnection);
+	QMetaObject::invokeMethod(m_parentPtr, "OnCollectionReadFinished", Qt::QueuedConnection);
 }
 
 
