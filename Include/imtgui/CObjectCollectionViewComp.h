@@ -59,6 +59,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
 		I_ASSIGN_MULTI_0(m_viewDelegatesCompPtr, "ViewDelegates", "List of view delegates (corresponding with the object type) used for the collection", false);
 		I_ASSIGN(m_columnSettingsKeyAttrPtr, "ColumnSettingsKey", "Registry/INI file key for storing column settings", true, "");
+		I_ASSIGN(m_useAsyncReadAttrPtr, "UseAsyncRead", "Useasync collectionRead", true, false);
 	I_END_COMPONENT;
 
 	enum DataRole
@@ -176,10 +177,10 @@ protected:
 		virtual KeyList GetFactoryKeys() const;
 	};
 
-	class UpdateThread: public QThread
+	class ReadCollectionThread: public QThread
 	{
 	public:
-		explicit UpdateThread(CObjectCollectionViewComp* parentPtr);
+		explicit ReadCollectionThread(CObjectCollectionViewComp* parentPtr);
 		void SetModels(QStandardItemModel* typeModelPtr, QStandardItemModel* itemModelPtr);
 
 	private:
@@ -192,22 +193,22 @@ protected:
 	};
 
 private:
-	enum UpdateThreadState
+	enum ReadCollectionThreadState
 	{
 		/*
-			Update thread is idle
+			Read collection thread is idle
 		*/
-		UTS_IDLE = 0,
+		RCTS_IDLE = 0,
 
 		/*
-			Update thread is running
+			Read collection thread is running
 		*/
-		UTS_RUNNING,
+		RCTS_RUNNING,
 
 		/*
-			Update thread is running and next run is pending
+			Read collection thread is running and next run is pending
 		*/
-		UTS_PENDING
+		RCTS_PENDING
 	};
 
 	void UpdateCommands();
@@ -228,9 +229,10 @@ private:
 
 	void UpdateTypeStatus();
 
-	void StartUpdate();
+	void ReadCollection(QStandardItemModel* typeModelPtr, QStandardItemModel* itemModelPtr);
+	void StartCollectionRead();
 	Q_INVOKABLE void OnUpdateProgress(int progress);
-	Q_INVOKABLE void OnUpdateFinished();
+	Q_INVOKABLE void OnCollectionReadFinished();
 
 	Q_INVOKABLE void ProcessObjectCollectionEventSync(
 				ObjectCollectionPtr objectCollectionPtr,
@@ -281,8 +283,8 @@ private:
 
 	int m_semaphoreCounter;
 
-	UpdateThread m_updateThread;
-	UpdateThreadState m_updateThreadState;
+	ReadCollectionThread m_readCollectionThread;
+	ReadCollectionThreadState m_readCollectionThreadState;
 
 	QShortcut* m_searchShortCutPtr;
 	QShortcut* m_escShortCutPtr;
@@ -322,6 +324,7 @@ private:
 	*/
 	I_MULTIREF(ICollectionViewDelegate, m_viewDelegatesCompPtr);
 	I_ATTR(QByteArray, m_columnSettingsKeyAttrPtr);
+	I_ATTR(bool, m_useAsyncReadAttrPtr);
 
 	bool m_eventBasedUpdateEnabled;
 };

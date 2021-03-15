@@ -380,7 +380,9 @@ void CProductLicensingInfoGuiComp::UpdateFeaturePackageCollectionProxy()
 	for (const QByteArray& fromId : m_selectedFeatures){
 		for (const QByteArray& toId : m_selectedFeatures){
 			if (HasDependency(m_featureDependencyMap, fromId, toId)){
-				disabledFeatures.append(toId);
+				if (!disabledFeatures.contains(toId)){
+					disabledFeatures.append(toId);
+				}
 			}
 		}
 	}

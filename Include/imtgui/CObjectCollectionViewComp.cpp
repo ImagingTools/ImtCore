@@ -37,8 +37,8 @@ namespace imtgui
 CObjectCollectionViewComp::CObjectCollectionViewComp()
 	:m_semaphoreCounter(0),
 	m_currentInformationViewPtr(nullptr),
-	m_updateThread(this),
-	m_updateThreadState(UTS_IDLE),
+	m_readCollectionThread(this),
+	m_readCollectionThreadState(RCTS_IDLE),
 	m_itemModelPtr(&m_itemModel1),
 	m_eventBasedUpdateEnabled(false)
 {
@@ -287,7 +287,13 @@ void CObjectCollectionViewComp::OnSaveSettings(QSettings& settings) const
 void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 {
 	if (changeSet.Contains(istd::IChangeable::CF_ALL_DATA) || !m_eventBasedUpdateEnabled){
-		StartUpdate();
+		if (*m_useAsyncReadAttrPtr){
+			StartCollectionRead();
+		}
+		else{
+			ReadCollection(&m_typeModel, m_itemModelPtr);
+			OnCollectionReadFinished();
+		}
 	}
 }
 
@@ -307,7 +313,13 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 		iter.value()->InitializeDelegate(objectPtr, this);
 	}
 
-	StartUpdate();
+	if (*m_useAsyncReadAttrPtr){
+		StartCollectionRead();
+	}
+	else{
+		ReadCollection(&m_typeModel, m_itemModelPtr);
+		OnCollectionReadFinished();
+	}
 }
 
 
@@ -319,7 +331,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	Progress->hide();
 
 	m_itemModelPtr = &m_itemModel1;
-	m_updateThread.SetModels(&m_typeModel, &m_itemModel2);
+	m_readCollectionThread.SetModels(&m_typeModel, &m_itemModel2);
 
 	ItemList->setProperty("ItemView", true);
 
@@ -375,8 +387,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 void CObjectCollectionViewComp::OnGuiDestroyed()
 {
-	m_updateThread.requestInterruption();
-	m_updateThread.wait();
+	m_readCollectionThread.requestInterruption();
+	m_readCollectionThread.wait();
 
 	if ((m_currentInformationViewPtr != nullptr) && m_currentInformationViewPtr->IsGuiCreated()){
 		m_currentInformationViewPtr->DestroyGui();
@@ -785,21 +797,68 @@ void CObjectCollectionViewComp::RestoreItemsSelection()
 }
 
 
-void CObjectCollectionViewComp::StartUpdate()
+void CObjectCollectionViewComp::ReadCollection(QStandardItemModel* typeModelPtr, QStandardItemModel* itemModelPtr)
 {
-	if (m_updateThreadState == UTS_IDLE){
+	imtbase::IObjectCollection* objectCollectionPtr = GetObservedObject();
+	if (objectCollectionPtr != nullptr){
+		Q_ASSERT(typeModelPtr != nullptr);
+		Q_ASSERT(itemModelPtr != nullptr);
+
+		typeModelPtr->clear();
+		itemModelPtr->clear();
+		itemModelPtr->setColumnCount(0);
+
+		const iprm::IOptionsList* objectTypeInfoPtr = objectCollectionPtr->GetObjectTypesInfo();
+		if (objectTypeInfoPtr != nullptr){
+			int typesCount = objectTypeInfoPtr->GetOptionsCount();
+			imtbase::IObjectCollectionInfo::Ids collectionItemIds = objectCollectionPtr->GetElementIds();
+
+			for (int typeIndex = 0; typeIndex < typesCount; ++typeIndex){
+				QByteArray typeId = objectTypeInfoPtr->GetOptionId(typeIndex);
+				QString typeName = objectTypeInfoPtr->GetOptionName(typeIndex);
+
+				QStandardItem* typeItemPtr = new QStandardItem();
+				typeItemPtr->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+				typeItemPtr->setData(typeName, Qt::DisplayRole);
+				typeItemPtr->setData(typeName, Qt::EditRole);
+				typeItemPtr->setData(typeId, DR_TYPE_ID);
+				typeModelPtr->appendRow(typeItemPtr);
+			}
+
+			int progress = 0;
+			int count = collectionItemIds.count();
+
+			for (int i = 0; i < count; i++){
+				UpdateItem(collectionItemIds[i], itemModelPtr);
+
+				if (*m_useAsyncReadAttrPtr){
+					int currentProgress = i * 100 / count;
+					if (progress != currentProgress){
+						progress = currentProgress;
+						QMetaObject::invokeMethod(this, "OnUpdateProgress", Qt::QueuedConnection, Q_ARG(int, progress));
+					}
+				}
+			}
+		}
+	}
+}
+
+
+void CObjectCollectionViewComp::StartCollectionRead()
+{
+	if (m_readCollectionThreadState == RCTS_IDLE){
 		if (m_proxyModelPtr->sourceModel() == &m_itemModel1){
-			m_updateThread.SetModels(&m_typeModel, &m_itemModel2);
+			m_readCollectionThread.SetModels(&m_typeModel, &m_itemModel2);
 		}
 		else{
-			m_updateThread.SetModels(&m_typeModel, &m_itemModel1);
+			m_readCollectionThread.SetModels(&m_typeModel, &m_itemModel1);
 		}
 
-		m_updateThreadState = UTS_RUNNING;
-		m_updateThread.start();
+		m_readCollectionThreadState = RCTS_RUNNING;
+		m_readCollectionThread.start();
 	}
 	else{
-		m_updateThreadState = UTS_PENDING;
+		m_readCollectionThreadState = RCTS_PENDING;
 	}
 }
 
@@ -813,7 +872,7 @@ void CObjectCollectionViewComp::OnUpdateProgress(int progress)
 }
 
 
-void CObjectCollectionViewComp::OnUpdateFinished()
+void CObjectCollectionViewComp::OnCollectionReadFinished()
 {
 	Progress->setValue(0);
 	Message->hide();
@@ -853,11 +912,13 @@ void CObjectCollectionViewComp::OnUpdateFinished()
 			}
 		}
 
-		if (m_proxyModelPtr->sourceModel() == &m_itemModel1){
-			m_itemModelPtr = &m_itemModel2;
-		}
-		else{
-			m_itemModelPtr = &m_itemModel1;
+		if (*m_useAsyncReadAttrPtr){
+			if (m_proxyModelPtr->sourceModel() == &m_itemModel1){
+				m_itemModelPtr = &m_itemModel2;
+			}
+			else{
+				m_itemModelPtr = &m_itemModel1;
+			}
 		}
 
 		m_proxyModelPtr->setSortRole(DR_SORT_VALUE);
@@ -874,12 +935,12 @@ void CObjectCollectionViewComp::OnUpdateFinished()
 
 	UpdateTypeStatus();
 
-	if (m_updateThreadState == UTS_PENDING){
-		m_updateThreadState = UTS_IDLE;
-		StartUpdate();
+	if (m_readCollectionThreadState == RCTS_PENDING){
+		m_readCollectionThreadState = RCTS_IDLE;
+		StartCollectionRead();
 	}
 	else{
-		m_updateThreadState = UTS_IDLE;
+		m_readCollectionThreadState = RCTS_IDLE;
 	}
 }
 
@@ -1397,7 +1458,7 @@ istd::IFactoryInfo::KeyList CObjectCollectionViewComp::FocusDecorationFactory::G
 
 // public methods of embedded class UpdateThread
 
-CObjectCollectionViewComp::UpdateThread::UpdateThread(CObjectCollectionViewComp* parentPtr)
+CObjectCollectionViewComp::ReadCollectionThread::ReadCollectionThread(CObjectCollectionViewComp* parentPtr)
 	:m_parentPtr(parentPtr),
 	m_typeModelPtr(nullptr),
 	m_itemModelPtr(nullptr)
@@ -1405,7 +1466,7 @@ CObjectCollectionViewComp::UpdateThread::UpdateThread(CObjectCollectionViewComp*
 }
 
 
-void CObjectCollectionViewComp::UpdateThread::SetModels(QStandardItemModel* typeModelPtr, QStandardItemModel* itemModelPtr)
+void CObjectCollectionViewComp::ReadCollectionThread::SetModels(QStandardItemModel* typeModelPtr, QStandardItemModel* itemModelPtr)
 {
 	m_typeModelPtr = typeModelPtr;
 	m_itemModelPtr = itemModelPtr;
@@ -1416,48 +1477,9 @@ void CObjectCollectionViewComp::UpdateThread::SetModels(QStandardItemModel* type
 
 // reimplemented (QThread)
 
-void CObjectCollectionViewComp::UpdateThread::run()
+void CObjectCollectionViewComp::ReadCollectionThread::run()
 {
-	imtbase::IObjectCollection* objectCollectionPtr = m_parentPtr->GetObservedObject();
-	if (objectCollectionPtr != nullptr){
-		Q_ASSERT(m_typeModelPtr != nullptr);
-		Q_ASSERT(m_itemModelPtr != nullptr);
-
-		m_typeModelPtr->clear();
-		m_itemModelPtr->clear();
-		m_itemModelPtr->setColumnCount(0);
-
-		const iprm::IOptionsList* objectTypeInfoPtr = objectCollectionPtr->GetObjectTypesInfo();
-		if (objectTypeInfoPtr != nullptr){
-			int typesCount = objectTypeInfoPtr->GetOptionsCount();
-			imtbase::IObjectCollectionInfo::Ids collectionItemIds = objectCollectionPtr->GetElementIds();
-
-			for (int typeIndex = 0; typeIndex < typesCount; ++typeIndex){
-				QByteArray typeId = objectTypeInfoPtr->GetOptionId(typeIndex);
-				QString typeName = objectTypeInfoPtr->GetOptionName(typeIndex);
-
-				QStandardItem* typeItemPtr = new QStandardItem();
-				typeItemPtr->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-				typeItemPtr->setData(typeName, Qt::DisplayRole);
-				typeItemPtr->setData(typeName, Qt::EditRole);
-				typeItemPtr->setData(typeId, DR_TYPE_ID);
-				m_typeModelPtr->appendRow(typeItemPtr);
-			}
-
-			int progress = 0;
-			int count = collectionItemIds.count();
-
-			for (int i = 0; i < count; i++){
-				m_parentPtr->UpdateItem(collectionItemIds[i], m_itemModelPtr);
-
-				int currentProgress = i * 100 / count;
-				if (progress != currentProgress){
-					progress = currentProgress;
-					QMetaObject::invokeMethod(m_parentPtr, "OnUpdateProgress", Qt::QueuedConnection, Q_ARG(int, progress));
-				}
-			}
-		}
-	}
+	m_parentPtr->ReadCollection(m_typeModelPtr, m_itemModelPtr);
 
 	QMetaObject::invokeMethod(m_parentPtr, "OnUpdateFinished", Qt::QueuedConnection);
 }

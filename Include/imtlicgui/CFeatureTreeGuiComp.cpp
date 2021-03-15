@@ -77,6 +77,9 @@ void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*change
 	}
 
 	Features->expandAll();
+
+	UpdateFeatureSelections();
+	UpdateFeatureStates();
 }
 
 
@@ -151,25 +154,8 @@ void CFeatureTreeGuiComp::OnFeatureSelectionChanged(
 			const istd::IChangeable::ChangeSet& /*changeSet*/,
 			const imtbase::IMultiSelection* selectionPtr)
 {
-	QSignalBlocker blocker(Features);
-
-	imtbase::IMultiSelection::Ids selectedIds = selectionPtr->GetSelectedIds();
-
-	if (*m_showFeatureStatesAttrPtr){
-		int groupCount = Features->topLevelItemCount();
-		for (int groupIndex = 0; groupIndex < groupCount; groupIndex++){
-			QTreeWidgetItem* groupItemPtr = Features->topLevelItem(groupIndex);
-
-			int featureCount = groupItemPtr->childCount();
-			for (int featureIndex = 0; featureIndex < featureCount; featureIndex++){
-				QTreeWidgetItem* featureItemPtr = groupItemPtr->child(featureIndex);
-
-				QByteArray featureId = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
-				bool isFeatureSelected = selectedIds.contains(featureId);
-				featureItemPtr->setCheckState(0, isFeatureSelected ? Qt::Checked : Qt::Unchecked);
-			}
-		}
-	}
+	m_selectedFeatures = selectionPtr->GetSelectedIds().toList();
+	UpdateFeatureSelections();
 }
 
 
@@ -177,10 +163,13 @@ void CFeatureTreeGuiComp::OnFeatureStateChanged(
 			const istd::IChangeable::ChangeSet& /*changeSet*/,
 			const imtbase::IMultiSelection* statePtr)
 {
-	QSignalBlocker blocker(Features);
+	m_disabledFeatures = statePtr->GetSelectedIds().toList();
+	UpdateFeatureStates();
+}
 
-	imtbase::IMultiSelection::Ids disabledIds = statePtr->GetSelectedIds();
 
+void CFeatureTreeGuiComp::UpdateFeatureSelections()
+{
 	if (*m_showFeatureStatesAttrPtr){
 		int groupCount = Features->topLevelItemCount();
 		for (int groupIndex = 0; groupIndex < groupCount; groupIndex++){
@@ -191,8 +180,31 @@ void CFeatureTreeGuiComp::OnFeatureStateChanged(
 				QTreeWidgetItem* featureItemPtr = groupItemPtr->child(featureIndex);
 
 				QByteArray featureId = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
-				if (disabledIds.contains(featureId)){
+				bool isFeatureSelected = m_selectedFeatures.contains(featureId);
+				featureItemPtr->setCheckState(0, isFeatureSelected ? Qt::Checked : Qt::Unchecked);
+			}
+		}
+	}
+}
+
+
+void CFeatureTreeGuiComp::UpdateFeatureStates()
+{
+	if (*m_showFeatureStatesAttrPtr){
+		int groupCount = Features->topLevelItemCount();
+		for (int groupIndex = 0; groupIndex < groupCount; groupIndex++){
+			QTreeWidgetItem* groupItemPtr = Features->topLevelItem(groupIndex);
+
+			int featureCount = groupItemPtr->childCount();
+			for (int featureIndex = 0; featureIndex < featureCount; featureIndex++){
+				QTreeWidgetItem* featureItemPtr = groupItemPtr->child(featureIndex);
+
+				QByteArray featureId = featureItemPtr->data(0, DR_ITEM_ID).toByteArray();
+				if (m_disabledFeatures.contains(featureId)){
 					featureItemPtr->setFlags(featureItemPtr->flags() & (~Qt::ItemIsEnabled));
+				}
+				else{
+					featureItemPtr->setFlags(featureItemPtr->flags() | Qt::ItemIsEnabled);
 				}
 			}
 		}
@@ -202,22 +214,16 @@ void CFeatureTreeGuiComp::OnFeatureStateChanged(
 
 // private slots
 
-void CFeatureTreeGuiComp::OnFeatureItemStateChanged(const QByteArray& itemId, bool isChecked)
-{
-	if (!IsUpdateBlocked()){
-		UpdateBlocker updateBlocker(this);
-
-		if (m_featureItemStateHandlerCompPtr.IsValid()){
-			m_featureItemStateHandlerCompPtr->OnItemStateChanged(itemId, isChecked);
-		}
-	}
-}
-
-
 void CFeatureTreeGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, int column)
 {
 	if (column == 0 && item->data(0, DR_ITEM_TYPE) == IT_FEATURE){
-		OnFeatureItemStateChanged(item->data(0, DR_ITEM_ID).toByteArray(), item->checkState(0) == Qt::Checked);
+		if (!IsUpdateBlocked()){
+			UpdateBlocker updateBlocker(this);
+
+			if (m_featureItemStateHandlerCompPtr.IsValid()){
+				m_featureItemStateHandlerCompPtr->OnItemStateChanged(item->data(0, DR_ITEM_ID).toByteArray(), item->checkState(0) == Qt::Checked);
+			}
+		}
 	}
 }
 

@@ -54,9 +54,10 @@ private:
 	void OnFeatureStateChanged(
 				const istd::IChangeable::ChangeSet& /*changeSet*/,
 				const imtbase::IMultiSelection* statePtr);
+	void UpdateFeatureSelections();
+	void UpdateFeatureStates();
 
 private Q_SLOTS:
-	void OnFeatureItemStateChanged(const QByteArray& itemId, bool isChecked);
 	void on_Features_itemChanged(QTreeWidgetItem *item, int column);
 
 private:
@@ -82,6 +83,9 @@ private:
 
 	imtbase::TModelUpdateBinder<imtbase::IMultiSelection, CFeatureTreeGuiComp> m_featureSelectionObserver;
 	imtbase::TModelUpdateBinder<imtbase::IMultiSelection, CFeatureTreeGuiComp> m_featureStateObserver;
+
+	QByteArrayList m_selectedFeatures;
+	QByteArrayList m_disabledFeatures;
 };
 
 
