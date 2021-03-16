@@ -24,6 +24,9 @@ public:
 	void UnregisterObject(int modelId);
 	void UnregisterAllObjects();
 
+	template <typename Object = istd::IChangeable>
+	Object* GetObjectAt(int modelId) const;
+
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
@@ -81,6 +84,14 @@ void TModelUpdateBinder<ModelInterface, Parent>::UnregisterAllObjects()
 	BaseClass::UnregisterAllModels();
 
 	m_callbackMap.clear();
+}
+
+
+template<typename ModelInterface, typename Parent>
+template<typename Object>
+Object* TModelUpdateBinder<ModelInterface, Parent>::GetObjectAt(int modelId) const
+{
+	return BaseClass::GetObjectAt<Object>(modelId);
 }
 
 
