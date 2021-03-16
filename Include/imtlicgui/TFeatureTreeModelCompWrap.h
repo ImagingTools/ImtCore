@@ -65,8 +65,17 @@ public:
 	virtual const imtbase::IObjectCollection* GetObjectCollection() const override;
 
 protected:
+	/*
+		Update feature tree models.
+		This method should be called directly from derived classes
+	*/
 	void DoUpdateFeatureTreeModels();
 
+
+	/*
+		Do update of the models to reflect the current contents of feature tree GUI.
+		This method should be implmented by derived classes.
+	*/
 	virtual void UpdateFeatureTreeModels(
 				imtbase::IObjectCollection* featureTreeModelPtr,
 				imtbase::IMultiSelection* selectedFeaturesModelPtr,
