@@ -59,7 +59,7 @@ public:
 
 	// reimplemented (imtlic::IFeatureDependencyChecker)
 	virtual const FeatureDependencyMap* GetDependencyMap() const override;
-	virtual bool HasDependency(const QByteArray& fromFeatureId, const QByteArray& toFeatureId, const FeatureDependencyMap* dependencyMapPtr = nullptr) const const;
+	virtual bool HasDependency(const QByteArray& fromFeatureId, const QByteArray& toFeatureId, const FeatureDependencyMap* dependencyMapPtr = nullptr) const;
 
 	// reimplemented (imtbase::IObjectCollectionProvider)
 	virtual const imtbase::IObjectCollection* GetObjectCollection() const override;
@@ -70,7 +70,6 @@ protected:
 		This method should be called directly from derived classes
 	*/
 	void DoUpdateFeatureTreeModels();
-
 
 	/*
 		Do update of the models to reflect the current contents of feature tree GUI.
