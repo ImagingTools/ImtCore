@@ -129,7 +129,7 @@ const imtbase::IObjectCollection* TFeatureTreeModelCompWrap<BaseComponent>::GetO
 
 
 template <class BaseComponent>
-const TFeatureTreeModelCompWrap<BaseComponent>::FeatureDependencyMap* TFeatureTreeModelCompWrap<BaseComponent>::GetDependencyMap() const
+const typename TFeatureTreeModelCompWrap<BaseComponent>::FeatureDependencyMap* TFeatureTreeModelCompWrap<BaseComponent>::GetDependencyMap() const
 {
 	return &m_featureDependencyMap;
 }
