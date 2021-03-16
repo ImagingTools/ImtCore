@@ -19,10 +19,7 @@ namespace imtlicgui
 // public methods
 
 CProductLicensingInfoGuiComp::CProductLicensingInfoGuiComp()
-	:m_featurePackageCollectionObserver(*this),
-	m_licenseSelectionObserver(*this),
-	m_isGuiModelInitialized(false),
-	m_isCollectionRepresentationInitialized(false)
+	:m_licenseSelectionObserver(*this)
 {
 }
 
@@ -31,20 +28,19 @@ CProductLicensingInfoGuiComp::CProductLicensingInfoGuiComp()
 
 void CProductLicensingInfoGuiComp::OnItemStateChanged(const QByteArray& itemId, bool isChecked)
 {
-	if (isChecked && !m_selectedFeatures.contains(itemId)){
-		m_selectedFeatures.append(itemId);
+	if (isChecked && !m_selectedFeatureIds.contains(itemId)){
+		m_selectedFeatureIds.append(itemId);
 
-		UpdateFeaturePackageCollectionProxy();
+		UpdateFeatureTreeModels();
 		DoUpdateModel();
 	}
 
-	if (!isChecked && m_selectedFeatures.contains(itemId)){
-		m_selectedFeatures.removeOne(itemId);
+	if (!isChecked && m_selectedFeatureIds.contains(itemId)){
+		m_selectedFeatureIds.removeOne(itemId);
 
-		UpdateFeaturePackageCollectionProxy();
+		UpdateFeatureTreeModels();
 		DoUpdateModel();
 	}
-
 }
 
 
@@ -72,10 +68,10 @@ void CProductLicensingInfoGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 
 	const imtlic::ILicenseInfo* licenseInfoPtr = productLicensingInfoPtr->GetLicenseInfo(m_selectedLicenseId);
 	if (licenseInfoPtr != nullptr){
-		m_selectedFeatures = licenseInfoPtr->GetFeatures();
+		m_selectedFeatureIds = licenseInfoPtr->GetFeatures();
 	}
 
-	UpdateFeaturePackageCollectionProxy();
+	UpdateFeatureTreeModels();
 }
 
 
@@ -90,23 +86,11 @@ void CProductLicensingInfoGuiComp::OnGuiModelAttached()
 					dynamic_cast<imtbase::IMultiSelection*>(m_objectCollectionViewCompPtr.GetPtr()),
 					&CProductLicensingInfoGuiComp::OnLicenseSelectionChanged);
 	}
-
-	if (m_featurePackageCollectionCompPtr.GetPtr()){
-		m_featurePackageCollectionObserver.RegisterObject(
-					m_featurePackageCollectionCompPtr.GetPtr(),
-					&CProductLicensingInfoGuiComp::OnFeaturePackageCollectionUpdate);
-	}
-
-	if (m_featureTreeCompPtr.IsValid() && m_featureTreeObserverCompPtr.IsValid()){
-		m_featurePackageCollectionProxy.AttachObserver(m_featureTreeObserverCompPtr.GetPtr());
-	}
 }
 
 
 void CProductLicensingInfoGuiComp::OnGuiModelDetached()
 {
-	m_featurePackageCollectionProxy.DetachAllObservers();
-	m_featurePackageCollectionObserver.UnregisterAllObjects();
 	m_licenseSelectionObserver.UnregisterAllObjects();
 
 	if (m_objectCollectionViewCompPtr.IsValid() && m_objectCollectionObserverCompPtr.IsValid()){
@@ -135,7 +119,7 @@ void CProductLicensingInfoGuiComp::UpdateModel() const
 	}
 
 	if (licenseInfoPtr != nullptr){
-		licenseInfoPtr->SetFeatures(m_selectedFeatures);
+		licenseInfoPtr->SetFeatures(m_selectedFeatureIds);
 	}
 }
 
@@ -172,43 +156,12 @@ void CProductLicensingInfoGuiComp::OnGuiDestroyed()
 
 // private methods
 
-void CProductLicensingInfoGuiComp::OnFeaturePackageCollectionUpdate(
-			const istd::IChangeable::ChangeSet& /*changeSet*/,
-			const imtbase::IObjectCollection* collectionPtr)
-{
-	imtbase::ICollectionInfo::Ids packageCollectionIds = collectionPtr->GetElementIds();
-
-	BuildDependencyMap(*collectionPtr);
-
-	m_featurePackageCollection.ResetData();
-
-	for (const QByteArray& packageCollectionId : packageCollectionIds){
-		imtbase::IObjectCollection::DataPtr packageDataPtr;
-		if (collectionPtr->GetObjectData(packageCollectionId, packageDataPtr)){
-			imtlic::IFeaturePackage* packagePtr = dynamic_cast<imtlic::IFeaturePackage*>(packageDataPtr.GetPtr());
-			if (packagePtr != nullptr){
-				// TODO: GetPackageId->GetPackageId();
-
-				m_featurePackageCollection.InsertNewObject(
-							"FeaturePackage",
-							collectionPtr->GetElementInfo(packageCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString(),
-							collectionPtr->GetElementInfo(packageCollectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString(),
-							packagePtr,
-							packageCollectionId);
-			}
-		}
-	}
-
-	UpdateFeaturePackageCollectionProxy();
-}
-
-
 void CProductLicensingInfoGuiComp::OnLicenseSelectionChanged(
 			const istd::IChangeable::ChangeSet& /*changeSet*/,
 			const imtbase::IMultiSelection* selectionPtr)
 {
 	m_selectedLicenseId.clear();
-	m_selectedFeatures.clear();
+	m_selectedFeatureIds.clear();
 
 	imtbase::IMultiSelection::Ids licenseIds = selectionPtr->GetSelectedIds();
 
@@ -218,12 +171,12 @@ void CProductLicensingInfoGuiComp::OnLicenseSelectionChanged(
 			const imtlic::ILicenseInfo* licenseInfo = productLicensingInfo->GetLicenseInfo(licenseIds.first());
 			if (licenseInfo != nullptr){
 				m_selectedLicenseId = licenseInfo->GetLicenseId();
-				m_selectedFeatures = licenseInfo->GetFeatures();
+				m_selectedFeatureIds = licenseInfo->GetFeatures();
 			}
 		}
 	}
 
-	UpdateFeaturePackageCollectionProxy();
+	UpdateFeatureTreeModels();
 }
 
 
@@ -236,8 +189,8 @@ void CProductLicensingInfoGuiComp::EnumerateDependencies(const QByteArrayList& f
 			QByteArrayList dependencies = m_featureDependencyMap[featureId];
 
 			for (const QByteArray& dependency : dependencies){
-				if (!m_selectedFeatures.contains(dependency)){
-					m_selectedFeatures.append(dependency);
+				if (!m_selectedFeatureIds.contains(dependency)){
+					m_selectedFeatureIds.append(dependency);
 					nextIdsForEnumeration.append(dependency);
 				}
 			}
@@ -252,12 +205,14 @@ void CProductLicensingInfoGuiComp::EnumerateDependencies(const QByteArrayList& f
 
 void CProductLicensingInfoGuiComp::EnumerateMissingFeatures()
 {
+	m_missingFeatureIds.clear();
+
 	QByteArrayList allFeatureIds;
 
-	imtbase::ICollectionInfo::Ids packageCollectionIds = m_featurePackageCollection.GetElementIds();
+	imtbase::ICollectionInfo::Ids packageCollectionIds = m_featurePackageCollectionMirror.GetElementIds();
 
 	for (const QByteArray& packageCollectionId : packageCollectionIds){
-		const istd::IChangeable* constObjectPtr = m_featurePackageCollection.GetObjectPtr(packageCollectionId);
+		const istd::IChangeable* constObjectPtr = m_featurePackageCollectionMirror.GetObjectPtr(packageCollectionId);
 		istd::IChangeable* objectPtr = const_cast<istd::IChangeable*>(constObjectPtr);
 		imtlic::IFeaturePackage* packagePtr = dynamic_cast<imtlic::IFeaturePackage*>(objectPtr);
 
@@ -273,86 +228,39 @@ void CProductLicensingInfoGuiComp::EnumerateMissingFeatures()
 		}
 	}
 
-	m_missingFeatures.clear();
-
-	for (const QByteArray& featureId : m_selectedFeatures){
+	for (const QByteArray& featureId : m_selectedFeatureIds){
 		if (!allFeatureIds.contains(featureId)){
-			m_missingFeatures.push_back(featureId);
+			m_missingFeatureIds.push_back(featureId);
 		}
 	}
 }
 
 
-void CProductLicensingInfoGuiComp::BuildDependencyMap(const imtbase::IObjectCollection& packageCollection)
-{
-	m_featureDependencyMap.clear();
-
-	imtbase::ICollectionInfo::Ids packageIds = packageCollection.GetElementIds();
-	for (const QByteArray& packageId : packageIds){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		packageCollection.GetObjectData(packageId, dataPtr);
-
-		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
-		if (packagePtr != nullptr){
-			const imtlic::IFeatureDependenciesProvider* dependenciesProvider = packagePtr->GetDependenciesInfoProvider();
-			if (dependenciesProvider != nullptr){
-				imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
-				for (const QByteArray& featureCollectionId : featureCollectionIds){
-					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
-					if (featureInfoPtr != nullptr){
-						QByteArray featureId = featureInfoPtr->GetFeatureId();
-
-						m_featureDependencyMap[featureId] = dependenciesProvider->GetFeatureDependencies(featureId);
-					}
-				}
-			}
-		}
-	}
-}
-
-
-bool CProductLicensingInfoGuiComp::HasDependency(const FeatureDependencyMap& dependencyMap, const QByteArray& fromFeatureId, const QByteArray& toFeatureId)
-{
-	if (dependencyMap.contains(fromFeatureId)){
-		if (dependencyMap[fromFeatureId].contains(toFeatureId)){
-			return true;
-		}
-
-		for (const QByteArray& featureId : dependencyMap[fromFeatureId]){
-			if (HasDependency(dependencyMap, featureId, toFeatureId)){
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
-
-void CProductLicensingInfoGuiComp::UpdateFeaturePackageCollectionProxy()
+void CProductLicensingInfoGuiComp::UpdateFeatureTreeModels()
 {
 	QByteArrayList selectedFeatures;
+	QByteArrayList disabledFeatures;
+
 	{
-		istd::CChangeGroup changeGroup(&m_featurePackageCollectionProxy);
+		istd::CChangeGroup changeGroup(&m_featureTreeModel);
 
 		if (m_selectedLicenseId.isEmpty()){
-			m_featurePackageCollectionProxy.ResetData();
+			m_featureTreeModel.ResetData();
 
 			return;
 		}
 
-		m_featurePackageCollectionProxy.CopyFrom(m_featurePackageCollection);
+		m_featureTreeModel.CopyFrom(m_featurePackageCollectionMirror);
+
+		EnumerateDependencies(m_selectedFeatureIds);
+		selectedFeatures = m_selectedFeatureIds;
 
 		EnumerateMissingFeatures();
-		EnumerateDependencies(m_selectedFeatures);
-		
-		selectedFeatures = m_selectedFeatures;
-
-		if (!m_missingFeatures.isEmpty()){
+		if (!m_missingFeatureIds.isEmpty()){
 			imtlic::CFeaturePackage missingPackage;
 			missingPackage.SetPackageId("MISSING_FEATURES");
 		
-			for (const QByteArray& featureId : m_missingFeatures){
+			for (const QByteArray& featureId : m_missingFeatureIds){
 				imtlic::CFeatureInfo featureInfo;
 				featureInfo.SetFeatureId(featureId);
 				featureInfo.SetFeatureName(tr("ID: %1").arg(QString(featureId)));
@@ -365,29 +273,29 @@ void CProductLicensingInfoGuiComp::UpdateFeaturePackageCollectionProxy()
 				selectedFeatures.append(featureId);
 			}
 
-			m_featurePackageCollectionProxy.InsertNewObject(
+			m_featureTreeModel.InsertNewObject(
 						"FeaturePackage",
 						tr("Missing features"),
 						"",
 						&missingPackage);
 		}
-	}
 
-	m_featureSelectionModel.SetSelectedIds(selectedFeatures.toVector());
-
-	// Disable dependent features
-	QByteArrayList disabledFeatures;
-	for (const QByteArray& fromId : m_selectedFeatures){
-		for (const QByteArray& toId : m_selectedFeatures){
-			if (HasDependency(m_featureDependencyMap, fromId, toId)){
-				if (!disabledFeatures.contains(toId)){
-					disabledFeatures.append(toId);
+		// Disable dependent features
+		for (const QByteArray& fromId : m_selectedFeatureIds){
+			for (const QByteArray& toId : m_selectedFeatureIds){
+				if (HasDependency(fromId, toId)){
+					if (!disabledFeatures.contains(toId)){
+						if (!m_missingFeatureIds.contains(toId)){
+							disabledFeatures.append(toId);
+						}
+					}
 				}
 			}
 		}
 	}
 
-	m_featureStateModel.SetSelectedIds(disabledFeatures.toVector());
+	m_selectedFeaturesModel.SetSelectedIds(selectedFeatures.toVector());
+	m_disabledFeaturesModel.SetSelectedIds(disabledFeatures.toVector());
 }
 
 
