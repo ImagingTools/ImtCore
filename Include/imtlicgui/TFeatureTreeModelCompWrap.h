@@ -14,6 +14,7 @@
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtbase/CMultiSelection.h>
 #include <imtlic/IFeatureDependenciesProvider.h>
+#include <imtlic/IFeatureDependencyChecker.h>
 #include <imtlic/IFeatureInfo.h>
 #include <imtlic/IFeatureInfoProvider.h>
 #include <imtlic/IFeaturePackage.h>
@@ -30,12 +31,15 @@ namespace imtlicgui
 template <class BaseComponent>
 class TFeatureTreeModelCompWrap:
 			public BaseComponent,
-			virtual public imtbase::IObjectCollectionProvider
+			virtual public imtbase::IObjectCollectionProvider,
+			virtual public imtlic::IFeatureDependencyChecker
 {
 public:
 	typedef BaseComponent BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(TFeatureTreeModelCompWrap);
+		I_REGISTER_INTERFACE(imtbase::IObjectCollectionProvider)
+		I_REGISTER_INTERFACE(imtlic::IFeatureDependencyChecker)
 		I_REGISTER_SUBELEMENT(FeatureTreeModel)
 		I_REGISTER_SUBELEMENT_INTERFACE(FeatureTreeModel, istd::IChangeable, ExtractFeatureTreeModel)
 		I_REGISTER_SUBELEMENT_INTERFACE(FeatureTreeModel, imod::IModel, ExtractFeatureTreeModel)
@@ -51,12 +55,11 @@ public:
 		I_ASSIGN(m_featurePackageCollectionCompPtr, "FeaturePackageCollection", "Feature package collection", true, "");
 	I_END_COMPONENT;
 
-	typedef QMap<QByteArray, QByteArrayList> FeatureDependencyMap;
-
 	TFeatureTreeModelCompWrap();
 
-	const FeatureDependencyMap* GetDependencyMap() const;
-	bool HasDependency(const QByteArray& fromFeatureId, const QByteArray& toFeatureId, const FeatureDependencyMap* dependencyMapPtr = nullptr) const;
+	// reimplemented (imtlic::IFeatureDependencyChecker)
+	virtual const FeatureDependencyMap* GetDependencyMap() const override;
+	virtual bool HasDependency(const QByteArray& fromFeatureId, const QByteArray& toFeatureId, const FeatureDependencyMap* dependencyMapPtr = nullptr) const const;
 
 	// reimplemented (imtbase::IObjectCollectionProvider)
 	virtual const imtbase::IObjectCollection* GetObjectCollection() const override;
@@ -121,15 +124,10 @@ TFeatureTreeModelCompWrap<BaseComponent>::TFeatureTreeModelCompWrap()
 }
 
 
-template <class BaseComponent>
-const imtbase::IObjectCollection* TFeatureTreeModelCompWrap<BaseComponent>::GetObjectCollection() const
-{
-	return &m_featurePackageCollectionMirror;
-}
-
+// reimplemented (imtlic::IFeatureDependencyChecker)
 
 template <class BaseComponent>
-const typename TFeatureTreeModelCompWrap<BaseComponent>::FeatureDependencyMap* TFeatureTreeModelCompWrap<BaseComponent>::GetDependencyMap() const
+const imtlic::IFeatureDependencyChecker::FeatureDependencyMap* TFeatureTreeModelCompWrap<BaseComponent>::GetDependencyMap() const
 {
 	return &m_featureDependencyMap;
 }
@@ -139,9 +137,9 @@ template <class BaseComponent>
 bool TFeatureTreeModelCompWrap<BaseComponent>::HasDependency(
 	const QByteArray& fromFeatureId,
 	const QByteArray& toFeatureId,
-	const TFeatureTreeModelCompWrap<BaseComponent>::FeatureDependencyMap* dependencyMapPtr) const
+	const imtlic::IFeatureDependencyChecker::FeatureDependencyMap* dependencyMapPtr) const
 {
-	if (dependencyMapPtr != nullptr){
+	if (dependencyMapPtr == nullptr){
 		dependencyMapPtr = &m_featureDependencyMap;
 	}
 
@@ -163,15 +161,24 @@ bool TFeatureTreeModelCompWrap<BaseComponent>::HasDependency(
 }
 
 
+// reimplemented (imtbase::IObjectCollectionProvider)
+
+template <class BaseComponent>
+const imtbase::IObjectCollection* TFeatureTreeModelCompWrap<BaseComponent>::GetObjectCollection() const
+{
+	return &m_featurePackageCollectionMirror;
+}
+
+
 // protected methods
 
 template <class BaseComponent>
 void TFeatureTreeModelCompWrap<BaseComponent>::DoUpdateFeatureTreeModels()
 {
 	UpdateFeatureTreeModels(
-		&m_featureTreeModel,
-		&m_selectedFeaturesModel,
-		&m_disabledFeaturesModel);
+				&m_featureTreeModel,
+				&m_selectedFeaturesModel,
+				&m_disabledFeaturesModel);
 }
 
 
@@ -181,8 +188,8 @@ template <class BaseComponent>
 void TFeatureTreeModelCompWrap<BaseComponent>::OnComponentCreated()
 {
 	m_featurePackageCollectionObserver.RegisterObject(
-		dynamic_cast<imtbase::IObjectCollection*>(m_featurePackageCollectionCompPtr.GetPtr()),
-		&TFeatureTreeModelCompWrap<BaseComponent>::OnFeaturePackageCollectionUpdate);
+				dynamic_cast<imtbase::IObjectCollection*>(m_featurePackageCollectionCompPtr.GetPtr()),
+				&TFeatureTreeModelCompWrap<BaseComponent>::OnFeaturePackageCollectionUpdate);
 }
 
 
