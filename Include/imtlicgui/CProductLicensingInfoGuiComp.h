@@ -11,7 +11,7 @@
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtlic/CFeaturePackageCollection.h>
 #include <imtlicgui/IFeatureItemStateHandler.h>
-#include <imtlicgui/TFeatureTreeModelCompBase.h>
+#include <imtlicgui/TFeatureTreeModelCompWrap.h>
 #include <GeneratedFiles/imtlicgui/ui_CProductLicensingInfoGuiComp.h>
 
 
@@ -25,7 +25,7 @@ namespace imtlicgui
 */
 
 class CProductLicensingInfoGuiComp:
-			public TFeatureTreeModelCompBase<
+			public TFeatureTreeModelCompWrap<
 						iqtgui::TDesignerGuiObserverCompBase <
 									Ui::CProductLicensingInfoGuiComp, imtlic::IProductLicensingInfo>>,
 			virtual public ibase::ICommandsProvider,
@@ -33,7 +33,7 @@ class CProductLicensingInfoGuiComp:
 {
 	Q_OBJECT
 public:
-	typedef public TFeatureTreeModelCompBase<
+	typedef public TFeatureTreeModelCompWrap<
 				iqtgui::TDesignerGuiObserverCompBase <
 							Ui::CProductLicensingInfoGuiComp, imtlic::IProductLicensingInfo>> BaseClass;
 
@@ -66,15 +66,16 @@ protected:
 	virtual void OnGuiDestroyed();
 
 private:
-	typedef QMap<QByteArray, QByteArrayList> FeatureDependencyMap;
-
 	void OnLicenseSelectionChanged(
 				const istd::IChangeable::ChangeSet& /*changeSet*/,
 				const imtbase::IMultiSelection* selectionPtr);
 	void EnumerateDependencies(const QByteArrayList& featureIds);
 	void EnumerateMissingFeatures();
 
-	virtual void UpdateFeatureTreeModels() override;
+	virtual void UpdateFeatureTreeModels(
+				imtbase::IObjectCollection* featureTreeModelPtr,
+				imtbase::IMultiSelection* selectedFeaturesModelPtr,
+				imtbase::IMultiSelection* disabledFeaturesModelPtr) override;
 
 private:
 	I_REF(iqtgui::IGuiObject, m_objectCollectionViewCompPtr);

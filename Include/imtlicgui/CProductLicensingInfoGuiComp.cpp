@@ -31,14 +31,14 @@ void CProductLicensingInfoGuiComp::OnItemStateChanged(const QByteArray& itemId, 
 	if (isChecked && !m_selectedFeatureIds.contains(itemId)){
 		m_selectedFeatureIds.append(itemId);
 
-		UpdateFeatureTreeModels();
+		DoUpdateFeatureTreeModels();
 		DoUpdateModel();
 	}
 
 	if (!isChecked && m_selectedFeatureIds.contains(itemId)){
 		m_selectedFeatureIds.removeOne(itemId);
 
-		UpdateFeatureTreeModels();
+		DoUpdateFeatureTreeModels();
 		DoUpdateModel();
 	}
 }
@@ -71,7 +71,7 @@ void CProductLicensingInfoGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 		m_selectedFeatureIds = licenseInfoPtr->GetFeatures();
 	}
 
-	UpdateFeatureTreeModels();
+	DoUpdateFeatureTreeModels();
 }
 
 
@@ -176,7 +176,7 @@ void CProductLicensingInfoGuiComp::OnLicenseSelectionChanged(
 		}
 	}
 
-	UpdateFeatureTreeModels();
+	DoUpdateFeatureTreeModels();
 }
 
 
@@ -184,9 +184,12 @@ void CProductLicensingInfoGuiComp::EnumerateDependencies(const QByteArrayList& f
 {
 	QByteArrayList nextIdsForEnumeration;
 
+	const QMap<QByteArray, QByteArrayList>* dependencyMapPtr = GetDependencyMap();
+	Q_ASSERT(dependencyMapPtr != nullptr);
+
 	for (const QByteArray& featureId : featureIds){
-		if (m_featureDependencyMap.contains(featureId)){
-			QByteArrayList dependencies = m_featureDependencyMap[featureId];
+		if (dependencyMapPtr->contains(featureId)){
+			QByteArrayList dependencies = dependencyMapPtr->value(featureId);
 
 			for (const QByteArray& dependency : dependencies){
 				if (!m_selectedFeatureIds.contains(dependency)){
@@ -209,10 +212,13 @@ void CProductLicensingInfoGuiComp::EnumerateMissingFeatures()
 
 	QByteArrayList allFeatureIds;
 
-	imtbase::ICollectionInfo::Ids packageCollectionIds = m_featurePackageCollectionMirror.GetElementIds();
+	const imtbase::IObjectCollection* collectionPtr = GetObjectCollection();
+	Q_ASSERT(collectionPtr != nullptr);
+
+	imtbase::ICollectionInfo::Ids packageCollectionIds = collectionPtr->GetElementIds();
 
 	for (const QByteArray& packageCollectionId : packageCollectionIds){
-		const istd::IChangeable* constObjectPtr = m_featurePackageCollectionMirror.GetObjectPtr(packageCollectionId);
+		const istd::IChangeable* constObjectPtr = collectionPtr->GetObjectPtr(packageCollectionId);
 		istd::IChangeable* objectPtr = const_cast<istd::IChangeable*>(constObjectPtr);
 		imtlic::IFeaturePackage* packagePtr = dynamic_cast<imtlic::IFeaturePackage*>(objectPtr);
 
@@ -236,21 +242,24 @@ void CProductLicensingInfoGuiComp::EnumerateMissingFeatures()
 }
 
 
-void CProductLicensingInfoGuiComp::UpdateFeatureTreeModels()
+void CProductLicensingInfoGuiComp::UpdateFeatureTreeModels(
+			imtbase::IObjectCollection* featureTreeModelPtr,
+			imtbase::IMultiSelection* selectedFeaturesModelPtr,
+			imtbase::IMultiSelection* disabledFeaturesModelPtr)
 {
 	QByteArrayList selectedFeatures;
 	QByteArrayList disabledFeatures;
 
 	{
-		istd::CChangeGroup changeGroup(&m_featureTreeModel);
+		istd::CChangeGroup changeGroup(featureTreeModelPtr);
 
 		if (m_selectedLicenseId.isEmpty()){
-			m_featureTreeModel.ResetData();
+			featureTreeModelPtr->ResetData();
 
 			return;
 		}
 
-		m_featureTreeModel.CopyFrom(m_featurePackageCollectionMirror);
+		featureTreeModelPtr->CopyFrom(*GetObjectCollection());
 
 		EnumerateDependencies(m_selectedFeatureIds);
 		selectedFeatures = m_selectedFeatureIds;
@@ -273,7 +282,7 @@ void CProductLicensingInfoGuiComp::UpdateFeatureTreeModels()
 				selectedFeatures.append(featureId);
 			}
 
-			m_featureTreeModel.InsertNewObject(
+			featureTreeModelPtr->InsertNewObject(
 						"FeaturePackage",
 						tr("Missing features"),
 						"",
@@ -294,8 +303,8 @@ void CProductLicensingInfoGuiComp::UpdateFeatureTreeModels()
 		}
 	}
 
-	m_selectedFeaturesModel.SetSelectedIds(selectedFeatures.toVector());
-	m_disabledFeaturesModel.SetSelectedIds(disabledFeatures.toVector());
+	selectedFeaturesModelPtr->SetSelectedIds(selectedFeatures.toVector());
+	disabledFeaturesModelPtr->SetSelectedIds(disabledFeatures.toVector());
 }
 
 
