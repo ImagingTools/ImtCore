@@ -117,6 +117,7 @@ void CFeatureTreeGuiComp::OnGuiCreated()
 	BaseClass::OnGuiCreated();
 
 	Features->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+	Features->setHeaderLabel(*m_headerLabelAttrPtr);
 }
 
 

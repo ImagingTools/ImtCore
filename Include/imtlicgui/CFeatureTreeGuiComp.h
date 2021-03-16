@@ -25,6 +25,7 @@ public:
 				Ui::CFeatureTreeGuiComp, imtbase::IObjectCollection> BaseClass;
 
 	I_BEGIN_COMPONENT(CFeatureTreeGuiComp);
+		I_ASSIGN(m_headerLabelAttrPtr, "HeaderLabel", "Header label", true, "Features");
 		I_ASSIGN(m_showFeatureStatesAttrPtr, "ShowFeatureStates", "Show feature selection states", true, true);
 		I_ASSIGN(m_featureItemStateHandlerCompPtr, "FeatureItemStateHandler", "Feature item state handler", false, "");
 		I_ASSIGN(m_featureSelectionCompPtr, "FeatureSelectionModel", "Feature selection model", true, "FeatureSelectionModel");
@@ -74,6 +75,7 @@ private:
 	};
 
 private:
+	I_TEXTATTR(m_headerLabelAttrPtr);
 	I_ATTR(bool, m_showFeatureStatesAttrPtr);
 	I_REF(imtlicgui::IFeatureItemStateHandler, m_featureItemStateHandlerCompPtr);
 	I_REF(imtbase::IMultiSelection, m_featureSelectionCompPtr);
