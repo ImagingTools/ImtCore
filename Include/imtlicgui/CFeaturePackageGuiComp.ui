@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>949</width>
-    <height>620</height>
+    <width>536</width>
+    <height>422</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Feature Package</string>
+   <string>Product Licensing</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -34,14 +34,14 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QWidget" name="FeatureList" native="true">
+     <widget class="QWidget" name="Features" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -59,34 +59,30 @@
        </property>
       </layout>
      </widget>
-     <widget class="QTreeWidget" name="FeatureTree">
-      <property name="styleSheet">
-       <string notr="true">QTreeView::item
-{
-    color: #335777;
-    height: 25px;
-}
-
-QTreeView::item::selected
-{
-    color: #335777;
-    background-color: #e3eefa;
-}
-
-QTreeView::branch::selected
-{
-    background: #e3eefa;
-}
-</string>
+     <widget class="QWidget" name="Dependencies" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <column>
-       <property name="text">
-        <string>Functional Dependencies</string>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
        </property>
-      </column>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+      </layout>
      </widget>
     </widget>
    </item>

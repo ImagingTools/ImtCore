@@ -10,10 +10,9 @@
 #include <imtbase/IMultiSelection.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/CCollectionInfo.h>
-#include <imtlic/IFeatureDependenciesProvider.h>
 #include <imtlic/IFeatureInfo.h>
 #include <imtlic/IFeaturePackage.h>
-#include <imtlicgui/CFeatureDependencyEditorBase.h>
+#include <imtlicgui/TFeatureTreeModelCompWrap.h>
 #include <GeneratedFiles/imtlicgui/ui_CFeaturePackageGuiComp.h>
 
 
@@ -26,54 +25,59 @@ namespace imtlicgui
 	\ingroup LicenseManagement
 */
 class CFeaturePackageGuiComp:
-			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CFeaturePackageGuiComp, imtlic::IFeaturePackage>,
-			protected CFeatureDependencyEditorBase,
-			virtual public ibase::ICommandsProvider
+			public TFeatureTreeModelCompWrap<
+						iqtgui::TDesignerGuiObserverCompBase<
+									Ui::CFeaturePackageGuiComp, imtlic::IFeaturePackage>>,
+			virtual public imtlicgui::IFeatureItemStateHandler
 {
 	Q_OBJECT
 public:
-	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CFeaturePackageGuiComp, imtlic::IFeaturePackage> BaseClass;
-	typedef CFeatureDependencyEditorBase BaseClass2;
+	typedef public TFeatureTreeModelCompWrap<
+				iqtgui::TDesignerGuiObserverCompBase<
+							Ui::CFeaturePackageGuiComp, imtlic::IFeaturePackage>> BaseClass;
 
 	I_BEGIN_COMPONENT(CFeaturePackageGuiComp);
-		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
+		I_REGISTER_INTERFACE(imtlicgui::IFeatureItemStateHandler)
 		I_REGISTER_SUBELEMENT(FeaturePackageProxy);
 		I_REGISTER_SUBELEMENT_INTERFACE(FeaturePackageProxy, imtlic::IFeatureInfoProvider, ExtractFeaturePackageProxy);
 		I_ASSIGN(m_objectCollectionViewCompPtr, "ObjectCollectionView", "Object collection view", true, "ObjectCollectionView");
 		I_ASSIGN_TO(m_objectCollectionObserverCompPtr, m_objectCollectionViewCompPtr, true);
+		I_ASSIGN(m_featureTreeCompPtr, "FeatureTreeView", "Feature tree view", true, "FeatureTreeGui");
+		I_ASSIGN_TO(m_featureTreeObserverCompPtr, m_featureTreeCompPtr, true);
 	I_END_COMPONENT;
 
 	CFeaturePackageGuiComp();
 
-Q_SIGNALS:
-	void EmitFeatureTreeItemChanged();
+	// reimplemented (imtlicgui::IFeatureItemStateHandler)
+	virtual void OnItemStateChanged(const QByteArray& itemId, bool isChecked) override;
 
 protected:
-	void virtual OnFeatureSelectionChanged();
-
-	// reimplemente (imtlicgui::CFeatureDependencyEditorBase)
-	virtual void UpdateFeaturePackageModel() override;
-	virtual void FeatureTreeItemChanged() override;
-
-	// reimplemented (ibase::ICommandsProvider)
-	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
-
-	// reimplemented (iqtgui::CGuiComponentBase)
-	virtual void OnGuiCreated();
-	virtual void OnGuiDestroyed();
-	virtual void OnGuiRetranslate() override;
+	// reimplemented (imtlicgui::TFeatureTreeModelCompWrap)
+	virtual void UpdateFeatureTreeModels(
+				imtbase::IObjectCollection* featureTreeModelPtr,
+				imtbase::IMultiSelection* selectedFeaturesModelPtr,
+				imtbase::IMultiSelection* disabledFeaturesModelPtr) override;
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelAttached() override;
 	virtual void OnGuiModelDetached() override;
 	virtual void UpdateModel() const;
+	
+	// reimplemented (iqtgui::CGuiComponentBase)
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiDestroyed() override;
 
-private Q_SLOTS:
-	void on_FeatureTree_itemChanged(QTreeWidgetItem *item, int column);
-	virtual void OnFeatureTreeItemChanged();
+private:
+	void OnFeatureSelectionChanged(
+				const istd::IChangeable::ChangeSet& /*changeSet*/,
+				const imtbase::IMultiSelection* selectionPtr);
+
+	template <class InterfaceType>
+	static InterfaceType* ExtractFeaturePackageProxy(CFeaturePackageGuiComp& component)
+	{
+		return &component.m_featurePackageProxy;
+	}
 
 protected:
 	class FeaturePackageProxy: virtual public imtlic::IFeaturePackage
@@ -101,37 +105,20 @@ protected:
 		CFeaturePackageGuiComp& m_parent;
 		imtbase::CCollectionInfo m_collectionInfo;
 	};
-	
-	template <class InterfaceType>
-	static InterfaceType* ExtractFeaturePackageProxy(CFeaturePackageGuiComp& component)
-	{
-		return &component.m_featurePackageProxy;
-	}
 
-	class FeatureSelectionObserver: public imod::TSingleModelObserverBase<imtbase::IMultiSelection>
-	{
-	public:
-		FeatureSelectionObserver(CFeaturePackageGuiComp& parent);
-
-		// reimplemented (imod::CSingleModelObserverBase)
-		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
-
-	private:
-		CFeaturePackageGuiComp& m_parent;
-	};
-
-	template <class InterfaceType>
-	static InterfaceType* ExtractFeatureSelection(CFeaturePackageGuiComp& component)
-	{
-		return &component.m_featureSelectionObserver;
-	}
-
-protected:
+private:
 	I_REF(iqtgui::IGuiObject, m_objectCollectionViewCompPtr);
 	I_REF(imod::IObserver, m_objectCollectionObserverCompPtr);
+	I_REF(iqtgui::IGuiObject, m_featureTreeCompPtr);
+	I_REF(imod::IObserver, m_featureTreeObserverCompPtr);
 
 	FeaturePackageProxy m_featurePackageProxy;
-	FeatureSelectionObserver m_featureSelectionObserver;
+
+	imtbase::TModelUpdateBinder<imtbase::IMultiSelection, CFeaturePackageGuiComp> m_featureSelectionObserver;
+
+	QByteArray m_selectedFeatureId;
+	FeatureDependencyMap m_dependencyMap;
+	QByteArrayList m_missingDependencyIds;
 };
 
 

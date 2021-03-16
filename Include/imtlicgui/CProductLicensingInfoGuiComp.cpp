@@ -44,20 +44,73 @@ void CProductLicensingInfoGuiComp::OnItemStateChanged(const QByteArray& itemId, 
 }
 
 
-// reimplemented (ibase::ICommandsProvider)
+// protected methods
 
-const ibase::IHierarchicalCommand* CProductLicensingInfoGuiComp::GetCommands() const
+// reimplemented (imtlicgui::TFeatureTreeModelCompWrap)
+
+void CProductLicensingInfoGuiComp::UpdateFeatureTreeModels(
+	imtbase::IObjectCollection* featureTreeModelPtr,
+	imtbase::IMultiSelection* selectedFeaturesModelPtr,
+	imtbase::IMultiSelection* disabledFeaturesModelPtr)
 {
-	ibase::ICommandsProvider* commandsProviderPtr = dynamic_cast<ibase::ICommandsProvider*>(m_objectCollectionViewCompPtr.GetPtr());
-	if (commandsProviderPtr != nullptr){
-		commandsProviderPtr->GetCommands();
+	QByteArrayList selectedFeatures;
+	QByteArrayList disabledFeatures;
+
+	{
+		istd::CChangeGroup changeGroup(featureTreeModelPtr);
+
+		featureTreeModelPtr->ResetData();
+
+		if (!m_selectedLicenseId.isEmpty()){
+			featureTreeModelPtr->CopyFrom(*GetObjectCollection());
+
+			EnumerateDependencies(m_selectedFeatureIds);
+			selectedFeatures = m_selectedFeatureIds;
+
+			EnumerateMissingFeatures();
+			if (!m_missingFeatureIds.isEmpty()){
+				imtlic::CFeaturePackage missingPackage;
+				missingPackage.SetPackageId("MISSING_FEATURES");
+
+				for (const QByteArray& featureId : m_missingFeatureIds){
+					imtlic::CFeatureInfo featureInfo;
+					featureInfo.SetFeatureId(featureId);
+					featureInfo.SetFeatureName(tr("ID: %1").arg(QString(featureId)));
+					missingPackage.InsertNewObject(
+						"FeatureInfo",
+						tr("ID: %1").arg(QString(featureId)),
+						"",
+						&featureInfo);
+
+					selectedFeatures.append(featureId);
+				}
+
+				featureTreeModelPtr->InsertNewObject(
+					"FeaturePackage",
+					tr("Missing features"),
+					"",
+					&missingPackage);
+			}
+
+			// Disable dependent features
+			for (const QByteArray& fromId : m_selectedFeatureIds){
+				for (const QByteArray& toId : m_selectedFeatureIds){
+					if (HasDependency(fromId, toId)){
+						if (!disabledFeatures.contains(toId)){
+							if (!m_missingFeatureIds.contains(toId)){
+								disabledFeatures.append(toId);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
-	
-	return nullptr;
+
+	selectedFeaturesModelPtr->SetSelectedIds(selectedFeatures.toVector());
+	disabledFeaturesModelPtr->SetSelectedIds(disabledFeatures.toVector());
 }
 
-
-// protected methods
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
@@ -239,72 +292,6 @@ void CProductLicensingInfoGuiComp::EnumerateMissingFeatures()
 			m_missingFeatureIds.push_back(featureId);
 		}
 	}
-}
-
-
-void CProductLicensingInfoGuiComp::UpdateFeatureTreeModels(
-			imtbase::IObjectCollection* featureTreeModelPtr,
-			imtbase::IMultiSelection* selectedFeaturesModelPtr,
-			imtbase::IMultiSelection* disabledFeaturesModelPtr)
-{
-	QByteArrayList selectedFeatures;
-	QByteArrayList disabledFeatures;
-
-	{
-		istd::CChangeGroup changeGroup(featureTreeModelPtr);
-
-		if (m_selectedLicenseId.isEmpty()){
-			featureTreeModelPtr->ResetData();
-
-			return;
-		}
-
-		featureTreeModelPtr->CopyFrom(*GetObjectCollection());
-
-		EnumerateDependencies(m_selectedFeatureIds);
-		selectedFeatures = m_selectedFeatureIds;
-
-		EnumerateMissingFeatures();
-		if (!m_missingFeatureIds.isEmpty()){
-			imtlic::CFeaturePackage missingPackage;
-			missingPackage.SetPackageId("MISSING_FEATURES");
-		
-			for (const QByteArray& featureId : m_missingFeatureIds){
-				imtlic::CFeatureInfo featureInfo;
-				featureInfo.SetFeatureId(featureId);
-				featureInfo.SetFeatureName(tr("ID: %1").arg(QString(featureId)));
-				missingPackage.InsertNewObject(
-							"FeatureInfo",
-							tr("ID: %1").arg(QString(featureId)),
-							"",
-							&featureInfo);
-
-				selectedFeatures.append(featureId);
-			}
-
-			featureTreeModelPtr->InsertNewObject(
-						"FeaturePackage",
-						tr("Missing features"),
-						"",
-						&missingPackage);
-		}
-
-		// Disable dependent features
-		for (const QByteArray& fromId : m_selectedFeatureIds){
-			for (const QByteArray& toId : m_selectedFeatureIds){
-				if (HasDependency(fromId, toId)){
-					if (!disabledFeatures.contains(toId)){
-						if (!m_missingFeatureIds.contains(toId)){
-							disabledFeatures.append(toId);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	selectedFeaturesModelPtr->SetSelectedIds(selectedFeatures.toVector());
-	disabledFeaturesModelPtr->SetSelectedIds(disabledFeatures.toVector());
 }
 
 

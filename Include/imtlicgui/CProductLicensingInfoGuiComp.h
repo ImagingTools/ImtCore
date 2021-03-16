@@ -28,7 +28,6 @@ class CProductLicensingInfoGuiComp:
 			public TFeatureTreeModelCompWrap<
 						iqtgui::TDesignerGuiObserverCompBase <
 									Ui::CProductLicensingInfoGuiComp, imtlic::IProductLicensingInfo>>,
-			virtual public ibase::ICommandsProvider,
 			virtual public imtlicgui::IFeatureItemStateHandler
 {
 	Q_OBJECT
@@ -38,7 +37,6 @@ public:
 							Ui::CProductLicensingInfoGuiComp, imtlic::IProductLicensingInfo>> BaseClass;
 
 	I_BEGIN_COMPONENT(CProductLicensingInfoGuiComp);
-		I_REGISTER_INTERFACE(ibase::ICommandsProvider)
 		I_REGISTER_INTERFACE(imtlicgui::IFeatureItemStateHandler)
 		I_ASSIGN(m_objectCollectionViewCompPtr, "ObjectCollectionView", "Object collection view", true, "ObjectCollectionView");
 		I_ASSIGN_TO(m_objectCollectionObserverCompPtr, m_objectCollectionViewCompPtr, true);
@@ -51,10 +49,13 @@ public:
 	// reimplemented (imtlicgui::IFeatureItemStateHandler)
 	virtual void OnItemStateChanged(const QByteArray& itemId, bool isChecked) override;
 	
-	// reimplemented (ibase::ICommandsProvider)
-	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
-
 protected:
+	// reimplemented (imtlicgui::TFeatureTreeModelCompWrap)
+	virtual void UpdateFeatureTreeModels(
+				imtbase::IObjectCollection* featureTreeModelPtr,
+				imtbase::IMultiSelection* selectedFeaturesModelPtr,
+				imtbase::IMultiSelection* disabledFeaturesModelPtr) override;
+
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelAttached() override;
@@ -62,8 +63,8 @@ protected:
 	virtual void UpdateModel() const;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
-	virtual void OnGuiCreated();
-	virtual void OnGuiDestroyed();
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiDestroyed() override;
 
 private:
 	void OnLicenseSelectionChanged(
@@ -71,11 +72,6 @@ private:
 				const imtbase::IMultiSelection* selectionPtr);
 	void EnumerateDependencies(const QByteArrayList& featureIds);
 	void EnumerateMissingFeatures();
-
-	virtual void UpdateFeatureTreeModels(
-				imtbase::IObjectCollection* featureTreeModelPtr,
-				imtbase::IMultiSelection* selectedFeaturesModelPtr,
-				imtbase::IMultiSelection* disabledFeaturesModelPtr) override;
 
 private:
 	I_REF(iqtgui::IGuiObject, m_objectCollectionViewCompPtr);
