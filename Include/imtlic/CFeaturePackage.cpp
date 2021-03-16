@@ -161,6 +161,18 @@ const IFeatureInfoProvider* CFeaturePackage::GetParentFeatureInfoProvider(const 
 }
 
 
+// reimplemented (IObjectCollection)
+
+bool CFeaturePackage::RemoveObject(const QByteArray& objectId)
+{
+	bool retVal = BaseClass::RemoveObject(objectId);
+
+	CleanupDependencies();
+
+	return retVal;
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CFeaturePackage::Serialize(iser::IArchive& archive)
@@ -218,6 +230,10 @@ bool CFeaturePackage::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && archive.EndTag(dependenciesTag);
 
+	if (archive.IsStoring()){
+		CleanupDependencies();
+	}
+
 	static iser::CArchiveTag parentsTag("Parents", "Parent feature providers", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(parentsTag);
 	retVal = retVal && m_parents.Serialize(archive);
@@ -264,6 +280,37 @@ bool CFeaturePackage::ResetData(CompatibilityMode mode)
 	m_dependencies.clear();
 
 	return true;
+}
+
+
+// private pethods
+
+void CFeaturePackage::CleanupDependencies()
+{
+	QByteArrayList featureCollectionIds = GetElementIds().toList();
+	QByteArrayList featureIds;
+	for (const QByteArray& featureCollectionId : featureCollectionIds){
+		const IFeatureInfo* featurePtr = dynamic_cast<const IFeatureInfo*>(GetObjectPtr(featureCollectionId));
+		if (featurePtr != nullptr){
+			featureIds.append(featurePtr->GetFeatureId());
+		}
+	}
+
+	QByteArrayList dependencyMapKeys = m_dependencies.keys();
+	QByteArrayList fetureIdsForRemove;
+	for (const QByteArray& featureId : dependencyMapKeys){
+		if (!featureIds.contains(featureId)){
+			fetureIdsForRemove.append(featureId);
+		}
+	}
+
+	if (!fetureIdsForRemove.isEmpty()){
+		istd::CChangeNotifier changeNotifier(this);
+
+		for (const QByteArray& featureId : fetureIdsForRemove){
+			m_dependencies.remove(featureId);
+		}
+	}
 }
 
 
