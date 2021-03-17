@@ -58,7 +58,7 @@ void CFeaturePackageGuiComp::OnItemStateChanged(const QByteArray& itemId, bool i
 		}
 	}
 
-	DoUpdateFeatureTreeModels();
+	DoUpdateItemTree();
 	DoUpdateModel();
 }
 
@@ -67,74 +67,99 @@ void CFeaturePackageGuiComp::OnItemStateChanged(const QByteArray& itemId, bool i
 
 // reimplemented (imtlicgui::TFeatureTreeModelCompWrap)
 
-void CFeaturePackageGuiComp::UpdateFeatureTreeModels(
-			imtbase::IObjectCollection* featureTreeModelPtr,
-			imtbase::IMultiSelection* selectedFeaturesModelPtr,
-			imtbase::IMultiSelection* disabledFeaturesModelPtr)
+void CFeaturePackageGuiComp::UpdateItemTree(IItemTree* itemTreePtr)
 {
-	QByteArrayList selectedFeatures;
-	QSet<QByteArray> disabledFeatures;
+	CItem* g1 = new CItem();
+	CItem* g2 = new CItem();
+	CItem* f11 = new CItem();
+	CItem* f12 = new CItem();
+	CItem* f21 = new CItem();
+	CItem* f22 = new CItem();
 
-	{
-		istd::CChangeGroup changeGroup(featureTreeModelPtr);
+	g1->SetName("G1");
+	g2->SetName("G2");
+	f11->SetName("F11");
+	f12->SetName("F12");
+	f21->SetName("F21");
+	f22->SetName("F21");
 
-		featureTreeModelPtr->ResetData();
-		
-		if (!m_selectedFeatureId.isEmpty()){
-			featureTreeModelPtr->CopyFrom(*GetObjectCollection());
+	f11->SetActivated(1);
+	f12->SetEnabled(false);
 
-			QByteArrayList allFeatureIds= imtlic::CFeaturePackageCollectionUtility::GetAllFeatureIds(*featureTreeModelPtr);
+	g1->AddChild(ItemTreePtr(f11));
+	g1->AddChild(ItemTreePtr(f12));
+	g2->AddChild(ItemTreePtr(f21));
+	g2->AddChild(ItemTreePtr(f22));
+	
+	istd::CChangeGroup changeGroup(itemTreePtr);
 
-			// Unsaved features
-			imtlic::CFeaturePackage unsavedFeaturesPackage;
+	itemTreePtr->ResetData();
+	itemTreePtr->AddChild(ItemTreePtr(g1));
+	itemTreePtr->AddChild(ItemTreePtr(g2));
 
-			imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<imtlic::IFeatureInfoProvider*>(GetObservedObject());
-			if (packagePtr != nullptr){
-				imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetFeatureList().GetElementIds();
-				for (const QByteArray& featureId : featureIds){
-					const imtlic::IFeatureInfo* featurePtr = dynamic_cast<const imtlic::IFeatureInfo*>(packagePtr->GetFeatureInfo(featureId));
-					if (featurePtr != nullptr){
-						if (!allFeatureIds.contains(featurePtr->GetFeatureId())){
-							imtlic::CFeatureInfo featureInfo;
-							featureInfo.SetFeatureId(featurePtr->GetFeatureId());
-							featureInfo.SetFeatureName(featurePtr->GetFeatureName());
-							unsavedFeaturesPackage.InsertNewObject(
-										"FeatureInfo",
-										featurePtr->GetFeatureName(),
-										"",
-										&featureInfo);
-						}
-					}
-				}
-			}
+	//QByteArrayList selectedFeatures;
+	//QSet<QByteArray> disabledFeatures;
 
-			if (!unsavedFeaturesPackage.GetFeatureList().GetElementIds().isEmpty()){
-				featureTreeModelPtr->InsertNewObject(
-					"FeaturePackage",
-					tr("Unsaved Features"),
-					"",
-					&unsavedFeaturesPackage);
-			}
+	//{
+		//istd::CChangeGroup changeGroup(featureTreeModelPtr);
 
-			// Remove m_selectedFeatureId feature
-			imtbase::ICollectionInfo::Ids packageIds = featureTreeModelPtr->GetElementIds();
-			for (const QByteArray& packageId : packageIds){
-				imtbase::IObjectCollection* packagePtr = dynamic_cast<imtbase::IObjectCollection*>(
-							const_cast<istd::IChangeable*>(featureTreeModelPtr->GetObjectPtr(packageId)));
+		//featureTreeModelPtr->ResetData();
+		//
+		//if (!m_selectedFeatureId.isEmpty()){
+		//	featureTreeModelPtr->CopyFrom(*GetObjectCollection());
 
-				if (packagePtr != nullptr){
-					imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetElementIds();
-					for (const QByteArray& featureId : featureIds){
-						const imtlic::IFeatureInfo* featurePtr = dynamic_cast<const imtlic::IFeatureInfo*>(packagePtr->GetObjectPtr(featureId));
-						if (featurePtr != nullptr){
-							if (featurePtr->GetFeatureId() == m_selectedFeatureId){
-								packagePtr->RemoveObject(featureId);
-								continue;
-							}
-						}
-					}
-				}
-			}
+		//	QByteArrayList allFeatureIds= imtlic::CFeaturePackageCollectionUtility::GetAllFeatureIds(*featureTreeModelPtr);
+
+		//	// Unsaved features
+		//	imtlic::CFeaturePackage unsavedFeaturesPackage;
+
+		//	imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<imtlic::IFeatureInfoProvider*>(GetObservedObject());
+		//	if (packagePtr != nullptr){
+		//		imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetFeatureList().GetElementIds();
+		//		for (const QByteArray& featureId : featureIds){
+		//			const imtlic::IFeatureInfo* featurePtr = dynamic_cast<const imtlic::IFeatureInfo*>(packagePtr->GetFeatureInfo(featureId));
+		//			if (featurePtr != nullptr){
+		//				if (!allFeatureIds.contains(featurePtr->GetFeatureId())){
+		//					imtlic::CFeatureInfo featureInfo;
+		//					featureInfo.SetFeatureId(featurePtr->GetFeatureId());
+		//					featureInfo.SetFeatureName(featurePtr->GetFeatureName());
+		//					unsavedFeaturesPackage.InsertNewObject(
+		//								"FeatureInfo",
+		//								featurePtr->GetFeatureName(),
+		//								"",
+		//								&featureInfo);
+		//				}
+		//			}
+		//		}
+		//	}
+
+		//	if (!unsavedFeaturesPackage.GetFeatureList().GetElementIds().isEmpty()){
+		//		featureTreeModelPtr->InsertNewObject(
+		//			"FeaturePackage",
+		//			tr("Unsaved Features"),
+		//			"",
+		//			&unsavedFeaturesPackage);
+		//	}
+
+		//	// Remove m_selectedFeatureId feature
+		//	imtbase::ICollectionInfo::Ids packageIds = featureTreeModelPtr->GetElementIds();
+		//	for (const QByteArray& packageId : packageIds){
+		//		imtbase::IObjectCollection* packagePtr = dynamic_cast<imtbase::IObjectCollection*>(
+		//					const_cast<istd::IChangeable*>(featureTreeModelPtr->GetObjectPtr(packageId)));
+
+		//		if (packagePtr != nullptr){
+		//			imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetElementIds();
+		//			for (const QByteArray& featureId : featureIds){
+		//				const imtlic::IFeatureInfo* featurePtr = dynamic_cast<const imtlic::IFeatureInfo*>(packagePtr->GetObjectPtr(featureId));
+		//				if (featurePtr != nullptr){
+		//					if (featurePtr->GetFeatureId() == m_selectedFeatureId){
+		//						packagePtr->RemoveObject(featureId);
+		//						continue;
+		//					}
+		//				}
+		//			}
+		//		}
+		//	}
 
 			// Disabled features
 			//allFeatureIds = imtlic::CFeaturePackageCollectionUtility::GetAllFeatureIds(*featureTreeModelPtr);
@@ -156,48 +181,45 @@ void CFeaturePackageGuiComp::UpdateFeatureTreeModels(
 			//}
 
 			// Selected features
-			selectedFeatures = m_dependencyMap[m_selectedFeatureId];
+			//selectedFeatures = m_dependencyMap[m_selectedFeatureId];
 
 			// Missing features group
-			allFeatureIds = imtlic::CFeaturePackageCollectionUtility::GetAllFeatureIds(*featureTreeModelPtr);
+	//		allFeatureIds = imtlic::CFeaturePackageCollectionUtility::GetAllFeatureIds(*featureTreeModelPtr);
 
-			imtlic::CFeaturePackage missingFeaturesPackage;
+	//		imtlic::CFeaturePackage missingFeaturesPackage;
 
-			if (packagePtr != nullptr){
-				imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetFeatureList().GetElementIds();
-				for (const QByteArray& featureId : featureIds){
-					const imtlic::IFeatureInfo* featurePtr = dynamic_cast<const imtlic::IFeatureInfo*>(packagePtr->GetFeatureInfo(featureId));
-					if (featurePtr != nullptr){
-						if (!allFeatureIds.contains(featurePtr->GetFeatureId()) && featurePtr->GetFeatureId() != m_selectedFeatureId){
-							imtlic::CFeatureInfo featureInfo;
-							featureInfo.SetFeatureId(featurePtr->GetFeatureId());
-							featureInfo.SetFeatureName(tr("ID: %1").arg(QString(featurePtr->GetFeatureId())));
-							missingFeaturesPackage.InsertNewObject(
-										"FeatureInfo",
-										tr("ID: %1").arg(QString(featurePtr->GetFeatureId())),
-										"",
-										&featureInfo);
+	//		if (packagePtr != nullptr){
+	//			imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetFeatureList().GetElementIds();
+	//			for (const QByteArray& featureId : featureIds){
+	//				const imtlic::IFeatureInfo* featurePtr = dynamic_cast<const imtlic::IFeatureInfo*>(packagePtr->GetFeatureInfo(featureId));
+	//				if (featurePtr != nullptr){
+	//					if (!allFeatureIds.contains(featurePtr->GetFeatureId()) && featurePtr->GetFeatureId() != m_selectedFeatureId){
+	//						imtlic::CFeatureInfo featureInfo;
+	//						featureInfo.SetFeatureId(featurePtr->GetFeatureId());
+	//						featureInfo.SetFeatureName(tr("ID: %1").arg(QString(featurePtr->GetFeatureId())));
+	//						missingFeaturesPackage.InsertNewObject(
+	//									"FeatureInfo",
+	//									tr("ID: %1").arg(QString(featurePtr->GetFeatureId())),
+	//									"",
+	//									&featureInfo);
 
-							//disabledFeatures.append(featurePtr->GetFeatureId());
-						}
-					}
-				}
-			}
+	//						//disabledFeatures.append(featurePtr->GetFeatureId());
+	//					}
+	//				}
+	//			}
+	//		}
 
-			if (!missingFeaturesPackage.GetFeatureList().GetElementIds().isEmpty()){
-				missingFeaturesPackage.SetPackageId("MISSING_FEATURES");
+	//		if (!missingFeaturesPackage.GetFeatureList().GetElementIds().isEmpty()){
+	//			missingFeaturesPackage.SetPackageId("MISSING_FEATURES");
 
-				featureTreeModelPtr->InsertNewObject(
-							"FeaturePackage",
-							tr("Missing Features"),
-							"",
-							&missingFeaturesPackage);
-			}
-		}
-	}
-
-	selectedFeaturesModelPtr->SetSelectedIds(selectedFeatures.toVector());
-	disabledFeaturesModelPtr->SetSelectedIds(disabledFeatures.toList().toVector());
+	//			featureTreeModelPtr->InsertNewObject(
+	//						"FeaturePackage",
+	//						tr("Missing Features"),
+	//						"",
+	//						&missingFeaturesPackage);
+	//		}
+	//	}
+	//}
 }
 
 
@@ -218,7 +240,7 @@ void CFeaturePackageGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 		}
 	}
 
-	DoUpdateFeatureTreeModels();
+	DoUpdateItemTree();
 }
 
 
@@ -315,7 +337,7 @@ void CFeaturePackageGuiComp::OnFeatureSelectionChanged(
 		}
 	}
 
-	DoUpdateFeatureTreeModels();
+	DoUpdateItemTree();
 }
 
 

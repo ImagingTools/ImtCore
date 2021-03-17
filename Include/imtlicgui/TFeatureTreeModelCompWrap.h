@@ -21,6 +21,7 @@
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtlic/CFeaturePackageCollection.h>
 #include <imtlic/CFeaturePackageCollectionUtility.h>
+#include <imtlicgui/CItem.h>
 #include <imtlicgui/IFeatureItemStateHandler.h>
 
 
@@ -38,18 +39,10 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(TFeatureTreeModelCompWrap);
 		I_REGISTER_INTERFACE(imtbase::IObjectCollectionProvider)
-		I_REGISTER_SUBELEMENT(FeatureTreeModel)
-		I_REGISTER_SUBELEMENT_INTERFACE(FeatureTreeModel, istd::IChangeable, ExtractFeatureTreeModel)
-		I_REGISTER_SUBELEMENT_INTERFACE(FeatureTreeModel, imod::IModel, ExtractFeatureTreeModel)
-		I_REGISTER_SUBELEMENT_INTERFACE(FeatureTreeModel, imtbase::IObjectCollection, ExtractFeatureTreeModel)
-		I_REGISTER_SUBELEMENT(SelectedFeaturesModel)
-		I_REGISTER_SUBELEMENT_INTERFACE(SelectedFeaturesModel, istd::IChangeable, ExtractSelectedFeaturesModel)
-		I_REGISTER_SUBELEMENT_INTERFACE(SelectedFeaturesModel, imod::IModel, ExtractSelectedFeaturesModel)
-		I_REGISTER_SUBELEMENT_INTERFACE(SelectedFeaturesModel, imtbase::IMultiSelection, ExtractSelectedFeaturesModel)
-		I_REGISTER_SUBELEMENT(DisabledFeaturesModel)
-		I_REGISTER_SUBELEMENT_INTERFACE(DisabledFeaturesModel, istd::IChangeable, ExtractDisabledFeaturesModel)
-		I_REGISTER_SUBELEMENT_INTERFACE(DisabledFeaturesModel, imod::IModel, ExtractDisabledFeaturesModel)
-		I_REGISTER_SUBELEMENT_INTERFACE(DisabledFeaturesModel, imtbase::IMultiSelection, ExtractDisabledFeaturesModel)
+		I_REGISTER_SUBELEMENT(ItemTree)
+		I_REGISTER_SUBELEMENT_INTERFACE(ItemTree, istd::IChangeable, ExtractItemTree)
+		I_REGISTER_SUBELEMENT_INTERFACE(ItemTree, imod::IModel, ExtractItemTree)
+		I_REGISTER_SUBELEMENT_INTERFACE(ItemTree, imtlicgui::IItemTree, ExtractItemTree)
 		I_ASSIGN(m_featurePackageCollectionCompPtr, "FeaturePackageCollection", "Feature package collection", true, "");
 	I_END_COMPONENT;
 
@@ -63,16 +56,13 @@ protected:
 		Update feature tree models.
 		This method should be called directly from derived classes
 	*/
-	void DoUpdateFeatureTreeModels();
+	void DoUpdateItemTree();
 
 	/*
 		Do update of the models to reflect the current contents of feature tree GUI.
 		This method should be implmented by derived classes.
 	*/
-	virtual void UpdateFeatureTreeModels(
-				imtbase::IObjectCollection* featureTreeModelPtr,
-				imtbase::IMultiSelection* selectedFeaturesModelPtr,
-				imtbase::IMultiSelection* disabledFeaturesModelPtr) = 0;
+	virtual void UpdateItemTree(IItemTree* itemTreePtr) = 0;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -84,33 +74,18 @@ private:
 
 private:
 	template <typename InterfaceType>
-	static InterfaceType* ExtractFeatureTreeModel(TFeatureTreeModelCompWrap& component)
+	static InterfaceType* ExtractItemTree(TFeatureTreeModelCompWrap& component)
 	{
-		return &component.m_featureTreeModel;
-	}
-
-	template <typename InterfaceType>
-	static InterfaceType* ExtractSelectedFeaturesModel(TFeatureTreeModelCompWrap& component)
-	{
-		return &component.m_selectedFeaturesModel;
-	}
-
-	template <typename InterfaceType>
-	static InterfaceType* ExtractDisabledFeaturesModel(TFeatureTreeModelCompWrap& component)
-	{
-		return &component.m_disabledFeaturesModel;
+		return &component.m_itemTree;
 	}
 
 private:
 	I_REF(imtbase::IObjectCollection, m_featurePackageCollectionCompPtr);
 
 	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, TFeatureTreeModelCompWrap> m_featurePackageCollectionObserver;
-
 	imtlic::CFeaturePackageCollection m_featurePackageCollectionMirror;
 
-	imod::TModelWrap<imtlic::CFeaturePackageCollection> m_featureTreeModel;
-	imod::TModelWrap<imtbase::CMultiSelection> m_selectedFeaturesModel;
-	imod::TModelWrap<imtbase::CMultiSelection> m_disabledFeaturesModel;
+	imod::TModelWrap<imtlicgui::CItem> m_itemTree;
 };
 
 
@@ -135,12 +110,9 @@ const imtbase::IObjectCollection* TFeatureTreeModelCompWrap<BaseComponent>::GetO
 // protected methods
 
 template <class BaseComponent>
-void TFeatureTreeModelCompWrap<BaseComponent>::DoUpdateFeatureTreeModels()
+void TFeatureTreeModelCompWrap<BaseComponent>::DoUpdateItemTree()
 {
-	UpdateFeatureTreeModels(
-				&m_featureTreeModel,
-				&m_selectedFeaturesModel,
-				&m_disabledFeaturesModel);
+	UpdateItemTree(&m_itemTree);
 }
 
 
@@ -187,7 +159,7 @@ void TFeatureTreeModelCompWrap<BaseComponent>::OnFeaturePackageCollectionUpdate(
 		}
 	}
 
-	DoUpdateFeatureTreeModels();
+	DoUpdateItemTree();
 }
 
 

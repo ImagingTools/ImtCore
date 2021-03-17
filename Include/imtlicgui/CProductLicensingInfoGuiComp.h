@@ -50,10 +50,7 @@ public:
 	
 protected:
 	// reimplemented (imtlicgui::TFeatureTreeModelCompWrap)
-	virtual void UpdateFeatureTreeModels(
-				imtbase::IObjectCollection* featureTreeModelPtr,
-				imtbase::IMultiSelection* selectedFeaturesModelPtr,
-				imtbase::IMultiSelection* disabledFeaturesModelPtr) override;
+	virtual void UpdateItemTree(IItemTree* itemTreePtr) override;
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
