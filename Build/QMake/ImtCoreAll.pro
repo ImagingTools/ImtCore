@@ -139,3 +139,9 @@ ImtPyPck.depends = imtpy
 	EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
 	EagleView.depends = Imt3dViewPck Imt3dGuiPck
 }
+
+# Tutorials
+	SUBDIRS += ServerDemo
+	ServerDemo.file = ../../Docs/Tutorials/ServerDemo/QMake/ServerDemo.pro
+	ServerDemo.depends = ImtRestPck ImtCorePck
+
