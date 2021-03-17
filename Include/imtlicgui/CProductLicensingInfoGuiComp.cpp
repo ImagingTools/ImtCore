@@ -10,6 +10,7 @@
 #include <imtlic/IFeatureInfoProvider.h>
 #include <imtlic/ILicenseInfo.h>
 #include <imtlic/CFeaturePackage.h>
+#include <imtlic/CFeaturePackageCollection.h>
 
 
 namespace imtlicgui
@@ -92,10 +93,13 @@ void CProductLicensingInfoGuiComp::UpdateFeatureTreeModels(
 					&missingPackage);
 			}
 
+			const QMap<QByteArray, QByteArrayList> dependencyMap =
+						imtlic::CFeaturePackageCollectionUtility::GetDependencies(*GetObjectCollection());
+
 			// Disable dependent features
 			for (const QByteArray& fromId : m_selectedFeatureIds){
 				for (const QByteArray& toId : m_selectedFeatureIds){
-					if (HasDependency(fromId, toId)){
+					if (imtlic::CFeaturePackageCollectionUtility::HasDependency(dependencyMap, fromId, toId)){
 						if (!disabledFeatures.contains(toId)){
 							if (!m_missingFeatureIds.contains(toId)){
 								disabledFeatures.append(toId);
@@ -237,12 +241,14 @@ void CProductLicensingInfoGuiComp::EnumerateDependencies(const QByteArrayList& f
 {
 	QByteArrayList nextIdsForEnumeration;
 
-	const QMap<QByteArray, QByteArrayList>* dependencyMapPtr = GetDependencyMap();
-	Q_ASSERT(dependencyMapPtr != nullptr);
+	const QMap<QByteArray, QByteArrayList> dependencyMap =
+				imtlic::CFeaturePackageCollectionUtility::GetDependencies(*GetObjectCollection());
+
+	//QByteArrayList allFeatureIds = imtlic::CFeaturePackageCollectionUtility::GetAllFeatureIds(*GetObjectCollection());
 
 	for (const QByteArray& featureId : featureIds){
-		if (dependencyMapPtr->contains(featureId)){
-			QByteArrayList dependencies = dependencyMapPtr->value(featureId);
+		if (dependencyMap.contains(featureId)){
+			QByteArrayList dependencies = dependencyMap.value(featureId);
 
 			for (const QByteArray& dependency : dependencies){
 				if (!m_selectedFeatureIds.contains(dependency)){

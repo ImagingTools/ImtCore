@@ -9,7 +9,6 @@
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtbase/CMultiSelection.h>
 #include <imtlic/IProductLicensingInfo.h>
-#include <imtlic/CFeaturePackageCollection.h>
 #include <imtlicgui/IFeatureItemStateHandler.h>
 #include <imtlicgui/TFeatureTreeModelCompWrap.h>
 #include <GeneratedFiles/imtlicgui/ui_CProductLicensingInfoGuiComp.h>

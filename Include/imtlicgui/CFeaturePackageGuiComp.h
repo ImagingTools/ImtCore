@@ -12,6 +12,7 @@
 #include <imtbase/CCollectionInfo.h>
 #include <imtlic/IFeatureInfo.h>
 #include <imtlic/IFeaturePackage.h>
+#include <imtlic/CFeaturePackageCollectionUtility.h>
 #include <imtlicgui/TFeatureTreeModelCompWrap.h>
 #include <GeneratedFiles/imtlicgui/ui_CFeaturePackageGuiComp.h>
 
@@ -79,7 +80,7 @@ private:
 		return &component.m_featurePackageProxy;
 	}
 
-protected:
+private:
 	class FeaturePackageProxy: virtual public imtlic::IFeaturePackage
 	{
 	public:
@@ -117,8 +118,8 @@ private:
 	imtbase::TModelUpdateBinder<imtbase::IMultiSelection, CFeaturePackageGuiComp> m_featureSelectionObserver;
 
 	QByteArray m_selectedFeatureId;
-	FeatureDependencyMap m_dependencyMap;
-	QByteArrayList m_missingDependencyIds;
+	QByteArray m_missingDependenciesIds;
+	imtlic::CFeaturePackageCollectionUtility::FeatureDependencyMap m_dependencyMap;
 };
 
 

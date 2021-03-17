@@ -28,6 +28,8 @@ CFeatureTreeGuiComp::CFeatureTreeGuiComp()
 
 void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
+	QSignalBlocker blocker(Features);
+
 	Features->clear();
 
 	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
@@ -95,8 +97,8 @@ void CFeatureTreeGuiComp::OnGuiModelAttached()
 
 	if (m_featureStateCompPtr.IsValid() && m_featureStateModelCompPtr.IsValid()){
 		m_featureStateObserver.RegisterObject(
-			m_featureStateCompPtr.GetPtr(),
-			&CFeatureTreeGuiComp::OnFeatureStateChanged);
+					m_featureStateCompPtr.GetPtr(),
+					&CFeatureTreeGuiComp::OnFeatureStateChanged);
 	}
 }
 
@@ -118,43 +120,27 @@ void CFeatureTreeGuiComp::OnGuiCreated()
 
 	Features->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	Features->setHeaderLabel(*m_headerLabelAttrPtr);
+
+	connect(this, &CFeatureTreeGuiComp::EmitItemChanged, this, &CFeatureTreeGuiComp::OnItemChanged, Qt::QueuedConnection);
 }
 
 
 void CFeatureTreeGuiComp::OnGuiDestroyed()
 {
+	disconnect(this, &CFeatureTreeGuiComp::EmitItemChanged, this, &CFeatureTreeGuiComp::OnItemChanged);
+
 	BaseClass::OnGuiDestroyed();
 }
 
 
 // private methods
 
-QTreeWidgetItem* CFeatureTreeGuiComp::FindItem(const QByteArray& itemId)
-{
-	int groupCount = Features->topLevelItemCount();
-	for (int groupIndex = 0; groupIndex < groupCount; groupIndex++){
-		QTreeWidgetItem* groupItemPtr = Features->topLevelItem(groupIndex);
-		if (groupItemPtr->data(0, DR_ITEM_ID).toByteArray() == itemId){
-			return groupItemPtr;
-		}
-
-		int featureCount = groupItemPtr->childCount();
-		for (int featureIndex = 0; featureIndex < featureCount; featureIndex++){
-			QTreeWidgetItem* featurteItemPtr = groupItemPtr->child(featureIndex);
-			if (featurteItemPtr->data(0, DR_ITEM_ID).toByteArray() == itemId){
-				return featurteItemPtr;
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-
 void CFeatureTreeGuiComp::OnFeatureSelectionChanged(
 			const istd::IChangeable::ChangeSet& /*changeSet*/,
 			const imtbase::IMultiSelection* selectionPtr)
 {
+	QSignalBlocker blocker(Features);
+
 	m_selectedFeatures = selectionPtr->GetSelectedIds().toList();
 	UpdateFeatureSelections();
 }
@@ -164,6 +150,8 @@ void CFeatureTreeGuiComp::OnFeatureStateChanged(
 			const istd::IChangeable::ChangeSet& /*changeSet*/,
 			const imtbase::IMultiSelection* statePtr)
 {
+	QSignalBlocker blocker(Features);
+
 	m_disabledFeatures = statePtr->GetSelectedIds().toList();
 	UpdateFeatureStates();
 }
@@ -218,13 +206,15 @@ void CFeatureTreeGuiComp::UpdateFeatureStates()
 void CFeatureTreeGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, int column)
 {
 	if (column == 0 && item->data(0, DR_ITEM_TYPE) == IT_FEATURE){
-		if (!IsUpdateBlocked()){
-			UpdateBlocker updateBlocker(this);
+		Q_EMIT EmitItemChanged(item->data(0, DR_ITEM_ID).toByteArray(), item->checkState(0) == Qt::Checked);
+	}
+}
 
-			if (m_featureItemStateHandlerCompPtr.IsValid()){
-				m_featureItemStateHandlerCompPtr->OnItemStateChanged(item->data(0, DR_ITEM_ID).toByteArray(), item->checkState(0) == Qt::Checked);
-			}
-		}
+
+void CFeatureTreeGuiComp::OnItemChanged(const QByteArray& itemId, bool isChecked)
+{
+	if (m_featureItemStateHandlerCompPtr.IsValid()){
+		m_featureItemStateHandlerCompPtr->OnItemStateChanged(itemId, isChecked);
 	}
 }
 

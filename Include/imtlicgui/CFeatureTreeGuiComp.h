@@ -36,6 +36,9 @@ public:
 
 	CFeatureTreeGuiComp();
 
+Q_SIGNALS:
+	void EmitItemChanged(const QByteArray& itemId, bool isChecked);
+
 protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
@@ -47,8 +50,6 @@ protected:
 	virtual void OnGuiDestroyed();
 
 private:
-	QTreeWidgetItem* FindItem(const QByteArray& itemId);
-
 	void OnFeatureSelectionChanged(
 				const istd::IChangeable::ChangeSet& /*changeSet*/,
 				const imtbase::IMultiSelection* selectionPtr);
@@ -60,6 +61,7 @@ private:
 
 private Q_SLOTS:
 	void on_Features_itemChanged(QTreeWidgetItem *item, int column);
+	void OnItemChanged(const QByteArray& itemId, bool isChecked);
 
 private:
 	enum DataRole
