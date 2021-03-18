@@ -89,12 +89,16 @@ bool CFeaturePackageCollectionUtility::HasDependency(const CFeaturePackageCollec
 
 QByteArrayList CFeaturePackageCollectionUtility::GetFeatureIds(const imtbase::IObjectCollection& packageCollection, const QByteArray& packageId)
 {
+	QByteArrayList retVal;
 	const IFeaturePackage* packagePtr =  GetPackagePtr(packageCollection, packageId);
 	if (packagePtr != nullptr){
-		return packagePtr->GetFeatureList().GetElementIds().toList();
+		QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
+		for (const QByteArray& featureCollectionId : featureCollectionIds){
+			retVal.append(packagePtr->GetFeatureInfo(featureCollectionId)->GetFeatureId());
+		}
 	}
 
-	return QByteArrayList();
+	return retVal;
 }
 
 

@@ -5,8 +5,16 @@
 #include <istd/IChangeable.h>
 #include <istd/TIHierarchical.h>
 
+
 class QByteArray;
 class QString;
+
+
+namespace imtlicgui
+{
+	class IItemChangeHandler;
+}
+
 
 namespace imtlicgui
 {
@@ -27,12 +35,15 @@ public:
 	virtual void SetName(const QString& name) = 0;
 	virtual Status GetStatus() const = 0;
 	virtual void GetStatus(Status status) = 0;
+	virtual bool IsActivationEnabled() const = 0;
+	virtual void SetActivationEnabled(bool isActivationEnabled) = 0;
 	virtual bool IsActivated() const = 0;
 	virtual void SetActivated(bool isActivated) = 0;
 	virtual bool IsEnabled() const = 0;
 	virtual void SetEnabled(bool isEnabled) = 0;
 
 	virtual void AddChild(istd::TSmartPtr<istd::TIHierarchical<IItem>> childItemPtr) = 0;
+	virtual IItemChangeHandler* FindItemChangeHandler() const = 0;
 };
 
 

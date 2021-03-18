@@ -8,8 +8,8 @@
 #include <imtbase/IMultiSelection.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/TModelUpdateBinder.h>
-#include <imtlicgui/IFeatureItemStateHandler.h>
 #include <imtlicgui/IItem.h>
+#include <imtlicgui/IItemChangeHandler.h>
 #include <GeneratedFiles/imtlicgui/ui_CFeatureTreeGuiComp.h>
 
 
@@ -30,6 +30,8 @@ public:
 		I_ASSIGN(m_showFeatureStatesAttrPtr, "ShowFeatureStates", "Show feature selection states", true, true);
 	I_END_COMPONENT;
 
+	CFeatureTreeGuiComp();
+
 protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
@@ -39,6 +41,7 @@ protected:
 
 private:
 	void CreteTreeItems(QTreeWidgetItem* parentTreeItemPtr, QList<IItemTree*> items);
+	IItemTree* FindItem(IItemTree* fromItemPtr, const QByteArray& itemId) const;
 
 private Q_SLOTS:
 	void on_Features_itemChanged(QTreeWidgetItem *item, int column);
@@ -46,6 +49,8 @@ private Q_SLOTS:
 private:
 	I_TEXTATTR(m_headerLabelAttrPtr);
 	I_ATTR(bool, m_showFeatureStatesAttrPtr);
+
+	bool m_blockItemChangedSignal;
 };
 
 

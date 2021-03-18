@@ -21,8 +21,8 @@
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtlic/CFeaturePackageCollection.h>
 #include <imtlic/CFeaturePackageCollectionUtility.h>
+#include <imtlicgui/IItemChangeHandler.h>
 #include <imtlicgui/CItem.h>
-#include <imtlicgui/IFeatureItemStateHandler.h>
 
 
 namespace imtlicgui
@@ -53,16 +53,10 @@ public:
 
 protected:
 	/*
-		Update feature tree models.
-		This method should be called directly from derived classes
-	*/
-	void DoUpdateItemTree();
-
-	/*
 		Do update of the models to reflect the current contents of feature tree GUI.
 		This method should be implmented by derived classes.
 	*/
-	virtual void UpdateItemTree(IItemTree* itemTreePtr) = 0;
+	virtual void UpdateItemTree() = 0;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -79,13 +73,14 @@ private:
 		return &component.m_itemTree;
 	}
 
+protected:
+	imod::TModelWrap<imtlicgui::CItem> m_itemTree;
+
 private:
 	I_REF(imtbase::IObjectCollection, m_featurePackageCollectionCompPtr);
 
 	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, TFeatureTreeModelCompWrap> m_featurePackageCollectionObserver;
 	imtlic::CFeaturePackageCollection m_featurePackageCollectionMirror;
-
-	imod::TModelWrap<imtlicgui::CItem> m_itemTree;
 };
 
 
@@ -108,13 +103,6 @@ const imtbase::IObjectCollection* TFeatureTreeModelCompWrap<BaseComponent>::GetO
 
 
 // protected methods
-
-template <class BaseComponent>
-void TFeatureTreeModelCompWrap<BaseComponent>::DoUpdateItemTree()
-{
-	UpdateItemTree(&m_itemTree);
-}
-
 
 // reimplemented (icomp::CComponentBase)
 
@@ -159,7 +147,7 @@ void TFeatureTreeModelCompWrap<BaseComponent>::OnFeaturePackageCollectionUpdate(
 		}
 	}
 
-	DoUpdateItemTree();
+	UpdateItemTree();
 }
 
 

@@ -20,27 +20,43 @@ namespace imtlicgui
 // public methods
 
 CProductLicensingInfoGuiComp::CProductLicensingInfoGuiComp()
-	:m_licenseSelectionObserver(*this)
+	:m_blockItemChangedHandler(false),
+	m_licenseSelectionObserver(*this)
 {
+	m_missingItemsGroupId = QUuid::createUuid().toByteArray();
 }
 
 
 // reimplemented (imtlicgui::IFeatureItemStateHandler)
 
-void CProductLicensingInfoGuiComp::OnItemStateChanged(const QByteArray& itemId, bool isChecked)
+void CProductLicensingInfoGuiComp::OnItemChanged(const QByteArray& itemId, IItemChangeHandler::ChangeId changeId, QVariantList params)
 {
-	if (isChecked && !m_selectedFeatureIds.contains(itemId)){
-		m_selectedFeatureIds.append(itemId);
+	if (!itemId.isEmpty() && changeId == IItemChangeHandler::CI_ITEM_ACTIVATED){
+		if (params.count() > 0 && params[0].type() == QVariant::Bool){
+			bool isActivated = params[0].toBool();
 
-		DoUpdateItemTree();
-		DoUpdateModel();
-	}
+			if (isActivated && !m_selectedFeatureIds.contains(itemId)){
+				m_selectedFeatureIds.append(itemId);
+				EnumerateDependencies(m_selectedFeatureIds);
 
-	if (!isChecked && m_selectedFeatureIds.contains(itemId)){
-		m_selectedFeatureIds.removeOne(itemId);
+				DoUpdateModel();
 
-		DoUpdateItemTree();
-		DoUpdateModel();
+				if (!m_blockItemChangedHandler){
+					Q_EMIT EmitItemChangedHandler();
+				}
+			}
+
+			if (!isActivated && m_selectedFeatureIds.contains(itemId)){
+				m_selectedFeatureIds.removeOne(itemId);
+				EnumerateDependencies(m_selectedFeatureIds);
+
+				DoUpdateModel();
+
+				if (!m_blockItemChangedHandler){
+					Q_EMIT EmitItemChangedHandler();
+				}
+			}
+		}
 	}
 }
 
@@ -49,67 +65,98 @@ void CProductLicensingInfoGuiComp::OnItemStateChanged(const QByteArray& itemId, 
 
 // reimplemented (imtlicgui::TFeatureTreeModelCompWrap)
 
-void CProductLicensingInfoGuiComp::UpdateItemTree(IItemTree* itemTreePtr)
+void CProductLicensingInfoGuiComp::UpdateItemTree()
 {
-	//QByteArrayList selectedFeatures;
-	//QByteArrayList disabledFeatures;
+	m_blockItemChangedHandler = true;
 
-	//{
-	//	istd::CChangeGroup changeGroup(featureTreeModelPtr);
+	istd::CChangeGroup changeGroup(&m_itemTree);
 
-	//	featureTreeModelPtr->ResetData();
+	m_itemTree.ResetData();
+	m_itemTree.SetItemChangeHandler(this);
 
-	//	if (!m_selectedLicenseId.isEmpty()){
-	//		featureTreeModelPtr->CopyFrom(*GetObjectCollection());
+	if (!m_selectedLicenseId.isEmpty()){
+		// Package collection features
+		{
+			imtlic::CFeaturePackageCollectionUtility::FeatureDependencyMap dependencyMap = imtlic::CFeaturePackageCollectionUtility::GetDependencies(*GetObjectCollection());
+			QByteArrayList collectionFeatureIds = imtlic::CFeaturePackageCollectionUtility::GetAllFeatureIds(*GetObjectCollection());
 
-	//		EnumerateDependencies(m_selectedFeatureIds);
-	//		selectedFeatures = m_selectedFeatureIds;
+			QByteArrayList packageIds = imtlic::CFeaturePackageCollectionUtility::GetPackageIds(*GetObjectCollection());
+			for (const QByteArray& packageId : packageIds){
+				QString packageName = imtlic::CFeaturePackageCollectionUtility::GetPackageName(*GetObjectCollection(), packageId);
 
-	//		EnumerateMissingFeatures();
-	//		if (!m_missingFeatureIds.isEmpty()){
-	//			imtlic::CFeaturePackage missingPackage;
-	//			missingPackage.SetPackageId("MISSING_FEATURES");
+				CItem* packageItemObjectPtr = new CItem();
+				packageItemObjectPtr->SetItemChangeHandler(this);
 
-	//			for (const QByteArray& featureId : m_missingFeatureIds){
-	//				imtlic::CFeatureInfo featureInfo;
-	//				featureInfo.SetFeatureId(featureId);
-	//				featureInfo.SetFeatureName(tr("ID: %1").arg(QString(featureId)));
-	//				missingPackage.InsertNewObject(
-	//					"FeatureInfo",
-	//					tr("ID: %1").arg(QString(featureId)),
-	//					"",
-	//					&featureInfo);
+				ItemTreePtr packageItemPtr(packageItemObjectPtr);
+				packageItemPtr->SetId(packageId);
+				packageItemPtr->SetName(packageName);
 
-	//				selectedFeatures.append(featureId);
-	//			}
+				QByteArrayList featureIds = imtlic::CFeaturePackageCollectionUtility::GetFeatureIds(*GetObjectCollection(), packageId);
+				for (const QByteArray& featureId : featureIds){
+					const imtlic::IFeatureInfo * featurePtr = imtlic::CFeaturePackageCollectionUtility::GetFeaturePtr(*GetObjectCollection(), featureId);
+					QString featureName = featurePtr->GetFeatureName();
 
-	//			featureTreeModelPtr->InsertNewObject(
-	//				"FeaturePackage",
-	//				tr("Missing features"),
-	//				"",
-	//				&missingPackage);
-	//		}
+					CItem* featureItemObjectPtr = new CItem();
+					featureItemObjectPtr->SetItemChangeHandler(this);
 
-	//		const QMap<QByteArray, QByteArrayList> dependencyMap =
-	//					imtlic::CFeaturePackageCollectionUtility::GetDependencies(*GetObjectCollection());
+					ItemTreePtr featureItemPtr(featureItemObjectPtr);
+					featureItemPtr->SetId(featureId);
+					featureItemPtr->SetName(featureName);
+					featureItemPtr->SetActivationEnabled(true);
 
-	//		// Disable dependent features
-	//		for (const QByteArray& fromId : m_selectedFeatureIds){
-	//			for (const QByteArray& toId : m_selectedFeatureIds){
-	//				if (imtlic::CFeaturePackageCollectionUtility::HasDependency(dependencyMap, fromId, toId)){
-	//					if (!disabledFeatures.contains(toId)){
-	//						if (!m_missingFeatureIds.contains(toId)){
-	//							disabledFeatures.append(toId);
-	//						}
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+					if (m_selectedFeatureIds.contains(featureId)){
+						featureItemPtr->SetActivated(true);
 
-	//selectedFeaturesModelPtr->SetSelectedIds(selectedFeatures.toVector());
-	//disabledFeaturesModelPtr->SetSelectedIds(disabledFeatures.toVector());
+						for (const QByteArray& selectedFeatureId : m_selectedFeatureIds){
+							if (imtlic::CFeaturePackageCollectionUtility::HasDependency(dependencyMap, selectedFeatureId, featureId)){
+								featureItemPtr->SetEnabled(false);
+							}
+						}
+					}
+
+					packageItemPtr->AddChild(featureItemPtr);
+				}
+
+				m_itemTree.AddChild(packageItemPtr);
+			}
+		}
+
+		// Missing features group
+		{
+			QByteArrayList packageCollectionFeatureIds = imtlic::CFeaturePackageCollectionUtility::GetAllFeatureIds(*GetObjectCollection());
+
+			CItem* missingItemsGroupObjectPtr = new CItem();
+			missingItemsGroupObjectPtr->SetItemChangeHandler(this);
+
+			ItemTreePtr missingItemsGroupPtr(missingItemsGroupObjectPtr);
+			missingItemsGroupPtr->SetId(m_missingItemsGroupId);
+			missingItemsGroupPtr->SetName(tr("Missing Features"));
+
+			imtlic::ILicenseInfo* licensePtr = dynamic_cast<imtlic::ILicenseInfo*>(GetObservedObject());
+			if (licensePtr != nullptr){
+				QByteArrayList featureIds = licensePtr->GetFeatures();
+				for (const QByteArray& featureId : featureIds){
+					if (packageCollectionFeatureIds.contains(featureId)){
+						CItem* missingItemObjectPtr = new CItem();
+						missingItemObjectPtr->SetItemChangeHandler(this);
+
+						ItemTreePtr missingItemPtr(missingItemObjectPtr);
+						missingItemPtr->SetId(featureId);
+						missingItemPtr->SetName(tr("ID: %1").arg(QString(featureId)));
+						missingItemPtr->SetActivationEnabled(true);
+						missingItemPtr->SetActivated(true);
+						missingItemsGroupPtr->AddChild(missingItemPtr);
+					}
+				}
+			}
+
+			if (missingItemsGroupPtr->GetChildsCount() > 0){
+				m_itemTree.AddChild(missingItemsGroupPtr);
+			}
+		}
+	}
+
+	m_blockItemChangedHandler = false;
 }
 
 
@@ -125,7 +172,7 @@ void CProductLicensingInfoGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 		m_selectedFeatureIds = licenseInfoPtr->GetFeatures();
 	}
 
-	DoUpdateItemTree();
+	UpdateItemTree();
 }
 
 
@@ -160,20 +207,15 @@ void CProductLicensingInfoGuiComp::UpdateModel() const
 	imtlic::IProductLicensingInfo* productLicensingInfoPtr = GetObservedObject();
 	Q_ASSERT(productLicensingInfoPtr != nullptr);
 
-	imtlic::ILicenseInfo* licenseInfoPtr = nullptr;
-	
-	imtbase::ICollectionInfo::Ids licenseCollectionIds = productLicensingInfoPtr->GetLicenseList().GetElementIds();
+		imtbase::ICollectionInfo::Ids licenseCollectionIds = productLicensingInfoPtr->GetLicenseList().GetElementIds();
 	for (const QByteArray& licenseCollectionId : licenseCollectionIds){
-		const imtlic::ILicenseInfo* currentLicenseInfoPtr = productLicensingInfoPtr->GetLicenseInfo(licenseCollectionId);
-		if (currentLicenseInfoPtr->GetLicenseId() == m_selectedLicenseId){
-			licenseInfoPtr = const_cast<imtlic::ILicenseInfo*>(currentLicenseInfoPtr);
+		imtlic::ILicenseInfo* licensePtr = const_cast<imtlic::ILicenseInfo*>
+					(productLicensingInfoPtr->GetLicenseInfo(licenseCollectionId));
 
+		if (licensePtr != nullptr && licensePtr->GetLicenseId() == m_selectedLicenseId){
+			licensePtr->SetFeatures(m_selectedFeatureIds);
 			break;
 		}
-	}
-
-	if (licenseInfoPtr != nullptr){
-		licenseInfoPtr->SetFeatures(m_selectedFeatureIds);
 	}
 }
 
@@ -183,6 +225,8 @@ void CProductLicensingInfoGuiComp::UpdateModel() const
 void CProductLicensingInfoGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
+
+	connect(this, &CProductLicensingInfoGuiComp::EmitItemChangedHandler, this, &CProductLicensingInfoGuiComp::OnItemChangedHandler, Qt::QueuedConnection);
 
 	if (m_objectCollectionViewCompPtr.IsValid() && m_objectCollectionObserverCompPtr.IsValid()){
 		m_objectCollectionViewCompPtr->CreateGui(Licenses);
@@ -204,6 +248,8 @@ void CProductLicensingInfoGuiComp::OnGuiDestroyed()
 		m_objectCollectionViewCompPtr->DestroyGui();
 	}
 
+	disconnect(this, &CProductLicensingInfoGuiComp::EmitItemChangedHandler, this, &CProductLicensingInfoGuiComp::OnItemChangedHandler);
+
 	BaseClass::OnGuiDestroyed();
 }
 
@@ -222,15 +268,15 @@ void CProductLicensingInfoGuiComp::OnLicenseSelectionChanged(
 	if (licenseIds.count() == 1){
 		imtlic::IProductLicensingInfo* productLicensingInfo = GetObservedObject();
 		if (productLicensingInfo != nullptr){
-			const imtlic::ILicenseInfo* licenseInfo = productLicensingInfo->GetLicenseInfo(licenseIds.first());
-			if (licenseInfo != nullptr){
-				m_selectedLicenseId = licenseInfo->GetLicenseId();
-				m_selectedFeatureIds = licenseInfo->GetFeatures();
+			const imtlic::ILicenseInfo* licensePtr = productLicensingInfo->GetLicenseInfo(licenseIds.first());
+			if (licensePtr != nullptr){
+				m_selectedLicenseId = licensePtr->GetLicenseId();
+				m_selectedFeatureIds = licensePtr->GetFeatures();
 			}
 		}
 	}
 
-	DoUpdateItemTree();
+	UpdateItemTree();
 }
 
 
@@ -262,39 +308,11 @@ void CProductLicensingInfoGuiComp::EnumerateDependencies(const QByteArrayList& f
 }
 
 
-void CProductLicensingInfoGuiComp::EnumerateMissingFeatures()
+// private slots
+
+void CProductLicensingInfoGuiComp::OnItemChangedHandler()
 {
-	m_missingFeatureIds.clear();
-
-	QByteArrayList allFeatureIds;
-
-	const imtbase::IObjectCollection* collectionPtr = GetObjectCollection();
-	Q_ASSERT(collectionPtr != nullptr);
-
-	imtbase::ICollectionInfo::Ids packageCollectionIds = collectionPtr->GetElementIds();
-
-	for (const QByteArray& packageCollectionId : packageCollectionIds){
-		const istd::IChangeable* constObjectPtr = collectionPtr->GetObjectPtr(packageCollectionId);
-		istd::IChangeable* objectPtr = const_cast<istd::IChangeable*>(constObjectPtr);
-		imtlic::IFeaturePackage* packagePtr = dynamic_cast<imtlic::IFeaturePackage*>(objectPtr);
-
-		if (packagePtr != nullptr){
-			imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
-
-			for (const QByteArray& featureCollectionId : featureCollectionIds){
-				const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
-				if (featureInfoPtr != nullptr){
-					allFeatureIds.append(featureInfoPtr->GetFeatureId());
-				}
-			}
-		}
-	}
-
-	for (const QByteArray& featureId : m_selectedFeatureIds){
-		if (!allFeatureIds.contains(featureId)){
-			m_missingFeatureIds.push_back(featureId);
-		}
-	}
+	UpdateItemTree();
 }
 
 

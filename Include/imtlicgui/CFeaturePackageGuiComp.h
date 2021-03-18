@@ -30,7 +30,7 @@ class CFeaturePackageGuiComp:
 			public TFeatureTreeModelCompWrap<
 						iqtgui::TDesignerGuiObserverCompBase<
 									Ui::CFeaturePackageGuiComp, imtlic::IFeaturePackage>>,
-			virtual public imtlicgui::IFeatureItemStateHandler
+			virtual public imtlicgui::IItemChangeHandler
 {
 	Q_OBJECT
 public:
@@ -39,7 +39,6 @@ public:
 							Ui::CFeaturePackageGuiComp, imtlic::IFeaturePackage>> BaseClass;
 
 	I_BEGIN_COMPONENT(CFeaturePackageGuiComp);
-		I_REGISTER_INTERFACE(imtlicgui::IFeatureItemStateHandler)
 		I_REGISTER_SUBELEMENT(FeaturePackageProxy);
 		I_REGISTER_SUBELEMENT_INTERFACE(FeaturePackageProxy, imtlic::IFeatureInfoProvider, ExtractFeaturePackageProxy);
 		I_ASSIGN(m_objectCollectionViewCompPtr, "ObjectCollectionView", "Object collection view", true, "ObjectCollectionView");
@@ -51,11 +50,14 @@ public:
 	CFeaturePackageGuiComp();
 
 	// reimplemented (imtlicgui::IFeatureItemStateHandler)
-	virtual void OnItemStateChanged(const QByteArray& itemId, bool isChecked) override;
+	virtual void OnItemChanged(const QByteArray& itemId, ChangeId changeId, QVariantList params) override;
+
+Q_SIGNALS:
+	void EmitItemChangedHandler();
 
 protected:
 	// reimplemented (imtlicgui::TFeatureTreeModelCompWrap)
-	virtual void UpdateItemTree(IItemTree* itemTreePtr) override;
+	virtual void UpdateItemTree() override;
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
@@ -77,6 +79,9 @@ private:
 	{
 		return &component.m_featurePackageProxy;
 	}
+
+private Q_SLOTS:
+	void OnItemChangedHandler();
 
 private:
 	class FeaturePackageProxy: virtual public imtlic::IFeaturePackage
@@ -111,6 +116,8 @@ private:
 	I_REF(iqtgui::IGuiObject, m_featureTreeCompPtr);
 	I_REF(imod::IObserver, m_featureTreeObserverCompPtr);
 
+	bool m_blockItemChangedHandler;
+
 	FeaturePackageProxy m_featurePackageProxy;
 
 	imtbase::TModelUpdateBinder<imtbase::IMultiSelection, CFeaturePackageGuiComp> m_featureSelectionObserver;
@@ -118,6 +125,8 @@ private:
 	QByteArray m_selectedFeatureId;
 	QByteArray m_missingDependenciesIds;
 	imtlic::CFeaturePackageCollectionUtility::FeatureDependencyMap m_dependencyMap;
+	QByteArray m_unsavedItemsGroupId;
+	QByteArray m_missingItemsGroupId;
 };
 
 

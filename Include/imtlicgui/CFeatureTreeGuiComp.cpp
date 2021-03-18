@@ -13,13 +13,21 @@ namespace imtlicgui
 {
 
 
+// public methods
+
+CFeatureTreeGuiComp::CFeatureTreeGuiComp()
+	:m_blockItemChangedSignal(false)
+{
+}
+
+
 // protected methods
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
 void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	QSignalBlocker blocker(Features);
+	m_blockItemChangedSignal = true;
 
 	Features->clear();
 
@@ -33,6 +41,8 @@ void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*change
 	CreteTreeItems(nullptr, childs);
 
 	Features->expandAll();
+
+	m_blockItemChangedSignal = false;
 }
 
 
@@ -55,16 +65,13 @@ void CFeatureTreeGuiComp::CreteTreeItems(QTreeWidgetItem* parentTreeItemPtr, QLi
 	for (int itemIndex = 0; itemIndex < itemCountcount; itemIndex++){
 		QTreeWidgetItem* treeItemPtr = new QTreeWidgetItem({items[itemIndex]->GetName()});
 		treeItemPtr->setData(0, Qt::UserRole, items[itemIndex]->GetId());
-		if (items[itemIndex]->GetChildsCount() > 0){
-			treeItemPtr->setFlags(treeItemPtr->flags() | Qt::ItemIsAutoTristate);
+
+		if (*m_showFeatureStatesAttrPtr && items[itemIndex]->IsActivationEnabled()){
+			treeItemPtr->setCheckState(0, items[itemIndex]->IsActivated() ? Qt::Checked : Qt::Unchecked);
 		}
 
 		if (!items[itemIndex]->IsEnabled()){
 			treeItemPtr->setFlags(treeItemPtr->flags() & (~Qt::ItemIsEnabled));
-		}
-
-		if (*m_showFeatureStatesAttrPtr){
-			treeItemPtr->setCheckState(0, items[itemIndex]->IsActivated() ? Qt::Checked : Qt::Unchecked);
 		}
 
 		if (parentTreeItemPtr != nullptr){
@@ -90,11 +97,46 @@ void CFeatureTreeGuiComp::CreteTreeItems(QTreeWidgetItem* parentTreeItemPtr, QLi
 }
 
 
+IItemTree* CFeatureTreeGuiComp::FindItem(IItemTree* fromItemPtr, const QByteArray& itemId) const
+{
+	if (fromItemPtr->GetId() == itemId){
+		return fromItemPtr;
+	}
+
+	IItemTree* retVal = nullptr;
+
+	int count = fromItemPtr->GetChildsCount();
+	for (int i = 0; i < count; i++){
+		IItemTree* itemPtr = dynamic_cast<IItemTree*>(fromItemPtr->GetChild(i));
+		Q_ASSERT(itemPtr != nullptr);
+
+		retVal = FindItem(itemPtr, itemId);
+		if (retVal != nullptr){
+			return retVal;
+		}
+	}
+
+	return retVal;
+}
+
+
 // private slots
 
 void CFeatureTreeGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, int column)
 {
-	//Q_EMIT EmitItemChanged(item->data(0, DR_ITEM_ID).toByteArray(), item->checkState(0) == Qt::Checked);
+	if (m_blockItemChangedSignal){
+		return;
+	}
+
+	if (!IsUpdateBlocked()){
+		UpdateBlocker blocker(this);
+
+		QByteArray itemId = item->data(0, Qt::UserRole).toByteArray();
+		IItemTree* itemPtr = FindItem(GetObservedObject(), itemId);
+		if (itemPtr != nullptr){
+			itemPtr->SetActivated(item->checkState(0) == Qt::Checked);
+		}
+	}
 }
 
 
