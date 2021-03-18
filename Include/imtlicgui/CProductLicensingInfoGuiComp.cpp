@@ -48,7 +48,7 @@ void CProductLicensingInfoGuiComp::OnItemChanged(const QByteArray& itemId, IItem
 
 			if (!isActivated && m_selectedFeatureIds.contains(itemId)){
 				m_selectedFeatureIds.removeOne(itemId);
-				EnumerateDependencies(m_selectedFeatureIds);
+//				EnumerateDependencies(m_selectedFeatureIds);
 
 				DoUpdateModel();
 
@@ -132,20 +132,33 @@ void CProductLicensingInfoGuiComp::UpdateItemTree()
 			missingItemsGroupPtr->SetId(m_missingItemsGroupId);
 			missingItemsGroupPtr->SetName(tr("Missing Features"));
 
-			imtlic::ILicenseInfo* licensePtr = dynamic_cast<imtlic::ILicenseInfo*>(GetObservedObject());
-			if (licensePtr != nullptr){
-				QByteArrayList featureIds = licensePtr->GetFeatures();
-				for (const QByteArray& featureId : featureIds){
-					if (packageCollectionFeatureIds.contains(featureId)){
-						CItem* missingItemObjectPtr = new CItem();
-						missingItemObjectPtr->SetItemChangeHandler(this);
+			imtlic::ILicenseInfoProvider* productPtr = dynamic_cast<imtlic::ILicenseInfoProvider*>(GetObservedObject());
+			if (productPtr != nullptr){
+				const imtlic::ILicenseInfo* licensePtr = nullptr;
 
-						ItemTreePtr missingItemPtr(missingItemObjectPtr);
-						missingItemPtr->SetId(featureId);
-						missingItemPtr->SetName(tr("ID: %1").arg(QString(featureId)));
-						missingItemPtr->SetActivationEnabled(true);
-						missingItemPtr->SetActivated(true);
-						missingItemsGroupPtr->AddChild(missingItemPtr);
+				imtbase::ICollectionInfo::Ids licenseCollectionIds = productPtr->GetLicenseList().GetElementIds();
+				for (const QByteArray& licenseCollectionId : licenseCollectionIds){
+					const imtlic::ILicenseInfo* currentLicensePtr = productPtr->GetLicenseInfo(licenseCollectionId);
+					if (currentLicensePtr->GetLicenseId() == m_selectedLicenseId){
+						licensePtr = currentLicensePtr;
+						break;
+					}
+				}
+
+				if (licensePtr != nullptr){
+					QByteArrayList featureIds = licensePtr->GetFeatures();
+					for (const QByteArray& featureId : featureIds){
+						if (!packageCollectionFeatureIds.contains(featureId)){
+							CItem* missingItemObjectPtr = new CItem();
+							missingItemObjectPtr->SetItemChangeHandler(this);
+
+							ItemTreePtr missingItemPtr(missingItemObjectPtr);
+							missingItemPtr->SetId(featureId);
+							missingItemPtr->SetName(tr("ID: %1").arg(QString(featureId)));
+							missingItemPtr->SetActivationEnabled(true);
+							missingItemPtr->SetActivated(true);
+							missingItemsGroupPtr->AddChild(missingItemPtr);
+						}
 					}
 				}
 			}

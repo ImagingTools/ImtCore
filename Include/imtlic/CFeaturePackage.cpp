@@ -167,7 +167,11 @@ bool CFeaturePackage::RemoveObject(const QByteArray& objectId)
 {
 	bool retVal = BaseClass::RemoveObject(objectId);
 
-	CleanupDependencies();
+	if (retVal){
+		istd::CChangeNotifier changeNotifier(this);
+
+		CleanupDependencies();
+	}
 
 	return retVal;
 }
@@ -230,9 +234,7 @@ bool CFeaturePackage::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && archive.EndTag(dependenciesTag);
 
-	if (archive.IsStoring()){
-		CleanupDependencies();
-	}
+	CleanupDependencies();
 
 	static iser::CArchiveTag parentsTag("Parents", "Parent feature providers", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(parentsTag);
@@ -305,8 +307,6 @@ void CFeaturePackage::CleanupDependencies()
 	}
 
 	if (!fetureIdsForRemove.isEmpty()){
-		istd::CChangeNotifier changeNotifier(this);
-
 		for (const QByteArray& featureId : fetureIdsForRemove){
 			m_dependencies.remove(featureId);
 		}
