@@ -22,7 +22,8 @@ namespace imtlicgui
 // public methods
 
 CProductInstanceInfoEditorComp::CProductInstanceInfoEditorComp()
-	:m_productCollectionObserver(*this),
+	:m_itemUpdateBlocked(false),
+	m_productCollectionObserver(*this),
 	m_licenseCollectionObserver(*this)
 {
 }
@@ -34,8 +35,12 @@ void CProductInstanceInfoEditorComp::OnProductsUpdated(
 			const istd::IChangeable::ChangeSet& /*changeSet*/,
 			const imtbase::IObjectCollection* /*productCollectionPtr*/)
 {
-	UpdateProductsCombo();
-	UpdateLicenseInstancesEdit();
+	if (IsUpdateBlocked()){
+		UpdateBlocker blocker(this);
+
+		UpdateProductsCombo();
+		UpdateLicenseInstancesEdit();
+	}
 }
 
 
@@ -87,6 +92,17 @@ void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 	imtlic::IProductInstanceInfo* productInstanceInfoPtr = GetObservedObject();
 	Q_ASSERT(productInstanceInfoPtr != nullptr);
 
+	QByteArrayList activatedLicenseIds;
+
+	const imtbase::ICollectionInfo& currentLicenses = productInstanceInfoPtr->GetLicenseInstances();
+	const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = productInstanceInfoPtr->GetLicenseInstances().GetElementIds();
+	for (const QByteArray& licenseCollectionId : licenseCollectionIds){
+		const imtlic::ILicenseInstance* licenseInstance = productInstanceInfoPtr->GetLicenseInstance(licenseCollectionId);
+		if (licenseInstance != nullptr){
+			activatedLicenseIds.append(licenseInstance->GetLicenseId());
+		}
+	}
+
 	const imtbase::IObjectCollection* productsCollectionPtr = productInstanceInfoPtr->GetProductDatabase();
 	if (productsCollectionPtr != nullptr){
 		imtbase::IObjectCollection::DataPtr dataPtr;
@@ -98,9 +114,6 @@ void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 				for ( const QByteArray& collectionId : licenseCollectionIds){
 					const imtlic::ILicenseInfo* licenseInfoPtr = licensingInfoPtr->GetLicenseInfo(collectionId);
 					if (licenseInfoPtr != nullptr){
-						const imtbase::ICollectionInfo& currentLicenses = productInstanceInfoPtr->GetLicenseInstances();
-						imtbase::ICollectionInfo::Ids currentLicenseIds = currentLicenses.GetElementIds();
-
 						QString licenseName = licenseInfoPtr->GetLicenseName();
 						QByteArray licenseId = licenseInfoPtr->GetLicenseId();
 
@@ -108,21 +121,30 @@ void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 						QString licenseNameText = QString(licenseName);
 
 						QTreeWidgetItem* itemPtr = new QTreeWidgetItem({licenseNameText, ""});
+						itemPtr->setFlags(itemPtr->flags() | Qt::ItemIsEditable);
 						itemPtr->setData(0, Qt::UserRole, licenseId);
 
-						if (currentLicenseIds.contains(licenseId)){
+						if (activatedLicenseIds.contains(licenseId)){
 							itemPtr->setCheckState(0, Qt::Checked);
 
 							const imtlic::ILicenseInstance* licenseInstancePtr =  productInstanceInfoPtr->GetLicenseInstance(licenseId);
 							Q_ASSERT(licenseInstancePtr != nullptr);
 
 							itemPtr->setData(1, Qt::UserRole, licenseInstancePtr->GetExpiration());
-							itemPtr->setText(1, licenseInstancePtr->GetExpiration().date().toString(Qt::DateFormat::SystemLocaleDate));
+							QDate date = licenseInstancePtr->GetExpiration().date();
+							if (date.isValid()){
+								itemPtr->setCheckState(1, Qt::Checked);
+								itemPtr->setText(1, licenseInstancePtr->GetExpiration().date().toString(Qt::DateFormat::SystemLocaleDate));
+							}
+							else{
+								itemPtr->setCheckState(1, Qt::Unchecked);
+								itemPtr->setText(1, tr("Unlimited"));
+							}
 						}
 						else{
 							itemPtr->setCheckState(0, Qt::Unchecked);
-							itemPtr->setData(1, Qt::UserRole, QDateTime(QDate(2000, 1, 1), QTime(0, 0)));
-							itemPtr->setText(1, QDate(2000, 1, 1).toString(Qt::DateFormat::SystemLocaleDate));
+							itemPtr->setData(1, Qt::UserRole, QDateTime());
+							itemPtr->setText(1, "");
 						}
 
 						LicenseInstancesEdit->addTopLevelItem(itemPtr);
@@ -188,7 +210,6 @@ void CProductInstanceInfoEditorComp::UpdateModel() const
 	int count = LicenseInstancesEdit->topLevelItemCount();
 	for (int i = 0; i < count; i++){
 		QTreeWidgetItem* itemPtr = LicenseInstancesEdit->topLevelItem(i);
-		itemPtr->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
 
 		if (itemPtr->checkState(0) == Qt::Checked){
 			QByteArray licenseId = itemPtr->data(0, Qt::UserRole).toByteArray();
@@ -235,26 +256,68 @@ void CProductInstanceInfoEditorComp::on_ProductCombo_currentIndexChanged(int /*i
 }
 
 
-void CProductInstanceInfoEditorComp::on_LicenseCombo_currentIndexChanged(int /*index*/)
-{
-	DoUpdateModel();
-}
-
-
-void CProductInstanceInfoEditorComp::on_ValidUntilDate_dateTimeChanged(const QDateTime& /*dateTime*/)
-{
-	DoUpdateModel();
-}
-
-
-void CProductInstanceInfoEditorComp::on_ExpireGroup_toggled(bool /*toggled*/)
-{
-	DoUpdateModel();
-}
-
-
 void CProductInstanceInfoEditorComp::on_LicenseInstancesEdit_itemChanged(QTreeWidgetItem *item, int column)
 {
+	if (m_itemUpdateBlocked){
+		return;
+	}
+
+	m_itemUpdateBlocked = true;
+
+	QDateTime dateTimeInModel;
+
+	imtlic::IProductInstanceInfo* productInstanceInfoPtr = GetObservedObject();
+	Q_ASSERT(productInstanceInfoPtr != nullptr);
+
+	const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = productInstanceInfoPtr->GetLicenseInstances().GetElementIds();
+	for (const QByteArray& licenseCollectionId : licenseCollectionIds){
+		const imtlic::ILicenseInstance* licenseInstance = productInstanceInfoPtr->GetLicenseInstance(licenseCollectionId);
+		if (licenseInstance != nullptr){
+			if (licenseInstance->GetLicenseId() == item->data(0, Qt::UserRole).toByteArray()){
+				dateTimeInModel = licenseInstance->GetExpiration();
+			}
+		}
+	}
+
+	if (column == 0){
+		if (item->checkState(0) == Qt::Unchecked){
+			item->setData(1, Qt::CheckStateRole, QVariant());
+			item->setText(1, tr(""));
+		}
+		else{
+			item->setData(1, Qt::UserRole, dateTimeInModel);
+			if (dateTimeInModel.isValid()){
+				item->setData(1, Qt::CheckStateRole, Qt::Checked);
+				item->setText(1, dateTimeInModel.date().toString(Qt::DateFormat::SystemLocaleDate));
+			}
+			else{
+				item->setData(1, Qt::CheckStateRole, Qt::Unchecked);
+				item->setText(1, tr("Unlimited"));
+			}
+		}
+	}
+	
+	if (column == 1){
+		if (item->checkState(1) == Qt::Unchecked){
+			item->setData(1, Qt::UserRole, QDateTime());
+			item->setText(1, tr("Unlimited"));
+		}
+		else{
+			QDateTime dateTime = QDateTime::currentDateTime();
+
+			if (!dateTimeInModel.isValid()){
+				item->setData(1, Qt::UserRole, dateTime);
+			}
+			else{
+				dateTime = item->data(1, Qt::UserRole).toDateTime();
+			}
+
+			item->setText(1, dateTime.date().toString(Qt::DateFormat::SystemLocaleDate));
+		}
+	}
+
+	m_itemUpdateBlocked = false;
+
 	DoUpdateModel();
 }
 
@@ -272,7 +335,9 @@ CProductInstanceInfoEditorComp::DateTimeDelegate::DateTimeDelegate(QObject *pare
 QWidget* CProductInstanceInfoEditorComp::DateTimeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
 	if (index.column() == 1){
-		return new QDateEdit(parent);
+		if (index.data(Qt::CheckStateRole).toInt() == Qt::Checked){
+			return new QDateEdit(parent);
+		}
 	}
 
 	return nullptr;

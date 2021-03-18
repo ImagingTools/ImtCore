@@ -59,9 +59,6 @@ protected:
 private Q_SLOTS:
 	void on_ProductInstanceIdEdit_editingFinished();
 	void on_ProductCombo_currentIndexChanged(int index);
-	void on_LicenseCombo_currentIndexChanged(int index);
-	void on_ValidUntilDate_dateTimeChanged(const QDateTime& dateTime);
-	void on_ExpireGroup_toggled(bool toggled);
 	void on_LicenseInstancesEdit_itemChanged(QTreeWidgetItem *item, int column);
 
 private:
@@ -80,6 +77,8 @@ private:
 	};
 
 private:
+	bool m_itemUpdateBlocked;
+
 	DateTimeDelegate m_dateDelegate;
 
 	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CProductInstanceInfoEditorComp> m_productCollectionObserver;
