@@ -78,6 +78,7 @@ private:
 
 private:
 	bool m_itemUpdateBlocked;
+	QMap<QByteArray, QDateTime> m_cachedLicenseExpiration;
 
 	DateTimeDelegate m_dateDelegate;
 

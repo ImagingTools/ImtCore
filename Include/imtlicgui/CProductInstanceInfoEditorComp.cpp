@@ -94,7 +94,6 @@ void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 
 	QByteArrayList activatedLicenseIds;
 
-	const imtbase::ICollectionInfo& currentLicenses = productInstanceInfoPtr->GetLicenseInstances();
 	const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = productInstanceInfoPtr->GetLicenseInstances().GetElementIds();
 	for (const QByteArray& licenseCollectionId : licenseCollectionIds){
 		const imtlic::ILicenseInstance* licenseInstance = productInstanceInfoPtr->GetLicenseInstance(licenseCollectionId);
@@ -246,6 +245,13 @@ void CProductInstanceInfoEditorComp::on_ProductInstanceIdEdit_editingFinished()
 
 void CProductInstanceInfoEditorComp::on_ProductCombo_currentIndexChanged(int /*index*/)
 {
+	int count = LicenseInstancesEdit->topLevelItemCount();
+	for (int i = 0; i < count; i++){
+		LicenseInstancesEdit->topLevelItem(i)->setCheckState(0, Qt::Unchecked);
+	}
+
+	m_cachedLicenseExpiration.clear();
+
 	DoUpdateModel();
 
 	if (!IsUpdateBlocked()){
@@ -264,55 +270,44 @@ void CProductInstanceInfoEditorComp::on_LicenseInstancesEdit_itemChanged(QTreeWi
 
 	m_itemUpdateBlocked = true;
 
-	QDateTime dateTimeInModel;
-
-	imtlic::IProductInstanceInfo* productInstanceInfoPtr = GetObservedObject();
-	Q_ASSERT(productInstanceInfoPtr != nullptr);
-
-	const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = productInstanceInfoPtr->GetLicenseInstances().GetElementIds();
-	for (const QByteArray& licenseCollectionId : licenseCollectionIds){
-		const imtlic::ILicenseInstance* licenseInstance = productInstanceInfoPtr->GetLicenseInstance(licenseCollectionId);
-		if (licenseInstance != nullptr){
-			if (licenseInstance->GetLicenseId() == item->data(0, Qt::UserRole).toByteArray()){
-				dateTimeInModel = licenseInstance->GetExpiration();
-			}
-		}
-	}
+	QByteArray licenseId = item->data(0, Qt::UserRole).toByteArray();
+	QDateTime licenseDateTime = item->data(1, Qt::UserRole).toDateTime();
 
 	if (column == 0){
+		item->setData(1, Qt::UserRole, QDateTime());
+
 		if (item->checkState(0) == Qt::Unchecked){
+			if (licenseDateTime.isValid()){
+				m_cachedLicenseExpiration[licenseId] = licenseDateTime;
+			}
+
 			item->setData(1, Qt::CheckStateRole, QVariant());
 			item->setText(1, tr(""));
 		}
 		else{
-			item->setData(1, Qt::UserRole, dateTimeInModel);
-			if (dateTimeInModel.isValid()){
-				item->setData(1, Qt::CheckStateRole, Qt::Checked);
-				item->setText(1, dateTimeInModel.date().toString(Qt::DateFormat::SystemLocaleDate));
-			}
-			else{
-				item->setData(1, Qt::CheckStateRole, Qt::Unchecked);
-				item->setText(1, tr("Unlimited"));
-			}
+			item->setData(1, Qt::CheckStateRole, Qt::Unchecked);
+			item->setText(1, tr("Unlimited"));
 		}
 	}
 	
 	if (column == 1){
+		if (licenseDateTime.isValid()){
+			m_cachedLicenseExpiration[licenseId] = licenseDateTime;
+		}
+
+		QDateTime cachedDateTime = m_cachedLicenseExpiration[licenseId];
+		if (!cachedDateTime.isValid()){
+			cachedDateTime.setDate(QDate(2020, 1, 1));
+			cachedDateTime.setTime(QTime(0, 0, 0));
+		}
+
 		if (item->checkState(1) == Qt::Unchecked){
 			item->setData(1, Qt::UserRole, QDateTime());
 			item->setText(1, tr("Unlimited"));
 		}
 		else{
-			QDateTime dateTime = QDateTime::currentDateTime();
-
-			if (!dateTimeInModel.isValid()){
-				item->setData(1, Qt::UserRole, dateTime);
-			}
-			else{
-				dateTime = item->data(1, Qt::UserRole).toDateTime();
-			}
-
-			item->setText(1, dateTime.date().toString(Qt::DateFormat::SystemLocaleDate));
+			item->setData(1, Qt::UserRole, cachedDateTime);
+			item->setText(1, cachedDateTime.date().toString(Qt::DateFormat::SystemLocaleDate));
 		}
 	}
 
@@ -332,7 +327,7 @@ CProductInstanceInfoEditorComp::DateTimeDelegate::DateTimeDelegate(QObject *pare
 
 // reimplemented (QItemDelegate)
 
-QWidget* CProductInstanceInfoEditorComp::DateTimeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
+QWidget* CProductInstanceInfoEditorComp::DateTimeDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& /*option*/, const QModelIndex& index) const
 {
 	if (index.column() == 1){
 		if (index.data(Qt::CheckStateRole).toInt() == Qt::Checked){

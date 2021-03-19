@@ -205,7 +205,7 @@ void CFeaturePackageGuiComp::UpdateItemTree()
 				if (dependencyProviderPtr != nullptr){
 					QByteArrayList dependencyIds = dependencyProviderPtr->GetFeatureDependencies(m_selectedFeatureId);
 					for (const QByteArray& dependencyId : dependencyIds){
-						if (!packageCollectionFeatureIds.contains(dependencyId)){
+						if (!packageCollectionFeatureIds.contains(dependencyId) && !ownFeatureIds.contains(dependencyId)){
 							CItem* missingItemObjectPtr = new CItem();
 							missingItemObjectPtr->SetItemChangeHandler(this);
 
