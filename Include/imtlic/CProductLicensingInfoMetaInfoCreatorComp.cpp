@@ -16,24 +16,6 @@ namespace imtlic
 {
 
 
-class MetaInfo: public idoc::CStandardDocumentMetaInfo
-{
-public:
-	typedef idoc::CStandardDocumentMetaInfo BaseClass;
-
-	// reimplemented (idoc::IDocumentMetaInfo)
-	virtual QString GetMetaInfoName(int metaInfoType) const override
-	{
-		switch (metaInfoType){
-		case IProductLicensingInfoProvider::MIT_LICENSES_INFO_LIST:
-			return QObject::tr("Licenses");
-		}
-
-		return BaseClass::GetMetaInfoName(metaInfoType);
-	}
-};
-
-
 // protected methods
 
 // reimplemented (imtbase::IMetaInfoCreator)
@@ -56,6 +38,23 @@ bool CProductLicensingInfoMetaInfoCreatorComp::CreateMetaInfo(
 	if (typeId != *m_objectTypeIdAttrPtr){
 		return false;
 	}
+
+	class MetaInfo: public idoc::CStandardDocumentMetaInfo
+	{
+	public:
+		typedef idoc::CStandardDocumentMetaInfo BaseClass;
+
+		// reimplemented (idoc::IDocumentMetaInfo)
+		virtual QString GetMetaInfoName(int metaInfoType) const override
+		{
+			switch (metaInfoType){
+			case imtlic::IProductLicensingInfoProvider::MIT_LICENSES_INFO_LIST:
+				return QObject::tr("Licenses");
+			}
+
+			return BaseClass::GetMetaInfoName(metaInfoType);
+		}
+	};
 
 	metaInfoPtr.SetPtr(new imod::TModelWrap<MetaInfo>);
 

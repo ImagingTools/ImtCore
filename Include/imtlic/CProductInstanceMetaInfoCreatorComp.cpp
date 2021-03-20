@@ -37,6 +37,23 @@ bool CProductInstanceMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
+	class MetaInfo: public idoc::CStandardDocumentMetaInfo
+	{
+	public:
+		typedef idoc::CStandardDocumentMetaInfo BaseClass;
+
+		// reimplemented (idoc::IDocumentMetaInfo)
+		virtual QString GetMetaInfoName(int metaInfoType) const override
+		{
+			switch (metaInfoType){
+			case imtlic::IProductInstanceInfoProvider::MIT_LICENSE_INSTANCE_INFO_LIST:
+				return QObject::tr("Licenses");
+			}
+
+			return BaseClass::GetMetaInfoName(metaInfoType);
+		}
+	};
+	
 	metaInfoPtr.SetPtr(new imod::TModelWrap<MetaInfo>);
 
 	if (dataPtr == nullptr){
@@ -54,8 +71,12 @@ bool CProductInstanceMetaInfoCreatorComp::CreateMetaInfo(
 	for (imtbase::ICollectionInfo::Id id : ids){
 		const imtlic::ILicenseInstance* licenseInstancePtr = productInstancePtr->GetLicenseInstance(id);
 		QDateTime expirationDate = licenseInstancePtr->GetExpiration();
-		QString expirationDateText = expirationDate.toString("dd.MM.yyyy");
 		QString licenseName = licenseInstancePtr->GetLicenseName();
+		QString expirationDateText = QObject::tr("Unlimited");
+		if (expirationDate.isValid()){
+			expirationDateText = expirationDate.toString("dd.MM.yyyy");
+		}
+
 		retVal +=  licenseName + QObject::tr(" (Valid until: %1)").arg(expirationDateText) + "\n";
 	}
 

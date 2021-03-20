@@ -35,24 +35,6 @@ protected:
 	virtual bool CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, MetaInfoPtr& metaInfoPtr) const override;
 
 private:
-	class MetaInfo: public idoc::CStandardDocumentMetaInfo
-	{
-	public:
-		typedef idoc::CStandardDocumentMetaInfo BaseClass;
-
-		// reimplemented (idoc::IDocumentMetaInfo)
-		virtual QString GetMetaInfoName(int metaInfoType) const override
-		{
-			switch (metaInfoType){
-			case IProductInstanceInfoProvider::MIT_LICENSE_INSTANCE_INFO_LIST:
-				return QObject::tr("Licenses");
-			}
-
-			return BaseClass::GetMetaInfoName(metaInfoType);
-		}
-	};
-
-private:
 	I_ATTR(QByteArray, m_objectTypeIdAttrPtr);
 };
 

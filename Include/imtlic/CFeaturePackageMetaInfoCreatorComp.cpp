@@ -15,24 +15,6 @@ namespace imtlic
 {
 
 
-class MetaInfo: public idoc::CStandardDocumentMetaInfo
-{
-public:
-	typedef idoc::CStandardDocumentMetaInfo BaseClass;
-
-	// reimplemented (idoc::IDocumentMetaInfo)
-	virtual QString GetMetaInfoName(int metaInfoType) const override
-	{
-		switch (metaInfoType){
-		case IFeatureInfoProvider::MIT_FEATURE_INFO_LIST:
-			return QObject::tr("Features");
-		}
-
-		return BaseClass::GetMetaInfoName(metaInfoType);
-	}
-};
-
-
 // protected methods
 
 // reimplemented (imtbase::IMetaInfoCreator)
@@ -55,6 +37,23 @@ bool CFeaturePackageMetaInfoCreatorComp::CreateMetaInfo(
 	if (typeId != *m_objectTypeIdAttrPtr){
 		return false;
 	}
+
+	class MetaInfo: public idoc::CStandardDocumentMetaInfo
+	{
+	public:
+		typedef idoc::CStandardDocumentMetaInfo BaseClass;
+
+		// reimplemented (idoc::IDocumentMetaInfo)
+		virtual QString GetMetaInfoName(int metaInfoType) const override
+		{
+			switch (metaInfoType){
+			case imtlic::IFeatureInfoProvider::MIT_FEATURE_INFO_LIST:
+				return QObject::tr("Features");
+			}
+
+			return BaseClass::GetMetaInfoName(metaInfoType);
+		}
+	};
 
 	metaInfoPtr.SetPtr(new imod::TModelWrap<MetaInfo>);
 
