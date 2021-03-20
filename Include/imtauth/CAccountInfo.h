@@ -43,7 +43,7 @@ public:
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
-private:
+protected:
 	AccountType m_accountType;
 	QString m_accountName;
 	QString m_accountDescription;

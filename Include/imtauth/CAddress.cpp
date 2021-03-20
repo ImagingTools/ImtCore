@@ -22,8 +22,6 @@ QByteArray CAddress::GetTypeId()
 
 // public methods
 
-// reimplemented (IAddress)
-
 CAddress::CAddress()
 	:m_postalCode(-1)
 {
@@ -117,7 +115,7 @@ bool CAddress::Serialize(iser::IArchive& archive)
 
 int CAddress::GetSupportedOperations() const
 {
-	return SO_CLONE | SO_COPY | SO_RESET;
+	return SO_COPY | SO_CLONE | SO_RESET;
 }
 
 

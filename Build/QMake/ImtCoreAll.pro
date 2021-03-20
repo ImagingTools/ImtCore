@@ -4,6 +4,9 @@ include ($(ACFCONFIGDIR)/QMake/Solution.pri)
 SUBDIRS += imtauth
 imtauth.file = ../../Include/imtauth/QMake/imtauth.pro
 
+SUBDIRS += imtauthgui
+imtauthgui.file = ../../Include/imtauthgui/QMake/imtauthgui.pro
+
 SUBDIRS += imtbase
 imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
 
@@ -63,9 +66,18 @@ SUBDIRS += imtlicgui
 imtlicgui.file = ../../Include/imtlicgui/QMake/imtlicgui.pro
 
 # Component packages
+
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
 ImtCorePck.depends = imtbase
+
+SUBDIRS += ImtAuthPck
+ImtAuthPck.file = ../../Impl/ImtAuthPck/QMake/ImtAuthPck.pro
+ImtAuthPck.depends = imtbase imtauth
+
+SUBDIRS += ImtAuthGuiPck
+ImtAuthGuiPck.file = ../../Impl/ImtAuthGuiPck/QMake/ImtAuthGuiPck.pro
+ImtAuthGuiPck.depends = imtbase imtauth imtauthgui
 
 SUBDIRS += ImtLicensePck
 ImtLicensePck.file = ../../Impl/ImtLicensePck/QMake/ImtLicensePck.pro

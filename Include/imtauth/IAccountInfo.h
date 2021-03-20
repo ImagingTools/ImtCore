@@ -2,9 +2,10 @@
 
 
 // ACF includes
-#include <iser/IObject.h>
-#include <iimg/IBitmap.h>
 #include <iauth/IRightsProvider.h>
+#include <idoc/IDocumentMetaInfo.h>
+#include <iimg/IBitmap.h>
+#include <iser/IObject.h>
 
 // ImtCore includes
 #include <imtauth/IPersonInfo.h>
@@ -35,6 +36,24 @@ public:
 			A company account.
 		*/
 		AT_COMPANY
+	};
+
+	enum MetaInfoTypes
+	{
+		/**
+			Account type given as AccountType.
+		*/
+		MIT_ACCOUNT_TYPE = idoc::IDocumentMetaInfo::MIT_USER + 1,
+
+		/**
+			Account name given as QString.
+		*/
+		MIT_ACCOUNT_NAME,
+
+		/**
+			Account description given as QString.
+		*/
+		MIT_ACCOUNT_DESCRIPTION,
 	};
 
 	/**
