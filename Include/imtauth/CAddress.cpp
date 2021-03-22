@@ -25,26 +25,12 @@ QByteArray CAddress::GetTypeId()
 CAddress::CAddress()
 	:m_postalCode(-1)
 {
+	m_country = QObject::tr("Country");
+	m_city = QObject::tr("City");
 }
 
 
 // reimplemented (IAddress)
-
-QString CAddress::GetCity() const
-{
-	return m_city;
-}
-
-
-void CAddress::SetCity(const QString& city)
-{
-	if (m_city != city){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_city = city;
-	}
-}
-
 
 QString CAddress::GetCountry() const
 {
@@ -58,6 +44,22 @@ void CAddress::SetCountry(const QString & country)
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_country = country;
+	}
+}
+
+
+QString CAddress::GetCity() const
+{
+	return m_city;
+}
+
+
+void CAddress::SetCity(const QString& city)
+{
+	if (m_city != city){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_city = city;
 	}
 }
 
@@ -92,15 +94,17 @@ bool CAddress::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	static iser::CArchiveTag cityTag("City", "City name", iser::CArchiveTag::TT_LEAF);
-	bool retVal = archive.BeginTag(cityTag);
-	retVal = retVal && archive.Process(m_city);
-	retVal = retVal && archive.EndTag(cityTag);
+	bool retVal = true;
 
 	static iser::CArchiveTag countryTag("Country", "Country name", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(countryTag);
 	retVal = retVal && archive.Process(m_country);
 	retVal = retVal && archive.EndTag(countryTag);
+	
+	static iser::CArchiveTag cityTag("City", "City name", iser::CArchiveTag::TT_LEAF);
+	retVal = archive.BeginTag(cityTag);
+	retVal = retVal && archive.Process(m_city);
+	retVal = retVal && archive.EndTag(cityTag);
 
 	static iser::CArchiveTag postalCodeTag("PostalCode", "Postal code", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(postalCodeTag);
@@ -125,8 +129,8 @@ bool CAddress::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_city = sourcePtr->GetCity();
 		m_country = sourcePtr->GetCountry();
+		m_city = sourcePtr->GetCity();
 		m_postalCode = sourcePtr->GetPostalCode();
 
 		return true;
@@ -151,8 +155,8 @@ bool CAddress::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_city.clear();
 	m_country.clear();
+	m_city.clear();
 	m_postalCode = -1;
 
 	return true;

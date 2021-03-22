@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtCore/QDate>
 
+// ACF includes
+#include <imod/CModelUpdateBridge.h>
+
 // ImtBase includes
 #include <imtauth/IPersonInfo.h>
 #include <imtauth/CAddressCollection.h>
@@ -48,7 +51,9 @@ private:
 	QString m_lastName;
 	QString m_nickName;
 
-	CAddressCollection m_addresses;
+	imod::TModelWrap<CAddressCollection> m_addresses;
+
+	imod::CModelUpdateBridge m_modelUpdateBridge;
 };
 
 

@@ -17,10 +17,10 @@ public:
 	CAddress();
 
 	// reimplemented (IAddress)
-	virtual QString GetCity() const override;
-	virtual void SetCity(const QString & city) override;
 	virtual QString GetCountry() const override;
 	virtual void SetCountry(const QString & country) override;
+	virtual QString GetCity() const override;
+	virtual void SetCity(const QString & city) override;
 	virtual int GetPostalCode() const override;
 	virtual void SetPostalCode(int postalCode) override;
 
@@ -37,8 +37,8 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
-	QString m_city;
 	QString m_country;
+	QString m_city;
 	int m_postalCode;
 };
 

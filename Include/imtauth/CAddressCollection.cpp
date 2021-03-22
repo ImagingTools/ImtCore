@@ -13,6 +13,25 @@ CAddressCollection::CAddressCollection()
 }
 
 
+// reimplemented (IAddressManager)
+QByteArray CAddressCollection::AddAddress(IAddress* addressPtr)
+{
+	return m_collection.InsertNewObject("Address", "", "", addressPtr);
+}
+
+
+bool CAddressCollection::RemoveAddress(const QByteArray& addressId)
+{
+	return m_collection.RemoveObject(addressId);
+}
+
+
+bool CAddressCollection::RemoveAllAddresses()
+{
+	return m_collection.ResetData();
+}
+
+
 // reimplemented (IAddressProvider)
 
 const imtbase::ICollectionInfo& CAddressCollection::GetAddressList() const

@@ -1,6 +1,10 @@
 #pragma once
 
 
+// Qt includes
+#include <QtWidgets/QAction>
+
+
 // ACF includes
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
@@ -46,6 +50,14 @@ private Q_SLOTS:
 	void on_FirstNameEdit_editingFinished();
 	void on_LastNameEdit_editingFinished();
 	void on_NicknameEdit_editingFinished();
+	void on_Addresses_itemSelectionChanged();
+	void on_Addresses_itemChanged(QTreeWidgetItem *item, int column);
+	void on_AddAddress_triggered(QAction *action);
+	void on_RemoveAddress_triggered(QAction *action);
+
+private:
+	QAction m_addAddressAction;
+	QAction m_removeAddressAction;
 };
 
 

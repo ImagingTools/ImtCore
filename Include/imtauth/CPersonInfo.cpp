@@ -27,9 +27,12 @@ CPersonInfo::CPersonInfo()
 	:m_genderType(GT_DIVERSE), // :)
 	m_firstName("DefaultFirstName"),
 	m_lastName("DefaultLastName"),
-	m_nickName("DefaultNickname")
+	m_nickName("DefaultNickname"),
+	m_modelUpdateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
 {
 	m_birthday = QDate(1, 1, 2020);
+
+	m_addresses.AttachObserver(&m_modelUpdateBridge);
 }
 
 
@@ -166,6 +169,11 @@ bool CPersonInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(nickNameTag);
 	retVal = retVal && archive.Process(m_nickName);
 	retVal = retVal && archive.EndTag(nickNameTag);
+
+	static iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(addressesTag);
+	retVal = retVal && m_addresses.Serialize(archive);
+	retVal = retVal && archive.EndTag(addressesTag);
 
 	return retVal;
 }
