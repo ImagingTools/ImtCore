@@ -29,6 +29,11 @@ I_EXPORT_COMPONENT(
 			"HTTP root handler",
 			"HTTP REST Root Protocol");
 
+I_EXPORT_COMPONENT(
+            HttpFileBasedHandler,
+            "HTTP file handler",
+            "HTTP File Template");
+
 
 } // namespace ImtRestPck
 

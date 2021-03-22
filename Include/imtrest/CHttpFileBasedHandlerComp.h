@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <ifile/IFileNameParam.h>
 
 // ImtCore includes
 #include <imtrest/IRequestHandler.h>
@@ -15,32 +16,27 @@ namespace imtrest
 {
 
 
-class CHttpRootHandlerComp:
+class CHttpFileBasedHandlerComp:
 			public ilog::CLoggerComponentBase,
 			virtual public IRequestHandler
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CHttpRootHandlerComp);
+    I_BEGIN_COMPONENT(CHttpFileBasedHandlerComp);
 		I_REGISTER_INTERFACE(IRequestHandler);
-		I_ASSIGN_MULTI_0(m_commandIdsAttrPtr, "CommandIds", "List of command-IDs used with corresponded handlers", true);
-		I_ASSIGN_MULTI_0(m_requestHandlersCompPtr, "RequestHandlers", "List of request handlers for corresponding command-IDs", true);
+        I_ASSIGN(m_commandIdAttrPtr, "CommandId", "List of command-ID used with corresponded handlers", true, "");
+        I_ASSIGN(m_fileTemplatePathCompPtr, "FileTemplatePath", "Comment", true, "FileTemplatePath");
 	I_END_COMPONENT
 
 	// reimplemented (IRequestHandler)
 	virtual bool ProcessRequest(const IRequest& request) const override;
     virtual QByteArray GetSupportedCommandId() const override;
 
-protected:
-	virtual IRequestHandler* FindRequestHandler(const QByteArray& commandId) const;
-
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
 
 private:
-	I_MULTIATTR(QByteArray, m_commandIdsAttrPtr);
-	I_MULTIREF(IRequestHandler, m_requestHandlersCompPtr);
+    I_ATTR(QByteArray, m_commandIdAttrPtr);
+    I_REF(ifile::IFileNameParam, m_fileTemplatePathCompPtr);
 
 	typedef QMap<QString, IRequestHandler*> HandlersMap;
 

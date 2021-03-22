@@ -111,6 +111,11 @@ void CTcpServerComp::OnSocketDisconnected()
 }
 
 
+QByteArray CTcpServerComp::GetSupportedCommandId() const
+{
+    return QByteArray();
+}
+
 } // namespace imtrest
 
 

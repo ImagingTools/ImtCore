@@ -42,6 +42,7 @@ public:
 
 	// reimplemented (IRequestHandler)
 	virtual bool ProcessRequest(const IRequest& request) const override;
+    virtual QByteArray GetSupportedCommandId() const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

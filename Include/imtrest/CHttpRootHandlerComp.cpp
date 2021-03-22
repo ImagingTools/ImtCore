@@ -21,6 +21,11 @@ bool CHttpRootHandlerComp::ProcessRequest(const IRequest& request) const
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 
 	QByteArray commandId = request.GetCommandId();
+	if (commandId.startsWith('/'))
+	{
+		commandId = commandId.remove(0, 1);
+	}
+
 	if (commandId.isEmpty()){
 		QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>The requested command could not be executed</p></body></html>");
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
@@ -32,12 +37,18 @@ bool CHttpRootHandlerComp::ProcessRequest(const IRequest& request) const
 			return false;
 		}
 	}
-
 	const IRequestHandler* handlerPtr = FindRequestHandler(commandId);
 	if (handlerPtr != nullptr){
 		return handlerPtr->ProcessRequest(request);
 	}
 	else{
+        QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>The requested command could not be executed</p></body></html>");
+        QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+
+        istd::TDelPtr<IResponse> responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
+        if (responsePtr.IsValid()){
+            engine.GetResponder().SendResponse(*responsePtr);
+        }
 		SendErrorMessage(0, QString("No request handler found for: '%1'").arg(qPrintable(commandId)));
 	}
 
@@ -47,8 +58,25 @@ bool CHttpRootHandlerComp::ProcessRequest(const IRequest& request) const
 
 // protected methods
 
-IRequestHandler* CHttpRootHandlerComp::FindRequestHandler(const QByteArray& /*commandId*/) const
+
+IRequestHandler* CHttpRootHandlerComp::FindRequestHandler(const QByteArray& commandId) const
 {
+//    int handlersCount = qMin(m_commandIdsAttrPtr.GetCount(), m_requestHandlersCompPtr.GetCount());
+    for (int i = 0; i < m_requestHandlersCompPtr.GetCount(); ++i)
+    {
+        IRequestHandler* handlerPtr = m_requestHandlersCompPtr[i];
+        if (handlerPtr && handlerPtr->GetSupportedCommandId() == commandId)
+        {
+            return handlerPtr;
+        }
+    }
+//    for(auto handlerPtr: m_requestHandlersCompPtr)
+//    {
+//        if (handlerPtr && handlerPtr->GetSupportedCommandId() == commandId)
+//        {
+//            return handlerPtr;
+//        }
+//    }
 	return nullptr;
 }
 
@@ -73,7 +101,13 @@ void CHttpRootHandlerComp::OnComponentCreated()
 				m_handlersMap[registeredCommandId] = handlerPtr;
 			}
 		}
-	}
+    }
+}
+
+
+QByteArray CHttpRootHandlerComp::GetSupportedCommandId() const
+{
+    return "/";
 }
 
 

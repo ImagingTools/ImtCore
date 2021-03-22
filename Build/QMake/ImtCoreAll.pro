@@ -154,6 +154,6 @@ ImtPyPck.depends = imtpy
 
 # Tutorials
 	SUBDIRS += ServerDemo
-	ServerDemo.file = ../../Docs/Tutorials/ServerDemo/QMake/ServerDemo.pro
+	ServerDemo.file = ../../Docs/Tutorials/Impl/ServerDemo/QMake/ServerDemo.pro
 	ServerDemo.depends = ImtRestPck ImtCorePck
 

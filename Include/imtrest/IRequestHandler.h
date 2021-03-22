@@ -17,6 +17,7 @@ class IRequestHandler: virtual public istd::IPolymorphic
 {
 public:
 	virtual bool ProcessRequest(const IRequest& request) const = 0;
+    virtual QByteArray GetSupportedCommandId() const = 0;
 };
 
 
