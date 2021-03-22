@@ -24,7 +24,7 @@ public:
 	virtual AccountType GetAccountType() const override;
 	virtual QString GetAccountName() const override;
 	virtual QString GetAccountDescription() const override;
-	virtual const IPersonInfo* GetAccountOwner() const override;
+	virtual const IContactInfo* GetAccountOwner() const override;
 	virtual const iauth::IRightsProvider& GetAccountRights() const override;
 	virtual const iimg::IBitmap& GetAccountPicture() const override;
 
@@ -47,7 +47,7 @@ protected:
 	AccountType m_accountType;
 	QString m_accountName;
 	QString m_accountDescription;
-	const IPersonInfo* m_accountOwnerPtr;
+	const IContactInfo* m_accountOwnerPtr;
 	imod::TModelWrap<iimg::CBitmap> m_accountPicture;
 };
 

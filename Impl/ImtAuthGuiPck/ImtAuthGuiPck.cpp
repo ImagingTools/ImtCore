@@ -15,9 +15,9 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
-			PersonInfoEditor,
-			"Person info editor",
-			"Person Info Editor");
+			ContactInfoEditor,
+			"Contact info editor",
+			"Contact Info Editor");
 
 I_EXPORT_COMPONENT(
 			AddressEditor,
@@ -30,9 +30,9 @@ I_EXPORT_COMPONENT(
 			"Account Info Editor");
 
 I_EXPORT_COMPONENT(
-			PersonInfoViewDelegate,
-			"Person info view delegate",
-			"Person Address Info View Delegate");
+			ContactInfoViewDelegate,
+			"Contact info view delegate",
+			"Contact Address Info View Delegate");
 
 
 } // namespace ImtAuthGuiPck

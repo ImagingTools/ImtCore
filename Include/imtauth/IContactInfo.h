@@ -20,7 +20,7 @@ class IAddressProvider;
 	Interface descibing a natural person.
 	\ingroup Authentification
 */
-class IPersonInfo: virtual public iser::IObject
+class IContactInfo: virtual public iser::IObject
 {
 public:
 	enum GenderType

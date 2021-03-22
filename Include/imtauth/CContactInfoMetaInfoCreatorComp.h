@@ -12,12 +12,12 @@ namespace imtauth
 /**
 	Meta-info creator for the person information object.
 */
-class CPersonInfoMetaInfoCreatorComp: public imtbase::CObjectMetaInfoCreatorCompBase
+class CContactInfoMetaInfoCreatorComp: public imtbase::CObjectMetaInfoCreatorCompBase
 {
 public:
 	typedef imtbase::CObjectMetaInfoCreatorCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CPersonInfoMetaInfoCreatorComp);
+	I_BEGIN_COMPONENT(CContactInfoMetaInfoCreatorComp);
 	I_END_COMPONENT;
 
 protected:

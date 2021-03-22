@@ -1,4 +1,4 @@
-#include <imtauthgui/CPersonInfoEditorComp.h>
+#include <imtauthgui/CContactInfoEditorComp.h>
 
 
 // ACF includes
@@ -18,19 +18,19 @@ namespace imtauthgui
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
-void CPersonInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CContactInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	imtauth::IPersonInfo* personPtr = GetObservedObject();
+	imtauth::IContactInfo* personPtr = GetObservedObject();
 	Q_ASSERT(personPtr != nullptr);
 
 	GenderCombo->addItem(tr("Diverse"));
 	GenderCombo->addItem(tr("Female"));
 	GenderCombo->addItem(tr("Male"));
 	switch (personPtr->GetGenderType()){
-	case imtauth::IPersonInfo::GT_FEMALE:
+	case imtauth::IContactInfo::GT_FEMALE:
 		GenderCombo->setCurrentIndex(1);
 		break;
-	case imtauth::IPersonInfo::GT_MALE:
+	case imtauth::IContactInfo::GT_MALE:
 		GenderCombo->setCurrentIndex(2);
 		break;
 	default:
@@ -38,9 +38,9 @@ void CPersonInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*chan
 	}
 
 	BirthdayEdit->setDate(personPtr->GetBirthday());
-	FirstNameEdit->setText(personPtr->GetNameField(imtauth::IPersonInfo::NFT_FIRST_NAME));
-	LastNameEdit->setText(personPtr->GetNameField(imtauth::IPersonInfo::NFT_LAST_NAME));
-	NicknameEdit->setText(personPtr->GetNameField(imtauth::IPersonInfo::NFT_NICKNAME));
+	FirstNameEdit->setText(personPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME));
+	LastNameEdit->setText(personPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME));
+	NicknameEdit->setText(personPtr->GetNameField(imtauth::IContactInfo::NFT_NICKNAME));
 
 	Addresses->clear();
 
@@ -66,30 +66,30 @@ void CPersonInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*chan
 }
 
 
-void CPersonInfoEditorComp::OnGuiModelAttached()
+void CContactInfoEditorComp::OnGuiModelAttached()
 {
 	BaseClass::OnGuiModelAttached();
 }
 
 
-void CPersonInfoEditorComp::OnGuiModelDetached()
+void CContactInfoEditorComp::OnGuiModelDetached()
 {
 	BaseClass::OnGuiModelDetached();
 }
 
 
-void CPersonInfoEditorComp::UpdateModel() const
+void CContactInfoEditorComp::UpdateModel() const
 {
-	imtauth::IPersonInfo* personPtr = GetObservedObject();
+	imtauth::IContactInfo* personPtr = GetObservedObject();
 	Q_ASSERT(personPtr != nullptr);
 
 	istd::CChangeGroup changeGroup(personPtr);
 
-	personPtr->SetGenderType(imtauth::IPersonInfo::GenderType(GenderCombo->currentIndex()));
+	personPtr->SetGenderType(imtauth::IContactInfo::GenderType(GenderCombo->currentIndex()));
 	personPtr->SetBirthday(BirthdayEdit->date());
-	personPtr->SetNameField(imtauth::IPersonInfo::NFT_FIRST_NAME, FirstNameEdit->text());
-	personPtr->SetNameField(imtauth::IPersonInfo::NFT_LAST_NAME, LastNameEdit->text());
-	personPtr->SetNameField(imtauth::IPersonInfo::NFT_NICKNAME, NicknameEdit->text());
+	personPtr->SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, FirstNameEdit->text());
+	personPtr->SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, LastNameEdit->text());
+	personPtr->SetNameField(imtauth::IContactInfo::NFT_NICKNAME, NicknameEdit->text());
 
 	imtauth::IAddressManager* addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
 				const_cast<imtauth::IAddressProvider*>(personPtr->GetAddresses()));
@@ -117,7 +117,7 @@ void CPersonInfoEditorComp::UpdateModel() const
 
 // reimplemented (iqtgui::CGuiComponentBase)
 
-void CPersonInfoEditorComp::OnGuiCreated()
+void CContactInfoEditorComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
@@ -129,7 +129,7 @@ void CPersonInfoEditorComp::OnGuiCreated()
 }
 
 
-void CPersonInfoEditorComp::OnGuiDestroyed()
+void CContactInfoEditorComp::OnGuiDestroyed()
 {
 	BaseClass::OnGuiDestroyed();
 }
@@ -137,51 +137,51 @@ void CPersonInfoEditorComp::OnGuiDestroyed()
 
 // private slots
 
-void CPersonInfoEditorComp::on_GenderCombo_currentIndexChanged(int index)
+void CContactInfoEditorComp::on_GenderCombo_currentIndexChanged(int index)
 {
 	DoUpdateModel();
 }
 
 
-void CPersonInfoEditorComp::on_BirthdayEdit_dateChanged(const QDate &date)
+void CContactInfoEditorComp::on_BirthdayEdit_dateChanged(const QDate &date)
 {
 	DoUpdateModel();
 }
 
 
-void CPersonInfoEditorComp::on_FirstNameEdit_editingFinished()
+void CContactInfoEditorComp::on_FirstNameEdit_editingFinished()
 {
 	DoUpdateModel();
 }
 
 
-void CPersonInfoEditorComp::on_LastNameEdit_editingFinished()
+void CContactInfoEditorComp::on_LastNameEdit_editingFinished()
 {
 	DoUpdateModel();
 }
 
 
-void CPersonInfoEditorComp::on_NicknameEdit_editingFinished()
+void CContactInfoEditorComp::on_NicknameEdit_editingFinished()
 {
 	DoUpdateModel();
 }
 
 
-void CPersonInfoEditorComp::on_Addresses_itemSelectionChanged()
+void CContactInfoEditorComp::on_Addresses_itemSelectionChanged()
 {
 	RemoveAddress->setEnabled(Addresses->selectedItems().count() > 0);
 }
 
 
-void CPersonInfoEditorComp::on_Addresses_itemChanged(QTreeWidgetItem *item, int column)
+void CContactInfoEditorComp::on_Addresses_itemChanged(QTreeWidgetItem *item, int column)
 {
 	DoUpdateModel();
 }
 
 
-void CPersonInfoEditorComp::on_AddAddress_triggered(QAction *action)
+void CContactInfoEditorComp::on_AddAddress_triggered(QAction *action)
 {
-	imtauth::IPersonInfo* personPtr = GetObservedObject();
+	imtauth::IContactInfo* personPtr = GetObservedObject();
 	Q_ASSERT(personPtr != nullptr);
 
 	imtauth::IAddressManager* addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
@@ -195,9 +195,9 @@ void CPersonInfoEditorComp::on_AddAddress_triggered(QAction *action)
 }
 
 
-void CPersonInfoEditorComp::on_RemoveAddress_triggered(QAction *action)
+void CContactInfoEditorComp::on_RemoveAddress_triggered(QAction *action)
 {
-	imtauth::IPersonInfo* personPtr = GetObservedObject();
+	imtauth::IContactInfo* personPtr = GetObservedObject();
 	Q_ASSERT(personPtr != nullptr);
 
 	imtauth::IAddressManager* addressesPtr = dynamic_cast<imtauth::IAddressManager*>(

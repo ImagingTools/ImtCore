@@ -1,8 +1,8 @@
-#include <imtauthgui/CPersonInfoViewDelegateComp.h>
+#include <imtauthgui/CContactInfoViewDelegateComp.h>
 
 
 // ImtCore includes
-#include <imtauth/IPersonInfo.h>
+#include <imtauth/IContactInfo.h>
 
 
 namespace imtauthgui
@@ -13,7 +13,7 @@ namespace imtauthgui
 
 // reimplemented (imtgui::ICollectionViewDelegate)
 
-imtgui::ICollectionViewDelegate::SummaryInformation CPersonInfoViewDelegateComp::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+imtgui::ICollectionViewDelegate::SummaryInformation CContactInfoViewDelegateComp::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
 {
 	SummaryInformation result;
 
@@ -21,12 +21,12 @@ imtgui::ICollectionViewDelegate::SummaryInformation CPersonInfoViewDelegateComp:
 		imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr;
 		if (m_collectionPtr->GetDataMetaInfo(objectId, metaInfoPtr)){
 			if (informationId == QByteArray("Gender")){
-				int genderType = metaInfoPtr->GetMetaInfo(imtauth::IPersonInfo::MIT_GENDER_TYPE).toInt();
+				int genderType = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_GENDER_TYPE).toInt();
 				switch (genderType){
-				case imtauth::IPersonInfo::GenderType::GT_FEMALE:
+				case imtauth::IContactInfo::GenderType::GT_FEMALE:
 					result.text = tr("Female");
 					break;
-				case imtauth::IPersonInfo::GenderType::GT_MALE:
+				case imtauth::IContactInfo::GenderType::GT_MALE:
 					result.text = tr("Male");
 					break;
 				default:
@@ -36,20 +36,20 @@ imtgui::ICollectionViewDelegate::SummaryInformation CPersonInfoViewDelegateComp:
 				result.sortValue = result.text;
 			}
 			else if (informationId == QByteArray("Birthday")){
-				QDate birthday = metaInfoPtr->GetMetaInfo(imtauth::IPersonInfo::MIT_BIRTHDAY).toDate();
+				QDate birthday = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_BIRTHDAY).toDate();
 				result.text = birthday.toString(Qt::DateFormat::SystemLocaleDate);
 				result.sortValue = result.text;
 			}
 			else if (informationId == QByteArray("FirstName")){
-				result.text = metaInfoPtr->GetMetaInfo(imtauth::IPersonInfo::MIT_FIRST_NAME).toString();
+				result.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_FIRST_NAME).toString();
 				result.sortValue = result.text;
 			}
 			else if (informationId == QByteArray("LastName")){
-				result.text = metaInfoPtr->GetMetaInfo(imtauth::IPersonInfo::MIT_LAST_NAME).toString();
+				result.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_LAST_NAME).toString();
 				result.sortValue = result.text;
 			}
 			else if (informationId == QByteArray("Nickname")){
-				result.text = metaInfoPtr->GetMetaInfo(imtauth::IPersonInfo::MIT_NICKNAME).toString();
+				result.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_NICKNAME).toString();
 				result.sortValue = result.text;
 			}
 		}
@@ -59,7 +59,7 @@ imtgui::ICollectionViewDelegate::SummaryInformation CPersonInfoViewDelegateComp:
 }
 
 
-bool CPersonInfoViewDelegateComp::IsCommandSupported(int commandId) const
+bool CContactInfoViewDelegateComp::IsCommandSupported(int commandId) const
 {
 	if (commandId == CI_DUPLICATE){
 		return false;
@@ -73,7 +73,7 @@ bool CPersonInfoViewDelegateComp::IsCommandSupported(int commandId) const
 
 // reimplemented (imtgui::CObjectCollectionViewDelegate)
 
-void CPersonInfoViewDelegateComp::SetupSummaryInformation()
+void CContactInfoViewDelegateComp::SetupSummaryInformation()
 {
 	m_summaryInformationTypes.ResetData();
 	m_summaryInformationHeaders.clear();

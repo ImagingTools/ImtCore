@@ -6,19 +6,19 @@
 #include <icomp/TModelCompWrap.h>
 
 // ImtCore includes
-#include <imtauthgui/CPersonInfoEditorComp.h>
+#include <imtauthgui/CContactInfoEditorComp.h>
 #include <imtauthgui/CAddressEditorComp.h>
 #include <imtauthgui/CAccountInfoEditorComp.h>
-#include <imtauthgui/CPersonInfoViewDelegateComp.h>
+#include <imtauthgui/CContactInfoViewDelegateComp.h>
 
 
 namespace ImtAuthGuiPck
 {
 
-typedef imtauthgui::CPersonInfoEditorComp PersonInfoEditor;
+typedef imtauthgui::CContactInfoEditorComp ContactInfoEditor;
 typedef imtauthgui::CAddressEditorComp AddressEditor;
 typedef imtauthgui::CAccountInfoEditorComp AccountInfoEditor;
-typedef imtauthgui::CPersonInfoViewDelegateComp PersonInfoViewDelegate;
+typedef imtauthgui::CContactInfoViewDelegateComp ContactInfoViewDelegate;
 
 
 } // namespace ImtAuthGuiPck

@@ -1,4 +1,4 @@
-#include <imtauth/CPersonInfo.h>
+#include <imtauth/CContactInfo.h>
 
 
 // ACF includes
@@ -15,7 +15,7 @@ namespace imtauth
 
 // public static methods
 
-QByteArray CPersonInfo::GetTypeId()
+QByteArray CContactInfo::GetTypeId()
 {
 	return "PersonInfo";
 }
@@ -23,7 +23,7 @@ QByteArray CPersonInfo::GetTypeId()
 
 // public methods
 
-CPersonInfo::CPersonInfo()
+CContactInfo::CContactInfo()
 	:m_genderType(GT_DIVERSE), // :)
 	m_firstName("DefaultFirstName"),
 	m_lastName("DefaultLastName"),
@@ -38,13 +38,13 @@ CPersonInfo::CPersonInfo()
 
 // reimplemented (IAddress)
 
-IPersonInfo::GenderType CPersonInfo::GetGenderType() const
+IContactInfo::GenderType CContactInfo::GetGenderType() const
 {
 	return m_genderType;
 }
 
 
-void CPersonInfo::SetGenderType(GenderType genderType)
+void CContactInfo::SetGenderType(GenderType genderType)
 {
 	if (m_genderType != genderType){
 		istd::CChangeNotifier changeNotifier(this);
@@ -54,13 +54,13 @@ void CPersonInfo::SetGenderType(GenderType genderType)
 }
 
 
-QDate CPersonInfo::GetBirthday() const
+QDate CContactInfo::GetBirthday() const
 {
 	return m_birthday;
 }
 
 
-void CPersonInfo::SetBirthday(const QDate& birthday)
+void CContactInfo::SetBirthday(const QDate& birthday)
 {
 	if (m_birthday != birthday){
 		istd::CChangeNotifier changeNotifier(this);
@@ -70,7 +70,7 @@ void CPersonInfo::SetBirthday(const QDate& birthday)
 }
 
 
-QString CPersonInfo::GetNameField(NameFieldType fieldType) const
+QString CContactInfo::GetNameField(NameFieldType fieldType) const
 {
 	switch(fieldType){
 	case NFT_FIRST_NAME:
@@ -85,7 +85,7 @@ QString CPersonInfo::GetNameField(NameFieldType fieldType) const
 }
 
 
-void CPersonInfo::SetNameField(NameFieldType fieldType, const QString& value)
+void CContactInfo::SetNameField(NameFieldType fieldType, const QString& value)
 {
 	switch (fieldType){
 	case NFT_FIRST_NAME:
@@ -113,7 +113,7 @@ void CPersonInfo::SetNameField(NameFieldType fieldType, const QString& value)
 }
 
 
-const IAddressProvider* CPersonInfo::GetAddresses() const
+const IAddressProvider* CContactInfo::GetAddresses() const
 {
 	return &m_addresses;
 }
@@ -121,7 +121,7 @@ const IAddressProvider* CPersonInfo::GetAddresses() const
 
 // reimplemented (iser::IObject)
 
-QByteArray CPersonInfo::GetFactoryId() const
+QByteArray CContactInfo::GetFactoryId() const
 {
 	return GetTypeId();
 }
@@ -129,7 +129,7 @@ QByteArray CPersonInfo::GetFactoryId() const
 
 // reimplemented (iser::ISerializable)
 
-bool CPersonInfo::Serialize(iser::IArchive& archive)
+bool CContactInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
@@ -181,15 +181,15 @@ bool CPersonInfo::Serialize(iser::IArchive& archive)
 
 // reimplemented (istd::IChangeable)
 
-int CPersonInfo::GetSupportedOperations() const
+int CContactInfo::GetSupportedOperations() const
 {
 	return SO_COPY | SO_CLONE | SO_RESET;
 }
 
 
-bool CPersonInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool CContactInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const IPersonInfo* sourcePtr = dynamic_cast<const IPersonInfo*>(&object);
+	const IContactInfo* sourcePtr = dynamic_cast<const IContactInfo*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
@@ -206,9 +206,9 @@ bool CPersonInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 }
 
 
-istd::IChangeable* CPersonInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeable* CContactInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CPersonInfo> clonePtr(new CPersonInfo);
+	istd::TDelPtr<CContactInfo> clonePtr(new CContactInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}
@@ -217,7 +217,7 @@ istd::IChangeable* CPersonInfo::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CPersonInfo::ResetData(CompatibilityMode /*mode*/)
+bool CContactInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 

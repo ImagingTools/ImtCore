@@ -1,4 +1,4 @@
-#include <imtauth/CPersonInfoMetaInfoCreatorComp.h>
+#include <imtauth/CContactInfoMetaInfoCreatorComp.h>
 
 
 // ACF includes
@@ -6,7 +6,7 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
-#include <imtauth/IPersonInfo.h>
+#include <imtauth/IContactInfo.h>
 
 
 namespace imtauth
@@ -22,15 +22,15 @@ public:
 	virtual QString GetMetaInfoName(int metaInfoType) const override
 	{
 		switch (metaInfoType){
-		case IPersonInfo::MIT_GENDER_TYPE:
+		case IContactInfo::MIT_GENDER_TYPE:
 			return QObject::tr("Gender");
-		case IPersonInfo::MIT_BIRTHDAY:
+		case IContactInfo::MIT_BIRTHDAY:
 			return QObject::tr("Birthday");
-		case IPersonInfo::MIT_FIRST_NAME:
+		case IContactInfo::MIT_FIRST_NAME:
 			return QObject::tr("First Name");
-		case IPersonInfo::MIT_LAST_NAME:
+		case IContactInfo::MIT_LAST_NAME:
 			return QObject::tr("Last Name");
-		case IPersonInfo::MIT_NICKNAME:
+		case IContactInfo::MIT_NICKNAME:
 			return QObject::tr("Nickname");
 		}
 
@@ -43,7 +43,7 @@ public:
 
 // reimplemented (imtbase::IMetaInfoCreator)
 
-bool CPersonInfoMetaInfoCreatorComp::CreateMetaInfo(
+bool CContactInfoMetaInfoCreatorComp::CreateMetaInfo(
 			const istd::IChangeable* dataPtr,
 			const QByteArray& typeId,
 			MetaInfoPtr& metaInfoPtr) const
@@ -58,16 +58,16 @@ bool CPersonInfoMetaInfoCreatorComp::CreateMetaInfo(
 		return true;
 	}
 
-	const IPersonInfo* personInfoPtr = dynamic_cast<const IPersonInfo*>(dataPtr);
+	const IContactInfo* personInfoPtr = dynamic_cast<const IContactInfo*>(dataPtr);
 	if (personInfoPtr == nullptr){
 		return false;
 	}
 
-	metaInfoPtr->SetMetaInfo(IPersonInfo::MIT_GENDER_TYPE, personInfoPtr->GetGenderType());
-	metaInfoPtr->SetMetaInfo(IPersonInfo::MIT_BIRTHDAY, personInfoPtr->GetBirthday());
-	metaInfoPtr->SetMetaInfo(IPersonInfo::MIT_FIRST_NAME, personInfoPtr->GetNameField(IPersonInfo::NFT_FIRST_NAME));
-	metaInfoPtr->SetMetaInfo(IPersonInfo::MIT_LAST_NAME, personInfoPtr->GetNameField(IPersonInfo::NFT_LAST_NAME));
-	metaInfoPtr->SetMetaInfo(IPersonInfo::MIT_NICKNAME, personInfoPtr->GetNameField(IPersonInfo::NFT_NICKNAME));
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_GENDER_TYPE, personInfoPtr->GetGenderType());
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_BIRTHDAY, personInfoPtr->GetBirthday());
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_FIRST_NAME, personInfoPtr->GetNameField(IContactInfo::NFT_FIRST_NAME));
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_LAST_NAME, personInfoPtr->GetNameField(IContactInfo::NFT_LAST_NAME));
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_NICKNAME, personInfoPtr->GetNameField(IContactInfo::NFT_NICKNAME));
 
 	return true;
 }

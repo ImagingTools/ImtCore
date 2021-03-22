@@ -8,7 +8,7 @@
 #include <imod/CModelUpdateBridge.h>
 
 // ImtBase includes
-#include <imtauth/IPersonInfo.h>
+#include <imtauth/IContactInfo.h>
 #include <imtauth/CAddressCollection.h>
 
 
@@ -16,12 +16,12 @@ namespace imtauth
 {
 
 
-class CPersonInfo: virtual public IPersonInfo
+class CContactInfo: virtual public IContactInfo
 {
 public:
 	static QByteArray GetTypeId();
 
-	CPersonInfo();
+	CContactInfo();
 
 	// reimplemented (IPersonInfo)
 	virtual GenderType GetGenderType() const override;

@@ -9,14 +9,14 @@ namespace imtauthgui
 {
 
 
-class CPersonInfoViewDelegateComp:
+class CContactInfoViewDelegateComp:
 	public imtrepogui::CDocumentBasedFileCollectionViewDelegateComp
 {
 	Q_OBJECT
 public:
 	typedef imtrepogui::CDocumentBasedFileCollectionViewDelegateComp BaseClass;
 
-	I_BEGIN_COMPONENT(CPersonInfoViewDelegateComp);
+	I_BEGIN_COMPONENT(CContactInfoViewDelegateComp);
 	I_END_COMPONENT;
 
 	// reimplemented (ICollectionViewDelegate)

@@ -15,9 +15,9 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
-			PersonInfo,
-			"Person information",
-			"Person Information Authority");
+			ContactInfo,
+			"Contact information",
+			"Contact Information Authority");
 
 I_EXPORT_COMPONENT(
 			Address,
@@ -30,9 +30,9 @@ I_EXPORT_COMPONENT(
 			"Account Information Authority");
 
 I_EXPORT_COMPONENT(
-			PersonInfoMetaInfoCreator,
-			"Person info metainfo creator",
-			"Person Metainfo Creator");
+			ContactInfoMetaInfoCreator,
+			"Contact info metainfo creator",
+			"Contact Metainfo Creator");
 
 I_EXPORT_COMPONENT(
 			AddressMetaInfoCreator,

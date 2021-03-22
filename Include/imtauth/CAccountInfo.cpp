@@ -48,7 +48,7 @@ QString CAccountInfo::GetAccountDescription() const
 }
 
 
-const IPersonInfo* CAccountInfo::GetAccountOwner() const
+const IContactInfo* CAccountInfo::GetAccountOwner() const
 {
 	return m_accountOwnerPtr;
 }

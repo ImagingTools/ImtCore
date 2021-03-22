@@ -8,7 +8,7 @@
 #include <iser/IObject.h>
 
 // ImtCore includes
-#include <imtauth/IPersonInfo.h>
+#include <imtauth/IContactInfo.h>
 
 
 namespace imtauth
@@ -75,7 +75,7 @@ public:
 	/**
 		Get information about the person who owns and manages this account.
 	*/
-	virtual const IPersonInfo* GetAccountOwner() const = 0;
+	virtual const IContactInfo* GetAccountOwner() const = 0;
 
 	/**
 		Get the access to the rights provider associated with this account.

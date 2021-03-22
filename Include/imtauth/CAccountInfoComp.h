@@ -6,7 +6,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtauth/IPersonInfo.h>
+#include <imtauth/IContactInfo.h>
 #include <imtauth/CAccountInfo.h>
 
 
@@ -39,7 +39,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-	I_REF(IPersonInfo, m_accountOwnerCompPtr);
+	I_REF(IContactInfo, m_accountOwnerCompPtr);
 };
 
 

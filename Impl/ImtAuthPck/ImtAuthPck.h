@@ -6,10 +6,10 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
-#include <imtauth/CPersonInfo.h>
+#include <imtauth/CContactInfo.h>
 #include <imtauth/CAddress.h>
 #include <imtauth/CAccountInfoComp.h>
-#include <imtauth/CPersonInfoMetaInfoCreatorComp.h>
+#include <imtauth/CContactInfoMetaInfoCreatorComp.h>
 #include <imtauth/CAddressMetaInfoCreatorComp.h>
 #include <imtauth/CAccountInfoMetaInfoCreatorComp.h>
 
@@ -20,15 +20,15 @@ namespace ImtAuthPck
 
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
-						imtauth::CPersonInfo,
-						imtauth::IPersonInfo,
+						imtauth::CContactInfo,
+						imtauth::IContactInfo,
 						iser::IObject,
 						iser::ISerializable,
-						istd::IChangeable>> PersonInfo;
+						istd::IChangeable>> ContactInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<imtauth::CAddress>> Address;
 typedef icomp::TModelCompWrap<imtauth::CAccountInfoComp> AccountInfo;
-typedef imtauth::CPersonInfoMetaInfoCreatorComp PersonInfoMetaInfoCreator;
+typedef imtauth::CContactInfoMetaInfoCreatorComp ContactInfoMetaInfoCreator;
 typedef imtauth::CAddressMetaInfoCreatorComp AddressMetaInfoCreator;
 typedef imtauth::CAccountInfoMetaInfoCreatorComp AccountInfoMetaInfoCreator;
 

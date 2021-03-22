@@ -9,7 +9,7 @@
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
-#include <imtauth/IPersonInfo.h>
+#include <imtauth/IContactInfo.h>
 #include <GeneratedFiles/imtauthgui/ui_CPersonInfoEditorComp.h>
 
 
@@ -21,16 +21,16 @@ namespace imtauthgui
 	Editor for the license info.
 	\ingroup LicenseManagement
 */
-class CPersonInfoEditorComp:
+class CContactInfoEditorComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CPersonInfoEditorComp, imtauth::IPersonInfo>
+						Ui::CContactInfoEditorComp, imtauth::IContactInfo>
 {
 	Q_OBJECT
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CPersonInfoEditorComp, imtauth::IPersonInfo> BaseClass;
+				Ui::CContactInfoEditorComp, imtauth::IContactInfo> BaseClass;
 
-	I_BEGIN_COMPONENT(CPersonInfoEditorComp);
+	I_BEGIN_COMPONENT(CContactInfoEditorComp);
 	I_END_COMPONENT;
 
 protected:
