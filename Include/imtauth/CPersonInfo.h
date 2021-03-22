@@ -4,8 +4,9 @@
 // Qt includes
 #include <QtCore/QDate>
 
-// ACF includes
+// ImtBase includes
 #include <imtauth/IPersonInfo.h>
+#include <imtauth/CAddressCollection.h>
 
 
 namespace imtauth
@@ -40,15 +41,14 @@ public:
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
-protected:
-	IAddressProvider* m_addressProviderPtr;
-
 private:
 	GenderType m_genderType;
 	QDate m_birthday;
 	QString m_firstName;
 	QString m_lastName;
 	QString m_nickName;
+
+	CAddressCollection m_addresses;
 };
 
 

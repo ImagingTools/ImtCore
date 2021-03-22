@@ -1,4 +1,4 @@
-#include <imtlicgui/CProductLicensingInfoCollectionViewDelegateComp.h>
+#include <imtlicgui/CProductLicensingInfoViewDelegateComp.h>
 
 
 namespace imtlicgui
@@ -9,7 +9,7 @@ namespace imtlicgui
 
 // reimplemented (imtgui::CObjectCollectionViewDelegate)
 
-void CProductLicensingInfoCollectionViewDelegateComp::SetupSummaryInformation()
+void CProductLicensingInfoViewDelegateComp::SetupSummaryInformation()
 {
 	BaseClass::SetupSummaryInformation();
 

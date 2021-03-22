@@ -77,7 +77,7 @@ ImtAuthPck.depends = imtbase imtauth
 
 SUBDIRS += ImtAuthGuiPck
 ImtAuthGuiPck.file = ../../Impl/ImtAuthGuiPck/QMake/ImtAuthGuiPck.pro
-ImtAuthGuiPck.depends = imtbase imtauth imtauthgui
+ImtAuthGuiPck.depends = imtbase imtauth imtauthgui imtrepogui
 
 SUBDIRS += ImtLicensePck
 ImtLicensePck.file = ../../Impl/ImtLicensePck/QMake/ImtLicensePck.pro

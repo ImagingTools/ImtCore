@@ -12,10 +12,6 @@ namespace imtauth
 void CPersonInfoComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-
-	if (m_addressProviderCompPtr.IsValid()){
-		m_addressProviderPtr = m_addressProviderCompPtr.GetPtr();
-	}
 }
 
 

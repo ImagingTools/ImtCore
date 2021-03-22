@@ -39,8 +39,11 @@ void CObjectCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 		case QVariant::String:
 			textValue = value.toString();
 			break;
+		case QVariant::Date:
+			textValue = value.toDate().toString(Qt::SystemLocaleShortDate);
+			break;
 		case QVariant::DateTime:
-			textValue = value.toDateTime().toString(Qt::DefaultLocaleShortDate);
+			textValue = value.toDateTime().toString(Qt::SystemLocaleShortDate);
 			break;
 		case QVariant::ByteArray:
 			textValue = value.toByteArray();

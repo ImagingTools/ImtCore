@@ -5,7 +5,7 @@
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
-#include <imtauth/IAddress.h>
+#include <imtauth/IPersonInfo.h>
 #include <GeneratedFiles/imtauthgui/ui_CPersonInfoEditorComp.h>
 
 
@@ -19,12 +19,12 @@ namespace imtauthgui
 */
 class CPersonInfoEditorComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CPersonInfoEditorComp, imtauth::IAddress>
+						Ui::CPersonInfoEditorComp, imtauth::IPersonInfo>
 {
 	Q_OBJECT
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CPersonInfoEditorComp, imtauth::IAddress> BaseClass;
+				Ui::CPersonInfoEditorComp, imtauth::IPersonInfo> BaseClass;
 
 	I_BEGIN_COMPONENT(CPersonInfoEditorComp);
 	I_END_COMPONENT;
@@ -41,10 +41,11 @@ protected:
 	virtual void OnGuiDestroyed() override;
 
 private Q_SLOTS:
-	void on_CountryEdit_editingFinished();
-	void on_CityEdit_editingFinished();
-	void on_PostalCodeEdit_editingFinished();
-
+	void on_GenderCombo_currentIndexChanged(int index);
+	void on_BirthdayEdit_dateChanged(const QDate &date);
+	void on_FirstNameEdit_editingFinished();
+	void on_LastNameEdit_editingFinished();
+	void on_NicknameEdit_editingFinished();
 };
 
 

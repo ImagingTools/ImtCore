@@ -18,7 +18,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="CountryGroup">
+    <widget class="QGroupBox" name="GenderGroup">
      <property name="maximumSize">
       <size>
        <width>400</width>
@@ -26,11 +26,11 @@
       </size>
      </property>
      <property name="title">
-      <string>Country</string>
+      <string>Gender</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="QLineEdit" name="CountryEdit"/>
+       <widget class="QComboBox" name="GenderCombo"/>
       </item>
      </layout>
     </widget>
@@ -44,17 +44,17 @@
       </size>
      </property>
      <property name="title">
-      <string>City</string>
+      <string>Birthday</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QLineEdit" name="CityEdit"/>
+       <widget class="QDateEdit" name="BirthdayEdit"/>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="PostalCodeGroup">
+    <widget class="QGroupBox" name="FirstNameGroup">
      <property name="maximumSize">
       <size>
        <width>400</width>
@@ -62,11 +62,47 @@
       </size>
      </property>
      <property name="title">
-      <string>Postal code</string>
+      <string>First Name</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QLineEdit" name="PostalCodeEdit"/>
+       <widget class="QLineEdit" name="FirstNameEdit"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="LastNameGroup">
+     <property name="maximumSize">
+      <size>
+       <width>400</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Last Name</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="QLineEdit" name="LastNameEdit"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="NicknameGroup">
+     <property name="maximumSize">
+      <size>
+       <width>400</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Nickname</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <widget class="QLineEdit" name="NicknameEdit"/>
       </item>
      </layout>
     </widget>

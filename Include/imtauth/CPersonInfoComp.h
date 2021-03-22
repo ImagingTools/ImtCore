@@ -30,15 +30,11 @@ public:
 		I_REGISTER_INTERFACE(iser::IObject);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(istd::IChangeable);
-		I_ASSIGN(m_addressProviderCompPtr, "AddressProvider", "Address provider", true, "AddressProvider");
 	I_END_COMPONENT
 
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
-
-private:
-	I_REF(IAddressProvider, m_addressProviderCompPtr);
 };
 
 

@@ -29,6 +29,11 @@ I_EXPORT_COMPONENT(
 			"Account info editor",
 			"Account Info Editor");
 
+I_EXPORT_COMPONENT(
+			PersonInfoViewDelegate,
+			"Person info view delegate",
+			"Person Address Info View Delegate");
+
 
 } // namespace ImtAuthGuiPck
 

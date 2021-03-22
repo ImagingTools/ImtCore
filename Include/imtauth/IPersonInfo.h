@@ -25,9 +25,9 @@ class IPersonInfo: virtual public iser::IObject
 public:
 	enum GenderType
 	{
-		GT_MALE,
+		GT_DIVERSE, // :)
 		GT_FEMALE,
-		GT_DIVERSE // :)
+		GT_MALE
 	};
 
 	enum NameFieldType

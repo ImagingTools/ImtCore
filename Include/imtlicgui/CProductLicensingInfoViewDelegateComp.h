@@ -9,14 +9,14 @@ namespace imtlicgui
 {
 
 
-class CProductLicensingInfoCollectionViewDelegateComp:
+class CProductLicensingInfoViewDelegateComp:
 			public imtrepogui::CDocumentBasedFileCollectionViewDelegateComp
 {
 	Q_OBJECT
 public:
 	typedef imtrepogui::CDocumentBasedFileCollectionViewDelegateComp BaseClass;
 
-	I_BEGIN_COMPONENT(CProductLicensingInfoCollectionViewDelegateComp);
+	I_BEGIN_COMPONENT(CProductLicensingInfoViewDelegateComp);
 	I_END_COMPONENT;
 
 protected:

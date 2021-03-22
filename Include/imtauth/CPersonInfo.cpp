@@ -25,8 +25,11 @@ QByteArray CPersonInfo::GetTypeId()
 
 CPersonInfo::CPersonInfo()
 	:m_genderType(GT_DIVERSE), // :)
-	m_addressProviderPtr(nullptr)
+	m_firstName("DefaultFirstName"),
+	m_lastName("DefaultLastName"),
+	m_nickName("DefaultNickname")
 {
+	m_birthday = QDate(1, 1, 2020);
 }
 
 
@@ -109,7 +112,7 @@ void CPersonInfo::SetNameField(NameFieldType fieldType, const QString& value)
 
 const IAddressProvider* CPersonInfo::GetAddresses() const
 {
-	return m_addressProviderPtr;
+	return &m_addresses;
 }
 
 
@@ -139,7 +142,7 @@ bool CPersonInfo::Serialize(iser::IArchive& archive)
 	if (!archive.IsStoring()){
 		m_genderType = GT_DIVERSE;
 
-		if (genderType >= 0 && genderType <= GT_DIVERSE){
+		if (genderType >= 0 && genderType <= GT_MALE){
 			m_genderType = (GenderType)genderType;
 		}
 	}
