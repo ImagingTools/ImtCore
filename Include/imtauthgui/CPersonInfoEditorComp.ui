@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>628</width>
-    <height>612</height>
+    <width>961</width>
+    <height>723</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,12 +16,12 @@
   <property name="styleSheet">
    <string notr="true"/>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_7">
    <item>
     <widget class="QGroupBox" name="GenderGroup">
      <property name="maximumSize">
       <size>
-       <width>400</width>
+       <width>600</width>
        <height>16777215</height>
       </size>
      </property>
@@ -39,7 +39,7 @@
     <widget class="QGroupBox" name="CityGroup">
      <property name="maximumSize">
       <size>
-       <width>400</width>
+       <width>600</width>
        <height>16777215</height>
       </size>
      </property>
@@ -57,7 +57,7 @@
     <widget class="QGroupBox" name="FirstNameGroup">
      <property name="maximumSize">
       <size>
-       <width>400</width>
+       <width>600</width>
        <height>16777215</height>
       </size>
      </property>
@@ -75,7 +75,7 @@
     <widget class="QGroupBox" name="LastNameGroup">
      <property name="maximumSize">
       <size>
-       <width>400</width>
+       <width>600</width>
        <height>16777215</height>
       </size>
      </property>
@@ -93,7 +93,7 @@
     <widget class="QGroupBox" name="NicknameGroup">
      <property name="maximumSize">
       <size>
-       <width>400</width>
+       <width>600</width>
        <height>16777215</height>
       </size>
      </property>
@@ -103,6 +103,88 @@
      <layout class="QVBoxLayout" name="verticalLayout_6">
       <item>
        <widget class="QLineEdit" name="NicknameEdit"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="NicknameGroup_2">
+     <property name="maximumSize">
+      <size>
+       <width>600</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Addresses</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QToolButton" name="AddButton">
+          <property name="text">
+           <string>Add</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../imtgui/imtgui.qrc">
+            <normaloff>:/Icons/Add</normaloff>:/Icons/Add</iconset>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="RemoveButton">
+          <property name="text">
+           <string>Remove</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../imtgui/imtgui.qrc">
+            <normaloff>:/Icons/Delete</normaloff>:/Icons/Delete</iconset>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTreeWidget" name="treeWidget">
+        <attribute name="headerDefaultSectionSize">
+         <number>200</number>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Country</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>City</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Postal Code</string>
+         </property>
+        </column>
+       </widget>
       </item>
      </layout>
     </widget>
