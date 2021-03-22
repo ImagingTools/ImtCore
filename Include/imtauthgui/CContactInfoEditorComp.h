@@ -10,7 +10,7 @@
 
 // ImtCore includes
 #include <imtauth/IContactInfo.h>
-#include <GeneratedFiles/imtauthgui/ui_CPersonInfoEditorComp.h>
+#include <GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h>
 
 
 namespace imtauthgui
