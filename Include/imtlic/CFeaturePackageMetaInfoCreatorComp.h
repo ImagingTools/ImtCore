@@ -2,10 +2,10 @@
 
 
 // ACF includes
-#include <ilog/TLoggerCompWrap.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
-#include <imtbase/IMetaInfoCreator.h>
+#include <imtbase/CObjectMetaInfoCreatorCompBase.h>
 
 
 namespace imtlic
@@ -15,25 +15,27 @@ namespace imtlic
 /**
 	Meta-info creator for the product' licensing information object.
 */
-class CFeaturePackageMetaInfoCreatorComp:
-			public ilog::CLoggerComponentBase,
-			virtual public imtbase::IMetaInfoCreator
+class CFeaturePackageMetaInfoCreatorComp: public imtbase::CObjectMetaInfoCreatorCompBase
 {
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef imtbase::CObjectMetaInfoCreatorCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFeaturePackageMetaInfoCreatorComp);
-		I_REGISTER_INTERFACE(imtbase::IMetaInfoCreator);
-		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "Type-ID of the document", true, "ProductLicensingInfo");
 	I_END_COMPONENT;
 
 protected:
 	// reimplemented (imtbase::IMetaInfoCreator)
-	virtual TypeIds GetSupportedTypeIds() const override;
 	virtual bool CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, MetaInfoPtr& metaInfoPtr) const override;
 
 private:
-	I_ATTR(QByteArray, m_objectTypeIdAttrPtr);
+	class MetaInfo: public idoc::CStandardDocumentMetaInfo
+	{
+	public:
+		typedef idoc::CStandardDocumentMetaInfo BaseClass;
+
+		// reimplemented (idoc::IDocumentMetaInfo)
+		virtual QString GetMetaInfoName(int metaInfoType) const override;
+	};
 };
 
 

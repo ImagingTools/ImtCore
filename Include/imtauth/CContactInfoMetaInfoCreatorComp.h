@@ -1,6 +1,9 @@
 #pragma once
 
 
+// ACF includes
+#include <idoc/CStandardDocumentMetaInfo.h>
+
 // ImtCore includes
 #include <imtbase/CObjectMetaInfoCreatorCompBase.h>
 
@@ -23,6 +26,16 @@ public:
 protected:
 	// reimplemented (imtbase::IMetaInfoCreator)
 	virtual bool CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, MetaInfoPtr& metaInfoPtr) const override;
+
+private:
+	class MetaInfo: public idoc::CStandardDocumentMetaInfo
+	{
+	public:
+		typedef idoc::CStandardDocumentMetaInfo BaseClass;
+
+		// reimplemented (idoc::IDocumentMetaInfo)
+		virtual QString GetMetaInfoName(int metaInfoType) const override;
+	};
 };
 
 

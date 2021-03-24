@@ -3,7 +3,6 @@
 
 // ACF includes
 #include <imod/TModelWrap.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtauth/IAddress.h>
@@ -11,28 +10,6 @@
 
 namespace imtauth
 {
-
-
-class MetaInfo: public idoc::CStandardDocumentMetaInfo
-{
-public:
-	typedef idoc::CStandardDocumentMetaInfo BaseClass;
-
-	// reimplemented (idoc::IDocumentMetaInfo)
-	virtual QString GetMetaInfoName(int metaInfoType) const override
-	{
-		switch (metaInfoType){
-		case IAddress::MIT_CITY:
-			return QObject::tr("City");
-		case IAddress::MIT_COUNTRY:
-			return QObject::tr("Country");
-		case IAddress::MIT_POSTAL_CODE:
-			return QObject::tr("Postal Code");
-		}
-
-		return BaseClass::GetMetaInfoName(metaInfoType);
-	}
-};
 
 
 // protected methods
@@ -64,6 +41,23 @@ bool CAddressMetaInfoCreatorComp::CreateMetaInfo(
 	metaInfoPtr->SetMetaInfo(IAddress::MIT_POSTAL_CODE, addressPtr->GetPostalCode());
 
 	return true;
+}
+
+
+// public methods of embedded class MetaInfo
+
+QString CAddressMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
+{
+	switch (metaInfoType){
+	case IAddress::MIT_CITY:
+		return QObject::tr("City");
+	case IAddress::MIT_COUNTRY:
+		return QObject::tr("Country");
+	case IAddress::MIT_POSTAL_CODE:
+		return QObject::tr("Postal Code");
+	}
+
+	return BaseClass::GetMetaInfoName(metaInfoType);
 }
 
 

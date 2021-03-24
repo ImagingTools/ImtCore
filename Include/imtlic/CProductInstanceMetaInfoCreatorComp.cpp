@@ -8,6 +8,7 @@
 #include <imtbase/ICollectionInfo.h>
 #include <imtlic/ILicenseInstance.h>
 #include <imtlic/IProductInstanceInfo.h>
+#include <imtlic/IProductInstanceInfoProvider.h>
 
 
 namespace imtlic
@@ -18,16 +19,6 @@ namespace imtlic
 
 // reimplemented (imtbase::IMetaInfoCreator)
 
-imtbase::IMetaInfoCreator::TypeIds CProductInstanceMetaInfoCreatorComp::GetSupportedTypeIds() const
-{
-	TypeIds retVal;
-
-	retVal.push_back(*m_objectTypeIdAttrPtr);
-
-	return retVal;
-}
-
-
 bool CProductInstanceMetaInfoCreatorComp::CreateMetaInfo(
 			const istd::IChangeable* dataPtr,
 			const QByteArray& typeId,
@@ -37,23 +28,6 @@ bool CProductInstanceMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
-	class MetaInfo: public idoc::CStandardDocumentMetaInfo
-	{
-	public:
-		typedef idoc::CStandardDocumentMetaInfo BaseClass;
-
-		// reimplemented (idoc::IDocumentMetaInfo)
-		virtual QString GetMetaInfoName(int metaInfoType) const override
-		{
-			switch (metaInfoType){
-			case imtlic::IProductInstanceInfoProvider::MIT_LICENSE_INSTANCE_INFO_LIST:
-				return QObject::tr("Licenses");
-			}
-
-			return BaseClass::GetMetaInfoName(metaInfoType);
-		}
-	};
-	
 	metaInfoPtr.SetPtr(new imod::TModelWrap<MetaInfo>);
 
 	if (dataPtr == nullptr){
@@ -85,6 +59,19 @@ bool CProductInstanceMetaInfoCreatorComp::CreateMetaInfo(
 	metaInfoPtr->SetMetaInfo(IProductInstanceInfoProvider::MIT_LICENSE_INSTANCE_INFO_LIST, retVal);
 
 	return true;
+}
+
+
+// public methods of embedded class MetaInfo
+
+QString CProductInstanceMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
+{
+	switch (metaInfoType){
+	case imtlic::IProductInstanceInfoProvider::MIT_LICENSE_INSTANCE_INFO_LIST:
+		return QObject::tr("Licenses");
+	}
+
+	return BaseClass::GetMetaInfoName(metaInfoType);
 }
 
 

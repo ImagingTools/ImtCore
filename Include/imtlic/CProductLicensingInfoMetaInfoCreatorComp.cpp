@@ -3,7 +3,6 @@
 
 // ACF includes
 #include <imod/TModelWrap.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
@@ -20,15 +19,6 @@ namespace imtlic
 
 // reimplemented (imtbase::IMetaInfoCreator)
 
-imtbase::IMetaInfoCreator::TypeIds CProductLicensingInfoMetaInfoCreatorComp::GetSupportedTypeIds() const
-{
-	TypeIds retVal;
-
-	retVal.push_back(*m_objectTypeIdAttrPtr);
-
-	return retVal;
-}
-
 
 bool CProductLicensingInfoMetaInfoCreatorComp::CreateMetaInfo(
 			const istd::IChangeable* dataPtr,
@@ -38,23 +28,6 @@ bool CProductLicensingInfoMetaInfoCreatorComp::CreateMetaInfo(
 	if (typeId != *m_objectTypeIdAttrPtr){
 		return false;
 	}
-
-	class MetaInfo: public idoc::CStandardDocumentMetaInfo
-	{
-	public:
-		typedef idoc::CStandardDocumentMetaInfo BaseClass;
-
-		// reimplemented (idoc::IDocumentMetaInfo)
-		virtual QString GetMetaInfoName(int metaInfoType) const override
-		{
-			switch (metaInfoType){
-			case imtlic::IProductLicensingInfoProvider::MIT_LICENSES_INFO_LIST:
-				return QObject::tr("Licenses");
-			}
-
-			return BaseClass::GetMetaInfoName(metaInfoType);
-		}
-	};
 
 	metaInfoPtr.SetPtr(new imod::TModelWrap<MetaInfo>);
 
@@ -80,6 +53,19 @@ bool CProductLicensingInfoMetaInfoCreatorComp::CreateMetaInfo(
 	metaInfoPtr->SetMetaInfo(IProductLicensingInfoProvider::MIT_LICENSES_INFO_LIST, retVal);
 
 	return true;
+}
+
+
+// public methods of embedded class MetaInfo
+
+QString CProductLicensingInfoMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
+{
+	switch (metaInfoType){
+	case imtlic::IProductLicensingInfoProvider::MIT_LICENSES_INFO_LIST:
+		return QObject::tr("Licenses");
+	}
+
+	return BaseClass::GetMetaInfoName(metaInfoType);
 }
 
 

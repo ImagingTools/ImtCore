@@ -3,7 +3,6 @@
 
 // ACF includes
 #include <imod/TModelWrap.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtauth/IAccountInfo.h>
@@ -11,30 +10,6 @@
 
 namespace imtauth
 {
-
-
-class MetaInfo: public idoc::CStandardDocumentMetaInfo
-{
-public:
-	typedef idoc::CStandardDocumentMetaInfo BaseClass;
-
-	// reimplemented (idoc::IDocumentMetaInfo)
-	virtual QString GetMetaInfoName(int metaInfoType) const override
-	{
-		switch (metaInfoType){
-		case IAccountInfo::MIT_CONTACT_EMAIL:
-			return QObject::tr("Contact EMail");
-		case IAccountInfo::MIT_ACCOUNT_TYPE:
-			return QObject::tr("Account Type");
-		case IAccountInfo::MIT_ACCOUNT_NAME:
-			return QObject::tr("Account Name");
-		case IAccountInfo::MIT_ACCOUNT_DESCRIPTION:
-			return QObject::tr("Account Description");
-		}
-
-		return BaseClass::GetMetaInfoName(metaInfoType);
-	}
-};
 
 
 // protected methods
@@ -67,6 +42,25 @@ bool CAccountInfoMetaInfoCreatorComp::CreateMetaInfo(
 	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_DESCRIPTION, accountInfoPtr->GetAccountDescription());
 
 	return true;
+}
+
+
+// public methods of embedded class MetaInfo
+
+QString CAccountInfoMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
+{
+	switch (metaInfoType){
+	case IAccountInfo::MIT_CONTACT_EMAIL:
+		return QObject::tr("Contact EMail");
+	case IAccountInfo::MIT_ACCOUNT_TYPE:
+		return QObject::tr("Account Type");
+	case IAccountInfo::MIT_ACCOUNT_NAME:
+		return QObject::tr("Account Name");
+	case IAccountInfo::MIT_ACCOUNT_DESCRIPTION:
+		return QObject::tr("Account Description");
+	}
+
+	return BaseClass::GetMetaInfoName(metaInfoType);
 }
 
 

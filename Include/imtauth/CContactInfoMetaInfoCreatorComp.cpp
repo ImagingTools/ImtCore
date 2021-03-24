@@ -13,34 +13,6 @@ namespace imtauth
 {
 
 
-class MetaInfo: public idoc::CStandardDocumentMetaInfo
-{
-public:
-	typedef idoc::CStandardDocumentMetaInfo BaseClass;
-
-	// reimplemented (idoc::IDocumentMetaInfo)
-	virtual QString GetMetaInfoName(int metaInfoType) const override
-	{
-		switch (metaInfoType){
-		case IContactInfo::MIT_EMAIL:
-			return QObject::tr("EMail");
-		case IContactInfo::MIT_GENDER_TYPE:
-			return QObject::tr("Gender");
-		case IContactInfo::MIT_BIRTHDAY:
-			return QObject::tr("Birthday");
-		case IContactInfo::MIT_FIRST_NAME:
-			return QObject::tr("First Name");
-		case IContactInfo::MIT_LAST_NAME:
-			return QObject::tr("Last Name");
-		case IContactInfo::MIT_NICKNAME:
-			return QObject::tr("Nickname");
-		}
-
-		return BaseClass::GetMetaInfoName(metaInfoType);
-	}
-};
-
-
 // protected methods
 
 // reimplemented (imtbase::IMetaInfoCreator)
@@ -73,6 +45,29 @@ bool CContactInfoMetaInfoCreatorComp::CreateMetaInfo(
 	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_NICKNAME, contactPtr->GetNameField(IContactInfo::NFT_NICKNAME));
 
 	return true;
+}
+
+
+// public methods of embedded class MetaInfo
+
+QString CContactInfoMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
+{
+	switch (metaInfoType){
+	case IContactInfo::MIT_EMAIL:
+		return QObject::tr("EMail");
+	case IContactInfo::MIT_GENDER_TYPE:
+		return QObject::tr("Gender");
+	case IContactInfo::MIT_BIRTHDAY:
+		return QObject::tr("Birthday");
+	case IContactInfo::MIT_FIRST_NAME:
+		return QObject::tr("First Name");
+	case IContactInfo::MIT_LAST_NAME:
+		return QObject::tr("Last Name");
+	case IContactInfo::MIT_NICKNAME:
+		return QObject::tr("Nickname");
+	}
+
+	return BaseClass::GetMetaInfoName(metaInfoType);
 }
 
 
