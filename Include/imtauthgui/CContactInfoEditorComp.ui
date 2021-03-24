@@ -18,7 +18,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_7">
    <item>
-    <widget class="QGroupBox" name="GenderGroup">
+    <widget class="QGroupBox" name="EMailGroup">
      <property name="maximumSize">
       <size>
        <width>600</width>
@@ -26,11 +26,11 @@
       </size>
      </property>
      <property name="title">
-      <string>Gender</string>
+      <string>EMail</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="QComboBox" name="GenderCombo"/>
+       <widget class="QLineEdit" name="EMailEdit"/>
       </item>
      </layout>
     </widget>

@@ -40,9 +40,14 @@ public:
 	enum MetaInfoTypes
 	{
 		/**
+			Person email given as QString.
+		*/
+		MIT_EMAIL = idoc::IDocumentMetaInfo::MIT_USER + 1,
+
+		/**
 			Person gender type given as GenderType.
 		*/
-		MIT_GENDER_TYPE = idoc::IDocumentMetaInfo::MIT_USER + 1,
+		MIT_GENDER_TYPE,
 
 		/**
 			Person birthday given as QDate.
@@ -65,6 +70,8 @@ public:
 		MIT_NICKNAME
 	};
 
+	virtual QString GetEMail() const = 0;
+	virtual void SetEMail(const QString& email) = 0;
 	virtual GenderType GetGenderType() const = 0;
 	virtual void SetGenderType(GenderType genderType) = 0;
 	virtual QDate GetBirthday() const = 0;

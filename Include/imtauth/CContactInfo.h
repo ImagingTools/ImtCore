@@ -23,7 +23,9 @@ public:
 
 	CContactInfo();
 
-	// reimplemented (IPersonInfo)
+	// reimplemented (IContactInfo)
+	virtual QString GetEMail() const override;
+	virtual void SetEMail(const QString& email) override;
 	virtual GenderType GetGenderType() const override;
 	virtual void SetGenderType(GenderType genderType) override;
 	virtual QDate GetBirthday() const override;
@@ -45,6 +47,7 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
+	QString m_email;
 	GenderType m_genderType;
 	QDate m_birthday;
 	QString m_firstName;

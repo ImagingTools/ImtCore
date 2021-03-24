@@ -1,12 +1,30 @@
 #include <imtauthgui/CAccountInfoEditorComp.h>
 
 
+// Qt includes
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QFileDialog>
+
 // ACF includes
+#include <ifilegui/CFileDialogLoaderComp.h>
+#include <iimg/CBitmap.h>
 #include <istd/CChangeGroup.h>
+
+// ImtCore includes
+#include <imtauth/IContactInfo.h>
 
 
 namespace imtauthgui
 {
+
+
+// public methods
+
+CAccountInfoEditorComp::CAccountInfoEditorComp()
+	:m_isContactChangedSignalBlocked(false),
+	m_contactCollectionUpdateBinder(*this)
+{
+}
 
 
 // protected methods
@@ -15,37 +33,71 @@ namespace imtauthgui
 
 void CAccountInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	imtauth::IAddress* addressPtr = GetObservedObject();
-	Q_ASSERT(addressPtr != nullptr);
+	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	Q_ASSERT(accountPtr != nullptr);
 
-	CountryEdit->setText(addressPtr->GetCountry());
-	CityEdit->setText(addressPtr->GetCity());
-	PostalCodeEdit->setText(QString("%1").arg(addressPtr->GetPostalCode()));
+	imtauth::IAccountInfo::ContactInfoPtr contactPtr = accountPtr->GetAccountOwner();
+	if (contactPtr.IsValid()){
+		ContactCombo->setCurrentText(contactPtr->GetEMail());
+	}
+	else{
+		ContactCombo->setCurrentIndex(-1);
+	}
+
+	AccountTypeCombo->addItem(tr("Personal"));
+	AccountTypeCombo->addItem(tr("Company"));
+	switch (accountPtr->GetAccountType()){
+	case imtauth::IAccountInfo::AT_COMPANY:
+		AccountTypeCombo->setCurrentIndex(1);
+		break;
+	default:
+		AccountTypeCombo->setCurrentIndex(0);
+	}
+
+	AccountNameEdit->setText(accountPtr->GetAccountName());
+	AccountDescriptionEdit->setText(accountPtr->GetAccountDescription());
 }
 
 
 void CAccountInfoEditorComp::OnGuiModelAttached()
 {
 	BaseClass::OnGuiModelAttached();
+
+	if (m_accountPictureObserverCompPtr.IsValid()){
+		imod::IModel* accountPicureModelPtr = dynamic_cast<imod::IModel*>(
+					const_cast<iimg::IBitmap*>(&GetObservedObject()->GetAccountPicture()));
+
+		if (accountPicureModelPtr != nullptr){
+			accountPicureModelPtr->AttachObserver(m_accountPictureObserverCompPtr.GetPtr());
+		}
+	}
 }
 
 
 void CAccountInfoEditorComp::OnGuiModelDetached()
 {
+	imod::IModel* accountPicureModelPtr = dynamic_cast<imod::IModel*>(
+				const_cast<iimg::IBitmap*>(&GetObservedObject()->GetAccountPicture()));
+
+	if (accountPicureModelPtr != nullptr){
+		accountPicureModelPtr->DetachAllObservers();
+	}
+
 	BaseClass::OnGuiModelDetached();
 }
 
 
 void CAccountInfoEditorComp::UpdateModel() const
 {
-	imtauth::IAddress* addressPtr = GetObservedObject();
-	Q_ASSERT(addressPtr != nullptr);
+	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	Q_ASSERT(accountPtr != nullptr);
 
-	istd::CChangeGroup changeGroup(addressPtr);
+	istd::CChangeGroup changeGroup(accountPtr);
 
-	addressPtr->SetCountry(CountryEdit->text());
-	addressPtr->SetCity(CityEdit->text());
-	addressPtr->SetPostalCode(PostalCodeEdit->text().toInt());
+	accountPtr->SetAccountOwner(ContactCombo->currentText());
+	accountPtr->SetAccountType((imtauth::IAccountInfo::AccountType)AccountTypeCombo->currentIndex());
+	accountPtr->SetAccountName(AccountNameEdit->text());
+	accountPtr->SetAccountDescription(AccountDescriptionEdit->text());
 }
 
 
@@ -54,32 +106,148 @@ void CAccountInfoEditorComp::UpdateModel() const
 void CAccountInfoEditorComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
+
+	m_loadAccountPictureAction.setIcon(QIcon(":/Icons/Workflow"));
+	m_removeAccountPictureAction.setIcon(QIcon(":/Icons/Remove"));
+	m_loadAccountPictureAction.setText(tr("Load..."));
+	m_removeAccountPictureAction.setText(tr("Remove"));
+
+	LoadPicture->setDefaultAction(&m_loadAccountPictureAction);
+	RemovePicture->setDefaultAction(&m_removeAccountPictureAction);
+
+	if (m_accountPictureGuiCompPtr.IsValid() && m_accountPictureObserverCompPtr.IsValid()){
+		m_accountPictureGuiCompPtr->CreateGui(AccountPicture);
+	}
+
+	if (m_contactCollectionCompPtr.IsValid() && m_contactCollectionModelCompPtr.IsValid()){
+		m_contactCollectionUpdateBinder.RegisterObject(
+			m_contactCollectionCompPtr.GetPtr(),
+			&CAccountInfoEditorComp::OnContactCollectionUpdate);
+	}
 }
 
 
 void CAccountInfoEditorComp::OnGuiDestroyed()
 {
+	m_contactCollectionUpdateBinder.UnregisterAllObjects();
+
+	if (m_accountPictureGuiCompPtr.IsValid() && m_accountPictureObserverCompPtr.IsValid()){
+		if (m_accountPictureGuiCompPtr->IsGuiCreated()){
+			m_accountPictureGuiCompPtr->DestroyGui();
+		}
+	}
+
+
 	BaseClass::OnGuiDestroyed();
 }
 
 
 // private slots
 
-void CAccountInfoEditorComp::on_CountryEdit_editingFinished()
+void CAccountInfoEditorComp::on_ContactCombo_currentIndexChanged(int index)
+{
+	if (!m_isContactChangedSignalBlocked){
+		DoUpdateModel();
+	}
+}
+
+
+void CAccountInfoEditorComp::on_AccountTypeCombo_currentIndexChanged(int index)
 {
 	DoUpdateModel();
 }
 
 
-void CAccountInfoEditorComp::on_CityEdit_editingFinished()
+void CAccountInfoEditorComp::on_AccountNameEdit_editingFinished()
 {
 	DoUpdateModel();
 }
 
 
-void CAccountInfoEditorComp::on_PostalCodeEdit_editingFinished()
+void CAccountInfoEditorComp::on_AccountDescriptionEdit_editingFinished()
 {
 	DoUpdateModel();
+}
+
+void CAccountInfoEditorComp::on_LoadPicture_triggered(QAction *action)
+{
+	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	Q_ASSERT(accountPtr != nullptr);
+
+	QStringList allExt;
+	QStringList filterList;
+
+	const ifile::IFilePersistence* filePersistencePtr = m_bitmapLoaderCompPtr.GetPtr();
+	if (filePersistencePtr != nullptr){
+		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*filePersistencePtr, nullptr, ifile::IFileTypeInfo::QF_LOAD, allExt, filterList, false);
+	}
+
+	if (filterList.size() > 1){
+		filterList.prepend(tr("All known file types (%1)").arg("*." + allExt.join(" *.")));
+	}
+
+	if (filterList.size() == 0){
+		filterList.prepend(tr("All file types (%1)").arg("*.*"));
+	}
+
+	QString representationFilePath = QFileDialog::getOpenFileName(GetWidget(), tr("Select picture file"), "", filterList.join("\n"));
+	if (!representationFilePath.isEmpty()){
+		QImage image(representationFilePath);
+		if (!image.isNull()){
+			image = image.scaled(300, 300);
+
+			iimg::CBitmap bitmap(image);
+
+			accountPtr->SetAccountPicture(bitmap);
+		}
+	}
+}
+
+
+void CAccountInfoEditorComp::on_RemovePicture_triggered(QAction *action)
+{
+	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	Q_ASSERT(accountPtr != nullptr);
+
+	iimg::CBitmap bitmap;
+
+	accountPtr->SetAccountPicture(bitmap);
+}
+
+
+// private methods
+
+void CAccountInfoEditorComp::OnContactCollectionUpdate(
+			const istd::IChangeable::ChangeSet& changeSet,
+			const imtbase::IObjectCollection* objectCollectionPtr)
+{
+	m_isContactChangedSignalBlocked = true;
+
+	ContactCombo->clear();
+
+	imtbase::ICollectionInfo::Ids ids = objectCollectionPtr->GetElementIds();
+	for (const QByteArray& id : ids){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (objectCollectionPtr->GetObjectData(id, dataPtr)){
+			imtauth::IContactInfo* contactPtr = dynamic_cast<imtauth::IContactInfo*>(dataPtr.GetPtr());
+			if (contactPtr != nullptr){
+				ContactCombo->addItem(contactPtr->GetEMail());
+			}
+		}
+	}
+
+	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	Q_ASSERT(accountPtr != nullptr);
+
+	//imtauth::IAccountInfo::ContactInfoPtr contactPtr = accountPtr->GetAccountOwner();
+	//if (contactPtr.IsValid()){
+	//	ContactCombo->setCurrentText(contactPtr->GetEMail());
+	//}
+	//else{
+	//	ContactCombo->setCurrentIndex(-1);
+	//}
+
+	m_isContactChangedSignalBlocked = false;
 }
 
 

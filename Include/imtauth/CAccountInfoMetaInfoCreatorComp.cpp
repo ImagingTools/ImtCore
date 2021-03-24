@@ -22,6 +22,8 @@ public:
 	virtual QString GetMetaInfoName(int metaInfoType) const override
 	{
 		switch (metaInfoType){
+		case IAccountInfo::MIT_CONTACT_EMAIL:
+			return QObject::tr("Contact EMail");
 		case IAccountInfo::MIT_ACCOUNT_TYPE:
 			return QObject::tr("Account Type");
 		case IAccountInfo::MIT_ACCOUNT_NAME:
@@ -59,7 +61,8 @@ bool CAccountInfoMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
-	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_TYPE, accountInfoPtr->GetAccountType());
+	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_EMAIL, accountInfoPtr->GetAccountOwnerEMail());
+	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_TYPE, (int)accountInfoPtr->GetAccountType());
 	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_NAME, accountInfoPtr->GetAccountName());
 	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_DESCRIPTION, accountInfoPtr->GetAccountDescription());
 

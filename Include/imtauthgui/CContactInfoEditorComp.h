@@ -45,7 +45,7 @@ protected:
 	virtual void OnGuiDestroyed() override;
 
 private Q_SLOTS:
-	void on_GenderCombo_currentIndexChanged(int index);
+	void on_EMailEdit_editingFinished();
 	void on_BirthdayEdit_dateChanged(const QDate &date);
 	void on_FirstNameEdit_editingFinished();
 	void on_LastNameEdit_editingFinished();

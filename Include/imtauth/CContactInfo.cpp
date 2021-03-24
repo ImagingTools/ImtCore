@@ -30,13 +30,27 @@ CContactInfo::CContactInfo()
 	m_nickName("DefaultNickname"),
 	m_modelUpdateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
 {
-	m_birthday = QDate(1, 1, 2020);
-
 	m_addresses.AttachObserver(&m_modelUpdateBridge);
 }
 
 
-// reimplemented (IAddress)
+// reimplemented (IContactInfo)
+
+QString CContactInfo::GetEMail() const
+{
+	return m_email;
+}
+
+
+void CContactInfo::SetEMail(const QString& email)
+{
+	if (m_email!= email){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_email = email;
+	}
+}
+
 
 IContactInfo::GenderType CContactInfo::GetGenderType() const
 {
@@ -135,6 +149,11 @@ bool CContactInfo::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
+	static iser::CArchiveTag emailTag("EMail", "EMail", iser::CArchiveTag::TT_LEAF);
+	retVal = archive.BeginTag(emailTag);
+	retVal = retVal && archive.Process(m_email);
+	retVal = retVal && archive.EndTag(emailTag);
+
 	int genderType = m_genderType;
 
 	static iser::CArchiveTag genderTypeTag("GenderType", "Gender type", iser::CArchiveTag::TT_LEAF);
@@ -193,6 +212,7 @@ bool CContactInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
+		m_email = sourcePtr->GetEMail();
 		m_genderType = sourcePtr->GetGenderType();
 		m_birthday = sourcePtr->GetBirthday();
 		m_firstName = sourcePtr->GetNameField(NFT_FIRST_NAME);
@@ -221,6 +241,7 @@ bool CContactInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
+	m_email.clear();
 	m_genderType = GT_DIVERSE;
 	m_birthday = QDate();
 	m_firstName.clear();

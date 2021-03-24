@@ -20,31 +20,19 @@ namespace imtauthgui
 
 void CContactInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	imtauth::IContactInfo* personPtr = GetObservedObject();
-	Q_ASSERT(personPtr != nullptr);
+	imtauth::IContactInfo* contactPtr = GetObservedObject();
+	Q_ASSERT(contactPtr != nullptr);
 
-	GenderCombo->addItem(tr("Diverse"));
-	GenderCombo->addItem(tr("Female"));
-	GenderCombo->addItem(tr("Male"));
-	switch (personPtr->GetGenderType()){
-	case imtauth::IContactInfo::GT_FEMALE:
-		GenderCombo->setCurrentIndex(1);
-		break;
-	case imtauth::IContactInfo::GT_MALE:
-		GenderCombo->setCurrentIndex(2);
-		break;
-	default:
-		GenderCombo->setCurrentIndex(0);
-	}
+	EMailEdit->setText(contactPtr->GetEMail());
 
-	BirthdayEdit->setDate(personPtr->GetBirthday());
-	FirstNameEdit->setText(personPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME));
-	LastNameEdit->setText(personPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME));
-	NicknameEdit->setText(personPtr->GetNameField(imtauth::IContactInfo::NFT_NICKNAME));
+	BirthdayEdit->setDate(contactPtr->GetBirthday());
+	FirstNameEdit->setText(contactPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME));
+	LastNameEdit->setText(contactPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME));
+	NicknameEdit->setText(contactPtr->GetNameField(imtauth::IContactInfo::NFT_NICKNAME));
 
 	Addresses->clear();
 
-	const imtauth::IAddressProvider* addressesPtr = personPtr->GetAddresses();
+	const imtauth::IAddressProvider* addressesPtr = contactPtr->GetAddresses();
 	if (addressesPtr != nullptr){
 		imtbase::ICollectionInfo::Ids ids = addressesPtr->GetAddressList().GetElementIds();
 		for (const QByteArray& id : ids){
@@ -80,19 +68,19 @@ void CContactInfoEditorComp::OnGuiModelDetached()
 
 void CContactInfoEditorComp::UpdateModel() const
 {
-	imtauth::IContactInfo* personPtr = GetObservedObject();
-	Q_ASSERT(personPtr != nullptr);
+	imtauth::IContactInfo* contactPtr = GetObservedObject();
+	Q_ASSERT(contactPtr != nullptr);
 
-	istd::CChangeGroup changeGroup(personPtr);
+	istd::CChangeGroup changeGroup(contactPtr);
 
-	personPtr->SetGenderType(imtauth::IContactInfo::GenderType(GenderCombo->currentIndex()));
-	personPtr->SetBirthday(BirthdayEdit->date());
-	personPtr->SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, FirstNameEdit->text());
-	personPtr->SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, LastNameEdit->text());
-	personPtr->SetNameField(imtauth::IContactInfo::NFT_NICKNAME, NicknameEdit->text());
+	contactPtr->SetEMail(EMailEdit->text());
+	contactPtr->SetBirthday(BirthdayEdit->date());
+	contactPtr->SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, FirstNameEdit->text());
+	contactPtr->SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, LastNameEdit->text());
+	contactPtr->SetNameField(imtauth::IContactInfo::NFT_NICKNAME, NicknameEdit->text());
 
 	imtauth::IAddressManager* addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
-				const_cast<imtauth::IAddressProvider*>(personPtr->GetAddresses()));
+				const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
 
 	if (addressesPtr != nullptr){
 		istd::CChangeGroup changeGroup(addressesPtr);
@@ -137,7 +125,7 @@ void CContactInfoEditorComp::OnGuiDestroyed()
 
 // private slots
 
-void CContactInfoEditorComp::on_GenderCombo_currentIndexChanged(int index)
+void CContactInfoEditorComp::on_EMailEdit_editingFinished()
 {
 	DoUpdateModel();
 }

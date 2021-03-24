@@ -22,6 +22,8 @@ public:
 	virtual QString GetMetaInfoName(int metaInfoType) const override
 	{
 		switch (metaInfoType){
+		case IContactInfo::MIT_EMAIL:
+			return QObject::tr("EMail");
 		case IContactInfo::MIT_GENDER_TYPE:
 			return QObject::tr("Gender");
 		case IContactInfo::MIT_BIRTHDAY:
@@ -58,16 +60,17 @@ bool CContactInfoMetaInfoCreatorComp::CreateMetaInfo(
 		return true;
 	}
 
-	const IContactInfo* personInfoPtr = dynamic_cast<const IContactInfo*>(dataPtr);
-	if (personInfoPtr == nullptr){
+	const IContactInfo* contactPtr = dynamic_cast<const IContactInfo*>(dataPtr);
+	if (contactPtr == nullptr){
 		return false;
 	}
 
-	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_GENDER_TYPE, personInfoPtr->GetGenderType());
-	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_BIRTHDAY, personInfoPtr->GetBirthday());
-	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_FIRST_NAME, personInfoPtr->GetNameField(IContactInfo::NFT_FIRST_NAME));
-	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_LAST_NAME, personInfoPtr->GetNameField(IContactInfo::NFT_LAST_NAME));
-	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_NICKNAME, personInfoPtr->GetNameField(IContactInfo::NFT_NICKNAME));
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_EMAIL, contactPtr->GetEMail());
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_GENDER_TYPE, contactPtr->GetGenderType());
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_BIRTHDAY, contactPtr->GetBirthday());
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_FIRST_NAME, contactPtr->GetNameField(IContactInfo::NFT_FIRST_NAME));
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_LAST_NAME, contactPtr->GetNameField(IContactInfo::NFT_LAST_NAME));
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_NICKNAME, contactPtr->GetNameField(IContactInfo::NFT_NICKNAME));
 
 	return true;
 }

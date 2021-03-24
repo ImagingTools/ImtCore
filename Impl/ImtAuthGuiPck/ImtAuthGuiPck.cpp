@@ -34,6 +34,11 @@ I_EXPORT_COMPONENT(
 			"Contact info view delegate",
 			"Contact Address Info View Delegate");
 
+I_EXPORT_COMPONENT(
+			AccountInfoViewDelegate,
+			"Account info view delegate",
+			"Account Info View Delegate");
+
 
 } // namespace ImtAuthGuiPck
 

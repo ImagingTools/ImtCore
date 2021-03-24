@@ -20,19 +20,8 @@ imtgui::ICollectionViewDelegate::SummaryInformation CContactInfoViewDelegateComp
 	if (m_collectionPtr != nullptr){
 		imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr;
 		if (m_collectionPtr->GetDataMetaInfo(objectId, metaInfoPtr)){
-			if (informationId == QByteArray("Gender")){
-				int genderType = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_GENDER_TYPE).toInt();
-				switch (genderType){
-				case imtauth::IContactInfo::GenderType::GT_FEMALE:
-					result.text = tr("Female");
-					break;
-				case imtauth::IContactInfo::GenderType::GT_MALE:
-					result.text = tr("Male");
-					break;
-				default:
-					result.text = tr("Diverse");
-				};
-
+			if (informationId == QByteArray("EMail")){
+				result.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_EMAIL).toString();
 				result.sortValue = result.text;
 			}
 			else if (informationId == QByteArray("Birthday")){
@@ -78,8 +67,8 @@ void CContactInfoViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.ResetData();
 	m_summaryInformationHeaders.clear();
 
-	m_summaryInformationTypes.InsertItem("Gender", tr("Gender"), "");
-	m_summaryInformationHeaders["Gender"] = HeaderInfo(true);
+	m_summaryInformationTypes.InsertItem("EMail", tr("EMail"), "");
+	m_summaryInformationHeaders["EMail"] = HeaderInfo(true);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("Birthday"), tr("Birthday"), "");
 	m_summaryInformationHeaders["Birthday"] = HeaderInfo(false);
