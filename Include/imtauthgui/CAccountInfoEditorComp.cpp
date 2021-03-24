@@ -21,7 +21,7 @@ namespace imtauthgui
 // public methods
 
 CAccountInfoEditorComp::CAccountInfoEditorComp()
-	:m_isContactChangedSignalBlocked(false),
+	:m_isComboChangedSignalBlocked(false),
 	m_contactCollectionUpdateBinder(*this)
 {
 }
@@ -36,23 +36,23 @@ void CAccountInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 	imtauth::IAccountInfo* accountPtr = GetObservedObject();
 	Q_ASSERT(accountPtr != nullptr);
 
-	imtauth::IAccountInfo::ContactInfoPtr contactPtr = accountPtr->GetAccountOwner();
-	if (contactPtr.IsValid()){
-		ContactCombo->setCurrentText(contactPtr->GetEMail());
-	}
-	else{
-		ContactCombo->setCurrentIndex(-1);
-	}
+	m_isComboChangedSignalBlocked = true;
 
-	AccountTypeCombo->addItem(tr("Personal"));
-	AccountTypeCombo->addItem(tr("Company"));
+	ContactCombo->setCurrentIndex(-1);
+	ContactCombo->setCurrentText(accountPtr->GetAccountOwnerEMail());
+
 	switch (accountPtr->GetAccountType()){
+	case imtauth::IAccountInfo::AT_PERSON:
+		AccountTypeCombo->setCurrentIndex(0);
+		break;
 	case imtauth::IAccountInfo::AT_COMPANY:
 		AccountTypeCombo->setCurrentIndex(1);
 		break;
 	default:
-		AccountTypeCombo->setCurrentIndex(0);
+		AccountTypeCombo->setCurrentIndex(-1);
 	}
+
+	m_isComboChangedSignalBlocked = false;
 
 	AccountNameEdit->setText(accountPtr->GetAccountName());
 	AccountDescriptionEdit->setText(accountPtr->GetAccountDescription());
@@ -107,6 +107,11 @@ void CAccountInfoEditorComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
+	m_isComboChangedSignalBlocked = true;
+	AccountTypeCombo->addItem(tr("Personal"));
+	AccountTypeCombo->addItem(tr("Company"));
+	m_isComboChangedSignalBlocked = false;
+
 	m_loadAccountPictureAction.setIcon(QIcon(":/Icons/Workflow"));
 	m_removeAccountPictureAction.setIcon(QIcon(":/Icons/Remove"));
 	m_loadAccountPictureAction.setText(tr("Load..."));
@@ -146,7 +151,7 @@ void CAccountInfoEditorComp::OnGuiDestroyed()
 
 void CAccountInfoEditorComp::on_ContactCombo_currentIndexChanged(int index)
 {
-	if (!m_isContactChangedSignalBlocked){
+	if (!m_isComboChangedSignalBlocked){
 		DoUpdateModel();
 	}
 }
@@ -154,7 +159,9 @@ void CAccountInfoEditorComp::on_ContactCombo_currentIndexChanged(int index)
 
 void CAccountInfoEditorComp::on_AccountTypeCombo_currentIndexChanged(int index)
 {
-	DoUpdateModel();
+	if (!m_isComboChangedSignalBlocked){
+		DoUpdateModel();
+	}
 }
 
 
@@ -221,7 +228,7 @@ void CAccountInfoEditorComp::OnContactCollectionUpdate(
 			const istd::IChangeable::ChangeSet& changeSet,
 			const imtbase::IObjectCollection* objectCollectionPtr)
 {
-	m_isContactChangedSignalBlocked = true;
+	m_isComboChangedSignalBlocked = true;
 
 	ContactCombo->clear();
 
@@ -239,15 +246,10 @@ void CAccountInfoEditorComp::OnContactCollectionUpdate(
 	imtauth::IAccountInfo* accountPtr = GetObservedObject();
 	Q_ASSERT(accountPtr != nullptr);
 
-	//imtauth::IAccountInfo::ContactInfoPtr contactPtr = accountPtr->GetAccountOwner();
-	//if (contactPtr.IsValid()){
-	//	ContactCombo->setCurrentText(contactPtr->GetEMail());
-	//}
-	//else{
-	//	ContactCombo->setCurrentIndex(-1);
-	//}
+	ContactCombo->setCurrentIndex(-1);
+	ContactCombo->setCurrentText(accountPtr->GetAccountOwnerEMail());
 
-	m_isContactChangedSignalBlocked = false;
+	m_isComboChangedSignalBlocked = false;
 }
 
 

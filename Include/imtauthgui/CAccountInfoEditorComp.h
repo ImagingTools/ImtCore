@@ -74,7 +74,7 @@ private:
 	I_REF(imod::IModel, m_contactCollectionModelCompPtr);
 	I_REF(ifile::IFilePersistence, m_bitmapLoaderCompPtr);
 
-	bool m_isContactChangedSignalBlocked;
+	bool m_isComboChangedSignalBlocked;
 
 	QAction m_loadAccountPictureAction;
 	QAction m_removeAccountPictureAction;
