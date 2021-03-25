@@ -37,9 +37,6 @@ void CAccountInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 
 	m_isComboChangedSignalBlocked = true;
 
-	//ContactCombo->setCurrentIndex(-1);
-	//ContactCombo->setCurrentText(accountPtr->GetAccountOwnerEMail());
-
 	switch (accountPtr->GetAccountType()){
 	case imtauth::IAccountInfo::AT_PERSON:
 		AccountTypeCombo->setCurrentIndex(0);
@@ -111,7 +108,6 @@ void CAccountInfoEditorComp::UpdateModel() const
 
 	istd::CChangeGroup changeGroup(accountPtr);
 
-	//accountPtr->SetAccountOwner(ContactCombo->currentText());
 	accountPtr->SetAccountType((imtauth::IAccountInfo::AccountType)AccountTypeCombo->currentIndex());
 	accountPtr->SetAccountName(AccountNameEdit->text());
 	accountPtr->SetAccountDescription(AccountDescriptionEdit->text());
