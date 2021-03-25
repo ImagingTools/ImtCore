@@ -36,8 +36,8 @@ public:
 	I_BEGIN_COMPONENT(CAccountInfoEditorComp);
 		I_ASSIGN(m_accountPictureGuiCompPtr, "AccountPictureView", "Account picture view", true, "ImageView");
 		I_ASSIGN_TO(m_accountPictureObserverCompPtr, m_accountPictureGuiCompPtr, true);
-		I_ASSIGN(m_contactCollectionCompPtr, "ContactCollection", "Collection of the contacts", true, "ContactCollection");
-		I_ASSIGN_TO(m_contactCollectionModelCompPtr, m_contactCollectionCompPtr, true);
+		I_ASSIGN(m_contactEditorCompPtr, "ContactEditor", "Contact editor", true, "ContactInfoEditor");
+		I_ASSIGN_TO(m_contactEditorObserverCompPtr, m_contactEditorCompPtr, true);
 		I_ASSIGN(m_bitmapLoaderCompPtr, "BitmapLoader", "Bitmap loader", true, "BitmapLoader");
 	I_END_COMPONENT;
 
@@ -63,23 +63,16 @@ private Q_SLOTS:
 	void on_RemovePicture_triggered(QAction *action);
 
 private:
-	void OnContactCollectionUpdate(
-				const istd::IChangeable::ChangeSet& changeSet,
-				const imtbase::IObjectCollection* objectCollectionPtr);
-
-private:
 	I_REF(iqtgui::IGuiObject, m_accountPictureGuiCompPtr);
 	I_REF(imod::IObserver, m_accountPictureObserverCompPtr);
-	I_REF(imtbase::IObjectCollection, m_contactCollectionCompPtr);
-	I_REF(imod::IModel, m_contactCollectionModelCompPtr);
+	I_REF(iqtgui::IGuiObject, m_contactEditorCompPtr);
+	I_REF(imod::IObserver, m_contactEditorObserverCompPtr);
 	I_REF(ifile::IFilePersistence, m_bitmapLoaderCompPtr);
 
 	bool m_isComboChangedSignalBlocked;
 
 	QAction m_loadAccountPictureAction;
 	QAction m_removeAccountPictureAction;
-
-	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CAccountInfoEditorComp> m_contactCollectionUpdateBinder;
 };
 
 

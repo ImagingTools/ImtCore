@@ -36,13 +36,13 @@ CContactInfo::CContactInfo()
 
 // reimplemented (IContactInfo)
 
-QString CContactInfo::GetEMail() const
+QString CContactInfo::GetEmail() const
 {
 	return m_email;
 }
 
 
-void CContactInfo::SetEMail(const QString& email)
+void CContactInfo::SetEmail(const QString& email)
 {
 	if (m_email!= email){
 		istd::CChangeNotifier changeNotifier(this);
@@ -189,7 +189,7 @@ bool CContactInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_nickName);
 	retVal = retVal && archive.EndTag(nickNameTag);
 
-	static iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(addressesTag);
 	retVal = retVal && m_addresses.Serialize(archive);
 	retVal = retVal && archive.EndTag(addressesTag);
@@ -208,16 +208,16 @@ int CContactInfo::GetSupportedOperations() const
 
 bool CContactInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const IContactInfo* sourcePtr = dynamic_cast<const IContactInfo*>(&object);
+	const CContactInfo* sourcePtr = dynamic_cast<const CContactInfo*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_email = sourcePtr->GetEMail();
-		m_genderType = sourcePtr->GetGenderType();
-		m_birthday = sourcePtr->GetBirthday();
-		m_firstName = sourcePtr->GetNameField(NFT_FIRST_NAME);
-		m_lastName = sourcePtr->GetNameField(NFT_LAST_NAME);
-		m_nickName = sourcePtr->GetNameField(NFT_NICKNAME);
+		m_email = sourcePtr->m_email;
+		m_genderType = sourcePtr->m_genderType;
+		m_birthday = sourcePtr->m_birthday;
+		m_firstName = sourcePtr->m_firstName;
+		m_lastName = sourcePtr->m_lastName;
+		m_nickName = sourcePtr->m_nickName;
 
 		return true;
 	}

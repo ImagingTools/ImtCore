@@ -31,15 +31,23 @@ bool CAccountInfoMetaInfoCreatorComp::CreateMetaInfo(
 		return true;
 	}
 
-	const IAccountInfo* accountInfoPtr = dynamic_cast<const IAccountInfo*>(dataPtr);
-	if (accountInfoPtr == nullptr){
+	const IAccountInfo* accountPtr = dynamic_cast<const IAccountInfo*>(dataPtr);
+	if (accountPtr == nullptr){
 		return false;
 	}
 
-	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_EMAIL, accountInfoPtr->GetAccountOwnerEMail());
-	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_TYPE, (int)accountInfoPtr->GetAccountType());
-	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_NAME, accountInfoPtr->GetAccountName());
-	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_DESCRIPTION, accountInfoPtr->GetAccountDescription());
+	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_TYPE, (int)accountPtr->GetAccountType());
+	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_NAME, accountPtr->GetAccountName());
+	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_DESCRIPTION, accountPtr->GetAccountDescription());
+
+	IContactInfo* contactPtr = const_cast<IContactInfo*>(accountPtr->GetAccountOwner());
+	if (contactPtr != nullptr){
+		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_EMAIL, contactPtr->GetEmail());
+		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_BIRTHDAY, contactPtr->GetBirthday());
+		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_FIRST_NAME, contactPtr->GetNameField(IContactInfo::NFT_FIRST_NAME));
+		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_LAST_NAME, contactPtr->GetNameField(IContactInfo::NFT_LAST_NAME));
+		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_NICKNAME, contactPtr->GetNameField(IContactInfo::NFT_NICKNAME));
+	}
 
 	return true;
 }
@@ -50,14 +58,22 @@ bool CAccountInfoMetaInfoCreatorComp::CreateMetaInfo(
 QString CAccountInfoMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
 {
 	switch (metaInfoType){
-	case IAccountInfo::MIT_CONTACT_EMAIL:
-		return QObject::tr("Contact EMail");
 	case IAccountInfo::MIT_ACCOUNT_TYPE:
 		return QObject::tr("Account Type");
 	case IAccountInfo::MIT_ACCOUNT_NAME:
 		return QObject::tr("Account Name");
 	case IAccountInfo::MIT_ACCOUNT_DESCRIPTION:
-		return QObject::tr("Account Description");
+		return QObject::tr("Description");
+	case IAccountInfo::MIT_CONTACT_EMAIL:
+		return QObject::tr("E-Mail");
+	case IAccountInfo::MIT_CONTACT_BIRTHDAY:
+		return QObject::tr("Birthday");
+	case IAccountInfo::MIT_CONTACT_FIRST_NAME:
+		return QObject::tr("First Name");
+	case IAccountInfo::MIT_CONTACT_LAST_NAME:
+		return QObject::tr("Last Name");
+	case IAccountInfo::MIT_CONTACT_NICKNAME:
+		return QObject::tr("Nickname");
 	}
 
 	return BaseClass::GetMetaInfoName(metaInfoType);

@@ -24,9 +24,16 @@ QByteArray CAccountInfo::GetTypeId()
 // public methods
 
 CAccountInfo::CAccountInfo()
-	:m_contactCollectionPtr(nullptr),
-	m_accountType(AT_PERSON)
+	:m_accountType(AT_PERSON),
+	m_contactUpdateBridge(this)
 {
+	m_contact.AttachObserver(&m_contactUpdateBridge);
+}
+
+
+CAccountInfo::~CAccountInfo()
+{
+	m_contactUpdateBridge.EnsureModelsDetached();
 }
 
 
@@ -94,45 +101,9 @@ void CAccountInfo::SetAccountPicture(const iimg::IBitmap& picture)
 }
 
 
-QString CAccountInfo::GetAccountOwnerEMail() const
+const IContactInfo* CAccountInfo::GetAccountOwner() const
 {
-	return m_contactEMail;
-}
-
-
-IAccountInfo::ContactInfoPtr CAccountInfo::GetAccountOwner() const
-{
-	ContactInfoPtr contactInfoPtr;
-
-	if (!m_contactEMail.isEmpty()){
-		if (m_contactCollectionPtr != nullptr){
-			imtbase::ICollectionInfo::Ids ids = m_contactCollectionPtr->GetElementIds();
-			for (const QByteArray& id : ids){
-				imtbase::IObjectCollection::DataPtr dataPtr;
-				if (m_contactCollectionPtr->GetObjectData(id, dataPtr)){
-					IContactInfo* contactPtr = dynamic_cast<IContactInfo*>(dataPtr.GetPtr());
-					if (contactPtr != nullptr){
-						if (contactPtr->GetEMail() == m_contactEMail){
-							contactInfoPtr.SetPtr(new CContactInfo);
-							contactInfoPtr->CopyFrom(*contactPtr);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return contactInfoPtr;
-}
-
-
-void CAccountInfo::SetAccountOwner(const QString& contactEMail)
-{
-	if (m_contactEMail != contactEMail){
-		istd::CChangeNotifier notifier(this);
-
-		m_contactEMail = contactEMail;
-	}
+	return &m_contact;
 }
 
 
@@ -196,10 +167,10 @@ bool CAccountInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && m_accountPicture.Serialize(archive);
 	retVal = retVal && archive.EndTag(accountPictureTag);
 
-	static iser::CArchiveTag contactEMailTag("ContactEMail", "Contact EMail", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(contactEMailTag);
-	retVal = retVal && archive.Process(m_contactEMail);
-	retVal = retVal && archive.EndTag(contactEMailTag);
+	static iser::CArchiveTag contactTag("Contact", "Contact", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(contactTag);
+	retVal = retVal && m_contact.Serialize(archive);
+	retVal = retVal && archive.EndTag(contactTag);
 
 	return retVal;
 }
@@ -215,15 +186,23 @@ int CAccountInfo::GetSupportedOperations() const
 
 bool CAccountInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const IAccountInfo* sourcePtr = dynamic_cast<const IAccountInfo*>(&object);
+	istd::CChangeGroup changeGroup(this);
+
+
+	const CAccountInfo* sourcePtr = dynamic_cast<const CAccountInfo*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_accountName = sourcePtr->GetAccountName();
-		m_accountDescription = sourcePtr->GetAccountDescription();
-		m_accountPicture.CopyFrom(sourcePtr->GetAccountPicture());
+		m_accountType = sourcePtr->m_accountType;
+		m_accountName = sourcePtr->m_accountName;
+		m_accountDescription = sourcePtr->m_accountDescription;
 
-		return true;
+		bool retVal = true;
+
+		retVal = retVal && m_accountPicture.CopyFrom(sourcePtr->GetAccountPicture());
+		retVal = retVal && m_contact.CopyFrom(sourcePtr->m_contact);
+
+		return retVal;
 	}
 
 	return false;
@@ -245,20 +224,12 @@ bool CAccountInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
+	m_accountType = AT_PERSON;
 	m_accountName.clear();
 	m_accountDescription.clear();
 	m_accountPicture.ResetImage();
 
-	return true;
-}
-
-
-// protected methods
-
-void CAccountInfo::OnContactCollectionUpdate(
-			const istd::IChangeable::ChangeSet& /*changeSet*/,
-			const imtbase::IObjectCollection* productCollectionPtr)
-{
+	return m_contact.ResetData();
 }
 
 

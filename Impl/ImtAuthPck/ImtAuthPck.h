@@ -8,7 +8,7 @@
 // ImtCore includes
 #include <imtauth/CContactInfo.h>
 #include <imtauth/CAddress.h>
-#include <imtauth/CAccountInfoComp.h>
+#include <imtauth/CAccountInfo.h>
 #include <imtauth/CContactInfoMetaInfoCreatorComp.h>
 #include <imtauth/CAddressMetaInfoCreatorComp.h>
 #include <imtauth/CAccountInfoMetaInfoCreatorComp.h>
@@ -27,7 +27,13 @@ typedef icomp::TModelCompWrap<
 						istd::IChangeable>> ContactInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<imtauth::CAddress>> Address;
-typedef icomp::TModelCompWrap<imtauth::CAccountInfoComp> AccountInfo;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::CAccountInfo,
+						imtauth::IAccountInfo,
+						iser::IObject,
+						iser::ISerializable,
+						istd::IChangeable>> AccountInfo;
 typedef imtauth::CContactInfoMetaInfoCreatorComp ContactInfoMetaInfoCreator;
 typedef imtauth::CAddressMetaInfoCreatorComp AddressMetaInfoCreator;
 typedef imtauth::CAccountInfoMetaInfoCreatorComp AccountInfoMetaInfoCreator;

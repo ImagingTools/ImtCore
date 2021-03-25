@@ -20,7 +20,11 @@ imtgui::ICollectionViewDelegate::SummaryInformation CAccountInfoViewDelegateComp
 	if (m_collectionPtr != nullptr){
 		imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr;
 		if (m_collectionPtr->GetDataMetaInfo(objectId, metaInfoPtr)){
-			if (informationId == QByteArray("Contact")){
+			if (informationId == QByteArray("AccountName")){
+				result.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME).toString();
+				result.sortValue = result.text;
+			}
+			else if (informationId == QByteArray("Email")){
 				result.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_CONTACT_EMAIL).toString();
 				result.sortValue = result.text;
 			}
@@ -41,10 +45,6 @@ imtgui::ICollectionViewDelegate::SummaryInformation CAccountInfoViewDelegateComp
 					result.sortValue = result.text;
 					break;
 				}
-			}
-			else if (informationId == QByteArray("AccountName")){
-				result.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME).toString();
-				result.sortValue = result.text;
 			}
 			else if (informationId == QByteArray("AccountDesciption")){
 				result.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION).toString();
@@ -76,14 +76,14 @@ void CAccountInfoViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.ResetData();
 	m_summaryInformationHeaders.clear();
 
-	m_summaryInformationTypes.InsertItem(QByteArray("Contact"), tr("Contact EMail"), "");
-	m_summaryInformationHeaders["Contact"] = HeaderInfo(false);
+	m_summaryInformationTypes.InsertItem(QByteArray("AccountName"), tr("Account Name"), "");
+	m_summaryInformationHeaders["AccountName"] = HeaderInfo(false);
+
+	m_summaryInformationTypes.InsertItem(QByteArray("Email"), tr("E-Mail"), "");
+	m_summaryInformationHeaders["Email"] = HeaderInfo(false);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("AccountType"), tr("Account Type"), "");
 	m_summaryInformationHeaders["AccountType"] = HeaderInfo(false);
-
-	m_summaryInformationTypes.InsertItem(QByteArray("AccountName"), tr("Account Name"), "");
-	m_summaryInformationHeaders["AccountName"] = HeaderInfo(false);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("AccountDesciption"), tr("Account Desciption"), "");
 	m_summaryInformationHeaders["AccountDesciption"] = HeaderInfo(false);

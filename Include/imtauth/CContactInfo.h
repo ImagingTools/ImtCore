@@ -24,8 +24,8 @@ public:
 	CContactInfo();
 
 	// reimplemented (IContactInfo)
-	virtual QString GetEMail() const override;
-	virtual void SetEMail(const QString& email) override;
+	virtual QString GetEmail() const override;
+	virtual void SetEmail(const QString& email) override;
 	virtual GenderType GetGenderType() const override;
 	virtual void SetGenderType(GenderType genderType) override;
 	virtual QDate GetBirthday() const override;

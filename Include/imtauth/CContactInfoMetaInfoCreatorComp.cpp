@@ -37,7 +37,7 @@ bool CContactInfoMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
-	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_EMAIL, contactPtr->GetEMail());
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_EMAIL, contactPtr->GetEmail());
 	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_GENDER_TYPE, contactPtr->GetGenderType());
 	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_BIRTHDAY, contactPtr->GetBirthday());
 	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_FIRST_NAME, contactPtr->GetNameField(IContactInfo::NFT_FIRST_NAME));

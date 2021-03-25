@@ -5,6 +5,7 @@
 #include <iimg/CBitmap.h>
 #include <imod/TModelWrap.h>
 #include <istd/TSmartPtr.h>
+#include <imod/CModelUpdateBridge.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
@@ -22,6 +23,7 @@ public:
 	static QByteArray GetTypeId();
 
 	CAccountInfo();
+	~CAccountInfo();
 
 	// reimplemented (IAccountInfo)
 	virtual AccountType GetAccountType() const override;
@@ -32,9 +34,7 @@ public:
 	virtual void SetAccountDescription(QString accountDescription) override;
 	virtual const iimg::IBitmap& GetAccountPicture() const override;
 	virtual void SetAccountPicture(const iimg::IBitmap& picture) override;
-	virtual QString GetAccountOwnerEMail() const override;
-	virtual ContactInfoPtr GetAccountOwner() const override;
-	virtual void SetAccountOwner(const QString& contactInfo) override;
+	virtual const IContactInfo* GetAccountOwner() const override;
 	virtual const iauth::IRightsProvider& GetAccountRights() const override;
 
 	// reimplemented (iauth::IRightsProvider)
@@ -52,20 +52,14 @@ public:
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
-protected:
-	void OnContactCollectionUpdate(
-				const istd::IChangeable::ChangeSet& changeSet,
-				const imtbase::IObjectCollection* productCollectionPtr);
-
-protected:
-	imtbase::IObjectCollection* m_contactCollectionPtr;
-	QString m_contactEMail;
-
 private:
 	AccountType m_accountType;
 	QString m_accountName;
 	QString m_accountDescription;
 	imod::TModelWrap<iimg::CBitmap> m_accountPicture;
+
+	imod::TModelWrap<CContactInfo> m_contact;
+	imod::CModelUpdateBridge m_contactUpdateBridge;
 };
 
 

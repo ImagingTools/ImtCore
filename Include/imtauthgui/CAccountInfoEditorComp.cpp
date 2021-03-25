@@ -21,8 +21,7 @@ namespace imtauthgui
 // public methods
 
 CAccountInfoEditorComp::CAccountInfoEditorComp()
-	:m_isComboChangedSignalBlocked(false),
-	m_contactCollectionUpdateBinder(*this)
+	:m_isComboChangedSignalBlocked(false)
 {
 }
 
@@ -38,8 +37,8 @@ void CAccountInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 
 	m_isComboChangedSignalBlocked = true;
 
-	ContactCombo->setCurrentIndex(-1);
-	ContactCombo->setCurrentText(accountPtr->GetAccountOwnerEMail());
+	//ContactCombo->setCurrentIndex(-1);
+	//ContactCombo->setCurrentText(accountPtr->GetAccountOwnerEMail());
 
 	switch (accountPtr->GetAccountType()){
 	case imtauth::IAccountInfo::AT_PERSON:
@@ -71,11 +70,29 @@ void CAccountInfoEditorComp::OnGuiModelAttached()
 			accountPicureModelPtr->AttachObserver(m_accountPictureObserverCompPtr.GetPtr());
 		}
 	}
+
+	if (m_contactEditorObserverCompPtr.IsValid()){
+		imod::IModel* contactModelPtr = dynamic_cast<imod::IModel*>(
+					const_cast<imtauth::IContactInfo*>(
+								GetObservedObject()->GetAccountOwner()));
+
+		if (contactModelPtr != nullptr){
+			contactModelPtr->AttachObserver(m_contactEditorObserverCompPtr.GetPtr());
+		}
+	}
 }
 
 
 void CAccountInfoEditorComp::OnGuiModelDetached()
 {
+	imod::IModel* contactModelPtr = dynamic_cast<imod::IModel*>(
+				const_cast<imtauth::IContactInfo*>(
+							GetObservedObject()->GetAccountOwner()));
+
+	if (contactModelPtr != nullptr){
+		contactModelPtr->DetachAllObservers();
+	}
+
 	imod::IModel* accountPicureModelPtr = dynamic_cast<imod::IModel*>(
 				const_cast<iimg::IBitmap*>(&GetObservedObject()->GetAccountPicture()));
 
@@ -94,7 +111,7 @@ void CAccountInfoEditorComp::UpdateModel() const
 
 	istd::CChangeGroup changeGroup(accountPtr);
 
-	accountPtr->SetAccountOwner(ContactCombo->currentText());
+	//accountPtr->SetAccountOwner(ContactCombo->currentText());
 	accountPtr->SetAccountType((imtauth::IAccountInfo::AccountType)AccountTypeCombo->currentIndex());
 	accountPtr->SetAccountName(AccountNameEdit->text());
 	accountPtr->SetAccountDescription(AccountDescriptionEdit->text());
@@ -124,24 +141,21 @@ void CAccountInfoEditorComp::OnGuiCreated()
 		m_accountPictureGuiCompPtr->CreateGui(AccountPicture);
 	}
 
-	if (m_contactCollectionCompPtr.IsValid() && m_contactCollectionModelCompPtr.IsValid()){
-		m_contactCollectionUpdateBinder.RegisterObject(
-			m_contactCollectionCompPtr.GetPtr(),
-			&CAccountInfoEditorComp::OnContactCollectionUpdate);
+	if (m_contactEditorCompPtr.IsValid() && m_contactEditorObserverCompPtr.IsValid()){
+		m_contactEditorCompPtr->CreateGui(ContactEditor);
 	}
 }
 
 
 void CAccountInfoEditorComp::OnGuiDestroyed()
 {
-	m_contactCollectionUpdateBinder.UnregisterAllObjects();
-
-	if (m_accountPictureGuiCompPtr.IsValid() && m_accountPictureObserverCompPtr.IsValid()){
-		if (m_accountPictureGuiCompPtr->IsGuiCreated()){
-			m_accountPictureGuiCompPtr->DestroyGui();
-		}
+	if (m_contactEditorCompPtr.IsValid() && m_contactEditorCompPtr->IsGuiCreated()){
+		m_contactEditorCompPtr->DestroyGui();
 	}
 
+	if (m_accountPictureGuiCompPtr.IsValid() && m_accountPictureGuiCompPtr->IsGuiCreated()){
+		m_accountPictureGuiCompPtr->DestroyGui();
+	}
 
 	BaseClass::OnGuiDestroyed();
 }
@@ -219,37 +233,6 @@ void CAccountInfoEditorComp::on_RemovePicture_triggered(QAction *action)
 	iimg::CBitmap bitmap;
 
 	accountPtr->SetAccountPicture(bitmap);
-}
-
-
-// private methods
-
-void CAccountInfoEditorComp::OnContactCollectionUpdate(
-			const istd::IChangeable::ChangeSet& changeSet,
-			const imtbase::IObjectCollection* objectCollectionPtr)
-{
-	m_isComboChangedSignalBlocked = true;
-
-	ContactCombo->clear();
-
-	imtbase::ICollectionInfo::Ids ids = objectCollectionPtr->GetElementIds();
-	for (const QByteArray& id : ids){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (objectCollectionPtr->GetObjectData(id, dataPtr)){
-			imtauth::IContactInfo* contactPtr = dynamic_cast<imtauth::IContactInfo*>(dataPtr.GetPtr());
-			if (contactPtr != nullptr){
-				ContactCombo->addItem(contactPtr->GetEMail());
-			}
-		}
-	}
-
-	imtauth::IAccountInfo* accountPtr = GetObservedObject();
-	Q_ASSERT(accountPtr != nullptr);
-
-	ContactCombo->setCurrentIndex(-1);
-	ContactCombo->setCurrentText(accountPtr->GetAccountOwnerEMail());
-
-	m_isComboChangedSignalBlocked = false;
 }
 
 

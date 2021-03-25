@@ -17,7 +17,7 @@ class IAddressProvider;
 
 
 /**
-	Interface descibing a natural person.
+	Interface descibing a natural contact.
 	\ingroup Authentification
 */
 class IContactInfo: virtual public iser::IObject
@@ -40,38 +40,38 @@ public:
 	enum MetaInfoTypes
 	{
 		/**
-			Person email given as QString.
+			Contact email given as QString.
 		*/
 		MIT_EMAIL = idoc::IDocumentMetaInfo::MIT_USER + 1,
 
 		/**
-			Person gender type given as GenderType.
+			Contact gender type given as GenderType.
 		*/
 		MIT_GENDER_TYPE,
 
 		/**
-			Person birthday given as QDate.
+			Contact birthday given as QDate.
 		*/
 		MIT_BIRTHDAY,
 
 		/**
-			Person first name given as QString.
+			Contact first name given as QString.
 		*/
 		MIT_FIRST_NAME,
 
 		/**
-			Person last name given as QString.
+			Contact last name given as QString.
 		*/
 		MIT_LAST_NAME,
 
 		/**
-			Person nickname given as QString.
+			Contact nickname given as QString.
 		*/
 		MIT_NICKNAME
 	};
 
-	virtual QString GetEMail() const = 0;
-	virtual void SetEMail(const QString& email) = 0;
+	virtual QString GetEmail() const = 0;
+	virtual void SetEmail(const QString& email) = 0;
 	virtual GenderType GetGenderType() const = 0;
 	virtual void SetGenderType(GenderType genderType) = 0;
 	virtual QDate GetBirthday() const = 0;

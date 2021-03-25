@@ -41,14 +41,9 @@ public:
 	enum MetaInfoTypes
 	{
 		/**
-			Account contact email given as QString.
-		*/
-		MIT_CONTACT_EMAIL = idoc::IDocumentMetaInfo::MIT_USER + 1,
-
-		/**
 			Account type given as AccountType.
 		*/
-		MIT_ACCOUNT_TYPE,
+		MIT_ACCOUNT_TYPE = idoc::IDocumentMetaInfo::MIT_USER + 1,
 
 		/**
 			Account name given as QString.
@@ -59,9 +54,32 @@ public:
 			Account description given as QString.
 		*/
 		MIT_ACCOUNT_DESCRIPTION,
-	};
 
-	typedef istd::TSmartPtr<IContactInfo> ContactInfoPtr;
+		/**
+			Contact email given as QString.
+		*/
+		MIT_CONTACT_EMAIL,
+
+		/**
+			Contact birthday given as QDate.
+		*/
+		MIT_CONTACT_BIRTHDAY,
+
+		/**
+			Contact first name given as QString.
+		*/
+		MIT_CONTACT_FIRST_NAME,
+
+		/**
+			Contact last name given as QString.
+		*/
+		MIT_CONTACT_LAST_NAME,
+
+		/**
+			Contact nickname given as QString.
+		*/
+		MIT_CONTACT_NICKNAME
+	};
 
 	/**
 		Get information about the type of the account.
@@ -106,19 +124,9 @@ public:
 	virtual void SetAccountPicture(const iimg::IBitmap& picture) = 0;
 
 	/**
-		Get information about the person email.
-	*/
-	virtual QString GetAccountOwnerEMail() const = 0;
-
-	/**
 		Get information about the person who owns and manages this account.
 	*/
-	virtual ContactInfoPtr GetAccountOwner() const = 0;
-
-	/**
-		Set information about the person who owns and manages this account.
-	*/
-	virtual void SetAccountOwner(const QString& contactEMail) = 0;
+	virtual const IContactInfo* GetAccountOwner() const = 0;
 
 	/**
 		Get the access to the rights provider associated with this account.

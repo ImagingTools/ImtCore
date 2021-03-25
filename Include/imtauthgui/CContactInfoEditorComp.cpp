@@ -23,7 +23,7 @@ void CContactInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 	imtauth::IContactInfo* contactPtr = GetObservedObject();
 	Q_ASSERT(contactPtr != nullptr);
 
-	EMailEdit->setText(contactPtr->GetEMail());
+	EMailEdit->setText(contactPtr->GetEmail());
 
 	BirthdayEdit->setDate(contactPtr->GetBirthday());
 	FirstNameEdit->setText(contactPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME));
@@ -73,7 +73,7 @@ void CContactInfoEditorComp::UpdateModel() const
 
 	istd::CChangeGroup changeGroup(contactPtr);
 
-	contactPtr->SetEMail(EMailEdit->text());
+	contactPtr->SetEmail(EMailEdit->text());
 	contactPtr->SetBirthday(BirthdayEdit->date());
 	contactPtr->SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, FirstNameEdit->text());
 	contactPtr->SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, LastNameEdit->text());
@@ -99,7 +99,6 @@ void CContactInfoEditorComp::UpdateModel() const
 			addressesPtr->AddAddress(&address);
 		}
 	}
-
 }
 
 
