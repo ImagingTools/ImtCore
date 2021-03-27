@@ -18,7 +18,21 @@ CObjectCollectionRemoveEvent::CObjectCollectionRemoveEvent(const QByteArray& ite
 }
 
 
+// reimplemented (IObjectCollectionEvent)
+
+int CObjectCollectionRemoveEvent::GetEventType() const
+{
+	return ET_REMOVE;
+}
+
+
 // reimplemented (istd::IChangeable)
+
+int CObjectCollectionRemoveEvent::GetSupportedOperations() const
+{
+	return BaseClass::GetSupportedOperations() | SO_CLONE;
+}
+
 
 istd::IChangeable* CObjectCollectionRemoveEvent::CloneMe(CompatibilityMode mode) const
 {

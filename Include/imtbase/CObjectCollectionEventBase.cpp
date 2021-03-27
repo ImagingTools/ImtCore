@@ -30,7 +30,7 @@ QByteArray CObjectCollectionEventBase::GetItemId() const
 
 int CObjectCollectionEventBase::GetSupportedOperations() const
 {
-	return SO_COPY | SO_COMPARE | SO_CLONE;
+	return SO_COPY | SO_COMPARE;
 }
 
 
@@ -38,6 +38,10 @@ bool CObjectCollectionEventBase::CopyFrom(const IChangeable& object, Compatibili
 {
 	const CObjectCollectionEventBase* sourcePtr = dynamic_cast<const CObjectCollectionEventBase*>(&object);
 	if (sourcePtr != nullptr){
+		if (GetEventType() != sourcePtr->GetEventType()){
+			return false;
+		}
+
 		if (m_itemId != sourcePtr->m_itemId){
 			istd::CChangeNotifier notifier(this);
 
@@ -51,11 +55,11 @@ bool CObjectCollectionEventBase::CopyFrom(const IChangeable& object, Compatibili
 }
 
 
-bool CObjectCollectionEventBase::IsEqual(const IChangeable& object) const
+bool CObjectCollectionEventBase::IsEqual(const istd::IChangeable& object) const
 {
 	const CObjectCollectionEventBase* sourcePtr = dynamic_cast<const CObjectCollectionEventBase*>(&object);
-	if (sourcePtr != NULL){
-		if (m_itemId != sourcePtr->m_itemId){
+	if (sourcePtr != nullptr){
+		if ((m_itemId != sourcePtr->m_itemId) && (GetEventType() == sourcePtr->GetEventType())){
 			return false;
 		}
 
@@ -63,17 +67,6 @@ bool CObjectCollectionEventBase::IsEqual(const IChangeable& object) const
 	}
 
 	return false;
-}
-
-
-istd::IChangeable* CObjectCollectionEventBase::CloneMe(CompatibilityMode mode) const
-{
-	istd::TDelPtr<CObjectCollectionEventBase> clonePtr(new CObjectCollectionEventBase);
-	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
-	}
-
-	return nullptr;
 }
 
 

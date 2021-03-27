@@ -31,7 +31,21 @@ CObjectCollectionUpdateEvent::UpdateType CObjectCollectionUpdateEvent::GetUpdate
 }
 
 
+// reimplemented (IObjectCollectionEvent)
+
+int CObjectCollectionUpdateEvent::GetEventType() const
+{
+	return ET_UPDATE;
+}
+
+
 // reimplemented (istd::IChangeable)
+
+int CObjectCollectionUpdateEvent::GetSupportedOperations() const
+{
+	return BaseClass::GetSupportedOperations() | SO_CLONE;
+}
+
 
 bool CObjectCollectionUpdateEvent::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 {
@@ -60,10 +74,8 @@ bool CObjectCollectionUpdateEvent::IsEqual(const IChangeable& object) const
 {
 	const CObjectCollectionUpdateEvent* sourcePtr = dynamic_cast<const CObjectCollectionUpdateEvent*>(&object);
 	if (sourcePtr != NULL){
-		if (BaseClass::GetSupportedOperations() & SO_COMPARE){
-			if (!BaseClass::IsEqual(object)){
-				return false;
-			}
+		if (!BaseClass::IsEqual(object)){
+			return false;
 		}
 
 		if (m_updateType != sourcePtr->m_updateType){

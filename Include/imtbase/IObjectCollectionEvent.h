@@ -16,6 +16,15 @@ namespace imtbase
 class IObjectCollectionEvent: virtual public istd::IChangeable
 {
 public:
+	enum EventType
+	{
+		ET_UPDATE,
+		ET_INSERT,
+		ET_REMOVE
+	};
+	
+	virtual int GetEventType() const = 0;
+
 	virtual QByteArray GetItemId() const = 0;
 };
 

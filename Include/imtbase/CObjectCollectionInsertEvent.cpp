@@ -18,7 +18,21 @@ CObjectCollectionInsertEvent::CObjectCollectionInsertEvent(const QByteArray& ite
 }
 
 
+// reimplemented (IObjectCollectionEvent)
+
+int CObjectCollectionInsertEvent::GetEventType() const
+{
+	return ET_INSERT;
+}
+
+
 // reimplemented (istd::IChangeable)
+
+int CObjectCollectionInsertEvent::GetSupportedOperations() const
+{
+	return BaseClass::GetSupportedOperations() | SO_CLONE;
+}
+
 
 istd::IChangeable* CObjectCollectionInsertEvent::CloneMe(CompatibilityMode mode) const
 {

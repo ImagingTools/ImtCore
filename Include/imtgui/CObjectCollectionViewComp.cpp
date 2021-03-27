@@ -23,9 +23,7 @@
 #include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
-#include <imtbase/CObjectCollectionInsertEvent.h>
-#include <imtbase/CObjectCollectionUpdateEvent.h>
-#include <imtbase/CObjectCollectionRemoveEvent.h>
+#include <imtbase/IObjectCollectionEvent.h>
 
 
 namespace imtgui
@@ -68,7 +66,7 @@ imtbase::IMultiSelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
 }
 
 
-bool CObjectCollectionViewComp::SetSelectedIds(const Ids& selectedIds)
+bool CObjectCollectionViewComp::SetSelectedIds(const Ids& /*selectedIds*/)
 {
 	return false;
 }
@@ -119,7 +117,7 @@ bool CObjectCollectionViewComp::IsCanceled(int /*sessionId*/) const
 
 // reimplemented (iser::ISerialize)
 
-bool CObjectCollectionViewComp::Serialize(iser::IArchive& archive)
+bool CObjectCollectionViewComp::Serialize(iser::IArchive& /*archive*/)
 {
 	return false;
 }
@@ -949,28 +947,25 @@ void CObjectCollectionViewComp::ProcessObjectCollectionEventSync(
 			ObjectCollectionPtr /*objectCollectionPtr*/,
 			ObjectCollectionEventPtr eventPtr)
 {
-	const imtbase::CObjectCollectionInsertEvent* insertEventPtr = dynamic_cast<const imtbase::CObjectCollectionInsertEvent*>(eventPtr.GetPtr());
-	if (insertEventPtr != nullptr){
-		UpdateItem(insertEventPtr->GetItemId(), m_itemModelPtr);
+	switch (eventPtr->GetEventType()){
+	case imtbase::IObjectCollectionEvent::ET_INSERT:
+		UpdateItem(eventPtr->GetItemId(), m_itemModelPtr);
 		if (!m_itemsSelection.isEmpty()){
 			UpdateCommands();
 		}
-		return;
-	}
-
-	const imtbase::CObjectCollectionUpdateEvent* updateEventPtr = dynamic_cast<const imtbase::CObjectCollectionUpdateEvent*>(eventPtr.GetPtr());
-	if (updateEventPtr != nullptr){
-		UpdateItem(updateEventPtr->GetItemId(), m_itemModelPtr);
+		break;
+	case imtbase::IObjectCollectionEvent::ET_UPDATE:
+		UpdateItem(eventPtr->GetItemId(), m_itemModelPtr);
 		if (!m_itemsSelection.isEmpty()){
 			UpdateCommands();
 		}
-		return;
-	}
+		break;
+	case imtbase::IObjectCollectionEvent::ET_REMOVE:
+		RemoveItem(eventPtr->GetItemId());
+		break;
 
-	const imtbase::CObjectCollectionRemoveEvent* removeEventPtr = dynamic_cast<const imtbase::CObjectCollectionRemoveEvent*>(eventPtr.GetPtr());
-	if (removeEventPtr != nullptr){
-		RemoveItem(removeEventPtr->GetItemId());
-		return;
+	default:
+		break;
 	}
 }
 

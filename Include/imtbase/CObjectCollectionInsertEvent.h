@@ -16,7 +16,11 @@ public:
 
 	CObjectCollectionInsertEvent(const QByteArray& itemId = QByteArray());
 
+	// reimplemented (IObjectCollectionEvent)
+	virtual int GetEventType() const override;
+
 	// reimplemented (istd::IChangeable)
+	virtual int GetSupportedOperations() const override;
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 };
 
