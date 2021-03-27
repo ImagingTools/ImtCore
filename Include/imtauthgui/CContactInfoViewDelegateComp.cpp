@@ -21,7 +21,7 @@ imtgui::ICollectionViewDelegate::SummaryInformation CContactInfoViewDelegateComp
 		imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr;
 		if (m_collectionPtr->GetDataMetaInfo(objectId, metaInfoPtr)){
 			if (informationId == QByteArray("EMail")){
-				result.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_EMAIL).toString();
+				result.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_MAIL).toString();
 				result.sortValue = result.text;
 			}
 			else if (informationId == QByteArray("Birthday")){

@@ -23,7 +23,7 @@ void CContactInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 	imtauth::IContactInfo* contactPtr = GetObservedObject();
 	Q_ASSERT(contactPtr != nullptr);
 
-	EMailEdit->setText(contactPtr->GetEmail());
+	EMailEdit->setText(contactPtr->GetMail());
 
 	BirthdayEdit->setDate(contactPtr->GetBirthday());
 	FirstNameEdit->setText(contactPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME));

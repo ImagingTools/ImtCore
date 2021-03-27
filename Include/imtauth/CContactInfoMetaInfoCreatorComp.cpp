@@ -37,7 +37,7 @@ bool CContactInfoMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
-	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_EMAIL, contactPtr->GetEmail());
+	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_MAIL, contactPtr->GetMail());
 	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_GENDER_TYPE, contactPtr->GetGenderType());
 	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_BIRTHDAY, contactPtr->GetBirthday());
 	metaInfoPtr->SetMetaInfo(IContactInfo::MIT_FIRST_NAME, contactPtr->GetNameField(IContactInfo::NFT_FIRST_NAME));
@@ -53,7 +53,7 @@ bool CContactInfoMetaInfoCreatorComp::CreateMetaInfo(
 QString CContactInfoMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
 {
 	switch (metaInfoType){
-	case IContactInfo::MIT_EMAIL:
+	case IContactInfo::MIT_MAIL:
 		return QObject::tr("EMail");
 	case IContactInfo::MIT_GENDER_TYPE:
 		return QObject::tr("Gender");

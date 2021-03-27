@@ -36,7 +36,7 @@ CContactInfo::CContactInfo()
 
 // reimplemented (IContactInfo)
 
-QString CContactInfo::GetEmail() const
+QString CContactInfo::GetMail() const
 {
 	return m_email;
 }

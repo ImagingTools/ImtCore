@@ -42,7 +42,7 @@ public:
 		/**
 			Contact email given as QString.
 		*/
-		MIT_EMAIL = idoc::IDocumentMetaInfo::MIT_USER + 1,
+		MIT_MAIL = idoc::IDocumentMetaInfo::MIT_USER + 1,
 
 		/**
 			Contact gender type given as GenderType.
@@ -70,7 +70,7 @@ public:
 		MIT_NICKNAME
 	};
 
-	virtual QString GetEmail() const = 0;
+	virtual QString GetMail() const = 0;
 	virtual void SetEmail(const QString& email) = 0;
 	virtual GenderType GetGenderType() const = 0;
 	virtual void SetGenderType(GenderType genderType) = 0;
