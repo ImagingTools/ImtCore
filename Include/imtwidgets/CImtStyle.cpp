@@ -214,12 +214,19 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							path = QPainterPath();
 							path.addRoundedRect(borderRect.adjusted(0, 0, 0, 0), 6, 6);
 
+							QLinearGradient gradient(0, 0, 0, borderRect.height());
+							gradient.setSpread(QGradient::PadSpread);
+
 							if (toolButtonStyleOptionPtr->state & (State_Sunken | State_On)){
-								painter->fillPath(path, QColor(205, 205, 207));
+								gradient.setColorAt(1, QColor(245, 245, 245));
+								gradient.setColorAt(0, QColor(245, 245, 245));
 							}
 							else {
-								painter->fillPath(path, QColor(245, 245, 247));
+								gradient.setColorAt(0, QColor(253, 253, 253));
+								gradient.setColorAt(1, QColor(235, 235, 235));
 							}
+
+							painter->fillPath(path, gradient);
 
 							painter->restore();
 
