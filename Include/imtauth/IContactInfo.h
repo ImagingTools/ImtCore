@@ -17,7 +17,7 @@ class IAddressProvider;
 
 
 /**
-	Interface descibing a natural contact.
+	Interface describing the contact information.
 	\ingroup Authentification
 */
 class IContactInfo: virtual public iser::IObject
@@ -30,12 +30,16 @@ public:
 		GT_MALE
 	};
 
+	I_DECLARE_ENUM(GenderType, GT_DIVERSE, GT_FEMALE, GT_MALE);
+
 	enum NameFieldType
 	{
 		NFT_FIRST_NAME,
 		NFT_LAST_NAME,
 		NFT_NICKNAME
 	};
+
+	I_DECLARE_ENUM(NameFieldType, NFT_FIRST_NAME, NFT_LAST_NAME, NFT_NICKNAME);
 
 	enum MetaInfoTypes
 	{

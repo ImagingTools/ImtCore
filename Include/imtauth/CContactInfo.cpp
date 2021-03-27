@@ -154,20 +154,10 @@ bool CContactInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_email);
 	retVal = retVal && archive.EndTag(emailTag);
 
-	int genderType = m_genderType;
-
 	static iser::CArchiveTag genderTypeTag("GenderType", "Gender type", iser::CArchiveTag::TT_LEAF);
 	retVal= archive.BeginTag(genderTypeTag);
-	retVal = retVal && archive.Process(genderType);
+	retVal = retVal && I_SERIALIZE_ENUM(GenderType, archive, m_genderType);
 	retVal = retVal && archive.EndTag(genderTypeTag);
-
-	if (!archive.IsStoring()){
-		m_genderType = GT_DIVERSE;
-
-		if (genderType >= 0 && genderType <= GT_MALE){
-			m_genderType = (GenderType)genderType;
-		}
-	}
 
 	static iser::CArchiveTag birthdayTag("Birthday", "Birthday", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(birthdayTag);
