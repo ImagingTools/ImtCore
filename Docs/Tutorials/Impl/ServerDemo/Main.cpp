@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[])
 {
-    CServerDemo instance;
+	CServerDemo instance;
 
 	ibase::IApplication* applicationPtr = instance.GetInterface<ibase::IApplication>();
 	if (applicationPtr != NULL){

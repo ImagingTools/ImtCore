@@ -9,6 +9,9 @@ namespace imtrest
 {
 
 
+/**
+	Common interface for a request object.
+*/
 class IRequest: virtual public INetworkObject
 {
 public:
