@@ -9,7 +9,7 @@
 #include <iattr/CAttributesManager.h>
 #include <iprm/COptionsManager.h>
 
-// Cells includes
+// ImtCore includes
 #include <imtpy/IScriptEngine.h>
 
 
