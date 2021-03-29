@@ -108,6 +108,8 @@ void CContactInfoEditorComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
+	BirthdayGroup->hide();
+
 	AddAddress->setDefaultAction(&m_addAddressAction);
 	RemoveAddress->setDefaultAction(&m_removeAddressAction);
 

@@ -15,7 +15,8 @@ namespace imtlic
 // public methods
 
 CProductLicensingInfo::CProductLicensingInfo()
-	:m_productListPtr(nullptr)
+	:m_productListPtr(nullptr),
+	m_accountListPtr(nullptr)
 {
 }
 
@@ -25,6 +26,12 @@ CProductLicensingInfo::CProductLicensingInfo()
 const imtbase::ICollectionInfo* CProductLicensingInfo::GetProductList() const
 {
 	return m_productListPtr;
+}
+
+
+const imtbase::ICollectionInfo* CProductLicensingInfo::GetAccountList() const
+{
+	return m_accountListPtr;
 }
 
 

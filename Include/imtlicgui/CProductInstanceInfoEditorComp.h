@@ -40,12 +40,6 @@ public:
 
 	CProductInstanceInfoEditorComp();
 
-protected:
-	void OnProductsUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* productCollectionPtr);
-	void OnLicensesUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* productCollectionPtr);
-	void UpdateProductsCombo();
-	void UpdateLicenseInstancesEdit();
-
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelAttached() override;
@@ -60,6 +54,14 @@ private Q_SLOTS:
 	void on_ProductInstanceIdEdit_editingFinished();
 	void on_ProductCombo_currentIndexChanged(int index);
 	void on_LicenseInstancesEdit_itemChanged(QTreeWidgetItem *item, int column);
+	void on_CustomerCombo_currentIndexChanged(int index);
+
+private:
+	void OnProductsUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* productCollectionPtr);
+	void OnLicensesUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* productCollectionPtr);
+	void OnCustomersUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* productCollectionPtr);
+	void UpdateProductsCombo();
+	void UpdateLicenseInstancesEdit();
 
 private:
 	class DateTimeDelegate: public QStyledItemDelegate
@@ -84,6 +86,7 @@ private:
 
 	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CProductInstanceInfoEditorComp> m_productCollectionObserver;
 	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CProductInstanceInfoEditorComp> m_licenseCollectionObserver;
+	imtbase::TModelUpdateBinder<imtbase::IObjectCollection, CProductInstanceInfoEditorComp> m_customerCollectionObserver;
 };
 
 

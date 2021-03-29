@@ -16,6 +16,10 @@ void CProductLicensingInfoComp::OnComponentCreated()
 	if (m_productCollectionCompPtr.IsValid()){
 		m_productListPtr = m_productCollectionCompPtr.GetPtr();
 	}
+
+	if (m_accountCollectionCompPtr.IsValid()){
+		m_accountListPtr = m_accountCollectionCompPtr.GetPtr();
+	}
 }
 
 

@@ -48,7 +48,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="CityGroup">
+    <widget class="QGroupBox" name="BirthdayGroup">
      <property name="maximumSize">
       <size>
        <width>600</width>

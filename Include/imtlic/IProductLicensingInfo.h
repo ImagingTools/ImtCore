@@ -21,6 +21,11 @@ public:
 		Get the list of all available products.
 	*/
 	virtual const imtbase::ICollectionInfo* GetProductList() const = 0;
+
+	/**
+		Get the list of all available accounts.
+	*/
+	virtual const imtbase::ICollectionInfo* GetAccountList() const = 0;
 };
 
 
