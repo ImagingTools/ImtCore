@@ -292,7 +292,7 @@
         </size>
        </property>
        <property name="title">
-        <string>Addresses</string>
+        <string>Company Address</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
