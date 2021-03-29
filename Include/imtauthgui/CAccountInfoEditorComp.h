@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtauth/IAccountInfo.h>
+#include <imtauth/IAddress.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h>
@@ -36,8 +37,10 @@ public:
 	I_BEGIN_COMPONENT(CAccountInfoEditorComp);
 		I_ASSIGN(m_accountPictureGuiCompPtr, "AccountPictureView", "Account picture view", true, "ImageView");
 		I_ASSIGN_TO(m_accountPictureObserverCompPtr, m_accountPictureGuiCompPtr, true);
-		I_ASSIGN(m_contactEditorCompPtr, "ContactEditor", "Contact editor", true, "ContactInfoEditor");
-		I_ASSIGN_TO(m_contactEditorObserverCompPtr, m_contactEditorCompPtr, true);
+		I_ASSIGN(m_personContactEditorCompPtr, "PersonContactEditor", "Person contact editor", true, "ContactInfoEditor");
+		I_ASSIGN_TO(m_personContactEditorObserverCompPtr, m_personContactEditorCompPtr, true);
+		I_ASSIGN(m_companyContactEditorCompPtr, "CompanyContactEditor", "Company contact editor", true, "ContactInfoEditor");
+		I_ASSIGN_TO(m_companyContactEditorObserverCompPtr, m_companyContactEditorCompPtr, true);
 		I_ASSIGN(m_bitmapLoaderCompPtr, "BitmapLoader", "Bitmap loader", true, "BitmapLoader");
 	I_END_COMPONENT;
 
@@ -54,6 +57,10 @@ protected:
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 
+private:
+	void EnableCompanyAddress(bool enabled);
+	void OnAddressUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtauth::IAddress* addressPtr);
+
 private Q_SLOTS:
 	void on_ContactCombo_currentIndexChanged(int index);
 	void on_AccountTypeCombo_currentIndexChanged(int index);
@@ -65,14 +72,18 @@ private Q_SLOTS:
 private:
 	I_REF(iqtgui::IGuiObject, m_accountPictureGuiCompPtr);
 	I_REF(imod::IObserver, m_accountPictureObserverCompPtr);
-	I_REF(iqtgui::IGuiObject, m_contactEditorCompPtr);
-	I_REF(imod::IObserver, m_contactEditorObserverCompPtr);
+	I_REF(iqtgui::IGuiObject, m_personContactEditorCompPtr);
+	I_REF(imod::IObserver, m_personContactEditorObserverCompPtr);
+	I_REF(iqtgui::IGuiObject, m_companyContactEditorCompPtr);
+	I_REF(imod::IObserver, m_companyContactEditorObserverCompPtr);
 	I_REF(ifile::IFilePersistence, m_bitmapLoaderCompPtr);
 
 	bool m_isComboChangedSignalBlocked;
 
 	QAction m_loadAccountPictureAction;
 	QAction m_removeAccountPictureAction;
+
+	imtbase::TModelUpdateBinder<imtauth::IAddress, CAccountInfoEditorComp> m_addressObserver;
 };
 
 

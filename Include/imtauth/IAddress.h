@@ -6,9 +6,6 @@
 #include <iser/IObject.h>
 
 
-class QDate;
-
-
 namespace imtauth
 {
 

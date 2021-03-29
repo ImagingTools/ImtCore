@@ -23,8 +23,21 @@ void CContactInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 	imtauth::IContactInfo* contactPtr = GetObservedObject();
 	Q_ASSERT(contactPtr != nullptr);
 
-	EMailEdit->setText(contactPtr->GetMail());
+	GenderCombo->addItem(tr("Diverse"));
+	GenderCombo->addItem(tr("Female"));
+	GenderCombo->addItem(tr("Male"));
+	switch (contactPtr->GetGenderType()){
+	case imtauth::IContactInfo::GT_FEMALE:
+		GenderCombo->setCurrentIndex(1);
+		break;
+	case imtauth::IContactInfo::GT_MALE:
+		GenderCombo->setCurrentIndex(2);
+		break;
+	default:
+		GenderCombo->setCurrentIndex(0);
+	}
 
+	EMailEdit->setText(contactPtr->GetMail());
 	BirthdayEdit->setDate(contactPtr->GetBirthday());
 	FirstNameEdit->setText(contactPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME));
 	LastNameEdit->setText(contactPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME));
@@ -75,6 +88,7 @@ void CContactInfoEditorComp::UpdateModel() const
 
 	contactPtr->SetEmail(EMailEdit->text());
 	contactPtr->SetBirthday(BirthdayEdit->date());
+	contactPtr->SetGenderType(imtauth::IContactInfo::GenderType(GenderCombo->currentIndex()));
 	contactPtr->SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, FirstNameEdit->text());
 	contactPtr->SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, LastNameEdit->text());
 	contactPtr->SetNameField(imtauth::IContactInfo::NFT_NICKNAME, NicknameEdit->text());
@@ -115,6 +129,14 @@ void CContactInfoEditorComp::OnGuiCreated()
 
 	m_addAddressAction.setIcon(QIcon(":/Icons/Add"));
 	m_removeAddressAction.setIcon(QIcon(":/Icons/Remove"));
+
+	EMailGroup->setVisible(*m_showMailEditAttrPtr);
+	BirthdayGroup->setVisible(*m_showBirthdayEditAttrPtr);
+	GenderGroup->setVisible(*m_showGenderEditAttrPtr);
+	FirstNameGroup->setVisible(*m_showFirstNameEditAttrPtr);
+	LastNameGroup->setVisible(*m_showLastNameEditAttrPtr);
+	NicknameGroup->setVisible(*m_showNickNameEditAttrPtr);
+	AddressesGroup->setVisible(*m_showAddressesEditAttrPtr);
 }
 
 
@@ -135,6 +157,12 @@ void CContactInfoEditorComp::on_EMailEdit_editingFinished()
 void CContactInfoEditorComp::on_BirthdayEdit_dateChanged(const QDate &date)
 {
 	DoUpdateModel();
+}
+
+
+void CContactInfoEditorComp::on_GenderCombo_currentIndexChanged(int index)
+{
+
 }
 
 

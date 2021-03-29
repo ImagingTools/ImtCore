@@ -11,7 +11,9 @@
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
+#include <imtauth/IAddressManager.h>
 #include <imtauth/IContactInfo.h>
+#include <imtauth/CAddress.h>
 
 
 namespace imtauthgui
@@ -21,7 +23,8 @@ namespace imtauthgui
 // public methods
 
 CAccountInfoEditorComp::CAccountInfoEditorComp()
-	:m_isComboChangedSignalBlocked(false)
+	:m_isComboChangedSignalBlocked(false),
+	m_addressObserver(*this)
 {
 }
 
@@ -34,18 +37,26 @@ void CAccountInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 {
 	imtauth::IAccountInfo* accountPtr = GetObservedObject();
 	Q_ASSERT(accountPtr != nullptr);
+	
+	istd::CChangeGroup changeGroup(GetObservedObject());
 
 	m_isComboChangedSignalBlocked = true;
 
 	switch (accountPtr->GetAccountType()){
 	case imtauth::IAccountInfo::AT_PERSON:
 		AccountTypeCombo->setCurrentIndex(0);
+		ContactStackedWidget->setCurrentIndex(0);
+		EnableCompanyAddress(false);
 		break;
 	case imtauth::IAccountInfo::AT_COMPANY:
 		AccountTypeCombo->setCurrentIndex(1);
+		ContactStackedWidget->setCurrentIndex(1);
+		EnableCompanyAddress(true);
 		break;
 	default:
 		AccountTypeCombo->setCurrentIndex(-1);
+		ContactStackedWidget->setCurrentIndex(-1);
+		EnableCompanyAddress(false);
 	}
 
 	m_isComboChangedSignalBlocked = false;
@@ -68,13 +79,17 @@ void CAccountInfoEditorComp::OnGuiModelAttached()
 		}
 	}
 
-	if (m_contactEditorObserverCompPtr.IsValid()){
-		imod::IModel* contactModelPtr = dynamic_cast<imod::IModel*>(
-					const_cast<imtauth::IContactInfo*>(
-								GetObservedObject()->GetAccountOwner()));
+	imod::IModel* contactModelPtr = dynamic_cast<imod::IModel*>(
+				const_cast<imtauth::IContactInfo*>(
+							GetObservedObject()->GetAccountOwner()));
 
-		if (contactModelPtr != nullptr){
-			contactModelPtr->AttachObserver(m_contactEditorObserverCompPtr.GetPtr());
+	if (contactModelPtr != nullptr){
+		if (m_personContactEditorObserverCompPtr.IsValid()){
+			contactModelPtr->AttachObserver(m_personContactEditorObserverCompPtr.GetPtr());
+		}
+
+		if (m_companyContactEditorObserverCompPtr.IsValid()){
+			contactModelPtr->AttachObserver(m_companyContactEditorObserverCompPtr.GetPtr());
 		}
 	}
 }
@@ -137,16 +152,26 @@ void CAccountInfoEditorComp::OnGuiCreated()
 		m_accountPictureGuiCompPtr->CreateGui(AccountPicture);
 	}
 
-	if (m_contactEditorCompPtr.IsValid() && m_contactEditorObserverCompPtr.IsValid()){
-		m_contactEditorCompPtr->CreateGui(ContactEditor);
+	if (m_personContactEditorCompPtr.IsValid() && m_personContactEditorObserverCompPtr.IsValid()){
+		m_personContactEditorCompPtr->CreateGui(PersonContactEditor);
+	}
+
+	if (m_companyContactEditorCompPtr.IsValid() && m_companyContactEditorObserverCompPtr.IsValid()){
+		m_companyContactEditorCompPtr->CreateGui(CompanyContactEditor);
 	}
 }
 
 
 void CAccountInfoEditorComp::OnGuiDestroyed()
 {
-	if (m_contactEditorCompPtr.IsValid() && m_contactEditorCompPtr->IsGuiCreated()){
-		m_contactEditorCompPtr->DestroyGui();
+	m_addressObserver.UnregisterAllObjects();
+
+	if (m_companyContactEditorCompPtr.IsValid() && m_companyContactEditorCompPtr->IsGuiCreated()){
+		m_companyContactEditorCompPtr->DestroyGui();
+	}
+
+	if (m_personContactEditorCompPtr.IsValid() && m_personContactEditorCompPtr->IsGuiCreated()){
+		m_personContactEditorCompPtr->DestroyGui();
 	}
 
 	if (m_accountPictureGuiCompPtr.IsValid() && m_accountPictureGuiCompPtr->IsGuiCreated()){
@@ -154,6 +179,66 @@ void CAccountInfoEditorComp::OnGuiDestroyed()
 	}
 
 	BaseClass::OnGuiDestroyed();
+}
+
+
+// private methods
+
+void CAccountInfoEditorComp::EnableCompanyAddress(bool enabled)
+{
+	UpdateBlocker blocker(this);
+
+	if (enabled){
+		imtauth::IAccountInfo* accountPtr = GetObservedObject();
+		if (accountPtr != nullptr){
+			const imtauth::IContactInfo* contactPtr = accountPtr->GetAccountOwner();
+			if (contactPtr != nullptr){
+				imtauth::IAddressManager* addressManager = dynamic_cast<imtauth::IAddressManager*>(
+					const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
+
+				if (addressManager != nullptr){
+					imtbase::ICollectionInfo::Ids ids = addressManager->GetAddressList().GetElementIds();
+					if (ids.count() == 0){
+						imtauth::CAddress* addressPtr = new imtauth::CAddress();
+
+						addressManager->AddAddress(addressPtr);
+					}
+					else if (ids.count() > 1){
+						for (int i = 1; i < ids.count(); i++){
+							addressManager->RemoveAddress(ids[i]);
+						}
+					}
+				}
+
+				imtbase::ICollectionInfo::Ids ids = addressManager->GetAddressList().GetElementIds();
+				Q_ASSERT(ids.count() == 1);
+
+				m_addressObserver.RegisterObject(
+							addressManager->GetAddress(ids[0]),
+							&CAccountInfoEditorComp::OnAddressUpdated);
+			}
+
+			AddressesGroup->show();
+		}
+	}
+	else{
+		m_addressObserver.UnregisterAllObjects();
+		AddressesGroup->hide();
+	}
+}
+
+
+void CAccountInfoEditorComp::OnAddressUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtauth::IAddress* addressPtr)
+{
+	Addresses->clear();
+
+	QTreeWidgetItem* itemPtr = new QTreeWidgetItem({
+		addressPtr->GetCountry(),
+		addressPtr->GetCity(),
+		QString::number(addressPtr->GetPostalCode())});
+
+	itemPtr->setFlags(itemPtr->flags() | Qt::ItemIsEditable);
+	Addresses->addTopLevelItem(itemPtr);
 }
 
 
@@ -170,7 +255,26 @@ void CAccountInfoEditorComp::on_ContactCombo_currentIndexChanged(int index)
 void CAccountInfoEditorComp::on_AccountTypeCombo_currentIndexChanged(int index)
 {
 	if (!m_isComboChangedSignalBlocked){
+		istd::CChangeGroup changeGroup(GetObservedObject());
+
 		DoUpdateModel();
+
+		imtauth::IAccountInfo* accountPtr = GetObservedObject();
+		if (accountPtr != nullptr){
+			switch (accountPtr->GetAccountType()){
+			case imtauth::IAccountInfo::AT_PERSON:
+				ContactStackedWidget->setCurrentIndex(0);
+				EnableCompanyAddress(false);
+				break;
+			case imtauth::IAccountInfo::AT_COMPANY:
+				ContactStackedWidget->setCurrentIndex(1);
+				EnableCompanyAddress(true);
+				break;
+			default:
+				ContactStackedWidget->setCurrentIndex(-1);
+				EnableCompanyAddress(false);
+			}
+		}
 	}
 }
 

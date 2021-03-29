@@ -25,9 +25,9 @@ QByteArray CContactInfo::GetTypeId()
 
 CContactInfo::CContactInfo()
 	:m_genderType(GT_DIVERSE), // :)
-	m_firstName("DefaultFirstName"),
-	m_lastName("DefaultLastName"),
-	m_nickName("DefaultNickname"),
+	m_firstName(""),
+	m_lastName(""),
+	m_nickName(""),
 	m_modelUpdateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
 {
 	m_addresses.AttachObserver(&m_modelUpdateBridge);
