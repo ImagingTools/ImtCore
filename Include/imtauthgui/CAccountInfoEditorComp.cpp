@@ -23,8 +23,7 @@ namespace imtauthgui
 // public methods
 
 CAccountInfoEditorComp::CAccountInfoEditorComp()
-	:m_isComboChangedSignalBlocked(false),
-	m_addressObserver(*this)
+	:m_addressObserver(*this)
 {
 }
 
@@ -37,29 +36,22 @@ void CAccountInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 {
 	imtauth::IAccountInfo* accountPtr = GetObservedObject();
 	Q_ASSERT(accountPtr != nullptr);
-	
-	istd::CChangeGroup changeGroup(GetObservedObject());
-
-	m_isComboChangedSignalBlocked = true;
 
 	switch (accountPtr->GetAccountType()){
 	case imtauth::IAccountInfo::AT_PERSON:
 		AccountTypeCombo->setCurrentIndex(0);
 		ContactStackedWidget->setCurrentIndex(0);
-		EnableCompanyAddress(false);
 		break;
+
 	case imtauth::IAccountInfo::AT_COMPANY:
 		AccountTypeCombo->setCurrentIndex(1);
 		ContactStackedWidget->setCurrentIndex(1);
-		EnableCompanyAddress(true);
 		break;
+
 	default:
 		AccountTypeCombo->setCurrentIndex(-1);
 		ContactStackedWidget->setCurrentIndex(-1);
-		EnableCompanyAddress(false);
 	}
-
-	m_isComboChangedSignalBlocked = false;
 
 	AccountNameEdit->setText(accountPtr->GetAccountName());
 	AccountDescriptionEdit->setText(accountPtr->GetAccountDescription());
@@ -126,6 +118,8 @@ void CAccountInfoEditorComp::UpdateModel() const
 	accountPtr->SetAccountType((imtauth::IAccountInfo::AccountType)AccountTypeCombo->currentIndex());
 	accountPtr->SetAccountName(AccountNameEdit->text());
 	accountPtr->SetAccountDescription(AccountDescriptionEdit->text());
+
+	EnableCompanyAddress(accountPtr->GetAccountType() == imtauth::IAccountInfo::AT_COMPANY);
 }
 
 
@@ -135,10 +129,8 @@ void CAccountInfoEditorComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	m_isComboChangedSignalBlocked = true;
 	AccountTypeCombo->addItem(tr("Personal"));
 	AccountTypeCombo->addItem(tr("Company"));
-	m_isComboChangedSignalBlocked = false;
 
 	m_loadAccountPictureAction.setIcon(QIcon(":/Icons/Workflow"));
 	m_removeAccountPictureAction.setIcon(QIcon(":/Icons/Remove"));
@@ -184,10 +176,8 @@ void CAccountInfoEditorComp::OnGuiDestroyed()
 
 // private methods
 
-void CAccountInfoEditorComp::EnableCompanyAddress(bool enabled)
+void CAccountInfoEditorComp::EnableCompanyAddress(bool enabled) const
 {
-	UpdateBlocker blocker(this);
-
 	if (enabled){
 		imtauth::IAccountInfo* accountPtr = GetObservedObject();
 		if (accountPtr != nullptr){
@@ -198,7 +188,7 @@ void CAccountInfoEditorComp::EnableCompanyAddress(bool enabled)
 
 				if (addressManager != nullptr){
 					imtbase::ICollectionInfo::Ids ids = addressManager->GetAddressList().GetElementIds();
-					if (ids.count() == 0){
+					if (ids.isEmpty()){
 						imtauth::CAddress* addressPtr = new imtauth::CAddress();
 
 						addressManager->AddAddress(addressPtr);
@@ -228,7 +218,7 @@ void CAccountInfoEditorComp::EnableCompanyAddress(bool enabled)
 }
 
 
-void CAccountInfoEditorComp::OnAddressUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtauth::IAddress* addressPtr)
+void CAccountInfoEditorComp::OnAddressUpdated(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtauth::IAddress* addressPtr)
 {
 	Addresses->clear();
 
@@ -246,34 +236,25 @@ void CAccountInfoEditorComp::OnAddressUpdated(const istd::IChangeable::ChangeSet
 
 void CAccountInfoEditorComp::on_ContactCombo_currentIndexChanged(int index)
 {
-	if (!m_isComboChangedSignalBlocked){
-		DoUpdateModel();
-	}
+	DoUpdateModel();
 }
 
 
-void CAccountInfoEditorComp::on_AccountTypeCombo_currentIndexChanged(int index)
+void CAccountInfoEditorComp::on_AccountTypeCombo_currentIndexChanged(int /*index*/)
 {
-	if (!m_isComboChangedSignalBlocked){
-		istd::CChangeGroup changeGroup(GetObservedObject());
+	DoUpdateModel();
 
-		DoUpdateModel();
-
-		imtauth::IAccountInfo* accountPtr = GetObservedObject();
-		if (accountPtr != nullptr){
-			switch (accountPtr->GetAccountType()){
-			case imtauth::IAccountInfo::AT_PERSON:
-				ContactStackedWidget->setCurrentIndex(0);
-				EnableCompanyAddress(false);
-				break;
-			case imtauth::IAccountInfo::AT_COMPANY:
-				ContactStackedWidget->setCurrentIndex(1);
-				EnableCompanyAddress(true);
-				break;
-			default:
-				ContactStackedWidget->setCurrentIndex(-1);
-				EnableCompanyAddress(false);
-			}
+	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	if (accountPtr != nullptr){
+		switch (accountPtr->GetAccountType()){
+		case imtauth::IAccountInfo::AT_PERSON:
+			ContactStackedWidget->setCurrentIndex(0);
+			break;
+		case imtauth::IAccountInfo::AT_COMPANY:
+			ContactStackedWidget->setCurrentIndex(1);
+			break;
+		default:
+			ContactStackedWidget->setCurrentIndex(-1);
 		}
 	}
 }
