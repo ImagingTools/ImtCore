@@ -23,7 +23,8 @@ namespace imtauthgui
 // public methods
 
 CAccountInfoEditorComp::CAccountInfoEditorComp()
-	:m_addressObserver(*this)
+	:m_addressObserver(*this),
+	m_blockComboChanged(false)
 {
 }
 
@@ -55,6 +56,7 @@ void CAccountInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 
 	AccountNameEdit->setText(accountPtr->GetAccountName());
 	AccountDescriptionEdit->setText(accountPtr->GetAccountDescription());
+	SetCompanyAddressVisibility(accountPtr->GetAccountType() == imtauth::IAccountInfo::AT_COMPANY);
 }
 
 
@@ -119,7 +121,11 @@ void CAccountInfoEditorComp::UpdateModel() const
 	accountPtr->SetAccountName(AccountNameEdit->text());
 	accountPtr->SetAccountDescription(AccountDescriptionEdit->text());
 
-	EnableCompanyAddress(accountPtr->GetAccountType() == imtauth::IAccountInfo::AT_COMPANY);
+	if (accountPtr->GetAccountType() == imtauth::IAccountInfo::AT_COMPANY){
+		SetupCompanyAddress();
+	}
+
+	SetCompanyAddressVisibility(accountPtr->GetAccountType() == imtauth::IAccountInfo::AT_COMPANY);
 }
 
 
@@ -129,8 +135,10 @@ void CAccountInfoEditorComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
+	m_blockComboChanged = true;
 	AccountTypeCombo->addItem(tr("Personal"));
 	AccountTypeCombo->addItem(tr("Company"));
+	m_blockComboChanged = false;
 
 	m_loadAccountPictureAction.setIcon(QIcon(":/Icons/Workflow"));
 	m_removeAccountPictureAction.setIcon(QIcon(":/Icons/Remove"));
@@ -176,35 +184,20 @@ void CAccountInfoEditorComp::OnGuiDestroyed()
 
 // private methods
 
-void CAccountInfoEditorComp::EnableCompanyAddress(bool enabled) const
+void CAccountInfoEditorComp::SetCompanyAddressVisibility(bool visibility) const
 {
-	if (enabled){
+	if (visibility){
 		imtauth::IAccountInfo* accountPtr = GetObservedObject();
 		if (accountPtr != nullptr){
 			const imtauth::IContactInfo* contactPtr = accountPtr->GetAccountOwner();
 			if (contactPtr != nullptr){
-				imtauth::IAddressManager* addressManager = dynamic_cast<imtauth::IAddressManager*>(
-					const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
+				const imtauth::IAddressProvider* addressProviderPtr = contactPtr->GetAddresses();
 
-				if (addressManager != nullptr){
-					imtbase::ICollectionInfo::Ids ids = addressManager->GetAddressList().GetElementIds();
-					if (ids.isEmpty()){
-						imtauth::CAddress* addressPtr = new imtauth::CAddress();
-
-						addressManager->AddAddress(addressPtr);
-					}
-					else if (ids.count() > 1){
-						for (int i = 1; i < ids.count(); i++){
-							addressManager->RemoveAddress(ids[i]);
-						}
-					}
-				}
-
-				imtbase::ICollectionInfo::Ids ids = addressManager->GetAddressList().GetElementIds();
+				imtbase::ICollectionInfo::Ids ids = addressProviderPtr->GetAddressList().GetElementIds();
 				Q_ASSERT(ids.count() == 1);
 
 				m_addressObserver.RegisterObject(
-							addressManager->GetAddress(ids[0]),
+							addressProviderPtr->GetAddress(ids[0]),
 							&CAccountInfoEditorComp::OnAddressUpdated);
 			}
 
@@ -214,6 +207,33 @@ void CAccountInfoEditorComp::EnableCompanyAddress(bool enabled) const
 	else{
 		m_addressObserver.UnregisterAllObjects();
 		AddressesGroup->hide();
+	}
+}
+
+
+void CAccountInfoEditorComp::SetupCompanyAddress() const
+{
+	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	if (accountPtr != nullptr){
+		const imtauth::IContactInfo* contactPtr = accountPtr->GetAccountOwner();
+		if (contactPtr != nullptr){
+			imtauth::IAddressManager* addressManager = dynamic_cast<imtauth::IAddressManager*>(
+						const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
+
+			if (addressManager != nullptr){
+				imtbase::ICollectionInfo::Ids ids = addressManager->GetAddressList().GetElementIds();
+				if (ids.isEmpty()){
+					imtauth::CAddress* addressPtr = new imtauth::CAddress();
+
+					addressManager->AddAddress(addressPtr);
+				}
+				else if (ids.count() > 1){
+					for (int i = 1; i < ids.count(); i++){
+						addressManager->RemoveAddress(ids[i]);
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -242,6 +262,10 @@ void CAccountInfoEditorComp::on_ContactCombo_currentIndexChanged(int index)
 
 void CAccountInfoEditorComp::on_AccountTypeCombo_currentIndexChanged(int /*index*/)
 {
+	if (m_blockComboChanged){
+		return;
+	}
+
 	DoUpdateModel();
 
 	imtauth::IAccountInfo* accountPtr = GetObservedObject();

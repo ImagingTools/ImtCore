@@ -58,7 +58,8 @@ protected:
 	virtual void OnGuiDestroyed() override;
 
 private:
-	void EnableCompanyAddress(bool enabled) const;
+	void SetCompanyAddressVisibility(bool visibility) const;
+	void SetupCompanyAddress() const;
 	void OnAddressUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtauth::IAddress* addressPtr);
 
 private Q_SLOTS:
@@ -80,6 +81,8 @@ private:
 
 	QAction m_loadAccountPictureAction;
 	QAction m_removeAccountPictureAction;
+
+	bool m_blockComboChanged;
 
 	mutable imtbase::TModelUpdateBinder<imtauth::IAddress, CAccountInfoEditorComp> m_addressObserver;
 };
