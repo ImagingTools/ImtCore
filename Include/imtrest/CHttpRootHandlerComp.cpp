@@ -16,7 +16,7 @@ namespace imtrest
 
 // reimplemented (IProtocolEngine)
 
-bool CHttpRootHandlerComp::ProcessRequest(const IRequest& request) const
+const imtrest::IResponse* CHttpRootHandlerComp::ProcessRequest(const IRequest& request) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 
@@ -31,10 +31,9 @@ bool CHttpRootHandlerComp::ProcessRequest(const IRequest& request) const
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
 		istd::TDelPtr<IResponse> responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
-		if (responsePtr.IsValid()){
-			engine.GetResponder().SendResponse(*responsePtr);
+        if (responsePtr.IsValid()){
 
-			return false;
+            return nullptr;
 		}
 	}
 	const IRequestHandler* handlerPtr = FindRequestHandler(commandId);

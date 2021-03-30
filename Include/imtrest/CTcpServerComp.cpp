@@ -6,6 +6,8 @@
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
+#include <imtrest/IResponse.h>
+#include <imtrest/IResponder.h>
 
 
 namespace imtrest
@@ -16,13 +18,18 @@ namespace imtrest
 
 // reimplemented (IRequestHandler)
 
-bool CTcpServerComp::ProcessRequest(const IRequest& request) const
+const imtrest::IResponse* CTcpServerComp::ProcessRequest(const IRequest& request) const
 {
 	if (m_requestHandlerCompPtr.IsValid()){
-		return m_requestHandlerCompPtr->ProcessRequest(request);
+        const IResponse* responsePtr = m_requestHandlerCompPtr->ProcessRequest(request);
+        if(responsePtr != nullptr)
+        {
+            request.GetProtocolEngine().GetResponder().SendResponse(*responsePtr);
+            delete responsePtr;
+        }
 	}
 
-	return false;
+    return nullptr;
 }
 
 

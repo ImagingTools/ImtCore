@@ -8,13 +8,21 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationInfo" X="450" Y="200" Note=""/>
-        <Element ComponentName="ConsoleApplication" X="700" Y="200" Note=""/>
-        <Element ComponentName="ConsoleLog" X="1000" Y="50" Note=""/>
-        <Element ComponentName="ExamplePath" X="1000" Y="525" Note=""/>
-        <Element ComponentName="HttpFileBasedHandler" X="1000" Y="400" Note=""/>
-        <Element ComponentName="HttpServerFramework" X="1000" Y="200" Note=""/>
-        <Element ComponentName="VersionInfo" X="175" Y="200" Note=""/>
+        <Element ComponentName="ApplicationInfo" X="125" Y="100" Note=""/>
+        <Element ComponentName="ConsoleApplication" X="125" Y="175" Note=""/>
+        <Element ComponentName="ConsoleLog" X="750" Y="350" Note=""/>
+        <Element ComponentName="HttpServerFramework" X="400" Y="25" Note=""/>
+        <Element ComponentName="ServletsGroup" X="425" Y="350" Note=""/>
+        <Element ComponentName="VersionInfo" X="125" Y="25" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries/>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="ServletsGroup">
+            <PositionMap>
+                <Element ComponentName="HttpDemoServlet" X="438" Y="275" Note=""/>
+                <Element ComponentName="HttpDemoServlet_1" X="775" Y="275" Note=""/>
+                <Element ComponentName="HttpDemoServlet_2" X="602" Y="419" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
 </Acf>

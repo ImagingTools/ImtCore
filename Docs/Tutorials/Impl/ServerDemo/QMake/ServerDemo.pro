@@ -8,10 +8,14 @@ INCLUDEPATH += $(IMTCOREDIR)/Include
 INCLUDEPATH += $(IMTCOREDIR)/Impl
 INCLUDEPATH +=  $$AUXINCLUDEDIR
 
-LIBS += -L../../../../../Lib/$$COMPILER_DIR -limeas -liproc -lAcfSlnLoc -lAcfLoc
-LIBS += -L../../../../../Lib/$$COMPILER_DIR -limtbase -limtrest
 
-HEADERS =
+INCLUDEPATH += $$OUT_PWD/../../../Include
+INCLUDEPATH += $$_PRO_FILE_PWD_/../../../Include
+
+LIBS += -L$$OUT_PWD
+
+LIBS += -L../../../../../Lib/$$COMPILER_DIR -limeas -liproc -lAcfSlnLoc -lAcfLoc
+LIBS += -L../../../../../Lib/$$COMPILER_DIR -limtbase -limtrest -lServletDemo
 
 QT += xml
 QT += network

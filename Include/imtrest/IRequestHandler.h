@@ -11,23 +11,14 @@ namespace imtrest
 
 class IRequest;
 class IProtocolEngine;
+class IResponse;
 
 
-/**
-	Interface for a request handler (servlet)
-*/
 class IRequestHandler: virtual public istd::IPolymorphic
 {
 public:
-	/**
-		Process required request.
-	*/
-	virtual bool ProcessRequest(const IRequest& request) const = 0;
-
-	/**
-		Get supported command-ID (e.g. EST sub-path) for the servlet.
-	*/
-	virtual QByteArray GetSupportedCommandId() const = 0;
+        virtual const IResponse* ProcessRequest(const IRequest& request) const = 0;
+    virtual QByteArray GetSupportedCommandId() const = 0;
 };
 
 

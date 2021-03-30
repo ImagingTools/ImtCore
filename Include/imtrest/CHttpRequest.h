@@ -36,6 +36,7 @@ public:
 
 	CHttpRequest(QAbstractSocket& socket, const IRequestHandler& requestHandler, const IProtocolEngine& engine);
 
+        QByteArrayList GetHeaders() const;
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
 	QUrl GetUrl() const;
 	MethodType GetMethodType() const;
