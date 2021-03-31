@@ -51,7 +51,7 @@ QByteArrayList CHttpRequest::GetHeaders() const
 }
 
 
-QByteArray CHttpRequest::GetHeaderValue(const QByteArray & headerType) const
+QByteArray CHttpRequest::GetHeaderValue(const QByteArray&  headerType) const
 {
 	if (m_headers.contains(headerType)){
 		return m_headers[headerType];
