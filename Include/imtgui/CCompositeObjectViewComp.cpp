@@ -43,7 +43,7 @@ void CCompositeObjectViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*c
 		return;
 	}
 
-	for (const QByteArray &id : ids){
+	for (const QByteArray& id : ids){
 		if (!m_objectIds.contains(id)){
 			DestroyView();
 			CreateView();

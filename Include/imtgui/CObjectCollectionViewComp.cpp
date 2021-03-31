@@ -481,7 +481,7 @@ void CObjectCollectionViewComp::UpdateCommands()
 }
 
 
-QVector<QByteArray> CObjectCollectionViewComp::GetMetaInfoIds(const QByteArray &typeId) const
+QVector<QByteArray> CObjectCollectionViewComp::GetMetaInfoIds(const QByteArray& typeId) const
 {
 	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
 	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();
@@ -489,7 +489,7 @@ QVector<QByteArray> CObjectCollectionViewComp::GetMetaInfoIds(const QByteArray &
 }
 
 
-QStringList CObjectCollectionViewComp::GetMetaInfoHeaders(const QByteArray &typeId) const
+QStringList CObjectCollectionViewComp::GetMetaInfoHeaders(const QByteArray& typeId) const
 {
 	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
 	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();
@@ -504,7 +504,7 @@ QStringList CObjectCollectionViewComp::GetMetaInfoHeaders(const QByteArray &type
 }
 
 
-CObjectCollectionViewComp::ObjectMetaInfo CObjectCollectionViewComp::GetMetaInfo(const QByteArray &itemId, const QByteArray &typeId) const
+CObjectCollectionViewComp::ObjectMetaInfo CObjectCollectionViewComp::GetMetaInfo(const QByteArray& itemId, const QByteArray& typeId) const
 {
 	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
 	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();

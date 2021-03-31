@@ -155,9 +155,11 @@ ImtPyPck.depends = imtpy
 # Tutorials
 	SUBDIRS += imtservletdemo
 	imtservletdemo.file = ../../Docs/Tutorials/Include/imtservletdemo/QMake/imtservletdemo.pro
+
 	SUBDIRS += ServletDemoPck
 	ServletDemoPck.file = ../../Docs/Tutorials/Impl/ServletDemoPck/QMake/ServletDemoPck.pro
-	ServletDemoPck.depends = ImtRestPck ImtCorePck
+        ServletDemoPck.depends = ImtRestPck ImtCorePck imtservletdemo
+
 	SUBDIRS += ServerDemo
 	ServerDemo.file = ../../Docs/Tutorials/Impl/ServerDemo/QMake/ServerDemo.pro
 	ServerDemo.depends = ServletDemoPck

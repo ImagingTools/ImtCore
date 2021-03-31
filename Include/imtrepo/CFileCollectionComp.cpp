@@ -1081,7 +1081,7 @@ const iprm::IOptionsList* CFileCollectionComp::GetObjectTypesInfo() const
 }
 
 
-imtbase::IObjectCollectionInfo::Id CFileCollectionComp::GetObjectTypeId(const QByteArray & objectId) const
+imtbase::IObjectCollectionInfo::Id CFileCollectionComp::GetObjectTypeId(const QByteArray&  objectId) const
 {
 	m_collectionLock.lockForRead();
 

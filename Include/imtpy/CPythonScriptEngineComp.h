@@ -56,7 +56,7 @@ protected:
 
 		// reimplemented (IAttributesMetaInfoProvider)
 		virtual iattr::IAttributesProvider::AttributeIds GetAttributeMetaIds() const override;
-		virtual const iattr::IAttributeMetaInfo* GetAttributeMetaInfo(const QByteArray & attributeId) const override;
+		virtual const iattr::IAttributeMetaInfo* GetAttributeMetaInfo(const QByteArray&  attributeId) const override;
 	};
 
 	typedef istd::TSmartPtr<Script> ScriptPtr;

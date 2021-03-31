@@ -49,14 +49,14 @@ const imtrest::IResponse* CHttpServletCompBase::ProcessRequest(const imtrest::IR
 
     switch (methodType)
     {
-    case HMT::MT_GET: this->OnGetRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_POST: this->OnPostRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_DELETE: this->OnDeleteRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_PATCH: this->OnPatchRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_PUT: this->OnPutRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_HEAD: this->OnHeadRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_OPTIONS: this->OnOptionsRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_UNKNOWN: this->OnUnknownRequestReceived(*httpRequest, engine); break;
+    case HMT::MT_GET: return this->OnGetRequestReceived(*httpRequest, engine); break;
+    case HMT::MT_POST: return this->OnPostRequestReceived(*httpRequest, engine); break;
+    case HMT::MT_DELETE: return this->OnDeleteRequestReceived(*httpRequest, engine); break;
+    case HMT::MT_PATCH: return this->OnPatchRequestReceived(*httpRequest, engine); break;
+    case HMT::MT_PUT: return this->OnPutRequestReceived(*httpRequest, engine); break;
+    case HMT::MT_HEAD: return this->OnHeadRequestReceived(*httpRequest, engine); break;
+    case HMT::MT_OPTIONS: return this->OnOptionsRequestReceived(*httpRequest, engine); break;
+    case HMT::MT_UNKNOWN: return this->OnUnknownRequestReceived(*httpRequest, engine); break;
     default: this->OnInvalidRequestReceived(*httpRequest, engine); break;
     }
 
@@ -305,7 +305,8 @@ const imtrest::IResponse* CHttpServletCompBase::OnInvalid(
 }
 
 imtrest::IResponse* CHttpServletCompBase::CreateDefaultErrorResponse(const QByteArray& errorString, const imtrest::CHttpRequest& request) const
-{    
+{
+    qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << errorString;
     return request.GetProtocolEngine().CreateResponse(
                         request,
                         imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,

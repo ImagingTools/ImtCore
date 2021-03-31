@@ -55,8 +55,6 @@
                     <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ServletsGroup/HttpDemoServlet_2</Value>
-                                <Value>ServletsGroup/HttpDemoServlet_1</Value>
                                 <Value>ServletsGroup/HttpDemoServlet</Value>
                             </Values>
                         </Data>
@@ -87,34 +85,7 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="news"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="HttpDemoServlet_1" PackageId="ServletDemoPck" ComponentId="HttpDemoServlet">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="feed"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="HttpDemoServlet_2" PackageId="ServletDemoPck" ComponentId="HttpDemoServlet">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="api"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -124,8 +95,6 @@
                 <ExportedInterfaces/>
                 <ExportedComponents>
                     <Component ExportedId="HttpDemoServlet" ComponentId="HttpDemoServlet"/>
-                    <Component ExportedId="HttpDemoServlet_1" ComponentId="HttpDemoServlet_1"/>
-                    <Component ExportedId="HttpDemoServlet_2" ComponentId="HttpDemoServlet_2"/>
                 </ExportedComponents>
             </Data>
         </EmbeddedRegistry>

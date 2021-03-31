@@ -18,9 +18,7 @@
     <EmbeddedRegistries>
         <EmbededRegistry Id="ServletsGroup">
             <PositionMap>
-                <Element ComponentName="HttpDemoServlet" X="438" Y="275" Note=""/>
-                <Element ComponentName="HttpDemoServlet_1" X="775" Y="275" Note=""/>
-                <Element ComponentName="HttpDemoServlet_2" X="602" Y="419" Note=""/>
+                <Element ComponentName="HttpDemoServlet" X="543" Y="230" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

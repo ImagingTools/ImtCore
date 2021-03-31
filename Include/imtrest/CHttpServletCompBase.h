@@ -23,14 +23,14 @@ namespace imtrest
 {
 
 
-class CHttpServletCompBase :
-	public ilog::CLoggerComponentBase,
-	virtual public imtrest::IRequestHandler
+class CHttpServletCompBase:
+			public ilog::CLoggerComponentBase,
+			virtual public imtrest::IRequestHandler
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CHttpServletCompBase);
+	I_BEGIN_BASE_COMPONENT(CHttpServletCompBase)
 		I_REGISTER_INTERFACE(IRequestHandler);
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "List of command-ID used with corresponded handlers", true, "");
 	I_END_COMPONENT
@@ -91,7 +91,9 @@ protected:
 
 protected:
 	virtual const imtrest::IResponse* OnGetRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const;
-	virtual const imtrest::IResponse* OnPostRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const;
+	virtual const imtrest::IResponse* OnPostRequestReceived(
+				const imtrest::CHttpRequest& request,
+				const imtrest::IProtocolEngine& engine) const;
 	virtual const imtrest::IResponse* OnDeleteRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const;
 	virtual const imtrest::IResponse* OnPatchRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const;
 	virtual const imtrest::IResponse* OnPutRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const;

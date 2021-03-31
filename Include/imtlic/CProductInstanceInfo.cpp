@@ -84,7 +84,7 @@ void CProductInstanceInfo::AddLicense(const QByteArray& licenseId, const QDateTi
 }
 
 
-void CProductInstanceInfo::RemoveLicense(const QByteArray & licenseId)
+void CProductInstanceInfo::RemoveLicense(const QByteArray&  licenseId)
 {
 	istd::CChangeNotifier changeNotifier(this);
 

@@ -315,7 +315,7 @@ QByteArray CCustomLayoutWidget::GetViewId()
 }
 
 
-void CCustomLayoutWidget::SetViewId(const QByteArray &viewId)
+void CCustomLayoutWidget::SetViewId(const QByteArray& viewId)
 {
 	m_viewId = viewId;
 }

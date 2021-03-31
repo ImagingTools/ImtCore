@@ -15,7 +15,7 @@ INCLUDEPATH += $$_PRO_FILE_PWD_/../../../Include
 LIBS += -L$$OUT_PWD
 
 LIBS += -L../../../../../Lib/$$COMPILER_DIR -limeas -liproc -lAcfSlnLoc -lAcfLoc
-LIBS += -L../../../../../Lib/$$COMPILER_DIR -limtbase -limtrest -lServletDemo
+LIBS += -L../../../../../Lib/$$COMPILER_DIR -limtbase -limtrest -lServletDemo -limtservletdemo
 
 QT += xml
 QT += network

@@ -39,7 +39,7 @@ public:
 	// reimplemented (IObjectCollectionInfo)
 	virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
 	virtual const iprm::IOptionsList * GetObjectTypesInfo() const override;
-	virtual Id GetObjectTypeId(const QByteArray & objectId) const override;
+	virtual Id GetObjectTypeId(const QByteArray&  objectId) const override;
 
 	// reimplemented (imtbase::ICollectionInfo)
 	virtual Ids GetElementIds() const override;

@@ -112,7 +112,7 @@ void CPageNavigationControllerComp::OnPageSelectionChanged()
 }
 
 
-void CPageNavigationControllerComp::GoToPage(const QByteArray & pageId)
+void CPageNavigationControllerComp::GoToPage(const QByteArray&  pageId)
 {
 	m_isUpdateBlocked = true;
 

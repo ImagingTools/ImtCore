@@ -102,11 +102,11 @@ public:
 	QString GetName();
 	void SetEditMode(bool isEditMode);
 	QByteArray GetId();
-	void SetId(const QByteArray &id);
+	void SetId(const QByteArray& id);
 	QPixmap GetIcon();
 	void SetIcon(const QPixmap &icon);
 	QByteArray GetViewId();
-	void SetViewId(const QByteArray &viewId);
+	void SetViewId(const QByteArray& viewId);
 	void SetTitleAlign(const ILayout::AlignType &align);
 	ILayout::AlignType GetTitleAlign();
     void SetLayoutProperties(const ILayout::LayoutProperties &properties);

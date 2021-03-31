@@ -213,9 +213,9 @@ private:
 
 	void UpdateCommands();
 
-	QVector<QByteArray> GetMetaInfoIds(const QByteArray &typeId) const;
-	QStringList GetMetaInfoHeaders(const QByteArray &typeId) const;
-	ObjectMetaInfo GetMetaInfo(const QByteArray &itemId, const QByteArray &typeId) const;
+	QVector<QByteArray> GetMetaInfoIds(const QByteArray& typeId) const;
+	QStringList GetMetaInfoHeaders(const QByteArray& typeId) const;
+	ObjectMetaInfo GetMetaInfo(const QByteArray& itemId, const QByteArray& typeId) const;
 
 	void UpdateItem(const imtbase::IObjectCollectionInfo::Id& objectId, QStandardItemModel* modelPtr);
 	void RemoveItem(const imtbase::IObjectCollectionInfo::Id& objectId);
