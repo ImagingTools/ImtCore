@@ -36,17 +36,31 @@ bool CAccountInfoMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
-	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_TYPE, (int)accountPtr->GetAccountType());
+	switch (accountPtr->GetAccountType()){
+	case IAccountInfo::AT_PERSON:
+		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_TYPE, QObject::tr("Person"));
+		break;
+	case IAccountInfo::AT_COMPANY:
+		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_TYPE, QObject::tr("Company"));
+		break;
+	default:
+		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_TYPE, QObject::tr("UNKNOWN"));
+		break;
+	}
+
 	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_NAME, accountPtr->GetAccountName());
 	metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_DESCRIPTION, accountPtr->GetAccountDescription());
 
 	IContactInfo* contactPtr = const_cast<IContactInfo*>(accountPtr->GetAccountOwner());
 	if (contactPtr != nullptr){
 		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_EMAIL, contactPtr->GetMail());
-		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_BIRTHDAY, contactPtr->GetBirthday());
 		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_FIRST_NAME, contactPtr->GetNameField(IContactInfo::NFT_FIRST_NAME));
 		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_LAST_NAME, contactPtr->GetNameField(IContactInfo::NFT_LAST_NAME));
-		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_NICKNAME, contactPtr->GetNameField(IContactInfo::NFT_NICKNAME));
+
+		if (accountPtr->GetAccountType() == IAccountInfo::AT_PERSON){
+			metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_BIRTHDAY, contactPtr->GetBirthday());
+			metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_NICKNAME, contactPtr->GetNameField(IContactInfo::NFT_NICKNAME));
+		}
 	}
 
 	return true;
