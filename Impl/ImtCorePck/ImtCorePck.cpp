@@ -69,6 +69,16 @@ I_EXPORT_COMPONENT(
 			"Plugin status monitor",
 			"Plugin Status Monitor");
 
+I_EXPORT_COMPONENT(
+			ObjectMetaInfoUniquenessValidator,
+			"Object Metainfo Uniqueness Validator",
+			"Object Metainfo Uniqueness Validator");
+
+I_EXPORT_COMPONENT(
+			CollectionObjectContext,
+			"Collection object context",
+			"Collection Object Context");
+
 
 } // namespace ImtCorePck
 

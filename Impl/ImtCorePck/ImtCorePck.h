@@ -17,6 +17,8 @@
 #include <imtbase/CParamsManagerAdapterComp.h>
 #include <imtbase/CCollectionObjectExtractorComp.h>
 #include <imtbase/CPluginStatusMonitor.h>
+#include <imtbase/CObjectMetaInfoUniquenessValidatorComp.h>
+#include <imtbase/CCollectionObjectContext.h>
 
 
 /**
@@ -41,6 +43,12 @@ typedef icomp::TModelCompWrap<
 						imtbase::CPluginStatusMonitor,
 						imtbase::IObjectCollection,
 						imtbase::IPluginStatusMonitor>> PluginStatusMonitor;
+typedef imtbase::CObjectMetaInfoUniquenessValidatorComp ObjectMetaInfoUniquenessValidator;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtbase::CCollectionObjectContext,
+						imtbase::ICollectionObjectContext>> CollectionObjectContext;
+
 
 } // namespace ImtCorePck
 
