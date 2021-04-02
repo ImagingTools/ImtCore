@@ -21,15 +21,14 @@ namespace imtrest
 const imtrest::IResponse* CTcpServerComp::ProcessRequest(const IRequest& request) const
 {
 	if (m_requestHandlerCompPtr.IsValid()){
-        const IResponse* responsePtr = m_requestHandlerCompPtr->ProcessRequest(request);
-        if(responsePtr != nullptr)
-        {
-            request.GetProtocolEngine().GetResponder().SendResponse(*responsePtr);
-            delete responsePtr;
-        }
+		const IResponse* responsePtr = m_requestHandlerCompPtr->ProcessRequest(request);
+		if (responsePtr != nullptr){
+			request.GetProtocolEngine().GetResponder().SendResponse(*responsePtr);
+			delete responsePtr;
+		}
 	}
 
-    return nullptr;
+	return nullptr;
 }
 
 
@@ -120,7 +119,7 @@ void CTcpServerComp::OnSocketDisconnected()
 
 QByteArray CTcpServerComp::GetSupportedCommandId() const
 {
-    return QByteArray();
+	return QByteArray();
 }
 
 } // namespace imtrest

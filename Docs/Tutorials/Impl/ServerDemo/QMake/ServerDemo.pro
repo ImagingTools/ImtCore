@@ -8,14 +8,13 @@ INCLUDEPATH += $(IMTCOREDIR)/Include
 INCLUDEPATH += $(IMTCOREDIR)/Impl
 INCLUDEPATH +=  $$AUXINCLUDEDIR
 
-
 INCLUDEPATH += $$OUT_PWD/../../../Include
 INCLUDEPATH += $$_PRO_FILE_PWD_/../../../Include
 
 LIBS += -L$$OUT_PWD
 
 LIBS += -L../../../../../Lib/$$COMPILER_DIR -limeas -liproc -lAcfSlnLoc -lAcfLoc
-LIBS += -L../../../../../Lib/$$COMPILER_DIR -limtbase -limtrest -lServletDemo -limtservletdemo
+LIBS += -L../../../../../Lib/$$COMPILER_DIR -limtbase -limtrest -limtservletdemo
 
 QT += xml
 QT += network
@@ -25,7 +24,7 @@ win32-msvc*{
 	QMAKE_CXXFLAGS += /wd4264
 
 	# copying all Qt DLLs to destination directory
-        greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = set path=$(QTDIR)\bin;%path% && $$(QTDIR)\bin\windeployqt $$DESTDIR
+	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = set path=$(QTDIR)\bin;%path% && $$(QTDIR)\bin\windeployqt $$DESTDIR
 }
 
 # Set configuration of custom builds:
