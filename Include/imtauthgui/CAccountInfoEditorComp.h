@@ -6,6 +6,8 @@
 
 // ACF includes
 #include <ifile/IFilePersistence.h>
+#include <iimg/CBitmap.h>
+#include <imod/CModelProxy.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <iqtgui/IGuiObject.h>
 
@@ -57,17 +59,26 @@ protected:
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
+
 private:
 	void SetCompanyAddressVisibility(bool visibility) const;
 	void SetupCompanyAddress() const;
 	void OnAddressUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtauth::IAddress* addressPtr);
+	imtauth::IAddress* GetCompanyAddress();
 
 private Q_SLOTS:
 	void on_ContactCombo_currentIndexChanged(int index);
 	void on_AccountTypeCombo_currentIndexChanged(int index);
 	void on_AccountNameEdit_editingFinished();
 	void on_AccountDescriptionEdit_editingFinished();
-	void on_Addresses_itemChanged(QTreeWidgetItem *item, int column);
+	void on_CountryEdit_editingFinished();
+	void on_CityEdit_editingFinished();
+	void on_PostalCodeEdit_editingFinished();
+	void on_StreetEdit_editingFinished();
+
 	void on_LoadPicture_triggered(QAction *action);
 	void on_RemovePicture_triggered(QAction *action);
 
@@ -82,6 +93,9 @@ private:
 
 	QAction m_loadAccountPictureAction;
 	QAction m_removeAccountPictureAction;
+
+	imod::CModelProxy m_accountPictureModelProxy;
+	imod::TModelWrap<iimg::CBitmap> m_emptyAccountPicture;
 
 	bool m_blockComboChanged;
 

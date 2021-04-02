@@ -16,7 +16,7 @@ namespace imtlic
 // public methods
 
 CFeatureInfo::CFeatureInfo()
-	:m_name(QObject::tr("DefaultName")),
+	:m_name(QObject::tr("Feature")),
 	m_packagePtr(nullptr)
 {
 }

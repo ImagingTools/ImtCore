@@ -32,6 +32,16 @@ void CFeatureInfoEditorGuiComp::UpdateModel() const
 	Q_ASSERT(featureInfoPtr != nullptr);
 
 	imtlic::CFeatureInfo featureInfo;
+
+	if (IdEdit->text().isEmpty()){
+		QString id = NameEdit->text();
+
+		id.replace(" ", "");
+		id.prepend("#");
+
+		IdEdit->setText(id);
+	}
+
 	featureInfo.SetFeatureId(IdEdit->text().toUtf8());
 	featureInfo.SetFeatureName(NameEdit->text());
 

@@ -102,7 +102,7 @@
         </attribute>
         <column>
          <property name="text">
-          <string>License Instance</string>
+          <string>License</string>
          </property>
         </column>
         <column>

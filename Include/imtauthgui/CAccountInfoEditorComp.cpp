@@ -7,7 +7,6 @@
 
 // ACF includes
 #include <ifilegui/CFileDialogLoaderComp.h>
-#include <iimg/CBitmap.h>
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
@@ -57,21 +56,30 @@ void CAccountInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 	AccountNameEdit->setText(accountPtr->GetAccountName());
 	AccountDescriptionEdit->setText(accountPtr->GetAccountDescription());
 	SetCompanyAddressVisibility(accountPtr->GetAccountType() == imtauth::IAccountInfo::AT_COMPANY);
+
+	if (m_accountPictureObserverCompPtr.IsValid()){
+		const iimg::IBitmap* bitmapPtr = &GetObservedObject()->GetAccountPicture();
+
+		if (bitmapPtr != nullptr){
+			if(!bitmapPtr->IsEmpty()){
+				imod::IModel* accountPicureModelPtr = dynamic_cast<imod::IModel*>(
+							const_cast<iimg::IBitmap*>(bitmapPtr));
+
+				if (accountPicureModelPtr != nullptr){
+					m_accountPictureModelProxy.SetModelPtr(accountPicureModelPtr);
+					return;
+				}
+			}
+		}
+
+		m_accountPictureModelProxy.SetModelPtr(&m_emptyAccountPicture);
+	}
 }
 
 
 void CAccountInfoEditorComp::OnGuiModelAttached()
 {
 	BaseClass::OnGuiModelAttached();
-
-	if (m_accountPictureObserverCompPtr.IsValid()){
-		imod::IModel* accountPicureModelPtr = dynamic_cast<imod::IModel*>(
-					const_cast<iimg::IBitmap*>(&GetObservedObject()->GetAccountPicture()));
-
-		if (accountPicureModelPtr != nullptr){
-			accountPicureModelPtr->AttachObserver(m_accountPictureObserverCompPtr.GetPtr());
-		}
-	}
 
 	imod::IModel* contactModelPtr = dynamic_cast<imod::IModel*>(
 				const_cast<imtauth::IContactInfo*>(
@@ -182,6 +190,28 @@ void CAccountInfoEditorComp::OnGuiDestroyed()
 }
 
 
+// reimplemented (icomp::CComponentBase)
+
+void CAccountInfoEditorComp::OnComponentCreated()
+{
+	QIcon icon = QIcon(":/Icons/Account"); 
+	if (!icon.isNull()){
+		iimg::CBitmap bitmap(icon.pixmap(300, 300).toImage());
+		m_emptyAccountPicture.CopyFrom(bitmap);
+	}
+
+	if (m_accountPictureObserverCompPtr.IsValid()){
+		m_accountPictureModelProxy.AttachObserver(m_accountPictureObserverCompPtr.GetPtr());
+	}
+}
+
+
+void CAccountInfoEditorComp::OnComponentDestroyed()
+{
+	m_accountPictureModelProxy.DetachAllObservers();
+}
+
+
 // private methods
 
 void CAccountInfoEditorComp::SetCompanyAddressVisibility(bool visibility) const
@@ -201,12 +231,12 @@ void CAccountInfoEditorComp::SetCompanyAddressVisibility(bool visibility) const
 							&CAccountInfoEditorComp::OnAddressUpdated);
 			}
 
-			AddressesGroup->show();
+			AddressGroup->show();
 		}
 	}
 	else{
 		m_addressObserver.UnregisterAllObjects();
-		AddressesGroup->hide();
+		AddressGroup->hide();
 	}
 }
 
@@ -240,16 +270,31 @@ void CAccountInfoEditorComp::SetupCompanyAddress() const
 
 void CAccountInfoEditorComp::OnAddressUpdated(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtauth::IAddress* addressPtr)
 {
-	Addresses->clear();
+	CountryEdit->setText(addressPtr->GetCountry());
+	CityEdit->setText(addressPtr->GetCity());
+	PostalCodeEdit->setText(QString::number(addressPtr->GetPostalCode()));
+	StreetEdit->setText(addressPtr->GetStreet());
+}
 
-	QTreeWidgetItem* itemPtr = new QTreeWidgetItem({
-				addressPtr->GetCountry(),
-				addressPtr->GetCity(),
-				QString::number(addressPtr->GetPostalCode()),
-				addressPtr->GetStreet()});
 
-	itemPtr->setFlags(itemPtr->flags() | Qt::ItemIsEditable);
-	Addresses->addTopLevelItem(itemPtr);
+imtauth::IAddress* CAccountInfoEditorComp::GetCompanyAddress()
+{
+	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	if (accountPtr != nullptr){
+		const imtauth::IContactInfo* contactPtr = accountPtr->GetAccountOwner();
+		if (contactPtr != nullptr){
+			const imtauth::IAddressProvider* addressProviderPtr = contactPtr->GetAddresses();
+
+			if (addressProviderPtr != nullptr){
+				imtbase::ICollectionInfo::Ids ids = addressProviderPtr->GetAddressList().GetElementIds();
+				Q_ASSERT(ids.count() == 1);
+
+				return const_cast<imtauth::IAddress*>(addressProviderPtr->GetAddress(ids[0]));
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 
@@ -297,35 +342,53 @@ void CAccountInfoEditorComp::on_AccountDescriptionEdit_editingFinished()
 }
 
 
-void CAccountInfoEditorComp::on_Addresses_itemChanged(QTreeWidgetItem *item, int column)
+void CAccountInfoEditorComp::on_CountryEdit_editingFinished()
 {
 	if (!m_isReadOnly && !IsUpdateBlocked() && IsModelAttached()){
 		UpdateBlocker updateBlocker(this);
 
-		imtauth::IAccountInfo* accountPtr = GetObservedObject();
-		if (accountPtr != nullptr){
-			const imtauth::IContactInfo* contactPtr = accountPtr->GetAccountOwner();
-			if (contactPtr != nullptr){
-				const imtauth::IAddressProvider* addressProviderPtr = contactPtr->GetAddresses();
+		imtauth::IAddress* addressPtr = GetCompanyAddress();
+		if (addressPtr != nullptr){
+			addressPtr->SetCountry(CountryEdit->text());
+		}
+	}
+}
 
-				imtauth::IAddressManager* addressManagerPtr = dynamic_cast<imtauth::IAddressManager*>(
-							const_cast<imtauth::IAddressProvider*>(addressProviderPtr));
 
-				if (addressManagerPtr != nullptr){
-					imtbase::ICollectionInfo::Ids ids = addressManagerPtr->GetAddressList().GetElementIds();
-					Q_ASSERT(ids.count() == 1);
+void CAccountInfoEditorComp::on_CityEdit_editingFinished()
+{
+	if (!m_isReadOnly && !IsUpdateBlocked() && IsModelAttached()){
+		UpdateBlocker updateBlocker(this);
 
-					imtauth::IAddress* addressPtr = const_cast<imtauth::IAddress*>(addressManagerPtr->GetAddress(ids[0]));
-					if (addressPtr != nullptr){
-						istd::CChangeGroup changeGroup(addressPtr);
+		imtauth::IAddress* addressPtr = GetCompanyAddress();
+		if (addressPtr != nullptr){
+			addressPtr->SetCity(CityEdit->text());
+		}
+	}
+}
 
-						addressPtr->SetCountry(item->text(0));
-						addressPtr->SetCity(item->text(1));
-						addressPtr->SetPostalCode(item->text(2).toInt());
-						addressPtr->SetStreet(item->text(3));
-					}
-				}
-			}
+
+void CAccountInfoEditorComp::on_PostalCodeEdit_editingFinished()
+{
+	if (!m_isReadOnly && !IsUpdateBlocked() && IsModelAttached()){
+		UpdateBlocker updateBlocker(this);
+
+		imtauth::IAddress* addressPtr = GetCompanyAddress();
+		if (addressPtr != nullptr){
+			addressPtr->SetPostalCode(PostalCodeEdit->text().toInt());
+		}
+	}
+}
+
+
+void CAccountInfoEditorComp::on_StreetEdit_editingFinished()
+{
+	if (!m_isReadOnly && !IsUpdateBlocked() && IsModelAttached()){
+		UpdateBlocker updateBlocker(this);
+
+		imtauth::IAddress* addressPtr = GetCompanyAddress();
+		if (addressPtr != nullptr){
+			addressPtr->SetStreet(StreetEdit->text());
 		}
 	}
 }
