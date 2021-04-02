@@ -30,7 +30,7 @@ IRequestHandler::ConstResponsePtr CHttpRootHandlerComp::ProcessRequest(const IRe
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 
 	if (commandId.isEmpty()){
-		QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>The requested command could not be executed</p></body></html>");
+		QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>Empty command-ID</p></body></html>");
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
 		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
@@ -42,14 +42,15 @@ IRequestHandler::ConstResponsePtr CHttpRootHandlerComp::ProcessRequest(const IRe
 	if (handlerPtr != nullptr) {
 		return handlerPtr->ProcessRequest(request);
 	}
-	else {
-		QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>The requested command could not be executed</p></body></html>");
+	else{
+		QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandId)).toUtf8();
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
 		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
 		if (responsePtr.IsValid()) {
 			engine.GetResponder().SendResponse(*responsePtr);
 		}
+
 		SendErrorMessage(0, QString("No request handler found for: '%1'").arg(qPrintable(commandId)));
 
 		return responsePtr;
