@@ -24,9 +24,16 @@ QByteArray CAccountInfo::GetTypeId()
 // public methods
 
 CAccountInfo::CAccountInfo()
-	:m_accountType(AT_PERSON),
+	:m_accountType(AT_COMPANY),
 	m_contactUpdateBridge(this)
 {
+	IAddressManager* addressManagerPtr = dynamic_cast<imtauth::IAddressManager*>(
+				const_cast<IAddressProvider*>(m_contact.GetAddresses()));
+	if (addressManagerPtr != nullptr){
+		CAddress address;
+		addressManagerPtr->AddAddress(&address);
+	}
+
 	m_contact.AttachObserver(&m_contactUpdateBridge);
 }
 

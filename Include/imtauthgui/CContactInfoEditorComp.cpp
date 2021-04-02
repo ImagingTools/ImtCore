@@ -54,7 +54,8 @@ void CContactInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 				QTreeWidgetItem* itemPtr = new QTreeWidgetItem({
 							addressPtr->GetCountry(),
 							addressPtr->GetCity(),
-							QString::number(addressPtr->GetPostalCode())});
+							QString::number(addressPtr->GetPostalCode()),
+							addressPtr->GetStreet()});
 
 				itemPtr->setFlags(itemPtr->flags() | Qt::ItemIsEditable);
 				itemPtr->setData(0, Qt::UserRole, id);
@@ -109,6 +110,7 @@ void CContactInfoEditorComp::UpdateModel() const
 			address.SetCountry(itemPtr->text(0));
 			address.SetCity(itemPtr->text(1));
 			address.SetPostalCode(itemPtr->text(2).toInt());
+			address.SetStreet(itemPtr->text(3));
 
 			addressesPtr->AddAddress(&address);
 		}
@@ -162,7 +164,7 @@ void CContactInfoEditorComp::on_BirthdayEdit_dateChanged(const QDate &date)
 
 void CContactInfoEditorComp::on_GenderCombo_currentIndexChanged(int index)
 {
-
+	DoUpdateModel();
 }
 
 
@@ -192,7 +194,34 @@ void CContactInfoEditorComp::on_Addresses_itemSelectionChanged()
 
 void CContactInfoEditorComp::on_Addresses_itemChanged(QTreeWidgetItem *item, int column)
 {
-	DoUpdateModel();
+	if (!m_isReadOnly && !IsUpdateBlocked() && IsModelAttached()){
+		UpdateBlocker updateBlocker(this);
+		
+		imtauth::IContactInfo* contactPtr = GetObservedObject();
+		Q_ASSERT(contactPtr != nullptr);
+
+		imtauth::IAddressManager* addressManagerPtr = dynamic_cast<imtauth::IAddressManager*>(
+					const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
+
+		if (addressManagerPtr != nullptr){
+			QByteArray changedAddressId = item->data(0, Qt::UserRole).toByteArray();
+
+			imtbase::ICollectionInfo::Ids ids = addressManagerPtr->GetAddressList().GetElementIds();
+			for (const QByteArray& id : ids){
+				if (id == changedAddressId){
+					imtauth::IAddress* addressPtr = const_cast<imtauth::IAddress*>(addressManagerPtr->GetAddress(id));
+					if (addressManagerPtr != nullptr){
+						istd::CChangeGroup changeGroup(addressManagerPtr);
+
+						addressPtr->SetCountry(item->text(0));
+						addressPtr->SetCity(item->text(1));
+						addressPtr->SetPostalCode(item->text(2).toInt());
+						addressPtr->SetStreet(item->text(3));
+					}
+				}
+			}
+		}
+	}
 }
 
 

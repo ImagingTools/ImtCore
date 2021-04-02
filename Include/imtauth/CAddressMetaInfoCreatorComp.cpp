@@ -39,6 +39,7 @@ bool CAddressMetaInfoCreatorComp::CreateMetaInfo(
 	metaInfoPtr->SetMetaInfo(IAddress::MIT_CITY, addressPtr->GetCity());
 	metaInfoPtr->SetMetaInfo(IAddress::MIT_COUNTRY, addressPtr->GetCountry());
 	metaInfoPtr->SetMetaInfo(IAddress::MIT_POSTAL_CODE, addressPtr->GetPostalCode());
+	metaInfoPtr->SetMetaInfo(IAddress::MIT_STREET, addressPtr->GetStreet());
 
 	return true;
 }
@@ -55,6 +56,8 @@ QString CAddressMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType)
 		return QObject::tr("Country");
 	case IAddress::MIT_POSTAL_CODE:
 		return QObject::tr("Postal Code");
+	case IAddress::MIT_STREET:
+		return QObject::tr("Street");
 	}
 
 	return BaseClass::GetMetaInfoName(metaInfoType);

@@ -80,6 +80,22 @@ void CAddress::SetPostalCode(int postalCode)
 }
 
 
+QString CAddress::GetStreet() const
+{
+	return m_street;
+}
+
+
+void CAddress::SetStreet(const QString& street)
+{
+	if (m_street != street){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_street = street;
+	}
+}
+
+
 // reimplemented (iser::IObject)
 
 QByteArray CAddress::GetFactoryId() const
@@ -111,6 +127,11 @@ bool CAddress::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_postalCode);
 	retVal = retVal && archive.EndTag(postalCodeTag);
 
+	static iser::CArchiveTag streetTag("Street", "Street", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(streetTag);
+	retVal = retVal && archive.Process(m_street);
+	retVal = retVal && archive.EndTag(streetTag);
+
 	return retVal;
 }
 
@@ -119,21 +140,38 @@ bool CAddress::Serialize(iser::IArchive& archive)
 
 int CAddress::GetSupportedOperations() const
 {
-	return SO_COPY | SO_CLONE | SO_RESET;
+	return SO_COPY | SO_COMPARE | SO_CLONE | SO_RESET;
 }
 
 
 bool CAddress::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const IAddress* sourcePtr = dynamic_cast<const IAddress*>(&object);
+	const CAddress* sourcePtr = dynamic_cast<const CAddress*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_country = sourcePtr->GetCountry();
-		m_city = sourcePtr->GetCity();
-		m_postalCode = sourcePtr->GetPostalCode();
+		m_country = sourcePtr->m_country;
+		m_city = sourcePtr->m_city;
+		m_postalCode = sourcePtr->m_postalCode;
+		m_street = sourcePtr->m_street;
 
 		return true;
+	}
+
+	return false;
+}
+
+
+bool CAddress::IsEqual(const IChangeable& object) const
+{
+	const CAddress* sourcePtr = dynamic_cast<const CAddress*>(&object);
+	if (sourcePtr != nullptr){
+		bool retVal = m_country == sourcePtr->m_country;
+		retVal = retVal && m_city == sourcePtr->m_city;
+		retVal = retVal && m_postalCode == sourcePtr->m_postalCode;
+		retVal = retVal && m_street == sourcePtr->m_street;
+
+		return retVal;
 	}
 
 	return false;
@@ -158,6 +196,7 @@ bool CAddress::ResetData(CompatibilityMode /*mode*/)
 	m_country.clear();
 	m_city.clear();
 	m_postalCode = -1;
+	m_street.clear();
 
 	return true;
 }

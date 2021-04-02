@@ -42,120 +42,120 @@
         </property>
         <item>
          <widget class="QGroupBox" name="EMailGroup">
-          <property name="minimumSize">
-           <size>
-            <width>400</width>
-            <height>0</height>
-           </size>
-          </property>
           <property name="title">
            <string>E-Mail</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <widget class="QLineEdit" name="EMailEdit"/>
+            <widget class="QLineEdit" name="EMailEdit">
+             <property name="minimumSize">
+              <size>
+               <width>600</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
         </item>
         <item>
          <widget class="QGroupBox" name="BirthdayGroup">
-          <property name="minimumSize">
-           <size>
-            <width>400</width>
-            <height>0</height>
-           </size>
-          </property>
           <property name="title">
            <string>Birthday</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
-            <widget class="QDateEdit" name="BirthdayEdit"/>
+            <widget class="QDateEdit" name="BirthdayEdit">
+             <property name="minimumSize">
+              <size>
+               <width>600</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
         </item>
         <item>
          <widget class="QGroupBox" name="GenderGroup">
-          <property name="minimumSize">
-           <size>
-            <width>400</width>
-            <height>0</height>
-           </size>
-          </property>
           <property name="title">
            <string>Gender</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <widget class="QComboBox" name="GenderCombo"/>
+            <widget class="QComboBox" name="GenderCombo">
+             <property name="minimumSize">
+              <size>
+               <width>600</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
         </item>
         <item>
          <widget class="QGroupBox" name="FirstNameGroup">
-          <property name="minimumSize">
-           <size>
-            <width>400</width>
-            <height>0</height>
-           </size>
-          </property>
           <property name="title">
            <string>First Name</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <widget class="QLineEdit" name="FirstNameEdit"/>
+            <widget class="QLineEdit" name="FirstNameEdit">
+             <property name="minimumSize">
+              <size>
+               <width>600</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
         </item>
         <item>
          <widget class="QGroupBox" name="LastNameGroup">
-          <property name="minimumSize">
-           <size>
-            <width>400</width>
-            <height>0</height>
-           </size>
-          </property>
           <property name="title">
            <string>Last Name</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
-            <widget class="QLineEdit" name="LastNameEdit"/>
+            <widget class="QLineEdit" name="LastNameEdit">
+             <property name="minimumSize">
+              <size>
+               <width>600</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
         </item>
         <item>
          <widget class="QGroupBox" name="NicknameGroup">
-          <property name="minimumSize">
-           <size>
-            <width>400</width>
-            <height>0</height>
-           </size>
-          </property>
           <property name="title">
            <string>Nickname</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
-            <widget class="QLineEdit" name="NicknameEdit"/>
+            <widget class="QLineEdit" name="NicknameEdit">
+             <property name="minimumSize">
+              <size>
+               <width>600</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
         </item>
         <item>
          <widget class="QGroupBox" name="AddressesGroup">
-          <property name="minimumSize">
-           <size>
-            <width>400</width>
-            <height>0</height>
-           </size>
-          </property>
           <property name="title">
            <string>Addresses</string>
           </property>
@@ -212,7 +212,7 @@
             <widget class="QTreeWidget" name="Addresses">
              <property name="minimumSize">
               <size>
-               <width>0</width>
+               <width>600</width>
                <height>250</height>
               </size>
              </property>
@@ -223,7 +223,7 @@
               <number>0</number>
              </property>
              <attribute name="headerDefaultSectionSize">
-              <number>150</number>
+              <number>149</number>
              </attribute>
              <column>
               <property name="text">
@@ -238,6 +238,11 @@
              <column>
               <property name="text">
                <string>Postal Code</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Street</string>
               </property>
              </column>
             </widget>

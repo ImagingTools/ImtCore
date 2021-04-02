@@ -37,7 +37,12 @@ I_EXPORT_COMPONENT(
 I_EXPORT_COMPONENT(
 			ProductLicensingInfoViewDelegate,
 			"Product licensing info delegate",
-			"Product Licensing Info Collection Delegate");
+			"Product Licensing Info View Collection Delegate");
+
+I_EXPORT_COMPONENT(
+			ProductInstanceInfoViewDelegate,
+			"Product instance info view delegate",
+			"Product Licensing Instance Info View Collection Delegate");
 
 I_EXPORT_COMPONENT(
 			FeatureCollectionViewDelegate,

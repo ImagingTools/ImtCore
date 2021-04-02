@@ -243,9 +243,10 @@ void CAccountInfoEditorComp::OnAddressUpdated(const istd::IChangeable::ChangeSet
 	Addresses->clear();
 
 	QTreeWidgetItem* itemPtr = new QTreeWidgetItem({
-		addressPtr->GetCountry(),
-		addressPtr->GetCity(),
-		QString::number(addressPtr->GetPostalCode())});
+				addressPtr->GetCountry(),
+				addressPtr->GetCity(),
+				QString::number(addressPtr->GetPostalCode()),
+				addressPtr->GetStreet()});
 
 	itemPtr->setFlags(itemPtr->flags() | Qt::ItemIsEditable);
 	Addresses->addTopLevelItem(itemPtr);
@@ -294,6 +295,41 @@ void CAccountInfoEditorComp::on_AccountDescriptionEdit_editingFinished()
 {
 	DoUpdateModel();
 }
+
+
+void CAccountInfoEditorComp::on_Addresses_itemChanged(QTreeWidgetItem *item, int column)
+{
+	if (!m_isReadOnly && !IsUpdateBlocked() && IsModelAttached()){
+		UpdateBlocker updateBlocker(this);
+
+		imtauth::IAccountInfo* accountPtr = GetObservedObject();
+		if (accountPtr != nullptr){
+			const imtauth::IContactInfo* contactPtr = accountPtr->GetAccountOwner();
+			if (contactPtr != nullptr){
+				const imtauth::IAddressProvider* addressProviderPtr = contactPtr->GetAddresses();
+
+				imtauth::IAddressManager* addressManagerPtr = dynamic_cast<imtauth::IAddressManager*>(
+							const_cast<imtauth::IAddressProvider*>(addressProviderPtr));
+
+				if (addressManagerPtr != nullptr){
+					imtbase::ICollectionInfo::Ids ids = addressManagerPtr->GetAddressList().GetElementIds();
+					Q_ASSERT(ids.count() == 1);
+
+					imtauth::IAddress* addressPtr = const_cast<imtauth::IAddress*>(addressManagerPtr->GetAddress(ids[0]));
+					if (addressPtr != nullptr){
+						istd::CChangeGroup changeGroup(addressPtr);
+
+						addressPtr->SetCountry(item->text(0));
+						addressPtr->SetCity(item->text(1));
+						addressPtr->SetPostalCode(item->text(2).toInt());
+						addressPtr->SetStreet(item->text(3));
+					}
+				}
+			}
+		}
+	}
+}
+
 
 void CAccountInfoEditorComp::on_LoadPicture_triggered(QAction *action)
 {

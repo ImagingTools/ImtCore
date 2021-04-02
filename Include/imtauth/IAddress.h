@@ -21,27 +21,34 @@ public:
 	enum MetaInfoTypes
 	{
 		/**
-			City given as QString.
-		*/
-		MIT_CITY,
-
-		/**
 			Country given as QString.
 		*/
 		MIT_COUNTRY,
 
 		/**
+			City given as QString.
+		*/
+		MIT_CITY,
+
+		/**
 			Postal code given as int.
 		*/
-		MIT_POSTAL_CODE
+		MIT_POSTAL_CODE,
+
+		/**
+			Streer given as QString.
+		*/
+		MIT_STREET
 	};
 
-	virtual QString GetCity() const = 0;
-	virtual void SetCity(const QString& city) = 0;
 	virtual QString GetCountry() const = 0;
 	virtual void SetCountry(const QString& country) = 0;
+	virtual QString GetCity() const = 0;
+	virtual void SetCity(const QString& city) = 0;
 	virtual int GetPostalCode() const = 0;
 	virtual void SetPostalCode(int postalCode) = 0;
+	virtual QString GetStreet() const = 0;
+	virtual void SetStreet(const QString& street) = 0;
 };
 
 

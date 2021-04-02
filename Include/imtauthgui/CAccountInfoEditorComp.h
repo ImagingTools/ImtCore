@@ -67,6 +67,7 @@ private Q_SLOTS:
 	void on_AccountTypeCombo_currentIndexChanged(int index);
 	void on_AccountNameEdit_editingFinished();
 	void on_AccountDescriptionEdit_editingFinished();
+	void on_Addresses_itemChanged(QTreeWidgetItem *item, int column);
 	void on_LoadPicture_triggered(QAction *action);
 	void on_RemovePicture_triggered(QAction *action);
 

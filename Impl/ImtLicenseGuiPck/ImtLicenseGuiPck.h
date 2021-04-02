@@ -14,6 +14,7 @@
 #include <imtlicgui/CFeatureInfoEditorGuiComp.h>
 #include <imtlicgui/CFeaturePackageViewDelegateComp.h>
 #include <imtlicgui/CProductLicensingInfoViewDelegateComp.h>
+#include <imtlicgui/CProductInstanceInfoViewDelegateComp.h>
 #include <imtlicgui/CProductInstanceInfoEditorComp.h>
 #include <imtlicgui/CFeatureTreeGuiComp.h>
 
@@ -32,6 +33,7 @@ typedef imtlicgui::CFeatureCollectionViewDelegateComp FeatureCollectionViewDeleg
 typedef imtlicgui::CFeatureInfoEditorGuiComp FeatureInfoEditorGui;
 typedef imtlicgui::CFeaturePackageViewDelegateComp FeaturePackageViewDelegate;
 typedef imtlicgui::CProductLicensingInfoViewDelegateComp ProductLicensingInfoViewDelegate;
+typedef imtlicgui::CProductInstanceInfoViewDelegateComp ProductInstanceInfoViewDelegate;
 typedef imtlicgui::CProductInstanceInfoEditorComp ProductInstanceInfoEditor;
 typedef imtlicgui::CFeatureTreeGuiComp FeatureTreeGui;
 

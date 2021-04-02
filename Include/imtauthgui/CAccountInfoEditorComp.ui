@@ -231,72 +231,75 @@
      </item>
      <item>
       <widget class="QGroupBox" name="AccountTypeGroup">
-       <property name="minimumSize">
-        <size>
-         <width>450</width>
-         <height>0</height>
-        </size>
-       </property>
        <property name="title">
         <string>Account Type</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <widget class="QComboBox" name="AccountTypeCombo"/>
+         <widget class="QComboBox" name="AccountTypeCombo">
+          <property name="minimumSize">
+           <size>
+            <width>600</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
      </item>
      <item>
       <widget class="QGroupBox" name="AccountNameGroup">
-       <property name="minimumSize">
-        <size>
-         <width>450</width>
-         <height>0</height>
-        </size>
-       </property>
        <property name="title">
         <string>Account Name</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QLineEdit" name="AccountNameEdit"/>
+         <widget class="QLineEdit" name="AccountNameEdit">
+          <property name="minimumSize">
+           <size>
+            <width>600</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
      </item>
      <item>
       <widget class="QGroupBox" name="AccountDescriptionGroup">
-       <property name="minimumSize">
-        <size>
-         <width>450</width>
-         <height>0</height>
-        </size>
-       </property>
        <property name="title">
         <string>Account Description</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-         <widget class="QLineEdit" name="AccountDescriptionEdit"/>
+         <widget class="QLineEdit" name="AccountDescriptionEdit">
+          <property name="minimumSize">
+           <size>
+            <width>600</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
      </item>
      <item>
       <widget class="QGroupBox" name="AddressesGroup">
-       <property name="minimumSize">
-        <size>
-         <width>450</width>
-         <height>0</height>
-        </size>
-       </property>
        <property name="title">
         <string>Company Address</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
          <widget class="QTreeWidget" name="Addresses">
+          <property name="minimumSize">
+           <size>
+            <width>600</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
@@ -310,7 +313,7 @@
            <number>0</number>
           </property>
           <attribute name="headerDefaultSectionSize">
-           <number>150</number>
+           <number>149</number>
           </attribute>
           <column>
            <property name="text">
@@ -325,6 +328,11 @@
           <column>
            <property name="text">
             <string>Postal Code</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Street</string>
            </property>
           </column>
          </widget>
