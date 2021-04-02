@@ -85,7 +85,7 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="api"/>
+                                    <Data IsEnabled="true" Value="api*"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>

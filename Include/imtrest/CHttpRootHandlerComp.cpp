@@ -25,6 +25,10 @@ const imtrest::IResponse* CHttpRootHandlerComp::ProcessRequest(const IRequest& r
 	{
 		commandId = commandId.remove(0, 1);
 	}
+	if (commandId.endsWith('/'))
+	{
+		commandId = commandId.remove(commandId.length()-1, 1);
+	}
 
 	if (commandId.isEmpty()){
 		QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>The requested command could not be executed</p></body></html>");
@@ -60,23 +64,38 @@ const imtrest::IResponse* CHttpRootHandlerComp::ProcessRequest(const IRequest& r
 
 IRequestHandler* CHttpRootHandlerComp::FindRequestHandler(const QByteArray& commandId) const
 {
-//    int handlersCount = qMin(m_commandIdsAttrPtr.GetCount(), m_requestHandlersCompPtr.GetCount());
+	/// contains an IRequestHandler pointer in which the commandID is exactly the same as the request (highest priority) 
+	/// \warning This pointer MUST be returned if is not null!
+	IRequestHandler* exactsCommandIdHandler = nullptr;
+
+	/// contains an IRequestHandler pointer in which the commandID is exactly the same as the request (highest priority) 
+	/// \warning This pointer chould be returned ONLY exactsCommandIdHandler is null!
+	IRequestHandler* startsCommandIdHandler = nullptr;
+
     for (int i = 0; i < m_requestHandlersCompPtr.GetCount(); ++i)
     {
         IRequestHandler* handlerPtr = m_requestHandlersCompPtr[i];
-        if (handlerPtr && handlerPtr->GetSupportedCommandId() == commandId)
+        if (handlerPtr)
         {
-            return handlerPtr;
+			QByteArray handlersPtrSupportedCommandId = handlerPtr->GetSupportedCommandId();
+			if (handlersPtrSupportedCommandId == commandId)
+			{
+				exactsCommandIdHandler = handlerPtr;
+				startsCommandIdHandler = nullptr;
+				break;
+			}
+
+			if
+				(handlersPtrSupportedCommandId.endsWith("*") &&
+				 commandId.startsWith(handlersPtrSupportedCommandId.remove(handlersPtrSupportedCommandId.length() - 1, 1))
+				 )
+			{
+				startsCommandIdHandler = handlerPtr;
+			}
+
         }
     }
-//    for(auto handlerPtr: m_requestHandlersCompPtr)
-//    {
-//        if (handlerPtr && handlerPtr->GetSupportedCommandId() == commandId)
-//        {
-//            return handlerPtr;
-//        }
-//    }
-	return nullptr;
+	return exactsCommandIdHandler == nullptr ? startsCommandIdHandler : exactsCommandIdHandler;
 }
 
 
