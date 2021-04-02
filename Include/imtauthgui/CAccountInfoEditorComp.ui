@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Edit Product Instance</string>
+   <string>Edit Account Information</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -74,7 +74,7 @@
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">background:</string>
+          <string notr="true">background:white;</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <property name="spacing">
