@@ -1,22 +1,11 @@
-#include <imtrest/CHttpFileBasedHandlerComp.h>
-#include "CHttpServletCompBase.h"
+#include <imtrest/CHttpServletCompBase.h>
 
-
-// Qt includes
-#include <QtCore/QFile>
-#include <QtCore/QTextStream>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonValue>
-#include<QtCore/QUrlQuery>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponder.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
-
 #include <imtrest/CHttpResponse.h>
 
 
@@ -28,291 +17,225 @@ namespace imtrest
 
 // reimplemented (IProtocolEngine)
 
-const imtrest::IResponse* CHttpServletCompBase::ProcessRequest(const imtrest::IRequest& request) const
+IRequestHandler::ConstResponsePtr CHttpServletCompBase::ProcessRequest(const imtrest::IRequest& request) const
 {
-    const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
-    QByteArray errorBody = "<html><head><title>Error</title></head><body><p>The requested command could not be executed</p></body></html>";
-    QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+	imtrest::CHttpRequest* httpRequestPtr = dynamic_cast<imtrest::CHttpRequest*>(const_cast<imtrest::IRequest*>(&request));
+	if (httpRequestPtr == nullptr){
+		Q_ASSERT_X(false, "CHttpServletCompBase::ProcessRequest", "Invalid request type, a HTTP request was expected");
 
-    istd::TDelPtr<imtrest::IResponse> errorResponsePtr(engine.CreateResponse(request, imtrest::IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId));
+		return ConstResponsePtr();
+	}
 
-    imtrest::CHttpRequest* httpRequest = dynamic_cast<imtrest::CHttpRequest*>(const_cast<imtrest::IRequest*>(&request));
-
-    if(httpRequest == nullptr)
-    {
-        qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << "\nwhat(): invalid request!";
-        return nullptr;
-    }
-
-    using HMT = imtrest::CHttpRequest::MethodType;
-    HMT methodType = httpRequest->GetMethodType();
-
-    switch (methodType)
-    {
-    case HMT::MT_GET: return this->OnGetRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_POST: return this->OnPostRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_DELETE: return this->OnDeleteRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_PATCH: return this->OnPatchRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_PUT: return this->OnPutRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_HEAD: return this->OnHeadRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_OPTIONS: return this->OnOptionsRequestReceived(*httpRequest, engine); break;
-    case HMT::MT_UNKNOWN: return this->OnUnknownRequestReceived(*httpRequest, engine); break;
-    default: this->OnInvalidRequestReceived(*httpRequest, engine); break;
-    }
-
-    return nullptr;
+	return OnRequestReceived(*httpRequestPtr);
 }
 
 
 QByteArray CHttpServletCompBase::GetSupportedCommandId() const
 {
-    return *m_commandIdAttrPtr;
+	return *m_commandIdAttrPtr;
 }
 
-const imtrest::IResponse* CHttpServletCompBase::OnGetRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const
+
+// protected methods
+
+IRequestHandler::ConstResponsePtr CHttpServletCompBase::OnRequestReceived(const imtrest::CHttpRequest& request) const
 {
-    qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << "\nwhat(): GET request received but NOT procseed!";
+	QByteArray commandId;
+	imtrest::IRequest::CommandParams commandParams;
+	HeadersMap headers;
 
-    QByteArray commandId = request.GetCommandId();
-    imtrest::IRequest::CommandParams commandParams = request.GetCommandParams();
-    HeadersMap headers;
-    QByteArrayList headersKeys = request.GetHeaders();
-    for(const QByteArray& key: ::qAsConst(headersKeys))
-    {
-        headers.insert(key, request.GetHeaderValue(key));
-    }
+	ExtractRequestInfo(request, commandId, commandParams, headers);
 
-    return this->OnGet(commandId, commandParams, headers, request);
+	switch (request.GetMethodType()){
+	case imtrest::CHttpRequest::MethodType::MT_GET:
+		return OnGet(commandId, commandParams, headers, request);
+
+	case imtrest::CHttpRequest::MethodType::MT_POST:
+		return OnPost(commandId, commandParams, headers, request);
+
+	case imtrest::CHttpRequest::MethodType::MT_DELETE:
+		return OnDelete(commandId, commandParams, headers, request);
+
+	case imtrest::CHttpRequest::MethodType::MT_PATCH:
+		return OnPatch(commandId, commandParams, headers, request);
+
+	case imtrest::CHttpRequest::MethodType::MT_PUT:
+		return OnPut(commandId, commandParams, headers, request);
+
+	case imtrest::CHttpRequest::MethodType::MT_HEAD:
+		return OnHead(commandId, commandParams, headers, request);
+
+	case imtrest::CHttpRequest::MethodType::MT_OPTIONS:
+		return OnOptions(commandId, commandParams, headers, request);
+
+	case imtrest::CHttpRequest::MethodType::MT_UNKNOWN:
+		return OnUnknown(commandId, commandParams, headers, request);
+
+	default:
+		return OnInvalid(commandId, commandParams, headers, request);
+		break;
+	}
+
+	return ConstResponsePtr();
 }
 
-const imtrest::IResponse* CHttpServletCompBase::OnPostRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const
+
+IRequestHandler::ConstResponsePtr CHttpServletCompBase::OnGet(
+			const QByteArray& commandId,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
 {
-    qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << "\nwhat(): POST request received but NOT procseed!";
-    QByteArray commandId = request.GetCommandId();
-    QByteArray body = request.GetBody();
-    imtrest::IRequest::CommandParams commandParams = request.GetCommandParams();
-    HeadersMap headers;
-    QByteArrayList headersKeys = request.GetHeaders();
-    for(const QByteArray& key: ::qAsConst(headersKeys))
-    {
-        headers.insert(key, request.GetHeaderValue(key));
-    }
+	Q_UNUSED(commandId);
+	Q_UNUSED(commandParams);
+	Q_UNUSED(headers);
 
-    return this->OnPost(commandId, body, commandParams, headers, request);
+	return CreateDefaultErrorResponse("GET request received but is NOT implemented!", request);
 }
 
-const imtrest::IResponse* CHttpServletCompBase::OnDeleteRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const
+
+IRequestHandler::ConstResponsePtr CHttpServletCompBase::OnPost(
+			const QByteArray& commandId,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
 {
-    qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << "\nwhat(): DELETE request received but NOT procseed!";
-    QByteArray commandId = request.GetCommandId();
-    imtrest::IRequest::CommandParams commandParams = request.GetCommandParams();
-    HeadersMap headers;
-    QByteArrayList headersKeys = request.GetHeaders();
-    for(const QByteArray& key: ::qAsConst(headersKeys))
-    {
-        headers.insert(key, request.GetHeaderValue(key));
-    }
+	Q_UNUSED(commandId);
+	Q_UNUSED(commandParams);
+	Q_UNUSED(headers);
 
-    return this->OnDelete(commandId, commandParams, headers, request);
+	return CreateDefaultErrorResponse("POST request received but is NOT implemented!", request);
 }
 
-const imtrest::IResponse* CHttpServletCompBase::OnPatchRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const
+
+IRequestHandler::ConstResponsePtr CHttpServletCompBase::OnDelete(
+			const QByteArray& commandId,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
 {
-    qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << "\nwhat(): PATCH request received but NOT procseed!";
-    QByteArray commandId = request.GetCommandId();
-    imtrest::IRequest::CommandParams commandParams = request.GetCommandParams();
-    HeadersMap headers;
-    QByteArrayList headersKeys = request.GetHeaders();
-    for(const QByteArray& key: ::qAsConst(headersKeys))
-    {
-        headers.insert(key, request.GetHeaderValue(key));
-    }
+	Q_UNUSED(commandId);
+	Q_UNUSED(commandParams);
+	Q_UNUSED(headers);
 
-    return this->OnPatch(commandId, commandParams, headers, request);
+	return CreateDefaultErrorResponse("DELETE request received but is NOT implemented!", request);
 }
 
-const imtrest::IResponse* CHttpServletCompBase::OnPutRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const
+
+IRequestHandler::ConstResponsePtr CHttpServletCompBase::OnPatch(
+			const QByteArray& commandId,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
 {
-    qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << "\nwhat(): PUT request received but NOT procseed!";
-    QByteArray commandId = request.GetCommandId();
-    imtrest::IRequest::CommandParams commandParams = request.GetCommandParams();
-    HeadersMap headers;
-    QByteArrayList headersKeys = request.GetHeaders();
-    for(const QByteArray& key: ::qAsConst(headersKeys))
-    {
-        headers.insert(key, request.GetHeaderValue(key));
-    }
+	Q_UNUSED(commandId);
+	Q_UNUSED(commandParams);
+	Q_UNUSED(headers);
 
-    return this->OnPut(commandId, commandParams, headers, request);
+	return CreateDefaultErrorResponse("PATCH request received but is NOT implemented!", request);
 }
 
-const imtrest::IResponse* CHttpServletCompBase::OnHeadRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const
+
+IRequestHandler::ConstResponsePtr CHttpServletCompBase::OnPut(
+			const QByteArray& commandId,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
 {
-    qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << "\nwhat(): HEAD request received but NOT procseed!";
-    QByteArray commandId = request.GetCommandId();
-    imtrest::IRequest::CommandParams commandParams = request.GetCommandParams();
-    HeadersMap headers;
-    QByteArrayList headersKeys = request.GetHeaders();
-    for(const QByteArray& key: ::qAsConst(headersKeys))
-    {
-        headers.insert(key, request.GetHeaderValue(key));
-    }
+	Q_UNUSED(commandId);
+	Q_UNUSED(commandParams);
+	Q_UNUSED(headers);
 
-    return this->OnHead(commandId, commandParams, headers, request);
+	return CreateDefaultErrorResponse("PUT request received but is NOT implemented!", request);
 }
 
-const imtrest::IResponse* CHttpServletCompBase::OnOptionsRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const
+
+IRequestHandler::ConstResponsePtr CHttpServletCompBase::OnHead(
+			const QByteArray& commandId,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
 {
-    qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << "\nwhat(): OPTIONS request received but NOT procseed!";
-    QByteArray commandId = request.GetCommandId();
-    imtrest::IRequest::CommandParams commandParams = request.GetCommandParams();
-    HeadersMap headers;
-    QByteArrayList headersKeys = request.GetHeaders();
-    for(const QByteArray& key: ::qAsConst(headersKeys))
-    {
-        headers.insert(key, request.GetHeaderValue(key));
-    }
+	Q_UNUSED(commandId);
+	Q_UNUSED(commandParams);
+	Q_UNUSED(headers);
 
-    return this->OnOptions(commandId, commandParams, headers, request);
+	return CreateDefaultErrorResponse("HEAD request received but is NOT implemented!", request);
 }
 
-const imtrest::IResponse* CHttpServletCompBase::OnUnknownRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const
+
+IRequestHandler::ConstResponsePtr CHttpServletCompBase::OnOptions(
+			const QByteArray& commandId,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
 {
-    qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << "\nwhat(): UNKNOWN request received but NOT procseed!";
-    QByteArray commandId = request.GetCommandId();
-    imtrest::IRequest::CommandParams commandParams = request.GetCommandParams();
-    HeadersMap headers;
-    QByteArrayList headersKeys = request.GetHeaders();
-    for(const QByteArray& key: ::qAsConst(headersKeys))
-    {
-        headers.insert(key, request.GetHeaderValue(key));
-    }
-
-    return this->OnUnknown(commandId, commandParams, headers, request);
+	Q_UNUSED(commandId);
+	Q_UNUSED(commandParams);
+	Q_UNUSED(headers);
+	
+	return CreateDefaultErrorResponse("OPTIONS request received but is NOT implemented!", request);
 }
 
-const imtrest::IResponse* CHttpServletCompBase::OnInvalidRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const
+IRequestHandler::ConstResponsePtr CHttpServletCompBase::OnUnknown(
+			const QByteArray& commandId,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
 {
-    qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << "\nwhat(): INVALID request received but NOT procseed!";
-    QByteArray commandId = request.GetCommandId();
-    imtrest::IRequest::CommandParams commandParams = request.GetCommandParams();
-    HeadersMap headers;
-    QByteArrayList headersKeys = request.GetHeaders();
-    for(const QByteArray& key: ::qAsConst(headersKeys))
-    {
-        headers.insert(key, request.GetHeaderValue(key));
-    }
+	Q_UNUSED(commandId);
+	Q_UNUSED(commandParams);
+	Q_UNUSED(headers);
 
-    return this->OnInvalid(commandId, commandParams, headers, request);
+	return CreateDefaultErrorResponse("UNKNOWN request received but is NOT implemented!", request);
 }
 
-const imtrest::IResponse* CHttpServletCompBase::OnGet(
-				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
-				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const
+IRequestHandler::ConstResponsePtr CHttpServletCompBase::OnInvalid(
+			const QByteArray& commandId,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
 {
-    Q_UNUSED(commandId) Q_UNUSED(commandParams) Q_UNUSED(headers)
-    return this->CreateDefaultErrorResponse("GET request received but NOT procseed!", request);
+	Q_UNUSED(commandId);
+	Q_UNUSED(commandParams);
+	Q_UNUSED(headers);
+
+	return CreateDefaultErrorResponse("INVALID request received but is NOT implemented!", request);
 }
 
-const imtrest::IResponse* CHttpServletCompBase::OnPost(
-				const QByteArray& commandId,
-				const QByteArray body,
-				const imtrest::IRequest::CommandParams& commandParams,
-				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const
+IRequestHandler::ConstResponsePtr CHttpServletCompBase::CreateDefaultErrorResponse(const QByteArray& errorString, const imtrest::CHttpRequest& request) const
 {
-    Q_UNUSED(commandId) Q_UNUSED(body) Q_UNUSED(commandParams) Q_UNUSED(headers)
-    return this->CreateDefaultErrorResponse("POST request received but NOT procseed!", request);
+	qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << errorString;
+
+	IRequestHandler::ConstResponsePtr retVal;
+
+	retVal.SetPtr(request.GetProtocolEngine().CreateResponse(
+				request,
+				imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
+				errorString,
+				QByteArray("text/plain; charset=utf-8")));
+
+	return retVal;
 }
 
-const imtrest::IResponse* CHttpServletCompBase::OnDelete(
-				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
-				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const
+
+// private methods
+
+void CHttpServletCompBase::ExtractRequestInfo(
+			const imtrest::CHttpRequest& request,
+			QByteArray& commandId,
+			imtrest::IRequest::CommandParams& commandParams,
+			HeadersMap& headers)
 {
-    Q_UNUSED(commandId) Q_UNUSED(commandParams) Q_UNUSED(headers)
-    return this->CreateDefaultErrorResponse("DELETE request received but NOT procseed!", request);
+	commandId = request.GetCommandId();
+	commandParams = request.GetCommandParams();
 
+	QByteArrayList headersKeys = request.GetHeaders();
+	for (const QByteArray& key : ::qAsConst(headersKeys)){
+		headers.insert(key, request.GetHeaderValue(key));
+	}
 }
 
-const imtrest::IResponse* CHttpServletCompBase::OnPatch(
-				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
-				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const
-{
-    Q_UNUSED(commandId) Q_UNUSED(commandParams) Q_UNUSED(headers)
-    return this->CreateDefaultErrorResponse("PATCH request received but NOT procseed!", request);
-
-}
-
-const imtrest::IResponse* CHttpServletCompBase::OnPut(
-				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
-				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const
-{
-    Q_UNUSED(commandId) Q_UNUSED(commandParams) Q_UNUSED(headers)
-    return this->CreateDefaultErrorResponse("PUT request received but NOT procseed!", request);
-
-}
-
-const imtrest::IResponse* CHttpServletCompBase::OnHead(
-				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
-				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const
-{
-    Q_UNUSED(commandId) Q_UNUSED(commandParams) Q_UNUSED(headers)
-    return this->CreateDefaultErrorResponse("HEAD request received but NOT procseed!", request);
-
-}
-
-const imtrest::IResponse* CHttpServletCompBase::OnOptions(
-				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
-				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const
-{
-    Q_UNUSED(commandId) Q_UNUSED(commandParams) Q_UNUSED(headers)
-    return this->CreateDefaultErrorResponse("OPTIONS request received but NOT procseed!", request);
-
-}
-
-const imtrest::IResponse* CHttpServletCompBase::OnUnknown(
-				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
-				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const
-{
-    Q_UNUSED(commandId) Q_UNUSED(commandParams) Q_UNUSED(headers)
-    return this->CreateDefaultErrorResponse("UNKNOWN request received but NOT procseed!", request);
-
-}
-
-const imtrest::IResponse* CHttpServletCompBase::OnInvalid(
-				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
-				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const
-{
-    Q_UNUSED(commandId) Q_UNUSED(commandParams) Q_UNUSED(headers)
-    return this->CreateDefaultErrorResponse("INVALID request received but NOT procseed!", request);
-
-}
-
-imtrest::IResponse* CHttpServletCompBase::CreateDefaultErrorResponse(const QByteArray& errorString, const imtrest::CHttpRequest& request) const
-{
-    qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << errorString;
-    return request.GetProtocolEngine().CreateResponse(
-                        request,
-                        imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
-                        errorString,
-                        QByteArray("text/plain; charset=utf-8"));
-}
 
 } // namespace imtrest
 

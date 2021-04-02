@@ -18,17 +18,18 @@ namespace imtrest
 
 // reimplemented (IRequestHandler)
 
-const imtrest::IResponse* CTcpServerComp::ProcessRequest(const IRequest& request) const
+IRequestHandler::ConstResponsePtr CTcpServerComp::ProcessRequest(const IRequest& request) const
 {
+	ConstResponsePtr retVal;
+
 	if (m_requestHandlerCompPtr.IsValid()){
-		const IResponse* responsePtr = m_requestHandlerCompPtr->ProcessRequest(request);
-		if (responsePtr != nullptr){
-			request.GetProtocolEngine().GetResponder().SendResponse(*responsePtr);
-			delete responsePtr;
+		retVal = m_requestHandlerCompPtr->ProcessRequest(request);
+		if (retVal.IsValid()){
+			request.GetProtocolEngine().GetResponder().SendResponse(*retVal);
 		}
 	}
 
-	return nullptr;
+	return retVal;
 }
 
 

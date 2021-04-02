@@ -18,43 +18,35 @@ namespace imtrest
 
 // public methods
 
-// reimplemented (IProtocolEngine)
+// reimplemented (IRequestHandler)
 
-const imtrest::IResponse* CHttpFileBasedHandlerComp::ProcessRequest(const IRequest& request) const
+IRequestHandler::ConstResponsePtr CHttpFileBasedHandlerComp::ProcessRequest(const IRequest& request) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-	istd::TDelPtr<IResponse> errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId));
+	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId));
 
-    if (!m_fileTemplatePathCompPtr.IsValid()){
-
-        return errorResponsePtr.PopPtr();
+	if (!m_fileTemplatePathCompPtr.IsValid()){
+		return errorResponsePtr;
 	}
 
 	QString templateFilePath = m_fileTemplatePathCompPtr->GetPath();
-
-    if (templateFilePath.isEmpty()){
-
-        return errorResponsePtr.PopPtr();
+	if (templateFilePath.isEmpty()){
+		return errorResponsePtr;
 	}
 
 	QFile templateFile(templateFilePath);
-
-    if (!templateFile.open(QIODevice::ReadOnly)){
-
-        return errorResponsePtr.PopPtr();
+	if (!templateFile.open(QIODevice::ReadOnly)){
+		return errorResponsePtr;
 	}
 
 	QByteArray body = templateFile.readAll();
 
-	istd::TDelPtr<IResponse> responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId));
-	if (!responsePtr.IsValid()){
-        return nullptr;
-	}
+	ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId));
 
-    return responsePtr.PopPtr();
+	return responsePtr;
 }
 
 

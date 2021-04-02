@@ -17,14 +17,13 @@ public:
 	I_BEGIN_COMPONENT(CHttpServletDemoComp);
 	I_END_COMPONENT
 
-	virtual const imtrest::IResponse* OnGet(
+	virtual ConstResponsePtr OnGet(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 				const imtrest::CHttpRequest& request) const override;
-	virtual const imtrest::IResponse* OnPost(
+	virtual ConstResponsePtr OnPost(
 				const QByteArray& commandId,
-				const QByteArray body,
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 				const imtrest::CHttpRequest& request) const override;

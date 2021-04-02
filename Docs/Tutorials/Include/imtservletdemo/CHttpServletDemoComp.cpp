@@ -19,33 +19,36 @@
 
 namespace imtservletdemo
 {
-	const imtrest::IResponse* CHttpServletDemoComp::OnGet(
-				const QByteArray& commandId,
-				const imtrest::IRequest::CommandParams& commandParams,
-				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const
-	{
-		return request.GetProtocolEngine().CreateResponse(
-					request,
-					imtrest::IProtocolEngine::SC_OK,
-					"[GET] HELLO WORLD!",
-					QByteArray("text/plain; charset=utf-8"));
-	}
 
 
-	const imtrest::IResponse* CHttpServletDemoComp::OnPost(
-				const QByteArray& commandId,
-				const QByteArray body,
-				const imtrest::IRequest::CommandParams& commandParams,
-				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const
-	{
-		return request.GetProtocolEngine().CreateResponse(
-					request,
-					imtrest::IProtocolEngine::SC_OK,
-					"[POST] HELLO WORLD!",
-					QByteArray("text/plain; charset=utf-8"));
-	}
+imtrest::IRequestHandler::ConstResponsePtr CHttpServletDemoComp::OnGet(
+			const QByteArray& commandId,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
+{
+	return imtrest::IRequestHandler::ConstResponsePtr(
+				request.GetProtocolEngine().CreateResponse(
+				request,
+				imtrest::IProtocolEngine::SC_OK,
+				"[GET] HELLO WORLD!",
+				QByteArray("text/plain; charset=utf-8")));
+}
+
+
+imtrest::IRequestHandler::ConstResponsePtr CHttpServletDemoComp::OnPost(
+			const QByteArray& commandId,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
+{
+	return imtrest::IRequestHandler::ConstResponsePtr(
+				request.GetProtocolEngine().CreateResponse(
+				request,
+				imtrest::IProtocolEngine::SC_OK,
+				"[POST] HELLO WORLD!",
+				QByteArray("text/plain; charset=utf-8")));
+}
 
 
 } //namespace imtservletdemo

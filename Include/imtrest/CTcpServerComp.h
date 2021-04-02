@@ -41,8 +41,8 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (IRequestHandler)
-    virtual const imtrest::IResponse* ProcessRequest(const IRequest& request) const override;
-    virtual QByteArray GetSupportedCommandId() const override;
+	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const override;
+	virtual QByteArray GetSupportedCommandId() const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

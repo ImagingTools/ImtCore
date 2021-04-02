@@ -36,83 +36,71 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (IRequestHandler)
-	virtual const imtrest::IResponse* ProcessRequest(const imtrest::IRequest& request) const override;
+	virtual ConstResponsePtr ProcessRequest(const imtrest::IRequest& request) const override;
 	virtual QByteArray GetSupportedCommandId() const override;
 
 protected:
 	typedef QMap<QByteArray, QByteArray> HeadersMap;
 
-	virtual const imtrest::IResponse* OnGet(
+	virtual ConstResponsePtr OnGet(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 				const imtrest::CHttpRequest& request) const;
-	virtual const imtrest::IResponse* OnPost(
-				const QByteArray& commandId,
-				const QByteArray body,
-				const imtrest::IRequest::CommandParams& commandParams,
-				const HeadersMap& headers,
-				const imtrest::CHttpRequest& request) const;
-	virtual const imtrest::IResponse* OnDelete(
+	virtual ConstResponsePtr OnPost(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 				const imtrest::CHttpRequest& request) const;
-	virtual const imtrest::IResponse* OnPatch(
+	virtual ConstResponsePtr OnDelete(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 				const imtrest::CHttpRequest& request) const;
-	virtual const imtrest::IResponse* OnPut(
+	virtual ConstResponsePtr OnPatch(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 				const imtrest::CHttpRequest& request) const;
-	virtual const imtrest::IResponse* OnHead(
+	virtual ConstResponsePtr OnPut(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 				const imtrest::CHttpRequest& request) const;
-	virtual const imtrest::IResponse* OnOptions(
+	virtual ConstResponsePtr OnHead(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 				const imtrest::CHttpRequest& request) const;
-	virtual const imtrest::IResponse* OnUnknown(
+	virtual ConstResponsePtr OnOptions(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 				const imtrest::CHttpRequest& request) const;
-	virtual const imtrest::IResponse* OnInvalid(
+	virtual ConstResponsePtr OnUnknown(
+				const QByteArray& commandId,
+				const imtrest::IRequest::CommandParams& commandParams,
+				const HeadersMap& headers,
+				const imtrest::CHttpRequest& request) const;
+	virtual ConstResponsePtr OnInvalid(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 			const imtrest::CHttpRequest& request) const;
 
 protected:
-	virtual const imtrest::IResponse* OnGetRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const;
-	virtual const imtrest::IResponse* OnPostRequestReceived(
-				const imtrest::CHttpRequest& request,
-				const imtrest::IProtocolEngine& engine) const;
-	virtual const imtrest::IResponse* OnDeleteRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const;
-	virtual const imtrest::IResponse* OnPatchRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const;
-	virtual const imtrest::IResponse* OnPutRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const;
-	virtual const imtrest::IResponse* OnHeadRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const;
-	virtual const imtrest::IResponse* OnOptionsRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const;
-	virtual const imtrest::IResponse* OnUnknownRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const;
-	virtual const imtrest::IResponse* OnInvalidRequestReceived(const imtrest::CHttpRequest& request, const imtrest::IProtocolEngine& engine) const;
+	virtual ConstResponsePtr OnRequestReceived(const imtrest::CHttpRequest& request) const;
+	virtual ConstResponsePtr CreateDefaultErrorResponse(const QByteArray& errorString, const imtrest::CHttpRequest& request) const;
 
+private:
+	static void ExtractRequestInfo(
+				const imtrest::CHttpRequest& request,
+				QByteArray& commandId,
+				imtrest::IRequest::CommandParams& commandParams,
+				HeadersMap& headers);
 
 private:
 	I_ATTR(QByteArray, m_commandIdAttrPtr);
-
-	typedef QMap<QString, IRequestHandler*> HandlersMap;
-
-	HandlersMap m_handlersMap;
-	QMutex m_handlersMapMutex;
-
-	imtrest::IResponse* CreateDefaultErrorResponse(const QByteArray& errorString, const imtrest::CHttpRequest& request) const;
-
 };
 
 

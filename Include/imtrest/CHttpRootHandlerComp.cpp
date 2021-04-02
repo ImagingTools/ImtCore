@@ -14,53 +14,52 @@ namespace imtrest
 
 // public methods
 
-// reimplemented (IProtocolEngine)
+// reimplemented (IRequestHandler)
 
-const imtrest::IResponse* CHttpRootHandlerComp::ProcessRequest(const IRequest& request) const
+IRequestHandler::ConstResponsePtr CHttpRootHandlerComp::ProcessRequest(const IRequest& request) const
 {
-	const IProtocolEngine& engine = request.GetProtocolEngine();
-
 	QByteArray commandId = request.GetCommandId();
-	if (commandId.startsWith('/'))
-	{
+	if (commandId.startsWith('/')){
 		commandId = commandId.remove(0, 1);
 	}
-	if (commandId.endsWith('/'))
-	{
-		commandId = commandId.remove(commandId.length()-1, 1);
+
+	if (commandId.endsWith('/')){
+		commandId = commandId.remove(commandId.length() - 1, 1);
 	}
+
+	const IProtocolEngine& engine = request.GetProtocolEngine();
 
 	if (commandId.isEmpty()){
 		QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>The requested command could not be executed</p></body></html>");
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-		istd::TDelPtr<IResponse> responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
-        if (responsePtr.IsValid()){
+		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
 
-            return nullptr;
-		}
+		return responsePtr;
 	}
+
 	const IRequestHandler* handlerPtr = FindRequestHandler(commandId);
-	if (handlerPtr != nullptr){
+	if (handlerPtr != nullptr) {
 		return handlerPtr->ProcessRequest(request);
 	}
-	else{
-        QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>The requested command could not be executed</p></body></html>");
-        QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+	else {
+		QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>The requested command could not be executed</p></body></html>");
+		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-        istd::TDelPtr<IResponse> responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
-        if (responsePtr.IsValid()){
-            engine.GetResponder().SendResponse(*responsePtr);
-        }
+		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
+		if (responsePtr.IsValid()) {
+			engine.GetResponder().SendResponse(*responsePtr);
+		}
 		SendErrorMessage(0, QString("No request handler found for: '%1'").arg(qPrintable(commandId)));
+
+		return responsePtr;
 	}
 
-	return false;
+	return ConstResponsePtr();
 }
 
 
 // protected methods
-
 
 IRequestHandler* CHttpRootHandlerComp::FindRequestHandler(const QByteArray& commandId) const
 {
@@ -72,11 +71,9 @@ IRequestHandler* CHttpRootHandlerComp::FindRequestHandler(const QByteArray& comm
 	/// \warning This pointer chould be returned ONLY exactsCommandIdHandler is null!
 	IRequestHandler* startsCommandIdHandler = nullptr;
 
-    for (int i = 0; i < m_requestHandlersCompPtr.GetCount(); ++i)
-    {
-        IRequestHandler* handlerPtr = m_requestHandlersCompPtr[i];
-        if (handlerPtr)
-        {
+	for (int i = 0; i < m_requestHandlersCompPtr.GetCount(); ++i) {
+		IRequestHandler* handlerPtr = m_requestHandlersCompPtr[i];
+		if (handlerPtr != nullptr){
 			QByteArray handlersPtrSupportedCommandId = handlerPtr->GetSupportedCommandId();
 			if (handlersPtrSupportedCommandId == commandId)
 			{
@@ -93,8 +90,8 @@ IRequestHandler* CHttpRootHandlerComp::FindRequestHandler(const QByteArray& comm
 				startsCommandIdHandler = handlerPtr;
 			}
 
-        }
-    }
+		}
+	}
 	return exactsCommandIdHandler == nullptr ? startsCommandIdHandler : exactsCommandIdHandler;
 }
 
@@ -119,13 +116,13 @@ void CHttpRootHandlerComp::OnComponentCreated()
 				m_handlersMap[registeredCommandId] = handlerPtr;
 			}
 		}
-    }
+	}
 }
 
 
 QByteArray CHttpRootHandlerComp::GetSupportedCommandId() const
 {
-    return "/";
+	return "/";
 }
 
 

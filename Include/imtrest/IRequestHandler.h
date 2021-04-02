@@ -2,7 +2,10 @@
 
 
 // ACF includes
-#include <istd/IPolymorphic.h>
+#include <istd/TSmartPtr.h>
+
+// ImtCore includes
+#include <imtrest/IResponse.h>
 
 
 namespace imtrest
@@ -17,8 +20,10 @@ class IResponse;
 class IRequestHandler: virtual public istd::IPolymorphic
 {
 public:
-        virtual const IResponse* ProcessRequest(const IRequest& request) const = 0;
-    virtual QByteArray GetSupportedCommandId() const = 0;
+	typedef istd::TSmartPtr<const imtrest::IResponse> ConstResponsePtr;
+
+	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const = 0;
+	virtual QByteArray GetSupportedCommandId() const = 0;
 };
 
 
