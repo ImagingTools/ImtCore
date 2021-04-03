@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtreport/IGraphicsElement.h>
+#include <imtreport/IDrawElement.h>
 
 
 namespace imtreport
@@ -10,12 +10,12 @@ namespace imtreport
 
 
 /**
-	Interface for describing a graphic element.
+	Basic implementation of a drawable element.
 */
-class CGraphicsElementBase: virtual public IGraphicsElement
+class CGraphicsElementBase: virtual public IDrawElement
 {
 public:
-	// reimplemented (IGraphicsElement)
+	// reimplemented (IDrawElement)
 	virtual GraphicsAttributes GetGraphicsAttributes() const override;
 	virtual void SetGraphicsAttributes(const GraphicsAttributes& graphicsAttributes) override;
 

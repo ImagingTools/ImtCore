@@ -14,9 +14,9 @@ namespace imtreport
 
 // public methods
 
-// reimplemented (IGraphicsElement)
+// reimplemented (IDrawElement)
 
-IGraphicsElement::GraphicsAttributes CGraphicsElementBase::GetGraphicsAttributes() const
+IDrawElement::GraphicsAttributes CGraphicsElementBase::GetGraphicsAttributes() const
 {
 	return m_graphicsAttributes;
 }

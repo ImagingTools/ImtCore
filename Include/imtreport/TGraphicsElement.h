@@ -46,11 +46,11 @@ template <class Object2dType>
 QByteArray TGraphicsElement<Object2dType>::GetTypeName()
 {
 	QMap<QByteArray, QByteArray> knownTypesMap;
+	knownTypesMap[istd::CClassInfo::GetName<i2d::CLine2d>()] = "Line";
 	knownTypesMap[istd::CClassInfo::GetName<i2d::CRectangle>()] = "Rectangle";
 	knownTypesMap[istd::CClassInfo::GetName<i2d::CCircle>()] = "Circle";
-	knownTypesMap[istd::CClassInfo::GetName<i2d::CLabel>()] = "Label";
 	knownTypesMap[istd::CClassInfo::GetName<i2d::CPolygon>()] = "Polygon";
-	knownTypesMap[istd::CClassInfo::GetName<i2d::CLine2d>()] = "Line";
+	knownTypesMap[istd::CClassInfo::GetName<i2d::CLabel>()] = "Label";
 	knownTypesMap[istd::CClassInfo::GetName<CTextLabel>()] = "TextLabel";
 	knownTypesMap[istd::CClassInfo::GetName<CImageRectangle>()] = "Image";
 

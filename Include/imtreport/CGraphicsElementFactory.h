@@ -11,7 +11,7 @@ namespace imtreport
 
 
 /**
-	 factory for 2D-objects.
+	Factory for drawable 2D-objects.
 */
 class CGraphicsElementFactory: virtual public istd::TIFactory<i2d::IObject2d>
 {

@@ -47,7 +47,7 @@ private:
 	static void CreateTextTableItem(const imtreport::CTextTableItem& tableItem, const QRectF& cellRect, QGraphicsScene& scene);
 
 	static qreal GetTextTableRowHeight(const imtreport::CTextTable& table, const CTextTableProxy& tableProxy, int row, int resolutionDpi);
-	static void SetShapePenAndBrush(const imtreport::IGraphicsElement& pageElement, QAbstractGraphicsShapeItem& sceneElement);
+	static void SetShapePenAndBrush(const imtreport::IDrawElement& pageElement, QAbstractGraphicsShapeItem& sceneElement);
 
 	static qreal MapCoordinateToScene(qreal value, bool isX, int resolutionDpi);
 	static QPointF MapPointToScene(const QPointF& point, int resolutionDpi);

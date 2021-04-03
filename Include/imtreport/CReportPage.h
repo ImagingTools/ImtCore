@@ -13,6 +13,7 @@
 #include <imtreport/IReportPage.h>
 #include <imtreport/CGraphicsElementFactory.h>
 
+
 namespace imtreport
 {
 
@@ -28,7 +29,7 @@ public:
 
 	// reimplemented (IReportPage)
 	ElementIds GetPageElements() const override;
-   i2d::IObject2d* GetPageElement(const QByteArray& elementId) const override;
+	i2d::IObject2d* GetPageElement(const QByteArray& elementId) const override;
 	QByteArray AddText(const QString& text, const i2d::CVector2d& position, const double textWidth = -1.0, const Qt::Alignment alignment = Qt::AlignLeft) override;
 	QByteArray AddImage(const QString& imagePath, const i2d::CRectangle& rect) override;
 	QByteArray AddLine(const i2d::CLine2d& line) override;
@@ -52,8 +53,10 @@ protected:
 private:
 	int FindItemIndex(const i2d::IObject2d& element) const;
 
-	template <typename TObject> TObject* AddObject(QByteArray& uuid);
+	template <typename TObject>
+	TObject* AddObject(QByteArray& uuid);
 
+private:
 	typedef QMap<QByteArray, int> ElementsIndiciesMap; // key - element uuid, value - element index in TContainer
 	ElementsIndiciesMap m_elementsIndicies;
 

@@ -306,7 +306,7 @@ qreal CReportSceneBuilder::GetTextTableRowHeight(const imtreport::CTextTable& ta
 }
 
 
-void CReportSceneBuilder::SetShapePenAndBrush(const imtreport::IGraphicsElement& pageElement, QAbstractGraphicsShapeItem& sceneElement)
+void CReportSceneBuilder::SetShapePenAndBrush(const imtreport::IDrawElement& pageElement, QAbstractGraphicsShapeItem& sceneElement)
 {
 	QPen pen(pageElement.GetGraphicsAttributes().strokeColor);
 

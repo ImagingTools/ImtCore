@@ -13,9 +13,9 @@ namespace imtreport
 
 
 /**
-	Interface for describing a graphical representation of a geometry element in 2D-space.
+	Interface for describing a graphical representation of a geometry element in 2D-canvas.
 */
-class IGraphicsElement: virtual public i2d::IObject2d
+class IDrawElement: virtual public i2d::IObject2d
 {
 public:
 	struct GraphicsAttributes
