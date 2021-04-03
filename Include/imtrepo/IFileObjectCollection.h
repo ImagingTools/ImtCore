@@ -18,7 +18,7 @@ namespace imtrepo
 
 
 /**
-	Common interface for a object collection where the objects are stored in the file system.
+	Common interface for an object collection, where the objects are stored in the file system.
 	\ingroup Collection
 	\ingroup FileRepository
 */
@@ -82,7 +82,7 @@ public:
 		\param objectName			Name of the file object used for human readable representation. If no name was set, the file name will be used.
 		\param objectDescription	Description of the file object.
 		\param proposedObjectId		User-defined object-ID. If this parameter is not set, the implementation should generate a ID automatically.
-		\return ID of the file object. If the operation was not successful, the method returns an empty ID.
+		\return ID of the file object. If the operation was not successful, the method returns an empty collection ID.
 	*/
 	virtual QByteArray InsertFile(
 				const QString& filePath,

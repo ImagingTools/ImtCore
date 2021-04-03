@@ -464,7 +464,7 @@ QByteArray CFileCollectionComp::InsertFile(
 
 		if (m_files[i].filePathInRepository == localFilePath){
 			if (proposedObjectId.isEmpty()){
-				SendInfoMessage(0, QString("The file '%1' already exists in the repository").arg(localFilePath));
+				SendInfoMessage(0, QString("File '%1' already exists in the repository").arg(localFilePath));
 
 				return collectionItem.fileId;
 			}
@@ -481,7 +481,7 @@ QByteArray CFileCollectionComp::InsertFile(
 					collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
 					collectionItem.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
 
-					SendVerboseMessage(QString("The file '%1' is already exists in the repository").arg(localFilePath));
+					SendVerboseMessage(QString("File '%1' already exists in the repository").arg(localFilePath));
 
 					QByteArray fileId = collectionItem.fileId;
 

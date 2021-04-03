@@ -15,12 +15,12 @@
 #include <iser/ISerializable.h>
 #include <imod/TModelWrap.h>
 #include <ilog/TLoggerCompWrap.h>
-#include <iauth/ILogin.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
 #include <ifile/IFileNameParam.h>
 #include <ifile/IFilePersistence.h>
 #include <ifile/IFileResourceTypeConstraints.h>
+#include <iauth/ILogin.h>
 #include <iauth/IRightsProvider.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtbase/IMetaInfoCreator.h>
