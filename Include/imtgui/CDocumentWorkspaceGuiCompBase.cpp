@@ -7,17 +7,16 @@
 #include <QtCore/QUrl>
 #include <QtCore/QMimeData>
 #include <QtGui/QDragEnterEvent>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QTabBar>
-#include <QtWidgets/QMenu>
+#include <QtWidgets/QMessageBox>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <istd/CChangeGroup.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 #include <ibase/ICommandsProvider.h>
-#include <idoc/IDocumentTemplate.h>
 #include <idoc/IDocumentMetaInfo.h>
+#include <idoc/IDocumentTemplate.h>
 #include <iwidgets/CWidgetUpdateBlocker.h>
 
 
@@ -44,9 +43,9 @@ void CDocumentWorkspaceGuiCompBase::OnTryClose(bool* ignoredPtr)
 	if (SaveDirtyDocuments(false, ignoredPtr)){
 		int documentInfosCount = GetDocumentsCount();
 		for (int documentIndex = 0; documentIndex < documentInfosCount; ++documentIndex){
-			SingleDocumentData& info = GetSingleDocumentData(documentIndex);
+			SingleDocumentData& documentData = GetSingleDocumentData(documentIndex);
 
-			info.isDirty = false;
+			documentData.isDirty = false;
 		}
 
 		CloseAllDocuments();
@@ -191,10 +190,10 @@ int CDocumentWorkspaceGuiCompBase::GetDocumentIndexFromWidget(const QWidget& wid
 {
 	int documentInfosCount = GetDocumentsCount();
 	for (int documentIndex = 0; documentIndex < documentInfosCount; ++documentIndex){
-		SingleDocumentData& info = GetSingleDocumentData(documentIndex);
+		const SingleDocumentData& documentData = GetSingleDocumentData(documentIndex);
 
-		for (		Views::ConstIterator viewIter = info.views.begin();
-					viewIter != info.views.end();
+		for (		Views::ConstIterator viewIter = documentData.views.begin();
+					viewIter != documentData.views.end();
 					++viewIter){
 			const ViewInfo& viewInfo = *viewIter;
 
@@ -213,14 +212,6 @@ int CDocumentWorkspaceGuiCompBase::GetDocumentIndexFromWidget(const QWidget& wid
 
 void CDocumentWorkspaceGuiCompBase::InitializeDocumentView(IDocumentViewDecorator* /*documentViewPtr*/, const SingleDocumentData& /*documentData*/)
 {
-}
-
-
-void CDocumentWorkspaceGuiCompBase::UpdateCommands()
-{
-	static ChangeSet changes(ibase::ICommandsProvider::CF_COMMANDS);
-
-	istd::CChangeNotifier changeNotifier(&m_commands, &changes);
 }
 
 
@@ -468,7 +459,7 @@ void CDocumentWorkspaceGuiCompBase::OnViewRemoved(istd::IPolymorphic* viewPtr)
 
 			guiObjectPtr->DestroyGui();
 
-			OnWindowActivated(lastPageIndex);
+			OnViewActivated(lastPageIndex);
 
 			Tabs->removeTab(pageIndex);
 
@@ -480,25 +471,27 @@ void CDocumentWorkspaceGuiCompBase::OnViewRemoved(istd::IPolymorphic* viewPtr)
 
 bool CDocumentWorkspaceGuiCompBase::QueryDocumentSave(const SingleDocumentData& info, bool* ignoredPtr)
 {
-	QFileInfo fileInfo(info.filePath);
 	QMessageBox::StandardButtons buttons = QMessageBox::Yes | QMessageBox::No;
 
 	if (ignoredPtr != nullptr){
 		*ignoredPtr = false;
+
 		buttons |= QMessageBox::Cancel;
 	}
 
-	int response = QMessageBox::information(
+	QFileInfo fileInfo(info.filePath);
+
+	int dialogResult = QMessageBox::information(
 				GetQtWidget(),
 				tr("Close document"),
 				tr("Do you want to save your changes made in document\n%1").arg(QDir::toNativeSeparators(fileInfo.completeBaseName())),
 				buttons,
 				QMessageBox::Yes);
 
-	if (response == QMessageBox::Yes){
+	if (dialogResult == QMessageBox::Yes){
 		return true;
 	}
-	else if ((ignoredPtr != nullptr) && (response == QMessageBox::Cancel)){
+	else if ((ignoredPtr != nullptr) && (dialogResult == QMessageBox::Cancel)){
 		*ignoredPtr = true;
 	}
 
@@ -582,20 +575,20 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 	}
 
 	connect(Tabs, SIGNAL(currentChanged(int)), this, SLOT(OnWindowActivated(int)));
-	connect(Tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(OnTabCloseRequested(int)));
-	connect(m_closeCurrentTabShortcutPtr, &QShortcut::activated, this, &CDocumentWorkspaceGuiCompBase::OnCloseCurrentTabShortcut);
+	connect(Tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(OnViewClosed(int)));
+	connect(m_closeCurrentTabShortcutPtr, &QShortcut::activated, this, &CDocumentWorkspaceGuiCompBase::OnCurrentViewCloseTriggered);
 
 	int documentsCount = GetDocumentsCount();
-	for (int docIndex = 0; docIndex < documentsCount; ++docIndex){
-		int viewsCount = GetViewsCount(docIndex);
+	for (int documentIndex = 0; documentIndex < documentsCount; ++documentIndex){
+		int viewsCount = GetViewsCount(documentIndex);
 
-		SingleDocumentData& info = GetSingleDocumentData(docIndex);
+		const SingleDocumentData& documentInfo = GetSingleDocumentData(documentIndex);
 
 		for (int viewIndex = 0; viewIndex < viewsCount; ++viewIndex){
-			istd::IPolymorphic* viewPtr = GetViewFromIndex(docIndex, viewIndex);
+			istd::IPolymorphic* viewPtr = GetViewFromIndex(documentIndex, viewIndex);
 			Q_ASSERT(viewPtr != nullptr);
 
-			OnViewRegistered(viewPtr, info);
+			OnViewRegistered(viewPtr, documentInfo);
 		}
 	}
 }
@@ -661,19 +654,18 @@ void CDocumentWorkspaceGuiCompBase::OnEndChanges(const ChangeSet& changeSet)
 		UpdateAllTitles();
 	}
 
-	if (changeSet.Contains(CF_VIEW_ACTIVATION_CHANGED)){
-		return;
-	}
+	if (!changeSet.Contains(CF_VIEW_ACTIVATION_CHANGED)){
+		idoc::CMultiDocumentManagerBase::SingleDocumentData* activeDocumentInfoPtr = GetActiveDocumentInfo();
+		if (activeDocumentInfoPtr == nullptr){
+			m_documentList.SetSelectedOptionIndex(iprm::ISelectionParam::NO_SELECTION);
 
-	idoc::CMultiDocumentManagerBase::SingleDocumentData* activeDocumentInfoPtr = GetActiveDocumentInfo();
-	if (activeDocumentInfoPtr == nullptr){
-		m_documentList.SetSelectedOptionIndex(iprm::ISelectionParam::NO_SELECTION);
-		m_currentDocumentName.SetName("");
-	}
-	else{
-		int documentIndex = GetDocumentIndex(*activeDocumentInfoPtr);
+			m_currentDocumentName.SetName(QString());
+		}
+		else{
+			int documentIndex = GetDocumentIndex(*activeDocumentInfoPtr);
 
-		m_documentList.SetSelectedOptionIndex(documentIndex);
+			m_documentList.SetSelectedOptionIndex(documentIndex);
+		}
 	}
 }
 
@@ -705,6 +697,14 @@ bool CDocumentWorkspaceGuiCompBase::eventFilter(QObject* sourcePtr, QEvent* even
 
 // protected slots
 
+void CDocumentWorkspaceGuiCompBase::UpdateCommands()
+{
+	static ChangeSet changes(ibase::ICommandsProvider::CF_COMMANDS);
+
+	istd::CChangeNotifier changeNotifier(&m_commands, &changes);
+}
+
+
 void CDocumentWorkspaceGuiCompBase::OnCloseDocument()
 {
 	int pageIndex = Tabs->currentIndex();
@@ -718,7 +718,7 @@ void CDocumentWorkspaceGuiCompBase::OnCloseDocument()
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnUndoDocument()
+void CDocumentWorkspaceGuiCompBase::OnUndo()
 {
 	SingleDocumentData* documentDataPtr = GetActiveDocumentInfo();
 	if ((documentDataPtr != nullptr) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableUndoSteps() > 0){
@@ -727,7 +727,7 @@ void CDocumentWorkspaceGuiCompBase::OnUndoDocument()
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnRedoDocument()
+void CDocumentWorkspaceGuiCompBase::OnRedo()
 {
 	SingleDocumentData* documentDataPtr = GetActiveDocumentInfo();
 	if ((documentDataPtr != nullptr) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableRedoSteps() > 0){
@@ -736,7 +736,7 @@ void CDocumentWorkspaceGuiCompBase::OnRedoDocument()
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnWindowActivated(int index)
+void CDocumentWorkspaceGuiCompBase::OnViewActivated(int index)
 {
 	if (index < m_fixedTabs.size()){
 		SetActiveView(m_fixedTabs[index]);
@@ -751,15 +751,6 @@ void CDocumentWorkspaceGuiCompBase::OnWindowActivated(int index)
 	}
 
 	UpdateCommands();
-}
-
-
-void CDocumentWorkspaceGuiCompBase::OnCloseAllViews()
-{
-	bool isCanceled = false;
-	if (SaveDirtyDocuments(false, &isCanceled) && !isCanceled){
-		CloseAllDocuments();
-	}
 }
 
 
@@ -780,7 +771,7 @@ void CDocumentWorkspaceGuiCompBase::OnOpenDocument(const QByteArray& documentTyp
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnTabCloseRequested(int index)
+void CDocumentWorkspaceGuiCompBase::OnViewCloseTriggered(int index)
 {
 	if (index > 0){
 		if (index > GetFixedWindowsCount() - 1){
@@ -795,22 +786,24 @@ void CDocumentWorkspaceGuiCompBase::OnTabCloseRequested(int index)
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnCloseCurrentTabShortcut()
+void CDocumentWorkspaceGuiCompBase::OnCurrentViewCloseTriggered()
 {
-	OnTabCloseRequested(Tabs->currentIndex());
+	OnViewCloseTriggered(Tabs->currentIndex());
 }
+
 
 // public methods of the embedded class DocumentList
 
 CDocumentWorkspaceGuiCompBase::DocumentList::DocumentList()
-	:m_selectedDocumentIndex(iprm::ISelectionParam::NO_SELECTION)
+	:m_selectedIndex(iprm::ISelectionParam::NO_SELECTION),
+	m_parentPtr(nullptr)
 {
 }
 
 
 void CDocumentWorkspaceGuiCompBase::DocumentList::SetParent(CDocumentWorkspaceGuiCompBase& parent)
 {
-	m_parent = &parent;
+	m_parentPtr = &parent;
 }
 
 
@@ -824,7 +817,7 @@ const iprm::IOptionsList* CDocumentWorkspaceGuiCompBase::DocumentList::GetSelect
 
 int CDocumentWorkspaceGuiCompBase::DocumentList::GetSelectedOptionIndex() const
 {
-	return m_selectedDocumentIndex;
+	return m_selectedIndex;
 }
 
 
@@ -834,17 +827,17 @@ bool CDocumentWorkspaceGuiCompBase::DocumentList::SetSelectedOptionIndex(int ind
 		return false;
 	}
 
-	if (m_selectedDocumentIndex != index){
+	if (m_selectedIndex != index){
 		static ChangeSet changeSet(CF_SELECTION_CHANGED);
 		istd::CChangeNotifier changePtr(this, &changeSet);
 
-		m_selectedDocumentIndex = index;
+		m_selectedIndex = index;
 
 		istd::IPolymorphic* viewPtr = nullptr;
-		if (m_selectedDocumentIndex >= 0){
-			viewPtr = m_parent->GetViewFromIndex(m_selectedDocumentIndex, 0);
+		if (m_selectedIndex >= 0){
+			viewPtr = m_parentPtr->GetViewFromIndex(m_selectedIndex, 0);
 
-			m_parent->SetActiveView(viewPtr);
+			m_parentPtr->SetActiveView(viewPtr);
 		}
 	}
 
@@ -868,15 +861,15 @@ int CDocumentWorkspaceGuiCompBase::DocumentList::GetOptionsFlags() const
 
 int CDocumentWorkspaceGuiCompBase::DocumentList::GetOptionsCount() const
 {
-	Q_ASSERT(m_parent != nullptr);
+	Q_ASSERT(m_parentPtr != nullptr);
 
-	return m_parent->GetDocumentsCount();
+	return m_parentPtr->GetDocumentsCount();
 }
 
 
 QString CDocumentWorkspaceGuiCompBase::DocumentList::GetOptionName(int index) const
 {
-	SingleDocumentData& documentData = m_parent->GetSingleDocumentData(index);
+	const SingleDocumentData& documentData = m_parentPtr->GetSingleDocumentData(index);
 
 	if (!documentData.filePath.isEmpty()){
 		QFileInfo fileInfo(QDir::toNativeSeparators(documentData.filePath));

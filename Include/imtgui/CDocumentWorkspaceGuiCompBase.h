@@ -142,16 +142,15 @@ protected:
 				const ifile::IFilePersistence* persistencePtr) = 0;
 
 protected Q_SLOTS:
+	virtual void UpdateCommands();
 	virtual void OnCloseDocument();
-	virtual void OnUndoDocument();
-	virtual void OnRedoDocument();
-	virtual void OnWindowActivated(int index);
-	virtual void OnCloseAllViews();
+	virtual void OnUndo();
+	virtual void OnRedo();
+	virtual void OnViewActivated(int index);
 	virtual void OnNewDocument(const QByteArray& documentTypeId);
 	virtual void OnOpenDocument(const QByteArray& documentTypeId);
-	void OnTabCloseRequested(int index);
-	void OnCloseCurrentTabShortcut();
-	virtual void UpdateCommands();
+	void OnViewCloseTriggered(int index);
+	void OnCurrentViewCloseTriggered();
 
 Q_SIGNALS:
 	void PostUpdateCommands();
@@ -194,8 +193,8 @@ private:
 		virtual bool Serialize(iser::IArchive& archive);
 
 	private:
-		int m_selectedDocumentIndex;
-		CDocumentWorkspaceGuiCompBase* m_parent;
+		int m_selectedIndex;
+		CDocumentWorkspaceGuiCompBase* m_parentPtr;
 	};
 
 	class Commands: virtual public ibase::ICommandsProvider
