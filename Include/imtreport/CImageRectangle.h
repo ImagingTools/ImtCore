@@ -2,7 +2,6 @@
 
 
 // ACF includes
-#include <i2d/CLabel.h>
 #include <i2d/CRectangle.h>
 
 
@@ -15,19 +14,11 @@ class CImageRectangle: public i2d::CRectangle
 public:
 	typedef i2d::CRectangle BaseClass;
 
-	/**
-		Get image path.
-	*/
-	virtual const QString& GetImagePath() const;
-
-	/**
-		Set image path.
-	*/
+	virtual QString GetImagePath() const;
 	virtual void SetImagePath(const QString& imagePath);
 
-
 	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive);
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented istd::IChangeable
 	virtual int GetSupportedOperations() const override;

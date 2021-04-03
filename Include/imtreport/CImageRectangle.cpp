@@ -2,9 +2,9 @@
 
 
 // ACF includes
-#include "istd/TDelPtr.h"
-#include "istd/CChangeNotifier.h"
-#include "iser/CArchiveTag.h"
+#include <istd/TDelPtr.h>
+#include <istd/CChangeNotifier.h>
+#include <iser/CArchiveTag.h>
 
 
 namespace imtreport
@@ -13,7 +13,7 @@ namespace imtreport
 
 // public methods
 
-const QString& CImageRectangle::GetImagePath() const
+QString CImageRectangle::GetImagePath() const
 {
 	return m_imagePath;
 }
