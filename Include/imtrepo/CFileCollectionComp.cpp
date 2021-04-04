@@ -693,7 +693,7 @@ bool CFileCollectionComp::GetDataMetaInfo(const QByteArray& objectId, ifile::IFi
 QByteArray CFileCollectionComp::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
-			const QString& /*description*/,
+			const QString& description,
 			const istd::IChangeable * defaultValuePtr,
 			const QByteArray& proposedObjectId)
 {
@@ -723,7 +723,7 @@ QByteArray CFileCollectionComp::InsertNewObject(
 			QString tempFilePath = targetFolder + "/" + QUuid::createUuid().toString() + "." + supportedExts[0];
 
 			if (persistencePtr->SaveToFile(*newObjectPtr, tempFilePath) == ifile::IFilePersistence::OS_OK){
-				QByteArray retval = InsertFile(tempFilePath, typeId, name, QString(), proposedObjectId);
+				QByteArray retval = InsertFile(tempFilePath, typeId, name, description, proposedObjectId);
 
 				QFile::remove(tempFilePath);
 
