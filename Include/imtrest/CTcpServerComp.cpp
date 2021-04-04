@@ -1,9 +1,6 @@
 #include <imtrest/CTcpServerComp.h>
 
 
-// Qt includes
-#include <QtNetwork/QNetworkInterface>
-
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponse.h>
