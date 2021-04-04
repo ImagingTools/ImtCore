@@ -117,11 +117,11 @@ void CDocumentWorkspaceGuiComp::OnSaveDocument()
 
 // public methods of the embedded class CollectionDocumentViewDecorator
 
-CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::CollectionDocumentViewDecorator(
+CollectionDocumentViewDecorator::CollectionDocumentViewDecorator(
 			CDocumentWorkspaceGuiComp* parentPtr,
 			istd::IPolymorphic* viewPtr,
 			QWidget* parentWidgetPtr,
-			SingleDocumentData& documentData,
+			idoc::CMultiDocumentManagerBase::SingleDocumentData& documentData,
 			const ifile::IFilePersistence* persistencePtr)
 :	QWidget(parentWidgetPtr),
 	m_documentData(documentData),
@@ -177,10 +177,10 @@ CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::CollectionDocumentVi
 	connect(&m_closeCommand, SIGNAL(triggered()), parentPtr, SLOT(OnCloseDocument()));
 	connect(&m_saveCommand, SIGNAL(triggered()), parentPtr, SLOT(OnSaveDocument()));
 
-	m_undoCommand.SetVisuals(tr("&Undo"), tr("Undo"), tr("Undo last document changes"), QIcon(":/Icons/Undo"));
-	m_redoCommand.SetVisuals(tr("&Redo"), tr("Redo"), tr("Redo last document changes"), QIcon(":/Icons/Redo"));
-	m_closeCommand.SetVisuals(tr("&Close"), tr("Close"), tr("Close the document"), QIcon(":/Icons/Remove"));
-	m_saveCommand.SetVisuals(tr("&Save"), tr("Save"), tr("Save the document changes"), QIcon(":/Icons/Save"));
+	m_undoCommand.SetVisuals(QObject::tr("&Undo"), QObject::tr("Undo"), QObject::tr("Undo last document changes"), QIcon(":/Icons/Undo"));
+	m_redoCommand.SetVisuals(QObject::tr("&Redo"), QObject::tr("Redo"), QObject::tr("Redo last document changes"), QIcon(":/Icons/Redo"));
+	m_closeCommand.SetVisuals(QObject::tr("&Close"), QObject::tr("Close"), QObject::tr("Close the document"), QIcon(":/Icons/Remove"));
+	m_saveCommand.SetVisuals(QObject::tr("&Save"), QObject::tr("Save"), QObject::tr("Save the document changes"), QIcon(":/Icons/Save"));
 
 	UpdateSaveButtonsStatus();
 
@@ -216,7 +216,7 @@ CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::CollectionDocumentVi
 }
 
 
-void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::UpdateSaveButtonsStatus()
+void CollectionDocumentViewDecorator::UpdateSaveButtonsStatus()
 {
 	bool isSaveActive = true;
 
@@ -243,13 +243,13 @@ void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::UpdateSaveButto
 }
 
 
-idoc::CMultiDocumentManagerBase::SingleDocumentData& CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::GetDocumentData() const
+idoc::CMultiDocumentManagerBase::SingleDocumentData& CollectionDocumentViewDecorator::GetDocumentData() const
 {
 	return m_documentData;
 }
 
 
-void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::OnViewContraintsChanged()
+void CollectionDocumentViewDecorator::OnViewContraintsChanged()
 {
 	const imtgui::IDocumentViewConstraints* viewConstraintsPtr = CompCastPtr<imtgui::IDocumentViewConstraints>(m_viewObjectPtr);
 	if (viewConstraintsPtr != NULL){
@@ -273,49 +273,49 @@ void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::OnViewContraint
 
 // reimplemeneted (IDocumentViewDecorator)
 
-QWidget* CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::GetDecoratorWidget()
+QWidget* CollectionDocumentViewDecorator::GetDecoratorWidget()
 {
 	return this;
 }
 
 
-QWidget* CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::GetViewFrame()
+QWidget* CollectionDocumentViewDecorator::GetViewFrame()
 {
 	return DocumentFrame;
 }
 
 
-istd::IPolymorphic* CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::GetView() const
+istd::IPolymorphic* CollectionDocumentViewDecorator::GetView() const
 {
 	return m_viewObjectPtr;
 }
 
 
-void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::SetViewEnabled(bool isEnabled)
+void CollectionDocumentViewDecorator::SetViewEnabled(bool isEnabled)
 {
 	setEnabled(isEnabled);
 }
 
 
-QString CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::GetTitle()
+QString CollectionDocumentViewDecorator::GetTitle()
 {
 	return QString();
 }
 
 
-void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::SetTitle(const QString& /*title*/)
+void CollectionDocumentViewDecorator::SetTitle(const QString& /*title*/)
 {
 }
 
 
-void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::SetDocumentTypeName(const QString& /*name*/)
+void CollectionDocumentViewDecorator::SetDocumentTypeName(const QString& /*name*/)
 {
 }
 
 
 // reimplemented (ibase::ICommandsProvider)
 
-const ibase::IHierarchicalCommand * CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::GetCommands() const
+const ibase::IHierarchicalCommand * CollectionDocumentViewDecorator::GetCommands() const
 {
 	return &m_commands;
 }
@@ -325,7 +325,7 @@ const ibase::IHierarchicalCommand * CDocumentWorkspaceGuiComp::CollectionDocumen
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CDocumentWorkspaceGuiComp::CollectionDocumentViewDecorator::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CollectionDocumentViewDecorator::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	Q_ASSERT(m_parentPtr != NULL);
 

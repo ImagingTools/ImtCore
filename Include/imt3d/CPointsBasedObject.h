@@ -30,6 +30,8 @@ public:
 	void* GetPointData(int pointIndex) override;
 	virtual void* GetData() override;
 	virtual const void* GetData() const override;
+	virtual int GetPointBytesSize() const override;
+
 
 	// reimplemented (imt3d::IObject3d)
 	bool IsEmpty() const override;
@@ -69,6 +71,7 @@ protected:
 	void OnEndChanges(const ChangeSet& changes) override;
 
 protected:
+	static int GetPointBytesSize(PointFormat pointFormat);
 	static int GetBufferSize(PointFormat pointFormat, int pointsCount);
 
 protected:

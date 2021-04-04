@@ -42,7 +42,8 @@ public:
 		PF_XYZW_32,						// 4 float point coordinates (homogeneous point coordinates)
 		PF_XYZW_NORMAL_CURVATURE_32,	// 4 float point coordinates + 4 float normal coordinates + 4 float curvature
 		PF_XYZW_NORMAL_RGBA_32,			// 4 float point coordinates + 4 float normal coordinates + color information as 32-bit float number
-		PF_XYZW_RGBA_32					// 4 float point coordinates + color information as 32-bit float number
+		PF_XYZW_RGBA_32,					// 4 float point coordinates + color information as 32-bit float number
+		PF_UNDEFINED
 	};
 
 	I_DECLARE_ENUM(PointFormat, PF_XYZ_32, PF_XYZ_64, PF_XYZ_ABC_32, PF_XYZW_32, PF_XYZW_NORMAL_CURVATURE_32, PF_XYZW_NORMAL_RGBA_32, PF_XYZW_RGBA_32);
@@ -102,6 +103,11 @@ public:
 		Return const pointer to the internal data buffer.
 	*/
 	virtual const void* GetData() const = 0;
+
+	/**
+		Return bytes count of one point
+	*/
+	virtual int GetPointBytesSize() const = 0;
 };
 
 

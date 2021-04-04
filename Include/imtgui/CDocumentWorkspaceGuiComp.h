@@ -52,70 +52,73 @@ private:
 		DR_TYPE_ID
 	};
 
-	class CollectionDocumentViewDecorator:
-				public QWidget,
-				public Ui::CStandardDocumentViewDecorator,
-				virtual public IDocumentViewDecorator,
-				virtual public ibase::ICommandsProvider,
-				protected imod::CMultiModelDispatcherBase
-	{
-	public:
-		enum ModelId
-		{
-			MI_VIEW_COMMANDS,
-			MI_VIEW_CONSTRAINTS,
-			MI_UNDO_MANAGER,
-			MI_DOCUMENT_META_INFO
-		};
-
-		CollectionDocumentViewDecorator(
-					CDocumentWorkspaceGuiComp* parentPtr,
-					istd::IPolymorphic* viewPtr,
-					QWidget* parentWidgetPtr,
-					SingleDocumentData& documentData,
-					const ifile::IFilePersistence* persistencePtr);
-
-		void UpdateSaveButtonsStatus();
-		SingleDocumentData& GetDocumentData() const;
-
-		// reimplemeneted (IDocumentViewDecorator)
-		virtual QWidget* GetDecoratorWidget() override;
-		virtual QWidget* GetViewFrame() override;
-		virtual istd::IPolymorphic* GetView() const override;
-		virtual void SetViewEnabled(bool isEnabled) override;
-		virtual QString GetTitle() override;
-		virtual void SetTitle(const QString& title) override;
-		virtual void SetDocumentTypeName(const QString& name) override;
-
-		// reimplemented (ibase::ICommandsProvider)
-		virtual const ibase::IHierarchicalCommand* GetCommands() const override;
-
-	protected:
-		void OnViewContraintsChanged();
-
-		// reimplemented (imod::CMultiModelDispatcherBase)
-		virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet);
-
-	private:
-		SingleDocumentData& m_documentData;
-		istd::IPolymorphic* m_viewObjectPtr;
-		idoc::IUndoManager* m_undoManagerPtr;
-		const ifile::IFilePersistence* m_filePersistencePtr;
-		CDocumentWorkspaceGuiComp* m_parentPtr;
-		bool m_isInitialized;
-		QString m_documentName;
-		QString m_comment;
-
-		iqtgui::CHierarchicalCommand m_commands;
-		iqtgui::CHierarchicalCommand m_saveCommand;
-		iqtgui::CHierarchicalCommand m_undoCommand;
-		iqtgui::CHierarchicalCommand m_redoCommand;
-		iqtgui::CHierarchicalCommand m_closeCommand;
-	};
+	friend class CollectionDocumentViewDecorator;
 
 	I_ATTR(QByteArray, m_tabStyleSheetPropertyAttrPtr);
 	I_REF(iauth::ILogin, m_loginCompPtr);
 	I_REF(ilog::IMessageConsumer, m_logCompPtr);
+};
+
+
+class CollectionDocumentViewDecorator:
+			public QWidget,
+			public Ui::CStandardDocumentViewDecorator,
+			virtual public IDocumentViewDecorator,
+			virtual public ibase::ICommandsProvider,
+			protected imod::CMultiModelDispatcherBase
+{
+public:
+	enum ModelId
+	{
+		MI_VIEW_COMMANDS,
+		MI_VIEW_CONSTRAINTS,
+		MI_UNDO_MANAGER,
+		MI_DOCUMENT_META_INFO
+	};
+
+	CollectionDocumentViewDecorator(
+		CDocumentWorkspaceGuiComp* parentPtr,
+		istd::IPolymorphic* viewPtr,
+		QWidget* parentWidgetPtr,
+		idoc::CMultiDocumentManagerBase::SingleDocumentData& documentData,
+		const ifile::IFilePersistence* persistencePtr);
+
+	void UpdateSaveButtonsStatus();
+	idoc::CMultiDocumentManagerBase::SingleDocumentData& GetDocumentData() const;
+
+	// reimplemeneted (IDocumentViewDecorator)
+	virtual QWidget* GetDecoratorWidget() override;
+	virtual QWidget* GetViewFrame() override;
+	virtual istd::IPolymorphic* GetView() const override;
+	virtual void SetViewEnabled(bool isEnabled) override;
+	virtual QString GetTitle() override;
+	virtual void SetTitle(const QString& title) override;
+	virtual void SetDocumentTypeName(const QString& name) override;
+
+	// reimplemented (ibase::ICommandsProvider)
+	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
+
+protected:
+	void OnViewContraintsChanged();
+
+	// reimplemented (imod::CMultiModelDispatcherBase)
+	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet);
+
+private:
+	idoc::CMultiDocumentManagerBase::SingleDocumentData& m_documentData;
+	istd::IPolymorphic* m_viewObjectPtr;
+	idoc::IUndoManager* m_undoManagerPtr;
+	const ifile::IFilePersistence* m_filePersistencePtr;
+	CDocumentWorkspaceGuiComp* m_parentPtr;
+	bool m_isInitialized;
+	QString m_documentName;
+	QString m_comment;
+
+	iqtgui::CHierarchicalCommand m_commands;
+	iqtgui::CHierarchicalCommand m_saveCommand;
+	iqtgui::CHierarchicalCommand m_undoCommand;
+	iqtgui::CHierarchicalCommand m_redoCommand;
+	iqtgui::CHierarchicalCommand m_closeCommand;
 };
 
 

@@ -20,7 +20,6 @@
 #include <imtgui/CLayoutManagerGuiComp.h>
 #include <imtgui/CLayout.h>
 #include <imtgui/CCompositeObjectViewComp.h>
-#include <imtgui/CImageContoursExtender.h>
 #include <imtgui/CPageNavigationControllerComp.h>
 #include <imtgui/CPageSwitcherComp.h>
 #include <imtgui/CPluginStatusViewerComp.h>
@@ -48,7 +47,6 @@ typedef icomp::TModelCompWrap<imtgui::CMonitorInfoProviderComp> MonitorInfoProvi
 typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtgui::CLayout, imtgui::ILayout, iser::ISerializable>> LayoutManager;
 typedef icomp::TModelCompWrap<imtgui::CLayoutManagerGuiComp> LayoutManagerGui;
 typedef imtgui::CCompositeObjectViewComp CompositeObjectView;
-typedef imtgui::CImageContoursExtender ImageContoursExtender;
 typedef icomp::TModelCompWrap<imtgui::CPageNavigationControllerComp> PageNavigationController;
 typedef ibase::TModelObserverCompWrap<imtgui::CPageSwitcherComp> PageSwitcher;
 typedef imtgui::CStandardCollectionViewDelegateComp StandardCollectionViewDelegate;

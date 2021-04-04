@@ -83,11 +83,6 @@ I_EXPORT_COMPONENT(
 			"Composite Object View Observer Collection");
 
 I_EXPORT_COMPONENT(
-			ImageContoursExtender,
-			"Image contours extender component",
-			"Image Contours Contour Extender View Observer");
-
-I_EXPORT_COMPONENT(
 			PageNavigationController,
 			"Controller for page navigation",
 			"Menu Page Navigation");
