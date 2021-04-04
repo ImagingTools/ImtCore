@@ -18,6 +18,17 @@ CCollectionObjectContext::CCollectionObjectContext()
 }
 
 
+void CCollectionObjectContext::SetObjectContext(const imtbase::IObjectCollection* objectCollectionPtr, const QByteArray& objectId)
+{
+	if ((m_objectCollectionPtr != objectCollectionPtr) || (m_objectId != objectId)){
+		istd::CChangeNotifier notifier(this);
+
+		m_objectCollectionPtr = objectCollectionPtr;
+		m_objectId = objectId;
+	}
+}
+
+
 // reimplemented (ICollectionObjectContext)
 
 const imtbase::IObjectCollection* CCollectionObjectContext::GetObjectCollectionPtr() const
@@ -32,17 +43,6 @@ QByteArray CCollectionObjectContext::GetObjectId() const
 }
 
 
-void CCollectionObjectContext::SetObjectContext(const imtbase::IObjectCollection* objectCollectionPtr, const QByteArray& objectId)
-{
-	if (m_objectCollectionPtr != objectCollectionPtr || m_objectId != objectId){
-		istd::CChangeNotifier notifier(this);
-
-		m_objectCollectionPtr = objectCollectionPtr;
-		m_objectId = objectId;
-	}
-}
-
-
 // reimplemented (istd::IChangeable)
 
 int CCollectionObjectContext::GetSupportedOperations() const
@@ -51,7 +51,7 @@ int CCollectionObjectContext::GetSupportedOperations() const
 }
 
 
-bool CCollectionObjectContext::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CCollectionObjectContext::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	if (m_objectCollectionPtr == nullptr && m_objectId.isEmpty()){
 		const CCollectionObjectContext* sourcePtr = dynamic_cast<const CCollectionObjectContext*>(&object);
@@ -73,10 +73,9 @@ bool CCollectionObjectContext::IsEqual(const IChangeable& object) const
 {
 	const CCollectionObjectContext* sourcePtr = dynamic_cast<const CCollectionObjectContext*>(&object);
 	if (sourcePtr != nullptr){
-		bool retVal = m_objectCollectionPtr == sourcePtr->m_objectCollectionPtr;
-		retVal = retVal && (m_objectId == sourcePtr->m_objectId);
-
-		return retVal;
+		if ((m_objectCollectionPtr == sourcePtr->m_objectCollectionPtr) && (m_objectId == sourcePtr->m_objectId)){
+			return true;
+		}
 	}
 
 	return false;
@@ -94,7 +93,7 @@ istd::IChangeable* CCollectionObjectContext::CloneMe(CompatibilityMode mode) con
 }
 
 
-bool CCollectionObjectContext::ResetData(CompatibilityMode mode)
+bool CCollectionObjectContext::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier notifier(this);
 	

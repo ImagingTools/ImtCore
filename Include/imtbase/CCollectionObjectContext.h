@@ -22,10 +22,11 @@ class CCollectionObjectContext: virtual public ICollectionObjectContext
 public:
 	CCollectionObjectContext();
 
+	virtual void SetObjectContext(const imtbase::IObjectCollection* objectCollectionPtr, const QByteArray& objectId);
+
 	// reimplemented (ICollectionObjectContext)
 	virtual const imtbase::IObjectCollection* GetObjectCollectionPtr() const override;
 	virtual QByteArray GetObjectId() const override;
-	virtual void SetObjectContext(const imtbase::IObjectCollection* objectCollectionPtr, const QByteArray& objectId) override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
