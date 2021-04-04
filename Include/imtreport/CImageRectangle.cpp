@@ -21,8 +21,7 @@ QString CImageRectangle::GetImagePath() const
 
 void CImageRectangle::SetImagePath(const QString& imagePath)
 {
-	if (m_imagePath != imagePath)
-	{
+	if (m_imagePath != imagePath){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_imagePath = imagePath;
