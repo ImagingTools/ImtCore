@@ -548,7 +548,7 @@
              <item>
               <widget class="QStackedWidget" name="PageStack">
                <property name="currentIndex">
-                <number>2</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="LoginPage">
                 <layout class="QGridLayout" name="gridLayout_2">
@@ -586,14 +586,7 @@
                    <property name="frameShadow">
                     <enum>QFrame::Raised</enum>
                    </property>
-                   <layout class="QGridLayout" name="gridLayout_3">
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="label_2">
-                      <property name="text">
-                       <string>Password</string>
-                      </property>
-                     </widget>
-                    </item>
+                   <layout class="QFormLayout" name="formLayout">
                     <item row="0" column="0">
                      <widget class="QLabel" name="label">
                       <property name="text">
@@ -601,32 +594,25 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="1" column="1" colspan="3">
+                    <item row="0" column="1">
+                     <widget class="QLineEdit" name="UserEdit"/>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="PasswordLabel">
+                      <property name="text">
+                       <string>Password</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
                      <widget class="QLineEdit" name="PasswordEdit">
                       <property name="echoMode">
                        <enum>QLineEdit::Password</enum>
                       </property>
                      </widget>
                     </item>
-                    <item row="0" column="1" colspan="3">
-                     <widget class="QLineEdit" name="UserEdit">
-                      <property name="minimumSize">
-                       <size>
-                        <width>300</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="1" colspan="3">
+                    <item row="2" column="0" colspan="2">
                      <layout class="QHBoxLayout" name="horizontalLayout">
-                      <item>
-                       <widget class="QLabel" name="LoginStatus">
-                        <property name="text">
-                         <string/>
-                        </property>
-                       </widget>
-                      </item>
                       <item>
                        <spacer name="horizontalSpacer_4">
                         <property name="orientation">

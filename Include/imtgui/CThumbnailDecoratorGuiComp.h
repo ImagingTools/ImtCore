@@ -178,6 +178,7 @@ private Q_SLOTS:
 	void on_HomeButton_clicked();
 	void on_LoginButton_clicked();
 	void on_LoginControlButton_clicked();
+	void on_PasswordEdit_textEdited(const QString &text);
 	void on_CommandsMenuButton_clicked();
 	void on_KeyboardButton_clicked();
 	void Logout();

@@ -361,6 +361,10 @@ void CThumbnailDecoratorGuiComp::on_PageStack_currentChanged(int stackIndex)
 		PasswordEdit->setFocus();
 		PasswordEdit->setCursorPosition(0);
 	}
+
+	PasswordEdit->setText("");
+	PasswordEdit->setStyleSheet("");
+	PasswordLabel->setStyleSheet("");
 }
 
 
@@ -435,8 +439,6 @@ void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 
 void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 {
-	LoginStatus->setText("");
-
 	PasswordEdit->setFocus();
 	if (m_loginCompPtr.IsValid()){
 		QString userName = UserEdit->text();
@@ -480,8 +482,8 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 			}
 		}
 		else{
-			LoginStatus->setStyleSheet("color : red");
-			LoginStatus->setText(tr("Wrong password"));
+			PasswordEdit->setStyleSheet("border-color: red; color: red");
+			PasswordLabel->setStyleSheet("color: red");
 			if (m_keyEnterTimerId != 0){
 				killTimer(m_keyEnterTimerId);
 			}
@@ -489,7 +491,7 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 		}
 	}
 
-	PasswordEdit->setText("");
+	//PasswordEdit->setText("");
 }
 
 
@@ -503,6 +505,13 @@ void CThumbnailDecoratorGuiComp::on_LoginControlButton_clicked()
 	else{
 		ProcessLogout();
 	}
+}
+
+
+void CThumbnailDecoratorGuiComp::on_PasswordEdit_textEdited(const QString &/*text*/)
+{
+	PasswordEdit->setStyleSheet("");
+	PasswordLabel->setStyleSheet("");
 }
 
 
