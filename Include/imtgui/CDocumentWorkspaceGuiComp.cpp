@@ -167,15 +167,15 @@ CollectionDocumentViewDecorator::CollectionDocumentViewDecorator(
 		m_comment = metaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
 	}
 
-	connect(UndoButton, SIGNAL(clicked()), parentPtr, SLOT(OnUndoDocument()));
-	connect(RedoButton, SIGNAL(clicked()), parentPtr, SLOT(OnRedoDocument()));
-	connect(CloseButton, SIGNAL(clicked()), parentPtr, SLOT(OnCloseDocument()));
-	connect(SaveButton, SIGNAL(clicked()), parentPtr, SLOT(OnSaveDocument()));
+	connect(UndoButton, &QToolButton::clicked, parentPtr, &CDocumentWorkspaceGuiComp::OnUndo);
+	connect(RedoButton, &QToolButton::clicked, parentPtr, &CDocumentWorkspaceGuiComp::OnRedo);
+	connect(CloseButton, &QToolButton::clicked, parentPtr, &CDocumentWorkspaceGuiComp::OnCloseDocument);
+	connect(SaveButton, &QToolButton::clicked, parentPtr, &CDocumentWorkspaceGuiComp::OnSaveDocument);
 
-	connect(&m_undoCommand, SIGNAL(triggered()), parentPtr, SLOT(OnUndoDocument()));
-	connect(&m_redoCommand, SIGNAL(triggered()), parentPtr, SLOT(OnRedoDocument()));
-	connect(&m_closeCommand, SIGNAL(triggered()), parentPtr, SLOT(OnCloseDocument()));
-	connect(&m_saveCommand, SIGNAL(triggered()), parentPtr, SLOT(OnSaveDocument()));
+	connect(&m_undoCommand, &QAction::triggered, parentPtr, &CDocumentWorkspaceGuiComp::OnUndo);
+	connect(&m_redoCommand, &QAction::triggered, parentPtr, &CDocumentWorkspaceGuiComp::OnRedo);
+	connect(&m_closeCommand, &QAction::triggered, parentPtr, &CDocumentWorkspaceGuiComp::OnCloseDocument);
+	connect(&m_saveCommand, &QAction::triggered, parentPtr, &CDocumentWorkspaceGuiComp::OnSaveDocument);
 
 	m_undoCommand.SetVisuals(QObject::tr("&Undo"), QObject::tr("Undo"), QObject::tr("Undo last document changes"), QIcon(":/Icons/Undo"));
 	m_redoCommand.SetVisuals(QObject::tr("&Redo"), QObject::tr("Redo"), QObject::tr("Redo last document changes"), QIcon(":/Icons/Redo"));
