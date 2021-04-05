@@ -16,7 +16,7 @@ class CAesEncryption
 {
 public:
 	CAesEncryption();
-	virtual ~CAesEncryption();
+	~CAesEncryption();
 
 	bool Encrypt(const QByteArray& inputData, const CAesKey& key, QByteArray& outputData) const;
 	bool Decrypt(const QByteArray& inputData, const CAesKey& key, QByteArray& outputData) const;
