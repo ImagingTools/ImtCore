@@ -25,8 +25,7 @@ CAesEncryption::CAesEncryption()
 
 CAesEncryption::~CAesEncryption()
 {
-	EVP_CIPHER_CTX_free(m_aesDecryptContext);
-	EVP_CIPHER_CTX_free(m_aesEncryptContext);
+	DestroyContext();
 }
 
 
