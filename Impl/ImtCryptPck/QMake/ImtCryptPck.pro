@@ -1,10 +1,10 @@
-TARGET = ImtCrypterPck
+TARGET = ImtCryptPck
 
 include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtcrypter
+LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtcrypt
 
 win32: {
 contains(QMAKE_HOST.arch, x86_64) {

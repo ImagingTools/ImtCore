@@ -6,16 +6,18 @@
 #include <icomp/TModelCompWrap.h>
 
 // ImtCore includes
-#include <imtcrypter/CCrypter.h>
+#include <imtcrypt/CCrypter.h>
 
-namespace ImtCrypterPck
+
+namespace ImtCryptPck
 {
 
+
 typedef icomp::TMakeComponentWrap<
-					imtcrypter::CCrypter,
-					imtcrypter::ICrypter> Crypter;
+			imtcrypt::CCrypter,
+			imtcrypt::ICrypter> Crypter;
 
 
-} // namespace ImtCrypterPck
+} // namespace ImtCryptPck
 
 

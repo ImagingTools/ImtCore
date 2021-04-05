@@ -5,12 +5,12 @@
 #include <openssl/rsa.h>
 
 // ImtCore includes
-#include <imtcrypter/ICrypter.h>
-#include <imtcrypter/CAesKey.h>
-#include <imtcrypter/CRsaKey.h>
+#include <imtcrypt/ICrypter.h>
+#include <imtcrypt/CAesKey.h>
+#include <imtcrypt/CRsaKey.h>
 
 
-namespace imtcrypter
+namespace imtcrypt
 {
 
 
@@ -43,5 +43,5 @@ private:
 };
 
 
-} //namespace imtcrypter
+} //namespace imtcrypt
 

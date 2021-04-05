@@ -1,4 +1,4 @@
-#include <imtcrypter/CRsaKey.h>
+#include <imtcrypt/CRsaKey.h>
 
 
 // OpenSSL includes
@@ -6,7 +6,7 @@
 #include <openssl/pem.h>
 
 
-namespace imtcrypter
+namespace imtcrypt
 {
 
 
@@ -69,6 +69,6 @@ void CRsaKey::SetPublicKey(const QByteArray &key)
 }
 
 
-} //namespace imtcrypter
+} //namespace imtcrypt
 
 

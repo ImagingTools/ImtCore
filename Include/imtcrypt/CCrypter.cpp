@@ -1,4 +1,4 @@
-#include <imtcrypter/CCrypter.h>
+#include <imtcrypt/CCrypter.h>
 
 
 // Qt includes
@@ -13,7 +13,7 @@
 #include <openssl/rand.h>
 
 
-namespace imtcrypter
+namespace imtcrypt
 {
 
 
@@ -239,5 +239,5 @@ bool CCrypter::InitAesContext()
 }
 
 
-} //namespace imtcrypter
+} //namespace imtcrypt
 

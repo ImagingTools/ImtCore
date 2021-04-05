@@ -2,10 +2,10 @@
 
 
 // ImtCore includes
-#include <imtcrypter/IRsaKey.h>
+#include <imtcrypt/IRsaKey.h>
 
 
-namespace imtcrypter
+namespace imtcrypt
 {
 
 
@@ -24,6 +24,6 @@ protected:
 };
 
 
-} //namespace imtcrypter
+} //namespace imtcrypt
 
 

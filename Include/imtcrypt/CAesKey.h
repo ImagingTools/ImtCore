@@ -2,10 +2,10 @@
 
 
 // ImtCore includes
-#include <imtcrypter/IAesKey.h>
+#include <imtcrypt/IAesKey.h>
 
 
-namespace imtcrypter
+namespace imtcrypt
 {
 
 
@@ -25,6 +25,6 @@ protected:
 };
 
 
-} //namespace imtcrypter
+} //namespace imtcrypt
 
 

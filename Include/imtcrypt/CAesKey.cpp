@@ -1,11 +1,11 @@
-#include <imtcrypter/CAesKey.h>
+#include <imtcrypt/CAesKey.h>
 
 
 // Qt includes
 #include <QtCore/QCryptographicHash>
 
 
-namespace imtcrypter
+namespace imtcrypt
 {
 
 
@@ -42,6 +42,6 @@ void CAesKey::SetIV(const QByteArray &iv)
 }
 
 
-} //namespace imtcrypter
+} //namespace imtcrypt
 
 

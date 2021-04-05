@@ -10,8 +10,8 @@ imtauthgui.file = ../../Include/imtauthgui/QMake/imtauthgui.pro
 SUBDIRS += imtbase
 imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
 
-SUBDIRS += imtcrypter
-imtcrypter.file = ../../Include/imtcrypter/QMake/imtcrypter.pro
+SUBDIRS += imtcrypt
+imtcrypt.file = ../../Include/imtcrypt/QMake/imtcrypt.pro
 
 SUBDIRS += imtwidgets
 imtwidgets.file = ../../Include/imtwidgets/QMake/imtwidgets.pro
@@ -90,9 +90,9 @@ SUBDIRS += ImtLicenseGuiPck
 ImtLicenseGuiPck.file = ../../Impl/ImtLicenseGuiPck/QMake/ImtLicenseGuiPck.pro
 ImtLicenseGuiPck.depends = imtbase imtlic imtlicgui
 
-SUBDIRS += ImtCrypterPck
-ImtCrypterPck.file = ../../Impl/ImtCrypterPck/QMake/ImtCrypterPck.pro
-ImtCrypterPck.depends = imtbase imtcrypter
+SUBDIRS += ImtCryptPck
+ImtCryptPck.file = ../../Impl/ImtCryptPck/QMake/ImtCryptPck.pro
+ImtCryptPck.depends = imtbase imtcrypt
 
 SUBDIRS += ImtRestPck
 ImtRestPck.file = ../../Impl/ImtRestPck/QMake/ImtRestPck.pro

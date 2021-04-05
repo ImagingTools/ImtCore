@@ -1,26 +1,26 @@
-#include "ImtCrypterPck.h"
+#include "ImtCryptPck.h"
 
 
 // ACF includes
 #include <icomp/export.h>
 
 
-namespace ImtCrypterPck
+namespace ImtCryptPck
 {
 
 
 I_EXPORT_PACKAGE(
-			"ImtCrypterPck",
-			"ImagingTools license management UI-component package",
+			"ImtCryptPck",
+			"Cryptography component package",
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
 			Crypter,
 			"Cryptography algoritms",
-			"Cryptography algoritms");
+			"Cryptography Encrypt Decrypt");
 
 
 
-} // namespace ImtCrypterPck
+} // namespace ImtCryptPck
 
 

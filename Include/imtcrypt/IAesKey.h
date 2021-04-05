@@ -6,7 +6,7 @@
 #include <istd/IChangeable.h>
 
 
-namespace imtcrypter
+namespace imtcrypt
 {
 
 
@@ -26,6 +26,6 @@ public:
 };
 
 
-} //namespace imtcrypter
+} //namespace imtcrypt
 
 

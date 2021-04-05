@@ -5,11 +5,11 @@
 #include <iser/IObject.h>
 
 // ImtCore includes
-#include <imtcrypter/IAesKey.h>
-#include <imtcrypter/IRsaKey.h>
+#include <imtcrypt/IAesKey.h>
+#include <imtcrypt/IRsaKey.h>
 
 
-namespace imtcrypter
+namespace imtcrypt
 {
 
 
@@ -27,6 +27,6 @@ public:
 };
 
 
-} //namespace imtcrypter
+} //namespace imtcrypt
 
 
