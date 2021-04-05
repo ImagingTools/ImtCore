@@ -279,6 +279,8 @@ protected:
 	private:
 		CFileCollectionComp& m_parent;
 		QList<Item> m_repositoryItems;
+
+		mutable QReadWriteLock m_lock;
 	};
 
 	/**

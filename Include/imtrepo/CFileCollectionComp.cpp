@@ -1976,6 +1976,9 @@ bool CFileCollectionComp::RepositoryItemInfoProvider::UpdateItems()
 	QFileInfoList fileList;
 	m_parent.GetRepositoryFileList(fileList);
 
+	QWriteLocker locker(&m_lock);
+	m_repositoryItems.clear();
+
 	for (QFileInfo& file : fileList){
 		QString itemBasePath = file.absolutePath() + "/" + file.completeBaseName();
 
@@ -2005,6 +2008,8 @@ const imtbase::ICollectionInfo& CFileCollectionComp::RepositoryItemInfoProvider:
 
 const IRepositoryItemInfo* CFileCollectionComp::RepositoryItemInfoProvider::GetRepositoryItemInfo(const QByteArray& itemId) const
 {
+	QReadLocker locker(&m_lock);
+
 	for (const Item& item : m_repositoryItems){
 		if (item.id == itemId){
 			return &item.itemInfo;
@@ -2019,6 +2024,8 @@ const IRepositoryItemInfo* CFileCollectionComp::RepositoryItemInfoProvider::GetR
 
 imtbase::ICollectionInfo::Ids CFileCollectionComp::RepositoryItemInfoProvider::GetElementIds() const
 {
+	QReadLocker locker(&m_lock);
+
 	imtbase::ICollectionInfo::Ids ids;
 	for (const Item& item : m_repositoryItems){
 		ids.append(item.id);
