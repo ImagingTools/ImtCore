@@ -490,8 +490,6 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 			m_keyEnterTimerId = startTimer(500);
 		}
 	}
-
-	//PasswordEdit->setText("");
 }
 
 
