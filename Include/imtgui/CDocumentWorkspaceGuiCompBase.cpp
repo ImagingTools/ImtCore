@@ -574,8 +574,8 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 		}
 	}
 
-	connect(Tabs, SIGNAL(currentChanged(int)), this, SLOT(OnWindowActivated(int)));
-	connect(Tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(OnViewClosed(int)));
+	connect(Tabs, &QTabWidget::currentChanged, this, &CDocumentWorkspaceGuiCompBase::OnViewActivated);
+	connect(Tabs, &QTabWidget::tabCloseRequested, this, &CDocumentWorkspaceGuiCompBase::OnViewCloseTriggered);
 	connect(m_closeCurrentTabShortcutPtr, &QShortcut::activated, this, &CDocumentWorkspaceGuiCompBase::OnCurrentViewCloseTriggered);
 
 	int documentsCount = GetDocumentsCount();
