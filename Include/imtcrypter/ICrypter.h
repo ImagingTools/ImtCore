@@ -5,8 +5,8 @@
 #include <iser/IObject.h>
 
 // ImtCore includes
-#include <imtcrypter/IAESKey.h>
-#include <imtcrypter/IRSAKey.h>
+#include <imtcrypter/IAesKey.h>
+#include <imtcrypter/IRsaKey.h>
 
 
 namespace imtcrypter
@@ -14,17 +14,16 @@ namespace imtcrypter
 
 
 /**
-	Interface descibing cryptography algoritms.
+	Interface descibing encryption/decryption of data.
 	\ingroup Crypter
 */
 class ICrypter: virtual public istd::IPolymorphic
 {
 public:
-	virtual bool EncryptAES(QByteArray &data, const IAESKey &key) = 0;
-	virtual bool DecryptAES(QByteArray &data, const IAESKey &key) = 0;
-
-	virtual bool EncryptRSA(QByteArray &data, const IRSAKey &key) = 0;
-	virtual bool DecryptRSA(QByteArray &data, const IRSAKey &key) = 0;
+	virtual bool EncryptAes(QByteArray& data, const IAesKey& key) = 0;
+	virtual bool DecryptAes(QByteArray& data, const IAesKey& key) = 0;
+	virtual bool EncryptRsa(QByteArray& data, const IRsaKey& key) = 0;
+	virtual bool DecryptRsa(QByteArray& data, const IRsaKey& key) = 0;
 };
 
 

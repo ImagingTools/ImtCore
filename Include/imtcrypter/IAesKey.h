@@ -14,11 +14,11 @@ namespace imtcrypter
 	Interface descibing cryptography algoritms.
 	\ingroup Crypter
 */
-class IAESKey: virtual public istd::IChangeable
+class IAesKey: virtual public istd::IChangeable
 {
 public:
 
-	virtual void CreateAESKeys(const QByteArray &password, const QByteArray &ext) = 0;
+	virtual void CreateAesKeys(const QByteArray &password, const QByteArray &ext) = 0;
 	virtual QByteArray GetKey() const = 0;
 	virtual QByteArray GetIV() const = 0;
 	virtual void SetKey(const QByteArray &key) = 0;
