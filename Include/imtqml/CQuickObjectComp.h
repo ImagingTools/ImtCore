@@ -14,11 +14,11 @@ namespace imtqml
 
 
 /**
-	Common interface for GUI objects using in component context.
+	QML object.
  */
 class CQuickObjectComp:
-	public icomp::CComponentBase,
-	virtual public imtqml::IQuickObject
+			public icomp::CComponentBase,
+			virtual public imtqml::IQuickObject
 {
 public:
 	typedef icomp::CComponentBase BaseClass;

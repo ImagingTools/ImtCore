@@ -14,7 +14,7 @@ namespace imtqml
 
 
 /**
-	Common interface for QML objects using in component context.
+	Common interface for QML objects.
  */
 class IQuickObject: virtual public istd::IPolymorphic
 {

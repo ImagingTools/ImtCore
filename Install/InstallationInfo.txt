@@ -1,5 +1,5 @@
 Installation creation time: $AcfTimestamp$
 ACF-Solutions Version: $AcfVersion:1$ ($AcfRawVersion:1$)
 Based on ACF Version: $AcfVersion:0$ ($AcfRawVersion:0$)
-ImagingTools SDK (Core module) Version: $AcfVersion:1978$ ($AcfRawVersion:1978$)
+ImagingTools SDK (Core module) Version: $AcfVersion:1977$ ($AcfRawVersion:1977$)
 Compiler code: $CompilerName$
