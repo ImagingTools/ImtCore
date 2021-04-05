@@ -435,6 +435,8 @@ void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 
 void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 {
+	LoginStatus->setText("");
+
 	PasswordEdit->setFocus();
 	if (m_loginCompPtr.IsValid()){
 		QString userName = UserEdit->text();
@@ -478,7 +480,8 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 			}
 		}
 		else{
-			QMessageBox::warning(GetQtWidget(), tr("Error"), tr("Wrong password"));
+			LoginStatus->setStyleSheet("color : red");
+			LoginStatus->setText(tr("Wrong password"));
 			if (m_keyEnterTimerId != 0){
 				killTimer(m_keyEnterTimerId);
 			}
