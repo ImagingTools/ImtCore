@@ -29,22 +29,8 @@ imtgui::ICollectionViewDelegate::SummaryInformation CAccountInfoViewDelegateComp
 				result.sortValue = result.text;
 			}
 			else if (informationId == QByteArray("AccountType")){
-				int type = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE).toInt();
-
-				switch (type){
-				case imtauth::IAccountInfo::AT_PERSON:
-					result.text = tr("Person");
-					result.sortValue = result.text;
-					break;
-				case imtauth::IAccountInfo::AT_COMPANY:
-					result.text = tr("Company");
-					result.sortValue = result.text;
-					break;
-				default:
-					result.text = tr("UNKNOWN");
-					result.sortValue = result.text;
-					break;
-				}
+				result.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE).toString();
+				result.sortValue = result.text;
 			}
 			else if (informationId == QByteArray("AccountDesciption")){
 				result.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION).toString();
