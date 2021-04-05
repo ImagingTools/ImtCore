@@ -15,8 +15,8 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
-			Crypter,
-			"Cryptography algoritms",
+			Encryption,
+			"Data encryption",
 			"Cryptography Encrypt Decrypt");
 
 

@@ -1,22 +1,22 @@
 #pragma once
 
 
-// ImtCore includes
-#include <imtcrypt/IRsaKey.h>
+// Qt includes
+#include <QtCore/QByteArray>
 
 
 namespace imtcrypt
 {
 
 
-class CRsaKey: virtual public IRsaKey
+class CRsaKey
 {
 public:
-	virtual void GenerateRsaKeys() override;
-	virtual QByteArray GetPrivateKey() const override;
-	virtual QByteArray GetPublicKey() const override;
-	virtual void SetPrivateKey(const QByteArray &key) override;
-	virtual void SetPublicKey(const QByteArray &key) override;
+	void GenerateRsaKeys();
+	QByteArray GetPrivateKey() const;
+	QByteArray GetPublicKey() const;
+	void SetPrivateKey(const QByteArray &key);
+	void SetPublicKey(const QByteArray &key);
 
 protected:
 	QByteArray m_privateKey;
