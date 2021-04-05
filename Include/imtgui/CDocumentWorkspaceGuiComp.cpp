@@ -121,7 +121,7 @@ CollectionDocumentViewDecorator::CollectionDocumentViewDecorator(
 			CDocumentWorkspaceGuiComp* parentPtr,
 			istd::IPolymorphic* viewPtr,
 			QWidget* parentWidgetPtr,
-			idoc::CMultiDocumentManagerBase::SingleDocumentData& documentData,
+			CDocumentWorkspaceGuiComp::SingleDocumentData& documentData,
 			const ifile::IFilePersistence* persistencePtr)
 :	QWidget(parentWidgetPtr),
 	m_documentData(documentData),
@@ -243,7 +243,7 @@ void CollectionDocumentViewDecorator::UpdateSaveButtonsStatus()
 }
 
 
-idoc::CMultiDocumentManagerBase::SingleDocumentData& CollectionDocumentViewDecorator::GetDocumentData() const
+CDocumentWorkspaceGuiComp::SingleDocumentData& CollectionDocumentViewDecorator::GetDocumentData() const
 {
 	return m_documentData;
 }

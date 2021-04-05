@@ -28,6 +28,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	typedef idoc::CMultiDocumentManagerBase::SingleDocumentData BaseClass2;
 	// reimplemented (imtgui::CDocumentWorkspaceGuiCompBase)
 	virtual IDocumentViewDecorator* CreateDocumentViewDecorator(
 				istd::IPolymorphic* viewPtr,
@@ -80,11 +81,11 @@ public:
 		CDocumentWorkspaceGuiComp* parentPtr,
 		istd::IPolymorphic* viewPtr,
 		QWidget* parentWidgetPtr,
-		idoc::CMultiDocumentManagerBase::SingleDocumentData& documentData,
+		CDocumentWorkspaceGuiComp::SingleDocumentData& documentData,
 		const ifile::IFilePersistence* persistencePtr);
 
 	void UpdateSaveButtonsStatus();
-	idoc::CMultiDocumentManagerBase::SingleDocumentData& GetDocumentData() const;
+	CDocumentWorkspaceGuiComp::SingleDocumentData& GetDocumentData() const;
 
 	// reimplemeneted (IDocumentViewDecorator)
 	virtual QWidget* GetDecoratorWidget() override;
@@ -105,7 +106,7 @@ protected:
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet);
 
 private:
-	idoc::CMultiDocumentManagerBase::SingleDocumentData& m_documentData;
+	CDocumentWorkspaceGuiComp::SingleDocumentData& m_documentData;
 	istd::IPolymorphic* m_viewObjectPtr;
 	idoc::IUndoManager* m_undoManagerPtr;
 	const ifile::IFilePersistence* m_filePersistencePtr;
