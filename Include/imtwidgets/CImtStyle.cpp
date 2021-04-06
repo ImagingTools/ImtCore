@@ -222,8 +222,8 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 								gradient.setColorAt(0, QColor(245, 245, 245));
 							}
 							else {
-								gradient.setColorAt(0, QColor(251, 251, 251));
-								gradient.setColorAt(1, QColor(235, 235, 235));
+								gradient.setColorAt(0, QColor(248, 248, 251));
+								gradient.setColorAt(1, QColor(235, 235, 238));
 							}
 
 							painter->fillPath(path, gradient);
