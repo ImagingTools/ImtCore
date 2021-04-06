@@ -365,6 +365,7 @@ void CThumbnailDecoratorGuiComp::on_PageStack_currentChanged(int stackIndex)
 	PasswordEdit->setText("");
 	PasswordEdit->setStyleSheet("");
 	PasswordLabel->setStyleSheet("");
+	PasswordMessage->setText("");
 }
 
 
@@ -484,6 +485,9 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 		else{
 			PasswordEdit->setStyleSheet("border-color: red; color: red");
 			PasswordLabel->setStyleSheet("color: red");
+			PasswordMessage->setStyleSheet("color: red");
+			PasswordMessage->setText(tr("Wrong password"));
+
 			if (m_keyEnterTimerId != 0){
 				killTimer(m_keyEnterTimerId);
 			}
@@ -510,6 +514,7 @@ void CThumbnailDecoratorGuiComp::on_PasswordEdit_textEdited(const QString &/*tex
 {
 	PasswordEdit->setStyleSheet("");
 	PasswordLabel->setStyleSheet("");
+	PasswordMessage->setText("");
 }
 
 
