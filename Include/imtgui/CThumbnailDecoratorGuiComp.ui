@@ -184,8 +184,8 @@
             </property>
             <property name="font">
              <font>
-              <family>Lucida Sans Unicode</family>
-              <pointsize>23</pointsize>
+              <family>Verdana</family>
+              <pointsize>24</pointsize>
              </font>
             </property>
             <property name="text">

@@ -1,5 +1,5 @@
-QWidget
-{
+QWidget {
+    font-family: "Verdana";
     color: #335777;
 }
 
@@ -95,13 +95,11 @@ QWidget#TotalCounterFrame, QWidget#WarningsCounterFrame
 }
 
 QLabel[ProductionApplicationName=true] {
-    font-family: "Segoe UI";
     font-size: 16pt;
     color: #335777;
 }
 
 QLabel[ProductionTime=true] {
-    font-family: "Segoe UI";
     font-size: 16pt;
     color: #335777;
 }
@@ -116,7 +114,6 @@ QLabel#PageLabel, QLabel#ManualModePageLabel
 	color: #335777;
 	font-size: 12pt;
 	font-weight: bold;
-	font-family: "Segoe UI";
 }
 
 QLineEdit, QPlainTextEdit 
