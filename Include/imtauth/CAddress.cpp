@@ -23,10 +23,8 @@ QByteArray CAddress::GetTypeId()
 // public methods
 
 CAddress::CAddress()
-	:m_postalCode(-1)
+	:m_postalCode(0)
 {
-	m_country = QObject::tr("Country");
-	m_city = QObject::tr("City");
 }
 
 

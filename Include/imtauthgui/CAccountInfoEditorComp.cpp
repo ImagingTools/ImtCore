@@ -419,7 +419,7 @@ void CAccountInfoEditorComp::on_LoadPicture_triggered(QAction *action)
 	if (!representationFilePath.isEmpty()){
 		QImage image(representationFilePath);
 		if (!image.isNull()){
-			image = image.scaled(300, 300);
+			image = image.scaled(300, 300, Qt::KeepAspectRatio);
 
 			iimg::CBitmap bitmap(image);
 
