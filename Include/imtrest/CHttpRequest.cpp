@@ -42,12 +42,13 @@ CHttpRequest::CHttpRequest(QAbstractSocket& socket, const IRequestHandler& handl
 	m_httpParser.data = this;
 
 	QObject::connect(&socket, &QAbstractSocket::readyRead, this, &CHttpRequest::HandleReadyRead);
-        QObject::connect(&socket, &QAbstractSocket::disconnected, &QObject::deleteLater);
+	QObject::connect(&socket, &QAbstractSocket::disconnected, &QObject::deleteLater);
 }
+
 
 QByteArrayList CHttpRequest::GetHeaders() const
 {
-    return m_headers.keys();
+	return m_headers.keys();
 }
 
 
