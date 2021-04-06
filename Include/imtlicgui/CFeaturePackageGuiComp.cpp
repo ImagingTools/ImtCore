@@ -33,7 +33,7 @@ CFeaturePackageGuiComp::CFeaturePackageGuiComp()
 
 void CFeaturePackageGuiComp::OnItemChanged(const QByteArray& itemId, ChangeId changeId, QVariantList params)
 {
-	if (!itemId.isEmpty() && changeId == IItemChangeHandler::CI_ITEM_ACTIVATED){
+	if (!itemId.isEmpty() && changeId == IItemChangeHandler::CI_ITEM_ACTIVATED && !m_blockItemChangedHandler){
 		if (params.count() > 0 && params[0].type() == QVariant::Bool){
 			bool isActivated = params[0].toBool();
 
@@ -57,9 +57,7 @@ void CFeaturePackageGuiComp::OnItemChanged(const QByteArray& itemId, ChangeId ch
 							.arg(QString(itemId))
 							.arg(QString(m_selectedFeatureId)));
 
-						if (!m_blockItemChangedHandler){
-							Q_EMIT EmitItemChangedHandler();
-						}
+						Q_EMIT EmitItemChangedHandler();
 
 						return;
 					}
@@ -73,9 +71,7 @@ void CFeaturePackageGuiComp::OnItemChanged(const QByteArray& itemId, ChangeId ch
 
 			DoUpdateModel();
 
-			if (!m_blockItemChangedHandler){
-				Q_EMIT EmitItemChangedHandler();
-			}
+			Q_EMIT EmitItemChangedHandler();
 		}
 	}
 }

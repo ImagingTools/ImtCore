@@ -49,7 +49,7 @@ public:
 
 	CFeaturePackageGuiComp();
 
-	// reimplemented (imtlicgui::IFeatureItemStateHandler)
+	// reimplemented (imtlicgui::IItemChangeHandler)
 	virtual void OnItemChanged(const QByteArray& itemId, ChangeId changeId, QVariantList params) override;
 
 Q_SIGNALS:
