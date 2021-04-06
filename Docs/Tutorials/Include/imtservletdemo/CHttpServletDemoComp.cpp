@@ -1,4 +1,5 @@
-#include "CHttpServletDemoComp.h"
+#include <imtservletdemo/CHttpServletDemoComp.h>
+
 
 // Qt includes
 #include <QtCore/QFile>
@@ -7,7 +8,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
-#include<QtCore/QUrlQuery>
+#include <QtCore/QUrlQuery>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
@@ -20,6 +21,10 @@
 namespace imtservletdemo
 {
 
+
+// protected methods
+
+// reimplemented (imtrest::CHttpServletCompBase)
 
 imtrest::IRequestHandler::ConstResponsePtr CHttpServletDemoComp::OnGet(
 			const QByteArray& commandId,
@@ -52,3 +57,5 @@ imtrest::IRequestHandler::ConstResponsePtr CHttpServletDemoComp::OnPost(
 
 
 } //namespace imtservletdemo
+
+

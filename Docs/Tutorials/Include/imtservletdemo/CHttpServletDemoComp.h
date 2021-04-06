@@ -17,6 +17,8 @@ public:
 	I_BEGIN_COMPONENT(CHttpServletDemoComp);
 	I_END_COMPONENT
 
+protected:
+	// reimplemented (imtrest::CHttpServletCompBase)
 	virtual ConstResponsePtr OnGet(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
