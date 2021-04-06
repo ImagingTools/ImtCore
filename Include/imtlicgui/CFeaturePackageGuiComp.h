@@ -34,7 +34,7 @@ class CFeaturePackageGuiComp:
 {
 	Q_OBJECT
 public:
-	typedef public TFeatureTreeModelCompWrap<
+	typedef TFeatureTreeModelCompWrap<
 				iqtgui::TDesignerGuiObserverCompBase<
 							Ui::CFeaturePackageGuiComp, imtlic::IFeaturePackage>> BaseClass;
 

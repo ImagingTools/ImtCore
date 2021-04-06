@@ -25,7 +25,7 @@ class CGroupComp:
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-	typedef public imtbase::CStaticObjectCollection BaseClass2;
+	typedef imtbase::CStaticObjectCollection BaseClass2;
 
 	I_BEGIN_COMPONENT(CGroupComp)
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);

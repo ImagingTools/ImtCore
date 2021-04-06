@@ -31,7 +31,7 @@ class CProductLicensingInfoGuiComp:
 {
 	Q_OBJECT
 public:
-	typedef public TFeatureTreeModelCompWrap<
+	typedef TFeatureTreeModelCompWrap<
 				iqtgui::TDesignerGuiObserverCompBase <
 							Ui::CProductLicensingInfoGuiComp, imtlic::IProductLicensingInfo>> BaseClass;
 

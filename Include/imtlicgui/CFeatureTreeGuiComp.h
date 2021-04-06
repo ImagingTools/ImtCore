@@ -22,7 +22,7 @@ class CFeatureTreeGuiComp: public iqtgui::TDesignerGuiObserverCompBase<
 {
 	Q_OBJECT
 public:
-	typedef public iqtgui::TDesignerGuiObserverCompBase<
+	typedef iqtgui::TDesignerGuiObserverCompBase<
 				Ui::CFeatureTreeGuiComp, imtlicgui::IItemTree> BaseClass;
 
 	I_BEGIN_COMPONENT(CFeatureTreeGuiComp);

@@ -122,7 +122,7 @@ IItemTree* CFeatureTreeGuiComp::FindItem(IItemTree* fromItemPtr, const QByteArra
 
 // private slots
 
-void CFeatureTreeGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, int column)
+void CFeatureTreeGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, int /*column*/)
 {
 	if (m_blockItemChangedSignal){
 		return;

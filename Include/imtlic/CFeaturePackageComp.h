@@ -21,7 +21,7 @@ class CFeaturePackageComp:
 			public CFeaturePackage
 {
 public:
-	typedef public icomp::CComponentBase BaseClass;
+	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFeaturePackageComp);
 		I_REGISTER_INTERFACE(IFeatureDependenciesProvider);
