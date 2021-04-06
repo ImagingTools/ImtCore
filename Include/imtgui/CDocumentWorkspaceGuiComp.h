@@ -28,7 +28,6 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	typedef idoc::CMultiDocumentManagerBase::SingleDocumentData BaseClass2;
 	// reimplemented (imtgui::CDocumentWorkspaceGuiCompBase)
 	virtual IDocumentViewDecorator* CreateDocumentViewDecorator(
 				istd::IPolymorphic* viewPtr,
