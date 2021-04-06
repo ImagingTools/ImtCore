@@ -21,7 +21,7 @@ const imtbase::ICollectionInfo& CProductCollection::GetProductList() const
 }
 
 
-const imtlic::IProductLicensingInfo* CProductCollection::GetProductLicenses(const QByteArray&  productId) const
+const imtlic::IProductLicensingInfo* CProductCollection::GetProductLicenses(const QByteArray& productId) const
 {
 	return dynamic_cast<const imtlic::IProductLicensingInfo*>(m_collection.GetObjectPtr(productId));
 }

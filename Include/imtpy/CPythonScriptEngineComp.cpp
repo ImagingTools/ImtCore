@@ -252,7 +252,7 @@ iattr::IAttributesProvider::AttributeIds CPythonScriptEngineComp::Script::GetAtt
 }
 
 
-const iattr::IAttributeMetaInfo* CPythonScriptEngineComp::Script::GetAttributeMetaInfo(const QByteArray& attributeId) const
+const iattr::IAttributeMetaInfo* CPythonScriptEngineComp::Script::GetAttributeMetaInfo(const QByteArray& /*attributeId*/) const
 {
 	return nullptr;
 }

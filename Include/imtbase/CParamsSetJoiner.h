@@ -20,8 +20,8 @@ public:
 
 	// reimplemented (iprm::IParamsSet)
 	virtual Ids GetParamIds(bool editableOnly = false) const override;
-	virtual const iser::ISerializable * GetParameter(const QByteArray&  id) const override;
-	virtual iser::ISerializable * GetEditableParameter(const QByteArray&  id) override;
+	virtual const iser::ISerializable * GetParameter(const QByteArray& id) const override;
+	virtual iser::ISerializable * GetEditableParameter(const QByteArray& id) override;
 
 	// reimplement (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;

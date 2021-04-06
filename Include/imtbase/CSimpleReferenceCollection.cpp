@@ -218,7 +218,7 @@ bool CSimpleReferenceCollection::ResetData(CompatibilityMode /*mode*/)
 
 // protected methods
 
-int CSimpleReferenceCollection::FindReference(const QByteArray&  id) const
+int CSimpleReferenceCollection::FindReference(const QByteArray& id) const
 {
 	for (int i = 0; i < m_references.count(); ++i){
 		if (m_references[i].id == id){

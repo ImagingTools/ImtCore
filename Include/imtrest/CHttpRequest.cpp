@@ -51,7 +51,7 @@ QByteArrayList CHttpRequest::GetHeaders() const
 }
 
 
-QByteArray CHttpRequest::GetHeaderValue(const QByteArray&  headerType) const
+QByteArray CHttpRequest::GetHeaderValue(const QByteArray& headerType) const
 {
 	if (m_headers.contains(headerType)){
 		return m_headers[headerType];
@@ -132,7 +132,7 @@ int CHttpRequest::OnUrl(http_parser* httpParser, const char *at, size_t length)
 }
 
 
-int CHttpRequest::OnStatus(http_parser* httpParser, const char *at, size_t length)
+int CHttpRequest::OnStatus(http_parser* httpParser, const char * /*at*/, size_t /*length*/)
 {
 	Q_ASSERT(httpParser != nullptr);
 

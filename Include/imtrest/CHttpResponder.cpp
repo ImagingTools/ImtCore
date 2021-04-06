@@ -76,7 +76,7 @@ bool CHttpResponder::WriteStatus(int statusCode, const QByteArray& statusCodeLit
 }
 
 
-bool CHttpResponder::WriteHeader(const QByteArray&  headerKey, const QByteArray&  value, QAbstractSocket& socket) const
+bool CHttpResponder::WriteHeader(const QByteArray& headerKey, const QByteArray& value, QAbstractSocket& socket) const
 {
 	Q_ASSERT(socket.isOpen());
 	if (!socket.isOpen()){

@@ -55,7 +55,7 @@ QByteArray CStaticObjectCollection::RegisterObject(
 
 // reimplemented (IObjectCollection)
 
-int CStaticObjectCollection::GetOperationFlags(const QByteArray&  /*objectId*/) const
+int CStaticObjectCollection::GetOperationFlags(const QByteArray& /*objectId*/) const
 {
 	return OF_SUPPORT_EDIT | OF_SUPPORT_RENAME;
 }
