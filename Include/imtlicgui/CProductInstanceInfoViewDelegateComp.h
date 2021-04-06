@@ -19,6 +19,11 @@ public:
 	I_BEGIN_COMPONENT(CProductInstanceInfoViewDelegateComp);
 	I_END_COMPONENT;
 
+	enum CommandGroup
+	{
+		CG_LICENSE = 2150
+	};
+
 	CProductInstanceInfoViewDelegateComp();
 
 protected:
@@ -36,6 +41,7 @@ protected Q_SLOTS:
 	virtual void OnExportLicense();
 
 private:
+	iqtgui::CHierarchicalCommand m_licenseCommands;
 	iqtgui::CHierarchicalCommand m_exportLicenseCommand;
 };
 
