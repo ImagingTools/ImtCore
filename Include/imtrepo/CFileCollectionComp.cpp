@@ -480,7 +480,7 @@ QByteArray CFileCollectionComp::InsertFile(
 		return emptyId;
 	}
 
-	// Reserve objectId and objectName during running transaction:
+	// Reserve objectId and objectName during running insert-transaction:
 	ResourceLocker resourceLocker(*this, fileId, targetName);
 
 	// Release access to collection items:
@@ -524,15 +524,17 @@ QByteArray CFileCollectionComp::InsertFile(
 
 	// Inserting new item into collection if the structure was created successfully:
 	if (!savedPath.isEmpty()){
-		if (MoveWorkingDirToRepository(workingPath, targetFileInfo.dir().absolutePath(), fileId, collectionItem)){
+		if (FinishInsertFileTransaction(workingPath, targetFileInfo.dir().absolutePath(), fileId, collectionItem)){
 			QDir(workingPath).removeRecursively();
+
 			return fileId;
 		}
 	}
 	
 	QDir(workingPath).removeRecursively();
 
-	SendErrorMessage(0, "File could not be added to the repository");
+	SendErrorMessage(0, "File could not be inserted into the repository");
+
 	return QByteArray();
 }
 
@@ -1979,7 +1981,7 @@ QString CFileCollectionComp::CalculateTargetFilePath(
 }
 
 
-bool CFileCollectionComp::MoveWorkingDirToRepository(
+bool CFileCollectionComp::FinishInsertFileTransaction(
 			const QString& workingPath,
 			const QString& repositoryPath,
 			const QByteArray& fileId,

@@ -1,5 +1,6 @@
 #include <imtcrypt/CEncryptionBasePersistenceComp.h>
 
+
 // Qt includes
 #include <QtCore/QFile>
 #include <QtCore/QTemporaryDir>
@@ -16,12 +17,16 @@ namespace imtcrypt
 {
 
 
+// public methods
+
 // reimplemented (IEncryptionBasePersistence)
 
-bool CEncryptionBasePersistenceComp::IsOperationSupported(const istd::IChangeable *dataObjectPtr, const QString* /*filePathPtr*/, int /*flags*/, bool /*beQuiet*/) const
+bool CEncryptionBasePersistenceComp::IsOperationSupported(const istd::IChangeable* dataObjectPtr, const QString* /*filePathPtr*/, int /*flags*/, bool /*beQuiet*/) const
 {
-	if (dataObjectPtr != nullptr)
+	if (dataObjectPtr != nullptr){
 		return true;
+	}
+
 	return false;
 }
 
@@ -32,7 +37,7 @@ int CEncryptionBasePersistenceComp::LoadFromFile(istd::IChangeable& /*data*/, co
 }
 
 
-int CEncryptionBasePersistenceComp::SaveToFile(const istd::IChangeable &data, const QString &filePath, ibase::IProgressManager *progressManagerPtr) const
+int CEncryptionBasePersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* progressManagerPtr) const
 {
 	if (m_basePersistenceCompPtr.IsValid() && !filePath.isEmpty()){
 		QFileInfo fileInfo(filePath);
@@ -66,7 +71,7 @@ int CEncryptionBasePersistenceComp::SaveToFile(const istd::IChangeable &data, co
 
 // reimplemented (ifile::IFileTypeInfo)
 
-bool CEncryptionBasePersistenceComp::GetFileExtensions(QStringList &result, const istd::IChangeable* /*dataObjectPtr*/, int /*flags*/, bool doAppend) const
+bool CEncryptionBasePersistenceComp::GetFileExtensions(QStringList& result, const istd::IChangeable* /*dataObjectPtr*/, int /*flags*/, bool doAppend) const
 {
 	if (!doAppend){
 		result.clear();
@@ -81,7 +86,7 @@ bool CEncryptionBasePersistenceComp::GetFileExtensions(QStringList &result, cons
 }
 
 
-QString CEncryptionBasePersistenceComp::GetTypeDescription(const QString *extensionPtr) const
+QString CEncryptionBasePersistenceComp::GetTypeDescription(const QString* extensionPtr) const
 {
 	if (extensionPtr != NULL){
 		int extensionsCount = qMin(m_fileExtensionsAttrPtr.GetCount(), m_typeDescriptionsAttrPtr.GetCount());
@@ -96,9 +101,10 @@ QString CEncryptionBasePersistenceComp::GetTypeDescription(const QString *extens
 		return m_typeDescriptionsAttrPtr[0];
 	}
 
-	return "";
+	return QString();
 }
 
 
 } //namespace imtcrypt
+
 

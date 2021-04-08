@@ -551,7 +551,10 @@ private:
 				QString& filePathInRepository);
 
 	/**
-		Write a file collection item to file system
+		Write a file collection item to file system.
+		\param repositoryItem collection item
+		\param dataFilePath target file path for the data item. If this parameter is empty file path defined in \c repositoryItem will be used.
+		\todo Refactor this method --> liquid shit in the brain of the programmer!
 	*/
 	QString SaveCollectionItem(const CollectionItem& repositoryItem, const QString& dataFilePath = QString()) const;
 	QString GetTempDirectory() const;
@@ -572,7 +575,7 @@ private:
 				const QString& filePath,
 				const QString& objectName,
 				const QByteArray& typeId) const;
-	bool MoveWorkingDirToRepository(
+	bool FinishInsertFileTransaction(
 				const QString& workingPath,
 				const QString& repositoryPath,
 				const QByteArray& fileId,
