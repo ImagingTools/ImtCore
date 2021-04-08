@@ -9,7 +9,7 @@
 #include <imtcrypt/IEncryptionKeysProvider.h>
 #include <imtcrypt/CRsaEncryption.h>
 #include <imtcrypt/CAesEncryption.h>
-#include <imtcrypt/CEncryptionKeysProvider.h>
+#include <imtcrypt/IEncryptionKeysProvider.h>
 
 
 namespace imtcrypt
