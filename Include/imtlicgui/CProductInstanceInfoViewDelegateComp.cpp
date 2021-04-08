@@ -17,7 +17,7 @@
 #include <imtlicgui/CProductInstanceInfoEditorComp.h>
 #include <iser/CMemoryReadArchive.h>
 #include <iser/CMemoryWriteArchive.h>
-#include <imtcrypt/CEncryptionKeysProvider.h>
+#include <imtcrypt/IEncryptionKeysProvider.h>
 
 
 namespace imtlicgui
