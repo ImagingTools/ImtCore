@@ -98,6 +98,22 @@ public:
 		\return \c true if the file object was successfully updated or \c false otherwise.
 	*/
 	virtual bool UpdateFile(const QString& filePath, const QByteArray& objectId) = 0;
+
+	/**
+		Export a file from a collection.
+		\param objectId		ID of the object to be exported from a collection.
+		\param targetPath	Path to the exported file.
+		\return \c true if the file object was successfully exported or \c false otherwise.
+	*/
+	virtual bool ExportFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const = 0;
+
+	/**
+		Import a file in the collection.
+		\param typeId		Object type ID.
+		\param sourcePath	Path to the imported file.
+		\return \c true if the file object was successfully imported or \c false otherwise.
+	*/
+	virtual QByteArray ImportFile(const QByteArray& typeId, const QString& sourceFilePath = QString()) = 0;
 };
 
 

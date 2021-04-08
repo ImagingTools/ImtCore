@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QMap>
+#include <QtCore/QMutex>
 #include <QtCore/QDateTime>
 #include <QtCore/QThread>
 #include <QtCore/QReadWriteLock>
@@ -198,6 +199,8 @@ public:
 	virtual bool UpdateFile(
 				const QString& localFilePath,
 				const QByteArray& resourceId) override;
+	virtual bool ExportFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
+	virtual QByteArray ImportFile(const QByteArray& typeId, const QString& sourceFilePath = QString()) override;
 
 	// reimplemented (IFileCollectionInfo)
 	virtual QString GetCollectionRootFolder() const override;
@@ -418,6 +421,11 @@ protected:
 	void UpdateItemMetaInfo(CollectionItem& item) const;
 
 	/**
+		Create the meta information file.
+	*/
+	bool CreateMetaInfoFile(const QString& dataObjectFilePath, const QByteArray& typeId, const QString& metaInfoFilePath) const;
+
+	/**
 		Save file's meta info.
 		\param metaInfo	Meta info of the resource file.
 		\param filePath	Optionally defined name of the meta info file. If not specified, the file path will be calculated automatically.
@@ -505,6 +513,33 @@ protected:
 	};
 
 private:
+	class ResourceLocker
+	{
+	public:
+		explicit ResourceLocker(
+					CFileCollectionComp& collection,
+					const QByteArray& resourceId,
+					const QString& resourceName);
+		~ResourceLocker();
+
+	private:
+		CFileCollectionComp& m_collection;
+		QByteArray m_resourceId;
+		QString m_resourceName;
+	};
+
+	//class InsertTransaction
+	//{
+	//public:
+	//	InsertTransaction(
+	//				CFileCollectionComp& collection,
+	//				);
+
+	//private:
+
+	//};
+
+private:
 	typedef QList<CollectionItem> Files;
 	typedef QList<imtbase::IObjectCollectionEventHandler*> EventHandlerList;
 
@@ -518,15 +553,32 @@ private:
 	/**
 		Write a file collection item to file system
 	*/
-	QString SaveCollectionItem(const CollectionItem& repositoryItem) const;
+	QString SaveCollectionItem(const CollectionItem& repositoryItem, const QString& dataFilePath = QString()) const;
 	QString GetTempDirectory() const;
 	QString GetDataItemFilePath(const CollectionItem& repositoryFile) const;
 	QString GetMetaInfoFilePath(const CollectionItem& repositoryFile) const;
 	QString CalculateShortFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const;
 
+	bool IsPathInsideRepository(const QString& filePath) const;
+	bool IsResourceIdLocked(const QByteArray& resourceId);
+	bool IsResourceNameLocked(const QString& resourceName);
+
+	QString CreateWorkingDir() const;
+	QString CalculateTargetFilePath(
+				const QString& filePath,
+				const QString& objectName,
+				const QByteArray& typeId) const;
+	bool MoveWorkingDirToRepository(
+				const QString& workingPath,
+				const QString& repositoryPath,
+				const QByteArray& fileId,
+				const CollectionItem& collectionItem);
+
+
 	void ReadRepositoryItems();
 	void GetRepositoryFileList(QFileInfoList& fileList) const;
 	void ReadItem(Files& filesPtr, const QString& itemFilePath);
+	bool ReadItemFile(CollectionItem& collectionItem, const QString& itemFilePath);
 
 	void StartRepositoryLoader();
 	Q_INVOKABLE void OnReaderProgress(int progress);
@@ -534,27 +586,12 @@ private:
 	Q_INVOKABLE void OnReaderInterrupted();
 
 private:
-	mutable bool m_directoryBlocked;
 	ReaderThread m_readerThread;
 	Files m_readerFiles;
 
-	class DirectoryBlocker
-	{
-	public:
-		DirectoryBlocker(const CFileCollectionComp& parent)
-			:m_parent(parent)
-		{
-			parent.m_directoryBlocked = true;
-		}
-
-		~DirectoryBlocker()
-		{
-			m_parent.m_directoryBlocked = false;
-		}
-
-	private:
-		const CFileCollectionComp& m_parent;
-	};
+	QList<QByteArray> m_lockedResourceIds;
+	QList<QString> m_lockedResourceNames;
+	QMutex m_lockedResourceMutex;
 
 	/**
 		Collection data.
