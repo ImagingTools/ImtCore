@@ -450,8 +450,13 @@ QByteArray CFileCollectionComp::InsertFile(
 
 	QWriteLocker locker(&m_collectionLock);
 
+	QByteArray fileId = FindSuitableFile(proposedObjectId, localFilePath, objectDescription);
+	if (!fileId.isEmpty()){
+		return fileId;
+	}
+
 	// Generate unique file-ID accroding to \c proposedObjectId variable provided by caller:
-	QByteArray fileId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray() : proposedObjectId;
+	fileId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray() : proposedObjectId;
 
 	// Generate teraget absolute file path for the data file:
 	QString targetFilePath = CalculateTargetFilePath(localFilePath, objectName, typeId);
@@ -461,6 +466,19 @@ QByteArray CFileCollectionComp::InsertFile(
 
 	QFileInfo targetFileInfo(targetFilePath);
 	QString targetName = targetFileInfo.completeBaseName();
+
+	// Check fileId and targetName for locking
+	if (IsResourceIdLocked(fileId)){
+		SendVerboseMessage(QString("Object-ID '%1' is locked").arg(proposedObjectId.constData()));
+
+		return emptyId;
+	}
+
+	if (IsResourceNameLocked(targetName)){
+		SendVerboseMessage(QString("Object Name '%1' is locked").arg(targetName));
+
+		return emptyId;
+	}
 
 	// Reserve objectId and objectName during running transaction:
 	ResourceLocker resourceLocker(*this, fileId, targetName);
@@ -1871,6 +1889,57 @@ bool CFileCollectionComp::IsResourceNameLocked(const QString& resourceName)
 	QMutexLocker locker(&m_lockedResourceMutex);
 
 	return m_lockedResourceNames.contains(resourceName);
+}
+
+
+QByteArray CFileCollectionComp::FindSuitableFile(
+			const QByteArray& proposedObjectId,
+			const QString& localFilePath,
+			const QString& objectDescription)
+{
+	QByteArray emptyId;
+
+	for (int i = 0; i < m_files.count(); ++i){
+		CollectionItem& collectionItem = m_files[i];
+
+		if (!proposedObjectId.isEmpty()){
+			if (collectionItem.fileId == proposedObjectId){
+				SendErrorMessage(0, QString("File '%1' could not be inserted into the repository. Proposed object-ID ('%2') already in use").arg(localFilePath).arg(qPrintable(proposedObjectId)));
+
+				return emptyId;
+			}
+		}
+
+		if (m_files[i].filePathInRepository == localFilePath){
+			if (proposedObjectId.isEmpty()){
+				SendInfoMessage(0, QString("File '%1' already exists in the repository").arg(localFilePath));
+
+				return collectionItem.fileId;
+			}
+
+			SendInfoMessage(0, QString("Trying to add already existing file '%1' using a different file-ID. New repository item will be created").arg(localFilePath));
+		}
+
+		if (!m_repositoryPathCompPtr.IsValid() && (collectionItem.sourceFilePath == localFilePath)){
+			if (proposedObjectId.isEmpty() || (!proposedObjectId.isEmpty() && (proposedObjectId == collectionItem.fileId))){
+				QFileInfo inputFileInfo(localFilePath);
+				if (inputFileInfo.lastModified() == collectionItem.metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime()){
+					istd::CChangeNotifier changeNotifier(this);
+
+					collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
+					collectionItem.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
+
+					SendVerboseMessage(QString("File '%1' already exists in the repository").arg(localFilePath));
+
+					QByteArray fileId = collectionItem.fileId;
+
+					return fileId;
+				}
+			}
+		}
+	}
+
+	return emptyId;
 }
 
 

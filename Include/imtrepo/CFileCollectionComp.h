@@ -563,6 +563,10 @@ private:
 	bool IsResourceIdLocked(const QByteArray& resourceId);
 	bool IsResourceNameLocked(const QString& resourceName);
 
+	QByteArray FindSuitableFile(
+				const QByteArray& proposedObjectId,
+				const QString& localFilePath,
+				const QString& objectDescription);
 	QString CreateWorkingDir() const;
 	QString CalculateTargetFilePath(
 				const QString& filePath,
@@ -573,7 +577,6 @@ private:
 				const QString& repositoryPath,
 				const QByteArray& fileId,
 				const CollectionItem& collectionItem);
-
 
 	void ReadRepositoryItems();
 	void GetRepositoryFileList(QFileInfoList& fileList) const;
