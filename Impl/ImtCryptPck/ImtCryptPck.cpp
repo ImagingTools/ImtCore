@@ -19,6 +19,10 @@ I_EXPORT_COMPONENT(
 			"Data encryption",
 			"Cryptography Encrypt Decrypt");
 
+I_EXPORT_COMPONENT(
+			EncryptionBasePersistence,
+			"Saving data encryption",
+			"Saving data encryption");
 
 
 } // namespace ImtCryptPck

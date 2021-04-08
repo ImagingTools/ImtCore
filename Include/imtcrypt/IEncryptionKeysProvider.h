@@ -13,7 +13,7 @@ namespace imtcrypt
 
 
 /**
-	Interface for a cryptopgraphic key provider.
+	Interface for a cryptopgraphic keys provider.
 	\ingroup Cryptography
 */
 class IEncryptionKeysProvider: virtual public istd::IChangeable
@@ -23,7 +23,8 @@ public:
 	{
 		KT_PUBLIC,
 		KT_PRIVATE,
-		KT_PASSWORD
+		KT_PASSWORD,
+		KT_VECTOR
 	};
 
 	/**
