@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtGui/QPainter>
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/QToolButton>
 
@@ -60,6 +61,39 @@ namespace imtwidgets
 {
 
 
+// public methods
+
+CImtStyle::CImtStyle()
+	:m_designSchema(DS_LIGHT)
+{
+	ColorSchema light;
+	light.toolButtonGradientColors.startColor = QColor(248, 248, 251);
+	light.toolButtonGradientColors.endColor = QColor(235, 235, 238);
+	light.pressedToolButtonGradientColors.startColor = QColor(245, 245, 245);
+	light.pressedToolButtonGradientColors.endColor = QColor(245, 245, 245);
+
+	m_colorSchemaMap[DS_LIGHT] = light;
+
+	ColorSchema dark;
+	dark.toolButtonGradientColors.startColor = QColor(160, 160, 160);
+	dark.toolButtonGradientColors.endColor = QColor(135, 135, 135);
+	dark.pressedToolButtonGradientColors.startColor = QColor(155, 155, 155);
+	dark.pressedToolButtonGradientColors.endColor = QColor(155, 155, 155);
+
+	m_colorSchemaMap[DS_DARK] = dark;
+}
+
+
+void CImtStyle::SetDesignSchema(DesignSchema designSchema)
+{
+	m_designSchema = designSchema;
+
+	polish(qApp);
+}
+
+
+// reimplemented (QStyle)
+
 void CImtStyle::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption * option, QPainter * painter, const QWidget * widget) const
 {
 	switch (pe){
@@ -91,6 +125,8 @@ void CImtStyle::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption * 
 
 void CImtStyle::drawControl(ControlElement element, const QStyleOption * option, QPainter * painter, const QWidget * widget) const
 {
+	ColorSchema colorSchema = m_colorSchemaMap[m_designSchema];
+
 	const QStyleOptionToolButton* toolButtonStyleOptionPtr = qstyleoption_cast<const QStyleOptionToolButton *>(option);
 
 	switch (element){
@@ -218,12 +254,12 @@ void CImtStyle::drawControl(ControlElement element, const QStyleOption * option,
 							gradient.setSpread(QGradient::PadSpread);
 
 							if (toolButtonStyleOptionPtr->state & (State_Sunken | State_On)){
-								gradient.setColorAt(1, QColor(245, 245, 245));
-								gradient.setColorAt(0, QColor(245, 245, 245));
+								gradient.setColorAt(1, colorSchema.pressedToolButtonGradientColors.startColor);
+								gradient.setColorAt(0, colorSchema.pressedToolButtonGradientColors.endColor);
 							}
 							else {
-								gradient.setColorAt(0, QColor(248, 248, 251));
-								gradient.setColorAt(1, QColor(235, 235, 238));
+								gradient.setColorAt(0, colorSchema.toolButtonGradientColors.startColor);
+								gradient.setColorAt(1, colorSchema.toolButtonGradientColors.endColor);
 							}
 
 							painter->fillPath(path, gradient);
