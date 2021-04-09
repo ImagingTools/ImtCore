@@ -5,7 +5,7 @@
 #include <icomp/export.h>
 
 
-I_REGISTER_QT_RESOURCE(imtgui);
+I_REGISTER_QT_RESOURCE(imtguilight);
 
 
 namespace ImtRepoGuiPck

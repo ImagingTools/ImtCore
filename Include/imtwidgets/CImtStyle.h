@@ -64,9 +64,18 @@ private:
 
 	struct ColorSchema
 	{
+		typedef int (*initResourceFunctionPtr)();
+
+		ColorSchema()
+			:initResourceFuncPtr(nullptr)
+		{
+		}
+
 		GradientColors toolButtonGradientColors;
 		GradientColors pressedToolButtonGradientColors;
 		QString styleSheetPath;
+
+		initResourceFunctionPtr initResourceFuncPtr;
 	};
 
 	typedef QMap<DesignSchema, ColorSchema> ColorSchemaMap;
