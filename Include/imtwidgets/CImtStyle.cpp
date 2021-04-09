@@ -12,7 +12,11 @@
 
 
 extern int qInitResources_imtguilight();
+extern int qCleanupResources_imtguilight();
+
 extern int qInitResources_imtguidark();
+extern int qCleanupResources_imtguidark();
+
 extern void qt_blurImage(QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0);
 
 
@@ -69,7 +73,7 @@ namespace imtwidgets
 // public methods
 
 CImtStyle::CImtStyle()
-	:m_designSchema(DS_DARK),
+	:m_designSchema(DS_LIGHT),
 	m_styleType(ST_IMAGINGTOOLS),
 	m_wasStyleSheetInitialized(false)
 {
@@ -80,16 +84,18 @@ CImtStyle::CImtStyle()
 	light.pressedToolButtonGradientColors.endColor = QColor(245, 245, 245);
 	light.styleSheetPath = ":/Styles/ImtLightStyle";
 	light.initResourceFuncPtr = &qInitResources_imtguilight;
+	light.cleanupResourceFuncPtr = &qCleanupResources_imtguilight;
 
 	m_colorSchemaMap[DS_LIGHT] = light;
 
 	ColorSchema dark;
-	dark.toolButtonGradientColors.startColor = QColor(160, 160, 160);
-	dark.toolButtonGradientColors.endColor = QColor(135, 135, 135);
-	dark.pressedToolButtonGradientColors.startColor = QColor(155, 155, 155);
-	dark.pressedToolButtonGradientColors.endColor = QColor(155, 155, 155);
+	dark.toolButtonGradientColors.startColor = QColor(140, 140, 140);
+	dark.toolButtonGradientColors.endColor = QColor(115, 115, 115);
+	dark.pressedToolButtonGradientColors.startColor = QColor(135, 135, 135);
+	dark.pressedToolButtonGradientColors.endColor = QColor(135, 135, 135);
 	dark.styleSheetPath = ":/Styles/ImtDarkStyle";
 	dark.initResourceFuncPtr = &qInitResources_imtguidark;
+	dark.cleanupResourceFuncPtr = &qCleanupResources_imtguidark;
 
 	m_colorSchemaMap[DS_DARK] = dark;
 }
@@ -382,9 +388,13 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 		if (!m_wasStyleSheetInitialized){
 			m_wasStyleSheetInitialized = true;
 
-			//if (m_colorSchemaMap[m_designSchema].initResourceFuncPtr != nullptr){
-			//	(*m_colorSchemaMap[m_designSchema].initResourceFuncPtr)();
-			//}
+			for(const ColorSchema& colorSchema : m_colorSchemaMap){
+				(*colorSchema.cleanupResourceFuncPtr)();
+			}
+
+			if (m_colorSchemaMap[m_designSchema].initResourceFuncPtr != nullptr){
+				(*m_colorSchemaMap[m_designSchema].initResourceFuncPtr)();
+			}
 
 			iqtgui::SetStyleSheetFromFile(*qApp, m_colorSchemaMap[m_designSchema].styleSheetPath);
 		}

@@ -101,9 +101,7 @@
         <file alias="Manual">Resources/Icons/Light/Manual.svg</file>
         <file alias="Robot">Resources/Icons/Light/Robot.svg</file>
         <file alias="StatusActive">Resources/Icons/Light/StatusActive.svg</file>
-        <file alias="LampHighlight">Resources/Icons/Light/LampHighlight.svg</file>
         <file alias="ManualProcessingHighlight">Resources/Icons/Light/ManualProcessingHighlight.svg</file>
-        <file alias="DetailedHighlight">Resources/Icons/Light/DetailedHighlight.svg</file>
         <file alias="ProductionOverviewHighlight">Resources/Icons/Light/ProductionOverviewHighlight.svg</file>
         <file alias="ClearLayers">Resources/Icons/Light/ClearLayers.svg</file>
         <file alias="SplitVertical">Resources/Icons/Light/SplitVertical.svg</file>
