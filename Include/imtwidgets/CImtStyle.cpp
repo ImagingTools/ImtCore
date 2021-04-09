@@ -6,8 +6,10 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/QToolButton>
+#include <QtWidgets/QStyleFactory>
 
 // ACF includes
+#include <istd/TDelPtr.h>
 #include <iqtgui/iqtgui.h>
 
 
@@ -85,6 +87,8 @@ CImtStyle::CImtStyle()
 	light.styleSheetPath = ":/Styles/ImtLightStyle";
 	light.initResourceFuncPtr = &qInitResources_imtguilight;
 	light.cleanupResourceFuncPtr = &qCleanupResources_imtguilight;
+	istd::TDelPtr<QStyle> baseStylePtr(QStyleFactory::create("fusion"));
+	light.palette = baseStylePtr->standardPalette();
 
 	m_colorSchemaMap[DS_LIGHT] = light;
 
@@ -96,6 +100,20 @@ CImtStyle::CImtStyle()
 	dark.styleSheetPath = ":/Styles/ImtDarkStyle";
 	dark.initResourceFuncPtr = &qInitResources_imtguidark;
 	dark.cleanupResourceFuncPtr = &qCleanupResources_imtguidark;
+
+	dark.palette.setColor(QPalette::Window, QColor(53, 53, 53));
+	dark.palette.setColor(QPalette::WindowText, Qt::white);
+	dark.palette.setColor(QPalette::Base, QColor(33, 33, 33));
+	dark.palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+	dark.palette.setColor(QPalette::ToolTipBase, Qt::white);
+	dark.palette.setColor(QPalette::ToolTipText, Qt::white);
+	dark.palette.setColor(QPalette::Text, Qt::white);
+	dark.palette.setColor(QPalette::Button, QColor(53, 53, 53));
+	dark.palette.setColor(QPalette::ButtonText, Qt::white);
+	dark.palette.setColor(QPalette::BrightText, Qt::red);
+	dark.palette.setColor(QPalette::Link, QColor(42, 130, 218));
+	dark.palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+	dark.palette.setColor(QPalette::HighlightedText, Qt::black);
 
 	m_colorSchemaMap[DS_DARK] = dark;
 }
@@ -392,11 +410,17 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 				(*colorSchema.cleanupResourceFuncPtr)();
 			}
 
-			if (m_colorSchemaMap[m_designSchema].initResourceFuncPtr != nullptr){
-				(*m_colorSchemaMap[m_designSchema].initResourceFuncPtr)();
+			qApp->setPalette(baseStyle()->standardPalette());
+
+			const ColorSchema& colorSchema = m_colorSchemaMap[m_designSchema];
+
+			if (colorSchema.initResourceFuncPtr != nullptr){
+				(*colorSchema.initResourceFuncPtr)();
 			}
 
-			iqtgui::SetStyleSheetFromFile(*qApp, m_colorSchemaMap[m_designSchema].styleSheetPath);
+			iqtgui::SetStyleSheetFromFile(*qApp, colorSchema.styleSheetPath);
+
+			qApp->setPalette(colorSchema.palette);
 		}
 	}
 	else{

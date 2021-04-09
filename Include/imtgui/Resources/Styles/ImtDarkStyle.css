@@ -14,10 +14,9 @@ QWidget:disabled
 }
 
 
-QSplashScreen > QWidget
-{
-	color: white;
-	background: transparent;
+QSplashScreen > QWidget {
+    color: #88b8e3;
+    background: transparent;
 }
 
 QSplashScreen > QWidget > QLabel 
@@ -27,44 +26,27 @@ QSplashScreen > QWidget > QLabel
 	background: transparent;
 }
 
-QWidget#MainVersionTitleLabel, QWidget#MainVersionLabel
-{
-    color: white;
+QWidget#MainVersionTitleLabel, QWidget#MainVersionLabel {
+    color: #88b8e3;
 }
 
 
-QSplashScreen > QWidget#CopyrightLabel
-{
-    color: yellow;
+QSplashScreen > QWidget#CopyrightLabel {
+    color: #88b8e3;
 }
 
 
 QWidget#PageTree 
 {
-    background-color: palette(midlight);
-/*    border-right: 1px solid rgb(200,200,202);*/
+    background-color: palette(dark);
 }
 
-
-QWidget#BottomFrame
-{
-	background: rgb(230,230,232);
-}
-
-QWidget#RightFrame 
-{
-    border-left: 1px solid #335777;
-}
 
 QWidget#ResultFrame
 {
     font-size: 24px;
 }
 
-QWidget#StatusFrame 
-{
-    border-bottom: 1px solid #335777;
-}
 
 QWidget[ImtTopFrame=true] {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(107,107,109), stop: 0.9 rgb(92,92,94), stop: 0.97 rgb(92,92,94), stop: 1.0 rgb(70,70,72));
@@ -73,7 +55,6 @@ QWidget[ImtTopFrame=true] {
 
 QWidget#EditPanel
 {
-    background: rgb(230,230,232);
     margin-top: 1px; margin-left: 1px; margin-right: 1px; 
 }
 
@@ -90,27 +71,23 @@ QWidget#MessageFrame
 QWidget#ErrorsCounterFrame, QWidget#NokCounterFrame, QWidget#OkCounterFrame, 
 QWidget#TotalCounterFrame, QWidget#WarningsCounterFrame 
 {
-    background: #ffffff;
+    background: palette(dark);
 }
 
 QLabel[ProductionApplicationName=true] {
     font-size: 16pt;
-    color: #335777;
 }
 
 QLabel[ProductionTime=true] {
     font-size: 16pt;
-    color: #335777;
 }
 
 QLabel[Header=true] {
     font-size: 12pt;
-    color: #88b8e3;
 }
 
 QLabel#PageLabel, QLabel#ManualModePageLabel
 {
-	color: #335777;
 	font-size: 12pt;
 	font-weight: bold;
 }
@@ -121,18 +98,14 @@ QLineEdit, QPlainTextEdit
     font-size: 10pt;
 }
 
-QToolButton 
-{
-    color: #335777;
-}
 
 QToolButton#windowTitle
 {
-    background: white;
+    background: palette(window);
     min-width: 3em;
     max-width: 3em;
     border-radius: 3px;
-    border: 1px solid lightGray;
+    border: 1px solid palette(mid);
 }
 
 QToolButton#PageIconToolButton 
@@ -145,7 +118,8 @@ QToolButton#PageIconToolButton
 
 QToolButton#PageIconToolButton:hover
 {
-	background-color: transparent; border: 0px solid transparent;
+	background-color: transparent;
+    border: 0px solid transparent;
 	padding: 0px;
 }
 
@@ -165,12 +139,11 @@ QToolBar[ImtToolBar=true]
 	qproperty-iconSize: 24px;
 }
 
-QTableView[ImtMenu=true]
-{
-	color: palette(background);
-	background: palette(background);
-	font-weight: bold;
-	text-align: center;
+QTableView[ImtMenu=true] {
+    color: palette(mid);
+    background: palette(mid);
+    font-weight: bold;
+    text-align: center;
 }
 
 QTableView[ImtMenu=true]::item
@@ -184,7 +157,7 @@ QTableView[ImtMenu=true]::item
 */
 QTreeWidget[TabSimulation=true]
 {
-	background: rgb(230,230,230);
+	background: palette(mid);
 	font-weight: bold;
 	text-align: left;
 }
@@ -237,16 +210,13 @@ QAbstractItemView::item
     height: 25px;
 }
 
-QAbstractItemView::item::selected
-{
-    color: #335777;
-    background-color: #e3eefa;
+QAbstractItemView::item::selected {
+    background-color: rgba(160, 80, 40);
 }
 
-QAbstractItemView::branch::selected
-{
-    background: #e3eefa;
-}
+    QAbstractItemView::branch::selected {
+        background-color: rgba(160, 80, 40);
+    }
 
 
 QTreeView[ItemView=true]::item
@@ -271,9 +241,8 @@ QHeaderView::section
 {
 	padding-top:5px;
 	padding-bottom:5px;
-	background-color: white;
 	padding-left: 4px;
-	border-bottom: 1px solid #dfdfdf;
+	border-bottom: 1px solid palette(mid);
 	border-left: none;
 	border-right: none;
 	border-top: none;

@@ -75,6 +75,7 @@ private:
 		GradientColors toolButtonGradientColors;
 		GradientColors pressedToolButtonGradientColors;
 		QString styleSheetPath;
+		QPalette palette;
 
 		resourceFunctionPtr initResourceFuncPtr;
 		resourceFunctionPtr cleanupResourceFuncPtr;
