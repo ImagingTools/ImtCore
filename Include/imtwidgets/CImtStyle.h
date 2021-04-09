@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtCore/QMap>
 #include <QtWidgets/QProxyStyle>
+#include <QtWidgets/QStyleOption>
 
 
 namespace imtwidgets
@@ -24,15 +25,35 @@ public:
 		DS_DARK
 	};
 
+	enum StyleType
+	{
+		ST_IMAGINGTOOLS,
+		ST_FLAT
+	};
+
 	CImtStyle();
 
+	DesignSchema GetDesignSchema() const;
 	void SetDesignSchema(DesignSchema designSchema);
 
+	StyleType GetStyleType() const;
+	void SetStyleType(StyleType styleType);
+
 	// reimplemented (QStyle)
+	virtual void polish(QWidget* widgetPtr) override;
 	virtual void drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *widget = nullptr) const override;
 	virtual void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = nullptr) const override;
 	virtual QRect subElementRect(SubElement subElement, const QStyleOption *option, const QWidget *widget = nullptr) const override;
 	virtual QSize sizeFromContents(QStyle::ContentsType type, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget = nullptr) const override;
+
+protected:
+	virtual void DrawImagingToolsToolButton(
+				const QStyleOptionToolButton* optionPtr,
+				QPainter* painter,
+				const QWidget* widget = nullptr) const;
+
+private:
+	void EnsureStyleSheetApplied(bool force = false) const;
 
 private:
 	struct GradientColors
@@ -45,6 +66,7 @@ private:
 	{
 		GradientColors toolButtonGradientColors;
 		GradientColors pressedToolButtonGradientColors;
+		QString styleSheetPath;
 	};
 
 	typedef QMap<DesignSchema, ColorSchema> ColorSchemaMap;
@@ -52,6 +74,9 @@ private:
 	ColorSchemaMap m_colorSchemaMap;
 
 	DesignSchema m_designSchema;
+	StyleType m_styleType;
+
+	mutable bool m_wasStyleSheetInitialized;
 };
 
 

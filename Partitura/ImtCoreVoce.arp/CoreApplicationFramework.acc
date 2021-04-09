@@ -80,7 +80,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="StyleSheet" Type="String" ExportId="StyleSheet">
-                        <Data IsEnabled="true" Value=":/Styles/ImtLightStyle"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TitleFormat" Type="String" ExportId="TitleFormat">
                         <Data IsEnabled="true" Value="$(AppName) by $(CompanyName)"/>

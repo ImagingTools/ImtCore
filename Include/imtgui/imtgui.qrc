@@ -168,6 +168,7 @@
     </qresource>
     <qresource prefix="/Styles">
         <file alias="ImtLightStyle">Resources/Styles/ImtLightStyle.css</file>
+        <file alias="ImtDarkStyle">Resources/Styles/ImtDarkStyle.css</file>
     </qresource>
     <qresource prefix="/Style/ImtLight/Images">
         <file alias="PanelBackground">Resources/Styles/ImtLight/Images/PanelBackground.svg</file>

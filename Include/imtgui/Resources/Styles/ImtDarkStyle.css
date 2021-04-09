@@ -1,0 +1,325 @@
+QWidget {
+    font-family: "Verdana";
+    color: #88b8e3;
+}
+
+QWidget::item:disabled
+{
+	color: palette(disabled);
+}
+
+QWidget:disabled
+{
+	color: palette(disabled);
+}
+
+
+QSplashScreen > QWidget
+{
+	color: white;
+	background: transparent;
+}
+
+QSplashScreen > QWidget > QLabel 
+{
+	color: yellow;
+
+	background: transparent;
+}
+
+QWidget#MainVersionTitleLabel, QWidget#MainVersionLabel
+{
+    color: white;
+}
+
+
+QSplashScreen > QWidget#CopyrightLabel
+{
+    color: yellow;
+}
+
+
+QWidget#PageTree 
+{
+    background-color: palette(midlight);
+/*    border-right: 1px solid rgb(200,200,202);*/
+}
+
+
+QWidget#BottomFrame
+{
+	background: rgb(230,230,232);
+}
+
+QWidget#RightFrame 
+{
+    border-left: 1px solid #335777;
+}
+
+QWidget#ResultFrame
+{
+    font-size: 24px;
+}
+
+QWidget#StatusFrame 
+{
+    border-bottom: 1px solid #335777;
+}
+
+QWidget[ImtTopFrame=true] {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(107,107,109), stop: 0.9 rgb(92,92,94), stop: 0.97 rgb(92,92,94), stop: 1.0 rgb(70,70,72));
+    border-bottom: 1px solid rgb(60,60,60);
+}
+
+QWidget#EditPanel
+{
+    background: rgb(230,230,232);
+    margin-top: 1px; margin-left: 1px; margin-right: 1px; 
+}
+
+QWidget#LoadWorkflowButton
+{
+    text-align: left;
+}
+
+QWidget#MessageFrame
+{
+    background-color: lightYellow;
+}
+
+QWidget#ErrorsCounterFrame, QWidget#NokCounterFrame, QWidget#OkCounterFrame, 
+QWidget#TotalCounterFrame, QWidget#WarningsCounterFrame 
+{
+    background: #ffffff;
+}
+
+QLabel[ProductionApplicationName=true] {
+    font-size: 16pt;
+    color: #335777;
+}
+
+QLabel[ProductionTime=true] {
+    font-size: 16pt;
+    color: #335777;
+}
+
+QLabel[Header=true] {
+    font-size: 12pt;
+    color: #88b8e3;
+}
+
+QLabel#PageLabel, QLabel#ManualModePageLabel
+{
+	color: #335777;
+	font-size: 12pt;
+	font-weight: bold;
+}
+
+QLineEdit, QPlainTextEdit 
+{
+    height: 1.3em;
+    font-size: 10pt;
+}
+
+QToolButton 
+{
+    color: #335777;
+}
+
+QToolButton#windowTitle
+{
+    background: white;
+    min-width: 3em;
+    max-width: 3em;
+    border-radius: 3px;
+    border: 1px solid lightGray;
+}
+
+QToolButton#PageIconToolButton 
+{
+    background-color: transparent;
+    border: 0px solid transparent;
+    padding: 0px;
+}
+    
+
+QToolButton#PageIconToolButton:hover
+{
+	background-color: transparent; border: 0px solid transparent;
+	padding: 0px;
+}
+
+QToolBar[ImtToolBar=true]::separator
+{
+	background: transparent;
+	width: 32px;
+}
+
+QPushButton#LoadWorkflowButton
+{
+    text-align: left;
+}
+
+QToolBar[ImtToolBar=true]
+{
+	qproperty-iconSize: 24px;
+}
+
+QTableView[ImtMenu=true]
+{
+	color: palette(background);
+	background: palette(background);
+	font-weight: bold;
+	text-align: center;
+}
+
+QTableView[ImtMenu=true]::item
+{
+	font-weight: bold;
+	text-align: center;
+}
+
+/*
+	Tab simulation using tree widget
+*/
+QTreeWidget[TabSimulation=true]
+{
+	background: rgb(230,230,230);
+	font-weight: bold;
+	text-align: left;
+}
+
+QTreeWidget[TabSimulation=true]::item 
+{
+    border: 0px none transparent;
+    padding-top: 0.7em;
+    padding-bottom: 0.7em;
+}
+
+QTreeWidget[TabSimulation=true]::item:first
+{
+    padding-left: 5px;
+}
+
+QTreeWidget[TabSimulation=true]::item:last
+{
+    padding-right: 15px;
+}
+
+QTreeWidget[TabSimulation=true]::item:selected
+{
+    background-color: rgb(255, 255, 255);
+	color: #335777;
+}
+
+QTreeWidget[TabSimulation=true]::item:!selected:hover
+{
+	background-color: #dedede;
+}
+
+QTreeWidget[TabSimulation=true]::item:first:selected
+{
+    border-top: 1px white;
+}
+
+
+QAbstractItemView {
+    outline: 0;
+}
+
+QAbstractItemView[NoFrame="true"]
+{
+    border: none;
+}
+
+QAbstractItemView::item
+{
+    height: 25px;
+}
+
+QAbstractItemView::item::selected
+{
+    color: #335777;
+    background-color: #e3eefa;
+}
+
+QAbstractItemView::branch::selected
+{
+    background: #e3eefa;
+}
+
+
+QTreeView[ItemView=true]::item
+{
+    height: 30px;
+}
+
+
+QComboBox::item:selected 
+{
+ 	color: white;
+}
+
+
+QHeaderView
+{
+	border: none;
+	padding: 0px;
+}
+
+QHeaderView::section
+{
+	padding-top:5px;
+	padding-bottom:5px;
+	background-color: white;
+	padding-left: 4px;
+	border-bottom: 1px solid #dfdfdf;
+	border-left: none;
+	border-right: none;
+	border-top: none;
+	font-weight: bold;
+}
+
+QTabBar {
+    background-color: rgb(120,120,122);
+}
+
+QTabBar::tab[CollectionView=true]
+{
+    min-height: 30px;
+    background-color: rgb(120,120,122);
+    min-width: 50ex;
+    padding: 2px;
+}
+
+QTabBar::tab:selected[CollectionView=true] {
+    color: rgb(230,230,232);
+    background-color: #1a869a;
+}
+
+
+QTabBar::tab::top:selected[CollectionView=true] {
+    border-bottom: 2px solid #eb6225;
+}
+
+QTabBar::tab::left:selected[CollectionView=true] {
+    border-left: 2px solid #eb6225;
+}
+
+
+QTabBar::tab::right:selected[CollectionView=true] {
+    border-left: 2px solid #eb6225;
+}
+
+QTabBar::tab::bottom:selected[CollectionView=true] {
+    border-bottom: 2px solid #f15a17;
+}
+
+
+QMenu[CommandsMenu=true]
+{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
