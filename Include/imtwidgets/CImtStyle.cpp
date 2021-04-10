@@ -76,7 +76,7 @@ namespace imtwidgets
 // public methods
 
 CImtStyle::CImtStyle()
-	:m_designSchema(DS_LIGHT),
+	:m_designSchema(DS_DARK),
 	m_styleType(ST_IMAGINGTOOLS),
 	m_wasStyleSheetInitialized(false)
 {
@@ -347,7 +347,13 @@ void CImtStyle::DrawImagingToolsToolButton(
 				}
 				else{
 					path.addRoundedRect(borderRect.adjusted(0, 0, 0, 0), 6, 6);
-					painter->fillPath(path, Qt::white);
+
+					if (m_designSchema == DS_LIGHT){
+						painter->fillPath(path, Qt::white);
+					}
+					else{
+						painter->fillPath(path, QColor(145, 145, 145));
+					}
 				}
 
 				path = QPainterPath();

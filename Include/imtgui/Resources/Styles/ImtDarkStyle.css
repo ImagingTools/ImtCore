@@ -38,7 +38,7 @@ QSplashScreen > QWidget#CopyrightLabel {
 
 QWidget#PageTree 
 {
-    background-color: palette(dark);
+    background-color: palette(window);
 }
 
 
