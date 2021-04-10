@@ -16,7 +16,8 @@ class IEncryptionKeysProvider;
 
 
 /**
-	Component describing saving an encrypted object using external components imtcrypt::IEncryption and imtcrypt::IEncryptionKeysProvider
+	Component for saving an encrypted object using imtcrypt::IEncryption and imtcrypt::IEncryptionKeysProvider interfaces
+	and underlaying data object persistence (see attribute \c BasePersistence).
 	\ingroup Cryptography
 */
 class CEncryptionBasedPersistenceComp: public ilog::CLoggerComponentBase, virtual public ifile::IFilePersistence
