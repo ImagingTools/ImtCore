@@ -1,5 +1,6 @@
 #include <imtcrypt/CEncryptionBasedPersistenceComp.h>
 
+
 // Qt includes
 #include <QtCore/QFile>
 #include <QtCore/QTemporaryDir>
@@ -20,16 +21,20 @@ namespace imtcrypt
 
 bool CEncryptionBasedPersistenceComp::IsOperationSupported(const istd::IChangeable *dataObjectPtr, const QString* /*filePathPtr*/, int /*flags*/, bool /*beQuiet*/) const
 {
-	if (dataObjectPtr != nullptr)
+	if (dataObjectPtr != nullptr){
 		return true;
+	}
+
 	return false;
 }
 
 
 int CEncryptionBasedPersistenceComp::LoadFromFile(istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* progressManagerPtr) const
 {
-	if (m_basePersistenceCompPtr.IsValid() && !filePath.isEmpty()
-			&& m_encryptionKeysProviderCompPtr.IsValid() && m_encryptionCompPtr.IsValid()){
+	if (		m_basePersistenceCompPtr.IsValid() &&
+				!filePath.isEmpty() &&
+				m_encryptionKeysProviderCompPtr.IsValid() &&
+				m_encryptionCompPtr.IsValid()){
 		QFileInfo fileInfo(filePath);
 		QTemporaryDir tempDir;
 		QString filePathTmp = tempDir.path() + "/" + fileInfo.baseName() + ".xml";
@@ -37,24 +42,31 @@ int CEncryptionBasedPersistenceComp::LoadFromFile(istd::IChangeable& data, const
 		if (file.open(QIODevice::ReadOnly)){
 			QByteArray decryptedData;
 			QByteArray encryptedData = file.readAll();
-			m_encryptionCompPtr->DecryptData(encryptedData,imtcrypt::IEncryption::EA_AES,*m_encryptionKeysProviderCompPtr,decryptedData);
+			
+			if (!m_encryptionCompPtr->DecryptData(encryptedData,imtcrypt::IEncryption::EA_AES,*m_encryptionKeysProviderCompPtr,decryptedData)){
+				SendErrorMessage(0, QString("Data decryption was failed. File '%1' could not be loaded").arg(filePath), "Encryption Persistence");
+
+				file.close();
+
+				return OS_FAILED;
+			}
+
 			file.close();
 			file.setFileName(filePathTmp);
 			if (file.open(QIODevice::WriteOnly)){
 				file.write(decryptedData);
 				file.close();
-				if (m_basePersistenceCompPtr->LoadFromFile(data, filePathTmp, progressManagerPtr) == OS_OK){
-					return OS_OK;
 
-				}
+				return m_basePersistenceCompPtr->LoadFromFile(data, filePathTmp, progressManagerPtr);
 			}
 		}
 	}
+
 	return OS_FAILED;
 }
 
 
-int CEncryptionBasedPersistenceComp::SaveToFile(const istd::IChangeable &data, const QString &filePath, ibase::IProgressManager *progressManagerPtr) const
+int CEncryptionBasedPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString & filePath, ibase::IProgressManager* progressManagerPtr) const
 {
 	if (m_basePersistenceCompPtr.IsValid() && !filePath.isEmpty()){
 		QFileInfo fileInfo(filePath);
@@ -69,18 +81,20 @@ int CEncryptionBasedPersistenceComp::SaveToFile(const istd::IChangeable &data, c
 				if (file.open(QIODevice::ReadOnly)){
 					xmlData = file.readAll();
 				}
+
 				file.close();
 				file.setFileName(filePath);
+
 				if (!xmlData.isEmpty() && m_encryptionKeysProviderCompPtr.IsValid() && file.open(QIODevice::WriteOnly)){
-					m_encryptionCompPtr->EncryptData(xmlData,imtcrypt::IEncryption::EA_AES,*m_encryptionKeysProviderCompPtr,encryptedData);
+					m_encryptionCompPtr->EncryptData(xmlData, imtcrypt::IEncryption::EA_AES, *m_encryptionKeysProviderCompPtr, encryptedData);
+
 					file.write(encryptedData);
 				}
+
 				file.close();
-				istd::IChangeable* copyData = data.CloneMe();
 
 				return OS_OK;
 			}
-
 		}
 	}
 
@@ -125,4 +139,5 @@ QString CEncryptionBasedPersistenceComp::GetTypeDescription(const QString *exten
 
 
 } //namespace imtcrypt
+
 
