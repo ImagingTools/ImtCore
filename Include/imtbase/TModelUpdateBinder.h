@@ -14,7 +14,7 @@ template <typename ModelInterface, typename Parent>
 class TModelUpdateBinder: protected imod::CMultiModelDispatcherBase
 {
 public:
-	typedef typename void (Parent::*CallbackMethod)(const istd::IChangeable::ChangeSet& changeSet, const ModelInterface* objectPtr);
+	typedef void (Parent::*CallbackMethod)(const istd::IChangeable::ChangeSet& changeSet, const ModelInterface* objectPtr);
 	typedef imod::CMultiModelDispatcherBase BaseClass;
 
 	TModelUpdateBinder(Parent& parent);

@@ -2467,13 +2467,13 @@ bool CFileCollectionComp::RevisionsContents::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && archive.BeginMultiTag(revisionListTag, revisionItemTag, revisionCount);
 
-	QList<int> keys(keys());
+	QList<int> keysList(keys());
 
 	for (int i = 0; i < revisionCount; i++){
 		RevisionsContentsItem revisionsContentsItem;
 
 		if (archive.IsStoring()){
-			revisionsContentsItem = value(keys[i]);
+			revisionsContentsItem = value(keysList[i]);
 		}
 
 		retVal = retVal && archive.BeginTag(revisionItemTag);

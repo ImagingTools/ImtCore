@@ -89,14 +89,17 @@ QByteArray CProductInstanceInfoViewDelegateComp::GetEncryptionKey(imtcrypt::IEnc
 		imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 		Q_ASSERT(fileCollectionPtr != nullptr);
 		iser::CMemoryWriteArchive archive;
-		QByteArray id = m_selectedItemIds[0];
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		fileCollectionPtr->GetObjectData(id, dataPtr);
-		Q_ASSERT(dataPtr.IsValid());
-		imtlic::IProductInstanceInfo* productInstanceInfoPtr;
-		productInstanceInfoPtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
-		Q_ASSERT(productInstanceInfoPtr != nullptr);
-		retVal = productInstanceInfoPtr->GetProductInstanceId();
+		if (!m_selectedItemIds.isEmpty()){
+			QByteArray id = m_selectedItemIds[0];
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			fileCollectionPtr->GetObjectData(id, dataPtr);
+			if (dataPtr.IsValid()){
+				imtlic::IProductInstanceInfo* productInstanceInfoPtr;
+				productInstanceInfoPtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
+				Q_ASSERT(productInstanceInfoPtr != nullptr);
+				retVal = productInstanceInfoPtr->GetProductInstanceId();
+			}
+		}
 	}
 	if (type == KT_VECTOR){
 		retVal = "vector";
@@ -112,21 +115,20 @@ void CProductInstanceInfoViewDelegateComp::OnExportLicense()
 	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	if (fileCollectionPtr != nullptr) {
 		iser::CMemoryWriteArchive archive;
-		//			for (int i = 0; i < m_selectedItemIds.count(); i++){
-		QByteArray id = m_selectedItemIds[0];
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		fileCollectionPtr->GetObjectData(id, dataPtr);
-		if (dataPtr.IsValid()){
-			imtlic::IProductInstanceInfo* productInstanceInfoPtr;
-			productInstanceInfoPtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
-			Q_ASSERT(productInstanceInfoPtr != nullptr);
-			if (m_filePersistence.IsValid()){
-				m_filePersistence.GetPtr()->SaveToFile(*productInstanceInfoPtr);
+		if (!m_selectedItemIds.isEmpty()){
+			QByteArray id = m_selectedItemIds[0];
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			fileCollectionPtr->GetObjectData(id, dataPtr);
+			if (dataPtr.IsValid()){
+				imtlic::IProductInstanceInfo* productInstanceInfoPtr;
+				productInstanceInfoPtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
+				Q_ASSERT(productInstanceInfoPtr != nullptr);
+				if (m_filePersistence.IsValid()){
+					m_filePersistence.GetPtr()->SaveToFile(*productInstanceInfoPtr);
+				}
 			}
 		}
 	}
-
-
 }
 
 
