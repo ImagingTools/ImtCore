@@ -21,20 +21,19 @@ bool CEncryption::EncryptData(
 {
 	switch (algorithm){
 		case EA_AES:{
-			CAesEncryption aes;
 			CAesKey key;
 			key.CreateAesKeys(keys.GetEncryptionKey(IEncryptionKeysProvider::KT_PASSWORD),keys.GetEncryptionKey(IEncryptionKeysProvider::KT_VECTOR));
-//			key.SetKey(keys.GetEncryptionKey(IEncryptionKeysProvider::KT_PASSWORD));
-		
+
+			CAesEncryption aes;
 			return aes.Encrypt(input, key, output);
 		}
 
 		case EA_RSA:{
-			CRsaEncryption rsa;
 			CRsaKey key;
 			key.SetPublicKey(keys.GetEncryptionKey(IEncryptionKeysProvider::KT_PUBLIC));
 			key.SetPrivateKey(keys.GetEncryptionKey(IEncryptionKeysProvider::KT_PRIVATE));
 		
+			CRsaEncryption rsa;
 			return rsa.Encrypt(input, key, output);
 		}
 	}
@@ -51,20 +50,19 @@ bool CEncryption::DecryptData(
 {
 	switch (algorithm){
 		case EA_AES:{
-			CAesEncryption aes;
 			CAesKey key;
 			key.CreateAesKeys(keys.GetEncryptionKey(IEncryptionKeysProvider::KT_PASSWORD),keys.GetEncryptionKey(IEncryptionKeysProvider::KT_VECTOR));
-//			key.SetKey(keys.GetEncryptionKey(IEncryptionKeysProvider::KT_PASSWORD));
 		
+			CAesEncryption aes;
 			return aes.Decrypt(input, key, output);
 		}
 
 		case EA_RSA:{
-			CRsaEncryption rsa;
 			CRsaKey key;
 			key.SetPublicKey(keys.GetEncryptionKey(IEncryptionKeysProvider::KT_PUBLIC));
 			key.SetPrivateKey(keys.GetEncryptionKey(IEncryptionKeysProvider::KT_PRIVATE));
-		
+
+			CRsaEncryption rsa;
 			return rsa.Decrypt(input, key, output);
 		}
 	}
@@ -74,4 +72,5 @@ bool CEncryption::DecryptData(
 
 
 } //namespace imtcrypt
+
 
