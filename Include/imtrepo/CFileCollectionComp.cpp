@@ -1987,24 +1987,28 @@ bool CFileCollectionComp::FinishInsertFileTransaction(
 			const QByteArray& fileId,
 			const CollectionItem& collectionItem)
 {
-	bool result = istd::CSystem::CopyDirectory(workingPath, repositoryPath);
-	if (result){
-		{
-			static ChangeSet changes(CF_ADDED);
-			istd::CChangeNotifier changeNotifier(this, &changes);
+	bool result = false;
 
-			QWriteLocker locker(&m_collectionLock);
-			m_files.push_back(collectionItem);
-			locker.unlock();
-		}
+	if (istd::CSystem::EnsurePathExists(repositoryPath)){
+		result = istd::CSystem::CopyDirectory(workingPath, repositoryPath);
+		if (result){
+			{
+				static ChangeSet changes(CF_ADDED);
+				istd::CChangeNotifier changeNotifier(this, &changes);
 
-		imtbase::CObjectCollectionInsertEvent event(fileId);
-		for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-			eventHandlerPtr->OnObjectCollectionEvent(this, &event);
+				QWriteLocker locker(&m_collectionLock);
+				m_files.push_back(collectionItem);
+				locker.unlock();
+			}
+
+			imtbase::CObjectCollectionInsertEvent event(fileId);
+			for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+				eventHandlerPtr->OnObjectCollectionEvent(this, &event);
+			}
 		}
-	}
-	else{
-		QDir(repositoryPath).removeRecursively();
+		else{
+			QDir(repositoryPath).removeRecursively();
+		}
 	}
 
 	return result;

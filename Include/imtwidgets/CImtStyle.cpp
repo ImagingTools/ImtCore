@@ -106,15 +106,15 @@ CImtStyle::CImtStyle()
 	dark.palette.setColor(QPalette::WindowText, Qt::white);
 	dark.palette.setColor(QPalette::Base, QColor(33, 33, 33));
 	dark.palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-	dark.palette.setColor(QPalette::ToolTipBase, Qt::white);
-	dark.palette.setColor(QPalette::ToolTipText, Qt::white);
-	dark.palette.setColor(QPalette::Text, Qt::white);
+	dark.palette.setColor(QPalette::ToolTipBase, Qt::lightGray);
+	dark.palette.setColor(QPalette::ToolTipText, Qt::lightGray);
+	dark.palette.setColor(QPalette::Text, Qt::lightGray);
 	dark.palette.setColor(QPalette::Button, QColor(53, 53, 53));
-	dark.palette.setColor(QPalette::ButtonText, Qt::white);
-	dark.palette.setColor(QPalette::BrightText, Qt::red);
+	dark.palette.setColor(QPalette::ButtonText, Qt::lightGray);
+	dark.palette.setColor(QPalette::BrightText, Qt::white);
 	dark.palette.setColor(QPalette::Link, QColor(42, 130, 218));
 	dark.palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
-	dark.palette.setColor(QPalette::HighlightedText, Qt::black);
+	dark.palette.setColor(QPalette::HighlightedText, Qt::white);
 
 	m_colorSchemaMap[DS_DARK] = dark;
 }

@@ -1,6 +1,6 @@
 QWidget {
     font-family: "Verdana";
-    color: #88b8e3;
+    color: #bfccd9;
 }
 
 QWidget::item:disabled
@@ -15,7 +15,7 @@ QWidget:disabled
 
 
 QSplashScreen > QWidget {
-    color: #88b8e3;
+    color: #bfccd9;
     background: transparent;
 }
 
@@ -27,12 +27,12 @@ QSplashScreen > QWidget > QLabel
 }
 
 QWidget#MainVersionTitleLabel, QWidget#MainVersionLabel {
-    color: #88b8e3;
+    color: #bfccd9;
 }
 
 
 QSplashScreen > QWidget#CopyrightLabel {
-    color: #88b8e3;
+    color: #bfccd9;
 }
 
 
@@ -140,7 +140,7 @@ QToolBar[ImtToolBar=true]
 }
 
 QTableView[ImtMenu=true] {
-    color: palette(mid);
+    color: palette(midlight);
     background: palette(mid);
     font-weight: bold;
     text-align: center;
@@ -157,7 +157,7 @@ QTableView[ImtMenu=true]::item
 */
 QTreeWidget[TabSimulation=true]
 {
-	background: palette(mid);
+	background: palette(window);
 	font-weight: bold;
 	text-align: left;
 }
@@ -179,20 +179,17 @@ QTreeWidget[TabSimulation=true]::item:last
     padding-right: 15px;
 }
 
-QTreeWidget[TabSimulation=true]::item:selected
-{
-    background-color: rgb(255, 255, 255);
-	color: #335777;
+QTreeWidget[TabSimulation=true]::item:selected {
+	background-color: palette(base);
+	color: #bfccd9;
 }
 
-QTreeWidget[TabSimulation=true]::item:!selected:hover
-{
-	background-color: #dedede;
+QTreeWidget[TabSimulation=true]::item:!selected:hover {
+	background-color: palette(light);
 }
 
-QTreeWidget[TabSimulation=true]::item:first:selected
-{
-    border-top: 1px white;
+QTreeWidget[TabSimulation=true]::item:first:selected {
+	border-top: 1px palette(midlight);
 }
 
 
