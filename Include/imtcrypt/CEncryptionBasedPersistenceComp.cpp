@@ -6,16 +6,12 @@
 #include <QtCore/QTemporaryDir>
 #include <QtCore/QFileInfo>
 
-// ImtCore includes
-#include <imtcrypt/IEncryptionKeysProvider.h>
-#include <imtcrypt/CRsaEncryption.h>
-#include <imtcrypt/CAesEncryption.h>
-#include <imtcrypt/IEncryptionKeysProvider.h>
-
 
 namespace imtcrypt
 {
 
+
+// protected methods
 
 // reimplemented (IEncryptionBasePersistence)
 
@@ -134,7 +130,7 @@ QString CEncryptionBasedPersistenceComp::GetTypeDescription(const QString *exten
 		return m_typeDescriptionsAttrPtr[0];
 	}
 
-	return "";
+	return QString();
 }
 
 

@@ -3,16 +3,15 @@
 
 // ACF includes
 #include <ifile/IFilePersistence.h>
+#include <ilog/TLoggerCompWrap.h>
+
+// ImtCore includes
 #include <imtcrypt/IEncryption.h>
 #include <imtcrypt/IEncryptionKeysProvider.h>
-#include <ilog/TLoggerCompWrap.h>
 
 
 namespace imtcrypt
 {
-
-
-class IEncryptionKeysProvider;
 
 
 /**
