@@ -407,9 +407,8 @@ protected:
 
 	/**
 		Create the meta information file.
-		\return The instance of the meta-information object, or \c NULL of no meta-info file was created for the given data object file.
 	*/
-	MetaInfoPtr CreateItemMetaInfoFile(const QString& dataObjectFilePath, const QByteArray& typeId, const QString& metaInfoFilePath) const;
+	bool CreateItemMetaInfoFile(const QString& dataObjectFilePath, const QByteArray& typeId, const QString& metaInfoFilePath) const;
 
 	/**
 		Update the meta informations for the existing item.
@@ -581,7 +580,7 @@ private:
 	ResourceTypeConstraintsModel m_resourceTypeConstraints;
 
 	/**
-		Mutex used for locking the collectio items.
+		Mutex used for locking the collection items.
 	*/
 	mutable QReadWriteLock m_collectionLock;
 

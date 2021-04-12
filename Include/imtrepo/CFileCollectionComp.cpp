@@ -507,11 +507,8 @@ QByteArray CFileCollectionComp::InsertFile(
 			collectionItem.metaInfo.SetMetaInfo(MIT_INSERTION_TIME, QDateTime::currentDateTime());
 			collectionItem.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
 
-
-			MetaInfoPtr metaInfoPtr = CreateItemMetaInfoFile(workingFilePath, typeId, metaInfoFilePath);
-			if (metaInfoPtr.IsValid()){
-				collectionItem.contentsMetaInfoPtr = metaInfoPtr;
-
+			bool metaInfoCreated = CreateItemMetaInfoFile(workingFilePath, typeId, metaInfoFilePath);
+			if (metaInfoCreated){
 				QString dataFilePath = workingPath + "/" + targetFileInfo.fileName() + "." + GetRepositoryInfo().dataFileSuffix;
 				QString savedPath = SaveCollectionItem(collectionItem, dataFilePath);
 
@@ -1462,19 +1459,16 @@ imtbase::IObjectCollection::MetaInfoPtr CFileCollectionComp::CreateItemMetaInfo(
 }
 
 
-imtbase::IObjectCollection::MetaInfoPtr CFileCollectionComp::CreateItemMetaInfoFile(const QString& dataObjectFilePath, const QByteArray& typeId, const QString& metaInfoFilePath) const
+bool CFileCollectionComp::CreateItemMetaInfoFile(const QString& dataObjectFilePath, const QByteArray& typeId, const QString& metaInfoFilePath) const
 {
 	MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(dataObjectFilePath, typeId);
-
 	if (metaInfoPtr.IsValid()){
 		if (SaveMetaInfo(*metaInfoPtr, metaInfoFilePath)){
-			return metaInfoPtr;
+			return true;
 		}
 	}
 
-	metaInfoPtr.SetPtr(nullptr);
-
-	return metaInfoPtr;
+	return false;
 }
 
 
@@ -1484,14 +1478,14 @@ void CFileCollectionComp::UpdateItemMetaInfo(CollectionItem& item) const
 	QFileInfo fileInfo(metaInfoFilePath);
 
 	bool retVal = false;
+
 	if (item.contentsMetaInfoPtr.IsValid()){
 		retVal = LoadMetaInfo(*item.contentsMetaInfoPtr, metaInfoFilePath);
 	}
 
 	if (!retVal){
-		MetaInfoPtr retVal = CreateItemMetaInfoFile(item.filePathInRepository, item.typeId, metaInfoFilePath);
-
-		if (!retVal.IsValid()){
+		retVal = CreateItemMetaInfoFile(item.filePathInRepository, item.typeId, metaInfoFilePath);
+		if (!retVal){
 			SendErrorMessage(0, QString("Meta-information for the file '%1' could not be created. Meta-information could not be provided").arg(metaInfoFilePath), "File Collection");
 		}
 	}
