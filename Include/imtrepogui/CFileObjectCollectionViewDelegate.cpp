@@ -73,18 +73,14 @@ void CFileObjectCollectionViewDelegate::UpdateItemSelection(const imtbase::IColl
 
 QByteArray CFileObjectCollectionViewDelegate::ImportObject(const QByteArray& typeId, const QString& sourcePath) const
 {
+	if (sourcePath.isEmpty()){
+		return QByteArray();
+	}
+
 	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
-	QByteArray objectId = fileCollectionPtr->InsertFile(sourcePath, typeId);
-	if (!objectId.isEmpty()){
-		const imtbase::IRevisionController* revisionControllerPtr = fileCollectionPtr->GetRevisionController();
-		if (revisionControllerPtr != nullptr){
-			revisionControllerPtr->BackupObject(*fileCollectionPtr, objectId, tr("Initial Revision"));
-		}
-	}
-
-	return objectId;
+	return fileCollectionPtr->ImportFile(typeId, sourcePath);
 }
 
 
@@ -97,9 +93,7 @@ bool CFileObjectCollectionViewDelegate::ExportObject(const QByteArray& objectId,
 	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
 
-	QString resultPath = fileCollectionPtr->GetFile(objectId, targetPath);
-
-	return (resultPath == targetPath);
+	return fileCollectionPtr->ExportFile(objectId, targetPath);
 }
 
 
@@ -245,7 +239,7 @@ void CFileObjectCollectionViewDelegate::OnImport()
 
 			QByteArray objectId = ImportObject(typeId, filePath);
 			if (objectId.isEmpty()){
-				QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be imported"));
+				QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document '%1' could not be imported").arg(filePath));
 			}
 			else{
 				OnImportObject(objectId);
@@ -390,6 +384,9 @@ QString CFileObjectCollectionViewDelegate::CreateFileImportFilter() const
 			}
 		}
 	}
+
+	filters.append("Compressed item folder (*.zip)");
+	allExt.append("zip");
 
 	if (allExt.size() > 1){
 		filters.prepend(tr("All known documents (%1)").arg("*." + allExt.join(" *.")));

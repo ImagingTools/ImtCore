@@ -62,7 +62,6 @@ public:
 		I_ASSIGN_MULTI_0(m_eventHandlerListCompPtr, "EventHandlerList", "List of event handler components", false);
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "FileCompressor");
 		I_ASSIGN(m_isCalculateCheckSumAttrPtr, "IsCalculateCheckSum", "Calculate check sums for the file", true, true);
-		I_ASSIGN(m_useSubfolderAttrPtr, "UseSubfolder", "If set, for each input file a subfolder with the corresponding file name will be created", true, false);
 		I_ASSIGN(m_asynchronousReadingAttrPtr, "AsynchronousReading", "If enabled, the collection will reading asynchronously", true, false);
 		I_ASSIGN(m_isEnableRevisionHistoryAttrPtr, "IsEnableRevisionHistory", "Allow saving item revisions", true, false);
 		I_ASSIGN(m_restoreRevisionRightIdAttrPtr, "RestoreRevisionRightId", "Restore to revision right id", true, "RestoreObject");
@@ -108,22 +107,6 @@ public:
 		Calculate checkSum for files
 	*/
 	I_ATTR(bool, m_isCalculateCheckSumAttrPtr);
-
-	/**
-		If set, for each input file a subfolder with the corresponding file name will be created.
-	*/
-	I_ATTR(bool, m_useSubfolderAttrPtr);
-
-	/**
-		Poll changes in file system to get automatic updates if an external process do some changes in the file collection.
-		Polling is disabled if asynchronous loading is enabled
-	*/
-	I_ATTR(bool, m_pollFileSystemAttrPtr);
-
-	/**
-		Polling period (seconds).
-	*/
-	I_ATTR(int, m_pollingPeriodAttrPtr);
 
 	/**
 		Asynchronous collection loading on dedicated thread
@@ -292,8 +275,9 @@ protected:
 	class CollectionItem: virtual public iser::ISerializable
 	{
 	public:
-		CollectionItem(const QString& repositoryFolderPath)
-			:m_repositoryFolderPath(repositoryFolderPath)
+		CollectionItem(const QString& repositoryFolderPath, int repositoryRev)
+			:m_repositoryFolderPath(repositoryFolderPath),
+			repositoryRevision(repositoryRev)
 		{
 		}
 
@@ -304,11 +288,6 @@ protected:
 		virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 	public:
-		/**
-			Path to the root folder of the repository.
-		*/
-		QString m_repositoryFolderPath;
-
 		/**
 			ID of the file in the file collection.
 		*/
@@ -335,6 +314,11 @@ protected:
 		QByteArray typeId;
 
 		/**
+			Repository revision.
+		*/
+		int repositoryRevision;
+
+		/**
 			Meta-informations for the file item in the collection.
 		*/
 		idoc::CStandardDocumentMetaInfo metaInfo;
@@ -343,6 +327,12 @@ protected:
 			Meta-informations for the file contents.
 		*/
 		imtbase::IMetaInfoCreator::MetaInfoPtr contentsMetaInfoPtr;
+
+	private:
+		/**
+			Path to the root folder of the repository.
+		*/
+		QString m_repositoryFolderPath;
 	};
 
 	struct RevisionsContentsItem: public imtbase::IRevisionController::RevisionInfo
@@ -413,7 +403,13 @@ protected:
 		Create meta-info object for a given file in the file collection.
 		\return The instance of the meta-information object, or \c NULL of no meta-info was created for the given file.
 	*/
-	virtual imtbase::IMetaInfoCreator::MetaInfoPtr CreateFileContentsMetaInfo(const QString& filePath, const QByteArray& typeId) const;
+	virtual MetaInfoPtr CreateItemMetaInfo(const QString& dataObjectFilePath, const QByteArray& typeId) const;
+
+	/**
+		Create the meta information file.
+		\return The instance of the meta-information object, or \c NULL of no meta-info file was created for the given data object file.
+	*/
+	MetaInfoPtr CreateItemMetaInfoFile(const QString& dataObjectFilePath, const QByteArray& typeId, const QString& metaInfoFilePath) const;
 
 	/**
 		Update the meta informations for the existing item.
@@ -421,17 +417,12 @@ protected:
 	void UpdateItemMetaInfo(CollectionItem& item) const;
 
 	/**
-		Create the meta information file.
-	*/
-	bool CreateMetaInfoFile(const QString& dataObjectFilePath, const QByteArray& typeId, const QString& metaInfoFilePath) const;
-
-	/**
 		Save file's meta info.
 		\param metaInfo	Meta info of the resource file.
 		\param filePath	Optionally defined name of the meta info file. If not specified, the file path will be calculated automatically.
 		\return \c true of the operation was sucessfull, or \c false otherwise.
 	*/
-	virtual bool SaveMetaInfo(const idoc::IDocumentMetaInfo& metaInfo, const QString& filePath = QString()) const;
+	virtual bool SaveMetaInfo(const idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const;
 
 	/**
 		Load file's meta info.
@@ -439,7 +430,7 @@ protected:
 		\param filePath	Path to the meta info file.
 		\return \c true of the operation was sucessfull, or \c false otherwise.
 	*/
-	virtual bool LoadFileMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QString& filePath) const;
+	virtual bool LoadMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const;
 
 	/**
 		Calculate path in file collection for the local file path
@@ -448,8 +439,6 @@ protected:
 				const QString& localFilePath,
 				const QString& resourceName,
 				const QByteArray& typeId,
-				bool useSubfolder,
-				bool useNameCounting,
 				ilog::IMessageConsumer* messageConsumerPtr) const;
 
 	/**
@@ -457,8 +446,7 @@ protected:
 	*/
 	virtual QString CalculateTargetFilePath(
 				const QString& targetFolderPath,
-				const QString& localFilePath,
-				bool useSubfolder) const;
+				const QString& localFilePath) const;
 
 	virtual bool LoadRevisionsContents(const IFileObjectCollection& collection, const QByteArray& objectId, RevisionsContents& revisionsContents) const;
 	virtual bool SaveRevisionsContents(const IFileObjectCollection& collection, const QByteArray& objectId, RevisionsContents& revisionsContents) const;
@@ -528,28 +516,10 @@ private:
 		QString m_resourceName;
 	};
 
-	//class InsertTransaction
-	//{
-	//public:
-	//	InsertTransaction(
-	//				CFileCollectionComp& collection,
-	//				);
-
-	//private:
-
-	//};
-
-private:
 	typedef QList<CollectionItem> Files;
 	typedef QList<imtbase::IObjectCollectionEventHandler*> EventHandlerList;
 
-	bool InsertFileIntoCollection(
-				const QString& filePath,
-				const QString& resourceName,
-				const QByteArray& typeId,
-				ilog::IMessageConsumer* messageConsumerPtr,
-				QString& filePathInRepository);
-
+private:
 	/**
 		Write a file collection item to file system.
 		\param repositoryItem collection item
@@ -563,13 +533,10 @@ private:
 	QString CalculateShortFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const;
 
 	bool IsPathInsideRepository(const QString& filePath) const;
-	bool IsResourceIdLocked(const QByteArray& resourceId);
-	bool IsResourceNameLocked(const QString& resourceName);
+	bool IsObjectIdLocked(const QByteArray& resourceId);
+	bool IsObjectNameLocked(const QString& resourceName);
 
-	QByteArray FindSuitableFile(
-				const QByteArray& proposedObjectId,
-				const QString& localFilePath,
-				const QString& objectDescription);
+	bool IsObjectIdUsed(const QByteArray& objectId);
 	QString CreateWorkingDir() const;
 	QString CalculateTargetFilePath(
 				const QString& filePath,
@@ -595,9 +562,9 @@ private:
 	ReaderThread m_readerThread;
 	Files m_readerFiles;
 
-	QList<QByteArray> m_lockedResourceIds;
-	QList<QString> m_lockedResourceNames;
-	QMutex m_lockedResourceMutex;
+	QList<QByteArray> m_lockedObjectIds;
+	QList<QString> m_lockedObjectNames;
+	QMutex m_lockedObjectInfoMutex;
 
 	/**
 		Collection data.
