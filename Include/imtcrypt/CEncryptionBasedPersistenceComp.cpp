@@ -38,8 +38,19 @@ int CEncryptionBasedPersistenceComp::LoadFromFile(istd::IChangeable& data, const
 		if (file.open(QIODevice::ReadOnly)){
 			QByteArray decryptedData;
 			QByteArray encryptedData = file.readAll();
-			
-			if (!m_encryptionCompPtr->DecryptData(encryptedData,imtcrypt::IEncryption::EA_AES,*m_encryptionKeysProviderCompPtr,decryptedData)){
+			imtcrypt::IEncryption::EncryptionAlgorithm encryptionAlgorithm = imtcrypt::IEncryption::EA_AES;
+			if (m_encryptionAlgorithm.IsValid()){
+				switch (*m_encryptionAlgorithm) {
+				case 0:
+					encryptionAlgorithm = imtcrypt::IEncryption::EA_RSA;
+					break;
+				default:
+					encryptionAlgorithm = imtcrypt::IEncryption::EA_AES;
+					break;
+				}
+			}
+
+			if (!m_encryptionCompPtr->DecryptData(encryptedData,encryptionAlgorithm,*m_encryptionKeysProviderCompPtr,decryptedData)){
 				SendErrorMessage(0, QString("Data decryption was failed. File '%1' could not be loaded").arg(filePath), "Encryption Persistence");
 
 				file.close();
@@ -82,7 +93,18 @@ int CEncryptionBasedPersistenceComp::SaveToFile(const istd::IChangeable& data, c
 				file.setFileName(filePath);
 
 				if (!xmlData.isEmpty() && m_encryptionKeysProviderCompPtr.IsValid() && file.open(QIODevice::WriteOnly)){
-					m_encryptionCompPtr->EncryptData(xmlData, imtcrypt::IEncryption::EA_AES, *m_encryptionKeysProviderCompPtr, encryptedData);
+					imtcrypt::IEncryption::EncryptionAlgorithm encryptionAlgorithm = imtcrypt::IEncryption::EA_AES;
+					if (m_encryptionAlgorithm.IsValid()){
+						switch (*m_encryptionAlgorithm) {
+						case 0:
+							encryptionAlgorithm = imtcrypt::IEncryption::EA_RSA;
+							break;
+						default:
+							encryptionAlgorithm = imtcrypt::IEncryption::EA_AES;
+							break;
+						}
+					}
+					m_encryptionCompPtr->EncryptData(xmlData, encryptionAlgorithm, *m_encryptionKeysProviderCompPtr, encryptedData);
 
 					file.write(encryptedData);
 				}
