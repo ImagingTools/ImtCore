@@ -82,8 +82,10 @@ IRepositoryFileTransformationStepsProvider::TransformationSteps CFileTransformat
 		}
 	}
 
-	if (steps.first().from != fromRevision || steps.last().to != toRevision){
-		steps.clear();
+	if (!steps.isEmpty()){
+		if (steps.first().from != fromRevision || steps.last().to != toRevision){
+			steps.clear();
+		}
 	}
 
 	return steps;
