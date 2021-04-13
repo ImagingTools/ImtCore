@@ -53,11 +53,11 @@ imt3dgui.file = ../../Include/imt3dgui/QMake/imt3dgui.pro
 SUBDIRS += imtfile
 imtfile.file = ../../Include/imtfile/QMake/imtfile.pro
 
-SUBDIRS += imtzip
-imtzip.file = ../../Include/imtzip/QMake/imtzip.pro
+#SUBDIRS += imtzip
+#imtzip.file = ../../Include/imtzip/QMake/imtzip.pro
 
-SUBDIRS += imtpy
-imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
+##SUBDIRS += imtpy
+##imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
 
 SUBDIRS += imtqml
 imtqml.file = ../../Include/imtqml/QMake/imtqml.pro
@@ -68,7 +68,7 @@ imtlic.file = ../../Include/imtlic/QMake/imtlic.pro
 SUBDIRS += imtlicgui
 imtlicgui.file = ../../Include/imtlicgui/QMake/imtlicgui.pro
 
-# Component packages
+## Component packages
 
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
@@ -144,30 +144,30 @@ SUBDIRS += Imt3dGuiPck
 Imt3dGuiPck.file = ../../Impl/Imt3dGuiPck/QMake/Imt3dGuiPck.pro
 Imt3dGuiPck.depends = imt3dview imt3dgui
 
-SUBDIRS += ImtZipPck
-ImtZipPck.file = ../../Impl/ImtZipPck/QMake/ImtZipPck.pro
-ImtZipPck.depends = imtzip
+#SUBDIRS += ImtZipPck
+#ImtZipPck.file = ../../Impl/ImtZipPck/QMake/ImtZipPck.pro
+#ImtZipPck.depends = imtzip
 
-SUBDIRS += ImtPyPck
-ImtPyPck.file = ../../Impl/ImtPyPck/QMake/ImtPyPck.pro
-ImtPyPck.depends = imtpy
+#SUBDIRS += ImtPyPck
+#ImtPyPck.file = ../../Impl/ImtPyPck/QMake/ImtPyPck.pro
+#ImtPyPck.depends = imtpy
 
 # Application
-!linux{
-	SUBDIRS += EagleView
-	EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
-	EagleView.depends = Imt3dViewPck Imt3dGuiPck
-}
+#!linux{
+#	SUBDIRS += EagleView
+#	EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
+#	EagleView.depends = Imt3dViewPck Imt3dGuiPck
+#}
 
-# Tutorials
-	SUBDIRS += imtservletdemo
-	imtservletdemo.file = ../../Docs/Tutorials/Include/imtservletdemo/QMake/imtservletdemo.pro
+## Tutorials
+#	SUBDIRS += imtservletdemo
+#	imtservletdemo.file = ../../Docs/Tutorials/Include/imtservletdemo/QMake/imtservletdemo.pro
 
-	SUBDIRS += ServletDemoPck
-	ServletDemoPck.file = ../../Docs/Tutorials/Impl/ServletDemoPck/QMake/ServletDemoPck.pro
-        ServletDemoPck.depends = ImtRestPck ImtCorePck imtservletdemo
+#	SUBDIRS += ServletDemoPck
+#	ServletDemoPck.file = ../../Docs/Tutorials/Impl/ServletDemoPck/QMake/ServletDemoPck.pro
+#        ServletDemoPck.depends = ImtRestPck ImtCorePck imtservletdemo
 
-	SUBDIRS += ServerDemo
-	ServerDemo.file = ../../Docs/Tutorials/Impl/ServerDemo/QMake/ServerDemo.pro
-	ServerDemo.depends = ServletDemoPck
+#	SUBDIRS += ServerDemo
+#	ServerDemo.file = ../../Docs/Tutorials/Impl/ServerDemo/QMake/ServerDemo.pro
+#	ServerDemo.depends = ServletDemoPck
 

@@ -39,29 +39,6 @@ add_subdirectory("${INCLUDE_DIR}/imtqml/CMake" "${AUX_INCLUDE_DIR}/imtqml")
 add_subdirectory("${INCLUDE_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlic")
 add_subdirectory("${INCLUDE_DIR}/imtlicgui/CMake" "${AUX_INCLUDE_DIR}/imtlicgui")
 
-#QMake
-#imtauth.file = ../../Include/imtauth/QMake/imtauth.pro
-#imtauthgui.file = ../../Include/imtauthgui/QMake/imtauthgui.pro
-#imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
-#imtwidgets.file = ../../Include/imtwidgets/QMake/imtwidgets.pro
-#imtrest.file = ../../Include/imtrest/QMake/imtrest.pro
-#imtrepo.file = ../../Include/imtrepo/QMake/imtrepo.pro
-#imtreport.file = ../../Include/imtreport/QMake/imtreport.pro
-#imtrepogui.file = ../../Include/imtrepogui/QMake/imtrepogui.pro
-#imtreportgui.file = ../../Include/imtreportgui/QMake/imtreportgui.pro
-#imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
-#imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
-#imtloggui.file = ../../Include/imtloggui/QMake/imtloggui.pro
-#imtlog.file = ../../Include/imtlog/QMake/imtlog.pro
-#imt3dview.file = ../../Include/imt3dview/QMake/imt3dview.pro
-#imt3dgui.file = ../../Include/imt3dgui/QMake/imt3dgui.pro
-#imtfile.file = ../../Include/imtfile/QMake/imtfile.pro
-#imtzip.file = ../../Include/imtzip/QMake/imtzip.pro
-#imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
-#imtqml.file = ../../Include/imtqml/QMake/imtqml.pro
-#imtlic.file = ../../Include/imtlic/QMake/imtlic.pro
-#imtlicgui.file = ../../Include/imtlicgui/QMake/imtlicgui.pro
-
 #Impl
 
 add_subdirectory("${IMPL_DIR}/ImtCorePck/CMake" "${AUX_INCLUDE_DIR}/ImtCorePck")
@@ -85,52 +62,7 @@ add_subdirectory("${IMPL_DIR}/Imt3dViewPck/CMake" "${AUX_INCLUDE_DIR}/Imt3dViewP
 #add_subdirectory("${IMPL_DIR}/ImtZipPck/CMake" "${AUX_INCLUDE_DIR}/ImtZipPck")
 add_subdirectory("${IMPL_DIR}/ImtPyPck/CMake" "${AUX_INCLUDE_DIR}/ImtPyPck")
 
-
-#QMake
-#ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
-#ImtAuthPck.file = ../../Impl/ImtAuthPck/QMake/ImtAuthPck.pro
-#ImtAuthGuiPck.file = ../../Impl/ImtAuthGuiPck/QMake/ImtAuthGuiPck.pro
-#ImtLicensePck.file = ../../Impl/ImtLicensePck/QMake/ImtLicensePck.pro
-#ImtLicenseGuiPck.file = ../../Impl/ImtLicenseGuiPck/QMake/ImtLicenseGuiPck.pro
-#ImtRestPck.file = ../../Impl/ImtRestPck/QMake/ImtRestPck.pro
-#Imt3dPck.file = ../../Impl/Imt3dPck/QMake/Imt3dPck.pro
-#ImtRepoGuiPck.file = ../../Impl/ImtRepoGuiPck/QMake/ImtRepoGuiPck.pro
-#ImtReportGuiPck.file = ../../Impl/ImtReportGuiPck/QMake/ImtReportGuiPck.pro
-#ImtRepoPck.file = ../../Impl/ImtRepoPck/QMake/ImtRepoPck.pro
-#ImtReportPck.file = ../../Impl/ImtReportPck/QMake/ImtReportPck.pro
-#ImtCoreLoc.file = ../../Impl/ImtCoreLoc/QMake/ImtCoreLoc.pro
-#ImtGuiPck.file = ../../Impl/ImtGuiPck/QMake/ImtGuiPck.pro
-#ImtQmlPck.file = ../../Impl/ImtQmlPck/QMake/ImtQmlPck.pro
-#ImtLogPck.file = ../../Impl/ImtLogPck/QMake/ImtLogPck.pro
-#ImtLogGuiPck.file = ../../Impl/ImtLogGuiPck/QMake/ImtLogGuiPck.pro
-#Imt3dViewPck.file = ../../Impl/Imt3dViewPck/QMake/Imt3dViewPck.pro
-#Imt3dGuiPck.file = ../../Impl/Imt3dGuiPck/QMake/Imt3dGuiPck.pro
-#ImtZipPck.file = ../../Impl/ImtZipPck/QMake/ImtZipPck.pro
-#ImtPyPck.file = ../../Impl/ImtPyPck/QMake/ImtPyPck.pro
-
 # Application
 IF(!UNIX)
 #	add_subdirectory("${IMPL_DIR}/EagleView/CMake" "${AUX_INCLUDE_DIR}/EagleView")
 ENDIF()
-#!linux{
-	#SUBDIRS += EagleView
-	#EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
-	#EagleView.depends = Imt3dViewPck Imt3dGuiPck
-#}
-
-# Tutorials
-	
-#	add_subdirectory("${IMPL_DIR}/imtservletdemo/CMake" "${AUX_INCLUDE_DIR}/imtservletdemo")
-	#SUBDIRS += imtservletdemo
-	#imtservletdemo.file = ../../Docs/Tutorials/Include/imtservletdemo/QMake/imtservletdemo.pro
-
-#	 add_subdirectory("${IMPL_DIR}/ServletDemoPck/CMake" "${AUX_INCLUDE_DIR}/ServletDemoPck")
-#	SUBDIRS += ServletDemoPck
-	#ServletDemoPck.file = ../../Docs/Tutorials/Impl/ServletDemoPck/QMake/ServletDemoPck.pro
-     #   ServletDemoPck.depends = ImtRestPck ImtCorePck imtservletdemo
-
-#	add_subdirectory("${IMPL_DIR}/ServerDemo/CMake" "${AUX_INCLUDE_DIR}/ServerDemo")
-#	SUBDIRS += ServerDemo
-#	ServerDemo.file = ../../Docs/Tutorials/Impl/ServerDemo/QMake/ServerDemo.pro
-#	ServerDemo.depends = ServletDemoPck
-

@@ -1,42 +1,9 @@
 project(Imt3dGuiPck LANGUAGES CXX)
-#TARGET = Imt3dGuiPck
 
 include($ENV{ACFCONFIGDIR}/CMake/ComponentConfig.cmake)
 include($ENV{ACFSLNDIR}/Config/CMake/AcfSln.cmake)
 
-#TARGET = Imt3dGuiPck
-
-#include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
-#include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
-#include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
-
-#INCLUDEPATH += $(IMTCOREDIR)/Include
-
-# ACF-Solutions libs
-#LIBS += -L$(ACFSLNDIR)/Lib/$$COMPILER_DIR -limeas
-
-#LIBS += -L../../../Lib/$$COMPILER_DIR -limt3d -limt3dgui -limt3dview
-
 target_link_libraries(${PROJECT_NAME} imt3d imt3dgui imt3dview)
-
-# Get build output directory of shadow build:
-#ACFSLNDIRBUILD = $$(ACFSLNDIR_BUILD)
-#!isEmpty(ACFSLNDIRBUILD){
-#	INCLUDEPATH += $$(ACFSLNDIR_BUILD)/$$AUXINCLUDEDIR
-#	LIBS += -L$$(ACFSLNDIR_BUILD)/Lib/$$COMPILER_DIR
-#}
-
-# Get build output directory of shadow build:
-#ACFDIRBUILD = $$(ACFDIR_BUILD)
-#!isEmpty(ACFDIRBUILD){
-#	INCLUDEPATH += $$(ACFDIR_BUILD)/$$AUXINCLUDEDIR
-#	LIBS += -L$$(ACFDIR_BUILD)/Lib/$$COMPILER_DIR
-#}
-
 
 include($ENV{ACFCONFIGDIR}/CMake/AcfQt.cmake)
 include($ENV{ACFCONFIGDIR}/CMake/AcfStd.cmake)
-
-#include($(ACFCONFIGDIR)/QMake/AcfQt.pri)
-#include($(ACFCONFIGDIR)/QMake/AcfStd.pri)
-
