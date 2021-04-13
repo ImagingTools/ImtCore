@@ -1,6 +1,7 @@
-QWidget {
-    font-family: "Verdana";
-    color: #bfccd9;
+QWidget
+{
+	font-family: "Verdana";
+	color: #ffffff;
 }
 
 QWidget::item:disabled
@@ -8,83 +9,96 @@ QWidget::item:disabled
 	color: palette(disabled);
 }
 
-QWidget:disabled
+QWidget:disabled 
 {
 	color: palette(disabled);
 }
 
 
-QSplashScreen > QWidget {
-    color: #bfccd9;
-    background: transparent;
-}
-
-QSplashScreen > QWidget > QLabel 
+QSplashScreen > QWidget
 {
-	color: yellow;
-
+	color: #ffffff;
 	background: transparent;
 }
 
-QWidget#MainVersionTitleLabel, QWidget#MainVersionLabel {
-    color: #bfccd9;
-}
-
-
-QSplashScreen > QWidget#CopyrightLabel {
-    color: #bfccd9;
-}
-
-
-QWidget#PageTree 
+QSplashScreen > QWidget > QLabel
 {
-    background-color: palette(window);
+	color: yellow;
+	background: transparent;
+}
+
+QWidget#MainVersionTitleLabel, QWidget#MainVersionLabel
+{
+	color: #ffffff;
+}
+
+
+QSplashScreen > QWidget#CopyrightLabel
+{
+	color: #ffffff;
+}
+
+
+QWidget#PageTree
+{
+	background-color: palette(window);
 }
 
 
 QWidget#ResultFrame
 {
-    font-size: 24px;
+	font-size: 24px;
 }
 
 
-QWidget[ImtTopFrame=true] {
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(107,107,109), stop: 0.9 rgb(92,92,94), stop: 0.97 rgb(92,92,94), stop: 1.0 rgb(70,70,72));
-    border-bottom: 1px solid rgb(60,60,60);
+QWidget[ImtTopFrame=true]
+{
+	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(107,107,109), stop: 0.9 rgb(92,92,94), stop: 0.97 rgb(92,92,94), stop: 1.0 rgb(70,70,72));
+	border-bottom: 1px solid rgb(60,60,60);
 }
 
 QWidget#EditPanel
 {
-    margin-top: 1px; margin-left: 1px; margin-right: 1px; 
+	margin-top: 1px;
+	margin-left: 1px;
+	margin-right: 1px;
 }
 
 QWidget#LoadWorkflowButton
 {
-    text-align: left;
+	text-align: left;
 }
+
 
 QWidget#MessageFrame
 {
-    background-color: lightYellow;
+	background-color: lightYellow;
 }
 
-QWidget#ErrorsCounterFrame, QWidget#NokCounterFrame, QWidget#OkCounterFrame, 
-QWidget#TotalCounterFrame, QWidget#WarningsCounterFrame 
+QWidget#ErrorsCounterFrame, QWidget#NokCounterFrame, QWidget#OkCounterFrame,
+QWidget#TotalCounterFrame, QWidget#WarningsCounterFrame
 {
-    background: palette(dark);
+	background: palette(dark);
 }
 
-QLabel[ProductionApplicationName=true] {
-    font-size: 16pt;
+
+QLabel[ProductionApplicationName=true]
+{
+	font-size: 16pt;
 }
 
-QLabel[ProductionTime=true] {
-    font-size: 16pt;
+
+QLabel[ProductionTime=true]
+{
+	font-size: 16pt;
 }
 
-QLabel[Header=true] {
-    font-size: 12pt;
+
+QLabel[Header=true]
+{
+	font-size: 12pt;
 }
+
 
 QLabel#PageLabel, QLabel#ManualModePageLabel
 {
@@ -92,36 +106,38 @@ QLabel#PageLabel, QLabel#ManualModePageLabel
 	font-weight: bold;
 }
 
-QLineEdit, QPlainTextEdit 
+
+QLineEdit, QPlainTextEdit
 {
-    height: 1.3em;
-    font-size: 10pt;
+	height: 1.3em;
+	font-size: 10pt;
 }
 
 
 QToolButton#windowTitle
 {
-    background: palette(window);
-    min-width: 3em;
-    max-width: 3em;
-    border-radius: 3px;
-    border: 1px solid palette(mid);
+	background: palette(window);
+	min-width: 3em;
+	max-width: 3em;
+	border-radius: 3px;
+	border: 1px solid palette(mid);
 }
 
 QToolButton#PageIconToolButton 
 {
-    background-color: transparent;
-    border: 0px solid transparent;
-    padding: 0px;
+	background-color: transparent;
+	border: 0px solid transparent;
+	padding: 0px;
 }
-    
+
 
 QToolButton#PageIconToolButton:hover
 {
 	background-color: transparent;
-    border: 0px solid transparent;
+	border: 0px solid transparent;
 	padding: 0px;
 }
+
 
 QToolBar[ImtToolBar=true]::separator
 {
@@ -129,22 +145,20 @@ QToolBar[ImtToolBar=true]::separator
 	width: 32px;
 }
 
-QPushButton#LoadWorkflowButton
-{
-    text-align: left;
-}
-
 QToolBar[ImtToolBar=true]
 {
 	qproperty-iconSize: 24px;
 }
 
-QTableView[ImtMenu=true] {
-    color: palette(midlight);
-    background: palette(mid);
-    font-weight: bold;
-    text-align: center;
+
+QTableView[ImtMenu=true]
+{
+	color: palette(midlight);
+	background: palette(mid);
+	font-weight: bold;
+	text-align: center;
 }
+
 
 QTableView[ImtMenu=true]::item
 {
@@ -162,69 +176,75 @@ QTreeWidget[TabSimulation=true]
 	text-align: left;
 }
 
-QTreeWidget[TabSimulation=true]::item 
+QTreeWidget[TabSimulation=true]::item
 {
-    border: 0px none transparent;
-    padding-top: 0.7em;
-    padding-bottom: 0.7em;
+	border: 0px none transparent;
+	padding-top: 0.7em;
+	padding-bottom: 0.7em;
 }
 
 QTreeWidget[TabSimulation=true]::item:first
 {
-    padding-left: 5px;
+	padding-left: 5px;
 }
 
 QTreeWidget[TabSimulation=true]::item:last
 {
-    padding-right: 15px;
+	padding-right: 15px;
 }
 
-QTreeWidget[TabSimulation=true]::item:selected {
+QTreeWidget[TabSimulation=true]::item:selected
+{
 	background-color: palette(base);
-	color: #bfccd9;
+	color: #ffffff;
 }
 
-QTreeWidget[TabSimulation=true]::item:!selected:hover {
+QTreeWidget[TabSimulation=true]::item:!selected:hover
+{
 	background-color: palette(light);
 }
 
-QTreeWidget[TabSimulation=true]::item:first:selected {
+QTreeWidget[TabSimulation=true]::item:first:selected
+{
 	border-top: 1px palette(midlight);
 }
 
 
-QAbstractItemView {
-    outline: 0;
+QAbstractItemView
+{
+	outline: 0;
 }
 
 QAbstractItemView[NoFrame="true"]
 {
-    border: none;
+	border: none;
 }
 
 QAbstractItemView::item
 {
-    height: 25px;
+	height: 25px;
 }
 
-QAbstractItemView::item::selected {
-    background-color: rgba(160, 80, 40);
+QAbstractItemView::item::selected
+{
+	background-color: rgb(160, 80, 40);
 }
 
-    QAbstractItemView::branch::selected {
-        background-color: rgba(160, 80, 40);
-    }
+QAbstractItemView::branch::selected
+{
+	background-color: rgb(160, 80, 40);
+}
 
 
 QTreeView[ItemView=true]::item
 {
-    height: 30px;
+	height: 30px;
 }
 
 
-QComboBox::item:selected 
+QComboBox::item:selected
 {
- 	color: white;
+	color: white;
 }
 
 
@@ -236,8 +256,8 @@ QHeaderView
 
 QHeaderView::section
 {
-	padding-top:5px;
-	padding-bottom:5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
 	padding-left: 4px;
 	border-bottom: 1px solid palette(mid);
 	border-left: none;
@@ -246,46 +266,55 @@ QHeaderView::section
 	font-weight: bold;
 }
 
-QTabBar {
-    background-color: rgb(120,120,122);
+
+QTabBar
+{
+	background-color: rgb(120,120,122);
 }
+
 
 QTabBar::tab[CollectionView=true]
 {
-    min-height: 30px;
-    background-color: rgb(120,120,122);
-    min-width: 50ex;
-    padding: 2px;
+	min-height: 30px;
+	background-color: rgb(120,120,122);
+	min-width: 50ex;
+	padding: 2px;
 }
 
-QTabBar::tab:selected[CollectionView=true] {
-    color: rgb(230,230,232);
-    background-color: #1a869a;
+QTabBar::tab:selected[CollectionView=true]
+{
+	color: rgb(255,255,255);
+	background-color:#eb6225;
+}
+
+QTabBar::tab::top:selected[CollectionView=true]
+{
+	border-bottom: 2px solid #eb6225;
+}
+
+QTabBar::tab::left:selected[CollectionView=true]
+{
+	border-left: 2px solid #eb6225;
 }
 
 
-QTabBar::tab::top:selected[CollectionView=true] {
-    border-bottom: 2px solid #eb6225;
+QTabBar::tab::right:selected[CollectionView=true]
+{
+	border-left: 2px solid #eb6225;
 }
 
-QTabBar::tab::left:selected[CollectionView=true] {
-    border-left: 2px solid #eb6225;
-}
-
-
-QTabBar::tab::right:selected[CollectionView=true] {
-    border-left: 2px solid #eb6225;
-}
-
-QTabBar::tab::bottom:selected[CollectionView=true] {
-    border-bottom: 2px solid #f15a17;
+QTabBar::tab::bottom:selected[CollectionView=true]
+{
+	border-bottom: 2px solid #eb6225;
 }
 
 
 QMenu[CommandsMenu=true]
 {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	margin-left: 10px;
+	margin-right: 10px;
 }
+
+
