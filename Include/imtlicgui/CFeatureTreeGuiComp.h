@@ -45,10 +45,14 @@ private:
 
 private Q_SLOTS:
 	void on_Features_itemChanged(QTreeWidgetItem *item, int column);
+	void on_Features_itemSelectionChanged();
 
 private:
 	I_TEXTATTR(m_headerLabelAttrPtr);
 	I_ATTR(bool, m_showFeatureStatesAttrPtr);
+
+	QByteArray m_lastSelectedItemId;
+	QTreeWidgetItem* m_selectedItemPtr;
 
 	bool m_blockItemChangedSignal;
 };

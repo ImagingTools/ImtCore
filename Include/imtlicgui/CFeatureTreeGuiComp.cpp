@@ -16,7 +16,8 @@ namespace imtlicgui
 // public methods
 
 CFeatureTreeGuiComp::CFeatureTreeGuiComp()
-	:m_blockItemChangedSignal(false)
+	:m_blockItemChangedSignal(false),
+	m_selectedItemPtr(nullptr)
 {
 }
 
@@ -28,6 +29,8 @@ CFeatureTreeGuiComp::CFeatureTreeGuiComp()
 void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_blockItemChangedSignal = true;
+
+	m_selectedItemPtr = nullptr;
 
 	Features->clear();
 
@@ -41,6 +44,11 @@ void CFeatureTreeGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*change
 	CreteTreeItems(nullptr, childs);
 
 	Features->expandAll();
+
+	if (m_selectedItemPtr!= nullptr) {
+		m_selectedItemPtr->setSelected(true);
+		Features->setCurrentItem(m_selectedItemPtr);
+	}
 
 	m_blockItemChangedSignal = false;
 }
@@ -64,7 +72,12 @@ void CFeatureTreeGuiComp::CreteTreeItems(QTreeWidgetItem* parentTreeItemPtr, QLi
 	int itemCountcount = items.count();
 	for (int itemIndex = 0; itemIndex < itemCountcount; itemIndex++){
 		QTreeWidgetItem* treeItemPtr = new QTreeWidgetItem({items[itemIndex]->GetName()});
-		treeItemPtr->setData(0, Qt::UserRole, items[itemIndex]->GetId());
+
+		QByteArray itemId = items[itemIndex]->GetId();
+		treeItemPtr->setData(0, Qt::UserRole, itemId);
+		if (itemId == m_lastSelectedItemId) {
+			m_selectedItemPtr = treeItemPtr;
+		}
 
 		if (*m_showFeatureStatesAttrPtr && items[itemIndex]->IsActivationEnabled()){
 			treeItemPtr->setCheckState(0, items[itemIndex]->IsActivated() ? Qt::Checked : Qt::Unchecked);
@@ -136,6 +149,15 @@ void CFeatureTreeGuiComp::on_Features_itemChanged(QTreeWidgetItem *item, int /*c
 		if (itemPtr != nullptr){
 			itemPtr->SetActivated(item->checkState(0) == Qt::Checked);
 		}
+	}
+}
+
+
+void CFeatureTreeGuiComp::on_Features_itemSelectionChanged()
+{
+	QList<QTreeWidgetItem*> items = Features->selectedItems();
+	if (!items.isEmpty()){
+		m_lastSelectedItemId = items[0]->data(0, Qt::UserRole).toByteArray();
 	}
 }
 
