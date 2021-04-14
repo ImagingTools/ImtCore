@@ -1209,6 +1209,11 @@ bool CFileCollectionComp::CollectionItem::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.Process(repositoryRevision);
 		retVal = retVal && archive.EndTag(repositoryRevisionTag);
 	}
+	else{
+		if (!archive.IsStoring()){
+			repositoryRevision = 0;
+		}
+	}
 
 	static iser::CArchiveTag metaInfoTag("MetaInfo", "Collection related meta-informations", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(metaInfoTag);
