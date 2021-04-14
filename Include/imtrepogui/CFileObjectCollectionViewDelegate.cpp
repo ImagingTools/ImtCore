@@ -242,6 +242,11 @@ void CFileObjectCollectionViewDelegate::OnImport()
 				QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document '%1' could not be imported").arg(filePath));
 			}
 			else{
+				const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
+				if (revisionControllerPtr != nullptr){
+					revisionControllerPtr->BackupObject(*m_collectionPtr, objectId, tr("Importing into collection"));
+				}
+
 				OnImportObject(objectId);
 			}
 		}
