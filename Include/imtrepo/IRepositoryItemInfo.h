@@ -37,7 +37,7 @@ public:
 	typedef QSet<RepositoryFileType> RepositoryFileTypes;
 
 	virtual RepositoryFileTypes GetRepositoryItemFileTypes() const = 0;
-	virtual QString GetRepositoryItemFilePath(RepositoryFileType fileId) const = 0;
+	virtual QString GetRepositoryItemFilePath(RepositoryFileType fileType) const = 0;
 };
 
 

@@ -76,7 +76,7 @@ namespace imtwidgets
 // public methods
 
 CImtStyle::CImtStyle()
-	:m_designSchema(DS_DARK),
+	:m_designSchema(DS_LIGHT),
 	m_styleType(ST_IMAGINGTOOLS),
 	m_wasStyleSheetInitialized(false)
 {

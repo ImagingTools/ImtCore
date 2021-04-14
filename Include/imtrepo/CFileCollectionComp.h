@@ -92,7 +92,6 @@ public:
 	virtual bool RemoveObject(const QByteArray& objectId) override;
 	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
 
-
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
