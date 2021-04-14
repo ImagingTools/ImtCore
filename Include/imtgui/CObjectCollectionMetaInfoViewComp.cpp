@@ -59,7 +59,9 @@ void CObjectCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 			QPixmap pixmap;
 			pixmap.convertFromImage(value.value<QImage>());
 			PreviewPixmap->setPixmap(pixmap.scaledToWidth(250));
-			PreviewFrame->show();
+			if (!pixmap.isNull()){
+				PreviewFrame->show();
+			}
 			break;
 		}
 
