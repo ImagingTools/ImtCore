@@ -59,8 +59,9 @@ public:
 
 	I_BEGIN_COMPONENT(CFileCollectionComp)
 		I_ASSIGN(m_isEnableRevisionHistoryAttrPtr, "IsEnableRevisionHistory", "Allow saving item revisions", true, false);
+		I_ASSIGN(m_restoreRevisionRightIdAttrPtr, "RestoreRevisionRightId", "Restore to revision right id", true, "RestoreObject");
 		I_ASSIGN(m_transformationControllerCompPtr, "TransformationController", "Controller for down- and upgrade of the repository data", false, "TransformationController");
-		I_ASSIGN(m_transformationStepsProviderCompPtr, "FileTranformationStepsProvider", "Transformation steps provider for the file in the repository", false, "FileTranformationStepsProvider");
+		I_ASSIGN_TO(m_transformationStepsProviderCompPtr, m_transformationControllerCompPtr, true);
 	I_END_COMPONENT;
 
 	CFileCollectionComp();
@@ -76,12 +77,6 @@ public:
 	virtual bool ExportObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision, const QString& filePath) const override;
 
 	// reimplemented (IFileObjectCollection)
-	virtual QByteArray InsertFile(
-				const QString& localFilePath,
-				const QByteArray& typeId = QByteArray(),
-				const QString& resourceName = QString(),
-				const QString& resourceDescription = QString(),
-				const QByteArray& resourceId = QByteArray()) override;
 	virtual QByteArray ImportFile(const QByteArray& typeId, const QString& sourceFilePath = QString()) override;
 
 	// reimplemented (IFileCollectionInfo)
@@ -128,14 +123,16 @@ protected:
 				const QString& localFilePath,
 				const QString& resourceName,
 				const QByteArray& typeId,
-				ilog::IMessageConsumer* messageConsumerPtr) const;
+				ilog::IMessageConsumer* messageConsumerPtr) const override;
 
-	/**
-		Calculate full file path for the item in the file collection.
-	*/
+	virtual QString CalculateTargetFilePath(
+				const QString& filePath,
+				const QString& objectName,
+				const QByteArray& typeId) const override;
+
 	virtual QString CalculateTargetFilePath(
 				const QString& targetFolderPath,
-				const QString& localFilePath) const;
+				const QString& localFilePath) const override;
 
 	virtual bool LoadRevisionsContents(const IFileObjectCollection& collection, const QByteArray& objectId, RevisionsContents& revisionsContents) const;
 	virtual bool SaveRevisionsContents(const IFileObjectCollection& collection, const QByteArray& objectId, RevisionsContents& revisionsContents) const;
@@ -152,38 +149,15 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 private:
-	class ResourceLocker
-	{
-	public:
-		explicit ResourceLocker(
-					CFileCollectionComp& collection,
-					const QByteArray& resourceId,
-					const QString& resourceName);
-		~ResourceLocker();
-
-	private:
-		CFileCollectionComp& m_collection;
-		QByteArray m_resourceId;
-		QString m_resourceName;
-	};
-
-private:
-	bool IsObjectIdLocked(const QByteArray& resourceId);
-	bool IsObjectNameLocked(const QString& resourceName);
-
-	bool IsObjectIdUsed(const QByteArray& objectId);
-	QString CalculateTargetFilePath(
-				const QString& filePath,
-				const QString& objectName,
-				const QByteArray& typeId) const;
-	bool FinishInsertFileTransaction(
-				const QString& workingPath,
-				const QString& repositoryPath,
-				const QByteArray& fileId,
-				const CollectionItem& collectionItem);
-
-private:
+	/**
+		Enable items changing history
+	*/
 	I_ATTR(bool, m_isEnableRevisionHistoryAttrPtr);
+
+	/**
+		Right-ID for accessing revision controller.
+	*/
+	I_ATTR(QByteArray, m_restoreRevisionRightIdAttrPtr);
 
 	/**
 		Upgrade and downgrade controller for the file repository.
@@ -194,10 +168,6 @@ private:
 		Transformation steps provider for the file in the repository.
 	*/
 	I_REF(IRepositoryFileTransformationStepsProvider, m_transformationStepsProviderCompPtr);
-
-	QList<QByteArray> m_lockedObjectIds;
-	QList<QString> m_lockedObjectNames;
-	QMutex m_lockedObjectInfoMutex;
 
 	RepositoryItemInfoProvider m_itemInfoProvider;
 };

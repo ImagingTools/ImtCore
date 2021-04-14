@@ -341,6 +341,121 @@ QString CFileCollectionCompBase2::GetFile(
 }
 
 
+QByteArray CFileCollectionCompBase2::InsertFile(
+			const QString& localFilePath,
+			const QByteArray& typeId,
+			const QString& objectName,
+			const QString& objectDescription,
+			const QByteArray& proposedObjectId)
+{
+	static QByteArray emptyId;
+
+	if (IsPathInsideRepository(localFilePath)){
+		return emptyId;
+	}
+
+	QWriteLocker locker(&m_filesLock);
+
+	if (IsObjectIdUsed(proposedObjectId)){
+		return emptyId;
+	}
+
+	// Generate unique file-ID accroding to \c proposedObjectId variable provided by caller:
+	QByteArray fileId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray() : proposedObjectId;
+
+	// Generate teraget absolute file path for the data file:
+	QString targetFilePath = CalculateTargetFilePath(localFilePath, objectName, typeId);
+	if (targetFilePath.isEmpty()){
+		return emptyId;
+	}
+
+	QFileInfo targetFileInfo(targetFilePath);
+	QString targetName = targetFileInfo.completeBaseName();
+
+	// Check fileId and targetName for locking
+	if (IsObjectIdLocked(fileId)){
+		SendVerboseMessage(tr("Object-ID '%1' is locked").arg(proposedObjectId.constData()));
+
+		return emptyId;
+	}
+
+	if (IsObjectNameLocked(targetName)){
+		SendVerboseMessage(tr("Object Name '%1' is locked").arg(targetName));
+
+		return emptyId;
+	}
+
+	// Reserve objectId and objectName during running insert-transaction:
+	ResourceLocker resourceLocker(*this, fileId, targetName);
+
+	// Release access to collection items:
+	locker.unlock();
+
+	// Create structure of the target files in the temporary location:
+	QString workingPath = CreateWorkingDir();
+	if (workingPath.isEmpty()){
+		return emptyId;
+	}
+
+	QString workingFilePath = workingPath + "/" + targetFileInfo.fileName();
+	if (istd::CSystem::FileCopy(localFilePath, workingFilePath)){
+		if (QFile::setPermissions(workingFilePath,
+			QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner |
+			QFile::ReadUser | QFile::WriteUser | QFile::ExeUser |
+			QFile::ReadGroup | QFile::WriteGroup | QFile::ExeGroup |
+			QFile::ReadOther | QFile::WriteOther | QFile::ExeOther)){
+			QString metaInfoFilePath = workingPath + "/" + targetFileInfo.fileName() + "." + GetRepositoryInfo().metaInfoFileSuffix;
+
+			CollectionItem collectionItem(GetCollectionRootFolder(), *m_revisionAttrPtr);
+			collectionItem.fileId = fileId;
+			collectionItem.typeId = typeId;
+			collectionItem.objectName = targetName;
+			collectionItem.filePathInRepository = targetFilePath;
+			collectionItem.sourceFilePath = localFilePath;
+
+			collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
+			collectionItem.metaInfo.SetMetaInfo(MIT_INSERTION_TIME, QDateTime::currentDateTime());
+			collectionItem.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
+
+			MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(workingFilePath, typeId);
+			bool metaInfoCreated = SaveMetaInfo(*metaInfoPtr, metaInfoFilePath);
+
+			if (metaInfoCreated){
+				collectionItem.contentsMetaInfoPtr = metaInfoPtr;
+
+				QString dataFilePath = workingPath + "/" + targetFileInfo.fileName() + "." + GetRepositoryInfo().dataFileSuffix;
+				QString savedPath = SaveCollectionItem(collectionItem, dataFilePath);
+
+				// Inserting new item into collection if the structure was created successfully:
+				if (!savedPath.isEmpty()){
+					if (FinishInsertFileTransaction(workingPath, targetFileInfo.dir().absolutePath(), fileId, collectionItem)){
+						QDir(workingPath).removeRecursively();
+
+						return fileId;
+					}
+					else{
+						SendErrorMessage(0, tr("File could not be inserted into the repository"));
+					}
+				}
+			}
+			else{
+				SendErrorMessage(0, tr("Metainfo for the file '%1' could not be created").arg(workingFilePath));
+			}
+		}
+		else{
+			SendErrorMessage(0, tr("Permissions for the file '%1' could not be set").arg(workingFilePath));
+		}
+	}
+	else{
+		SendErrorMessage(0, tr("Can't copy the file '%1' to working folder").arg(localFilePath));
+	}
+
+	QDir(workingPath).removeRecursively();
+
+	return emptyId;
+}
+
+
 bool CFileCollectionCompBase2::UpdateFile(
 	const QString& localFilePath,
 	const QByteArray& objectId)
@@ -419,7 +534,19 @@ bool CFileCollectionCompBase2::ExportFile(const QByteArray& objectId, const QStr
 }
 
 
+QByteArray CFileCollectionCompBase2::ImportFile(const QByteArray& /*typeId*/, const QString& /*sourceFilePath*/)
+{
+	return QByteArray();
+}
+
+
 // reimplemented (IObjectCollection)
+
+const imtbase::IRevisionController* CFileCollectionCompBase2::GetRevisionController() const
+{
+	return nullptr;
+}
+
 
 int CFileCollectionCompBase2::GetOperationFlags(const QByteArray& /*objectId*/) const
 {
@@ -500,6 +627,12 @@ QByteArray CFileCollectionCompBase2::InsertNewObject(
 }
 
 
+bool CFileCollectionCompBase2::RemoveObject(const QByteArray& /*objectId*/)
+{
+	return false;
+}
+
+
 const istd::IChangeable* CFileCollectionCompBase2::GetObjectPtr(const QByteArray& /*objectId*/) const
 {
 	return nullptr;
@@ -560,6 +693,11 @@ bool CFileCollectionCompBase2::SetObjectData(const QByteArray& objectId, const i
 	}
 
 	return false;
+}
+
+
+void CFileCollectionCompBase2::SetObjectName(const QByteArray& /*objectId*/, const QString& /*objectName*/)
+{
 }
 
 
@@ -918,6 +1056,72 @@ void CFileCollectionCompBase2::OnReaderInterrupted()
 }
 
 
+bool CFileCollectionCompBase2::IsObjectIdLocked(const QByteArray& resourceId)
+{
+	QMutexLocker locker(&m_lockedObjectInfoMutex);
+
+	return m_lockedObjectIds.contains(resourceId);
+}
+
+
+bool CFileCollectionCompBase2::IsObjectNameLocked(const QString& resourceName)
+{
+	QMutexLocker locker(&m_lockedObjectInfoMutex);
+
+	return m_lockedObjectNames.contains(resourceName);
+}
+
+
+bool CFileCollectionCompBase2::IsObjectIdUsed(const QByteArray& objectId)
+{
+	if (objectId.isEmpty()){
+		return false;
+	}
+
+	for (int i = 0; i < m_files.count(); ++i){
+		if (m_files[i].fileId == objectId){
+			return true;
+		}
+	}
+
+	return IsObjectIdLocked(objectId);
+}
+
+
+bool CFileCollectionCompBase2::FinishInsertFileTransaction(
+	const QString& workingPath,
+	const QString& repositoryPath,
+	const QByteArray& fileId,
+	const CollectionItem& collectionItem)
+{
+	bool result = false;
+
+	if (istd::CSystem::EnsurePathExists(repositoryPath)){
+		result = istd::CSystem::CopyDirectory(workingPath, repositoryPath);
+		if (result){
+			{
+				static ChangeSet changes(CF_ADDED);
+				istd::CChangeNotifier changeNotifier(this, &changes);
+
+				QWriteLocker locker(&m_filesLock);
+				m_files.push_back(collectionItem);
+				locker.unlock();
+			}
+
+			imtbase::CObjectCollectionInsertEvent event(fileId);
+			for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
+				eventHandlerPtr->OnObjectCollectionEvent(this, &event);
+			}
+		}
+		else{
+			QDir(repositoryPath).removeRecursively();
+		}
+	}
+
+	return result;
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CFileCollectionCompBase2::OnComponentCreated()
@@ -1137,6 +1341,42 @@ bool CFileCollectionCompBase::ResourceTypeConstraints::IsOptionEnabled(int index
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
 
 	return m_parentPtr->m_resourceTypesCompPtr->IsOptionEnabled(index);
+}
+
+
+// public methods of embedded class QResourceLocker
+
+CFileCollectionCompBase2::ResourceLocker::ResourceLocker(
+	CFileCollectionCompBase2& collection,
+	const QByteArray& objectId,
+	const QString& objectName)
+	:m_collection(collection)
+{
+	QMutexLocker locker(&m_collection.m_lockedObjectInfoMutex);
+
+	if (!objectId.isEmpty()){
+		m_resourceId = objectId;
+		m_collection.m_lockedObjectIds.append(objectId);
+	}
+
+	if (!objectName.isEmpty()){
+		m_resourceName = objectName;
+		m_collection.m_lockedObjectNames.append(objectName);
+	}
+}
+
+
+CFileCollectionCompBase2::ResourceLocker::~ResourceLocker()
+{
+	QMutexLocker locker(&m_collection.m_lockedObjectInfoMutex);
+
+	if (!m_resourceId.isEmpty()){
+		Q_ASSERT(m_collection.m_lockedObjectIds.removeOne(m_resourceId));
+	}
+
+	if (!m_resourceName.isEmpty()){
+		Q_ASSERT(m_collection.m_lockedObjectNames.removeOne(m_resourceName));
+	}
 }
 
 

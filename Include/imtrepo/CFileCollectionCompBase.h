@@ -58,6 +58,7 @@ public:
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "FileCompressor");
 		I_ASSIGN(m_loginProviderCompPtr, "Login", "Provider of login data used for revision management", false, "Login");
 		I_ASSIGN(m_resourceTypesCompPtr, "ResourceTypes", "List of supported resource types", false, "ResourceTypes");
+		I_ASSIGN(m_rightsProviderCompPtr, "RightsProvider", "Rights provider", false, "RightsProvider");
 		I_ASSIGN_MULTI_0(m_progressManagerListCompPtr, "ProgressManagerList", "List of progress manager components", false);
 		I_ASSIGN_MULTI_0(m_objectPersistenceListCompPtr, "ObjectPersistenceList", "List of persistence components used for data object loading", false);
 		I_ASSIGN_MULTI_0(m_resourceFileTypesCompPtr, "FileTypeInfos", "List of file type infos for corresponding resource type", false);
@@ -306,6 +307,11 @@ protected:
 	I_REF(iprm::IOptionsList, m_resourceTypesCompPtr);
 
 	/**
+		Rights provider
+	*/
+	I_REF(iauth::IRightsProvider, m_rightsProviderCompPtr);
+
+	/**
 		Consumers of the progress information
 	*/
 	I_MULTIREF(ibase::IProgressManager, m_progressManagerListCompPtr);
@@ -365,23 +371,33 @@ public:
 
 	// reimplemented (IFileObjectCollection)
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
-	virtual FileInfo GetFileInfo(const QByteArray& resourceId) const override;
-	virtual QString GetFile(const QByteArray& resourceId, const QString& targetFilePath) const override;
-	virtual bool UpdateFile(const QString& localFilePath, const QByteArray& resourceId) override;
+	virtual FileInfo GetFileInfo(const QByteArray& objectId) const override;
+	virtual QString GetFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
+	virtual QByteArray InsertFile(
+				const QString& filePath,
+				const QByteArray& objectTypeId = QByteArray(),
+				const QString& objectName = QString(),
+				const QString& objectDescription = QString(),
+				const QByteArray& proposedObjectId = QByteArray()) override;
+	virtual bool UpdateFile(const QString& filePath, const QByteArray& objectId) override;
 	virtual bool ExportFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
+	virtual QByteArray ImportFile(const QByteArray& typeId, const QString& sourceFilePath = QString()) override;
 
 	// reimplemented (IObjectCollection)
+	virtual const imtbase::IRevisionController* GetRevisionController() const override;
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
-	virtual bool GetDataMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const override;
+	virtual bool GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const override;
 	virtual QByteArray InsertNewObject(
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				const istd::IChangeable * defaultValuePtr = nullptr,
+				const istd::IChangeable* defaultValuePtr = nullptr,
 				const QByteArray& proposedObjectId = QByteArray()) override;
+	virtual bool RemoveObject(const QByteArray& objectId) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
 	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
 	virtual bool RegisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler) override;
@@ -434,9 +450,50 @@ protected:
 	Q_INVOKABLE void OnReaderFinished();
 	Q_INVOKABLE void OnReaderInterrupted();
 
+	bool IsObjectIdLocked(const QByteArray& resourceId);
+	bool IsObjectNameLocked(const QString& resourceName);
+	bool IsObjectIdUsed(const QByteArray& objectId);
+
+	virtual QString CalculateFolderPathInRepository(
+				const QString& localFilePath,
+				const QString& resourceName,
+				const QByteArray& typeId,
+				ilog::IMessageConsumer* messageConsumerPtr) const = 0;
+
+	virtual QString CalculateTargetFilePath(
+				const QString& filePath,
+				const QString& objectName,
+				const QByteArray& typeId) const = 0;
+
+	virtual QString CalculateTargetFilePath(
+				const QString& targetFolderPath,
+				const QString& localFilePath) const = 0;
+
+	bool FinishInsertFileTransaction(
+				const QString& workingPath,
+				const QString& repositoryPath,
+				const QByteArray& fileId,
+				const CollectionItem& collectionItem);
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
+
+protected:
+	class ResourceLocker
+	{
+	public:
+		explicit ResourceLocker(
+			CFileCollectionCompBase2& collection,
+			const QByteArray& resourceId,
+			const QString& resourceName);
+		~ResourceLocker();
+
+	private:
+		CFileCollectionCompBase2& m_collection;
+		QByteArray m_resourceId;
+		QString m_resourceName;
+	};
 
 protected:
 	/**
@@ -473,6 +530,10 @@ private:
 
 	typedef QMap<QByteArray, const imtbase::IMetaInfoCreator*> MetaInfoCreatorMap;
 	MetaInfoCreatorMap m_metaInfoCreatorMap;
+
+	QList<QByteArray> m_lockedObjectIds;
+	QList<QString> m_lockedObjectNames;
+	QMutex m_lockedObjectInfoMutex;
 };
 
 
