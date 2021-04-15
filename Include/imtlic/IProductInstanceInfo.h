@@ -47,9 +47,9 @@ public:
 		Setup the instance of a given product.
 	*/
 	virtual void SetupProductInstance(
-				const QByteArray& productId,
+				const QString& productId,
 				const QByteArray& instanceId,
-				const QByteArray& customerId) = 0;
+				const QString& customerId) = 0;
 
 	/**
 		Add a license to this product instance.
@@ -79,14 +79,14 @@ public:
 		Additional informations about the product can be accessed using this ID in the product database.
 		\sa GetProductDatabase
 	*/
-	virtual QByteArray GetProductId() const = 0;
+	virtual QString GetProductId() const = 0;
 
 	/**
 		Get customer-ID of this product instance.
 		Additional informations about the customer can be accessed using this ID in the customer database.
 		\sa GetCustomerDatabase
 	*/
-	virtual QByteArray GetCustomerId() const = 0;
+	virtual QString GetCustomerId() const = 0;
 };
 
 

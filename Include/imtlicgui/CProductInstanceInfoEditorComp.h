@@ -63,6 +63,9 @@ private:
 	void UpdateProductsCombo();
 	void UpdateLicenseInstancesEdit();
 
+	QByteArray GetProductId(const QString& productName) const;
+	QByteArray GetCustomerId(const QString& customerName) const;
+
 private:
 	class DateTimeDelegate: public QStyledItemDelegate
 	{

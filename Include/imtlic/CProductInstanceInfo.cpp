@@ -40,15 +40,15 @@ const imtbase::IObjectCollection* CProductInstanceInfo::GetCustomerDatabase() co
 
 
 void CProductInstanceInfo::SetupProductInstance(
-			const QByteArray& productId,
+			const QString& productId,
 			const QByteArray& instanceId,
-			const QByteArray& customerId)
+			const QString& customerId)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_productId = productId;
-	m_customerId = customerId;
 	m_instanceId = instanceId;
+	m_customerId = customerId;
 }
 
 
@@ -60,7 +60,7 @@ void CProductInstanceInfo::AddLicense(const QByteArray& licenseId, const QDateTi
 
 	if (m_productCollectionPtr != nullptr){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_productCollectionPtr->GetObjectData(m_productId, dataPtr)){
+		if (m_productCollectionPtr->GetObjectData(GetProductId(m_productId), dataPtr)){
 			const imtlic::IProductLicensingInfo* productLicensingInfoPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
 			if (productLicensingInfoPtr != nullptr) {
 				const imtbase::ICollectionInfo& licenseList = productLicensingInfoPtr->GetLicenseList();
@@ -102,7 +102,7 @@ void CProductInstanceInfo::ClearLicenses()
 }
 
 
-QByteArray CProductInstanceInfo::GetProductId() const
+QString CProductInstanceInfo::GetProductId() const
 {
 	return m_productId;
 }
@@ -114,7 +114,7 @@ QByteArray CProductInstanceInfo::GetProductInstanceId() const
 }
 
 
-QByteArray CProductInstanceInfo::GetCustomerId() const
+QString CProductInstanceInfo::GetCustomerId() const
 {
 	return m_customerId;
 }
@@ -258,6 +258,22 @@ bool CProductInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 	m_licenseContainerInfo.ResetData();
 
 	return true;
+}
+
+
+QByteArray CProductInstanceInfo::GetProductId(const QString& productName) const
+{
+	const imtbase::IObjectCollection* productsCollectionPtr = m_productCollectionPtr;
+	if (productsCollectionPtr != nullptr){
+		imtbase::ICollectionInfo::Ids productCollectionIds = productsCollectionPtr->GetElementIds();
+		for (const QByteArray productCollectionId : productCollectionIds){
+			if (productsCollectionPtr->GetElementInfo(productCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString() == productName){
+				return productCollectionId;
+			}
+		}
+	}
+
+	return QByteArray();
 }
 
 

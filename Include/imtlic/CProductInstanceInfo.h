@@ -25,15 +25,15 @@ public:
 	virtual const imtbase::IObjectCollection* GetProductDatabase() const override;
 	virtual const imtbase::IObjectCollection* GetCustomerDatabase() const override;
 	virtual void SetupProductInstance(
-				const QByteArray& productId,
+				const QString& productId,
 				const QByteArray& instanceId,
-				const QByteArray& customerId) override;
+				const QString& customerId) override;
 	virtual void AddLicense(const QByteArray& licenseId, const QDateTime& expirationDate = QDateTime()) override;
 	virtual void RemoveLicense(const QByteArray& licenseId) override;
 	virtual void ClearLicenses() override;
-	virtual QByteArray GetProductId() const override;
+	virtual QString GetProductId() const override;
 	virtual QByteArray GetProductInstanceId() const override;
-	virtual QByteArray GetCustomerId() const override;
+	virtual QString GetCustomerId() const override;
 
 	// reimplemented (imtlic::ILicenseInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetLicenseInstances() const override;
@@ -49,17 +49,21 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
+	const imtbase::IObjectCollection* m_customerCollectionPtr;
+	const imtbase::IObjectCollection* m_productCollectionPtr;
+
+private:
+	QByteArray GetProductId(const QString& productName) const;
+
+private:
 	typedef istd::TSmartPtr<CLicenseInstance> LicenseInstancePtr;
 	typedef QMap<QByteArray /*ID of the license definition in the product*/, LicenseInstancePtr> LicenseInstances;
 
-	QByteArray m_productId;
-	QByteArray m_customerId;
+	QString m_productId;
+	QString m_customerId;
 	QByteArray m_instanceId;
 	LicenseInstances m_licenses;
 	imtbase::CCollectionInfo m_licenseContainerInfo;
-
-	const imtbase::IObjectCollection* m_customerCollectionPtr;
-	const imtbase::IObjectCollection* m_productCollectionPtr;
 };
 
 

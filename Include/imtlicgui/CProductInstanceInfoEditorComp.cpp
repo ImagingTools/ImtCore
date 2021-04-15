@@ -10,6 +10,7 @@
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
+#include <imtauth/IAccountInfo.h>
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtlic/ILicenseInfo.h>
 #include <imtlic/ILicenseInstance.h>
@@ -72,8 +73,8 @@ void CProductInstanceInfoEditorComp::UpdateModel() const
 
 	istd::CChangeGroup changeGroup(productInstanceInfoPtr);
 
-	QByteArray currentProductId = ProductCombo->currentData().toByteArray();
-	QByteArray customerId = CustomerCombo->currentData().toByteArray();
+	QString currentProductId = ProductCombo->currentText();
+	QString customerId = CustomerCombo->currentText();
 	QByteArray instanceId = ProductInstanceIdEdit->text().toUtf8();
 
 	productInstanceInfoPtr->ResetData();
@@ -237,20 +238,26 @@ void CProductInstanceInfoEditorComp::OnCustomersUpdated(
 		imtlic::IProductInstanceInfo* productInstanceInfoPtr = GetObservedObject();
 		Q_ASSERT(productInstanceInfoPtr != nullptr);
 
-		QByteArray selectedCustomerId = productInstanceInfoPtr->GetCustomerId();
-		QByteArray newSelectedCustomerId;
+		QString selectedCustomerId = productInstanceInfoPtr->GetCustomerId();
+		QString newSelectedCustomerId;
 
 		const imtbase::IObjectCollection* customerCollectionPtr = productInstanceInfoPtr->GetCustomerDatabase();
 		if (customerCollectionPtr != nullptr){
 			const imtbase::IObjectCollectionInfo::Ids customerIds = customerCollectionPtr->GetElementIds();
 			for (const QByteArray& customerId : customerIds){
-				QString customerName = customerCollectionPtr->GetElementInfo(customerId, imtbase::ICollectionInfo::EIT_NAME).toString();
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				if (customerCollectionPtr->GetObjectData(customerId, dataPtr)){
+					imtauth::IAccountInfo* customerPtr = dynamic_cast<imtauth::IAccountInfo*>(dataPtr.GetPtr());
+					if (customerPtr != nullptr){
+						QString customerName =  customerPtr->GetAccountName();
 
-				CustomerCombo->addItem(customerName, customerId);
+						CustomerCombo->addItem(customerName, customerId);
 
-				if (selectedCustomerId == customerId){
-					CustomerCombo->setCurrentText(customerName);
-					newSelectedCustomerId = selectedCustomerId;
+						if (selectedCustomerId == customerName){
+							CustomerCombo->setCurrentText(customerName);
+							newSelectedCustomerId = selectedCustomerId;
+						}
+					}
 				}
 			}
 		}
@@ -271,8 +278,8 @@ void CProductInstanceInfoEditorComp::UpdateProductsCombo()
 	imtlic::IProductInstanceInfo* productInstanceInfoPtr = GetObservedObject();
 	Q_ASSERT(productInstanceInfoPtr != nullptr);
 
-	QByteArray selectedProductId = productInstanceInfoPtr->GetProductId();
-	QByteArray newSelectedProductId;
+	QString selectedProductId = productInstanceInfoPtr->GetProductId();
+	QString newSelectedProductId;
 
 	const imtbase::IObjectCollection* productsCollectionPtr = productInstanceInfoPtr->GetProductDatabase();
 	if (productsCollectionPtr != nullptr){
@@ -282,7 +289,7 @@ void CProductInstanceInfoEditorComp::UpdateProductsCombo()
 
 			ProductCombo->addItem(productName, productId);
 
-			if (selectedProductId == productId){
+			if (selectedProductId == productName){
 				ProductCombo->setCurrentText(productName);
 				newSelectedProductId = selectedProductId;
 
@@ -317,7 +324,7 @@ void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 	const imtbase::IObjectCollection* productsCollectionPtr = productInstanceInfoPtr->GetProductDatabase();
 	if (productsCollectionPtr != nullptr){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (productsCollectionPtr->GetObjectData(productInstanceInfoPtr->GetProductId(), dataPtr)){
+		if (productsCollectionPtr->GetObjectData(GetProductId(productInstanceInfoPtr->GetProductId()), dataPtr)){
 			const imtlic::IProductLicensingInfo* licensingInfoPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
 			if (licensingInfoPtr != nullptr){
 				const imtbase::ICollectionInfo& licenseList = licensingInfoPtr->GetLicenseList();
@@ -366,6 +373,51 @@ void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 	}
 
 	LicenseInstancesEdit->setItemDelegate(&m_dateDelegate);
+}
+
+
+QByteArray CProductInstanceInfoEditorComp::GetProductId(const QString& productName) const
+{
+	imtlic::IProductInstanceInfo* productInstanceInfoPtr = GetObservedObject();
+
+	if (productInstanceInfoPtr != nullptr){
+		const imtbase::IObjectCollection* productsCollectionPtr = productInstanceInfoPtr->GetProductDatabase();
+		if (productsCollectionPtr != nullptr){
+			imtbase::ICollectionInfo::Ids productCollectionIds = productsCollectionPtr->GetElementIds();
+			for (const QByteArray productCollectionId : productCollectionIds){
+				if (productsCollectionPtr->GetElementInfo(productCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString() == productName){
+					return productCollectionId;
+				}
+			}
+		}
+	}
+
+	return QByteArray();
+}
+
+
+QByteArray CProductInstanceInfoEditorComp::GetCustomerId(const QString& customerName) const
+{
+	imtlic::IProductInstanceInfo* productInstanceInfoPtr = GetObservedObject();
+	if (productInstanceInfoPtr != nullptr){
+		const imtbase::IObjectCollection* customerCollectionPtr = productInstanceInfoPtr->GetCustomerDatabase();
+		if (customerCollectionPtr != nullptr){
+			imtbase::ICollectionInfo::Ids customerCollectionIds = customerCollectionPtr->GetElementIds();
+			for (const QByteArray customerCollectionId : customerCollectionIds){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				if (customerCollectionPtr->GetObjectData(customerCollectionId, dataPtr)){
+					imtauth::IAccountInfo* customerPtr = dynamic_cast<imtauth::IAccountInfo*>(dataPtr.GetPtr());
+					if (customerPtr != nullptr){
+						if (customerPtr->GetAccountName() == customerName){
+							return customerCollectionId;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return QByteArray();
 }
 
 
