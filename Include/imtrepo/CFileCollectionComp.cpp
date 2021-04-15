@@ -208,6 +208,10 @@ bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection& collection, 
 		return false;
 	}
 
+	if (m_rightsProviderCompPtr.IsValid() && !m_rightsProviderCompPtr->HasRight(*m_restoreRevisionRightIdAttrPtr)){
+		return false;
+	}
+
 	RevisionsContents revisionsContents;
 	if (LoadRevisionsContents(*collectionPtr, objectId, revisionsContents)){
 		if (revisionsContents.contains(revision)){
@@ -504,10 +508,6 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 	if (objectId.isEmpty()){
 		SendErrorMessage(0, "object-ID is empty. Unknown resource could not be removed");
 
-		return false;
-	}
-
-	if (m_rightsProviderCompPtr.IsValid() && !m_rightsProviderCompPtr->HasRight(*m_restoreRevisionRightIdAttrPtr)){
 		return false;
 	}
 
