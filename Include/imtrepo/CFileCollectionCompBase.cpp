@@ -33,9 +33,24 @@ namespace imtrepo
 
 CFileCollectionCompBase2::CFileCollectionCompBase2()
 	:m_filesLock(QReadWriteLock::Recursive),
-	m_readerThread(this)
+	m_readerThread(this),
+	m_itemInfoProvider(*this)
 {
 	m_resourceTypeConstraints.SetParent(this);
+}
+
+
+// reimplemented (IRepositoryItemInfoProvider)
+
+const imtbase::ICollectionInfo& CFileCollectionCompBase2::GetRepositoryItems()
+{
+	return m_itemInfoProvider;
+}
+
+
+const IRepositoryItemInfo* CFileCollectionCompBase2::GetRepositoryItemInfo(const QByteArray& itemId) const
+{
+	return m_itemInfoProvider.GetRepositoryItemInfo(itemId);
 }
 
 
@@ -1118,6 +1133,8 @@ bool CFileCollectionCompBase2::FinishInsertFileTransaction(
 void CFileCollectionCompBase2::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	m_itemInfoProvider.UpdateItems();
 
 	for (int i = 0; i < m_metaInfoCreatorListCompPtr.GetCount(); ++i){
 		const imtbase::IMetaInfoCreator* metaInfoCreatorPtr = m_metaInfoCreatorListCompPtr[i];

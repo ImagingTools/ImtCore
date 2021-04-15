@@ -29,9 +29,7 @@
 #include <imtfile/IFileCompression.h>
 #include <imtrepo/IFileCollectionInfo.h>
 #include <imtrepo/IFileObjectCollection.h>
-#include <imtrepo/IRepositoryFileTransformationStepsProvider.h>
 #include <imtrepo/IRepositoryItemInfoProvider.h>
-#include <imtrepo/IRepositoryTransformationController.h>
 
 
 namespace imtrepo
@@ -75,7 +73,8 @@ protected:
 */
 class CFileCollectionCompBase2:
 			public CFileCollectionCompBase,
-			virtual public IFileObjectCollection
+			virtual public IFileObjectCollection,
+			virtual public IRepositoryItemInfoProvider
 {
 	Q_OBJECT
 public:
@@ -103,6 +102,10 @@ public:
 
 public:
 	CFileCollectionCompBase2();
+
+	// reimplemented (IRepositoryItemInfoProvider)
+	virtual const imtbase::ICollectionInfo& GetRepositoryItems() override;
+	virtual const IRepositoryItemInfo* GetRepositoryItemInfo(const QByteArray& itemId) const override;
 
 	// reimplemented (IFileCollectionInfo)
 	virtual QString GetCollectionRootFolder() const override;
@@ -528,6 +531,8 @@ private:
 	QList<QByteArray> m_lockedObjectIds;
 	QList<QString> m_lockedObjectNames;
 	QMutex m_lockedObjectInfoMutex;
+
+	RepositoryItemInfoProvider m_itemInfoProvider;
 };
 
 

@@ -32,22 +32,7 @@ namespace imtrepo
 // public methods
 
 CFileCollectionComp::CFileCollectionComp()
-	:m_itemInfoProvider(*this)
 {
-}
-
-
-// reimplemented (IRepositoryItemInfoProvider)
-
-const imtbase::ICollectionInfo& CFileCollectionComp::GetRepositoryItems()
-{
-	return m_itemInfoProvider;
-}
-
-
-const IRepositoryItemInfo* CFileCollectionComp::GetRepositoryItemInfo(const QByteArray& itemId) const
-{
-	return m_itemInfoProvider.GetRepositoryItemInfo(itemId);
 }
 
 
@@ -905,8 +890,6 @@ bool CFileCollectionComp::TransformRepositoryItem(const RepositoryItemInfo& repo
 void CFileCollectionComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-
-	m_itemInfoProvider.UpdateItems();
 
 	if (UpdateRepositoryFormat()){
 		ReadRepositoryItems();

@@ -1,36 +1,9 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QMap>
-#include <QtCore/QMutex>
-#include <QtCore/QDateTime>
-#include <QtCore/QThread>
-#include <QtCore/QReadWriteLock>
-#include <QtCore/QFileInfo>
-#include <QtCore/QTimer>
-
-// ACF includes
-#include <ibase/IProgressManager.h>
-#include <istd/TSmartPtr.h>
-#include <iser/ISerializable.h>
-#include <imod/TModelWrap.h>
-#include <ilog/TLoggerCompWrap.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
-#include <ifile/IFileNameParam.h>
-#include <ifile/IFilePersistence.h>
-#include <ifile/IFileResourceTypeConstraints.h>
-#include <iauth/ILogin.h>
-#include <iauth/IRightsProvider.h>
-
 // ImtCore includes
-#include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/IRevisionController.h>
-#include <imtfile/IFileCompression.h>
-#include <imtrepo/IFileCollectionInfo.h>
-#include <imtrepo/IFileObjectCollection.h>
 #include <imtrepo/IRepositoryFileTransformationStepsProvider.h>
-#include <imtrepo/IRepositoryItemInfoProvider.h>
 #include <imtrepo/IRepositoryTransformationController.h>
 #include <imtrepo/CFileCollectionCompBase.h>
 
@@ -50,7 +23,6 @@ namespace imtrepo
 
 class CFileCollectionComp:
 			public CFileCollectionCompBase2,
-			virtual public IRepositoryItemInfoProvider,
 			virtual protected imtbase::IRevisionController
 {
 	Q_OBJECT
@@ -65,10 +37,6 @@ public:
 	I_END_COMPONENT;
 
 	CFileCollectionComp();
-
-	// reimplemented (IRepositoryItemInfoProvider)
-	virtual const imtbase::ICollectionInfo& GetRepositoryItems() override;
-	virtual const IRepositoryItemInfo* GetRepositoryItemInfo(const QByteArray& itemId) const override;
 
 	// reimplemented (imtbase::IRevisionController)
 	virtual RevisionInfoList GetRevisionInfoList(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const override;
@@ -168,8 +136,6 @@ private:
 		Transformation steps provider for the file in the repository.
 	*/
 	I_REF(IRepositoryFileTransformationStepsProvider, m_transformationStepsProviderCompPtr);
-
-	RepositoryItemInfoProvider m_itemInfoProvider;
 };
 
 
