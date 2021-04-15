@@ -38,9 +38,6 @@ namespace imtrepo
 {
 
 
-/**
-	Base class of the file collection without own data
-*/
 class CFileCollectionCompBase:
 			public QObject,
 			public ilog::CLoggerComponentBase
@@ -50,15 +47,52 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CFileCollectionCompBase)
+		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
+		I_ASSIGN(m_loginProviderCompPtr, "Login", "Provider of login data used for revision management", false, "Login");
+		I_ASSIGN(m_rightsProviderCompPtr, "RightsProvider", "Rights provider", false, "RightsProvider");
+	I_END_COMPONENT;
+
+protected:
+	/**
+		Provider of the version information for the entire system.
+	*/
+	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
+
+	/**
+		Provider of the logged user.
+	*/
+	I_REF(iauth::ILogin, m_loginProviderCompPtr);
+
+	/**
+		Rights provider
+	*/
+	I_REF(iauth::IRightsProvider, m_rightsProviderCompPtr);
+};
+
+
+/**
+	Base class of the file collection. General implementation
+*/
+class CFileCollectionCompBase2:
+			public CFileCollectionCompBase,
+			virtual public IFileObjectCollection
+{
+	Q_OBJECT
+public:
+	typedef CFileCollectionCompBase BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CFileCollectionCompBase2)
+		I_REGISTER_INTERFACE(IFileObjectCollection);
+		I_REGISTER_INTERFACE(IFileCollectionInfo);
+		I_REGISTER_INTERFACE(IObjectCollection);
+		I_REGISTER_INTERFACE(IObjectCollectionInfo);
+		I_REGISTER_INTERFACE(ICollectionInfo);
 		I_ASSIGN(m_revisionAttrPtr, "RepositoryRevision", "Revision number of the whole repository", true, 0);
 		I_ASSIGN(m_isCalculateCheckSumAttrPtr, "IsCalculateCheckSum", "Calculate check sums for the file", true, true);
 		I_ASSIGN(m_asynchronousReadingAttrPtr, "AsynchronousReading", "If enabled, the collection will reading asynchronously", true, false);
-		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
 		I_ASSIGN(m_repositoryPathCompPtr, "RepositoryPath", "Path to the file collection folder", false, "RepositoryPath");
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "FileCompressor");
-		I_ASSIGN(m_loginProviderCompPtr, "Login", "Provider of login data used for revision management", false, "Login");
 		I_ASSIGN(m_resourceTypesCompPtr, "ResourceTypes", "List of supported resource types", false, "ResourceTypes");
-		I_ASSIGN(m_rightsProviderCompPtr, "RightsProvider", "Rights provider", false, "RightsProvider");
 		I_ASSIGN_MULTI_0(m_progressManagerListCompPtr, "ProgressManagerList", "List of progress manager components", false);
 		I_ASSIGN_MULTI_0(m_objectPersistenceListCompPtr, "ObjectPersistenceList", "List of persistence components used for data object loading", false);
 		I_ASSIGN_MULTI_0(m_resourceFileTypesCompPtr, "FileTypeInfos", "List of file type infos for corresponding resource type", false);
@@ -67,7 +101,72 @@ public:
 		I_ASSIGN_MULTI_0(m_objectFactoryListCompPtr, "ObjectFactoryList", "List of factories used for data object instance creation", false);
 	I_END_COMPONENT;
 
+public:
+	CFileCollectionCompBase2();
+
+	// reimplemented (IFileCollectionInfo)
+	virtual QString GetCollectionRootFolder() const override;
+	virtual int GetRepositoryRevision() const override;
+
+	// reimplemented (IFileObjectCollection)
+	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
+	virtual FileInfo GetFileInfo(const QByteArray& objectId) const override;
+	virtual QString GetFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
+	virtual QByteArray InsertFile(
+				const QString& filePath,
+				const QByteArray& objectTypeId = QByteArray(),
+				const QString& objectName = QString(),
+				const QString& objectDescription = QString(),
+				const QByteArray& proposedObjectId = QByteArray()) override;
+	virtual bool UpdateFile(const QString& filePath, const QByteArray& objectId) override;
+	virtual bool ExportFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
+	virtual QByteArray ImportFile(const QByteArray& typeId, const QString& sourceFilePath = QString()) override;
+
+	// reimplemented (IObjectCollection)
+	virtual const imtbase::IRevisionController* GetRevisionController() const override;
+	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
+	virtual bool GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const override;
+	virtual QByteArray InsertNewObject(
+				const QByteArray& typeId,
+				const QString& name,
+				const QString& description,
+				const istd::IChangeable* defaultValuePtr = nullptr,
+				const QByteArray& proposedObjectId = QByteArray()) override;
+	virtual bool RemoveObject(const QByteArray& objectId) override;
+	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
+	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const override;
+	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
+	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
+	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
+	virtual bool RegisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler) override;
+	virtual bool UnregisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler) override;
+
+	// reimplemented (IObjectCollectionInfo)
+	virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
+	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
+	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
+
+	// reimplemented (ICollectionInfo)
+	virtual Ids GetElementIds() const override;
+	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
+
 protected:
+	class ResourceLocker
+	{
+	public:
+		explicit ResourceLocker(
+			CFileCollectionCompBase2& collection,
+			const QByteArray& resourceId,
+			const QString& resourceName);
+		~ResourceLocker();
+
+	private:
+		CFileCollectionCompBase2& m_collection;
+		QByteArray m_resourceId;
+		QString m_resourceName;
+	};
+
 	struct RepositoryInfo
 	{
 		QString metaInfoFileSuffix;
@@ -88,11 +187,11 @@ protected:
 	};
 
 	class RepositoryItemInfoProvider:
-				virtual public imtbase::ICollectionInfo,
-				virtual public IRepositoryItemInfoProvider
+		virtual public imtbase::ICollectionInfo,
+		virtual public IRepositoryItemInfoProvider
 	{
 	public:
-		RepositoryItemInfoProvider(CFileCollectionCompBase& parent);
+		RepositoryItemInfoProvider(CFileCollectionCompBase2& parent);
 
 		bool UpdateItems();
 
@@ -112,7 +211,7 @@ protected:
 		};
 
 	private:
-		CFileCollectionCompBase& m_parent;
+		CFileCollectionCompBase2& m_parent;
 		QList<Item> m_repositoryItems;
 
 		mutable QReadWriteLock m_lock;
@@ -190,7 +289,7 @@ protected:
 	{
 	public:
 		ResourceTypeConstraints();
-		void SetParent(CFileCollectionCompBase* parentPtr);
+		void SetParent(CFileCollectionCompBase2* parentPtr);
 
 		// reimplemented (ifile::IFileResourceTypeConstraints)
 		virtual const ifile::IFileTypeInfo* GetFileTypeInfo(int resourceTypeIndex) const override;
@@ -204,7 +303,7 @@ protected:
 		virtual bool IsOptionEnabled(int index) const override;
 
 	private:
-		CFileCollectionCompBase* m_parentPtr;
+		CFileCollectionCompBase2* m_parentPtr;
 	};
 
 	typedef imod::TModelWrap<ResourceTypeConstraints> ResourceTypeConstraintsModel;
@@ -213,8 +312,6 @@ protected:
 
 protected:
 	static RepositoryInfo GetRepositoryInfo();
-
-	QString GetCollectionRootFolder() const;
 
 	void EnumerateRepositoryItems(QFileInfoList& fileList) const;
 	QString CreateWorkingDir() const;
@@ -263,156 +360,6 @@ protected:
 
 	bool IsPathInsideRepository(const QString& filePath) const;
 
-protected:
-	/**
-		Whole repository revision.
-	*/
-	I_ATTR(int, m_revisionAttrPtr);
-
-	/**
-		Calculate checkSum for files
-	*/
-	I_ATTR(bool, m_isCalculateCheckSumAttrPtr);
-
-	/**
-		Asynchronous collection loading on dedicated thread
-	*/
-	I_ATTR(bool, m_asynchronousReadingAttrPtr);
-
-	/**
-		Provider of the version information for the entire system.
-	*/
-	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
-
-	/**
-		Path to the directory where the file file collection is located.
-		If the path is set, the incomming file will be copied to this location,
-		otherwise only a link to the file wil be created.
-	*/
-	I_REF(ifile::IFileNameParam, m_repositoryPathCompPtr);
-
-	/**
-		File compressor.
-	*/
-	I_REF(imtfile::IFileCompression, m_compressorCompPtr);
-
-	/**
-		Provider of the logged user.
-	*/
-	I_REF(iauth::ILogin, m_loginProviderCompPtr);
-
-	/**
-		List of supported resource types.
-	*/
-	I_REF(iprm::IOptionsList, m_resourceTypesCompPtr);
-
-	/**
-		Rights provider
-	*/
-	I_REF(iauth::IRightsProvider, m_rightsProviderCompPtr);
-
-	/**
-		Consumers of the progress information
-	*/
-	I_MULTIREF(ibase::IProgressManager, m_progressManagerListCompPtr);
-
-	/**
-		List of file persistence components related to registered resource types.
-	*/
-	I_MULTIREF(ifile::IFilePersistence, m_objectPersistenceListCompPtr);
-
-	/**
-		List of file type infos related to registered resource types.
-	*/
-	I_MULTIREF(ifile::IFileTypeInfo, m_resourceFileTypesCompPtr);
-
-	/**
-		List of meta-info creators related to registered resource types.
-	*/
-	I_MULTIREF(imtbase::IMetaInfoCreator, m_metaInfoCreatorListCompPtr);
-
-	/**
-		Event handlers
-	*/
-	I_MULTIREF(imtbase::IObjectCollectionEventHandler, m_eventHandlerListCompPtr);
-
-	/**
-		List of data object factories related to registered resource types.
-	*/
-	I_MULTIFACT(istd::IChangeable, m_objectFactoryListCompPtr);
-};
-
-
-/**
-	Base class of the file collection. General implementation
-*/
-class CFileCollectionCompBase2:
-			public CFileCollectionCompBase,
-			virtual public IFileObjectCollection
-{
-	Q_OBJECT
-public:
-	typedef CFileCollectionCompBase BaseClass;
-
-	I_BEGIN_BASE_COMPONENT(CFileCollectionCompBase2)
-		I_REGISTER_INTERFACE(IFileObjectCollection);
-		I_REGISTER_INTERFACE(IFileCollectionInfo);
-		I_REGISTER_INTERFACE(IObjectCollection);
-		I_REGISTER_INTERFACE(IObjectCollectionInfo);
-		I_REGISTER_INTERFACE(ICollectionInfo);
-	I_END_COMPONENT;
-
-public:
-	CFileCollectionCompBase2();
-
-	// reimplemented (IFileCollectionInfo)
-	virtual QString GetCollectionRootFolder() const override;
-	virtual int GetRepositoryRevision() const override;
-
-	// reimplemented (IFileObjectCollection)
-	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
-	virtual FileInfo GetFileInfo(const QByteArray& objectId) const override;
-	virtual QString GetFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
-	virtual QByteArray InsertFile(
-				const QString& filePath,
-				const QByteArray& objectTypeId = QByteArray(),
-				const QString& objectName = QString(),
-				const QString& objectDescription = QString(),
-				const QByteArray& proposedObjectId = QByteArray()) override;
-	virtual bool UpdateFile(const QString& filePath, const QByteArray& objectId) override;
-	virtual bool ExportFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
-	virtual QByteArray ImportFile(const QByteArray& typeId, const QString& sourceFilePath = QString()) override;
-
-	// reimplemented (IObjectCollection)
-	virtual const imtbase::IRevisionController* GetRevisionController() const override;
-	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
-	virtual bool GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const override;
-	virtual QByteArray InsertNewObject(
-				const QByteArray& typeId,
-				const QString& name,
-				const QString& description,
-				const istd::IChangeable* defaultValuePtr = nullptr,
-				const QByteArray& proposedObjectId = QByteArray()) override;
-	virtual bool RemoveObject(const QByteArray& objectId) override;
-	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
-	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const override;
-	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
-	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
-	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
-	virtual bool RegisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler) override;
-	virtual bool UnregisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler) override;
-
-	// reimplemented (IObjectCollectionInfo)
-	virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
-	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
-	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
-
-	// reimplemented (ICollectionInfo)
-	virtual Ids GetElementIds() const override;
-	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
-
-protected:
 	/**
 		Get the index of the file by file ID.
 		If the file was not found, the method will return a negative number.
@@ -480,22 +427,6 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 protected:
-	class ResourceLocker
-	{
-	public:
-		explicit ResourceLocker(
-			CFileCollectionCompBase2& collection,
-			const QByteArray& resourceId,
-			const QString& resourceName);
-		~ResourceLocker();
-
-	private:
-		CFileCollectionCompBase2& m_collection;
-		QByteArray m_resourceId;
-		QString m_resourceName;
-	};
-
-protected:
 	/**
 		Supported types of the objects in the collection.
 	*/
@@ -509,6 +440,69 @@ protected:
 	mutable QReadWriteLock m_filesLock;
 
 	EventHandlerList m_eventHandlerList;
+
+protected:
+	/**
+		Whole repository revision.
+	*/
+	I_ATTR(int, m_revisionAttrPtr);
+
+	/**
+		Calculate checkSum for files
+	*/
+	I_ATTR(bool, m_isCalculateCheckSumAttrPtr);
+
+	/**
+		Asynchronous collection loading on dedicated thread
+	*/
+	I_ATTR(bool, m_asynchronousReadingAttrPtr);
+
+	/**
+		Path to the directory where the file file collection is located.
+		If the path is set, the incomming file will be copied to this location,
+		otherwise only a link to the file wil be created.
+	*/
+	I_REF(ifile::IFileNameParam, m_repositoryPathCompPtr);
+
+	/**
+		File compressor.
+	*/
+	I_REF(imtfile::IFileCompression, m_compressorCompPtr);
+
+	/**
+		List of supported resource types.
+	*/
+	I_REF(iprm::IOptionsList, m_resourceTypesCompPtr);
+
+	/**
+		Consumers of the progress information
+	*/
+	I_MULTIREF(ibase::IProgressManager, m_progressManagerListCompPtr);
+
+	/**
+		List of file persistence components related to registered resource types.
+	*/
+	I_MULTIREF(ifile::IFilePersistence, m_objectPersistenceListCompPtr);
+
+	/**
+		List of file type infos related to registered resource types.
+	*/
+	I_MULTIREF(ifile::IFileTypeInfo, m_resourceFileTypesCompPtr);
+
+	/**
+		List of meta-info creators related to registered resource types.
+	*/
+	I_MULTIREF(imtbase::IMetaInfoCreator, m_metaInfoCreatorListCompPtr);
+
+	/**
+		Event handlers
+	*/
+	I_MULTIREF(imtbase::IObjectCollectionEventHandler, m_eventHandlerListCompPtr);
+
+	/**
+		List of data object factories related to registered resource types.
+	*/
+	I_MULTIFACT(istd::IChangeable, m_objectFactoryListCompPtr);
 
 private:
 	class ReaderThread: public QThread

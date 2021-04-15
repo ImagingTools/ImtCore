@@ -29,218 +29,6 @@ namespace imtrepo
 {
 
 
-// static protected methods of the class CFileCollectionCompBase
-
-CFileCollectionCompBase::RepositoryInfo CFileCollectionCompBase::GetRepositoryInfo()
-{
-	RepositoryInfo retVal;
-
-	retVal.metaInfoFileSuffix = "meta";
-	retVal.dataFileSuffix = "item";
-
-	return retVal;
-}
-
-
-// protected methods of the class CFileCollectionCompBase
-
-QString CFileCollectionCompBase::GetCollectionRootFolder() const
-{
-	QString retVal;
-
-	if (m_repositoryPathCompPtr.IsValid()){
-		retVal = m_repositoryPathCompPtr->GetPath();
-	}
-
-	return retVal;
-}
-
-
-void CFileCollectionCompBase::EnumerateRepositoryItems(QFileInfoList& fileList) const
-{
-	QString repositoryRootPath = GetCollectionRootFolder();
-	QDir repositoryRootDir(repositoryRootPath);
-
-	ifile::CFileListProviderComp::CreateFileList(repositoryRootDir, 0, 2, QStringList() << QString("*.%1").arg(GetRepositoryInfo().dataFileSuffix), QDir::Name, fileList);
-}
-
-
-QString CFileCollectionCompBase::CreateWorkingDir() const
-{
-	QString workingPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString();
-
-	if (istd::CSystem::EnsurePathExists(workingPath)){
-		return workingPath;
-	}
-
-	return QString();
-}
-
-
-istd::IChangeable* CFileCollectionCompBase::CreateDataObject(const QByteArray& typeId) const
-{
-	int factoryIndex = -1;
-
-	if (m_resourceTypesCompPtr.IsValid()){
-		for (int i = 0; i < m_resourceTypesCompPtr->GetOptionsCount(); ++i){
-			if (typeId == m_resourceTypesCompPtr->GetOptionId(i)){
-				factoryIndex = i;
-				break;
-			}
-		}
-	}
-
-	if ((factoryIndex >= 0) && factoryIndex < m_objectFactoryListCompPtr.GetCount()){
-		return m_objectFactoryListCompPtr.CreateInstance(factoryIndex);
-	}
-
-	return nullptr;
-}
-
-
-istd::IChangeable* CFileCollectionCompBase::CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const
-{
-	istd::IChangeable* retVal = CreateDataObject(typeId);
-	if (retVal != nullptr){
-		const ifile::IFilePersistence* filePersistenceCompPtr = GetPersistenceForResource(typeId);
-		if (filePersistenceCompPtr != nullptr){
-			int loadState = filePersistenceCompPtr->LoadFromFile(*retVal, filePath);
-			if (loadState == ifile::IFilePersistence::OS_OK){
-				return retVal;
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-
-const ifile::IFilePersistence* CFileCollectionCompBase::GetPersistenceForResource(const QByteArray& typeId) const
-{
-	int factoryIndex = -1;
-
-	if (m_resourceTypesCompPtr.IsValid()){
-		for (int i = 0; i < m_resourceTypesCompPtr->GetOptionsCount(); ++i){
-			if (typeId == m_resourceTypesCompPtr->GetOptionId(i)){
-				factoryIndex = i;
-				break;
-			}
-		}
-	}
-
-	if ((factoryIndex >= 0) && factoryIndex < m_objectPersistenceListCompPtr.GetCount()){
-		return m_objectPersistenceListCompPtr[factoryIndex];
-	}
-
-	return nullptr;
-}
-
-
-QString CFileCollectionCompBase::SaveCollectionItem(const CollectionItem& collectionItem, const QString& dataFilePath) const
-{
-	QString itemFilePath = dataFilePath.isEmpty() ? GetDataItemFilePath(collectionItem) : dataFilePath;
-
-	ifile::CCompactXmlFileWriteArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
-
-	if (!const_cast<CollectionItem&>(collectionItem).Serialize(archive)){
-		SendErrorMessage(0, QString("Collection item could not be saved into '%1'").arg(itemFilePath));
-
-		return QString();
-	}
-
-	return itemFilePath;
-}
-
-
-QString CFileCollectionCompBase::GetDataItemFilePath(const CollectionItem& repositoryFile) const
-{
-	QString retVal;
-
-	QFileInfo fileInfo(repositoryFile.filePathInRepository);
-	QString baseName = fileInfo.fileName();
-	if (!baseName.isEmpty()){
-		retVal = fileInfo.absolutePath() + "/" + baseName + "." + GetRepositoryInfo().dataFileSuffix;
-	}
-
-	return retVal;
-}
-
-
-QString CFileCollectionCompBase::GetMetaInfoFilePath(const CollectionItem& repositoryFile) const
-{
-	QString retVal;
-
-	QFileInfo fileInfo(repositoryFile.filePathInRepository);
-	QString baseName = fileInfo.fileName();
-	if (!baseName.isEmpty()){
-		retVal = fileInfo.absolutePath() + "/" + baseName + "." + GetRepositoryInfo().metaInfoFileSuffix;
-	}
-
-	return retVal;
-}
-
-
-QString CFileCollectionCompBase::CalculateShortFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const
-{
-	const int maxFileNameLength = 255;
-
-	int fileSuffixSize = qMax(GetRepositoryInfo().dataFileSuffix.size(), GetRepositoryInfo().metaInfoFileSuffix.size()) + 1;
-
-	if (fileName.size() + fileSuffixSize > maxFileNameLength){
-		int reducedNameSize = maxFileNameLength - fileSuffixSize - prefix.size();
-
-		QString reducedFileName = fileInfo.fileName().mid(0, reducedNameSize - (fileInfo.suffix().size() + 1));
-		reducedFileName.chop(1);
-		reducedFileName.append("~.").append(fileInfo.suffix());
-		reducedFileName.prepend(prefix);
-
-		Q_ASSERT(reducedFileName.size() <= maxFileNameLength - fileSuffixSize);
-
-		return reducedFileName;
-	}
-	else{
-		return fileName;
-	}
-}
-
-
-bool CFileCollectionCompBase::SaveMetaInfo(const idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const
-{
-	const iser::ISerializable* serializablePtr = dynamic_cast<const iser::ISerializable*>(&metaInfo);
-	if (serializablePtr != nullptr){
-		ifile::CCompactXmlFileWriteArchive archive(metaInfoFilePath, m_versionInfoCompPtr.GetPtr());
-
-		return (const_cast<iser::ISerializable*>(serializablePtr))->Serialize(archive);
-	}
-
-	return false;
-}
-
-
-bool CFileCollectionCompBase::LoadMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const
-{
-	if (QFile::exists(metaInfoFilePath)){
-		iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(&metaInfo);
-		if (serializablePtr != nullptr){
-			ifile::CCompactXmlFileReadArchive archive(metaInfoFilePath, m_versionInfoCompPtr.GetPtr());
-
-			return serializablePtr->Serialize(archive);
-		}
-	}
-
-	return false;
-}
-
-
-bool CFileCollectionCompBase::IsPathInsideRepository(const QString& filePath) const
-{
-	QString cleanFileDir = QDir::cleanPath(QFileInfo(filePath).absolutePath());
-	QString cleanRepositoryDir = QDir::cleanPath(GetCollectionRootFolder());
-
-	return cleanFileDir.contains(cleanRepositoryDir);
-}
-
-
 // public methods of the class CFileCollectionCompBase2
 
 CFileCollectionCompBase2::CFileCollectionCompBase2()
@@ -255,7 +43,13 @@ CFileCollectionCompBase2::CFileCollectionCompBase2()
 
 QString CFileCollectionCompBase2::GetCollectionRootFolder() const
 {
-	return BaseClass::GetCollectionRootFolder();
+	QString retVal;
+
+	if (m_repositoryPathCompPtr.IsValid()){
+		retVal = m_repositoryPathCompPtr->GetPath();
+	}
+
+	return retVal;
 }
 
 
@@ -852,8 +646,205 @@ QVariant CFileCollectionCompBase2::GetElementInfo(const QByteArray& elementId, i
 }
 
 
+// static protected methods of the class CFileCollectionCompBase
 
-// protected methods of the class CFileCollectionCompBase2
+CFileCollectionCompBase2::RepositoryInfo CFileCollectionCompBase2::GetRepositoryInfo()
+{
+	RepositoryInfo retVal;
+
+	retVal.metaInfoFileSuffix = "meta";
+	retVal.dataFileSuffix = "item";
+
+	return retVal;
+}
+
+
+// protected methods of the class CFileCollectionCompBase
+
+void CFileCollectionCompBase2::EnumerateRepositoryItems(QFileInfoList& fileList) const
+{
+	QString repositoryRootPath = GetCollectionRootFolder();
+	QDir repositoryRootDir(repositoryRootPath);
+
+	ifile::CFileListProviderComp::CreateFileList(repositoryRootDir, 0, 2, QStringList() << QString("*.%1").arg(GetRepositoryInfo().dataFileSuffix), QDir::Name, fileList);
+}
+
+
+QString CFileCollectionCompBase2::CreateWorkingDir() const
+{
+	QString workingPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString();
+
+	if (istd::CSystem::EnsurePathExists(workingPath)){
+		return workingPath;
+	}
+
+	return QString();
+}
+
+
+istd::IChangeable* CFileCollectionCompBase2::CreateDataObject(const QByteArray& typeId) const
+{
+	int factoryIndex = -1;
+
+	if (m_resourceTypesCompPtr.IsValid()){
+		for (int i = 0; i < m_resourceTypesCompPtr->GetOptionsCount(); ++i){
+			if (typeId == m_resourceTypesCompPtr->GetOptionId(i)){
+				factoryIndex = i;
+				break;
+			}
+		}
+	}
+
+	if ((factoryIndex >= 0) && factoryIndex < m_objectFactoryListCompPtr.GetCount()){
+		return m_objectFactoryListCompPtr.CreateInstance(factoryIndex);
+	}
+
+	return nullptr;
+}
+
+
+istd::IChangeable* CFileCollectionCompBase2::CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const
+{
+	istd::IChangeable* retVal = CreateDataObject(typeId);
+	if (retVal != nullptr){
+		const ifile::IFilePersistence* filePersistenceCompPtr = GetPersistenceForResource(typeId);
+		if (filePersistenceCompPtr != nullptr){
+			int loadState = filePersistenceCompPtr->LoadFromFile(*retVal, filePath);
+			if (loadState == ifile::IFilePersistence::OS_OK){
+				return retVal;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+
+const ifile::IFilePersistence* CFileCollectionCompBase2::GetPersistenceForResource(const QByteArray& typeId) const
+{
+	int factoryIndex = -1;
+
+	if (m_resourceTypesCompPtr.IsValid()){
+		for (int i = 0; i < m_resourceTypesCompPtr->GetOptionsCount(); ++i){
+			if (typeId == m_resourceTypesCompPtr->GetOptionId(i)){
+				factoryIndex = i;
+				break;
+			}
+		}
+	}
+
+	if ((factoryIndex >= 0) && factoryIndex < m_objectPersistenceListCompPtr.GetCount()){
+		return m_objectPersistenceListCompPtr[factoryIndex];
+	}
+
+	return nullptr;
+}
+
+
+QString CFileCollectionCompBase2::SaveCollectionItem(const CollectionItem& collectionItem, const QString& dataFilePath) const
+{
+	QString itemFilePath = dataFilePath.isEmpty() ? GetDataItemFilePath(collectionItem) : dataFilePath;
+
+	ifile::CCompactXmlFileWriteArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
+
+	if (!const_cast<CollectionItem&>(collectionItem).Serialize(archive)){
+		SendErrorMessage(0, QString("Collection item could not be saved into '%1'").arg(itemFilePath));
+
+		return QString();
+	}
+
+	return itemFilePath;
+}
+
+
+QString CFileCollectionCompBase2::GetDataItemFilePath(const CollectionItem& repositoryFile) const
+{
+	QString retVal;
+
+	QFileInfo fileInfo(repositoryFile.filePathInRepository);
+	QString baseName = fileInfo.fileName();
+	if (!baseName.isEmpty()){
+		retVal = fileInfo.absolutePath() + "/" + baseName + "." + GetRepositoryInfo().dataFileSuffix;
+	}
+
+	return retVal;
+}
+
+
+QString CFileCollectionCompBase2::GetMetaInfoFilePath(const CollectionItem& repositoryFile) const
+{
+	QString retVal;
+
+	QFileInfo fileInfo(repositoryFile.filePathInRepository);
+	QString baseName = fileInfo.fileName();
+	if (!baseName.isEmpty()){
+		retVal = fileInfo.absolutePath() + "/" + baseName + "." + GetRepositoryInfo().metaInfoFileSuffix;
+	}
+
+	return retVal;
+}
+
+
+QString CFileCollectionCompBase2::CalculateShortFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const
+{
+	const int maxFileNameLength = 255;
+
+	int fileSuffixSize = qMax(GetRepositoryInfo().dataFileSuffix.size(), GetRepositoryInfo().metaInfoFileSuffix.size()) + 1;
+
+	if (fileName.size() + fileSuffixSize > maxFileNameLength){
+		int reducedNameSize = maxFileNameLength - fileSuffixSize - prefix.size();
+
+		QString reducedFileName = fileInfo.fileName().mid(0, reducedNameSize - (fileInfo.suffix().size() + 1));
+		reducedFileName.chop(1);
+		reducedFileName.append("~.").append(fileInfo.suffix());
+		reducedFileName.prepend(prefix);
+
+		Q_ASSERT(reducedFileName.size() <= maxFileNameLength - fileSuffixSize);
+
+		return reducedFileName;
+	}
+	else{
+		return fileName;
+	}
+}
+
+
+bool CFileCollectionCompBase2::SaveMetaInfo(const idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const
+{
+	const iser::ISerializable* serializablePtr = dynamic_cast<const iser::ISerializable*>(&metaInfo);
+	if (serializablePtr != nullptr){
+		ifile::CCompactXmlFileWriteArchive archive(metaInfoFilePath, m_versionInfoCompPtr.GetPtr());
+
+		return (const_cast<iser::ISerializable*>(serializablePtr))->Serialize(archive);
+	}
+
+	return false;
+}
+
+
+bool CFileCollectionCompBase2::LoadMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const
+{
+	if (QFile::exists(metaInfoFilePath)){
+		iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(&metaInfo);
+		if (serializablePtr != nullptr){
+			ifile::CCompactXmlFileReadArchive archive(metaInfoFilePath, m_versionInfoCompPtr.GetPtr());
+
+			return serializablePtr->Serialize(archive);
+		}
+	}
+
+	return false;
+}
+
+
+bool CFileCollectionCompBase2::IsPathInsideRepository(const QString& filePath) const
+{
+	QString cleanFileDir = QDir::cleanPath(QFileInfo(filePath).absolutePath());
+	QString cleanRepositoryDir = QDir::cleanPath(GetCollectionRootFolder());
+
+	return cleanFileDir.contains(cleanRepositoryDir);
+}
+
 
 int CFileCollectionCompBase2::GetFileIndexById(const QByteArray& fileId) const
 {
@@ -1203,13 +1194,13 @@ QString CFileCollectionCompBase2::RepositoryItemInfo::GetRepositoryItemFilePath(
 
 // public methods of the embedded class RepositoryItemInfoProvider
 
-CFileCollectionCompBase::RepositoryItemInfoProvider::RepositoryItemInfoProvider(CFileCollectionCompBase& parent)
+CFileCollectionCompBase2::RepositoryItemInfoProvider::RepositoryItemInfoProvider(CFileCollectionCompBase2& parent)
 	:m_parent(parent)
 {
 }
 
 
-bool CFileCollectionCompBase::RepositoryItemInfoProvider::UpdateItems()
+bool CFileCollectionCompBase2::RepositoryItemInfoProvider::UpdateItems()
 {
 	QFileInfoList fileList;
 	m_parent.EnumerateRepositoryItems(fileList);
@@ -1238,13 +1229,13 @@ bool CFileCollectionCompBase::RepositoryItemInfoProvider::UpdateItems()
 
 // reimplemented (IRepositoryItemInfoProvider)
 
-const imtbase::ICollectionInfo& CFileCollectionCompBase::RepositoryItemInfoProvider::GetRepositoryItems()
+const imtbase::ICollectionInfo& CFileCollectionCompBase2::RepositoryItemInfoProvider::GetRepositoryItems()
 {
 	return *this;
 }
 
 
-const IRepositoryItemInfo* CFileCollectionCompBase::RepositoryItemInfoProvider::GetRepositoryItemInfo(const QByteArray& itemId) const
+const IRepositoryItemInfo* CFileCollectionCompBase2::RepositoryItemInfoProvider::GetRepositoryItemInfo(const QByteArray& itemId) const
 {
 	QReadLocker locker(&m_lock);
 
@@ -1260,13 +1251,13 @@ const IRepositoryItemInfo* CFileCollectionCompBase::RepositoryItemInfoProvider::
 
 // public methods of the embedded class ResourceTypeConstraints
 
-CFileCollectionCompBase::ResourceTypeConstraints::ResourceTypeConstraints()
+CFileCollectionCompBase2::ResourceTypeConstraints::ResourceTypeConstraints()
 	:m_parentPtr(nullptr)
 {
 }
 
 
-void CFileCollectionCompBase::ResourceTypeConstraints::SetParent(CFileCollectionCompBase* parentPtr)
+void CFileCollectionCompBase2::ResourceTypeConstraints::SetParent(CFileCollectionCompBase2* parentPtr)
 {
 	m_parentPtr = parentPtr;
 }
@@ -1274,7 +1265,7 @@ void CFileCollectionCompBase::ResourceTypeConstraints::SetParent(CFileCollection
 
 // reimplemented (IFileResourceTypeConstraints)
 
-const ifile::IFileTypeInfo* CFileCollectionCompBase::ResourceTypeConstraints::GetFileTypeInfo(int typeIndex) const
+const ifile::IFileTypeInfo* CFileCollectionCompBase2::ResourceTypeConstraints::GetFileTypeInfo(int typeIndex) const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1290,7 +1281,7 @@ const ifile::IFileTypeInfo* CFileCollectionCompBase::ResourceTypeConstraints::Ge
 
 // reimplemented (iprm::IOptionsList)
 
-int CFileCollectionCompBase::ResourceTypeConstraints::GetOptionsFlags() const
+int CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionsFlags() const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1299,7 +1290,7 @@ int CFileCollectionCompBase::ResourceTypeConstraints::GetOptionsFlags() const
 }
 
 
-int CFileCollectionCompBase::ResourceTypeConstraints::GetOptionsCount() const
+int CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionsCount() const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1308,7 +1299,7 @@ int CFileCollectionCompBase::ResourceTypeConstraints::GetOptionsCount() const
 }
 
 
-QString CFileCollectionCompBase::ResourceTypeConstraints::GetOptionName(int index) const
+QString CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionName(int index) const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1317,7 +1308,7 @@ QString CFileCollectionCompBase::ResourceTypeConstraints::GetOptionName(int inde
 }
 
 
-QString CFileCollectionCompBase::ResourceTypeConstraints::GetOptionDescription(int index) const
+QString CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionDescription(int index) const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1326,7 +1317,7 @@ QString CFileCollectionCompBase::ResourceTypeConstraints::GetOptionDescription(i
 }
 
 
-QByteArray CFileCollectionCompBase::ResourceTypeConstraints::GetOptionId(int index) const
+QByteArray CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionId(int index) const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1335,7 +1326,7 @@ QByteArray CFileCollectionCompBase::ResourceTypeConstraints::GetOptionId(int ind
 }
 
 
-bool CFileCollectionCompBase::ResourceTypeConstraints::IsOptionEnabled(int index) const
+bool CFileCollectionCompBase2::ResourceTypeConstraints::IsOptionEnabled(int index) const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1347,10 +1338,10 @@ bool CFileCollectionCompBase::ResourceTypeConstraints::IsOptionEnabled(int index
 // public methods of embedded class QResourceLocker
 
 CFileCollectionCompBase2::ResourceLocker::ResourceLocker(
-	CFileCollectionCompBase2& collection,
-	const QByteArray& objectId,
-	const QString& objectName)
-	:m_collection(collection)
+			CFileCollectionCompBase2& collection,
+			const QByteArray& objectId,
+			const QString& objectName)
+			:m_collection(collection)
 {
 	QMutexLocker locker(&m_collection.m_lockedObjectInfoMutex);
 
