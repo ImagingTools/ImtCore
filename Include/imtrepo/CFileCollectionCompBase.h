@@ -36,7 +36,7 @@ namespace imtrepo
 {
 
 
-class CFileCollectionCompBase:
+class CFileCollectionCompBaseAttr:
 			public QObject,
 			public ilog::CLoggerComponentBase
 {
@@ -44,51 +44,51 @@ class CFileCollectionCompBase:
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CFileCollectionCompBase)
-		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
-		I_ASSIGN(m_loginProviderCompPtr, "Login", "Provider of login data used for revision management", false, "Login");
-		I_ASSIGN(m_rightsProviderCompPtr, "RightsProvider", "Rights provider", false, "RightsProvider");
+	I_BEGIN_BASE_COMPONENT(CFileCollectionCompBaseAttr)
+		I_ASSIGN(m_revisionAttrPtr, "RepositoryRevision", "Revision number of the whole repository", true, 0);
+		I_ASSIGN(m_isCalculateCheckSumAttrPtr, "IsCalculateCheckSum", "Calculate check sums for the file", true, true);
+		I_ASSIGN(m_asynchronousReadingAttrPtr, "AsynchronousReading", "If enabled, the collection will reading asynchronously", true, false);
 	I_END_COMPONENT;
 
 protected:
 	/**
-		Provider of the version information for the entire system.
+		Whole repository revision.
 	*/
-	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
+	I_ATTR(int, m_revisionAttrPtr);
 
 	/**
-		Provider of the logged user.
+		Calculate checkSum for files
 	*/
-	I_REF(iauth::ILogin, m_loginProviderCompPtr);
+	I_ATTR(bool, m_isCalculateCheckSumAttrPtr);
 
 	/**
-		Rights provider
+		Asynchronous collection loading on dedicated thread
 	*/
-	I_REF(iauth::IRightsProvider, m_rightsProviderCompPtr);
+	I_ATTR(bool, m_asynchronousReadingAttrPtr);
 };
 
 
 /**
 	Base class of the file collection. General implementation
 */
-class CFileCollectionCompBase2:
-			public CFileCollectionCompBase,
+class CFileCollectionCompBase:
+			public CFileCollectionCompBaseAttr,
 			virtual public IFileObjectCollection,
 			virtual public IRepositoryItemInfoProvider
 {
 	Q_OBJECT
 public:
-	typedef CFileCollectionCompBase BaseClass;
+	typedef CFileCollectionCompBaseAttr BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CFileCollectionCompBase2)
+	I_BEGIN_BASE_COMPONENT(CFileCollectionCompBase)
 		I_REGISTER_INTERFACE(IFileObjectCollection);
 		I_REGISTER_INTERFACE(IFileCollectionInfo);
 		I_REGISTER_INTERFACE(IObjectCollection);
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(ICollectionInfo);
-		I_ASSIGN(m_revisionAttrPtr, "RepositoryRevision", "Revision number of the whole repository", true, 0);
-		I_ASSIGN(m_isCalculateCheckSumAttrPtr, "IsCalculateCheckSum", "Calculate check sums for the file", true, true);
-		I_ASSIGN(m_asynchronousReadingAttrPtr, "AsynchronousReading", "If enabled, the collection will reading asynchronously", true, false);
+		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
+		I_ASSIGN(m_loginProviderCompPtr, "Login", "Provider of login data used for revision management", false, "Login");
+		I_ASSIGN(m_rightsProviderCompPtr, "RightsProvider", "Rights provider", false, "RightsProvider");
 		I_ASSIGN(m_repositoryPathCompPtr, "RepositoryPath", "Path to the file collection folder", false, "RepositoryPath");
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "FileCompressor");
 		I_ASSIGN(m_resourceTypesCompPtr, "ResourceTypes", "List of supported resource types", false, "ResourceTypes");
@@ -101,7 +101,7 @@ public:
 	I_END_COMPONENT;
 
 public:
-	CFileCollectionCompBase2();
+	CFileCollectionCompBase();
 
 	// reimplemented (IRepositoryItemInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetRepositoryItems() override;
@@ -159,13 +159,13 @@ protected:
 	{
 	public:
 		explicit ResourceLocker(
-			CFileCollectionCompBase2& collection,
+			CFileCollectionCompBase& collection,
 			const QByteArray& resourceId,
 			const QString& resourceName);
 		~ResourceLocker();
 
 	private:
-		CFileCollectionCompBase2& m_collection;
+		CFileCollectionCompBase& m_collection;
 		QByteArray m_resourceId;
 		QString m_resourceName;
 	};
@@ -194,7 +194,7 @@ protected:
 		virtual public IRepositoryItemInfoProvider
 	{
 	public:
-		RepositoryItemInfoProvider(CFileCollectionCompBase2& parent);
+		RepositoryItemInfoProvider(CFileCollectionCompBase& parent);
 
 		bool UpdateItems();
 
@@ -214,7 +214,7 @@ protected:
 		};
 
 	private:
-		CFileCollectionCompBase2& m_parent;
+		CFileCollectionCompBase& m_parent;
 		QList<Item> m_repositoryItems;
 
 		mutable QReadWriteLock m_lock;
@@ -292,7 +292,7 @@ protected:
 	{
 	public:
 		ResourceTypeConstraints();
-		void SetParent(CFileCollectionCompBase2* parentPtr);
+		void SetParent(CFileCollectionCompBase* parentPtr);
 
 		// reimplemented (ifile::IFileResourceTypeConstraints)
 		virtual const ifile::IFileTypeInfo* GetFileTypeInfo(int resourceTypeIndex) const override;
@@ -306,7 +306,7 @@ protected:
 		virtual bool IsOptionEnabled(int index) const override;
 
 	private:
-		CFileCollectionCompBase2* m_parentPtr;
+		CFileCollectionCompBase* m_parentPtr;
 	};
 
 	typedef imod::TModelWrap<ResourceTypeConstraints> ResourceTypeConstraintsModel;
@@ -446,19 +446,19 @@ protected:
 
 protected:
 	/**
-		Whole repository revision.
-	*/
-	I_ATTR(int, m_revisionAttrPtr);
+	Provider of the version information for the entire system.
+*/
+	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 
 	/**
-		Calculate checkSum for files
+		Provider of the logged user.
 	*/
-	I_ATTR(bool, m_isCalculateCheckSumAttrPtr);
+	I_REF(iauth::ILogin, m_loginProviderCompPtr);
 
 	/**
-		Asynchronous collection loading on dedicated thread
+		Rights provider
 	*/
-	I_ATTR(bool, m_asynchronousReadingAttrPtr);
+	I_REF(iauth::IRightsProvider, m_rightsProviderCompPtr);
 
 	/**
 		Path to the directory where the file file collection is located.
@@ -511,14 +511,14 @@ private:
 	class ReaderThread: public QThread
 	{
 	public:
-		explicit ReaderThread(CFileCollectionCompBase2* parentPtr);
+		explicit ReaderThread(CFileCollectionCompBase* parentPtr);
 
 	private:
 		// reimplemented (QThread)
 		virtual void run() override;
 
 	private:
-		CFileCollectionCompBase2* m_parentPtr;
+		CFileCollectionCompBase* m_parentPtr;
 	};
 
 private:

@@ -22,12 +22,12 @@ namespace imtrepo
 */
 
 class CFileCollectionComp:
-			public CFileCollectionCompBase2,
+			public CFileCollectionCompBase,
 			virtual protected imtbase::IRevisionController
 {
 	Q_OBJECT
 public:
-	typedef CFileCollectionCompBase2 BaseClass;
+	typedef CFileCollectionCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFileCollectionComp)
 		I_ASSIGN(m_isEnableRevisionHistoryAttrPtr, "IsEnableRevisionHistory", "Allow saving item revisions", true, false);

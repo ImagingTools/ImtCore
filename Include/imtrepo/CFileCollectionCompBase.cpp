@@ -29,9 +29,9 @@ namespace imtrepo
 {
 
 
-// public methods of the class CFileCollectionCompBase2
+// public methods of the class CFileCollectionCompBase
 
-CFileCollectionCompBase2::CFileCollectionCompBase2()
+CFileCollectionCompBase::CFileCollectionCompBase()
 	:m_filesLock(QReadWriteLock::Recursive),
 	m_readerThread(this),
 	m_itemInfoProvider(*this)
@@ -42,13 +42,13 @@ CFileCollectionCompBase2::CFileCollectionCompBase2()
 
 // reimplemented (IRepositoryItemInfoProvider)
 
-const imtbase::ICollectionInfo& CFileCollectionCompBase2::GetRepositoryItems()
+const imtbase::ICollectionInfo& CFileCollectionCompBase::GetRepositoryItems()
 {
 	return m_itemInfoProvider;
 }
 
 
-const IRepositoryItemInfo* CFileCollectionCompBase2::GetRepositoryItemInfo(const QByteArray& itemId) const
+const IRepositoryItemInfo* CFileCollectionCompBase::GetRepositoryItemInfo(const QByteArray& itemId) const
 {
 	return m_itemInfoProvider.GetRepositoryItemInfo(itemId);
 }
@@ -56,7 +56,7 @@ const IRepositoryItemInfo* CFileCollectionCompBase2::GetRepositoryItemInfo(const
 
 // reimplemented (IFileCollectionInfo)
 
-QString CFileCollectionCompBase2::GetCollectionRootFolder() const
+QString CFileCollectionCompBase::GetCollectionRootFolder() const
 {
 	QString retVal;
 
@@ -68,7 +68,7 @@ QString CFileCollectionCompBase2::GetCollectionRootFolder() const
 }
 
 
-int CFileCollectionCompBase2::GetRepositoryRevision() const
+int CFileCollectionCompBase::GetRepositoryRevision() const
 {
 	return *m_revisionAttrPtr;
 }
@@ -76,7 +76,7 @@ int CFileCollectionCompBase2::GetRepositoryRevision() const
 
 // reimplemented (IFileObjectCollection)
 
-const ifile::IFileResourceTypeConstraints* CFileCollectionCompBase2::GetFileTypeConstraints() const
+const ifile::IFileResourceTypeConstraints* CFileCollectionCompBase::GetFileTypeConstraints() const
 {
 	if (!m_resourceFileTypesCompPtr.IsValid() || !m_resourceTypesCompPtr.IsValid()){
 		return nullptr;
@@ -86,7 +86,7 @@ const ifile::IFileResourceTypeConstraints* CFileCollectionCompBase2::GetFileType
 }
 
 
-IFileObjectCollection::FileInfo CFileCollectionCompBase2::GetFileInfo(const QByteArray& objectId) const
+IFileObjectCollection::FileInfo CFileCollectionCompBase::GetFileInfo(const QByteArray& objectId) const
 {
 	FileInfo retVal;
 
@@ -109,7 +109,7 @@ IFileObjectCollection::FileInfo CFileCollectionCompBase2::GetFileInfo(const QByt
 }
 
 
-QString CFileCollectionCompBase2::GetFile(
+QString CFileCollectionCompBase::GetFile(
 	const QByteArray& objectId,
 	const QString& targetFilePath) const
 {
@@ -150,7 +150,7 @@ QString CFileCollectionCompBase2::GetFile(
 }
 
 
-QByteArray CFileCollectionCompBase2::InsertFile(
+QByteArray CFileCollectionCompBase::InsertFile(
 			const QString& localFilePath,
 			const QByteArray& typeId,
 			const QString& objectName,
@@ -265,7 +265,7 @@ QByteArray CFileCollectionCompBase2::InsertFile(
 }
 
 
-bool CFileCollectionCompBase2::UpdateFile(
+bool CFileCollectionCompBase::UpdateFile(
 	const QString& localFilePath,
 	const QByteArray& objectId)
 {
@@ -329,7 +329,7 @@ bool CFileCollectionCompBase2::UpdateFile(
 }
 
 
-bool CFileCollectionCompBase2::ExportFile(const QByteArray& objectId, const QString& targetFilePath) const
+bool CFileCollectionCompBase::ExportFile(const QByteArray& objectId, const QString& targetFilePath) const
 {
 	if (!targetFilePath.isEmpty()){
 		if (!IsPathInsideRepository(targetFilePath)){
@@ -343,7 +343,7 @@ bool CFileCollectionCompBase2::ExportFile(const QByteArray& objectId, const QStr
 }
 
 
-QByteArray CFileCollectionCompBase2::ImportFile(const QByteArray& /*typeId*/, const QString& /*sourceFilePath*/)
+QByteArray CFileCollectionCompBase::ImportFile(const QByteArray& /*typeId*/, const QString& /*sourceFilePath*/)
 {
 	return QByteArray();
 }
@@ -351,19 +351,19 @@ QByteArray CFileCollectionCompBase2::ImportFile(const QByteArray& /*typeId*/, co
 
 // reimplemented (IObjectCollection)
 
-const imtbase::IRevisionController* CFileCollectionCompBase2::GetRevisionController() const
+const imtbase::IRevisionController* CFileCollectionCompBase::GetRevisionController() const
 {
 	return nullptr;
 }
 
 
-int CFileCollectionCompBase2::GetOperationFlags(const QByteArray& /*objectId*/) const
+int CFileCollectionCompBase::GetOperationFlags(const QByteArray& /*objectId*/) const
 {
 	return OF_SUPPORT_DELETE | OF_SUPPORT_EDIT | OF_SUPPORT_INSERT | OF_SUPPORT_RENAME;
 }
 
 
-bool CFileCollectionCompBase2::GetDataMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const
+bool CFileCollectionCompBase::GetDataMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const
 {
 	QReadLocker lockCollection(&m_filesLock);
 
@@ -388,7 +388,7 @@ bool CFileCollectionCompBase2::GetDataMetaInfo(const QByteArray& objectId, ifile
 }
 
 
-QByteArray CFileCollectionCompBase2::InsertNewObject(
+QByteArray CFileCollectionCompBase::InsertNewObject(
 	const QByteArray& typeId,
 	const QString& name,
 	const QString& description,
@@ -436,19 +436,19 @@ QByteArray CFileCollectionCompBase2::InsertNewObject(
 }
 
 
-bool CFileCollectionCompBase2::RemoveObject(const QByteArray& /*objectId*/)
+bool CFileCollectionCompBase::RemoveObject(const QByteArray& /*objectId*/)
 {
 	return false;
 }
 
 
-const istd::IChangeable* CFileCollectionCompBase2::GetObjectPtr(const QByteArray& /*objectId*/) const
+const istd::IChangeable* CFileCollectionCompBase::GetObjectPtr(const QByteArray& /*objectId*/) const
 {
 	return nullptr;
 }
 
 
-bool CFileCollectionCompBase2::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const
+bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const
 {
 	for (const CollectionItem& item : m_files){
 		if (item.fileId == objectId){
@@ -477,7 +477,7 @@ bool CFileCollectionCompBase2::GetObjectData(const QByteArray& objectId, DataPtr
 }
 
 
-bool CFileCollectionCompBase2::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode /*mode*/)
+bool CFileCollectionCompBase::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const ifile::IFilePersistence* persistencePtr = GetPersistenceForResource(GetObjectTypeId(objectId));
 	if (persistencePtr == nullptr){
@@ -505,12 +505,12 @@ bool CFileCollectionCompBase2::SetObjectData(const QByteArray& objectId, const i
 }
 
 
-void CFileCollectionCompBase2::SetObjectName(const QByteArray& /*objectId*/, const QString& /*objectName*/)
+void CFileCollectionCompBase::SetObjectName(const QByteArray& /*objectId*/, const QString& /*objectName*/)
 {
 }
 
 
-void CFileCollectionCompBase2::SetObjectDescription(const QByteArray& objectId, const QString& objectDescription)
+void CFileCollectionCompBase::SetObjectDescription(const QByteArray& objectId, const QString& objectDescription)
 {
 	QWriteLocker locker(&m_filesLock);
 
@@ -538,12 +538,12 @@ void CFileCollectionCompBase2::SetObjectDescription(const QByteArray& objectId, 
 }
 
 
-void CFileCollectionCompBase2::SetObjectEnabled(const QByteArray& /*objectId*/, bool /*isEnabled*/)
+void CFileCollectionCompBase::SetObjectEnabled(const QByteArray& /*objectId*/, bool /*isEnabled*/)
 {
 }
 
 
-bool CFileCollectionCompBase2::RegisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler)
+bool CFileCollectionCompBase::RegisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler)
 {
 	if (eventHandler != nullptr && !m_eventHandlerList.contains(eventHandler)){
 		m_eventHandlerList.append(eventHandler);
@@ -557,7 +557,7 @@ bool CFileCollectionCompBase2::RegisterEventHandler(imtbase::IObjectCollectionEv
 }
 
 
-bool CFileCollectionCompBase2::UnregisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler)
+bool CFileCollectionCompBase::UnregisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler)
 {
 	int index = m_eventHandlerList.indexOf(eventHandler, 0);
 	if (index >= 0){
@@ -574,7 +574,7 @@ bool CFileCollectionCompBase2::UnregisterEventHandler(imtbase::IObjectCollection
 
 // reimplemented (IObjectCollectionInfo)
 
-bool CFileCollectionCompBase2::GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const
+bool CFileCollectionCompBase::GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const
 {
 	QReadLocker lockCollection(&m_filesLock);
 
@@ -593,13 +593,13 @@ bool CFileCollectionCompBase2::GetCollectionItemMetaInfo(const QByteArray& objec
 }
 
 
-const iprm::IOptionsList* CFileCollectionCompBase2::GetObjectTypesInfo() const
+const iprm::IOptionsList* CFileCollectionCompBase::GetObjectTypesInfo() const
 {
 	return &m_resourceTypeConstraints;
 }
 
 
-imtbase::IObjectCollectionInfo::Id CFileCollectionCompBase2::GetObjectTypeId(const QByteArray& objectId) const
+imtbase::IObjectCollectionInfo::Id CFileCollectionCompBase::GetObjectTypeId(const QByteArray& objectId) const
 {
 	m_filesLock.lockForRead();
 
@@ -618,7 +618,7 @@ imtbase::IObjectCollectionInfo::Id CFileCollectionCompBase2::GetObjectTypeId(con
 
 // reimplemented (ICollectionInfo)
 
-imtbase::ICollectionInfo::Ids CFileCollectionCompBase2::GetElementIds() const
+imtbase::ICollectionInfo::Ids CFileCollectionCompBase::GetElementIds() const
 {
 	Ids retVal;
 
@@ -634,7 +634,7 @@ imtbase::ICollectionInfo::Ids CFileCollectionCompBase2::GetElementIds() const
 }
 
 
-QVariant CFileCollectionCompBase2::GetElementInfo(const QByteArray& elementId, int infoType) const
+QVariant CFileCollectionCompBase::GetElementInfo(const QByteArray& elementId, int infoType) const
 {
 	QReadLocker locker(&m_filesLock);
 
@@ -663,7 +663,7 @@ QVariant CFileCollectionCompBase2::GetElementInfo(const QByteArray& elementId, i
 
 // static protected methods of the class CFileCollectionCompBase
 
-CFileCollectionCompBase2::RepositoryInfo CFileCollectionCompBase2::GetRepositoryInfo()
+CFileCollectionCompBase::RepositoryInfo CFileCollectionCompBase::GetRepositoryInfo()
 {
 	RepositoryInfo retVal;
 
@@ -676,7 +676,7 @@ CFileCollectionCompBase2::RepositoryInfo CFileCollectionCompBase2::GetRepository
 
 // protected methods of the class CFileCollectionCompBase
 
-void CFileCollectionCompBase2::EnumerateRepositoryItems(QFileInfoList& fileList) const
+void CFileCollectionCompBase::EnumerateRepositoryItems(QFileInfoList& fileList) const
 {
 	QString repositoryRootPath = GetCollectionRootFolder();
 	QDir repositoryRootDir(repositoryRootPath);
@@ -685,7 +685,7 @@ void CFileCollectionCompBase2::EnumerateRepositoryItems(QFileInfoList& fileList)
 }
 
 
-QString CFileCollectionCompBase2::CreateWorkingDir() const
+QString CFileCollectionCompBase::CreateWorkingDir() const
 {
 	QString workingPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString();
 
@@ -697,7 +697,7 @@ QString CFileCollectionCompBase2::CreateWorkingDir() const
 }
 
 
-istd::IChangeable* CFileCollectionCompBase2::CreateDataObject(const QByteArray& typeId) const
+istd::IChangeable* CFileCollectionCompBase::CreateDataObject(const QByteArray& typeId) const
 {
 	int factoryIndex = -1;
 
@@ -718,7 +718,7 @@ istd::IChangeable* CFileCollectionCompBase2::CreateDataObject(const QByteArray& 
 }
 
 
-istd::IChangeable* CFileCollectionCompBase2::CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const
+istd::IChangeable* CFileCollectionCompBase::CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const
 {
 	istd::IChangeable* retVal = CreateDataObject(typeId);
 	if (retVal != nullptr){
@@ -735,7 +735,7 @@ istd::IChangeable* CFileCollectionCompBase2::CreateObjectFromFile(const QString&
 }
 
 
-const ifile::IFilePersistence* CFileCollectionCompBase2::GetPersistenceForResource(const QByteArray& typeId) const
+const ifile::IFilePersistence* CFileCollectionCompBase::GetPersistenceForResource(const QByteArray& typeId) const
 {
 	int factoryIndex = -1;
 
@@ -756,7 +756,7 @@ const ifile::IFilePersistence* CFileCollectionCompBase2::GetPersistenceForResour
 }
 
 
-QString CFileCollectionCompBase2::SaveCollectionItem(const CollectionItem& collectionItem, const QString& dataFilePath) const
+QString CFileCollectionCompBase::SaveCollectionItem(const CollectionItem& collectionItem, const QString& dataFilePath) const
 {
 	QString itemFilePath = dataFilePath.isEmpty() ? GetDataItemFilePath(collectionItem) : dataFilePath;
 
@@ -772,7 +772,7 @@ QString CFileCollectionCompBase2::SaveCollectionItem(const CollectionItem& colle
 }
 
 
-QString CFileCollectionCompBase2::GetDataItemFilePath(const CollectionItem& repositoryFile) const
+QString CFileCollectionCompBase::GetDataItemFilePath(const CollectionItem& repositoryFile) const
 {
 	QString retVal;
 
@@ -786,7 +786,7 @@ QString CFileCollectionCompBase2::GetDataItemFilePath(const CollectionItem& repo
 }
 
 
-QString CFileCollectionCompBase2::GetMetaInfoFilePath(const CollectionItem& repositoryFile) const
+QString CFileCollectionCompBase::GetMetaInfoFilePath(const CollectionItem& repositoryFile) const
 {
 	QString retVal;
 
@@ -800,7 +800,7 @@ QString CFileCollectionCompBase2::GetMetaInfoFilePath(const CollectionItem& repo
 }
 
 
-QString CFileCollectionCompBase2::CalculateShortFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const
+QString CFileCollectionCompBase::CalculateShortFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const
 {
 	const int maxFileNameLength = 255;
 
@@ -824,7 +824,7 @@ QString CFileCollectionCompBase2::CalculateShortFileName(const QString& fileName
 }
 
 
-bool CFileCollectionCompBase2::SaveMetaInfo(const idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const
+bool CFileCollectionCompBase::SaveMetaInfo(const idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const
 {
 	const iser::ISerializable* serializablePtr = dynamic_cast<const iser::ISerializable*>(&metaInfo);
 	if (serializablePtr != nullptr){
@@ -837,7 +837,7 @@ bool CFileCollectionCompBase2::SaveMetaInfo(const idoc::IDocumentMetaInfo& metaI
 }
 
 
-bool CFileCollectionCompBase2::LoadMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const
+bool CFileCollectionCompBase::LoadMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const
 {
 	if (QFile::exists(metaInfoFilePath)){
 		iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(&metaInfo);
@@ -852,7 +852,7 @@ bool CFileCollectionCompBase2::LoadMetaInfo(idoc::IDocumentMetaInfo& metaInfo, c
 }
 
 
-bool CFileCollectionCompBase2::IsPathInsideRepository(const QString& filePath) const
+bool CFileCollectionCompBase::IsPathInsideRepository(const QString& filePath) const
 {
 	QString cleanFileDir = QDir::cleanPath(QFileInfo(filePath).absolutePath());
 	QString cleanRepositoryDir = QDir::cleanPath(GetCollectionRootFolder());
@@ -861,7 +861,7 @@ bool CFileCollectionCompBase2::IsPathInsideRepository(const QString& filePath) c
 }
 
 
-int CFileCollectionCompBase2::GetFileIndexById(const QByteArray& fileId) const
+int CFileCollectionCompBase::GetFileIndexById(const QByteArray& fileId) const
 {
 	if (fileId.isEmpty()){
 		return -1;
@@ -877,7 +877,7 @@ int CFileCollectionCompBase2::GetFileIndexById(const QByteArray& fileId) const
 }
 
 
-int CFileCollectionCompBase2::GetFileIndexByName(const QString& fileName) const
+int CFileCollectionCompBase::GetFileIndexByName(const QString& fileName) const
 {
 	for (int i = 0; i < m_files.count(); ++i){
 		if (m_files[i].objectName == fileName){
@@ -889,7 +889,7 @@ int CFileCollectionCompBase2::GetFileIndexByName(const QString& fileName) const
 }
 
 
-imtbase::IObjectCollection::MetaInfoPtr CFileCollectionCompBase2::CreateItemMetaInfo(const QString& dataObjectFilePath, const QByteArray& typeId) const
+imtbase::IObjectCollection::MetaInfoPtr CFileCollectionCompBase::CreateItemMetaInfo(const QString& dataObjectFilePath, const QByteArray& typeId) const
 {
 	IFileObjectCollection::MetaInfoPtr retVal;
 
@@ -923,7 +923,7 @@ imtbase::IObjectCollection::MetaInfoPtr CFileCollectionCompBase2::CreateItemMeta
 }
 
 
-bool CFileCollectionCompBase2::CreateItemMetaInfoFile(const QString& dataObjectFilePath, const QByteArray& typeId, const QString& metaInfoFilePath) const
+bool CFileCollectionCompBase::CreateItemMetaInfoFile(const QString& dataObjectFilePath, const QByteArray& typeId, const QString& metaInfoFilePath) const
 {
 	IFileObjectCollection::MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(dataObjectFilePath, typeId);
 	if (metaInfoPtr.IsValid()){
@@ -936,7 +936,7 @@ bool CFileCollectionCompBase2::CreateItemMetaInfoFile(const QString& dataObjectF
 }
 
 
-void CFileCollectionCompBase2::UpdateItemMetaInfo(CollectionItem& item) const
+void CFileCollectionCompBase::UpdateItemMetaInfo(CollectionItem& item) const
 {
 	QString metaInfoFilePath = GetMetaInfoFilePath(item);
 	QFileInfo fileInfo(metaInfoFilePath);
@@ -956,7 +956,7 @@ void CFileCollectionCompBase2::UpdateItemMetaInfo(CollectionItem& item) const
 }
 
 
-void CFileCollectionCompBase2::ReadRepositoryItems()
+void CFileCollectionCompBase::ReadRepositoryItems()
 {
 	istd::CChangeNotifier changeNotifier(this, &istd::IChangeable::GetAllChanges());
 
@@ -973,7 +973,7 @@ void CFileCollectionCompBase2::ReadRepositoryItems()
 }
 
 
-void CFileCollectionCompBase2::ReadItem(Files& filesPtr, const QString& itemFilePath)
+void CFileCollectionCompBase::ReadItem(Files& filesPtr, const QString& itemFilePath)
 {
 	CollectionItem fileItem(GetCollectionRootFolder(), *m_revisionAttrPtr);
 	if (!ReadItemFile(fileItem, itemFilePath)){
@@ -1011,7 +1011,7 @@ void CFileCollectionCompBase2::ReadItem(Files& filesPtr, const QString& itemFile
 }
 
 
-bool CFileCollectionCompBase2::ReadItemFile(CollectionItem& collectionItem, const QString& itemFilePath)
+bool CFileCollectionCompBase::ReadItemFile(CollectionItem& collectionItem, const QString& itemFilePath)
 {
 	ifile::CCompactXmlFileReadArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
 
@@ -1019,7 +1019,7 @@ bool CFileCollectionCompBase2::ReadItemFile(CollectionItem& collectionItem, cons
 }
 
 
-void CFileCollectionCompBase2::StartRepositoryLoader()
+void CFileCollectionCompBase::StartRepositoryLoader()
 {
 	if (m_progressManagerListCompPtr.IsValid()){
 		for (int i = 0; i < m_progressManagerListCompPtr.GetCount(); i++){
@@ -1031,7 +1031,7 @@ void CFileCollectionCompBase2::StartRepositoryLoader()
 }
 
 
-void CFileCollectionCompBase2::OnReaderProgress(int progress)
+void CFileCollectionCompBase::OnReaderProgress(int progress)
 {
 	if (m_progressManagerListCompPtr.IsValid()){
 		for (int i = 0; i < m_progressManagerListCompPtr.GetCount(); i++){
@@ -1041,7 +1041,7 @@ void CFileCollectionCompBase2::OnReaderProgress(int progress)
 }
 
 
-void CFileCollectionCompBase2::OnReaderFinished()
+void CFileCollectionCompBase::OnReaderFinished()
 {
 	istd::CChangeNotifier changeNotifier(this, &istd::IChangeable::GetAllChanges());
 
@@ -1057,12 +1057,12 @@ void CFileCollectionCompBase2::OnReaderFinished()
 }
 
 
-void CFileCollectionCompBase2::OnReaderInterrupted()
+void CFileCollectionCompBase::OnReaderInterrupted()
 {
 }
 
 
-bool CFileCollectionCompBase2::IsObjectIdLocked(const QByteArray& resourceId)
+bool CFileCollectionCompBase::IsObjectIdLocked(const QByteArray& resourceId)
 {
 	QMutexLocker locker(&m_lockedObjectInfoMutex);
 
@@ -1070,7 +1070,7 @@ bool CFileCollectionCompBase2::IsObjectIdLocked(const QByteArray& resourceId)
 }
 
 
-bool CFileCollectionCompBase2::IsObjectNameLocked(const QString& resourceName)
+bool CFileCollectionCompBase::IsObjectNameLocked(const QString& resourceName)
 {
 	QMutexLocker locker(&m_lockedObjectInfoMutex);
 
@@ -1078,7 +1078,7 @@ bool CFileCollectionCompBase2::IsObjectNameLocked(const QString& resourceName)
 }
 
 
-bool CFileCollectionCompBase2::IsObjectIdUsed(const QByteArray& objectId)
+bool CFileCollectionCompBase::IsObjectIdUsed(const QByteArray& objectId)
 {
 	if (objectId.isEmpty()){
 		return false;
@@ -1094,7 +1094,7 @@ bool CFileCollectionCompBase2::IsObjectIdUsed(const QByteArray& objectId)
 }
 
 
-bool CFileCollectionCompBase2::FinishInsertFileTransaction(
+bool CFileCollectionCompBase::FinishInsertFileTransaction(
 	const QString& workingPath,
 	const QString& repositoryPath,
 	const QByteArray& fileId,
@@ -1130,7 +1130,7 @@ bool CFileCollectionCompBase2::FinishInsertFileTransaction(
 
 // reimplemented (icomp::CComponentBase)
 
-void CFileCollectionCompBase2::OnComponentCreated()
+void CFileCollectionCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
@@ -1163,7 +1163,7 @@ void CFileCollectionCompBase2::OnComponentCreated()
 }
 
 
-void CFileCollectionCompBase2::OnComponentDestroyed()
+void CFileCollectionCompBase::OnComponentDestroyed()
 {
 	m_readerThread.requestInterruption();
 	m_readerThread.wait();
@@ -1179,7 +1179,7 @@ void CFileCollectionCompBase2::OnComponentDestroyed()
 
 // public methods of the embedded class RepositoryItemInfo
 
-void CFileCollectionCompBase2::RepositoryItemInfo::SetRepositoryItemFilePath(RepositoryFileType fileId, const QString& filePath)
+void CFileCollectionCompBase::RepositoryItemInfo::SetRepositoryItemFilePath(RepositoryFileType fileId, const QString& filePath)
 {
 	m_files[int(fileId)] = filePath;
 }
@@ -1187,7 +1187,7 @@ void CFileCollectionCompBase2::RepositoryItemInfo::SetRepositoryItemFilePath(Rep
 
 // reimplemented (IRepositoryItemInfo)
 
-IRepositoryItemInfo::RepositoryFileTypes CFileCollectionCompBase2::RepositoryItemInfo::GetRepositoryItemFileTypes() const
+IRepositoryItemInfo::RepositoryFileTypes CFileCollectionCompBase::RepositoryItemInfo::GetRepositoryItemFileTypes() const
 {
 	IRepositoryItemInfo::RepositoryFileTypes types;
 
@@ -1199,7 +1199,7 @@ IRepositoryItemInfo::RepositoryFileTypes CFileCollectionCompBase2::RepositoryIte
 }
 
 
-QString CFileCollectionCompBase2::RepositoryItemInfo::GetRepositoryItemFilePath(RepositoryFileType fileId) const
+QString CFileCollectionCompBase::RepositoryItemInfo::GetRepositoryItemFilePath(RepositoryFileType fileId) const
 {
 	if (m_files.contains(fileId)){
 		return m_files[fileId];
@@ -1211,13 +1211,13 @@ QString CFileCollectionCompBase2::RepositoryItemInfo::GetRepositoryItemFilePath(
 
 // public methods of the embedded class RepositoryItemInfoProvider
 
-CFileCollectionCompBase2::RepositoryItemInfoProvider::RepositoryItemInfoProvider(CFileCollectionCompBase2& parent)
+CFileCollectionCompBase::RepositoryItemInfoProvider::RepositoryItemInfoProvider(CFileCollectionCompBase& parent)
 	:m_parent(parent)
 {
 }
 
 
-bool CFileCollectionCompBase2::RepositoryItemInfoProvider::UpdateItems()
+bool CFileCollectionCompBase::RepositoryItemInfoProvider::UpdateItems()
 {
 	QFileInfoList fileList;
 	m_parent.EnumerateRepositoryItems(fileList);
@@ -1246,13 +1246,13 @@ bool CFileCollectionCompBase2::RepositoryItemInfoProvider::UpdateItems()
 
 // reimplemented (IRepositoryItemInfoProvider)
 
-const imtbase::ICollectionInfo& CFileCollectionCompBase2::RepositoryItemInfoProvider::GetRepositoryItems()
+const imtbase::ICollectionInfo& CFileCollectionCompBase::RepositoryItemInfoProvider::GetRepositoryItems()
 {
 	return *this;
 }
 
 
-const IRepositoryItemInfo* CFileCollectionCompBase2::RepositoryItemInfoProvider::GetRepositoryItemInfo(const QByteArray& itemId) const
+const IRepositoryItemInfo* CFileCollectionCompBase::RepositoryItemInfoProvider::GetRepositoryItemInfo(const QByteArray& itemId) const
 {
 	QReadLocker locker(&m_lock);
 
@@ -1268,13 +1268,13 @@ const IRepositoryItemInfo* CFileCollectionCompBase2::RepositoryItemInfoProvider:
 
 // public methods of the embedded class ResourceTypeConstraints
 
-CFileCollectionCompBase2::ResourceTypeConstraints::ResourceTypeConstraints()
+CFileCollectionCompBase::ResourceTypeConstraints::ResourceTypeConstraints()
 	:m_parentPtr(nullptr)
 {
 }
 
 
-void CFileCollectionCompBase2::ResourceTypeConstraints::SetParent(CFileCollectionCompBase2* parentPtr)
+void CFileCollectionCompBase::ResourceTypeConstraints::SetParent(CFileCollectionCompBase* parentPtr)
 {
 	m_parentPtr = parentPtr;
 }
@@ -1282,7 +1282,7 @@ void CFileCollectionCompBase2::ResourceTypeConstraints::SetParent(CFileCollectio
 
 // reimplemented (IFileResourceTypeConstraints)
 
-const ifile::IFileTypeInfo* CFileCollectionCompBase2::ResourceTypeConstraints::GetFileTypeInfo(int typeIndex) const
+const ifile::IFileTypeInfo* CFileCollectionCompBase::ResourceTypeConstraints::GetFileTypeInfo(int typeIndex) const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1298,7 +1298,7 @@ const ifile::IFileTypeInfo* CFileCollectionCompBase2::ResourceTypeConstraints::G
 
 // reimplemented (iprm::IOptionsList)
 
-int CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionsFlags() const
+int CFileCollectionCompBase::ResourceTypeConstraints::GetOptionsFlags() const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1307,7 +1307,7 @@ int CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionsFlags() const
 }
 
 
-int CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionsCount() const
+int CFileCollectionCompBase::ResourceTypeConstraints::GetOptionsCount() const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1316,7 +1316,7 @@ int CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionsCount() const
 }
 
 
-QString CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionName(int index) const
+QString CFileCollectionCompBase::ResourceTypeConstraints::GetOptionName(int index) const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1325,7 +1325,7 @@ QString CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionName(int ind
 }
 
 
-QString CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionDescription(int index) const
+QString CFileCollectionCompBase::ResourceTypeConstraints::GetOptionDescription(int index) const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1334,7 +1334,7 @@ QString CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionDescription(
 }
 
 
-QByteArray CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionId(int index) const
+QByteArray CFileCollectionCompBase::ResourceTypeConstraints::GetOptionId(int index) const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1343,7 +1343,7 @@ QByteArray CFileCollectionCompBase2::ResourceTypeConstraints::GetOptionId(int in
 }
 
 
-bool CFileCollectionCompBase2::ResourceTypeConstraints::IsOptionEnabled(int index) const
+bool CFileCollectionCompBase::ResourceTypeConstraints::IsOptionEnabled(int index) const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 	Q_ASSERT(m_parentPtr->m_resourceFileTypesCompPtr.IsValid());
@@ -1354,8 +1354,8 @@ bool CFileCollectionCompBase2::ResourceTypeConstraints::IsOptionEnabled(int inde
 
 // public methods of embedded class QResourceLocker
 
-CFileCollectionCompBase2::ResourceLocker::ResourceLocker(
-			CFileCollectionCompBase2& collection,
+CFileCollectionCompBase::ResourceLocker::ResourceLocker(
+			CFileCollectionCompBase& collection,
 			const QByteArray& objectId,
 			const QString& objectName)
 			:m_collection(collection)
@@ -1374,7 +1374,7 @@ CFileCollectionCompBase2::ResourceLocker::ResourceLocker(
 }
 
 
-CFileCollectionCompBase2::ResourceLocker::~ResourceLocker()
+CFileCollectionCompBase::ResourceLocker::~ResourceLocker()
 {
 	QMutexLocker locker(&m_collection.m_lockedObjectInfoMutex);
 
@@ -1390,7 +1390,7 @@ CFileCollectionCompBase2::ResourceLocker::~ResourceLocker()
 
 // public methods of embedded class ReaderThread
 
-CFileCollectionCompBase2::ReaderThread::ReaderThread(CFileCollectionCompBase2* parentPtr)
+CFileCollectionCompBase::ReaderThread::ReaderThread(CFileCollectionCompBase* parentPtr)
 	:m_parentPtr(parentPtr)
 {
 }
@@ -1400,7 +1400,7 @@ CFileCollectionCompBase2::ReaderThread::ReaderThread(CFileCollectionCompBase2* p
 
 // reimplemented (QThread)
 
-void CFileCollectionCompBase2::ReaderThread::run()
+void CFileCollectionCompBase::ReaderThread::run()
 {
 	QFileInfoList fileList;
 	m_parentPtr->EnumerateRepositoryItems(fileList);
