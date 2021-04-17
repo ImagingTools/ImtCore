@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Main Window</string>
+   <string>Edit License</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QToolBar[ImtToolBar=true] &gt; QToolButton

@@ -24,6 +24,13 @@ CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 	m_collectionPtr(nullptr)
 {
 	SetupSummaryInformation();
+	EnableLocalization(true);
+}
+
+
+CObjectCollectionViewDelegate::~CObjectCollectionViewDelegate()
+{
+	EnableLocalization(false);
 }
 
 

@@ -175,6 +175,10 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
+	if (*m_hideHomeButtonAttrPtr){
+		HomeButton->hide();
+	}
+
 	if (m_dashboardGuiCompPtr.IsValid()){
 		m_dashboardGuiCompPtr->CreateGui(DashBoardFrame);
 	}

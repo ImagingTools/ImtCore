@@ -48,6 +48,7 @@ public:
 	};
 
 	CObjectCollectionViewDelegate();
+	~CObjectCollectionViewDelegate();
 
 	// reimplemented (ICollectionViewDelegate)
 	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;

@@ -82,10 +82,12 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CThumbnailDecoratorGuiCompAttr2);
 		I_ASSIGN(m_hideMenuPanelOnHomePageAttrPtr, "HideMenuPanelOnHomePage", "Hide menu panel when home page is active", true, true);
+		I_ASSIGN(m_hideHomeButtonAttrPtr, "HideHomeButton", "Hide home button", true, false);
 	I_END_COMPONENT;
 
 protected:
 	I_ATTR(bool, m_hideMenuPanelOnHomePageAttrPtr);
+	I_ATTR(bool, m_hideHomeButtonAttrPtr);
 };
 
 
