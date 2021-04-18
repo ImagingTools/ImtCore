@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4902" Description="ACF"/>
-            <Version Id="1" Number="2135" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331010" Description="Qt Framework"/>
+            <Version Id="0" Number="4909" Description="ACF"/>
+            <Version Id="1" Number="2137" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -13,8 +13,8 @@
         <Element ComponentName="DesignSchema" X="125" Y="425" Note=""/>
         <Element ComponentName="Designs" X="125" Y="525" Note=""/>
         <Element ComponentName="General" X="350" Y="350" Note=""/>
-        <Element ComponentName="ImtCoreLocalization" X="350" Y="525" Note=""/>
         <Element ComponentName="Language" X="350" Y="425" Note=""/>
+        <Element ComponentName="LisaLocalization" X="700" Y="600" Note=""/>
         <Element ComponentName="Preferences" X="625" Y="275" Note=""/>
         <Element ComponentName="PreferencesFilePath" X="625" Y="125" Note=""/>
         <Element ComponentName="SystemLocation" X="625" Y="50" Note=""/>
