@@ -18,47 +18,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-30"/>
+        <location line="-28"/>
         <source>3D-Viewer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+32"/>
-        <location line="+4"/>
+        <location line="+30"/>
         <location line="+2"/>
         <location line="+4"/>
+        <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location line="+4"/>
         <location line="+2"/>
         <location line="+4"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
-        <location line="+4"/>
         <location line="+2"/>
         <location line="+4"/>
+        <location line="+2"/>
         <source>Edit License</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-8"/>
+        <location line="-4"/>
         <location line="+6"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
         <location line="+6"/>
-        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-8"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-4"/>
         <location line="+6"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+6"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-38"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-38"/>
-        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-40"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-40"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-38"/>
         <source>STL</source>
         <translation type="unfinished"></translation>
     </message>
@@ -125,18 +125,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-22"/>
-        <location line="+44"/>
+        <location line="-26"/>
+        <location line="+48"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+22"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+22"/>
         <source>ImtCore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-4"/>
+        <location line="-44"/>
+        <location line="+42"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-2"/>
         <source>ImagingTools GmbH</source>
         <translation type="unfinished"></translation>
     </message>
@@ -146,7 +146,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-2"/>
         <source>Server Dermo</source>
         <translation type="unfinished"></translation>
     </message>
@@ -169,7 +169,7 @@
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location line="+108"/>
@@ -328,7 +328,7 @@
         <location line="+17"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location line="+45"/>
@@ -550,6 +550,19 @@
     </message>
 </context>
 <context>
+    <name>CFeatureCollectionGuiComp</name>
+    <message>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CFeatureCollectionGuiComp.h" line="+79"/>
+        <source>Feature Package</source>
+        <translation>Пакет функций</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Page2</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
     <name>CFeatureInfoEditorGuiComp</name>
     <message>
         <location filename="../../../Include/imtlicgui/CFeatureInfoEditorGuiComp.ui" line="+14"/>
@@ -631,14 +644,31 @@
     </message>
     <message>
         <location line="+125"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CLicenseInfoEditorGuiComp.h" line="+213"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h" line="+1"/>
         <source>License Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Название лицензии</translation>
     </message>
     <message>
         <location line="+12"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CLicenseInfoEditorGuiComp.h" line="+1"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h" line="+1"/>
         <source>License-ID</source>
+        <translation>Идентификатор лицензии</translation>
+    </message>
+    <message>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CLicenseInfoEditorGuiComp.h" line="-2"/>
+        <source>Main Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>License Package</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Valid Until</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -717,7 +747,7 @@
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -801,25 +831,25 @@
         <location filename="../../../Include/imtgui/CStandardDocumentViewDecorator.ui" line="+59"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+146"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Отменить</translation>
     </message>
     <message>
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>Повторить</translation>
     </message>
     <message>
         <location line="+70"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить</translation>
     </message>
     <message>
         <location line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть</translation>
     </message>
 </context>
 <context>
@@ -828,7 +858,7 @@
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+539"/>
         <source>Main Window</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+73"/>
@@ -838,61 +868,61 @@
         <location line="+1"/>
         <location line="+1"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+35"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Welcome</source>
-        <translation type="unfinished"></translation>
+        <translation>Добро пожаловать</translation>
     </message>
     <message>
         <location line="+109"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Commands</source>
-        <translation type="unfinished"></translation>
+        <translation>Команды</translation>
     </message>
     <message>
         <location line="+20"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Log out</source>
-        <translation type="unfinished"></translation>
+        <translation>Выйти из системы</translation>
     </message>
     <message>
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Клавиатура</translation>
     </message>
     <message>
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Dashboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Приборная панель</translation>
     </message>
     <message>
         <location line="+20"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Выйти</translation>
     </message>
     <message>
         <location line="+206"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation>Пользователь</translation>
     </message>
     <message>
         <location line="+17"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Пароль</translation>
     </message>
     <message>
         <location line="+36"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+2"/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Вход</translation>
     </message>
 </context>
 <context>
@@ -968,7 +998,7 @@
         <location line="-45"/>
         <location line="+46"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <location line="-45"/>
@@ -1028,7 +1058,7 @@
     <message>
         <location line="+2"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Описание</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1263,110 +1293,110 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtgui/CDocumentWorkspaceGuiComp.cpp" line="+180"/>
         <source>&amp;Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Отменить</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Отменить</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Undo last document changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Отменить последние изменения</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Повторить</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>Повторить</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Redo last document changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Повторить последние изменения</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Close</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Закрыть</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Close the document</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть документ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Save</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Сохранить</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Save the document changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить изменения</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CFeatureInfo.cpp" line="+19"/>
         <source>Feature</source>
-        <translation type="unfinished"></translation>
+        <translation>Функция</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CFeaturePackageMetaInfoCreatorComp.cpp" line="+63"/>
         <source>Features</source>
-        <translation type="unfinished"></translation>
+        <translation>Функции</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CProductInstanceMetaInfoCreatorComp.cpp" line="+49"/>
         <source>Unlimited</source>
-        <translation type="unfinished"></translation>
+        <translation>Без ограничений</translation>
     </message>
     <message>
         <location line="+5"/>
         <source> (Valid until: %1)</source>
-        <translation type="unfinished"></translation>
+        <translation> (Действительна до: %1)</translation>
     </message>
     <message>
         <location line="+17"/>
         <location filename="../../../Include/imtlic/CProductLicensingInfoMetaInfoCreatorComp.cpp" line="+65"/>
         <source>Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензии</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="+161"/>
         <source>Unsaved Features</source>
-        <translation type="unfinished"></translation>
+        <translation>Несохраненные функции</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Missing features</source>
-        <translation type="unfinished"></translation>
+        <translation>Недоступные функции</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>ID: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Идентификатор: %1</translation>
     </message>
     <message>
         <location line="+174"/>
         <location line="+27"/>
         <location filename="../../../Include/imtlicgui/CFeaturePackageGuiComp.cpp" line="+55"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Предупреждение</translation>
     </message>
     <message>
         <location line="-26"/>
@@ -1668,7 +1698,7 @@ Errors: 0</source>
     <message>
         <location line="+1"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location line="+257"/>
@@ -1857,12 +1887,12 @@ Errors: 0</source>
     <message>
         <location line="+1"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Импорт</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Экспорт</translation>
     </message>
     <message>
         <location line="+86"/>
@@ -1916,143 +1946,143 @@ Errors: 0</source>
         <location filename="../../../Include/imtgui/CObjectCollectionViewComp.cpp" line="+83"/>
         <location line="+22"/>
         <source>Reading collection...</source>
-        <translation type="unfinished"></translation>
+        <translation>Чтение выполняется...</translation>
     </message>
     <message>
         <location line="+761"/>
         <source>Update...</source>
-        <translation type="unfinished"></translation>
+        <translation>Oбновить...</translation>
     </message>
     <message>
         <location line="+185"/>
         <source>Edit...</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать...</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Set Description...</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить описание...</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation>Переименовать...</translation>
     </message>
     <message>
         <location line="+157"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Enter new object name</source>
-        <translation type="unfinished"></translation>
+        <translation>Ввести новое название объекта</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Enter object description</source>
-        <translation type="unfinished"></translation>
+        <translation>Ввести новое описание объекта</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Описание</translation>
     </message>
 </context>
 <context>
     <name>imtgui::CObjectCollectionViewDelegate</name>
     <message>
         <location filename="../../../Include/imtgui/CObjectCollectionViewDelegate.cpp" line="+21"/>
-        <location line="+73"/>
+        <location line="+80"/>
         <location line="+255"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать</translation>
     </message>
     <message>
         <location line="-195"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The document name contains some not allowed characters</source>
-        <translation type="unfinished"></translation>
+        <translation>Название документа содержит недопустимые символы</translation>
     </message>
     <message>
         <location line="+111"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Описание</translation>
     </message>
     <message>
         <location line="+78"/>
         <source>Insert</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Insert new document into the collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать новый документ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Duplicate selected objects</source>
-        <translation type="unfinished"></translation>
+        <translation>Продублировать выбранный документ</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Initial Revision</source>
-        <translation type="unfinished"></translation>
+        <translation>Начальная ревизия</translation>
     </message>
     <message>
         <location line="-273"/>
         <location line="+232"/>
         <source>Remove selected document from the collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить выбранные документы</translation>
     </message>
     <message>
-        <location line="-331"/>
+        <location line="-338"/>
         <source>&amp;Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Редактировать</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+328"/>
+        <location line="+335"/>
         <source>Duplicate</source>
-        <translation type="unfinished"></translation>
+        <translation>Дублировать</translation>
     </message>
     <message>
         <location line="+13"/>
         <location line="+51"/>
         <source>New document could not be created</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно создать документ</translation>
     </message>
     <message>
-        <location line="-391"/>
-        <location line="+96"/>
+        <location line="-398"/>
+        <location line="+103"/>
         <location line="+232"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location line="+12"/>
         <location line="+51"/>
         <source>Collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Коллекция</translation>
     </message>
 </context>
 <context>
@@ -2065,7 +2095,7 @@ Errors: 0</source>
     <message>
         <location line="+4"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -2094,12 +2124,12 @@ Errors: 0</source>
         <location filename="../../../Include/imtgui/CStandardCollectionViewDelegateComp.cpp" line="+24"/>
         <location line="+81"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Edit existing object</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать выбранные документы</translation>
     </message>
 </context>
 <context>
@@ -2108,28 +2138,28 @@ Errors: 0</source>
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+315"/>
         <location line="+298"/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Вход в систему</translation>
     </message>
     <message>
         <location line="-269"/>
         <source>Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Выйти</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Do you really want to quit?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы действительно хотите покинуть систему?</translation>
     </message>
     <message>
         <location line="+149"/>
         <source>Wrong password</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверный пароль</translation>
     </message>
     <message>
         <location line="+281"/>
         <location line="+154"/>
         <source>&lt;unnamed&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;безымянный&gt;</translation>
     </message>
 </context>
 <context>
@@ -2178,17 +2208,17 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtlicgui/CLicenseManagerViewDelegateComp.cpp" line="+40"/>
         <source>New License</source>
-        <translation type="unfinished"></translation>
+        <translation>Новая лицензия</translation>
     </message>
     <message>
         <location line="+106"/>
         <source>License Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Название лицензии</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>License-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Идентификатор лицензии</translation>
     </message>
 </context>
 <context>
@@ -2198,7 +2228,7 @@ Errors: 0</source>
         <location line="+17"/>
         <location line="+177"/>
         <source>Unlimited</source>
-        <translation type="unfinished"></translation>
+        <translation>Без ограничений</translation>
     </message>
 </context>
 <context>
@@ -2207,7 +2237,7 @@ Errors: 0</source>
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoViewDelegateComp.cpp" line="+30"/>
         <location line="+23"/>
         <source>Create License File</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать файл лицензии</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -2220,12 +2250,12 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtlicgui/CProductLicensingInfoGuiComp.cpp" line="+133"/>
         <source>Missing Features</source>
-        <translation type="unfinished"></translation>
+        <translation>Недоступные свяязи</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>ID: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Идентификатор: %1</translation>
     </message>
 </context>
 <context>
@@ -2470,22 +2500,22 @@ Errors: 0</source>
         <location filename="../../../Include/imtrepogui/CDocumentBasedFileCollectionViewDelegateComp.cpp" line="+28"/>
         <location line="+280"/>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать</translation>
     </message>
     <message>
         <location line="-235"/>
         <source>Collection Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Менеджер коллекции</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The file could not be created</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно создать файл</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -2505,12 +2535,12 @@ Errors: 0</source>
     <message>
         <location line="+76"/>
         <source>Edit existing object</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактировать выбранные документы</translation>
     </message>
     <message>
         <location line="+190"/>
         <source>Initial Revision</source>
-        <translation type="unfinished"></translation>
+        <translation>Начальная ревизия</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2520,7 +2550,7 @@ Errors: 0</source>
     <message>
         <location line="+1"/>
         <source>Please enter comment for your changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Введите коментарий к Вашему изменениям в документе</translation>
     </message>
 </context>
 <context>
@@ -2528,7 +2558,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtrepogui/CFileObjectCollectionRevisionDialog.cpp" line="+33"/>
         <source>Restore</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Восстановить</translation>
     </message>
     <message>
         <location line="+25"/>
@@ -2541,22 +2571,22 @@ Errors: 0</source>
     <message>
         <location line="+41"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Export File</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт в файл</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Коллекция</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Document could not be exported</source>
-        <translation type="unfinished"></translation>
+        <translation>Документ не может быть экспортирован</translation>
     </message>
 </context>
 <context>
