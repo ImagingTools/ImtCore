@@ -122,23 +122,11 @@
         <Element Id="Language" PackageId="BasePck" ComponentId="SelectionParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="LisaLocalization"/>
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="Languages">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="0"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="LisaLocalization" PackageId="LisaVoce" ComponentId="LisaLocalization">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="LanguageSelection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Language"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -205,5 +193,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="General" ComponentId="General"/>
+        <Component ExportedId="SelectedLanguage" ComponentId="Language"/>
     </ExportedComponents>
 </Acf>

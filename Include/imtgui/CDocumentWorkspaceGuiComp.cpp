@@ -179,7 +179,7 @@ CollectionDocumentViewDecorator::CollectionDocumentViewDecorator(
 
 	m_undoCommand.SetVisuals(QObject::tr("&Undo"), QObject::tr("Undo"), QObject::tr("Undo last document changes"), QIcon(":/Icons/Undo"));
 	m_redoCommand.SetVisuals(QObject::tr("&Redo"), QObject::tr("Redo"), QObject::tr("Redo last document changes"), QIcon(":/Icons/Redo"));
-	m_closeCommand.SetVisuals(QObject::tr("&Close"), QObject::tr("Close"), QObject::tr("Close the document"), QIcon(":/Icons/Remove"));
+	m_closeCommand.SetVisuals(QObject::tr("&Close"), QObject::tr("Close"), QObject::tr("Close the document"), QIcon(":/Icons/Close"));
 	m_saveCommand.SetVisuals(QObject::tr("&Save"), QObject::tr("Save"), QObject::tr("Save the document changes"), QIcon(":/Icons/Save"));
 
 	UpdateSaveButtonsStatus();
