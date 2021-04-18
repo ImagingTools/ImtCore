@@ -28,20 +28,20 @@
         <location line="+4"/>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+4"/>
         <location line="+2"/>
         <location line="+4"/>
+        <location line="+2"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
         <location line="+2"/>
         <location line="+4"/>
         <location line="+2"/>
         <source>Edit License</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактор лицензии</translation>
     </message>
     <message>
         <location line="-4"/>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
         <location line="+6"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-4"/>
         <location line="+6"/>
@@ -50,14 +50,14 @@
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-38"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-40"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-38"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-38"/>
         <source>STL</source>
         <translation type="unfinished"></translation>
@@ -125,17 +125,67 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-26"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+22"/>
+        <location line="+22"/>
+        <location line="+16"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+26"/>
+        <location line="+16"/>
+        <source>Preference File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-14"/>
+        <location line="+16"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-20"/>
+        <location line="+16"/>
+        <source>Light</source>
+        <translation>Светлая</translation>
+    </message>
+    <message>
+        <location line="-14"/>
+        <location line="+16"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-14"/>
+        <location line="+16"/>
+        <source>Dark</source>
+        <translation>Тёмная</translation>
+    </message>
+    <message>
+        <location line="-14"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
+        <source>Design</source>
+        <translation>Цветовая схема</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <source>Language</source>
+        <translation>Язык</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <source>General</source>
+        <translation>Общие</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <location line="+2"/>
+        <source>Preferences</source>
+        <translation>Настройки</translation>
+    </message>
+    <message>
+        <location line="-62"/>
+        <location line="+70"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+22"/>
         <source>ImtCore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-44"/>
+        <location line="-66"/>
         <location line="+42"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-24"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-2"/>
         <source>ImagingTools GmbH</source>
         <translation type="unfinished"></translation>
@@ -552,14 +602,8 @@
 <context>
     <name>CFeatureCollectionGuiComp</name>
     <message>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CFeatureCollectionGuiComp.h" line="+79"/>
         <source>Feature Package</source>
-        <translation>Пакет функций</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Page2</source>
-        <translation></translation>
+        <translation type="vanished">Пакет функций</translation>
     </message>
 </context>
 <context>
@@ -625,7 +669,7 @@
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h" line="+2"/>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Пользователь</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -644,32 +688,15 @@
     </message>
     <message>
         <location line="+125"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CLicenseInfoEditorGuiComp.h" line="+213"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h" line="+1"/>
         <source>License Name</source>
         <translation>Название лицензии</translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CLicenseInfoEditorGuiComp.h" line="+1"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h" line="+1"/>
         <source>License-ID</source>
         <translation>Идентификатор лицензии</translation>
-    </message>
-    <message>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CLicenseInfoEditorGuiComp.h" line="-2"/>
-        <source>Main Window</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>License Package</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Valid Until</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -714,7 +741,7 @@
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Закрыть</translation>
     </message>
     <message>
         <location line="+44"/>
@@ -759,7 +786,7 @@
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка</translation>
     </message>
 </context>
 <context>
@@ -792,7 +819,7 @@
         <location line="+24"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+1"/>
         <source>Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Лицензии</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -1403,7 +1430,7 @@ Errors: 0</source>
         <location line="+27"/>
         <location filename="../../../Include/imtlicgui/CFeaturePackageGuiComp.cpp" line="+1"/>
         <source>Feature with ID &apos;%1&apos; depends on feature with ID &apos;%2&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>У &apos;%1&apos; существует функциональная зависимость от &apos;%2&apos;</translation>
     </message>
 </context>
 <context>
@@ -1412,7 +1439,7 @@ Errors: 0</source>
         <location filename="../../../Include/imtgui/CSingleStatusProviderGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CSingleStatusProviderGuiComp.h" line="+59"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1809,12 +1836,12 @@ Errors: 0</source>
         <location line="+9"/>
         <location line="+6"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>The document name contains some not allowed characters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Название документа содержит недопустимые символы</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2410,7 +2437,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtqml/CQuickApplicationComp.cpp" line="+123"/>
         <source>Quit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выйти</translation>
     </message>
 </context>
 <context>
@@ -2520,7 +2547,7 @@ Errors: 0</source>
     <message>
         <location line="+0"/>
         <source>Remove selected document from the collection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удалить выбранные документы</translation>
     </message>
     <message>
         <location line="+19"/>
