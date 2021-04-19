@@ -75,48 +75,9 @@ namespace imtwidgets
 
 // public methods
 
-CImtStyle::CImtStyle()
-	:m_designSchema(DS_LIGHT),
-	m_styleType(ST_IMAGINGTOOLS),
-	m_wasStyleSheetInitialized(false)
+int CImtStyle::GetDesignSchemaCount()
 {
-	ColorSchema light;
-	light.toolButtonGradientColors.startColor = QColor(248, 248, 251);
-	light.toolButtonGradientColors.endColor = QColor(235, 235, 238);
-	light.pressedToolButtonGradientColors.startColor = QColor(245, 245, 245);
-	light.pressedToolButtonGradientColors.endColor = QColor(245, 245, 245);
-	light.styleSheetPath = ":/Styles/ImtLightStyle";
-	light.initResourceFuncPtr = &qInitResources_imtguilight;
-	light.cleanupResourceFuncPtr = &qCleanupResources_imtguilight;
-	istd::TDelPtr<QStyle> baseStylePtr(QStyleFactory::create("fusion"));
-	light.palette = baseStylePtr->standardPalette();
-
-	m_colorSchemaMap[DS_LIGHT] = light;
-
-	ColorSchema dark;
-	dark.toolButtonGradientColors.startColor = QColor(140, 140, 140);
-	dark.toolButtonGradientColors.endColor = QColor(115, 115, 115);
-	dark.pressedToolButtonGradientColors.startColor = QColor(135, 135, 135);
-	dark.pressedToolButtonGradientColors.endColor = QColor(135, 135, 135);
-	dark.styleSheetPath = ":/Styles/ImtDarkStyle";
-	dark.initResourceFuncPtr = &qInitResources_imtguidark;
-	dark.cleanupResourceFuncPtr = &qCleanupResources_imtguidark;
-
-	dark.palette.setColor(QPalette::Window, QColor(53, 53, 53));
-	dark.palette.setColor(QPalette::WindowText, Qt::white);
-	dark.palette.setColor(QPalette::Base, QColor(33, 33, 33));
-	dark.palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-	dark.palette.setColor(QPalette::ToolTipBase, Qt::lightGray);
-	dark.palette.setColor(QPalette::ToolTipText, Qt::lightGray);
-	dark.palette.setColor(QPalette::Text, Qt::lightGray);
-	dark.palette.setColor(QPalette::Button, QColor(53, 53, 53));
-	dark.palette.setColor(QPalette::ButtonText, Qt::lightGray);
-	dark.palette.setColor(QPalette::BrightText, Qt::white);
-	dark.palette.setColor(QPalette::Link, QColor(42, 130, 218));
-	dark.palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
-	dark.palette.setColor(QPalette::HighlightedText, Qt::white);
-
-	m_colorSchemaMap[DS_DARK] = dark;
+	return 2;
 }
 
 
@@ -413,18 +374,9 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 		if (!m_wasStyleSheetInitialized){
 			m_wasStyleSheetInitialized = true;
 
-			for(const ColorSchema& colorSchema : m_colorSchemaMap){
-				(*colorSchema.cleanupResourceFuncPtr)();
-			}
-
 			qApp->setPalette(baseStyle()->standardPalette());
 
 			const ColorSchema& colorSchema = m_colorSchemaMap[m_designSchema];
-
-			if (colorSchema.initResourceFuncPtr != nullptr){
-				(*colorSchema.initResourceFuncPtr)();
-			}
-
 			iqtgui::SetStyleSheetFromFile(*qApp, colorSchema.styleSheetPath);
 
 			qApp->setPalette(colorSchema.palette);
@@ -433,6 +385,49 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 	else{
 		m_wasStyleSheetInitialized = false;
 	}
+}
+
+
+// private methods
+
+CImtStyle::CImtStyle()
+	:m_designSchema(DS_LIGHT),
+	m_styleType(ST_IMAGINGTOOLS),
+	m_wasStyleSheetInitialized(false)
+{
+	ColorSchema light;
+	light.toolButtonGradientColors.startColor = QColor(248, 248, 251);
+	light.toolButtonGradientColors.endColor = QColor(235, 235, 238);
+	light.pressedToolButtonGradientColors.startColor = QColor(245, 245, 245);
+	light.pressedToolButtonGradientColors.endColor = QColor(245, 245, 245);
+	light.styleSheetPath = ":/Styles/ImtLightStyle";
+	istd::TDelPtr<QStyle> baseStylePtr(QStyleFactory::create("fusion"));
+	light.palette = baseStylePtr->standardPalette();
+
+	m_colorSchemaMap[DS_LIGHT] = light;
+
+	ColorSchema dark;
+	dark.toolButtonGradientColors.startColor = QColor(140, 140, 140);
+	dark.toolButtonGradientColors.endColor = QColor(115, 115, 115);
+	dark.pressedToolButtonGradientColors.startColor = QColor(135, 135, 135);
+	dark.pressedToolButtonGradientColors.endColor = QColor(135, 135, 135);
+	dark.styleSheetPath = ":/Styles/ImtDarkStyle";
+
+	dark.palette.setColor(QPalette::Window, QColor(53, 53, 53));
+	dark.palette.setColor(QPalette::WindowText, Qt::white);
+	dark.palette.setColor(QPalette::Base, QColor(33, 33, 33));
+	dark.palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+	dark.palette.setColor(QPalette::ToolTipBase, Qt::lightGray);
+	dark.palette.setColor(QPalette::ToolTipText, Qt::lightGray);
+	dark.palette.setColor(QPalette::Text, Qt::lightGray);
+	dark.palette.setColor(QPalette::Button, QColor(53, 53, 53));
+	dark.palette.setColor(QPalette::ButtonText, Qt::lightGray);
+	dark.palette.setColor(QPalette::BrightText, Qt::white);
+	dark.palette.setColor(QPalette::Link, QColor(42, 130, 218));
+	dark.palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+	dark.palette.setColor(QPalette::HighlightedText, Qt::white);
+
+	m_colorSchemaMap[DS_DARK] = dark;
 }
 
 

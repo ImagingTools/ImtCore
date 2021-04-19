@@ -25,6 +25,8 @@
 #include <imtgui/CPluginStatusViewerComp.h>
 #include <imtgui/CPluginStatusMonitorViewDelegateComp.h>
 #include <imtgui/CApplicationSwitchCommandComp.h>
+#include <imtgui/CDesignManagerComp.h>
+
 
 
 /**
@@ -53,6 +55,7 @@ typedef imtgui::CStandardCollectionViewDelegateComp StandardCollectionViewDelega
 typedef imtgui::CPluginStatusViewerComp PluginStatusViewer;
 typedef imtgui::CPluginStatusMonitorViewDelegateComp PluginStatusMonitorViewDelegate;
 typedef imtgui::CApplicationSwitchCommandComp ApplicationSwitchCommand;
+typedef imtgui::CDesignManagerComp DesignManager;
 
 
 } // namespace ImtGuiPck

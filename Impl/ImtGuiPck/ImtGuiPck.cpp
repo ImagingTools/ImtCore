@@ -112,6 +112,11 @@ I_EXPORT_COMPONENT(
 			"Command for switching between applications",
 			"Command Application Switch Process Window");
 
+I_EXPORT_COMPONENT(
+			DesignManager,
+			"Design Manager",
+			"Style Design Manager");
+
 
 } // namespace ImtGuiPck
 

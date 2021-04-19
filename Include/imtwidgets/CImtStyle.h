@@ -31,8 +31,13 @@ public:
 		ST_FLAT
 	};
 
-	CImtStyle();
+	static CImtStyle& Instance()
+	{
+		static CImtStyle instance;
+		return instance;
+	}
 
+	int GetDesignSchemaCount();
 	DesignSchema GetDesignSchema() const;
 	void SetDesignSchema(DesignSchema designSchema);
 
@@ -64,11 +69,7 @@ private:
 
 	struct ColorSchema
 	{
-		typedef int (*resourceFunctionPtr)();
-
 		ColorSchema()
-			:initResourceFuncPtr(nullptr),
-			cleanupResourceFuncPtr(nullptr)
 		{
 		}
 
@@ -76,9 +77,6 @@ private:
 		GradientColors pressedToolButtonGradientColors;
 		QString styleSheetPath;
 		QPalette palette;
-
-		resourceFunctionPtr initResourceFuncPtr;
-		resourceFunctionPtr cleanupResourceFuncPtr;
 	};
 
 	typedef QMap<DesignSchema, ColorSchema> ColorSchemaMap;
@@ -89,6 +87,10 @@ private:
 	StyleType m_styleType;
 
 	mutable bool m_wasStyleSheetInitialized;
+
+private:
+	CImtStyle();
+	Q_DISABLE_COPY_MOVE(CImtStyle);
 };
 
 
