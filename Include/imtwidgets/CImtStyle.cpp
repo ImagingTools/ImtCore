@@ -8,6 +8,7 @@
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QStyleFactory>
+#include <QtGui/QPixmapCache>
 
 // ACF includes
 #include <istd/TDelPtr.h>
@@ -113,6 +114,8 @@ CImtStyle::DesignSchema CImtStyle::GetDesignSchema() const
 
 void CImtStyle::SetDesignSchema(DesignSchema designSchema)
 {
+	BaseClass::unpolish(qApp);
+
 	m_designSchema = designSchema;
 
 	EnsureStyleSheetApplied(true);
@@ -424,12 +427,13 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 		if (!m_wasStyleSheetInitialized){
 			m_wasStyleSheetInitialized = true;
 
-			qApp->setPalette(baseStyle()->standardPalette());
+			QPixmapCache::clear();
 
 			const ColorSchema& colorSchema = m_colorSchemaMap[m_designSchema];
-			iqtgui::SetStyleSheetFromFile(*qApp, colorSchema.styleSheetPath);
 
 			qApp->setPalette(colorSchema.palette);
+
+			iqtgui::SetStyleSheetFromFile(*qApp, colorSchema.styleSheetPath);
 		}
 	}
 	else{
