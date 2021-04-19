@@ -10,23 +10,36 @@
 #include <imtwidgets/CImtStyle.h>
 
 
+// ACF includes
+#include <ibase/TLocalizableWrap.h>
+
+
 namespace imtgui
 {
 
 
 class CDesignManagerCompBase:
 			public icomp::CComponentBase,
-			public iprm::CSelectionParam
+			public ibase::TLocalizableWrap<iprm::CSelectionParam>
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-	typedef iprm::CSelectionParam BaseClass2;
+	typedef ibase::TLocalizableWrap<iprm::CSelectionParam> BaseClass2;
 
 	I_BEGIN_BASE_COMPONENT(CDesignManagerCompBase);
 		I_REGISTER_INTERFACE(iprm::ISelectionParam);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_ASSIGN(m_slaveCompPtr, "SlaveDesignManager", "Slave design manager", false, "SlaveDesignManager");
 	I_END_COMPONENT;
+
+	CDesignManagerCompBase();
+	~CDesignManagerCompBase();
+
+	// reimplemented (iprm::ISelectionParam)
+	virtual bool SetSelectedOptionIndex(int index) override;
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 protected:
 	typedef int(*ResourceFunctionPtr)();
@@ -38,12 +51,15 @@ protected:
 				ResourceFunctionPtr initResources,
 				ResourceFunctionPtr cleanupResources);
 
-	// reimplemented (iprm::ISelectionParam)
-	virtual bool SetSelectedOptionIndex(int index) override;
-
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
+
+	// reimplemented (ibase::TLocalizableWrap)
+	virtual void OnLanguageChanged() override;
+
+private:
+	bool ApplyDesignScheme(int index);
 
 private:
 	class DesignList: virtual public iprm::IOptionsList

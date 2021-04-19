@@ -9,6 +9,50 @@ namespace imtgui
 {
 
 
+// public methods
+
+CDesignManagerCompBase::CDesignManagerCompBase()
+{
+	EnableLocalization(true);
+}
+
+
+CDesignManagerCompBase::~CDesignManagerCompBase()
+{
+	EnableLocalization(false);
+}
+
+
+// reimplemented (iprm:ISelectionParam)
+
+bool CDesignManagerCompBase::SetSelectedOptionIndex(int index)
+{
+	bool retVal = BaseClass2::SetSelectedOptionIndex(index);
+
+	if (retVal){
+		retVal = retVal && ApplyDesignScheme(index);
+	}
+
+	return retVal;
+}
+
+
+// reimplemented (iser::ISerializable)
+
+bool CDesignManagerCompBase::Serialize(iser::IArchive& archive)
+{
+	bool retVal = BaseClass2::Serialize(archive);
+
+	if (retVal && !archive.IsStoring()){
+		int index = GetSelectedOptionIndex();
+
+		ApplyDesignScheme(index);
+	}
+
+	return retVal;
+}
+
+
 // protected methods
 
 void CDesignManagerCompBase::SetDesignResourcesFunctions(
@@ -21,43 +65,6 @@ void CDesignManagerCompBase::SetDesignResourcesFunctions(
 
 		m_cleanupResources[designSchema] = cleanupResources;
 	}
-}
-
-
-// reimplemented (iprm:ISelectionParam)
-
-bool CDesignManagerCompBase::SetSelectedOptionIndex(int index)
-{
-	bool retVal = BaseClass2::SetSelectedOptionIndex(index);
-
-	if (retVal){
-		imtwidgets::CImtStyle* imtStylePtr = imtwidgets::CImtStyle::GetInstance();
-		Q_ASSERT(imtStylePtr != nullptr);
-
-		imtwidgets::CImtStyle::DesignSchema designSchema = imtStylePtr->GetDesignSchemaFromIndex(index);
-		if (designSchema != imtwidgets::CImtStyle::DS_INVALID){
-			if (index < imtStylePtr->GetDesignSchemaCount()){
-				if (m_initResources.contains(designSchema)){
-					if (m_initResources[designSchema] != nullptr){
-						for (ResourceFunctionPtr cleanupFunctionPtr : m_cleanupResources){
-							if (cleanupFunctionPtr != nullptr){
-								cleanupFunctionPtr();
-							}
-						}
-
-						m_initResources[designSchema]();
-						imtStylePtr->SetDesignSchema(designSchema);
-
-						if (m_slaveCompPtr.IsValid()){
-							retVal = retVal && m_slaveCompPtr->SetSelectedOptionIndex(index);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return retVal;
 }
 
 
@@ -84,6 +91,52 @@ void CDesignManagerCompBase::OnComponentDestroyed()
 	}
 
 	BaseClass::OnComponentDestroyed();
+}
+
+
+// reimplemented (ibase::TLocalizableWrap)
+
+void CDesignManagerCompBase::OnLanguageChanged()
+{
+	m_designs.UpdateDesignList();
+}
+
+
+// private methods
+
+bool CDesignManagerCompBase::ApplyDesignScheme(int index)
+{
+	bool retVal = true;
+
+	imtwidgets::CImtStyle* imtStylePtr = imtwidgets::CImtStyle::GetInstance();
+	Q_ASSERT(imtStylePtr != nullptr);
+
+	imtwidgets::CImtStyle::DesignSchema designSchema = imtStylePtr->GetDesignSchemaFromIndex(index);
+	if (designSchema != imtwidgets::CImtStyle::DS_INVALID){
+		if (index < imtStylePtr->GetDesignSchemaCount()){
+			if (m_initResources.contains(designSchema)){
+				if (m_initResources[designSchema] != nullptr){
+					for (ResourceFunctionPtr cleanupFunctionPtr : m_cleanupResources){
+						if (cleanupFunctionPtr != nullptr){
+							cleanupFunctionPtr();
+						}
+					}
+
+					m_initResources[designSchema]();
+					imtStylePtr->SetDesignSchema(designSchema);
+
+					if (m_slaveCompPtr.IsValid()){
+						retVal = retVal && m_slaveCompPtr->SetSelectedOptionIndex(index);
+					}
+				}
+			}
+		}
+	}
+	else{
+		retVal = false;
+	}
+
+	return retVal;
 }
 
 
