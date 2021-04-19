@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/Icons">
+        <file alias="Account">Resources/Icons/Account.svg</file>
+    </qresource>
+    <qresource prefix="/ColorIcons"/>
+</RCC>

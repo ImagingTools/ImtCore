@@ -60,23 +60,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="DesignManager" PackageId="ImtGuiPck" ComponentId="DesignManager">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DesignSelectionProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DesignSchema"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="DesignSchema" PackageId="BasePck" ComponentId="SelectionParam">
+        <Element Id="DesignSchemas" PackageId="" ComponentId="DesignSchemes">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Designs"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="0"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -109,7 +97,7 @@
                     <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>DesignSchema</Value>
+                                <Value>DesignSchemas</Value>
                                 <Value>Language</Value>
                             </Values>
                         </Data>
@@ -191,7 +179,72 @@
             </Data>
         </Element>
     </ElementsList>
-    <EmbeddedRegistriesList/>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="DesignSchemes">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="AuthDesignSchema" PackageId="ImtAuthGuiPck" ComponentId="DesignManager">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Constraints" Type="Reference" ExportId="Constraints">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="0"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="ImtDesignSchema" PackageId="ImtGuiPck" ComponentId="DesignManager">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Constraints" Type="Reference" ExportId="Constraints">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="0"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SlaveDesignManagers" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>LicDesignSchema</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="LicDesignSchema" PackageId="ImtLicenseGuiPck" ComponentId="DesignManager">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Constraints" Type="Reference" ExportId="Constraints">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="0"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SlaveDesignManagers" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>AuthDesignSchema</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="iprm::ISelectionParam" ComponentId="ImtDesignSchema"/>
+                    <Interface InterfaceId="iser::ISerializable" ComponentId="ImtDesignSchema"/>
+                    <Interface InterfaceId="istd::IChangeable" ComponentId="ImtDesignSchema"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="ImtDesignSchema"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
+    </EmbeddedRegistriesList>
     <ExportedInterfaces>
         <Interface InterfaceId="imod::IModel" ComponentId="Preferences"/>
         <Interface InterfaceId="iprm::IParamsSet" ComponentId="Preferences"/>

@@ -11,6 +11,7 @@
 #include <imtauthgui/CAccountInfoEditorComp.h>
 #include <imtauthgui/CContactInfoViewDelegateComp.h>
 #include <imtauthgui/CAccountInfoViewDelegateComp.h>
+#include <imtauthgui/CDesignManagerComp.h>
 
 
 namespace ImtAuthGuiPck
@@ -21,6 +22,7 @@ typedef imtauthgui::CAddressEditorComp AddressEditor;
 typedef imtauthgui::CAccountInfoEditorComp AccountInfoEditor;
 typedef imtauthgui::CContactInfoViewDelegateComp ContactInfoViewDelegate;
 typedef imtauthgui::CAccountInfoViewDelegateComp AccountInfoViewDelegate;
+typedef imtauthgui::CDesignManagerComp DesignManager;
 
 
 } // namespace ImtAuthGuiPck

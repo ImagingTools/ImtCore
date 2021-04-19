@@ -13,9 +13,43 @@ namespace imtgui
 
 // public methods
 
-CDesignManagerCompBase::CDesignManagerCompBase()
-	:m_selectionObserver(*this)
+// reimplemented (iprm:ISelectionParam)
+
+bool CDesignManagerCompBase::SetSelectedOptionIndex(int index)
 {
+	bool retVal = BaseClass::SetSelectedOptionIndex(index);
+
+	if (retVal){
+		imtwidgets::CImtStyle* imtStylePtr = imtwidgets::CImtStyle::GetInstance();
+		Q_ASSERT(imtStylePtr != nullptr);
+
+		imtwidgets::CImtStyle::DesignSchema designSchema = imtStylePtr->GetDesignSchemaFromIndex(index);
+		if (designSchema != imtwidgets::CImtStyle::DS_INVALID){
+			if (index < imtStylePtr->GetDesignSchemaCount()){
+				if (m_initResources.contains(designSchema)){
+					if (m_initResources[designSchema] != nullptr){
+						for (ResourceFunctionPtr functionPtr : m_cleanupResources){
+							if (functionPtr != nullptr){
+								functionPtr();
+							}
+						}
+
+						m_initResources[designSchema]();
+						imtStylePtr->SetDesignSchema(designSchema);
+
+						for (int i = 0; i < m_slaveCompPtr.GetCount(); i++){
+							iprm::ISelectionParam* selectionParamPtr = m_slaveCompPtr[i];
+							if (selectionParamPtr != nullptr){
+								retVal = retVal && selectionParamPtr->SetSelectedOptionIndex(index);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return retVal;
 }
 
 
@@ -42,22 +76,14 @@ void CDesignManagerCompBase::SetDesignResourcesFunctions(
 
 void CDesignManagerCompBase::OnComponentCreated()
 {
-	BaseClass::OnComponentCreated();
-
 	RegisterResourcesFunctions();
 
-	if (m_selectionParamCompPtr.IsValid() && m_selectionParamModelPtr.IsValid()){
-		m_selectionObserver.RegisterObject(
-					m_selectionParamCompPtr.GetPtr(),
-					&CDesignManagerCompBase::OnDesignSelectionUpdated);
-	}
+	BaseClass::OnComponentCreated();
 }
 
 
 void CDesignManagerCompBase::OnComponentDestroyed()
 {
-	m_selectionObserver.UnregisterAllObjects();
-
 	for (ResourceFunctionPtr functionPtr : m_cleanupResources){
 		if (functionPtr != nullptr){
 			functionPtr();
@@ -65,33 +91,6 @@ void CDesignManagerCompBase::OnComponentDestroyed()
 	}
 
 	BaseClass::OnComponentDestroyed();
-}
-
-
-// private methods
-
-void CDesignManagerCompBase::OnDesignSelectionUpdated(const istd::IChangeable::ChangeSet& changeSet, const iprm::ISelectionParam* selectionParamPtr)
-{
-	imtwidgets::CImtStyle* imtStylePtr = imtwidgets::CImtStyle::GetInstance();
-	Q_ASSERT(imtStylePtr != nullptr);
-
-	int index = selectionParamPtr->GetSelectedOptionIndex();
-	imtwidgets::CImtStyle::DesignSchema designSchema = imtStylePtr->GetDesignSchemaFromIndex(index);
-
-	if (index < imtStylePtr->GetDesignSchemaCount()){
-		if (m_initResources.contains(designSchema)){
-			if (m_initResources[designSchema] != nullptr){
-				for (ResourceFunctionPtr functionPtr : m_cleanupResources){
-					if (functionPtr != nullptr){
-						functionPtr();
-					}
-				}
-
-				m_initResources[designSchema]();
-				imtStylePtr->SetDesignSchema(designSchema);
-			}
-		}
-	}
 }
 
 

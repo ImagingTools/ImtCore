@@ -10,8 +10,7 @@
     <PositionMap>
         <Element ComponentName="AutoPersistence" X="625" Y="200" Note=""/>
         <Element ComponentName="CompactXmlFileSerializer" X="875" Y="200" Note=""/>
-        <Element ComponentName="DesignManager" X="125" Y="325" Note=""/>
-        <Element ComponentName="DesignSchema" X="125" Y="425" Note=""/>
+        <Element ComponentName="DesignSchemas" X="125" Y="425" Note=""/>
         <Element ComponentName="Designs" X="125" Y="525" Note=""/>
         <Element ComponentName="General" X="350" Y="350" Note=""/>
         <Element ComponentName="Language" X="350" Y="425" Note=""/>
@@ -19,5 +18,14 @@
         <Element ComponentName="PreferencesFilePath" X="625" Y="125" Note=""/>
         <Element ComponentName="SystemLocation" X="625" Y="50" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries/>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="DesignSchemes">
+            <PositionMap>
+                <Element ComponentName="AuthDesignSchema" X="525" Y="350" Note=""/>
+                <Element ComponentName="ImtDesignSchema" X="525" Y="150" Note=""/>
+                <Element ComponentName="LicDesignSchema" X="525" Y="250" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
 </Acf>

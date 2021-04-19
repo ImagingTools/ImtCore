@@ -39,6 +39,11 @@ I_EXPORT_COMPONENT(
 			"Account info view delegate",
 			"Account Info View Delegate");
 
+I_EXPORT_COMPONENT(
+			DesignManager,
+			"Design Manager",
+			"Style Design Manager");
+
 
 } // namespace ImtAuthGuiPck
 
