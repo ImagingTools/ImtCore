@@ -93,16 +93,16 @@ void CDesignManagerCompBase::DesignList::UpdateDesignList()
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_options.clear();
+	m_designList.clear();
 
 	imtwidgets::CImtStyle* imtStyle = imtwidgets::CImtStyle::GetInstance();
 	if (imtStyle != nullptr){
 		for (int i = 0; i < imtStyle->GetDesignSchemaCount(); i++){
-			Option option;
-			option.id = imtStyle->GetDesignSchemaId((imtwidgets::CImtStyle::DesignSchema)i);
-			option.name = imtStyle->GetDesignSchemaName((imtwidgets::CImtStyle::DesignSchema)i);
+			DesignInfo designInfo;
+			designInfo.id = imtStyle->GetDesignSchemaId((imtwidgets::CImtStyle::DesignSchema)i);
+			designInfo.name = imtStyle->GetDesignSchemaName((imtwidgets::CImtStyle::DesignSchema)i);
 
-			m_options.append(option);
+			m_designList.append(designInfo);
 		}
 	}
 }
@@ -118,7 +118,7 @@ int CDesignManagerCompBase::DesignList::GetOptionsFlags() const
 
 int CDesignManagerCompBase::DesignList::GetOptionsCount() const
 {
-	return m_options.count();
+	return m_designList.count();
 }
 
 
@@ -126,8 +126,8 @@ QString CDesignManagerCompBase::DesignList::GetOptionName(int index) const
 {
 	Q_ASSERT(index >= 0);
 
-	if (index < m_options.count()){
-		return m_options[index].name;
+	if (index < m_designList.count()){
+		return m_designList[index].name;
 	}
 
 	return QString();
@@ -138,8 +138,8 @@ QString CDesignManagerCompBase::DesignList::GetOptionDescription(int index) cons
 {
 	Q_ASSERT(index >= 0);
 
-	if (index < m_options.count()){
-		return m_options[index].description;
+	if (index < m_designList.count()){
+		return m_designList[index].description;
 	}
 
 	return QString();
@@ -150,8 +150,8 @@ QByteArray CDesignManagerCompBase::DesignList::GetOptionId(int index) const
 {
 	Q_ASSERT(index >= 0);
 
-	if (index < m_options.count()){
-		return m_options[index].id;
+	if (index < m_designList.count()){
+		return m_designList[index].id;
 	}
 
 	return QByteArray();

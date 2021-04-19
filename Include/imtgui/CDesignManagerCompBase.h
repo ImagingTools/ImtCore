@@ -60,7 +60,7 @@ private:
 		virtual bool IsOptionEnabled(int index) const;
 
 	private:
-		struct Option
+		struct DesignInfo
 		{
 			QByteArray id;
 			QString name;
@@ -68,7 +68,7 @@ private:
 		};
 
 	private:
-		QList<Option> m_options;
+		QList<DesignInfo> m_designList;
 	};
 
 private:
