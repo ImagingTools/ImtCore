@@ -35,7 +35,7 @@ public:
 		ST_FLAT
 	};
 
-	static CImtStyle& GetInstance();
+	static CImtStyle* GetInstance();
 
 	int GetDesignSchemaCount();
 	DesignSchema GetDesignSchema() const;
@@ -93,6 +93,8 @@ private:
 private:
 	CImtStyle();
 	Q_DISABLE_COPY(CImtStyle);
+
+	static CImtStyle* m_instancePtr;
 };
 
 

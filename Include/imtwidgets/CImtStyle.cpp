@@ -76,10 +76,16 @@ namespace imtwidgets
 // public methods
 
 
-CImtStyle& CImtStyle::GetInstance()
+CImtStyle* CImtStyle::m_instancePtr = nullptr;
+
+
+CImtStyle* CImtStyle::GetInstance()
 {
-	static CImtStyle instance;
-	return instance;
+	if (m_instancePtr == nullptr){
+		m_instancePtr = new CImtStyle;
+	}
+
+	return m_instancePtr;
 }
 
 

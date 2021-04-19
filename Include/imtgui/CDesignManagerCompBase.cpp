@@ -44,19 +44,25 @@ void CDesignManagerCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
+	RegisterResourcesFunctions();
+
 	if (m_selectionParamCompPtr.IsValid() && m_selectionParamModelPtr.IsValid()){
 		m_selectionObserver.RegisterObject(
 					m_selectionParamCompPtr.GetPtr(),
 					&CDesignManagerCompBase::OnDesignSelectionUpdated);
 	}
-
-	RegisterResourcesFunctions();
 }
 
 
 void CDesignManagerCompBase::OnComponentDestroyed()
 {
 	m_selectionObserver.UnregisterAllObjects();
+
+	for (ResourceFunctionPtr functionPtr : m_cleanupResources){
+		if (functionPtr != nullptr){
+			functionPtr();
+		}
+	}
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -66,10 +72,13 @@ void CDesignManagerCompBase::OnComponentDestroyed()
 
 void CDesignManagerCompBase::OnDesignSelectionUpdated(const istd::IChangeable::ChangeSet& changeSet, const iprm::ISelectionParam* selectionParamPtr)
 {
-	int index = selectionParamPtr->GetSelectedOptionIndex();
-	imtwidgets::CImtStyle::DesignSchema designSchema = imtwidgets::CImtStyle::GetInstance().GetDesignSchemaFromIndex(index);
+	imtwidgets::CImtStyle* imtStylePtr = imtwidgets::CImtStyle::GetInstance();
+	Q_ASSERT(imtStylePtr != nullptr);
 
-	if (index < imtwidgets::CImtStyle::GetInstance().GetDesignSchemaCount()){
+	int index = selectionParamPtr->GetSelectedOptionIndex();
+	imtwidgets::CImtStyle::DesignSchema designSchema = imtStylePtr->GetDesignSchemaFromIndex(index);
+
+	if (index < imtStylePtr->GetDesignSchemaCount()){
 		if (m_initResources.contains(designSchema)){
 			if (m_initResources[designSchema] != nullptr){
 				for (ResourceFunctionPtr functionPtr : m_cleanupResources){
@@ -79,7 +88,7 @@ void CDesignManagerCompBase::OnDesignSelectionUpdated(const istd::IChangeable::C
 				}
 
 				m_initResources[designSchema]();
-				imtwidgets::CImtStyle::GetInstance().SetDesignSchema(designSchema);
+				imtStylePtr->SetDesignSchema(designSchema);
 			}
 		}
 	}
