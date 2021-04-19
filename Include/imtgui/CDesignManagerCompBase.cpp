@@ -1,17 +1,8 @@
 #include <imtgui/CDesignManagerCompBase.h>
 
 
-// Qt includes
-#include <QtCore/QUuid>
-
 // ACF includes
-#include <istd/CChangeGroup.h>
-
-
-extern int qInitResources_imtguilight();
-extern int qCleanupResources_imtguilight();
-extern int qInitResources_imtguidark();
-extern int qCleanupResources_imtguidark();
+#include <istd/CChangeNotifier.h>
 
 
 namespace imtgui
@@ -100,7 +91,7 @@ void CDesignManagerCompBase::OnComponentDestroyed()
 
 void CDesignManagerCompBase::Constraints::Update()
 {
-	istd::CChangeGroup changeGroup(this);
+	istd::CChangeNotifier changeNotifier(this);
 
 	m_options.clear();
 
