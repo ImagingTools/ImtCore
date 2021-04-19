@@ -62,33 +62,7 @@
         </Element>
         <Element Id="DesignSchemas" PackageId="" ComponentId="DesignSchemes">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Designs"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="Designs" PackageId="BasePck" ComponentId="SelectionConstraints">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Light</Value>
-                                <Value>Dark</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Light</Value>
-                                <Value>Dark</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="General" PackageId="BasePck" ComponentId="ComposedParamsSet">
@@ -185,25 +159,12 @@
                 <ElementsList>
                     <Element Id="AuthDesignSchema" PackageId="ImtAuthGuiPck" ComponentId="DesignManager">
                         <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Constraints" Type="Reference" ExportId="Constraints">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
-                                    <Data IsEnabled="true" Value="0"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
+                            <AttributeInfoMap/>
                         </Data>
                     </Element>
                     <Element Id="ImtDesignSchema" PackageId="ImtGuiPck" ComponentId="DesignManager">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="Constraints" Type="Reference" ExportId="Constraints">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
-                                    <Data IsEnabled="true" Value="0"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="SlaveDesignManagers" Type="Reference[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -217,12 +178,6 @@
                     <Element Id="LicDesignSchema" PackageId="ImtLicenseGuiPck" ComponentId="DesignManager">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="Constraints" Type="Reference" ExportId="Constraints">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
-                                    <Data IsEnabled="true" Value="0"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="SlaveDesignManagers" Type="Reference[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -236,6 +191,7 @@
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
+                    <Interface InterfaceId="imod::IModel" ComponentId="ImtDesignSchema"/>
                     <Interface InterfaceId="iprm::ISelectionParam" ComponentId="ImtDesignSchema"/>
                     <Interface InterfaceId="iser::ISerializable" ComponentId="ImtDesignSchema"/>
                     <Interface InterfaceId="istd::IChangeable" ComponentId="ImtDesignSchema"/>

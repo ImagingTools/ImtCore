@@ -55,7 +55,7 @@ typedef imtgui::CStandardCollectionViewDelegateComp StandardCollectionViewDelega
 typedef imtgui::CPluginStatusViewerComp PluginStatusViewer;
 typedef imtgui::CPluginStatusMonitorViewDelegateComp PluginStatusMonitorViewDelegate;
 typedef imtgui::CApplicationSwitchCommandComp ApplicationSwitchCommand;
-typedef imtgui::CDesignManagerComp DesignManager;
+typedef icomp::TModelCompWrap<imtgui::CDesignManagerComp> DesignManager;
 
 
 } // namespace ImtGuiPck

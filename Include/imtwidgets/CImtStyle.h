@@ -39,6 +39,8 @@ public:
 
 	int GetDesignSchemaCount();
 	DesignSchema GetDesignSchema() const;
+	QByteArray GetDesignSchemaId(DesignSchema designSchema);
+	QString GetDesignSchemaName(DesignSchema designSchema);
 	void SetDesignSchema(DesignSchema designSchema);
 
 	StyleType GetStyleType() const;

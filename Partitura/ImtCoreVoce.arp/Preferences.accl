@@ -11,7 +11,6 @@
         <Element ComponentName="AutoPersistence" X="625" Y="200" Note=""/>
         <Element ComponentName="CompactXmlFileSerializer" X="875" Y="200" Note=""/>
         <Element ComponentName="DesignSchemas" X="125" Y="425" Note=""/>
-        <Element ComponentName="Designs" X="125" Y="525" Note=""/>
         <Element ComponentName="General" X="350" Y="350" Note=""/>
         <Element ComponentName="Language" X="350" Y="425" Note=""/>
         <Element ComponentName="Preferences" X="625" Y="275" Note=""/>

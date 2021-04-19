@@ -37,7 +37,7 @@ typedef imtlicgui::CProductLicensingInfoViewDelegateComp ProductLicensingInfoVie
 typedef imtlicgui::CProductInstanceInfoViewDelegateComp ProductInstanceInfoViewDelegate;
 typedef imtlicgui::CProductInstanceInfoEditorComp ProductInstanceInfoEditor;
 typedef imtlicgui::CFeatureTreeGuiComp FeatureTreeGui;
-typedef imtlicgui::CDesignManagerComp DesignManager;
+typedef icomp::TModelCompWrap<imtlicgui::CDesignManagerComp> DesignManager;
 
 
 } // namespace ImtLicenseGuiPck

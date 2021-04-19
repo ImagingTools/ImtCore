@@ -101,6 +101,32 @@ CImtStyle::DesignSchema CImtStyle::GetDesignSchema() const
 }
 
 
+QByteArray CImtStyle::GetDesignSchemaId(DesignSchema designSchema)
+{
+	switch (designSchema){
+	case DS_LIGHT:
+		return "Light";
+	case DS_DARK:
+		return "Dark";
+	default:
+		return QByteArray();
+	}
+}
+
+
+QString CImtStyle::GetDesignSchemaName(DesignSchema designSchema)
+{
+	switch (designSchema){
+	case DS_LIGHT:
+		return tr("Light");
+	case DS_DARK:
+		return tr("Dark");
+	default:
+		return QString();
+	}
+}
+
+
 void CImtStyle::SetDesignSchema(DesignSchema designSchema)
 {
 	m_designSchema = designSchema;

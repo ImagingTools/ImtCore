@@ -22,7 +22,7 @@ typedef imtauthgui::CAddressEditorComp AddressEditor;
 typedef imtauthgui::CAccountInfoEditorComp AccountInfoEditor;
 typedef imtauthgui::CContactInfoViewDelegateComp ContactInfoViewDelegate;
 typedef imtauthgui::CAccountInfoViewDelegateComp AccountInfoViewDelegate;
-typedef imtauthgui::CDesignManagerComp DesignManager;
+typedef icomp::TModelCompWrap<imtauthgui::CDesignManagerComp> DesignManager;
 
 
 } // namespace ImtAuthGuiPck
