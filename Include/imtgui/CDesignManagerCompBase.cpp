@@ -57,7 +57,7 @@ bool CDesignManagerCompBase::SetSelectedOptionIndex(int index)
 						imtStylePtr->SetDesignSchema(designSchema);
 
 						if (m_slaveCompPtr.IsValid()){
-							retVal = retVal && m_slaveCompPtr.GetPtr()->SetSelectedOptionIndex(index);
+							retVal = retVal && m_slaveCompPtr->SetSelectedOptionIndex(index);
 						}
 					}
 				}
