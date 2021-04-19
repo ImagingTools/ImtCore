@@ -34,8 +34,8 @@ protected:
 
 	void SetDesignResourcesFunctions(
 				imtwidgets::CImtStyle::DesignSchema designSchema,
-				ResourceFunctionPtr initResourceFunctionPtr,
-				ResourceFunctionPtr cleanupResourceFunctionPtr);
+				ResourceFunctionPtr initResources,
+				ResourceFunctionPtr cleanupResources);
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -48,8 +48,8 @@ private:
 	I_REF(iprm::ISelectionParam, m_selectionParamCompPtr);
 	I_REF(imod::IModel, m_selectionParamModelPtr);
 
-	QMap<int, ResourceFunctionPtr> m_initResourceFunctions;
-	QMap<int, ResourceFunctionPtr> m_cleanupResourceFunctions;
+	QMap<imtwidgets::CImtStyle::DesignSchema, ResourceFunctionPtr> m_initResources;
+	QMap<imtwidgets::CImtStyle::DesignSchema, ResourceFunctionPtr> m_cleanupResources;
 	imtbase::TModelUpdateBinder<iprm::ISelectionParam, CDesignManagerCompBase> m_selectionObserver;
 };
 

@@ -75,9 +75,17 @@ namespace imtwidgets
 
 // public methods
 
+
+CImtStyle& CImtStyle::GetInstance()
+{
+	static CImtStyle instance;
+	return instance;
+}
+
+
 int CImtStyle::GetDesignSchemaCount()
 {
-	return 2;
+	return DS_LAST;
 }
 
 
@@ -110,6 +118,16 @@ void CImtStyle::SetStyleType(StyleType styleType)
 	EnsureStyleSheetApplied(true);
 
 	BaseClass::polish(qApp);
+}
+
+
+CImtStyle::DesignSchema CImtStyle::GetDesignSchemaFromIndex(int index)
+{
+	if (index >= 0 && index < CImtStyle::DS_LAST){
+		return (DesignSchema)index;
+	}
+
+	return DS_INVALID;
 }
 
 

@@ -21,8 +21,12 @@ public:
 	*/
 	enum DesignSchema
 	{
-		DS_LIGHT,
-		DS_DARK
+		DS_INVALID = -1,
+
+		DS_LIGHT = 0,
+		DS_DARK,
+
+		DS_LAST
 	};
 
 	enum StyleType
@@ -31,11 +35,7 @@ public:
 		ST_FLAT
 	};
 
-	static CImtStyle& Instance()
-	{
-		static CImtStyle instance;
-		return instance;
-	}
+	static CImtStyle& GetInstance();
 
 	int GetDesignSchemaCount();
 	DesignSchema GetDesignSchema() const;
@@ -43,6 +43,8 @@ public:
 
 	StyleType GetStyleType() const;
 	void SetStyleType(StyleType styleType);
+
+	DesignSchema GetDesignSchemaFromIndex(int index);
 
 	// reimplemented (QStyle)
 	virtual void polish(QWidget* widgetPtr) override;
