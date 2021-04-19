@@ -101,7 +101,7 @@ CImtStyle::DesignSchema CImtStyle::GetDesignSchema() const
 }
 
 
-QByteArray CImtStyle::GetDesignSchemaId(DesignSchema designSchema)
+QByteArray CImtStyle::GetDesignSchemaId(DesignSchema designSchema) const
 {
 	switch (designSchema){
 	case DS_LIGHT:
@@ -114,7 +114,7 @@ QByteArray CImtStyle::GetDesignSchemaId(DesignSchema designSchema)
 }
 
 
-QString CImtStyle::GetDesignSchemaName(DesignSchema designSchema)
+QString CImtStyle::GetDesignSchemaName(DesignSchema designSchema) const
 {
 	switch (designSchema){
 	case DS_LIGHT:
