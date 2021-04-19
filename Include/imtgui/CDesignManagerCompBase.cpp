@@ -16,7 +16,6 @@ namespace imtgui
 CDesignManagerCompBase::CDesignManagerCompBase()
 	:m_selectionObserver(*this)
 {
-	RegisterResourcesFunctions();
 }
 
 
@@ -43,17 +42,23 @@ void CDesignManagerCompBase::SetDesignResourcesFunctions(
 
 void CDesignManagerCompBase::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
 	if (m_selectionParamCompPtr.IsValid() && m_selectionParamModelPtr.IsValid()){
 		m_selectionObserver.RegisterObject(
 					m_selectionParamCompPtr.GetPtr(),
 					&CDesignManagerCompBase::OnDesignSelectionUpdated);
 	}
+
+	RegisterResourcesFunctions();
 }
 
 
 void CDesignManagerCompBase::OnComponentDestroyed()
 {
 	m_selectionObserver.UnregisterAllObjects();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 
