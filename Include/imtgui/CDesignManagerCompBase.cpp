@@ -21,12 +21,13 @@ namespace imtgui
 // protected methods
 
 void CDesignManagerCompBase::SetDesignResourcesFunctions(
-	imtwidgets::CImtStyle::DesignSchema designSchema,
-	ResourceFunctionPtr initResources,
-	ResourceFunctionPtr cleanupResources)
+			imtwidgets::CImtStyle::DesignSchema designSchema,
+			ResourceFunctionPtr initResources,
+			ResourceFunctionPtr cleanupResources)
 {
 	if (initResources != nullptr && cleanupResources != nullptr){
 		m_initResources[designSchema] = initResources;
+
 		m_cleanupResources[designSchema] = cleanupResources;
 	}
 }
@@ -47,9 +48,9 @@ bool CDesignManagerCompBase::SetSelectedOptionIndex(int index)
 			if (index < imtStylePtr->GetDesignSchemaCount()){
 				if (m_initResources.contains(designSchema)){
 					if (m_initResources[designSchema] != nullptr){
-						for (ResourceFunctionPtr functionPtr : m_cleanupResources){
-							if (functionPtr != nullptr){
-								functionPtr();
+						for (ResourceFunctionPtr cleanupFunctionPtr : m_cleanupResources){
+							if (cleanupFunctionPtr != nullptr){
+								cleanupFunctionPtr();
 							}
 						}
 
