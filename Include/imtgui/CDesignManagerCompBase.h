@@ -25,7 +25,7 @@ public:
 	I_BEGIN_BASE_COMPONENT(CDesignManagerCompBase);
 		I_REGISTER_INTERFACE(iprm::ISelectionParam);
 		I_REGISTER_INTERFACE(iser::ISerializable);
-		I_ASSIGN(m_slaveCompPtr, "SlaveDesignManager", "Slave design manager", false, "");
+		I_ASSIGN(m_slaveCompPtr, "SlaveDesignManager", "Slave design manager", false, "SlaveDesignManager");
 	I_END_COMPONENT;
 
 protected:

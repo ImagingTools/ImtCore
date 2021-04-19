@@ -89,41 +89,25 @@ CImtStyle* CImtStyle::GetInstance()
 }
 
 
-int CImtStyle::GetDesignSchemaCount()
+int CImtStyle::GetDesignSchemaCount() const
 {
 	return DS_LAST;
+}
+
+
+CImtStyle::DesignSchema CImtStyle::GetDesignSchemaFromIndex(int index) const
+{
+	if (index >= 0 && index < CImtStyle::DS_LAST){
+		return (DesignSchema)index;
+	}
+
+	return DS_INVALID;
 }
 
 
 CImtStyle::DesignSchema CImtStyle::GetDesignSchema() const
 {
 	return m_designSchema;
-}
-
-
-QByteArray CImtStyle::GetDesignSchemaId(DesignSchema designSchema) const
-{
-	switch (designSchema){
-	case DS_LIGHT:
-		return "Light";
-	case DS_DARK:
-		return "Dark";
-	default:
-		return QByteArray();
-	}
-}
-
-
-QString CImtStyle::GetDesignSchemaName(DesignSchema designSchema) const
-{
-	switch (designSchema){
-	case DS_LIGHT:
-		return tr("Light");
-	case DS_DARK:
-		return tr("Dark");
-	default:
-		return QString();
-	}
 }
 
 
@@ -153,13 +137,29 @@ void CImtStyle::SetStyleType(StyleType styleType)
 }
 
 
-CImtStyle::DesignSchema CImtStyle::GetDesignSchemaFromIndex(int index)
+QByteArray CImtStyle::GetDesignSchemaId(DesignSchema designSchema) const
 {
-	if (index >= 0 && index < CImtStyle::DS_LAST){
-		return (DesignSchema)index;
+	switch (designSchema){
+	case DS_LIGHT:
+		return "Light";
+	case DS_DARK:
+		return "Dark";
+	default:
+		return QByteArray();
 	}
+}
 
-	return DS_INVALID;
+
+QString CImtStyle::GetDesignSchemaName(DesignSchema designSchema) const
+{
+	switch (designSchema){
+	case DS_LIGHT:
+		return tr("Light");
+	case DS_DARK:
+		return tr("Dark");
+	default:
+		return QString();
+	}
 }
 
 

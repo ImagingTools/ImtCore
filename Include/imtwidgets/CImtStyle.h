@@ -37,16 +37,14 @@ public:
 
 	static CImtStyle* GetInstance();
 
-	int GetDesignSchemaCount();
+	int GetDesignSchemaCount() const;
+	DesignSchema GetDesignSchemaFromIndex(int index) const;
 	DesignSchema GetDesignSchema() const;
-	QByteArray GetDesignSchemaId(DesignSchema designSchema) const;
-	QString GetDesignSchemaName(DesignSchema designSchema) const;
 	void SetDesignSchema(DesignSchema designSchema);
-
 	StyleType GetStyleType() const;
 	void SetStyleType(StyleType styleType);
-
-	DesignSchema GetDesignSchemaFromIndex(int index);
+	QByteArray GetDesignSchemaId(DesignSchema designSchema) const;
+	QString GetDesignSchemaName(DesignSchema designSchema) const;
 
 	// reimplemented (QStyle)
 	virtual void polish(QWidget* widgetPtr) override;

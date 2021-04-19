@@ -77,9 +77,9 @@ void CDesignManagerCompBase::OnComponentCreated()
 
 void CDesignManagerCompBase::OnComponentDestroyed()
 {
-	for (ResourceFunctionPtr functionPtr : m_cleanupResources){
-		if (functionPtr != nullptr){
-			functionPtr();
+	for (ResourceFunctionPtr cleanupFunctionPtr : m_cleanupResources){
+		if (cleanupFunctionPtr != nullptr){
+			cleanupFunctionPtr();
 		}
 	}
 
