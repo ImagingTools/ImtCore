@@ -46,10 +46,10 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 private:
-	class Constraints: virtual public iprm::IOptionsList
+	class DesignList: virtual public iprm::IOptionsList
 	{
 	public:
-		void Update();
+		void UpdateDesignList();
 
 		// reimplemented (iprm::IOptionsList)
 		virtual int GetOptionsFlags() const;
@@ -77,7 +77,7 @@ private:
 	QMap<imtwidgets::CImtStyle::DesignSchema, ResourceFunctionPtr> m_initResources;
 	QMap<imtwidgets::CImtStyle::DesignSchema, ResourceFunctionPtr> m_cleanupResources;
 
-	imod::TModelWrap<Constraints> m_constraints;
+	imod::TModelWrap<DesignList> m_designs;
 };
 
 

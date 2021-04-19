@@ -65,9 +65,9 @@ bool CDesignManagerCompBase::SetSelectedOptionIndex(int index)
 
 void CDesignManagerCompBase::OnComponentCreated()
 {
-	m_constraints.Update();
+	m_designs.UpdateDesignList();
 
-	SetSelectionConstraints(&m_constraints);
+	SetSelectionConstraints(&m_designs);
 
 	RegisterResourcesFunctions();
 
@@ -87,9 +87,9 @@ void CDesignManagerCompBase::OnComponentDestroyed()
 }
 
 
-// public methods of the embedded class Constraints
+// public methods of the embedded class DesignList
 
-void CDesignManagerCompBase::Constraints::Update()
+void CDesignManagerCompBase::DesignList::UpdateDesignList()
 {
 	istd::CChangeNotifier changeNotifier(this);
 
@@ -110,19 +110,19 @@ void CDesignManagerCompBase::Constraints::Update()
 
 // reimplemented (iprm::IOptionsList)
 
-int CDesignManagerCompBase::Constraints::GetOptionsFlags() const
+int CDesignManagerCompBase::DesignList::GetOptionsFlags() const
 {
 	return SCF_NONE;
 }
 
 
-int CDesignManagerCompBase::Constraints::GetOptionsCount() const
+int CDesignManagerCompBase::DesignList::GetOptionsCount() const
 {
 	return m_options.count();
 }
 
 
-QString CDesignManagerCompBase::Constraints::GetOptionName(int index) const
+QString CDesignManagerCompBase::DesignList::GetOptionName(int index) const
 {
 	Q_ASSERT(index >= 0);
 
@@ -134,7 +134,7 @@ QString CDesignManagerCompBase::Constraints::GetOptionName(int index) const
 }
 
 
-QString CDesignManagerCompBase::Constraints::GetOptionDescription(int index) const
+QString CDesignManagerCompBase::DesignList::GetOptionDescription(int index) const
 {
 	Q_ASSERT(index >= 0);
 
@@ -146,7 +146,7 @@ QString CDesignManagerCompBase::Constraints::GetOptionDescription(int index) con
 }
 
 
-QByteArray CDesignManagerCompBase::Constraints::GetOptionId(int index) const
+QByteArray CDesignManagerCompBase::DesignList::GetOptionId(int index) const
 {
 	Q_ASSERT(index >= 0);
 
@@ -158,7 +158,7 @@ QByteArray CDesignManagerCompBase::Constraints::GetOptionId(int index) const
 }
 
 
-bool CDesignManagerCompBase::Constraints::IsOptionEnabled(int /*index*/) const
+bool CDesignManagerCompBase::DesignList::IsOptionEnabled(int /*index*/) const
 {
 	return true;
 }
