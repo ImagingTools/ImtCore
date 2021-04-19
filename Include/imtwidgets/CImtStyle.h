@@ -90,7 +90,7 @@ private:
 
 private:
 	CImtStyle();
-	Q_DISABLE_COPY_MOVE(CImtStyle);
+	Q_DISABLE_COPY(CImtStyle);
 };
 
 
