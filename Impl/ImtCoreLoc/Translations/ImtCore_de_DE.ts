@@ -50,14 +50,14 @@
     </message>
     <message>
         <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+6"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
         <translation>(C) 2018 ImagingToolsGmbH. Alle Rechte vorbehalten</translation>
     </message>
     <message>
         <location line="-38"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-38"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-40"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-40"/>
         <source>STL</source>
         <translation></translation>
@@ -127,7 +127,7 @@
     <message>
         <location line="-22"/>
         <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+22"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+34"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+22"/>
         <source>ImtCore</source>
         <translation></translation>
@@ -135,7 +135,7 @@
     <message>
         <location line="-46"/>
         <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-16"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-4"/>
         <source>ImagingTools GmbH</source>
         <translation></translation>
@@ -148,6 +148,32 @@
     <message>
         <location line="+2"/>
         <source>Server Dermo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <source>Preference File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+2"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Design</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>General</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

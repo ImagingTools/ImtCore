@@ -50,14 +50,14 @@
     </message>
     <message>
         <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+6"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-38"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-38"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-40"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-40"/>
         <source>STL</source>
         <translation type="unfinished"></translation>
@@ -133,25 +133,35 @@
         <translation type="vanished">Тёмная</translation>
     </message>
     <message>
-        <source>Design</source>
-        <translation type="vanished">Цветовая схема</translation>
-    </message>
-    <message>
-        <source>Language</source>
-        <translation type="vanished">Язык</translation>
-    </message>
-    <message>
-        <source>General</source>
-        <translation type="vanished">Общие</translation>
-    </message>
-    <message>
-        <source>Preferences</source>
-        <translation type="vanished">Настройки</translation>
-    </message>
-    <message>
-        <location line="-22"/>
-        <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+22"/>
+        <source>Preference File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Design</source>
+        <translation>Цветовая схема</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Language</source>
+        <translation>Язык</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>General</source>
+        <translation>Общие</translation>
+    </message>
+    <message>
+        <location line="-8"/>
+        <location line="+2"/>
+        <source>Preferences</source>
+        <translation>Настройки</translation>
+    </message>
+    <message>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/EagleView/CEagleView.cpp" line="-22"/>
+        <location line="+44"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+8"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+22"/>
         <source>ImtCore</source>
         <translation type="unfinished"></translation>
@@ -159,7 +169,7 @@
     <message>
         <location line="-46"/>
         <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-16"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-4"/>
         <source>ImagingTools GmbH</source>
         <translation type="unfinished"></translation>
