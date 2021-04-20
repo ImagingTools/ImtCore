@@ -72,13 +72,13 @@ void CDesignManagerCompBase::SetDesignResourcesFunctions(
 
 void CDesignManagerCompBase::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
 	m_designs.UpdateDesignList();
 
 	SetSelectionConstraints(&m_designs);
 
 	RegisterResourcesFunctions();
-
-	BaseClass::OnComponentCreated();
 }
 
 
