@@ -457,6 +457,7 @@ CImtStyle::CImtStyle()
 	light.styleSheetPath = ":/Styles/ImtLightStyle";
 	istd::TDelPtr<QStyle> baseStylePtr(QStyleFactory::create("fusion"));
 	light.palette = baseStylePtr->standardPalette();
+	light.palette.setColor(QPalette::Highlight, QColor(57, 168, 237));
 
 	m_colorSchemaMap[DS_LIGHT] = light;
 
