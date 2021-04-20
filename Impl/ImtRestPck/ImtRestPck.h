@@ -10,6 +10,7 @@
 #include <imtrest/CHttpProtocolEngineComp.h>
 #include <imtrest/CHttpRootHandlerComp.h>
 #include <imtrest/CHttpFileBasedHandlerComp.h>
+#include <imtrest/CHttpHtmlFolderBasedHandlerComp.h>
 
 
 /**
@@ -23,6 +24,7 @@ typedef imtrest::CTcpServerComp TcpServer;
 typedef imtrest::CHttpProtocolEngineComp HttpProtocolEngine;
 typedef imtrest::CHttpRootHandlerComp HttpRootHandler;
 typedef imtrest::CHttpFileBasedHandlerComp HttpFileBasedHandler;
+typedef imtrest::CHttpHtmlFolderBasedHandlerComp HttpHtmlFolderBasedHandler;
 
 
 } // namespace ImtRestPck

@@ -34,6 +34,11 @@ I_EXPORT_COMPONENT(
             "HTTP file handler",
             "HTTP File Template");
 
+I_EXPORT_COMPONENT(
+		HttpHtmlFolderBasedHandler,
+		"Generates HTML-document with list of objects for all the files and directories in the directory",
+		"HTTP File Dir Directory HTML");
+
 
 } // namespace ImtRestPck
 
