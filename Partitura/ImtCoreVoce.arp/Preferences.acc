@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4902" Description="ACF"/>
-            <Version Id="1" Number="2135" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331010" Description="Qt Framework"/>
+            <Version Id="0" Number="4909" Description="ACF"/>
+            <Version Id="1" Number="2137" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -165,12 +165,8 @@
                     <Element Id="ImtDesignSchema" PackageId="ImtGuiPck" ComponentId="DesignManager">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="SlaveDesignManagers" Type="Reference[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>LicDesignSchema</Value>
-                                        </Values>
-                                    </Data>
+                                <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="LicDesignSchema"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -178,12 +174,8 @@
                     <Element Id="LicDesignSchema" PackageId="ImtLicenseGuiPck" ComponentId="DesignManager">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="SlaveDesignManagers" Type="Reference[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>AuthDesignSchema</Value>
-                                        </Values>
-                                    </Data>
+                                <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="AuthDesignSchema"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
