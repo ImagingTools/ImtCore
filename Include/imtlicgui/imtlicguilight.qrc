@@ -1,14 +1,14 @@
 <RCC>
     <qresource prefix="/Icons">
-        <file alias="Deployment">Resources/Icons/Deployment.svg</file>
-        <file alias="FeaturePackage">Resources/Icons/FeaturePackage.svg</file>
-        <file alias="FeatureList">Resources/Icons/FeatureList.svg</file>
-        <file alias="Dependencies">Resources/Icons/Dependencies.svg</file>
+        <file alias="Deployment">Resources/Icons/Light/Deployment.svg</file>
+        <file alias="FeaturePackage">Resources/Icons/Light/FeaturePackage.svg</file>
+        <file alias="FeatureList">Resources/Icons/Light/FeatureList.svg</file>
+        <file alias="Dependencies">Resources/Icons/Light/Dependencies.svg</file>
     </qresource>
     <qresource prefix="/ColorIcons">
-        <file alias="FeaturePackage">Resources/Icons/Color/FeaturePackage.svg</file>
-        <file alias="Dependencies">Resources/Icons/Color/Dependencies.svg</file>
-        <file alias="License">Resources/Icons/Color/License.svg</file>
-        <file alias="Deployment">Resources/Icons/Color/Deployment.svg</file>
+        <file alias="FeaturePackage">Resources/Icons/Light/Color/FeaturePackage.svg</file>
+        <file alias="Dependencies">Resources/Icons/Light/Color/Dependencies.svg</file>
+        <file alias="License">Resources/Icons/Light/Color/License.svg</file>
+        <file alias="Deployment">Resources/Icons/Light/Color/Deployment.svg</file>
     </qresource>
 </RCC>
