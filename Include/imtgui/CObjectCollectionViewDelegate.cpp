@@ -25,13 +25,13 @@ CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 {
 	SetupSummaryInformation();
 	EnableLocalization(true);
-	EnableDesignSchemaChangeHandler(true);
+	EnableDesignHandler(true);
 }
 
 
 CObjectCollectionViewDelegate::~CObjectCollectionViewDelegate()
 {
-	EnableDesignSchemaChangeHandler(false);
+	EnableDesignHandler(false);
 	EnableLocalization(false);
 }
 
