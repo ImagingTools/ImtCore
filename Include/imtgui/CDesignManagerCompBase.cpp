@@ -80,7 +80,7 @@ void CDesignManagerCompBase::OnComponentCreated()
 
 	RegisterResourcesFunctions();
 
-	if (GetSelectionConstraints()->GetOptionsCount() > 0){
+	if (m_designs.GetOptionsCount() > 0){
 		SetSelectedOptionIndex(0);
 	}
 }

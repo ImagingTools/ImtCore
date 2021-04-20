@@ -2,29 +2,20 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4909" Description="ACF"/>
-            <Version Id="1" Number="2137" Description="ACF-Solutions"/>
+            <Version Id="0" Number="4918" Description="ACF"/>
+            <Version Id="1" Number="2138" Description="ACF-Solutions"/>
             <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="AutoPersistence" X="625" Y="200" Note=""/>
         <Element ComponentName="CompactXmlFileSerializer" X="875" Y="200" Note=""/>
-        <Element ComponentName="DesignSchemas" X="125" Y="425" Note=""/>
-        <Element ComponentName="General" X="350" Y="350" Note=""/>
-        <Element ComponentName="Language" X="350" Y="425" Note=""/>
+        <Element ComponentName="DesignSchemas" X="125" Y="525" Note=""/>
+        <Element ComponentName="General" X="375" Y="425" Note=""/>
+        <Element ComponentName="Language" X="625" Y="525" Note=""/>
         <Element ComponentName="Preferences" X="625" Y="275" Note=""/>
         <Element ComponentName="PreferencesFilePath" X="625" Y="125" Note=""/>
         <Element ComponentName="SystemLocation" X="625" Y="50" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries>
-        <EmbededRegistry Id="DesignSchemes">
-            <PositionMap>
-                <Element ComponentName="AuthDesignSchema" X="850" Y="450" Note=""/>
-                <Element ComponentName="ImtDesignSchema" X="275" Y="100" Note=""/>
-                <Element ComponentName="LicDesignSchema" X="550" Y="300" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-    </EmbeddedRegistries>
+    <EmbeddedRegistries/>
 </Acf>

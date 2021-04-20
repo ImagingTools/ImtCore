@@ -2,12 +2,12 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4909" Description="ACF"/>
-            <Version Id="1" Number="2137" Description="ACF-Solutions"/>
+            <Version Id="0" Number="4918" Description="ACF"/>
+            <Version Id="1" Number="2138" Description="ACF-Solutions"/>
             <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description></Description>
+    <Description>Basic preferences</Description>
     <Keywords></Keywords>
     <ElementsList>
         <Element Id="AutoPersistence" PackageId="FilePck" ComponentId="AutoPersistence">
@@ -60,7 +60,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="DesignSchemas" PackageId="" ComponentId="DesignSchemes">
+        <Element Id="DesignSchemas" PackageId="ImtCoreVoce" ComponentId="DesignSchema">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>
@@ -153,46 +153,7 @@
             </Data>
         </Element>
     </ElementsList>
-    <EmbeddedRegistriesList>
-        <EmbeddedRegistry Id="DesignSchemes">
-            <Data Description="" Keywords="">
-                <ElementsList>
-                    <Element Id="AuthDesignSchema" PackageId="ImtAuthGuiPck" ComponentId="DesignManager">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap/>
-                        </Data>
-                    </Element>
-                    <Element Id="ImtDesignSchema" PackageId="ImtGuiPck" ComponentId="DesignManager">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="LicDesignSchema"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="LicDesignSchema" PackageId="ImtLicenseGuiPck" ComponentId="DesignManager">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="AuthDesignSchema"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                </ElementsList>
-                <EmbeddedRegistriesList/>
-                <ExportedInterfaces>
-                    <Interface InterfaceId="imod::IModel" ComponentId="ImtDesignSchema"/>
-                    <Interface InterfaceId="iprm::ISelectionParam" ComponentId="ImtDesignSchema"/>
-                    <Interface InterfaceId="iser::ISerializable" ComponentId="ImtDesignSchema"/>
-                    <Interface InterfaceId="istd::IChangeable" ComponentId="ImtDesignSchema"/>
-                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="ImtDesignSchema"/>
-                </ExportedInterfaces>
-                <ExportedComponents/>
-            </Data>
-        </EmbeddedRegistry>
-    </EmbeddedRegistriesList>
+    <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imod::IModel" ComponentId="Preferences"/>
         <Interface InterfaceId="iprm::IParamsSet" ComponentId="Preferences"/>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4918" Description="ACF"/>
+            <Version Id="1" Number="2138" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Design schema for ImtCore</Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="AuthDesignSchema" PackageId="ImtAuthGuiPck" ComponentId="DesignManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="SlaveDesignManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ImtDesignSchema" PackageId="ImtGuiPck" ComponentId="DesignManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LicDesignSchema"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LicDesignSchema" PackageId="ImtLicenseGuiPck" ComponentId="DesignManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AuthDesignSchema"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="ImtDesignSchema"/>
+        <Interface InterfaceId="iprm::ISelectionParam" ComponentId="ImtDesignSchema"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="ImtDesignSchema"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="ImtDesignSchema"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ImtDesignSchema"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

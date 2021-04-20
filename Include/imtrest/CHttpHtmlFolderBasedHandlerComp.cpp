@@ -1,9 +1,5 @@
 #include "CHttpHtmlFolderBasedHandlerComp.h"
 
-#ifndef __BASE_FILE__
-#define __BASE_FILE__ "CHttpHtmlFolderBasedHandlerComp.cpp"
-#endif
-
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <ifile/IFileNameParam.h>
@@ -44,19 +40,19 @@ QByteArray CHttpHtmlFolderBasedHandlerComp::Generate(const QString& directoryPat
 	QFileInfo fileInfo(directoryPath);
 	if(!fileInfo.exists())
 	{
-		qCritical() << __BASE_FILE__ << __LINE__ << "Trying to get info of nonexistent value!" << fileInfo.absoluteFilePath();
+		qCritical() << __FILE__ << __LINE__ << "Trying to get info of nonexistent value!" << fileInfo.absoluteFilePath();
 	}
 	else if(!fileInfo.isReadable())
 	{
-		qCritical() << __BASE_FILE__ << __LINE__ << "Trying to get info of nonreadable value!" << fileInfo.absoluteFilePath();
+		qCritical() << __FILE__ << __LINE__ << "Trying to get info of nonreadable value!" << fileInfo.absoluteFilePath();
 	}
 	else if(fileInfo.isFile())
 	{
-		qWarning() << __BASE_FILE__ << __LINE__ << "Trying to get info of file" << fileInfo.absoluteFilePath();
+		qWarning() << __FILE__ << __LINE__ << "Trying to get info of file" << fileInfo.absoluteFilePath();
 	}
 	else if(!fileInfo.isDir())
 	{
-		qCritical() << __BASE_FILE__ << __LINE__ << "Trying to get info of unexpected value!" << fileInfo.absoluteFilePath();
+		qCritical() << __FILE__ << __LINE__ << "Trying to get info of unexpected value!" << fileInfo.absoluteFilePath();
 	}
 	else
 	{
@@ -147,7 +143,7 @@ IRequestHandler::ConstResponsePtr CHttpHtmlFolderBasedHandlerComp::ProcessReques
 	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId));
 
 	auto generateErrorResponsePtr = [&request, &engine, reponseTypeId](QByteArray errorBody){
-		qCritical() << __BASE_FILE__ << __LINE__ << "Error occurred" << errorBody;
+		qCritical() << __FILE__ << __LINE__ << "Error occurred" << errorBody;
 		QByteArray generatedErrorBody = "<html><head><title>Error</title></head><body><p>";
 		generatedErrorBody.append(errorBody);
 		generatedErrorBody.append("</p></body></html>");
