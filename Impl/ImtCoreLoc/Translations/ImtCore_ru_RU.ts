@@ -18,47 +18,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-28"/>
+        <location line="-30"/>
         <source>3D-Viewer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+30"/>
-        <location line="+2"/>
+        <location line="+32"/>
         <location line="+4"/>
         <location line="+2"/>
+        <location line="+4"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+2"/>
         <location line="+4"/>
         <location line="+2"/>
+        <location line="+4"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
-        <location line="+2"/>
         <location line="+4"/>
         <location line="+2"/>
+        <location line="+4"/>
         <source>Edit License</source>
         <translation>Редактор лицензии</translation>
     </message>
     <message>
-        <location line="-4"/>
+        <location line="-8"/>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
         <location line="+6"/>
-        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-4"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-8"/>
         <location line="+6"/>
         <source>Edit</source>
         <translation>Редактировать</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+6"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-38"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-38"/>
-        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-38"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-40"/>
         <source>STL</source>
         <translation type="unfinished"></translation>
     </message>
@@ -125,68 +125,42 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+22"/>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+26"/>
-        <location line="+16"/>
-        <source>Preference File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-14"/>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-20"/>
-        <location line="+16"/>
         <source>Light</source>
-        <translation>Светлая</translation>
+        <translation type="vanished">Светлая</translation>
     </message>
     <message>
-        <location line="-14"/>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-14"/>
-        <location line="+16"/>
         <source>Dark</source>
-        <translation>Тёмная</translation>
+        <translation type="vanished">Тёмная</translation>
     </message>
     <message>
-        <location line="-14"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
         <source>Design</source>
-        <translation>Цветовая схема</translation>
+        <translation type="vanished">Цветовая схема</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Language</source>
-        <translation>Язык</translation>
+        <translation type="vanished">Язык</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
         <source>General</source>
-        <translation>Общие</translation>
+        <translation type="vanished">Общие</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
-        <location line="+2"/>
         <source>Preferences</source>
-        <translation>Настройки</translation>
+        <translation type="vanished">Настройки</translation>
     </message>
     <message>
-        <location line="-62"/>
-        <location line="+70"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
+        <location line="-22"/>
+        <location line="+44"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+22"/>
         <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+22"/>
         <source>ImtCore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-66"/>
-        <location line="+42"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-24"/>
-        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-2"/>
+        <location line="-46"/>
+        <location line="+44"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-4"/>
         <source>ImagingTools GmbH</source>
         <translation type="unfinished"></translation>
     </message>
@@ -196,7 +170,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
+        <location line="+2"/>
         <source>Server Dermo</source>
         <translation type="unfinished"></translation>
     </message>
@@ -684,7 +658,7 @@
         <location filename="../../../Include/imtlicgui/CLicenseInfoEditorGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h" line="+179"/>
         <source>Edit License</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Редактор лицензии</translation>
     </message>
     <message>
         <location line="+125"/>
@@ -2025,7 +1999,7 @@ Errors: 0</source>
     <name>imtgui::CObjectCollectionViewDelegate</name>
     <message>
         <location filename="../../../Include/imtgui/CObjectCollectionViewDelegate.cpp" line="+21"/>
-        <location line="+80"/>
+        <location line="+82"/>
         <location line="+255"/>
         <source>New</source>
         <translation>Создать</translation>
@@ -2071,42 +2045,42 @@ Errors: 0</source>
         <translation>Продублировать выбранный документ</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+50"/>
         <source>Initial Revision</source>
         <translation>Начальная ревизия</translation>
     </message>
     <message>
-        <location line="-273"/>
+        <location line="-281"/>
         <location line="+232"/>
         <source>Remove selected document from the collection</source>
         <translation>Удалить выбранные документы</translation>
     </message>
     <message>
-        <location line="-338"/>
+        <location line="-340"/>
         <source>&amp;Edit</source>
         <translation>&amp;Редактировать</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+335"/>
+        <location line="+337"/>
         <source>Duplicate</source>
         <translation>Дублировать</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+21"/>
         <location line="+51"/>
         <source>New document could not be created</source>
         <translation>Невозможно создать документ</translation>
     </message>
     <message>
-        <location line="-398"/>
-        <location line="+103"/>
+        <location line="-408"/>
+        <location line="+105"/>
         <location line="+232"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+20"/>
         <location line="+51"/>
         <source>Collection</source>
         <translation>Коллекция</translation>
@@ -2781,6 +2755,19 @@ Errors: 0</source>
         <location line="+0"/>
         <source>Set grid visible/unvisible</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>imtwidgets::CImtStyle</name>
+    <message>
+        <location filename="../../../Include/imtwidgets/CImtStyle.cpp" line="+160"/>
+        <source>Light</source>
+        <translation type="unfinished">Светлая</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Dark</source>
+        <translation type="unfinished">Тёмная</translation>
     </message>
 </context>
 </TS>

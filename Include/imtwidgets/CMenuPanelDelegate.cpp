@@ -27,15 +27,7 @@ CMenuPanelDelegate::CMenuPanelDelegate(QTreeView* menuPanelPtr)
 	m_topPadding(0),
 	m_leftPadding(0),
 	m_rightPadding(0),
-	m_iconToTextPadding(0),
-	
-	m_textColor(QColor(0, 0, 0)),
-	m_selectedContourColor(QColor(0, 0, 0)),
-	m_selectedColor(QColor(0, 0, 0)),
-	m_mouseOverColor(QColor(0, 0, 0)),
-	m_mouseOverSelectedColor(QColor(0, 0, 0)),
-	m_mouseOverTextColor(QColor(0, 0, 0)),
-	m_mouseOverSelectedTextColor(QColor(0, 0, 0))
+	m_iconToTextPadding(0)
 {
 }
 
@@ -124,48 +116,6 @@ void CMenuPanelDelegate::SetIconToTextPadding(int padding)
 }
 
 
-void CMenuPanelDelegate::SetSelectedColor(const QColor& color)
-{
-	m_selectedColor = color;
-}
-
-
-void CMenuPanelDelegate::SetMouserOverColor(const QColor& color)
-{
-	m_mouseOverColor = color;
-}
-
-
-void CMenuPanelDelegate::SetMouserOverSelectedColor(const QColor& color)
-{
-	m_mouseOverSelectedColor = color;
-}
-
-
-void CMenuPanelDelegate::SetMouserOverTextColor(const QColor& color)
-{
-	m_mouseOverTextColor = color;
-}
-
-
-void CMenuPanelDelegate::SetMouserOverSelectedTextColor(const QColor& color)
-{
-	m_mouseOverSelectedTextColor = color;
-}
-
-
-void CMenuPanelDelegate::SetSelectedContourColor(const QColor& color)
-{
-	m_selectedContourColor = color;
-}
-
-
-void CMenuPanelDelegate::SetTextColor(const QColor& color)
-{
-	m_textColor = color;
-}
-
-
 // protected methods
 
 // reimplemented (QItemDelegate)
@@ -209,6 +159,8 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const
 
 void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
+	QPalette palette = qApp->palette();
+
 	if (option.rect.height() < m_height){
 		return;
 	}
@@ -216,25 +168,11 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 	int indent = property("indent").toInt();
 
 	QColor backgroundColor = Qt::transparent;
-	QColor textColor = m_textColor;
+	QColor textColor = palette.color(QPalette::Text);
 
 	if (option.state & QStyle::State_Selected){
-		backgroundColor = m_selectedColor;
-	}
-
-	if (option.state & QStyle::State_MouseOver){
-		const QStandardItemModel* modelPtr = dynamic_cast<const QStandardItemModel*>(index.model());
-		Q_ASSERT(modelPtr != nullptr);
-
-		if (modelPtr->itemFromIndex(index)->isEnabled()){
-			backgroundColor = m_mouseOverColor;
-			textColor = m_mouseOverTextColor;
-
-			if (option.state & QStyle::State_Selected){
-				backgroundColor = m_mouseOverSelectedColor;
-				textColor = m_mouseOverSelectedTextColor;
-			}
-		}
+		backgroundColor = palette.color(QPalette::Highlight);
+		textColor = palette.color(QPalette::HighlightedText);
 	}
 
 	painter->save();
@@ -269,7 +207,6 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 			painter->drawEllipse(backgroundRightEllipse);
 		}
 		else {
-			painter->setPen(m_selectedContourColor);
 			painter->drawEllipse(backgroundSingleEllipse);
 		}
 	}

@@ -421,47 +421,6 @@ void CMenuPanel::SetItemIconToTextPadding(int padding)
 }
 
 
-void CMenuPanel::SetItemTextColor(QColor color)
-{
-	m_delegatePtr.SetTextColor(color);
-}
-
-
-void CMenuPanel::SetItemSelectedContourColor(QColor color)
-{
-	m_delegatePtr.SetSelectedContourColor(color);
-}
-
-
-void CMenuPanel::SetItemSelectedColor(QColor color)
-{
-	m_delegatePtr.SetSelectedColor(color);
-}
-
-
-void CMenuPanel::SetItemMouseOverColor(QColor color)
-{
-	m_delegatePtr.SetMouserOverColor(color);
-}
-
-
-void CMenuPanel::SetItemMouseOverSelectedColor(QColor color)
-{
-	m_delegatePtr.SetMouserOverSelectedColor(color);
-}
-
-
-void CMenuPanel::SetItemMouseOverTextColor(QColor color)
-{
-	m_delegatePtr.SetMouserOverTextColor(color);
-}
-
-
-void CMenuPanel::SetItemMouseOverSelectedTextColor(QColor color)
-{
-	m_delegatePtr.SetMouserOverSelectedTextColor(color);
-}
-
 void CMenuPanel::SetAnimationDelay(int delay)
 {
 	m_animationDelay = delay;

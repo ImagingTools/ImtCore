@@ -32,26 +32,11 @@ public:
 							imod::TSingleModelObserverBase<iprm::ISelectionParam>>> BaseClass;
 
 	I_BEGIN_COMPONENT(CMenuPanelCompBase);
-		I_ASSIGN(m_textColorAttrPtr, "TextColor", "Item text color", true, "#000000");
-		I_ASSIGN(m_selectedColorAttrPtr, "SelectedColor", "Selected item background color", true, "#808080");
-		I_ASSIGN(m_selectedContourColorAttrPtr, "SelectedContourColor", "Selected item contour color", true, "#000000");
-		I_ASSIGN(m_mouseOverColorAttrPtr, "MouseOverColor", "Item under mouse background color", true, "#808080");
-		I_ASSIGN(m_mouseOverSelectedColorAttrPtr, "MouseOverSelectedColor", "Selected item under mouse background color ", true, "#808080");
-		I_ASSIGN(m_mouseOverTextColorAttrPtr, "MouseOverTextColor", "Item under mouse text color", true, "#808080");
-		I_ASSIGN(m_mouseOverSelectedTextColorAttrPtr, "MouseOverSelectedTextColor", "Selected item under mouse text color ", true, "#808080");
 		I_ASSIGN(m_animationDelayAttrPtr, "AnimationDelay", "Animation delay", true, 800);
 		I_ASSIGN(m_animationDurationAttrPtr, "AnimationDuration", "Animation duration", true, 150);
 	I_END_COMPONENT;
 
 protected:
-	I_ATTR(QByteArray, m_textColorAttrPtr);
-	I_ATTR(QByteArray, m_selectedColorAttrPtr);
-	I_ATTR(QByteArray, m_selectedContourColorAttrPtr);
-	I_ATTR(QByteArray, m_mouseOverColorAttrPtr);
-	I_ATTR(QByteArray, m_mouseOverSelectedColorAttrPtr);
-	I_ATTR(QByteArray, m_mouseOverTextColorAttrPtr);
-	I_ATTR(QByteArray, m_mouseOverSelectedTextColorAttrPtr);
-
 	I_ATTR(int, m_animationDelayAttrPtr);
 	I_ATTR(int, m_animationDurationAttrPtr);
 };

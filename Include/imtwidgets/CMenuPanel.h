@@ -83,14 +83,6 @@ public:
 	virtual void SetItemRightPadding(int padding);
 	virtual void SetItemIconToTextPadding(int padding);
 
-	virtual void SetItemTextColor(QColor color);
-	virtual void SetItemSelectedContourColor(QColor color);
-	virtual void SetItemSelectedColor(QColor color);
-	virtual void SetItemMouseOverColor(QColor color);
-	virtual void SetItemMouseOverSelectedColor(QColor color);
-	virtual void SetItemMouseOverTextColor(QColor color);
-	virtual void SetItemMouseOverSelectedTextColor(QColor color);
-
 	virtual void SetAnimationDelay(int delay);
 	virtual void SetAnimationDuration(int duration);
 

@@ -74,14 +74,6 @@ void CMenuPanelComp::OnGuiCreated()
 	widgetPtr->SetIconSizeHoverRatio(*m_iconSizeHoverRatioAttrPtr);
 	widgetPtr->SetFontSizeRatio(*m_fontSizeRatioAttrPtr);
 
-	widgetPtr->SetItemTextColor(QColor(QString(*m_textColorAttrPtr)));
-	widgetPtr->SetItemSelectedContourColor(QColor(QString(*m_selectedContourColorAttrPtr)));
-	widgetPtr->SetItemSelectedColor(QColor(QString(*m_selectedColorAttrPtr)));
-	widgetPtr->SetItemMouseOverColor(QColor(QString(*m_mouseOverColorAttrPtr)));
-	widgetPtr->SetItemMouseOverSelectedColor(QColor(QString(*m_mouseOverSelectedColorAttrPtr)));
-	widgetPtr->SetItemMouseOverTextColor(QColor(QString(*m_mouseOverTextColorAttrPtr)));
-	widgetPtr->SetItemMouseOverSelectedTextColor(QColor(QString(*m_mouseOverSelectedTextColorAttrPtr)));
-
 	m_animationDelayAttrPtr.IsValid() ? widgetPtr->SetAnimationDelay(*m_animationDelayAttrPtr) : widgetPtr->SetAnimationDelay(500);
 	m_animationDurationAttrPtr.IsValid() ? widgetPtr->SetAnimationDuration(*m_animationDurationAttrPtr) : widgetPtr->SetAnimationDuration(300);
 
