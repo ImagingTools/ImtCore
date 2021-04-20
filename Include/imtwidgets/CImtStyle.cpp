@@ -114,13 +114,15 @@ CImtStyle::DesignSchema CImtStyle::GetDesignSchema() const
 
 void CImtStyle::SetDesignSchema(DesignSchema designSchema)
 {
-	BaseClass::unpolish(qApp);
+	if (m_designSchema != designSchema){
+		BaseClass::unpolish(qApp);
 
-	m_designSchema = designSchema;
+		m_designSchema = designSchema;
 
-	EnsureStyleSheetApplied(true);
+		EnsureStyleSheetApplied(true);
 
-	BaseClass::polish(qApp);
+		BaseClass::polish(qApp);
+	}
 }
 
 
