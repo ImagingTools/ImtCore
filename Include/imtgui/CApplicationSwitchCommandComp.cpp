@@ -43,6 +43,18 @@ void CApplicationSwitchCommandComp::OnComponentCreated()
 	m_switchCommand.setVisible(m_executablePathCompPtr.IsValid());
 
 	connect(&m_switchCommand, SIGNAL(triggered()), this, SLOT(OnCommandActivated()));
+
+	EnableLocalization(true);
+}
+
+
+// protected methods
+
+// reimpemented (ibase::TLocalizableWrap)
+
+void CApplicationSwitchCommandComp::OnLanguageChanged()
+{
+	m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionAttrPtr, QIcon(*m_actionIconAttrPtr));
 }
 
 

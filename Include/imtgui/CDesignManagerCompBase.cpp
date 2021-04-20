@@ -79,6 +79,10 @@ void CDesignManagerCompBase::OnComponentCreated()
 	SetSelectionConstraints(&m_designs);
 
 	RegisterResourcesFunctions();
+
+	if (GetSelectionConstraints()->GetOptionsCount() > 0){
+		SetSelectedOptionIndex(0);
+	}
 }
 
 

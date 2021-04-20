@@ -8,6 +8,7 @@
 #include <ifile/IFileNameParam.h>
 #include <iqtgui/IIconProvider.h>
 #include <iqtgui/CHierarchicalCommand.h>
+#include <ibase/TLocalizableWrap.h>
 
 
 namespace imtgui
@@ -19,12 +20,12 @@ namespace imtgui
 */
 class CApplicationSwitchCommandComp:
 			public QObject,
-			public icomp::CComponentBase,
+			public ibase::TLocalizableWrap<icomp::CComponentBase>,
 			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 public:
-	typedef icomp::CComponentBase BaseClass;
+	typedef ibase::TLocalizableWrap<icomp::CComponentBase> BaseClass;
 	
 	I_BEGIN_COMPONENT(CApplicationSwitchCommandComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
@@ -42,6 +43,10 @@ public:
 
 	// reimpemented (icomp::IComponent)
 	virtual void OnComponentCreated();
+
+protected:
+	// reimpemented (ibase::TLocalizableWrap)
+	virtual void OnLanguageChanged() override;
 
 private Q_SLOTS:
 	void OnCommandActivated();

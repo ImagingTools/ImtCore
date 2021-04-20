@@ -37,7 +37,8 @@ protected:
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
-	virtual void OnGuiCreated();
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiRetranslate() override;
 
 private:
 	void CreteTreeItems(QTreeWidgetItem* parentTreeItemPtr, QList<IItemTree*> items);

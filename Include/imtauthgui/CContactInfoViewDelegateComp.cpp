@@ -67,7 +67,7 @@ void CContactInfoViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.ResetData();
 	m_summaryInformationHeaders.clear();
 
-	m_summaryInformationTypes.InsertItem("EMail", tr("EMail"), "");
+	m_summaryInformationTypes.InsertItem("EMail", tr("E-Mail"), "");
 	m_summaryInformationHeaders["EMail"] = HeaderInfo(true);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("Birthday"), tr("Birthday"), "");

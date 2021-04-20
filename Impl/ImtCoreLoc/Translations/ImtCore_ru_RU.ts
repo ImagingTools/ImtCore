@@ -187,7 +187,7 @@
         <location line="+112"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Load...</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузить...</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -199,55 +199,55 @@
         <location line="+108"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Account Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип учетной записи</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Account Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя учетной записи</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Account Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Описание учетной записи</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Company Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Адрес компании</translation>
     </message>
     <message>
         <location line="+6"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Country</source>
-        <translation type="unfinished"></translation>
+        <translation>Страна</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>City</source>
-        <translation type="unfinished"></translation>
+        <translation>Город</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Postal Code</source>
-        <translation type="unfinished"></translation>
+        <translation>Почтовый индекс</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Street</source>
-        <translation type="unfinished"></translation>
+        <translation>Улица</translation>
     </message>
     <message>
         <location line="+13"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Account Owner</source>
-        <translation type="unfinished"></translation>
+        <translation>Владелец учетной записи</translation>
     </message>
 </context>
 <context>
@@ -262,13 +262,13 @@
         <location line="+27"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h" line="+1"/>
         <source>Country</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Страна</translation>
     </message>
     <message>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h" line="+1"/>
         <source>City</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Город</translation>
     </message>
     <message>
         <location line="+18"/>
@@ -280,7 +280,7 @@
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h" line="+1"/>
         <source>Street</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Улица</translation>
     </message>
 </context>
 <context>
@@ -304,49 +304,49 @@
         <location line="+9"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>E-Mail</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Birthday</source>
-        <translation type="unfinished"></translation>
+        <translation>Дата рождения</translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Gender</source>
-        <translation type="unfinished"></translation>
+        <translation>Пол</translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>First Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Last Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Фамилия</translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Nickname</source>
-        <translation type="unfinished"></translation>
+        <translation>Ник</translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>Адрес</translation>
     </message>
     <message>
         <location line="+8"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -358,25 +358,25 @@
         <location line="+45"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+5"/>
         <source>Country</source>
-        <translation type="unfinished"></translation>
+        <translation>Страна</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="-1"/>
         <source>City</source>
-        <translation type="unfinished"></translation>
+        <translation>Город</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="-1"/>
         <source>Postal Code</source>
-        <translation type="unfinished"></translation>
+        <translation>Почтовый индекс</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="-1"/>
         <source>Street</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Улица</translation>
     </message>
 </context>
 <context>
@@ -658,7 +658,7 @@
         <location filename="../../../Include/imtlicgui/CLicenseInfoEditorGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h" line="+179"/>
         <source>Edit License</source>
-        <translation type="unfinished">Редактор лицензии</translation>
+        <translation>Редактор лицензии</translation>
     </message>
     <message>
         <location line="+125"/>
@@ -742,7 +742,7 @@
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Статус</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -754,7 +754,7 @@
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>Path</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Путь</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -775,37 +775,37 @@
         <location line="+15"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+1"/>
         <source>Instance-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Идентификатор инсталляции</translation>
     </message>
     <message>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+1"/>
         <source>Customer</source>
-        <translation type="unfinished"></translation>
+        <translation>Клиент</translation>
     </message>
     <message>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+1"/>
         <source>Product</source>
-        <translation type="unfinished"></translation>
+        <translation>Продукт</translation>
     </message>
     <message>
         <location line="+24"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+1"/>
         <source>Licenses</source>
-        <translation type="unfinished">Лицензии</translation>
+        <translation>Лицензии</translation>
     </message>
     <message>
         <location line="+16"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+3"/>
         <source>License</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензия</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="-1"/>
         <source>Expiration</source>
-        <translation type="unfinished"></translation>
+        <translation>Истекает</translation>
     </message>
 </context>
 <context>
@@ -1038,7 +1038,7 @@
     <message>
         <location line="+3"/>
         <source>Company</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Компания</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1049,12 +1049,12 @@
     <message>
         <location line="+29"/>
         <source>Account Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Тип учетной записи</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Account Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя учетной записи</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1070,25 +1070,25 @@
         <location line="+2"/>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+61"/>
         <source>Birthday</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Дата рождения</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
         <source>First Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
         <source>Last Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Фамилия</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
         <source>Nickname</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ник</translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CEventItemBase.cpp" line="+2"/>
@@ -1123,12 +1123,12 @@
     <message>
         <location line="+2"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сообщение</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Статус</translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CLoginEventItem.cpp" line="+70"/>
@@ -1234,22 +1234,22 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtauth/CAddressMetaInfoCreatorComp.cpp" line="+54"/>
         <source>City</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Город</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Country</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Страна</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Postal Code</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Почтовый индекс</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Street</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Улица</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="-10"/>
@@ -1259,7 +1259,7 @@ Errors: 0</source>
     <message>
         <location line="+2"/>
         <source>Gender</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Пол</translation>
     </message>
     <message>
         <location filename="../../../Include/imtbase/TPluginManagerCompBase.h" line="+213"/>
@@ -1684,17 +1684,17 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtauthgui/CAccountInfoEditorComp.cpp" line="+147"/>
         <source>Personal</source>
-        <translation type="unfinished"></translation>
+        <translation>Частное лицо</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Company</source>
-        <translation type="unfinished"></translation>
+        <translation>Компания</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Load...</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузить...</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1704,17 +1704,17 @@ Errors: 0</source>
     <message>
         <location line="+257"/>
         <source>All known file types (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Все известные типы файлов (%1)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>All file types (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Все файлы (%1)</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Select picture file</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите файл картинки</translation>
     </message>
 </context>
 <context>
@@ -1722,22 +1722,22 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtauthgui/CAccountInfoViewDelegateComp.cpp" line="+65"/>
         <source>Account Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя учетной записи</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>E-Mail</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Account Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип учетной записи</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Account Desciption</source>
-        <translation type="unfinished"></translation>
+        <translation>Описание учетной записи</translation>
     </message>
 </context>
 <context>
@@ -1745,45 +1745,45 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtauthgui/CContactInfoEditorComp.cpp" line="+26"/>
         <source>Diverse</source>
-        <translation type="unfinished"></translation>
+        <translation>Иной</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Female</source>
-        <translation type="unfinished"></translation>
+        <translation>Женский</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Male</source>
-        <translation type="unfinished"></translation>
+        <translation>Мужской</translation>
     </message>
 </context>
 <context>
     <name>imtauthgui::CContactInfoViewDelegateComp</name>
     <message>
         <location filename="../../../Include/imtauthgui/CContactInfoViewDelegateComp.cpp" line="+70"/>
-        <source>EMail</source>
-        <translation type="unfinished"></translation>
+        <source>E-Mail</source>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Birthday</source>
-        <translation type="unfinished"></translation>
+        <translation>Дата рождения</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>First Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Last Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Фамилия</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Nickname</source>
-        <translation type="unfinished"></translation>
+        <translation>Ник</translation>
     </message>
 </context>
 <context>
@@ -2091,7 +2091,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtgui/CPluginStatusMonitorViewDelegateComp.cpp" line="+214"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Статус</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2101,22 +2101,22 @@ Errors: 0</source>
     <message>
         <location line="+5"/>
         <source>Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Путь</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Loaded at</source>
-        <translation type="unfinished"></translation>
+        <translation>Загружен</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Сообщение</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Type ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Идентификатор типа</translation>
     </message>
 </context>
 <context>
@@ -2243,7 +2243,7 @@ Errors: 0</source>
     <message>
         <location line="+0"/>
         <source>Export existing product installation license to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт существующей лицензии на инсталляцию продукта в файл</translation>
     </message>
 </context>
 <context>
@@ -2559,7 +2559,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtrepogui/CFileObjectCollectionRevisionDialog.cpp" line="+33"/>
         <source>Restore</source>
-        <translation type="unfinished">Восстановить</translation>
+        <translation>Восстановить</translation>
     </message>
     <message>
         <location line="+25"/>
@@ -2760,14 +2760,14 @@ Errors: 0</source>
 <context>
     <name>imtwidgets::CImtStyle</name>
     <message>
-        <location filename="../../../Include/imtwidgets/CImtStyle.cpp" line="+160"/>
+        <location filename="../../../Include/imtwidgets/CImtStyle.cpp" line="+162"/>
         <source>Light</source>
-        <translation type="unfinished">Светлая</translation>
+        <translation>Светлая</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Dark</source>
-        <translation type="unfinished">Тёмная</translation>
+        <translation>Тёмная</translation>
     </message>
 </context>
 </TS>

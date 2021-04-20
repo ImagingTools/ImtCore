@@ -65,6 +65,14 @@ void CFeatureTreeGuiComp::OnGuiCreated()
 }
 
 
+void CFeatureTreeGuiComp::OnGuiRetranslate()
+{
+	BaseClass::OnGuiRetranslate();
+
+	Features->setHeaderLabel(*m_headerLabelAttrPtr);
+}
+
+
 // private methods
 
 void CFeatureTreeGuiComp::CreteTreeItems(QTreeWidgetItem* parentTreeItemPtr, QList<IItemTree*> items)
