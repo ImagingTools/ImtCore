@@ -10,6 +10,7 @@
 #include <ibase/TLocalizableWrap.h>
 #include <imtbase/CCollectionInfo.h>
 #include <iqtgui/IGuiObject.h>
+#include <iqtgui/TDesignSchemaHandlerWrap.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
@@ -24,11 +25,13 @@ namespace imtgui
 	Standard view delegate for an object collection view.
 	\ingroup Collection
 */
-class CObjectCollectionViewDelegate: public QObject, public ibase::TLocalizableWrap<ICollectionViewDelegate>
+class CObjectCollectionViewDelegate:
+			public QObject,
+			public iqtgui::TDesignSchemaHandlerWrap<ibase::TLocalizableWrap<ICollectionViewDelegate>>
 {
 	Q_OBJECT
 public:
-	typedef ibase::TLocalizableWrap<ICollectionViewDelegate> BaseClass;
+	typedef iqtgui::TDesignSchemaHandlerWrap<ibase::TLocalizableWrap<ICollectionViewDelegate>> BaseClass;
 
 	enum CommandGroup
 	{
@@ -82,6 +85,9 @@ protected:
 
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
+
+	// reimplemented (iqtgui::TDesignSchemaHandlerWrap)
+	virtual void OnDesignSchemaChanged() override;
 
 protected:
 	class VisualStatus: virtual public iqtgui::IVisualStatus

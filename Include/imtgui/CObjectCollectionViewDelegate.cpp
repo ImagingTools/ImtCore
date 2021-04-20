@@ -25,11 +25,13 @@ CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 {
 	SetupSummaryInformation();
 	EnableLocalization(true);
+	EnableDesignSchemaChangeHandler(true);
 }
 
 
 CObjectCollectionViewDelegate::~CObjectCollectionViewDelegate()
 {
+	EnableDesignSchemaChangeHandler(false);
 	EnableLocalization(false);
 }
 
@@ -356,6 +358,14 @@ void CObjectCollectionViewDelegate::OnLanguageChanged()
 	m_insertCommand.SetVisuals(tr("Insert"), tr("New"), tr("Insert new document into the collection"), QIcon(":/Icons/Add"));
 	m_duplicateCommand.SetVisuals(tr("Duplicate"), tr("Duplicate"), tr("Duplicate selected objects"), QIcon(":/Icons/Duplicate"));
 	m_removeCommand.SetVisuals(tr("Remove"), tr("Remove"), tr("Remove selected document from the collection"), QIcon(":/Icons/Delete"));
+}
+
+
+// reimplemented (imtbase::TPolishableWrap)
+
+void CObjectCollectionViewDelegate::OnDesignSchemaChanged()
+{
+
 }
 
 
