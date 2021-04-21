@@ -2,15 +2,24 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4918" Description="ACF"/>
-            <Version Id="1" Number="2138" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="0" Number="4902" Description="ACF"/>
+            <Version Id="1" Number="2135" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331010" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Design schema for ImtCore</Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="AuthDesignSchema" PackageId="ImtAuthGuiPck" ComponentId="DesignManager">
+        <Element Id="Imt3dGuiDesignSchema" PackageId="Imt3dGuiPck" ComponentId="DesignManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ImtLicDesignSchema"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ImtAuthDesignSchema" PackageId="ImtAuthGuiPck" ComponentId="DesignManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="SlaveDesignManager">
@@ -19,20 +28,20 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ImtDesignSchema" PackageId="ImtGuiPck" ComponentId="DesignManager">
+        <Element Id="ImtGuiDesignSchema" PackageId="ImtGuiPck" ComponentId="DesignManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="LicDesignSchema"/>
+                        <Data IsEnabled="true" Value="Imt3dGuiDesignSchema"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="LicDesignSchema" PackageId="ImtLicenseGuiPck" ComponentId="DesignManager">
+        <Element Id="ImtLicDesignSchema" PackageId="ImtLicenseGuiPck" ComponentId="DesignManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="AuthDesignSchema"/>
+                        <Data IsEnabled="true" Value="ImtAuthDesignSchema"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -40,11 +49,11 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imod::IModel" ComponentId="ImtDesignSchema"/>
-        <Interface InterfaceId="iprm::ISelectionParam" ComponentId="ImtDesignSchema"/>
-        <Interface InterfaceId="iser::ISerializable" ComponentId="ImtDesignSchema"/>
-        <Interface InterfaceId="istd::IChangeable" ComponentId="ImtDesignSchema"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ImtDesignSchema"/>
+        <Interface InterfaceId="imod::IModel" ComponentId="ImtGuiDesignSchema"/>
+        <Interface InterfaceId="iprm::ISelectionParam" ComponentId="ImtGuiDesignSchema"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="ImtGuiDesignSchema"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="ImtGuiDesignSchema"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ImtGuiDesignSchema"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>
