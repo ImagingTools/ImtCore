@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/Html">
+        <file alias="index_files_begin.dom">Resources/Templates/Html/index_files_begin.dom</file>
+        <file alias="index_files_end.dom">Resources/Templates/Html/index_files_end.dom</file>
+    </qresource>
+</RCC>

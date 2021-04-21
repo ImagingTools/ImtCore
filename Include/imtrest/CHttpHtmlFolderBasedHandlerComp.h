@@ -40,8 +40,8 @@ public:
 		I_ASSIGN(m_fileTemplatePathCompPtr, "FileTemplateHomePath", "Home path\n Note: type is ignored only value matters \n Warning: overwrites HomePath!", false, "FileTemplatePath");
 	I_END_COMPONENT
 
-	QByteArray Generate(const QString& directoryPath) const;
-	QByteArray GenerateSingleEntry(const QFileInfo& fileInfo) const;
+	QByteArray Generate(const QString& directoryPath, const QString& commandId = QString()) const;
+	QByteArray GenerateSingleEntry(const QFileInfo& fileInfo, const QString& commandId = QString()) const;
 
 	// reimplemented (IRequestHandler)
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const override;

@@ -16,19 +16,19 @@ CHttpHtmlFolderBasedHandlerComp::CHttpHtmlFolderBasedHandlerComp()
 {
 	QFile messagePartFile;
 
-	messagePartFile.setFileName("/Volumes/ALL_DATA/ZProjects/Acf/SibNavAcf/index_files_begin.html");
+	messagePartFile.setFileName(":/Html/index_files_begin.dom");
 	messagePartFile.open(QFile::ReadOnly);
 	m_beginOfMessage = messagePartFile.readAll();
 	messagePartFile.close();
 
-	messagePartFile.setFileName("/Volumes/ALL_DATA/ZProjects/Acf/SibNavAcf/index_files_end.html");
+	messagePartFile.setFileName(":/Html/index_files_end.dom");
 	messagePartFile.open(QFile::ReadOnly);
 	m_endOfMessage = messagePartFile.readAll();
 	messagePartFile.close();
 
 }
 
-QByteArray CHttpHtmlFolderBasedHandlerComp::Generate(const QString& directoryPath) const
+QByteArray CHttpHtmlFolderBasedHandlerComp::Generate(const QString& directoryPath, const QString& commandId) const
 {
 	QString retval;
 	QString homeDirPath = *m_homeDirPath;
@@ -60,14 +60,14 @@ QByteArray CHttpHtmlFolderBasedHandlerComp::Generate(const QString& directoryPat
 		QDir dir(directoryPath);
 		using _dfs = QDir::Filter;
 		QDir::Filters dirFilters = _dfs::NoDot | _dfs::Files | _dfs::Dirs;
-		if(homeDirPath != directoryPath)
+		if(QDir(homeDirPath) == QDir(directoryPath))
 		{
 			dirFilters |= _dfs::NoDotDot;
 		}
-		QFileInfoList diryEnties = dir.entryInfoList(dirFilters, QDir::SortFlag::Name);
+		QFileInfoList diryEnties = dir.entryInfoList(dirFilters, QDir::SortFlag::Type | QDir::SortFlag::Name);
 		for (const auto& entry: ::qAsConst(diryEnties))
 		{
-			retval.append(this->GenerateSingleEntry(entry)).append('\n');
+			retval.append(this->GenerateSingleEntry(entry, commandId)).append('\n');
 		}
 		retval.append(this->m_endOfMessage);
 	}
@@ -75,7 +75,7 @@ QByteArray CHttpHtmlFolderBasedHandlerComp::Generate(const QString& directoryPat
 }
 
 
-QByteArray CHttpHtmlFolderBasedHandlerComp::GenerateSingleEntry(const QFileInfo& fileInfo) const
+QByteArray CHttpHtmlFolderBasedHandlerComp::GenerateSingleEntry(const QFileInfo& fileInfo, const QString& commandId) const
 {
 	QString retval;
 	retval.append(fileInfo.birthTime().toString(Qt::ISODate));
@@ -89,21 +89,21 @@ QByteArray CHttpHtmlFolderBasedHandlerComp::GenerateSingleEntry(const QFileInfo&
 	{
 		QByteArray sizeValue;
 		qint64 fileSize = fileInfo.size();
-		if(fileSize > 1024 * 1024 * 1024)
+		if(fileSize >1073741824)
 		{
-			sizeValue = QByteArray::number(fileSize / (1024*1024*1024), 'f', 2);
+			sizeValue = QByteArray::number(fileSize / 1073741824.00, 'f', 2);
 			sizeValue.append(' ');
 			sizeValue.append(QObject::tr("GB"));
 		}
-		else if(fileSize > 1024 * 1024)
+		else if(fileSize > 1048576)
 		{
-			sizeValue = QByteArray::number(fileSize / (1024*1024), 'f', 2);
+			sizeValue = QByteArray::number(fileSize / 1048576.00, 'f', 2);
 			sizeValue.append(' ');
 			sizeValue.append(QObject::tr("MB"));
 		}
 		else if(fileSize > 1024)
 		{
-			sizeValue = QByteArray::number(fileSize / (1024), 'f', 2);
+			sizeValue = QByteArray::number(fileSize / 1024.00, 'f', 2);
 			sizeValue.append(' ');
 			sizeValue.append(QObject::tr("KB"));
 		}
@@ -118,15 +118,27 @@ QByteArray CHttpHtmlFolderBasedHandlerComp::GenerateSingleEntry(const QFileInfo&
 		retval.append(sizeValue);
 		retval.append(']');
 	}
-	QString fileName = fileInfo.baseName() + fileInfo.suffix();
-	QString fileLink = *this->m_homeDirPath + fileInfo.baseName() + fileInfo.suffix();
+	QString rootLinkPath = *this->m_commandIdAttrPtr;
+	if(rootLinkPath.endsWith('*'))
+	{
+		rootLinkPath.chop(1);
+	}
+
+	QString fileName = fileInfo.fileName();
+	if(fileName == "..")
+	{
+		fileName = '[';
+		fileName.append(QObject::tr("Parent direcotry"));
+		fileName.append(']');
+	}
+	QString fileLink = rootLinkPath + commandId + fileInfo.fileName();
 
 
 	retval.append("\t\t");
 	retval.append(R"(<A HREF="/)");
-	retval.append(fileName);
+	retval.append(fileLink);
 	retval.append(R"(/"><B>)");
-	retval.append(fileInfo.baseName() + fileInfo.suffix());
+	retval.append(fileName);
 	retval.append(R"(</B></A>)");
 
 	return retval.toUtf8();
@@ -157,23 +169,22 @@ IRequestHandler::ConstResponsePtr CHttpHtmlFolderBasedHandlerComp::ProcessReques
 	{
 		commandIdBase.chop(1);
 	}
+	if(!commandIdBase.startsWith('/'))
+	{
+		commandIdBase.prepend('/');
+	}
 	QString homeDirPath = *this->m_homeDirPath;
 	if( m_fileTemplatePathCompPtr.IsValid() && m_fileTemplatePathCompPtr.GetPtr()->GetPath().length())
 	{
 		homeDirPath = m_fileTemplatePathCompPtr.GetPtr()->GetPath();
 	}
-	if(!homeDirPath.endsWith('/'))
-	{
-		homeDirPath.append('/');
-	}
 	commandId.replace(commandIdBase,"");
-	//	files*
-	//	files/dir
+
 	QString destinationEntryPath = homeDirPath + commandId;
 	QFileInfo destinationEntry(destinationEntryPath);
 	if(destinationEntry.isDir())
 	{
-		body = this->Generate(destinationEntry.absoluteFilePath());
+		body = this->Generate(destinationEntry.absoluteFilePath(), commandId);
 	}
 	else
 	{
