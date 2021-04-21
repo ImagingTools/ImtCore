@@ -114,7 +114,7 @@ CImtStyle::DesignSchema CImtStyle::GetDesignSchema() const
 
 void CImtStyle::SetDesignSchema(DesignSchema designSchema)
 {
-	if (m_designSchema != designSchema){
+	if (m_blockerCount == 0){
 		BaseClass::unpolish(qApp);
 
 		m_designSchema = designSchema;
@@ -449,7 +449,8 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 CImtStyle::CImtStyle()
 	:m_designSchema(DS_LIGHT),
 	m_styleType(ST_IMAGINGTOOLS),
-	m_wasStyleSheetInitialized(false)
+	m_wasStyleSheetInitialized(false),
+	m_blockerCount(0)
 {
 	ColorSchema light;
 	light.toolButtonGradientColors.startColor = QColor(248, 248, 251);
@@ -485,6 +486,22 @@ CImtStyle::CImtStyle()
 	dark.palette.setColor(QPalette::HighlightedText, Qt::white);
 
 	m_colorSchemaMap[DS_DARK] = dark;
+}
+
+
+// public methods of the embedded class DesignSchemaSetterBlocker
+
+CImtStyle::DesignSchemaSetterBlocker::DesignSchemaSetterBlocker(CImtStyle& parent)
+	:m_parent(parent)
+{
+	m_parent.m_blockerCount++;
+}
+
+
+CImtStyle::DesignSchemaSetterBlocker::~DesignSchemaSetterBlocker()
+{
+	m_parent.m_blockerCount--;
+	Q_ASSERT(m_parent.m_blockerCount >= 0);
 }
 
 

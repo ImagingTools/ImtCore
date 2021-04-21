@@ -126,12 +126,16 @@ bool CDesignManagerCompBase::ApplyDesignScheme(int index)
 						}
 					}
 
+					{
+						imtwidgets::CImtStyle::DesignSchemaSetterBlocker blocker(*imtStylePtr);
+
+						if (m_slaveCompPtr.IsValid()){
+							retVal = retVal && m_slaveCompPtr->SetSelectedOptionIndex(index);
+						}
+					}
+
 					m_initResources[designSchema]();
 					imtStylePtr->SetDesignSchema(designSchema);
-
-					if (m_slaveCompPtr.IsValid()){
-						retVal = retVal && m_slaveCompPtr->SetSelectedOptionIndex(index);
-					}
 				}
 			}
 		}

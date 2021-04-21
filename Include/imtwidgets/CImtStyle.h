@@ -53,6 +53,17 @@ public:
 	virtual QRect subElementRect(SubElement subElement, const QStyleOption *option, const QWidget *widget = nullptr) const override;
 	virtual QSize sizeFromContents(QStyle::ContentsType type, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget = nullptr) const override;
 
+public:
+	class DesignSchemaSetterBlocker
+	{
+	public:
+		explicit DesignSchemaSetterBlocker(CImtStyle& parent);
+		~DesignSchemaSetterBlocker();
+
+	private:
+		CImtStyle& m_parent;
+	};
+
 protected:
 	virtual void DrawImagingToolsToolButton(
 				const QStyleOptionToolButton* optionPtr,
@@ -95,6 +106,8 @@ private:
 	Q_DISABLE_COPY(CImtStyle);
 
 	static CImtStyle* m_instancePtr;
+
+	int m_blockerCount;
 };
 
 
