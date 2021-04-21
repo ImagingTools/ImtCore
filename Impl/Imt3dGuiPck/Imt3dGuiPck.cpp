@@ -4,7 +4,7 @@
 #include <icomp/export.h>
 
 
-I_REGISTER_QT_RESOURCE(imt3dgui)
+I_REGISTER_QT_RESOURCE(imt3dguilight)
 
 
 namespace Imt3dGuiPck
@@ -30,6 +30,11 @@ I_EXPORT_COMPONENT(
 			MeshView,
 			"Viewer of the 3D mesh",
 			"3D Mesh View")
+
+I_EXPORT_COMPONENT(
+			DesignManager,
+			"Design Manager",
+			"Style Design Manager");
 
 
 } // namespace Imt3dGuiPck

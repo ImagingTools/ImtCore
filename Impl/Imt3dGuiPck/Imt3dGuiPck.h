@@ -10,6 +10,7 @@
 #include <imt3dgui/CView3dProviderComp.h>
 #include <imt3dgui/CPointCloudViewComp.h>
 #include <imt3dgui/CMeshViewComp.h>
+#include <imt3dgui/CDesignManagerComp.h>
 
 
 /**
@@ -22,6 +23,7 @@ namespace Imt3dGuiPck
 typedef imod::TModelWrap<imt3dgui::CView3dProviderComp> View3dProvider;
 typedef icomp::TModelCompWrap<ibase::TModelObserverCompWrap<imt3dgui::CPointCloudViewComp>> PointCloudView;
 typedef icomp::TModelCompWrap<ibase::TModelObserverCompWrap<imt3dgui::CMeshViewComp>> MeshView;
+typedef icomp::TModelCompWrap<imt3dgui::CDesignManagerComp> DesignManager;
 
 
 } // namespace Imt3dGuiPck

@@ -1,0 +1,37 @@
+<RCC>
+    <qresource prefix="/Shaders">
+        <file alias="fshader.glsl">Resources/Shaders/fshader.glsl</file>
+        <file alias="vshader.glsl">Resources/Shaders/vshader.glsl</file>
+    </qresource>
+    <qresource prefix="/Textures">
+        <file>Resources/Textures/sample.png</file>
+    </qresource>
+    <qresource prefix="/Icons">
+        <file alias="ViewFront">Resources/Icons/Dark/ViewFront.svg</file>
+        <file alias="ViewReset">Resources/Icons/Dark/ViewReset.svg</file>
+        <file alias="ViewRight">Resources/Icons/Dark/ViewRight.svg</file>
+        <file alias="ViewTop">Resources/Icons/Dark/ViewTop.svg</file>
+        <file alias="ViewZoomIn">Resources/Icons/Dark/ViewZoomIn.svg</file>
+        <file alias="ViewZoomOut">Resources/Icons/Dark/ViewZoomOut.svg</file>
+        <file alias="ViewBack">Resources/Icons/Dark/ViewBack.svg</file>
+        <file alias="ViewBottom">Resources/Icons/Dark/ViewBottom.svg</file>
+        <file alias="ViewLeft">Resources/Icons/Dark/ViewLeft.svg</file>
+        <file alias="Grid">Resources/Icons/Dark/Grid.svg</file>
+        <file alias="Axis">Resources/Icons/Dark/Axis.svg</file>
+        <file alias="BoxSelection">Resources/Icons/Dark/BoxSelection.svg</file>
+        <file alias="CircleSelection">Resources/Icons/Dark/CircleSelection.svg</file>
+        <file alias="ClearSelection">Resources/Icons/Dark/ClearSelection.svg</file>
+        <file alias="InvertSelection">Resources/Icons/Dark/InvertSelection.svg</file>
+        <file alias="DeleteSelection">Resources/Icons/Dark/DeleteSelection.svg</file>
+        <file alias="Box3dSelection">Resources/Icons/Dark/Box3dSelection.svg</file>
+        <file alias="FreeRotation">Resources/Icons/Dark/FreeRotation.svg</file>
+        <file alias="PointSelection">Resources/Icons/Dark/PointSelection.svg</file>
+        <file alias="RotationAroundX">Resources/Icons/Dark/RotationAroundX.svg</file>
+        <file alias="RotationAroundY">Resources/Icons/Dark/RotationAroundY.svg</file>
+        <file alias="RotationAroundZ">Resources/Icons/Dark/RotationAroundZ.svg</file>
+        <file alias="SelectAll">Resources/Icons/Dark/SelectAll.svg</file>
+        <file alias="NoSelection">Resources/Icons/Dark/NoSelection.svg</file>
+        <file alias="Selection">Resources/Icons/Dark/Selection.svg</file>
+        <file alias="View">Resources/Icons/Dark/View.svg</file>
+    </qresource>
+</RCC>

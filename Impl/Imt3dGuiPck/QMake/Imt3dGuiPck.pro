@@ -9,7 +9,7 @@ INCLUDEPATH += $(IMTCOREDIR)/Include
 # ACF-Solutions libs
 LIBS += -L$(ACFSLNDIR)/Lib/$$COMPILER_DIR -limeas
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limt3d -limt3dgui -limt3dview
+LIBS += -L../../../Lib/$$COMPILER_DIR -limt3d -limt3dgui -limt3dview -limtgui -limtwidgets
 
 # Get build output directory of shadow build:
 ACFSLNDIRBUILD = $$(ACFSLNDIR_BUILD)
