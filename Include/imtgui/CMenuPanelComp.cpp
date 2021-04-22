@@ -5,6 +5,7 @@
 
 // ACF includes
 #include <iprm/IOptionsList.h>
+#include <iqtgui/iqtgui.h>
 #include <iqtgui/IMultiVisualStatusProvider.h>
 
 // ImtCore includes
@@ -60,43 +61,6 @@ void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QBy
 }
 
 
-// reimplemented (icomp::CComponentBase)
-
-void CMenuPanelComp::OnGuiCreated()
-{
-	imtwidgets::CMenuPanel* widgetPtr = GetQtWidget();
-
-	if (m_widgetProviderCompPtr.IsValid() && m_isShowOverAttrPtr.IsValid() && *m_isShowOverAttrPtr){
-		widgetPtr->SetMainWidget(m_widgetProviderCompPtr->GetWidgetPtr(QByteArray()));
-	}
-	
-	widgetPtr->SetIconSizeRatio(*m_iconSizeRatioAttrPtr);
-	widgetPtr->SetIconSizeHoverRatio(*m_iconSizeHoverRatioAttrPtr);
-	widgetPtr->SetFontSizeRatio(*m_fontSizeRatioAttrPtr);
-
-	m_animationDelayAttrPtr.IsValid() ? widgetPtr->SetAnimationDelay(*m_animationDelayAttrPtr) : widgetPtr->SetAnimationDelay(500);
-	m_animationDurationAttrPtr.IsValid() ? widgetPtr->SetAnimationDuration(*m_animationDurationAttrPtr) : widgetPtr->SetAnimationDuration(300);
-
-	connect(widgetPtr, &imtwidgets::CMenuPanel::PageIdChanged, this, &CMenuPanelComp::OnPageIdChanged);
-
-	if (m_monitorInfoProviderModelPtr.IsValid()){
-		m_monitorInfoProviderModelPtr->AttachObserver(&m_monitorInfoObserver);
-	}
-	else{
-		m_resolutionX = *m_physicalResolutionAttrPtr;
-		m_resolutionY = *m_physicalResolutionAttrPtr;
-		m_scale = 1;
-		UpdateWidgetSizeAttributes();
-	}
-
-	if (m_menuPanelVisibilityModelCompPtr.IsValid()){
-		m_menuPanelVisibilityModelCompPtr->AttachObserver(&m_menuPanelVisibilityObserver);
-	}
-
-	BaseClass::OnGuiCreated();
-}
-
-
 // reimplemented (iqtgui::TGuiObserverWrap)
 
 void CMenuPanelComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
@@ -138,7 +102,52 @@ void CMenuPanelComp::OnGuiModelDetached()
 }
 
 
+// iqtgui::TDesignSchemaHandlerWrap
+
+void CMenuPanelComp::OnDesignSchemaChanged()
+{
+	iqtgui::SetStyleSheetFromFile(*GetQtWidget(), ":/Styles/MenuPanelStyle");
+}
+
+
 // reimplemented (iqtgui::CGuiComponentBase)
+
+void CMenuPanelComp::OnGuiCreated()
+{
+	BaseClass::OnGuiCreated();
+
+	imtwidgets::CMenuPanel* widgetPtr = GetQtWidget();
+
+	if (m_widgetProviderCompPtr.IsValid() && m_isShowOverAttrPtr.IsValid() && *m_isShowOverAttrPtr){
+		widgetPtr->SetMainWidget(m_widgetProviderCompPtr->GetWidgetPtr(QByteArray()));
+	}
+
+	widgetPtr->SetIconSizeRatio(*m_iconSizeRatioAttrPtr);
+	widgetPtr->SetIconSizeHoverRatio(*m_iconSizeHoverRatioAttrPtr);
+	widgetPtr->SetFontSizeRatio(*m_fontSizeRatioAttrPtr);
+
+	m_animationDelayAttrPtr.IsValid() ? widgetPtr->SetAnimationDelay(*m_animationDelayAttrPtr) : widgetPtr->SetAnimationDelay(500);
+	m_animationDurationAttrPtr.IsValid() ? widgetPtr->SetAnimationDuration(*m_animationDurationAttrPtr) : widgetPtr->SetAnimationDuration(300);
+
+	connect(widgetPtr, &imtwidgets::CMenuPanel::PageIdChanged, this, &CMenuPanelComp::OnPageIdChanged);
+
+	if (m_monitorInfoProviderModelPtr.IsValid()){
+		m_monitorInfoProviderModelPtr->AttachObserver(&m_monitorInfoObserver);
+	}
+	else{
+		m_resolutionX = *m_physicalResolutionAttrPtr;
+		m_resolutionY = *m_physicalResolutionAttrPtr;
+		m_scale = 1;
+		UpdateWidgetSizeAttributes();
+	}
+
+	if (m_menuPanelVisibilityModelCompPtr.IsValid()){
+		m_menuPanelVisibilityModelCompPtr->AttachObserver(&m_menuPanelVisibilityObserver);
+	}
+
+	iqtgui::SetStyleSheetFromFile(*widgetPtr, ":/Styles/MenuPanelStyle");
+}
+
 
 void CMenuPanelComp::OnGuiRetranslate()
 {

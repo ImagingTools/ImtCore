@@ -14,7 +14,6 @@ QWidget:disabled
 	color: palette(disabled);
 }
 
-
 QSplashScreen > QWidget
 {
 	color: #ffffff;
@@ -32,24 +31,15 @@ QWidget#MainVersionTitleLabel, QWidget#MainVersionLabel
 	color: #ffffff;
 }
 
-
 QSplashScreen > QWidget#CopyrightLabel
 {
 	color: #ffffff;
 }
 
-
-QWidget#PageTree
-{
-	background-color: palette(window);
-}
-
-
 QWidget#ResultFrame
 {
 	font-size: 24px;
 }
-
 
 QWidget[ImtTopFrame=true]
 {
@@ -57,48 +47,25 @@ QWidget[ImtTopFrame=true]
 	border-bottom: 1px solid rgb(60,60,60);
 }
 
-QWidget#EditPanel
-{
-	margin-top: 1px;
-	margin-left: 1px;
-	margin-right: 1px;
-}
-
 QWidget#LoadWorkflowButton
 {
 	text-align: left;
 }
-
-
-QWidget#MessageFrame
-{
-	background-color: lightYellow;
-}
-
-QWidget#ErrorsCounterFrame, QWidget#NokCounterFrame, QWidget#OkCounterFrame,
-QWidget#TotalCounterFrame, QWidget#WarningsCounterFrame
-{
-	background: palette(dark);
-}
-
 
 QLabel[ProductionApplicationName=true]
 {
 	font-size: 16pt;
 }
 
-
 QLabel[ProductionTime=true]
 {
 	font-size: 16pt;
 }
 
-
 QLabel[Header=true]
 {
 	font-size: 12pt;
 }
-
 
 QLabel#PageLabel, QLabel#ManualModePageLabel
 {
@@ -106,13 +73,11 @@ QLabel#PageLabel, QLabel#ManualModePageLabel
 	font-weight: bold;
 }
 
-
 QLineEdit, QPlainTextEdit
 {
 	height: 1.3em;
 	font-size: 10pt;
 }
-
 
 QToolButton#windowTitle
 {

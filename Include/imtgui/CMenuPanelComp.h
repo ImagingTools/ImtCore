@@ -71,15 +71,16 @@ public:
 protected:
 	void OnPageIdChanged(const QByteArray& selectedPageId, const QByteArray& deselectedPageId);
 
-	// reimplemented (iqtgui::CGuiComponentBase)
-	virtual void OnGuiCreated() override;
-
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelAttached() override;
 	virtual void OnGuiModelDetached() override;
 
+	// iqtgui::TDesignSchemaHandlerWrap
+	virtual void OnDesignSchemaChanged() override;
+
 	// reimplemented (iqtgui::CGuiComponentBase)
+	virtual void OnGuiCreated() override;
 	virtual void OnGuiRetranslate() override;
 
 private:

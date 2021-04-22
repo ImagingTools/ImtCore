@@ -12,7 +12,7 @@
 #include <istd/CChangeGroup.h>
 #include <ifile/CCompactXmlFileWriteArchive.h>
 #include <ifile/CCompactXmlFileReadArchive.h>
-
+#include <iqtgui/iqtgui.h>
 
 namespace imtgui
 {
@@ -153,10 +153,20 @@ void CLayoutManagerGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*chan
 }
 
 
+// iqtgui::TDesignSchemaHandlerWrap
+
+void CLayoutManagerGuiComp::OnDesignSchemaChanged()
+{
+	iqtgui::SetStyleSheetFromFile(*GetQtWidget(), ":/Styles/CustomLayoutWidgetFormStyle");
+}
+
+
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CLayoutManagerGuiComp::OnGuiCreated()
 {
+	BaseClass::OnGuiCreated();
+
 	m_layoutWidgetPtr = new CHierarchicalLayoutWidget(GetQtWidget());
 	this->GetWidget()->layout()->addWidget(m_layoutWidgetPtr);
 
@@ -235,7 +245,7 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 
 	m_layoutWidgetPtr->SetAdditionalNames(additionalNames);
 
-	BaseClass::OnGuiCreated();
+	iqtgui::SetStyleSheetFromFile(*GetQtWidget(), ":/Styles/CustomLayoutWidgetFormStyle");
 }
 
 
