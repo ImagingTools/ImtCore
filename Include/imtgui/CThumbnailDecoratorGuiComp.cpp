@@ -169,6 +169,14 @@ void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& settings) const
 }
 
 
+// iqtgui::TDesignSchemaHandlerWrap
+
+void CThumbnailDecoratorGuiComp::OnDesignSchemaChanged()
+{
+	iqtgui::SetStyleSheetFromFile(*SubPages, ":/Styles/ThumbnailDecoratorGuiStyle");
+}
+
+
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CThumbnailDecoratorGuiComp::OnGuiCreated()
@@ -280,6 +288,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	if (m_defaultPageIndexAttrPtr.IsValid()){
 		m_lastPageIndexForLoggedUser = *m_defaultPageIndexAttrPtr;
 	}
+
+	iqtgui::SetStyleSheetFromFile(*SubPages, ":/Styles/ThumbnailDecoratorGuiStyle");
 }
 
 

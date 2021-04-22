@@ -168,6 +168,8 @@
         <file alias="ImtDarkStyle">Resources/Styles/ImtDarkStyle.css</file>
         <file alias="MenuPanelStyle">Resources/Styles/MenuPanelDarkStyle.css</file>
         <file alias="CustomLayoutWidgetFormStyle">Resources/Styles/CustomLayoutWidgetFormDarkStyle.css</file>
+        <file alias="ObjectCollectionViewStyle">Resources/Styles/ObjectCollectionViewDarkStyle.css</file>
+        <file alias="ThumbnailDecoratorGuiStyle">Resources/Styles/ThumbnailDecoratorGuiDarkStyle.css</file>
     </qresource>
     <qresource prefix="/Style/ImtDark/Images"/>
 </RCC>

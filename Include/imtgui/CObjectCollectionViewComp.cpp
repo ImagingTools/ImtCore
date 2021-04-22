@@ -321,6 +321,14 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 }
 
 
+// iqtgui::TDesignSchemaHandlerWrap
+
+void CObjectCollectionViewComp::OnDesignSchemaChanged()
+{
+	iqtgui::SetStyleSheetFromFile(*TypeList, ":/Styles/ObjectCollectionViewStyle");
+}
+
+
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CObjectCollectionViewComp::OnGuiCreated()
@@ -380,6 +388,8 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	if (m_currentInformationViewPtr == nullptr){
 		RightPanel->setVisible(false);
 	}
+
+	iqtgui::SetStyleSheetFromFile(*TypeList, ":/Styles/ObjectCollectionViewStyle");
 }
 
 

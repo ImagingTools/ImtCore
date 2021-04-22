@@ -131,50 +131,6 @@ QTableView[ImtMenu=true]::item
 	text-align: center;
 }
 
-/*
-	Tab simulation using tree widget
-*/
-QTreeWidget[TabSimulation=true]
-{
-	background: palette(window);
-	font-weight: bold;
-	text-align: left;
-}
-
-QTreeWidget[TabSimulation=true]::item
-{
-	border: 0px none transparent;
-	padding-top: 0.7em;
-	padding-bottom: 0.7em;
-}
-
-QTreeWidget[TabSimulation=true]::item:first
-{
-	padding-left: 5px;
-}
-
-QTreeWidget[TabSimulation=true]::item:last
-{
-	padding-right: 15px;
-}
-
-QTreeWidget[TabSimulation=true]::item:selected
-{
-	background-color: palette(base);
-	color: #ffffff;
-}
-
-QTreeWidget[TabSimulation=true]::item:!selected:hover
-{
-	background-color: palette(light);
-}
-
-QTreeWidget[TabSimulation=true]::item:first:selected
-{
-	border-top: 1px palette(midlight);
-}
-
-
 QAbstractItemView
 {
 	outline: 0;

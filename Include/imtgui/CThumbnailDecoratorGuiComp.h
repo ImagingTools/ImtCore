@@ -166,6 +166,9 @@ protected:
 	virtual void OnRestoreSettings(const QSettings& settings) override;
 	virtual void OnSaveSettings(QSettings& settings) const override;
 
+	// iqtgui::TDesignSchemaHandlerWrap
+	void OnDesignSchemaChanged() override;
+
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;

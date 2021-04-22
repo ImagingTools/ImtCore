@@ -116,6 +116,9 @@ protected:
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelAttached() override;
 
+	// iqtgui::TDesignSchemaHandlerWrap
+	void OnDesignSchemaChanged() override;
+
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;

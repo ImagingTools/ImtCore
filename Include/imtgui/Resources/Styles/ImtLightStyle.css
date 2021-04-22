@@ -152,50 +152,6 @@ QTableView[ImtMenu=true]::item
 	text-align: center;
 }
 
-/*
-	Tab simulation using tree widget
-*/
-QTreeWidget[TabSimulation=true]
-{
-	background: rgb(230,230,230);
-	font-weight: bold;
-	text-align: left;
-}
-
-QTreeWidget[TabSimulation=true]::item 
-{
-	border: 0px none transparent;
-	padding-top: 0.7em;
-	padding-bottom: 0.7em;
-}
-
-QTreeWidget[TabSimulation=true]::item:first
-{
-	padding-left: 5px;
-}
-
-QTreeWidget[TabSimulation=true]::item:last
-{
-	padding-right: 15px;
-}
-
-QTreeWidget[TabSimulation=true]::item:selected
-{
-	background-color: rgb(255, 255, 255);
-	color: #335777;
-}
-
-QTreeWidget[TabSimulation=true]::item:!selected:hover
-{
-	background-color: #dedede;
-}
-
-QTreeWidget[TabSimulation=true]::item:first:selected
-{
-	border-top: 1px white;
-}
-
-
 QAbstractItemView {
 	outline: 0;
 }
@@ -296,3 +252,5 @@ QMenu[CommandsMenu=true]
 	margin-left: 10px;
 	margin-right: 10px;
 }
+
+
