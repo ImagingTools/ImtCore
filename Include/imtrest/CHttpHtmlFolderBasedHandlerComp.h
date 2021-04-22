@@ -42,6 +42,7 @@ public:
 
 	QByteArray Generate(const QString& directoryPath, const QString& commandId = QString()) const;
 	QByteArray GenerateSingleEntry(const QFileInfo& fileInfo, const QString& commandId = QString()) const;
+	QByteArray GetMimeType(const QFileInfo& fileInfo) const;
 
 	// reimplemented (IRequestHandler)
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const override;
