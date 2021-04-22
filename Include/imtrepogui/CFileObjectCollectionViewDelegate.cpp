@@ -138,18 +138,18 @@ void CFileObjectCollectionViewDelegate::OnImportObject(const QByteArray& /*objec
 }
 
 
-bool CFileObjectCollectionViewDelegate::IsRestoreAllowed(const QByteArray& objectId)
+bool CFileObjectCollectionViewDelegate::IsRestoreAllowed(const QByteArray& /*objectId*/)
 {
 	return true;
 }
 
 
-void CFileObjectCollectionViewDelegate::BeforeRestore(const QByteArray& objectId)
+void CFileObjectCollectionViewDelegate::BeforeRestore(const QByteArray& /*objectId*/)
 {
 }
 
 
-void CFileObjectCollectionViewDelegate::AfterRestore(const QByteArray& objectId, bool isRestoreSuccessful)
+void CFileObjectCollectionViewDelegate::AfterRestore(const QByteArray& /*objectId*/, bool /*isRestoreSuccessful*/)
 {
 }
 
