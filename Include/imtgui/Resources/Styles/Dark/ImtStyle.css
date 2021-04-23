@@ -1,6 +1,5 @@
 QWidget
 {
-	font-family: "Verdana";
 	color: #ffffff;
 }
 
@@ -36,14 +35,24 @@ QSplashScreen > QWidget#CopyrightLabel
 	color: #ffffff;
 }
 
-QWidget#ResultFrame
+QWidget#BottomFrame
 {
-	font-size: 24px;
+	background: palette(dark);
 }
 
-QLabel#PageLabel {
-	font-size: 12pt;
-	font-weight: bold;
+QWidget#RightFrame
+{
+	 border-left: 1px solid /*#335777*/; 
+}
+
+QWidget#StatusFrame
+{
+	border-bottom: 1px solid /*#335777*/;
+}
+
+QLabel#PageLabel
+{
+	/*color: #335777;*/
 }
 
 QWidget[ImtTopFrame=true]
@@ -52,28 +61,19 @@ QWidget[ImtTopFrame=true]
 	border-bottom: 1px solid rgb(60,60,60);
 }
 
-QWidget#LoadWorkflowButton
-{
-	text-align: left;
-}
-
 QLabel[Header=true]
 {
-	font-size: 12pt;
+	/*color: #88b8e3;*/
 }
 
-QLineEdit, QPlainTextEdit
+QToolButton
 {
-	height: 1.3em;
-	font-size: 10pt;
+	/*color: #335777;*/
 }
 
 QToolButton#windowTitle
 {
 	background: palette(window);
-	min-width: 3em;
-	max-width: 3em;
-	border-radius: 3px;
 	border: 1px solid palette(mid);
 }
 
@@ -81,62 +81,28 @@ QToolButton#PageIconToolButton
 {
 	background-color: transparent;
 	border: 0px solid transparent;
-	padding: 0px;
 }
-
 
 QToolButton#PageIconToolButton:hover
 {
 	background-color: transparent;
 	border: 0px solid transparent;
-	padding: 0px;
 }
-
 
 QToolBar[ImtToolBar=true]::separator
 {
 	background: transparent;
-	width: 32px;
 }
-
-QToolBar[ImtToolBar=true]
-{
-	qproperty-iconSize: 24px;
-}
-
 
 QTableView[ImtMenu=true]
 {
 	color: palette(midlight);
 	background: palette(mid);
-	font-weight: bold;
-	text-align: center;
-}
-
-
-QTableView[ImtMenu=true]::item
-{
-	font-weight: bold;
-	text-align: center;
-}
-
-QAbstractItemView
-{
-	outline: 0;
-}
-
-QAbstractItemView[NoFrame="true"]
-{
-	border: none;
-}
-
-QAbstractItemView::item
-{
-	height: 25px;
 }
 
 QAbstractItemView::item::selected
 {
+	/*color: #335777;*/
 	background-color: rgb(160, 80, 40);
 }
 
@@ -145,50 +111,25 @@ QAbstractItemView::branch::selected
 	background-color: rgb(160, 80, 40);
 }
 
-
-QTreeView[ItemView=true]::item
-{
-	height: 30px;
-}
-
-
 QComboBox::item:selected
 {
 	color: white;
 }
 
-
-QHeaderView
-{
-	border: none;
-	padding: 0px;
-}
-
 QHeaderView::section
 {
-	padding-top: 5px;
-	padding-bottom: 5px;
-	padding-left: 4px;
+	/*background-color: white;*/
 	border-bottom: 1px solid palette(mid);
-	border-left: none;
-	border-right: none;
-	border-top: none;
-	font-weight: bold;
 }
-
 
 QTabBar
 {
 	background-color: rgb(120,120,122);
 }
 
-
 QTabBar::tab[CollectionView=true]
 {
-	min-height: 30px;
 	background-color: rgb(120,120,122);
-	min-width: 50ex;
-	padding: 2px;
 }
 
 QTabBar::tab:selected[CollectionView=true]
@@ -207,7 +148,6 @@ QTabBar::tab::left:selected[CollectionView=true]
 	border-left: 2px solid #eb6225;
 }
 
-
 QTabBar::tab::right:selected[CollectionView=true]
 {
 	border-left: 2px solid #eb6225;
@@ -217,13 +157,3 @@ QTabBar::tab::bottom:selected[CollectionView=true]
 {
 	border-bottom: 2px solid #eb6225;
 }
-
-
-QMenu[CommandsMenu=true]
-{
-	margin-top: 10px;
-	margin-bottom: 10px;
-	margin-left: 10px;
-	margin-right: 10px;
-}
-

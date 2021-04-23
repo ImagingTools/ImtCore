@@ -1,0 +1,125 @@
+QWidget
+{
+	font-family: "Verdana";
+}
+
+QWidget#ResultFrame
+{
+	font-size: 24px;
+}
+
+QLabel#PageLabel {
+	font-size: 12pt;
+	font-weight: bold;
+}
+
+QWidget#LoadWorkflowButton
+{
+	text-align: left;
+}
+
+QLabel[Header=true] {
+	font-size: 12pt;
+}
+
+QLineEdit, QPlainTextEdit 
+{
+	height: 1.3em;
+	font-size: 10pt;
+}
+
+QToolButton#windowTitle
+{
+	min-width: 3em;
+	max-width: 3em;
+	border-radius: 3px;
+}
+
+QToolButton#PageIconToolButton 
+{
+	padding: 0px;
+}
+
+QToolButton#PageIconToolButton:hover
+{
+	padding: 0px;
+}
+
+QToolBar[ImtToolBar=true]::separator
+{
+	width: 32px;
+}
+
+QToolBar[ImtToolBar=true]
+{
+	qproperty-iconSize: 24px;
+}
+
+QPushButton#LoadWorkflowButton
+{
+	text-align: left;
+}
+
+QTableView[ImtMenu=true]
+{
+	font-weight: bold;
+	text-align: center;
+}
+
+QTableView[ImtMenu=true]::item
+{
+	font-weight: bold;
+	text-align: center;
+}
+
+QAbstractItemView {
+	outline: 0;
+}
+
+QAbstractItemView[NoFrame="true"]
+{
+	border: none;
+}
+
+QAbstractItemView::item
+{
+	height: 25px;
+}
+
+QTreeView[ItemView=true]::item
+{
+	height: 30px;
+}
+
+QHeaderView
+{
+	border: none;
+	padding: 0px;
+}
+
+QHeaderView::section
+{
+	padding-top:5px;
+	padding-bottom:5px;
+	padding-left: 4px;
+	border-left: none;
+	border-right: none;
+	border-top: none;
+	font-weight: bold;
+}
+
+QTabBar::tab[CollectionView=true]
+{
+	min-height: 30px;
+	min-width: 50ex;
+	padding: 2px;
+}
+
+QMenu[CommandsMenu=true]
+{
+	margin-top: 10px;
+	margin-bottom: 10px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+

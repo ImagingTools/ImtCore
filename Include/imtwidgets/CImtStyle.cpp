@@ -429,7 +429,14 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 
 			qApp->setPalette(colorSchema.palette);
 
-			iqtgui::SetStyleSheetFromFile(*qApp, ":/Styles/ImtStyle");
+			QWidget widget;
+
+			iqtgui::SetStyleSheetFromFile(widget, ":/Styles/ImtNoColorStyle");
+			QString imtNoColorStyle = widget.styleSheet();
+			iqtgui::SetStyleSheetFromFile(widget, ":/Styles/ImtStyle");
+			QString imtStyle = widget.styleSheet();
+
+			qApp->setStyleSheet(imtNoColorStyle + imtStyle);
 		}
 	}
 	else{
