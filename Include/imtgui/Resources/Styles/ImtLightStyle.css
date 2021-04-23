@@ -56,6 +56,12 @@ QWidget#StatusFrame
 	border-bottom: 1px solid #335777;
 }
 
+QLabel#PageLabel {
+	color: #335777;
+	font-size: 12pt;
+	font-weight: bold;
+}
+
 QWidget[ImtTopFrame=true] 
 {
 	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(227,227,229), stop: 0.9 rgb(212,212,214), stop: 0.97 rgb(212,212,214), stop: 1.0 rgb(190,190,192));
@@ -234,5 +240,4 @@ QMenu[CommandsMenu=true]
 	margin-left: 10px;
 	margin-right: 10px;
 }
-
 

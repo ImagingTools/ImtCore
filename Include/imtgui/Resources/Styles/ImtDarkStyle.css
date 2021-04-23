@@ -41,6 +41,11 @@ QWidget#ResultFrame
 	font-size: 24px;
 }
 
+QLabel#PageLabel {
+	font-size: 12pt;
+	font-weight: bold;
+}
+
 QWidget[ImtTopFrame=true]
 {
 	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(107,107,109), stop: 0.9 rgb(92,92,94), stop: 0.97 rgb(92,92,94), stop: 1.0 rgb(70,70,72));
@@ -221,5 +226,4 @@ QMenu[CommandsMenu=true]
 	margin-left: 10px;
 	margin-right: 10px;
 }
-
 
