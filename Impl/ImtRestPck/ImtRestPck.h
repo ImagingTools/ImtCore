@@ -11,6 +11,7 @@
 #include <imtrest/CHttpRootHandlerComp.h>
 #include <imtrest/CHttpFileBasedHandlerComp.h>
 #include <imtrest/CHttpHtmlFolderBasedHandlerComp.h>
+#include <imtrest/CJsonModelBasedHandlerComp.h>
 
 
 /**
@@ -25,6 +26,7 @@ typedef imtrest::CHttpProtocolEngineComp HttpProtocolEngine;
 typedef imtrest::CHttpRootHandlerComp HttpRootHandler;
 typedef imtrest::CHttpFileBasedHandlerComp HttpFileBasedHandler;
 typedef imtrest::CHttpHtmlFolderBasedHandlerComp HttpHtmlFolderBasedHandler;
+typedef imtrest::CJsonModelBasedHandlerComp JsonModelBasedHandler;
 
 
 } // namespace ImtRestPck

@@ -39,6 +39,11 @@ I_EXPORT_COMPONENT(
 		"Generates HTML-document with list of objects for all the files and directories in the directory",
 		"HTTP File Dir Directory HTML");
 
+I_EXPORT_COMPONENT(
+		JsonModelBasedHandler,
+		"Generates Json model for QML??",
+		"JSON Model");
+
 
 } // namespace ImtRestPck
 
