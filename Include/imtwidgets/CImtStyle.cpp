@@ -429,7 +429,7 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 
 			qApp->setPalette(colorSchema.palette);
 
-			iqtgui::SetStyleSheetFromFile(*qApp, colorSchema.styleSheetPath);
+			iqtgui::SetStyleSheetFromFile(*qApp, ":/Styles/ImtStyle");
 		}
 	}
 	else{
@@ -451,7 +451,6 @@ CImtStyle::CImtStyle()
 	light.toolButtonGradientColors.endColor = QColor(235, 235, 238);
 	light.pressedToolButtonGradientColors.startColor = QColor(245, 245, 245);
 	light.pressedToolButtonGradientColors.endColor = QColor(245, 245, 245);
-	light.styleSheetPath = ":/Styles/ImtLightStyle";
 	istd::TDelPtr<QStyle> baseStylePtr(QStyleFactory::create("fusion"));
 	light.palette = baseStylePtr->standardPalette();
 	light.palette.setColor(QPalette::Highlight, QColor(130, 210, 255));
@@ -463,7 +462,6 @@ CImtStyle::CImtStyle()
 	dark.toolButtonGradientColors.endColor = QColor(115, 115, 115);
 	dark.pressedToolButtonGradientColors.startColor = QColor(135, 135, 135);
 	dark.pressedToolButtonGradientColors.endColor = QColor(135, 135, 135);
-	dark.styleSheetPath = ":/Styles/ImtDarkStyle";
 
 	dark.palette.setColor(QPalette::Window, QColor(53, 53, 53));
 	dark.palette.setColor(QPalette::WindowText, Qt::white);

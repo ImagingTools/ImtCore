@@ -169,6 +169,7 @@
         <file alias="CustomLayoutWidgetForm">Resources/Styles/Dark/CustomLayoutWidgetForm.css</file>
         <file alias="ObjectCollectionView">Resources/Styles/Dark/ObjectCollectionView.css</file>
         <file alias="ThumbnailDecoratorGui">Resources/Styles/Dark/ThumbnailDecoratorGui.css</file>
+        <file alias="ImtStyle">Resources/Styles/Dark/ImtStyle.css</file>
     </qresource>
     <qresource prefix="/Style/ImtDark/Images"/>
 </RCC>

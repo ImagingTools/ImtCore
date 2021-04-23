@@ -169,6 +169,7 @@
         <file alias="CustomLayoutWidgetForm">Resources/Styles/Light/CustomLayoutWidgetForm.css</file>
         <file alias="ObjectCollectionView">Resources/Styles/Light/ObjectCollectionView.css</file>
         <file alias="ThumbnailDecoratorGui">Resources/Styles/Light/ThumbnailDecoratorGui.css</file>
+        <file alias="ImtStyle">Resources/Styles/Light/ImtStyle.css</file>
     </qresource>
     <qresource prefix="/Style/ImtLight/Images">
         <file alias="PanelBackground">Resources/Styles/ImtLight/Images/PanelBackground.svg</file>

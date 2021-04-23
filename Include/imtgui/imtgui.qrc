@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/Styles">
-        <file alias="ImtLightStyle">Resources/Styles/ImtLightStyle.css</file>
-        <file alias="ImtDarkStyle">Resources/Styles/ImtDarkStyle.css</file>
-    </qresource>
-</RCC>
