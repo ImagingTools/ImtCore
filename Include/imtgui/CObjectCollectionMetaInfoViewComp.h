@@ -35,6 +35,9 @@ protected:
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelDetached() override;
 
+	// iqtgui::TDesignSchemaHandlerWrap
+	void OnDesignSchemaChanged() override;
+
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiRetranslate() override;

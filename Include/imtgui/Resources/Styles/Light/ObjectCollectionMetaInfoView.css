@@ -1,0 +1,12 @@
+QLabel[MetaInfoType = true]
+{
+	font-size: 12px;
+	font: bold;
+	color: #88b8e3
+}
+
+QLabel[MetaInfoValue = true]
+{
+	font-size: 9px;
+	color: red
+}

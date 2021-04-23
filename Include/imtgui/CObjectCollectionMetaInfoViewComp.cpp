@@ -67,16 +67,13 @@ void CObjectCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 
 		if (type != imtbase::IObjectCollection::MIT_PREVIEW_THUMBNAIL){
 			QLabel* labelNamePtr = new QLabel(name, GetWidget());
-			labelNamePtr->setStyleSheet("font-size: 12px; font: bold; color: #88b8e3");
+			labelNamePtr->setProperty("MetaInfoType", true);
+			layoutPtr->addWidget(labelNamePtr, layoutPtr->rowCount(), 0, 1, 1);
 
 			QLabel* labelValuePtr = new QLabel(textValue, GetWidget());
-		//	labelValuePtr->setWordWrap(true);
-
-			layoutPtr->addWidget(labelNamePtr, layoutPtr->rowCount(), 0, 1, 1);
-			if (labelValuePtr != nullptr){
-				labelValuePtr->setStyleSheet("font-size: 9px; color: gray");
-				layoutPtr->addWidget(labelValuePtr, layoutPtr->rowCount(), 0, 1, 1);
-			}
+			labelValuePtr->setProperty("MetaInfoValue", true);
+			//labelValuePtr->setWordWrap(true);
+			layoutPtr->addWidget(labelValuePtr, layoutPtr->rowCount(), 0, 1, 1);
 		}
 
 		QSpacerItem* delimeter = new QSpacerItem(10, 5);
@@ -106,6 +103,14 @@ void CObjectCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::Chang
 }
 
 
+// iqtgui::TDesignSchemaHandlerWrap
+
+void CObjectCollectionMetaInfoViewComp::OnDesignSchemaChanged()
+{
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionMetaInfoView");
+}
+
+
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CObjectCollectionMetaInfoViewComp::OnGuiCreated()
@@ -126,6 +131,7 @@ void CObjectCollectionMetaInfoViewComp::OnGuiCreated()
 
 	PreviewFrame->setGraphicsEffect(shadowPtr);
 
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionMetaInfoView");
 }
 
 
