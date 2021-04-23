@@ -165,11 +165,10 @@
         <file alias="NozzleHighlight">Resources/Icons/Light/Color/NozzleHighlight.svg</file>
     </qresource>
     <qresource prefix="/Styles">
-        <file alias="ImtLightStyle">Resources/Styles/ImtLightStyle.css</file>
-        <file alias="MenuPanelStyle">Resources/Styles/MenuPanelLightStyle.css</file>
-        <file alias="CustomLayoutWidgetFormStyle">Resources/Styles/CustomLayoutWidgetFormLightStyle.css</file>
-        <file alias="ObjectCollectionViewStyle">Resources/Styles/ObjectCollectionViewLightStyle.css</file>
-        <file alias="ThumbnailDecoratorGuiStyle">Resources/Styles/ThumbnailDecoratorGuiLightStyle.css</file>
+        <file alias="MenuPanel">Resources/Styles/Light/MenuPanel.css</file>
+        <file alias="CustomLayoutWidgetForm">Resources/Styles/Light/CustomLayoutWidgetForm.css</file>
+        <file alias="ObjectCollectionView">Resources/Styles/Light/ObjectCollectionView.css</file>
+        <file alias="ThumbnailDecoratorGui">Resources/Styles/Light/ThumbnailDecoratorGui.css</file>
     </qresource>
     <qresource prefix="/Style/ImtLight/Images">
         <file alias="PanelBackground">Resources/Styles/ImtLight/Images/PanelBackground.svg</file>

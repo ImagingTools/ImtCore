@@ -173,7 +173,7 @@ void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& settings) const
 
 void CThumbnailDecoratorGuiComp::OnDesignSchemaChanged()
 {
-	iqtgui::SetStyleSheetFromFile(*SubPages, ":/Styles/ThumbnailDecoratorGuiStyle");
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ThumbnailDecoratorGui");
 }
 
 
@@ -289,7 +289,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		m_lastPageIndexForLoggedUser = *m_defaultPageIndexAttrPtr;
 	}
 
-	iqtgui::SetStyleSheetFromFile(*SubPages, ":/Styles/ThumbnailDecoratorGuiStyle");
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ThumbnailDecoratorGui");
 }
 
 

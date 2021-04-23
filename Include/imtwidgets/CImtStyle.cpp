@@ -15,12 +15,6 @@
 #include <iqtgui/iqtgui.h>
 
 
-extern int qInitResources_imtguilight();
-extern int qCleanupResources_imtguilight();
-
-extern int qInitResources_imtguidark();
-extern int qCleanupResources_imtguidark();
-
 extern void qt_blurImage(QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0);
 
 

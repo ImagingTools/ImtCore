@@ -157,7 +157,7 @@ void CLayoutManagerGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*chan
 
 void CLayoutManagerGuiComp::OnDesignSchemaChanged()
 {
-	iqtgui::SetStyleSheetFromFile(*GetQtWidget(), ":/Styles/CustomLayoutWidgetFormStyle");
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/CustomLayoutWidgetForm");
 }
 
 
@@ -245,7 +245,7 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 
 	m_layoutWidgetPtr->SetAdditionalNames(additionalNames);
 
-	iqtgui::SetStyleSheetFromFile(*GetQtWidget(), ":/Styles/CustomLayoutWidgetFormStyle");
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/CustomLayoutWidgetForm");
 }
 
 

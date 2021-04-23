@@ -325,7 +325,7 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 
 void CObjectCollectionViewComp::OnDesignSchemaChanged()
 {
-	iqtgui::SetStyleSheetFromFile(*TypeList, ":/Styles/ObjectCollectionViewStyle");
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionView");
 }
 
 
@@ -389,7 +389,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 		RightPanel->setVisible(false);
 	}
 
-	iqtgui::SetStyleSheetFromFile(*TypeList, ":/Styles/ObjectCollectionViewStyle");
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionView");
 }
 
 

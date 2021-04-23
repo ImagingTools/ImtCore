@@ -106,7 +106,7 @@ void CMenuPanelComp::OnGuiModelDetached()
 
 void CMenuPanelComp::OnDesignSchemaChanged()
 {
-	iqtgui::SetStyleSheetFromFile(*GetQtWidget(), ":/Styles/MenuPanelStyle");
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/MenuPanel");
 }
 
 
@@ -145,7 +145,7 @@ void CMenuPanelComp::OnGuiCreated()
 		m_menuPanelVisibilityModelCompPtr->AttachObserver(&m_menuPanelVisibilityObserver);
 	}
 
-	iqtgui::SetStyleSheetFromFile(*widgetPtr, ":/Styles/MenuPanelStyle");
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/MenuPanel");
 }
 
 
