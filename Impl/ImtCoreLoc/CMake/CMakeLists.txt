@@ -1,4 +1,4 @@
 project(ImtCoreLoc LANGUAGES CXX)
 
-include($ENV{ACFCONFIGDIR}/CMake/StaticConfig.cmake)
-include($ENV{ACFCONFIGDIR}/CMake/CustomBuild.cmake)
+include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
+include(${ACFDIR}/Config/CMake/CustomBuild.cmake)

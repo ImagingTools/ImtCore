@@ -1,5 +1,6 @@
-include($ENV{ACFSLNDIR}/Config/CMake/AcfSln.cmake)
-include($ENV{IACFDIR}/Config/CMake/Iacf.cmake)
+include(${ACFSLNDIR}/Config/CMake/AcfSln.cmake)
+include(${IACFDIR}/Config/CMake/Iacf.cmake)
+#include($ENV{IACFDIR}/Config/CMake/Iacf.cmake)
 
 ##include_directories("$ENV{IMTCOREDIR}/$$AUXINCLUDEDIR")
 #include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)

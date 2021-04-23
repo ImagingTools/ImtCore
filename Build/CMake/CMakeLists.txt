@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(ImtCore)
 
+
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
 
@@ -11,7 +12,7 @@ subdirlist(IMPL_DIRS ${IMPL_DIR})
 get_target_name(TARGETNAME)
 
 set(AUX_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../AuxInclude/Qt${QT_DEFAULT_MAJOR_VERSION}_${TARGETNAME}/GeneratedFiles")
-set(IMT_BIN_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Bin/${TARGETNAME}")
+set(IMT_BIN_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Bin/${CMAKE_BUILD_TYPE}${TARGETNAME}")
 
 include_directories(${AUX_INCLUDE_DIR}/..)
 
