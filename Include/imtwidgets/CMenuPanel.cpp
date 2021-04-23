@@ -55,17 +55,11 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	PageTree->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 	PageTree->setIndentation(0);
 
-	PageTree->setStyleSheet("QTreeView::item::hover {background - color:rgb(0, 0, 0);}");
 	PageTree->verticalScrollBar()->installEventFilter(this);
 
 	PageTree->setContentsMargins(QMargins(0,0,0,0));
 	PageTree->setMaximumWidth(m_minWidth);
 	PageTree->setItemsExpandable(false);
-
-	pushTop->setStyleSheet("QPushButton:hover{	background: white } "
-		" QPushButton{ border: 1px solid #9d9d9d; background: #e0e0e0; }" );
-
-	pushBottom->setStyleSheet(pushTop->styleSheet());
 
 	m_animationWidth.setTargetObject(PageTree);
 	m_animationWidth.setPropertyName("maximumWidth");
