@@ -72,13 +72,6 @@ QLabel[Header=true] {
 	color: #88b8e3;
 }
 
-QLabel#PageLabel, QLabel#ManualModePageLabel
-{
-	color: #335777;
-	font-size: 12pt;
-	font-weight: bold;
-}
-
 QLineEdit, QPlainTextEdit 
 {
 	height: 1.3em;

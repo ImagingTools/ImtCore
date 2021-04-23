@@ -57,12 +57,6 @@ QLabel[Header=true]
 	font-size: 12pt;
 }
 
-QLabel#PageLabel, QLabel#ManualModePageLabel
-{
-	font-size: 12pt;
-	font-weight: bold;
-}
-
 QLineEdit, QPlainTextEdit
 {
 	height: 1.3em;

@@ -37,3 +37,9 @@ QTreeWidget#SubPages::item:first:selected
 {
 	border-top: 1px palette(midlight);
 }
+
+QLabel#PageLabel
+{
+	font-size: 12pt;
+	font-weight: bold;
+}
