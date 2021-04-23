@@ -67,16 +67,6 @@ QWidget#LoadWorkflowButton
 	text-align: left;
 }
 
-QLabel[ProductionApplicationName=true] {
-	font-size: 16pt;
-	color: #335777;
-}
-
-QLabel[ProductionTime=true] {
-	font-size: 16pt;
-	color: #335777;
-}
-
 QLabel[Header=true] {
 	font-size: 12pt;
 	color: #88b8e3;
@@ -128,14 +118,13 @@ QToolBar[ImtToolBar=true]::separator
 	width: 32px;
 }
 
+QToolBar[ImtToolBar=true] {
+	qproperty-iconSize: 24px;
+}
+
 QPushButton#LoadWorkflowButton
 {
 	text-align: left;
-}
-
-QToolBar[ImtToolBar=true]
-{
-	qproperty-iconSize: 24px;
 }
 
 QTableView[ImtMenu=true]

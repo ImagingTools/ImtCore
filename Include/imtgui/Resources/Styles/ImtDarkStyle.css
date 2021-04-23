@@ -52,16 +52,6 @@ QWidget#LoadWorkflowButton
 	text-align: left;
 }
 
-QLabel[ProductionApplicationName=true]
-{
-	font-size: 16pt;
-}
-
-QLabel[ProductionTime=true]
-{
-	font-size: 16pt;
-}
-
 QLabel[Header=true]
 {
 	font-size: 12pt;
