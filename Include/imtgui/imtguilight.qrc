@@ -165,7 +165,6 @@
         <file alias="NozzleHighlight">Resources/Icons/Light/Color/NozzleHighlight.svg</file>
     </qresource>
     <qresource prefix="/Styles">
-        <file alias="ImtStyle">Resources/Styles/Light/ImtStyle.css</file>
         <file alias="MenuPanel">Resources/Styles/Light/MenuPanel.css</file>
         <file alias="CustomLayoutWidgetForm">Resources/Styles/Light/CustomLayoutWidgetForm.css</file>
         <file alias="ObjectCollectionView">Resources/Styles/Light/ObjectCollectionView.css</file>

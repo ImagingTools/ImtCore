@@ -5,7 +5,7 @@ include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liproc -liauth -liedge
-LIBS += -limtgui -limtloggui -limtbase -limtwidgets -li2d -liqt2d
+LIBS += -limtgui -limtloggui -limtbase -limtwidgets -li2d -liqt2d -limtstyle
 
 win32
 {

@@ -16,12 +16,12 @@ namespace imtgui
 void CDesignManagerComp::RegisterResourcesFunctions()
 {
 	SetDesignResourcesFunctions(
-				imtwidgets::CImtStyle::DS_LIGHT,
+				imtstyle::CImtStyle::DS_LIGHT,
 				qInitResources_imtguilight,
 				qCleanupResources_imtguilight);
 
 	SetDesignResourcesFunctions(
-				imtwidgets::CImtStyle::DS_DARK,
+				imtstyle::CImtStyle::DS_DARK,
 				qInitResources_imtguidark,
 				qCleanupResources_imtguidark);
 }

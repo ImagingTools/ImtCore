@@ -7,7 +7,7 @@
 #include <QtWidgets/QStyleOption>
 
 
-namespace imtwidgets
+namespace imtstyle
 {
 
 
@@ -89,6 +89,7 @@ private:
 		GradientColors toolButtonGradientColors;
 		GradientColors pressedToolButtonGradientColors;
 		QPalette palette;
+		QString stylePath;
 	};
 
 	typedef QMap<DesignSchema, ColorSchema> ColorSchemaMap;
@@ -110,6 +111,6 @@ private:
 };
 
 
-} // namespace imtwidgets
+} // namespace imtstyle
 
 

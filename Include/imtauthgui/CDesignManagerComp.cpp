@@ -16,12 +16,12 @@ namespace imtauthgui
 void CDesignManagerComp::RegisterResourcesFunctions()
 {
 	SetDesignResourcesFunctions(
-				imtwidgets::CImtStyle::DS_LIGHT,
+				imtstyle::CImtStyle::DS_LIGHT,
 				qInitResources_imtauthguilight,
 				qCleanupResources_imtauthguilight);
 
 	SetDesignResourcesFunctions(
-				imtwidgets::CImtStyle::DS_DARK,
+				imtstyle::CImtStyle::DS_DARK,
 				qInitResources_imtauthguidark,
 				qCleanupResources_imtauthguidark);
 }

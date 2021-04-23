@@ -56,7 +56,7 @@ bool CDesignManagerCompBase::Serialize(iser::IArchive& archive)
 // protected methods
 
 void CDesignManagerCompBase::SetDesignResourcesFunctions(
-			imtwidgets::CImtStyle::DesignSchema designSchema,
+			imtstyle::CImtStyle::DesignSchema designSchema,
 			ResourceFunctionPtr initResources,
 			ResourceFunctionPtr cleanupResources)
 {
@@ -112,11 +112,11 @@ bool CDesignManagerCompBase::ApplyDesignScheme(int index)
 {
 	bool retVal = true;
 
-	imtwidgets::CImtStyle* imtStylePtr = imtwidgets::CImtStyle::GetInstance();
+	imtstyle::CImtStyle* imtStylePtr = imtstyle::CImtStyle::GetInstance();
 	Q_ASSERT(imtStylePtr != nullptr);
 
-	imtwidgets::CImtStyle::DesignSchema designSchema = imtStylePtr->GetDesignSchemaFromIndex(index);
-	if (designSchema != imtwidgets::CImtStyle::DS_INVALID){
+	imtstyle::CImtStyle::DesignSchema designSchema = imtStylePtr->GetDesignSchemaFromIndex(index);
+	if (designSchema != imtstyle::CImtStyle::DS_INVALID){
 		if (index < imtStylePtr->GetDesignSchemaCount()){
 			if (m_initResources.contains(designSchema)){
 				if (m_initResources[designSchema] != nullptr){
@@ -127,7 +127,7 @@ bool CDesignManagerCompBase::ApplyDesignScheme(int index)
 					}
 
 					{
-						imtwidgets::CImtStyle::DesignSchemaSetterBlocker blocker(*imtStylePtr);
+						imtstyle::CImtStyle::DesignSchemaSetterBlocker blocker(*imtStylePtr);
 
 						if (m_slaveCompPtr.IsValid()){
 							retVal = retVal && m_slaveCompPtr->SetSelectedOptionIndex(index);
@@ -156,12 +156,12 @@ void CDesignManagerCompBase::DesignList::UpdateDesignList()
 
 	m_designList.clear();
 
-	imtwidgets::CImtStyle* imtStyle = imtwidgets::CImtStyle::GetInstance();
+	imtstyle::CImtStyle* imtStyle = imtstyle::CImtStyle::GetInstance();
 	if (imtStyle != nullptr){
 		for (int i = 0; i < imtStyle->GetDesignSchemaCount(); i++){
 			DesignInfo designInfo;
-			designInfo.id = imtStyle->GetDesignSchemaId((imtwidgets::CImtStyle::DesignSchema)i);
-			designInfo.name = imtStyle->GetDesignSchemaName((imtwidgets::CImtStyle::DesignSchema)i);
+			designInfo.id = imtStyle->GetDesignSchemaId((imtstyle::CImtStyle::DesignSchema)i);
+			designInfo.name = imtStyle->GetDesignSchemaName((imtstyle::CImtStyle::DesignSchema)i);
 
 			m_designList.append(designInfo);
 		}

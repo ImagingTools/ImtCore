@@ -1,4 +1,4 @@
-#include <imtwidgets/CImtStyle.h>
+#include <imtstyle/CImtStyle.h>
 
 
 // Qt includes
@@ -64,7 +64,7 @@ static void DrawArrow(
 }
 
 
-namespace imtwidgets
+namespace imtstyle
 {
 
 
@@ -431,9 +431,9 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 
 			QWidget widget;
 
-			iqtgui::SetStyleSheetFromFile(widget, ":/Styles/ImtNoColorStyle");
-			QString imtNoColorStyle = widget.styleSheet();
 			iqtgui::SetStyleSheetFromFile(widget, ":/Styles/ImtStyle");
+			QString imtNoColorStyle = widget.styleSheet();
+			iqtgui::SetStyleSheetFromFile(widget, colorSchema.stylePath);
 			QString imtStyle = widget.styleSheet();
 
 			qApp->setStyleSheet(imtNoColorStyle + imtStyle);
@@ -461,6 +461,7 @@ CImtStyle::CImtStyle()
 	istd::TDelPtr<QStyle> baseStylePtr(QStyleFactory::create("fusion"));
 	light.palette = baseStylePtr->standardPalette();
 	light.palette.setColor(QPalette::Highlight, QColor(130, 210, 255));
+	light.stylePath = ":/Styles/ImtColorStyleLight";
 
 	m_colorSchemaMap[DS_LIGHT] = light;
 
@@ -469,7 +470,6 @@ CImtStyle::CImtStyle()
 	dark.toolButtonGradientColors.endColor = QColor(115, 115, 115);
 	dark.pressedToolButtonGradientColors.startColor = QColor(135, 135, 135);
 	dark.pressedToolButtonGradientColors.endColor = QColor(135, 135, 135);
-
 	dark.palette.setColor(QPalette::Window, QColor(53, 53, 53));
 	dark.palette.setColor(QPalette::WindowText, Qt::white);
 	dark.palette.setColor(QPalette::Base, QColor(33, 33, 33));
@@ -483,6 +483,7 @@ CImtStyle::CImtStyle()
 	dark.palette.setColor(QPalette::Link, QColor(42, 130, 218));
 	dark.palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
 	dark.palette.setColor(QPalette::HighlightedText, Qt::white);
+	light.stylePath = ":/Styles/ImtColorStyleDark";
 
 	m_colorSchemaMap[DS_DARK] = dark;
 }
@@ -504,6 +505,6 @@ CImtStyle::DesignSchemaSetterBlocker::~DesignSchemaSetterBlocker()
 }
 
 
-} // namespace imtwidgets
+} // namespace imtstyle
 
 

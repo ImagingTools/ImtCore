@@ -7,7 +7,7 @@
 #include <iprm/CSelectionParam.h>
 
 // ImtCore includes
-#include <imtwidgets/CImtStyle.h>
+#include <imtstyle/CImtStyle.h>
 
 
 // ACF includes
@@ -47,7 +47,7 @@ protected:
 	virtual void RegisterResourcesFunctions() = 0;
 
 	void SetDesignResourcesFunctions(
-				imtwidgets::CImtStyle::DesignSchema designSchema,
+				imtstyle::CImtStyle::DesignSchema designSchema,
 				ResourceFunctionPtr initResources,
 				ResourceFunctionPtr cleanupResources);
 
@@ -90,8 +90,8 @@ private:
 private:
 	I_REF(iprm::ISelectionParam, m_slaveCompPtr);
 
-	QMap<imtwidgets::CImtStyle::DesignSchema, ResourceFunctionPtr> m_initResources;
-	QMap<imtwidgets::CImtStyle::DesignSchema, ResourceFunctionPtr> m_cleanupResources;
+	QMap<imtstyle::CImtStyle::DesignSchema, ResourceFunctionPtr> m_initResources;
+	QMap<imtstyle::CImtStyle::DesignSchema, ResourceFunctionPtr> m_cleanupResources;
 
 	imod::TModelWrap<DesignList> m_designs;
 };
