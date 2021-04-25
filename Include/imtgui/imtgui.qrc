@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/Styles">
-        <file alias="ImtNoColorStyle">Resources/Styles/ImtStyle.css</file>
-    </qresource>
-</RCC>
