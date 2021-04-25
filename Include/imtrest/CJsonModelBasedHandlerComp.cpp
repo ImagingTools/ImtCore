@@ -1,4 +1,5 @@
-﻿#include "CJsonModelBasedHandlerComp.h"
+﻿#include <imtrest/CJsonModelBasedHandlerComp.h>
+
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -12,10 +13,12 @@ namespace imtrest
 {
 
 
+// public methods
+
 CJsonModelBasedHandlerComp::CJsonModelBasedHandlerComp()
 {
-
 }
+
 
 // reimplemented (IRequestHandler)
 
@@ -35,8 +38,6 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 		return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_INTERNAL_ERROR, generatedErrorBody, reponseTypeId));
 	};
 
-
-
 	QByteArray body;
 	QByteArray commandId = request.GetCommandId();
 	QByteArray commandIdBase = *this->m_commandIdAttrPtr;
@@ -45,37 +46,30 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 		commandIdBase.chop(1);
 	}
 	QString modelName = commandId.replace(commandIdBase, "");
-	if(modelName.endsWith('/'))
-	{
+	if(modelName.endsWith('/')){
 		modelName.chop(1);
 	}
-	while(modelName.startsWith('/'))
-	{
+
+	while(modelName.startsWith('/')){
 		modelName.remove(0,1);
 	}
 
-	if(modelName == "__HELLO_MODEL__")
-	{
+	if(modelName == "__HELLO_MODEL__"){
 		reponseTypeId = "application/json";
 		body = QByteArray(R"({"I'm seyin to you": "HELLO WORLD"})");
 	}
-	else if(modelName == "__EXAMPLE_1__")
-	{
+	else if(modelName == "__EXAMPLE_1__"){
 		reponseTypeId = "application/json";
 		body = QByteArray(R"({"adresses":[{"city":"Moscou","country":"Russia","postalCode":644099,"street":"Lenina 10"},{"city":"Munic","country":"Germany","postalCode":123456,"street":"Street St"}],"firstName":"Ivan","lastName":"Ivanov","nicName":"NicIvan"})");
 	}
-	else if(modelName == "__EXAMPLE_2__")
-	{
+	else if(modelName == "__EXAMPLE_2__"){
 		reponseTypeId = "application/json";
 		body = QByteArray(R"({"firstName":"Ivan","lastName":"Ivanov","nicName":"NicIvan","adresses":[{"country":"Russia","city":"Moscow","postalCode":644099,"street":"Lenina 10"},{"country":"Germany","city":"Munic","postalCode":123456,"street":"Street St"}]})");
 	}
-	else if(m_jsonModelProcessor.IsValid())
-	{
-//		m_jsonModelProcessor->GetModel(modelName);
+	else if(m_jsonModelProcessor.IsValid()){
 		reponseTypeId = "application/json";
 	}
-	else
-	{
+	else{
 		generateErrorResponsePtr(QByteArray("Cannot init ModelProcessor OffLine OR Not created OR not setted"));
 	}
 
@@ -84,11 +78,13 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 	return responsePtr;
 }
 
+
 QByteArray CJsonModelBasedHandlerComp::GetSupportedCommandId() const
 {
 	return *m_commandIdAttrPtr;
 }
 
 
-
 } // namespace imtrest
+
+

@@ -25,7 +25,7 @@ namespace imtgui
 
 // protected methods
 
-// reimplemented (imtgui::CDocumentWorkspaceGuiCompBase)
+// reimplemented (imtgui::CMultiDocumentWorkspaceGuiCompBase)
 
 IDocumentViewDecorator* CDocumentWorkspaceGuiComp::CreateDocumentViewDecorator(
 			istd::IPolymorphic* viewPtr,

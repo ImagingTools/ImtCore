@@ -1,4 +1,4 @@
-#include <imtgui/CDocumentWorkspaceGuiCompBase.h>
+#include <imtgui/CMultiDocumentWorkspaceGuiCompBase.h>
 
 
 // Qt includes
@@ -26,7 +26,7 @@ namespace imtgui
 
 // public methods
 
-CDocumentWorkspaceGuiCompBase::CDocumentWorkspaceGuiCompBase()
+CMultiDocumentWorkspaceGuiCompBase::CMultiDocumentWorkspaceGuiCompBase()
 	:m_forceQuietClose(false),
 	m_isUpdateBlocked(false),
 	m_previousTabIndex(-1)
@@ -38,7 +38,7 @@ CDocumentWorkspaceGuiCompBase::CDocumentWorkspaceGuiCompBase()
 
 // reimplemented (iqtgui::IGuiObject)
 
-void CDocumentWorkspaceGuiCompBase::OnTryClose(bool* ignoredPtr)
+void CMultiDocumentWorkspaceGuiCompBase::OnTryClose(bool* ignoredPtr)
 {
 	if (SaveDirtyDocuments(false, ignoredPtr)){
 		int documentInfosCount = GetDocumentsCount();
@@ -59,7 +59,7 @@ void CDocumentWorkspaceGuiCompBase::OnTryClose(bool* ignoredPtr)
 
 // reimplemented (idoc::IDocumentManager)
 
-void CDocumentWorkspaceGuiCompBase::SetActiveView(istd::IPolymorphic* viewPtr)
+void CMultiDocumentWorkspaceGuiCompBase::SetActiveView(istd::IPolymorphic* viewPtr)
 {
 	if (viewPtr != GetActiveView()){
 		istd::CChangeGroup selectorChangeGroup(&m_documentList);
@@ -118,13 +118,13 @@ void CDocumentWorkspaceGuiCompBase::SetActiveView(istd::IPolymorphic* viewPtr)
 
 // protected members
 
-int CDocumentWorkspaceGuiCompBase::GetFixedWindowsCount() const
+int CMultiDocumentWorkspaceGuiCompBase::GetFixedWindowsCount() const
 {
 	return m_fixedTabs.size();
 }
 
 
-void CDocumentWorkspaceGuiCompBase::UpdateAllTitles()
+void CMultiDocumentWorkspaceGuiCompBase::UpdateAllTitles()
 {
 	typedef QMap<QString, int> NameFrequencies;
 	NameFrequencies nameFrequencies;
@@ -186,7 +186,7 @@ void CDocumentWorkspaceGuiCompBase::UpdateAllTitles()
 }
 
 
-int CDocumentWorkspaceGuiCompBase::GetDocumentIndexFromWidget(const QWidget& widget) const
+int CMultiDocumentWorkspaceGuiCompBase::GetDocumentIndexFromWidget(const QWidget& widget) const
 {
 	int documentInfosCount = GetDocumentsCount();
 	for (int documentIndex = 0; documentIndex < documentInfosCount; ++documentIndex){
@@ -210,14 +210,14 @@ int CDocumentWorkspaceGuiCompBase::GetDocumentIndexFromWidget(const QWidget& wid
 }
 
 
-void CDocumentWorkspaceGuiCompBase::InitializeDocumentView(IDocumentViewDecorator* /*documentViewPtr*/, const SingleDocumentData& /*documentData*/)
+void CMultiDocumentWorkspaceGuiCompBase::InitializeDocumentView(IDocumentViewDecorator* /*documentViewPtr*/, const SingleDocumentData& /*documentData*/)
 {
 }
 
 
 // protected methods
 
-bool CDocumentWorkspaceGuiCompBase::AddTab(const QString& name, iqtgui::IGuiObject* guiPtr, const QIcon& icon)
+bool CMultiDocumentWorkspaceGuiCompBase::AddTab(const QString& name, iqtgui::IGuiObject* guiPtr, const QIcon& icon)
 {
 	Q_ASSERT(guiPtr != nullptr);
 
@@ -250,7 +250,7 @@ bool CDocumentWorkspaceGuiCompBase::AddTab(const QString& name, iqtgui::IGuiObje
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnDragEnterEvent(QDragEnterEvent* dragEnterEventPtr)
+void CMultiDocumentWorkspaceGuiCompBase::OnDragEnterEvent(QDragEnterEvent* dragEnterEventPtr)
 {
 	if (dragEnterEventPtr->mimeData()->hasFormat("text/uri-list")){
 		dragEnterEventPtr->acceptProposedAction();
@@ -258,7 +258,7 @@ void CDocumentWorkspaceGuiCompBase::OnDragEnterEvent(QDragEnterEvent* dragEnterE
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnDropEvent(QDropEvent* dropEventPtr)
+void CMultiDocumentWorkspaceGuiCompBase::OnDropEvent(QDropEvent* dropEventPtr)
 {
 	const QMimeData* mimeData = dropEventPtr->mimeData();
 	if (mimeData->hasUrls()){
@@ -281,7 +281,7 @@ void CDocumentWorkspaceGuiCompBase::OnDropEvent(QDropEvent* dropEventPtr)
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CDocumentWorkspaceGuiCompBase::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CMultiDocumentWorkspaceGuiCompBase::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if ((modelId >= MI_VISUAL_STATUS_BASE_INDEX) && (modelId < MI_DOCUMENT_COMMANDS_BASE_INDEX)){
 		int tabIndex = modelId - MI_VISUAL_STATUS_BASE_INDEX;
@@ -301,7 +301,7 @@ void CDocumentWorkspaceGuiCompBase::OnModelChanged(int modelId, const istd::ICha
 
 // reimplemented (idoc::CMultiDocumentManagerBase)
 
-istd::IChangeable* CDocumentWorkspaceGuiCompBase::OpenSingleDocument(
+istd::IChangeable* CMultiDocumentWorkspaceGuiCompBase::OpenSingleDocument(
 			const QString& filePath,
 			bool createView,
 			const QByteArray& viewTypeId,
@@ -331,7 +331,7 @@ istd::IChangeable* CDocumentWorkspaceGuiCompBase::OpenSingleDocument(
 
 // reimplemented (idoc::IDocumentManager)
 
-bool CDocumentWorkspaceGuiCompBase::InsertNewDocument(
+bool CMultiDocumentWorkspaceGuiCompBase::InsertNewDocument(
 			const QByteArray& documentTypeId,
 			bool createView,
 			const QByteArray& viewTypeId,
@@ -361,7 +361,7 @@ bool CDocumentWorkspaceGuiCompBase::InsertNewDocument(
 
 // reimplemented (idoc::CMultiDocumentManagerBase)
 
-void CDocumentWorkspaceGuiCompBase::CloseAllDocuments()
+void CMultiDocumentWorkspaceGuiCompBase::CloseAllDocuments()
 {
 	if (!IsGuiCreated()){
 		return;
@@ -390,7 +390,7 @@ void CDocumentWorkspaceGuiCompBase::CloseAllDocuments()
 }
 
 
-QStringList CDocumentWorkspaceGuiCompBase::GetOpenFilePaths(const QByteArray* documentTypeIdPtr) const
+QStringList CMultiDocumentWorkspaceGuiCompBase::GetOpenFilePaths(const QByteArray* documentTypeIdPtr) const
 {
 	QStringList files = GetOpenFilePathesFromDialog(documentTypeIdPtr);
 
@@ -402,7 +402,7 @@ QStringList CDocumentWorkspaceGuiCompBase::GetOpenFilePaths(const QByteArray* do
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnViewRegistered(istd::IPolymorphic* viewPtr, const SingleDocumentData& documentData)
+void CMultiDocumentWorkspaceGuiCompBase::OnViewRegistered(istd::IPolymorphic* viewPtr, const SingleDocumentData& documentData)
 {
 	ifile::IFilePersistence* persistencePtr = nullptr;
 	const idoc::IDocumentTemplate* templatePtr = GetDocumentTemplate();
@@ -445,7 +445,7 @@ void CDocumentWorkspaceGuiCompBase::OnViewRegistered(istd::IPolymorphic* viewPtr
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnViewRemoved(istd::IPolymorphic* viewPtr)
+void CMultiDocumentWorkspaceGuiCompBase::OnViewRemoved(istd::IPolymorphic* viewPtr)
 {
 	for (int pageIndex = GetFixedWindowsCount(); pageIndex < Tabs->count(); ++pageIndex){
 		IDocumentViewDecorator* documentViewPtr = dynamic_cast<IDocumentViewDecorator*>(Tabs->widget(pageIndex));
@@ -469,7 +469,7 @@ void CDocumentWorkspaceGuiCompBase::OnViewRemoved(istd::IPolymorphic* viewPtr)
 }
 
 
-bool CDocumentWorkspaceGuiCompBase::QueryDocumentSave(const SingleDocumentData& info, bool* ignoredPtr)
+bool CMultiDocumentWorkspaceGuiCompBase::QueryDocumentSave(const SingleDocumentData& info, bool* ignoredPtr)
 {
 	QMessageBox::StandardButtons buttons = QMessageBox::Yes | QMessageBox::No;
 
@@ -501,7 +501,7 @@ bool CDocumentWorkspaceGuiCompBase::QueryDocumentSave(const SingleDocumentData& 
 
 // reimplemented (iqt:CGuiObjectBase)
 
-void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
+void CMultiDocumentWorkspaceGuiCompBase::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
@@ -521,9 +521,9 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 
 	connect(
 				this,
-				&CDocumentWorkspaceGuiCompBase::PostUpdateCommands,
+				&CMultiDocumentWorkspaceGuiCompBase::PostUpdateCommands,
 				this,
-				&CDocumentWorkspaceGuiCompBase::UpdateCommands,
+				&CMultiDocumentWorkspaceGuiCompBase::UpdateCommands,
 				Qt::QueuedConnection);
 
 	QWidget* mainWindowPtr = GetQtWidget();
@@ -574,9 +574,9 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 		}
 	}
 
-	connect(Tabs, &QTabWidget::currentChanged, this, &CDocumentWorkspaceGuiCompBase::OnViewActivated);
-	connect(Tabs, &QTabWidget::tabCloseRequested, this, &CDocumentWorkspaceGuiCompBase::OnViewCloseTriggered);
-	connect(m_closeCurrentTabShortcutPtr, &QShortcut::activated, this, &CDocumentWorkspaceGuiCompBase::OnCurrentViewCloseTriggered);
+	connect(Tabs, &QTabWidget::currentChanged, this, &CMultiDocumentWorkspaceGuiCompBase::OnViewActivated);
+	connect(Tabs, &QTabWidget::tabCloseRequested, this, &CMultiDocumentWorkspaceGuiCompBase::OnViewCloseTriggered);
+	connect(m_closeCurrentTabShortcutPtr, &QShortcut::activated, this, &CMultiDocumentWorkspaceGuiCompBase::OnCurrentViewCloseTriggered);
 
 	int documentsCount = GetDocumentsCount();
 	for (int documentIndex = 0; documentIndex < documentsCount; ++documentIndex){
@@ -594,7 +594,7 @@ void CDocumentWorkspaceGuiCompBase::OnGuiCreated()
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnGuiDestroyed()
+void CMultiDocumentWorkspaceGuiCompBase::OnGuiDestroyed()
 {
 	BaseClass2::UnregisterAllModels();
 
@@ -615,13 +615,13 @@ void CDocumentWorkspaceGuiCompBase::OnGuiDestroyed()
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnRetranslate()
+void CMultiDocumentWorkspaceGuiCompBase::OnRetranslate()
 {
 	BaseClass::OnRetranslate();
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnGuiRetranslate()
+void CMultiDocumentWorkspaceGuiCompBase::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
@@ -636,7 +636,7 @@ void CDocumentWorkspaceGuiCompBase::OnGuiRetranslate()
 
 // reimplemented (icomp::CComponentBase)
 
-void CDocumentWorkspaceGuiCompBase::OnComponentCreated()
+void CMultiDocumentWorkspaceGuiCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
@@ -646,7 +646,7 @@ void CDocumentWorkspaceGuiCompBase::OnComponentCreated()
 
 // reimplemented (istd:IChangeable)
 
-void CDocumentWorkspaceGuiCompBase::OnEndChanges(const ChangeSet& changeSet)
+void CMultiDocumentWorkspaceGuiCompBase::OnEndChanges(const ChangeSet& changeSet)
 {
 	BaseClass::OnEndChanges(changeSet);
 
@@ -672,7 +672,7 @@ void CDocumentWorkspaceGuiCompBase::OnEndChanges(const ChangeSet& changeSet)
 
 // reimplemented (QObject)
 
-bool CDocumentWorkspaceGuiCompBase::eventFilter(QObject* sourcePtr, QEvent* eventPtr)
+bool CMultiDocumentWorkspaceGuiCompBase::eventFilter(QObject* sourcePtr, QEvent* eventPtr)
 {
 	if (eventPtr->type() == QEvent::DragEnter){
 		QDragEnterEvent* dragEnterEventPtr = dynamic_cast<QDragEnterEvent*>(eventPtr);
@@ -697,7 +697,7 @@ bool CDocumentWorkspaceGuiCompBase::eventFilter(QObject* sourcePtr, QEvent* even
 
 // protected slots
 
-void CDocumentWorkspaceGuiCompBase::UpdateCommands()
+void CMultiDocumentWorkspaceGuiCompBase::UpdateCommands()
 {
 	static ChangeSet changes(ibase::ICommandsProvider::CF_COMMANDS);
 
@@ -705,7 +705,7 @@ void CDocumentWorkspaceGuiCompBase::UpdateCommands()
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnCloseDocument()
+void CMultiDocumentWorkspaceGuiCompBase::OnCloseDocument()
 {
 	int pageIndex = Tabs->currentIndex();
 	if (pageIndex > GetFixedWindowsCount() - 1){
@@ -718,7 +718,7 @@ void CDocumentWorkspaceGuiCompBase::OnCloseDocument()
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnUndo()
+void CMultiDocumentWorkspaceGuiCompBase::OnUndo()
 {
 	SingleDocumentData* documentDataPtr = GetActiveDocumentInfo();
 	if ((documentDataPtr != nullptr) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableUndoSteps() > 0){
@@ -727,7 +727,7 @@ void CDocumentWorkspaceGuiCompBase::OnUndo()
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnRedo()
+void CMultiDocumentWorkspaceGuiCompBase::OnRedo()
 {
 	SingleDocumentData* documentDataPtr = GetActiveDocumentInfo();
 	if ((documentDataPtr != nullptr) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableRedoSteps() > 0){
@@ -736,7 +736,7 @@ void CDocumentWorkspaceGuiCompBase::OnRedo()
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnViewActivated(int index)
+void CMultiDocumentWorkspaceGuiCompBase::OnViewActivated(int index)
 {
 	if (index < m_fixedTabs.size()){
 		SetActiveView(m_fixedTabs[index]);
@@ -754,13 +754,13 @@ void CDocumentWorkspaceGuiCompBase::OnViewActivated(int index)
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnNewDocument(const QByteArray& documentTypeId)
+void CMultiDocumentWorkspaceGuiCompBase::OnNewDocument(const QByteArray& documentTypeId)
 {
 	InsertNewDocument(documentTypeId);
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnOpenDocument(const QByteArray& documentTypeId)
+void CMultiDocumentWorkspaceGuiCompBase::OnOpenDocument(const QByteArray& documentTypeId)
 {
 	bool ignoredFlag = false;
 	if (!OpenDocument(&documentTypeId, nullptr, true, "", nullptr, nullptr, false, &ignoredFlag)){
@@ -771,7 +771,7 @@ void CDocumentWorkspaceGuiCompBase::OnOpenDocument(const QByteArray& documentTyp
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnViewCloseTriggered(int index)
+void CMultiDocumentWorkspaceGuiCompBase::OnViewCloseTriggered(int index)
 {
 	if (index > 0){
 		if (index > GetFixedWindowsCount() - 1){
@@ -786,7 +786,7 @@ void CDocumentWorkspaceGuiCompBase::OnViewCloseTriggered(int index)
 }
 
 
-void CDocumentWorkspaceGuiCompBase::OnCurrentViewCloseTriggered()
+void CMultiDocumentWorkspaceGuiCompBase::OnCurrentViewCloseTriggered()
 {
 	OnViewCloseTriggered(Tabs->currentIndex());
 }
@@ -794,14 +794,14 @@ void CDocumentWorkspaceGuiCompBase::OnCurrentViewCloseTriggered()
 
 // public methods of the embedded class DocumentList
 
-CDocumentWorkspaceGuiCompBase::DocumentList::DocumentList()
+CMultiDocumentWorkspaceGuiCompBase::DocumentList::DocumentList()
 	:m_selectedIndex(iprm::ISelectionParam::NO_SELECTION),
 	m_parentPtr(nullptr)
 {
 }
 
 
-void CDocumentWorkspaceGuiCompBase::DocumentList::SetParent(CDocumentWorkspaceGuiCompBase& parent)
+void CMultiDocumentWorkspaceGuiCompBase::DocumentList::SetParent(CMultiDocumentWorkspaceGuiCompBase& parent)
 {
 	m_parentPtr = &parent;
 }
@@ -809,19 +809,19 @@ void CDocumentWorkspaceGuiCompBase::DocumentList::SetParent(CDocumentWorkspaceGu
 
 // reimplemented (iprm::ISelectionParam)
 
-const iprm::IOptionsList* CDocumentWorkspaceGuiCompBase::DocumentList::GetSelectionConstraints() const
+const iprm::IOptionsList* CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetSelectionConstraints() const
 {
 	return this;
 }
 
 
-int CDocumentWorkspaceGuiCompBase::DocumentList::GetSelectedOptionIndex() const
+int CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetSelectedOptionIndex() const
 {
 	return m_selectedIndex;
 }
 
 
-bool CDocumentWorkspaceGuiCompBase::DocumentList::SetSelectedOptionIndex(int index)
+bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::SetSelectedOptionIndex(int index)
 {
 	if (index >= GetOptionsCount()){
 		return false;
@@ -845,7 +845,7 @@ bool CDocumentWorkspaceGuiCompBase::DocumentList::SetSelectedOptionIndex(int ind
 }
 
 
-iprm::ISelectionParam* CDocumentWorkspaceGuiCompBase::DocumentList::GetSubselection(int /*index*/) const
+iprm::ISelectionParam* CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetSubselection(int /*index*/) const
 {
 	return nullptr;
 }
@@ -853,13 +853,13 @@ iprm::ISelectionParam* CDocumentWorkspaceGuiCompBase::DocumentList::GetSubselect
 
 // reimplemented (iprm::IOptionsList)
 
-int CDocumentWorkspaceGuiCompBase::DocumentList::GetOptionsFlags() const
+int CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetOptionsFlags() const
 {
 	return SCF_SUPPORT_UNIQUE_ID;
 }
 
 
-int CDocumentWorkspaceGuiCompBase::DocumentList::GetOptionsCount() const
+int CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetOptionsCount() const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 
@@ -867,7 +867,7 @@ int CDocumentWorkspaceGuiCompBase::DocumentList::GetOptionsCount() const
 }
 
 
-QString CDocumentWorkspaceGuiCompBase::DocumentList::GetOptionName(int index) const
+QString CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetOptionName(int index) const
 {
 	const SingleDocumentData& documentData = m_parentPtr->GetSingleDocumentData(index);
 
@@ -881,19 +881,19 @@ QString CDocumentWorkspaceGuiCompBase::DocumentList::GetOptionName(int index) co
 }
 
 
-QString CDocumentWorkspaceGuiCompBase::DocumentList::GetOptionDescription(int /*index*/) const
+QString CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetOptionDescription(int /*index*/) const
 {
 	return QString();
 }
 
 
-QByteArray CDocumentWorkspaceGuiCompBase::DocumentList::GetOptionId(int index) const
+QByteArray CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetOptionId(int index) const
 {
 	return GetOptionName(index).toLatin1();
 }
 
 
-bool CDocumentWorkspaceGuiCompBase::DocumentList::IsOptionEnabled(int /*index*/) const
+bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::IsOptionEnabled(int /*index*/) const
 {
 	return true;
 }
@@ -901,19 +901,19 @@ bool CDocumentWorkspaceGuiCompBase::DocumentList::IsOptionEnabled(int /*index*/)
 
 // reimplemented (imtbase::IObjectCollectionInfo)
 
-bool CDocumentWorkspaceGuiCompBase::DocumentList::GetCollectionItemMetaInfo(const QByteArray& /*objectId*/, idoc::IDocumentMetaInfo& /*metaInfo*/) const
+bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetCollectionItemMetaInfo(const QByteArray& /*objectId*/, idoc::IDocumentMetaInfo& /*metaInfo*/) const
 {
 	return false;
 }
 
 
-const iprm::IOptionsList* CDocumentWorkspaceGuiCompBase::DocumentList::GetObjectTypesInfo() const
+const iprm::IOptionsList* CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetObjectTypesInfo() const
 {
 	return nullptr;
 }
 
 
-imtbase::ICollectionInfo::Id CDocumentWorkspaceGuiCompBase::DocumentList::GetObjectTypeId(const QByteArray& /*objectId*/) const
+imtbase::ICollectionInfo::Id CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetObjectTypeId(const QByteArray& /*objectId*/) const
 {
 	Id retVal;
 
@@ -923,13 +923,13 @@ imtbase::ICollectionInfo::Id CDocumentWorkspaceGuiCompBase::DocumentList::GetObj
 
 // reimplemented (imtbase::ICollectionInfo)
 
-imtbase::ICollectionInfo::Ids CDocumentWorkspaceGuiCompBase::DocumentList::GetElementIds() const
+imtbase::ICollectionInfo::Ids CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementIds() const
 {
 	return Ids();
 }
 
 
-QVariant CDocumentWorkspaceGuiCompBase::DocumentList::GetElementInfo(const QByteArray& /*elementId*/, int /*infoType*/) const
+QVariant CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementInfo(const QByteArray& /*elementId*/, int /*infoType*/) const
 {
 	return QVariant();
 }
@@ -937,7 +937,7 @@ QVariant CDocumentWorkspaceGuiCompBase::DocumentList::GetElementInfo(const QByte
 
 // reimplemented (iser::ISerializable)
 
-bool CDocumentWorkspaceGuiCompBase::DocumentList::Serialize(iser::IArchive& /*archive*/)
+bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::Serialize(iser::IArchive& /*archive*/)
 {
 	I_CRITICAL(); // NOT IMPLEMENTED
 
@@ -949,13 +949,13 @@ bool CDocumentWorkspaceGuiCompBase::DocumentList::Serialize(iser::IArchive& /*ar
 
 // public methods of the embedded class Commands
 
-CDocumentWorkspaceGuiCompBase::Commands::Commands()
+CMultiDocumentWorkspaceGuiCompBase::Commands::Commands()
 	:m_parentPtr(nullptr)
 {
 }
 
 
-void CDocumentWorkspaceGuiCompBase::Commands::SetParent(CDocumentWorkspaceGuiCompBase* parentPtr)
+void CMultiDocumentWorkspaceGuiCompBase::Commands::SetParent(CMultiDocumentWorkspaceGuiCompBase* parentPtr)
 {
 	Q_ASSERT(parentPtr != nullptr);
 
@@ -965,7 +965,7 @@ void CDocumentWorkspaceGuiCompBase::Commands::SetParent(CDocumentWorkspaceGuiCom
 
 // reimplemented (ibase::ICommandsProvider)
 
-const ibase::IHierarchicalCommand* CDocumentWorkspaceGuiCompBase::Commands::GetCommands() const
+const ibase::IHierarchicalCommand* CMultiDocumentWorkspaceGuiCompBase::Commands::GetCommands() const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 

@@ -20,7 +20,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollectionInfo.h>
 #include <imtgui/IDocumentViewDecorator.h>
-#include <GeneratedFiles/imtgui/ui_CDocumentWorkspaceGuiCompBase.h>
+#include <GeneratedFiles/imtgui/ui_CMultiDocumentWorkspaceGuiCompBase.h>
 
 
 namespace imtgui
@@ -28,10 +28,10 @@ namespace imtgui
 
 
 
-class CDocumentWorkspaceGuiCompBase:
+class CMultiDocumentWorkspaceGuiCompBase:
 			public iqtdoc::TQtDocumentManagerWrap<
 						idoc::CMultiDocumentManagerBase,
-						iqtgui::TRestorableGuiWrap< iqtgui::TDesignerGuiCompBase<Ui::CDocumentWorkspaceGuiCompBase> > >,
+						iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<Ui::CMultiDocumentWorkspaceGuiCompBase>>>,
 			protected imod::CMultiModelDispatcherBase
 {
 	Q_OBJECT
@@ -39,10 +39,10 @@ class CDocumentWorkspaceGuiCompBase:
 public:
 	typedef iqtdoc::TQtDocumentManagerWrap<
 				idoc::CMultiDocumentManagerBase,
-				iqtgui::TRestorableGuiWrap< iqtgui::TDesignerGuiCompBase<Ui::CDocumentWorkspaceGuiCompBase> > > BaseClass;
+				iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<Ui::CMultiDocumentWorkspaceGuiCompBase>>> BaseClass;
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
-	I_BEGIN_BASE_COMPONENT(CDocumentWorkspaceGuiCompBase);
+	I_BEGIN_BASE_COMPONENT(CMultiDocumentWorkspaceGuiCompBase);
 		I_REGISTER_INTERFACE(idoc::IDocumentManager);
 		I_REGISTER_INTERFACE(idoc::IDocumentTypesInfo);
 		I_REGISTER_SUBELEMENT(DocumentList);
@@ -71,7 +71,7 @@ public:
 		MI_DOCUMENT_COMMANDS_BASE_INDEX = 10000
 	};
 
-	CDocumentWorkspaceGuiCompBase();
+	CMultiDocumentWorkspaceGuiCompBase();
 
 	// reimplemented (iqtgui::IGuiObject)
 	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
@@ -164,7 +164,7 @@ private:
 	public:
 		DocumentList();
 
-		void SetParent(CDocumentWorkspaceGuiCompBase& parent);
+		void SetParent(CMultiDocumentWorkspaceGuiCompBase& parent);
 
 		// reimplemented (iprm::ISelectionParam)
 		virtual const iprm::IOptionsList* GetSelectionConstraints() const;
@@ -194,7 +194,7 @@ private:
 
 	private:
 		int m_selectedIndex;
-		CDocumentWorkspaceGuiCompBase* m_parentPtr;
+		CMultiDocumentWorkspaceGuiCompBase* m_parentPtr;
 	};
 
 	class Commands: virtual public ibase::ICommandsProvider
@@ -202,32 +202,32 @@ private:
 	public:
 		Commands();
 
-		void SetParent(CDocumentWorkspaceGuiCompBase* parentPtr);
+		void SetParent(CMultiDocumentWorkspaceGuiCompBase* parentPtr);
 
 	protected:
 		// reimplemented (ibase::ICommandsProvider)
 		virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 	private:
-		CDocumentWorkspaceGuiCompBase* m_parentPtr;
+		CMultiDocumentWorkspaceGuiCompBase* m_parentPtr;
 	};
 
 
 	// static template methods for subelement access
 	template <class InterfaceType>
-	static InterfaceType* ExtractDocumentList(CDocumentWorkspaceGuiCompBase& component)
+	static InterfaceType* ExtractDocumentList(CMultiDocumentWorkspaceGuiCompBase& component)
 	{
 		return &component.m_documentList;
 	}
 
 	template <class InterfaceType>
-	static InterfaceType* ExtractCurrentDocumentName(CDocumentWorkspaceGuiCompBase& component)
+	static InterfaceType* ExtractCurrentDocumentName(CMultiDocumentWorkspaceGuiCompBase& component)
 	{
 		return &component.m_currentDocumentName;
 	}
 
 	template <typename InterfaceType>
-	static InterfaceType* ExtractCommands(CDocumentWorkspaceGuiCompBase& component)
+	static InterfaceType* ExtractCommands(CMultiDocumentWorkspaceGuiCompBase& component)
 	{
 		return &component.m_commands;
 	}

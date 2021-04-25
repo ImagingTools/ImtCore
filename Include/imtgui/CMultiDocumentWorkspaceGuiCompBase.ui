@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CDocumentWorkspaceGuiCompBase</class>
- <widget class="QWidget" name="CDocumentWorkspaceGuiCompBase">
+ <class>CMultiDocumentWorkspaceGuiCompBase</class>
+ <widget class="QWidget" name="CMultiDocumentWorkspaceGuiCompBase">
   <property name="geometry">
    <rect>
     <x>0</x>

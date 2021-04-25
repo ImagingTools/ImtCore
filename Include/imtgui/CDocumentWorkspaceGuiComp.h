@@ -6,7 +6,7 @@
 #include <ilog/IMessageConsumer.h>
 
 // ImtCore includes
-#include <imtgui/CDocumentWorkspaceGuiCompBase.h>
+#include <imtgui/CMultiDocumentWorkspaceGuiCompBase.h>
 #include <GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h>
 
 
@@ -14,12 +14,12 @@ namespace imtgui
 {
 
 
-class CDocumentWorkspaceGuiComp: public imtgui::CDocumentWorkspaceGuiCompBase
+class CDocumentWorkspaceGuiComp: public imtgui::CMultiDocumentWorkspaceGuiCompBase
 {
 	Q_OBJECT
 
 public:
-	typedef imtgui::CDocumentWorkspaceGuiCompBase BaseClass;
+	typedef imtgui::CMultiDocumentWorkspaceGuiCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDocumentWorkspaceGuiComp);
 		I_ASSIGN(m_loginCompPtr, "Login", "Login component", false, "Login");
@@ -28,7 +28,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtgui::CDocumentWorkspaceGuiCompBase)
+	// reimplemented (imtgui::CMultiDocumentWorkspaceGuiCompBase)
 	virtual IDocumentViewDecorator* CreateDocumentViewDecorator(
 				istd::IPolymorphic* viewPtr,
 				QWidget* parentWidgetPtr,

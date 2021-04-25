@@ -1,5 +1,6 @@
 #pragma once
 
+
 // ACF includes
 #include <ifile/IFileNameParam.h>
 #include <ilog/TLoggerCompWrap.h>
@@ -18,8 +19,10 @@
 #include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
 
+
 namespace imtrest
 {
+
 
 /**
  * \brief The CJsonModelBasedHandlerComp class generates JSON-model
@@ -47,7 +50,6 @@ public:
 private:
 	I_REF(ifile::IFileNameParam, m_jsonModelProcessor);
 	I_ATTR(QByteArray, m_commandIdAttrPtr);
-
 };
 
 
