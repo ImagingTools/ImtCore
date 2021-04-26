@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/Icons"/>
+    <qresource prefix="/ColorIcons"/>
+    <qresource prefix="/qml">
+        <file alias="ContactInfoEditor.qml">Resources/qml/ContactInfoEditor.qml</file>
+        <file alias="TextFieldCustom.qml">Resources/qml/TextFieldCustom.qml</file>
+    </qresource>
+</RCC>
