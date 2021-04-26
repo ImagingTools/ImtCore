@@ -37,7 +37,8 @@ public:
 		I_REGISTER_INTERFACE(IRequestHandler);
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "List of command-ID used with corresponded handlers", true, "");
 		I_ASSIGN(m_homeDirPath, "HomePath", "Home path", true, QDir::currentPath());
-		I_ASSIGN(m_fileTemplatePathCompPtr, "FileTemplateHomePath", "Home path\n Note: type is ignored only value matters \n Warning: overwrites HomePath!", false, "FileTemplatePath");
+		I_ASSIGN(m_pathsProblemsAutoSolve, "AutoSolvePathsProblems", "If 'true' servelt'll automatically solve paths problems", false, true);
+		I_ASSIGN(m_fileTemplatePathCompPtr, "FileTemplateHomePath", "FileTemplate based Home path\n Note: type is ignored only value matters \n Warning: overwrites HomePath!", false, "FileTemplatePath");
 	I_END_COMPONENT
 
 	QByteArray Generate(const QString& directoryPath, const QString& commandId = QString()) const;
@@ -50,6 +51,7 @@ public:
 
 private:
 	I_ATTR (QString, m_homeDirPath);
+	I_ATTR (bool, m_pathsProblemsAutoSolve);
 	I_REF(ifile::IFileNameParam, m_fileTemplatePathCompPtr);
 
 	I_ATTR(QByteArray, m_commandIdAttrPtr);

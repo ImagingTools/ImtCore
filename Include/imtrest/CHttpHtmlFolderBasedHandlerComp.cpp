@@ -7,6 +7,9 @@
 // ImtCore includes
 #include <imtrest/IRequestHandler.h>
 
+// QT includes
+#include <QtCore/QRegularExpression>
+#include <QtCore/QRegularExpressionMatch>
 
 namespace imtrest
 {
@@ -243,6 +246,19 @@ IRequestHandler::ConstResponsePtr CHttpHtmlFolderBasedHandlerComp::ProcessReques
 		homeDirPath = m_fileTemplatePathCompPtr.GetPtr()->GetPath();
 	}
 	commandId.replace(commandIdBase,"");
+	int indexOfPathSeparator = -1;
+	QRegularExpression regexp("(.\\/.)");
+
+	QRegularExpressionMatch indexOfPathSeparatorMatch = regexp.match(commandId);
+	if(indexOfPathSeparatorMatch.hasMatch() && (indexOfPathSeparatorMatch.capturedStart() + 1) != commandId.length())
+	{
+		indexOfPathSeparator = indexOfPathSeparatorMatch.capturedStart() + 1;
+	}
+
+	if(*m_pathsProblemsAutoSolve && indexOfPathSeparator > 0)
+	{
+		commandId = commandId.remove(0, indexOfPathSeparator+1);
+	}
 
 	QString destinationEntryPath = homeDirPath + commandId;
 	QFileInfo destinationEntry(destinationEntryPath);
