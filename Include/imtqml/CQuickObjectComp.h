@@ -31,12 +31,13 @@ public:
 	CQuickObjectComp();
 
 	// reimplemented (imtgui::IQuickObject)
-	virtual bool IsItemCreated() const;
-	virtual bool CreateItem(QQuickItem* parentPtr);
-	virtual bool CreateItem(QQmlEngine* engine);
-	virtual bool DestroyItem();
-	virtual QQuickItem* GetItem() const;
-	virtual void OnTryClose(bool* ignoredPtr = NULL);
+	virtual bool IsItemCreated() const override;
+	virtual bool CreateItem(QQuickItem* parentPtr) override;
+	virtual bool CreateItem(QQmlEngine* enginePtr) override;
+	virtual bool CreateItem(QQmlEngine* enginePtr, const QVariantMap& initialProperties);
+	virtual bool DestroyItem() override;
+	virtual QQuickItem* GetItem() const override;
+	virtual void OnTryClose(bool* ignoredPtr = NULL) override;
 
 protected:
 	I_ATTR(QString, m_pathToQmlPtr);

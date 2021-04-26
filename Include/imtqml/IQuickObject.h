@@ -32,7 +32,7 @@ public:
 		Initialize GUI root Item
 		\return		true if initialization successed.
 	 */
-	virtual bool CreateItem(QQmlEngine* engine) = 0;
+	virtual bool CreateItem(QQmlEngine* enginePtr) = 0;
 	/**
 		Release GUI and disconnect it from parent.
 		\return		true if this operation successed.

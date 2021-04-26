@@ -43,19 +43,31 @@ bool CQuickObjectComp::CreateItem(QQuickItem *parentPtr)
 }
 
 
-bool CQuickObjectComp::CreateItem(QQmlEngine *engine)
+bool CQuickObjectComp::CreateItem(QQmlEngine *enginePtr)
 {
 	if (m_pathToQmlPtr.IsValid() == false){
 		return false;
 	}
 
-	QQmlComponent component(engine, QUrl::fromLocalFile((m_pathToQmlPtr->GetValue())));
-
-	m_quickItemPtr = qobject_cast<QQuickItem*>(component.create(engine->rootContext()));
+//	QQmlComponent component(enginePtr, QUrl::fromLocalFile(m_pathToQmlPtr->GetValue()));
+	QQmlComponent component(enginePtr, QUrl("qrc" + m_pathToQmlPtr->GetValue()));
+	m_quickItemPtr = qobject_cast<QQuickItem*>(component.create(enginePtr->rootContext()));
 
 	return  IsItemCreated();
 }
 
+bool CQuickObjectComp::CreateItem(QQmlEngine *enginePtr, const QVariantMap &initialProperties)
+{
+	if (m_pathToQmlPtr.IsValid() == false){
+		return false;
+	}
+
+//	QQmlComponent component(enginePtr, QUrl::fromLocalFile(m_pathToQmlPtr->GetValue()));
+	QQmlComponent component(enginePtr, QUrl("qrc" + m_pathToQmlPtr->GetValue()));
+	m_quickItemPtr = qobject_cast<QQuickItem*>(component.createWithInitialProperties(initialProperties, enginePtr->rootContext()));
+
+	return  IsItemCreated();
+}
 
 bool CQuickObjectComp::DestroyItem()
 {
@@ -72,6 +84,8 @@ QQuickItem *CQuickObjectComp::GetItem() const
 void CQuickObjectComp::OnTryClose(bool* /*ignoredPtr*/)
 {
 }
+
+
 
 
 } // namespace imtqml
