@@ -483,7 +483,7 @@ CImtStyle::CImtStyle()
 	dark.palette.setColor(QPalette::Link, QColor(42, 130, 218));
 	dark.palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
 	dark.palette.setColor(QPalette::HighlightedText, Qt::white);
-	light.stylePath = ":/Styles/ImtColorStyleDark";
+	dark.stylePath = ":/Styles/ImtColorStyleDark";
 
 	m_colorSchemaMap[DS_DARK] = dark;
 }

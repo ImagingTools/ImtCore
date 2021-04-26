@@ -13,9 +13,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true"/>
-  </property>
   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,6,1">
    <property name="spacing">
     <number>0</number>
@@ -241,7 +238,6 @@
   </layout>
  </widget>
  <resources>
-  <include location="imtgui.qrc"/>
  </resources>
  <connections/>
 </ui>
