@@ -4,7 +4,7 @@ project(ImtZipPck LANGUAGES CXX)
 #include_directories($ENV{ZLIBDIR}/include)
 
 include($ENV{ACFCONFIGDIR}/CMake/ComponentConfig.cmake)
-include($ENV{ACFSLNDIR}/Config/CMake/AcfSln.cmake)
+include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 include($ENV{ACFCONFIGDIR}/CMake/AcfStd.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../../../../Config/CMake/Quazip.cmake)
 
