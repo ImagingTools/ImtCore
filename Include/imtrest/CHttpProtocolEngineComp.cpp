@@ -59,6 +59,11 @@ bool CHttpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protoco
 		statusCodeLiteral = "Internal Server Error";
 		return true;
 
+	case SC_MOVED_PERMANENTLY:
+		protocolStatusCode = 301;
+		statusCodeLiteral = "Moved Permanently";
+		return true;
+
 	default:
 		Q_ASSERT(false);
 		break;
