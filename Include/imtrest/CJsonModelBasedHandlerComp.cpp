@@ -1,5 +1,7 @@
 ﻿#include <imtrest/CJsonModelBasedHandlerComp.h>
 
+#include <stdlib.h>
+#include <time.h>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -7,6 +9,13 @@
 
 // ImtCore includes
 #include <imtrest/IRequestHandler.h>
+
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
+#include <QtCore/QRandomGenerator>
+#include <QtGui/QColor>
 
 
 namespace imtrest
@@ -50,26 +59,76 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 		modelName.chop(1);
 	}
 
-	while(modelName.startsWith('/')){
+	while(modelName.startsWith('/'))
+	{
 		modelName.remove(0,1);
 	}
 
-	if(modelName == "__HELLO_MODEL__"){
+	if(modelName == "__HELLO_MODEL__")
+	{
 		reponseTypeId = "application/json";
 		body = QByteArray(R"({"I'm seyin to you": "HELLO WORLD"})");
 	}
-	else if(modelName == "__EXAMPLE_1__"){
+	else if(modelName == "__EXAMPLE_1__")
+	{
 		reponseTypeId = "application/json";
 		body = QByteArray(R"({"adresses":[{"city":"Moscou","country":"Russia","postalCode":644099,"street":"Lenina 10"},{"city":"Munic","country":"Germany","postalCode":123456,"street":"Street St"}],"firstName":"Ivan","lastName":"Ivanov","nicName":"NicIvan"})");
 	}
-	else if(modelName == "__EXAMPLE_2__"){
+	else if(modelName == "__EXAMPLE_2__")
+	{
 		reponseTypeId = "application/json";
 		body = QByteArray(R"({"firstName":"Ivan","lastName":"Ivanov","nicName":"NicIvan","adresses":[{"country":"Russia","city":"Moscow","postalCode":644099,"street":"Lenina 10"},{"country":"Germany","city":"Munic","postalCode":123456,"street":"Street St"}]})");
 	}
-	else if(m_jsonModelProcessor.IsValid()){
+	else if(modelName == "__COLORS_EXAMPLE__")
+	{
+		reponseTypeId = "application/json";
+		int sizeParam = request.GetCommandParams().value("size").toInt();
+		if(sizeParam <= 0)
+		{
+			sizeParam = 50;
+		}
+		auto generateRandomNumber = [](int min = 0, int max = 255){
+			::srand((unsigned) ::rand());
+			return min + ::rand() % (max - min);
+		};
+
+		QJsonArray allArray;
+		for(int j = 0; j < sizeParam; ++j)
+		{
+			QJsonArray colorsArray;
+			for(int i = 0; i < sizeParam ; ++i)
+			{
+				quint32 r = generateRandomNumber(1,254);
+				quint32 g = generateRandomNumber(2,253);
+				quint32 b = generateRandomNumber(3,252);
+				colorsArray << QJsonObject({
+											   QPair<QString, QJsonValue>(QString("Color ").append(QString::number(i)),QColor::fromRgb(r,g,b).name(QColor::HexRgb))
+										   });
+			}
+			allArray <<	QJsonObject({
+										QPair<QString, QJsonValue>(QString("data ").append(QString::number(j)),colorsArray)
+									});
+		}
+
+		body = QJsonDocument(QJsonObject({
+								QPair<QString, QJsonValue>("data",allArray)
+						   })).toJson(QJsonDocument::Compact);
+	}
+	else if(modelName == "__EXAMPLE_2__")
+	{
+		reponseTypeId = "application/json";
+		body = QByteArray(R"({"firstName":"Ivan","lastName":"Ivanov","nicName":"NicIvan","adresses":[{"country":"Russia","city":"Moscow","postalCode":644099,"street":"Lenina 10"},{"country":"Germany","city":"Munic","postalCode":123456,"street":"Street St"}]})");
+	}
+	else if(m_jsonModelProcessor.IsValid())
+	{
+//		std::pair<QByteArray, QByteArray> modelResult;
+//		modelResult = m_jsonModelProcessor->GetData("main.qml");
+//		reponseTypeId = modelResult.first;
+//		body = modelResult.second;
 		reponseTypeId = "application/json";
 	}
-	else{
+	else
+	{
 		generateErrorResponsePtr(QByteArray("Cannot init ModelProcessor OffLine OR Not created OR not setted"));
 	}
 
