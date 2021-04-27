@@ -29,18 +29,17 @@ IRequestHandler::ConstResponsePtr CHttpRootHandlerComp::ProcessRequest(const IRe
 
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 
-	if (commandId.isEmpty()){
+	const IRequestHandler* handlerPtr = FindRequestHandler(commandId);
+	if (handlerPtr != nullptr) {
+		return handlerPtr->ProcessRequest(request);
+	}
+	else if (commandId.isEmpty()){
 		QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>Empty command-ID</p></body></html>");
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
 		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
 
 		return responsePtr;
-	}
-
-	const IRequestHandler* handlerPtr = FindRequestHandler(commandId);
-	if (handlerPtr != nullptr) {
-		return handlerPtr->ProcessRequest(request);
 	}
 	else{
 		QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandId)).toUtf8();

@@ -60,7 +60,12 @@ public:
 		/**
 			Internal server error.
 		*/
-		SC_INTERNAL_ERROR
+		SC_INTERNAL_ERROR,
+
+		/**
+			Moved Permanently
+		*/
+		SC_MOVED_PERMANENTLY
 	};
 
 	/**
