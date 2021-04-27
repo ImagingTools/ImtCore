@@ -246,18 +246,24 @@ IRequestHandler::ConstResponsePtr CHttpHtmlFolderBasedHandlerComp::ProcessReques
 		homeDirPath = m_fileTemplatePathCompPtr.GetPtr()->GetPath();
 	}
 	commandId.replace(commandIdBase,"");
-	int indexOfPathSeparator = -1;
-	QRegularExpression regexp("(.\\/.)");
-
-	QRegularExpressionMatch indexOfPathSeparatorMatch = regexp.match(commandId);
-	if(indexOfPathSeparatorMatch.hasMatch() && (indexOfPathSeparatorMatch.capturedStart() + 1) != commandId.length())
+	if(*m_pathsProblemsAutoSolve)
 	{
-		indexOfPathSeparator = indexOfPathSeparatorMatch.capturedStart() + 1;
-	}
+		int indexOfPathSeparator = -1;
+		QRegularExpression regexp("(.\\/.)");
 
-	if(*m_pathsProblemsAutoSolve && indexOfPathSeparator > 0)
-	{
-		commandId = commandId.remove(0, indexOfPathSeparator+1);
+		QRegularExpressionMatch indexOfPathSeparatorMatch = regexp.match(commandId);
+		if(indexOfPathSeparatorMatch.hasMatch() && (indexOfPathSeparatorMatch.capturedStart() + 1) != commandId.length())
+		{
+			indexOfPathSeparator = indexOfPathSeparatorMatch.capturedStart() + 1;
+		}
+
+		if(indexOfPathSeparator > 0)
+		{
+			if(QFileInfo(homeDirPath + commandId.mid(0,indexOfPathSeparator)).isFile())
+			{
+				commandId = commandId.remove(0, indexOfPathSeparator);
+			}
+		}
 	}
 
 	QString destinationEntryPath = homeDirPath + commandId;
