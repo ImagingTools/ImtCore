@@ -40,6 +40,11 @@ I_EXPORT_COMPONENT(
 		"HTTP File Dir Directory HTML");
 
 I_EXPORT_COMPONENT(
+		HttpRedirectHandler,
+		"Redirects to other command",
+		"HTTP Redirect");
+
+I_EXPORT_COMPONENT(
 		JsonModelBasedHandler,
 		"Generates Json model for QML??",
 		"JSON Model");
