@@ -228,10 +228,15 @@ bool CContactInfoEditorQmlComp::CreateItem(QQmlEngine *enginePtr)
 		qDebug() << ba;
 	}
 
-	QQmlContext *ctxt = enginePtr->rootContext();
-	ctxt->setContextProperty("contactInfoModel", &m_treeItemModel);
+	bool retVal = BaseClass::CreateItem(enginePtr);
+	if (retVal){
+		QQuickItem *item = BaseClass::GetItem();
+		item->setProperty("contactInfoModel", QVariant::fromValue(&m_treeItemModel));
+		m_treeItemModel.setProperty("state","Ready");
+	}
 
-	return BaseClass::CreateItem(enginePtr,{{"contactInfoModel", QVariant::fromValue(&m_treeItemModel)}});
+	return retVal;
+//	return BaseClass::CreateItem(enginePtr,{{"contactInfoModel", QVariant::fromValue(&m_treeItemModel)}});
 }
 
 

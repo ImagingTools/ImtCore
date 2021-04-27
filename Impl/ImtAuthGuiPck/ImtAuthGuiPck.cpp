@@ -20,6 +20,11 @@ I_EXPORT_COMPONENT(
 			"Contact Info Editor");
 
 I_EXPORT_COMPONENT(
+			ContactInfoQmlEditor,
+			"Contact info editor for Qml",
+			"Contact Info Editor for Qml");
+
+I_EXPORT_COMPONENT(
 			AddressEditor,
 			"Address editor",
 			"Address Editor");

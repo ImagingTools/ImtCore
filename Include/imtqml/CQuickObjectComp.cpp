@@ -49,7 +49,6 @@ bool CQuickObjectComp::CreateItem(QQmlEngine *enginePtr)
 		return false;
 	}
 
-//	QQmlComponent component(enginePtr, QUrl::fromLocalFile(m_pathToQmlPtr->GetValue()));
 	QQmlComponent component(enginePtr, QUrl("qrc" + m_pathToQmlPtr->GetValue()));
 	m_quickItemPtr = qobject_cast<QQuickItem*>(component.create(enginePtr->rootContext()));
 
@@ -62,11 +61,12 @@ bool CQuickObjectComp::CreateItem(QQmlEngine *enginePtr, const QVariantMap &init
 		return false;
 	}
 
-//	QQmlComponent component(enginePtr, QUrl::fromLocalFile(m_pathToQmlPtr->GetValue()));
 	QQmlComponent component(enginePtr, QUrl("qrc" + m_pathToQmlPtr->GetValue()));
+#if QT_VERSION > QT_VERSION_CHECK(5, 14, 0)
 	m_quickItemPtr = qobject_cast<QQuickItem*>(component.createWithInitialProperties(initialProperties, enginePtr->rootContext()));
-
 	return  IsItemCreated();
+#endif
+	return false;
 }
 
 bool CQuickObjectComp::DestroyItem()
