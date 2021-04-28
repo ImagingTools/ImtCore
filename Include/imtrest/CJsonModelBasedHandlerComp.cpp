@@ -39,12 +39,12 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 
 	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId));
 
-	auto generateErrorResponsePtr = [&request, &engine, reponseTypeId](QByteArray errorBody){
+	auto generateErrorResponsePtr = [&request, &engine, reponseTypeId](QByteArray errorBody, int errorCode = IProtocolEngine::SC_INTERNAL_ERROR){
 		qCritical() << __FILE__ << __LINE__ << "Error occurred" << errorBody;
 		QByteArray generatedErrorBody = "<html><head><title>Error</title></head><body><p>";
 		generatedErrorBody.append(errorBody);
 		generatedErrorBody.append("</p></body></html>");
-		return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_INTERNAL_ERROR, generatedErrorBody, reponseTypeId));
+		return ConstResponsePtr(engine.CreateResponse(request, errorCode, generatedErrorBody, reponseTypeId));
 	};
 
 	QByteArray body;
@@ -121,18 +121,21 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 	}
 	else if(m_jsonModelProcessor.IsValid())
 	{
+		return generateErrorResponsePtr("FAIL", IProtocolEngine::SC_UNKNOWN_ERROR);
 //		std::pair<QByteArray, QByteArray> modelResult;
 //		modelResult = m_jsonModelProcessor->GetData("main.qml");
 //		reponseTypeId = modelResult.first;
 //		body = modelResult.second;
-		reponseTypeId = "application/json";
+//		reponseTypeId = "application/json";
+
 	}
 	else
 	{
-		generateErrorResponsePtr(QByteArray("Cannot init ModelProcessor OffLine OR Not created OR not setted"));
+//		return generateErrorResponsePtr(QByteArray("Cannot init ModelProcessor OffLine OR Not created OR not setted"), IProtocolEngine::SC_UNKNOWN_ERROR);
+		return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_UNKNOWN_ERROR, "FAIL(", "plain/text; charset=utf-8"));
 	}
 
-	ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId));
+	ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_I_AM_A_TEAPOT, body, reponseTypeId));
 
 	return responsePtr;
 }
