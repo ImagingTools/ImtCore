@@ -13,6 +13,7 @@ namespace imtstyle
 
 class CImtStyle: public QProxyStyle
 {
+	Q_OBJECT
 public:
 	typedef QProxyStyle BaseClass;
 
