@@ -19,6 +19,7 @@
 #include <imtbase/CPluginStatusMonitor.h>
 #include <imtbase/CObjectMetaInfoUniquenessValidatorComp.h>
 #include <imtbase/CCollectionObjectContext.h>
+#include <imtbase/CFileBasedTranslationManagerComp.h>
 
 
 /**
@@ -48,6 +49,7 @@ typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtbase::CCollectionObjectContext,
 						imtbase::ICollectionObjectContext>> CollectionObjectContext;
+typedef icomp::TModelCompWrap<imtbase::CFileBasedTranslationManagerComp> FileBasedTranslationManager;
 
 
 } // namespace ImtCorePck

@@ -79,6 +79,11 @@ I_EXPORT_COMPONENT(
 			"Collection object context",
 			"Collection Object Context");
 
+I_EXPORT_COMPONENT(
+			FileBasedTranslationManager,
+			"File based text localization manager",
+			"Translation" IM_TAG("Localization"));
+
 
 } // namespace ImtCorePck
 
