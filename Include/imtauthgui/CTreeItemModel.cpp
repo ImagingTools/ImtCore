@@ -188,5 +188,18 @@ QHash<int, QByteArray> CTreeItemModel::roleNames() const
 	return m_roleNames;
 }
 
+const QString &CTreeItemModel::state() const
+{
+	return m_state;
+}
+
+void CTreeItemModel::setState(const QString &newState)
+{
+	if (m_state == newState)
+		return;
+	m_state = newState;
+	emit stateChanged(m_state);
+}
+
 
 } // namespace imtauthgui

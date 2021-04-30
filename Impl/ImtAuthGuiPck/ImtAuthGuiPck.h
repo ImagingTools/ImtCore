@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtauthgui/CContactInfoEditorComp.h>
 #include <imtauthgui/CContactInfoEditorQmlComp.h>
+#include <imtauthgui/CContactInfoEditorDataControllerComp.h>
 #include <imtauthgui/CAddressEditorComp.h>
 #include <imtauthgui/CAccountInfoEditorComp.h>
 #include <imtauthgui/CContactInfoViewDelegateComp.h>
@@ -25,6 +26,8 @@ typedef imtauthgui::CAccountInfoEditorComp AccountInfoEditor;
 typedef imtauthgui::CContactInfoViewDelegateComp ContactInfoViewDelegate;
 typedef imtauthgui::CAccountInfoViewDelegateComp AccountInfoViewDelegate;
 typedef icomp::TModelCompWrap<imtauthgui::CDesignManagerComp> DesignManager;
+typedef icomp::TMakeComponentWrap<imtauthgui::CContactInfoEditorDataController,
+	imtauthgui::IDataController, imod::IObserver> ContactInfoEditorDataController;
 
 
 } // namespace ImtAuthGuiPck

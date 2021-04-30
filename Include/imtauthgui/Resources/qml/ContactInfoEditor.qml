@@ -17,6 +17,7 @@ Rectangle {
                 tfName.text = contactInfoModel.getData("firstName")
                 tfLastName.text = contactInfoModel.getData("lastName")
                 tfNicName.text = contactInfoModel.getData("nicName")
+            console.log("tfName.text ", tfName.text)
             //}
         }
     }

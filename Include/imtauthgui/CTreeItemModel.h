@@ -21,11 +21,15 @@ namespace imtauthgui
 class CTreeItemModel : public QAbstractListModel, virtual public iser::ISerializable
 {
 	Q_OBJECT
+	Q_PROPERTY(QString state READ state WRITE setState NOTIFY stateChanged)
 
 public:
 	explicit CTreeItemModel(QObject* parent = nullptr);
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
+
+	const QString &state() const;
+	void setState(const QString &newState);
 
 public slots:
 	int addItem();
@@ -38,6 +42,9 @@ public slots:
 
 	// reimplemented (QAbstractListModel)
 	int rowCount(const QModelIndex & parent = QModelIndex()) const override;
+
+signals:
+	void stateChanged(const QString& state);
 
 protected:
 	virtual bool SerializeRecursive(iser::IArchive& archive, const QByteArray &tagName);
@@ -79,7 +86,7 @@ private:
 	QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
 	QHash<int, QByteArray> roleNames() const override;
 
-
+	QString m_state;
 };
 
 

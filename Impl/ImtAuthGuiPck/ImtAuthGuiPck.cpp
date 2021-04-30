@@ -49,6 +49,11 @@ I_EXPORT_COMPONENT(
 			"Design Manager",
 			"Style Design Manager");
 
+I_EXPORT_COMPONENT(
+			ContactInfoEditorDataController,
+			"Contact InfoEditor DataController",
+			"Contact InfoEditor DataController");
+
 
 } // namespace ImtAuthGuiPck
 
