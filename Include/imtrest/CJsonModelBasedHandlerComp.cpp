@@ -26,6 +26,7 @@ namespace imtrest
 
 CJsonModelBasedHandlerComp::CJsonModelBasedHandlerComp()
 {
+	m_treeItemModel = new imtauthgui::CTreeItemModel();
 }
 
 
@@ -118,6 +119,41 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 	{
 		reponseTypeId = "application/json";
 		body = QByteArray(R"({"firstName":"Ivan","lastName":"Ivanov","nicName":"NicIvan","adresses":[{"country":"Russia","city":"Moscow","postalCode":644099,"street":"Lenina 10"},{"country":"Germany","city":"Munic","postalCode":123456,"street":"Street St"}]})");
+	}
+	else if(modelName == "__CREATE_COLORS_IN_CTREE__")
+	{
+		using namespace imtauthgui;
+		int sizeParam = request.GetCommandParams().value("size").toInt();
+		if(sizeParam <= 0)
+		{
+			sizeParam = 50;
+		}
+		auto generateRandomNumber = [](int min = 0, int max = 255){
+			::srand((unsigned) ::rand());
+			return min + ::rand() % (max - min);
+		};
+		for(int i = 0; i < sizeParam ; ++i)
+		{
+			QByteArray modelName = QByteArray("data ") + QByteArray::number(i);
+			m_treeItemModel->addTreeModel(modelName);
+			auto treeModelPtr = m_treeItemModel->getTreeItemModel(modelName);
+			for(int j = 0; j < sizeParam; ++j)
+			{
+				quint32 r = generateRandomNumber(1,254);
+				quint32 g = generateRandomNumber(2,253);
+				quint32 b = generateRandomNumber(3,252);
+				treeModelPtr->setData(QByteArray("color ") + QByteArray::number(j), QColor::fromRgb(r,g,b).name(QColor::HexRgb),j);
+			}
+		}
+
+		reponseTypeId = "application/json";
+
+		{
+			QByteArray jsonData;
+			iser::CJsonStringWriteArchive archive(jsonData);
+			m_treeItemModel->Serialize(archive);
+			body = jsonData;
+		}
 	}
 	else if(m_jsonModelProcessor.IsValid())
 	{
