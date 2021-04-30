@@ -1,5 +1,6 @@
 #include <imtauthgui/CTreeItemModel.h>
 
+
 // ACF includes
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
@@ -9,15 +10,16 @@ namespace imtauthgui
 {
 
 
-CTreeItemModel::CTreeItemModel(QObject *parent) : QAbstractListModel(parent)
+CTreeItemModel::CTreeItemModel(QObject *parent)
+	:QAbstractListModel(parent)
 {
-
 }
 
 
 int CTreeItemModel::addItem()
 {
 	m_items.append(new Item());
+
 	return m_items.count() - 1;
 }
 
@@ -28,11 +30,14 @@ void CTreeItemModel::addTreeModel(const QByteArray &key, int index)
 	if (m_items.isEmpty() && index == 0){
 		addItem();
 	}
+
 	if (index < 0 || index > m_items.count() - 1){
 		return;
 	}
+
 	Item *item = m_items[index];
 	QVariant v = QVariant::fromValue((CTreeItemModel *)(new CTreeItemModel(this)));
+
 	item->SetValue(key, v);
 }
 
@@ -159,50 +164,54 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	else if (countSize > 1){
 		retVal = retVal && archive.EndTag(arrayTag);
 	}
-
 }
-
 
 
 // reimplemented (iser::ISerializable)
 
 bool CTreeItemModel::Serialize(iser::IArchive &archive)
 {
-	bool retVal = true;
 	int countSize = m_items.count();
 	if (countSize < 1){
 		return false;
 	}
-	retVal = SerializeRecursive(archive,"");
-	return retVal;
+
+	return SerializeRecursive(archive,"");
 }
 
 
 QVariant CTreeItemModel::data(const QModelIndex& index, int role) const
 {
-	int row = index.row();
 	QByteArray key = m_roleNames.value(role);
-	const QVariant v = this->getData(key, row);
-	return v;
+
+	int row = index.row();
+
+	return this->getData(key, row);
 }
+
 
 QHash<int, QByteArray> CTreeItemModel::roleNames() const
 {
 	return m_roleNames;
 }
 
+
 const QString &CTreeItemModel::state() const
 {
 	return m_state;
 }
 
+
 void CTreeItemModel::setState(const QString &newState)
 {
-	if (m_state == newState)
-		return;
-	m_state = newState;
-	emit stateChanged(m_state);
+	if (m_state != newState){
+		m_state = newState;
+
+		emit stateChanged(m_state);
+	}
 }
 
 
 } // namespace imtauthgui
+
+
