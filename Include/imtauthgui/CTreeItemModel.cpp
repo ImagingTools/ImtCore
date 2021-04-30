@@ -16,7 +16,25 @@ CTreeItemModel::CTreeItemModel(QObject *parent)
 }
 
 
-int CTreeItemModel::addItem()
+const QString& CTreeItemModel::state() const
+{
+	return m_state;
+}
+
+
+void CTreeItemModel::setState(const QString &newState)
+{
+	if (m_state != newState){
+		m_state = newState;
+
+		emit stateChanged(m_state);
+	}
+}
+
+
+// public slots
+
+int CTreeItemModel::InsertNewItem()
 {
 	m_items.append(new Item());
 
@@ -24,11 +42,10 @@ int CTreeItemModel::addItem()
 }
 
 
-void CTreeItemModel::addTreeModel(const QByteArray &key, int index)
+void CTreeItemModel::AddTreeModel(const QByteArray &key, int index)
 {
-	CTreeItemModel *treeItemModel = nullptr;
 	if (m_items.isEmpty() && index == 0){
-		addItem();
+		InsertNewItem();
 	}
 
 	if (index < 0 || index > m_items.count() - 1){
@@ -42,63 +59,100 @@ void CTreeItemModel::addTreeModel(const QByteArray &key, int index)
 }
 
 
-bool CTreeItemModel::setData(const QByteArray &key, const QVariant &value, int index)
+bool CTreeItemModel::SetData(const QByteArray &key, const QVariant &value, int index)
 {
-	CTreeItemModel *treeItemModel = nullptr;
 	if (m_items.isEmpty() && index == 0){
-		addItem();
+		InsertNewItem();
 	}
+
 	if (index < 0 || index > m_items.count() - 1){
 		return false;
 	}
+
 	QList<QByteArray> roles = m_roleNames.values();
 	if (!roles.contains(key)){
 		m_roleNames.insert(Qt::UserRole + 1 + m_roleNames.count(), key);
 	}
-	Item *item = m_items[index];
+
+	Item* item = m_items[index];
+
 	item->SetValue(key, value);
+
 	return true;
 }
 
 
-QVariant CTreeItemModel::getData(const QByteArray &key, int index) const
+QVariant CTreeItemModel::GetData(const QByteArray &key, int index) const
 {
 	if (index < 0 || index > m_items.count() - 1){
 		return QVariant();
 	}
+
 	return m_items[index]->Value(key);
 }
 
 
-bool CTreeItemModel::isTreeModel(const QByteArray &key, int index)
+bool CTreeItemModel::IsTreeModel(const QByteArray &key, int index) const
 {
-	return getTreeItemModel(key,index) != nullptr;
+	return GetTreeItemModel(key,index) != nullptr;
 }
 
 
-CTreeItemModel *CTreeItemModel::getTreeItemModel(const QByteArray &key, int index)
+CTreeItemModel* CTreeItemModel::GetTreeItemModel(const QByteArray &key, int index) const
 {
-	CTreeItemModel *treeItemModel = nullptr;
-	QVariant v = getData(key,index);
-
-	if (v.isValid()){
-		treeItemModel = (CTreeItemModel*)v.value<CTreeItemModel *>();
+	QVariant data = GetData(key, index);
+	if (data.isValid()){
+		return (CTreeItemModel*)data.value<CTreeItemModel*>();
 	}
-	return treeItemModel;
+
+	return nullptr;
 }
 
 
-int CTreeItemModel::ItemsCount()
+int CTreeItemModel::GetItemsCount() const
 {
 	return m_items.count();
 }
 
+
+// reimplemented (QAbstractListModel)
 
 int CTreeItemModel::rowCount(const QModelIndex& /*parent*/) const
 {
 	return m_items.count();
 }
 
+
+QVariant CTreeItemModel::data(const QModelIndex& index, int role) const
+{
+	QByteArray key = m_roleNames.value(role);
+
+	int row = index.row();
+
+	return this->GetData(key, row);
+}
+
+
+QHash<int, QByteArray> CTreeItemModel::roleNames() const
+{
+	return m_roleNames;
+}
+
+
+// reimplemented (iser::ISerializable)
+
+bool CTreeItemModel::Serialize(iser::IArchive &archive)
+{
+	int countSize = m_items.count();
+	if (countSize < 1){
+		return false;
+	}
+
+	return SerializeRecursive(archive,"");
+}
+
+
+// protected methods
 
 bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArray& tagName)
 {
@@ -125,15 +179,15 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 			retVal = retVal && archive.BeginTag(subArrayTag);
 		}
 		for (const QByteArray& key: keys){
-			CTreeItemModel *treeItemModel = nullptr;
+			CTreeItemModel* treeItemModelPtr = nullptr;
 			QVariant v = item->Value(key);
 			if (v.isValid()){
-				treeItemModel = (CTreeItemModel*)v.value<void *>();
+				treeItemModelPtr = (CTreeItemModel*)v.value<void*>();
 			}
-			if (treeItemModel!=nullptr){
-				int itemsCount = treeItemModel->ItemsCount();
+			if (treeItemModelPtr != nullptr){
+				int itemsCount = treeItemModelPtr->GetItemsCount();
 				if (itemsCount > 1){
-					treeItemModel->SerializeRecursive(archive, key);
+					treeItemModelPtr->SerializeRecursive(archive, key);
 				}
 			}
 			else{
@@ -155,7 +209,6 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 		if (countSize > 1){
 			retVal = retVal && archive.EndTag(subArrayTag);
 		}
-
 	}
 
 	if (countSize == 1){
@@ -164,51 +217,8 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	else if (countSize > 1){
 		retVal = retVal && archive.EndTag(arrayTag);
 	}
-}
 
-
-// reimplemented (iser::ISerializable)
-
-bool CTreeItemModel::Serialize(iser::IArchive &archive)
-{
-	int countSize = m_items.count();
-	if (countSize < 1){
-		return false;
-	}
-
-	return SerializeRecursive(archive,"");
-}
-
-
-QVariant CTreeItemModel::data(const QModelIndex& index, int role) const
-{
-	QByteArray key = m_roleNames.value(role);
-
-	int row = index.row();
-
-	return this->getData(key, row);
-}
-
-
-QHash<int, QByteArray> CTreeItemModel::roleNames() const
-{
-	return m_roleNames;
-}
-
-
-const QString &CTreeItemModel::state() const
-{
-	return m_state;
-}
-
-
-void CTreeItemModel::setState(const QString &newState)
-{
-	if (m_state != newState){
-		m_state = newState;
-
-		emit stateChanged(m_state);
-	}
+	return retVal;
 }
 
 

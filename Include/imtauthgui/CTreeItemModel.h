@@ -1,8 +1,8 @@
 #pragma once
 
+
 // Qt includes
 #include <QtCore/QAbstractListModel>
-#include <QtCore/QJsonArray>
 
 // ACF includes
 #include <iser/ISerializable.h>
@@ -16,39 +16,39 @@ namespace imtauthgui
 	Universal data controller for UI representations
 	\ingroup LicenseManagement
 */
-
-
-class CTreeItemModel : public QAbstractListModel, virtual public iser::ISerializable
+class CTreeItemModel: public QAbstractListModel, virtual public iser::ISerializable
 {
 	Q_OBJECT
 	Q_PROPERTY(QString state READ state WRITE setState NOTIFY stateChanged)
 
 public:
 	explicit CTreeItemModel(QObject* parent = nullptr);
-	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive &archive) override;
 
 	const QString &state() const;
 	void setState(const QString &newState);
 
-public slots:
-	int addItem();
-	void addTreeModel(const QByteArray &key, int index = 0);
-	bool setData(const QByteArray &key, const QVariant &value, int index = 0);
-	QVariant getData(const QByteArray &key, int index = 0) const;
-	bool isTreeModel(const QByteArray &key, int index = 0);
-	CTreeItemModel* getTreeItemModel(const QByteArray &key, int index = 0);
-	int ItemsCount();
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive &archive) override;
+
+public Q_SLOTS:
+	int InsertNewItem();
+	void AddTreeModel(const QByteArray &key, int index = 0);
+	bool SetData(const QByteArray &key, const QVariant &value, int index = 0);
+	QVariant GetData(const QByteArray &key, int index = 0) const;
+	bool IsTreeModel(const QByteArray &key, int index = 0) const;
+	CTreeItemModel* GetTreeItemModel(const QByteArray &key, int index = 0) const;
+	int GetItemsCount() const;
 
 	// reimplemented (QAbstractListModel)
-	int rowCount(const QModelIndex & parent = QModelIndex()) const override;
+	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const override;
+	virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
+	virtual QHash<int, QByteArray> roleNames() const override;
 
-signals:
+Q_SIGNALS:
 	void stateChanged(const QString& state);
 
 protected:
 	virtual bool SerializeRecursive(iser::IArchive& archive, const QByteArray &tagName);
-
 
 private:
 	class Item
@@ -81,10 +81,6 @@ private:
 
 	QList<Item*> m_items;
 	QHash<int, QByteArray> m_roleNames;
-
-	// reimplemented (QAbstractListModel)
-	QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
-	QHash<int, QByteArray> roleNames() const override;
 
 	QString m_state;
 };

@@ -73,12 +73,12 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 	else if(modelName == "__EXAMPLE_1__")
 	{
 		reponseTypeId = "application/json";
-		body = QByteArray(R"({"adresses":[{"city":"Moscou","country":"Russia","postalCode":644099,"street":"Lenina 10"},{"city":"Munic","country":"Germany","postalCode":123456,"street":"Street St"}],"firstName":"Ivan","lastName":"Ivanov","nicName":"NicIvan"})");
+		body = QByteArray(R"({"adresses":[{"city":"Moscou","country":"Russia","postalCode":644099,"street":"Lenina 10"},{"city":"Munic","country":"Germany","postalCode":123456,"street":"Street St"}],"firstName":"Ivan","lastName":"Ivanov","nickName":"NicIvan"})");
 	}
 	else if(modelName == "__EXAMPLE_2__")
 	{
 		reponseTypeId = "application/json";
-		body = QByteArray(R"({"firstName":"Ivan","lastName":"Ivanov","nicName":"NicIvan","adresses":[{"country":"Russia","city":"Moscow","postalCode":644099,"street":"Lenina 10"},{"country":"Germany","city":"Munic","postalCode":123456,"street":"Street St"}]})");
+		body = QByteArray(R"({"firstName":"Ivan","lastName":"Ivanov","nickName":"NicIvan","adresses":[{"country":"Russia","city":"Moscow","postalCode":644099,"street":"Lenina 10"},{"country":"Germany","city":"Munic","postalCode":123456,"street":"Street St"}]})");
 	}
 	else if(modelName == "__COLORS_EXAMPLE__")
 	{
@@ -118,7 +118,7 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 	else if(modelName == "__EXAMPLE_2__")
 	{
 		reponseTypeId = "application/json";
-		body = QByteArray(R"({"firstName":"Ivan","lastName":"Ivanov","nicName":"NicIvan","adresses":[{"country":"Russia","city":"Moscow","postalCode":644099,"street":"Lenina 10"},{"country":"Germany","city":"Munic","postalCode":123456,"street":"Street St"}]})");
+		body = QByteArray(R"({"firstName":"Ivan","lastName":"Ivanov","nickName":"NicIvan","adresses":[{"country":"Russia","city":"Moscow","postalCode":644099,"street":"Lenina 10"},{"country":"Germany","city":"Munic","postalCode":123456,"street":"Street St"}]})");
 	}
 	else if(modelName == "__CREATE_COLORS_IN_CTREE__")
 	{
@@ -134,15 +134,15 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 		};
 		for(int i = 0; i < sizeParam ; ++i)
 		{
-			QByteArray modelName = QByteArray("data ") + QByteArray::number(i);
-			m_treeItemModel->addTreeModel(modelName);
-			auto treeModelPtr = m_treeItemModel->getTreeItemModel(modelName);
+			QByteArray newModelName = QByteArray("data ") + QByteArray::number(i);
+			m_treeItemModel->AddTreeModel(newModelName);
+			auto treeModelPtr = m_treeItemModel->GetTreeItemModel(newModelName);
 			for(int j = 0; j < sizeParam; ++j)
 			{
 				quint32 r = generateRandomNumber(1,254);
 				quint32 g = generateRandomNumber(2,253);
 				quint32 b = generateRandomNumber(3,252);
-				treeModelPtr->setData(QByteArray("color ") + QByteArray::number(j), QColor::fromRgb(r,g,b).name(QColor::HexRgb),j);
+				treeModelPtr->SetData(QByteArray("color ") + QByteArray::number(j), QColor::fromRgb(r,g,b).name(QColor::HexRgb),j);
 			}
 		}
 

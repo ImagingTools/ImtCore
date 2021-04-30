@@ -16,7 +16,7 @@ Rectangle {
            // if(contactInfoModel.state === "Ready"){
                 tfName.text = contactInfoModel.getData("firstName")
                 tfLastName.text = contactInfoModel.getData("lastName")
-                tfNicName.text = contactInfoModel.getData("nicName")
+                tfNicName.text = contactInfoModel.getData("nickName")
             console.log("tfName.text ", tfName.text)
             //}
         }
@@ -44,7 +44,7 @@ Rectangle {
            id: tfNicName
             width: parent.width
             placeHolderText: qsTr("nic name")
-//            text: contactInfoModel.getData("nicName")
+//            text: contactInfoModel.getData("nickName")
         }
     }
 }

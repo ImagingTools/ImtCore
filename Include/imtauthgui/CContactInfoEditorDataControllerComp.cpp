@@ -28,11 +28,12 @@ bool CContactInfoEditorDataController::GetJsonData(QByteArray& jsonData, const Q
 	iser::CJsonStringWriteArchive archive(jsonData);
 
 	bool retVal = m_treeItemModel.Serialize(archive);
+
 	return retVal;
 }
 
 
-CTreeItemModel *CContactInfoEditorDataController::GetTreeItemModel(const QString &typeData)
+CTreeItemModel* CContactInfoEditorDataController::GetTreeItemModel(const QString& /*typeData*/)
 {
 	return &m_treeItemModel;
 }
@@ -50,34 +51,32 @@ bool CContactInfoEditorDataController::OnModelAttached(imod::IModel *modelPtr, i
 	imtauth::IContactInfo* contactPtr = GetObservedObject();
 	Q_ASSERT(contactPtr != nullptr);
 
-	m_treeItemModel.setData("firstName", contactPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME));
-	m_treeItemModel.setData("lastName", contactPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME));
-	m_treeItemModel.setData("nicName", contactPtr->GetNameField(imtauth::IContactInfo::NFT_NICKNAME));
+	m_treeItemModel.SetData("firstName", contactPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME));
+	m_treeItemModel.SetData("lastName", contactPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME));
+	m_treeItemModel.SetData("nickName", contactPtr->GetNameField(imtauth::IContactInfo::NFT_NICKNAME));
 	qmlRegisterType<CTreeItemModel>("ACF", 1, 0, "TreeItemModel");
 
 	const imtauth::IAddressProvider* addressesPtr = contactPtr->GetAddresses();
 	if (addressesPtr != nullptr){
 		imtbase::ICollectionInfo::Ids ids = addressesPtr->GetAddressList().GetElementIds();
-		m_treeItemModel.addTreeModel("adresses");
-		CTreeItemModel *addressesModel = m_treeItemModel.getTreeItemModel("adresses");
+		m_treeItemModel.AddTreeModel("adresses");
+		CTreeItemModel *addressesModel = m_treeItemModel.GetTreeItemModel("adresses");
 		for (const QByteArray& id : ids){
 			const imtauth::IAddress* addressPtr = addressesPtr->GetAddress(id);
 			if (addressPtr != nullptr){
-				int index = addressesModel->addItem();
-				addressesModel->setData("country",addressPtr->GetCountry(), index);
-				addressesModel->setData("city",addressPtr->GetCity(), index);
-				addressesModel->setData("postalCode",addressPtr->GetPostalCode(), index);
-				addressesModel->setData("street",addressPtr->GetStreet(), index);
+				int index = addressesModel->InsertNewItem();
+				addressesModel->SetData("country", addressPtr->GetCountry(), index);
+				addressesModel->SetData("city", addressPtr->GetCity(), index);
+				addressesModel->SetData("postalCode", addressPtr->GetPostalCode(), index);
+				addressesModel->SetData("street", addressPtr->GetStreet(), index);
 			}
 		}
 	}
-	m_treeItemModel.setProperty("state","Ready");
 
+	m_treeItemModel.setProperty("state", "Ready");
+
+	return true;
 }
-
-
-
-
 
 
 } // namespace imtauthgui
