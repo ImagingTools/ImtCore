@@ -21,7 +21,6 @@
 #include <imtbase/CCollectionObjectContext.h>
 #include <imtbase/CFileBasedTranslationManagerComp.h>
 
-
 /**
 	ImtCorePck package
 */

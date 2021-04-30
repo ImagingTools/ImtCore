@@ -8,11 +8,11 @@
 namespace imtbase
 {
 
-	
+
 /**
 	A translation manager component.
 
-	Translation manager based on using a set of Qt translation files.
+	Translation manager based on using a set of Qt translation files in the native file system.
 */
 class CFileBasedTranslationManagerComp: public iqt::CTranslationManagerComp
 {

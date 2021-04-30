@@ -21,8 +21,13 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			EncryptionBasePersistence,
-			"Saving data encryption",
-			"Saving data encryption");
+			"Persistence based on encrypted data",
+			"Persistence Encryption Decryption")
+			
+I_EXPORT_COMPONENT(
+			StaticEncryptionKeyProvider,
+			"Static provider of the encryption keys",
+			"Keys AES RSA Encryption Decryption");
 
 
 } // namespace ImtCryptPck

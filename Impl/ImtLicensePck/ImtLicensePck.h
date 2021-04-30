@@ -39,7 +39,7 @@ typedef icomp::TModelCompWrap<
 						imtbase::IObjectCollectionInfo,
 						imtbase::ICollectionInfo,
 						iser::ISerializable>> LicenseInfoManager;
-typedef imtlic::CLicenseBasedRightsProviderComp LicenseBasedRightsProvider;
+typedef icomp::TModelCompWrap<imtlic::CLicenseBasedRightsProviderComp> LicenseBasedRightsProvider;
 typedef icomp::TModelCompWrap<imtlic::CProductLicensingInfoComp> ProductLicensingInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<

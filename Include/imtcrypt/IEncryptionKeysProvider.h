@@ -24,7 +24,7 @@ public:
 		KT_PUBLIC,
 		KT_PRIVATE,
 		KT_PASSWORD,
-		KT_VECTOR
+		KT_INIT_VECTOR
 	};
 
 	/**

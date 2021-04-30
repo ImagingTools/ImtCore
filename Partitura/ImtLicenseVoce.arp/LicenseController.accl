@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4923" Description="ACF"/>
+            <Version Id="1" Number="2139" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="AesInitVector" X="900" Y="150" Note=""/>
+        <Element ComponentName="AutoPersistence" X="525" Y="625" Note=""/>
+        <Element ComponentName="CompactXmlFileSerializer" X="525" Y="275" Note=""/>
+        <Element ComponentName="Encryption" X="250" Y="275" Note=""/>
+        <Element ComponentName="EncryptionBasePersistence" X="525" Y="475" Note=""/>
+        <Element ComponentName="LicenseBasedRightsProvider" X="850" Y="775" Note=""/>
+        <Element ComponentName="LicenseFile" X="525" Y="775" Note=""/>
+        <Element ComponentName="ProductInstanceInfo" X="850" Y="625" Note=""/>
+        <Element ComponentName="StaticEncryptionKeyProvider" X="900" Y="275" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

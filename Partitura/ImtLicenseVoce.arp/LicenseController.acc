@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4923" Description="ACF"/>
+            <Version Id="1" Number="2139" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Client-side license controller</Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="AesInitVector" PackageId="ImtLicenseVoce" ComponentId="AesInitVector">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="AutoPersistence" PackageId="FilePck" ComponentId="AutoPersistence">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AutoReload" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FileLoader" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="EncryptionBasePersistence"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FilePath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LicenseFile"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Object" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ProductInstanceInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestoreOnBegin" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StoreOnEnd" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CompactXmlFileSerializer" PackageId="FilePck" ComponentId="CompactXmlFileSerializer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FileExtensions" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>xml</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Encryption" PackageId="ImtCryptPck" ComponentId="Encryption">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="EncryptionBasePersistence" PackageId="ImtCryptPck" ComponentId="EncryptionBasePersistence">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="BasePersistence" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CompactXmlFileSerializer"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Encryption" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Encryption"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EncryptionKeysProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="StaticEncryptionKeyProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LicenseBasedRightsProvider" PackageId="ImtLicensePck" ComponentId="LicenseBasedRightsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="LicenseInfoProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ProductInstanceInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LicenseFile" PackageId="FilePck" ComponentId="RelativeFileNameParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="License.lic"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ReferencePath" Type="Reference" ExportId="LicenseFolder">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ProductInstanceInfo" PackageId="ImtLicensePck" ComponentId="ProductInstanceInfo">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="StaticEncryptionKeyProvider" PackageId="ImtCryptPck" ComponentId="StaticEncryptionKeyProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="InitializationVector" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AesInitVector"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Password" Type="Reference" ExportId="Password">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="iauth::IRightsProvider" ComponentId="LicenseBasedRightsProvider"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="ProductInstanceInfo" ComponentId="ProductInstanceInfo"/>
+    </ExportedComponents>
+</Acf>

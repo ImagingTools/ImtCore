@@ -2,20 +2,11 @@
 
 
 // Qt includes
-#include <QtWidgets/QFileDialog>
 #include <QtCore/QFile>
 
 // ImtCore includes
 #include <imtrepo/IFileObjectCollection.h>
 #include <imtlic/IProductInstanceInfo.h>
-#include <imtlic/IProductLicensingInfo.h>
-#include <imtlic/ILicenseInfo.h>
-#include <imtlic/ILicenseInstance.h>
-#include <imtlic/IFeaturePackage.h>
-#include <imtlic/IFeatureInfo.h>
-#include <imtlic/IFeaturePackage.h>
-#include <imtlicgui/CProductInstanceInfoEditorComp.h>
-#include <iser/CMemoryReadArchive.h>
 #include <iser/CMemoryWriteArchive.h>
 #include <imtcrypt/IEncryptionKeysProvider.h>
 
@@ -75,6 +66,7 @@ void CProductInstanceInfoViewDelegateComp::SetupCommands()
 	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	if (fileCollectionPtr != nullptr) {
 		connect(&m_exportLicenseCommand, &QAction::triggered, this, &CProductInstanceInfoViewDelegateComp::OnExportLicense);
+
 		m_licenseCommands.InsertChild(&m_exportLicenseCommand);
 	}
 }
@@ -85,6 +77,7 @@ void CProductInstanceInfoViewDelegateComp::SetupCommands()
 QByteArray CProductInstanceInfoViewDelegateComp::GetEncryptionKey(imtcrypt::IEncryptionKeysProvider::KeyType type) const
 {
 	QByteArray retVal;
+
 	if (type == KT_PASSWORD){
 		imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
 		Q_ASSERT(fileCollectionPtr != nullptr);
@@ -94,16 +87,21 @@ QByteArray CProductInstanceInfoViewDelegateComp::GetEncryptionKey(imtcrypt::IEnc
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			fileCollectionPtr->GetObjectData(id, dataPtr);
 			if (dataPtr.IsValid()){
-				imtlic::IProductInstanceInfo* productInstanceInfoPtr;
-				productInstanceInfoPtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
+				imtlic::IProductInstanceInfo* productInstanceInfoPtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
 				Q_ASSERT(productInstanceInfoPtr != nullptr);
-				retVal = productInstanceInfoPtr->GetProductInstanceId();
+
+				if (productInstanceInfoPtr != nullptr){
+					retVal = productInstanceInfoPtr->GetProductInstanceId();
+				}
 			}
 		}
 	}
-	if (type == KT_VECTOR){
-		retVal = "vector";
+	else if (type == KT_INIT_VECTOR){
+		if (m_vectorKeyCompPtr.IsValid()){
+			retVal = m_vectorKeyCompPtr->GetId();
+		}
 	}
+
 	return retVal;
 }
 
@@ -123,8 +121,8 @@ void CProductInstanceInfoViewDelegateComp::OnExportLicense()
 				imtlic::IProductInstanceInfo* productInstanceInfoPtr;
 				productInstanceInfoPtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
 				Q_ASSERT(productInstanceInfoPtr != nullptr);
-				if (m_filePersistence.IsValid()){
-					m_filePersistence.GetPtr()->SaveToFile(*productInstanceInfoPtr);
+				if (m_licensePersistenceCompPtr.IsValid()){
+					m_licensePersistenceCompPtr->SaveToFile(*productInstanceInfoPtr);
 				}
 			}
 		}
@@ -133,6 +131,6 @@ void CProductInstanceInfoViewDelegateComp::OnExportLicense()
 
 
 
-} // namespace aculainspgui
+} // namespace imtlicgui
 
 

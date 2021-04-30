@@ -22,7 +22,9 @@ bool CEncryption::EncryptData(
 	switch (algorithm){
 		case EA_AES:{
 			CAesKey key;
-			key.CreateAesKeys(keys.GetEncryptionKey(IEncryptionKeysProvider::KT_PASSWORD),keys.GetEncryptionKey(IEncryptionKeysProvider::KT_VECTOR));
+			key.CreateAesKeys(
+						keys.GetEncryptionKey(IEncryptionKeysProvider::KT_PASSWORD),
+						keys.GetEncryptionKey(IEncryptionKeysProvider::KT_INIT_VECTOR));
 
 			CAesEncryption aes;
 			return aes.Encrypt(input, key, output);
@@ -51,7 +53,9 @@ bool CEncryption::DecryptData(
 	switch (algorithm){
 		case EA_AES:{
 			CAesKey key;
-			key.CreateAesKeys(keys.GetEncryptionKey(IEncryptionKeysProvider::KT_PASSWORD),keys.GetEncryptionKey(IEncryptionKeysProvider::KT_VECTOR));
+			key.CreateAesKeys(
+						keys.GetEncryptionKey(IEncryptionKeysProvider::KT_PASSWORD),
+						keys.GetEncryptionKey(IEncryptionKeysProvider::KT_INIT_VECTOR));
 		
 			CAesEncryption aes;
 			return aes.Decrypt(input, key, output);
