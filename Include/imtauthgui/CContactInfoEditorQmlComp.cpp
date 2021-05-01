@@ -5,10 +5,6 @@
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
 
-// ACF includes
-#include <istd/CChangeGroup.h>
-#include <iser/CJsonStringWriteArchive.h>
-
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
 #include <imtauth/IAddressManager.h>
@@ -25,14 +21,7 @@ namespace imtauthgui
 
 bool CContactInfoEditorQmlComp::CreateItem(QQmlEngine *enginePtr)
 {
-
 	enginePtr->addImportPath("qrc:/qml");
-
-//	QFile file("TextFieldCustom.qml");
-//	if(file.open(QIODevice::ReadOnly)){
-//		QByteArray ba = file.readAll();
-//		qDebug() << ba;
-//	}
 
 	bool retVal = BaseClass::CreateItem(enginePtr);
 	if (retVal){
@@ -44,7 +33,6 @@ bool CContactInfoEditorQmlComp::CreateItem(QQmlEngine *enginePtr)
 	}
 
 	return retVal;
-//	return BaseClass::CreateItem(enginePtr,{{"contactInfoModel", QVariant::fromValue(&m_treeItemModel)}});
 }
 
 
