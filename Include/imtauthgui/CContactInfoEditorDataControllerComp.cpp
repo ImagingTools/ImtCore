@@ -41,7 +41,6 @@ CTreeItemModel* CContactInfoEditorDataController::GetTreeItemModel(const QString
 
 // protected methods
 
-
 bool CContactInfoEditorDataController::OnModelAttached(imod::IModel *modelPtr, istd::IChangeable::ChangeSet &changeMask)
 {
 	if (!BaseClass::OnModelAttached(modelPtr, changeMask)){

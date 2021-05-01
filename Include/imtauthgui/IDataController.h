@@ -13,7 +13,7 @@ namespace imtauthgui
 	Base interface for all data controllers
 	\ingroup LicenseManagement
 */
-class IDataController : virtual public istd::IPolymorphic
+class IDataController: virtual public istd::IPolymorphic
 {
 public:
 	virtual bool GetJsonData(QByteArray& jsonData, const QString& typeData = "") = 0;
