@@ -25,7 +25,7 @@ public:
 
 	I_BEGIN_COMPONENT(CQuickObjectComp);
 		I_REGISTER_INTERFACE(imtqml::IQuickObject);
-		I_ASSIGN(m_pathToQmlPtr, "PathToQmlPtr", "If enabled, this path used for load Qml", true, "");
+		I_ASSIGN(m_pathToQmlAttrPtr, "QmlFilePath", "If enabled, this path used for load QML file", true, "QmlFilePath");
 	I_END_COMPONENT;
 
 	CQuickObjectComp();
@@ -40,7 +40,7 @@ public:
 	virtual void OnTryClose(bool* ignoredPtr = NULL) override;
 
 protected:
-	I_ATTR(QString, m_pathToQmlPtr);
+	I_ATTR(QString, m_pathToQmlAttrPtr);
 
 	QQuickItem* m_quickItemPtr;
 };
