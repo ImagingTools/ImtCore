@@ -28,13 +28,13 @@ public:
 		Initialize GUI and connect it to the parent.
 		\return		true if initialization successed.
 	 */
-	virtual bool CreateItem(QQuickItem* parentPtr) = 0;
+	virtual bool CreateQuickItem(QQuickItem* parentPtr) = 0;
 
 	/**
 		Release GUI and disconnect it from parent.
 		\return		true if this operation successed.
 	 */
-	virtual bool DestroyItem() = 0;
+	virtual bool DestroyQuickItem() = 0;
 
 	/**
 		Get access to internal QQuickItem object.

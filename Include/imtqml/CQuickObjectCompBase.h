@@ -32,16 +32,32 @@ public:
 
 	// reimplemented (imtgui::IQuickObject)
 	virtual bool IsItemCreated() const override;
-	virtual bool CreateItem(QQuickItem* parentPtr) override;
-	virtual bool DestroyItem() override;
+	virtual bool CreateQuickItem(QQuickItem* parentPtr) override;
+	virtual bool DestroyQuickItem() override;
 	virtual QQuickItem* GetQuickItem() const override;
 	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
 
 protected:
+	/**
+		Internal creation of the quick item using QML-engine.
+	*/
 	virtual QQuickItem* CreateItem(QQmlEngine* enginePtr) const;
+
+	/**
+		Internal creation of the quick item using QML-engine using some properties for the engine initialization.
+	*/
 	virtual QQuickItem* CreateItem(QQmlEngine* enginePtr, const QVariantMap& initialProperties) const;
 
+	/**
+		Callback method after the quick item was created.
+		Default implementation does nothing.
+	*/
 	virtual void OnItemCreated();
+
+	/**
+		Callback method before the quick item will be destroyed.
+		Default implementation does nothing.
+	*/
 	virtual void OnItemDestroyed();
 
 	// reimplemented (icomp::CComponentBase)

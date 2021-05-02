@@ -27,13 +27,13 @@ bool CGuiQuickWrapComp::IsGuiCreated() const
 bool CGuiQuickWrapComp::CreateGui(QWidget *parentPtr)
 {
 	if (m_quickCompPtr.IsValid()){
-		imtqml::IQuickObject *quickObject = m_quickCompPtr.GetPtr();
+		imtqml::IQuickObject *quickObjectPtr = m_quickCompPtr.GetPtr();
 		if (m_quickWidget == nullptr){
 			m_quickWidget = new QQuickWidget(parentPtr);
 			m_quickWidget->setContentsMargins(0, 0, 0, 0);
 			m_quickWidget->setSource(QUrl("qrc:/qml/WrapItem.qml"));
 
-			quickObject->CreateItem(m_quickWidget->rootObject());
+			quickObjectPtr->CreateQuickItem(m_quickWidget->rootObject());
 
 			m_quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
 		}
@@ -54,6 +54,11 @@ bool CGuiQuickWrapComp::CreateGui(QWidget *parentPtr)
 bool CGuiQuickWrapComp::DestroyGui()
 {
 	if (m_quickWidget != nullptr){
+		imtqml::IQuickObject* quickObjectPtr = m_quickCompPtr.GetPtr();
+		if (quickObjectPtr != nullptr){
+			quickObjectPtr->DestroyQuickItem();
+		}
+
 		m_quickWidget->deleteLater();
 	}
 
@@ -61,7 +66,7 @@ bool CGuiQuickWrapComp::DestroyGui()
 }
 
 
-QWidget *CGuiQuickWrapComp::GetWidget() const
+QWidget* CGuiQuickWrapComp::GetWidget() const
 {
 	return m_quickWidget;
 }

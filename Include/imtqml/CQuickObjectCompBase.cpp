@@ -11,6 +11,8 @@ namespace imtqml
 {
 
 
+// public methods
+
 CQuickObjectCompBase::CQuickObjectCompBase()
 	:m_quickItemPtr(nullptr)
 {
@@ -25,7 +27,7 @@ bool CQuickObjectCompBase::IsItemCreated() const
 }
 
 
-bool CQuickObjectCompBase::CreateItem(QQuickItem* parentPtr)
+bool CQuickObjectCompBase::CreateQuickItem(QQuickItem* parentPtr)
 {
 	if (parentPtr == nullptr){
 		return false;
@@ -53,6 +55,35 @@ bool CQuickObjectCompBase::CreateItem(QQuickItem* parentPtr)
 	return false;
 }
 
+
+bool CQuickObjectCompBase::DestroyQuickItem()
+{
+	if (m_quickItemPtr != nullptr){
+		OnItemDestroyed();
+
+		m_quickItemPtr->deleteLater();
+
+		m_quickItemPtr = nullptr;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+QQuickItem* CQuickObjectCompBase::GetQuickItem() const
+{
+	return m_quickItemPtr;
+}
+
+
+void CQuickObjectCompBase::OnTryClose(bool* /*ignoredPtr*/)
+{
+}
+
+
+// protected methods
 
 QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr) const
 {
@@ -84,31 +115,6 @@ QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr, const QVaria
 	return nullptr;
 }
 
-
-bool CQuickObjectCompBase::DestroyItem()
-{
-	if (m_quickItemPtr != nullptr){
-		OnItemDestroyed();
-
-		return true;
-	}
-
-	return false;
-}
-
-
-QQuickItem* CQuickObjectCompBase::GetQuickItem() const
-{
-	return m_quickItemPtr;
-}
-
-
-void CQuickObjectCompBase::OnTryClose(bool* /*ignoredPtr*/)
-{
-}
-
-
-// protected methods
 
 void CQuickObjectCompBase::OnItemCreated()
 {
