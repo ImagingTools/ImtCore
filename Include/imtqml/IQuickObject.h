@@ -39,7 +39,7 @@ public:
 	/**
 		Get access to internal QQuickItem object.
 	*/
-	virtual QQuickItem* GetItem() const = 0;
+	virtual QQuickItem* GetQuickItem() const = 0;
 
 	/**
 		Called on trying to close application.

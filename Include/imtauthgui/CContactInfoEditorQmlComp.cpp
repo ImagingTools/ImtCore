@@ -9,12 +9,14 @@ namespace imtauthgui
 
 // reimplemented (imtqml::CQuickObjectCompBase)
 
-void CContactInfoEditorQmlComp::OnItemCreated(QQuickItem& item)
+void CContactInfoEditorQmlComp::OnItemCreated()
 {
+	Q_ASSERT(m_quickItemPtr != nullptr);
+
 	if (m_dataControllerCompPtr.IsValid()){
 		CTreeItemModel *treeItemModel = m_dataControllerCompPtr->GetTreeItemModel("");
 
-		item.setProperty("contactInfoModel", QVariant::fromValue(treeItemModel));
+		m_quickItemPtr->setProperty("contactInfoModel", QVariant::fromValue(treeItemModel));
 	}
 }
 

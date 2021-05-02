@@ -26,7 +26,7 @@ public:
 
 protected:
 	// reimplemented (imtqml::CQuickObjectCompBase)
-	virtual void OnItemCreated(QQuickItem& item) override;
+	virtual void OnItemCreated() override;
 
 private:
 	I_REF(imtauthgui::IDataController, m_dataControllerCompPtr);

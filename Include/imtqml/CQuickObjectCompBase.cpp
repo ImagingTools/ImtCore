@@ -1,4 +1,4 @@
-#include <imtqml/CQuickObjectComp.h>
+#include <imtqml/CQuickObjectCompBase.h>
 
 
 // Qt includes
@@ -11,13 +11,13 @@ namespace imtqml
 {
 
 
-CQuickObjectComp::CQuickObjectComp()
+CQuickObjectCompBase::CQuickObjectCompBase()
 	:m_quickItemPtr(nullptr)
 {
 }
 
 
-bool CQuickObjectComp::IsItemCreated() const
+bool CQuickObjectCompBase::IsItemCreated() const
 {
 	return (m_quickItemPtr != nullptr);
 }
@@ -25,7 +25,7 @@ bool CQuickObjectComp::IsItemCreated() const
 
 // reimplemented (imtgui::IQuickObject)
 
-bool CQuickObjectComp::CreateItem(QQuickItem* parentPtr)
+bool CQuickObjectCompBase::CreateItem(QQuickItem* parentPtr)
 {
 	if (parentPtr == nullptr){
 		return false;
@@ -45,7 +45,7 @@ bool CQuickObjectComp::CreateItem(QQuickItem* parentPtr)
 	if (m_quickItemPtr != nullptr){
 		m_quickItemPtr->setParentItem(parentPtr);
 
-		OnItemCreated(*m_quickItemPtr);
+		OnItemCreated();
 
 		return true;
 	}
@@ -54,7 +54,7 @@ bool CQuickObjectComp::CreateItem(QQuickItem* parentPtr)
 }
 
 
-QQuickItem* CQuickObjectComp::CreateItem(QQmlEngine* enginePtr)
+QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr)
 {
 	if (enginePtr != nullptr){
 		enginePtr->addImportPath("qrc:/qml");
@@ -68,7 +68,7 @@ QQuickItem* CQuickObjectComp::CreateItem(QQmlEngine* enginePtr)
 }
 
 
-QQuickItem* CQuickObjectComp::CreateItem(QQmlEngine* enginePtr, const QVariantMap& initialProperties)
+QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr, const QVariantMap& initialProperties)
 {
 	Q_UNUSED(initialProperties);
 
@@ -85,33 +85,44 @@ QQuickItem* CQuickObjectComp::CreateItem(QQmlEngine* enginePtr, const QVariantMa
 }
 
 
-bool CQuickObjectComp::DestroyItem()
+bool CQuickObjectCompBase::DestroyItem()
 {
+	if (m_quickItemPtr != nullptr){
+		OnItemDestroyed();
+
+		return true;
+	}
+
 	return false;
 }
 
 
-QQuickItem* CQuickObjectComp::GetItem() const
+QQuickItem* CQuickObjectCompBase::GetQuickItem() const
 {
 	return m_quickItemPtr;
 }
 
 
-void CQuickObjectComp::OnTryClose(bool* /*ignoredPtr*/)
+void CQuickObjectCompBase::OnTryClose(bool* /*ignoredPtr*/)
 {
 }
 
 
 // protected methods
 
-void CQuickObjectComp::OnItemCreated(QQuickItem& /*item*/)
+void CQuickObjectCompBase::OnItemCreated()
+{
+}
+
+
+void CQuickObjectCompBase::OnItemDestroyed()
 {
 }
 
 
 // reimplemented (icomp::CComponentBase)
 
-void CQuickObjectComp::OnComponentCreated()
+void CQuickObjectCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 }
