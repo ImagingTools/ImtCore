@@ -38,8 +38,8 @@ public:
 	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
 
 protected:
-	virtual QQuickItem* CreateItem(QQmlEngine* enginePtr);
-	virtual QQuickItem* CreateItem(QQmlEngine* enginePtr, const QVariantMap& initialProperties);
+	virtual QQuickItem* CreateItem(QQmlEngine* enginePtr) const;
+	virtual QQuickItem* CreateItem(QQmlEngine* enginePtr, const QVariantMap& initialProperties) const;
 
 	virtual void OnItemCreated();
 	virtual void OnItemDestroyed();

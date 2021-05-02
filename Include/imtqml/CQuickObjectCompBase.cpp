@@ -17,13 +17,13 @@ CQuickObjectCompBase::CQuickObjectCompBase()
 }
 
 
+// reimplemented (imtgui::IQuickObject)
+
 bool CQuickObjectCompBase::IsItemCreated() const
 {
 	return (m_quickItemPtr != nullptr);
 }
 
-
-// reimplemented (imtgui::IQuickObject)
 
 bool CQuickObjectCompBase::CreateItem(QQuickItem* parentPtr)
 {
@@ -54,7 +54,7 @@ bool CQuickObjectCompBase::CreateItem(QQuickItem* parentPtr)
 }
 
 
-QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr)
+QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr) const
 {
 	if (enginePtr != nullptr){
 		enginePtr->addImportPath("qrc:/qml");
@@ -68,7 +68,7 @@ QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr)
 }
 
 
-QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr, const QVariantMap& initialProperties)
+QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr, const QVariantMap& initialProperties) const
 {
 	Q_UNUSED(initialProperties);
 
