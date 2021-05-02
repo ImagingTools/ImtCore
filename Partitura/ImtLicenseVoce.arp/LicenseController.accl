@@ -9,14 +9,14 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="AesInitVector" X="900" Y="150" Note=""/>
-        <Element ComponentName="AutoPersistence" X="525" Y="625" Note=""/>
-        <Element ComponentName="CompactXmlFileSerializer" X="525" Y="275" Note=""/>
+        <Element ComponentName="EncryptedXmlPersistence" X="525" Y="475" Note=""/>
         <Element ComponentName="Encryption" X="250" Y="275" Note=""/>
-        <Element ComponentName="EncryptionBasePersistence" X="525" Y="475" Note=""/>
-        <Element ComponentName="LicenseBasedRightsProvider" X="850" Y="775" Note=""/>
+        <Element ComponentName="EncryptionKeys" X="900" Y="275" Note=""/>
+        <Element ComponentName="LicenseBasedRights" X="200" Y="775" Note=""/>
+        <Element ComponentName="LicenseController" X="525" Y="625" Note=""/>
         <Element ComponentName="LicenseFile" X="525" Y="775" Note=""/>
-        <Element ComponentName="ProductInstanceInfo" X="850" Y="625" Note=""/>
-        <Element ComponentName="StaticEncryptionKeyProvider" X="900" Y="275" Note=""/>
+        <Element ComponentName="ProductInstanceInfo" X="175" Y="625" Note=""/>
+        <Element ComponentName="XmlSerializer" X="525" Y="275" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
