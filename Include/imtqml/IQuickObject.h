@@ -23,31 +23,30 @@ public:
 		Inform if GUI was initilized.
 	 */
 	virtual bool IsItemCreated() const = 0;
+
 	/**
 		Initialize GUI and connect it to the parent.
 		\return		true if initialization successed.
 	 */
 	virtual bool CreateItem(QQuickItem* parentPtr) = 0;
-	/**
-		Initialize GUI root Item
-		\return		true if initialization successed.
-	 */
-	virtual bool CreateItem(QQmlEngine* enginePtr) = 0;
+
 	/**
 		Release GUI and disconnect it from parent.
 		\return		true if this operation successed.
 	 */
 	virtual bool DestroyItem() = 0;
+
 	/**
 		Get access to internal QQuickItem object.
 	*/
 	virtual QQuickItem* GetItem() const = 0;
+
 	/**
 		Called on trying to close application.
 		\param	ignoredPtr		if it is not NULL, ignoring of close is allowed.
 								In this case implementation should set pointed value to true.
 	 */
-	virtual void OnTryClose(bool* ignoredPtr = NULL) = 0;
+	virtual void OnTryClose(bool* ignoredPtr = nullptr) = 0;
 };
 
 

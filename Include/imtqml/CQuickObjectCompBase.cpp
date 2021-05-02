@@ -35,47 +35,53 @@ bool CQuickObjectComp::CreateItem(QQuickItem* parentPtr)
 		return false;
 	}
 
-	if (CreateItem(qmlEngine(parentPtr))){
-		if (m_quickItemPtr != nullptr){
-			m_quickItemPtr->setParentItem(parentPtr);
-		}
+	if (m_quickItemPtr != nullptr){
+		Q_ASSERT(false);
 
-		return (m_quickItemPtr != nullptr);
+		return false;
+	}
+
+	m_quickItemPtr = CreateItem(qmlEngine(parentPtr));
+	if (m_quickItemPtr != nullptr){
+		m_quickItemPtr->setParentItem(parentPtr);
+
+		OnItemCreated(*m_quickItemPtr);
+
+		return true;
 	}
 
 	return false;
 }
 
 
-bool CQuickObjectComp::CreateItem(QQmlEngine* enginePtr)
+QQuickItem* CQuickObjectComp::CreateItem(QQmlEngine* enginePtr)
 {
 	if (enginePtr != nullptr){
+		enginePtr->addImportPath("qrc:/qml");
+
 		QQmlComponent component(enginePtr, QUrl("qrc" + m_pathToQmlAttrPtr->GetValue()));
 
-		m_quickItemPtr = qobject_cast<QQuickItem*>(component.create(enginePtr->rootContext()));
-
-		return (m_quickItemPtr != nullptr);
+		return qobject_cast<QQuickItem*>(component.create(enginePtr->rootContext()));
 	}
 
-	return false;
+	return nullptr;
 }
 
 
-bool CQuickObjectComp::CreateItem(QQmlEngine* enginePtr, const QVariantMap& initialProperties)
+QQuickItem* CQuickObjectComp::CreateItem(QQmlEngine* enginePtr, const QVariantMap& initialProperties)
 {
 	Q_UNUSED(initialProperties);
 
 	if ((*m_pathToQmlAttrPtr).isEmpty()){
-		return false;
+		return nullptr;
 	}
 
 	QQmlComponent component(enginePtr, QUrl("qrc" + m_pathToQmlAttrPtr->GetValue()));
 #if QT_VERSION > QT_VERSION_CHECK(5, 14, 0)
-	m_quickItemPtr = qobject_cast<QQuickItem*>(component.createWithInitialProperties(initialProperties, enginePtr->rootContext()));
+	return qobject_cast<QQuickItem*>(component.createWithInitialProperties(initialProperties, enginePtr->rootContext()));
 
-	return (m_quickItemPtr != nullptr);
 #endif
-	return false;
+	return nullptr;
 }
 
 
@@ -94,6 +100,22 @@ QQuickItem* CQuickObjectComp::GetItem() const
 void CQuickObjectComp::OnTryClose(bool* /*ignoredPtr*/)
 {
 }
+
+
+// protected methods
+
+void CQuickObjectComp::OnItemCreated(QQuickItem& /*item*/)
+{
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CQuickObjectComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+}
+
 
 
 } // namespace imtqml

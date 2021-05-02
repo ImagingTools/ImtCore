@@ -8,7 +8,7 @@
 // ImtCore includes
 
 #include <imtqml/CQuickApplicationComp.h>
-#include <imtqml/CQuickObjectComp.h>
+#include <imtqml/CQuickObjectCompBase.h>
 #include <imtqml/CGuiQuickWrapComp.h>
 
 /**
@@ -18,7 +18,7 @@ namespace ImtQmlPck
 {
 
 typedef imtqml::CQuickApplicationComp QuickApplication;
-typedef imtqml::CQuickObjectComp QuickObject;
+typedef imtqml::CQuickObjectCompBase QuickObject;
 typedef imtqml::CGuiQuickWrapComp GuiQuickWrap;
 
 

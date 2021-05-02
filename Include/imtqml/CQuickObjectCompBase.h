@@ -33,11 +33,18 @@ public:
 	// reimplemented (imtgui::IQuickObject)
 	virtual bool IsItemCreated() const override;
 	virtual bool CreateItem(QQuickItem* parentPtr) override;
-	virtual bool CreateItem(QQmlEngine* enginePtr) override;
-	virtual bool CreateItem(QQmlEngine* enginePtr, const QVariantMap& initialProperties);
 	virtual bool DestroyItem() override;
 	virtual QQuickItem* GetItem() const override;
-	virtual void OnTryClose(bool* ignoredPtr = NULL) override;
+	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
+
+protected:
+	virtual QQuickItem* CreateItem(QQmlEngine* enginePtr);
+	virtual QQuickItem* CreateItem(QQmlEngine* enginePtr, const QVariantMap& initialProperties);
+
+	virtual void OnItemCreated(QQuickItem& item);
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 protected:
 	I_ATTR(QString, m_pathToQmlAttrPtr);

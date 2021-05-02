@@ -1,38 +1,21 @@
 #include <imtauthgui/CContactInfoEditorQmlComp.h>
 
 
-// Qt includes
-#include <QtQml/QQmlEngine>
-#include <QtQml/QQmlContext>
-
-// ImtCore includes
-#include <imtbase/ICollectionInfo.h>
-#include <imtauth/IAddressManager.h>
-#include <imtauth/CAddress.h>
-
-
 namespace imtauthgui
 {
 
 
 // protected methods
 
-// reimplemented (imtqml::CQuickObjectComp)
+// reimplemented (imtqml::CQuickObjectCompBase)
 
-bool CContactInfoEditorQmlComp::CreateItem(QQmlEngine *enginePtr)
+void CContactInfoEditorQmlComp::OnItemCreated(QQuickItem& item)
 {
-	enginePtr->addImportPath("qrc:/qml");
+	if (m_dataControllerCompPtr.IsValid()){
+		CTreeItemModel *treeItemModel = m_dataControllerCompPtr->GetTreeItemModel("");
 
-	bool retVal = BaseClass::CreateItem(enginePtr);
-	if (retVal){
-		QQuickItem *item = BaseClass::GetItem();
-		if (item && m_dataControllerCompPtr.IsValid()){
-			CTreeItemModel *treeItemModel = m_dataControllerCompPtr->GetTreeItemModel("");
-			item->setProperty("contactInfoModel", QVariant::fromValue(treeItemModel));
-		}
+		item.setProperty("contactInfoModel", QVariant::fromValue(treeItemModel));
 	}
-
-	return retVal;
 }
 
 
