@@ -134,7 +134,6 @@ void CQuickObjectCompBase::OnComponentCreated()
 }
 
 
-
 } // namespace imtqml
 
 
