@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtCore/QFileInfo>
 
+// ACF includes
+#include <istd/CCrcCalculator.h>
+
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
 #include <imtlic/ILicenseInstance.h>
@@ -82,16 +85,54 @@ void CLicenseControllerComp::ReadLicenseFile()
 		return;
 	}
 
+	QString fingerprintFilePath;
+
 	int state = m_productInstancePersistenceCompPtr->LoadFromFile(*m_productInstanceCompPtr, licenseFilePath);
 	if (state != ifile::IFilePersistence::OS_OK){
 		SendErrorMessage(0, QString(QObject::tr("You have no license to run this software. License file: '%1'")).arg(licenseFilePath), "License Management");
 
+		LoadFingerprint(fingerprintFilePath);
+
 		return;
+	}
+
+	UpdateFingerprint(fingerprintFilePath);
+}
+
+
+void CLicenseControllerComp::UpdateFingerprint(const QString& fingerprintFilePath) const
+{
+	if (!m_fingerprintInstancePersistenceCompPtr.IsValid()){
+		return;
+	}
+
+	m_fingerprintInstancePersistenceCompPtr->SaveToFile(*m_productInstanceCompPtr, fingerprintFilePath);
+}
+
+
+void CLicenseControllerComp::LoadFingerprint(const QString& filePath)
+{
+	if (!m_fingerprintInstancePersistenceCompPtr.IsValid()){
+		return;
+	}
+
+	if (m_fingerprintExpirationAttrPtr.IsValid()){
+		QDateTime currentTime = QDateTime::currentDateTime();
+
+		QFileInfo fingerprintInfo(filePath);
+		QDateTime fingerprintTimeStamp = fingerprintInfo.lastModified();
+
+		int days = fingerprintTimeStamp.daysTo(currentTime);
+		if (days < *m_fingerprintExpirationAttrPtr){
+			m_fingerprintInstancePersistenceCompPtr->LoadFromFile(*m_productInstanceCompPtr, filePath);
+		}
 	}
 }
 
 
-void CLicenseControllerComp::OnLicenseKeysUpdated(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtcrypt::IEncryptionKeysProvider* /*licenseKeysProviderPtr*/)
+void CLicenseControllerComp::OnLicenseKeysUpdated(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const imtcrypt::IEncryptionKeysProvider* /*licenseKeysProviderPtr*/)
 {
 	if (!m_isInitializing){
 		ReadLicenseFile();
