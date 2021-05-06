@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QFileInfo>
+#include <QtCore/QDir>
 
 // ACF includes
 #include <istd/CCrcCalculator.h>
@@ -85,7 +86,9 @@ void CLicenseControllerComp::ReadLicenseFile()
 		return;
 	}
 
-	QString fingerprintFilePath;
+	int checksum = istd::CCrcCalculator::GetCrcFromFile(licenseFilePath);
+
+	QString fingerprintFilePath = QDir::tempPath() + "/" + checksum + ".xli";
 
 	int state = m_productInstancePersistenceCompPtr->LoadFromFile(*m_productInstanceCompPtr, licenseFilePath);
 	if (state != ifile::IFilePersistence::OS_OK){
@@ -116,10 +119,13 @@ void CLicenseControllerComp::LoadFingerprint(const QString& filePath)
 		return;
 	}
 
+	QFileInfo fingerprintInfo(filePath);
+	if (!fingerprintInfo.exists()){
+		return;
+	}
+
 	if (m_fingerprintExpirationAttrPtr.IsValid()){
 		QDateTime currentTime = QDateTime::currentDateTime();
-
-		QFileInfo fingerprintInfo(filePath);
 		QDateTime fingerprintTimeStamp = fingerprintInfo.lastModified();
 
 		int days = fingerprintTimeStamp.daysTo(currentTime);
