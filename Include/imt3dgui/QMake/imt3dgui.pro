@@ -5,8 +5,8 @@ include($(ACFCONFIGDIR)/QMake/QtGuiBaseConfig.pri)
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 include($(IMTCOREDIR)/Config/QMake/ImtCore.pri)
 
-#FORMS += $$_PRO_FILE_PWD_/../*.ui
-RESOURCES += $$_PRO_FILE_PWD_/../*.qrc
+#FORMS += $$files($$_PRO_FILE_PWD_/../*.ui, true)
+RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, true)
 
 INCLUDEPATH += ../../
 

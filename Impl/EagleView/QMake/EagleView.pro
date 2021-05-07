@@ -8,7 +8,7 @@ INCLUDEPATH += $(IMTCOREDIR)/Include
 INCLUDEPATH += $(IMTCOREDIR)/Impl
 INCLUDEPATH +=  $$AUXINCLUDEDIR
 
-RESOURCES += $$_PRO_FILE_PWD_/../*.qrc
+RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, true)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liproc -liqtmeas -lAcfSlnLoc -lAcfLoc
 LIBS += -L../../../Lib/$$COMPILER_DIR -limtgui -limt3d -limt3dview -limt3dgui
