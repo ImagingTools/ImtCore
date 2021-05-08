@@ -72,6 +72,9 @@ void CLicenseControllerComp::ReadLicenseFile()
 		return;
 	}
 
+	// Remove all existing license data:
+	m_productInstanceCompPtr->ResetData();
+
 	QString licenseFilePath = m_licensePathCompPtr->GetPath();
 	if (licenseFilePath.isEmpty()){
 		SendCriticalMessage(0, "License file path is empty. Please check component configuration", "CLicenseControllerComp::ReadLicenseFile");
@@ -88,13 +91,19 @@ void CLicenseControllerComp::ReadLicenseFile()
 
 	int checksum = istd::CCrcCalculator::GetCrcFromFile(licenseFilePath);
 
-	QString fingerprintFilePath = QDir::tempPath() + "/" + checksum + ".xli";
+	QString checkSumString = QString::number(checksum, 16).rightJustified(8, '0').toUpper();
+
+	QString fingerprintFilePath = QDir::tempPath() + "/" + checkSumString + ".xli";
 
 	int state = m_productInstancePersistenceCompPtr->LoadFromFile(*m_productInstanceCompPtr, licenseFilePath);
 	if (state != ifile::IFilePersistence::OS_OK){
-		SendErrorMessage(0, QString(QObject::tr("You have no license to run this software. License file: '%1'")).arg(licenseFilePath), "License Management");
-
-		LoadFingerprint(fingerprintFilePath);
+		int daysUntilExpire = -1;
+		if (LoadFingerprint(fingerprintFilePath, daysUntilExpire)){
+			SendWarningMessage(0, QString(QObject::tr("You have no valid license to run this software anymore. You have %1 day(s) to update your system with a valid license")).arg(daysUntilExpire), "License Management");
+		}
+		else{
+			SendErrorMessage(0, QString(QObject::tr("You have no license to run this software. License file: '%1'")).arg(licenseFilePath), "License Management");
+		}
 
 		return;
 	}
@@ -103,25 +112,27 @@ void CLicenseControllerComp::ReadLicenseFile()
 }
 
 
-void CLicenseControllerComp::UpdateFingerprint(const QString& fingerprintFilePath) const
+bool CLicenseControllerComp::UpdateFingerprint(const QString& fingerprintFilePath) const
 {
 	if (!m_fingerprintInstancePersistenceCompPtr.IsValid()){
-		return;
+		return false;
 	}
 
-	m_fingerprintInstancePersistenceCompPtr->SaveToFile(*m_productInstanceCompPtr, fingerprintFilePath);
+	return (m_fingerprintInstancePersistenceCompPtr->SaveToFile(*m_productInstanceCompPtr, fingerprintFilePath) == ifile::IFilePersistence::OS_OK);
 }
 
 
-void CLicenseControllerComp::LoadFingerprint(const QString& filePath)
+bool CLicenseControllerComp::LoadFingerprint(const QString& filePath, int& daysUntilExpire)
 {
+	daysUntilExpire = -1;
+
 	if (!m_fingerprintInstancePersistenceCompPtr.IsValid()){
-		return;
+		return false;
 	}
 
 	QFileInfo fingerprintInfo(filePath);
 	if (!fingerprintInfo.exists()){
-		return;
+		return false;
 	}
 
 	if (m_fingerprintExpirationAttrPtr.IsValid()){
@@ -130,9 +141,13 @@ void CLicenseControllerComp::LoadFingerprint(const QString& filePath)
 
 		int days = fingerprintTimeStamp.daysTo(currentTime);
 		if (days < *m_fingerprintExpirationAttrPtr){
-			m_fingerprintInstancePersistenceCompPtr->LoadFromFile(*m_productInstanceCompPtr, filePath);
+			daysUntilExpire = *m_fingerprintExpirationAttrPtr - days;
+
+			return (m_fingerprintInstancePersistenceCompPtr->LoadFromFile(*m_productInstanceCompPtr, filePath) == ifile::IFilePersistence::OS_OK);
 		}
 	}
+
+	return false;
 }
 
 

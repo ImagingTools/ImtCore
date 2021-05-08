@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imt3d/IDepthBitmap.h>
+#include <imt3d/CImage3dCalibration.h>
 
 
 namespace imt3d
@@ -41,7 +42,8 @@ public:
 	enum
 	{
 		MIT_CALIBRATION = MIT_LAST + 1,
-		MIT_CALIBRATION_TYPE_ID
+		MIT_CALIBRATION_TYPE_ID,
+		MIT_CALIBRATION_3D
 	};
 
 	typedef iimg::CReflectedBitmapBase BaseClass;
@@ -51,11 +53,14 @@ public:
 
 	void SetDepthRange(const istd::CRange& depthRange);
 	void SetColorMap(ColorMapType colorMapType);
+	void SetClibration3d(const CImage3dCalibration& calibration3d);
 
 	// reimplemented (IDepthBitmap)
 	istd::CRange GetDepthRange() const override;
 	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size) override;
 	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size, void * dataPtr, bool releaseFlag, int linesDifference = 0) override;
+	virtual const IImage3dCalibration* GetCalibration3d() const override;
+
 
 	// reimplemented (iimg::IRasterImage)
 	virtual void ResetImage() override;
@@ -85,6 +90,7 @@ private:
 private:
 	istd::CRange m_depthRange;
 	ColorMapType m_colorMapType;
+	CImage3dCalibration m_calibration3d;
 };
 
 

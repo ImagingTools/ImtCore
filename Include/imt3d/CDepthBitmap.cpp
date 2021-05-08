@@ -49,6 +49,13 @@ void CDepthBitmap::SetColorMap(ColorMapType colorMapType)
 	InvalidateCache(istd::IChangeable::GetNoChanges());
 }
 
+void CDepthBitmap::SetClibration3d(const CImage3dCalibration& calibration3d)
+{
+	m_calibration3d.CopyFrom(calibration3d);
+
+	EnsureMetaInfoCreated();
+}
+
 
 // reimplemented (IDepthBitmap)
 
@@ -91,6 +98,11 @@ bool CDepthBitmap::CreateDepthBitmap(const istd::CRange& depthRange, const istd:
 	}
 
 	return false;
+}
+
+const IImage3dCalibration* CDepthBitmap::GetCalibration3d() const
+{
+	return &m_calibration3d;
 }
 
 
@@ -176,6 +188,20 @@ bool CDepthBitmap::Serialize(iser::IArchive& archive)
 				}
 			}
 		}
+
+		QVariant calibration3dData = GetMetaInfo(MIT_CALIBRATION_3D);
+		if (!calibration3dData.isNull()) {
+			QByteArray data = calibration3dData.toByteArray();
+
+			iser::CMemoryReadArchive calibration3dArchive(data, data.size());
+			CImage3dCalibration calibration3d;
+			if (calibration3d.Serialize(calibration3dArchive)) {
+				SetClibration3d(calibration3d);
+			}
+			else {
+				SetClibration3d(CImage3dCalibration());
+			}
+		}
 	}
 
 	return retVal;
@@ -198,6 +224,7 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 
 		m_depthRange = sourcePtr->m_depthRange;
 		m_colorMapType = sourcePtr->m_colorMapType;
+		m_calibration3d.CopyFrom(sourcePtr->m_calibration3d);
 
 		InvalidateCache(istd::IChangeable::GetNoChanges());
 
@@ -310,6 +337,8 @@ bool CDepthBitmap::ResetData(CompatibilityMode mode)
 	m_colorMapType = CMT_GRAY;
 
 	m_depthRange = istd::CRange();
+
+	m_calibration3d.ResetData();
 
 	SetCalibration(nullptr, false);
 
@@ -430,6 +459,17 @@ void CDepthBitmap::EnsureMetaInfoCreated()
 
 	SetMetaInfo(MIT_CALIBRATION, calibrationData);
 	SetMetaInfo(MIT_CALIBRATION_TYPE_ID, calibrationTypeId);
+
+	QVariant calibration3dData;
+
+	{
+		iser::CMemoryWriteArchive archive;
+		if (m_calibration3d.Serialize(archive)){
+			calibration3dData.setValue(QByteArray((const char*)archive.GetBuffer(), archive.GetBufferSize()));
+		}
+	}
+
+	SetMetaInfo(MIT_CALIBRATION_3D, calibration3dData);
 }
 
 

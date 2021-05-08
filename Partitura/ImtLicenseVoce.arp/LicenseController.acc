@@ -62,6 +62,12 @@
         <Element Id="LicenseController" PackageId="ImtLicensePck" ComponentId="LicenseController">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="FingerprintExpiration" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="5"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FingerprintInstancePersistence" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SecureFileSerializer"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="LicenseFilePath" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="LicenseFile"/>
                     </AttributeInfo>
@@ -98,6 +104,28 @@
         <Element Id="ProductInstanceInfo" PackageId="ImtLicensePck" ComponentId="ProductInstanceInfo">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SecureFileSerializer" PackageId="QFilePck" ComponentId="SecureFileSerializer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AutoCreatePath" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FileExtensions" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>xli</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="XmlSerializer" PackageId="FilePck" ComponentId="CompactXmlFileSerializer">

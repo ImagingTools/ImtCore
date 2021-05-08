@@ -44,8 +44,8 @@ protected:
 
 private:
 	void ReadLicenseFile();
-	void UpdateFingerprint(const QString& filePath) const;
-	void LoadFingerprint(const QString& filePath);
+	bool UpdateFingerprint(const QString& filePath) const;
+	bool LoadFingerprint(const QString& filePath, int& daysUntilExpire);
 	void OnLicenseKeysUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtcrypt::IEncryptionKeysProvider* licenseKeysProviderPtr);
 
 private:

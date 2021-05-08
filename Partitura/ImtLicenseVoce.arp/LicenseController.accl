@@ -16,6 +16,7 @@
         <Element ComponentName="LicenseController" X="525" Y="625" Note=""/>
         <Element ComponentName="LicenseFile" X="525" Y="775" Note=""/>
         <Element ComponentName="ProductInstanceInfo" X="175" Y="625" Note=""/>
+        <Element ComponentName="SecureFileSerializer" X="900" Y="775" Note=""/>
         <Element ComponentName="XmlSerializer" X="525" Y="275" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
