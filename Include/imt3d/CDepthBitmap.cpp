@@ -184,7 +184,7 @@ bool CDepthBitmap::Serialize(iser::IArchive& archive)
 				iser::CMemoryReadArchive calibrationArchive(data, data.size());
 
 				if (calibrationPtr->Serialize(calibrationArchive)){
-					SetCalibration(calibrationPtr.PopPtr(), true);
+					BaseClass::SetCalibration(calibrationPtr.PopPtr(), true);
 				}
 			}
 		}
@@ -195,11 +195,11 @@ bool CDepthBitmap::Serialize(iser::IArchive& archive)
 
 			iser::CMemoryReadArchive calibration3dArchive(data, data.size());
 			CImage3dCalibration calibration3d;
-			if (calibration3d.Serialize(calibration3dArchive)) {
-				SetClibration3d(calibration3d);
+			if (calibration3d.Serialize(calibration3dArchive)){
+				m_calibration3d.CopyFrom(calibration3d);
 			}
-			else {
-				SetClibration3d(CImage3dCalibration());
+			else{
+				m_calibration3d.ResetData();
 			}
 		}
 	}
