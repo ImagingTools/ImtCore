@@ -33,6 +33,8 @@ class TDocumentWorkspaceGuiCompBase:
 						iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<UI>>>
 {
 public:
+	Q_DECLARE_TR_FUNCTIONS(TDocumentWorkspaceGuiCompBase)
+	
 	typedef iqtdoc::TQtDocumentManagerWrap<
 				DocumentManagerBase,
 				iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<UI>>> BaseClass;

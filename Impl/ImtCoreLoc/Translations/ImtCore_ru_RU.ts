@@ -4,57 +4,68 @@
 <context>
     <name>Attribute</name>
     <message>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/EagleView/CEagleView.cpp" line="+65"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+53"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/EagleView/CEagleView.cpp" line="+71"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+57"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+60"/>
         <source>Report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
         <source>Report Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-30"/>
+        <location line="-36"/>
         <source>3D-Viewer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="+38"/>
         <location line="+4"/>
         <location line="+2"/>
         <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location line="+2"/>
         <location line="+4"/>
+        <location line="+2"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
+        <location line="+2"/>
+        <location line="+4"/>
+        <location line="+2"/>
         <source>Edit License</source>
         <translation>Редактор лицензии</translation>
     </message>
     <message>
         <location line="-8"/>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <location line="+6"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-4"/>
         <location line="+6"/>
         <source>Edit</source>
         <translation>Редактировать</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <location line="-18"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-18"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-40"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-38"/>
+        <location line="-22"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-24"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-38"/>
         <source>STL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
         <source>OBJ</source>
         <translation type="unfinished"></translation>
     </message>
@@ -65,57 +76,78 @@
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location line="+2"/>
         <location line="+2"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
+        <location line="+2"/>
+        <location line="+2"/>
         <source>rad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
         <source>Search radius</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
         <source>Mu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
         <source>Minimum angle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
         <source>Maximum angle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
         <source>Maximum surface angle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+2"/>
         <source>Maximum nearest neighbors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-22"/>
-        <location line="+44"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+22"/>
+        <location line="+28"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="+22"/>
         <source>ImtCore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location line="+42"/>
-        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location line="-30"/>
+        <location line="+28"/>
+        <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-2"/>
         <source>ImagingTools GmbH</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Docs/Tutorials/AuxInclude/Qt5_VC15_64/GeneratedFiles/ServerDemo/CServerDemo.cpp" line="-42"/>
+        <source>SMService</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-2"/>
+        <source>Server Dermo</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -866,7 +898,7 @@
 <context>
     <name>ContactInfoEditor</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Resources/qml/ContactInfoEditor.qml" line="+33"/>
+        <location filename="../../../Include/imtauthgui/Resources/qml/ContactInfoEditor.qml" line="+34"/>
         <source>first name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1362,6 +1394,21 @@ Errors: 0</source>
         <translation>У &apos;%1&apos; существует функциональная зависимость от &apos;%2&apos;</translation>
     </message>
     <message>
+        <location filename="../../../Include/imtlic/CLicenseControllerComp.cpp" line="+87"/>
+        <source>License file &apos;%1&apos; doesn&apos;t exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>You have no valid license to run this software anymore. You have %1 day(s) to update your system with a valid license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>You have no license to run this software. License file: &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../../Include/imtrest/CHttpHtmlFolderBasedHandlerComp.cpp" line="+88"/>
         <source>Directory</source>
         <translation type="unfinished"></translation>
@@ -1404,6 +1451,25 @@ Errors: 0</source>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CSingleStatusProviderGuiComp.h" line="+59"/>
         <source>Form</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>TDocumentWorkspaceGuiCompBase</name>
+    <message>
+        <location filename="../../../Include/imtgui/TDocumentWorkspaceGuiCompBase.h" line="+320"/>
+        <source>Close document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Do you want to save your changes made in document
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+125"/>
+        <source>Document could not be opened</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2154,25 +2220,6 @@ Errors: 0</source>
     </message>
 </context>
 <context>
-    <name>imtgui::UI</name>
-    <message>
-        <location filename="../../../Include/imtgui/TDocumentWorkspaceGuiCompBase.h" line="+318"/>
-        <source>Close document</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Do you want to save your changes made in document
-%1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+125"/>
-        <source>Document could not be opened</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>imtlicgui::CFeatureCollectionViewDelegateComp</name>
     <message>
         <location filename="../../../Include/imtlicgui/CFeatureCollectionViewDelegateComp.cpp" line="+39"/>
@@ -2244,7 +2291,7 @@ Errors: 0</source>
 <context>
     <name>imtlicgui::CProductInstanceInfoViewDelegateComp</name>
     <message>
-        <location filename="../../../Include/imtlicgui/CProductInstanceInfoViewDelegateComp.cpp" line="+30"/>
+        <location filename="../../../Include/imtlicgui/CProductInstanceInfoViewDelegateComp.cpp" line="+21"/>
         <location line="+23"/>
         <source>Create License File</source>
         <translation>Создать файл лицензии</translation>
@@ -2771,12 +2818,12 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtstyle/CImtStyle.cpp" line="+156"/>
         <source>Light</source>
-        <translation>Светлая</translation>
+        <translation type="unfinished">Светлая</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Dark</source>
-        <translation>Тёмная</translation>
+        <translation type="unfinished">Тёмная</translation>
     </message>
 </context>
 </TS>
