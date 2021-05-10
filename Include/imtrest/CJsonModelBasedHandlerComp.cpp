@@ -26,7 +26,7 @@ namespace imtrest
 
 CJsonModelBasedHandlerComp::CJsonModelBasedHandlerComp()
 {
-	m_treeItemModel = new imtauthgui::CTreeItemModel();
+	m_treeItemModel = new imtbase::CTreeItemModel();
 }
 
 

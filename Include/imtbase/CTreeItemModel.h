@@ -8,7 +8,7 @@
 #include <iser/ISerializable.h>
 
 
-namespace imtauthgui
+namespace imtbase
 {
 
 
@@ -19,13 +19,13 @@ namespace imtauthgui
 class CTreeItemModel: public QAbstractListModel, virtual public iser::ISerializable
 {
 	Q_OBJECT
-	Q_PROPERTY(QString state READ state WRITE setState NOTIFY stateChanged)
+	Q_PROPERTY(QString state READ GetState WRITE SetState NOTIFY stateChanged)
 
 public:
 	explicit CTreeItemModel(QObject* parent = nullptr);
 
-	const QString &state() const;
-	void setState(const QString &newState);
+	const QString& GetState() const;
+	void SetState(const QString &newState);
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -86,5 +86,5 @@ private:
 };
 
 
-} // namespace imtauthgui
+} // namespace imtbase
 

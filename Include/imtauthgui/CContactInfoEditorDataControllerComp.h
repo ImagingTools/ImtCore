@@ -5,9 +5,9 @@
 #include <imod/TSingleModelObserverBase.h>
 
 // ImtCore includes
+#include <imtbase/CTreeItemModel.h>
 #include <imtauth/IContactInfo.h>
 #include <imtauthgui/IDataController.h>
-#include <imtauthgui/CTreeItemModel.h>
 
 
 namespace imtauthgui
@@ -26,15 +26,15 @@ public:
 	typedef imod::TSingleModelObserverBase<imtauth::IContactInfo> BaseClass;
 
 	// reimplemented (imtauthgui::IDataController)
-	bool GetJsonData(QByteArray& jsonData, const QString& typeData = "") override;
-	CTreeItemModel* GetTreeItemModel(const QString& typeData) override;
+	bool GetJsonData(QByteArray& jsonData, const QString& typeData = "") const override;
+	imtbase::CTreeItemModel* GetTreeItemModel(const QString& typeData) const override;
 
 protected:
 	// reimplemented (imod::IObserver)
 	virtual bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask);
 
 private:
-	CTreeItemModel m_treeItemModel;
+	mutable imtbase::CTreeItemModel m_treeItemModel;
 };
 
 

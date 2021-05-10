@@ -1,59 +1,38 @@
 #pragma once
 
 
-// ACF includes
-#include <ifile/IFileNameParam.h>
-#include <ilog/TLoggerCompWrap.h>
-
-// ImtCore includes
-#include <imtrest/IRequestHandler.h>
-
 // Qt includes
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
+#include <QtWidgets/QAction>
+#include <QtCore/QJsonDocument>
+#include <QtQml/QQmlEngine>
+#include <QtQml/QQmlContext>
+
+// ACF includes
+#include <ifile/IFileNameParam.h>
+#include <ilog/TLoggerCompWrap.h>
+#include <istd/CChangeGroup.h>
+#include <iser/CJsonStringWriteArchive.h>
+#include <imod/TSingleModelObserverBase.h>
+#include <ilog/TLoggerCompWrap.h>
+#include <iqtgui/IGuiObject.h>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponder.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
-
-
-
-
-//------------------------------------------------------------------mem test
-// Qt includes
-#include <QtWidgets/QAction>
-#include <QtCore/QJsonDocument>
-
-
-// ACF includes
-//#include <iqtgui/TDesignerGuiObserverCompBase.h>
-#include <iqtgui/IGuiObject.h>
-#include <imod/TSingleModelObserverBase.h>
-#include <ilog/TLoggerCompWrap.h>
-
-// ImtCore includes
-#include <imtauth/IContactInfo.h>
-//#include <GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h>
-#include <imtauth/IContactInfo.h>
-#include <imtauthgui/IDataController.h>
-#include <imtauthgui/CTreeItemModel.h>
-
-// Qt includes
-#include <QtQml/QQmlEngine>
-#include <QtQml/QQmlContext>
-
-// ACF includes
-#include <istd/CChangeGroup.h>
-#include <iser/CJsonStringWriteArchive.h>
-
-// ImtCore includes
+#include <imtrest/IRequestHandler.h>
 #include <imtbase/ICollectionInfo.h>
+#include <imtbase/CTreeItemModel.h>
+#include <imtauth/IContactInfo.h>
+#include <imtauth/IContactInfo.h>
 #include <imtauth/IAddressManager.h>
 #include <imtauth/CAddress.h>
-//------------------------------------------------------------------
+#include <imtauthgui/IDataController.h>
+
 
 namespace imtrest
 {
@@ -86,7 +65,7 @@ private:
 	I_REF(ifile::IFileNameParam, m_jsonModelProcessor);
 	I_ATTR(QByteArray, m_commandIdAttrPtr);
 
-	imtauthgui::CTreeItemModel *m_treeItemModel;
+	imtbase::CTreeItemModel* m_treeItemModel;
 };
 
 

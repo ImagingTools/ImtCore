@@ -1,4 +1,4 @@
-#include <imtauthgui/CTreeItemModel.h>
+#include <imtbase/CTreeItemModel.h>
 
 
 // ACF includes
@@ -6,7 +6,7 @@
 #include <iser/CArchiveTag.h>
 
 
-namespace imtauthgui
+namespace imtbase
 {
 
 
@@ -16,13 +16,13 @@ CTreeItemModel::CTreeItemModel(QObject *parent)
 }
 
 
-const QString& CTreeItemModel::state() const
+const QString& CTreeItemModel::GetState() const
 {
 	return m_state;
 }
 
 
-void CTreeItemModel::setState(const QString &newState)
+void CTreeItemModel::SetState(const QString &newState)
 {
 	if (m_state != newState){
 		m_state = newState;
@@ -158,9 +158,9 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 {
 	bool retVal = true;
 	int countSize = m_items.count();
-	iser::CArchiveTag arrayTag(tagName, "array items", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag subArrayTag("item", "array item", iser::CArchiveTag::TT_GROUP, &arrayTag);
-	iser::CArchiveTag objectTag(tagName, "key", iser::CArchiveTag::TT_GROUP);
+	iser::CArchiveTag arrayTag(tagName, "Items", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag subArrayTag("Item", "array item", iser::CArchiveTag::TT_GROUP, &arrayTag);
+	iser::CArchiveTag objectTag(tagName, "Key", iser::CArchiveTag::TT_GROUP);
 	if (countSize < 1){
 		return false;
 	}
@@ -222,6 +222,6 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 }
 
 
-} // namespace imtauthgui
+} // namespace imtbase
 
 

@@ -23,7 +23,7 @@ namespace imtauthgui
 
 // reimplemented (imtauthgui::IDataController)
 
-bool CContactInfoEditorDataController::GetJsonData(QByteArray& jsonData, const QString& /*typeData*/)
+bool CContactInfoEditorDataController::GetJsonData(QByteArray& jsonData, const QString& /*typeData*/) const
 {
 	iser::CJsonStringWriteArchive archive(jsonData);
 
@@ -33,7 +33,7 @@ bool CContactInfoEditorDataController::GetJsonData(QByteArray& jsonData, const Q
 }
 
 
-CTreeItemModel* CContactInfoEditorDataController::GetTreeItemModel(const QString& /*typeData*/)
+imtbase::CTreeItemModel* CContactInfoEditorDataController::GetTreeItemModel(const QString& /*typeData*/) const
 {
 	return &m_treeItemModel;
 }
@@ -53,13 +53,13 @@ bool CContactInfoEditorDataController::OnModelAttached(imod::IModel *modelPtr, i
 	m_treeItemModel.SetData("firstName", contactPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME));
 	m_treeItemModel.SetData("lastName", contactPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME));
 	m_treeItemModel.SetData("nickName", contactPtr->GetNameField(imtauth::IContactInfo::NFT_NICKNAME));
-	qmlRegisterType<CTreeItemModel>("ACF", 1, 0, "TreeItemModel");
+	qmlRegisterType<imtbase::CTreeItemModel>("ACF", 1, 0, "TreeItemModel");
 
 	const imtauth::IAddressProvider* addressesPtr = contactPtr->GetAddresses();
 	if (addressesPtr != nullptr){
 		imtbase::ICollectionInfo::Ids ids = addressesPtr->GetAddressList().GetElementIds();
 		m_treeItemModel.AddTreeModel("adresses");
-		CTreeItemModel *addressesModel = m_treeItemModel.GetTreeItemModel("adresses");
+		imtbase::CTreeItemModel *addressesModel = m_treeItemModel.GetTreeItemModel("adresses");
 		for (const QByteArray& id : ids){
 			const imtauth::IAddress* addressPtr = addressesPtr->GetAddress(id);
 			if (addressPtr != nullptr){
