@@ -10,4 +10,4 @@ include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 
 target_link_libraries(${PROJECT_NAME} Qt5::Network)
 
-target_link_libraries(${PROJECT_NAME} imtbase imtrest iproc)
+target_link_libraries(${PROJECT_NAME} imtbase imtrest iproc imtauthgui)
