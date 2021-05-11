@@ -1,6 +1,6 @@
 TARGET = ImtAuthGuiPck
 
-QT += qml
+QT += qml quick
 
 include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)

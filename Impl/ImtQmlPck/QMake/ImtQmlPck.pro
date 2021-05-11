@@ -1,5 +1,7 @@
 TARGET = ImtQmlPck
 
+QT += qml quick quickwidgets
+
 include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
@@ -28,3 +30,8 @@ ACFDIRBUILD = $$(ACFDIR_BUILD)
 include($(ACFCONFIGDIR)/QMake/AcfQt.pri)
 include($(ACFCONFIGDIR)/QMake/AcfStd.pri)
 
+# Set OS-specific build options:
+win32-msvc*{
+    # copying all Qt DLLs to destination directory
+	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = $(QTDIR)\bin\windeployqt $$DESTDIR\ImtQmlPck.arp
+}
