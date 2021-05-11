@@ -35,9 +35,11 @@ void CProductLicensingInfoGuiComp::OnItemChanged(const QByteArray& itemId, IItem
 		if (params.count() > 0 && params[0].type() == QVariant::Bool){
 			bool isActivated = params[0].toBool();
 
-			if (isActivated && !m_selectedFeatureIds.contains(itemId)){
-				m_selectedFeatureIds.append(itemId);
-				EnumerateDependencies(m_selectedFeatureIds);
+			int featureIndex = FindFeatureById(itemId, m_selectedFeatures);
+			if (isActivated && (featureIndex < 0)){
+				m_selectedFeatures.append(GetFeatureInfo(itemId));
+
+				EnumerateDependencies(GetSelectedFeatureIds());
 
 				DoUpdateModel();
 
@@ -46,9 +48,8 @@ void CProductLicensingInfoGuiComp::OnItemChanged(const QByteArray& itemId, IItem
 				}
 			}
 
-			if (!isActivated && m_selectedFeatureIds.contains(itemId)){
-				m_selectedFeatureIds.removeOne(itemId);
-//				EnumerateDependencies(m_selectedFeatureIds);
+			if (!isActivated && (featureIndex >= 0)){
+				m_selectedFeatures.removeAt(featureIndex);
 
 				DoUpdateModel();
 
@@ -104,11 +105,12 @@ void CProductLicensingInfoGuiComp::UpdateItemTree()
 					featureItemPtr->SetName(featureName);
 					featureItemPtr->SetActivationEnabled(true);
 
-					if (m_selectedFeatureIds.contains(featureId)){
+					int featureIndex = FindFeatureById(featureId, m_selectedFeatures);
+					if (featureIndex >= 0){
 						featureItemPtr->SetActivated(true);
 
-						for (const QByteArray& selectedFeatureId : m_selectedFeatureIds){
-							if (imtlic::CFeaturePackageCollectionUtility::HasDependency(dependencyMap, selectedFeatureId, featureId)){
+						for (const imtlic::ILicenseInfo::FeatureInfo& selectedFeature : m_selectedFeatures){
+							if (imtlic::CFeaturePackageCollectionUtility::HasDependency(dependencyMap, selectedFeature.id, featureId)){
 								featureItemPtr->SetEnabled(false);
 							}
 						}
@@ -146,15 +148,15 @@ void CProductLicensingInfoGuiComp::UpdateItemTree()
 				}
 
 				if (licensePtr != nullptr){
-					QByteArrayList featureIds = licensePtr->GetFeatures();
-					for (const QByteArray& featureId : featureIds){
-						if (!packageCollectionFeatureIds.contains(featureId)){
+					imtlic::ILicenseInfo::FeatureInfos features = licensePtr->GetFeatureInfos();
+					for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : features){
+						if (!packageCollectionFeatureIds.contains(featureInfo.id)){
 							CItem* missingItemObjectPtr = new CItem();
 							missingItemObjectPtr->SetItemChangeHandler(this);
 
 							ItemTreePtr missingItemPtr(missingItemObjectPtr);
-							missingItemPtr->SetId(featureId);
-							missingItemPtr->SetName(tr("ID: %1").arg(QString(featureId)));
+							missingItemPtr->SetId(featureInfo.id);
+							missingItemPtr->SetName(tr("ID: %1").arg(QString(featureInfo.id)));
 							missingItemPtr->SetActivationEnabled(true);
 							missingItemPtr->SetActivated(true);
 							missingItemsGroupPtr->AddChild(missingItemPtr);
@@ -182,7 +184,7 @@ void CProductLicensingInfoGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 
 	const imtlic::ILicenseInfo* licenseInfoPtr = productLicensingInfoPtr->GetLicenseInfo(m_selectedLicenseId);
 	if (licenseInfoPtr != nullptr){
-		m_selectedFeatureIds = licenseInfoPtr->GetFeatures();
+		m_selectedFeatures = licenseInfoPtr->GetFeatureInfos();
 	}
 
 	UpdateItemTree();
@@ -220,13 +222,12 @@ void CProductLicensingInfoGuiComp::UpdateModel() const
 	imtlic::IProductLicensingInfo* productLicensingInfoPtr = GetObservedObject();
 	Q_ASSERT(productLicensingInfoPtr != nullptr);
 
-		imtbase::ICollectionInfo::Ids licenseCollectionIds = productLicensingInfoPtr->GetLicenseList().GetElementIds();
+	imtbase::ICollectionInfo::Ids licenseCollectionIds = productLicensingInfoPtr->GetLicenseList().GetElementIds();
 	for (const QByteArray& licenseCollectionId : licenseCollectionIds){
-		imtlic::ILicenseInfo* licensePtr = const_cast<imtlic::ILicenseInfo*>
-					(productLicensingInfoPtr->GetLicenseInfo(licenseCollectionId));
-
+		imtlic::ILicenseInfo* licensePtr = const_cast<imtlic::ILicenseInfo*>(productLicensingInfoPtr->GetLicenseInfo(licenseCollectionId));
 		if (licensePtr != nullptr && licensePtr->GetLicenseId() == m_selectedLicenseId){
-			licensePtr->SetFeatures(m_selectedFeatureIds);
+			licensePtr->SetFeatureInfos(m_selectedFeatures);
+
 			break;
 		}
 	}
@@ -274,7 +275,7 @@ void CProductLicensingInfoGuiComp::OnLicenseSelectionChanged(
 			const imtbase::IMultiSelection* selectionPtr)
 {
 	m_selectedLicenseId.clear();
-	m_selectedFeatureIds.clear();
+	m_selectedFeatures.clear();
 
 	imtbase::IMultiSelection::Ids licenseIds = selectionPtr->GetSelectedIds();
 
@@ -284,7 +285,7 @@ void CProductLicensingInfoGuiComp::OnLicenseSelectionChanged(
 			const imtlic::ILicenseInfo* licensePtr = productLicensingInfo->GetLicenseInfo(licenseIds.first());
 			if (licensePtr != nullptr){
 				m_selectedLicenseId = licensePtr->GetLicenseId();
-				m_selectedFeatureIds = licensePtr->GetFeatures();
+				m_selectedFeatures = licensePtr->GetFeatureInfos();
 			}
 		}
 	}
@@ -297,18 +298,17 @@ void CProductLicensingInfoGuiComp::EnumerateDependencies(const QByteArrayList& f
 {
 	QByteArrayList nextIdsForEnumeration;
 
-	const QMap<QByteArray, QByteArrayList> dependencyMap =
-				imtlic::CFeaturePackageCollectionUtility::GetDependencies(*GetObjectCollection());
-
-	//QByteArrayList allFeatureIds = imtlic::CFeaturePackageCollectionUtility::GetAllFeatureIds(*GetObjectCollection());
+	const QMap<QByteArray, QByteArrayList> dependencyMap = imtlic::CFeaturePackageCollectionUtility::GetDependencies(*GetObjectCollection());
 
 	for (const QByteArray& featureId : featureIds){
 		if (dependencyMap.contains(featureId)){
 			QByteArrayList dependencies = dependencyMap.value(featureId);
 
 			for (const QByteArray& dependency : dependencies){
-				if (!m_selectedFeatureIds.contains(dependency)){
-					m_selectedFeatureIds.append(dependency);
+				int index = FindFeatureById(dependency, m_selectedFeatures);
+				if (index < 0){
+					m_selectedFeatures.append(GetFeatureInfo(dependency));
+
 					nextIdsForEnumeration.append(dependency);
 				}
 			}
@@ -318,6 +318,46 @@ void CProductLicensingInfoGuiComp::EnumerateDependencies(const QByteArrayList& f
 	if (!nextIdsForEnumeration.isEmpty()){
 		EnumerateDependencies(nextIdsForEnumeration);
 	}
+}
+
+
+int CProductLicensingInfoGuiComp::FindFeatureById(const QByteArray& featureId, const imtlic::ILicenseInfo::FeatureInfos& featureContainer) const
+{
+	for (int i = 0; i < featureContainer.count(); ++i){
+		if (featureContainer[i].id == featureId){
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+
+imtlic::ILicenseInfo::FeatureInfo CProductLicensingInfoGuiComp::GetFeatureInfo(const QByteArray& featureId) const
+{
+	QString featureName;
+	const imtlic::IFeatureInfo* featurePtr = imtlic::CFeaturePackageCollectionUtility::GetFeaturePtr(*GetObjectCollection(), featureId);
+	if (featurePtr != nullptr){
+		featureName = featurePtr->GetFeatureName();
+	}
+
+	imtlic::ILicenseInfo::FeatureInfo featureInfo;
+	featureInfo.id = featureId;
+	featureInfo.name = featureName;
+
+	return featureInfo;
+}
+
+
+QByteArrayList CProductLicensingInfoGuiComp::GetSelectedFeatureIds() const
+{
+	QByteArrayList retVal;
+
+	for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : m_selectedFeatures){
+		retVal.push_back(featureInfo.id);
+	}
+
+	return retVal;
 }
 
 

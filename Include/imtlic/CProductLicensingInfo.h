@@ -14,7 +14,7 @@ namespace imtlic
 	Common implementation of IProductLicensingInfo interface.
 	\ingroup LicenseManagement
 */
-class CProductLicensingInfo: 
+class CProductLicensingInfo:
 			virtual public imtlic::IProductLicensingInfo,
 			public CLicenseInfoManager
 {

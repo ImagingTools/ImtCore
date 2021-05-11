@@ -68,8 +68,10 @@ private:
 	void OnLicenseSelectionChanged(
 				const istd::IChangeable::ChangeSet& /*changeSet*/,
 				const imtbase::IMultiSelection* selectionPtr);
-
 	void EnumerateDependencies(const QByteArrayList& featureIds);
+	int FindFeatureById(const QByteArray& featureId, const imtlic::ILicenseInfo::FeatureInfos& featureContainer) const;
+	imtlic::ILicenseInfo::FeatureInfo GetFeatureInfo(const QByteArray& featureId) const;
+	QByteArrayList GetSelectedFeatureIds() const;
 
 private Q_SLOTS:
 	void OnItemChangedHandler();
@@ -85,7 +87,7 @@ private:
 	imtbase::TModelUpdateBinder<imtbase::IMultiSelection, CProductLicensingInfoGuiComp> m_licenseSelectionObserver;
 
 	QByteArray m_selectedLicenseId;
-	QByteArrayList m_selectedFeatureIds;
+	imtlic::ILicenseInfo::FeatureInfos m_selectedFeatures;
 	QByteArrayList m_missingFeatureIds;
 	QByteArray m_missingItemsGroupId;
 };

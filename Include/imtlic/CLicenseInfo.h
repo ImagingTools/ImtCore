@@ -28,8 +28,8 @@ public:
 	void SetLicenseName(const QString& licenseName) override;
 	virtual QByteArray GetLicenseId() const override;
 	void SetLicenseId(const QByteArray& licenseId) override;
-	virtual FeatureIds GetFeatures() const override;
-	virtual void SetFeatures(const FeatureIds& featureIds) override;
+	virtual FeatureInfos GetFeatureInfos() const override;
+	virtual void SetFeatureInfos(const FeatureInfos& featureInfos) override;
 
 	// reimplemented (iser::IObject)
 	virtual QByteArray GetFactoryId() const override;
@@ -44,10 +44,10 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	imtbase::IObjectCollection* m_featurePackageCollectionPtr;
+	const imtbase::IObjectCollection* m_featurePackageCollectionPtr;
 	QString m_licenseName;
 	QByteArray m_licenseId;
-	FeatureIds m_featureIds;
+	FeatureInfos m_featureInfos;
 };
 
 

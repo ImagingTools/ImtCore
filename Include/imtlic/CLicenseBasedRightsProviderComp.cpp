@@ -31,9 +31,9 @@ bool CLicenseBasedRightsProviderComp::HasRight(
 		for (const QByteArray& licenseId : licenseIds){
 			const ILicenseInstance* licenseInstancePtr = m_licenseInfoProviderCompPtr->GetLicenseInstance(licenseId);
 			if (licenseInstancePtr != nullptr){
-				QByteArrayList featureIds = licenseInstancePtr->GetFeatures();
-				for (const QByteArray& featureId : featureIds){
-					if (featureId == operationId){
+				ILicenseInfo::FeatureInfos features = licenseInstancePtr->GetFeatureInfos();
+				for (const ILicenseInfo::FeatureInfo& featureInfo : features){
+					if (featureInfo.id == operationId){
 						bool isExpired = (licenseInstancePtr->GetExpiration() >= QDateTime::currentDateTime());
 
 						return !isExpired;

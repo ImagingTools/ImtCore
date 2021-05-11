@@ -27,7 +27,23 @@ namespace imtlic
 class ILicenseInfo: virtual public iser::IObject
 {
 public:
-	typedef QByteArrayList FeatureIds;
+	struct FeatureInfo
+	{
+		QByteArray id;
+		QString name;
+
+		bool operator==(const FeatureInfo& other) const
+		{
+			return (id == other.id) && (name == other.name);
+		}
+	
+		bool operator!=(const FeatureInfo& other) const
+		{
+			return !operator==(other);
+		}
+	};
+
+	typedef QVector<FeatureInfo> FeatureInfos;
 
 	/**
 		Get list of all available features for this license.
@@ -58,12 +74,12 @@ public:
 	/**
 		Get the list of feature-IDs supported by this license.
 	*/
-	virtual FeatureIds GetFeatures() const = 0;
+	virtual FeatureInfos GetFeatureInfos() const = 0;
 
 	/**
 		Set the list of feature-IDs supported by this license.
 	*/
-	virtual void SetFeatures(const FeatureIds& featureIds) = 0;
+	virtual void SetFeatureInfos(const FeatureInfos& featureInfos) = 0;
 };
 
 

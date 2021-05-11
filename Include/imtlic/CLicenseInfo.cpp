@@ -8,6 +8,11 @@
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 
+// ImtCore includes
+#include <imtcore/Version.h>
+#include <imtlic/IFeatureInfoProvider.h>
+#include <imtlic/IFeatureInfo.h>
+
 
 namespace imtlic
 {
@@ -67,18 +72,18 @@ void CLicenseInfo::SetLicenseId(const QByteArray& licenseId)
 }
 
 
-ILicenseInfo::FeatureIds CLicenseInfo::GetFeatures() const
+CLicenseInfo::FeatureInfos CLicenseInfo::GetFeatureInfos() const
 {
-	return m_featureIds;
+	return m_featureInfos;
 }
 
 
-void CLicenseInfo::SetFeatures(const FeatureIds& featureIds)
+void CLicenseInfo::SetFeatureInfos(const FeatureInfos& featureInfos)
 {
-	if (m_featureIds != featureIds){
+	if (m_featureInfos != featureInfos){
 		istd::CChangeNotifier notifier(this);
 
-		m_featureIds = featureIds;
+		m_featureInfos = featureInfos;
 	}
 }
 
@@ -107,7 +112,57 @@ bool CLicenseInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_licenseId);
 	retVal = retVal && archive.EndTag(licenseIdTag);
 
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_featureIds, "Features", "Feature");
+	if (!archive.IsStoring()){
+		m_featureInfos.clear();
+	}
+
+	quint32 imtCoreVersion;
+	bool imtCoreVersionExists = archive.GetVersionInfo().GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion);
+
+	bool oldVersion = (imtCoreVersionExists && imtCoreVersion < 3248);
+
+	if (!archive.IsStoring() && oldVersion){
+		QByteArrayList featureIds;
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, featureIds, "Features", "Feature");
+
+		if (retVal){
+			for (const QByteArray& featureId: featureIds){
+				FeatureInfo featureInfo;
+				featureInfo.id = featureId;
+
+				m_featureInfos.push_back(featureInfo);
+			}
+		}
+	}
+	else{
+		static iser::CArchiveTag featuresTag("Features", "List of license features", iser::CArchiveTag::TT_MULTIPLE);
+		static iser::CArchiveTag featureInfoTag("Feature", "Feature information", iser::CArchiveTag::TT_GROUP);
+
+		int featuresCount = m_featureInfos.count();
+		retVal = retVal && archive.BeginMultiTag(featuresTag, featureInfoTag, featuresCount);
+
+		if (retVal && !archive.IsStoring()){
+			m_featureInfos.resize(featuresCount);
+		}
+
+		for (int i = 0; i < featuresCount; ++i){
+			retVal = retVal && archive.BeginTag(featureInfoTag);
+
+			static iser::CArchiveTag featureIdTag("ID", "Feature ID", iser::CArchiveTag::TT_LEAF, &featureInfoTag);
+			retVal = retVal && archive.BeginTag(featureIdTag);
+			retVal = retVal && archive.Process(m_featureInfos[i].id);
+			retVal = retVal && archive.EndTag(featureIdTag);
+
+			static iser::CArchiveTag featureNameTag("Name", "Feature name", iser::CArchiveTag::TT_LEAF, &featureInfoTag);
+			retVal = retVal && archive.BeginTag(featureNameTag);
+			retVal = retVal && archive.Process(m_featureInfos[i].name);
+			retVal = retVal && archive.EndTag(featureNameTag);
+
+			retVal = retVal && archive.EndTag(featureInfoTag);
+		}
+
+		retVal = retVal && archive.EndTag(featuresTag);
+	}
 
 	return retVal;
 }
@@ -129,7 +184,7 @@ bool CLicenseInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 
 		m_licenseName = sourcePtr->GetLicenseName();
 		m_licenseId = sourcePtr->GetLicenseId();
-		m_featureIds = sourcePtr->GetFeatures();
+		m_featureInfos = sourcePtr->GetFeatureInfos();
 
 		return true;
 	}
@@ -155,7 +210,7 @@ bool CLicenseInfo::ResetData(CompatibilityMode /*mode*/)
 
 	m_licenseName.clear();
 	m_licenseId.clear();
-	m_featureIds.clear();
+	m_featureInfos.clear();
 
 	return true;
 }

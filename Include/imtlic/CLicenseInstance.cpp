@@ -79,8 +79,8 @@ bool CLicenseInstance::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 		}
 	}
 	else{
-		const imtlic::ILicenseInfo* sourcePtr = dynamic_cast<const imtlic::ILicenseInfo*>(&object);
-		if (sourcePtr != nullptr){
+		const imtlic::ILicenseInfo* interfacePtr = dynamic_cast<const imtlic::ILicenseInfo*>(&object);
+		if (interfacePtr != nullptr){
 			istd::CChangeNotifier changeNotifier(this);
 
 			if (BaseClass::CopyFrom(object)){
