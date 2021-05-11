@@ -118,12 +118,12 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 	{
 		reponseTypeId = "application/json";
 		body = QByteArray(R"({"firstName":"Ivan","lastName":"Ivanov","nickName":"NicIvan","adresses":[{"country":"Russia","city":"Moscow","postalCode":644099,"street":"Lenina 10"},{"country":"Germany","city":"Munic","postalCode":123456,"street":"Street St"}]})");
-	}
-	else if(modelName == "__CREATE_COLORS_IN_CTREE__")
+	}	else if(modelName == "__CREATE_COLORS_IN_CTREE__")
 	{
 		using namespace imtbase;
 		imtbase::CTreeItemModel treeItemModel;
 		treeItemModel.AddTreeModel("data");
+
 		auto header = treeItemModel.GetTreeItemModel("data");
 
 		int sizeParam = request.GetCommandParams().value("size").toInt();

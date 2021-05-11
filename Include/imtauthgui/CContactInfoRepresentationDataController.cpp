@@ -38,7 +38,7 @@ void CContactInfoRepresentationDataController::UpdateRepresentationFromBaseModel
 	Q_ASSERT(treeItemModel != nullptr);
 	Q_ASSERT(contactPtr != nullptr);
 
-	istd::IChangeable::InfoMap infoMap = changeSet.GetInfoMap();
+	istd::IChangeable::ChangeInfoMap infoMap = changeSet.GetChangeInfoMap();
 	if (infoMap.isEmpty()){
 		this->FullUpdateRepresentationModel(contactPtr, treeItemModel);
 	}
@@ -46,12 +46,10 @@ void CContactInfoRepresentationDataController::UpdateRepresentationFromBaseModel
 		if (infoMap.contains("key0") && infoMap.value("key0") == "addresses"){
 			treeItemModel = treeItemModel->GetTreeItemModel("addresses",infoMap.value("index0",0).toInt());
 		}
-		istd::IChangeable::InfoMap infoUpdate;
+		istd::IChangeable::ChangeInfoMap infoUpdate;
 		infoUpdate.insert("fromModel",true);
 		treeItemModel->SetData(infoMap.value("key").toByteArray(),infoMap.value("value"), infoMap.value("index").toInt(), infoUpdate);
 	}
-
-
 }
 
 
@@ -60,7 +58,7 @@ void CContactInfoRepresentationDataController::UpdateBaseModelFromRepresentation
 		istd::IChangeable *representationModel,
 		const istd::IChangeable::ChangeSet &changeSet)
 {
-	istd::IChangeable::InfoMap infoMap = changeSet.GetInfoMap();
+	istd::IChangeable::ChangeInfoMap infoMap = changeSet.GetChangeInfoMap();
 	if (infoMap.contains("fromModel")){
 		return;
 	}

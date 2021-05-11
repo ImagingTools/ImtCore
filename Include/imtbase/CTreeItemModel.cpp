@@ -64,8 +64,8 @@ CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int index)
 	}
 
 	Item *item = m_items[index];
-	CTreeItemModel *retVal = new CTreeItemModel(this);
-//	this->AttachObserver(&retVal->m_parentUpdateBridge);
+	CTreeItemModel* retVal = new CTreeItemModel(this);
+
 	int level = 0;
 	CTreeItemModel* parentModel = this;
 	while (parentModel != nullptr){
@@ -74,11 +74,7 @@ CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int index)
 			level++;
 		}
 	}
-	istd::IChangeable::InfoMap infoMap;
-	infoMap.insert("index" + QByteArray::number(level),index);
-	infoMap.insert("key" + QByteArray::number(level),key);
-	retVal->m_parentUpdateBridge.SetInfoMap(infoMap);
-//	retVal->AttachObserver(&m_parentUpdateBridge);
+
 	QVariant v = QVariant::fromValue(retVal);
 
 	item->SetValue(key, v);
@@ -87,7 +83,7 @@ CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int index)
 }
 
 
-bool CTreeItemModel::SetData(const QByteArray &key, const QVariant &value, int index, istd::IChangeable::InfoMap infoMap)
+bool CTreeItemModel::SetData(const QByteArray &key, const QVariant &value, int index, const istd::IChangeable::ChangeInfoMap& infoMap)
 {
 	if (m_items.isEmpty() && index == 0){
 		InsertNewItem();
@@ -104,22 +100,18 @@ bool CTreeItemModel::SetData(const QByteArray &key, const QVariant &value, int i
 
 	Item* item = m_items[index];
 
-	IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
-	changeSet += infoMap;
-	changeSet.SetInfo("curVal", item->Value(key));
-	changeSet.SetInfo("newVal", value);
-	changeSet.SetInfo("key", key);
-	changeSet.SetInfo("index", index);
+	IChangeable::ChangeSet changeSet;
+	changeSet.SetChangeInfo("curVal", item->Value(key));
+	changeSet.SetChangeInfo("newVal", value);
+	changeSet.SetChangeInfo("key", key);
+	changeSet.SetChangeInfo("index", index);
 
 	CTreeItemModel* parentModel = dynamic_cast<CTreeItemModel*>(parent());
-//	if (parentModel != nullptr){
-//		parentModel->subModelChanged(this, changeSet);
-//	}
-//	else{
-//		istd::CChangeNotifier changeNotifier(this, &changeSet);
-//	}
+
 	BeginChanges(changeSet);
+
 	item->SetValue(key, value);
+
 	EndChanges(changeSet);
 
 	return true;
@@ -304,11 +296,11 @@ void CTreeItemModel::subModelChanged(const CTreeItemModel *model, ChangeSet &cha
 		item->GetKeys(keys);
 		for (int j = 0; j < keys.count(); j++){
 			if (item->Value(keys[j]).value<CTreeItemModel*>() == model){
-				int level = changeSet.GetInfo("level").toInt();
+				int level = changeSet.GetChangeInfo("level").toInt();
 				level++;
-				changeSet.SetInfo("level", level);
-				changeSet.SetInfo("key" + QByteArray::number(level), keys[j]);
-				changeSet.SetInfo("index" + QByteArray::number(level), i);
+				changeSet.SetChangeInfo("level", level);
+				changeSet.SetChangeInfo("key" + QByteArray::number(level), keys[j]);
+				changeSet.SetChangeInfo("index" + QByteArray::number(level), i);
 			}
 		}
 	}
@@ -319,13 +311,14 @@ void CTreeItemModel::subModelChanged(const CTreeItemModel *model, ChangeSet &cha
 	else{
 		istd::CChangeNotifier changeNotifier(this, &changeSet);
 	}
-
 }
+
 
 void CTreeItemModel::OnBeginGlobalChanges()
 {
 	this->OnBeginChanges();
 }
+
 
 void CTreeItemModel::OnEndGlobalChanges(const ChangeSet &changeSet)
 {
@@ -333,6 +326,6 @@ void CTreeItemModel::OnEndGlobalChanges(const ChangeSet &changeSet)
 }
 
 
-} // namespace imtauthgui
+} // namespace imtbase
 
 

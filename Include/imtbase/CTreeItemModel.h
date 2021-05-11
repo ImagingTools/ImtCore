@@ -36,7 +36,7 @@ public:
 public Q_SLOTS:
 	int InsertNewItem();
 	CTreeItemModel* AddTreeModel(const QByteArray &key, int index = 0);
-	bool SetData(const QByteArray &key, const QVariant &value, int index = 0, InfoMap infoMap = InfoMap());
+	bool SetData(const QByteArray &key, const QVariant &value, int index = 0, const ChangeInfoMap& infoMap = ChangeInfoMap());
 	QVariant GetData(const QByteArray &key, int index = 0) const;
 	bool IsTreeModel(const QByteArray &key, int index = 0) const;
 	CTreeItemModel* GetTreeItemModel(const QByteArray &key, int index = 0) const;
@@ -104,5 +104,5 @@ private:
 };
 
 
-} // namespace imtauthgui
+} // namespace imtbase
 
