@@ -13,8 +13,8 @@ void CContactInfoEditorQmlComp::OnItemCreated()
 {
 	Q_ASSERT(m_quickItemPtr != nullptr);
 
-	if (m_dataControllerCompPtr.IsValid()){
-		imtbase::CTreeItemModel* itemModelPtr = m_dataControllerCompPtr->GetTreeItemModel("");
+	if (m_dataProviderCompPtr.IsValid()){
+		imtbase::CTreeItemModel *itemModelPtr = m_dataProviderCompPtr->GetTreeItemModel("");
 
 		m_quickItemPtr->setProperty("contactInfoModel", QVariant::fromValue(itemModelPtr));
 	}

@@ -3,48 +3,55 @@ import QtQuick 2.0
 //import "../qml"
 
 Rectangle {
+    id: container
 //    anchors.fill: parent
     width: parent.width //200
     height: 100
     color: "transparent"
 //    property TreeItemModel contactInfoModel
     property var contactInfoModel
+    function updateData() {
+        tfName.text = contactInfoModel.GetData("firstName")
+        tfLastName.text = contactInfoModel.GetData("lastName")
+        tfNicName.text = contactInfoModel.GetData("nickName")
+        console.log("tfName.text ", tfName.text)
+
+    }
+
+    onContactInfoModelChanged: {
+        container.updateData()
+    }
 
     Connections {
         target: contactInfoModel
         onStateChanged: {
-           // if(contactInfoModel.state === "Ready"){
-                tfName.text = contactInfoModel.getData("firstName")
-                tfLastName.text = contactInfoModel.getData("lastName")
-                tfNicName.text = contactInfoModel.getData("nickName")
-            console.log("tfName.text ", tfName.text)
-            //}
+            if(contactInfoModel.state === "Ready"){
+                container.updateData()
+            }
         }
     }
 
-//    required contactInfoModel
 
     Column {
         width: parent.width
-//        spacing: 10
 
         TextFieldCustom {
     	    id: tfName
             width: parent.width
             placeHolderText: qsTr("first name")
-//            text: contactInfoModel.getData("firstName")
+            onAccepted: {
+                contactInfoModel.SetData("firstName", tfName.text)
+            }
         }
         TextFieldCustom {
             id: tfLastName
             width: parent.width
             placeHolderText: qsTr("last name")
-//            text: contactInfoModel.getData("secondName")
         }
        TextFieldCustom {
            id: tfNicName
             width: parent.width
             placeHolderText: qsTr("nic name")
-//            text: contactInfoModel.getData("nickName")
         }
     }
 }

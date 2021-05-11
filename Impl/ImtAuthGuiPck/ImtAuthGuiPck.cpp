@@ -54,6 +54,15 @@ I_EXPORT_COMPONENT(
 			"Contact InfoEditor DataController",
 			"Contact InfoEditor DataController");
 
+I_EXPORT_COMPONENT(
+			CContactInfoRepresentationDataProvider,
+			"Contact Info Representation DataProvider",
+			"Contact Info Representation DataProvider");
+
+I_EXPORT_COMPONENT(
+			CContactInfoRepresentationDataController,
+			"Contact Info Representation DataController",
+			"Contact Info Representation DataController");
 
 } // namespace ImtAuthGuiPck
 

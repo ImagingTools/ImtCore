@@ -26,7 +26,6 @@ namespace imtrest
 
 CJsonModelBasedHandlerComp::CJsonModelBasedHandlerComp()
 {
-	m_treeItemModel = new imtbase::CTreeItemModel();
 }
 
 
@@ -55,7 +54,7 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 	{
 		commandIdBase.chop(1);
 	}
-	QString modelName = commandId.replace(commandIdBase, "");
+	QByteArray modelName = commandId.replace(commandIdBase, "");
 	if(modelName.endsWith('/')){
 		modelName.chop(1);
 	}
@@ -122,7 +121,11 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 	}
 	else if(modelName == "__CREATE_COLORS_IN_CTREE__")
 	{
-		using namespace imtauthgui;
+		using namespace imtbase;
+		imtbase::CTreeItemModel treeItemModel;
+		treeItemModel.AddTreeModel("data");
+		auto header = treeItemModel.GetTreeItemModel("data");
+
 		int sizeParam = request.GetCommandParams().value("size").toInt();
 		if(sizeParam <= 0)
 		{
@@ -134,41 +137,43 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 		};
 		for(int i = 0; i < sizeParam ; ++i)
 		{
-			QByteArray newModelName = QByteArray("data ") + QByteArray::number(i);
-			m_treeItemModel->AddTreeModel(newModelName);
-			auto treeModelPtr = m_treeItemModel->GetTreeItemModel(newModelName);
+			QByteArray modelName = QByteArray("data ") + QByteArray::number(i);
+			int index = header->InsertNewItem();
+			header->AddTreeModel(modelName, index);
+			auto treeModelPtr = header->GetTreeItemModel(modelName,index);
 			for(int j = 0; j < sizeParam; ++j)
 			{
 				quint32 r = generateRandomNumber(1,254);
 				quint32 g = generateRandomNumber(2,253);
 				quint32 b = generateRandomNumber(3,252);
-				treeModelPtr->SetData(QByteArray("color ") + QByteArray::number(j), QColor::fromRgb(r,g,b).name(QColor::HexRgb),j);
+				int index = treeModelPtr->InsertNewItem();
+				treeModelPtr->SetData(QByteArray("Color ") + QByteArray::number(j), QColor::fromRgb(r,g,b).name(QColor::HexRgb), index);
 			}
 		}
 
 		reponseTypeId = "application/json";
 
 		{
-			QByteArray jsonData;
-			iser::CJsonStringWriteArchive archive(jsonData);
-			m_treeItemModel->Serialize(archive);
-			body = jsonData;
+//			QByteArray jsonData;
+			iser::CJsonStringWriteArchive archive(body);
+			treeItemModel.Serialize(archive);
+//			body = jsonData;
 		}
 	}
-	else if(m_jsonModelProcessor.IsValid())
+	else if(m_representationDataProvider.IsValid())
 	{
-		return generateErrorResponsePtr("FAIL", IProtocolEngine::SC_UNKNOWN_ERROR);
-//		std::pair<QByteArray, QByteArray> modelResult;
-//		modelResult = m_jsonModelProcessor->GetData("main.qml");
-//		reponseTypeId = modelResult.first;
-//		body = modelResult.second;
-//		reponseTypeId = "application/json";
+		reponseTypeId = "application/json";
+		if (m_representationDataProvider->GetRepresentationData(
+					imtrest::IRepresentationDataProvider::RF_JSON,
+					body,modelName) == false){
+			return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_NOT_IMPLEMENTED, "FAIL(", "plain/text; charset=utf-8"));
+		}
 
 	}
 	else
 	{
 //		return generateErrorResponsePtr(QByteArray("Cannot init ModelProcessor OffLine OR Not created OR not setted"), IProtocolEngine::SC_UNKNOWN_ERROR);
-		return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_UNKNOWN_ERROR, "FAIL(", "plain/text; charset=utf-8"));
+		return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_NOT_IMPLEMENTED, "FAIL(", "plain/text; charset=utf-8"));
 	}
 
 	ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_I_AM_A_TEAPOT, body, reponseTypeId));

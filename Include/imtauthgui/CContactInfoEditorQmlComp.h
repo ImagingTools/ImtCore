@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtauth/IContactInfo.h>
-#include <imtauthgui/IDataController.h>
+#include <imtbase/IItemBasedRepresentationDataProvider.h>
 #include <imtqml/CQuickObjectCompBase.h>
 
 
@@ -21,7 +21,7 @@ public:
 	typedef imtqml::CQuickObjectCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CContactInfoEditorQmlComp);
-		I_ASSIGN(m_dataControllerCompPtr, "DataControllerCompPtr", "reference to DataController", true, "DataController");
+		I_ASSIGN(m_dataProviderCompPtr, "DataControllerCompPtr", "reference to DataController", true, "DataController");
 	I_END_COMPONENT;
 
 protected:
@@ -29,7 +29,7 @@ protected:
 	virtual void OnItemCreated() override;
 
 private:
-	I_REF(imtauthgui::IDataController, m_dataControllerCompPtr);
+	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_dataProviderCompPtr);
 };
 
 

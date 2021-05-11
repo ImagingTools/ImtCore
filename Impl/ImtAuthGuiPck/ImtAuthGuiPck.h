@@ -9,6 +9,8 @@
 #include <imtauthgui/CContactInfoEditorComp.h>
 #include <imtauthgui/CContactInfoEditorQmlComp.h>
 #include <imtauthgui/CContactInfoEditorDataControllerComp.h>
+#include <imtauthgui/CContactInfoRepresentationDataProviderComp.h>
+#include <imtauthgui/CContactInfoRepresentationDataController.h>
 #include <imtauthgui/CAddressEditorComp.h>
 #include <imtauthgui/CAccountInfoEditorComp.h>
 #include <imtauthgui/CContactInfoViewDelegateComp.h>
@@ -26,8 +28,11 @@ typedef imtauthgui::CAccountInfoEditorComp AccountInfoEditor;
 typedef imtauthgui::CContactInfoViewDelegateComp ContactInfoViewDelegate;
 typedef imtauthgui::CAccountInfoViewDelegateComp AccountInfoViewDelegate;
 typedef icomp::TModelCompWrap<imtauthgui::CDesignManagerComp> DesignManager;
-typedef icomp::TMakeComponentWrap<imtauthgui::CContactInfoEditorDataController,
-	imtauthgui::IDataController, imod::IObserver> ContactInfoEditorDataController;
+typedef imtauthgui::CContactInfoEditorDataControllerComp ContactInfoEditorDataController;
+typedef imtauthgui::CContactInfoRepresentationDataProviderComp CContactInfoRepresentationDataProvider;
+typedef icomp::TMakeComponentWrap<
+							imtauthgui::CContactInfoRepresentationDataController,
+							imtbase::IItemBasedRepresentationDataController> CContactInfoRepresentationDataController;
 
 
 } // namespace ImtAuthGuiPck

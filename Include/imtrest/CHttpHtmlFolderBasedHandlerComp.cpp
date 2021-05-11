@@ -67,8 +67,7 @@ QByteArray CHttpHtmlFolderBasedHandlerComp::Generate(const QString& directoryPat
 			dirFilters |= _dfs::NoDotDot;
 		}
 		QFileInfoList diryEnties = dir.entryInfoList(dirFilters, QDir::SortFlag::Type | QDir::SortFlag::Name);
-		for (const auto& entry: ::qAsConst(diryEnties))
-		{
+		for (const auto& entry: ::qAsConst(diryEnties)){
 			retval.append(this->GenerateSingleEntry(entry, commandId)).append('\n');
 		}
 		retval.append(this->m_endOfMessage);
@@ -83,34 +82,28 @@ QByteArray CHttpHtmlFolderBasedHandlerComp::GenerateSingleEntry(const QFileInfo&
 	retval.append(fileInfo.birthTime().toString(Qt::ISODate));
 	retval.append('\t');
 
-	if(fileInfo.isDir())
-	{
+	if (fileInfo.isDir()){
 		retval.append(QObject::tr("Directory"));
 	}
-	else
-	{
+	else{
 		QByteArray sizeValue;
 		qint64 fileSize = fileInfo.size();
-		if(fileSize >1073741824)
-		{
+		if (fileSize >1073741824){
 			sizeValue = QByteArray::number(fileSize / 1073741824.00, 'f', 2);
 			sizeValue.append(' ');
 			sizeValue.append(QObject::tr("GB"));
 		}
-		else if(fileSize > 1048576)
-		{
+		else if (fileSize > 1048576){
 			sizeValue = QByteArray::number(fileSize / 1048576.00, 'f', 2);
 			sizeValue.append(' ');
 			sizeValue.append(QObject::tr("MB"));
 		}
-		else if(fileSize > 1024)
-		{
+		else if (fileSize > 1024){
 			sizeValue = QByteArray::number(fileSize / 1024.00, 'f', 2);
 			sizeValue.append(' ');
 			sizeValue.append(QObject::tr("KB"));
 		}
-		else
-		{
+		else{
 			sizeValue = QByteArray::number(fileSize);
 			sizeValue.append(' ');
 			sizeValue.append(QObject::tr("B"));
@@ -121,14 +114,12 @@ QByteArray CHttpHtmlFolderBasedHandlerComp::GenerateSingleEntry(const QFileInfo&
 		retval.append(']');
 	}
 	QString rootLinkPath = *this->m_commandIdAttrPtr;
-	if(rootLinkPath.endsWith('*'))
-	{
+	if (rootLinkPath.endsWith('*')){
 		rootLinkPath.chop(1);
 	}
 
 	QString fileName = fileInfo.fileName();
-	if(fileName == "..")
-	{
+	if (fileName == ".."){
 		fileName = '[';
 		fileName.append(QObject::tr("Parent direcotry"));
 		fileName.append(']');
@@ -150,8 +141,7 @@ QByteArray CHttpHtmlFolderBasedHandlerComp::GetMimeType(const QFileInfo& fileInf
 {
 	QByteArray retval = "application/octet-stream";
 	QByteArray fileSuffix = fileInfo.suffix().toUtf8();	
-	if(fileSuffix.startsWith('.'))
-	{
+	if (fileSuffix.startsWith('.')){
 		fileSuffix = fileSuffix.remove(0,1);
 	}
 	auto setMimeTypeByExtention = [&retval, &fileSuffix](const QByteArray& mimeType, const std::initializer_list<QByteArray>& fileExtentions){
@@ -232,35 +222,28 @@ IRequestHandler::ConstResponsePtr CHttpHtmlFolderBasedHandlerComp::ProcessReques
 	QByteArray body;
 	QByteArray commandId = request.GetCommandId();
 	QByteArray commandIdBase = *this->m_commandIdAttrPtr;
-	if(commandIdBase.endsWith('*'))
-	{
+	if (commandIdBase.endsWith('*')){
 		commandIdBase.chop(1);
 	}
-	if(!commandIdBase.startsWith('/'))
-	{
+	if (!commandIdBase.startsWith('/')){
 		commandIdBase.prepend('/');
 	}
 	QString homeDirPath = *this->m_homeDirPath;
-	if( m_fileTemplatePathCompPtr.IsValid() && m_fileTemplatePathCompPtr.GetPtr()->GetPath().length())
-	{
+	if ( m_fileTemplatePathCompPtr.IsValid() && m_fileTemplatePathCompPtr.GetPtr()->GetPath().length()){
 		homeDirPath = m_fileTemplatePathCompPtr.GetPtr()->GetPath();
 	}
 	commandId.replace(commandIdBase,"");
-	if(*m_pathsProblemsAutoSolve)
-	{
+	if (*m_pathsProblemsAutoSolve){
 		int indexOfPathSeparator = -1;
 		QRegularExpression regexp("(.\\/.)");
 
 		QRegularExpressionMatch indexOfPathSeparatorMatch = regexp.match(commandId);
-		if(indexOfPathSeparatorMatch.hasMatch() && (indexOfPathSeparatorMatch.capturedStart() + 1) != commandId.length())
-		{
+		if (indexOfPathSeparatorMatch.hasMatch() && (indexOfPathSeparatorMatch.capturedStart() + 1) != commandId.length()){
 			indexOfPathSeparator = indexOfPathSeparatorMatch.capturedStart() + 1;
 		}
 
-		if(indexOfPathSeparator > 0)
-		{
-			if(QFileInfo(homeDirPath + commandId.mid(0,indexOfPathSeparator)).isFile())
-			{
+		if (indexOfPathSeparator > 0){
+			if (QFileInfo(homeDirPath + commandId.mid(0,indexOfPathSeparator)).isFile()){
 				commandId = commandId.remove(0, indexOfPathSeparator);
 			}
 		}
@@ -268,21 +251,20 @@ IRequestHandler::ConstResponsePtr CHttpHtmlFolderBasedHandlerComp::ProcessReques
 
 	QString destinationEntryPath = homeDirPath + commandId;
 	QFileInfo destinationEntry(destinationEntryPath);
-	if(destinationEntry.isDir())
-	{
+	if (destinationEntry.isDir()){
 		body = this->Generate(destinationEntry.absoluteFilePath(), commandId);
 	}
-	else
-	{
+	else{
 		QString destinationFileAbsoluteFilePath = destinationEntry.absoluteFilePath();
-		if(destinationFileAbsoluteFilePath.endsWith('/'))
-		{
+		if (homeDirPath == ":"){
+			destinationFileAbsoluteFilePath = destinationEntryPath;
+		}
+		if (destinationFileAbsoluteFilePath.endsWith('/')){
 			destinationFileAbsoluteFilePath.chop(1);
 		}
 		QFile destinationFile(destinationFileAbsoluteFilePath);
 
-		if(!destinationFile.open(QFile::ReadOnly))
-		{
+		if (!destinationFile.open(QFile::ReadOnly)){
 			generateErrorResponsePtr(QByteArray("Cannot open file for read ").append(destinationFile.fileName()));
 		}
 		reponseTypeId = this->GetMimeType(destinationFileAbsoluteFilePath);
