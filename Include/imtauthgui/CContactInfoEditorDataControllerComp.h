@@ -45,7 +45,7 @@ protected:
 		imtbase::CTreeItemModel m_treeItemModel;
 
 		// reimplemented (imtbase::IItemBasedRepresentationProvider)
-		virtual const imtbase::ICollectionInfo& GetModelsList() const override;
+//		virtual const imtbase::ICollectionInfo& GetModelsList() const override;
 		virtual imtbase::CTreeItemModel* GetTreeItemModel(const QByteArray& modelId) override;
 	} m_itemBesedRepresentetionProvider;
 

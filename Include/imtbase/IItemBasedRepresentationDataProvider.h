@@ -18,7 +18,7 @@ namespace imtbase
 class IItemBasedRepresentationDataProvider: virtual public istd::IPolymorphic
 {
 public:
-	virtual const imtbase::ICollectionInfo& GetModelsList() const = 0;
+//	virtual const imtbase::ICollectionInfo& GetModelsList() const = 0;
 	virtual CTreeItemModel* GetTreeItemModel(const QByteArray& modelId) = 0;
 };
 

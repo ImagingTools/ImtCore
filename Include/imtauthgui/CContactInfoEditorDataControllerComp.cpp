@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
+#include <QtCore/QDebug>
 
 // ACF includes
 #include <istd/CChangeGroup.h>
@@ -30,11 +31,11 @@ CContactInfoEditorDataControllerComp::CContactInfoEditorDataControllerComp() :
 // implemented CItemBasedRepresentationProvider
 // reimplemented (imtauthgui::IItemBasedRepresentationController)
 
-const imtbase::ICollectionInfo &CContactInfoEditorDataControllerComp
-::CItemBasedRepresentationDataProvider::GetModelsList() const
-{
-	//	imtbase::ICollectionInfo
-}
+//const imtbase::ICollectionInfo &CContactInfoEditorDataControllerComp
+//::CItemBasedRepresentationDataProvider::GetModelsList() const
+//{
+//	//	imtbase::ICollectionInfo
+//}
 
 imtbase::CTreeItemModel *CContactInfoEditorDataControllerComp
 ::CItemBasedRepresentationDataProvider
