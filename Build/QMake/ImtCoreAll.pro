@@ -1,5 +1,5 @@
 # Root of ImtCore project
-include ($(ACFCONFIGDIR)/QMake/Solution.pri)
+include ($(ACFDIR)/Config/QMake/Solution.pri)
 
 SUBDIRS += imtauth
 imtauth.file = ../../Include/imtauth/QMake/imtauth.pro
