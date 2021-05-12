@@ -85,15 +85,12 @@ QString CLocalizedHelpPathProviderComp::GetPathForLocale(int languageIndex) cons
 			timer.setSingleShot(true);
 			timer.connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
 			timer.connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-			timer.start(10000);   // 10 secs. timeout
+			timer.start(10000);
 			loop.exec();
 
 			if (timer.isActive()){
 				timer.stop();
-				if (reply->error() > 0){
-
-				}
-				else{
+				if (reply->error() == 0){
 					int attribute = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
 					if (attribute >= 200 && attribute < 400){
