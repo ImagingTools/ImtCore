@@ -3,7 +3,7 @@ TARGET = imtpy
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
-include(../../../Config/QMake/pybind11.pri)
+include($(IMTCOREDIR)/Config/QMake/pybind11.pri)
 i
 INCLUDEPATH += ../../../3rdParty/ImtCore/Include
 INCLUDEPATH += ../../../3rdParty/ImtCore/Impl
