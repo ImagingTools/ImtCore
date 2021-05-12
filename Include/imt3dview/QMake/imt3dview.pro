@@ -4,6 +4,5 @@ QT += opengl
 
 include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtGuiBaseConfig.pri)
-include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
-include($(IMTCOREDIR)/Config/QMake/ImtCore.pri)
+include($$PWD/../../../Config/QMake/ImtCore.pri)
 

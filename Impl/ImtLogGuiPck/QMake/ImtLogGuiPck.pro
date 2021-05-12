@@ -3,7 +3,7 @@ TARGET = ImtLogGuiPck
 include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtGuiBaseConfig.pri)
-include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
+include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liinsp -liipr -liproc -licalib
 LIBS += -limtgui -limtlog -limtloggui -limtbase -limtwidgets -li2d -liqt2d -liedge

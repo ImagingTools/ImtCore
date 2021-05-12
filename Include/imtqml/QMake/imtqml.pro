@@ -2,7 +2,7 @@ TARGET = imtqml
 
 include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtGuiBaseConfig.pri)
-include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
+include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 QT += qml quick quickwidgets
 

@@ -2,7 +2,7 @@ TARGET = ImtCorePck
 
 include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
-include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
+include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase
 LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -limeas -liinsp -liproc
