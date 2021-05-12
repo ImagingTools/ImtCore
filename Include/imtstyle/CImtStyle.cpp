@@ -132,7 +132,9 @@ void CImtStyle::SetStyleType(StyleType styleType)
 
 	EnsureStyleSheetApplied(true);
 
-	BaseClass::polish(qApp);
+	if (qApp != nullptr){
+		BaseClass::polish(qApp);
+	}
 }
 
 
