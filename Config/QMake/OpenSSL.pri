@@ -1,12 +1,15 @@
 
-INCLUDEPATH += $(OPENSSLDIR)
+INCLUDEPATH += $$PWD/../../3rdParty/openssl/1.1
 
-win32: {
+win32:
+{
 	contains(QMAKE_HOST.arch, x86_64) {
-	LIBS += -L$(OPENSSLDIR)/lib/x64 -llibcrypto
-    } else {
-	LIBS += -L$(OPENSSLDIR)/lib/x86 -llibcrypto
-    }
+		LIBS += -L$$PWD/../../3rdParty/openssl/1.1/lib/x64 -llibcrypto
+	}
+	else {
+		LIBS += -L$$PWD/../../3rdParty/openssl/1.1/lib/x86 -llibcrypto
+	}
 }
 
 unix: LIBS += -lcrypto
+

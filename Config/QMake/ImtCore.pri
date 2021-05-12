@@ -1,9 +1,9 @@
 include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 include($(IACFDIR)/Config/QMake/Iacf.pri)
 
-INCLUDEPATH += $(IMTCOREDIR)/Include
-INCLUDEPATH += $(IMTCOREDIR)/Impl
-INCLUDEPATH += $(IMTCOREDIR)/$$AUXINCLUDEDIR
+INCLUDEPATH += $$PWD/../../Include
+INCLUDEPATH += $$PWD/../..//Impl
+INCLUDEPATH += $$PWD/../../$$AUXINCLUDEDIR
 
 win32{
 	LIBS += -ladvapi32 -luser32

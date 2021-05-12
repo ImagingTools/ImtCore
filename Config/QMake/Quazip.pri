@@ -1,8 +1,8 @@
 include($(IACFDIR)/Config/QMake/zlib.pri)
 
-INCLUDEPATH += $(QUAZIP)/include
+INCLUDEPATH += $$PWD/../../3rdParty/quazip/include
 
-LIBS += -L$(QUAZIP)/lib/$$COMPILER_DIR -lquazip
+LIBS += -L$$PWD/../../3rdParty/quazip/lib/$$COMPILER_DIR -lquazip
 
 DEFINES += QUAZIP_STATIC
 
