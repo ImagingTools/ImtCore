@@ -1,36 +1,17 @@
-cmake_minimum_required(VERSION 3.1.0)
-
 project(ImtCore)
 
-include($ENV{IMTCOREDIR}/Config/CMake/ImtEnv.cmake)
+
+if(NOT DEFINED IMTCOREDIR)
+	set(IMTCOREDIR "$ENV{IMTCOREDIR}")
+endif()
+
+include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
 include(${ACFDIR}/Config/CMake/Macro.cmake)
 
 
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
-
-subdirlist(INCLUDE_DIRS ${INCLUDE_DIR})
-subdirlist(IMPL_DIRS ${IMPL_DIR})
-
-get_target_name(TARGETNAME)
-
 set(AUX_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../AuxInclude/Qt${QT_DEFAULT_MAJOR_VERSION}_${TARGETNAME}/GeneratedFiles")
-set(IMT_BIN_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Bin/${CMAKE_BUILD_TYPE}${TARGETNAME}")
-
-include_directories("${ACFDIR}/AuxInclude/Qt${QT_DEFAULT_MAJOR_VERSION}_${TARGETNAME}")
-include_directories("${ACFDIR}/Include")
-include_directories("${ACFDIR}/Impl")
-include_directories("${ACFSLNDIR}/AuxInclude/Qt${QT_DEFAULT_MAJOR_VERSION}_${TARGETNAME}")
-include_directories("${ACFSLNDIR}/Include")
-include_directories("${ACFSLNDIR}/Impl")
-include_directories("${IACFDIR}/AuxInclude/Qt${QT_DEFAULT_MAJOR_VERSION}_${TARGETNAME}")
-include_directories("${IACFDIR}/Include")
-include_directories("${IACFDIR}/Impl")
-
-link_directories("${ACFDIR}/Lib/${CMAKE_BUILD_TYPE}${TARGETNAME}")
-link_directories("${ACFSLNDIR}/Lib/${CMAKE_BUILD_TYPE}${TARGETNAME}")
-link_directories("${IACFDIR}/Lib/${CMAKE_BUILD_TYPE}${TARGETNAME}")
-link_directories("${CMAKE_CURRENT_LIST_DIR}/../../../ImtCore/Lib/${CMAKE_BUILD_TYPE}${TARGETNAME}")
 
 include_directories(${AUX_INCLUDE_DIR}/..)
 
@@ -105,7 +86,6 @@ add_dependencies(ImtReportPck imtreport imtbase)
 add_subdirectory("${IMPL_DIR}/ImtCoreLoc/CMake" "${AUX_INCLUDE_DIR}/ImtCoreLoc")
 
 add_subdirectory("${IMPL_DIR}/ImtGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtGuiPck")
-#add_dependencies(ImtGuiPck imt3d imt3proc imtgui)
 add_dependencies(ImtGuiPck imt3d imtgui)
 
 add_subdirectory("${IMPL_DIR}/ImtQmlPck/CMake" "${AUX_INCLUDE_DIR}/ImtQmlPck")
@@ -114,7 +94,6 @@ add_subdirectory("${IMPL_DIR}/ImtLogPck/CMake" "${AUX_INCLUDE_DIR}/ImtLogPck")
 add_dependencies(ImtLogPck imtbase)
 
 add_subdirectory("${IMPL_DIR}/ImtLogGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtLogGuiPck")
-#add_dependencies(ImtLogGuiPck imt3d imt3proc imtgui)
 add_dependencies(ImtLogGuiPck imt3d imtgui)
 
 add_subdirectory("${IMPL_DIR}/Imt3dViewPck/CMake" "${AUX_INCLUDE_DIR}/Imt3dViewPck")
