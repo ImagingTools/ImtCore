@@ -2,11 +2,8 @@ TARGET = EagleView
 
 include($(ACFCONFIGDIR)/QMake/ApplicationConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
-include($(IMTCOREDIR)/Config/QMake/ImtCore.pri)
+include($$PWD/../../../Config/QMake/ImtCore.pri)
 
-INCLUDEPATH += $(IMTCOREDIR)/Include
-INCLUDEPATH += $(IMTCOREDIR)/Impl
-INCLUDEPATH +=  $$AUXINCLUDEDIR
 
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
