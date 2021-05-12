@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(ImtCore)
 
+include($ENV{IMTCOREDIR}/Config/CMake/ImtEnv.cmake)
+include(${ACFDIR}/Config/CMake/Macro.cmake)
+
 
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
@@ -13,6 +16,21 @@ get_target_name(TARGETNAME)
 
 set(AUX_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../AuxInclude/Qt${QT_DEFAULT_MAJOR_VERSION}_${TARGETNAME}/GeneratedFiles")
 set(IMT_BIN_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Bin/${CMAKE_BUILD_TYPE}${TARGETNAME}")
+
+include_directories("${ACFDIR}/AuxInclude/Qt${QT_DEFAULT_MAJOR_VERSION}_${TARGETNAME}")
+include_directories("${ACFDIR}/Include")
+include_directories("${ACFDIR}/Impl")
+include_directories("${ACFSLNDIR}/AuxInclude/Qt${QT_DEFAULT_MAJOR_VERSION}_${TARGETNAME}")
+include_directories("${ACFSLNDIR}/Include")
+include_directories("${ACFSLNDIR}/Impl")
+include_directories("${IACFDIR}/AuxInclude/Qt${QT_DEFAULT_MAJOR_VERSION}_${TARGETNAME}")
+include_directories("${IACFDIR}/Include")
+include_directories("${IACFDIR}/Impl")
+
+link_directories("${ACFDIR}/Lib/${CMAKE_BUILD_TYPE}${TARGETNAME}")
+link_directories("${ACFSLNDIR}/Lib/${CMAKE_BUILD_TYPE}${TARGETNAME}")
+link_directories("${IACFDIR}/Lib/${CMAKE_BUILD_TYPE}${TARGETNAME}")
+link_directories("${CMAKE_CURRENT_LIST_DIR}/../../../ImtCore/Lib/${CMAKE_BUILD_TYPE}${TARGETNAME}")
 
 include_directories(${AUX_INCLUDE_DIR}/..)
 
@@ -112,7 +130,7 @@ add_subdirectory("${IMPL_DIR}/ImtPyPck/CMake" "${AUX_INCLUDE_DIR}/ImtPyPck")
 add_dependencies(ImtPyPck imtpy)
 
 # Application
-IF(!UNIX)
+if(NOT UNIX)
 #	add_subdirectory("${IMPL_DIR}/EagleView/CMake" "${AUX_INCLUDE_DIR}/EagleView")
 #	add_dependencies(EagleView Imt3dViewPck Imt3dGuiPck)
-ENDIF()
+endif()
