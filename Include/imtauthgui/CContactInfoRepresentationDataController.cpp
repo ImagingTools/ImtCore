@@ -169,7 +169,7 @@ void CContactInfoRepresentationDataController::FullUpdateBaseModel(
 				const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
 
 	if (addressesPtr != nullptr){
-		istd::CChangeGroup changeGroup(addressesPtr);
+		istd::CChangeGroup addressesChangeGroup(addressesPtr);
 
 		addressesPtr->RemoveAllAddresses();
 
@@ -188,6 +188,7 @@ void CContactInfoRepresentationDataController::FullUpdateBaseModel(
 			}
 		}
 	}
+
 	m_isUpdateFromRepresentation = false;
 }
 

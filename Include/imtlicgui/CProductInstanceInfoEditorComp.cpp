@@ -193,7 +193,7 @@ void CProductInstanceInfoEditorComp::on_LicenseInstancesEdit_itemChanged(QTreeWi
 }
 
 
-void CProductInstanceInfoEditorComp::on_CustomerCombo_currentIndexChanged(int index)
+void CProductInstanceInfoEditorComp::on_CustomerCombo_currentIndexChanged(int /*index*/)
 {
 	DoUpdateModel();
 }
@@ -313,8 +313,8 @@ void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 
 	QByteArrayList activatedLicenseIds;
 
-	const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = productInstanceInfoPtr->GetLicenseInstances().GetElementIds();
-	for (const QByteArray& licenseCollectionId : licenseCollectionIds){
+	const imtbase::IObjectCollectionInfo::Ids allInstanceLicenseIds = productInstanceInfoPtr->GetLicenseInstances().GetElementIds();
+	for (const QByteArray& licenseCollectionId : allInstanceLicenseIds){
 		const imtlic::ILicenseInstance* licenseInstance = productInstanceInfoPtr->GetLicenseInstance(licenseCollectionId);
 		if (licenseInstance != nullptr){
 			activatedLicenseIds.append(licenseInstance->GetLicenseId());

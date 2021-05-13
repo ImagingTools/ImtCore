@@ -83,7 +83,7 @@ CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int index)
 }
 
 
-bool CTreeItemModel::SetData(const QByteArray &key, const QVariant &value, int index, const istd::IChangeable::ChangeInfoMap& infoMap)
+bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int index, const istd::IChangeable::ChangeInfoMap& /*infoMap*/)
 {
 	if (m_items.isEmpty() && index == 0){
 		InsertNewItem();
@@ -105,8 +105,6 @@ bool CTreeItemModel::SetData(const QByteArray &key, const QVariant &value, int i
 	changeSet.SetChangeInfo("newVal", value);
 	changeSet.SetChangeInfo("key", key);
 	changeSet.SetChangeInfo("index", index);
-
-	CTreeItemModel* parentModel = dynamic_cast<CTreeItemModel*>(parent());
 
 	BeginChanges(changeSet);
 

@@ -208,7 +208,7 @@ void CMessagesController::OnTimer()
 			item.timeout = m_containerCachingTime;
 
 			it = m_workingQueue.erase(it);
-			continue;			
+			continue;
 		}
 
 		it++;
@@ -220,16 +220,16 @@ void CMessagesController::OnTimer()
 
 	// Cleanup cache
 	{
-		QList<QueueItem>::iterator it = m_cache.begin();
+		QList<QueueItem>::iterator cacheIter = m_cache.begin();
 
-		while (it != m_cache.end()){
-			it->timeout--;
-			if (it->timeout == 0){
-				it = m_cache.erase(it);
+		while (cacheIter != m_cache.end()){
+			cacheIter->timeout--;
+			if (cacheIter->timeout == 0){
+				cacheIter = m_cache.erase(cacheIter);
 				continue;
 			}
 
-			it++;
+			cacheIter++;
 		}
 	}
 }

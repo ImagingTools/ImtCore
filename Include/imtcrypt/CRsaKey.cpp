@@ -28,7 +28,7 @@ void CRsaKey::GenerateRsaKeys()
 		BIO *bio = BIO_new(BIO_s_mem());
 		i2d_RSAPrivateKey_bio(bio, privKey);
 
-		size_t bioLength = BIO_pending(bio);
+		int bioLength = BIO_pending(bio);
 		m_privateKey.resize(bioLength);
 
 		BIO_read(bio, m_privateKey.data(), bioLength);

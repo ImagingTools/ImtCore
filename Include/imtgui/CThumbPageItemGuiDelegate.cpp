@@ -64,7 +64,7 @@ void CThumbPageItemGuiDelegate::paint(QPainter* painter, const QStyleOptionViewI
 	Q_ASSERT(itemPtr != NULL);
 
 	QRect mainRect = option.rect;
-	const QColor& color = option.palette.background().color();
+	const QColor& color = option.palette.window().color();
 	painter->fillRect(mainRect, color);
 
 	if (!(itemPtr->data(DR_PAGE_ID).isValid())){

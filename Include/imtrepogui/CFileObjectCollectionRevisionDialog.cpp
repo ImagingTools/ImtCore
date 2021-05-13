@@ -51,10 +51,10 @@ void CFileObjectCollectionRevisionDialog::SetParams(
 
 		if (!revisions[i].isRevisionAvailable){
 			m_unavailableRevisions.insert(revisions[i].revision);
-			Table->item(i, 0)->setTextColor(Qt::red);
-			Table->item(i, 1)->setTextColor(Qt::red);
-			Table->item(i, 2)->setTextColor(Qt::red);
-			Table->item(i, 3)->setTextColor(Qt::red);
+			Table->item(i, 0)->setForeground(Qt::red);
+			Table->item(i, 1)->setForeground(Qt::red);
+			Table->item(i, 2)->setForeground(Qt::red);
+			Table->item(i, 3)->setForeground(Qt::red);
 			Table->item(i, 0)->setToolTip(tr("Revision package not found"));
 			Table->item(i, 1)->setToolTip(tr("Revision package not found"));
 			Table->item(i, 2)->setToolTip(tr("Revision package not found"));

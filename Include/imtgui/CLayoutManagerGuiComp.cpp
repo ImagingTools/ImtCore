@@ -551,7 +551,7 @@ void CLayoutManagerGuiComp::OnChangeProperties(const QByteArray& id)
 
 			istd::CChangeGroup changeGroup(rootLayoutPtr);
 
-			ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
+			childLayoutPtr = rootLayoutPtr->FindChild(id);
 			if (childLayoutPtr != nullptr){
 				childLayoutPtr->SetLayoutProperties(dialogProperties);
 				ILayout* parentLayoutPtr = childLayoutPtr->GetParent();

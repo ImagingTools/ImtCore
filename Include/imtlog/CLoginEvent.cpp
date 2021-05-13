@@ -72,7 +72,7 @@ QByteArray CLoginEvent::GetFactoryId() const
 
 // reimplemented (istd::IChangeable)
 
-bool CLoginEvent::CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode mode)
+bool CLoginEvent::CopyFrom(const istd::IChangeable& object, istd::IChangeable::CompatibilityMode /*mode*/)
 {
 	const CLoginEvent* sourcePtr = dynamic_cast<const CLoginEvent*>(&object);
 	if (sourcePtr != nullptr){
@@ -84,7 +84,7 @@ bool CLoginEvent::CopyFrom(const istd::IChangeable& object, istd::IChangeable::C
 }
 
 
-istd::IChangeable* CLoginEvent::CloneMe(istd::IChangeable::CompatibilityMode mode) const
+istd::IChangeable* CLoginEvent::CloneMe(istd::IChangeable::CompatibilityMode /*mode*/) const
 {
 	return new CLoginEvent(
 				m_loginEventInfo,

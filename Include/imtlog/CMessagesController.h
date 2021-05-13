@@ -129,7 +129,7 @@ private:
 private:
 	ControllerState m_state;
 
-	quint32 m_maxContainerMessageCount;
+	int m_maxContainerMessageCount;
 	quint16 m_containerSavingPeriod;
 	quint16 m_containerCachingTime;
 

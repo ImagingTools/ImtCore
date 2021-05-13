@@ -330,10 +330,8 @@ bool CFeatureDependencyEditorBase::HasDependency(const DependencyMap& dependency
 }
 
 
-void CFeatureDependencyEditorBase::on_FeatureTree_itemChanged(QTreeWidgetItem *item, int column)
+void CFeatureDependencyEditorBase::on_FeatureTree_itemChanged(QTreeWidgetItem *item, int /*column*/)
 {
-	imtbase::IObjectCollection* collectionPtr = m_packageCollectionObserver.GetObjectPtr();
-
 	for (const QByteArray& id : m_dependencies.keys()){
 		m_packageDependenciyMap[id] = m_dependencies[id];
 	}
@@ -414,7 +412,7 @@ void CFeatureDependencyEditorBase::FeaturePackageCollectionObserver::SetParent(C
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CFeatureDependencyEditorBase::FeaturePackageCollectionObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CFeatureDependencyEditorBase::FeaturePackageCollectionObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_parentPtr->OnFeaturePackageCollectionUpdate();
 }

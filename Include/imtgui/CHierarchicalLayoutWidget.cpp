@@ -137,9 +137,9 @@ CCustomLayoutWidget::CCustomLayoutWidget(
 			CHierarchicalLayoutWidget& hierarchicalLayoutWidget,
 			CCustomLayoutWidget* parentCustomWidgetPtr,
 			QWidget* parentPtr)
-	:QWidget(NULL),
+	:QWidget(parentPtr),
 	m_hierarchicalLayoutWidget(hierarchicalLayoutWidget),
-	m_parentCustomWidgetPtr(NULL),
+	m_parentCustomWidgetPtr(parentCustomWidgetPtr),
 	m_id(id),
 	m_externalWidgetPtr(NULL),
 	m_titleAlign(ILayout::AT_LEFT)

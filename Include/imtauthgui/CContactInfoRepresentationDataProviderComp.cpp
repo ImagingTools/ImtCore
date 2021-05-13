@@ -48,10 +48,11 @@ bool CContactInfoRepresentationDataProviderComp::GetRepresentationData(
 	return retVal;
 }
 
+
 bool CContactInfoRepresentationDataProviderComp::SetRepresentationData(
-		imtrest::IRepresentationDataProvider::Format format,
-		QByteArray &representationData,
-		const QByteArray &commandId)
+			imtrest::IRepresentationDataProvider::Format format,
+			QByteArray& /*representationData*/,
+			const QByteArray& commandId)
 {
 	bool retVal = false;
 

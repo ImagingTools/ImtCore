@@ -230,7 +230,7 @@ int CItem::GetSupportedOperations() const
 }
 
 
-bool CItem::CopyFrom(const istd::IChangeable& object, CompatibilityMode mode)
+bool CItem::CopyFrom(const istd::IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CItem* otherObjectPtr = dynamic_cast<const CItem*>(&object);
 	if (otherObjectPtr != nullptr){

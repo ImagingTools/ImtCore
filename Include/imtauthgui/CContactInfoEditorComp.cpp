@@ -98,7 +98,7 @@ void CContactInfoEditorComp::UpdateModel() const
 				const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
 
 	if (addressesPtr != nullptr){
-		istd::CChangeGroup changeGroup(addressesPtr);
+		istd::CChangeGroup addressesChangeGroup(addressesPtr);
 
 		addressesPtr->RemoveAllAddresses();
 
@@ -156,13 +156,13 @@ void CContactInfoEditorComp::on_EMailEdit_editingFinished()
 }
 
 
-void CContactInfoEditorComp::on_BirthdayEdit_dateChanged(const QDate &date)
+void CContactInfoEditorComp::on_BirthdayEdit_dateChanged(const QDate& /*date*/)
 {
 	DoUpdateModel();
 }
 
 
-void CContactInfoEditorComp::on_GenderCombo_currentIndexChanged(int index)
+void CContactInfoEditorComp::on_GenderCombo_currentIndexChanged(int /*index*/)
 {
 	DoUpdateModel();
 }
@@ -192,7 +192,7 @@ void CContactInfoEditorComp::on_Addresses_itemSelectionChanged()
 }
 
 
-void CContactInfoEditorComp::on_Addresses_itemChanged(QTreeWidgetItem *item, int column)
+void CContactInfoEditorComp::on_Addresses_itemChanged(QTreeWidgetItem* item, int /*column*/)
 {
 	if (!m_isReadOnly && !IsUpdateBlocked() && IsModelAttached()){
 		UpdateBlocker updateBlocker(this);
@@ -225,7 +225,7 @@ void CContactInfoEditorComp::on_Addresses_itemChanged(QTreeWidgetItem *item, int
 }
 
 
-void CContactInfoEditorComp::on_AddAddress_triggered(QAction *action)
+void CContactInfoEditorComp::on_AddAddress_triggered(QAction * /*action*/)
 {
 	imtauth::IContactInfo* personPtr = GetObservedObject();
 	Q_ASSERT(personPtr != nullptr);
@@ -241,7 +241,7 @@ void CContactInfoEditorComp::on_AddAddress_triggered(QAction *action)
 }
 
 
-void CContactInfoEditorComp::on_RemoveAddress_triggered(QAction *action)
+void CContactInfoEditorComp::on_RemoveAddress_triggered(QAction* /*action*/)
 {
 	imtauth::IContactInfo* personPtr = GetObservedObject();
 	Q_ASSERT(personPtr != nullptr);

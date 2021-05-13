@@ -36,7 +36,7 @@ void CAxisShape::SetAxisRange(const istd::CRange& range)
 
 // reimplement (imt3dgui::CShape3dBase)
 
-void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet)
+void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_vertices.clear();
 	m_vertices.resize(6);

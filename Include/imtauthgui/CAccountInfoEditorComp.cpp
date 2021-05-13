@@ -300,7 +300,7 @@ imtauth::IAddress* CAccountInfoEditorComp::GetCompanyAddress()
 
 // private slots
 
-void CAccountInfoEditorComp::on_ContactCombo_currentIndexChanged(int index)
+void CAccountInfoEditorComp::on_ContactCombo_currentIndexChanged(int /*index*/)
 {
 	DoUpdateModel();
 }
@@ -394,7 +394,7 @@ void CAccountInfoEditorComp::on_StreetEdit_editingFinished()
 }
 
 
-void CAccountInfoEditorComp::on_LoadPicture_triggered(QAction *action)
+void CAccountInfoEditorComp::on_LoadPicture_triggered(QAction* /*action*/)
 {
 	imtauth::IAccountInfo* accountPtr = GetObservedObject();
 	Q_ASSERT(accountPtr != nullptr);
@@ -429,7 +429,7 @@ void CAccountInfoEditorComp::on_LoadPicture_triggered(QAction *action)
 }
 
 
-void CAccountInfoEditorComp::on_RemovePicture_triggered(QAction *action)
+void CAccountInfoEditorComp::on_RemovePicture_triggered(QAction* /*action*/)
 {
 	imtauth::IAccountInfo* accountPtr = GetObservedObject();
 	Q_ASSERT(accountPtr != nullptr);
