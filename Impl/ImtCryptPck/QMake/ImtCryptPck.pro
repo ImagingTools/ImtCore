@@ -3,7 +3,7 @@ TARGET = ImtCryptPck
 include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
-include($(IMTCOREDIR)/Config/QMake/OpenSSL.pri)
+include($$PWD/../../../Config/QMake/OpenSSL.pri)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtcrypt
 

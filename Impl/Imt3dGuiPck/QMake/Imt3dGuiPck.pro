@@ -4,8 +4,6 @@ include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
-INCLUDEPATH += $(IMTCOREDIR)/Include
-
 # ACF-Solutions libs
 LIBS += -L$(ACFSLNDIR)/Lib/$$COMPILER_DIR -limeas
 
