@@ -21,9 +21,9 @@ public:
 
 	I_BEGIN_COMPONENT(CParamSetSummaryRepresentationControllerComp);
 		I_REGISTER_INTERFACE(ISummaryRepresentationController);
-		I_ASSIGN_MULTI_0(m_paramIdAttrPtr, "ParamIds", "Param ids in the ParamSet", false)
-		I_ASSIGN_MULTI_0(m_paramNameAttrPtr, "ParamNames", "Displayed names for params", false)
-		I_ASSIGN_MULTI_0(m_paramRepresentationControllerCompPtr, "ParamRepresentationControllers", "Param representation controllers", false)
+		I_ASSIGN_MULTI_0(m_paramIdAttrPtr, "ParamIds", "IDs of the related parameters in the parameter set", false);
+		I_ASSIGN_MULTI_0(m_paramNameAttrPtr, "ParamNames", "Displayed names for params", false);
+		I_ASSIGN_MULTI_0(m_paramRepresentationControllerCompPtr, "ParamRepresentationControllers", "List of related summary representation controllers according to the parameter-IDs", false);
 	I_END_COMPONENT;
 
 	// reimplemented (ISummaryRepresentationController)

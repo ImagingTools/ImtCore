@@ -1,10 +1,10 @@
 #include <imtzip/CFileCompressorComp.h>
 
 
-namespace imtgui
+namespace imtzip
 {
 
 
-} // namespace imtgui
+} // namespace imtzip
 
 
