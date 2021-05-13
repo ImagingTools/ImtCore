@@ -1,4 +1,4 @@
-#include <imtbase/CTextBasedParamSetRepresentationControllerComp.h>
+#include <imtbase/CParamSetSummaryRepresentationControllerComp.h>
 
 
 // ACF includes
@@ -13,7 +13,7 @@ namespace imtbase
 
 // reimplemented (ITextBasedRepresentationController)
 
-bool CTextBasedParamSetRepresentationControllerComp::CreateTextRepresentation(const istd::IChangeable& object, QString& textRepresentation) const
+bool CParamSetSummaryRepresentationControllerComp::CreateSummaryRepresentation(const istd::IChangeable& object, QString& textRepresentation) const
 {
 	const iprm::IParamsSet*  paramSetPtr = dynamic_cast<const iprm::IParamsSet*>(&object);
 	if (paramSetPtr != nullptr){
@@ -32,7 +32,7 @@ bool CTextBasedParamSetRepresentationControllerComp::CreateTextRepresentation(co
 					}
 
 					QString paramTextRepresentation;
-					if (!m_paramRepresentationControllerCompPtr[i]->CreateTextRepresentation(*paramPtr, paramTextRepresentation)){
+					if (!m_paramRepresentationControllerCompPtr[i]->CreateSummaryRepresentation(*paramPtr, paramTextRepresentation)){
 						 return false;
 					}
 

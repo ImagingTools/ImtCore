@@ -1,4 +1,4 @@
-#include <imtbase/CTextParamRepresentationControllerComp.h>
+#include <imtbase/CTextParamSummaryRepresentationControllerComp.h>
 
 
 // ACF includes
@@ -13,7 +13,7 @@ namespace imtbase
 
 // reimplemented (IParamRepresentationController)
 
-bool CTextParamRepresentationControllerComp::CreateTextRepresentation(const iser::ISerializable& param, QString& textRepresentation) const
+bool CTextParamSummaryRepresentationControllerComp::CreateSummaryRepresentation(const istd::IChangeable& param, QString& textRepresentation) const
 {
 	const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(&param);
 	if (textParamPtr != nullptr){

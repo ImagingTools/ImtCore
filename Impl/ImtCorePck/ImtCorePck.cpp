@@ -85,19 +85,19 @@ I_EXPORT_COMPONENT(
 			"Translation" IM_TAG("Localization"));
 
 I_EXPORT_COMPONENT(
-			TextBasedParamSetRepresentationController,
-			"Text based representation controller for ParamSet",
-			"Text Representation ParamSet Controller");
+			ParamSetSummaryRepresentationController,
+			"Summary representation controller for ParamSet",
+			"Summary Representation Controller ParamSet ");
 
 I_EXPORT_COMPONENT(
-			NumericParamRepresentationController,
-			"Text based representation controller for numeric param",
-			"Text Representation Controller Numeric Param");
+			NumericParamSummaryRepresentationController,
+			"Summary representation controller for numeric param",
+			"Summary Representation Controller Numeric Param");
 
 I_EXPORT_COMPONENT(
-			TextParamRepresentationController,
-			"Text based representation controller for text param",
-			"Text Representation Controller Text Param");
+			TextParamSummaryRepresentationController,
+			"Summary representation controller for text param",
+			"Summary Representation Controller Text Param");
 
 
 } // namespace ImtCorePck

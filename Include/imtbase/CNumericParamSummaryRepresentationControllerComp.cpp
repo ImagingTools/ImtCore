@@ -1,4 +1,4 @@
-#include <imtbase/CNumericParamRepresentationControllerComp.h>
+#include <imtbase/CNumericParamSummaryRepresentationControllerComp.h>
 
 
 // ACF includes
@@ -14,7 +14,7 @@ namespace imtbase
 
 // reimplemented (IParamRepresentationController)
 
-bool CNumericParamRepresentationControllerComp::CreateTextRepresentation(const iser::ISerializable& param, QString& textRepresentation) const
+bool CNumericParamSummaryRepresentationControllerComp::CreateSummaryRepresentation(const istd::IChangeable& param, QString& textRepresentation) const
 {
 	const imeas::INumericValue* numericValuePtr = dynamic_cast<const imeas::INumericValue*>(&param);
 	if (numericValuePtr != nullptr){
@@ -31,7 +31,7 @@ bool CNumericParamRepresentationControllerComp::CreateTextRepresentation(const i
 		int count = qMin(vars.GetElementsCount(), constraintsCount);
 		QString retVal;
 
-		for (int i = 0; i < vars.GetElementsCount(); i++){
+		for (int i = 0; i < count; i++){
 			QString units;
 			if (constraintsPtr != nullptr){
 				const imath::IUnitInfo* unitInfoPtr = constraintsPtr->GetNumericValueUnitInfo(i);
