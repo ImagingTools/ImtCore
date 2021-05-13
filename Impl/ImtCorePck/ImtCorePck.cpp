@@ -84,6 +84,21 @@ I_EXPORT_COMPONENT(
 			"File based text localization manager",
 			"Translation" IM_TAG("Localization"));
 
+I_EXPORT_COMPONENT(
+			TextBasedParamSetRepresentationController,
+			"Text based representation controller for ParamSet",
+			"Text Representation ParamSet Controller");
+
+I_EXPORT_COMPONENT(
+			NumericParamRepresentationController,
+			"Text based representation controller for numeric param",
+			"Text Representation Controller Numeric Param");
+
+I_EXPORT_COMPONENT(
+			TextParamRepresentationController,
+			"Text based representation controller for text param",
+			"Text Representation Controller Text Param");
+
 
 } // namespace ImtCorePck
 

@@ -20,6 +20,10 @@
 #include <imtbase/CObjectMetaInfoUniquenessValidatorComp.h>
 #include <imtbase/CCollectionObjectContext.h>
 #include <imtbase/CFileBasedTranslationManagerComp.h>
+#include <imtbase/CTextBasedParamSetRepresentationControllerComp.h>
+#include <imtbase/CNumericParamRepresentationControllerComp.h>
+#include <imtbase/CTextParamRepresentationControllerComp.h>
+
 
 /**
 	ImtCorePck package
@@ -49,6 +53,9 @@ typedef icomp::TModelCompWrap<
 						imtbase::CCollectionObjectContext,
 						imtbase::ICollectionObjectContext>> CollectionObjectContext;
 typedef icomp::TModelCompWrap<imtbase::CFileBasedTranslationManagerComp> FileBasedTranslationManager;
+typedef imtbase::CTextBasedParamSetRepresentationControllerComp TextBasedParamSetRepresentationController;
+typedef imtbase::CNumericParamRepresentationControllerComp NumericParamRepresentationController;
+typedef imtbase::CTextParamRepresentationControllerComp TextParamRepresentationController;
 
 
 } // namespace ImtCorePck
