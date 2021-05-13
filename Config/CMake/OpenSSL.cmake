@@ -1,8 +1,3 @@
-	if(DEFINED ENV{OPENSSLDIR})
-		set(OPENSSLDIR $ENV{OPENSSLDIR})
-	else()
-		set(OPENSSLDIR "${CMAKE_CURRENT_LIST_DIR}/../../3rdParty/openssl/1.1")
-	endif()
 	include_directories(${OPENSSLDIR})
 
 if(WIN32)
@@ -13,8 +8,6 @@ if(WIN32)
     endif()
 endif()
 
-#target_link_libraries(${PROJECT_NAME} libcrypto)
-#target_link_libraries(${PROJECT_NAME} C:/Work/Rpos/ITDevelopment/3rdParty/openssl/1.1/lib/x64/libcrypto.lib)
 if(UNIX)
 	target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/linux/crypto.so)
 endif()
