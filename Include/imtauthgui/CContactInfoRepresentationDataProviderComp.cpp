@@ -59,7 +59,7 @@ bool CContactInfoRepresentationDataProviderComp::SetRepresentationData(
 {
 	bool retVal = false;
 	QJsonDocument jsonDocument = QJsonDocument::fromJson(representationData);
-	qDebug() << jsonDocument;
+	//	qDebug() << jsonDocument;
 	if (m_itemBasedRepresentationDataProvider.IsValid()
 			&& format == imtrest::IRepresentationDataProvider::RF_JSON
 			&& commandId == "__ContactInfo__"
