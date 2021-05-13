@@ -1,10 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QVector>
-#include <QtCore/QUuid>
-
 // ACF includes
 #include <icomp/CComponentBase.h>
 
@@ -30,7 +26,7 @@ public:
 		I_ASSIGN_MULTI_0(m_paramRepresentationControllerCompPtr, "ParamRepresentationControllers", "Param representation controllers", false)
 	I_END_COMPONENT;
 
-	// reimplemented (ITextBasedRepresentationController)
+	// reimplemented (ISummaryRepresentationController)
 	virtual bool CreateSummaryRepresentation(const istd::IChangeable& object, QString& textRepresentation) const override;
 
 private:

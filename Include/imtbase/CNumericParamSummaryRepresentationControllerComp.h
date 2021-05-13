@@ -23,7 +23,7 @@ public:
 		I_REGISTER_INTERFACE(ISummaryRepresentationController);
 	I_END_COMPONENT;
 
-	// reimplemented (IParamRepresentationController)
+	// reimplemented (ISummaryRepresentationController)
 	virtual bool CreateSummaryRepresentation(const istd::IChangeable& param, QString& textRepresentation) const override;
 };
 

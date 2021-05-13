@@ -12,7 +12,7 @@ namespace imtbase
 
 // public methods
 
-// reimplemented (IParamRepresentationController)
+// reimplemented (ISummaryRepresentationController)
 
 bool CNumericParamSummaryRepresentationControllerComp::CreateSummaryRepresentation(const istd::IChangeable& param, QString& textRepresentation) const
 {
@@ -25,7 +25,7 @@ bool CNumericParamSummaryRepresentationControllerComp::CreateSummaryRepresentati
 			constraintsCount = INT_MAX;
 		}
 		else{
-			constraintsPtr->GetValueListInfo().GetOptionsCount();
+			constraintsCount = constraintsPtr->GetValueListInfo().GetOptionsCount();
 		}
 
 		int count = qMin(vars.GetElementsCount(), constraintsCount);

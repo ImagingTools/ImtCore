@@ -11,7 +11,7 @@ namespace imtbase
 
 // public methods
 
-// reimplemented (IParamRepresentationController)
+// reimplemented (ISummaryRepresentationController)
 
 bool CTextParamSummaryRepresentationControllerComp::CreateSummaryRepresentation(const istd::IChangeable& param, QString& textRepresentation) const
 {
