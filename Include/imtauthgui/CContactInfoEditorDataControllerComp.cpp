@@ -22,8 +22,8 @@ namespace imtauthgui
 
 // public methods
 
-CContactInfoEditorDataControllerComp::CContactInfoEditorDataControllerComp()
-	:m_treeItemModelObserver(this)
+CContactInfoEditorDataControllerComp::CContactInfoEditorDataControllerComp() :
+	m_treeItemModelObserver(this)
 {
 	m_contactInfoPtr = nullptr;
 }
@@ -46,7 +46,6 @@ bool CContactInfoEditorDataControllerComp::OnModelAttached(imod::IModel *modelPt
 	if (!BaseClass2::OnModelAttached(modelPtr, changeMask)){
 		return false;
 	}
-
 	return true;
 }
 
@@ -72,6 +71,7 @@ CContactInfoEditorDataControllerComp::CTreeItemModelObserver::CTreeItemModelObse
 
 CContactInfoEditorDataControllerComp::CTreeItemModelObserver::~CTreeItemModelObserver()
 {
+
 }
 
 

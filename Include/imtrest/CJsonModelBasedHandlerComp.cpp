@@ -9,6 +9,7 @@
 
 // ImtCore includes
 #include <imtrest/IRequestHandler.h>
+#include <imtrest/CHttpRequest.h>
 
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
@@ -109,12 +110,11 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 
 		body = QJsonDocument(QJsonObject({QPair<QString, QJsonValue>("data",allArray)})).toJson(QJsonDocument::Compact);
 	}
-	else if(modelName == "__EXAMPLE_2__")
-	{
+	else if(modelName == "__EXAMPLE_2__"){
 		reponseTypeId = "application/json";
 		body = QByteArray(R"({"firstName":"Ivan","lastName":"Ivanov","nickName":"NicIvan","adresses":[{"country":"Russia","city":"Moscow","postalCode":644099,"street":"Lenina 10"},{"country":"Germany","city":"Munic","postalCode":123456,"street":"Street St"}]})");
-	}	else if(modelName == "__CREATE_COLORS_IN_CTREE__")
-	{
+	}
+	else if(modelName == "__CREATE_COLORS_IN_CTREE__"){
 		using namespace imtbase;
 		imtbase::CTreeItemModel treeItemModel;
 		treeItemModel.AddTreeModel("data");
@@ -157,11 +157,28 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 	}
 	else if(m_representationDataProvider.IsValid())
 	{
-		reponseTypeId = "application/json";
-		if (m_representationDataProvider->GetRepresentationData(
-					imtrest::IRepresentationDataProvider::RF_JSON,
-					body,modelName) == false){
-			return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_NOT_IMPLEMENTED, "FAIL(", "plain/text; charset=utf-8"));
+		imtrest::CHttpRequest* httpRequestPtr = dynamic_cast<imtrest::CHttpRequest*>(const_cast<imtrest::IRequest*>(&request));
+		if (httpRequestPtr != nullptr && httpRequestPtr->GetMethodType() == imtrest::CHttpRequest::MT_POST)
+		{
+			QByteArray requestBody = httpRequestPtr->GetBody();
+			reponseTypeId = "application/json";
+			if (m_representationDataProvider->SetRepresentationData(
+						imtrest::IRepresentationDataProvider::RF_JSON,
+						requestBody,modelName) == false){
+				return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_NOT_IMPLEMENTED, "FAIL(", "plain/text; charset=utf-8"));
+			}
+			else{
+				return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, "Sucsess", "plain/text; charset=utf-8"));
+			}
+
+		}
+		else{
+			reponseTypeId = "application/json";
+			if (m_representationDataProvider->GetRepresentationData(
+						imtrest::IRepresentationDataProvider::RF_JSON,
+						body,modelName) == false){
+				return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_NOT_IMPLEMENTED, "FAIL(", "plain/text; charset=utf-8"));
+			}
 		}
 
 	}

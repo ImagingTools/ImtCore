@@ -8,6 +8,7 @@
         <file alias="TreeItemModel.qml">Resources/qml/TreeItemModel.qml</file>
         <file alias="JSONListModel.qml">Resources/qml/JSONListModel.qml</file>
         <file alias="jsonpath.js">Resources/qml/jsonpath.js</file>
+        <file alias="colors.qml">Resources/qml/colors.qml</file>
     </qresource>
     <qresource prefix="/lib">
         <file alias="qmlweb.js">Resources/lib/qmlweb.js</file>
@@ -17,5 +18,6 @@
     </qresource>
     <qresource prefix="/html">
         <file alias="index.html">Resources/html/index.html</file>
+        <file alias="colors.html">Resources/html/colors.html</file>
     </qresource>
 </RCC>

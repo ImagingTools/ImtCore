@@ -1,21 +1,20 @@
 import QtQuick 2.0
 //import ACF 1.0
-//import "../qml"
 
 Rectangle {
     id: container
-//    anchors.fill: parent
-    width: parent.width //200
+    width: parent.width
     height: 100
     color: "transparent"
 //    property TreeItemModel contactInfoModel
     property var contactInfoModel
     function updateData() {
         tfName.text = contactInfoModel.GetData("firstName")
+        tfName.isTextChanged = false
         tfLastName.text = contactInfoModel.GetData("lastName")
+        tfLastName.isTextChanged = false
         tfNicName.text = contactInfoModel.GetData("nickName")
-        console.log("tfName.text ", tfName.text)
-
+        tfNicName.isTextChanged = false
     }
 
     onContactInfoModelChanged: {
@@ -31,12 +30,11 @@ Rectangle {
         }
     }
 
-
     Column {
         width: parent.width
 
         TextFieldCustom {
-    	    id: tfName
+            id: tfName
             width: parent.width
             placeHolderText: qsTr("first name")
             onAccepted: {
@@ -47,12 +45,19 @@ Rectangle {
             id: tfLastName
             width: parent.width
             placeHolderText: qsTr("last name")
+            onAccepted: {
+                contactInfoModel.SetData("lastName", tfLastName.text)
+            }
         }
        TextFieldCustom {
            id: tfNicName
             width: parent.width
             placeHolderText: qsTr("nic name")
+            onAccepted: {
+                contactInfoModel.SetData("nickName", tfNicName.text)
+            }
         }
+
     }
 }
 

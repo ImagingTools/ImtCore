@@ -23,6 +23,7 @@ public:
 	virtual QByteArray AddAddress(IAddress* addressPtr) override;
 	virtual bool RemoveAddress(const QByteArray& addressId) override;
 	virtual bool RemoveAllAddresses() override;
+	virtual IAddress* GetEditableAddress(const QByteArray& addressId) override;
 
 	// reimplemented (IAddressProvider)
 	virtual const imtbase::ICollectionInfo& GetAddressList() const override;

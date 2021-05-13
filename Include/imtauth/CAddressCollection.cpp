@@ -31,6 +31,11 @@ bool CAddressCollection::RemoveAllAddresses()
 	return m_collection.ResetData();
 }
 
+IAddress* CAddressCollection::GetEditableAddress(const QByteArray &addressId)
+{
+	return dynamic_cast<IAddress*>(const_cast<istd::IChangeable*>(m_collection.GetObjectPtr(addressId)));
+}
+
 
 // reimplemented (IAddressProvider)
 

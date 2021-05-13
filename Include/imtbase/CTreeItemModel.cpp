@@ -66,14 +66,14 @@ CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int index)
 	Item *item = m_items[index];
 	CTreeItemModel* retVal = new CTreeItemModel(this);
 
-	int level = 0;
-	CTreeItemModel* parentModel = this;
-	while (parentModel != nullptr){
-		parentModel = dynamic_cast<CTreeItemModel*>(parent());
-		if (parentModel != nullptr){
-			level++;
-		}
-	}
+//	int level = 0;
+//	CTreeItemModel* parentModel = this;
+//	while (parentModel != nullptr){
+//		parentModel = dynamic_cast<CTreeItemModel*>(parentModel->parent());
+//		if (parentModel != nullptr){
+//			level++;
+//		}
+//	}
 
 	QVariant v = QVariant::fromValue(retVal);
 
@@ -100,7 +100,7 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 
 	Item* item = m_items[index];
 
-	IChangeable::ChangeSet changeSet;
+	IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
 	changeSet.SetChangeInfo("curVal", item->Value(key));
 	changeSet.SetChangeInfo("newVal", value);
 	changeSet.SetChangeInfo("key", key);
@@ -231,10 +231,11 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	if (countSize < 1){
 		return false;
 	}
-	if (countSize == 1){
+	bool isMultiTag = countSize > 1 || !tagName.isEmpty();
+	if (isMultiTag == false){
 		retVal = retVal && archive.BeginTag(objectTag);
 	}
-	else if (countSize > 1){
+	else{
 		retVal = retVal && archive.BeginMultiTag(arrayTag, subArrayTag, countSize);
 	}
 
@@ -242,7 +243,7 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 		Item *item = m_items[i];
 		QList<QByteArray> keys;
 		item->GetKeys(keys);
-		if (countSize > 1){
+		if (isMultiTag == true){
 			retVal = retVal && archive.BeginTag(subArrayTag);
 		}
 		for (const QByteArray& key: keys){
@@ -270,15 +271,15 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 			}
 
 		}
-		if (countSize > 1){
+		if (isMultiTag == true){
 			retVal = retVal && archive.EndTag(subArrayTag);
 		}
 	}
 
-	if (countSize == 1){
+	if (isMultiTag == false){
 		retVal = retVal && archive.EndTag(objectTag);
 	}
-	else if (countSize > 1){
+	else{
 		retVal = retVal && archive.EndTag(arrayTag);
 	}
 
