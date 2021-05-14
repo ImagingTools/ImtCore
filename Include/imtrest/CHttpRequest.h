@@ -61,7 +61,7 @@ public:
 
 	// reimplemented (INetworkObject)
 	virtual const IProtocolEngine& GetProtocolEngine() const override;
-	virtual QAbstractSocket& GetSocket() const override;
+	virtual QObject& GetSocketObject() const override;
 
 	// reimplemented (istd::IChangeable)
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;

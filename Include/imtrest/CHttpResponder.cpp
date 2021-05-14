@@ -27,29 +27,36 @@ bool CHttpResponder::SendResponse(const IResponse& response) const
 		return false;
 	}
 
-	QAbstractSocket& socket = response.GetSocket();
+	QObject& socket = response.GetSocketObject();
 
-	if (!socket.isOpen()){
-		return false;
+	QAbstractSocket* tcpSocketPtr = dynamic_cast<QAbstractSocket*>(&socket);
+	if (tcpSocketPtr != nullptr){
+		if (!tcpSocketPtr->isOpen()){
+			return false;
+		}
+
+		retVal = retVal && WriteStatus(protocolStatusCode, statusLiteral, *tcpSocketPtr);
+
+		IResponse::Headers headers = response.GetHeaders();
+
+		for (IResponse::Headers::ConstIterator headerIter = headers.constBegin(); headerIter != headers.constEnd(); ++headerIter){
+			retVal = retVal && WriteHeader(headerIter.key(), headerIter.value(), *tcpSocketPtr);
+		}
+
+		const QByteArray& contentData = response.GetData();
+		quint64 contentLength = contentData.size();
+
+		retVal = retVal && WriteHeader(QByteArray("Content-Length"), QByteArray::number(contentLength), *tcpSocketPtr);
+		retVal = retVal && WriteHeader(QByteArray("Content-Type"), response.GetDataTypeId(), *tcpSocketPtr);
+
+		retVal = retVal && WriteBody(contentData, *tcpSocketPtr);
+
+		return retVal;
 	}
 
-	retVal = retVal && WriteStatus(protocolStatusCode, statusLiteral, socket);
+	// \todo Implement Websocket implementation at this point!
 
-	IResponse::Headers headers = response.GetHeaders();
-
-	for (IResponse::Headers::ConstIterator headerIter = headers.constBegin(); headerIter != headers.constEnd(); ++headerIter){
-		retVal = retVal && WriteHeader(headerIter.key(), headerIter.value(), socket);
-	}
-
-	const QByteArray& contentData = response.GetData();
-	quint64 contentLength = contentData.size();
-
-	retVal = retVal && WriteHeader(QByteArray("Content-Length"), QByteArray::number(contentLength), socket);
-	retVal = retVal && WriteHeader(QByteArray("Content-Type"), response.GetDataTypeId(), socket);
-
-	retVal = retVal && WriteBody(contentData, socket);
-
-	return retVal;
+	return false;
 }
 
 

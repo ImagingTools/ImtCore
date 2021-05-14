@@ -95,14 +95,14 @@ void CTcpServerComp::HandleNewConnections()
 
 void CTcpServerComp::OnSocketDisconnected()
 {
-	QTcpSocket* socketPtr = qobject_cast<QTcpSocket*>(sender());
-	Q_ASSERT(socketPtr != nullptr);
+	QObject* socketObjectPtr = sender();
+	Q_ASSERT(socketObjectPtr != nullptr);
 
 	for (int i = 0; i < m_requests.GetCount(); ++i){
 		IRequest* requestPtr = m_requests.GetAt(i);
 		Q_ASSERT(requestPtr != nullptr);
 
-		if (&requestPtr->GetSocket() == socketPtr){
+		if (&requestPtr->GetSocketObject() == socketObjectPtr){
 			m_requests.RemoveAt(i);
 
 			qDebug("Request deleted");
@@ -111,7 +111,7 @@ void CTcpServerComp::OnSocketDisconnected()
 		}
 	}
 
-	socketPtr->deleteLater();
+	socketObjectPtr->deleteLater();
 }
 
 

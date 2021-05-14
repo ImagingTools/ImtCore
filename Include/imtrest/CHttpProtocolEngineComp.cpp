@@ -166,7 +166,7 @@ IResponse* CHttpProtocolEngineComp::CreateResponse(
 			const QByteArray& data,
 			const QByteArray& dataTypeId) const
 {
-	return new CHttpResponse(statusCode, data, dataTypeId, request.GetSocket(), *this);
+	return new CHttpResponse(statusCode, data, dataTypeId, request.GetSocketObject(), *this);
 }
 
 

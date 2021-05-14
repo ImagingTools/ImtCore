@@ -15,10 +15,10 @@ CHttpResponse::CHttpResponse(
 			int statusCode,
 			const QByteArray& data,
 			const QByteArray& dataTypeId,
-			QAbstractSocket& socket,
+			QObject& socketObject,
 			const IProtocolEngine& engine)
 	:m_engine(engine),
-	m_socket(socket),
+	m_socket(socketObject),
 	m_statusCode(statusCode),
 	m_data(data),
 	m_dataTypeId(dataTypeId)
@@ -60,7 +60,7 @@ const IProtocolEngine& CHttpResponse::GetProtocolEngine() const
 }
 
 
-QAbstractSocket& CHttpResponse::GetSocket() const
+QObject& CHttpResponse::GetSocketObject() const
 {
 	return m_socket;
 }

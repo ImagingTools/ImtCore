@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtNetwork/QAbstractSocket>
+#include <QtCore/QObject>
 
 // ACF includes
 #include <istd/IChangeable.h>
@@ -19,7 +19,7 @@ class INetworkObject: virtual public istd::IChangeable
 {
 public:
 	virtual const IProtocolEngine& GetProtocolEngine() const = 0;
-	virtual QAbstractSocket& GetSocket() const = 0;
+	virtual QObject& GetSocketObject() const = 0;
 };
 
 

@@ -296,7 +296,7 @@ const IProtocolEngine& CHttpRequest::GetProtocolEngine() const
 }
 
 
-QAbstractSocket& CHttpRequest::GetSocket() const
+QObject& CHttpRequest::GetSocketObject() const
 {
 	return m_socket;
 }
