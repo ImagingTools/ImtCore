@@ -1,4 +1,9 @@
-#include "CHttpHtmlFolderBasedHandlerComp.h"
+#include <imtrest/CHttpHtmlFolderBasedHandlerComp.h>
+
+
+// Qt includes
+#include <QtCore/QRegularExpression>
+#include <QtCore/QRegularExpressionMatch>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -7,9 +12,6 @@
 // ImtCore includes
 #include <imtrest/IRequestHandler.h>
 
-// QT includes
-#include <QtCore/QRegularExpression>
-#include <QtCore/QRegularExpressionMatch>
 
 namespace imtrest
 {
@@ -29,6 +31,7 @@ CHttpHtmlFolderBasedHandlerComp::CHttpHtmlFolderBasedHandlerComp()
 	m_endOfMessage = messagePartFile.readAll();
 	messagePartFile.close();
 }
+
 
 QByteArray CHttpHtmlFolderBasedHandlerComp::Generate(const QString& directoryPath, const QString& commandId) const
 {
@@ -137,6 +140,7 @@ QByteArray CHttpHtmlFolderBasedHandlerComp::GenerateSingleEntry(const QFileInfo&
 	return retval.toUtf8();
 }
 
+
 QByteArray CHttpHtmlFolderBasedHandlerComp::GetMimeType(const QFileInfo& fileInfo) const
 {
 	QByteArray retval = "application/octet-stream";
@@ -198,8 +202,10 @@ QByteArray CHttpHtmlFolderBasedHandlerComp::GetMimeType(const QFileInfo& fileInf
 	else if(setMimeTypeByExtention("video/3gpp2",				{"3g2", "3gpp2"}));
 
 	retval.append("; charset=UTF-8");
+
 	return retval;
 }
+
 
 // reimplemented (IRequestHandler)
 
@@ -278,6 +284,7 @@ IRequestHandler::ConstResponsePtr CHttpHtmlFolderBasedHandlerComp::ProcessReques
 	return responsePtr;
 }
 
+
 QByteArray CHttpHtmlFolderBasedHandlerComp::GetSupportedCommandId() const
 {
 	return *m_commandIdAttrPtr;
@@ -285,3 +292,5 @@ QByteArray CHttpHtmlFolderBasedHandlerComp::GetSupportedCommandId() const
 
 
 } // namespace imtrest
+
+
