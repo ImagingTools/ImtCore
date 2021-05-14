@@ -34,7 +34,7 @@ public:
 		MT_PATCH = 64
 	};
 
-	CHttpRequest(QAbstractSocket& socket, const IRequestHandler& requestHandler, const IProtocolEngine& engine);
+	CHttpRequest(QObject& socket, const IRequestHandler& requestHandler, const IProtocolEngine& engine);
 
 	QByteArrayList GetHeaders() const;
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
@@ -68,9 +68,12 @@ public:
 
 protected:
 	virtual bool ParseDeviceData(QIODevice& device);
+	virtual bool ExecuteHttpParser(const QByteArray& data, const QObject* socketObjectPtr);
 
 private Q_SLOTS:
 	void HandleReadyRead();
+	void OnWebSocketTextMessage(const QString& textMessage);
+	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
 
 private:
 	static bool ParseUrl(const char *at, size_t length, bool connect, QUrl& url);
@@ -84,7 +87,7 @@ private:
 
 	const IRequestHandler& m_requestHandler;
 	const IProtocolEngine& m_engine;
-	QAbstractSocket& m_socket;
+	QObject& m_socket;
 
 	typedef QMap<QByteArray, QByteArray> HeaderMap;
 	HeaderMap m_headers;

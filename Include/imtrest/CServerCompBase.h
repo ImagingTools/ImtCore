@@ -23,7 +23,7 @@ namespace imtrest
 	TCP-based communication server.
 	The server uses the underlaying protocol engine for creation of requests and responses.
 */
-class CTcpServerComp:
+class CServerCompBase:
 			public QObject,
 			public ilog::CLoggerComponentBase,
 			virtual public IRequestHandler
@@ -32,7 +32,7 @@ class CTcpServerComp:
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CTcpServerComp);
+	I_BEGIN_BASE_COMPONENT(CServerCompBase);
 		I_ASSIGN(m_requestHandlerCompPtr, "RequestHandler", "Request handler registered for the server", true, "RequestHandler");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
 		I_ASSIGN(m_serverAddressAttrPtr, "ServerAddress", "Server address to be listened", false, "ServerAddress");
@@ -45,29 +45,32 @@ public:
 	virtual QByteArray GetSupportedCommandId() const override;
 
 protected:
+	typedef QList<QObject*> SocketList;
+
+	virtual bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0) = 0;
+	virtual SocketList CreateConnectionSockets(QObject* serverPtr) const = 0;
+	virtual void RegisterSocket(QObject* socketPtr) = 0;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated();
 
-private:
-	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);
-
-private Q_SLOTS:
+public Q_SLOTS:
 	void HandleNewConnections();
 	void OnSocketDisconnected();
 
-private:
+protected:
+	typedef QVector<QObject*> Servers;
+	Servers m_servers;
+
+	typedef istd::TPointerVector<IRequest> Requests;
+	Requests m_requests;
+
+protected:
 	I_REF(imtrest::IRequestHandler, m_requestHandlerCompPtr);
 	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
 	I_ATTR(QByteArray, m_serverAddressAttrPtr);
 	I_ATTR(int, m_serverPortAttrPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
-
-	typedef QVector<QTcpServer*> Servers;
-
-	Servers m_servers;
-
-	typedef istd::TPointerVector<IRequest> Requests;
-	Requests m_requests;
 };
 
 

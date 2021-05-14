@@ -155,7 +155,7 @@ public:
 		\param requestHandler	Instance to process the request after all data has been read.
 	*/
 	virtual IRequest* CreateRequest(
-				QAbstractSocket* socketPtr,
+				QObject* socketPtr,
 				const IRequestHandler& requestHandler) const = 0;
 
 	/**

@@ -2,10 +2,11 @@
 
 
 // Qt includes
+#include <QtCore/QUrlQuery>
 #if QT_CONFIG(ssl)
 #include <QtNetwork/QSslSocket>
 #endif
-#include <QtCore/QUrlQuery>
+#include <QtWebSockets/QWebSocket>
 
 
 namespace imtrest
@@ -29,20 +30,33 @@ static http_parser_settings s_httpParserSettings
 
 // public methods
 
-CHttpRequest::CHttpRequest(QAbstractSocket& socket, const IRequestHandler& handler, const IProtocolEngine& engine)
+CHttpRequest::CHttpRequest(QObject& socket, const IRequestHandler& handler, const IProtocolEngine& engine)
 	:m_requestHandler(handler),
 	m_engine(engine),
 	m_socket(socket),
 	m_state(RS_NON_STARTED)
 {
-	m_remoteAddress = socket.peerAddress();
+	QAbstractSocket* socketPtr = dynamic_cast<QAbstractSocket*>(&socket);
+	if (socketPtr != nullptr){
+		m_remoteAddress = socketPtr->peerAddress();
+		QObject::connect(socketPtr, &QAbstractSocket::readyRead, this, &CHttpRequest::HandleReadyRead);
+		QObject::connect(socketPtr, &QAbstractSocket::disconnected, &QObject::deleteLater);
+	}
+	else{
+		QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(&socket);
+		if (webSocketPtr != nullptr){
+			m_remoteAddress = socketPtr->peerAddress();
+
+			connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CHttpRequest::OnWebSocketTextMessage);
+			connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CHttpRequest::OnWebSocketBinaryMessage);
+			QObject::connect(webSocketPtr, &QWebSocket::disconnected, &QObject::deleteLater);
+		}
+	}
 
 	http_parser_init(&m_httpParser, HTTP_REQUEST);
 
 	m_httpParser.data = this;
 
-	QObject::connect(&socket, &QAbstractSocket::readyRead, this, &CHttpRequest::HandleReadyRead);
-	QObject::connect(&socket, &QAbstractSocket::disconnected, &QObject::deleteLater);
 }
 
 
@@ -323,25 +337,43 @@ bool CHttpRequest::ParseDeviceData(QIODevice& device)
 {
 	QByteArray data = device.readAll();
 	if (!data.isEmpty()){
+		return ExecuteHttpParser(data, &device);
+	}
+
+	return true;
+}
+
+
+bool CHttpRequest::ExecuteHttpParser(const QByteArray& data, const QObject* socketObjectPtr)
+{
 #if QT_CONFIG(ssl)
-		QSslSocket* sslSocketPtr = qobject_cast<QSslSocket*>(&device);
-		if ((sslSocketPtr != nullptr) && sslSocketPtr->isEncrypted()){
-			m_url.setScheme(QStringLiteral("https"));
+	const QSslSocket* sslSocketPtr = qobject_cast<const QSslSocket*>(socketObjectPtr);
+	if ((sslSocketPtr != nullptr) && sslSocketPtr->isEncrypted()){
+		m_url.setScheme(QStringLiteral("https"));
+	}
+	else{
+		const QWebSocket* webSocketPtr = qobject_cast<const QWebSocket*>(socketObjectPtr);
+		if (webSocketPtr != nullptr){
+			m_url.setScheme(QStringLiteral("ws"));
 		}
-		else{
-			m_url.setScheme(QStringLiteral("http"));
-		}
+	}
 #else
+	const QWebSocket* webSocketPtr = qobject_cast<QWebSocket*>(socketObjectPtr);
+	if (webSocketPtr != nullptr){
+		m_url.setScheme(QStringLiteral("ws"));
+	}
+	else{
 		m_url.setScheme(QStringLiteral("http"));
+	}
 #endif
-		int parsedCount = http_parser_execute(
-					&m_httpParser,
-					&s_httpParserSettings,
-					data.constData(),
-					size_t(data.size()));
-		if (parsedCount < data.size()){
-			return false;
-		}
+
+	int parsedCount = http_parser_execute(
+		&m_httpParser,
+		&s_httpParserSettings,
+		data.constData(),
+		size_t(data.size()));
+	if (parsedCount < data.size()){
+		return false;
 	}
 
 	return true;
@@ -381,6 +413,23 @@ void CHttpRequest::HandleReadyRead()
 	// Start request handler:
 	m_requestHandler.ProcessRequest(*this);
 }
+
+
+void CHttpRequest::OnWebSocketTextMessage(const QString& textMessage)
+{
+	if (ExecuteHttpParser(textMessage.toUtf8(), sender())){
+		m_requestHandler.ProcessRequest(*this);
+	}
+}
+
+
+void CHttpRequest::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
+{
+	if (ExecuteHttpParser(dataMessage, sender())){
+		m_requestHandler.ProcessRequest(*this);
+	}
+}
+
 
 
 // private static methods

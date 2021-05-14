@@ -1,9 +1,7 @@
-#include <imtrest/CTcpServerComp.h>
+#include <imtrest/CServerCompBase.h>
 
 
 // ImtCore includes
-#include <imtrest/IRequest.h>
-#include <imtrest/IResponse.h>
 #include <imtrest/IResponder.h>
 
 
@@ -15,7 +13,7 @@ namespace imtrest
 
 // reimplemented (IRequestHandler)
 
-IRequestHandler::ConstResponsePtr CTcpServerComp::ProcessRequest(const IRequest& request) const
+IRequestHandler::ConstResponsePtr CServerCompBase::ProcessRequest(const IRequest& request) const
 {
 	ConstResponsePtr retVal;
 
@@ -30,11 +28,17 @@ IRequestHandler::ConstResponsePtr CTcpServerComp::ProcessRequest(const IRequest&
 }
 
 
+QByteArray CServerCompBase::GetSupportedCommandId() const
+{
+	return QByteArray();
+}
+
+
 // protected methods
 
 // reimplemented (icomp::CComponentBase)
 
-void CTcpServerComp::OnComponentCreated()
+void CServerCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
@@ -51,49 +55,24 @@ void CTcpServerComp::OnComponentCreated()
 }
 
 
-// private methods
-
-bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
-{
-	if (!m_protocolEngineCompPtr.IsValid()){
-		return false;
-	}
-
-	istd::TDelPtr<QTcpServer> tcpServerPtr(new QTcpServer(this));
-	if (tcpServerPtr->listen(address, port)){
-		connect(tcpServerPtr.GetPtr(), &QTcpServer::newConnection, this, &CTcpServerComp::HandleNewConnections, Qt::UniqueConnection);
-
-		m_servers.push_back(tcpServerPtr.PopPtr());
-
-		return true;
-	}
-	else{
-		SendErrorMessage(0, QString("Server could not be started on %1:%2").arg(address.toString()).arg(port));
-	}
-
-	return false;
-}
-
-
 // private slots
 
-void CTcpServerComp::HandleNewConnections()
+void CServerCompBase::HandleNewConnections()
 {
-	QTcpServer* tcpServerPtr = qobject_cast<QTcpServer*>(sender());
-	Q_ASSERT(tcpServerPtr != nullptr);
+	QList<QObject*> sockets = CreateConnectionSockets(sender());
 
-	while (QTcpSocket* socketPtr = tcpServerPtr->nextPendingConnection()){
+	for (QObject* socketPtr : sockets){
 		IRequest* newRequestPtr = m_protocolEngineCompPtr->CreateRequest(socketPtr, *this);
 		if (newRequestPtr != nullptr){
-			m_requests.PushBack(newRequestPtr);
+			RegisterSocket(socketPtr);
 
-			QObject::connect(socketPtr, &QTcpSocket::disconnected, this, &CTcpServerComp::OnSocketDisconnected);
+			m_requests.PushBack(newRequestPtr);
 		}
 	}
 }
 
 
-void CTcpServerComp::OnSocketDisconnected()
+void CServerCompBase::OnSocketDisconnected()
 {
 	QObject* socketObjectPtr = sender();
 	Q_ASSERT(socketObjectPtr != nullptr);
@@ -112,12 +91,6 @@ void CTcpServerComp::OnSocketDisconnected()
 	}
 
 	socketObjectPtr->deleteLater();
-}
-
-
-QByteArray CTcpServerComp::GetSupportedCommandId() const
-{
-	return QByteArray();
 }
 
 

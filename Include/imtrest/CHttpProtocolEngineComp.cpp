@@ -150,7 +150,7 @@ bool CHttpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protoco
 }
 
 
-IRequest* CHttpProtocolEngineComp::CreateRequest(QAbstractSocket* socketPtr, const IRequestHandler& requestHandler) const
+IRequest* CHttpProtocolEngineComp::CreateRequest(QObject* socketPtr, const IRequestHandler& requestHandler) const
 {
 	if (socketPtr != nullptr){
 		return new CHttpRequest(*socketPtr, requestHandler, *this);
