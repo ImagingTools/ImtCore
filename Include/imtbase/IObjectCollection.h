@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <istd/TIFactory.h>
 #include <istd/TSmartPtr.h>
 
 // ImtCore includes
@@ -24,6 +25,7 @@ class IObjectCollection: virtual public IObjectCollectionInfo
 {
 public:
 	typedef istd::TSmartPtr<istd::IChangeable> DataPtr;
+	typedef istd::TIFactory<istd::IChangeable> IDataFactory;
 	typedef istd::TSmartPtr<idoc::IDocumentMetaInfo> MetaInfoPtr;
 
 	/**

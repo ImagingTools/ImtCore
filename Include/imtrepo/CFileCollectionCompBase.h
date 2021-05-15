@@ -74,6 +74,7 @@ protected:
 class CFileCollectionCompBase:
 			public CFileCollectionCompBaseAttr,
 			virtual public IFileObjectCollection,
+			virtual public IFileObjectCollection::IDataFactory,
 			virtual public IRepositoryItemInfoProvider
 {
 	Q_OBJECT
@@ -153,6 +154,12 @@ public:
 	// reimplemented (ICollectionInfo)
 	virtual Ids GetElementIds() const override;
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
+
+	// reimplemented (IObjectCollection::IDataFactory)
+	istd::IChangeable* CreateInstance(const QByteArray& keyId = "") const override;
+
+	// reimplemented (istd::IFactoryInfo)
+	istd::IFactoryInfo::KeyList GetFactoryKeys() const override;
 
 protected:
 	class ResourceLocker

@@ -70,11 +70,46 @@ QByteArray CDocumentBasedFileCollectionViewDelegateComp::CreateNewObject(
 			return "Default";
 		}
 		else{
-			QMessageBox::critical(NULL, tr("Collection Manager"), tr("The file could not be created"));
+			QMessageBox::critical(nullptr, tr("Collection Manager"), tr("The file could not be created"));
 		}
 	}
 
 	return QByteArray();
+}
+
+
+QByteArray CDocumentBasedFileCollectionViewDelegateComp::ImportObject(const QByteArray& typeId, const QString& sourcePath) const
+{
+	if ((m_collectionPtr != nullptr) && m_objectImportPersistenceCompPtr.IsValid()){
+		const imtbase::IObjectCollection::IDataFactory* objectFactorPtr = dynamic_cast<const imtbase::IObjectCollection::IDataFactory*>(m_collectionPtr);
+		if (objectFactorPtr != nullptr){
+			istd::TDelPtr<istd::IChangeable> documentPtr(objectFactorPtr->CreateInstance(typeId));
+			if (documentPtr.IsValid()){
+				int state = m_objectImportPersistenceCompPtr->LoadFromFile(*documentPtr, sourcePath);
+				if (state == ifile::IFilePersistence::OS_OK){
+					QFileInfo sourceFileInfo(sourcePath);
+
+					QString documentName = sourceFileInfo.baseName();
+
+					QByteArray documentId = m_collectionPtr->InsertNewObject(typeId, documentName, QString(tr("Imported from %1")).arg(sourceFileInfo.fileName()), documentPtr.GetPtr());
+					if (!documentId.isEmpty()){
+						return documentId;
+					}
+					else{
+						QMessageBox::critical(nullptr, "", tr("File \"%1\"could not be imported").arg(sourcePath));
+					}
+				}
+			}
+		}
+	}
+
+	return BaseClass2::ImportObject(typeId, sourcePath);
+}
+
+
+bool CDocumentBasedFileCollectionViewDelegateComp::ExportObject(const QByteArray& objectId, const QString& targetPath) const
+{
+	return BaseClass2::ExportObject(objectId, targetPath);
 }
 
 
@@ -84,7 +119,7 @@ void CDocumentBasedFileCollectionViewDelegateComp::RemoveObjects(const imtbase::
 		return;
 	}
 
-	if (QMessageBox::question(NULL, tr("Remove"), tr("Remove selected document from the collection"), QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes){
+	if (QMessageBox::question(nullptr, tr("Remove"), tr("Remove selected document from the collection"), QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes){
 		return;
 	}
 
@@ -104,7 +139,7 @@ void CDocumentBasedFileCollectionViewDelegateComp::RemoveObjects(const imtbase::
 						if (objectInfoPtr->objectPtr == &m_documentManagerCompPtr->GetDocumentFromIndex(docIndex, &documentInfo)){
 							if (documentInfo.isDirty){
 								QString message = tr("Document \"%1\" is currently being edited and cannot be deleted").arg(objectInfoPtr->name);
-								QMessageBox::warning(NULL, "", message, QMessageBox::Ok);
+								QMessageBox::warning(nullptr, "", message, QMessageBox::Ok);
 								isRemoveAccepted = false;
 							}
 							else{
@@ -407,7 +442,7 @@ int CDocumentBasedFileCollectionViewDelegateComp::ObjectPersistenceProxy::SaveTo
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	if (m_parent.m_collectionPtr != NULL){
+	if (m_parent.m_collectionPtr != nullptr){
 		for (int i = 0; i < m_parent.m_openedDocuments.GetCount(); ++i){
 			ICollectionViewDelegate::ObjectInfo* objectInfoPtr = m_parent.m_openedDocuments.GetAt(i);
 			Q_ASSERT(objectInfoPtr != nullptr);
@@ -422,7 +457,7 @@ int CDocumentBasedFileCollectionViewDelegateComp::ObjectPersistenceProxy::SaveTo
 				if (objectInfoPtr->uuid.isEmpty()){
 					QString description;
 					const idoc::IDocumentMetaInfo* documentMetaInfoPtr = CompCastPtr<idoc::IDocumentMetaInfo>(&data);
-					if (documentMetaInfoPtr != NULL){
+					if (documentMetaInfoPtr != nullptr){
 						description = documentMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
 					}
 
@@ -459,9 +494,9 @@ bool CDocumentBasedFileCollectionViewDelegateComp::ObjectPersistenceProxy::GetFi
 {
 	for (int i = 0; i < m_parent.m_openedDocuments.GetCount(); ++i){
 		const ICollectionViewDelegate::ObjectInfo* documentInfoPtr = m_parent.m_openedDocuments.GetAt(i);
-		Q_ASSERT(documentInfoPtr != NULL);
+		Q_ASSERT(documentInfoPtr != nullptr);
 
-		if ((dataObjectPtr != NULL) && (dataObjectPtr == documentInfoPtr->objectPtr) && m_parent.m_filePersistenceCompPtr.IsValid()){
+		if ((dataObjectPtr != nullptr) && (dataObjectPtr == documentInfoPtr->objectPtr) && m_parent.m_filePersistenceCompPtr.IsValid()){
 			return m_parent.m_filePersistenceCompPtr->GetFileExtensions(result, dataObjectPtr, flags, doAppend);
 		}
 	}

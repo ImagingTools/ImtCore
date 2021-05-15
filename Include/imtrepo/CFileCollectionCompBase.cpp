@@ -661,6 +661,28 @@ QVariant CFileCollectionCompBase::GetElementInfo(const QByteArray& elementId, in
 }
 
 
+// reimplemented (IObjectCollection::IDataFactory)
+
+istd::IChangeable* CFileCollectionCompBase::CreateInstance(const QByteArray& keyId) const
+{
+	return CreateDataObject(keyId);
+}
+
+
+// reimplemented (istd::IFactoryInfo)
+
+istd::IFactoryInfo::KeyList CFileCollectionCompBase::GetFactoryKeys() const
+{
+	KeyList retVal;
+
+	for (int i = 0; i < m_resourceTypeConstraints.GetOptionsCount(); ++i){
+		retVal.insert(m_resourceTypeConstraints.GetOptionId(i));
+	}
+
+	return retVal;
+}
+
+
 // static protected methods of the class CFileCollectionCompBase
 
 CFileCollectionCompBase::RepositoryInfo CFileCollectionCompBase::GetRepositoryInfo()

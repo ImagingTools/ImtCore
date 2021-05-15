@@ -38,6 +38,8 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(CollectionPersistence, ifile::IFileTypeInfo, ExtractCollectionPersistence);
 		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "Type-ID supported by this delegate", true, "ObjectTypeId");
 		I_ASSIGN(m_filePersistenceCompPtr, "FilePersistence", "Persistence for editable objects", true, "FilePersistence");
+		I_ASSIGN(m_objectImportPersistenceCompPtr, "ImportPersistence", "Persistence used for importing documents", true, "ImportPersistence");
+		I_ASSIGN(m_objectExportPersistenceCompPtr, "ExportPersistence", "Persistence used for exporting documents", true, "ExportPersistence");
 		I_ASSIGN(m_statusIconsProviderCompPtr, "StatusIcons", "Icons for delegate visual status", false, "StatusIcons");
 		I_ASSIGN(m_documentManagerCompPtr, "DocumentManager", "Document manager", true, "DocumentManager");
 		I_ASSIGN_TO(m_documentManagerModelCompPtr, m_documentManagerCompPtr, true);
@@ -55,6 +57,8 @@ public:
 	virtual QByteArray GetSupportedTypeId() const override;
 	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;
 	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
+	virtual QByteArray ImportObject(const QByteArray& typeId, const QString& sourcePath = QString()) const override;
+	virtual bool ExportObject(const QByteArray& objectId, const QString& targetPath = QString()) const override;
 	virtual void RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const override;
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
@@ -138,13 +142,30 @@ private:
 	void InitializeVisualStatus();
 
 private:
+	/**
+		Type-ID of the related document/object.
+	*/
 	I_ATTR(QByteArray, m_objectTypeIdAttrPtr);
+
+	/**
+		Provider of status icons.
+	*/
 	I_REF(iqtgui::IIconProvider, m_statusIconsProviderCompPtr);
 
 	/**
 		Persistence for the related object.
 	*/
 	I_REF(ifile::IFilePersistence, m_filePersistenceCompPtr);
+
+	/**
+		Persistence used for import of objects.
+	*/
+	I_REF(ifile::IFilePersistence, m_objectImportPersistenceCompPtr);
+
+	/**
+		Persistence used for export of objects.
+	*/
+	I_REF(ifile::IFilePersistence, m_objectExportPersistenceCompPtr);
 
 	/**
 		Underlaying document manager used for object operations.
