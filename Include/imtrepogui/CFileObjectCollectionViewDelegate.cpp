@@ -353,7 +353,7 @@ QByteArray CFileObjectCollectionViewDelegate::FindTypeIdFromFile(const QString& 
 }
 
 
-const ifile::IFileTypeInfo* CFileObjectCollectionViewDelegate::FindFileInfo(const QByteArray& typeId) const
+const ifile::IFileTypeInfo* CFileObjectCollectionViewDelegate::FindFileInfo(const QByteArray& typeId, FileOperationType /*operationType*/) const
 {
 	const imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<const imtrepo::IFileObjectCollection*>(m_collectionPtr);
 	Q_ASSERT(fileCollectionPtr != nullptr);
@@ -378,16 +378,9 @@ QString CFileObjectCollectionViewDelegate::CreateFileImportFilter() const
 	QStringList filters;
 	QStringList allExt;
 
-	const ifile::IFileResourceTypeConstraints* fileConstraintsPtr = fileCollectionPtr->GetFileTypeConstraints();
-	for (int typeIndex = 0; typeIndex < fileConstraintsPtr->GetOptionsCount(); ++typeIndex){
-		QByteArray typeId = fileConstraintsPtr->GetOptionId(typeIndex);
-
-		if (m_selectedTypeId.isEmpty() || (m_selectedTypeId == typeId)){
-			const ifile::IFileTypeInfo* fileTypeInfoPtr = fileConstraintsPtr->GetFileTypeInfo(typeIndex);
-			if (fileTypeInfoPtr != nullptr){
-				ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileTypeInfoPtr, nullptr, -1, allExt, filters, false);
-			}
-		}
+	const ifile::IFileTypeInfo* fileTypeInfoPtr = FindFileInfo(m_selectedTypeId, FOT_IMPORT);
+	if (fileTypeInfoPtr != nullptr){
+		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileTypeInfoPtr, nullptr, -1, allExt, filters, false);
 	}
 
 	filters.append("Compressed item folder (*.zip)");
@@ -410,11 +403,14 @@ QString CFileObjectCollectionViewDelegate::CreateFileExportFilter(const QByteArr
 	QStringList allExt;
 
 	QByteArray typeId = fileCollectionPtr->GetObjectTypeId(objectId);
-	const ifile::IFileTypeInfo* fileInfoPtr = FindFileInfo(typeId);
+	const ifile::IFileTypeInfo* fileInfoPtr = FindFileInfo(typeId, FOT_EXPORT);
 
 	if (fileInfoPtr != nullptr){
 		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileInfoPtr, nullptr, -1, allExt, filters, false);
 	}
+
+	filters.append("Compressed item folder (*.zip)");
+	allExt.append("zip");
 
 	return filters.join(";;");
 }

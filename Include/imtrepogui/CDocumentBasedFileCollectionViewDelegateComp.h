@@ -117,6 +117,7 @@ protected:
 	// reimplemented (imtrepogui::CFileObjectCollectionViewDelegate)
 	virtual bool IsRestoreAllowed(const QByteArray& objectId) override;
 	virtual void AfterRestore(const QByteArray& objectId, bool isRestoreSuccessful) override;
+	virtual const ifile::IFileTypeInfo* FindFileInfo(const QByteArray& typeId, FileOperationType operationType) const;
 
 	// reimplemented (imtgui::CObjectCollectionViewDelegate)
 	virtual void SetupCommands() override;

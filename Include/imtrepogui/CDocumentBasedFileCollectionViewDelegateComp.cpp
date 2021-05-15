@@ -109,6 +109,22 @@ QByteArray CDocumentBasedFileCollectionViewDelegateComp::ImportObject(const QByt
 
 bool CDocumentBasedFileCollectionViewDelegateComp::ExportObject(const QByteArray& objectId, const QString& targetPath) const
 {
+	if ((m_collectionPtr != nullptr) && m_objectExportPersistenceCompPtr.IsValid()){
+		imtbase::IObjectCollection::DataPtr objectDataPtr;
+		
+		if (m_collectionPtr->GetObjectData(objectId, objectDataPtr)){
+			int state = m_objectExportPersistenceCompPtr->SaveToFile(*objectDataPtr, targetPath);
+			if (state != ifile::IFilePersistence::OS_OK){
+				QMessageBox::critical(nullptr, "", tr("File \"%1\"could not be exported").arg(targetPath));
+
+				return false;
+			}
+			else{
+				return true;
+			}
+		}
+	}
+	
 	return BaseClass2::ExportObject(objectId, targetPath);
 }
 
@@ -312,6 +328,23 @@ void CDocumentBasedFileCollectionViewDelegateComp::AfterRestore(const QByteArray
 	}
 
 	m_closedForRestoreId.clear();
+}
+
+
+const ifile::IFileTypeInfo* CDocumentBasedFileCollectionViewDelegateComp::FindFileInfo(const QByteArray& typeId, FileOperationType operationType) const
+{
+	switch (operationType){
+		case FOT_EXPORT:
+			if (m_objectExportPersistenceCompPtr.IsValid()){
+				return m_objectExportPersistenceCompPtr.GetPtr();
+			}
+		case FOT_IMPORT:
+			if (m_objectImportPersistenceCompPtr.IsValid()){
+				return m_objectImportPersistenceCompPtr.GetPtr();
+			}
+	}
+
+	return BaseClass2::FindFileInfo(typeId, operationType);
 }
 
 

@@ -57,10 +57,16 @@ protected Q_SLOTS:
 	virtual void OnRestore();
 
 protected:
-	QByteArray FindTypeIdFromFile(const QString& filePath) const;
-	const ifile::IFileTypeInfo* FindFileInfo(const QByteArray& typeId) const;
-	QString CreateFileImportFilter() const;
-	QString CreateFileExportFilter(const QByteArray& objectId) const;
+	enum FileOperationType
+	{
+		FOT_EXPORT,
+		FOT_IMPORT
+	};
+
+	virtual QByteArray FindTypeIdFromFile(const QString& filePath) const;
+	virtual const ifile::IFileTypeInfo* FindFileInfo(const QByteArray& typeId, FileOperationType operationType) const;
+	virtual QString CreateFileImportFilter() const;
+	virtual QString CreateFileExportFilter(const QByteArray& objectId) const;
 
 private:
 	// commands
