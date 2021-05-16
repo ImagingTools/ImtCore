@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="MeshDocumentTemplate" PackageId="EagleVoce" ComponentId="MeshTemplate">
+        <Element Id="MeshDocumentTemplate" PackageId="ImtEagleVoce" ComponentId="MeshTemplate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="">
@@ -60,7 +60,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PointCloudDocumentTemplate" PackageId="EagleVoce" ComponentId="PointCloudDocumentTemplate">
+        <Element Id="PointCloudDocumentTemplate" PackageId="ImtEagleVoce" ComponentId="PointCloudDocumentTemplate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="">
