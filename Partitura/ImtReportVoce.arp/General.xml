@@ -16,7 +16,7 @@
     </VersionInfos>
   </AcfHeader>
   <Description>
-    Core framework components of the ImagingTools SDK
+    Reporting components of the ImagingTools SDK
   </Description>
   <Keywords>
     Company='ImagingTools' Project='"ImagingTools Core Framework"'
