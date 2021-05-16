@@ -97,18 +97,19 @@ QToolBar[ImtToolBar=true]::separator
 QTableView[ImtMenu=true]
 {
 	color: palette(midlight);
-	background: palette(mid);
+
+	background: palette(base);
 }
+
 
 QAbstractItemView::item::selected
 {
-	/*color: #335777;*/
-	background-color: rgb(160, 80, 40);
+	background-color: rgba(160, 80, 40, 128);
 }
 
 QAbstractItemView::branch::selected
 {
-	background-color: rgb(160, 80, 40);
+	background-color: rgba(160, 80, 40, 128);
 }
 
 QComboBox::item:selected
@@ -118,42 +119,45 @@ QComboBox::item:selected
 
 QHeaderView::section
 {
-	/*background-color: white;*/
 	border-bottom: 1px solid palette(mid);
 }
 
 QTabBar
 {
-	background-color: rgb(120,120,122);
+	background-color: palette(base);
 }
+
 
 QTabBar::tab[CollectionView=true]
 {
-	background-color: rgb(120,120,122);
+	color: rgb(128,128,128);
+	
+	background-color: palette(base);
 }
 
 QTabBar::tab:selected[CollectionView=true]
 {
-	color: rgb(255,255,255);
-	background-color:#eb6225;
+	color: rgb(235, 98, 37, 200);
 }
 
 QTabBar::tab::top:selected[CollectionView=true]
 {
-	border-bottom: 2px solid #eb6225;
+	border-bottom: 2px solid rgba(235, 98, 37, 128);
 }
 
 QTabBar::tab::left:selected[CollectionView=true]
 {
-	border-left: 2px solid #eb6225;
+	border-left: 2px solid rgba(235, 98, 37, 128);
 }
 
 QTabBar::tab::right:selected[CollectionView=true]
 {
-	border-left: 2px solid #eb6225;
+	border-left: 2px solid rgba(235, 98, 37, 128);
 }
 
 QTabBar::tab::bottom:selected[CollectionView=true]
 {
-	border-bottom: 2px solid #eb6225;
+	border-bottom: 2px solid rgba(235, 98, 37, 128);
 }
+
+

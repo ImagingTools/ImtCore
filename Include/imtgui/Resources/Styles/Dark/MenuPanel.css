@@ -1,6 +1,6 @@
 QWidget#PageTree
 {
-	background-color: palette(window);
+	background-color: palette(base);
 }
 
 QTreeView#PageTree::item::hover
