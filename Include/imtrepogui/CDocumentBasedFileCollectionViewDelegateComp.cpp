@@ -96,13 +96,13 @@ QByteArray CDocumentBasedFileCollectionViewDelegateComp::ImportObject(const QByt
 						return documentId;
 					}
 					else{
-						QMessageBox::critical(nullptr, "", tr("File \"%1\"could not be imported").arg(sourcePath));
+						QMessageBox::critical(nullptr, "", tr("File '%1' could not be imported").arg(sourcePath));
 
 						return QByteArray();
 					}
 				}
 				else{
-					QMessageBox::critical(nullptr, "", tr("File \"%1\"could not be imported. Failed to load the file contents").arg(sourcePath));
+					QMessageBox::critical(nullptr, "", tr("File '%1' could not be imported. Failed to load the file contents").arg(sourcePath));
 
 					return QByteArray();
 				}
