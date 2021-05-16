@@ -57,8 +57,8 @@ QLabel#PageLabel
 
 QWidget[ImtTopFrame=true]
 {
-	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(107,107,109), stop: 0.9 rgb(92,92,94), stop: 0.97 rgb(92,92,94), stop: 1.0 rgb(70,70,72));
-	border-bottom: 1px solid rgb(60,60,60);
+	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(50,50,52), stop: 0.9 rgb(35, 35, 37), stop: 0.97 rgb(35,35,37), stop: 1.0 rgb(35,35,37));
+	border-bottom: 1px solid rgb(25,25,27);
 }
 
 QLabel[Header=true]

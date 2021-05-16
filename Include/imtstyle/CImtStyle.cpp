@@ -364,7 +364,7 @@ void CImtStyle::DrawImagingToolsToolButton(
 						painter->fillPath(path, Qt::white);
 					}
 					else{
-						painter->fillPath(path, QColor(145, 145, 145));
+						painter->fillPath(path, QColor(88, 88, 88));
 					}
 				}
 
@@ -468,10 +468,10 @@ CImtStyle::CImtStyle()
 	m_colorSchemaMap[DS_LIGHT] = light;
 
 	ColorSchema dark;
-	dark.toolButtonGradientColors.startColor = QColor(140, 140, 140);
-	dark.toolButtonGradientColors.endColor = QColor(115, 115, 115);
-	dark.pressedToolButtonGradientColors.startColor = QColor(135, 135, 135);
-	dark.pressedToolButtonGradientColors.endColor = QColor(135, 135, 135);
+	dark.toolButtonGradientColors.startColor = QColor(83, 83, 83);
+	dark.toolButtonGradientColors.endColor = QColor(58, 58, 58);
+	dark.pressedToolButtonGradientColors.startColor = QColor(77, 77, 77);
+	dark.pressedToolButtonGradientColors.endColor = QColor(77, 77, 77);
 	dark.palette.setColor(QPalette::Window, QColor(53, 53, 53));
 	dark.palette.setColor(QPalette::WindowText, Qt::white);
 	dark.palette.setColor(QPalette::Base, QColor(33, 33, 33));
