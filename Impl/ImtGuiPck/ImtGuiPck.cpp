@@ -117,6 +117,11 @@ I_EXPORT_COMPONENT(
 			"Design Manager",
 			"Style Design Manager");
 
+I_EXPORT_COMPONENT(
+			VirtualKeyboardShowCommandComp,
+			"Command for show Virtual Keyboard",
+			"Command for show Virtual Keyboard");
+
 
 } // namespace ImtGuiPck
 
