@@ -87,7 +87,7 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 	iconRect.setLeft(3);
 	iconRect.setRight(option.rect.right());
 	iconRect.setTop(option.rect.bottom() - m_height + 1);
-	iconRect.setBottom(option.rect.bottom() - 5);
+	iconRect.setBottom(option.rect.bottom() - m_height * 0.21);
 
 	// Draw icon:
 	QIcon::Mode iconMode = QIcon::Mode::Normal;
@@ -118,13 +118,16 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 				iconPixmap);
 
 	// Draw text:
-	QString text = index.data(Qt::DisplayRole).toString();
+	QString text = index.data(Qt::DisplayRole).toString();	
 	painter->setPen(textColor);
 	QFont font = painter->font();
-	font.setPixelSize(m_height * 0.2);
+	font.setPixelSize(m_height * 0.21);
 	painter->setFont(font);
+	QFontMetrics fontMetrics(font);
 	QRect textRect = option.rect;
-	textRect.setTop(option.rect.bottom() - m_height * 0.25 );
+	textRect.setLeft(3);
+	textRect.setTop(option.rect.bottom() - m_height * 0.21 );
+	text = fontMetrics.elidedText(text,Qt::ElideRight,textRect.width());
 
 	option.widget->style()->drawItemText(
 				painter,
