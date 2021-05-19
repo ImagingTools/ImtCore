@@ -122,6 +122,16 @@ I_EXPORT_COMPONENT(
 			"Command for show Virtual Keyboard",
 			"Command for show Virtual Keyboard");
 
+I_EXPORT_COMPONENT(
+			MenuPanelDelegate,
+			"Menu panel delegate",
+			"Delegate for MenuPanel");
+
+I_EXPORT_COMPONENT(
+			MenuPanelDelegateMin,
+			"Minimal menu panel delegate",
+			"Delegate for MenuPanel");
+
 
 } // namespace ImtGuiPck
 

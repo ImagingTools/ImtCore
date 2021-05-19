@@ -26,6 +26,8 @@
 #include <imtgui/CPluginStatusMonitorViewDelegateComp.h>
 #include <imtgui/CApplicationSwitchCommandComp.h>
 #include <imtgui/CDesignManagerComp.h>
+#include <imtwidgets/CMenuPanelDelegate.h>
+#include <imtwidgets/CMenuPanelDelegateMin.h>
 #include <imtgui/CVirtualKeyboardShowCommandComp.h>
 
 
@@ -58,6 +60,8 @@ typedef imtgui::CPluginStatusMonitorViewDelegateComp PluginStatusMonitorViewDele
 typedef imtgui::CApplicationSwitchCommandComp ApplicationSwitchCommand;
 typedef icomp::TModelCompWrap<imtgui::CDesignManagerComp> DesignManager;
 typedef imtgui::CVirtualKeyboardShowCommandComp VirtualKeyboardShowCommandComp;
+typedef icomp::TMakeComponentWrap<imtwidgets::CMenuPanelDelegate, imtwidgets::IMenuPanelDelegate> MenuPanelDelegate;
+typedef icomp::TMakeComponentWrap<imtwidgets::CMenuPanelDelegateMin, imtwidgets::IMenuPanelDelegate> MenuPanelDelegateMin;
 
 
 } // namespace ImtGuiPck
