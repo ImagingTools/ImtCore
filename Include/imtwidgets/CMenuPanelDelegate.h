@@ -1,42 +1,39 @@
 #pragma once
 
 
-// Qt includes
-#include <QtWidgets/QStyledItemDelegate>
-
-// Qt includes
-#include <QtWidgets/QTreeView>
-
+// ImtCore includes
+#include <imtwidgets/IMenuPanelDelegate.h>
 
 namespace imtwidgets
 {
 
 
-class CMenuPanelDelegate: public QStyledItemDelegate
+class CMenuPanelDelegate: public IMenuPanelDelegate
 {
 public:
 	explicit CMenuPanelDelegate(QTreeView* menuPanelPtr = nullptr);
 	
-	int GetMinimumWidth();
+	// reimplemented (IMenuPanelDelegate)
+	int GetMinimumWidth() override;
 
-	void SetFontMetrics(const QFontMetrics& fontMetrics);
+	void SetFontMetrics(const QFontMetrics& fontMetrics) override;
 
-	void SetIndent(int indent);
-	void SetItemHeight(int height);
-	void SetIconSizeRatio(double ratio);
-	void SetIconSizeHoverRatio(double ratio);
+	void SetIndent(int indent) override;
+	void SetItemHeight(int height) override;
+	void SetIconSizeRatio(double ratio) override;
+	void SetIconSizeHoverRatio(double ratio) override;
 
-	void SetTopPadding(int padding);
-	void SetLeftPadding(int padding);
-	void SetRightPadding(int padding);
-	void SetIconToTextPadding(int padding);
+	void SetTopPadding(int padding) override;
+	void SetLeftPadding(int padding) override;
+	void SetRightPadding(int padding) override;
+	void SetIconToTextPadding(int padding) override;
 
 protected:
 	// reimplemented (QItemDelegate)
 	virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 	virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
-private:
+protected:
 	int m_indent;
 	int m_height;
 

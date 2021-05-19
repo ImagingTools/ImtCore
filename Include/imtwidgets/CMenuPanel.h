@@ -10,7 +10,7 @@
 #include <iwidgets/CFocusDecorator.h>
 
 // ImtCore includes
-#include <imtwidgets/CMenuPanelDelegate.h>
+#include <imtwidgets/IMenuPanelDelegate.h>
 #include <GeneratedFiles/imtwidgets/ui_CMenuPanel.h>
 
 
@@ -85,12 +85,15 @@ public:
 
 	virtual void SetAnimationDelay(int delay);
 	virtual void SetAnimationDuration(int duration);
+	virtual void SetAnimationEnabled(int animationEnabled);
 
 	virtual void SetMainWidget(QWidget* mainWidget);
 
 	virtual void CollapsePanelImmideatly();
 
 	virtual void UpdateFontSize();
+
+	virtual void SetDelegate(IMenuPanelDelegate* menuPanelDelegate);
 
 Q_SIGNALS:
 	/**
@@ -127,6 +130,7 @@ private:
 	int m_animationTimerIdentifier;
 	int m_animationDelay;
 	int m_animationDuration;
+	bool m_animationEnabled;
 
 	QStandardItemModel m_model;
 	QPropertyAnimation m_animationWidth;
@@ -136,7 +140,7 @@ private:
 	QWidget* m_mainWidgetPtr;
 	QWidget* m_parentWidgetPtr;
 
-	CMenuPanelDelegate m_delegatePtr;
+	IMenuPanelDelegate* m_delegatePtr;
 
 	QGraphicsDropShadowEffect* m_shadowPtr;
 

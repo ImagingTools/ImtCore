@@ -118,6 +118,13 @@ void CMenuPanelComp::OnGuiCreated()
 
 	imtwidgets::CMenuPanel* widgetPtr = GetQtWidget();
 
+	if (m_menuPanelDelegateCompPtr.IsValid()){
+		imtwidgets::IMenuPanelDelegate* menuPanelDelegate = m_menuPanelDelegateCompPtr.GetPtr();
+		if (menuPanelDelegate != nullptr){
+			widgetPtr->SetDelegate(menuPanelDelegate);
+		}
+	}
+
 	if (m_widgetProviderCompPtr.IsValid() && m_isShowOverAttrPtr.IsValid() && *m_isShowOverAttrPtr){
 		widgetPtr->SetMainWidget(m_widgetProviderCompPtr->GetWidgetPtr(QByteArray()));
 	}
@@ -128,6 +135,7 @@ void CMenuPanelComp::OnGuiCreated()
 
 	m_animationDelayAttrPtr.IsValid() ? widgetPtr->SetAnimationDelay(*m_animationDelayAttrPtr) : widgetPtr->SetAnimationDelay(500);
 	m_animationDurationAttrPtr.IsValid() ? widgetPtr->SetAnimationDuration(*m_animationDurationAttrPtr) : widgetPtr->SetAnimationDuration(300);
+	m_animationEnabledAttrPtr.IsValid() ? widgetPtr->SetAnimationEnabled(*m_animationEnabledAttrPtr) : widgetPtr->SetAnimationEnabled(true);
 
 	connect(widgetPtr, &imtwidgets::CMenuPanel::PageIdChanged, this, &CMenuPanelComp::OnPageIdChanged);
 

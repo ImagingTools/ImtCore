@@ -27,9 +27,11 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_animationTimerIdentifier(0),
 	m_animationDelay(0),
 	m_animationDuration(0),
+	m_animationEnabled(true),
 	m_mainWidgetPtr(nullptr),
 	m_leftFramePtr(parent),
 	m_parentWidgetPtr(nullptr),
+	m_delegatePtr(nullptr),
 	m_shadowPtr(nullptr)
 {
 	setupUi(this);
@@ -45,10 +47,6 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	PageTree->selectionModel()->clearSelection();
 	connect(PageTree->selectionModel(), &QItemSelectionModel::currentChanged, this, &CMenuPanel::OnPageIdChanged);
 
-	m_delegatePtr.SetFontMetrics(PageTree->fontMetrics());
-	
-	PageTree->setItemDelegate(&m_delegatePtr);
-
 	PageTree->setHeaderHidden(true);
 	PageTree->setIconSize(QSize(16, 16));
 	SetItemHeight(16);
@@ -63,7 +61,6 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 
 	m_animationWidth.setTargetObject(PageTree);
 	m_animationWidth.setPropertyName("maximumWidth");
-	m_animationIndent.setTargetObject(&m_delegatePtr);
 	m_animationIndent.setPropertyName("indent");
 	connect(&m_animationWidth, &QPropertyAnimation::finished, this, &CMenuPanel::OnAnimationFinished);
 
@@ -351,7 +348,9 @@ bool CMenuPanel::SetPageName(const QByteArray& pageId, const QString& pageName)
 void CMenuPanel::SetItemIndent(int indent)
 {
 	m_indent = indent;
-	m_delegatePtr.SetIndent(indent);
+	if (m_delegatePtr != nullptr){
+		m_delegatePtr->SetIndent(indent);
+	}
 	AfterSizesChanged();
 }
 
@@ -359,7 +358,9 @@ void CMenuPanel::SetItemIndent(int indent)
 void CMenuPanel::SetItemHeight(int height)
 {
 	m_cachedItemHeight = height;
-	m_delegatePtr.SetItemHeight(height);
+	if (m_delegatePtr != nullptr){
+		m_delegatePtr->SetItemHeight(height);
+	}
 	UpdateFontSize();
 	AfterSizesChanged();
 }
@@ -368,7 +369,9 @@ void CMenuPanel::SetItemHeight(int height)
 void CMenuPanel::SetIconSizeRatio(double ratio)
 {
 	m_cachedIconSizeRatio = ratio;
-	m_delegatePtr.SetIconSizeRatio(ratio);
+	if (m_delegatePtr != nullptr){
+		m_delegatePtr->SetIconSizeRatio(ratio);
+	}
 	UpdateFontSize();
 	AfterSizesChanged();
 }
@@ -376,7 +379,9 @@ void CMenuPanel::SetIconSizeRatio(double ratio)
 
 void CMenuPanel::SetIconSizeHoverRatio(double ratio)
 {
-	m_delegatePtr.SetIconSizeHoverRatio(ratio);
+	if (m_delegatePtr != nullptr){
+		m_delegatePtr->SetIconSizeHoverRatio(ratio);
+	}
 }
 
 
@@ -390,27 +395,35 @@ void CMenuPanel::SetFontSizeRatio(double ratio)
 
 void CMenuPanel::SetItemVerticalPadding(int padding)
 {
-	m_delegatePtr.SetTopPadding(padding);
+	if (m_delegatePtr != nullptr){
+		m_delegatePtr->SetTopPadding(padding);
+	}
 }
 
 
 void CMenuPanel::SetItemLeftPadding(int padding)
 {
-	m_delegatePtr.SetLeftPadding(padding);
+	if (m_delegatePtr != nullptr){
+		m_delegatePtr->SetLeftPadding(padding);
+	}
 	AfterSizesChanged(); 
 }
 
 
 void CMenuPanel::SetItemRightPadding(int padding)
 {
-	m_delegatePtr.SetRightPadding(padding);
+	if (m_delegatePtr != nullptr){
+		m_delegatePtr->SetRightPadding(padding);
+	}
 	AfterSizesChanged(); 
 }
 
 
 void CMenuPanel::SetItemIconToTextPadding(int padding)
 {
-	m_delegatePtr.SetIconToTextPadding(padding);
+	if (m_delegatePtr != nullptr){
+		m_delegatePtr->SetIconToTextPadding(padding);
+	}
 	AfterSizesChanged();
 }
 
@@ -424,6 +437,12 @@ void CMenuPanel::SetAnimationDelay(int delay)
 void CMenuPanel::SetAnimationDuration(int duration)
 {
 	m_animationDuration = duration;
+}
+
+
+void CMenuPanel::SetAnimationEnabled(int animationEnabled)
+{
+	m_animationEnabled = animationEnabled;
 }
 
 
@@ -475,7 +494,9 @@ void CMenuPanel::CollapsePanelImmideatly()
 		}
 	}
 
-	m_delegatePtr.setProperty("indent", 0);
+	if (m_delegatePtr != nullptr){
+		m_delegatePtr->setProperty("indent", 0);
+	}
 }
 
 
@@ -484,7 +505,18 @@ void CMenuPanel::UpdateFontSize()
 	QFont font = PageTree->font();
 	font.setPixelSize(m_cachedItemHeight * m_cachedIconSizeRatio * m_cachedFontSizeRatio);
 	PageTree->setFont(font);
-	m_delegatePtr.SetFontMetrics(PageTree->fontMetrics());
+	if (m_delegatePtr != nullptr){
+		m_delegatePtr->SetFontMetrics(PageTree->fontMetrics());
+	}
+}
+
+
+void CMenuPanel::SetDelegate(IMenuPanelDelegate* menuPanelDelegate)
+{
+	m_delegatePtr = menuPanelDelegate;
+	m_delegatePtr->SetFontMetrics(PageTree->fontMetrics());
+	PageTree->setItemDelegate(m_delegatePtr);
+	m_animationIndent.setTargetObject(m_delegatePtr);
 }
 
 
@@ -600,6 +632,8 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 
 void CMenuPanel::enterEvent(QEvent* /*event*/)
 {
+	if (m_animationEnabled == false)
+		return;
 	if (!PageTree->currentIndex().isValid()){
 		m_animationAction = AA_EXPAND; 
 		return;
@@ -615,6 +649,8 @@ void CMenuPanel::enterEvent(QEvent* /*event*/)
 
 void CMenuPanel::leaveEvent(QEvent* /*event*/)
 {
+	if (m_animationEnabled == false)
+		return;
 	if (!PageTree->currentIndex().isValid()){
 		m_animationAction = AA_COLLAPSE;
 		return;
@@ -885,7 +921,9 @@ void CMenuPanel::ReconnectModel()
 
 void CMenuPanel::AfterSizesChanged()
 {
-	m_minWidth = m_delegatePtr.GetMinimumWidth();
+	if (m_delegatePtr != nullptr){
+		m_minWidth = m_delegatePtr->GetMinimumWidth();
+	}
 	SetMinimumPanelWidth(m_minWidth);
 	m_maxWidth = CalculateMaxItemWith();
 

@@ -13,7 +13,7 @@
 #include <imtgui/IWidgetProvider.h>
 #include <imtgui/IMonitorInfoProvider.h>
 #include <imtwidgets/CMenuPanel.h>
-
+#include <imtwidgets/IMenuPanelDelegate.h>
 
 namespace imtgui
 {
@@ -34,11 +34,13 @@ public:
 	I_BEGIN_COMPONENT(CMenuPanelCompBase);
 		I_ASSIGN(m_animationDelayAttrPtr, "AnimationDelay", "Animation delay", true, 800);
 		I_ASSIGN(m_animationDurationAttrPtr, "AnimationDuration", "Animation duration", true, 150);
+		I_ASSIGN(m_animationEnabledAttrPtr, "AnimationEnabled", "Animation enabled", true, true);
 	I_END_COMPONENT;
 
 protected:
 	I_ATTR(int, m_animationDelayAttrPtr);
 	I_ATTR(int, m_animationDurationAttrPtr);
+	I_ATTR(bool, m_animationEnabledAttrPtr);
 };
 
 
@@ -64,6 +66,7 @@ public:
 		I_ASSIGN(m_leftPaddingAttrPtr, "LeftPadding", "Left item padding", true, 0);
 		I_ASSIGN(m_rightPaddingAttrPtr, "RightPadding", "Right item padding", true, 20);
 		I_ASSIGN(m_iconToTextPaddingAttrPtr, "IconToTextPadding", "Icon to text item padding", true, 1);
+		I_ASSIGN(m_menuPanelDelegateCompPtr, "MenuPanelDelegate", "Delegate for menu panel", true, "MenuPanelDelegate");
 	I_END_COMPONENT;
 
 	CMenuPanelComp();
@@ -152,6 +155,7 @@ private:
 	I_REF(imtgui::IWidgetProvider, m_widgetProviderCompPtr);
 	I_REF(imtgui::IMonitorInfoProvider, m_monitorInfoProviderPtr);
 	I_REF(imod::IModel, m_monitorInfoProviderModelPtr);
+	I_REF(imtwidgets::IMenuPanelDelegate, m_menuPanelDelegateCompPtr);
 
 	I_ATTR(bool, m_isShowOverAttrPtr);
 
