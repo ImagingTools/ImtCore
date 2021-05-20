@@ -28,8 +28,7 @@ void CFullScreenCommandComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	m_mainMenuCommand.SetName(*m_rootMenuNameAttrPtr);
-	m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionAttrPtr, QIcon(*m_actionIconScreenOffAttrPtr));
-
+	m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOffAttrPtr, QIcon(*m_actionIconScreenOffAttrPtr));
 	m_rootMenuCommand.InsertChild(&m_mainMenuCommand);
 	m_mainMenuCommand.InsertChild(&m_switchCommand);
 
@@ -42,12 +41,33 @@ void CFullScreenCommandComp::OnComponentCreated()
 
 // protected methods
 
+bool CFullScreenCommandComp::CheckIsFullScreen()
+{
+	bool retVal = true;
+	QWidget* mainWidgetPtr = m_guiObjectCompPtr->GetWidget();
+	Q_ASSERT(mainWidgetPtr != nullptr);
+
+	while (mainWidgetPtr->parentWidget() != nullptr){
+		mainWidgetPtr = mainWidgetPtr->parentWidget();
+	}
+
+	if (mainWidgetPtr->isFullScreen() == false){
+		retVal = false;
+	}
+	return retVal;
+}
+
+
 // reimpemented (ibase::TLocalizableWrap)
 
 void CFullScreenCommandComp::OnLanguageChanged()
 {
-	m_switchCommand.setStatusTip(*m_menuDescriptionAttrPtr);
-	m_switchCommand.setToolTip(*m_menuDescriptionAttrPtr);
+	if (CheckIsFullScreen() == true){
+		m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOffAttrPtr, QIcon(*m_actionIconScreenOffAttrPtr));
+	}
+	else{
+		m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOnAttrPtr, QIcon(*m_actionIconScreenOnAttrPtr));
+	}
 }
 
 
@@ -65,13 +85,13 @@ void CFullScreenCommandComp::OnCommandActivated()
 	if (mainWidgetPtr->isFullScreen()){
 		mainWidgetPtr->showMaximized();
 		if (m_actionIconScreenOnAttrPtr.IsValid()){
-			m_switchCommand.setIcon(QIcon(*m_actionIconScreenOnAttrPtr));
+			m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOnAttrPtr, QIcon(*m_actionIconScreenOnAttrPtr));
 		}
 	}
 	else{
 		mainWidgetPtr->showFullScreen();
 		if (m_actionIconScreenOnAttrPtr.IsValid()){
-			m_switchCommand.setIcon(QIcon(*m_actionIconScreenOffAttrPtr));
+			m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOffAttrPtr, QIcon(*m_actionIconScreenOffAttrPtr));
 		}
 	}
 }

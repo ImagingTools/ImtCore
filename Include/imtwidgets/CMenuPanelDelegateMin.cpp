@@ -125,7 +125,7 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 	painter->setFont(font);
 	QFontMetrics fontMetrics(font);
 	QRect textRect = option.rect;
-	textRect.setLeft(3);
+	textRect.setLeft(4);
 	textRect.setTop(option.rect.bottom() - m_height * 0.21 );
 	text = fontMetrics.elidedText(text,Qt::ElideRight,textRect.width());
 

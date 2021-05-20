@@ -283,6 +283,9 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	UpdateLoginButtonsState();
 
 	connect(&m_autoLogoutTimer, SIGNAL(timeout()), this, SLOT(Logout()));
+	connect(&m_checkIsFullScreenTimer, SIGNAL(timeout()), this, SLOT(checkIsFullScreen()));
+
+	m_checkIsFullScreenTimer.start(500);
 
 	if (m_defaultPageIndexAttrPtr.IsValid()){
 		m_lastPageIndexForLoggedUser = *m_defaultPageIndexAttrPtr;
@@ -549,6 +552,25 @@ void CThumbnailDecoratorGuiComp::on_CommandsMenuButton_clicked()
 void CThumbnailDecoratorGuiComp::Logout()
 {
 	ProcessLogout();
+}
+
+
+void CThumbnailDecoratorGuiComp::checkIsFullScreen()
+{
+	QWidget* mainWidgetPtr = GetWidget();
+	Q_ASSERT(mainWidgetPtr != nullptr);
+
+	while (mainWidgetPtr->parentWidget() != nullptr){
+		mainWidgetPtr = mainWidgetPtr->parentWidget();
+	}
+
+	if (mainWidgetPtr->isFullScreen() == true){
+		ExitButton->setVisible(true);
+	}
+	else{
+		ExitButton->setVisible(false);
+	}
+
 }
 
 
@@ -1389,5 +1411,6 @@ void CThumbnailDecoratorGuiComp::PageVisualStatusObserver::OnModelChanged(int /*
 
 
 } // namespace imtgui
+
 
 

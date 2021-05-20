@@ -36,7 +36,8 @@ public:
 		I_ASSIGN(m_actionIconScreenOnAttrPtr, "ActionFullScreenOnIcon", "Icon screen on used command menu", true, ":/Icons/FullScreenOnNormal");
 		I_ASSIGN(m_actionIconScreenOffAttrPtr, "ActionFullScreenOffIcon", "Icon screen off used command menu", true, ":/Icons/FullScreenOffNormal");
 		I_ASSIGN(m_menuNameAttrPtr, "MenuName", "Name of the menu for the action group", true, "MenuName");
-		I_ASSIGN(m_menuDescriptionAttrPtr, "MenuDescription", "Description for the action group", true, "MenuDescription");
+		I_ASSIGN(m_menuDescriptionOnAttrPtr, "MenuDescriptionOn", "Description for the full screen On", true, "MenuDescription");
+		I_ASSIGN(m_menuDescriptionOffAttrPtr, "MenuDescriptionOff", "Description for the full screen Off", true, "MenuDescription");
 		I_ASSIGN(m_rootMenuNameAttrPtr, "RootMenu", "Name of the root command", true, "");
 		I_ASSIGN(m_guiObjectCompPtr, "GuiObject", "Any of the gui object", true, "GuiObject");
 	I_END_COMPONENT;
@@ -50,6 +51,8 @@ public:
 	virtual void OnComponentCreated();
 
 protected:
+	virtual bool CheckIsFullScreen();
+
 	// reimpemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
 
@@ -60,7 +63,8 @@ protected:
 	I_ATTR(QByteArray, m_actionIconScreenOnAttrPtr);
 	I_ATTR(QByteArray, m_actionIconScreenOffAttrPtr);
 	I_TEXTATTR(m_menuNameAttrPtr);
-	I_TEXTATTR(m_menuDescriptionAttrPtr);
+	I_TEXTATTR(m_menuDescriptionOnAttrPtr);
+	I_TEXTATTR(m_menuDescriptionOffAttrPtr);
 	I_TEXTATTR(m_rootMenuNameAttrPtr);
 	I_REF(iqtgui::IGuiObject, m_guiObjectCompPtr);
 

@@ -186,6 +186,7 @@ private Q_SLOTS:
 	void on_PasswordEdit_textEdited(const QString &text);
 	void on_CommandsMenuButton_clicked();
 	void Logout();
+	void checkIsFullScreen();
 	void on_BackPageButton_clicked();
 	void on_NextPageButton_clicked();
 	void on_DashboardButton_clicked();
@@ -333,6 +334,7 @@ private:
 	QToolBar* m_mainToolBar;
 	QToolBar* m_additionalCommandsToolBar;
 	QTimer m_autoLogoutTimer;
+	QTimer m_checkIsFullScreenTimer;
 
 	QMenu m_commandsMenu;
 
