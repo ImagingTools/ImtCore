@@ -45,7 +45,7 @@ CHttpRequest::CHttpRequest(QObject& socket, const IRequestHandler& handler, cons
 	else{
 		QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(&socket);
 		if (webSocketPtr != nullptr){
-			m_remoteAddress = socketPtr->peerAddress();
+			m_remoteAddress = webSocketPtr->peerAddress();
 
 			connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CHttpRequest::OnWebSocketTextMessage);
 			connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CHttpRequest::OnWebSocketBinaryMessage);

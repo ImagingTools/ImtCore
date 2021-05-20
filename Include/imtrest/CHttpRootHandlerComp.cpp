@@ -73,8 +73,12 @@ IRequestHandler* CHttpRootHandlerComp::FindRequestHandler(const QByteArray& comm
 
 	for (int i = 0; i < m_requestHandlersCompPtr.GetCount(); ++i) {
 		IRequestHandler* handlerPtr = m_requestHandlersCompPtr[i];
+		if (i > m_commandIdsAttrPtr.GetCount() - 1){
+			break;
+		}
 		if (handlerPtr != nullptr){
-			QByteArray handlersPtrSupportedCommandId = handlerPtr->GetSupportedCommandId();
+//			QByteArray handlersPtrSupportedCommandId = handlerPtr->GetSupportedCommandId();
+			QByteArray handlersPtrSupportedCommandId = m_commandIdsAttrPtr[i];
 			if (handlersPtrSupportedCommandId == commandId)
 			{
 				exactsCommandIdHandler = handlerPtr;
