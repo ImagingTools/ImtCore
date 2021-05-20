@@ -20,6 +20,11 @@ I_EXPORT_COMPONENT(
 			"TCP Connection Server");
 
 I_EXPORT_COMPONENT(
+			WebSocketServer,
+			"General TCP-server",
+			"WebSocket Connection Server");
+
+I_EXPORT_COMPONENT(
 			HttpProtocolEngine,
 			"HTTP protocol engine",
 			"TCP Connection Server HTTP REST");
