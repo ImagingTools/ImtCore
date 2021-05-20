@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
+#include <QtCore/QTimer>
 
 // ACF includes
 #include <istd/CCrcCalculator.h>
@@ -89,17 +90,17 @@ void CLicenseControllerComp::ReadLicenseFile()
 		return;
 	}
 
-	int checksum = istd::CCrcCalculator::GetCrcFromFile(licenseFilePath);
-
-	QString checkSumString = QString::number(checksum, 16).rightJustified(8, '0').toUpper();
-
-	QString fingerprintFilePath = QDir::tempPath() + "/" + checkSumString + ".xli";
+	QString fingerprintFilePath = GetFingerprintPath();
 
 	int state = m_productInstancePersistenceCompPtr->LoadFromFile(*m_productInstanceCompPtr, licenseFilePath);
 	if (state != ifile::IFilePersistence::OS_OK){
 		int daysUntilExpire = -1;
 		if (LoadFingerprint(fingerprintFilePath, daysUntilExpire)){
 			SendWarningMessage(0, QString(QObject::tr("You have no valid license to run this software anymore. You have %1 day(s) to update your system with a valid license")).arg(daysUntilExpire), "License Management");
+
+			int oneDay = 1000 * 60 * 60 * 24;
+
+			QTimer::singleShot(oneDay, this, &CLicenseControllerComp::OnFingeprintCheckTimer);
 		}
 		else{
 			SendErrorMessage(0, QString(QObject::tr("You have no license to run this software. License file: '%1'")).arg(licenseFilePath), "License Management");
@@ -151,6 +152,28 @@ bool CLicenseControllerComp::LoadFingerprint(const QString& filePath, int& daysU
 }
 
 
+QString CLicenseControllerComp::GetFingerprintPath() const
+{
+	QString licenseFilePath = m_licensePathCompPtr->GetPath();
+	if (licenseFilePath.isEmpty()){
+		return QString();
+	}
+
+	QFileInfo licenseFileInfo(licenseFilePath);
+	if (!licenseFileInfo.exists()){
+		return QString();
+	}
+
+	int checksum = istd::CCrcCalculator::GetCrcFromFile(licenseFilePath);
+
+	QString checkSumString = QString::number(checksum, 16).rightJustified(8, '0').toUpper();
+
+	QString fingerprintFilePath = QDir::tempPath() + "/" + checkSumString + ".xli";
+
+	return fingerprintFilePath;
+}
+
+
 void CLicenseControllerComp::OnLicenseKeysUpdated(
 			const istd::IChangeable::ChangeSet& /*changeSet*/,
 			const imtcrypt::IEncryptionKeysProvider* /*licenseKeysProviderPtr*/)
@@ -158,6 +181,12 @@ void CLicenseControllerComp::OnLicenseKeysUpdated(
 	if (!m_isInitializing){
 		ReadLicenseFile();
 	}
+}
+
+
+void CLicenseControllerComp::OnFingeprintCheckTimer()
+{
+	ReadLicenseFile();
 }
 
 

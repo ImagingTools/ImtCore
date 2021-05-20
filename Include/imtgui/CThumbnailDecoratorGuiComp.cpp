@@ -199,6 +199,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 			if (m_additionalCommandsToolBar == nullptr){
 				m_additionalCommandsToolBar = new QToolBar(AdditionalCommandsFrame);
 				m_additionalCommandsToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+				m_additionalCommandsToolBar->setIconSize(QSize(24, 24));
 
 				AdditionalCommandsFrame->layout()->addWidget(m_additionalCommandsToolBar);
 

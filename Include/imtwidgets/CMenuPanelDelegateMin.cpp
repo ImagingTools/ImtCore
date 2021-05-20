@@ -62,7 +62,7 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 	backgroundSingleEllipse.setBottom(option.rect.bottom() - 1);
 
 	// Draw background:
-	if (option.state & QStyle::State_Selected || option.state & QStyle::State_MouseOver){
+	if (option.state & QStyle::State_Selected){
 		painter->setBrush(QBrush(backgroundColor));
 
 		QRect backgroundRect = option.rect;
@@ -72,7 +72,7 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 		backgroundRect.setRight(3);
 		backgroundRect.setTop(option.rect.bottom() - m_height + 1);
 		backgroundRect.setBottom(option.rect.bottom());
-		painter->fillRect(backgroundRect, backgroundColor);
+		painter->fillRect(backgroundRect, QColor(25, 200, 60));
 	}
 
 	// Calculate offset from treeview's left side:
@@ -96,7 +96,7 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 	}
 
 	int iconSize = m_iconHeight;
-	if (option.state & QStyle::State_MouseOver){
+	if ((option.state & QStyle::State_Selected) || (option.state & QStyle::State_MouseOver)){
 		const QStandardItemModel* modelPtr = dynamic_cast<const QStandardItemModel*>(index.model());
 		Q_ASSERT(modelPtr != nullptr);
 
@@ -118,7 +118,7 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 				iconPixmap);
 
 	// Draw text:
-	QString text = index.data(Qt::DisplayRole).toString();	
+	QString text = index.data(Qt::DisplayRole).toString();
 	painter->setPen(textColor);
 	QFont font = painter->font();
 	font.setPixelSize(m_height * 0.21);

@@ -21,8 +21,9 @@ namespace imtlic
 	Client-side license check controller.
 	\ingroup LicenseManagement
 */
-class CLicenseControllerComp: public ilog::CLoggerComponentBase
+class CLicenseControllerComp: public QObject, public ilog::CLoggerComponentBase
 {
+	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
@@ -46,7 +47,11 @@ private:
 	void ReadLicenseFile();
 	bool UpdateFingerprint(const QString& filePath) const;
 	bool LoadFingerprint(const QString& filePath, int& daysUntilExpire);
+	QString GetFingerprintPath() const;
 	void OnLicenseKeysUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtcrypt::IEncryptionKeysProvider* licenseKeysProviderPtr);
+
+protected:
+	void OnFingeprintCheckTimer();
 
 private:
 	imtbase::TModelUpdateBinder<imtcrypt::IEncryptionKeysProvider, CLicenseControllerComp> m_licenseKeysProvider;
