@@ -283,8 +283,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 	connect(&m_autoLogoutTimer, SIGNAL(timeout()), this, SLOT(Logout()));
 
-	SetKeyboardCommandPath();
-
 	if (m_defaultPageIndexAttrPtr.IsValid()){
 		m_lastPageIndexForLoggedUser = *m_defaultPageIndexAttrPtr;
 	}
@@ -547,21 +545,9 @@ void CThumbnailDecoratorGuiComp::on_CommandsMenuButton_clicked()
 }
 
 
-void CThumbnailDecoratorGuiComp::on_KeyboardButton_clicked()
-{
-	ShowKeyboard();
-}
-
-
 void CThumbnailDecoratorGuiComp::Logout()
 {
 	ProcessLogout();
-}
-
-
-void CThumbnailDecoratorGuiComp::OnVirtualKeyboardStateChanged(QProcess::ProcessState state)
-{
-	KeyboardButton->setEnabled(state == QProcess::NotRunning);
 }
 
 
@@ -1311,62 +1297,6 @@ int CThumbnailDecoratorGuiComp::SetupCommandsMenu(const iqtgui::CHierarchicalCom
 	}
 
 	return prevGroupId;
-}
-
-
-// private methods
-
-void CThumbnailDecoratorGuiComp::ShowKeyboard()
-{
-	HideKeyboard();
-
-	m_keyboardProcessPtr.SetPtr(new QProcess(this));
-
-	connect(	m_keyboardProcessPtr.GetPtr(),
-				SIGNAL(stateChanged(QProcess::ProcessState)),
-				this,
-				SLOT(OnVirtualKeyboardStateChanged(QProcess::ProcessState)));
-
-	m_keyboardProcessPtr->setProgram(m_winKeyboardPath);
-
-	m_keyboardProcessPtr->startDetached();
-}
-
-
-void CThumbnailDecoratorGuiComp::HideKeyboard()
-{
-	if (m_keyboardProcessPtr != nullptr){
-		m_keyboardProcessPtr->terminate();
-		m_keyboardProcessPtr->waitForFinished(2000);
-		if (!m_keyboardProcessPtr->isOpen()){
-			m_keyboardProcessPtr->kill();
-		}
-		m_keyboardProcessPtr.Reset();
-	}
-}
-
-
-void CThumbnailDecoratorGuiComp::SetKeyboardCommandPath()
-{
-	QString processPath;
-
-	KeyboardButton->setVisible(false);
-
-	if (m_winKeyboardPath.isEmpty()){
-		processPath = getenv("SystemRoot");
-		if (processPath.isEmpty()){
-			processPath = "C:\\Windows";
-		}
-
-		processPath += "\\System32\\osk.exe";
-
-		QFileInfo processFileInfo(processPath);
-		if (processFileInfo.exists()){
-			m_winKeyboardPath = processPath;
-
-			KeyboardButton->setVisible(true);
-		}
-	}
 }
 
 

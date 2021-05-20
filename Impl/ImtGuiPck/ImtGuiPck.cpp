@@ -118,9 +118,14 @@ I_EXPORT_COMPONENT(
 			"Style Design Manager");
 
 I_EXPORT_COMPONENT(
-			VirtualKeyboardShowCommandComp,
+			VirtualKeyboardShowCommand,
 			"Command for show Virtual Keyboard",
 			"Command for show Virtual Keyboard");
+
+I_EXPORT_COMPONENT(
+			FullScreenCommand,
+			"Command for switch of FullScreen/Normal mode",
+			"Command for switch of FullScreen/Normal mode");
 
 I_EXPORT_COMPONENT(
 			MenuPanelDelegate,

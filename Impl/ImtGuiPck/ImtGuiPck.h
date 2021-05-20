@@ -29,6 +29,7 @@
 #include <imtwidgets/CMenuPanelDelegate.h>
 #include <imtwidgets/CMenuPanelDelegateMin.h>
 #include <imtgui/CVirtualKeyboardShowCommandComp.h>
+#include <imtgui/CFullScreenCommandComp.h>
 
 
 
@@ -59,7 +60,8 @@ typedef imtgui::CPluginStatusViewerComp PluginStatusViewer;
 typedef imtgui::CPluginStatusMonitorViewDelegateComp PluginStatusMonitorViewDelegate;
 typedef imtgui::CApplicationSwitchCommandComp ApplicationSwitchCommand;
 typedef icomp::TModelCompWrap<imtgui::CDesignManagerComp> DesignManager;
-typedef imtgui::CVirtualKeyboardShowCommandComp VirtualKeyboardShowCommandComp;
+typedef imtgui::CVirtualKeyboardShowCommandComp VirtualKeyboardShowCommand;
+typedef imtgui::CFullScreenCommandComp FullScreenCommand;
 typedef icomp::TMakeComponentWrap<imtwidgets::CMenuPanelDelegate, imtwidgets::IMenuPanelDelegate> MenuPanelDelegate;
 typedef icomp::TMakeComponentWrap<imtwidgets::CMenuPanelDelegateMin, imtwidgets::IMenuPanelDelegate> MenuPanelDelegateMin;
 

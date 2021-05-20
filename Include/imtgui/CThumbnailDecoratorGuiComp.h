@@ -185,9 +185,7 @@ private Q_SLOTS:
 	void on_LoginControlButton_clicked();
 	void on_PasswordEdit_textEdited(const QString &text);
 	void on_CommandsMenuButton_clicked();
-	void on_KeyboardButton_clicked();
 	void Logout();
-	void OnVirtualKeyboardStateChanged(QProcess::ProcessState state);
 	void on_BackPageButton_clicked();
 	void on_NextPageButton_clicked();
 	void on_DashboardButton_clicked();
@@ -220,9 +218,6 @@ private:
 	void UpdateMinSize();
 	void UpdateCommands();
 	int SetupCommandsMenu(const iqtgui::CHierarchicalCommand& command, QMenu& result, int& prevGroupId);
-	void ShowKeyboard();
-	void HideKeyboard();
-	void SetKeyboardCommandPath();
 
 private:
 	struct ItemInfo

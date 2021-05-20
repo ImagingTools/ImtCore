@@ -87,7 +87,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="imtguilight.qrc">
+             <iconset resource="imtguidark.qrc">
               <normaloff>:/ColorIcons/MenuRing</normaloff>:/ColorIcons/MenuRing</iconset>
             </property>
             <property name="iconSize">
@@ -137,7 +137,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="imtguilight.qrc">
+                <iconset resource="imtguidark.qrc">
                  <normaloff>:/Icons/Left</normaloff>:/Icons/Left</iconset>
                </property>
                <property name="iconSize">
@@ -157,7 +157,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="imtguilight.qrc">
+                <iconset resource="imtguidark.qrc">
                  <normaloff>:/Icons/Right</normaloff>:/Icons/Right</iconset>
                </property>
                <property name="iconSize">
@@ -301,7 +301,7 @@
              <string>Commands</string>
             </property>
             <property name="icon">
-             <iconset resource="imtguilight.qrc">
+             <iconset resource="imtguidark.qrc">
               <normaloff>:/Icons/Menu</normaloff>:/Icons/Menu</iconset>
             </property>
             <property name="iconSize">
@@ -321,31 +321,8 @@
              <string>Log out</string>
             </property>
             <property name="icon">
-             <iconset resource="imtguilight.qrc">
+             <iconset resource="imtguidark.qrc">
               <normaloff>:/Icons/Lock</normaloff>:/Icons/Lock</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="shortcut">
-             <string/>
-            </property>
-            <property name="autoRaise">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="KeyboardButton">
-            <property name="text">
-             <string>Keyboard</string>
-            </property>
-            <property name="icon">
-             <iconset resource="imtguilight.qrc">
-              <normaloff>:/Icons/Keyboard</normaloff>:/Icons/Keyboard</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -367,7 +344,7 @@
              <string>Dashboard</string>
             </property>
             <property name="icon">
-             <iconset resource="imtguilight.qrc">
+             <iconset resource="imtguidark.qrc">
               <normaloff>:/Icons/Dashboard</normaloff>:/Icons/Dashboard</iconset>
             </property>
             <property name="iconSize">
@@ -387,7 +364,7 @@
              <string>Quit</string>
             </property>
             <property name="icon">
-             <iconset resource="imtguilight.qrc">
+             <iconset resource="imtguidark.qrc">
               <normaloff>:/Icons/PowerOff</normaloff>:/Icons/PowerOff</iconset>
             </property>
             <property name="iconSize">
@@ -643,7 +620,7 @@
                          <string>Login</string>
                         </property>
                         <property name="icon">
-                         <iconset resource="imtguilight.qrc">
+                         <iconset resource="imtguidark.qrc">
                           <normaloff>:/Icons/Unlock</normaloff>:/Icons/Unlock</iconset>
                         </property>
                         <property name="default">
@@ -951,7 +928,7 @@
   <tabstop>PageList</tabstop>
  </tabstops>
  <resources>
-  <include location="imtguilight.qrc"/>
+  <include location="imtguidark.qrc"/>
  </resources>
  <connections/>
 </ui>

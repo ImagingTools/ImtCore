@@ -94,6 +94,7 @@ void CVirtualKeyboardShowCommandComp::HideKeyboard()
 void CVirtualKeyboardShowCommandComp::SetKeyboardCommandPath()
 {
 	QString processPath;
+	m_switchCommand.setVisible(false);
 
 	if (m_winKeyboardPath.isEmpty()){
 		processPath = getenv("SystemRoot");
@@ -106,6 +107,7 @@ void CVirtualKeyboardShowCommandComp::SetKeyboardCommandPath()
 		QFileInfo processFileInfo(processPath);
 		if (processFileInfo.exists()){
 			m_winKeyboardPath = processPath;
+			m_switchCommand.setVisible(true);
 		}
 	}
 
