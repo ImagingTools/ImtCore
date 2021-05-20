@@ -160,11 +160,11 @@ ImtPyPck.file = ../../Impl/ImtPyPck/QMake/ImtPyPck.pro
 ImtPyPck.depends = imtpy
 
 # Application
-!linux{
-	SUBDIRS += EagleView
-	EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
-	EagleView.depends = Imt3dViewPck Imt3dGuiPck
-}
+#!linux{
+#	SUBDIRS += EagleView
+#	EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
+#	EagleView.depends = Imt3dViewPck Imt3dGuiPck
+#}
 
 ## Tutorials
 #	SUBDIRS += imtservletdemo
