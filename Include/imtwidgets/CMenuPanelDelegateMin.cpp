@@ -3,12 +3,12 @@
 
 // Qt includes
 #include <QtCore/QtMath>
+#include <QtCore/QDebug>
 #include <QtGui/QPainter>
 
 // ImtCore includes
 #include <imtwidgets/CMenuPanel.h>
 
-#include <QDebug>
 
 namespace imtwidgets
 {
@@ -17,22 +17,22 @@ namespace imtwidgets
 // public methods
 
 CMenuPanelDelegateMin::CMenuPanelDelegateMin(QTreeView* menuPanelPtr)
-	: CMenuPanelDelegate(menuPanelPtr)
+	:CMenuPanelDelegate(menuPanelPtr)
 {
 }
 
 
 // reimplemented (IMenuPanelDelegate)
+
 int CMenuPanelDelegateMin::GetMinimumWidth()
 {
-	return 2 * m_leftPadding + 1.3 * m_height;
+	return 2 * m_leftPadding + m_height;
 }
 
 
 // protected methods
 
 // reimplemented (QItemDelegate)
-
 
 void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
@@ -121,7 +121,7 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 	QString text = index.data(Qt::DisplayRole).toString();
 	painter->setPen(textColor);
 	QFont font = painter->font();
-	font.setPixelSize(m_height * 0.21);
+	font.setPointSize(8);
 	painter->setFont(font);
 	QFontMetrics fontMetrics(font);
 	QRect textRect = option.rect;

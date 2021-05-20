@@ -43,7 +43,16 @@ void CFullScreenCommandComp::OnComponentCreated()
 
 bool CFullScreenCommandComp::CheckIsFullScreen()
 {
+	if (!m_guiObjectCompPtr.IsValid()){
+		return false;
+	}
+
+	if (!m_guiObjectCompPtr->IsGuiCreated()){
+		return false;
+	}
+
 	bool retVal = true;
+
 	QWidget* mainWidgetPtr = m_guiObjectCompPtr->GetWidget();
 	Q_ASSERT(mainWidgetPtr != nullptr);
 
@@ -54,6 +63,7 @@ bool CFullScreenCommandComp::CheckIsFullScreen()
 	if (mainWidgetPtr->isFullScreen() == false){
 		retVal = false;
 	}
+
 	return retVal;
 }
 
@@ -62,7 +72,8 @@ bool CFullScreenCommandComp::CheckIsFullScreen()
 
 void CFullScreenCommandComp::OnLanguageChanged()
 {
-	if (CheckIsFullScreen() == true){
+	bool isFullScreen = CheckIsFullScreen();
+	if (isFullScreen){
 		m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOffAttrPtr, QIcon(*m_actionIconScreenOffAttrPtr));
 	}
 	else{
