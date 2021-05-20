@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.1.0)
 
 set(QT_DEFAULT_MAJOR_VERSION 5)
 
+if(NOT DEFINED IACFDIR)
+	set(IACFDIR "$ENV{IACFDIR}")
+endif()
 if(NOT DEFINED IMTROOTDIR)
 	set(IMTROOTDIR "$ENV{IMTROOTDIR}")
 endif()
@@ -27,16 +30,17 @@ if(NOT DEFINED ACFCONFIGDIR)
 	set(ACFCONFIGDIR "$ENV{ACFCONFIGDIR}")
 endif()
 if(NOT DEFINED ZLIBDIR)
-	set(ZLIBDIR "$ENV{IACFDIR}/../3rdParty/zlib")
+	set(ZLIBDIR "${IACFDIR}/../3rdParty/zlib")
 endif()
 if(NOT DEFINED NICPDIR)
 	set(NICPDIR "${IMTROOTDIR}/3rdParty/nicp")
 endif()
 
+
+include(${IACFDIR}/Config/CMake/IAcfEnv.cmake)
+
 include_directories("${IMTCOREDIR}/AuxInclude/Qt${QT_DEFAULT_MAJOR_VERSION}_${TARGETNAME}")
 include_directories("${IMTCOREDIR}/Include")
 include_directories("${IMTCOREDIR}/Impl")
-
-include($ENV{IACFDIR}/Config/CMake/IAcfEnv.cmake)
 
 link_directories("${IMTCOREDIR}/Lib/${CMAKE_BUILD_TYPE}${TARGETNAME}")

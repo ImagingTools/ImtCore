@@ -2,12 +2,20 @@ project(ImtRestPck LANGUAGES CXX)
 
 message("QT_DEFAULT_MAJOR_VERSION " ${QT_DEFAULT_MAJOR_VERSION})
 
-find_package("Qt${QT_DEFAULT_MAJOR_VERSION}" COMPONENTS Core Network REQUIRED)
+find_package("Qt${QT_DEFAULT_MAJOR_VERSION}" COMPONENTS WebSockets REQUIRED)
 
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
+include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
+include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} Qt5::Network)
+target_link_libraries(${PROJECT_NAME} Qt${QT_DEFAULT_MAJOR_VERSION}::WebSockets)
 
-target_link_libraries(${PROJECT_NAME} imtbase imtrest iproc imtauthgui)
+target_link_libraries(${PROJECT_NAME} imtbase imtrest iproc)
+
+
+if(WIN32)
+	set(files  \"${IMTCOREDIR}/Bin/${CMAKE_BUILD_TYPE}${TARGETNAME}/${PROJECT_NAME}.arp\")
+	
+	windeploy(${PROJECT_NAME} "" "${files}")
+endif()

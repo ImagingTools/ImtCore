@@ -7,7 +7,6 @@ if(NOT DEFINED IMTCOREDIR)
 endif()
 
 include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
-include(${ACFDIR}/Config/CMake/Macro.cmake)
 
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")

@@ -1,7 +1,7 @@
 project(ImtAuthGuiPck LANGUAGES CXX)
 
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
+include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_link_libraries(${PROJECT_NAME} imtbase imtgui imtauth imtauthgui imtrepogui imtwidgets imtstyle imtqml)
 
