@@ -179,6 +179,8 @@ void CLicenseControllerComp::OnLicenseKeysUpdated(
 			const imtcrypt::IEncryptionKeysProvider* /*licenseKeysProviderPtr*/)
 {
 	if (!m_isInitializing){
+		SendInfoMessage(0, tr("License key was changed. Checking license fingerprint"), tr("License Controller"));
+
 		ReadLicenseFile();
 	}
 }
@@ -186,6 +188,8 @@ void CLicenseControllerComp::OnLicenseKeysUpdated(
 
 void CLicenseControllerComp::OnFingeprintCheckTimer()
 {
+	SendInfoMessage(0, tr("Checking license fingerprint"), tr("License Controller"));
+
 	ReadLicenseFile();
 }
 
