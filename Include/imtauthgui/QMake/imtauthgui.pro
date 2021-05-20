@@ -6,6 +6,6 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 QT += qml quick
 
-FORMS += $$_PRO_FILE_PWD_/../*.ui
-RESOURCES += $$_PRO_FILE_PWD_/../*.qrc
+FORMS += $$files($$_PRO_FILE_PWD_/../*.ui, false)
+RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
