@@ -164,6 +164,12 @@ QString CImtStyle::GetDesignSchemaName(DesignSchema designSchema) const
 }
 
 
+void CImtStyle::SetPalette(DesignSchema designSchema, const QPalette& palette)
+{
+	m_colorSchemaMap[designSchema].palette = palette;
+}
+
+
 // reimplemented (QStyle)
 
 void CImtStyle::polish(QWidget* widgetPtr)

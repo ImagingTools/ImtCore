@@ -47,6 +47,8 @@ public:
 	QByteArray GetDesignSchemaId(DesignSchema designSchema) const;
 	QString GetDesignSchemaName(DesignSchema designSchema) const;
 
+	void SetPalette(DesignSchema designSchema, const QPalette& palette);
+
 	// reimplemented (QStyle)
 	virtual void polish(QWidget* widgetPtr) override;
 	virtual void drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *widget = nullptr) const override;

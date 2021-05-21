@@ -2,16 +2,14 @@
 
 
 // ACF includes
+#include <ibase/TLocalizableWrap.h>
 #include <icomp/CComponentBase.h>
 #include <imod/TModelWrap.h>
 #include <iprm/CSelectionParam.h>
 
 // ImtCore includes
 #include <imtstyle/CImtStyle.h>
-
-
-// ACF includes
-#include <ibase/TLocalizableWrap.h>
+#include <imtstyle/IColorPaletteProvider.h>
 
 
 namespace imtgui
@@ -30,6 +28,7 @@ public:
 		I_REGISTER_INTERFACE(iprm::ISelectionParam);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_ASSIGN(m_slaveCompPtr, "SlaveDesignManager", "Slave design manager", false, "SlaveDesignManager");
+		I_ASSIGN(m_paletteProviderCompPtr, "PaletteProvider", "Palette provider", false, "PaletteProvider");
 	I_END_COMPONENT;
 
 	CDesignManagerCompBase();
@@ -89,6 +88,7 @@ private:
 
 private:
 	I_REF(iprm::ISelectionParam, m_slaveCompPtr);
+	I_REF(imtstyle::IColorPaletteProvider, m_paletteProviderCompPtr);
 
 	QMap<imtstyle::CImtStyle::DesignSchema, ResourceFunctionPtr> m_initResources;
 	QMap<imtstyle::CImtStyle::DesignSchema, ResourceFunctionPtr> m_cleanupResources;

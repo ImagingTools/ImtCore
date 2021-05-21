@@ -1,22 +1,26 @@
 #pragma once
 
 
-// Qt includes
-#include <QtGui/QPalette>
+// ACF includes
+#include <istd/IChangeable.h>
 
-// ImtCore includes
-#include <imtbase/ICollectionInfo.h>
 
+class QPalette;
+
+namespace imtbase
+{
+	class ICollectionInfo;
+}
 
 namespace imtstyle
 {
 
 
-class IColorPaletteProvider: virtual public istd::IChangable
+class IColorPaletteProvider: virtual public istd::IChangeable
 {
 public:
-	const imtbase::ICollectionInfo& GetDesignSchemaList() const = 0;
-	virtual QPalette GetColorPalette(const QByteArray& designSchemaId) const = 0
+	virtual const imtbase::ICollectionInfo& GetDesignSchemaList() const = 0;
+	virtual bool GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const = 0;
 };
 
 

@@ -132,6 +132,12 @@ bool CDesignManagerCompBase::ApplyDesignScheme(int index)
 						if (m_slaveCompPtr.IsValid()){
 							retVal = retVal && m_slaveCompPtr->SetSelectedOptionIndex(index);
 						}
+						else if (m_paletteProviderCompPtr.IsValid()){
+							QPalette palette;
+							if (m_paletteProviderCompPtr->GetColorPalette(imtStylePtr->GetDesignSchemaId(designSchema), palette)){
+								imtStylePtr->SetPalette(designSchema, palette);
+							}
+						}
 					}
 
 					m_initResources[designSchema]();
