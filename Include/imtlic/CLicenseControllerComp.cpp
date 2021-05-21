@@ -109,7 +109,11 @@ void CLicenseControllerComp::ReadLicenseFile()
 		return;
 	}
 
-	UpdateFingerprint(fingerprintFilePath);
+	if (!UpdateFingerprint(fingerprintFilePath)){
+		SendErrorMessage(0, QString(QObject::tr("License fingerprint could not be updated")), "License Management");
+	}
+
+	SendInfoMessage(0, QString(QObject::tr("License was successfully loaded")), "License Management");
 }
 
 
