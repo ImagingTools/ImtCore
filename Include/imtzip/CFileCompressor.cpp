@@ -2,7 +2,7 @@
 
 
 // Quazip includes
-#include <JlCompress.h>
+#include <quazip/JlCompress.h>
 
 // Qt includes
 #include <QtCore/QString>
