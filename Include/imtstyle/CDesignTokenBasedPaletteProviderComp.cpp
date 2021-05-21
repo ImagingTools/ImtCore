@@ -47,6 +47,10 @@ bool CDesignTokenBasedPaletteProviderComp::GetColorPalette(const QByteArray& des
 
 void CDesignTokenBasedPaletteProviderComp::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
+	CreateDefaultPalettes();
+
 	if (m_resourceNameAttrPtr.IsValid()){
 		QFile paletteFile(*m_resourceNameAttrPtr);
 
@@ -100,14 +104,15 @@ void CDesignTokenBasedPaletteProviderComp::OnComponentCreated()
 							return;
 						}
 
-						QPalette palette = paletteMap[m_designShemaIdAttrPtr[i]];
-						palette.setColor(QPalette::WindowText, textColor);
-						palette.setColor(QPalette::Text, textColor);
-						palette.setColor(QPalette::Window, backgroundColor);
-						palette.setColor(QPalette::Base, backgroundColor);
-						paletteMap[m_designShemaIdAttrPtr[i]] = palette;
-
-						m_designSchemaList.InsertItem(m_designShemaIdAttrPtr[i], m_designShemaIdAttrPtr[i], "");
+						QByteArray designShemaId = m_designShemaIdAttrPtr[i];
+						if (m_designSchemaList.GetElementIds().contains(designShemaId)){
+							QPalette palette = m_paletteMap[m_designShemaIdAttrPtr[i]];
+							palette.setColor(QPalette::WindowText, textColor);
+							palette.setColor(QPalette::Text, textColor);
+							palette.setColor(QPalette::Window, backgroundColor);
+							palette.setColor(QPalette::Base, backgroundColor);
+							paletteMap[designShemaId] = palette;
+						}
 					}
 				}
 
