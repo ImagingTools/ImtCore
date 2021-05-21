@@ -26,7 +26,7 @@ CMenuPanelDelegateMin::CMenuPanelDelegateMin(QTreeView* menuPanelPtr)
 
 int CMenuPanelDelegateMin::GetMinimumWidth()
 {
-	return 2 * m_leftPadding + m_height;
+	return 2 * m_leftPadding + 1.2 * m_height;
 }
 
 
