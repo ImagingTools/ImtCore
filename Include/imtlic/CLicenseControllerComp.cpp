@@ -98,9 +98,9 @@ void CLicenseControllerComp::ReadLicenseFile()
 		if (LoadFingerprint(fingerprintFilePath, daysUntilExpire)){
 			SendWarningMessage(0, QString(QObject::tr("You have no valid license to run this software anymore. You have %1 day(s) to update your system with a valid license")).arg(daysUntilExpire), "License Management");
 
-			int oneDay = 1000 * 60 * 60 * 24;
+			int oneHour = 1000 * 60 * 60;
 
-			QTimer::singleShot(oneDay, this, &CLicenseControllerComp::OnFingeprintCheckTimer);
+			QTimer::singleShot(oneHour, this, &CLicenseControllerComp::OnFingeprintCheckTimer);
 		}
 		else{
 			SendErrorMessage(0, QString(QObject::tr("You have no license to run this software. License file: '%1'")).arg(licenseFilePath), "License Management");
