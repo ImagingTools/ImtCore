@@ -36,27 +36,6 @@ CMultiDocumentWorkspaceGuiCompBase::CMultiDocumentWorkspaceGuiCompBase()
 }
 
 
-// reimplemented (iqtgui::IGuiObject)
-
-void CMultiDocumentWorkspaceGuiCompBase::OnTryClose(bool* ignoredPtr)
-{
-	if (SaveDirtyDocuments(false, ignoredPtr)){
-		int documentInfosCount = GetDocumentsCount();
-		for (int documentIndex = 0; documentIndex < documentInfosCount; ++documentIndex){
-			SingleDocumentData& documentData = GetSingleDocumentData(documentIndex);
-
-			documentData.isDirty = false;
-		}
-
-		CloseAllDocuments();
-	}
-
-	if (ignoredPtr != nullptr){
-		*ignoredPtr = (GetDocumentsCount() > 0);
-	}
-}
-
-
 // reimplemented (idoc::IDocumentManager)
 
 void CMultiDocumentWorkspaceGuiCompBase::SetActiveView(istd::IPolymorphic* viewPtr)
@@ -186,30 +165,6 @@ void CMultiDocumentWorkspaceGuiCompBase::UpdateAllTitles()
 }
 
 
-int CMultiDocumentWorkspaceGuiCompBase::GetDocumentIndexFromWidget(const QWidget& widget) const
-{
-	int documentInfosCount = GetDocumentsCount();
-	for (int documentIndex = 0; documentIndex < documentInfosCount; ++documentIndex){
-		const SingleDocumentData& documentData = GetSingleDocumentData(documentIndex);
-
-		for (		Views::ConstIterator viewIter = documentData.views.begin();
-					viewIter != documentData.views.end();
-					++viewIter){
-			const ViewInfo& viewInfo = *viewIter;
-
-			iqtgui::IGuiObject* guiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(viewInfo.viewPtr.GetPtr());
-			if (guiObjectPtr != nullptr){
-				if (guiObjectPtr->GetWidget() == &widget){
-					return documentIndex;
-				}
-			}
-		}
-	}
-
-	return -1;
-}
-
-
 void CMultiDocumentWorkspaceGuiCompBase::InitializeDocumentView(IDocumentViewDecorator* /*documentViewPtr*/, const SingleDocumentData& /*documentData*/)
 {
 }
@@ -250,35 +205,6 @@ bool CMultiDocumentWorkspaceGuiCompBase::AddTab(const QString& name, iqtgui::IGu
 }
 
 
-void CMultiDocumentWorkspaceGuiCompBase::OnDragEnterEvent(QDragEnterEvent* dragEnterEventPtr)
-{
-	if (dragEnterEventPtr->mimeData()->hasFormat("text/uri-list")){
-		dragEnterEventPtr->acceptProposedAction();
-	}
-}
-
-
-void CMultiDocumentWorkspaceGuiCompBase::OnDropEvent(QDropEvent* dropEventPtr)
-{
-	const QMimeData* mimeData = dropEventPtr->mimeData();
-	if (mimeData->hasUrls()){
-		QList<QUrl> files = mimeData->urls();
-
-		for (int fileIndex = 0; fileIndex < files.count(); fileIndex++){
-			QString filePath = files.at(fileIndex).toLocalFile();
-
-			if (OpenDocument(nullptr, &filePath)){
-				dropEventPtr->setAccepted(true);
-				return;
-			}
-		}
-	}
-
-	dropEventPtr->setAccepted(false);
-	return;
-}
-
-
 // reimplemented (imod::CMultiModelDispatcherBase)
 
 void CMultiDocumentWorkspaceGuiCompBase::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
@@ -296,66 +222,6 @@ void CMultiDocumentWorkspaceGuiCompBase::OnModelChanged(int modelId, const istd:
 	if (modelId >= MI_DOCUMENT_COMMANDS_BASE_INDEX){
 		Q_EMIT PostUpdateCommands();
 	}
-}
-
-
-// reimplemented (idoc::CMultiDocumentManagerBase)
-
-istd::IChangeable* CMultiDocumentWorkspaceGuiCompBase::OpenSingleDocument(
-			const QString& filePath,
-			bool createView,
-			const QByteArray& viewTypeId,
-			QByteArray& documentTypeId,
-			bool beQuiet,
-			bool* ignoredPtr,
-			ibase::IProgressManager* progressManagerPtr)
-{
-	SingleDocumentData* documentInfoPtr = GetDocumentInfoFromPath(filePath);
-	bool isNewViewType = true;
-	if (documentInfoPtr != nullptr){
-		for (int i = 0; i < documentInfoPtr->views.count(); ++i){
-			if (documentInfoPtr->views[i].viewTypeId == viewTypeId){
-				isNewViewType = false;
-				break;
-			}
-		}
-	}
-
-	if (documentInfoPtr != nullptr && !isNewViewType){
-		createView = false;
-	}
-
-	return BaseClass::OpenSingleDocument(filePath, createView, viewTypeId, documentTypeId, beQuiet, ignoredPtr, progressManagerPtr);
-}
-
-
-// reimplemented (idoc::IDocumentManager)
-
-bool CMultiDocumentWorkspaceGuiCompBase::InsertNewDocument(
-			const QByteArray& documentTypeId,
-			bool createView,
-			const QByteArray& viewTypeId,
-			istd::IChangeable** newDocumentPtr,
-			bool beQuiet,
-			bool* ignoredPtr)
-{
-	bool retVal = BaseClass::InsertNewDocument(documentTypeId, createView, viewTypeId, newDocumentPtr, beQuiet, ignoredPtr);
-
-	if (retVal && (newDocumentPtr != nullptr) && (*newDocumentPtr != nullptr) && createView){
-		int documentsCount = GetDocumentsCount();
-		for (int i = 0; i < documentsCount; ++i){
-			if (&GetDocumentFromIndex(i) == *newDocumentPtr){
-				istd::IPolymorphic* viewPtr = GetViewFromIndex(i, 0);
-				if (viewPtr != nullptr){
-					SetActiveView(viewPtr);
-				}
-
-				break;
-			}
-		}
-	}
-
-	return retVal;
 }
 
 
@@ -390,18 +256,6 @@ void CMultiDocumentWorkspaceGuiCompBase::CloseAllDocuments()
 }
 
 
-QStringList CMultiDocumentWorkspaceGuiCompBase::GetOpenFilePaths(const QByteArray* documentTypeIdPtr) const
-{
-	QStringList files = GetOpenFilePathesFromDialog(documentTypeIdPtr);
-
-	if (!files.isEmpty()){
-		UpdateLastDirectory(files.at(0));
-	}
-
-	return files;
-}
-
-
 void CMultiDocumentWorkspaceGuiCompBase::OnViewRegistered(istd::IPolymorphic* viewPtr, const SingleDocumentData& documentData)
 {
 	ifile::IFilePersistence* persistencePtr = nullptr;
@@ -412,7 +266,7 @@ void CMultiDocumentWorkspaceGuiCompBase::OnViewRegistered(istd::IPolymorphic* vi
 
 	iqtgui::IGuiObject* guiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(viewPtr);
 	if ((guiObjectPtr != nullptr) && IsGuiCreated()){
-		istd::TDelPtr<IDocumentViewDecorator> documentViewPtr(CreateDocumentViewDecorator(viewPtr, Tabs, documentData, persistencePtr));
+		istd::TDelPtr<IDocumentViewDecorator> documentViewPtr(CreateDocumentViewDecorator(viewPtr, Tabs, persistencePtr));
 		if (guiObjectPtr->CreateGui(documentViewPtr->GetViewFrame())){
 			Q_ASSERT(guiObjectPtr->GetWidget() != nullptr);
 
@@ -469,36 +323,6 @@ void CMultiDocumentWorkspaceGuiCompBase::OnViewRemoved(istd::IPolymorphic* viewP
 }
 
 
-bool CMultiDocumentWorkspaceGuiCompBase::QueryDocumentSave(const SingleDocumentData& info, bool* ignoredPtr)
-{
-	QMessageBox::StandardButtons buttons = QMessageBox::Yes | QMessageBox::No;
-
-	if (ignoredPtr != nullptr){
-		*ignoredPtr = false;
-
-		buttons |= QMessageBox::Cancel;
-	}
-
-	QFileInfo fileInfo(info.filePath);
-
-	int dialogResult = QMessageBox::information(
-				GetQtWidget(),
-				tr("Close document"),
-				tr("Do you want to save your changes made in document\n%1").arg(QDir::toNativeSeparators(fileInfo.completeBaseName())),
-				buttons,
-				QMessageBox::Yes);
-
-	if (dialogResult == QMessageBox::Yes){
-		return true;
-	}
-	else if ((ignoredPtr != nullptr) && (dialogResult == QMessageBox::Cancel)){
-		*ignoredPtr = true;
-	}
-
-	return false;
-}
-
-
 // reimplemented (iqt:CGuiObjectBase)
 
 void CMultiDocumentWorkspaceGuiCompBase::OnGuiCreated()
@@ -525,11 +349,6 @@ void CMultiDocumentWorkspaceGuiCompBase::OnGuiCreated()
 				this,
 				&CMultiDocumentWorkspaceGuiCompBase::UpdateCommands,
 				Qt::QueuedConnection);
-
-	QWidget* mainWindowPtr = GetQtWidget();
-	if (mainWindowPtr != nullptr){
-		mainWindowPtr->setAcceptDrops(true);
-	}
 
 	Tabs->setDocumentMode(true);
 	Tabs->tabBar()->setDrawBase(false);
@@ -615,32 +434,14 @@ void CMultiDocumentWorkspaceGuiCompBase::OnGuiDestroyed()
 }
 
 
-void CMultiDocumentWorkspaceGuiCompBase::OnRetranslate()
-{
-	BaseClass::OnRetranslate();
-}
-
-
 void CMultiDocumentWorkspaceGuiCompBase::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
-	UpdateAllTitles();
-	
 	// refresh tab titles
 	for (int i = 0; i < m_fixedTabsNamesAttrPtr.GetCount(); ++i){
 		Tabs->setTabText(i, m_fixedTabsNamesAttrPtr[i]);
 	}
-}
-
-
-// reimplemented (icomp::CComponentBase)
-
-void CMultiDocumentWorkspaceGuiCompBase::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	SetDocumentTemplate(m_documentTemplateCompPtr.GetPtr());
 }
 
 
@@ -649,10 +450,6 @@ void CMultiDocumentWorkspaceGuiCompBase::OnComponentCreated()
 void CMultiDocumentWorkspaceGuiCompBase::OnEndChanges(const ChangeSet& changeSet)
 {
 	BaseClass::OnEndChanges(changeSet);
-
-	if (IsGuiCreated()){
-		UpdateAllTitles();
-	}
 
 	if (!changeSet.Contains(CF_VIEW_ACTIVATION_CHANGED)){
 		idoc::CMultiDocumentManagerBase::SingleDocumentData* activeDocumentInfoPtr = GetActiveDocumentInfo();
@@ -670,31 +467,6 @@ void CMultiDocumentWorkspaceGuiCompBase::OnEndChanges(const ChangeSet& changeSet
 }
 
 
-// reimplemented (QObject)
-
-bool CMultiDocumentWorkspaceGuiCompBase::eventFilter(QObject* sourcePtr, QEvent* eventPtr)
-{
-	if (eventPtr->type() == QEvent::DragEnter){
-		QDragEnterEvent* dragEnterEventPtr = dynamic_cast<QDragEnterEvent*>(eventPtr);
-		Q_ASSERT(dragEnterEventPtr != nullptr);
-
-		OnDragEnterEvent(dragEnterEventPtr);
-
-		return true;
-	}
-	else if (eventPtr->type() == QEvent::Drop){
-		QDropEvent* dropEventPtr = dynamic_cast<QDropEvent*>(eventPtr);
-		Q_ASSERT(dropEventPtr != nullptr);
-
-		OnDropEvent(dropEventPtr);
-
-		return true;
-	}
-
-	return BaseClass::eventFilter(sourcePtr, eventPtr);
-}
-
-
 // protected slots
 
 void CMultiDocumentWorkspaceGuiCompBase::UpdateCommands()
@@ -702,6 +474,21 @@ void CMultiDocumentWorkspaceGuiCompBase::UpdateCommands()
 	static ChangeSet changes(ibase::ICommandsProvider::CF_COMMANDS);
 
 	istd::CChangeNotifier changeNotifier(&m_commands, &changes);
+}
+
+
+void CMultiDocumentWorkspaceGuiCompBase::OnNew()
+{
+}
+
+
+void CMultiDocumentWorkspaceGuiCompBase::OnOpen()
+{
+}
+
+
+void CMultiDocumentWorkspaceGuiCompBase::OnSaveDocumentAs()
+{
 }
 
 
@@ -720,19 +507,13 @@ void CMultiDocumentWorkspaceGuiCompBase::OnCloseDocument()
 
 void CMultiDocumentWorkspaceGuiCompBase::OnUndo()
 {
-	SingleDocumentData* documentDataPtr = GetActiveDocumentInfo();
-	if ((documentDataPtr != nullptr) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableUndoSteps() > 0){
-		documentDataPtr->undoManagerPtr->DoUndo();
-	}
+	BaseClass::DoUndo();
 }
 
 
 void CMultiDocumentWorkspaceGuiCompBase::OnRedo()
 {
-	SingleDocumentData* documentDataPtr = GetActiveDocumentInfo();
-	if ((documentDataPtr != nullptr) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableRedoSteps() > 0){
-		documentDataPtr->undoManagerPtr->DoRedo();
-	}
+	BaseClass::DoRedo();
 }
 
 
@@ -943,8 +724,6 @@ bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::Serialize(iser::IArchive&
 
 	return false;
 }
-
-
 
 
 // public methods of the embedded class Commands

@@ -12,7 +12,7 @@
 #include <imtgui/CMultiStatusProviderGuiComp.h>
 #include <imtgui/CObjectCollectionViewComp.h>
 #include <imtgui/CStandardCollectionViewDelegateComp.h>
-#include <imtgui/CDocumentWorkspaceGuiComp.h>
+#include <imtgui/CMultiDocumentWorkspaceGuiComp.h>
 #include <imtgui/CObjectCollectionMetaInfoViewComp.h>
 #include <imtgui/CDelegatedCommandsProviderComp.h>
 #include <imtgui/CMenuPanelComp.h>
@@ -30,7 +30,7 @@
 #include <imtwidgets/CMenuPanelDelegateMin.h>
 #include <imtgui/CVirtualKeyboardShowCommandComp.h>
 #include <imtgui/CFullScreenCommandComp.h>
-
+#include <imtgui/CSingleDocumentWorkspaceGuiComp.h>
 
 
 /**
@@ -45,7 +45,7 @@ typedef imtgui::CThumbnailDecoratorGuiComp ThumbnailDecoratorGui;
 typedef imtgui::CSingleStatusProviderGuiComp SingleStatusProviderGui;
 typedef imtgui::CMultiStatusProviderGuiComp MultiStatusProviderGui;
 typedef icomp::TModelCompWrap<imtgui::CObjectCollectionViewComp> ObjectCollectionView;
-typedef icomp::TModelCompWrap<imtgui::CDocumentWorkspaceGuiComp> DocumentWorkspaceGui;
+typedef icomp::TModelCompWrap<imtgui::CMultiDocumentWorkspaceGuiComp> DocumentWorkspaceGui;
 typedef imtgui::CObjectCollectionMetaInfoViewComp ObjectCollectionMetaInfoView;
 typedef imtgui::CDelegatedCommandsProviderComp DelegatedCommandsProvider;
 typedef imtgui::CMenuPanelComp MenuPanel;
@@ -64,6 +64,7 @@ typedef imtgui::CVirtualKeyboardShowCommandComp VirtualKeyboardShowCommand;
 typedef imtgui::CFullScreenCommandComp FullScreenCommand;
 typedef icomp::TMakeComponentWrap<imtwidgets::CMenuPanelDelegate, imtwidgets::IMenuPanelDelegate> MenuPanelDelegate;
 typedef icomp::TMakeComponentWrap<imtwidgets::CMenuPanelDelegateMin, imtwidgets::IMenuPanelDelegate> MenuPanelDelegateMin;
+typedef imtgui::CSingleDocumentWorkspaceGuiComp SingleDocumentWorkspace;
 
 
 } // namespace ImtGuiPck

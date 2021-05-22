@@ -130,12 +130,17 @@ I_EXPORT_COMPONENT(
 I_EXPORT_COMPONENT(
 			MenuPanelDelegate,
 			"Menu panel delegate",
-			"Delegate for MenuPanel");
+			"Delegate Menu Panel Navigation");
 
 I_EXPORT_COMPONENT(
 			MenuPanelDelegateMin,
 			"Minimal menu panel delegate",
-			"Delegate for MenuPanel");
+			"Delegate Menu Panel Navigation");
+
+I_EXPORT_COMPONENT(
+			SingleDocumentWorkspace,
+			"SDI document workspace",
+			"View Document SDI Decorator");
 
 
 } // namespace ImtGuiPck

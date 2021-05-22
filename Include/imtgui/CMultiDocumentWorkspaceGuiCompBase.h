@@ -6,20 +6,12 @@
 
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>
-#include <iprm/ISelectionParam.h>
-#include <iprm/IOptionsList.h>
-#include <idoc/CMultiDocumentManagerBase.h>
-#include <idoc/IDocumentTemplate.h>
 #include <ibase/ICommandsProvider.h>
-#include <iqtgui/IVisualStatus.h>
-#include <iqtgui/TDesignerGuiCompBase.h>
-#include <iqtgui/TRestorableGuiWrap.h>
-#include <iqtgui/CHierarchicalCommand.h>
-#include <iqtdoc/TQtDocumentManagerWrap.h>
+#include <idoc/CMultiDocumentManagerBase.h>
+#include <iprm/ISelectionParam.h>
 
 // ImtCore includes
-#include <imtbase/IObjectCollectionInfo.h>
-#include <imtgui/IDocumentViewDecorator.h>
+#include <imtgui/TDocumentWorkspaceGuiCompBase.h>
 #include <GeneratedFiles/imtgui/ui_CMultiDocumentWorkspaceGuiCompBase.h>
 
 
@@ -29,7 +21,7 @@ namespace imtgui
 
 
 class CMultiDocumentWorkspaceGuiCompBase:
-			public iqtdoc::TQtDocumentManagerWrap<
+			public imtgui::TDocumentWorkspaceGuiCompBase<
 						idoc::CMultiDocumentManagerBase,
 						iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<Ui::CMultiDocumentWorkspaceGuiCompBase>>>,
 			protected imod::CMultiModelDispatcherBase
@@ -37,28 +29,22 @@ class CMultiDocumentWorkspaceGuiCompBase:
 	Q_OBJECT
 
 public:
-	typedef iqtdoc::TQtDocumentManagerWrap<
+	typedef imtgui::TDocumentWorkspaceGuiCompBase<
 				idoc::CMultiDocumentManagerBase,
 				iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<Ui::CMultiDocumentWorkspaceGuiCompBase>>> BaseClass;
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_BASE_COMPONENT(CMultiDocumentWorkspaceGuiCompBase);
-		I_REGISTER_INTERFACE(idoc::IDocumentManager);
-		I_REGISTER_INTERFACE(idoc::IDocumentTypesInfo);
 		I_REGISTER_SUBELEMENT(DocumentList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DocumentList, iprm::ISelectionParam, ExtractDocumentList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DocumentList, imod::IModel, ExtractDocumentList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DocumentList, istd::IChangeable, ExtractDocumentList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DocumentList, iprm::IOptionsList, ExtractDocumentList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DocumentList, imtbase::ICollectionInfo, ExtractDocumentList);
-		I_REGISTER_SUBELEMENT(CurrentDocumentName);
-		I_REGISTER_SUBELEMENT_INTERFACE(CurrentDocumentName, iprm::INameParam, ExtractCurrentDocumentName);
-		I_REGISTER_SUBELEMENT_INTERFACE(CurrentDocumentName, imod::IModel, ExtractCurrentDocumentName);
 		I_REGISTER_SUBELEMENT(Commands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
-		I_ASSIGN(m_documentTemplateCompPtr, "DocumentTemplate", "Document template", true, "DocumentTemplate");
 		I_ASSIGN(m_tabsPositionAttrPtr, "TabsPosition", "Tabs position inside workspace (0 - North, 1 - South, 2 - West, 3 - East)", true, 0);
 		I_ASSIGN_MULTI_0(m_fixedTabsCompPtr, "FixedViews", "List of fixed views", false);
 		I_ASSIGN_MULTI_0(m_fixedTabsNamesAttrPtr, "FixedViewNames", "List of names for the fixed views", false);
@@ -73,76 +59,40 @@ public:
 
 	CMultiDocumentWorkspaceGuiCompBase();
 
-	// reimplemented (iqtgui::IGuiObject)
-	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
-
 	// reimplemented (idoc::IDocumentManager)
 	virtual void SetActiveView(istd::IPolymorphic* viewPtr) override;
 
 protected:
 	int GetFixedWindowsCount() const;
-	void UpdateAllTitles();
-	int GetDocumentIndexFromWidget(const QWidget& widget) const;
-	virtual void InitializeDocumentView(IDocumentViewDecorator* pageViewPtr, const SingleDocumentData& documentData);
+
+	// reimplemented (TDocumentWorkspaceGuiCompBase)
+	virtual void UpdateAllTitles() override;
+	virtual void InitializeDocumentView(IDocumentViewDecorator* pageViewPtr, const SingleDocumentData& documentData) override;
 
 protected:
 	virtual bool AddTab(const QString& name, iqtgui::IGuiObject* guiPtr, const QIcon& icon = QIcon());
-	virtual void OnDragEnterEvent(QDragEnterEvent* dragEnterEventPtr);
-	virtual void OnDropEvent(QDropEvent* dropEventPtr);
 
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (idoc::CMultiDocumentManagerBase)
-	virtual istd::IChangeable* OpenSingleDocument(
-				const QString& filePath,
-				bool createView,
-				const QByteArray& viewTypeId,
-				QByteArray& documentTypeId,
-				bool beQuiet,
-				bool* ignoredPtr,
-				ibase::IProgressManager* progressManagerPtr) override;
-
-	// reimplemented (idoc::IDocumentManager)
-	virtual bool InsertNewDocument(
-				const QByteArray& documentTypeId,
-				bool createView = true,
-				const QByteArray& viewTypeId = "",
-				istd::IChangeable** newDocumentPtr = NULL,
-				bool beQuiet = false,
-				bool* ignoredPtr = NULL) override;
-
-	// reimplemented (idoc::CMultiDocumentManagerBase)
 	virtual void CloseAllDocuments() override;
-	virtual QStringList GetOpenFilePaths(const QByteArray* documentTypeIdPtr = NULL) const override;
 	virtual void OnViewRegistered(istd::IPolymorphic* viewPtr, const SingleDocumentData& documentData) override;
 	virtual void OnViewRemoved(istd::IPolymorphic* viewPtr) override;
-	virtual bool QueryDocumentSave(const SingleDocumentData& info, bool* ignoredPtr) override;
 
 	// reimplemented (iqt:CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
-	virtual void OnRetranslate() override;
 	virtual void OnGuiRetranslate() override;
-
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
 
 	// reimplemented (istd:IChangeable)
 	virtual void OnEndChanges(const ChangeSet& changeSet) override;
 
-	// reimplemented (QObject)
-	virtual bool eventFilter(QObject* sourcePtr, QEvent* eventPtr) override;
-
-	// abstract methods
-	virtual IDocumentViewDecorator* CreateDocumentViewDecorator(
-				istd::IPolymorphic* viewPtr,
-				QWidget* parentWidgetPtr,
-				const SingleDocumentData& documentData,
-				const ifile::IFilePersistence* persistencePtr) = 0;
-
 protected Q_SLOTS:
 	virtual void UpdateCommands();
+	void OnNew();
+	void OnOpen();
+	void OnSaveDocumentAs();
 	virtual void OnCloseDocument();
 	virtual void OnUndo();
 	virtual void OnRedo();
@@ -220,12 +170,6 @@ private:
 		return &component.m_documentList;
 	}
 
-	template <class InterfaceType>
-	static InterfaceType* ExtractCurrentDocumentName(CMultiDocumentWorkspaceGuiCompBase& component)
-	{
-		return &component.m_currentDocumentName;
-	}
-
 	template <typename InterfaceType>
 	static InterfaceType* ExtractCommands(CMultiDocumentWorkspaceGuiCompBase& component)
 	{
@@ -234,7 +178,6 @@ private:
 
 private:
 	imod::TModelWrap<DocumentList> m_documentList;
-	imod::TModelWrap<iprm::CNameParam> m_currentDocumentName;
 	imod::TModelWrap<Commands> m_commands;
 
 	bool m_forceQuietClose;

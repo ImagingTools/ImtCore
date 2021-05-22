@@ -28,15 +28,11 @@ namespace imtgui
 
 template <class DocumentManagerBase, class UI>
 class TDocumentWorkspaceGuiCompBase:
-			public iqtdoc::TQtDocumentManagerWrap<
-						DocumentManagerBase,
-						iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<UI>>>
+			public iqtdoc::TQtDocumentManagerWrap<DocumentManagerBase, UI>
 {
 	Q_DECLARE_TR_FUNCTIONS(TDocumentWorkspaceGuiCompBase)
 public:
-	typedef iqtdoc::TQtDocumentManagerWrap<
-				DocumentManagerBase,
-				iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<UI>>> BaseClass;
+	typedef iqtdoc::TQtDocumentManagerWrap<DocumentManagerBase, UI> BaseClass;
 	typedef typename DocumentManagerBase::SingleDocumentData SingleDocumentData;
 
 	I_BEGIN_BASE_COMPONENT(TDocumentWorkspaceGuiCompBase);
@@ -56,7 +52,7 @@ public:
 protected:
 	virtual void UpdateAllTitles() = 0;
 	virtual int GetDocumentIndexFromWidget(const QWidget& widget) const;
-	virtual void InitializeDocumentView(IDocumentViewDecorator* pageViewPtr, const SingleDocumentData& documentData);
+	virtual void InitializeDocumentView(IDocumentViewDecorator* pageViewPtr, const SingleDocumentData& documentData) = 0;
 
 protected:
 	virtual void OnDragEnterEvent(QDragEnterEvent* dragEnterEventPtr);
@@ -103,7 +99,6 @@ protected:
 	virtual IDocumentViewDecorator* CreateDocumentViewDecorator(
 				istd::IPolymorphic* viewPtr,
 				QWidget* parentWidgetPtr,
-				const SingleDocumentData& documentData,
 				const ifile::IFilePersistence* persistencePtr) = 0;
 
 protected:
@@ -180,14 +175,6 @@ int TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::GetDocumentIndexFrom
 	}
 
 	return -1;
-}
-
-
-template <class DocumentManagerBase, class UI>
-void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::InitializeDocumentView(
-			IDocumentViewDecorator* /*documentViewPtr*/,
-			const SingleDocumentData& /*documentData*/)
-{
 }
 
 
