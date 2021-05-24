@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtWidgets/QToolButton>
+
 // ACF includes
 #include <imod/IModelEditor.h>
 #include <imod/IModel.h>
@@ -112,7 +115,7 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	Q_ASSERT(parentPtr != nullptr);
 	Q_ASSERT(viewPtr != nullptr);
 
-	setupUi(this);
+	UI::setupUi(this);
 
 	setObjectName("DocumentView");
 
@@ -129,13 +132,13 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	m_commands.InsertChild(&m_saveAsCommand);
 	m_commands.InsertChild(&m_closeCommand);
 
-	UndoButton->setEnabled(false);
-	RedoButton->setEnabled(false);
+	UI::UndoButton->setEnabled(false);
+	UI::RedoButton->setEnabled(false);
 	m_undoCommand.setEnabled(false);
 	m_redoCommand.setEnabled(false);
 
-	UndoButton->setVisible(m_undoManagerPtr != nullptr);
-	RedoButton->setVisible(m_undoManagerPtr != nullptr);
+	UI::UndoButton->setVisible(m_undoManagerPtr != nullptr);
+	UI::RedoButton->setVisible(m_undoManagerPtr != nullptr);
 	m_undoCommand.setVisible(m_undoManagerPtr != nullptr);
 	m_redoCommand.setVisible(m_undoManagerPtr != nullptr);
 
@@ -152,12 +155,12 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 		m_comment = metaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
 	}
 
-	connect(NewButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnNew);
-	connect(OpenButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnOpen);
-	connect(UndoButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnUndo);
-	connect(RedoButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnRedo);
-	connect(CloseButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnCloseDocument);
-	connect(SaveButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnSaveDocument);
+	connect(UI::NewButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnNew);
+	connect(UI::OpenButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnOpen);
+	connect(UI::UndoButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnUndo);
+	connect(UI::RedoButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnRedo);
+	connect(UI::CloseButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnCloseDocument);
+	connect(UI::SaveButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnSaveDocument);
 
 	connect(&m_newCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnNew);
 	connect(&m_openCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnOpen);
@@ -205,7 +208,7 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 		}
 	}
 
-	HeaderFrame->setVisible(false);
+	UI::HeaderFrame->setVisible(false);
 }
 
 
@@ -228,13 +231,13 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::UpdateSaveButtonsStatus(
 	}
 
 	m_saveCommand.setEnabled(isSaveActive);
-	SaveButton->setEnabled(isSaveActive);
+	UI::SaveButton->setEnabled(isSaveActive);
 
 	const imtgui::IDocumentViewConstraints* viewConstraintsPtr = CompCastPtr<imtgui::IDocumentViewConstraints>(m_viewObjectPtr);
 	if (viewConstraintsPtr != nullptr){
 		bool isSaveEnabled = viewConstraintsPtr->GetViewConstraints() & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT;
 
-		SaveButton->setVisible(isSaveEnabled);
+		UI::SaveButton->setVisible(isSaveEnabled);
 		m_saveCommand.setVisible(isSaveEnabled);
 	}
 }
@@ -252,13 +255,13 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::OnViewContraintsChanged(
 			modelEditorPtr->SetReadOnly(!(viewFlags & imtgui::IDocumentViewConstraints::CF_EDIT_DOCUMENT));
 		}
 
-		SaveButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT));
-		UndoButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
-		RedoButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
+		UI::SaveButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT));
+		UI::UndoButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
+		UI::RedoButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
 		m_undoCommand.setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
 		m_redoCommand.setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
 
-		CloseButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_CLOSE_SUPPORT));
+		UI::CloseButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_CLOSE_SUPPORT));
 	}
 }
 
@@ -275,7 +278,7 @@ QWidget* TStandardDocumentViewDecorator<WorkspaceImpl, UI>::GetDecoratorWidget()
 template <class WorkspaceImpl, class UI>
 QWidget* TStandardDocumentViewDecorator<WorkspaceImpl, UI>::GetViewFrame()
 {
-	return DocumentFrame;
+	return UI::DocumentFrame;
 }
 
 
@@ -337,8 +340,8 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::OnModelChanged(int model
 	switch (modelId){
 		case MI_UNDO_MANAGER:
 			if (m_undoManagerPtr != nullptr){
-				UndoButton->setEnabled(m_undoManagerPtr->GetAvailableUndoSteps() > 0);
-				RedoButton->setEnabled(m_undoManagerPtr->GetAvailableRedoSteps() > 0);
+				UI::UndoButton->setEnabled(m_undoManagerPtr->GetAvailableUndoSteps() > 0);
+				UI::RedoButton->setEnabled(m_undoManagerPtr->GetAvailableRedoSteps() > 0);
 				m_undoCommand.setEnabled(m_undoManagerPtr->GetAvailableUndoSteps() > 0);
 				m_redoCommand.setEnabled(m_undoManagerPtr->GetAvailableRedoSteps() > 0);
 			}
@@ -349,12 +352,12 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::OnModelChanged(int model
 			m_commands.ResetChilds();
 
 			if (commandsProviderPtr != nullptr){
-				iwidgets::ClearLayout(CommandToolBarFrame->layout());
+				iwidgets::ClearLayout(UI::CommandToolBarFrame->layout());
 				const iqtgui::CHierarchicalCommand* guiCommandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(commandsProviderPtr->GetCommands());
 				if (guiCommandPtr != nullptr){
-					QToolBar* toolBarPtr = new QToolBar(CommandToolBarFrame);
+					QToolBar* toolBarPtr = new QToolBar(UI::CommandToolBarFrame);
 					toolBarPtr->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-					CommandToolBarFrame->layout()->addWidget(toolBarPtr);
+					UI::CommandToolBarFrame->layout()->addWidget(toolBarPtr);
 					iqtgui::CCommandTools::SetupToolbar(*guiCommandPtr, *toolBarPtr);
 					toolBarPtr->setIconSize(QSize(16, 16));
 				}

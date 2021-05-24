@@ -34,6 +34,9 @@ class TDocumentWorkspaceGuiCompBase:
 public:
 	typedef iqtdoc::TQtDocumentManagerWrap<DocumentManagerBase, UI> BaseClass;
 	typedef typename DocumentManagerBase::SingleDocumentData SingleDocumentData;
+	typedef typename DocumentManagerBase::Views Views;
+	typedef typename Views::ConstIterator ConstIterator;
+	typedef typename DocumentManagerBase::ViewInfo ViewInfo;
 
 	I_BEGIN_BASE_COMPONENT(TDocumentWorkspaceGuiCompBase);
 		I_REGISTER_INTERFACE(idoc::IDocumentManager);
@@ -134,19 +137,19 @@ TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::TDocumentWorkspaceGuiCom
 template <class DocumentManagerBase, class UI>
 void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnTryClose(bool* ignoredPtr)
 {
-	if (SaveDirtyDocuments(false, ignoredPtr)){
-		int documentInfosCount = GetDocumentsCount();
+	if (BaseClass::SaveDirtyDocuments(false, ignoredPtr)){
+		int documentInfosCount = BaseClass::GetDocumentsCount();
 		for (int documentIndex = 0; documentIndex < documentInfosCount; ++documentIndex){
-			SingleDocumentData& documentData = GetSingleDocumentData(documentIndex);
+			SingleDocumentData& documentData = BaseClass::GetSingleDocumentData(documentIndex);
 
 			documentData.isDirty = false;
 		}
 
-		CloseAllDocuments();
+		BaseClass::CloseAllDocuments();
 	}
 
 	if (ignoredPtr != nullptr){
-		*ignoredPtr = (GetDocumentsCount() > 0);
+		*ignoredPtr = (BaseClass::GetDocumentsCount() > 0);
 	}
 }
 
@@ -156,11 +159,11 @@ void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnTryClose(bool* ig
 template <class DocumentManagerBase, class UI>
 int TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::GetDocumentIndexFromWidget(const QWidget& widget) const
 {
-	int documentInfosCount = GetDocumentsCount();
+	int documentInfosCount = BaseClass::GetDocumentsCount();
 	for (int documentIndex = 0; documentIndex < documentInfosCount; ++documentIndex){
-		const SingleDocumentData& documentData = GetSingleDocumentData(documentIndex);
+		const SingleDocumentData& documentData = BaseClass::GetSingleDocumentData(documentIndex);
 
-		for (		Views::ConstIterator viewIter = documentData.views.begin();
+		for (		ConstIterator viewIter = documentData.views.begin();
 					viewIter != documentData.views.end();
 					++viewIter){
 			const ViewInfo& viewInfo = *viewIter;
@@ -199,7 +202,7 @@ void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnDropEvent(QDropEv
 		for (int fileIndex = 0; fileIndex < files.count(); fileIndex++){
 			QString filePath = files.at(fileIndex).toLocalFile();
 
-			if (OpenDocument(nullptr, &filePath)){
+			if (BaseClass::OpenDocument(nullptr, &filePath)){
 				dropEventPtr->setAccepted(true);
 
 				return;
@@ -223,7 +226,7 @@ istd::IChangeable* TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OpenS
 			bool* ignoredPtr,
 			ibase::IProgressManager* progressManagerPtr)
 {
-	SingleDocumentData* documentInfoPtr = GetDocumentInfoFromPath(filePath);
+	SingleDocumentData* documentInfoPtr = BaseClass::GetDocumentInfoFromPath(filePath);
 	bool isNewViewType = true;
 	if (documentInfoPtr != nullptr){
 		for (int i = 0; i < documentInfoPtr->views.count(); ++i){
@@ -256,12 +259,12 @@ bool TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::InsertNewDocument(
 	bool retVal = BaseClass::InsertNewDocument(documentTypeId, createView, viewTypeId, newDocumentPtr, beQuiet, ignoredPtr);
 
 	if (retVal && (newDocumentPtr != nullptr) && (*newDocumentPtr != nullptr) && createView){
-		int documentsCount = GetDocumentsCount();
+		int documentsCount = BaseClass::GetDocumentsCount();
 		for (int i = 0; i < documentsCount; ++i){
-			if (&GetDocumentFromIndex(i) == *newDocumentPtr){
-				istd::IPolymorphic* viewPtr = GetViewFromIndex(i, 0);
+			if (&BaseClass::GetDocumentFromIndex(i) == *newDocumentPtr){
+				istd::IPolymorphic* viewPtr = BaseClass::GetViewFromIndex(i, 0);
 				if (viewPtr != nullptr){
-					SetActiveView(viewPtr);
+					BaseClass::SetActiveView(viewPtr);
 				}
 
 				break;
@@ -278,10 +281,10 @@ bool TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::InsertNewDocument(
 template <class DocumentManagerBase, class UI>
 QStringList TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::GetOpenFilePaths(const QByteArray* documentTypeIdPtr) const
 {
-	QStringList files = GetOpenFilePathesFromDialog(documentTypeIdPtr);
+	QStringList files = BaseClass::GetOpenFilePathesFromDialog(documentTypeIdPtr);
 
 	if (!files.isEmpty()){
-		UpdateLastDirectory(files.at(0));
+		BaseClass::UpdateLastDirectory(files.at(0));
 	}
 
 	return files;
@@ -302,7 +305,7 @@ bool TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::QueryDocumentSave(c
 	QFileInfo fileInfo(info.filePath);
 
 	int dialogResult = QMessageBox::information(
-				GetQtWidget(),
+				BaseClass::GetQtWidget(),
 				tr("Close document"),
 				tr("Do you want to save your changes made in document\n%1").arg(QDir::toNativeSeparators(fileInfo.completeBaseName())),
 				buttons,
@@ -326,7 +329,7 @@ void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	QWidget* mainWindowPtr = GetQtWidget();
+	QWidget* mainWindowPtr = BaseClass::GetQtWidget();
 	if (mainWindowPtr != nullptr){
 		mainWindowPtr->setAcceptDrops(true);
 	}
@@ -336,7 +339,7 @@ void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnGuiCreated()
 template <class DocumentManagerBase, class UI>
 void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnGuiDestroyed()
 {
-	CloseAllDocuments();
+	BaseClass::CloseAllDocuments();
 
 	BaseClass::OnGuiDestroyed();
 }
@@ -358,7 +361,7 @@ void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnComponentCreated(
 {
 	BaseClass::OnComponentCreated();
 
-	SetDocumentTemplate(m_documentTemplateCompPtr.GetPtr());
+	BaseClass::SetDocumentTemplate(m_documentTemplateCompPtr.GetPtr());
 }
 
 
@@ -369,7 +372,7 @@ void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnEndChanges(const 
 {
 	BaseClass::OnEndChanges(changeSet);
 
-	if (IsGuiCreated()){
+	if (BaseClass::IsGuiCreated()){
 		UpdateAllTitles();
 	}
 }
@@ -406,7 +409,7 @@ bool TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::eventFilter(QObject
 template <class DocumentManagerBase, class UI>
 void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::DoUndo()
 {
-	SingleDocumentData* documentDataPtr = GetActiveDocumentInfo();
+	SingleDocumentData* documentDataPtr = BaseClass::GetActiveDocumentInfo();
 	if ((documentDataPtr != nullptr) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableUndoSteps() > 0){
 		documentDataPtr->undoManagerPtr->DoUndo();
 	}
@@ -416,7 +419,7 @@ void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::DoUndo()
 template <class DocumentManagerBase, class UI>
 void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::DoRedo()
 {
-	SingleDocumentData* documentDataPtr = GetActiveDocumentInfo();
+	SingleDocumentData* documentDataPtr = BaseClass::GetActiveDocumentInfo();
 	if ((documentDataPtr != nullptr) && documentDataPtr->undoManagerPtr.IsValid() && documentDataPtr->undoManagerPtr->GetAvailableRedoSteps() > 0){
 		documentDataPtr->undoManagerPtr->DoRedo();
 	}
@@ -427,7 +430,7 @@ template <class DocumentManagerBase, class UI>
 void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OpenDocumentForType(const QByteArray& documentTypeId)
 {
 	bool ignoredFlag = false;
-	if (!OpenDocument(&documentTypeId, nullptr, true, "", nullptr, nullptr, false, &ignoredFlag)){
+	if (!BaseClass::OpenDocument(&documentTypeId, nullptr, true, "", nullptr, nullptr, false, &ignoredFlag)){
 		if (!ignoredFlag){
 			QMessageBox::warning(nullptr, "", tr("Document could not be opened"));
 		}
