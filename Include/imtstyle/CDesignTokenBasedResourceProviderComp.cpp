@@ -1,13 +1,13 @@
-#include <imtstyle/CDesignTokenBasedPaletteProviderComp.h>
+#include <imtstyle/CDesignTokenBasedResourceProviderComp.h>
 
 
 // Qt includes
 #include <QtCore/QFile>
-#include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
-#include <QtCore/QFile>
+#include <QtCore/QMap>
 #include <QtWidgets/QStyleFactory>
 #include <QtWidgets/QStyle>
 
@@ -24,13 +24,7 @@ namespace imtstyle
 
 // public methods
 
-const imtbase::ICollectionInfo& CDesignTokenBasedPaletteProviderComp::GetDesignSchemaList() const
-{
-	return m_designSchemaList;
-}
-
-
-bool CDesignTokenBasedPaletteProviderComp::GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const
+bool CDesignTokenBasedResourceProviderComp::GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const
 {
 	if (m_paletteMap.contains(designSchemaId)){
 		palette = m_paletteMap[designSchemaId];
@@ -41,18 +35,45 @@ bool CDesignTokenBasedPaletteProviderComp::GetColorPalette(const QByteArray& des
 }
 
 
+// reimplemented (IFontProvider)
+
+const imtbase::ICollectionInfo& CDesignTokenBasedResourceProviderComp::GetFontList() const
+{
+	return m_fontList;
+}
+
+
+bool CDesignTokenBasedResourceProviderComp::GetFont(const QByteArray& fontId, QFont& font) const
+{
+	if (m_fontMap.contains(fontId)){
+		font = m_fontMap[fontId];
+		return true;
+	}
+
+	return false;
+}
+
+
+// reimplemented (IColorPaletteProvider)
+
+const imtbase::ICollectionInfo& CDesignTokenBasedResourceProviderComp::GetDesignSchemaList() const
+{
+	return m_designSchemaList;
+}
+
+
 // protected methods
 
 // reimplemented (icomp::CComponentBase)
 
-void CDesignTokenBasedPaletteProviderComp::OnComponentCreated()
+void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
 	CreateDefaultPalettes();
 
-	if (m_resourceNameAttrPtr.IsValid()){
-		QFile paletteFile(*m_resourceNameAttrPtr);
+	if (m_resourceFileNameAttrPtr.IsValid()){
+		QFile paletteFile(*m_resourceFileNameAttrPtr);
 
 		int count = qMin(m_designShemaIdAttrPtr.GetCount(), m_paletteModeAttrPtr.GetCount());
 		if (count > 0 && paletteFile.open(QIODevice::ReadOnly)){
@@ -70,8 +91,8 @@ void CDesignTokenBasedPaletteProviderComp::OnComponentCreated()
 
 				for (int i = 0; i < count; i++){
 					if (!m_designShemaIdAttrPtr[i].isEmpty() && !m_paletteModeAttrPtr[i].isEmpty()){
-						QJsonObject modeObject = paletteObject[m_paletteModeAttrPtr[i]].toObject();
-						if (modeObject.isEmpty()){
+						QJsonObject modeObject;
+						if (!GetObjectValue(paletteObject, m_paletteModeAttrPtr[i], modeObject)){
 							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
 							return;
 						}
@@ -106,17 +127,44 @@ void CDesignTokenBasedPaletteProviderComp::OnComponentCreated()
 
 						QByteArray designShemaId = m_designShemaIdAttrPtr[i];
 						if (m_designSchemaList.GetElementIds().contains(designShemaId)){
-							QPalette palette = m_paletteMap[m_designShemaIdAttrPtr[i]];
+							QPalette palette = m_paletteMap[designShemaId];
 							palette.setColor(QPalette::WindowText, textColor);
 							palette.setColor(QPalette::Text, textColor);
 							palette.setColor(QPalette::Window, backgroundColor);
 							palette.setColor(QPalette::Base, backgroundColor);
-							paletteMap[designShemaId] = palette;
+							m_paletteMap[designShemaId] = palette;
 						}
 					}
 				}
 
-				m_paletteMap = paletteMap;
+				QJsonObject typographyObject;
+				if (!GetObjectValue(rootObject, "typography", typographyObject)){
+					SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+					return;
+				}
+
+				QJsonArray fontFamilyArray;
+				double fontSize;
+				if (!GetArrayValue(typographyObject, "fontFamily", fontFamilyArray) ||
+					!GetDoubleValue(typographyObject, "fontSize", fontSize)){
+					SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+					return;
+				}
+
+				for (int i = 0; i < fontFamilyArray.count(); i++){
+					QString fontName;
+					if (!GetStringValue(fontFamilyArray, i, fontName)){
+						SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+						return;
+					}
+
+					QFont font(fontName, fontSize);
+
+					QByteArray fontId = fontName.toLatin1();
+					fontId.replace(" ", "");
+					m_fontMap[fontId] = font;
+					m_fontList.InsertItem(fontId, fontName, "");
+				}
 			}
 
 			paletteFile.close();
@@ -127,7 +175,15 @@ void CDesignTokenBasedPaletteProviderComp::OnComponentCreated()
 
 // private methods
 
-void CDesignTokenBasedPaletteProviderComp::CreateDefaultPalettes()
+int CDesignTokenBasedResourceProviderComp::GetCount() const
+{
+	int count = qMin(m_designShemaIdAttrPtr.GetCount(), m_paletteModeAttrPtr.GetCount());
+
+	return  count;
+}
+
+
+void CDesignTokenBasedResourceProviderComp::CreateDefaultPalettes()
 {
 	istd::TDelPtr<QStyle> baseStylePtr(QStyleFactory::create("fusion"));
 	QPalette lightPalette = baseStylePtr->standardPalette();
@@ -154,7 +210,7 @@ void CDesignTokenBasedPaletteProviderComp::CreateDefaultPalettes()
 }
 
 
-bool CDesignTokenBasedPaletteProviderComp::StringToColor(const QString& colorString, QColor& color) const
+bool CDesignTokenBasedResourceProviderComp::StringToColor(const QString& colorString, QColor& color) const
 {
 	QString tempColorString = colorString;
 	tempColorString.replace(" ", "");

@@ -410,11 +410,15 @@ void CMultiDocumentWorkspaceGuiCompBase::OnGuiCreated()
 			OnViewRegistered(viewPtr, documentInfo);
 		}
 	}
+
+	EnableDesignHandler(true);
 }
 
 
 void CMultiDocumentWorkspaceGuiCompBase::OnGuiDestroyed()
 {
+	EnableDesignHandler(false);
+
 	BaseClass2::UnregisterAllModels();
 
 	CloseAllDocuments();

@@ -10,6 +10,7 @@
 // ImtCore includes
 #include <imtstyle/CImtStyle.h>
 #include <imtstyle/IColorPaletteProvider.h>
+#include <imtstyle/IFontProvider.h>
 
 
 namespace imtgui
@@ -29,6 +30,7 @@ public:
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_ASSIGN(m_slaveCompPtr, "SlaveDesignManager", "Slave design manager", false, "SlaveDesignManager");
 		I_ASSIGN(m_paletteProviderCompPtr, "PaletteProvider", "Palette provider", false, "PaletteProvider");
+		I_ASSIGN_TO(m_fontProviderCompPtr, m_paletteProviderCompPtr, false);
 	I_END_COMPONENT;
 
 	CDesignManagerCompBase();
@@ -89,6 +91,7 @@ private:
 private:
 	I_REF(iprm::ISelectionParam, m_slaveCompPtr);
 	I_REF(imtstyle::IColorPaletteProvider, m_paletteProviderCompPtr);
+	I_REF(imtstyle::IFontProvider, m_fontProviderCompPtr);
 
 	QMap<imtstyle::CImtStyle::DesignSchema, ResourceFunctionPtr> m_initResources;
 	QMap<imtstyle::CImtStyle::DesignSchema, ResourceFunctionPtr> m_cleanupResources;

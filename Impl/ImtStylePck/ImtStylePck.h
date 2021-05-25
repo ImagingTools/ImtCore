@@ -3,11 +3,11 @@
 
 // ACF includes
 #include <icomp/TMakeComponentWrap.h>
-#include <imtstyle/CDesignTokenBasedPaletteProviderComp.h>
+#include <imtstyle/CDesignTokenBasedResourceProviderComp.h>
 
 
 // ImtCore includes
-#include <imtstyle/CDesignTokenBasedPaletteProviderComp.h>
+#include <imtstyle/CDesignTokenBasedResourceProviderComp.h>
 
 /**
 	ImtStylePck package
@@ -15,8 +15,8 @@
 namespace ImtStylePck
 {
 
-	typedef imtstyle::CDesignTokenBasedPaletteProviderComp DesignTokenBasedPaletteProvider;
-	   
+	typedef imtstyle::CDesignTokenBasedResourceProviderComp DesignTokenBasedResourceProvider;
+
 } // namespace ImtStylePck
 
 

@@ -14,10 +14,10 @@ I_EXPORT_PACKAGE(
 			"Design style package",
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
-			I_EXPORT_COMPONENT(
-			DesignTokenBasedPaletteProvider,
-			"Design token based color palette provider",
-			"Design Token Provider Color Palette");
+I_EXPORT_COMPONENT(
+			DesignTokenBasedResourceProvider,
+			"Design token based resource provider",
+			"Design Token Resource Color Palette Font Icons");
 
 } // namespace ImtStylePck
 
