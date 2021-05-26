@@ -19,8 +19,8 @@ namespace imtrest
 
 
 class CWebSocketSubscriberEngineComp:
-		public ilog::CLoggerComponentBase,
-		virtual public ISubscriberEngine
+			public ilog::CLoggerComponentBase,
+			virtual public ISubscriberEngine
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
