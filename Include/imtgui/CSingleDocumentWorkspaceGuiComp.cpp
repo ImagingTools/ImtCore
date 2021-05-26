@@ -76,9 +76,11 @@ void CSingleDocumentWorkspaceGuiComp::OnViewRemoved(istd::IPolymorphic* viewPtr)
 	BaseClass::OnViewRemoved(viewPtr);
 
 	QWidget* rootWidgetPtr = GetWidget();
-	QLayout* layoutPtr = rootWidgetPtr->layout();
+	if (rootWidgetPtr != nullptr){
+		QLayout* layoutPtr = rootWidgetPtr->layout();
 
-	iwidgets::ClearLayout(layoutPtr);
+		iwidgets::ClearLayout(layoutPtr);
+	}
 }
 
 
