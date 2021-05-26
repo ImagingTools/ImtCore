@@ -9048,14 +9048,12 @@ var QtQuick_Canvas = function (_QtQuick_Item25) {
     value: function $updateWidth(val) {
       this.width = val;
       this.impl.style.width = this.width + "px";
-      console.log(this.width);
     }
   }, {
     key: "$updateHeight",
     value: function $updateHeight(val) {
       this.height = val;
       this.impl.style.height = this.height + "px";
-      console.log(this.height);
     }
   }, {
     key: "$completed",
@@ -12375,10 +12373,14 @@ var QtQuick_TextInput = function (_QtQuick_Item40) {
     _this127.echoModeChanged.connect(_this127, _this127.$onEchoModeChanged);
     _this127.maximumLengthChanged.connect(_this127, _this127.$onMaximumLengthChanged);
     _this127.readOnlyChanged.connect(_this127, _this127.$onReadOnlyChanged);
-    _this127.Keys.pressed.connect(_this127, _this127.Keys$onPressed);
+    //this.Keys.pressed.connect(this, this.Keys$onPressed);
 
     _this127.impl.addEventListener("input", function () {
       return _this127.$updateValue();
+    });
+
+    _this127.impl.addEventListener("keydown", function (e) {
+      _this127.Keys$onPressed(e);
     });
     return _this127;
   }
@@ -12437,9 +12439,10 @@ var QtQuick_TextInput = function (_QtQuick_Item40) {
     key: "Keys$onPressed",
     value: function Keys$onPressed(e) {
       var Qt = QmlWeb.Qt;
-      var submit = e.key === Qt.Key_Return || e.key === Qt.Key_Enter;
+      var submit = e.keyCode === Qt.Key_Return || e.keyCode === Qt.Key_Enter;
       if (submit && this.$testValidator()) {
         this.accepted();
+
         e.accepted = true;
       }
     }
