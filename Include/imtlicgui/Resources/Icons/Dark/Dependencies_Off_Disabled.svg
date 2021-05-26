@@ -13,7 +13,7 @@
    version="1.1"
    id="svg20"
    sodipodi:docname="Dependencies.svg"
-   inkscape:version="1.0.2-2 (e86c870879, 2021-01-15)">
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
   <metadata
      id="metadata26">
     <rdf:RDF>
@@ -28,7 +28,7 @@
   <defs
      id="defs24" />
   <sodipodi:namedview
-     pagecolor="#D9D9D9"
+     pagecolor="#8E8E8E"
      bordercolor="#666666"
      borderopacity="1"
      objecttolerance="10"
@@ -37,23 +37,22 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1920"
-     inkscape:window-height="1017"
+     inkscape:window-height="1028"
      id="namedview22"
      showgrid="false"
      inkscape:zoom="0.4609375"
-     inkscape:cx="-186.57627"
+     inkscape:cx="-64"
      inkscape:cy="256"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg20"
-     inkscape:document-rotation="0" />
+     inkscape:current-layer="svg20" />
   <g
      id="g844"
      transform="matrix(0.91185133,0,0,0.91185133,3.8182681,3.8182681)"
-     style="stroke-width:1.09667003;fill:#D9D9D9;fill-opacity:1">
+     style="stroke-width:1.09667003">
     <path
-       style="fill:#D9D9D9;fill-opacity:1;stroke-width:1.09667003"
+       style="fill:#8E8E8E;fill-opacity:1;stroke-width:1.09667003"
        id="path2"
        d="m 115.833,101.667 h -47 a 5.006,5.006 0 0 0 -5,5 v 3.5 H 52.667 v -19.5 h 37.166 a 5.006,5.006 0 0 0 5,-5 v -9 a 5.006,5.006 0 0 0 -5,-5 h -47 a 5.006,5.006 0 0 0 -5,5 v 3.5 H 26.666 v -28 h 11.167 v 3.5 a 5.006,5.006 0 0 0 5,5 h 47 a 5.006,5.006 0 0 0 5,-5 v -9 a 5.006,5.006 0 0 0 -5,-5 h -47 a 5.006,5.006 0 0 0 -5,5 v 3.5 H 26.666 V 30.333 h 36.5 a 5.006,5.006 0 0 0 5,-5 v -9 a 5.006,5.006 0 0 0 -5,-5 h -47 a 5.006,5.006 0 0 0 -5,5 v 9 a 5.006,5.006 0 0 0 5,5 h 8.5 v 50.833 a 1,1 0 0 0 1,1 h 12.167 v 3.5 a 5.006,5.006 0 0 0 5,5 h 7.834 v 20.5 a 1,1 0 0 0 1,1 h 12.166 v 3.5 a 5.006,5.006 0 0 0 5,5 h 47 a 5.006,5.006 0 0 0 5,-5 v -9 a 5.006,5.006 0 0 0 -5,-4.999 z"
        inkscape:connector-curvature="0" />
