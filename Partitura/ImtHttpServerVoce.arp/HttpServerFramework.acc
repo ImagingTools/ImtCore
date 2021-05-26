@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4932" Description="ACF"/>
-            <Version Id="1" Number="2143" Description="ACF-Solutions"/>
+            <Version Id="0" Number="4940" Description="ACF"/>
+            <Version Id="1" Number="2150" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -11,7 +11,7 @@
     <Keywords>HTTP Server</Keywords>
     <ElementsList>
         <Element Id="HttpProtocolEngine" PackageId="ImtRestPck" ComponentId="HttpProtocolEngine">
-            <Data IsEnabled="true" Flags="0">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
@@ -23,7 +23,7 @@
             </Data>
         </Element>
         <Element Id="HttpRootHandler" PackageId="ImtRestPck" ComponentId="HttpRootHandler">
-            <Data IsEnabled="true" Flags="0">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="HttpCommandIds">
                         <Data IsEnabled="false"/>
@@ -68,7 +68,7 @@
             </Data>
         </Element>
         <Element Id="WebSocketHttpRootHandler" PackageId="ImtRestPck" ComponentId="HttpRootHandler">
-            <Data IsEnabled="true" Flags="0">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="WebSocketCommandIds">
                         <Data IsEnabled="false"/>
@@ -85,6 +85,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="WebSocketProtocolEngine" PackageId="ImtRestPck" ComponentId="WebSocketProtocolEngine">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="WebSocketServer" PackageId="ImtRestPck" ComponentId="WebSocketServer">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
@@ -92,7 +97,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="HttpProtocolEngine"/>
+                        <Data IsEnabled="true" Value="WebSocketProtocolEngine"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestHandler" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketHttpRootHandler"/>
@@ -104,6 +109,9 @@
                         <Data IsEnabled="true" Value="8112"/>
                     </AttributeInfo>
                     <AttributeInfo Id="StartServerOnCreate" Type="Boolean" ExportId="StartWebSocketServerOnCreate">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriberEngine" Type="Reference" ExportId="WebSocketSubscriberEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

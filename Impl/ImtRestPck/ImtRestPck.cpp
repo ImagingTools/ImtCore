@@ -25,6 +25,16 @@ I_EXPORT_COMPONENT(
 			"WebSocket Connection Server");
 
 I_EXPORT_COMPONENT(
+			WebSocketSubscriberEngine,
+			"WebSocket subscriber engine",
+			"WebSocket subscriber engine");
+
+I_EXPORT_COMPONENT(
+			WebSocketProtocolEngine,
+			"WebSocket protocol engine",
+			"WebSocket Connection Server HTTP REST");
+
+I_EXPORT_COMPONENT(
 			HttpProtocolEngine,
 			"HTTP protocol engine",
 			"TCP Connection Server HTTP REST");

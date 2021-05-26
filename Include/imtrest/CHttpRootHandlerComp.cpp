@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
-#include <imtrest/IResponder.h>
+#include <imtrest/ISender.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
 
@@ -47,7 +47,7 @@ IRequestHandler::ConstResponsePtr CHttpRootHandlerComp::ProcessRequest(const IRe
 
 		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
 		if (responsePtr.IsValid()) {
-			engine.GetResponder().SendResponse(*responsePtr);
+			engine.GetSender().SendResponse(*responsePtr);
 		}
 
 		SendErrorMessage(0, QString("No request handler found for: '%1'").arg(qPrintable(commandId)));

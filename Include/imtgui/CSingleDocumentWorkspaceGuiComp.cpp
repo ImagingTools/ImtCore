@@ -65,7 +65,7 @@ void CSingleDocumentWorkspaceGuiComp::OnViewRegistered(istd::IPolymorphic* viewP
 
 			documentViewPtr.PopPtr();
 
-			m_lastViewPtr = guiObjectPtr;
+			this->m_lastViewPtr = guiObjectPtr;
 		}
 	}
 }

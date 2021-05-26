@@ -12,6 +12,8 @@ Item {
 
 	onSourceChanged: {
 		state = "Loading"
+        if(source == "")
+            return
 		var xhr = new XMLHttpRequest;
 		xhr.open("GET", source);
 		xhr.onreadystatechange = function() {

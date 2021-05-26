@@ -1,0 +1,79 @@
+#include <imtrest/CWebSocketSender.h>
+
+
+// Qt includes
+#include <QtCore/QDataStream>
+#include <QtWebSockets/QWebSocket>
+
+// ImtCore includes
+#include <imtrest/IResponse.h>
+#include <imtrest/IProtocolEngine.h>
+
+
+namespace imtrest
+{
+
+
+// public methods
+
+// reimplemented (IResponder)
+
+bool CWebSocketSender::SendResponse(const IResponse& response) const
+{
+	int protocolStatusCode = -1;
+	QByteArray statusLiteral;
+
+	bool retVal = response.GetProtocolEngine().GetProtocolStatusCode(response.GetStatusCode(), protocolStatusCode, statusLiteral);
+	if (!retVal){
+		return false;
+	}
+
+	QObject& socket = response.GetSocketObject();
+
+	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(&socket);
+	if (webSocketPtr != nullptr){
+		if (!webSocketPtr->isValid()){
+			return false;
+		}
+
+
+		const QByteArray& contentData = response.GetData();
+		quint64 contentLength = contentData.size();
+
+		webSocketPtr->sendBinaryMessage(contentData);
+		return true;
+	}
+
+
+	return false;
+}
+
+
+bool CWebSocketSender::SendRequest(const IRequest &reguest) const
+{
+	QObject& socket = reguest.GetSocketObject();
+
+	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(&socket);
+	if (webSocketPtr != nullptr){
+		if (!webSocketPtr->isValid()){
+			return false;
+		}
+
+
+		const QByteArray& contentData = reguest.GetBody();
+		quint64 contentLength = contentData.size();
+
+		webSocketPtr->sendTextMessage(contentData);
+		return true;
+	}
+
+	return false;
+
+}
+
+
+
+
+} // namespace imtrest
+
+

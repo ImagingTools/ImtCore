@@ -15,7 +15,8 @@ namespace imtrest
 class IRequest;
 class IRequestHandler;
 class IResponse;
-class IResponder;
+class ISender;
+//class IResponder;
 
 
 /**
@@ -159,6 +160,18 @@ public:
 				const IRequestHandler& requestHandler) const = 0;
 
 	/**
+		Create request for sending data.
+		\param data		The response data.
+		\param request	Related request.
+	*/
+	virtual IRequest* CreateRequestForSend(
+				QObject* socketPtr,
+				const IRequestHandler& requestHandler,
+				int statusCode,
+				const QByteArray& data,
+				const QByteArray& dataTypeId) const = 0;
+
+	/**
 		Create reponse for a given request.
 		\param data		The response data.
 		\param request	Related request.
@@ -169,10 +182,15 @@ public:
 				const QByteArray& data,
 				const QByteArray& dataTypeId) const = 0;
 
+//	/**
+//		Get responder instance using for sending responses to the clients.
+//	*/
+	//	virtual const IResponder& GetResponder(const IRequest* requestPtr = nullptr) const = 0;
+
 	/**
-		Get responder instance using for sending responses to the clients.
+		Get sender instance using for sending responses to the clients.
 	*/
-	virtual const IResponder& GetResponder(const IRequest* requestPtr = nullptr) const = 0;
+	virtual const ISender& GetSender(const IRequest* requestPtr = nullptr) const = 0;
 };
 
 

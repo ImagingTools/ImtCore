@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtrest/IResponder.h>
+#include <imtrest/ISender.h>
 
 
 namespace imtrest
@@ -20,7 +20,7 @@ IRequestHandler::ConstResponsePtr CServerCompBase::ProcessRequest(const IRequest
 	if (m_requestHandlerCompPtr.IsValid()){
 		retVal = m_requestHandlerCompPtr->ProcessRequest(request);
 		if (retVal.IsValid()){
-			request.GetProtocolEngine().GetResponder().SendResponse(*retVal);
+			request.GetProtocolEngine().GetSender().SendResponse(*retVal);
 		}
 	}
 

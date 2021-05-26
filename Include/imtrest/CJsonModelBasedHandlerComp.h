@@ -2,21 +2,21 @@
 
 
 // ACF includes
-#include <ifile/IFileNameParam.h>
+//#include <ifile/IFileNameParam.h>
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
 #include <imtrest/IRequestHandler.h>
 
-// Qt includes
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QTextStream>
+//// Qt includes
+//#include <QtCore/QDir>
+//#include <QtCore/QFile>
+//#include <QtCore/QTextStream>
 
-// ImtCore includes
-#include <imtrest/IRequest.h>
-#include <imtrest/IResponder.h>
-#include <imtrest/IResponse.h>
+//// ImtCore includes
+//#include <imtrest/IRequest.h>
+//#include <imtrest/IResponder.h>
+//#include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
 
 
@@ -24,31 +24,31 @@
 
 //------------------------------------------------------------------mem test
 // Qt includes
-#include <QtWidgets/QAction>
-#include <QtCore/QJsonDocument>
+//#include <QtWidgets/QAction>
+//#include <QtCore/QJsonDocument>
 
 
-// ACF includes
-//#include <iqtgui/TDesignerGuiObserverCompBase.h>
-#include <iqtgui/IGuiObject.h>
-#include <imod/TSingleModelObserverBase.h>
-#include <ilog/TLoggerCompWrap.h>
+//// ACF includes
+////#include <iqtgui/TDesignerGuiObserverCompBase.h>
+//#include <iqtgui/IGuiObject.h>
+//#include <imod/TSingleModelObserverBase.h>
+//#include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtauth/IContactInfo.h>
+//#include <imtauth/IContactInfo.h>
 //#include <GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h>
-#include <imtauth/IContactInfo.h>
+//#include <imtauth/IContactInfo.h>
 //#include <imtbase/IItemBasedRepresentationProvider.h>
-#include <imtbase/CTreeItemModel.h>
+//#include <imtbase/CTreeItemModel.h>
 
 // ACF includes
-#include <istd/CChangeGroup.h>
+//#include <istd/CChangeGroup.h>
 #include <iser/CJsonStringWriteArchive.h>
 
 // ImtCore includes
-#include <imtbase/ICollectionInfo.h>
-#include <imtauth/IAddressManager.h>
-#include <imtauth/CAddress.h>
+//#include <imtbase/ICollectionInfo.h>
+//#include <imtauth/IAddressManager.h>
+//#include <imtauth/CAddress.h>
 #include <imtrest/IRepresentationDataProvider.h>
 //------------------------------------------------------------------
 

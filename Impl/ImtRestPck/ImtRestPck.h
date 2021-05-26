@@ -7,7 +7,10 @@
 
 // ImtCore includes
 #include <imtrest/TSocketServerComp.h>
-#include <imtrest/CWebSocketServer.h>
+#include <imtrest/CWebSocketServerComp.h>
+#include <imtrest/CWebSocketProtocolEngineComp.h>
+#include <imtrest/CWebSocketSuscriberEngineComp.h>
+#include <imtrest/CTcpServerComp.h>
 #include <imtrest/CHttpProtocolEngineComp.h>
 #include <imtrest/CHttpRootHandlerComp.h>
 #include <imtrest/CHttpFileBasedHandlerComp.h>
@@ -23,8 +26,10 @@ namespace ImtRestPck
 {
 
 
-typedef imtrest::TSocketServerComp<QTcpServer, QTcpSocket> TcpServer;
-typedef imtrest::TSocketServerComp<imtrest::CWebSocketServer, QWebSocket> WebSocketServer;
+typedef imtrest::CTcpServerComp TcpServer;
+typedef imtrest::CWebSocketServerComp WebSocketServer;
+typedef imtrest::CWebSocketSubscriberEngineComp WebSocketSubscriberEngine;
+typedef imtrest::CWebSocketProtocolEngineComp WebSocketProtocolEngine;
 typedef imtrest::CHttpProtocolEngineComp HttpProtocolEngine;
 typedef imtrest::CHttpRootHandlerComp HttpRootHandler;
 typedef imtrest::CHttpFileBasedHandlerComp HttpFileBasedHandler;

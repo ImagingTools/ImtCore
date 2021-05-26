@@ -9,12 +9,30 @@ Rectangle {
 //    property TreeItemModel contactInfoModel
     property var contactInfoModel
     function updateData() {
+        console.log("lastName", contactInfoModel.GetData("lastName"))
         tfName.text = contactInfoModel.GetData("firstName")
         tfName.isTextChanged = false
         tfLastName.text = contactInfoModel.GetData("lastName")
         tfLastName.isTextChanged = false
         tfNicName.text = contactInfoModel.GetData("nickName")
         tfNicName.isTextChanged = false
+    }
+
+    function updateShortData(shortData) {
+        var key = shortData["key"]
+//        console.log("key", key)
+        if (key === "firstName"){
+            tfName.text = shortData["newVal"]
+            tfName.isTextChanged = false
+        }
+        if (key === "lastName"){
+            tfLastName.text = shortData["newVal"]
+            tfLastName.isTextChanged = false
+        }
+        if (key === "nickName"){
+            tfNicName.text = shortData["newVal"]
+            tfNicName.isTextChanged = false
+        }
     }
 
     onContactInfoModelChanged: {
@@ -24,6 +42,7 @@ Rectangle {
     Connections {
         target: contactInfoModel
         onStateChanged: {
+            console.log("ModelState", contactInfoModel.state)
             if(contactInfoModel.state === "Ready"){
                 container.updateData()
             }

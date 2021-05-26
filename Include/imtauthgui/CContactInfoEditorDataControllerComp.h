@@ -10,6 +10,7 @@
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
 #include <imtbase/IItemBasedRepresentationDataController.h>
 #include <imod/TModelWrap.h>
+#include <imtrest/ISuscriberEngine.h>
 
 
 namespace imtauthgui
@@ -31,6 +32,7 @@ public:
 	I_BEGIN_COMPONENT(CContactInfoEditorDataControllerComp);
 		I_REGISTER_INTERFACE(imod::IObserver);
 		I_ASSIGN(m_representationDataControllerCompPtr, "ItemBasedRepresentationDataControllerCompPtr", "reference to ItemBasedRepresentationDataController", true, "ItemBasedRepresentationDataController");
+		I_ASSIGN(m_subscriberEngineCompPtr, "SubscriberEngineCompPtr", "reference to ISubscriberEngine", false, "SubscriberEngine");
 		I_REGISTER_SUBELEMENT(CItemBasedRepresentationDataProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(CItemBasedRepresentationDataProvider, imtbase::IItemBasedRepresentationDataProvider, ExtractCommands);
 	I_END_COMPONENT;
@@ -63,6 +65,7 @@ protected:
 
 private:
 	I_REF(imtbase::IItemBasedRepresentationDataController, m_representationDataControllerCompPtr);
+	I_REF(imtrest::ISubscriberEngine, m_subscriberEngineCompPtr);
 
 	class CTreeItemModelObserver : public imod::TSingleModelObserverBase<imod::IModel>
 	{

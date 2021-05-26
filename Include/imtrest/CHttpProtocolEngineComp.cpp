@@ -160,6 +160,21 @@ IRequest* CHttpProtocolEngineComp::CreateRequest(QObject* socketPtr, const IRequ
 }
 
 
+IRequest* CHttpProtocolEngineComp::CreateRequestForSend(
+		QObject* socketPtr,
+		const IRequestHandler& requestHandler,
+		int statusCode,
+		const QByteArray& data,
+		const QByteArray& dataTypeId) const
+{
+	if (socketPtr != nullptr){
+		return new CHttpRequest(*socketPtr, requestHandler, *this);
+	}
+
+	return nullptr;
+}
+
+
 IResponse* CHttpProtocolEngineComp::CreateResponse(
 			const IRequest& request,
 			int statusCode,
@@ -170,9 +185,9 @@ IResponse* CHttpProtocolEngineComp::CreateResponse(
 }
 
 
-const IResponder& CHttpProtocolEngineComp::GetResponder(const IRequest* /*requestPtr*/) const
+const ISender& CHttpProtocolEngineComp::GetSender(const IRequest* /*requestPtr*/) const
 {
-	return m_responder;
+	return m_sender;
 }
 
 

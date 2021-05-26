@@ -85,6 +85,9 @@ void CContactInfoEditorDataControllerComp::CTreeItemModelObserver::OnUpdate(cons
 					&m_parent->m_itemBesedRepresentetionProvider.m_treeItemModel,
 					changeSet);
 	}
+	if (m_parent->m_subscriberEngineCompPtr.IsValid()){
+		m_parent->m_subscriberEngineCompPtr->OnModelUpdate("__ContactInfo__", changeSet);
+	}
 
 	qDebug() << "OnUpdate";
 }
