@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtNetwork/QAbstractSocket>
-
 // ImtCore includes
 #include <imtrest/ISender.h>
 

@@ -36,14 +36,12 @@ bool CWebSocketSender::SendResponse(const IResponse& response) const
 			return false;
 		}
 
-
 		const QByteArray& contentData = response.GetData();
 		quint64 contentLength = contentData.size();
 
 		webSocketPtr->sendBinaryMessage(contentData);
 		return true;
 	}
-
 
 	return false;
 }

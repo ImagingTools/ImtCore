@@ -1,7 +1,17 @@
 ﻿#include <imtrest/CJsonModelBasedHandlerComp.h>
 
+
+// STL includes
 #include <stdlib.h>
 #include <time.h>
+
+// Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
+#include <QtCore/QRandomGenerator>
+#include <QtGui/QColor>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -10,13 +20,6 @@
 // ImtCore includes
 #include <imtrest/IRequestHandler.h>
 #include <imtrest/CHttpRequest.h>
-
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonValue>
-#include <QtCore/QRandomGenerator>
-#include <QtGui/QColor>
 
 
 namespace imtrest

@@ -55,8 +55,6 @@ QUrl CWebSocketRequest::GetUrl() const
 }
 
 
-
-
 QByteArray CWebSocketRequest::GetBody() const
 {
 	return m_body;

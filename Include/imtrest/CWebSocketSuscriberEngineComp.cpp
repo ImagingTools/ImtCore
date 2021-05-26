@@ -1,30 +1,37 @@
 #include <imtrest/CWebSocketSuscriberEngineComp.h>
 
 
+// ACF includes
+#include <iser/CJsonStringWriteArchive.h>
+
 // ImtCore includes
 #include <imtrest/CSubscriberBase.h>
 #include <imtrest/IProtocolEngine.h>
-#include <imtrest/CJsonModelBasedHandlerComp.h>
 #include <imtrest/ISender.h>
+
 
 namespace imtrest
 {
+
 
 // public methods
 
 CWebSocketSubscriberEngineComp::CWebSocketSubscriberEngineComp()
 {
-
 }
 
 
 // reimplemented (ISuscriberEngine)
 
 ISubscriber* CWebSocketSubscriberEngineComp::RegisterSubscriber(
-		QObject* socketPtr, const IRequestHandler& requestHandler, const IProtocolEngine& engine)
+			QObject* socketPtr,
+			const IRequestHandler& requestHandler,
+			const IProtocolEngine& engine)
 {
 	CSubscriberBase* subscriberPtr = new CSubscriberBase(*socketPtr, requestHandler, engine);
+
 	m_subscribers.PushBack(subscriberPtr);
+
 	return subscriberPtr;
 }
 
@@ -32,16 +39,16 @@ ISubscriber* CWebSocketSubscriberEngineComp::RegisterSubscriber(
 void CWebSocketSubscriberEngineComp::UnRegisterSubscriber(QObject *socketObjectPtr)
 {
 	for (int i = 0; i < m_subscribers.GetCount(); ++i){
-	ISubscriber* subscriberPtr = m_subscribers.GetAt(i);
-	Q_ASSERT(subscriberPtr != nullptr);
+		ISubscriber* subscriberPtr = m_subscribers.GetAt(i);
+		Q_ASSERT(subscriberPtr != nullptr);
 
-	if (&subscriberPtr->GetSocketObject() == socketObjectPtr){
-		m_subscribers.RemoveAt(i);
+		if (&subscriberPtr->GetSocketObject() == socketObjectPtr){
+			m_subscribers.RemoveAt(i);
 
-		qDebug("Request deleted");
+			qDebug("Request deleted");
 
-		break;
-	}
+			break;
+		}
 	}
 }
 
@@ -62,7 +69,7 @@ const ISubscriber* CWebSocketSubscriberEngineComp::GetSubscriber(const IRequest 
 }
 
 
-int CWebSocketSubscriberEngineComp::GetCount() const
+int CWebSocketSubscriberEngineComp::GetSubscriberCount() const
 {
 	return m_subscribers.GetCount();
 }
@@ -73,7 +80,8 @@ const ISubscriber* CWebSocketSubscriberEngineComp::GetSubscriber(int index) cons
 	return m_subscribers.GetAt(index);
 }
 
-void CWebSocketSubscriberEngineComp::OnModelUpdate(QByteArray modelId, const istd::IChangeable::ChangeSet &changeSet) const
+
+void CWebSocketSubscriberEngineComp::OnModelUpdate(QByteArray modelId, const istd::IChangeable::ChangeSet& changeSet) const
 {
 	imtbase::CTreeItemModel treeItemModel;
 	QByteArray body;
@@ -81,13 +89,16 @@ void CWebSocketSubscriberEngineComp::OnModelUpdate(QByteArray modelId, const ist
 	treeItemModel.SetData("description",changeSet.GetDescription());
 	imtbase::CTreeItemModel *treeModelPtr = treeItemModel.AddTreeModel("data");
 	istd::IChangeable::ChangeInfoMap infoMap = changeSet.GetChangeInfoMap();
+
 	for (QByteArray key: infoMap.keys()){
 		treeModelPtr->SetData(key,infoMap.value(key));
 	}
+
 	{
 		iser::CJsonStringWriteArchive archive(body);
 		treeItemModel.Serialize(archive);
 	}
+
 	for (int i = 0; i < m_subscribers.GetCount(); ++i){
 		ISubscriber* subscriberPtr = m_subscribers.GetAt(i);
 		Q_ASSERT(subscriberPtr != nullptr);
@@ -99,9 +110,6 @@ void CWebSocketSubscriberEngineComp::OnModelUpdate(QByteArray modelId, const ist
 		subscriberPtr->GetProtocolEngine().GetSender().SendRequest(*irequestPtr);
 	}
 }
-
-
-
 
 
 } // namespace imtrest

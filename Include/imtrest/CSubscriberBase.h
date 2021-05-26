@@ -1,7 +1,7 @@
 #pragma once
 
 
-// ACF includes
+// ImtCore includes
 #include <imtrest/ISubscriber.h>
 
 
@@ -23,7 +23,6 @@ public:
 	virtual QByteArray GetTokenId() const override;
 	virtual QByteArray GetSubscriberId() const override;
 	virtual const IRequestHandler &GetRequestHandler() const override;
-
 
 	// reimplemented (INetworkObject)
 	virtual const IProtocolEngine& GetProtocolEngine() const override;

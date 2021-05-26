@@ -11,6 +11,7 @@
 #include <imtrest/IRepresentationDataProvider.h>
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
 #include <imtrest/ISuscriberEngine.h>
+#include <imtrest/ISubscriber.h>
 
 
 namespace imtrest
@@ -36,15 +37,10 @@ public:
 				QObject* socketPtr,
 				const IRequestHandler& requestHandler,
 				const IProtocolEngine& engine) override;
-
 	virtual void UnRegisterSubscriber(QObject* socketObjectPtr) override;
-
 	virtual const ISubscriber* GetSubscriber(const IRequest* requestPtr) const override;
-
-	int GetCount() const;
-
+	virtual int GetSubscriberCount() const override;
 	virtual const ISubscriber* GetSubscriber(int index) const override;
-
 	virtual void OnModelUpdate(QByteArray modelId, const istd::IChangeable::ChangeSet& changeSet) const override;
 
 private:

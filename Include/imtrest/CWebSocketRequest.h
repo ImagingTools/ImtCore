@@ -27,10 +27,8 @@ public:
 	QByteArrayList GetHeaders() const;
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
 	QUrl GetUrl() const;
-//	MethodType GetMethodType() const;
 	QHostAddress GetRemoteAddress() const;
 	void SetBody(const QByteArray& body);
-
 
 	// reimplemented (IRequest)
 	virtual RequestState GetState() const override;
@@ -44,7 +42,6 @@ public:
 
 	// reimplemented (istd::IChangeable)
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
-
 
 private Q_SLOTS:
 	void OnWebSocketTextMessage(const QString& textMessage);

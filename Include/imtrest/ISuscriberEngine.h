@@ -18,7 +18,6 @@ class IRequestHandler;
 class IResponse;
 class ISender;
 class ISubscriber;
-//class IResponder;
 
 
 /**
@@ -27,7 +26,6 @@ class ISubscriber;
 class ISubscriberEngine: virtual public istd::IPolymorphic
 {
 public:
-
 	/**
 		Create and register subscriber based on the incomming data.
 		\param socketPtr		Socket instance for reading the incommming data
@@ -41,8 +39,7 @@ public:
 	/**
 		Unregister subscriber based on the incomming data.
 	*/
-	virtual void UnRegisterSubscriber(
-				QObject* socketPtr) = 0;
+	virtual void UnRegisterSubscriber(QObject* socketPtr) = 0;
 
 	/**
 		Get sender subscriber using for sending responses to the clients.
@@ -52,7 +49,7 @@ public:
 	/**
 		Get number of subscriber.
 	*/
-	virtual int GetCount() const = 0;
+	virtual int GetSubscriberCount() const = 0;
 
 	/**
 		Get sender subscriber using index
@@ -60,8 +57,6 @@ public:
 	virtual const ISubscriber* GetSubscriber(int index) const = 0;
 
 	virtual void OnModelUpdate(QByteArray modelId, const istd::IChangeable::ChangeSet& changeSet) const = 0;
-
-
 };
 
 

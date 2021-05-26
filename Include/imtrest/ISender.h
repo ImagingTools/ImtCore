@@ -2,15 +2,12 @@
 
 
 // ACF includes
-#include <istd/IPolymorphic.h>
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponse.h>
 
+
 namespace imtrest
 {
-
-
-//class IResponse;
 
 
 /**

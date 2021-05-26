@@ -6,7 +6,6 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
-#include <imtrest/TSocketServerComp.h>
 #include <imtrest/CWebSocketServerComp.h>
 #include <imtrest/CWebSocketProtocolEngineComp.h>
 #include <imtrest/CWebSocketSuscriberEngineComp.h>
