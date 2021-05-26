@@ -157,7 +157,11 @@ void CLayoutManagerGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*chan
 
 void CLayoutManagerGuiComp::OnDesignSchemaChanged()
 {
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/CustomLayoutWidgetForm");
+	BaseClass::OnDesignSchemaChanged();
+
+	if (IsGuiCreated()){
+		iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/CustomLayoutWidgetForm");
+	}
 }
 
 

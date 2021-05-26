@@ -106,7 +106,11 @@ void CMenuPanelComp::OnGuiModelDetached()
 
 void CMenuPanelComp::OnDesignSchemaChanged()
 {
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/MenuPanel");
+	BaseClass::OnDesignSchemaChanged();
+
+	if (IsGuiCreated()){
+		iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/MenuPanel");
+	}
 }
 
 

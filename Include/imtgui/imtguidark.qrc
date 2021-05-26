@@ -22,6 +22,14 @@
         <file alias="Product">Resources/Icons/Dark/Product.svg</file>
         <file alias="Statistics">Resources/Icons/Dark/Statistics.svg</file>
         <file alias="Log">Resources/Icons/Dark/Log.svg</file>
+        <file alias="Log_Off_Active">Resources/Icons/Dark/Log_Off_Active.svg</file>
+        <file alias="Log_Off_Disabled">Resources/Icons/Dark/Log_Off_Disabled.svg</file>
+        <file alias="Log_Off_Normal">Resources/Icons/Dark/Log_Off_Normal.svg</file>
+        <file alias="Log_Off_Selected">Resources/Icons/Dark/Log_Off_Selected.svg</file>
+        <file alias="Log_On_Active">Resources/Icons/Dark/Log_On_Active.svg</file>
+        <file alias="Log_On_Disabled">Resources/Icons/Dark/Log_On_Disabled.svg</file>
+        <file alias="Log_On_Normal">Resources/Icons/Dark/Log_On_Normal.svg</file>
+        <file alias="Log_On_Selected">Resources/Icons/Dark/Log_On_Selected.svg</file>
         <file alias="Ok">Resources/Icons/Dark/Ok.svg</file>
         <file alias="StateInvalid">Resources/Icons/Dark/StateInvalid.svg</file>
         <file alias="StateInvalid2">Resources/Icons/Dark/StateInvalid2.svg</file>
@@ -99,6 +107,14 @@
         <file alias="ProductionOverview">Resources/Icons/Dark/ProductionOverview.svg</file>
         <file alias="ArrowRight">Resources/Icons/Dark/ArrowRight.svg</file>
         <file alias="Manual">Resources/Icons/Dark/Manual.svg</file>
+        <file alias="Manual_Off_Active">Resources/Icons/Dark/Manual_Off_Active.svg</file>
+        <file alias="Manual_Off_Disabled">Resources/Icons/Dark/Manual_Off_Disabled.svg</file>
+        <file alias="Manual_Off_Normal">Resources/Icons/Dark/Manual_Off_Normal.svg</file>
+        <file alias="Manual_Off_Selected">Resources/Icons/Dark/Manual_Off_Selected.svg</file>
+        <file alias="Manual_On_Active">Resources/Icons/Dark/Manual_On_Active.svg</file>
+        <file alias="Manual_On_Disabled">Resources/Icons/Dark/Manual_On_Disabled.svg</file>
+        <file alias="Manual_On_Normal">Resources/Icons/Dark/Manual_On_Normal.svg</file>
+        <file alias="Manual_On_Selected">Resources/Icons/Dark/Manual_On_Selected.svg</file>
         <file alias="Robot">Resources/Icons/Dark/Robot.svg</file>
         <file alias="StatusActive">Resources/Icons/Dark/StatusActive.svg</file>
         <file alias="ManualProcessingHighlight">Resources/Icons/Dark/ManualProcessingHighlight.svg</file>
@@ -120,6 +136,14 @@
         <file alias="Collapse">Resources/Icons/Dark/Collapse.svg</file>
         <file alias="Dashboard">Resources/Icons/Dark/Dashboard.svg</file>
         <file alias="Switch">Resources/Icons/Dark/Switch.svg</file>
+        <file alias="Product_Off_Active">Resources/Icons/Dark/Product_Off_Active.svg</file>
+        <file alias="Product_Off_Disabled">Resources/Icons/Dark/Product_Off_Disabled.svg</file>
+        <file alias="Product_Off_Normal">Resources/Icons/Dark/Product_Off_Normal.svg</file>
+        <file alias="Product_Off_Selected">Resources/Icons/Dark/Product_Off_Selected.svg</file>
+        <file alias="Product_On_Active">Resources/Icons/Dark/Product_On_Active.svg</file>
+        <file alias="Product_On_Disabled">Resources/Icons/Dark/Product_On_Disabled.svg</file>
+        <file alias="Product_On_Normal">Resources/Icons/Dark/Product_On_Normal.svg</file>
+        <file alias="Product_On_Selected">Resources/Icons/Dark/Product_On_Selected.svg</file>
     </qresource>
     <qresource prefix="/ColorIcons">
         <file alias="Workflow">Resources/Icons/Dark/Color/Workflow.svg</file>
@@ -171,5 +195,7 @@
         <file alias="ThumbnailDecoratorGui">Resources/Styles/Dark/ThumbnailDecoratorGui.css</file>
         <file alias="ObjectCollectionMetaInfoView">Resources/Styles/Dark/ObjectCollectionMetaInfoView.css</file>
     </qresource>
-    <qresource prefix="/Style/ImtDark/Images"/>
+    <qresource prefix="/Style/ImtLight/Images">
+        <file alias="PanelBackground">Resources/Styles/ImtLight/Images/PanelBackground.svg</file>
+    </qresource>
 </RCC>

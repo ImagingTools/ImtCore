@@ -325,7 +325,11 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 
 void CObjectCollectionViewComp::OnDesignSchemaChanged()
 {
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionView");
+	BaseClass::OnDesignSchemaChanged();
+
+	if (IsGuiCreated()){
+		iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionView");
+	}
 }
 
 

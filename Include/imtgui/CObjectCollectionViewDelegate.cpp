@@ -366,7 +366,6 @@ void CObjectCollectionViewDelegate::OnLanguageChanged()
 
 void CObjectCollectionViewDelegate::OnDesignSchemaChanged()
 {
-
 }
 
 

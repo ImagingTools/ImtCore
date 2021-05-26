@@ -1,7 +1,23 @@
 <RCC>
     <qresource prefix="/Icons">
         <file alias="Deployment">Resources/Icons/Light/Deployment.svg</file>
+        <file alias="Deployment_Off_Active">Resources/Icons/Light/Deployment_Off_Active.svg</file>
+        <file alias="Deployment_Off_Disabled">Resources/Icons/Light/Deployment_Off_Disabled.svg</file>
+        <file alias="Deployment_Off_Normal">Resources/Icons/Light/Deployment_Off_Normal.svg</file>
+        <file alias="Deployment_Off_Selected">Resources/Icons/Light/Deployment_Off_Selected.svg</file>
+        <file alias="Deployment_On_Active">Resources/Icons/Light/Deployment_On_Active.svg</file>
+        <file alias="Deployment_On_Disabled">Resources/Icons/Light/Deployment_On_Disabled.svg</file>
+        <file alias="Deployment_On_Normal">Resources/Icons/Light/Deployment_On_Normal.svg</file>
+        <file alias="Deployment_On_Selected">Resources/Icons/Light/Deployment_On_Selected.svg</file>
         <file alias="FeaturePackage">Resources/Icons/Light/FeaturePackage.svg</file>
+        <file alias="FeaturePackage_Off_Active">Resources/Icons/Light/FeaturePackage_Off_Active.svg</file>
+        <file alias="FeaturePackage_Off_Disabled">Resources/Icons/Light/FeaturePackage_Off_Disabled.svg</file>
+        <file alias="FeaturePackage_Off_Normal">Resources/Icons/Light/FeaturePackage_Off_Normal.svg</file>
+        <file alias="FeaturePackage_Off_Selected">Resources/Icons/Light/FeaturePackage_Off_Selected.svg</file>
+        <file alias="FeaturePackage_On_Active">Resources/Icons/Light/FeaturePackage_On_Active.svg</file>
+        <file alias="FeaturePackage_On_Disabled">Resources/Icons/Light/FeaturePackage_On_Disabled.svg</file>
+        <file alias="FeaturePackage_On_Normal">Resources/Icons/Light/FeaturePackage_On_Normal.svg</file>
+        <file alias="FeaturePackage_On_Selected">Resources/Icons/Light/FeaturePackage_On_Selected.svg</file>
         <file alias="FeatureList">Resources/Icons/Light/FeatureList.svg</file>
         <file alias="Dependencies">Resources/Icons/Light/Dependencies.svg</file>
     </qresource>

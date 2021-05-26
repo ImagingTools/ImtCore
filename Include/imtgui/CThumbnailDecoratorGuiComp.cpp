@@ -173,7 +173,11 @@ void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& settings) const
 
 void CThumbnailDecoratorGuiComp::OnDesignSchemaChanged()
 {
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ThumbnailDecoratorGui");
+	BaseClass::OnDesignSchemaChanged();
+
+	if (IsGuiCreated()){
+		iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ThumbnailDecoratorGui");
+	}
 }
 
 

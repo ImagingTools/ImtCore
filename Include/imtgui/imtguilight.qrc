@@ -22,6 +22,14 @@
         <file alias="Product">Resources/Icons/Light/Product.svg</file>
         <file alias="Statistics">Resources/Icons/Light/Statistics.svg</file>
         <file alias="Log">Resources/Icons/Light/Log.svg</file>
+        <file alias="Log_Off_Active">Resources/Icons/Light/Log_Off_Active.svg</file>
+        <file alias="Log_Off_Disabled">Resources/Icons/Light/Log_Off_Disabled.svg</file>
+        <file alias="Log_Off_Normal">Resources/Icons/Light/Log_Off_Normal.svg</file>
+        <file alias="Log_Off_Selected">Resources/Icons/Light/Log_Off_Selected.svg</file>
+        <file alias="Log_On_Active">Resources/Icons/Light/Log_On_Active.svg</file>
+        <file alias="Log_On_Disabled">Resources/Icons/Light/Log_On_Disabled.svg</file>
+        <file alias="Log_On_Normal">Resources/Icons/Light/Log_On_Normal.svg</file>
+        <file alias="Log_On_Selected">Resources/Icons/Light/Log_On_Selected.svg</file>
         <file alias="Ok">Resources/Icons/Light/Ok.svg</file>
         <file alias="StateInvalid">Resources/Icons/Light/StateInvalid.svg</file>
         <file alias="StateInvalid2">Resources/Icons/Light/StateInvalid2.svg</file>
@@ -99,6 +107,14 @@
         <file alias="ProductionOverview">Resources/Icons/Light/ProductionOverview.svg</file>
         <file alias="ArrowRight">Resources/Icons/Light/ArrowRight.svg</file>
         <file alias="Manual">Resources/Icons/Light/Manual.svg</file>
+        <file alias="Manual_Off_Active">Resources/Icons/Light/Manual_Off_Active.svg</file>
+        <file alias="Manual_Off_Disabled">Resources/Icons/Light/Manual_Off_Disabled.svg</file>
+        <file alias="Manual_Off_Normal">Resources/Icons/Light/Manual_Off_Normal.svg</file>
+        <file alias="Manual_Off_Selected">Resources/Icons/Light/Manual_Off_Selected.svg</file>
+        <file alias="Manual_On_Active">Resources/Icons/Light/Manual_On_Active.svg</file>
+        <file alias="Manual_On_Disabled">Resources/Icons/Light/Manual_On_Disabled.svg</file>
+        <file alias="Manual_On_Normal">Resources/Icons/Light/Manual_On_Normal.svg</file>
+        <file alias="Manual_On_Selected">Resources/Icons/Light/Manual_On_Selected.svg</file>
         <file alias="Robot">Resources/Icons/Light/Robot.svg</file>
         <file alias="StatusActive">Resources/Icons/Light/StatusActive.svg</file>
         <file alias="ManualProcessingHighlight">Resources/Icons/Light/ManualProcessingHighlight.svg</file>
@@ -120,6 +136,14 @@
         <file alias="Collapse">Resources/Icons/Light/Collapse.svg</file>
         <file alias="Dashboard">Resources/Icons/Light/Dashboard.svg</file>
         <file alias="Switch">Resources/Icons/Light/Switch.svg</file>
+        <file alias="Product_Off_Active">Resources/Icons/Light/Product_Off_Active.svg</file>
+        <file alias="Product_Off_Disabled">Resources/Icons/Light/Product_Off_Disabled.svg</file>
+        <file alias="Product_Off_Normal">Resources/Icons/Light/Product_Off_Normal.svg</file>
+        <file alias="Product_Off_Selected">Resources/Icons/Light/Product_Off_Selected.svg</file>
+        <file alias="Product_On_Active">Resources/Icons/Light/Product_On_Active.svg</file>
+        <file alias="Product_On_Disabled">Resources/Icons/Light/Product_On_Disabled.svg</file>
+        <file alias="Product_On_Normal">Resources/Icons/Light/Product_On_Normal.svg</file>
+        <file alias="Product_On_Selected">Resources/Icons/Light/Product_On_Selected.svg</file>
     </qresource>
     <qresource prefix="/ColorIcons">
         <file alias="Workflow">Resources/Icons/Light/Color/Workflow.svg</file>

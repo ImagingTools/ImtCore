@@ -107,7 +107,11 @@ void CObjectCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::Chang
 
 void CObjectCollectionMetaInfoViewComp::OnDesignSchemaChanged()
 {
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionMetaInfoView");
+	BaseClass::OnDesignSchemaChanged();
+
+	if (IsGuiCreated()){
+		iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionMetaInfoView");
+	}
 }
 
 
