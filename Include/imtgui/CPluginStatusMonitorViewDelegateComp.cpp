@@ -121,37 +121,30 @@ ICollectionViewDelegate::SummaryInformation CPluginStatusMonitorViewDelegateComp
 		imtbase::IPluginStatusMonitor* pluginStatusMonitorPtr = dynamic_cast<imtbase::IPluginStatusMonitor*>(m_collectionPtr);
 
 		if (informationProviderPtr != nullptr && pluginStatusMonitorPtr != nullptr){
-			if (informationId == QByteArray("Status")){
-				switch (informationProviderPtr->GetInformationCategory()){
-				case istd::IInformationProvider::IC_NONE:
-					result.icon = none;
-					result.sortValue = istd::IInformationProvider::IC_NONE;
-					break;
-				case istd::IInformationProvider::IC_INFO:
-					result.icon = ok;
-					result.sortValue = istd::IInformationProvider::IC_INFO;
-					break;
-				case istd::IInformationProvider::IC_WARNING:
-					result.icon = warning;
-					result.sortValue = istd::IInformationProvider::IC_WARNING;
-					break;
-				case istd::IInformationProvider::IC_ERROR:
-					result.icon = error;
-					result.sortValue = istd::IInformationProvider::IC_ERROR;
-					break;
-				case istd::IInformationProvider::IC_CRITICAL:
-					result.icon = critical;
-					result.sortValue = istd::IInformationProvider::IC_CRITICAL;
-					break;
-				}
-			}
-			else if (informationId == QByteArray("LoadedAt")){
+			if (informationId == QByteArray("LoadedAt")){
 				result.text = informationProviderPtr->GetInformationTimeStamp().toString("dd.MM.yyyy hh:mm:ss");
 				result.sortValue = informationProviderPtr->GetInformationTimeStamp();
 			}
 			else if (informationId == QByteArray("Name")){
 				result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 				result.sortValue = result.text;
+				switch (informationProviderPtr->GetInformationCategory()){
+				case istd::IInformationProvider::IC_NONE:
+					result.icon = none;
+					break;
+				case istd::IInformationProvider::IC_INFO:
+					result.icon = ok;
+					break;
+				case istd::IInformationProvider::IC_WARNING:
+					result.icon = warning;
+					break;
+				case istd::IInformationProvider::IC_ERROR:
+					result.icon = error;
+					break;
+				case istd::IInformationProvider::IC_CRITICAL:
+					result.icon = critical;
+					break;
+				}
 			}
 			else if (informationId == QByteArray("TypeId")){
 				result.text = pluginStatusMonitorPtr->GetPluginTypeId(objectId);
@@ -217,9 +210,6 @@ void CPluginStatusMonitorViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.ResetData();
 	m_summaryInformationHeaders.clear();
 
-	m_summaryInformationTypes.InsertItem("Status", tr("Status"), "");
-	m_summaryInformationHeaders["Status"] = HeaderInfo(true);
-
 	if (*m_enabledNameAttrPtr){
 		m_summaryInformationTypes.InsertItem("Name", tr("Name"), "");
 		m_summaryInformationHeaders["Name"] = HeaderInfo(false);
@@ -241,7 +231,7 @@ void CPluginStatusMonitorViewDelegateComp::SetupSummaryInformation()
 	}
 
 	if (*m_enabledTypeIdAttrPtr){
-		m_summaryInformationTypes.InsertItem("TypeId", tr("Type ID"), "");
+		m_summaryInformationTypes.InsertItem("TypeId", tr("Type"), "");
 		m_summaryInformationHeaders["TypeId"] = HeaderInfo(false);
 	}
 }
