@@ -109,13 +109,17 @@ CImtStyle::DesignSchema CImtStyle::GetDesignSchema() const
 void CImtStyle::SetDesignSchema(DesignSchema designSchema)
 {
 	if (m_blockerCount == 0){
-		BaseClass::unpolish(qApp);
+		if (qApp != nullptr){
+			BaseClass::unpolish(qApp);
+		}
 
 		m_designSchema = designSchema;
 
 		EnsureStyleSheetApplied(true);
 
-		BaseClass::polish(qApp);
+		if (qApp != nullptr){
+			BaseClass::polish(qApp);
+		}
 	}
 }
 

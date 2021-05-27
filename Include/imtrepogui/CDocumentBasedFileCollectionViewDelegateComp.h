@@ -38,12 +38,12 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(CollectionPersistence, ifile::IFileTypeInfo, ExtractCollectionPersistence);
 		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "Type-ID supported by this delegate", true, "ObjectTypeId");
 		I_ASSIGN(m_filePersistenceCompPtr, "FilePersistence", "Persistence for editable objects", true, "FilePersistence");
-		I_ASSIGN(m_objectImportPersistenceCompPtr, "ImportPersistence", "Persistence used for importing documents", true, "ImportPersistence");
-		I_ASSIGN(m_objectExportPersistenceCompPtr, "ExportPersistence", "Persistence used for exporting documents", true, "ExportPersistence");
+		I_ASSIGN(m_objectImportPersistenceCompPtr, "ImportPersistence", "Persistence used for importing documents", false, "ImportPersistence");
+		I_ASSIGN(m_objectExportPersistenceCompPtr, "ExportPersistence", "Persistence used for exporting documents", false, "ExportPersistence");
 		I_ASSIGN(m_statusIconsProviderCompPtr, "StatusIcons", "Icons for delegate visual status", false, "StatusIcons");
 		I_ASSIGN(m_documentManagerCompPtr, "DocumentManager", "Document manager", true, "DocumentManager");
 		I_ASSIGN_TO(m_documentManagerModelCompPtr, m_documentManagerCompPtr, true);
-		I_ASSIGN(m_informationViewCompPtr, "InformationView", "information view", false, "InformationView");
+		I_ASSIGN(m_informationViewCompPtr, "InformationView", "Document summary information view", false, "InformationView");
 	I_END_COMPONENT;
 
 	enum CommandGroup
