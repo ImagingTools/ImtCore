@@ -6,6 +6,7 @@
 #include <QtCore/QString>
 #include <QtCore/QVector>
 #include <QtCore/QVariant>
+#include <QtWidgets/QAbstractItemDelegate>
 
 // ACF includes
 #include <ibase/ICommandsProvider.h>
@@ -101,6 +102,11 @@ public:
 		The delegate can only work with objects of supported type.
 	*/
 	virtual QByteArray GetSupportedTypeId() const = 0;
+
+	/**
+		Get item delegate for the given column.
+	*/
+	virtual QAbstractItemDelegate* GetColumnItemDelegate(const QByteArray& columnId) const = 0;
 
 	/**
 		Update the commands state according to the state of the collection and the current state of the collection view.

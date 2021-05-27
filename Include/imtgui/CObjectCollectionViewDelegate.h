@@ -57,6 +57,7 @@ public:
 	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;
 	virtual const iqtgui::IVisualStatus& GetDocumentTypeStatus() const override;
 	virtual QByteArray GetSupportedTypeId() const override;
+	virtual QAbstractItemDelegate* GetColumnItemDelegate(const QByteArray& columnId) const override;
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
 	virtual QByteArray ImportObject(const QByteArray& typeId, const QString& sourcePath = QString()) const override;

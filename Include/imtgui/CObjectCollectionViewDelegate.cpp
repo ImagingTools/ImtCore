@@ -70,6 +70,12 @@ QByteArray CObjectCollectionViewDelegate::GetSupportedTypeId() const
 }
 
 
+QAbstractItemDelegate* CObjectCollectionViewDelegate::GetColumnItemDelegate(const QByteArray& /*columnId*/) const
+{
+	return nullptr;
+}
+
+
 void CObjectCollectionViewDelegate::UpdateItemSelection(
 			const imtbase::ICollectionInfo::Ids& selectedItems,
 			const QByteArray& selectedTypeId)
@@ -440,6 +446,7 @@ void CObjectCollectionViewDelegate::OnAddMenuOptionClicked(QAction* action)
 void CObjectCollectionViewDelegate::VisualStatus::SetStatusIcon(const QIcon &statusIcon)
 {
 	istd::CChangeNotifier changeNotifier(this);
+
 	m_statusIcon = statusIcon;
 }
 
@@ -448,6 +455,7 @@ void CObjectCollectionViewDelegate::VisualStatus::SetStatusText(const QString &s
 {
 	if (m_statusText != statusText){
 		istd::CChangeNotifier changeNotifier(this);
+
 		m_statusText = statusText;
 	}
 }

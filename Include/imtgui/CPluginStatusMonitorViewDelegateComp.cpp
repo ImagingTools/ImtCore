@@ -50,6 +50,12 @@ QByteArray CPluginStatusMonitorViewDelegateComp::GetSupportedTypeId() const
 }
 
 
+QAbstractItemDelegate* CPluginStatusMonitorViewDelegateComp::GetColumnItemDelegate(const QByteArray& /*columnId*/) const
+{
+	return nullptr;
+}
+
+
 void CPluginStatusMonitorViewDelegateComp::UpdateItemSelection(
 			const imtbase::ICollectionInfo::Ids& /*selectedItems*/,
 			const QByteArray& /*selectedTypeId*/)
