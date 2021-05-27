@@ -36,6 +36,9 @@ protected:
 				QWidget* parentWidgetPtr,
 				const ifile::IFilePersistence* persistencePtr);
 
+	// reimplemented (iqtdoc::CSingleDocumentWorkspaceGuiComp)
+	virtual void UpdateTitle() override;
+
 	// reimplemented (idoc::CSingleDocumentManagerBase)
 	virtual void OnViewRegistered(istd::IPolymorphic* viewPtr) override;
 	virtual void OnViewRemoved(istd::IPolymorphic* viewPtr) override;
@@ -90,6 +93,8 @@ private:
 	friend class TStandardDocumentViewDecorator<CSingleDocumentWorkspaceGuiComp, Ui::CStandardDocumentViewDecorator>;
 
 	imod::TModelWrap<Commands> m_commands;
+
+	istd::TDelPtr<IDocumentViewDecorator> m_documentViewPtr;
 };
 
 

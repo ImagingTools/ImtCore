@@ -31,7 +31,19 @@ IDocumentViewDecorator* CSingleDocumentWorkspaceGuiComp::CreateDocumentViewDecor
 }
 
 
-// reimplemented (idoc::IDocumentManager)
+// reimplemented (iqtdoc::CSingleDocumentWorkspaceGuiComp)
+
+void CSingleDocumentWorkspaceGuiComp::UpdateTitle()
+{
+	if (m_documentViewPtr.IsValid()){
+		QString titleName = BaseClass::GenerateDocumentTitle();
+
+		m_documentViewPtr->SetTitle(titleName);
+	}
+}
+
+
+// reimplemented (idoc::CSingleDocumentManagerBase)
 
 void CSingleDocumentWorkspaceGuiComp::OnViewRegistered(istd::IPolymorphic* viewPtr)
 {
@@ -49,11 +61,11 @@ void CSingleDocumentWorkspaceGuiComp::OnViewRegistered(istd::IPolymorphic* viewP
 		QWidget* rootWidgetPtr = GetWidget();
 		QLayout* layoutPtr = rootWidgetPtr->layout();
 
-		istd::TDelPtr<IDocumentViewDecorator> documentViewPtr(CreateDocumentViewDecorator(viewPtr, rootWidgetPtr, persistencePtr));
-		if (guiObjectPtr->CreateGui(documentViewPtr->GetViewFrame())){
+		m_documentViewPtr.SetPtr(CreateDocumentViewDecorator(viewPtr, rootWidgetPtr, persistencePtr));
+		if (guiObjectPtr->CreateGui(m_documentViewPtr->GetViewFrame())){
 			Q_ASSERT(guiObjectPtr->GetWidget() != nullptr);
 
-			layoutPtr->addWidget(documentViewPtr->GetDecoratorWidget());
+			layoutPtr->addWidget(m_documentViewPtr->GetDecoratorWidget());
 
 			ibase::ICommandsProvider* commandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(viewPtr);
 			imod::IModel* commandsProviderModelPtr = dynamic_cast<imod::IModel*>(commandsProviderPtr);
@@ -62,8 +74,6 @@ void CSingleDocumentWorkspaceGuiComp::OnViewRegistered(istd::IPolymorphic* viewP
 			}
 
 			SetActiveView(viewPtr);
-
-			documentViewPtr.PopPtr();
 
 			this->m_lastViewPtr = guiObjectPtr;
 		}
@@ -74,6 +84,8 @@ void CSingleDocumentWorkspaceGuiComp::OnViewRegistered(istd::IPolymorphic* viewP
 void CSingleDocumentWorkspaceGuiComp::OnViewRemoved(istd::IPolymorphic* viewPtr)
 {
 	BaseClass::OnViewRemoved(viewPtr);
+
+	m_documentViewPtr.Reset();
 
 	QWidget* rootWidgetPtr = GetWidget();
 	if (rootWidgetPtr != nullptr){
@@ -151,7 +163,7 @@ void CSingleDocumentWorkspaceGuiComp::OnSaveDocument()
 
 	bool ignoredFlag = false;
 	if (SaveDocument(-1, false, &fileMap, false, &ignoredFlag)){
-		BaseClass::UpdateTitle();
+		UpdateTitle();
 	}
 	else if (!ignoredFlag){
 		QMessageBox::critical(NULL, "", tr("File could not be saved!"));
@@ -165,7 +177,7 @@ void CSingleDocumentWorkspaceGuiComp::OnSaveDocumentAs()
 
 	bool ignoredFlag = false;
 	if (SaveDocument(-1, true, &fileMap, false, &ignoredFlag)){
-		BaseClass::UpdateTitle();
+		UpdateTitle();
 	}
 	else if (!ignoredFlag){
 		QMessageBox::critical(NULL, "", tr("File could not be saved!"));
@@ -193,8 +205,6 @@ void CSingleDocumentWorkspaceGuiComp::Commands::SetParent(CSingleDocumentWorkspa
 
 const ibase::IHierarchicalCommand* CSingleDocumentWorkspaceGuiComp::Commands::GetCommands() const
 {
-	return nullptr;
-	
 	Q_ASSERT(m_parentPtr != nullptr);
 
 	if (m_parentPtr->IsGuiCreated()){

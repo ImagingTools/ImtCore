@@ -304,8 +304,11 @@ QString TStandardDocumentViewDecorator<WorkspaceImpl, UI>::GetTitle()
 
 
 template <class WorkspaceImpl, class UI>
-void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::SetTitle(const QString& /*title*/)
+void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::SetTitle(const QString& title)
 {
+	UI::DocumentTitle->setText(title);
+
+	UI::DocumentTitle->setVisible(!title.isEmpty());
 }
 
 
