@@ -182,6 +182,9 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 						body,modelName) == false){
 				return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_NOT_IMPLEMENTED, "FAIL(", "plain/text; charset=utf-8"));
 			}
+			else {
+				return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId));
+			}
 		}
 
 	}

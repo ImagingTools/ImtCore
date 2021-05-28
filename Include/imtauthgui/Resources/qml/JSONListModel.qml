@@ -19,13 +19,16 @@ Item {
 		xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE){
 				json = xhr.responseText;
+                updateJSONModel()
+//                console.log("Ready",json)
+//                console.log("Model",jsonModel.$items)
                 state = "Ready"
             }
 		}
 		xhr.send();
 	}
 
-	onJsonChanged: updateJSONModel()
+    //onJsonChanged: updateJSONModel()
 	onQueryChanged: updateJSONModel()
 
 	function makeJson(){

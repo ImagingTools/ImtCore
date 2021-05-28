@@ -8,7 +8,7 @@ Item {
 
     Timer {
         id: timer
-        interval: 1000
+        interval: 4000
         running: false
         repeat: true
         onTriggered: {
@@ -28,18 +28,15 @@ Item {
         url: "ws://127.0.0.1:8888/Lisa/ws"
         property bool reload: false
         onTextMessageReceived: {
-            console.log("onTextMessageReceived", message)
             var objectArray = JSON.parse(message)
             var dataObj = objectArray["data"][0]
-            console.log("dataObj", dataObj)
             contactEditor.updateShortData(dataObj)
         }
         onBinaryMessageReceived: {
-            console.log("onBinaryMessageReceived", message)
+//            console.log("onBinaryMessageReceived", message)
         }
 
         onStatusChanged: {
-            console.log("WebSocket onStatusChanged",webSocket.status)
             if (webSocket.status === 3){
                 timer.running = true
             }
@@ -50,6 +47,7 @@ Item {
                 var modelSource = contactInfoTreeItemModel.source
                 contactInfoTreeItemModel.source = ""
                 contactInfoTreeItemModel.source = modelSource
+
             }
         }
     }

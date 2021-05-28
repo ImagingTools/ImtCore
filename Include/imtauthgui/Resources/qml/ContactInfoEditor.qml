@@ -9,7 +9,7 @@ Rectangle {
 //    property TreeItemModel contactInfoModel
     property var contactInfoModel
     function updateData() {
-        console.log("lastName", contactInfoModel.GetData("lastName"))
+        console.log("contactInfoModel.model", contactInfoModel.model)
         tfName.text = contactInfoModel.GetData("firstName")
         tfName.isTextChanged = false
         tfLastName.text = contactInfoModel.GetData("lastName")

@@ -28,7 +28,17 @@ Item {
         }
     }
 
-
+    Timer {
+        id: timer
+        interval: 3000
+        onTriggered: {
+            console.log("onTriggered",container.isTextChanged)
+            if (container.isTextChanged === true){
+                container.accepted()
+                container.isTextChanged = false
+            }
+        }
+    }
 
     TextInput {
         id: textField
@@ -42,16 +52,17 @@ Item {
         focus: false
         text: ""
         onFocusChanged: {
-            if (container.isTextChanged === true){
-                console.log("onFocusChanged")
-                container.accepted()
-                container.isTextChanged = false
-            }
+//            if (container.isTextChanged === true){
+//                console.log("onFocusChanged")
+//                container.accepted()
+//                container.isTextChanged = false
+//            }
         }
 
         onTextChanged: {
             console.log("onTextChanged")
             container.isTextChanged = true
+            timer.restart()
         }
         onAccepted: {
             console.log("onAccepted")
