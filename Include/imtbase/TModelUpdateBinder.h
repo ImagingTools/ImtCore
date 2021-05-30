@@ -9,7 +9,48 @@ namespace imtbase
 {
 
 
+/**
+	Helper for managing data change notifications from sub-models.
+	In the context of an observer of some hierarchical data model it is usefull to have a mechanism for the reaction on changes of a sub-model.
+	\code
+	class IAddress: public istd::IChangeable
+	{
+	public:
+		virtual QString GetCity() const = 0;
+	};
 
+	class IUser: public istd::IChangeable
+	{
+	public:
+		virutal const QString GetName() const = 0; // Observed data model
+
+		virutal const IAddress* GetAddress() const = 0; // Sub-model
+	};
+
+	class UserObserver: public imod::TSingleModelObserverBase<IUser>
+	{
+	public:
+		// reimplemented (imod::IObserver)
+		virtual bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask);
+		{
+			IUser* userPtr = GetObservedObject();
+
+			m_addressObserver.RegisterObject(
+						userPtr->GetAddress(),
+						&UserObserver::OnAddressUpdated);
+		}
+
+	private:
+		void OnAddressUpdated(const istd::IChangeable::ChangeSet& changeSet, const IAddress* addressPtr)
+		{
+			// Some reaction on the update of the sub-model (Address)
+		}
+
+	private:
+		mutable imtbase::TModelUpdateBinder<IAddress, UserObserver> m_addressObserver;
+	};
+	\endcode
+*/
 template <typename ModelInterface, typename Parent>
 class TModelUpdateBinder: protected imod::CMultiModelDispatcherBase
 {
