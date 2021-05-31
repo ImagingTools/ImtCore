@@ -186,21 +186,18 @@ int CFileCollectionComp::BackupObject(imtbase::IObjectCollection& collection, co
 }
 
 
-bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision) const
+bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection&, const QByteArray& objectId, int revision) const
 {
-	IFileObjectCollection* collectionPtr = dynamic_cast<IFileObjectCollection*>(&collection);
-	if (collectionPtr == nullptr || !m_compressorCompPtr.IsValid()){
+	if (!m_compressorCompPtr.IsValid())
 		return false;
-	}
 
-	if (m_rightsProviderCompPtr.IsValid() && !m_rightsProviderCompPtr->HasRight(*m_restoreRevisionRightIdAttrPtr)){
+	if (m_rightsProviderCompPtr.IsValid() && !m_rightsProviderCompPtr->HasRight(*m_restoreRevisionRightIdAttrPtr))
 		return false;
-	}
 
 	RevisionsContents revisionsContents;
-	if (LoadRevisionsContents(*collectionPtr, objectId, revisionsContents)){
+	if (LoadRevisionsContents(*this, objectId, revisionsContents)){
 		if (revisionsContents.contains(revision)){
-			QString revisionsPath = QFileInfo(collectionPtr->GetFileInfo(objectId).filePath).path() + "/Revisions";
+			QString revisionsPath = QFileInfo(GetFileInfo(objectId).filePath).path() + "/Revisions";
 			QString revisionFilePath = revisionsPath + "/" + revisionsContents[revision].path;
 
 			if (QFile(revisionFilePath).exists()){
@@ -222,45 +219,31 @@ bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection& collection, 
 								}
 							}
 
-							QString fileFromCollectionPath = collectionPtr->GetFile(objectId);
+							QString fileFromCollectionPath = GetFile(objectId);
 							QFile fileFromCollection(fileFromCollectionPath);
 							if (fileFromCollection.exists()){
 								QString newObjectDataFilePath = objectDataFilePath + "." + QFileInfo(fileFromCollection).suffix();
 								fileFromCollection.remove();
 
 								if (objectDataFile.rename(newObjectDataFilePath)){
-									if (collectionPtr->UpdateFile(newObjectDataFilePath, objectId)){
-										// TODO: remove dirty code
+									QWriteLocker writeLocker(&m_filesLock);
 
-										QReadLocker readLocker(&m_filesLock);
-
-										int fileIndex = GetFileIndexById(objectId);
-										if (fileIndex < 0){
-											tempDir.removeRecursively();
-											return false;
-										}
-
-										CollectionItem& collectionItem = m_files[fileIndex];
-
-										readLocker.unlock();
-
-										collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION, revision);
-										collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
-
-										QWriteLocker writeLocker(&m_filesLock);
-
-										SaveCollectionItem(collectionItem);
-
-										writeLocker.unlock();
-
-										imtbase::CObjectCollectionUpdateEvent event(objectId, imtbase::CObjectCollectionUpdateEvent::UT_DATA);
-										for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-											eventHandlerPtr->OnObjectCollectionEvent(this, &event);
-										}
-
+									int fileIndex = GetFileIndexById(objectId);
+									if (fileIndex < 0){
 										tempDir.removeRecursively();
-										return true;
+										return false;
 									}
+
+									CollectionItem& collectionItem = m_files[fileIndex];
+
+									collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION, revision);
+									collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
+
+									writeLocker.unlock();
+
+									bool result = const_cast<CFileCollectionComp*>(this)->UpdateFile(newObjectDataFilePath, objectId);
+									tempDir.removeRecursively();
+									return result;
 								}
 							}
 						}
@@ -343,128 +326,144 @@ bool CFileCollectionComp::ExportObject(const imtbase::IObjectCollection& collect
 
 // reimplemented (IFileObjectCollection)
 
+bool CFileCollectionComp::ExportFile(const QByteArray& objectId, const QString& targetFilePath) const
+{
+	if (targetFilePath.isEmpty())
+		return false;
+
+	if (QFileInfo(targetFilePath).suffix() != "zip") // normal file save - taking the implementation of the base class
+		return BaseClass::ExportFile(objectId, targetFilePath);
+
+	// compressing and exporting the whole directory
+
+	if (!m_compressorCompPtr.IsValid() || !IsPathInsideRepository(GetFileInfo(objectId).filePath))
+		return false;
+
+	QString objPath = QFileInfo(GetFileInfo(objectId).filePath).path();
+	return m_compressorCompPtr->CompressFolder(objPath, targetFilePath, true);
+}
+
 QByteArray CFileCollectionComp::ImportFile(const QByteArray& typeId, const QString& sourceFilePath)
 {
 	int repositoryRevision = *m_revisionAttrPtr;
 
-	if (!sourceFilePath.isEmpty()){
-		if (!IsPathInsideRepository(sourceFilePath)){
-			QFileInfo fileInfo(sourceFilePath);
-			if (fileInfo.suffix() == "zip"){
-				QString workingPath = CreateWorkingDir();
-				QDir workingDir(workingPath);
+	if (sourceFilePath.isEmpty())
+		return QByteArray();
 
-				if (istd::CSystem::EnsurePathExists(workingPath)){
-					if (m_compressorCompPtr->DecompressFolder(sourceFilePath, workingPath)){
-						QString itemSuffix = GetRepositoryInfo().dataFileSuffix;
-						workingDir.setFilter(QDir::Files);
-						workingDir.setNameFilters({"*."+ GetRepositoryInfo().dataFileSuffix});
-						QStringList list = workingDir.entryList();
-						if (!list.isEmpty()){
-							QString itemFile = workingDir.filePath(list[0]);
-							CollectionItem collectionItem(GetCollectionRootFolder(), repositoryRevision);
-							if (ReadItemFile(collectionItem, itemFile)){
-								QString dataFile = workingDir.filePath(QFileInfo(collectionItem.filePathInRepository).fileName());
-								if (QFile(dataFile).exists()){
-									if (collectionItem.repositoryRevision != repositoryRevision){
-										if (m_transformationStepsProviderCompPtr.IsValid()){
-											RepositoryItemInfo itemInfo;
-											itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_INFO, itemFile);
-											itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_DATA, dataFile);
+	if (QFileInfo(sourceFilePath).suffix() == "zip"){
+		QString workingPath = CreateWorkingDir();
+		QDir workingDir(workingPath);
 
-											if (!TransformRepositoryItem(itemInfo, collectionItem.repositoryRevision, repositoryRevision)){
-												workingDir.removeRecursively();
-												return QByteArray();
-											}
+		if (istd::CSystem::EnsurePathExists(workingPath)){
+			if (m_compressorCompPtr->DecompressFolder(sourceFilePath, workingPath)){
+				QString itemSuffix = GetRepositoryInfo().dataFileSuffix;
+				workingDir.setFilter(QDir::Files);
+				workingDir.setNameFilters({ "*." + GetRepositoryInfo().dataFileSuffix });
+				QStringList list = workingDir.entryList();
+				if (!list.isEmpty()){
+					QString itemFile = workingDir.filePath(list[0]);
+					CollectionItem collectionItem(GetCollectionRootFolder(), repositoryRevision);
+					if (ReadItemFile(collectionItem, itemFile)){
+						QString dataFile = workingDir.filePath(QFileInfo(collectionItem.filePathInRepository).fileName());
+						if (QFile(dataFile).exists()){
+							if (collectionItem.repositoryRevision != repositoryRevision){
+								if (m_transformationStepsProviderCompPtr.IsValid()){
+									RepositoryItemInfo itemInfo;
+									itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_INFO, itemFile);
+									itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_DATA, dataFile);
 
-											if (!ReadItemFile(collectionItem, itemFile)){
-												workingDir.removeRecursively();
-												return QByteArray();
-											}
-										}
-									}
-
-									QFileInfo dataFileInfo(dataFile);
-									QFileInfo itemFileInfo(itemFile);
-
-									QFile(dataFile + "." + GetRepositoryInfo().metaInfoFileSuffix).remove();
-
-									QWriteLocker locker(&m_filesLock);
-
-									QString targetDirPath = CalculateFolderPathInRepository(dataFile, dataFileInfo.completeBaseName(), typeId, nullptr);
-									QString objectName = QDir(targetDirPath).dirName();
-									ResourceLocker(*this, QByteArray(), objectName);
-
-									locker.unlock();
-
-									QString newDataFile = dataFileInfo.dir().path() + "/" + objectName + "." + dataFileInfo.suffix();
-									QString newItemFile = newDataFile + "." + GetRepositoryInfo().dataFileSuffix;
-									QString newMetaInfoFile = newDataFile + "." + GetRepositoryInfo().metaInfoFileSuffix;
-
-									QFile(dataFile).rename(newDataFile);
-									QFile(itemFile).rename(newItemFile);
-
-									MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(newDataFile, typeId);
-									if (!metaInfoPtr.IsValid()){
+									if (!TransformRepositoryItem(itemInfo, collectionItem.repositoryRevision, repositoryRevision)){
 										workingDir.removeRecursively();
 										return QByteArray();
 									}
 
-									collectionItem.contentsMetaInfoPtr = metaInfoPtr;
-									SaveMetaInfo(*metaInfoPtr, newMetaInfoFile);
-
-									collectionItem.objectName = objectName;
-									collectionItem.fileId = QUuid::createUuid().toByteArray();
-									collectionItem.filePathInRepository = GetCollectionRootFolder() + "/" + objectName + "/" + QFileInfo(newDataFile).fileName();
-									collectionItem.repositoryRevision = repositoryRevision;
-
-									collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
-									collectionItem.metaInfo.SetMetaInfo(MIT_INSERTION_TIME, QDateTime::currentDateTime());
-
-									QString savedPath = SaveCollectionItem(collectionItem, newItemFile);
-									if (!savedPath.isEmpty()){
-										if (FinishInsertFileTransaction(workingPath, targetDirPath, collectionItem.fileId, collectionItem)){
-											QDir(workingPath).removeRecursively();
-
-											return collectionItem.fileId;
-										}
-										else{
-											SendErrorMessage(0, tr("File could not be inserted into the repository"));
-										}
-									}
-									else{
-										SendErrorMessage(0, tr("Item file '%1' could not be saved").arg(newItemFile));
+									if (!ReadItemFile(collectionItem, itemFile)){
+										workingDir.removeRecursively();
+										return QByteArray();
 									}
 								}
+							}
+
+							QFileInfo dataFileInfo(dataFile);
+							QFileInfo itemFileInfo(itemFile);
+
+							QFile(dataFile + "." + GetRepositoryInfo().metaInfoFileSuffix).remove();
+
+							QWriteLocker locker(&m_filesLock);
+
+							QString targetDirPath = CalculateFolderPathInRepository(dataFile, dataFileInfo.completeBaseName(), typeId, nullptr);
+							QString objectName = QDir(targetDirPath).dirName();
+							ResourceLocker(*this, QByteArray(), objectName);
+
+							locker.unlock();
+
+							QString newDataFile = dataFileInfo.dir().path() + "/" + objectName + "." + dataFileInfo.suffix();
+							QString newItemFile = newDataFile + "." + GetRepositoryInfo().dataFileSuffix;
+							QString newMetaInfoFile = newDataFile + "." + GetRepositoryInfo().metaInfoFileSuffix;
+
+							QFile(dataFile).rename(newDataFile);
+							QFile(itemFile).rename(newItemFile);
+
+							MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(newDataFile, typeId);
+							if (!metaInfoPtr.IsValid()){
+								workingDir.removeRecursively();
+								return QByteArray();
+							}
+
+							collectionItem.contentsMetaInfoPtr = metaInfoPtr;
+							SaveMetaInfo(*metaInfoPtr, newMetaInfoFile);
+
+							collectionItem.objectName = objectName;
+							collectionItem.fileId = QUuid::createUuid().toByteArray();
+							collectionItem.filePathInRepository = targetDirPath + QDir::separator() + QFileInfo(newDataFile).fileName();
+							collectionItem.sourceFilePath = newDataFile;
+							collectionItem.repositoryRevision = repositoryRevision;
+
+							collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
+							collectionItem.metaInfo.SetMetaInfo(MIT_INSERTION_TIME, QDateTime::currentDateTime());
+
+							QString savedPath = SaveCollectionItem(collectionItem, newItemFile);
+							if (!savedPath.isEmpty()){
+								if (FinishInsertFileTransaction(workingPath, targetDirPath, collectionItem.fileId, collectionItem)){
+									QDir(workingPath).removeRecursively();
+
+									return collectionItem.fileId;
+								}
 								else{
-									SendErrorMessage(0, tr("Data file '%1' not fount").arg(dataFile));
+									SendErrorMessage(0, tr("File could not be inserted into the repository"));
 								}
 							}
 							else{
-								SendErrorMessage(0, tr("Unable read item file '%1'").arg(itemFile));
+								SendErrorMessage(0, tr("Item file '%1' could not be saved").arg(newItemFile));
 							}
 						}
 						else{
-							SendErrorMessage(0, tr("Item file not found in '%1'").arg(workingPath));
+							SendErrorMessage(0, tr("Data file '%1' not found").arg(dataFile));
 						}
 					}
 					else{
-						SendErrorMessage(0, tr("Unable to uncompress '%1'").arg(sourceFilePath));
+						SendErrorMessage(0, tr("Unable read item file '%1'").arg(itemFile));
 					}
-
-					workingDir.removeRecursively();
 				}
 				else{
-					SendErrorMessage(0, tr("Target folder '%1' could not be created").arg(workingPath));
+					SendErrorMessage(0, tr("Item file not found in '%1'").arg(workingPath));
 				}
 			}
 			else{
-				istd::TDelPtr<istd::IChangeable> dataObjectPtr(CreateObjectFromFile(sourceFilePath, typeId));
-				if (dataObjectPtr.IsValid()){
-					QByteArray objectId = InsertFile(sourceFilePath, typeId, QFileInfo(sourceFilePath).completeBaseName());
-					return objectId;
-				}
+				SendErrorMessage(0, tr("Unable to uncompress '%1'").arg(sourceFilePath));
 			}
+
+			workingDir.removeRecursively();
+		}
+		else{
+			SendErrorMessage(0, tr("Target folder '%1' could not be created").arg(workingPath));
+		}
+	}
+	else if (!IsPathInsideRepository(sourceFilePath)){
+		istd::TDelPtr<istd::IChangeable> dataObjectPtr(CreateObjectFromFile(sourceFilePath, typeId));
+		if (dataObjectPtr.IsValid()){
+			QByteArray objectId = InsertFile(sourceFilePath, typeId, QFileInfo(sourceFilePath).completeBaseName());
+			return objectId;
 		}
 	}
 
@@ -508,7 +507,7 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 		QString dataFilePath = GetDataItemFilePath(itemToRemove);
 		QFile dataFile(dataFilePath);
 		if (!dataFile.remove()){
-			SendErrorMessage(0, QString("Collection data file '%1' could not be removed. Error status: %2").arg(dataFilePath).arg(dataFile.errorString()));
+			SendErrorMessage(0, QObject::tr("File '%1' could not be removed. Error status: %2").arg(dataFilePath).arg(dataFile.errorString()));
 
 			return false;
 		}
@@ -516,7 +515,7 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 		QString metaDataFilePath = GetMetaInfoFilePath(itemToRemove);
 		QFile metaDataFile(metaDataFilePath);
 		if (!metaDataFile.remove()){
-			SendErrorMessage(0, QString("Collection meta-data file '%1' could not be removed. Error status: %2").arg(metaDataFilePath).arg(metaDataFile.errorString()));
+			SendErrorMessage(0, QObject::tr("File '%1' could not be removed. Error status: %2").arg(metaDataFilePath).arg(metaDataFile.errorString()));
 
 			return false;
 		}
@@ -525,7 +524,7 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 			QString parentDirectory = fileInfo.absolutePath();
 
 			if (!istd::CSystem::RemoveDirectory(parentDirectory)){
-				SendErrorMessage(0, QString("Folder containing file '%1'could not be removed").arg(itemToRemove.filePathInRepository));
+				SendErrorMessage(0, QObject::tr("Folder containing file '%1'could not be removed").arg(itemToRemove.filePathInRepository));
 
 				return false;
 			}
@@ -550,7 +549,7 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 		return true;
 	}
 	else{
-		SendInfoMessage(0, QString("Resource '%1' doesn't exist").arg(qPrintable(objectId)));
+		SendInfoMessage(0, QObject::tr("Resource '%1' doesn't exist").arg(qPrintable(objectId)));
 	}
 
 	return true;
@@ -571,7 +570,7 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 				bool isSameResourceType = (m_files[fileIndex].typeId == m_files[foundIndex].typeId);
 
 				if (isSameResourceType){
-					SendErrorMessage(0, QString("Resource with the name '%1' already exists").arg(objectName));
+					SendErrorMessage(0, QObject::tr("Resource with the name '%1' already exists").arg(objectName));
 
 					return;
 				}
@@ -598,7 +597,7 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 			// Remove old data file:
 			QString oldDataItemFilePath = GetDataItemFilePath(item);
 			if (!QFile::remove(oldDataItemFilePath)){
-				SendWarningMessage(0, QString("Data file '%1' could not be removed").arg(oldDataItemFilePath));
+				SendWarningMessage(0, QObject::tr("Data file '%1' could not be removed").arg(oldDataItemFilePath));
 			}
 
 			// Rename meta info file:
@@ -608,7 +607,7 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 				QString newMetaInfoFilePath = metaFileInfo.absolutePath() + "/" + newFileName + "." + GetRepositoryInfo().metaInfoFileSuffix;
 
 				if (!QFile::rename(oldMetaInfoFilePath, newMetaInfoFilePath)){
-					SendWarningMessage(0, QString("Meta-info file '%1' could not be removed").arg(oldMetaInfoFilePath));
+					SendWarningMessage(0, QObject::tr("Meta-info file '%1' could not be removed").arg(oldMetaInfoFilePath));
 
 					QFile::remove(oldMetaInfoFilePath);
 				}
@@ -627,7 +626,7 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 			targetFolderPath += "/" + newPhysicalName;
 
 			if (!resourceDir.rename(resouceDirPath, targetFolderPath)){
-				SendErrorMessage(0, QString("Resource path could not be renamed from '%1' into '%2'. Resource could not be renamed to '%3'").arg(resouceDirPath).arg(targetFolderPath).arg(objectName));
+				SendErrorMessage(0, QObject::tr("Resource path could not be renamed from '%1' into '%2'. Resource could not be renamed to '%3'").arg(resouceDirPath).arg(targetFolderPath).arg(objectName));
 
 				locker.unlock();
 
@@ -655,7 +654,7 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 		return;
 	}
 
-	SendErrorMessage(0, QString("Resource with the ID '%1' doesn't exist").arg(objectId.constData()));
+	SendErrorMessage(0, QObject::tr("Resource with the ID '%1' doesn't exist").arg(objectId.constData()));
 }
 
 
@@ -708,7 +707,7 @@ QString CFileCollectionComp::CalculateFolderPathInRepository(
 {
 	QFileInfo inputFileInfo(localFilePath);
 	if (!inputFileInfo.isFile()){
-		SendErrorMessage(0 , QString("Path '%1' is not a valid path to an existing file").arg(localFilePath));
+		SendErrorMessage(0 , QObject::tr("Path '%1' is not a valid path to an existing file").arg(localFilePath));
 
 		return QString();
 	}
@@ -815,7 +814,7 @@ bool CFileCollectionComp::UpdateRepositoryFormat()
 	QString path = GetCollectionRootFolder();
 	if (!path.isEmpty()){
 		if (!istd::CSystem::EnsurePathExists(path)){
-			SendCriticalMessage(0, QString("Root folder for the file collection could not be created in '%1'").arg(path));
+			SendCriticalMessage(0, QObject::tr("Root folder for the file collection could not be created in '%1'").arg(path));
 		}
 
 		revisionFilePath = path + "/Revision";
@@ -932,11 +931,11 @@ QString CFileCollectionComp::CalculateTargetFilePath(
 			return CalculateTargetFilePath(targetFolderPath, filePath);
 		}
 		else{
-			SendErrorMessage(0, QString("Collection folder for the input file '%1' could not be calculated").arg(filePath));
+			SendErrorMessage(0, QObject::tr("Collection folder for the input file '%1' could not be calculated").arg(filePath));
 		}
 	}
 	else{
-		SendErrorMessage(0, QString("Input file '%1' doesn't exist").arg(filePath));
+		SendErrorMessage(0, QObject::tr("Input file '%1' doesn't exist").arg(filePath));
 	}
 
 	return QString();

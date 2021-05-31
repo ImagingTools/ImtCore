@@ -73,6 +73,8 @@ private:
 	iqtgui::CHierarchicalCommand m_importCommand;
 	iqtgui::CHierarchicalCommand m_exportCommand;
 	iqtgui::CHierarchicalCommand m_restoreCommand;
+
+	QString m_exportFilePath;
 };
 
 

@@ -48,6 +48,7 @@ public:
 		I_ASSIGN(m_revisionAttrPtr, "RepositoryRevision", "Revision number of the whole repository", true, 0);
 		I_ASSIGN(m_isCalculateCheckSumAttrPtr, "IsCalculateCheckSum", "Calculate check sums for the file", true, true);
 		I_ASSIGN(m_asynchronousReadingAttrPtr, "AsynchronousReading", "If enabled, the collection will reading asynchronously", true, false);
+		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
 	I_END_COMPONENT;
 
 protected:
@@ -65,6 +66,11 @@ protected:
 		Asynchronous collection loading on dedicated thread
 	*/
 	I_ATTR(bool, m_asynchronousReadingAttrPtr);
+
+	/**
+		Provider of the version information for the entire system.
+	*/
+	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 };
 
 
@@ -87,12 +93,12 @@ public:
 		I_REGISTER_INTERFACE(IObjectCollection);
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(ICollectionInfo);
-		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", true, "VersionInfo");
 		I_ASSIGN(m_loginProviderCompPtr, "Login", "Provider of login data used for revision management", false, "Login");
 		I_ASSIGN(m_rightsProviderCompPtr, "RightsProvider", "Rights provider", false, "RightsProvider");
 		I_ASSIGN(m_repositoryPathCompPtr, "RepositoryPath", "Path to the file collection folder", false, "RepositoryPath");
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "FileCompressor");
 		I_ASSIGN(m_resourceTypesCompPtr, "ResourceTypes", "List of supported resource types", false, "ResourceTypes");
+		I_ASSIGN(m_helperFilesPersistence, "HelperFilesPersistence", "Persistence component used for loading / saving helper (item and meta) files. Replaced by default persistence engine if not specified", true, "HelperFilesPersistence");
 		I_ASSIGN_MULTI_0(m_progressManagerListCompPtr, "ProgressManagerList", "List of progress manager components", false);
 		I_ASSIGN_MULTI_0(m_objectPersistenceListCompPtr, "ObjectPersistenceList", "List of persistence components used for data object loading", false);
 		I_ASSIGN_MULTI_0(m_resourceFileTypesCompPtr, "FileTypeInfos", "List of file type infos for corresponding resource type", false);
@@ -453,11 +459,6 @@ protected:
 
 protected:
 	/**
-	Provider of the version information for the entire system.
-*/
-	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
-
-	/**
 		Provider of the logged user.
 	*/
 	I_REF(iauth::ILogin, m_loginProviderCompPtr);
@@ -483,6 +484,11 @@ protected:
 		List of supported resource types.
 	*/
 	I_REF(iprm::IOptionsList, m_resourceTypesCompPtr);
+
+	/**
+		Persistence component for helper (item & meta) files
+	*/
+	I_REF(ifile::IFilePersistence, m_helperFilesPersistence);
 
 	/**
 		Consumers of the progress information

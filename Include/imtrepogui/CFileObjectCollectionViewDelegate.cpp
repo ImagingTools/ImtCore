@@ -17,6 +17,42 @@
 #include <imtrepogui/CFileObjectCollectionRevisionDialog.h>
 
 
+namespace
+{
+
+QString FindSelectedFilter(const QString& filters, const QString& filePath)
+{
+	QStringList filterList = filters.split(";;");
+	QString ext = filePath.isEmpty() ? QString() : QFileInfo(filePath).suffix();
+	if (ext.isEmpty())
+		return QString();
+
+	for (auto& filter : filterList)
+		if (filter.contains(ext))
+			return filter;
+
+	return QString();
+}
+
+QString GetExportFileName(const imtbase::IObjectCollection& collection, const QByteArray& objectId)
+{
+	QVariant title = collection.GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME);
+
+	return title.isValid() && !title.toString().isEmpty() ? title.toString() : QString("export");
+}
+
+QString ComposeExportFilePath(const QString olderPath, const QString& projectName)
+{
+	if (olderPath.isEmpty())
+		return projectName;
+
+	QFileInfo info(olderPath);
+	return info.absoluteDir().absolutePath() + QDir::separator() + projectName + "." + info.suffix();
+}
+
+}
+
+
 namespace imtrepogui
 {
 
@@ -256,22 +292,23 @@ void CFileObjectCollectionViewDelegate::OnImport()
 
 void CFileObjectCollectionViewDelegate::OnExport()
 {
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	Q_ASSERT(fileCollectionPtr != nullptr);
+	Q_ASSERT(m_collectionPtr != nullptr);
+	if (m_selectedItemIds.isEmpty() || !m_collectionPtr)
+		return;
 
-	if (!m_selectedItemIds.isEmpty()){
-		QByteArray objectId = m_selectedItemIds[0];
+	QByteArray objectId = m_selectedItemIds[0];
 
-		QString filePath = QFileDialog::getSaveFileName(
-					(m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr,
-					tr("Export File"),
-					QString(),
-					CreateFileExportFilter(objectId));
+	QString filters = CreateFileExportFilter(objectId);
+	QString selectedFilter = FindSelectedFilter(filters, m_exportFilePath);
+	m_exportFilePath = ComposeExportFilePath(m_exportFilePath, GetExportFileName(*m_collectionPtr, objectId));
+	m_exportFilePath = QFileDialog::getSaveFileName(
+		m_parentGuiPtr ? m_parentGuiPtr->GetWidget() : nullptr,
+		tr("Export File"), m_exportFilePath.isEmpty() ? "export" : m_exportFilePath,
+		filters, selectedFilter.isEmpty() ? nullptr : &selectedFilter);
 
-		if (!filePath.isEmpty()){
-			if (!ExportObject(objectId, filePath)){
-				QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be exported"));
-			}
+	if (!m_exportFilePath.isEmpty()){
+		if (!ExportObject(objectId, m_exportFilePath)){
+			QMessageBox::critical(m_parentGuiPtr ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be exported"));
 		}
 	}
 }

@@ -24,6 +24,8 @@
 #include <imtbase/CObjectCollectionUpdateEvent.h>
 #include <imtbase/CObjectCollectionRemoveEvent.h>
 
+using OperationState = ifile::IFilePersistence::OperationState;
+
 
 namespace imtrepo
 {
@@ -138,11 +140,11 @@ QString CFileCollectionCompBase::GetFile(
 				return outputFilePath;
 			}
 			else{
-				SendErrorMessage(0, QString("File could not be copied from '%1' to '%2'").arg(filePathInRepository).arg(targetFilePath));
+				SendErrorMessage(0, QObject::tr("File could not be copied from '%1' to '%2'").arg(filePathInRepository).arg(targetFilePath));
 			}
 		}
 		else{
-			SendErrorMessage(0, QString("Collection file doesn't exist '%1'").arg(filePathInRepository));
+			SendErrorMessage(0, QObject::tr("File doesn't exist '%1'").arg(filePathInRepository));
 		}
 	}
 
@@ -273,7 +275,7 @@ bool CFileCollectionCompBase::UpdateFile(
 
 	int fileIndex = GetFileIndexById(objectId);
 	if (fileIndex < 0){
-		SendErrorMessage(0, QString("No file with the ID '%1' was found in the repository. File could not be updated").arg(objectId.constData()));
+		SendErrorMessage(0, QObject::tr("No file with the ID '%1' was found in the repository. File could not be updated").arg(objectId.constData()));
 
 		return false;
 	}
@@ -285,7 +287,7 @@ bool CFileCollectionCompBase::UpdateFile(
 	// Create meta-informations for the file contents:
 	collectionItem.contentsMetaInfoPtr = CreateItemMetaInfo(localFilePath, collectionItem.typeId);
 	if (!collectionItem.contentsMetaInfoPtr.IsValid()){
-		SendErrorMessage(0, QString("Meta-informations could not be created for'%1'. File could not be updated").arg(localFilePath));
+		SendErrorMessage(0, QObject::tr("Meta-informations could not be created for'%1'. File could not be updated").arg(localFilePath));
 
 		return false;
 	}
@@ -296,7 +298,7 @@ bool CFileCollectionCompBase::UpdateFile(
 
 	if (istd::CSystem::FileCopy(localFilePath, targetFilePath, true)){
 		if (!QFile::setPermissions(targetFilePath, QFile::WriteGroup)){
-			SendErrorMessage(0, QString("Permissions for the file '%1' could not be set").arg(targetFilePath));
+			SendErrorMessage(0, QObject::tr("Permissions for the file '%1' could not be set").arg(targetFilePath));
 		}
 
 		locker.relock();
@@ -310,7 +312,7 @@ bool CFileCollectionCompBase::UpdateFile(
 
 		QString metaInfoFilePath = GetMetaInfoFilePath(collectionItem);
 		if (!SaveMetaInfo(*collectionItem.contentsMetaInfoPtr, metaInfoFilePath)){
-			SendErrorMessage(0, QString("Meta information of the file '%1' could not be updated").arg(targetFilePath));
+			SendErrorMessage(0, QObject::tr("Meta information of the file '%1' could not be updated").arg(targetFilePath));
 		}
 
 		locker.unlock();
@@ -323,7 +325,7 @@ bool CFileCollectionCompBase::UpdateFile(
 		return true;
 	}
 
-	SendErrorMessage(0, QString("File '%1' could not be copied to %2").arg(localFilePath).arg(targetFilePath));
+	SendErrorMessage(0, QObject::tr("File '%1' could not be copied to %2").arg(localFilePath).arg(targetFilePath));
 
 	return false;
 }
@@ -370,7 +372,7 @@ bool CFileCollectionCompBase::GetDataMetaInfo(const QByteArray& objectId, ifile:
 	// Looking for file item:
 	int fileIndex = GetFileIndexById(objectId);
 	if (fileIndex < 0){
-		SendVerboseMessage(QString("Collection item doesn't exist for the given object-ID (%1). Meta-information could not be provided").arg(objectId.constData()), "File Collection");
+		SendVerboseMessage(QObject::tr("Collection item doesn't exist for the given object-ID (%1). Meta-information could not be provided").arg(objectId.constData()), "File Collection");
 
 		return false;
 	}
@@ -412,7 +414,7 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 
 			QString targetFolder = CreateWorkingDir();
 			if (targetFolder.isEmpty()){
-				SendErrorMessage(0, QString(QObject::tr("Target folder '%1' could not be created")).arg(targetFolder));
+				SendErrorMessage(0, QObject::tr("Target folder '%1' could not be created").arg(targetFolder));
 
 				return QByteArray();
 			}
@@ -427,7 +429,7 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 				return retval;
 			}
 			else{
-				SendErrorMessage(0, QString(QObject::tr("File could not be saved into '%1'")).arg(tempFilePath));
+				SendErrorMessage(0, QObject::tr("File could not be saved into '%1'").arg(tempFilePath));
 			}
 		}
 	}
@@ -581,7 +583,7 @@ bool CFileCollectionCompBase::GetCollectionItemMetaInfo(const QByteArray& object
 	// Looking for file item:
 	int fileIndex = GetFileIndexById(objectId);
 	if (fileIndex < 0){
-		SendVerboseMessage(QString("Collection item doesn't exist for the given object-ID (%1). Meta-information could not be provided").arg(objectId.constData()), "File Collection");
+		SendVerboseMessage(QObject::tr("Collection item doesn't exist for the given object-ID (%1). Meta-information could not be provided").arg(objectId.constData()), "File Collection");
 
 		return false;
 	}
@@ -782,15 +784,19 @@ QString CFileCollectionCompBase::SaveCollectionItem(const CollectionItem& collec
 {
 	QString itemFilePath = dataFilePath.isEmpty() ? GetDataItemFilePath(collectionItem) : dataFilePath;
 
-	ifile::CCompactXmlFileWriteArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
-
-	if (!const_cast<CollectionItem&>(collectionItem).Serialize(archive)){
-		SendErrorMessage(0, QString("Collection item could not be saved into '%1'").arg(itemFilePath));
-
-		return QString();
+	if (m_helperFilesPersistence.IsValid()){
+		if (m_helperFilesPersistence->SaveToFile(collectionItem, itemFilePath) == OperationState::OS_OK)
+			return itemFilePath;
+	}
+	else{
+		ifile::CCompactXmlFileWriteArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
+		if (const_cast<CollectionItem&>(collectionItem).Serialize(archive))
+			return itemFilePath;
 	}
 
-	return itemFilePath;
+
+	SendErrorMessage(0, QObject::tr("Collection item could not be saved into '%1'").arg(itemFilePath));
+	return QString();
 }
 
 
@@ -849,28 +855,33 @@ QString CFileCollectionCompBase::CalculateShortFileName(const QString& fileName,
 bool CFileCollectionCompBase::SaveMetaInfo(const idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const
 {
 	const iser::ISerializable* serializablePtr = dynamic_cast<const iser::ISerializable*>(&metaInfo);
-	if (serializablePtr != nullptr){
-		ifile::CCompactXmlFileWriteArchive archive(metaInfoFilePath, m_versionInfoCompPtr.GetPtr());
+	if (!serializablePtr)
+		return false;
 
-		return (const_cast<iser::ISerializable*>(serializablePtr))->Serialize(archive);
-	}
+	if (m_helperFilesPersistence.IsValid())
+		return m_helperFilesPersistence->SaveToFile(*serializablePtr, metaInfoFilePath) == OperationState::OS_OK;
 
-	return false;
+	// using default serializer
+	ifile::CCompactXmlFileWriteArchive archive(metaInfoFilePath, m_versionInfoCompPtr.GetPtr());
+	return (const_cast<iser::ISerializable*>(serializablePtr))->Serialize(archive);
 }
 
 
 bool CFileCollectionCompBase::LoadMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const
 {
-	if (QFile::exists(metaInfoFilePath)){
-		iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(&metaInfo);
-		if (serializablePtr != nullptr){
-			ifile::CCompactXmlFileReadArchive archive(metaInfoFilePath, m_versionInfoCompPtr.GetPtr());
+	if (!QFile::exists(metaInfoFilePath))
+		return false;
 
-			return serializablePtr->Serialize(archive);
-		}
-	}
+	iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(&metaInfo);
+	if (!serializablePtr)
+		return false;
 
-	return false;
+	if (m_helperFilesPersistence.IsValid())
+		return m_helperFilesPersistence->LoadFromFile(*serializablePtr, metaInfoFilePath) == OperationState::OS_OK;
+
+	// using default serializer
+	ifile::CCompactXmlFileReadArchive archive(metaInfoFilePath, m_versionInfoCompPtr.GetPtr());
+	return serializablePtr->Serialize(archive);
 }
 
 
@@ -972,7 +983,7 @@ void CFileCollectionCompBase::UpdateItemMetaInfo(CollectionItem& item) const
 	if (!retVal){
 		retVal = CreateItemMetaInfoFile(item.filePathInRepository, item.typeId, metaInfoFilePath);
 		if (!retVal){
-			SendErrorMessage(0, QString("Meta-information for the file '%1' could not be created. Meta-information could not be provided").arg(metaInfoFilePath), "File Collection");
+			SendErrorMessage(0, QObject::tr("Meta-information for the file '%1' could not be created. Meta-information could not be provided").arg(metaInfoFilePath), "File Collection");
 		}
 	}
 }
@@ -999,7 +1010,7 @@ void CFileCollectionCompBase::ReadItem(Files& filesPtr, const QString& itemFileP
 {
 	CollectionItem fileItem(GetCollectionRootFolder(), *m_revisionAttrPtr);
 	if (!ReadItemFile(fileItem, itemFilePath)){
-		SendErrorMessage(0, QString("Collection item could not be loaded from '%1'").arg(itemFilePath));
+		SendErrorMessage(0, QObject::tr("Collection item could not be loaded from '%1'").arg(itemFilePath));
 		return;
 	}
 
@@ -1028,15 +1039,20 @@ void CFileCollectionCompBase::ReadItem(Files& filesPtr, const QString& itemFileP
 		}
 	}
 	else{
-		SendErrorMessage(0, QString("File '%1' doesn't exist. Collection item was automatically removed").arg(fileItem.filePathInRepository));
+		SendErrorMessage(0, QObject::tr("File '%1' doesn't exist. Collection item was automatically removed").arg(fileItem.filePathInRepository));
 	}
 }
 
 
 bool CFileCollectionCompBase::ReadItemFile(CollectionItem& collectionItem, const QString& itemFilePath)
 {
-	ifile::CCompactXmlFileReadArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
+	if (itemFilePath.isEmpty())
+		return false;
 
+	if (m_helperFilesPersistence.IsValid())
+		return m_helperFilesPersistence->LoadFromFile(collectionItem, itemFilePath) == OperationState::OS_OK;
+
+	ifile::CCompactXmlFileReadArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
 	return collectionItem.Serialize(archive);
 }
 
@@ -1173,7 +1189,7 @@ void CFileCollectionCompBase::OnComponentCreated()
 	// Ensure, that the repository folder was created:
 	if (!path.isEmpty()){
 		if (!istd::CSystem::EnsurePathExists(path)){
-			SendCriticalMessage(0, QString("Root folder for the file collection could not be created in '%1'").arg(path));
+			SendCriticalMessage(0, QObject::tr("Root folder for the file collection could not be created in '%1'").arg(path));
 		}
 	}
 

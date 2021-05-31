@@ -45,6 +45,7 @@ public:
 	virtual bool ExportObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision, const QString& filePath) const override;
 
 	// reimplemented (IFileObjectCollection)
+	virtual bool ExportFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
 	virtual QByteArray ImportFile(const QByteArray& typeId, const QString& sourceFilePath = QString()) override;
 
 	// reimplemented (IFileCollectionInfo)
