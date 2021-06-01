@@ -347,12 +347,20 @@ void CObjectCollectionViewDelegate::SetupInsertCommand()
 		const iprm::IOptionsList* typesPtr = m_collectionPtr->GetObjectTypesInfo();
 		if (typesPtr != nullptr){
 			int typesCount = typesPtr->GetOptionsCount();
+			for (int i = 0; i < typesCount; ++i){
+				if (!typesPtr->IsOptionEnabled(i)){
+					--typesCount;
+				}
+			}
+
 			if (typesCount > 1){
 				for (int i = 0; i < typesCount; ++i){
-					const QString typeName = typesPtr->GetOptionName(i);
+					if (typesPtr->IsOptionEnabled(i)){
+						const QString typeName = typesPtr->GetOptionName(i);
 
-					QAction* action = m_insertNewDocumentMenuPtr->addAction(typeName);
-					action->setData(typesPtr->GetOptionId(i));
+						QAction* action = m_insertNewDocumentMenuPtr->addAction(typeName);
+						action->setData(typesPtr->GetOptionId(i));
+					}
 				}
 
 				m_insertCommand.setMenu(m_insertNewDocumentMenuPtr.GetPtr());

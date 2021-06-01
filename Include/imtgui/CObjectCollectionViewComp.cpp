@@ -826,15 +826,17 @@ void CObjectCollectionViewComp::ReadCollection(QStandardItemModel* typeModelPtr,
 			imtbase::IObjectCollectionInfo::Ids collectionItemIds = objectCollectionPtr->GetElementIds();
 
 			for (int typeIndex = 0; typeIndex < typesCount; ++typeIndex){
-				QByteArray typeId = objectTypeInfoPtr->GetOptionId(typeIndex);
-				QString typeName = objectTypeInfoPtr->GetOptionName(typeIndex);
+				if (objectTypeInfoPtr->IsOptionEnabled(typeIndex)){
+					QByteArray typeId = objectTypeInfoPtr->GetOptionId(typeIndex);
+					QString typeName = objectTypeInfoPtr->GetOptionName(typeIndex);
 
-				QStandardItem* typeItemPtr = new QStandardItem();
-				typeItemPtr->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-				typeItemPtr->setData(typeName, Qt::DisplayRole);
-				typeItemPtr->setData(typeName, Qt::EditRole);
-				typeItemPtr->setData(typeId, DR_TYPE_ID);
-				typeModelPtr->appendRow(typeItemPtr);
+					QStandardItem* typeItemPtr = new QStandardItem();
+					typeItemPtr->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+					typeItemPtr->setData(typeName, Qt::DisplayRole);
+					typeItemPtr->setData(typeName, Qt::EditRole);
+					typeItemPtr->setData(typeId, DR_TYPE_ID);
+					typeModelPtr->appendRow(typeItemPtr);
+				}
 			}
 
 			int progress = 0;

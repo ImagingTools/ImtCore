@@ -2,10 +2,8 @@
 
 
 // Qt includes
-#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStyledItemDelegate>
-//#include <QtCore/QModelIndex>
-//#include <QtCore/QSize>
+
 
 namespace imtwidgets
 {
@@ -13,22 +11,21 @@ namespace imtwidgets
 
 class CNoEditableItemDelegate : public QStyledItemDelegate
  {
-     Q_OBJECT
+	Q_OBJECT
 public:
 
 	CNoEditableItemDelegate(QObject *parent = 0);
-	~CNoEditableItemDelegate();
+	virtual ~CNoEditableItemDelegate();
 
-	// reimplemented (IMenuPanelDelegate)
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
-						   const QModelIndex &index) const override;
-	 void setEditorData(QWidget *editor, const QModelIndex &index) const override;
-     void setModelData(QWidget *editor, QAbstractItemModel *model,
-					   const QModelIndex &index) const override;
-     void updateEditorGeometry(QWidget *editor,
-		 const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-
- };
+	// reimplemented (QStyledItemDelegate)
+	virtual QWidget* createEditor(
+		QWidget* parent,
+		const QStyleOptionViewItem& option,
+		const QModelIndex& index) const override;
+	virtual void setEditorData(QWidget* editor, const QModelIndex& index) const override;
+	virtual void setModelData(QWidget* editor, QAbstractItemModel*model, const QModelIndex& index) const override;
+	virtual void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+};
 
 
 } // namespace imtwidgets
