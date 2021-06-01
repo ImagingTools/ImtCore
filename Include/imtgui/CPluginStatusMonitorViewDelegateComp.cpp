@@ -56,6 +56,18 @@ QAbstractItemDelegate* CPluginStatusMonitorViewDelegateComp::GetColumnItemDelega
 }
 
 
+void CPluginStatusMonitorViewDelegateComp::OnColumnItemDelegateEditFinished(const QByteArray &/*objectId*/, const QByteArray &/*columnId*/, const QVariant &/*newValue*/) const
+{
+
+}
+
+
+bool CPluginStatusMonitorViewDelegateComp::IsEditorEnabled(const QByteArray &/*columnId*/) const
+{
+	return true;
+}
+
+
 void CPluginStatusMonitorViewDelegateComp::UpdateItemSelection(
 			const imtbase::ICollectionInfo::Ids& /*selectedItems*/,
 			const QByteArray& /*selectedTypeId*/)

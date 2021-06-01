@@ -46,6 +46,8 @@ public:
 	virtual const iqtgui::IVisualStatus& GetDocumentTypeStatus() const override;
 	virtual QByteArray GetSupportedTypeId() const override;
 	virtual QAbstractItemDelegate* GetColumnItemDelegate(const QByteArray& columnId) const override;
+	virtual void OnColumnItemDelegateEditFinished(const QByteArray& objectId, const QByteArray& columnId, const QVariant& newValue) const override;
+	virtual bool IsEditorEnabled(const QByteArray& columnId) const override;
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
 	virtual QByteArray ImportObject(const QByteArray& typeId, const QString& sourcePath = QString()) const override;

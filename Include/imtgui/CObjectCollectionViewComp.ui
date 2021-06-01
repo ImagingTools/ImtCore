@@ -145,7 +145,7 @@
             <string>Close</string>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="imtguidark.qrc">
              <normaloff>:/Icons/Close</normaloff>:/Icons/Close</iconset>
            </property>
            <property name="iconSize">
@@ -166,9 +166,6 @@
        <widget class="QTreeView" name="ItemList">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="editTriggers">
-         <set>QAbstractItemView::NoEditTriggers</set>
         </property>
         <property name="selectionMode">
          <enum>QAbstractItemView::ExtendedSelection</enum>
@@ -238,6 +235,7 @@
   </layout>
  </widget>
  <resources>
+  <include location="imtguidark.qrc"/>
  </resources>
  <connections/>
 </ui>

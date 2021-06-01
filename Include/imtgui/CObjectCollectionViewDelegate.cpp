@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtbase/IRevisionController.h>
+#include <imtwidgets/CNoEditableItemDelegate.h>
 
 
 namespace imtgui
@@ -72,7 +73,19 @@ QByteArray CObjectCollectionViewDelegate::GetSupportedTypeId() const
 
 QAbstractItemDelegate* CObjectCollectionViewDelegate::GetColumnItemDelegate(const QByteArray& /*columnId*/) const
 {
-	return nullptr;
+	return new imtwidgets::CNoEditableItemDelegate();
+}
+
+
+void CObjectCollectionViewDelegate::OnColumnItemDelegateEditFinished(const QByteArray &/*objectId*/, const QByteArray &/*columnId*/, const QVariant &/*newValue*/) const
+{
+
+}
+
+
+bool CObjectCollectionViewDelegate::IsEditorEnabled(const QByteArray &/*columnId*/) const
+{
+	return true;
 }
 
 

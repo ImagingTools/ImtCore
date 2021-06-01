@@ -376,7 +376,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	connect(m_renameShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnRenameShortCut);
 
 	ItemList->setContextMenuPolicy(Qt::CustomContextMenu);
-	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
+//	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	ItemList->header()->setFirstSectionMovable(true);
 	ItemList->installEventFilter(this);
 
@@ -938,6 +938,16 @@ void CObjectCollectionViewComp::OnCollectionReadFinished()
 
 		if (activeTypeItemPtr != nullptr){
 			activeTypeItemPtr->setSelected(true);
+			const ICollectionViewDelegate &delegate = GetViewDelegateRef(m_currentTypeId);
+			const imtbase::ICollectionInfo &collectionInfo = delegate.GetSummaryInformationTypes();
+
+			imtbase::ICollectionInfo::Ids ids = collectionInfo.GetElementIds();
+			for (int i = 0; i < ids.count(); ++i){
+				QByteArray id = ids[i];
+				ItemList->itemDelegateForColumn(i)->deleteLater();
+				QAbstractItemDelegate *itemDelegate = delegate.GetColumnItemDelegate(id);
+				ItemList->setItemDelegateForColumn(i, itemDelegate);
+			}
 		}
 	}
 
@@ -1044,7 +1054,15 @@ void CObjectCollectionViewComp::OnItemDoubleClick(const QModelIndex &item)
 	QByteArray itemId = m_itemModelPtr->item(sourceRow, 0)->data(DR_OBJECT_ID).toByteArray();
 
 	const ICollectionViewDelegate &delegate = GetViewDelegateRef(m_currentTypeId);
-	delegate.OpenDocumentEditor(itemId);
+	const imtbase::ICollectionInfo &collectionInfo = delegate.GetSummaryInformationTypes();
+
+	imtbase::ICollectionInfo::Ids ids = collectionInfo.GetElementIds();
+	int column = item.column();
+	if (column < ids.count()) {
+		if (delegate.IsEditorEnabled(ids[column])){
+			delegate.OpenDocumentEditor(itemId);
+		}
+	}
 }
 
 

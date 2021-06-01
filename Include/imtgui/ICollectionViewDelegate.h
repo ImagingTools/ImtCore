@@ -109,6 +109,16 @@ public:
 	virtual QAbstractItemDelegate* GetColumnItemDelegate(const QByteArray& columnId) const = 0;
 
 	/**
+		Set value to object after finish editing.
+	*/
+	virtual void OnColumnItemDelegateEditFinished(const QByteArray& objectId, const QByteArray& columnId, const QVariant& newValue) const = 0;
+
+	/**
+		Check for editor enabled.
+	*/
+	virtual bool IsEditorEnabled(const QByteArray& columnId) const = 0;
+
+	/**
 		Update the commands state according to the state of the collection and the current state of the collection view.
 	*/
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) = 0;
