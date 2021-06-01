@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4923" Description="ACF"/>
-            <Version Id="1" Number="2139" Description="ACF-Solutions"/>
+            <Version Id="0" Number="4943" Description="ACF"/>
+            <Version Id="1" Number="2150" Description="ACF-Solutions"/>
             <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -145,6 +145,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="iauth::IRightsProvider" ComponentId="LicenseBasedRights"/>
+        <Interface InterfaceId="imod::IModel" ComponentId="LicenseBasedRights"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ProductInstanceInfo" ComponentId="ProductInstanceInfo"/>
