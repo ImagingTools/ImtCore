@@ -16,9 +16,6 @@
 #include <iqtgui/CCommandTools.h>
 
 
-#include <ilog/CMessage.h>
-
-
 namespace imtgui
 {
 
@@ -517,11 +514,6 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 			PasswordLabel->setStyleSheet("color: red");
 			PasswordMessage->setStyleSheet("color: red");
 			PasswordMessage->setText(tr("Login failed"));
-
-			m_loginLog.AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, "sdlfjsldfkjslkdjflsdkjflskdjflskdjlf", "Login")));
-			m_loginLog.AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, "dfgdfgdfgdfgdfgdf", "Login")));
-			m_loginLog.AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, "dfgdfgdfgdfgdfg", "Login")));
-			m_loginLog.AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, "dlfkgjldkfjgldkfjgldkjflgkdjlfjgldkjflgkjdflkgjdlfkjgldkfjglkdjflgkjdflgjkkldfkjgldfkjgldkfjgldkfjlg", "Login")));
 
 			if (m_keyEnterTimerId != 0){
 				killTimer(m_keyEnterTimerId);
