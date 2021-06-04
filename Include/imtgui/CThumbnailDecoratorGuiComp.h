@@ -12,6 +12,7 @@
 
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>
+#include <ilog/IMessageConsumer.h>
 #include <iqtgui/TDesignerGuiCompBase.h>
 #include <ibase/ICommandsProvider.h>
 #include <iprm/ISelectionParam.h>
@@ -81,13 +82,42 @@ public:
 	typedef CThumbnailDecoratorGuiCompAttr BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CThumbnailDecoratorGuiCompAttr2);
+		I_REGISTER_SUBELEMENT(LoginLog);
+		I_REGISTER_SUBELEMENT_INTERFACE(LoginLog, ilog::IMessageConsumer, ExtractLoginLog);
 		I_ASSIGN(m_hideMenuPanelOnHomePageAttrPtr, "HideMenuPanelOnHomePage", "Hide menu panel when home page is active", true, true);
 		I_ASSIGN(m_hideHomeButtonAttrPtr, "HideHomeButton", "Hide home button", true, false);
 	I_END_COMPONENT;
 
+	CThumbnailDecoratorGuiCompAttr2()
+		:m_loginLog(*this)
+	{
+	}
+
+private:
+	class LoginLog: public ilog::IMessageConsumer
+	{
+	public:
+		LoginLog(CThumbnailDecoratorGuiCompAttr2& parent);
+
+		// reimplemented (ilog::IMessageConsumer)
+		virtual bool IsMessageSupported(int messageCategory = -1, int messageId = -1, const istd::IInformationProvider* messagePtr = NULL) const override;
+		virtual void AddMessage(const MessagePtr& messagePtr) override;
+
+	private:
+		CThumbnailDecoratorGuiCompAttr2& m_parent;
+	};
+
+	template <typename InterfaceType>
+	static InterfaceType* ExtractLoginLog(CThumbnailDecoratorGuiCompAttr2& parent)
+	{
+		return &parent.m_loginLog;
+	}
+
 protected:
 	I_ATTR(bool, m_hideMenuPanelOnHomePageAttrPtr);
 	I_ATTR(bool, m_hideHomeButtonAttrPtr);
+
+	LoginLog m_loginLog;
 };
 
 
@@ -219,7 +249,7 @@ private:
 	void UpdateMinSize();
 	void UpdateCommands();
 	int SetupCommandsMenu(const iqtgui::CHierarchicalCommand& command, QMenu& result, int& prevGroupId);
-
+	void UpdateMenuVisibility();
 private:
 	struct ItemInfo
 	{

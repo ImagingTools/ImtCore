@@ -534,7 +534,7 @@
                    <property name="sizeHint" stdset="0">
                     <size>
                      <width>20</width>
-                     <height>239</height>
+                     <height>238</height>
                     </size>
                    </property>
                   </spacer>
@@ -555,16 +555,16 @@
                  <item row="1" column="1">
                   <widget class="QFrame" name="frame">
                    <property name="frameShape">
-                    <enum>QFrame::StyledPanel</enum>
+                    <enum>QFrame::NoFrame</enum>
                    </property>
                    <property name="frameShadow">
                     <enum>QFrame::Raised</enum>
                    </property>
                    <layout class="QGridLayout" name="formLayout">
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="label">
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="PasswordLabel">
                       <property name="text">
-                       <string>User</string>
+                       <string>Password</string>
                       </property>
                      </widget>
                     </item>
@@ -578,17 +578,17 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="PasswordLabel">
-                      <property name="text">
-                       <string>Password</string>
-                      </property>
-                     </widget>
-                    </item>
                     <item row="1" column="1">
                      <widget class="QLineEdit" name="PasswordEdit">
                       <property name="echoMode">
                        <enum>QLineEdit::Password</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="label">
+                      <property name="text">
+                       <string>User</string>
                       </property>
                      </widget>
                     </item>
@@ -629,6 +629,27 @@
                        </widget>
                       </item>
                      </layout>
+                    </item>
+                    <item row="3" column="1">
+                     <widget class="QTextEdit" name="LoginLogText">
+                      <property name="styleSheet">
+                       <string notr="true">background: lightYellow;
+border-radius: 4px;
+border: 1px solid  palette(midlight);</string>
+                      </property>
+                      <property name="frameShape">
+                       <enum>QFrame::StyledPanel</enum>
+                      </property>
+                      <property name="verticalScrollBarPolicy">
+                       <enum>Qt::ScrollBarAlwaysOff</enum>
+                      </property>
+                      <property name="horizontalScrollBarPolicy">
+                       <enum>Qt::ScrollBarAlwaysOff</enum>
+                      </property>
+                      <property name="readOnly">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
                     </item>
                    </layout>
                   </widget>

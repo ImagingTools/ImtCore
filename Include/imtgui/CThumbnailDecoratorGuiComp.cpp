@@ -16,6 +16,9 @@
 #include <iqtgui/CCommandTools.h>
 
 
+#include <ilog/CMessage.h>
+
+
 namespace imtgui
 {
 
@@ -190,6 +193,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	if (*m_hideHomeButtonAttrPtr){
 		HomeButton->hide();
 	}
+
+	LoginLogText->setVisible(false);
 
 	if (m_dashboardGuiCompPtr.IsValid()){
 		m_dashboardGuiCompPtr->CreateGui(DashBoardFrame);
@@ -461,6 +466,11 @@ void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 {
 	PasswordEdit->setFocus();
+
+	LoginLogText->clear();
+
+	LoginLogText->setVisible(false);
+
 	if (m_loginCompPtr.IsValid()){
 		QString userName = UserEdit->text();
 		QString password = PasswordEdit->text();
@@ -506,7 +516,12 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 			PasswordEdit->setStyleSheet("border-color: red; color: red");
 			PasswordLabel->setStyleSheet("color: red");
 			PasswordMessage->setStyleSheet("color: red");
-			PasswordMessage->setText(tr("Wrong password"));
+			PasswordMessage->setText(tr("Login failed"));
+
+			m_loginLog.AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, "sdlfjsldfkjslkdjflsdkjflskdjflskdjlf", "Login")));
+			m_loginLog.AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, "dfgdfgdfgdfgdfgdf", "Login")));
+			m_loginLog.AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, "dfgdfgdfgdfgdfg", "Login")));
+			m_loginLog.AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, "dlfkgjldkfjgldkfjgldkjflgkdjlfjgldkjflgkjdflkgjdlfkjgldkfjglkdjflgkjdflgjkkldfkjgldfkjgldkfjgldkfjlg", "Login")));
 
 			if (m_keyEnterTimerId != 0){
 				killTimer(m_keyEnterTimerId);
@@ -535,6 +550,8 @@ void CThumbnailDecoratorGuiComp::on_PasswordEdit_textEdited(const QString &/*tex
 	PasswordEdit->setStyleSheet("");
 	PasswordLabel->setStyleSheet("");
 	PasswordMessage->setText("");
+	LoginLogText->clear();
+	LoginLogText->setVisible(false);
 }
 
 
@@ -634,6 +651,8 @@ void CThumbnailDecoratorGuiComp::ShowLoginPage()
 	UpdateLoginButtonsState();
 
 	CurrentPageLabel->setText(tr("Login"));
+
+	UpdateMenuVisibility();
 }
 
 
@@ -661,6 +680,8 @@ void CThumbnailDecoratorGuiComp::ShowHomePage()
 	UpdateLoginButtonsState();
 
 	CurrentPageLabel->setText(*m_welcomeTextAttrPtr);
+
+	UpdateMenuVisibility();
 }
 
 
@@ -707,33 +728,7 @@ void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 
 	HomeButton->setEnabled(true);
 
-	// Check menu panel visibility
-	bool showMenuPanel = false;
-
-	if (!m_menuPanelVisibilityCompPtr.IsValid() || (m_menuPanelVisibilityCompPtr.IsValid() && m_menuPanelVisibilityCompPtr->IsEnabled())){
-		if (PageStack->currentIndex() == HOME_PAGE_INDEX){
-			if (!*m_hideMenuPanelOnHomePageAttrPtr){
-				showMenuPanel = true;
-			}
-		}
-		else if (PageStack->currentIndex() == 0){
-		}
-		else{
-			showMenuPanel = true;
-		}
-	}
-
-	// Show/hide menu panel
-	MenuPanelFrame->setVisible(showMenuPanel);
-
-	QWidget* menuPanelWidgetPtr = nullptr;
-	if (m_leftMenuPanelGuiCompPtr.IsValid()){
-		menuPanelWidgetPtr = m_leftMenuPanelGuiCompPtr->GetWidget();
-	}
-
-	if (menuPanelWidgetPtr != nullptr){
-		menuPanelWidgetPtr->setVisible(showMenuPanel);
-	}
+	UpdateMenuVisibility();
 }
 
 
@@ -1071,16 +1066,16 @@ bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 	if (m_loginCompPtr.IsValid()){
 		isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
 
-		hasCloseRight = hasCloseRight && isLogged;
+		if (!m_rightsCompPtr.IsValid()){
+			hasCloseRight = hasCloseRight && isLogged;
+		}
 
 		LoginMode loginMode = GetLoginMode();
 		if (loginMode == LM_STRONG){
-			isLoginControlEnabled = isLogged;
 			isHomeEnabled = isLogged;
 		}
-		else{
-			isLoginControlEnabled = (PageStack->currentIndex() != LOGIN_PAGE_INDEX);
-		}
+
+		isLoginControlEnabled = (PageStack->currentIndex() != LOGIN_PAGE_INDEX);
 	}
 
 	switch (action){
@@ -1327,6 +1322,44 @@ int CThumbnailDecoratorGuiComp::SetupCommandsMenu(const iqtgui::CHierarchicalCom
 }
 
 
+void CThumbnailDecoratorGuiComp::UpdateMenuVisibility()
+{
+	// Check menu panel visibility
+	bool showMenuPanel = false;
+
+	if (!m_menuPanelVisibilityCompPtr.IsValid() || (m_menuPanelVisibilityCompPtr.IsValid() && m_menuPanelVisibilityCompPtr->IsEnabled())){
+		int pageIndex = PageStack->currentIndex();
+
+		if (pageIndex == HOME_PAGE_INDEX){
+			if (!*m_hideMenuPanelOnHomePageAttrPtr){
+				showMenuPanel = true;
+			}
+		}
+		else if (pageIndex == LOGIN_PAGE_INDEX){
+			showMenuPanel = false;
+		}
+		else if (PageStack->currentIndex() == 0){
+			showMenuPanel = false;
+		}
+		else{
+			showMenuPanel = true;
+		}
+	}
+
+	// Show/hide menu panel
+	MenuPanelFrame->setVisible(showMenuPanel);
+
+	QWidget* menuPanelWidgetPtr = nullptr;
+	if (m_leftMenuPanelGuiCompPtr.IsValid()){
+		menuPanelWidgetPtr = m_leftMenuPanelGuiCompPtr->GetWidget();
+	}
+
+	if (menuPanelWidgetPtr != nullptr){
+		menuPanelWidgetPtr->setVisible(showMenuPanel);
+	}
+}
+
+
 // public methods of embedded class CommandsObserver
 
 CThumbnailDecoratorGuiComp::CommandsObserver::CommandsObserver(CThumbnailDecoratorGuiComp& parent)
@@ -1411,6 +1444,36 @@ CThumbnailDecoratorGuiComp::PageVisualStatusObserver::PageVisualStatusObserver(C
 void CThumbnailDecoratorGuiComp::PageVisualStatusObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_parent.UpdatePageState();
+}
+
+
+// public methods of embedded class LoginLog
+
+CThumbnailDecoratorGuiCompAttr2::LoginLog::LoginLog(CThumbnailDecoratorGuiCompAttr2& parent)
+	:m_parent(parent)
+{
+}
+
+
+// reimplemented (ilog::IMessageConsumer)
+
+bool CThumbnailDecoratorGuiCompAttr2::LoginLog::IsMessageSupported(int /*messageCategory*/, int /*messageId*/, const istd::IInformationProvider* /*messagePtr*/) const
+{
+	return true;
+}
+
+
+void CThumbnailDecoratorGuiCompAttr2::LoginLog::AddMessage(const MessagePtr& messagePtr)
+{
+	Q_ASSERT(messagePtr.IsValid());
+
+	if (messagePtr.IsValid()){
+		QString loginMessage = messagePtr->GetInformationDescription();
+
+		m_parent.LoginLogText->setVisible(!loginMessage.isEmpty());
+
+		m_parent.LoginLogText->setPlainText(m_parent.LoginLogText->toPlainText()  + "\n" + loginMessage);
+	}
 }
 
 
