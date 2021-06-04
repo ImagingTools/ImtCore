@@ -437,6 +437,7 @@ void CHttpRequest::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
 bool CHttpRequest::ParseUrl(const char* at, size_t length, bool connect, QUrl& url)
 {
 	struct http_parser_url parserUrl;
+	http_parser_url_init(&parserUrl);
 
 	int schemeMask = 1 << UF_SCHEMA;
 	int hostMask = 1 << UF_HOST;
