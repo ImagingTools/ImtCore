@@ -113,7 +113,12 @@ public:
 		/**
 			Tumbnail for the item preview.
 		*/
-		MIT_PREVIEW_THUMBNAIL
+		MIT_PREVIEW_THUMBNAIL,
+
+		/**
+			Current element revision.
+		*/
+		MIT_REVISION = idoc::IDocumentMetaInfo::MIT_USER + 20000
 	};
 
 	I_DECLARE_FLAGS(OperationalFlags, OF_SUPPORT_RENAME, OF_SUPPORT_INSERT, OF_SUPPORT_DELETE, OF_SUPPORT_EDIT, OF_SUPPORT_USING, OF_ALL);

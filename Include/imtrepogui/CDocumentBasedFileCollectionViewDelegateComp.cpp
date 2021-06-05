@@ -15,7 +15,7 @@
 
 // ImtCore includes
 #include <imtbase/IRevisionController.h>
-#include <imtrepo/IFileObjectCollection.h>
+#include <imtbase/IObjectCollection.h>
 
 
 namespace imtrepogui
@@ -228,8 +228,9 @@ bool CDocumentBasedFileCollectionViewDelegateComp::OpenDocumentEditor(
 		return false;
 	}
 
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	Q_ASSERT(fileCollectionPtr != nullptr);
+	if (!m_filePersistenceCompPtr.IsValid()){
+		return false;
+	}
 
 	ObjectInfo* objectInfoPtr = nullptr;
 	bool isAlreadyOpened = false;
@@ -258,26 +259,33 @@ bool CDocumentBasedFileCollectionViewDelegateComp::OpenDocumentEditor(
 	objectInfoPtr = new ObjectInfo;
 	objectInfoPtr->typeId = m_collectionPtr->GetObjectTypeId(objectId);
 	objectInfoPtr->name = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-
-	imtrepo::IFileObjectCollection::FileInfo fileInfo = fileCollectionPtr->GetFileInfo(objectId);
-
 	objectInfoPtr->uuid = objectId;
 
+	QStringList fileExtensions;
+	if (!m_filePersistenceCompPtr->GetFileExtensions(fileExtensions)){
+		return false;
+	}
+
+	Q_ASSERT(!fileExtensions.isEmpty());
+
+	QString fileExtension = fileExtensions[0];
+
 	QString tempPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString();
-
 	istd::CSystem::EnsurePathExists(tempPath);
+	QString tempFilePath = tempPath + "/" + objectInfoPtr->name + "." + fileExtension;
 
-	QString tempFilePath = tempPath + "/" + objectInfoPtr->name + "." + QFileInfo(fileInfo.fileName).suffix();
+	imtbase::IObjectCollection::DataPtr documentDataPtr;
+	if (m_collectionPtr->GetObjectData(objectId, documentDataPtr)){
+		int state = m_filePersistenceCompPtr->SaveToFile(*documentDataPtr, tempFilePath);
+		if (state == ifile::IFilePersistence::OS_OK){
+			if (m_documentManagerCompPtr->OpenDocument(&objectInfoPtr->typeId, &tempFilePath, true, viewTypeId, &objectInfoPtr->objectPtr)){
+				m_openedDocuments.PushBack(objectInfoPtr);
 
-	QString targetFilePath = fileCollectionPtr->GetFile(objectId, tempFilePath);
-	if (!targetFilePath.isEmpty()){
-		if (m_documentManagerCompPtr->OpenDocument(&objectInfoPtr->typeId, &targetFilePath, true, viewTypeId, &objectInfoPtr->objectPtr)){
-			m_openedDocuments.PushBack(objectInfoPtr);
+				QDir tempDir(tempPath);
+				tempDir.removeRecursively();
 
-			QDir tempDir(tempPath);
-			tempDir.removeRecursively();
-
-			return true;
+				return true;
+			}
 		}
 	}
 
@@ -361,11 +369,8 @@ void CDocumentBasedFileCollectionViewDelegateComp::SetupCommands()
 {
 	BaseClass2::SetupCommands();
 
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	if (fileCollectionPtr != nullptr){
-		connect(&m_editContentsCommand, SIGNAL(triggered()), this, SLOT(OnEdit()));
-		m_editCommands.InsertChild(&m_editContentsCommand);
-	}
+	connect(&m_editContentsCommand, SIGNAL(triggered()), this, SLOT(OnEdit()));
+	m_editCommands.InsertChild(&m_editContentsCommand);
 }
 
 
@@ -561,7 +566,7 @@ void CDocumentBasedFileCollectionViewDelegateComp::ObjectPersistenceProxy::Creat
 	if (revisionControllerPtr != nullptr){
 		idoc::CStandardDocumentMetaInfo metaInfo;
 		m_parent.m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo);
-		QVariant variant = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
+		QVariant variant = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);
 		
 		int revision = -1;
 		if (variant.isValid()){

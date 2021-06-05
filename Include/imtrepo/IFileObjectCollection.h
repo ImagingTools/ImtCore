@@ -25,14 +25,6 @@ namespace imtrepo
 class IFileObjectCollection: virtual public imtbase::IObjectCollection, virtual public IFileCollectionInfo
 {
 public:
-	enum MetaInfoType
-	{
-		/**
-			Current element revision.
-		*/
-		MIT_REVISION = idoc::IDocumentMetaInfo::MIT_USER + 20000
-	};
-
 	/**
 		Information related to the file item in the file collection.
 	*/

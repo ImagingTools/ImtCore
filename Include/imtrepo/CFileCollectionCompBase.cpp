@@ -112,8 +112,8 @@ IFileObjectCollection::FileInfo CFileCollectionCompBase::GetFileInfo(const QByte
 
 
 QString CFileCollectionCompBase::GetFile(
-	const QByteArray& objectId,
-	const QString& targetFilePath) const
+			const QByteArray& objectId,
+			const QString& targetFilePath) const
 {
 	QReadLocker locker(&m_filesLock);
 
