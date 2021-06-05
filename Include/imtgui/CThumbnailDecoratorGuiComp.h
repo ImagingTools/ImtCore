@@ -234,6 +234,7 @@ private:
 	void ProcessLogout();
 	bool IsUserActionAllowed(UserAction action);
 	void ExitApplication();
+	bool IsHomePageEnabled() const;
 
 	/**
 		Calculate layout of page thumbnails based on m_horizontalItemsViewAttrPtr and m_verticalItemsViewAttrPtr

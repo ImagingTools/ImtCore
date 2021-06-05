@@ -484,7 +484,7 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 			int lastPageIndex = m_lastPageIndexForLoggedUser;
 
 			// No page was selected:
-			if (lastPageIndex < 0){
+			if (lastPageIndex < 0 && IsHomePageEnabled()){
 				ShowHomePage();
 			}
 			else{
@@ -492,7 +492,21 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 				const iprm::IOptionsList* pageInfoListPtr = m_pagesCompPtr->GetSelectionConstraints();
 				Q_ASSERT(pageInfoListPtr != nullptr);
 
-				bool isPageEnabled = pageInfoListPtr->IsOptionEnabled(lastPageIndex);
+				// If no last page is known, looking for the first available page:
+				if (lastPageIndex < 0){
+					for (int pageIndex = 0; pageIndex < pageInfoListPtr->GetOptionsCount(); ++pageIndex){
+						if (pageInfoListPtr->IsOptionEnabled(pageIndex)){
+							lastPageIndex = pageIndex;
+							break;
+						}
+					}
+				}
+
+				// Check if the target page can be entered:
+				bool isPageEnabled = false;
+				if (lastPageIndex >= 0){
+					isPageEnabled = pageInfoListPtr->IsOptionEnabled(lastPageIndex);
+				}
 	
 				// If possible, go to the last active page:
 				if (isPageEnabled){
@@ -1032,11 +1046,11 @@ void CThumbnailDecoratorGuiComp::ProcessLogout()
 		if (loginMode == LM_STRONG){
 			ShowLoginPage();
 		}
-		else {
+		else{
 			if (m_defaultPageIndexAttrPtr.IsValid()){
 				SwitchToPage(*m_defaultPageIndexAttrPtr);
 			}
-			else {
+			else{
 				ShowHomePage();
 			}
 		}
@@ -1099,6 +1113,12 @@ void CThumbnailDecoratorGuiComp::ExitApplication()
 
 		qApp->quit();
 	}
+}
+
+
+bool CThumbnailDecoratorGuiComp::IsHomePageEnabled() const
+{
+	return !*m_hideHomeButtonAttrPtr;
 }
 
 

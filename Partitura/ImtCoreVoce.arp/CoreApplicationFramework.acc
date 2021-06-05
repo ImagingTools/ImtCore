@@ -208,7 +208,7 @@
                     <AttributeInfo Id="MaximumFrameWidth" Type="Integer" ExportId="MaximumFrameWidth">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MenuPanelVisibility" Type="Reference" ExportId="">
+                    <AttributeInfo Id="MenuPanelVisibility" Type="Reference" ExportId="MenuPanelVisibility">
                         <Data IsEnabled="true" Value="MenuPanelVisibility"/>
                     </AttributeInfo>
                     <AttributeInfo Id="NavigationController" Type="Reference" ExportId="">
