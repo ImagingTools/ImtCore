@@ -12,6 +12,7 @@
 
 // ImtCore includes
 #include <imtbase/IRevisionController.h>
+#include <imtbase/ICollectionDataController.h>
 #include <imtrepo/IFileObjectCollection.h>
 #include <imtrepogui/CFileObjectCollectionRevisionDialog.h>
 
@@ -113,10 +114,14 @@ QByteArray CFileObjectCollectionViewDelegate::ImportObject(const QByteArray& typ
 		return QByteArray();
 	}
 
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	Q_ASSERT(fileCollectionPtr != nullptr);
+	Q_ASSERT(m_collectionPtr != nullptr);
 
-	return fileCollectionPtr->ImportFile(typeId, sourcePath);
+	const imtbase::ICollectionDataController* dataControllerPtr = m_collectionPtr->GetDataController();
+	if (dataControllerPtr != nullptr){
+		return dataControllerPtr->ImportFile(*m_collectionPtr, typeId, sourcePath);
+	}
+
+	return QByteArray();
 }
 
 
@@ -126,10 +131,14 @@ bool CFileObjectCollectionViewDelegate::ExportObject(const QByteArray& objectId,
 		return false;
 	}
 
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	Q_ASSERT(fileCollectionPtr != nullptr);
+	Q_ASSERT(m_collectionPtr != nullptr);
 
-	return fileCollectionPtr->ExportFile(objectId, targetPath);
+	const imtbase::ICollectionDataController* dataControllerPtr = m_collectionPtr->GetDataController();
+	if (dataControllerPtr != nullptr){
+		return dataControllerPtr->ExportFile(*m_collectionPtr, objectId, targetPath);
+	}
+
+	return false;
 }
 
 
@@ -218,22 +227,24 @@ void CFileObjectCollectionViewDelegate::SetupCommands()
 {
 	BaseClass::SetupCommands();
 
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	if (fileCollectionPtr != nullptr){
-		connect(&m_importCommand, SIGNAL(triggered()), this, SLOT(OnImport()));
-		connect(&m_exportCommand, SIGNAL(triggered()), this, SLOT(OnExport()));
-		connect(&m_restoreCommand, SIGNAL(triggered()), this, SLOT(OnRestore()));
+	if (m_collectionPtr != nullptr){
+		const imtbase::ICollectionDataController* dataControllerPtr = m_collectionPtr->GetDataController();
+		if (dataControllerPtr != nullptr){
+			connect(&m_importCommand, SIGNAL(triggered()), this, SLOT(OnImport()));
+			connect(&m_exportCommand, SIGNAL(triggered()), this, SLOT(OnExport()));
+			connect(&m_restoreCommand, SIGNAL(triggered()), this, SLOT(OnRestore()));
 
-		if (IsCommandSupported(CI_IMPORT)){
-			m_editCommands.InsertChild(&m_importCommand);
-		}
+			if (IsCommandSupported(CI_IMPORT)){
+				m_editCommands.InsertChild(&m_importCommand);
+			}
 
-		if (IsCommandSupported(CI_EXPORT)){
-			m_editCommands.InsertChild(&m_exportCommand);
-		}
+			if (IsCommandSupported(CI_EXPORT)){
+				m_editCommands.InsertChild(&m_exportCommand);
+			}
 
-		if (IsCommandSupported(CI_RESTORE)){
-			m_editCommands.InsertChild(&m_restoreCommand);
+			if (IsCommandSupported(CI_RESTORE)){
+				m_editCommands.InsertChild(&m_restoreCommand);
+			}
 		}
 	}
 }
@@ -255,10 +266,7 @@ void CFileObjectCollectionViewDelegate::OnLanguageChanged()
 
 void CFileObjectCollectionViewDelegate::OnImport()
 {
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	Q_ASSERT(fileCollectionPtr != nullptr);
-
-	istd::CChangeGroup changeGroup(fileCollectionPtr);
+	istd::CChangeGroup changeGroup(m_collectionPtr);
 
 	QStringList files = QFileDialog::getOpenFileNames(
 				(m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr,
@@ -316,8 +324,6 @@ void CFileObjectCollectionViewDelegate::OnExport()
 
 void CFileObjectCollectionViewDelegate::OnRestore()
 {
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	Q_ASSERT(fileCollectionPtr != nullptr);
 	Q_ASSERT(m_selectedItemIds.count() > 0);
 
 	const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
@@ -336,7 +342,7 @@ void CFileObjectCollectionViewDelegate::OnRestore()
 
 		imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_collectionPtr, objectId);
 
-		QString fileName = fileCollectionPtr->GetElementInfo(objectId, imtbase::IObjectCollectionInfo::EIT_NAME).toString();
+		QString fileName = m_collectionPtr->GetElementInfo(objectId, imtbase::IObjectCollectionInfo::EIT_NAME).toString();
 
 		CFileObjectCollectionRevisionDialog dialog;
 
@@ -409,9 +415,6 @@ const ifile::IFileTypeInfo* CFileObjectCollectionViewDelegate::FindFileInfo(cons
 
 QString CFileObjectCollectionViewDelegate::CreateFileImportFilter() const
 {
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	Q_ASSERT(fileCollectionPtr != nullptr);
-
 	QStringList filters;
 	QStringList allExt;
 
@@ -433,13 +436,10 @@ QString CFileObjectCollectionViewDelegate::CreateFileImportFilter() const
 
 QString CFileObjectCollectionViewDelegate::CreateFileExportFilter(const QByteArray& objectId) const
 {
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	Q_ASSERT(fileCollectionPtr != nullptr);
-
 	QStringList filters;
 	QStringList allExt;
 
-	QByteArray typeId = fileCollectionPtr->GetObjectTypeId(objectId);
+	QByteArray typeId = m_collectionPtr->GetObjectTypeId(objectId);
 	const ifile::IFileTypeInfo* fileInfoPtr = FindFileInfo(typeId, FOT_EXPORT);
 
 	if (fileInfoPtr != nullptr){

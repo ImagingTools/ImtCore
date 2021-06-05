@@ -26,6 +26,7 @@
 // ImtCore includes
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/IRevisionController.h>
+#include <imtbase/ICollectionDataController.h>
 #include <imtfile/IFileCompression.h>
 #include <imtrepo/IFileCollectionInfo.h>
 #include <imtrepo/IFileObjectCollection.h>
@@ -81,7 +82,8 @@ class CFileCollectionCompBase:
 			public CFileCollectionCompBaseAttr,
 			virtual public IFileObjectCollection,
 			virtual public IFileObjectCollection::IDataFactory,
-			virtual public IRepositoryItemInfoProvider
+			virtual public IRepositoryItemInfoProvider,
+			virtual protected imtbase::ICollectionDataController
 {
 	Q_OBJECT
 public:
@@ -129,11 +131,14 @@ public:
 				const QString& objectDescription = QString(),
 				const QByteArray& proposedObjectId = QByteArray()) override;
 	virtual bool UpdateFile(const QString& filePath, const QByteArray& objectId) override;
-	virtual bool ExportFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
-	virtual QByteArray ImportFile(const QByteArray& typeId, const QString& sourceFilePath = QString()) override;
+
+	// reimplemented (ICollectionDataController)
+	virtual bool ExportFile(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
+	virtual QByteArray ImportFile(imtbase::IObjectCollection& collection, const QByteArray& typeId, const QString& sourceFilePath = QString()) const override;
 
 	// reimplemented (IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
+	virtual const imtbase::ICollectionDataController* GetDataController() const override;
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
 	virtual bool GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const override;
 	virtual QByteArray InsertNewObject(
@@ -405,8 +410,8 @@ protected:
 	void UpdateItemMetaInfo(CollectionItem& item) const;
 
 	void ReadRepositoryItems();
-	void ReadItem(Files& filesPtr, const QString& itemFilePath);
-	bool ReadItemFile(CollectionItem& collectionItem, const QString& itemFilePath);
+	void ReadItem(Files& files, const QString& itemFilePath) const;
+	bool ReadItemFile(CollectionItem& collectionItem, const QString& itemFilePath) const;
 
 	void StartRepositoryLoader();
 	Q_INVOKABLE void OnReaderProgress(int progress);

@@ -15,6 +15,7 @@ namespace imtbase
 
 
 class IRevisionController;
+class ICollectionDataController;
 
 
 /**
@@ -128,6 +129,11 @@ public:
 		Get access to the revision controller of the collection, if available.
 	*/
 	virtual const IRevisionController* GetRevisionController() const = 0;
+
+	/**
+		Get access to the revision controller of the collection, if available.
+	*/
+	virtual const ICollectionDataController* GetDataController() const = 0;
 
 	/**
 		Get binary flags describing the possible operations on the single object or on the whole collection.

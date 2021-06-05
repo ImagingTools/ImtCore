@@ -324,153 +324,6 @@ bool CFileCollectionComp::ExportObject(const imtbase::IObjectCollection& collect
 }
 
 
-// reimplemented (IFileObjectCollection)
-
-bool CFileCollectionComp::ExportFile(const QByteArray& objectId, const QString& targetFilePath) const
-{
-	if (targetFilePath.isEmpty())
-		return false;
-
-	if (QFileInfo(targetFilePath).suffix() != "zip") // normal file save - taking the implementation of the base class
-		return BaseClass::ExportFile(objectId, targetFilePath);
-
-	// compressing and exporting the whole directory
-
-	if (!m_compressorCompPtr.IsValid() || !IsPathInsideRepository(GetFileInfo(objectId).filePath))
-		return false;
-
-	QString objPath = QFileInfo(GetFileInfo(objectId).filePath).path();
-	return m_compressorCompPtr->CompressFolder(objPath, targetFilePath, true);
-}
-
-QByteArray CFileCollectionComp::ImportFile(const QByteArray& typeId, const QString& sourceFilePath)
-{
-	int repositoryRevision = *m_revisionAttrPtr;
-
-	if (sourceFilePath.isEmpty())
-		return QByteArray();
-
-	if (QFileInfo(sourceFilePath).suffix() == "zip"){
-		QString workingPath = CreateWorkingDir();
-		QDir workingDir(workingPath);
-
-		if (istd::CSystem::EnsurePathExists(workingPath)){
-			if (m_compressorCompPtr->DecompressFolder(sourceFilePath, workingPath)){
-				QString itemSuffix = GetRepositoryInfo().dataFileSuffix;
-				workingDir.setFilter(QDir::Files);
-				workingDir.setNameFilters({ "*." + GetRepositoryInfo().dataFileSuffix });
-				QStringList list = workingDir.entryList();
-				if (!list.isEmpty()){
-					QString itemFile = workingDir.filePath(list[0]);
-					CollectionItem collectionItem(GetCollectionRootFolder(), repositoryRevision);
-					if (ReadItemFile(collectionItem, itemFile)){
-						QString dataFile = workingDir.filePath(QFileInfo(collectionItem.filePathInRepository).fileName());
-						if (QFile(dataFile).exists()){
-							if (collectionItem.repositoryRevision != repositoryRevision){
-								if (m_transformationStepsProviderCompPtr.IsValid()){
-									RepositoryItemInfo itemInfo;
-									itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_INFO, itemFile);
-									itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_DATA, dataFile);
-
-									if (!TransformRepositoryItem(itemInfo, collectionItem.repositoryRevision, repositoryRevision)){
-										workingDir.removeRecursively();
-										return QByteArray();
-									}
-
-									if (!ReadItemFile(collectionItem, itemFile)){
-										workingDir.removeRecursively();
-										return QByteArray();
-									}
-								}
-							}
-
-							QFileInfo dataFileInfo(dataFile);
-							QFileInfo itemFileInfo(itemFile);
-
-							QFile(dataFile + "." + GetRepositoryInfo().metaInfoFileSuffix).remove();
-
-							QWriteLocker locker(&m_filesLock);
-
-							QString targetDirPath = CalculateFolderPathInRepository(dataFile, dataFileInfo.completeBaseName(), typeId, nullptr);
-							QString objectName = QDir(targetDirPath).dirName();
-							ResourceLocker(*this, QByteArray(), objectName);
-
-							locker.unlock();
-
-							QString newDataFile = dataFileInfo.dir().path() + "/" + objectName + "." + dataFileInfo.suffix();
-							QString newItemFile = newDataFile + "." + GetRepositoryInfo().dataFileSuffix;
-							QString newMetaInfoFile = newDataFile + "." + GetRepositoryInfo().metaInfoFileSuffix;
-
-							QFile(dataFile).rename(newDataFile);
-							QFile(itemFile).rename(newItemFile);
-
-							MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(newDataFile, typeId);
-							if (!metaInfoPtr.IsValid()){
-								workingDir.removeRecursively();
-								return QByteArray();
-							}
-
-							collectionItem.contentsMetaInfoPtr = metaInfoPtr;
-							SaveMetaInfo(*metaInfoPtr, newMetaInfoFile);
-
-							collectionItem.objectName = objectName;
-							collectionItem.fileId = QUuid::createUuid().toByteArray();
-							collectionItem.filePathInRepository = targetDirPath + QDir::separator() + QFileInfo(newDataFile).fileName();
-							collectionItem.sourceFilePath = newDataFile;
-							collectionItem.repositoryRevision = repositoryRevision;
-
-							collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
-							collectionItem.metaInfo.SetMetaInfo(MIT_INSERTION_TIME, QDateTime::currentDateTime());
-
-							QString savedPath = SaveCollectionItem(collectionItem, newItemFile);
-							if (!savedPath.isEmpty()){
-								if (FinishInsertFileTransaction(workingPath, targetDirPath, collectionItem.fileId, collectionItem)){
-									QDir(workingPath).removeRecursively();
-
-									return collectionItem.fileId;
-								}
-								else{
-									SendErrorMessage(0, tr("File could not be inserted into the repository"));
-								}
-							}
-							else{
-								SendErrorMessage(0, tr("Item file '%1' could not be saved").arg(newItemFile));
-							}
-						}
-						else{
-							SendErrorMessage(0, tr("Data file '%1' not found").arg(dataFile));
-						}
-					}
-					else{
-						SendErrorMessage(0, tr("Unable read item file '%1'").arg(itemFile));
-					}
-				}
-				else{
-					SendErrorMessage(0, tr("Item file not found in '%1'").arg(workingPath));
-				}
-			}
-			else{
-				SendErrorMessage(0, tr("Unable to uncompress '%1'").arg(sourceFilePath));
-			}
-
-			workingDir.removeRecursively();
-		}
-		else{
-			SendErrorMessage(0, tr("Target folder '%1' could not be created").arg(workingPath));
-		}
-	}
-	else if (!IsPathInsideRepository(sourceFilePath)){
-		istd::TDelPtr<istd::IChangeable> dataObjectPtr(CreateObjectFromFile(sourceFilePath, typeId));
-		if (dataObjectPtr.IsValid()){
-			QByteArray objectId = InsertFile(sourceFilePath, typeId, QFileInfo(sourceFilePath).completeBaseName());
-			return objectId;
-		}
-	}
-
-	return QByteArray();
-}
-
-
 // reimplemented (IFileCollectionInfo)
 
 IFileCollectionInfo::FileCollectionLayout CFileCollectionComp::GetCollectionFileLayout() const
@@ -655,6 +508,159 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 	}
 
 	SendErrorMessage(0, QObject::tr("Resource with the ID '%1' doesn't exist").arg(objectId.constData()));
+}
+
+
+// reimplemented (ICollectionDataController)
+
+bool CFileCollectionComp::ExportFile(const imtbase::IObjectCollection& /*collection*/, const QByteArray& objectId, const QString& targetFilePath) const
+{
+	if (targetFilePath.isEmpty()){
+		return false;
+		}
+
+	if (QFileInfo(targetFilePath).suffix() != "zip"){ // normal file save - taking the implementation of the base class
+		return BaseClass::ExportFile(*this, objectId, targetFilePath);
+	}
+
+	// Compressing and exporting the whole directory:
+	if (!m_compressorCompPtr.IsValid() || !IsPathInsideRepository(GetFileInfo(objectId).filePath)){
+		return false;
+	}
+
+	QString objectPath = QFileInfo(GetFileInfo(objectId).filePath).path();
+
+	return m_compressorCompPtr->CompressFolder(objectPath, targetFilePath, true);
+}
+
+
+QByteArray CFileCollectionComp::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& typeId, const QString& sourceFilePath) const
+{
+	int repositoryRevision = *m_revisionAttrPtr;
+
+	if (sourceFilePath.isEmpty()){
+		return QByteArray();
+	}
+
+	if (QFileInfo(sourceFilePath).suffix() == "zip"){
+		QString workingPath = CreateWorkingDir();
+		QDir workingDir(workingPath);
+
+		if (istd::CSystem::EnsurePathExists(workingPath)){
+			if (m_compressorCompPtr->DecompressFolder(sourceFilePath, workingPath)){
+				QString itemSuffix = GetRepositoryInfo().dataFileSuffix;
+				workingDir.setFilter(QDir::Files);
+				workingDir.setNameFilters({ "*." + GetRepositoryInfo().dataFileSuffix });
+				QStringList list = workingDir.entryList();
+				if (!list.isEmpty()){
+					QString itemFile = workingDir.filePath(list[0]);
+					CollectionItem collectionItem(GetCollectionRootFolder(), repositoryRevision);
+					if (ReadItemFile(collectionItem, itemFile)){
+						QString dataFile = workingDir.filePath(QFileInfo(collectionItem.filePathInRepository).fileName());
+						if (QFile(dataFile).exists()){
+							if (collectionItem.repositoryRevision != repositoryRevision){
+								if (m_transformationStepsProviderCompPtr.IsValid()){
+									RepositoryItemInfo itemInfo;
+									itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_INFO, itemFile);
+									itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_DATA, dataFile);
+
+									if (!TransformRepositoryItem(itemInfo, collectionItem.repositoryRevision, repositoryRevision)){
+										workingDir.removeRecursively();
+										return QByteArray();
+									}
+
+									if (!ReadItemFile(collectionItem, itemFile)){
+										workingDir.removeRecursively();
+										return QByteArray();
+									}
+								}
+							}
+
+							QFileInfo dataFileInfo(dataFile);
+							QFileInfo itemFileInfo(itemFile);
+
+							QFile(dataFile + "." + GetRepositoryInfo().metaInfoFileSuffix).remove();
+
+							QWriteLocker locker(&m_filesLock);
+
+							QString targetDirPath = CalculateFolderPathInRepository(dataFile, dataFileInfo.completeBaseName(), typeId, nullptr);
+							QString objectName = QDir(targetDirPath).dirName();
+							ResourceLocker(const_cast<CFileCollectionComp&>(*this), QByteArray(), objectName);
+
+							locker.unlock();
+
+							QString newDataFile = dataFileInfo.dir().path() + "/" + objectName + "." + dataFileInfo.suffix();
+							QString newItemFile = newDataFile + "." + GetRepositoryInfo().dataFileSuffix;
+							QString newMetaInfoFile = newDataFile + "." + GetRepositoryInfo().metaInfoFileSuffix;
+
+							QFile(dataFile).rename(newDataFile);
+							QFile(itemFile).rename(newItemFile);
+
+							MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(newDataFile, typeId);
+							if (!metaInfoPtr.IsValid()){
+								workingDir.removeRecursively();
+								return QByteArray();
+							}
+
+							collectionItem.contentsMetaInfoPtr = metaInfoPtr;
+							SaveMetaInfo(*metaInfoPtr, newMetaInfoFile);
+
+							collectionItem.objectName = objectName;
+							collectionItem.fileId = QUuid::createUuid().toByteArray();
+							collectionItem.filePathInRepository = targetDirPath + QDir::separator() + QFileInfo(newDataFile).fileName();
+							collectionItem.sourceFilePath = newDataFile;
+							collectionItem.repositoryRevision = repositoryRevision;
+
+							collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
+							collectionItem.metaInfo.SetMetaInfo(MIT_INSERTION_TIME, QDateTime::currentDateTime());
+
+							QString savedPath = SaveCollectionItem(collectionItem, newItemFile);
+							if (!savedPath.isEmpty()){
+								if ((const_cast<CFileCollectionComp*>(this))->FinishInsertFileTransaction(workingPath, targetDirPath, collectionItem.fileId, collectionItem)){
+									QDir(workingPath).removeRecursively();
+
+									return collectionItem.fileId;
+								}
+								else{
+									SendErrorMessage(0, tr("File could not be inserted into the repository"));
+								}
+							}
+							else{
+								SendErrorMessage(0, tr("Item file '%1' could not be saved").arg(newItemFile));
+							}
+						}
+						else{
+							SendErrorMessage(0, tr("Data file '%1' not found").arg(dataFile));
+						}
+					}
+					else{
+						SendErrorMessage(0, tr("Unable read item file '%1'").arg(itemFile));
+					}
+				}
+				else{
+					SendErrorMessage(0, tr("Item file not found in '%1'").arg(workingPath));
+				}
+			}
+			else{
+				SendErrorMessage(0, tr("Unable to uncompress '%1'").arg(sourceFilePath));
+			}
+
+			workingDir.removeRecursively();
+		}
+		else{
+			SendErrorMessage(0, tr("Target folder '%1' could not be created").arg(workingPath));
+		}
+	}
+	else if (!IsPathInsideRepository(sourceFilePath)){
+		istd::TDelPtr<istd::IChangeable> dataObjectPtr(CreateObjectFromFile(sourceFilePath, typeId));
+		if (dataObjectPtr.IsValid()){
+			QByteArray objectId = (const_cast<CFileCollectionComp*>(this))->InsertFile(sourceFilePath, typeId, QFileInfo(sourceFilePath).completeBaseName());
+
+			return objectId;
+		}
+	}
+
+	return QByteArray();
 }
 
 

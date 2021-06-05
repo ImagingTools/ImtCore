@@ -44,10 +44,6 @@ public:
 	virtual bool RestoreObject(imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision) const override;
 	virtual bool ExportObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision, const QString& filePath) const override;
 
-	// reimplemented (IFileObjectCollection)
-	virtual bool ExportFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
-	virtual QByteArray ImportFile(const QByteArray& typeId, const QString& sourceFilePath = QString()) override;
-
 	// reimplemented (IFileCollectionInfo)
 	virtual FileCollectionLayout GetCollectionFileLayout() const override;
 
@@ -55,6 +51,10 @@ public:
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
 	virtual bool RemoveObject(const QByteArray& objectId) override;
 	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
+
+	// reimplemented (ICollectionDataController)
+	virtual bool ExportFile(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
+	virtual QByteArray ImportFile(imtbase::IObjectCollection& collection, const QByteArray& typeId, const QString& sourceFilePath = QString()) const override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;

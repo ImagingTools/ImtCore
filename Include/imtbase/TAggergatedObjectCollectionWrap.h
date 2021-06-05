@@ -41,6 +41,7 @@ public:
 
 	// reimplemented (IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
+	virtual const imtbase::ICollectionDataController* GetDataController() const override;
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
 	virtual bool GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const override;
 	virtual QByteArray InsertNewObject(
@@ -117,6 +118,13 @@ template<class BaseInterface, class ObjectImpl>
 inline const imtbase::IRevisionController* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetRevisionController() const
 {
 	return m_collection.GetRevisionController();
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+inline const imtbase::ICollectionDataController* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetDataController() const
+{
+	return m_collection.GetDataController();
 }
 
 

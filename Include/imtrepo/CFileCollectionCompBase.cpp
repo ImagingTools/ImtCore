@@ -331,7 +331,9 @@ bool CFileCollectionCompBase::UpdateFile(
 }
 
 
-bool CFileCollectionCompBase::ExportFile(const QByteArray& objectId, const QString& targetFilePath) const
+// reimplemented (ICollectionDataController)
+
+bool CFileCollectionCompBase::ExportFile(const imtbase::IObjectCollection& /*collection*/, const QByteArray& objectId, const QString& targetFilePath) const
 {
 	if (!targetFilePath.isEmpty()){
 		if (!IsPathInsideRepository(targetFilePath)){
@@ -345,7 +347,7 @@ bool CFileCollectionCompBase::ExportFile(const QByteArray& objectId, const QStri
 }
 
 
-QByteArray CFileCollectionCompBase::ImportFile(const QByteArray& /*typeId*/, const QString& /*sourceFilePath*/)
+QByteArray CFileCollectionCompBase::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& /*typeId*/, const QString& /*sourceFilePath*/) const
 {
 	return QByteArray();
 }
@@ -356,6 +358,12 @@ QByteArray CFileCollectionCompBase::ImportFile(const QByteArray& /*typeId*/, con
 const imtbase::IRevisionController* CFileCollectionCompBase::GetRevisionController() const
 {
 	return nullptr;
+}
+
+
+const imtbase::ICollectionDataController* CFileCollectionCompBase::GetDataController() const
+{
+	return this;
 }
 
 
@@ -1006,7 +1014,7 @@ void CFileCollectionCompBase::ReadRepositoryItems()
 }
 
 
-void CFileCollectionCompBase::ReadItem(Files& filesPtr, const QString& itemFilePath)
+void CFileCollectionCompBase::ReadItem(Files& filesPtr, const QString& itemFilePath) const
 {
 	CollectionItem fileItem(GetCollectionRootFolder(), *m_revisionAttrPtr);
 	if (!ReadItemFile(fileItem, itemFilePath)){
@@ -1044,7 +1052,7 @@ void CFileCollectionCompBase::ReadItem(Files& filesPtr, const QString& itemFileP
 }
 
 
-bool CFileCollectionCompBase::ReadItemFile(CollectionItem& collectionItem, const QString& itemFilePath)
+bool CFileCollectionCompBase::ReadItemFile(CollectionItem& collectionItem, const QString& itemFilePath) const
 {
 	if (itemFilePath.isEmpty())
 		return false;

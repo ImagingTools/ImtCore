@@ -39,7 +39,7 @@
                         <Data IsEnabled="true" Value="ImtCore"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionNumber" ExportId="" Type="Integer">
-                        <Data IsEnabled="true" Value="3372"/>
+                        <Data IsEnabled="true" Value="3375"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
