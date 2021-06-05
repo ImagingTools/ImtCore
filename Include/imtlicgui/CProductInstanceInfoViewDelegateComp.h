@@ -6,7 +6,7 @@
 #include <iprm/IIdParam.h>
 
 // ImtCore includes
-#include <imtrepogui/CDocumentBasedFileCollectionViewDelegateComp.h>
+#include <imtrepogui/CDocumentCollectionViewDelegateComp.h>
 #include <imtcrypt/IEncryption.h>
 #include <imtcrypt/IEncryptionKeysProvider.h>
 
@@ -16,12 +16,12 @@ namespace imtlicgui
 
 
 class CProductInstanceInfoViewDelegateComp:
-			public imtrepogui::CDocumentBasedFileCollectionViewDelegateComp,
+			public imtrepogui::CDocumentCollectionViewDelegateComp,
 			virtual public imtcrypt::IEncryptionKeysProvider
 {
 	Q_OBJECT
 public:
-	typedef imtrepogui::CDocumentBasedFileCollectionViewDelegateComp BaseClass;
+	typedef imtrepogui::CDocumentCollectionViewDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CProductInstanceInfoViewDelegateComp);
 		I_REGISTER_INTERFACE(imtcrypt::IEncryptionKeysProvider);

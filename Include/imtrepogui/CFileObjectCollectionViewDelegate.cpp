@@ -4,7 +4,6 @@
 // Qt includes
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QFileDialog>
-#include <QtWidgets/QInputDialog>
 
 // ACF includes
 #include <istd/CChangeGroup.h>
@@ -19,6 +18,7 @@
 
 namespace
 {
+
 
 QString FindSelectedFilter(const QString& filters, const QString& filePath)
 {
@@ -85,7 +85,7 @@ void CFileObjectCollectionViewDelegate::UpdateItemSelection(const imtbase::IColl
 			QByteArray objectId = m_selectedItemIds[0];
 
 			if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
-				QVariant variant = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
+				QVariant variant = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);
 				if (variant.isValid()){
 					revision = variant.toInt();
 				}
@@ -328,7 +328,7 @@ void CFileObjectCollectionViewDelegate::OnRestore()
 		QByteArray objectId = m_selectedItemIds[0];
 
 		if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
-			QVariant revision = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
+			QVariant revision = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);
 			if (revision.isValid()){
 				currentRevision = revision.toInt();
 			}

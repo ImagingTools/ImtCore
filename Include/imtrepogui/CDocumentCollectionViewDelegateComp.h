@@ -22,7 +22,7 @@ namespace imtrepogui
 	Such operations as 'New' 'Edit' (Update) on the collection objects will be done via registered document manager.
 	\ingroup Collection
 */
-class CDocumentBasedFileCollectionViewDelegateComp:
+class CDocumentCollectionViewDelegateComp:
 			public CFileObjectCollectionViewDelegate,
 			public icomp::CComponentBase
 {
@@ -31,7 +31,7 @@ public:
 	typedef icomp::CComponentBase BaseClass;
 	typedef CFileObjectCollectionViewDelegate BaseClass2;
 
-	I_BEGIN_COMPONENT(CDocumentBasedFileCollectionViewDelegateComp);
+	I_BEGIN_COMPONENT(CDocumentCollectionViewDelegateComp);
 		I_REGISTER_INTERFACE(imtgui::ICollectionViewDelegate);
 		I_REGISTER_SUBELEMENT(CollectionPersistence);
 		I_REGISTER_SUBELEMENT_INTERFACE(CollectionPersistence, ifile::IFilePersistence, ExtractCollectionPersistence);
@@ -51,7 +51,7 @@ public:
 		CG_DOCUMENT_MANAGER = 2100
 	};
 
-	CDocumentBasedFileCollectionViewDelegateComp();
+	CDocumentCollectionViewDelegateComp();
 
 	// reimplemented (imtgui::ICollectionViewDelegate)
 	virtual QByteArray GetSupportedTypeId() const override;
@@ -72,7 +72,7 @@ protected:
 	class ObjectPersistenceProxy: virtual public ifile::IFilePersistence
 	{
 	public:
-		ObjectPersistenceProxy(CDocumentBasedFileCollectionViewDelegateComp& parent);
+		ObjectPersistenceProxy(CDocumentCollectionViewDelegateComp& parent);
 
 		// reimplemented (ifile::IFilePersistence)
 		virtual bool IsOperationSupported(
@@ -97,20 +97,20 @@ protected:
 		void CreateBackup(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const;
 
 	private:
-		CDocumentBasedFileCollectionViewDelegateComp& m_parent;
+		CDocumentCollectionViewDelegateComp& m_parent;
 	};
 
 
 	class DocumentManagerObserver: public imod::TSingleModelObserverBase<idoc::IDocumentManager>
 	{
 	public:
-		DocumentManagerObserver(CDocumentBasedFileCollectionViewDelegateComp& parent);
+		DocumentManagerObserver(CDocumentCollectionViewDelegateComp& parent);
 
 		// reimplemented (imod::CSingleModelObserverBase)
 		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
 
 	private:
-		CDocumentBasedFileCollectionViewDelegateComp& m_parent;
+		CDocumentCollectionViewDelegateComp& m_parent;
 	};
 
 protected:
@@ -135,7 +135,7 @@ protected Q_SLOTS:
 
 private:
 	template <class InterfaceType>
-	static InterfaceType* ExtractCollectionPersistence(CDocumentBasedFileCollectionViewDelegateComp& component)
+	static InterfaceType* ExtractCollectionPersistence(CDocumentCollectionViewDelegateComp& component)
 	{
 		return &component.m_collectionPersistence;
 	}

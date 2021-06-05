@@ -23,7 +23,7 @@ I_EXPORT_COMPONENT(
 			"Object Collection File Delegate View");
 
 I_EXPORT_COMPONENT(
-			DocumentBasedFileCollectionViewDelegate,
+			DocumentCollectionViewDelegate,
 			"View delegate for a file collection using document manager for the data operations",
 			"Object Collection File Delegate View Document MDI");
 
