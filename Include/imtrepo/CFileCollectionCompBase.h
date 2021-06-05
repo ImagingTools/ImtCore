@@ -98,7 +98,7 @@ public:
 		I_ASSIGN(m_repositoryPathCompPtr, "RepositoryPath", "Path to the file collection folder", false, "RepositoryPath");
 		I_ASSIGN(m_compressorCompPtr, "FileCompressor", "File compressor", false, "FileCompressor");
 		I_ASSIGN(m_resourceTypesCompPtr, "ResourceTypes", "List of supported resource types", false, "ResourceTypes");
-		I_ASSIGN(m_helperFilesPersistence, "HelperFilesPersistence", "Persistence component used for loading / saving helper (item and meta) files. Replaced by default persistence engine if not specified", true, "HelperFilesPersistence");
+		I_ASSIGN(m_helperFilesPersistence, "HelperFilesPersistence", "Persistence component used for loading / saving helper (item and meta) files. Replaced by default persistence engine if not specified", false, "HelperFilesPersistence");
 		I_ASSIGN_MULTI_0(m_progressManagerListCompPtr, "ProgressManagerList", "List of progress manager components", false);
 		I_ASSIGN_MULTI_0(m_objectPersistenceListCompPtr, "ObjectPersistenceList", "List of persistence components used for data object loading", false);
 		I_ASSIGN_MULTI_0(m_resourceFileTypesCompPtr, "FileTypeInfos", "List of file type infos for corresponding resource type", false);
