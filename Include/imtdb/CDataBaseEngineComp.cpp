@@ -27,31 +27,12 @@ QSqlDatabase CDataBaseEngineComp::GetDatabase() const
 
 bool CDataBaseEngineComp::OpenDataBase()
 {
-//	m_db = QSqlDatabase::addDatabase(*m_dbType, *m_dbName);
-//	m_db.setHostName(*m_hostName);
-//	m_db.setUserName(*m_userName);
-//	m_db.setPassword(*m_pasword);
-//	int port = *m_port;
-//	m_db.setPort(port);
-
-	qCritical() << __FILE__ << __LINE__ << "USING STATIC CONNECTION!!!!!!!!!";
-	m_db = QSqlDatabase::addDatabase("QSQLITE");
-	m_db.setHostName("SQL_LITE_ADDRESS_TEST");
-
-	QFile f1("/Users/sergey3/Downloads/TestDB.db");
-	qDebug() << f1.exists();
-	if(f1.open(QFile::ReadOnly))
-	{
-		qDebug() << "open OK";
-	}
-	else
-	{
-		qCritical() << "FAIL to open\n" <<
-					   f1.error() << "\n" << f1.errorString();
-	}
-	f1.close();
-	m_db.setDatabaseName("/Users/sergey3/Downloads/TestDB.db");
-
+	m_db = QSqlDatabase::addDatabase(*m_dbType, *m_dbName);
+	m_db.setHostName(*m_hostName);
+	m_db.setUserName(*m_userName);
+	m_db.setPassword(*m_pasword);
+	int port = *m_port;
+	m_db.setPort(port);
 	return m_db.open();
 
 }
