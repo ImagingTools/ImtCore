@@ -6,13 +6,11 @@ namespace imtdb
 
 CDataBaseObjectCollection::CDataBaseObjectCollection():imtbase::CObjectCollectionBase()
 {
-	qDebug() << __PRETTY_FUNCTION__;
 }
 
 
 CDataBaseObjectCollection::~CDataBaseObjectCollection()
-{	
-	qDebug() << __PRETTY_FUNCTION__;
+{
 }
 
 void CDataBaseObjectCollection::Refresh()
