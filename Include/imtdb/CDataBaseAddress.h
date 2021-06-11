@@ -6,25 +6,14 @@
 namespace imtdb
 {
 
-class CDataBaseAddress: public IDataBaseChangeable
+class CDataBaseAddress: public istd::IChangeable
 {
 
 public:
 	CDataBaseAddress();
 	virtual ~CDataBaseAddress();
 
-// IDataBaseChangeable interface
 public:
-	QByteArrayList GetProperties() const override;
-	QVariant GetProperty(const QByteArray& propName) const override;
-	bool SetProperty(const QVariant& value, const QByteArray& propName) override;
-	QByteArray GetSelectSqlQuery() const override;
-	QByteArray GetUpdateSqlQuery() const override;
-	QByteArray GetInsertSqlQuery() const override;
-	QByteArray GetDeleteSqlQuery() const override;
-	virtual QByteArray GetTypeId() const override;
-	IDataBaseChangeable* Join(const IDataBaseChangeable* const baseObject, const IDataBaseChangeable* const objectWithNewProps) const override;
-
 
 private:
 	typedef QPair<QByteArray, QVariant> AddressProperty;
