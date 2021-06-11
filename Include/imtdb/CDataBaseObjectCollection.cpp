@@ -13,16 +13,6 @@ CDataBaseObjectCollection::~CDataBaseObjectCollection()
 {
 }
 
-void CDataBaseObjectCollection::Refresh()
-{
-
-}
-
-istd::IChangeable* CDataBaseObjectCollection::CreateObjectInstance(const QByteArray& typeId) const
-{
-	return nullptr;
-}
-
 QSqlQuery CDataBaseObjectCollection::ExecSelectSqlQuery(QVariantMap bindValues, QSqlError* sqlError) const
 {
 	return m_dbEngine->ExecSqlQuery(*m_selectSqlQueryString, bindValues, sqlError);

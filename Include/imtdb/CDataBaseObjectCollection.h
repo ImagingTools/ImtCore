@@ -30,10 +30,7 @@ public:
 	explicit CDataBaseObjectCollection();
 	virtual ~CDataBaseObjectCollection();
 
-	virtual void Refresh();
-
-	static inline std::pair<QString, QVariant> MakeSqlBindBalue(const QByteArray& propName, const IDataBaseChangeable* const object);
-	static inline QVariantMap MakeSqlBindBaluesList(const IDataBaseChangeable* const object);
+	virtual void Refresh() = 0;
 
 	// reimplemented (imtbase::IObjectCollection)
 	virtual QByteArray InsertNewObject(
@@ -44,11 +41,14 @@ public:
 				const QByteArray& preferredId= QByteArray()) override = 0;
 	virtual bool RemoveObject(const QByteArray& objectId) override = 0;
 	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override = 0;
-	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override = 0;
-	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override = 0;
-	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override = 0;
+	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
+	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
+	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
 
 protected:
+	static inline std::pair<QString, QVariant> MakeSqlBindBalue(const QByteArray& propName, const IDataBaseChangeable* const object);
+	static inline QVariantMap MakeSqlBindBaluesList(const IDataBaseChangeable* const object);
+
 	const IDataBaseChangeable* const GetObjectPtrById(const QByteArray& id) const;
 	Q_REQUIRED_RESULT virtual QSqlQuery ExecSelectSqlQuery(
 				_In_opt_ QVariantMap bindValues = {},
@@ -64,7 +64,7 @@ protected:
 				_Outptr_opt_ QSqlError* sqlError = nullptr) const;
 
 	// reimplemented (CObjectCollectionBase)
-	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override;
+	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override = 0;
 
 protected:
 	I_REF(IDatabaseEngine, m_dbEngine);
