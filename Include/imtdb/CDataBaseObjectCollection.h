@@ -1,5 +1,7 @@
 #pragma once
 
+// Qt includes
+#include <QtSql>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -30,7 +32,9 @@ public:
 	explicit CDataBaseObjectCollection();
 	virtual ~CDataBaseObjectCollection();
 
-	virtual void Refresh() = 0;
+	virtual void Refresh();
+
+	virtual const istd::IChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record) const = 0;
 
 	// reimplemented (imtbase::IObjectCollection)
 	virtual QByteArray InsertNewObject(

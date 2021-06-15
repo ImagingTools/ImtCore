@@ -25,7 +25,6 @@
 #define _Outptr_opt_
 #endif
 
-
 // Qt includes
 #include <QtSql>
 

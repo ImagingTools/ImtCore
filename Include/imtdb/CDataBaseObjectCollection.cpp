@@ -13,6 +13,15 @@ CDataBaseObjectCollection::~CDataBaseObjectCollection()
 {
 }
 
+void CDataBaseObjectCollection::Refresh()
+{
+	QSqlQuery sqlQuery= this->ExecSelectSqlQuery();
+	while (sqlQuery.next()) {
+		auto newObj = this->CreateObjectFromSqlRecord(sqlQuery.record());
+		CDataBaseObjectCollection::CObjectCollectionBase::InsertNewObject("","","",newObj, "");
+	}
+}
+
 QSqlQuery CDataBaseObjectCollection::ExecSelectSqlQuery(QVariantMap bindValues, QSqlError* sqlError) const
 {
 	return m_dbEngine->ExecSqlQuery(*m_selectSqlQueryString, bindValues, sqlError);
@@ -55,26 +64,6 @@ const IDataBaseChangeable* const CDataBaseObjectCollection::GetObjectPtrById(con
 	return retval;
 }
 
-std::pair<QString, QVariant> CDataBaseObjectCollection::MakeSqlBindBalue(const QByteArray& propName, const IDataBaseChangeable* const object)
-{
-	std::pair<QByteArray, QVariant> retval = std::make_pair(QByteArray(), QVariant());
-	if(object != nullptr)
-	{
-		retval = std::make_pair(QByteArray(":") + propName, object->GetProperty(propName));
-	}
-	return retval;
-}
-QVariantMap CDataBaseObjectCollection::MakeSqlBindBaluesList(const IDataBaseChangeable* const object)
-{
-	QVariantMap retval;
-	QByteArrayList props = object->GetProperties();
-	for(const auto& prop: ::qAsConst(props))
-	{
-		auto val = CDataBaseObjectCollection::MakeSqlBindBalue(prop, object);
-		retval.insert(val.first, val.second);
-	}
-	return retval;
-}
 
 
 } // namespace imod
