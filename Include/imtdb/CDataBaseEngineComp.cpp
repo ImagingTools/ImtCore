@@ -13,8 +13,6 @@ namespace imtdb
 	
 CDataBaseEngineComp::CDataBaseEngineComp()
 {
-
-			
 }
 	
 QString CDataBaseEngineComp::ConnectionName() const

@@ -64,6 +64,37 @@ const IDataBaseChangeable* const CDataBaseObjectCollection::GetObjectPtrById(con
 	return retval;
 }
 
+const IDataBaseChangeable* CDataBaseObjectCollection::CreateObjectFromSqlRecord(const QSqlRecord& record) const
+{
+	Q_ASSERT_X(0, Q_FUNC_INFO, "Unreimplemented method call");
+	return nullptr;
+}
+
+QByteArray CDataBaseObjectCollection::InsertNewObject(const QByteArray& typeId, const QString& name, const QString& description, const istd::IChangeable* defaultValuePtr, const QByteArray& preferredId)
+{
+	Q_ASSERT_X(0, Q_FUNC_INFO, "Unreimplemented method call");
+	return nullptr;
+}
+
+bool CDataBaseObjectCollection::RemoveObject(const QByteArray& objectId)
+{
+	Q_ASSERT_X(0, Q_FUNC_INFO, "Unreimplemented method call");
+	return false;
+}
+
+bool CDataBaseObjectCollection::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode)
+{
+	Q_ASSERT_X(0, Q_FUNC_INFO, "Unreimplemented method call");
+	return false;
+}
+
+istd::IChangeable* CDataBaseObjectCollection::CreateObjectInstance(const QByteArray& typeId) const
+{
+	Q_ASSERT_X(0, Q_FUNC_INFO, "Unreimplemented method call");
+	return nullptr;
+}
+
+
 
 
 } // namespace imod

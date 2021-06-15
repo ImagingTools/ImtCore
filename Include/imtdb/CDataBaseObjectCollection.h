@@ -12,29 +12,31 @@
 #include <imtdb/IDataBaseEngine.h>
 #include <imtdb/IDataBaseChangeable.h>
 
-
-#define IMTDB__C_DATA_BASE_OBJECT_COLLECTION_COMP__INIT \
-		I_ASSIGN(m_dbEngine, "DataBaseEngine", "DataBase for getting data", true, "IDatabaseEngine");\
-		I_ASSIGN(m_updateOnDataBaseConnected, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", false, true);\
-		I_ASSIGN(m_selectSqlQueryString, "SelectSqlQueryString", "Sql query string for Selecting in database", true, "");\
-		I_ASSIGN(m_insertSqlQueryString, "InsertSqlQueryString", "Sql query string for Inserting in database", true, "");\
-		I_ASSIGN(m_updateSqlQueryString, "UpdateSqlQueryString", "Sql query string for Updateing in database", true, "");\
-		I_ASSIGN(m_deleteSqlQueryString, "DeleteSqlQueryString", "Sql query string for Deleteing in database", true, "");
-
 namespace imtdb
 {
 /**
 	Basic implementation of a DataBase based model.
 */
-class CDataBaseObjectCollection: public imtbase::CObjectCollectionBase
+class CDataBaseObjectCollection: public imtbase::CObjectCollectionBase, public ilog::CLoggerComponentBase
 {
 public:
+	typedef ilog::CLoggerComponentBase BaseClass;
+
 	explicit CDataBaseObjectCollection();
 	virtual ~CDataBaseObjectCollection();
 
+	I_BEGIN_COMPONENT(CDataBaseObjectCollection);
+		I_ASSIGN(m_dbEngine, "DataBaseEngine", "DataBase for getting data", true, "IDatabaseEngine");
+		I_ASSIGN(m_updateOnDataBaseConnected, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", false, true);
+		I_ASSIGN(m_selectSqlQueryString, "SelectSqlQueryString", "Sql query string for Selecting in database", true, "");
+		I_ASSIGN(m_insertSqlQueryString, "InsertSqlQueryString", "Sql query string for Inserting in database", true, "");
+		I_ASSIGN(m_updateSqlQueryString, "UpdateSqlQueryString", "Sql query string for Updateing in database", true, "");
+		I_ASSIGN(m_deleteSqlQueryString, "DeleteSqlQueryString", "Sql query string for Deleteing in database", true, "");
+	I_END_COMPONENT;
+
 	virtual void Refresh();
 
-	virtual const IDataBaseChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record) const = 0;
+	virtual const IDataBaseChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record) const;
 
 	// reimplemented (imtbase::IObjectCollection)
 	virtual QByteArray InsertNewObject(
@@ -42,9 +44,9 @@ public:
 				const QString& name,
 				const QString& description,
 				const istd::IChangeable* defaultValuePtr = nullptr,
-				const QByteArray& preferredId= QByteArray()) override = 0;
-	virtual bool RemoveObject(const QByteArray& objectId) override = 0;
-	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override = 0;
+				const QByteArray& preferredId= QByteArray()) override;
+	virtual bool RemoveObject(const QByteArray& objectId) override;
+	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
 	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
@@ -68,7 +70,7 @@ protected:
 				_Outptr_opt_ QSqlError* sqlError = nullptr) const;
 
 	// reimplemented (CObjectCollectionBase)
-	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override = 0;
+	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override;
 
 protected:
 	I_REF(IDatabaseEngine, m_dbEngine);
