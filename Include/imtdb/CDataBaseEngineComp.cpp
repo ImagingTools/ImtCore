@@ -69,7 +69,7 @@ QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 	QByteArray _queryString = queryString;
 	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value)
 	{
-		if(value->isValid() && !value->isNull())
+		if(!value->isValid() || value->isNull())
 			this->DrectBindValue(&_queryString, value.key().toUtf8(), " DEFAULT ");
 	}
 	QSqlQuery retval(_queryString, m_db);
