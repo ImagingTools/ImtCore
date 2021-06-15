@@ -18,7 +18,7 @@ void CDataBaseObjectCollection::Refresh()
 	QSqlQuery sqlQuery= this->ExecSelectSqlQuery();
 	while (sqlQuery.next()) {
 		auto newObj = this->CreateObjectFromSqlRecord(sqlQuery.record());
-		CDataBaseObjectCollection::CObjectCollectionBase::InsertNewObject("","","",newObj, "");
+		CDataBaseObjectCollection::CObjectCollectionBase::InsertNewObject("","","",newObj, newObj->GetID());
 	}
 }
 

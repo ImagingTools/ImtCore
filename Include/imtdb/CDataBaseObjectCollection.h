@@ -34,7 +34,7 @@ public:
 
 	virtual void Refresh();
 
-	virtual const istd::IChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record) const = 0;
+	virtual const IDataBaseChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record) const = 0;
 
 	// reimplemented (imtbase::IObjectCollection)
 	virtual QByteArray InsertNewObject(
