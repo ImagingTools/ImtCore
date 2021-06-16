@@ -10,6 +10,7 @@
 // ImtCore includes
 #include <imtbase/CObjectCollectionBase.h>
 #include <imtdb/IDataBaseEngine.h>
+#include <imtdb/CDataBaseEngineComp.h>
 #include <imtdb/IDataBaseChangeable.h>
 
 namespace imtdb

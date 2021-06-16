@@ -45,6 +45,8 @@ public:
 	Q_REQUIRED_RESULT virtual QSqlQuery ExecSqlQueryFromFile(const QByteArray& filePath, const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const override;
 
 	static void DrectBindValue(_Inout_ QByteArray* string, _In_ const QByteArray& what, _In_ const QByteArray& expr);
+	static void DrectBindValueInsertDefault(_Inout_ QByteArray* string, _In_ const QByteArray& what);
+	static void DrectBindValueUpdateDefault(_Inout_ QByteArray* string, _In_ const QByteArray& what);
 
 
 private:

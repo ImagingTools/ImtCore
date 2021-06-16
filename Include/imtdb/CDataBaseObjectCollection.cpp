@@ -29,12 +29,24 @@ QSqlQuery CDataBaseObjectCollection::ExecSelectSqlQuery(const QVariantMap bindVa
 
 QSqlQuery CDataBaseObjectCollection::ExecUpdateSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
 {
-	return m_dbEngine->ExecSqlQuery(*m_updateSqlQueryString, bindValues, sqlError);
+	QByteArray _queryString = *m_updateSqlQueryString;
+	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value)
+	{
+		if(!value->isValid() || value->isNull())
+			CDataBaseEngineComp::DrectBindValueUpdateDefault(&_queryString, value.key().toUtf8());
+	}
+	return m_dbEngine->ExecSqlQuery(_queryString, bindValues, sqlError);
 }
 
 QSqlQuery CDataBaseObjectCollection::ExecInsertSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
 {
-	return m_dbEngine->ExecSqlQuery(*m_insertSqlQueryString, bindValues, sqlError);
+	QByteArray _queryString = *m_insertSqlQueryString;
+	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value)
+	{
+		if(!value->isValid() || value->isNull())
+			CDataBaseEngineComp::DrectBindValueInsertDefault(&_queryString, value.key().toUtf8());
+	}
+	return m_dbEngine->ExecSqlQuery(_queryString, bindValues, sqlError);
 }
 
 QSqlQuery CDataBaseObjectCollection::ExecDeleteSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const

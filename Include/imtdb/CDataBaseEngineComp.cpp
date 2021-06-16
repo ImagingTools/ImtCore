@@ -64,13 +64,7 @@ QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 
 QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError) const
 {
-	QByteArray _queryString = queryString;
-	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value)
-	{
-		if(!value->isValid() || value->isNull())
-			this->DrectBindValue(&_queryString, value.key().toUtf8(), " DEFAULT ");
-	}
-	QSqlQuery retval(_queryString, m_db);
+	QSqlQuery retval(queryString, m_db);
 	retval.exec();
 	if(sqlError)
 	{
@@ -82,7 +76,7 @@ QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 					<< "\n\t| what(): sqlError Occured"
 					<< "\n\t| DataBase error" << m_db.lastError().text()
 					<< "\n\t| Query error" << retval.lastError().text()
-					<< "\n\t| Executed query" << _queryString
+					<< "\n\t| Executed query" << queryString
 					<< "\n\t| Values" << bindValues
 					   ;
 	}
@@ -134,7 +128,22 @@ void CDataBaseEngineComp::DrectBindValue(QByteArray* string, const QByteArray& w
 	}
 }
 
+void CDataBaseEngineComp::DrectBindValueInsertDefault(QByteArray* string, const QByteArray& what)
+{
+	CDataBaseEngineComp::DrectBindValue(string, what, " DEFAULT ");
+}
 
+void CDataBaseEngineComp::DrectBindValueUpdateDefault(QByteArray* string, const QByteArray& what)
+{
+	QByteArray newValue = what;
+	if(newValue.startsWith(':'))
+	{
+		newValue.remove(0,1);
+		newValue.append('"');
+		newValue.prepend('"');
+		CDataBaseEngineComp::DrectBindValue(string, what, newValue);
+	}
+}
 
 
 };// namespace imtdb
