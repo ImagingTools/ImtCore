@@ -57,16 +57,16 @@ protected:
 
 	const IDataBaseChangeable* const GetObjectPtrById(const QByteArray& id) const;
 	Q_REQUIRED_RESULT virtual QSqlQuery ExecSelectSqlQuery(
-				_In_opt_ QVariantMap bindValues = {},
+				_In_opt_ const QVariantMap bindValues = {},
 				_Outptr_opt_ QSqlError* sqlError = nullptr) const;
 	virtual QSqlQuery ExecUpdateSqlQuery(
-				_In_ QVariantMap bindValues,
+				_In_ const QVariantMap bindValues,
 				_Outptr_opt_ QSqlError* sqlError = nullptr) const;
 	Q_REQUIRED_RESULT virtual QSqlQuery ExecInsertSqlQuery(
-				_In_ QVariantMap bindValues,
+				_In_ const QVariantMap bindValues,
 				_Outptr_opt_ QSqlError* sqlError = nullptr) const;
 	virtual QSqlQuery ExecDeleteSqlQuery(
-				_In_opt_ QVariantMap bindValues,
+				_In_opt_ const QVariantMap bindValues,
 				_Outptr_opt_ QSqlError* sqlError = nullptr) const;
 
 	// reimplemented (CObjectCollectionBase)

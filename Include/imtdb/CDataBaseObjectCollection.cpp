@@ -22,22 +22,22 @@ void CDataBaseObjectCollection::Refresh()
 	}
 }
 
-QSqlQuery CDataBaseObjectCollection::ExecSelectSqlQuery(QVariantMap bindValues, QSqlError* sqlError) const
+QSqlQuery CDataBaseObjectCollection::ExecSelectSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
 {
 	return m_dbEngine->ExecSqlQuery(*m_selectSqlQueryString, bindValues, sqlError);
 }
 
-QSqlQuery CDataBaseObjectCollection::ExecUpdateSqlQuery(QVariantMap bindValues, QSqlError* sqlError) const
+QSqlQuery CDataBaseObjectCollection::ExecUpdateSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
 {
 	return m_dbEngine->ExecSqlQuery(*m_updateSqlQueryString, bindValues, sqlError);
 }
 
-QSqlQuery CDataBaseObjectCollection::ExecInsertSqlQuery(QVariantMap bindValues, QSqlError* sqlError) const
+QSqlQuery CDataBaseObjectCollection::ExecInsertSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
 {
 	return m_dbEngine->ExecSqlQuery(*m_insertSqlQueryString, bindValues, sqlError);
 }
 
-QSqlQuery CDataBaseObjectCollection::ExecDeleteSqlQuery(QVariantMap bindValues, QSqlError* sqlError) const
+QSqlQuery CDataBaseObjectCollection::ExecDeleteSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
 {
 	return m_dbEngine->ExecSqlQuery(*m_deleteSqlQueryString, bindValues, sqlError);
 }
