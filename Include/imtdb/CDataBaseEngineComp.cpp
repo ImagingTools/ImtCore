@@ -31,6 +31,7 @@ bool CDataBaseEngineComp::OpenDataBase()
 	m_db.setHostName(*m_hostName);
 	m_db.setUserName(*m_userName);
 	m_db.setPassword(*m_pasword);
+	m_db.setDatabaseName(*m_dbName);
 	int port = *m_port;
 	m_db.setPort(port);
 	return m_db.open();
@@ -44,7 +45,8 @@ void CDataBaseEngineComp::CloseDataBase()
 
 QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlError) const
 {
-	QSqlQuery retval(queryString, m_db);
+	QSqlQuery retval(m_db);
+	retval.prepare(queryString);
 	retval.exec();
 	if(sqlError)
 	{
@@ -64,7 +66,8 @@ QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 
 QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError) const
 {
-	QSqlQuery retval(queryString, m_db);
+	QSqlQuery retval(m_db);
+	retval.prepare(queryString);
 	retval.exec();
 	if(sqlError)
 	{

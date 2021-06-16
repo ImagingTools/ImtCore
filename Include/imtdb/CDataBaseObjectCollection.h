@@ -29,10 +29,10 @@ public:
 	I_BEGIN_COMPONENT(CDataBaseObjectCollection);
 		I_ASSIGN(m_dbEngine, "DataBaseEngine", "DataBase for getting data", true, "IDatabaseEngine");
 		I_ASSIGN(m_updateOnDataBaseConnected, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", false, true);
-		I_ASSIGN(m_selectSqlQueryString, "SelectSqlQueryString", "Sql query string for Selecting in database", true, "");
-		I_ASSIGN(m_insertSqlQueryString, "InsertSqlQueryString", "Sql query string for Inserting in database", true, "");
-		I_ASSIGN(m_updateSqlQueryString, "UpdateSqlQueryString", "Sql query string for Updateing in database", true, "");
-		I_ASSIGN(m_deleteSqlQueryString, "DeleteSqlQueryString", "Sql query string for Deleteing in database", true, "");
+		I_ASSIGN(m_selectSqlQueryPath, "SelectSqlQueryPath", "Sql query string file path for Selecting in database", false, "");
+		I_ASSIGN(m_insertSqlQueryPath, "InsertSqlQueryPath", "Sql query string file path for Inserting in database", false, "");
+		I_ASSIGN(m_updateSqlQueryPath, "UpdateSqlQueryPath", "Sql query string file path for Updateing in database", false, "");
+		I_ASSIGN(m_deleteSqlQueryPath, "DeleteSqlQueryPath", "Sql query string file path for Deleteing in database", false, "");
 	I_END_COMPONENT;
 
 	virtual void Refresh();
@@ -56,6 +56,7 @@ protected:
 	static inline std::pair<QString, QVariant> MakeSqlBindBalue(const QByteArray& propName, const IDataBaseChangeable* const object);
 	static inline QVariantMap MakeSqlBindBaluesList(const IDataBaseChangeable* const object);
 
+	QByteArray GetQueryStringFromFile(const QByteArray& filePath) const;
 	const IDataBaseChangeable* const GetObjectPtrById(const QByteArray& id) const;
 	Q_REQUIRED_RESULT virtual QSqlQuery ExecSelectSqlQuery(
 				_In_opt_ const QVariantMap bindValues = {},
@@ -76,10 +77,10 @@ protected:
 protected:
 	I_REF(IDatabaseEngine, m_dbEngine);
 	I_ATTR(bool, m_updateOnDataBaseConnected);
-	I_ATTR(QByteArray, m_selectSqlQueryString);
-	I_ATTR(QByteArray, m_insertSqlQueryString);
-	I_ATTR(QByteArray, m_updateSqlQueryString);
-	I_ATTR(QByteArray, m_deleteSqlQueryString);
+	I_ATTR(QByteArray, m_selectSqlQueryPath);
+	I_ATTR(QByteArray, m_insertSqlQueryPath);
+	I_ATTR(QByteArray, m_updateSqlQueryPath);
+	I_ATTR(QByteArray, m_deleteSqlQueryPath);
 };
 
 

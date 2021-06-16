@@ -24,12 +24,12 @@ void CDataBaseObjectCollection::Refresh()
 
 QSqlQuery CDataBaseObjectCollection::ExecSelectSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
 {
-	return m_dbEngine->ExecSqlQuery(*m_selectSqlQueryString, bindValues, sqlError);
+	return m_dbEngine->ExecSqlQuery(this->GetQueryStringFromFile(*m_selectSqlQueryPath), bindValues, sqlError);
 }
 
 QSqlQuery CDataBaseObjectCollection::ExecUpdateSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
 {
-	QByteArray _queryString = *m_updateSqlQueryString;
+	QByteArray _queryString = this->GetQueryStringFromFile(*m_updateSqlQueryPath);
 	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value)
 	{
 		if(!value->isValid() || value->isNull())
@@ -40,7 +40,7 @@ QSqlQuery CDataBaseObjectCollection::ExecUpdateSqlQuery(const QVariantMap bindVa
 
 QSqlQuery CDataBaseObjectCollection::ExecInsertSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
 {
-	QByteArray _queryString = *m_insertSqlQueryString;
+	QByteArray _queryString = this->GetQueryStringFromFile(*m_insertSqlQueryPath);
 	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value)
 	{
 		if(!value->isValid() || value->isNull())
@@ -51,7 +51,7 @@ QSqlQuery CDataBaseObjectCollection::ExecInsertSqlQuery(const QVariantMap bindVa
 
 QSqlQuery CDataBaseObjectCollection::ExecDeleteSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
 {
-	return m_dbEngine->ExecSqlQuery(*m_deleteSqlQueryString, bindValues, sqlError);
+	return m_dbEngine->ExecSqlQuery(this->GetQueryStringFromFile(*m_deleteSqlQueryPath), bindValues, sqlError);
 }
 
 void CDataBaseObjectCollection::SetObjectName(const QByteArray& objectId, const QString& objectName)
@@ -104,6 +104,26 @@ istd::IChangeable* CDataBaseObjectCollection::CreateObjectInstance(const QByteAr
 {
 	Q_ASSERT_X(0, Q_FUNC_INFO, "Unreimplemented method call");
 	return nullptr;
+}
+
+QByteArray CDataBaseObjectCollection::GetQueryStringFromFile(const QByteArray& filePath) const
+{
+	QByteArray retval;
+	QFile queryFile(filePath);
+	if(!queryFile.open(QFile::ReadOnly))
+	{
+		qCritical() << __FILE__ << __LINE__
+					<< "\n\t| what(): Unable to open file"
+					<< "\n\t| fileName(): " << queryFile.fileName()
+					<< "\n\t| path(): " << filePath
+					   ;
+	}
+	else
+	{
+		retval = queryFile.readAll();
+		queryFile.close();
+	}
+	return retval;
 }
 
 
