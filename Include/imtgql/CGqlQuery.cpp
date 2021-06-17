@@ -21,7 +21,7 @@ imtgql::IGqlRequest::RequestType CGqlQuery::GetRequestType() const
 
 QByteArray CGqlQuery::GetQuery() const
 {
-	return "query " + m_commandId + " { " + m_commandId + QString(" { data %1 } }").arg(CreateFieldQueryPart()).toUtf8();
+	return "query " + m_commandId + " { " + m_commandId + QString(" { data { %1 } } }").arg(CreateFieldQueryPart()).toUtf8();
 }
 
 
@@ -31,15 +31,15 @@ QString CGqlQuery::CreateFieldQueryPart() const
 {
 	QString fields;
 
-	fields += "{";
-
 	QByteArrayList fieldList = GetFields();
 
 	for (int i = 0; i < fieldList.count(); ++i){
 		fields += fieldList[i];
-	}
 
-	fields += "}";
+		if (i < fieldList.count() - 1){
+			fields += ", ";
+		}
+	}
 
 	return fields;
 }
