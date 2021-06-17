@@ -58,6 +58,22 @@ QByteArrayList CGqlRequestBase::GetFieldArguments(const QByteArray& /*fieldId*/)
 }
 
 
+// reimplemented (iser::IObject)
+
+QByteArray CGqlRequestBase::GetFactoryId() const
+{
+	return m_commandId;
+}
+
+
+// reimplemented (iser::ISerializable)
+
+bool CGqlRequestBase::Serialize(iser::IArchive& /*archive*/)
+{
+	return false;
+}
+
+
 } // namespace imtgql
 
 

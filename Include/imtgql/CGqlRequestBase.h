@@ -22,6 +22,12 @@ public:
 	virtual QByteArrayList GetFields() const override;
 	virtual QByteArrayList GetFieldArguments(const QByteArray& fieldId) const override;
 
+	// reimplemented (iser::IObject)
+	virtual QByteArray GetFactoryId() const override;
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
+
 protected:
 	struct Argument
 	{
