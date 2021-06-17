@@ -68,6 +68,10 @@ QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 {
 	QSqlQuery retval(m_db);
 	retval.prepare(queryString);
+	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++ value)
+	{
+		retval.bindValue(value.key(), *value);
+	}
 	retval.exec();
 	if(sqlError)
 	{
@@ -80,7 +84,9 @@ QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 					<< "\n\t| DataBase error" << m_db.lastError().text()
 					<< "\n\t| Query error" << retval.lastError().text()
 					<< "\n\t| Executed query" << queryString
-					<< "\n\t| Values" << bindValues
+					<< "\n\t| Bind Values" << bindValues
+					<< "\n\t| Bound Values" << retval.boundValues()
+					<< "\n\t| QExecuted query" << ::qPrintable(retval.executedQuery())
 					   ;
 	}
 	return retval;

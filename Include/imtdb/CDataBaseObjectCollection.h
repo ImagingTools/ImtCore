@@ -28,7 +28,7 @@ public:
 
 	I_BEGIN_COMPONENT(CDataBaseObjectCollection);
 		I_ASSIGN(m_dbEngine, "DataBaseEngine", "DataBase for getting data", true, "IDatabaseEngine");
-		I_ASSIGN(m_updateOnDataBaseConnected, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", false, true);
+		I_ASSIGN(m_updateOnDataBaseConnected, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", true, false);
 		I_ASSIGN(m_selectSqlQueryPath, "SelectSqlQueryPath", "Sql query string file path for Selecting in database", false, "");
 		I_ASSIGN(m_insertSqlQueryPath, "InsertSqlQueryPath", "Sql query string file path for Inserting in database", false, "");
 		I_ASSIGN(m_updateSqlQueryPath, "UpdateSqlQueryPath", "Sql query string file path for Updateing in database", false, "");
