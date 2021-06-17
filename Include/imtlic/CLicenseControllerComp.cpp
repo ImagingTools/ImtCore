@@ -97,23 +97,22 @@ void CLicenseControllerComp::ReadLicenseFile()
 		int daysUntilExpire = -1;
 		if (LoadFingerprint(fingerprintFilePath, daysUntilExpire)){
 			SendWarningMessage(0, QString(QObject::tr("You have no valid license to run this software anymore. You have %1 day(s) to update your system with a valid license")).arg(daysUntilExpire), "License Management");
-
-			int oneHour = 1000 * 60 * 60;
-
-			QTimer::singleShot(oneHour, this, &CLicenseControllerComp::OnFingeprintCheckTimer);
 		}
 		else{
 			SendErrorMessage(0, QString(QObject::tr("You have no license to run this software. License file: '%1'")).arg(licenseFilePath), "License Management");
 		}
+	}
+	else{
+		if (!UpdateFingerprint(fingerprintFilePath)){
+			SendErrorMessage(0, QString(QObject::tr("License fingerprint could not be updated")), "License Management");
+		}
 
-		return;
+		SendInfoMessage(0, QString(QObject::tr("License was successfully loaded")), "License Management");
 	}
 
-	if (!UpdateFingerprint(fingerprintFilePath)){
-		SendErrorMessage(0, QString(QObject::tr("License fingerprint could not be updated")), "License Management");
-	}
+	int oneHour = 1000 * 60 * 60;
 
-	SendInfoMessage(0, QString(QObject::tr("License was successfully loaded")), "License Management");
+	QTimer::singleShot(oneHour, this, &CLicenseControllerComp::OnFingeprintCheckTimer);
 }
 
 
@@ -192,7 +191,7 @@ void CLicenseControllerComp::OnLicenseKeysUpdated(
 
 void CLicenseControllerComp::OnFingeprintCheckTimer()
 {
-	SendInfoMessage(0, tr("Checking license fingerprint"), tr("License Controller"));
+	SendVerboseMessage(tr("Checking license fingerprint"), tr("License Controller"));
 
 	ReadLicenseFile();
 }

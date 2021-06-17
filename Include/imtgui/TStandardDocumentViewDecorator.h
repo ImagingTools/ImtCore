@@ -73,7 +73,6 @@ protected:
 
 protected:
 	istd::IPolymorphic* m_viewObjectPtr;
-	idoc::IUndoManager* m_undoManagerPtr;
 	const ifile::IFilePersistence* m_filePersistencePtr;
 	idoc::IDocumentManager* m_parentPtr;
 	bool m_isInitialized;
@@ -122,8 +121,6 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	istd::IChangeable* documentPtr = m_parentPtr->GetDocumentFromView(*viewPtr);
 	Q_ASSERT(documentPtr != nullptr);
 
-	m_undoManagerPtr = m_parentPtr->GetUndoManagerForDocument(documentPtr);
-
 	m_commands.InsertChild(&m_newCommand);
 	m_commands.InsertChild(&m_openCommand);
 	m_commands.InsertChild(&m_undoCommand);
@@ -137,10 +134,12 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	m_undoCommand.setEnabled(false);
 	m_redoCommand.setEnabled(false);
 
-	UI::UndoButton->setVisible(m_undoManagerPtr != nullptr);
-	UI::RedoButton->setVisible(m_undoManagerPtr != nullptr);
-	m_undoCommand.setVisible(m_undoManagerPtr != nullptr);
-	m_redoCommand.setVisible(m_undoManagerPtr != nullptr);
+	idoc::IUndoManager* undoManagerPtr = m_parentPtr->GetUndoManagerForDocument(documentPtr);
+
+	UI::UndoButton->setVisible(undoManagerPtr != nullptr);
+	UI::RedoButton->setVisible(undoManagerPtr != nullptr);
+	m_undoCommand.setVisible(undoManagerPtr != nullptr);
+	m_redoCommand.setVisible(undoManagerPtr != nullptr);
 
 	m_newCommand.setShortcut(Qt::CTRL + Qt::Key_N);
 	m_openCommand.setShortcut(Qt::CTRL + Qt::Key_O);
@@ -190,7 +189,7 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 		}
 	}
 	
-	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_undoManagerPtr);
+	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(undoManagerPtr);
 	if (modelPtr != nullptr){
 		RegisterModel(modelPtr, MI_UNDO_MANAGER);
 	}
@@ -217,8 +216,9 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::UpdateSaveButtonsStatus(
 {
 	bool isSaveActive = true;
 
-	if (m_undoManagerPtr != nullptr){
-		isSaveActive = isSaveActive && (m_undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL);
+	idoc::IUndoManager* undoManagerPtr = this->GetObjectAt<idoc::IUndoManager>(MI_UNDO_MANAGER);
+	if (undoManagerPtr != nullptr){
+		isSaveActive = isSaveActive && (undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL);
 	}
 
 	idoc::IDocumentManager::DocumentInfo documentInfo = {};
@@ -342,11 +342,14 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::OnModelChanged(int model
 
 	switch (modelId){
 		case MI_UNDO_MANAGER:
-			if (m_undoManagerPtr != nullptr){
-				UI::UndoButton->setEnabled(m_undoManagerPtr->GetAvailableUndoSteps() > 0);
-				UI::RedoButton->setEnabled(m_undoManagerPtr->GetAvailableRedoSteps() > 0);
-				m_undoCommand.setEnabled(m_undoManagerPtr->GetAvailableUndoSteps() > 0);
-				m_redoCommand.setEnabled(m_undoManagerPtr->GetAvailableRedoSteps() > 0);
+			{
+				idoc::IUndoManager* undoManagerPtr = this->GetObjectAt<idoc::IUndoManager>(MI_UNDO_MANAGER);
+				Q_ASSERT(undoManagerPtr != nullptr);
+
+				UI::UndoButton->setEnabled(undoManagerPtr->GetAvailableUndoSteps() > 0);
+				UI::RedoButton->setEnabled(undoManagerPtr->GetAvailableRedoSteps() > 0);
+				m_undoCommand.setEnabled(undoManagerPtr->GetAvailableUndoSteps() > 0);
+				m_redoCommand.setEnabled(undoManagerPtr->GetAvailableRedoSteps() > 0);
 			}
 			break;
 

@@ -145,7 +145,7 @@ void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnTryClose(bool* ig
 			documentData.isDirty = false;
 		}
 
-		BaseClass::CloseAllDocuments();
+		CloseAllDocuments();
 	}
 
 	if (ignoredPtr != nullptr){
@@ -339,7 +339,7 @@ void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnGuiCreated()
 template <class DocumentManagerBase, class UI>
 void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnGuiDestroyed()
 {
-	BaseClass::CloseAllDocuments();
+	CloseAllDocuments();
 
 	BaseClass::OnGuiDestroyed();
 }
