@@ -3,16 +3,6 @@
 
 namespace imtdb
 {
-
-CDataBaseObjectCollection::CDataBaseObjectCollection():imtbase::CObjectCollectionBase()
-{
-}
-
-
-CDataBaseObjectCollection::~CDataBaseObjectCollection()
-{
-}
-
 void CDataBaseObjectCollection::Refresh()
 {
 	QSqlQuery sqlQuery= this->ExecSelectSqlQuery();
@@ -22,51 +12,37 @@ void CDataBaseObjectCollection::Refresh()
 	}
 }
 
-QSqlQuery CDataBaseObjectCollection::ExecSelectSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
+QSqlQuery CDataBaseObjectCollection::ExecSelectSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
 {
 	return m_dbEngine->ExecSqlQuery(this->GetQueryStringFromFile(*m_selectSqlQueryPath), bindValues, sqlError);
 }
 
-QSqlQuery CDataBaseObjectCollection::ExecUpdateSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
+QSqlQuery CDataBaseObjectCollection::ExecUpdateSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
 {
 	QByteArray _queryString = this->GetQueryStringFromFile(*m_updateSqlQueryPath);
-	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value)
-	{
-		if(!value->isValid() || value->isNull())
+	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value) {
+		if(!value->isValid() || value->isNull()) {
 			CDataBaseEngineComp::DrectBindValueUpdateDefault(&_queryString, value.key().toUtf8());
+		}
 	}
+
 	return m_dbEngine->ExecSqlQuery(_queryString, bindValues, sqlError);
 }
 
-QSqlQuery CDataBaseObjectCollection::ExecInsertSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
+QSqlQuery CDataBaseObjectCollection::ExecInsertSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
 {
 	QByteArray _queryString = this->GetQueryStringFromFile(*m_insertSqlQueryPath);
-	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value)
-	{
+	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value) {
 		if(!value->isValid() || value->isNull())
 			CDataBaseEngineComp::DrectBindValueInsertDefault(&_queryString, value.key().toUtf8());
 	}
+
 	return m_dbEngine->ExecSqlQuery(_queryString, bindValues, sqlError);
 }
 
-QSqlQuery CDataBaseObjectCollection::ExecDeleteSqlQuery(const QVariantMap bindValues, QSqlError* sqlError) const
+QSqlQuery CDataBaseObjectCollection::ExecDeleteSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
 {
 	return m_dbEngine->ExecSqlQuery(this->GetQueryStringFromFile(*m_deleteSqlQueryPath), bindValues, sqlError);
-}
-
-void CDataBaseObjectCollection::SetObjectName(const QByteArray& objectId, const QString& objectName)
-{
-	CObjectCollectionBase::SetObjectName(objectId, objectName);
-}
-
-void CDataBaseObjectCollection::SetObjectDescription(const QByteArray& objectId, const QString& objectDescription)
-{
-	CObjectCollectionBase::SetObjectDescription(objectId, objectDescription);
-}
-
-void CDataBaseObjectCollection::SetObjectEnabled(const QByteArray& objectId, bool isEnabled)
-{
-	CObjectCollectionBase::SetObjectEnabled(objectId, isEnabled);
 }
 
 const IDataBaseChangeable* const CDataBaseObjectCollection::GetObjectPtrById(const QByteArray& id) const
@@ -110,19 +86,18 @@ QByteArray CDataBaseObjectCollection::GetQueryStringFromFile(const QByteArray& f
 {
 	QByteArray retval;
 	QFile queryFile(filePath);
-	if(!queryFile.open(QFile::ReadOnly))
-	{
+	if(!queryFile.open(QFile::ReadOnly)) {
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| what(): Unable to open file"
 					<< "\n\t| fileName(): " << queryFile.fileName()
 					<< "\n\t| path(): " << filePath
 					   ;
 	}
-	else
-	{
+	else {
 		retval = queryFile.readAll();
 		queryFile.close();
 	}
+
 	return retval;
 }
 

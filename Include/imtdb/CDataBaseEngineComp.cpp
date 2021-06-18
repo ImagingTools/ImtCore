@@ -10,11 +10,7 @@
 
 namespace imtdb
 {
-	
-CDataBaseEngineComp::CDataBaseEngineComp()
-{
-}
-	
+
 QString CDataBaseEngineComp::ConnectionName() const
 {
 	return m_db.connectionName();
@@ -48,12 +44,11 @@ QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 	QSqlQuery retval(m_db);
 	retval.prepare(queryString);
 	retval.exec();
-	if(sqlError)
-	{
+	if(sqlError) {
 		*sqlError = m_db.lastError().type() ? m_db.lastError() : retval.lastError();
 	}
-	if(m_db.lastError().type() || retval.lastError().type())
-	{
+
+	if(m_db.lastError().type() || retval.lastError().type()) {
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| what() sqlError Occured"
 					<< "\n\t| DataBase error" << m_db.lastError().text()
@@ -61,6 +56,7 @@ QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 					<< "\n\t| Executed query" << queryString
 					   ;
 	}
+
 	return retval;
 }
 
@@ -68,17 +64,16 @@ QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 {
 	QSqlQuery retval(m_db);
 	retval.prepare(queryString);
-	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++ value)
-	{
+	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++ value) {
 		retval.bindValue(value.key(), *value);
 	}
+
 	retval.exec();
-	if(sqlError)
-	{
+	if(sqlError) {
 		*sqlError = m_db.lastError().type() ? m_db.lastError() : retval.lastError();
 	}
-	if(m_db.lastError().type() || retval.lastError().type())
-	{
+
+	if(m_db.lastError().type() || retval.lastError().type()) {
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| what(): sqlError Occured"
 					<< "\n\t| DataBase error" << m_db.lastError().text()
@@ -89,6 +84,7 @@ QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 					<< "\n\t| QExecuted query" << ::qPrintable(retval.executedQuery())
 					   ;
 	}
+
 	return retval;
 }
 
@@ -119,21 +115,19 @@ void CDataBaseEngineComp::DrectBindValue(QByteArray* string, const QByteArray& w
 	QRegularExpression regExp(what);
 
 	auto globalMatch = regExp.globalMatch(*string);
-	while( globalMatch.hasNext() )
-	{
+	while(globalMatch.hasNext()) {
 		auto regMatch = globalMatch.next();
-		if(regMatch.capturedEnd() < string->length()-1)
-		{
+		if(regMatch.capturedEnd() < string->length()-1) 	{
 			QChar nextSym = string->at(regMatch.capturedEnd());
-			if(!nextSym.isLetter())
-			{
+			if(!nextSym.isLetter()) {
 				string->replace(regMatch.capturedStart(), regMatch.capturedLength(), expr);
 			}
+
 		}
-		else
-		{
+		else {
 			string->replace(regMatch.capturedStart(), string->length()-1, expr);
 		}
+
 	}
 }
 
@@ -145,8 +139,7 @@ void CDataBaseEngineComp::DrectBindValueInsertDefault(QByteArray* string, const 
 void CDataBaseEngineComp::DrectBindValueUpdateDefault(QByteArray* string, const QByteArray& what)
 {
 	QByteArray newValue = what;
-	if(newValue.startsWith(':'))
-	{
+	if(newValue.startsWith(':')) {
 		newValue.remove(0,1);
 		newValue.append('"');
 		newValue.prepend('"');

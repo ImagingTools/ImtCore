@@ -23,9 +23,6 @@ class CDataBaseObjectCollection: public imtbase::CObjectCollectionBase, public i
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	explicit CDataBaseObjectCollection();
-	virtual ~CDataBaseObjectCollection();
-
 	I_BEGIN_COMPONENT(CDataBaseObjectCollection);
 		I_ASSIGN(m_dbEngine, "DataBaseEngine", "DataBase for getting data", true, "IDatabaseEngine");
 		I_ASSIGN(m_updateOnDataBaseConnected, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", true, false);
@@ -48,9 +45,6 @@ public:
 				const QByteArray& preferredId= QByteArray()) override;
 	virtual bool RemoveObject(const QByteArray& objectId) override;
 	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
-	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
-	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
 
 protected:
 	static inline std::pair<QString, QVariant> MakeSqlBindBalue(const QByteArray& propName, const IDataBaseChangeable* const object);
@@ -58,18 +52,18 @@ protected:
 
 	QByteArray GetQueryStringFromFile(const QByteArray& filePath) const;
 	const IDataBaseChangeable* const GetObjectPtrById(const QByteArray& id) const;
-	Q_REQUIRED_RESULT virtual QSqlQuery ExecSelectSqlQuery(
-				_In_opt_ const QVariantMap bindValues = {},
-				_Outptr_opt_ QSqlError* sqlError = nullptr) const;
+	 virtual QSqlQuery ExecSelectSqlQuery(
+				 const QVariantMap& bindValues = {},
+				 QSqlError* sqlError = nullptr) const;
 	virtual QSqlQuery ExecUpdateSqlQuery(
-				_In_ const QVariantMap bindValues,
-				_Outptr_opt_ QSqlError* sqlError = nullptr) const;
-	Q_REQUIRED_RESULT virtual QSqlQuery ExecInsertSqlQuery(
-				_In_ const QVariantMap bindValues,
-				_Outptr_opt_ QSqlError* sqlError = nullptr) const;
+				 const QVariantMap& bindValues,
+				 QSqlError* sqlError = nullptr) const;
+	 virtual QSqlQuery ExecInsertSqlQuery(
+				 const QVariantMap& bindValues,
+				 QSqlError* sqlError = nullptr) const;
 	virtual QSqlQuery ExecDeleteSqlQuery(
-				_In_opt_ const QVariantMap bindValues,
-				_Outptr_opt_ QSqlError* sqlError = nullptr) const;
+				 const QVariantMap& bindValues,
+				 QSqlError* sqlError = nullptr) const;
 
 	// reimplemented (CObjectCollectionBase)
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override;

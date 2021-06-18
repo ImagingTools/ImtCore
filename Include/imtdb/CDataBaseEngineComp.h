@@ -2,7 +2,7 @@
 
 
 // Qt includes
-//#include <QSqlDatabase>
+//#include <QtSql/QSqlDatabase>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -14,15 +14,12 @@
 namespace imtdb
 {
 
-
 class CDataBaseEngineComp :
 			public ilog::CLoggerComponentBase,
 			virtual public IDatabaseEngine
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
-
-	CDataBaseEngineComp();
 
 	I_BEGIN_COMPONENT(CDataBaseEngineComp);
 		I_REGISTER_INTERFACE(IDatabaseEngine)
@@ -39,14 +36,14 @@ public:
 	virtual QSqlDatabase GetDatabase() const override;
 	bool OpenDataBase() override;
 	void CloseDataBase() override;
-	Q_REQUIRED_RESULT virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlError = nullptr) const override;
-	Q_REQUIRED_RESULT virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const override;
-	Q_REQUIRED_RESULT virtual QSqlQuery ExecSqlQueryFromFile(const QByteArray& filePath, QSqlError* sqlError = nullptr) const override;
-	Q_REQUIRED_RESULT virtual QSqlQuery ExecSqlQueryFromFile(const QByteArray& filePath, const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const override;
+	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlError = nullptr) const override;
+	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const override;
+	virtual QSqlQuery ExecSqlQueryFromFile(const QByteArray& filePath, QSqlError* sqlError = nullptr) const override;
+	virtual QSqlQuery ExecSqlQueryFromFile(const QByteArray& filePath, const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const override;
 
-	static void DrectBindValue(_Inout_ QByteArray* string, _In_ const QByteArray& what, _In_ const QByteArray& expr);
-	static void DrectBindValueInsertDefault(_Inout_ QByteArray* string, _In_ const QByteArray& what);
-	static void DrectBindValueUpdateDefault(_Inout_ QByteArray* string, _In_ const QByteArray& what);
+	static void DrectBindValue(QByteArray* string,  const QByteArray& what,  const QByteArray& expr);
+	static void DrectBindValueInsertDefault(QByteArray* string,  const QByteArray& what);
+	static void DrectBindValueUpdateDefault(QByteArray* string,  const QByteArray& what);
 
 
 private:
