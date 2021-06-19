@@ -26,18 +26,27 @@ bool CApiClientComp::SendRequest(const IGqlRequest& request, const QByteArray& d
 		return false;
 	}
 
+	// Move processing instance to the current thread:
 	(const_cast<CApiClientComp*>(this))->moveToThread(QThread::currentThread());
 
+	// Each request with its own instance of the network management:
 	QNetworkAccessManager* networkManagerPtr = new QNetworkAccessManager;
 
 	QEventLoop connectionLoop;
-	QObject::connect(networkManagerPtr, SIGNAL(finished(QNetworkReply*)), &connectionLoop, SLOT(quit()), Qt::DirectConnection);
+
+	// If the network reply is finished, the internal event loop will be finished:
+	QObject::connect(networkManagerPtr, &QNetworkAccessManager::finished, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
 
 	QTimer timer;
 	timer.setSingleShot(true);
-	QObject::connect(&timer, SIGNAL(timeout()), &connectionLoop, SLOT(quit()), Qt::DirectConnection);
-	QObject::connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()), &connectionLoop, SLOT(quit()), Qt::DirectConnection);
 
+	// If the timer is running out, the internal event loop will be finished:
+	QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
+
+	// If the application will be finished, the internal event loop will be also finished:
+	QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
+
+	// If timeout for the request was defgined, start the timer:
 	if (m_timeout > 0){
 		timer.start(m_timeout);
 	}
@@ -60,14 +69,16 @@ bool CApiClientComp::SendRequest(const IGqlRequest& request, const QByteArray& d
 
 				timer.stop();
 
+				bool retVal = true;
+
 				// Check if the reply was timed out and cancel further network processing:
 				if (replyPtr->isRunning()){
 					replyPtr->abort();
+
+					retVal = false;
 				}
 
-				bool retVal = true;
-
-				// Copy task output to processor output:
+				// Check if the reply was failed:
 				if (replyPtr->error()){
 					SendErrorMessage(0, replyPtr->errorString(), "API client");
 
