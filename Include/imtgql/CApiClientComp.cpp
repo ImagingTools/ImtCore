@@ -20,7 +20,7 @@ CApiClientComp::CApiClientComp()
 
 // reimplemented (IGqlClient)
 
-bool CApiClientComp::SendRequest(const IGqlRequest& request, const QByteArray& data, ResponseHandler& responseHandler) const
+bool CApiClientComp::SendRequest(const IGqlRequest& request, ResponseHandler& responseHandler) const
 {
 	if (!m_protocolEngineCompPtr.IsValid()){
 		return false;
@@ -55,7 +55,7 @@ bool CApiClientComp::SendRequest(const IGqlRequest& request, const QByteArray& d
 	if (networkRequestPtr != nullptr){
 		IGqlRequest::RequestType requestType = request.GetRequestType();
 		if ((requestType == IGqlRequest::RT_QUERY) || (requestType == IGqlRequest::RT_MUTATION)){
-			QNetworkReply* replyPtr = networkManagerPtr->post(*networkRequestPtr, data);
+			QNetworkReply* replyPtr = networkManagerPtr->post(*networkRequestPtr, request.GetQuery());
 			if (replyPtr != nullptr){
 				connect(replyPtr, &QNetworkReply::finished, this, &CApiClientComp::OnReply, Qt::DirectConnection);
 

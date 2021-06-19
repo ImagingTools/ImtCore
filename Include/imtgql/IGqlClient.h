@@ -18,7 +18,7 @@ public:
 		virtual void OnReply(const QByteArray& replyData) = 0;
 	};
 
-	virtual bool SendRequest(const IGqlRequest& request, const QByteArray& data, ResponseHandler& responseHandler) const = 0;
+	virtual bool SendRequest(const IGqlRequest& request, ResponseHandler& responseHandler) const = 0;
 };
 
 

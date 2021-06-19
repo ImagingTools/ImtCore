@@ -36,7 +36,7 @@ public:
 	CApiClientComp();
 
 	// reimplemented (IGqlClient)
-	virtual bool SendRequest(const IGqlRequest& request, const QByteArray& data, ResponseHandler& responseHandler) const override;
+	virtual bool SendRequest(const IGqlRequest& request, ResponseHandler& responseHandler) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
