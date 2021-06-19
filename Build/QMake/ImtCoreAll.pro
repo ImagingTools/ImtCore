@@ -28,9 +28,6 @@ imtrepo.file = ../../Include/imtrepo/QMake/imtrepo.pro
 SUBDIRS += imtreport
 imtreport.file = ../../Include/imtreport/QMake/imtreport.pro
 
-SUBDIRS += imtrepogui
-imtrepogui.file = ../../Include/imtrepogui/QMake/imtrepogui.pro
-
 SUBDIRS += imtreportgui
 imtreportgui.file = ../../Include/imtreportgui/QMake/imtreportgui.pro
 
@@ -90,7 +87,7 @@ ImtAuthPck.depends = imtbase imtauth
 
 SUBDIRS += ImtAuthGuiPck
 ImtAuthGuiPck.file = ../../Impl/ImtAuthGuiPck/QMake/ImtAuthGuiPck.pro
-ImtAuthGuiPck.depends = imtbase imtauth imtauthgui imtrepogui
+ImtAuthGuiPck.depends = imtbase imtauth imtauthgui
 
 SUBDIRS += ImtLicensePck
 ImtLicensePck.file = ../../Impl/ImtLicensePck/QMake/ImtLicensePck.pro
@@ -111,10 +108,6 @@ ImtRestPck.depends = imtbase imtrest
 SUBDIRS += Imt3dPck
 Imt3dPck.file = ../../Impl/Imt3dPck/QMake/Imt3dPck.pro
 Imt3dPck.depends = imt3d
-
-SUBDIRS += ImtRepoGuiPck
-ImtRepoGuiPck.file = ../../Impl/ImtRepoGuiPck/QMake/ImtRepoGuiPck.pro
-ImtRepoGuiPck.depends = imtrepo imtrepogui
 
 SUBDIRS += ImtReportGuiPck
 ImtReportGuiPck.file = ../../Impl/ImtReportGuiPck/QMake/ImtReportGuiPck.pro

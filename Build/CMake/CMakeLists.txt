@@ -25,7 +25,6 @@ add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
 add_subdirectory("${INCLUDE_DIR}/imtrest/CMake" "${AUX_INCLUDE_DIR}/imtrest")
 add_subdirectory("${INCLUDE_DIR}/imtrepo/CMake" "${AUX_INCLUDE_DIR}/imtrepo")
 add_subdirectory("${INCLUDE_DIR}/imtreport/CMake" "${AUX_INCLUDE_DIR}/imtreport")
-add_subdirectory("${INCLUDE_DIR}/imtrepogui/CMake" "${AUX_INCLUDE_DIR}/imtrepogui")
 add_subdirectory("${INCLUDE_DIR}/imtreportgui/CMake" "${AUX_INCLUDE_DIR}/imtreportgui")
 add_subdirectory("${INCLUDE_DIR}/imt3d/CMake" "${AUX_INCLUDE_DIR}/imt3d")
 add_subdirectory("${INCLUDE_DIR}/imtgui/CMake" "${AUX_INCLUDE_DIR}/imtgui")
@@ -56,7 +55,7 @@ add_subdirectory("${IMPL_DIR}/ImtAuthPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthPck")
 add_dependencies(ImtAuthPck imtbase imtauth)
 
 add_subdirectory("${IMPL_DIR}/ImtAuthGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGuiPck")
-add_dependencies(ImtAuthGuiPck imtbase imtauth imtauthgui imtrepogui)
+add_dependencies(ImtAuthGuiPck imtbase imtauth imtauthgui)
 
 add_subdirectory("${IMPL_DIR}/ImtLicensePck/CMake" "${AUX_INCLUDE_DIR}/ImtLicensePck")
 add_dependencies(ImtLicensePck imtbase)
@@ -72,9 +71,6 @@ add_dependencies(ImtRestPck imtbase imtrest)
 
 add_subdirectory("${IMPL_DIR}/Imt3dPck/CMake" "${AUX_INCLUDE_DIR}/Imt3dPck")
 add_dependencies(Imt3dPck imt3d)
-
-add_subdirectory("${IMPL_DIR}/ImtRepoGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtRepoGuiPck")
-add_dependencies(ImtRepoGuiPck imtrepo imtrepogui)
 
 add_subdirectory("${IMPL_DIR}/ImtReportGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtReportGuiPck")
 add_dependencies(ImtReportGuiPck imtreport imtreportgui)
