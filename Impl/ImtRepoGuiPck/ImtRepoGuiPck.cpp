@@ -17,11 +17,6 @@ I_EXPORT_PACKAGE(
 			"ImagingTools core framework UI-component package",
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
-I_EXPORT_COMPONENT(
-			DocumentCollectionViewDelegate,
-			"View delegate for a file collection using document manager for the data operations",
-			"Object Collection File Delegate View Document MDI");
-
 
 } // namespace ImtRepoGuiPck
 

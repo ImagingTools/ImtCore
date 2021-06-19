@@ -13,7 +13,7 @@
 #include <imtgui/CObjectCollectionViewDelegate.h>
 
 
-namespace imtrepogui
+namespace imtgui
 {
 
 
@@ -114,12 +114,10 @@ protected:
 	};
 
 protected:
-	// reimplemented (imtrepogui::CFileObjectCollectionViewDelegate)
+	// reimplemented (imtgui::CObjectCollectionViewDelegate)
 	virtual bool IsRestoreAllowed(const QByteArray& objectId) override;
 	virtual void AfterRestore(const QByteArray& objectId, bool isRestoreSuccessful) override;
 	virtual const ifile::IFileTypeInfo* FindFileInfo(const QByteArray& typeId, FileOperationType operationType) const;
-
-	// reimplemented (imtgui::CObjectCollectionViewDelegate)
 	virtual void SetupCommands() override;
 	virtual void SetupInsertCommand() override;
 
@@ -195,6 +193,6 @@ private:
 };
 
 
-} // namespace imtrepogui
+} // namespace imtgui
 
 

@@ -1,4 +1,4 @@
-#include <imtrepogui/CDocumentCollectionViewDelegateComp.h>
+#include <imtgui/CDocumentCollectionViewDelegateComp.h>
 
 
 // Qt includes
@@ -18,7 +18,7 @@
 #include <imtbase/IObjectCollection.h>
 
 
-namespace imtrepogui
+namespace imtgui
 {
 
 
@@ -311,7 +311,7 @@ iqtgui::IGuiObject* CDocumentCollectionViewDelegateComp::GetInformationView() co
 
 // protected methods
 
-// reimplemented (imtrepogui::CFileObjectCollectionViewDelegate)
+// reimplemented (imtgui::CObjectCollectionViewDelegate)
 
 bool CDocumentCollectionViewDelegateComp::IsRestoreAllowed(const QByteArray& objectId)
 {
@@ -630,6 +630,6 @@ void CDocumentCollectionViewDelegateComp::DocumentManagerObserver::OnUpdate(cons
 }
 
 
-} // namespace imtrepogui
+} // namespace imtgui
 
 

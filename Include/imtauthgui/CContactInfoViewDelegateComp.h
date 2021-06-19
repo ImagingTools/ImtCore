@@ -2,19 +2,18 @@
 
 
 // ImtCore includes
-#include <imtrepogui/CDocumentCollectionViewDelegateComp.h>
+#include <imtgui/CDocumentCollectionViewDelegateComp.h>
 
 
 namespace imtauthgui
 {
 
 
-class CContactInfoViewDelegateComp:
-	public imtrepogui::CDocumentCollectionViewDelegateComp
+class CContactInfoViewDelegateComp: public imtgui::CDocumentCollectionViewDelegateComp
 {
 	Q_OBJECT
 public:
-	typedef imtrepogui::CDocumentCollectionViewDelegateComp BaseClass;
+	typedef imtgui::CDocumentCollectionViewDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CContactInfoViewDelegateComp);
 	I_END_COMPONENT;

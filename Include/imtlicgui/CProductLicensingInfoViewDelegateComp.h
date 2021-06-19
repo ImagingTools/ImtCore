@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtrepogui/CDocumentCollectionViewDelegateComp.h>
+#include <imtgui/CDocumentCollectionViewDelegateComp.h>
 
 
 namespace imtlicgui
@@ -10,11 +10,11 @@ namespace imtlicgui
 
 
 class CProductLicensingInfoViewDelegateComp:
-			public imtrepogui::CDocumentCollectionViewDelegateComp
+			public imtgui::CDocumentCollectionViewDelegateComp
 {
 	Q_OBJECT
 public:
-	typedef imtrepogui::CDocumentCollectionViewDelegateComp BaseClass;
+	typedef imtgui::CDocumentCollectionViewDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CProductLicensingInfoViewDelegateComp);
 	I_END_COMPONENT;

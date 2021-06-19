@@ -31,6 +31,7 @@
 #include <imtgui/CVirtualKeyboardShowCommandComp.h>
 #include <imtgui/CFullScreenCommandComp.h>
 #include <imtgui/CSingleDocumentWorkspaceGuiComp.h>
+#include <imtgui/CDocumentCollectionViewDelegateComp.h>
 
 
 /**
@@ -65,6 +66,7 @@ typedef imtgui::CFullScreenCommandComp FullScreenCommand;
 typedef icomp::TMakeComponentWrap<imtwidgets::CMenuPanelDelegate, imtwidgets::IMenuPanelDelegate> MenuPanelDelegate;
 typedef icomp::TMakeComponentWrap<imtwidgets::CMenuPanelDelegateMin, imtwidgets::IMenuPanelDelegate> MenuPanelDelegateMin;
 typedef imtgui::CSingleDocumentWorkspaceGuiComp SingleDocumentWorkspace;
+typedef imtgui::CDocumentCollectionViewDelegateComp DocumentCollectionViewDelegate;
 
 
 } // namespace ImtGuiPck

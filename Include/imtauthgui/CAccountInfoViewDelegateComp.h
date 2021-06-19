@@ -2,19 +2,18 @@
 
 
 // ImtCore includes
-#include <imtrepogui/CDocumentCollectionViewDelegateComp.h>
+#include <imtgui/CDocumentCollectionViewDelegateComp.h>
 
 
 namespace imtauthgui
 {
 
 
-class CAccountInfoViewDelegateComp:
-	public imtrepogui::CDocumentCollectionViewDelegateComp
+class CAccountInfoViewDelegateComp: public imtgui::CDocumentCollectionViewDelegateComp
 {
 	Q_OBJECT
 public:
-	typedef imtrepogui::CDocumentCollectionViewDelegateComp BaseClass;
+	typedef imtgui::CDocumentCollectionViewDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CAccountInfoViewDelegateComp);
 	I_END_COMPONENT;

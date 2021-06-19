@@ -142,6 +142,11 @@ I_EXPORT_COMPONENT(
 			"SDI document workspace",
 			"View Document SDI Decorator");
 
+I_EXPORT_COMPONENT(
+			DocumentCollectionViewDelegate,
+			"View delegate for a collection using document manager for the data operations",
+			"Object Collection Delegate View Document MDI");
+
 
 } // namespace ImtGuiPck
 
