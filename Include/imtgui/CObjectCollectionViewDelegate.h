@@ -8,12 +8,13 @@
 #include <istd/TDelPtr.h>
 #include <imod/TModelWrap.h>
 #include <ibase/TLocalizableWrap.h>
-#include <imtbase/CCollectionInfo.h>
+#include <ifile/IFileTypeInfo.h>
 #include <iqtgui/IGuiObject.h>
 #include <iqtgui/TDesignSchemaHandlerWrap.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
+#include <imtbase/CCollectionInfo.h>
 #include <imtgui/ICollectionViewDelegate.h>
 
 
@@ -46,7 +47,9 @@ public:
 		CI_REMOVE,
 		CI_RENAME,
 		CI_EDIT_DESCRIPTION,
-
+		CI_IMPORT,
+		CI_EXPORT,
+		CI_RESTORE,
 		CI_USER = BaseClass::CI_USER + 100
 	};
 
@@ -78,6 +81,12 @@ public:
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 protected:
+	enum FileOperationType
+	{
+		FOT_EXPORT,
+		FOT_IMPORT
+	};
+
 	bool IsNameUnique(const QString& name) const;
 	QString GetUniqueName(const QString& name) const;
 
@@ -85,6 +94,14 @@ protected:
 	virtual void SetupCommands();
 	virtual void SetupInsertCommand();
 	virtual void OnDuplicateObject(const QByteArray& sourceObjectId, const QByteArray& destinationObjectId);
+	virtual void OnImportObject(const QByteArray& objectId);
+	virtual bool IsRestoreAllowed(const QByteArray& objectId);
+	virtual void BeforeRestore(const QByteArray& objectId);
+	virtual void AfterRestore(const QByteArray& objectId, bool isRestoreSuccessful);
+	virtual QByteArray FindTypeIdFromFile(const QString& filePath) const;
+	virtual const ifile::IFileTypeInfo* FindFileInfo(const QByteArray& typeId, FileOperationType operationType) const;
+	virtual QString CreateFileImportFilter() const;
+	virtual QString CreateFileExportFilter(const QByteArray& objectId) const;
 
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
@@ -113,6 +130,9 @@ protected Q_SLOTS:
 	virtual void OnDuplicate();
 	virtual void OnRemove();
 	virtual void OnAddMenuOptionClicked(QAction* action);
+	virtual void OnImport();
+	virtual void OnExport();
+	virtual void OnRestore();
 
 protected:
 	// commands
@@ -122,6 +142,9 @@ protected:
 	iqtgui::CHierarchicalCommand m_insertCommand;
 	iqtgui::CHierarchicalCommand m_duplicateCommand;
 	iqtgui::CHierarchicalCommand m_removeCommand;
+	iqtgui::CHierarchicalCommand m_importCommand;
+	iqtgui::CHierarchicalCommand m_exportCommand;
+	iqtgui::CHierarchicalCommand m_restoreCommand;
 
 	istd::TDelPtr<QMenu> m_insertNewDocumentMenuPtr;
 
@@ -135,6 +158,8 @@ protected:
 	QMap<QByteArray, HeaderInfo> m_summaryInformationHeaders;
 
 	imod::TModelWrap<VisualStatus> m_visualStatus;
+
+	QString m_exportFilePath;
 };
 
 

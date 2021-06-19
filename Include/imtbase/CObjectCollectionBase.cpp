@@ -3,12 +3,16 @@
 
 // Qt includes
 #include <QtCore/QUuid>
+#include <QtCore/QFileInfo>
 
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+
+// ImtCore includes
+#include <imtcore/Version.h>
 
 
 namespace imtbase
@@ -29,6 +33,53 @@ CObjectCollectionBase::~CObjectCollectionBase()
 }
 
 
+// reimplemented (ICollectionDataController)
+
+const ifile::IFilePersistence* CObjectCollectionBase::GetPersistenceForObjectType(const QByteArray& /*typeId*/) const
+{
+	return nullptr;
+}
+
+
+bool CObjectCollectionBase::ExportFile(const imtbase::IObjectCollection& /*collection*/, const QByteArray& objectId, const QString& targetFilePath) const
+{
+	QByteArray objectTypeId = GetObjectTypeId(objectId);
+	if (!objectTypeId.isEmpty()){
+		const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(objectTypeId);
+		if (persistencePtr != nullptr){
+			DataPtr objectDataPtr;
+			if (GetObjectData(objectId, objectDataPtr)){
+				return persistencePtr->SaveToFile(*objectDataPtr, targetFilePath) == ifile::IFilePersistence::OS_OK;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+QByteArray CObjectCollectionBase::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& typeId, const QString& sourceFilePath) const
+{
+	if (!typeId.isEmpty()){
+		const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
+		if (persistencePtr != nullptr){
+			DataPtr objectDataPtr(CreateObjectInstance(typeId));
+			if (objectDataPtr.IsValid()){
+				if (persistencePtr->LoadFromFile(*objectDataPtr, sourceFilePath) == ifile::IFilePersistence::OS_OK){
+					QFileInfo fileInfo(sourceFilePath);
+
+					QString newObjectName = fileInfo.baseName();
+
+					return (const_cast<CObjectCollectionBase*>(this))->InsertNewObject(typeId, newObjectName, QString("Imported from %1").arg(sourceFilePath), objectDataPtr.GetPtr());
+				}
+			}
+		}
+	}
+
+	return QByteArray();
+}
+
+
 // reimplemented (IObjectCollection)
 
 const imtbase::IRevisionController* CObjectCollectionBase::GetRevisionController() const
@@ -39,7 +90,7 @@ const imtbase::IRevisionController* CObjectCollectionBase::GetRevisionController
 
 const imtbase::ICollectionDataController* CObjectCollectionBase::GetDataController() const
 {
-	return nullptr;
+	return this;
 }
 
 
@@ -234,8 +285,14 @@ bool CObjectCollectionBase::UnregisterEventHandler(IObjectCollectionEventHandler
 
 // reimplemented (IObjectCollectionInfo)
 
-bool CObjectCollectionBase::GetCollectionItemMetaInfo(const QByteArray& /*objectId*/, idoc::IDocumentMetaInfo& /*metaInfo*/) const
+bool CObjectCollectionBase::GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const
 {
+	for (const ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == objectId){
+			return metaInfo.CopyFrom(objectInfo.metaInfo);
+		}
+	}
+	
 	return false;
 }
 
@@ -348,6 +405,15 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.BeginTag(objectNameTag);
 		retVal = retVal && archive.Process(elementInfo.name);
 		retVal = retVal && archive.EndTag(objectNameTag);
+
+		quint32 imtCoreVersion;
+		bool imtCoreVersionExists = archive.GetVersionInfo().GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion);
+		if (imtCoreVersionExists && imtCoreVersion >= 3401){
+			static iser::CArchiveTag collectionMetaInfoTag("CollectionItemMeta", "Collection item meta information", iser::CArchiveTag::TT_GROUP, &objectTag);
+			retVal = retVal && archive.BeginTag(collectionMetaInfoTag);
+			retVal = retVal && elementInfo.metaInfo.Serialize(archive);
+			retVal = retVal && archive.EndTag(collectionMetaInfoTag);
+		}
 
 		static iser::CArchiveTag objectDataTag("Data", "Object data", iser::CArchiveTag::TT_GROUP, &objectTag);
 		retVal = retVal && archive.BeginTag(objectDataTag);

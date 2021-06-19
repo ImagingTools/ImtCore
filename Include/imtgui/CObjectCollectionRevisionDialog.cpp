@@ -1,4 +1,4 @@
-#include <imtrepogui/CFileObjectCollectionRevisionDialog.h>
+#include <imtgui/CObjectCollectionRevisionDialog.h>
 
 
 // Qt includes
@@ -8,20 +8,20 @@
 #include <QtWidgets/QPushButton>
 
 
-namespace imtrepogui
+namespace imtgui
 {
 
 
-CFileObjectCollectionRevisionDialog::CFileObjectCollectionRevisionDialog(QWidget *parent)
+CObjectCollectionRevisionDialog::CObjectCollectionRevisionDialog(QWidget *parent)
 	:QDialog(parent, Qt::WindowTitleHint)
 {
 	setupUi(this);
 	Table->setContextMenuPolicy(Qt::CustomContextMenu);
-	connect(Table, &QTableWidget::customContextMenuRequested, this, &CFileObjectCollectionRevisionDialog::OnCustomContextMenuRequested);
+	connect(Table, &QTableWidget::customContextMenuRequested, this, &CObjectCollectionRevisionDialog::OnCustomContextMenuRequested);
 }
 
 
-void CFileObjectCollectionRevisionDialog::SetParams(
+void CObjectCollectionRevisionDialog::SetParams(
 			const imtbase::IRevisionController::RevisionInfoList& revisions,
 			int currentRevision,
 			const imtbase::IObjectCollection* collectionPtr, 
@@ -72,7 +72,7 @@ void CFileObjectCollectionRevisionDialog::SetParams(
 }
 
 
-int CFileObjectCollectionRevisionDialog::GetSelectedRevision()
+int CObjectCollectionRevisionDialog::GetSelectedRevision()
 {
 	QList<QTableWidgetItem*> selectedItems = Table->selectedItems();
 	if (!selectedItems.isEmpty()){
@@ -85,7 +85,7 @@ int CFileObjectCollectionRevisionDialog::GetSelectedRevision()
 
 // private slots
 
-void CFileObjectCollectionRevisionDialog::OnCustomContextMenuRequested(const QPoint &point)
+void CObjectCollectionRevisionDialog::OnCustomContextMenuRequested(const QPoint &point)
 {
 	QList<QTableWidgetItem*> selectedItems = Table->selectedItems();
 	if (selectedItems.isEmpty()){
@@ -100,13 +100,13 @@ void CFileObjectCollectionRevisionDialog::OnCustomContextMenuRequested(const QPo
 	QMenu menu(Table);
 
 	actionRestore = menu.addAction(QIcon(":/Icons/Export"), tr("Export"));
-	connect(actionRestore, &QAction::triggered, this, &CFileObjectCollectionRevisionDialog::OnExport);
+	connect(actionRestore, &QAction::triggered, this, &CObjectCollectionRevisionDialog::OnExport);
 
 	menu.exec(Table->viewport()->mapToGlobal(point));
 }
 
 
-void CFileObjectCollectionRevisionDialog::OnExport()
+void CObjectCollectionRevisionDialog::OnExport()
 {
 	if (m_revisionControllerPtr != nullptr){
 		int revision = -1;
@@ -133,6 +133,6 @@ void CFileObjectCollectionRevisionDialog::OnExport()
 }
 
 
-} // namespace imtrepogui
+} // namespace imtgui
 
 

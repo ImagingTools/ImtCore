@@ -81,7 +81,7 @@ protected:
 class CFileCollectionCompBase:
 			public CFileCollectionCompBaseAttr,
 			virtual public IFileObjectCollection,
-			virtual public IFileObjectCollection::IDataFactory,
+			virtual public imtbase::IObjectCollection::IDataFactory,
 			virtual public IRepositoryItemInfoProvider,
 			virtual protected imtbase::ICollectionDataController
 {
@@ -133,6 +133,7 @@ public:
 	virtual bool UpdateFile(const QString& filePath, const QByteArray& objectId) override;
 
 	// reimplemented (ICollectionDataController)
+	virtual const ifile::IFilePersistence* GetPersistenceForObjectType(const QByteArray& typeId) const override;
 	virtual bool ExportFile(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
 	virtual QByteArray ImportFile(imtbase::IObjectCollection& collection, const QByteArray& typeId, const QString& sourceFilePath = QString()) const override;
 
@@ -346,11 +347,6 @@ protected:
 		Create object data from the file.
 	*/
 	virtual istd::IChangeable* CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const;
-
-	/**
-		Get persistence object for the related resource type.
-	*/
-	virtual const ifile::IFilePersistence* GetPersistenceForResource(const QByteArray& typeId) const;
 
 	/**
 		Write a file collection item to file system.

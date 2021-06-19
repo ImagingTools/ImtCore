@@ -295,7 +295,7 @@ bool CDocumentCollectionViewDelegateComp::OpenDocumentEditor(
 	if (m_collectionPtr != nullptr){
 		QVariant documentName = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME);
 		if (documentName.isValid()){
-			QMessageBox::critical(nullptr, "", tr("Document \"%1\"could not be opened").arg(documentName.toString()));
+			QMessageBox::critical(nullptr, "", tr("Document \"%1\" could not be opened").arg(documentName.toString()));
 		}
 	}
 

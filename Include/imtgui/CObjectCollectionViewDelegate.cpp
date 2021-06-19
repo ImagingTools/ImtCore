@@ -4,14 +4,57 @@
 // Qt includes
 #include <QtGui/QRegExpValidator>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QFileDialog>
 
 // ACF includes
 #include <istd/CChangeGroup.h>
 #include <istd/CChangeNotifier.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
+#include <ifilegui/CFileDialogLoaderComp.h>
 
 // ImtCore includes
 #include <imtbase/IRevisionController.h>
+#include <imtbase/ICollectionDataController.h>
+#include <imtgui/CObjectCollectionRevisionDialog.h>
 #include <imtwidgets/CNoEditableItemDelegate.h>
+
+
+namespace
+{
+
+
+QString FindSelectedFilter(const QString& filters, const QString& filePath)
+{
+	QStringList filterList = filters.split(";;");
+	QString ext = filePath.isEmpty() ? QString() : QFileInfo(filePath).suffix();
+	if (ext.isEmpty())
+		return QString();
+
+	for (auto& filter : filterList)
+		if (filter.contains(ext))
+			return filter;
+
+	return QString();
+}
+
+QString GetExportFileName(const imtbase::IObjectCollection& collection, const QByteArray& objectId)
+{
+	QVariant title = collection.GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME);
+
+	return title.isValid() && !title.toString().isEmpty() ? title.toString() : QString("export");
+}
+
+QString ComposeExportFilePath(const QString olderPath, const QString& projectName)
+{
+	if (olderPath.isEmpty())
+		return projectName;
+
+	QFileInfo info(olderPath);
+	return info.absoluteDir().absolutePath() + QDir::separator() + projectName + "." + info.suffix();
+}
+
+
+} // namespace
 
 
 namespace imtgui
@@ -23,9 +66,13 @@ CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 	m_insertCommand(tr("New"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_duplicateCommand(tr("Duplicate"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_removeCommand(tr("Remove"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
+	m_importCommand(tr("Import"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
+	m_exportCommand(tr("Export"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
+	m_restoreCommand(tr("Restore"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_collectionPtr(nullptr)
 {
 	SetupSummaryInformation();
+
 	EnableLocalization(true);
 	EnableDesignHandler(true);
 }
@@ -106,6 +153,37 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(
 				isRemoveEnabled = true;
 			}
 		}
+		const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
+		if (revisionControllerPtr != nullptr){
+			if (m_selectedItemIds.count() == 1){
+				int revision = -1;
+				idoc::CStandardDocumentMetaInfo metaInfo;
+
+				QByteArray objectId = m_selectedItemIds[0];
+
+				if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
+					QVariant variant = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);
+					if (variant.isValid()){
+						revision = variant.toInt();
+					}
+				}
+
+				imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_collectionPtr, objectId);
+				for (int i = 0; i < revisionList.count(); i++){
+					if (revisionList[i].revision == revision){
+						revisionList.removeAt(i);
+						break;
+					}
+				}
+
+				if (revisionList.count() > 0){
+					m_restoreCommand.setEnabled(true);
+				}
+			}
+		}
+		else{
+			m_restoreCommand.setVisible(false);
+		}
 	}
 
 	m_insertCommand.setEnabled(isAddEnabled);
@@ -114,6 +192,10 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(
 
 	m_selectedItemIds = selectedItems;
 	m_selectedTypeId = selectedTypeId;
+
+	m_importCommand.setEnabled(m_insertCommand.IsEnabled());
+	m_exportCommand.setEnabled(selectedItems.count() == 1);
+	m_restoreCommand.setEnabled(false);
 }
 
 
@@ -127,14 +209,36 @@ QByteArray CObjectCollectionViewDelegate::CreateNewObject(const QByteArray& type
 }
 
 
-QByteArray CObjectCollectionViewDelegate::ImportObject(const QByteArray& /*typeId*/, const QString& /*sourcePath*/) const
+QByteArray CObjectCollectionViewDelegate::ImportObject(const QByteArray& typeId, const QString& sourcePath) const
 {
+	if (sourcePath.isEmpty()){
+		return QByteArray();
+	}
+
+	Q_ASSERT(m_collectionPtr != nullptr);
+
+	const imtbase::ICollectionDataController* dataControllerPtr = m_collectionPtr->GetDataController();
+	if (dataControllerPtr != nullptr){
+		return dataControllerPtr->ImportFile(*m_collectionPtr, typeId, sourcePath);
+	}
+
 	return QByteArray();
 }
 
 
-bool CObjectCollectionViewDelegate::ExportObject(const QByteArray& /*objectId*/, const QString& /*targetPath*/) const
+bool CObjectCollectionViewDelegate::ExportObject(const QByteArray& objectId, const QString& targetPath) const
 {
+	if (targetPath.isEmpty()){
+		return false;
+	}
+
+	Q_ASSERT(m_collectionPtr != nullptr);
+
+	const imtbase::ICollectionDataController* dataControllerPtr = m_collectionPtr->GetDataController();
+	if (dataControllerPtr != nullptr){
+		return dataControllerPtr->ExportFile(*m_collectionPtr, objectId, targetPath);
+	}
+
 	return false;
 }
 
@@ -202,13 +306,25 @@ ICollectionViewDelegate::SummaryInformation CObjectCollectionViewDelegate::GetSu
 			result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 			result.sortValue = result.text;
 		}
-		else if (informationId == QByteArray("Type")){
-			result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_TYPE_NAME).toByteArray();
+		else if (informationId == QByteArray("TypeId")){
+			result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_TYPE_ID).toByteArray();
 			result.sortValue = result.text;
 		}
 		else if (informationId == QByteArray("Description")){
 			result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 			result.sortValue = result.text;
+		}
+
+		idoc::CStandardDocumentMetaInfo metaInfo;
+		if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
+			if (informationId == QByteArray("Added")){
+				result.sortValue = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME);
+				result.text = result.sortValue.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+			}
+			else if (informationId == QByteArray("ModificationTime")){
+				result.sortValue = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME);
+				result.text = result.sortValue.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+			}
 		}
 	}
 
@@ -289,16 +405,23 @@ QString CObjectCollectionViewDelegate::GetUniqueName(const QString& name) const
 void CObjectCollectionViewDelegate::SetupSummaryInformation()
 {
 	m_summaryInformationTypes.ResetData();
+
 	m_summaryInformationHeaders.clear();
 
 	m_summaryInformationTypes.InsertItem("Name", tr("Name"), "");
 	m_summaryInformationHeaders["Name"] = HeaderInfo(true);
 
-	m_summaryInformationTypes.InsertItem("Type", tr("Type"), "");
-	m_summaryInformationHeaders["Type"] = HeaderInfo(false);
+	m_summaryInformationTypes.InsertItem(QByteArray("TypeId"), tr("Type"), "");
+	m_summaryInformationHeaders["TypeId"] = HeaderInfo(false);
 
-	m_summaryInformationTypes.InsertItem("Description", tr("Description"), "");
+	m_summaryInformationTypes.InsertItem(QByteArray("Description"), tr("Description"), "");
 	m_summaryInformationHeaders["Description"] = HeaderInfo(false);
+
+	m_summaryInformationTypes.InsertItem(QByteArray("Added"), tr("Added"), "");
+	m_summaryInformationHeaders["Added"] = HeaderInfo(false);
+
+	m_summaryInformationTypes.InsertItem(QByteArray("ModificationTime"), tr("Last Modified"), "");
+	m_summaryInformationHeaders["ModificationTime"] = HeaderInfo(false);
 }
 
 
@@ -331,6 +454,27 @@ void CObjectCollectionViewDelegate::SetupCommands()
 
 	if (IsCommandSupported(CI_EDIT)){
 		m_rootCommands.InsertChild(&m_editCommands);
+	}
+
+	if (m_collectionPtr != nullptr){
+		const imtbase::ICollectionDataController* dataControllerPtr = m_collectionPtr->GetDataController();
+		if (dataControllerPtr != nullptr){
+			connect(&m_importCommand, SIGNAL(triggered()), this, SLOT(OnImport()));
+			connect(&m_exportCommand, SIGNAL(triggered()), this, SLOT(OnExport()));
+			connect(&m_restoreCommand, SIGNAL(triggered()), this, SLOT(OnRestore()));
+
+			if (IsCommandSupported(CI_IMPORT)){
+				m_editCommands.InsertChild(&m_importCommand);
+			}
+
+			if (IsCommandSupported(CI_EXPORT)){
+				m_editCommands.InsertChild(&m_exportCommand);
+			}
+
+			if (IsCommandSupported(CI_RESTORE)){
+				m_editCommands.InsertChild(&m_restoreCommand);
+			}
+		}
 	}
 }
 
@@ -377,6 +521,119 @@ void CObjectCollectionViewDelegate::OnDuplicateObject(const QByteArray& /*source
 }
 
 
+void CObjectCollectionViewDelegate::OnImportObject(const QByteArray& /*objectId*/)
+{
+}
+
+
+bool CObjectCollectionViewDelegate::IsRestoreAllowed(const QByteArray& /*objectId*/)
+{
+	return true;
+}
+
+
+void CObjectCollectionViewDelegate::BeforeRestore(const QByteArray& /*objectId*/)
+{
+}
+
+
+void CObjectCollectionViewDelegate::AfterRestore(const QByteArray& /*objectId*/, bool /*isRestoreSuccessful*/)
+{
+}
+
+
+QByteArray CObjectCollectionViewDelegate::FindTypeIdFromFile(const QString& filePath) const
+{
+	if (m_collectionPtr == nullptr){
+		return QByteArray();
+	}
+
+	const imtbase::ICollectionDataController* dataControllerPtr = m_collectionPtr->GetDataController();
+	if (dataControllerPtr == nullptr){
+		return QByteArray();
+	}
+
+	const iprm::IOptionsList* objectTypeListPtr = m_collectionPtr->GetObjectTypesInfo();
+	if (objectTypeListPtr == nullptr){
+		return QByteArray();
+	}
+
+	QFileInfo fileInfo(filePath);
+	QString extension = fileInfo.suffix();
+
+	for (int typeIndex = 0; typeIndex < objectTypeListPtr->GetOptionsCount(); ++typeIndex){
+		QByteArray typeId = objectTypeListPtr->GetOptionId(typeIndex);
+
+		const ifile::IFileTypeInfo* fileTypeInfoPtr = dataControllerPtr->GetPersistenceForObjectType(typeId);
+		if (fileTypeInfoPtr != nullptr){
+			QStringList extensions;
+			fileTypeInfoPtr->GetFileExtensions(extensions);
+			if (extensions.contains(extension, Qt::CaseInsensitive)){
+				return typeId;
+			}
+		}
+	}
+
+	return QByteArray();
+}
+
+
+const ifile::IFileTypeInfo* CObjectCollectionViewDelegate::FindFileInfo(const QByteArray& typeId, FileOperationType /*operationType*/) const
+{
+	if (m_collectionPtr == nullptr){
+		return nullptr;
+	}
+
+	const imtbase::ICollectionDataController* dataControllerPtr = m_collectionPtr->GetDataController();
+	if (dataControllerPtr == nullptr){
+		return nullptr;
+	}
+
+	return dataControllerPtr->GetPersistenceForObjectType(typeId);
+}
+
+
+QString CObjectCollectionViewDelegate::CreateFileImportFilter() const
+{
+	QStringList filters;
+	QStringList allExt;
+
+	const ifile::IFileTypeInfo* fileTypeInfoPtr = FindFileInfo(m_selectedTypeId, FOT_IMPORT);
+	if (fileTypeInfoPtr != nullptr){
+		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileTypeInfoPtr, nullptr, -1, allExt, filters, false);
+	}
+
+	filters.append("Compressed item folder (*.zip)");
+	allExt.append("zip");
+
+	if (allExt.size() > 1){
+		filters.prepend(tr("All known documents (%1)").arg("*." + allExt.join(" *.")));
+	}
+
+	return filters.join(";;");
+}
+
+
+QString CObjectCollectionViewDelegate::CreateFileExportFilter(const QByteArray& objectId) const
+{
+	QStringList filters;
+	QStringList allExt;
+
+	QByteArray typeId = m_collectionPtr->GetObjectTypeId(objectId);
+
+	const ifile::IFileTypeInfo* fileInfoPtr = FindFileInfo(typeId, FOT_EXPORT);
+	if (fileInfoPtr != nullptr){
+		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileInfoPtr, nullptr, -1, allExt, filters, false);
+	}
+
+	filters.append("Compressed item folder (*.zip)");
+
+	allExt.append("zip");
+
+	return filters.join(";;");
+}
+
+
 // reimplemented (ibase::TLocalizableWrap)
 
 void CObjectCollectionViewDelegate::OnLanguageChanged()
@@ -386,6 +643,9 @@ void CObjectCollectionViewDelegate::OnLanguageChanged()
 	m_insertCommand.SetVisuals(tr("Insert"), tr("New"), tr("Insert new document into the collection"), QIcon(":/Icons/Add"));
 	m_duplicateCommand.SetVisuals(tr("Duplicate"), tr("Duplicate"), tr("Duplicate selected objects"), QIcon(":/Icons/Duplicate"));
 	m_removeCommand.SetVisuals(tr("Remove"), tr("Remove"), tr("Remove selected document from the collection"), QIcon(":/Icons/Delete"));
+	m_importCommand.SetVisuals(tr("Import from File..."), tr("Import"), tr("Import existing file into the collection"), QIcon(":/Icons/Import"));
+	m_exportCommand.SetVisuals(tr("Export to File..."), tr("Export"), tr("Export data from the collection to a file"), QIcon(":/Icons/Export"));
+	m_restoreCommand.SetVisuals(tr("Restore revision..."), tr("Restore"), tr("Restore data from backup"), QIcon(":/Icons/Undo"));
 }
 
 
@@ -458,6 +718,115 @@ void CObjectCollectionViewDelegate::OnAddMenuOptionClicked(QAction* action)
 		QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("New document could not be created"));
 	}
 }
+
+
+
+void CObjectCollectionViewDelegate::OnImport()
+{
+	istd::CChangeGroup changeGroup(m_collectionPtr);
+
+	QStringList files = QFileDialog::getOpenFileNames(
+				(m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr,
+				tr("Import File"),
+				QString(),
+				CreateFileImportFilter());
+
+	if (!files.isEmpty()){
+		for (const QString& filePath : files){
+			QByteArray typeId = m_selectedTypeId;
+			if (typeId.isEmpty()){
+				typeId = FindTypeIdFromFile(filePath);
+			}
+
+			QByteArray objectId = ImportObject(typeId, filePath);
+			if (objectId.isEmpty()){
+				QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document '%1' could not be imported").arg(filePath));
+			}
+			else{
+				const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
+				if (revisionControllerPtr != nullptr){
+					revisionControllerPtr->BackupObject(*m_collectionPtr, objectId, tr("Importing into collection"));
+				}
+
+				OnImportObject(objectId);
+			}
+		}
+	}
+}
+
+
+void CObjectCollectionViewDelegate::OnExport()
+{
+	Q_ASSERT(m_collectionPtr != nullptr);
+	if (m_selectedItemIds.isEmpty() || !m_collectionPtr)
+		return;
+
+	QByteArray objectId = m_selectedItemIds[0];
+
+	QString filters = CreateFileExportFilter(objectId);
+	QString selectedFilter = FindSelectedFilter(filters, m_exportFilePath);
+	m_exportFilePath = ComposeExportFilePath(m_exportFilePath, GetExportFileName(*m_collectionPtr, objectId));
+	m_exportFilePath = QFileDialog::getSaveFileName(
+		m_parentGuiPtr ? m_parentGuiPtr->GetWidget() : nullptr,
+		tr("Export File"), m_exportFilePath.isEmpty() ? "export" : m_exportFilePath,
+		filters, selectedFilter.isEmpty() ? nullptr : &selectedFilter);
+
+	if (!m_exportFilePath.isEmpty()){
+		if (!ExportObject(objectId, m_exportFilePath)){
+			QMessageBox::critical(m_parentGuiPtr ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be exported"));
+		}
+	}
+}
+
+
+void CObjectCollectionViewDelegate::OnRestore()
+{
+	Q_ASSERT(m_selectedItemIds.count() > 0);
+
+	const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
+	if (revisionControllerPtr != nullptr){
+		idoc::CStandardDocumentMetaInfo metaInfo;
+		int currentRevision = -1;
+
+		QByteArray objectId = m_selectedItemIds[0];
+
+		if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
+			QVariant revision = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);
+			if (revision.isValid()){
+				currentRevision = revision.toInt();
+			}
+		}
+
+		imtbase::IRevisionController::RevisionInfoList revisionList = revisionControllerPtr->GetRevisionInfoList(*m_collectionPtr, objectId);
+
+		QString fileName = m_collectionPtr->GetElementInfo(objectId, imtbase::IObjectCollectionInfo::EIT_NAME).toString();
+
+		CObjectCollectionRevisionDialog dialog;
+
+		dialog.SetParams(
+					revisionList,
+					currentRevision,
+					m_collectionPtr,
+					revisionControllerPtr,
+					objectId,
+					fileName,
+					CreateFileExportFilter(objectId));
+
+		if (dialog.exec() == QDialog::Accepted){
+			int revision = dialog.GetSelectedRevision();
+			if (revision != -1 && revision != currentRevision){
+				if (IsRestoreAllowed(objectId)){
+					BeforeRestore(objectId);
+
+					bool isRestored = revisionControllerPtr->RestoreObject(*m_collectionPtr, objectId, revision);
+
+					AfterRestore(objectId, isRestored);
+				}
+			}
+		}
+	}
+}
+
 
 
 // public methods of the embedded class VisualStatus

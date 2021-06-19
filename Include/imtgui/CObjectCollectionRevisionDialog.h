@@ -6,20 +6,20 @@
 
 // ImtCore includes
 #include <imtbase/IRevisionController.h>
-#include <GeneratedFiles/imtrepogui/ui_CFileObjectCollectionRevisionDialog.h>
+#include <GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h>
 
 
-namespace imtrepogui
+namespace imtgui
 {
 
 
-class CFileObjectCollectionRevisionDialog:
+class CObjectCollectionRevisionDialog:
 			public QDialog,
-			public Ui::CFileObjectCollectionRevisionDialog
+			public Ui::CObjectCollectionRevisionDialog
 {
 	Q_OBJECT
 public:
-	explicit CFileObjectCollectionRevisionDialog(QWidget *parent = nullptr);
+	explicit CObjectCollectionRevisionDialog(QWidget *parent = nullptr);
 
 	void SetParams(
 				const imtbase::IRevisionController::RevisionInfoList& revisions,
@@ -45,6 +45,6 @@ private:
 };
 
 
-} // namespace imtrepogui
+} // namespace imtgui
 
 

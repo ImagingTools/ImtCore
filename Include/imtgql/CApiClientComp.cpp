@@ -18,7 +18,7 @@ bool CApiClientComp::SendRequest(const IGqlRequest& request, const QByteArray& d
 	QNetworkRequest* networkRequestPtr = m_protocolEngineCompPtr->CreateNetworkRequest(request);
 	if (networkRequestPtr != nullptr){
 		IGqlRequest::RequestType requestType = request.GetRequestType();
-		if (requestType == IGqlRequest::RT_QUERY){
+		if ((requestType == IGqlRequest::RT_QUERY) || (requestType == IGqlRequest::RT_MUTATION)){
 			QNetworkReply* replyPtr = m_networkManager.post(*networkRequestPtr, data);
 			if (replyPtr != nullptr){
 				if (!connect(replyPtr, &QNetworkReply::finished, this, &CApiClientComp::OnReply)){

@@ -10,7 +10,7 @@
 #include <iqtgui/IIconProvider.h>
 
 // ImtCore includes
-#include <imtrepogui/CFileObjectCollectionViewDelegate.h>
+#include <imtgui/CObjectCollectionViewDelegate.h>
 
 
 namespace imtrepogui
@@ -23,13 +23,13 @@ namespace imtrepogui
 	\ingroup Collection
 */
 class CDocumentCollectionViewDelegateComp:
-			public CFileObjectCollectionViewDelegate,
+			public imtgui::CObjectCollectionViewDelegate,
 			public icomp::CComponentBase
 {
 	Q_OBJECT
 public:
 	typedef icomp::CComponentBase BaseClass;
-	typedef CFileObjectCollectionViewDelegate BaseClass2;
+	typedef imtgui::CObjectCollectionViewDelegate BaseClass2;
 
 	I_BEGIN_COMPONENT(CDocumentCollectionViewDelegateComp);
 		I_REGISTER_INTERFACE(imtgui::ICollectionViewDelegate);

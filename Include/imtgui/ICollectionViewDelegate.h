@@ -90,6 +90,9 @@ public:
 		QVariant sortValue;
 	};
 
+	/**
+		Initialize the delegate for the collection instance.
+	*/
 	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) = 0;
 
 	/**
@@ -114,7 +117,7 @@ public:
 	virtual void OnColumnItemDelegateEditFinished(const QByteArray& objectId, const QByteArray& columnId, const QVariant& newValue) const = 0;
 
 	/**
-		Check for editor enabled.
+		Check if the editing of a given column is enabled.
 	*/
 	virtual bool IsEditorEnabled(const QByteArray& columnId) const = 0;
 

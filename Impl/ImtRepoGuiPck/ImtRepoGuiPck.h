@@ -6,18 +6,16 @@
 #include <icomp/TModelCompWrap.h>
 
 // ImtCore includes
-#include <imtrepogui/CFileObjectCollectionViewDelegate.h>
 #include <imtrepogui/CDocumentCollectionViewDelegateComp.h>
 
 
 /**
-	ImtGuiPck package
+	ImtRepoGuiPck package
 */
 namespace ImtRepoGuiPck
 {
 
 
-typedef icomp::TMakeComponentWrap<imtrepogui::CFileObjectCollectionViewDelegate, imtgui::ICollectionViewDelegate> FileObjectCollectionViewDelegate;
 typedef imtrepogui::CDocumentCollectionViewDelegateComp DocumentCollectionViewDelegate;
 
 

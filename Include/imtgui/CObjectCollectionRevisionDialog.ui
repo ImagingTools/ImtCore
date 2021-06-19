@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CFileObjectCollectionRevisionDialog</class>
- <widget class="QDialog" name="CFileObjectCollectionRevisionDialog">
+ <class>CObjectCollectionRevisionDialog</class>
+ <widget class="QDialog" name="CObjectCollectionRevisionDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -76,7 +76,7 @@
   <connection>
    <sender>ButtonBox</sender>
    <signal>accepted()</signal>
-   <receiver>CFileObjectCollectionRevisionDialog</receiver>
+   <receiver>CObjectCollectionRevisionDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -92,7 +92,7 @@
   <connection>
    <sender>ButtonBox</sender>
    <signal>rejected()</signal>
-   <receiver>CFileObjectCollectionRevisionDialog</receiver>
+   <receiver>CObjectCollectionRevisionDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

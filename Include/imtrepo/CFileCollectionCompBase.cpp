@@ -24,8 +24,6 @@
 #include <imtbase/CObjectCollectionUpdateEvent.h>
 #include <imtbase/CObjectCollectionRemoveEvent.h>
 
-using OperationState = ifile::IFilePersistence::OperationState;
-
 
 namespace imtrepo
 {
@@ -333,6 +331,27 @@ bool CFileCollectionCompBase::UpdateFile(
 
 // reimplemented (ICollectionDataController)
 
+const ifile::IFilePersistence* CFileCollectionCompBase::GetPersistenceForObjectType(const QByteArray& typeId) const
+{
+	int persistenceIndex = -1;
+
+	if (m_resourceTypesCompPtr.IsValid()){
+		for (int i = 0; i < m_resourceTypesCompPtr->GetOptionsCount(); ++i){
+			if (typeId == m_resourceTypesCompPtr->GetOptionId(i)){
+				persistenceIndex = i;
+				break;
+			}
+		}
+	}
+
+	if ((persistenceIndex >= 0) && persistenceIndex < m_objectPersistenceListCompPtr.GetCount()){
+		return m_objectPersistenceListCompPtr[persistenceIndex];
+	}
+
+	return nullptr;
+}
+
+
 bool CFileCollectionCompBase::ExportFile(const imtbase::IObjectCollection& /*collection*/, const QByteArray& objectId, const QString& targetFilePath) const
 {
 	if (!targetFilePath.isEmpty()){
@@ -415,7 +434,7 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 	}
 
 	if (newObjectPtr.IsValid()){
-		const ifile::IFilePersistence* persistencePtr = GetPersistenceForResource(typeId);
+		const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
 		if (persistencePtr != nullptr){
 			QStringList supportedExts;
 			persistencePtr->GetFileExtensions(supportedExts, defaultValuePtr, ifile::IFilePersistence::QF_SAVE);
@@ -489,7 +508,7 @@ bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr&
 
 bool CFileCollectionCompBase::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const ifile::IFilePersistence* persistencePtr = GetPersistenceForResource(GetObjectTypeId(objectId));
+	const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(GetObjectTypeId(objectId));
 	if (persistencePtr == nullptr){
 		return false;
 	}
@@ -754,7 +773,7 @@ istd::IChangeable* CFileCollectionCompBase::CreateObjectFromFile(const QString& 
 {
 	istd::IChangeable* retVal = CreateDataObject(typeId);
 	if (retVal != nullptr){
-		const ifile::IFilePersistence* filePersistenceCompPtr = GetPersistenceForResource(typeId);
+		const ifile::IFilePersistence* filePersistenceCompPtr = GetPersistenceForObjectType(typeId);
 		if (filePersistenceCompPtr != nullptr){
 			int loadState = filePersistenceCompPtr->LoadFromFile(*retVal, filePath);
 			if (loadState == ifile::IFilePersistence::OS_OK){
@@ -767,33 +786,12 @@ istd::IChangeable* CFileCollectionCompBase::CreateObjectFromFile(const QString& 
 }
 
 
-const ifile::IFilePersistence* CFileCollectionCompBase::GetPersistenceForResource(const QByteArray& typeId) const
-{
-	int factoryIndex = -1;
-
-	if (m_resourceTypesCompPtr.IsValid()){
-		for (int i = 0; i < m_resourceTypesCompPtr->GetOptionsCount(); ++i){
-			if (typeId == m_resourceTypesCompPtr->GetOptionId(i)){
-				factoryIndex = i;
-				break;
-			}
-		}
-	}
-
-	if ((factoryIndex >= 0) && factoryIndex < m_objectPersistenceListCompPtr.GetCount()){
-		return m_objectPersistenceListCompPtr[factoryIndex];
-	}
-
-	return nullptr;
-}
-
-
 QString CFileCollectionCompBase::SaveCollectionItem(const CollectionItem& collectionItem, const QString& dataFilePath) const
 {
 	QString itemFilePath = dataFilePath.isEmpty() ? GetDataItemFilePath(collectionItem) : dataFilePath;
 
 	if (m_helperFilesPersistence.IsValid()){
-		if (m_helperFilesPersistence->SaveToFile(collectionItem, itemFilePath) == OperationState::OS_OK)
+		if (m_helperFilesPersistence->SaveToFile(collectionItem, itemFilePath) == ifile::IFilePersistence::OS_OK)
 			return itemFilePath;
 	}
 	else{
@@ -867,7 +865,7 @@ bool CFileCollectionCompBase::SaveMetaInfo(const idoc::IDocumentMetaInfo& metaIn
 		return false;
 
 	if (m_helperFilesPersistence.IsValid())
-		return m_helperFilesPersistence->SaveToFile(*serializablePtr, metaInfoFilePath) == OperationState::OS_OK;
+		return m_helperFilesPersistence->SaveToFile(*serializablePtr, metaInfoFilePath) == ifile::IFilePersistence::OS_OK;
 
 	// using default serializer
 	ifile::CCompactXmlFileWriteArchive archive(metaInfoFilePath, m_versionInfoCompPtr.GetPtr());
@@ -885,7 +883,7 @@ bool CFileCollectionCompBase::LoadMetaInfo(idoc::IDocumentMetaInfo& metaInfo, co
 		return false;
 
 	if (m_helperFilesPersistence.IsValid())
-		return m_helperFilesPersistence->LoadFromFile(*serializablePtr, metaInfoFilePath) == OperationState::OS_OK;
+		return m_helperFilesPersistence->LoadFromFile(*serializablePtr, metaInfoFilePath) == ifile::IFilePersistence::OS_OK;
 
 	// using default serializer
 	ifile::CCompactXmlFileReadArchive archive(metaInfoFilePath, m_versionInfoCompPtr.GetPtr());
@@ -1058,7 +1056,7 @@ bool CFileCollectionCompBase::ReadItemFile(CollectionItem& collectionItem, const
 		return false;
 
 	if (m_helperFilesPersistence.IsValid())
-		return m_helperFilesPersistence->LoadFromFile(collectionItem, itemFilePath) == OperationState::OS_OK;
+		return m_helperFilesPersistence->LoadFromFile(collectionItem, itemFilePath) == ifile::IFilePersistence::OS_OK;
 
 	ifile::CCompactXmlFileReadArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
 	return collectionItem.Serialize(archive);

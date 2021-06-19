@@ -13,6 +13,25 @@ const iprm::IOptionsList* CObjectCollectionComp::GetObjectTypesInfo() const
 }
 
 
+const ifile::IFilePersistence* CObjectCollectionComp::GetPersistenceForObjectType(const QByteArray& typeId) const
+{
+	int persistenceIndex = -1;
+
+	for (int i = 0; i < m_typesInfo.GetOptionsCount(); ++i){
+		if (typeId == m_typesInfo.GetOptionId(i)){
+			persistenceIndex = i;
+			break;
+		}
+	}
+
+	if ((persistenceIndex >= 0) && persistenceIndex < m_objectPersistenceListCompPtr.GetCount()){
+		return m_objectPersistenceListCompPtr[persistenceIndex];
+	}
+
+	return nullptr;
+}
+
+
 // protected methods
 
 istd::IChangeable* CObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const

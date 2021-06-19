@@ -8,10 +8,11 @@
 // ACF includes
 #include <istd/TOptDelPtr.h>
 #include <imod/CModelUpdateBridge.h>
-#include <iser/ISerializable.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/ICollectionDataController.h>
 
 
 namespace imtbase
@@ -22,11 +23,19 @@ namespace imtbase
 	Basic implementation of a general data object collection.
 	\ingroup Collection
 */
-class CObjectCollectionBase: virtual public IObjectCollection, virtual public iser::ISerializable
+class CObjectCollectionBase:
+			virtual public IObjectCollection,
+			virtual protected ICollectionDataController,
+			virtual public iser::ISerializable
 {
 public:
 	CObjectCollectionBase();
 	virtual ~CObjectCollectionBase();
+
+	// reimplemented (ICollectionDataController)
+	virtual const ifile::IFilePersistence* GetPersistenceForObjectType(const QByteArray& typeId) const override;
+	virtual bool ExportFile(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
+	virtual QByteArray ImportFile(imtbase::IObjectCollection& collection, const QByteArray& typeId, const QString& sourceFilePath = QString()) const override;
 
 	// reimplemented (IObjectCollection)
 	virtual const IRevisionController* GetRevisionController() const override;
@@ -88,6 +97,7 @@ protected:
 			this->isEnabled = object.isEnabled;
 			this->flags = object.flags;
 			this->description = object.description;
+			this->metaInfo.CopyFrom(object.metaInfo);
 		}
 
 		bool isEnabled;
@@ -97,6 +107,7 @@ protected:
 		QByteArray id;
 		QByteArray typeId;
 		int flags;
+		idoc::CStandardDocumentMetaInfo metaInfo;
 	};
 
 	typedef QVector<ObjectInfo> Objects;

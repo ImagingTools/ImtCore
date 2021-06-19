@@ -6,7 +6,7 @@
 #include <QtCore/QByteArray>
 
 // ACF includes
-#include <istd/IPolymorphic.h>
+#include <ifile/IFilePersistence.h>
 
 
 namespace imtbase
@@ -23,6 +23,11 @@ class IObjectCollection;
 class ICollectionDataController: virtual public istd::IPolymorphic
 {
 public:
+	/**
+		Get the file persistence for a given object type.
+	*/
+	virtual const ifile::IFilePersistence* GetPersistenceForObjectType(const QByteArray& typeId) const = 0;
+
 	/**
 		Export a file from an object collection.
 		\param collection	Collection containing the object to be exported.

@@ -18,11 +18,6 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
-			FileObjectCollectionViewDelegate,
-			"View delegate for a file-based collection",
-			"Object Collection File Delegate View");
-
-I_EXPORT_COMPONENT(
 			DocumentCollectionViewDelegate,
 			"View delegate for a file collection using document manager for the data operations",
 			"Object Collection File Delegate View Document MDI");

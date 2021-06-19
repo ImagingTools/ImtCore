@@ -173,7 +173,7 @@ public:
 
 	/**
 		Get access to the object instance inside of collecton.
-		\note This method should returns objects that are fixed in the collection.
+		\note This method should return a valid instance for an object only for objects that are permanent in the collection (fixed).
 	*/
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const = 0;
 
