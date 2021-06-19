@@ -8,6 +8,7 @@
 
 // ACF includes
 #include <istd/TPointerVector.h>
+#include <ibase/IProgressManager.h>
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
@@ -32,6 +33,8 @@ public:
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used for the communication with the server", true, "ProtocolEngine");
 	I_END_COMPONENT
 
+	CApiClientComp();
+
 	// reimplemented (IGqlClient)
 	virtual bool SendRequest(const IGqlRequest& request, const QByteArray& data, ResponseHandler& responseHandler) const override;
 
@@ -44,8 +47,6 @@ private Q_SLOTS:
 
 private:
 	I_REF(IClientProtocolEngine, m_protocolEngineCompPtr);
-
-	mutable QNetworkAccessManager m_networkManager;
 
 	struct RequestInfo
 	{
@@ -62,6 +63,10 @@ private:
 	typedef QVector<RequestInfo> RequestInfos;
 
 	mutable RequestInfos m_requestInfos;
+
+	int m_timeout;
+
+	ibase::IProgressManager* m_progressManagerPtr;
 };
 
 
