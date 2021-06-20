@@ -2,13 +2,13 @@
 
 
 // Qt includes
+#include <QtCore/QMap>
+#include <QtCore/QReadWriteLock>
 #include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 
 // ACF includes
 #include <istd/TPointerVector.h>
-#include <ibase/IProgressManager.h>
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
@@ -48,25 +48,11 @@ private Q_SLOTS:
 private:
 	I_REF(IClientProtocolEngine, m_protocolEngineCompPtr);
 
-	struct RequestInfo
-	{
-		RequestInfo()
-			:replyPtr(nullptr),
-			responseHandlerPtr(nullptr)
-		{
-		}
-
-		QNetworkReply* replyPtr;
-		IGqlClient::ResponseHandler* responseHandlerPtr;
-	};
-
-	typedef QVector<RequestInfo> RequestInfos;
-
-	mutable RequestInfos m_requestInfos;
+	typedef QMap<QNetworkReply*, IGqlClient::ResponseHandler*> RequestMap;
+	mutable RequestMap m_requestMap;
+	mutable QReadWriteLock m_requestMapMutex;
 
 	int m_timeout;
-
-	ibase::IProgressManager* m_progressManagerPtr;
 };
 
 

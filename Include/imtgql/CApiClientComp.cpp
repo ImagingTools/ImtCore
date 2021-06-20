@@ -11,9 +11,9 @@ namespace imtgql
 
 
 // public methods
+
 CApiClientComp::CApiClientComp()
-	:m_timeout(30000),
-	m_progressManagerPtr(nullptr)
+	:m_timeout(30000)
 {
 }
 
@@ -23,6 +23,8 @@ CApiClientComp::CApiClientComp()
 bool CApiClientComp::SendRequest(const IGqlRequest& request, ResponseHandler& responseHandler) const
 {
 	if (!m_protocolEngineCompPtr.IsValid()){
+		SendCriticalMessage(0, "Client engine component was not set. Check the component configuration", "API client");
+
 		return false;
 	}
 
@@ -46,10 +48,12 @@ bool CApiClientComp::SendRequest(const IGqlRequest& request, ResponseHandler& re
 	// If the application will be finished, the internal event loop will be also finished:
 	QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
 
-	// If timeout for the request was defgined, start the timer:
+	// If a timeout for the request was defined, start the timer:
 	if (m_timeout > 0){
 		timer.start(m_timeout);
 	}
+
+	bool retVal = true;
 
 	QNetworkRequest* networkRequestPtr = m_protocolEngineCompPtr->CreateNetworkRequest(request);
 	if (networkRequestPtr != nullptr){
@@ -59,17 +63,15 @@ bool CApiClientComp::SendRequest(const IGqlRequest& request, ResponseHandler& re
 			if (replyPtr != nullptr){
 				connect(replyPtr, &QNetworkReply::finished, this, &CApiClientComp::OnReply, Qt::DirectConnection);
 
-				RequestInfo requestInfo;
-				requestInfo.replyPtr = replyPtr;
-				requestInfo.responseHandlerPtr = &responseHandler;
+				{
+					QWriteLocker mapLock(&m_requestMapMutex);
 
-				m_requestInfos.push_back(requestInfo);
+					m_requestMap[replyPtr] = &responseHandler;
+				}
 
 				connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 
 				timer.stop();
-
-				bool retVal = true;
 
 				// Check if the reply was timed out and cancel further network processing:
 				if (replyPtr->isRunning()){
@@ -85,14 +87,28 @@ bool CApiClientComp::SendRequest(const IGqlRequest& request, ResponseHandler& re
 					retVal = false;
 				}
 
-				networkManagerPtr->deleteLater();
+				{
+					QWriteLocker mapLock(&m_requestMapMutex);
 
-				return retVal;
+					m_requestMap.remove(replyPtr);
+				}
+			}
+			else{
+				qDebug("POST operation failed");
+
+				retVal = false;
 			}
 		}
 	}
+	else{
+		qDebug("Network request could not be created by the client engine");
 
-	return false;
+		retVal = false;
+	}
+	
+	networkManagerPtr->deleteLater();
+
+	return retVal;
 }
 
 
@@ -112,25 +128,28 @@ void CApiClientComp::OnReply()
 {
 	QNetworkReply* replyPtr = dynamic_cast<QNetworkReply*>(sender());
 	if (replyPtr != nullptr){
-		for (const RequestInfo& requestInfo : m_requestInfos){
-			if (requestInfo.replyPtr == replyPtr){
-				QByteArray payload = replyPtr->readAll();
+		QReadLocker mapLock(&m_requestMapMutex);
 
-				if (replyPtr->error() == QNetworkReply::NoError){
-					if (requestInfo.responseHandlerPtr != nullptr){
-						requestInfo.responseHandlerPtr->OnReply(payload);
-					}
+		if (m_requestMap.contains(replyPtr)){
+			ResponseHandler* responseHandlerPtr = m_requestMap[replyPtr];
+			Q_ASSERT(responseHandlerPtr != nullptr);
 
-					qDebug() << "*** SERVER RESPONSE: " << payload;
-				}
-				else{
-					qDebug() << "*** NETWORK ERROR: " << replyPtr->errorString();
-				}
+			m_requestMapMutex.unlock();
+
+			QByteArray payload = replyPtr->readAll();
+
+			if (replyPtr->error() == QNetworkReply::NoError){
+				responseHandlerPtr->OnReply(payload);
+
+				qDebug() << "*** SERVER RESPONSE: " << payload;
+			}
+			else{
+				qDebug() << "*** NETWORK ERROR: " << replyPtr->errorString();
 			}
 		}
-
-		replyPtr->deleteLater();
 	}
+
+	replyPtr->deleteLater();
 }
 
 } // namespace imtgql
