@@ -1,6 +1,10 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QVector.h>
+#include <QtCore/QVariant.h>
+
 // ImtCore includes
 #include <imtgql/IGqlRequest.h>
 
