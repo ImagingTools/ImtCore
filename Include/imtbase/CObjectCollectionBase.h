@@ -11,6 +11,7 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
+#include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/ICollectionDataController.h>
 
@@ -47,7 +48,9 @@ public:
 				const QString& name,
 				const QString& description,
 				const istd::IChangeable* defaultValuePtr = nullptr,
-				const QByteArray& proposedObjectId = QByteArray()) override;
+				const QByteArray& proposedObjectId = QByteArray(),
+				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
+				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr) override;
 	virtual bool RemoveObject(const QByteArray& objectId) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
@@ -108,10 +111,17 @@ protected:
 		QByteArray typeId;
 		int flags;
 		idoc::CStandardDocumentMetaInfo metaInfo;
+
+		/**
+			Meta-informations for the data object.
+		*/
+		imtbase::IMetaInfoCreator::MetaInfoPtr contentsMetaInfoPtr;
 	};
 
 	typedef QVector<ObjectInfo> Objects;
 	typedef QList<IObjectCollectionEventHandler*> EventHandlerList;
+
+	Objects m_objects;
 
 protected:
 	// abstract methods
@@ -127,7 +137,6 @@ protected:
 private:
 	imod::CModelUpdateBridge m_modelUpdateBridge;
 
-	Objects m_objects;
 	EventHandlerList m_eventHandlerList;
 };
 

@@ -41,7 +41,9 @@ public:
 				const QString& name,
 				const QString& description,
 				const istd::IChangeable* defaultValuePtr = nullptr,
-				const QByteArray& proposedObjectId = QByteArray()) override;
+				const QByteArray& proposedObjectId = QByteArray(),
+				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
+				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr) override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;

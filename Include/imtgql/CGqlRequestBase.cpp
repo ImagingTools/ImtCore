@@ -31,7 +31,7 @@ void CGqlRequestBase::InsertField(const QByteArray& fieldId)
 }
 
 
-void CGqlRequestBase::InsertFieldArgument(const QByteArray & fieldId, const QByteArray & argumentId, const QVariant & value)
+void CGqlRequestBase::InsertFieldArgument(const QByteArray& fieldId, const QByteArray& argumentId, const QVariant& value)
 {
 	if (m_fieldsMap.contains(fieldId)){
 		Field& field = m_fieldsMap[fieldId];

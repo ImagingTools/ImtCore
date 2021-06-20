@@ -108,8 +108,18 @@ int CObjectCollectionBase::GetOperationFlags(const QByteArray& objectId) const
 }
 
 
-bool CObjectCollectionBase::GetDataMetaInfo(const QByteArray& /*objectId*/, MetaInfoPtr& /*metaInfoPtr*/) const
+bool CObjectCollectionBase::GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const
 {
+	for (const ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == objectId){
+			if (objectInfo.contentsMetaInfoPtr.IsValid()){
+				metaInfoPtr.SetCastedOrRemove(objectInfo.contentsMetaInfoPtr->CloneMe());
+
+				return metaInfoPtr.IsValid();
+			}
+		}
+	}
+
 	return false;
 }
 
@@ -119,7 +129,9 @@ QByteArray CObjectCollectionBase::InsertNewObject(
 			const QString& name,
 			const QString& description,
 			const istd::IChangeable* defaultValuePtr,
-			const QByteArray& proposedObjectId)
+			const QByteArray& proposedObjectId,
+			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
+			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
 {
 	ObjectInfo info;
 
@@ -143,6 +155,14 @@ QByteArray CObjectCollectionBase::InsertNewObject(
 		info.name = name;
 		info.typeId = typeId;
 		info.flags = GetItemDefaultFlags();
+
+		if (collectionItemMetaInfoPtr != nullptr){
+			info.metaInfo.CopyFrom(*collectionItemMetaInfoPtr);
+		}
+
+		if (dataMetaInfoPtr != nullptr){
+			info.contentsMetaInfoPtr.SetCastedOrRemove(dataMetaInfoPtr->CloneMe());
+		}
 
 		if (InsertObjectIntoCollection(info)){
 			return info.id;

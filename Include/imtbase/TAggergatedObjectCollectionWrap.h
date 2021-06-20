@@ -49,7 +49,9 @@ public:
 				const QString& name,
 				const QString& description,
 				const istd::IChangeable* defaultValuePtr = nullptr,
-				const QByteArray& proposedObjectId = QByteArray()) override;
+				const QByteArray& proposedObjectId = QByteArray(),
+				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
+				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr) override;
 	virtual bool RemoveObject(const QByteArray& objectId) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
@@ -148,9 +150,11 @@ inline QByteArray TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::In
 			const QString& name,
 			const QString& description,
 			const istd::IChangeable* defaultValuePtr,
-			const QByteArray& proposedObjectId)
+			const QByteArray& proposedObjectId,
+			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
+			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
 {
-	return m_collection.InsertNewObject(typeId, name, description, defaultValuePtr, proposedObjectId);
+	return m_collection.InsertNewObject(typeId, name, description, defaultValuePtr, proposedObjectId, dataMetaInfoPtr, collectionItemMetaInfoPtr);
 }
 
 
