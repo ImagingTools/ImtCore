@@ -9,6 +9,9 @@ namespace imtgql
 {
 
 
+/**
+	Common interface for a GraphQL request.
+*/
 class IGqlRequest: virtual public iser::IObject
 {
 public:

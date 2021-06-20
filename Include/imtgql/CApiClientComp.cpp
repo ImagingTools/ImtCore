@@ -66,7 +66,14 @@ bool CApiClientComp::SendRequest(const IGqlRequest& request, ResponseHandler& re
 				{
 					QWriteLocker mapLock(&m_requestMapMutex);
 
-					m_requestMap[replyPtr] = &responseHandler;
+					Response response;
+
+					response.responseHandlerPtr = &responseHandler;
+					response.requestPtr.SetCastedOrRemove(request.CloneMe());
+
+					Q_ASSERT(response.requestPtr.IsValid());
+
+					m_requestMap[replyPtr] = response;
 				}
 
 				connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
@@ -131,15 +138,18 @@ void CApiClientComp::OnReply()
 		QReadLocker mapLock(&m_requestMapMutex);
 
 		if (m_requestMap.contains(replyPtr)){
-			ResponseHandler* responseHandlerPtr = m_requestMap[replyPtr];
+			ResponseHandler* responseHandlerPtr = m_requestMap[replyPtr].responseHandlerPtr;
 			Q_ASSERT(responseHandlerPtr != nullptr);
+
+			IGqlRequest* requestPtr = m_requestMap[replyPtr].requestPtr.GetPtr();
+			Q_ASSERT(requestPtr != nullptr);
 
 			m_requestMapMutex.unlock();
 
 			QByteArray payload = replyPtr->readAll();
 
 			if (replyPtr->error() == QNetworkReply::NoError){
-				responseHandlerPtr->OnReply(payload);
+				responseHandlerPtr->OnReply(*requestPtr, payload);
 
 				qDebug() << "*** SERVER RESPONSE: " << payload;
 			}

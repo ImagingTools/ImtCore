@@ -1,9 +1,15 @@
 #include <imtgql/CGqlQuery.h>
 
 
+// ACF includes
+#include <istd/TDelPtr.h>
+
+
 namespace imtgql
 {
 
+
+// public methods
 
 imtgql::CGqlQuery::CGqlQuery(const QByteArray& commandId)
 	:BaseClass(commandId)
@@ -22,6 +28,25 @@ imtgql::IGqlRequest::RequestType CGqlQuery::GetRequestType() const
 QByteArray CGqlQuery::GetQuery() const
 {
 	return QByteArray("{") + QByteArray("\"query\"") + ":" + "\"query " + m_commandId + " { " + m_commandId + QString(" { data { %1 } } }" + QByteArray("\"") + " }").arg(CreateFieldQueryPart()).toUtf8();
+}
+
+
+// reimplemented (istd::IChangeable)
+
+int CGqlQuery::GetSupportedOperations() const
+{
+	return BaseClass::GetSupportedOperations() | SO_CLONE;
+}
+
+
+istd::IChangeable* CGqlQuery::CloneMe(CompatibilityMode mode) const
+{
+	istd::TDelPtr<CGqlQuery> clonePtr(new CGqlQuery);
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr.PopPtr();
+	}
+
+	return nullptr;
 }
 
 

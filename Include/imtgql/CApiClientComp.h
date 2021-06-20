@@ -48,7 +48,18 @@ private Q_SLOTS:
 private:
 	I_REF(IClientProtocolEngine, m_protocolEngineCompPtr);
 
-	typedef QMap<QNetworkReply*, IGqlClient::ResponseHandler*> RequestMap;
+	struct Response
+	{
+		Response()
+			:responseHandlerPtr(nullptr)
+		{
+		}
+
+		istd::TSmartPtr<imtgql::IGqlRequest> requestPtr;
+		IGqlClient::ResponseHandler* responseHandlerPtr;
+	};
+
+	typedef QMap<QNetworkReply*, Response> RequestMap;
 	mutable RequestMap m_requestMap;
 	mutable QReadWriteLock m_requestMapMutex;
 

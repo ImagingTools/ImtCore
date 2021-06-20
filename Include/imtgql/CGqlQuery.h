@@ -20,6 +20,10 @@ public:
 	virtual RequestType GetRequestType() const override;
 	virtual QByteArray GetQuery() const override;
 
+	// reimplemented (istd::IChangeable)
+	virtual int GetSupportedOperations() const override;
+	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+
 protected:
 	virtual QString CreateFieldQueryPart() const;
 };

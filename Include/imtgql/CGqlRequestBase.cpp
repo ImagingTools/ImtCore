@@ -1,9 +1,16 @@
 #include <imtgql/CGqlRequestBase.h>
 
 
+// ACF includes
+#include <istd/TDelPtr.h>
+#include <istd/CChangeNotifier.h>
+
+
 namespace imtgql
 {
 
+
+// public methods
 
 CGqlRequestBase::CGqlRequestBase(const QByteArray& commandId)
 	:m_commandId(commandId)
@@ -71,6 +78,42 @@ QByteArray CGqlRequestBase::GetFactoryId() const
 bool CGqlRequestBase::Serialize(iser::IArchive& /*archive*/)
 {
 	return false;
+}
+
+
+// reimplemented (istd::IChangeable)
+
+int CGqlRequestBase::GetSupportedOperations() const
+{
+	return SO_COPY | SO_RESET;
+}
+
+
+bool CGqlRequestBase::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+{
+	const CGqlRequestBase* sourcePtr = dynamic_cast<const CGqlRequestBase*>(&object);
+	if (sourcePtr != nullptr){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_commandId = sourcePtr->m_commandId;
+		m_fieldsMap = sourcePtr->m_fieldsMap;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+
+bool CGqlRequestBase::ResetData(CompatibilityMode /*mode*/)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_commandId.clear();
+	m_fieldsMap.clear();
+
+	return true;
 }
 
 
