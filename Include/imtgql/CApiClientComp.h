@@ -30,6 +30,7 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CApiClientComp);
+		I_REGISTER_INTERFACE(IGqlClient);
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used for the communication with the server", true, "ProtocolEngine");
 	I_END_COMPONENT
 

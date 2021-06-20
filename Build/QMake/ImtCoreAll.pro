@@ -155,6 +155,10 @@ SUBDIRS += ImtPyPck
 ImtPyPck.file = ../../Impl/ImtPyPck/QMake/ImtPyPck.pro
 ImtPyPck.depends = imtpy
 
+SUBDIRS += ImtGqlPck
+ImtGqlPck.file = ../../Impl/ImtGqlPck/QMake/ImtGqlPck.pro
+ImtGqlPck.depends = imtgql
+
 # Application
 #!linux{
 #	SUBDIRS += EagleView

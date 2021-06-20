@@ -144,7 +144,7 @@ void CApiClientComp::OnReply()
 			IGqlRequest* requestPtr = m_requestMap[replyPtr].requestPtr.GetPtr();
 			Q_ASSERT(requestPtr != nullptr);
 
-			m_requestMapMutex.unlock();
+			mapLock.unlock();
 
 			QByteArray payload = replyPtr->readAll();
 
