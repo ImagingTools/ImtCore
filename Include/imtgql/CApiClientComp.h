@@ -20,6 +20,8 @@ namespace imtgql
 {
 
 
+class RequestSender;
+
 class CApiClientComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
@@ -43,9 +45,6 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated();
 
-private Q_SLOTS:
-	void OnReply();
-
 private:
 	I_REF(IClientProtocolEngine, m_protocolEngineCompPtr);
 
@@ -65,6 +64,8 @@ private:
 	mutable QReadWriteLock m_requestMapMutex;
 
 	int m_timeout;
+
+	friend class RequestSender;
 };
 
 
