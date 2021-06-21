@@ -136,7 +136,10 @@ public:
 					qDebug() << "*** SERVER RESPONSE: " << payload;
 				}
 				else{
+					m_client.SendErrorMessage(0, QString::fromLatin1(payload));
+
 					qDebug() << "*** NETWORK ERROR: " << replyPtr->errorString();
+					qDebug() << payload;
 				}
 			}
 		}
