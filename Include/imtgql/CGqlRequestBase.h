@@ -18,6 +18,8 @@ class CGqlRequestBase: virtual public IGqlRequest
 public:
 	CGqlRequestBase(const QByteArray& commandId = QByteArray());
 
+	void InsertQueryParameter(const QByteArray& paramId);
+	void InsertParameterValue(const QByteArray& paramId, const QByteArray& valueId, const QVariant& value);
 	void InsertField(const QByteArray& fieldId);
 	void InsertFieldArgument(const QByteArray& fieldId, const QByteArray& argumentId, const QVariant& value);
 	
@@ -54,6 +56,8 @@ protected:
 
 	typedef QMap<QByteArray, Field> Fields;
 	Fields m_fieldsMap;
+
+	Fields m_paramsMap;
 
 	QByteArray m_commandId;
 };

@@ -18,7 +18,36 @@ CGqlRequestBase::CGqlRequestBase(const QByteArray& commandId)
 }
 
 
-// reimplemented (IGqlRequest)
+void CGqlRequestBase::InsertQueryParameter(const QByteArray& paramId)
+{
+	if (!m_paramsMap.contains(paramId)){
+		Field parameter;
+		parameter.id = paramId;
+
+		m_paramsMap[paramId] = parameter;
+	}
+	else{
+		Q_ASSERT(false);
+	}
+}
+
+
+void CGqlRequestBase::InsertParameterValue(const QByteArray& paramId, const QByteArray& valueId, const QVariant& value)
+{
+	if (m_paramsMap.contains(paramId)){
+		Field& parameter = m_paramsMap[paramId];
+
+		Argument argument;
+		argument.key = valueId;
+		argument.value = value;
+
+		parameter.arguments.push_back(argument);
+	}
+	else{
+		Q_ASSERT(false);
+	}
+}
+
 
 void CGqlRequestBase::InsertField(const QByteArray& fieldId)
 {
@@ -27,6 +56,9 @@ void CGqlRequestBase::InsertField(const QByteArray& fieldId)
 		newField.id = fieldId;
 
 		m_fieldsMap[fieldId] = newField;
+	}
+	else{
+		Q_ASSERT(false);
 	}
 }
 
@@ -42,8 +74,13 @@ void CGqlRequestBase::InsertFieldArgument(const QByteArray& fieldId, const QByte
 
 		field.arguments.push_back(argument);
 	}
+	else{
+		Q_ASSERT(false);
+	}
 }
 
+
+// reimplemented (IGqlRequest)
 
 QByteArray CGqlRequestBase::GetCommandId() const
 {
@@ -97,6 +134,7 @@ bool CGqlRequestBase::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 
 		m_commandId = sourcePtr->m_commandId;
 		m_fieldsMap = sourcePtr->m_fieldsMap;
+		m_paramsMap = sourcePtr->m_paramsMap;
 
 		return true;
 	}
@@ -112,6 +150,7 @@ bool CGqlRequestBase::ResetData(CompatibilityMode /*mode*/)
 
 	m_commandId.clear();
 	m_fieldsMap.clear();
+	m_paramsMap.clear();
 
 	return true;
 }

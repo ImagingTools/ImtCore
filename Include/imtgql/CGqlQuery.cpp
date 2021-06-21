@@ -27,7 +27,9 @@ imtgql::IGqlRequest::RequestType CGqlQuery::GetRequestType() const
 
 QByteArray CGqlQuery::GetQuery() const
 {
-	return QByteArray("{") + QByteArray("\"query\"") + ":" + "\"query " + m_commandId + " { " + m_commandId + QString(" { data { %1 } } }" + QByteArray("\"") + " }").arg(CreateFieldQueryPart()).toUtf8();
+	QByteArray queryData = QString(" { data { %1 } } }" + QByteArray("\"") + " }").arg(CreateFieldQueryPart()).toUtf8();
+
+	return QByteArray("{") + QByteArray("\"query\"") + ":" + "\"query " + m_commandId + " { " + m_commandId + CreateQueryParams().toUtf8() + queryData;
 }
 
 
@@ -67,6 +69,44 @@ QString CGqlQuery::CreateFieldQueryPart() const
 	}
 
 	return fields;
+}
+
+
+QString CGqlQuery::CreateQueryParams() const
+{
+	if (m_paramsMap.isEmpty()){
+		return QString();
+	}
+
+	QString queryParamsString;
+
+	queryParamsString += "(";
+
+	QByteArrayList parameterIds = m_paramsMap.keys();
+
+	for (int i = 0; i < parameterIds.count(); ++i){
+		QByteArray parameterId = parameterIds[i];
+		queryParamsString += parameterId;
+		queryParamsString += ": ";
+		queryParamsString += "{";
+
+		Arguments arguments = m_paramsMap[parameterId].arguments;
+		for (int argIndex = 0; argIndex < arguments.count(); ++argIndex){
+			queryParamsString += arguments[argIndex].key;
+			queryParamsString += ": ";
+			queryParamsString += "\\\"" + arguments[argIndex].value.toString() + "\\\"";
+		}
+
+		queryParamsString += "}";
+
+		if (i < parameterIds.count() - 1){
+			queryParamsString += ", ";
+		}
+	}
+
+	queryParamsString += ")";
+
+	return queryParamsString;
 }
 
 

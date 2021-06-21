@@ -26,6 +26,7 @@ public:
 
 protected:
 	virtual QString CreateFieldQueryPart() const;
+	virtual QString CreateQueryParams() const;
 };
 
 
