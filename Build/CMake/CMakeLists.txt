@@ -106,8 +106,6 @@ add_dependencies(ImtZipPck imtzip)
 add_subdirectory("${IMPL_DIR}/ImtPyPck/CMake" "${AUX_INCLUDE_DIR}/ImtPyPck")
 add_dependencies(ImtPyPck imtpy)
 
-add_subdirectory("${IMPL_DIR}/ImtDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtDbPck")
-
 # Application
 if(NOT UNIX)
 #	add_subdirectory("${IMPL_DIR}/EagleView/CMake" "${AUX_INCLUDE_DIR}/EagleView")
