@@ -58,7 +58,15 @@ const IDataBaseChangeable* CDataBaseObjectCollection::CreateObjectFromSqlRecord(
 	return nullptr;
 }
 
-QByteArray CDataBaseObjectCollection::InsertNewObject(const QByteArray& typeId, const QString& name, const QString& description, const istd::IChangeable* defaultValuePtr, const QByteArray& preferredId)
+
+QByteArray CDataBaseObjectCollection::InsertNewObject(
+			const QByteArray& typeId,
+			const QString& name,
+			const QString& description,
+			const istd::IChangeable* defaultValuePtr,
+			const QByteArray& proposedObjectId,
+			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
+			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
 {
 	Q_ASSERT_X(0, Q_FUNC_INFO, "Unreimplemented method call");
 	return nullptr;
