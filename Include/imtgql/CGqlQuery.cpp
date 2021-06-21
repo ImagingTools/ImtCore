@@ -94,7 +94,23 @@ QString CGqlQuery::CreateQueryParams() const
 		for (int argIndex = 0; argIndex < arguments.count(); ++argIndex){
 			queryParamsString += arguments[argIndex].key;
 			queryParamsString += ": ";
-			queryParamsString += "\\\"" + arguments[argIndex].value.toString() + "\\\"";
+
+			int valueType = arguments[argIndex].value.type();
+			bool isString = (valueType == QVariant::String) || (valueType == QVariant::ByteArray);
+
+			if (isString){
+				queryParamsString += "\\\"";
+			}
+
+			queryParamsString += arguments[argIndex].value.toString();
+
+			if (isString){
+				queryParamsString += "\\\"";
+			}
+
+			if (argIndex < arguments.count() - 1){
+				queryParamsString += ", ";
+			}
 		}
 
 		queryParamsString += "}";
