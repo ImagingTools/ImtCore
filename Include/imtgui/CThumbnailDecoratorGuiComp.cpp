@@ -151,8 +151,13 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 void CThumbnailDecoratorGuiComp::OnRestoreSettings(const QSettings& settings)
 {
 	QString lastUser  = settings.value("LastUser").toString();
+	bool isRememberMe = settings.value("RememberMe",false).toBool();
 
-	UserEdit->setText(lastUser);
+	if (isRememberMe){
+		UserEdit->setText(lastUser);
+	}
+
+	RememberMe->setChecked(isRememberMe);
 
 	if (!lastUser.isEmpty()){
 		PasswordEdit->setFocus();
@@ -163,9 +168,12 @@ void CThumbnailDecoratorGuiComp::OnRestoreSettings(const QSettings& settings)
 
 void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& settings) const
 {
+	bool isRememberMe = RememberMe->isChecked();
 	QString lastUser  = UserEdit->text();
 	
+	settings.setValue("RememberMe", isRememberMe);
 	settings.setValue("LastUser", lastUser);
+
 }
 
 
@@ -472,6 +480,9 @@ void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
 		QString userName = UserEdit->text();
 		QString password = PasswordEdit->text();
 		if (m_loginCompPtr->Login(userName, password)){
+			if (RememberMe->isChecked() == false){
+				UserEdit->setText("");
+			}
 			int autoLogoutSeconds = GetAutoLogoutTime();
 			if (autoLogoutSeconds > 0){
 				m_autoLogoutTimer.start(autoLogoutSeconds * 1000);
