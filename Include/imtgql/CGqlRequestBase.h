@@ -19,7 +19,7 @@ public:
 	CGqlRequestBase(const QByteArray& commandId = QByteArray());
 
 	void InsertQueryParameter(const QByteArray& paramId);
-	void InsertParameterValue(const QByteArray& paramId, const QByteArray& valueId, const QVariant& value);
+	void InsertParameterAttribute(const QByteArray& paramId, const QByteArray& attributeId, const QVariant& value);
 	void InsertField(const QByteArray& fieldId);
 	void InsertFieldArgument(const QByteArray& fieldId, const QByteArray& argumentId, const QVariant& value);
 	

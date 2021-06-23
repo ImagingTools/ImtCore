@@ -32,13 +32,13 @@ void CGqlRequestBase::InsertQueryParameter(const QByteArray& paramId)
 }
 
 
-void CGqlRequestBase::InsertParameterValue(const QByteArray& paramId, const QByteArray& valueId, const QVariant& value)
+void CGqlRequestBase::InsertParameterAttribute(const QByteArray& paramId, const QByteArray& attributeId, const QVariant& value)
 {
 	if (m_paramsMap.contains(paramId)){
 		Field& parameter = m_paramsMap[paramId];
 
 		Argument argument;
-		argument.key = valueId;
+		argument.key = attributeId;
 		argument.value = value;
 
 		parameter.arguments.push_back(argument);
