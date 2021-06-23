@@ -72,7 +72,6 @@ void CObjectCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 
 			QLabel* labelValuePtr = new QLabel(textValue, GetWidget());
 			labelValuePtr->setProperty("MetaInfoValue", true);
-			//labelValuePtr->setWordWrap(true);
 			layoutPtr->addWidget(labelValuePtr, layoutPtr->rowCount(), 0, 1, 1);
 		}
 
