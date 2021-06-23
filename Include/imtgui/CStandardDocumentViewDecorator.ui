@@ -52,16 +52,32 @@
       </property>
       <item>
        <widget class="QLabel" name="DocumentTitle">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
         </property>
         <property name="text">
-         <string/>
+         <string>lkfldkjfgldfjgldjflkjdlfkjldkfjldkjflgkdjflgkjdlfkgjdlfkgjldfkjgldkfjgldkfjglkdjflgkdjflgkdjflgkjdflgkjdlfkjgldfg</string>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>60</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="QToolButton" name="NewButton">
@@ -124,7 +140,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>40</width>
+          <width>60</width>
           <height>20</height>
          </size>
         </property>
@@ -188,11 +204,11 @@
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeType">
-         <enum>QSizePolicy::Expanding</enum>
+         <enum>QSizePolicy::Fixed</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>40</width>
+          <width>60</width>
           <height>20</height>
          </size>
         </property>
@@ -226,6 +242,9 @@
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Maximum</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>

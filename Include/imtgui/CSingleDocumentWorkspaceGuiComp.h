@@ -27,6 +27,8 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
+		I_ASSIGN(m_iconSizeAttrPtr, "IconSize", "Size of the icon used in the document command tool bar", true, 16);
+		I_ASSIGN(m_toolButtonStyleAttrPtr, "ToolButtonStyle", "Style of the command tool bar (See Qt::QToolButtonStyle for reference)", true, Qt::ToolButtonFollowStyle);
 	I_END_COMPONENT;
 
 	CSingleDocumentWorkspaceGuiComp();
@@ -95,6 +97,9 @@ private:
 	imod::TModelWrap<Commands> m_commands;
 
 	istd::TDelPtr<IDocumentViewDecorator> m_documentViewPtr;
+
+	I_ATTR(int, m_iconSizeAttrPtr);
+	I_ATTR(int, m_toolButtonStyleAttrPtr);
 };
 
 
@@ -107,7 +112,9 @@ public:
 				CSingleDocumentWorkspaceGuiComp* parentPtr,
 				istd::IPolymorphic* viewPtr,
 				QWidget* parentWidgetPtr,
-				const ifile::IFilePersistence* persistencePtr);
+				const ifile::IFilePersistence* persistencePtr,
+				int iconSize,
+				Qt::ToolButtonStyle toolButtonStyle);
 };
 
 
