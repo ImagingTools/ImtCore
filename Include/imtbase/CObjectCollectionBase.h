@@ -101,6 +101,7 @@ protected:
 			this->flags = object.flags;
 			this->description = object.description;
 			this->metaInfo.CopyFrom(object.metaInfo);
+			this->contentsMetaInfoPtr = object.contentsMetaInfoPtr;
 		}
 
 		bool isEnabled;
