@@ -91,13 +91,14 @@ protected:
 protected:
 	virtual ConstResponsePtr OnRequestReceived(const imtrest::CHttpRequest& request) const;
 	virtual ConstResponsePtr CreateDefaultErrorResponse(const QByteArray& errorString, const imtrest::CHttpRequest& request) const;
-
-private:
 	static void ExtractRequestInfo(
 				const imtrest::CHttpRequest& request,
 				QByteArray& commandId,
 				imtrest::IRequest::CommandParams& commandParams,
 				HeadersMap& headers);
+
+private:
+
 
 private:
 	I_ATTR(QByteArray, m_commandIdAttrPtr);

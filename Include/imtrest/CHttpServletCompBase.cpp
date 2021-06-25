@@ -219,8 +219,6 @@ IRequestHandler::ConstResponsePtr CHttpServletCompBase::CreateDefaultErrorRespon
 }
 
 
-// private methods
-
 void CHttpServletCompBase::ExtractRequestInfo(
 			const imtrest::CHttpRequest& request,
 			QByteArray& commandId,
