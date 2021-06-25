@@ -1,7 +1,7 @@
 #pragma once
 
 // Qt includes
-#include <QtSql>
+#include <QtSql/QtSql>
 
 // ACF includes
 #include <istd/IPolymorphic.h>
@@ -16,7 +16,7 @@ namespace imtdb
 	Interfaces and basic implementations for general database management.
 	This package is system independent.
 */
-class IDatabaseEngine : virtual public istd::IPolymorphic
+class IDataBaseEngine : virtual public istd::IPolymorphic
 {
 public:
 	virtual	QString ConnectionName() const = 0;

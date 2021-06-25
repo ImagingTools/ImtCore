@@ -16,13 +16,13 @@ namespace imtdb
 
 class CDataBaseEngineComp :
 			public ilog::CLoggerComponentBase,
-			virtual public IDatabaseEngine
+			virtual public IDataBaseEngine
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDataBaseEngineComp);
-		I_REGISTER_INTERFACE(IDatabaseEngine)
+		I_REGISTER_INTERFACE(IDataBaseEngine)
 		I_ASSIGN(m_dbType, "DbType", "List of DbType used with corresponded handlers", true, "");
 		I_ASSIGN(m_dbName, "DbName", "List of DbName used with corresponded handlers", true, "");
 		I_ASSIGN(m_userName, "UserName", "List of command-UserName used with corresponded handlers", true, "");

@@ -1,7 +1,7 @@
 #pragma once
 
 // Qt includes
-#include <QtSql>
+#include <QtSql/QtSql>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -71,7 +71,7 @@ protected:
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override;
 
 protected:
-	I_REF(IDatabaseEngine, m_dbEngine);
+	I_REF(IDataBaseEngine, m_dbEngine);
 	I_ATTR(bool, m_updateOnDataBaseConnected);
 	I_ATTR(QByteArray, m_selectSqlQueryPath);
 	I_ATTR(QByteArray, m_insertSqlQueryPath);
