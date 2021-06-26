@@ -62,7 +62,7 @@
          <property name="ImtTopFrame" stdset="0">
           <bool>true</bool>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <layout class="QHBoxLayout" name="TopFrameLayout">
           <property name="spacing">
            <number>4</number>
           </property>
@@ -194,7 +194,7 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer">
+           <spacer name="CommandSpaceLeft">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -240,7 +240,7 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_3">
+           <spacer name="CommandSpacerRight">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -253,7 +253,7 @@
            </spacer>
           </item>
           <item>
-           <spacer name="horizontalSpacer_2">
+           <spacer name="AdditionalSpacerRight">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>

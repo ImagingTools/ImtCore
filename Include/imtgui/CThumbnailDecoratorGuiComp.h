@@ -57,6 +57,7 @@ public:
 		I_ASSIGN(m_welcomeTextAttrPtr, "WelcomeText", "Welcome text on the start page", true, "Welcome");
 		I_ASSIGN(m_closeRightIdAttrPtr, "CloseRightId", "ID of the user right to close the application", true, "Close");
 		I_ASSIGN_MULTI_0(m_disablePageListViewIndexesAttrPtr, "DisablePageListViewIndexes", "List of page indexes where the page list view is not shown", false);
+		I_ASSIGN(m_showPageTitlesAttrPtr, "ShowPageTitles", "Show title of the current page in the main tool bar", true, true);
 	I_END_COMPONENT;
 
 protected:
@@ -73,6 +74,7 @@ protected:
 	I_TEXTATTR(m_welcomeTextAttrPtr);
 	I_ATTR(QByteArray, m_closeRightIdAttrPtr);
 	I_MULTIATTR(int, m_disablePageListViewIndexesAttrPtr);
+	I_ATTR(bool, m_showPageTitlesAttrPtr);
 };
 
 

@@ -34,17 +34,17 @@ public:
 		// If the network reply is finished, the internal event loop will be finished:
 		QObject::connect(networkManagerPtr, &QNetworkAccessManager::finished, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
 
-		QTimer timer;
-		timer.setSingleShot(true);
-
-		// If the timer is running out, the internal event loop will be finished:
-		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
-
 		// If the application will be finished, the internal event loop will be also finished:
 		QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
 
 		// If a timeout for the request was defined, start the timer:
+		QTimer timer;
 		if (m_client.m_timeout > 0){
+			timer.setSingleShot(true);
+
+			// If the timer is running out, the internal event loop will be finished:
+			QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
+
 			timer.start(m_client.m_timeout);
 		}
 
@@ -184,6 +184,8 @@ bool CApiClientComp::SendRequest(const IGqlRequest& request, ResponseHandler& re
 void CApiClientComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	m_timeout = *m_timeoutAttrPtr;
 }
 
 

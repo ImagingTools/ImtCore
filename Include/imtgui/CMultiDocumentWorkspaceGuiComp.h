@@ -27,8 +27,6 @@ public:
 		I_ASSIGN(m_loginCompPtr, "Login", "Login component", false, "Login");
 		I_ASSIGN(m_logCompPtr, "Log", "Message consumer component", false, "Log");
 		I_ASSIGN(m_tabStyleSheetPropertyAttrPtr, "TabStyleSheetProperty", "Enable a stylesheet with a property for the tab", true, "");
-		I_ASSIGN(m_iconSizeAttrPtr, "IconSize", "Size of the icon used in the document command tool bar", true, 16);
-		I_ASSIGN(m_toolButtonStyleAttrPtr, "ToolButtonStyle", "Style of the command tool bar (See Qt::QToolButtonStyle for reference)", true, Qt::ToolButtonFollowStyle);
 	I_END_COMPONENT;
 
 protected:
@@ -61,8 +59,6 @@ private:
 	I_ATTR(QByteArray, m_tabStyleSheetPropertyAttrPtr);
 	I_REF(iauth::ILogin, m_loginCompPtr);
 	I_REF(ilog::IMessageConsumer, m_logCompPtr);
-	I_ATTR(int, m_iconSizeAttrPtr);
-	I_ATTR(int, m_toolButtonStyleAttrPtr);
 };
 
 
@@ -77,8 +73,7 @@ public:
 				istd::IPolymorphic* viewPtr,
 				QWidget* parentWidgetPtr,
 				const ifile::IFilePersistence* persistencePtr,
-				int iconSize,
-				Qt::ToolButtonStyle toolButtonStyle);
+				const DecoratorConfiguration& configuration);
 };
 
 

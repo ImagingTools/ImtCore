@@ -27,7 +27,14 @@ IDocumentViewDecorator* CSingleDocumentWorkspaceGuiComp::CreateDocumentViewDecor
 			QWidget* parentWidgetPtr,
 			const ifile::IFilePersistence* persistencePtr)
 {
-	return new SdiDocumentViewDecorator(this, viewPtr, parentWidgetPtr, persistencePtr, *m_iconSizeAttrPtr, Qt::ToolButtonStyle(*m_toolButtonStyleAttrPtr));
+	SdiDocumentViewDecorator::DecoratorConfiguration configuration;
+	configuration.iconSize = *m_iconSizeAttrPtr;
+	configuration.showDocumentTitle = *m_showDocumentTitleAttrPtr;
+	configuration.fileButtonsStyle = Qt::ToolButtonStyle(*m_fileButtonsStyleAttrPtr);
+	configuration.undoButtonsStyle = Qt::ToolButtonStyle(*m_undoButtonsStyleAttrPtr);
+	configuration.documentButtonsStyle = Qt::ToolButtonStyle(*m_documentButtonsStyleAttrPtr);
+
+	return new SdiDocumentViewDecorator(this, viewPtr, parentWidgetPtr, persistencePtr, configuration);
 }
 
 
@@ -153,7 +160,12 @@ void CSingleDocumentWorkspaceGuiComp::OnNew()
 
 void CSingleDocumentWorkspaceGuiComp::OnOpen()
 {
-	OpenDocument(nullptr);
+	istd::IChangeable* documentPtr = 0;
+	if (OpenDocument(nullptr, nullptr, false, "", &documentPtr)){
+		Q_ASSERT(documentPtr != nullptr);
+
+		AddViewToDocument(*documentPtr);
+	}
 }
 
 
@@ -226,9 +238,8 @@ SdiDocumentViewDecorator::SdiDocumentViewDecorator(
 			istd::IPolymorphic* viewPtr,
 			QWidget* parentWidgetPtr,
 			const ifile::IFilePersistence* persistencePtr,
-			int iconSize,
-			Qt::ToolButtonStyle toolButtonStyle)
-	:BaseClass(parentPtr, viewPtr, parentWidgetPtr, persistencePtr, iconSize, toolButtonStyle)
+			const DecoratorConfiguration& configuration)
+	:BaseClass(parentPtr, viewPtr, parentWidgetPtr, persistencePtr, configuration)
 {
 	bool newButtonVisible = false;
 

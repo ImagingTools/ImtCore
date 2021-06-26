@@ -45,6 +45,10 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(CurrentDocumentName, iprm::INameParam, ExtractCurrentDocumentName);
 		I_REGISTER_SUBELEMENT_INTERFACE(CurrentDocumentName, imod::IModel, ExtractCurrentDocumentName);
 		I_ASSIGN(m_documentTemplateCompPtr, "DocumentTemplate", "Document template", true, "DocumentTemplate");
+		I_ASSIGN(m_iconSizeAttrPtr, "IconSize", "Size of the icon used in the document command tool bar", true, 16);
+		I_ASSIGN(m_undoButtonsStyleAttrPtr, "UndoButtonsStyle", "Style of the command buttons for undo manager (See Qt::QToolButtonStyle for reference)", true, Qt::ToolButtonFollowStyle);
+		I_ASSIGN(m_fileButtonsStyleAttrPtr, "FileButtonsStyle", "Style of the command buttons for file operations (See Qt::QToolButtonStyle for reference)", true, Qt::ToolButtonFollowStyle);
+		I_ASSIGN(m_documentButtonsStyleAttrPtr, "DocumentButtonsStyle", "Style of the command buttons for document operations (See Qt::QToolButtonStyle for reference)", true, Qt::ToolButtonFollowStyle);
 	I_END_COMPONENT;
 
 	TDocumentWorkspaceGuiCompBase();
@@ -121,6 +125,10 @@ protected:
 	imod::TModelWrap<iprm::CNameParam> m_currentDocumentName;
 
 	I_REF(idoc::IDocumentTemplate, m_documentTemplateCompPtr);
+	I_ATTR(int, m_iconSizeAttrPtr);
+	I_ATTR(int, m_undoButtonsStyleAttrPtr);
+	I_ATTR(int, m_fileButtonsStyleAttrPtr);
+	I_ATTR(int, m_documentButtonsStyleAttrPtr);
 };
 
 
@@ -145,7 +153,7 @@ void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnTryClose(bool* ig
 			documentData.isDirty = false;
 		}
 
-		CloseAllDocuments();
+		this->CloseAllDocuments();
 	}
 
 	if (ignoredPtr != nullptr){
@@ -339,7 +347,7 @@ void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnGuiCreated()
 template <class DocumentManagerBase, class UI>
 void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnGuiDestroyed()
 {
-	CloseAllDocuments();
+	this->CloseAllDocuments();
 
 	BaseClass::OnGuiDestroyed();
 }

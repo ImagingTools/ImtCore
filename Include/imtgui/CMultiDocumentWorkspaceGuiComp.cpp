@@ -32,7 +32,13 @@ IDocumentViewDecorator* CMultiDocumentWorkspaceGuiComp::CreateDocumentViewDecora
 			QWidget* parentWidgetPtr,
 			const ifile::IFilePersistence* persistencePtr)
 {
-	return new MdiDocumentViewDecorator(this, viewPtr, parentWidgetPtr, persistencePtr, *m_iconSizeAttrPtr, Qt::ToolButtonStyle(*m_toolButtonStyleAttrPtr));
+	MdiDocumentViewDecorator::DecoratorConfiguration configuration;
+	configuration.iconSize = *m_iconSizeAttrPtr;
+	configuration.fileButtonsStyle = Qt::ToolButtonStyle(*m_fileButtonsStyleAttrPtr);
+	configuration.undoButtonsStyle = Qt::ToolButtonStyle(*m_undoButtonsStyleAttrPtr);
+	configuration.documentButtonsStyle = Qt::ToolButtonStyle(*m_documentButtonsStyleAttrPtr);
+
+	return new MdiDocumentViewDecorator(this, viewPtr, parentWidgetPtr, persistencePtr, configuration);
 }
 
 
@@ -121,9 +127,8 @@ MdiDocumentViewDecorator::MdiDocumentViewDecorator(
 			istd::IPolymorphic * viewPtr,
 			QWidget * parentWidgetPtr,
 			const ifile::IFilePersistence * persistencePtr,
-			int iconSize,
-			Qt::ToolButtonStyle toolButtonStyle)
-	:BaseClass(parentPtr, viewPtr, parentWidgetPtr, persistencePtr, iconSize, toolButtonStyle)
+			const DecoratorConfiguration& configuration)
+	:BaseClass(parentPtr, viewPtr, parentWidgetPtr, persistencePtr, configuration)
 {
 }
 

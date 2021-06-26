@@ -45,13 +45,30 @@ public:
 
 	typedef WorkspaceImpl Workspace;
 
+	struct DecoratorConfiguration
+	{
+		DecoratorConfiguration()
+			:iconSize(16),
+			fileButtonsStyle(Qt::ToolButtonFollowStyle),
+			documentButtonsStyle(Qt::ToolButtonFollowStyle),
+			undoButtonsStyle(Qt::ToolButtonFollowStyle),
+			showDocumentTitle(true)
+		{
+		}
+
+		int iconSize;
+		Qt::ToolButtonStyle fileButtonsStyle;
+		Qt::ToolButtonStyle documentButtonsStyle;
+		Qt::ToolButtonStyle undoButtonsStyle;
+		bool showDocumentTitle;
+	};
+
 	TStandardDocumentViewDecorator(
 				WorkspaceImpl* parentPtr,
 				istd::IPolymorphic* viewPtr,
 				QWidget* parentWidgetPtr,
 				const ifile::IFilePersistence* persistencePtr,
-				int iconSize,
-				Qt::ToolButtonStyle toolButtonStyle);
+				const DecoratorConfiguration& configuration);
 
 	void UpdateSaveButtonsStatus();
 
@@ -80,8 +97,8 @@ protected:
 	bool m_isInitialized;
 	QString m_documentName;
 	QString m_comment;
-	int m_iconSize;
-	Qt::ToolButtonStyle m_toolButtonStyle;
+
+	DecoratorConfiguration m_configuration;
 
 	iqtgui::CHierarchicalCommand m_commands;
 
@@ -102,15 +119,13 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 			istd::IPolymorphic* viewPtr,
 			QWidget* parentWidgetPtr,
 			const ifile::IFilePersistence* persistencePtr,
-			int iconSize,
-			Qt::ToolButtonStyle toolButtonStyle)
-:	QWidget(parentWidgetPtr),
+			const DecoratorConfiguration& configuration)
+	:QWidget(parentWidgetPtr),
 	m_viewObjectPtr(viewPtr),
 	m_filePersistencePtr(persistencePtr),
 	m_parentPtr(parentPtr),
 	m_isInitialized(false),
-	m_iconSize(iconSize),
-	m_toolButtonStyle(toolButtonStyle),
+	m_configuration(configuration),
 	m_newCommand("New", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
 	m_openCommand("Open", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
 	m_saveCommand("Save", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
@@ -125,6 +140,8 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	UI::setupUi(this);
 
 	setObjectName("DocumentView");
+
+	UI::DocumentTitleFrame->setVisible(configuration.showDocumentTitle);
 
 	istd::IChangeable* documentPtr = m_parentPtr->GetDocumentFromView(*viewPtr);
 	Q_ASSERT(documentPtr != nullptr);
@@ -162,21 +179,21 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 		m_comment = metaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
 	}
 
-	UI::NewButton->setToolButtonStyle(toolButtonStyle);
+	UI::NewButton->setToolButtonStyle(configuration.fileButtonsStyle);
 	connect(UI::NewButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnNew);
 
-	UI::OpenButton->setToolButtonStyle(toolButtonStyle);
+	UI::OpenButton->setToolButtonStyle(configuration.fileButtonsStyle);
 	connect(UI::OpenButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnOpen);
 
-	UI::UndoButton->setToolButtonStyle(toolButtonStyle);
+	UI::UndoButton->setToolButtonStyle(configuration.undoButtonsStyle);
 	connect(UI::UndoButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnUndo);
 
-	UI::RedoButton->setToolButtonStyle(toolButtonStyle);
+	UI::RedoButton->setToolButtonStyle(configuration.undoButtonsStyle);
 	connect(UI::RedoButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnRedo);
 
 	connect(UI::CloseButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnCloseDocument);
 
-	UI::SaveButton->setToolButtonStyle(toolButtonStyle);
+	UI::SaveButton->setToolButtonStyle(configuration.fileButtonsStyle);
 	connect(UI::SaveButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnSaveDocument);
 
 	connect(&m_newCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnNew);
@@ -326,7 +343,7 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::SetTitle(const QString& 
 {
 	UI::DocumentTitle->setText(title);
 
-	UI::DocumentTitle->setVisible(!title.isEmpty());
+	UI::DocumentTitle->setVisible(!title.isEmpty() && m_configuration.showDocumentTitle);
 }
 
 
@@ -380,10 +397,10 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::OnModelChanged(int model
 				const iqtgui::CHierarchicalCommand* guiCommandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(commandsProviderPtr->GetCommands());
 				if (guiCommandPtr != nullptr){
 					QToolBar* toolBarPtr = new QToolBar(UI::CommandToolBarFrame);
-					toolBarPtr->setToolButtonStyle(m_toolButtonStyle);
+					toolBarPtr->setToolButtonStyle(m_configuration.documentButtonsStyle);
 					UI::CommandToolBarFrame->layout()->addWidget(toolBarPtr);
 					iqtgui::CCommandTools::SetupToolbar(*guiCommandPtr, *toolBarPtr);
-					toolBarPtr->setIconSize(QSize(m_iconSize, m_iconSize));
+					toolBarPtr->setIconSize(QSize(m_configuration.iconSize, m_configuration.iconSize));
 				}
 
 				const ibase::IHierarchicalCommand* viewCommandsPtr = commandsProviderPtr->GetCommands();

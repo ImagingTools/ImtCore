@@ -199,6 +199,11 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		HomeButton->hide();
 	}
 
+	CurrentPageLabel->setVisible(*m_showPageTitlesAttrPtr);
+	if (!*m_showPageTitlesAttrPtr){
+		TopFrameLayout->removeItem(AdditionalSpacerRight);
+	}
+
 	LoginLogText->setVisible(false);
 
 	if (m_dashboardGuiCompPtr.IsValid()){

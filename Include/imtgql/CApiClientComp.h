@@ -34,6 +34,7 @@ public:
 	I_BEGIN_COMPONENT(CApiClientComp);
 		I_REGISTER_INTERFACE(IGqlClient);
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used for the communication with the server", true, "ProtocolEngine");
+		I_ASSIGN(m_timeoutAttrPtr, "Timeout", "Request timeout in seconds", true, 30.0);
 	I_END_COMPONENT
 
 	CApiClientComp();
@@ -46,8 +47,6 @@ protected:
 	virtual void OnComponentCreated();
 
 private:
-	I_REF(IClientProtocolEngine, m_protocolEngineCompPtr);
-
 	struct Response
 	{
 		Response()
@@ -64,6 +63,9 @@ private:
 	mutable QReadWriteLock m_requestMapMutex;
 
 	int m_timeout;
+
+	I_REF(IClientProtocolEngine, m_protocolEngineCompPtr);
+	I_ATTR(double, m_timeoutAttrPtr);
 
 	friend class RequestSender;
 };

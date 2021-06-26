@@ -28,7 +28,10 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
 		I_ASSIGN(m_iconSizeAttrPtr, "IconSize", "Size of the icon used in the document command tool bar", true, 16);
-		I_ASSIGN(m_toolButtonStyleAttrPtr, "ToolButtonStyle", "Style of the command tool bar (See Qt::QToolButtonStyle for reference)", true, Qt::ToolButtonFollowStyle);
+		I_ASSIGN(m_showDocumentTitleAttrPtr, "ShowDocumentTitle", "If enabled, the document title is shown inside of the decorator area", true, true);
+		I_ASSIGN(m_undoButtonsStyleAttrPtr, "UndoButtonsStyle", "Style of the command buttons for undo manager (See Qt::QToolButtonStyle for reference)", true, Qt::ToolButtonFollowStyle);
+		I_ASSIGN(m_fileButtonsStyleAttrPtr, "FileButtonsStyle", "Style of the command buttons for file operations (See Qt::QToolButtonStyle for reference)", true, Qt::ToolButtonFollowStyle);
+		I_ASSIGN(m_documentButtonsStyleAttrPtr, "DocumentButtonsStyle", "Style of the command buttons for document operations (See Qt::QToolButtonStyle for reference)", true, Qt::ToolButtonFollowStyle);
 	I_END_COMPONENT;
 
 	CSingleDocumentWorkspaceGuiComp();
@@ -99,7 +102,10 @@ private:
 	istd::TDelPtr<IDocumentViewDecorator> m_documentViewPtr;
 
 	I_ATTR(int, m_iconSizeAttrPtr);
-	I_ATTR(int, m_toolButtonStyleAttrPtr);
+	I_ATTR(bool, m_showDocumentTitleAttrPtr);
+	I_ATTR(int, m_undoButtonsStyleAttrPtr);
+	I_ATTR(int, m_fileButtonsStyleAttrPtr);
+	I_ATTR(int, m_documentButtonsStyleAttrPtr);
 };
 
 
@@ -113,8 +119,7 @@ public:
 				istd::IPolymorphic* viewPtr,
 				QWidget* parentWidgetPtr,
 				const ifile::IFilePersistence* persistencePtr,
-				int iconSize,
-				Qt::ToolButtonStyle toolButtonStyle);
+				const DecoratorConfiguration& configuration);
 };
 
 
