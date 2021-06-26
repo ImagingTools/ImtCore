@@ -10,7 +10,7 @@ namespace imtgql
 {
 
 
-class CGqlRequest: public IGqlRequest
+class CGqlRequest: virtual public IGqlRequest
 {
 public:
 	CGqlRequest(RequestType requestType, const QByteArray& commandId = QByteArray());
