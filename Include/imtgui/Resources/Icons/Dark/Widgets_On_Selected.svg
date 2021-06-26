@@ -50,7 +50,7 @@
   <g
      id="layer2"
      transform="matrix(0.78813559,0,0,0.78813559,0.89689271,0.8968928)"
-     style="stroke-width:1.26881719;fill:#FFFFFF;fill-opacity:1">
+     style="stroke-width:1.26881719;fill:#1a76e7;fill-opacity:1">
     <path
        id="path824"
        d="m 1.5869302,0 c -0.2883,0 -0.52861,0.240737 -0.52861,0.52916598 V 7.938016 c 0,0.2884048 0.24033,0.5286499 0.52861,0.5286499 0.025,0 3.9923569,1.1e-6 5.2922768,0 0.2882802,0 0.5285801,-0.2402451 0.5286103,-0.5286499 L 7.4083464,2.11615 h -1.85039 c -0.1461802,0 -0.25996,-0.117432 -0.26611,-0.26355 V 0 Z m 4.2340271,0 v 1.586983 h 1.5873698 c -0.002,-0.07121 -0.0276,-0.138906 -0.0796,-0.187585 L 6.025037,0.095084 C 5.9520869,0.02213392 5.9194062,0 5.8209573,0 Z M 2.6462102,2.9098999 h 3.1731969 c 0.3530999,0 0.3530999,0.5296832 0,0.5296832 H 2.6462102 c -0.35292,0 -0.35292,-0.5296832 0,-0.5296832 z m 0,1.3224 h 3.1731969 c 0.3529301,0 0.3529301,0.5291661 0,0.5291661 H 2.6462102 c -0.35292,0 -0.35292,-0.5291661 0,-0.5291661 z m 0,1.3244671 h 3.1731969 c 0.3529301,0 0.3529301,0.5291659 0,0.5291659 H 2.6462102 c -0.35292,0 -0.35292,-0.5291659 0,-0.5291659 z"
@@ -69,6 +69,6 @@
        isolation="auto"
        mix-blend-mode="normal"
        inkscape:connector-curvature="0"
-       style="font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;text-transform:none;text-orientation:mixed;white-space:normal;shape-padding:0;isolation:auto;mix-blend-mode:normal;solid-color:#000000;solid-opacity:1;vector-effect:none;stroke-width:1.60989714;fill:#FFFFFF;fill-opacity:1" />
+       style="font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;text-transform:none;text-orientation:mixed;white-space:normal;shape-padding:0;isolation:auto;mix-blend-mode:normal;solid-color:#000000;solid-opacity:1;vector-effect:none;stroke-width:1.60989714;fill:#1a76e7;fill-opacity:1" />
   </g>
 </svg>

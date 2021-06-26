@@ -49,12 +49,12 @@
      inkscape:current-layer="svg4" />
   <g
      id="menu,-more,-option,-window"
-     style="fill:#FFFFFF;fill-opacity:1;fill-rule:evenodd;stroke-width:0.88"
+     style="fill:#1a76e7;fill-opacity:1;fill-rule:evenodd;stroke-width:0.88"
      transform="matrix(1.1363636,0,0,1.1363636,-2.1818176,-2.1818176)">
     <path
        id="Shape"
        d="M 15,17 V 27 H 5 V 17 Z m 12,0 V 27 H 17 V 17 Z M 15,5 V 15 H 5 V 5 Z M 27,5 V 15 H 17 V 5 Z"
-       style="fill:#FFFFFF;fill-opacity:1;fill-rule:nonzero;stroke-width:0.80561835"
+       style="fill:#1a76e7;fill-opacity:1;fill-rule:nonzero;stroke-width:0.80561835"
        inkscape:connector-curvature="0" />
   </g>
 </svg>
