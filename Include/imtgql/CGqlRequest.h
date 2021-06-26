@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRequestBase.h>
+#include <imtgql/IGqlRequest.h>
 #include <imtgql/CGqlObject.h>
 
 
@@ -13,20 +13,15 @@ namespace imtgql
 class CGqlRequest: public IGqlRequest
 {
 public:
-	typedef CGqlRequestBase BaseClass;
-
 	CGqlRequest(RequestType requestType, const QByteArray& commandId = QByteArray());
 
-	void addParam(const CGqlObject& param);
-	void addField(const CGqlObject& field);
+	void AddParam(const CGqlObject& param);
+	void AddField(const CGqlObject& field);
 
 	// reimplemented (IGqlRequest)
 	virtual QByteArray GetCommandId() const override;
 	virtual RequestType GetRequestType() const override;
 	virtual QByteArray GetQuery() const override;
-
-	virtual QByteArrayList GetFields() const override; // deprecated
-	virtual QByteArrayList GetFieldArguments(const QByteArray& fieldId) const override; // deprecated
 
 	// reimplemented (iser::IObject)
 	virtual QByteArray GetFactoryId() const override;

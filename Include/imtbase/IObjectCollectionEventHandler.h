@@ -17,6 +17,7 @@ class IObjectCollectionEvent;
 /**
 	Interface for object collection event handler
 	\ingroup Collection
+	\todo Remove this interface and replace the functionality by using ChangeMap extension in the istd::CChangeNotifier (istd::IChangeable)
 */
 class IObjectCollectionEventHandler: virtual public istd::IPolymorphic
 {

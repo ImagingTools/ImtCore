@@ -8,7 +8,7 @@ namespace imtgql
 // public methods
 
 imtgql::CGqlObject::CGqlObject(const QByteArray& objectId)
-	: m_objectId(objectId)
+	:m_objectId(objectId)
 {
 }
 
@@ -34,6 +34,7 @@ QVariant CGqlObject::GetFieldArgumentValue(const QByteArray &fieldId) const
 	else{
 		Q_ASSERT(false);
 	}
+
 	return retVal;
 }
 
@@ -41,12 +42,14 @@ QVariant CGqlObject::GetFieldArgumentValue(const QByteArray &fieldId) const
 const CGqlObject* CGqlObject::GetFieldArgumentObjectPtr(const QByteArray &fieldId) const
 {
 	const CGqlObject* retVal = nullptr;
+
 	if (m_fieldsMap.contains(fieldId)){
 		retVal = m_fieldsMap[fieldId].objectPtr.GetPtr();
 	}
 	else{
 		Q_ASSERT(false);
 	}
+
 	return retVal;
 }
 
@@ -95,7 +98,7 @@ void CGqlObject::InsertFieldObject(CGqlObject *objectPtr)
 }
 
 
-bool CGqlObject::isObject(const QByteArray &fieldId) const
+bool CGqlObject::IsObject(const QByteArray &fieldId) const
 {
 	bool retVal = false;
 	if (m_fieldsMap.contains(fieldId)){

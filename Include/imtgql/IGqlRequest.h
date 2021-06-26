@@ -36,8 +36,6 @@ public:
 	virtual QByteArray GetCommandId() const = 0;
 	virtual RequestType GetRequestType() const = 0;
 	virtual QByteArray GetQuery() const = 0;
-	virtual QByteArrayList GetFields() const = 0;
-	virtual QByteArrayList GetFieldArguments(const QByteArray& fieldId) const = 0;
 };
 
 

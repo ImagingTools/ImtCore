@@ -1,23 +1,21 @@
 #pragma once
 
+
 // Qt includes
 #include <QtCore/QByteArray>
 #include <QtCore/QVariant>
 
 // ImtCore includes
-#include <imtgql/CGqlRequestBase.h>
 #include <istd/TSmartPtr.h>
 
 
 namespace imtgql
 {
-//class CGqlObject;
+
 
 class CGqlObject
 {
 public:
-	typedef istd::IChangeable BaseClass;
-
 	CGqlObject(const QByteArray& objectId = QByteArray());
 
 	QByteArray GetId() const;
@@ -27,10 +25,9 @@ public:
 	void InsertField(const QByteArray& fieldId);
 	void InsertFieldArgument(const QByteArray& fieldId, const QVariant& value);
 	void InsertFieldObject(CGqlObject *objectPtr);
-	bool isObject(const QByteArray& fieldId) const;
+	bool IsObject(const QByteArray& fieldId) const;
 
 protected:
-
 	struct Field
 	{
 		QByteArray id;

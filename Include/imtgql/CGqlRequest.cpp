@@ -17,12 +17,14 @@ imtgql::CGqlRequest::CGqlRequest(RequestType requestType, const QByteArray& comm
 {
 }
 
-void CGqlRequest::addParam(const CGqlObject &param)
+
+void CGqlRequest::AddParam(const CGqlObject &param)
 {
 	m_params.append(param);
 }
 
-void CGqlRequest::addField(const CGqlObject &field)
+
+void CGqlRequest::AddField(const CGqlObject &field)
 {
 	m_fields.append(field);
 }
@@ -46,27 +48,20 @@ QByteArray CGqlRequest::GetQuery() const
 {
 	QByteArray fields = CreateQueryFields();
 	QByteArray params = CreateQueryParams();
+
 	QByteArray type = "query";
 	if (m_requestType == RT_MUTATION){
 		type = "mutation";
 	}
+
 	if (!params.isEmpty()){
 		params.prepend("(");
 		params.append(")");
 	}
 
 	QByteArray queryData = "{\"query\": \"" + type + ": " + m_commandId + " { " + m_commandId + params + " {" + fields + " }" + "}\"}";
+
 	return queryData;
-}
-
-QByteArrayList CGqlRequest::GetFields() const
-{
-	return QByteArrayList();
-}
-
-QByteArrayList CGqlRequest::GetFieldArguments(const QByteArray &fieldId) const
-{
-	return QByteArrayList();
 }
 
 
@@ -80,7 +75,7 @@ QByteArray CGqlRequest::GetFactoryId() const
 
 // reimplemented (iser::ISerializable)
 
-bool CGqlRequest::Serialize(iser::IArchive &archive)
+bool CGqlRequest::Serialize(iser::IArchive& /*archive*/)
 {
 	return false;
 }
@@ -96,20 +91,32 @@ int CGqlRequest::GetSupportedOperations() const
 
 bool CGqlRequest::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const CGqlRequestBase* sourcePtr = dynamic_cast<const CGqlRequestBase*>(&object);
+	const CGqlRequest* sourcePtr = dynamic_cast<const CGqlRequest*>(&object);
 	if (sourcePtr != nullptr){
-		istd::CChangeNotifier changeNotifier(this);
+		if (m_requestType == sourcePtr->GetRequestType()){
+			istd::CChangeNotifier changeNotifier(this);
 
-		return true;
+			m_commandId = sourcePtr->m_commandId;
+			m_params = sourcePtr->m_params;
+			m_fields = sourcePtr->m_fields;
+
+			return true;
+		}
 	}
 
 	return false;
 }
 
 
-bool CGqlRequest::ResetData(istd::IChangeable::CompatibilityMode mode)
+bool CGqlRequest::ResetData(istd::IChangeable::CompatibilityMode /*mode*/)
 {
-	return false;
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_commandId.clear();
+	m_params.clear();
+	m_fields.clear();
+
+	return true;
 }
 
 
@@ -158,7 +165,7 @@ QByteArray CGqlRequest::AddObjectFieldPart(const CGqlObject &gqlObject) const
 	QByteArrayList fieldIds = gqlObject.GetFieldIds();
 	for (int i = 0; i < fieldIds.count(); ++i){
 		const QByteArray& fieldId = fieldIds[i];
-		if (gqlObject.isObject(fieldId)){
+		if (gqlObject.IsObject(fieldId)){
 			retVal += AddObjectFieldPart(*gqlObject.GetFieldArgumentObjectPtr(fieldId));
 		}
 		else{
@@ -185,7 +192,7 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 	for (int i = 0; i < fieldIds.count(); ++i){
 		const QByteArray& fieldId = fieldIds[i];
 
-		if (gqlObject.isObject(fieldId)){
+		if (gqlObject.IsObject(fieldId)){
 			retVal += AddObjectParamPart(*gqlObject.GetFieldArgumentObjectPtr(fieldId));
 		}
 		else{
