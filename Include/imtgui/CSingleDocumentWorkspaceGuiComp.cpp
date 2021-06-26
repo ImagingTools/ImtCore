@@ -154,7 +154,12 @@ void CSingleDocumentWorkspaceGuiComp::OnRedo()
 
 void CSingleDocumentWorkspaceGuiComp::OnNew()
 {
-	InsertNewDocument("");
+	istd::IChangeable* newDocumentPtr = 0;
+	if (InsertNewDocument("", false, "", &newDocumentPtr)){
+		Q_ASSERT(newDocumentPtr != nullptr);
+
+		AddViewToDocument(*newDocumentPtr);
+	}
 }
 
 
