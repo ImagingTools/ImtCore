@@ -50,7 +50,7 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 	if (option.state & QStyle::State_Selected){
 		backgroundColor = palette.color(QPalette::WindowText);
 
-		textColor = QColor("#27B3FF");
+		textColor = palette.color(QPalette::Highlight);
 	}
 
 	painter->save();
@@ -74,7 +74,7 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 		backgroundRect.setRight(3);
 		backgroundRect.setTop(option.rect.bottom() - m_height + 1);
 		backgroundRect.setBottom(option.rect.bottom());
-		painter->fillRect(backgroundRect, QColor("#27B3FF"));
+		painter->fillRect(backgroundRect, QColor("#1a76e7"));
 	}
 
 	// Calculate offset from treeview's left side:

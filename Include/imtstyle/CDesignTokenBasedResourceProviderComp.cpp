@@ -187,7 +187,7 @@ void CDesignTokenBasedResourceProviderComp::CreateDefaultPalettes()
 {
 	istd::TDelPtr<QStyle> baseStylePtr(QStyleFactory::create("fusion"));
 	QPalette lightPalette = baseStylePtr->standardPalette();
-	lightPalette.setColor(QPalette::Highlight, QColor(130, 210, 255));
+	lightPalette.setColor(QPalette::Highlight, QColor("#1a76e7"));
 	m_paletteMap["Light"] = lightPalette;
 	m_designSchemaList.InsertItem("Light", QObject::tr("Light"),"");
 
@@ -203,7 +203,7 @@ void CDesignTokenBasedResourceProviderComp::CreateDefaultPalettes()
 	darkPalette.setColor(QPalette::ButtonText, Qt::lightGray);
 	darkPalette.setColor(QPalette::BrightText, Qt::white);
 	darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-	darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+	darkPalette.setColor(QPalette::Highlight, QColor("#1a76e7"));
 	darkPalette.setColor(QPalette::HighlightedText, Qt::white);
 	m_paletteMap["Dark"] = darkPalette;
 	m_designSchemaList.InsertItem("Dark", QObject::tr("Dark"), "");

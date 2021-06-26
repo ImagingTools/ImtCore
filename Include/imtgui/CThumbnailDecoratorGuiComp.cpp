@@ -1282,7 +1282,7 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 				iqtgui::CCommandTools::SetupToolbar(*commandsPtr, *m_mainToolBar);
 				int group = ibase::ICommand::GI_NONE;
 				SetupCommandsMenu(*commandsPtr, m_commandsMenu, group);
-				CommandsMenuButton->setEnabled(!m_commandsMenu.isEmpty());
+				CommandsMenuButton->setVisible(!m_commandsMenu.isEmpty());
 			}
 			else{
 				QAction* placeholderAction = new QAction(QIcon("/"), "");
@@ -1291,7 +1291,7 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 				m_mainToolBar->addAction(placeholderAction);
 				m_mainToolBar->addSeparator();
 
-				CommandsMenuButton->setEnabled(false);
+				CommandsMenuButton->setVisible(false);
 			}
 		}
 	}

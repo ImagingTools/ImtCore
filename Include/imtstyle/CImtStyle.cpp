@@ -472,7 +472,7 @@ CImtStyle::CImtStyle()
 	light.pressedToolButtonGradientColors.endColor = QColor(245, 245, 245);
 	istd::TDelPtr<QStyle> baseStylePtr(QStyleFactory::create("fusion"));
 	light.palette = baseStylePtr->standardPalette();
-	light.palette.setColor(QPalette::Highlight, QColor(130, 210, 255));
+	light.palette.setColor(QPalette::Highlight, QColor("1a76e7"));
 	light.stylePath = ":/Styles/ImtColorStyleLight";
 
 	m_colorSchemaMap[DS_LIGHT] = light;
@@ -493,7 +493,7 @@ CImtStyle::CImtStyle()
 	dark.palette.setColor(QPalette::ButtonText, Qt::lightGray);
 	dark.palette.setColor(QPalette::BrightText, Qt::white);
 	dark.palette.setColor(QPalette::Link, QColor(42, 130, 218));
-	dark.palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+	dark.palette.setColor(QPalette::Highlight, QColor("1a76e7"));
 	dark.palette.setColor(QPalette::HighlightedText, Qt::white);
 	dark.stylePath = ":/Styles/ImtColorStyleDark";
 
