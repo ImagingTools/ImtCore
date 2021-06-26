@@ -47,7 +47,7 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 	QColor backgroundColor = Qt::transparent;
 	QColor textColor = palette.color(QPalette::Text);
 
-	if (option.state & QStyle::State_Selected){
+	if (option.state & QStyle::State_Selected || (option.state & QStyle::State_MouseOver)){
 		backgroundColor = palette.color(QPalette::WindowText);
 
 		textColor = palette.color(QPalette::Highlight);
