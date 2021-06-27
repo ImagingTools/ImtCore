@@ -13,7 +13,8 @@ namespace imtgql
 // public methods
 
 imtgql::CGqlRequest::CGqlRequest(RequestType requestType, const QByteArray& commandId)
-	:m_commandId(commandId), m_requestType(requestType)
+	:m_commandId(commandId),
+	m_requestType(requestType)
 {
 }
 
@@ -85,7 +86,7 @@ bool CGqlRequest::Serialize(iser::IArchive& /*archive*/)
 
 int CGqlRequest::GetSupportedOperations() const
 {
-	return SO_COPY | SO_RESET;
+	return SO_COPY | SO_RESET | SO_CLONE;
 }
 
 
@@ -93,23 +94,24 @@ bool CGqlRequest::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 {
 	const CGqlRequest* sourcePtr = dynamic_cast<const CGqlRequest*>(&object);
 	if (sourcePtr != nullptr){
-		istd::CChangeNotifier changeNotifier(this);
+		if (m_requestType == sourcePtr->GetRequestType()){
+			istd::CChangeNotifier changeNotifier(this);
 
-		m_requestType = sourcePtr->m_requestType;
-		m_commandId = sourcePtr->m_commandId;
-		m_params = sourcePtr->m_params;
-		m_fields = sourcePtr->m_fields;
+			m_commandId = sourcePtr->m_commandId;
+			m_params = sourcePtr->m_params;
+			m_fields = sourcePtr->m_fields;
 
-		return true;
+			return true;
+		}
 	}
 
 	return false;
 }
 
 
-istd::IChangeable *CGqlRequest::CloneMe(istd::IChangeable::CompatibilityMode mode) const
+istd::IChangeable* CGqlRequest::CloneMe(istd::IChangeable::CompatibilityMode mode) const
 {
-	istd::TDelPtr<CGqlRequest> clonePtr(new CGqlRequest());
+	istd::TDelPtr<CGqlRequest> clonePtr(new CGqlRequest(m_requestType));
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}
