@@ -93,18 +93,28 @@ bool CGqlRequest::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 {
 	const CGqlRequest* sourcePtr = dynamic_cast<const CGqlRequest*>(&object);
 	if (sourcePtr != nullptr){
-		if (m_requestType == sourcePtr->GetRequestType()){
-			istd::CChangeNotifier changeNotifier(this);
+		istd::CChangeNotifier changeNotifier(this);
 
-			m_commandId = sourcePtr->m_commandId;
-			m_params = sourcePtr->m_params;
-			m_fields = sourcePtr->m_fields;
+		m_requestType = sourcePtr->m_requestType;
+		m_commandId = sourcePtr->m_commandId;
+		m_params = sourcePtr->m_params;
+		m_fields = sourcePtr->m_fields;
 
-			return true;
-		}
+		return true;
 	}
 
 	return false;
+}
+
+
+istd::IChangeable *CGqlRequest::CloneMe(istd::IChangeable::CompatibilityMode mode) const
+{
+	istd::TDelPtr<CGqlRequest> clonePtr(new CGqlRequest());
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr.PopPtr();
+	}
+
+	return nullptr;
 }
 
 

@@ -13,7 +13,7 @@ namespace imtgql
 class CGqlRequest: virtual public IGqlRequest
 {
 public:
-	CGqlRequest(RequestType requestType, const QByteArray& commandId = QByteArray());
+	CGqlRequest(RequestType requestType = RT_QUERY, const QByteArray& commandId = QByteArray());
 
 	void AddParam(const CGqlObject& param);
 	void AddField(const CGqlObject& field);
@@ -32,6 +32,7 @@ public:
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
