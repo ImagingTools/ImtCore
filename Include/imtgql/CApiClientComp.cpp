@@ -185,7 +185,7 @@ void CApiClientComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	m_timeout = *m_timeoutAttrPtr;
+	m_timeout = *m_timeoutAttrPtr * 1000;
 }
 
 
