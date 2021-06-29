@@ -167,9 +167,14 @@ void CSingleDocumentWorkspaceGuiComp::OnOpen()
 {
 	istd::IChangeable* documentPtr = 0;
 	if (OpenDocument(nullptr, nullptr, false, "", &documentPtr)){
-		Q_ASSERT(documentPtr != nullptr);
+		if (documentPtr != nullptr){
+			AddViewToDocument(*documentPtr);
+		}
+	}
+	else{
+		OnNew();
 
-		AddViewToDocument(*documentPtr);
+		QMessageBox::critical(GetWidget(), tr("Open File"), tr("Selected file could not be loaded"));
 	}
 }
 
