@@ -50,17 +50,29 @@ QByteArray CGqlRequest::GetQuery() const
 	QByteArray fields = CreateQueryFields();
 	QByteArray params = CreateQueryParams();
 
-	QByteArray type = "query";
-	if (m_requestType == RT_MUTATION){
+	QByteArray type = "";
+	switch (m_requestType)
+	{
+	case imtgql::IGqlRequest::RT_QUERY:
+		type = "query";
+		break;
+	case imtgql::IGqlRequest::RT_MUTATION:
 		type = "mutation";
+		break;
+	case imtgql::IGqlRequest::RT_SUBSCRIPTION:
+		type = "subscription";
+		break;
+	default:
+		Q_ASSERT(false);
+		return QByteArray();
 	}
 
-	if (!params.isEmpty()){
+	if (!params.isEmpty()) {
 		params.prepend("(");
 		params.append(")");
 	}
 
-	QByteArray queryData = "{\"query\": \"" + type + ": " + m_commandId + " { " + m_commandId + params + " {" + fields + " }" + "}\"}";
+	QByteArray queryData = "{\"query\": \"" + type + " " + m_commandId + " {" + m_commandId + params + " {" + fields + "}" + "}\"}";
 
 	return queryData;
 }
@@ -197,36 +209,43 @@ QByteArray CGqlRequest::AddObjectFieldPart(const CGqlObject &gqlObject) const
 QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 {
 	QByteArray retVal;
-	retVal += gqlObject.GetId();
+	QByteArray objectId = gqlObject.GetId();
 
-	retVal += ": {";
+	if (objectId.isEmpty() == false) {
+		retVal += objectId;
+		retVal += ": {";
+	}
+
 	QByteArrayList fieldIds = gqlObject.GetFieldIds();
-	for (int i = 0; i < fieldIds.count(); ++i){
+	for (int i = 0; i < fieldIds.count(); ++i) {
 		const QByteArray& fieldId = fieldIds[i];
 
-		if (gqlObject.IsObject(fieldId)){
+		if (gqlObject.IsObject(fieldId)) {
 			retVal += AddObjectParamPart(*gqlObject.GetFieldArgumentObjectPtr(fieldId));
 		}
-		else{
+		else {
 			retVal += fieldId;
 			retVal += ": ";
 			QVariant value = gqlObject.GetFieldArgumentValue(fieldId);
-			if (value.type() == QVariant::Int){
-				retVal += QByteArray::number(value.toInt());
-			}
-			else{
+			int valueType = value.type();
+			bool isString = (valueType == QVariant::String) || (valueType == QVariant::ByteArray);
+			if (isString) {
 				retVal += "\\\"";
-				retVal += value.toByteArray();
+			}
+			retVal += value.toString();
+			if (isString) {
 				retVal += "\\\"";
 			}
 
 		}
-		if (i < fieldIds.count() - 1){
+		if (i < fieldIds.count() - 1) {
 			retVal += ", ";
 		}
 	}
 
-	retVal += "}";
+	if (objectId.isEmpty() == false) {
+		retVal += "}";
+	}
 
 	return retVal;
 }
