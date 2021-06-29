@@ -362,6 +362,8 @@
 		<file alias="Collapse_On_Selected">Resources/Icons/Light/Collapse_On_Selected.svg</file>
 		<file alias="Dashboard_On_Selected">Resources/Icons/Light/Dashboard_On_Selected.svg</file>
 		<file alias="Switch_On_Selected">Resources/Icons/Light/Switch_On_Selected.svg</file>
+		<file alias="Online">Resources/Icons/Light/Online.svg</file>
+
 	</qresource>
     <qresource prefix="/ColorIcons">
         <file alias="Workflow">Resources/Icons/Light/Color/Workflow.svg</file>
@@ -405,7 +407,7 @@
         <file alias="Eye">Resources/Icons/Light/Color/Eye.svg</file>
         <file alias="Nozzle">Resources/Icons/Light/Color/Nozzle.svg</file>
         <file alias="NozzleHighlight">Resources/Icons/Light/Color/NozzleHighlight.svg</file>
-    </qresource>
+	</qresource>
     <qresource prefix="/Styles">
         <file alias="MenuPanel">Resources/Styles/Light/MenuPanel.css</file>
         <file alias="CustomLayoutWidgetForm">Resources/Styles/Light/CustomLayoutWidgetForm.css</file>

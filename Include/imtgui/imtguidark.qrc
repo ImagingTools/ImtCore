@@ -604,7 +604,8 @@
 		<file alias="Collapse_On_Selected">Resources/Icons/Dark/Collapse_On_Selected.svg</file>
 		<file alias="Dashboard_On_Selected">Resources/Icons/Dark/Dashboard_On_Selected.svg</file>
 		<file alias="Switch_On_Selected">Resources/Icons/Dark/Switch_On_Selected.svg</file>
-    </qresource>
+		<file alias="Online">Resources/Icons/Dark/Online.svg</file>
+	</qresource>
     <qresource prefix="/ColorIcons">
         <file alias="Workflow">Resources/Icons/Dark/Color/Workflow.svg</file>
         <file alias="WorkflowHighlight">Resources/Icons/Dark/Color/WorkflowHighlight.svg</file>
