@@ -41,6 +41,7 @@ void CDataBaseEngineComp::CloseDataBase()
 
 QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlError) const
 {
+	this->ReConnectToDataBaseIfNeeded();
 	QSqlQuery retval(m_db);
 	retval.prepare(queryString);
 	retval.exec();
@@ -62,6 +63,7 @@ QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 
 QSqlQuery CDataBaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError) const
 {
+	this->ReConnectToDataBaseIfNeeded();
 	QSqlQuery retval(m_db);
 	retval.prepare(queryString);
 	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++ value) {
@@ -145,6 +147,25 @@ void CDataBaseEngineComp::DrectBindValueUpdateDefault(QByteArray* string, const 
 		newValue.prepend('"');
 		CDataBaseEngineComp::DrectBindValue(string, what, newValue);
 	}
+}
+
+bool CDataBaseEngineComp::ReConnectToDataBaseIfNeeded() const
+{
+	bool dbOpened = this->m_db.isOpen();
+	if(!dbOpened)
+	{
+		auto thiz = const_cast<CDataBaseEngineComp*>(this);
+		thiz->m_db.close();
+		thiz->OpenDataBase();
+		dbOpened = this->m_db.isOpen();
+		if(!dbOpened) {
+			qCritical() << __FILE__ << __LINE__
+						<< "\n\t| what(): DataBase Error Occured Unable to open database"
+						<< "\n\t| DataBase error" << m_db.lastError().text()
+						   ;
+		}
+	}
+	return dbOpened;
 }
 
 

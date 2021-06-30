@@ -45,6 +45,13 @@ public:
 	static void DrectBindValueInsertDefault(QByteArray* string,  const QByteArray& what);
 	static void DrectBindValueUpdateDefault(QByteArray* string,  const QByteArray& what);
 
+private:
+	/*!
+		\brief ReConnectToDataBaseIfNeeded - internal method for reconnection database on disconnect or  not connected
+		\warning reconnection database may be occur if it connected not!
+		\return connectivity status
+	 */
+	bool ReConnectToDataBaseIfNeeded() const;
 
 private:
 	I_ATTR(QByteArray, m_dbType);
