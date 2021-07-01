@@ -50,7 +50,7 @@ int CEncryptionBasedPersistenceComp::LoadFromFile(istd::IChangeable& data, const
 				}
 			}
 
-			if (!m_encryptionCompPtr->DecryptData(encryptedData,encryptionAlgorithm,*m_encryptionKeysProviderCompPtr,decryptedData)){
+			if (!m_encryptionCompPtr->DecryptData(encryptedData,encryptionAlgorithm, *m_encryptionKeysProviderCompPtr, decryptedData)){
 				SendErrorMessage(0, QString("Data decryption was failed. File '%1' could not be loaded").arg(filePath), "Encryption Persistence");
 
 				file.close();

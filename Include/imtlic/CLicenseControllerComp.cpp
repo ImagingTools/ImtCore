@@ -179,12 +179,23 @@ QString CLicenseControllerComp::GetFingerprintPath() const
 
 void CLicenseControllerComp::OnLicenseKeysUpdated(
 			const istd::IChangeable::ChangeSet& /*changeSet*/,
-			const imtcrypt::IEncryptionKeysProvider* /*licenseKeysProviderPtr*/)
+			const imtcrypt::IEncryptionKeysProvider* licenseKeysProviderPtr)
 {
 	if (!m_isInitializing){
-		SendInfoMessage(0, tr("License key was changed. Checking license fingerprint"), tr("License Controller"));
+		Q_ASSERT(licenseKeysProviderPtr != nullptr);
 
-		ReadLicenseFile();
+		QByteArray key = licenseKeysProviderPtr->GetEncryptionKey(imtcrypt::IEncryptionKeysProvider::KT_PASSWORD);
+		if (!key.isEmpty()){
+			SendInfoMessage(0, tr("License key was changed. Checking license fingerprint"), tr("License Controller"));
+
+			ReadLicenseFile();
+		}
+		else{
+			if (m_productInstanceCompPtr.IsValid()){
+				// Remove all existing license data:
+				m_productInstanceCompPtr->ResetData();
+			}
+		}
 	}
 }
 

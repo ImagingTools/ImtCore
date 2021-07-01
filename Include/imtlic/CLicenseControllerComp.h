@@ -24,6 +24,7 @@ namespace imtlic
 class CLicenseControllerComp: public QObject, public ilog::CLoggerComponentBase
 {
 	Q_OBJECT
+
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 

@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtlic/IProductInstanceInfo.h>
+#include <imtcrypt/IEncryptionKeysProvider.h>
 #include <GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h>
 
 
@@ -14,7 +15,7 @@ namespace imtlicgui
 
 
 /**
-	Editor for the license info.
+	License instance viewer. This component shows information about available licenses and features in the product.
 	\ingroup LicenseManagement
 */
 class CProductInstanceInfoViewComp:
@@ -42,6 +43,8 @@ public:
 private:
 	void UpdateProductName();
 	void UpdateFeatureTree();
+
+	I_REF(imtcrypt::IEncryptionKeysProvider, m_encryptionKeysProviderCompPtr);
 };
 
 
