@@ -97,11 +97,10 @@ protected:
 				imtrest::IRequest::CommandParams& commandParams,
 				HeadersMap& headers);
 
-private:
-
-
-private:
+protected:
 	I_ATTR(QByteArray, m_commandIdAttrPtr);
+
+
 };
 
 

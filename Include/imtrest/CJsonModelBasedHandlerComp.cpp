@@ -54,40 +54,40 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 	QByteArray body;
 	QByteArray commandId = request.GetCommandId();
 	QByteArray commandIdBase = *this->m_commandIdAttrPtr;
-	if(commandIdBase.endsWith('*'))
+	if (commandIdBase.endsWith('*'))
 	{
 		commandIdBase.chop(1);
 	}
 	QByteArray modelName = commandId.replace(commandIdBase, "");
-	if(modelName.endsWith('/')){
+	if (modelName.endsWith('/')){
 		modelName.chop(1);
 	}
 
-	while(modelName.startsWith('/'))
+	while (modelName.startsWith('/'))
 	{
 		modelName.remove(0,1);
 	}
 
-	if(modelName == "__HELLO_MODEL__")
+	if (modelName == "__HELLO_MODEL__")
 	{
 		reponseTypeId = "application/json";
 		body = QByteArray(R"({"I'm seyin to you": "HELLO WORLD"})");
 	}
-	else if(modelName == "__EXAMPLE_1__")
+	else if (modelName == "__EXAMPLE_1__")
 	{
 		reponseTypeId = "application/json";
 		body = QByteArray(R"({"adresses":[{"city":"Moscou","country":"Russia","postalCode":644099,"street":"Lenina 10"},{"city":"Munic","country":"Germany","postalCode":123456,"street":"Street St"}],"firstName":"Ivan","lastName":"Ivanov","nickName":"NicIvan"})");
 	}
-	else if(modelName == "__EXAMPLE_2__")
+	else if (modelName == "__EXAMPLE_2__")
 	{
 		reponseTypeId = "application/json";
 		body = QByteArray(R"({"firstName":"Ivan","lastName":"Ivanov","nickName":"NicIvan","adresses":[{"country":"Russia","city":"Moscow","postalCode":644099,"street":"Lenina 10"},{"country":"Germany","city":"Munic","postalCode":123456,"street":"Street St"}]})");
 	}
-	else if(modelName == "__COLORS_EXAMPLE__")
+	else if (modelName == "__COLORS_EXAMPLE__")
 	{
 		reponseTypeId = "application/json";
 		int sizeParam = request.GetCommandParams().value("size").toInt();
-		if(sizeParam <= 0)
+		if (sizeParam <= 0)
 		{
 			sizeParam = 50;
 		}
@@ -97,10 +97,10 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 		};
 
 		QJsonArray allArray;
-		for(int j = 0; j < sizeParam; ++j)
+		for (int j = 0; j < sizeParam; ++j)
 		{
 			QJsonArray colorsArray;
-			for(int i = 0; i < sizeParam ; ++i)
+			for (int i = 0; i < sizeParam ; ++i)
 			{
 				quint32 r = generateRandomNumber(1,254);
 				quint32 g = generateRandomNumber(2,253);
@@ -113,11 +113,11 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 
 		body = QJsonDocument(QJsonObject({QPair<QString, QJsonValue>("data",allArray)})).toJson(QJsonDocument::Compact);
 	}
-	else if(modelName == "__EXAMPLE_2__"){
+	else if (modelName == "__EXAMPLE_2__"){
 		reponseTypeId = "application/json";
 		body = QByteArray(R"({"firstName":"Ivan","lastName":"Ivanov","nickName":"NicIvan","adresses":[{"country":"Russia","city":"Moscow","postalCode":644099,"street":"Lenina 10"},{"country":"Germany","city":"Munic","postalCode":123456,"street":"Street St"}]})");
 	}
-	else if(modelName == "__CREATE_COLORS_IN_CTREE__"){
+	else if (modelName == "__CREATE_COLORS_IN_CTREE__"){
 		using namespace imtbase;
 		imtbase::CTreeItemModel treeItemModel;
 		treeItemModel.AddTreeModel("data");
@@ -125,7 +125,7 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 		auto header = treeItemModel.GetTreeItemModel("data");
 
 		int sizeParam = request.GetCommandParams().value("size").toInt();
-		if(sizeParam <= 0)
+		if (sizeParam <= 0)
 		{
 			sizeParam = 50;
 		}
@@ -133,13 +133,13 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 			::srand((unsigned) ::rand());
 			return min + ::rand() % (max - min);
 		};
-		for(int i = 0; i < sizeParam ; ++i)
+		for (int i = 0; i < sizeParam ; ++i)
 		{
 			QByteArray subModelName = QByteArray("data ") + QByteArray::number(i);
 			int index = header->InsertNewItem();
 			header->AddTreeModel(subModelName, index);
 			auto treeModelPtr = header->GetTreeItemModel(subModelName,index);
-			for(int j = 0; j < sizeParam; ++j)
+			for (int j = 0; j < sizeParam; ++j)
 			{
 				quint32 r = generateRandomNumber(1,254);
 				quint32 g = generateRandomNumber(2,253);
@@ -158,7 +158,7 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 //			body = jsonData;
 		}
 	}
-	else if(m_representationDataProvider.IsValid())
+	else if (m_representationDataProvider.IsValid())
 	{
 		imtrest::CHttpRequest* httpRequestPtr = dynamic_cast<imtrest::CHttpRequest*>(const_cast<imtrest::IRequest*>(&request));
 		if (httpRequestPtr != nullptr && httpRequestPtr->GetMethodType() == imtrest::CHttpRequest::MT_POST)
