@@ -16,6 +16,7 @@
 #include <imtrest/CHttpHtmlFolderBasedHandlerComp.h>
 #include <imtrest/CJsonModelBasedHandlerComp.h>
 #include <imtrest/CHttpRedirectComp.h>
+#include <imtrest/CHttpFileProviderBasedServletComp.h>
 
 
 /**
@@ -35,6 +36,7 @@ typedef imtrest::CHttpFileBasedHandlerComp HttpFileBasedHandler;
 typedef imtrest::CHttpHtmlFolderBasedHandlerComp HttpHtmlFolderBasedHandler;
 typedef imtrest::CJsonModelBasedHandlerComp JsonModelBasedHandler;
 typedef imtrest::CHttpRedirectComp HttpRedirectHandler;
+typedef imtrest::CHttpFileProviderBasedServletComp HttpFileProviderBasedServlet;
 
 
 } // namespace ImtRestPck

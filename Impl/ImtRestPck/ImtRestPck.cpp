@@ -60,6 +60,11 @@ I_EXPORT_COMPONENT(
 		"HTTP Redirect");
 
 I_EXPORT_COMPONENT(
+		HttpFileProviderBasedServlet,
+		"Returns file by name \n Note: name - is a part of commandID",
+		"FileProvider - based HTTP servlet");
+
+I_EXPORT_COMPONENT(
 		JsonModelBasedHandler,
 		"Generates Json model for QML??",
 		"JSON Model");
