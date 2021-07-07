@@ -7,11 +7,6 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liproc -liauth -liedge
 LIBS += -limtgui -limtloggui -limtbase -limtwidgets -li2d -liqt2d -limtstyle
 
-win32
-{
-	LIBS += -lUser32 -lAdvapi32
-}
-
 # Get build output directory of shadow build:
 ACFSLNDIRBUILD = $$(ACFSLNDIR_BUILD)
 !isEmpty(ACFSLNDIRBUILD){

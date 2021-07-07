@@ -1,46 +1,44 @@
-#pragma once
-
-#include "imtfile/CFileProviderComp.h"
+#include <imtfile/CFileProviderComp.h>
 
 
 namespace imtfile
 {
 
+
+// reimplemented (IFileProvider)
+
 bool CFileProviderComp::LoadData(QByteArray& data, const QByteArray& name) const
 {
-	QByteArray _name = name;
+	QByteArray workingFileName = name;
 	QString homeDirPath = *this->m_homeDirPath;
 
-	if ( m_fileTemplatePathCompPtr.IsValid() && m_fileTemplatePathCompPtr.GetPtr()->GetPath().length()){
-		homeDirPath = m_fileTemplatePathCompPtr.GetPtr()->GetPath();
+	if (m_fileTemplatePathCompPtr.IsValid() && m_fileTemplatePathCompPtr->GetPath().length()){
+		homeDirPath = m_fileTemplatePathCompPtr->GetPath();
 	}
 
 	if (*m_pathsProblemsAutoSolve){
-
 		int indexOfPathSeparator = -1;
 		QRegularExpression regexp("(.\\/.)");
 
-		QRegularExpressionMatch indexOfPathSeparatorMatch = regexp.match(_name);
+		QRegularExpressionMatch indexOfPathSeparatorMatch = regexp.match(workingFileName);
 
-		if (indexOfPathSeparatorMatch.hasMatch() && (indexOfPathSeparatorMatch.capturedStart() + 1) != _name.length()){
+		if (indexOfPathSeparatorMatch.hasMatch() && (indexOfPathSeparatorMatch.capturedStart() + 1) != workingFileName.length()){
 			indexOfPathSeparator = indexOfPathSeparatorMatch.capturedStart() + 1;
 		}
 
 		if (indexOfPathSeparator > 0){
 
-			if (QFileInfo(homeDirPath + _name.mid(0,indexOfPathSeparator)).isFile()){
-				_name = _name.remove(0, indexOfPathSeparator);
-
+			if (QFileInfo(homeDirPath + workingFileName.mid(0,indexOfPathSeparator)).isFile()){
+				workingFileName = workingFileName.remove(0, indexOfPathSeparator);
 			}
 		}
-
 	}
 
 	if (!homeDirPath.endsWith('/')){
 		homeDirPath.append('/');
 	}
 
-	QString destinationEntryPath = homeDirPath + _name;
+	QString destinationEntryPath = homeDirPath + workingFileName;
 	QFileInfo destinationEntry(destinationEntryPath);
 
 	if (!destinationEntry.isFile()){

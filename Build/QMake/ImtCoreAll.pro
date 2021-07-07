@@ -50,14 +50,18 @@ imt3dview.file = ../../Include/imt3dview/QMake/imt3dview.pro
 SUBDIRS += imt3dgui
 imt3dgui.file = ../../Include/imt3dgui/QMake/imt3dgui.pro
 
-SUBDIRS += imtfile
-imtfile.file = ../../Include/imtfile/QMake/imtfile.pro
+!macx {
+    SUBDIRS += imtfile
+    imtfile.file = ../../Include/imtfile/QMake/imtfile.pro
+}
 
 SUBDIRS += imtzip
 imtzip.file = ../../Include/imtzip/QMake/imtzip.pro
 
-SUBDIRS += imtpy
-imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
+!macx {
+    SUBDIRS += imtpy
+    imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
+}
 
 SUBDIRS += imtqml
 imtqml.file = ../../Include/imtqml/QMake/imtqml.pro
@@ -151,9 +155,11 @@ SUBDIRS += ImtZipPck
 ImtZipPck.file = ../../Impl/ImtZipPck/QMake/ImtZipPck.pro
 ImtZipPck.depends = imtzip
 
-SUBDIRS += ImtPyPck
-ImtPyPck.file = ../../Impl/ImtPyPck/QMake/ImtPyPck.pro
-ImtPyPck.depends = imtpy
+!macx {
+    SUBDIRS += ImtPyPck
+    ImtPyPck.file = ../../Impl/ImtPyPck/QMake/ImtPyPck.pro
+    ImtPyPck.depends = imtpy
+}
 
 SUBDIRS += ImtGqlPck
 ImtGqlPck.file = ../../Impl/ImtGqlPck/QMake/ImtGqlPck.pro

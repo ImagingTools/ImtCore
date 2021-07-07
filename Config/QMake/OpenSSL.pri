@@ -1,9 +1,8 @@
 
-INCLUDEPATH += $$PWD/../../3rdParty/openssl/1.1
 
-win32:
-{
-	contains(QMAKE_HOST.arch, x86_64) {
+win32*{
+    INCLUDEPATH += $$PWD/../../3rdParty/openssl/1.1
+    contains(QMAKE_HOST.arch, x86_64) {
 		LIBS += -L$$PWD/../../3rdParty/openssl/1.1/lib/x64 -llibcrypto
 	}
 	else {
@@ -11,5 +10,11 @@ win32:
 	}
 }
 
-unix: LIBS += -lcrypto
+
+mac*{
+    INCLUDEPATH += /usr/local/opt/openssl/include/
+
+    LIBS += -L/usr/local/opt/openssl/lib/ -lssl -lcrypto
+}
+
 
