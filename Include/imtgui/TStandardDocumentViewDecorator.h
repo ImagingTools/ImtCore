@@ -251,7 +251,7 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::UpdateSaveButtonsStatus(
 {
 	bool isSaveActive = true;
 
-	idoc::IUndoManager* undoManagerPtr = this->GetObjectAt<idoc::IUndoManager>(MI_UNDO_MANAGER);
+	idoc::IUndoManager* undoManagerPtr = this->template GetObjectAt<idoc::IUndoManager>(MI_UNDO_MANAGER);
 	if (undoManagerPtr != nullptr){
 		isSaveActive = isSaveActive && (undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL);
 	}
@@ -378,7 +378,7 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::OnModelChanged(int model
 	switch (modelId){
 		case MI_UNDO_MANAGER:
 			{
-				idoc::IUndoManager* undoManagerPtr = this->GetObjectAt<idoc::IUndoManager>(MI_UNDO_MANAGER);
+				idoc::IUndoManager* undoManagerPtr = this->template GetObjectAt<idoc::IUndoManager>(MI_UNDO_MANAGER);
 				Q_ASSERT(undoManagerPtr != nullptr);
 
 				UI::UndoButton->setEnabled(undoManagerPtr->GetAvailableUndoSteps() > 0);
