@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtCore/QString>
+#include <QtCore/QByteArray>
 
 // ACF includes
 #include <istd/IPolymorphic.h>
@@ -11,22 +11,20 @@
 namespace imtfile
 {
 
+
 /**
- * \brief The IFileProvider class provides file from disc, resources or memory
+	Interface for providing binary file contents.
  */
-class IFileProvider:  virtual public istd::IPolymorphic
+class IFileProvider: virtual public istd::IPolymorphic
 {
-
 public:
-	/*!
-	 * \brief extracts data from providing file and puts it in data param
-	 * \param data [OUTPUT] - data of providing file
-	 * \param name [INPUT] - name of providing file
-	 * \return result of extracting data
-	 */
-	virtual bool LoadData(QByteArray& data, const QByteArray& name) const = 0;
-
-
+	/**
+		\brief extracts data from providing file and puts it in data param
+		\param data [OUTPUT] - data of providing file
+		\param filePath [INPUT] - path of the file
+		\return result of extracting data
+	*/
+	virtual bool LoadData(QByteArray& data, const QByteArray& filePath) const = 0;
 };
 
 

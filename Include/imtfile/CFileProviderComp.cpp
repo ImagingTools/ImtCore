@@ -1,6 +1,9 @@
 #include <imtfile/CFileProviderComp.h>
 
 
+// Qt includes
+#include <QtCore/QRegularExpression>
+
 namespace imtfile
 {
 
@@ -10,13 +13,13 @@ namespace imtfile
 bool CFileProviderComp::LoadData(QByteArray& data, const QByteArray& name) const
 {
 	QByteArray workingFileName = name;
-	QString homeDirPath = *this->m_homeDirPath;
+	QString homeDirPath = *m_homeDirPathAttrPtr;
 
 	if (m_fileTemplatePathCompPtr.IsValid() && m_fileTemplatePathCompPtr->GetPath().length()){
 		homeDirPath = m_fileTemplatePathCompPtr->GetPath();
 	}
 
-	if (*m_pathsProblemsAutoSolve){
+	if (*m_pathsProblemsAutoSolveAttrPtr){
 		int indexOfPathSeparator = -1;
 		QRegularExpression regexp("(.\\/.)");
 
