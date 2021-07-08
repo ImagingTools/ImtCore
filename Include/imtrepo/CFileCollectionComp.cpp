@@ -343,9 +343,17 @@ const imtbase::IRevisionController* CFileCollectionComp::GetRevisionController()
 bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 {
 	if (objectId.isEmpty()){
-		SendErrorMessage(0, "object-ID is empty. Unknown resource could not be removed");
+		SendErrorMessage(0, "Object-ID is empty. Unknown resource could not be removed");
 
 		return false;
+	}
+
+	{
+		QWriteLocker cacheLocker(&m_objectCacheLock);
+
+		if (m_objectCache.contains(objectId)){
+			m_objectCache.remove(objectId);
+		}
 	}
 
 	QWriteLocker repositoryDataLocker(&m_filesLock);

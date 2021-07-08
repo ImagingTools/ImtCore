@@ -269,6 +269,14 @@ bool CFileCollectionCompBase::UpdateFile(
 	const QString& localFilePath,
 	const QByteArray& objectId)
 {
+	{
+		QWriteLocker cacheLocker(&m_objectCacheLock);
+
+		if (m_objectCache.contains(objectId)){
+			m_objectCache.remove(objectId);
+		}
+	}
+
 	QWriteLocker locker(&m_filesLock);
 
 	int fileIndex = GetFileIndexById(objectId);
@@ -481,15 +489,17 @@ const istd::IChangeable* CFileCollectionCompBase::GetObjectPtr(const QByteArray&
 
 bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const
 {
-	for (const CollectionItem& item : m_files){
-		if (item.fileId == objectId){
-			istd::TDelPtr<istd::IChangeable> dataObjectPtr(CreateObjectFromFile(item.filePathInRepository, item.typeId));
-			if (!dataObjectPtr.IsValid()){
-				return false;
-			}
+	QByteArray typeId = GetObjectTypeId(objectId);
+
+	// Check the object cache first:
+	{
+		QReadLocker lockCache(&m_objectCacheLock);
+		if (m_objectCache.contains(objectId)){
+			DataPtr dataObjectPtr = m_objectCache[objectId];
+			Q_ASSERT(dataObjectPtr.IsValid());
 
 			if (!dataPtr.IsValid()){
-				istd::TDelPtr<istd::IChangeable> newInstancePtr(CreateDataObject(item.typeId));
+				istd::TDelPtr<istd::IChangeable> newInstancePtr(CreateDataObject(typeId));
 				if (newInstancePtr.IsValid()){
 					if (newInstancePtr->CopyFrom(*dataObjectPtr)){
 						dataPtr.SetPtr(newInstancePtr.PopPtr());
@@ -500,6 +510,40 @@ bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr&
 			}
 			else{
 				return dataPtr->CopyFrom(*dataObjectPtr);
+			}
+		}
+	}
+
+	for (const CollectionItem& item : m_files){
+		if (item.fileId == objectId){
+			istd::TDelPtr<istd::IChangeable> dataObjectPtr(CreateObjectFromFile(item.filePathInRepository, typeId));
+			if (!dataObjectPtr.IsValid()){
+				return false;
+			}
+
+			
+			if (!dataPtr.IsValid()){
+				istd::TDelPtr<istd::IChangeable> newInstancePtr(CreateDataObject(typeId));
+				if (newInstancePtr.IsValid()){
+					if (newInstancePtr->CopyFrom(*dataObjectPtr)){
+						dataPtr.SetPtr(newInstancePtr.PopPtr());
+
+						QWriteLocker lockCache(&m_objectCacheLock);
+
+						m_objectCache[objectId] = dataPtr;
+
+						return true;
+					}
+				}
+			}
+			else{
+				if (dataPtr->CopyFrom(*dataObjectPtr)){
+					QWriteLocker lockCache(&m_objectCacheLock);
+
+					m_objectCache[objectId] = dataPtr;
+
+					return true;
+				}
 			}
 		}
 	}

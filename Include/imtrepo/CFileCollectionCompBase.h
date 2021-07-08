@@ -377,6 +377,9 @@ protected:
 	*/
 	virtual bool LoadMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const;
 
+	/**
+		Check if the path to the file is inside of repository folder.
+	*/
 	bool IsPathInsideRepository(const QString& filePath) const;
 
 	/**
@@ -457,6 +460,10 @@ protected:
 	*/
 	mutable Files m_files;
 	mutable QReadWriteLock m_filesLock;
+
+	typedef QMap<QByteArray, DataPtr> ObjectCache;
+	mutable ObjectCache m_objectCache;
+	mutable QReadWriteLock m_objectCacheLock;
 
 	EventHandlerList m_eventHandlerList;
 
