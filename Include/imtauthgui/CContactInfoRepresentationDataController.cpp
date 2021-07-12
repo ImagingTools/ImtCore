@@ -118,7 +118,7 @@ void CContactInfoRepresentationDataController::FullUpdateRepresentationModel(
 		imtbase::CTreeItemModel *treeItemModel) const
 {
 	istd::CChangeGroup changeGroup(treeItemModel);
-	treeItemModel->setState("Updated");
+	treeItemModel->SetState("Updated");
 	treeItemModel->SetData("firstName", contactPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME));
 	treeItemModel->SetData("lastName", contactPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME));
 	treeItemModel->SetData("nickName", contactPtr->GetNameField(imtauth::IContactInfo::NFT_NICKNAME));
@@ -140,7 +140,7 @@ void CContactInfoRepresentationDataController::FullUpdateRepresentationModel(
 			}
 		}
 	}
-	treeItemModel->setState("Ready");
+	treeItemModel->SetState("Ready");
 
 }
 

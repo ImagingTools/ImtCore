@@ -2,9 +2,13 @@
 
 // ACF includes
 #include <istd/IPolymorphic.h>
-#include <imod/IObserver.h>
+#include <istd/IChangeable.h>
+//#include <imod/IObserver.h>
+
+// ImtCore includes
 #include <imtbase/CTreeItemModel.h>
-#include <imtbase/ICollectionInfo.h>
+#include <imtrest/imtrest.h>
+//#include <imtbase/ICollectionInfo.h>
 
 
 namespace imtbase
@@ -18,8 +22,8 @@ namespace imtbase
 class IItemBasedRepresentationDataProvider: virtual public istd::IPolymorphic
 {
 public:
-//	virtual const imtbase::ICollectionInfo& GetModelsList() const = 0;
-	virtual CTreeItemModel* GetTreeItemModel(const QByteArray& modelId) = 0;
+	virtual QByteArray GetModelId() const = 0;
+	virtual CTreeItemModel* GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QweryParams& params) = 0;
 };
 
 

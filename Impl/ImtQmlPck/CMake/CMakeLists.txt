@@ -8,7 +8,7 @@ include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 target_link_libraries(${PROJECT_NAME} Qt${QT_DEFAULT_MAJOR_VERSION}::QuickWidgets)
-target_link_libraries(${PROJECT_NAME} imtqml)
+target_link_libraries(${PROJECT_NAME} imtqml imtbase)
 
 
 

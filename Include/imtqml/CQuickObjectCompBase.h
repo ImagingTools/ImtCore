@@ -7,6 +7,8 @@
 // ACF includes
 #include <icomp/CComponentBase.h>
 #include <imtqml/IQuickObject.h>
+#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtbase/CTreeItemModel.h>
 
 
 namespace imtqml
@@ -17,18 +19,25 @@ namespace imtqml
 	Component wrapper for the QML object.
  */
 class CQuickObjectCompBase:
+			public QObject,
 			public icomp::CComponentBase,
 			virtual public imtqml::IQuickObject
 {
+	Q_OBJECT
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CQuickObjectCompBase);
 		I_REGISTER_INTERFACE(imtqml::IQuickObject);
-		I_ASSIGN(m_pathToQmlAttrPtr, "QmlFilePath", "If enabled, this path used for load QML file", true, "QmlFilePath");
+		I_ASSIGN(m_pathToQmlAttrPtr, "QmlFilePath", "This path used for load QML file", true, GetPathToQml());
+		I_ASSIGN_MULTI_0(m_modelIdsAttrPtr, "ModelIdsAttr", "If enabled, this Id's used for register models", false);
+		I_ASSIGN_MULTI_0(m_modelQueriesAttrPtr, "ModelQueries", "If enabled, this Queries used for get datas", false);
+		I_ASSIGN(m_dataProviderCompPtr, "DataProviderComp", "If enabled, this ref used for get datas", false, "");
 	I_END_COMPONENT;
 
 	CQuickObjectCompBase();
+
+	static QString GetPathToQml();
 
 	// reimplemented (imtgui::IQuickObject)
 	virtual bool IsItemCreated() const override;
@@ -63,10 +72,17 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
+public Q_SLOTS:
+	void OnModelNeedsReload(imtbase::CTreeItemModel *itemModelPtr = nullptr);
+
 protected:
 	I_ATTR(QString, m_pathToQmlAttrPtr);
+	I_MULTIATTR(QByteArray, m_modelIdsAttrPtr);
+	I_MULTIATTR(QByteArray, m_modelQueriesAttrPtr);
+	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_dataProviderCompPtr);
 
 	QQuickItem* m_quickItemPtr;
+	QList<imtbase::CTreeItemModel*> m_models;
 };
 
 

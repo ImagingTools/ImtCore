@@ -7,7 +7,7 @@ Window
 	height: 480
 	width: 740
 	visible: true
-	color: "red"
+    color: "red"
 }
 
 

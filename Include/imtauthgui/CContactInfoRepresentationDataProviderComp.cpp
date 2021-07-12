@@ -43,7 +43,9 @@ bool CContactInfoRepresentationDataProviderComp::GetRepresentationData(
 	if (m_itemBasedRepresentationDataProvider.IsValid()
 			&& format == imtrest::IRepresentationDataProvider::RF_JSON
 			&& commandId == "__ContactInfo__"){
-		imtbase::CTreeItemModel *treeItemModel = m_itemBasedRepresentationDataProvider->GetTreeItemModel("");
+		QList<QByteArray> query;
+		imtrest::QweryParams params;
+		imtbase::CTreeItemModel *treeItemModel = m_itemBasedRepresentationDataProvider->GetTreeItemModel(query, params);
 		iser::CJsonStringWriteArchive archive(representationData);
 		retVal = treeItemModel->Serialize(archive);
 	}
@@ -65,7 +67,9 @@ bool CContactInfoRepresentationDataProviderComp::SetRepresentationData(
 			&& commandId == "__ContactInfo__"
 			&& jsonDocument.isObject()){
 		QJsonObject jsonObject = jsonDocument.object();
-		imtbase::CTreeItemModel* treeItemModel = m_itemBasedRepresentationDataProvider->GetTreeItemModel("");
+		QList<QByteArray> query;
+		imtrest::QweryParams params;
+		imtbase::CTreeItemModel* treeItemModel = m_itemBasedRepresentationDataProvider->GetTreeItemModel(query, params);
 		if (jsonObject.value("key").toString() == "addresses"){
 			imtbase::CTreeItemModel* addressesModel = treeItemModel->GetTreeItemModel("addresses",jsonObject.value("index0").toInt());
 			if (addressesModel != nullptr){
@@ -81,11 +85,12 @@ bool CContactInfoRepresentationDataProviderComp::SetRepresentationData(
 			}
 		}
 		else{
-			treeItemModel->setState("Updated");
+			treeItemModel->SetState("Updated");
 			for(QString key : jsonObject.keys()){
 				treeItemModel->SetData(key.toLatin1(),jsonObject.value(key).toVariant());
+				retVal = true;
 			}
-			treeItemModel->setState("Ready");
+			treeItemModel->SetState("Ready");
 		}
 
 //		istd::IChangeable::ChangeInfoMap infoUpdate;

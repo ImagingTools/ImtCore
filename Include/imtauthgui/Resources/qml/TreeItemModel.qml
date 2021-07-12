@@ -5,9 +5,10 @@ JSONListModel {
 
     property var infoPath: []
     
-    function get(row){
-        return container.model.get(row)
-    }
+//    function get(row){
+//        return container.get(row)
+//    }
+
     
     function GetData(key, row){
         if(row === undefined)
@@ -16,7 +17,16 @@ JSONListModel {
             row = 0
         var modelObject = get(row)
         var retVal = modelObject[key]
-        return  retVal
+        if(typeof retVal === 'object'){
+            var retModel
+            var component = Qt.createComponent("TreeItemModel.qml");
+            if (component.status === Component.Ready) {
+                retModel = component.createObject(container);
+                retModel.append(retVal);
+            }
+            return  retModel
+        }
+        return retVal
     }
     function SetData(key, value, row){
         if(row === undefined)

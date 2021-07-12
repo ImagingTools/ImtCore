@@ -21,27 +21,40 @@ namespace imtbase
 class CTreeItemModel: public QAbstractListModel, public imod::CModelBase, virtual public iser::ISerializable
 {
 	Q_OBJECT
-	Q_PROPERTY(QString state READ state WRITE setState NOTIFY stateChanged)
+	Q_PROPERTY(QString state READ State WRITE SetState NOTIFY stateChanged)
 
 public:
 	explicit CTreeItemModel(QObject* parent = nullptr);
 	~CTreeItemModel();
 
-	const QString &state() const;
-	void setState(const QString &newState);
+	const QString &State() const;
+	void SetState(const QString &newState);
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
 
 public Q_SLOTS:
 	int InsertNewItem();
+	int RemoveItem(int index, const ChangeInfoMap& infoMap = ChangeInfoMap());
 	CTreeItemModel* AddTreeModel(const QByteArray &key, int index = 0);
+	bool SetExternTreeModel(const QByteArray &key, CTreeItemModel *externTreeModel, int index = 0);
+	bool CopyItemDataFromModel(int index, CTreeItemModel *externTreeModel, int externIndex = 0);
 	bool SetData(const QByteArray &key, const QVariant &value, int index = 0, const ChangeInfoMap& infoMap = ChangeInfoMap());
+	bool RemoveData(const QByteArray &key, int index = 0, const ChangeInfoMap& infoMap = ChangeInfoMap());
 	QVariant GetData(const QByteArray &key, int index = 0) const;
 	bool IsTreeModel(const QByteArray &key, int index = 0) const;
+	bool ContainsKey(const QByteArray &key, int index = 0) const;
 	CTreeItemModel* GetTreeItemModel(const QByteArray &key, int index = 0) const;
 	int GetItemsCount() const;
 	void GetKeys(QList<QByteArray>& keys, int index = 0);
+
+	void SetQueryParam(const QByteArray& key, const QByteArray& value);
+	QByteArray GetQueryParam(const QByteArray& key);
+	QByteArray TakeQueryParam(const QByteArray& key);
+	QMap<QByteArray, QByteArray> &GetQueryParams();
+	void ClearQueryParams(const QByteArray& key);
+
+	void Refresh();
 
 	// reimplemented (QAbstractListModel)
 	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const override;
@@ -49,8 +62,6 @@ public Q_SLOTS:
 	virtual QHash<int, QByteArray> roleNames() const override;
 
 	// pseudo-reimplemented (istd::IChangeable)
-//	virtual int GetSupportedOperations() const;
-//	virtual istd::IChangeable* CloneMe(istd::IChangeable::CompatibilityMode mode = istd::IChangeable::CM_WITHOUT_REFS) const;
 	virtual void BeginChanges(const istd::IChangeable::ChangeSet& changeSet);
 	virtual void EndChanges(const istd::IChangeable::ChangeSet& changeSet);
 	virtual void BeginChangeGroup(const istd::IChangeable::ChangeSet& changeSet);
@@ -58,6 +69,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void stateChanged(const QString& state);
+	void needsReload();
 
 protected:
 	virtual bool SerializeRecursive(iser::IArchive& archive, const QByteArray &tagName);
@@ -90,6 +102,7 @@ private:
 		}
 		void GetKeys(QList<QByteArray>& keys) { keys = m_keys; }
 		bool Contains(const QByteArray &key) { return m_map.contains(key); }
+		bool ContainsKey(const QByteArray &key) { return m_keys.contains(key); }
 	private:
 		QMap<QByteArray,QVariant> m_map;
 		QList<QByteArray> m_keys;
@@ -98,6 +111,7 @@ private:
 	QList<Item*> m_items;
 	QHash<int, QByteArray> m_roleNames;
 	imod::CModelUpdateBridge m_parentUpdateBridge;
+	QMap<QByteArray,QByteArray> m_queryParams;
 
 
 	QString m_state;
@@ -106,3 +120,4 @@ private:
 
 } // namespace imtbase
 
+Q_DECLARE_METATYPE(imtbase::CTreeItemModel*)

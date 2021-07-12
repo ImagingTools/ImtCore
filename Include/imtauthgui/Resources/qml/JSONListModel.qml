@@ -1,14 +1,15 @@
 import QtQuick 2.0
 import "jsonpath.js" as JSONPath
 
-Item {
+ListModel {
 	property string source: ""
 	property string json: ""
 	property string query: ""
 	property string target: ""
 
-	property ListModel model : ListModel { id: jsonModel }
-	property alias count: jsonModel.count
+//	property ListModel model : ListModel { id: jsonModel }
+//	property alias count: jsonModel.count
+    property string state
 
 	onSourceChanged: {
 		state = "Loading"
@@ -20,7 +21,6 @@ Item {
             if (xhr.readyState === XMLHttpRequest.DONE){
 				json = xhr.responseText;
                 updateJSONModel()
-//                console.log("Ready",json)
 //                console.log("Model",jsonModel.$items)
                 state = "Ready"
             }
@@ -41,7 +41,7 @@ Item {
 	}
 
     function updateJSONModel() {
-	jsonModel.clear();
+    clear();
 
 	if ( json === "" )
 	    return;
@@ -52,7 +52,7 @@ Item {
 	    var jo = objectArray[key];
 	    dict[key] = jo
 	}
-        jsonModel.append(dict);
+        append(dict);
 	var d2 = new Date()
 	console.log(d2.getMilliseconds() - d1.getMilliseconds())
     }

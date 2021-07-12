@@ -5,6 +5,7 @@
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 #include <istd/CChangeNotifier.h>
+#include <istd/TSmartPtr.h>
 
 
 namespace imtbase
@@ -23,17 +24,18 @@ CTreeItemModel::CTreeItemModel(QObject *parent)
 
 CTreeItemModel::~CTreeItemModel()
 {
-
+	qDeleteAll(m_items);
+	m_items.clear();
 }
 
 
-const QString& CTreeItemModel::state() const
+const QString& CTreeItemModel::State() const
 {
 	return m_state;
 }
 
 
-void CTreeItemModel::setState(const QString &newState)
+void CTreeItemModel::SetState(const QString &newState)
 {
 	if (m_state != newState){
 		m_state = newState;
@@ -53,6 +55,34 @@ int CTreeItemModel::InsertNewItem()
 }
 
 
+int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap &infoMap)
+{
+	if (index < 0 || index > m_items.count() - 1){
+		return false;
+	}
+
+	IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
+
+	changeSet.SetChangeInfo("operation", "remove item");
+	changeSet.SetChangeInfo("index", index);
+
+	BeginChanges(changeSet);
+
+	Item* item = m_items.takeAt(index);
+	QList<QByteArray> keys;
+
+	delete item;
+
+	EndChanges(changeSet);
+
+
+	QModelIndex topLeft = QAbstractListModel::index(index);
+	emit dataChanged(topLeft,topLeft,m_roleNames.keys().toVector());
+
+	return true;
+}
+
+
 CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int index)
 {
 	if (m_items.isEmpty() && index == 0){
@@ -64,21 +94,50 @@ CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int index)
 	}
 
 	Item *item = m_items[index];
+
 	CTreeItemModel* retVal = new CTreeItemModel(this);
+//	istd::TSmartPtr<CTreeItemModel> *smartPtr = new istd::TSmartPtr<CTreeItemModel>(retVal);
 
-//	int level = 0;
-//	CTreeItemModel* parentModel = this;
-//	while (parentModel != nullptr){
-//		parentModel = dynamic_cast<CTreeItemModel*>(parentModel->parent());
-//		if (parentModel != nullptr){
-//			level++;
-//		}
-//	}
-
+//	QVariant v = QVariant::fromValue((void*)smartPtr);
 	QVariant v = QVariant::fromValue(retVal);
 
 	item->SetValue(key, v);
 
+	return retVal;
+}
+
+bool CTreeItemModel::SetExternTreeModel(const QByteArray &key, CTreeItemModel *externTreeModel, int index)
+{
+	if (m_items.isEmpty() && index == 0){
+		InsertNewItem();
+	}
+
+	if (index < 0 || index > m_items.count() - 1){
+		return false;
+	}
+
+	Item *item = m_items[index];
+	if (externTreeModel != nullptr){
+		externTreeModel->setParent(this);
+	}
+	QVariant v = QVariant::fromValue(externTreeModel);
+	item->SetValue(key, v);
+
+	return true;
+}
+
+bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTreeModel, int externIndex)
+{
+	bool retVal = false;
+	QList<QByteArray> keys;
+	externTreeModel->GetKeys(keys, externIndex);
+	for (QByteArray key : keys){
+		QVariant value = externTreeModel->GetData(key, externIndex);
+		retVal = SetData(key, value, index);
+		if (retVal == false){
+			break;
+		}
+	}
 	return retVal;
 }
 
@@ -99,8 +158,9 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 	}
 
 	Item* item = m_items[index];
-
 	IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
+
+	changeSet.SetChangeInfo("operation", "set");
 	changeSet.SetChangeInfo("curVal", item->Value(key));
 	changeSet.SetChangeInfo("newVal", value);
 	changeSet.SetChangeInfo("key", key);
@@ -112,7 +172,61 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 
 	EndChanges(changeSet);
 
+	int keyRole = -1;
+	QList<int> keys = m_roleNames.keys();
+	for (int i : keys){
+		if (m_roleNames[i] == key){
+			keyRole = i;
+			break;
+		}
+	}
+	if (keyRole > -1){
+		QModelIndex topLeft = QAbstractListModel::index(index);
+		QVector<int> roles;
+		roles.append(keyRole);
+		emit dataChanged(topLeft,topLeft,roles);
+	}
+
 	return true;
+}
+
+bool CTreeItemModel::RemoveData(const QByteArray &key, int index, const ChangeInfoMap &infoMap)
+{
+	if (index < 0 || index > m_items.count() - 1){
+		return false;
+	}
+
+	Item* item = m_items[index];
+	IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
+
+	changeSet.SetChangeInfo("operation", "remove");
+	changeSet.SetChangeInfo("curVal", item->Value(key));
+	changeSet.SetChangeInfo("key", key);
+	changeSet.SetChangeInfo("index", index);
+
+	BeginChanges(changeSet);
+
+	item->RemoveValue(key);
+
+	EndChanges(changeSet);
+
+	int keyRole = -1;
+	QList<int> keys = m_roleNames.keys();
+	for (int i : keys){
+		if (m_roleNames[i] == key){
+			keyRole = i;
+			break;
+		}
+	}
+	if (keyRole > -1){
+		QModelIndex topLeft = QAbstractListModel::index(index);
+		QVector<int> roles;
+		roles.append(keyRole);
+		emit dataChanged(topLeft,topLeft,roles);
+	}
+
+	return true;
+
 }
 
 
@@ -129,6 +243,18 @@ QVariant CTreeItemModel::GetData(const QByteArray &key, int index) const
 bool CTreeItemModel::IsTreeModel(const QByteArray &key, int index) const
 {
 	return GetTreeItemModel(key,index) != nullptr;
+}
+
+
+bool CTreeItemModel::ContainsKey(const QByteArray &key, int index) const
+{
+	bool retVal = false;
+
+	if (index >= 0 && index < m_items.count()){
+		retVal = m_items[index]->ContainsKey(key);
+	}
+
+	return retVal;
 }
 
 
@@ -157,6 +283,42 @@ void CTreeItemModel::GetKeys(QList<QByteArray>& keys, int index)
 }
 
 
+void CTreeItemModel::SetQueryParam(const QByteArray &key, const QByteArray &value)
+{
+	m_queryParams.insert(key, value);
+}
+
+
+QByteArray CTreeItemModel::GetQueryParam(const QByteArray &key)
+{
+	return m_queryParams.value(key);
+}
+
+
+QByteArray CTreeItemModel::TakeQueryParam(const QByteArray &key)
+{
+	return m_queryParams.take(key);
+}
+
+
+QMap<QByteArray, QByteArray> &CTreeItemModel::GetQueryParams()
+{
+	return m_queryParams;
+}
+
+
+void CTreeItemModel::ClearQueryParams(const QByteArray &key)
+{
+	m_queryParams.clear();
+}
+
+void CTreeItemModel::Refresh()
+{
+	beginResetModel();
+	endResetModel();
+}
+
+
 // reimplemented (QAbstractListModel)
 
 int CTreeItemModel::rowCount(const QModelIndex& /*parent*/) const
@@ -167,6 +329,10 @@ int CTreeItemModel::rowCount(const QModelIndex& /*parent*/) const
 
 QVariant CTreeItemModel::data(const QModelIndex& index, int role) const
 {
+	if (m_roleNames.contains(role) == false){
+		return QVariant();
+	}
+
 	QByteArray key = m_roleNames.value(role);
 
 	int row = index.row();

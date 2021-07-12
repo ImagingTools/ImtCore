@@ -8,7 +8,10 @@
 #include <QtGui/QIcon>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlApplicationEngine>
+#include <QtQml/QJSEngine>
+#include <QtQml/QQmlPropertyMap>
 #include <QtQuick/QQuickView>
+#include <QtQml/QQmlContext>
 #include <QtQuickWidgets/QQuickWidget>
 
 #if defined (Q_OS_WIN)
@@ -21,7 +24,6 @@
 #include <istd/CSystem.h>
 #include <iqtgui/CCommandTools.h>
 #include <iqtgui/CHierarchicalCommand.h>
-
 
 #if defined(Q_OS_MACX) && (QT_VERSION >= 0x040000) && (QT_VERSION < 0x050000)
 void qt_mac_set_menubar_icons(bool enable);
@@ -87,16 +89,33 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 	if (BaseClass::InitializeApplication(argc, argv)){
 		m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_STARTING);
 
-		QQmlApplicationEngine engine;
-		engine.addImportPath("qrc:/");
-		engine.addImportPath("qrc:/qml");
-		engine.load(QUrl("qrc:/qml/MainWindow.qml"));
+		QQmlApplicationEngine *engine = new QQmlApplicationEngine(this);
+		engine->addImportPath("qrc:/");
+		engine->addImportPath("qrc:/qml");
+		engine->load(QUrl("qrc:/qml/MainWindow.qml"));
+
+
+//		QQmlContext *ctxt = engine->rootContext();
+//		imtqml::Acf *acf = new imtqml::Acf(engine);
+//		ctxt->setContextProperty("Acf2", acf);
+//		qmlRegisterSingletonInstance<imtqml::Acf>("ACFS", 1, 0, "AcfS", acf);
+////		qmlRegisterType<imtqml::Acf>("ACFS", 1, 0, "AcfS");
+
 
 		if (m_allowApplicationCloseModelCompPtr.IsValid()){
 			m_allowApplicationCloseModelCompPtr->AttachObserver(this);
 		}
 
 		if (m_mainQuickCompPtr.IsValid()){
+			imtqml::IQuickObject *quickObjectPtr = m_mainQuickCompPtr.GetPtr();
+			if (quickObjectPtr != nullptr){
+
+				QObject *root = engine->rootObjects()[0];
+				QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
+				QQuickItem* mainItem = window->contentItem();
+
+				quickObjectPtr->CreateQuickItem(mainItem);
+			}
 		}
 
 		HideSplashScreen();

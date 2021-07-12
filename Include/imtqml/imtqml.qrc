@@ -2,5 +2,13 @@
     <qresource prefix="/qml">
         <file alias="MainWindow.qml">Resources/qml/MainWindow.qml</file>
         <file alias="WrapItem.qml">Resources/qml/WrapItem.qml</file>
+        <file alias="ThumbnailDecorator.qml">Resources/qml/ThumbnailDecorator.qml</file>
+        <file alias="AuxComponents/Button.qml">Resources/qml/AuxComponents/Button.qml</file>
+        <file alias="AuxComponents/MenuPanel.qml">Resources/qml/AuxComponents/MenuPanel.qml</file>
+        <file alias="AuxComponents/TopPanel.qml">Resources/qml/AuxComponents/TopPanel.qml</file>
+        <file alias="AuxComponents/MenuPanelButton.qml">Resources/qml/AuxComponents/MenuPanelButton.qml</file>
+        <file alias="AuxComponents/ToolButton.qml">Resources/qml/AuxComponents/ToolButton.qml</file>
+        <file alias="AuxComponents/AcfTest.qml">Resources/qml/AuxComponents/Acf.qml</file>
+        <file alias="AuxComponents/TopButton.qml">Resources/qml/AuxComponents/TopButton.qml</file>
     </qresource>
 </RCC>
