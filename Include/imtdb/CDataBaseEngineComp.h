@@ -2,7 +2,7 @@
 
 
 // Qt includes
-//#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlDatabase>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -14,7 +14,8 @@
 namespace imtdb
 {
 
-class CDataBaseEngineComp :
+
+class CDataBaseEngineComp:
 			public ilog::CLoggerComponentBase,
 			virtual public IDataBaseEngine
 {
@@ -47,11 +48,10 @@ public:
 
 private:
 	/*!
-		\brief ReConnectToDataBaseIfNeeded - internal method for reconnection database on disconnect or  not connected
-		\warning reconnection database may be occur if it connected not!
-		\return connectivity status
+		Internal method for reconnection database on disconnect or not connected.
+		\return \c true if the database could not be connected successfully or \c false otherwise.
 	 */
-	bool ReConnectToDataBaseIfNeeded() const;
+	bool EnsureDatabaseConnected() const;
 
 private:
 	I_ATTR(QByteArray, m_dbType);
@@ -60,9 +60,11 @@ private:
 	I_ATTR(QByteArray, m_pasword);
 	I_ATTR(QByteArray, m_hostName);
 	I_ATTR(int, m_port);
+
 	QSqlDatabase m_db;
 };
 
 
 } // namespace imtdb
+
 

@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Qt includes
 #include <QtSql/QtSql>
 
@@ -10,11 +11,13 @@
 // ImtCore includes
 #include <imtbase/CObjectCollectionBase.h>
 #include <imtdb/IDataBaseEngine.h>
-#include <imtdb/CDataBaseEngineComp.h>
 #include <imtdb/IDataBaseChangeable.h>
+
 
 namespace imtdb
 {
+
+
 /**
 	Basic implementation of a DataBase based model.
 */
@@ -24,16 +27,15 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDataBaseObjectCollection);
-		I_ASSIGN(m_dbEngine, "DataBaseEngine", "DataBase for getting data", true, "IDatabaseEngine");
-		I_ASSIGN(m_updateOnDataBaseConnected, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", true, false);
-		I_ASSIGN(m_selectSqlQueryPath, "SelectSqlQueryPath", "Sql query string file path for Selecting in database", false, "");
-		I_ASSIGN(m_insertSqlQueryPath, "InsertSqlQueryPath", "Sql query string file path for Inserting in database", false, "");
-		I_ASSIGN(m_updateSqlQueryPath, "UpdateSqlQueryPath", "Sql query string file path for Updateing in database", false, "");
-		I_ASSIGN(m_deleteSqlQueryPath, "DeleteSqlQueryPath", "Sql query string file path for Deleteing in database", false, "");
+		I_ASSIGN(m_dbEngineCompPtr, "DataBaseEngine", "DataBase for getting data", true, "IDatabaseEngine");
+		I_ASSIGN(m_updateOnDataBaseConnectedAttrPtr, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", true, false);
+		I_ASSIGN(m_selectSqlQueryPathAttrPtr, "SelectSqlQueryPath", "SQL query string file path for Selecting in database", false, "");
+		I_ASSIGN(m_insertSqlQueryPathAttrPtr, "InsertSqlQueryPath", "SQL query string file path for Inserting in database", false, "");
+		I_ASSIGN(m_updateSqlQueryPathAttrPtr, "UpdateSqlQueryPath", "SQL query string file path for Updateing in database", false, "");
+		I_ASSIGN(m_deleteSqlQueryPathAttrPtr, "DeleteSqlQueryPath", "SQL query string file path for Deleteing in database", false, "");
 	I_END_COMPONENT;
 
 	virtual void Refresh();
-
 	virtual const IDataBaseChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record) const;
 
 	// reimplemented (imtbase::IObjectCollection)
@@ -71,12 +73,12 @@ protected:
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override;
 
 protected:
-	I_REF(IDataBaseEngine, m_dbEngine);
-	I_ATTR(bool, m_updateOnDataBaseConnected);
-	I_ATTR(QByteArray, m_selectSqlQueryPath);
-	I_ATTR(QByteArray, m_insertSqlQueryPath);
-	I_ATTR(QByteArray, m_updateSqlQueryPath);
-	I_ATTR(QByteArray, m_deleteSqlQueryPath);
+	I_REF(IDataBaseEngine, m_dbEngineCompPtr);
+	I_ATTR(bool, m_updateOnDataBaseConnectedAttrPtr);
+	I_ATTR(QByteArray, m_selectSqlQueryPathAttrPtr);
+	I_ATTR(QByteArray, m_insertSqlQueryPathAttrPtr);
+	I_ATTR(QByteArray, m_updateSqlQueryPathAttrPtr);
+	I_ATTR(QByteArray, m_deleteSqlQueryPathAttrPtr);
 };
 
 
