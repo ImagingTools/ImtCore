@@ -16,10 +16,10 @@
 namespace imtrest
 {
 
-QByteArray CHttpFileProviderBasedServletComp::GetMimeType(const QFileInfo& fileInfo) const
+QByteArray CHttpFileProviderBasedServletComp::GetMimeType(QByteArray fileSuffix) const
 {
 	QByteArray retval = "application/octet-stream";
-	QByteArray fileSuffix = fileInfo.suffix().toUtf8();
+//	QByteArray fileSuffix = fileInfo.suffix().toUtf8();
 	if (fileSuffix.startsWith('.')){
 		fileSuffix = fileSuffix.remove(0,1);
 	}
@@ -52,7 +52,7 @@ QByteArray CHttpFileProviderBasedServletComp::GetMimeType(const QFileInfo& fileI
 	else if (setMimeTypeByExtention("image/gif",					{"agif", "gfb", "gfw", "gif", "gifv"}));
 	else if (setMimeTypeByExtention("image/jpeg",				{"j", "j2c", "j2k", "jfif", "jif", "jiff", "jng", "jp2", "jpc", "jpe", "jpeg", "jpf", "jpg", "jpg-large", "jpg2", "jps", "jpx", "jtf", "jxr", "ljp"}));
 	else if (setMimeTypeByExtention("image/png",					{"apng", "png", "pns"}));
-	else if (setMimeTypeByExtention("image/svg+xml",				{"svg", "svgz"  }));
+	else if (setMimeTypeByExtention("image/svg+xml",				{"svg", "svgz", ""  }));
 	else if (setMimeTypeByExtention("image/tiff",				{"kdk", "tif", "tiff", "tsr"}));
 	else if (setMimeTypeByExtention("image/vnd.microsoft.icon",	{"ico", "icon"}));
 	else if (setMimeTypeByExtention("image/vnd.wap.wbmp",		{"wbmp"}));
@@ -126,9 +126,17 @@ IRequestHandler::ConstResponsePtr CHttpFileProviderBasedServletComp::ProcessRequ
 
 	bool loadRes = false;
 
-	for (int i = 0; i < m_fileProvidersPtrs.GetCount(); ++i){
+	for (int i = 0; i < m_binaryDataProvidersCompPtr.GetCount(); ++i){
 
-		if ((loadRes = (m_fileProvidersPtrs[i]->LoadData(body, commandIdFileName)))){
+		if ((loadRes = (m_binaryDataProvidersCompPtr[i]->GetData(body, commandIdFileName)))){
+			QByteArray fileSuffix;
+			int index = commandIdFileName.lastIndexOf('.');
+			if (index > 0){
+				index = commandIdFileName.count() - index;
+				fileSuffix = commandIdFileName.right(index);
+			}
+			reponseTypeId = this->GetMimeType(fileSuffix);
+			reponseTypeId.append(QByteArray("; charset=utf-8"));
 			break;
 		}
 

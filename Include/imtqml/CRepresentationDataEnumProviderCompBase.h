@@ -11,9 +11,11 @@
 #include <iser/CJsonStringWriteArchive.h>
 
 // ImtCore includes
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
-#include <imtrest/IRepresentationDataProvider.h>
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
+//#include <imtbase/IItemBasedRepresentationDataProvider.h>
+//#include <imtrest/IRepresentationDataProvider.h>
+//#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtbase/IBinaryDataProvider.h>
+#include <imtrest/imtrest.h>
 
 
 namespace imtqml
@@ -22,48 +24,43 @@ namespace imtqml
 
 class CRepresentationDataEnumProviderCompBase :
 		public icomp::CComponentBase,
-		public imtrest::IRepresentationDataProvider
+		public imtbase::IBinaryDataProvider
 {
 
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CRepresentationDataEnumProviderCompBase);
-		I_REGISTER_INTERFACE(imtrest::IRepresentationDataProvider);
+		I_REGISTER_INTERFACE(imtbase::IBinaryDataProvider);
+		I_ASSIGN(m_dataIdAttrPtr, "Data Id", "Data Id", true, "");
 	I_END_COMPONENT;
 
 	CRepresentationDataEnumProviderCompBase() : BaseClass() {}
 
-
-	// reimplemented (imtauthgui::IRepresentationDataProvider)
-	virtual bool GetRepresentationData(
-				imtrest::IRepresentationDataProvider::Format format,
-				QByteArray& representationData,
-				const QByteArray& commandId = "") override
+	// reimplemented (imtbase::IBinaryDataProvider)
+	virtual bool GetData(QByteArray& data, const QByteArray& dataId) const override
 	{
 		bool retVal = false;
+		if (m_dataIdAttrPtr.IsValid() && *m_dataIdAttrPtr == dataId){
+			imtrest::QweryParams enums;
+			GetEnums(enums);
 
-		istd::IChangeable::ChangeInfoMap params;
-
-		{
-			imtbase::CTreeItemModel rootModel;
-			SetEnums(rootModel);
-			iser::CJsonStringWriteArchive archive(representationData);
-			retVal = rootModel.Serialize(archive);
+			data = "//pragma Singleton\n"
+				"import QtQuick 2.0\n"
+				"QtObject {\n";
+			for (const QByteArray& key: enums.keys()){
+				data += " property string " + key + ": \"" + enums.value(key) + "\"\n";
+				retVal = true;
+			}
+			data += "\n}\n";
 		}
-
 		return retVal;
-	}
-	virtual bool SetRepresentationData(
-				imtrest::IRepresentationDataProvider::Format format,
-				QByteArray& representationData,
-				const QByteArray& commandId = "") override
-	{
-		return false;
 	}
 
 protected:
-	virtual void SetEnums(imtbase::CTreeItemModel& rootModel) {}
+	I_ATTR(QByteArray, m_dataIdAttrPtr);
+
+	virtual void GetEnums(imtrest::QweryParams& enums) const { }
 
 };
 

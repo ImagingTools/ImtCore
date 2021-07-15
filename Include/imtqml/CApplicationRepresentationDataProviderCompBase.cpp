@@ -36,17 +36,17 @@ CApplicationRepresentationDataProviderCompBase::CApplicationRepresentationDataPr
 bool CApplicationRepresentationDataProviderCompBase::GetRepresentationData(
 		imtrest::IRepresentationDataProvider::Format format,
 		QByteArray& representationData,
-		const QByteArray& commandId)
+		const QList<QByteArray>& query, const imtrest::QweryParams& params)
 {
 	bool retVal = false;
 
 	if (m_slaveRepresentationDataProviderCompPtr.IsValid()){
-		QList<QByteArray> query;
-		imtrest::QweryParams params;
 		imtbase::CTreeItemModel *rootModel = m_slaveRepresentationDataProviderCompPtr->GetTreeItemModel(query, params);
-		iser::CJsonStringWriteArchive archive(representationData);
-		retVal = rootModel->Serialize(archive);
-		delete rootModel;
+		if (rootModel != nullptr){
+			iser::CJsonStringWriteArchive archive(representationData);
+			retVal = rootModel->Serialize(archive);
+			delete rootModel;
+		}
 	}
 
 	return retVal;

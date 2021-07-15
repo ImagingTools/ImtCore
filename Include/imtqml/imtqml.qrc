@@ -10,5 +10,12 @@
         <file alias="AuxComponents/ToolButton.qml">Resources/qml/AuxComponents/ToolButton.qml</file>
         <file alias="AuxComponents/AcfTest.qml">Resources/qml/AuxComponents/Acf.qml</file>
         <file alias="AuxComponents/TopButton.qml">Resources/qml/AuxComponents/TopButton.qml</file>
+        <file alias="AuxComponents/Table.qml">Resources/qml/AuxComponents/Table.qml</file>
+        <file alias="AuxComponents/TabPanel.qml">Resources/qml/AuxComponents/TabPanel.qml</file>
+        <file alias="AuxComponents/TableDelegate.qml">Resources/qml/AuxComponents/TableDelegate.qml</file>
+        <file alias="AuxComponents/TabDelegate.qml">Resources/qml/AuxComponents/TabDelegate.qml</file>
+    </qresource>
+    <qresource prefix="/Icons">
+        <file alias="DeleteStylized.svg">Resources/Icons/DeleteStylized.svg</file>
     </qresource>
 </RCC>

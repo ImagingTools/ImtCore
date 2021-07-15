@@ -32,10 +32,9 @@ public:
 	CApplicationRepresentationDataProviderCompBase();
 
 	// reimplemented (imtauthgui::IRepresentationDataProvider)
-	virtual bool GetRepresentationData(
-				imtrest::IRepresentationDataProvider::Format format,
+	virtual bool GetRepresentationData(imtrest::IRepresentationDataProvider::Format format,
 				QByteArray& representationData,
-				const QByteArray& commandId = "") override;
+				const QList<QByteArray> &query, const imtrest::QweryParams &params) override;
 	virtual bool SetRepresentationData(
 				imtrest::IRepresentationDataProvider::Format format,
 				QByteArray& representationData,

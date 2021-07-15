@@ -21,9 +21,12 @@ class CCommandDataEnumProviderComp :
 public:
 	typedef CRepresentationDataEnumProviderCompBase BaseClass;
 
+	I_BEGIN_COMPONENT(CCommandDataEnumProviderComp);
+	I_END_COMPONENT;
+
 	CCommandDataEnumProviderComp(QObject *parent = nullptr) : QObject(parent), BaseClass() {}
 
-	static constexpr const char* ID = "Id";
+	static constexpr const char* ID = "CommandId";
 	const QString Id() { return ID; }
 	static constexpr const char* NAME = "Name";
 	const QString Name() { return NAME; }
@@ -33,12 +36,12 @@ public:
 	const QString Enabled() { return ENABLED; }
 
 protected:
-	void SetEnums(imtbase::CTreeItemModel& rootModel) override
+	void GetEnums(imtrest::QweryParams& enums) const override
 	{
-		rootModel.SetData(NAME, NAME);
-		rootModel.SetData(ICON, ICON);
-		rootModel.SetData(ENABLED, ENABLED);
-		rootModel.SetData(ID, ID);
+		enums.insert("NAME", NAME);
+		enums.insert("ICON", ICON);
+		enums.insert("ENABLED", ENABLED);
+		enums.insert("ID", ID);
 	}
 
 };

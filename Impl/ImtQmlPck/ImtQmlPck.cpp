@@ -54,15 +54,19 @@ I_EXPORT_COMPONENT(
 			"Page item based data provider");
 
 I_EXPORT_COMPONENT(
-			EnumApplicationDataProvider,
-			"Application Enums data provider",
-			"Application Enums data provider");
+			ApplicationDataEnumProvider,
+			"Application data enum provider",
+			"Application data enum provider");
 
 I_EXPORT_COMPONENT(
-			EnumPageDataProvider,
-			"Page Enums data provider",
-			"Page Enums data provider");
+			PageDataEnumProvider,
+			"Page data enum provider",
+			"Page data enum provider");
 
+I_EXPORT_COMPONENT(
+			CommandDataEnumProvider,
+			"Command data enum provider",
+			"Command data enum provider");
 
 } // namespace ImtQmlPck
 

@@ -20,6 +20,9 @@ class CApplicationDataEnumProviderComp :
 public:
 	typedef CRepresentationDataEnumProviderCompBase BaseClass;
 
+	I_BEGIN_COMPONENT(CApplicationDataEnumProviderComp);
+	I_END_COMPONENT;
+
 	CApplicationDataEnumProviderComp(QObject *parent = nullptr) : QObject(parent), BaseClass() {}
 
 	static constexpr const char* APPLICATION = "Application";
@@ -32,11 +35,11 @@ public:
 	const QString Data() { return DATA; }
 
 protected:
-	void SetEnums(imtbase::CTreeItemModel& rootModel) override
+	void virtual GetEnums(imtrest::QweryParams& enums) const override
 	{
-		rootModel.SetData(APPLICATION, APPLICATION);
-		rootModel.SetData(PAGES, PAGES);
-		rootModel.SetData(DATA, DATA);
+		enums.insert("APPLICATION", APPLICATION);
+		enums.insert("PAGES", PAGES);
+		enums.insert("DATA", DATA);
 	}
 
 };

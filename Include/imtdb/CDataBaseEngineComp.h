@@ -33,7 +33,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IDatabaseEngine)
-	virtual	QString ConnectionName() const override;
+	virtual	QString GetConnectionName() const override;
 	virtual QSqlDatabase GetDatabase() const override;
 	bool OpenDataBase() override;
 	void CloseDataBase() override;

@@ -10,7 +10,7 @@ namespace imtdb
 {
 
 
-QString CDataBaseEngineComp::ConnectionName() const
+QString CDataBaseEngineComp::GetConnectionName() const
 {
 	return m_db.connectionName();
 }

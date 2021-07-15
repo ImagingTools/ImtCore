@@ -23,6 +23,7 @@
 #include <imtbase/CParamSetSummaryRepresentationControllerComp.h>
 #include <imtbase/CNumericParamSummaryRepresentationControllerComp.h>
 #include <imtbase/CTextParamSummaryRepresentationControllerComp.h>
+#include <imtbase/CBinaryDataProviderComp.h>
 
 
 /**
@@ -56,6 +57,7 @@ typedef icomp::TModelCompWrap<imtbase::CFileBasedTranslationManagerComp> FileBas
 typedef imtbase::CParamSetSummaryRepresentationControllerComp ParamSetSummaryRepresentationController;
 typedef imtbase::CNumericParamSummaryRepresentationControllerComp NumericParamSummaryRepresentationController;
 typedef imtbase::CTextParamSummaryRepresentationControllerComp TextParamSummaryRepresentationController;
+typedef imtbase::CBinaryDataProviderComp BinaryDataProvider;
 
 
 } // namespace ImtCorePck

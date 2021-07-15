@@ -95,7 +95,7 @@ IRequest::CommandParams CWebSocketRequest::GetCommandParams() const
 
 		QList<QPair<QString, QString>> items = query.queryItems();
 		for (const QPair<QString, QString>& item : items){
-			params[item.first] = item.second;
+			params[item.first.toUtf8()] = item.second.toUtf8();
 		}
 
 		return params;

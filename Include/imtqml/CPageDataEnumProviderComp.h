@@ -24,16 +24,14 @@ class CPageDataEnumProviderComp :
 public:
 	typedef CRepresentationDataEnumProviderCompBase BaseClass;
 
-//	I_BEGIN_COMPONENT(CEnumApplicationDataProviderComp);
-//	//	I_REGISTER_INTERFACE(imtrest::IRepresentationDataProvider);
-//	//	I_ASSIGN(m_slaveRepresentationDataProviderCompPtr, "ItemBasedRepresentationDataProvider", "Item based representation data provider", true, "ItemBasedRepresentationDataProvider");
-//	I_END_COMPONENT;
+	I_BEGIN_COMPONENT(CPageDataEnumProviderComp);
+	I_END_COMPONENT;
 
 	CPageDataEnumProviderComp(QObject *parent = nullptr) : QObject(parent), BaseClass() {}
 
 	static constexpr const char* ID = "PageId";
 	const QString Id() { return ID; }
-	static constexpr const char* NAME = "name";
+	static constexpr const char* NAME = "Name";
 	const QString Name() { return NAME; }
 	static constexpr const char* ICON = "Icon";
 	const QString Icon() { return ICON; }
@@ -47,15 +45,15 @@ public:
 	const QString Enabled() { return ENABLED; }
 
 protected:
-	void SetEnums(imtbase::CTreeItemModel& rootModel) override
+	void virtual GetEnums(imtrest::QweryParams& enums) const override
 	{
-		rootModel.SetData(ID, ID);
-		rootModel.SetData(NAME, NAME);
-		rootModel.SetData(ICON, ICON);
-		rootModel.SetData(ICON_ON_SELECTED, ICON_ON_SELECTED);
-		rootModel.SetData(ICON_OFF_SELECTED, ICON_OFF_SELECTED);
-		rootModel.SetData(COMMANDS, COMMANDS);
-		rootModel.SetData(ENABLED, ENABLED);
+		enums.insert("ID", ID);
+		enums.insert("NAME", NAME);
+		enums.insert("ICON", ICON);
+		enums.insert("ICON_ON_SELECTED", ICON_ON_SELECTED);
+		enums.insert("ICON_OFF_SELECTED", ICON_OFF_SELECTED);
+		enums.insert("COMMANDS", COMMANDS);
+		enums.insert("ENABLED", ENABLED);
 	}
 
 };

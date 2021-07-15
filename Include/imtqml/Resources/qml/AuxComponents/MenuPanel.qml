@@ -5,13 +5,13 @@ import Acf 1.0
 
 
 Rectangle {
-    id: container
+    id: menuPanel
     width: 59
     color: "#e6e6e8"
     property string textColor: "#335777"
     property string fontName: "Helvetica"
     property alias model: lvButtons.model
-    signal activePageChanged(string activePageId)
+    signal activePageChanged(string activePageId, string activeIcon)
 
 
     ListView {
@@ -19,11 +19,11 @@ Rectangle {
         anchors.fill: parent
 
         delegate:  MenuPanelButton{
-            width: container.width
+            width: menuPanel.width
             height: width
             text:  model[PageEnum.NAME]
-            textColor: container.textColor
-            fontName: container.fontName
+            textColor: menuPanel.textColor
+            fontName: menuPanel.fontName
             imageSource: model[PageEnum.ICON]
             imageSourceDisabled: model[PageEnum.ICON_OFF_SELECTED]
             imageSourceSelected: model[PageEnum.ICON_ON_SELECTED]
@@ -31,9 +31,9 @@ Rectangle {
 
             onClicked: {
                 lvButtons.currentIndex = index
-                container.activePageChanged(model[PageEnum.ID])
-//                console.log("Acf", PageEnum.NAME)
-//                console.log("Acf", model.name)
+                menuPanel.activePageChanged(model[PageEnum.ID], model[PageEnum.ICON])
+                console.log("Acf", PageEnum.ICON)
+                console.log("AcfModel", model[PageEnum.ICON])
 
 //                lvButtons.model.SetData(AcfS.Name,"Name2",index)
 

@@ -36,13 +36,14 @@ CContactInfoRepresentationDataProviderComp::CContactInfoRepresentationDataProvid
 bool CContactInfoRepresentationDataProviderComp::GetRepresentationData(
 		imtrest::IRepresentationDataProvider::Format format,
 		QByteArray& representationData,
-		const QByteArray& commandId)
+		const QList<QByteArray>& query, const imtrest::QweryParams& params)
 {
 	bool retVal = false;
 
 	if (m_itemBasedRepresentationDataProvider.IsValid()
 			&& format == imtrest::IRepresentationDataProvider::RF_JSON
-			&& commandId == "__ContactInfo__"){
+			&& !query.isEmpty()
+			&& query[0] == "__ContactInfo__"){
 		QList<QByteArray> query;
 		imtrest::QweryParams params;
 		imtbase::CTreeItemModel *treeItemModel = m_itemBasedRepresentationDataProvider->GetTreeItemModel(query, params);

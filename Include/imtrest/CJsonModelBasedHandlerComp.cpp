@@ -177,9 +177,11 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 		}
 		else{
 			reponseTypeId = "application/json";
+			QList<QByteArray> query = modelName.split('/');
+			imtrest::QweryParams params = request.GetCommandParams();
 			if (m_representationDataProvider->GetRepresentationData(
 						imtrest::IRepresentationDataProvider::RF_JSON,
-						body,modelName) == false){
+						body, query, params) == false){
 				return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_NOT_IMPLEMENTED, "FAIL(", "plain/text; charset=utf-8"));
 			}
 			else {

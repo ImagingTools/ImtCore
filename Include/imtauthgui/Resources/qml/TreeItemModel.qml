@@ -4,7 +4,9 @@ JSONListModel {
     id: container
 
     property var infoPath: []
-    
+    property string baseUrl
+    property var queryParams: []
+
 //    function get(row){
 //        return container.get(row)
 //    }
@@ -47,5 +49,35 @@ JSONListModel {
         console.log("setData", json, txt_data, json.toString())
         xhr.open("POST", target);
         xhr.send(txt_data);
+    }
+
+    function ContainsKey(key,row){
+        return true
+//        if(row === undefined)
+//            row = 0
+//        if(row === null)
+//            row = 0
+//        return get(row).has(key)
+    }
+
+    function SetQueryParam(key,value){
+        queryParams[key] = value
+    }
+
+    function needsReload(){
+        var newSource = baseUrl
+        var first = true;
+        for (var queryKey in queryParams){
+            if (first)
+                newSource += "?"
+            else
+                newSource += "&"
+            first = false
+            newSource += queryKey + "=";
+            newSource += queryParams[queryKey]
+  //          newSource += "\""
+        }
+        console.log("newSource",newSource)
+        source = newSource
     }
 }

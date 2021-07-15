@@ -99,6 +99,10 @@ I_EXPORT_COMPONENT(
 			"Summary representation controller for text param",
 			"Summary Representation Controller Text Param");
 
+I_EXPORT_COMPONENT(
+			BinaryDataProvider,
+			"Binary data provider from folder",
+			"Binary data provider");
 
 } // namespace ImtCorePck
 

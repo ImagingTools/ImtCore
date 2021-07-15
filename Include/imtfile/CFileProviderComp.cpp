@@ -1,8 +1,9 @@
 #include <imtfile/CFileProviderComp.h>
 
-
 // Qt includes
 #include <QtCore/QRegularExpression>
+#include <QtCore/QRegularExpressionMatch>
+
 
 namespace imtfile
 {

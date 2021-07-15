@@ -1,5 +1,8 @@
 #include <imtdb/CDataBaseObjectCollection.h>
 
+// ImtCore includes
+#include <imtdb/CDataBaseEngineComp.h>
+
 
 namespace imtdb
 {

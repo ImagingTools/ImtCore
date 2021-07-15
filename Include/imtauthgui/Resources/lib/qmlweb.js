@@ -2195,7 +2195,7 @@ var QMLBinding = function () {
   }], [{
     key: "bindSrc",
     value: function bindSrc(src, isFunction) {
-      return new Function("__executionObject", "__executionContext", "\n      with(QmlWeb) with(__executionContext) with(__executionObject) {\n        " + (isFunction ? "" : "return") + " " + src + "\n      }\n    ");
+      return new Function("__executionObject", "__executionContext", "\n      with(QmlWeb) with(__executionContext) with(__executionObject){\n        " + (isFunction ? "" : "return") + " " + src + "\n      }\n    ");
     }
   }]);
 
@@ -2227,7 +2227,7 @@ var QMLEngine = function () {
     _classCallCheck(this, QMLEngine);
 
     //----------Public Members----------
-
+    this.onceFunc = false;
     this.fps = 60;
     // Math.floor, causes bugs to timing?
     this.$interval = Math.floor(1000 / this.fps);
@@ -2300,6 +2300,7 @@ var QMLEngine = function () {
     window.addEventListener("resize", function () {
       return _this13.updateGeometry();
     });
+    //setInterval(()=>{this.updateGeometry()}, this.$interval);
   }
 
   //---------- Public Methods ----------
@@ -2312,19 +2313,23 @@ var QMLEngine = function () {
       // to reposition child elements of qml scene
       var width = void 0;
       var height = void 0;
+
       if (this.dom === document.body) {
         width = window.innerWidth;
         height = window.innerHeight;
+        this.dom.style.margin = '0';
+        this.dom.style.padding = '0';
       } else {
         var style = window.getComputedStyle(this.dom);
         width = parseFloat(style.getPropertyValue("width"));
         height = parseFloat(style.getPropertyValue("height"));
       }
+
       if (width) {
-        this.rootObject.width = width;
+        this.rootObject.width = width; //временно
       }
       if (height) {
-        this.rootObject.height = height;
+        this.rootObject.height = height; //временно
       }
     }
 
@@ -2333,6 +2338,11 @@ var QMLEngine = function () {
   }, {
     key: "start",
     value: function start() {
+      if (!this.onceFunc) {
+        this.rootObject.dom.insertAdjacentHTML("beforeend", "\n      <style>\n        .ListView, .GridView, .MouseArea, .Flickable {\n              overflow: auto;\n              -ms-overflow-style: none;\n              scrollbar-width: none;\n        }\n\n        .ListView::-webkit-scrollbar, .GridView::-webkit-scrollbar, .MouseArea::-webkit-scrollbar, .Flickable::-webkit-scrollbar {\n              width: 0;\n              height: 0;\n        }\n        .unselectable {\n          -webkit-touch-callout: none;\n          -webkit-user-select: none;\n          -khtml-user-select: none;\n          -moz-user-select: none;\n          -ms-user-select: none;\n          user-select: none;           \n        }\n      </style>");
+        this.onceFunc = true;
+      }
+
       QmlWeb.engine = this;
       var QMLOperationState = QmlWeb.QMLOperationState;
       if (this.operationState !== QMLOperationState.Running) {
@@ -2906,14 +2916,14 @@ var QMLEngine = function () {
           // during eval of other bindings but in that case $updateHGeometry and
           // $updateVGeometry could be blocked during their eval.
           // So we call them explicitly, just in case.
-          var obj = property.obj,
+          var _obj = property.obj,
               changed = property.changed;
 
-          if (obj.$updateHGeometry && changed.isConnected(obj, obj.$updateHGeometry)) {
-            obj.$updateHGeometry(property.val, property.val, property.name);
+          if (_obj.$updateHGeometry && changed.isConnected(_obj, _obj.$updateHGeometry)) {
+            _obj.$updateHGeometry(property.val, property.val, property.name);
           }
-          if (obj.$updateVGeometry && changed.isConnected(obj, obj.$updateVGeometry)) {
-            obj.$updateVGeometry(property.val, property.val, property.name);
+          if (_obj.$updateVGeometry && changed.isConnected(_obj, _obj.$updateVGeometry)) {
+            _obj.$updateVGeometry(property.val, property.val, property.name);
           }
         }
       }
@@ -4108,9 +4118,12 @@ var modules = {
 
 // All object constructors
 QmlWeb.constructors = modules.Main;
+QmlWeb.importList = [{}];
+QmlWeb.importList['__all__'] = {};
 
 var perImportContextConstructors = {};
 var importContextIds = 0;
+var importNumber = 0;
 
 // Helper. Adds a type to the constructor list
 function registerGlobalQmlType(name, type) {
@@ -4287,6 +4300,8 @@ function construct(meta) {
     }
 
     var component = QmlWeb.Qt.createComponent(filePath);
+    importNumber += 1;
+    QmlWeb.importList.push({});
 
     if (!component) {
       throw new Error("No constructor found for " + meta.object.$class);
@@ -4302,12 +4317,32 @@ function construct(meta) {
     // Handle default properties
   }
 
-  // id
+  //id
+  if (!item.importNumber) {
+    if (item.$isComponentRoot) {
+      if (item.$parent) item.importNumber = item.$parent.importNumber;else item.importNumber = importNumber;
+    } else {
+      item.importNumber = importNumber;
+    }
+  }
+
   if (meta.object.id) {
+    QmlWeb.importList[importNumber][meta.object.id] = item;
+    QmlWeb.importList['__all__'][meta.object.id] = item;
+
+    // if(meta.context[meta.object.id] == undefined){
     QmlWeb.setupGetterSetter(meta.context, meta.object.id, function () {
       return item;
     }, function () {});
+    // }
   }
+  for (var id in QmlWeb.importList['__all__']) {
+    for (var i = 0; i <= importNumber; i++) {
+      if (!QmlWeb.importList[i][id]) QmlWeb.importList[i][id] = QmlWeb.importList['__all__'][id];
+    }
+  }
+
+  meta.context['__importList__'] = QmlWeb.importList;
 
   // keep path in item for probale use it later in Qt.resolvedUrl
   item.$context.$basePath = QmlWeb.engine.$basePath; //gut
@@ -5921,11 +5956,13 @@ var QtQuick_Animation = function (_QtQml_QtObject13) {
     key: "start",
     value: function start() {
       this.running = true;
+      this.started();
     }
   }, {
     key: "stop",
     value: function stop() {
       this.running = false;
+      this.stopped();
     }
   }, {
     key: "pause",
@@ -5940,8 +5977,10 @@ var QtQuick_Animation = function (_QtQml_QtObject13) {
   }, {
     key: "complete",
     value: function complete() {
-      // To be overridden
-      console.log("Unbound method for", this);
+      this.running = false;
+      this.stopped();
+      this.finished();
+      //console.log("Unbound method for", this);
     }
   }]);
 
@@ -5957,6 +5996,11 @@ QtQuick_Animation.properties = {
   loops: { type: "int", initialValue: 1 },
   paused: "bool",
   running: "bool"
+};
+QtQuick_Animation.signals = {
+  finished: [],
+  started: [],
+  stopped: []
 };
 
 QmlWeb.registerQmlType(QtQuick_Animation);
@@ -6200,64 +6244,100 @@ QtQuick_FontLoader.properties = {
 
 QmlWeb.registerQmlType(QtQuick_FontLoader);
 
+var QtQuick_GradientStop = function (_QtQml_QtObject16) {
+  _inherits(QtQuick_GradientStop, _QtQml_QtObject16);
+
+  function QtQuick_GradientStop(meta) {
+    _classCallCheck(this, QtQuick_GradientStop);
+
+    var _this39 = _possibleConstructorReturn(this, (QtQuick_GradientStop.__proto__ || Object.getPrototypeOf(QtQuick_GradientStop)).call(this, meta));
+
+    _this39.positionChanged.connect(_this39, _this39.$positionChanged);
+    _this39.colorChanged.connect(_this39, _this39.$colorChanged);
+    //this.$parent.stops.push({position: this.position, color: this.color})
+    return _this39;
+  }
+
+  _createClass(QtQuick_GradientStop, [{
+    key: "$colorChanged",
+    value: function $colorChanged() {
+      //console.log(this.color)
+    }
+  }, {
+    key: "$positionChanged",
+    value: function $positionChanged() {
+      //console.log(this.position)
+    }
+  }]);
+
+  return QtQuick_GradientStop;
+}(QtQml_QtObject);
+
+QtQuick_GradientStop.properties = {
+  color: { type: "color", initialValue: "black" },
+  position: "real"
+};
+
+QmlWeb.registerQmlType(QtQuick_GradientStop);
+
 // eslint-disable-next-line no-undef
 
-var QtQuick_Item = function (_QtQml_QtObject16) {
-  _inherits(QtQuick_Item, _QtQml_QtObject16);
+var QtQuick_Item = function (_QtQml_QtObject17) {
+  _inherits(QtQuick_Item, _QtQml_QtObject17);
 
   function QtQuick_Item(meta) {
     _classCallCheck(this, QtQuick_Item);
 
-    var _this39 = _possibleConstructorReturn(this, (QtQuick_Item.__proto__ || Object.getPrototypeOf(QtQuick_Item)).call(this, meta));
+    var _this40 = _possibleConstructorReturn(this, (QtQuick_Item.__proto__ || Object.getPrototypeOf(QtQuick_Item)).call(this, meta));
 
-    if (!_this39.dom) {
+    if (!_this40.dom) {
       // Create a dom element for this item.
-      _this39.dom = document.createElement(meta.tagName || "div");
+      _this40.dom = document.createElement(meta.tagName || "div");
     }
-    _this39.dom.style.position = "absolute";
-    _this39.dom.style.pointerEvents = "none";
+    _this40.dom.style.position = "absolute";
+    _this40.dom.style.pointerEvents = "none";
     if (meta.style) {
       for (var key in meta.style) {
         if (!meta.style.hasOwnProperty(key)) continue;
-        _this39.dom.style[key] = meta.style[key];
+        _this40.dom.style[key] = meta.style[key];
       }
     }
 
     // In case the class is qualified, only use the last part for the css class
     // name.
     var classComponent = meta.object.$class.split(".").pop();
-    _this39.dom.className = "" + classComponent + (_this39.id ? " " + _this39.id : "");
-    _this39.css = _this39.dom.style;
-    _this39.impl = null; // Store the actually drawn element
+    _this40.dom.className = "" + classComponent + (_this40.id ? " " + _this40.id : "");
+    _this40.css = _this40.dom.style;
+    _this40.impl = null; // Store the actually drawn element
 
-    _this39.css.boxSizing = "border-box";
+    _this40.css.boxSizing = "border-box";
 
-    if (_this39.$isComponentRoot) {
-      QmlWeb.createProperty("var", _this39, "activeFocus");
+    if (_this40.$isComponentRoot) {
+      QmlWeb.createProperty("var", _this40, "activeFocus");
     }
 
-    _this39.parentChanged.connect(_this39, _this39.$onParentChanged_);
-    _this39.dataChanged.connect(_this39, _this39.$onDataChanged);
-    _this39.stateChanged.connect(_this39, _this39.$onStateChanged);
-    _this39.visibleChanged.connect(_this39, _this39.$onVisibleChanged_);
-    _this39.clipChanged.connect(_this39, _this39.$onClipChanged);
-    _this39.zChanged.connect(_this39, _this39.$onZChanged);
-    _this39.xChanged.connect(_this39, _this39.$onXChanged);
-    _this39.yChanged.connect(_this39, _this39.$onYChanged);
-    _this39.widthChanged.connect(_this39, _this39.$onWidthChanged_);
-    _this39.heightChanged.connect(_this39, _this39.$onHeightChanged_);
-    _this39.focusChanged.connect(_this39, _this39.$onFocusChanged_);
+    _this40.parentChanged.connect(_this40, _this40.$onParentChanged_);
+    _this40.dataChanged.connect(_this40, _this40.$onDataChanged);
+    _this40.stateChanged.connect(_this40, _this40.$onStateChanged);
+    _this40.visibleChanged.connect(_this40, _this40.$onVisibleChanged_);
+    _this40.clipChanged.connect(_this40, _this40.$onClipChanged);
+    _this40.zChanged.connect(_this40, _this40.$onZChanged);
+    _this40.xChanged.connect(_this40, _this40.$onXChanged);
+    _this40.yChanged.connect(_this40, _this40.$onYChanged);
+    _this40.widthChanged.connect(_this40, _this40.$onWidthChanged_);
+    _this40.heightChanged.connect(_this40, _this40.$onHeightChanged_);
+    _this40.focusChanged.connect(_this40, _this40.$onFocusChanged_);
 
-    _this39.widthChanged.connect(_this39, _this39.$updateHGeometry);
-    _this39.heightChanged.connect(_this39, _this39.$updateVGeometry);
-    _this39.implicitWidthChanged.connect(_this39, _this39.$onImplicitWidthChanged);
-    _this39.implicitHeightChanged.connect(_this39, _this39.$onImplicitHeightChanged);
+    _this40.widthChanged.connect(_this40, _this40.$updateHGeometry);
+    _this40.heightChanged.connect(_this40, _this40.$updateVGeometry);
+    _this40.implicitWidthChanged.connect(_this40, _this40.$onImplicitWidthChanged);
+    _this40.implicitHeightChanged.connect(_this40, _this40.$onImplicitHeightChanged);
 
-    _this39.$isUsingImplicitWidth = true;
-    _this39.$isUsingImplicitHeight = true;
+    _this40.$isUsingImplicitWidth = true;
+    _this40.$isUsingImplicitHeight = true;
 
-    _this39.anchors = new QmlWeb.QObject(_this39);
-    QmlWeb.createProperties(_this39.anchors, {
+    _this40.anchors = new QmlWeb.QObject(_this40);
+    QmlWeb.createProperties(_this40.anchors, {
       left: "var",
       right: "var",
       top: "var",
@@ -6272,50 +6352,133 @@ var QtQuick_Item = function (_QtQml_QtObject16) {
       topMargin: "real",
       bottomMargin: "real"
     });
-    _this39.anchors.leftChanged.connect(_this39, _this39.$updateHGeometry);
-    _this39.anchors.rightChanged.connect(_this39, _this39.$updateHGeometry);
-    _this39.anchors.topChanged.connect(_this39, _this39.$updateVGeometry);
-    _this39.anchors.bottomChanged.connect(_this39, _this39.$updateVGeometry);
-    _this39.anchors.horizontalCenterChanged.connect(_this39, _this39.$updateHGeometry);
-    _this39.anchors.verticalCenterChanged.connect(_this39, _this39.$updateVGeometry);
-    _this39.anchors.fillChanged.connect(_this39, _this39.$updateHGeometry);
-    _this39.anchors.fillChanged.connect(_this39, _this39.$updateVGeometry);
-    _this39.anchors.centerInChanged.connect(_this39, _this39.$updateHGeometry);
-    _this39.anchors.centerInChanged.connect(_this39, _this39.$updateVGeometry);
-    _this39.anchors.leftMarginChanged.connect(_this39, _this39.$updateHGeometry);
-    _this39.anchors.rightMarginChanged.connect(_this39, _this39.$updateHGeometry);
-    _this39.anchors.topMarginChanged.connect(_this39, _this39.$updateVGeometry);
-    _this39.anchors.bottomMarginChanged.connect(_this39, _this39.$updateVGeometry);
-    _this39.anchors.marginsChanged.connect(_this39, _this39.$updateHGeometry);
-    _this39.anchors.marginsChanged.connect(_this39, _this39.$updateVGeometry);
+    _this40.anchors.leftChanged.connect(_this40, _this40.$updateHGeometry);
+    _this40.anchors.rightChanged.connect(_this40, _this40.$updateHGeometry);
+    _this40.anchors.topChanged.connect(_this40, _this40.$updateVGeometry);
+    _this40.anchors.bottomChanged.connect(_this40, _this40.$updateVGeometry);
+    _this40.anchors.horizontalCenterChanged.connect(_this40, _this40.$updateHGeometry);
+    _this40.anchors.verticalCenterChanged.connect(_this40, _this40.$updateVGeometry);
+    _this40.anchors.fillChanged.connect(_this40, _this40.$updateHGeometry);
+    _this40.anchors.fillChanged.connect(_this40, _this40.$updateVGeometry);
+    _this40.anchors.centerInChanged.connect(_this40, _this40.$updateHGeometry);
+    _this40.anchors.centerInChanged.connect(_this40, _this40.$updateVGeometry);
+    _this40.anchors.leftMarginChanged.connect(_this40, _this40.$updateHGeometry);
+    _this40.anchors.rightMarginChanged.connect(_this40, _this40.$updateHGeometry);
+    _this40.anchors.topMarginChanged.connect(_this40, _this40.$updateVGeometry);
+    _this40.anchors.bottomMarginChanged.connect(_this40, _this40.$updateVGeometry);
+    _this40.anchors.marginsChanged.connect(_this40, _this40.$updateHGeometry);
+    _this40.anchors.marginsChanged.connect(_this40, _this40.$updateVGeometry);
 
     // childrenRect property
-    _this39.childrenRect = new QmlWeb.QObject(_this39);
-    QmlWeb.createProperties(_this39.childrenRect, {
+    _this40.childrenRect = new QmlWeb.QObject(_this40);
+    QmlWeb.createProperties(_this40.childrenRect, {
       x: "real", // TODO ro
       y: "real", // TODO ro
       width: "real", // TODO ro
       height: "real" // TODO ro
     });
 
-    _this39.rotationChanged.connect(_this39, _this39.$updateTransform);
-    _this39.scaleChanged.connect(_this39, _this39.$updateTransform);
-    _this39.transformChanged.connect(_this39, _this39.$updateTransform);
+    _this40.rotationChanged.connect(_this40, _this40.$updateTransform);
+    _this40.scaleChanged.connect(_this40, _this40.$updateTransform);
+    _this40.transformChanged.connect(_this40, _this40.$updateTransform);
 
-    _this39.Component.completed.connect(_this39, _this39.Component$onCompleted_);
-    _this39.opacityChanged.connect(_this39, _this39.$calculateOpacity);
-    if (_this39.$parent) {
-      _this39.$parent.$opacityChanged.connect(_this39, _this39.$calculateOpacity);
+    _this40.Component.completed.connect(_this40, _this40.Component$onCompleted_);
+    _this40.opacityChanged.connect(_this40, _this40.$calculateOpacity);
+    if (_this40.$parent) {
+      _this40.$parent.$opacityChanged.connect(_this40, _this40.$calculateOpacity);
     }
 
-    _this39.spacing = 0;
-    _this39.$revertActions = [];
-    _this39.css.left = _this39.x + "px";
-    _this39.css.top = _this39.y + "px";
-    return _this39;
+    _this40.spacing = 0;
+    _this40.$revertActions = [];
+    _this40.css.left = _this40.x + "px";
+    _this40.css.top = _this40.y + "px";
+
+    _this40.disabledList = [];
+    return _this40;
   }
 
   _createClass(QtQuick_Item, [{
+    key: "mapToItem",
+    value: function mapToItem(item, x, y) {
+
+      var parent = this.parent;
+      var dx = item.x + x + this.x;
+      var dy = item.y + y + this.y;
+      while (parent) {
+        dx += parent.x;
+        dy += parent.y;
+        parent = parent.parent;
+      }
+      return {
+        x: dx,
+        y: dy
+      };
+    }
+  }, {
+    key: "$firstParentForWheel",
+    value: function $firstParentForWheel() {
+      var item = this.parent;
+      while (item.parent && !(item instanceof QtQuick_ListView || item instanceof QtQuick_GridView || item instanceof QtQuick_Flickable)) {
+        item = item.parent;
+      }
+      return item instanceof QtQuick_ListView || item instanceof QtQuick_GridView || item instanceof QtQuick_Flickable ? item : null;
+    }
+  }, {
+    key: "$offAllMouseEvent",
+    value: function $offAllMouseEvent() {
+      var _this41 = this;
+
+      var item = this.parent;
+      while (item.parent) {
+        item = item.parent;
+      }
+      this.areaList = [];
+      var func = function func(item) {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = item.children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var child = _step.value;
+
+            if (child != _this41) {
+              if (child instanceof QtQuick_MouseArea || child instanceof QtQuick_ListView || child instanceof QtQuick_GridView || child instanceof QtQuick_Flickable) {
+                if (child.enabled) {
+                  child.enabled = false;
+                  _this41.disabledList.push(child);
+                }
+              }
+            }
+            func(child);
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+      };
+      func(item);
+    }
+  }, {
+    key: "$onAllMouseEvent",
+    value: function $onAllMouseEvent() {
+      obj = this.disabledList.pop();
+      while (obj) {
+        obj.enabled = true;
+        obj = this.disabledList.pop();
+      }
+    }
+  }, {
     key: "$onParentChanged_",
     value: function $onParentChanged_(newParent, oldParent, propName) {
       if (oldParent) {
@@ -6442,7 +6605,7 @@ var QtQuick_Item = function (_QtQml_QtObject16) {
   }, {
     key: "$applyChange",
     value: function $applyChange(actions, change) {
-      var _this40 = this;
+      var _this42 = this;
 
       var arrayFindIndex = QmlWeb.helpers.arrayFindIndex;
 
@@ -6469,14 +6632,14 @@ var QtQuick_Item = function (_QtQml_QtObject16) {
         }
 
         // Look for existing revert action, else create it
-        var revertIndex = arrayFindIndex(_this40.$revertActions, function (element) {
+        var revertIndex = arrayFindIndex(_this42.$revertActions, function (element) {
           return element.target === change.target && element.property === item.property;
         });
         if (revertIndex !== -1 && !change.restoreEntryValues) {
           // We don't want to revert, so remove it
-          _this40.$revertActions.splice(revertIndex, 1);
+          _this42.$revertActions.splice(revertIndex, 1);
         } else if (revertIndex === -1 && change.restoreEntryValues) {
-          _this40.$revertActions.push({
+          _this42.$revertActions.push({
             target: change.target,
             property: item.property,
             value: change.target.$properties[item.property].binding || change.target.$properties[item.property].val,
@@ -6493,6 +6656,8 @@ var QtQuick_Item = function (_QtQml_QtObject16) {
   }, {
     key: "$onVisibleChanged_",
     value: function $onVisibleChanged_(newVal) {
+      //this.tempVisible = this.css.display != 'none' ?  this.css.display : this.tempVisible
+      //this.css.display = newVal ? this.tempVisible == '' ? 'unset' : this.tempVisible : "none"; // возможно нужно исправить
       this.css.visibility = newVal ? "inherit" : "hidden";
     }
   }, {
@@ -6545,13 +6710,19 @@ var QtQuick_Item = function (_QtQml_QtObject16) {
   }, {
     key: "setupFocusOnDom",
     value: function setupFocusOnDom(element) {
-      var _this41 = this;
+      var _this43 = this;
 
       element.addEventListener("focus", function () {
-        _this41.focus = true;
+        _this43.focus = true;
       });
+      element.addEventListener("click", function () {
+        if (_this43.enabled) {
+          element.focus();
+          _this43.focus = true;
+        }
+      }); // для фокуса, возможно нужно переделать
       element.addEventListener("blur", function () {
-        _this41.focus = false;
+        _this43.focus = false;
       });
     }
   }, {
@@ -6891,7 +7062,8 @@ QtQuick_Item.properties = {
   opacity: { type: "real", initialValue: 1 },
   visible: { type: "bool", initialValue: true },
   clip: "bool",
-  focus: "bool"
+  focus: "bool",
+  enabled: { type: "bool", initialValue: true }
 
 };
 QtQuick_Item.defaultProperty = "data";
@@ -6908,24 +7080,24 @@ var QmlWeb_Dom_DomElement = function (_QtQuick_Item) {
 
     meta.tagName = meta.object.tagName || meta.tagName;
 
-    var _this42 = _possibleConstructorReturn(this, (QmlWeb_Dom_DomElement.__proto__ || Object.getPrototypeOf(QmlWeb_Dom_DomElement)).call(this, meta));
+    var _this44 = _possibleConstructorReturn(this, (QmlWeb_Dom_DomElement.__proto__ || Object.getPrototypeOf(QmlWeb_Dom_DomElement)).call(this, meta));
 
     for (var key in meta.object.attrs) {
       if (!meta.object.attrs.hasOwnProperty(key)) continue;
-      _this42.dom[key] = meta.object.attrs[key];
+      _this44.dom[key] = meta.object.attrs[key];
     }
     for (var _key26 in meta.object.style) {
       if (!meta.object.style.hasOwnProperty(_key26)) continue;
-      _this42.dom.style[_key26] = meta.object.style[_key26];
+      _this44.dom.style[_key26] = meta.object.style[_key26];
     }
 
-    _this42.htmlChanged.connect(function () {
-      _this42.dom.innerHTML = _this42.html;
+    _this44.htmlChanged.connect(function () {
+      _this44.dom.innerHTML = _this44.html;
     });
-    _this42.textChanged.connect(function () {
-      _this42.dom.innerText = _this42.text;
+    _this44.textChanged.connect(function () {
+      _this44.dom.innerText = _this44.text;
     });
-    return _this42;
+    return _this44;
   }
 
   return QmlWeb_Dom_DomElement;
@@ -6984,36 +7156,36 @@ var QmlWeb_RestModel = function (_QtQuick_Item2) {
   function QmlWeb_RestModel(meta) {
     _classCallCheck(this, QmlWeb_RestModel);
 
-    var _this45 = _possibleConstructorReturn(this, (QmlWeb_RestModel.__proto__ || Object.getPrototypeOf(QmlWeb_RestModel)).call(this, meta));
+    var _this47 = _possibleConstructorReturn(this, (QmlWeb_RestModel.__proto__ || Object.getPrototypeOf(QmlWeb_RestModel)).call(this, meta));
 
-    _this45.attributes = _this45.getAttributes();
-    _this45.runningRequests = 0;
-    return _this45;
+    _this47.attributes = _this47.getAttributes();
+    _this47.runningRequests = 0;
+    return _this47;
   }
 
   _createClass(QmlWeb_RestModel, [{
     key: "fetch",
     value: function fetch() {
-      var _this46 = this;
+      var _this48 = this;
 
       this.$ajax({
         method: "GET",
         mimeType: this.mimetype,
         success: function success(xhr) {
-          _this46.$xhrReadResponse(xhr);
-          _this46.fetched();
+          _this48.$xhrReadResponse(xhr);
+          _this48.fetched();
         }
       });
     }
   }, {
     key: "remove",
     value: function remove() {
-      var _this47 = this;
+      var _this49 = this;
 
       this.$ajax({
         method: "DELETE",
         success: function success() {
-          _this47.destroy();
+          _this49.destroy();
         }
       });
     }
@@ -7030,15 +7202,15 @@ var QmlWeb_RestModel = function (_QtQuick_Item2) {
   }, {
     key: "$sendToServer",
     value: function $sendToServer(method) {
-      var _this48 = this;
+      var _this50 = this;
 
       this.$ajax({
         method: method,
         mimeType: this.queryMimeType,
         body: this.$generateBodyForPostQuery(),
         success: function success(xhr) {
-          _this48.$xhrReadResponse(xhr);
-          _this48.saved();
+          _this50.$xhrReadResponse(xhr);
+          _this50.saved();
         }
       });
     }
@@ -7090,7 +7262,7 @@ var QmlWeb_RestModel = function (_QtQuick_Item2) {
   }, {
     key: "$ajax",
     value: function $ajax(options) {
-      var _this49 = this;
+      var _this51 = this;
 
       var xhr = new XMLHttpRequest();
       xhr.overrideMimeType(this.mimeType);
@@ -7101,9 +7273,9 @@ var QmlWeb_RestModel = function (_QtQuick_Item2) {
           } else {
             options.failure(xhr);
           }
-          _this49.runningRequests -= 1;
-          if (_this49.runningRequests <= 0) {
-            _this49.isLoading = false;
+          _this51.runningRequests -= 1;
+          if (_this51.runningRequests <= 0) {
+            _this51.isLoading = false;
           }
         }
       };
@@ -7170,14 +7342,14 @@ var Qt_labs_settings_Settings = function (_QtQuick_Item3) {
   function Qt_labs_settings_Settings(meta) {
     _classCallCheck(this, Qt_labs_settings_Settings);
 
-    var _this50 = _possibleConstructorReturn(this, (Qt_labs_settings_Settings.__proto__ || Object.getPrototypeOf(Qt_labs_settings_Settings)).call(this, meta));
+    var _this52 = _possibleConstructorReturn(this, (Qt_labs_settings_Settings.__proto__ || Object.getPrototypeOf(Qt_labs_settings_Settings)).call(this, meta));
 
     if (typeof window.localStorage === "undefined") {
-      return _possibleConstructorReturn(_this50);
+      return _possibleConstructorReturn(_this52);
     }
 
-    _this50.Component.completed.connect(_this50, _this50.Component$onCompleted);
-    return _this50;
+    _this52.Component.completed.connect(_this52, _this52.Component$onCompleted);
+    return _this52;
   }
 
   _createClass(Qt_labs_settings_Settings, [{
@@ -7194,33 +7366,33 @@ var Qt_labs_settings_Settings = function (_QtQuick_Item3) {
   }, {
     key: "$loadProperties",
     value: function $loadProperties() {
-      var _this51 = this;
+      var _this53 = this;
 
       this.$attributes.forEach(function (attrName) {
-        if (!_this51.$properties[attrName]) return;
+        if (!_this53.$properties[attrName]) return;
 
-        var key = _this51.$getKey(attrName);
-        _this51[attrName] = localStorage.getItem(key);
+        var key = _this53.$getKey(attrName);
+        _this53[attrName] = localStorage.getItem(key);
       });
     }
   }, {
     key: "$initializeProperties",
     value: function $initializeProperties() {
-      var _this52 = this;
+      var _this54 = this;
 
       this.$attributes.forEach(function (attrName) {
-        if (!_this52.$properties[attrName]) return;
+        if (!_this54.$properties[attrName]) return;
 
-        var emitter = _this52;
+        var emitter = _this54;
         var signalName = attrName + "Changed";
 
-        if (_this52.$properties[attrName].type === "alias") {
-          emitter = _this52.$context[_this52.$properties[attrName].val.objectName];
-          signalName = _this52.$properties[attrName].val.propertyName + "Changed";
+        if (_this54.$properties[attrName].type === "alias") {
+          emitter = _this54.$context[_this54.$properties[attrName].val.objectName];
+          signalName = _this54.$properties[attrName].val.propertyName + "Changed";
         }
 
-        emitter[signalName].connect(_this52, function () {
-          localStorage.setItem(_this52.$getKey(attrName), _this52[attrName]);
+        emitter[signalName].connect(_this54, function () {
+          localStorage.setItem(_this54.$getKey(attrName), _this54[attrName]);
         });
       });
     }
@@ -7243,23 +7415,16 @@ var QtGraphicalEffects_DropShadow = function (_QtQuick_Item4) {
   function QtGraphicalEffects_DropShadow(meta) {
     _classCallCheck(this, QtGraphicalEffects_DropShadow);
 
-    /*
-    this.impl = document.createElement("div");
-    const style = this.impl.style;
-    style.pointerEvents = "none";
-    style.position = "absolute";
-    style.left = style.right = style.top = style.bottom = "0px";
-    style.border = "none";
-    //style.backgroundColor = this.color.$css;
-    this.dom.appendChild(this.impl);*/
+    var _this55 = _possibleConstructorReturn(this, (QtGraphicalEffects_DropShadow.__proto__ || Object.getPrototypeOf(QtGraphicalEffects_DropShadow)).call(this, meta));
 
-    var _this53 = _possibleConstructorReturn(this, (QtGraphicalEffects_DropShadow.__proto__ || Object.getPrototypeOf(QtGraphicalEffects_DropShadow)).call(this, meta));
-
-    _this53.colorChanged.connect(_this53, _this53.$updateBoxShadow);
-    _this53.radiusChanged.connect(_this53, _this53.$updateBoxShadow);
-    _this53.spreadChanged.connect(_this53, _this53.$updateBoxShadow);
-    _this53.sourceChanged.connect(_this53, _this53.$updateBoxShadow);
-    return _this53;
+    _this55.colorChanged.connect(_this55, _this55.$updateBoxShadow);
+    _this55.samplesChanged.connect(_this55, _this55.$updateBoxShadow);
+    _this55.radiusChanged.connect(_this55, _this55.$updateBoxShadow);
+    _this55.spreadChanged.connect(_this55, _this55.$updateBoxShadow);
+    _this55.sourceChanged.connect(_this55, _this55.$updateBoxShadow);
+    _this55.verticalOffsetChanged.connect(_this55, _this55.$updateBoxShadow);
+    _this55.horizontalOffsetChanged.connect(_this55, _this55.$updateBoxShadow);
+    return _this55;
   }
 
   _createClass(QtGraphicalEffects_DropShadow, [{
@@ -7273,8 +7438,7 @@ var QtGraphicalEffects_DropShadow = function (_QtQuick_Item4) {
 
       if (this.source) {
         var style = this.source.impl.style;
-        var blur_radius = 1 + radius * 2;
-        style.boxShadow = horizontalOffset + "px " + verticalOffset + "px " + blur_radius + "px " + spread + "px " + color;
+        style.boxShadow = horizontalOffset + "px " + verticalOffset + "px " + radius + "px " + spread + "px " + color;
       }
     }
   }]);
@@ -7286,10 +7450,10 @@ QtGraphicalEffects_DropShadow.properties = {
   cached: "bool",
   color: { type: "color", initialValue: "black" },
   horizontalOffset: "real",
-  radius: "int",
-  samples: "int",
+  radius: { type: "int", initialValue: 4 },
+  samples: { type: "int", initialValue: 9 },
   source: { type: "var", initialValue: null },
-  spread: "real",
+  spread: { type: "real", initialValue: 0 },
   transparentBorder: "bool",
   verticalOffset: "real"
 };
@@ -7304,14 +7468,14 @@ var QtGraphicalEffects_FastBlur = function (_QtQuick_Item5) {
   function QtGraphicalEffects_FastBlur(meta) {
     _classCallCheck(this, QtGraphicalEffects_FastBlur);
 
-    var _this54 = _possibleConstructorReturn(this, (QtGraphicalEffects_FastBlur.__proto__ || Object.getPrototypeOf(QtGraphicalEffects_FastBlur)).call(this, meta));
+    var _this56 = _possibleConstructorReturn(this, (QtGraphicalEffects_FastBlur.__proto__ || Object.getPrototypeOf(QtGraphicalEffects_FastBlur)).call(this, meta));
 
-    _this54.$previousSource = null;
-    _this54.$filterObject = undefined;
+    _this56.$previousSource = null;
+    _this56.$filterObject = undefined;
 
-    _this54.radiusChanged.connect(_this54, _this54.$onRadiusChanged);
-    _this54.sourceChanged.connect(_this54, _this54.$onSourceChanged);
-    return _this54;
+    _this56.radiusChanged.connect(_this56, _this56.$onRadiusChanged);
+    _this56.sourceChanged.connect(_this56, _this56.$onSourceChanged);
+    return _this56;
   }
 
   _createClass(QtGraphicalEffects_FastBlur, [{
@@ -7372,24 +7536,24 @@ var QtGraphicalEffects_RectangularGlow = function (_QtQuick_Item6) {
   function QtGraphicalEffects_RectangularGlow(meta) {
     _classCallCheck(this, QtGraphicalEffects_RectangularGlow);
 
-    var _this55 = _possibleConstructorReturn(this, (QtGraphicalEffects_RectangularGlow.__proto__ || Object.getPrototypeOf(QtGraphicalEffects_RectangularGlow)).call(this, meta));
+    var _this57 = _possibleConstructorReturn(this, (QtGraphicalEffects_RectangularGlow.__proto__ || Object.getPrototypeOf(QtGraphicalEffects_RectangularGlow)).call(this, meta));
 
-    _this55.impl = document.createElement("div");
-    var style = _this55.impl.style;
+    _this57.impl = document.createElement("div");
+    var style = _this57.impl.style;
     style.pointerEvents = "none";
     style.position = "absolute";
     style.left = style.right = style.top = style.bottom = "0px";
     style.border = "none";
-    style.backgroundColor = _this55.color.$css;
-    _this55.dom.appendChild(_this55.impl);
+    style.backgroundColor = _this57.color.$css;
+    _this57.dom.appendChild(_this57.impl);
 
-    _this55.colorChanged.connect(_this55, _this55.$onColorChanged);
-    _this55.glowRadiusChanged.connect(_this55, _this55.$updateBoxShadow);
-    _this55.cornerRadiusChanged.connect(_this55, _this55.$updateBoxShadow);
-    _this55.widthChanged.connect(_this55, _this55.$updateBoxShadow);
-    _this55.heightChanged.connect(_this55, _this55.$updateBoxShadow);
-    _this55.spreadChanged.connect(_this55, _this55.$onSpreadChanged);
-    return _this55;
+    _this57.colorChanged.connect(_this57, _this57.$onColorChanged);
+    _this57.glowRadiusChanged.connect(_this57, _this57.$updateBoxShadow);
+    _this57.cornerRadiusChanged.connect(_this57, _this57.$updateBoxShadow);
+    _this57.widthChanged.connect(_this57, _this57.$updateBoxShadow);
+    _this57.heightChanged.connect(_this57, _this57.$updateBoxShadow);
+    _this57.spreadChanged.connect(_this57, _this57.$onSpreadChanged);
+    return _this57;
   }
 
   _createClass(QtGraphicalEffects_RectangularGlow, [{
@@ -7468,19 +7632,19 @@ var QtMobility_GeoLocation = function (_QtQuick_Item7) {
   function QtMobility_GeoLocation(meta) {
     _classCallCheck(this, QtMobility_GeoLocation);
 
-    var _this56 = _possibleConstructorReturn(this, (QtMobility_GeoLocation.__proto__ || Object.getPrototypeOf(QtMobility_GeoLocation)).call(this, meta));
+    var _this58 = _possibleConstructorReturn(this, (QtMobility_GeoLocation.__proto__ || Object.getPrototypeOf(QtMobility_GeoLocation)).call(this, meta));
 
     if (!navigator.geolocation) {
-      return _possibleConstructorReturn(_this56);
+      return _possibleConstructorReturn(_this58);
     }
 
     navigator.geolocation.getCurrentPosition(function (pos) {
-      return _this56.$updatePosition(pos);
+      return _this58.$updatePosition(pos);
     });
     navigator.geolocation.watchPosition(function (pos) {
-      return _this56.$updatePosition(pos);
+      return _this58.$updatePosition(pos);
     });
-    return _this56;
+    return _this58;
   }
 
   _createClass(QtMobility_GeoLocation, [{
@@ -7522,90 +7686,90 @@ var QtMultimedia_Video = function (_QtQuick_Item8) {
   function QtMultimedia_Video(meta) {
     _classCallCheck(this, QtMultimedia_Video);
 
-    var _this57 = _possibleConstructorReturn(this, (QtMultimedia_Video.__proto__ || Object.getPrototypeOf(QtMultimedia_Video)).call(this, meta));
+    var _this59 = _possibleConstructorReturn(this, (QtMultimedia_Video.__proto__ || Object.getPrototypeOf(QtMultimedia_Video)).call(this, meta));
 
-    _this57.$runningEventListener = 0;
+    _this59.$runningEventListener = 0;
 
-    _this57.impl = document.createElement("video");
-    _this57.impl.style.width = _this57.impl.style.height = "100%";
-    _this57.impl.style.margin = "0";
-    _this57.dom.appendChild(_this57.impl);
+    _this59.impl = document.createElement("video");
+    _this59.impl.style.width = _this59.impl.style.height = "100%";
+    _this59.impl.style.margin = "0";
+    _this59.dom.appendChild(_this59.impl);
 
-    _this57.volume = _this57.impl.volume;
-    _this57.duration = _this57.impl.duration;
+    _this59.volume = _this59.impl.volume;
+    _this59.duration = _this59.impl.duration;
 
-    _this57.impl.addEventListener("play", function () {
-      _this57.playing();
-      _this57.playbackState = _this57.MediaPlayer.PlayingState;
+    _this59.impl.addEventListener("play", function () {
+      _this59.playing();
+      _this59.playbackState = _this59.MediaPlayer.PlayingState;
     });
 
-    _this57.impl.addEventListener("pause", function () {
-      _this57.paused();
-      _this57.playbackState = _this57.MediaPlayer.PausedState;
+    _this59.impl.addEventListener("pause", function () {
+      _this59.paused();
+      _this59.playbackState = _this59.MediaPlayer.PausedState;
     });
 
-    _this57.impl.addEventListener("timeupdate", function () {
-      _this57.$runningEventListener++;
-      _this57.position = _this57.impl.currentTime * 1000;
-      _this57.$runningEventListener--;
+    _this59.impl.addEventListener("timeupdate", function () {
+      _this59.$runningEventListener++;
+      _this59.position = _this59.impl.currentTime * 1000;
+      _this59.$runningEventListener--;
     });
 
-    _this57.impl.addEventListener("ended", function () {
-      _this57.stopped();
-      _this57.playbackState = _this57.MediaPlayer.StoppedState;
+    _this59.impl.addEventListener("ended", function () {
+      _this59.stopped();
+      _this59.playbackState = _this59.MediaPlayer.StoppedState;
     });
 
-    _this57.impl.addEventListener("progress", function () {
-      if (_this57.impl.buffered.length > 0) {
-        _this57.progress = _this57.impl.buffered.end(0) / _this57.impl.duration;
-        _this57.status = _this57.progress < 1 ? _this57.MediaPlayer.Buffering : _this57.MediaPlayer.Buffered;
+    _this59.impl.addEventListener("progress", function () {
+      if (_this59.impl.buffered.length > 0) {
+        _this59.progress = _this59.impl.buffered.end(0) / _this59.impl.duration;
+        _this59.status = _this59.progress < 1 ? _this59.MediaPlayer.Buffering : _this59.MediaPlayer.Buffered;
       }
     });
 
-    _this57.impl.addEventListener("stalled", function () {
-      _this57.status = _this57.MediaPlayer.Stalled;
+    _this59.impl.addEventListener("stalled", function () {
+      _this59.status = _this59.MediaPlayer.Stalled;
     });
 
-    _this57.impl.addEventListener("canplaythrough", function () {
-      _this57.status = _this57.MediaPlayer.Buffered;
+    _this59.impl.addEventListener("canplaythrough", function () {
+      _this59.status = _this59.MediaPlayer.Buffered;
     });
 
-    _this57.impl.addEventListener("loadstart", function () {
-      _this57.status = _this57.MediaPlayer.Loading;
+    _this59.impl.addEventListener("loadstart", function () {
+      _this59.status = _this59.MediaPlayer.Loading;
     });
 
-    _this57.impl.addEventListener("durationchanged", function () {
-      _this57.duration = _this57.impl.duration;
+    _this59.impl.addEventListener("durationchanged", function () {
+      _this59.duration = _this59.impl.duration;
     });
 
-    _this57.impl.addEventListener("volumechanged", function () {
-      _this57.$runningEventListener++;
-      _this57.volume = _this57.impl.volume;
-      _this57.$runningEventListener--;
+    _this59.impl.addEventListener("volumechanged", function () {
+      _this59.$runningEventListener++;
+      _this59.volume = _this59.impl.volume;
+      _this59.$runningEventListener--;
     });
 
-    _this57.impl.addEventListener("suspend", function () {
-      _this57.error |= _this57.MediaPlayer.NetworkError;
+    _this59.impl.addEventListener("suspend", function () {
+      _this59.error |= _this59.MediaPlayer.NetworkError;
     });
 
-    _this57.impl.addEventListener("error", function () {
-      _this57.error |= _this57.MediaPlayer.ResourceError;
+    _this59.impl.addEventListener("error", function () {
+      _this59.error |= _this59.MediaPlayer.ResourceError;
     });
 
-    _this57.impl.addEventListener("ratechange", function () {
-      _this57.$runningEventListener++;
-      _this57.playbackRate = _this57.impl.playbackRate;
-      _this57.$runningEventListener--;
+    _this59.impl.addEventListener("ratechange", function () {
+      _this59.$runningEventListener++;
+      _this59.playbackRate = _this59.impl.playbackRate;
+      _this59.$runningEventListener--;
     });
 
-    _this57.autoPlayChanged.connect(_this57, _this57.$onAutoPlayChanged);
-    _this57.sourceChanged.connect(_this57, _this57.$onSourceChanged);
-    _this57.positionChanged.connect(_this57, _this57.$onPositionChanged);
-    _this57.volumeChanged.connect(_this57, _this57.$onVolumeChanged);
-    _this57.playbackRateChanged.connect(_this57, _this57.$onPlaybackRateChanged);
-    _this57.mutedChanged.connect(_this57, _this57.$onMutedChanged);
-    _this57.fillModeChanged.connect(_this57, _this57.$onFillModeChanged);
-    return _this57;
+    _this59.autoPlayChanged.connect(_this59, _this59.$onAutoPlayChanged);
+    _this59.sourceChanged.connect(_this59, _this59.$onSourceChanged);
+    _this59.positionChanged.connect(_this59, _this59.$onPositionChanged);
+    _this59.volumeChanged.connect(_this59, _this59.$onVolumeChanged);
+    _this59.playbackRateChanged.connect(_this59, _this59.$onPlaybackRateChanged);
+    _this59.mutedChanged.connect(_this59, _this59.$onMutedChanged);
+    _this59.fillModeChanged.connect(_this59, _this59.$onFillModeChanged);
+    return _this59;
   }
 
   _createClass(QtMultimedia_Video, [{
@@ -7825,10 +7989,10 @@ var QtQuick_Controls_2_AbstractButton = function (_QtQuick_Controls_2_C) {
   function QtQuick_Controls_2_AbstractButton(meta) {
     _classCallCheck(this, QtQuick_Controls_2_AbstractButton);
 
-    var _this60 = _possibleConstructorReturn(this, (QtQuick_Controls_2_AbstractButton.__proto__ || Object.getPrototypeOf(QtQuick_Controls_2_AbstractButton)).call(this, meta));
+    var _this62 = _possibleConstructorReturn(this, (QtQuick_Controls_2_AbstractButton.__proto__ || Object.getPrototypeOf(QtQuick_Controls_2_AbstractButton)).call(this, meta));
 
-    _this60.icon = new QmlWeb.QObject(_this60);
-    QmlWeb.createProperties(_this60.icon, {
+    _this62.icon = new QmlWeb.QObject(_this62);
+    QmlWeb.createProperties(_this62.icon, {
       name: "string",
       source: "url",
       width: "int",
@@ -7837,7 +8001,7 @@ var QtQuick_Controls_2_AbstractButton = function (_QtQuick_Controls_2_C) {
     });
 
     // TODO
-    return _this60;
+    return _this62;
   }
 
   return QtQuick_Controls_2_AbstractButton;
@@ -7867,14 +8031,14 @@ var QtQuick_Controls_2_Container = function (_QtQuick_Controls_2_C2) {
   function QtQuick_Controls_2_Container(meta) {
     _classCallCheck(this, QtQuick_Controls_2_Container);
 
-    var _this61 = _possibleConstructorReturn(this, (QtQuick_Controls_2_Container.__proto__ || Object.getPrototypeOf(QtQuick_Controls_2_Container)).call(this, meta));
+    var _this63 = _possibleConstructorReturn(this, (QtQuick_Controls_2_Container.__proto__ || Object.getPrototypeOf(QtQuick_Controls_2_Container)).call(this, meta));
 
-    _this61.widthChanged.connect(_this61, _this61.layoutChildren);
-    _this61.heightChanged.connect(_this61, _this61.layoutChildren);
-    _this61.childrenChanged.connect(_this61, _this61.layoutChildren);
-    _this61.childrenChanged.connect(_this61, _this61.$onChildrenChanged);
-    _this61.layoutChildren();
-    return _this61;
+    _this63.widthChanged.connect(_this63, _this63.layoutChildren);
+    _this63.heightChanged.connect(_this63, _this63.layoutChildren);
+    _this63.childrenChanged.connect(_this63, _this63.layoutChildren);
+    _this63.childrenChanged.connect(_this63, _this63.$onChildrenChanged);
+    _this63.layoutChildren();
+    return _this63;
   }
 
   _createClass(QtQuick_Controls_2_Container, [{
@@ -8029,20 +8193,20 @@ var QtQuick_Controls_Button = function (_QtQuick_Item11) {
   function QtQuick_Controls_Button(meta) {
     _classCallCheck(this, QtQuick_Controls_Button);
 
-    var _this66 = _possibleConstructorReturn(this, (QtQuick_Controls_Button.__proto__ || Object.getPrototypeOf(QtQuick_Controls_Button)).call(this, meta));
+    var _this68 = _possibleConstructorReturn(this, (QtQuick_Controls_Button.__proto__ || Object.getPrototypeOf(QtQuick_Controls_Button)).call(this, meta));
 
-    _this66.Component.completed.connect(_this66, _this66.Component$onCompleted);
-    _this66.textChanged.connect(_this66, _this66.$onTextChanged);
-    _this66.enabledChanged.connect(_this66, _this66.$onEnabledChanged);
+    _this68.Component.completed.connect(_this68, _this68.Component$onCompleted);
+    _this68.textChanged.connect(_this68, _this68.$onTextChanged);
+    _this68.enabledChanged.connect(_this68, _this68.$onEnabledChanged);
 
-    var button = _this66.impl = document.createElement("button");
+    var button = _this68.impl = document.createElement("button");
     button.style.pointerEvents = "auto";
-    _this66.dom.appendChild(button);
+    _this68.dom.appendChild(button);
 
     button.onclick = function () {
-      _this66.clicked();
+      _this68.clicked();
     };
-    return _this66;
+    return _this68;
   }
 
   _createClass(QtQuick_Controls_Button, [{
@@ -8087,29 +8251,29 @@ var QtQuick_Controls_CheckBox = function (_QtQuick_Item12) {
   function QtQuick_Controls_CheckBox(meta) {
     _classCallCheck(this, QtQuick_Controls_CheckBox);
 
-    var _this67 = _possibleConstructorReturn(this, (QtQuick_Controls_CheckBox.__proto__ || Object.getPrototypeOf(QtQuick_Controls_CheckBox)).call(this, meta));
+    var _this69 = _possibleConstructorReturn(this, (QtQuick_Controls_CheckBox.__proto__ || Object.getPrototypeOf(QtQuick_Controls_CheckBox)).call(this, meta));
 
-    _this67.impl = document.createElement("label");
-    _this67.impl.style.pointerEvents = "auto";
+    _this69.impl = document.createElement("label");
+    _this69.impl.style.pointerEvents = "auto";
 
     var checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.style.verticalAlign = "text-bottom";
     checkbox.addEventListener("change", function () {
-      _this67.checked = checkbox.checked;
+      _this69.checked = checkbox.checked;
     });
-    _this67.impl.appendChild(checkbox);
+    _this69.impl.appendChild(checkbox);
 
     var span = document.createElement("span");
-    _this67.impl.appendChild(span);
+    _this69.impl.appendChild(span);
 
-    _this67.dom.appendChild(_this67.impl);
+    _this69.dom.appendChild(_this69.impl);
 
-    _this67.Component.completed.connect(_this67, _this67.Component$onCompleted);
-    _this67.textChanged.connect(_this67, _this67.$onTextChanged);
-    _this67.colorChanged.connect(_this67, _this67.$onColorChanged);
-    _this67.checkedChanged.connect(_this67, _this67.$onCheckedChanged);
-    return _this67;
+    _this69.Component.completed.connect(_this69, _this69.Component$onCompleted);
+    _this69.textChanged.connect(_this69, _this69.$onTextChanged);
+    _this69.colorChanged.connect(_this69, _this69.$onColorChanged);
+    _this69.checkedChanged.connect(_this69, _this69.$onCheckedChanged);
+    return _this69;
   }
 
   _createClass(QtQuick_Controls_CheckBox, [{
@@ -8157,29 +8321,29 @@ var QtQuick_Controls_ComboBox = function (_QtQuick_Item13) {
   function QtQuick_Controls_ComboBox(meta) {
     _classCallCheck(this, QtQuick_Controls_ComboBox);
 
-    var _this68 = _possibleConstructorReturn(this, (QtQuick_Controls_ComboBox.__proto__ || Object.getPrototypeOf(QtQuick_Controls_ComboBox)).call(this, meta));
+    var _this70 = _possibleConstructorReturn(this, (QtQuick_Controls_ComboBox.__proto__ || Object.getPrototypeOf(QtQuick_Controls_ComboBox)).call(this, meta));
 
-    _this68.dom.style.pointerEvents = "auto";
-    _this68.name = "QMLComboBox";
+    _this70.dom.style.pointerEvents = "auto";
+    _this70.name = "QMLComboBox";
 
     // TODO change innerHTML to DOM
-    _this68.dom.innerHTML = "<select></select>";
-    _this68.impl = _this68.dom.firstChild;
+    _this70.dom.innerHTML = "<select></select>";
+    _this70.impl = _this70.dom.firstChild;
 
-    _this68.Component.completed.connect(_this68, _this68.Component$onCompleted);
-    _this68.modelChanged.connect(_this68, _this68.$onModelChanged);
-    _this68.currentIndexChanged.connect(_this68, _this68.$onCurrentIndexChanged);
-    _this68.heightChanged.connect(_this68, _this68.$onHeightChanged);
-    _this68.widthChanged.connect(_this68, _this68.$onWidthChanged);
+    _this70.Component.completed.connect(_this70, _this70.Component$onCompleted);
+    _this70.modelChanged.connect(_this70, _this70.$onModelChanged);
+    _this70.currentIndexChanged.connect(_this70, _this70.$onCurrentIndexChanged);
+    _this70.heightChanged.connect(_this70, _this70.$onHeightChanged);
+    _this70.widthChanged.connect(_this70, _this70.$onWidthChanged);
 
-    _this68.dom.onclick = function () {
-      var index = _this68.dom.firstChild.selectedIndex;
-      _this68.currentIndex = index;
-      _this68.currentText = _this68.model[index];
-      _this68.accepted();
-      _this68.activated(index);
+    _this70.dom.onclick = function () {
+      var index = _this70.dom.firstChild.selectedIndex;
+      _this70.currentIndex = index;
+      _this70.currentText = _this70.model[index];
+      _this70.accepted();
+      _this70.activated(index);
     };
-    return _this68;
+    return _this70;
   }
 
   _createClass(QtQuick_Controls_ComboBox, [{
@@ -8293,41 +8457,41 @@ var QtQuick_Controls_ScrollView = function (_QtQuick_Item14) {
   function QtQuick_Controls_ScrollView(meta) {
     _classCallCheck(this, QtQuick_Controls_ScrollView);
 
-    var _this69 = _possibleConstructorReturn(this, (QtQuick_Controls_ScrollView.__proto__ || Object.getPrototypeOf(QtQuick_Controls_ScrollView)).call(this, meta));
+    var _this71 = _possibleConstructorReturn(this, (QtQuick_Controls_ScrollView.__proto__ || Object.getPrototypeOf(QtQuick_Controls_ScrollView)).call(this, meta));
 
-    _this69.css.pointerEvents = "auto";
-    _this69.setupFocusOnDom(_this69.dom);
+    _this71.css.pointerEvents = "auto";
+    _this71.setupFocusOnDom(_this71.dom);
 
-    _this69.contentItemChanged.connect(_this69, _this69.$onContentItemChanged);
-    _this69.flickableItemChanged.connect(_this69, _this69.$onFlickableItemChanged);
-    _this69.viewportChanged.connect(_this69, _this69.$onViewportChanged);
-    _this69.frameVisibleChanged.connect(_this69, _this69.$onFrameVisibleChanged);
-    _this69.highlightOnFocusChanged.connect(_this69, _this69.$onHighlightOnFocusChanged);
-    _this69.horizontalScrollBarPolicyChanged.connect(_this69, _this69.$onHorizontalScrollBarPolicyChanged);
-    _this69.verticalScrollBarPolicyChanged.connect(_this69, _this69.$onVerticalScrollBarPolicyChanged);
-    _this69.styleChanged.connect(_this69, _this69.$onStyleChanged);
-    _this69.childrenChanged.connect(_this69, _this69.$onChildrenChanged);
-    _this69.focusChanged.connect(_this69, _this69.$onFocusChanged);
+    _this71.contentItemChanged.connect(_this71, _this71.$onContentItemChanged);
+    _this71.flickableItemChanged.connect(_this71, _this71.$onFlickableItemChanged);
+    _this71.viewportChanged.connect(_this71, _this71.$onViewportChanged);
+    _this71.frameVisibleChanged.connect(_this71, _this71.$onFrameVisibleChanged);
+    _this71.highlightOnFocusChanged.connect(_this71, _this71.$onHighlightOnFocusChanged);
+    _this71.horizontalScrollBarPolicyChanged.connect(_this71, _this71.$onHorizontalScrollBarPolicyChanged);
+    _this71.verticalScrollBarPolicyChanged.connect(_this71, _this71.$onVerticalScrollBarPolicyChanged);
+    _this71.styleChanged.connect(_this71, _this71.$onStyleChanged);
+    _this71.childrenChanged.connect(_this71, _this71.$onChildrenChanged);
+    _this71.focusChanged.connect(_this71, _this71.$onFocusChanged);
 
-    _this69.width = _this69.implicitWidth = 240; // default QML ScrollView width
-    _this69.height = _this69.implicitHeight = 150; // default QML ScrollView height
-    _this69.width = _this69.implicitWidth;
-    _this69.height = _this69.implicitHeight;
+    _this71.width = _this71.implicitWidth = 240; // default QML ScrollView width
+    _this71.height = _this71.implicitHeight = 150; // default QML ScrollView height
+    _this71.width = _this71.implicitWidth;
+    _this71.height = _this71.implicitHeight;
 
     var Qt = QmlWeb.Qt;
-    _this69.contentItem = undefined;
-    _this69.flickableItem = undefined;
-    _this69.viewport = undefined;
-    _this69.frameVisible = false;
-    _this69.highlightOnFocus = false;
+    _this71.contentItem = undefined;
+    _this71.flickableItem = undefined;
+    _this71.viewport = undefined;
+    _this71.frameVisible = false;
+    _this71.highlightOnFocus = false;
 
-    _this69.verticalScrollBarPolicy = Qt.ScrollBarAsNeeded;
-    _this69.horizontalScrollBarPolicy = Qt.ScrollBarAsNeeded;
-    _this69.style = undefined;
+    _this71.verticalScrollBarPolicy = Qt.ScrollBarAsNeeded;
+    _this71.horizontalScrollBarPolicy = Qt.ScrollBarAsNeeded;
+    _this71.style = undefined;
 
-    _this69.$onVerticalScrollBarPolicyChanged(_this69.verticalScrollBarPolicy);
-    _this69.$onHorizontalScrollBarPolicyChanged(_this69.horizontalScrollBarPolicy);
-    return _this69;
+    _this71.$onVerticalScrollBarPolicyChanged(_this71.verticalScrollBarPolicy);
+    _this71.$onHorizontalScrollBarPolicyChanged(_this71.horizontalScrollBarPolicy);
+    return _this71;
   }
 
   _createClass(QtQuick_Controls_ScrollView, [{
@@ -8429,29 +8593,29 @@ var QtQuick_Controls_TextField = function (_QtQuick_Item15) {
   function QtQuick_Controls_TextField(meta) {
     _classCallCheck(this, QtQuick_Controls_TextField);
 
-    var _this70 = _possibleConstructorReturn(this, (QtQuick_Controls_TextField.__proto__ || Object.getPrototypeOf(QtQuick_Controls_TextField)).call(this, meta));
+    var _this72 = _possibleConstructorReturn(this, (QtQuick_Controls_TextField.__proto__ || Object.getPrototypeOf(QtQuick_Controls_TextField)).call(this, meta));
 
-    var input = _this70.impl = document.createElement("input");
+    var input = _this72.impl = document.createElement("input");
     input.type = "text";
     input.disabled = true;
     input.style.pointerEvents = "auto";
     input.style.margin = "0";
     input.style.width = "100%";
-    _this70.dom.appendChild(input);
-    _this70.setupFocusOnDom(input);
+    _this72.dom.appendChild(input);
+    _this72.setupFocusOnDom(input);
     input.disabled = false;
 
-    _this70.Component.completed.connect(_this70, _this70.Component$onCompleted);
-    _this70.textChanged.connect(_this70, _this70.$onTextChanged);
-    _this70.echoModeChanged.connect(_this70, _this70.$onEchoModeChanged);
-    _this70.maximumLengthChanged.connect(_this70, _this70.$onMaximumLengthChanged);
-    _this70.readOnlyChanged.connect(_this70, _this70.$onReadOnlyChanged);
-    _this70.Keys.pressed.connect(_this70, _this70.Keys$onPressed);
+    _this72.Component.completed.connect(_this72, _this72.Component$onCompleted);
+    _this72.textChanged.connect(_this72, _this72.$onTextChanged);
+    _this72.echoModeChanged.connect(_this72, _this72.$onEchoModeChanged);
+    _this72.maximumLengthChanged.connect(_this72, _this72.$onMaximumLengthChanged);
+    _this72.readOnlyChanged.connect(_this72, _this72.$onReadOnlyChanged);
+    _this72.Keys.pressed.connect(_this72, _this72.Keys$onPressed);
 
-    _this70.impl.addEventListener("input", function () {
-      return _this70.$updateValue();
+    _this72.impl.addEventListener("input", function () {
+      return _this72.$updateValue();
     });
-    return _this70;
+    return _this72;
   }
 
   _createClass(QtQuick_Controls_TextField, [{
@@ -8664,12 +8828,12 @@ var QtQuick_Particles_Emitter = function (_QtQuick_Item20) {
   }, {
     key: "pulse",
     value: function pulse(duration) {
-      var _this76 = this;
+      var _this78 = this;
 
       if (this.enabled) return;
       this.enabled = true;
       setTimeout(function () {
-        _this76.enabled = false;
+        _this78.enabled = false;
       }, duration);
     }
   }]);
@@ -8814,10 +8978,10 @@ var QtQuick_Window_Window = function (_QtQuick_Item23) {
   function QtQuick_Window_Window(meta) {
     _classCallCheck(this, QtQuick_Window_Window);
 
-    var _this80 = _possibleConstructorReturn(this, (QtQuick_Window_Window.__proto__ || Object.getPrototypeOf(QtQuick_Window_Window)).call(this, meta));
+    var _this82 = _possibleConstructorReturn(this, (QtQuick_Window_Window.__proto__ || Object.getPrototypeOf(QtQuick_Window_Window)).call(this, meta));
 
-    _this80.colorChanged.connect(_this80, _this80.$onColorChanged);
-    return _this80;
+    _this82.colorChanged.connect(_this82, _this82.$onColorChanged);
+    return _this82;
   }
 
   _createClass(QtQuick_Window_Window, [{
@@ -8913,40 +9077,40 @@ var QtQuick_BorderImage = function (_QtQuick_Item24) {
   function QtQuick_BorderImage(meta) {
     _classCallCheck(this, QtQuick_BorderImage);
 
-    var _this83 = _possibleConstructorReturn(this, (QtQuick_BorderImage.__proto__ || Object.getPrototypeOf(QtQuick_BorderImage)).call(this, meta));
+    var _this85 = _possibleConstructorReturn(this, (QtQuick_BorderImage.__proto__ || Object.getPrototypeOf(QtQuick_BorderImage)).call(this, meta));
 
-    _this83.border = new QmlWeb.QObject(_this83);
-    QmlWeb.createProperties(_this83.border, {
+    _this85.border = new QmlWeb.QObject(_this85);
+    QmlWeb.createProperties(_this85.border, {
       left: "int",
       right: "int",
       top: "int",
       bottom: "int"
     });
 
-    var bg = _this83.impl = document.createElement("div");
+    var bg = _this85.impl = document.createElement("div");
     bg.style.pointerEvents = "none";
     bg.style.height = "100%";
     bg.style.boxSizing = "border-box";
-    _this83.dom.appendChild(bg);
+    _this85.dom.appendChild(bg);
 
-    _this83.$img = new Image();
-    _this83.$img.addEventListener("load", function () {
-      _this83.progress = 1;
-      _this83.status = _this83.BorderImage.Ready;
+    _this85.$img = new Image();
+    _this85.$img.addEventListener("load", function () {
+      _this85.progress = 1;
+      _this85.status = _this85.BorderImage.Ready;
     });
-    _this83.$img.addEventListener("error", function () {
-      _this83.status = _this83.BorderImage.Error;
+    _this85.$img.addEventListener("error", function () {
+      _this85.status = _this85.BorderImage.Error;
     });
 
-    _this83.sourceChanged.connect(_this83, _this83.$onSourceChanged);
-    _this83.border.leftChanged.connect(_this83, _this83.$updateBorder);
-    _this83.border.rightChanged.connect(_this83, _this83.$updateBorder);
-    _this83.border.topChanged.connect(_this83, _this83.$updateBorder);
-    _this83.border.bottomChanged.connect(_this83, _this83.$updateBorder);
-    _this83.horizontalTileModeChanged.connect(_this83, _this83.$updateBorder);
-    _this83.verticalTileModeChanged.connect(_this83, _this83.$updateBorder);
-    _this83.smoothChanged.connect(_this83, _this83.$onSmoothChanged);
-    return _this83;
+    _this85.sourceChanged.connect(_this85, _this85.$onSourceChanged);
+    _this85.border.leftChanged.connect(_this85, _this85.$updateBorder);
+    _this85.border.rightChanged.connect(_this85, _this85.$updateBorder);
+    _this85.border.topChanged.connect(_this85, _this85.$updateBorder);
+    _this85.border.bottomChanged.connect(_this85, _this85.$updateBorder);
+    _this85.horizontalTileModeChanged.connect(_this85, _this85.$updateBorder);
+    _this85.verticalTileModeChanged.connect(_this85, _this85.$updateBorder);
+    _this85.smoothChanged.connect(_this85, _this85.$onSmoothChanged);
+    return _this85;
   }
 
   _createClass(QtQuick_BorderImage, [{
@@ -9032,15 +9196,15 @@ var QtQuick_Canvas = function (_QtQuick_Item25) {
   function QtQuick_Canvas(meta) {
     _classCallCheck(this, QtQuick_Canvas);
 
-    var _this84 = _possibleConstructorReturn(this, (QtQuick_Canvas.__proto__ || Object.getPrototypeOf(QtQuick_Canvas)).call(this, meta));
+    var _this86 = _possibleConstructorReturn(this, (QtQuick_Canvas.__proto__ || Object.getPrototypeOf(QtQuick_Canvas)).call(this, meta));
 
-    var canvas = _this84.impl = document.createElement("canvas");
-    _this84.dom.appendChild(canvas);
+    var canvas = _this86.impl = document.createElement("canvas");
+    _this86.dom.appendChild(canvas);
 
-    _this84.widthChanged.connect(_this84, _this84.$updateWidth);
-    _this84.heightChanged.connect(_this84, _this84.$updateHeight);
-    _this84.Component.completed.connect(_this84, _this84.$completed);
-    return _this84;
+    _this86.widthChanged.connect(_this86, _this86.$updateWidth);
+    _this86.heightChanged.connect(_this86, _this86.$updateHeight);
+    _this86.Component.completed.connect(_this86, _this86.$completed);
+    return _this86;
   }
 
   _createClass(QtQuick_Canvas, [{
@@ -9154,11 +9318,11 @@ var QtQuick_DoubleValidator = function (_QtQuick_Item26) {
   function QtQuick_DoubleValidator(meta) {
     _classCallCheck(this, QtQuick_DoubleValidator);
 
-    var _this85 = _possibleConstructorReturn(this, (QtQuick_DoubleValidator.__proto__ || Object.getPrototypeOf(QtQuick_DoubleValidator)).call(this, meta));
+    var _this87 = _possibleConstructorReturn(this, (QtQuick_DoubleValidator.__proto__ || Object.getPrototypeOf(QtQuick_DoubleValidator)).call(this, meta));
 
-    _this85.$standardRegExp = /^(-|\+)?\s*[0-9]+(\.[0-9]+)?$/;
-    _this85.$scientificRegExp = /^(-|\+)?\s*[0-9]+(\.[0-9]+)?(E(-|\+)?[0-9]+)?$/;
-    return _this85;
+    _this87.$standardRegExp = /^(-|\+)?\s*[0-9]+(\.[0-9]+)?$/;
+    _this87.$scientificRegExp = /^(-|\+)?\s*[0-9]+(\.[0-9]+)?(E(-|\+)?[0-9]+)?$/;
+    return _this87;
   }
 
   _createClass(QtQuick_DoubleValidator, [{
@@ -9212,8 +9376,274 @@ QmlWeb.registerQmlType(QtQuick_DoubleValidator);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_FocusScope = function (_QtQuick_Item27) {
-  _inherits(QtQuick_FocusScope, _QtQuick_Item27);
+var QtQuick_Flickable = function (_QtQuick_Item27) {
+  _inherits(QtQuick_Flickable, _QtQuick_Item27);
+
+  function QtQuick_Flickable(meta) {
+    _classCallCheck(this, QtQuick_Flickable);
+
+    var _this88 = _possibleConstructorReturn(this, (QtQuick_Flickable.__proto__ || Object.getPrototypeOf(QtQuick_Flickable)).call(this, meta));
+
+    _this88.parent = meta.parent;
+    _this88.dom.style.pointerEvents = "all";
+    _this88.dom.style.overflow = "auto";
+
+    var bg = _this88.impl = document.createElement("div");
+    bg.style.pointerEvents = "none";
+    bg.style.position = "absolute";
+    bg.style.left = bg.style.right = bg.style.top = bg.style.bottom = "0px";
+    bg.style.background = "none";
+    _this88.dom.appendChild(bg);
+
+    _this88.isDragging = false;
+    _this88.mouseIsDown = false;
+    _this88.curSX = 0;
+    _this88.curSY = 0;
+    _this88.dom.addEventListener("mousedown", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      _this88.mouseIsDown = true;
+      _this88.curSX = e.pageX;
+      _this88.curSY = e.pageY;
+      //this.dom.classList.add("unselectable");
+    });
+    _this88.dom.addEventListener("mouseup", function (e) {
+      //e.stopPropagation();
+      e.preventDefault();
+      setTimeout(function () {
+        _this88.$onAllMouseEvent();
+      }, 100);
+      _this88.isDragging = false;
+      _this88.mouseIsDown = false;
+      _this88.dom.classList.remove("unselectable");
+    });
+    _this88.dom.addEventListener("mouseleave", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      setTimeout(function () {
+        _this88.$onAllMouseEvent();
+      }, 100);
+      _this88.isDragging = false;
+      _this88.mouseIsDown = false;
+      _this88.dom.classList.remove("unselectable");
+    });
+    _this88.dom.addEventListener("mousemove", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (_this88.mouseIsDown && _this88.enabled) {
+        _this88.dom.classList.add("unselectable");
+        _this88.$offAllMouseEvent();
+        _this88.isDragging = true;
+
+        if (_this88.interactive) {
+          switch (_this88.flickableDirection) {
+            case Flickable.AutoFlickDirection:
+              if (_this88.contentHeight != _this88.height) _this88.dom.scrollBy(0, _this88.curSY - e.pageY);
+              if (_this88.contentWidth != _this88.width) _this88.dom.scrollBy(_this88.curSX - e.pageX, 0);
+              break;
+            case Flickable.AutoFlickIfNeeded:
+              if (_this88.contentHeight >= _this88.height) _this88.dom.scrollBy(0, _this88.curSY - e.pageY);
+              if (_this88.contentWidth >= _this88.width) _this88.dom.scrollBy(_this88.curSX - e.pageX, 0);
+              break;
+            case Flickable.HorizontalFlick:
+              _this88.dom.scrollBy(_this88.curSX - e.pageX, 0);
+              break;
+            case Flickable.VerticalFlick:
+              _this88.dom.scrollBy(0, _this88.curSY - e.pageY);
+              break;
+            case Flickable.HorizontalAndVerticalFlick:
+              _this88.dom.scrollBy(_this88.curSX - e.pageX, _this88.curSY - e.pageY);
+              break;
+          }
+          _this88.contentX = _this88.dom.scrollLeft;
+          _this88.contentY = _this88.dom.scrollTop;
+          _this88.curSX = e.pageX;
+          _this88.curSY = e.pageY;
+        }
+      }
+    });
+    _this88.dom.addEventListener("wheel", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      _this88.mouseIsWheel = true;
+      if (_this88.interactive) {
+
+        _this88.$calcContentXY(e.deltaX, e.deltaY);
+      }
+      _this88.mouseIsWheel = false;
+    });
+    _this88.dom.addEventListener("scroll", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
+    _this88.contentHeightChanged.connect(_this88, _this88.$contentHeightChanged);
+    _this88.contentWidthChanged.connect(_this88, _this88.$contentWidthChanged);
+    _this88.contentXChanged.connect(_this88, _this88.$contentXChanged);
+    _this88.contentYChanged.connect(_this88, _this88.$contentYChanged);
+    _this88.flickableDirectionChanged.connect(_this88, _this88.$flickableDirectionChanged);
+
+    _this88.Component.completed.connect(_this88, _this88.Component$onCompleted);
+    return _this88;
+  }
+
+  _createClass(QtQuick_Flickable, [{
+    key: "Component$onCompleted",
+    value: function Component$onCompleted() {
+      this.$flickableDirectionChanged();
+      this.$contentHeightChanged();
+      this.$contentWidthChanged();
+      this.dom.scrollTo(this.contentX, this.contentY);
+    }
+  }, {
+    key: "$calcContentXY",
+    value: function $calcContentXY(deltaX, deltaY) {
+      if (this.enabled) {
+
+        var p = this.$firstParentForWheel();
+        var limitH = this.contentHeight; //Math.max(this.dom.clientHeight, this.dom.scrollHeight, this.dom.offsetHeight);
+        var limitW = this.contentWidth; //Math.max(this.dom.clientWidth, this.dom.scrollWidth, this.dom.offsetWidth);
+
+        if (this.orientation === Qt.Horizontal) {
+          if (this.contentX + deltaX > limitW - this.width) {
+            this.contentX = limitW - this.width;
+            if (p) {
+              if (this.mouseIsDown) p.enabled = true;
+              p.$calcContentXY(deltaX, deltaY);
+            }
+          } else if (this.contentX + deltaX < 0) {
+            this.contentX = 0;
+            if (p) {
+              if (this.mouseIsDown) p.enabled = true;
+              p.$calcContentXY(deltaX, deltaY);
+            }
+          } else this.contentX += deltaX;
+        } else {
+          if (this.contentY + deltaY > limitH - this.height) {
+            this.contentY = limitH - this.height;
+            if (p) {
+              if (this.mouseIsDown) p.enabled = true;
+              p.$calcContentXY(deltaX, deltaY);
+            }
+          } else if (this.contentY + deltaY < 0) {
+            this.contentY = 0;
+            if (p) {
+              if (this.mouseIsDown) p.enabled = true;
+              p.$calcContentXY(deltaX, deltaY);
+            }
+          } else this.contentY += deltaY;
+        }
+      }
+    }
+  }, {
+    key: "$flickableDirectionChanged",
+    value: function $flickableDirectionChanged() {
+      this.dom.style.overflow = "hidden";
+      switch (this.flickableDirection) {
+        case Flickable.AutoFlickDirection:
+          if (this.contentHeight != this.height) this.dom.style.overflowY = "auto";
+          if (this.contentWidth != this.width) this.dom.style.overflowX = "auto";
+          break;
+        case Flickable.AutoFlickIfNeeded:
+          if (this.contentHeight >= this.height) this.dom.style.overflowY = "auto";
+          if (this.contentWidth >= this.width) this.dom.style.overflowX = "auto";
+          break;
+        case Flickable.HorizontalFlick:
+          this.dom.style.overflowX = "auto";
+          break;
+        case Flickable.VerticalFlick:
+          this.dom.style.overflowY = "auto";
+          break;
+        case Flickable.HorizontalAndVerticalFlick:
+          this.dom.style.overflow = "auto";
+          break;
+
+      }
+    }
+  }, {
+    key: "$contentHeightChanged",
+    value: function $contentHeightChanged() {
+      if (this.contentHeight === 0) {
+        this.impl.style.height = "100%";
+        this.impl.style.bottom = "0";
+      } else {
+        this.impl.style.height = this.contentHeight + "px";
+        this.impl.style.bottom = this.contentHeight + "px";
+      }
+    }
+  }, {
+    key: "$contentWidthChanged",
+    value: function $contentWidthChanged() {
+      if (this.contentWidth === 0) {
+        this.impl.style.width = "100%";
+        this.impl.style.right = "0";
+      } else {
+        this.impl.style.width = this.contentWidth + "px";
+        this.impl.style.right = this.contentWidth + "px";
+      }
+    }
+  }, {
+    key: "$contentXChanged",
+    value: function $contentXChanged() {
+      var _this89 = this;
+
+      if (this.mouseIsDown || this.mouseIsWheel) {
+        if (this.eventTimer) clearTimeout(this.eventTimer);else this.flickStarted();
+        this.eventTimer = setTimeout(function () {
+          _this89.flickEnded();
+          _this89.eventTimer = null;
+        }, 100);
+      }
+      this.dom.scrollTo(this.contentX, this.contentY);
+    }
+  }, {
+    key: "$contentYChanged",
+    value: function $contentYChanged() {
+      var _this90 = this;
+
+      if (this.mouseIsDown || this.mouseIsWheel) {
+        if (this.eventTimer) clearTimeout(this.eventTimer);else this.flickStarted();
+        this.eventTimer = setTimeout(function () {
+          _this90.flickEnded();
+          _this90.eventTimer = null;
+        }, 100);
+      }
+      this.dom.scrollTo(this.contentX, this.contentY);
+    }
+  }]);
+
+  return QtQuick_Flickable;
+}(QtQuick_Item);
+
+QtQuick_Flickable.enums = {
+  Flickable: {
+    AutoFlickDirection: 0,
+    AutoFlickIfNeeded: 1,
+    HorizontalFlick: 2,
+    VerticalFlick: 3,
+    HorizontalAndVerticalFlick: 4
+  }
+};
+QtQuick_Flickable.properties = {
+  contentHeight: "real",
+  contentWidth: "real",
+  contentX: "real",
+  contentY: "real",
+  flickableDirection: { type: "enum", initialValue: 0 },
+  interactive: { type: "bool", initialValue: true }
+};
+QtQuick_Flickable.signals = {
+  completed: [],
+  flickStarted: [],
+  flickEnded: []
+};
+
+QmlWeb.registerQmlType(QtQuick_Flickable);
+
+// eslint-disable-next-line no-undef
+
+var QtQuick_FocusScope = function (_QtQuick_Item28) {
+  _inherits(QtQuick_FocusScope, _QtQuick_Item28);
 
   function QtQuick_FocusScope() {
     _classCallCheck(this, QtQuick_FocusScope);
@@ -9228,64 +9658,156 @@ QmlWeb.registerQmlType(QtQuick_FocusScope);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_Image = function (_QtQuick_Item28) {
-  _inherits(QtQuick_Image, _QtQuick_Item28);
+var QtQuick_Gradient = function (_QtQuick_Item29) {
+  _inherits(QtQuick_Gradient, _QtQuick_Item29);
+
+  function QtQuick_Gradient(meta) {
+    _classCallCheck(this, QtQuick_Gradient);
+
+    var _this92 = _possibleConstructorReturn(this, (QtQuick_Gradient.__proto__ || Object.getPrototypeOf(QtQuick_Gradient)).call(this, meta));
+
+    _this92.Gradient = {
+      Vertical: Qt.Vertical,
+      Horizontal: Qt.Horizontal
+    };
+
+    var bg = _this92.impl = document.createElement("div");
+    bg.style.pointerEvents = "none";
+    bg.style.position = "absolute";
+    bg.style.background = "none";
+    bg.style.left = bg.style.right = bg.style.top = bg.style.bottom = "0px";
+
+    var firstChild = _this92.$parent.dom.firstChild;
+    if (firstChild && firstChild.nextSibling) {
+      _this92.$parent.dom.insertBefore(bg, firstChild.nextSibling);
+    } else {
+      _this92.$parent.dom.appendChild(bg);
+    }
+
+    _this92.stopsChanged.connect(_this92, _this92.$stopsChanged);
+    _this92.orientationChanged.connect(_this92, _this92.$orientationChanged);
+    return _this92;
+  }
+
+  _createClass(QtQuick_Gradient, [{
+    key: "applyGradient",
+    value: function applyGradient() {
+      var g_temp = [];
+      //old_pos = 0;
+      for (var i = 0; i < this.stops.length; i++) {
+        g_temp.push(this.stops[i].color + " " + this.stops[i].position * 100 + "%");
+      }
+
+      var g_str = 'none';
+      if (this.orientation === Qt.Vertical) {
+        g_str = "linear-gradient(180deg, " + g_temp.join(',') + ")";
+      } else if (this.orientation === Qt.Horizontal) {
+        g_str = "linear-gradient(90deg, " + g_temp.join(',') + ")";
+      }
+
+      this.impl.style.background = g_str;
+    }
+  }, {
+    key: "$stopsChanged",
+    value: function $stopsChanged() {
+      this.applyGradient();
+    }
+  }, {
+    key: "$orientationChanged",
+    value: function $orientationChanged() {
+      this.applyGradient();
+    }
+  }]);
+
+  return QtQuick_Gradient;
+}(QtQuick_Item);
+
+QtQuick_Gradient.properties = {
+  orientation: "enum",
+  stops: "list"
+};
+QtQuick_Gradient.defaultProperty = "stops";
+
+QmlWeb.registerQmlType(QtQuick_Gradient);
+
+// eslint-disable-next-line no-undef
+
+var QtQuick_Image = function (_QtQuick_Item30) {
+  _inherits(QtQuick_Image, _QtQuick_Item30);
 
   function QtQuick_Image(meta) {
     _classCallCheck(this, QtQuick_Image);
 
-    var _this87 = _possibleConstructorReturn(this, (QtQuick_Image.__proto__ || Object.getPrototypeOf(QtQuick_Image)).call(this, meta));
+    var _this93 = _possibleConstructorReturn(this, (QtQuick_Image.__proto__ || Object.getPrototypeOf(QtQuick_Image)).call(this, meta));
 
-    _this87.sourceSize = new QmlWeb.QObject(_this87);
-    QmlWeb.createProperties(_this87.sourceSize, {
-      width: "int",
-      height: "int"
+    _this93.sourceSize = new QmlWeb.QObject(_this93);
+    QmlWeb.createProperties(_this93.sourceSize, {
+      width: "real",
+      height: "real"
     });
 
-    var bg = _this87.impl = document.createElement("div");
-    bg.style.pointerEvents = "none";
-    bg.style.height = "100%";
-    _this87.dom.appendChild(bg);
+    _this93.dom.style.inset = '0';
+    _this93.dom.style.textAlign = 'center';
 
-    _this87.$img = new Image();
-    _this87.$img.addEventListener("load", function () {
-      var w = _this87.$img.naturalWidth;
-      var h = _this87.$img.naturalHeight;
-      _this87.sourceSize.width = w;
-      _this87.sourceSize.height = h;
-      _this87.implicitWidth = w;
-      _this87.implicitHeight = h;
-      _this87.progress = 1;
-      _this87.status = _this87.Image.Ready;
+    _this93.impl = document.createElement("div");
+    _this93.impl.style.pointerEvents = "none";
+    _this93.impl.style.height = "100%";
+    _this93.impl.style.width = "100%";
+    _this93.dom.appendChild(_this93.impl);
+
+    _this93.$img = new Image();
+    _this93.$img.addEventListener("load", function () {
+      _this93.sourceSize.width = _this93.sourceSize.width > 0 ? _this93.sourceSize.width : _this93.$img.naturalWidth;
+      _this93.sourceSize.height = _this93.sourceSize.height > 0 ? _this93.sourceSize.height : _this93.$img.naturalHeight;
+      _this93.implicitWidth = _this93.sourceSize.width;
+      _this93.implicitHeight = _this93.sourceSize.height;
+      _this93.progress = 1;
+      _this93.status = _this93.Image.Ready;
     });
-    _this87.$img.addEventListener("error", function () {
-      _this87.status = _this87.Image.Error;
+    _this93.$img.addEventListener("error", function () {
+      _this93.status = _this93.Image.Error;
     });
 
-    _this87.sourceChanged.connect(_this87, _this87.$onSourceChanged);
-    _this87.mirrorChanged.connect(_this87, _this87.$onMirrorChanged);
-    _this87.fillModeChanged.connect(_this87, _this87.$onFillModeChanged);
-    _this87.smoothChanged.connect(_this87, _this87.$onSmoothChanged);
-    return _this87;
+    _this93.sourceChanged.connect(_this93, _this93.$onSourceChanged);
+    _this93.mirrorChanged.connect(_this93, _this93.$onMirrorChanged);
+    _this93.fillModeChanged.connect(_this93, _this93.$onFillModeChanged);
+    _this93.smoothChanged.connect(_this93, _this93.$onSmoothChanged);
+
+    _this93.sourceSize.widthChanged.connect(_this93, _this93.$sourceSizeWidthChanged);
+    _this93.sourceSize.heightChanged.connect(_this93, _this93.$sourceSizeHeightChanged);
+
+    _this93.Component.completed.connect(_this93, _this93.Component$onCompleted);
+    return _this93;
   }
 
   _createClass(QtQuick_Image, [{
+    key: "Component$onCompleted",
+    value: function Component$onCompleted() {}
+  }, {
+    key: "$sourceSizeWidthChanged",
+    value: function $sourceSizeWidthChanged() {
+      this.$updateFillMode();
+    }
+  }, {
+    key: "$sourceSizeHeightChanged",
+    value: function $sourceSizeHeightChanged() {
+      this.$updateFillMode();
+    }
+  }, {
     key: "$updateFillMode",
     value: function $updateFillMode() {
-      var val = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.fillMode;
-
       var style = this.impl.style;
-      switch (val) {
+      switch (this.fillMode) {
         default:
         case this.Image.Stretch:
-          style.backgroundRepeat = "auto";
-          style.backgroundSize = "100% 100%";
-          style.backgroundPosition = "auto";
+          style.backgroundRepeat = "no-repeat";
+          style.backgroundSize = this.sourceSize.width + "px " + this.sourceSize.height + "px";
+          style.backgroundPosition = "center";
           break;
         case this.Image.Tile:
-          style.backgroundRepeat = "auto";
-          style.backgroundSize = "auto";
-          style.backgroundPosition = "center";
+          style.backgroundRepeat = "repeat";
+          style.backgroundSize = this.sourceSize.width + "px " + this.sourceSize.height + "px";
+          style.backgroundPosition = "top left";
           break;
         case this.Image.PreserveAspectFit:
           style.backgroundRepeat = "no-repeat";
@@ -9299,12 +9821,12 @@ var QtQuick_Image = function (_QtQuick_Item28) {
           break;
         case this.Image.TileVertically:
           style.backgroundRepeat = "repeat-y";
-          style.backgroundSize = "100% auto";
+          style.backgroundSize = this.sourceSize.width + "px " + this.sourceSize.height + "px";
           style.backgroundPosition = "auto";
           break;
         case this.Image.TileHorizontally:
           style.backgroundRepeat = "repeat-x";
-          style.backgroundSize = "auto 100%";
+          style.backgroundSize = this.sourceSize.width + "px " + this.sourceSize.height + "px";
           style.backgroundPosition = "auto";
           break;
       }
@@ -9312,17 +9834,17 @@ var QtQuick_Image = function (_QtQuick_Item28) {
   }, {
     key: "$onSourceChanged",
     value: function $onSourceChanged(source) {
-      var _this88 = this;
+      var _this94 = this;
 
       this.progress = 0;
       this.status = this.Image.Loading;
+      this.impl.style.backgroundImage = "url(\"" + source + "\")";
       var imageURL = QmlWeb.engine.$resolveImageURL(source);
-      this.impl.style.backgroundImage = "url(\"" + imageURL + "\")";
       this.$img.src = imageURL;
       if (this.$img.complete) {
         setTimeout(function () {
-          _this88.progress = 1;
-          _this88.status = _this88.Image.Ready;
+          _this94.progress = 1;
+          _this94.status = _this94.Image.Ready;
         }, 0);
       }
       this.$updateFillMode();
@@ -9403,8 +9925,8 @@ QmlWeb.registerQmlType(QtQuick_AnimatedImage);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_IntValidator = function (_QtQuick_Item29) {
-  _inherits(QtQuick_IntValidator, _QtQuick_Item29);
+var QtQuick_IntValidator = function (_QtQuick_Item31) {
+  _inherits(QtQuick_IntValidator, _QtQuick_Item31);
 
   function QtQuick_IntValidator() {
     _classCallCheck(this, QtQuick_IntValidator);
@@ -9438,21 +9960,21 @@ QmlWeb.registerQmlType(QtQuick_IntValidator);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_ListElement = function (_QtQml_QtObject17) {
-  _inherits(QtQuick_ListElement, _QtQml_QtObject17);
+var QtQuick_ListElement = function (_QtQml_QtObject18) {
+  _inherits(QtQuick_ListElement, _QtQml_QtObject18);
 
   function QtQuick_ListElement(meta) {
     _classCallCheck(this, QtQuick_ListElement);
 
-    var _this91 = _possibleConstructorReturn(this, (QtQuick_ListElement.__proto__ || Object.getPrototypeOf(QtQuick_ListElement)).call(this, meta));
+    var _this97 = _possibleConstructorReturn(this, (QtQuick_ListElement.__proto__ || Object.getPrototypeOf(QtQuick_ListElement)).call(this, meta));
 
     for (var i in meta.object) {
       if (i[0] !== "$") {
-        QmlWeb.createProperty("variant", _this91, i);
+        QmlWeb.createProperty("variant", _this97, i);
       }
     }
-    QmlWeb.applyProperties(meta.object, _this91, _this91, _this91.$context);
-    return _this91;
+    QmlWeb.applyProperties(meta.object, _this97, _this97, _this97.$context);
+    return _this97;
   }
 
   return QtQuick_ListElement;
@@ -9480,25 +10002,25 @@ QmlWeb.registerQmlType(QtQml_Models_ListElement);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_ListModel = function (_QtQml_QtObject18) {
-  _inherits(QtQuick_ListModel, _QtQml_QtObject18);
+var QtQuick_ListModel = function (_QtQml_QtObject19) {
+  _inherits(QtQuick_ListModel, _QtQml_QtObject19);
 
   function QtQuick_ListModel(meta) {
     _classCallCheck(this, QtQuick_ListModel);
 
-    var _this93 = _possibleConstructorReturn(this, (QtQuick_ListModel.__proto__ || Object.getPrototypeOf(QtQuick_ListModel)).call(this, meta));
+    var _this99 = _possibleConstructorReturn(this, (QtQuick_ListModel.__proto__ || Object.getPrototypeOf(QtQuick_ListModel)).call(this, meta));
 
-    _this93.$firstItem = true;
-    _this93.$itemsChanged.connect(_this93, _this93.$on$itemsChanged);
-    _this93.$model = new QmlWeb.JSItemModel();
-    _this93.$model.data = function (index, role) {
-      return _this93.$items[index][role];
+    _this99.$firstItem = true;
+    _this99.$itemsChanged.connect(_this99, _this99.$on$itemsChanged);
+    _this99.$model = new QmlWeb.JSItemModel();
+    _this99.$model.data = function (index, role) {
+      return _this99.$items[index][role];
     };
-    _this93.$model.rowCount = function () {
-      return _this93.$items.length;
+    _this99.$model.rowCount = function () {
+      return _this99.$items.length;
     };
 
-    return _this93;
+    return _this99;
   }
 
   _createClass(QtQuick_ListModel, [{
@@ -9621,22 +10143,22 @@ QmlWeb.registerQmlType(QtQml_Models_ListModel);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_Loader = function (_QtQuick_Item30) {
-  _inherits(QtQuick_Loader, _QtQuick_Item30);
+var QtQuick_Loader = function (_QtQuick_Item32) {
+  _inherits(QtQuick_Loader, _QtQuick_Item32);
 
   function QtQuick_Loader(meta) {
     _classCallCheck(this, QtQuick_Loader);
 
-    var _this95 = _possibleConstructorReturn(this, (QtQuick_Loader.__proto__ || Object.getPrototypeOf(QtQuick_Loader)).call(this, meta));
+    var _this101 = _possibleConstructorReturn(this, (QtQuick_Loader.__proto__ || Object.getPrototypeOf(QtQuick_Loader)).call(this, meta));
 
-    _this95.$sourceUrl = "";
+    _this101.$sourceUrl = "";
 
-    _this95.activeChanged.connect(_this95, _this95.$onActiveChanged);
-    _this95.sourceChanged.connect(_this95, _this95.$onSourceChanged);
-    _this95.sourceComponentChanged.connect(_this95, _this95.$onSourceComponentChanged);
-    _this95.widthChanged.connect(_this95, _this95.$updateGeometry);
-    _this95.heightChanged.connect(_this95, _this95.$updateGeometry);
-    return _this95;
+    _this101.activeChanged.connect(_this101, _this101.$onActiveChanged);
+    _this101.sourceChanged.connect(_this101, _this101.$onSourceChanged);
+    _this101.sourceComponentChanged.connect(_this101, _this101.$onSourceComponentChanged);
+    _this101.widthChanged.connect(_this101, _this101.$updateGeometry);
+    _this101.heightChanged.connect(_this101, _this101.$updateGeometry);
+    return _this101;
   }
 
   _createClass(QtQuick_Loader, [{
@@ -9779,85 +10301,151 @@ QmlWeb.registerQmlType(QtQuick_Loader);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_MouseArea = function (_QtQuick_Item31) {
-  _inherits(QtQuick_MouseArea, _QtQuick_Item31);
+var QtQuick_MouseArea = function (_QtQuick_Item33) {
+  _inherits(QtQuick_MouseArea, _QtQuick_Item33);
 
   function QtQuick_MouseArea(meta) {
     _classCallCheck(this, QtQuick_MouseArea);
 
-    var _this96 = _possibleConstructorReturn(this, (QtQuick_MouseArea.__proto__ || Object.getPrototypeOf(QtQuick_MouseArea)).call(this, meta));
+    var _this102 = _possibleConstructorReturn(this, (QtQuick_MouseArea.__proto__ || Object.getPrototypeOf(QtQuick_MouseArea)).call(this, meta));
 
-    _this96.dom.style.pointerEvents = "all";
+    _this102.dom.style.pointerEvents = "all";
+    _this102.dom.style.overflow = "scroll";
 
+    areaList = [];
+    _this102.fillAreaList = function (e) {
+      var item = _this102.parent;
+      while (item.parent) {
+        item = item.parent;
+      }
+      _this102.areaList = [];
+      allEvent = function (_allEvent) {
+        function allEvent(_x21) {
+          return _allEvent.apply(this, arguments);
+        }
+
+        allEvent.toString = function () {
+          return _allEvent.toString();
+        };
+
+        return allEvent;
+      }(function (item) {
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
+
+        try {
+          for (var _iterator2 = item.children[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var child = _step2.value;
+
+            if (child instanceof QtQuick_MouseArea && child != _this102) {
+              var rect = child.dom.getBoundingClientRect();
+              if (e.x >= rect.left && e.x <= rect.right && e.y >= rect.top && e.y <= rect.bottom) {
+                _this102.areaList.push(child);
+              }
+            }
+            allEvent(child);
+          }
+        } catch (err) {
+          _didIteratorError2 = true;
+          _iteratorError2 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+              _iterator2.return();
+            }
+          } finally {
+            if (_didIteratorError2) {
+              throw _iteratorError2;
+            }
+          }
+        }
+      });
+      allEvent(item);
+    };
     // IE does not handle mouse clicks to transparent divs, so we have
     // to set a background color and make it invisible using opacity
     // as that doesn't affect the mouse handling.
-    _this96.dom.style.backgroundColor = "white";
-    _this96.dom.style.opacity = 0;
+    _this102.dom.style.backgroundColor = "white";
+    _this102.dom.style.opacity = 0;
 
-    _this96.cursorShapeChanged.connect(_this96, _this96.$onCursorShapeChanged);
+    _this102.cursorShapeChanged.connect(_this102, _this102.$onCursorShapeChanged);
 
-    _this96.dom.addEventListener("click", function (e) {
-      return _this96.$handleClick(e);
+    _this102.dom.addEventListener("click", function (e) {
+      _this102.fillAreaList(e);
+      _this102.$handleClick(e);
     });
-    _this96.dom.addEventListener("contextmenu", function (e) {
-      return _this96.$handleClick(e);
+    _this102.dom.addEventListener("contextmenu", function (e) {
+      _this102.fillAreaList(e);
+      _this102.$handleClick(e);
     });
     var handleMouseMove = function handleMouseMove(e) {
-      if (!_this96.enabled || !_this96.hoverEnabled && !_this96.pressed) return;
-      _this96.$handlePositionChanged(e);
+      if (!_this102.enabled || !_this102.hoverEnabled && !_this102.pressed) return;
+      _this102.$handlePositionChanged(e);
     };
     var handleMouseUp = function handleMouseUp(e) {
-      var mouse = _this96.$eventToMouse(e);
-      _this96.pressed = false;
-      _this96.containsPress = false;
-      _this96.pressedButtons = 0;
-      _this96.released(mouse);
+      var mouse = _this102.$eventToMouse(e);
+      _this102.pressed = false;
+      _this102.containsPress = false;
+      _this102.pressedButtons = 0;
+      _this102.released(mouse);
       document.removeEventListener("mouseup", handleMouseUp);
-      _this96.$clientTransform = undefined;
+      _this102.$clientTransform = undefined;
       document.removeEventListener("mousemove", handleMouseMove);
     };
-    _this96.dom.addEventListener("mousedown", function (e) {
-      if (!_this96.enabled) return;
+    _this102.dom.addEventListener("mousedown", function (e) {
+      if (!_this102.enabled) return;
       // Handle scale and translate transformations
-      var boundingRect = _this96.dom.getBoundingClientRect();
-      _this96.$clientTransform = {
+      var boundingRect = _this102.dom.getBoundingClientRect();
+      _this102.$clientTransform = {
         x: boundingRect.left,
         y: boundingRect.top,
-        xScale: _this96.width ? (boundingRect.right - boundingRect.left) / _this96.width : 1,
-        yScale: _this96.height ? (boundingRect.bottom - boundingRect.top) / _this96.height : 1
+        xScale: _this102.width ? (boundingRect.right - boundingRect.left) / _this102.width : 1,
+        yScale: _this102.height ? (boundingRect.bottom - boundingRect.top) / _this102.height : 1
       };
-      var mouse = _this96.$eventToMouse(e);
-      _this96.mouseX = mouse.x;
-      _this96.mouseY = mouse.y;
-      _this96.pressed = true;
-      _this96.containsPress = true;
-      _this96.pressedButtons = mouse.button;
-      _this96.$Signals.pressed(mouse);
+      var mouse = _this102.$eventToMouse(e);
+      _this102.mouseX = mouse.x;
+      _this102.mouseY = mouse.y;
+      _this102.pressed = true;
+      _this102.containsPress = true;
+      _this102.pressedButtons = mouse.button;
+      _this102.$Signals.pressed(mouse);
       document.addEventListener("mouseup", handleMouseUp);
       document.addEventListener("mousemove", handleMouseMove);
     });
-    _this96.dom.addEventListener("mouseover", function () {
-      _this96.containsMouse = true;
-      _this96.containsPress = _this96.pressed;
-      _this96.entered();
+    _this102.dom.addEventListener("mouseover", function () {
+      _this102.containsMouse = true;
+      _this102.containsPress = _this102.pressed;
+      _this102.entered();
     });
-    _this96.dom.addEventListener("mouseout", function () {
-      _this96.containsMouse = false;
-      _this96.containsPress = false;
-      _this96.exited();
+    _this102.dom.addEventListener("mouseout", function () {
+      _this102.containsMouse = false;
+      _this102.containsPress = false;
+      _this102.exited();
     });
     // This is to emit positionChanged for `hoverEnabled` only. When `pressed`,
     // `positionChanged` is handled by a temporary `mousemove` event listener
     // on `document`.
-    _this96.dom.addEventListener("mousemove", function (e) {
-      if (!_this96.enabled || !_this96.hoverEnabled || _this96.pressed) return;
-      _this96.$handlePositionChanged(e);
+
+    _this102.dom.addEventListener("mousemove", function (e) {
+      if (!_this102.enabled || !_this102.hoverEnabled || _this102.pressed) return;
+      _this102.$handlePositionChanged(e);
     });
-    _this96.dom.addEventListener("wheel", function (e) {
-      _this96.$handleWheel(e);
+
+    _this102.dom.addEventListener("wheel", function (e) {
+      _this102.fillAreaList(e);
+      _this102.$handleWheel(e);
     });
-    return _this96;
+
+    var bg = _this102.impl = document.createElement("div");
+    bg.style.pointerEvents = "none";
+    bg.style.position = "absolute";
+    bg.style.left = bg.style.top = "0px";
+    bg.style.width = '101%';
+    bg.style.height = '101%';
+    bg.style.background = "none";
+    _this102.dom.appendChild(bg);
+    return _this102;
   }
 
   _createClass(QtQuick_MouseArea, [{
@@ -9882,17 +10470,46 @@ var QtQuick_MouseArea = function (_QtQuick_Item31) {
 
       this.wheel(wheel);
 
-      if (wheel.accepted) {
-        e.stopPropagation();
+      if (wheel.accepted || !this.propagateComposedEvents) {
+        //e.stopPropagation();
         e.preventDefault();
+      } else {
+        var i = 0;
+        var stop = false;
+        while (!stop && i < this.areaList.length) {
+          stop = this.areaList[i];
+          tempWheel = this.areaList[i].$eventToMouse(e);
+          tempWheel.accepted = false;
+          this.areaList[i].wheel(tempWheel);
+          stop = tempWheel.accepted || this.areaList[i].propagateComposedEvents;
+          i++;
+        }
       }
     }
   }, {
     key: "$handleClick",
     value: function $handleClick(e) {
       var mouse = this.$eventToMouse(e);
+      mouse.accepted = false;
+
       if (this.enabled && this.acceptedButtons & mouse.button) {
         this.clicked(mouse);
+
+        if (mouse.accepted || !this.propagateComposedEvents) {
+          //e.stopPropagation();
+          e.preventDefault();
+        } else {
+          var i = 0;
+          var stop = false;
+          while (!stop && i < this.areaList.length) {
+            stop = this.areaList[i];
+            tempMouse = this.areaList[i].$eventToMouse(e);
+            tempMouse.accepted = false;
+            this.areaList[i].clicked(tempMouse);
+            stop = tempMouse.accepted || this.areaList[i].propagateComposedEvents;
+            i++;
+          }
+        }
       }
       // This decides whether to show the browser's context menu on right click or
       // not
@@ -9989,7 +10606,8 @@ QtQuick_MouseArea.properties = {
   containsMouse: "bool",
   containsPress: "bool",
   pressedButtons: { type: "variant", initialValue: 0 },
-  cursorShape: "enum" // Qt.ArrowCursor
+  cursorShape: "enum", // Qt.ArrowCursor
+  propagateComposedEvents: { type: "bool", initialValue: false }
 };
 QtQuick_MouseArea.signals = {
   canceled: [],
@@ -10032,21 +10650,21 @@ var QtQuick_ParallelAnimation = function (_QtQuick_Animation2) {
   function QtQuick_ParallelAnimation(meta) {
     _classCallCheck(this, QtQuick_ParallelAnimation);
 
-    var _this98 = _possibleConstructorReturn(this, (QtQuick_ParallelAnimation.__proto__ || Object.getPrototypeOf(QtQuick_ParallelAnimation)).call(this, meta));
+    var _this104 = _possibleConstructorReturn(this, (QtQuick_ParallelAnimation.__proto__ || Object.getPrototypeOf(QtQuick_ParallelAnimation)).call(this, meta));
 
-    _this98.$runningAnimations = 0;
+    _this104.$runningAnimations = 0;
 
-    _this98.animationsChanged.connect(_this98, _this98.$onAnimationsChanged);
+    _this104.animationsChanged.connect(_this104, _this104.$onAnimationsChanged);
 
     QmlWeb.engine.$registerStart(function () {
-      if (!_this98.running) return;
+      if (!_this104.running) return;
       self.running = false; // toggled back by start();
       self.start();
     });
     QmlWeb.engine.$registerStop(function () {
-      return _this98.stop();
+      return _this104.stop();
     });
-    return _this98;
+    return _this104;
   }
 
   _createClass(QtQuick_ParallelAnimation, [{
@@ -10112,15 +10730,15 @@ var QtQuick_PauseAnimation = function (_QtQuick_Animation3) {
   function QtQuick_PauseAnimation(meta) {
     _classCallCheck(this, QtQuick_PauseAnimation);
 
-    var _this99 = _possibleConstructorReturn(this, (QtQuick_PauseAnimation.__proto__ || Object.getPrototypeOf(QtQuick_PauseAnimation)).call(this, meta));
+    var _this105 = _possibleConstructorReturn(this, (QtQuick_PauseAnimation.__proto__ || Object.getPrototypeOf(QtQuick_PauseAnimation)).call(this, meta));
 
-    _this99.$at = 0;
+    _this105.$at = 0;
 
     QmlWeb.engine.$addTicker(function () {
-      return _this99.$ticker.apply(_this99, arguments);
+      return _this105.$ticker.apply(_this105, arguments);
     });
-    _this99.runningChanged.connect(_this99, _this99.$onRunningChanged);
-    return _this99;
+    _this105.runningChanged.connect(_this105, _this105.$onRunningChanged);
+    return _this105;
   }
 
   _createClass(QtQuick_PauseAnimation, [{
@@ -10142,11 +10760,6 @@ var QtQuick_PauseAnimation = function (_QtQuick_Animation3) {
         this.paused = false;
       }
     }
-  }, {
-    key: "complete",
-    value: function complete() {
-      this.running = false;
-    }
   }]);
 
   return QtQuick_PauseAnimation;
@@ -10160,19 +10773,19 @@ QmlWeb.registerQmlType(QtQuick_PauseAnimation);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_Positioner = function (_QtQuick_Item32) {
-  _inherits(QtQuick_Positioner, _QtQuick_Item32);
+var QtQuick_Positioner = function (_QtQuick_Item34) {
+  _inherits(QtQuick_Positioner, _QtQuick_Item34);
 
   function QtQuick_Positioner(meta) {
     _classCallCheck(this, QtQuick_Positioner);
 
-    var _this100 = _possibleConstructorReturn(this, (QtQuick_Positioner.__proto__ || Object.getPrototypeOf(QtQuick_Positioner)).call(this, meta));
+    var _this106 = _possibleConstructorReturn(this, (QtQuick_Positioner.__proto__ || Object.getPrototypeOf(QtQuick_Positioner)).call(this, meta));
 
-    _this100.childrenChanged.connect(_this100, _this100.$onChildrenChanged);
-    _this100.spacingChanged.connect(_this100, _this100.layoutChildren);
-    _this100.childrenChanged.connect(_this100, _this100.layoutChildren);
-    _this100.layoutChildren();
-    return _this100;
+    _this106.childrenChanged.connect(_this106, _this106.$onChildrenChanged);
+    _this106.spacingChanged.connect(_this106, _this106.layoutChildren);
+    _this106.childrenChanged.connect(_this106, _this106.layoutChildren);
+    _this106.layoutChildren();
+    return _this106;
   }
 
   _createClass(QtQuick_Positioner, [{
@@ -10248,14 +10861,14 @@ var QtQuick_Flow = function (_QtQuick_Positioner2) {
   function QtQuick_Flow(meta) {
     _classCallCheck(this, QtQuick_Flow);
 
-    var _this102 = _possibleConstructorReturn(this, (QtQuick_Flow.__proto__ || Object.getPrototypeOf(QtQuick_Flow)).call(this, meta));
+    var _this108 = _possibleConstructorReturn(this, (QtQuick_Flow.__proto__ || Object.getPrototypeOf(QtQuick_Flow)).call(this, meta));
 
-    _this102.flowChanged.connect(_this102, _this102.layoutChildren);
-    _this102.layoutDirectionChanged.connect(_this102, _this102.layoutChildren);
-    _this102.widthChanged.connect(_this102, _this102.layoutChildren);
-    _this102.heightChanged.connect(_this102, _this102.layoutChildren);
-    _this102.layoutChildren();
-    return _this102;
+    _this108.flowChanged.connect(_this108, _this108.layoutChildren);
+    _this108.layoutDirectionChanged.connect(_this108, _this108.layoutChildren);
+    _this108.widthChanged.connect(_this108, _this108.layoutChildren);
+    _this108.heightChanged.connect(_this108, _this108.layoutChildren);
+    _this108.layoutChildren();
+    return _this108;
   }
 
   _createClass(QtQuick_Flow, [{
@@ -10331,14 +10944,14 @@ var QtQuick_Grid = function (_QtQuick_Positioner3) {
   function QtQuick_Grid(meta) {
     _classCallCheck(this, QtQuick_Grid);
 
-    var _this103 = _possibleConstructorReturn(this, (QtQuick_Grid.__proto__ || Object.getPrototypeOf(QtQuick_Grid)).call(this, meta));
+    var _this109 = _possibleConstructorReturn(this, (QtQuick_Grid.__proto__ || Object.getPrototypeOf(QtQuick_Grid)).call(this, meta));
 
-    _this103.columnsChanged.connect(_this103, _this103.layoutChildren);
-    _this103.rowsChanged.connect(_this103, _this103.layoutChildren);
-    _this103.flowChanged.connect(_this103, _this103.layoutChildren);
-    _this103.layoutDirectionChanged.connect(_this103, _this103.layoutChildren);
-    _this103.layoutChildren();
-    return _this103;
+    _this109.columnsChanged.connect(_this109, _this109.layoutChildren);
+    _this109.rowsChanged.connect(_this109, _this109.layoutChildren);
+    _this109.flowChanged.connect(_this109, _this109.layoutChildren);
+    _this109.layoutDirectionChanged.connect(_this109, _this109.layoutChildren);
+    _this109.layoutChildren();
+    return _this109;
   }
 
   _createClass(QtQuick_Grid, [{
@@ -10504,36 +11117,36 @@ var QtQuick_PropertyAnimation = function (_QtQuick_Animation4) {
   function QtQuick_PropertyAnimation(meta) {
     _classCallCheck(this, QtQuick_PropertyAnimation);
 
-    var _this104 = _possibleConstructorReturn(this, (QtQuick_PropertyAnimation.__proto__ || Object.getPrototypeOf(QtQuick_PropertyAnimation)).call(this, meta));
+    var _this110 = _possibleConstructorReturn(this, (QtQuick_PropertyAnimation.__proto__ || Object.getPrototypeOf(QtQuick_PropertyAnimation)).call(this, meta));
 
-    _this104.easing = new QmlWeb.QObject(_this104);
-    QmlWeb.createProperties(_this104.easing, {
-      type: { type: "enum", initialValue: _this104.Easing.Linear },
+    _this110.easing = new QmlWeb.QObject(_this110);
+    QmlWeb.createProperties(_this110.easing, {
+      type: { type: "enum", initialValue: _this110.Easing.Linear },
       amplitude: { type: "real", initialValue: 1 },
       overshoot: { type: "real", initialValue: 1.70158 },
       period: { type: "real", initialValue: 0.3 },
       bezierCurve: "list"
     });
 
-    _this104.easing.$valueForProgress = function (t) {
+    _this110.easing.$valueForProgress = function (t) {
       return QmlWeb.$ease(this.type, this.period, this.amplitude, this.overshoot, t);
     };
 
-    _this104.$props = [];
-    _this104.$targets = [];
-    _this104.$actions = [];
+    _this110.$props = [];
+    _this110.$targets = [];
+    _this110.$actions = [];
 
-    _this104.targetChanged.connect(_this104, _this104.$redoTargets);
-    _this104.targetsChanged.connect(_this104, _this104.$redoTargets);
-    _this104.propertyChanged.connect(_this104, _this104.$redoProperties);
-    _this104.propertiesChanged.connect(_this104, _this104.$redoProperties);
+    _this110.targetChanged.connect(_this110, _this110.$redoTargets);
+    _this110.targetsChanged.connect(_this110, _this110.$redoTargets);
+    _this110.propertyChanged.connect(_this110, _this110.$redoProperties);
+    _this110.propertiesChanged.connect(_this110, _this110.$redoProperties);
 
     if (meta.object.$on !== undefined) {
-      _this104.property = meta.object.$on;
-      _this104.target = _this104.$parent;
-      _this104.running = true;
+      _this110.property = meta.object.$on;
+      _this110.target = _this110.$parent;
+      _this110.running = true;
     }
-    return _this104;
+    return _this110;
   }
 
   _createClass(QtQuick_PropertyAnimation, [{
@@ -10604,16 +11217,16 @@ var QtQuick_NumberAnimation = function (_QtQuick_PropertyAnim) {
   function QtQuick_NumberAnimation(meta) {
     _classCallCheck(this, QtQuick_NumberAnimation);
 
-    var _this105 = _possibleConstructorReturn(this, (QtQuick_NumberAnimation.__proto__ || Object.getPrototypeOf(QtQuick_NumberAnimation)).call(this, meta));
+    var _this111 = _possibleConstructorReturn(this, (QtQuick_NumberAnimation.__proto__ || Object.getPrototypeOf(QtQuick_NumberAnimation)).call(this, meta));
 
-    _this105.$at = 0;
-    _this105.$loop = 0;
+    _this111.$at = 0;
+    _this111.$loop = 0;
 
     QmlWeb.engine.$addTicker(function () {
-      return _this105.$ticker.apply(_this105, arguments);
+      return _this111.$ticker.apply(_this111, arguments);
     });
-    _this105.runningChanged.connect(_this105, _this105.$onRunningChanged);
-    return _this105;
+    _this111.runningChanged.connect(_this111, _this111.$onRunningChanged);
+    return _this111;
   }
 
   _createClass(QtQuick_NumberAnimation, [{
@@ -10671,6 +11284,8 @@ var QtQuick_NumberAnimation = function (_QtQuick_PropertyAnim) {
       this.$loop++;
       if (this.$loop === this.loops) {
         this.running = false;
+        this.stopped();
+        this.finished();
       } else if (!this.running) {
         this.$actions = [];
       } else {
@@ -10686,16 +11301,16 @@ QmlWeb.registerQmlType(QtQuick_NumberAnimation);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_PropertyChanges = function (_QtQml_QtObject19) {
-  _inherits(QtQuick_PropertyChanges, _QtQml_QtObject19);
+var QtQuick_PropertyChanges = function (_QtQml_QtObject20) {
+  _inherits(QtQuick_PropertyChanges, _QtQml_QtObject20);
 
   function QtQuick_PropertyChanges(meta) {
     _classCallCheck(this, QtQuick_PropertyChanges);
 
-    var _this106 = _possibleConstructorReturn(this, (QtQuick_PropertyChanges.__proto__ || Object.getPrototypeOf(QtQuick_PropertyChanges)).call(this, meta));
+    var _this112 = _possibleConstructorReturn(this, (QtQuick_PropertyChanges.__proto__ || Object.getPrototypeOf(QtQuick_PropertyChanges)).call(this, meta));
 
-    _this106.$actions = [];
-    return _this106;
+    _this112.$actions = [];
+    return _this112;
   }
 
   _createClass(QtQuick_PropertyChanges, [{
@@ -10718,22 +11333,23 @@ QmlWeb.registerQmlType(QtQuick_PropertyChanges);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_Rectangle = function (_QtQuick_Item33) {
-  _inherits(QtQuick_Rectangle, _QtQuick_Item33);
+var QtQuick_Rectangle = function (_QtQuick_Item35) {
+  _inherits(QtQuick_Rectangle, _QtQuick_Item35);
 
   function QtQuick_Rectangle(meta) {
     _classCallCheck(this, QtQuick_Rectangle);
 
-    var _this107 = _possibleConstructorReturn(this, (QtQuick_Rectangle.__proto__ || Object.getPrototypeOf(QtQuick_Rectangle)).call(this, meta));
+    //this.parent = meta.parent
+    var _this113 = _possibleConstructorReturn(this, (QtQuick_Rectangle.__proto__ || Object.getPrototypeOf(QtQuick_Rectangle)).call(this, meta));
 
-    _this107.border = new QmlWeb.QObject(_this107);
-    QmlWeb.createProperties(_this107.border, {
+    _this113.border = new QmlWeb.QObject(_this113);
+    QmlWeb.createProperties(_this113.border, {
       color: { type: "color", initialValue: "black" },
       width: { type: "int", initialValue: 1 }
     });
-    _this107.$borderActive = false;
+    _this113.$borderActive = false;
 
-    var bg = _this107.impl = document.createElement("div");
+    var bg = _this113.impl = document.createElement("div");
     bg.style.pointerEvents = "none";
     bg.style.position = "relative";
     bg.style.width = "100%";
@@ -10741,20 +11357,28 @@ var QtQuick_Rectangle = function (_QtQuick_Item33) {
     bg.style.left = bg.style.right = bg.style.top = bg.style.bottom = "0px";
     bg.style.borderWidth = "0px";
     bg.style.borderStyle = "solid";
-    bg.style.borderColor = _this107.border.color.$css;
-    bg.style.backgroundColor = _this107.color.$css;
-    _this107.dom.appendChild(bg);
+    bg.style.boxSizing = "border-box";
+    bg.style.borderColor = _this113.border.color.$css;
+    bg.style.backgroundColor = _this113.color.$css;
+    _this113.dom.appendChild(bg);
 
-    _this107.colorChanged.connect(_this107, _this107.$onColorChanged);
-    _this107.radiusChanged.connect(_this107, _this107.$onRadiusChanged);
-    _this107.border.colorChanged.connect(_this107, _this107.border$onColorChanged);
-    _this107.border.widthChanged.connect(_this107, _this107.border$onWidthChanged);
-    _this107.widthChanged.connect(_this107, _this107.$updateBorder);
-    _this107.heightChanged.connect(_this107, _this107.$updateBorder);
-    return _this107;
+    _this113.colorChanged.connect(_this113, _this113.$onColorChanged);
+    _this113.radiusChanged.connect(_this113, _this113.$onRadiusChanged);
+    _this113.border.colorChanged.connect(_this113, _this113.border$onColorChanged);
+    _this113.border.widthChanged.connect(_this113, _this113.border$onWidthChanged);
+    _this113.widthChanged.connect(_this113, _this113.$updateBorder);
+    _this113.heightChanged.connect(_this113, _this113.$updateBorder);
+
+    _this113.gradientChanged.connect(_this113, _this113.gradientApply);
+    return _this113;
   }
 
   _createClass(QtQuick_Rectangle, [{
+    key: "gradientApply",
+    value: function gradientApply() {
+      this.gradient.$createObject(this);
+    }
+  }, {
     key: "$onColorChanged",
     value: function $onColorChanged(newVal) {
       this.impl.style.backgroundColor = newVal.$css;
@@ -10796,6 +11420,7 @@ var QtQuick_Rectangle = function (_QtQuick_Item33) {
 }(QtQuick_Item);
 
 QtQuick_Rectangle.properties = {
+  gradient: "Component",
   color: { type: "color", initialValue: "white" },
   radius: "real"
 };
@@ -10804,16 +11429,26 @@ QmlWeb.registerQmlType(QtQuick_Rectangle);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_RegExpValidator = function (_QtQuick_Item34) {
-  _inherits(QtQuick_RegExpValidator, _QtQuick_Item34);
+var QtQuick_RegExpValidator = function (_QtQml_QtObject21) {
+  _inherits(QtQuick_RegExpValidator, _QtQml_QtObject21);
 
-  function QtQuick_RegExpValidator() {
+  function QtQuick_RegExpValidator(meta) {
     _classCallCheck(this, QtQuick_RegExpValidator);
 
-    return _possibleConstructorReturn(this, (QtQuick_RegExpValidator.__proto__ || Object.getPrototypeOf(QtQuick_RegExpValidator)).apply(this, arguments));
+    var _this114 = _possibleConstructorReturn(this, (QtQuick_RegExpValidator.__proto__ || Object.getPrototypeOf(QtQuick_RegExpValidator)).call(this, meta));
+
+    _this114.parent = meta.parent;
+    _this114.regExpChanged.connect(_this114, _this114.$regExpChanged);
+    //this.$parent.stops.push({position: this.position, color: this.color})
+    return _this114;
   }
 
   _createClass(QtQuick_RegExpValidator, [{
+    key: "$regExpChanged",
+    value: function $regExpChanged() {
+      //this.parent.impl.pattern = this.regExp
+    }
+  }, {
     key: "validate",
     value: function validate(string) {
       if (!this.regExp) return true;
@@ -10822,7 +11457,7 @@ var QtQuick_RegExpValidator = function (_QtQuick_Item34) {
   }]);
 
   return QtQuick_RegExpValidator;
-}(QtQuick_Item);
+}(QtQml_QtObject);
 
 QtQuick_RegExpValidator.properties = {
   regExp: "var"
@@ -10832,30 +11467,30 @@ QmlWeb.registerQmlType(QtQuick_RegExpValidator);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_Repeater = function (_QtQuick_Item35) {
-  _inherits(QtQuick_Repeater, _QtQuick_Item35);
+var QtQuick_Repeater = function (_QtQuick_Item36) {
+  _inherits(QtQuick_Repeater, _QtQuick_Item36);
 
   function QtQuick_Repeater(meta) {
     _classCallCheck(this, QtQuick_Repeater);
 
-    var _this109 = _possibleConstructorReturn(this, (QtQuick_Repeater.__proto__ || Object.getPrototypeOf(QtQuick_Repeater)).call(this, meta));
+    var _this115 = _possibleConstructorReturn(this, (QtQuick_Repeater.__proto__ || Object.getPrototypeOf(QtQuick_Repeater)).call(this, meta));
 
-    _this109.parent = meta.parent;
+    _this115.parent = meta.parent;
     // TODO: some (all ?) of the components including Repeater needs to know own
     // parent at creation time. Please consider this major change.
 
-    _this109.$completed = false;
-    _this109.$items = []; // List of created items
+    _this115.$completed = false;
+    _this115.$items = []; // List of created items
 
-    _this109.modelChanged.connect(_this109, _this109.$onModelChanged);
-    _this109.delegateChanged.connect(_this109, _this109.$onDelegateChanged);
-    _this109.parentChanged.connect(_this109, _this109.$onParentChanged);
-    return _this109;
+    _this115.modelChanged.connect(_this115, _this115.$onModelChanged);
+    _this115.delegateChanged.connect(_this115, _this115.$onDelegateChanged);
+    _this115.parentChanged.connect(_this115, _this115.$onParentChanged);
+    return _this115;
   }
 
   _createClass(QtQuick_Repeater, [{
-    key: "container",
-    value: function container() {
+    key: "_container",
+    value: function _container() {
       return this.parent;
     }
   }, {
@@ -11038,7 +11673,7 @@ var QtQuick_Repeater = function (_QtQuick_Item35) {
       }
 
       if (index > 0) {
-        this.container().childrenChanged();
+        this._container().childrenChanged();
       }
 
       for (var _i12 = endIndex; _i12 < this.$items.length; _i12++) {
@@ -11082,30 +11717,371 @@ QmlWeb.registerQmlType(QtQuick_Repeater);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_ListView = function (_QtQuick_Repeater) {
-  _inherits(QtQuick_ListView, _QtQuick_Repeater);
+var QtQuick_GridView = function (_QtQuick_Repeater) {
+  _inherits(QtQuick_GridView, _QtQuick_Repeater);
 
-  function QtQuick_ListView(meta) {
-    _classCallCheck(this, QtQuick_ListView);
+  function QtQuick_GridView(meta) {
+    _classCallCheck(this, QtQuick_GridView);
 
-    var _this110 = _possibleConstructorReturn(this, (QtQuick_ListView.__proto__ || Object.getPrototypeOf(QtQuick_ListView)).call(this, meta));
+    var _this116 = _possibleConstructorReturn(this, (QtQuick_GridView.__proto__ || Object.getPrototypeOf(QtQuick_GridView)).call(this, meta));
 
-    _this110.ListView = {
-      Vertical: Qt.Vertical,
-      Horizontal: Qt.Horizontal
-    };
-    _this110.modelChanged.connect(_this110, _this110.$styleChanged);
-    _this110.delegateChanged.connect(_this110, _this110.$styleChanged);
-    _this110.orientationChanged.connect(_this110, _this110.$styleChanged);
-    _this110.spacingChanged.connect(_this110, _this110.$styleChanged);
-    _this110._childrenInserted.connect(_this110, _this110.$applyStyleOnItem);
-    return _this110;
+    _this116.modelChanged.connect(_this116, _this116.$styleChanged);
+    _this116.delegateChanged.connect(_this116, _this116.$styleChanged);
+    _this116._childrenInserted.connect(_this116, _this116.$applyStyleOnItem);
+    _this116.enabledChanged.connect(_this116, _this116.$enabledChanged);
+    _this116.currentIndexChanged.connect(_this116, _this116.$currentIndexChanged);
+    _this116.highlightFollowsCurrentItemChanged.connect(_this116, _this116.$highlightFollowsCurrentItemChanged);
+
+    _this116.dom.style.pointerEvents = "all";
+    _this116.dom.style.overflow = "hidden";
+    _this116.dom.style.whiteSpace = "nowrap";
+    _this116.dom.style.display = "flex";
+    _this116.dom.style.flexWrap = "wrap";
+
+    var bg = _this116.impl = document.createElement("div");
+    bg.style.pointerEvents = "none";
+    bg.style.position = "absolute";
+    bg.style.left = bg.style.right = bg.style.top = bg.style.bottom = "0px";
+    bg.style.background = "none";
+    _this116.dom.appendChild(bg);
+
+    _this116.isDragging = false;
+    _this116.mouseIsDown = false;
+    _this116.curSX = 0;
+    _this116.curSY = 0;
+    _this116.dom.addEventListener("mousedown", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      _this116.mouseIsDown = true;
+      _this116.curSX = e.pageX;
+      _this116.curSY = e.pageY;
+
+      //this.dom.classList.add("unselectable");
+    });
+    _this116.dom.addEventListener("mouseup", function (e) {
+      //e.stopPropagation();
+      e.preventDefault();
+      setTimeout(function () {
+        _this116.$onAllMouseEvent();
+      }, 100);
+      _this116.isDragging = false;
+      _this116.mouseIsDown = false;
+      _this116.dom.classList.remove("unselectable");
+      _this116.$contentXYChanged();
+    });
+    _this116.dom.addEventListener("mouseleave", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      setTimeout(function () {
+        _this116.$onAllMouseEvent();
+      }, 100);
+      _this116.isDragging = false;
+      _this116.mouseIsDown = false;
+      _this116.dom.classList.remove("unselectable");
+      _this116.$contentXYChanged();
+    });
+    _this116.dom.addEventListener("mousemove", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (_this116.mouseIsDown && _this116.enabled) {
+        _this116.dom.classList.add("unselectable");
+        _this116.$offAllMouseEvent();
+        _this116.isDragging = true;
+        if (_this116.interactive) {
+          _this116.dom.scrollBy(_this116.flow === GridView.FlowTopToBottom ? _this116.curSX - e.pageX : 0, _this116.flow === GridView.FlowLeftToRight ? _this116.curSY - e.pageY : 0);
+
+          _this116.$calcContentXY(_this116.curSX - e.pageX, _this116.curSY - e.pageY);
+        }
+        _this116.curSX = e.pageX;
+        _this116.curSY = e.pageY;
+      }
+    });
+
+    _this116.dom.addEventListener("wheel", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (_this116.interactive) {
+        _this116.$calcContentXY(e.deltaX, e.deltaY);
+      }
+    });
+    _this116.dom.addEventListener("scroll", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+    _this116.modelNotReady = false;
+
+    _this116.Component.completed.connect(_this116, _this116.Component$onCompleted);
+
+    _this116.contentHeightChanged.connect(_this116, _this116.$contentHeightChanged);
+    _this116.contentWidthChanged.connect(_this116, _this116.$contentWidthChanged);
+    _this116.contentXChanged.connect(_this116, _this116.$contentXChanged);
+    _this116.contentYChanged.connect(_this116, _this116.$contentYChanged);
+    _this116.cellWidthChanged.connect(_this116, _this116.$cellWidthChanged);
+    _this116.cellHeightChanged.connect(_this116, _this116.$cellHeightChanged);
+    _this116.flowChanged.connect(_this116, _this116.$flowChanged);
+
+    return _this116;
   }
 
-  _createClass(QtQuick_ListView, [{
-    key: "container",
-    value: function container() {
+  _createClass(QtQuick_GridView, [{
+    key: "_container",
+    value: function _container() {
       return this;
+    }
+  }, {
+    key: "Component$onCompleted",
+    value: function Component$onCompleted() {
+      this.completed();
+    }
+  }, {
+    key: "$flowChanged",
+    value: function $flowChanged() {
+      if (this.flow === GridView.FlowLeftToRight) {
+        this.dom.style.flexDirection = "row";
+      } else {
+        this.dom.style.flexDirection = "column";
+      }
+    }
+  }, {
+    key: "$cellWidthChanged",
+    value: function $cellWidthChanged() {
+      this.$styleChanged();
+    }
+  }, {
+    key: "$cellHeightChanged",
+    value: function $cellHeightChanged() {
+      this.$styleChanged();
+    }
+  }, {
+    key: "$calcContentXY",
+    value: function $calcContentXY(deltaX, deltaY) {
+      if (this.enabled) {
+        var el = null;
+
+        for (var i = 0; i < this.$items.length; i++) {
+          var x1 = this.$items[i].dom.offsetLeft - parseFloat(this.$items[i].dom.style.marginLeft.replace('px', '').replace('%', ''));
+          var y1 = this.$items[i].dom.offsetTop - parseFloat(this.$items[i].dom.style.marginTop.replace('px', '').replace('%', ''));
+          var x2 = this.$items[i].dom.offsetLeft + this.$items[i].width;
+          var y2 = this.$items[i].dom.offsetTop + this.$items[i].height;
+          if (!el && this.dom.scrollLeft >= x1 && this.dom.scrollLeft < x2 && this.dom.scrollTop >= y1 && this.dom.scrollTop < y2) {
+            el = this.$items[i];
+
+            if (this.snapMode === GridView.SnapOneRow) {
+              if ((this.flow === GridView.FlowTopToBottom && deltaX < 0 || this.flow === GridView.FlowLeftToRight && deltaY < 0) && i - 1 >= 0) {
+                el = this.$items[i - 1];
+              }
+              if ((this.flow === GridView.FlowTopToBottom && deltaX > 0 || this.flow === GridView.FlowLeftToRight && deltaY > 0) && i + 1 < this.$items.length) {
+                el = this.$items[i + 1];
+              }
+            }
+          }
+        }
+
+        var p = this.$firstParentForWheel();
+        if (this.snapMode === GridView.NoSnap || el === null) {
+          var limitH = Math.max(this.dom.clientHeight, this.dom.scrollHeight, this.dom.offsetHeight);
+          var limitW = Math.max(this.dom.clientWidth, this.dom.scrollWidth, this.dom.offsetWidth);
+
+          if (this.flow === GridView.FlowTopToBottom) {
+            if (this.contentX + deltaX == this.contentX) {
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            } else if (this.contentX + deltaX > limitW - this.width) {
+              this.contentX = limitW - this.width;
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            } else if (this.contentX + deltaX < 0) {
+              this.contentX = 0;
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            } else this.contentX += deltaX;
+          } else {
+            if (this.contentY + deltaY == this.contentY) {
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            } else if (this.contentY + deltaY > limitH - this.height) {
+              this.contentY = limitH - this.height;
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            } else if (this.contentY + deltaY < 0) {
+              this.contentY = 0;
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            } else this.contentY += deltaY;
+          }
+        } else {
+          if (this.flow === GridView.FlowTopToBottom) {
+            if (this.contentX != el.dom.offsetLeft) {
+              this.contentX = el.dom.offsetLeft;
+            } else {
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            }
+          } else {
+            if (this.contentY != el.dom.offsetTop) {
+              this.contentY = el.dom.offsetTop;
+            } else {
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            }
+          }
+        }
+      }
+    }
+  }, {
+    key: "$contentHeightChanged",
+    value: function $contentHeightChanged() {
+      if (this.contentHeight === 0) {
+        this.impl.style.height = "100%";
+        this.impl.style.bottom = "0";
+      } else {
+        this.impl.style.height = this.contentHeight + "px";
+        this.impl.style.bottom = this.contentHeight + "px";
+      }
+    }
+  }, {
+    key: "$contentWidthChanged",
+    value: function $contentWidthChanged() {
+      if (this.contentWidth === 0) {
+        this.impl.style.width = "100%";
+        this.impl.style.right = "0";
+      } else {
+        this.impl.style.width = this.contentWidth + "px";
+        this.impl.style.right = this.contentWidth + "px";
+      }
+    }
+  }, {
+    key: "$contentXYChanged",
+    value: function $contentXYChanged() {
+      var _this117 = this;
+
+      if (this.mouseIsDown || this.mouseIsWheel) {
+        if (this.eventTimer) clearTimeout(this.eventTimer);else this.flickStarted();
+        this.eventTimer = setTimeout(function () {
+          _this117.flickEnded();
+          _this117.eventTimer = null;
+        }, 100);
+      }
+      switch (this.snapMode) {
+        case GridView.NoSnap:
+          if (!this.mouseIsDown) this.dom.scrollTo(this.contentX, this.contentY);
+          break;
+        case GridView.SnapToRow:
+          if (!this.mouseIsDown) this.dom.scrollTo({ left: this.contentX, top: this.contentY, behavior: "smooth" });
+          break;
+        case GridView.SnapOneRow:
+          if (!this.mouseIsDown) this.dom.scrollTo({ left: this.contentX, top: this.contentY, behavior: "smooth" });
+          break;
+      }
+    }
+  }, {
+    key: "$contentXChanged",
+    value: function $contentXChanged() {
+      this.$contentXYChanged();
+    }
+  }, {
+    key: "$contentYChanged",
+    value: function $contentYChanged() {
+      this.$contentXYChanged();
+    }
+  }, {
+    key: "positionViewAtBeginning",
+    value: function positionViewAtBeginning() {
+      this.positionViewAtIndex(0, this.GridView.Beginning);
+    }
+  }, {
+    key: "positionViewAtEnd",
+    value: function positionViewAtEnd() {
+      this.positionViewAtIndex(this.count - 1, this.GridView.End);
+    }
+  }, {
+    key: "positionViewAtIndex",
+    value: function positionViewAtIndex(index, mode) {
+      var item = this.itemAt(index);
+      var offsetTop = item.dom.offsetTop ? item.dom.offsetTop : this.contentY;
+      var offsetleft = item.dom.offsetleft ? item.dom.offsetleft : this.contentX;
+      var clientWidth = item.dom.clientWidth;
+      var clientHeight = item.dom.clientHeight;
+
+      var parentWidth = this.dom.clientWidth;
+      var parentHeight = this.dom.clientHeight;
+
+      switch (mode) {
+        case this.GridView.Beginning:
+          if (this.flow === GridView.FlowLeftToRight) {
+            this.contentX = offsetleft;
+          } else {
+            this.contentY = offsetTop;
+          }
+          break;
+        case this.GridView.End:
+          if (this.flow === GridView.FlowLeftToRight) {
+            this.contentX = offsetleft - parentWidth + clientWidth;
+          } else {
+            this.contentY = offsetTop - parentHeight + clientHeight;
+          }
+          break;
+        case this.GridView.Center:
+          if (this.flow === GridView.FlowLeftToRight) {
+            this.contentX = offsetleft - parentWidth / 2 + clientWidth;
+          } else {
+            this.contentY = offsetTop - parentHeight / 2 + clientHeight;
+          }
+          break;
+      }
+      this.contentX = this.dom.scrollLeft;
+      this.contentY = this.dom.scrollTop;
+    }
+  }, {
+    key: "$enabledChanged",
+    value: function $enabledChanged() {
+      this.$styleChanged();
+    }
+  }, {
+    key: "$highlightFollowsCurrentItemChanged",
+    value: function $highlightFollowsCurrentItemChanged() {
+      this.$currentIndexChanged();
+    }
+  }, {
+    key: "$currentIndexChanged",
+    value: function $currentIndexChanged() {
+      var _this118 = this;
+
+      if (this.currentIndex > -1) {
+        if (this.count > 0) {
+          this.currentItem = this.itemAt(this.currentIndex);
+          if (this.highlightFollowsCurrentItem && this.currentItem) {
+
+            var waitInterval = setInterval(function () {
+              var state = document.readyState;
+              if (state === 'interactive' || state === 'complete') {
+                _this118.currentItem.dom.scrollIntoView({ block: "start", behavior: "smooth" });
+                clearInterval(waitInterval);
+              }
+            }, 100);
+          }
+        } else {
+          this.modelNotReady = true;
+        }
+      } else {
+        this.currentItem = null;
+      }
     }
   }, {
     key: "$applyModel",
@@ -11137,6 +12113,11 @@ var QtQuick_ListView = function (_QtQuick_Repeater) {
         this.$insertChildren(0, model.length);
       }
       this.count = this.$items.length;
+
+      if (this.modelNotReady) {
+        this.currentIndexChanged();
+        this.modelNotReady = false;
+      }
     }
   }, {
     key: "$insertChildren",
@@ -11201,7 +12182,7 @@ var QtQuick_ListView = function (_QtQuick_Repeater) {
       }
 
       if (index > 0) {
-        this.container().childrenChanged();
+        this._container().childrenChanged();
       }
 
       for (var _i13 = endIndex; _i13 < this.$items.length; _i13++) {
@@ -11211,16 +12192,562 @@ var QtQuick_ListView = function (_QtQuick_Repeater) {
   }, {
     key: "$applyStyleOnItem",
     value: function $applyStyleOnItem($item) {
-      var Qt = QmlWeb.Qt;
+      $item.dom.style["margin"] = '0';
+      $item.dom.style["position"] = 'relative';
+      $item.dom.style["width"] = this.cellWidth + "px";
+      $item.dom.style["height"] = this.cellHeight + "px";
+    }
+  }, {
+    key: "$styleChanged",
+    value: function $styleChanged() {
+      this.dom.style.overflow = "hidden";
 
-      $item.dom.style.position = "initial";
+      if (this.enabled) {
+        if (this.flow === GridView.FlowLeftToRight) {
+          this.dom.style.overflowX = "auto";
+        } else {
+          this.dom.style.overflowY = "auto";
+        }
+      }
+
+      for (var i = 0; i < this.$items.length; ++i) {
+        this.$applyStyleOnItem(this.$items[i]);
+      }
+    }
+  }]);
+
+  return QtQuick_GridView;
+}(QtQuick_Repeater);
+
+QtQuick_GridView.enums = {
+  GridView: {
+    NoSnap: 0,
+    SnapToRow: 1,
+    SnapOneRow: 2,
+    Beginning: 0,
+    Center: 1,
+    End: 2,
+    Visible: 3,
+    Contain: 4,
+    SnapPosition: 5,
+    FlowLeftToRight: 0,
+    FlowTopToBottom: 1
+  }
+};
+QtQuick_GridView.properties = {
+  currentIndex: { type: "int", initialValue: -1 },
+  currentItem: { type: "var", initialValue: null },
+  highlightFollowsCurrentItem: { type: "bool", initialValue: true },
+  snapMode: { type: "enum", initialValue: 0 },
+  flow: { type: "enum", initialValue: 0 },
+  interactive: { type: "bool", initialValue: true },
+  contentHeight: "real",
+  contentWidth: "real",
+  contentX: "real",
+  contentY: "real",
+
+  cellWidth: "real",
+  cellHeight: "real"
+};
+QtQuick_GridView.signals = {
+  completed: [],
+  flickStarted: [],
+  flickEnded: []
+};
+
+QmlWeb.registerQmlType(QtQuick_GridView);
+
+// eslint-disable-next-line no-undef
+
+var QtQuick_ListView = function (_QtQuick_Repeater2) {
+  _inherits(QtQuick_ListView, _QtQuick_Repeater2);
+
+  function QtQuick_ListView(meta) {
+    _classCallCheck(this, QtQuick_ListView);
+
+    var _this119 = _possibleConstructorReturn(this, (QtQuick_ListView.__proto__ || Object.getPrototypeOf(QtQuick_ListView)).call(this, meta));
+
+    _this119.modelChanged.connect(_this119, _this119.$styleChanged);
+    _this119.delegateChanged.connect(_this119, _this119.$styleChanged);
+    _this119.orientationChanged.connect(_this119, _this119.$styleChanged);
+    _this119.spacingChanged.connect(_this119, _this119.$styleChanged);
+    _this119._childrenInserted.connect(_this119, _this119.$applyStyleOnItem);
+    _this119.enabledChanged.connect(_this119, _this119.$enabledChanged);
+    _this119.currentIndexChanged.connect(_this119, _this119.$currentIndexChanged);
+    _this119.highlightFollowsCurrentItemChanged.connect(_this119, _this119.$highlightFollowsCurrentItemChanged);
+
+    _this119.dom.style.pointerEvents = "all";
+    _this119.dom.style.overflow = "hidden";
+    _this119.dom.style.whiteSpace = "nowrap";
+
+    var bg = _this119.impl = document.createElement("div");
+    bg.style.pointerEvents = "none";
+    bg.style.position = "absolute";
+    bg.style.left = bg.style.right = bg.style.top = bg.style.bottom = "0px";
+    bg.style.background = "none";
+    _this119.dom.appendChild(bg);
+
+    _this119.isDragging = false;
+    _this119.mouseIsDown = false;
+    _this119.curSX = 0;
+    _this119.curSY = 0;
+    _this119.dom.addEventListener("mousedown", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      _this119.mouseIsDown = true;
+      _this119.curSX = e.pageX;
+      _this119.curSY = e.pageY;
+
+      //this.dom.classList.add("unselectable");
+    });
+    _this119.dom.addEventListener("mouseup", function (e) {
+      //e.stopPropagation();
+      e.preventDefault();
+      setTimeout(function () {
+        _this119.$onAllMouseEvent();
+      }, 100);
+      _this119.isDragging = false;
+      _this119.mouseIsDown = false;
+      _this119.dom.classList.remove("unselectable");
+      _this119.$contentXYChanged();
+    });
+    _this119.dom.addEventListener("mouseleave", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      setTimeout(function () {
+        _this119.$onAllMouseEvent();
+      }, 100);
+      _this119.isDragging = false;
+      _this119.mouseIsDown = false;
+      _this119.dom.classList.remove("unselectable");
+      _this119.$contentXYChanged();
+    });
+    _this119.dom.addEventListener("mousemove", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (_this119.mouseIsDown && _this119.enabled) {
+        _this119.dom.classList.add("unselectable");
+        _this119.$offAllMouseEvent();
+        _this119.isDragging = true;
+        if (_this119.interactive) {
+          _this119.dom.scrollBy(_this119.orientation === Qt.Horizontal ? _this119.curSX - e.pageX : 0, _this119.orientation === Qt.Vertical ? _this119.curSY - e.pageY : 0);
+
+          _this119.$calcContentXY(_this119.curSX - e.pageX, _this119.curSY - e.pageY);
+        }
+        _this119.curSX = e.pageX;
+        _this119.curSY = e.pageY;
+      }
+    });
+
+    _this119.dom.addEventListener("wheel", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (_this119.interactive) {
+        _this119.$calcContentXY(e.deltaX, e.deltaY);
+      }
+    });
+    _this119.dom.addEventListener("scroll", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+    _this119.modelNotReady = false;
+
+    _this119.Component.completed.connect(_this119, _this119.Component$onCompleted);
+
+    _this119.contentHeightChanged.connect(_this119, _this119.$contentHeightChanged);
+    _this119.contentWidthChanged.connect(_this119, _this119.$contentWidthChanged);
+    _this119.contentXChanged.connect(_this119, _this119.$contentXChanged);
+    _this119.contentYChanged.connect(_this119, _this119.$contentYChanged);
+
+    var config = {
+      attributes: true,
+      childList: true,
+      subtree: true
+    };
+
+    var observer = new MutationObserver(function () {
+      _this119.contentWidth = Math.max(_this119.impl.clientWidth, _this119.impl.scrollWidth, _this119.impl.offsetWidth);
+      _this119.contentHeight = Math.max(_this119.impl.clientHeight, _this119.impl.scrollHeight, _this119.impl.offsetHeight);
+    });
+    observer.observe(_this119.dom, config);
+    return _this119;
+  }
+
+  _createClass(QtQuick_ListView, [{
+    key: "_container",
+    value: function _container() {
+      return this;
+    }
+  }, {
+    key: "Component$onCompleted",
+    value: function Component$onCompleted() {
+      this.completed();
+    }
+  }, {
+    key: "$calcContentXY",
+    value: function $calcContentXY(deltaX, deltaY) {
+      if (this.enabled) {
+
+        var el = null;
+
+        //let deltaX = e.deltaX ? e.deltaX : this.curSX - e.pageX;
+        //let deltaY = e.deltaY ? e.deltaY : this.curSY - e.pageY;
+
+        for (var i = 0; i < this.$items.length; i++) {
+          var x1 = this.$items[i].dom.offsetLeft - parseFloat(this.$items[i].dom.style.marginLeft.replace('px', '').replace('%', ''));
+          var y1 = this.$items[i].dom.offsetTop - parseFloat(this.$items[i].dom.style.marginTop.replace('px', '').replace('%', ''));
+          var x2 = this.$items[i].dom.offsetLeft + this.$items[i].width;
+          var y2 = this.$items[i].dom.offsetTop + this.$items[i].height;
+          if (!el && this.dom.scrollLeft >= x1 && this.dom.scrollLeft < x2 && this.dom.scrollTop >= y1 && this.dom.scrollTop < y2) {
+            el = this.$items[i];
+
+            if (this.snapMode === ListView.SnapOneItem) {
+              //if((this.orientation === Qt.Horizontal && deltaX < 0 || this.orientation === Qt.Vertical && deltaY < 0) && i - 1 >= 0){
+              //el = this.$items[i-1]
+              //}
+              if ((this.orientation === Qt.Horizontal && deltaX > 0 || this.orientation === Qt.Vertical && deltaY > 0) && i + 1 < this.$items.length) {
+                el = this.$items[i + 1];
+              }
+            }
+          }
+        }
+
+        var p = this.$firstParentForWheel();
+        if (this.snapMode === ListView.NoSnap || el === null) {
+          var limitH = Math.max(this.dom.clientHeight, this.dom.scrollHeight, this.dom.offsetHeight);
+          var limitW = Math.max(this.dom.clientWidth, this.dom.scrollWidth, this.dom.offsetWidth);
+
+          if (this.orientation === Qt.Horizontal) {
+            if (this.contentX + deltaX == this.contentX) {
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            } else if (this.contentX + deltaX > limitW - this.width) {
+              this.contentX = limitW - this.width;
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            } else if (this.contentX + deltaX < 0) {
+              this.contentX = 0;
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            } else this.contentX += deltaX;
+          } else {
+            if (this.contentY + deltaY == this.contentY) {
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            } else if (this.contentY + deltaY > limitH - this.height) {
+              this.contentY = limitH - this.height;
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            } else if (this.contentY + deltaY < 0) {
+              this.contentY = 0;
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            } else this.contentY += deltaY;
+          }
+        } else {
+          if (this.orientation === Qt.Horizontal) {
+            if (this.contentX != el.dom.offsetLeft) {
+              this.contentX = el.dom.offsetLeft;
+            } else {
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            }
+          } else {
+            if (this.contentY != el.dom.offsetTop) {
+              this.contentY = el.dom.offsetTop;
+            } else {
+              if (p) {
+                if (this.mouseIsDown) p.enabled = true;
+                p.$calcContentXY(deltaX, deltaY);
+              }
+            }
+          }
+        }
+      }
+    }
+  }, {
+    key: "$contentHeightChanged",
+    value: function $contentHeightChanged() {
+      if (this.contentHeight === 0) {
+        this.impl.style.height = "100%";
+        this.impl.style.bottom = "0";
+      } else {
+        this.impl.style.height = this.contentHeight + "px";
+        this.impl.style.bottom = this.contentHeight + "px";
+      }
+    }
+  }, {
+    key: "$contentWidthChanged",
+    value: function $contentWidthChanged() {
+      if (this.contentWidth === 0) {
+        this.impl.style.width = "100%";
+        this.impl.style.right = "0";
+      } else {
+        this.impl.style.width = this.contentWidth + "px";
+        this.impl.style.right = this.contentWidth + "px";
+      }
+    }
+  }, {
+    key: "$contentXYChanged",
+    value: function $contentXYChanged() {
+      var _this120 = this;
+
+      if (this.mouseIsDown || this.mouseIsWheel) {
+        if (this.eventTimer) clearTimeout(this.eventTimer);else this.flickStarted();
+        this.eventTimer = setTimeout(function () {
+          _this120.flickEnded();
+          _this120.eventTimer = null;
+        }, 100);
+      }
+      switch (this.snapMode) {
+        case ListView.NoSnap:
+          if (!this.mouseIsDown) this.dom.scrollTo(this.contentX, this.contentY);
+          break;
+        case ListView.SnapToItem:
+          if (!this.mouseIsDown) this.dom.scrollTo({ left: this.contentX, top: this.contentY, behavior: "smooth" });
+          break;
+        case ListView.SnapOneItem:
+          if (!this.mouseIsDown) this.dom.scrollTo({ left: this.contentX, top: this.contentY, behavior: "smooth" });
+          break;
+      }
+    }
+  }, {
+    key: "$contentXChanged",
+    value: function $contentXChanged() {
+      this.$contentXYChanged();
+    }
+  }, {
+    key: "$contentYChanged",
+    value: function $contentYChanged() {
+      this.$contentXYChanged();
+    }
+  }, {
+    key: "positionViewAtBeginning",
+    value: function positionViewAtBeginning() {
+      this.positionViewAtIndex(0, this.ListView.Beginning);
+    }
+  }, {
+    key: "positionViewAtEnd",
+    value: function positionViewAtEnd() {
+      this.positionViewAtIndex(this.count - 1, this.ListView.End);
+    }
+  }, {
+    key: "positionViewAtIndex",
+    value: function positionViewAtIndex(index, mode) {
+      var item = this.itemAt(index);
+      //let rect = item.dom.getBoundingClientRect()
+      //console.log(rect)
+      //let offsetTop = item.dom.offsetTop ? item.dom.offsetTop : this.contentY
+      //let offsetleft = rect.left ? rect.left : this.contentX
+      var offsetTop = item.index * item.height;
+      var offsetleft = item.index * item.width;
+      var clientWidth = item.dom.clientWidth;
+      var clientHeight = item.dom.clientHeight;
+
+      var parentWidth = this.dom.clientWidth;
+      var parentHeight = this.dom.clientHeight;
+
+      switch (mode) {
+        case this.ListView.Beginning:
+          if (this.orientation === Qt.Horizontal) {
+            this.dom.scrollTo({ left: offsetleft, top: this.contentY });
+            this.contentX = offsetleft;
+          } else {
+            this.dom.scrollTo({ left: this.contentX, top: offsetTop });
+            this.contentY = offsetTop;
+          }
+          break;
+        case this.ListView.End:
+          if (this.orientation === Qt.Horizontal) {
+            this.dom.scrollTo({ left: offsetleft - parentWidth + clientWidth, top: this.contentY });
+            this.contentX = offsetleft - parentWidth + clientWidth;
+          } else {
+            this.dom.scrollTo({ left: this.contentX, top: offsetTop - parentHeight + clientHeight });
+            this.contentY = offsetTop - parentHeight + clientHeight;
+          }
+          break;
+        case this.ListView.Center:
+          if (this.orientation === Qt.Horizontal) {
+            this.dom.scrollTo({ left: offsetleft - parentWidth / 2 + clientWidth, top: this.contentY });
+            this.contentX = offsetleft - parentWidth / 2 + clientWidth;
+          } else {
+            this.dom.scrollTo({ left: this.contentX, top: offsetTop - parentHeight / 2 + clientHeight });
+            this.contentY = offsetTop - parentHeight / 2 + clientHeight;
+          }
+          break;
+      }
+      //this.contentX = this.dom.scrollLeft;
+      //this.contentY = this.dom.scrollTop;
+    }
+  }, {
+    key: "$enabledChanged",
+    value: function $enabledChanged() {
+      this.$styleChanged();
+    }
+  }, {
+    key: "$highlightFollowsCurrentItemChanged",
+    value: function $highlightFollowsCurrentItemChanged() {
+      this.$currentIndexChanged();
+    }
+  }, {
+    key: "$currentIndexChanged",
+    value: function $currentIndexChanged() {
+      var _this121 = this;
+
+      if (this.currentIndex > -1) {
+        if (this.count > 0) {
+          this.currentItem = this.itemAt(this.currentIndex);
+          if (this.highlightFollowsCurrentItem && this.currentItem) {
+
+            var waitInterval = setInterval(function () {
+              var state = document.readyState;
+              if (state === 'interactive' || state === 'complete') {
+                _this121.currentItem.dom.scrollIntoView({ block: "start", behavior: "smooth" });
+                clearInterval(waitInterval);
+              }
+            }, 100);
+          }
+        } else {
+          this.modelNotReady = true;
+        }
+      } else {
+        this.currentItem = null;
+      }
+    }
+  }, {
+    key: "$applyModel",
+    value: function $applyModel() {
+      if (!this.delegate) {
+        return;
+      }
+      var model = this.$getModel();
+      if (model instanceof QmlWeb.JSItemModel) {
+        var flags = QmlWeb.Signal.UniqueConnection;
+        model.dataChanged.connect(this, this.$_onModelDataChanged, flags);
+        model.rowsInserted.connect(this, this.$_onRowsInserted, flags);
+        model.rowsMoved.connect(this, this.$_onRowsMoved, flags);
+        model.rowsRemoved.connect(this, this.$_onRowsRemoved, flags);
+        model.modelReset.connect(this, this.$_onModelReset, flags);
+
+        this.$removeChildren(0, this.$items.length);
+        this.$insertChildren(0, model.rowCount());
+      } else if (typeof model === "number") {
+        if (this.$items.length > model) {
+          // have more than we need
+          this.$removeChildren(model, this.$items.length);
+        } else {
+          // need more
+          this.$insertChildren(this.$items.length, model);
+        }
+      } else if (model instanceof Array) {
+        this.$removeChildren(0, this.$items.length);
+        this.$insertChildren(0, model.length);
+      }
+      this.count = this.$items.length;
+
+      if (this.modelNotReady) {
+        this.currentIndexChanged();
+        this.modelNotReady = false;
+      }
+    }
+  }, {
+    key: "$insertChildren",
+    value: function $insertChildren(startIndex, endIndex) {
+      if (endIndex <= 0) {
+        this.count = 0;
+        return;
+      }
+
+      var QMLOperationState = QmlWeb.QMLOperationState;
+      var createProperty = QmlWeb.createProperty;
+      var model = this.$getModel();
+      var index = void 0;
+      for (index = startIndex; index < endIndex; index++) {
+        var newItem = this.delegate.$createObject(this.parent);
+        createProperty("int", newItem, "index", { initialValue: index });
+
+        if (typeof model === "number" || model instanceof Array) {
+          if (typeof newItem.$properties.modelData === "undefined") {
+            createProperty("variant", newItem, "modelData");
+          }
+          var value = model instanceof Array ? model[index] : typeof model === "number" ? index : "undefined";
+          newItem.$properties.modelData.set(value, QmlWeb.QMLProperty.ReasonInit, newItem, model.$context);
+        } else {
+          // QML exposes a "model" property in the scope that contains all role
+          // data.
+          var modelData = {};
+          for (var i = 0; i < model.roleNames.length; i++) {
+            var roleName = model.roleNames[i];
+            if (typeof newItem.$properties[roleName] === "undefined") {
+              createProperty("variant", newItem, roleName);
+            }
+            var roleData = model.data(index, roleName);
+            modelData[roleName] = roleData;
+            newItem.$properties[roleName].set(roleData, QmlWeb.QMLProperty.ReasonInit, newItem, this.model.$context);
+          }
+          if (typeof newItem.$properties.model === "undefined") {
+            createProperty("variant", newItem, "model");
+          }
+          newItem.$properties.model.set(modelData, QmlWeb.QMLProperty.ReasonInit, newItem, this.model.$context);
+        }
+
+        this.$items.splice(index, 0, newItem);
+
+        // parent must be set after the roles have been added to newItem scope in
+        // case we are outside of QMLOperationState.Init and parentChanged has
+        // any side effects that result in those roleNames being referenced.
+        newItem.parent = this;
+
+        // TODO debug this. Without check to Init, Completed sometimes called
+        // twice.. But is this check correct?
+        if (QmlWeb.engine.operationState !== QMLOperationState.Init && QmlWeb.engine.operationState !== QMLOperationState.Idle) {
+          // We don't call those on first creation, as they will be called
+          // by the regular creation-procedures at the right time.
+          this.$callOnCompleted(newItem);
+        }
+      }
+      if (QmlWeb.engine.operationState !== QMLOperationState.Init) {
+        // We don't call those on first creation, as they will be called
+        // by the regular creation-procedures at the right time.
+        QmlWeb.engine.$initializePropertyBindings();
+      }
+
+      if (index > 0) {
+        this._container().childrenChanged();
+      }
+
+      for (var _i14 = endIndex; _i14 < this.$items.length; _i14++) {
+        this.$items[_i14].index = _i14;
+      }
+    }
+  }, {
+    key: "$applyStyleOnItem",
+    value: function $applyStyleOnItem($item) {
+      var Qt = QmlWeb.Qt;
+      $item.dom.style["margin"] = '0';
+      $item.dom.style["position"] = 'relative';
+      //$item.dom.style.position = "initial";
       if (this.orientation === Qt.Horizontal) {
         $item.dom.style.display = "inline-block";
         if ($item !== this.$items[0]) {
           $item.dom.style["margin-left"] = this.spacing + "px";
         }
       } else {
-        $item.dom.style.display = "block";
+        //$item.dom.style.display = "block";
         if ($item !== this.$items[0]) {
           $item.dom.style["margin-top"] = this.spacing + "px";
         }
@@ -11229,6 +12756,15 @@ var QtQuick_ListView = function (_QtQuick_Repeater) {
   }, {
     key: "$styleChanged",
     value: function $styleChanged() {
+      this.dom.style.overflow = "hidden";
+
+      if (this.enabled) {
+        if (this.orientation === Qt.Horizontal) {
+          this.dom.style.overflowX = "auto";
+        } else {
+          this.dom.style.overflowY = "auto";
+        }
+      }
       for (var i = 0; i < this.$items.length; ++i) {
         this.$applyStyleOnItem(this.$items[i]);
       }
@@ -11238,44 +12774,73 @@ var QtQuick_ListView = function (_QtQuick_Repeater) {
   return QtQuick_ListView;
 }(QtQuick_Repeater);
 
+QtQuick_ListView.enums = {
+  ListView: {
+    Vertical: Qt.Vertical,
+    Horizontal: Qt.Horizontal,
+    NoSnap: 0,
+    SnapToItem: 1,
+    SnapOneItem: 2,
+    Beginning: 0,
+    Center: 1,
+    End: 2,
+    Visible: 3,
+    Contain: 4,
+    SnapPosition: 5
+  }
+};
 QtQuick_ListView.properties = {
   orientation: "enum",
-  spacing: "real"
+  spacing: "real",
+  currentIndex: { type: "int", initialValue: -1 },
+  currentItem: { type: "var", initialValue: null },
+  highlightFollowsCurrentItem: { type: "bool", initialValue: true },
+  snapMode: { type: "enum", initialValue: 0 },
+  interactive: { type: "bool", initialValue: true },
+  contentHeight: "real",
+  contentWidth: "real",
+  contentX: "real",
+  contentY: "real"
+};
+QtQuick_ListView.signals = {
+  completed: [],
+  flickStarted: [],
+  flickEnded: []
 };
 
 QmlWeb.registerQmlType(QtQuick_ListView);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_Rotation = function (_QtQml_QtObject20) {
-  _inherits(QtQuick_Rotation, _QtQml_QtObject20);
+var QtQuick_Rotation = function (_QtQml_QtObject22) {
+  _inherits(QtQuick_Rotation, _QtQml_QtObject22);
 
   function QtQuick_Rotation(meta) {
     _classCallCheck(this, QtQuick_Rotation);
 
-    var _this111 = _possibleConstructorReturn(this, (QtQuick_Rotation.__proto__ || Object.getPrototypeOf(QtQuick_Rotation)).call(this, meta));
+    var _this122 = _possibleConstructorReturn(this, (QtQuick_Rotation.__proto__ || Object.getPrototypeOf(QtQuick_Rotation)).call(this, meta));
 
-    _this111.axis = new QmlWeb.QObject(_this111);
-    QmlWeb.createProperties(_this111.axis, {
+    _this122.axis = new QmlWeb.QObject(_this122);
+    QmlWeb.createProperties(_this122.axis, {
       x: "real",
       y: "real",
       z: { type: "real", initialValue: 1 }
     });
 
-    _this111.origin = new QmlWeb.QObject(_this111);
-    QmlWeb.createProperties(_this111.origin, {
+    _this122.origin = new QmlWeb.QObject(_this122);
+    QmlWeb.createProperties(_this122.origin, {
       x: "real",
       y: "real"
     });
 
-    _this111.angleChanged.connect(_this111.$parent, _this111.$parent.$updateTransform);
-    _this111.axis.xChanged.connect(_this111.$parent, _this111.$parent.$updateTransform);
-    _this111.axis.yChanged.connect(_this111.$parent, _this111.$parent.$updateTransform);
-    _this111.axis.zChanged.connect(_this111.$parent, _this111.$parent.$updateTransform);
-    _this111.origin.xChanged.connect(_this111, _this111.$updateOrigin);
-    _this111.origin.yChanged.connect(_this111, _this111.$updateOrigin);
-    _this111.$parent.$updateTransform();
-    return _this111;
+    _this122.angleChanged.connect(_this122.$parent, _this122.$parent.$updateTransform);
+    _this122.axis.xChanged.connect(_this122.$parent, _this122.$parent.$updateTransform);
+    _this122.axis.yChanged.connect(_this122.$parent, _this122.$parent.$updateTransform);
+    _this122.axis.zChanged.connect(_this122.$parent, _this122.$parent.$updateTransform);
+    _this122.origin.xChanged.connect(_this122, _this122.$updateOrigin);
+    _this122.origin.yChanged.connect(_this122, _this122.$updateOrigin);
+    _this122.$parent.$updateTransform();
+    return _this122;
   }
 
   _createClass(QtQuick_Rotation, [{
@@ -11322,11 +12887,11 @@ var QtQuick_Row = function (_QtQuick_Positioner4) {
   function QtQuick_Row(meta) {
     _classCallCheck(this, QtQuick_Row);
 
-    var _this113 = _possibleConstructorReturn(this, (QtQuick_Row.__proto__ || Object.getPrototypeOf(QtQuick_Row)).call(this, meta));
+    var _this124 = _possibleConstructorReturn(this, (QtQuick_Row.__proto__ || Object.getPrototypeOf(QtQuick_Row)).call(this, meta));
 
-    _this113.layoutDirectionChanged.connect(_this113, _this113.layoutChildren);
-    _this113.layoutChildren();
-    return _this113;
+    _this124.layoutDirectionChanged.connect(_this124, _this124.layoutChildren);
+    _this124.layoutChildren();
+    return _this124;
   }
 
   _createClass(QtQuick_Row, [{
@@ -11367,29 +12932,29 @@ QmlWeb.registerQmlType(QtQuick_Row);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_Scale = function (_QtQml_QtObject21) {
-  _inherits(QtQuick_Scale, _QtQml_QtObject21);
+var QtQuick_Scale = function (_QtQml_QtObject23) {
+  _inherits(QtQuick_Scale, _QtQml_QtObject23);
 
   function QtQuick_Scale(meta) {
     _classCallCheck(this, QtQuick_Scale);
 
-    var _this114 = _possibleConstructorReturn(this, (QtQuick_Scale.__proto__ || Object.getPrototypeOf(QtQuick_Scale)).call(this, meta));
+    var _this125 = _possibleConstructorReturn(this, (QtQuick_Scale.__proto__ || Object.getPrototypeOf(QtQuick_Scale)).call(this, meta));
 
-    _this114.origin = new QmlWeb.QObject(_this114);
-    QmlWeb.createProperties(_this114.origin, {
+    _this125.origin = new QmlWeb.QObject(_this125);
+    QmlWeb.createProperties(_this125.origin, {
       x: "real",
       y: "real"
     });
 
-    _this114.xScaleChanged.connect(_this114.$parent, _this114.$parent.$updateTransform);
-    _this114.yScaleChanged.connect(_this114.$parent, _this114.$parent.$updateTransform);
-    _this114.origin.xChanged.connect(_this114, _this114.$updateOrigin);
-    _this114.origin.yChanged.connect(_this114, _this114.$updateOrigin);
+    _this125.xScaleChanged.connect(_this125.$parent, _this125.$parent.$updateTransform);
+    _this125.yScaleChanged.connect(_this125.$parent, _this125.$parent.$updateTransform);
+    _this125.origin.xChanged.connect(_this125, _this125.$updateOrigin);
+    _this125.origin.yChanged.connect(_this125, _this125.$updateOrigin);
 
     /* QML default origin is top-left, while CSS default origin is centre, so
      * $updateOrigin must be called to set the initial transformOrigin. */
-    _this114.$updateOrigin();
-    return _this114;
+    _this125.$updateOrigin();
+    return _this125;
   }
 
   _createClass(QtQuick_Scale, [{
@@ -11437,19 +13002,19 @@ var QtQuick_SequentialAnimation = function (_QtQuick_Animation5) {
   function QtQuick_SequentialAnimation(meta) {
     _classCallCheck(this, QtQuick_SequentialAnimation);
 
-    var _this116 = _possibleConstructorReturn(this, (QtQuick_SequentialAnimation.__proto__ || Object.getPrototypeOf(QtQuick_SequentialAnimation)).call(this, meta));
+    var _this127 = _possibleConstructorReturn(this, (QtQuick_SequentialAnimation.__proto__ || Object.getPrototypeOf(QtQuick_SequentialAnimation)).call(this, meta));
 
-    _this116.animationsChanged.connect(_this116, _this116.$onAnimatonsChanged);
+    _this127.animationsChanged.connect(_this127, _this127.$onAnimatonsChanged);
 
     QmlWeb.engine.$registerStart(function () {
-      if (!_this116.running) return;
-      _this116.running = false; // toggled back by start();
-      _this116.start();
+      if (!_this127.running) return;
+      _this127.running = false; // toggled back by start();
+      _this127.start();
     });
     QmlWeb.engine.$registerStop(function () {
       return self.stop();
     });
-    return _this116;
+    return _this127;
   }
 
   _createClass(QtQuick_SequentialAnimation, [{
@@ -11523,8 +13088,8 @@ QmlWeb.registerQmlType(QtQuick_SequentialAnimation);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_ShaderEffect = function (_QtQuick_Item36) {
-  _inherits(QtQuick_ShaderEffect, _QtQuick_Item36);
+var QtQuick_ShaderEffect = function (_QtQuick_Item37) {
+  _inherits(QtQuick_ShaderEffect, _QtQuick_Item37);
 
   function QtQuick_ShaderEffect() {
     _classCallCheck(this, QtQuick_ShaderEffect);
@@ -11556,8 +13121,8 @@ QmlWeb.registerQmlType(QtQuick_ShaderEffect);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_ShaderEffectSource = function (_QtQuick_Item37) {
-  _inherits(QtQuick_ShaderEffectSource, _QtQuick_Item37);
+var QtQuick_ShaderEffectSource = function (_QtQuick_Item38) {
+  _inherits(QtQuick_ShaderEffectSource, _QtQuick_Item38);
 
   function QtQuick_ShaderEffectSource() {
     _classCallCheck(this, QtQuick_ShaderEffectSource);
@@ -11603,24 +13168,24 @@ QmlWeb.registerQmlType(QtQuick_ShaderEffectSource);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_State = function (_QtQml_QtObject22) {
-  _inherits(QtQuick_State, _QtQml_QtObject22);
+var QtQuick_State = function (_QtQml_QtObject24) {
+  _inherits(QtQuick_State, _QtQml_QtObject24);
 
   function QtQuick_State(meta) {
     _classCallCheck(this, QtQuick_State);
 
-    var _this119 = _possibleConstructorReturn(this, (QtQuick_State.__proto__ || Object.getPrototypeOf(QtQuick_State)).call(this, meta));
+    var _this130 = _possibleConstructorReturn(this, (QtQuick_State.__proto__ || Object.getPrototypeOf(QtQuick_State)).call(this, meta));
 
-    _this119.$item = _this119.$parent;
+    _this130.$item = _this130.$parent;
 
-    _this119.whenChanged.connect(_this119, _this119.$onWhenChanged);
-    return _this119;
+    _this130.whenChanged.connect(_this130, _this130.$onWhenChanged);
+    return _this130;
   }
 
   _createClass(QtQuick_State, [{
     key: "$getAllChanges",
     value: function $getAllChanges() {
-      var _this120 = this;
+      var _this131 = this;
 
       if (this.extend) {
         /* ECMAScript 2015. TODO: polyfill Array?
@@ -11628,7 +13193,7 @@ var QtQuick_State = function (_QtQml_QtObject22) {
         */
         var states = this.$item.states;
         var base = states.filter(function (state) {
-          return state.name === _this120.extend;
+          return state.name === _this131.extend;
         })[0];
         if (base) {
           return base.$getAllChanges().concat(this.changes);
@@ -11671,39 +13236,39 @@ var systemPalettes = {};
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_SystemPalette = function (_QtQml_QtObject23) {
-  _inherits(QtQuick_SystemPalette, _QtQml_QtObject23);
+var QtQuick_SystemPalette = function (_QtQml_QtObject25) {
+  _inherits(QtQuick_SystemPalette, _QtQml_QtObject25);
 
   function QtQuick_SystemPalette(meta) {
     _classCallCheck(this, QtQuick_SystemPalette);
 
-    var _this121 = _possibleConstructorReturn(this, (QtQuick_SystemPalette.__proto__ || Object.getPrototypeOf(QtQuick_SystemPalette)).call(this, meta));
+    var _this132 = _possibleConstructorReturn(this, (QtQuick_SystemPalette.__proto__ || Object.getPrototypeOf(QtQuick_SystemPalette)).call(this, meta));
 
-    _this121.colorGroupChanged.connect(_this121, _this121.$onColorGroupChanged);
+    _this132.colorGroupChanged.connect(_this132, _this132.$onColorGroupChanged);
 
-    _this121.$platform = "OSX";
+    _this132.$platform = "OSX";
     // Detect OS
     for (var i = 0; i < platformsDetectors.length; ++i) {
       if (platformsDetectors[i].regexp.test(navigator.userAgent)) {
-        _this121.$platform = platformsDetectors[i].name;
+        _this132.$platform = platformsDetectors[i].name;
         break;
       }
     }
 
-    _this121.$onColorGroupChanged(_this121.colorGroup);
-    return _this121;
+    _this132.$onColorGroupChanged(_this132.colorGroup);
+    return _this132;
   }
 
   _createClass(QtQuick_SystemPalette, [{
     key: "$onColorGroupChanged",
     value: function $onColorGroupChanged(newVal) {
-      var _this122 = this;
+      var _this133 = this;
 
       var name = ["active", "disabled", "inactive"][newVal];
       var pallete = systemPalettes[this.$platform][name];
       this.$canEditReadOnlyProperties = true;
       Object.keys(pallete).forEach(function (key) {
-        _this122[key] = pallete[key];
+        _this133[key] = pallete[key];
       });
       delete this.$canEditReadOnlyProperties;
     }
@@ -11794,40 +13359,54 @@ QmlWeb.registerQmlType(QtQuick_SystemPalette);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_Text = function (_QtQuick_Item38) {
-  _inherits(QtQuick_Text, _QtQuick_Item38);
+var QtQuick_Text = function (_QtQuick_Item39) {
+  _inherits(QtQuick_Text, _QtQuick_Item39);
 
   function QtQuick_Text(meta) {
     _classCallCheck(this, QtQuick_Text);
 
-    var _this123 = _possibleConstructorReturn(this, (QtQuick_Text.__proto__ || Object.getPrototypeOf(QtQuick_Text)).call(this, meta));
+    var _this134 = _possibleConstructorReturn(this, (QtQuick_Text.__proto__ || Object.getPrototypeOf(QtQuick_Text)).call(this, meta));
 
-    var fc = _this123.impl = document.createElement("span");
+    var fc = _this134.impl = document.createElement("span");
     fc.style.pointerEvents = "none";
-    fc.style.width = "100%";
-    fc.style.height = "100%";
+    //fc.style.width = "100%";
+    //fc.style.height = "100%";
     fc.style.whiteSpace = "pre";
-    fc.style.display = "table-cell";
+    //fc.style.display = "table-cell";
     fc.style.verticalAlign = "top";
-    _this123.dom.style.display = "table";
-    _this123.dom.style.textAlign = "left";
-    _this123.dom.appendChild(fc);
+    _this134.dom.style.display = "table";
+    _this134.dom.style.textAlign = "left";
+    _this134.dom.appendChild(fc);
 
-    _this123.colorChanged.connect(_this123, _this123.$onColorChanged);
-    _this123.textChanged.connect(_this123, _this123.$onTextChanged);
-    _this123.textFormatChanged.connect(_this123, _this123.$onTextFormatChanged);
-    _this123.lineHeightChanged.connect(_this123, _this123.$onLineHeightChanged);
-    _this123.wrapModeChanged.connect(_this123, _this123.$onWrapModeChanged);
-    _this123.horizontalAlignmentChanged.connect(_this123, _this123.$onHorizontalAlignmentChanged);
-    _this123.verticalAlignmentChanged.connect(_this123, _this123.$onVerticalAlignmentChanged);
-    _this123.styleChanged.connect(_this123, _this123.$onStyleChanged);
-    _this123.styleColorChanged.connect(_this123, _this123.$onStyleColorChanged);
+    _this134.colorChanged.connect(_this134, _this134.$onColorChanged);
+    _this134.textChanged.connect(_this134, _this134.$onTextChanged);
+    _this134.textFormatChanged.connect(_this134, _this134.$onTextFormatChanged);
+    _this134.lineHeightChanged.connect(_this134, _this134.$onLineHeightChanged);
+    _this134.wrapModeChanged.connect(_this134, _this134.$onWrapModeChanged);
+    _this134.horizontalAlignmentChanged.connect(_this134, _this134.$onHorizontalAlignmentChanged);
+    _this134.verticalAlignmentChanged.connect(_this134, _this134.$onVerticalAlignmentChanged);
+    _this134.styleChanged.connect(_this134, _this134.$onStyleChanged);
+    _this134.styleColorChanged.connect(_this134, _this134.$onStyleColorChanged);
 
-    _this123.widthChanged.connect(_this123, _this123.$onWidthChanged);
-    _this123.fontChanged.connect(_this123, _this123.$onFontChanged);
+    _this134.widthChanged.connect(_this134, _this134.$onWidthChanged);
+    _this134.fontChanged.connect(_this134, _this134.$onFontChanged);
 
-    _this123.Component.completed.connect(_this123, _this123.Component$onCompleted);
-    return _this123;
+    _this134.contentHeightChanged.connect(_this134, _this134.$contentHeightChanged);
+    _this134.contentWidthChanged.connect(_this134, _this134.$contentWidthChanged);
+
+    _this134.Component.completed.connect(_this134, _this134.Component$onCompleted);
+
+    var config = {
+      attributes: true,
+      childList: true,
+      subtree: true
+    };
+    var observer = new MutationObserver(function () {
+      _this134.contentWidth = Math.max(_this134.impl.clientWidth, _this134.impl.scrollWidth, _this134.impl.offsetWidth);
+      _this134.contentHeight = Math.max(_this134.impl.clientHeight, _this134.impl.scrollHeight, _this134.impl.offsetHeight);
+    });
+    observer.observe(_this134.dom, config);
+    return _this134;
   }
 
   _createClass(QtQuick_Text, [{
@@ -11850,6 +13429,17 @@ var QtQuick_Text = function (_QtQuick_Item38) {
         // TODO: sanitize StyledText/RichText
         this.impl.innerHTML = text;
       }
+
+      this.$updateImplicit();
+    }
+  }, {
+    key: "$contentHeightChanged",
+    value: function $contentHeightChanged() {
+      this.$updateImplicit();
+    }
+  }, {
+    key: "$contentWidthChanged",
+    value: function $contentWidthChanged() {
       this.$updateImplicit();
     }
   }, {
@@ -11963,19 +13553,18 @@ var QtQuick_Text = function (_QtQuick_Item38) {
   }, {
     key: "$updateImplicit",
     value: function $updateImplicit() {
+      /*
       if (!this.text || !this.dom) {
         this.implicitHeight = this.implicitWidth = 0;
         return;
       }
-
-      if (!this.$isUsingImplicitWidth) {
+        if (!this.$isUsingImplicitWidth) {
         this.implicitWidth = this.impl.offsetWidth;
         this.implicitHeight = this.impl.offsetHeight;
         return;
       }
-
-      var fc = this.impl;
-      var engine = QmlWeb.engine;
+        const fc = this.impl;
+      const engine = QmlWeb.engine;
       // Need to move the child out of it's parent so that it can properly
       // recalculate it's "natural" offsetWidth/offsetHeight
       if (engine.dom === document.body && engine.dom !== engine.domTarget) {
@@ -11985,12 +13574,12 @@ var QtQuick_Text = function (_QtQuick_Item38) {
       } else {
         document.body.appendChild(fc);
       }
-      var height = fc.offsetHeight;
-      var width = fc.offsetWidth;
-      this.dom.appendChild(fc);
-
-      this.implicitHeight = height;
-      this.implicitWidth = width;
+      const height = fc.offsetHeight;
+      const width = fc.offsetWidth;
+        this.dom.appendChild(fc);
+      */
+      this.implicitHeight = this.contentHeight;
+      this.implicitWidth = this.contentWidth;
     }
   }, {
     key: "$updateShadow",
@@ -12047,7 +13636,9 @@ QtQuick_Text.properties = {
   horizontalAlignment: { type: "enum", initialValue: 1 }, // Text.AlignLeft
   verticalAlignment: { type: "enum", initialValue: 32 }, // Text.AlignTop
   style: "enum",
-  styleColor: "color"
+  styleColor: "color",
+  contentHeight: "real",
+  contentWidth: "real"
 };
 
 QmlWeb.registerQmlType(QtQuick_Text);
@@ -12076,21 +13667,21 @@ QmlWeb.registerQmlType(QtQuick_Controls_2_Label);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_TextEdit = function (_QtQuick_Item39) {
-  _inherits(QtQuick_TextEdit, _QtQuick_Item39);
+var QtQuick_TextEdit = function (_QtQuick_Item40) {
+  _inherits(QtQuick_TextEdit, _QtQuick_Item40);
 
   function QtQuick_TextEdit(meta) {
     _classCallCheck(this, QtQuick_TextEdit);
 
     // Undo / Redo stacks;
-    var _this125 = _possibleConstructorReturn(this, (QtQuick_TextEdit.__proto__ || Object.getPrototypeOf(QtQuick_TextEdit)).call(this, meta));
+    var _this136 = _possibleConstructorReturn(this, (QtQuick_TextEdit.__proto__ || Object.getPrototypeOf(QtQuick_TextEdit)).call(this, meta));
 
-    _this125.undoStack = [];
-    _this125.undoStackPosition = -1;
-    _this125.redoStack = [];
-    _this125.redoStackPosition = -1;
+    _this136.undoStack = [];
+    _this136.undoStackPosition = -1;
+    _this136.redoStack = [];
+    _this136.redoStackPosition = -1;
 
-    var textarea = _this125.impl = document.createElement("textarea");
+    var textarea = _this136.impl = document.createElement("textarea");
     textarea.style.pointerEvents = "auto";
     textarea.style.width = "100%";
     textarea.style.height = "100%";
@@ -12104,16 +13695,16 @@ var QtQuick_TextEdit = function (_QtQuick_Item39) {
     // the positioning, so we need to manually set it to 0.
     textarea.style.margin = "0";
     textarea.disabled = false;
-    _this125.dom.appendChild(textarea);
+    _this136.dom.appendChild(textarea);
 
-    _this125.Component.completed.connect(_this125, _this125.Component$onCompleted);
-    _this125.textChanged.connect(_this125, _this125.$onTextChanged);
-    _this125.colorChanged.connect(_this125, _this125.$onColorChanged);
+    _this136.Component.completed.connect(_this136, _this136.Component$onCompleted);
+    _this136.textChanged.connect(_this136, _this136.$onTextChanged);
+    _this136.colorChanged.connect(_this136, _this136.$onColorChanged);
 
-    _this125.impl.addEventListener("input", function () {
-      return _this125.$updateValue();
+    _this136.impl.addEventListener("input", function () {
+      return _this136.$updateValue();
     });
-    return _this125;
+    return _this136;
   }
 
   _createClass(QtQuick_TextEdit, [{
@@ -12222,7 +13813,9 @@ var QtQuick_TextEdit = function (_QtQuick_Item39) {
     key: "Component$onCompleted",
     value: function Component$onCompleted() {
       this.selectByKeyboard = !this.readOnly;
+
       this.impl.readOnly = this.readOnly;
+
       this.$updateValue();
       this.implicitWidth = this.offsetWidth;
       this.implicitHeight = this.offsetHeight;
@@ -12246,6 +13839,8 @@ var QtQuick_TextEdit = function (_QtQuick_Item39) {
       this.length = this.text.length;
       this.lineCount = this.$getLineCount();
       this.$updateCss();
+
+      this.contentHeight = this.impl.scrollHeight;
     }
     // Transfer dom style to firstChild,
     // then clear corresponding dom style
@@ -12297,7 +13892,7 @@ QtQuick_TextEdit.properties = {
   lineCount: "int",
   mouseSelectionMode: "enum",
   persistentSelection: "bool",
-  readOnly: "bool",
+  readOnly: { type: "bool", initialValue: false },
   renderType: "enum",
   selectByKeyboard: { type: "bool", initialValue: true },
   selectByMouse: "bool",
@@ -12328,13 +13923,13 @@ var QtQuick_Controls_TextArea = function (_QtQuick_TextEdit) {
   function QtQuick_Controls_TextArea(meta) {
     _classCallCheck(this, QtQuick_Controls_TextArea);
 
-    var _this126 = _possibleConstructorReturn(this, (QtQuick_Controls_TextArea.__proto__ || Object.getPrototypeOf(QtQuick_Controls_TextArea)).call(this, meta));
+    var _this137 = _possibleConstructorReturn(this, (QtQuick_Controls_TextArea.__proto__ || Object.getPrototypeOf(QtQuick_Controls_TextArea)).call(this, meta));
 
-    var textarea = _this126.impl;
+    var textarea = _this137.impl;
     textarea.style.padding = "5px";
     textarea.style.borderWidth = "1px";
     textarea.style.backgroundColor = "#fff";
-    return _this126;
+    return _this137;
   }
 
   return QtQuick_Controls_TextArea;
@@ -12344,15 +13939,15 @@ QmlWeb.registerQmlType(QtQuick_Controls_TextArea);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_TextInput = function (_QtQuick_Item40) {
-  _inherits(QtQuick_TextInput, _QtQuick_Item40);
+var QtQuick_TextInput = function (_QtQuick_Item41) {
+  _inherits(QtQuick_TextInput, _QtQuick_Item41);
 
   function QtQuick_TextInput(meta) {
     _classCallCheck(this, QtQuick_TextInput);
 
-    var _this127 = _possibleConstructorReturn(this, (QtQuick_TextInput.__proto__ || Object.getPrototypeOf(QtQuick_TextInput)).call(this, meta));
+    var _this138 = _possibleConstructorReturn(this, (QtQuick_TextInput.__proto__ || Object.getPrototypeOf(QtQuick_TextInput)).call(this, meta));
 
-    var input = _this127.impl = document.createElement("input");
+    var input = _this138.impl = document.createElement("textarea");
     input.type = "text";
     input.disabled = true;
     input.style.pointerEvents = "auto";
@@ -12364,25 +13959,47 @@ var QtQuick_TextInput = function (_QtQuick_Item40) {
     input.style.height = "100%";
     input.style.border = "none";
     input.style.outline = "none";
-    _this127.dom.appendChild(input);
-    _this127.setupFocusOnDom(input);
+    input.style.background = "none";
+    input.style.resize = "none";
+    input.style.wordBreak = 'normal';
+    input.style.whiteSpace = 'nowrap';
+    input.style.overflow = 'hidden';
+    /*
+    input.style.display = "table-cell";
+    input.contentEditable = true;
+    input.style.whiteSpace = "nowrap";
+    input.style.whiteSpace = "nowrap";
+    input.style.overflowX = "hidden";
+    */
+    _this138.dom.appendChild(input);
+    _this138.setupFocusOnDom(input);
     input.disabled = false;
 
-    _this127.Component.completed.connect(_this127, _this127.Component$onCompleted);
-    _this127.textChanged.connect(_this127, _this127.$onTextChanged);
-    _this127.echoModeChanged.connect(_this127, _this127.$onEchoModeChanged);
-    _this127.maximumLengthChanged.connect(_this127, _this127.$onMaximumLengthChanged);
-    _this127.readOnlyChanged.connect(_this127, _this127.$onReadOnlyChanged);
+    _this138.Component.completed.connect(_this138, _this138.Component$onCompleted);
+    _this138.textChanged.connect(_this138, _this138.$onTextChanged);
+    _this138.echoModeChanged.connect(_this138, _this138.$onEchoModeChanged);
+    _this138.maximumLengthChanged.connect(_this138, _this138.$onMaximumLengthChanged);
+    _this138.readOnlyChanged.connect(_this138, _this138.$onReadOnlyChanged);
+    _this138.horizontalAlignmentChanged.connect(_this138, _this138.$alignChanged);
+    _this138.verticalAlignmentChanged.connect(_this138, _this138.$alignChanged);
+
+    _this138.heightChanged.connect(_this138, _this138.$heightChanged);
+    _this138.widthChanged.connect(_this138, _this138.$widthChanged);
+    _this138.colorChanged.connect(_this138, _this138.$colorChanged);
+    _this138.validatorChanged.connect(_this138, _this138.$validatorChanged);
+    _this138.wrapModeChanged.connect(_this138, _this138.$wrapModeChanged);
     //this.Keys.pressed.connect(this, this.Keys$onPressed);
 
-    _this127.impl.addEventListener("input", function () {
-      return _this127.$updateValue();
+    _this138.impl.addEventListener("input", function () {
+      return _this138.$updateValue();
     });
 
-    _this127.impl.addEventListener("keydown", function (e) {
-      _this127.Keys$onPressed(e);
+    _this138.impl.addEventListener("keydown", function (e) {
+      _this138.Keys$onPressed(e);
     });
-    return _this127;
+
+    _this138._buffer == null;
+    return _this138;
   }
 
   _createClass(QtQuick_TextInput, [{
@@ -12390,6 +14007,82 @@ var QtQuick_TextInput = function (_QtQuick_Item40) {
     value: function Component$onCompleted() {
       this.implicitWidth = this.impl.offsetWidth;
       this.implicitHeight = this.impl.offsetHeight;
+    }
+  }, {
+    key: "$wrapModeChanged",
+    value: function $wrapModeChanged() {
+
+      switch (this.wrapMode) {
+        case TextInput.NoWrap:
+          this.impl.style.wordBreak = 'normal';
+          this.impl.style.whiteSpace = 'nowrap';
+          break;
+        case TextInput.WordWrap:
+          this.impl.style.wordBreak = 'break-word';
+          this.impl.style.whiteSpace = 'break-spaces';
+          break;
+        case TextInput.WrapAnywhere:
+          this.impl.style.wordBreak = 'break-all';
+          this.impl.style.whiteSpace = 'break-spaces';
+          break;
+        case TextInput.Wrap:
+          this.impl.style.wordBreak = 'break-all';
+          this.impl.style.whiteSpace = 'break-spaces';
+          break;
+      }
+    }
+  }, {
+    key: "$colorChanged",
+    value: function $colorChanged(newVal) {
+      this.impl.style.color = newVal.$css;
+    }
+  }, {
+    key: "$validatorChanged",
+    value: function $validatorChanged() {
+      //this.impl.pattern
+    }
+  }, {
+    key: "$heightChanged",
+    value: function $heightChanged() {
+      this.impl.style.height = this.height + "px";
+      this.$alignChanged();
+    }
+  }, {
+    key: "$widthChanged",
+    value: function $widthChanged() {
+      this.impl.style.width = this.width + "px";
+      this.$alignChanged();
+    }
+  }, {
+    key: "$alignChanged",
+    value: function $alignChanged() {
+
+      switch (this.horizontalAlignment) {
+        case TextInput.AlignLeft:
+          this.impl.style.textAlign = 'start';
+          break;
+        case TextInput.AlignRight:
+          this.impl.style.textAlign = 'end';
+          break;
+        case TextInput.AlignHCenter:
+          this.impl.style.textAlign = 'center';
+          break;
+      }
+
+      this.impl.style.padding = "0";
+      this.impl.style.height = this.height + "px";
+      switch (this.verticalAlignment) {
+        case TextInput.AlignTop:
+          //this.impl.style.paddingBottom = `${this.height - this.font.pixelSize}px`;
+          //this.impl.style.height = `auto`;
+          break;
+        case TextInput.AlignBottom:
+          this.impl.style.paddingTop = this.height - this.font.pixelSize + "px";
+          break;
+        case TextInput.AlignVCenter:
+          this.impl.style.paddingTop = this.height / 2 - this.countLines() * this.font.pixelSize / 2 + "px";
+          break;
+      }
     }
   }, {
     key: "$onTextChanged",
@@ -12402,6 +14095,7 @@ var QtQuick_TextInput = function (_QtQuick_Item40) {
       if (this.impl.value !== newVal) {
         this.impl.value = newVal;
       }
+      this.$alignChanged();
     }
   }, {
     key: "$onEchoModeChanged",
@@ -12438,9 +14132,11 @@ var QtQuick_TextInput = function (_QtQuick_Item40) {
   }, {
     key: "Keys$onPressed",
     value: function Keys$onPressed(e) {
+
       var Qt = QmlWeb.Qt;
       var submit = e.keyCode === Qt.Key_Return || e.keyCode === Qt.Key_Enter;
       if (submit && this.$testValidator()) {
+        e.preventDefault();
         this.accepted();
 
         e.accepted = true;
@@ -12455,11 +14151,62 @@ var QtQuick_TextInput = function (_QtQuick_Item40) {
       return true;
     }
   }, {
+    key: "countLines",
+    value: function countLines() {
+      var textarea = this.impl;
+      if (this._buffer == null) {
+        this._buffer = document.createElement('textarea');
+        this._buffer.style.border = 'none';
+        this._buffer.style.height = '0';
+        this._buffer.style.overflow = 'hidden';
+        this._buffer.style.padding = '0';
+        this._buffer.style.position = 'absolute';
+        this._buffer.style.left = '0';
+        this._buffer.style.top = '0';
+        this._buffer.style.zIndex = '-1';
+        this.dom.appendChild(this._buffer);
+      }
+
+      var cs = window.getComputedStyle(textarea);
+      var pl = parseInt(cs.paddingLeft);
+      var pr = parseInt(cs.paddingRight);
+      var lh = parseInt(cs.lineHeight);
+
+      // [cs.lineHeight] may return 'normal', which means line height = font size.
+      if (isNaN(lh)) lh = parseInt(cs.fontSize);
+
+      // Copy content width.
+      this._buffer.style.width = textarea.clientWidth - pl - pr + 'px';
+
+      // Copy text properties.
+      this._buffer.style.font = cs.font;
+      this._buffer.style.letterSpacing = cs.letterSpacing;
+      this._buffer.style.whiteSpace = cs.whiteSpace;
+      this._buffer.style.wordBreak = cs.wordBreak;
+      this._buffer.style.wordSpacing = cs.wordSpacing;
+      this._buffer.style.wordWrap = cs.wordWrap;
+
+      // Copy value.
+      this._buffer.value = textarea.value;
+
+      var result = Math.floor(this._buffer.scrollHeight / lh);
+      if (result == 0) result = 1;
+      return result;
+    }
+  }, {
     key: "$updateValue",
     value: function $updateValue() {
       if (this.text !== this.impl.value) {
         this.$canEditReadOnlyProperties = true;
-        this.text = this.impl.value;
+        if (this.validator) {
+          if (this.impl.value == '' || this.validator.validate(this.impl.value)) {
+            this.text = this.impl.value;
+          } else {
+            this.impl.value = this.text;
+          }
+        } else {
+          this.text = this.impl.value;
+        }
         this.$canEditReadOnlyProperties = false;
       }
     }
@@ -12469,16 +14216,34 @@ var QtQuick_TextInput = function (_QtQuick_Item40) {
 }(QtQuick_Item);
 
 QtQuick_TextInput.enums = {
-  TextInput: { Normal: 0, Password: 1, NoEcho: 2, PasswordEchoOnEdit: 3 }
+  TextInput: {
+    Normal: 0,
+    Password: 1,
+    NoEcho: 2,
+    PasswordEchoOnEdit: 3,
+    AlignLeft: Qt.AlignLeft,
+    AlignRight: Qt.AlignRight,
+    AlignHCenter: Qt.AlignHCenter,
+    AlignTop: Qt.AlignTop,
+    AlignBottom: Qt.AlignBottom,
+    AlignVCenter: Qt.AlignVCenter,
+    NoWrap: 0,
+    WordWrap: 1,
+    WrapAnywhere: 2,
+    Wrap: 3
+  }
 };
 QtQuick_TextInput.properties = {
   color: { type: "color", initialValue: "white" },
   text: "string",
   font: "font",
   maximumLength: { type: "int", initialValue: -1 },
-  readOnly: "bool",
+  readOnly: { type: "bool", initialValue: false },
   validator: "var",
-  echoMode: "enum" // TextInput.Normal
+  echoMode: "enum", // TextInput.Normal
+  wrapMode: { type: "enum", initialValue: 0 }, // TextInput.Normal
+  horizontalAlignment: "enum",
+  verticalAlignment: { type: "enum", initialValue: Qt.AlignTop }
 };
 QtQuick_TextInput.signals = {
   accepted: []
@@ -12488,16 +14253,16 @@ QmlWeb.registerQmlType(QtQuick_TextInput);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_Transition = function (_QtQml_QtObject24) {
-  _inherits(QtQuick_Transition, _QtQml_QtObject24);
+var QtQuick_Transition = function (_QtQml_QtObject26) {
+  _inherits(QtQuick_Transition, _QtQml_QtObject26);
 
   function QtQuick_Transition(meta) {
     _classCallCheck(this, QtQuick_Transition);
 
-    var _this128 = _possibleConstructorReturn(this, (QtQuick_Transition.__proto__ || Object.getPrototypeOf(QtQuick_Transition)).call(this, meta));
+    var _this139 = _possibleConstructorReturn(this, (QtQuick_Transition.__proto__ || Object.getPrototypeOf(QtQuick_Transition)).call(this, meta));
 
-    _this128.$item = _this128.$parent;
-    return _this128;
+    _this139.$item = _this139.$parent;
+    return _this139;
   }
 
   _createClass(QtQuick_Transition, [{
@@ -12543,17 +14308,17 @@ QmlWeb.registerQmlType(QtQuick_Transition);
 
 // eslint-disable-next-line no-undef
 
-var QtQuick_Translate = function (_QtQml_QtObject25) {
-  _inherits(QtQuick_Translate, _QtQml_QtObject25);
+var QtQuick_Translate = function (_QtQml_QtObject27) {
+  _inherits(QtQuick_Translate, _QtQml_QtObject27);
 
   function QtQuick_Translate(meta) {
     _classCallCheck(this, QtQuick_Translate);
 
-    var _this129 = _possibleConstructorReturn(this, (QtQuick_Translate.__proto__ || Object.getPrototypeOf(QtQuick_Translate)).call(this, meta));
+    var _this140 = _possibleConstructorReturn(this, (QtQuick_Translate.__proto__ || Object.getPrototypeOf(QtQuick_Translate)).call(this, meta));
 
-    _this129.xChanged.connect(_this129.$parent, _this129.$parent.$updateTransform);
-    _this129.yChanged.connect(_this129.$parent, _this129.$parent.$updateTransform);
-    return _this129;
+    _this140.xChanged.connect(_this140.$parent, _this140.$parent.$updateTransform);
+    _this140.yChanged.connect(_this140.$parent, _this140.$parent.$updateTransform);
+    return _this140;
   }
 
   return QtQuick_Translate;
@@ -12625,8 +14390,8 @@ QmlWeb.registerQmlType(QtQuick_YAnimator);
 
 // eslint-disable-next-line no-undef
 
-var QtTest_SignalSpy = function (_QtQuick_Item41) {
-  _inherits(QtTest_SignalSpy, _QtQuick_Item41);
+var QtTest_SignalSpy = function (_QtQuick_Item42) {
+  _inherits(QtTest_SignalSpy, _QtQuick_Item42);
 
   function QtTest_SignalSpy() {
     _classCallCheck(this, QtTest_SignalSpy);
@@ -12669,15 +14434,15 @@ QmlWeb.registerQmlType(QtTest_SignalSpy);
 
 // eslint-disable-next-line no-undef
 
-var QtTest_TestCase = function (_QtQuick_Item42) {
-  _inherits(QtTest_TestCase, _QtQuick_Item42);
+var QtTest_TestCase = function (_QtQuick_Item43) {
+  _inherits(QtTest_TestCase, _QtQuick_Item43);
 
   function QtTest_TestCase(meta) {
     _classCallCheck(this, QtTest_TestCase);
 
-    var _this134 = _possibleConstructorReturn(this, (QtTest_TestCase.__proto__ || Object.getPrototypeOf(QtTest_TestCase)).call(this, meta));
+    var _this145 = _possibleConstructorReturn(this, (QtTest_TestCase.__proto__ || Object.getPrototypeOf(QtTest_TestCase)).call(this, meta));
 
-    _this134.Component.completed.connect(_this134, _this134.Component$onCompleted);
+    _this145.Component.completed.connect(_this145, _this145.Component$onCompleted);
 
     var engine = QmlWeb.engine;
     if (!engine.tests) {
@@ -12698,7 +14463,7 @@ var QtTest_TestCase = function (_QtQuick_Item42) {
     }
     QmlWeb.engine.tests.total++;
 
-    _this134.console = {
+    _this145.console = {
       assert: function assert() {
         var _console;
 
@@ -12711,7 +14476,7 @@ var QtTest_TestCase = function (_QtQuick_Item42) {
           a[_key27] = arguments[_key27];
         }
 
-        return (_console2 = console).error.apply(_console2, ["QSYSTEM: " + _this134.$testId + " qml:"].concat(a));
+        return (_console2 = console).error.apply(_console2, ["QSYSTEM: " + _this145.$testId + " qml:"].concat(a));
       },
       info: function info() {
         var _console3;
@@ -12720,7 +14485,7 @@ var QtTest_TestCase = function (_QtQuick_Item42) {
           a[_key28] = arguments[_key28];
         }
 
-        return (_console3 = console).info.apply(_console3, ["QINFO  : " + _this134.$testId + " qml:"].concat(a));
+        return (_console3 = console).info.apply(_console3, ["QINFO  : " + _this145.$testId + " qml:"].concat(a));
       },
       log: function log() {
         var _console4;
@@ -12729,7 +14494,7 @@ var QtTest_TestCase = function (_QtQuick_Item42) {
           a[_key29] = arguments[_key29];
         }
 
-        return (_console4 = console).log.apply(_console4, ["QDEBUG : " + _this134.$testId + " qml:"].concat(a));
+        return (_console4 = console).log.apply(_console4, ["QDEBUG : " + _this145.$testId + " qml:"].concat(a));
       },
       time: function time() {
         var _console5;
@@ -12753,16 +14518,16 @@ var QtTest_TestCase = function (_QtQuick_Item42) {
           a[_key30] = arguments[_key30];
         }
 
-        return (_console8 = console).warn.apply(_console8, ["QWARN  : " + _this134.$testId + " qml:"].concat(a));
+        return (_console8 = console).warn.apply(_console8, ["QWARN  : " + _this145.$testId + " qml:"].concat(a));
       }
     };
-    return _this134;
+    return _this145;
   }
 
   _createClass(QtTest_TestCase, [{
     key: "Component$onCompleted",
     value: function Component$onCompleted() {
-      var _this135 = this;
+      var _this146 = this;
 
       var info = QmlWeb.engine.tests;
       if (!info.started) {
@@ -12781,19 +14546,19 @@ var QtTest_TestCase = function (_QtQuick_Item42) {
       tests.unshift("initTestCase");
       tests.push("cleanupTestCase");
       tests.forEach(function (test) {
-        _this135.$testId = info.name + "::" + _this135.name + "::" + test + "()";
+        _this146.$testId = info.name + "::" + _this146.name + "::" + test + "()";
         var special = test === "initTestCase" || test === "cleanupTestCase";
 
         var dstart = performance.now();
         var data = void 0;
-        if (_this135[test + "_data"] && !special) {
-          data = _this135[test + "_data"]();
+        if (_this146[test + "_data"] && !special) {
+          data = _this146[test + "_data"]();
           if (!data || !data.length) {
-            _this135.warn("no data supplied for " + test + "() by " + test + "_data()");
+            _this146.warn("no data supplied for " + test + "() by " + test + "_data()");
             data = [];
           }
-        } else if (_this135.init_data && !special) {
-          data = _this135.init_data();
+        } else if (_this146.init_data && !special) {
+          data = _this146.init_data();
           if (!data || !data.length) {
             data = undefined;
           }
@@ -12806,30 +14571,30 @@ var QtTest_TestCase = function (_QtQuick_Item42) {
 
         data.forEach(function (row) {
           var arg = row ? row.tag : "";
-          _this135.$testId = info.name + "::" + _this135.name + "::" + test + "(" + arg + ")";
+          _this146.$testId = info.name + "::" + _this146.name + "::" + test + "(" + arg + ")";
           var start = performance.now();
           var error = void 0;
           try {
             if (!special) {
-              _this135.init();
+              _this146.init();
             }
-            _this135[test](row);
+            _this146[test](row);
           } catch (e) {
             error = e;
           } finally {
             if (!special) {
-              _this135.cleanup();
+              _this146.cleanup();
             }
           }
           var end = performance.now();
           info.duration += end - start;
           if (error && error.skip) {
             info.stats.skip++;
-            console.log("SKIP   : " + _this135.$testId + " " + error.message);
+            console.log("SKIP   : " + _this146.$testId + " " + error.message);
           } else if (error) {
             info.stats.fail++;
-            info.errors.push(_this135.$testId + " " + error.message);
-            console.log("FAIL!  : " + _this135.$testId + " " + error.message);
+            info.errors.push(_this146.$testId + " " + error.message);
+            console.log("FAIL!  : " + _this146.$testId + " " + error.message);
             if ("actual" in error) {
               console.log("   Actual   (): " + error.actual);
             }
@@ -12838,11 +14603,11 @@ var QtTest_TestCase = function (_QtQuick_Item42) {
             }
           } else {
             info.stats.pass++;
-            console.log("PASS   : " + _this135.$testId);
+            console.log("PASS   : " + _this146.$testId);
           }
         });
 
-        _this135.$testId = info.name + "::UnknownTestFunc()";
+        _this146.$testId = info.name + "::UnknownTestFunc()";
       });
 
       // TODO: benchmarks
@@ -13027,21 +14792,21 @@ QmlWeb.registerQmlType(QtTest_TestCase);
 
 // eslint-disable-next-line no-undef
 
-var QtWebSockets_WebSocket = function (_QtQml_QtObject26) {
-  _inherits(QtWebSockets_WebSocket, _QtQml_QtObject26);
+var QtWebSockets_WebSocket = function (_QtQml_QtObject28) {
+  _inherits(QtWebSockets_WebSocket, _QtQml_QtObject28);
 
   function QtWebSockets_WebSocket(meta) {
     _classCallCheck(this, QtWebSockets_WebSocket);
 
-    var _this136 = _possibleConstructorReturn(this, (QtWebSockets_WebSocket.__proto__ || Object.getPrototypeOf(QtWebSockets_WebSocket)).call(this, meta));
+    var _this147 = _possibleConstructorReturn(this, (QtWebSockets_WebSocket.__proto__ || Object.getPrototypeOf(QtWebSockets_WebSocket)).call(this, meta));
 
-    _this136.$socket = undefined;
-    _this136.$reconnect = false;
+    _this147.$socket = undefined;
+    _this147.$reconnect = false;
 
-    _this136.statusChanged.connect(_this136, _this136.$onStatusChanged);
-    _this136.activeChanged.connect(_this136, _this136.$reconnectSocket);
-    _this136.urlChanged.connect(_this136, _this136.$reconnectSocket);
-    return _this136;
+    _this147.statusChanged.connect(_this147, _this147.$onStatusChanged);
+    _this147.activeChanged.connect(_this147, _this147.$reconnectSocket);
+    _this147.urlChanged.connect(_this147, _this147.$reconnectSocket);
+    return _this147;
   }
 
   _createClass(QtWebSockets_WebSocket, [{
@@ -13054,7 +14819,7 @@ var QtWebSockets_WebSocket = function (_QtQml_QtObject26) {
   }, {
     key: "$connectSocket",
     value: function $connectSocket() {
-      var _this137 = this;
+      var _this148 = this;
 
       this.$reconnect = false;
 
@@ -13065,20 +14830,20 @@ var QtWebSockets_WebSocket = function (_QtQml_QtObject26) {
       this.status = this.WebSocket.Connecting;
       this.$socket = new WebSocket(this.url);
       this.$socket.onopen = function () {
-        _this137.status = _this137.WebSocket.Open;
+        _this148.status = _this148.WebSocket.Open;
       };
       this.$socket.onclose = function () {
-        _this137.status = _this137.WebSocket.Closed;
-        if (_this137.$reconnect) {
-          _this137.$connectSocket();
+        _this148.status = _this148.WebSocket.Closed;
+        if (_this148.$reconnect) {
+          _this148.$connectSocket();
         }
       };
       this.$socket.onerror = function (error) {
-        _this137.errorString = error.message;
-        _this137.status = _this137.WebSocket.Error;
+        _this148.errorString = error.message;
+        _this148.status = _this148.WebSocket.Error;
       };
       this.$socket.onmessage = function (message) {
-        _this137.textMessageReceived(message.data);
+        _this148.textMessageReceived(message.data);
       };
     }
   }, {
@@ -13128,41 +14893,41 @@ QmlWeb.registerQmlType(QtWebSockets_WebSocket);
 
 // eslint-disable-next-line no-undef
 
-var QtWebView_WebView = function (_QtQuick_Item43) {
-  _inherits(QtWebView_WebView, _QtQuick_Item43);
+var QtWebView_WebView = function (_QtQuick_Item44) {
+  _inherits(QtWebView_WebView, _QtQuick_Item44);
 
   function QtWebView_WebView(meta) {
     _classCallCheck(this, QtWebView_WebView);
 
-    var _this138 = _possibleConstructorReturn(this, (QtWebView_WebView.__proto__ || Object.getPrototypeOf(QtWebView_WebView)).call(this, meta));
+    var _this149 = _possibleConstructorReturn(this, (QtWebView_WebView.__proto__ || Object.getPrototypeOf(QtWebView_WebView)).call(this, meta));
 
-    _this138.urlChanged.connect(_this138, _this138.$onUrlChanged);
+    _this149.urlChanged.connect(_this149, _this149.$onUrlChanged);
 
-    var iframe = _this138.impl = document.createElement("iframe");
+    var iframe = _this149.impl = document.createElement("iframe");
     iframe.style.display = "block";
     iframe.style.position = "absolute";
     iframe.style.width = "100%";
     iframe.style.height = "100%";
     iframe.style.borderWidth = "0";
     iframe.style.pointerEvents = "auto";
-    _this138.dom.appendChild(iframe);
+    _this149.dom.appendChild(iframe);
 
     iframe.onload = function () {
       try {
-        _this138.title = iframe.contentDocument.title;
+        _this149.title = iframe.contentDocument.title;
       } catch (e) {
-        console.log("CSP prevents us from reading title for " + _this138.url);
-        _this138.title = "";
+        console.log("CSP prevents us from reading title for " + _this149.url);
+        _this149.title = "";
       }
-      _this138.loadProgress = 100;
-      _this138.loading = false;
+      _this149.loadProgress = 100;
+      _this149.loading = false;
     };
     iframe.onerror = function () {
-      _this138.title = "";
-      _this138.loadProgress = 0;
-      _this138.loading = false;
+      _this149.title = "";
+      _this149.loadProgress = 0;
+      _this149.loading = false;
     };
-    return _this138;
+    return _this149;
   }
 
   _createClass(QtWebView_WebView, [{

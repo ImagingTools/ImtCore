@@ -49,6 +49,8 @@ Rectangle
         anchors.bottom: parent.bottom
         onActivePageChanged: {
             topPanel.title = activePageId
+            tabPanel.firstElementName = activePageId
+            tabPanel.firstElementImageSource = activeIcon
             console.log("onActivePageChanged", activePageId)
             commandsModel.SetQueryParam(PageEnum.ID,activePageId);
             commandsModel.SetQueryParam(CommandEnum.ID,"");
@@ -56,8 +58,26 @@ Rectangle
         }
     }
 
+    AUX.TabPanel{
+        id:tabPanel
+        anchors.left: menuPanel.right
+        anchors.right: parent.right
+        anchors.top: topPanel.bottom
+        visible: true//ПОМЕНЯТЬ!!!
+       // textColor: window.textColor
+       // fontName: window.fontName
+    }
 
 
+    AUX.Table{
+        id: table
+        anchors.left: menuPanel.right
+        width: tabPanel.width/4*3
+        anchors.top: tabPanel.bottom
+        anchors.bottom: parent.bottom
+        textColor: window.textColor
+        fontName: window.fontName
+    }
 
 
 }

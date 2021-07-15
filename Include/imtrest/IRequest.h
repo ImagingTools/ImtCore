@@ -29,7 +29,7 @@ public:
 		RS_CHUNK_COMPLETE
 	};
 
-	typedef QMap<QString, QString> CommandParams;
+	typedef QMap<QByteArray, QByteArray> CommandParams;
 
 	virtual RequestState GetState() const = 0;
 	virtual QByteArray GetCommandId() const = 0;

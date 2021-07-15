@@ -13,7 +13,7 @@
 #include <QtCore/QTextStream>
 
 // ImtCore includes
-#include <imtfile/IFileProvider.h>
+#include <imtbase/IBinaryDataProvider.h>
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponder.h>
 #include <imtrest/IResponse.h>
@@ -33,17 +33,17 @@ public:
 
 	I_BEGIN_COMPONENT(CHttpFileProviderBasedServletComp);
 		I_REGISTER_INTERFACE(IRequestHandler);
-		I_ASSIGN_MULTI_0(m_fileProvidersPtrs, "FileTemplateHomePath", "FileTemplate based Home path\n Note: type is ignored only value matters \n Warning: overwrites HomePath!", true);
+		I_ASSIGN_MULTI_0(m_binaryDataProvidersCompPtr, "Bynary data providers", "Bynary data providers", true);
 	I_END_COMPONENT
 
-	QByteArray GetMimeType(const QFileInfo& fileInfo) const;
+	QByteArray GetMimeType(QByteArray fileSuffix) const;
 
 // reimplemented (IRequestHandler)
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const override;
 	virtual QByteArray GetSupportedCommandId() const override;
 
 private:
-	I_MULTIREF(imtfile::IFileProvider, m_fileProvidersPtrs);
+	I_MULTIREF(imtbase::IBinaryDataProvider, m_binaryDataProvidersCompPtr);
 
 	QByteArray m_beginOfMessage;
 	QByteArray m_endOfMessage;
