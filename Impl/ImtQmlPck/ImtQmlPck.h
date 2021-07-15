@@ -16,6 +16,7 @@
 #include <imtqml/CApplicationDataEnumProviderComp.h>
 #include <imtqml/CPageDataEnumProviderComp.h>
 #include <imtqml/CCommandDataEnumProviderComp.h>
+#include <imtqml/CMenuDataEnumProviderComp.h>
 /**
 	ImtQmlPck package
 */
@@ -33,6 +34,7 @@ typedef imtqml::CPageDataProviderCompBase PageDataProvider;
 typedef imtqml::CApplicationDataEnumProviderComp ApplicationDataEnumProvider;
 typedef imtqml::CPageDataEnumProviderComp PageDataEnumProvider;
 typedef imtqml::CCommandDataEnumProviderComp CommandDataEnumProvider;
+typedef imtqml::CMenuDataEnumProviderComp MenuDataEnumProvider;
 
 
 } // namespace ImtQmlPck

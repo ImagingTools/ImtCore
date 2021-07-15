@@ -68,6 +68,11 @@ I_EXPORT_COMPONENT(
 			"Command data enum provider",
 			"Command data enum provider");
 
+I_EXPORT_COMPONENT(
+			MenuDataEnumProvider,
+			"Menu data enum provider",
+			"Menu data enum provider");
+
 } // namespace ImtQmlPck
 
 
