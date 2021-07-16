@@ -25,8 +25,8 @@ class CDataBaseObjectCollection: public imtbase::CObjectCollectionBase, public i
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
-
 	I_BEGIN_COMPONENT(CDataBaseObjectCollection);
+	    I_REGISTER_INTERFACE(CDataBaseObjectCollection);
 		I_ASSIGN(m_dbEngineCompPtr, "DataBaseEngine", "DataBase for getting data", true, "IDatabaseEngine");
 		I_ASSIGN(m_updateOnDataBaseConnectedAttrPtr, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", true, false);
 		I_ASSIGN(m_selectSqlQueryPathAttrPtr, "SelectSqlQueryPath", "SQL query string file path for Selecting in database", false, "");
