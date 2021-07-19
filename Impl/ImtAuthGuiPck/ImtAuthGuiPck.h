@@ -16,6 +16,7 @@
 #include <imtauthgui/CContactInfoViewDelegateComp.h>
 #include <imtauthgui/CAccountInfoViewDelegateComp.h>
 #include <imtauthgui/CDesignManagerComp.h>
+#include <imtauthgui/CStandardAccountMenu.h>
 
 
 namespace ImtAuthGuiPck
@@ -33,6 +34,7 @@ typedef imtauthgui::CContactInfoRepresentationDataProviderComp CContactInfoRepre
 typedef icomp::TMakeComponentWrap<
 							imtauthgui::CContactInfoRepresentationDataController,
 							imtbase::IItemBasedRepresentationDataController> CContactInfoRepresentationDataController;
+typedef imtauthgui::CStandardAccountMenu StandardAccountMenu;
 
 
 } // namespace ImtAuthGuiPck

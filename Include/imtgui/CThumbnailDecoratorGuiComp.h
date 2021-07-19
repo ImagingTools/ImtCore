@@ -88,6 +88,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(LoginLog, ilog::IMessageConsumer, ExtractLoginLog);
 		I_ASSIGN(m_hideMenuPanelOnHomePageAttrPtr, "HideMenuPanelOnHomePage", "Hide menu panel when home page is active", true, true);
 		I_ASSIGN(m_hideHomeButtonAttrPtr, "HideHomeButton", "Hide home button", true, false);
+		I_ASSIGN(m_accountMenuCompPtr, "AccountMenu", "Menu for logged account", false, "AccountMenu");
 	I_END_COMPONENT;
 
 	CThumbnailDecoratorGuiCompAttr2()
@@ -118,6 +119,7 @@ private:
 protected:
 	I_ATTR(bool, m_hideMenuPanelOnHomePageAttrPtr);
 	I_ATTR(bool, m_hideHomeButtonAttrPtr);
+	I_REF(iqtgui::IGuiObject, m_accountMenuCompPtr);
 
 	LoginLog m_loginLog;
 };
@@ -217,8 +219,8 @@ private Q_SLOTS:
 	void on_LoginControlButton_clicked();
 	void on_PasswordEdit_textEdited(const QString &text);
 	void on_CommandsMenuButton_clicked();
-	void Logout();
-	void checkIsFullScreen();
+	void OnAutoLogoutTimer();
+	void OnCheckIsFullScreenTimer();
 	void on_BackPageButton_clicked();
 	void on_NextPageButton_clicked();
 	void on_DashboardButton_clicked();

@@ -301,8 +301,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 	UpdateLoginButtonsState();
 
-	connect(&m_autoLogoutTimer, SIGNAL(timeout()), this, SLOT(Logout()));
-	connect(&m_checkIsFullScreenTimer, SIGNAL(timeout()), this, SLOT(checkIsFullScreen()));
+	connect(&m_autoLogoutTimer, SIGNAL(timeout()), this, SLOT(OnAutoLogoutTimer()));
+	connect(&m_checkIsFullScreenTimer, SIGNAL(timeout()), this, SLOT(OnCheckIsFullScreenTimer()));
 
 	m_checkIsFullScreenTimer.start(500);
 
@@ -311,11 +311,19 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 
 	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ThumbnailDecoratorGui");
+
+	if (m_accountMenuCompPtr.IsValid()){
+		m_accountMenuCompPtr->CreateGui(GetQtWidget());
+	}
 }
 
 
 void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 {
+	if (m_accountMenuCompPtr.IsValid() && m_accountMenuCompPtr->IsGuiCreated()){
+		m_accountMenuCompPtr->DestroyGui();
+	}
+
 	if (m_dashboardGuiCompPtr.IsValid() && m_dashboardGuiCompPtr->IsGuiCreated()){
 		m_dashboardGuiCompPtr->DestroyGui();
 	}
@@ -562,7 +570,20 @@ void CThumbnailDecoratorGuiComp::on_LoginControlButton_clicked()
 		ShowLoginPage();
 	}
 	else{
-		ProcessLogout();
+		if (m_accountMenuCompPtr.IsValid()){
+			QWidget* menuPtr = m_accountMenuCompPtr->GetWidget();
+			if (menuPtr != nullptr){
+				QPoint menuPos = LoginControlButton->mapToGlobal(LoginControlButton->rect().bottomRight());
+				menuPtr->resize(10, 10);
+				menuPos.rx() -= menuPtr->sizeHint().width();
+				menuPos.setY(TopFrame->mapToGlobal(TopFrame->rect().bottomRight()).y());
+				menuPtr->move(menuPos);
+				menuPtr->show();
+			}
+		}
+		else{
+			m_loginCompPtr->Logout();
+		}
 	}
 }
 
@@ -592,13 +613,13 @@ void CThumbnailDecoratorGuiComp::on_CommandsMenuButton_clicked()
 }
 
 
-void CThumbnailDecoratorGuiComp::Logout()
+void CThumbnailDecoratorGuiComp::OnAutoLogoutTimer()
 {
-	ProcessLogout();
+	m_loginCompPtr->Logout();
 }
 
 
-void CThumbnailDecoratorGuiComp::checkIsFullScreen()
+void CThumbnailDecoratorGuiComp::OnCheckIsFullScreenTimer()
 {
 	QWidget* mainWidgetPtr = GetWidget();
 	Q_ASSERT(mainWidgetPtr != nullptr);
@@ -1051,24 +1072,22 @@ int CThumbnailDecoratorGuiComp::GetAutoLogoutTime() const
 
 void CThumbnailDecoratorGuiComp::ProcessLogout()
 {
-	if (m_loginCompPtr->Logout()){
-		m_autoLogoutTimer.stop();
+	m_autoLogoutTimer.stop();
 
-		qApp->removeEventFilter(this);
+	qApp->removeEventFilter(this);
 
-		UpdateLoginButtonsState();
+	UpdateLoginButtonsState();
 
-		LoginMode loginMode = GetLoginMode();
-		if (loginMode == LM_STRONG){
-			ShowLoginPage();
+	LoginMode loginMode = GetLoginMode();
+	if (loginMode == LM_STRONG){
+		ShowLoginPage();
+	}
+	else{
+		if (m_defaultPageIndexAttrPtr.IsValid()){
+			SwitchToPage(*m_defaultPageIndexAttrPtr);
 		}
 		else{
-			if (m_defaultPageIndexAttrPtr.IsValid()){
-				SwitchToPage(*m_defaultPageIndexAttrPtr);
-			}
-			else{
-				ShowHomePage();
-			}
+			ShowHomePage();
 		}
 	}
 }
@@ -1453,6 +1472,10 @@ void CThumbnailDecoratorGuiComp::LoginObserver::OnModelChanged(int /*modelId*/, 
 		for (QDialog* dialogPtr : openDialogs){
 			dialogPtr->reject();
 		}
+	}
+
+	if (m_parent.m_loginCompPtr->GetLoggedUser() == nullptr){
+		m_parent.ProcessLogout();
 	}
 
 	m_parent.UpdateLoginButtonsState();

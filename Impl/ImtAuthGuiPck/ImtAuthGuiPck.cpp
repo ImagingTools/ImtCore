@@ -64,6 +64,11 @@ I_EXPORT_COMPONENT(
 			"Contact Info Representation DataController",
 			"Contact Info Representation DataController");
 
+I_EXPORT_COMPONENT(
+			StandardAccountMenu,
+			"Standard account menu",
+			"Account Menu Login Logout");
+
 } // namespace ImtAuthGuiPck
 
 

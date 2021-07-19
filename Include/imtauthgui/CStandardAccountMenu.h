@@ -1,0 +1,54 @@
+#pragma once
+#include <GeneratedFiles/imtauthgui/ui_CStandardAccountMenu.h>
+
+
+// ACF includes
+#include <iauth/ILogin.h>
+#include <iqtgui/IDialog.h>
+#include <iqtgui/TDesignerGuiCompBase.h>
+
+// ImtCore includes
+#include <imtbase/TModelUpdateBinder.h>
+
+
+namespace imtauthgui
+{
+
+
+class CStandardAccountMenu: public iqtgui::TDesignerGuiCompBase<Ui::CStandardAccountMenu>
+{
+public:
+	typedef iqtgui::TDesignerGuiCompBase<Ui::CStandardAccountMenu> BaseClass;
+
+	I_BEGIN_COMPONENT(CStandardAccountMenu);
+		I_ASSIGN(m_accountPreviewAttrPtr, "AccountIcon", "Account icon", true, ":/Icons/Account");
+		I_ASSIGN(m_preferencesIconAttrPtr, "PreferencesIcon", "Preferences icon", true, ":/Icons/Settings");
+		I_ASSIGN(m_iconSizeAttrPtr, "IconSize", "Size of icons", true, 32);
+		I_ASSIGN(m_loginCompPtr, "Login", "Login", false, "Login");
+		I_ASSIGN(m_preferencesDialogCompPtr, "PreferencesDialog", "Preferences dialog", false, "Preferences");
+	I_END_COMPONENT;
+
+	CStandardAccountMenu();
+	virtual bool eventFilter(QObject* watched, QEvent* event) override;
+
+protected:
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiDestroyed() override;
+
+private:
+	void OnLoginUpdate(const istd::IChangeable::ChangeSet& changeSet, const iauth::ILogin* objectPtr);
+
+private:
+	I_ATTR(QByteArray, m_accountPreviewAttrPtr);
+	I_ATTR(QByteArray, m_preferencesIconAttrPtr);
+	I_ATTR(int, m_iconSizeAttrPtr);
+	I_REF(iauth::ILogin, m_loginCompPtr);
+	I_REF(iqtgui::IDialog, m_preferencesDialogCompPtr);
+
+	imtbase::TModelUpdateBinder<iauth::ILogin, CStandardAccountMenu> m_loginObserver;
+};
+
+
+} // namespace imtauthgui
+
+
