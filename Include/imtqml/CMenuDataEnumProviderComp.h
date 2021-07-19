@@ -39,7 +39,7 @@ public:
 	const QString Url() { return URL; }
 
 protected:
-	void virtual GetEnums(imtrest::QweryParams& enums) const override
+	void virtual GetEnums(imtrest::QueryParams& enums) const override
 	{
 		enums.insert("TITLE", TITLE);
 		enums.insert("TEXT", TEXT);

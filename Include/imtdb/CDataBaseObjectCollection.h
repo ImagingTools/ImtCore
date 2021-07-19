@@ -1,6 +1,6 @@
 #pragma once
 
-
+ 
 // Qt includes
 #include <QtSql/QtSql>
 

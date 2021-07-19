@@ -35,7 +35,7 @@ QByteArray CContactInfoEditorDataControllerComp::CItemBasedRepresentationDataPro
 }
 
 
-imtbase::CTreeItemModel *CContactInfoEditorDataControllerComp::CItemBasedRepresentationDataProvider::GetTreeItemModel(const QList<QByteArray>& /*query*/, const imtrest::QweryParams& /*params*/)
+imtbase::CTreeItemModel *CContactInfoEditorDataControllerComp::CItemBasedRepresentationDataProvider::GetTreeItemModel(const QList<QByteArray>& /*query*/, const imtrest::QueryParams& /*params*/)
 {
 	return &m_treeItemModel;
 }

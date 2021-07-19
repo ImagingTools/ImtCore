@@ -34,7 +34,7 @@ public:
 	// reimplemented (imtauthgui::IRepresentationDataProvider)
 	virtual bool GetRepresentationData(imtrest::IRepresentationDataProvider::Format format,
 				QByteArray& representationData,
-				const QList<QByteArray> &query, const imtrest::QweryParams &params) override;
+				const QList<QByteArray> &query, const imtrest::QueryParams &params) override;
 	virtual bool SetRepresentationData(
 				imtrest::IRepresentationDataProvider::Format format,
 				QByteArray& representationData,

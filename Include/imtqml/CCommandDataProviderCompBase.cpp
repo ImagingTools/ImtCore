@@ -21,7 +21,7 @@ QByteArray CCommandDataProviderCompBase::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel *CCommandDataProviderCompBase::GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QweryParams& params)
+imtbase::CTreeItemModel *CCommandDataProviderCompBase::GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QueryParams& params)
 {
 	imtbase::CTreeItemModel* treeModel = nullptr;
 	if (query.count() > 0 &&

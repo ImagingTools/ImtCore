@@ -3,6 +3,12 @@
 
 // Qt includes
 #include <QtWidgets/QTreeWidgetItem>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
+
+// ACF includes
+#include <iprm/CNameParam.h>
+#include <ifilegui/CFileDialogLoaderComp.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
@@ -117,6 +123,43 @@ void CProductInstanceInfoViewComp::UpdateFeatureTree()
 			}
 		}
 	}
+}
+
+
+// private slots
+
+void CProductInstanceInfoViewComp::on_NewLicenseRequestButton_clicked()
+{
+	if (m_licenseKeyPersistenceCompPtr.IsValid() && m_encryptionKeysProviderCompPtr.IsValid()){
+		QStringList allExt;
+		QStringList filterList;
+		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*m_licenseKeyPersistenceCompPtr, nullptr, ifile::IFileTypeInfo::QF_SAVE, allExt, filterList, false);
+
+		if (filterList.size() > 1){
+			filterList.prepend(tr("All known file types (%1)").arg("*." + allExt.join(" *.")));
+		}
+
+		if (filterList.size() == 0){
+			filterList.prepend(tr("All file types (%1)").arg("*.*"));
+		}
+
+		QString licenseKeyFilePath = QFileDialog::getOpenFileName(GetWidget(), tr("Select representation file"), "", filterList.join("\n"));
+		if (!licenseKeyFilePath.isEmpty()){
+			iprm::CNameParam licenseKey;
+
+			licenseKey.SetName(m_encryptionKeysProviderCompPtr->GetEncryptionKey(imtcrypt::IEncryptionKeysProvider::KT_PASSWORD));
+
+			int state = m_licenseKeyPersistenceCompPtr->SaveToFile(licenseKey, licenseKeyFilePath);
+			if (state == ifile::IFilePersistence::OS_FAILED){
+				QMessageBox::critical(GetWidget(), tr("License Request Manager"), tr("License request file could not be saved"));
+			}
+		}
+	}
+}
+
+
+void CProductInstanceInfoViewComp::on_LoadLicenseButton_clicked()
+{
 }
 
 

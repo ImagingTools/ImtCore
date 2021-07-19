@@ -35,7 +35,7 @@ public:
 	const QString Data() { return DATA; }
 
 protected:
-	void virtual GetEnums(imtrest::QweryParams& enums) const override
+	void virtual GetEnums(imtrest::QueryParams& enums) const override
 	{
 		enums.insert("APPLICATION", APPLICATION);
 		enums.insert("PAGES", PAGES);

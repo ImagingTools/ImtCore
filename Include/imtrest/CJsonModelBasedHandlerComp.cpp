@@ -178,7 +178,7 @@ IRequestHandler::ConstResponsePtr CJsonModelBasedHandlerComp::ProcessRequest(con
 		else{
 			reponseTypeId = "application/json";
 			QList<QByteArray> query = modelName.split('/');
-			imtrest::QweryParams params = request.GetCommandParams();
+			imtrest::QueryParams params = request.GetCommandParams();
 			if (m_representationDataProvider->GetRepresentationData(
 						imtrest::IRepresentationDataProvider::RF_JSON,
 						body, query, params) == false){

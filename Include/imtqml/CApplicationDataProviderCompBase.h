@@ -41,7 +41,7 @@ public:
 
 	// reimplemented (imtbase::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QweryParams& params) override;
+	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QueryParams& params) override;
 
 private:
 	I_ATTR(QByteArray, m_applicationIdAttrPtr);

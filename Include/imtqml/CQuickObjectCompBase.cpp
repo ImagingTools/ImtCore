@@ -131,7 +131,7 @@ QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr, const QVaria
 void CQuickObjectCompBase::OnItemCreated()
 {
 	if (m_dataProviderCompPtr.IsValid()){
-		imtrest::QweryParams params;
+		imtrest::QueryParams params;
 		for (int i = 0; i < m_modelIdsAttrPtr.GetCount(); ++i){
 			QByteArray modelId = m_modelIdsAttrPtr[i];
 //			QByteArray modelQuery = m_modelQueriesAttrPtr[i];
@@ -171,7 +171,7 @@ void CQuickObjectCompBase::OnModelNeedsReload(imtbase::CTreeItemModel *itemModel
 		int index  = m_models.indexOf(rootModelPtr);
 		if (m_modelQueriesAttrPtr.IsValid() && m_modelQueriesAttrPtr.GetCount() > index && index > -1){
 			QByteArray modelQuery = m_modelQueriesAttrPtr[index];
-			imtrest::QweryParams queryParams = rootModelPtr->GetQueryParams();
+			imtrest::QueryParams queryParams = rootModelPtr->GetQueryParams();
 			QList<QByteArray> query = modelQuery.split('/');
 			imtbase::CTreeItemModel *sourceModelPtr = m_dataProviderCompPtr->GetTreeItemModel(query,queryParams);
 			if (sourceModelPtr != nullptr){

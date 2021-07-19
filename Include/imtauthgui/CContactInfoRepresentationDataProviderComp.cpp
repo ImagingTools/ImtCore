@@ -34,20 +34,21 @@ CContactInfoRepresentationDataProviderComp::CContactInfoRepresentationDataProvid
 // reimplemented (imtrest::IRepresentationDataProvider)
 
 bool CContactInfoRepresentationDataProviderComp::GetRepresentationData(
-		imtrest::IRepresentationDataProvider::Format format,
-		QByteArray& representationData,
-		const QList<QByteArray>& query, const imtrest::QweryParams& params)
+			imtrest::IRepresentationDataProvider::Format format,
+			QByteArray& representationData,
+			const QList<QByteArray>& query,
+			const imtrest::QueryParams& params)
 {
 	bool retVal = false;
 
-	if (m_itemBasedRepresentationDataProvider.IsValid()
-			&& format == imtrest::IRepresentationDataProvider::RF_JSON
-			&& !query.isEmpty()
-			&& query[0] == "__ContactInfo__"){
-		QList<QByteArray> query;
-		imtrest::QweryParams params;
+	if (	m_itemBasedRepresentationDataProvider.IsValid() &&
+			format == imtrest::IRepresentationDataProvider::RF_JSON &&
+			!query.isEmpty() &&
+			query[0] == "__ContactInfo__"){
 		imtbase::CTreeItemModel *treeItemModel = m_itemBasedRepresentationDataProvider->GetTreeItemModel(query, params);
+
 		iser::CJsonStringWriteArchive archive(representationData);
+
 		retVal = treeItemModel->Serialize(archive);
 	}
 
@@ -62,15 +63,16 @@ bool CContactInfoRepresentationDataProviderComp::SetRepresentationData(
 {
 	bool retVal = false;
 	QJsonDocument jsonDocument = QJsonDocument::fromJson(representationData);
-	//	qDebug() << jsonDocument;
-	if (m_itemBasedRepresentationDataProvider.IsValid()
-			&& format == imtrest::IRepresentationDataProvider::RF_JSON
-			&& commandId == "__ContactInfo__"
-			&& jsonDocument.isObject()){
-		QJsonObject jsonObject = jsonDocument.object();
+	if (	m_itemBasedRepresentationDataProvider.IsValid() &&
+			format == imtrest::IRepresentationDataProvider::RF_JSON &&
+			commandId == "__ContactInfo__" &&
+			jsonDocument.isObject()){
+
 		QList<QByteArray> query;
-		imtrest::QweryParams params;
+		imtrest::QueryParams params;
 		imtbase::CTreeItemModel* treeItemModel = m_itemBasedRepresentationDataProvider->GetTreeItemModel(query, params);
+
+		QJsonObject jsonObject = jsonDocument.object();
 		if (jsonObject.value("key").toString() == "addresses"){
 			imtbase::CTreeItemModel* addressesModel = treeItemModel->GetTreeItemModel("addresses",jsonObject.value("index0").toInt());
 			if (addressesModel != nullptr){
@@ -89,21 +91,16 @@ bool CContactInfoRepresentationDataProviderComp::SetRepresentationData(
 			treeItemModel->SetState("Updated");
 			for(QString key : jsonObject.keys()){
 				treeItemModel->SetData(key.toLatin1(),jsonObject.value(key).toVariant());
+
 				retVal = true;
 			}
+
 			treeItemModel->SetState("Ready");
 		}
-
-//		istd::IChangeable::ChangeInfoMap infoUpdate;
-//		infoUpdate.insert("fromModel",true);
-//		treeItemModel->SetData(infoMap.value("key").toByteArray(),infoMap.value("value"), infoMap.value("index").toInt(), infoUpdate);
-
 	}
 
 	return retVal;
 }
-
-
 
 
 } // namespace imtauthgui

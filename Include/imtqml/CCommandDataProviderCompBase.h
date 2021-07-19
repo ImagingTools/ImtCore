@@ -24,7 +24,7 @@ public:
 
 	I_BEGIN_COMPONENT(CCommandDataProviderCompBase);
 		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
-		I_ASSIGN(m_commandsModelIdAttrPtr, "СommandsModelId", "Commands model Id", true,"");
+		I_ASSIGN(m_commandsModelIdAttrPtr, "СommandsModelId", "Command model-ID", true, "");
 		I_ASSIGN_MULTI_0(m_commandIdAttrPtr, "СommandId", "Command Id", true);
 		I_ASSIGN_MULTI_0(m_commandNameAttrPtr, "СommandName", "Command name", true);
 		I_ASSIGN_MULTI_0(m_commandDefaultStatusIcon, "СommandDefaultStatusIcon", "Path of status icon used by default", false);
@@ -34,7 +34,7 @@ public:
 
 	// reimplemented (imtbase::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QweryParams& params) override;
+	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QueryParams& params) override;
 
 private:
 	I_ATTR(QByteArray, m_commandsModelIdAttrPtr);

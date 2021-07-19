@@ -9,15 +9,16 @@ namespace imtqml
 {
 
 
-class CCommandDataEnumProviderComp :
-		public QObject,
-		public CRepresentationDataEnumProviderCompBase
+class CCommandDataEnumProviderComp:
+			public QObject,
+			public CRepresentationDataEnumProviderCompBase
 {
 	Q_OBJECT
 	Q_PROPERTY(QString ID READ Id)
 	Q_PROPERTY(QString NAME READ Name)
 	Q_PROPERTY(QString ICON READ Icon)
 	Q_PROPERTY(QString ENABLED READ Enabled)
+
 public:
 	typedef CRepresentationDataEnumProviderCompBase BaseClass;
 
@@ -36,16 +37,16 @@ public:
 	const QString Enabled() { return ENABLED; }
 
 protected:
-	void GetEnums(imtrest::QweryParams& enums) const override
+	void GetEnums(imtrest::QueryParams& enums) const override
 	{
 		enums.insert("NAME", NAME);
 		enums.insert("ICON", ICON);
 		enums.insert("ENABLED", ENABLED);
 		enums.insert("ID", ID);
 	}
-
 };
 
 
 } // namespace imtqml
+
 

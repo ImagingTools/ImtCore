@@ -90,13 +90,14 @@ void CStandardAccountMenuComp::OnDesignSchemaChanged()
 
 // private methods
 
-void CStandardAccountMenuComp::OnLoginUpdate(const istd::IChangeable::ChangeSet& changeSet, const iauth::ILogin* objectPtr)
+void CStandardAccountMenuComp::OnLoginUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/, const iauth::ILogin* objectPtr)
 {
 	iauth::CUser* userPtr = objectPtr->GetLoggedUser();
 	if (userPtr != nullptr){
 		QString userName = userPtr->GetUserName();
 		UserName->setText(userPtr->GetUserName());
 		userName.replace(" ", "");
+
 		//Email->setText(userName + "@yahoo.com");
 		Email->setVisible(false);
 	}

@@ -10,7 +10,7 @@
 */
 namespace imtrest
 {
-typedef QMap<QByteArray,QByteArray> QweryParams;
+typedef QMap<QByteArray,QByteArray> QueryParams;
 
 } // namespace imtrest
 

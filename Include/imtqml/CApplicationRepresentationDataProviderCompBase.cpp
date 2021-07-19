@@ -36,7 +36,7 @@ CApplicationRepresentationDataProviderCompBase::CApplicationRepresentationDataPr
 bool CApplicationRepresentationDataProviderCompBase::GetRepresentationData(
 		imtrest::IRepresentationDataProvider::Format format,
 		QByteArray& representationData,
-		const QList<QByteArray>& query, const imtrest::QweryParams& params)
+		const QList<QByteArray>& query, const imtrest::QueryParams& params)
 {
 	bool retVal = false;
 

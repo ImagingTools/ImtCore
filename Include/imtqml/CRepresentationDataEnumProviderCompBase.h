@@ -42,7 +42,7 @@ public:
 	{
 		bool retVal = false;
 		if (m_dataIdAttrPtr.IsValid() && *m_dataIdAttrPtr == dataId){
-			imtrest::QweryParams enums;
+			imtrest::QueryParams enums;
 			GetEnums(enums);
 
 			data = "//pragma Singleton\n"
@@ -60,7 +60,7 @@ public:
 protected:
 	I_ATTR(QByteArray, m_dataIdAttrPtr);
 
-	virtual void GetEnums(imtrest::QweryParams& enums) const { }
+	virtual void GetEnums(imtrest::QueryParams& enums) const { }
 
 };
 

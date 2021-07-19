@@ -15,7 +15,7 @@ void CContactInfoEditorQmlComp::OnItemCreated()
 
 	if (m_dataProviderCompPtr.IsValid()){
 		QList<QByteArray> query;
-		imtrest::QweryParams params;
+		imtrest::QueryParams params;
 		imtbase::CTreeItemModel *itemModelPtr = m_dataProviderCompPtr->GetTreeItemModel(query, params);
 
 		m_quickItemPtr->setProperty("contactInfoModel", QVariant::fromValue(itemModelPtr));

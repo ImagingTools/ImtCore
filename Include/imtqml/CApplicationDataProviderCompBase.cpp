@@ -21,7 +21,7 @@ QByteArray CApplicationDataProviderCompBase::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel *CApplicationDataProviderCompBase::GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QweryParams& params)
+imtbase::CTreeItemModel *CApplicationDataProviderCompBase::GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QueryParams& params)
 {
 	imtbase::CTreeItemModel *rootModel = nullptr;
 
@@ -43,9 +43,9 @@ imtbase::CTreeItemModel *CApplicationDataProviderCompBase::GetTreeItemModel(cons
 		rootModel = new imtbase::CTreeItemModel();
 		imtbase::CTreeItemModel* pagesModel = rootModel->AddTreeModel(AppEnum::PAGES);
 		for (int i = 0; i < m_representationPageProvidersCompPtr.GetCount(); ++i){
-			imtrest::QweryParams queryParams;
+			imtrest::QueryParams queryParams;
 			pagesModel->InsertNewItem();
-			imtbase::IItemBasedRepresentationDataProvider* representationPageProvider = m_representationPageProvidersCompPtr[i];			
+			imtbase::IItemBasedRepresentationDataProvider* representationPageProvider = m_representationPageProvidersCompPtr[i];
 			QByteArray modelId = representationPageProvider->GetModelId();
 			queryParams.insert(PageEnum::ID, modelId);
 			imtbase::CTreeItemModel *pageModel = representationPageProvider->GetTreeItemModel(queryPages, queryParams);
@@ -66,18 +66,6 @@ imtbase::CTreeItemModel *CApplicationDataProviderCompBase::GetTreeItemModel(cons
 		}
 	}
 
-//	if (modelId == "__Commands__"){
-////		rootModel = new imtbase::CTreeItemModel();
-////		rootModel->SetData("id", *m_applicationIdAttrPtr);
-////		imtbase::CTreeItemModel* commandsModel = rootModel->AddTreeModel("commands");
-//		if (m_representationPageProvidersCompPtr.GetCount() > 0){
-//			imtbase::IItemBasedRepresentationDataProvider* representationPageProvider = m_representationPageProvidersCompPtr[0];
-//			QByteArray testKey = representationPageProvider->GetModelId();
-//			istd::IChangeable::ChangeInfoMap testParams;
-//			testParams.insert("pageId",testKey);
-//			rootModel = representationPageProvider->GetTreeItemModel("commands", testParams);
-//		}
-//	}
 	return rootModel;
 }
 

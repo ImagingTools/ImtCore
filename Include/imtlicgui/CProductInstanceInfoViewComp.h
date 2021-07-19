@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <ifile/IFilePersistence.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
@@ -29,6 +30,8 @@ public:
 				Ui::CProductInstanceInfoViewComp, imtlic::IProductInstanceInfo> BaseClass;
 
 	I_BEGIN_COMPONENT(CProductInstanceInfoViewComp);
+		I_ASSIGN(m_encryptionKeysProviderCompPtr, "EncryptionKeysProvider", "Provider of the license key", true, "EncryptionKeysProvider");
+		I_ASSIGN(m_licenseKeyPersistenceCompPtr, "LicenseKeyPersistence", "Persistence for the license key", true, "LicenseKeyPersistence");
 	I_END_COMPONENT;
 
 	CProductInstanceInfoViewComp();
@@ -44,7 +47,13 @@ private:
 	void UpdateProductName();
 	void UpdateFeatureTree();
 
+private Q_SLOTS:
+	void on_NewLicenseRequestButton_clicked();
+	void on_LoadLicenseButton_clicked();
+
+private:
 	I_REF(imtcrypt::IEncryptionKeysProvider, m_encryptionKeysProviderCompPtr);
+	I_REF(ifile::IFilePersistence, m_licenseKeyPersistenceCompPtr);
 };
 
 

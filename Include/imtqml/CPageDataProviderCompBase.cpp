@@ -21,7 +21,7 @@ QByteArray CPageDataProviderCompBase::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel *CPageDataProviderCompBase::GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QweryParams& params)
+imtbase::CTreeItemModel *CPageDataProviderCompBase::GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QueryParams& params)
 {
 	imtbase::CTreeItemModel* rootModel = nullptr;
 //	if (modelId == *m_pageIdAttrPtr){

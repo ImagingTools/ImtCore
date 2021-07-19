@@ -6,12 +6,7 @@ include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtqml
-
-win32
-{
-#	LIBS += -lUser32 -lAdvapi32
-}
+LIBS += -L../../../Lib/$$COMPILER_DIR -limtqml -limtbase
 
 # Get build output directory of shadow build:
 ACFSLNDIRBUILD = $$(ACFSLNDIR_BUILD)

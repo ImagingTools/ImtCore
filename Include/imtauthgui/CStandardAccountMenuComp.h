@@ -1,5 +1,4 @@
 #pragma once
-#include <GeneratedFiles/imtauthgui/ui_CStandardAccountMenu.h>
 
 
 // ACF includes
@@ -9,6 +8,7 @@
 
 // ImtCore includes
 #include <imtbase/TModelUpdateBinder.h>
+#include <GeneratedFiles/imtauthgui/ui_CStandardAccountMenuComp.h>
 
 
 namespace imtauthgui

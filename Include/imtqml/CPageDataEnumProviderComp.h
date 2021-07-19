@@ -45,7 +45,7 @@ public:
 	const QString Enabled() { return ENABLED; }
 
 protected:
-	void virtual GetEnums(imtrest::QweryParams& enums) const override
+	void virtual GetEnums(imtrest::QueryParams& enums) const override
 	{
 		enums.insert("ID", ID);
 		enums.insert("NAME", NAME);
