@@ -160,4 +160,9 @@ QTabBar::tab::bottom:selected[CollectionView=true]
 	border-bottom: 2px solid rgba(235, 98, 37, 128);
 }
 
-
+QFrame[frameShape="4"],
+QFrame[frameShape="5"]
+{
+    border: none;
+    background: palette(dark);
+}

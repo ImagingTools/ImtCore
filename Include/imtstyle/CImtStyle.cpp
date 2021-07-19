@@ -489,12 +489,17 @@ CImtStyle::CImtStyle()
 	dark.palette.setColor(QPalette::ToolTipBase, Qt::lightGray);
 	dark.palette.setColor(QPalette::ToolTipText, Qt::lightGray);
 	dark.palette.setColor(QPalette::Text, Qt::lightGray);
-	dark.palette.setColor(QPalette::Button, QColor(53, 53, 53));
 	dark.palette.setColor(QPalette::ButtonText, Qt::lightGray);
 	dark.palette.setColor(QPalette::BrightText, Qt::white);
 	dark.palette.setColor(QPalette::Link, QColor(42, 130, 218));
 	dark.palette.setColor(QPalette::Highlight, QColor("#1a76e7"));
 	dark.palette.setColor(QPalette::HighlightedText, Qt::white);
+	dark.palette.setColor(QPalette::Light, QColor(63, 63, 63));
+	dark.palette.setColor(QPalette::Midlight, QColor(58, 58, 58));
+	dark.palette.setColor(QPalette::Button, QColor(53, 53, 53));
+	dark.palette.setColor(QPalette::Mid, QColor(48, 48, 48));
+	dark.palette.setColor(QPalette::Dark, QColor(43, 43, 43));
+	dark.palette.setColor(QPalette::Shadow, QColor(30, 30, 30));
 	dark.stylePath = ":/Styles/ImtColorStyleDark";
 
 	m_colorSchemaMap[DS_DARK] = dark;
