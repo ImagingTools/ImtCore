@@ -192,7 +192,7 @@ public:
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
-	//reimplemented (QObject)
+	// reimplemented (QObject)
 	virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 protected:
@@ -200,7 +200,7 @@ protected:
 	virtual void OnRestoreSettings(const QSettings& settings) override;
 	virtual void OnSaveSettings(QSettings& settings) const override;
 
-	// iqtgui::TDesignSchemaHandlerWrap
+	// reimlpemented (iqtgui::TDesignSchemaHandlerWrap)
 	void OnDesignSchemaChanged() override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)

@@ -15,12 +15,12 @@ namespace imtauthgui
 {
 
 
-class CStandardAccountMenu: public iqtgui::TDesignerGuiCompBase<Ui::CStandardAccountMenu>
+class CStandardAccountMenuComp: public iqtgui::TDesignerGuiCompBase<Ui::CStandardAccountMenuComp>
 {
 public:
-	typedef iqtgui::TDesignerGuiCompBase<Ui::CStandardAccountMenu> BaseClass;
+	typedef iqtgui::TDesignerGuiCompBase<Ui::CStandardAccountMenuComp> BaseClass;
 
-	I_BEGIN_COMPONENT(CStandardAccountMenu);
+	I_BEGIN_COMPONENT(CStandardAccountMenuComp);
 		I_ASSIGN(m_accountPreviewAttrPtr, "AccountIcon", "Account icon", true, ":/Icons/Account");
 		I_ASSIGN(m_preferencesIconAttrPtr, "PreferencesIcon", "Preferences icon", true, ":/Icons/Settings");
 		I_ASSIGN(m_iconSizeAttrPtr, "IconSize", "Size of icons", true, 32);
@@ -28,12 +28,16 @@ public:
 		I_ASSIGN(m_preferencesDialogCompPtr, "PreferencesDialog", "Preferences dialog", false, "Preferences");
 	I_END_COMPONENT;
 
-	CStandardAccountMenu();
+	CStandardAccountMenuComp();
 	virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 protected:
+	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
+
+	// reimplemented (ibase::TDesignSchemaHandlerWrap)
+	virtual void OnDesignSchemaChanged();
 
 private:
 	void OnLoginUpdate(const istd::IChangeable::ChangeSet& changeSet, const iauth::ILogin* objectPtr);
@@ -45,7 +49,7 @@ private:
 	I_REF(iauth::ILogin, m_loginCompPtr);
 	I_REF(iqtgui::IDialog, m_preferencesDialogCompPtr);
 
-	imtbase::TModelUpdateBinder<iauth::ILogin, CStandardAccountMenu> m_loginObserver;
+	imtbase::TModelUpdateBinder<iauth::ILogin, CStandardAccountMenuComp> m_loginObserver;
 };
 
 

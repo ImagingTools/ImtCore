@@ -177,7 +177,7 @@ void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& settings) const
 }
 
 
-// iqtgui::TDesignSchemaHandlerWrap
+// reimplemented (iqtgui::TDesignSchemaHandlerWrap)
 
 void CThumbnailDecoratorGuiComp::OnDesignSchemaChanged()
 {
@@ -1474,9 +1474,17 @@ void CThumbnailDecoratorGuiComp::LoginObserver::OnModelChanged(int /*modelId*/, 
 		}
 	}
 
-	if (m_parent.m_loginCompPtr->GetLoggedUser() == nullptr){
+	iauth::CUser* userPtr = m_parent.m_loginCompPtr->GetLoggedUser();
+	if (userPtr == nullptr){
 		m_parent.ProcessLogout();
+
+		m_parent.UserNameLabel->clear();
 	}
+	else{
+		m_parent.UserNameLabel->setText(userPtr->GetUserName());
+	}
+
+	m_parent.UserNameLabel->setVisible(userPtr != nullptr);
 
 	m_parent.UpdateLoginButtonsState();
 }

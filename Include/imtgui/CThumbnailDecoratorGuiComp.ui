@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>960</width>
+    <width>1051</width>
     <height>611</height>
    </rect>
   </property>
@@ -316,13 +316,20 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="UserNameLabel">
+            <property name="text">
+             <string>Kirilgibon</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QToolButton" name="LoginControlButton">
             <property name="text">
              <string>Log out</string>
             </property>
             <property name="icon">
-             <iconset resource="imtguidark.qrc">
-              <normaloff>:/Icons/Lock</normaloff>:/Icons/Lock</iconset>
+             <iconset resource="../imtauthgui/imtauthguilight.qrc">
+              <normaloff>:/Icons/Account</normaloff>:/Icons/Account</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -962,6 +969,7 @@ color:red;</string>
  </tabstops>
  <resources>
   <include location="imtguidark.qrc"/>
+  <include location="../imtauthgui/imtauthguilight.qrc"/>
  </resources>
  <connections/>
 </ui>
