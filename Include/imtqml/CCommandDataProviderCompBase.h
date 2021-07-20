@@ -24,10 +24,10 @@ public:
 
 	I_BEGIN_COMPONENT(CCommandDataProviderCompBase);
 		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
-		I_ASSIGN(m_commandsModelIdAttrPtr, "СommandsModelId", "Command model-ID", true, "");
-		I_ASSIGN_MULTI_0(m_commandIdAttrPtr, "СommandId", "Command Id", true);
-		I_ASSIGN_MULTI_0(m_commandNameAttrPtr, "СommandName", "Command name", true);
-		I_ASSIGN_MULTI_0(m_commandDefaultStatusIcon, "СommandDefaultStatusIcon", "Path of status icon used by default", false);
+		I_ASSIGN(m_commandsModelIdAttrPtr, "CommandsModelId", "Command model-ID", true, "");
+		I_ASSIGN_MULTI_0(m_commandIdAttrPtr, "CommandId", "Command Id", true);
+		I_ASSIGN_MULTI_0(m_commandNameAttrPtr, "CommandName", "Command name", true);
+		I_ASSIGN_MULTI_0(m_commandDefaultStatusIcon, "CommandDefaultStatusIcon", "Path of status icon used by default", false);
 	I_END_COMPONENT;
 
 	CCommandDataProviderCompBase();
