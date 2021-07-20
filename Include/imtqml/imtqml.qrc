@@ -18,4 +18,7 @@
     <qresource prefix="/Icons">
         <file alias="DeleteStylized.svg">Resources/Icons/DeleteStylized.svg</file>
     </qresource>
+    <qresource prefix="/Fonts">
+        <file alias="Ubuntu-Regular.ttf">Resources/Fonts/Ubuntu-Regular.ttf</file>
+    </qresource>
 </RCC>

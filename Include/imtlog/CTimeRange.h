@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtCore/QDateTime.h>
+#include <QtCore/QDateTime>
 
 
 namespace imtlog

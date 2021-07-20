@@ -2,8 +2,8 @@
 
 
 // Qt includes
-#include <QtCore/QMargins.h>
-#include <QtCore/QRect.h>
+#include <QtCore/QMargins>
+#include <QtCore/QRect>
 
 // ACF includes
 #include <istd/IChangeable.h>

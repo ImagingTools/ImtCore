@@ -9,5 +9,6 @@ if(WIN32)
 endif()
 
 if(UNIX)
-	target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/${TARGETNAME}/libcrypto.a)
+    target_link_libraries(${PROJECT_NAME} -lcrypto)
+#	target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/${TARGETNAME}/libcrypto.a)
 endif()

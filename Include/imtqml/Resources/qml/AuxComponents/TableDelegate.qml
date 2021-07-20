@@ -7,7 +7,7 @@ Rectangle{
     color: "transparent"
     property string text: "Text"
     property real delegateWidth: count == 0 ? 0 : width/count
-    property int count: array.length
+    property int count: bodyArray.length
     property bool selected: false
     property string  textColor: "#335777"
     property string fontName: ""
@@ -16,25 +16,25 @@ Rectangle{
     property int textTopMargin: 8
 
     //property var array: ["First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First", "Second Second Second", "Third"]
-    property var array: ["First", "Second", "Third"]
+    property var bodyArray:  ["First", "Second", "Third"]
 
     property string maxSizeText: ""
 
-    onArrayChanged: setContainerSize()
+    onBodyArrayChanged: setContainerSize()
 
     function clearArray(){
-        while(array.length > 0)
-            array.pop()
+        while(bodyArray.length > 0)
+            bodyArray.pop()
     }
 
     function addToArray(str){
-        array.push(str)
+        bodyArray.push(str)
     }
 
     function setContainerSize(){
-        for(var i = 0; i < array.length; i++){
-            if(array[i].length > container.maxSizeText.length){
-                container.maxSizeText = array[i]
+        for(var i = 0; i < bodyArray.length; i++){
+            if(bodyArray[i].length > container.maxSizeText.length){
+                container.maxSizeText = bodyArray[i]
             }
         }
 
@@ -79,7 +79,7 @@ Rectangle{
         anchors.fill: parent
         Repeater{
             id: rep
-            model: container.count
+            model: 3 //container.count
             Item{
                 id:element
                 height: container.height
@@ -98,7 +98,7 @@ Rectangle{
                     width: container.delegateWidth - 16
                     height: contentHeight
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    text: container.array[index]
+                    text: container.bodyArray[index]
                 }
 
 

@@ -6,6 +6,7 @@ Rectangle {
     height: 55
     width: parent.width
     color: "#e5e5e7"
+    property string fontName: ""
     property alias model: lvButtons.model
     property alias title: title.text
 
@@ -70,6 +71,7 @@ Rectangle {
             delegate: TopButton {
                 text: model[CommandEnum.NAME]
                 imageSource: model[CommandEnum.ICON]
+                fontName: topPanel.fontName
             }
         }
     }

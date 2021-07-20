@@ -13,6 +13,7 @@ Rectangle
     property var pagesModel
 //        property TreeItemModel pagesModel
     property var commandsModel
+    property string fontName: mainFont.name
 //    property TreeItemModel commandsModel
 
     function firstModelsInit() {
@@ -39,14 +40,22 @@ Rectangle
         }
     }
 
+    FontLoader{
+        id: mainFont
+        source: "../Fonts/Ubuntu-Regular.ttf"
+    }
+
     AUX.TopPanel{
         id: topPanel
+        fontName: container.fontName
     }
 
     AUX.MenuPanel{
         id: menuPanel
         anchors.top: topPanel.bottom
         anchors.bottom: parent.bottom
+        textColor: container.textColor
+        fontName: container.fontName
         onActivePageChanged: {
             topPanel.title = activePageId
             tabPanel.firstElementName = activePageId
@@ -64,8 +73,8 @@ Rectangle
         anchors.right: parent.right
         anchors.top: topPanel.bottom
         visible: true//ПОМЕНЯТЬ!!!
-       // textColor: window.textColor
-       // fontName: window.fontName
+        textColor: container.textColor
+        fontName: container.fontName
     }
 
 
@@ -75,8 +84,8 @@ Rectangle
         width: tabPanel.width/4*3
         anchors.top: tabPanel.bottom
         anchors.bottom: parent.bottom
-        textColor: window.textColor
-        fontName: window.fontName
+        textColor: container.textColor
+        fontName: container.fontName
     }
 
 

@@ -53,9 +53,9 @@ Item {
                     anchors.leftMargin: 8
                     font.pixelSize: container.fontSize
                     font.family: container.fontName
-                    font.bold: container.fontBold
-                    color: container.textColor
-                    text: headersArray[index]
+                    font.bold: true //container.fontBold
+//                    color: container.textColor
+                    text: container.headersArray[index]
                 }
             }
         }

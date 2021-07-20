@@ -8,7 +8,7 @@ Rectangle{
 
     property bool selected: false
     property bool firstElement: false
-    property string text: "text"
+    property string text: "no name"
     property string firstElementText: "text"
     property int fontSize: 12
     property string fontName: ""
@@ -93,7 +93,7 @@ Rectangle{
         Text {
             id: text
             anchors.centerIn: parent
-            text: tabDelegate.firstElement ? tabDelegate.firstElementText : "<no name>" //tabDelegate.text
+            text: tabDelegate.firstElement ? tabDelegate.firstElementText : tabDelegate.text
           //  text: tabDelegate.text
             color: tabDelegate.textColor
             font.pixelSize: tabDelegate.fontSize

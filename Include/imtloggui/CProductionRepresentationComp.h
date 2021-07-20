@@ -2,8 +2,8 @@
 
 
 // Qt includes
-#include <QtCore/QDateTime.h>
-#include <QtCore/QMap.h>
+#include <QtCore/QDateTime>
+#include <QtCore/QMap>
 
 // ACF includes
 #include <istd/IChangeable.h>

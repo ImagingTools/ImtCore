@@ -49,10 +49,10 @@ bool CImage3dCalibration::Transform(IPointsBasedObject::PointXyz32 & result, con
 	float pixel22ValueY = line1Ptr[lineOffset + 4];
 	float pixel22ValueZ = line1Ptr[lineOffset + 5];
 
-	if (isnan(pixel11ValueX) || isnan(pixel11ValueY) || isnan(pixel11ValueZ) ||
-		isnan(pixel12ValueX) || isnan(pixel12ValueY) || isnan(pixel12ValueZ) ||
-		isnan(pixel21ValueX) || isnan(pixel21ValueY) || isnan(pixel21ValueZ) ||
-		isnan(pixel22ValueX) || isnan(pixel22ValueY) || isnan(pixel22ValueZ)){
+    if (std::isnan(pixel11ValueX) || std::isnan(pixel11ValueY) || std::isnan(pixel11ValueZ) ||
+        std::isnan(pixel12ValueX) || std::isnan(pixel12ValueY) || std::isnan(pixel12ValueZ) ||
+        std::isnan(pixel21ValueX) || std::isnan(pixel21ValueY) || std::isnan(pixel21ValueZ) ||
+        std::isnan(pixel22ValueX) || std::isnan(pixel22ValueY) || std::isnan(pixel22ValueZ)){
 		return false;
 	}
 
