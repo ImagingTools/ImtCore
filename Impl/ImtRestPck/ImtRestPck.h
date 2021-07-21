@@ -11,10 +11,10 @@
 #include <imtrest/CWebSocketSuscriberEngineComp.h>
 #include <imtrest/CTcpServerComp.h>
 #include <imtrest/CHttpProtocolEngineComp.h>
-#include <imtrest/CHttpRootHandlerComp.h>
-#include <imtrest/CHttpFileBasedHandlerComp.h>
-#include <imtrest/CHttpHtmlFolderBasedHandlerComp.h>
-#include <imtrest/CJsonModelBasedHandlerComp.h>
+#include <imtrest/CHttpRootServletComp.h>
+#include <imtrest/CHttpFileBasedServletComp.h>
+#include <imtrest/CHttpHtmlFolderBasedServletComp.h>
+#include <imtrest/CJsonModelBasedServletComp.h>
 #include <imtrest/CHttpRedirectComp.h>
 #include <imtrest/CHttpFileProviderBasedServletComp.h>
 
@@ -31,11 +31,11 @@ typedef imtrest::CWebSocketServerComp WebSocketServer;
 typedef imtrest::CWebSocketSubscriberEngineComp WebSocketSubscriberEngine;
 typedef imtrest::CWebSocketProtocolEngineComp WebSocketProtocolEngine;
 typedef imtrest::CHttpProtocolEngineComp HttpProtocolEngine;
-typedef imtrest::CHttpRootHandlerComp HttpRootHandler;
-typedef imtrest::CHttpFileBasedHandlerComp HttpFileBasedHandler;
-typedef imtrest::CHttpHtmlFolderBasedHandlerComp HttpHtmlFolderBasedHandler;
-typedef imtrest::CJsonModelBasedHandlerComp JsonModelBasedHandler;
-typedef imtrest::CHttpRedirectComp HttpRedirectHandler;
+typedef imtrest::CHttpRootServletComp HttpRootServlet;
+typedef imtrest::CHttpFileBasedServletComp HttpFileBasedServlet;
+typedef imtrest::CHttpHtmlFolderBasedServletComp HttpHtmlFolderBasedServlet;
+typedef imtrest::CJsonModelBasedServletComp JsonModelBasedServlet;
+typedef imtrest::CHttpRedirectComp HttpRedirectServlet;
 typedef imtrest::CHttpFileProviderBasedServletComp HttpFileProviderBasedServlet;
 
 

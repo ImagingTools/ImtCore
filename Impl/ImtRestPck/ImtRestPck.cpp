@@ -40,22 +40,22 @@ I_EXPORT_COMPONENT(
 			"TCP Connection Server HTTP REST");
 
 I_EXPORT_COMPONENT(
-			HttpRootHandler,
-			"HTTP root handler",
+			HttpRootServlet,
+			"HTTP root servlet",
 			"HTTP REST Root Protocol");
 
 I_EXPORT_COMPONENT(
-            HttpFileBasedHandler,
-            "HTTP file handler",
+            HttpFileBasedServlet,
+            "HTTP file servlet",
             "HTTP File Template");
 
 I_EXPORT_COMPONENT(
-		HttpHtmlFolderBasedHandler,
+		HttpHtmlFolderBasedServlet,
 		"Generates HTML-document with list of objects for all the files and directories in the directory",
 		"HTTP File Dir Directory HTML");
 
 I_EXPORT_COMPONENT(
-		HttpRedirectHandler,
+		HttpRedirectServlet,
 		"Redirects to other command",
 		"HTTP Redirect");
 
@@ -65,7 +65,7 @@ I_EXPORT_COMPONENT(
 		"FileProvider - based HTTP servlet");
 
 I_EXPORT_COMPONENT(
-		JsonModelBasedHandler,
+		JsonModelBasedServlet,
 		"Generates Json model for QML??",
 		"JSON Model");
 
