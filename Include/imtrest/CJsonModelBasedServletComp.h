@@ -6,7 +6,7 @@
 #include <iser/CJsonStringWriteArchive.h>
 
 // ImtCore includes
-#include <imtrest/IRequestHandler.h>
+#include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 
 // ImtCore includes
@@ -20,17 +20,17 @@ namespace imtrest
 /**
  * \brief The CJsonModelBasedHandlerComp class generates JSON-model
  */
-class CJsonModelBasedHandlerComp:
+class CJsonModelBasedServletComp:
 			public ilog::CLoggerComponentBase,
-			virtual public IRequestHandler
+			virtual public IRequestServlet
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	CJsonModelBasedHandlerComp();
+	CJsonModelBasedServletComp();
 
-	I_BEGIN_COMPONENT(CJsonModelBasedHandlerComp);
-		I_REGISTER_INTERFACE(IRequestHandler);
+	I_BEGIN_COMPONENT(CJsonModelBasedServletComp);
+		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN(m_representationDataProvider, "RepresentationDataProvider", "Representation data provider", false, "RepresentationDataProvider");
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "List of command-ID used with corresponded handlers", true, "");
 	I_END_COMPONENT
