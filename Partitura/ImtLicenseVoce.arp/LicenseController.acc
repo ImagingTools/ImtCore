@@ -62,8 +62,8 @@
         <Element Id="LicenseController" PackageId="ImtLicensePck" ComponentId="LicenseController">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="FingerprintExpiration" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="5"/>
+                    <AttributeInfo Id="FingerprintExpiration" Type="Integer" ExportId="FingerprintExpiration">
+                        <Data IsEnabled="true" Value="10"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FingerprintInstancePersistence" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SecureFileSerializer"/>

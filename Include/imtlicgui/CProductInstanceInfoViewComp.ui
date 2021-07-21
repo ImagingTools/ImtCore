@@ -145,7 +145,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="LicenseManagementGroup">
      <property name="title">
       <string>License Control</string>
      </property>

@@ -28,6 +28,7 @@ bool CDesignTokenBasedResourceProviderComp::GetColorPalette(const QByteArray& de
 {
 	if (m_paletteMap.contains(designSchemaId)){
 		palette = m_paletteMap[designSchemaId];
+
 		return true;
 	}
 
@@ -47,6 +48,7 @@ bool CDesignTokenBasedResourceProviderComp::GetFont(const QByteArray& fontId, QF
 {
 	if (m_fontMap.contains(fontId)){
 		font = m_fontMap[fontId];
+
 		return true;
 	}
 
@@ -84,6 +86,7 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 				QJsonObject paletteObject = rootObject["palette"].toObject();
 				if (paletteObject.isEmpty()){
 					SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+
 					return;
 				}
 
@@ -94,6 +97,7 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 						QJsonObject modeObject;
 						if (!GetObjectValue(paletteObject, m_paletteModeAttrPtr[i], modeObject)){
 							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+
 							return;
 						}
 
@@ -101,16 +105,19 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 						QJsonObject backgroundObject = modeObject["background"].toObject();
 						if (textObject.isEmpty() || backgroundObject.isEmpty()){
 							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+
 							return;
 						}
 
 						if (!textObject.contains("primary") || !backgroundObject.contains("default")){
 							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+
 							return;
 						}
 
 						if (!textObject["primary"].isString() || !backgroundObject["default"].isString()){
 							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+
 							return;
 						}
 
@@ -122,6 +129,7 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 
 						if (!StringToColor(textColorString, textColor) || !StringToColor(backgroundColorString, backgroundColor)){
 							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+
 							return;
 						}
 
@@ -132,6 +140,7 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 							palette.setColor(QPalette::Text, textColor);
 							palette.setColor(QPalette::Window, backgroundColor);
 							palette.setColor(QPalette::Base, backgroundColor);
+
 							m_paletteMap[designShemaId] = palette;
 						}
 					}
@@ -140,14 +149,16 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 				QJsonObject typographyObject;
 				if (!GetObjectValue(rootObject, "typography", typographyObject)){
 					SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+
 					return;
 				}
 
 				QJsonArray fontFamilyArray;
-				double fontSize;
+				double fontSize = 0.0;
 				if (!GetArrayValue(typographyObject, "fontFamily", fontFamilyArray) ||
 					!GetDoubleValue(typographyObject, "fontSize", fontSize)){
 					SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+
 					return;
 				}
 
@@ -155,6 +166,7 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 					QString fontName;
 					if (!GetStringValue(fontFamilyArray, i, fontName)){
 						SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+
 						return;
 					}
 
@@ -177,9 +189,7 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 
 int CDesignTokenBasedResourceProviderComp::GetCount() const
 {
-	int count = qMin(m_designShemaIdAttrPtr.GetCount(), m_paletteModeAttrPtr.GetCount());
-
-	return  count;
+	return qMin(m_designShemaIdAttrPtr.GetCount(), m_paletteModeAttrPtr.GetCount());
 }
 
 
@@ -188,7 +198,10 @@ void CDesignTokenBasedResourceProviderComp::CreateDefaultPalettes()
 	istd::TDelPtr<QStyle> baseStylePtr(QStyleFactory::create("fusion"));
 	QPalette lightPalette = baseStylePtr->standardPalette();
 	lightPalette.setColor(QPalette::Highlight, QColor("#1a76e7"));
+	lightPalette.setColor(QPalette::Text, QColor("#335777"));
+
 	m_paletteMap["Light"] = lightPalette;
+
 	m_designSchemaList.InsertItem("Light", QObject::tr("Light"),"");
 
 	QPalette darkPalette;
@@ -205,7 +218,9 @@ void CDesignTokenBasedResourceProviderComp::CreateDefaultPalettes()
 	darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
 	darkPalette.setColor(QPalette::Highlight, QColor("#1a76e7"));
 	darkPalette.setColor(QPalette::HighlightedText, Qt::white);
+
 	m_paletteMap["Dark"] = darkPalette;
+
 	m_designSchemaList.InsertItem("Dark", QObject::tr("Dark"), "");
 }
 
@@ -219,6 +234,7 @@ bool CDesignTokenBasedResourceProviderComp::StringToColor(const QString& colorSt
 	QRegExp stdFormat("^#[0-9A-Fa-f]{6,6}$");
 	if (stdFormat.exactMatch(tempColorString)){
 		color = QColor(tempColorString);
+
 		return true;
 	}
 
@@ -234,6 +250,7 @@ bool CDesignTokenBasedResourceProviderComp::StringToColor(const QString& colorSt
 
 			if (isOkR && isOkG && isOkB && isOkA){
 				color.setRgb(r, g, b, a);
+
 				return true;
 			}
 		}

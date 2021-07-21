@@ -7,6 +7,7 @@
 #include <QtWidgets/QMessageBox>
 
 // ACF includes
+#include <istd/CSystem.h>
 #include <iprm/CNameParam.h>
 #include <ifilegui/CFileDialogLoaderComp.h>
 
@@ -160,6 +161,17 @@ void CProductInstanceInfoViewComp::on_NewLicenseRequestButton_clicked()
 
 void CProductInstanceInfoViewComp::on_LoadLicenseButton_clicked()
 {
+	if (m_licensePathCompPtr.IsValid()){
+		QString licenseFilePath = QFileDialog::getOpenFileName(GetWidget(), tr("Select license file to be imported"), "", "*.lic");
+		if (!licenseFilePath.isEmpty()){
+			QString targetFilePath = m_licensePathCompPtr->GetPath();
+			if (!targetFilePath.isEmpty()){
+				if (!istd::CSystem::FileCopy(licenseFilePath, targetFilePath, true)){
+					QMessageBox::critical(GetWidget(), tr("License Manager"), tr("License file could not be copied to the target location"));
+				}
+			}
+		}
+	}
 }
 
 
