@@ -15,7 +15,7 @@ namespace imtrest
 
 // public methods
 
-CWebSocketRequest::CWebSocketRequest(QObject& socket, const IRequestHandler& handler, const IProtocolEngine& engine)
+CWebSocketRequest::CWebSocketRequest(QObject& socket, const IRequestServlet& handler, const IProtocolEngine& engine)
 	:m_requestHandler(handler),
 	m_engine(engine),
 	m_socket(socket),

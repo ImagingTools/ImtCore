@@ -9,7 +9,7 @@
 #include <ifile/IFileNameParam.h>
 
 // ImtCore includes
-#include <imtrest/IRequestHandler.h>
+#include <imtrest/IRequestServlet.h>
 #include <imtrest/CHttpRequest.h>
 
 
@@ -25,13 +25,13 @@ namespace imtrest
 
 class CHttpServletCompBase:
 			public ilog::CLoggerComponentBase,
-			virtual public imtrest::IRequestHandler
+			virtual public imtrest::IRequestServlet
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CHttpServletCompBase)
-		I_REGISTER_INTERFACE(IRequestHandler);
+		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "List of command-ID used with corresponded handlers", true, "");
 	I_END_COMPONENT
 

@@ -32,10 +32,10 @@ public:
 	virtual QByteArray GetProtocolTypeId() const override;
 	virtual const iser::IVersionInfo* GetProtocolVersion() const override;
 	virtual bool GetProtocolStatusCode(int statusCode, int& protocolStatusCode, QByteArray& statusCodeLiteral) const override;
-	virtual IRequest* CreateRequest(QObject* socketPtr, const IRequestHandler& requestHandler) const override;
+	virtual IRequest* CreateRequest(QObject* socketPtr, const IRequestServlet& requestHandler) const override;
 	virtual IRequest* CreateRequestForSend(
 				QObject* socketPtr,
-				const IRequestHandler& requestHandler,
+				const IRequestServlet& requestHandler,
 				int statusCode,
 				const QByteArray& data,
 				const QByteArray& dataTypeId) const override;

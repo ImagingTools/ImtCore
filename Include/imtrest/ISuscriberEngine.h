@@ -14,7 +14,7 @@ namespace imtrest
 
 class IRequest;
 class IProtocolEngine;
-class IRequestHandler;
+class IRequestServlet;
 class IResponse;
 class ISender;
 class ISubscriber;
@@ -33,7 +33,7 @@ public:
 	*/
 	virtual ISubscriber* RegisterSubscriber(
 				QObject* socketPtr,
-				const IRequestHandler& requestHandler,
+				const IRequestServlet& requestHandler,
 				const IProtocolEngine& engine) = 0;
 
 	/**

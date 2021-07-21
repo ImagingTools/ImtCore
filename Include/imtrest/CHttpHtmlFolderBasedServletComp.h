@@ -5,7 +5,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtrest/IRequestHandler.h>
+#include <imtrest/IRequestServlet.h>
 
 // Qt includes
 #include <QtCore/QDir>
@@ -24,17 +24,18 @@ namespace imtrest
 /**
  * \brief The CHttpHtmlFolderBasedHandlerComp class generates HTML-document with list of objects for all the files and directories in the directory
  */
-class CHttpHtmlFolderBasedHandlerComp:
+class Q_DECL_DEPRECATED_X("use imtrest::CHttpFileProviderBasedServletComp") CHttpHtmlFolderBasedServletComp:
 			public ilog::CLoggerComponentBase,
-			virtual public IRequestHandler
+			virtual public IRequestServlet
+
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	CHttpHtmlFolderBasedHandlerComp();
+	CHttpHtmlFolderBasedServletComp();
 
-	I_BEGIN_COMPONENT(CHttpHtmlFolderBasedHandlerComp);
-		I_REGISTER_INTERFACE(IRequestHandler);
+	I_BEGIN_COMPONENT(CHttpHtmlFolderBasedServletComp);
+		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "List of command-ID used with corresponded handlers", true, "");
 		I_ASSIGN(m_homeDirPath, "HomePath", "Home path", true, QDir::currentPath());
 		I_ASSIGN(m_pathsProblemsAutoSolve, "AutoSolvePathsProblems", "If 'true' servelt'll automatically solve paths problems", true, true);

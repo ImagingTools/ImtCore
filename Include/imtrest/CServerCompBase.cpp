@@ -13,7 +13,7 @@ namespace imtrest
 
 // reimplemented (IRequestHandler)
 
-IRequestHandler::ConstResponsePtr CServerCompBase::ProcessRequest(const IRequest& request) const
+IRequestServlet::ConstResponsePtr CServerCompBase::ProcessRequest(const IRequest& request) const
 {
 	ConstResponsePtr retVal;
 

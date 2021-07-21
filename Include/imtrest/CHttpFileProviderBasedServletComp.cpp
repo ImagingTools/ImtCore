@@ -10,7 +10,7 @@
 #include <ifile/IFileNameParam.h>
 
 // ImtCore includes
-#include <imtrest/IRequestHandler.h>
+#include <imtrest/IRequestServlet.h>
 
 
 namespace imtrest
@@ -84,7 +84,7 @@ QByteArray CHttpFileProviderBasedServletComp::GetMimeType(QByteArray fileSuffix)
 
 // reimplemented (IRequestHandler)
 
-IRequestHandler::ConstResponsePtr CHttpFileProviderBasedServletComp::ProcessRequest(const IRequest& request) const
+IRequestServlet::ConstResponsePtr CHttpFileProviderBasedServletComp::ProcessRequest(const IRequest& request) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";

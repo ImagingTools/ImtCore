@@ -15,7 +15,7 @@ namespace imtrest
 
 // reimplemented (IRequestHandler)
 
-IRequestHandler::ConstResponsePtr CWebSocketServerComp::ProcessRequest(const IRequest& request) const
+IRequestServlet::ConstResponsePtr CWebSocketServerComp::ProcessRequest(const IRequest& request) const
 {
     ConstResponsePtr retVal;
 

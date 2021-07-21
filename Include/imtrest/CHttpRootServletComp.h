@@ -8,22 +8,22 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtrest/IRequestHandler.h>
+#include <imtrest/IRequestServlet.h>
 
 
 namespace imtrest
 {
 
 
-class CHttpRootHandlerComp:
+class CHttpRootServletComp:
 			public ilog::CLoggerComponentBase,
-			virtual public IRequestHandler
+			virtual public IRequestServlet
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CHttpRootHandlerComp);
-		I_REGISTER_INTERFACE(IRequestHandler);
+	I_BEGIN_COMPONENT(CHttpRootServletComp);
+		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN_MULTI_0(m_commandIdsAttrPtr, "CommandIds", "List of command-IDs used with corresponded handlers", true);
 		I_ASSIGN_MULTI_0(m_requestHandlersCompPtr, "RequestHandlers", "List of request handlers for corresponding command-IDs", true);
 	I_END_COMPONENT
@@ -33,16 +33,16 @@ public:
 	virtual QByteArray GetSupportedCommandId() const override;
 
 protected:
-	virtual IRequestHandler* FindRequestHandler(const QByteArray& commandId) const;
+	virtual IRequestServlet* FindRequestHandler(const QByteArray& commandId) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated();
 
 private:
 	I_MULTIATTR(QByteArray, m_commandIdsAttrPtr);
-	I_MULTIREF(IRequestHandler, m_requestHandlersCompPtr);
+	I_MULTIREF(IRequestServlet, m_requestHandlersCompPtr);
 
-	typedef QMap<QString, IRequestHandler*> HandlersMap;
+	typedef QMap<QString, IRequestServlet*> HandlersMap;
 
 	HandlersMap m_handlersMap;
 	QMutex m_handlersMapMutex;

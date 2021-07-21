@@ -10,7 +10,7 @@
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
-#include <imtrest/IRequestHandler.h>
+#include <imtrest/IRequestServlet.h>
 #include <imtrest/http_parser.h>
 
 
@@ -34,7 +34,7 @@ public:
 		MT_PATCH = 64
 	};
 
-	CHttpRequest(QObject& socket, const IRequestHandler& requestHandler, const IProtocolEngine& engine);
+	CHttpRequest(QObject& socket, const IRequestServlet& requestHandler, const IProtocolEngine& engine);
 
 	QByteArrayList GetHeaders() const;
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
@@ -85,7 +85,7 @@ private:
 	RequestState m_state;
 	QByteArray m_body;
 
-	const IRequestHandler& m_requestHandler;
+	const IRequestServlet& m_requestHandler;
 	const IProtocolEngine& m_engine;
 	QObject& m_socket;
 

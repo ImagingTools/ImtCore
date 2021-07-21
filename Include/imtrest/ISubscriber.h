@@ -8,7 +8,7 @@
 namespace imtrest
 {
 
-class IRequestHandler;
+class IRequestServlet;
 
 /**
 	Common interface for a subscriber object.
@@ -26,7 +26,7 @@ public:
 	virtual void SetState(const SubscriberState& subscriberState) = 0;
 	virtual QByteArray GetTokenId() const = 0;
 	virtual QByteArray GetSubscriberId() const = 0;
-	virtual const IRequestHandler& GetRequestHandler() const = 0;
+	virtual const IRequestServlet& GetRequestHandler() const = 0;
 };
 
 

@@ -35,7 +35,7 @@ public:
 	// reimplemented (ISuscriberEngine)
 	virtual ISubscriber* RegisterSubscriber(
 				QObject* socketPtr,
-				const IRequestHandler& requestHandler,
+				const IRequestServlet& requestHandler,
 				const IProtocolEngine& engine) override;
 	virtual void UnRegisterSubscriber(QObject* socketObjectPtr) override;
 	virtual const ISubscriber* GetSubscriber(const IRequest* requestPtr) const override;

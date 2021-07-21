@@ -36,7 +36,7 @@ CHttpRedirectComp::ConstResponsePtr CHttpRedirectComp::ProcessRequest(const IReq
 															   "text/html; charset=UTF-8")
 											   );
 //	const CHttpResponse *httpResp = dynamic_cast<const CHttpResponse*>(retval.GetPtr());
-//	if(httpResp != nullptr)
+//	if (httpResp != nullptr)
 //	{
 //		httpResp->
 //	}

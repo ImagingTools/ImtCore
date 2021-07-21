@@ -28,7 +28,7 @@ const iser::IVersionInfo* CHttpProtocolEngineComp::GetProtocolVersion() const
 
 bool CHttpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protocolStatusCode, QByteArray& statusCodeLiteral) const
 {
-	auto setProtocolStatusCode = [&protocolStatusCode, &statusCodeLiteral](const int& protocolStatusCodeValue, const QByteArray& statusCodeLiteralValue) {
+	auto setProtocolStatusCode = [&protocolStatusCode, &statusCodeLiteral](const int& protocolStatusCodeValue, const QByteArray& statusCodeLiteralValue){
 		protocolStatusCode = protocolStatusCodeValue;
 		statusCodeLiteral = statusCodeLiteralValue;
 		return true;
@@ -150,7 +150,7 @@ bool CHttpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protoco
 }
 
 
-IRequest* CHttpProtocolEngineComp::CreateRequest(QObject* socketPtr, const IRequestHandler& requestHandler) const
+IRequest* CHttpProtocolEngineComp::CreateRequest(QObject* socketPtr, const IRequestServlet& requestHandler) const
 {
 	if (socketPtr != nullptr){
 		return new CHttpRequest(*socketPtr, requestHandler, *this);
@@ -162,7 +162,7 @@ IRequest* CHttpProtocolEngineComp::CreateRequest(QObject* socketPtr, const IRequ
 
 IRequest* CHttpProtocolEngineComp::CreateRequestForSend(
 		QObject* socketPtr,
-		const IRequestHandler& requestHandler,
+		const IRequestServlet& requestHandler,
 		int statusCode,
 		const QByteArray& data,
 		const QByteArray& dataTypeId) const

@@ -1,4 +1,4 @@
-#include <imtrest/CHttpRootHandlerComp.h>
+#include <imtrest/CHttpRootServletComp.h>
 
 
 // ImtCore includes
@@ -16,7 +16,7 @@ namespace imtrest
 
 // reimplemented (IRequestHandler)
 
-IRequestHandler::ConstResponsePtr CHttpRootHandlerComp::ProcessRequest(const IRequest& request) const
+IRequestServlet::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request) const
 {
 	QByteArray commandId = request.GetCommandId();
 	if (commandId.startsWith('/')){
@@ -29,8 +29,8 @@ IRequestHandler::ConstResponsePtr CHttpRootHandlerComp::ProcessRequest(const IRe
 
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 
-	const IRequestHandler* handlerPtr = FindRequestHandler(commandId);
-	if (handlerPtr != nullptr) {
+	const IRequestServlet* handlerPtr = FindRequestHandler(commandId);
+	if (handlerPtr != nullptr){
 		return handlerPtr->ProcessRequest(request);
 	}
 	else if (commandId.isEmpty()){
@@ -46,7 +46,7 @@ IRequestHandler::ConstResponsePtr CHttpRootHandlerComp::ProcessRequest(const IRe
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
 		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
-		if (responsePtr.IsValid()) {
+		if (responsePtr.IsValid()){
 			engine.GetSender().SendResponse(*responsePtr);
 		}
 
@@ -61,18 +61,18 @@ IRequestHandler::ConstResponsePtr CHttpRootHandlerComp::ProcessRequest(const IRe
 
 // protected methods
 
-IRequestHandler* CHttpRootHandlerComp::FindRequestHandler(const QByteArray& commandId) const
+IRequestServlet* CHttpRootServletComp::FindRequestHandler(const QByteArray& commandId) const
 {
 	/// contains an IRequestHandler pointer in which the commandID is exactly the same as the request (highest priority) 
 	/// \warning This pointer MUST be returned if is not null!
-	IRequestHandler* exactsCommandIdHandler = nullptr;
+	IRequestServlet* exactsCommandIdHandler = nullptr;
 
 	/// contains an IRequestHandler pointer in which the commandID is exactly the same as the request (highest priority) 
 	/// \warning This pointer chould be returned ONLY exactsCommandIdHandler is null!
-	IRequestHandler* startsCommandIdHandler = nullptr;
+	IRequestServlet* startsCommandIdHandler = nullptr;
 
-	for (int i = 0; i < m_requestHandlersCompPtr.GetCount(); ++i) {
-		IRequestHandler* handlerPtr = m_requestHandlersCompPtr[i];
+	for (int i = 0; i < m_requestHandlersCompPtr.GetCount(); ++i){
+		IRequestServlet* handlerPtr = m_requestHandlersCompPtr[i];
 		if (i > m_commandIdsAttrPtr.GetCount() - 1){
 			break;
 		}
@@ -102,7 +102,7 @@ IRequestHandler* CHttpRootHandlerComp::FindRequestHandler(const QByteArray& comm
 
 // reimplemented (icomp::CComponentBase)
 
-void CHttpRootHandlerComp::OnComponentCreated()
+void CHttpRootServletComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
@@ -114,7 +114,7 @@ void CHttpRootHandlerComp::OnComponentCreated()
 		
 		for (int i = 0; i < handlersCount; ++i){
 			QString registeredCommandId = m_commandIdsAttrPtr[i];
-			IRequestHandler* handlerPtr = m_requestHandlersCompPtr[i];
+			IRequestServlet* handlerPtr = m_requestHandlersCompPtr[i];
 
 			if ((handlerPtr != nullptr) && !registeredCommandId.isEmpty()){
 				m_handlersMap[registeredCommandId] = handlerPtr;
@@ -124,7 +124,7 @@ void CHttpRootHandlerComp::OnComponentCreated()
 }
 
 
-QByteArray CHttpRootHandlerComp::GetSupportedCommandId() const
+QByteArray CHttpRootServletComp::GetSupportedCommandId() const
 {
 	return "/";
 }

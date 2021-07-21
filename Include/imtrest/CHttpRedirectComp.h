@@ -8,7 +8,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtrest/IRequestHandler.h>
+#include <imtrest/IRequestServlet.h>
 
 
 namespace imtrest
@@ -17,13 +17,13 @@ namespace imtrest
 
 class CHttpRedirectComp:
 		public ilog::CLoggerComponentBase,
-		virtual public IRequestHandler
+		virtual public IRequestServlet
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CHttpRedirectComp)
-		I_REGISTER_INTERFACE(IRequestHandler)
+		I_REGISTER_INTERFACE(IRequestServlet)
 	I_ASSIGN(m_commandIdAttrPtr, "CommandId", "List of command-ID used with corresponded handlers", true, "");
 	I_ASSIGN(m_redirectToCommandID, "RedirectToCommandId", "Command-ID used with corresponded handlers", true, "");
 

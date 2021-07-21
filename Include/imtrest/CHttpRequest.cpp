@@ -30,7 +30,7 @@ static http_parser_settings s_httpParserSettings
 
 // public methods
 
-CHttpRequest::CHttpRequest(QObject& socket, const IRequestHandler& handler, const IProtocolEngine& engine)
+CHttpRequest::CHttpRequest(QObject& socket, const IRequestServlet& handler, const IProtocolEngine& engine)
 	:m_requestHandler(handler),
 	m_engine(engine),
 	m_socket(socket),

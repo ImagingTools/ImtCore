@@ -34,7 +34,7 @@ bool CWebSocketProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& pr
 }
 
 
-IRequest* CWebSocketProtocolEngineComp::CreateRequest(QObject* socketPtr, const IRequestHandler& requestHandler) const
+IRequest* CWebSocketProtocolEngineComp::CreateRequest(QObject* socketPtr, const IRequestServlet& requestHandler) const
 {
 	if (socketPtr != nullptr){
 		return new CWebSocketRequest(*socketPtr, requestHandler, *this);
@@ -46,7 +46,7 @@ IRequest* CWebSocketProtocolEngineComp::CreateRequest(QObject* socketPtr, const 
 
 IRequest *CWebSocketProtocolEngineComp::CreateRequestForSend(
 		QObject* socketPtr,
-		const IRequestHandler& requestHandler,
+		const IRequestServlet& requestHandler,
 		int statusCode,
 		const QByteArray &data,
 		const QByteArray &dataTypeId) const

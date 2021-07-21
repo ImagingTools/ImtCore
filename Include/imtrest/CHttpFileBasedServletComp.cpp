@@ -1,4 +1,4 @@
-#include <imtrest/CHttpFileBasedHandlerComp.h>
+#include <imtrest/CHttpFileBasedServletComp.h>
 
 
 // Qt includes
@@ -20,7 +20,7 @@ namespace imtrest
 
 // reimplemented (IRequestHandler)
 
-IRequestHandler::ConstResponsePtr CHttpFileBasedHandlerComp::ProcessRequest(const IRequest& request) const
+IRequestServlet::ConstResponsePtr CHttpFileBasedServletComp::ProcessRequest(const IRequest& request) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
@@ -50,7 +50,7 @@ IRequestHandler::ConstResponsePtr CHttpFileBasedHandlerComp::ProcessRequest(cons
 }
 
 
-QByteArray CHttpFileBasedHandlerComp::GetSupportedCommandId() const
+QByteArray CHttpFileBasedServletComp::GetSupportedCommandId() const
 {
 	return *m_commandIdAttrPtr;
 }

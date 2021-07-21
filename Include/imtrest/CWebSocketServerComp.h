@@ -13,7 +13,7 @@
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
-#include <imtrest/IRequestHandler.h>
+#include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/ISuscriberEngine.h>
 
@@ -29,7 +29,7 @@ namespace imtrest
 class CWebSocketServerComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
-			virtual public IRequestHandler
+			virtual public IRequestServlet
 {
 	Q_OBJECT
 public:
@@ -60,7 +60,7 @@ private Q_SLOTS:
 	void OnSocketDisconnected();
 
 private:
-	I_REF(imtrest::IRequestHandler, m_requestHandlerCompPtr);
+	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);
 	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
 	I_REF(ISubscriberEngine, m_subscriberEngineCompPtr);
 	I_ATTR(QByteArray, m_serverAddressAttrPtr);

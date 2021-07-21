@@ -25,7 +25,7 @@ CWebSocketSubscriberEngineComp::CWebSocketSubscriberEngineComp()
 
 ISubscriber* CWebSocketSubscriberEngineComp::RegisterSubscriber(
 			QObject* socketPtr,
-			const IRequestHandler& requestHandler,
+			const IRequestServlet& requestHandler,
 			const IProtocolEngine& engine)
 {
 	CSubscriberBase* subscriberPtr = new CSubscriberBase(*socketPtr, requestHandler, engine);

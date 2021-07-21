@@ -17,7 +17,7 @@ class IProtocolEngine;
 class IResponse;
 
 
-class IRequestHandler: virtual public istd::IPolymorphic
+class IRequestServlet: virtual public istd::IPolymorphic
 {
 public:
 	typedef istd::TSmartPtr<const imtrest::IResponse> ConstResponsePtr;

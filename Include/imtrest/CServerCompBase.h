@@ -11,7 +11,7 @@
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
-#include <imtrest/IRequestHandler.h>
+#include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 
 
@@ -26,7 +26,7 @@ namespace imtrest
 class CServerCompBase:
 			public QObject,
 			public ilog::CLoggerComponentBase,
-			virtual public IRequestHandler
+			virtual public IRequestServlet
 {
 	Q_OBJECT
 public:
@@ -66,7 +66,7 @@ protected:
 	Requests m_requests;
 
 protected:
-	I_REF(imtrest::IRequestHandler, m_requestHandlerCompPtr);
+	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);
 	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
 	I_ATTR(QByteArray, m_serverAddressAttrPtr);
 	I_ATTR(int, m_serverPortAttrPtr);

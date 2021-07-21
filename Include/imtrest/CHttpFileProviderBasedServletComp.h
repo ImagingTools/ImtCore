@@ -5,7 +5,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtrest/IRequestHandler.h>
+#include <imtrest/IRequestServlet.h>
 
 // Qt includes
 #include <QtCore/QDir>
@@ -32,7 +32,7 @@ public:
 	typedef CHttpServletCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CHttpFileProviderBasedServletComp);
-		I_REGISTER_INTERFACE(IRequestHandler);
+		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN_MULTI_0(m_binaryDataProvidersCompPtr, "Bynary data providers", "Bynary data providers", true);
 	I_END_COMPONENT
 

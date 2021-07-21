@@ -6,22 +6,22 @@
 #include <ifile/IFileNameParam.h>
 
 // ImtCore includes
-#include <imtrest/IRequestHandler.h>
+#include <imtrest/IRequestServlet.h>
 
 
 namespace imtrest
 {
 
 
-class CHttpFileBasedHandlerComp:
+class CHttpFileBasedServletComp:
 			public ilog::CLoggerComponentBase,
-			virtual public IRequestHandler
+			virtual public IRequestServlet
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CHttpFileBasedHandlerComp);
-		I_REGISTER_INTERFACE(IRequestHandler);
+	I_BEGIN_COMPONENT(CHttpFileBasedServletComp);
+		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "List of command-ID used with corresponded handlers", true, "");
 		I_ASSIGN(m_fileTemplatePathCompPtr, "FileTemplatePath", "Comment", true, "FileTemplatePath");
 	I_END_COMPONENT

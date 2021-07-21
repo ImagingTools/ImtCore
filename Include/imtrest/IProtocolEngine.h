@@ -13,7 +13,7 @@ namespace imtrest
 
 
 class IRequest;
-class IRequestHandler;
+class IRequestServlet;
 class IResponse;
 class ISender;
 //class IResponder;
@@ -157,7 +157,7 @@ public:
 	*/
 	virtual IRequest* CreateRequest(
 				QObject* socketPtr,
-				const IRequestHandler& requestHandler) const = 0;
+				const IRequestServlet& requestHandler) const = 0;
 
 	/**
 		Create request for sending data.
@@ -166,7 +166,7 @@ public:
 	*/
 	virtual IRequest* CreateRequestForSend(
 				QObject* socketPtr,
-				const IRequestHandler& requestHandler,
+				const IRequestServlet& requestHandler,
 				int statusCode,
 				const QByteArray& data,
 				const QByteArray& dataTypeId) const = 0;
