@@ -60,8 +60,9 @@ public:
 protected:
 	I_ATTR(QByteArray, m_dataIdAttrPtr);
 
-	virtual void GetEnums(imtrest::QueryParams& enums) const { }
-
+	virtual void GetEnums(imtrest::QueryParams& /*enums*/) const
+	{
+	}
 };
 
 

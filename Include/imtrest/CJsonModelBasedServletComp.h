@@ -18,7 +18,7 @@ namespace imtrest
 
 
 /**
- * \brief The CJsonModelBasedHandlerComp class generates JSON-model
+ * \brief The CJsonModelBasedServletComp class generates JSON-model
  */
 class CJsonModelBasedServletComp:
 			public ilog::CLoggerComponentBase,
