@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4940" Description="ACF"/>
+            <Version Id="0" Number="4947" Description="ACF"/>
             <Version Id="1" Number="2150" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -22,7 +22,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="HttpRootHandler" PackageId="ImtRestPck" ComponentId="HttpRootHandler">
+        <Element Id="HttpRootHandler" PackageId="ImtRestPck" ComponentId="HttpRootServlet">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="HttpCommandIds">
@@ -67,7 +67,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WebSocketHttpRootHandler" PackageId="ImtRestPck" ComponentId="HttpRootHandler">
+        <Element Id="WebSocketHttpRootHandler" PackageId="ImtRestPck" ComponentId="HttpRootServlet">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="WebSocketCommandIds">
