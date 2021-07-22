@@ -8,7 +8,10 @@ if(WIN32)
     endif()
 endif()
 
-if(UNIX)
-    target_link_libraries(${PROJECT_NAME} -lcrypto)
-#	target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/${TARGETNAME}/libcrypto.a)
+if(APPLE)
+	target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/${TARGETNAME}/libcrypto.a)
+
+	elseif(UNIX)
+		target_link_libraries(${PROJECT_NAME} -lcrypto)
+
 endif()
