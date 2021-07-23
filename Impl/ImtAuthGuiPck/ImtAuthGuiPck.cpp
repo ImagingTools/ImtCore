@@ -69,6 +69,12 @@ I_EXPORT_COMPONENT(
 			"Standard account menu",
 			"Account Menu Login Logout");
 
+I_EXPORT_COMPONENT(
+			StandardLoginGui,
+			"Standard login gui",
+			"Login Logout Gui");
+
+
 } // namespace ImtAuthGuiPck
 
 

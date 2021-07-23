@@ -58,6 +58,7 @@ public:
 		I_ASSIGN(m_closeRightIdAttrPtr, "CloseRightId", "ID of the user right to close the application", true, "Close");
 		I_ASSIGN_MULTI_0(m_disablePageListViewIndexesAttrPtr, "DisablePageListViewIndexes", "List of page indexes where the page list view is not shown", false);
 		I_ASSIGN(m_showPageTitlesAttrPtr, "ShowPageTitles", "Show title of the current page in the main tool bar", true, true);
+		I_ASSIGN(m_loginGuiCompPtr, "LoginGui", "Login gui", false, "StandardLoginGui");
 	I_END_COMPONENT;
 
 protected:
@@ -75,6 +76,7 @@ protected:
 	I_ATTR(QByteArray, m_closeRightIdAttrPtr);
 	I_MULTIATTR(int, m_disablePageListViewIndexesAttrPtr);
 	I_ATTR(bool, m_showPageTitlesAttrPtr);
+	I_REF(iqtgui::IGuiObject, m_loginGuiCompPtr);
 };
 
 
@@ -84,44 +86,15 @@ public:
 	typedef CThumbnailDecoratorGuiCompAttr BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CThumbnailDecoratorGuiCompAttr2);
-		I_REGISTER_SUBELEMENT(LoginLog);
-		I_REGISTER_SUBELEMENT_INTERFACE(LoginLog, ilog::IMessageConsumer, ExtractLoginLog);
 		I_ASSIGN(m_hideMenuPanelOnHomePageAttrPtr, "HideMenuPanelOnHomePage", "Hide menu panel when home page is active", true, true);
 		I_ASSIGN(m_hideHomeButtonAttrPtr, "HideHomeButton", "Hide home button", true, false);
 		I_ASSIGN(m_accountMenuCompPtr, "AccountMenu", "Menu for logged account", false, "AccountMenu");
 	I_END_COMPONENT;
 
-	CThumbnailDecoratorGuiCompAttr2()
-		:m_loginLog(*this)
-	{
-	}
-
-private:
-	class LoginLog: public ilog::IMessageConsumer
-	{
-	public:
-		LoginLog(CThumbnailDecoratorGuiCompAttr2& parent);
-
-		// reimplemented (ilog::IMessageConsumer)
-		virtual bool IsMessageSupported(int messageCategory = -1, int messageId = -1, const istd::IInformationProvider* messagePtr = NULL) const override;
-		virtual void AddMessage(const MessagePtr& messagePtr) override;
-
-	private:
-		CThumbnailDecoratorGuiCompAttr2& m_parent;
-	};
-
-	template <typename InterfaceType>
-	static InterfaceType* ExtractLoginLog(CThumbnailDecoratorGuiCompAttr2& parent)
-	{
-		return &parent.m_loginLog;
-	}
-
 protected:
 	I_ATTR(bool, m_hideMenuPanelOnHomePageAttrPtr);
 	I_ATTR(bool, m_hideHomeButtonAttrPtr);
 	I_REF(iqtgui::IGuiObject, m_accountMenuCompPtr);
-
-	LoginLog m_loginLog;
 };
 
 
@@ -201,7 +174,7 @@ protected:
 	virtual void OnSaveSettings(QSettings& settings) const override;
 
 	// reimlpemented (iqtgui::TDesignSchemaHandlerWrap)
-	void OnDesignSchemaChanged() override;
+	virtual void OnDesignSchemaChanged() override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
@@ -210,14 +183,11 @@ protected:
 	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
 
 private Q_SLOTS:
-	void on_PageStack_currentChanged(int stackIndex);
 	void on_PageList_clicked(const QModelIndex& index);
 	void on_ExitButton_clicked();
 	void on_SubPages_itemSelectionChanged();
 	void on_HomeButton_clicked();
-	void on_LoginButton_clicked();
 	void on_LoginControlButton_clicked();
-	void on_PasswordEdit_textEdited(const QString &text);
 	void on_CommandsMenuButton_clicked();
 	void OnAutoLogoutTimer();
 	void OnCheckIsFullScreenTimer();
@@ -377,8 +347,6 @@ private:
 	QString m_winKeyboardPath;
 
 	int m_lastPageIndexForLoggedUser;
-
-	int m_keyEnterTimerId;
 	bool m_isExitProcess;
 };
 

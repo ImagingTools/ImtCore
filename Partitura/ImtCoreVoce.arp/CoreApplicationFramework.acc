@@ -205,6 +205,9 @@
                     <AttributeInfo Id="Login" Type="Reference" ExportId="Login">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="LoginGui" Type="Reference" ExportId="LoginGui">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="MaximumFrameHeight" Type="Integer" ExportId="MaximumFrameHeight">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -300,7 +303,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ApplicationInfo" ComponentId="ApplicationInfo"/>
-        <Component ExportedId="LoginLog" ComponentId="Pages/LoginLog"/>
         <Component ExportedId="MenuPanelVisibility" ComponentId="MenuPanelVisibility"/>
         <Component ExportedId="PageCommands" ComponentId="CommandsMultiplexer"/>
         <Component ExportedId="RuntimeStatus" ComponentId="GuiApplication/RuntimeStatus"/>

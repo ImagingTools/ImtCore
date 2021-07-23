@@ -41,7 +41,6 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_verticalFrameMargin(6),
 	m_itemDelegate(nullptr),
 	m_lastPageIndexForLoggedUser(-1),
-	m_keyEnterTimerId(0),
 	m_isExitProcess(false)
 {
 	m_rootCommands.InsertChild(&m_commands);
@@ -113,24 +112,9 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 			}
 		}
 
-		QTimerEvent* timerEventPtr = dynamic_cast<QTimerEvent*>(event);
-		if (timerEventPtr != nullptr){
-			if (timerEventPtr->timerId() == m_keyEnterTimerId){
-				killTimer(m_keyEnterTimerId);
-				m_keyEnterTimerId = 0;
-			}
-		}
-
 		QKeyEvent* keyEventPtr = dynamic_cast<QKeyEvent*>(event);
 		if (keyEventPtr != nullptr){
 			int pressedKey = keyEventPtr->key();
-
-			if ((pressedKey == Qt::Key_Return || pressedKey == Qt::Key_Enter) && m_keyEnterTimerId == 0){
-				if ((PageStack->currentIndex() == LOGIN_PAGE_INDEX) && !isLogged && LoginButton->isEnabled()){
-					on_LoginButton_clicked();
-					m_keyEnterTimerId = startTimer(500);
-				}
-			}
 
 			if (pressedKey == Qt::Key_Escape){
 				if (ViewStack->currentIndex() == 1){
@@ -148,32 +132,13 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 
 // reimplemented (iqtgui::TRestorableGuiWrap)
 
-void CThumbnailDecoratorGuiComp::OnRestoreSettings(const QSettings& settings)
+void CThumbnailDecoratorGuiComp::OnRestoreSettings(const QSettings& /*settings*/)
 {
-	QString lastUser  = settings.value("LastUser").toString();
-	bool isRememberMe = settings.value("RememberMe",false).toBool();
-
-	if (isRememberMe){
-		UserEdit->setText(lastUser);
-	}
-
-	RememberMe->setChecked(isRememberMe);
-
-	if (!lastUser.isEmpty()){
-		PasswordEdit->setFocus();
-		PasswordEdit->setCursorPosition(0);
-	}
 }
 
 
-void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& settings) const
+void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& /*settings*/) const
 {
-	bool isRememberMe = RememberMe->isChecked();
-	QString lastUser  = UserEdit->text();
-	
-	settings.setValue("RememberMe", isRememberMe);
-	settings.setValue("LastUser", lastUser);
-
 }
 
 
@@ -195,6 +160,10 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
+	if (m_loginGuiCompPtr.IsValid()){
+		m_loginGuiCompPtr->CreateGui(LoginGuiFrame);
+	}
+
 	if (*m_hideHomeButtonAttrPtr){
 		HomeButton->hide();
 	}
@@ -203,8 +172,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	if (!*m_showPageTitlesAttrPtr){
 		TopFrameLayout->removeItem(AdditionalSpacerRight);
 	}
-
-	LoginLogText->setVisible(false);
 
 	if (m_dashboardGuiCompPtr.IsValid()){
 		m_dashboardGuiCompPtr->CreateGui(DashBoardFrame);
@@ -341,6 +308,10 @@ void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 	m_loginObserver.UnregisterAllModels();
 	m_pageVisualStatusObserver.UnregisterAllModels();
 
+	if (m_loginGuiCompPtr.IsValid() && m_loginGuiCompPtr->IsGuiCreated()){
+		m_loginGuiCompPtr->DestroyGui();
+	}
+
 	BaseClass::OnGuiDestroyed();
 }
 
@@ -397,20 +368,6 @@ void CThumbnailDecoratorGuiComp::OnTryClose(bool* ignoredPtr)
 
 
 // private slots
-
-void CThumbnailDecoratorGuiComp::on_PageStack_currentChanged(int stackIndex)
-{
-	if (!UserEdit->text().isEmpty() && (stackIndex == LOGIN_PAGE_INDEX)){
-		PasswordEdit->setFocus();
-		PasswordEdit->setCursorPosition(0);
-	}
-
-	PasswordEdit->setText("");
-	PasswordEdit->setStyleSheet("");
-	PasswordLabel->setStyleSheet("");
-	PasswordMessage->setText("");
-}
-
 
 void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 {
@@ -481,87 +438,6 @@ void CThumbnailDecoratorGuiComp::on_HomeButton_clicked()
 }
 
 
-void CThumbnailDecoratorGuiComp::on_LoginButton_clicked()
-{
-	PasswordEdit->setFocus();
-
-	LoginLogText->clear();
-
-	LoginLogText->setVisible(false);
-
-	if (m_loginCompPtr.IsValid()){
-		QString userName = UserEdit->text();
-		QString password = PasswordEdit->text();
-		if (m_loginCompPtr->Login(userName, password)){
-			if (RememberMe->isChecked() == false){
-				UserEdit->setText("");
-			}
-			int autoLogoutSeconds = GetAutoLogoutTime();
-			if (autoLogoutSeconds > 0){
-				m_autoLogoutTimer.start(autoLogoutSeconds * 1000);
-
-				qApp->installEventFilter(this);
-			}
-
-			UpdateLoginButtonsState();
-
-			int lastPageIndex = m_lastPageIndexForLoggedUser;
-
-			// No page was selected:
-			if (lastPageIndex < 0 && IsHomePageEnabled()){
-				ShowHomePage();
-			}
-			else{
-				// Check if the page can be entered for the newly logged user:
-				const iprm::IOptionsList* pageInfoListPtr = m_pagesCompPtr->GetSelectionConstraints();
-				Q_ASSERT(pageInfoListPtr != nullptr);
-
-				// If no last page is known, looking for the first available page:
-				if (lastPageIndex < 0){
-					for (int pageIndex = 0; pageIndex < pageInfoListPtr->GetOptionsCount(); ++pageIndex){
-						if (pageInfoListPtr->IsOptionEnabled(pageIndex)){
-							lastPageIndex = pageIndex;
-							break;
-						}
-					}
-				}
-
-				// Check if the target page can be entered:
-				bool isPageEnabled = false;
-				if (lastPageIndex >= 0){
-					isPageEnabled = pageInfoListPtr->IsOptionEnabled(lastPageIndex);
-				}
-	
-				// If possible, go to the last active page:
-				if (isPageEnabled){
-					SwitchToPage(lastPageIndex);
-				}
-				// If not swtich to the default page or show the main menu:
-				else{
-					if (m_defaultPageIndexAttrPtr.IsValid()){
-						SwitchToPage(*m_defaultPageIndexAttrPtr);
-					}
-					else{
-						ShowHomePage();
-					}
-				}
-			}
-		}
-		else{
-			PasswordEdit->setStyleSheet("border-color: red; color: red");
-			PasswordLabel->setStyleSheet("color: red");
-			PasswordMessage->setStyleSheet("color: red");
-			PasswordMessage->setText(tr("Login failed"));
-
-			if (m_keyEnterTimerId != 0){
-				killTimer(m_keyEnterTimerId);
-			}
-			m_keyEnterTimerId = startTimer(500);
-		}
-	}
-}
-
-
 void CThumbnailDecoratorGuiComp::on_LoginControlButton_clicked()
 {
 	Q_ASSERT(m_loginCompPtr.IsValid());
@@ -588,16 +464,6 @@ void CThumbnailDecoratorGuiComp::on_LoginControlButton_clicked()
 }
 
 
-void CThumbnailDecoratorGuiComp::on_PasswordEdit_textEdited(const QString &/*text*/)
-{
-	PasswordEdit->setStyleSheet("");
-	PasswordLabel->setStyleSheet("");
-	PasswordMessage->setText("");
-	LoginLogText->clear();
-	LoginLogText->setVisible(false);
-}
-
-
 void CThumbnailDecoratorGuiComp::on_CommandsMenuButton_clicked()
 {
 	QPoint origin = CommandsMenuButton->geometry().center();
@@ -615,7 +481,9 @@ void CThumbnailDecoratorGuiComp::on_CommandsMenuButton_clicked()
 
 void CThumbnailDecoratorGuiComp::OnAutoLogoutTimer()
 {
-	m_loginCompPtr->Logout();
+	if (m_loginCompPtr.IsValid()){
+		m_loginCompPtr->Logout();
+	}
 }
 
 
@@ -796,12 +664,6 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 	ExitButton->setEnabled(IsUserActionAllowed(UA_APPLICATION_EXIT));
 
 	LoginControlButton->setEnabled(IsUserActionAllowed(UA_LOGIN_CONTROL_ENABLED));
-
-	bool isLoginEnabled = IsUserActionAllowed(UA_LOGIN_ENABLED);
-	UserEdit->setEnabled(isLoginEnabled);
-	PasswordEdit->setEnabled(isLoginEnabled);
-	UserEdit->setEnabled(isLoginEnabled);
-	LoginButton->setEnabled(isLoginEnabled);
 
 	HomeButton->setEnabled(IsUserActionAllowed(UA_HOME_ENABLED));
 }
@@ -1481,7 +1343,57 @@ void CThumbnailDecoratorGuiComp::LoginObserver::OnModelChanged(int /*modelId*/, 
 		m_parent.UserNameLabel->clear();
 	}
 	else{
+		int autoLogoutSeconds = m_parent.GetAutoLogoutTime();
+		if (autoLogoutSeconds > 0){
+			m_parent.m_autoLogoutTimer.start(autoLogoutSeconds * 1000);
+
+			qApp->installEventFilter(&m_parent);
+		}
+
 		m_parent.UserNameLabel->setText(userPtr->GetUserName());
+
+		int lastPageIndex = m_parent.m_lastPageIndexForLoggedUser;
+
+		// No page was selected:
+		if (lastPageIndex < 0 && m_parent.IsHomePageEnabled()){
+			m_parent.ShowHomePage();
+		}
+		else{
+			// Check if the page can be entered for the newly logged user:
+			const iprm::IOptionsList* pageInfoListPtr = m_parent.m_pagesCompPtr->GetSelectionConstraints();
+			Q_ASSERT(pageInfoListPtr != nullptr);
+
+			// If no last page is known, looking for the first available page:
+			if (lastPageIndex < 0){
+				for (int pageIndex = 0; pageIndex < pageInfoListPtr->GetOptionsCount(); ++pageIndex){
+					if (pageInfoListPtr->IsOptionEnabled(pageIndex)){
+						lastPageIndex = pageIndex;
+						break;
+					}
+				}
+			}
+
+			// Check if the target page can be entered:
+			bool isPageEnabled = false;
+			if (lastPageIndex >= 0){
+				isPageEnabled = pageInfoListPtr->IsOptionEnabled(lastPageIndex);
+			}
+
+			// If possible, go to the last active page:
+			if (isPageEnabled){
+				m_parent.SwitchToPage(lastPageIndex);
+			}
+			// If not swtich to the default page or show the main menu:
+			else{
+				if (m_parent.m_defaultPageIndexAttrPtr.IsValid()){
+					m_parent.SwitchToPage(*m_parent.m_defaultPageIndexAttrPtr);
+				}
+				else{
+					m_parent.ShowHomePage();
+				}
+			}
+		}
+
 	}
 
 	m_parent.UserNameLabel->setVisible(userPtr != nullptr);
@@ -1503,36 +1415,6 @@ CThumbnailDecoratorGuiComp::PageVisualStatusObserver::PageVisualStatusObserver(C
 void CThumbnailDecoratorGuiComp::PageVisualStatusObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_parent.UpdatePageState();
-}
-
-
-// public methods of embedded class LoginLog
-
-CThumbnailDecoratorGuiCompAttr2::LoginLog::LoginLog(CThumbnailDecoratorGuiCompAttr2& parent)
-	:m_parent(parent)
-{
-}
-
-
-// reimplemented (ilog::IMessageConsumer)
-
-bool CThumbnailDecoratorGuiCompAttr2::LoginLog::IsMessageSupported(int /*messageCategory*/, int /*messageId*/, const istd::IInformationProvider* /*messagePtr*/) const
-{
-	return true;
-}
-
-
-void CThumbnailDecoratorGuiCompAttr2::LoginLog::AddMessage(const MessagePtr& messagePtr)
-{
-	Q_ASSERT(messagePtr.IsValid());
-
-	if (messagePtr.IsValid()){
-		QString loginMessage = messagePtr->GetInformationDescription();
-
-		m_parent.LoginLogText->setVisible(!loginMessage.isEmpty());
-
-		m_parent.LoginLogText->setPlainText(m_parent.LoginLogText->toPlainText()  + "\n" + loginMessage);
-	}
 }
 
 
