@@ -206,7 +206,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LoginGui" Type="Reference" ExportId="LoginGui">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="StandardLoginGui"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MaximumFrameHeight" Type="Integer" ExportId="MaximumFrameHeight">
                         <Data IsEnabled="false"/>
@@ -291,6 +291,21 @@
                     </AttributeInfo>
                     <AttributeInfo Id="VersionNames" Type="Text[]" ExportId="SplashVersionNames">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="StandardLoginGui" PackageId="ImtAuthGuiPck" ComponentId="StandardLoginGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Login" Type="Reference" ExportId="Login">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Rights" Type="Reference" ExportId="Rights">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SettingsProvider"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
