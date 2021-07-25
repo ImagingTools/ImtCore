@@ -170,7 +170,10 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected() const
 		OpenDatabase();
 
 		isOpened = m_db.isOpen();
-		if(!isOpened){
+		if (isOpened){
+			ExecSqlQueryFromFile(":/Database/CreateDatabase");
+		}
+		else{
 			qCritical() << __FILE__ << __LINE__
 						<< "\n\t| what(): Database Error Occured Unable to open database"
 						<< "\n\t| Database error" << m_db.lastError().text();

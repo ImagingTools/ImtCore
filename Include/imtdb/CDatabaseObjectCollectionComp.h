@@ -27,16 +27,18 @@ public:
 	typedef imtbase::CObjectCollectionBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CDatabaseObjectCollectionComp);
-		I_REGISTER_INTERFACE(CDatabaseObjectCollectionComp);
+		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
+		I_REGISTER_INTERFACE(imtbase::IObjectCollectionInfo);
+		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
 		I_ASSIGN(m_objectFactoryCompPtr, "ObjectFactory", "List of factories used for object creation", false, "ObjectFactory");
 		I_ASSIGN(m_typeIdAttrPtr, "TypeId", "Type-ID corresponding to the registered factory", false, "Default");
 		I_ASSIGN(m_typeNameAttrPtr, "TypeName", "Type name corresponding to the registered factory", false, "Default");
 		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database engine used for low level SQL quering", true, "DatabaseEngine");
 		I_ASSIGN(m_updateOnDatabaseConnectedAttrPtr, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", true, false);
-		I_ASSIGN(m_selectSqlQueryPathAttrPtr, "SelectSqlQueryPath", "SQL query string file path for Selecting in database", false, "");
-		I_ASSIGN(m_insertSqlQueryPathAttrPtr, "InsertSqlQueryPath", "SQL query string file path for Inserting in database", false, "");
-		I_ASSIGN(m_updateSqlQueryPathAttrPtr, "UpdateSqlQueryPath", "SQL query string file path for Updating in database", false, "");
-		I_ASSIGN(m_deleteSqlQueryPathAttrPtr, "DeleteSqlQueryPath", "SQL query string file path for Deleting in database", false, "");
+		I_ASSIGN(m_selectSqlQueryPathAttrPtr, "SelectSqlQueryPath", "SQL query string file path for Selecting in database", true, "");
+		I_ASSIGN(m_insertSqlQueryPathAttrPtr, "InsertSqlQueryPath", "SQL query string file path for Inserting in database", true, "");
+		I_ASSIGN(m_updateSqlQueryPathAttrPtr, "UpdateSqlQueryPath", "SQL query string file path for Updating in database", true, "");
+		I_ASSIGN(m_deleteSqlQueryPathAttrPtr, "DeleteSqlQueryPath", "SQL query string file path for Deleting in database", true, "");
 	I_END_COMPONENT;
 
 	// reimplemented (imtbase::IObjectCollection)
