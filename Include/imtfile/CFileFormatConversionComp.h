@@ -23,8 +23,10 @@ class CFileFormatConversionComp: virtual public ifileproc::IFileConversion, publ
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CFileProviderComp);
+	I_BEGIN_COMPONENT(CFileFormatConversionComp);
 		I_REGISTER_INTERFACE(ifileproc::IFileConversion);
+		I_ASSIGN(m_persistenceCompPtr, "Persistence", "Format support", true, "Persistence");
+		I_ASSIGN(m_workingObjectCompPtr, "WorkingObject", "Working object", true, "WorkingObject");
 	I_END_COMPONENT
 
 	// reimplemented (ifileproc::IFileConversion)

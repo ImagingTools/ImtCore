@@ -19,6 +19,11 @@ I_EXPORT_COMPONENT(
 			"File provider component",
 			"File Provider");
 
+I_EXPORT_COMPONENT(
+			FileFormatConversion,
+			"File format conversion",
+			"File Format Conversion");
+
 
 } // namespace ImtFilePck
 
