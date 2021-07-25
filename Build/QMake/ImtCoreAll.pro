@@ -75,6 +75,9 @@ imtlicgui.file = ../../Include/imtlicgui/QMake/imtlicgui.pro
 SUBDIRS += imtgql
 imtgql.file = ../../Include/imtgql/QMake/imtgql.pro
 
+SUBDIRS += imtdb
+imtdb.file = ../../Include/imtdb/QMake/imtdb.pro
+
 ## Component packages
 
 SUBDIRS += ImtCorePck
@@ -88,6 +91,10 @@ ImtStylePck.depends = imtstyle
 SUBDIRS += ImtAuthPck
 ImtAuthPck.file = ../../Impl/ImtAuthPck/QMake/ImtAuthPck.pro
 ImtAuthPck.depends = imtbase imtauth
+
+SUBDIRS += ImtDatabasePck
+ImtDatabasePck.file = ../../Impl/ImtDatabasePck/QMake/ImtDatabasePck.pro
+ImtDatabasePck.depends = imtbase imtdb
 
 SUBDIRS += ImtAuthGuiPck
 ImtAuthGuiPck.file = ../../Impl/ImtAuthGuiPck/QMake/ImtAuthGuiPck.pro

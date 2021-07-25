@@ -10,8 +10,8 @@
 
 // ImtCore includes
 #include <imtbase/CObjectCollectionBase.h>
-#include <imtdb/IDataBaseEngine.h>
-#include <imtdb/IDataBaseChangeable.h>
+#include <imtdb/IDatabaseEngine.h>
+#include <imtdb/IDatabaseChangeable.h>
 
 
 namespace imtdb
@@ -19,24 +19,23 @@ namespace imtdb
 
 
 /**
-	Basic implementation of a DataBase based model.
+	Basic implementation of a Database based model.
 */
-class CDataBaseObjectCollection: public imtbase::CObjectCollectionBase, public ilog::CLoggerComponentBase
+class CDatabaseObjectCollectionComp: public imtbase::CObjectCollectionBase, public ilog::CLoggerComponentBase
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
-	I_BEGIN_COMPONENT(CDataBaseObjectCollection);
-	    I_REGISTER_INTERFACE(CDataBaseObjectCollection);
-		I_ASSIGN(m_dbEngineCompPtr, "DataBaseEngine", "DataBase for getting data", true, "IDatabaseEngine");
-		I_ASSIGN(m_updateOnDataBaseConnectedAttrPtr, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", true, false);
+	typedef imtbase::CObjectCollectionBase BaseClass2;
+
+	I_BEGIN_COMPONENT(CDatabaseObjectCollectionComp);
+	    I_REGISTER_INTERFACE(CDatabaseObjectCollectionComp);
+		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database for getting data", true, "IDatabaseEngine");
+		I_ASSIGN(m_updateOnDatabaseConnectedAttrPtr, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", true, false);
 		I_ASSIGN(m_selectSqlQueryPathAttrPtr, "SelectSqlQueryPath", "SQL query string file path for Selecting in database", false, "");
 		I_ASSIGN(m_insertSqlQueryPathAttrPtr, "InsertSqlQueryPath", "SQL query string file path for Inserting in database", false, "");
-		I_ASSIGN(m_updateSqlQueryPathAttrPtr, "UpdateSqlQueryPath", "SQL query string file path for Updateing in database", false, "");
-		I_ASSIGN(m_deleteSqlQueryPathAttrPtr, "DeleteSqlQueryPath", "SQL query string file path for Deleteing in database", false, "");
+		I_ASSIGN(m_updateSqlQueryPathAttrPtr, "UpdateSqlQueryPath", "SQL query string file path for Updating in database", false, "");
+		I_ASSIGN(m_deleteSqlQueryPathAttrPtr, "DeleteSqlQueryPath", "SQL query string file path for Deleting in database", false, "");
 	I_END_COMPONENT;
-
-	virtual void Refresh();
-	virtual const IDataBaseChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record) const;
 
 	// reimplemented (imtbase::IObjectCollection)
 	virtual QByteArray InsertNewObject(
@@ -51,12 +50,13 @@ public:
 	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	static inline std::pair<QString, QVariant> MakeSqlBindBalue(const QByteArray& propName, const IDataBaseChangeable* const object);
-	static inline QVariantMap MakeSqlBindBaluesList(const IDataBaseChangeable* const object);
-
 	QByteArray GetQueryStringFromFile(const QByteArray& filePath) const;
-	const IDataBaseChangeable* const GetObjectPtrById(const QByteArray& id) const;
-	 virtual QSqlQuery ExecSelectSqlQuery(
+	const IDatabaseChangeable* const GetObjectPtrById(const QByteArray& id) const;
+
+	virtual void Refresh();
+	virtual istd::IChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record) const;
+
+	virtual QSqlQuery ExecSelectSqlQuery(
 				 const QVariantMap& bindValues = {},
 				 QSqlError* sqlError = nullptr) const;
 	virtual QSqlQuery ExecUpdateSqlQuery(
@@ -73,8 +73,8 @@ protected:
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override;
 
 protected:
-	I_REF(IDataBaseEngine, m_dbEngineCompPtr);
-	I_ATTR(bool, m_updateOnDataBaseConnectedAttrPtr);
+	I_REF(IDatabaseEngine, m_dbEngineCompPtr);
+	I_ATTR(bool, m_updateOnDatabaseConnectedAttrPtr);
 	I_ATTR(QByteArray, m_selectSqlQueryPathAttrPtr);
 	I_ATTR(QByteArray, m_insertSqlQueryPathAttrPtr);
 	I_ATTR(QByteArray, m_updateSqlQueryPathAttrPtr);

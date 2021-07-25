@@ -1,36 +1,39 @@
-#include <imtdb/CDataBaseObjectCollection.h>
+#include <imtdb/CDatabaseObjectCollectionComp.h>
 
 // ImtCore includes
-#include <imtdb/CDataBaseEngineComp.h>
+#include <imtdb/CDatabaseEngineComp.h>
 
 
 namespace imtdb
 {
 
 
-void CDataBaseObjectCollection::Refresh()
+void CDatabaseObjectCollectionComp::Refresh()
 {
+	ResetData();
+
 	QSqlQuery sqlQuery= this->ExecSelectSqlQuery();
 	while (sqlQuery.next()){
-		auto newObj = this->CreateObjectFromSqlRecord(sqlQuery.record());
-
-		CDataBaseObjectCollection::CObjectCollectionBase::InsertNewObject("","","",newObj, newObj->GetID());
+		istd::IChangeable* objectPtr = this->CreateObjectFromSqlRecord(sqlQuery.record());
+		if (objectPtr != nullptr){
+			BaseClass2::InsertNewObject("", "", "", objectPtr);
+		}
 	}
 }
 
 
-QSqlQuery CDataBaseObjectCollection::ExecSelectSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
+QSqlQuery CDatabaseObjectCollectionComp::ExecSelectSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
 {
 	return m_dbEngineCompPtr->ExecSqlQuery(this->GetQueryStringFromFile(*m_selectSqlQueryPathAttrPtr), bindValues, sqlError);
 }
 
 
-QSqlQuery CDataBaseObjectCollection::ExecUpdateSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
+QSqlQuery CDatabaseObjectCollectionComp::ExecUpdateSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
 {
 	QByteArray queryString = this->GetQueryStringFromFile(*m_updateSqlQueryPathAttrPtr);
 	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value){
 		if(!value->isValid() || value->isNull()){
-			CDataBaseEngineComp::DrectBindValueUpdateDefault(&queryString, value.key().toUtf8());
+			CDatabaseEngineComp::DrectBindValueUpdateDefault(&queryString, value.key().toUtf8());
 		}
 	}
 
@@ -38,33 +41,33 @@ QSqlQuery CDataBaseObjectCollection::ExecUpdateSqlQuery(const QVariantMap& bindV
 }
 
 
-QSqlQuery CDataBaseObjectCollection::ExecInsertSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
+QSqlQuery CDatabaseObjectCollectionComp::ExecInsertSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
 {
 	QByteArray queryString = this->GetQueryStringFromFile(*m_insertSqlQueryPathAttrPtr);
 	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value){
 		if(!value->isValid() || value->isNull())
-			CDataBaseEngineComp::DrectBindValueInsertDefault(&queryString, value.key().toUtf8());
+			CDatabaseEngineComp::DrectBindValueInsertDefault(&queryString, value.key().toUtf8());
 	}
 
 	return m_dbEngineCompPtr->ExecSqlQuery(queryString, bindValues, sqlError);
 }
 
 
-QSqlQuery CDataBaseObjectCollection::ExecDeleteSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
+QSqlQuery CDatabaseObjectCollectionComp::ExecDeleteSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
 {
 	return m_dbEngineCompPtr->ExecSqlQuery(this->GetQueryStringFromFile(*m_deleteSqlQueryPathAttrPtr), bindValues, sqlError);
 }
 
 
-const IDataBaseChangeable* const CDataBaseObjectCollection::GetObjectPtrById(const QByteArray& id) const
+const IDatabaseChangeable* const CDatabaseObjectCollectionComp::GetObjectPtrById(const QByteArray& id) const
 {
-	const IDataBaseChangeable* retVal = nullptr;
-	retVal = dynamic_cast<const IDataBaseChangeable*>(CObjectCollectionBase::GetObjectPtr(id));
+	const IDatabaseChangeable* retVal = nullptr;
+	retVal = dynamic_cast<const IDatabaseChangeable*>(CObjectCollectionBase::GetObjectPtr(id));
 	return retVal;
 }
 
 
-const IDataBaseChangeable* CDataBaseObjectCollection::CreateObjectFromSqlRecord(const QSqlRecord& record) const
+istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectFromSqlRecord(const QSqlRecord& record) const
 {
 	Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented method");
 
@@ -74,7 +77,7 @@ const IDataBaseChangeable* CDataBaseObjectCollection::CreateObjectFromSqlRecord(
 
 // reimplemented (imtbase::IObjectCollection)
 
-QByteArray CDataBaseObjectCollection::InsertNewObject(
+QByteArray CDatabaseObjectCollectionComp::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
@@ -89,7 +92,7 @@ QByteArray CDataBaseObjectCollection::InsertNewObject(
 }
 
 
-bool CDataBaseObjectCollection::RemoveObject(const QByteArray& objectId)
+bool CDatabaseObjectCollectionComp::RemoveObject(const QByteArray& objectId)
 {
 	Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented method");
 
@@ -97,7 +100,7 @@ bool CDataBaseObjectCollection::RemoveObject(const QByteArray& objectId)
 }
 
 
-bool CDataBaseObjectCollection::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode)
+bool CDatabaseObjectCollectionComp::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode)
 {
 	Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented method");
 
@@ -105,7 +108,7 @@ bool CDataBaseObjectCollection::SetObjectData(const QByteArray& objectId, const 
 }
 
 
-istd::IChangeable* CDataBaseObjectCollection::CreateObjectInstance(const QByteArray& typeId) const
+istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
 {
 	Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented method");
 
@@ -113,7 +116,7 @@ istd::IChangeable* CDataBaseObjectCollection::CreateObjectInstance(const QByteAr
 }
 
 
-QByteArray CDataBaseObjectCollection::GetQueryStringFromFile(const QByteArray& filePath) const
+QByteArray CDatabaseObjectCollectionComp::GetQueryStringFromFile(const QByteArray& filePath) const
 {
 	QByteArray retVal;
 	QFile queryFile(filePath);

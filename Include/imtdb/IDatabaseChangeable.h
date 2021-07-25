@@ -18,7 +18,7 @@ namespace imtdb
 	Data model changes are executed in two steps: begin and end.
 	The caller can also put some flags and additional data to the update functions, to control the update logic.
 */
-class IDataBaseChangeable: virtual public istd::IChangeable
+class IDatabaseChangeable: virtual public istd::IChangeable
 {
 public:
 

@@ -8,22 +8,22 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtdb/IDataBaseEngine.h>
+#include <imtdb/IDatabaseEngine.h>
 
 
 namespace imtdb
 {
 
 
-class CDataBaseEngineComp:
+class CDatabaseEngineComp:
 			public ilog::CLoggerComponentBase,
-			virtual public IDataBaseEngine
+			virtual public IDatabaseEngine
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CDataBaseEngineComp);
-		I_REGISTER_INTERFACE(IDataBaseEngine)
+	I_BEGIN_COMPONENT(CDatabaseEngineComp);
+		I_REGISTER_INTERFACE(IDatabaseEngine)
 		I_ASSIGN(m_dbType, "DbType", "List of DbType used with corresponded handlers", true, "");
 		I_ASSIGN(m_dbName, "DbName", "List of DbName used with corresponded handlers", true, "");
 		I_ASSIGN(m_userName, "UserName", "List of command-UserName used with corresponded handlers", true, "");
@@ -35,8 +35,8 @@ public:
 	// reimplemented (IDatabaseEngine)
 	virtual	QString GetConnectionName() const override;
 	virtual QSqlDatabase GetDatabase() const override;
-	bool OpenDataBase() override;
-	void CloseDataBase() override;
+	bool OpenDatabase() override;
+	void CloseDatabase() override;
 	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlError = nullptr) const override;
 	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const override;
 	virtual QSqlQuery ExecSqlQueryFromFile(const QByteArray& filePath, QSqlError* sqlError = nullptr) const override;
