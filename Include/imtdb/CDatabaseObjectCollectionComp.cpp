@@ -59,14 +59,6 @@ QSqlQuery CDatabaseObjectCollectionComp::ExecDeleteSqlQuery(const QVariantMap& b
 }
 
 
-const IDatabaseChangeable* const CDatabaseObjectCollectionComp::GetObjectPtrById(const QByteArray& id) const
-{
-	const IDatabaseChangeable* retVal = nullptr;
-	retVal = dynamic_cast<const IDatabaseChangeable*>(CObjectCollectionBase::GetObjectPtr(id));
-	return retVal;
-}
-
-
 istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectFromSqlRecord(const QSqlRecord& record) const
 {
 	Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented method");

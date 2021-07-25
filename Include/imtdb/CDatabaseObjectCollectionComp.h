@@ -11,7 +11,6 @@
 // ImtCore includes
 #include <imtbase/CObjectCollectionBase.h>
 #include <imtdb/IDatabaseEngine.h>
-#include <imtdb/IDatabaseChangeable.h>
 
 
 namespace imtdb
@@ -51,7 +50,6 @@ public:
 
 protected:
 	QByteArray GetQueryStringFromFile(const QByteArray& filePath) const;
-	const IDatabaseChangeable* const GetObjectPtrById(const QByteArray& id) const;
 
 	virtual void Refresh();
 	virtual istd::IChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record) const;
