@@ -11,6 +11,7 @@
 // ImtCore includes
 #include <imtbase/CObjectCollectionBase.h>
 #include <imtdb/IDatabaseEngine.h>
+#include <imtdb/IDatabaseObjectDelegate.h>
 
 
 namespace imtdb
@@ -27,7 +28,7 @@ public:
 	typedef imtbase::CObjectCollectionBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CDatabaseObjectCollectionComp);
-	    I_REGISTER_INTERFACE(CDatabaseObjectCollectionComp);
+		I_REGISTER_INTERFACE(CDatabaseObjectCollectionComp);
 		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database for getting data", true, "IDatabaseEngine");
 		I_ASSIGN(m_updateOnDatabaseConnectedAttrPtr, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", true, false);
 		I_ASSIGN(m_selectSqlQueryPathAttrPtr, "SelectSqlQueryPath", "SQL query string file path for Selecting in database", false, "");
@@ -49,9 +50,7 @@ public:
 	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	QByteArray GetQueryStringFromFile(const QByteArray& filePath) const;
-
-	virtual void Refresh();
+	virtual void SyncWithDatabase();
 	virtual istd::IChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record) const;
 
 	virtual QSqlQuery ExecSelectSqlQuery(
@@ -67,11 +66,14 @@ protected:
 				 const QVariantMap& bindValues,
 				 QSqlError* sqlError = nullptr) const;
 
+	QByteArray GetQueryStringFromFile(const QByteArray& filePath) const;
+
 	// reimplemented (CObjectCollectionBase)
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override;
 
 protected:
 	I_REF(IDatabaseEngine, m_dbEngineCompPtr);
+	I_REF(IDatabaseObjectDelegate, m_objectDelegateCompPtr);
 	I_ATTR(bool, m_updateOnDatabaseConnectedAttrPtr);
 	I_ATTR(QByteArray, m_selectSqlQueryPathAttrPtr);
 	I_ATTR(QByteArray, m_insertSqlQueryPathAttrPtr);
