@@ -5,7 +5,7 @@
 #include <QtSql/QtSql>
 
 // ACF includes
-#include <istd/IPolymorphic.h>
+#include <istd/IChangeable.h>
 
 
 namespace imtdb

@@ -133,6 +133,53 @@ QByteArray CDatabaseObjectCollectionComp::GetQueryStringFromFile(const QByteArra
 }
 
 
+// reimplemented (CObjectCollectionBase)
+
+istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
+{
+	int factoryIndex = m_typeIdsAttrPtr.FindValue(typeId);
+	if (factoryIndex >= 0){
+		if (factoryIndex < m_objectFactoriesCompPtr.GetCount()){
+			return m_objectFactoriesCompPtr.CreateInstance(factoryIndex);
+		}
+	}
+
+	return nullptr;
+}
+
+
+void CDatabaseObjectCollectionComp::DestroyObjectInstance(istd::IChangeable* objectPtr) const
+{
+	if (objectPtr != nullptr){
+		icomp::IComponent* componentPtr = dynamic_cast<icomp::IComponent*>(objectPtr);
+		if (componentPtr != nullptr){
+			const icomp::ICompositeComponent* parentComponentPtr = nullptr;
+			while ((parentComponentPtr = componentPtr->GetParentComponent(true)) != nullptr){
+				componentPtr = const_cast<icomp::ICompositeComponent*>(parentComponentPtr);
+			}
+
+			if (componentPtr != nullptr){
+				delete componentPtr;
+			}
+		}
+		else{
+			delete objectPtr;
+		}
+	}
+}
+
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CDatabaseObjectCollectionComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	SyncWithDatabase();
+}
+
+
 } // namespace imtdb
 
 

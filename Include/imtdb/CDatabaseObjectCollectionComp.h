@@ -29,6 +29,9 @@ public:
 
 	I_BEGIN_COMPONENT(CDatabaseObjectCollectionComp);
 		I_REGISTER_INTERFACE(CDatabaseObjectCollectionComp);
+		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "List of factories used for object creation", false);
+		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
+		I_ASSIGN_MULTI_0(m_typeNamesAttrPtr, "TypeNames", "List of type names corresponding to the registered factories", false);
 		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database for getting data", true, "IDatabaseEngine");
 		I_ASSIGN(m_updateOnDatabaseConnectedAttrPtr, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", true, false);
 		I_ASSIGN(m_selectSqlQueryPathAttrPtr, "SelectSqlQueryPath", "SQL query string file path for Selecting in database", false, "");
@@ -70,8 +73,15 @@ protected:
 
 	// reimplemented (CObjectCollectionBase)
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override;
+	virtual void DestroyObjectInstance(istd::IChangeable* objectPtr) const override;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 protected:
+	I_MULTIFACT(istd::IChangeable, m_objectFactoriesCompPtr);
+	I_MULTIATTR(QByteArray, m_typeIdsAttrPtr);
+	I_MULTITEXTATTR(m_typeNamesAttrPtr);
 	I_REF(IDatabaseEngine, m_dbEngineCompPtr);
 	I_REF(IDatabaseObjectDelegate, m_objectDelegateCompPtr);
 	I_ATTR(bool, m_updateOnDatabaseConnectedAttrPtr);
