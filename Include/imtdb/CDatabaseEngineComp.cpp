@@ -117,7 +117,6 @@ void CDatabaseEngineComp::DrectBindValue(QByteArray* string, const QByteArray& w
 		else {
 			string->replace(regMatch.capturedStart(), string->length()-1, expr);
 		}
-
 	}
 }
 
