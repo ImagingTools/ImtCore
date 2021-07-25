@@ -33,8 +33,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 					<< "\n\t| what() sqlError Occured"
 					<< "\n\t| Database error" << m_db.lastError().text()
 					<< "\n\t| Query error" << retVal.lastError().text()
-					<< "\n\t| Executed query" << queryString
-					   ;
+					<< "\n\t| Executed query" << queryString;
 	}
 
 	return retVal;
@@ -68,8 +67,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 					<< "\n\t| Executed query" << queryString
 					<< "\n\t| Bind Values" << bindValues
 					<< "\n\t| Bound Values" << retVal.boundValues()
-					<< "\n\t| QExecuted query" << ::qPrintable(retVal.executedQuery())
-					   ;
+					<< "\n\t| QExecuted query" << ::qPrintable(retVal.executedQuery());
 	}
 
 	return retVal;
@@ -78,10 +76,12 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 
 QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QByteArray& filePath, QSqlError* sqlError) const
 {
-	QByteArray queryString;
 	QFile sqlQuetyFile(filePath);
+
 	sqlQuetyFile.open(QFile::ReadOnly);
-	queryString = sqlQuetyFile.readAll();
+
+	QByteArray queryString = sqlQuetyFile.readAll();
+
 	sqlQuetyFile.close();
 
 	return this->ExecSqlQuery(queryString, sqlError);
@@ -90,10 +90,12 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QByteArray& filePath, 
 
 QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QByteArray& filePath, const QVariantMap& bindValues, QSqlError* sqlError) const
 {
-	QByteArray queryString;
 	QFile sqlQuetyFile(filePath);
+
 	sqlQuetyFile.open(QFile::ReadOnly);
-	queryString = sqlQuetyFile.readAll();
+
+	QByteArray queryString = sqlQuetyFile.readAll();
+
 	sqlQuetyFile.close();
 
 	return this->ExecSqlQuery(queryString, bindValues, sqlError);
@@ -107,14 +109,13 @@ void CDatabaseEngineComp::DrectBindValue(QByteArray* string, const QByteArray& w
 	auto globalMatch = regExp.globalMatch(*string);
 	while(globalMatch.hasNext()){
 		auto regMatch = globalMatch.next();
-		if(regMatch.capturedEnd() < string->length()-1) 	{
+		if(regMatch.capturedEnd() < string->length()-1){
 			QChar nextSym = string->at(regMatch.capturedEnd());
 			if(!nextSym.isLetter()){
 				string->replace(regMatch.capturedStart(), regMatch.capturedLength(), expr);
 			}
-
 		}
-		else {
+		else{
 			string->replace(regMatch.capturedStart(), string->length()-1, expr);
 		}
 	}
