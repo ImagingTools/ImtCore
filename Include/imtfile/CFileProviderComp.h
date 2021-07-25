@@ -20,7 +20,7 @@ namespace imtfile
 /**
 	This component provides file from disc, resources or memory
  */
-class CFileProviderComp: public IFileProvider, public ilog::CLoggerComponentBase
+class CFileProviderComp: virtual public IFileProvider, public ilog::CLoggerComponentBase
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
