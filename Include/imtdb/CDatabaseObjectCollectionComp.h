@@ -29,10 +29,10 @@ public:
 
 	I_BEGIN_COMPONENT(CDatabaseObjectCollectionComp);
 		I_REGISTER_INTERFACE(CDatabaseObjectCollectionComp);
-		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "List of factories used for object creation", false);
-		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
-		I_ASSIGN_MULTI_0(m_typeNamesAttrPtr, "TypeNames", "List of type names corresponding to the registered factories", false);
-		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database for getting data", true, "IDatabaseEngine");
+		I_ASSIGN(m_objectFactoryCompPtr, "ObjectFactory", "List of factories used for object creation", false, "ObjectFactory");
+		I_ASSIGN(m_typeIdAttrPtr, "TypeId", "Type-ID corresponding to the registered factory", false, "Default");
+		I_ASSIGN(m_typeNameAttrPtr, "TypeName", "Type name corresponding to the registered factory", false, "Default");
+		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database engine used for low level SQL quering", true, "DatabaseEngine");
 		I_ASSIGN(m_updateOnDatabaseConnectedAttrPtr, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", true, false);
 		I_ASSIGN(m_selectSqlQueryPathAttrPtr, "SelectSqlQueryPath", "SQL query string file path for Selecting in database", false, "");
 		I_ASSIGN(m_insertSqlQueryPathAttrPtr, "InsertSqlQueryPath", "SQL query string file path for Inserting in database", false, "");
@@ -79,9 +79,9 @@ protected:
 	virtual void OnComponentCreated() override;
 
 protected:
-	I_MULTIFACT(istd::IChangeable, m_objectFactoriesCompPtr);
-	I_MULTIATTR(QByteArray, m_typeIdsAttrPtr);
-	I_MULTITEXTATTR(m_typeNamesAttrPtr);
+	I_FACT(istd::IChangeable, m_objectFactoryCompPtr);
+	I_ATTR(QByteArray, m_typeIdAttrPtr);
+	I_TEXTATTR(m_typeNameAttrPtr);
 	I_REF(IDatabaseEngine, m_dbEngineCompPtr);
 	I_REF(IDatabaseObjectDelegate, m_objectDelegateCompPtr);
 	I_ATTR(bool, m_updateOnDatabaseConnectedAttrPtr);

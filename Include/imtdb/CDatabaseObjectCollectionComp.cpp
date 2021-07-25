@@ -137,11 +137,8 @@ QByteArray CDatabaseObjectCollectionComp::GetQueryStringFromFile(const QByteArra
 
 istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
 {
-	int factoryIndex = m_typeIdsAttrPtr.FindValue(typeId);
-	if (factoryIndex >= 0){
-		if (factoryIndex < m_objectFactoriesCompPtr.GetCount()){
-			return m_objectFactoriesCompPtr.CreateInstance(factoryIndex);
-		}
+	if (m_objectFactoryCompPtr.IsValid()){
+		return m_objectFactoryCompPtr.CreateInstance();
 	}
 
 	return nullptr;
@@ -167,7 +164,6 @@ void CDatabaseObjectCollectionComp::DestroyObjectInstance(istd::IChangeable* obj
 		}
 	}
 }
-
 
 
 // reimplemented (icomp::CComponentBase)
