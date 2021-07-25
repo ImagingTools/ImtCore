@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Qt includes
 #include <QtSql/QtSql>
 
@@ -18,10 +19,6 @@ namespace imtdb
 class IDatabaseEngine: virtual public istd::IPolymorphic
 {
 public:
-	virtual QString GetConnectionName() const = 0;
-	virtual QSqlDatabase GetDatabase() const = 0;
-	virtual bool OpenDatabase() = 0;
-	virtual void CloseDatabase() = 0;
 	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlError = nullptr) const = 0;
 	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const = 0;
 	virtual QSqlQuery ExecSqlQueryFromFile(const QByteArray& filePath, QSqlError* sqlError = nullptr) const = 0;

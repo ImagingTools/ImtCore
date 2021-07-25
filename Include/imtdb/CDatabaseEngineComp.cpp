@@ -10,39 +10,9 @@ namespace imtdb
 {
 
 
-QString CDatabaseEngineComp::GetConnectionName() const
-{
-	return m_db.connectionName();
-}
+// public methods
 
-
-QSqlDatabase CDatabaseEngineComp::GetDatabase() const
-{
-	return const_cast<QSqlDatabase&>(m_db);
-}
-
-
-bool CDatabaseEngineComp::OpenDatabase()
-{
-	m_db = QSqlDatabase::addDatabase(*m_dbType, *m_dbName);
-
-	m_db.setHostName(*m_hostName);
-	m_db.setUserName(*m_userName);
-	m_db.setPassword(*m_pasword);
-	m_db.setDatabaseName(*m_dbName);
-
-	int port = *m_port;
-	m_db.setPort(port);
-
-	return m_db.open();
-}
-
-
-void CDatabaseEngineComp::CloseDatabase()
-{
-	m_db.close();
-}
-
+// reimplemented (IDatabaseEngine)
 
 QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlErrorPtr) const
 {
@@ -171,15 +141,34 @@ void CDatabaseEngineComp::DrectBindValueUpdateDefault(QByteArray* string, const 
 }
 
 
+// protected methods
+
+bool CDatabaseEngineComp::OpenDatabase() const
+{
+	m_db.close();
+
+	m_db = QSqlDatabase::addDatabase(*m_dbType, *m_dbName);
+
+	m_db.setHostName(*m_hostName);
+	m_db.setUserName(*m_userName);
+	m_db.setPassword(*m_pasword);
+	m_db.setDatabaseName(*m_dbName);
+
+	m_db.setPort(*m_port);
+
+	return m_db.open();
+}
+
+
+// private methods
+
 bool CDatabaseEngineComp::EnsureDatabaseConnected() const
 {
 	bool isOpened = m_db.isOpen();
 	if(!isOpened){
-		CDatabaseEngineComp* enginePtr = const_cast<CDatabaseEngineComp*>(this);
+		m_db.close();
 
-		enginePtr->m_db.close();
-
-		enginePtr->OpenDatabase();
+		OpenDatabase();
 
 		isOpened = m_db.isOpen();
 		if(!isOpened){

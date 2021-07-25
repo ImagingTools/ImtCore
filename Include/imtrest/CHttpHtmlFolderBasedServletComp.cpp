@@ -36,7 +36,7 @@ CHttpHtmlFolderBasedServletComp::CHttpHtmlFolderBasedServletComp()
 QByteArray CHttpHtmlFolderBasedServletComp::Generate(const QString& directoryPath, const QString& commandId) const
 {
 	QString retval;
-	QString homeDirPath = *m_homeDirPath;
+	QString homeDirPath = *m_homeDirPathAttrPtr;
 	if ( m_fileTemplatePathCompPtr.IsValid() && m_fileTemplatePathCompPtr.GetPtr()->GetPath().length())
 	{
 		homeDirPath = m_fileTemplatePathCompPtr.GetPtr()->GetPath();
@@ -228,18 +228,24 @@ IRequestServlet::ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessReques
 	QByteArray body;
 	QByteArray commandId = request.GetCommandId();
 	QByteArray commandIdBase = *this->m_commandIdAttrPtr;
+
 	if (commandIdBase.endsWith('*')){
 		commandIdBase.chop(1);
 	}
+
 	if (!commandIdBase.startsWith('/')){
 		commandIdBase.prepend('/');
 	}
-	QString homeDirPath = *this->m_homeDirPath;
+
+	QString homeDirPath = *this->m_homeDirPathAttrPtr;
+
 	if ( m_fileTemplatePathCompPtr.IsValid() && m_fileTemplatePathCompPtr.GetPtr()->GetPath().length()){
 		homeDirPath = m_fileTemplatePathCompPtr.GetPtr()->GetPath();
 	}
+
 	commandId.replace(commandIdBase,"");
-	if (*m_pathsProblemsAutoSolve){
+
+	if (*m_pathsProblemsAutoSolveAttrPtr){
 		int indexOfPathSeparator = -1;
 		QRegularExpression regexp("(.\\/.)");
 
@@ -257,6 +263,7 @@ IRequestServlet::ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessReques
 
 	QString destinationEntryPath = homeDirPath + commandId;
 	QFileInfo destinationEntry(destinationEntryPath);
+
 	if (destinationEntry.isDir()){
 		body = this->Generate(destinationEntry.absoluteFilePath(), commandId);
 	}
@@ -265,17 +272,22 @@ IRequestServlet::ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessReques
 		if (homeDirPath == ":"){
 			destinationFileAbsoluteFilePath = destinationEntryPath;
 		}
+
 		if (destinationFileAbsoluteFilePath.endsWith('/')){
 			destinationFileAbsoluteFilePath.chop(1);
 		}
+
 		QFile destinationFile(destinationFileAbsoluteFilePath);
 
 		if (!destinationFile.open(QFile::ReadOnly)){
 			generateErrorResponsePtr(QByteArray("Cannot open file for read ").append(destinationFile.fileName()));
 		}
+
 		reponseTypeId = this->GetMimeType(destinationFileAbsoluteFilePath);
 		reponseTypeId.append(QByteArray("; charset=utf-8"));
+
 		body = destinationFile.readAll();
+
 		destinationFile.close();
 	}
 

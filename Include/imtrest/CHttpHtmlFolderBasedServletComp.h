@@ -1,5 +1,6 @@
 #pragma once
 
+
 // ACF includes
 #include <ifile/IFileNameParam.h>
 #include <ilog/TLoggerCompWrap.h>
@@ -18,16 +19,17 @@
 #include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
 
+
 namespace imtrest
 {
+
 
 /**
  * \brief The CHttpHtmlFolderBasedHandlerComp class generates HTML-document with list of objects for all the files and directories in the directory
  */
-class Q_DECL_DEPRECATED_X("use imtrest::CHttpFileProviderBasedServletComp") CHttpHtmlFolderBasedServletComp:
+class CHttpHtmlFolderBasedServletComp:
 			public ilog::CLoggerComponentBase,
 			virtual public IRequestServlet
-
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
@@ -37,8 +39,8 @@ public:
 	I_BEGIN_COMPONENT(CHttpHtmlFolderBasedServletComp);
 		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "List of command-ID used with corresponded handlers", true, "");
-		I_ASSIGN(m_homeDirPath, "HomePath", "Home path", true, QDir::currentPath());
-		I_ASSIGN(m_pathsProblemsAutoSolve, "AutoSolvePathsProblems", "If 'true' servelt'll automatically solve paths problems", true, true);
+		I_ASSIGN(m_homeDirPathAttrPtr, "HomePath", "Home path", true, QDir::currentPath());
+		I_ASSIGN(m_pathsProblemsAutoSolveAttrPtr, "AutoSolvePathsProblems", "If 'true' servelt'll automatically solve paths problems", true, true);
 		I_ASSIGN(m_fileTemplatePathCompPtr, "FileTemplateHomePath", "FileTemplate based Home path\n Note: type is ignored only value matters \n Warning: overwrites HomePath!", false, "FileTemplatePath");
 	I_END_COMPONENT
 
@@ -51,15 +53,13 @@ public:
 	virtual QByteArray GetSupportedCommandId() const override;
 
 private:
-	I_ATTR (QString, m_homeDirPath);
-	I_ATTR (bool, m_pathsProblemsAutoSolve);
+	I_ATTR (QString, m_homeDirPathAttrPtr);
+	I_ATTR (bool, m_pathsProblemsAutoSolveAttrPtr);
 	I_REF(ifile::IFileNameParam, m_fileTemplatePathCompPtr);
-
 	I_ATTR(QByteArray, m_commandIdAttrPtr);
 
 	QByteArray m_beginOfMessage;
 	QByteArray m_endOfMessage;
-
 };
 
 

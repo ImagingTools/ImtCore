@@ -33,10 +33,6 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IDatabaseEngine)
-	virtual	QString GetConnectionName() const override;
-	virtual QSqlDatabase GetDatabase() const override;
-	bool OpenDatabase() override;
-	void CloseDatabase() override;
 	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlError = nullptr) const override;
 	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const override;
 	virtual QSqlQuery ExecSqlQueryFromFile(const QByteArray& filePath, QSqlError* sqlError = nullptr) const override;
@@ -46,8 +42,11 @@ public:
 	static void DrectBindValueInsertDefault(QByteArray* string,  const QByteArray& what);
 	static void DrectBindValueUpdateDefault(QByteArray* string,  const QByteArray& what);
 
+protected:
+	bool OpenDatabase() const;
+
 private:
-	/*!
+	/**
 		Internal method for reconnection database on disconnect or not connected.
 		\return \c true if the database could not be connected successfully or \c false otherwise.
 	 */
@@ -61,7 +60,7 @@ private:
 	I_ATTR(QByteArray, m_hostName);
 	I_ATTR(int, m_port);
 
-	QSqlDatabase m_db;
+	mutable QSqlDatabase m_db;
 };
 
 
