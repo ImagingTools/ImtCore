@@ -17,7 +17,7 @@ I_EXPORT_PACKAGE(
 
 I_EXPORT_COMPONENT(
 		SqlDatabaseEngine,
-		"SQL-based database engine´",
+		"SQL-based database engine",
 		"SQL Database");
 
 I_EXPORT_COMPONENT(
