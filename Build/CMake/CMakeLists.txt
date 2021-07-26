@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(ImtCore)
 
-if(NOT DEFINED IMTCOREDIR)
+if (NOT DEFINED IMTCOREDIR)
 	set(IMTCOREDIR "$ENV{IMTCOREDIR}")
-endif()
+endif ()
 
 include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
 
@@ -40,7 +40,6 @@ add_subdirectory("${INCLUDE_DIR}/imtqml/CMake" "${AUX_INCLUDE_DIR}/imtqml")
 add_subdirectory("${INCLUDE_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlic")
 add_subdirectory("${INCLUDE_DIR}/imtlicgui/CMake" "${AUX_INCLUDE_DIR}/imtlicgui")
 add_subdirectory("${INCLUDE_DIR}/imtdb/CMake" "${AUX_INCLUDE_DIR}/imtdb")
-
 add_subdirectory("${INCLUDE_DIR}/imtgql/CMake" "${AUX_INCLUDE_DIR}/imtgql")
 
 #Impl
@@ -59,6 +58,9 @@ add_dependencies(ImtAuthGuiPck imtbase imtauth imtauthgui)
 
 add_subdirectory("${IMPL_DIR}/ImtLicensePck/CMake" "${AUX_INCLUDE_DIR}/ImtLicensePck")
 add_dependencies(ImtLicensePck imtbase)
+
+add_subdirectory("${IMPL_DIR}/ImtDatabasePck/CMake" "${AUX_INCLUDE_DIR}/ImtDatabasePck")
+add_dependencies(ImtDatabasePck imtbase imtdb)
 
 add_subdirectory("${IMPL_DIR}/ImtLicenseGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtLicenseGuiPck")
 add_dependencies(ImtLicenseGuiPck imtbase imtlic imtlicgui)
