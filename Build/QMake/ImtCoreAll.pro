@@ -78,6 +78,9 @@ imtgql.file = ../../Include/imtgql/QMake/imtgql.pro
 SUBDIRS += imtdb
 imtdb.file = ../../Include/imtdb/QMake/imtdb.pro
 
+SUBDIRS += imtlicdb
+imtlicdb.file = ../../Include/imtlicdb/QMake/imtlicdb.pro
+
 ## Component packages
 
 SUBDIRS += ImtCorePck
@@ -171,6 +174,10 @@ ImtZipPck.depends = imtzip
 SUBDIRS += ImtGqlPck
 ImtGqlPck.file = ../../Impl/ImtGqlPck/QMake/ImtGqlPck.pro
 ImtGqlPck.depends = imtgql
+
+SUBDIRS += ImtLicenseDbPck
+ImtLicenseDbPck.file = ../../Impl/ImtLicenseDbPck/QMake/ImtLicenseDbPck.pro
+ImtLicenseDbPck.depends = imtlic imtlicdb
 
 # Application
 #!linux{
