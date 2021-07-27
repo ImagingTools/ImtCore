@@ -185,14 +185,28 @@ bool CDatabaseEngineComp::CreateDatabase() const
 
 	if(retval){
 
-		QString queryString = "CREATE DATABASE ";
-		queryString.append('"');
-		queryString.append(*m_dbName);
-		queryString.append('"');
-		queryString.append("WITH OWNER ");
-		queryString.append('"');
-		queryString.append(*m_userName);
-		queryString.append('"');
+		QString queryString;
+
+		if (m_databaseCreationScriptPath.IsValid() && QFile(*m_databaseCreationScriptPath).isReadable()){
+
+			QFile scriptFile(*m_databaseCreationScriptPath);
+			scriptFile.open(QFile::ReadOnly);
+			queryString = scriptFile.readAll();
+			scriptFile.close();
+
+		}
+		else{
+
+			queryString = "CREATE DATABASE ";
+			queryString.append('"');
+			queryString.append(*m_dbName);
+			queryString.append('"');
+			queryString.append("WITH OWNER ");
+			queryString.append('"');
+			queryString.append(*m_userName);
+			queryString.append('"');
+
+		}
 
 		maintainanceDb.exec(queryString);
 
@@ -237,9 +251,17 @@ bool CDatabaseEngineComp::CreateTables() const
 {
 	QSqlError sqlError;
 	QString queryString;
+	QFile scriptFile(*m_tablesCreationScriptPath);
 
-	QFile scriptFile(":/Database/CreateDatabase");
-	scriptFile.open(QFile::ReadOnly);
+	if(!scriptFile.open(QFile::ReadOnly)) {
+
+		qCritical() << __FILE__ << __LINE__
+					<< "\n\t| what(): Unable to open file"
+					<< "\n\t| fileName():" << scriptFile.fileName();
+		return false;
+
+	}
+
 	queryString = scriptFile.readAll();
 	scriptFile.close();
 
