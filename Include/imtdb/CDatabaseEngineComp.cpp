@@ -106,9 +106,9 @@ void CDatabaseEngineComp::DrectBindValue(QByteArray* string, const QByteArray& w
 {
 	QRegularExpression regExp(what);
 
-	auto globalMatch = regExp.globalMatch(*string);
+	QRegularExpressionMatchIterator globalMatch = regExp.globalMatch(*string);
 	while(globalMatch.hasNext()){
-		auto regMatch = globalMatch.next();
+		QRegularExpressionMatch regMatch = globalMatch.next();
 		if(regMatch.capturedEnd() < string->length()-1){
 			QChar nextSym = string->at(regMatch.capturedEnd());
 			if(!nextSym.isLetter()){
@@ -145,18 +145,109 @@ void CDatabaseEngineComp::DrectBindValueUpdateDefault(QByteArray* string, const 
 
 bool CDatabaseEngineComp::OpenDatabase() const
 {
-	m_db.close();
+	bool retval = false;
+
+	if (m_db.isOpen()){
+		m_db.close();
+	}
 
 	m_db = QSqlDatabase::addDatabase(*m_dbType, *m_dbName);
-
 	m_db.setHostName(*m_hostName);
 	m_db.setUserName(*m_userName);
 	m_db.setPassword(*m_pasword);
 	m_db.setDatabaseName(*m_dbName);
-
 	m_db.setPort(*m_port);
+	retval = m_db.open();
 
-	return m_db.open();
+	if (*m_autoCreateDatabase > 0){
+		this->CreateDatabase();
+	}
+
+	if (*m_autoCreateTables > 0){
+		this->CreateTables();
+	}
+
+	return retval;
+}
+
+
+bool CDatabaseEngineComp::CreateDatabase() const
+{
+	bool retval = false;
+
+	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbType, *m_maintenanceDatabaseName);
+	maintainanceDb.setHostName(*m_hostName);
+	maintainanceDb.setUserName(*m_userName);
+	maintainanceDb.setPassword(*m_pasword);
+	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseName);
+	maintainanceDb.setPort(*m_port);
+	retval = maintainanceDb.open();
+
+	if(retval){
+
+		QString queryString = "CREATE DATABASE ";
+		queryString.append('"');
+		queryString.append(*m_dbName);
+		queryString.append('"');
+		queryString.append("WITH OWNER ");
+		queryString.append('"');
+		queryString.append(*m_userName);
+		queryString.append('"');
+
+		maintainanceDb.exec(queryString);
+
+		QSqlError sqlError;
+		sqlError = maintainanceDb.lastError();
+
+		retval = bool(sqlError.type() == QSqlError::ErrorType::NoError);
+
+		maintainanceDb.close();
+
+		if (!retval){
+
+			qCritical() << __FILE__ << __LINE__
+						<< "\n\t| what(): Maintainance SQL error occured"
+						<< "\n\t| error():" << sqlError
+						<< "\n\t| query():" << queryString
+						;
+
+		}
+
+		else{
+
+			QSqlDatabase::removeDatabase(*m_maintenanceDatabaseName);
+
+			m_db = QSqlDatabase::addDatabase(*m_dbType, *m_dbName);
+			m_db.setHostName(*m_hostName);
+			m_db.setUserName(*m_userName);
+			m_db.setPassword(*m_pasword);
+			m_db.setDatabaseName(*m_dbName);
+			m_db.setPort(*m_port);
+			retval = m_db.open();
+
+		}
+
+	}
+
+	return retval;
+}
+
+
+bool CDatabaseEngineComp::CreateTables() const
+{
+	QSqlError sqlError;
+	QString queryString;
+
+	QFile scriptFile(":/Database/CreateDatabase");
+	scriptFile.open(QFile::ReadOnly);
+	queryString = scriptFile.readAll();
+	scriptFile.close();
+
+	m_db.exec(queryString);
+
+	sqlError = m_db.lastError();
+
+	return bool(sqlError.type() == QSqlError::ErrorType::NoError);
 }
 
 
@@ -171,14 +262,18 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected() const
 		OpenDatabase();
 
 		isOpened = m_db.isOpen();
-		if (isOpened){
-			ExecSqlQueryFromFile(":/Database/CreateDatabase");
+
+		if (!isOpened && *m_autoCreateDatabase == 2){
+			this->CreateDatabase();
+			isOpened = m_db.isOpen();
 		}
-		else{
+
+		if (!isOpened){
 			qCritical() << __FILE__ << __LINE__
 						<< "\n\t| what(): Database Error Occured Unable to open database"
 						<< "\n\t| Database error" << m_db.lastError().text();
 		}
+
 	}
 
 	return isOpened;
