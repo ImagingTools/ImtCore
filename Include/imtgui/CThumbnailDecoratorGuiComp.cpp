@@ -263,6 +263,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 
 	LoginControlButton->setVisible(m_loginCompPtr.IsValid());
+	UserNameLabel->setVisible(m_loginCompPtr.IsValid());
 	
 	installEventFilter(this);
 
