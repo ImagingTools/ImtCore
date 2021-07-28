@@ -318,6 +318,7 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ApplicationInfo" ComponentId="ApplicationInfo"/>
+        <Component ExportedId="LoginLog" ComponentId="StandardLoginGui/LoginLog"/>
         <Component ExportedId="MenuPanelVisibility" ComponentId="MenuPanelVisibility"/>
         <Component ExportedId="PageCommands" ComponentId="CommandsMultiplexer"/>
         <Component ExportedId="RuntimeStatus" ComponentId="GuiApplication/RuntimeStatus"/>

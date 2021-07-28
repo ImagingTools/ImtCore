@@ -160,10 +160,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	if (m_loginGuiCompPtr.IsValid()){
-		m_loginGuiCompPtr->CreateGui(LoginGuiFrame);
-	}
-
 	if (*m_hideHomeButtonAttrPtr){
 		HomeButton->hide();
 	}
@@ -283,11 +279,19 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	if (m_accountMenuCompPtr.IsValid()){
 		m_accountMenuCompPtr->CreateGui(GetQtWidget());
 	}
+
+	if (m_loginGuiCompPtr.IsValid()){
+		m_loginGuiCompPtr->CreateGui(LoginGuiFrame);
+	}
 }
 
 
 void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 {
+	if (m_loginGuiCompPtr.IsValid() && m_loginGuiCompPtr->IsGuiCreated()){
+		m_loginGuiCompPtr->DestroyGui();
+	}
+
 	if (m_accountMenuCompPtr.IsValid() && m_accountMenuCompPtr->IsGuiCreated()){
 		m_accountMenuCompPtr->DestroyGui();
 	}
@@ -308,10 +312,6 @@ void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 	m_commandsObserver.UnregisterAllModels();
 	m_loginObserver.UnregisterAllModels();
 	m_pageVisualStatusObserver.UnregisterAllModels();
-
-	if (m_loginGuiCompPtr.IsValid() && m_loginGuiCompPtr->IsGuiCreated()){
-		m_loginGuiCompPtr->DestroyGui();
-	}
 
 	BaseClass::OnGuiDestroyed();
 }
