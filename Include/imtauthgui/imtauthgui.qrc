@@ -5,16 +5,7 @@
         <file alias="ContactInfoEditor.qml">Resources/qml/ContactInfoEditor.qml</file>
         <file alias="TextFieldCustom.qml">Resources/qml/TextFieldCustom.qml</file>
         <file alias="main.qml">Resources/qml/main.qml</file>
-        <file alias="TreeItemModel.qml">Resources/qml/TreeItemModel.qml</file>
-        <file alias="JSONListModel.qml">Resources/qml/JSONListModel.qml</file>
-        <file alias="jsonpath.js">Resources/qml/jsonpath.js</file>
         <file alias="colors.qml">Resources/qml/colors.qml</file>
-    </qresource>
-    <qresource prefix="/lib">
-        <file alias="qmlweb.js">Resources/lib/qmlweb.js</file>
-        <file alias="qmlweb.js.map">Resources/lib/qmlweb.js.map</file>
-        <file alias="qmlweb.parser.js">Resources/lib/qmlweb.parser.js</file>
-        <file alias="qmlweb.parser.js.map">Resources/lib/qmlweb.parser.js.map</file>
     </qresource>
     <qresource prefix="/html">
         <file alias="index.html">Resources/html/index.html</file>

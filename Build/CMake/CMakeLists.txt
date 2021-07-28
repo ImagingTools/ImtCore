@@ -105,6 +105,9 @@ add_dependencies(Imt3dGuiPck imt3dview imt3dgui)
 add_subdirectory("${IMPL_DIR}/ImtZipPck/CMake" "${AUX_INCLUDE_DIR}/ImtZipPck")
 add_dependencies(ImtZipPck imtzip)
 
+add_subdirectory("${IMPL_DIR}/ImtFilePck/CMake" "${AUX_INCLUDE_DIR}/ImtFilePck")
+add_dependencies(ImtFilePck imtfile)
+
 #add_subdirectory("${IMPL_DIR}/ImtPyPck/CMake" "${AUX_INCLUDE_DIR}/ImtPyPck")
 #add_dependencies(ImtPyPck imtpy)
 
