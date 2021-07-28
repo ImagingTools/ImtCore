@@ -259,7 +259,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 
 	LoginControlButton->setVisible(m_loginCompPtr.IsValid());
-	UserNameLabel->setVisible(m_loginCompPtr.IsValid());
+	UserNameLabel->setVisible(false);
 	
 	installEventFilter(this);
 
@@ -1341,7 +1341,7 @@ void CThumbnailDecoratorGuiComp::LoginObserver::OnModelChanged(int /*modelId*/, 
 	if (userPtr == nullptr){
 		m_parent.ProcessLogout();
 
-		m_parent.UserNameLabel->clear();
+		m_parent.UserNameLabel->setVisible(false);
 	}
 	else{
 		int autoLogoutSeconds = m_parent.GetAutoLogoutTime();
@@ -1352,6 +1352,7 @@ void CThumbnailDecoratorGuiComp::LoginObserver::OnModelChanged(int /*modelId*/, 
 		}
 
 		m_parent.UserNameLabel->setText(userPtr->GetUserName());
+		m_parent.UserNameLabel->setVisible(true);
 
 		int lastPageIndex = m_parent.m_lastPageIndexForLoggedUser;
 

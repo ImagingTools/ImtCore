@@ -47,14 +47,14 @@
            </size>
           </property>
           <property name="text">
-           <string>User name</string>
+           <string notr="true">User name</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QLabel" name="Email">
           <property name="text">
-           <string>user@yahoo.com</string>
+           <string notr="true">user@yahoo.com</string>
           </property>
          </widget>
         </item>
