@@ -62,7 +62,7 @@ public Q_SLOTS:
 	virtual void OnUndo();
 	virtual void OnRedo();
 
-private:
+protected:
 	class Commands: virtual public ibase::ICommandsProvider
 	{
 	public:
@@ -84,7 +84,7 @@ private:
 		return &component.m_commands;
 	}
 
-private:
+protected:
 	enum DataRole
 	{
 		DR_PATH = Qt::UserRole,
