@@ -2,17 +2,19 @@
 
 
 // ACF includes
+#include <imod/CMultiModelDispatcherBase.h>
 #include <idoc/CSingleDocumentManagerBase.h>
 #include <iqtdoc/CSingleDocumentWorkspaceGuiComp.h>
 
 // ImtCore includes
-#include <imtgui/TStandardDocumentViewDecorator.h>
-#include <imtgui/TStandardDocumentViewDecorator.h>
-#include <GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h>
+#include <imtgui/IDocumentViewDecorator.h>
 
 
 namespace imtgui
 {
+
+
+class SdiDocumentViewDecorator;
 
 
 class CSingleDocumentWorkspaceGuiComp: public iqtdoc::CSingleDocumentWorkspaceGuiComp, public imod::CMultiModelDispatcherBase
@@ -51,7 +53,7 @@ protected:
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
-protected Q_SLOTS:
+public Q_SLOTS:
 	void OnNew();
 	void OnOpen();
 	void OnSaveDocument();
@@ -95,7 +97,6 @@ private:
 	};
 
 	friend class SdiDocumentViewDecorator;
-	friend class TStandardDocumentViewDecorator<CSingleDocumentWorkspaceGuiComp, Ui::CStandardDocumentViewDecorator>;
 
 	imod::TModelWrap<Commands> m_commands;
 
@@ -106,20 +107,6 @@ private:
 	I_ATTR(int, m_undoButtonsStyleAttrPtr);
 	I_ATTR(int, m_fileButtonsStyleAttrPtr);
 	I_ATTR(int, m_documentButtonsStyleAttrPtr);
-};
-
-
-class SdiDocumentViewDecorator: public TStandardDocumentViewDecorator<CSingleDocumentWorkspaceGuiComp, Ui::CStandardDocumentViewDecorator>
-{
-public:
-	typedef TStandardDocumentViewDecorator<CSingleDocumentWorkspaceGuiComp, Ui::CStandardDocumentViewDecorator> BaseClass;
-
-	SdiDocumentViewDecorator(
-				CSingleDocumentWorkspaceGuiComp* parentPtr,
-				istd::IPolymorphic* viewPtr,
-				QWidget* parentWidgetPtr,
-				const ifile::IFilePersistence* persistencePtr,
-				const DecoratorConfiguration& configuration);
 };
 
 

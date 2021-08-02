@@ -5,9 +5,27 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QToolBar>
 
+// ImtCore includes
+#include <imtgui/TStandardDocumentViewDecorator.h>
+#include <GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h>
+
 
 namespace imtgui
 {
+
+
+class SdiDocumentViewDecorator: public TStandardDocumentViewDecorator<CSingleDocumentWorkspaceGuiComp, Ui::CStandardDocumentViewDecorator>
+{
+public:
+	typedef TStandardDocumentViewDecorator<CSingleDocumentWorkspaceGuiComp, Ui::CStandardDocumentViewDecorator> BaseClass;
+
+	SdiDocumentViewDecorator(
+		CSingleDocumentWorkspaceGuiComp* parentPtr,
+		istd::IPolymorphic* viewPtr,
+		QWidget* parentWidgetPtr,
+		const ifile::IFilePersistence* persistencePtr,
+		const DecoratorConfiguration& configuration);
+};
 
 
 // public methods
