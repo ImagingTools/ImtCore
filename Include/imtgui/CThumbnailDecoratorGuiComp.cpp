@@ -250,8 +250,14 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		}
 	}
 	else{
-		if (m_loginCompPtr.IsValid()){
-			ShowLoginPage();
+		if (m_loginCompPtr.IsValid()){ 
+			iauth::CUser* loggedUserPtr = m_loginCompPtr->GetLoggedUser();
+			if (loggedUserPtr == nullptr){
+				ShowLoginPage();
+			}
+			else{
+				SwitchToPage(0);
+			}
 		}
 		else{
 			ShowHomePage();
