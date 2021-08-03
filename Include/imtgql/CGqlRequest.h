@@ -22,7 +22,7 @@ public:
 	virtual QByteArray GetCommandId() const override;
 	virtual RequestType GetRequestType() const override;
 	virtual QByteArray GetQuery() const override;
-	virtual bool ParceQuery(const QByteArray& query);
+	virtual bool ParseQuery(const QByteArray& query);
 
 	// reimplemented (iser::IObject)
 	virtual QByteArray GetFactoryId() const override;
