@@ -22,6 +22,7 @@ public:
 	virtual QByteArray GetCommandId() const override;
 	virtual RequestType GetRequestType() const override;
 	virtual QByteArray GetQuery() const override;
+	virtual bool ParceQuery(const QByteArray& query);
 
 	// reimplemented (iser::IObject)
 	virtual QByteArray GetFactoryId() const override;
@@ -40,6 +41,8 @@ protected:
 	virtual QByteArray CreateQueryParams() const;
 	virtual QByteArray AddObjectFieldPart(const CGqlObject& gqlObject) const;
 	virtual QByteArray AddObjectParamPart(const CGqlObject& gqlObject) const;
+	virtual void ParceObjectFieldPart(CGqlObject &gqlObject, const QJsonObject& object) const;
+	virtual void ParceObjectParamPart(CGqlObject &gqlObject, const QJsonObject& object) const;
 
 protected:
 	QByteArray m_commandId;

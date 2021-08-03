@@ -1,5 +1,9 @@
 #include <imtgql/CGqlRequest.h>
 
+// Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 // ACF includes
 #include <istd/TDelPtr.h>
@@ -75,6 +79,93 @@ QByteArray CGqlRequest::GetQuery() const
 	QByteArray queryData = "{\"query\": \"" + type + " " + m_commandId + " {" + m_commandId + params + " {" + fields + "}" + "}\"}";
 
 	return queryData;
+}
+
+
+bool CGqlRequest::ParseQuery(const QByteArray &query)
+{
+	QJsonDocument document = QJsonDocument::fromJson(query);
+	QByteArray body = document.object().value("query").toString().toUtf8();
+	int index = body.indexOf("{");
+	QByteArray header = body.left(index);
+	QList<QByteArray> headersData = header.split(' ');
+	QByteArray type;
+	for (int i = 0; i < headersData.count(); ++i){
+		if (!headersData[i].isEmpty()){
+			type = headersData[i];
+			break;
+		}
+	}
+	if (type == "query"){
+		m_requestType = imtgql::IGqlRequest::RT_QUERY;
+	}
+	else if (type == "mutation"){
+		m_requestType = imtgql::IGqlRequest::RT_MUTATION;
+	}
+	else if (type == "subscription"){
+		m_requestType = imtgql::IGqlRequest::RT_SUBSCRIPTION;
+	}
+	else{
+		return false;
+	}
+
+	body = body.mid(index + 1);
+	index = body.indexOf("{");
+	QByteArray commands = body.left(index);
+	while (body.at(0) == ' '){
+		body.remove(0,1);
+	}
+	index = body.indexOf(" ");
+	m_commandId = body.left(index);
+	body = body.mid(index + 1);
+	index = body.indexOf("{");
+	QByteArray commandParams = body.left(index);
+	body = body.remove(0,index);
+	while (commandParams.at(0) == ' '){
+		commandParams = commandParams.remove(0,1);
+	}
+	while (commandParams.back() == ' '){
+		commandParams.resize(commandParams.length() - 1);
+	}
+	if (!commandParams.isEmpty()){
+		commandParams.front() = '{';
+		commandParams.back() = '}';
+		QJsonDocument paramsDocument = QJsonDocument::fromJson(commandParams);
+		if (paramsDocument.isObject()){
+			QJsonObject object = paramsDocument.object();
+			QStringList keys = object.keys();
+			for (QString key: keys){
+				CGqlObject gqlObject(key.toUtf8());
+				if (object.value(key).isObject()){
+					ParceObjectParamPart(gqlObject, object.value(key).toObject());
+				}
+				AddParam(gqlObject);
+			}
+		}
+	}
+	for (int i = 0; i < 3; i++){
+		body = body.replace("  "," ");
+	}
+	body = body.replace("{",":{");
+	body = body.replace(" {",":{");
+	body = body.replace(" }","}");
+	body = body.replace("} ","}#");
+	body = body.replace(" ",":\"\",");
+	body = body.replace("}#","} ");
+	QJsonDocument bodyDocument = QJsonDocument::fromJson(body);
+	if (bodyDocument.isObject()){
+		QJsonObject object = bodyDocument.object();
+		QStringList keys = object.keys();
+		for (QString key: keys){
+			CGqlObject gqlObject(key.toUtf8());
+			if (object.value(key).isObject()){
+				ParceObjectFieldPart(gqlObject, object.value(key).toObject());
+			}
+			AddField(gqlObject);
+		}
+	}
+
+	return false;
 }
 
 
@@ -248,6 +339,39 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 	}
 
 	return retVal;
+}
+
+
+void CGqlRequest::ParceObjectFieldPart(CGqlObject &gqlObject, const QJsonObject &object) const
+{
+	QStringList keys = object.keys();
+	for (QString key: keys){
+		if (object.value(key).isObject()){
+			CGqlObject* slaveGqlObject = new CGqlObject(key.toUtf8());
+			ParceObjectFieldPart(*slaveGqlObject, object.value(key).toObject());
+			gqlObject.InsertFieldObject(slaveGqlObject);
+		}
+		else{
+			gqlObject.InsertField(key.toUtf8());
+		}
+	}
+}
+
+
+void CGqlRequest::ParceObjectParamPart(CGqlObject &gqlObject, const QJsonObject &object) const
+{
+	QStringList keys = object.keys();
+	for (QString key: keys){
+		if (object.value(key).isObject()){
+			CGqlObject* slaveGqlObject = new CGqlObject(key.toUtf8());
+			ParceObjectParamPart(*slaveGqlObject, object.value(key).toObject());
+			gqlObject.InsertFieldObject(slaveGqlObject);
+		}
+		else{
+			gqlObject.InsertField(key.toUtf8());
+			gqlObject.InsertFieldArgument(key.toUtf8(), object.value(key).toString().toUtf8());
+		}
+	}
 }
 
 
