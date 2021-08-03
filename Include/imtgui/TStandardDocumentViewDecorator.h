@@ -70,7 +70,7 @@ public:
 				const ifile::IFilePersistence* persistencePtr,
 				const DecoratorConfiguration& configuration);
 
-	void UpdateSaveButtonsStatus();
+	virtual void UpdateSaveButtonsStatus();
 
 	// reimplemeneted (IDocumentViewDecorator)
 	virtual QWidget* GetDecoratorWidget() override;
@@ -85,7 +85,7 @@ public:
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 protected:
-	void OnViewContraintsChanged();
+	virtual void OnViewContraintsChanged();
 
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet);
