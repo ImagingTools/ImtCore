@@ -276,22 +276,25 @@ QByteArray CGqlRequest::AddObjectFieldPart(const CGqlObject &gqlObject) const
 	QByteArray retVal;
 	retVal += gqlObject.GetId();
 
-	retVal += " {";
 	QByteArrayList fieldIds = gqlObject.GetFieldIds();
-	for (int i = 0; i < fieldIds.count(); ++i){
-		const QByteArray& fieldId = fieldIds[i];
-		if (gqlObject.IsObject(fieldId)){
-			retVal += AddObjectFieldPart(*gqlObject.GetFieldArgumentObjectPtr(fieldId));
-		}
-		else{
-			retVal += fieldId;
-		}
-		if (i < fieldIds.count() - 1){
-			retVal += " ";
-		}
-	}
+	if (!fieldIds.isEmpty()){
+		retVal += " {";
 
-	retVal += "}";
+		for (int i = 0; i < fieldIds.count(); ++i){
+			const QByteArray& fieldId = fieldIds[i];
+			if (gqlObject.IsObject(fieldId)){
+				retVal += AddObjectFieldPart(*gqlObject.GetFieldArgumentObjectPtr(fieldId));
+			}
+			else{
+				retVal += fieldId;
+			}
+			if (i < fieldIds.count() - 1){
+				retVal += " ";
+			}
+		}
+
+		retVal += "}";
+	}
 
 	return retVal;
 }

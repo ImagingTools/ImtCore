@@ -19,6 +19,9 @@ imtwidgets.file = ../../Include/imtwidgets/QMake/imtwidgets.pro
 SUBDIRS += imtstyle
 imtstyle.file = ../../Include/imtstyle/QMake/imtstyle.pro
 
+SUBDIRS += imtconn
+imtconn.file = ../../Include/imtconn/QMake/imtconn.pro
+
 SUBDIRS += imtrest
 imtrest.file = ../../Include/imtrest/QMake/imtrest.pro
 
