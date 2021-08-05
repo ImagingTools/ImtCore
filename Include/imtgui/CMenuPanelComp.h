@@ -68,6 +68,7 @@ public:
 		I_ASSIGN(m_leftPaddingAttrPtr, "LeftPadding", "Left item padding", true, 0);
 		I_ASSIGN(m_rightPaddingAttrPtr, "RightPadding", "Right item padding", true, 20);
 		I_ASSIGN(m_iconToTextPaddingAttrPtr, "IconToTextPadding", "Icon to text item padding", true, 1);
+		I_ASSIGN_MULTI_0(m_bottomPagesIdsAttrPtr, "BottomPagesIds", "The list of pages ids that should be placed at bottom of the page", false);
 	I_END_COMPONENT;
 
 	CMenuPanelComp();
@@ -158,6 +159,8 @@ private:
 	I_REF(imod::IModel, m_monitorInfoProviderModelPtr);
 
 	I_ATTR(bool, m_isShowOverAttrPtr);
+
+	I_MULTIATTR(QByteArray, m_bottomPagesIdsAttrPtr);
 
 	// Widget attributes
 	I_ATTR(double, m_physicalResolutionAttrPtr);

@@ -275,7 +275,18 @@ void CMenuPanelComp::CreatePageTree(const iprm::ISelectionParam& selection, cons
 				currentPageId = pageId;
 			}
 
-			panelPtr->InsertPage(pageId, parentId);
+			bool pushToBottom = false;
+
+			if (m_bottomPagesIdsAttrPtr.IsValid()){
+				for(int i = 0; i < m_bottomPagesIdsAttrPtr.GetCount(); ++i){
+					if(pageId == m_bottomPagesIdsAttrPtr[i]){
+						pushToBottom = true;
+						break;
+					}
+				}
+			}
+
+			panelPtr->InsertPage(pageId, parentId, pushToBottom);
 
 			const iprm::ISelectionParam* subSelectionPtr = selection.GetSubselection(pageIndex);
 			if (subSelectionPtr != nullptr){

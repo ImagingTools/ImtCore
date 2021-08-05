@@ -3,7 +3,17 @@ QWidget#PageTree
 	background: rgb(230,230,232);
 }
 
+QWidget#BottomPageTree
+{
+	background: rgb(230,230,232);
+}
+
 QTreeView#PageTree::item::hover
+{
+	background-color: rgb(0, 0, 0);
+}
+
+QTreeView#BottomPageTree::item::hover
 {
 	background-color: rgb(0, 0, 0);
 }

@@ -3,9 +3,19 @@ QWidget#PageTree
 	background-color: palette(base);
 }
 
+QWidget#BottomPageTree
+{
+	background-color: palette(base);
+}
+
 QTreeView#PageTree::item::hover
 {
 	background-color: rgb(0, 0, 0);
+}
+
+QTreeView#BottomPageTree::item::hover
+{
+background-color: rgb(0, 0, 0);
 }
 
 QPushButton#pushTop, QPushButton#pushBottom
