@@ -59,7 +59,7 @@ public:
 	virtual bool IsPageIdExist(const QByteArray& pageId) const;
 
 	virtual bool RemovePage(const QByteArray& pageId);
-	virtual bool InsertPage(const QByteArray& pageId, const QByteArray& parentPageId = QByteArray());
+	virtual bool InsertPage(const QByteArray& pageId, const QByteArray& parentPageId = QByteArray(), bool insertToBottom = false);
 
 	virtual int GetPageOrder(const QByteArray& pageId) const;
 	virtual bool SetPageOrder(const QByteArray& pageId, int position);
@@ -133,6 +133,7 @@ private:
 	bool m_animationEnabled;
 
 	QStandardItemModel m_model;
+	QStandardItemModel m_bottomModel;
 	QPropertyAnimation m_animationWidth;
 	QPropertyAnimation m_animationIndent;
 
@@ -146,9 +147,11 @@ private:
 
 private:
 	void HoverMoveEvent(QHoverEvent* event);
-	QModelIndex GetModelIndex(const QByteArray& pageId) const;
+	QModelIndex GetModelIndex(const QByteArray& pageId, const QStandardItemModel** modelPtr) const;
+	QModelIndex GetModelIndexFromModel(const QByteArray& pageId, const QStandardItemModel& model) const;
 	void SetMinimumPanelWidth(int width);
 	int CalculateMaxItemWith();
+	int CalculateMaxItemWithByModel(const QStandardItemModel& model);
 	void CheckButtonsVisible();
 	
 	void StartTimer(int time = -1);

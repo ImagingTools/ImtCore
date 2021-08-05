@@ -48,10 +48,61 @@
    </item>
    <item>
     <widget class="QTreeView" name="PageTree">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="font">
       <font>
        <pointsize>12</pointsize>
       </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
+     </property>
+     <attribute name="headerMinimumSectionSize">
+      <number>19</number>
+     </attribute>
+     <attribute name="headerDefaultSectionSize">
+      <number>42</number>
+     </attribute>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushBottom">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>:/Down.svg</normaloff>:/Down.svg</iconset>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTreeView" name="BottomPageTree">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -73,24 +124,8 @@
      </attribute>
     </widget>
    </item>
-   <item>
-    <widget class="QPushButton" name="pushBottom">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset>
-       <normaloff>:/Down.svg</normaloff>:/Down.svg</iconset>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
- <resources>
-  <include location="imtwidgets.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
