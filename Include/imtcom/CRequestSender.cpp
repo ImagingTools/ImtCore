@@ -1,11 +1,11 @@
-#include <imtconn/CRequestSender.h>
+#include <imtcom/CRequestSender.h>
 
 
 // Qt includes
 #include <QtNetwork/QNetworkReply>
 
 
-namespace imtconn
+namespace imtcom
 {
 
 
@@ -112,6 +112,6 @@ CRequestSender::WorkingObjects::~WorkingObjects()
 }
 
 
-} // namespace imtconn
+} // namespace imtcom
 
 

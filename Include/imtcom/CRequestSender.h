@@ -7,7 +7,7 @@
 #include <QtNetwork/QNetworkAccessManager>
 
 
-namespace imtconn
+namespace imtcom
 {
 
 
@@ -34,6 +34,6 @@ private:
 };
 
 
-} // namespace imtconn
+} // namespace imtcom
 
 

@@ -19,8 +19,8 @@ imtwidgets.file = ../../Include/imtwidgets/QMake/imtwidgets.pro
 SUBDIRS += imtstyle
 imtstyle.file = ../../Include/imtstyle/QMake/imtstyle.pro
 
-SUBDIRS += imtconn
-imtconn.file = ../../Include/imtconn/QMake/imtconn.pro
+SUBDIRS += imtcom
+imtcom.file = ../../Include/imtcom/QMake/imtcom.pro
 
 SUBDIRS += imtrest
 imtrest.file = ../../Include/imtrest/QMake/imtrest.pro
@@ -117,6 +117,10 @@ ImtLicenseGuiPck.depends = imtbase imtlic imtlicgui
 SUBDIRS += ImtCryptPck
 ImtCryptPck.file = ../../Impl/ImtCryptPck/QMake/ImtCryptPck.pro
 ImtCryptPck.depends = imtbase imtcrypt
+
+SUBDIRS += ImtComPck
+ImtComPck.file = ../../Impl/ImtComPck/QMake/ImtComPck.pro
+ImtComPck.depends = imtbase imtcom
 
 SUBDIRS += ImtRestPck
 ImtRestPck.file = ../../Impl/ImtRestPck/QMake/ImtRestPck.pro
