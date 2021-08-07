@@ -29,11 +29,11 @@ public:
 		I_ASSIGN(m_userName, "UserName", "The property holds connection's user name", true, "postgres");
 		I_ASSIGN(m_pasword, "Pasword", "The property holds connection's password.", true, "12345");
 		I_ASSIGN(m_hostName, "HostName", "The property holds connection's host name.", true, "localhost");
-		I_ASSIGN(m_maintenanceDatabaseName, "MaintainanceDatabase", "Name of Maintenance database. It's necessary for creating database if it not exists", true, "postgres");
-		I_ASSIGN(m_databaseCreationScriptPath, "DatabaseCreationScriptPath", "The property holds the name of the file that will be opened to receive the SQL-query for creation database", false, "");
-		I_ASSIGN(m_tablesCreationScriptPath, "TablesCreationScriptPath", "The property holds the name of the file that will be opened to receive the SQL-query for creation tables", false, "");
-		I_ASSIGN(m_autoCreateDatabase, "AutoCreateDatabase", "The property holds behavior to create database on startup.\n Possible values:\n0 - will not create new database;\n1 - will create database once;\n2 - will create database at each startup", true, 1);
-		I_ASSIGN(m_autoCreateTables, "AutoCreateTables", "The property holds behavior to create tables on startup.\n Possible values:\n0 - will not create new tables;\n1 - will create tables once;\n2 - will create tables at each startup", true, 1);
+		I_ASSIGN(m_maintenanceDatabaseNameAttrPtr, "MaintainanceDatabase", "Name of Maintenance database. It's necessary for creating database if it not exists", true, "postgres");
+		I_ASSIGN(m_databaseCreationScriptPathAttrPtr, "DatabaseCreationScriptPath", "The property holds the name of the file that will be opened to receive the SQL-query for creation database", false, "");
+		I_ASSIGN(m_tablesCreationScriptPathAttrPtr, "TablesCreationScriptPath", "The property holds the name of the file that will be opened to receive the SQL-query for creation tables", false, "");
+		I_ASSIGN(m_autoCreateDatabaseAttrPtr, "AutoCreateDatabase", "The property holds behavior to create database on startup.\n Possible values:\n0 - will not create new database;\n1 - will create database once;\n2 - will create database at each startup", true, 1);
+		I_ASSIGN(m_autoCreateTablesAttrPtr, "AutoCreateTables", "The property holds behavior to create tables on startup.\n Possible values:\n0 - will not create new tables;\n1 - will create tables once;\n2 - will create tables at each startup", true, 1);
 		I_ASSIGN(m_port, "Port", "The property holds connection's port number", true, 5432);
 	I_END_COMPONENT;
 
@@ -65,11 +65,11 @@ private:
 	I_ATTR(QByteArray, m_userName);
 	I_ATTR(QByteArray, m_pasword);
 	I_ATTR(QByteArray, m_hostName);
-	I_ATTR(QByteArray, m_maintenanceDatabaseName);
-	I_ATTR(QByteArray, m_databaseCreationScriptPath);
-	I_ATTR(QByteArray, m_tablesCreationScriptPath);
-	I_ATTR(int, m_autoCreateDatabase);
-	I_ATTR(int, m_autoCreateTables);
+	I_ATTR(QByteArray, m_maintenanceDatabaseNameAttrPtr);
+	I_ATTR(QByteArray, m_databaseCreationScriptPathAttrPtr);
+	I_ATTR(QByteArray, m_tablesCreationScriptPathAttrPtr);
+	I_ATTR(int, m_autoCreateDatabaseAttrPtr);
+	I_ATTR(int, m_autoCreateTablesAttrPtr);
 	I_ATTR(int, m_port);
 
 	mutable QSqlDatabase m_db;

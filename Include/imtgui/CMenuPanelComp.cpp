@@ -348,9 +348,15 @@ void CMenuPanelComp::UpdatePageState()
 
 void CMenuPanelComp::UpdateMonitorsInfo()
 {
-	double resolutionX = m_monitorInfoProviderPtr->GetPhysicalResolutionX(0);
-	double resolutionY = m_monitorInfoProviderPtr->GetPhysicalResolutionY(0);
-	double scale = m_monitorInfoProviderPtr->GetScaling(0);
+	double resolutionX = 0;
+	double resolutionY = 0;
+	double scale = 0;
+	
+	if (m_monitorInfoProviderCompPtr.IsValid()){
+		resolutionX = m_monitorInfoProviderCompPtr->GetPhysicalResolutionX(0);
+		resolutionY = m_monitorInfoProviderCompPtr->GetPhysicalResolutionY(0);
+		scale = m_monitorInfoProviderCompPtr->GetScaling(0);
+	}
 
 	if (resolutionX != 0 && resolutionY != 0){
 		m_resolutionX = resolutionX;
@@ -367,6 +373,7 @@ void CMenuPanelComp::UpdateMonitorsInfo()
 
 	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
 	Q_ASSERT(panelPtr != nullptr);
+
 	panelPtr->SetActivePage(FindSelectedItem());
 }
 

@@ -289,6 +289,15 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	if (m_loginGuiCompPtr.IsValid()){
 		m_loginGuiCompPtr->CreateGui(LoginGuiFrame);
 	}
+
+	if (m_loginCompPtr.IsValid()){
+		iauth::CUser* userPtr = m_loginCompPtr->GetLoggedUser();
+		if (userPtr != nullptr){
+			UserNameLabel->setText(userPtr->GetUserName());
+			
+			UserNameLabel->setVisible(true);
+		}
+	}
 }
 
 
@@ -633,6 +642,7 @@ void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 
 				CreateMenu(subSelectionPtr, NULL);
 			}
+
 			if (index < 0){
 				PageStack->setCurrentIndex(HOME_PAGE_INDEX);
 			}

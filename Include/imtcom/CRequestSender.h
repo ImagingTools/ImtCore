@@ -11,21 +11,24 @@ namespace imtcom
 {
 
 
+/**
+*	Helper implementation for executing network requests.
+*/
 class CRequestSender: public QObject
 {
 public:
-	static QNetworkReply* Get(const QNetworkRequest& request, int timeout);
-	static QNetworkReply* Put(const QNetworkRequest& request, const QByteArray& data, int timeout);
-	static QNetworkReply* Post(const QNetworkRequest& request, const QByteArray& data, int timeout);
-	static QNetworkReply* CustomRequest(const QNetworkRequest& request, const QByteArray& verb, const QByteArray& data, int timeout);
+	static QNetworkReply* DoSyncGet(const QNetworkRequest& request, int timeout);
+	static QNetworkReply* DoSyncPut(const QNetworkRequest& request, const QByteArray& data, int timeout);
+	static QNetworkReply* DoSyncPost(const QNetworkRequest& request, const QByteArray& data, int timeout);
+	static QNetworkReply* DoSyncCustomRequest(const QNetworkRequest& request, const QByteArray& verb, const QByteArray& data, int timeout);
 
 private:
-	class WorkingObjects
+	class NetworkOperation
 	{
 	public:
-		WorkingObjects() = delete;
-		WorkingObjects(int timeout);
-		~WorkingObjects();
+		NetworkOperation() = delete;
+		NetworkOperation(int timeout);
+		~NetworkOperation();
 
 		QNetworkAccessManager* networkManagerPtr;
 		QEventLoop connectionLoop;

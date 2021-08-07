@@ -11,14 +11,14 @@ namespace imtcom
 
 // public methods
 
-QNetworkReply* CRequestSender::Get(const QNetworkRequest& request, int timeout)
+QNetworkReply* CRequestSender::DoSyncGet(const QNetworkRequest& request, int timeout)
 {
-	WorkingObjects workingObjects(timeout);
+	NetworkOperation networkOperation(timeout);
 
-	QNetworkReply* replyPtr = workingObjects.networkManagerPtr->get(request);
+	QNetworkReply* replyPtr = networkOperation.networkManagerPtr->get(request);
 	if (replyPtr != nullptr){
-		workingObjects.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
-		workingObjects.timer.stop();
+		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
+		networkOperation.timer.stop();
 
 		if (replyPtr->isRunning()){
 			replyPtr->abort();
@@ -29,14 +29,14 @@ QNetworkReply* CRequestSender::Get(const QNetworkRequest& request, int timeout)
 }
 
 
-QNetworkReply* CRequestSender::Put(const QNetworkRequest& request, const QByteArray& data, int timeout)
+QNetworkReply* CRequestSender::DoSyncPut(const QNetworkRequest& request, const QByteArray& data, int timeout)
 {
-	WorkingObjects workingObjects(timeout);
+	NetworkOperation networkOperation(timeout);
 
-	QNetworkReply* replyPtr = workingObjects.networkManagerPtr->put(request, data);
+	QNetworkReply* replyPtr = networkOperation.networkManagerPtr->put(request, data);
 	if (replyPtr != nullptr){
-		workingObjects.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
-		workingObjects.timer.stop();
+		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
+		networkOperation.timer.stop();
 
 		if (replyPtr->isRunning()){
 			replyPtr->abort();
@@ -47,14 +47,14 @@ QNetworkReply* CRequestSender::Put(const QNetworkRequest& request, const QByteAr
 }
 
 
-QNetworkReply* CRequestSender::Post(const QNetworkRequest& request, const QByteArray& data, int timeout)
+QNetworkReply* CRequestSender::DoSyncPost(const QNetworkRequest& request, const QByteArray& data, int timeout)
 {
-	WorkingObjects workingObjects(timeout);
+	NetworkOperation networkOperation(timeout);
 
-	QNetworkReply* replyPtr = workingObjects.networkManagerPtr->post(request, data);
+	QNetworkReply* replyPtr = networkOperation.networkManagerPtr->post(request, data);
 	if (replyPtr != nullptr){
-		workingObjects.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
-		workingObjects.timer.stop();
+		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
+		networkOperation.timer.stop();
 
 		if (replyPtr->isRunning()){
 			replyPtr->abort();
@@ -65,14 +65,14 @@ QNetworkReply* CRequestSender::Post(const QNetworkRequest& request, const QByteA
 }
 
 
-QNetworkReply* CRequestSender::CustomRequest(const QNetworkRequest& request, const QByteArray& verb, const QByteArray& data, int timeout)
+QNetworkReply* CRequestSender::DoSyncCustomRequest(const QNetworkRequest& request, const QByteArray& verb, const QByteArray& data, int timeout)
 {
-	WorkingObjects workingObjects(timeout);
+	NetworkOperation networkOperation(timeout);
 
-	QNetworkReply* replyPtr = workingObjects.networkManagerPtr->sendCustomRequest(request, verb, data);
+	QNetworkReply* replyPtr = networkOperation.networkManagerPtr->sendCustomRequest(request, verb, data);
 	if (replyPtr != nullptr){
-		workingObjects.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
-		workingObjects.timer.stop();
+		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
+		networkOperation.timer.stop();
 
 		if (replyPtr->isRunning()){
 			replyPtr->abort();
@@ -83,9 +83,9 @@ QNetworkReply* CRequestSender::CustomRequest(const QNetworkRequest& request, con
 }
 
 
-// public methods of the embedded class WorkingObjects
+// public methods of the embedded class NetworkOperation
 
-CRequestSender::WorkingObjects::WorkingObjects(int timeout)
+CRequestSender::NetworkOperation::NetworkOperation(int timeout)
 {
 	networkManagerPtr = new QNetworkAccessManager();
 
@@ -106,7 +106,7 @@ CRequestSender::WorkingObjects::WorkingObjects(int timeout)
 	}
 }
 
-CRequestSender::WorkingObjects::~WorkingObjects()
+CRequestSender::NetworkOperation::~NetworkOperation()
 {
 	networkManagerPtr->deleteLater();
 }

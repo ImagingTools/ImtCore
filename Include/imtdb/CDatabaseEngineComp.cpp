@@ -55,11 +55,11 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 
 	retVal.exec();
 
-	if(sqlError){
+	if (sqlError){
 		*sqlError = m_db.lastError().type() ? m_db.lastError() : retVal.lastError();
 	}
 
-	if(m_db.lastError().type() || retVal.lastError().type()){
+	if (m_db.lastError().type() || retVal.lastError().type()){
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| what(): sqlError Occured"
 					<< "\n\t| Database error" << m_db.lastError().text()
@@ -109,9 +109,9 @@ void CDatabaseEngineComp::DrectBindValue(QByteArray* string, const QByteArray& w
 	QRegularExpressionMatchIterator globalMatch = regExp.globalMatch(*string);
 	while(globalMatch.hasNext()){
 		QRegularExpressionMatch regMatch = globalMatch.next();
-		if(regMatch.capturedEnd() < string->length()-1){
+		if (regMatch.capturedEnd() < string->length()-1){
 			QChar nextSym = string->at(regMatch.capturedEnd());
-			if(!nextSym.isLetter()){
+			if (!nextSym.isLetter()){
 				string->replace(regMatch.capturedStart(), regMatch.capturedLength(), expr);
 			}
 		}
@@ -131,7 +131,7 @@ void CDatabaseEngineComp::DrectBindValueInsertDefault(QByteArray* string, const 
 void CDatabaseEngineComp::DrectBindValueUpdateDefault(QByteArray* string, const QByteArray& what)
 {
 	QByteArray newValue = what;
-	if(newValue.startsWith(':')){
+	if (newValue.startsWith(':')){
 		newValue.remove(0,1);
 		newValue.append('"');
 		newValue.prepend('"');
@@ -145,7 +145,7 @@ void CDatabaseEngineComp::DrectBindValueUpdateDefault(QByteArray* string, const 
 
 bool CDatabaseEngineComp::OpenDatabase() const
 {
-	bool retval = false;
+	bool retVal = false;
 
 	if (m_db.isOpen()){
 		m_db.close();
@@ -157,46 +157,50 @@ bool CDatabaseEngineComp::OpenDatabase() const
 	m_db.setPassword(*m_pasword);
 	m_db.setDatabaseName(*m_dbName);
 	m_db.setPort(*m_port);
-	retval = m_db.open();
+	
+	retVal = m_db.open();
+	if (retVal){
+		if (*m_autoCreateDatabaseAttrPtr > 0){
+			CreateDatabase();
+		}
 
-	if (*m_autoCreateDatabase > 0){
-		this->CreateDatabase();
+		if (*m_autoCreateTablesAttrPtr > 0 && m_tablesCreationScriptPathAttrPtr.IsValid()){
+			CreateTables();
+		}
+	}
+	else{
+		SendErrorMessage(0, "Database could not be connected", "Database engine");
 	}
 
-	if (*m_autoCreateTables > 0){
-		this->CreateTables();
-	}
-
-	return retval;
+	return retVal;
 }
 
 
 bool CDatabaseEngineComp::CreateDatabase() const
 {
-	bool retval = false;
+	bool retVal = false;
 
-	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbType, *m_maintenanceDatabaseName);
+	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbType, *m_maintenanceDatabaseNameAttrPtr);
 	maintainanceDb.setHostName(*m_hostName);
 	maintainanceDb.setUserName(*m_userName);
 	maintainanceDb.setPassword(*m_pasword);
-	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseName);
+	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
 	maintainanceDb.setPort(*m_port);
-	retval = maintainanceDb.open();
+	retVal = maintainanceDb.open();
 
-	if(retval){
-
+	if (retVal){
 		QString queryString;
 
-		if (m_databaseCreationScriptPath.IsValid() && QFile(*m_databaseCreationScriptPath).isReadable()){
+		if (m_databaseCreationScriptPathAttrPtr.IsValid() && QFile(*m_databaseCreationScriptPathAttrPtr).isReadable()){
+			QFile scriptFile(*m_databaseCreationScriptPathAttrPtr);
 
-			QFile scriptFile(*m_databaseCreationScriptPath);
 			scriptFile.open(QFile::ReadOnly);
-			queryString = scriptFile.readAll();
-			scriptFile.close();
 
+			queryString = scriptFile.readAll();
+
+			scriptFile.close();
 		}
 		else{
-
 			queryString = "CREATE DATABASE ";
 			queryString.append('"');
 			queryString.append(*m_dbName);
@@ -205,7 +209,6 @@ bool CDatabaseEngineComp::CreateDatabase() const
 			queryString.append('"');
 			queryString.append(*m_userName);
 			queryString.append('"');
-
 		}
 
 		maintainanceDb.exec(queryString);
@@ -213,37 +216,33 @@ bool CDatabaseEngineComp::CreateDatabase() const
 		QSqlError sqlError;
 		sqlError = maintainanceDb.lastError();
 
-		retval = bool(sqlError.type() == QSqlError::ErrorType::NoError);
-
 		maintainanceDb.close();
 
-		if (!retval){
+		retVal = bool(sqlError.type() == QSqlError::ErrorType::NoError);
 
+		if (!retVal){
 			qCritical() << __FILE__ << __LINE__
 						<< "\n\t| what(): Maintainance SQL error occured"
 						<< "\n\t| error():" << sqlError
-						<< "\n\t| query():" << queryString
-						;
-
+						<< "\n\t| query():" << queryString;
 		}
-
 		else{
-
-			QSqlDatabase::removeDatabase(*m_maintenanceDatabaseName);
+			QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);
 
 			m_db = QSqlDatabase::addDatabase(*m_dbType, *m_dbName);
+
 			m_db.setHostName(*m_hostName);
 			m_db.setUserName(*m_userName);
 			m_db.setPassword(*m_pasword);
 			m_db.setDatabaseName(*m_dbName);
 			m_db.setPort(*m_port);
-			retval = m_db.open();
 
+			retVal = m_db.open();
 		}
 
 	}
 
-	return retval;
+	return retVal;
 }
 
 
@@ -251,15 +250,14 @@ bool CDatabaseEngineComp::CreateTables() const
 {
 	QSqlError sqlError;
 	QString queryString;
-	QFile scriptFile(*m_tablesCreationScriptPath);
+	QFile scriptFile(*m_tablesCreationScriptPathAttrPtr);
 
-	if(!scriptFile.open(QFile::ReadOnly)) {
-
+	if (!scriptFile.open(QFile::ReadOnly)){
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| what(): Unable to open file"
 					<< "\n\t| fileName():" << scriptFile.fileName();
-		return false;
 
+		return false;
 	}
 
 	queryString = scriptFile.readAll();
@@ -278,15 +276,16 @@ bool CDatabaseEngineComp::CreateTables() const
 bool CDatabaseEngineComp::EnsureDatabaseConnected() const
 {
 	bool isOpened = m_db.isOpen();
-	if(!isOpened){
+	if (!isOpened){
 		m_db.close();
 
 		OpenDatabase();
 
 		isOpened = m_db.isOpen();
 
-		if (!isOpened && *m_autoCreateDatabase == 2){
+		if (!isOpened && *m_autoCreateDatabaseAttrPtr == 2){
 			this->CreateDatabase();
+
 			isOpened = m_db.isOpen();
 		}
 
@@ -295,7 +294,6 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected() const
 						<< "\n\t| what(): Database Error Occured Unable to open database"
 						<< "\n\t| Database error" << m_db.lastError().text();
 		}
-
 	}
 
 	return isOpened;
