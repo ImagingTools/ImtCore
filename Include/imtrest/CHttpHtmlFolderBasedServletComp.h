@@ -48,7 +48,7 @@ public:
 	QByteArray GenerateSingleEntry(const QFileInfo& fileInfo, const QString& commandId = QString()) const;
 	QByteArray GetMimeType(const QFileInfo& fileInfo) const;
 
-	// reimplemented (IRequestHandler)
+	// reimplemented (IRequestServlet)
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const override;
 	virtual QByteArray GetSupportedCommandId() const override;
 

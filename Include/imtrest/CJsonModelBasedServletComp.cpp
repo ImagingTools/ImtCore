@@ -129,16 +129,18 @@ IRequestServlet::ConstResponsePtr CJsonModelBasedServletComp::ProcessRequest(con
 		{
 			sizeParam = 50;
 		}
+
 		auto generateRandomNumber = [](int min = 0, int max = 255){
 			::srand((unsigned) ::rand());
 			return min + ::rand() % (max - min);
 		};
+
 		for (int i = 0; i < sizeParam ; ++i)
 		{
 			QByteArray subModelName = QByteArray("data ") + QByteArray::number(i);
 			int index = header->InsertNewItem();
 			header->AddTreeModel(subModelName, index);
-			auto treeModelPtr = header->GetTreeItemModel(subModelName,index);
+			CTreeItemModel* treeModelPtr = header->GetTreeItemModel(subModelName,index);
 			for (int j = 0; j < sizeParam; ++j)
 			{
 				quint32 r = generateRandomNumber(1,254);
