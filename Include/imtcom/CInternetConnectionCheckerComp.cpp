@@ -61,7 +61,7 @@ void CInternetConnectionCheckerComp::OnComponentCreated()
 
 	QNetworkRequest request;
 	request.setUrl(*m_urlAttrPtr);
-	QNetworkReply* replyPtr = imtcom::CRequestSender::Get(request, 3000);
+	QNetworkReply* replyPtr = imtcom::CRequestSender::DoSyncGet(request, 3000);
 	if (replyPtr != nullptr){
 		m_isOnline = replyPtr->error() == QNetworkReply::NoError;
 		replyPtr->deleteLater();
