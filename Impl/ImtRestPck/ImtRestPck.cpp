@@ -69,6 +69,16 @@ I_EXPORT_COMPONENT(
 		"Generates Json model for QML??",
 		"JSON Model");
 
+I_EXPORT_COMPONENT(
+		HttpClientRequestManager,
+		"The CHttpClientComp is a manager of generated http requests created by other modules of THIS application. It's is an observer of requests queue.",
+		"Rest Http Client Request Manager");
+
+I_EXPORT_COMPONENT(
+		HttpClientRequestFactory,
+		"The factory for creting http client requests for 'HttpClientRequestManager'",
+		"Rest Http Client Request Factory");
+
 
 } // namespace ImtRestPck
 
