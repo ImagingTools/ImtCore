@@ -63,7 +63,13 @@ void CInternetConnectionCheckerComp::OnComponentCreated()
 	request.setUrl(*m_urlAttrPtr);
 	QNetworkReply* replyPtr = imtcom::CRequestSender::DoSyncGet(request, 3000);
 	if (replyPtr != nullptr){
-		m_isOnline = replyPtr->error() == QNetworkReply::NoError;
+		bool isOnline = replyPtr->error() == QNetworkReply::NoError;
+		if (m_isOnline != isOnline){
+			istd::CChangeNotifier notifier(this);
+
+			m_isOnline = isOnline;
+		}
+
 		replyPtr->deleteLater();
 	}
 
@@ -110,9 +116,10 @@ void CInternetConnectionCheckerComp::OnRequestFinished()
 {
 	QNetworkReply* replyPtr = dynamic_cast<QNetworkReply*>(sender());
 	if (replyPtr != nullptr){
-		bool isOnline = replyPtr->error() == QNetworkReply::NoError ? true : false;
+		bool isOnline = replyPtr->error() == QNetworkReply::NoError;
 		if (m_isOnline != isOnline){
 			istd::CChangeNotifier notifier(this);
+
 			m_isOnline = isOnline;
 		}
 
