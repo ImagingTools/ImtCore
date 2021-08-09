@@ -14,21 +14,17 @@
 #include <imtrest/IHttpClientRequest.h>
 
 
-
-
 namespace imtrest
 {
 
 
-/*!
+/**
 	\brief The CHttpClientRequest class is a reimplementation of \class IHttpClientRequest
 	\sa IHttpClientRequest
 */
 class CHttpClientRequest: public IHttpClientRequest
 {
-
 public:
-
 	CHttpClientRequest();
 	CHttpClientRequest(const QNetworkRequest& request, QNetworkAccessManager::Operation requestType);
 
@@ -51,11 +47,9 @@ public:
 	virtual void SetRequestBody(const QByteArray& body) override;
 	virtual void SetRequestType(QNetworkAccessManager::Operation requestType) override;
 
-
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
 	bool CopyFrom(const IChangeable& object, CompatibilityMode mode) override;
-
 
 private:
 	bool CheckForReady();
@@ -67,11 +61,9 @@ private:
 	QNetworkRequest *m_networkRequest;
 	QByteArray m_requestBody;
 	QNetworkAccessManager::Operation m_requestType;
-
-
 };
 
 
+} // namespace imtrest
 
-}
 

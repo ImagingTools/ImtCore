@@ -14,20 +14,19 @@
 namespace imtrest
 {
 
+
 /// The IHttpClientRequest class is a container that containing information about http requests (is an unit of model).
 class IHttpClientRequest: virtual public istd::IChangeable
 {
-
 public:
-
 	enum RequestState
 	{
-		CREATED				= 0x0000, ///< Just created, and not ready to be proceed
-		READY_TO_PROCESSING = 0x0001, ///< ready to proceed (When all properties has been set)
-		PROCESSING			= 0x0002, ///< Processing of the request started
-		FINISED				= 0x0004, ///< Processing of the request has been finished
-		NO_ERROR			= 0x0008, ///< Processing of the request has been finished with normal result
-		ERROR				= 0x0010, ///< Processing of the request has been finished with error
+		RS_CREATED				= 0x0000, ///< Just created, and not ready to be proceed
+		RS_READY_TO_PROCESSING	= 0x0001, ///< ready to proceed (When all properties has been set)
+		RS_PROCESSING			= 0x0002, ///< Processing of the request started
+		RS_FINISHED				= 0x0004, ///< Processing of the request has been finished
+		RS_NO_ERROR				= 0x0008, ///< Processing of the request has been finished with normal result
+		RS_ERROR				= 0x0010 ///< Processing of the request has been finished with error
 	};
 
 	virtual QVariant GetAttribute(QNetworkRequest::Attribute code) const = 0;
@@ -50,5 +49,6 @@ public:
 };
 
 
-}
+} // namespace imtrest
+
 

@@ -88,7 +88,7 @@ void CHttpClientComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 
 			if (httpRequest != nullptr){
 				// Looking for request that ready to be proceed
-				if (httpRequest->GetState() & IHttpClientRequest::RequestState::READY_TO_PROCESSING){
+				if (httpRequest->GetState() & IHttpClientRequest::RequestState::RS_READY_TO_PROCESSING){
 
 					//Getting QNetworkRequest and fill url from local template
 					QNetworkRequest request = httpRequest->GetRequest();

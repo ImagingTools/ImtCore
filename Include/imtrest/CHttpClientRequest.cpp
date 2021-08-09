@@ -10,7 +10,7 @@ namespace imtrest
 
 CHttpClientRequest::CHttpClientRequest()
 {
-	m_state				= IHttpClientRequest::RequestState::CREATED;
+	m_state				= IHttpClientRequest::RequestState::RS_CREATED;
 	m_networkReply		= nullptr;
 	m_networkRequest	= nullptr;
 	m_requestType		= QNetworkAccessManager::Operation::UnknownOperation;
@@ -21,7 +21,7 @@ CHttpClientRequest::CHttpClientRequest(const QNetworkRequest& request, QNetworkA
 	QNetworkRequest* newRequest = new QNetworkRequest(request);
 	m_networkRequest	= newRequest;
 	m_requestType		= requestType;
-	m_state				= requestType != QNetworkAccessManager::Operation::PostOperation ? IHttpClientRequest::RequestState::READY_TO_PROCESSING : IHttpClientRequest::RequestState::CREATED;
+	m_state				= requestType != QNetworkAccessManager::Operation::PostOperation ? IHttpClientRequest::RequestState::RS_READY_TO_PROCESSING : IHttpClientRequest::RequestState::RS_CREATED;
 }
 
 QVariant CHttpClientRequest::GetAttribute(QNetworkRequest::Attribute code) const
@@ -103,7 +103,7 @@ void CHttpClientRequest::SetReply(QNetworkReply* reply)
 	istd::CChangeNotifier changeNotifier(this);
 	m_networkReply = reply;
 	QObject::connect(m_networkReply, &QNetworkReply::finished, [&](){this->OnReplyFinished();});
-	m_state = IHttpClientRequest::RequestState::PROCESSING;
+	m_state = IHttpClientRequest::RequestState::RS_PROCESSING;
 
 	}
 }
@@ -186,7 +186,7 @@ bool CHttpClientRequest::CheckForReady()
 	}
 
 	if(retval){
-		m_state = IHttpClientRequest::RequestState::READY_TO_PROCESSING;
+		m_state = IHttpClientRequest::RequestState::RS_READY_TO_PROCESSING;
 	}
 
 	return retval;
@@ -199,13 +199,13 @@ void CHttpClientRequest::OnReplyFinished()
 
 	if (m_networkReply != nullptr){
 
-		m_state = IHttpClientRequest::RequestState::FINISED;
+		m_state = IHttpClientRequest::RequestState::RS_FINISHED;
 
 		if (m_networkReply->error() == QNetworkReply::NetworkError::NoError){
-			m_state |= IHttpClientRequest::RequestState::NO_ERROR;
+			m_state |= IHttpClientRequest::RequestState::RS_NO_ERROR;
 		}
 		else{
-			m_state |= IHttpClientRequest::RequestState::ERROR;
+			m_state |= IHttpClientRequest::RequestState::RS_ERROR;
 		}
 	}
 }
