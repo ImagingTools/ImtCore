@@ -61,21 +61,32 @@ void CDatabaseObjectCollectionComp::SyncWithDatabase()
 
 	QSqlQuery sqlQuery = ExecSelectSqlQuery();
 	while (sqlQuery.next()){
-		istd::IChangeable* objectPtr = CreateObjectFromSqlRecord(sqlQuery.record());
+		QString name;
+		QString description;
+
+		istd::IChangeable* objectPtr = CreateObjectFromSqlRecord(sqlQuery.record(), name, description);
 		if (objectPtr != nullptr){
-			BaseClass2::InsertNewObject("", "", "", objectPtr);
+			BaseClass2::InsertNewObject(*m_typeIdAttrPtr, name, description, objectPtr);
 		}
 	}
 }
 
 
-istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectFromSqlRecord(const QSqlRecord& record) const
+istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectFromSqlRecord(const QSqlRecord& record, QString& objectName, QString& objectDescription) const
 {
 	if (m_objectDelegateCompPtr.IsValid()){
-		return m_objectDelegateCompPtr->CreateObjectFromRecord("", record);
+		return m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, record, objectName, objectDescription);
 	}
 
 	return nullptr;
+}
+
+
+// reimplemented (IObjectCollectionInfo)
+
+const iprm::IOptionsList* CDatabaseObjectCollectionComp::GetObjectTypesInfo() const
+{
+	return &m_typesInfo;
 }
 
 
@@ -171,6 +182,8 @@ void CDatabaseObjectCollectionComp::DestroyObjectInstance(istd::IChangeable* obj
 void CDatabaseObjectCollectionComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	m_typesInfo.InsertOption(*m_typeNameAttrPtr, *m_typeIdAttrPtr);
 
 	SyncWithDatabase();
 }

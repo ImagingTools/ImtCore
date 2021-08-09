@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
+#include <imtlic/CFeaturePackage.h>
 
 
 namespace imtlicdb
@@ -13,22 +14,58 @@ namespace imtlicdb
 
 // reimplemented (imtdb::IDatabaseObjectDelegate)
 
-istd::IChangeable* CFeatureInfoObjectDelegateComp::CreateObjectFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
+istd::IChangeable* CFeatureInfoObjectDelegateComp::CreateObjectFromRecord(
+			const QByteArray& /*typeId*/,
+			const QSqlRecord& record,
+			QString& objectName,
+			QString& /*objectDescription*/) const
 {
-	istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr = new imtlic::CFeatureInfo;
-	QByteArray featureId;
-	QString featureName;
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	istd::TDelPtr<imtlic::CFeaturePackage> featurePackagePtr = new imtlic::CFeaturePackage;
+
+	QByteArray packageId;
+	QString packageName;
 
 	if (record.contains("Id")){
-		featureId = record.value("Id").toByteArray();
-	}
-	
-	if (record.contains("Name")){
-		featureName = record.value("Name").toString();
+		packageId = record.value("Id").toByteArray();
 	}
 
-	if (!featureId.isEmpty() && !featureName.isEmpty()){
-		return featureInfoPtr.PopPtr();
+	if (record.contains("Name")){
+		packageName = record.value("Name").toString();
+
+		objectName = packageName;
+	}
+
+	QByteArray query = QString("SELECT * from Features WHERE PackageId = '%1'").arg(qPrintable(packageId)).toUtf8();
+
+	QSqlError error;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &error);
+
+	while (sqlQuery.next()){
+		QSqlRecord featureRecord = sqlQuery.record();
+		QByteArray featureId;
+		QString featureName;
+
+		if (featureRecord.contains("Id")){
+			featureId = featureRecord.value("Id").toByteArray();
+		}
+
+		if (featureRecord.contains("Name")){
+			featureName = featureRecord.value("Name").toString();
+		}
+
+		istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr = new imtlic::CFeatureInfo;
+		featureInfoPtr->SetFeatureId(featureId);
+		featureInfoPtr->SetFeatureName(featureName);
+
+		featurePackagePtr->InsertNewObject("FeatureInfo", featureName, "", featureInfoPtr.GetPtr());
+	}
+
+	if (!packageId.isEmpty() && !packageName.isEmpty()){
+		return featurePackagePtr.PopPtr();
 	}
 
 	return nullptr;

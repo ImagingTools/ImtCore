@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtdb/IDatabaseObjectDelegate.h>
+#include <imtdb/IDatabaseEngine.h>
 
 
 namespace imtlicdb
@@ -24,10 +25,14 @@ public:
 
 	I_BEGIN_COMPONENT(CFeatureInfoObjectDelegateComp)
 		I_REGISTER_INTERFACE(imtdb::IDatabaseObjectDelegate);
+		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine used for querying the feature info", true, "DatabaseEngine");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::IDatabaseObjectDelegate)
-	virtual istd::IChangeable* CreateObjectFromRecord(const QByteArray& typeId, const QSqlRecord& record) const override;
+	virtual istd::IChangeable* CreateObjectFromRecord(const QByteArray& typeId, const QSqlRecord& record, QString& objectName, QString& objectDescription) const override;
+
+private:
+	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 };
 
 

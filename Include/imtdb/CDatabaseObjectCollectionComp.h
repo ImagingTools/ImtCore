@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <iprm/COptionsManager.h>
 
 // ImtCore includes
 #include <imtbase/CObjectCollectionBase.h>
@@ -33,8 +34,8 @@ public:
 		I_REGISTER_INTERFACE(imtbase::IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
 		I_ASSIGN(m_objectFactoryCompPtr, "ObjectFactory", "List of factories used for object creation", false, "ObjectFactory");
-		I_ASSIGN(m_typeIdAttrPtr, "TypeId", "Type-ID corresponding to the registered factory", false, "Default");
-		I_ASSIGN(m_typeNameAttrPtr, "TypeName", "Type name corresponding to the registered factory", false, "Default");
+		I_ASSIGN(m_typeIdAttrPtr, "TypeId", "Type-ID corresponding to the registered factory", true, "Default");
+		I_ASSIGN(m_typeNameAttrPtr, "TypeName", "Type name corresponding to the registered factory", true, "Default");
 		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database engine used for low level SQL quering", true, "DatabaseEngine");
 		I_ASSIGN(m_objectDelegateCompPtr, "ObjectDelegate", "Database object delegate used for creation of C++ objects from the SQL record", true, "ObjectDelegate");
 		I_ASSIGN(m_updateOnDatabaseConnectedAttrPtr, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", true, false);
@@ -43,6 +44,9 @@ public:
 		I_ASSIGN(m_updateSqlQueryPathAttrPtr, "UpdateSqlQueryPath", "SQL query string file path for Updating in database", true, "");
 		I_ASSIGN(m_deleteSqlQueryPathAttrPtr, "DeleteSqlQueryPath", "SQL query string file path for Deleting in database", true, "");
 	I_END_COMPONENT;
+
+	// reimplemented (IObjectCollectionInfo)
+	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 
 	// reimplemented (imtbase::IObjectCollection)
 	virtual QByteArray InsertNewObject(
@@ -58,7 +62,7 @@ public:
 
 protected:
 	virtual void SyncWithDatabase();
-	virtual istd::IChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record) const;
+	virtual istd::IChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record, QString& objectName, QString& objectDescription) const;
 	virtual QSqlQuery ExecSelectSqlQuery(const QVariantMap& bindValues = {}, QSqlError* sqlError = nullptr) const;
 	virtual QSqlQuery ExecUpdateSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const;
 	 virtual QSqlQuery ExecInsertSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const;
@@ -83,6 +87,8 @@ private:
 	I_ATTR(QByteArray, m_insertSqlQueryPathAttrPtr);
 	I_ATTR(QByteArray, m_updateSqlQueryPathAttrPtr);
 	I_ATTR(QByteArray, m_deleteSqlQueryPathAttrPtr);
+
+	iprm::COptionsManager m_typesInfo;
 };
 
 

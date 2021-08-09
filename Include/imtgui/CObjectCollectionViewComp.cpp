@@ -298,8 +298,6 @@ void CObjectCollectionViewComp::UpdateGui(const istd::IChangeable::ChangeSet& ch
 
 void CObjectCollectionViewComp::OnGuiModelAttached()
 {
-	BaseClass::OnGuiModelAttached();
-
 	imtbase::IObjectCollection* objectPtr = GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
 
@@ -311,13 +309,7 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 		iter.value()->InitializeDelegate(objectPtr, this);
 	}
 
-	if (*m_useAsyncReadAttrPtr){
-		StartCollectionRead();
-	}
-	else{
-		ReadCollection(&m_typeModel, m_itemModelPtr);
-		OnCollectionReadFinished();
-	}
+	BaseClass::OnGuiModelAttached();
 }
 
 
