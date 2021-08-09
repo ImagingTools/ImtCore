@@ -1,13 +1,8 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QTimer>
-#include <QtNetwork/QNetworkAccessManager>
-
 // ACF includes
-#include <iprm/IEnableableParam.h>
-#include <icomp/CComponentBase.h>
+#include <istd/IChangeable.h>
 
 
 namespace imtcom
