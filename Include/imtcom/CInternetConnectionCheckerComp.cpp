@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtNetwork/QNetworkReply>
 
+// ImtCore includes
+#include <imtcom/CRequestSender.h>
+
 
 namespace imtcom
 {
@@ -55,6 +58,14 @@ bool CInternetConnectionCheckerComp::Serialize(iser::IArchive& /*archive*/)
 void CInternetConnectionCheckerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	QNetworkRequest request;
+	request.setUrl(*m_urlAttrPtr);
+	QNetworkReply* replyPtr = imtcom::CRequestSender::Get(request, 3000);
+	if (replyPtr != nullptr){
+		m_isOnline = replyPtr->error() == QNetworkReply::NoError;
+		replyPtr->deleteLater();
+	}
 
 	if (*m_timeoutAttrPtr > 0){
 		m_timeout = *m_timeoutAttrPtr;
