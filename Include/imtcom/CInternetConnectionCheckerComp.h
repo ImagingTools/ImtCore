@@ -6,8 +6,10 @@
 #include <QtNetwork/QNetworkAccessManager>
 
 // ACF includes
-#include <iprm/IEnableableParam.h>
 #include <icomp/CComponentBase.h>
+
+// ImtCore includes
+#include <imtcom/IInternetConnectionStatusProvider.h>
 
 
 namespace imtcom
@@ -17,14 +19,14 @@ namespace imtcom
 class CInternetConnectionCheckerComp:
 			public QObject,
 			public icomp::CComponentBase,
-			virtual public iprm::IEnableableParam
+			virtual public IInternetConnectionStatusProvider
 {
 	Q_OBJECT
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CInternetConnectionCheckerComp);
-		I_REGISTER_INTERFACE(iprm::IEnableableParam);
+		I_REGISTER_INTERFACE(IInternetConnectionStatusProvider);
 		I_ASSIGN(m_urlAttrPtr, "Url", "URL to check availability", true, "https://google.com");
 		I_ASSIGN(m_timeoutAttrPtr, "Timeout", "Request timeout", true, 1000)
 		I_ASSIGN(m_delayAttrPtr, "Delay", "Delay between two consecutive requests", true, 1000);
@@ -32,13 +34,8 @@ public:
 
 	CInternetConnectionCheckerComp();
 
-	// reimplemented (iprm::IEnableableParam)
-	virtual bool IsEnabled() const override;
-	virtual bool IsEnablingAllowed() const override;
-	virtual bool SetEnabled(bool isEnabled = true) override;
-
-	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive) override;
+	// reimplemented (IInternetConnectionStatusProvider)
+	virtual InternetConnectionStatus GetIntenetConnectionStatus() const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
@@ -57,7 +54,7 @@ private:
 	I_ATTR(int, m_timeoutAttrPtr);
 	I_ATTR(int, m_delayAttrPtr);
 
-	bool m_isOnline;
+	InternetConnectionStatus m_status;
 	QTimer m_timer;
 	QNetworkAccessManager* m_managerPtr;
 

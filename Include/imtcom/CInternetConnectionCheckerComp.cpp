@@ -4,9 +4,6 @@
 // Qt includes
 #include <QtNetwork/QNetworkReply>
 
-// ImtCore includes
-#include <imtcom/CRequestSender.h>
-
 
 namespace imtcom
 {
@@ -15,39 +12,18 @@ namespace imtcom
 // public methods
 
 CInternetConnectionCheckerComp::CInternetConnectionCheckerComp()
-	:m_isOnline(false),
+	:m_status(ICS_UNKNOWN),
 	m_managerPtr(nullptr),
 	m_timeout(1000),
 	m_delay(1000)
 {
 }
 
+// reimplemented (IInternetConnectionStatusProvider)
 
-// reimplemented (iprm::IEnableableParam)
-
-bool CInternetConnectionCheckerComp::IsEnabled() const
+imtcom::IInternetConnectionStatusProvider::InternetConnectionStatus CInternetConnectionCheckerComp::GetIntenetConnectionStatus() const
 {
-	return m_isOnline;
-}
-
-
-bool CInternetConnectionCheckerComp::IsEnablingAllowed() const
-{
-	return false;
-}
-
-
-bool CInternetConnectionCheckerComp::SetEnabled(bool /*isEnabled*/)
-{
-	return false;
-}
-
-
-// reimplemented (iser::ISerializable)
-
-bool CInternetConnectionCheckerComp::Serialize(iser::IArchive& /*archive*/)
-{
-	return false;
+	return m_status;
 }
 
 
@@ -58,20 +34,6 @@ bool CInternetConnectionCheckerComp::Serialize(iser::IArchive& /*archive*/)
 void CInternetConnectionCheckerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-
-	QNetworkRequest request;
-	request.setUrl(*m_urlAttrPtr);
-	QNetworkReply* replyPtr = imtcom::CRequestSender::DoSyncGet(request, 3000);
-	if (replyPtr != nullptr){
-		bool isOnline = replyPtr->error() == QNetworkReply::NoError;
-		if (m_isOnline != isOnline){
-			istd::CChangeNotifier notifier(this);
-
-			m_isOnline = isOnline;
-		}
-
-		replyPtr->deleteLater();
-	}
 
 	if (*m_timeoutAttrPtr > 0){
 		m_timeout = *m_timeoutAttrPtr;
@@ -117,10 +79,15 @@ void CInternetConnectionCheckerComp::OnRequestFinished()
 	QNetworkReply* replyPtr = dynamic_cast<QNetworkReply*>(sender());
 	if (replyPtr != nullptr){
 		bool isOnline = replyPtr->error() == QNetworkReply::NoError;
-		if (m_isOnline != isOnline){
+		if (isOnline && m_status != ICS_ONLINE){
 			istd::CChangeNotifier notifier(this);
 
-			m_isOnline = isOnline;
+			m_status = ICS_ONLINE;
+		}
+		else if (!isOnline && m_status != ICS_OFFLINE){
+			istd::CChangeNotifier notifier(this);
+
+			m_status = ICS_OFFLINE;
 		}
 
 		replyPtr->deleteLater();
