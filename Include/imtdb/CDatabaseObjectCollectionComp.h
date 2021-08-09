@@ -20,7 +20,9 @@ namespace imtdb
 /**
 	Basic implementation of a Database based model.
 */
-class CDatabaseObjectCollectionComp: public imtbase::CObjectCollectionBase, public ilog::CLoggerComponentBase
+class CDatabaseObjectCollectionComp:
+			public imtbase::CObjectCollectionBase,
+			public ilog::CLoggerComponentBase
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;

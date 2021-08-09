@@ -163,10 +163,6 @@ bool CDatabaseEngineComp::OpenDatabase() const
 		if (*m_autoCreateDatabaseAttrPtr > 0){
 			CreateDatabase();
 		}
-
-		if (*m_autoCreateTablesAttrPtr > 0 && m_tablesCreationScriptPathAttrPtr.IsValid()){
-			CreateTables();
-		}
 	}
 	else{
 		SendErrorMessage(0, "Database could not be connected", "Database engine");
@@ -191,7 +187,7 @@ bool CDatabaseEngineComp::CreateDatabase() const
 	if (retVal){
 		QString queryString;
 
-		if (m_databaseCreationScriptPathAttrPtr.IsValid() && QFile(*m_databaseCreationScriptPathAttrPtr).isReadable()){
+		if (m_databaseCreationScriptPathAttrPtr.IsValid()){
 			QFile scriptFile(*m_databaseCreationScriptPathAttrPtr);
 
 			scriptFile.open(QFile::ReadOnly);
@@ -219,12 +215,11 @@ bool CDatabaseEngineComp::CreateDatabase() const
 		maintainanceDb.close();
 
 		retVal = bool(sqlError.type() == QSqlError::ErrorType::NoError);
-
 		if (!retVal){
 			qCritical() << __FILE__ << __LINE__
-						<< "\n\t| what(): Maintainance SQL error occured"
-						<< "\n\t| error():" << sqlError
-						<< "\n\t| query():" << queryString;
+						<< "\n\t| Maintainance SQL error occured"
+						<< "\n\t| Error: " << sqlError
+						<< "\n\t| Query: " << queryString;
 		}
 		else{
 			QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);
@@ -239,7 +234,12 @@ bool CDatabaseEngineComp::CreateDatabase() const
 
 			retVal = m_db.open();
 		}
+	}
 
+	if (retVal){
+		if (*m_autoCreateTablesAttrPtr > 0 && m_tablesCreationScriptPathAttrPtr.IsValid()){
+			retVal = CreateTables();
+		}
 	}
 
 	return retVal;
@@ -254,8 +254,8 @@ bool CDatabaseEngineComp::CreateTables() const
 
 	if (!scriptFile.open(QFile::ReadOnly)){
 		qCritical() << __FILE__ << __LINE__
-					<< "\n\t| what(): Unable to open file"
-					<< "\n\t| fileName():" << scriptFile.fileName();
+					<< "\n\t| Unable to open file"
+					<< "\n\t| File: " << scriptFile.fileName();
 
 		return false;
 	}
@@ -266,8 +266,14 @@ bool CDatabaseEngineComp::CreateTables() const
 	m_db.exec(queryString);
 
 	sqlError = m_db.lastError();
+	if (sqlError.type() != QSqlError::ErrorType::NoError){
+		qCritical() << __FILE__ << __LINE__
+			<< "\n\t| Maintainance SQL error occured"
+			<< "\n\t| Error: " << sqlError
+			<< "\n\t| Query: " << queryString;
+	}
 
-	return bool(sqlError.type() == QSqlError::ErrorType::NoError);
+	return sqlError.type() == QSqlError::ErrorType::NoError;
 }
 
 
@@ -291,8 +297,8 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected() const
 
 		if (!isOpened){
 			qCritical() << __FILE__ << __LINE__
-						<< "\n\t| what(): Database Error Occured Unable to open database"
-						<< "\n\t| Database error" << m_db.lastError().text();
+						<< "\n\t| Unable to open database"
+						<< "\n\t| Error: " << m_db.lastError().text();
 		}
 	}
 
