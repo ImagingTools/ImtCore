@@ -87,6 +87,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	BottomPageTree->setContentsMargins(QMargins(0,0,0,0));
 	BottomPageTree->setMaximumWidth(m_minWidth);
 	BottomPageTree->setItemsExpandable(false);
+	BottomPageTree->setVisible(false);
 
 
 	//===========================================
@@ -238,6 +239,10 @@ bool CMenuPanel::InsertPage(const QByteArray& pageId, const QByteArray& parentPa
 	QTreeView* activeTreePtr = insertToBottom ? BottomPageTree : PageTree;
 	QStandardItemModel& activeModelPtr = insertToBottom ? m_bottomModel : m_model;
 
+	if (activeTreePtr == BottomPageTree){
+		activeTreePtr->setVisible(true);
+	}
+
 	if (pageId.isEmpty()){
 		return false;
 	}
@@ -332,7 +337,6 @@ bool CMenuPanel::SetPageOrder(const QByteArray& pageId, int position)
 
 QList<QByteArray> CMenuPanel::GetChilds(const QByteArray& pageId)
 {
-	qDebug() << __FILE__ << __LINE__ << "What does makes???????";
 	QList<QByteArray> childs;
 	if (pageId.isEmpty()){
 		for (int i = 0; i < m_model.rowCount(); i++){
