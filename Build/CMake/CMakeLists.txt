@@ -16,6 +16,7 @@ include_directories(${AUX_INCLUDE_DIR}/..)
 
 #Include
 
+add_subdirectory("${INCLUDE_DIR}/designtokencreator/CMake" "${AUX_INCLUDE_DIR}/designtokencreator")
 add_subdirectory("${INCLUDE_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauth")
 add_subdirectory("${INCLUDE_DIR}/imtauthgui/CMake" "${AUX_INCLUDE_DIR}/imtauthgui")
 add_subdirectory("${INCLUDE_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbase")
@@ -42,8 +43,15 @@ add_subdirectory("${INCLUDE_DIR}/imtlicgui/CMake" "${AUX_INCLUDE_DIR}/imtlicgui"
 add_subdirectory("${INCLUDE_DIR}/imtdb/CMake" "${AUX_INCLUDE_DIR}/imtdb")
 add_subdirectory("${INCLUDE_DIR}/imtlicdb/CMake" "${AUX_INCLUDE_DIR}/imtlicdb")
 add_subdirectory("${INCLUDE_DIR}/imtgql/CMake" "${AUX_INCLUDE_DIR}/imtgql")
+add_subdirectory("${INCLUDE_DIR}/imtcom/CMake" "${AUX_INCLUDE_DIR}/imtcom")
 
 #Impl
+
+add_subdirectory("${IMPL_DIR}/DesignTokenCreatorPck/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreatorPck")
+add_dependencies(DesignTokenCreatorPck imtbase designtokencreator)
+
+add_subdirectory("${IMPL_DIR}/DesignTokenCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreatorExe")
+add_dependencies(DesignTokenCreatorExe imtbase designtokencreator)
 
 add_subdirectory("${IMPL_DIR}/ImtCorePck/CMake" "${AUX_INCLUDE_DIR}/ImtCorePck")
 add_dependencies(ImtCorePck imtbase)
@@ -53,6 +61,9 @@ add_dependencies(ImtStylePck imtstyle)
 
 add_subdirectory("${IMPL_DIR}/ImtAuthPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthPck")
 add_dependencies(ImtAuthPck imtbase imtauth)
+
+add_subdirectory("${IMPL_DIR}/ImtComPck/CMake" "${AUX_INCLUDE_DIR}/ImtComPck")
+add_dependencies(ImtComPck imtbase imtauth imtcom)
 
 add_subdirectory("${IMPL_DIR}/ImtAuthGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGuiPck")
 add_dependencies(ImtAuthGuiPck imtbase imtauth imtauthgui)
