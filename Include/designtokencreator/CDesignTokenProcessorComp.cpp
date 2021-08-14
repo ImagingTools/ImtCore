@@ -1,5 +1,5 @@
 #include <designtokencreator/CDesignTokenProcessorComp.h>
-
+#include <designtokencreator/CDesignTokenArgumentsParser.h>
 
 
 namespace designtokencreator
@@ -53,6 +53,15 @@ int CDesignTokenProcessorComp::Exec()
 void CDesignTokenProcessorComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	using L_ATTR = CDesignTokenArgumentsParser::AvailableArguments;
+
+	auto L_SetParam = [&](L_ATTR propId, QByteArray& classProp){
+		QByteArray newProp;
+		m_paramSetAttrPtr->GetParameter(QByteArray::number(int(propId)));
+		classProp = newProp;
+	};
+
 	this->Exec();
 }
 

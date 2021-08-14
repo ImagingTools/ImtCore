@@ -6,36 +6,28 @@ namespace designtokencreator
 {
 
 
-CDesignTokenArgumentsParser::CDesignTokenArgumentsParser()
+CDesignTokenArgumentsParser::CDesignTokenArgumentsParser(int argc, char** argv)
 {
-	//=====================================================================================Commands init
-	m_commands.insert(AvailableCommands::HELP, "--help");
-	m_commands.insert(AvailableCommands::HELP, "-h");
-	m_commands.insert(AvailableCommands::HELP, "/?");
+	//=====================================================================================
 
-	//-----------------------------------colors
-	m_commands.insert(AvailableCommands::REPLACEBLE_COLOR, "--replaceble-color");
-	m_commands.insert(AvailableCommands::OFF_NORMAL_COLOR, "--off-normal-color");
-	m_commands.insert(AvailableCommands::OFF_DISABLED_COLOR, "--off-disabled-color");
-	m_commands.insert(AvailableCommands::OFF_ACTIVE_COLOR, "--off-active-color");
-	m_commands.insert(AvailableCommands::OFF_SELECTED_COLOR, "--off-selected-color");
-	m_commands.insert(AvailableCommands::ON_NORMAL_COLOR, "--on-normal-color");
-	m_commands.insert(AvailableCommands::ON_DISABLED_COLOR, "--on-disabled-color");
-	m_commands.insert(AvailableCommands::ON_ACTIVE_COLOR, "--on-active-color");
-	m_commands.insert(AvailableCommands::ON_SELECTED_COLOR, "--on-selected-color");
+	//=====================================================================================Commands init
+	m_commands.insert(AvailableArguments::AA_HELP, "--help");
+	m_commands.insert(AvailableArguments::AA_HELP, "-h");
+	m_commands.insert(AvailableArguments::AA_HELP, "/?");
+
 
 	//=====================================================================================Reading arguments
 }
 
 
-bool CDesignTokenArgumentsParser::CheckArgument(AvailableCommands AC) const
+bool CDesignTokenArgumentsParser::CheckArgument(AvailableArguments argument) const
 {
 	bool retval = false;
 
-	QByteArrayList AC_commands = m_commands.values(AC);
+	QByteArrayList args = m_commands.values(argument);
 
-	for(const QByteArray &AC_command : ::qAsConst(AC_commands)){
-		if(m_arguments.contains(AC_command)){
+	for(const QByteArray &arg : ::qAsConst(args)){
+		if(m_arguments.contains(arg)){
 			retval = true;
 			break;
 		}
@@ -45,21 +37,21 @@ bool CDesignTokenArgumentsParser::CheckArgument(AvailableCommands AC) const
 }
 
 
-QByteArray CDesignTokenArgumentsParser::GetArgumentKey(AvailableCommands AC) const
+QByteArray CDesignTokenArgumentsParser::GetArgumentKey(AvailableArguments argument) const
 {
 	QByteArray retval;
 
-	QByteArrayList AC_commands = m_commands.values(AC);
-	QByteArray AC_key;
+	QByteArrayList args = m_commands.values(argument);
+	QByteArray argKey;
 
-	for(const QByteArray &AC_command : ::qAsConst(AC_commands)){
-		if(m_arguments.contains(AC_command)){
-			AC_key = AC_command;
+	for(const QByteArray &arg : ::qAsConst(args)){
+		if(m_arguments.contains(arg)){
+			argKey = arg;
 			break;
 		}
 	}
 
-	int indexOfArg = m_arguments.indexOf(AC_key);
+	int indexOfArg = m_arguments.indexOf(argKey);
 
 	if(m_arguments.size() < indexOfArg){
 		retval = m_arguments[indexOfArg];
@@ -69,10 +61,10 @@ QByteArray CDesignTokenArgumentsParser::GetArgumentKey(AvailableCommands AC) con
 }
 
 
-QByteArray CDesignTokenArgumentsParser::GetArgumentValue(AvailableCommands AC) const
+QByteArray CDesignTokenArgumentsParser::GetArgumentValue(AvailableArguments argument) const
 {
 	QByteArray retval;
-	QByteArray AC_key = this->GetArgumentKey(AC);
+	QByteArray AC_key = this->GetArgumentKey(argument);
 	int indexOfArg = m_arguments.indexOf(AC_key);
 
 	if(m_arguments.size() < indexOfArg){
@@ -83,20 +75,20 @@ QByteArray CDesignTokenArgumentsParser::GetArgumentValue(AvailableCommands AC) c
 }
 
 
-QByteArrayList CDesignTokenArgumentsParser::GetArgumentValueMulti(AvailableCommands AC) const
+QByteArrayList CDesignTokenArgumentsParser::GetArgumentValueMulti(AvailableArguments argument) const
 {
 	QByteArrayList retval;
-	QByteArrayList AC_commands = m_commands.values(AC);
-	QByteArray AC_key;
+	QByteArrayList args = m_commands.values(argument);
+	QByteArray argValue;
 
-	for(const QByteArray &AC_command : ::qAsConst(AC_commands)){
-		if(m_arguments.contains(AC_command)){
-			AC_key = AC_command;
+	for(const QByteArray &arg : ::qAsConst(args)){
+		if(m_arguments.contains(arg)){
+			argValue = arg;
 			break;
 		}
 	}
 
-	int indexOfArg = m_arguments.indexOf(AC_key);
+	int indexOfArg = m_arguments.indexOf(argValue);
 
 	while(m_arguments.size() < indexOfArg + 1){
 		++indexOfArg;
@@ -111,12 +103,6 @@ QByteArrayList CDesignTokenArgumentsParser::GetArgumentValueMulti(AvailableComma
 }
 
 
-void CDesignTokenArgumentsParser::SetParams(int argc, char** argv, iprm::IParamsSet* paramSet)
-{
-	for (int i = 0; i < argc; ++i){
-		m_arguments << argv[i];
-	}
-}
 
 
 

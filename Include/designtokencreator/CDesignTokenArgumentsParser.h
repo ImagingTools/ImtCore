@@ -8,59 +8,55 @@
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/IParamsSet.h>
 
-
+/// \todo MOVE it to imtstyle
 namespace designtokencreator
 {
+
 
 class CDesignTokenArgumentsParser
 {
 public:
-	enum class AvailableCommands: int
+	enum AvailableArguments
 	{
-		HELP				= 0x0001,
-		REPLACEBLE_COLOR	= 0x0002,
-		NORMAL_COLOR		= 0x0004,
-		OFF_NORMAL_COLOR	= 0x0008,
-		OFF_DISABLED_COLOR	= 0x0010,
-		OFF_ACTIVE_COLOR	= 0x0020,
-		OFF_SELECTED_COLOR	= 0x0040,
-		ON_NORMAL_COLOR		= 0x0080,
-		ON_DISABLED_COLOR	= 0x0100,
-		ON_ACTIVE_COLOR		= 0x0200,
-		ON_SELECTED_COLOR	= 0x0400
+		/**
+			Displays help
+		*/
+		AA_HELP,
+
+		/**
+
+		*/
+		AA_TEMPLATE_ICON_COLOR,
+		AA_TEMPLATE_PRIMARY_COLOR,
+		AA_TEMPLATE_SECONDARY_COLOR,
+		AA_DESIGN_TOKEN_FILE_PATH
 	};
-	CDesignTokenArgumentsParser();
-	void SetParams(int argc, char** argv, iprm::IParamsSet* paramSet);
+	CDesignTokenArgumentsParser(int argc, char** argv);
 
-private:
-	constexpr static const char* SUFFIX_OFF_NORMAL   = "_Off_Normal";
-	constexpr static const char* SUFFIX_OFF_DISABLED = "_Off_Disabled";
-	constexpr static const char* SUFFIX_OFF_ACTIVE   = "_Off_Active";
-	constexpr static const char* SUFFIX_OFF_SELECTED = "_Off_Selected";
-	constexpr static const char* SUFFIX_ON_NORMAL    = "_On_Normal";
-	constexpr static const char* SUFFIX_ON_DISABLED  = "_On_Disabled";
-	constexpr static const char* SUFFIX_ON_ACTIVE    = "_On_Active";
-	constexpr static const char* SUFFIX_ON_SELECTED  = "_On_Selected";
-
-private:
-	/// Checking arguments and returns containing value \c AC
-	bool CheckArgument(AvailableCommands AC) const;
+	/// Checking arguments and returns containing value \c argument
+	bool CheckArgument(AvailableArguments argument) const;
 
 	/// Getting argument's key and returns it
-	QByteArray GetArgumentKey(AvailableCommands AC) const;
+	/// \todo rename arg to human-readdeble
+	QByteArray GetArgumentKey(AvailableArguments argument) const;
 
 	/// Getting argument's value and returns it
-	QByteArray GetArgumentValue(AvailableCommands AC) const;
+	/// \todo rename arg to human-readdeble
+	QByteArray GetArgumentValue(AvailableArguments argument) const;
 
 	/// Getting argument's value and returns it
-	QByteArrayList GetArgumentValueMulti(AvailableCommands AC) const;
+	/// \todo rename arg to human-readdeble
+	QByteArrayList GetArgumentValueMulti(AvailableArguments argument) const;
 
 private:
-	QMultiMap<AvailableCommands, QByteArray> m_commands;
+
+
+private:
+	QMultiMap<AvailableArguments, QByteArray> m_commands;
 	QByteArrayList m_arguments;
-
-
 };
 
 
 } // namespace designtokencreator
+
+

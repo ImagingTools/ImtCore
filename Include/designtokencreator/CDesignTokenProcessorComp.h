@@ -6,6 +6,9 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <iprm/IParamsSet.h>
+
+// ImtCore includes
 
 
 namespace designtokencreator
@@ -17,7 +20,7 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDesignTokenProcessorComp);
-
+	I_ASSIGN(m_paramSetAttrPtr, "ParamSet", "Param set", true, "IParamsSet")
 	I_END_COMPONENT;
 
 	int Exec();
@@ -28,6 +31,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
+	/// \todo rename to s_camelCase
 	constexpr static const char* SUFFIX_OFF_NORMAL   = "_Off_Normal";
 	constexpr static const char* SUFFIX_OFF_DISABLED = "_Off_Disabled";
 	constexpr static const char* SUFFIX_OFF_ACTIVE   = "_Off_Active";
@@ -36,6 +40,8 @@ private:
 	constexpr static const char* SUFFIX_ON_DISABLED  = "_On_Disabled";
 	constexpr static const char* SUFFIX_ON_ACTIVE    = "_On_Active";
 	constexpr static const char* SUFFIX_ON_SELECTED  = "_On_Selected";
+
+	I_REF(iprm::IParamsSet, m_paramSetAttrPtr);
 
 	/// The color that should be replaced by \c m_replacedColor
 	QByteArray m_replaceableColor;

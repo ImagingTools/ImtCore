@@ -25,7 +25,76 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationInfo"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>DesignTokenProcessor</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConversionParams" PackageId="BasePck" ComponentId="ComposedParamsSet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>DesignTokenFilePath</Value>
+                                <Value>TemplateIconColor</Value>
+                                <Value>HelpParam</Value>
+                                <Value>TemplatePrimaryColor</Value>
+                                <Value>TemplateSecondaryColor</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>DesignTokenFilePath</Value>
+                                <Value>TemplateIconColor</Value>
+                                <Value>HelpParam</Value>
+                                <Value>TemplatePrimaryColor</Value>
+                                <Value>TemplateSecondaryColor</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DesignTokenFilePath" PackageId="FilePck" ComponentId="FileNameParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="DesignTokenProcessor" PackageId="DesignTokenCreatorPck" ComponentId="DesignTokenProcessor">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ParamSet" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConversionParams"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="HelpParam" PackageId="BasePck" ComponentId="EnableableParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TemplateIconColor" PackageId="BasePck" ComponentId="IdParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TemplatePrimaryColor" PackageId="BasePck" ComponentId="IdParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TemplateSecondaryColor" PackageId="BasePck" ComponentId="IdParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="VersionInfo" PackageId="BasePck" ComponentId="VersionInfo">
@@ -37,6 +106,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="ibase::IApplication" ComponentId="ConsoleApplication"/>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="ConversionParams"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>
