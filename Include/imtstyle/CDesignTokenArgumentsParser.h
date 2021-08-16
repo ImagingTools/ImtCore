@@ -8,30 +8,17 @@
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/IParamsSet.h>
 
-/// \todo MOVE it to imtstyle
+// ImtCore includes
+#include <imtstyle/IDesignTokenArgumentsParser.h>
+
+
 namespace imtstyle
 {
 
 
-class CDesignTokenArgumentsParser
+class CDesignTokenArgumentsParser: IDesignTokenArgumentsParser
 {
 public:
-	enum AvailableArguments
-	{
-		/**
-			Displays help
-		*/
-		AA_HELP,
-
-		/**
-
-		*/
-		AA_TEMPLATE_ICON_COLOR,
-		AA_TEMPLATE_PRIMARY_COLOR,
-		AA_TEMPLATE_SECONDARY_COLOR,
-		AA_DESIGN_TOKEN_FILE_PATH
-	};
-	CDesignTokenArgumentsParser(int argc, char** argv);
 
 	/// Checking arguments and returns containing value \c argument
 	bool CheckArgument(AvailableArguments argument) const;
@@ -44,6 +31,14 @@ public:
 
 	/// Getting argument's value and returns it
 	QByteArrayList GetArgumentValueMulti(AvailableArguments argument) const;
+
+	// reimplemented (IDesignTokenArgumentsParser)
+	virtual void SetArguments(int argc, char** argv) override;
+	virtual bool IsHelpRequested() const override;
+	virtual QByteArray GetDesignTokenFilePath() const override;
+	virtual QByteArray GetTemplateIconColor() const override;
+	virtual QByteArray GetTemplatePrimaryColor() const override;
+	virtual QByteArray GetTemplateSecondaryColor() const override;
 
 private:
 

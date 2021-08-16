@@ -50,7 +50,6 @@ private:
 	QByteArray m_inputFileName;
 	QByteArray m_outputDirName;
 	QFileInfo m_designTokenFileInfo;
-	QFileInfoList m_images;
 
 
 private:

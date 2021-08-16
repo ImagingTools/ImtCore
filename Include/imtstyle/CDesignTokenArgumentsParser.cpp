@@ -6,31 +6,6 @@ namespace imtstyle
 {
 
 
-CDesignTokenArgumentsParser::CDesignTokenArgumentsParser(int argc, char** argv)
-{
-	//=====================================================================================Commands init
-	m_commands.insert(AvailableArguments::AA_HELP, "--help");
-	m_commands.insert(AvailableArguments::AA_HELP, "-h");
-	m_commands.insert(AvailableArguments::AA_HELP, "/?");
-
-	//-----------------------------------------------colors
-	m_commands.insert(AA_TEMPLATE_ICON_COLOR, "--template-icon-color");
-	m_commands.insert(AA_TEMPLATE_ICON_COLOR, "-TIC");
-	m_commands.insert(AA_TEMPLATE_PRIMARY_COLOR, "--template-primary-color");
-	m_commands.insert(AA_TEMPLATE_PRIMARY_COLOR, "-TPC");
-	m_commands.insert(AA_TEMPLATE_SECONDARY_COLOR, "--template-secondary-color");
-	m_commands.insert(AA_TEMPLATE_SECONDARY_COLOR, "-TSC");
-
-	//----------------------------------------------- files & dirs
-	m_commands.insert(AA_DESIGN_TOKEN_FILE_PATH, "--file");
-	m_commands.insert(AA_DESIGN_TOKEN_FILE_PATH, "-F");
-
-	//-----------------------------------------------
-
-	//=====================================================================================
-}
-
-
 bool CDesignTokenArgumentsParser::CheckArgument(AvailableArguments argument) const
 {
 	bool retval = false;
@@ -114,9 +89,67 @@ QByteArrayList CDesignTokenArgumentsParser::GetArgumentValueMulti(AvailableArgum
 }
 
 
+// reimplemented (IDesignTokenArgumentsParser)
+
+void CDesignTokenArgumentsParser::SetArguments(int argc, char** argv)
+{
+	//=====================================================================================Commands init
+	m_commands.insert(AA_HELP, "--help");
+	m_commands.insert(AA_HELP, "-h");
+	m_commands.insert(AA_HELP, "/?");
+
+	//-----------------------------------------------colors
+	m_commands.insert(AA_TEMPLATE_ICON_COLOR, "--template-icon-color");
+	m_commands.insert(AA_TEMPLATE_ICON_COLOR, "-TIC");
+	m_commands.insert(AA_TEMPLATE_PRIMARY_COLOR, "--template-primary-color");
+	m_commands.insert(AA_TEMPLATE_PRIMARY_COLOR, "-TPC");
+	m_commands.insert(AA_TEMPLATE_SECONDARY_COLOR, "--template-secondary-color");
+	m_commands.insert(AA_TEMPLATE_SECONDARY_COLOR, "-TSC");
+
+	//----------------------------------------------- files & dirs
+	m_commands.insert(AA_DESIGN_TOKEN_FILE_PATH, "--file");
+	m_commands.insert(AA_DESIGN_TOKEN_FILE_PATH, "-F");
+
+	//-----------------------------------------------
+
+	//=====================================================================================
+}
+
+
+bool CDesignTokenArgumentsParser::IsHelpRequested() const
+{
+	return this->CheckArgument(AA_HELP);
+}
+
+
+QByteArray CDesignTokenArgumentsParser::GetDesignTokenFilePath() const
+{
+	return this->GetArgumentValue(AA_DESIGN_TOKEN_FILE_PATH);
+}
+
+
+QByteArray CDesignTokenArgumentsParser::GetTemplateIconColor() const
+{
+	return this->GetArgumentValue(AA_TEMPLATE_ICON_COLOR);
+}
+
+
+QByteArray CDesignTokenArgumentsParser::GetTemplatePrimaryColor() const
+{
+	return this->GetArgumentValue(AA_TEMPLATE_PRIMARY_COLOR);
+}
+
+
+QByteArray CDesignTokenArgumentsParser::GetTemplateSecondaryColor() const
+{
+	return this->GetArgumentValue(AA_TEMPLATE_SECONDARY_COLOR);
+}
 
 
 
 } // namespace imtstyle
+
+
+
 
 
