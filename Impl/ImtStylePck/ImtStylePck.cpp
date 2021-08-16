@@ -19,6 +19,12 @@ I_EXPORT_COMPONENT(
 			"Design token based resource provider",
 			"Design Token Resource Color Palette Font Icons");
 
+I_EXPORT_COMPONENT(
+			DesignTokenProcessor,
+			"Creates theme schems",
+			"Design Token");
+
+
 } // namespace ImtStylePck
 
 
