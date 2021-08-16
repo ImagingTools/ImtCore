@@ -9,13 +9,13 @@
 #include <ifile/IFileNameParam.h>
 
 // project includes
-#include <designtokencreator/CDesignTokenArgumentsParser.h>
+#include <imtstyle/CDesignTokenArgumentsParser.h>
 
 #include <GeneratedFiles/DesignTokenCreatorExe/CDesignTokenCreatorExe.h>
 
 static bool SetParams(int argc, char** argv, iprm::IParamsSet& paramSet, QString& errorString)
 {
-	using designtokencreator::CDesignTokenArgumentsParser;
+	using imtstyle::CDesignTokenArgumentsParser;
 	bool retval = false;
 	QByteArrayList arguments;
 	for (int i = 0; i < argc; ++i){

@@ -68,7 +68,7 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="DesignTokenProcessor" PackageId="DesignTokenCreatorPck" ComponentId="DesignTokenProcessor">
+        <Element Id="DesignTokenProcessor" PackageId="ImtStylePck" ComponentId="DesignTokenProcessor">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ParamSet" Type="Reference" ExportId="">
