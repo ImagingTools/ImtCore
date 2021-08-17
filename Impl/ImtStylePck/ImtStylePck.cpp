@@ -22,7 +22,17 @@ I_EXPORT_COMPONENT(
 I_EXPORT_COMPONENT(
 			DesignTokenProcessor,
 			"Creates theme schems",
-			"Design Token");
+			"Design Token Processor");
+
+I_EXPORT_COMPONENT(
+		DesignTokenArgumentsParser,
+		"Creates theme schems",
+		"Design Token Arguments Parser");
+
+I_EXPORT_COMPONENT(
+		DesignTokenFileParser,
+		"Design token file parser",
+		"Design Token File Parser");
 
 
 } // namespace ImtStylePck
