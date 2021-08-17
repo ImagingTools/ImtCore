@@ -35,35 +35,12 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ConversionParams" PackageId="BasePck" ComponentId="ComposedParamsSet">
+        <Element Id="DesignTokenArgumentsParser" PackageId="ImtStylePck" ComponentId="DesignTokenArgumentsParser">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>DesignTokenFilePath</Value>
-                                <Value>TemplateIconColor</Value>
-                                <Value>HelpParam</Value>
-                                <Value>TemplatePrimaryColor</Value>
-                                <Value>TemplateSecondaryColor</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>DesignTokenFilePath</Value>
-                                <Value>TemplateIconColor</Value>
-                                <Value>HelpParam</Value>
-                                <Value>TemplatePrimaryColor</Value>
-                                <Value>TemplateSecondaryColor</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
+                <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="DesignTokenFilePath" PackageId="FilePck" ComponentId="FileNameParam">
+        <Element Id="DesignTokenFileParser" PackageId="ImtStylePck" ComponentId="DesignTokenFileParser">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>
@@ -71,30 +48,13 @@
         <Element Id="DesignTokenProcessor" PackageId="ImtStylePck" ComponentId="DesignTokenProcessor">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ParamSet" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConversionParams"/>
+                    <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DesignTokenArgumentsParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DesignTokenFileParser"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="HelpParam" PackageId="BasePck" ComponentId="EnableableParam">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="TemplateIconColor" PackageId="BasePck" ComponentId="IdParam">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="TemplatePrimaryColor" PackageId="BasePck" ComponentId="IdParam">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="TemplateSecondaryColor" PackageId="BasePck" ComponentId="IdParam">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="VersionInfo" PackageId="BasePck" ComponentId="VersionInfo">
@@ -106,7 +66,6 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="ibase::IApplication" ComponentId="ConsoleApplication"/>
-        <Interface InterfaceId="iprm::IParamsSet" ComponentId="ConversionParams"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

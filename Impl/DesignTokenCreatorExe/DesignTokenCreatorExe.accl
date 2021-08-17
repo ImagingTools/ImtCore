@@ -10,13 +10,9 @@
     <PositionMap>
         <Element ComponentName="ApplicationInfo" X="1000" Y="25" Note=""/>
         <Element ComponentName="ConsoleApplication" X="800" Y="25" Note=""/>
-        <Element ComponentName="ConversionParams" X="675" Y="175" Note=""/>
-        <Element ComponentName="DesignTokenFilePath" X="400" Y="375" Note=""/>
-        <Element ComponentName="DesignTokenProcessor" X="550" Y="25" Note=""/>
-        <Element ComponentName="HelpParam" X="500" Y="300" Note=""/>
-        <Element ComponentName="TemplateIconColor" X="850" Y="250" Note=""/>
-        <Element ComponentName="TemplatePrimaryColor" X="975" Y="325" Note=""/>
-        <Element ComponentName="TemplateSecondaryColor" X="1100" Y="400" Note=""/>
+        <Element ComponentName="DesignTokenArgumentsParser" X="575" Y="225" Note=""/>
+        <Element ComponentName="DesignTokenFileParser" X="250" Y="125" Note=""/>
+        <Element ComponentName="DesignTokenProcessor" X="550" Y="125" Note=""/>
         <Element ComponentName="VersionInfo" X="1150" Y="25" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
