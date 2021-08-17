@@ -24,32 +24,26 @@ public:
 		AA_HELP,
 
 		/**
-			The TEMPLATE ICON COLOR setting
+			The input directory parameter
 		*/
-		AA_TEMPLATE_ICON_COLOR,
+		AA_DESIGN_TOKEN_FILE_PATH,
 
 		/**
-			The template primary color setting
+			The input directory parameter
 		*/
-		AA_TEMPLATE_PRIMARY_COLOR,
+		AA_INPUT_DIRECTORY_PATH,
 
 		/**
-			The template secondary color setting
+			The output directory parameter
 		*/
-		AA_TEMPLATE_SECONDARY_COLOR,
-
-		/**
-			The design token file path setting
-		*/
-		AA_DESIGN_TOKEN_FILE_PATH
+		AA_OUTPUT_DIRECTORY_PATH
 	};
 
 	virtual void SetArguments(int argc, char**argv) = 0;
 	virtual bool IsHelpRequested() const = 0;
 	virtual QByteArray GetDesignTokenFilePath() const = 0;
-	virtual QByteArray GetTemplateIconColor() const = 0;
-	virtual QByteArray GetTemplatePrimaryColor() const = 0;
-	virtual QByteArray GetTemplateSecondaryColor() const = 0;
+	virtual QByteArray GetInputDirectoryPath() const = 0;
+	virtual QByteArray GetOutputDirectoryPath() const = 0;
 
 };
 

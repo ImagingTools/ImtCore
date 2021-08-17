@@ -92,20 +92,25 @@ void CDesignTokenProcessorComp::OnComponentCreated()
 
 			m_designTokenFileInfo = QFileInfo(designTokenFilePathParamPtr->GetPath());
 		}
-		this->Exec();
 	}
-	else{
+	else {
 		m_designTokenFileParserAttrPtr->SetFile(m_argumentParserAttrPtr->GetDesignTokenFilePath());
+		m_designTokenFileParserAttrPtr->ParseFile();
+		QStringList styles = m_designTokenFileParserAttrPtr->GetStyleNames();
 
-		using DesignTokenImageFileInfo = IDesignTokenFileParser::DesignTokenImageFileInfo;
+		for (const QString& styleName: ::qAsConst(styles)){
+			m_templateIconColor = m_designTokenFileParserAttrPtr->GetTemplateIconColor(styleName);
+			m_offNormalColor =  m_designTokenFileParserAttrPtr->GetOffNormalColor(styleName);
+			m_offDisabledColor =  m_designTokenFileParserAttrPtr->GetOffDisabledColor(styleName);
+			m_offActiveColor =  m_designTokenFileParserAttrPtr->GetOffActiveColor(styleName);
+			m_offSelectedColor =  m_designTokenFileParserAttrPtr->GetOffSelectedColor(styleName);
+			m_onNormalColor =  m_designTokenFileParserAttrPtr->GetOnNormalColor(styleName);
+			m_onDisabledColor =  m_designTokenFileParserAttrPtr->GetOnDisabledColor(styleName);
+			m_onActiveColor =  m_designTokenFileParserAttrPtr->GetOnActiveColor(styleName);
+			m_onSelectedColor =  m_designTokenFileParserAttrPtr->GetOnSelectedColor(styleName);
 
-		DesignTokenImageFileInfo imagesPath;
-		m_designTokenFileParserAttrPtr->ParseFile(&imagesPath);
-
-		QByteArray templateColor = m_argumentParserAttrPtr->GetTemplateIconColor();
-
-		for(DesignTokenImageFileInfo::const_iterator img = imagesPath.cbegin(); img != imagesPath.cend(); ++img){
-			this->SetColor(img->sourceFile, img->destinationPath, img->destinationColor);
+			QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + styleName.toLocal8Bit().constData();
+			this->SetColorAllFilesInDir(m_inputDirName, outputDirName);
 		}
 	}
 }
@@ -156,42 +161,29 @@ void CDesignTokenProcessorComp::SetColorForAllModeState(const QByteArray& fileNa
 		inputFileSuffix.prepend('.');
 	}
 
-	QByteArray normalColor = "#ff0000";
-	QByteArray offNormalColor = "#00ff00";
-	QByteArray offDisabledColor = "#0000ff";
-	QByteArray offActiveColor = "#ff00ff";
-	QByteArray offSelectedColor = "#ffff00";
-	QByteArray onNormalColor = "#00ffff";
-	QByteArray onDisabledColor = "#f0ffd0";
-	QByteArray onActiveColor = "#dedede";
-	QByteArray onSelectedColor = "#0f0f0f";
-
-	if (normalColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileInfo.fileName().toLocal8Bit()), normalColor);
+	if (m_offNormalColor.length()){
+		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffNormal + inputFileSuffix), m_offNormalColor);
 	}
-	if (offNormalColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffNormal + inputFileSuffix), offNormalColor);
+	if (m_offDisabledColor.length()){
+		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffDisabled + inputFileSuffix), m_offDisabledColor);
 	}
-	if (offDisabledColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffDisabled + inputFileSuffix), offDisabledColor);
+	if (m_offActiveColor.length()){
+		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffActive + inputFileSuffix), m_offActiveColor);
 	}
-	if (offActiveColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffActive + inputFileSuffix), offActiveColor);
+	if (m_offSelectedColor.length()){
+		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffSelected + inputFileSuffix), m_offSelectedColor);
 	}
-	if (offSelectedColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffSelected + inputFileSuffix), offSelectedColor);
+	if (m_onNormalColor.length()){
+		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnNormal + inputFileSuffix), m_onNormalColor);
 	}
-	if (onNormalColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnNormal + inputFileSuffix), onNormalColor);
+	if (m_onDisabledColor.length()){
+		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnDisabled + inputFileSuffix), m_onDisabledColor);
 	}
-	if (onDisabledColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnDisabled + inputFileSuffix), onDisabledColor);
+	if (m_onActiveColor.length()){
+		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnActive + inputFileSuffix), m_onActiveColor);
 	}
-	if (onActiveColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnActive + inputFileSuffix), onActiveColor);
-	}
-	if (onSelectedColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnSelected + inputFileSuffix), onSelectedColor);
+	if (m_onSelectedColor.length()){
+		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnSelected + inputFileSuffix), m_onSelectedColor);
 	}
 
 }

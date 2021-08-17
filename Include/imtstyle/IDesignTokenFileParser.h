@@ -32,6 +32,18 @@ public:
 	virtual bool ParseFile(DesignTokenImageFileInfo* parsedImages = nullptr) = 0;
 	virtual DesignTokenImageFileInfo GetFiles() const = 0;
 
+	virtual QStringList GetStyleNames() const = 0;
+	virtual QByteArray GetTemplateIconColor(const QString& styleName = QByteArray()) const = 0;
+	virtual QByteArray GetOffNormalColor(const QString& styleName = QByteArray()) const = 0;
+	virtual QByteArray GetOffDisabledColor(const QString& styleName = QByteArray()) const = 0;
+	virtual QByteArray GetOffActiveColor(const QString& styleName = QByteArray()) const  = 0;
+	virtual QByteArray GetOffSelectedColor(const QString& styleName = QByteArray()) const = 0;
+	virtual QByteArray GetOnNormalColor(const QString& styleName = QByteArray()) const = 0;
+	virtual QByteArray GetOnDisabledColor(const QString& styleName = QByteArray()) const = 0;
+	virtual QByteArray GetOnActiveColor(const QString& styleName = QByteArray()) const = 0;
+	virtual QByteArray GetOnSelectedColor(const QString& styleName = QByteArray()) const = 0;
+
+
 };
 
 

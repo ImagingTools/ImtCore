@@ -98,17 +98,15 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_commands.insert(AA_HELP, "-h");
 	m_commands.insert(AA_HELP, "/?");
 
-	//-----------------------------------------------colors
-	m_commands.insert(AA_TEMPLATE_ICON_COLOR, "--template-icon-color");
-	m_commands.insert(AA_TEMPLATE_ICON_COLOR, "-TIC");
-	m_commands.insert(AA_TEMPLATE_PRIMARY_COLOR, "--template-primary-color");
-	m_commands.insert(AA_TEMPLATE_PRIMARY_COLOR, "-TPC");
-	m_commands.insert(AA_TEMPLATE_SECONDARY_COLOR, "--template-secondary-color");
-	m_commands.insert(AA_TEMPLATE_SECONDARY_COLOR, "-TSC");
-
 	//----------------------------------------------- files & dirs
 	m_commands.insert(AA_DESIGN_TOKEN_FILE_PATH, "--file");
 	m_commands.insert(AA_DESIGN_TOKEN_FILE_PATH, "-F");
+
+	m_commands.insert(AA_INPUT_DIRECTORY_PATH, "--input-dir");
+	m_commands.insert(AA_INPUT_DIRECTORY_PATH, "-ID");
+
+	m_commands.insert(AA_OUTPUT_DIRECTORY_PATH, "--output-dir");
+	m_commands.insert(AA_OUTPUT_DIRECTORY_PATH, "-OD");
 
 	//-----------------------------------------------
 
@@ -128,26 +126,19 @@ QByteArray CDesignTokenArgumentsParserComp::GetDesignTokenFilePath() const
 }
 
 
-QByteArray CDesignTokenArgumentsParserComp::GetTemplateIconColor() const
+QByteArray imtstyle::CDesignTokenArgumentsParserComp::GetInputDirectoryPath() const
 {
-	return this->GetArgumentValue(AA_TEMPLATE_ICON_COLOR);
+	return this->GetArgumentValue(AA_INPUT_DIRECTORY_PATH);
 }
 
 
-QByteArray CDesignTokenArgumentsParserComp::GetTemplatePrimaryColor() const
+QByteArray imtstyle::CDesignTokenArgumentsParserComp::GetOutputDirectoryPath() const
 {
-	return this->GetArgumentValue(AA_TEMPLATE_PRIMARY_COLOR);
+	return this->GetArgumentValue(AA_OUTPUT_DIRECTORY_PATH);
 }
-
-
-QByteArray CDesignTokenArgumentsParserComp::GetTemplateSecondaryColor() const
-{
-	return this->GetArgumentValue(AA_TEMPLATE_SECONDARY_COLOR);
-}
-
-
 
 } // namespace imtstyle
+
 
 
 

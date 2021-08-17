@@ -22,7 +22,7 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDesignTokenArgumentsParserComp);
-		I_REGISTER_INTERFACE(IDesignTokenArgumentsParser);
+	I_REGISTER_INTERFACE(IDesignTokenArgumentsParser);
 	I_END_COMPONENT;
 
 	/// Checking arguments and returns containing value \c argument
@@ -41,9 +41,8 @@ public:
 	virtual void SetArguments(int argc, char** argv) override;
 	virtual bool IsHelpRequested() const override;
 	virtual QByteArray GetDesignTokenFilePath() const override;
-	virtual QByteArray GetTemplateIconColor() const override;
-	virtual QByteArray GetTemplatePrimaryColor() const override;
-	virtual QByteArray GetTemplateSecondaryColor() const override;
+	virtual QByteArray GetInputDirectoryPath() const override;
+	virtual QByteArray GetOutputDirectoryPath() const override;
 
 
 private:

@@ -52,6 +52,15 @@ private:
 
 
 	QByteArray m_templateIconColor;
+	QByteArray m_offNormalColor;
+	QByteArray m_offDisabledColor;
+	QByteArray m_offActiveColor;
+	QByteArray m_offSelectedColor;
+	QByteArray m_onNormalColor;
+	QByteArray m_onDisabledColor;
+	QByteArray m_onActiveColor;
+	QByteArray m_onSelectedColor;
+
 	QByteArray m_templatePrimaryColor;
 	QByteArray m_templateSecondaryColor;
 	QByteArray m_inputDirName;

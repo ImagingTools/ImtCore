@@ -64,6 +64,55 @@ CDesignTokenFileParserComp::DesignTokenImageFileInfo CDesignTokenFileParserComp:
 	return m_parsedImagesInfo;
 }
 
+QStringList imtstyle::CDesignTokenFileParserComp::GetStyleNames() const
+{
+	return m_stylesColors.keys();
+}
+
+QByteArray imtstyle::CDesignTokenFileParserComp::GetTemplateIconColor(const QString& styleName) const
+{
+}
+
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOffNormalColor(const QString& styleName) const
+{
+	return m_stylesColors[styleName].toMap()[s_offNormalColorParamName].toByteArray();
+}
+
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOffDisabledColor(const QString& styleName) const
+{
+	return m_stylesColors[styleName].toMap()[s_offDisabledColorParamName].toByteArray();
+}
+
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOffActiveColor(const QString& styleName) const
+{
+	return m_stylesColors[styleName].toMap()[s_offActiveColorParamName].toByteArray();
+}
+
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOffSelectedColor(const QString& styleName) const
+{
+	return m_stylesColors[styleName].toMap()[s_offSelectedColorParamName].toByteArray();
+}
+
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOnNormalColor(const QString& styleName) const
+{
+	return m_stylesColors[styleName].toMap()[s_onNormalColorParamName].toByteArray();
+}
+
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOnDisabledColor(const QString& styleName) const
+{
+	return m_stylesColors[styleName].toMap()[s_onDisabledColorParamName].toByteArray();
+}
+
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOnActiveColor(const QString& styleName) const
+{
+	return m_stylesColors[styleName].toMap()[s_onActiveColorParamName].toByteArray();
+}
+
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOnSelectedColor(const QString& styleName) const
+{
+	return m_stylesColors[styleName].toMap()[s_onSelectedColorParamName].toByteArray();
+}
+
 
 // reimplemented (ilog::CLoggerComponentBase)
 void CDesignTokenFileParserComp::OnComponentCreated()
@@ -74,5 +123,7 @@ void CDesignTokenFileParserComp::OnComponentCreated()
 
 
 } // namespace imtstyle
+
+
 
 
