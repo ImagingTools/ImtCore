@@ -26,7 +26,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IDesignTokenFileParser)
-	virtual bool ParseFile();
+	virtual bool ParseFile(DesignTokenImageFileInfo* parsedImages = nullptr) override;
 	virtual bool SetFile(const QByteArray& filePath) override;
 	virtual DesignTokenImageFileInfo GetFiles() const override;
 

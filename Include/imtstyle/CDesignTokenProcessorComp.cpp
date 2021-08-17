@@ -48,57 +48,66 @@ void CDesignTokenProcessorComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if(!m_paramSetAttrPtr.IsValid()){
-		qCritical() << "paramSet invalid";
-		return;
+	if (m_paramSetAttrPtr.IsValid()){
+		{
+			QByteArray paramId = "HelpParam";
+
+			iprm::IEnableableParam* templateIconColorParamPtr = dynamic_cast<iprm::IEnableableParam*>(m_paramSetAttrPtr->GetEditableParameter(paramId));
+
+			if (templateIconColorParamPtr->IsEnabled()) {
+				this->ShowHelp();
+				::exit(0);
+			}
+		}
+		{
+			QByteArray paramId = "TemplateIconColor";
+
+			iprm::IIdParam* templateIconColorParamPtr = dynamic_cast<iprm::IIdParam*>(m_paramSetAttrPtr->GetEditableParameter(paramId));
+			Q_ASSERT(templateIconColorParamPtr != nullptr);
+
+			m_templateIconColor = templateIconColorParamPtr->GetId();
+		}
+
+		{
+			QByteArray paramId = "TemplatePrimaryColor";
+
+			iprm::IIdParam* templateIconColorParamPtr = dynamic_cast<iprm::IIdParam*>(m_paramSetAttrPtr->GetEditableParameter(paramId));
+			Q_ASSERT(templateIconColorParamPtr != nullptr);
+
+			m_templateIconColor = templateIconColorParamPtr->GetId();
+		}
+		{
+			QByteArray paramId = "TemplateSecondaryColor";
+
+			iprm::IIdParam* templateIconColorParamPtr = dynamic_cast<iprm::IIdParam*>(m_paramSetAttrPtr->GetEditableParameter(paramId));
+			Q_ASSERT(templateIconColorParamPtr != nullptr);
+
+			m_templateIconColor = templateIconColorParamPtr->GetId();
+		}
+		{
+			QByteArray paramId = "DesignTokenFilePath";
+
+			ifile::IFileNameParam* designTokenFilePathParamPtr = dynamic_cast<ifile::IFileNameParam*>(m_paramSetAttrPtr->GetEditableParameter(paramId));
+			Q_ASSERT(designTokenFilePathParamPtr != nullptr);
+
+			m_designTokenFileInfo = QFileInfo(designTokenFilePathParamPtr->GetPath());
+		}
+		this->Exec();
 	}
+	else{
+		m_designTokenFileParserAttrPtr->SetFile(m_argumentParserAttrPtr->GetDesignTokenFilePath());
 
-	{
-		QByteArray paramId = "HelpParam";
+		using DesignTokenImageFileInfo = IDesignTokenFileParser::DesignTokenImageFileInfo;
 
-		iprm::IEnableableParam* templateIconColorParamPtr = dynamic_cast<iprm::IEnableableParam*>(m_paramSetAttrPtr->GetEditableParameter(paramId));
+		DesignTokenImageFileInfo imagesPath;
+		m_designTokenFileParserAttrPtr->ParseFile(&imagesPath);
 
-		if (templateIconColorParamPtr->IsEnabled()) {
-			this->ShowHelp();
-			::exit(0);
+		QByteArray templateColor = m_argumentParserAttrPtr->GetTemplateIconColor();
+
+		for(DesignTokenImageFileInfo::const_iterator img = imagesPath.cbegin(); img != imagesPath.cend(); ++img){
+			this->SetColor(img->sourceFile, img->destinationPath, img->destinationColor);
 		}
 	}
-	{
-		QByteArray paramId = "TemplateIconColor";
-
-		iprm::IIdParam* templateIconColorParamPtr = dynamic_cast<iprm::IIdParam*>(m_paramSetAttrPtr->GetEditableParameter(paramId));
-		Q_ASSERT(templateIconColorParamPtr != nullptr);
-
-		m_templateIconColor = templateIconColorParamPtr->GetId();
-	}
-
-	{
-		QByteArray paramId = "TemplatePrimaryColor";
-
-		iprm::IIdParam* templateIconColorParamPtr = dynamic_cast<iprm::IIdParam*>(m_paramSetAttrPtr->GetEditableParameter(paramId));
-		Q_ASSERT(templateIconColorParamPtr != nullptr);
-
-		m_templateIconColor = templateIconColorParamPtr->GetId();
-	}
-	{
-		QByteArray paramId = "TemplateSecondaryColor";
-
-		iprm::IIdParam* templateIconColorParamPtr = dynamic_cast<iprm::IIdParam*>(m_paramSetAttrPtr->GetEditableParameter(paramId));
-		Q_ASSERT(templateIconColorParamPtr != nullptr);
-
-		m_templateIconColor = templateIconColorParamPtr->GetId();
-	}
-	{
-		QByteArray paramId = "DesignTokenFilePath";
-
-		ifile::IFileNameParam* designTokenFilePathParamPtr = dynamic_cast<ifile::IFileNameParam*>(m_paramSetAttrPtr->GetEditableParameter(paramId));
-		Q_ASSERT(designTokenFilePathParamPtr != nullptr);
-
-		m_designTokenFileInfo = QFileInfo(designTokenFilePathParamPtr->GetPath());
-	}
-
-
-	this->Exec();
 }
 
 int CDesignTokenProcessorComp::ShowHelp() const
@@ -109,7 +118,7 @@ int CDesignTokenProcessorComp::ShowHelp() const
 }
 
 
-void CDesignTokenProcessorComp::SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor) const
+void CDesignTokenProcessorComp::SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor) const
 {
 	QByteArray fileData;
 
@@ -119,7 +128,7 @@ void CDesignTokenProcessorComp::SetColor(const QByteArray& fileName, const QByte
 	originalImageFile.close();
 	Q_ASSERT(fileData.length());
 
-	fileData.replace(m_templateIconColor, replacedColor);
+	fileData.replace((reolacebleColor.length() ? reolacebleColor : m_templateIconColor), replacedColor);
 
 	QFile outputImageFile(outputFileName);
 	Q_ASSERT(outputImageFile.open(QFile::WriteOnly));

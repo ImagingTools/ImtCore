@@ -22,7 +22,7 @@ bool CDesignTokenFileParserComp::CDesignTokenFileParserComp::SetFile(const QByte
 }
 
 
-bool CDesignTokenFileParserComp::ParseFile()
+bool CDesignTokenFileParserComp::ParseFile(DesignTokenImageFileInfo* parsedImages)
 {
 	QFile designTokenFile;
 
@@ -52,6 +52,9 @@ bool CDesignTokenFileParserComp::ParseFile()
 		return false;
 	}
 
+	if (parsedImages){
+		*parsedImages = m_parsedImagesInfo;
+	}
 	return false;
 }
 
