@@ -57,7 +57,7 @@ bool CStandardCollectionViewDelegateComp::OpenDocumentEditor(
 		if (modelPtr != nullptr){
 			if (m_editDialogCompPtr.IsValid() && m_editDialogObserverCompPtr.IsValid()){
 				if (modelPtr->AttachObserver(m_editDialogObserverCompPtr.GetPtr())){
-					m_editDialogCompPtr->ExecuteDialog(nullptr);
+					m_editDialogCompPtr->ExecuteDialog(m_parentGuiPtr);
 
 					modelPtr->DetachObserver(m_editDialogObserverCompPtr.GetPtr());
 

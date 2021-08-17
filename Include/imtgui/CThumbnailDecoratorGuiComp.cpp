@@ -1358,6 +1358,10 @@ void CThumbnailDecoratorGuiComp::LoginObserver::OnModelChanged(int /*modelId*/, 
 		m_parent.ProcessLogout();
 
 		m_parent.UserNameLabel->setVisible(false);
+
+		if (m_parent.m_accountMenuCompPtr.IsValid() && m_parent.m_accountMenuCompPtr->IsGuiCreated()){
+			m_parent.m_accountMenuCompPtr->GetWidget()->hide();
+		}
 	}
 	else{
 		int autoLogoutSeconds = m_parent.GetAutoLogoutTime();

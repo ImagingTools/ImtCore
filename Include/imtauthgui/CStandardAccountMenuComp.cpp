@@ -34,7 +34,7 @@ bool CStandardAccountMenuComp::eventFilter(QObject* watched, QEvent* event)
 			}
 			
 			if (m_preferencesDialogCompPtr.IsValid()){
-				m_preferencesDialogCompPtr->ExecuteDialog(nullptr);
+				m_preferencesDialogCompPtr->ExecuteDialog(this);
 			}
 		}
 	}
