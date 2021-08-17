@@ -16,9 +16,14 @@ namespace imtstyle
 {
 
 
-class CDesignTokenArgumentsParser: IDesignTokenArgumentsParser
+class CDesignTokenArgumentsParserComp: public ilog::CLoggerComponentBase, public IDesignTokenArgumentsParser
 {
 public:
+	typedef ilog::CLoggerComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CDesignTokenArgumentsParserComp);
+		I_REGISTER_INTERFACE(IDesignTokenArgumentsParser);
+	I_END_COMPONENT;
 
 	/// Checking arguments and returns containing value \c argument
 	bool CheckArgument(AvailableArguments argument) const;
@@ -39,8 +44,6 @@ public:
 	virtual QByteArray GetTemplateIconColor() const override;
 	virtual QByteArray GetTemplatePrimaryColor() const override;
 	virtual QByteArray GetTemplateSecondaryColor() const override;
-
-private:
 
 
 private:

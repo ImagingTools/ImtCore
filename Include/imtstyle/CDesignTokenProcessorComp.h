@@ -9,21 +9,27 @@
 #include <iprm/IParamsSet.h>
 
 // ImtCore includes
+#include <imtstyle/IDesignTokenProcessor.h>
+#include <imtstyle/IDesignTokenArgumentsParser.h>
+#include <imtstyle/IDesignTokenFileParser.h>
 
 
 namespace imtstyle
 {
 
-class CDesignTokenProcessorComp: public ilog::CLoggerComponentBase
+class CDesignTokenProcessorComp: public ilog::CLoggerComponentBase, public IDesignTokenProcessor
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDesignTokenProcessorComp);
-	I_ASSIGN(m_paramSetAttrPtr, "ParamSet", "Param set", true, "IParamsSet")
+		I_REGISTER_INTERFACE(IDesignTokenFileParser);
+		I_ASSIGN(m_argumentParserAttrPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
+		I_ASSIGN(m_designTokenFileParserAttrPtr, "DesignTokenFileParser", "Design token file parser", true, "IDesignTokenFileParser")
+		I_ASSIGN(m_paramSetAttrPtr, "ParamSet", "Param set", false, "IParamsSet")
 	I_END_COMPONENT;
 
-	int Exec();
+	int Exec() override;
 
 
 protected:
@@ -40,6 +46,8 @@ private:
 	constexpr static const char* s_suffixOnActive = "_On_Active";
 	constexpr static const char* s_suffixOnSelected = "_On_Selected";
 
+	I_REF(IDesignTokenArgumentsParser, m_argumentParserAttrPtr);
+	I_REF(IDesignTokenFileParser, m_designTokenFileParserAttrPtr);
 	I_REF(iprm::IParamsSet, m_paramSetAttrPtr);
 
 
@@ -68,3 +76,4 @@ private:
 
 
 } // namespace imtstyle
+

@@ -10,23 +10,26 @@
 #include <iprm/IParamsSet.h>
 
 // ImtCore includes
-
+#include <imtstyle/IDesignTokenFileParser.h>
 
 namespace imtstyle
 {
 
-class CDesignTokenFileParserComp: public ilog::CLoggerComponentBase
+class CDesignTokenFileParserComp: public ilog::CLoggerComponentBase, public IDesignTokenFileParser
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDesignTokenFileParserComp);
-		I_ASSIGN(m_designTokenFilePathAttrPtr, "designTokenFilePath", "Design token file path", false, "IFileNameParam")
+		I_REGISTER_INTERFACE(IDesignTokenFileParser);
+		I_ASSIGN(m_designTokenFilePathAttrPtr, "DesignTokenFilePath", "Design token default file path", false, "IFileNameParam");
 	I_END_COMPONENT;
 
-	// public methods
-	bool SetDesignTokenFilePath(const QByteArray& designTokenFilePath);
-	bool ParseFile();
+	// reimplemented (IDesignTokenFileParser)
+	virtual bool ParseFile();
+	virtual bool SetFile(const QByteArray& filePath) override;
+	virtual DesignTokenImageFileInfo GetFiles() const override;
+
 
 
 protected:
@@ -40,6 +43,7 @@ private:
 private:
 	I_REF(ifile::IFileNameParam, m_designTokenFilePathAttrPtr);
 
+	CDesignTokenFileParserComp::DesignTokenImageFileInfo m_parsedImagesInfo;
 	QFileInfo m_designTokenFileInfo;
 
 };

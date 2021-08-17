@@ -17,7 +17,7 @@ namespace imtstyle
 class IDesignTokenProcessor
 {
 public:
-	virtual int Exec();
+	virtual int Exec() = 0;
 
 };
 

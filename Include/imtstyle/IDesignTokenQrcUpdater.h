@@ -13,7 +13,7 @@ namespace imtstyle
 {
 
 
-class CDesignTokenArgumentsParser
+class IDesignTokenQrcUpdater
 {
 public:
 

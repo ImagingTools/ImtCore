@@ -27,9 +27,9 @@ public:
 		Contains info about each file that should be preceed. The key of this map is a source file path. The value(s) of this map is info(s)? where should be placed converted files with same color
 	*/
 	typedef QMultiMap<QByteArray, DesignTokenImageTargetState> DesignTokenImageFileInfo;
-	bool SetFile(const QByteArray& filePath);
-	bool ParseFile();
-	DesignTokenImageFileInfo GetFiles() const;
+	virtual bool SetFile(const QByteArray& filePath) = 0;
+	virtual bool ParseFile() = 0;
+	virtual DesignTokenImageFileInfo GetFiles() const = 0;
 
 };
 

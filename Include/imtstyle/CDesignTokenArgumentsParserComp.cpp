@@ -1,4 +1,4 @@
-#include <imtstyle/CDesignTokenArgumentsParser.h>
+#include <imtstyle/CDesignTokenArgumentsParserComp.h>
 
 
 
@@ -6,7 +6,7 @@ namespace imtstyle
 {
 
 
-bool CDesignTokenArgumentsParser::CheckArgument(AvailableArguments argument) const
+bool CDesignTokenArgumentsParserComp::CheckArgument(AvailableArguments argument) const
 {
 	bool retval = false;
 
@@ -23,7 +23,7 @@ bool CDesignTokenArgumentsParser::CheckArgument(AvailableArguments argument) con
 }
 
 
-QByteArray CDesignTokenArgumentsParser::GetArgumentKey(AvailableArguments argument) const
+QByteArray CDesignTokenArgumentsParserComp::GetArgumentKey(AvailableArguments argument) const
 {
 	QByteArray retval;
 
@@ -47,7 +47,7 @@ QByteArray CDesignTokenArgumentsParser::GetArgumentKey(AvailableArguments argume
 }
 
 
-QByteArray CDesignTokenArgumentsParser::GetArgumentValue(AvailableArguments argument) const
+QByteArray CDesignTokenArgumentsParserComp::GetArgumentValue(AvailableArguments argument) const
 {
 	QByteArray retval;
 	QByteArray AC_key = this->GetArgumentKey(argument);
@@ -61,7 +61,7 @@ QByteArray CDesignTokenArgumentsParser::GetArgumentValue(AvailableArguments argu
 }
 
 
-QByteArrayList CDesignTokenArgumentsParser::GetArgumentValueMulti(AvailableArguments argument) const
+QByteArrayList CDesignTokenArgumentsParserComp::GetArgumentValueMulti(AvailableArguments argument) const
 {
 	QByteArrayList retval;
 	QByteArrayList args = m_commands.values(argument);
@@ -91,7 +91,7 @@ QByteArrayList CDesignTokenArgumentsParser::GetArgumentValueMulti(AvailableArgum
 
 // reimplemented (IDesignTokenArgumentsParser)
 
-void CDesignTokenArgumentsParser::SetArguments(int argc, char** argv)
+void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 {
 	//=====================================================================================Commands init
 	m_commands.insert(AA_HELP, "--help");
@@ -116,31 +116,31 @@ void CDesignTokenArgumentsParser::SetArguments(int argc, char** argv)
 }
 
 
-bool CDesignTokenArgumentsParser::IsHelpRequested() const
+bool CDesignTokenArgumentsParserComp::IsHelpRequested() const
 {
 	return this->CheckArgument(AA_HELP);
 }
 
 
-QByteArray CDesignTokenArgumentsParser::GetDesignTokenFilePath() const
+QByteArray CDesignTokenArgumentsParserComp::GetDesignTokenFilePath() const
 {
 	return this->GetArgumentValue(AA_DESIGN_TOKEN_FILE_PATH);
 }
 
 
-QByteArray CDesignTokenArgumentsParser::GetTemplateIconColor() const
+QByteArray CDesignTokenArgumentsParserComp::GetTemplateIconColor() const
 {
 	return this->GetArgumentValue(AA_TEMPLATE_ICON_COLOR);
 }
 
 
-QByteArray CDesignTokenArgumentsParser::GetTemplatePrimaryColor() const
+QByteArray CDesignTokenArgumentsParserComp::GetTemplatePrimaryColor() const
 {
 	return this->GetArgumentValue(AA_TEMPLATE_PRIMARY_COLOR);
 }
 
 
-QByteArray CDesignTokenArgumentsParser::GetTemplateSecondaryColor() const
+QByteArray CDesignTokenArgumentsParserComp::GetTemplateSecondaryColor() const
 {
 	return this->GetArgumentValue(AA_TEMPLATE_SECONDARY_COLOR);
 }

@@ -1,5 +1,4 @@
 #include <imtstyle/CDesignTokenProcessorComp.h>
-#include <imtstyle/CDesignTokenArgumentsParser.h>
 
 // Acf includes
 #include <iprm/IParamsSet.h>
@@ -48,6 +47,11 @@ int CDesignTokenProcessorComp::Exec()
 void CDesignTokenProcessorComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	if(!m_paramSetAttrPtr.IsValid()){
+		qCritical() << "paramSet invalid";
+		return;
+	}
 
 	{
 		QByteArray paramId = "HelpParam";

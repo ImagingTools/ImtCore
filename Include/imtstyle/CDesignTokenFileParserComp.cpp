@@ -5,13 +5,12 @@ namespace imtstyle
 {
 
 
-
-// public methods
-bool CDesignTokenFileParserComp::SetDesignTokenFilePath(const QByteArray& designTokenFilePath)
+// reimplemented (IDesignTokenFileParser)
+bool CDesignTokenFileParserComp::CDesignTokenFileParserComp::SetFile(const QByteArray& filePath)
 {
 	bool retval = false;
 
-	QFileInfo designTokenFileInfo(designTokenFilePath);
+	QFileInfo designTokenFileInfo(filePath);
 
 	retval = designTokenFileInfo.isReadable();
 
@@ -53,9 +52,15 @@ bool CDesignTokenFileParserComp::ParseFile()
 		return false;
 	}
 
-
-	return true;
+	return false;
 }
+
+
+CDesignTokenFileParserComp::DesignTokenImageFileInfo CDesignTokenFileParserComp::CDesignTokenFileParserComp::GetFiles() const
+{
+	return m_parsedImagesInfo;
+}
+
 
 // reimplemented (ilog::CLoggerComponentBase)
 void CDesignTokenFileParserComp::OnComponentCreated()
@@ -63,11 +68,6 @@ void CDesignTokenFileParserComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 }
-
-
-
-
-
 
 
 } // namespace imtstyle
