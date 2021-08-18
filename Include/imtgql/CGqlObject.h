@@ -26,6 +26,7 @@ public:
 	void InsertFieldArgument(const QByteArray& fieldId, const QVariant& value);
 	void InsertFieldObject(CGqlObject *objectPtr);
 	bool IsObject(const QByteArray& fieldId) const;
+	CGqlObject* GetParentObject() const;
 
 protected:
 	struct Field
@@ -38,6 +39,7 @@ protected:
 	typedef QMap<QByteArray, Field> Fields;
 	Fields m_fieldsMap;
 	QByteArray m_objectId;
+	CGqlObject* m_parentPtr;
 };
 
 

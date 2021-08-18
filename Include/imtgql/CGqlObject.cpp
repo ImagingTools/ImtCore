@@ -8,7 +8,7 @@ namespace imtgql
 // public methods
 
 imtgql::CGqlObject::CGqlObject(const QByteArray& objectId)
-	:m_objectId(objectId)
+	:m_objectId(objectId), m_parentPtr(nullptr)
 {
 }
 
@@ -90,6 +90,7 @@ void CGqlObject::InsertFieldObject(CGqlObject *objectPtr)
 			newField.objectPtr.SetPtr(objectPtr);
 
 			m_fieldsMap[fieldId] = newField;
+			objectPtr->m_parentPtr = this;
 		}
 		else{
 			Q_ASSERT(false);
@@ -107,6 +108,12 @@ bool CGqlObject::IsObject(const QByteArray &fieldId) const
 		}
 	}
 	return retVal;
+}
+
+
+CGqlObject *CGqlObject::GetParentObject() const
+{
+	return m_parentPtr;
 }
 
 
