@@ -64,7 +64,7 @@ bool CDesignTokenFileParserComp::ParseFile(DesignTokenImageFileInfo* parsedImage
 			continue;
 		}
 
-		QJsonObject colorsObject = styleEntry["Color"].toObject();
+		QJsonObject colorsObject = styleEntry["IconColor"].toObject();
 		if(colorsObject.isEmpty()){
 			qInfo() << "Skipping empty object";
 			continue;
