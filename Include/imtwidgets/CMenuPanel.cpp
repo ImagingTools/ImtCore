@@ -23,6 +23,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_maxWidth(0),
 	m_minWidth(0),
 	m_indent(0),
+	m_verticalPadding(0),
 	m_animationAction(AA_NONE),
 	m_animationTimerIdentifier(0),
 	m_animationDelay(0),
@@ -238,6 +239,7 @@ bool CMenuPanel::InsertPage(const QByteArray& pageId, const QByteArray& parentPa
 {
 	QTreeView* activeTreePtr = insertToBottom ? BottomPageTree : PageTree;
 	QStandardItemModel& activeModelPtr = insertToBottom ? m_bottomModel : m_model;
+
 
 	if (activeTreePtr == BottomPageTree){
 		activeTreePtr->setVisible(true);
@@ -458,6 +460,7 @@ void CMenuPanel::SetFontSizeRatio(double ratio)
 
 void CMenuPanel::SetItemVerticalPadding(int padding)
 {
+	m_verticalPadding = padding;
 	if (m_delegatePtr != nullptr){
 		m_delegatePtr->SetTopPadding(padding);
 	}
@@ -1065,6 +1068,16 @@ void CMenuPanel::AfterSizesChanged()
 	if (PageTree->currentIndex().isValid()){
 		m_animationAction = AA_EXPAND;
 	}
+
+	if (m_delegatePtr != nullptr && BottomPageTree->model()->rowCount() > 0){
+		QStyleOptionViewItem options;
+		QSize size = m_delegatePtr->sizeHint(options, QModelIndex());
+		if (size.height() > 0){
+			int bottomPageHeight = size.height() * BottomPageTree->model()->rowCount() + m_verticalPadding + 10;
+			BottomPageTree->setMaximumHeight(bottomPageHeight);
+		}
+	}
+
 	StartAnimation();
 }
 

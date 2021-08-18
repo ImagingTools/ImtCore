@@ -125,6 +125,7 @@ private:
 	int m_minWidth;
 	int m_maxWidth;
 	int m_indent;
+	int m_verticalPadding;
 
 	AnimationAction m_animationAction;
 	int m_animationTimerIdentifier;
