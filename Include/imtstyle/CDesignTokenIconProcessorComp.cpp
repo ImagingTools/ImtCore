@@ -1,4 +1,4 @@
-#include <imtstyle/CDesignTokenProcessorComp.h>
+#include <imtstyle/CDesignTokenIconProcessorComp.h>
 
 // Acf includes
 #include <iprm/IParamsSet.h>
@@ -7,57 +7,32 @@
 #include <ibase/IApplication.h>
 #include <ifile/IFileNameParam.h>
 
+// ImtCore includes
+#include <imtbase/ICollectionInfo.h>
+
 
 
 namespace imtstyle
 {
 
-int CDesignTokenProcessorComp::Exec()
+
+QByteArray CDesignTokenIconProcessorComp::GetHelpString() const
 {
-	if(!m_templateIconColor.length()){
-		qCritical() << "Replaceable color set not";
-		return this->ShowHelp();
-	}
-
-	if(!m_inputFileName.length() ){
-		qCritical() << "Input file set not";
-		return this->ShowHelp();
-	}
-	if(!m_outputDirName.length()){
-		qCritical() << "Output dir set not";
-		return this->ShowHelp();
-	}
-
-	if(m_inputFileName.length() && m_inputDirName.length()){
-		this->SetColorForAllModeState(m_inputFileName, m_outputDirName);
-		return 0;
-	}
-	else if(m_inputDirName.length() && m_outputDirName.length()){
-		this->SetColorAllFilesInDir(m_inputDirName, m_outputDirName);
-		return 0;
-	}
-	else {
-		qCritical() << "Unexpected error";
-		return this->ShowHelp();
-	}
-	return -1;
+	QByteArray retval;
+	QString helpText = "Invalid arguments \n \t\tAnd other help text\n\n";
+	retval = helpText.toLocal8Bit().constData();
+	return retval;
 }
 
 
-void CDesignTokenProcessorComp::OnComponentCreated()
+int CDesignTokenIconProcessorComp::Exec()
 {
-	BaseClass::OnComponentCreated();
 
 	if (m_paramSetAttrPtr.IsValid()){
 		{
 			QByteArray paramId = "HelpParam";
 
 			iprm::IEnableableParam* templateIconColorParamPtr = dynamic_cast<iprm::IEnableableParam*>(m_paramSetAttrPtr->GetEditableParameter(paramId));
-
-			if (templateIconColorParamPtr->IsEnabled()) {
-				this->ShowHelp();
-				::exit(0);
-			}
 		}
 		{
 			QByteArray paramId = "TemplateIconColor";
@@ -92,15 +67,43 @@ void CDesignTokenProcessorComp::OnComponentCreated()
 
 			m_designTokenFileInfo = QFileInfo(designTokenFilePathParamPtr->GetPath());
 		}
+		if(!m_templateIconColor.length()){
+			qCritical() << "Replaceable color set not";
+			return -1;
+		}
+
+		if(!m_inputFileName.length() ){
+			qCritical() << "Input file set not";
+			return -1;
+		}
+		if(!m_outputDirName.length()){
+			qCritical() << "Output dir set not";
+			return -1;
+		}
+
+		if(m_inputFileName.length() && m_inputDirName.length()){
+			this->SetColorForAllModeState(m_inputFileName, m_outputDirName);
+			return 0;
+		}
+		else if(m_inputDirName.length() && m_outputDirName.length()){
+			this->SetColorAllFilesInDir(m_inputDirName, m_outputDirName);
+			return 0;
+		}
+		else {
+			qCritical() << "Unexpected error";
+			return -1;
+		}
+		return -1;
 	}
 	else {
 		m_designTokenFileParserAttrPtr->SetFile(m_argumentParserAttrPtr->GetDesignTokenFilePath());
 		m_designTokenFileParserAttrPtr->ParseFile();
-		QStringList styles = m_designTokenFileParserAttrPtr->GetStyleNames();
+
+		QVector<QByteArray> styles = m_designTokenFileParserAttrPtr->GetDesignSchemaList().GetElementIds();
 		m_outputDirName = m_argumentParserAttrPtr->GetOutputDirectoryPath();
 		m_inputDirName = m_argumentParserAttrPtr->GetInputDirectoryPath();
 
-		for (const QString& styleName: ::qAsConst(styles)){
+		for (const QByteArray& styleName: ::qAsConst(styles)){
 			m_templateIconColor = m_designTokenFileParserAttrPtr->GetTemplateIconColor(styleName);
 			m_offNormalColor =  m_designTokenFileParserAttrPtr->GetOffNormalColor(styleName);
 			m_offDisabledColor =  m_designTokenFileParserAttrPtr->GetOffDisabledColor(styleName);
@@ -111,22 +114,15 @@ void CDesignTokenProcessorComp::OnComponentCreated()
 			m_onActiveColor =  m_designTokenFileParserAttrPtr->GetOnActiveColor(styleName);
 			m_onSelectedColor =  m_designTokenFileParserAttrPtr->GetOnSelectedColor(styleName);
 
-			QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + styleName.toLocal8Bit().constData();
+			QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + styleName.constData();
 			this->SetColorAllFilesInDir(m_inputDirName, outputDirName);
 		}
-		::exit(0);
 	}
-}
-
-int CDesignTokenProcessorComp::ShowHelp() const
-{
-	QString helpText = "Invalid arguments \n \t\tAnd other help text\n\n";
-	qCritical() << helpText.toLocal8Bit().constData();
-	return -1;
+	return 0;
 }
 
 
-void CDesignTokenProcessorComp::SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor) const
+void CDesignTokenIconProcessorComp::SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor) const
 {
 	QByteArray fileData;
 
@@ -145,7 +141,7 @@ void CDesignTokenProcessorComp::SetColor(const QByteArray& fileName, const QByte
 	outputImageFile.close();
 }
 
-void CDesignTokenProcessorComp::SetColorForAllModeState(const QByteArray& fileName, const QByteArray& outputDirName) const
+void CDesignTokenIconProcessorComp::SetColorForAllModeState(const QByteArray& fileName, const QByteArray& outputDirName) const
 {
 	QDir outputDir(outputDirName);
 	if(!outputDir.exists()){
@@ -192,7 +188,7 @@ void CDesignTokenProcessorComp::SetColorForAllModeState(const QByteArray& fileNa
 }
 
 
-void CDesignTokenProcessorComp::SetColorAllFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName) const
+void CDesignTokenIconProcessorComp::SetColorAllFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName) const
 {
 	QDir outputDir(outputDirName);
 	if(!outputDir.exists()){
@@ -212,7 +208,7 @@ void CDesignTokenProcessorComp::SetColorAllFilesInDir(const QByteArray& inputDir
 	}
 }
 
-bool CDesignTokenProcessorComp::IgnoreFile(const QFileInfo& fileInfo) const
+bool CDesignTokenIconProcessorComp::IgnoreFile(const QFileInfo& fileInfo) const
 {
 	bool retval = false;
 
@@ -231,7 +227,6 @@ bool CDesignTokenProcessorComp::IgnoreFile(const QFileInfo& fileInfo) const
 
 	return retval;
 }
-
 
 
 } // namespace imtstyle

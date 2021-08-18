@@ -1,4 +1,5 @@
 #include <imtstyle/CDesignTokenFileParserComp.h>
+#include <QPalette>
 
 
 namespace imtstyle
@@ -22,7 +23,7 @@ bool CDesignTokenFileParserComp::CDesignTokenFileParserComp::SetFile(const QByte
 }
 
 
-bool CDesignTokenFileParserComp::ParseFile(DesignTokenImageFileInfo* parsedImages)
+bool CDesignTokenFileParserComp::ParseFile()
 {
 	QFile designTokenFile;
 
@@ -71,79 +72,77 @@ bool CDesignTokenFileParserComp::ParseFile(DesignTokenImageFileInfo* parsedImage
 		}
 
 		QVariantMap colorsMap = colorsObject.toVariantMap();
-		m_stylesColors.insert(styleName, colorsMap);
+		m_iconColors.insert(styleName, colorsMap);
+		m_designSchemaList.InsertItem(styleName.toUtf8(), styleName,"");
 	}
-
-	if (parsedImages){
-		*parsedImages = m_parsedImagesInfo;
-	}
-	return false;
+	return true;
 }
 
 
-CDesignTokenFileParserComp::DesignTokenImageFileInfo CDesignTokenFileParserComp::CDesignTokenFileParserComp::GetFiles() const
+const imtbase::ICollectionInfo& CDesignTokenFileParserComp::GetDesignSchemaList() const
 {
-	return m_parsedImagesInfo;
+	return m_designSchemaList;
 }
 
 
-QStringList imtstyle::CDesignTokenFileParserComp::GetStyleNames() const
+bool CDesignTokenFileParserComp::GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const
 {
-	return m_stylesColors.keys();
+	palette = m_stylesPalettes[designSchemaId].value<QPalette>();
+	return true;
 }
 
 
-QByteArray imtstyle::CDesignTokenFileParserComp::GetTemplateIconColor(const QString&) const
+QByteArray imtstyle::CDesignTokenFileParserComp::GetTemplateIconColor(const QByteArray&) const
 {
 	return m_templateIconColor;
 }
 
 
-QByteArray imtstyle::CDesignTokenFileParserComp::GetOffNormalColor(const QString& styleName) const
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOffNormalColor(const QByteArray& styleName) const
 {
-	return m_stylesColors[styleName].toMap()[s_offNormalColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[s_offNormalColorParamName].toByteArray();
 }
 
 
-QByteArray imtstyle::CDesignTokenFileParserComp::GetOffDisabledColor(const QString& styleName) const
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOffDisabledColor(const QByteArray& styleName) const
 {
-	return m_stylesColors[styleName].toMap()[s_offDisabledColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[s_offDisabledColorParamName].toByteArray();
 }
 
 
-QByteArray imtstyle::CDesignTokenFileParserComp::GetOffActiveColor(const QString& styleName) const
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOffActiveColor(const QByteArray& styleName) const
 {
-	return m_stylesColors[styleName].toMap()[s_offActiveColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[s_offActiveColorParamName].toByteArray();
 }
 
 
-QByteArray imtstyle::CDesignTokenFileParserComp::GetOffSelectedColor(const QString& styleName) const
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOffSelectedColor(const QByteArray& styleName) const
 {
-	return m_stylesColors[styleName].toMap()[s_offSelectedColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[s_offSelectedColorParamName].toByteArray();
 }
 
 
-QByteArray imtstyle::CDesignTokenFileParserComp::GetOnNormalColor(const QString& styleName) const
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOnNormalColor(const QByteArray& styleName) const
 {
-	return m_stylesColors[styleName].toMap()[s_onNormalColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[s_onNormalColorParamName].toByteArray();
 }
 
 
-QByteArray imtstyle::CDesignTokenFileParserComp::GetOnDisabledColor(const QString& styleName) const
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOnDisabledColor(const QByteArray& styleName) const
 {
-	return m_stylesColors[styleName].toMap()[s_onDisabledColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[s_onDisabledColorParamName].toByteArray();
 }
 
 
-QByteArray imtstyle::CDesignTokenFileParserComp::GetOnActiveColor(const QString& styleName) const
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOnActiveColor(const QByteArray& styleName) const
 {
-	return m_stylesColors[styleName].toMap()[s_onActiveColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[s_onActiveColorParamName].toByteArray();
 }
 
 
-QByteArray imtstyle::CDesignTokenFileParserComp::GetOnSelectedColor(const QString& styleName) const
+QByteArray imtstyle::CDesignTokenFileParserComp::GetOnSelectedColor(const QByteArray& styleName) const
 {
-	return m_stylesColors[styleName].toMap()[s_onSelectedColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[s_onSelectedColorParamName].toByteArray();
 }
 
 
@@ -153,6 +152,7 @@ void CDesignTokenFileParserComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 }
+
 
 
 } // namespace imtstyle

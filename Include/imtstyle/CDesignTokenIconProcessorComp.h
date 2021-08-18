@@ -17,12 +17,12 @@
 namespace imtstyle
 {
 
-class CDesignTokenProcessorComp: public ilog::CLoggerComponentBase, public IDesignTokenProcessor
+class CDesignTokenIconProcessorComp: public ilog::CLoggerComponentBase, public IDesignTokenProcessor
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CDesignTokenProcessorComp);
+	I_BEGIN_COMPONENT(CDesignTokenIconProcessorComp);
 		I_REGISTER_INTERFACE(IDesignTokenFileParser);
 		I_ASSIGN(m_argumentParserAttrPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
 		I_ASSIGN(m_designTokenFileParserAttrPtr, "DesignTokenFileParser", "Design token file parser", true, "IDesignTokenFileParser")
@@ -30,11 +30,8 @@ public:
 	I_END_COMPONENT;
 
 	int Exec() override;
+	QByteArray GetHelpString() const override;
 
-
-protected:
-	// reimplemented (ilog::CLoggerComponentBase)
-	virtual void OnComponentCreated() override;
 
 private:
 	constexpr static const char* s_suffixOffNormal = "_Off_Normal";
@@ -50,7 +47,6 @@ private:
 	I_REF(IDesignTokenFileParser, m_designTokenFileParserAttrPtr);
 	I_REF(iprm::IParamsSet, m_paramSetAttrPtr);
 
-
 	QByteArray m_templateIconColor;
 	QByteArray m_offNormalColor;
 	QByteArray m_offDisabledColor;
@@ -61,8 +57,6 @@ private:
 	QByteArray m_onActiveColor;
 	QByteArray m_onSelectedColor;
 
-	QByteArray m_templatePrimaryColor;
-	QByteArray m_templateSecondaryColor;
 	QByteArray m_inputDirName;
 	QByteArray m_inputFileName;
 	QByteArray m_outputDirName;
@@ -70,8 +64,6 @@ private:
 
 
 private:
-	///displays help
-	int ShowHelp() const;
 	/// sets new color in single image
 	void SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor = QByteArray()) const;
 	/// sets all available colors for single images

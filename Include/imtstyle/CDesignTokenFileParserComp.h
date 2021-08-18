@@ -10,6 +10,7 @@
 #include <iprm/IParamsSet.h>
 
 // ImtCore includes
+#include <imtbase/CCollectionInfo.h>
 #include <imtstyle/IDesignTokenFileParser.h>
 
 namespace imtstyle
@@ -22,24 +23,24 @@ public:
 
 	I_BEGIN_COMPONENT(CDesignTokenFileParserComp);
 		I_REGISTER_INTERFACE(IDesignTokenFileParser);
-		I_ASSIGN(m_designTokenFilePathAttrPtr, "DesignTokenFilePath", "Design token default file path", false, "IFileNameParam");
 	I_END_COMPONENT;
 
 	// reimplemented (IDesignTokenFileParser)
-	virtual bool ParseFile(DesignTokenImageFileInfo* parsedImages = nullptr) override;
+	virtual bool ParseFile() override;
 	virtual bool SetFile(const QByteArray& filePath) override;
-	virtual DesignTokenImageFileInfo GetFiles() const override;
-	virtual QStringList GetStyleNames() const override;
-	virtual QByteArray GetTemplateIconColor(const QString& styleName) const override;
-	virtual QByteArray GetOffNormalColor(const QString& styleName) const override;
-	virtual QByteArray GetOffDisabledColor(const QString& styleName) const override;
-	virtual QByteArray GetOffActiveColor(const QString& styleName) const override;
-	virtual QByteArray GetOffSelectedColor(const QString& styleName) const override;
-	virtual QByteArray GetOnNormalColor(const QString& styleName) const override;
-	virtual QByteArray GetOnDisabledColor(const QString& styleName) const override;
-	virtual QByteArray GetOnActiveColor(const QString& styleName) const override;
-	virtual QByteArray GetOnSelectedColor(const QString& styleName) const override;
+	virtual QByteArray GetTemplateIconColor(const QByteArray& styleName) const override;
+	virtual QByteArray GetOffNormalColor(const QByteArray& styleName) const override;
+	virtual QByteArray GetOffDisabledColor(const QByteArray& styleName) const override;
+	virtual QByteArray GetOffActiveColor(const QByteArray& styleName) const override;
+	virtual QByteArray GetOffSelectedColor(const QByteArray& styleName) const override;
+	virtual QByteArray GetOnNormalColor(const QByteArray& styleName) const override;
+	virtual QByteArray GetOnDisabledColor(const QByteArray& styleName) const override;
+	virtual QByteArray GetOnActiveColor(const QByteArray& styleName) const override;
+	virtual QByteArray GetOnSelectedColor(const QByteArray& styleName) const override;
 
+	// reimplemented (IColorPaletteProvider)
+	virtual const imtbase::ICollectionInfo& GetDesignSchemaList() const override;
+	virtual bool GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const override;
 
 protected:
 	// reimplemented (ilog::CLoggerComponentBase)
@@ -60,14 +61,15 @@ private:
 private:
 	I_REF(ifile::IFileNameParam, m_designTokenFilePathAttrPtr);
 
-	CDesignTokenFileParserComp::DesignTokenImageFileInfo m_parsedImagesInfo;
 	QByteArray m_templateIconColor;
 	QFileInfo m_designTokenFileInfo;
+	imtbase::CCollectionInfo m_designSchemaList;
 
 	/**
 		m_stylesColors[styleName].toMap()[colorName].toByteArray();
 	*/
-	QVariantMap m_stylesColors;
+	QVariantMap m_iconColors;
+	QVariantMap m_stylesPalettes;
 
 };
 
