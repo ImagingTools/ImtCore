@@ -1,0 +1,32 @@
+{
+	"LastChanged": "2021-05-06T11:59:00Z",
+	"TemplateIconColor": "#D9D9D9",
+	"Styles": [
+		{
+		"StyleName": "Dark",
+			"Color": {
+				"OffNormal":"#ff00ff",
+				"OffDisabled":"#ffff00",
+				"OffActive":"#00ffff",
+				"OffSelected":"#0000ff",
+				"OnNormal":"#00ff00",
+				"OnDisabled":"#ff0000",
+				"OnActive":"#dedede",
+				"OnSelected":"#04060f"
+			}
+		},
+		{
+		"StyleName": "Light",
+			"Color": {
+				"OnNormal":"#ff00ff",
+				"OnDisabled":"#ffff00",
+				"OnActive":"#00ffff",
+				"OnSelected":"#0000ff",
+				"OffNormal":"#00ff00",
+				"OffDisabled":"#ff0000",
+				"OffActive":"#dedede",
+				"OffSelected":"#04060f"
+			}
+		}
+	]
+}
