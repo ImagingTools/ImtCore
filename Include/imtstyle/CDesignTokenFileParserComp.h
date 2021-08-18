@@ -46,14 +46,14 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-	constexpr static char* s_offNormalColorParamName = "offNormal";
-	constexpr static char* s_offDisabledColorParamName = "offDisabled";
-	constexpr static char* s_offActiveColorParamName = "offActive";
-	constexpr static char* s_offSelectedColorParamName = "offSelected";
-	constexpr static char* s_onNormalColorParamName = "onNormal";
-	constexpr static char* s_onDisabledColorParamName = "onDisabled";
-	constexpr static char* s_onActiveColorParamName = "onActive";
-	constexpr static char* s_onSelectedColorParamName = "onSelected";
+	constexpr static const char* s_offNormalColorParamName = "OffNormal";
+	constexpr static const char* s_offDisabledColorParamName = "OffDisabled";
+	constexpr static const char* s_offActiveColorParamName = "OffActive";
+	constexpr static const char* s_offSelectedColorParamName = "OffSelected";
+	constexpr static const char* s_onNormalColorParamName = "OnNormal";
+	constexpr static const char* s_onDisabledColorParamName = "OnDisabled";
+	constexpr static const char* s_onActiveColorParamName = "OnActive";
+	constexpr static const char* s_onSelectedColorParamName = "OnSelected";
 
 
 
@@ -61,11 +61,12 @@ private:
 	I_REF(ifile::IFileNameParam, m_designTokenFilePathAttrPtr);
 
 	CDesignTokenFileParserComp::DesignTokenImageFileInfo m_parsedImagesInfo;
+	QByteArray m_templateIconColor;
 	QFileInfo m_designTokenFileInfo;
 
 	/**
 		m_stylesColors[styleName].toMap()[colorName].toByteArray();
-	 */
+	*/
 	QVariantMap m_stylesColors;
 
 };

@@ -39,7 +39,7 @@ QByteArray CDesignTokenArgumentsParserComp::GetArgumentKey(AvailableArguments ar
 
 	int indexOfArg = m_arguments.indexOf(argKey);
 
-	if(m_arguments.size() < indexOfArg){
+	if(m_arguments.size() > indexOfArg){
 		retval = m_arguments[indexOfArg];
 	}
 
@@ -53,8 +53,8 @@ QByteArray CDesignTokenArgumentsParserComp::GetArgumentValue(AvailableArguments 
 	QByteArray AC_key = this->GetArgumentKey(argument);
 	int indexOfArg = m_arguments.indexOf(AC_key);
 
-	if(m_arguments.size() < indexOfArg){
-		retval = m_arguments[++indexOfArg];
+	if(m_arguments.size() > ++indexOfArg){
+		retval = m_arguments[indexOfArg];
 	}
 
 	return retval;
@@ -76,7 +76,7 @@ QByteArrayList CDesignTokenArgumentsParserComp::GetArgumentValueMulti(AvailableA
 
 	int indexOfArg = m_arguments.indexOf(argValue);
 
-	while(m_arguments.size() < indexOfArg + 1){
+	while(m_arguments.size() > indexOfArg + 1){
 		++indexOfArg;
 		if(m_arguments[indexOfArg].startsWith('-') || m_arguments[indexOfArg].startsWith('/')){
 			break;
@@ -93,6 +93,10 @@ QByteArrayList CDesignTokenArgumentsParserComp::GetArgumentValueMulti(AvailableA
 
 void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 {
+	for(int i = 0; i < argc; ++i){
+		m_arguments << argv[i];
+	}
+
 	//=====================================================================================Commands init
 	m_commands.insert(AA_HELP, "--help");
 	m_commands.insert(AA_HELP, "-h");

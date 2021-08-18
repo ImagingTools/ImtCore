@@ -22,7 +22,7 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDesignTokenArgumentsParserComp);
-	I_REGISTER_INTERFACE(IDesignTokenArgumentsParser);
+		I_REGISTER_INTERFACE(IDesignTokenArgumentsParser);
 	I_END_COMPONENT;
 
 	/// Checking arguments and returns containing value \c argument

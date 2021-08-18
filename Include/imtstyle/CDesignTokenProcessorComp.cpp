@@ -97,6 +97,8 @@ void CDesignTokenProcessorComp::OnComponentCreated()
 		m_designTokenFileParserAttrPtr->SetFile(m_argumentParserAttrPtr->GetDesignTokenFilePath());
 		m_designTokenFileParserAttrPtr->ParseFile();
 		QStringList styles = m_designTokenFileParserAttrPtr->GetStyleNames();
+		m_outputDirName = m_argumentParserAttrPtr->GetOutputDirectoryPath();
+		m_inputDirName = m_argumentParserAttrPtr->GetInputDirectoryPath();
 
 		for (const QString& styleName: ::qAsConst(styles)){
 			m_templateIconColor = m_designTokenFileParserAttrPtr->GetTemplateIconColor(styleName);
@@ -112,6 +114,7 @@ void CDesignTokenProcessorComp::OnComponentCreated()
 			QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + styleName.toLocal8Bit().constData();
 			this->SetColorAllFilesInDir(m_inputDirName, outputDirName);
 		}
+		::exit(0);
 	}
 }
 
