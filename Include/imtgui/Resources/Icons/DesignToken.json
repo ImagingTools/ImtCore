@@ -4,7 +4,7 @@
 	"Styles": [
 		{
 		"StyleName": "Dark",
-			"Color": {
+			"IconColor": {
 				"OffNormal":"#ff00ff",
 				"OffDisabled":"#ffff00",
 				"OffActive":"#00ffff",
@@ -17,7 +17,7 @@
 		},
 		{
 		"StyleName": "Light",
-			"Color": {
+			"IconColor": {
 				"OnNormal":"#ff00ff",
 				"OnDisabled":"#ffff00",
 				"OnActive":"#00ffff",
