@@ -1,0 +1,7 @@
+QWidget#EditPanel
+{
+	background-color: ${NormalWindow};
+	margin-top: 1px;
+	margin-left: 1px;
+	margin-right: 1px;
+}

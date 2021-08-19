@@ -1,0 +1,30 @@
+QWidget#PageTree
+{
+	background-color: ${NormalForeground};
+}
+
+QWidget#BottomPageTree
+{
+	background-color: ${NormalForeground};
+}
+
+QTreeView#PageTree::item::hover
+{
+	background-color: ${NormalLight};
+}
+
+QTreeView#BottomPageTree::item::hover
+{
+background-color: ${NormalLight};
+}
+
+QPushButton#pushTop, QPushButton#pushBottom
+{
+	border: 1px solid ${NormalForeground};
+	background: ${NormalForeground};
+}
+
+QPushButton#pushTop::hover, QPushButton#pushBottom::hover
+{
+	background: ${NormalLight};
+}
