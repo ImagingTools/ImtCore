@@ -20,11 +20,6 @@ I_EXPORT_COMPONENT(
 			"Design Token Resource Color Palette Font Icons");
 
 I_EXPORT_COMPONENT(
-			DesignTokenProcessor,
-			"Creates theme schems",
-			"Design Token Processor");
-
-I_EXPORT_COMPONENT(
 		DesignTokenArgumentsParser,
 		"Creates theme schems",
 		"Design Token Arguments Parser");
