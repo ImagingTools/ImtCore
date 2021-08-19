@@ -7,10 +7,10 @@
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>
 #include <ibase/ICommandsProvider.h>
-#include <idoc/CMultiDocumentManagerBase.h>
 #include <iprm/ISelectionParam.h>
 
 // ImtCore includes
+#include <imtbase/CMultiDocumentManager.h>
 #include <imtgui/TDocumentWorkspaceGuiCompBase.h>
 #include <GeneratedFiles/imtgui/ui_CMultiDocumentWorkspaceGuiCompBase.h>
 
@@ -22,7 +22,7 @@ namespace imtgui
 
 class CMultiDocumentWorkspaceGuiCompBase:
 			public imtgui::TDocumentWorkspaceGuiCompBase<
-						idoc::CMultiDocumentManagerBase,
+						imtbase::CMultiDocumentManager,
 						iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<Ui::CMultiDocumentWorkspaceGuiCompBase>>>,
 			protected imod::CMultiModelDispatcherBase
 {
@@ -30,7 +30,7 @@ class CMultiDocumentWorkspaceGuiCompBase:
 
 public:
 	typedef imtgui::TDocumentWorkspaceGuiCompBase<
-				idoc::CMultiDocumentManagerBase,
+				imtbase::CMultiDocumentManager,
 				iqtgui::TRestorableGuiWrap<iqtgui::TDesignerGuiCompBase<Ui::CMultiDocumentWorkspaceGuiCompBase>>> BaseClass;
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
