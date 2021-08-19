@@ -24,7 +24,7 @@ public:
 	static const QMap<QString, QPalette::ColorRole> s_colorRolesNamesMap;
 
 	static QString s_GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role);
-	static void s_GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group,  QPalette::ColorRole& role);
+	static bool s_GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group,  QPalette::ColorRole& role);
 
 	typedef ilog::CLoggerComponentBase BaseClass;
 

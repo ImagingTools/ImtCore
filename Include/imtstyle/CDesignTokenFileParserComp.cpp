@@ -51,10 +51,9 @@ QString CDesignTokenFileParserComp::s_GetColorName(QPalette::ColorGroup group, Q
 }
 
 
-void CDesignTokenFileParserComp::s_GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role)
+bool CDesignTokenFileParserComp::s_GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role)
 {
 	const QStringList& groupNames = CDesignTokenFileParserComp::s_colorGroupNamesMap.keys();
-
 
 	for(const QString& groupName: groupNames){
 
@@ -65,14 +64,25 @@ void CDesignTokenFileParserComp::s_GetColorRoleGroup(const QString& name, QPalet
 
 			QRegularExpressionMatch groupRegExMatch;
 			groupRegExMatch = globalMatch.next();
+
+			if(!s_colorGroupNamesMap.contains(groupName)) {
+				return false;
+			}
+
 			group = s_colorGroupNamesMap[groupName];
 
 			QString roleName = name;
 			roleName.remove(groupRegExMatch.capturedStart(), groupRegExMatch.capturedLength());
+
+			if(!s_colorRolesNamesMap.contains(roleName)) {
+				return false;
+			}
+
 			role = s_colorRolesNamesMap[roleName];
-			break;
+			return true;
 		}
 	}
+	return false;
 }
 
 
