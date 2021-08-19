@@ -9,8 +9,10 @@
 // ImtCore includes
 #include <imtstyle/CDesignTokenBasedResourceProviderComp.h>
 #include <imtstyle/CDesignTokenIconProcessorComp.h>
+#include <imtstyle/CDesignTokenStyleSheetProcessorComp.h>
 #include <imtstyle/CDesignTokenArgumentsParserComp.h>
 #include <imtstyle/CDesignTokenFileParserComp.h>
+#include <imtstyle/CDesignTokenProcessorsControllerComp.h>
 
 /**
 	ImtStylePck package
@@ -22,6 +24,8 @@ typedef imtstyle::CDesignTokenBasedResourceProviderComp DesignTokenBasedResource
 typedef imtstyle::CDesignTokenArgumentsParserComp DesignTokenArgumentsParser;
 typedef imtstyle::CDesignTokenFileParserComp DesignTokenFileParser;
 typedef imtstyle::CDesignTokenIconProcessorComp DesignTokenIconProcessor;
+typedef imtstyle::CDesignTokenStyleSheetProcessorComp DesignTokenStyleSheetProcessor;
+typedef imtstyle::CDesignTokenProcessorsControllerComp DesignTokenProcessorsController;
 
 } // namespace ImtStylePck
 

@@ -30,9 +30,21 @@ I_EXPORT_COMPONENT(
 		"Design Token File Parser");
 
 I_EXPORT_COMPONENT(
+		DesignTokenProcessorsController,
+		"Controls and lauches all processors",
+		"Design Token StyleSheet Style Sheet Processor");
+
+I_EXPORT_COMPONENT(
 			DesignTokenIconProcessor,
 			"Creates icons for theme schems",
 			"Design Token Icon Processor");
+
+I_EXPORT_COMPONENT(
+		DesignTokenStyleSheetProcessor,
+		"Creates style sheets for theme schems",
+		"Design Token StyleSheet Style Sheet Processor");
+
+
 
 
 } // namespace ImtStylePck
