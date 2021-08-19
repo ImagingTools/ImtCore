@@ -142,7 +142,7 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(
 {
 	bool isAddEnabled = false;
 	bool isRemoveEnabled = false;
-
+	bool isRestoreEnabled = false;
 	if (m_collectionPtr != nullptr){
 		isAddEnabled = m_collectionPtr->GetOperationFlags() & imtbase::IObjectCollection::OF_SUPPORT_INSERT;
 		isRemoveEnabled = false;
@@ -177,7 +177,7 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(
 				}
 
 				if (revisionList.count() > 0){
-					m_restoreCommand.setEnabled(true);
+					isRestoreEnabled = true;
 				}
 			}
 		}
@@ -195,7 +195,7 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(
 
 	m_importCommand.setEnabled(m_insertCommand.IsEnabled());
 	m_exportCommand.setEnabled(selectedItems.count() == 1);
-	m_restoreCommand.setEnabled(false);
+	m_restoreCommand.setEnabled(isRestoreEnabled);
 }
 
 
