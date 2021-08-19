@@ -1,6 +1,5 @@
 #include <imtstyle/CDesignTokenFileParserComp.h>
 
-
 // Qt includes
 #include <QtCore/QRegularExpression>
 #include <QtCore/QRegularExpressionMatch>
@@ -49,13 +48,13 @@ const QMap<QString, QPalette::ColorRole>CDesignTokenFileParserComp::s_colorRoles
 };
 
 
-QString CDesignTokenFileParserComp::s_GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role)
+QString CDesignTokenFileParserComp::GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role) const
 {
 	return CDesignTokenFileParserComp::s_colorGroupNamesMap.key(group) + CDesignTokenFileParserComp::s_colorRolesNamesMap.key(role);
 }
 
 
-bool CDesignTokenFileParserComp::s_GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role)
+bool CDesignTokenFileParserComp::GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role) const
 {
 	const QStringList& groupNames = CDesignTokenFileParserComp::s_colorGroupNamesMap.keys();
 
@@ -91,7 +90,6 @@ bool CDesignTokenFileParserComp::s_GetColorRoleGroup(const QString& name, QPalet
 
 
 // reimplemented (IDesignTokenFileParser)
-
 bool CDesignTokenFileParserComp::CDesignTokenFileParserComp::SetFile(const QByteArray& filePath)
 {
 	bool retval = false;
@@ -163,7 +161,6 @@ bool CDesignTokenFileParserComp::ParseFile()
 	}
 	return true;
 }
-
 
 const imtbase::ICollectionInfo& CDesignTokenFileParserComp::GetDesignSchemaList() const
 {
@@ -248,7 +245,7 @@ void CDesignTokenFileParserComp::GetPaletteFromEntry(const QString& styleName, c
 	for(QJsonObject::const_iterator value = paletteEntryObject.constBegin(); value != paletteEntryObject.constEnd(); ++value){
 		QPalette::ColorGroup colorGroup;
 		QPalette::ColorRole colorRole;
-		this->s_GetColorRoleGroup(value.key(), colorGroup, colorRole);
+		this->GetColorRoleGroup(value.key(), colorGroup, colorRole);
 
 		QColor color;
 		color.setNamedColor(value->toString());
@@ -259,6 +256,7 @@ void CDesignTokenFileParserComp::GetPaletteFromEntry(const QString& styleName, c
 
 	m_stylesPalettes.insert(styleName, palette);
 }
+
 
 
 } // namespace imtstyle

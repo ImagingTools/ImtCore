@@ -11,12 +11,12 @@
 namespace imtstyle
 {
 
-class CDesignTokenProcessorsComtrollerComp: public ilog::CLoggerComponentBase
+class CDesignTokenProcessorsControllerComp: public ilog::CLoggerComponentBase
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CDesignTokenProcessorsComtrollerComp);
+	I_BEGIN_COMPONENT(CDesignTokenProcessorsControllerComp);
 		I_ASSIGN(m_argumentParserAttrPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
 		I_ASSIGN_MULTI_0(m_designTokenProcessors, "DesignTokenProcessors", "Arguments Parser", true)
 	I_END_COMPONENT;

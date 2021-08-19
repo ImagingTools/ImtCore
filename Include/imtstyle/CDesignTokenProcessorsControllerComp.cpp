@@ -1,10 +1,10 @@
-#include <imtstyle/CDesignTokenProcessorsComtrollerComp.h>
+#include <imtstyle/CDesignTokenProcessorsControllerComp.h>
 
 
 namespace imtstyle
 {
 
-void CDesignTokenProcessorsComtrollerComp::OnComponentCreated()
+void CDesignTokenProcessorsControllerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 

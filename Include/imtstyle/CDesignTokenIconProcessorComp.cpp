@@ -145,7 +145,7 @@ void CDesignTokenIconProcessorComp::SetColorForAllModeState(const QByteArray& fi
 {
 	QDir outputDir(outputDirName);
 	if(!outputDir.exists()){
-		Q_ASSERT(outputDir.mkdir(outputDirName));
+		Q_ASSERT(outputDir.mkpath(outputDirName));
 	}
 
 	QByteArray dirSeparator(1, QDir::separator().toLatin1());
@@ -192,7 +192,7 @@ void CDesignTokenIconProcessorComp::SetColorAllFilesInDir(const QByteArray& inpu
 {
 	QDir outputDir(outputDirName);
 	if(!outputDir.exists()){
-		Q_ASSERT(outputDir.mkdir(outputDirName));
+		Q_ASSERT(outputDir.mkpath(outputDirName));
 	}
 
 	QDir inputDir(inputDirName);

@@ -23,7 +23,7 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDesignTokenIconProcessorComp);
-		I_REGISTER_INTERFACE(IDesignTokenFileParser);
+		I_REGISTER_INTERFACE(IDesignTokenProcessor);
 		I_ASSIGN(m_argumentParserAttrPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
 		I_ASSIGN(m_designTokenFileParserAttrPtr, "DesignTokenFileParser", "Design token file parser", true, "IDesignTokenFileParser")
 		I_ASSIGN(m_paramSetAttrPtr, "ParamSet", "Param set", false, "IParamsSet")

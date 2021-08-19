@@ -22,12 +22,6 @@ namespace imtstyle
 class CDesignTokenFileParserComp: public ilog::CLoggerComponentBase, public IDesignTokenFileParser
 {
 public:
-	static const QMap<QString, QPalette::ColorGroup> s_colorGroupNamesMap;
-	static const QMap<QString, QPalette::ColorRole> s_colorRolesNamesMap;
-
-	static QString s_GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role);
-	static bool s_GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group,  QPalette::ColorRole& role);
-
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDesignTokenFileParserComp);
@@ -35,25 +29,32 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IDesignTokenFileParser)
-	virtual bool ParseFile() override;
-	virtual bool SetFile(const QByteArray& filePath) override;
-	virtual QByteArray GetTemplateIconColor(const QByteArray& styleName) const override;
-	virtual QByteArray GetOffNormalColor(const QByteArray& styleName) const override;
-	virtual QByteArray GetOffDisabledColor(const QByteArray& styleName) const override;
-	virtual QByteArray GetOffActiveColor(const QByteArray& styleName) const override;
-	virtual QByteArray GetOffSelectedColor(const QByteArray& styleName) const override;
-	virtual QByteArray GetOnNormalColor(const QByteArray& styleName) const override;
-	virtual QByteArray GetOnDisabledColor(const QByteArray& styleName) const override;
-	virtual QByteArray GetOnActiveColor(const QByteArray& styleName) const override;
-	virtual QByteArray GetOnSelectedColor(const QByteArray& styleName) const override;
+	bool ParseFile() override;
+	bool SetFile(const QByteArray& filePath) override;
+	bool GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role) const override;
+	QString GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role) const override;
+
+	QByteArray GetTemplateIconColor(const QByteArray& styleName) const override;
+	QByteArray GetOffNormalColor(const QByteArray& styleName) const override;
+	QByteArray GetOffDisabledColor(const QByteArray& styleName) const override;
+	QByteArray GetOffActiveColor(const QByteArray& styleName) const override;
+	QByteArray GetOffSelectedColor(const QByteArray& styleName) const override;
+	QByteArray GetOnNormalColor(const QByteArray& styleName) const override;
+	QByteArray GetOnDisabledColor(const QByteArray& styleName) const override;
+	QByteArray GetOnActiveColor(const QByteArray& styleName) const override;
+	QByteArray GetOnSelectedColor(const QByteArray& styleName) const override;
 
 	// reimplemented (IColorPaletteProvider)
-	virtual const imtbase::ICollectionInfo& GetDesignSchemaList() const override;
-	virtual bool GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const override;
+	const imtbase::ICollectionInfo& GetDesignSchemaList() const override;
+	bool GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const override;
+
+public:
+	static const QMap<QString, QPalette::ColorGroup> s_colorGroupNamesMap;
+	static const QMap<QString, QPalette::ColorRole> s_colorRolesNamesMap;
 
 protected:
 	// reimplemented (ilog::CLoggerComponentBase)
-	virtual void OnComponentCreated() override;
+	void OnComponentCreated() override;
 
 private:
 	constexpr static const char* s_offNormalColorParamName = "OffNormal";

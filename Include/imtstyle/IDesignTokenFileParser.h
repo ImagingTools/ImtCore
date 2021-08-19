@@ -3,20 +3,24 @@
 
 // Qt includes
 #include <QtCore/QtCore>
+#include <QtGui/QPalette>
 
 // ACF includes
 
 // ImtCore includes
 #include <imtstyle/IColorPaletteProvider.h>
 
+
 namespace imtstyle
 {
 
-class IDesignTokenFileParser: public IColorPaletteProvider
+class IDesignTokenFileParser: virtual public IColorPaletteProvider
 {
 public:
 	virtual bool SetFile(const QByteArray& filePath) = 0;
 	virtual bool ParseFile() = 0;
+	virtual bool GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group,  QPalette::ColorRole& role) const = 0;
+	virtual QString GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role) const = 0;
 
 	virtual QByteArray GetTemplateIconColor(const QByteArray& styleName = QByteArray()) const = 0;
 	virtual QByteArray GetOffNormalColor(const QByteArray& styleName = QByteArray()) const = 0;
