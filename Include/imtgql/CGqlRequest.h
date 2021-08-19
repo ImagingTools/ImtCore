@@ -57,7 +57,6 @@ protected:
 	bool m_startValue;
 	bool m_startParams;
 	bool m_startFields;
-//	QByteArray m_parserId;
 	CGqlObject* m_activeGqkObjectPtr;
 };
 

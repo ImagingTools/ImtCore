@@ -82,109 +82,6 @@ QByteArray CGqlRequest::GetQuery() const
 }
 
 
-//bool CGqlRequest::ParseQuery(const QByteArray &query)
-//{
-//	QJsonDocument document = QJsonDocument::fromJson(query);
-//	QByteArray body = document.object().value("query").toString().toUtf8();
-//	int index = body.indexOf("{");
-//	QByteArray header = body.left(index);
-//	QList<QByteArray> headersData = header.split(' ');
-//	QByteArray type;
-//	for (int i = 0; i < headersData.count(); ++i){
-//		if (!headersData[i].isEmpty()){
-//			type = headersData[i];
-//			break;
-//		}
-//	}
-//	if (type == "query"){
-//		m_requestType = imtgql::IGqlRequest::RT_QUERY;
-//	}
-//	else if (type == "mutation"){
-//		m_requestType = imtgql::IGqlRequest::RT_MUTATION;
-//	}
-//	else if (type == "subscription"){
-//		m_requestType = imtgql::IGqlRequest::RT_SUBSCRIPTION;
-//	}
-//	else{
-//		return false;
-//	}
-
-
-//	body = body.mid(index + 1);
-//	index = body.indexOf("(");
-//	m_commandId = body.left(index);
-//	body = body.remove(0,index);
-////	while (body.at(0) == ' '){
-////		body.remove(0,1);
-////	}
-////	index = body.indexOf(" ");
-////	m_commandId = body.left(index);
-////	body = body.mid(index + 1);
-////	index = body.indexOf("{");
-
-//	index = body.lastIndexOf('}');
-//	index = body.lastIndexOf('}',index - 1);
-//	int count = 1;
-//	while (count > 0 && index > 0){
-//		index--;
-//		if (body[index] == '}'){
-//			count++;
-//		}
-//		if (body[index] == '{'){
-//			count--;
-//		}
-//	}
-//	if (index > 0){
-//		QByteArray bodyData = body.right(body.count() - index);
-//		body.resize(index);
-//		while (body.at(0) == ' '){
-//			body = body.remove(0,1);
-//		}
-//		while (body.back() == ' '){
-//			body.resize(body.length() - 1);
-//		}
-//		if (!body.isEmpty()){
-//			body.front() = '{';
-//			body.back() = '}';
-//			QJsonDocument paramsDocument = QJsonDocument::fromJson(body);
-//			if (paramsDocument.isObject()){
-//				QJsonObject object = paramsDocument.object();
-//				QStringList keys = object.keys();
-//				for (QString key: keys){
-//					CGqlObject gqlObject(key.toUtf8());
-//					if (object.value(key).isObject()){
-//						ParceObjectParamPart(gqlObject, object.value(key).toObject());
-//					}
-//					AddParam(gqlObject);
-//				}
-//			}
-//		}
-//		for (int i = 0; i < 3; i++){
-//			bodyData = bodyData.replace("  "," ");
-//		}
-//		bodyData = bodyData.replace("{",":{");
-//		bodyData = bodyData.replace(" {",":{");
-//		bodyData = bodyData.replace(" }","}");
-//		bodyData = bodyData.replace("} ","}#");
-//		bodyData = bodyData.replace(" ",":\"\",");
-//		bodyData = bodyData.replace("}#","} ");
-//		QJsonDocument bodyDocument = QJsonDocument::fromJson(bodyData);
-//		if (bodyDocument.isObject()){
-//			QJsonObject object = bodyDocument.object();
-//			QStringList keys = object.keys();
-//			for (QString key: keys){
-//				CGqlObject gqlObject(key.toUtf8());
-//				if (object.value(key).isObject()){
-//					ParceObjectFieldPart(gqlObject, object.value(key).toObject());
-//				}
-//				AddField(gqlObject);
-//			}
-//		}
-//	}
-
-//	return false;
-//}
-
 
 bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 {
@@ -218,18 +115,7 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 	index = body.indexOf("(");
 	m_commandId = body.left(index);
 	body = body.remove(0,index);
-//	while (body.at(0) == ' '){
-//		body.remove(0,1);
-//	}
-//	index = body.indexOf(" ");
-//	m_commandId = body.left(index);
-//	body = body.mid(index + 1);
-//	index = body.indexOf("{");
-//	bool startParams = false;
 	bool endParams = false;
-//	bool startFields = false;
-//	bool startKey = false;
-//	bool startValue = false;
 	bool startText = false;
 	bool startBigText = false;
 	bool startBackSlash = false;
@@ -275,11 +161,6 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 			}
 			else{
 				startText = false;
-//				if (startText) {
-//					SetParseText(text);
-//					text.clear();
-//					startText = false;
-//				}
 			}
 			break;
 
@@ -289,7 +170,6 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 			}
 			else{
 				if (!text.isEmpty()) {
-//					SetParseText(text);
 					SetParseObject(text);
 					text.clear();
 					startText = false;
@@ -403,67 +283,6 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 		}
 	}
 
-
-
-//	index = body.lastIndexOf('}');
-//	index = body.lastIndexOf('}',index - 1);
-//	int count = 1;
-//	while (count > 0 && index > 0){
-//		index--;
-//		if (body[index] == '}'){
-//			count++;
-//		}
-//		if (body[index] == '{'){
-//			count--;
-//		}
-//	}
-//	if (index > 0){
-//		QByteArray bodyData = body.right(body.count() - index);
-//		body.resize(index);
-//		while (body.at(0) == ' '){
-//			body = body.remove(0,1);
-//		}
-//		while (body.back() == ' '){
-//			body.resize(body.length() - 1);
-//		}
-//		if (!body.isEmpty()){
-//			body.front() = '{';
-//			body.back() = '}';
-//			QJsonDocument paramsDocument = QJsonDocument::fromJson(body);
-//			if (paramsDocument.isObject()){
-//				QJsonObject object = paramsDocument.object();
-//				QStringList keys = object.keys();
-//				for (QString key: keys){
-//					CGqlObject gqlObject(key.toUtf8());
-//					if (object.value(key).isObject()){
-//						ParceObjectParamPart(gqlObject, object.value(key).toObject());
-//					}
-//					AddParam(gqlObject);
-//				}
-//			}
-//		}
-//		for (int i = 0; i < 3; i++){
-//			bodyData = bodyData.replace("  "," ");
-//		}
-//		bodyData = bodyData.replace("{",":{");
-//		bodyData = bodyData.replace(" {",":{");
-//		bodyData = bodyData.replace(" }","}");
-//		bodyData = bodyData.replace("} ","}#");
-//		bodyData = bodyData.replace(" ",":\"\",");
-//		bodyData = bodyData.replace("}#","} ");
-//		QJsonDocument bodyDocument = QJsonDocument::fromJson(bodyData);
-//		if (bodyDocument.isObject()){
-//			QJsonObject object = bodyDocument.object();
-//			QStringList keys = object.keys();
-//			for (QString key: keys){
-//				CGqlObject gqlObject(key.toUtf8());
-//				if (object.value(key).isObject()){
-//					ParceObjectFieldPart(gqlObject, object.value(key).toObject());
-//				}
-//				AddField(gqlObject);
-//			}
-//		}
-//	}
 
 	return false;
 }
