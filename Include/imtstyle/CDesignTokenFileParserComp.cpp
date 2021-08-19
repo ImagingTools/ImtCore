@@ -1,9 +1,79 @@
 #include <imtstyle/CDesignTokenFileParserComp.h>
-#include <QPalette>
-
+#include <QtCore/QRegularExpression>
+#include <QtCore/QRegularExpressionMatch>
+#include <QtCore/QRegularExpressionMatchIterator>
 
 namespace imtstyle
 {
+
+
+const QMap<QString, QPalette::ColorGroup> CDesignTokenFileParserComp::s_colorGroupNamesMap = {
+			std::make_pair("Active", QPalette::ColorGroup::Active),
+			std::make_pair("Disabled", QPalette::ColorGroup::Disabled),
+			std::make_pair("Inactive", QPalette::ColorGroup::Inactive),
+			std::make_pair("NColorGroups", QPalette::ColorGroup::NColorGroups),
+			std::make_pair("Current", QPalette::ColorGroup::Current),
+			std::make_pair("All", QPalette::ColorGroup::All),
+			std::make_pair("Normal", QPalette::ColorGroup::Normal)
+};
+
+
+const QMap<QString, QPalette::ColorRole>CDesignTokenFileParserComp::s_colorRolesNamesMap = {
+			std::make_pair("WindowText", QPalette::ColorRole::WindowText),
+			std::make_pair("Button", QPalette::ColorRole::Button),
+			std::make_pair("Light", QPalette::ColorRole::Light),
+			std::make_pair("Midlight", QPalette::ColorRole::Midlight),
+			std::make_pair("Dark", QPalette::ColorRole::Dark),
+			std::make_pair("Mid", QPalette::ColorRole::Mid),
+			std::make_pair("Text", QPalette::ColorRole::Text),
+			std::make_pair("BrightText", QPalette::ColorRole::BrightText),
+			std::make_pair("ButtonText", QPalette::ColorRole::ButtonText),
+			std::make_pair("Base", QPalette::ColorRole::Base),
+			std::make_pair("Window", QPalette::ColorRole::Window),
+			std::make_pair("Shadow", QPalette::ColorRole::Shadow),
+			std::make_pair("Highlight", QPalette::ColorRole::Highlight),
+			std::make_pair("HighlightedText", QPalette::ColorRole::HighlightedText),
+			std::make_pair("Link", QPalette::ColorRole::Link),
+			std::make_pair("LinkVisited", QPalette::ColorRole::LinkVisited),
+			std::make_pair("AlternateBase", QPalette::ColorRole::AlternateBase),
+			std::make_pair("NoRole", QPalette::ColorRole::NoRole),
+			std::make_pair("ToolTipBase", QPalette::ColorRole::ToolTipBase),
+			std::make_pair("ToolTipText", QPalette::ColorRole::ToolTipText),
+			std::make_pair("PlaceholderText", QPalette::ColorRole::PlaceholderText),
+			std::make_pair("Foreground", QPalette::ColorRole::Foreground),
+			std::make_pair("Background", QPalette::ColorRole::Background)
+};
+
+
+QString CDesignTokenFileParserComp::s_GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role)
+{
+	return CDesignTokenFileParserComp::s_colorGroupNamesMap.key(group) + CDesignTokenFileParserComp::s_colorRolesNamesMap.key(role);
+}
+
+
+void CDesignTokenFileParserComp::s_GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role)
+{
+	const QStringList& groupNames = CDesignTokenFileParserComp::s_colorGroupNamesMap.keys();
+
+
+	for(const QString& groupName: groupNames){
+
+		QRegularExpression groupRegEx(QString("^" + groupName), QRegularExpression::PatternOption::CaseInsensitiveOption);
+		QRegularExpressionMatchIterator globalMatch = groupRegEx.globalMatch(name);
+
+		if(globalMatch.hasNext()){
+
+			QRegularExpressionMatch groupRegExMatch;
+			groupRegExMatch = globalMatch.next();
+			group = s_colorGroupNamesMap[groupName];
+
+			QString roleName = name;
+			roleName.remove(groupRegExMatch.capturedStart(), groupRegExMatch.capturedLength());
+			role = s_colorRolesNamesMap[roleName];
+			break;
+		}
+	}
+}
 
 
 // reimplemented (IDesignTokenFileParser)
@@ -74,6 +144,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 		QVariantMap colorsMap = colorsObject.toVariantMap();
 		m_iconColors.insert(styleName, colorsMap);
 		m_designSchemaList.InsertItem(styleName.toUtf8(), styleName,"");
+		this->GetPaletteFromEntry(styleName, styleEntry["PaletteColor"]);
 	}
 	return true;
 }
@@ -87,7 +158,7 @@ const imtbase::ICollectionInfo& CDesignTokenFileParserComp::GetDesignSchemaList(
 
 bool CDesignTokenFileParserComp::GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const
 {
-	palette = m_stylesPalettes[designSchemaId].value<QPalette>();
+	palette = m_stylesPalettes[designSchemaId];
 	return true;
 }
 
@@ -150,7 +221,28 @@ QByteArray imtstyle::CDesignTokenFileParserComp::GetOnSelectedColor(const QByteA
 void CDesignTokenFileParserComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+}
 
+
+void CDesignTokenFileParserComp::GetPaletteFromEntry(const QString& styleName, const QJsonValue& paletteEntry)
+{
+	QPalette palette;
+
+	const QJsonObject& paletteEntryObject = paletteEntry.toObject();
+
+	for(QJsonObject::const_iterator value = paletteEntryObject.constBegin(); value != paletteEntryObject.constEnd(); ++value){
+		QPalette::ColorGroup colorGroup;
+		QPalette::ColorRole colorRole;
+		this->s_GetColorRoleGroup(value.key(), colorGroup, colorRole);
+
+		QColor color;
+		color.setNamedColor(value->toString());
+		if(color.isValid()){
+			palette.setColor(colorGroup, colorRole, color);
+		}
+	}
+
+	m_stylesPalettes.insert(styleName, palette);
 }
 
 

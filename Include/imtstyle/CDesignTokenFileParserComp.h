@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QtCore>
+#include <QtGui/QPalette>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -19,6 +20,12 @@ namespace imtstyle
 class CDesignTokenFileParserComp: public ilog::CLoggerComponentBase, public IDesignTokenFileParser
 {
 public:
+	static const QMap<QString, QPalette::ColorGroup> s_colorGroupNamesMap;
+	static const QMap<QString, QPalette::ColorRole> s_colorRolesNamesMap;
+
+	static QString s_GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role);
+	static void s_GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group,  QPalette::ColorRole& role);
+
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDesignTokenFileParserComp);
@@ -56,20 +63,21 @@ private:
 	constexpr static const char* s_onActiveColorParamName = "OnActive";
 	constexpr static const char* s_onSelectedColorParamName = "OnSelected";
 
-
-
-private:
 	I_REF(ifile::IFileNameParam, m_designTokenFilePathAttrPtr);
 
+	imtbase::CCollectionInfo m_designSchemaList;
 	QByteArray m_templateIconColor;
 	QFileInfo m_designTokenFileInfo;
-	imtbase::CCollectionInfo m_designSchemaList;
 
 	/**
 		m_stylesColors[styleName].toMap()[colorName].toByteArray();
 	*/
 	QVariantMap m_iconColors;
-	QVariantMap m_stylesPalettes;
+	QMap<QString, QPalette> m_stylesPalettes;
+
+private:
+	void GetPaletteFromEntry(const QString& styleName, const QJsonValue& paletteEntry);
+
 
 };
 
