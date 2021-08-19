@@ -1,7 +1,11 @@
 #include <imtstyle/CDesignTokenFileParserComp.h>
+
+
+// Qt includes
 #include <QtCore/QRegularExpression>
 #include <QtCore/QRegularExpressionMatch>
 #include <QtCore/QRegularExpressionMatchIterator>
+
 
 namespace imtstyle
 {
@@ -87,6 +91,7 @@ bool CDesignTokenFileParserComp::s_GetColorRoleGroup(const QString& name, QPalet
 
 
 // reimplemented (IDesignTokenFileParser)
+
 bool CDesignTokenFileParserComp::CDesignTokenFileParserComp::SetFile(const QByteArray& filePath)
 {
 	bool retval = false;
@@ -256,9 +261,6 @@ void CDesignTokenFileParserComp::GetPaletteFromEntry(const QString& styleName, c
 }
 
 
-
 } // namespace imtstyle
-
-
 
 

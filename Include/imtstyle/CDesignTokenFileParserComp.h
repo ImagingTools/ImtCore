@@ -14,8 +14,10 @@
 #include <imtbase/CCollectionInfo.h>
 #include <imtstyle/IDesignTokenFileParser.h>
 
+
 namespace imtstyle
 {
+
 
 class CDesignTokenFileParserComp: public ilog::CLoggerComponentBase, public IDesignTokenFileParser
 {
@@ -69,17 +71,14 @@ private:
 	QByteArray m_templateIconColor;
 	QFileInfo m_designTokenFileInfo;
 
-	/**
-		m_stylesColors[styleName].toMap()[colorName].toByteArray();
-	*/
 	QVariantMap m_iconColors;
 	QMap<QString, QPalette> m_stylesPalettes;
 
 private:
 	void GetPaletteFromEntry(const QString& styleName, const QJsonValue& paletteEntry);
-
-
 };
 
 
 } // namespace imtstyle
+
+
