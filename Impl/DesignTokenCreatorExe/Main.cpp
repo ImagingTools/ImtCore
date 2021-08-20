@@ -17,8 +17,6 @@ int main(int argc, char *argv[])
 {
 	CDesignTokenCreatorExe instance;
 
-	QString errorString = "unknown error";
-
 	imtstyle::IDesignTokenArgumentsParser* argumentsParser = instance.GetInterface<imtstyle::IDesignTokenArgumentsParser>();
 	if (argumentsParser == nullptr){
 		std::cerr << "Component configuration failed" << std::endl;

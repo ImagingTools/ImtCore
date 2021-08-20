@@ -28,7 +28,7 @@
                     <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>DesignTokenProcessor</Value>
+                                <Value>DesignTokenProcessorsController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -36,7 +36,7 @@
             </Data>
         </Element>
         <Element Id="DesignTokenArgumentsParser" PackageId="ImtStylePck" ComponentId="DesignTokenArgumentsParser">
-            <Data IsEnabled="true" Flags="0">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap/>
             </Data>
         </Element>
@@ -45,7 +45,36 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="DesignTokenProcessor" PackageId="ImtStylePck" ComponentId="DesignTokenProcessor">
+        <Element Id="DesignTokenIconProcessor" PackageId="ImtStylePck" ComponentId="DesignTokenIconProcessor">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DesignTokenArgumentsParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DesignTokenFileParser"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DesignTokenProcessorsController" PackageId="ImtStylePck" ComponentId="DesignTokenProcessorsController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DesignTokenArgumentsParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DesignTokenProcessors" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>DesignTokenStyleSheetProcessor</Value>
+                                <Value>DesignTokenIconProcessor</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DesignTokenStyleSheetProcessor" PackageId="ImtStylePck" ComponentId="DesignTokenStyleSheetProcessor">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
@@ -66,6 +95,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="ibase::IApplication" ComponentId="ConsoleApplication"/>
+        <Interface InterfaceId="imtstyle::IDesignTokenArgumentsParser" ComponentId="DesignTokenArgumentsParser"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

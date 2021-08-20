@@ -15,8 +15,8 @@ target_link_libraries(${PROJECT_NAME} Qt${QT_DEFAULT_MAJOR_VERSION}::WebSockets)
 target_link_libraries(${PROJECT_NAME} imtbase imtrest)
 
 
-if(WIN32)
+if (WIN32)
 	set(files  \"${IMTCOREDIR}/Bin/${CMAKE_BUILD_TYPE}${TARGETNAME}/${PROJECT_NAME}.arp\")
 	
 	windeploy(${PROJECT_NAME} "" "${files}")
-endif()
+endif ()
