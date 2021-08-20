@@ -27,6 +27,9 @@ QByteArray CDesignTokenIconProcessorComp::GetHelpString() const
 
 int CDesignTokenIconProcessorComp::Exec()
 {
+	if(!m_argumentParserAttrPtr->IsImageModeRequired()){
+		return 0;
+	}
 
 	if (m_paramSetAttrPtr.IsValid()){
 		{

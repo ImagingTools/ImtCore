@@ -112,6 +112,13 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_commands.insert(AA_OUTPUT_DIRECTORY_PATH, "--output-dir");
 	m_commands.insert(AA_OUTPUT_DIRECTORY_PATH, "-OD");
 
+	//-----------------------------------------------control options
+	m_commands.insert(AA_IMAGE_MODE, "-I");
+	m_commands.insert(AA_IMAGE_MODE, "--image");
+
+	m_commands.insert(AA_STYLE_SHEET_MODE, "-S");
+	m_commands.insert(AA_STYLE_SHEET_MODE, "--style-sheet");
+
 	//-----------------------------------------------
 
 	//=====================================================================================
@@ -121,6 +128,18 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 bool CDesignTokenArgumentsParserComp::IsHelpRequested() const
 {
 	return this->CheckArgument(AA_HELP);
+}
+
+
+bool imtstyle::CDesignTokenArgumentsParserComp::IsStyleSheetModeRequired() const
+{
+	return this->CheckArgument(AA_STYLE_SHEET_MODE);
+}
+
+
+bool imtstyle::CDesignTokenArgumentsParserComp::IsImageModeRequired() const
+{
+	return this->CheckArgument(AA_IMAGE_MODE);
 }
 
 
@@ -141,7 +160,10 @@ QByteArray imtstyle::CDesignTokenArgumentsParserComp::GetOutputDirectoryPath() c
 	return this->GetArgumentValue(AA_OUTPUT_DIRECTORY_PATH);
 }
 
+
 } // namespace imtstyle
+
+
 
 
 

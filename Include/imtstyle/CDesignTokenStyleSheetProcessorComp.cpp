@@ -29,6 +29,10 @@ QByteArray CDesignTokenStyleSheetProcessorComp::GetHelpString() const
 
 int CDesignTokenStyleSheetProcessorComp::Exec()
 {
+	if(!m_argumentParserAttrPtr->IsStyleSheetModeRequired()){
+		return 0;
+	}
+
 	m_designTokenFileParserAttrPtr->SetFile(m_argumentParserAttrPtr->GetDesignTokenFilePath());
 	m_designTokenFileParserAttrPtr->ParseFile();
 
