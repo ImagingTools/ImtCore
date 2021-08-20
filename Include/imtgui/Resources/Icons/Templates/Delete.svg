@@ -13,7 +13,7 @@
    width="512px"
    height="512px"
    id="svg4"
-   sodipodi:docname="Add.svg"
+   sodipodi:docname="Delete.svg"
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)">
   <metadata
      id="metadata10">
@@ -23,6 +23,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -37,20 +38,21 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1680"
-     inkscape:window-height="998"
+     inkscape:window-width="1920"
+     inkscape:window-height="1028"
      id="namedview6"
      showgrid="false"
-     inkscape:zoom="0.4609375"
-     inkscape:cx="-520.67797"
-     inkscape:cy="256"
+     inkscape:zoom="1.3037281"
+     inkscape:cx="12.569644"
+     inkscape:cy="237.96669"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg4" />
   <path
-     d="m 20.354873,10.480932 h -6.456038 c -0.22786,0 -0.379767,-0.151906 -0.379767,-0.379767 V 3.6451273 c 0,-0.4557204 -0.303813,-0.7595339 -0.759534,-0.7595339 h -1.519068 c -0.45572,0 -0.759534,0.3038135 -0.759534,0.7595339 v 6.4560377 c 0,0.227861 -0.151906,0.379767 -0.379767,0.379767 H 3.6451273 c -0.4557204,0 -0.7595339,0.303814 -0.7595339,0.759534 v 1.519068 c 0,0.455721 0.3038135,0.759534 0.7595339,0.759534 h 6.4560377 c 0.227861,0 0.379767,0.151907 0.379767,0.379767 v 6.456038 c 0,0.45572 0.303814,0.759534 0.759534,0.759534 h 1.519068 c 0.455721,0 0.759534,-0.303814 0.759534,-0.759534 v -6.456038 c 0,-0.22786 0.151907,-0.379767 0.379767,-0.379767 h 6.456038 c 0.45572,0 0.759534,-0.303813 0.759534,-0.759534 v -1.519068 c 0,-0.45572 -0.303814,-0.759534 -0.759534,-0.759534 z"
+     d="m 20.354865,10.348443 c -12.3430368,-0.07562 -10.5821869,-0.134893 -16.7097304,0 -0.4557199,0 -0.7595332,0.334803 -0.7595332,0.837006 v 1.674012 c 0,0.502204 0.3038133,0.837006 0.7595332,0.837006 13.9687034,0.10465 7.4740664,-0.06123 16.7097304,0 0.455721,0 0.759534,-0.334802 0.759534,-0.837006 v -1.674012 c 0,-0.502203 -0.303813,-0.837006 -0.759534,-0.837006 z"
      id="path2"
      inkscape:connector-curvature="0"
-     style="fill:#D9D9D9;stroke-width:0.99999994" />
+     style="fill:#f00066;fill-opacity:1;stroke-width:1"
+     sodipodi:nodetypes="ccssccssc" />
 </svg>
