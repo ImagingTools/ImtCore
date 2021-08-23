@@ -186,6 +186,11 @@ SUBDIRS += ImtLicenseDbPck
 ImtLicenseDbPck.file = ../../Impl/ImtLicenseDbPck/QMake/ImtLicenseDbPck.pro
 ImtLicenseDbPck.depends = imtlic imtlicdb
 
+SUBDIRS += DesignTokenCreatorExe
+DesignTokenCreatorExe.file = ../../Impl/DesignTokenCreatorExe/QMake/DesignTokenCreatorExe.pro
+DesignTokenCreatorExe.depends = imtbase imtstyle
+
+
 # Application
 #!linux{
 #	SUBDIRS += EagleView
@@ -199,6 +204,7 @@ ImtLicenseDbPck.depends = imtlic imtlicdb
 
 #	SUBDIRS += ServletDemoPck
 #	ServletDemoPck.file = ../../Docs/Tutorials/Impl/ServletDemoPck/QMake/ServletDemoPck.pro
+#        ServletDemoPck.depends = ImtRestPck ImtCorePck imtservletdemo
 #	ServletDemoPck.depends = ImtRestPck ImtCorePck imtservletdemo
 
 #	SUBDIRS += ServerDemo
