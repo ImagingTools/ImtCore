@@ -56,8 +56,8 @@ var QObject = function () {
         }
       }
 
-      for (var i in this.$properties) {
-        var prop = this.$properties[i];
+      for (var _i in this.$properties) {
+        var prop = this.$properties[_i];
         while (prop.$tidyupList.length > 0) {
           prop.$tidyupList[0].disconnect(prop);
         }
@@ -75,8 +75,8 @@ var QObject = function () {
 
       // Disconnect any slots connected to any of our signals. Do this after
       // clearing the parent, as that relies on parentChanged being handled.
-      for (var _i in this.$signals) {
-        this.$signals[_i].disconnect();
+      for (var _i2 in this.$signals) {
+        this.$signals[_i2].disconnect();
       }
     }
 
@@ -1536,8 +1536,8 @@ var Signal = function () {
         args[_key10] = arguments[_key10];
       }
 
-      for (var i in this.connectedSlots) {
-        var desc = this.connectedSlots[i];
+      for (var _i3 in this.connectedSlots) {
+        var desc = this.connectedSlots[_i3];
         if (desc.type & Signal.QueuedConnection) {
           Signal.$addQueued(desc, args);
         } else {
@@ -1595,10 +1595,10 @@ var Signal = function () {
       //  3 = object with string method,  4 = object with function
       // No args means disconnect everything connected to this signal
       var callType = args.length === 1 ? args[0] instanceof Function ? 1 : 2 : typeof args[1] === "string" || args[1] instanceof String ? 3 : 4;
-      for (var i = 0; i < this.connectedSlots.length; i++) {
-        var _connectedSlots$i = this.connectedSlots[i],
-            slot = _connectedSlots$i.slot,
-            thisObj = _connectedSlots$i.thisObj;
+      for (var _i4 = 0; _i4 < this.connectedSlots.length; _i4++) {
+        var _connectedSlots$_i = this.connectedSlots[_i4],
+            slot = _connectedSlots$_i.slot,
+            thisObj = _connectedSlots$_i.thisObj;
 
         if (args.length === 0 || callType === 1 && slot === args[0] || callType === 2 && thisObj === args[0] || callType === 3 && thisObj === args[0] && slot === args[0][args[1]] || thisObj === args[0] && slot === args[1]) {
           if (thisObj) {
@@ -1607,10 +1607,10 @@ var Signal = function () {
               thisObj.$tidyupList.splice(index, 1);
             }
           }
-          this.connectedSlots.splice(i, 1);
+          this.connectedSlots.splice(_i4, 1);
           // We have removed an item from the list so the indexes shifted one
           // backwards
-          i--;
+          _i4--;
         }
       }
 
@@ -1627,10 +1627,10 @@ var Signal = function () {
       }
 
       var callType = args.length === 1 ? 1 : typeof args[1] === "string" || args[1] instanceof String ? 2 : 3;
-      for (var i in this.connectedSlots) {
-        var _connectedSlots$i2 = this.connectedSlots[i],
-            slot = _connectedSlots$i2.slot,
-            thisObj = _connectedSlots$i2.thisObj;
+      for (var _i5 in this.connectedSlots) {
+        var _connectedSlots$_i2 = this.connectedSlots[_i5],
+            slot = _connectedSlots$_i2.slot,
+            thisObj = _connectedSlots$_i2.thisObj;
 
         if (callType === 1 && slot === args[0] || callType === 2 && thisObj === args[0] && slot === args[0][args[1]] || thisObj === args[0] && slot === args[1]) {
           return true;
@@ -1676,8 +1676,8 @@ var Signal = function () {
       Signal.$queued = [];
 
       QmlWeb.QMLProperty.pushEvalStack();
-      for (var i in queued) {
-        Signal.$execute.apply(Signal, _toConsumableArray(queued[i]));
+      for (var _i6 in queued) {
+        Signal.$execute.apply(Signal, _toConsumableArray(queued[_i6]));
       }
       QmlWeb.QMLProperty.popEvalStack();
     }
@@ -1717,8 +1717,8 @@ var Qt = {
       var nameIsUrl = engine.$parseURI(name) !== undefined;
       if (!nameIsUrl) {
         var moreDirs = engine.importSearchPaths(QmlWeb.executionContext.importContextId);
-        for (var i = 0; i < moreDirs.length; i++) {
-          file = "" + moreDirs[i] + name;
+        for (var _i7 = 0; _i7 < moreDirs.length; _i7++) {
+          file = "" + moreDirs[_i7] + name;
           tree = engine.loadComponent(file);
           if (tree) break;
         }
@@ -2597,8 +2597,8 @@ var QMLEngine = function () {
 
       var setter = function setter(newVal) {
         value = newVal;
-        for (var i in dependantProperties) {
-          dependantProperties[i].update();
+        for (var _i8 in dependantProperties) {
+          dependantProperties[_i8].update();
         }
       };
 
@@ -2631,8 +2631,8 @@ var QMLEngine = function () {
         return;
       }
 
-      for (var i = 0; i < importsArray.length; i++) {
-        this.loadImport(importsArray[i], currentFileDir, importContextId);
+      for (var _i9 = 0; _i9 < importsArray.length; _i9++) {
+        this.loadImport(importsArray[_i9], currentFileDir, importContextId);
       }
     }
   }, {
@@ -2960,8 +2960,8 @@ var QMLEngine = function () {
       }
 
       var schemes = ["data:", "blob:", "about:"];
-      for (var i = 0; i < schemes.length; i++) {
-        if (file.lastIndexOf(schemes[i], 0) === 0) {
+      for (var _i10 = 0; _i10 < schemes.length; _i10++) {
+        if (file.lastIndexOf(schemes[_i10], 0) === 0) {
           return file;
         }
       }
@@ -3039,9 +3039,9 @@ QmlWeb.qmlInteger = QMLInteger;
 function QMLList(meta) {
   var list = [];
   if (meta.object instanceof Array) {
-    for (var i in meta.object) {
+    for (var _i11 in meta.object) {
       list.push(QmlWeb.construct({
-        object: meta.object[i],
+        object: meta.object[_i11],
         parent: meta.parent,
         context: meta.context
       }));
@@ -3374,8 +3374,8 @@ QmlWeb.qmlVariant = QMLVariant;
 
 window.addEventListener("load", function () {
   var metaTags = document.getElementsByTagName("body");
-  for (var i = 0; i < metaTags.length; ++i) {
-    var metaTag = metaTags[i];
+  for (var _i12 = 0; _i12 < metaTags.length; ++_i12) {
+    var metaTag = metaTags[_i12];
     var source = metaTag.getAttribute("data-qml");
     if (source) {
       QmlWeb.qmlEngine = new QmlWeb.QMLEngine();
@@ -3829,8 +3829,8 @@ var QmlWebHelpers = function () {
         args[_key23] = arguments[_key23];
       }
 
-      for (var i in args) {
-        var arg = args[i];
+      for (var _i13 in args) {
+        var arg = args[_i13];
         if (!arg) {
           continue;
         }
@@ -4010,8 +4010,8 @@ function readQmlDir(url) {
   }
 
   var lines = qmldir.split(/\r?\n/);
-  for (var i = 0; i < lines.length; i++) {
-    var line = lines[i].trim();
+  for (var _i14 = 0; _i14 < lines.length; _i14++) {
+    var line = lines[_i14].trim();
     if (!line.length || line[0] === "#") continue; // Empty line or comment
     var parts = line.split(/\s+/);
     var res = {};
@@ -4191,8 +4191,8 @@ function registerQmlType(spec) {
 
 function getConstructor(moduleName, version, name) {
   if (typeof modules[moduleName] !== "undefined") {
-    for (var i = 0; i < modules[moduleName].length; ++i) {
-      var type = modules[moduleName][i];
+    for (var _i15 = 0; _i15 < modules[moduleName].length; ++_i15) {
+      var type = modules[moduleName][_i15];
       if (type.name === name && type.versions.test(version)) {
         return type.constructor;
       }
@@ -4207,8 +4207,8 @@ function getModuleConstructors(moduleName, version) {
     console.warn("module \"" + moduleName + "\" not found");
     return constructors;
   }
-  for (var i = 0; i < modules[moduleName].length; ++i) {
-    var module = modules[moduleName][i];
+  for (var _i16 = 0; _i16 < modules[moduleName].length; ++_i16) {
+    var module = modules[moduleName][_i16];
     if (module.versions.test(version)) {
       constructors[module.name] = module.constructor;
     }
@@ -4226,11 +4226,11 @@ function loadImports(self, imports) {
   }).length === 1) {
     imports.push(["qmlimport", "QtQml", 2, "", true]);
   }
-  for (var i = 0; i < imports.length; ++i) {
-    var _imports$i = _slicedToArray(imports[i], 4),
-        moduleName = _imports$i[1],
-        moduleVersion = _imports$i[2],
-        moduleAlias = _imports$i[3];
+  for (var _i17 = 0; _i17 < imports.length; ++_i17) {
+    var _imports$_i = _slicedToArray(imports[_i17], 4),
+        moduleName = _imports$_i[1],
+        moduleVersion = _imports$_i[2],
+        moduleAlias = _imports$_i[3];
 
     if (typeof moduleVersion !== "number") continue;
     var versionString = moduleVersion % 1 === 0 ? moduleVersion.toFixed(1) : moduleVersion.toString();
@@ -4337,13 +4337,29 @@ function construct(meta) {
     // }
   }
   for (var id in QmlWeb.importList['__all__']) {
-    for (var i = 0; i <= importNumber; i++) {
-      if (!QmlWeb.importList[i][id]) QmlWeb.importList[i][id] = QmlWeb.importList['__all__'][id];
+    for (var _i18 = 0; _i18 <= importNumber; _i18++) {
+      if (!QmlWeb.importList[_i18][id]) QmlWeb.importList[_i18][id] = QmlWeb.importList['__all__'][id];
     }
   }
 
   meta.context['__importList__'] = QmlWeb.importList;
   meta.context['__location__'] = window.location;
+
+  var params = window.location.search.replace('?', '').split("&");
+  var result = {};
+  for (i = 0; i < params.length; i++) {
+    var val = params[i].split("=");
+    result[val[0]] = val[1];
+  }
+
+  meta.context['__location__'].searchParams = result;
+  //meta.context['__location__'].url = window.location.origin + window.location.pathname
+
+  QmlWeb.setupGetterSetter(meta.context['__location__'], 'url', function () {
+    return window.location.origin + window.location.pathname;
+  }, function (val) {
+    window.location.href = val;
+  });
 
   // keep path in item for probale use it later in Qt.resolvedUrl
   item.$context.$basePath = QmlWeb.engine.$basePath; //gut
@@ -4454,23 +4470,23 @@ function applyProperties(metaObject, item, objectScopeIn, componentScope) {
     item.$defaultProperty = metaObject.$defaultProperty;
   }
 
-  for (var i in metaObject) {
-    var _value = metaObject[i];
-    if (i === "id" || i === "$class") {
+  for (var _i19 in metaObject) {
+    var _value = metaObject[_i19];
+    if (_i19 === "id" || _i19 === "$class") {
       // keep them
-      item[i] = _value;
+      item[_i19] = _value;
       continue;
     }
 
     // skip global id's and internal values
-    if (i === "id" || i[0] === "$") {
+    if (_i19 === "id" || _i19[0] === "$") {
       // TODO: what? See above.
       continue;
     }
 
     // slots
-    if (i.indexOf("on") === 0 && i.length > 2 && /[A-Z]/.test(i[2])) {
-      var signalName = i[2].toLowerCase() + i.slice(3);
+    if (_i19.indexOf("on") === 0 && _i19.length > 2 && /[A-Z]/.test(_i19[2])) {
+      var signalName = _i19[2].toLowerCase() + _i19.slice(3);
       if (connectSignal(item, signalName, _value, objectScope, componentScope)) {
         continue;
       }
@@ -4481,19 +4497,19 @@ function applyProperties(metaObject, item, objectScopeIn, componentScope) {
     }
 
     if (_value instanceof Object) {
-      if (applyProperty(item, i, _value, objectScope, componentScope)) {
+      if (applyProperty(item, _i19, _value, objectScope, componentScope)) {
         continue;
       }
     }
 
-    if (item.$properties && i in item.$properties) {
-      item.$properties[i].set(_value, QMLProperty.ReasonInit, objectScope, componentScope);
-    } else if (i in item) {
-      item[i] = _value;
+    if (item.$properties && _i19 in item.$properties) {
+      item.$properties[_i19].set(_value, QMLProperty.ReasonInit, objectScope, componentScope);
+    } else if (_i19 in item) {
+      item[_i19] = _value;
     } else if (item.$setCustomData) {
-      item.$setCustomData(i, _value);
+      item.$setCustomData(_i19, _value);
     } else {
-      console.warn("Cannot assign to non-existent property \"" + i + "\". Ignoring assignment.");
+      console.warn("Cannot assign to non-existent property \"" + _i19 + "\". Ignoring assignment.");
     }
   }
 }
@@ -4785,8 +4801,8 @@ convertToEngine.walkers = {
   qmlelem: function qmlelem(elem, onProp, statements) {
     var item = new QMLMetaElement(convertToEngine.stringifyDots(elem), onProp);
 
-    for (var i in statements) {
-      var statement = statements[i];
+    for (var _i20 in statements) {
+      var statement = statements[_i20];
       var name = statement[1];
       var val = convertToEngine(statement);
       switch (statement[0]) {
@@ -4832,8 +4848,8 @@ convertToEngine.walkers = {
   },
   qmlobj: function qmlobj(elem, statements) {
     var item = {};
-    for (var i in statements) {
-      var statement = statements[i];
+    for (var _i21 in statements) {
+      var statement = statements[_i21];
       var name = statement[1];
       var val = convertToEngine(statement);
       if (statement[0] === "qmlprop") {
@@ -4876,8 +4892,8 @@ convertToEngine.walkers = {
     var a = [];
     var isList = false;
     var hasBinding = false;
-    for (var i in tree) {
-      var val = convertToEngine.bindout(tree[i]);
+    for (var _i22 in tree) {
+      var val = convertToEngine.bindout(tree[_i22]);
       a.push(val);
 
       if (val instanceof QMLMetaElement) {
@@ -4919,9 +4935,9 @@ function loadParser() {
 
   console.log("Loading parser...");
   var tags = document.getElementsByTagName("script");
-  for (var i in tags) {
-    if (tags[i].src && tags[i].src.match(/\/(qt|qmlweb)\./)) {
-      var src = tags[i].src.replace(/\/(qt|qmlweb)\.(es201.\.)?/, "/qmlweb.parser.");
+  for (var _i23 in tags) {
+    if (tags[_i23].src && tags[_i23].src.match(/\/(qt|qmlweb)\./)) {
+      var src = tags[_i23].src.replace(/\/(qt|qmlweb)\.(es201.\.)?/, "/qmlweb.parser.");
       // TODO: rewrite to async loading
       var xhr = new XMLHttpRequest();
       xhr.open("GET", src, false);
@@ -5083,8 +5099,8 @@ var QtQml_QtObject = function (_QmlWeb$QObject10) {
     _this19.Keys.callPressed = Signal.signal();
     _this19.Keys.cancelPressed = Signal.signal();
     _this19.Keys.deletePressed = Signal.signal();
-    for (var i = 0; i < 10; ++i) {
-      _this19.Keys["digit" + i + "Pressed"] = Signal.signal();
+    for (var _i24 = 0; _i24 < 10; ++_i24) {
+      _this19.Keys["digit" + _i24 + "Pressed"] = Signal.signal();
     }
     _this19.Keys.escapePressed = Signal.signal();
     _this19.Keys.flipPressed = Signal.signal();
@@ -5505,8 +5521,8 @@ var QtQml_Component = function (_QtQml_QtObject7) {
         }
       };
 
-      for (var i = 0; i < meta.object.$imports.length; ++i) {
-        loadImport(meta.object.$imports[i]);
+      for (var _i25 = 0; _i25 < meta.object.$imports.length; ++_i25) {
+        loadImport(meta.object.$imports[_i25]);
       }
       QmlWeb.loadImports(_this26, moduleImports);
     }
@@ -5524,8 +5540,8 @@ var QtQml_Component = function (_QtQml_QtObject7) {
     key: "finalizeImports",
     value: function finalizeImports($context) {
       var engine = QmlWeb.engine;
-      for (var i = 0; i < this.$jsImports.length; ++i) {
-        var importDesc = this.$jsImports[i];
+      for (var _i26 = 0; _i26 < this.$jsImports.length; ++_i26) {
+        var importDesc = this.$jsImports[_i26];
         var js = engine.loadJS(engine.$resolvePath(importDesc[1]));
 
         if (!js) {
@@ -5649,13 +5665,13 @@ var QtQml_Connections = function (_QtQml_QtObject8) {
     key: "$reconnectTarget",
     value: function $reconnectTarget() {
       var old_target = this.$old_target;
-      for (var i in this.$connections) {
-        var c = this.$connections[i];
-        if (c._currentConnection && old_target && old_target[i] && typeof old_target[i].disconnect === "function") {
-          old_target[i].disconnect(c._currentConnection);
+      for (var _i27 in this.$connections) {
+        var c = this.$connections[_i27];
+        if (c._currentConnection && old_target && old_target[_i27] && typeof old_target[_i27].disconnect === "function") {
+          old_target[_i27].disconnect(c._currentConnection);
         }
         if (this.target) {
-          c._currentConnection = QmlWeb.connectSignal(this.target, i, c.value, c.objectScope, c.componentScope);
+          c._currentConnection = QmlWeb.connectSignal(this.target, _i27, c.value, c.objectScope, c.componentScope);
         }
       }
       this.$old_target = this.target;
@@ -6504,8 +6520,8 @@ var QtQuick_Item = function (_QtQml_QtObject17) {
     key: "$onDataChanged",
     value: function $onDataChanged(newData) {
       var QMLItem = QmlWeb.getConstructor("QtQuick", "2.0", "Item");
-      for (var i in newData) {
-        var child = newData[i];
+      for (var _i28 in newData) {
+        var child = newData[_i28];
         if (child instanceof QMLItem) {
           child.parent = this; // This will also add it to children.
         } else {
@@ -6518,9 +6534,9 @@ var QtQuick_Item = function (_QtQml_QtObject17) {
     value: function $onStateChanged(newVal, oldVal) {
       // let oldState; // TODO: do we need oldState?
       var newState = void 0;
-      for (var i = 0; i < this.states.length; i++) {
-        if (this.states[i].name === newVal) {
-          newState = this.states[i];
+      for (var _i29 = 0; _i29 < this.states.length; _i29++) {
+        if (this.states[_i29].name === newVal) {
+          newState = this.states[_i29];
         }
         /*
         else if (this.states[i].name === oldVal) {
@@ -6533,16 +6549,16 @@ var QtQuick_Item = function (_QtQml_QtObject17) {
 
       // Get current values for revert actions
 
-      for (var _i2 in actions) {
-        var action = actions[_i2];
+      for (var _i30 in actions) {
+        var action = actions[_i30];
         action.from = action.target[action.property];
       }
       if (newState) {
         var changes = newState.$getAllChanges();
 
         // Get all actions we need to do and create actions to revert them
-        for (var _i3 = 0; _i3 < changes.length; _i3++) {
-          this.$applyChange(actions, changes[_i3]);
+        for (var _i31 = 0; _i31 < changes.length; _i31++) {
+          this.$applyChange(actions, changes[_i31]);
         }
       }
 
@@ -6557,15 +6573,15 @@ var QtQuick_Item = function (_QtQml_QtObject17) {
           transitionProps = _transition.$properties.animations.val[k].$props;
         }
       }
-      for (var _i4 in actions) {
-        var _action = actions[_i4];
+      for (var _i32 in actions) {
+        var _action = actions[_i32];
         if (transitionProps.indexOf(_action.property) < 0) {
           _action.target.$properties[_action.property].set(_action.value, QmlWeb.QMLProperty.ReasonUser, _action.target, newState ? newState.$context : _action.target.$context);
         }
       }
 
-      for (var _i5 in actions) {
-        var _action2 = actions[_i5];
+      for (var _i33 in actions) {
+        var _action2 = actions[_i33];
         //action.to = action.target[action.property];
         if (_action2.explicit) {
           // Remove binding
@@ -6577,11 +6593,11 @@ var QtQuick_Item = function (_QtQml_QtObject17) {
       // Find the best transition to use
       var transition = void 0;
       var rating = 0;
-      for (var _i6 = 0; _i6 < this.transitions.length; _i6++) {
+      for (var _i34 = 0; _i34 < this.transitions.length; _i34++) {
         // We need to stop running transitions, so let's do
         // it while iterating through the transitions anyway
-        this.transitions[_i6].$stop();
-        var curTransition = this.transitions[_i6];
+        this.transitions[_i34].$stop();
+        var curTransition = this.transitions[_i34];
         var curRating = 0;
         if (curTransition.from === oldVal || curTransition.reversible && curTransition.from === newVal) {
           curRating += 2;
@@ -6739,8 +6755,8 @@ var QtQuick_Item = function (_QtQml_QtObject17) {
       var filter = "";
       var transformStyle = "preserve-3d";
 
-      for (var i = 0; i < this.transform.length; i++) {
-        var t = this.transform[i];
+      for (var _i35 = 0; _i35 < this.transform.length; _i35++) {
+        var t = this.transform[_i35];
         if (t instanceof QMLRotation) {
           var ax = t.axis;
           transform += " rotate3d(" + ax.x + ", " + ax.y + ", " + ax.z + ", " + ax.angle + "deg)";
@@ -7019,8 +7035,8 @@ var QtQuick_Item = function (_QtQml_QtObject17) {
       var minX = children.length > 0 ? children[0].x : 0;
       var minY = children.length > 0 ? children[0].y : 0;
 
-      for (var i = 0; i < children.length; i++) {
-        var child = children[i];
+      for (var _i36 = 0; _i36 < children.length; _i36++) {
+        var child = children[_i36];
         maxWidth = Math.max(maxWidth, child.x + child.width);
         maxHeight = Math.max(maxHeight, child.y + child.heighth);
         minX = Math.min(minX, child.x);
@@ -7222,8 +7238,8 @@ var QmlWeb_RestModel = function (_QtQuick_Item2) {
     key: "$generateBodyForPostQuery",
     value: function $generateBodyForPostQuery() {
       var object = {};
-      for (var i = 0; i < this.attributes.length; ++i) {
-        object[this.attributes[i]] = this.$properties[this.attributes[i]].get();
+      for (var _i37 = 0; _i37 < this.attributes.length; ++_i37) {
+        object[this.attributes[_i37]] = this.$properties[this.attributes[_i37]].get();
       }
       console.log(object);
       switch (this.queryMimeType) {
@@ -8049,8 +8065,8 @@ var QtQuick_Controls_2_Container = function (_QtQuick_Controls_2_C2) {
     key: "$onChildrenChanged",
     value: function $onChildrenChanged() {
       var flags = QmlWeb.Signal.UniqueConnection;
-      for (var i = 0; i < this.children.length; i++) {
-        var child = this.children[i];
+      for (var _i38 = 0; _i38 < this.children.length; _i38++) {
+        var child = this.children[_i38];
         child.widthChanged.connect(this, this.layoutChildren, flags);
         child.heightChanged.connect(this, this.layoutChildren, flags);
         child.visibleChanged.connect(this, this.layoutChildren, flags);
@@ -8124,8 +8140,8 @@ var QtQuick_Controls_2_SwipeView = function (_QtQuick_Controls_2_C4) {
 
     value: function layoutChildren() {
       var pos = 0;
-      for (var i = 0; i < this.children.length; i++) {
-        var child = this.children[i];
+      for (var _i39 = 0; _i39 < this.children.length; _i39++) {
+        var child = this.children[_i39];
         if (!child.visible) continue;
         child.height = this.height;
         child.width = this.width;
@@ -8373,8 +8389,8 @@ var QtQuick_Controls_ComboBox = function (_QtQuick_Item13) {
       var k = this.count;var m = this.model;
 
       this.impl.options.length = k;
-      for (var i = 0; i < k; i++) {
-        this.impl.options[i] = new Option(m[i]);
+      for (var _i40 = 0; _i40 < k; _i40++) {
+        this.impl.options[_i40] = new Option(m[_i40]);
       }
 
       // should call this, because width()/heights() invoke updateV(H)Geometry,
@@ -9395,7 +9411,7 @@ var QtQuick_Flickable = function (_QtQuick_Item27) {
     var bg = _this88.impl = document.createElement("div");
     bg.style.pointerEvents = "none";
     bg.style.position = "absolute";
-    bg.style.left = bg.style.right = bg.style.top = bg.style.bottom = "0px";
+    bg.style.left = bg.style.top = "0px";
     bg.style.background = "none";
     _this88.dom.appendChild(bg);
 
@@ -9488,6 +9504,54 @@ var QtQuick_Flickable = function (_QtQuick_Item27) {
     _this88.flickableDirectionChanged.connect(_this88, _this88.$flickableDirectionChanged);
 
     _this88.Component.completed.connect(_this88, _this88.Component$onCompleted);
+
+    var config = {
+      attributes: true,
+      childList: true,
+      subtree: true
+    };
+
+    var observer = new MutationObserver(function () {
+      var left = 0;
+      var right = 0;
+      var top = 0;
+      var bottom = 0;
+      var pRect = _this88.dom.getBoundingClientRect();
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = _this88.dom.childNodes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var child = _step2.value;
+
+          if (child !== _this88.impl) {
+            var cRect = child.getBoundingClientRect();
+            if (cRect.left - pRect.left < left) left = cRect.left - pRect.left;
+            if (cRect.right - pRect.left > right) right = cRect.right - pRect.left;
+            if (cRect.top - pRect.top < top) top = cRect.top - pRect.top;
+            if (cRect.bottom - pRect.top > bottom) bottom = cRect.bottom - pRect.top;
+          }
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+
+      _this88.contentWidth = right - left;
+      _this88.contentHeight = bottom - top;
+    });
+    observer.observe(_this88.dom, config);
     return _this88;
   }
 
@@ -9567,24 +9631,12 @@ var QtQuick_Flickable = function (_QtQuick_Item27) {
   }, {
     key: "$contentHeightChanged",
     value: function $contentHeightChanged() {
-      if (this.contentHeight === 0) {
-        this.impl.style.height = "100%";
-        this.impl.style.bottom = "0";
-      } else {
-        this.impl.style.height = this.contentHeight + "px";
-        this.impl.style.bottom = this.contentHeight + "px";
-      }
+      this.impl.style.height = this.contentHeight + "px";
     }
   }, {
     key: "$contentWidthChanged",
     value: function $contentWidthChanged() {
-      if (this.contentWidth === 0) {
-        this.impl.style.width = "100%";
-        this.impl.style.right = "0";
-      } else {
-        this.impl.style.width = this.contentWidth + "px";
-        this.impl.style.right = this.contentWidth + "px";
-      }
+      this.impl.style.width = this.contentWidth + "px";
     }
   }, {
     key: "$contentXChanged",
@@ -9698,8 +9750,8 @@ var QtQuick_Gradient = function (_QtQuick_Item29) {
     value: function applyGradient() {
       var g_temp = [];
       //old_pos = 0;
-      for (var i = 0; i < this.stops.length; i++) {
-        g_temp.push(this.stops[i].color + " " + this.stops[i].position * 100 + "%");
+      for (var _i41 = 0; _i41 < this.stops.length; _i41++) {
+        g_temp.push(this.stops[_i41].color + " " + this.stops[_i41].position * 100 + "%");
       }
 
       var g_str = 'none';
@@ -9972,9 +10024,9 @@ var QtQuick_ListElement = function (_QtQml_QtObject18) {
 
     var _this97 = _possibleConstructorReturn(this, (QtQuick_ListElement.__proto__ || Object.getPrototypeOf(QtQuick_ListElement)).call(this, meta));
 
-    for (var i in meta.object) {
-      if (i[0] !== "$") {
-        QmlWeb.createProperty("variant", _this97, i);
+    for (var _i42 in meta.object) {
+      if (_i42[0] !== "$") {
+        QmlWeb.createProperty("variant", _this97, _i42);
       }
     }
     QmlWeb.applyProperties(meta.object, _this97, _this97, _this97.$context);
@@ -10039,9 +10091,9 @@ var QtQuick_ListModel = function (_QtQml_QtObject19) {
         if (dict instanceof QMLListElement) {
           dict = dict.$properties;
         }
-        for (var i in dict) {
-          if (i !== "index") {
-            roleNames.push(i);
+        for (var _i43 in dict) {
+          if (_i43 !== "index") {
+            roleNames.push(_i43);
           }
         }
         this.$model.setRoleNames(roleNames);
@@ -10089,8 +10141,8 @@ var QtQuick_ListModel = function (_QtQml_QtObject19) {
     key: "move",
     value: function move(from, to, n) {
       var vals = this.$items.splice(from, n);
-      for (var i = 0; i < vals.length; i++) {
-        this.$items.splice(to + i, 0, vals[i]);
+      for (var _i44 = 0; _i44 < vals.length; _i44++) {
+        this.$items.splice(to + _i44, 0, vals[_i44]);
       }
       this.$model.rowsMoved(from, from + n, to);
     }
@@ -10220,7 +10272,7 @@ var QtQuick_Loader = function (_QtQuick_Item32) {
       if (newItem instanceof QMLComponent) {
         qmlComponent = newItem.$createObject(this, {}, this);
       }
-      qmlComponent.parent = this;
+      qmlComponent.parent = this.parent;
       this.item = qmlComponent;
       this.$updateGeometry();
       if (this.item) {
@@ -10247,9 +10299,9 @@ var QtQuick_Loader = function (_QtQuick_Item32) {
     value: function $callOnCompleted(child) {
       child.Component.completed();
       var QMLBaseObject = QmlWeb.getConstructor("QtQml", "2.0", "QtObject");
-      for (var i = 0; i < child.$tidyupList.length; i++) {
-        if (child.$tidyupList[i] instanceof QMLBaseObject) {
-          this.$callOnCompleted(child.$tidyupList[i]);
+      for (var _i45 = 0; _i45 < child.$tidyupList.length; _i45++) {
+        if (child.$tidyupList[_i45] instanceof QMLBaseObject) {
+          this.$callOnCompleted(child.$tidyupList[_i45]);
         }
       }
     }
@@ -10334,13 +10386,13 @@ var QtQuick_MouseArea = function (_QtQuick_Item33) {
 
         return allEvent;
       }(function (item) {
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
+        var _iteratorNormalCompletion3 = true;
+        var _didIteratorError3 = false;
+        var _iteratorError3 = undefined;
 
         try {
-          for (var _iterator2 = item.children[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var child = _step2.value;
+          for (var _iterator3 = item.children[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+            var child = _step3.value;
 
             if (child instanceof QtQuick_MouseArea && child != _this102) {
               var rect = child.dom.getBoundingClientRect();
@@ -10351,16 +10403,16 @@ var QtQuick_MouseArea = function (_QtQuick_Item33) {
             allEvent(child);
           }
         } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
+          _didIteratorError3 = true;
+          _iteratorError3 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-              _iterator2.return();
+            if (!_iteratorNormalCompletion3 && _iterator3.return) {
+              _iterator3.return();
             }
           } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
+            if (_didIteratorError3) {
+              throw _iteratorError3;
             }
           }
         }
@@ -10478,15 +10530,15 @@ var QtQuick_MouseArea = function (_QtQuick_Item33) {
         //e.stopPropagation();
         e.preventDefault();
       } else {
-        var i = 0;
+        var _i46 = 0;
         var stop = false;
-        while (!stop && i < this.areaList.length) {
-          stop = this.areaList[i];
-          tempWheel = this.areaList[i].$eventToMouse(e);
+        while (!stop && _i46 < this.areaList.length) {
+          stop = this.areaList[_i46];
+          tempWheel = this.areaList[_i46].$eventToMouse(e);
           tempWheel.accepted = false;
-          this.areaList[i].wheel(tempWheel);
-          stop = tempWheel.accepted || this.areaList[i].propagateComposedEvents;
-          i++;
+          this.areaList[_i46].wheel(tempWheel);
+          stop = tempWheel.accepted || this.areaList[_i46].propagateComposedEvents;
+          _i46++;
         }
       }
     }
@@ -10503,15 +10555,15 @@ var QtQuick_MouseArea = function (_QtQuick_Item33) {
           //e.stopPropagation();
           e.preventDefault();
         } else {
-          var i = 0;
+          var _i47 = 0;
           var stop = false;
-          while (!stop && i < this.areaList.length) {
-            stop = this.areaList[i];
-            tempMouse = this.areaList[i].$eventToMouse(e);
+          while (!stop && _i47 < this.areaList.length) {
+            stop = this.areaList[_i47];
+            tempMouse = this.areaList[_i47].$eventToMouse(e);
             tempMouse.accepted = false;
-            this.areaList[i].clicked(tempMouse);
-            stop = tempMouse.accepted || this.areaList[i].propagateComposedEvents;
-            i++;
+            this.areaList[_i47].clicked(tempMouse);
+            stop = tempMouse.accepted || this.areaList[_i47].propagateComposedEvents;
+            _i47++;
           }
         }
       }
@@ -10675,8 +10727,8 @@ var QtQuick_ParallelAnimation = function (_QtQuick_Animation2) {
     key: "$onAnimationsChanged",
     value: function $onAnimationsChanged() {
       var flags = QmlWeb.Signal.UniqueConnection;
-      for (var i = 0; i < this.animations.length; i++) {
-        var animation = this.animations[i];
+      for (var _i48 = 0; _i48 < this.animations.length; _i48++) {
+        var animation = this.animations[_i48];
         animation.runningChanged.connect(this, this.$animationFinished, flags);
       }
     }
@@ -10693,16 +10745,16 @@ var QtQuick_ParallelAnimation = function (_QtQuick_Animation2) {
     value: function start() {
       if (this.running) return;
       this.running = true;
-      for (var i = 0; i < this.animations.length; i++) {
-        this.animations[i].start();
+      for (var _i49 = 0; _i49 < this.animations.length; _i49++) {
+        this.animations[_i49].start();
       }
     }
   }, {
     key: "stop",
     value: function stop() {
       if (!this.running) return;
-      for (var i = 0; i < this.animations.length; i++) {
-        this.animations[i].stop();
+      for (var _i50 = 0; _i50 < this.animations.length; _i50++) {
+        this.animations[_i50].stop();
       }
       this.running = false;
     }
@@ -10796,8 +10848,8 @@ var QtQuick_Positioner = function (_QtQuick_Item34) {
     key: "$onChildrenChanged",
     value: function $onChildrenChanged() {
       var flags = QmlWeb.Signal.UniqueConnection;
-      for (var i = 0; i < this.children.length; i++) {
-        var child = this.children[i];
+      for (var _i51 = 0; _i51 < this.children.length; _i51++) {
+        var child = this.children[_i51];
         child.widthChanged.connect(this, this.layoutChildren, flags);
         child.heightChanged.connect(this, this.layoutChildren, flags);
         child.visibleChanged.connect(this, this.layoutChildren, flags);
@@ -10836,8 +10888,8 @@ var QtQuick_Column = function (_QtQuick_Positioner) {
     value: function layoutChildren() {
       var curPos = this.padding;
       var maxWidth = 0;
-      for (var i = 0; i < this.children.length; i++) {
-        var child = this.children[i];
+      for (var _i52 = 0; _i52 < this.children.length; _i52++) {
+        var child = this.children[_i52];
         if (!child.visible || !child.width || !child.height) {
           continue;
         }
@@ -10886,8 +10938,8 @@ var QtQuick_Flow = function (_QtQuick_Positioner2) {
       var curHPos = 0;
       var curVPos = 0;
       var rowSize = 0;
-      for (var i = 0; i < this.children.length; i++) {
-        var child = this.children[i];
+      for (var _i53 = 0; _i53 < this.children.length; _i53++) {
+        var child = this.children[_i53];
         if (!child.visible || !child.width || !child.height) {
           continue;
         }
@@ -10989,9 +11041,9 @@ var QtQuick_Grid = function (_QtQuick_Positioner3) {
       var curHPos = 0;
       var curVPos = 0;
       if (this.flow === 0) {
-        for (var i = 0; i < r; i++) {
+        for (var _i54 = 0; _i54 < r; _i54++) {
           for (var j = startingPoint; j !== endPoint; j += step) {
-            var _item = visibleItems[i * c + j];
+            var _item = visibleItems[_i54 * c + j];
             if (!_item) {
               break;
             }
@@ -11000,13 +11052,13 @@ var QtQuick_Grid = function (_QtQuick_Positioner3) {
 
             curHPos += colWidth[j] + this.spacing;
           }
-          curVPos += rowHeight[i] + this.spacing;
+          curVPos += rowHeight[_i54] + this.spacing;
           curHPos = 0;
         }
       } else {
-        for (var _i7 = startingPoint; _i7 !== endPoint; _i7 += step) {
+        for (var _i55 = startingPoint; _i55 !== endPoint; _i55 += step) {
           for (var _j = 0; _j < r; _j++) {
-            var _item2 = visibleItems[_i7 * r + _j];
+            var _item2 = visibleItems[_i55 * r + _j];
             if (!_item2) {
               break;
             }
@@ -11015,7 +11067,7 @@ var QtQuick_Grid = function (_QtQuick_Positioner3) {
 
             curVPos += rowHeight[_j] + this.spacing;
           }
-          curHPos += colWidth[_i7] + this.spacing;
+          curHPos += colWidth[_i55] + this.spacing;
           curVPos = 0;
         }
       }
@@ -11023,11 +11075,11 @@ var QtQuick_Grid = function (_QtQuick_Positioner3) {
       // Set implicit size
       var gridWidth = -this.spacing;
       var gridHeight = -this.spacing;
-      for (var _i8 in colWidth) {
-        gridWidth += colWidth[_i8] + this.spacing;
+      for (var _i56 in colWidth) {
+        gridWidth += colWidth[_i56] + this.spacing;
       }
-      for (var _i9 in rowHeight) {
-        gridHeight += rowHeight[_i9] + this.spacing;
+      for (var _i57 in rowHeight) {
+        gridHeight += rowHeight[_i57] + this.spacing;
       }
       this.implicitWidth = gridWidth;
       this.implicitHeight = gridHeight;
@@ -11063,32 +11115,32 @@ var QtQuick_Grid = function (_QtQuick_Positioner3) {
       var rowHeight = [];
 
       if (this.flow === 0) {
-        for (var i = 0; i < rows; i++) {
+        for (var _i58 = 0; _i58 < rows; _i58++) {
           for (var j = 0; j < cols; j++) {
-            var _item3 = visibleItems[i * cols + j];
+            var _item3 = visibleItems[_i58 * cols + j];
             if (!_item3) {
               break;
             }
             if (!colWidth[j] || _item3.width > colWidth[j]) {
               colWidth[j] = _item3.width;
             }
-            if (!rowHeight[i] || _item3.height > rowHeight[i]) {
-              rowHeight[i] = _item3.height;
+            if (!rowHeight[_i58] || _item3.height > rowHeight[_i58]) {
+              rowHeight[_i58] = _item3.height;
             }
           }
         }
       } else {
-        for (var _i10 = 0; _i10 < cols; _i10++) {
+        for (var _i59 = 0; _i59 < cols; _i59++) {
           for (var _j2 = 0; _j2 < rows; _j2++) {
-            var _item4 = visibleItems[_i10 * rows + _j2];
+            var _item4 = visibleItems[_i59 * rows + _j2];
             if (!_item4) {
               break;
             }
             if (!rowHeight[_j2] || _item4.height > rowHeight[_j2]) {
               rowHeight[_j2] = _item4.height;
             }
-            if (!colWidth[_i10] || _item4.width > colWidth[_i10]) {
-              colWidth[_i10] = _item4.width;
+            if (!colWidth[_i59] || _item4.width > colWidth[_i59]) {
+              colWidth[_i59] = _item4.width;
             }
           }
         }
@@ -11157,10 +11209,10 @@ var QtQuick_PropertyAnimation = function (_QtQuick_Animation4) {
     key: "$redoActions",
     value: function $redoActions() {
       this.$actions = [];
-      for (var i = 0; i < this.$targets.length; i++) {
+      for (var _i60 = 0; _i60 < this.$targets.length; _i60++) {
         for (var j in this.$props) {
           this.$actions.push({
-            target: this.$targets[i],
+            target: this.$targets[_i60],
             property: this.$props[j],
             from: this.from,
             to: this.to
@@ -11174,13 +11226,13 @@ var QtQuick_PropertyAnimation = function (_QtQuick_Animation4) {
       this.$props = this.properties.split(",");
 
       // Remove whitespaces
-      for (var i = 0; i < this.$props.length; i++) {
-        var matches = this.$props[i].match(/\w+/);
+      for (var _i61 = 0; _i61 < this.$props.length; _i61++) {
+        var matches = this.$props[_i61].match(/\w+/);
         if (matches) {
-          this.$props[i] = matches[0];
+          this.$props[_i61] = matches[0];
         } else {
-          this.$props.splice(i, 1);
-          i--;
+          this.$props.splice(_i61, 1);
+          _i61--;
         }
       }
       // Merge properties and property
@@ -11236,8 +11288,8 @@ var QtQuick_NumberAnimation = function (_QtQuick_PropertyAnim) {
   _createClass(QtQuick_NumberAnimation, [{
     key: "$startLoop",
     value: function $startLoop() {
-      for (var i in this.$actions) {
-        var _action3 = this.$actions[i];
+      for (var _i62 in this.$actions) {
+        var _action3 = this.$actions[_i62];
         _action3.from = _action3.from !== undefined ? _action3.from : _action3.target[_action3.property];
       }
       this.$at = 0;
@@ -11257,8 +11309,8 @@ var QtQuick_NumberAnimation = function (_QtQuick_PropertyAnim) {
         this.complete();
         return;
       }
-      for (var i in this.$actions) {
-        var _action4 = this.$actions[i];
+      for (var _i63 in this.$actions) {
+        var _action4 = this.$actions[_i63];
         var value = _action4.from + (_action4.to - _action4.from) * this.easing.$valueForProgress(this.$at);
         var property = _action4.target.$properties[_action4.property];
         property.set(value, QmlWeb.QMLProperty.ReasonAnimation);
@@ -11280,8 +11332,8 @@ var QtQuick_NumberAnimation = function (_QtQuick_PropertyAnim) {
   }, {
     key: "complete",
     value: function complete() {
-      for (var i in this.$actions) {
-        var _action5 = this.$actions[i];
+      for (var _i64 in this.$actions) {
+        var _action5 = this.$actions[_i64];
         var property = _action5.target.$properties[_action5.property];
         property.set(_action5.to, QmlWeb.QMLProperty.ReasonAnimation);
       }
@@ -11559,9 +11611,9 @@ var QtQuick_Repeater = function (_QtQuick_Item36) {
     value: function $callOnCompleted(child) {
       child.Component.completed();
       var QMLBaseObject = QmlWeb.getConstructor("QtQml", "2.0", "QtObject");
-      for (var i = 0; i < child.$tidyupList.length; i++) {
-        if (child.$tidyupList[i] instanceof QMLBaseObject) {
-          this.$callOnCompleted(child.$tidyupList[i]);
+      for (var _i65 = 0; _i65 < child.$tidyupList.length; _i65++) {
+        if (child.$tidyupList[_i65] instanceof QMLBaseObject) {
+          this.$callOnCompleted(child.$tidyupList[_i65]);
         }
       }
     }
@@ -11573,8 +11625,8 @@ var QtQuick_Repeater = function (_QtQuick_Item36) {
       for (var index = startIndex; index <= endIndex; index++) {
         var _item5 = this.$items[index];
         var modelData = _item5.$properties.model;
-        for (var i in roleNames) {
-          var roleName = roleNames[i];
+        for (var _i66 in roleNames) {
+          var roleName = roleNames[_i66];
           var roleData = model.data(index, roleName);
           _item5.$properties[roleName].set(roleData, QmlWeb.QMLProperty.ReasonInit, _item5, this.model.$context);
           modelData[roleName] = roleData;
@@ -11592,20 +11644,20 @@ var QtQuick_Repeater = function (_QtQuick_Item36) {
     key: "$_onRowsMoved",
     value: function $_onRowsMoved(sourceStartIndex, sourceEndIndex, destinationIndex) {
       var vals = this.$items.splice(sourceStartIndex, sourceEndIndex - sourceStartIndex);
-      for (var i = 0; i < vals.length; i++) {
-        this.$items.splice(destinationIndex + i, 0, vals[i]);
+      for (var _i67 = 0; _i67 < vals.length; _i67++) {
+        this.$items.splice(destinationIndex + _i67, 0, vals[_i67]);
       }
       var smallestChangedIndex = sourceStartIndex < destinationIndex ? sourceStartIndex : destinationIndex;
-      for (var _i11 = smallestChangedIndex; _i11 < this.$items.length; _i11++) {
-        this.$items[_i11].index = _i11;
+      for (var _i68 = smallestChangedIndex; _i68 < this.$items.length; _i68++) {
+        this.$items[_i68].index = _i68;
       }
     }
   }, {
     key: "$_onRowsRemoved",
     value: function $_onRowsRemoved(startIndex, endIndex) {
       this.$removeChildren(startIndex, endIndex);
-      for (var i = startIndex; i < this.$items.length; i++) {
-        this.$items[i].index = i;
+      for (var _i69 = startIndex; _i69 < this.$items.length; _i69++) {
+        this.$items[_i69].index = _i69;
       }
       this.count = this.$items.length;
     }
@@ -11640,8 +11692,8 @@ var QtQuick_Repeater = function (_QtQuick_Item36) {
           // QML exposes a "model" property in the scope that contains all role
           // data.
           var modelData = {};
-          for (var i = 0; i < model.roleNames.length; i++) {
-            var roleName = model.roleNames[i];
+          for (var _i70 = 0; _i70 < model.roleNames.length; _i70++) {
+            var roleName = model.roleNames[_i70];
             if (typeof newItem.$properties[roleName] === "undefined") {
               createProperty("variant", newItem, roleName);
             }
@@ -11680,8 +11732,8 @@ var QtQuick_Repeater = function (_QtQuick_Item36) {
         this._container().childrenChanged();
       }
 
-      for (var _i12 = endIndex; _i12 < this.$items.length; _i12++) {
-        this.$items[_i12].index = _i12;
+      for (var _i71 = endIndex; _i71 < this.$items.length; _i71++) {
+        this.$items[_i71].index = _i71;
       }
     }
   }, {
@@ -11698,8 +11750,8 @@ var QtQuick_Repeater = function (_QtQuick_Item36) {
     value: function $removeChildProperties(child) {
       var signals = QmlWeb.engine.completedSignals;
       signals.splice(signals.indexOf(child.Component.completed), 1);
-      for (var i = 0; i < child.children.length; i++) {
-        this.$removeChildProperties(child.children[i]);
+      for (var _i72 = 0; _i72 < child.children.length; _i72++) {
+        this.$removeChildProperties(child.children[_i72]);
       }
     }
   }]);
@@ -11745,7 +11797,7 @@ var QtQuick_GridView = function (_QtQuick_Repeater) {
     var bg = _this116.impl = document.createElement("div");
     bg.style.pointerEvents = "none";
     bg.style.position = "absolute";
-    bg.style.left = bg.style.right = bg.style.top = bg.style.bottom = "0px";
+    bg.style.left = bg.style.top = "0px";
     bg.style.background = "none";
     _this116.dom.appendChild(bg);
 
@@ -11824,6 +11876,54 @@ var QtQuick_GridView = function (_QtQuick_Repeater) {
     _this116.cellHeightChanged.connect(_this116, _this116.$cellHeightChanged);
     _this116.flowChanged.connect(_this116, _this116.$flowChanged);
 
+    var config = {
+      attributes: true,
+      childList: true,
+      subtree: true
+    };
+
+    var observer = new MutationObserver(function () {
+      var left = 0;
+      var right = 0;
+      var top = 0;
+      var bottom = 0;
+      var pRect = _this116.dom.getBoundingClientRect();
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
+
+      try {
+        for (var _iterator4 = _this116.dom.childNodes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var child = _step4.value;
+
+          if (child !== _this116.impl) {
+            var cRect = child.getBoundingClientRect();
+            if (cRect.left - pRect.left < left) left = cRect.left - pRect.left;
+            if (cRect.right - pRect.left > right) right = cRect.right - pRect.left;
+            if (cRect.top - pRect.top < top) top = cRect.top - pRect.top;
+            if (cRect.bottom - pRect.top > bottom) bottom = cRect.bottom - pRect.top;
+          }
+        }
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
+          }
+        }
+      }
+
+      _this116.contentWidth = right - left;
+      _this116.contentHeight = bottom - top;
+    });
+    observer.observe(_this116.dom, config);
+
     return _this116;
   }
 
@@ -11862,20 +11962,20 @@ var QtQuick_GridView = function (_QtQuick_Repeater) {
       if (this.enabled) {
         var el = null;
 
-        for (var i = 0; i < this.$items.length; i++) {
-          var x1 = this.$items[i].dom.offsetLeft - parseFloat(this.$items[i].dom.style.marginLeft.replace('px', '').replace('%', ''));
-          var y1 = this.$items[i].dom.offsetTop - parseFloat(this.$items[i].dom.style.marginTop.replace('px', '').replace('%', ''));
-          var x2 = this.$items[i].dom.offsetLeft + this.$items[i].width;
-          var y2 = this.$items[i].dom.offsetTop + this.$items[i].height;
+        for (var _i73 = 0; _i73 < this.$items.length; _i73++) {
+          var x1 = this.$items[_i73].dom.offsetLeft - parseFloat(this.$items[_i73].dom.style.marginLeft.replace('px', '').replace('%', ''));
+          var y1 = this.$items[_i73].dom.offsetTop - parseFloat(this.$items[_i73].dom.style.marginTop.replace('px', '').replace('%', ''));
+          var x2 = this.$items[_i73].dom.offsetLeft + this.$items[_i73].width;
+          var y2 = this.$items[_i73].dom.offsetTop + this.$items[_i73].height;
           if (!el && this.dom.scrollLeft >= x1 && this.dom.scrollLeft < x2 && this.dom.scrollTop >= y1 && this.dom.scrollTop < y2) {
-            el = this.$items[i];
+            el = this.$items[_i73];
 
             if (this.snapMode === GridView.SnapOneRow) {
-              if ((this.flow === GridView.FlowTopToBottom && deltaX < 0 || this.flow === GridView.FlowLeftToRight && deltaY < 0) && i - 1 >= 0) {
-                el = this.$items[i - 1];
+              if ((this.flow === GridView.FlowTopToBottom && deltaX < 0 || this.flow === GridView.FlowLeftToRight && deltaY < 0) && _i73 - 1 >= 0) {
+                el = this.$items[_i73 - 1];
               }
-              if ((this.flow === GridView.FlowTopToBottom && deltaX > 0 || this.flow === GridView.FlowLeftToRight && deltaY > 0) && i + 1 < this.$items.length) {
-                el = this.$items[i + 1];
+              if ((this.flow === GridView.FlowTopToBottom && deltaX > 0 || this.flow === GridView.FlowLeftToRight && deltaY > 0) && _i73 + 1 < this.$items.length) {
+                el = this.$items[_i73 + 1];
               }
             }
           }
@@ -11951,24 +12051,12 @@ var QtQuick_GridView = function (_QtQuick_Repeater) {
   }, {
     key: "$contentHeightChanged",
     value: function $contentHeightChanged() {
-      if (this.contentHeight === 0) {
-        this.impl.style.height = "100%";
-        this.impl.style.bottom = "0";
-      } else {
-        this.impl.style.height = this.contentHeight + "px";
-        this.impl.style.bottom = this.contentHeight + "px";
-      }
+      this.impl.style.height = this.contentHeight + "px";
     }
   }, {
     key: "$contentWidthChanged",
     value: function $contentWidthChanged() {
-      if (this.contentWidth === 0) {
-        this.impl.style.width = "100%";
-        this.impl.style.right = "0";
-      } else {
-        this.impl.style.width = this.contentWidth + "px";
-        this.impl.style.right = this.contentWidth + "px";
-      }
+      this.impl.style.width = this.contentWidth + "px";
     }
   }, {
     key: "$contentXYChanged",
@@ -12149,8 +12237,8 @@ var QtQuick_GridView = function (_QtQuick_Repeater) {
           // QML exposes a "model" property in the scope that contains all role
           // data.
           var modelData = {};
-          for (var i = 0; i < model.roleNames.length; i++) {
-            var roleName = model.roleNames[i];
+          for (var _i74 = 0; _i74 < model.roleNames.length; _i74++) {
+            var roleName = model.roleNames[_i74];
             if (typeof newItem.$properties[roleName] === "undefined") {
               createProperty("variant", newItem, roleName);
             }
@@ -12189,8 +12277,8 @@ var QtQuick_GridView = function (_QtQuick_Repeater) {
         this._container().childrenChanged();
       }
 
-      for (var _i13 = endIndex; _i13 < this.$items.length; _i13++) {
-        this.$items[_i13].index = _i13;
+      for (var _i75 = endIndex; _i75 < this.$items.length; _i75++) {
+        this.$items[_i75].index = _i75;
       }
     }
   }, {
@@ -12214,8 +12302,8 @@ var QtQuick_GridView = function (_QtQuick_Repeater) {
         }
       }
 
-      for (var i = 0; i < this.$items.length; ++i) {
-        this.$applyStyleOnItem(this.$items[i]);
+      for (var _i76 = 0; _i76 < this.$items.length; ++_i76) {
+        this.$applyStyleOnItem(this.$items[_i76]);
       }
     }
   }]);
@@ -12287,7 +12375,7 @@ var QtQuick_ListView = function (_QtQuick_Repeater2) {
     var bg = _this119.impl = document.createElement("div");
     bg.style.pointerEvents = "none";
     bg.style.position = "absolute";
-    bg.style.left = bg.style.right = bg.style.top = bg.style.bottom = "0px";
+    bg.style.left = bg.style.top = "0px";
     bg.style.background = "none";
     _this119.dom.appendChild(bg);
 
@@ -12371,8 +12459,44 @@ var QtQuick_ListView = function (_QtQuick_Repeater2) {
     };
 
     var observer = new MutationObserver(function () {
-      _this119.contentWidth = Math.max(_this119.impl.clientWidth, _this119.impl.scrollWidth, _this119.impl.offsetWidth);
-      _this119.contentHeight = Math.max(_this119.impl.clientHeight, _this119.impl.scrollHeight, _this119.impl.offsetHeight);
+      var left = 0;
+      var right = 0;
+      var top = 0;
+      var bottom = 0;
+      var pRect = _this119.dom.getBoundingClientRect();
+      var _iteratorNormalCompletion5 = true;
+      var _didIteratorError5 = false;
+      var _iteratorError5 = undefined;
+
+      try {
+        for (var _iterator5 = _this119.dom.childNodes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+          var child = _step5.value;
+
+          if (child !== _this119.impl) {
+            var cRect = child.getBoundingClientRect();
+            if (cRect.left - pRect.left < left) left = cRect.left - pRect.left;
+            if (cRect.right - pRect.left > right) right = cRect.right - pRect.left;
+            if (cRect.top - pRect.top < top) top = cRect.top - pRect.top;
+            if (cRect.bottom - pRect.top > bottom) bottom = cRect.bottom - pRect.top;
+          }
+        }
+      } catch (err) {
+        _didIteratorError5 = true;
+        _iteratorError5 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion5 && _iterator5.return) {
+            _iterator5.return();
+          }
+        } finally {
+          if (_didIteratorError5) {
+            throw _iteratorError5;
+          }
+        }
+      }
+
+      _this119.contentWidth = right - left;
+      _this119.contentHeight = bottom - top;
     });
     observer.observe(_this119.dom, config);
     return _this119;
@@ -12398,21 +12522,21 @@ var QtQuick_ListView = function (_QtQuick_Repeater2) {
         //let deltaX = e.deltaX ? e.deltaX : this.curSX - e.pageX;
         //let deltaY = e.deltaY ? e.deltaY : this.curSY - e.pageY;
 
-        for (var i = 0; i < this.$items.length; i++) {
-          var x1 = this.$items[i].dom.offsetLeft - parseFloat(this.$items[i].dom.style.marginLeft.replace('px', '').replace('%', ''));
-          var y1 = this.$items[i].dom.offsetTop - parseFloat(this.$items[i].dom.style.marginTop.replace('px', '').replace('%', ''));
-          var x2 = this.$items[i].dom.offsetLeft + this.$items[i].width;
-          var y2 = this.$items[i].dom.offsetTop + this.$items[i].height;
+        for (var _i77 = 0; _i77 < this.$items.length; _i77++) {
+          var x1 = this.$items[_i77].dom.offsetLeft - parseFloat(this.$items[_i77].dom.style.marginLeft.replace('px', '').replace('%', ''));
+          var y1 = this.$items[_i77].dom.offsetTop - parseFloat(this.$items[_i77].dom.style.marginTop.replace('px', '').replace('%', ''));
+          var x2 = this.$items[_i77].dom.offsetLeft + this.$items[_i77].width;
+          var y2 = this.$items[_i77].dom.offsetTop + this.$items[_i77].height;
           if (!el && this.dom.scrollLeft >= x1 && this.dom.scrollLeft < x2 && this.dom.scrollTop >= y1 && this.dom.scrollTop < y2) {
-            el = this.$items[i];
+            el = this.$items[_i77];
 
             if (this.snapMode === ListView.SnapOneItem) {
-              if (this.mouseIsWheel) if ((this.orientation === Qt.Horizontal && deltaX < 0 || this.orientation === Qt.Vertical && deltaY < 0) && i - 1 >= 0) {
-                el = this.$items[i - 1];
+              if (this.mouseIsWheel) if ((this.orientation === Qt.Horizontal && deltaX < 0 || this.orientation === Qt.Vertical && deltaY < 0) && _i77 - 1 >= 0) {
+                el = this.$items[_i77 - 1];
                 this.mouseIsWheel = false;
               }
-              if ((this.orientation === Qt.Horizontal && deltaX > 0 || this.orientation === Qt.Vertical && deltaY > 0) && i + 1 < this.$items.length) {
-                el = this.$items[i + 1];
+              if ((this.orientation === Qt.Horizontal && deltaX > 0 || this.orientation === Qt.Vertical && deltaY > 0) && _i77 + 1 < this.$items.length) {
+                el = this.$items[_i77 + 1];
               }
             }
           }
@@ -12495,24 +12619,12 @@ var QtQuick_ListView = function (_QtQuick_Repeater2) {
   }, {
     key: "$contentHeightChanged",
     value: function $contentHeightChanged() {
-      if (this.contentHeight === 0) {
-        this.impl.style.height = "100%";
-        this.impl.style.bottom = "0";
-      } else {
-        this.impl.style.height = this.contentHeight + "px";
-        this.impl.style.bottom = this.contentHeight + "px";
-      }
+      this.impl.style.height = this.contentHeight + "px";
     }
   }, {
     key: "$contentWidthChanged",
     value: function $contentWidthChanged() {
-      if (this.contentWidth === 0) {
-        this.impl.style.width = "100%";
-        this.impl.style.right = "0";
-      } else {
-        this.impl.style.width = this.contentWidth + "px";
-        this.impl.style.right = this.contentWidth + "px";
-      }
+      this.impl.style.width = this.contentWidth + "px";
     }
   }, {
     key: "$contentXYChanged",
@@ -12703,8 +12815,8 @@ var QtQuick_ListView = function (_QtQuick_Repeater2) {
           // QML exposes a "model" property in the scope that contains all role
           // data.
           var modelData = {};
-          for (var i = 0; i < model.roleNames.length; i++) {
-            var roleName = model.roleNames[i];
+          for (var _i78 = 0; _i78 < model.roleNames.length; _i78++) {
+            var roleName = model.roleNames[_i78];
             if (typeof newItem.$properties[roleName] === "undefined") {
               createProperty("variant", newItem, roleName);
             }
@@ -12724,6 +12836,7 @@ var QtQuick_ListView = function (_QtQuick_Repeater2) {
         // case we are outside of QMLOperationState.Init and parentChanged has
         // any side effects that result in those roleNames being referenced.
         newItem.parent = this;
+        this.$applyStyleOnItem(newItem);
 
         // TODO debug this. Without check to Init, Completed sometimes called
         // twice.. But is this check correct?
@@ -12743,8 +12856,8 @@ var QtQuick_ListView = function (_QtQuick_Repeater2) {
         this._container().childrenChanged();
       }
 
-      for (var _i14 = endIndex; _i14 < this.$items.length; _i14++) {
-        this.$items[_i14].index = _i14;
+      for (var _i79 = endIndex; _i79 < this.$items.length; _i79++) {
+        this.$items[_i79].index = _i79;
       }
     }
   }, {
@@ -12778,8 +12891,8 @@ var QtQuick_ListView = function (_QtQuick_Repeater2) {
           this.dom.style.overflowY = "auto";
         }
       }
-      for (var i = 0; i < this.$items.length; ++i) {
-        this.$applyStyleOnItem(this.$items[i]);
+      for (var _i80 = 0; _i80 < this.$items.length; ++_i80) {
+        this.$applyStyleOnItem(this.$items[_i80]);
       }
     }
   }]);
@@ -13034,8 +13147,8 @@ var QtQuick_SequentialAnimation = function (_QtQuick_Animation5) {
     key: "$onAnimatonsChanged",
     value: function $onAnimatonsChanged() {
       var flags = QmlWeb.Signal.UniqueConnection;
-      for (var i = 0; i < this.animations.length; i++) {
-        var animation = this.animations[i];
+      for (var _i81 = 0; _i81 < this.animations.length; _i81++) {
+        var animation = this.animations[_i81];
         animation.runningChanged.connect(this, this.$nextAnimation, flags);
       }
     }
@@ -13261,9 +13374,9 @@ var QtQuick_SystemPalette = function (_QtQml_QtObject25) {
 
     _this132.$platform = "OSX";
     // Detect OS
-    for (var i = 0; i < platformsDetectors.length; ++i) {
-      if (platformsDetectors[i].regexp.test(navigator.userAgent)) {
-        _this132.$platform = platformsDetectors[i].name;
+    for (var _i82 = 0; _i82 < platformsDetectors.length; ++_i82) {
+      if (platformsDetectors[_i82].regexp.test(navigator.userAgent)) {
+        _this132.$platform = platformsDetectors[_i82].name;
         break;
       }
     }
@@ -13415,8 +13528,8 @@ var QtQuick_Text = function (_QtQuick_Item39) {
       subtree: true
     };
     var observer = new MutationObserver(function () {
-      _this134.contentWidth = Math.max(_this134.dom.clientWidth, _this134.dom.scrollWidth, _this134.dom.offsetWidth);
-      _this134.contentHeight = Math.max(_this134.dom.clientHeight, _this134.dom.scrollHeight, _this134.dom.offsetHeight);
+      _this134.contentWidth = Math.max(_this134.impl.clientWidth, _this134.impl.scrollWidth, _this134.impl.offsetWidth);
+      _this134.contentHeight = Math.max(_this134.impl.clientHeight, _this134.impl.scrollHeight, _this134.impl.offsetHeight);
     });
     observer.observe(_this134.dom, config);
     return _this134;
@@ -14391,8 +14504,8 @@ var QtQuick_Transition = function (_QtQml_QtObject26) {
   _createClass(QtQuick_Transition, [{
     key: "$start",
     value: function $start(actions) {
-      for (var i = 0; i < this.animations.length; i++) {
-        var animation = this.animations[i];
+      for (var _i83 = 0; _i83 < this.animations.length; _i83++) {
+        var animation = this.animations[_i83];
         animation.$actions = [];
         var $targets = animation.$targets,
             $props = animation.$props,
@@ -14410,8 +14523,8 @@ var QtQuick_Transition = function (_QtQml_QtObject26) {
   }, {
     key: "$stop",
     value: function $stop() {
-      for (var i = 0; i < this.animations.length; i++) {
-        this.animations[i].stop();
+      for (var _i84 = 0; _i84 < this.animations.length; _i84++) {
+        this.animations[_i84].stop();
       }
     }
   }]);
