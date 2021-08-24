@@ -44,6 +44,11 @@ I_EXPORT_COMPONENT(
 		"Creates style sheets for theme schems",
 		"Design Token StyleSheet Style Sheet Processor");
 
+I_EXPORT_COMPONENT(
+		DesignTokenQrcUpdater,
+		"Modifyes QRC files",
+		"Design Token QRC");
+
 
 
 

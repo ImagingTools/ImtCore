@@ -11,6 +11,7 @@
 #include <imtstyle/CDesignTokenArgumentsParserComp.h>
 #include <imtstyle/CDesignTokenFileParserComp.h>
 #include <imtstyle/CDesignTokenProcessorsControllerComp.h>
+#include <imtstyle/CDesignTokenQrcUpdaterComp.h>
 
 /**
 	ImtStylePck package
@@ -24,6 +25,7 @@ typedef imtstyle::CDesignTokenFileParserComp DesignTokenFileParser;
 typedef imtstyle::CDesignTokenIconProcessorComp DesignTokenIconProcessor;
 typedef imtstyle::CDesignTokenStyleSheetProcessorComp DesignTokenStyleSheetProcessor;
 typedef imtstyle::CDesignTokenProcessorsControllerComp DesignTokenProcessorsController;
+typedef imtstyle::CDesignTokenQrcUpdaterComp DesignTokenQrcUpdater;
 
 } // namespace ImtStylePck
 
