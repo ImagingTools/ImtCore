@@ -6,13 +6,13 @@
 		"StyleName": "Dark",
 			"IconColor": {
 				"OffNormal":"#ff00ff",
-				"OffDisabled":"#ffff00",
+				"OffDisabled":"#8E8E8E",
 				"OffActive":"#00ffff",
-				"OffSelected":"#0000ff",
+				"OffSelected":"#1a76e7",
 				"OnNormal":"#00ff00",
-				"OnDisabled":"#ff0000",
+				"OnDisabled":"#8E8E8E",
 				"OnActive":"#dedede",
-				"OnSelected":"#04060f"
+				"OnSelected":"#1a76e7"
 			},
 			"PaletteColor": {
 				"ActiveAlternateBase": "#000000",
@@ -107,11 +107,11 @@
 				"OnNormal":"#ff00ff",
 				"OnDisabled":"#ffff00",
 				"OnActive":"#00ffff",
-				"OnSelected":"#0000ff",
+				"OnSelected":"#1a76e7",
 				"OffNormal":"#00ff00",
 				"OffDisabled":"#ff0000",
 				"OffActive":"#dedede",
-				"OffSelected":"#04060f"
+				"OffSelected":"#1a76e7"
 			},
 			"PaletteColor": {
 				"ActiveAlternateBase": "#000000",
