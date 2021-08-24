@@ -165,9 +165,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 
 	CurrentPageLabel->setVisible(*m_showPageTitlesAttrPtr);
-	if (!*m_showPageTitlesAttrPtr){
-		TopFrameLayout->removeItem(AdditionalSpacerRight);
-	}
 
 	if (m_dashboardGuiCompPtr.IsValid()){
 		m_dashboardGuiCompPtr->CreateGui(DashBoardFrame);

@@ -8,10 +8,10 @@
 #include <ibase/IApplication.h>
 #include <ifile/IFileNameParam.h>
 
-// project includes
+// ImtCore includes
 #include <imtstyle/IDesignTokenArgumentsParser.h>
-
 #include <GeneratedFiles/DesignTokenCreatorExe/CDesignTokenCreatorExe.h>
+
 
 int main(int argc, char *argv[])
 {

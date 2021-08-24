@@ -54,8 +54,8 @@ SUBDIRS += imt3dgui
 imt3dgui.file = ../../Include/imt3dgui/QMake/imt3dgui.pro
 
 !macx {
-    SUBDIRS += imtfile
-    imtfile.file = ../../Include/imtfile/QMake/imtfile.pro
+	SUBDIRS += imtfile
+	imtfile.file = ../../Include/imtfile/QMake/imtfile.pro
 }
 
 SUBDIRS += imtzip
@@ -173,9 +173,9 @@ ImtZipPck.file = ../../Impl/ImtZipPck/QMake/ImtZipPck.pro
 ImtZipPck.depends = imtzip
 
 !macx {
-    SUBDIRS += ImtPyPck
-    ImtPyPck.file = ../../Impl/ImtPyPck/QMake/ImtPyPck.pro
-    ImtPyPck.depends = imtpy
+	SUBDIRS += ImtPyPck
+	ImtPyPck.file = ../../Impl/ImtPyPck/QMake/ImtPyPck.pro
+	ImtPyPck.depends = imtpy
 }
 
 SUBDIRS += ImtGqlPck
