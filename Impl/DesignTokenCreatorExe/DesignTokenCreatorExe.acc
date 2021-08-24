@@ -54,6 +54,9 @@
                     <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="DesignTokenFileParser"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DesignTokenQrcUpdater" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DesignTokenQrcUpdater"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -72,6 +75,11 @@
                         </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DesignTokenQrcUpdater" PackageId="ImtStylePck" ComponentId="DesignTokenQrcUpdater">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="DesignTokenStyleSheetProcessor" PackageId="ImtStylePck" ComponentId="DesignTokenStyleSheetProcessor">

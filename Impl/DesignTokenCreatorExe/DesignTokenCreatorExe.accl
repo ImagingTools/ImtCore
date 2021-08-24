@@ -12,9 +12,10 @@
         <Element ComponentName="ConsoleApplication" X="800" Y="25" Note=""/>
         <Element ComponentName="DesignTokenArgumentsParser" X="1075" Y="150" Note=""/>
         <Element ComponentName="DesignTokenFileParser" X="100" Y="150" Note=""/>
-        <Element ComponentName="DesignTokenIconProcessor" X="425" Y="300" Note=""/>
+        <Element ComponentName="DesignTokenIconProcessor" X="422.635284428" Y="289.358779926" Note=""/>
         <Element ComponentName="DesignTokenProcessorsController" X="525" Y="75" Note=""/>
-        <Element ComponentName="DesignTokenStyleSheetProcessor" X="725" Y="225" Note=""/>
+        <Element ComponentName="DesignTokenQrcUpdater" X="100" Y="325" Note=""/>
+        <Element ComponentName="DesignTokenStyleSheetProcessor" X="750" Y="250" Note=""/>
         <Element ComponentName="VersionInfo" X="1150" Y="25" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
