@@ -37,6 +37,11 @@ public:
 		/**
 			The output directory parameter
 		*/
+		AA_PROJECT_NAME,
+
+		/**
+			The output directory parameter
+		*/
 		AA_IMAGE_MODE,
 
 		/**
@@ -52,6 +57,7 @@ public:
 	virtual QByteArray GetDesignTokenFilePath() const = 0;
 	virtual QByteArray GetInputDirectoryPath() const = 0;
 	virtual QByteArray GetOutputDirectoryPath() const = 0;
+	virtual QByteArray GetProjectName() const = 0;
 
 };
 

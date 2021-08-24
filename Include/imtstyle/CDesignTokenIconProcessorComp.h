@@ -12,6 +12,7 @@
 #include <imtstyle/IDesignTokenProcessor.h>
 #include <imtstyle/IDesignTokenArgumentsParser.h>
 #include <imtstyle/IDesignTokenFileParser.h>
+#include <imtstyle/IDesignTokenQrcUpdater.h>
 
 
 namespace imtstyle
@@ -26,6 +27,7 @@ public:
 		I_REGISTER_INTERFACE(IDesignTokenProcessor);
 		I_ASSIGN(m_argumentParserAttrPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
 		I_ASSIGN(m_designTokenFileParserAttrPtr, "DesignTokenFileParser", "Design token file parser", true, "IDesignTokenFileParser")
+		I_ASSIGN(m_designTokenQrcUpdater, "DesignTokenQrcUpdater", "Design token QRC file updater", true, "IDesignTokenQrcUpdater")
 		I_ASSIGN(m_paramSetAttrPtr, "ParamSet", "Param set", false, "IParamsSet")
 	I_END_COMPONENT;
 
@@ -45,6 +47,7 @@ private:
 
 	I_REF(IDesignTokenArgumentsParser, m_argumentParserAttrPtr);
 	I_REF(IDesignTokenFileParser, m_designTokenFileParserAttrPtr);
+	I_REF(IDesignTokenQrcUpdater, m_designTokenQrcUpdater);
 	I_REF(iprm::IParamsSet, m_paramSetAttrPtr);
 
 	QByteArray m_templateIconColor;
@@ -60,6 +63,7 @@ private:
 	QByteArray m_inputDirName;
 	QByteArray m_inputFileName;
 	QByteArray m_outputDirName;
+	QByteArray m_projectName;
 	QFileInfo m_designTokenFileInfo;
 
 

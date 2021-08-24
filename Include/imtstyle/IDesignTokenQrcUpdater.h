@@ -15,8 +15,10 @@ namespace imtstyle
 
 class IDesignTokenQrcUpdater
 {
-public:
 
+public:
+	virtual bool CreateQrc(const QString& prefix, const QString& path, const QFileInfoList& files, const QByteArray& outputFileName) const = 0;
+	virtual bool ModifyQrc(const QString& prefix, const QString& path, const QFileInfoList& files, const QByteArray& outputFileName) const = 0;
 };
 
 

@@ -104,7 +104,9 @@ int CDesignTokenIconProcessorComp::Exec()
 
 		QVector<QByteArray> styles = m_designTokenFileParserAttrPtr->GetDesignSchemaList().GetElementIds();
 		m_outputDirName = m_argumentParserAttrPtr->GetOutputDirectoryPath();
+		m_outputDirName += QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Icons");
 		m_inputDirName = m_argumentParserAttrPtr->GetInputDirectoryPath();
+		m_projectName = m_argumentParserAttrPtr->GetProjectName();
 
 		for (const QByteArray& styleName: ::qAsConst(styles)){
 			m_templateIconColor = m_designTokenFileParserAttrPtr->GetTemplateIconColor(styleName);
@@ -117,8 +119,16 @@ int CDesignTokenIconProcessorComp::Exec()
 			m_onActiveColor =  m_designTokenFileParserAttrPtr->GetOnActiveColor(styleName);
 			m_onSelectedColor =  m_designTokenFileParserAttrPtr->GetOnSelectedColor(styleName);
 
+
 			QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + styleName.constData();
 			this->SetColorAllFilesInDir(m_inputDirName, outputDirName);
+
+			QDir inputDir(outputDirName);
+			QStringList nameFilters = {"*.svg"};
+			QDir::Filters filters = QDir::Filter::Files | QDir::Filter::Readable;
+			QDir::SortFlags sort = QDir::SortFlag::Name;
+			QFileInfoList inputFiles = inputDir.entryInfoList(nameFilters, filters, sort);
+			m_designTokenQrcUpdater->CreateQrc("/Icons", QString("Resources/Icons/") + styleName, inputFiles, QByteArray(m_outputDirName) + "/../../" + m_projectName + styleName.toLower() + ".qrc");
 		}
 	}
 	return 0;

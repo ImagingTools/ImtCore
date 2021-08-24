@@ -1,5 +1,5 @@
 #include <imtstyle/CDesignTokenArgumentsParserComp.h>
-
+#include <iostream>
 
 
 namespace imtstyle
@@ -113,6 +113,8 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_commands.insert(AA_OUTPUT_DIRECTORY_PATH, "-OD");
 
 	//-----------------------------------------------control options
+	m_commands.insert(AA_PROJECT_NAME, "-P");
+
 	m_commands.insert(AA_IMAGE_MODE, "-I");
 	m_commands.insert(AA_IMAGE_MODE, "--image");
 
@@ -146,6 +148,12 @@ bool imtstyle::CDesignTokenArgumentsParserComp::IsImageModeRequired() const
 QByteArray CDesignTokenArgumentsParserComp::GetDesignTokenFilePath() const
 {
 	return this->GetArgumentValue(AA_DESIGN_TOKEN_FILE_PATH);
+}
+
+
+QByteArray imtstyle::CDesignTokenArgumentsParserComp::GetProjectName() const
+{
+	return this->GetArgumentValue(AA_PROJECT_NAME);
 }
 
 

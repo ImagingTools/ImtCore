@@ -45,6 +45,7 @@ public:
 	virtual QByteArray GetDesignTokenFilePath() const override;
 	virtual QByteArray GetInputDirectoryPath() const override;
 	virtual QByteArray GetOutputDirectoryPath() const override;
+	virtual QByteArray GetProjectName() const override;
 
 
 private:
