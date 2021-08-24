@@ -110,6 +110,7 @@ int CDesignTokenIconProcessorComp::Exec()
 
 		for (const QByteArray& styleName: ::qAsConst(styles)){
 			m_templateIconColor = m_designTokenFileParserAttrPtr->GetTemplateIconColor(styleName);
+			m_normalColor =  m_designTokenFileParserAttrPtr->GetNormalColor(styleName);
 			m_offNormalColor =  m_designTokenFileParserAttrPtr->GetOffNormalColor(styleName);
 			m_offDisabledColor =  m_designTokenFileParserAttrPtr->GetOffDisabledColor(styleName);
 			m_offActiveColor =  m_designTokenFileParserAttrPtr->GetOffActiveColor(styleName);
@@ -173,6 +174,9 @@ void CDesignTokenIconProcessorComp::SetColorForAllModeState(const QByteArray& fi
 		inputFileSuffix.prepend('.');
 	}
 
+    if(m_normalColor.length()){
+        this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + inputFileSuffix), m_normalColor);
+    }
 	if (m_offNormalColor.length()){
 		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffNormal + inputFileSuffix), m_offNormalColor);
 	}

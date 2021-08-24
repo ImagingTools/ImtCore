@@ -94,9 +94,9 @@ bool CDesignTokenFileParserComp::CDesignTokenFileParserComp::SetFile(const QByte
 {
 	bool retval = false;
 
-	QFileInfo designTokenFileInfo(filePath);
+    QFileInfo designTokenFileInfo(filePath);
 
-	retval = designTokenFileInfo.isReadable();
+    retval = designTokenFileInfo.isReadable();
 
 	if(retval){
 		m_designTokenFileInfo = designTokenFileInfo;
@@ -181,6 +181,11 @@ QByteArray imtstyle::CDesignTokenFileParserComp::GetTemplateIconColor(const QByt
 }
 
 
+QByteArray imtstyle::CDesignTokenFileParserComp::GetNormalColor(const QByteArray& styleName) const
+{
+    return m_iconColors[styleName].toMap()["Normal"].toByteArray();
+}
+
 QByteArray imtstyle::CDesignTokenFileParserComp::GetOffNormalColor(const QByteArray& styleName) const
 {
 	return m_iconColors[styleName].toMap()[s_offNormalColorParamName].toByteArray();
@@ -260,5 +265,3 @@ void CDesignTokenFileParserComp::GetPaletteFromEntry(const QString& styleName, c
 
 
 } // namespace imtstyle
-
-

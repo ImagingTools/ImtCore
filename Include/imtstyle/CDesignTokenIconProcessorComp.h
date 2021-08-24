@@ -51,6 +51,7 @@ private:
 	I_REF(iprm::IParamsSet, m_paramSetAttrPtr);
 
 	QByteArray m_templateIconColor;
+    QByteArray m_normalColor;
 	QByteArray m_offNormalColor;
 	QByteArray m_offDisabledColor;
 	QByteArray m_offActiveColor;

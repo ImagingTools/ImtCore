@@ -35,6 +35,7 @@ public:
 	QString GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role) const override;
 
 	QByteArray GetTemplateIconColor(const QByteArray& styleName) const override;
+    QByteArray GetNormalColor(const QByteArray& styleName) const override;
 	QByteArray GetOffNormalColor(const QByteArray& styleName) const override;
 	QByteArray GetOffDisabledColor(const QByteArray& styleName) const override;
 	QByteArray GetOffActiveColor(const QByteArray& styleName) const override;

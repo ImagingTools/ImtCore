@@ -23,6 +23,7 @@ public:
 	virtual QString GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role) const = 0;
 
 	virtual QByteArray GetTemplateIconColor(const QByteArray& styleName = QByteArray()) const = 0;
+    virtual QByteArray GetNormalColor(const QByteArray& styleName = QByteArray()) const = 0;
 	virtual QByteArray GetOffNormalColor(const QByteArray& styleName = QByteArray()) const = 0;
 	virtual QByteArray GetOffDisabledColor(const QByteArray& styleName = QByteArray()) const = 0;
 	virtual QByteArray GetOffActiveColor(const QByteArray& styleName = QByteArray()) const  = 0;
