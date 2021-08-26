@@ -1,7 +1,7 @@
 project(DesignTokenCreatorExe LANGUAGES CXX)
 
 
-set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/DesignTokenCreator.awc")
+set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/BaseOnly.awc")
 set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../${PROJECT_NAME}.acc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
 
@@ -9,7 +9,7 @@ message("ARXC_CONFIG " ${ARXC_CONFIG})
 
 if(WIN32)
 	set(CMAKE_WIN32_EXECUTABLE "on")
-	set(ACF_CONVERT_REGISTRY "${PROJECT_SOURCE_DIR}/../VC/FileSubstitCopyApp.acc")
+	#set(ACF_CONVERT_REGISTRY "${PROJECT_SOURCE_DIR}/../VC/FileSubstitCopyApp.acc")
 	set(ACF_CONVERT_CONFIG  "${PROJECT_SOURCE_DIR}/../../../Config/BaseOnly.awc")
 endif()
 
