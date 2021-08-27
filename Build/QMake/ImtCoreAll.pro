@@ -37,9 +37,13 @@ imtreportgui.file = ../../Include/imtreportgui/QMake/imtreportgui.pro
 SUBDIRS += imt3d
 imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
 
+SUBDIRS += DesignTokenCreatorExe
+DesignTokenCreatorExe.file = ../../Impl/DesignTokenCreatorExe/QMake/DesignTokenCreatorExe.pro
+DesignTokenCreatorExe.depends = imtbase imtstyle
+
 SUBDIRS += imtgui
 imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
-imtgui.depends = ../../Include/imtwidgets/QMake/imtwidgets.pro
+imtgui.depends = imtwidgets DesignTokenCreatorExe
 
 SUBDIRS += imtloggui
 imtloggui.file = ../../Include/imtloggui/QMake/imtloggui.pro
@@ -84,7 +88,7 @@ imtdb.file = ../../Include/imtdb/QMake/imtdb.pro
 SUBDIRS += imtlicdb
 imtlicdb.file = ../../Include/imtlicdb/QMake/imtlicdb.pro
 
-## Component packages
+######### Component packages
 
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
@@ -186,9 +190,7 @@ SUBDIRS += ImtLicenseDbPck
 ImtLicenseDbPck.file = ../../Impl/ImtLicenseDbPck/QMake/ImtLicenseDbPck.pro
 ImtLicenseDbPck.depends = imtlic imtlicdb
 
-SUBDIRS += DesignTokenCreatorExe
-DesignTokenCreatorExe.file = ../../Impl/DesignTokenCreatorExe/QMake/DesignTokenCreatorExe.pro
-DesignTokenCreatorExe.depends = imtbase imtstyle
+
 
 
 # Application
