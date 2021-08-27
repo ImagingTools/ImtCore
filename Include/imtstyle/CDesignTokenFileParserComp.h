@@ -30,6 +30,7 @@ public:
 
 	// reimplemented (IDesignTokenFileParser)
 	bool ParseFile() override;
+	bool SplitFile(const QString& outputDirPath, const QString& projectName) override;
 	bool SetFile(const QByteArray& filePath) override;
 	bool GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role) const override;
 	QString GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role) const override;

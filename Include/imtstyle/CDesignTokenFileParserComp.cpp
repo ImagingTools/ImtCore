@@ -162,6 +162,77 @@ bool CDesignTokenFileParserComp::ParseFile()
 	return true;
 }
 
+
+bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const QString& projectName)
+{
+	QFile designTokenFile;
+	QDir outputDir(outputDirPath);
+	if(!outputDir.exists()){
+		Q_ASSERT(outputDir.mkpath(outputDirPath));
+	}
+
+	if (m_designTokenFileInfo.isReadable()){
+		designTokenFile.setFileName(m_designTokenFileInfo.absoluteFilePath());
+	}
+	else {
+		designTokenFile.setFileName(m_designTokenFilePathAttrPtr->GetPath());
+	}
+
+	if (!designTokenFile.open(QFile::ReadOnly)){
+		qCritical() << "Cannot read file" << ::qPrintable(designTokenFile.fileName());
+		Q_ASSERT(0);
+		return false;
+	}
+
+	QFileInfo designTokenFileInfo(designTokenFile.fileName());
+
+	QJsonObject designTokenObject = QJsonDocument::fromJson(designTokenFile.readAll()).object();
+	if(designTokenObject.isEmpty()) {
+		qCritical() << "Cannot parse JSON";
+		return false;
+	}
+
+	QJsonArray designTokenStylesArray = designTokenObject["Styles"].toArray();
+	if(designTokenStylesArray.isEmpty()) {
+		qCritical() << "Cannot parse Styles";
+		return false;
+	}
+
+	QJsonObject designTokenObjectSplitted = designTokenObject;
+
+	for (const QJsonValue& style: ::qAsConst(designTokenStylesArray)){
+
+		QJsonArray stylesArray;
+
+
+		QJsonObject styleEntry = style.toObject();
+		QString styleName = styleEntry["StyleName"].toString();
+		stylesArray << styleEntry;
+		designTokenObjectSplitted["Styles"] = stylesArray;
+
+		QString outputSingleThemeFileName;
+		if(outputDir.isEmpty()){
+			outputSingleThemeFileName.append(designTokenFileInfo.absolutePath());
+		}
+		else{
+			outputSingleThemeFileName.append(QDir::toNativeSeparators(outputDirPath));
+		}
+		if(!outputSingleThemeFileName.endsWith(QDir::separator())){
+			outputSingleThemeFileName.append(QDir::separator());
+		}
+		outputSingleThemeFileName.append(projectName);
+		outputSingleThemeFileName.append(styleName.toLower());
+		outputSingleThemeFileName.append('.').append(designTokenFileInfo.completeSuffix());
+
+		QFile outputSingleThemeFile(outputSingleThemeFileName);
+		Q_ASSERT(outputSingleThemeFile.open(QFile::WriteOnly));
+		outputSingleThemeFile.write(QJsonDocument(designTokenObjectSplitted).toJson());
+		outputSingleThemeFile.close();
+	}
+	return true;
+}
+
+
 const imtbase::ICollectionInfo& CDesignTokenFileParserComp::GetDesignSchemaList() const
 {
 	return m_designSchemaList;

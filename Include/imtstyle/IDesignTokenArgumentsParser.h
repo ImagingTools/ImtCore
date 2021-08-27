@@ -40,18 +40,24 @@ public:
 		AA_PROJECT_NAME,
 
 		/**
-			The output directory parameter
+			The image process behavior modificator
 		*/
 		AA_IMAGE_MODE,
 
 		/**
-			The output directory parameter
+			The style sheet process behavior modificator
 		*/
-		AA_STYLE_SHEET_MODE
+		AA_STYLE_SHEET_MODE,
+
+		/**
+			The split file by parts behavior modificator
+		*/
+		AA_SPLIT_FILE_MODE
 	};
 
 	virtual void SetArguments(int argc, char**argv) = 0;
 	virtual bool IsHelpRequested() const = 0;
+	virtual bool IsSplitModeRequired() const = 0;
 	virtual bool IsImageModeRequired() const = 0;
 	virtual bool IsStyleSheetModeRequired() const = 0;
 	virtual QByteArray GetDesignTokenFilePath() const = 0;

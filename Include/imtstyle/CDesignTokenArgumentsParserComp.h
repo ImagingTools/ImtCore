@@ -40,6 +40,7 @@ public:
 	// reimplemented (IDesignTokenArgumentsParser)
 	virtual void SetArguments(int argc, char** argv) override;
 	virtual bool IsHelpRequested() const override;
+	virtual bool IsSplitModeRequired() const override;
 	virtual bool IsImageModeRequired() const override;
 	virtual bool IsStyleSheetModeRequired() const override;
 	virtual QByteArray GetDesignTokenFilePath() const override;

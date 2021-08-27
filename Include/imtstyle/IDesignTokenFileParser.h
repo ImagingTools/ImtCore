@@ -19,6 +19,8 @@ class IDesignTokenFileParser: virtual public IColorPaletteProvider
 public:
 	virtual bool SetFile(const QByteArray& filePath) = 0;
 	virtual bool ParseFile() = 0;
+	virtual bool SplitFile(const QString& outputDirPath, const QString& projectName) = 0;
+
 	virtual bool GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group,  QPalette::ColorRole& role) const = 0;
 	virtual QString GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role) const = 0;
 

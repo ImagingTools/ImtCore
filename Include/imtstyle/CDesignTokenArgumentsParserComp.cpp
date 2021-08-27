@@ -39,7 +39,7 @@ QByteArray CDesignTokenArgumentsParserComp::GetArgumentKey(AvailableArguments ar
 
 	int indexOfArg = m_arguments.indexOf(argKey);
 
-	if(m_arguments.size() > indexOfArg){
+	if(indexOfArg > -1 && m_arguments.size() > indexOfArg){
 		retval = m_arguments[indexOfArg];
 	}
 
@@ -53,10 +53,9 @@ QByteArray CDesignTokenArgumentsParserComp::GetArgumentValue(AvailableArguments 
 	QByteArray AC_key = this->GetArgumentKey(argument);
 	int indexOfArg = m_arguments.indexOf(AC_key);
 
-	if(m_arguments.size() > ++indexOfArg){
+	if(indexOfArg > -1 && m_arguments.size() > ++indexOfArg){
 		retval = m_arguments[indexOfArg];
 	}
-
 	return retval;
 }
 
@@ -76,7 +75,7 @@ QByteArrayList CDesignTokenArgumentsParserComp::GetArgumentValueMulti(AvailableA
 
 	int indexOfArg = m_arguments.indexOf(argValue);
 
-	while(m_arguments.size() > indexOfArg + 1){
+	while(indexOfArg > -1 && m_arguments.size() > indexOfArg + 1){
 		++indexOfArg;
 		if(m_arguments[indexOfArg].startsWith('-') || m_arguments[indexOfArg].startsWith('/')){
 			break;
@@ -121,6 +120,7 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_commands.insert(AA_STYLE_SHEET_MODE, "-S");
 	m_commands.insert(AA_STYLE_SHEET_MODE, "--style-sheet");
 
+	m_commands.insert(AA_SPLIT_FILE_MODE, "--split");
 	//-----------------------------------------------
 
 	//=====================================================================================
@@ -130,6 +130,12 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 bool CDesignTokenArgumentsParserComp::IsHelpRequested() const
 {
 	return this->CheckArgument(AA_HELP);
+}
+
+
+bool CDesignTokenArgumentsParserComp::IsSplitModeRequired() const
+{
+	return this->CheckArgument(AA_SPLIT_FILE_MODE);
 }
 
 
