@@ -10,13 +10,21 @@
     <PositionMap>
         <Element ComponentName="ApplicationInfo" X="1000" Y="25" Note=""/>
         <Element ComponentName="ConsoleApplication" X="800" Y="25" Note=""/>
-        <Element ComponentName="DesignTokenArgumentsParser" X="1075" Y="150" Note=""/>
-        <Element ComponentName="DesignTokenFileParser" X="100" Y="150" Note=""/>
-        <Element ComponentName="DesignTokenIconProcessor" X="422.635284428" Y="289.358779926" Note=""/>
-        <Element ComponentName="DesignTokenProcessorsController" X="525" Y="75" Note=""/>
-        <Element ComponentName="DesignTokenQrcUpdater" X="100" Y="325" Note=""/>
-        <Element ComponentName="DesignTokenStyleSheetProcessor" X="750" Y="250" Note=""/>
+        <Element ComponentName="DesignTokenArgumentsParser" X="125" Y="100" Note=""/>
+        <Element ComponentName="DesignTokenIconProcessor" X="350" Y="225" Note=""/>
+        <Element ComponentName="DesignTokenProcessorsController" X="525" Y="125" Note=""/>
+        <Element ComponentName="DesignTokenSplitProcessor" X="450" Y="350" Note=""/>
+        <Element ComponentName="DesignTokenStyleSheetProcessor" X="625" Y="475" Note=""/>
+        <Element ComponentName="ProcessorsTools" X="1050" Y="350" Note=""/>
         <Element ComponentName="VersionInfo" X="1150" Y="25" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries/>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="ProcessorsTools">
+            <PositionMap>
+                <Element ComponentName="DesignTokenFileParser" X="100" Y="125" Note=""/>
+                <Element ComponentName="DesignTokenQrcUpdater" X="100" Y="200" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
 </Acf>

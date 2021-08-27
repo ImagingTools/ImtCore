@@ -40,11 +40,6 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="DesignTokenFileParser" PackageId="ImtStylePck" ComponentId="DesignTokenFileParser">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
         <Element Id="DesignTokenIconProcessor" PackageId="ImtStylePck" ComponentId="DesignTokenIconProcessor">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -52,10 +47,10 @@
                         <Data IsEnabled="true" Value="DesignTokenArgumentsParser"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DesignTokenFileParser"/>
+                        <Data IsEnabled="true" Value="ProcessorsTools/DesignTokenFileParser"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DesignTokenQrcUpdater" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DesignTokenQrcUpdater"/>
+                        <Data IsEnabled="true" Value="ProcessorsTools/DesignTokenQrcUpdater"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -71,15 +66,23 @@
                             <Values>
                                 <Value>DesignTokenStyleSheetProcessor</Value>
                                 <Value>DesignTokenIconProcessor</Value>
+                                <Value>DesignTokenSplitProcessor</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="DesignTokenQrcUpdater" PackageId="ImtStylePck" ComponentId="DesignTokenQrcUpdater">
+        <Element Id="DesignTokenSplitProcessor" PackageId="ImtStylePck" ComponentId="DesignTokenSplitProcessor">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DesignTokenArgumentsParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ProcessorsTools/DesignTokenFileParser"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="DesignTokenStyleSheetProcessor" PackageId="ImtStylePck" ComponentId="DesignTokenStyleSheetProcessor">
@@ -89,9 +92,14 @@
                         <Data IsEnabled="true" Value="DesignTokenArgumentsParser"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DesignTokenFileParser"/>
+                        <Data IsEnabled="true" Value="ProcessorsTools/DesignTokenFileParser"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ProcessorsTools" PackageId="" ComponentId="ProcessorsTools">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="VersionInfo" PackageId="BasePck" ComponentId="VersionInfo">
@@ -100,10 +108,35 @@
             </Data>
         </Element>
     </ElementsList>
-    <EmbeddedRegistriesList/>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="ProcessorsTools">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="DesignTokenFileParser" PackageId="ImtStylePck" ComponentId="DesignTokenFileParser">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                    <Element Id="DesignTokenQrcUpdater" PackageId="ImtStylePck" ComponentId="DesignTokenQrcUpdater">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces/>
+                <ExportedComponents>
+                    <Component ExportedId="DesignTokenFileParser" ComponentId="DesignTokenFileParser"/>
+                    <Component ExportedId="DesignTokenQrcUpdater" ComponentId="DesignTokenQrcUpdater"/>
+                </ExportedComponents>
+            </Data>
+        </EmbeddedRegistry>
+    </EmbeddedRegistriesList>
     <ExportedInterfaces>
         <Interface InterfaceId="ibase::IApplication" ComponentId="ConsoleApplication"/>
         <Interface InterfaceId="imtstyle::IDesignTokenArgumentsParser" ComponentId="DesignTokenArgumentsParser"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="ProcessorsTools" ComponentId="ProcessorsTools"/>
+    </ExportedComponents>
 </Acf>

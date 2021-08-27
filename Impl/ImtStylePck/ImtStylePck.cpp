@@ -45,6 +45,11 @@ I_EXPORT_COMPONENT(
 		"Design Token StyleSheet Style Sheet Processor");
 
 I_EXPORT_COMPONENT(
+		DesignTokenSplitProcessor,
+		"Splits single file for each theme scheme",
+		"Design Token Split Processor");
+
+I_EXPORT_COMPONENT(
 		DesignTokenQrcUpdater,
 		"Modifyes QRC files",
 		"Design Token QRC");
