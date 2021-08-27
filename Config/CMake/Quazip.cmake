@@ -10,7 +10,7 @@ if(WIN32)
 endif()
 
 if(UNIX)
-        target_link_libraries(${PROJECT_NAME} ${QUAZIP}/lib/${TARGETNAME}/libquazip.a)
+		target_link_libraries(${PROJECT_NAME} ${QUAZIP}/lib/${CMAKE_BUILD_TYPE}${TARGETNAME}/libquazip.a)
 #        target_link_libraries(${PROJECT_NAME} -lquazip)
 endif()
 
