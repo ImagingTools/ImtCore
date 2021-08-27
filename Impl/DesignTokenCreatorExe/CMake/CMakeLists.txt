@@ -14,7 +14,7 @@ if(WIN32)
 endif()
 
 if(APPLE)
-	set(CMAKE_MACOSX_BUNDLE "on")
+	set(CMAKE_MACOSX_BUNDLE "off")
 endif()
 
 
@@ -23,7 +23,6 @@ include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
-include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 target_link_libraries(${PROJECT_NAME} imtbase imtstyle)
