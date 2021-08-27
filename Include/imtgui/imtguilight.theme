@@ -3,7 +3,7 @@
     "Styles": [
         {
             "IconColor": {
-                "Normal": "#335777",
+				"Normal": "#000000",
                 "OffActive": "#dedede",
                 "OffDisabled": "#ff0000",
                 "OffNormal": "#00ff00",
