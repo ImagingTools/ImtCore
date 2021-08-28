@@ -83,6 +83,6 @@ add_custom_command(
 	)
 
 add_custom_target(
-	designToekn ALL
+	DesignToekn${PROJECT_NAME} ALL
 	DEPENDS ${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/${PROJECT_NAME}DesignToekn.stamp
 	)
