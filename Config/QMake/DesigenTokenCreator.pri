@@ -49,12 +49,12 @@ win32{
 	DESIGN_TOKEN_CREATOR_INPUT_THEME_FILES ~= s,/,\\,g
 }
 
-generatedResources1.name = Generated Resources Compiler 1
-generatedResources1.commands = $${DESIGN_TOKEN_CREATOR_COMMAND} && $${GENERATE_RESOURCE_COMMANDS}
-generatedResources1.input = DESIGN_TOKEN_CREATOR_INPUT_THEME_FILES
-generatedResources1.output = $${GENERATED_RESOURCE_OUTPUT}
-generatedResources1.dependency_type = TYPE_C
-generatedResources1.variable_out = SOURCES
-generatedResources1.CONFIG += no_link target_predeps
-QMAKE_EXTRA_COMPILERS += generatedResources1
+generatedResources1$${TARGET}.name = Generated Resources Compiler 1
+generatedResources1$${TARGET}.commands = $${DESIGN_TOKEN_CREATOR_COMMAND} && $${GENERATE_RESOURCE_COMMANDS}
+generatedResources1$${TARGET}.input = DESIGN_TOKEN_CREATOR_INPUT_THEME_FILES
+generatedResources1$${TARGET}.output = $${GENERATED_RESOURCE_OUTPUT}
+generatedResources1$${TARGET}.dependency_type = TYPE_C
+generatedResources1$${TARGET}.variable_out = SOURCES
+generatedResources1$${TARGET}.CONFIG += no_link target_predeps
+QMAKE_EXTRA_COMPILERS += generatedResources1$${TARGET}
 
