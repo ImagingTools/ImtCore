@@ -1,23 +1,36 @@
 # Root of ImtCore project
 include ($(ACFDIR)/Config/QMake/Solution.pri)
 
+############### DesignToken must Builds first!!!
+
+SUBDIRS += imtbase
+imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
+
+SUBDIRS += imtstyle
+imtstyle.file = ../../Include/imtstyle/QMake/imtstyle.pro
+
+SUBDIRS += ImtStylePck
+ImtStylePck.file = ../../Impl/ImtStylePck/QMake/ImtStylePck.pro
+ImtStylePck.depends = imtstyle
+
+SUBDIRS += DesignTokenCreatorExe
+DesignTokenCreatorExe.file = ../../Impl/DesignTokenCreatorExe/QMake/DesignTokenCreatorExe.pro
+DesignTokenCreatorExe.depends = imtbase imtstyles ImtStylePck
+
+
+################ libs
 SUBDIRS += imtauth
 imtauth.file = ../../Include/imtauth/QMake/imtauth.pro
 
 SUBDIRS += imtauthgui
 imtauthgui.file = ../../Include/imtauthgui/QMake/imtauthgui.pro
-
-SUBDIRS += imtbase
-imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
+imtauthgui.depends = DesignTokenCreatorExe
 
 SUBDIRS += imtcrypt
 imtcrypt.file = ../../Include/imtcrypt/QMake/imtcrypt.pro
 
 SUBDIRS += imtwidgets
 imtwidgets.file = ../../Include/imtwidgets/QMake/imtwidgets.pro
-
-SUBDIRS += imtstyle
-imtstyle.file = ../../Include/imtstyle/QMake/imtstyle.pro
 
 SUBDIRS += imtcom
 imtcom.file = ../../Include/imtcom/QMake/imtcom.pro
@@ -37,10 +50,6 @@ imtreportgui.file = ../../Include/imtreportgui/QMake/imtreportgui.pro
 SUBDIRS += imt3d
 imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
 
-SUBDIRS += DesignTokenCreatorExe
-DesignTokenCreatorExe.file = ../../Impl/DesignTokenCreatorExe/QMake/DesignTokenCreatorExe.pro
-DesignTokenCreatorExe.depends = imtbase imtstyle
-
 SUBDIRS += imtgui
 imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
 imtgui.depends = imtwidgets DesignTokenCreatorExe
@@ -56,6 +65,7 @@ imt3dview.file = ../../Include/imt3dview/QMake/imt3dview.pro
 
 SUBDIRS += imt3dgui
 imt3dgui.file = ../../Include/imt3dgui/QMake/imt3dgui.pro
+imt3dgui.depends = DesignTokenCreatorExe
 
 !macx {
 	SUBDIRS += imtfile
@@ -78,6 +88,7 @@ imtlic.file = ../../Include/imtlic/QMake/imtlic.pro
 
 SUBDIRS += imtlicgui
 imtlicgui.file = ../../Include/imtlicgui/QMake/imtlicgui.pro
+imtlicgui.depends = DesignTokenCreatorExe
 
 SUBDIRS += imtgql
 imtgql.file = ../../Include/imtgql/QMake/imtgql.pro
@@ -93,10 +104,6 @@ imtlicdb.file = ../../Include/imtlicdb/QMake/imtlicdb.pro
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
 ImtCorePck.depends = imtbase
-
-SUBDIRS += ImtStylePck
-ImtStylePck.file = ../../Impl/ImtStylePck/QMake/ImtStylePck.pro
-ImtStylePck.depends = imtstyle
 
 SUBDIRS += ImtAuthPck
 ImtAuthPck.file = ../../Impl/ImtAuthPck/QMake/ImtAuthPck.pro
