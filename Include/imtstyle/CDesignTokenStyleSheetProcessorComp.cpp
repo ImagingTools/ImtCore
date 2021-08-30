@@ -29,7 +29,7 @@ QByteArray CDesignTokenStyleSheetProcessorComp::GetHelpString() const
 
 int CDesignTokenStyleSheetProcessorComp::Exec()
 {
-	if(!m_argumentParserAttrPtr->IsStyleSheetModeRequired()){
+	if(!QDir(m_argumentParserAttrPtr->GetStyleSheetsInputDirectoryPath()).isReadable()){
 		return 0;
 	}
 
@@ -38,13 +38,14 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 
 	QVector<QByteArray> styles = m_designTokenFileParserAttrPtr->GetDesignSchemaList().GetElementIds();
 	m_outputDirName = m_argumentParserAttrPtr->GetOutputDirectoryPath();
-	m_inputDirName = m_argumentParserAttrPtr->GetInputDirectoryPath();
+	m_inputDirName = m_argumentParserAttrPtr->GetStyleSheetsInputDirectoryPath();
 
 	for (const QByteArray& styleName: ::qAsConst(styles)){
 
+		m_currentTheme = styleName;
 		QPalette palette;
 		m_designTokenFileParserAttrPtr->GetColorPalette(styleName, palette);
-		QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + styleName.constData();
+		QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Styles") + QDir::separator().toLatin1() + styleName.constData();
 		this->SetColorAllFilesInDir(m_inputDirName, outputDirName, palette);
 	}
 	return 0;
@@ -138,8 +139,13 @@ bool CDesignTokenStyleSheetProcessorComp::SetVariableColor(QByteArray& data, con
 			QPalette::ColorRole colorRole;
 
 			if(m_designTokenFileParserAttrPtr->GetColorRoleGroup(colorName, colorGroup, colorRole)){
-
-				QByteArray colorHex = palette.color(colorGroup, colorRole).name().toUtf8();
+				QColor color = palette.color(colorGroup, colorRole);
+				QByteArray colorHex;
+				if(color.name() == "#000000"){
+				}
+				else {
+					colorHex = color.name().toUtf8();
+				}
 				data.replace(indexOfBeginVariable, lengthOfVariable+3, colorHex);
 			}
 			return true;

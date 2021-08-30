@@ -105,20 +105,17 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_commands.insert(AA_DESIGN_TOKEN_FILE_PATH, "--file");
 	m_commands.insert(AA_DESIGN_TOKEN_FILE_PATH, "-F");
 
-	m_commands.insert(AA_INPUT_DIRECTORY_PATH, "--input-dir");
-	m_commands.insert(AA_INPUT_DIRECTORY_PATH, "-ID");
-
 	m_commands.insert(AA_OUTPUT_DIRECTORY_PATH, "--output-dir");
 	m_commands.insert(AA_OUTPUT_DIRECTORY_PATH, "-OD");
 
 	//-----------------------------------------------control options
 	m_commands.insert(AA_PROJECT_NAME, "-P");
 
-	m_commands.insert(AA_IMAGE_MODE, "-I");
-	m_commands.insert(AA_IMAGE_MODE, "--image");
+	m_commands.insert(AA_IMAGES_INPUT_DIR_PATH, "-I");
+	m_commands.insert(AA_IMAGES_INPUT_DIR_PATH, "--images-input-dir");
 
-	m_commands.insert(AA_STYLE_SHEET_MODE, "-S");
-	m_commands.insert(AA_STYLE_SHEET_MODE, "--style-sheet");
+	m_commands.insert(AA_STYLE_SHEETS_INPUT_DIR_PATH, "-S");
+	m_commands.insert(AA_STYLE_SHEETS_INPUT_DIR_PATH, "--style-sheet-input-dir");
 
 	m_commands.insert(AA_SPLIT_FILE_MODE, "--split");
 	//-----------------------------------------------
@@ -139,15 +136,15 @@ bool CDesignTokenArgumentsParserComp::IsSplitModeRequired() const
 }
 
 
-bool imtstyle::CDesignTokenArgumentsParserComp::IsStyleSheetModeRequired() const
+QByteArray CDesignTokenArgumentsParserComp::GetImagesInputDirectoryPath() const
 {
-	return this->CheckArgument(AA_STYLE_SHEET_MODE);
+	return this->GetArgumentValue(AA_IMAGES_INPUT_DIR_PATH);
 }
 
 
-bool imtstyle::CDesignTokenArgumentsParserComp::IsImageModeRequired() const
+QByteArray CDesignTokenArgumentsParserComp::GetStyleSheetsInputDirectoryPath() const
 {
-	return this->CheckArgument(AA_IMAGE_MODE);
+	return this->GetArgumentValue(AA_STYLE_SHEETS_INPUT_DIR_PATH);
 }
 
 
@@ -160,12 +157,6 @@ QByteArray CDesignTokenArgumentsParserComp::GetDesignTokenFilePath() const
 QByteArray imtstyle::CDesignTokenArgumentsParserComp::GetProjectName() const
 {
 	return this->GetArgumentValue(AA_PROJECT_NAME);
-}
-
-
-QByteArray imtstyle::CDesignTokenArgumentsParserComp::GetInputDirectoryPath() const
-{
-	return this->GetArgumentValue(AA_INPUT_DIRECTORY_PATH);
 }
 
 

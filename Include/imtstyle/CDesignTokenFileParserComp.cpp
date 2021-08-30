@@ -324,13 +324,52 @@ void CDesignTokenFileParserComp::GetPaletteFromEntry(const QString& styleName, c
 		this->GetColorRoleGroup(value.key(), colorGroup, colorRole);
 
 		QColor color;
-		color.setNamedColor(value->toString());
+		if (!this->CreateColorFromGrb(value->toString(), color)){
+			color.setNamedColor(value->toString());
+		}
 		if(color.isValid()){
 			palette.setColor(colorGroup, colorRole, color);
 		}
 	}
-
 	m_stylesPalettes.insert(styleName, palette);
+}
+
+bool CDesignTokenFileParserComp::CreateColorFromGrb(const QString& rgbString, QColor& color) const
+{
+	int indexOfBegin = rgbString.indexOf("rgb(");
+	if(indexOfBegin >= 0){
+		bool rFill = false, gFill = false;
+		QString r,g,b;
+
+		for(int i = indexOfBegin + 4; i < rgbString.length(); ++i){
+			QChar symbol = rgbString[i];
+			if(symbol.isDigit()){
+				if(!rFill){
+					r += symbol;
+				}
+				else if(!gFill){
+					g += symbol;
+				}
+				else {
+					b += symbol;
+				}
+			}
+			else{
+				if(!rFill){
+					rFill = true;
+				}
+				else if(!gFill){
+					gFill = true;
+				}
+				else{
+					int iR = r.toInt(), iG = g.toInt(), iB = b.toInt();
+					color = QColor::fromRgb(iR, iG, iB);
+					return color.isValid();
+				}
+			}
+		}
+	}
+	return false;
 }
 
 
