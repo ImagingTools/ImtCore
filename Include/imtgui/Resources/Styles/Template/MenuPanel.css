@@ -1,11 +1,11 @@
 QWidget#PageTree
 {
-	background-color: ${NormalForeground};
+	background-color: ${ActiveBackground};
 }
 
 QWidget#BottomPageTree
 {
-	background-color: ${NormalForeground};
+	background-color: ${ActiveBackground};
 }
 
 QTreeView#PageTree::item::hover
@@ -20,11 +20,11 @@ background-color: ${NormalLight};
 
 QPushButton#pushTop, QPushButton#pushBottom
 {
-	border: 1px solid ${NormalForeground};
-	background: ${NormalForeground};
+	border: 1px solid #9d9d9d;
+	background: #e0e0e0;
 }
 
 QPushButton#pushTop::hover, QPushButton#pushBottom::hover
 {
-	background: ${NormalLight};
+	background: white;
 }
