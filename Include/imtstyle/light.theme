@@ -2,17 +2,17 @@
     "LastChanged": "2021-05-06T11:59:00Z",
     "Styles": [
         {
-            "IconColor": {
-		"Normal": "#000000",
-		"OffActive": "#0000FF",
-		"OffDisabled": "#000000",
-		"OffNormal": "#00FF00",
-		"OffSelected": "#27B3FF",
-		"OnActive": "#FF0000",
-		"OnDisabled": "#000000",
-		"OnNormal": "#FF00FF",
-		"OnSelected": "#27B3FF"
-            },
+          "IconColor": {
+            "Normal": "#335777",
+            "OffActive": "#335777",
+            "OffDisabled": "#CCCCCC",
+            "OffNormal": "#335777",
+            "OffSelected": "#1A76E7",
+            "OnActive": "#335777",
+            "OnDisabled": "#CCCCCC",
+            "OnNormal": "#335777",
+            "OnSelected": "#1A76E7"
+          },
             "PaletteColor": {
                 "ActiveAlternateBase": "#000000",
                 "ActiveBackground": "#000000",
