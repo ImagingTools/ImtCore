@@ -54,6 +54,18 @@ QString CDesignTokenFileParserComp::GetColorName(QPalette::ColorGroup group, QPa
 }
 
 
+QByteArray CDesignTokenFileParserComp::GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const
+{
+    QList<RawColor> clolrs = m_styleSheetColors.values(styleName);
+    for(const RawColor& color: ::qAsConst(m_styleSheetColors)){
+        if (color.group == group && color.role == role){
+            return color.value ;
+        }
+    }
+    return QByteArray();
+}
+
+
 bool CDesignTokenFileParserComp::GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role) const
 {
 	const QStringList& groupNames = CDesignTokenFileParserComp::s_colorGroupNamesMap.keys();
@@ -330,6 +342,9 @@ void CDesignTokenFileParserComp::GetPaletteFromEntry(const QString& styleName, c
 		if(color.isValid()){
 			palette.setColor(colorGroup, colorRole, color);
 		}
+        else {
+            m_styleSheetColors.insert(styleName.toUtf8(), RawColor(colorGroup, colorRole, value->toString().toUtf8()));
+        }
 	}
 	m_stylesPalettes.insert(styleName, palette);
 }

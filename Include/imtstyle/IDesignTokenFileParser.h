@@ -24,6 +24,8 @@ public:
 	virtual bool GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group,  QPalette::ColorRole& role) const = 0;
 	virtual QString GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role) const = 0;
 
+    virtual QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const = 0;
+
 	virtual QByteArray GetTemplateIconColor(const QByteArray& styleName = QByteArray()) const = 0;
     virtual QByteArray GetNormalColor(const QByteArray& styleName = QByteArray()) const = 0;
 	virtual QByteArray GetOffNormalColor(const QByteArray& styleName = QByteArray()) const = 0;
