@@ -25,11 +25,6 @@ public:
 		AA_DESIGN_TOKEN_FILE_PATH,
 
 		/**
-			The input directory parameter
-		*/
-		AA_INPUT_DIRECTORY_PATH,
-
-		/**
 			The output directory parameter
 		*/
 		AA_OUTPUT_DIRECTORY_PATH,
@@ -40,14 +35,14 @@ public:
 		AA_PROJECT_NAME,
 
 		/**
-			The image process behavior modificator
+			The input directory parameter for images
 		*/
-		AA_IMAGE_MODE,
+		AA_IMAGES_INPUT_DIR_PATH,
 
 		/**
-			The style sheet process behavior modificator
+			The input directory parameter for style sheets
 		*/
-		AA_STYLE_SHEET_MODE,
+		AA_STYLE_SHEETS_INPUT_DIR_PATH,
 
 		/**
 			The split file by parts behavior modificator
@@ -58,10 +53,9 @@ public:
 	virtual void SetArguments(int argc, char**argv) = 0;
 	virtual bool IsHelpRequested() const = 0;
 	virtual bool IsSplitModeRequired() const = 0;
-	virtual bool IsImageModeRequired() const = 0;
-	virtual bool IsStyleSheetModeRequired() const = 0;
 	virtual QByteArray GetDesignTokenFilePath() const = 0;
-	virtual QByteArray GetInputDirectoryPath() const = 0;
+	virtual QByteArray GetImagesInputDirectoryPath() const = 0;
+	virtual QByteArray GetStyleSheetsInputDirectoryPath() const = 0;
 	virtual QByteArray GetOutputDirectoryPath() const = 0;
 	virtual QByteArray GetProjectName() const = 0;
 

@@ -79,6 +79,7 @@ private:
 
 private:
 	void GetPaletteFromEntry(const QString& styleName, const QJsonValue& paletteEntry);
+	bool CreateColorFromGrb(const QString& rgbString, QColor& color) const;
 };
 
 

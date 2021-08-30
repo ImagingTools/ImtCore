@@ -49,6 +49,7 @@ private:
 	QByteArray m_inputDirName;
 	QByteArray m_outputDirName;
 	QByteArray m_designTokenFileInfo;
+	QByteArray m_currentTheme;
 
 };
 

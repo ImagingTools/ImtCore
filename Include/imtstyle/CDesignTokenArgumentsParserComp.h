@@ -38,15 +38,14 @@ public:
 	QByteArrayList GetArgumentValueMulti(AvailableArguments argument) const;
 
 	// reimplemented (IDesignTokenArgumentsParser)
-	virtual void SetArguments(int argc, char** argv) override;
-	virtual bool IsHelpRequested() const override;
-	virtual bool IsSplitModeRequired() const override;
-	virtual bool IsImageModeRequired() const override;
-	virtual bool IsStyleSheetModeRequired() const override;
-	virtual QByteArray GetDesignTokenFilePath() const override;
-	virtual QByteArray GetInputDirectoryPath() const override;
-	virtual QByteArray GetOutputDirectoryPath() const override;
-	virtual QByteArray GetProjectName() const override;
+	void SetArguments(int argc, char**argv) override;
+	bool IsHelpRequested() const override;
+	bool IsSplitModeRequired() const override;
+	QByteArray GetDesignTokenFilePath() const override;
+	QByteArray GetImagesInputDirectoryPath() const override;
+	QByteArray GetStyleSheetsInputDirectoryPath() const override;
+	QByteArray GetOutputDirectoryPath() const override;
+	QByteArray GetProjectName() const override;
 
 
 private:
