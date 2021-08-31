@@ -65,7 +65,7 @@ protected:
 	virtual istd::IChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record, QString& objectName, QString& objectDescription) const;
 	virtual QSqlQuery ExecSelectSqlQuery(const QVariantMap& bindValues = {}, QSqlError* sqlError = nullptr) const;
 	virtual QSqlQuery ExecUpdateSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const;
-	 virtual QSqlQuery ExecInsertSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const;
+	virtual QSqlQuery ExecInsertSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const;
 	virtual QSqlQuery ExecDeleteSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const;
 	QByteArray GetQueryStringFromFile(const QByteArray& filePath) const;
 
@@ -76,9 +76,10 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
+	I_REF(IDatabaseEngine, m_dbEngineCompPtr);
+
 private:
 	I_FACT(istd::IChangeable, m_objectFactoryCompPtr);
-	I_REF(IDatabaseEngine, m_dbEngineCompPtr);
 	I_REF(IDatabaseObjectDelegate, m_objectDelegateCompPtr);
 	I_ATTR(QByteArray, m_typeIdAttrPtr);
 	I_TEXTATTR(m_typeNameAttrPtr);
