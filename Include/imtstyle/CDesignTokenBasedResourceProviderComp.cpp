@@ -82,7 +82,7 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 			m_designTokenFileParser->SetFile(m_resourceFileNameAttrPtr[i]);
 			m_designTokenFileParser->ParseFile();
 			QPalette palette;
-			m_designTokenFileParser->GetColorPalette(QByteArray(), palette);
+			m_designTokenFileParser->GetColorPalette(m_designShemaIdAttrPtr[i], palette);
 			m_paletteMap[m_designShemaIdAttrPtr[i]] = palette;
 		}
 

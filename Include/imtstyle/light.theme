@@ -80,8 +80,7 @@
 			},			
 			"PaletteColor": {
 				"AllHighlight": "#1a76e7",
-				"AllText": "#335777",
-
+				"AllText": "#335777"
 			},
 			"StyleName": "Light"
 		}

@@ -68,7 +68,7 @@ QByteArray CDesignTokenFileParserComp::GetRawColor(const QByteArray& styleName, 
 
 bool CDesignTokenFileParserComp::GetStyleSheetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const
 {
-	if(!designSchemaId.length()) {
+	if(!designSchemaId.length() && m_styleSheetColors.size()) {
 		palette = m_stylesPalettes.first();
 	}
 	else{
@@ -182,7 +182,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 		m_iconColors.insert(styleName, colorsMap);
 		m_designSchemaList.InsertItem(styleName.toUtf8(), styleName,"");
 
-		m_stylesPalettes.insert(styleName, this->GetPaletteFromEntry(styleName, styleEntry["StyleSheetColor"]));
+		//m_stylesPalettes.insert(styleName, this->GetPaletteFromEntry(styleName, styleEntry["StyleSheetColor"]));
 		m_colorPalettes.insert(styleName, this->GetPaletteFromEntry(styleName, styleEntry["PaletteColor"]));
 	}
 	designTokenFile.close();
@@ -268,10 +268,26 @@ const imtbase::ICollectionInfo& CDesignTokenFileParserComp::GetDesignSchemaList(
 
 bool CDesignTokenFileParserComp::GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const
 {
-	if(!designSchemaId.length()){
+	if(!designSchemaId.length() && m_colorPalettes.size()){
 		palette = m_colorPalettes.first();
 	}
 	palette = m_colorPalettes[designSchemaId];
+
+
+
+	QString AllWindow = palette.color(QPalette::All, QPalette::Window).name();
+	QString AllWindowText = palette.color(QPalette::All, QPalette::WindowText).name();
+	QString AllBase = palette.color(QPalette::All, QPalette::Base).name();
+	QString AllAlternateBase = palette.color(QPalette::All, QPalette::AlternateBase).name();
+	QString AllToolTipBase = palette.color(QPalette::All, QPalette::ToolTipBase).name();
+	QString AllToolTipText = palette.color(QPalette::All, QPalette::ToolTipText).name();
+	QString AllText = palette.color(QPalette::All, QPalette::Text).name();
+	QString AllButton = palette.color(QPalette::All, QPalette::Button).name();
+	QString AllButtonText = palette.color(QPalette::All, QPalette::ButtonText).name();
+	QString AllBrightText = palette.color(QPalette::All, QPalette::BrightText).name();
+	QString AllLink = palette.color(QPalette::All, QPalette::Link).name();
+	QString AllHighlight = palette.color(QPalette::All, QPalette::Highlight).name();
+	QString AllHighlightedText = palette.color(QPalette::All, QPalette::HighlightedText).name();
 	return true;
 }
 
