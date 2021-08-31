@@ -66,6 +66,18 @@ QByteArray CDesignTokenFileParserComp::GetRawColor(const QByteArray& styleName, 
 }
 
 
+bool CDesignTokenFileParserComp::GetStyleSheetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const
+{
+	if(!designSchemaId.length()) {
+		palette = m_stylesPalettes.first();
+	}
+	else{
+		palette = m_stylesPalettes[designSchemaId];
+	}
+	return true;
+}
+
+
 bool CDesignTokenFileParserComp::GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role) const
 {
 	const QStringList& groupNames = CDesignTokenFileParserComp::s_colorGroupNamesMap.keys();
@@ -169,8 +181,11 @@ bool CDesignTokenFileParserComp::ParseFile()
 		QVariantMap colorsMap = colorsObject.toVariantMap();
 		m_iconColors.insert(styleName, colorsMap);
 		m_designSchemaList.InsertItem(styleName.toUtf8(), styleName,"");
-		this->GetPaletteFromEntry(styleName, styleEntry["PaletteColor"]);
+
+		m_stylesPalettes.insert(styleName, this->GetPaletteFromEntry(styleName, styleEntry["StyleSheetColor"]));
+		m_colorPalettes.insert(styleName, this->GetPaletteFromEntry(styleName, styleEntry["PaletteColor"]));
 	}
+	designTokenFile.close();
 	return true;
 }
 
@@ -253,7 +268,7 @@ const imtbase::ICollectionInfo& CDesignTokenFileParserComp::GetDesignSchemaList(
 
 bool CDesignTokenFileParserComp::GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const
 {
-	palette = m_stylesPalettes[designSchemaId];
+	palette = m_colorPalettes[designSchemaId];
 	return true;
 }
 
@@ -324,7 +339,7 @@ void CDesignTokenFileParserComp::OnComponentCreated()
 }
 
 
-void CDesignTokenFileParserComp::GetPaletteFromEntry(const QString& styleName, const QJsonValue& paletteEntry)
+QPalette CDesignTokenFileParserComp::GetPaletteFromEntry(const QString& styleName, const QJsonValue& paletteEntry)
 {
 	QPalette palette;
 
@@ -346,7 +361,7 @@ void CDesignTokenFileParserComp::GetPaletteFromEntry(const QString& styleName, c
             m_styleSheetColors.insert(styleName.toUtf8(), RawColor(colorGroup, colorRole, value->toString().toUtf8()));
         }
 	}
-	m_stylesPalettes.insert(styleName, palette);
+	return palette;
 }
 
 bool CDesignTokenFileParserComp::CreateColorFromGrb(const QString& rgbString, QColor& color) const

@@ -14,6 +14,7 @@
 #include <imtbase/CJsonHelper.h>
 #include <imtstyle/IColorPaletteProvider.h>
 #include <imtstyle/IFontProvider.h>
+#include <imtstyle/IDesignTokenFileParser.h>
 
 
 namespace imtstyle
@@ -33,9 +34,10 @@ public:
 		I_REGISTER_INTERFACE(IDesignSchemaInfoProvider);
 		I_REGISTER_INTERFACE(IColorPaletteProvider);
 		I_REGISTER_INTERFACE(IFontProvider);
-		I_ASSIGN(m_resourceFileNameAttrPtr, "ResourceFileName", "Resource file name", false, "");
+		I_ASSIGN_MULTI_0(m_resourceFileNameAttrPtr, "ResourceFileNames", "Resource file names", false);
 		I_ASSIGN_MULTI_0(m_designShemaIdAttrPtr, "DesignSchemaIds", "Design schema ids", false);
 		I_ASSIGN_MULTI_0(m_paletteModeAttrPtr, "PaletteModes", "Palette modes", false);
+		I_ASSIGN(m_designTokenFileParser, "DesignTokenFileParser", "DesignToken File Parser", false, "IDesignTokenFileParser");
 	I_END_COMPONENT;
 
 	// reimplemented (IColorPaletteProvider)
@@ -58,9 +60,10 @@ private:
 	bool StringToColor(const QString& colorString, QColor& color) const;
 
 private:
-	I_ATTR(QByteArray, m_resourceFileNameAttrPtr);
+	I_MULTIATTR(QByteArray, m_resourceFileNameAttrPtr);
 	I_MULTIATTR(QByteArray, m_designShemaIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_paletteModeAttrPtr);
+	I_REF(IDesignTokenFileParser, m_designTokenFileParser);
 
 	imtbase::CCollectionInfo m_designSchemaList;
 	imtbase::CCollectionInfo m_fontList;

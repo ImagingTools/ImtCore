@@ -4,4 +4,8 @@
         <file alias="ImtColorStyleLight">Resources/ImtColorStyleLight.css</file>
         <file alias="ImtStyle">Resources/ImtStyle.css</file>
     </qresource>
+    <qresource prefix="/">
+        <file alias="dark.theme">dark.theme</file>
+        <file alias="light.theme">light.theme</file>
+    </qresource>
 </RCC>

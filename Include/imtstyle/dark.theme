@@ -13,7 +13,7 @@
 		"OnNormal": "#FFB0FF",
 		"OnSelected": "#FFFFB0"
 		},
-		"PaletteColor": {
+		"StyleSheetColor": {
 				"ActiveAlternateBase": "#000000",
 				"ActiveBackground": "palette(base)",
 				"ActiveBase": "palette(base)",
@@ -77,6 +77,21 @@
 				"InactiveText": "#ffffff",
 				"InactiveToolTipBase": "#ffffdc",
 				"InactiveToolTipText": "#000000"
+			},
+			"PaletteColor": {
+				"AllWindow": "rgb(53,53,53)",
+				"AllWindowText": "white",
+				"AllBase": "rgb(33,33,33)",
+				"AllAlternateBase": "rgb(53,53,53)",
+				"AllToolTipBase": "lightGray",
+				"AllToolTipText": "lightGray",
+				"AllText": "lightGray",
+				"AllButton": "rgb(53,53,53)",
+				"AllButtonText": "lightGray",
+				"AllBrightText": "white",
+				"AllLink": "rgb(42,130,218)",
+				"AllHighlight": "#1a76e7",
+				"AllHighlightedText": "white"
 			},
 			"StyleName": "Dark"
 		}

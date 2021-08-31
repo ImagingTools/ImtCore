@@ -44,7 +44,7 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 
 		m_currentTheme = styleName;
 		QPalette palette;
-		m_designTokenFileParserAttrPtr->GetColorPalette(styleName, palette);
+		m_designTokenFileParserAttrPtr->GetStyleSheetColorPalette(styleName, palette);
 		QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Styles") + QDir::separator().toLatin1() + styleName.constData();
 		this->SetColorAllFilesInDir(m_inputDirName, outputDirName, palette);
 	}

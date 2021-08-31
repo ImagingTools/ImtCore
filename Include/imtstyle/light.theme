@@ -13,7 +13,7 @@
 			"OnNormal": "#335777",
 			"OnSelected": "#1A76E7"
 			},
-			"PaletteColor": {
+			"StyleSheetColor": {
 				"ActiveAlternateBase": "#000000",
 				"ActiveBackground": "rgb(230,230,232)",
 				"ActiveBase": "rgb(255, 255, 255)",
@@ -77,6 +77,11 @@
 				"InactiveText": "#ffffff",
 				"InactiveToolTipBase": "#ffffdc",
 				"InactiveToolTipText": "#000000"
+			},			
+			"PaletteColor": {
+				"AllHighlight": "#1a76e7",
+				"AllText": "#335777",
+
 			},
 			"StyleName": "Light"
 		}

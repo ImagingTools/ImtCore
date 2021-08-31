@@ -118,6 +118,9 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_commands.insert(AA_STYLE_SHEETS_INPUT_DIR_PATH, "--style-sheet-input-dir");
 
 	m_commands.insert(AA_SPLIT_FILE_MODE, "--split");
+
+	m_commands.insert(AA_COPY_DESIGN_TOKEN_FILE, "-C");
+	m_commands.insert(AA_COPY_DESIGN_TOKEN_FILE, "--copy");
 	//-----------------------------------------------
 
 	//=====================================================================================
@@ -133,6 +136,12 @@ bool CDesignTokenArgumentsParserComp::IsHelpRequested() const
 bool CDesignTokenArgumentsParserComp::IsSplitModeRequired() const
 {
 	return this->CheckArgument(AA_SPLIT_FILE_MODE);
+}
+
+
+bool CDesignTokenArgumentsParserComp::IsCopyDesignTokenFileRequired() const
+{
+	return this->CheckArgument(AA_COPY_DESIGN_TOKEN_FILE);
 }
 
 

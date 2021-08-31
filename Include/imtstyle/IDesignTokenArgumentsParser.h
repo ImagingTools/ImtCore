@@ -47,12 +47,18 @@ public:
 		/**
 			The split file by parts behavior modificator
 		*/
-		AA_SPLIT_FILE_MODE
+		AA_SPLIT_FILE_MODE,
+
+		/**
+			The colpy design token file to output dir behavior modificator
+		*/
+		AA_COPY_DESIGN_TOKEN_FILE
 	};
 
 	virtual void SetArguments(int argc, char**argv) = 0;
 	virtual bool IsHelpRequested() const = 0;
 	virtual bool IsSplitModeRequired() const = 0;
+	virtual bool IsCopyDesignTokenFileRequired() const = 0;
 	virtual QByteArray GetDesignTokenFilePath() const = 0;
 	virtual QByteArray GetImagesInputDirectoryPath() const = 0;
 	virtual QByteArray GetStyleSheetsInputDirectoryPath() const = 0;

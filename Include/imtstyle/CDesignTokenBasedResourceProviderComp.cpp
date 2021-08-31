@@ -74,25 +74,35 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 
 	CreateDefaultPalettes();
 
-	if (m_resourceFileNameAttrPtr.IsValid()){
-		QFile paletteFile(*m_resourceFileNameAttrPtr);
+	int count = qMin(qMin(m_designShemaIdAttrPtr.GetCount(), m_paletteModeAttrPtr.GetCount()), m_resourceFileNameAttrPtr.GetCount());
 
-		int count = qMin(m_designShemaIdAttrPtr.GetCount(), m_paletteModeAttrPtr.GetCount());
-		if (count > 0 && paletteFile.open(QIODevice::ReadOnly)){
-			QByteArray contents = paletteFile.readAll();
-			QJsonDocument document = QJsonDocument::fromJson(contents);
-			if (document.isObject()){
-				QJsonObject rootObject = document.object();
-				QJsonObject paletteObject = rootObject["palette"].toObject();
-				if (paletteObject.isEmpty()){
-					SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+	for (int i = 0; i < count; i++){
 
-					return;
-				}
+		if (m_designTokenFileParser.IsValid()){
+			m_designTokenFileParser->SetFile(m_resourceFileNameAttrPtr[i]);
+			m_designTokenFileParser->ParseFile();
+			QPalette palette;
+			m_designTokenFileParser->GetColorPalette(QByteArray(), palette);
+			m_paletteMap[m_designShemaIdAttrPtr[i]] = palette;
+		}
 
-				QMap<QByteArray, QPalette> paletteMap;
+		else {
+			QFile paletteFile(m_resourceFileNameAttrPtr[i]);
+			if (paletteFile.open(QIODevice::ReadOnly)){
+				QByteArray contents = paletteFile.readAll();
+				QJsonDocument document = QJsonDocument::fromJson(contents);
+				if (document.isObject()){
+					QJsonObject rootObject = document.object();
+					QJsonObject paletteObject = rootObject["palette"].toObject();
+					if (paletteObject.isEmpty()){
+						SendErrorMessage(0, QObject::tr("Palette file parsing error"));
 
-				for (int i = 0; i < count; i++){
+						return;
+					}
+
+					QMap<QByteArray, QPalette> paletteMap;
+
+
 					if (!m_designShemaIdAttrPtr[i].isEmpty() && !m_paletteModeAttrPtr[i].isEmpty()){
 						QJsonObject modeObject;
 						if (!GetObjectValue(paletteObject, m_paletteModeAttrPtr[i], modeObject)){
@@ -144,41 +154,41 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 							m_paletteMap[designShemaId] = palette;
 						}
 					}
-				}
 
-				QJsonObject typographyObject;
-				if (!GetObjectValue(rootObject, "typography", typographyObject)){
-					SendErrorMessage(0, QObject::tr("Palette file parsing error"));
 
-					return;
-				}
-
-				QJsonArray fontFamilyArray;
-				double fontSize = 0.0;
-				if (!GetArrayValue(typographyObject, "fontFamily", fontFamilyArray) ||
-					!GetDoubleValue(typographyObject, "fontSize", fontSize)){
-					SendErrorMessage(0, QObject::tr("Palette file parsing error"));
-
-					return;
-				}
-
-				for (int i = 0; i < fontFamilyArray.count(); i++){
-					QString fontName;
-					if (!GetStringValue(fontFamilyArray, i, fontName)){
+					QJsonObject typographyObject;
+					if (!GetObjectValue(rootObject, "typography", typographyObject)){
 						SendErrorMessage(0, QObject::tr("Palette file parsing error"));
 
 						return;
 					}
 
-					QFont font(fontName, fontSize);
+					QJsonArray fontFamilyArray;
+					double fontSize = 0.0;
+					if (!GetArrayValue(typographyObject, "fontFamily", fontFamilyArray) ||
+							!GetDoubleValue(typographyObject, "fontSize", fontSize)){
+						SendErrorMessage(0, QObject::tr("Palette file parsing error"));
 
-					QByteArray fontId = fontName.toLatin1();
-					fontId.replace(" ", "");
-					m_fontMap[fontId] = font;
-					m_fontList.InsertItem(fontId, fontName, "");
+						return;
+					}
+
+					for (int i = 0; i < fontFamilyArray.count(); i++){
+						QString fontName;
+						if (!GetStringValue(fontFamilyArray, i, fontName)){
+							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
+
+							return;
+						}
+
+						QFont font(fontName, fontSize);
+
+						QByteArray fontId = fontName.toLatin1();
+						fontId.replace(" ", "");
+						m_fontMap[fontId] = font;
+						m_fontList.InsertItem(fontId, fontName, "");
+					}
 				}
 			}
-
 			paletteFile.close();
 		}
 	}

@@ -35,7 +35,8 @@ public:
 	bool GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role) const override;
 	QString GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role) const override;
 
-    QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const override;
+    QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const override;	
+	bool GetStyleSheetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const override;
 
 	QByteArray GetTemplateIconColor(const QByteArray& styleName) const override;
     QByteArray GetNormalColor(const QByteArray& styleName) const override;
@@ -78,6 +79,7 @@ private:
 
 	QVariantMap m_iconColors;
 	QMap<QString, QPalette> m_stylesPalettes;
+	QMap<QString, QPalette> m_colorPalettes;
 
     struct RawColor
     {
@@ -94,7 +96,7 @@ private:
     QMultiMap<QByteArray, RawColor> m_styleSheetColors;
 
 private:
-	void GetPaletteFromEntry(const QString& styleName, const QJsonValue& paletteEntry);
+	QPalette GetPaletteFromEntry(const QString& styleName, const QJsonValue& paletteEntry);
 	bool CreateColorFromGrb(const QString& rgbString, QColor& color) const;
 };
 
