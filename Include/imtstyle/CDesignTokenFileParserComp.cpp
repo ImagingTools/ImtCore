@@ -268,6 +268,9 @@ const imtbase::ICollectionInfo& CDesignTokenFileParserComp::GetDesignSchemaList(
 
 bool CDesignTokenFileParserComp::GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const
 {
+	if(!designSchemaId.length()){
+		palette = m_colorPalettes.first();
+	}
 	palette = m_colorPalettes[designSchemaId];
 	return true;
 }
@@ -357,9 +360,6 @@ QPalette CDesignTokenFileParserComp::GetPaletteFromEntry(const QString& styleNam
 		if(color.isValid()){
 			palette.setColor(colorGroup, colorRole, color);
 		}
-        else {
-            m_styleSheetColors.insert(styleName.toUtf8(), RawColor(colorGroup, colorRole, value->toString().toUtf8()));
-        }
 	}
 	return palette;
 }
