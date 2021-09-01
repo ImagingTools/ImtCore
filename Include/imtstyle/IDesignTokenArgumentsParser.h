@@ -52,11 +52,19 @@ public:
 		/**
 			The colpy design token file to output dir behavior modificator
 		*/
-		AA_COPY_DESIGN_TOKEN_FILE
+		AA_COPY_DESIGN_TOKEN_FILE,
+
+		/**
+			The colpy design token errors ignore behavior modificator
+			\details Tells processors to ignore any errors, that could be emerged
+			\warning The program with this modificator must finished with code 0 ALWAYS!!!
+		*/
+		AA_ERRORS_IGNORE_MODE
 	};
 
 	virtual void SetArguments(int argc, char**argv) = 0;
 	virtual bool IsHelpRequested() const = 0;
+	virtual bool IsErrorsIgnoreRequested() const = 0;
 	virtual bool IsSplitModeRequired() const = 0;
 	virtual bool IsCopyDesignTokenFileRequired() const = 0;
 	virtual QByteArray GetDesignTokenFilePath() const = 0;

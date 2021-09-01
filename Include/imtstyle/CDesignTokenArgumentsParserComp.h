@@ -41,6 +41,7 @@ public:
 	void SetArguments(int argc, char**argv) override;
 	bool IsHelpRequested() const override;
 	bool IsSplitModeRequired() const override;
+	bool IsErrorsIgnoreRequested() const override;
 	bool IsCopyDesignTokenFileRequired() const override;
 	QByteArray GetDesignTokenFilePath() const override;
 	QByteArray GetImagesInputDirectoryPath() const override;

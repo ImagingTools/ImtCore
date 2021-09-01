@@ -15,15 +15,18 @@ void CDesignTokenProcessorsControllerComp::OnComponentCreated()
 		}
 	}
 
-	for(const IDesignTokenProcessor* processor: ::qAsConst(failedProcessors)){
-		qInfo() << "--------------------------Error";
-		qInfo() << processor->GetHelpString();
-	}
+	if(!m_argumentParserAttrPtr->IsErrorsIgnoreRequested()){
 
-	if(failedProcessors.size() == m_designTokenProcessors.GetCount()){
-		::exit(-1);
-	}
+		for(const IDesignTokenProcessor* processor: ::qAsConst(failedProcessors)){
+			qInfo() << "--------------------------Error";
+			qInfo() << processor->GetHelpString();
+		}
 
+		if(failedProcessors.size() == m_designTokenProcessors.GetCount()){
+			::exit(-1);
+		}
+
+	}
 	::exit(0);
 }
 

@@ -175,14 +175,13 @@ bool CDesignTokenFileParserComp::ParseFile()
 		QJsonObject colorsObject = styleEntry["IconColor"].toObject();
 		if(colorsObject.isEmpty()){
 			qInfo() << "Skipping empty object";
-			continue;
 		}
 
 		QVariantMap colorsMap = colorsObject.toVariantMap();
 		m_iconColors.insert(styleName, colorsMap);
 		m_designSchemaList.InsertItem(styleName.toUtf8(), styleName,"");
 
-		//m_stylesPalettes.insert(styleName, this->GetPaletteFromEntry(styleName, styleEntry["StyleSheetColor"]));
+		m_stylesPalettes.insert(styleName, this->GetPaletteFromEntry(styleName, styleEntry["StyleSheetColor"]));
 		m_colorPalettes.insert(styleName, this->GetPaletteFromEntry(styleName, styleEntry["PaletteColor"]));
 	}
 	designTokenFile.close();
