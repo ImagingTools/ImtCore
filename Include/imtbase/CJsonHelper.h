@@ -14,6 +14,7 @@ class CJsonHelper
 {
 public:
 	static bool GetBoolValue(const QJsonObject& object, const QString& key, bool &value);
+	static bool GetIntValue(const QJsonObject& object, const QString& key, int &value);
 	static bool GetDoubleValue(const QJsonObject& object, const QString& key, double &value);
 	static bool GetStringValue(const QJsonObject& object, const QString& key, QString &value);
 	static bool GetArrayValue(const QJsonObject& object, const QString& key, QJsonArray &value);

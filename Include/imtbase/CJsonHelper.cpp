@@ -18,6 +18,19 @@ bool CJsonHelper::GetBoolValue(const QJsonObject& object, const QString& key, bo
 	return false;
 }
 
+bool CJsonHelper::GetIntValue(const QJsonObject& object, const QString& key, int& value)
+{
+	if (object.contains(key)){
+		QJsonValue jsonValue = object[key];
+		if (jsonValue.isDouble()){
+			value = jsonValue.toInt();
+			return true;
+		}
+	}
+
+	return false;
+}
+
 
 bool CJsonHelper::GetDoubleValue(const QJsonObject& object, const QString& key, double &value)
 {
