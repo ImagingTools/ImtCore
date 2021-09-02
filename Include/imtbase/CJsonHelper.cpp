@@ -74,6 +74,35 @@ bool CJsonHelper::GetObjectValue(const QJsonObject& object, const QString& key, 
 	return false;
 }
 
+bool CJsonHelper::GetStringListValue(const QJsonObject& object, const QString& key, QStringList& value)
+{
+	if (object.contains(key)){
+		QJsonValue jsonValue = object[key];
+		if (jsonValue.isArray()){
+			QJsonArray jsonArray = jsonValue.toArray();
+			for(const QJsonValue& arrayValue: ::qAsConst(jsonArray)){
+				if(!arrayValue.isString()) {
+					return false;
+				}
+				value << arrayValue.toString();
+			}
+		}
+	}
+	return false;
+}
+
+bool CJsonHelper::GetVariantListValue(const QJsonObject& object, const QString& key, QVariantList& value)
+{
+	if (object.contains(key)){
+		QJsonValue jsonValue = object[key];
+		if (jsonValue.isArray()){
+			value = jsonValue.toArray().toVariantList();
+			return true;
+		}
+	}
+	return false;
+}
+
 
 bool CJsonHelper::GetBoolValue(const QJsonArray& array, int index, bool &value)
 {
