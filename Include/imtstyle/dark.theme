@@ -93,6 +93,41 @@
 				"AllHighlight": "#1a76e7",
 				"AllHighlightedText": "white"
 			},
+			"Fonts": {
+				"Base":{
+					"Bold": false,
+					"FixedPitch": false,
+					"Italic": false,
+					"Kerning": false,
+					"Overline": false,
+					"StrikeOut": false,
+					"Underline": false,
+					"PixelSize": 15,
+					"PointSize": 15,
+					"Stretch": 15,
+					"Weight": 15,
+					"PointSizeF": 15.5,
+					"WordSpacing": 15.5,
+					"HintingPreference": "PreferDefaultHinting",
+					"Capitalization": "Capitalize",
+					"Style": "Normal",
+					"Family": "nano sans",
+					"StyleName": "",
+					"Families": ["nano sans", "Helvetica"],
+					"StyleStrategy": ["PreferBitmap", "ForceOutline"],
+					"LetterSpacing": {
+						"SpacingType": "PercentageSpacing",
+						"Spacing": 15.5
+					},
+					"StyleHint":{
+						"StyleHint": "Helvetica",
+						"StyleStrategy": ["PreferBitmap", "ForceOutline"]
+					}
+				},
+				"WindowTittle":{"Family": ["nano sans", "Helvetica"]},
+				"Title":{"Families": "nano sans"},
+				"Subtitle":{}
+			},
 			"StyleName": "Dark"
 		}
 	],
