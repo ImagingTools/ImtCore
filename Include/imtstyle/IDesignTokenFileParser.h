@@ -9,21 +9,18 @@
 
 // ImtCore includes
 #include <imtstyle/IColorPaletteProvider.h>
+#include <imtstyle/IFontProvider.h>
 
 
 namespace imtstyle
 {
 
-class IDesignTokenFileParser: virtual public IColorPaletteProvider
+class IDesignTokenFileParser: virtual public IColorPaletteProvider, virtual public IFontProvider
 {
 public:
 	virtual bool SetFile(const QByteArray& filePath) = 0;
 	virtual bool ParseFile() = 0;
 	virtual bool SplitFile(const QString& outputDirPath, const QString& projectName) = 0;
-
-	virtual bool GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group,  QPalette::ColorRole& role) const = 0;
-	virtual QString GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role) const = 0;
-
 
 	virtual bool GetStyleSheetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const = 0;
 	virtual QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const = 0;

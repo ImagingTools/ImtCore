@@ -10,6 +10,7 @@
 //ImtCore includes
 #include <imtbase/ICollectionInfo.h>
 #include <imtstyle/CDesignTokenFileParserComp.h>
+#include <imtstyle/CImtStyleUtils.h>
 
 
 namespace imtstyle
@@ -138,7 +139,7 @@ bool CDesignTokenStyleSheetProcessorComp::SetVariableColor(QByteArray& data, con
 			QPalette::ColorGroup colorGroup;
 			QPalette::ColorRole colorRole;
 
-			if(m_designTokenFileParserAttrPtr->GetColorRoleGroup(colorName, colorGroup, colorRole)){
+			if(CImtStyleUtils::GetColorRoleGroup(colorName, colorGroup, colorRole)){
 				QColor color = palette.color(colorGroup, colorRole);
 				QByteArray colorHex;
 				if(color.name() == "#000000"){

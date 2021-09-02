@@ -5,53 +5,18 @@
 #include <QtCore/QRegularExpressionMatch>
 #include <QtCore/QRegularExpressionMatchIterator>
 
+// Imtcore includes
+#include <imtstyle/CImtStyleUtils.h>
+
 
 namespace imtstyle
 {
 
 
-const QMap<QString, QPalette::ColorGroup> CDesignTokenFileParserComp::s_colorGroupNamesMap = {
-			std::make_pair("Active", QPalette::ColorGroup::Active),
-			std::make_pair("Disabled", QPalette::ColorGroup::Disabled),
-			std::make_pair("Inactive", QPalette::ColorGroup::Inactive),
-			std::make_pair("NColorGroups", QPalette::ColorGroup::NColorGroups),
-			std::make_pair("Current", QPalette::ColorGroup::Current),
-			std::make_pair("All", QPalette::ColorGroup::All),
-			std::make_pair("Normal", QPalette::ColorGroup::Normal)
-};
 
 
-const QMap<QString, QPalette::ColorRole>CDesignTokenFileParserComp::s_colorRolesNamesMap = {
-			std::make_pair("WindowText", QPalette::ColorRole::WindowText),
-			std::make_pair("Button", QPalette::ColorRole::Button),
-			std::make_pair("Light", QPalette::ColorRole::Light),
-			std::make_pair("Midlight", QPalette::ColorRole::Midlight),
-			std::make_pair("Dark", QPalette::ColorRole::Dark),
-			std::make_pair("Mid", QPalette::ColorRole::Mid),
-			std::make_pair("Text", QPalette::ColorRole::Text),
-			std::make_pair("BrightText", QPalette::ColorRole::BrightText),
-			std::make_pair("ButtonText", QPalette::ColorRole::ButtonText),
-			std::make_pair("Base", QPalette::ColorRole::Base),
-			std::make_pair("Window", QPalette::ColorRole::Window),
-			std::make_pair("Shadow", QPalette::ColorRole::Shadow),
-			std::make_pair("Highlight", QPalette::ColorRole::Highlight),
-			std::make_pair("HighlightedText", QPalette::ColorRole::HighlightedText),
-			std::make_pair("Link", QPalette::ColorRole::Link),
-			std::make_pair("LinkVisited", QPalette::ColorRole::LinkVisited),
-			std::make_pair("AlternateBase", QPalette::ColorRole::AlternateBase),
-			std::make_pair("NoRole", QPalette::ColorRole::NoRole),
-			std::make_pair("ToolTipBase", QPalette::ColorRole::ToolTipBase),
-			std::make_pair("ToolTipText", QPalette::ColorRole::ToolTipText),
-			std::make_pair("PlaceholderText", QPalette::ColorRole::PlaceholderText),
-			std::make_pair("Foreground", QPalette::ColorRole::Foreground),
-			std::make_pair("Background", QPalette::ColorRole::Background)
-};
 
 
-QString CDesignTokenFileParserComp::GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role) const
-{
-	return CDesignTokenFileParserComp::s_colorGroupNamesMap.key(group) + CDesignTokenFileParserComp::s_colorRolesNamesMap.key(role);
-}
 
 
 QByteArray CDesignTokenFileParserComp::GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const
@@ -78,39 +43,6 @@ bool CDesignTokenFileParserComp::GetStyleSheetColorPalette(const QByteArray& des
 }
 
 
-bool CDesignTokenFileParserComp::GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role) const
-{
-	const QStringList& groupNames = CDesignTokenFileParserComp::s_colorGroupNamesMap.keys();
-
-	for(const QString& groupName: groupNames){
-
-		QRegularExpression groupRegEx(QString("^" + groupName), QRegularExpression::PatternOption::CaseInsensitiveOption);
-		QRegularExpressionMatchIterator globalMatch = groupRegEx.globalMatch(name);
-
-		if(globalMatch.hasNext()){
-
-			QRegularExpressionMatch groupRegExMatch;
-			groupRegExMatch = globalMatch.next();
-
-			if(!s_colorGroupNamesMap.contains(groupName)) {
-				return false;
-			}
-
-			group = s_colorGroupNamesMap[groupName];
-
-			QString roleName = name;
-			roleName.remove(groupRegExMatch.capturedStart(), groupRegExMatch.capturedLength());
-
-			if(!s_colorRolesNamesMap.contains(roleName)) {
-				return false;
-			}
-
-			role = s_colorRolesNamesMap[roleName];
-			return true;
-		}
-	}
-	return false;
-}
 
 
 // reimplemented (IDesignTokenFileParser)
@@ -181,8 +113,15 @@ bool CDesignTokenFileParserComp::ParseFile()
 		m_iconColors.insert(styleName, colorsMap);
 		m_designSchemaList.InsertItem(styleName.toUtf8(), styleName,"");
 
-		m_stylesPalettes.insert(styleName, this->GetPaletteFromEntry(styleName, styleEntry["StyleSheetColor"]));
-		m_colorPalettes.insert(styleName, this->GetPaletteFromEntry(styleName, styleEntry["PaletteColor"]));
+		m_stylesPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromEntry(styleEntry["StyleSheetColor"]));
+		m_colorPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromEntry(styleEntry["PaletteColor"]));
+
+		imtbase::CCollectionInfo* themeFontsCollection = new imtbase::CCollectionInfo;
+		QMap<QByteArray, QFont> fonts;
+
+		CImtStyleUtils::GetFontsFromEntry(styleEntry["Fonts"], fonts, themeFontsCollection);
+		m_fontsCollectionInfos.insert(styleName, istd::TSmartPtr<imtbase::ICollectionInfo>(themeFontsCollection));
+		m_fonts.insert(styleName, fonts);
 	}
 	designTokenFile.close();
 	return true;
@@ -271,22 +210,6 @@ bool CDesignTokenFileParserComp::GetColorPalette(const QByteArray& designSchemaI
 		palette = m_colorPalettes.first();
 	}
 	palette = m_colorPalettes[designSchemaId];
-
-
-
-	QString AllWindow = palette.color(QPalette::All, QPalette::Window).name();
-	QString AllWindowText = palette.color(QPalette::All, QPalette::WindowText).name();
-	QString AllBase = palette.color(QPalette::All, QPalette::Base).name();
-	QString AllAlternateBase = palette.color(QPalette::All, QPalette::AlternateBase).name();
-	QString AllToolTipBase = palette.color(QPalette::All, QPalette::ToolTipBase).name();
-	QString AllToolTipText = palette.color(QPalette::All, QPalette::ToolTipText).name();
-	QString AllText = palette.color(QPalette::All, QPalette::Text).name();
-	QString AllButton = palette.color(QPalette::All, QPalette::Button).name();
-	QString AllButtonText = palette.color(QPalette::All, QPalette::ButtonText).name();
-	QString AllBrightText = palette.color(QPalette::All, QPalette::BrightText).name();
-	QString AllLink = palette.color(QPalette::All, QPalette::Link).name();
-	QString AllHighlight = palette.color(QPalette::All, QPalette::Highlight).name();
-	QString AllHighlightedText = palette.color(QPalette::All, QPalette::HighlightedText).name();
 	return true;
 }
 
@@ -304,49 +227,70 @@ QByteArray imtstyle::CDesignTokenFileParserComp::GetNormalColor(const QByteArray
 
 QByteArray imtstyle::CDesignTokenFileParserComp::GetOffNormalColor(const QByteArray& styleName) const
 {
-	return m_iconColors[styleName].toMap()[s_offNormalColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[CImtStyleUtils::s_offNormalColorParamName].toByteArray();
 }
 
 
 QByteArray imtstyle::CDesignTokenFileParserComp::GetOffDisabledColor(const QByteArray& styleName) const
 {
-	return m_iconColors[styleName].toMap()[s_offDisabledColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[CImtStyleUtils::s_offDisabledColorParamName].toByteArray();
 }
 
 
 QByteArray imtstyle::CDesignTokenFileParserComp::GetOffActiveColor(const QByteArray& styleName) const
 {
-	return m_iconColors[styleName].toMap()[s_offActiveColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[CImtStyleUtils::s_offActiveColorParamName].toByteArray();
 }
 
 
 QByteArray imtstyle::CDesignTokenFileParserComp::GetOffSelectedColor(const QByteArray& styleName) const
 {
-	return m_iconColors[styleName].toMap()[s_offSelectedColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[CImtStyleUtils::s_offSelectedColorParamName].toByteArray();
 }
 
 
 QByteArray imtstyle::CDesignTokenFileParserComp::GetOnNormalColor(const QByteArray& styleName) const
 {
-	return m_iconColors[styleName].toMap()[s_onNormalColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[CImtStyleUtils::s_onNormalColorParamName].toByteArray();
 }
 
 
 QByteArray imtstyle::CDesignTokenFileParserComp::GetOnDisabledColor(const QByteArray& styleName) const
 {
-	return m_iconColors[styleName].toMap()[s_onDisabledColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[CImtStyleUtils::s_onDisabledColorParamName].toByteArray();
 }
 
 
 QByteArray imtstyle::CDesignTokenFileParserComp::GetOnActiveColor(const QByteArray& styleName) const
 {
-	return m_iconColors[styleName].toMap()[s_onActiveColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[CImtStyleUtils::s_onActiveColorParamName].toByteArray();
 }
 
 
 QByteArray imtstyle::CDesignTokenFileParserComp::GetOnSelectedColor(const QByteArray& styleName) const
 {
-	return m_iconColors[styleName].toMap()[s_onSelectedColorParamName].toByteArray();
+	return m_iconColors[styleName].toMap()[CImtStyleUtils::s_onSelectedColorParamName].toByteArray();
+}
+
+
+const imtbase::ICollectionInfo& CDesignTokenFileParserComp::GetFontList(const QByteArray& designSchemaId) const
+{
+	if (m_fonts.contains(designSchemaId) && m_fontsCollectionInfos[designSchemaId].GetPtr() != nullptr){
+		const imtbase::ICollectionInfo& retval = *m_fontsCollectionInfos[designSchemaId];
+		return retval;
+	}
+	return m_emptyCollectionInfo;
+}
+
+
+bool CDesignTokenFileParserComp::GetFont(const QByteArray& designSchemaId, const QByteArray& fontId, QFont& font) const
+{
+	if (m_fonts.contains(designSchemaId) && m_fonts[designSchemaId].contains(fontId)){
+		font = m_fonts[designSchemaId][fontId];
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -357,65 +301,7 @@ void CDesignTokenFileParserComp::OnComponentCreated()
 }
 
 
-QPalette CDesignTokenFileParserComp::GetPaletteFromEntry(const QString& styleName, const QJsonValue& paletteEntry)
-{
-	QPalette palette;
 
-	const QJsonObject& paletteEntryObject = paletteEntry.toObject();
-
-	for(QJsonObject::const_iterator value = paletteEntryObject.constBegin(); value != paletteEntryObject.constEnd(); ++value){
-		QPalette::ColorGroup colorGroup;
-		QPalette::ColorRole colorRole;
-		this->GetColorRoleGroup(value.key(), colorGroup, colorRole);
-
-		QColor color;
-		if (!this->CreateColorFromGrb(value->toString(), color)){
-			color.setNamedColor(value->toString());
-		}
-		if(color.isValid()){
-			palette.setColor(colorGroup, colorRole, color);
-		}
-	}
-	return palette;
-}
-
-bool CDesignTokenFileParserComp::CreateColorFromGrb(const QString& rgbString, QColor& color) const
-{
-	int indexOfBegin = rgbString.indexOf("rgb(");
-	if(indexOfBegin >= 0){
-		bool rFill = false, gFill = false;
-		QString r,g,b;
-
-		for(int i = indexOfBegin + 4; i < rgbString.length(); ++i){
-			QChar symbol = rgbString[i];
-			if(symbol.isDigit()){
-				if(!rFill){
-					r += symbol;
-				}
-				else if(!gFill){
-					g += symbol;
-				}
-				else {
-					b += symbol;
-				}
-			}
-			else{
-				if(!rFill){
-					rFill = true;
-				}
-				else if(!gFill){
-					gFill = true;
-				}
-				else{
-					int iR = r.toInt(), iG = g.toInt(), iB = b.toInt();
-					color = QColor::fromRgb(iR, iG, iB);
-					return color.isValid();
-				}
-			}
-		}
-	}
-	return false;
-}
 
 
 

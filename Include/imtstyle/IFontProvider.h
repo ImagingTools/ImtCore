@@ -1,9 +1,8 @@
 #pragma once
 
 
-// ACF includes
-#include <istd/IChangeable.h>
-
+// ImtCore includes
+#include <imtstyle/IDesignSchemaInfoProvider.h>
 
 class QFont;
 
@@ -16,11 +15,11 @@ namespace imtstyle
 {
 
 
-class IFontProvider: virtual public istd::IChangeable
+class IFontProvider: virtual public IDesignSchemaInfoProvider
 {
 public:
-	virtual const imtbase::ICollectionInfo& GetFontList() const = 0;
-	virtual bool GetFont(const QByteArray& fontId, QFont& font) const = 0;
+	virtual const imtbase::ICollectionInfo& GetFontList(const QByteArray& designSchemaId) const = 0;
+	virtual bool GetFont(const QByteArray& designSchemaId, const QByteArray& fontId, QFont& font) const = 0;
 };
 
 

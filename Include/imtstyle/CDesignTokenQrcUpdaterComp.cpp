@@ -21,7 +21,8 @@ int CDesignTokenQrcUpdaterComp::Exec()
 
 	QByteArray outputDirName = m_argumentParserAttrPtr->GetOutputDirectoryPath();
 	QByteArray projectName = m_argumentParserAttrPtr->GetProjectName();
-	m_designTokenFileParserAttrPtr->SetFile(m_argumentParserAttrPtr->GetDesignTokenFilePath());
+	QByteArray designTokenFilePath = m_argumentParserAttrPtr->GetDesignTokenFilePath();
+	m_designTokenFileParserAttrPtr->SetFile(designTokenFilePath);
 	m_designTokenFileParserAttrPtr->ParseFile();
 	QVector<QByteArray> styles = m_designTokenFileParserAttrPtr->GetDesignSchemaList().GetElementIds();
 

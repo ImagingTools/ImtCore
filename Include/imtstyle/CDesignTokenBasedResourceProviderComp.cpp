@@ -26,6 +26,10 @@ namespace imtstyle
 
 bool CDesignTokenBasedResourceProviderComp::GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const
 {
+	if(m_designTokenFileParser.IsValid()){
+		return m_designTokenFileParser->GetColorPalette(designSchemaId, palette);
+	}
+
 	if (m_paletteMap.contains(designSchemaId)){
 		palette = m_paletteMap[designSchemaId];
 
@@ -38,17 +42,28 @@ bool CDesignTokenBasedResourceProviderComp::GetColorPalette(const QByteArray& de
 
 // reimplemented (IFontProvider)
 
-const imtbase::ICollectionInfo& CDesignTokenBasedResourceProviderComp::GetFontList() const
+const imtbase::ICollectionInfo& CDesignTokenBasedResourceProviderComp::GetFontList(const QByteArray& designSchemaId) const
 {
-	return m_fontList;
+	if(m_designTokenFileParser.IsValid()){
+		return m_designTokenFileParser->GetFontList(designSchemaId);
+	}
+
+	if (m_fonts.contains(designSchemaId) && m_fontsCollectionInfos[designSchemaId].GetPtr() != nullptr){
+		const imtbase::ICollectionInfo& retval = *m_fontsCollectionInfos[designSchemaId];
+		return retval;
+	}
+	return m_emptyCollectionInfo;
 }
 
 
-bool CDesignTokenBasedResourceProviderComp::GetFont(const QByteArray& fontId, QFont& font) const
-{
-	if (m_fontMap.contains(fontId)){
-		font = m_fontMap[fontId];
+bool CDesignTokenBasedResourceProviderComp::GetFont(const QByteArray& designSchemaId, const QByteArray& fontId, QFont& font) const
+{	
+	if(m_designTokenFileParser.IsValid()){
+		return m_designTokenFileParser->GetFont(designSchemaId, fontId, font);
+	}
 
+	if (m_fonts.contains(designSchemaId) && m_fonts[designSchemaId].contains(fontId)){
+		font = m_fonts[designSchemaId][fontId];
 		return true;
 	}
 
@@ -81,9 +96,16 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 		if (m_designTokenFileParser.IsValid()){
 			m_designTokenFileParser->SetFile(m_resourceFileNameAttrPtr[i]);
 			m_designTokenFileParser->ParseFile();
-			QPalette palette;
-			m_designTokenFileParser->GetColorPalette(m_designShemaIdAttrPtr[i], palette);
-			m_paletteMap[m_designShemaIdAttrPtr[i]] = palette;
+
+//			QPalette palette;
+//			m_designTokenFileParser->GetColorPalette(m_designShemaIdAttrPtr[i], palette);
+//			m_paletteMap[m_designShemaIdAttrPtr[i]] = palette;
+
+//			imtbase::CCollectionInfo* themeCFontsCollection = new imtbase::CCollectionInfo;
+//			QMap<QByteArray, QFont> fonts;
+
+//			m_fontsCollectionInfos.insert(m_designShemaIdAttrPtr[i], istd::TSmartPtr<imtbase::ICollectionInfo>(themeCFontsCollection));
+//			m_fonts.insert(m_designShemaIdAttrPtr[i], fonts);
 		}
 
 		else {
@@ -184,8 +206,8 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 
 						QByteArray fontId = fontName.toLatin1();
 						fontId.replace(" ", "");
-						m_fontMap[fontId] = font;
-						m_fontList.InsertItem(fontId, fontName, "");
+//						m_fontMap[fontId] = font;
+//						m_fontList.InsertItem(fontId, fontName, "");
 					}
 				}
 			}

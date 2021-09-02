@@ -8,6 +8,7 @@
 // ACF includes
 #include <icomp/CComponentBase.h>
 #include <ilog/TLoggerCompWrap.h>
+#include <istd/TSmartPtr.h>
 
 // ImtCore includes
 #include <imtbase/CCollectionInfo.h>
@@ -44,8 +45,8 @@ public:
 	virtual bool GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const override;
 
 	// reimplemented (IFontProvider)
-	virtual const imtbase::ICollectionInfo& GetFontList() const override;
-	virtual bool GetFont(const QByteArray& fontId, QFont& font) const override;
+	virtual const imtbase::ICollectionInfo& GetFontList(const QByteArray& designSchemaId) const override;
+	virtual bool GetFont(const QByteArray& designSchemaId, const QByteArray& fontId, QFont& font) const override;
 
 	// reimplemented (IDesignSchemaInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetDesignSchemaList() const override;
@@ -66,10 +67,13 @@ private:
 	I_REF(IDesignTokenFileParser, m_designTokenFileParser);
 
 	imtbase::CCollectionInfo m_designSchemaList;
-	imtbase::CCollectionInfo m_fontList;
+
+	imtbase::CCollectionInfo m_emptyCollectionInfo;
 
 	QMap<QByteArray, QPalette> m_paletteMap;
-	QMap<QByteArray, QFont> m_fontMap;
+	QMap<QByteArray, istd::TSmartPtr<imtbase::ICollectionInfo>> m_fontsCollectionInfos;
+	QMap<QByteArray, QMap<QByteArray, QFont>> m_fonts;
+
 };
 
 
