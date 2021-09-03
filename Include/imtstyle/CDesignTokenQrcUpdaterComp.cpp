@@ -173,7 +173,7 @@ bool CDesignTokenQrcUpdaterComp::CreateSingleEntry(const QString& prefix, const 
 
 QString CDesignTokenQrcUpdaterComp::GetPathOverFile(const QString& dir, const QString& file) const
 {
-	QString retval = dir;
+	QString retval = QDir(dir).absolutePath();
 	QFileInfo inputFileInfo(file);
 	QString inputFileInfoPath = inputFileInfo.absolutePath();
 	retval.replace(inputFileInfoPath, "");
