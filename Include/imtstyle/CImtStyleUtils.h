@@ -50,6 +50,8 @@ public:
 	static bool GetFontsFromEntry(const QJsonValue& paletteEntry,
 								  QMap<QByteArray, QFont>& fonts,
 								  imtbase::CCollectionInfo* fontsCollectionInfos = nullptr);
+	static bool CreateCssFont(QByteArray&output, const QFont& font);
+
 
 
 

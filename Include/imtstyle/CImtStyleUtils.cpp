@@ -562,9 +562,13 @@ bool CImtStyleUtils::GetFontsFromEntry(const QJsonValue& fontsEntry, QMap<QByteA
 		}
 		fonts.insert(fontEntry.key().toUtf8(), font);
 	}
-
 	return true;
+}
 
+bool CImtStyleUtils::CreateCssFont(QByteArray& output, const QFont& font)
+{
+
+	return false;
 }
 
 
