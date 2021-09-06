@@ -47,14 +47,26 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 		QPalette palette;
 		m_designTokenFileParserAttrPtr->GetStyleSheetColorPalette(styleName, palette);
 		QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Styles") + QDir::separator().toLatin1() + styleName.constData();
-		this->SetColorAllFilesInDir(m_inputDirName, outputDirName, palette);
+
+		m_currentPalette = palette;
+
+		m_currentFontsCss.clear();
+		QVector<QByteArray> fonts = m_designTokenFileParserAttrPtr->GetFontList(styleName).GetElementIds();
+		for(const QByteArray& fontName: ::qAsConst(fonts)){
+			QFont font;
+			QByteArray cssFont;
+			m_designTokenFileParserAttrPtr->GetFont(styleName, fontName,font);
+			CImtStyleUtils::CreateCssFont(cssFont, font);
+			m_currentFontsCss[fontName] = cssFont;
+		}
+		this->ProcessAllCssFilesInDir(m_inputDirName, outputDirName);
 	}
 	return 0;
 }
 
 
 
-void CDesignTokenStyleSheetProcessorComp::SetColorAllFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName, const QPalette& palette) const
+void CDesignTokenStyleSheetProcessorComp::ProcessAllCssFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName) const
 {
 	QDir outputDir(outputDirName);
 	if(!outputDir.exists()){
@@ -79,13 +91,12 @@ void CDesignTokenStyleSheetProcessorComp::SetColorAllFilesInDir(const QByteArray
 		if(!inputFileSuffix.startsWith('.')){
 			inputFileSuffix.prepend('.');
 		}
-
-		this->SetColor(inputFile.absoluteFilePath().toLocal8Bit(), QByteArray(outputDirName + dirSeparator + inputFileBaseName + inputFileSuffix), palette);
+		this->ProcesCssFile(inputFile.absoluteFilePath().toLocal8Bit(), QByteArray(outputDirName + dirSeparator + inputFileBaseName + inputFileSuffix));
 	}
 }
 
 
-void CDesignTokenStyleSheetProcessorComp::SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QPalette& palette) const
+void CDesignTokenStyleSheetProcessorComp::ProcesCssFile(const QByteArray& fileName, const QByteArray& outputFileName) const
 {
 	QByteArray fileData;
 
@@ -95,7 +106,9 @@ void CDesignTokenStyleSheetProcessorComp::SetColor(const QByteArray& fileName, c
 	originalImageFile.close();
 	Q_ASSERT(fileData.length());
 
-	while (this->SetVariableColor(fileData, palette));
+	while (this->SetVariableColor(fileData, m_currentPalette));
+
+	CImtStyleUtils::SetVariables(fileData, '$', '(', ')', m_currentFontsCss);
 
 	QFile outputImageFile(outputFileName);
 	Q_ASSERT(outputImageFile.open(QFile::WriteOnly));

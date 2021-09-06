@@ -36,8 +36,8 @@ public:
 
 
 private:
-	void SetColorAllFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName, const QPalette& palette) const;
-	void SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QPalette& palette) const;
+	void ProcessAllCssFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName) const;
+	void ProcesCssFile(const QByteArray& fileName, const QByteArray& outputFileName) const;
 	bool SetVariableColor(QByteArray& data, const QPalette& palette) const;
 
 
@@ -50,6 +50,8 @@ private:
 	QByteArray m_outputDirName;
 	QByteArray m_designTokenFileInfo;
 	QByteArray m_currentTheme;
+	mutable QPalette m_currentPalette;
+	mutable QMap<QByteArray, QByteArray> m_currentFontsCss;
 
 };
 

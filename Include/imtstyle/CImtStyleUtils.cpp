@@ -507,12 +507,12 @@ bool CImtStyleUtils::GetFontsFromEntry(const QJsonValue& fontsEntry, QMap<QByteA
 			font.setHintingPreference(hintingPreference);
 		}
 
-		if(GetStringValue(fontObject, "HintingPreference", s_caps) &&
+		if(GetStringValue(fontObject, "Capitalization", s_caps) &&
 				GetFontCapitalization(s_hintingPreference, caps)){
 			font.setCapitalization(caps);
 		}
 
-		if(GetStringValue(fontObject, "HintingPreference", s_style) &&
+		if(GetStringValue(fontObject, "Style", s_style) &&
 				GetFontStyle(s_hintingPreference, style)){
 			font.setStyle(style);
 		}
@@ -567,8 +567,108 @@ bool CImtStyleUtils::GetFontsFromEntry(const QJsonValue& fontsEntry, QMap<QByteA
 
 bool CImtStyleUtils::CreateCssFont(QByteArray& output, const QFont& font)
 {
+	qDebug() << __FILE__ << __LINE__ << output;
+	if(font.pointSize() > 0){
+		output.append("font-size: ").append(QByteArray::number(font.pointSize())).append("pt;\n");
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+	else if(font.pointSizeF() > 0){
+		output.append("font-size: ").append(QByteArray::number(font.pointSizeF())).append("pt;\n");
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+	else if(font.pixelSize() > 0){
+		output.append("font-size: ").append(QByteArray::number(font.pixelSize())).append("px;\n");
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+	qDebug() << __FILE__ << __LINE__ << output;
 
-	return false;
+	QByteArray fontFamilyString = "font-family: ";
+	if(font.family().length()){
+		fontFamilyString.append('"').append(font.family().toUtf8()).append('"');
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+	else if(font.families().size()){
+		QStringList tempFonts = font.families();
+		for(QStringList::iterator font = tempFonts.begin(); font != tempFonts.end(); ++font){
+			font->append('"');
+			font->prepend('"');
+			qDebug() << __FILE__ << __LINE__ << output;
+		}
+		qDebug() << __FILE__ << __LINE__ << output;
+		fontFamilyString.append(tempFonts.join(", ").toUtf8());
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+
+	qDebug() << __FILE__ << __LINE__ << output;
+	if(font.styleHint() != QFont::AnyStyle){
+		if(!fontFamilyString.trimmed().endsWith(':')){
+			fontFamilyString.append(", ");
+			fontFamilyString.append(s_fontStyleHintNamesMap.key(font.styleHint()).toUtf8());
+			qDebug() << __FILE__ << __LINE__ << output;
+		}
+	}
+
+	if(!fontFamilyString.trimmed().endsWith(':')){
+		fontFamilyString.append(";\n");
+		output += fontFamilyString;
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+
+	QByteArray fontStyleString = s_fontStyleNamesMap.key(font.style()).toUtf8();
+	fontStyleString = fontStyleString.toLower();
+	fontStyleString.replace("style", "");
+	fontStyleString.prepend("font-style: ").append(";\n");
+	output += fontStyleString;
+	qDebug() << __FILE__ << __LINE__ << output;
+
+	if(font.weight() > 0) {
+		output += "font-weight: ";
+		output += QByteArray::number(font.weight()).append(";\n");
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+
+	if(font.stretch() > 0){
+		output += "font-stretch: ";
+		output += QByteArray::number(font.stretch()).append(";\n");
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+
+	QStringList fontDecorations;
+	if(font.underline()){
+		fontDecorations << "underline";
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+	if(font.overline()){
+		fontDecorations << "overline";
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+	if(font.strikeOut()){
+		fontDecorations << "line-through";
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+	if(fontDecorations.size()){
+		output += "text-decoration: ";
+		output += fontDecorations.join(", ").toUtf8();
+		output += ";\n";
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+
+	qDebug() << __FILE__ << __LINE__ << font.capitalization();
+	if(font.capitalization() != QFont::MixedCase && font.capitalization() != QFont::SmallCaps){
+		QString transformString = s_fontCapitalizationNamesMap.key(font.capitalization());
+		transformString = transformString.toLower();
+		transformString.replace("all", "");
+		output += "text-transform: ";
+		output += transformString.toUtf8();
+		output += ";\n";
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+	else if (font.capitalization() == QFont::SmallCaps){
+		output += "font-variant: small-caps;\n";
+		qDebug() << __FILE__ << __LINE__ << output;
+	}
+	qDebug() << __FILE__ << __LINE__ << output;
+	return true;
 }
 
 
