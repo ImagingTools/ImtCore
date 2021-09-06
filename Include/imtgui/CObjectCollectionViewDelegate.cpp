@@ -155,11 +155,11 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(
 		}
 		const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
 		if (revisionControllerPtr != nullptr){
-			if (m_selectedItemIds.count() == 1){
+			if (selectedItems.count() == 1){
 				int revision = -1;
 				idoc::CStandardDocumentMetaInfo metaInfo;
 
-				QByteArray objectId = m_selectedItemIds[0];
+				QByteArray objectId = selectedItems[0];
 
 				if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
 					QVariant variant = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);
