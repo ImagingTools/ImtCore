@@ -98,7 +98,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 		QJsonObject styleEntry = style.toObject();
 		QString styleName = styleEntry["Name"].toString();
 
-		ReplaceColorNamesRecursivle(styleEntry, colorPaletteVariables);
+        ReplaceColorNamesRecursivle(styleEntry, colorPaletteVariables);
 
 		if(!styleName.length()){
 			qInfo() << "Skipping invalid object";
@@ -118,8 +118,8 @@ bool CDesignTokenFileParserComp::ParseFile()
 		m_iconColors.insert(styleName, colorsMap);
 		m_designSchemaList.InsertItem(styleName.toUtf8(), styleName,"");
 
-		m_stylesPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromMultiEntry(style));
-		m_colorPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromMultiEntry(style));
+        m_stylesPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromMultiEntry(styleEntry));
+        m_colorPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromMultiEntry(styleEntry));
 
 		imtbase::CCollectionInfo* themeFontsCollection = new imtbase::CCollectionInfo;
 		QMap<QByteArray, QFont> fonts;

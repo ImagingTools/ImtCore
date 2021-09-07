@@ -1,119 +1,119 @@
 {
-	"ColorPalette": {
-		"PrimaryColor": "#000000",
-		"GMGBlue": "#0000ff",
-		"Blue 1": "#00ffff",
-		"MyNicemMgenta": "#ffee00",
-		"GMG Gray Dark":  "rgb(33, 43, 33)",
-		"GMG Gray Dark 2":  "rgb(33, 33, 33)",
-		"PrimaryBlack": "rgb(53,53,53)",
-		"ToolTipColor": "lightGray",
-		"LinkColor": "rgb(42,130,218)",
-		"TextColor": "#335777"
-	},
-	"Style": {
-		"Name": "Dark",
-		"TemplateIconColor": "#D9D9D9",
-		"IconColor": {
-			"Normal": "#D9D9D9",
-			"OffActive": "#B0B0FF",
-			"OffDisabled": "#FFFFFF",
-			"OffNormal": "#B0FFB0",
-			"OffSelected": "#B0FFFF",
-			"OnActive": "#FFB0B",
-			"OnDisabled": "#FFFFFF",
-			"OnNormal": "#FFB0FF",
-			"OnSelected": "#FFFFB0"
-		},
-		"ActiveColors": {
-			"Window": "GMGBlue",
-			"WindowText": "MyNicemMgenta",
-			"Base": "GMG Gray Dark",
-			"AlternateBase": "PrimaryBlack",
-			"ToolTipBase": "ToolTipColor",
-			"ToolTipText": "ToolTipColor",
-			"Text": "TextColor",
-			"Button": "PrimaryBlack",
-			"ButtonText": "ToolTipColor",
-			"BrightText": "white",
-			"Link": "LinkColor",
-			"Highlight": "#1a76e7",
-			"HighlightedText": "white"
-		},
-		"InactiveColors": {
-			"Window": "PrimaryBlack",
-			"WindowText": "white",
-			"Base": "GMG Gray Dark 2",
-			"AlternateBase": "PrimaryBlack",
-			"ToolTipBase": "ToolTipColor",
-			"ToolTipText": "ToolTipColor",
-			"Text": "TextColor",
-			"Button": "PrimaryBlack",
-			"ButtonText": "ToolTipColor",
-			"BrightText": "white",
-			"Link": "LinkColor",
-			"Highlight": "#1a76e7",
-			"HighlightedText": "white"
-		},
-		"DisabledColors": {
-			"Window": "PrimaryBlack",
-			"WindowText": "white",
-			"Base": "GMG Gray Dark 2",
-			"AlternateBase": "PrimaryBlack",
-			"ToolTipBase": "ToolTipColor",
-			"ToolTipText": "ToolTipColor",
-			"Text": "TextColor",
-			"Button": "PrimaryBlack",
-			"ButtonText": "ToolTipColor",
-			"BrightText": "white",
-			"Link": "LinkColor",
-			"Highlight": "#1a76e7",
-			"HighlightedText": "white"
-		},
-		"Fonts": {
-			"Default": {
-				"Bold": false,
-				"FixedPitch": false,
-				"Italic": false,
-				"Kerning": false,
-				"Overline": false,
-				"StrikeOut": false,
-				"Underline": false,
-				"PointSize": 11,
-				"Stretch": 15,
-				"Weight": 15,
-				"WordSpacing": 15.5,
-				"HintingPreference": "PreferDefaultHinting",
-				"Capitalization": "Capitalize",
-				"Style": "Normal",
-				"Family": "Arial",
-				"Families": [ "nano sans", "Helvetica" ],
-				"StyleStrategy": [ "PreferBitmap", "ForceOutline" ],
-				"LetterSpacing": {
-					"SpacingType": "PercentageSpacing",
-					"Spacing": 15.5
-				},
-				"StyleHint": {
-					"StyleHint": "Helvetica",
-					"StyleStrategy": [ "PreferBitmap", "ForceOutline" ]
-				}
-			},
-			"Header 1": {
-				"BaseFont": "Default",
-				"Bold": true,
-				"PointSize": 24,
-			},
-			"Header 2": {
-			"BaseFont": "Header 1",
-			"PointSize": 18
-			},
-			"Header 3": {
-				"BaseFont": "Header 2",
-				"PointSize": 16,
-				"Italic": true
-			}
-		}
-	}
+        "ColorPalette": {
+                "PrimaryColor": "#000000",
+                "GMGBlue": "#0000ff",
+                "Blue 1": "#00ffff",
+                "MyNicemMgenta": "#ffee00",
+                "GMG Gray Dark":  "rgb(33, 43, 33)",
+                "GMG Gray Dark 2":  "rgb(33, 33, 33)",
+                "PrimaryBlack": "rgb(53,53,53)",
+                "ToolTipColor": "lightGray",
+                "LinkColor": "rgb(42,130,218)",
+                "TextColor": "#335777"
+        },
+        "Style": {
+                "Name": "Dark",
+                "TemplateIconColor": "#D9D9D9",
+                "IconColor": {
+                        "Normal": "#D9D9D9",
+                        "OffActive": "#B0B0FF",
+                        "OffDisabled": "#FFFFFF",
+                        "OffNormal": "#B0FFB0",
+                        "OffSelected": "#B0FFFF",
+                        "OnActive": "#FFB0B",
+                        "OnDisabled": "#FFFFFF",
+                        "OnNormal": "#FFB0FF",
+                        "OnSelected": "#FFFFB0"
+                },
+                "ActiveColors": {
+                        "Window": "GMGBlue",
+                        "WindowText": "MyNicemMgenta",
+                        "Base": "GMG Gray Dark",
+                        "AlternateBase": "PrimaryBlack",
+                        "ToolTipBase": "ToolTipColor",
+                        "ToolTipText": "ToolTipColor",
+                        "Text": "TextColor",
+                        "Button": "PrimaryBlack",
+                        "ButtonText": "ToolTipColor",
+                        "BrightText": "white",
+                        "Link": "LinkColor",
+                        "Highlight": "#1a76e7",
+                        "HighlightedText": "white"
+                },
+                "InactiveColors": {
+                        "Window": "PrimaryBlack",
+                        "WindowText": "white",
+                        "Base": "GMG Gray Dark 2",
+                        "AlternateBase": "PrimaryBlack",
+                        "ToolTipBase": "ToolTipColor",
+                        "ToolTipText": "ToolTipColor",
+                        "Text": "TextColor",
+                        "Button": "PrimaryBlack",
+                        "ButtonText": "ToolTipColor",
+                        "BrightText": "white",
+                        "Link": "LinkColor",
+                        "Highlight": "#1a76e7",
+                        "HighlightedText": "white"
+                },
+                "DisabledColors": {
+                        "Window": "PrimaryBlack",
+                        "WindowText": "white",
+                        "Base": "GMG Gray Dark 2",
+                        "AlternateBase": "PrimaryBlack",
+                        "ToolTipBase": "ToolTipColor",
+                        "ToolTipText": "ToolTipColor",
+                        "Text": "TextColor",
+                        "Button": "PrimaryBlack",
+                        "ButtonText": "ToolTipColor",
+                        "BrightText": "white",
+                        "Link": "LinkColor",
+                        "Highlight": "#1a76e7",
+                        "HighlightedText": "white"
+                },
+                "Fonts": {
+                        "Default": {
+                                "Bold": false,
+                                "FixedPitch": false,
+                                "Italic": false,
+                                "Kerning": false,
+                                "Overline": false,
+                                "StrikeOut": false,
+                                "Underline": false,
+                                "PointSize": 11,
+                                "Stretch": 15,
+                                "Weight": 15,
+                                "WordSpacing": 15.5,
+                                "HintingPreference": "PreferDefaultHinting",
+                                "Capitalization": "Capitalize",
+                                "Style": "Normal",
+                                "Family": "Arial",
+                                "Families": [ "nano sans", "Helvetica" ],
+                                "StyleStrategy": [ "PreferBitmap", "ForceOutline" ],
+                                "LetterSpacing": {
+                                        "SpacingType": "PercentageSpacing",
+                                        "Spacing": 15.5
+                                },
+                                "StyleHint": {
+                                        "StyleHint": "Helvetica",
+                                        "StyleStrategy": [ "PreferBitmap", "ForceOutline" ]
+                                }
+                        },
+                        "Header 1": {
+                                "BaseFont": "Default",
+                                "Bold": true,
+                                "PointSize": 24
+                        },
+                        "Header 2": {
+                        "BaseFont": "Header 1",
+                        "PointSize": 18
+                        },
+                        "Header 3": {
+                                "BaseFont": "Header 2",
+                                "PointSize": 16,
+                                "Italic": true
+                        }
+                }
+        }
 }
 
 
