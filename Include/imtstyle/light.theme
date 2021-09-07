@@ -1,6 +1,5 @@
 {
-	"LastChanged": "2021-05-06T11:59:00Z",
-	"Styles": [
+	"Style":
 		{
 			"IconColor": {
 			"Normal": "#335777",
@@ -79,11 +78,59 @@
 				"InactiveToolTipText": "#000000"
 			},			
 			"PaletteColor": {
-				"AllHighlight": "#1a76e7",
-				"AllText": "#335777"
+				"Window": "rgb(53,53,53)",
+				"WindowText": "white",
+				"Base": "rgb(33,33,33)",
+				"AlternateBase": "rgb(53,53,53)",
+				"ToolTipBase": "lightGray",
+				"ToolTipText": "lightGray",
+				"Text": "lightGray",
+				"Button": "rgb(53,53,53)",
+				"ButtonText": "lightGray",
+				"BrightText": "white",
+				"Link": "rgb(42,130,218)",
+				"Highlight": "#1a76e7",
+				"HighlightedText": "white"
+				"Highlight": "#1a76e7",
 			},
-			"StyleName": "Light"
-		}
-	],
+			"Fonts": {
+				"Base":{
+					"Bold": false,
+					"FixedPitch": false,
+					"Italic": false,
+					"Kerning": false,
+					"Overline": false,
+					"StrikeOut": false,
+					"Underline": false,
+					"PixelSize": 15,
+					"PointSize": 15,
+					"Stretch": 15,
+					"Weight": 15,
+					"PointSizeF": 15.5,
+					"WordSpacing": 15.5,
+					"HintingPreference": "PreferDefaultHinting",
+					"Capitalization": "Capitalize",
+					"Style": "Normal",
+					"Family": "nano sans",
+					"StyleName": "",
+					"Families": ["nano sans", "Helvetica"],
+					"StyleStrategy": ["PreferBitmap", "ForceOutline"],
+					"LetterSpacing": {
+						"SpacingType": "PercentageSpacing",
+						"Spacing": 15.5
+					},
+					"StyleHint":{
+						"StyleHint": "Helvetica",
+						"StyleStrategy": ["PreferBitmap", "ForceOutline"]
+					}
+				},
+				"WindowTittle":{"Family": ["nano sans", "Helvetica"]},
+				"Title":{"Families": "nano sans"},
+				"Subtitle":{}
+			},
+			"Name": "Light"
+		},
 	"TemplateIconColor": "#D9D9D9"
 }
+
+
