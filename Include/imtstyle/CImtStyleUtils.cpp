@@ -124,6 +124,35 @@ QString CImtStyleUtils::GetColorName(QPalette::ColorGroup group, QPalette::Color
 	return CImtStyleUtils::s_colorGroupNamesMap.key(group) + CImtStyleUtils::s_colorRolesNamesMap.key(role);
 }
 
+QPalette CImtStyleUtils::GetPaletteFromMultiEntry(const QJsonValue& styleEntry)
+{
+	QPalette palette;
+
+	QJsonObject jsonObject = styleEntry.toObject();
+	QJsonValue v;
+	for(QJsonObject::const_iterator jsonValue = jsonObject.constBegin(); jsonValue != jsonObject.constEnd(); ++jsonValue){
+
+		for (const QString& groupName: s_colorGroupNamesMap.keys()){
+			if (jsonValue->isObject() && jsonValue.key().startsWith(groupName)){
+				QJsonObject colorGroupObject = jsonValue->toObject();
+				QPalette::ColorGroup colorRoleGroup = s_colorGroupNamesMap[groupName];
+				for (QJsonObject::const_iterator jsonColorValue = colorGroupObject.constBegin(); jsonColorValue != colorGroupObject.constEnd(); ++jsonColorValue){
+					if(s_colorRolesNamesMap.contains(jsonColorValue.key())){
+						QColor color;
+						if (!CImtStyleUtils::CreateColorFromGrb(jsonColorValue->toString(), color)){
+							color.setNamedColor(jsonColorValue->toString());
+						}
+						if (color.isValid()){
+							palette.setColor(colorRoleGroup, s_colorRolesNamesMap[jsonColorValue.key()], color);
+						}
+					}
+				}
+			}
+		}
+	}
+	return palette;
+}
+
 
 bool SetVariableColor(QByteArray& data, const QPalette& palette)
 {
@@ -259,6 +288,13 @@ bool CImtStyleUtils::GetColorRoleGroup(const QString& name, QPalette::ColorGroup
 			return true;
 		}
 	}
+
+	if(s_colorRolesNamesMap.contains(name)){
+		group = QPalette::All;
+		role = s_colorRolesNamesMap[name];
+		return true;
+	}
+
 	return false;
 }
 
@@ -477,24 +513,29 @@ bool CImtStyleUtils::GetFontsFromEntry(const QJsonValue& fontsEntry, QMap<QByteA
 		}
 
 		//------------------------------------------number
-		if(GetIntValue(fontObject, "PixelSize", pixelSize)){
-			font.setPixelSize(pixelSize);
-		}
-
-		if(GetIntValue(fontObject, "PointSize", pointSize)){
-			font.setPointSize(pointSize);
-		}
-
 		if(GetIntValue(fontObject, "Stretch", Stretch)){
 			font.setStretch(Stretch);
+		}
+
+		if(GetIntValue(fontObject, "PixelSize", pixelSize)){
+			font.setPixelSize(pixelSize);
 		}
 
 		if(GetDoubleValue(fontObject, "PointSizeF", pointSizeF)){
 			font.setPointSizeF(pointSizeF);
 		}
 
+		if(GetIntValue(fontObject, "PointSize", pointSize)){
+			font.setPointSize(pointSize);
+		}
+
 		if(GetIntValue(fontObject, "Weight", weight)){
-			font.setWeight(weight);
+			if(Bold){
+				font.setWeight(QFont::Weight::Bold);
+			}
+			else{
+				font.setWeight(weight);
+			}
 		}
 
 		if(GetDoubleValue(fontObject, "WordSpacing", wordSpacing)){
@@ -567,51 +608,41 @@ bool CImtStyleUtils::GetFontsFromEntry(const QJsonValue& fontsEntry, QMap<QByteA
 
 bool CImtStyleUtils::CreateCssFont(QByteArray& output, const QFont& font)
 {
-	qDebug() << __FILE__ << __LINE__ << output;
 	if(font.pointSize() > 0){
 		output.append("font-size: ").append(QByteArray::number(font.pointSize())).append("pt;\n");
-		qDebug() << __FILE__ << __LINE__ << output;
 	}
 	else if(font.pointSizeF() > 0){
 		output.append("font-size: ").append(QByteArray::number(font.pointSizeF())).append("pt;\n");
-		qDebug() << __FILE__ << __LINE__ << output;
 	}
 	else if(font.pixelSize() > 0){
 		output.append("font-size: ").append(QByteArray::number(font.pixelSize())).append("px;\n");
-		qDebug() << __FILE__ << __LINE__ << output;
 	}
-	qDebug() << __FILE__ << __LINE__ << output;
+
 
 	QByteArray fontFamilyString = "font-family: ";
 	if(font.family().length()){
 		fontFamilyString.append('"').append(font.family().toUtf8()).append('"');
-		qDebug() << __FILE__ << __LINE__ << output;
 	}
 	else if(font.families().size()){
 		QStringList tempFonts = font.families();
 		for(QStringList::iterator font = tempFonts.begin(); font != tempFonts.end(); ++font){
 			font->append('"');
 			font->prepend('"');
-			qDebug() << __FILE__ << __LINE__ << output;
 		}
-		qDebug() << __FILE__ << __LINE__ << output;
 		fontFamilyString.append(tempFonts.join(", ").toUtf8());
-		qDebug() << __FILE__ << __LINE__ << output;
 	}
 
-	qDebug() << __FILE__ << __LINE__ << output;
+
 	if(font.styleHint() != QFont::AnyStyle){
 		if(!fontFamilyString.trimmed().endsWith(':')){
 			fontFamilyString.append(", ");
 			fontFamilyString.append(s_fontStyleHintNamesMap.key(font.styleHint()).toUtf8());
-			qDebug() << __FILE__ << __LINE__ << output;
 		}
 	}
 
 	if(!fontFamilyString.trimmed().endsWith(':')){
 		fontFamilyString.append(";\n");
 		output += fontFamilyString;
-		qDebug() << __FILE__ << __LINE__ << output;
 	}
 
 	QByteArray fontStyleString = s_fontStyleNamesMap.key(font.style()).toUtf8();
@@ -619,38 +650,35 @@ bool CImtStyleUtils::CreateCssFont(QByteArray& output, const QFont& font)
 	fontStyleString.replace("style", "");
 	fontStyleString.prepend("font-style: ").append(";\n");
 	output += fontStyleString;
-	qDebug() << __FILE__ << __LINE__ << output;
 
 	if(font.weight() > 0) {
 		output += "font-weight: ";
 		output += QByteArray::number(font.weight()).append(";\n");
-		qDebug() << __FILE__ << __LINE__ << output;
 	}
 
 	if(font.stretch() > 0){
 		output += "font-stretch: ";
 		output += QByteArray::number(font.stretch()).append(";\n");
-		qDebug() << __FILE__ << __LINE__ << output;
+
 	}
 
 	QStringList fontDecorations;
 	if(font.underline()){
 		fontDecorations << "underline";
-		qDebug() << __FILE__ << __LINE__ << output;
+
 	}
 	if(font.overline()){
 		fontDecorations << "overline";
-		qDebug() << __FILE__ << __LINE__ << output;
+
 	}
 	if(font.strikeOut()){
 		fontDecorations << "line-through";
-		qDebug() << __FILE__ << __LINE__ << output;
+
 	}
 	if(fontDecorations.size()){
 		output += "text-decoration: ";
 		output += fontDecorations.join(", ").toUtf8();
 		output += ";\n";
-		qDebug() << __FILE__ << __LINE__ << output;
 	}
 
 	qDebug() << __FILE__ << __LINE__ << font.capitalization();
@@ -661,13 +689,12 @@ bool CImtStyleUtils::CreateCssFont(QByteArray& output, const QFont& font)
 		output += "text-transform: ";
 		output += transformString.toUtf8();
 		output += ";\n";
-		qDebug() << __FILE__ << __LINE__ << output;
+
 	}
 	else if (font.capitalization() == QFont::SmallCaps){
 		output += "font-variant: small-caps;\n";
-		qDebug() << __FILE__ << __LINE__ << output;
 	}
-	qDebug() << __FILE__ << __LINE__ << output;
+
 	return true;
 }
 

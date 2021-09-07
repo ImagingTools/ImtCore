@@ -178,7 +178,13 @@ QString CDesignTokenQrcUpdaterComp::GetPathOverFile(const QString& dir, const QS
 	QString inputFileInfoPath = inputFileInfo.absolutePath();
 	retval.replace(inputFileInfoPath, "");
 
-	if(retval.startsWith(QDir::separator())){
+	while(retval.startsWith(QDir::separator())){
+		retval.remove(0,1);
+	}
+	while(retval.startsWith('/')){
+		retval.remove(0,1);
+	}
+	while(retval.startsWith('\\')){
 		retval.remove(0,1);
 	}
 	return retval;

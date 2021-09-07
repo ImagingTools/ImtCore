@@ -35,6 +35,7 @@ public:
 	static bool GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role);
 	static QString GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role);
 
+	static QPalette GetPaletteFromMultiEntry(const QJsonValue& styleEntry);
 	static QPalette GetPaletteFromEntry(const QJsonValue& paletteEntry);
 	static bool CreateColorFromGrb(const QString& rgbString, QColor& color);
 

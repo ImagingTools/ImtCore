@@ -121,13 +121,6 @@ int CDesignTokenIconProcessorComp::Exec()
 
 			QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Icons") + QDir::separator().toLatin1() + styleName.constData();
 			this->SetColorAllFilesInDir(m_inputDirName, outputDirName);
-
-//			QDir inputDir(outputDirName);
-//			QStringList nameFilters = {"*.svg"};
-//			QDir::Filters filters = QDir::Filter::Files | QDir::Filter::Readable;
-//			QDir::SortFlags sort = QDir::SortFlag::Name;
-//			QFileInfoList inputFiles = inputDir.entryInfoList(nameFilters, filters, sort);
-//			m_designTokenQrcUpdater->CreateQrc("/Icons", QString("Resources/Icons/") + styleName, inputFiles, QByteArray(m_outputDirName) + "/" + m_projectName + styleName.toLower() + ".qrc");
 		}
 	}
 	return 0;
@@ -172,9 +165,9 @@ void CDesignTokenIconProcessorComp::SetColorForAllModeState(const QByteArray& fi
 		inputFileSuffix.prepend('.');
 	}
 
-    if(m_normalColor.length()){
-        this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + inputFileSuffix), m_normalColor);
-    }
+	if(m_normalColor.length()){
+		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + inputFileSuffix), m_normalColor);
+	}
 	if (m_offNormalColor.length()){
 		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffNormal + inputFileSuffix), m_offNormalColor);
 	}

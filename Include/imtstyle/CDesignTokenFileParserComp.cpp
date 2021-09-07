@@ -13,21 +13,14 @@ namespace imtstyle
 {
 
 
-
-
-
-
-
-
 QByteArray CDesignTokenFileParserComp::GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const
 {
-    QList<RawColor> clolrs = m_styleSheetColors.values(styleName);
-    for(const RawColor& color: ::qAsConst(m_styleSheetColors)){
-        if (color.group == group && color.role == role){
-            return color.value ;
-        }
-    }
-    return QByteArray();
+	for(const RawColor& color: ::qAsConst(m_styleSheetColors)){
+		if (color.group == group && color.role == role){
+			return color.value ;
+		}
+	}
+	return QByteArray();
 }
 
 
@@ -43,16 +36,14 @@ bool CDesignTokenFileParserComp::GetStyleSheetColorPalette(const QByteArray& des
 }
 
 
-
-
 // reimplemented (IDesignTokenFileParser)
 bool CDesignTokenFileParserComp::CDesignTokenFileParserComp::SetFile(const QByteArray& filePath)
 {
 	bool retval = false;
 
-    QFileInfo designTokenFileInfo(filePath);
+	QFileInfo designTokenFileInfo(filePath);
 
-    retval = designTokenFileInfo.isReadable();
+	retval = designTokenFileInfo.isReadable();
 
 	if(retval){
 		m_designTokenFileInfo = designTokenFileInfo;
@@ -80,7 +71,10 @@ bool CDesignTokenFileParserComp::ParseFile()
 	}
 
 
-	QJsonObject designTokenObject = QJsonDocument::fromJson(designTokenFile.readAll()).object();
+	QByteArray fileData = designTokenFile.readAll();
+	QJsonDocument jsonDocument = QJsonDocument::fromJson(fileData);
+	QJsonObject designTokenObject = jsonDocument.object();
+
 	if(designTokenObject.isEmpty()) {
 		qCritical() << "Cannot parse JSON";
 		return false;
@@ -88,16 +82,23 @@ bool CDesignTokenFileParserComp::ParseFile()
 
 	m_templateIconColor = designTokenObject["TemplateIconColor"].toString().toUtf8();
 
+	QJsonObject singleStyle = designTokenObject["Style"].toObject();
 	QJsonArray designTokenStylesArray = designTokenObject["Styles"].toArray();
+	designTokenStylesArray << singleStyle;
+
 	if(designTokenStylesArray.isEmpty()) {
 		qCritical() << "Cannot parse Styles";
 		return false;
 	}
 
+	QVariantMap colorPaletteVariables = designTokenObject["ColorPalette"].toObject().toVariantMap();
+
 	for (const QJsonValue& style: ::qAsConst(designTokenStylesArray)){
 
 		QJsonObject styleEntry = style.toObject();
-		QString styleName = styleEntry["StyleName"].toString();
+		QString styleName = styleEntry["Name"].toString();
+
+		ReplaceColorNamesRecursivle(styleEntry, colorPaletteVariables);
 
 		if(!styleName.length()){
 			qInfo() << "Skipping invalid object";
@@ -109,12 +110,16 @@ bool CDesignTokenFileParserComp::ParseFile()
 			qInfo() << "Skipping empty object";
 		}
 
+
+		if(!m_templateIconColor.length()){
+			m_templateIconColor = style["TemplateIconColor"].toString().toUtf8();
+		}
 		QVariantMap colorsMap = colorsObject.toVariantMap();
 		m_iconColors.insert(styleName, colorsMap);
 		m_designSchemaList.InsertItem(styleName.toUtf8(), styleName,"");
 
-		m_stylesPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromEntry(styleEntry["StyleSheetColor"]));
-		m_colorPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromEntry(styleEntry["PaletteColor"]));
+		m_stylesPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromMultiEntry(style));
+		m_colorPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromMultiEntry(style));
 
 		imtbase::CCollectionInfo* themeFontsCollection = new imtbase::CCollectionInfo;
 		QMap<QByteArray, QFont> fonts;
@@ -222,7 +227,7 @@ QByteArray imtstyle::CDesignTokenFileParserComp::GetTemplateIconColor(const QByt
 
 QByteArray imtstyle::CDesignTokenFileParserComp::GetNormalColor(const QByteArray& styleName) const
 {
-    return m_iconColors[styleName].toMap()["Normal"].toByteArray();
+	return m_iconColors[styleName].toMap()["Normal"].toByteArray();
 }
 
 QByteArray imtstyle::CDesignTokenFileParserComp::GetOffNormalColor(const QByteArray& styleName) const
@@ -301,8 +306,29 @@ void CDesignTokenFileParserComp::OnComponentCreated()
 }
 
 
+void CDesignTokenFileParserComp::ReplaceColorNames(QJsonObject& json, const QVariantMap& variableMaps)
+{
+	for(QJsonObject::iterator jsonValue = json.begin(); jsonValue != json.end(); ++jsonValue){
+		if(variableMaps.contains(jsonValue->toString())){
+			*jsonValue = variableMaps[jsonValue->toString()].toString();
+		}
+	}
+}
 
-
+void CDesignTokenFileParserComp::ReplaceColorNamesRecursivle(QJsonObject& json, const QVariantMap& variableMaps)
+{
+	QStringList keys = json.keys();
+	for (const QString& key : ::qAsConst(keys)){
+		QJsonValue jsonValue = json[key];
+		if(jsonValue.isObject()){
+			QJsonObject jsonObject = jsonValue.toObject();
+			ReplaceColorNames(jsonObject, variableMaps);
+			json[key] = jsonObject;
+		}
+	}
+}
 
 
 } // namespace imtstyle
+
+
