@@ -444,10 +444,11 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 			QWidget widget;
 
 			iqtgui::SetStyleSheetFromFile(widget, ":/Styles/ImtStyle");
+
 			QString imtNoColorStyle = widget.styleSheet();
 			iqtgui::SetStyleSheetFromFile(widget, colorSchema.stylePath);
-			QString imtStyle = widget.styleSheet();
 
+			QString imtStyle = widget.styleSheet();
 			qApp->setStyleSheet(imtNoColorStyle + imtStyle);
 		}
 	}
