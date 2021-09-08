@@ -50,7 +50,7 @@
 			"BrightText": "White",
 			"Link": "LightBlue",
 			"Highlight": "DeepBlue",
-			"HighlightedText": "White",
+			"HighlightedText": "White"
 		},
 		"Disabled": {
 			"Window": "GrayBlue",
@@ -65,7 +65,7 @@
 			"BrightText": "White",
 			"Link": "LightBlue",
 			"Highlight": "DeepBlue",
-			"HighlightedText": "White",
+			"HighlightedText": "White"
 		},
 		"Fonts": {
 			"Default": {
