@@ -96,19 +96,8 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 		if (m_designTokenFileParser.IsValid()){
 			m_designTokenFileParser->SetFile(m_resourceFileNameAttrPtr[i]);
 			m_designTokenFileParser->ParseFile();
-
-//			QPalette palette;
-//			m_designTokenFileParser->GetColorPalette(m_designShemaIdAttrPtr[i], palette);
-//			m_paletteMap[m_designShemaIdAttrPtr[i]] = palette;
-
-//			imtbase::CCollectionInfo* themeCFontsCollection = new imtbase::CCollectionInfo;
-//			QMap<QByteArray, QFont> fonts;
-
-//			m_fontsCollectionInfos.insert(m_designShemaIdAttrPtr[i], istd::TSmartPtr<imtbase::ICollectionInfo>(themeCFontsCollection));
-//			m_fonts.insert(m_designShemaIdAttrPtr[i], fonts);
 		}
-
-		else {
+		else{
 			QFile paletteFile(m_resourceFileNameAttrPtr[i]);
 			if (paletteFile.open(QIODevice::ReadOnly)){
 				QByteArray contents = paletteFile.readAll();
@@ -123,7 +112,6 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 					}
 
 					QMap<QByteArray, QPalette> paletteMap;
-
 
 					if (!m_designShemaIdAttrPtr[i].isEmpty() && !m_paletteModeAttrPtr[i].isEmpty()){
 						QJsonObject modeObject;
@@ -177,7 +165,6 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 						}
 					}
 
-
 					QJsonObject typographyObject;
 					if (!GetObjectValue(rootObject, "typography", typographyObject)){
 						SendErrorMessage(0, QObject::tr("Palette file parsing error"));
@@ -187,8 +174,8 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 
 					QJsonArray fontFamilyArray;
 					double fontSize = 0.0;
-					if (!GetArrayValue(typographyObject, "fontFamily", fontFamilyArray) ||
-							!GetDoubleValue(typographyObject, "fontSize", fontSize)){
+					if (		!GetArrayValue(typographyObject, "fontFamily", fontFamilyArray) ||
+								!GetDoubleValue(typographyObject, "fontSize", fontSize)){
 						SendErrorMessage(0, QObject::tr("Palette file parsing error"));
 
 						return;
@@ -206,11 +193,10 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 
 						QByteArray fontId = fontName.toLatin1();
 						fontId.replace(" ", "");
-//						m_fontMap[fontId] = font;
-//						m_fontList.InsertItem(fontId, fontName, "");
 					}
 				}
 			}
+
 			paletteFile.close();
 		}
 	}

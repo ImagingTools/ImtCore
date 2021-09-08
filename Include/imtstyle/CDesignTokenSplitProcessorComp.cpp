@@ -32,6 +32,7 @@ int CDesignTokenSplitProcessorComp::Exec()
 		m_designTokenFileParserAttrPtr->SetFile(m_argumentParserAttrPtr->GetDesignTokenFilePath());
 		return bool(int(!m_designTokenFileParserAttrPtr->SplitFile(m_argumentParserAttrPtr->GetOutputDirectoryPath(), m_argumentParserAttrPtr->GetProjectName())));
 	}
+
 	return 0;
 }
 

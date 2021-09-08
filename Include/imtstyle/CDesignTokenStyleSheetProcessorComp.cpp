@@ -1,13 +1,14 @@
 #include <imtstyle/CDesignTokenStyleSheetProcessorComp.h>
 
-// Acf includes
+
+// ACF includes
 #include <iprm/IParamsSet.h>
 #include <iprm/IEnableableParam.h>
 #include <iprm/IIdParam.h>
 #include <ibase/IApplication.h>
 #include <ifile/IFileNameParam.h>
 
-//ImtCore includes
+// ImtCore includes
 #include <imtbase/ICollectionInfo.h>
 #include <imtstyle/CDesignTokenFileParserComp.h>
 #include <imtstyle/CImtStyleUtils.h>

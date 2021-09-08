@@ -55,13 +55,6 @@ public:
 	virtual const imtbase::ICollectionInfo& GetFontList(const QByteArray& designSchemaId) const override;
 	virtual bool GetFont(const QByteArray& designSchemaId, const QByteArray& fontId, QFont& font) const override;
 
-public:
-
-
-protected:
-	// reimplemented (ilog::CLoggerComponentBase)
-	void OnComponentCreated() override;
-
 private:
 	static void ReplaceColorNames(QJsonObject& json, const QVariantMap& variableMaps);
 	static void ReplaceColorNamesRecursivle(QJsonObject& json, const QVariantMap& variableMaps);

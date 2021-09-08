@@ -1,6 +1,7 @@
 #include <imtstyle/CDesignTokenIconProcessorComp.h>
 
-// Acf includes
+
+// ACF includes
 #include <iprm/IParamsSet.h>
 #include <iprm/IEnableableParam.h>
 #include <iprm/IIdParam.h>
@@ -18,10 +19,12 @@ namespace imtstyle
 
 QByteArray CDesignTokenIconProcessorComp::GetHelpString() const
 {
-	QByteArray retval;
+	QByteArray retVal;
 	QString helpText = "Invalid arguments \n \t\tAnd other help text\n\n";
-	retval = helpText.toLocal8Bit().constData();
-	return retval;
+
+	retVal = helpText.toLocal8Bit().constData();
+
+	return retVal;
 }
 
 
@@ -36,6 +39,7 @@ int CDesignTokenIconProcessorComp::Exec()
 			QByteArray paramId = "HelpParam";
 
 			iprm::IEnableableParam* templateIconColorParamPtr = dynamic_cast<iprm::IEnableableParam*>(m_paramSetAttrPtr->GetEditableParameter(paramId));
+			Q_UNUSED(templateIconColorParamPtr);
 		}
 		{
 			QByteArray paramId = "TemplateIconColor";
@@ -85,11 +89,11 @@ int CDesignTokenIconProcessorComp::Exec()
 		}
 
 		if(m_inputFileName.length() && m_inputDirName.length()){
-			this->SetColorForAllModeState(m_inputFileName, m_outputDirName);
+			SetColorForAllModeState(m_inputFileName, m_outputDirName);
 			return 0;
 		}
 		else if(m_inputDirName.length() && m_outputDirName.length()){
-			this->SetColorAllFilesInDir(m_inputDirName, m_outputDirName);
+			SetColorAllFilesInDir(m_inputDirName, m_outputDirName);
 			return 0;
 		}
 		else {
@@ -120,9 +124,10 @@ int CDesignTokenIconProcessorComp::Exec()
 			m_onSelectedColor =  m_designTokenFileParserAttrPtr->GetOnSelectedColor(styleName);
 
 			QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Icons") + QDir::separator().toLatin1() + styleName.constData();
-			this->SetColorAllFilesInDir(m_inputDirName, outputDirName);
+			SetColorAllFilesInDir(m_inputDirName, outputDirName);
 		}
 	}
+
 	return 0;
 }
 
@@ -146,6 +151,7 @@ void CDesignTokenIconProcessorComp::SetColor(const QByteArray& fileName, const Q
 	outputImageFile.close();
 }
 
+
 void CDesignTokenIconProcessorComp::SetColorForAllModeState(const QByteArray& fileName, const QByteArray& outputDirName) const
 {
 	QDir outputDir(outputDirName);
@@ -160,39 +166,47 @@ void CDesignTokenIconProcessorComp::SetColorForAllModeState(const QByteArray& fi
 	if(inputFileBaseName.endsWith('.')){
 		inputFileBaseName.chop(1);
 	}
+
 	QByteArray inputFileSuffix = inputFileInfo.completeSuffix().toLocal8Bit();
 	if(!inputFileSuffix.startsWith('.')){
 		inputFileSuffix.prepend('.');
 	}
 
 	if(m_normalColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + inputFileSuffix), m_normalColor);
-	}
-	if (m_offNormalColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffNormal + inputFileSuffix), m_offNormalColor);
-	}
-	if (m_offDisabledColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffDisabled + inputFileSuffix), m_offDisabledColor);
-	}
-	if (m_offActiveColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffActive + inputFileSuffix), m_offActiveColor);
-	}
-	if (m_offSelectedColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffSelected + inputFileSuffix), m_offSelectedColor);
-	}
-	if (m_onNormalColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnNormal + inputFileSuffix), m_onNormalColor);
-	}
-	if (m_onDisabledColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnDisabled + inputFileSuffix), m_onDisabledColor);
-	}
-	if (m_onActiveColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnActive + inputFileSuffix), m_onActiveColor);
-	}
-	if (m_onSelectedColor.length()){
-		this->SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnSelected + inputFileSuffix), m_onSelectedColor);
+		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + inputFileSuffix), m_normalColor);
 	}
 
+	if (m_offNormalColor.length()){
+		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffNormal + inputFileSuffix), m_offNormalColor);
+	}
+
+	if (m_offDisabledColor.length()){
+		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffDisabled + inputFileSuffix), m_offDisabledColor);
+	}
+
+	if (m_offActiveColor.length()){
+		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffActive + inputFileSuffix), m_offActiveColor);
+	}
+
+	if (m_offSelectedColor.length()){
+		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffSelected + inputFileSuffix), m_offSelectedColor);
+	}
+
+	if (m_onNormalColor.length()){
+		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnNormal + inputFileSuffix), m_onNormalColor);
+	}
+
+	if (m_onDisabledColor.length()){
+		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnDisabled + inputFileSuffix), m_onDisabledColor);
+	}
+
+	if (m_onActiveColor.length()){
+		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnActive + inputFileSuffix), m_onActiveColor);
+	}
+
+	if (m_onSelectedColor.length()){
+		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnSelected + inputFileSuffix), m_onSelectedColor);
+	}
 }
 
 
@@ -210,30 +224,27 @@ void CDesignTokenIconProcessorComp::SetColorAllFilesInDir(const QByteArray& inpu
 	QFileInfoList inputFiles = inputDir.entryInfoList(nameFilters, filters, sort);
 
 	for (const QFileInfo& inputFile: ::qAsConst(inputFiles)){
-		if(!this->IgnoreFile(inputFile)){
-			this->SetColorForAllModeState(inputFile.absoluteFilePath().toLocal8Bit(), outputDirName);
+		if(!IgnoreFile(inputFile)){
+			SetColorForAllModeState(inputFile.absoluteFilePath().toLocal8Bit(), outputDirName);
 		}
 	}
 }
 
 bool CDesignTokenIconProcessorComp::IgnoreFile(const QFileInfo& fileInfo) const
 {
-	bool retval = false;
-
 	const QByteArray& fileName = fileInfo.baseName().toUtf8();
 
-	retval = fileName.endsWith(s_suffixOffNormal)
-			|| fileName.endsWith(s_suffixOffDisabled)
-			|| fileName.endsWith(s_suffixOffActive)
-			|| fileName.endsWith(s_suffixOffSelected)
-			|| fileName.endsWith(s_suffixOnNormal)
-			|| fileName.endsWith(s_suffixOnDisabled)
-			|| fileName.endsWith(s_suffixOnActive)
-			|| fileName.endsWith(s_suffixOnSelected)
-			;
+	bool retVal =
+			fileName.endsWith(s_suffixOffNormal) ||
+			fileName.endsWith(s_suffixOffDisabled) ||
+			fileName.endsWith(s_suffixOffActive) ||
+			fileName.endsWith(s_suffixOffSelected) ||
+			fileName.endsWith(s_suffixOnNormal) ||
+			fileName.endsWith(s_suffixOnDisabled) ||
+			fileName.endsWith(s_suffixOnActive) ||
+			fileName.endsWith(s_suffixOnSelected);
 
-
-	return retval;
+	return retVal;
 }
 
 

@@ -1,5 +1,6 @@
 #include <imtstyle/CImtStyleUtils.h>
 
+
 // Qt includes
 #include <QtCore/QtCore>
 #include <QtGui/QPalette>
@@ -13,8 +14,10 @@
 #include <imtbase/CCollectionInfo.h>
 #include <imtstyle/IDesignTokenFileParser.h>
 
+
 namespace imtstyle
 {
+
 
 const QMap<QString, QPalette::ColorGroup> CImtStyleUtils::s_colorGroupNamesMap = {
 	std::make_pair("Active", QPalette::ColorGroup::Active),
@@ -123,6 +126,7 @@ QString CImtStyleUtils::GetColorName(QPalette::ColorGroup group, QPalette::Color
 {
 	return CImtStyleUtils::s_colorGroupNamesMap.key(group) + CImtStyleUtils::s_colorRolesNamesMap.key(role);
 }
+
 
 QPalette CImtStyleUtils::GetPaletteFromMultiEntry(const QJsonValue& styleEntry)
 {
@@ -603,8 +607,10 @@ bool CImtStyleUtils::GetFontsFromEntry(const QJsonValue& fontsEntry, QMap<QByteA
 		}
 		fonts.insert(fontEntry.key().toUtf8(), font);
 	}
+
 	return true;
 }
+
 
 bool CImtStyleUtils::CreateCssFont(QByteArray& output, const QFont& font)
 {
@@ -617,7 +623,6 @@ bool CImtStyleUtils::CreateCssFont(QByteArray& output, const QFont& font)
 	else if(font.pixelSize() > 0){
 		output.append("font-size: ").append(QByteArray::number(font.pixelSize())).append("px;\n");
 	}
-
 
 	QByteArray fontFamilyString = "font-family: ";
 	if(font.family().length()){

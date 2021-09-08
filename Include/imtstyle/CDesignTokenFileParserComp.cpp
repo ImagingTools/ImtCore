@@ -1,5 +1,6 @@
 #include <imtstyle/CDesignTokenFileParserComp.h>
 
+
 // Qt includes
 #include <QtCore/QRegularExpression>
 #include <QtCore/QRegularExpressionMatch>
@@ -20,6 +21,7 @@ QByteArray CDesignTokenFileParserComp::GetRawColor(const QByteArray& styleName, 
 			return color.value ;
 		}
 	}
+
 	return QByteArray();
 }
 
@@ -32,6 +34,7 @@ bool CDesignTokenFileParserComp::GetStyleSheetColorPalette(const QByteArray& des
 	else{
 		palette = m_stylesPalettes[designSchemaId];
 	}
+
 	return true;
 }
 
@@ -60,16 +63,15 @@ bool CDesignTokenFileParserComp::ParseFile()
 	if (m_designTokenFileInfo.isReadable()){
 		designTokenFile.setFileName(m_designTokenFileInfo.absoluteFilePath());
 	}
-	else {
+	else{
 		designTokenFile.setFileName(m_designTokenFilePathAttrPtr->GetPath());
 	}
 
 	if (!designTokenFile.open(QFile::ReadOnly)){
 		qCritical() << "Cannot read file" << ::qPrintable(designTokenFile.fileName());
-		Q_ASSERT(0);
+
 		return false;
 	}
-
 
 	QByteArray fileData = designTokenFile.readAll();
 	QJsonDocument jsonDocument = QJsonDocument::fromJson(fileData);
@@ -77,6 +79,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 
 	if(designTokenObject.isEmpty()) {
 		qCritical() << "Cannot parse JSON";
+
 		return false;
 	}
 
@@ -88,13 +91,13 @@ bool CDesignTokenFileParserComp::ParseFile()
 
 	if(designTokenStylesArray.isEmpty()) {
 		qCritical() << "Cannot parse Styles";
+
 		return false;
 	}
 
 	QVariantMap colorPaletteVariables = designTokenObject["ColorPalette"].toObject().toVariantMap();
 
 	for (const QJsonValue& style: ::qAsConst(designTokenStylesArray)){
-
 		QJsonObject styleEntry = style.toObject();
 		QString styleName = styleEntry["Name"].toString();
 
@@ -102,6 +105,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 
 		if(!styleName.length()){
 			qInfo() << "Skipping invalid object";
+
 			continue;
 		}
 
@@ -110,7 +114,6 @@ bool CDesignTokenFileParserComp::ParseFile()
 			qInfo() << "Skipping empty object";
 		}
 
-
 		if(!m_templateIconColor.length()){
 			m_templateIconColor = style["TemplateIconColor"].toString().toUtf8();
 		}
@@ -118,8 +121,8 @@ bool CDesignTokenFileParserComp::ParseFile()
 		m_iconColors.insert(styleName, colorsMap);
 		m_designSchemaList.InsertItem(styleName.toUtf8(), styleName,"");
 
-        m_stylesPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromMultiEntry(styleEntry));
-        m_colorPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromMultiEntry(styleEntry));
+		m_stylesPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromMultiEntry(styleEntry));
+		m_colorPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromMultiEntry(styleEntry));
 
 		imtbase::CCollectionInfo* themeFontsCollection = new imtbase::CCollectionInfo;
 		QMap<QByteArray, QFont> fonts;
@@ -128,7 +131,9 @@ bool CDesignTokenFileParserComp::ParseFile()
 		m_fontsCollectionInfos.insert(styleName, istd::TSmartPtr<imtbase::ICollectionInfo>(themeFontsCollection));
 		m_fonts.insert(styleName, fonts);
 	}
+
 	designTokenFile.close();
+
 	return true;
 }
 
@@ -144,13 +149,13 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 	if (m_designTokenFileInfo.isReadable()){
 		designTokenFile.setFileName(m_designTokenFileInfo.absoluteFilePath());
 	}
-	else {
+	else{
 		designTokenFile.setFileName(m_designTokenFilePathAttrPtr->GetPath());
 	}
 
 	if (!designTokenFile.open(QFile::ReadOnly)){
 		qCritical() << "Cannot read file" << ::qPrintable(designTokenFile.fileName());
-		Q_ASSERT(0);
+
 		return false;
 	}
 
@@ -159,21 +164,21 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 	QJsonObject designTokenObject = QJsonDocument::fromJson(designTokenFile.readAll()).object();
 	if(designTokenObject.isEmpty()) {
 		qCritical() << "Cannot parse JSON";
+
 		return false;
 	}
 
 	QJsonArray designTokenStylesArray = designTokenObject["Styles"].toArray();
 	if(designTokenStylesArray.isEmpty()) {
 		qCritical() << "Cannot parse Styles";
+
 		return false;
 	}
 
 	QJsonObject designTokenObjectSplitted = designTokenObject;
 
 	for (const QJsonValue& style: ::qAsConst(designTokenStylesArray)){
-
 		QJsonArray stylesArray;
-
 
 		QJsonObject styleEntry = style.toObject();
 		QString styleName = styleEntry["StyleName"].toString();
@@ -181,15 +186,18 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 		designTokenObjectSplitted["Styles"] = stylesArray;
 
 		QString outputSingleThemeFileName;
+
 		if(outputDir.isEmpty()){
 			outputSingleThemeFileName.append(designTokenFileInfo.absolutePath());
 		}
 		else{
 			outputSingleThemeFileName.append(QDir::toNativeSeparators(outputDirPath));
 		}
+
 		if(!outputSingleThemeFileName.endsWith(QDir::separator())){
 			outputSingleThemeFileName.append(QDir::separator());
 		}
+
 		outputSingleThemeFileName.append(projectName);
 		outputSingleThemeFileName.append(styleName.toLower());
 		outputSingleThemeFileName.append('.').append(designTokenFileInfo.completeSuffix());
@@ -199,6 +207,7 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 		outputSingleThemeFile.write(QJsonDocument(designTokenObjectSplitted).toJson());
 		outputSingleThemeFile.close();
 	}
+
 	return true;
 }
 
@@ -214,7 +223,9 @@ bool CDesignTokenFileParserComp::GetColorPalette(const QByteArray& designSchemaI
 	if(!designSchemaId.length() && m_colorPalettes.size()){
 		palette = m_colorPalettes.first();
 	}
+
 	palette = m_colorPalettes[designSchemaId];
+
 	return true;
 }
 
@@ -229,6 +240,7 @@ QByteArray imtstyle::CDesignTokenFileParserComp::GetNormalColor(const QByteArray
 {
 	return m_iconColors[styleName].toMap()["Normal"].toByteArray();
 }
+
 
 QByteArray imtstyle::CDesignTokenFileParserComp::GetOffNormalColor(const QByteArray& styleName) const
 {
@@ -282,8 +294,10 @@ const imtbase::ICollectionInfo& CDesignTokenFileParserComp::GetFontList(const QB
 {
 	if (m_fonts.contains(designSchemaId) && m_fontsCollectionInfos[designSchemaId].GetPtr() != nullptr){
 		const imtbase::ICollectionInfo& retval = *m_fontsCollectionInfos[designSchemaId];
+
 		return retval;
 	}
+
 	return m_emptyCollectionInfo;
 }
 
@@ -292,6 +306,7 @@ bool CDesignTokenFileParserComp::GetFont(const QByteArray& designSchemaId, const
 {
 	if (m_fonts.contains(designSchemaId) && m_fonts[designSchemaId].contains(fontId)){
 		font = m_fonts[designSchemaId][fontId];
+
 		return true;
 	}
 
@@ -299,12 +314,7 @@ bool CDesignTokenFileParserComp::GetFont(const QByteArray& designSchemaId, const
 }
 
 
-// reimplemented (ilog::CLoggerComponentBase)
-void CDesignTokenFileParserComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-}
-
+// private static methods
 
 void CDesignTokenFileParserComp::ReplaceColorNames(QJsonObject& json, const QVariantMap& variableMaps)
 {
@@ -314,6 +324,7 @@ void CDesignTokenFileParserComp::ReplaceColorNames(QJsonObject& json, const QVar
 		}
 	}
 }
+
 
 void CDesignTokenFileParserComp::ReplaceColorNamesRecursivle(QJsonObject& json, const QVariantMap& variableMaps)
 {

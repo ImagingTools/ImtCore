@@ -1,5 +1,4 @@
 #include <imtstyle/CDesignTokenArgumentsParserComp.h>
-#include <iostream>
 
 
 namespace imtstyle
@@ -56,6 +55,7 @@ QByteArray CDesignTokenArgumentsParserComp::GetArgumentValue(AvailableArguments 
 	if(indexOfArg > -1 && m_arguments.size() > ++indexOfArg){
 		retval = m_arguments[indexOfArg];
 	}
+
 	return retval;
 }
 
@@ -84,6 +84,7 @@ QByteArrayList CDesignTokenArgumentsParserComp::GetArgumentValueMulti(AvailableA
 		QByteArray arg = m_arguments[indexOfArg];
 		retval << arg;
 	}
+
 	return retval;
 }
 
@@ -96,37 +97,22 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 		m_arguments << argv[i];
 	}
 
-	//=====================================================================================Commands init
 	m_commands.insert(AA_HELP, "--help");
 	m_commands.insert(AA_HELP, "-h");
 	m_commands.insert(AA_HELP, "/?");
-
-	//----------------------------------------------- files & dirs
 	m_commands.insert(AA_DESIGN_TOKEN_FILE_PATH, "--file");
 	m_commands.insert(AA_DESIGN_TOKEN_FILE_PATH, "-F");
-
 	m_commands.insert(AA_OUTPUT_DIRECTORY_PATH, "--output-dir");
 	m_commands.insert(AA_OUTPUT_DIRECTORY_PATH, "-OD");
-
 	m_commands.insert(AA_IMAGES_INPUT_DIR_PATH, "-I");
 	m_commands.insert(AA_IMAGES_INPUT_DIR_PATH, "--images-input-dir");
-
 	m_commands.insert(AA_STYLE_SHEETS_INPUT_DIR_PATH, "-S");
 	m_commands.insert(AA_STYLE_SHEETS_INPUT_DIR_PATH, "--style-sheet-input-dir");
-
-	//-----------------------------------------------control options
 	m_commands.insert(AA_PROJECT_NAME, "-P");
-
 	m_commands.insert(AA_SPLIT_FILE_MODE, "--split");
-
 	m_commands.insert(AA_COPY_DESIGN_TOKEN_FILE, "-C");
 	m_commands.insert(AA_COPY_DESIGN_TOKEN_FILE, "--copy");
-
 	m_commands.insert(AA_ERRORS_IGNORE_MODE, "--ignore-errors");
-
-	//-----------------------------------------------
-
-	//=====================================================================================
 }
 
 
@@ -185,11 +171,5 @@ QByteArray imtstyle::CDesignTokenArgumentsParserComp::GetOutputDirectoryPath() c
 
 
 } // namespace imtstyle
-
-
-
-
-
-
 
 
