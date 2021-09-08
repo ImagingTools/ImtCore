@@ -681,7 +681,6 @@ bool CImtStyleUtils::CreateCssFont(QByteArray& output, const QFont& font)
 		output += ";\n";
 	}
 
-	qDebug() << __FILE__ << __LINE__ << font.capitalization();
 	if(font.capitalization() != QFont::MixedCase && font.capitalization() != QFont::SmallCaps){
 		QString transformString = s_fontCapitalizationNamesMap.key(font.capitalization());
 		transformString = transformString.toLower();

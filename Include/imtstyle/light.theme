@@ -1,75 +1,139 @@
 {
-	"Style":
-		{		
-			"Name": "Light",
-			"TemplateIconColor": "#D9D9D9",
-			"IconColor": {
-			"Normal": "#335777",
-			"OffActive": "#335777",
-			"OffDisabled": "#CCCCCC",
-			"OffNormal": "#335777",
-			"OffSelected": "#1A76E7",
-			"OnActive": "#335777",
-			"OnDisabled": "#CCCCCC",
-			"OnNormal": "#335777",
-			"OnSelected": "#1A76E7"
-			},
-			"PaletteColor": {
-				"Window": "rgb(53,53,53)",
-				"WindowText": "white",
-				"Base": "rgb(33,33,33)",
-				"AlternateBase": "rgb(53,53,53)",
-				"ToolTipBase": "lightGray",
-				"ToolTipText": "lightGray",
-				"Text": "lightGray",
-				"Button": "rgb(53,53,53)",
-				"ButtonText": "lightGray",
-				"BrightText": "white",
-				"Link": "rgb(42,130,218)",
-				"Highlight": "#1a76e7",
-				"HighlightedText": "white",
-				"Highlight": "#1a76e7",
-				"ActiveBackground": "rgb(230,230,232)",
-				"ActiveBase": "rgb(255, 255, 255)",
-				"ActiveLight": "#dedede",
-				"ActiveMidlight": "white"
-			},
-			"Fonts": {
-				"Base":{
-					"Bold": false,
-					"FixedPitch": false,
-					"Italic": false,
-					"Kerning": false,
-					"Overline": false,
-					"StrikeOut": false,
-					"Underline": false,
-					"PixelSize": 15,
-					"PointSize": 15,
-					"Stretch": 15,
-					"Weight": 15,
-					"PointSizeF": 15.5,
-					"WordSpacing": 15.5,
-					"HintingPreference": "PreferDefaultHinting",
-					"Capitalization": "Capitalize",
-					"Style": "Normal",
-					"Family": "nano sans",
-					"StyleName": "",
-					"Families": ["nano sans", "Helvetica"],
-					"StyleStrategy": ["PreferBitmap", "ForceOutline"],
-					"LetterSpacing": {
-						"SpacingType": "PercentageSpacing",
-						"Spacing": 15.5
-					},
-					"StyleHint":{
-						"StyleHint": "Helvetica",
-						"StyleStrategy": ["PreferBitmap", "ForceOutline"]
-					}
+	"ColorPalette": {
+		"WindowColor": "rgb(230,230,232)",
+		"WindowTextColor": "white",
+		"BaseColor": "white",
+		"AlternateBaseColor": "rgb(53,53,53)",
+		"ToolTipBaseColor": "lightGray",
+		"ToolTipTextColor": "lightGray",
+		"TextColor": "lightGray",
+		"ButtonColor": "lightGray",
+		"ButtonTextColor": "rgb(53,53,53)",
+		"BrightTextColor": "white",
+		"LinkColor": "rgb(42,130,218)",
+		"HighlightColor": "#1a76e7",
+		"HighlightedTextColor": "white",
+		"LightColor": "#dedede",
+		"MidlightColor": "white",
+		"IconNormal": "#335777",
+		"IconOffActive": "#335777",
+		"IconOffDisabled": "#CCCCCC",
+		"IconOffNormal": "#335777",
+		"IconOffSelected": "#1A76E7",
+		"IconOnActive": "#335777",
+		"IconOnDisabled": "#CCCCCC",
+		"IconOnNormal": "#335777",
+		"IconOnSelected": "#1A76E7"
+	},
+	"Style": {
+		"Name": "Light",
+		"TemplateIconColor": "#D9D9D9",
+		"IconColor": {
+			"Normal": "IconNormal",
+			"OffActive": "IconOffActive",
+			"OffDisabled": "IconOffDisabled",
+			"OffNormal": "IconOffNormal",
+			"OffSelected": "IconOffSelected",
+			"OnActive": "IconOnActive",
+			"OnDisabled": "IconOnDisabled",
+			"OnNormal": "IconOnNormal",
+			"OnSelected": "IconOnSelected"
+		},
+		"ActiveColors": {
+			"Window": "WindowColor",
+			"WindowText": "WindowTextColor",
+			"Base": "BaseColor",
+			"AlternateBase": "AlternateBaseColor",
+			"ToolTipBase": "ToolTipBaseColor",
+			"ToolTipText": "ToolTipTextColor",
+			"Text": "TextColor",
+			"Button": "ButtonColor",
+			"ButtonText": "ButtonTextColor",
+			"BrightText": "BrightTextColor",
+			"Link": "LinkColor",
+			"Highlight": "HighlightColor",
+			"HighlightedText": "HighlightedTextColor",
+			"Light": "LightColor",
+			"Midlight": "MidlightColor"
+		},
+		"InactiveColors": {
+			"Window": "WindowColor",
+			"WindowText": "WindowTextColor",
+			"Base": "BaseColor",
+			"AlternateBase": "AlternateBaseColor",
+			"ToolTipBase": "ToolTipBaseColor",
+			"ToolTipText": "ToolTipTextColor",
+			"Text": "TextColor",
+			"Button": "ButtonColor",
+			"ButtonText": "ButtonTextColor",
+			"BrightText": "BrightTextColor",
+			"Link": "LinkColor",
+			"Highlight": "HighlightColor",
+			"HighlightedText": "HighlightedTextColor",
+			"Light": "LightColor",
+			"Midlight": "MidlightColor"
+		},
+		"DisabledColors": {
+			"Window": "WindowColor",
+			"WindowText": "WindowTextColor",
+			"Base": "BaseColor",
+			"AlternateBase": "AlternateBaseColor",
+			"ToolTipBase": "ToolTipBaseColor",
+			"ToolTipText": "ToolTipTextColor",
+			"Text": "TextColor",
+			"Button": "ButtonColor",
+			"ButtonText": "ButtonTextColor",
+			"BrightText": "BrightTextColor",
+			"Link": "LinkColor",
+			"Highlight": "HighlightColor",
+			"HighlightedText": "HighlightedTextColor",
+			"Light": "LightColor",
+			"Midlight": "MidlightColor"
+		},
+		"Fonts": {
+			"Default": {
+				"Bold": false,
+				"FixedPitch": false,
+				"Italic": false,
+				"Kerning": false,
+				"Overline": false,
+				"StrikeOut": false,
+				"Underline": false,
+				"PointSize": 11,
+				"Stretch": 15,
+				"Weight": 15,
+				"WordSpacing": 15.5,
+				"HintingPreference": "PreferDefaultHinting",
+				"Capitalization": "Capitalize",
+				"Style": "Normal",
+				"Family": "Arial",
+				"Families": [ "nano sans", "Helvetica" ],
+				"StyleStrategy": [ "PreferBitmap", "ForceOutline" ],
+				"LetterSpacing": {
+					"SpacingType": "PercentageSpacing",
+					"Spacing": 15.5
 				},
-				"WindowTittle":{"Family": ["nano sans", "Helvetica"]},
-				"Title":{"Families": "nano sans"},
-				"Subtitle":{}
+				"StyleHint": {
+					"StyleHint": "Helvetica",
+					"StyleStrategy": [ "PreferBitmap", "ForceOutline" ]
+				}
+			},
+			"Header 1": {
+				"BaseFont": "Default",
+				"Bold": true,
+				"PointSize": 24
+			},
+			"Header 2": {
+				"BaseFont": "Header 1",
+				"PointSize": 18
+			},
+			"Header 3": {
+				"BaseFont": "Header 2",
+				"PointSize": 16,
+				"Italic": true
 			}
 		}
+	}
 }
 
 

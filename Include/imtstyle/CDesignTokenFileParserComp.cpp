@@ -98,7 +98,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 		QJsonObject styleEntry = style.toObject();
 		QString styleName = styleEntry["Name"].toString();
 
-        ReplaceColorNamesRecursivle(styleEntry, colorPaletteVariables);
+		ReplaceColorNamesRecursivle(styleEntry, colorPaletteVariables);
 
 		if(!styleName.length()){
 			qInfo() << "Skipping invalid object";
