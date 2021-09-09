@@ -26,6 +26,7 @@ class CImtStyleUtils: imtbase::CJsonHelper
 public:
 	//-------------basic
 	static QByteArrayList GetVariables(const QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol);
+	static bool CopyDirectoryRecursivly(const QByteArray& inputDirPath, const QByteArray& outputDirPath, const QFileInfoList& specificEntries = QFileInfoList());
 
 	static bool SetVariables(QByteArray& data,
 							const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol,

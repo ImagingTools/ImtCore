@@ -45,6 +45,7 @@ public:
 
 private:
 	bool CreateSingleEntry(const QString& prefix, const QString& inputDirPath, const QString& path, QXmlStreamWriter& xmlWriter) const;
+	bool CreateSingleEntryInCurrentPrefix(const QString& inputDirPath, const QString& path, QXmlStreamWriter& xmlWriter) const;
 	QString GetPathOverFile(const QString& dir, const QString& file) const;
 
 private:

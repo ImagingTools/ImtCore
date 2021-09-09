@@ -252,6 +252,40 @@ QByteArrayList CImtStyleUtils::GetVariables(const QByteArray& data, const QChar&
 	return retval;
 }
 
+bool CImtStyleUtils::CopyDirectoryRecursivly(const QByteArray& inputDirPath, const QByteArray& outputDirPath, const QFileInfoList& specificEntries)
+{
+	QDir inputDir(inputDirPath);
+	if(!inputDir.isReadable()){
+		return false;
+	}
+	QDir outputDir(outputDirPath);
+	if(!outputDir.exists()){
+		bool createOutputDir = outputDir.mkpath(outputDirPath);
+		if(!createOutputDir){
+			qCritical() << __FILE__ << __LINE__ << "Unable to create output path" << outputDirPath;
+			Q_ASSERT(createOutputDir);
+			return false;
+		}
+	}
+	QFileInfoList inputDirEntries = specificEntries.size() ? specificEntries : inputDir.entryInfoList(QDir::Dirs |
+				QDir::Files			 |
+				QDir::NoDotAndDotDot,
+				QDir::DirsFirst);
+
+	for (const QFileInfo& inputDirEntry : ::qAsConst(inputDirEntries)){
+		if(inputDirEntry.isDir()){
+			if (!CopyDirectoryRecursivly(inputDirEntry.absoluteFilePath().toUtf8(),
+										 outputDirPath + QDir::separator().toLatin1() + inputDirEntry.baseName().toUtf8())){
+				qCritical() << __FILE__ << __LINE__ << "Unable to Copy From '" << inputDirPath << "' TO '" << outputDirPath << "'\n";
+			}
+		}
+		else {
+			QFile::copy(inputDirEntry.absoluteFilePath(), outputDirPath + QDir::separator().toLatin1() + inputDirEntry.fileName());
+		}
+	}
+	return true;
+}
+
 
 bool CImtStyleUtils::SetVariables(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QMap<QByteArray, QByteArray> variables)
 {
@@ -283,6 +317,10 @@ bool CImtStyleUtils::GetColorRoleGroup(const QString& name, QPalette::ColorGroup
 
 			QString roleName = name;
 			roleName.remove(groupRegExMatch.capturedStart(), groupRegExMatch.capturedLength());
+
+			while(roleName.startsWith('.')){
+				roleName.remove(0,1);
+			}
 
 			if(!s_colorRolesNamesMap.contains(roleName)) {
 				return false;

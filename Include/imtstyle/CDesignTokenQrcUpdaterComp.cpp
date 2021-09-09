@@ -119,7 +119,6 @@ bool CDesignTokenQrcUpdaterComp::CreateQrcForDirs(const QStringList& inputDirNam
 		if (dirParts.size() > 2){
 			prefix += dirParts[dirParts.size() - 2];
 		}
-
 		CreateSingleEntry(prefix, dir, GetPathOverFile(dir, outputFileName), xmlWriter);
 	}
 
@@ -138,7 +137,7 @@ bool CDesignTokenQrcUpdaterComp::ModifyQrc(const QString& prefix, const QString&
 		return CreateQrc(prefix, path, files, outputFileName);
 	}
 
-	return true;
+	return false;
 }
 
 
@@ -153,17 +152,50 @@ bool CDesignTokenQrcUpdaterComp::CreateSingleEntry(const QString& prefix, const 
 	xmlWriter.writeAttribute("prefix", prefix);
 
 	for (const QFileInfo& file : ::qAsConst(files)){
-		xmlWriter.writeStartElement("file");
-		xmlWriter.writeAttribute("alias", file.baseName());
-		xmlWriter.writeCharacters(path + '/' + file.fileName());
-		xmlWriter.writeEndElement();
+		if(file.isFile()){
+			xmlWriter.writeStartElement("file");
+			xmlWriter.writeAttribute("alias", file.baseName());
+			xmlWriter.writeCharacters(path + '/' + file.fileName());
+			xmlWriter.writeEndElement();
+		}
 	}
 
 	xmlWriter.writeEndElement();
 
+	filters = QDir::Filter::Dirs | QDir::NoDotAndDotDot;
+	files = QDir(inputDirPath).entryInfoList(filters, sort);
+	for (const QFileInfo& file : ::qAsConst(files)){
+		if(prefix == "/Icons" && file.baseName() == "Color"){
+			CreateSingleEntry("/ColorIcons",file.absoluteFilePath(), path + QDir::separator().toLatin1() + file.fileName(),xmlWriter);
+		}
+		else{
+			CreateSingleEntryInCurrentPrefix(file.absoluteFilePath(), path + QDir::separator().toLatin1() + file.fileName(),xmlWriter);
+		}
+	}
+
 	return true;
 }
 
+
+bool CDesignTokenQrcUpdaterComp::CreateSingleEntryInCurrentPrefix(const QString& inputDirPath, const QString& path, QXmlStreamWriter& xmlWriter) const
+{
+	QDir::Filters filters = QDir::Filter::Dirs | QDir::NoDotAndDotDot | QDir::Filter::Files | QDir::Filter::Readable;
+	QDir::SortFlags sort = QDir::SortFlag::Name;
+	QFileInfoList files = QDir(inputDirPath).entryInfoList(filters, sort);
+
+	for (const QFileInfo& file : ::qAsConst(files)){
+		if(file.isFile()){
+			xmlWriter.writeStartElement("file");
+			xmlWriter.writeAttribute("alias", file.baseName());
+			xmlWriter.writeCharacters(path + '/' + file.fileName());
+			xmlWriter.writeEndElement();
+		}
+		else{
+			CreateSingleEntryInCurrentPrefix(file.absoluteFilePath(), path + QDir::separator().toLatin1() + file.fileName(),xmlWriter);
+		}
+	}
+	return true;
+}
 
 QString CDesignTokenQrcUpdaterComp::GetPathOverFile(const QString& dir, const QString& file) const
 {

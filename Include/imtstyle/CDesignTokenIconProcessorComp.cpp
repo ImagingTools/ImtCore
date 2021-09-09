@@ -10,6 +10,7 @@
 
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
+#include <imtstyle/CImtStyleUtils.h>
 
 
 
@@ -31,7 +32,7 @@ QByteArray CDesignTokenIconProcessorComp::GetHelpString() const
 int CDesignTokenIconProcessorComp::Exec()
 {
 	if(!QDir(m_argumentParserAttrPtr->GetImagesInputDirectoryPath()).isReadable()){
-		return 0;
+		return -1;
 	}
 
 	if (m_paramSetAttrPtr.IsValid()){
@@ -124,6 +125,17 @@ int CDesignTokenIconProcessorComp::Exec()
 			m_onSelectedColor =  m_designTokenFileParserAttrPtr->GetOnSelectedColor(styleName);
 
 			QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Icons") + QDir::separator().toLatin1() + styleName.constData();
+
+			QDir resourceDir(m_inputDirName);
+			resourceDir.cdUp();
+			QDir colorResourceDir(m_inputDirName);
+			for(const QFileInfo& possibleColorResourceDir : resourceDir.entryInfoList({(QString('*').append(styleName).append('*'))}, QDir::Dirs)){
+				if(possibleColorResourceDir.isDir()){
+					colorResourceDir.setPath(possibleColorResourceDir.absoluteFilePath());
+					break;
+				}
+			}
+			CImtStyleUtils::CopyDirectoryRecursivly(colorResourceDir.absolutePath().toUtf8(), outputDirName);
 			SetColorAllFilesInDir(m_inputDirName, outputDirName);
 		}
 	}
