@@ -1,6 +1,6 @@
 QWidget#EditPanel
 {
-	background-color: ${ActiveBackground};
+        background-color: ${Active.Background};
 	margin-top: 1px;
 	margin-left: 1px;
 	margin-right: 1px;

@@ -1,6 +1,6 @@
 QTreeWidget#TypeList
 {
-	background: ${ActiveBackground};
+        background: ${Active.Background};
 	font-weight: bold;
 	text-align: left;
 }
@@ -24,16 +24,16 @@ QTreeWidget#TypeList::item:last
 
 QTreeWidget#TypeList::item:selected
 {
-	background-color: ${ActiveBase};
+        background-color: ${Active.Base};
 	color: ${CurrentBase};
 }
 
 QTreeWidget#TypeList::item:!selected:hover
 {
-	background-color: ${ActiveLight};
+        background-color: ${Active.Light};
 }
 
 QTreeWidget#TypeList::item:first:selected
 {
-	border-top: 1px ${ActiveMidlight};
+        border-top: 1px ${Active.Midlight};
 }
