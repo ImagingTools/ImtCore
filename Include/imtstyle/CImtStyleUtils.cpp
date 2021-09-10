@@ -1,5 +1,10 @@
 #include <imtstyle/CImtStyleUtils.h>
 
+#ifdef Q_OS_WIN
+#include "windows.h"
+#elif defined(Q_OS_LINUX)
+#include <unistd.h>
+#endif
 
 // Qt includes
 #include <QtCore/QtCore>
@@ -214,6 +219,31 @@ bool SetVariableColor(QByteArray& data, const QPalette& palette)
 }
 
 
+bool CImtStyleUtils::CreateDirWithDelay(const QByteArray& dirPath, int delayMsec, int attempts)
+{
+	QDir outputDir(dirPath);
+	bool createOutputDit = outputDir.mkpath(dirPath) || outputDir.isReadable() || outputDir.exists();
+	for(int i = 0; i < attempts; ++i){
+		createOutputDit = outputDir.mkpath(dirPath) || outputDir.isReadable() || outputDir.exists();
+		if(createOutputDit){
+			break;
+		}
+		else {
+			CImtStyleUtils::Delay(delayMsec);
+		}
+	}
+	return createOutputDit;
+}
+
+void CImtStyleUtils::Delay(int msec)
+{
+#ifdef Q_OS_WIN
+	::Sleep(msec);
+#elif defined(Q_OS_LINUX)
+	::sleep(int(msec/1000));
+#endif
+}
+
 QByteArrayList CImtStyleUtils::GetVariables(const QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol)
 {
 	QByteArrayList retval;
@@ -260,7 +290,7 @@ bool CImtStyleUtils::CopyDirectoryRecursivly(const QByteArray& inputDirPath, con
 	}
 	QDir outputDir(outputDirPath);
 	if(!outputDir.exists()){
-		bool createOutputDir = outputDir.mkpath(outputDirPath);
+		bool createOutputDir = outputDir.mkpath(outputDirPath) || outputDir.isReadable();
 		if(!createOutputDir){
 			qCritical() << __FILE__ << __LINE__ << "Unable to create output path" << outputDirPath;
 			Q_ASSERT(createOutputDir);

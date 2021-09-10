@@ -1,6 +1,5 @@
 #include <imtstyle/CDesignTokenStyleSheetProcessorComp.h>
 
-
 // ACF includes
 #include <iprm/IParamsSet.h>
 #include <iprm/IEnableableParam.h>
@@ -71,7 +70,7 @@ void CDesignTokenStyleSheetProcessorComp::ProcessAllCssFilesInDir(const QByteArr
 {
 	QDir outputDir(outputDirName);
 	if(!outputDir.exists()){
-		Q_ASSERT(outputDir.mkpath(outputDirName));
+		Q_ASSERT(CImtStyleUtils::CreateDirWithDelay(outputDirName));
 	}
 
 	QByteArray dirSeparator(1, QDir::separator().toLatin1());

@@ -143,7 +143,7 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 	QFile designTokenFile;
 	QDir outputDir(outputDirPath);
 	if(!outputDir.exists()){
-		Q_ASSERT(outputDir.mkpath(outputDirPath));
+		Q_ASSERT(CImtStyleUtils::CreateDirWithDelay(outputDirPath.toUtf8()));
 	}
 
 	if (m_designTokenFileInfo.isReadable()){
