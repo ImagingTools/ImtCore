@@ -16,23 +16,28 @@ include_directories(${AUX_INCLUDE_DIR}/..)
 
 #Include
 
-add_subdirectory("${INCLUDE_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauth")
 add_subdirectory("${INCLUDE_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbase")
+add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
+
+add_subdirectory("${IMPL_DIR}/ImtStylePck/CMake" "${AUX_INCLUDE_DIR}/ImtStylePck")
+add_dependencies(ImtStylePck imtstyle)
+
+add_subdirectory("${IMPL_DIR}/DesignTokenCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreatorExe")
+add_dependencies(DesignTokenCreatorExe imtbase imtstyle ImtStylePck)
+
+add_subdirectory("${INCLUDE_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauth")
 add_subdirectory("${INCLUDE_DIR}/imtcrypt/CMake" "${AUX_INCLUDE_DIR}/imtcrypt")
 add_subdirectory("${INCLUDE_DIR}/imtwidgets/CMake" "${AUX_INCLUDE_DIR}/imtwidgets")
-add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
 add_subdirectory("${INCLUDE_DIR}/imtrest/CMake" "${AUX_INCLUDE_DIR}/imtrest")
 add_subdirectory("${INCLUDE_DIR}/imtrepo/CMake" "${AUX_INCLUDE_DIR}/imtrepo")
 add_subdirectory("${INCLUDE_DIR}/imtreport/CMake" "${AUX_INCLUDE_DIR}/imtreport")
 add_subdirectory("${INCLUDE_DIR}/imtreportgui/CMake" "${AUX_INCLUDE_DIR}/imtreportgui")
 add_subdirectory("${INCLUDE_DIR}/imt3d/CMake" "${AUX_INCLUDE_DIR}/imt3d")
 
-add_subdirectory("${IMPL_DIR}/DesignTokenCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreatorExe")
-add_dependencies(DesignTokenCreatorExe imtbase imtstyle)
+
 
 add_subdirectory("${INCLUDE_DIR}/imtgui/CMake" "${AUX_INCLUDE_DIR}/imtgui")
-add_dependencies(imtgui DesignTokenCreatorExe)
-
+add_dependencies(imtgui DesignTokenCreatorExe imtbase imtstyle ImtStylePck)
 add_dependencies(imtgui imtwidgets)
 
 add_subdirectory("${INCLUDE_DIR}/imtauthgui/CMake" "${AUX_INCLUDE_DIR}/imtauthgui")
@@ -63,8 +68,7 @@ add_subdirectory("${INCLUDE_DIR}/imtcom/CMake" "${AUX_INCLUDE_DIR}/imtcom")
 add_subdirectory("${IMPL_DIR}/ImtCorePck/CMake" "${AUX_INCLUDE_DIR}/ImtCorePck")
 add_dependencies(ImtCorePck imtbase)
 
-add_subdirectory("${IMPL_DIR}/ImtStylePck/CMake" "${AUX_INCLUDE_DIR}/ImtStylePck")
-add_dependencies(ImtStylePck imtstyle)
+
 
 add_subdirectory("${IMPL_DIR}/ImtAuthPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthPck")
 add_dependencies(ImtAuthPck imtbase imtauth)
@@ -130,13 +134,13 @@ add_dependencies(ImtZipPck imtzip)
 add_subdirectory("${IMPL_DIR}/ImtFilePck/CMake" "${AUX_INCLUDE_DIR}/ImtFilePck")
 add_dependencies(ImtFilePck imtfile)
 
-#add_subdirectory("${IMPL_DIR}/ImtPyPck/CMake" "${AUX_INCLUDE_DIR}/ImtPyPck")
-#add_dependencies(ImtPyPck imtpy)
+##add_subdirectory("${IMPL_DIR}/ImtPyPck/CMake" "${AUX_INCLUDE_DIR}/ImtPyPck")
+##add_dependencies(ImtPyPck imtpy)
 
 add_subdirectory("${IMPL_DIR}/ImtGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtGqlPck")
 add_dependencies(ImtGqlPck imtgql)
 
-# Application
+## Application
 if(NOT UNIX)
 #	add_subdirectory("${IMPL_DIR}/EagleView/CMake" "${AUX_INCLUDE_DIR}/EagleView")
 #	add_dependencies(EagleView Imt3dViewPck Imt3dGuiPck)
