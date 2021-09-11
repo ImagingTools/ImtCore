@@ -70,7 +70,11 @@ void CDesignTokenStyleSheetProcessorComp::ProcessAllCssFilesInDir(const QByteArr
 {
 	QDir outputDir(outputDirName);
 	if(!outputDir.exists()){
-		Q_ASSERT(CImtStyleUtils::CreateDirWithDelay(outputDirName));
+		bool createOutputDir = CImtStyleUtils::CreateDirWithDelay(outputDirName);
+		if (!createOutputDir){
+			Q_ASSERT(createOutputDir);
+			return;
+		}
 	}
 
 	QByteArray dirSeparator(1, QDir::separator().toLatin1());
@@ -101,7 +105,11 @@ void CDesignTokenStyleSheetProcessorComp::ProcesCssFile(const QByteArray& fileNa
 	QByteArray fileData;
 
 	QFile originalImageFile(fileName);
-	Q_ASSERT(originalImageFile.open(QFile::ReadOnly));
+	bool openFile = originalImageFile.open(QFile::ReadOnly);
+	if(!openFile){
+		Q_ASSERT(openFile);
+		return;
+	}
 	fileData = originalImageFile.readAll();
 	originalImageFile.close();
 	Q_ASSERT(fileData.length());
@@ -111,8 +119,16 @@ void CDesignTokenStyleSheetProcessorComp::ProcesCssFile(const QByteArray& fileNa
 	CImtStyleUtils::SetVariables(fileData, '$', '(', ')', m_currentFontsCss);
 
 	QFile outputImageFile(outputFileName);
-	Q_ASSERT(outputImageFile.open(QFile::WriteOnly));
-	Q_ASSERT(outputImageFile.write(fileData));
+	bool openOutputFile = outputImageFile.open(QFile::WriteOnly);
+	if(!openOutputFile){
+		Q_ASSERT(openOutputFile);
+		return;
+	}
+	const qint64& writtenBytes = outputImageFile.write(fileData);
+	if(writtenBytes <= 0){
+		Q_ASSERT(writtenBytes > 0);
+		return;
+	}
 	outputImageFile.flush();
 	outputImageFile.close();
 }
@@ -156,10 +172,10 @@ bool CDesignTokenStyleSheetProcessorComp::SetVariableColor(QByteArray& data, con
 				QColor color = palette.color(colorGroup, colorRole);
 				QByteArray colorHex;
 				if(color.name() == "#000000"){
-                    colorHex = m_designTokenFileParserAttrPtr->GetRawColor(m_currentTheme, colorGroup, colorRole);
-                    if(!colorHex.length()){
-                        colorHex = "#000000";
-                    }
+					colorHex = m_designTokenFileParserAttrPtr->GetRawColor(m_currentTheme, colorGroup, colorRole);
+					if(!colorHex.length()){
+						colorHex = "#000000";
+					}
 				}
 				else {
 					colorHex = color.name().toUtf8();

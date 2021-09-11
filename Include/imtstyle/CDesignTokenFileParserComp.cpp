@@ -143,7 +143,11 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 	QFile designTokenFile;
 	QDir outputDir(outputDirPath);
 	if(!outputDir.exists()){
-		Q_ASSERT(CImtStyleUtils::CreateDirWithDelay(outputDirPath.toUtf8()));
+		bool createOutputDir = CImtStyleUtils::CreateDirWithDelay(outputDirPath.toUtf8());
+		if(!createOutputDir){
+			Q_ASSERT(createOutputDir);
+			return false;
+		}
 	}
 
 	if (m_designTokenFileInfo.isReadable()){
@@ -203,7 +207,11 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 		outputSingleThemeFileName.append('.').append(designTokenFileInfo.completeSuffix());
 
 		QFile outputSingleThemeFile(outputSingleThemeFileName);
-		Q_ASSERT(outputSingleThemeFile.open(QFile::WriteOnly));
+		bool openOutputFile = outputSingleThemeFile.open(QFile::WriteOnly);
+		if(!openOutputFile){
+			Q_ASSERT(openOutputFile);
+			return openOutputFile;
+		}
 		outputSingleThemeFile.write(QJsonDocument(designTokenObjectSplitted).toJson());
 		outputSingleThemeFile.close();
 	}

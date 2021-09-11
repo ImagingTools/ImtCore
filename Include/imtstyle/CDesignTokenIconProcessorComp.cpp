@@ -149,7 +149,11 @@ void CDesignTokenIconProcessorComp::SetColor(const QByteArray& fileName, const Q
 	QByteArray fileData;
 
 	QFile originalImageFile(fileName);
-	Q_ASSERT(originalImageFile.open(QFile::ReadOnly));
+	bool openInputImageFile = originalImageFile.open(QFile::ReadOnly);
+	if(!openInputImageFile){
+		Q_ASSERT(openInputImageFile);
+		return ;
+	}
 	fileData = originalImageFile.readAll();
 	originalImageFile.close();
 	Q_ASSERT(fileData.length());
@@ -157,8 +161,15 @@ void CDesignTokenIconProcessorComp::SetColor(const QByteArray& fileName, const Q
 	fileData.replace((reolacebleColor.length() ? reolacebleColor : m_templateIconColor), replacedColor);
 
 	QFile outputImageFile(outputFileName);
-	Q_ASSERT(outputImageFile.open(QFile::WriteOnly));
-	Q_ASSERT(outputImageFile.write(fileData));
+	bool openOutputImageFile = outputImageFile.open(QFile::WriteOnly);
+	if(!openOutputImageFile){
+		Q_ASSERT(openOutputImageFile);
+		return;
+	}
+	const qint64& writeBytes = outputImageFile.write(fileData);
+	if(writeBytes <= 0){
+		Q_ASSERT(0);
+	}
 	outputImageFile.flush();
 	outputImageFile.close();
 }
@@ -168,7 +179,11 @@ void CDesignTokenIconProcessorComp::SetColorForAllModeState(const QByteArray& fi
 {
 	QDir outputDir(outputDirName);
 	if(!outputDir.exists()){
-		Q_ASSERT(CImtStyleUtils::CreateDirWithDelay(outputDirName));
+		bool createOutputDir = CImtStyleUtils::CreateDirWithDelay(outputDirName);
+		if(!createOutputDir){
+			Q_ASSERT(createOutputDir);
+			return;
+		}
 	}
 
 	QByteArray dirSeparator(1, QDir::separator().toLatin1());
@@ -226,7 +241,11 @@ void CDesignTokenIconProcessorComp::SetColorAllFilesInDir(const QByteArray& inpu
 {
 	QDir outputDir(outputDirName);
 	if(!outputDir.exists()){
-		Q_ASSERT(CImtStyleUtils::CreateDirWithDelay(outputDirName));
+		bool createOutputDir = CImtStyleUtils::CreateDirWithDelay(outputDirName);
+		if(createOutputDir){
+			Q_ASSERT(createOutputDir);
+			return;
+		}
 	}
 
 	QDir inputDir(inputDirName);
