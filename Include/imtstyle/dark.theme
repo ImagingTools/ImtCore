@@ -1,11 +1,11 @@
 {
 	"ColorPalette": {
 		"LightGray": "#c0c0c0",
-		"DeepGray": "#353535",
-		"DarkGray": "#212121",
+		"DeepGray": "#2b2d2d",
+		"DarkGray": "#1e2020",
 		"White": "#ffffff",
 		"Black": "#000000",
-		"VividBlue": "#1a76e7",
+		"VividBlue": "#0078d7",
 		"BrightBlue": "#2a82da",
 		"ImagingTools Blue": "#335777",
 		"CyanMagenta": "#B0B0FF",
