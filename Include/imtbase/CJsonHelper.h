@@ -4,6 +4,8 @@
 // Qt includes
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
+#include <QtCore/QStringList>
+#include <QtCore/QVariantList>
 
 
 namespace imtbase
