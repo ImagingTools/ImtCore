@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QUuid>
 #include <QtWidgets/QTreeWidgetItem>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
@@ -23,6 +24,7 @@ namespace imtlicgui
 // public methods
 
 CProductInstanceInfoViewComp::CProductInstanceInfoViewComp()
+	:m_importLicenseEnablerObserver(*this)
 {
 }
 
@@ -49,11 +51,16 @@ void CProductInstanceInfoViewComp::OnGuiCreated()
 	BaseClass::OnGuiCreated();
 
 	FeatureTree->header()->setSectionResizeMode(QHeaderView::Stretch);
+
+	m_importLicenseEnablerObserver.RegisterObject(m_importLicenseEnablerCompPtr.GetPtr(), &CProductInstanceInfoViewComp::OnImportLicenseEnabled);
+
 }
 
 
 void CProductInstanceInfoViewComp::OnGuiDestroyed()
 {
+	m_importLicenseEnablerObserver.UnregisterAllObjects();
+	
 	BaseClass::OnGuiDestroyed();
 }
 
@@ -127,6 +134,14 @@ void CProductInstanceInfoViewComp::UpdateFeatureTree()
 }
 
 
+void CProductInstanceInfoViewComp::OnImportLicenseEnabled(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::IEnableableParam* licenseImportEnablerPtr)
+{
+	Q_ASSERT(licenseImportEnablerPtr != nullptr);
+
+	LoadLicenseButton->setEnabled(licenseImportEnablerPtr->IsEnabled());
+}
+
+
 // private slots
 
 void CProductInstanceInfoViewComp::on_NewLicenseRequestButton_clicked()
@@ -161,16 +176,49 @@ void CProductInstanceInfoViewComp::on_NewLicenseRequestButton_clicked()
 
 void CProductInstanceInfoViewComp::on_LoadLicenseButton_clicked()
 {
-	if (m_licensePathCompPtr.IsValid()){
+	//! \todo: Move the interface ILicenseController, ImportLicense
+	if (m_licensePathCompPtr.IsValid() && m_licensePersistenceCompPtr.IsValid() && m_productInstanceCompPtr.IsValid()){
+		QString targetFilePath = m_licensePathCompPtr->GetPath();
+
+		QFileInfo licenseFileInfo(targetFilePath);
+
 		QString licenseFilePath = QFileDialog::getOpenFileName(GetWidget(), tr("Select license file to be imported"), "", tr("License files (*.lic)"));
 		if (!licenseFilePath.isEmpty()){
-			QString targetFilePath = m_licensePathCompPtr->GetPath();
 			if (!targetFilePath.isEmpty()){
-				if (!istd::CSystem::FileCopy(licenseFilePath, targetFilePath, true)){
-					QMessageBox::critical(GetWidget(), tr("License Manager"), tr("License file could not be copied to the target location"));
+				// Backup the license file:
+				QString backupFilePath;
+				if (licenseFileInfo.exists()){
+					backupFilePath = QDir::tempPath() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "/License.lic";
+					if (!istd::CSystem::FileCopy(targetFilePath, backupFilePath)){
+						QMessageBox::critical(GetWidget(), tr("License Manager"), tr("Backup of the existing license failed. Import canceled"));
+
+						return;
+					}
+				}
+
+				if (istd::CSystem::FileCopy(licenseFilePath, targetFilePath, true)){
+					int licenseState = m_licensePersistenceCompPtr->LoadFromFile(*m_productInstanceCompPtr, targetFilePath);
+					if (licenseState == ifile::IFilePersistence::OS_OK){
+						QMessageBox::information(GetWidget(), tr("License Manager"), tr("License file successfully imported"));
+
+						QFile::remove(backupFilePath);
+					}
+					else{
+						QMessageBox::critical(GetWidget(), tr("License Manager"), tr("License file could not be imported"));
+
+						// Restore the license backup:
+						if (!backupFilePath.isEmpty()){
+							if (istd::CSystem::FileCopy(backupFilePath, targetFilePath, true)){
+								QFile::remove(backupFilePath);
+							}
+							else{
+								QMessageBox::critical(GetWidget(), tr("License Manager"), tr("Restore of the last license failed"));
+							}
+						}
+					}
 				}
 				else{
-					QMessageBox::information(GetWidget(), tr("License Manager"), tr("License file successfully imported"));
+					QMessageBox::critical(GetWidget(), tr("License Manager"), tr("License file could not be copied to the target location"));
 				}
 			}
 		}
