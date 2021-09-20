@@ -35,9 +35,9 @@ public:
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
 		I_ASSIGN(m_actionIconScreenOnAttrPtr, "ActionFullScreenOnIcon", "Icon screen on used command menu", true, ":/Icons/FullScreenOnNormal");
 		I_ASSIGN(m_actionIconScreenOffAttrPtr, "ActionFullScreenOffIcon", "Icon screen off used command menu", true, ":/Icons/FullScreenOffNormal");
-		I_ASSIGN(m_menuNameAttrPtr, "MenuName", "Name of the menu for the action group", true, "MenuName");
-		I_ASSIGN(m_menuDescriptionOnAttrPtr, "MenuDescriptionOn", "Description for the full screen On", true, "MenuDescription");
-		I_ASSIGN(m_menuDescriptionOffAttrPtr, "MenuDescriptionOff", "Description for the full screen Off", true, "MenuDescription");
+		I_ASSIGN(m_menuNameAttrPtr, "MenuName", "Name of the menu for the action group", true, "View");
+		I_ASSIGN(m_menuDescriptionOnAttrPtr, "MenuDescriptionOn", "Description for the full screen On", true, "Switch to fullscreen mode");
+		I_ASSIGN(m_menuDescriptionOffAttrPtr, "MenuDescriptionOff", "Description for the full screen Off", true, "Switch to normal view mode");
 		I_ASSIGN(m_rootMenuNameAttrPtr, "RootMenu", "Name of the root command", true, "");
 		I_ASSIGN(m_guiObjectCompPtr, "GuiObject", "Any of the gui object", true, "GuiObject");
 	I_END_COMPONENT;

@@ -30,8 +30,8 @@ public:
 		I_ASSIGN(m_encryptionKeysProviderCompPtr, "EncryptionKeysProvider", "Keys provider instances", true, "EncryptionKeysProvider");
 		I_ASSIGN(m_basePersistenceCompPtr, "BasePersistence", "Base file export instances", true, "BasePersistence");
 		I_ASSIGN(m_encryptionAlgorithm, "EncryptionAlgorithm", "Algoritm for encrypt/decrypt (0 - RSA, 1 - AES)", true, 1);
-		I_ASSIGN_MULTI_1(m_fileExtensionsAttrPtr, "FileExtensions", "List of possible file extensions", false, "txt");
-		I_ASSIGN_MULTI_1(m_typeDescriptionsAttrPtr, "TypeDescriptions", "List of descriptions for each extension", false, "Text file");
+		I_ASSIGN_MULTI_1(m_fileExtensionsAttrPtr, "FileExtensions", "List of possible file extensions", true, "txt");
+		I_ASSIGN_MULTI_1(m_typeDescriptionsAttrPtr, "TypeDescriptions", "List of descriptions for each extension", true, "Text file");
 	I_END_COMPONENT;
 
 protected:

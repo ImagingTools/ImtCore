@@ -146,6 +146,12 @@
    </item>
    <item>
     <widget class="QGroupBox" name="LicenseManagementGroup">
+     <property name="maximumSize">
+      <size>
+       <width>600</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="title">
       <string>License Control</string>
      </property>

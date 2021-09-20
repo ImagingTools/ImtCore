@@ -30,8 +30,8 @@ public:
 	I_BEGIN_COMPONENT(CApplicationSwitchCommandComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
 		I_ASSIGN(m_actionIconAttrPtr, "ActionIcon", "Icon used command menu", true, ":/Icons");
-		I_ASSIGN(m_menuNameAttrPtr, "MenuName", "Name of the menu for the action group", true, "MenuName");
-		I_ASSIGN(m_menuDescriptionAttrPtr, "MenuDescription", "Description for the action group", true, "MenuDescription");
+		I_ASSIGN(m_menuNameAttrPtr, "MenuName", "Name of the menu for the action group", true, "Application Switch");
+		I_ASSIGN(m_menuDescriptionAttrPtr, "MenuDescription", "Description for the action group", true, "Swtich between applications");
 		I_ASSIGN(m_rootMenuNameAttrPtr, "RootMenu", "Name of the root command", true, "");
 		I_ASSIGN(m_executablePathCompPtr, "ExecutablePath", "Path to process exectuable", true, "ExecutablePath");
 	I_END_COMPONENT;

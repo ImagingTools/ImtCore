@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4943" Description="ACF"/>
-            <Version Id="1" Number="2150" Description="ACF-Solutions"/>
+            <Version Id="0" Number="4881" Description="ACF"/>
+            <Version Id="1" Number="2123" Description="ACF-Solutions"/>
             <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -13,6 +13,18 @@
         <Element Id="AesInitVector" PackageId="ImtLicenseVoce" ComponentId="AesInitVector">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="DataPath" PackageId="FilePck" ComponentId="SystemLocation">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="105"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="EncryptedXmlPersistence" PackageId="ImtCryptPck" ComponentId="EncryptionBasePersistence">
@@ -27,8 +39,22 @@
                     <AttributeInfo Id="EncryptionKeysProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="EncryptionKeys"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="FileExtensions" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>txt</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeDescriptions" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Text file</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -70,6 +96,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="LicenseFilePath" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="LicenseFile"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LicenseFingerprintPath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DataPath"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LicenseKeys" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="EncryptionKeys"/>
@@ -148,6 +177,9 @@
         <Interface InterfaceId="imod::IModel" ComponentId="LicenseBasedRights"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="EncryptedXmlPersistence" ComponentId="EncryptedXmlPersistence"/>
+        <Component ExportedId="EncryptionKeys" ComponentId="EncryptionKeys"/>
+        <Component ExportedId="LicenseFile" ComponentId="LicenseFile"/>
         <Component ExportedId="ProductInstanceInfo" ComponentId="ProductInstanceInfo"/>
     </ExportedComponents>
 </Acf>

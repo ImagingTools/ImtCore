@@ -144,7 +144,7 @@ void CProductInstanceInfoViewComp::on_NewLicenseRequestButton_clicked()
 			filterList.prepend(tr("All file types (%1)").arg("*.*"));
 		}
 
-		QString licenseKeyFilePath = QFileDialog::getOpenFileName(GetWidget(), tr("Select representation file"), "", filterList.join("\n"));
+		QString licenseKeyFilePath = QFileDialog::getSaveFileName(GetWidget(), tr("Request File"), "", filterList.join("\n"));
 		if (!licenseKeyFilePath.isEmpty()){
 			iprm::CNameParam licenseKey;
 
@@ -162,12 +162,15 @@ void CProductInstanceInfoViewComp::on_NewLicenseRequestButton_clicked()
 void CProductInstanceInfoViewComp::on_LoadLicenseButton_clicked()
 {
 	if (m_licensePathCompPtr.IsValid()){
-		QString licenseFilePath = QFileDialog::getOpenFileName(GetWidget(), tr("Select license file to be imported"), "", "*.lic");
+		QString licenseFilePath = QFileDialog::getOpenFileName(GetWidget(), tr("Select license file to be imported"), "", tr("License files (*.lic)"));
 		if (!licenseFilePath.isEmpty()){
 			QString targetFilePath = m_licensePathCompPtr->GetPath();
 			if (!targetFilePath.isEmpty()){
 				if (!istd::CSystem::FileCopy(licenseFilePath, targetFilePath, true)){
 					QMessageBox::critical(GetWidget(), tr("License Manager"), tr("License file could not be copied to the target location"));
+				}
+				else{
+					QMessageBox::information(GetWidget(), tr("License Manager"), tr("License file successfully imported"));
 				}
 			}
 		}
