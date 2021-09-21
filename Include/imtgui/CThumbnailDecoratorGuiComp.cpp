@@ -164,6 +164,11 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		HomeButton->hide();
 	}
 
+	if (*m_viewPageNavigationAttrPtr == false){
+		BackPageButton->hide();
+		NextPageButton->hide();
+	}
+
 	CurrentPageLabel->setVisible(*m_showPageTitlesAttrPtr);
 
 	if (m_dashboardGuiCompPtr.IsValid()){

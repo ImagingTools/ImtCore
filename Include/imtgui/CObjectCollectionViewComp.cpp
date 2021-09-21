@@ -1,5 +1,23 @@
-#include <imtgui/CObjectCollectionViewComp.h>
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
 
+#include <imtgui/CObjectCollectionViewComp.h>
 
 // Qt includes
 #include <QtCore/QMetaType>
@@ -41,6 +59,12 @@ CObjectCollectionViewComp::CObjectCollectionViewComp()
 	m_eventBasedUpdateEnabled(false)
 {
 	m_commands.SetParent(this);
+}
+
+
+void CObjectCollectionViewComp::SetFilterString(const QString &text)
+{
+	OnFilterChanged(text);
 }
 
 
@@ -361,8 +385,9 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 	connect(FilterEdit, &QLineEdit::textChanged, this, &CObjectCollectionViewComp::OnFilterChanged);
 	connect(CloseButton, &QToolButton::clicked, this, &CObjectCollectionViewComp::OnEscShortCut);
-
-	connect(m_searchShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnSearchShortCut);
+	if (*m_useSearchWidgetAttrPtr == true) {
+		connect(m_searchShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnSearchShortCut);
+	}
 	connect(m_escShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnEscShortCut);
 	connect(m_delShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnDelShortCut);
 	connect(m_renameShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnRenameShortCut);
@@ -837,7 +862,7 @@ void CObjectCollectionViewComp::ReadCollection(QStandardItemModel* typeModelPtr,
 			for (int i = 0; i < count; i++){
 				UpdateItem(collectionItemIds[i], itemModelPtr);
 
-				if (*m_useAsyncReadAttrPtr){
+				if (*m_useAsyncReadAttrPtr && *m_viewProgressAttrPtr){
 					int currentProgress = i * 100 / count;
 					if (progress != currentProgress){
 						progress = currentProgress;
@@ -1211,8 +1236,9 @@ void CObjectCollectionViewComp::OnTypeChanged()
 		m_currentInformationViewPtr = GetViewDelegateRef(m_currentTypeId).GetInformationView();
 		if (m_currentInformationViewPtr != nullptr){
 			m_currentInformationViewPtr->CreateGui(RightPanel);
-
-			RightPanel->setVisible(true);
+			if (*m_viewRightPanelAttrPtr){
+				RightPanel->setVisible(true);
+			}
 		}
 	}
 

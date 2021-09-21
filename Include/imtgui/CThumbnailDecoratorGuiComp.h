@@ -126,6 +126,7 @@ public:
 		I_ASSIGN(m_pageNavigationControllerCompPtr, "NavigationController", "Page navigation controller", false, "NavigationController");
 		I_ASSIGN(m_dashboardGuiCompPtr, "Dashboard", "Dashboard UI", false, "Dashboard");
 		I_ASSIGN(m_additionalCommandsCompPtr, "AdditionalCommands", "Additional tool commands showed on the right side of the main tool bar", false, "AdditionalCommands");
+		I_ASSIGN(m_viewPageNavigationAttrPtr, "ViewPageNavigation", "View page navigation", true, true);
 	I_END_COMPONENT;
 
 	enum
@@ -335,6 +336,7 @@ private:
 	I_REF(imtgui::IPageNavigationController, m_pageNavigationControllerCompPtr);
 	I_REF(iqtgui::IGuiObject, m_dashboardGuiCompPtr);
 	I_REF(ibase::ICommandsProvider, m_additionalCommandsCompPtr);
+	I_ATTR(bool, m_viewPageNavigationAttrPtr);
 
 	QToolBar* m_mainToolBar;
 	QToolBar* m_additionalCommandsToolBar;

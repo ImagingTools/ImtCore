@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #pragma once
 
 
@@ -60,94 +80,94 @@ public:
 		I_ASSIGN_MULTI_0(m_viewDelegatesCompPtr, "ViewDelegates", "List of view delegates (corresponding with the object type) used for the collection", false);
 		I_ASSIGN(m_columnSettingsKeyAttrPtr, "ColumnSettingsKey", "Registry/INI file key for storing column settings", true, "");
 		I_ASSIGN(m_useAsyncReadAttrPtr, "UseAsyncRead", "Useasync collectionRead", true, false);
-	I_END_COMPONENT;
+		I_ASSIGN(m_useSearchWidgetAttrPtr, "UseSearchWidget", "Use internal search widget", true, true);
+		I_ASSIGN(m_viewProgressAttrPtr, "ViewProgress", "View progress bar on upload", true, true);
+		I_ASSIGN(m_viewRightPanelAttrPtr, "ViewRightPanel", "View right panel", true, true);
+		I_END_COMPONENT;
 
-	enum DataRole
-	{
-		DR_TYPE_ID = Qt::UserRole,
-		DR_OBJECT_ID,
-		DR_SORT_VALUE
-	};
+		enum DataRole { DR_TYPE_ID = Qt::UserRole, DR_OBJECT_ID, DR_SORT_VALUE };
 
-	enum ModelId
-	{
-		MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE = 0,
-		MI_LAST = MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE + 1000
-	};
+		enum ModelId {
+			MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE = 0,
+			MI_LAST = MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE + 1000
+		};
 
-	typedef QVector<ICollectionViewDelegate::SummaryInformation> ObjectMetaInfo;
+		typedef QVector<ICollectionViewDelegate::SummaryInformation> ObjectMetaInfo;
 
-	CObjectCollectionViewComp();
+		CObjectCollectionViewComp();
 
-	// reimplemented (imtbase::IObjectCollectionEventHandler)
-	virtual void OnCollectionConnected(const imtbase::IObjectCollection* objectCollectionPtr) override;
+		void SetFilterString(const QString &text);
 
-	// reimplemented (imtbase::IMultiSelection)
-	virtual const iprm::IOptionsList* GetSelectionConstraints() const override;
-	virtual Ids GetSelectedIds() const override;
-	virtual bool SetSelectedIds(const Ids& selectedIds) override;
+		// reimplemented (imtbase::IObjectCollectionEventHandler)
+		virtual void OnCollectionConnected(
+			const imtbase::IObjectCollection *objectCollectionPtr) override;
 
-	// reimplemented (ibase::IProgressManager)
-	virtual int BeginProgressSession(
-				const QByteArray& progressId,
-				const QString& description,
-				bool isCancelable = false) override;
-	virtual void EndProgressSession(int sessionId) override;
-	virtual void OnProgress(int sessionId, double currentProgress) override;
-	virtual bool IsCanceled(int sessionId) const override;
+		// reimplemented (imtbase::IMultiSelection)
+		virtual const iprm::IOptionsList *GetSelectionConstraints() const override;
+		virtual Ids GetSelectedIds() const override;
+		virtual bool SetSelectedIds(const Ids &selectedIds) override;
 
-	// reimplemented (iser::ISerialize)
-	virtual bool Serialize(iser::IArchive& archive) override;
+		// reimplemented (ibase::IProgressManager)
+		virtual int BeginProgressSession(const QByteArray &progressId,
+										 const QString &description,
+										 bool isCancelable = false) override;
+		virtual void EndProgressSession(int sessionId) override;
+		virtual void OnProgress(int sessionId, double currentProgress) override;
+		virtual bool IsCanceled(int sessionId) const override;
 
-protected:
-	ICollectionViewDelegate& GetViewDelegateRef(const QByteArray& typeId);
-	const ICollectionViewDelegate& GetViewDelegate(const QByteArray& typeId) const;
-
-	// reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
-	virtual void ProcessObjectCollectionEvent(
-				const imtbase::IObjectCollection* objectCollectionPtr,
-				const imtbase::IObjectCollectionEvent* eventPtr) override;
-
-	// reimplemented (iqtgui::TRestorableGuiWrap)
-	virtual void OnRestoreSettings(const QSettings& settings) override;
-	virtual void OnSaveSettings(QSettings& settings) const override;
-
-	// reimplemented (iqtgui::TGuiObserverWrap)
-	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
-	virtual void OnGuiModelAttached() override;
-
-	// iqtgui::TDesignSchemaHandlerWrap
-	void OnDesignSchemaChanged() override;
-
-	// reimplemented (iqtgui::CGuiComponentBase)
-	virtual void OnGuiCreated() override;
-	virtual void OnGuiDestroyed() override;
-	virtual void OnGuiRetranslate() override;
-
-	// reimplemented (imod::CMultiModelDispatcherBase)
-	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
-
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
- 
-protected:
-	class Commands: virtual public ibase::ICommandsProvider
-	{
-	public:
-		Commands();
-
-		void SetParent(CObjectCollectionViewComp* parentPtr);
+		// reimplemented (iser::ISerialize)
+		virtual bool Serialize(iser::IArchive &archive) override;
 
 	protected:
-		// reimplemented (ibase::ICommandsProvider)
-		virtual const ibase::IHierarchicalCommand* GetCommands() const override;
+		ICollectionViewDelegate &GetViewDelegateRef(const QByteArray &typeId);
+		const ICollectionViewDelegate &GetViewDelegate(const QByteArray &typeId) const;
 
-	private:
-		CObjectCollectionViewComp* m_parentPtr;
-	};
+		// reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
+		virtual void ProcessObjectCollectionEvent(
+			const imtbase::IObjectCollection *objectCollectionPtr,
+			const imtbase::IObjectCollectionEvent *eventPtr) override;
 
-	template <typename InterfaceType>
+		// reimplemented (iqtgui::TRestorableGuiWrap)
+		virtual void OnRestoreSettings(const QSettings &settings) override;
+		virtual void OnSaveSettings(QSettings &settings) const override;
+
+		// reimplemented (iqtgui::TGuiObserverWrap)
+		virtual void UpdateGui(const istd::IChangeable::ChangeSet &changeSet) override;
+		virtual void OnGuiModelAttached() override;
+
+		// iqtgui::TDesignSchemaHandlerWrap
+		void OnDesignSchemaChanged() override;
+
+		// reimplemented (iqtgui::CGuiComponentBase)
+		virtual void OnGuiCreated() override;
+		virtual void OnGuiDestroyed() override;
+		virtual void OnGuiRetranslate() override;
+
+		// reimplemented (imod::CMultiModelDispatcherBase)
+		virtual void OnModelChanged(int modelId,
+									const istd::IChangeable::ChangeSet &changeSet) override;
+
+		// reimplemented (icomp::CComponentBase)
+		virtual void OnComponentCreated() override;
+		virtual void OnComponentDestroyed() override;
+
+	protected:
+		class Commands : virtual public ibase::ICommandsProvider
+		{
+		public:
+			Commands();
+
+			void SetParent(CObjectCollectionViewComp *parentPtr);
+
+		protected:
+			// reimplemented (ibase::ICommandsProvider)
+			virtual const ibase::IHierarchicalCommand *GetCommands() const override;
+
+		private:
+			CObjectCollectionViewComp *m_parentPtr;
+		};
+
+		template <typename InterfaceType>
 	static InterfaceType* ExtractCommands(CObjectCollectionViewComp& component)
 	{
 		return &component.m_commands;
@@ -328,6 +348,9 @@ private:
 	I_MULTIREF(ICollectionViewDelegate, m_viewDelegatesCompPtr);
 	I_ATTR(QByteArray, m_columnSettingsKeyAttrPtr);
 	I_ATTR(bool, m_useAsyncReadAttrPtr);
+	I_ATTR(bool, m_useSearchWidgetAttrPtr);
+	I_ATTR(bool, m_viewProgressAttrPtr);
+	I_ATTR(bool, m_viewRightPanelAttrPtr);
 
 	bool m_eventBasedUpdateEnabled;
 };
