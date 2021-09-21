@@ -1469,11 +1469,11 @@ CFileCollectionCompBase::ResourceLocker::~ResourceLocker()
 	QMutexLocker locker(&m_collection.m_lockedObjectInfoMutex);
 
 	if (!m_resourceId.isEmpty()){
-		Q_ASSERT(m_collection.m_lockedObjectIds.removeOne(m_resourceId));
+		m_collection.m_lockedObjectIds.removeOne(m_resourceId);
 	}
 
 	if (!m_resourceName.isEmpty()){
-		Q_ASSERT(m_collection.m_lockedObjectNames.removeOne(m_resourceName));
+		m_collection.m_lockedObjectNames.removeOne(m_resourceName);
 	}
 }
 
