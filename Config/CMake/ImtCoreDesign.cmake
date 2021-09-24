@@ -1,0 +1,149 @@
+macro(get_target_name target_name)
+	set(COMPILER_NAME "Clang")
+    if(${MSVC})
+        if(${MSVC_TOOLSET_VERSION} STREQUAL 100)
+            set(COMPILER_NAME "VC10")
+        endif()
+        if(${MSVC_TOOLSET_VERSION} STREQUAL 110)
+            set(COMPILER_NAME "VC11")
+        endif()
+
+        if(${MSVC_TOOLSET_VERSION} STREQUAL 120)
+            set(COMPILER_NAME}"VC12")
+        endif()
+
+        if(${MSVC_TOOLSET_VERSION} STREQUAL 140)
+            set(COMPILER_NAME "VC14")
+        endif()
+        if(${MSVC_TOOLSET_VERSION} STREQUAL 141)
+            set(COMPILER_NAME "VC15")
+        endif()
+        if(${MSVC_TOOLSET_VERSION} STREQUAL 142)
+            set(COMPILER_NAME "VC16")
+        endif()
+
+		if(${CMAKE_CL_64} STREQUAL 1)
+			set(COMPILER_NAME "${COMPILER_NAME}_64")
+		endif()
+
+	elseif(${APPLE})
+
+		if("${CMAKE_OSX_ARCHITECTURES}" STREQUAL "arm64")
+			set(COMPILER_NAME "${COMPILER_NAME}OSX_arm64")
+			add_compile_definitions(COMPILER_NAME=ClangOSX)
+			add_compile_definitions(PLATFORM_CODE=arm64)
+		else()
+			set(COMPILER_NAME "${COMPILER_NAME}OSX_64")
+			add_compile_definitions(COMPILER_NAME=ClangOSX)
+			add_compile_definitions(PLATFORM_CODE=x64)
+		endif()
+
+	elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+
+		if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+			set(COMPILER_NAME "GCCLinux_64")
+		else()
+			set(COMPILER_NAME "${COMPILER_NAME}_64")
+		endif()
+	endif()
+
+	message("CMAKE_SYSTEM_NAME" "${CMAKE_SYSTEM_NAME}")
+	message("CMAKE_CXX_COMPILER_ARCHITECTURE_ID " "${CMAKE_CL_64}")
+
+
+	set(${target_name} "${COMPILER_NAME}")
+endmacro()
+
+function(GenerateDesignTokenExt DESIGN_TOKEN_CREATOR_COMMAND_PARAM_IMAGES_INPUT_DIR, DESIGN_TOKEN_CREATOR_COMMAND_PARAM_STYIES_INPUT_DIR, DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR, DESIGN_TOKEN_CREATOR_INPUT_THEME_FILES)
+
+
+#----------------------------------------------------------- The DESIGN TOKEN CREATOR config
+# Setting the executable file name for specific OS
+get_target_name(TARGETNAME)
+set(COMPILER_DIR ${CMAKE_BUILD_TYPE}${TARGETNAME})
+if (WIN32)
+	set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreatorExe.exe")
+else()
+	set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreatorExe")
+endif()
+
+#  Setting the executable absolutely file path for specific OS
+set(DESIGN_TOKEN_CREATOR_EXE_BIN "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../Bin/${COMPILER_DIR}/${DESIGN_TOKEN_CREATOR_EXE}")
+
+
+set(DESIGN_TOKEN_CREATOR_COMMAND_PARAMS
+	-I
+		${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_IMAGES_INPUT_DIR}
+	-S
+		${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_STYIES_INPUT_DIR}
+	-OD
+		${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}
+	-P
+		${PROJECT_NAME}
+	)
+
+set(QRC_QRC_FILES)
+
+foreach(_file ${DESIGN_TOKEN_CREATOR_INPUT_THEME_FILES})
+
+	string(REPLACE "/" ";" CURRENT_FILE_PARTS ${_file})
+	list(GET CURRENT_FILE_PARTS -1 CURRENT_FILE_NAME_WITH_EXT)
+	string(REPLACE "." ";" CURRENT_FILE_NAME_WITH_NO_EXT ${CURRENT_FILE_NAME_WITH_EXT})
+	list(GET CURRENT_FILE_NAME_WITH_NO_EXT 0 CURRENT_FILE_NAME)
+
+	set(QRC_QRC_CURRENT_FILE ${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/${PROJECT_NAME}${CURRENT_FILE_NAME}.qrc)
+	set(QRC_CPP_CURRENT_FILE ${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/qrc_${PROJECT_NAME}${CURRENT_FILE_NAME}.cpp)
+
+	target_sources(${PROJECT_NAME} PRIVATE ${QRC_CPP_CURRENT_FILE})
+#	set_property(SOURCE ${QRC_CPP_CURRENT_FILE} PROPERTY SKIP_AUTOMOC ON)
+
+	add_custom_command(
+		OUTPUT
+			${QRC_QRC_CURRENT_FILE}
+		COMMAND
+			${DESIGN_TOKEN_CREATOR_EXE_BIN}
+		ARGS
+			${DESIGN_TOKEN_CREATOR_COMMAND_PARAMS} -F ${_file}
+		DEPENDS
+			${DESIGN_TOKEN_CREATOR_EXE_BIN}
+		COMMENT
+			"[DesignToken::${PROJECT_NAME}] Creating QRC ${QRC_QRC_CURRENT_FILE}"
+		VERBATIM
+		)
+
+	add_custom_command(
+		OUTPUT ${QRC_CPP_CURRENT_FILE}
+		COMMAND
+			${Qt5Core_RCC_EXECUTABLE}
+		ARGS
+			-name ${PROJECT_NAME}${CURRENT_FILE_NAME} ${QRC_QRC_CURRENT_FILE} -o ${QRC_CPP_CURRENT_FILE}
+		DEPENDS
+			${QRC_QRC_CURRENT_FILE}
+		COMMENT
+			"[DesignToken::${PROJECT_NAME}] CREATING RES ${QRC_CPP_CURRENT_FILE}"
+	)
+
+	list(APPEND QRC_QRC_FILES ${QRC_CPP_CURRENT_FILE})
+
+endforeach()
+
+
+add_custom_command(
+	OUTPUT
+		${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/${PROJECT_NAME}DesignToekn.stamp
+	COMMAND
+		${CMAKE_COMMAND} -E touch ${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/${PROJECT_NAME}DesignToekn.stamp
+	COMMENT
+		"[DesignToken::${PROJECT_NAME}] Creating done"
+	DEPENDS
+		${QRC_QRC_FILES}
+	VERBATIM
+	)
+
+add_custom_target(
+	DesignToekn${PROJECT_NAME}${DESIGN_TOKEN_CREATOR_CUSTOM_TARGET} ALL
+	DEPENDS ${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/${PROJECT_NAME}DesignToekn.stamp
+	)
+
+
+endfunction()
