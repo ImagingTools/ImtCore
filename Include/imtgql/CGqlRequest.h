@@ -17,6 +17,8 @@ public:
 
 	void AddParam(const CGqlObject& param);
 	void AddField(const CGqlObject& field);
+	const QList<CGqlObject>* GetFields() const;
+	const QList<CGqlObject>* GetParams() const;
 
 	// reimplemented (IGqlRequest)
 	virtual QByteArray GetCommandId() const override;
@@ -57,6 +59,8 @@ protected:
 	bool m_startValue;
 	bool m_startParams;
 	bool m_startFields;
+	QByteArray m_currentField;
+
 	CGqlObject* m_activeGqkObjectPtr;
 };
 

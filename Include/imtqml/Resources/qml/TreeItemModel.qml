@@ -37,7 +37,16 @@ JSONListModel {
             row = 0
         console.log("setData",key,value,row)
         var modelObject = get(row)
+
+        if (modelObject === undefined && row === 0){
+            append({})
+            modelObject = get(row)
+        }
+        if (modelObject === null)
+            console.log("modelObject is null")
+
         modelObject[key] = value
+
         var xhr = new XMLHttpRequest;
         var json = {}
         json[key] = value

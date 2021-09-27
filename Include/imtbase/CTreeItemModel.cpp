@@ -397,7 +397,7 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	if (countSize < 1){
 		return false;
 	}
-	bool isMultiTag = countSize > 1 || !tagName.isEmpty();
+	bool isMultiTag = countSize > 1;
 	if (isMultiTag == false){
 		retVal = retVal && archive.BeginTag(objectTag);
 	}
@@ -429,9 +429,17 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 					qint32 intVal = value.toInt();
 					retVal = retVal && archive.Process(intVal);
 				}
-				else{
+				else if (value.type() == QVariant::Bool){
+					bool boolVal = value.toBool();
+					retVal = retVal && archive.Process(boolVal);
+				}
+				else if (value.type() == QVariant::String){
 					QString strVal = value.toString();
 					retVal = retVal && archive.Process(strVal);
+				}
+				else {
+					QByteArray baVal = "null";
+					retVal = retVal && archive.Process(baVal);
 				}
 				retVal = retVal && archive.EndTag(keyTag);
 			}

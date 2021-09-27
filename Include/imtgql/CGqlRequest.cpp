@@ -35,6 +35,18 @@ void CGqlRequest::AddField(const CGqlObject &field)
 }
 
 
+const QList<CGqlObject> *CGqlRequest::GetFields() const
+{
+	return &m_fields;
+}
+
+
+const QList<CGqlObject> *CGqlRequest::GetParams() const
+{
+	return &m_params;
+}
+
+
 QByteArray CGqlRequest::GetCommandId() const
 {
 	return m_commandId;
@@ -112,6 +124,9 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 
 
 	body = body.mid(index + 1);
+	index = body.lastIndexOf("}");
+	body = body.left(index);
+
 	index = body.indexOf("(");
 	m_commandId = body.left(index);
 	body = body.remove(0,index);
@@ -187,8 +202,13 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 			}
 			else{
 				if (m_activeGqkObjectPtr == nullptr){
-					errorPosition = i;
-					return false;
+					if (m_startFields == true){
+						return true;
+					}
+					else{
+						errorPosition = i + index;
+						return false;
+					}
 				}
 				if (!text.isEmpty()) {
 					SetParseText(text);
@@ -214,7 +234,7 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 					m_startValue = false;
 				}
 				else{
-					errorPosition = i;
+					errorPosition = i + index;
 					return false;
 				}
 			}
@@ -230,7 +250,7 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 					m_startValue = true;
 				}
 				else{
-					errorPosition = i;
+					errorPosition = i + index;
 					return false;
 				}
 			}
@@ -242,7 +262,7 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				startBackSlash = true;
 			}
 			else{
-				errorPosition = i;
+				errorPosition = i + index;
 				return false;
 			}
 			break;
@@ -286,7 +306,6 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 
 	return false;
 }
-
 
 
 // reimplemented (iser::IObject)
@@ -534,10 +553,11 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 		SetParseObject("");
 	}
 	if (m_startKey){
-			m_activeGqkObjectPtr->InsertField(text);
+		m_activeGqkObjectPtr->InsertField(text);
+		m_currentField = text;
 	}
 	else{
-		m_activeGqkObjectPtr->InsertFieldArgument(m_activeGqkObjectPtr->GetFieldIds().last(), text);
+		m_activeGqkObjectPtr->InsertFieldArgument(m_currentField, text);
 	}
 
 }
