@@ -13,7 +13,7 @@ macx*{
 }
 
 #  Setting the executable absolutely file path for specific OS
-DESIGN_TOKEN_CREATOR_EXE_BIN = $$(IMTCOREDIR)/Bin/$$COMPILER_DIR/$$DESIGN_TOKEN_CREATOR_EXE
+DESIGN_TOKEN_CREATOR_EXE_BIN = $$PWD/../../Bin/$$COMPILER_DIR/$$DESIGN_TOKEN_CREATOR_EXE
 
 win32{
 	ARX_COMPILER = Arxc.exe
