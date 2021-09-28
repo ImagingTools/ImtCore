@@ -11,6 +11,8 @@ LIBS +=  -limtbase -limtstyle
 
 QT += core gui
 
+CONFIG += console
+
 # Set OS-specific build options:
 win32-msvc*{
 	QMAKE_CXXFLAGS += /wd4264
