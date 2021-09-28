@@ -1,5 +1,7 @@
 #include <imtstyle/CImtStyleUtils.h>
 
+
+
 #ifdef Q_OS_WIN
 #include "windows.h"
 #elif defined(Q_OS_LINUX)
@@ -712,19 +714,18 @@ bool CImtStyleUtils::CreateCssFont(QByteArray& output, const QFont& font)
 
 bool CImtStyleUtils::SetVariable_(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QMap<QByteArray, QByteArray> variables)
 {
-
-    QMap<QByteArray, QByteArray> upperVariables = variables;
-    for(const QByteArray& variablesKey: upperVariables.keys()){
-        upperVariables[variablesKey] = upperVariables[variablesKey].toUpper();
-    }
+	QMap<QByteArray, QByteArray> upperVariables = variables;
+	for (const QByteArray& variablesKey : upperVariables.keys()){
+		upperVariables[variablesKey] = upperVariables[variablesKey].toUpper();
+	}
 
 	/// points to 'beginSymbol' symbol
 	int indexOfBeginVariable = -1;
+
 	/// points to 'endSymbol' symbol
 	int indexOfEndVariable = -1;
 
 	for(int i = 0; i < data.length(); ++i){
-
 		QChar symbol(data.at(i));
 		if(symbol == variableBeginSymbol && i+1 < data.length()){
 
@@ -744,21 +745,21 @@ bool CImtStyleUtils::SetVariable_(QByteArray& data, const QChar& variableBeginSy
 		}
 
 		if(indexOfBeginVariable > -1 && indexOfEndVariable > indexOfBeginVariable){
-
 			int lengthOfVariable = indexOfEndVariable - indexOfBeginVariable - 2;
-			QByteArray variableName = data.mid(indexOfBeginVariable+2, lengthOfVariable);
-            variableName = variableName.toUpper();
 
-            if(variables.contains(variableName)){
-                data.replace(indexOfBeginVariable, lengthOfVariable+3, variables[variableName]);
+			QByteArray variableName = data.mid(indexOfBeginVariable + 2, lengthOfVariable).toUpper();
+			if (variables.contains(variableName)){
+				data.replace(indexOfBeginVariable, lengthOfVariable + 3, variables[variableName]);
+
 				return true;
 			}
 		}
 	}
+
 	return false;
 }
 
 
-}
+} // namespace imtstyle
 
 

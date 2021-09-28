@@ -63,30 +63,30 @@ bool CDesignTokenFileParserComp::ParseFile()
 	if (m_designTokenFileInfo.isReadable()){
 		designTokenFile.setFileName(m_designTokenFileInfo.absoluteFilePath());
 	}
-    else{
-        if(m_designTokenFilePathAttrPtr.IsValid()){
-            designTokenFile.setFileName(m_designTokenFilePathAttrPtr->GetPath());
-        }
-        else{
-            qCritical() << "Unable to open theme file" << m_designTokenFileInfo.absoluteFilePath();
-            return false;
-        }
-    }
+	else{
+		if (m_designTokenFilePathAttrPtr.IsValid()){
+			designTokenFile.setFileName(m_designTokenFilePathAttrPtr->GetPath());
+		}
+		else{
+			qCritical() << "Unable to open theme file" << m_designTokenFileInfo.absoluteFilePath();
+			return false;
+		}
+	}
 
 	if (!designTokenFile.open(QFile::ReadOnly)){
-        QString errorString = QString("Cannot read file ") + ::qPrintable(designTokenFile.fileName());
-        qCritical() << errorString;
-        return false;
+		QString errorString = QString("Cannot read file ") + ::qPrintable(designTokenFile.fileName());
+		qCritical() << errorString;
+		return false;
 	}
 
 	QByteArray fileData = designTokenFile.readAll();
 	QJsonDocument jsonDocument = QJsonDocument::fromJson(fileData);
 	QJsonObject designTokenObject = jsonDocument.object();
 
-    if(designTokenObject.isEmpty()) {
-        QString errorString = QString("Invalid data in file ") + ::qPrintable(designTokenFile.fileName());
-        qCritical() << errorString;
-        return false;
+	if (designTokenObject.isEmpty()){
+		QString errorString = QString("Invalid data in file ") + ::qPrintable(designTokenFile.fileName());
+		qCritical() << errorString;
+		return false;
 	}
 
 	m_templateIconColor = designTokenObject["TemplateIconColor"].toString().toUtf8();
@@ -95,32 +95,32 @@ bool CDesignTokenFileParserComp::ParseFile()
 	QJsonArray designTokenStylesArray = designTokenObject["Styles"].toArray();
 	designTokenStylesArray << singleStyle;
 
-	if(designTokenStylesArray.isEmpty()) {
-        QString errorString = QString("Cannot parse Styles") + ::qPrintable(designTokenFile.fileName());
-        qCritical() << errorString;
+	if (designTokenStylesArray.isEmpty()){
+		QString errorString = QString("Cannot parse Styles") + ::qPrintable(designTokenFile.fileName());
+		qCritical() << errorString;
 		return false;
 	}
 
 	QVariantMap colorPaletteVariables = designTokenObject["ColorPalette"].toObject().toVariantMap();
 
-	for (const QJsonValue& style: ::qAsConst(designTokenStylesArray)){
+	for (const QJsonValue& style : ::qAsConst(designTokenStylesArray)){
 		QJsonObject styleEntry = style.toObject();
 		QString styleName = styleEntry["Name"].toString();
 
 		ReplaceColorNamesRecursivle(styleEntry, colorPaletteVariables);
 
-		if(!styleName.length()){
+		if (!styleName.length()){
 			qInfo() << "Skipping invalid object";
 
 			continue;
 		}
 
 		QJsonObject colorsObject = styleEntry["IconColor"].toObject();
-		if(colorsObject.isEmpty()){
+		if (colorsObject.isEmpty()){
 			qInfo() << "Skipping empty object";
 		}
 
-		if(!m_templateIconColor.length()){
+		if (!m_templateIconColor.length()){
 			m_templateIconColor = style["TemplateIconColor"].toString().toUtf8();
 		}
 		QVariantMap colorsMap = colorsObject.toVariantMap();
@@ -148,10 +148,10 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 {
 	QFile designTokenFile;
 	QDir outputDir(outputDirPath);
-	if(!outputDir.exists()){
-        bool createOutputDir = istd::CSystem::EnsurePathExists(outputDirPath.toUtf8());
-		if(!createOutputDir){
-            qCritical() << "Cannot create output dir" << outputDirPath.toLocal8Bit();
+	if (!outputDir.exists()){
+		bool createOutputDir = istd::CSystem::EnsurePathExists(outputDirPath.toUtf8());
+		if (!createOutputDir){
+			qCritical() << "Cannot create output dir" << outputDirPath.toLocal8Bit();
 			return false;
 		}
 	}
@@ -215,8 +215,9 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 		QFile outputSingleThemeFile(outputSingleThemeFileName);
 		bool openOutputFile = outputSingleThemeFile.open(QFile::WriteOnly);
 		if(!openOutputFile){
-            qCritical() << "Cannot open output file" << outputSingleThemeFile.fileName();
-            return false;
+			qCritical() << "Cannot open output file" << outputSingleThemeFile.fileName();
+
+			return false;
 		}
 		outputSingleThemeFile.write(QJsonDocument(designTokenObjectSplitted).toJson());
 		outputSingleThemeFile.close();
