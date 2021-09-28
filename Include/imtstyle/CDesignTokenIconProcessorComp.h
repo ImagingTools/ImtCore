@@ -28,12 +28,12 @@ public:
 		I_REGISTER_INTERFACE(IDesignTokenProcessor);
 		I_ASSIGN(m_argumentParserAttrPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
 		I_ASSIGN(m_designTokenFileParserAttrPtr, "DesignTokenFileParser", "Design token file parser", true, "IDesignTokenFileParser")
-		I_ASSIGN(m_paramSetAttrPtr, "ParamSet", "Param set", false, "IParamsSet")
 	I_END_COMPONENT;
 
 	// reimplemented (IDesignTokenProcessor)
 	int Exec() override;
 	QByteArray GetHelpString() const override;
+
 
 private:
 	constexpr static const char* s_suffixOffNormal = "_Off_Normal";
@@ -47,7 +47,6 @@ private:
 
 	I_REF(IDesignTokenArgumentsParser, m_argumentParserAttrPtr);
 	I_REF(IDesignTokenFileParser, m_designTokenFileParserAttrPtr);
-	I_REF(iprm::IParamsSet, m_paramSetAttrPtr);
 
 	QByteArray m_templateIconColor;
 	QByteArray m_normalColor;
@@ -66,15 +65,26 @@ private:
 	QByteArray m_projectName;
 	QFileInfo m_designTokenFileInfo;
 
+
 private:
-	/// sets new color in single image
+	/**
+		sets new color in single image
+	*/
 	bool SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor = QByteArray()) const;
-	/// sets all available colors for single images
+
+	/**
+		sets all available colors for single images
+	*/
 	bool SetColorForAllModeState(const QByteArray& fileName, const QByteArray& outputDirName) const;
-	/// sets all colors for all images in directory
+	/**
+		sets all colors for all images in directory
+	*/
 	bool SetColorAllFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName) const;
-	/// Checks for ignore some files e.g.? if it has suffix
+	/**
+		Checks for ignore some files e.g.? if it has suffix
+	*/
 	bool IgnoreFile(const QFileInfo& fileInfo) const;
+
 };
 
 

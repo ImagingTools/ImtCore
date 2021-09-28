@@ -34,11 +34,11 @@ public:
 	bool SplitFile(const QString& outputDirPath, const QString& projectName) override;
 	bool SetFile(const QByteArray& filePath) override;
 
-    QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const override;	
+	QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const override;
 	bool GetStyleSheetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const override;
 
 	QByteArray GetTemplateIconColor(const QByteArray& styleName) const override;
-    QByteArray GetNormalColor(const QByteArray& styleName) const override;
+	QByteArray GetNormalColor(const QByteArray& styleName) const override;
 	QByteArray GetOffNormalColor(const QByteArray& styleName) const override;
 	QByteArray GetOffDisabledColor(const QByteArray& styleName) const override;
 	QByteArray GetOffActiveColor(const QByteArray& styleName) const override;
@@ -76,19 +76,19 @@ private:
 	QMap<QString, istd::TSmartPtr<imtbase::ICollectionInfo>> m_fontsCollectionInfos;
 	QMap<QString, QMap<QByteArray, QFont>> m_fonts;
 
-    struct RawColor
-    {
-       RawColor(QPalette::ColorGroup group, QPalette::ColorRole role, const QByteArray& value)
-       {
-           this->group = group;
-           this->role = role;
-           this->value = value;
-       }
-       QPalette::ColorGroup group;
-       QPalette::ColorRole role;
-       QByteArray value;
-    };
-    QMultiMap<QByteArray, RawColor> m_styleSheetColors;
+	struct RawColor
+	{
+		RawColor(QPalette::ColorGroup group, QPalette::ColorRole role, const QByteArray& value)
+		{
+			this->group = group;
+			this->role = role;
+			this->value = value;
+		}
+		QPalette::ColorGroup group;
+		QPalette::ColorRole role;
+		QByteArray value;
+	};
+	QMultiMap<QByteArray, RawColor> m_styleSheetColors;
 
 };
 

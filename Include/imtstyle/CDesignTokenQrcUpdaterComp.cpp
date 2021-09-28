@@ -31,9 +31,9 @@ int CDesignTokenQrcUpdaterComp::Exec()
 		for(const QString& resType: ::qAsConst(typesOfResources)) {
 			dirsForTheme << outputDirName  + dirSeparator + "Resources" + dirSeparator + resType + dirSeparator + styleName;
 		}
-        if(!CreateQrcForDirs(dirsForTheme, QByteArray(outputDirName) + dirSeparator + projectName + styleName.toLower() + ".qrc")){
-            return -1;
-        }
+		if(!CreateQrcForDirs(dirsForTheme, QByteArray(outputDirName) + dirSeparator + projectName + styleName.toLower() + ".qrc")){
+			return -1;
+		}
 	}
 
 	return 0;
@@ -106,10 +106,10 @@ bool CDesignTokenQrcUpdaterComp::CreateQrcRecursivly(const QString& inputDirName
 bool CDesignTokenQrcUpdaterComp::CreateQrcForDirs(const QStringList& inputDirNames, const QByteArray& outputFileName) const
 {
 	QFile outputFile(outputFileName);
-    bool openResourceFile = outputFile.open(QFile::WriteOnly);
-    if(!openResourceFile){
-        qCritical() << "Cannot open resource file" << outputFileName;
-    }
+	bool openResourceFile = outputFile.open(QFile::WriteOnly);
+	if(!openResourceFile){
+		qCritical() << "Cannot open resource file" << outputFileName;
+	}
 	QXmlStreamWriter xmlWriter(&outputFile);
 	xmlWriter.setAutoFormatting(1);
 

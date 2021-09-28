@@ -29,6 +29,7 @@ public:
 		I_ASSIGN(m_designTokenFileParserAttrPtr, "DesignTokenFileParser", "Design token file parser", true, "IDesignTokenFileParser")
 	I_END_COMPONENT;
 
+	// reimplemented (IDesignTokenProcessor)
 	int Exec() override;
 	QByteArray GetHelpString() const override;
 

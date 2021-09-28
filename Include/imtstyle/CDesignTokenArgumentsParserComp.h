@@ -25,16 +25,24 @@ public:
 		I_REGISTER_INTERFACE(IDesignTokenArgumentsParser);
 	I_END_COMPONENT;
 
-	/// Checking arguments and returns containing value \c argument
+	/**
+		Checking arguments and returns containing value \c argument
+	*/
 	bool CheckArgument(AvailableArguments argument) const;
 
-	/// Getting argument's key and returns it
+	/**
+		Getting argument's key and returns it
+	*/
 	QByteArray GetArgumentKey(AvailableArguments argument) const;
 
-	/// Getting argument's value and returns it
+	/**
+		Getting argument's value and returns it
+	*/
 	QByteArray GetArgumentValue(AvailableArguments argument) const;
 
-	/// Getting argument's value and returns it
+	/**
+	Getting argument's value and returns it
+	*/
 	QByteArrayList GetArgumentValueMulti(AvailableArguments argument) const;
 
 	// reimplemented (IDesignTokenArgumentsParser)
