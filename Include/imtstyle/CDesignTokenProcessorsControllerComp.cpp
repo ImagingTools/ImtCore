@@ -1,4 +1,5 @@
 #include <imtstyle/CDesignTokenProcessorsControllerComp.h>
+#include <QtCore/QLockFile>
 
 namespace imtstyle
 {
@@ -14,14 +15,22 @@ void CDesignTokenProcessorsControllerComp::OnComponentCreated()
 		beginInfoString += "\n\t| Output path: " + m_argumentParserAttrPtr->GetOutputDirectoryPath();
 		beginInfoString += "\n\t| Styles path: " + m_argumentParserAttrPtr->GetStyleSheetsInputDirectoryPath();
 	}
+	qInfo() << ::qPrintable(beginInfoString);
 
-	qCritical() << ::qPrintable(beginInfoString);
+	QString lockFileName = m_argumentParserAttrPtr->GetOutputDirectoryPath() + "/DesignToken.lock";
+	QLockFile lockFile(lockFileName);
+	if(!lockFile.lock()){
+		qWarning() << "Unable to lock " << lockFileName;
+	}
+
 
 	for (int i = 0; i < m_designTokenProcessors.GetCount(); ++i){
 		if(m_designTokenProcessors[i]->Exec() != 0){
+			lockFile.unlock();
 			::exit(-1);
 		}
 	}
+	lockFile.unlock();
 	QCoreApplication::exit(0);
 }
 

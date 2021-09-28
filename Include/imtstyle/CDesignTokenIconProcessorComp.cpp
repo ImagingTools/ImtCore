@@ -33,6 +33,10 @@ QByteArray CDesignTokenIconProcessorComp::GetHelpString() const
 
 int CDesignTokenIconProcessorComp::Exec()
 {
+	if(m_argumentParserAttrPtr->GetImagesInputDirectoryPath().isEmpty()){
+		qDebug() << "Images dir is not set skipping...";
+		return 0;
+	}
 	if(!QDir(m_argumentParserAttrPtr->GetImagesInputDirectoryPath()).isReadable()){
 		return -1;
 	}

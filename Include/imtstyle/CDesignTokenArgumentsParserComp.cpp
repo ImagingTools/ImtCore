@@ -53,7 +53,9 @@ QByteArray CDesignTokenArgumentsParserComp::GetArgumentValue(AvailableArguments 
 	int indexOfArg = m_arguments.indexOf(AC_key);
 
 	if(indexOfArg > -1 && m_arguments.size() > ++indexOfArg){
-		retval = m_arguments[indexOfArg];
+		if(!m_arguments[indexOfArg].startsWith('-')){
+			retval = m_arguments[indexOfArg];
+		}
 	}
 
 	return retval;
