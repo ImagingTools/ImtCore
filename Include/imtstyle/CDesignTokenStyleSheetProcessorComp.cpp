@@ -181,8 +181,8 @@ bool CDesignTokenStyleSheetProcessorComp::SetVariableColor(QByteArray& data, con
 					colorHex = color.name().toUtf8();
 				}
 				data.replace(indexOfBeginVariable, lengthOfVariable+3, colorHex);
+                return true;
 			}
-			return true;
 		}
 	}
 	return false;

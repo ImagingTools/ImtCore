@@ -310,7 +310,15 @@ bool CImtStyleUtils::CopyDirectoryRecursivly(const QByteArray& inputDirPath, con
 			}
 		}
 		else {
-			QFile::copy(inputDirEntry.absoluteFilePath(), outputDirPath + QDir::separator().toLatin1() + inputDirEntry.fileName());
+            QFile inputFile(inputDirEntry.absoluteFilePath());
+            QFile outputFile(outputDirPath + QDir::separator().toLatin1() + inputDirEntry.fileName());
+            inputFile.open(QFile::ReadOnly);
+            QByteArray inputFileData = inputFile.readAll();
+            inputFile.close();
+            outputFile.open(QFile::WriteOnly);
+            qint64 bytesWritten = outputFile.write(inputFileData);
+            outputFile.close();
+            Q_ASSERT(bytesWritten > 0);
 		}
 	}
 	return true;
@@ -774,6 +782,11 @@ bool CImtStyleUtils::CreateCssFont(QByteArray& output, const QFont& font)
 bool CImtStyleUtils::SetVariable_(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QMap<QByteArray, QByteArray> variables)
 {
 
+    QMap<QByteArray, QByteArray> upperVariables = variables;
+    for(const QByteArray& variablesKey: upperVariables.keys()){
+        upperVariables[variablesKey] = upperVariables[variablesKey].toUpper();
+    }
+
 	/// points to 'beginSymbol' symbol
 	int indexOfBeginVariable = -1;
 	/// points to 'endSymbol' symbol
@@ -803,9 +816,10 @@ bool CImtStyleUtils::SetVariable_(QByteArray& data, const QChar& variableBeginSy
 
 			int lengthOfVariable = indexOfEndVariable - indexOfBeginVariable - 2;
 			QByteArray variableName = data.mid(indexOfBeginVariable+2, lengthOfVariable);
+            variableName = variableName.toUpper();
 
-			if(variables.contains(variableName)){
-				data.replace(indexOfBeginVariable, lengthOfVariable+3, variables[variableName]);
+            if(variables.contains(variableName)){
+                data.replace(indexOfBeginVariable, lengthOfVariable+3, variables[variableName]);
 				return true;
 			}
 		}
