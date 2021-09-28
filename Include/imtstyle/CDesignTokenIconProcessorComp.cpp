@@ -94,8 +94,12 @@ int CDesignTokenIconProcessorComp::Exec()
 			return 0;
 		}
 		else if(m_inputDirName.length() && m_outputDirName.length()){
-			SetColorAllFilesInDir(m_inputDirName, m_outputDirName);
-			return 0;
+            if(!SetColorAllFilesInDir(m_inputDirName, m_outputDirName)){
+                return -1;
+            }
+            else {
+                return 0;
+            }
 		}
 		else {
 			qCritical() << "Unexpected error";
@@ -105,12 +109,18 @@ int CDesignTokenIconProcessorComp::Exec()
 	}
 	else {
 		m_designTokenFileParserAttrPtr->SetFile(m_argumentParserAttrPtr->GetDesignTokenFilePath());
-		m_designTokenFileParserAttrPtr->ParseFile();
+        if(!m_designTokenFileParserAttrPtr->ParseFile()){
+            return -1;
+        }
 
 		QVector<QByteArray> styles = m_designTokenFileParserAttrPtr->GetDesignSchemaList().GetElementIds();
 		m_outputDirName = m_argumentParserAttrPtr->GetOutputDirectoryPath();
 		m_inputDirName = m_argumentParserAttrPtr->GetImagesInputDirectoryPath();
 		m_projectName = m_argumentParserAttrPtr->GetProjectName();
+        if(!m_inputDirName.length()){
+            qInfo() << "Icons dir is not set skipping...";
+            return 0;
+        }
 
 		for (const QByteArray& styleName: ::qAsConst(styles)){
 			m_templateIconColor = m_designTokenFileParserAttrPtr->GetTemplateIconColor(styleName);
@@ -135,8 +145,25 @@ int CDesignTokenIconProcessorComp::Exec()
 					break;
 				}
 			}
-			CImtStyleUtils::CopyDirectoryRecursivly(colorResourceDir.absolutePath().toUtf8(), outputDirName);
-			SetColorAllFilesInDir(m_inputDirName, outputDirName);
+            istd::CSystem::CopyDirectory(colorResourceDir.absolutePath().toUtf8(), outputDirName);
+
+            QDir outputDir(outputDirName);
+            QFileInfoList outputDirEntries = outputDir.entryInfoList(QDir::Files);
+
+            for (const QFileInfo& outputDirEntry : ::qAsConst(outputDirEntries)){
+                if(outputDirEntry.isFile()){
+                QFile file(outputDirEntry.absoluteFilePath());
+                file.setPermissions(file.permissions() |
+                            QFileDevice::WriteOwner |
+                            QFileDevice::WriteUser  |
+                            QFileDevice::WriteGroup |
+                            QFileDevice::WriteOther);
+                }
+            }
+
+            if(!SetColorAllFilesInDir(m_inputDirName, outputDirName)){
+                return -1;
+            }
 		}
 	}
 
@@ -144,21 +171,22 @@ int CDesignTokenIconProcessorComp::Exec()
 }
 
 
-void CDesignTokenIconProcessorComp::SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor) const
+bool CDesignTokenIconProcessorComp::SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor) const
 {
 	QByteArray fileData;
 
 	QFile originalImageFile(fileName);
 	bool openInputImageFile = originalImageFile.open(QFile::ReadOnly);
 	if(!openInputImageFile){
-		Q_ASSERT(openInputImageFile);
-		return ;
+        qCritical() << "Cannot open image file" << fileName;
+        return false;
 	}
 	fileData = originalImageFile.readAll();
 	originalImageFile.close();
-	Q_ASSERT(fileData.length());
-
-//	fileData.replace((reolacebleColor.length() ? reolacebleColor : m_templateIconColor), replacedColor);
+    if(fileData.length() < 1){
+        qWarning() << "Skpiipng empty file" << fileName;
+        return true;
+    }
 
     QRegularExpression groupRegEx(QByteArray(reolacebleColor.length() ? reolacebleColor : m_templateIconColor), QRegularExpression::PatternOption::CaseInsensitiveOption);
     QRegularExpressionMatchIterator globalMatch = groupRegEx.globalMatch(fileData);
@@ -172,27 +200,31 @@ void CDesignTokenIconProcessorComp::SetColor(const QByteArray& fileName, const Q
 
 	QFile outputImageFile(outputFileName);
 	bool openOutputImageFile = outputImageFile.open(QFile::WriteOnly);
-	if(!openOutputImageFile){
-		Q_ASSERT(openOutputImageFile);
-		return;
+    if(!openOutputImageFile){
+        qCritical() << "Cannot open output file" << outputFileName;
+        outputImageFile.close();
+        return false;
 	}
 	const qint64& writeBytes = outputImageFile.write(fileData);
 	if(writeBytes <= 0){
-		Q_ASSERT(0);
+        qCritical() << "Unable to write file" << outputFileName;
+        outputImageFile.close();
+        return false;
 	}
 	outputImageFile.flush();
 	outputImageFile.close();
+    return true;
 }
 
 
-void CDesignTokenIconProcessorComp::SetColorForAllModeState(const QByteArray& fileName, const QByteArray& outputDirName) const
+bool CDesignTokenIconProcessorComp::SetColorForAllModeState(const QByteArray& fileName, const QByteArray& outputDirName) const
 {
 	QDir outputDir(outputDirName);
-	if(!outputDir.exists()){
-		bool createOutputDir = CImtStyleUtils::CreateDirWithDelay(outputDirName);
+    if(!outputDir.exists()){
+        bool createOutputDir = istd::CSystem::EnsurePathExists(outputDirName);
 		if(!createOutputDir){
-			Q_ASSERT(createOutputDir);
-			return;
+            qCritical() << "Cannot create output dir" << outputDirName;
+            return false;
 		}
 	}
 
@@ -210,51 +242,70 @@ void CDesignTokenIconProcessorComp::SetColorForAllModeState(const QByteArray& fi
 	}
 
 	if(m_normalColor.length()){
-		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + inputFileSuffix), m_normalColor);
+        if(!SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + inputFileSuffix), m_normalColor)){
+            return false;
+        }
 	}
 
 	if (m_offNormalColor.length()){
-		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffNormal + inputFileSuffix), m_offNormalColor);
+        if(!SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffNormal + inputFileSuffix), m_offNormalColor)){
+            return false;
+        }
 	}
 
 	if (m_offDisabledColor.length()){
-		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffDisabled + inputFileSuffix), m_offDisabledColor);
+        if(!SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffDisabled + inputFileSuffix), m_offDisabledColor)){
+            return false;
+        }
 	}
 
 	if (m_offActiveColor.length()){
-		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffActive + inputFileSuffix), m_offActiveColor);
+        if(!SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffActive + inputFileSuffix), m_offActiveColor)){
+            return false;
+        }
 	}
 
 	if (m_offSelectedColor.length()){
-		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffSelected + inputFileSuffix), m_offSelectedColor);
+        if(!SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffSelected + inputFileSuffix), m_offSelectedColor)){
+            return false;
+        }
 	}
 
 	if (m_onNormalColor.length()){
-		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnNormal + inputFileSuffix), m_onNormalColor);
+        if(!SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnNormal + inputFileSuffix), m_onNormalColor)){
+            return false;
+        }
 	}
 
 	if (m_onDisabledColor.length()){
-		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnDisabled + inputFileSuffix), m_onDisabledColor);
+        if(!SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnDisabled + inputFileSuffix), m_onDisabledColor)){
+            return false;
+        }
 	}
 
 	if (m_onActiveColor.length()){
-		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnActive + inputFileSuffix), m_onActiveColor);
+        if(!SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnActive + inputFileSuffix), m_onActiveColor)){
+            return false;
+        }
 	}
 
 	if (m_onSelectedColor.length()){
-		SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnSelected + inputFileSuffix), m_onSelectedColor);
+        if(!SetColor(fileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnSelected + inputFileSuffix), m_onSelectedColor)){
+            return false;
+        }
 	}
+    return true;
 }
 
 
-void CDesignTokenIconProcessorComp::SetColorAllFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName) const
+bool CDesignTokenIconProcessorComp::SetColorAllFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName) const
 {
 	QDir outputDir(outputDirName);
 	if(!outputDir.exists()){
-		bool createOutputDir = CImtStyleUtils::CreateDirWithDelay(outputDirName);
-		if(createOutputDir){
-			Q_ASSERT(createOutputDir);
-			return;
+        bool createOutputDir = istd::CSystem::EnsurePathExists(outputDirName);
+        if(!createOutputDir){
+            qCritical() << "Cannot create output dir" << outputDirName;
+            return false;
 		}
 	}
 
@@ -266,9 +317,12 @@ void CDesignTokenIconProcessorComp::SetColorAllFilesInDir(const QByteArray& inpu
 
 	for (const QFileInfo& inputFile: ::qAsConst(inputFiles)){
 		if(!IgnoreFile(inputFile)){
-			SetColorForAllModeState(inputFile.absoluteFilePath().toLocal8Bit(), outputDirName);
+            if(!SetColorForAllModeState(inputFile.absoluteFilePath().toLocal8Bit(), outputDirName)){
+                return false;
+            }
 		}
 	}
+    return true;
 }
 
 bool CDesignTokenIconProcessorComp::IgnoreFile(const QFileInfo& fileInfo) const

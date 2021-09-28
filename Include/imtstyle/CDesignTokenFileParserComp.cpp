@@ -63,17 +63,20 @@ bool CDesignTokenFileParserComp::ParseFile()
 	if (m_designTokenFileInfo.isReadable()){
 		designTokenFile.setFileName(m_designTokenFileInfo.absoluteFilePath());
 	}
-	else{
-		designTokenFile.setFileName(m_designTokenFilePathAttrPtr->GetPath());
-	}
+    else{
+        if(m_designTokenFilePathAttrPtr.IsValid()){
+            designTokenFile.setFileName(m_designTokenFilePathAttrPtr->GetPath());
+        }
+        else{
+            qCritical() << "Unable to open theme file" << m_designTokenFileInfo.absoluteFilePath();
+            return false;
+        }
+    }
 
 	if (!designTokenFile.open(QFile::ReadOnly)){
-        QString errorString = QString("Cannot read file") + ::qPrintable(designTokenFile.fileName());
+        QString errorString = QString("Cannot read file ") + ::qPrintable(designTokenFile.fileName());
         qCritical() << errorString;
-
-        Q_ASSERT_X(false, "CDesignTokenFileParserComp::ParseFile", errorString.toLocal8Bit());
-        ::exit(-1);
-		return false;
+        return false;
 	}
 
 	QByteArray fileData = designTokenFile.readAll();
@@ -81,11 +84,8 @@ bool CDesignTokenFileParserComp::ParseFile()
 	QJsonObject designTokenObject = jsonDocument.object();
 
     if(designTokenObject.isEmpty()) {
-        QString errorString = QString("Cannot read file") + ::qPrintable(designTokenFile.fileName());
+        QString errorString = QString("Invalid data in file ") + ::qPrintable(designTokenFile.fileName());
         qCritical() << errorString;
-
-        Q_ASSERT_X(false, "CDesignTokenFileParserComp::ParseFile", errorString.toLocal8Bit());
-        ::exit(-1);
         return false;
 	}
 
@@ -98,10 +98,6 @@ bool CDesignTokenFileParserComp::ParseFile()
 	if(designTokenStylesArray.isEmpty()) {
         QString errorString = QString("Cannot parse Styles") + ::qPrintable(designTokenFile.fileName());
         qCritical() << errorString;
-
-        Q_ASSERT_X(false, "CDesignTokenFileParserComp::ParseFile", errorString.toLocal8Bit());
-        ::exit(-1);
-
 		return false;
 	}
 
@@ -153,9 +149,9 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 	QFile designTokenFile;
 	QDir outputDir(outputDirPath);
 	if(!outputDir.exists()){
-		bool createOutputDir = CImtStyleUtils::CreateDirWithDelay(outputDirPath.toUtf8());
+        bool createOutputDir = istd::CSystem::EnsurePathExists(outputDirPath.toUtf8());
 		if(!createOutputDir){
-			Q_ASSERT(createOutputDir);
+            qCritical() << "Cannot create output dir" << outputDirPath.toLocal8Bit();
 			return false;
 		}
 	}
@@ -219,8 +215,8 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 		QFile outputSingleThemeFile(outputSingleThemeFileName);
 		bool openOutputFile = outputSingleThemeFile.open(QFile::WriteOnly);
 		if(!openOutputFile){
-			Q_ASSERT(openOutputFile);
-			return openOutputFile;
+            qCritical() << "Cannot open output file" << outputSingleThemeFile.fileName();
+            return false;
 		}
 		outputSingleThemeFile.write(QJsonDocument(designTokenObjectSplitted).toJson());
 		outputSingleThemeFile.close();

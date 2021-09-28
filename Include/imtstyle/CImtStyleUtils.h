@@ -6,6 +6,7 @@
 #include <QtGui/QFont>
 
 
+
 // ImtCore includes
 #include <imtbase/CJsonHelper.h>
 
@@ -25,10 +26,7 @@ class CImtStyleUtils: imtbase::CJsonHelper
 
 public:
 	//-------------basic
-	static bool CreateDirWithDelay(const QByteArray& dirPath, int delayMsec = 5000, int attempts = 3);
-	static void Delay(int msec);
 	static QByteArrayList GetVariables(const QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol);
-	static bool CopyDirectoryRecursivly(const QByteArray& inputDirPath, const QByteArray& outputDirPath, const QFileInfoList& specificEntries = QFileInfoList());
 
 	static bool SetVariables(QByteArray& data,
 							const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol,

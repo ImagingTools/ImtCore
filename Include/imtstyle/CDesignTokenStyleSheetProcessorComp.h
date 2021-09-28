@@ -36,8 +36,8 @@ public:
 
 
 private:
-	void ProcessAllCssFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName) const;
-	void ProcesCssFile(const QByteArray& fileName, const QByteArray& outputFileName) const;
+    bool ProcessAllCssFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName) const;
+    bool ProcesCssFile(const QByteArray& fileName, const QByteArray& outputFileName) const;
 	bool SetVariableColor(QByteArray& data, const QPalette& palette) const;
 
 

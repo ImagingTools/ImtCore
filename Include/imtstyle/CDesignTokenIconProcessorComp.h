@@ -7,6 +7,7 @@
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/IParamsSet.h>
+#include <istd/CSystem.h>
 
 // ImtCore includes
 #include <imtstyle/IDesignTokenProcessor.h>
@@ -70,11 +71,11 @@ private:
 
 private:
 	/// sets new color in single image
-	void SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor = QByteArray()) const;
+    bool SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor = QByteArray()) const;
 	/// sets all available colors for single images
-	void SetColorForAllModeState(const QByteArray& fileName, const QByteArray& outputDirName) const;
+    bool SetColorForAllModeState(const QByteArray& fileName, const QByteArray& outputDirName) const;
 	/// sets all colors for all images in directory
-	void SetColorAllFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName) const;
+    bool SetColorAllFilesInDir(const QByteArray& inputDirName, const QByteArray& outputDirName) const;
 	/// Checks for ignore some files e.g.? if it has suffix
 	bool IgnoreFile(const QFileInfo& fileInfo) const;
 

@@ -218,32 +218,6 @@ bool SetVariableColor(QByteArray& data, const QPalette& palette)
 	return false;
 }
 
-
-bool CImtStyleUtils::CreateDirWithDelay(const QByteArray& dirPath, int delayMsec, int attempts)
-{
-	QDir outputDir(dirPath);
-	bool createOutputDit = outputDir.mkpath(dirPath) || outputDir.isReadable() || outputDir.exists();
-	for(int i = 0; i < attempts; ++i){
-		createOutputDit = outputDir.mkpath(dirPath) || outputDir.isReadable() || outputDir.exists();
-		if(createOutputDit){
-			break;
-		}
-		else {
-			CImtStyleUtils::Delay(delayMsec);
-		}
-	}
-	return createOutputDit;
-}
-
-void CImtStyleUtils::Delay(int msec)
-{
-#ifdef Q_OS_WIN
-	::Sleep(msec);
-#elif defined(Q_OS_LINUX)
-	::sleep(int(msec/1000));
-#endif
-}
-
 QByteArrayList CImtStyleUtils::GetVariables(const QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol)
 {
 	QByteArrayList retval;
@@ -281,49 +255,6 @@ QByteArrayList CImtStyleUtils::GetVariables(const QByteArray& data, const QChar&
 	}
 	return retval;
 }
-
-bool CImtStyleUtils::CopyDirectoryRecursivly(const QByteArray& inputDirPath, const QByteArray& outputDirPath, const QFileInfoList& specificEntries)
-{
-	QDir inputDir(inputDirPath);
-	if(!inputDir.isReadable()){
-		return false;
-	}
-	QDir outputDir(outputDirPath);
-	if(!outputDir.exists()){
-		bool createOutputDir = outputDir.mkpath(outputDirPath) || outputDir.isReadable();
-		if(!createOutputDir){
-			qCritical() << __FILE__ << __LINE__ << "Unable to create output path" << outputDirPath;
-			Q_ASSERT(createOutputDir);
-			return false;
-		}
-	}
-	QFileInfoList inputDirEntries = specificEntries.size() ? specificEntries : inputDir.entryInfoList(QDir::Dirs |
-				QDir::Files			 |
-				QDir::NoDotAndDotDot,
-				QDir::DirsFirst);
-
-	for (const QFileInfo& inputDirEntry : ::qAsConst(inputDirEntries)){
-		if(inputDirEntry.isDir()){
-			if (!CopyDirectoryRecursivly(inputDirEntry.absoluteFilePath().toUtf8(),
-										 outputDirPath + QDir::separator().toLatin1() + inputDirEntry.baseName().toUtf8())){
-				qCritical() << __FILE__ << __LINE__ << "Unable to Copy From '" << inputDirPath << "' TO '" << outputDirPath << "'\n";
-			}
-		}
-		else {
-            QFile inputFile(inputDirEntry.absoluteFilePath());
-            QFile outputFile(outputDirPath + QDir::separator().toLatin1() + inputDirEntry.fileName());
-            inputFile.open(QFile::ReadOnly);
-            QByteArray inputFileData = inputFile.readAll();
-            inputFile.close();
-            outputFile.open(QFile::WriteOnly);
-            qint64 bytesWritten = outputFile.write(inputFileData);
-            outputFile.close();
-            Q_ASSERT(bytesWritten > 0);
-		}
-	}
-	return true;
-}
-
 
 bool CImtStyleUtils::SetVariables(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QMap<QByteArray, QByteArray> variables)
 {
