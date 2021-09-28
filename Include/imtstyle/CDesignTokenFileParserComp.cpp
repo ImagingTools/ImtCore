@@ -68,8 +68,11 @@ bool CDesignTokenFileParserComp::ParseFile()
 	}
 
 	if (!designTokenFile.open(QFile::ReadOnly)){
-		qCritical() << "Cannot read file" << ::qPrintable(designTokenFile.fileName());
+        QString errorString = QString("Cannot read file") + ::qPrintable(designTokenFile.fileName());
+        qCritical() << errorString;
 
+        Q_ASSERT_X(false, "CDesignTokenFileParserComp::ParseFile", errorString.toLocal8Bit());
+        ::exit(-1);
 		return false;
 	}
 
@@ -77,10 +80,13 @@ bool CDesignTokenFileParserComp::ParseFile()
 	QJsonDocument jsonDocument = QJsonDocument::fromJson(fileData);
 	QJsonObject designTokenObject = jsonDocument.object();
 
-	if(designTokenObject.isEmpty()) {
-		qCritical() << "Cannot parse JSON";
+    if(designTokenObject.isEmpty()) {
+        QString errorString = QString("Cannot read file") + ::qPrintable(designTokenFile.fileName());
+        qCritical() << errorString;
 
-		return false;
+        Q_ASSERT_X(false, "CDesignTokenFileParserComp::ParseFile", errorString.toLocal8Bit());
+        ::exit(-1);
+        return false;
 	}
 
 	m_templateIconColor = designTokenObject["TemplateIconColor"].toString().toUtf8();
@@ -90,7 +96,11 @@ bool CDesignTokenFileParserComp::ParseFile()
 	designTokenStylesArray << singleStyle;
 
 	if(designTokenStylesArray.isEmpty()) {
-		qCritical() << "Cannot parse Styles";
+        QString errorString = QString("Cannot parse Styles") + ::qPrintable(designTokenFile.fileName());
+        qCritical() << errorString;
+
+        Q_ASSERT_X(false, "CDesignTokenFileParserComp::ParseFile", errorString.toLocal8Bit());
+        ::exit(-1);
 
 		return false;
 	}

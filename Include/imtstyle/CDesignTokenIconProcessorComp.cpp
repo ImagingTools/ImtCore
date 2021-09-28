@@ -158,7 +158,17 @@ void CDesignTokenIconProcessorComp::SetColor(const QByteArray& fileName, const Q
 	originalImageFile.close();
 	Q_ASSERT(fileData.length());
 
-	fileData.replace((reolacebleColor.length() ? reolacebleColor : m_templateIconColor), replacedColor);
+//	fileData.replace((reolacebleColor.length() ? reolacebleColor : m_templateIconColor), replacedColor);
+
+    QRegularExpression groupRegEx(QByteArray(reolacebleColor.length() ? reolacebleColor : m_templateIconColor), QRegularExpression::PatternOption::CaseInsensitiveOption);
+    QRegularExpressionMatchIterator globalMatch = groupRegEx.globalMatch(fileData);
+
+    while(globalMatch.hasNext()){
+        QRegularExpressionMatch groupRegExMatch;
+        groupRegExMatch = globalMatch.next();
+        fileData.replace(groupRegExMatch.capturedStart(), groupRegExMatch.capturedLength(),replacedColor);
+    }
+
 
 	QFile outputImageFile(outputFileName);
 	bool openOutputImageFile = outputImageFile.open(QFile::WriteOnly);
