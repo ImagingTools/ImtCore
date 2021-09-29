@@ -4,12 +4,12 @@
 // Qt includes
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
-#include <QtCore/QTimer>
 #include <QtCore/QStandardPaths>
 
 // ACF includes
 #include <istd/CCrcCalculator.h>
 #include <istd/CSystem.h>
+#include <ilog/CMessage.h>
 
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
@@ -29,9 +29,77 @@ CLicenseControllerComp::CLicenseControllerComp()
 }
 
 
+// reimplemented (ILicenseController)
+
+bool CLicenseControllerComp::ImportLicense(const QString& licenseFilePath, ilog::IMessageConsumer* logPtr) const
+{
+	if (m_licensePathCompPtr.IsValid() && m_productInstancePersistenceCompPtr.IsValid() && m_productInstanceCompPtr.IsValid()){
+		QString targetFilePath = m_licensePathCompPtr->GetPath();
+
+		QFileInfo licenseFileInfo(targetFilePath);
+
+		if (!targetFilePath.isEmpty()){
+			// Backup the license file:
+			QString backupFilePath;
+			if (licenseFileInfo.exists()){
+				backupFilePath = QDir::tempPath() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "/License.lic";
+				if (!istd::CSystem::FileCopy(targetFilePath, backupFilePath)){
+					if (logPtr != nullptr){
+						ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, tr("Backup of the existing license failed. Import canceled"), "License Manager"));
+
+						logPtr->AddMessage(messagePtr);
+					}
+
+					return false;
+				}
+			}
+
+			if (istd::CSystem::FileCopy(licenseFilePath, targetFilePath, true)){
+				int licenseState = m_productInstancePersistenceCompPtr->LoadFromFile(*m_productInstanceCompPtr, targetFilePath);
+				if (licenseState == ifile::IFilePersistence::OS_OK){
+					OnFingeprintCheckTimer();
+
+					return true;
+				}
+				else{
+					if (logPtr != nullptr){
+						ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, tr("License file could not be imported"), "License Manager"));
+
+						logPtr->AddMessage(messagePtr);
+					}
+
+					// Restore the license backup:
+					if (!backupFilePath.isEmpty()){
+						if (istd::CSystem::FileCopy(backupFilePath, targetFilePath, true)){
+							QFile::remove(backupFilePath);
+						}
+						else{
+							if (logPtr != nullptr){
+								ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, tr("Restore of the last license failed"), "License Manager"));
+
+								logPtr->AddMessage(messagePtr);
+							}
+						}
+					}
+				}
+			}
+			else{
+				if (logPtr != nullptr){
+					ilog::IMessageConsumer::MessagePtr messagePtr(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, tr("License file could not be copied to the target location"), "License Manager"));
+
+					logPtr->AddMessage(messagePtr);
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+
 // protected methods
 
-void CLicenseControllerComp::OnFingeprintCheckTimer()
+void CLicenseControllerComp::OnFingeprintCheckTimer() const
 {
 	SendVerboseMessage(tr("Checking license fingerprint"), tr("License Controller"));
 
@@ -56,12 +124,21 @@ void CLicenseControllerComp::OnComponentCreated()
 	m_licenseKeysProvider.RegisterObject(m_licenseKeysProviderCompPtr.GetPtr(), &CLicenseControllerComp::OnLicenseKeysUpdated);
 
 	m_isInitializing = false;
+
+	int oneHour = 1000 * 60 * 60;
+	QTimer::singleShot(oneHour, this, &CLicenseControllerComp::OnFingeprintCheckTimer);
+
+	connect(&m_checkLicenseTimer, &QTimer::timeout, this, &CLicenseControllerComp::OnFingeprintCheckTimer);
+
+	m_checkLicenseTimer.start(oneHour);
 }
 
 
 void CLicenseControllerComp::OnComponentDestroyed()
 {
 	m_licenseKeysProvider.UnregisterAllObjects();
+
+	m_checkLicenseTimer.stop();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -120,10 +197,6 @@ bool CLicenseControllerComp::ReadLicenseFromFile(imtlic::IProductInstanceInfo& l
 
 		SendInfoMessage(0, QString(QObject::tr("License was successfully loaded")), "License Management");
 	}
-
-	int oneHour = 1000 * 60 * 60;
-
-	QTimer::singleShot(oneHour, this, &CLicenseControllerComp::OnFingeprintCheckTimer);
 
 	return true;
 }

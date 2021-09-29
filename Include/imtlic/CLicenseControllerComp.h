@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QTimer>
+
 // ACF includes
 #include <imod/IModel.h>
 #include <ilog/TLoggerCompWrap.h>
@@ -11,6 +14,7 @@
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtcrypt/IEncryptionKeysProvider.h>
 #include <imtlic/IProductInstanceInfo.h>
+#include <imtlic/ILicenseController.h>
 
 
 namespace imtlic
@@ -21,7 +25,7 @@ namespace imtlic
 	Client-side license check controller.
 	\ingroup LicenseManagement
 */
-class CLicenseControllerComp: public QObject, public ilog::CLoggerComponentBase
+class CLicenseControllerComp: public QObject, public ilog::CLoggerComponentBase, virtual public ILicenseController
 {
 	Q_OBJECT
 
@@ -29,6 +33,7 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CLicenseControllerComp);
+		I_REGISTER_INTERFACE(ILicenseController);
 		I_ASSIGN(m_productInstanceCompPtr, "ProductInstance", "Instance of the product installation", true, "ProductInstance");
 		I_ASSIGN(m_productInstancePersistenceCompPtr, "ProductInstancePersistence", "Encrypted ersistence for the product instance", true, "ProductInstancePersistence");
 		I_ASSIGN(m_fingerprintInstancePersistenceCompPtr, "FingerprintInstancePersistence", "Fingerprint persistence for the product instance", true, "FingerprintPersistence");
@@ -40,8 +45,11 @@ public:
 
 	CLicenseControllerComp();
 
+	// reimplemented (ILicenseController)
+	virtual bool ImportLicense(const QString& licenseFilePath, ilog::IMessageConsumer* logPtr = nullptr) const override;
+
 protected:
-	void OnFingeprintCheckTimer();
+	void OnFingeprintCheckTimer() const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -65,6 +73,8 @@ private:
 	I_REF(ifile::IFileNameParam, m_licenseFingerprintPathCompPtr);
 	I_REF(imtcrypt::IEncryptionKeysProvider, m_licenseKeysProviderCompPtr);
 	I_ATTR(int, m_fingerprintExpirationAttrPtr);
+
+	QTimer m_checkLicenseTimer;
 };
 
 
