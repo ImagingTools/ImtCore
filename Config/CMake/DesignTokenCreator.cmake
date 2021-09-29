@@ -79,9 +79,9 @@ endforeach()
 
 add_custom_command(
 	OUTPUT
-		${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/${PROJECT_NAME}DesignToekn.stamp
+                ${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/${PROJECT_NAME}DesignToken.stamp
 	COMMAND
-		${CMAKE_COMMAND} -E touch ${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/${PROJECT_NAME}DesignToekn.stamp
+                ${CMAKE_COMMAND} -E touch ${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/${PROJECT_NAME}DesignToken.stamp
 	COMMENT
 		"[DesignToken::${PROJECT_NAME}] Creating done"
 	DEPENDS
@@ -90,6 +90,6 @@ add_custom_command(
 	)
 
 add_custom_target(
-	DesignToekn${PROJECT_NAME} ALL
-	DEPENDS ${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/${PROJECT_NAME}DesignToekn.stamp
+        DesignToken${PROJECT_NAME} ALL
+        DEPENDS ${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/${PROJECT_NAME}DesignToken.stamp
 	)

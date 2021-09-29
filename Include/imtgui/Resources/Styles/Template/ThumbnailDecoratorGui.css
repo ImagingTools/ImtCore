@@ -1,6 +1,6 @@
 QTreeWidget#SubPages
 {
-        background: ${Active.Background};
+	background: ${Active.Background};
 	font-weight: bold;
 	text-align: left;
 }
