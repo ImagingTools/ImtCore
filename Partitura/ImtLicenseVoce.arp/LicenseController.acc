@@ -175,6 +175,7 @@
     <ExportedInterfaces>
         <Interface InterfaceId="iauth::IRightsProvider" ComponentId="LicenseBasedRights"/>
         <Interface InterfaceId="imod::IModel" ComponentId="LicenseBasedRights"/>
+        <Interface InterfaceId="imtlic::ILicenseController" ComponentId="LicenseController"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="EncryptedXmlPersistence" ComponentId="EncryptedXmlPersistence"/>
