@@ -11,6 +11,12 @@ namespace imtbase
 
 // public methods
 
+CObjectCollection::CObjectCollection()
+	:m_operationFlags(IObjectCollection::OF_ALL)
+{
+}
+
+
 void CObjectCollection::SetOperationFlags(int flags, const QByteArray& objectId)
 {
 	if (objectId.isEmpty()){

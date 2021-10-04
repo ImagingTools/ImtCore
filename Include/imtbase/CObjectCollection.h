@@ -24,6 +24,8 @@ public:
 	typedef CObjectCollectionBase BaseClass;
 	typedef istd::TComposedFactory<istd::IChangeable> BaseClass2;
 
+	CObjectCollection();
+
 	void SetOperationFlags(int flags, const QByteArray& objectId = QByteArray());
 
 	// reimplemented (imtbase::IObjectCollection)
