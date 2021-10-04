@@ -11,6 +11,35 @@ namespace imtbase
 
 // public methods
 
+void CObjectCollection::SetOperationFlags(int flags, const QByteArray& objectId)
+{
+	if (objectId.isEmpty()){
+		m_operationFlags = flags;
+		return;
+	}
+
+	ObjectInfo* objectInfo = GetObjectInfo(objectId);
+	if (objectInfo != nullptr){
+		objectInfo->flags = flags;
+	} else {
+		m_operationFlags = flags;
+	}
+}
+
+
+// reimplemented (imtbase::IObjectCollection)
+
+int CObjectCollection::GetOperationFlags(const QByteArray& objectId) const
+{
+	ObjectInfo* objectInfo = GetObjectInfo(objectId);
+	if (objectInfo != nullptr){
+		return objectInfo->flags;
+	}
+
+	return m_operationFlags;
+}
+
+
 // reimplemented (istd::IChangeable)
 
 int CObjectCollection::GetSupportedOperations() const

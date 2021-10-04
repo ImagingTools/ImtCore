@@ -39,6 +39,8 @@ public:
 				const QByteArray& collectionTagName);
 	virtual ~TAggergatedObjectCollectionWrap();
 
+	void SetOperationFlags(int flags, const QByteArray& objectId = QByteArray());
+
 	// reimplemented (IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
 	virtual const imtbase::ICollectionDataController* GetDataController() const override;
@@ -111,6 +113,13 @@ template<class BaseInterface, class ObjectImpl>
 inline TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::~TAggergatedObjectCollectionWrap()
 {
 	m_updateBridge.EnsureModelsDetached();
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+void TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetOperationFlags(int flags, const QByteArray& objectId)
+{
+	m_collection.SetOperationFlags(flags, objectId);
 }
 
 

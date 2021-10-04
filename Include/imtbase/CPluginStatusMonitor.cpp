@@ -14,6 +14,7 @@ namespace imtbase
 CPluginStatusMonitor::CPluginStatusMonitor()
 	:BaseClass("PluginStatus", "Plugin status collection", "PluginStatusCollection")
 {
+	SetOperationFlags(IObjectCollection::OF_SUPPORT_INSERT || IObjectCollection::OF_SUPPORT_DELETE);
 }
 
 
@@ -73,6 +74,7 @@ void CPluginStatusMonitor::OnPluginStatusChanged(
 
 	if (!pluginId.isEmpty()){
 		m_pluginTypeIds[pluginId] = pluginTypeId;
+		SetOperationFlags(IObjectCollection::OF_SUPPORT_USING, pluginId);
 	}
 }
 

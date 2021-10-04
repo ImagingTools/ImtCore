@@ -581,13 +581,16 @@ void CObjectCollectionViewComp::UpdateItem(const imtbase::IObjectCollectionInfo:
 
 	if (row == -1){
 		Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-		if (objectCollectionPtr->GetSupportedOperations() & imtbase::IObjectCollection::OF_SUPPORT_RENAME){
+		if (objectCollectionPtr->GetOperationFlags(objectId) & imtbase::IObjectCollection::OF_SUPPORT_EDIT){
 			flags |= Qt::ItemIsEditable;
 		}
 
 		columns[0]->setData(objectId, DR_OBJECT_ID);
 		columns[0]->setData(objectCollectionPtr->GetElementInfo(objectId, imtbase::IObjectCollectionInfo::EIT_TYPE_ID), DR_TYPE_ID);
-		columns[0]->setFlags(flags);
+
+		for (int i = 0; i < columns.count(); i++){
+			columns[i]->setFlags(flags);
+		}
 
 		modelPtr->appendRow(columns);
 	}

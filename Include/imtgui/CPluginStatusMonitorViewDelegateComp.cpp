@@ -64,7 +64,7 @@ void CPluginStatusMonitorViewDelegateComp::OnColumnItemDelegateEditFinished(cons
 
 bool CPluginStatusMonitorViewDelegateComp::IsEditorEnabled(const QByteArray &/*columnId*/) const
 {
-	return true;
+	return false;
 }
 
 

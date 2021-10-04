@@ -24,6 +24,11 @@ public:
 	typedef CObjectCollectionBase BaseClass;
 	typedef istd::TComposedFactory<istd::IChangeable> BaseClass2;
 
+	void SetOperationFlags(int flags, const QByteArray& objectId = QByteArray());
+
+	// reimplemented (imtbase::IObjectCollection)
+	int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
+
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
@@ -31,6 +36,9 @@ public:
 protected:
 	// reimplemented (CObjectCollectionBase)
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const;
+
+private:
+	int m_operationFlags;
 };
 
 
