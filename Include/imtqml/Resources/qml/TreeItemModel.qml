@@ -19,6 +19,8 @@ JSONListModel {
             row = 0
         var modelObject = get(row)
         var retVal = modelObject[key]
+        if (retVal === null)
+            return null
         if(typeof retVal === 'object'){
             var retModel
             var component = Qt.createComponent("TreeItemModel.qml");
@@ -61,12 +63,14 @@ JSONListModel {
     }
 
     function ContainsKey(key,row){
-        return true
-//        if(row === undefined)
-//            row = 0
-//        if(row === null)
-//            row = 0
-//        return get(row).has(key)
+        //        return true
+        if(row === undefined)
+            row = 0
+        if(row === null)
+            row = 0
+        if(count > row)
+            return get(row).hasOwnProperty(key)
+        return false
     }
 
     function SetQueryParam(key,value){
