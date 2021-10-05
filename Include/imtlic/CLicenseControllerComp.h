@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <imod/IModel.h>
+#include <imod/TModelWrap.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <ifile/IFilePersistence.h>
 #include <ifile/IFileNameParam.h>
@@ -15,6 +16,7 @@
 #include <imtcrypt/IEncryptionKeysProvider.h>
 #include <imtlic/IProductInstanceInfo.h>
 #include <imtlic/ILicenseController.h>
+#include <imtlic/ILicenseStatus.h>
 
 
 namespace imtlic
@@ -34,6 +36,10 @@ public:
 
 	I_BEGIN_COMPONENT(CLicenseControllerComp);
 		I_REGISTER_INTERFACE(ILicenseController);
+		I_REGISTER_SUBELEMENT(LicenseStatus);
+		I_REGISTER_SUBELEMENT_INTERFACE(LicenseStatus, imtlic::ILicenseStatus, ExtractLicenseStatus);
+		I_REGISTER_SUBELEMENT_INTERFACE(LicenseStatus, istd::IChangeable, ExtractLicenseStatus);
+		I_REGISTER_SUBELEMENT_INTERFACE(LicenseStatus, imod::IModel, ExtractLicenseStatus);
 		I_ASSIGN(m_productInstanceCompPtr, "ProductInstance", "Instance of the product installation", true, "ProductInstance");
 		I_ASSIGN(m_productInstancePersistenceCompPtr, "ProductInstancePersistence", "Encrypted ersistence for the product instance", true, "ProductInstancePersistence");
 		I_ASSIGN(m_fingerprintInstancePersistenceCompPtr, "FingerprintInstancePersistence", "Fingerprint persistence for the product instance", true, "FingerprintPersistence");
@@ -63,6 +69,29 @@ private:
 	void OnLicenseKeysUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtcrypt::IEncryptionKeysProvider* licenseKeysProviderPtr);
 
 private:
+	class LicenseStatus: public imtlic::ILicenseStatus
+	{
+	public:
+		LicenseStatus();
+
+		// reimplemented (imtlic::ILicenseStatus)
+		virtual int GetLicenseStatusFlags() const override;
+		virtual void SetLicenseStatusFlags(int licenseStatusFlags) override;
+		virtual QString GetLicenseLocation() const override;
+		virtual void SetLicenseLocation(const QString & licenseLocation) override;
+
+	private:
+		int m_licenseStatusFlags;
+		QString m_licenseLocation;
+	};
+
+	template <typename InterfaceType>
+	static InterfaceType* ExtractLicenseStatus(CLicenseControllerComp& component)
+	{
+		return &component.m_licenseStatus;
+	}
+
+private:
 	imtbase::TModelUpdateBinder<imtcrypt::IEncryptionKeysProvider, CLicenseControllerComp> m_licenseKeysProvider;
 	bool m_isInitializing;
 
@@ -75,6 +104,8 @@ private:
 	I_ATTR(int, m_fingerprintExpirationAttrPtr);
 
 	QTimer m_checkLicenseTimer;
+
+	mutable imod::TModelWrap<LicenseStatus> m_licenseStatus;
 };
 
 

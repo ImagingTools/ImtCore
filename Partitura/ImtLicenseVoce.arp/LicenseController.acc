@@ -181,6 +181,7 @@
         <Component ExportedId="EncryptedXmlPersistence" ComponentId="EncryptedXmlPersistence"/>
         <Component ExportedId="EncryptionKeys" ComponentId="EncryptionKeys"/>
         <Component ExportedId="LicenseFile" ComponentId="LicenseFile"/>
+        <Component ExportedId="LicenseStatus" ComponentId="LicenseController/LicenseStatus"/>
         <Component ExportedId="ProductInstanceInfo" ComponentId="ProductInstanceInfo"/>
     </ExportedComponents>
 </Acf>

@@ -9,6 +9,8 @@
 // ACF includes
 #include <istd/CCrcCalculator.h>
 #include <istd/CSystem.h>
+#include <istd/CChangeGroup.h>
+#include <istd/CChangeNotifier.h>
 #include <ilog/CMessage.h>
 
 // ImtCore includes
@@ -119,6 +121,10 @@ void CLicenseControllerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
+	if (m_licensePathCompPtr.IsValid()){
+		m_licenseStatus.SetLicenseLocation(m_licensePathCompPtr->GetPath());
+	}
+
 	m_isInitializing = true;
 
 	m_licenseKeysProvider.RegisterObject(m_licenseKeysProviderCompPtr.GetPtr(), &CLicenseControllerComp::OnLicenseKeysUpdated);
@@ -148,6 +154,10 @@ void CLicenseControllerComp::OnComponentDestroyed()
 
 bool CLicenseControllerComp::ReadLicenseFromFile(imtlic::IProductInstanceInfo& license) const
 {
+	istd::CChangeGroup changeGroup(&m_licenseStatus);
+
+	m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_INVALID);
+
 	if (!m_licensePathCompPtr.IsValid()){
 		SendCriticalMessage(0, "No license path component was set. Please check component configuration", "CLicenseControllerComp::ReadLicenseFile");
 
@@ -164,12 +174,16 @@ bool CLicenseControllerComp::ReadLicenseFromFile(imtlic::IProductInstanceInfo& l
 	if (licenseFilePath.isEmpty()){
 		SendCriticalMessage(0, "License file path is empty. Please check component configuration", "CLicenseControllerComp::ReadLicenseFile");
 
+		m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_INVALID | imtlic::ILicenseStatus::LSF_NO_LICENSE);
+
 		return false;
 	}
 
 	QFileInfo licenseFileInfo(licenseFilePath);
 	if (!licenseFileInfo.exists()){
 		SendErrorMessage(0, QString(QObject::tr("License file '%1' doesn't exist")).arg(licenseFilePath), "License Management");
+
+		m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_INVALID | imtlic::ILicenseStatus::LSF_NO_LICENSE);
 
 		return false;
 	}
@@ -190,12 +204,12 @@ bool CLicenseControllerComp::ReadLicenseFromFile(imtlic::IProductInstanceInfo& l
 	}
 	else{
 		if (!UpdateFingerprint(fingerprintFilePath, license)){
-			SendErrorMessage(0, QString(QObject::tr("License fingerprint could not be updated")), "License Management");
-
-			return false;
+			SendWarningMessage(0, QString(QObject::tr("License fingerprint could not be updated")), "License Management");
 		}
 
 		SendInfoMessage(0, QString(QObject::tr("License was successfully loaded")), "License Management");
+
+		m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_VALID);
 	}
 
 	return true;
@@ -288,6 +302,48 @@ void CLicenseControllerComp::OnLicenseKeysUpdated(
 			// Remove all existing license data:
 			m_productInstanceCompPtr->ResetData();
 		}
+	}
+}
+
+
+// public methods of the embedded class LicenseStatus
+
+CLicenseControllerComp::LicenseStatus::LicenseStatus()
+	:m_licenseStatusFlags(LSF_LICENSE_INVALID)
+{
+}
+
+
+// reimplemented (imtlic::ILicenseStatus)
+
+int CLicenseControllerComp::LicenseStatus::GetLicenseStatusFlags() const
+{
+	return m_licenseStatusFlags;
+}
+
+
+void CLicenseControllerComp::LicenseStatus::SetLicenseStatusFlags(int licenseStatusFlags)
+{
+	if (m_licenseStatusFlags != licenseStatusFlags){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_licenseStatusFlags = licenseStatusFlags;
+	}
+}
+
+
+QString CLicenseControllerComp::LicenseStatus::GetLicenseLocation() const
+{
+	return m_licenseLocation;
+}
+
+
+void CLicenseControllerComp::LicenseStatus::SetLicenseLocation(const QString& licenseLocation)
+{
+	if (m_licenseLocation != licenseLocation){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_licenseLocation = licenseLocation;
 	}
 }
 

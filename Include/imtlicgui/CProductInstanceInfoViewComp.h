@@ -10,6 +10,8 @@
 // ImtCore includes
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtlic/IProductInstanceInfo.h>
+#include <imtlic/ILicenseController.h>
+#include <imtlic/ILicenseStatus.h>
 #include <imtcrypt/IEncryptionKeysProvider.h>
 #include <GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h>
 
@@ -35,10 +37,12 @@ public:
 	I_BEGIN_COMPONENT(CProductInstanceInfoViewComp);
 		I_ASSIGN(m_encryptionKeysProviderCompPtr, "EncryptionKeysProvider", "Provider of the license key", true, "EncryptionKeysProvider");
 		I_ASSIGN(m_licenseKeyPersistenceCompPtr, "LicenseKeyPersistence", "Persistence for the license key", true, "LicenseKeyPersistence");
-		I_ASSIGN(m_licensePathCompPtr, "LicensePath", "Path to the license file", true, "LicensePath");
 		I_ASSIGN(m_importLicenseEnablerCompPtr, "ImportLicenseEnabler", "Enabling of the license import", false, "ImportLicenseEnabler");
-		I_ASSIGN(m_licensePersistenceCompPtr, "LicensePersistence", "License persistence for the applying the imported license", true, "LicensePersistence");
+		I_ASSIGN(m_licenseRequestEnablerCompPtr, "LicenseRequestEnabler", "Enabling of the license request", false, "LicenseRequestEnabler");
 		I_ASSIGN(m_productInstanceCompPtr, "ProductInstance", "Instance of the product installation", true, "ProductInstance");
+		I_ASSIGN(m_licenseControllerCompPtr, "LicenseController", "License controller used for import", true, "LicenseController");
+		I_ASSIGN(m_licenseStatusCompPtr, "LicenseStatus", "Status of the current license", true, "LicenseStatus");
+		I_ASSIGN(m_licenseRequestDescriptionTextAttrPtr, "LicenseRequestDescriptionText", "Description text for the request button", true, "");
 	I_END_COMPONENT;
 
 	CProductInstanceInfoViewComp();
@@ -49,11 +53,14 @@ public:
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
+	virtual void OnGuiRetranslate() override;
 
 private:
 	void UpdateProductName();
 	void UpdateFeatureTree();
 	void OnImportLicenseEnabled(const istd::IChangeable::ChangeSet& changeSet, const iprm::IEnableableParam* licenseImportEnablerPtr);
+	void OnLicenseRequestEnabled(const istd::IChangeable::ChangeSet& changeSet, const iprm::IEnableableParam* licenseRequstEnablerPtr);
+	void OnLicenseStatusChanged(const istd::IChangeable::ChangeSet& changeSet, const imtlic::ILicenseStatus* licenseStatusPtr);
 
 private Q_SLOTS:
 	void on_NewLicenseRequestButton_clicked();
@@ -62,13 +69,16 @@ private Q_SLOTS:
 private:
 	I_REF(imtcrypt::IEncryptionKeysProvider, m_encryptionKeysProviderCompPtr);
 	I_REF(ifile::IFilePersistence, m_licenseKeyPersistenceCompPtr);
-	I_REF(ifile::IFileNameParam, m_licensePathCompPtr);
 	I_REF(iprm::IEnableableParam, m_importLicenseEnablerCompPtr);
-	I_REF(ifile::IFilePersistence, m_licensePersistenceCompPtr);
+	I_REF(iprm::IEnableableParam, m_licenseRequestEnablerCompPtr);
 	I_REF(imtlic::IProductInstanceInfo, m_productInstanceCompPtr);
+	I_REF(imtlic::ILicenseController, m_licenseControllerCompPtr);
+	I_REF(imtlic::ILicenseStatus, m_licenseStatusCompPtr);
+	I_TEXTATTR(m_licenseRequestDescriptionTextAttrPtr);
 
 	mutable imtbase::TModelUpdateBinder<iprm::IEnableableParam, CProductInstanceInfoViewComp> m_importLicenseEnablerObserver;
-
+	mutable imtbase::TModelUpdateBinder<iprm::IEnableableParam, CProductInstanceInfoViewComp> m_licenseRequestEnablerObserver;
+	mutable imtbase::TModelUpdateBinder<imtlic::ILicenseStatus, CProductInstanceInfoViewComp> m_licenseStatusObserver;
 };
 
 
