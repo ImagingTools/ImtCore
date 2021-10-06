@@ -186,9 +186,11 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 				m_additionalCommandsToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 				m_additionalCommandsToolBar->setIconSize(QSize(24, 24));
 
-				AdditionalCommandsFrame->layout()->addWidget(m_additionalCommandsToolBar);
-
-				iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_additionalCommandsToolBar);
+				QLayout* layoutPtr = AdditionalCommandsFrame->layout();
+				if (layoutPtr != nullptr){
+					layoutPtr->addWidget(m_additionalCommandsToolBar);
+					iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_additionalCommandsToolBar);
+				}
 			}
 		}
 	}
@@ -201,9 +203,11 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 				m_rightsCommandsToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 				m_rightsCommandsToolBar->setIconSize(QSize(24, 24));
 
-				RightsCommandsFrame->layout()->addWidget(m_rightsCommandsToolBar);
-
-				iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_rightsCommandsToolBar);
+				QLayout* layoutPtr = AdditionalCommandsFrame->layout();
+				if (layoutPtr != nullptr){
+					layoutPtr->addWidget(m_rightsCommandsToolBar);
+					iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_rightsCommandsToolBar);
+				}
 			}
 		}
 	}
@@ -217,7 +221,10 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		m_mainToolBar->setProperty("ImtToolBar", true);
 		m_mainToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
-		CurrentPageToolBarFrame->layout()->addWidget(m_mainToolBar);
+		QLayout* layoutPtr = CurrentPageToolBarFrame->layout();
+		if (layoutPtr != nullptr){
+			layoutPtr->addWidget(m_mainToolBar);
+		}
 	}
 
 	m_commandsMenu.setProperty("CommandsMenu", true);
