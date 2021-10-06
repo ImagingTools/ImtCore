@@ -29,6 +29,7 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	:m_commands("&View", 100),
 	m_mainToolBar(nullptr),
 	m_additionalCommandsToolBar(nullptr),
+	m_rightsCommandsToolBar(nullptr),
 	m_commandsObserver(*this),
 	m_pageModelObserver(*this),
 	m_loginObserver(*this),
@@ -188,6 +189,21 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 				AdditionalCommandsFrame->layout()->addWidget(m_additionalCommandsToolBar);
 
 				iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_additionalCommandsToolBar);
+			}
+		}
+	}
+
+	if (m_rightsCommandsCompPtr.IsValid()) {
+		const iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_rightsCommandsCompPtr->GetCommands());
+		if (commandPtr != nullptr){
+			if (m_rightsCommandsToolBar == nullptr){
+				m_rightsCommandsToolBar = new QToolBar(RightsCommandsFrame);
+				m_rightsCommandsToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+				m_rightsCommandsToolBar->setIconSize(QSize(24, 24));
+
+				RightsCommandsFrame->layout()->addWidget(m_rightsCommandsToolBar);
+
+				iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_rightsCommandsToolBar);
 			}
 		}
 	}
@@ -369,7 +385,17 @@ void CThumbnailDecoratorGuiComp::OnTryClose(bool* ignoredPtr)
 			return;
 		}
 
-		if (QMessageBox::question(GetWidget(), tr("Quit"), tr("Do you really want to quit?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes){
+		bool isExit = false;
+		if (*m_quitDialogIgnoredAttrPtr == true){
+			isExit = true;
+		}
+		else {
+			if (QMessageBox::question(GetWidget(), tr("Quit"), tr("Do you really want to quit?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes){
+				isExit = true;
+			}
+		}
+
+		if (isExit){
 			bool ignored = false;
 			if (m_pagesWidgetCompPtr.IsValid()){
 				m_pagesWidgetCompPtr->OnTryClose(&ignored);

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 
 // Qt includes
@@ -89,12 +89,16 @@ public:
 		I_ASSIGN(m_hideMenuPanelOnHomePageAttrPtr, "HideMenuPanelOnHomePage", "Hide menu panel when home page is active", true, true);
 		I_ASSIGN(m_hideHomeButtonAttrPtr, "HideHomeButton", "Hide home button", true, false);
 		I_ASSIGN(m_accountMenuCompPtr, "AccountMenu", "Menu for logged account", false, "AccountMenu");
+		I_ASSIGN(m_viewPageNavigationAttrPtr, "ViewPageNavigation", "View page navigation", true, true);
+		I_ASSIGN(m_quitDialogIgnoredAttrPtr, "QuitDialogIgnored", "If true, exit application without dialog", true, false);
 	I_END_COMPONENT;
 
 protected:
 	I_ATTR(bool, m_hideMenuPanelOnHomePageAttrPtr);
 	I_ATTR(bool, m_hideHomeButtonAttrPtr);
 	I_REF(iqtgui::IGuiObject, m_accountMenuCompPtr);
+	I_ATTR(bool, m_viewPageNavigationAttrPtr);
+	I_ATTR(bool, m_quitDialogIgnoredAttrPtr);
 };
 
 
@@ -126,7 +130,7 @@ public:
 		I_ASSIGN(m_pageNavigationControllerCompPtr, "NavigationController", "Page navigation controller", false, "NavigationController");
 		I_ASSIGN(m_dashboardGuiCompPtr, "Dashboard", "Dashboard UI", false, "Dashboard");
 		I_ASSIGN(m_additionalCommandsCompPtr, "AdditionalCommands", "Additional tool commands showed on the right side of the main tool bar", false, "AdditionalCommands");
-		I_ASSIGN(m_viewPageNavigationAttrPtr, "ViewPageNavigation", "View page navigation", true, true);
+		I_ASSIGN(m_rightsCommandsCompPtr, "RightsCommands", "Additional tool commands showed on the right side of the login button", false, "RightsCommands");
 	I_END_COMPONENT;
 
 	enum
@@ -336,10 +340,11 @@ private:
 	I_REF(imtgui::IPageNavigationController, m_pageNavigationControllerCompPtr);
 	I_REF(iqtgui::IGuiObject, m_dashboardGuiCompPtr);
 	I_REF(ibase::ICommandsProvider, m_additionalCommandsCompPtr);
-	I_ATTR(bool, m_viewPageNavigationAttrPtr);
+	I_REF(ibase::ICommandsProvider, m_rightsCommandsCompPtr);
 
 	QToolBar* m_mainToolBar;
 	QToolBar* m_additionalCommandsToolBar;
+	QToolBar* m_rightsCommandsToolBar;
 	QTimer m_autoLogoutTimer;
 	QTimer m_checkIsFullScreenTimer;
 

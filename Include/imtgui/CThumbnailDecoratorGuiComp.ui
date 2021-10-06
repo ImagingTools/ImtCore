@@ -87,7 +87,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="imtguidark.qrc">
+             <iconset>
               <normaloff>:/ColorIcons/MenuRing</normaloff>:/ColorIcons/MenuRing</iconset>
             </property>
             <property name="iconSize">
@@ -137,7 +137,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="imtguidark.qrc">
+                <iconset>
                  <normaloff>:/Icons/Left</normaloff>:/Icons/Left</iconset>
                </property>
                <property name="iconSize">
@@ -157,7 +157,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="imtguidark.qrc">
+                <iconset>
                  <normaloff>:/Icons/Right</normaloff>:/Icons/Right</iconset>
                </property>
                <property name="iconSize">
@@ -258,7 +258,7 @@
              <enum>QFrame::NoFrame</enum>
             </property>
             <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
+             <enum>QFrame::Sunken</enum>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_9">
              <property name="spacing">
@@ -285,7 +285,7 @@
              <string>Commands</string>
             </property>
             <property name="icon">
-             <iconset resource="imtguidark.qrc">
+             <iconset>
               <normaloff>:/Icons/Menu</normaloff>:/Icons/Menu</iconset>
             </property>
             <property name="iconSize">
@@ -312,7 +312,7 @@
              <string>Log out</string>
             </property>
             <property name="icon">
-             <iconset resource="../imtauthgui/imtauthguilight.qrc">
+             <iconset>
               <normaloff>:/Icons/Account</normaloff>:/Icons/Account</iconset>
             </property>
             <property name="iconSize">
@@ -335,7 +335,7 @@
              <string>Dashboard</string>
             </property>
             <property name="icon">
-             <iconset resource="imtguidark.qrc">
+             <iconset>
               <normaloff>:/Icons/Dashboard</normaloff>:/Icons/Dashboard</iconset>
             </property>
             <property name="iconSize">
@@ -350,12 +350,39 @@
            </widget>
           </item>
           <item>
+           <widget class="QFrame" name="RightsCommandsFrame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+            </layout>
+           </widget>
+          </item>
+          <item>
            <widget class="QToolButton" name="ExitButton">
             <property name="text">
              <string>Quit</string>
             </property>
             <property name="icon">
-             <iconset resource="imtguidark.qrc">
+             <iconset>
               <normaloff>:/Icons/PowerOff</normaloff>:/Icons/PowerOff</iconset>
             </property>
             <property name="iconSize">
@@ -787,9 +814,6 @@
   <tabstop>LoginControlButton</tabstop>
   <tabstop>PageList</tabstop>
  </tabstops>
- <resources>
-  <include location="imtguidark.qrc"/>
-  <include location="../imtauthgui/imtauthguilight.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

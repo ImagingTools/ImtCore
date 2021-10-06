@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4881" Description="ACF"/>
-            <Version Id="1" Number="2123" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="0" Number="4950" Description="ACF"/>
+            <Version Id="1" Number="2151" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>ImagingTools application framework</Description>
@@ -229,7 +229,13 @@
                     <AttributeInfo Id="PageUiContainer" Type="Reference" ExportId="MainUiPages">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="QuitDialogIgnored" Type="Boolean" ExportId="QuitDialogIgnored">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Rights" Type="Reference" ExportId="Rights">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RightsCommands" Type="Reference" ExportId="RightsCommands">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="">
@@ -246,6 +252,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="VerticalSpacing" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="10"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewPageNavigation" Type="Boolean" ExportId="ViewPageNavigation">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WelcomeText" Type="Text" ExportId="WelcomeText">
                         <Data IsEnabled="false"/>
