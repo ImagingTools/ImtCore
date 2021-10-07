@@ -19,8 +19,8 @@ public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CParameterLinkControllerComp);
-		I_ASSIGN(m_selectionParamIdAttrPtr, "SelectionParamId", "Id of the SelectionParam", false, "");
-		I_ASSIGN(m_paramsManagerCompPtr, "Linked parameter manager", "", false, "ParamsManager");
+		I_ASSIGN(m_selectionParamIdAttrPtr, "ReferenceParamId", "ID of the reference parameter in the parameter set", true, "Index");
+		I_ASSIGN(m_paramsManagerCompPtr, "SlaveManager", "Slave parameter set manager containing the references from the observer data model", true, "SlaveManager");
 	I_END_COMPONENT;
 
 protected:
@@ -28,7 +28,7 @@ protected:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
-	const iprm::ISelectionParam* FindSelectionParam(int paramSetIndex) const;
+	const iprm::ISelectionParam* FindReferenceSelection(int paramSetIndex) const;
 
 private:
 	I_ATTR(QByteArray, m_selectionParamIdAttrPtr);

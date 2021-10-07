@@ -22,9 +22,9 @@ void CParameterLinkControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& 
 	}
 
 	if (m_paramsManagerCompPtr.IsValid() && m_selectionParamIdAttrPtr.IsValid()){
-		iprm::IParamsManager* pmPtr = GetObservedObject();
-		if (pmPtr != nullptr){
-			const iprm::IOptionsList* sourceOptionsPtr = pmPtr->GetSelectionConstraints();
+		iprm::IParamsManager* sourceParamsManagerPtr = GetObservedObject();
+		if (sourceParamsManagerPtr != nullptr){
+			const iprm::IOptionsList* sourceOptionsPtr = sourceParamsManagerPtr->GetSelectionConstraints();
 			if (sourceOptionsPtr != nullptr){
 				QByteArrayList availableIds;
 
@@ -37,7 +37,7 @@ void CParameterLinkControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& 
 
 				int targetOptionsCount = m_paramsManagerCompPtr->GetParamsSetsCount();
 				for (int i = 0; i < targetOptionsCount; i++){
-					const iprm::ISelectionParam* targetSelectionParamPtr = FindSelectionParam(i);
+					const iprm::ISelectionParam* targetSelectionParamPtr = FindReferenceSelection(i);
 					if (targetSelectionParamPtr != nullptr){
 						int selectedIndex = targetSelectionParamPtr->GetSelectedOptionIndex();
 						if (selectedIndex == -1){
@@ -47,8 +47,11 @@ void CParameterLinkControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& 
 
 						const iprm::IOptionsList* targetOptionsPtr = targetSelectionParamPtr->GetSelectionConstraints();
 						if (targetOptionsPtr != nullptr){
-							if (!availableIds.contains(targetOptionsPtr->GetOptionId(selectedIndex))){
+							QByteArray targetId = targetOptionsPtr->GetOptionId(selectedIndex);
+
+							if (!availableIds.contains(targetId)){
 								removeTargetOptions.append(i);
+
 								continue;
 							}
 						}
@@ -72,15 +75,12 @@ void CParameterLinkControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& 
 
 // private methods
 
-const iprm::ISelectionParam* CParameterLinkControllerComp::FindSelectionParam(int paramSetIndex)const
+const iprm::ISelectionParam* CParameterLinkControllerComp::FindReferenceSelection(int paramSetIndex)const
 {
 	if (m_paramsManagerCompPtr.IsValid() && m_selectionParamIdAttrPtr.IsValid()){
-		int psCount = m_paramsManagerCompPtr->GetParamsSetsCount();
-		for (int psIndex = 0; psIndex < psCount; psIndex++){
-			iprm::IParamsSet* paramSetPtr = m_paramsManagerCompPtr->GetParamsSet(psIndex);
-			if (paramSetPtr != nullptr){
-				return dynamic_cast<const iprm::ISelectionParam*>(paramSetPtr->GetParameter(*m_selectionParamIdAttrPtr));
-			}
+		iprm::IParamsSet* paramSetPtr = m_paramsManagerCompPtr->GetParamsSet(paramSetIndex);
+		if (paramSetPtr != nullptr){
+			return dynamic_cast<const iprm::ISelectionParam*>(paramSetPtr->GetParameter(*m_selectionParamIdAttrPtr));
 		}
 	}
 
