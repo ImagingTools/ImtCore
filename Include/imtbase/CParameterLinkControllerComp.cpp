@@ -4,7 +4,7 @@
 // ACF includes
 #include <iprm/IOptionsList.h>
 #include <iprm/IParamsSet.h>
-#include <istd/CChangeNotifier.h>
+#include <istd/CChangeGroup.h>
 
 
 namespace imtbase
@@ -47,25 +47,26 @@ void CParameterLinkControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& 
 
 						const iprm::IOptionsList* targetOptionsPtr = targetSelectionParamPtr->GetSelectionConstraints();
 						if (targetOptionsPtr != nullptr){
-							QByteArray targetId = targetOptionsPtr->GetOptionId(selectedIndex);
+							int targetOptionsCount = targetOptionsPtr->GetOptionsCount();
+							if (selectedIndex < targetOptionsCount){
+								QByteArray targetId = targetOptionsPtr->GetOptionId(selectedIndex);
 
-							if (!availableIds.contains(targetId)){
-								removeTargetOptions.append(i);
+								if (!availableIds.contains(targetId)){
+									removeTargetOptions.append(i);
 
-								continue;
+									continue;
+								}
 							}
 						}
 					}
 				}
 
 				if (removeTargetOptions.count() > 0){
-					istd::CChangeNotifier changeNotifier(m_paramsManagerCompPtr.GetPtr());
+					istd::CChangeGroup changeGroup(m_paramsManagerCompPtr.GetPtr());
 
 					for (int i = removeTargetOptions.count() - 1; i >= 0; i--){
 						m_paramsManagerCompPtr->RemoveParamsSet(removeTargetOptions[i]);
 					}
-
-					changeNotifier.Abort();
 				}
 			}
 		}

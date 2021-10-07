@@ -43,8 +43,9 @@ public:
 		I_ASSIGN(m_licenseControllerCompPtr, "LicenseController", "License controller used for import", true, "LicenseController");
 		I_ASSIGN(m_licenseStatusCompPtr, "LicenseStatus", "Status of the current license", true, "LicenseStatus");
 		I_ASSIGN(m_licenseRequestDescriptionTextAttrPtr, "LicenseRequestDescriptionText", "Description text for the request button", true, "");
+		I_ASSIGN(m_showLicenseControlPanelAttrPtr, "ShowLicenseControlPanel", "If enabled the license control panel will be shown", true, true);
 	I_END_COMPONENT;
-
+	
 	CProductInstanceInfoViewComp();
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
@@ -75,6 +76,7 @@ private:
 	I_REF(imtlic::ILicenseController, m_licenseControllerCompPtr);
 	I_REF(imtlic::ILicenseStatus, m_licenseStatusCompPtr);
 	I_TEXTATTR(m_licenseRequestDescriptionTextAttrPtr);
+	I_ATTR(bool, m_showLicenseControlPanelAttrPtr);
 
 	mutable imtbase::TModelUpdateBinder<iprm::IEnableableParam, CProductInstanceInfoViewComp> m_importLicenseEnablerObserver;
 	mutable imtbase::TModelUpdateBinder<iprm::IEnableableParam, CProductInstanceInfoViewComp> m_licenseRequestEnablerObserver;
