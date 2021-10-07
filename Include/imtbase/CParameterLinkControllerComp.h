@@ -1,0 +1,41 @@
+#pragma once
+
+
+// ACF includes
+#include <icomp/CComponentBase.h>
+#include <imod/TSingleModelObserverBase.h>
+#include <iprm/IParamsManager.h>
+
+
+namespace imtbase
+{
+
+
+class CParameterLinkControllerComp:
+			public icomp::CComponentBase,
+			public imod::TSingleModelObserverBase<iprm::IParamsManager>
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CParameterLinkControllerComp);
+		I_ASSIGN(m_selectionParamIdAttrPtr, "SelectionParamId", "Id of the SelectionParam", false, "");
+		I_ASSIGN(m_paramsManagerCompPtr, "Linked parameter manager", "", false, "ParamsManager");
+	I_END_COMPONENT;
+
+protected:
+	// reimplemented (imod::CSingleModelObserverBase)
+	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+
+private:
+	const iprm::ISelectionParam* FindSelectionParam(int paramSetIndex) const;
+
+private:
+	I_ATTR(QByteArray, m_selectionParamIdAttrPtr);
+	I_REF(iprm::IParamsManager, m_paramsManagerCompPtr);
+};
+
+
+} // namespace imtbase
+
+

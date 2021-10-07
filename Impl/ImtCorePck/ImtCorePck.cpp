@@ -104,6 +104,12 @@ I_EXPORT_COMPONENT(
 			"Binary data provider from folder",
 			"Binary data provider");
 
+I_EXPORT_COMPONENT(
+			ParameterLinkController,
+			"Parameter link controller",
+			"Parameter Controller");
+
+
 } // namespace ImtCorePck
 
 

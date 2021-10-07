@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <ibase/TModelObserverCompWrap.h>
 #include <icomp/TModelCompWrap.h>
 #include <icomp/TMakeComponentWrap.h>
 
@@ -24,6 +25,7 @@
 #include <imtbase/CNumericParamSummaryRepresentationControllerComp.h>
 #include <imtbase/CTextParamSummaryRepresentationControllerComp.h>
 #include <imtbase/CBinaryDataProviderComp.h>
+#include <imtbase/CParameterLinkControllerComp.h>
 
 
 /**
@@ -58,6 +60,7 @@ typedef imtbase::CParamSetSummaryRepresentationControllerComp ParamSetSummaryRep
 typedef imtbase::CNumericParamSummaryRepresentationControllerComp NumericParamSummaryRepresentationController;
 typedef imtbase::CTextParamSummaryRepresentationControllerComp TextParamSummaryRepresentationController;
 typedef imtbase::CBinaryDataProviderComp BinaryDataProvider;
+typedef ibase::TModelObserverCompWrap<imtbase::CParameterLinkControllerComp> ParameterLinkController;
 
 
 } // namespace ImtCorePck
