@@ -13,6 +13,46 @@ namespace imtbase
 
 // protected methods
 
+// reimplemented (imod::IObserver)
+
+void CParameterLinkControllerComp::BeforeUpdate(imod::IModel* modelPtr)
+{
+	BaseClass2::BeforeUpdate(modelPtr);
+
+	m_referenceMap.clear();
+
+	if (!m_paramsManagerCompPtr.IsValid()){
+		return;
+	}
+
+	const iprm::IOptionsList* paramsSetListPtr = m_paramsManagerCompPtr->GetSelectionConstraints();
+	if (paramsSetListPtr == nullptr){
+		return;
+	}
+
+	int targetParamsSetCount = paramsSetListPtr->GetOptionsCount();
+	for (int i = 0; i < targetParamsSetCount; i++){
+		QByteArray targetParamsSetId = paramsSetListPtr->GetOptionId(i);
+
+		const iprm::ISelectionParam* targetSelectionParamPtr = FindReferenceSelection(i);
+		if (targetSelectionParamPtr != nullptr){
+			int selectedIndex = targetSelectionParamPtr->GetSelectedOptionIndex();
+			if (selectedIndex >= 0){
+				const iprm::IOptionsList* referenceListPtr = targetSelectionParamPtr->GetSelectionConstraints();
+				if (referenceListPtr != nullptr){
+					int targetOptionsCount = referenceListPtr->GetOptionsCount();
+					if (selectedIndex < targetOptionsCount){
+						QByteArray referenceId = referenceListPtr->GetOptionId(selectedIndex);
+
+						m_referenceMap[targetParamsSetId] = referenceId;
+					}
+				}
+			}
+		}
+	}
+}
+
+
 // reimplemented (imod::CSingleModelObserverBase)
 
 void CParameterLinkControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
@@ -35,29 +75,21 @@ void CParameterLinkControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& 
 
 				QVector<int> removeTargetOptions;
 
-				int targetOptionsCount = m_paramsManagerCompPtr->GetParamsSetsCount();
-				for (int i = 0; i < targetOptionsCount; i++){
-					const iprm::ISelectionParam* targetSelectionParamPtr = FindReferenceSelection(i);
-					if (targetSelectionParamPtr != nullptr){
-						int selectedIndex = targetSelectionParamPtr->GetSelectedOptionIndex();
-						if (selectedIndex == -1){
-							removeTargetOptions.append(i);
-							continue;
-						}
+				const iprm::IOptionsList* paramsSetListPtr = m_paramsManagerCompPtr->GetSelectionConstraints();
+				if (paramsSetListPtr == nullptr){
+					return;
+				}
 
-						const iprm::IOptionsList* targetOptionsPtr = targetSelectionParamPtr->GetSelectionConstraints();
-						if (targetOptionsPtr != nullptr){
-							int targetOptionsCount = targetOptionsPtr->GetOptionsCount();
-							if (selectedIndex < targetOptionsCount){
-								QByteArray targetId = targetOptionsPtr->GetOptionId(selectedIndex);
+				int targetParamsSetCount = paramsSetListPtr->GetOptionsCount();
+				for (int i = 0; i < targetParamsSetCount; i++){
+					QByteArray targetParamsSetId = paramsSetListPtr->GetOptionId(i);
 
-								if (!availableIds.contains(targetId)){
-									removeTargetOptions.append(i);
+					Q_ASSERT(m_referenceMap.contains(targetParamsSetId));
 
-									continue;
-								}
-							}
-						}
+					QByteArray referenceId = m_referenceMap[targetParamsSetId];
+
+					if (!availableIds.contains(referenceId)){
+						removeTargetOptions.append(i);
 					}
 				}
 
