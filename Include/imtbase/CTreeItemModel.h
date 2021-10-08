@@ -3,6 +3,9 @@
 
 // Qt includes
 #include <QtCore/QAbstractListModel>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 // ACF includes
 #include <iser/ISerializable.h>
@@ -47,6 +50,10 @@ public Q_SLOTS:
 	CTreeItemModel* GetTreeItemModel(const QByteArray &key, int index = 0) const;
 	int GetItemsCount() const;
 	void GetKeys(QList<QByteArray>& keys, int index = 0);
+	void Clear();
+	bool IsArray();
+	void SetIsArray(const bool& isArray);
+	bool Parse(const QByteArray& data);
 
 	void SetQueryParam(const QByteArray& key, const QByteArray& value);
 	QByteArray GetQueryParam(const QByteArray& key);
@@ -71,12 +78,6 @@ Q_SIGNALS:
 	void stateChanged(const QString& state);
 	void needsReload();
 
-protected:
-	virtual bool SerializeRecursive(iser::IArchive& archive, const QByteArray &tagName);
-	virtual void subModelChanged(const CTreeItemModel* model, istd::IChangeable::ChangeSet& changeSet);
-	// reimplemented (imod::CModelBase)
-	virtual void OnBeginGlobalChanges();
-	virtual void OnEndGlobalChanges(const istd::IChangeable::ChangeSet& changeSet);
 
 private:
 	class Item
@@ -112,9 +113,18 @@ private:
 	QHash<int, QByteArray> m_roleNames;
 	imod::CModelUpdateBridge m_parentUpdateBridge;
 	QMap<QByteArray,QByteArray> m_queryParams;
-
+	bool m_isArray;
 
 	QString m_state;
+
+protected:
+	virtual bool SerializeRecursive(iser::IArchive& archive, const QByteArray &tagName);
+	virtual bool ParseRecursive(const QJsonObject &jsonObject, Item& item);
+	virtual void subModelChanged(const CTreeItemModel* model, istd::IChangeable::ChangeSet& changeSet);
+
+	// reimplemented (imod::CModelBase)
+	virtual void OnBeginGlobalChanges();
+	virtual void OnEndGlobalChanges(const istd::IChangeable::ChangeSet& changeSet);
 };
 
 

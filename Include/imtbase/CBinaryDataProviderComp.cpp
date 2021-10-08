@@ -45,7 +45,7 @@ bool CBinaryDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId
 	QString destinationEntryPath = homeDirPath + workingFileName;
 	QFileInfo destinationEntry(destinationEntryPath);
 
-	if (!destinationEntry.isFile()){
+	if (destinationEntry.isDir()){
 		return false;
 	}
 
@@ -62,8 +62,22 @@ bool CBinaryDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId
 
 		QFile destinationFile(destinationFileAbsoluteFilePath);
 
-		if (!destinationFile.open(QFile::ReadOnly)){
-			return false;
+		while (!destinationFile.open(QFile::ReadOnly)){
+			QString fileName = destinationEntry.fileName();
+			QString filePath = destinationEntry.filePath();
+			QStringList listPath = filePath.split("/");
+			if (listPath.last() == fileName){
+				listPath.removeLast();
+			}
+			if(listPath.size() > 1){
+				listPath.removeLast();
+				fileName = listPath.join("/") + "/" + fileName;
+				destinationFile.setFileName(fileName);
+				destinationEntry.setFile(fileName);
+			}
+			else{
+				return false;
+			}
 		}
 
 		data = destinationFile.readAll();

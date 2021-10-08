@@ -1,5 +1,9 @@
 #include <imtbase/CTreeItemModel.h>
 
+// Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 
 // ACF includes
 #include <iser/IArchive.h>
@@ -24,8 +28,7 @@ CTreeItemModel::CTreeItemModel(QObject *parent)
 
 CTreeItemModel::~CTreeItemModel()
 {
-	qDeleteAll(m_items);
-	m_items.clear();
+	Clear();
 }
 
 
@@ -51,6 +54,10 @@ int CTreeItemModel::InsertNewItem()
 {
 	m_items.append(new Item());
 
+	if(m_items.count() > 1){
+		m_isArray = true;
+	}
+
 	return m_items.count() - 1;
 }
 
@@ -72,6 +79,10 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap &infoMap)
 	QList<QByteArray> keys;
 
 	delete item;
+
+	if(m_items.isEmpty()){
+		m_isArray = false;
+	}
 
 	EndChanges(changeSet);
 
@@ -283,6 +294,40 @@ void CTreeItemModel::GetKeys(QList<QByteArray>& keys, int index)
 }
 
 
+void CTreeItemModel::Clear()
+{
+	qDeleteAll(m_items);
+	m_items.clear();
+}
+
+
+bool CTreeItemModel::IsArray()
+{
+	return m_isArray;
+}
+
+
+void CTreeItemModel::SetIsArray(const bool &isArray)
+{
+	m_isArray = isArray;
+}
+
+
+bool CTreeItemModel::Parse(const QByteArray &data)
+{
+	QJsonParseError error;
+	QJsonDocument document = QJsonDocument::fromJson(data, &error);
+	if (error.error != QJsonParseError::NoError){
+		qCritical()  << "Error for parsing json document:" << error.errorString();
+		return false;
+	}
+	Clear();
+	InsertNewItem();
+	bool retVal = ParseRecursive(document.object(), *m_items.last());
+	return retVal;
+}
+
+
 void CTreeItemModel::SetQueryParam(const QByteArray &key, const QByteArray &value)
 {
 	m_queryParams.insert(key, value);
@@ -377,7 +422,10 @@ void CTreeItemModel::EndChangeGroup(const ChangeSet &changeSet)
 bool CTreeItemModel::Serialize(iser::IArchive &archive)
 {
 	int countSize = m_items.count();
-	if (countSize < 1){
+	if (!archive.IsStoring()){
+		Clear();
+	}
+	else if (countSize < 1){
 		return false;
 	}
 
@@ -394,16 +442,19 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	iser::CArchiveTag arrayTag(tagName, "array items", iser::CArchiveTag::TT_MULTIPLE);
 	static iser::CArchiveTag subArrayTag(tagName, "array item", iser::CArchiveTag::TT_GROUP, &arrayTag);
 	iser::CArchiveTag objectTag(tagName, "key", iser::CArchiveTag::TT_GROUP);
+	bool isMultiTag = false;
+
 	if (countSize < 1){
 		return false;
 	}
-	bool isMultiTag = countSize > 1;
+	isMultiTag = countSize > 1 || m_isArray == true;
 	if (isMultiTag == false){
 		retVal = retVal && archive.BeginTag(objectTag);
 	}
 	else{
 		retVal = retVal && archive.BeginMultiTag(arrayTag, subArrayTag, countSize);
 	}
+
 
 	for (int i = 0; i < countSize; i++){
 		Item *item = m_items[i];
@@ -455,6 +506,39 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	}
 	else{
 		retVal = retVal && archive.EndTag(arrayTag);
+	}
+
+	return retVal;
+}
+
+
+bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, Item &item)
+{
+	bool retVal = true;
+	QJsonObject::ConstIterator objectIterator = jsonObject.begin();
+	while (objectIterator != jsonObject.end()) {
+		QJsonValue jsonValue = objectIterator.value();
+		if (jsonValue.isArray()){
+			QJsonArray jsonArrary = jsonValue.toArray();
+			QJsonArray::ConstIterator arrayIterator = jsonArrary.begin();
+			while (arrayIterator != jsonArrary.end()) {
+				jsonValue = *arrayIterator;
+				if(jsonValue.isObject()){
+					InsertNewItem();
+					ParseRecursive(jsonValue.toObject(), *m_items.last());
+				}
+				arrayIterator++;
+			}
+		}
+		else if(jsonValue.isObject()){
+			CTreeItemModel* treeItemModel = AddTreeModel(objectIterator.key().toUtf8());
+			treeItemModel->InsertNewItem();
+			treeItemModel->ParseRecursive(jsonValue.toObject(), *treeItemModel->m_items.last());
+		}
+		else{
+			SetData(objectIterator.key().toUtf8(),objectIterator.value().toVariant());
+		}
+		objectIterator++;
 	}
 
 	return retVal;

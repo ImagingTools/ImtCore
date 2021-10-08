@@ -203,7 +203,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 				m_rightsCommandsToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 				m_rightsCommandsToolBar->setIconSize(QSize(24, 24));
 
-				QLayout* layoutPtr = AdditionalCommandsFrame->layout();
+				QLayout* layoutPtr = RightsCommandsFrame->layout();
 				if (layoutPtr != nullptr){
 					layoutPtr->addWidget(m_rightsCommandsToolBar);
 					iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_rightsCommandsToolBar);
@@ -289,8 +289,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		}
 	}
 
-	LoginControlButton->setVisible(m_loginCompPtr.IsValid());
-	UserNameLabel->setVisible(false);
+//	LoginControlButton->setVisible(m_loginCompPtr.IsValid());
+//	UserNameLabel->setVisible(false);
 	
 	installEventFilter(this);
 
