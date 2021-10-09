@@ -519,13 +519,15 @@ bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, Item &item)
 	while (objectIterator != jsonObject.end()) {
 		QJsonValue jsonValue = objectIterator.value();
 		if (jsonValue.isArray()){
+			CTreeItemModel* treeItemModel = AddTreeModel(objectIterator.key().toUtf8());
+			treeItemModel->SetIsArray(true);
 			QJsonArray jsonArrary = jsonValue.toArray();
 			QJsonArray::ConstIterator arrayIterator = jsonArrary.begin();
 			while (arrayIterator != jsonArrary.end()) {
 				jsonValue = *arrayIterator;
 				if(jsonValue.isObject()){
-					InsertNewItem();
-					ParseRecursive(jsonValue.toObject(), *m_items.last());
+					treeItemModel->InsertNewItem();
+					treeItemModel->ParseRecursive(jsonValue.toObject(), *treeItemModel->m_items.last());
 				}
 				arrayIterator++;
 			}

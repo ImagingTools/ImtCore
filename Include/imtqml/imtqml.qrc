@@ -17,6 +17,8 @@
         <file alias="JSONListModel.qml">Resources/qml/JSONListModel.qml</file>
         <file alias="jsonpath.js">Resources/qml/jsonpath.js</file>
         <file alias="TreeItemModel.qml">Resources/qml/TreeItemModel.qml</file>
+        <file alias="GraphQLRequest.js">Resources/qml/GraphQLRequest.js</file>
+        <file alias="GqlModel.qml">Resources/qml/GqlModel.qml</file>
     </qresource>
     <qresource prefix="/Icons">
         <file alias="DeleteStylized.svg">Resources/Icons/DeleteStylized.svg</file>

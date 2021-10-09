@@ -61,7 +61,7 @@ protected:
 	bool m_startFields;
 	QByteArray m_currentField;
 
-	CGqlObject* m_activeGqkObjectPtr;
+	CGqlObject* m_activeGqlObjectPtr;
 };
 
 
