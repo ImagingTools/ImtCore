@@ -323,7 +323,7 @@ bool CTreeItemModel::Parse(const QByteArray &data)
 	}
 	Clear();
 	InsertNewItem();
-	bool retVal = ParseRecursive(document.object(), *m_items.last());
+	bool retVal = ParseRecursive(document.object(), 0);
 	return retVal;
 }
 
@@ -512,7 +512,7 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 }
 
 
-bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, Item &item)
+bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, int index)
 {
 	bool retVal = true;
 	QJsonObject::ConstIterator objectIterator = jsonObject.begin();
@@ -527,7 +527,7 @@ bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, Item &item)
 				jsonValue = *arrayIterator;
 				if(jsonValue.isObject()){
 					treeItemModel->InsertNewItem();
-					treeItemModel->ParseRecursive(jsonValue.toObject(), *treeItemModel->m_items.last());
+					treeItemModel->ParseRecursive(jsonValue.toObject(), treeItemModel->m_items.count() - 1);
 				}
 				arrayIterator++;
 			}
@@ -535,10 +535,10 @@ bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, Item &item)
 		else if(jsonValue.isObject()){
 			CTreeItemModel* treeItemModel = AddTreeModel(objectIterator.key().toUtf8());
 			treeItemModel->InsertNewItem();
-			treeItemModel->ParseRecursive(jsonValue.toObject(), *treeItemModel->m_items.last());
+			treeItemModel->ParseRecursive(jsonValue.toObject(), treeItemModel->m_items.count() - 1);
 		}
 		else{
-			SetData(objectIterator.key().toUtf8(),objectIterator.value().toVariant());
+			SetData(objectIterator.key().toUtf8(),objectIterator.value().toVariant(), index);
 		}
 		objectIterator++;
 	}
