@@ -8,9 +8,6 @@ win32{
 else{
 	DESIGN_TOKEN_CREATOR_EXE = DesignTokenCreatorExe
 }
-macx*{
-	DESIGN_TOKEN_CREATOR_EXE = DesignTokenCreatorExe.app/Contents/MacOS/DesignTokenCreatorExe
-}
 
 #  Setting the executable absolutely file path for specific OS
 DESIGN_TOKEN_CREATOR_EXE_BIN = $$PWD/../../Bin/$$COMPILER_DIR/$$DESIGN_TOKEN_CREATOR_EXE
