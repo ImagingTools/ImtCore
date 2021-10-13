@@ -23,8 +23,8 @@
 			"OnSelected": "DeepBlue"
 		},
 		"Active": {
-			"Window": "GrayBlue",
-			"WindowText": "White",
+			"Background": "GrayBlue",
+			"Foreground": "White",
 			"Base": "White",
 			"AlternateBase": "LightGray",
 			"ToolTipBase": "LightGray",
@@ -38,8 +38,8 @@
 			"HighlightedText": "White"
 		},
 		"Inactive": {
-			"Window": "GrayBlue",
-			"WindowText": "White",
+			"Background": "GrayBlue",
+			"Foreground": "White",
 			"Base": "White",
 			"AlternateBase": "LightGray",
 			"ToolTipBase": "LightGray",
@@ -53,8 +53,8 @@
 			"HighlightedText": "White"
 		},
 		"Disabled": {
-			"Window": "GrayBlue",
-			"WindowText": "White",
+			"Background": "GrayBlue",
+			"Foreground": "White",
 			"Base": "White",
 			"AlternateBase": "LightGray",
 			"ToolTipBase": "LightGray",

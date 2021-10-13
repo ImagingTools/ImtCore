@@ -258,10 +258,17 @@ QByteArrayList CImtStyleUtils::GetVariables(const QByteArray& data, const QChar&
 	return retval;
 }
 
-bool CImtStyleUtils::SetVariables(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QMap<QByteArray, QByteArray> variables)
+bool CImtStyleUtils::SetVariables(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QMap<QByteArray, QByteArray>& variables)
 {
 	bool retval = SetVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, variables);
 	while(SetVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, variables));
+	return retval;
+}
+
+bool CImtStyleUtils::SetVariablesFromDualVariable(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QVariantMap& variables)
+{
+	bool retval = SetVariablesFromDualVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, variables);
+	while(SetVariablesFromDualVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, variables));
 	return retval;
 }
 
@@ -755,8 +762,78 @@ bool CImtStyleUtils::SetVariable_(QByteArray& data, const QChar& variableBeginSy
 			}
 		}
 	}
-
 	return false;
+}
+
+bool CImtStyleUtils::SetVariablesFromDualVariable_(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QVariantMap& variables)
+{
+	/// points to 'beginSymbol' symbol
+	int indexOfBeginVariable = -1;
+
+	/// points to 'endSymbol' symbol
+	int indexOfEndVariable = -1;
+
+	for(int i = 0; i < data.length(); ++i){
+		QChar symbol(data.at(i));
+		if(symbol == variableBeginSymbol && i+1 < data.length()){
+
+			QChar nextSymbol = data.at(i+1);
+			if(nextSymbol == variableBeginSymbol2){
+				indexOfBeginVariable = i;
+
+				for(int j = i+1; j < data.length(); ++j){
+					QChar endSymbol = data.at(j);
+
+					if(endSymbol == variableEndSymbol){
+						indexOfEndVariable = j;
+						break;
+					}
+				}
+			}
+		}
+
+		if(indexOfBeginVariable > -1 && indexOfEndVariable > indexOfBeginVariable){
+			int lengthOfVariable = indexOfEndVariable - indexOfBeginVariable - 2;
+
+			QByteArray variableName = data.mid(indexOfBeginVariable + 2, lengthOfVariable);
+			QByteArrayList variablesParts = variableName.split('.');
+			if(variablesParts.size() > 1){
+				QByteArray varGroup = variablesParts[0];
+				QByteArray varRole = variablesParts[1];
+
+
+				QVariant currentVariableColorroles;
+				QVariant currentVariableColor;
+				bool hasColorGroup = CImtStyleUtils::FindColorEnrty(varGroup, variables, currentVariableColorroles, QString::fromUtf8("Colors"));
+				bool hasColorRole = CImtStyleUtils::FindColorEnrty(varRole, currentVariableColorroles.toMap(),currentVariableColor);
+				if (hasColorGroup && hasColorRole && currentVariableColor.isValid()){
+					data.replace(indexOfBeginVariable, lengthOfVariable + 3, currentVariableColor.toString().toUtf8());
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool CImtStyleUtils::FindColorEnrty(const QByteArray& name, const QVariantMap& variantMap, QVariant& output, const QString& appendix)
+{
+	bool retval = false;
+
+	QStringList keys = variantMap.keys();
+
+	for (const QString& key: ::qAsConst(keys)){
+		QString clearKey = key;
+		if(appendix.length() && key.endsWith(appendix, Qt::CaseInsensitive)){
+			clearKey = clearKey.chopped(appendix.length());
+		}
+		clearKey = clearKey.toUpper();
+		if(clearKey == name.toUpper()){
+			output = variantMap[key];
+			return true;
+		}
+	}
+	return retval;
 }
 
 

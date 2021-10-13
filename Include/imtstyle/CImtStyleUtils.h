@@ -34,7 +34,16 @@ public:
 				const QChar& variableBeginSymbol,
 				const QChar& variableBeginSymbol2,
 				const QChar& variableEndSymbol,
-				const QMap<QByteArray, QByteArray> variables);
+				const QMap<QByteArray, QByteArray>& variables);
+	/**
+		sets variable that declared as dual i.e. Active.Background
+	*/
+	static bool SetVariablesFromDualVariable(QByteArray& data,
+							 const QChar& variableBeginSymbol,
+							 const QChar& variableBeginSymbol2,
+							 const QChar& variableEndSymbol,
+							 const QVariantMap& variables);
+
 	static bool GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role);
 	static QString GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role);
 	static QPalette GetPaletteFromMultiEntry(const QJsonValue& styleEntry);
@@ -79,6 +88,13 @@ private:
 				const QChar& variableBeginSymbol2,
 				const QChar& variableEndSymbol,
 				const QMap<QByteArray, QByteArray> variables);
+	static bool SetVariablesFromDualVariable_(
+				QByteArray& data,
+				const QChar& variableBeginSymbol,
+				const QChar& variableBeginSymbol2,
+				const QChar& variableEndSymbol,
+				const QVariantMap& variables);
+	static bool FindColorEnrty(const QByteArray& name, const QVariantMap& variantMap, QVariant& output, const QString& appendix = QString());
 };
 
 

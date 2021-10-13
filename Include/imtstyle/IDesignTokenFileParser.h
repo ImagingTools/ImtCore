@@ -22,7 +22,7 @@ public:
 	virtual bool ParseFile() = 0;
 	virtual bool SplitFile(const QString& outputDirPath, const QString& projectName) = 0;
 
-	virtual bool GetStyleSheetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const = 0;
+	virtual bool GetStyleSheetColorPalette(const QByteArray& designSchemaId, QVariantMap& palette) const = 0;
 	virtual QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const = 0;
 
 	virtual QByteArray GetTemplateIconColor(const QByteArray& styleName = QByteArray()) const = 0;

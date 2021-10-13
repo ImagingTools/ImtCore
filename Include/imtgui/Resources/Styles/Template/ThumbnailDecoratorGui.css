@@ -24,17 +24,17 @@ QTreeWidget#SubPages::item:last
 
 QTreeWidget#SubPages::item:selected
 {
-        background-color: ${Active.Base};
-        color: ${Current.Base};
+    background-color: ${Active.Base};
+    color: ${Active.Base};
 }
 
 QTreeWidget#SubPages::item:!selected:hover
 {
-        background-color: ${Active.Light};
+    background-color: ${Active.Light};
 }
 
 QTreeWidget#SubPages::item:first:selected
 {
-        border-top: 1px ${Active.Midlight};
+    border-top: 1px ${Active.Midlight};
 }
 

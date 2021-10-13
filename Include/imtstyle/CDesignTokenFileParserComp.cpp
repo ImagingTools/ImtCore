@@ -26,7 +26,7 @@ QByteArray CDesignTokenFileParserComp::GetRawColor(const QByteArray& styleName, 
 }
 
 
-bool CDesignTokenFileParserComp::GetStyleSheetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const
+bool CDesignTokenFileParserComp::GetStyleSheetColorPalette(const QByteArray& designSchemaId, QVariantMap& palette) const
 {
 	if(!designSchemaId.length() && m_styleSheetColors.size()) {
 		palette = m_stylesPalettes.first();
@@ -127,7 +127,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 		m_iconColors.insert(styleName, colorsMap);
 		m_designSchemaList.InsertItem(styleName.toUtf8(), styleName,"");
 
-		m_stylesPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromMultiEntry(styleEntry));
+		m_stylesPalettes.insert(styleName, styleEntry.toVariantMap());
 		m_colorPalettes.insert(styleName, CImtStyleUtils::GetPaletteFromMultiEntry(styleEntry));
 
 		imtbase::CCollectionInfo* themeFontsCollection = new imtbase::CCollectionInfo;

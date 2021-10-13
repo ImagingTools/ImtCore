@@ -50,7 +50,7 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 	for (const QByteArray& styleName: ::qAsConst(styles)){
 
 		m_currentTheme = styleName;
-		QPalette palette;
+		QVariantMap palette;
 		m_designTokenFileParserAttrPtr->GetStyleSheetColorPalette(styleName, palette);
 		QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Styles") + QDir::separator().toLatin1() + styleName.constData();
 
@@ -128,7 +128,8 @@ bool CDesignTokenStyleSheetProcessorComp::ProcesCssFile(const QByteArray& fileNa
 		return true;
 	}
 
-	while (this->SetVariableColor(fileData, m_currentPalette));
+//	while (this->SetVariableColor(fileData, m_currentPalette));
+	CImtStyleUtils::SetVariablesFromDualVariable(fileData, '$', '{', '}', m_currentPalette);
 
 	CImtStyleUtils::SetVariables(fileData, '$', '(', ')', m_currentFontsCss);
 

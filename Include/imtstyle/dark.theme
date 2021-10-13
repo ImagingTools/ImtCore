@@ -30,8 +30,8 @@
 			"OnSelected": "LightYellow"
 		},
 		"ActiveColors": {
-			"Window": "DeepGray",
-			"WindowText": "White",
+			"Background": "DeepGray",
+			"Foreground": "White",
 			"Base": "DarkGray",
 			"AlternateBase": "DeepGray",
 			"ToolTipBase": "LightGray",
@@ -47,8 +47,8 @@
 			"Midlight": "Black"
 		},
 		"InactiveColors": {
-			"Window": "DeepGray",
-			"WindowText": "White",
+			"Background": "DeepGray",
+			"Foreground": "White",
 			"Base": "DarkGray",
 			"AlternateBase": "DeepGray",
 			"ToolTipBase": "LightGray",
@@ -64,8 +64,8 @@
 			"Midlight": "Black"
 		},
 		"DisabledColors": {
-			"Window": "DeepGray",
-			"WindowText": "White",
+			"Background": "DeepGray",
+			"Foreground": "White",
 			"Base": "DarkGray",
 			"AlternateBase": "DeepGray",
 			"ToolTipBase": "LightGray",

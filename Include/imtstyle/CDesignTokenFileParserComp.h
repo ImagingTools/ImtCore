@@ -35,7 +35,7 @@ public:
 	bool SetFile(const QByteArray& filePath) override;
 
 	QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const override;
-	bool GetStyleSheetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const override;
+	bool GetStyleSheetColorPalette(const QByteArray& designSchemaId, QVariantMap& palette) const override;
 
 	QByteArray GetTemplateIconColor(const QByteArray& styleName) const override;
 	QByteArray GetNormalColor(const QByteArray& styleName) const override;
@@ -70,7 +70,7 @@ private:
 	imtbase::CCollectionInfo m_emptyCollectionInfo;
 
 	QVariantMap m_iconColors;
-	QMap<QString, QPalette> m_stylesPalettes;
+	QMap<QString, QVariantMap> m_stylesPalettes;
 	QMap<QString, QPalette> m_colorPalettes;
 
 	QMap<QString, istd::TSmartPtr<imtbase::ICollectionInfo>> m_fontsCollectionInfos;
