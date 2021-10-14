@@ -1,11 +1,6 @@
 #include <imtauthgui/CContactInfoEditorDataControllerComp.h>
 
 
-// Qt includes
-#include <QtQml/QQmlEngine>
-#include <QtQml/QQmlContext>
-#include <QtCore/QDebug>
-
 // ACF includes
 #include <istd/CChangeGroup.h>
 #include <iser/CJsonStringWriteArchive.h>

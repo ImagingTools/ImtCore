@@ -2,8 +2,6 @@
 
 
 // Qt includes
-#include <QtQml/QQmlEngine>
-#include <QtQml/QQmlContext>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>

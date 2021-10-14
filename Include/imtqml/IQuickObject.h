@@ -42,6 +42,11 @@ public:
 	virtual QQuickItem* GetQuickItem() const = 0;
 
 	/**
+		Set BaseUrl for NetworkAccessManager.
+	*/
+	virtual void SetBaseUrl(const QString& baseUrl) const = 0;
+
+	/**
 		Called on trying to close application.
 		\param	ignoredPtr		if it is not NULL, ignoring of close is allowed.
 								In this case implementation should set pointed value to true.

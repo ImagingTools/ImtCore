@@ -30,6 +30,7 @@ public:
 	I_BEGIN_COMPONENT(CQuickObjectCompBase);
 		I_REGISTER_INTERFACE(imtqml::IQuickObject);
 		I_ASSIGN(m_pathToQmlAttrPtr, "QmlFilePath", "This path used for load QML file", true, GetPathToQml());
+		I_ASSIGN(m_baseUrlAttrPtr, "BaseUrl", "BaseUrl for AccessManager", false, "");
 		I_ASSIGN_MULTI_0(m_modelIdsAttrPtr, "ModelIdsAttr", "If enabled, this Id's used for register models", false);
 		I_ASSIGN_MULTI_0(m_modelQueriesAttrPtr, "ModelQueries", "If enabled, this Queries used for get datas", false);
 		I_ASSIGN(m_dataProviderCompPtr, "DataProviderComp", "If enabled, this ref used for get datas", false, "");
@@ -44,6 +45,7 @@ public:
 	virtual bool CreateQuickItem(QQuickItem* parentPtr) override;
 	virtual bool DestroyQuickItem() override;
 	virtual QQuickItem* GetQuickItem() const override;
+	virtual void SetBaseUrl(const QString& baseUrl) const;
 	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
 
 protected:
@@ -77,6 +79,7 @@ public Q_SLOTS:
 
 protected:
 	I_ATTR(QString, m_pathToQmlAttrPtr);
+	I_ATTR(QString, m_baseUrlAttrPtr);
 	I_MULTIATTR(QByteArray, m_modelIdsAttrPtr);
 	I_MULTIATTR(QByteArray, m_modelQueriesAttrPtr);
 	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_dataProviderCompPtr);

@@ -55,13 +55,19 @@ bool CQuickObjectCompBase::CreateQuickItem(QQuickItem* parentPtr)
 		return false;
 	}
 
-	m_quickItemPtr = CreateItem(qmlEngine(parentPtr));
-	if (m_quickItemPtr != nullptr){
-		m_quickItemPtr->setParentItem(parentPtr);
+	QQmlEngine *engine = qmlEngine(parentPtr);
+	if (engine != nullptr){
+		if (m_baseUrlAttrPtr.IsValid() && *m_baseUrlAttrPtr != ""){
+			engine->setBaseUrl(*m_baseUrlAttrPtr);
+		}
+		m_quickItemPtr = CreateItem(engine);
+		if (m_quickItemPtr != nullptr){
+			m_quickItemPtr->setParentItem(parentPtr);
 
-		OnItemCreated();
+			OnItemCreated();
 
-		return true;
+			return true;
+		}
 	}
 
 	return false;
@@ -87,6 +93,15 @@ bool CQuickObjectCompBase::DestroyQuickItem()
 QQuickItem* CQuickObjectCompBase::GetQuickItem() const
 {
 	return m_quickItemPtr;
+}
+
+
+void CQuickObjectCompBase::SetBaseUrl(const QString &baseUrl) const
+{
+	if (m_quickItemPtr != nullptr){
+		QQmlEngine *engine = qmlEngine(m_quickItemPtr);
+		engine->setBaseUrl(baseUrl);
+	}
 }
 
 
