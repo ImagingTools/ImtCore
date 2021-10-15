@@ -1,58 +1,59 @@
 QWidget
 {
-	color: #ffffff;
+	background: ${Active.Background}; 	
+	color: ${Active.Foreground};
 }
 
 QWidget::item:disabled
 {
-	color: palette(disabled);
+	color: ${Active.Foreground};
 }
 
 QWidget:disabled 
 {
-	color: palette(disabled);
+	color: ${Active.Foreground};
 }
 
 QSplashScreen > QWidget
 {
-	color: #ffffff;
+	color: ${Active.Foreground};
 	background: transparent;
 }
 
 QSplashScreen > QWidget > QLabel
 {
-	color: yellow;
+	color: ${Active.YellowLabel};
 	background: transparent;
 }
 
 QWidget#MainVersionTitleLabel, QWidget#MainVersionLabel
 {
-	color: #ffffff;
+	color: ${Active.Foreground};
 }
 
 QSplashScreen > QWidget#CopyrightLabel
 {
-	color: #ffffff;
+	color: ${Active.Foreground};
 }
 
 QWidget#BottomFrame
 {
-	background: palette(dark);
+	background: ${Active.Background};
 }
 
 QWidget#RightFrame
 {
-	 border-left: 1px solid /*#335777*/; 
+	 border-left: 1px solid ${Active.Text};  
 }
 
 QWidget#StatusFrame
 {
-	border-bottom: 1px solid /*#335777*/;
+	border-bottom: 1px solid ${Active.Text}; 
 }
 
 QLabel#PageLabel
 {
-	/*color: #335777;*/
+	color: ${Active.Text}; /*color: #335777;*/
 }
 
 QWidget[ImtTopFrame=true]
@@ -63,18 +64,18 @@ QWidget[ImtTopFrame=true]
 
 QLabel[Header=true]
 {
-	/*color: #88b8e3;*/
+	color: ${Active.BlueLabel};
 }
 
 QToolButton
 {
-	/*color: #335777;*/
+	color: ${Active.Text};
 }
 
 QToolButton#windowTitle
 {
-	background: palette(window);
-	border: 1px solid palette(mid);
+	background: ${Active.Background};
+	border: 1px solid ${Active.Mid};
 }
 
 QToolButton#PageIconToolButton 
@@ -96,53 +97,53 @@ QToolBar[ImtToolBar=true]::separator
 
 QTableView[ImtMenu=true]
 {
-	color: palette(midlight);
+	color: ${Active.Midlight};
 
-	background: palette(base);
+	background: ${Active.Base};
 }
 
 
 QAbstractItemView::item::selected
 {
-	background-color: rgba(160, 80, 40, 128);
+	background-color: color: ${Active.Background};  /* rgba(160, 80, 40, 128); */
 }
 
 QAbstractItemView::branch::selected
 {
-	background-color: rgba(160, 80, 40, 128);
+	background-color: ${Active.Background}; /* rgba(160, 80, 40, 128); */
 }
 
 QComboBox::item:selected
 {
-	color: white;
+	color: ${Active.Selected};
 }
 
 QHeaderView::section
 {
-	border-bottom: 1px solid palette(mid);
+	border-bottom: 1px solid ${Active.Mid}; /*palette(mid); */
 }
 
 QTabBar
 {
-	background-color: palette(base);
+	background-color: ${Active.Base};
 }
 
 
 QTabBar::tab[CollectionView=true]
 {
-	color: rgb(128,128,128);
+	color: ${Active.Button}; /* color: rgb(128,128,128); */
 	
-	background-color: palette(base);
+	background-color: ${Active.Base};
 }
 
 QTabBar::tab:selected[CollectionView=true]
 {
-	color: rgb(235, 98, 37, 200);
+	color: ${Active.Text}; /* color: rgb(235, 98, 37, 200); */
 }
 
 QTabBar::tab::top:selected[CollectionView=true]
 {
-	border-bottom: 2px solid rgba(235, 98, 37, 128);
+	border-bottom: 2px solid ${Active.Link}; /* rgba(235, 98, 37, 128); */
 }
 
 QTabBar::tab::left:selected[CollectionView=true]
@@ -152,17 +153,17 @@ QTabBar::tab::left:selected[CollectionView=true]
 
 QTabBar::tab::right:selected[CollectionView=true]
 {
-	border-left: 2px solid rgba(235, 98, 37, 128);
+	border-left: 2px solid ${Active.Link}; /* rgba(235, 98, 37, 128); */
 }
 
 QTabBar::tab::bottom:selected[CollectionView=true]
 {
-	border-bottom: 2px solid rgba(235, 98, 37, 128);
+	border-bottom: 2px solid ${Active.Link}; /* rgba(235, 98, 37, 128); */
 }
 
 QFrame[frameShape="4"],
 QFrame[frameShape="5"]
 {
     border: none;
-    background: palette(dark);
+    background: ${Active.Dark};
 }

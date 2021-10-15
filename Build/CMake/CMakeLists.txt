@@ -17,9 +17,11 @@ include_directories(${AUX_INCLUDE_DIR}/..)
 
 #------ DesignToken ------
 add_subdirectory("${INCLUDE_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbase")
-add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
+add_subdirectory("${INCLUDE_DIR}/imtdesign/CMake" "${AUX_INCLUDE_DIR}/imtdesign")
 add_subdirectory("${IMPL_DIR}/DesignTokenCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreatorExe")
-add_dependencies(DesignTokenCreatorExe imtbase imtstyle ImtStylePck)
+add_dependencies(DesignTokenCreatorExe imtbase imtdesign)
+add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
+add_dependencies(imtstyle DesignTokenCreatorExe)
 
 
 #-------- Include --------
@@ -68,11 +70,17 @@ endif()
 add_subdirectory("${IMPL_DIR}/ImtCorePck/CMake" "${AUX_INCLUDE_DIR}/ImtCorePck")
 add_dependencies(ImtCorePck imtbase)
 
+add_subdirectory("${IMPL_DIR}/ImtDesignPck/CMake" "${AUX_INCLUDE_DIR}/ImtDesignPck")
+add_dependencies(ImtDesignPck imtdesign)
+
 add_subdirectory("${IMPL_DIR}/ImtStylePck/CMake" "${AUX_INCLUDE_DIR}/ImtStylePck")
 add_dependencies(ImtStylePck imtstyle)
 
 add_subdirectory("${IMPL_DIR}/ImtAuthPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthPck")
 add_dependencies(ImtAuthPck imtbase imtauth)
+
+add_subdirectory("${IMPL_DIR}/ImtAuthGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGuiPck")
+add_dependencies(ImtAuthGuiPck imtbase imtauth imtauthgui)
 
 add_subdirectory("${IMPL_DIR}/ImtLicensePck/CMake" "${AUX_INCLUDE_DIR}/ImtLicensePck")
 add_dependencies(ImtLicensePck imtbase)
@@ -137,9 +145,6 @@ if(NOT DEFINED USE_QT3D OR USE_QT3D)
 endif()
 
 if(NOT DEFINED USE_QTQML OR USE_QTQML)
-	add_subdirectory("${IMPL_DIR}/ImtAuthGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGuiPck")
-	add_dependencies(ImtAuthGuiPck imtbase imtqml imtauth imtauthgui)
-
 	add_subdirectory("${IMPL_DIR}/ImtQmlPck/CMake" "${AUX_INCLUDE_DIR}/ImtQmlPck")
 	add_dependencies(ImtQmlPck imtqml)
 endif()

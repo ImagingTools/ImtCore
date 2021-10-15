@@ -10,21 +10,21 @@ QWidget#BottomPageTree
 
 QTreeView#PageTree::item::hover
 {
-        background-color: ${Normal.Light};
+        background-color: ${Active.Hover};
 }
 
 QTreeView#BottomPageTree::item::hover
 {
-background-color: ${Normal.Light};
+background-color: ${Active.Hover};
 }
 
 QPushButton#pushTop, QPushButton#pushBottom
 {
-	border: 1px solid #9d9d9d;
-	background: #e0e0e0;
+	border: 1px solid ${Active.ButtonBorder}; /* #9d9d9d; */
+	background: ${Active.Background}; /* #e0e0e0; */
 }
 
 QPushButton#pushTop::hover, QPushButton#pushBottom::hover
 {
-	background: white;
+	background: ${Active.Hover}; /* white; */
 }

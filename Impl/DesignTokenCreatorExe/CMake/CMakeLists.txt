@@ -22,5 +22,5 @@ include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} imtbase imtstyle)
+target_link_libraries(${PROJECT_NAME} imtdesign imtbase)
 

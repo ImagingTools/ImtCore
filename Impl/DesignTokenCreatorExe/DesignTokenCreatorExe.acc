@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4948" Description="ACF"/>
+            <Version Id="0" Number="4950" Description="ACF"/>
             <Version Id="1" Number="2151" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -35,17 +35,17 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="DesignTokenArgumentsParser" PackageId="ImtStylePck" ComponentId="DesignTokenArgumentsParser">
+        <Element Id="DesignTokenArgumentsParser" PackageId="ImtDesignPck" ComponentId="DesignTokenArgumentsParser">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="DesignTokenFileParser" PackageId="ImtStylePck" ComponentId="DesignTokenFileParser">
+        <Element Id="DesignTokenFileParser" PackageId="ImtDesignPck" ComponentId="DesignTokenFileParser">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="DesignTokenIconProcessor" PackageId="ImtStylePck" ComponentId="DesignTokenIconProcessor">
+        <Element Id="DesignTokenIconProcessor" PackageId="ImtDesignPck" ComponentId="DesignTokenIconProcessor">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
@@ -57,7 +57,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="DesignTokenProcessorsController" PackageId="ImtStylePck" ComponentId="DesignTokenProcessorsController">
+        <Element Id="DesignTokenProcessorsController" PackageId="ImtDesignPck" ComponentId="DesignTokenProcessorsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
@@ -75,7 +75,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="DesignTokenQrcUpdater" PackageId="ImtStylePck" ComponentId="DesignTokenQrcUpdater">
+        <Element Id="DesignTokenQrcUpdater" PackageId="ImtDesignPck" ComponentId="DesignTokenQrcUpdater">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
@@ -87,7 +87,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="DesignTokenStyleSheetProcessor" PackageId="ImtStylePck" ComponentId="DesignTokenStyleSheetProcessor">
+        <Element Id="DesignTokenStyleSheetProcessor" PackageId="ImtDesignPck" ComponentId="DesignTokenStyleSheetProcessor">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
@@ -117,7 +117,7 @@
     </EmbeddedRegistriesList>
     <ExportedInterfaces>
         <Interface InterfaceId="ibase::IApplication" ComponentId="ConsoleApplication"/>
-        <Interface InterfaceId="imtstyle::IDesignTokenArgumentsParser" ComponentId="DesignTokenArgumentsParser"/>
+        <Interface InterfaceId="imtdesign::IDesignTokenArgumentsParser" ComponentId="DesignTokenArgumentsParser"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

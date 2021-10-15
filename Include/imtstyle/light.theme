@@ -6,7 +6,8 @@
 		"White": "#ffffff",
 		"ImagingTools Blue": "#335777",
 		"LightBlue": "#3399cc",
-		"DeepBlue": "#1a76e7"
+		"DeepBlue": "#1a76e7",
+		"LightYellow": "#FFFFB0"
 	},
 	"Style": {
 		"Name": "Light",
@@ -22,7 +23,7 @@
 			"OnNormal": "ImagingTools Blue",
 			"OnSelected": "DeepBlue"
 		},
-		"Active": {
+		"ActiveColors": {
 			"Background": "GrayBlue",
 			"Foreground": "White",
 			"Base": "White",
@@ -31,13 +32,22 @@
 			"ToolTipText": "LightGray",
 			"Text": "LightGray",
 			"Button": "LightGray",
+			"ButtonBorder": "LightGray2",
 			"ButtonText": "ImagingTools Blue",
 			"BrightText": "White",
+			"Hover": "GrayBlue",
 			"Link": "LightBlue",
-			"Highlight": "DeepBlue",
-			"HighlightedText": "White"
+			"HighLight": "DeepBlue",
+			"HighLightedText": "White",
+			"Light": "GrayBlue",
+			"Mid": "GrayBlue",
+			"MidLight": "GrayBlue",
+			"Dark": "GrayBlue",
+			"BlueLabel": "GrayBlue",
+			"YellowLabel": "LightYellow",
+			"Selected": "LightGray"
 		},
-		"Inactive": {
+		"InactiveColors": {
 			"Background": "GrayBlue",
 			"Foreground": "White",
 			"Base": "White",
@@ -48,11 +58,19 @@
 			"Button": "LightGray",
 			"ButtonText": "ImagingTools Blue",
 			"BrightText": "White",
+			"Hover": "GrayBlue",
 			"Link": "LightBlue",
-			"Highlight": "DeepBlue",
-			"HighlightedText": "White"
+			"HighLight": "DeepBlue",
+			"HighLightedText": "White",
+			"Light": "GrayBlue",
+			"Mid": "GrayBlue",
+			"MidLight": "GrayBlue",
+			"Dark": "GrayBlue",
+			"BlueLabel": "GrayBlue",
+			"YellowLabel": "LightYellow",
+			"Selected": "LightGray"
 		},
-		"Disabled": {
+		"DisabledActiveColors": {
 			"Background": "GrayBlue",
 			"Foreground": "White",
 			"Base": "White",
@@ -63,9 +81,40 @@
 			"Button": "LightGray",
 			"ButtonText": "ImagingTools Blue",
 			"BrightText": "White",
+			"Hover": "GrayBlue",
 			"Link": "LightBlue",
-			"Highlight": "DeepBlue",
-			"HighlightedText": "White"
+			"HighLight": "DeepBlue",
+			"HighLightedText": "White",
+			"Light": "GrayBlue",
+			"Mid": "GrayBlue",
+			"MidLight": "GrayBlue",
+			"Dark": "GrayBlue",
+			"BlueLabel": "GrayBlue",
+			"YellowLabel": "LightYellow",
+			"Selected": "LightGray"
+		},
+		"DisabledInActiveColors": {
+			"Background": "GrayBlue",
+			"Foreground": "White",
+			"Base": "White",
+			"AlternateBase": "LightGray",
+			"ToolTipBase": "LightGray",
+			"ToolTipText": "LightGray",
+			"Text": "LightGray",
+			"Button": "LightGray",
+			"ButtonText": "ImagingTools Blue",
+			"BrightText": "White",
+			"Hover": "GrayBlue",
+			"Link": "LightBlue",
+			"HighLight": "DeepBlue",
+			"HighLightedText": "White",
+			"Light": "GrayBlue",
+			"Mid": "GrayBlue",
+			"MidLight": "GrayBlue",
+			"Dark": "GrayBlue",
+			"BlueLabel": "GrayBlue",
+			"YellowLabel": "LightYellow",
+			"Selected": "LightGray"
 		},
 		"Fonts": {
 			"Default": {

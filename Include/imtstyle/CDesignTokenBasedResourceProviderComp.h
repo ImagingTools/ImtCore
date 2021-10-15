@@ -15,7 +15,7 @@
 #include <imtbase/CJsonHelper.h>
 #include <imtstyle/IColorPaletteProvider.h>
 #include <imtstyle/IFontProvider.h>
-#include <imtstyle/IDesignTokenFileParser.h>
+#include <imtdesign/IDesignTokenFileParser.h>
 
 
 namespace imtstyle
@@ -64,7 +64,7 @@ private:
 	I_MULTIATTR(QByteArray, m_resourceFileNameAttrPtr);
 	I_MULTIATTR(QByteArray, m_designShemaIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_paletteModeAttrPtr);
-	I_REF(IDesignTokenFileParser, m_designTokenFileParser);
+	I_REF(imtdesign::IDesignTokenFileParser, m_designTokenFileParser);
 
 	imtbase::CCollectionInfo m_designSchemaList;
 

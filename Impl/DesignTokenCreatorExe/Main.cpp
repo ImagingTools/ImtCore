@@ -9,7 +9,7 @@
 #include <ifile/IFileNameParam.h>
 
 // ImtCore includes
-#include <imtstyle/IDesignTokenArgumentsParser.h>
+#include <imtdesign/IDesignTokenArgumentsParser.h>
 #include <GeneratedFiles/DesignTokenCreatorExe/CDesignTokenCreatorExe.h>
 
 
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 {
 	CDesignTokenCreatorExe instance;
 
-	imtstyle::IDesignTokenArgumentsParser* argumentsParser = instance.GetInterface<imtstyle::IDesignTokenArgumentsParser>();
+	imtdesign::IDesignTokenArgumentsParser* argumentsParser = instance.GetInterface<imtdesign::IDesignTokenArgumentsParser>();
 	if (argumentsParser == nullptr){
 		std::cerr << "Component configuration failed" << std::endl;
 		return -1;
