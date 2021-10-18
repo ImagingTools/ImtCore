@@ -480,6 +480,18 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 					qint32 intVal = value.toInt();
 					retVal = retVal && archive.Process(intVal);
 				}
+				else if (value.type() == QVariant::UInt){
+					quint32 intVal = value.toUInt();
+					retVal = retVal && archive.Process(intVal);
+				}
+				else if (value.type() == QVariant::LongLong){
+					qint64 intVal = value.toLongLong();
+					retVal = retVal && archive.Process(intVal);
+				}
+				else if (value.type() == QVariant::ULongLong){
+					quint64 intVal = value.toULongLong();
+					retVal = retVal && archive.Process(intVal);
+				}
 				else if (value.type() == QVariant::Bool){
 					bool boolVal = value.toBool();
 					retVal = retVal && archive.Process(boolVal);
