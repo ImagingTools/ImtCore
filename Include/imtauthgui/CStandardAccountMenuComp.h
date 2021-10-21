@@ -23,6 +23,7 @@ public:
 	I_BEGIN_COMPONENT(CStandardAccountMenuComp);
 		I_ASSIGN(m_accountPreviewAttrPtr, "AccountIcon", "Account icon", true, ":/Icons/Account");
 		I_ASSIGN(m_preferencesIconAttrPtr, "PreferencesIcon", "Preferences icon", true, ":/Icons/Settings");
+		I_ASSIGN(m_logoutIconAttrPtr, "LogoutIcon", "Logout icon", true, ":/Icons/Exit");
 		I_ASSIGN(m_iconSizeAttrPtr, "IconSize", "Size of icons", true, 32);
 		I_ASSIGN(m_loginCompPtr, "Login", "Login", false, "Login");
 		I_ASSIGN(m_preferencesDialogCompPtr, "PreferencesDialog", "Preferences dialog", false, "Preferences");
@@ -45,6 +46,7 @@ private:
 private:
 	I_ATTR(QByteArray, m_accountPreviewAttrPtr);
 	I_ATTR(QByteArray, m_preferencesIconAttrPtr);
+	I_ATTR(QByteArray, m_logoutIconAttrPtr);
 	I_ATTR(int, m_iconSizeAttrPtr);
 	I_REF(iauth::ILogin, m_loginCompPtr);
 	I_REF(iqtgui::IDialog, m_preferencesDialogCompPtr);

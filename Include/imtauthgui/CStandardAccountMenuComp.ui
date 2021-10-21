@@ -7,13 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>554</width>
-    <height>183</height>
+    <height>195</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QFrame" name="AccountFrame">
      <property name="frameShape">
@@ -124,6 +130,13 @@
       <enum>QFrame::Plain</enum>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLabel" name="LogoutIcon">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QLabel" name="LogoutLabel">
         <property name="sizePolicy">

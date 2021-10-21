@@ -31,9 +31,6 @@ QVariant CGqlObject::GetFieldArgumentValue(const QByteArray &fieldId) const
 	if (m_fieldsMap.contains(fieldId)){
 		retVal = m_fieldsMap[fieldId].value;
 	}
-	else{
-		Q_ASSERT(false);
-	}
 
 	return retVal;
 }
@@ -45,9 +42,6 @@ const CGqlObject* CGqlObject::GetFieldArgumentObjectPtr(const QByteArray &fieldI
 
 	if (m_fieldsMap.contains(fieldId)){
 		retVal = m_fieldsMap[fieldId].objectPtr.GetPtr();
-	}
-	else{
-		Q_ASSERT(false);
 	}
 
 	return retVal;
@@ -62,9 +56,6 @@ void CGqlObject::InsertField(const QByteArray &fieldId)
 
 		m_fieldsMap[fieldId] = newField;
 	}
-	else{
-		Q_ASSERT(false);
-	}
 }
 
 
@@ -73,9 +64,6 @@ void CGqlObject::InsertFieldArgument(const QByteArray &fieldId, const QVariant &
 	if (m_fieldsMap.contains(fieldId)){
 		Field& field = m_fieldsMap[fieldId];
 		field.value = value;
-	}
-	else{
-		Q_ASSERT(false);
 	}
 }
 
@@ -91,9 +79,6 @@ void CGqlObject::InsertFieldObject(CGqlObject *objectPtr)
 
 			m_fieldsMap[fieldId] = newField;
 			objectPtr->m_parentPtr = this;
-		}
-		else{
-			Q_ASSERT(false);
 		}
 	}
 }
