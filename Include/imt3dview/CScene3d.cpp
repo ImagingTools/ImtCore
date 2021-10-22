@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #include <imt3dview/CScene3d.h>
 
 
@@ -19,16 +39,18 @@ namespace imt3dview
 
 CScene3d::CScene3d()
 	:m_contextPtr(nullptr),
-	m_sceneBoundingCuboid(-1., 1., -1., 1., 1., -1.),
-	m_nextModelId(0)
+	m_nextModelId(0),
+	m_cameraPtr(nullptr)
 {
 }
 
 
 // reimplemented (IScene3d)
 
-void CScene3d::SetCamera(const IScene3dCamera* cameraPtr)
+void CScene3d::SetCamera(IScene3dCamera* cameraPtr)
 {
+	m_cameraPtr = cameraPtr;
+
 	for (Shapes::Iterator i = m_shapes.begin(); i != m_shapes.end(); ++i){
 		const ShapeInfoPtr& shapeInfoPtr = i.value();
 
@@ -63,9 +85,13 @@ void CScene3d::SetViewPort(const QRect& viewPort)
 }
 
 
-const imt3d::CCuboid& CScene3d::GetBoundingCuboid() const
+imt3d::CCuboid CScene3d::GetBoundingCuboid() const
 {
-	return m_sceneBoundingCuboid;
+	if (m_cameraPtr != nullptr) {
+		return m_cameraPtr->GetBoundingCuboid();
+	}
+
+	return imt3d::CCuboid();
 }
 
 
@@ -192,30 +218,8 @@ void CScene3d::UpdateBoundingCuboid()
 void CScene3d::UpdateBoundingCuboid(const imt3dview::IScene3dItem* objectPtr)
 {
 	imt3d::CCuboid objectCuboid = GetItemBoundingCuboid(objectPtr);
-	if (objectCuboid.IsValid()){
-		if (objectCuboid.GetBottom() < m_sceneBoundingCuboid.GetBottom()){
-			m_sceneBoundingCuboid.SetBottom(objectCuboid.GetBottom());
-		}
-
-		if (objectCuboid.GetTop() > m_sceneBoundingCuboid.GetTop()){
-			m_sceneBoundingCuboid.SetTop(objectCuboid.GetTop());
-		}
-
-		if (objectCuboid.GetLeft() < m_sceneBoundingCuboid.GetLeft()){
-			m_sceneBoundingCuboid.SetLeft(objectCuboid.GetLeft());
-		}
-
-		if (objectCuboid.GetRight() > m_sceneBoundingCuboid.GetRight()){
-			m_sceneBoundingCuboid.SetRight(objectCuboid.GetRight());
-		}
-
-		if (objectCuboid.GetFar() < m_sceneBoundingCuboid.GetFar()){
-			m_sceneBoundingCuboid.SetFar(objectCuboid.GetFar());
-		}
-
-		if (objectCuboid.GetNear() > m_sceneBoundingCuboid.GetNear()){
-			m_sceneBoundingCuboid.SetNear(objectCuboid.GetNear());
-		}
+	if (m_cameraPtr != nullptr) {
+		m_cameraPtr->SetBoundingCuboid(objectCuboid);
 	}
 }
 
@@ -237,14 +241,15 @@ void CScene3d::UpdateItemsScale()
 
 void CScene3d::UpdateItemScale(IScene3dItem& scene3dItem)
 {
-	double maxBound = qAbs(m_sceneBoundingCuboid.GetTop());
-	maxBound = qMax(maxBound, qAbs(m_sceneBoundingCuboid.GetBottom()));
-	maxBound = qMax(maxBound, qAbs(m_sceneBoundingCuboid.GetLeft()));
-	maxBound = qMax(maxBound, qAbs(m_sceneBoundingCuboid.GetRight()));
-	maxBound = qMax(maxBound, qAbs(m_sceneBoundingCuboid.GetNear()));
-	maxBound = qMax(maxBound, qAbs(m_sceneBoundingCuboid.GetFar()));
+	imt3d::CCuboid sceneBoundingCuboid = GetBoundingCuboid();
+	double maxBound = qAbs(sceneBoundingCuboid.GetTop());
+	maxBound = qMax(maxBound, qAbs(sceneBoundingCuboid.GetBottom()));
+	maxBound = qMax(maxBound, qAbs(sceneBoundingCuboid.GetLeft()));
+	maxBound = qMax(maxBound, qAbs(sceneBoundingCuboid.GetRight()));
+	maxBound = qMax(maxBound, qAbs(sceneBoundingCuboid.GetNear()));
+	maxBound = qMax(maxBound, qAbs(sceneBoundingCuboid.GetFar()));
 
-	if (!qFuzzyIsNull(maxBound)){
+	if (!qFuzzyIsNull(maxBound)) {
 		float scale = 1.0f / static_cast<float>(maxBound);
 		scene3dItem.SetScale(scale);
 	}

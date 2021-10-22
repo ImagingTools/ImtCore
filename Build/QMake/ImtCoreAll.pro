@@ -1,24 +1,28 @@
 # Root of ImtCore project
 include ($(ACFDIR)/Config/QMake/Solution.pri)
 
-############### DesignToken must Builds first!!!
-
 SUBDIRS += imtbase
 imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
 
-SUBDIRS += imtstyle
-imtstyle.file = ../../Include/imtstyle/QMake/imtstyle.pro
+SUBDIRS += imtdesign
+imtdesign.file = ../../Include/imtdesign/QMake/imtdesign.pro
 
-SUBDIRS += ImtStylePck
-ImtStylePck.file = ../../Impl/ImtStylePck/QMake/ImtStylePck.pro
-ImtStylePck.depends = imtstyle
+SUBDIRS += ImtDesignPck
+ImtDesignPck.file = ../../Impl/ImtDesignPck/QMake/ImtDesignPck.pro
+ImtDesignPck.depends = imtdesign
 
 SUBDIRS += DesignTokenCreatorExe
 DesignTokenCreatorExe.file = ../../Impl/DesignTokenCreatorExe/QMake/DesignTokenCreatorExe.pro
-DesignTokenCreatorExe.depends = imtbase imtstyles ImtStylePck
+DesignTokenCreatorExe.depends = imtbase imtdesign ImtDesignPck
 
+SUBDIRS += imtstyle
+imtstyle.file = ../../Include/imtstyle/QMake/imtstyle.pro
+imtstyle.depends = DesignTokenCreatorExe
 
-################ libs
+SUBDIRS += ImtStylePck
+ImtStylePck.file = ../../Impl/ImtStylePck/QMake/ImtStylePck.pro
+ImtStylePck.depends = imtstyle DesignTokenCreatorExe
+
 SUBDIRS += imtauth
 imtauth.file = ../../Include/imtauth/QMake/imtauth.pro
 

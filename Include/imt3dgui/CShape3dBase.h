@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #pragma once
 
 
@@ -10,6 +30,7 @@
 
 // ImtCore includes
 #include <imt3dgui/IShape3d.h>
+#include <imt3d/IPointsBasedObject.h>
 
 
 class QOpenGLContext;
@@ -20,7 +41,7 @@ namespace imt3dgui
 
 
 /**
-	Base thread-safe implementation for GL shapes
+	Base implementation for GL shapes (not thread-safe)
 */
 class CShape3dBase: public imod::CSingleModelObserverBase, virtual public IShape3d
 {
@@ -58,11 +79,7 @@ public:
 
 protected:
 	// reimplement (IShape3d)
-	virtual void OnContextInitialized(QOpenGLContext* contextPtr);
-	virtual void OnContextDestroyed(QOpenGLContext* contextPtr);
-	virtual ColorMode GetColorMode() const override { return IShape3d::CM_UNKNOWN; }
 	virtual QVector3D GetColor() const override { return QVector3D(); }
-	virtual bool HasNormals() const { return false; }
 
 protected:
 	// to be implemented in descendants
@@ -75,49 +92,14 @@ protected:
 	QPoint ModelToWindow(const QVector3D& modelCoordinate) const;
 	QVector3D WindowToModel(const QPoint& windowCoordinate, float z) const;
 
-	template <typename TDataVector>
-	void CreateGeometry(const TDataVector& dataVector, QOpenGLBuffer& dataBuffer)
-	{
-		if (!dataVector.isEmpty() && dataBuffer.isCreated()){
-			dataBuffer.bind();
-			dataBuffer.allocate(dataVector.data(), dataVector.count() * sizeof(dataVector.first()));
-			dataBuffer.release();
-		}
-	}
-
-	template <typename TDataVector>
-	void UpdateGeometry(const TDataVector& dataVector, QOpenGLBuffer& dataBuffer)
-	{
-		if (!dataVector.isEmpty() && dataBuffer.isCreated()) {
-			dataBuffer.bind();
-			dataBuffer.write(0, dataVector.data(), dataVector.count() * sizeof(dataVector.first()));
-			dataBuffer.release();
-		}
-	}
+	void CreateGeometry();
+	void RefreshGeometry();
 
 	// reimplemented (imod::CSingleModelObserverBase)
 	void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 protected:
-	struct Vertex
-	{
-		Vertex()
-		{
-		}
-
-		Vertex(const QVector3D& inPosition, const QVector3D& inNormal = QVector3D(), const QVector3D& inColor = QVector3D())
-			:position(inPosition),
-			normal(inNormal),
-			color(inColor)
-		{
-		}
-
-		QVector3D position;
-		QVector3D normal;
-		QVector3D color;
-	};
-
-	QVector<Vertex> m_vertices;
+	const imt3d::IPointsBasedObject* m_pointsDataPtr;
 	QVector<GLuint> m_indices;
 
 	QVector3D m_position;
@@ -133,7 +115,6 @@ protected:
 
 	bool m_isVisible;
 };
-
 
 } // namespace imt3dgui
 

@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #include <imt3dgui/CGridShape.h>
 
 
@@ -9,13 +29,10 @@ namespace imt3dgui
 
 CGridShape::CGridShape()
 	:m_gridValue(0.0),
-	m_count(0)
+	m_count(0),
+	m_doUpdate(true)
 {
-}
-
-
-CGridShape::~CGridShape()
-{
+	m_pointsDataPtr = &m_data;
 }
 
 
@@ -24,6 +41,7 @@ void CGridShape::SetGridValue(double gridValue)
 	Q_ASSERT(gridValue > 0.0);
 
 	m_gridValue = gridValue;
+	m_doUpdate = true;
 }
 
 
@@ -32,6 +50,7 @@ void CGridShape::SetCount(int count)
 	Q_ASSERT(count > 0);
 
 	m_count = count;
+	m_doUpdate = true;
 }
 
 
@@ -39,27 +58,53 @@ void CGridShape::SetCount(int count)
 
 // reimplement (imt3dgui::CShape3dBase)
 
-void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet)
 {
-	m_vertices.clear();
-	m_vertices.reserve(m_count * 2 + 1);
+	if (!m_doUpdate) {
+		return;
+	}
+
+	std::vector<imt3d::CPointCloud3d::PointXyz32> vertices;
+	vertices.reserve(m_count * 2 + 1);
 
 	for(int i = -m_count; i <= m_count; ++i){
-		m_vertices.push_back(Vertex(QVector3D(m_gridValue * i, -m_gridValue * m_count, 0.0)));
-		m_vertices.push_back(Vertex(QVector3D(m_gridValue * i, m_gridValue * m_count, 0.0)));
+		imt3d::CPointCloud3d::PointXyz32 a;
+		a.data[0] = m_gridValue * i;
+		a.data[1] = -m_gridValue * m_count;
+		a.data[2] = 0.0;
+		vertices.emplace_back(a);
+
+		imt3d::CPointCloud3d::PointXyz32 b;
+		b.data[0] = m_gridValue * i;
+		b.data[1] = m_gridValue * m_count;
+		b.data[2] = 0.0;
+		vertices.emplace_back(b);
 	}
 
 	for(int i = -m_count; i <= m_count; ++i){
-		m_vertices.push_back(Vertex(QVector3D(-m_gridValue * m_count, m_gridValue * i, 0.0)));
-		m_vertices.push_back(Vertex(QVector3D(m_gridValue * m_count, m_gridValue * i, 0.0)));
+		imt3d::CPointCloud3d::PointXyz32 a;
+		a.data[0] = -m_gridValue * m_count;
+		a.data[1] = m_gridValue * i;
+		a.data[2] = 0.0;
+		vertices.emplace_back(a);
+
+		imt3d::CPointCloud3d::PointXyz32 b;
+		b.data[0] = m_gridValue * m_count;
+		b.data[1] = m_gridValue * i;
+		b.data[2] = 0.0;
+		vertices.emplace_back(b);
 	}
+
+	m_data.CreateCloud(imt3d::CPointCloud3d::PF_XYZ_32, vertices.size(), vertices.data());
 
 	m_indices.clear();
-	m_indices.reserve(m_vertices.size());
+	m_indices.reserve(vertices.size());
 
-	for(int i = 0; i < m_vertices.count(); ++i){
+	for(int i = 0; i < vertices.size(); ++i){
 		m_indices.push_back(i);
 	}
+
+	m_doUpdate = false;
 }
 
 

@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #include <imt3d/CMesh3d.h>
 
 
@@ -111,7 +131,7 @@ bool CMesh3d::CreateMesh(PointFormat pointFormat)
 }
 
 
-bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, const void* pointsDataPtr, const Indices& indices)
+bool CMesh3d::CreateMesh(PointFormat pointFormat, size_t pointsCount, const void* pointsDataPtr, const Indices& indices)
 {
 	static ChangeSet createChangeSet(CF_CREATE);
 	istd::CChangeNotifier changeNotifier(this, &createChangeSet);
@@ -126,7 +146,7 @@ bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, const void* p
 }
 
 
-bool CMesh3d::InsertData(int pointsCount, const void * pointsDataPtr, const Indices& indices)
+bool CMesh3d::InsertData(size_t pointsCount, const void * pointsDataPtr, const Indices& indices)
 {
 	static ChangeSet appendChangeSet(CF_APPEND);
 	istd::CChangeNotifier changeNotifier(this, &appendChangeSet);

@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #include <imt3dview/CTrackballCameraComp.h>
 #include <cfloat>
 
@@ -20,18 +40,13 @@ const double CTrackballCameraComp::s_rotationSpeed = 1.0;
 // public methods
 
 CTrackballCameraComp::CTrackballCameraComp()
-	:m_position(0.0, 0.0, 5.0)
+	:m_position(0.0, 0.0, 5.0),
+	m_sceneBoundingCuboid(-1., 1., -1., 1., 1., -1.)
 {
 }
 
 
 // reimplemented (imt3dview::IScene3dCamera)
-
-void CTrackballCameraComp::SetViewPortSize(const QSize& size)
-{
-	m_viewPortSize = size;
-}
-
 
 const QVector3D& CTrackballCameraComp::GetPosition() const
 {
@@ -118,6 +133,40 @@ QMatrix4x4 CTrackballCameraComp::GetViewMatrix() const
 	return viewMatrix;
 }
 
+void CTrackballCameraComp::SetBoundingCuboid(const imt3d::CCuboid & cuboid)
+{
+	if (cuboid.IsValid()) {
+		if (cuboid.GetBottom() < m_sceneBoundingCuboid.GetBottom()) {
+			m_sceneBoundingCuboid.SetBottom(cuboid.GetBottom());
+		}
+
+		if (cuboid.GetTop() > m_sceneBoundingCuboid.GetTop()) {
+			m_sceneBoundingCuboid.SetTop(cuboid.GetTop());
+		}
+
+		if (cuboid.GetLeft() < m_sceneBoundingCuboid.GetLeft()) {
+			m_sceneBoundingCuboid.SetLeft(cuboid.GetLeft());
+		}
+
+		if (cuboid.GetRight() > m_sceneBoundingCuboid.GetRight()) {
+			m_sceneBoundingCuboid.SetRight(cuboid.GetRight());
+		}
+
+		if (cuboid.GetFar() < m_sceneBoundingCuboid.GetFar()) {
+			m_sceneBoundingCuboid.SetFar(cuboid.GetFar());
+		}
+
+		if (cuboid.GetNear() > m_sceneBoundingCuboid.GetNear()) {
+			m_sceneBoundingCuboid.SetNear(cuboid.GetNear());
+		}
+	}
+}
+
+imt3d::CCuboid CTrackballCameraComp::GetBoundingCuboid() const
+{
+	return m_sceneBoundingCuboid;
+}
+
 
 // protected methods
 
@@ -125,9 +174,8 @@ QVector3D CTrackballCameraComp::GetTrackballVector(const QPoint& point2d) const
 {
 	QVector3D point3d;
 
-	point3d.setX(((float)point2d.x() * 2.0f) / (float)m_viewPortSize.width() - 1.0);
-	point3d.setY(((float)point2d.y() * 2.0f) / (float)m_viewPortSize.height() - 1.0);
-	point3d.setY(-point3d.y());
+	point3d.setX(point2d.x() * 0.001f - 1.0f);
+	point3d.setY(1.0f - point2d.y() * 0.001f);
 	point3d.setZ(0.0);
 
 	float sqrZ = 1.0f - QVector3D::dotProduct(point3d, point3d);

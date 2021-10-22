@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #pragma once
 
 
@@ -25,11 +45,11 @@ public:
 	// reimplemented (imt3d::IPointCloud3d)
 	bool CreateCloud(PointFormat pointFormat) override;
 	bool CreateCloud(PointFormat pointFormat,
-			int pointsCount,
-			const void* dataPtr,
-			const istd::CIndex2d* gridSizePtr = nullptr) override;
+				size_t pointsCount,
+				const void* dataPtr,
+				const istd::CIndex2d* gridSizePtr = nullptr) override;
 	virtual bool InsertPoints(
-				int pointsCount,
+				size_t pointsCount,
 				const void* dataPtr) override;
 
 	// reimplemented (imt3d::IGridInfo)

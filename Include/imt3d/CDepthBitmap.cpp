@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #include <imt3d/CDepthBitmap.h>
 
 
@@ -56,6 +76,13 @@ void CDepthBitmap::SetClibration3d(const CImage3dCalibration& calibration3d)
 	EnsureMetaInfoCreated();
 }
 
+void CDepthBitmap::SetReferenceBitmap(const iimg::CGeneralBitmap & referenceBitmap)
+{
+	m_referenceBitmap.CopyFrom(referenceBitmap);
+
+	EnsureMetaInfoCreated();
+}
+
 
 // reimplemented (IDepthBitmap)
 
@@ -103,6 +130,11 @@ bool CDepthBitmap::CreateDepthBitmap(const istd::CRange& depthRange, const istd:
 const IImage3dCalibration* CDepthBitmap::GetCalibration3d() const
 {
 	return &m_calibration3d;
+}
+
+const iimg::IBitmap * CDepthBitmap::GetReferenceBitmap() const
+{
+	return &m_referenceBitmap;
 }
 
 
@@ -202,6 +234,20 @@ bool CDepthBitmap::Serialize(iser::IArchive& archive)
 				m_calibration3d.ResetData();
 			}
 		}
+
+		QVariant referenceBitmapData = GetMetaInfo(MIT_REFERENCE_BITMAP);
+		if (!referenceBitmapData.isNull()) {
+			QByteArray data = referenceBitmapData.toByteArray();
+
+			iser::CMemoryReadArchive referenceBitmapArchive(data, data.size());
+			iimg::CGeneralBitmap referenceBitmap;
+			if (referenceBitmap.Serialize(referenceBitmapArchive)) {
+				m_referenceBitmap.CopyFrom(referenceBitmap);
+			}
+			else {
+				m_referenceBitmap.ResetData();
+			}
+		}
 	}
 
 	return retVal;
@@ -225,6 +271,7 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 		m_depthRange = sourcePtr->m_depthRange;
 		m_colorMapType = sourcePtr->m_colorMapType;
 		m_calibration3d.CopyFrom(sourcePtr->m_calibration3d);
+		m_referenceBitmap.CopyFrom(sourcePtr->m_referenceBitmap);
 
 		InvalidateCache(istd::IChangeable::GetNoChanges());
 
@@ -470,6 +517,17 @@ void CDepthBitmap::EnsureMetaInfoCreated()
 	}
 
 	SetMetaInfo(MIT_CALIBRATION_3D, calibration3dData);
+
+	QVariant referenceBitmapData;
+
+	{
+		iser::CMemoryWriteArchive archive;
+		if (m_referenceBitmap.Serialize(archive)) {
+			referenceBitmapData.setValue(QByteArray((const char*)archive.GetBuffer(), archive.GetBufferSize()));
+		}
+	}
+
+	SetMetaInfo(MIT_REFERENCE_BITMAP, referenceBitmapData);
 }
 
 

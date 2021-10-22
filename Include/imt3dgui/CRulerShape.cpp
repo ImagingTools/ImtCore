@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #include <imt3dgui/CRulerShape.h>
 
 
@@ -23,6 +43,29 @@ CRulerShape::CRulerShape()
 	m_movingVertexIndex(-1)
 {
 	m_vertexBuffer.setUsagePattern(QOpenGLBuffer::StreamDraw);
+
+	std::vector<imt3d::IPointsBasedObject::PointXyzwRgba32> vertices;
+	// line vertices
+	imt3d::IPointsBasedObject::PointXyzwRgba32 a;
+	a.data[2] = 1;
+	a.data[4] = s_color.x();
+	a.data[5] = s_color.y();
+	a.data[6] = s_color.z();
+	vertices.push_back(a);
+
+	imt3d::IPointsBasedObject::PointXyzwRgba32 b = a;
+	b.data[0] = 1;
+	vertices.push_back(b);
+
+	// point vertices
+	vertices.push_back(vertices[0]);
+	vertices.push_back(vertices[1]);
+
+	m_data.CreateCloud(imt3d::CPointCloud3d::PF_XYZW_RGBA_32, vertices.size(), vertices.data());
+	m_vertices = static_cast<imt3d::IPointsBasedObject::PointXyzwRgba32*>(m_data.GetData());
+
+	m_indices = { 0, 1, 2, 3 };
+	m_pointsDataPtr = &m_data;
 }
 
 
@@ -51,10 +94,15 @@ bool CRulerShape::OnMousePress(QMouseEvent& e)
 			if (slaveShapeVertexIndex >= 0 && rulerVertexIndex >= 0){
 				QVector3D newPos = slaveShapeVertexPos * m_slaveShapePtr->GetScale();
 
-				m_vertices[rulerVertexIndex + 0].position = newPos;
-				m_vertices[rulerVertexIndex + 2].position = newPos;
+				m_vertices[rulerVertexIndex + 0].data[0] = newPos.x();
+				m_vertices[rulerVertexIndex + 0].data[1] = newPos.y();
+				m_vertices[rulerVertexIndex + 0].data[2] = newPos.z();
 
-				UpdateGeometry(m_vertices, m_vertexBuffer);
+				m_vertices[rulerVertexIndex + 2].data[0] = newPos.x();
+				m_vertices[rulerVertexIndex + 2].data[1] = newPos.y();
+				m_vertices[rulerVertexIndex + 2].data[2] = newPos.z();
+
+				RefreshGeometry();
 			}
 		}
 
@@ -65,15 +113,16 @@ bool CRulerShape::OnMousePress(QMouseEvent& e)
 	m_movingVertexIndex = FindVertex(e.pos(), true) % 2;
 
 	if (m_movingVertexIndex >= 0){
-		m_vertices[m_movingVertexIndex + 2].color = s_selectionColor;
+		m_vertices[m_movingVertexIndex + 2].data[4] = s_selectionColor.x();
+		m_vertices[m_movingVertexIndex + 2].data[5] = s_selectionColor.y();
+		m_vertices[m_movingVertexIndex + 2].data[6] = s_selectionColor.z();
 
-		UpdateGeometry(m_vertices, m_vertexBuffer);
+		RefreshGeometry();
 
 		return true;
 	}
-	else{
-		return false;
-	}
+
+	return false;
 }
 
 
@@ -91,10 +140,15 @@ bool CRulerShape::OnMouseMove(QMouseEvent& e)
 		QVector3D newPos = WindowToModel(e.pos(), 1.0);
 		QVector3D posDiff = (newPos - oldPos) * s_moveSpeed;
 
-		m_vertices[m_movingVertexIndex + 0].position += posDiff;
-		m_vertices[m_movingVertexIndex + 2].position += posDiff;
+		m_vertices[m_movingVertexIndex + 0].data[0] += posDiff.x();
+		m_vertices[m_movingVertexIndex + 0].data[1] += posDiff.y();
+		m_vertices[m_movingVertexIndex + 0].data[2] += posDiff.z();
 
-		UpdateGeometry(m_vertices, m_vertexBuffer);
+		m_vertices[m_movingVertexIndex + 2].data[0] += posDiff.x();
+		m_vertices[m_movingVertexIndex + 2].data[1] += posDiff.y();
+		m_vertices[m_movingVertexIndex + 2].data[2] += posDiff.z();
+
+		RefreshGeometry();
 
 		retVal = true;
 	}
@@ -108,17 +162,19 @@ bool CRulerShape::OnMouseMove(QMouseEvent& e)
 bool CRulerShape::OnMouseRelease(QMouseEvent& /*e*/)
 {
 	if (m_movingVertexIndex >= 0){
-		m_vertices[m_movingVertexIndex + 2].color = s_color;
+		m_vertices[m_movingVertexIndex + 2].data[4] = s_color.x();
+		m_vertices[m_movingVertexIndex + 2].data[5] = s_color.y();
+		m_vertices[m_movingVertexIndex + 2].data[6] = s_color.z();
 
 		m_movingVertexIndex = -1;
 
-		UpdateGeometry(m_vertices, m_vertexBuffer);
+		RefreshGeometry();
 
 		return true;
 	}
-	else{
-		return false;
-	}
+
+	return false;
+
 }
 
 
@@ -128,17 +184,6 @@ bool CRulerShape::OnMouseRelease(QMouseEvent& /*e*/)
 
 void CRulerShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	m_vertices.clear();
-
-	// line vertices
-	m_vertices.push_back(Vertex(QVector3D(0.0, 0.0, 1.0), QVector3D(), s_color));
-	m_vertices.push_back(Vertex(QVector3D(1.0, 0.0, 1.0), QVector3D(), s_color));
-
-	// point vertices
-	m_vertices.push_back(m_vertices[0]);
-	m_vertices.push_back(m_vertices[1]);
-
-	m_indices = {0, 1, 2, 3};
 }
 
 
@@ -168,16 +213,16 @@ void CRulerShape::Draw(QPainter& painter)
 		return;
 	}
 
-	if (m_vertices.count() < 2){
-		return;
-	}
+	QVector3D posA(m_vertices[0].data[0], m_vertices[0].data[1], m_vertices[0].data[2]);
+	QVector3D posB(m_vertices[1].data[0], m_vertices[1].data[1], m_vertices[1].data[2]);
 
-	QVector3D pos3d1 = m_vertices[0].position / m_slaveShapePtr->GetScale();
-	QVector3D pos3d2 = m_vertices[1].position / m_slaveShapePtr->GetScale();
+	QVector3D pos3d1 = posA / m_slaveShapePtr->GetScale();
+	QVector3D pos3d2 = posB / m_slaveShapePtr->GetScale();
+
 	float distance = qAbs(pos3d1.distanceToPoint(pos3d2));
 
-	QPoint pos2d1 = ModelToWindow(m_vertices[0].position);
-	QPoint pos2d2 = ModelToWindow(m_vertices[1].position);
+	QPoint pos2d1 = ModelToWindow(posA);
+	QPoint pos2d2 = ModelToWindow(posB);
 	QPoint pos2dDistance = (pos2d1 + pos2d2) / 2;
 
 	QString point1Text = QString("(%1,%2,%3)")
@@ -200,12 +245,6 @@ void CRulerShape::Draw(QPainter& painter)
 	painter.drawText(pos2d2, point2Text);
 	painter.drawText(pos2dDistance, distanceText);
 	painter.restore();
-}
-
-
-IShape3d::ColorMode CRulerShape::GetColorMode() const
-{
-	return ColorMode::CM_POINT;
 }
 
 

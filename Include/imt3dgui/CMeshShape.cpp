@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #include <imt3dgui/CMeshShape.h>
 
 
@@ -57,6 +77,7 @@ void CMeshShape::SetCircleSelection(const QRect& selectionRect, bool clearPrevio
 
 void CMeshShape::ClearSelection()
 {
+	/*
 	if (m_selectedIndicies.empty()){
 		return;
 	}
@@ -68,11 +89,13 @@ void CMeshShape::ClearSelection()
 	}
 
 	UpdateGeometry(m_vertices, m_vertexBuffer);
+	*/
 }
 
 
 void CMeshShape::AllSelection()
 {
+	/*
 	m_selectedIndicies.clear();
 
 	for (int i = 0; i < m_indices.size(); ++i){
@@ -84,11 +107,13 @@ void CMeshShape::AllSelection()
 	}
 
 	UpdateGeometry(m_vertices, m_vertexBuffer);
+	*/
 }
 
 
 void CMeshShape::InvertSelection()
 {
+	/*
 	// select all vertices
 	for (Vertex& vertex : m_vertices){
 		vertex.color = s_selectionColor;
@@ -111,6 +136,7 @@ void CMeshShape::InvertSelection()
 	}
 
 	UpdateGeometry(m_vertices, m_vertexBuffer);
+	*/
 }
 
 
@@ -150,28 +176,28 @@ void CMeshShape::SetInfoBoxEnabled(bool isEnabled)
 
 // reimplement (imt3dgui::CShape3dBase)
 
-void CMeshShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet)
+void CMeshShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	imt3d::IMesh3d* meshPtr = dynamic_cast<imt3d::IMesh3d*>(GetObservedModel());
-	if (!meshPtr){
+	const imt3d::IMesh3d* meshPtr = dynamic_cast<imt3d::IMesh3d*>(GetObservedModel());
+
+	if (meshPtr == nullptr || meshPtr->IsEmpty()) {
+		m_indices.clear();
 		return;
 	}
 
-	switch (meshPtr->GetPointFormat()){
-		case imt3d::IPointsBasedObject::PF_XYZ_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyz32>(*meshPtr, changeSet);
-		case imt3d::IPointsBasedObject::PF_XYZ_64:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyz64>(*meshPtr, changeSet);
-		case imt3d::IPointsBasedObject::PF_XYZW_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzw32>(*meshPtr, changeSet);
-		case imt3d::IPointsBasedObject::PF_XYZ_ABC_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*meshPtr, changeSet);
-		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*meshPtr, changeSet);
-		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormalRgba32>(*meshPtr, changeSet);
-		case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*meshPtr, changeSet);
+	m_pointsDataPtr = meshPtr;
+
+	const imt3d::IMesh3d::Indices& indices = meshPtr->GetIndices();
+
+	m_indices.clear();
+
+	// update indices
+	for (size_t i = 0; i < indices.size(); ++i) {
+		const std::vector<uint32_t>& index = indices[i];
+
+		for (size_t j = 0; j < index.size(); ++j) {
+			m_indices.push_back(index[j]);
+		}
 	}
 }
 
@@ -186,8 +212,8 @@ void CMeshShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions
 
 void CMeshShape::Draw(QPainter& painter)
 {
-	if (m_isInfoBoxEnabled){
-		QString text = QString("<b><p>Total vertices: %1</p>").arg(m_vertices.size());
+	if (m_isInfoBoxEnabled && m_pointsDataPtr != nullptr){
+		QString text = QString("<b><p>Total vertices: %1</p>").arg(m_pointsDataPtr->GetPointsCount());
 		text += QString("<p>Total faces: %1</p>").arg(m_indices.size() / 3);
 		text += QString("<p>Selected faces: %1</p></b>").arg(static_cast<int>(m_selectedIndicies.size() / 3));
 
@@ -206,28 +232,9 @@ void CMeshShape::Draw(QPainter& painter)
 }
 
 
-IShape3d::ColorMode CMeshShape::GetColorMode() const
-{
-	return IShape3d::CM_POINT;
-}
-
-
 QVector3D CMeshShape::GetColor() const
 {
 	return m_color;
-}
-
-
-bool CMeshShape::HasNormals() const
-{
-	imt3d::IMesh3d* meshPtr = dynamic_cast<imt3d::IMesh3d*>(GetObservedModel());
-	if (meshPtr == nullptr){
-		return false;
-	}
-
-	imt3d::IPointsBasedObject::PointFormat format = meshPtr->GetPointFormat();
-
-	return (format == imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32) || (format == imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32);
 }
 
 
@@ -241,83 +248,6 @@ void CMeshShape::SetRectSelection(const QRect& selectionRect, bool isCircle, boo
 
 	// select/deselect vertices
 	SelectVertices(intersectedIndicies, clearPreviousSelection);
-}
-
-
-template <typename PointType>
-void CMeshShape::UpdateShapeGeometryHelper(const imt3d::IMesh3d& mesh, const istd::IChangeable::ChangeSet& changeSet)
-{
-	int meshSize = mesh.GetPointsCount();
-	const imt3d::IMesh3d::Indices& indices = mesh.GetIndices();
-
-	if (meshSize <= 0 || indices.empty()){
-		m_vertices.clear();
-		m_indices.clear();
-
-		return;
-	}
-
-	bool appendData = changeSet.ContainsExplicit(imt3d::IPointsBasedObject::CF_APPEND);
-	int lastVertexIndex = m_vertices.empty() ? 0 : m_vertices.size() - 1;
-	int lastIndIndex = m_indices.empty() ? 0 : m_indices.size() - 1;
-
-	if (!appendData){
-		m_vertices.clear();
-		m_indices.clear();
-
-		lastVertexIndex = 0;
-		lastIndIndex = 0;
-	}
-
-	m_vertices.reserve(meshSize);
-	m_indices.reserve(static_cast<int>(indices.size() * indices.front().size()));
-
-	imt3d::IPointsBasedObject::PointFormat format = mesh.GetPointFormat();
-
-	// update vertices and normals
-	for (int i = lastVertexIndex; i < meshSize; ++i){
-		const PointType* pointDataPtr = static_cast<const PointType*>(mesh.GetPointData(i));
-		Q_ASSERT(pointDataPtr != nullptr);
-
-		float positionX = static_cast<float>(pointDataPtr->data[0]);
-		float positionY = static_cast<float>(pointDataPtr->data[1]);
-		float positionZ = static_cast<float>(pointDataPtr->data[2]);
-
-		float normalX = static_cast<float>(pointDataPtr->data[4]);
-		float normalY = static_cast<float>(pointDataPtr->data[5]);
-		float normalZ = static_cast<float>(pointDataPtr->data[6]);
-
-		QVector3D color = m_color;
-
-		if (format == imt3d::IPointsBasedObject::PF_XYZW_RGBA_32){
-			float r = static_cast<float>(pointDataPtr->data[4]);
-			float g = static_cast<float>(pointDataPtr->data[5]);
-			float b = static_cast<float>(pointDataPtr->data[6]);
-
-			color = QVector3D(r, g, b);
-		}
-		else if (format == imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32){
-			float r = static_cast<float>(pointDataPtr->data[8]);
-			float g = static_cast<float>(pointDataPtr->data[9]);
-			float b = static_cast<float>(pointDataPtr->data[10]);
-
-			color = QVector3D(r, g, b);
-		}
-
-		m_vertices.push_back(Vertex(
-					QVector3D(positionX, positionY, positionZ),
-					QVector3D(normalX, normalY, normalZ),
-					color));
-		}
-
-	// update indices
-	for (int i = lastIndIndex; i < indices.size(); ++i){
-		const std::vector<uint32_t>& index = indices[i];
-
-		for (int j = 0; j < index.size(); ++j){
-			m_indices.push_back(index[j]);
-		}
-	}
 }
 
 
@@ -406,6 +336,7 @@ bool CMeshShape::IsPointWithin(const QPoint& point, const QRect& rect, bool isCi
 
 bool CMeshShape::GetFacePointIntersection(const QPoint& point, Indices& intersectedIndicies) const
 {
+	/*
 	intersectedIndicies.clear();
 
 	if (point.isNull() || m_vertices.isEmpty()){
@@ -445,11 +376,15 @@ bool CMeshShape::GetFacePointIntersection(const QPoint& point, Indices& intersec
 	}
 
 	return !intersectedIndicies.empty();
+	*/
+
+	return false;
 }
 
 
 bool CMeshShape::GetFaceRectIntersections(const QRect& rect, bool isCircle, Indices& intersectedIndicies) const
 {
+	/*
 	intersectedIndicies.clear();
 
 	if (rect.isNull() || m_vertices.isEmpty()){
@@ -475,6 +410,8 @@ bool CMeshShape::GetFaceRectIntersections(const QRect& rect, bool isCircle, Indi
 	}
 
 	return !intersectedIndicies.empty();
+	*/
+	return false;
 }
 
 
@@ -534,6 +471,7 @@ bool CMeshShape::IsFaceRayIntersection(
 
 void CMeshShape::SelectVertices(Indices& intersectedIndicies, bool clearPreviousSelection)
 {
+	/*
 	// update selected indices
 	if (clearPreviousSelection){
 		m_selectedIndicies.swap(intersectedIndicies);
@@ -556,6 +494,7 @@ void CMeshShape::SelectVertices(Indices& intersectedIndicies, bool clearPrevious
 
 	// upload new geometry
 	UpdateGeometry(m_vertices, m_vertexBuffer);
+	*/
 }
 
 

@@ -7,7 +7,7 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR
-LIBS +=  -limtbase -limtstyle
+LIBS += -limtbase -limtdesign
 
 QT += core gui
 

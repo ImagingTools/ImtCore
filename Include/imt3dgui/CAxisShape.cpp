@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #include <imt3dgui/CAxisShape.h>
 
 
@@ -13,8 +33,39 @@ const float CAxisShape::s_zoomFontFactor = 50.0f;
 
 CAxisShape::CAxisShape()
 	:m_axisLength(0.0),
-	m_axisRange(0.0, 1.0)
+	m_axisRange(0.0, 1.0),
+	m_doUpdate(true)
 {
+	std::vector<imt3d::CPointCloud3d::PointXyzwRgba32> vertexes(6);
+
+	// x (red)
+	vertexes[0].data[4] = 1.0;
+	vertexes[0].data[5] = 0.0;
+	vertexes[0].data[6] = 0.0;
+	vertexes[1].data[4] = 1.0;
+	vertexes[1].data[5] = 0.0;
+	vertexes[1].data[6] = 0.0;
+
+	// y (green)
+	vertexes[2].data[4] = 0.0;
+	vertexes[2].data[5] = 1.0;
+	vertexes[2].data[6] = 0.0;
+	vertexes[3].data[4] = 0.0;
+	vertexes[3].data[5] = 1.0;
+	vertexes[3].data[6] = 0.0;
+
+	// z (blue)
+	vertexes[4].data[4] = 0.0;
+	vertexes[4].data[5] = 0.0;
+	vertexes[4].data[6] = 1.0;
+	vertexes[5].data[4] = 0.0;
+	vertexes[5].data[5] = 0.0;
+	vertexes[5].data[6] = 1.0;
+
+	m_data.CreateCloud(imt3d::CPointCloud3d::PF_XYZW_RGBA_32, 6, vertexes.data());
+
+	m_indices = { 0, 1, 2, 3, 4, 5 };
+	m_pointsDataPtr = &m_data;
 }
 
 
@@ -23,12 +74,14 @@ void CAxisShape::SetAxisLength(double axisLength)
 	Q_ASSERT(axisLength > 0.0);
 
 	m_axisLength = axisLength;
+	m_doUpdate = true;
 }
 
 
 void CAxisShape::SetAxisRange(const istd::CRange& range)
 {
 	m_axisRange = range;
+	m_doUpdate = true;
 }
 
 
@@ -36,30 +89,25 @@ void CAxisShape::SetAxisRange(const istd::CRange& range)
 
 // reimplement (imt3dgui::CShape3dBase)
 
-void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*changeSet*/)
+// protected methods
+
+// reimplement (imt3dgui::CShape3dBase)
+
+void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet & /*changeSet*/)
 {
-	m_vertices.clear();
-	m_vertices.resize(6);
+	if (!m_doUpdate) {
+		return;
+	}
 
-	// x (red)
-	m_vertices[0] = Vertex(QVector3D(m_axisLength * m_axisRange.GetMinValue(), 0.0, 0.0), QVector3D(), QVector3D(1.0, 0.0, 0.0));
-	m_vertices[1] = Vertex(QVector3D(m_axisLength * m_axisRange.GetMaxValue(), 0.0, 0.0), QVector3D(), QVector3D(1.0, 0.0, 0.0));
+	for (int i = 0; i < 3; i++) {
+		imt3d::CPointCloud3d::PointXyzwRgba32* a = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(i*2);
+		a->data[i] = m_axisLength * m_axisRange.GetMinValue();
+		imt3d::CPointCloud3d::PointXyzwRgba32* b = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(i * 2 + 1);
+		b->data[i] = m_axisLength * m_axisRange.GetMaxValue();
+	}
 
-	// y (green)
-	m_vertices[2] = Vertex(QVector3D(0.0, m_axisLength * m_axisRange.GetMinValue(), 0.0), QVector3D(), QVector3D(0.0, 1.0, 0.0));
-	m_vertices[3] = Vertex(QVector3D(0.0, m_axisLength * m_axisRange.GetMaxValue(), 0.0), QVector3D(), QVector3D(0.0, 1.0, 0.0));
-
-	// z (blue)
-	m_vertices[4] = Vertex(QVector3D(0.0, 0.0, m_axisLength * m_axisRange.GetMinValue()), QVector3D(), QVector3D(0.0, 0.0, 1.0));
-	m_vertices[5] = Vertex(QVector3D(0.0, 0.0, m_axisLength * m_axisRange.GetMaxValue()), QVector3D(), QVector3D(0.0, 0.0, 1.0));
-	
-	m_indices = { 0, 1, 2, 3, 4, 5 };
+	m_doUpdate = false;
 }
-
-
-// protected methods
-
-// reimplement (imt3dgui::CShape3dBase)
 
 void CAxisShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions& functions)
 {

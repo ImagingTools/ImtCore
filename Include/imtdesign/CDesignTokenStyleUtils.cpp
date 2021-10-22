@@ -10,7 +10,6 @@
 
 // Qt includes
 #include <QtCore/QtCore>
-#include <QtGui/QPalette>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -640,19 +639,25 @@ bool CDesignTokenStyleUtils::CreateCssFont(QByteArray& output, const QFont& font
 		output.append("font-size: ").append(QByteArray::number(font.pixelSize())).append("px;\n");
 	}
 
+	QStringList fontFamilies;
+
+	#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
+		fontFamilies = font.families();
+	#endif
+
 	QByteArray fontFamilyString = "font-family: ";
 	if(font.family().length()){
 		fontFamilyString.append('"').append(font.family().toUtf8()).append('"');
 	}
-	else if(font.families().size()){
-		QStringList tempFonts = font.families();
+	else if(fontFamilies.count()){
+		QStringList tempFonts = fontFamilies;
 		for(QStringList::iterator font = tempFonts.begin(); font != tempFonts.end(); ++font){
 			font->append('"');
 			font->prepend('"');
 		}
+	
 		fontFamilyString.append(tempFonts.join(", ").toUtf8());
 	}
-
 
 	if(font.styleHint() != QFont::AnyStyle){
 		if(!fontFamilyString.trimmed().endsWith(':')){

@@ -1,5 +1,24 @@
-#include <imt3dgui/CPointCloudShape.h>
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
 
+
+#include <imt3dgui/CPointCloudShape.h>
 
 // Qt includes
 #include <QtGui/QTextDocument>
@@ -44,6 +63,7 @@ void CPointCloudShape::SetPointSize(float pointSize)
 
 void CPointCloudShape::SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection)
 {
+	/*
 	if (selectionPoint.isNull() || m_vertices.isEmpty()){
 		return;
 	}
@@ -63,6 +83,7 @@ void CPointCloudShape::SetPointSelection(const QPoint& selectionPoint, bool clea
 	}
 
 	UpdateGeometry(m_vertices, m_vertexBuffer);
+	*/
 }
 
 
@@ -80,6 +101,7 @@ void CPointCloudShape::SetCircleSelection(const QRect& selectionRect, bool clear
 
 void CPointCloudShape::ClearSelection()
 {
+	/*
 	if (m_selectedVerticesIndicies.empty()){
 		return;
 	}
@@ -91,11 +113,13 @@ void CPointCloudShape::ClearSelection()
 	m_selectedVerticesIndicies.clear();
 
 	UpdateGeometry(m_vertices, m_vertexBuffer);
+	*/
 }
 
 
 void CPointCloudShape::AllSelection()
 {
+	/*
 	for (int i = 0; i < m_vertices.size(); ++i){
 		m_selectedVerticesIndicies.insert(i);
 
@@ -103,11 +127,13 @@ void CPointCloudShape::AllSelection()
 	}
 
 	UpdateGeometry(m_vertices, m_vertexBuffer);
+	*/
 }
 
 
 void CPointCloudShape::InvertSelection()
 {
+	/*
 	for (int i = 0; i < m_vertices.size(); ++i){
 		Vertex& vertex = m_vertices[i];
 
@@ -124,6 +150,7 @@ void CPointCloudShape::InvertSelection()
 	}
 
 	UpdateGeometry(m_vertices, m_vertexBuffer);
+	*/
 }
 
 
@@ -164,26 +191,31 @@ void CPointCloudShape::SetInfoBoxEnabled(bool isEnabled)
 
 void CPointCloudShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet)
 {
-	imt3d::IPointCloud3d* pointCloudPtr = dynamic_cast<imt3d::IPointCloud3d*>(GetObservedModel());
-	if (!pointCloudPtr){
+	m_pointsDataPtr = dynamic_cast<imt3d::IPointsBasedObject*>(GetObservedModel());
+
+	if (m_pointsDataPtr == nullptr || m_pointsDataPtr->GetData() == nullptr) {
+		m_indices.clear();
 		return;
 	}
 
-	switch (pointCloudPtr->GetPointFormat()){
-		case imt3d::IPointsBasedObject::PF_XYZ_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyz32>(*pointCloudPtr, changeSet);
-		case imt3d::IPointsBasedObject::PF_XYZ_64:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyz64>(*pointCloudPtr, changeSet);
-		case imt3d::IPointsBasedObject::PF_XYZW_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzw32>(*pointCloudPtr, changeSet);
-		case imt3d::IPointsBasedObject::PF_XYZ_ABC_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzAbc32>(*pointCloudPtr, changeSet);
-		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*pointCloudPtr, changeSet);
-		case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwNormal32>(*pointCloudPtr, changeSet);
-		case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
-			return UpdateShapeGeometryHelper<imt3d::IPointsBasedObject::PointXyzwRgba32>(*pointCloudPtr, changeSet);
+	bool appendData = changeSet.ContainsExplicit(imt3d::IPointsBasedObject::CF_APPEND);
+	int lastIndex = m_indices.size();
+
+	if (!appendData) {
+		m_indices.clear();
+
+		lastIndex = 0;
+	}
+
+	int pointCloudSize = m_pointsDataPtr->GetPointsCount();
+	if (pointCloudSize < 1) {
+		m_indices.clear();
+		return;
+	}
+
+	// update indeces
+	for (int i = lastIndex; i < pointCloudSize; i++) {
+		m_indices.push_back(i);
 	}
 }
 
@@ -227,12 +259,6 @@ void CPointCloudShape::Draw(QPainter& painter)
 
 // reimplemented (imt3dgui::IShape3d)
 
-imt3dgui::IShape3d::ColorMode CPointCloudShape::GetColorMode() const
-{
-	return IShape3d::CM_POINT;
-}
-
-
 QVector3D CPointCloudShape::GetColor() const
 {
 	return m_color;
@@ -243,6 +269,7 @@ QVector3D CPointCloudShape::GetColor() const
 
 void CPointCloudShape::SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection)
 {
+	/*
 	if (!selectionRect.isValid() || m_vertices.isEmpty()){
 		return;
 	}
@@ -263,61 +290,7 @@ void CPointCloudShape::SetRectSelection(const QRect& selectionRect, bool isCircl
 	}
 
 	UpdateGeometry(m_vertices, m_vertexBuffer);
-}
-
-
-template <typename PointType>
-void CPointCloudShape::UpdateShapeGeometryHelper(const imt3d::IPointCloud3d& pointCloud, const istd::IChangeable::ChangeSet& changeSet)
-{
-	bool appendData = changeSet.ContainsExplicit(imt3d::IPointsBasedObject::CF_APPEND);
-	int lastIndex = m_vertices.empty() ? 0 : m_vertices.size() - 1;
-
-	if (!appendData){
-		m_vertices.clear();
-		m_indices.clear();
-
-		lastIndex = 0;
-	}
-
-	int pointCloudSize = pointCloud.GetPointsCount();
-	if (pointCloudSize <= 0){
-		m_vertices.clear();
-		m_indices.clear();
-
-		return;
-	}
-
-	m_vertices.reserve(pointCloudSize);
-	m_indices.reserve(pointCloudSize);
-
-	imt3d::IPointsBasedObject::PointFormat format = pointCloud.GetPointFormat();
-
-	// update vertices
-	for (int i = lastIndex; i < pointCloudSize; ++i){
-		const PointType* pointDataPtr = static_cast<const PointType*>(pointCloud.GetPointData(i));
-		Q_ASSERT(pointDataPtr != nullptr);
-
-		float x = static_cast<float>(pointDataPtr->data[0]);
-		float y = static_cast<float>(pointDataPtr->data[1]);
-		float z = static_cast<float>(pointDataPtr->data[2]);
-
-		if (qIsNaN(x) || qIsNaN(y) || qIsNaN(z)){
-			continue;
-		}
-
-		QVector3D color = m_color;
-
-		if (format == imt3d::IPointsBasedObject::PF_XYZW_RGBA_32){
-			float r = static_cast<float>(pointDataPtr->data[4]);
-			float g = static_cast<float>(pointDataPtr->data[5]);
-			float b = static_cast<float>(pointDataPtr->data[6]);
-
-			color = QVector3D(r, g, b);
-		}
-
-		m_vertices.push_back(Vertex(QVector3D(x, y, z), QVector3D(), color));
-		m_indices.push_back(m_indices.size());
-	}
+	*/
 }
 
 

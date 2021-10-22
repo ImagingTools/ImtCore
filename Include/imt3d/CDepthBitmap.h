@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #pragma once
 
 
@@ -43,7 +63,8 @@ public:
 	{
 		MIT_CALIBRATION = MIT_LAST + 1,
 		MIT_CALIBRATION_TYPE_ID,
-		MIT_CALIBRATION_3D
+		MIT_CALIBRATION_3D,
+		MIT_REFERENCE_BITMAP
 	};
 
 	typedef iimg::CReflectedBitmapBase BaseClass;
@@ -54,13 +75,14 @@ public:
 	void SetDepthRange(const istd::CRange& depthRange);
 	void SetColorMap(ColorMapType colorMapType);
 	void SetClibration3d(const CImage3dCalibration& calibration3d);
+	void SetReferenceBitmap(const iimg::CGeneralBitmap& referenceBitmap);
 
 	// reimplemented (IDepthBitmap)
 	istd::CRange GetDepthRange() const override;
 	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size) override;
 	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size, void * dataPtr, bool releaseFlag, int linesDifference = 0) override;
 	virtual const IImage3dCalibration* GetCalibration3d() const override;
-
+	virtual const iimg::IBitmap* GetReferenceBitmap() const override;
 
 	// reimplemented (iimg::IRasterImage)
 	virtual void ResetImage() override;
@@ -91,6 +113,7 @@ private:
 	istd::CRange m_depthRange;
 	ColorMapType m_colorMapType;
 	CImage3dCalibration m_calibration3d;
+	iimg::CGeneralBitmap m_referenceBitmap;
 };
 
 
