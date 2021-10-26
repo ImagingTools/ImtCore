@@ -35,6 +35,11 @@ public:
 				const QChar& variableBeginSymbol2,
 				const QChar& variableEndSymbol,
 				const QMap<QByteArray, QByteArray>& variables);
+	static bool SetVariables(QByteArray& data,
+							 const QChar& variableBeginSymbol,
+							 const QChar& variableBeginSymbol2,
+							 const QChar& variableEndSymbol,
+							 const QVariantMap& variables);
 	/**
 		sets variable that declared as dual i.e. Active.Background
 	*/

@@ -51,10 +51,13 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 
 		m_currentTheme = styleName;
 		QVariantMap palette;
+		QVariantMap currentBasePalette;
 		m_designTokenFileParserAttrPtr->GetStyleSheetColorPalette(styleName, palette);
+		m_designTokenFileParserAttrPtr->GetBasePalette(styleName, currentBasePalette);
 		QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Styles") + QDir::separator().toLatin1() + styleName.constData();
 
 		m_currentPalette = palette;
+		m_currentBasePalette = currentBasePalette;
 
 		m_currentFontsCss.clear();
 		QVector<QByteArray> fonts = m_designTokenFileParserAttrPtr->GetFontList(styleName).GetElementIds();
@@ -130,6 +133,7 @@ bool CDesignTokenStyleSheetProcessorComp::ProcesCssFile(const QByteArray& fileNa
 
 //	while (this->SetVariableColor(fileData, m_currentPalette));
 	CDesignTokenStyleUtils::SetVariablesFromDualVariable(fileData, '$', '{', '}', m_currentPalette);
+	CDesignTokenStyleUtils::SetVariables(fileData, '$', '{', '}', m_currentBasePalette);
 
 	CDesignTokenStyleUtils::SetVariables(fileData, '$', '(', ')', m_currentFontsCss);
 

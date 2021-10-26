@@ -50,6 +50,7 @@ private:
 	QByteArray m_outputDirName;
 	QByteArray m_designTokenFileInfo;
 	QByteArray m_currentTheme;
+	mutable QVariantMap m_currentBasePalette;
 	mutable QVariantMap m_currentPalette;
 	mutable QMap<QByteArray, QByteArray> m_currentFontsCss;
 

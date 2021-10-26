@@ -22,6 +22,7 @@ public:
 	virtual bool ParseFile() = 0;
 	virtual bool SplitFile(const QString& outputDirPath, const QString& projectName) = 0;
 
+	virtual bool GetBasePalette(const QByteArray& designSchemaId, QVariantMap& palette) const = 0;
 	virtual bool GetStyleSheetColorPalette(const QByteArray& designSchemaId, QVariantMap& palette) const = 0;
 	virtual QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const = 0;
 
@@ -35,6 +36,7 @@ public:
 	virtual QByteArray GetOnDisabledColor(const QByteArray& styleName = QByteArray()) const = 0;
 	virtual QByteArray GetOnActiveColor(const QByteArray& styleName = QByteArray()) const = 0;
 	virtual QByteArray GetOnSelectedColor(const QByteArray& styleName = QByteArray()) const = 0;
+
 
 
 };

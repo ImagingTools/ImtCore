@@ -39,6 +39,22 @@ bool CDesignTokenFileParserComp::GetStyleSheetColorPalette(const QByteArray& des
 }
 
 
+bool CDesignTokenFileParserComp::GetBasePalette(const QByteArray& designSchemaId, QVariantMap& palette) const
+{
+	if(m_stylesBasePalettes.size()){
+		if(!designSchemaId.length()) {
+			palette = m_stylesBasePalettes.first();
+			return true;
+		}
+		else if (m_stylesBasePalettes.contains(designSchemaId)){
+			palette = m_stylesBasePalettes[designSchemaId];
+			return true;
+		}
+	}
+	return false;
+}
+
+
 // reimplemented (IDesignTokenFileParser)
 bool CDesignTokenFileParserComp::CDesignTokenFileParserComp::SetFile(const QByteArray& filePath)
 {
@@ -108,6 +124,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 		QString styleName = styleEntry["Name"].toString();
 
 		ReplaceColorNamesRecursivle(styleEntry, colorPaletteVariables);
+		m_stylesBasePalettes.insert(styleName.toUtf8(), colorPaletteVariables);
 
 		if (!styleName.length()){
 			qInfo() << "Skipping invalid object";

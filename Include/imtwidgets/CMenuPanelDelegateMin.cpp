@@ -122,9 +122,7 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 	// Draw text:
 	QString text = index.data(Qt::DisplayRole).toString();
 	painter->setPen(textColor);
-	QFont font = painter->font();
-	font.setFamily("Arial");
-	font.setPointSize(7);
+	QFont font = option.font;
 	painter->setFont(font);
 	QFontMetrics fontMetrics(font);
 	QRect textRect = option.rect;

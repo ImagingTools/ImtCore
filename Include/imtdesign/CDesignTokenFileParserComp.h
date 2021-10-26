@@ -36,6 +36,7 @@ public:
 
 	QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const override;
 	bool GetStyleSheetColorPalette(const QByteArray& designSchemaId, QVariantMap& palette) const override;
+	bool GetBasePalette(const QByteArray& designSchemaId, QVariantMap& palette) const override;
 
 	QByteArray GetTemplateIconColor(const QByteArray& styleName) const override;
 	QByteArray GetNormalColor(const QByteArray& styleName) const override;
@@ -71,6 +72,7 @@ private:
 
 	QVariantMap m_iconColors;
 	QMap<QString, QVariantMap> m_stylesPalettes;
+	QMap<QString, QVariantMap> m_stylesBasePalettes;
 	QMap<QString, QPalette> m_colorPalettes;
 
 	QMap<QString, istd::TSmartPtr<imtbase::ICollectionInfo>> m_fontsCollectionInfos;

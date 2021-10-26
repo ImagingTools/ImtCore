@@ -264,6 +264,19 @@ bool CDesignTokenStyleUtils::SetVariables(QByteArray& data, const QChar& variabl
 	return retval;
 }
 
+bool CDesignTokenStyleUtils::SetVariables(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QVariantMap& variables)
+{
+	QMap<QByteArray, QByteArray> _variables;
+	for(auto variable = variables.cbegin(); variable != variables.cend(); ++variable){
+		auto k = variable.key();
+		auto ks = k.toUtf8();
+		_variables.insert(ks, variable->toByteArray());
+	}
+	bool retval = SetVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, _variables);
+	while(SetVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, _variables));
+	return retval;
+}
+
 bool CDesignTokenStyleUtils::SetVariablesFromDualVariable(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QVariantMap& variables)
 {
 	bool retval = SetVariablesFromDualVariable_(data, variableBeginSymbol, variableBeginSymbol2, variableEndSymbol, variables);
@@ -726,9 +739,9 @@ bool CDesignTokenStyleUtils::CreateCssFont(QByteArray& output, const QFont& font
 
 bool CDesignTokenStyleUtils::SetVariable_(QByteArray& data, const QChar& variableBeginSymbol, const QChar& variableBeginSymbol2, const QChar& variableEndSymbol, const QMap<QByteArray, QByteArray> variables)
 {
-	QMap<QByteArray, QByteArray> upperVariables = variables;
-	for (const QByteArray& variablesKey : upperVariables.keys()){
-		upperVariables[variablesKey] = upperVariables[variablesKey].toUpper();
+	QMap<QString, QVariant> _variables;
+	for (const QByteArray& variablesKey : variables.keys()){
+		_variables[variablesKey] = variables[variablesKey];
 	}
 
 	/// points to 'beginSymbol' symbol
@@ -760,9 +773,10 @@ bool CDesignTokenStyleUtils::SetVariable_(QByteArray& data, const QChar& variabl
 			int lengthOfVariable = indexOfEndVariable - indexOfBeginVariable - 2;
 
 			QByteArray variableName = data.mid(indexOfBeginVariable + 2, lengthOfVariable).toUpper();
-			if (variables.contains(variableName)){
-				data.replace(indexOfBeginVariable, lengthOfVariable + 3, variables[variableName]);
-
+			QVariant newColor;
+			bool hasNewColor = CDesignTokenStyleUtils::FindColorEnrty(variableName, _variables, newColor);
+			if (hasNewColor && newColor.isValid()){
+				data.replace(indexOfBeginVariable, lengthOfVariable + 3, newColor.toByteArray());
 				return true;
 			}
 		}

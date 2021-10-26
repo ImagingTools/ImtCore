@@ -1,30 +1,35 @@
 QWidget#PageTree
 {
-        background-color: ${Active.Background};
+	background-color: ${Active.Background};
 }
 
 QWidget#BottomPageTree
 {
-        background-color: ${Active.Background};
+	background-color: ${Active.Background};
+}
+
+QTreeView
+{
+	font-size: 14px;
 }
 
 QTreeView#PageTree::item::hover
 {
-        background-color: ${Active.Hover};
+	background-color: ${Active.Hover};
 }
 
 QTreeView#BottomPageTree::item::hover
 {
-background-color: ${Active.Hover};
+	background-color: ${Active.Hover};
 }
 
 QPushButton#pushTop, QPushButton#pushBottom
 {
-	border: 1px solid ${Active.ButtonBorder}; /* #9d9d9d; */
-	background: ${Active.Background}; /* #e0e0e0; */
+	border: 1px solid ${Active.ButtonBorder};
+	background: ${Active.Background};
 }
 
 QPushButton#pushTop::hover, QPushButton#pushBottom::hover
 {
-	background: ${Active.Hover}; /* white; */
+	background: ${Active.Hover};
 }
