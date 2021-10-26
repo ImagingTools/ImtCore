@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4936" Description="ACF"/>
-            <Version Id="1" Number="2146" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331010" Description="Qt Framework"/>
+            <Version Id="0" Number="4950" Description="ACF"/>
+            <Version Id="1" Number="2151" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Design schema for ImtCore</Description>
@@ -58,14 +58,26 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="ImtStyleDesignShema" PackageId="ImtStylePck" ComponentId="DesignManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="PaletteProvider" Type="Reference" ExportId="PaletteProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ImtGuiDesignSchema"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imod::IModel" ComponentId="ImtGuiDesignSchema"/>
-        <Interface InterfaceId="iprm::ISelectionParam" ComponentId="ImtGuiDesignSchema"/>
-        <Interface InterfaceId="iser::ISerializable" ComponentId="ImtGuiDesignSchema"/>
-        <Interface InterfaceId="istd::IChangeable" ComponentId="ImtGuiDesignSchema"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ImtGuiDesignSchema"/>
+        <Interface InterfaceId="imod::IModel" ComponentId="ImtStyleDesignShema"/>
+        <Interface InterfaceId="iprm::ISelectionParam" ComponentId="ImtStyleDesignShema"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="ImtStyleDesignShema"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="ImtStyleDesignShema"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ImtStyleDesignShema"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

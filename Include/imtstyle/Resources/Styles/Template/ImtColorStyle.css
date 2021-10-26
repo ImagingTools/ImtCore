@@ -1,81 +1,90 @@
 QWidget
 {
-	background: ${Active.Background}; 	
-	color: ${Active.Foreground};
+	color: ${Active.Text}; /* #335777; */
 }
 
 QWidget::item:disabled
 {
-	color: ${Active.Foreground};
+	color: ${Inactive.Text};
+/*	color: palette(disabled); */
 }
 
-QWidget:disabled 
+QWidget:disabled
 {
-	color: ${Active.Foreground};
+	color: ${Active.Text};
+/*	color: palette(disabled); */
 }
 
 QSplashScreen > QWidget
 {
-	color: ${Active.Foreground};
+	color: ${Active.BrightText}; /* white; */
 	background: transparent;
 }
 
-QSplashScreen > QWidget > QLabel
+QSplashScreen > QWidget > QLabel 
 {
-	color: ${Active.YellowLabel};
+	color: ${Active.Yellowlabel}; /* yellow; */
 	background: transparent;
 }
 
 QWidget#MainVersionTitleLabel, QWidget#MainVersionLabel
 {
-	color: ${Active.Foreground};
+	color: ${Active.BrightText}; /* white; */
 }
 
 QSplashScreen > QWidget#CopyrightLabel
 {
-	color: ${Active.Foreground};
+	color: ${Active.Yellowlabel}; /* yellow; */
 }
+
 
 QWidget#BottomFrame
 {
-	background: ${Active.Background};
+	background: ${Active.Background}; /* rgb(230,230,232); */
 }
 
-QWidget#RightFrame
+QWidget#RightFrame 
 {
-	 border-left: 1px solid ${Active.Text};  
+	border-left: 1px solid ${Active.Text}; /* #335777; */
 }
 
-QWidget#StatusFrame
+QWidget#StatusFrame 
 {
-	border-bottom: 1px solid ${Active.Text}; 
+	border-bottom: 1px solid ${Active.Text}; /* #335777; */
 }
 
 QLabel#PageLabel
 {
-	color: ${Active.Text}; /*color: #335777;*/
+	color: ${Active.Text}; /* #335777; */
 }
 
-QWidget[ImtTopFrame=true]
+QWidget[ImtTopFrame=true] 
 {
-	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(50,50,52), stop: 0.9 rgb(35, 35, 37), stop: 0.97 rgb(35,35,37), stop: 1.0 rgb(35,35,37));
-	border-bottom: 1px solid rgb(25,25,27);
+/*
+	background: ${Active.Background};
+
+	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(227,227,229), stop: 0.9 rgb(212,212,214), stop: 0.97 rgb(212,212,214), stop: 1.0 rgb(190,190,192));
+	border-bottom: 1px solid rgb(180,180,182);
+*/
+	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 ${ImagingToolsGradient1}, stop: 0.9 ${ImagingToolsGradient2}, stop: 0.97 ${ImagingToolsGradient2}, stop: 1.0 ${ImagingToolsGradient3});
+	border-bottom: 1px solid ${ImagingToolsGradient4};
+
 }
 
 QLabel[Header=true]
 {
-	color: ${Active.BlueLabel};
+	color: ${Active.BlueLabel}; /* #88b8e3; */
 }
 
-QToolButton
+QToolButton 
 {
-	color: ${Active.Text};
+	color: ${Active.Text}; /* #335777; */
 }
 
 QToolButton#windowTitle
 {
-	background: ${Active.Background};
-	border: 1px solid ${Active.Mid};
+	background: ${Active.BackgroundSelected}; /* white; */
+	border: 1px solid  ${Active.Button}; /* lightGray; */
 }
 
 QToolButton#PageIconToolButton 
@@ -97,73 +106,66 @@ QToolBar[ImtToolBar=true]::separator
 
 QTableView[ImtMenu=true]
 {
-	color: ${Active.Midlight};
-
-	background: ${Active.Base};
+	color: palette(background);
+	background: palette(background);
 }
-
 
 QAbstractItemView::item::selected
 {
-	background-color: color: ${Active.Background};  /* rgba(160, 80, 40, 128); */
+	color: ${Active.Text}; /* #335777; */
+	background-color: ${Active.ItemSelected}; /* #e3eefa; */
 }
 
 QAbstractItemView::branch::selected
 {
-	background-color: ${Active.Background}; /* rgba(160, 80, 40, 128); */
+	background: ${Active.ItemSelected}; /* #e3eefa; */
 }
 
-QComboBox::item:selected
+QComboBox::item:selected 
 {
-	color: ${Active.Selected};
+ 	color: ${Active.BackgroundSelected}; /* white; */
 }
 
 QHeaderView::section
 {
-	border-bottom: 1px solid ${Active.Mid}; /*palette(mid); */
+	background-color: ${Active.HeaderSection}; /*  white; */
+	border-bottom: 1px solid ${Active.HeaderBorder}; /*  #dfdfdf; */
 }
+
 
 QTabBar
 {
-	background-color: ${Active.Base};
+	background-color: ${Active.TabBackground}; /* rgb(230,230,232);  Background */
 }
-
 
 QTabBar::tab[CollectionView=true]
 {
-	color: ${Active.Button}; /* color: rgb(128,128,128); */
-	
-	background-color: ${Active.Base};
+	background-color: ${Active.TabBackground}; /* rgb(230,230,232); Background */
 }
 
 QTabBar::tab:selected[CollectionView=true]
 {
-	color: ${Active.Text}; /* color: rgb(235, 98, 37, 200); */
+	color: ${Active.TextSelected}; /* #253f57; */
+	background-color: ${Active.BackgroundSelected}; /* white; */
 }
 
 QTabBar::tab::top:selected[CollectionView=true]
 {
-	border-bottom: 2px solid ${Active.Link}; /* rgba(235, 98, 37, 128); */
+	border-bottom: 2px solid ${Active.TabBorderSelected}; /* #eb6225; */
 }
 
 QTabBar::tab::left:selected[CollectionView=true]
 {
-	border-left: 2px solid rgba(235, 98, 37, 128);
+	border-left: 2px solid ${Active.TabBorderSelected}; /* #eb6225; */
 }
 
 QTabBar::tab::right:selected[CollectionView=true]
 {
-	border-left: 2px solid ${Active.Link}; /* rgba(235, 98, 37, 128); */
+	border-left: 2px solid ${Active.TabBorderSelected}; /* #eb6225; */
 }
 
 QTabBar::tab::bottom:selected[CollectionView=true]
 {
-	border-bottom: 2px solid ${Active.Link}; /* rgba(235, 98, 37, 128); */
+	border-bottom: 2px solid ${Active.TabBorderSelected2}; /* #f15a17; */
 }
 
-QFrame[frameShape="4"],
-QFrame[frameShape="5"]
-{
-    border: none;
-    background: ${Active.Dark};
-}

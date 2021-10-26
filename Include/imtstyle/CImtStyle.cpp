@@ -475,7 +475,7 @@ CImtStyle::CImtStyle()
 	light.palette = baseStylePtr->standardPalette();
 	light.palette.setColor(QPalette::Highlight, QColor("#1a76e7"));
 	light.palette.setColor(QPalette::Text, QColor("#335777"));
-	light.stylePath = ":/Styles/ImtColorStyleLight";
+	light.stylePath = ":/Styles/ImtColorStyle";
 
 	m_colorSchemaMap[DS_LIGHT] = light;
 
@@ -502,7 +502,7 @@ CImtStyle::CImtStyle()
 	dark.palette.setColor(QPalette::Mid, QColor(48, 48, 48));
 	dark.palette.setColor(QPalette::Dark, QColor(43, 43, 43));
 	dark.palette.setColor(QPalette::Shadow, QColor(30, 30, 30));
-	dark.stylePath = ":/Styles/ImtColorStyleDark";
+	dark.stylePath = ":/Styles/ImtColorStyle";
 
 	m_colorSchemaMap[DS_DARK] = dark;
 }

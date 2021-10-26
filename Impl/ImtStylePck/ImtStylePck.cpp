@@ -4,6 +4,7 @@
 // ACF includes
 #include <icomp/export.h>
 
+I_REGISTER_QT_RESOURCE(imtstylelight);
 
 namespace ImtStylePck
 {
@@ -18,6 +19,11 @@ I_EXPORT_COMPONENT(
 			DesignTokenBasedResourceProvider,
 			"Design token based resource provider",
 			"Design Token Resource Color Palette Font Icons");
+
+I_EXPORT_COMPONENT(
+			DesignManager,
+			"Design Manager",
+			"Style Design Manager");
 
 
 } // namespace ImtStylePck

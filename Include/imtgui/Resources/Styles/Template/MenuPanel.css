@@ -10,7 +10,7 @@ QWidget#BottomPageTree
 
 QTreeView
 {
-	font-size: 14px;
+	font-size: 10px;
 }
 
 QTreeView#PageTree::item::hover
