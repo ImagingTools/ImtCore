@@ -1474,10 +1474,10 @@ bool CObjectCollectionViewComp::ItemProxyModel::lessThan(const QModelIndex &left
 
 	bool result;
 
-	if (tryDateTime(leftValue, rightValue, result)){
+	if (TryDateTime(leftValue, rightValue, result)){
 		return result;
 	}
-	else if (tryInt(leftValue, rightValue, result)){
+	else if (TryInt(leftValue, rightValue, result)){
 		return result;
 	}
 	else{
@@ -1498,11 +1498,11 @@ bool CObjectCollectionViewComp::ItemProxyModel::TryDateTime(QVariant left, QVari
 
 	QDateTime leftDate = left.toDateTime();
 	if (leftDate.isNull()) {
-		leftDate = QDateTime::fromString(leftString, CObjectCollectionViewDelegate::sDateTimeFormat);
+		leftDate = QDateTime::fromString(leftString, CObjectCollectionViewDelegate::s_dateTimeFormat);
 	}
 	QDateTime rightDate = right.toDateTime();
 	if (rightDate.isNull()) {
-		rightDate = QDateTime::fromString(rightString, CObjectCollectionViewDelegate::sDateTimeFormat);
+		rightDate = QDateTime::fromString(rightString, CObjectCollectionViewDelegate::s_dateTimeFormat);
 	}
 
 	if (leftDate.isValid() && rightDate.isValid()){
