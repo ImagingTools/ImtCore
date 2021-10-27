@@ -22,7 +22,7 @@
 
 
 // ImtCore includes
-#include <imtgui/CDesignManagerCompBase.h>
+#include <imtstyle/CDesignManagerCompBase.h>
 
 
 namespace imt3dgui
