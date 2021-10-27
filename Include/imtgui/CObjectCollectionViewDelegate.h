@@ -80,6 +80,8 @@ public:
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
+	static QString s_dateTimeFormat;
+
 protected:
 	enum FileOperationType
 	{

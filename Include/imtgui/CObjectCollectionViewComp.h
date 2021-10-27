@@ -170,6 +170,11 @@ public:
 	protected:
 		// reimplemented (QSortFilterProxyModel)
 		virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
+		virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+
+	private:
+		bool TryDateTime(QVariant left, QVariant right, bool& result) const;
+		bool TryInt(QVariant left, QVariant right, bool& result) const;
 	};
 
 	class FocusDecorationFactory: public iwidgets::CFocusDecorator::GraphicsEffectFactory

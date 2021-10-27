@@ -20,6 +20,26 @@ CApplicationSwitchCommandComp::CApplicationSwitchCommandComp()
 }
 
 
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CApplicationSwitchCommandComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	switch (modelId){
+		case MI_VISIBILITY:
+		{
+			bool isVisible = m_menuItemVisibilityCompPtr->IsEnabled();
+			m_switchCommand.setVisible(isVisible);
+			break;
+		}
+		case MI_NAME:
+		{
+			this->OnLanguageChanged();
+			break;
+		}
+	}
+}
+
+
 // reimpemented (ibase::ICommandsProvider)
 
 const ibase::IHierarchicalCommand* CApplicationSwitchCommandComp::GetCommands() const
@@ -45,6 +65,21 @@ void CApplicationSwitchCommandComp::OnComponentCreated()
 	connect(&m_switchCommand, SIGNAL(triggered()), this, SLOT(OnCommandActivated()));
 
 	EnableLocalization(true);
+
+	if (m_executablePathModelCompPtr.IsValid()){
+		BaseClass2::RegisterModel(m_executablePathModelCompPtr.GetPtr(), MI_EXECUTABLE_PATH);
+	}
+	if (m_menuItemVisibilityCompPtr.IsValid() && m_menuItemVisibilityModelCompPtr.IsValid()){
+		BaseClass2::RegisterModel(m_menuItemVisibilityModelCompPtr.GetPtr(), MI_VISIBILITY);
+	}
+}
+
+
+void CApplicationSwitchCommandComp::OnComponentDestroyed()
+{
+	BaseClass2::UnregisterAllModels();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 

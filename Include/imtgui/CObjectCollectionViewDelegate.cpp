@@ -60,6 +60,7 @@ QString ComposeExportFilePath(const QString olderPath, const QString& projectNam
 namespace imtgui
 {
 
+QString CObjectCollectionViewDelegate::s_dateTimeFormat = QString("dd.MM.yyyy hh:mm:ss");
 
 CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 	:m_editCommands(tr("&Edit"), 100),
@@ -319,11 +320,11 @@ ICollectionViewDelegate::SummaryInformation CObjectCollectionViewDelegate::GetSu
 		if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
 			if (informationId == QByteArray("Added")){
 				result.sortValue = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME);
-				result.text = result.sortValue.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+				result.text = result.sortValue.toDateTime().toString(s_dateTimeFormat);
 			}
 			else if (informationId == QByteArray("ModificationTime")){
 				result.sortValue = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME);
-				result.text = result.sortValue.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+				result.text = result.sortValue.toDateTime().toString(s_dateTimeFormat);
 			}
 		}
 	}

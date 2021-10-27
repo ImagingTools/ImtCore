@@ -2,7 +2,7 @@ include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
 include($(IACFDIR)/Config/QMake/Iacf.pri)
 
 INCLUDEPATH += $$PWD/../../Include
-INCLUDEPATH += $$PWD/../..//Impl
+INCLUDEPATH += $$PWD/../../Impl
 INCLUDEPATH += $$PWD/../../$$AUXINCLUDEDIR
 
 win32{

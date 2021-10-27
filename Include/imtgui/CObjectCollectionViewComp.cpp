@@ -1435,6 +1435,7 @@ const ibase::IHierarchicalCommand* CObjectCollectionViewComp::Commands::GetComma
 
 // protected methods of the embedded class ItemProxyModel
 
+
 // reimplemented (QSortFilterProxyModel)
 
 bool CObjectCollectionViewComp::ItemProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& /*sourceParent*/) const
@@ -1462,6 +1463,77 @@ bool CObjectCollectionViewComp::ItemProxyModel::filterAcceptsRow(int sourceRow, 
 
 	return false;
 }
+
+
+// reimplemented (QSortFilterProxyModel)
+
+bool CObjectCollectionViewComp::ItemProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
+{
+	QVariant leftValue = sourceModel()->data(left);
+	QVariant rightValue = sourceModel()->data(right);
+
+	bool result;
+
+	if (tryDateTime(leftValue, rightValue, result)){
+		return result;
+	}
+	else if (tryInt(leftValue, rightValue, result)){
+		return result;
+	}
+	else{
+		// if neither DateTime, nor Int or convertible to Int, then sort it as QString
+		QString leftString = leftValue.toString();
+		QString rightString = rightValue.toString();
+		return  QString::localeAwareCompare(leftString, rightString) < 0;
+	}
+}
+
+
+// private methods of embedded class ItemProxyModel
+
+bool CObjectCollectionViewComp::ItemProxyModel::TryDateTime(QVariant left, QVariant right, bool& result) const
+{
+	QString leftString = left.toString();
+	QString rightString = right.toString();
+
+	QDateTime leftDate = left.toDateTime();
+	if (leftDate.isNull()) {
+		leftDate = QDateTime::fromString(leftString, CObjectCollectionViewDelegate::sDateTimeFormat);
+	}
+	QDateTime rightDate = right.toDateTime();
+	if (rightDate.isNull()) {
+		rightDate = QDateTime::fromString(rightString, CObjectCollectionViewDelegate::sDateTimeFormat);
+	}
+
+	if (leftDate.isValid() && rightDate.isValid()){
+		result = (leftDate < rightDate);
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CObjectCollectionViewComp::ItemProxyModel::TryInt(QVariant left, QVariant right, bool& result) const
+{
+	if (left.userType() == QMetaType::Int && right.userType() == QMetaType::Int){
+		result = left.toInt() < right.toInt();
+		return true;
+	}
+
+	bool ok;
+	int valueLeft = left.toInt(&ok);
+	if (ok){
+		int valueRight = right.toInt(&ok);
+		if (ok){
+			result = (valueLeft < valueRight);
+			return true;
+		}
+	}
+
+	return false;
+}
+
 
 
 // protected methods of the embedded class FocusDecorationFactory

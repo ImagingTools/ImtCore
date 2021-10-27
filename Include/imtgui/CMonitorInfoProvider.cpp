@@ -1,7 +1,7 @@
 #include <imtgui/CMonitorInfoProvider.h>
 
 
-#ifdef Q_OS_WINDOWS
+#ifdef Q_OS_WIN
 	// Windows includes
 	#include <windows.h>
 	#include <winreg.h>
@@ -183,7 +183,7 @@ QSize CMonitorInfoProvider::RetrievePhysicalSize(QString monitorId)
 
 	QSize size(500, 281);
 
-#ifdef Q_OS_WINDOWS
+#ifdef Q_OS_WIN
 	DISPLAY_DEVICE ddAdapter;
 	ddAdapter.cb = sizeof(ddAdapter);
 	int adapterIndex = 0;
