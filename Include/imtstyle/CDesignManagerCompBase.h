@@ -13,7 +13,7 @@
 #include <imtstyle/IFontProvider.h>
 
 
-namespace imtgui
+namespace imtstyle
 {
 
 
@@ -100,6 +100,6 @@ private:
 };
 
 
-} // namespace imtgui
+} // namespace imtstyle
 
 

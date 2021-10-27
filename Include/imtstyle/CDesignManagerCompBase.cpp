@@ -5,7 +5,7 @@
 #include <istd/CChangeNotifier.h>
 
 
-namespace imtgui
+namespace imtstyle
 {
 
 
@@ -231,6 +231,6 @@ bool CDesignManagerCompBase::DesignList::IsOptionEnabled(int /*index*/) const
 }
 
 
-} // namespace imtgui
+} // namespace imtstyle
 
 

@@ -9,10 +9,10 @@ namespace imtgui
 {
 
 
-class CDesignManagerComp: public imtgui::CDesignManagerCompBase
+class CDesignManagerComp: public imtstyle::CDesignManagerCompBase
 {
 public:
-	typedef imtgui::CDesignManagerCompBase BaseClass;
+	typedef imtstyle::CDesignManagerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDesignManagerComp);
 	I_END_COMPONENT;
