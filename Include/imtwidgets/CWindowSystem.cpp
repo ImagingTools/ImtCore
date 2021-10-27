@@ -1,7 +1,7 @@
 #include <imtwidgets/CWindowSystem.h>
 
 // Windows includes
-#ifdef Q_OS_WINDOWS
+#ifdef Q_OS_WIN
 	#include <windows.h>
 	#include <psapi.h>
 #endif
@@ -26,7 +26,7 @@ public:
 
 
 
-#ifdef Q_OS_WINDOWS
+#ifdef Q_OS_WIN
 BOOL CALLBACK FindHandleCallback(HWND windowHandle, LPARAM pParam)
 {
 	static const int maxBufferSize = 256;
@@ -56,7 +56,7 @@ qint64 CWindowSystem::FindProcessIdByTitle(const QString& title)
 {
 	qint64 foundProcessId = 0;
 
-#ifdef Q_OS_WINDOWS
+#ifdef Q_OS_WIN
 	DWORD processList[1024];
 	DWORD bytes = 0;
 
@@ -91,7 +91,7 @@ qint64 CWindowSystem::FindProcessIdByTitle(const QString& title)
 		}
 	}
 
-#endif // Q_OS_WINDOWS
+#endif // Q_OS_WIN
 
 	return foundProcessId;
 }
@@ -101,7 +101,7 @@ Qt::HANDLE CWindowSystem::FindHandleByProcessId(qint64 processId)
 {
 	Qt::HANDLE handle = 0;
 
-#ifdef Q_OS_WINDOWS
+#ifdef Q_OS_WIN
 	HWND topWindowHandle = ::GetTopWindow(nullptr);
 
 	while(topWindowHandle != nullptr){
@@ -137,7 +137,7 @@ Qt::HANDLE CWindowSystem::FindHandleByTitle(const QString& title)
 {
 	Qt::HANDLE handle = nullptr;
 
-#ifdef Q_OS_WINDOWS
+#ifdef Q_OS_WIN
 	HandleInfo handleInfo;
 	handleInfo.title = title;
 
@@ -153,7 +153,7 @@ Qt::HANDLE CWindowSystem::FindHandleByTitle(const QString& title)
 
 void CWindowSystem::RaiseWindowByProcessId(qint64 processId)
 {
-#ifdef Q_OS_WINDOWS
+#ifdef Q_OS_WIN
 	HWND windowHandle = (HWND)FindHandleByProcessId(processId);
 	if (windowHandle){
 		::SetForegroundWindow(windowHandle);
@@ -168,7 +168,7 @@ void CWindowSystem::RaiseWindowByProcessId(qint64 processId)
 
 void CWindowSystem::RaiseWindowByTitle(const QString& title)
 {
-#ifdef Q_OS_WINDOWS
+#ifdef Q_OS_WIN
 	HWND mainWindowHandle = (HWND)FindHandleByTitle(title);
 	HWND lastActiveWindowHandle = mainWindowHandle;
 
