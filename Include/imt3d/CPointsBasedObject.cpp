@@ -42,7 +42,7 @@ int CPointsBasedObject::GetPointsCount() const
 }
 
 
-const void* CPointsBasedObject::GetPointData(size_t pointIndex) const
+const void* CPointsBasedObject::GetPointData(int pointIndex) const
 {
 	switch (m_pointFormat){
 		case IPointsBasedObject::PF_XYZ_32:
@@ -65,7 +65,7 @@ const void* CPointsBasedObject::GetPointData(size_t pointIndex) const
 }
 
 
-void* CPointsBasedObject::GetPointData(size_t pointIndex)
+void* CPointsBasedObject::GetPointData(int pointIndex)
 {
 	const CPointsBasedObject* constThis = static_cast<const CPointsBasedObject*>(this);
 
@@ -256,7 +256,7 @@ bool CPointsBasedObject::ResetData(istd::IChangeable::CompatibilityMode /*mode*/
 // protected methods
 
 template <typename PointType>
-const PointType* CPointsBasedObject::TGetPointData(size_t pointIndex, bool validOnly) const
+const PointType* CPointsBasedObject::TGetPointData(int pointIndex, bool validOnly) const
 {
 	Q_ASSERT(pointIndex >= 0 && pointIndex < m_pointsCount);
 
@@ -275,7 +275,7 @@ const PointType* CPointsBasedObject::TGetPointData(size_t pointIndex, bool valid
 }
 
 template <typename PointType>
-PointType* CPointsBasedObject::TGetPointData(size_t pointIndex, bool validOnly)
+PointType* CPointsBasedObject::TGetPointData(int pointIndex, bool validOnly)
 {
 	Q_ASSERT(pointIndex >= 0 && pointIndex < m_pointsCount);
 
@@ -302,7 +302,7 @@ bool CPointsBasedObject::Create(PointFormat pointFormat)
 	return true;
 }
 
-bool CPointsBasedObject::Create(PointFormat pointFormat, size_t pointsCount, const void* dataPtr)
+bool CPointsBasedObject::Create(PointFormat pointFormat, int pointsCount, const void* dataPtr)
 {
 	bool retval = Create(pointFormat);
 
@@ -314,7 +314,7 @@ bool CPointsBasedObject::Create(PointFormat pointFormat, size_t pointsCount, con
 }
 
 
-bool CPointsBasedObject::Append(size_t pointsCount, const void* dataPtr)
+bool CPointsBasedObject::Append(int pointsCount, const void* dataPtr)
 {
 	if (pointsCount <= 0 || dataPtr == nullptr){
 		return false;
@@ -561,7 +561,7 @@ int CPointsBasedObject::GetPointBytesSize(PointFormat pointFormat)
 }
 
 
-int CPointsBasedObject::GetBufferSize(PointFormat pointFormat, size_t pointsCount)
+int CPointsBasedObject::GetBufferSize(PointFormat pointFormat, int pointsCount)
 {
 	return int(pointsCount * GetPointBytesSize(pointFormat));
 }

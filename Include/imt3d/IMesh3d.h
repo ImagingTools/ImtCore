@@ -30,9 +30,9 @@ public:
 	/**
 		Create mesh with specified point format using external data buffer.
 	*/
-	virtual bool CreateMesh(PointFormat pointFormat, size_t pointsCount, const void* pointsDataPtr, const Indices& indices) = 0;
+	virtual bool CreateMesh(PointFormat pointFormat, int pointsCount, const void* pointsDataPtr, const Indices& indices) = 0;
 
-	virtual bool InsertData(size_t pointsCount, const void* pointsDataPtr, const Indices& indices) = 0;
+	virtual bool InsertData(int pointsCount, const void* pointsDataPtr, const Indices& indices) = 0;
 
 	/**
 		Get mesh indices.

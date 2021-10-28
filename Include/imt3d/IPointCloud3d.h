@@ -25,7 +25,7 @@ public:
 	*/
 	virtual bool CreateCloud(
 				PointFormat pointFormat,
-				size_t pointsCount,
+				int pointsCount,
 				const void* dataPtr,
 				const istd::CIndex2d* gridSizePtr = nullptr) = 0;
 
@@ -34,7 +34,7 @@ public:
 		The points should be in the format specified by \c CreateCloud.
 	*/
 	virtual bool InsertPoints(
-				size_t pointsCount,
+				int pointsCount,
 				const void* dataPtr) = 0;
 };
 

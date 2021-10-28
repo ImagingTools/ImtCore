@@ -25,11 +25,11 @@ public:
 	// reimplemented (imt3d::IPointCloud3d)
 	bool CreateCloud(PointFormat pointFormat) override;
 	bool CreateCloud(PointFormat pointFormat,
-				size_t pointsCount,
+				int pointsCount,
 				const void* dataPtr,
 				const istd::CIndex2d* gridSizePtr = nullptr) override;
 	virtual bool InsertPoints(
-				size_t pointsCount,
+				int pointsCount,
 				const void* dataPtr) override;
 
 	// reimplemented (imt3d::IGridInfo)

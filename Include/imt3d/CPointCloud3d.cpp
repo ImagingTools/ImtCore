@@ -31,7 +31,7 @@ bool CPointCloud3d::CreateCloud(PointFormat pointFormat)
 
 
 bool CPointCloud3d::CreateCloud(PointFormat pointFormat,
-			size_t pointsCount,
+			int pointsCount,
 			const void* dataPtr,
 			const istd::CIndex2d* gridSizePtr)
 {
@@ -50,7 +50,7 @@ bool CPointCloud3d::CreateCloud(PointFormat pointFormat,
 
 
 bool CPointCloud3d::InsertPoints(
-			size_t pointsCount,
+			int pointsCount,
 			const void* dataPtr)
 {
 	static ChangeSet appendChangeSet(CF_APPEND);

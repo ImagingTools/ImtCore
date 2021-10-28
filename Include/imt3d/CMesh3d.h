@@ -26,8 +26,8 @@ public:
 
 	// reimplemented (imt3d::IMesh3d)
 	virtual bool CreateMesh(PointFormat pointFormat) override;
-	virtual bool CreateMesh(PointFormat pointFormat, size_t pointsCount, const void* pointsDataPtr, const Indices& indices) override;
-	virtual bool InsertData(size_t pointsCount, const void* pointsDataPtr, const Indices& indices) override;
+	virtual bool CreateMesh(PointFormat pointFormat, int pointsCount, const void* pointsDataPtr, const Indices& indices) override;
+	virtual bool InsertData(int pointsCount, const void* pointsDataPtr, const Indices& indices) override;
 	virtual const Indices& GetIndices() const override;
 
 	// reimplemented (iser::ISerializable)

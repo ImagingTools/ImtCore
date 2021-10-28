@@ -111,7 +111,7 @@ bool CMesh3d::CreateMesh(PointFormat pointFormat)
 }
 
 
-bool CMesh3d::CreateMesh(PointFormat pointFormat, size_t pointsCount, const void* pointsDataPtr, const Indices& indices)
+bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, const void* pointsDataPtr, const Indices& indices)
 {
 	static ChangeSet createChangeSet(CF_CREATE);
 	istd::CChangeNotifier changeNotifier(this, &createChangeSet);
@@ -126,7 +126,7 @@ bool CMesh3d::CreateMesh(PointFormat pointFormat, size_t pointsCount, const void
 }
 
 
-bool CMesh3d::InsertData(size_t pointsCount, const void * pointsDataPtr, const Indices& indices)
+bool CMesh3d::InsertData(int pointsCount, const void * pointsDataPtr, const Indices& indices)
 {
 	static ChangeSet appendChangeSet(CF_APPEND);
 	istd::CChangeNotifier changeNotifier(this, &appendChangeSet);
@@ -252,7 +252,7 @@ bool CMesh3d::SaveToStlFile(const QString& filePath) const
 	bool retVal = WriteTypedValue<quint32>(trianglesCount, file);
 
 	// write triangles
-	for (size_t i = 0; retVal && i < m_indices.size(); i++){
+	for (int i = 0; retVal && i < m_indices.size(); i++){
 		const std::vector<uint32_t>& triangle = m_indices[i];
 
 		retVal = (triangle.size() == 3);

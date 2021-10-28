@@ -87,12 +87,12 @@ public:
 	/**
 		Get full access to the point data buffer.
 	*/
-	virtual void* GetPointData(size_t pointIndex) = 0;
+	virtual void* GetPointData(int pointIndex) = 0;
 
 	/**
 		Get read-only access to the point data buffer.
 	*/
-	virtual const void* GetPointData(size_t pointIndex) const = 0;
+	virtual const void* GetPointData(int pointIndex) const = 0;
 
 	/**
 		Return pointer to the internal data buffer.
