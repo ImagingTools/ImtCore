@@ -33,3 +33,4 @@ QPushButton#pushTop::hover, QPushButton#pushBottom::hover
 {
 	background: ${Active.Hover};
 }
+

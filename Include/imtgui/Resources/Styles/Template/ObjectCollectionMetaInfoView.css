@@ -8,5 +8,6 @@ QLabel[MetaInfoType = true]
 QLabel[MetaInfoValue = true]
 {
 	font-size: 9px;
-	color: gray
+	color: ${Active.Text};
 }
+
