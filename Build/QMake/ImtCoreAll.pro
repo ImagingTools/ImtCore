@@ -1,5 +1,5 @@
 # Root of ImtCore project
-include ($(ACFDIR)/Config/QMake/Solution.pri)
+TEMPLATE = subdirs
 
 SUBDIRS += imtbase
 imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
