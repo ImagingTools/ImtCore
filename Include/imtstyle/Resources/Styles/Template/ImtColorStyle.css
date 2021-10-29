@@ -1,90 +1,81 @@
 QWidget
 {
-	color: ${Active.Text}; /* #335777; */
+	color: ${Active.Text}; 
 }
 
 QWidget::item:disabled
 {
 	color: ${Inactive.Text};
-/*	color: palette(disabled); */
 }
 
 QWidget:disabled
 {
 	color: ${Active.Text};
-/*	color: palette(disabled); */
 }
 
 QSplashScreen > QWidget
 {
-	color: ${Active.BrightText}; /* white; */
+	color: ${Active.BrightText};
 	background: transparent;
 }
 
 QSplashScreen > QWidget > QLabel 
 {
-	color: ${Active.Yellowlabel}; /* yellow; */
+	color: ${Active.Yellowlabel}; 
 	background: transparent;
 }
 
 QWidget#MainVersionTitleLabel, QWidget#MainVersionLabel
 {
-	color: ${Active.BrightText}; /* white; */
+	color: ${Active.BrightText}; 
 }
 
 QSplashScreen > QWidget#CopyrightLabel
 {
-	color: ${Active.Yellowlabel}; /* yellow; */
+	color: ${Active.Yellowlabel}; 
 }
 
 
 QWidget#BottomFrame
 {
-	background: ${Active.Background}; /* rgb(230,230,232); */
+	background: ${Active.Background}; 
 }
 
 QWidget#RightFrame 
 {
-	border-left: 1px solid ${Active.Text}; /* #335777; */
+	border-left: 1px solid ${Active.Text}; 
 }
 
 QWidget#StatusFrame 
 {
-	border-bottom: 1px solid ${Active.Text}; /* #335777; */
+	border-bottom: 1px solid ${Active.Text}; 
 }
 
 QLabel#PageLabel
 {
-	color: ${Active.Text}; /* #335777; */
+	color: ${Active.Text}; 
 }
 
 QWidget[ImtTopFrame=true] 
 {
-/*
-	background: ${Active.Background};
-
-	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(227,227,229), stop: 0.9 rgb(212,212,214), stop: 0.97 rgb(212,212,214), stop: 1.0 rgb(190,190,192));
-	border-bottom: 1px solid rgb(180,180,182);
-*/
 	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 ${ImagingToolsGradient1}, stop: 0.9 ${ImagingToolsGradient2}, stop: 0.97 ${ImagingToolsGradient2}, stop: 1.0 ${ImagingToolsGradient3});
 	border-bottom: 1px solid ${ImagingToolsGradient4};
-
 }
 
 QLabel[Header=true]
 {
-	color: ${Active.BlueLabel}; /* #88b8e3; */
+	color: ${Active.BlueLabel}; 
 }
 
 QToolButton 
 {
-	color: ${Active.Text}; /* #335777; */
+	color: ${Active.Text}; 
 }
 
 QToolButton#windowTitle
 {
-	background: ${Active.BackgroundSelected}; /* white; */
-	border: 1px solid  ${Active.Button}; /* lightGray; */
+	background: ${Active.BackgroundSelected}; 
+	border: 1px solid  ${Active.Button}; 
 }
 
 QToolButton#PageIconToolButton 
@@ -112,60 +103,59 @@ QTableView[ImtMenu=true]
 
 QAbstractItemView::item::selected
 {
-	color: ${Active.Text}; /* #335777; */
-	background-color: ${Active.ItemSelected}; /* #e3eefa; */
+	color: ${Active.Text}; 
+	background-color: ${Active.ItemSelected}; 
 }
 
 QAbstractItemView::branch::selected
 {
-	background: ${Active.ItemSelected}; /* #e3eefa; */
+	background: ${Active.ItemSelected}; 
 }
 
 QComboBox::item:selected 
 {
- 	color: ${Active.BackgroundSelected}; /* white; */
+ 	color: ${Active.BackgroundSelected}; 
 }
 
 QHeaderView::section
 {
-	background-color: ${Active.HeaderSection}; /*  white; */
-	border-bottom: 1px solid ${Active.HeaderBorder}; /*  #dfdfdf; */
+	background-color: ${Active.HeaderSection}; 
+	border-bottom: 1px solid ${Active.HeaderBorder}; 
 }
-
 
 QTabBar
 {
-	background-color: ${Active.TabBackground}; /* rgb(230,230,232);  Background */
+	background-color: ${Active.TabBackground}; 
 }
 
 QTabBar::tab[CollectionView=true]
 {
-	background-color: ${Active.TabBackground}; /* rgb(230,230,232); Background */
+	background-color: ${Active.TabBackground}; 
 }
 
 QTabBar::tab:selected[CollectionView=true]
 {
-	color: ${Active.TextSelected}; /* #253f57; */
-	background-color: ${Active.BackgroundSelected}; /* white; */
+	color: ${Active.TextSelected}; 
+	background-color: ${Active.BackgroundSelected}; 
 }
 
 QTabBar::tab::top:selected[CollectionView=true]
 {
-	border-bottom: 2px solid ${Active.TabBorderSelected}; /* #eb6225; */
+	border-bottom: 2px solid ${Active.TabBorderSelected}; 
 }
 
 QTabBar::tab::left:selected[CollectionView=true]
 {
-	border-left: 2px solid ${Active.TabBorderSelected}; /* #eb6225; */
+	border-left: 2px solid ${Active.TabBorderSelected}; 
 }
 
 QTabBar::tab::right:selected[CollectionView=true]
 {
-	border-left: 2px solid ${Active.TabBorderSelected}; /* #eb6225; */
+	border-left: 2px solid ${Active.TabBorderSelected}; 
 }
 
 QTabBar::tab::bottom:selected[CollectionView=true]
 {
-	border-bottom: 2px solid ${Active.TabBorderSelected2}; /* #f15a17; */
+	border-bottom: 2px solid ${Active.TabBorderSelected2}; 
 }
 
