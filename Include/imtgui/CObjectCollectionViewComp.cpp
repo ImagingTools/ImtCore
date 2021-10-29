@@ -1257,14 +1257,7 @@ void CObjectCollectionViewComp::OnContextMenuRename(bool /*checked*/)
 			if (itemPtr != nullptr){
 				QByteArray itemId = itemPtr->data(DR_OBJECT_ID).toByteArray();
 				if (!itemId.isEmpty()){
-					const imtbase::IObjectCollection* objectPtr = GetObservedObject();
-					QString name = objectPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_NAME).toString();
-
-					bool ok;
-					const QString newName = QInputDialog::getText(ItemList, tr("Enter new object name"), tr("Name"), QLineEdit::Normal, name, &ok);
-					if (ok){
-						delegate.RenameObject(itemId, newName);
-					}
+					delegate.RenameObject(itemId, "");
 				}
 			}
 		}

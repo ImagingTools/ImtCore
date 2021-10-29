@@ -5,6 +5,7 @@
 #include <QtGui/QRegExpValidator>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QFileDialog>
+#include <QtWidgets/QInputDialog>
 
 // ACF includes
 #include <istd/CChangeGroup.h>
@@ -276,16 +277,31 @@ bool CObjectCollectionViewDelegate::UpdateObject(const QByteArray& objectId, con
 
 bool CObjectCollectionViewDelegate::RenameObject(const QByteArray& objectId, const QString& newName) const
 {
+	if (objectId.isEmpty()){
+		return false;
+	}
+
 	if (m_collectionPtr != nullptr){
+		QString name = newName;
+
+		if (name.isEmpty()){
+			QString oldName = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			bool ok;
+			name = QInputDialog::getText(nullptr, tr("Enter new object name"), tr("Name"), QLineEdit::Normal, oldName, &ok);
+			if (!ok){
+				return false;
+			}
+		}
+
 		QRegExpValidator inputValidator(QRegExp("^[^\\\\/:\\*\\?\"\\<\\>\\|\\+]+$"));
 		int pos;
-		QString name = newName.trimmed();
+		name = name.trimmed();
 		if (inputValidator.validate(name, pos) == QValidator::Acceptable){
 			m_collectionPtr->SetObjectName(objectId, name);
 			return true;
 		}
 
-		QMessageBox::critical(NULL, tr("Error"), tr("The document name contains some not allowed characters"));
+		QMessageBox::critical(nullptr, tr("Error"), tr("The document name contains some not allowed characters"));
 	}
 
 	return false;
