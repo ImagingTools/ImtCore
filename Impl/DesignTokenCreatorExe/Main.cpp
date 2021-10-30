@@ -10,7 +10,7 @@
 
 // ImtCore includes
 #include <imtdesign/IDesignTokenArgumentsParser.h>
-#include <GeneratedFiles/DesignTokenCreatorExe/CDesignTokenCreatorExe.h>
+#include <GeneratedFiles/DesignTokenCreator/CDesignTokenCreatorExe.h>
 
 
 int main(int argc, char *argv[])

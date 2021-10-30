@@ -1,10 +1,8 @@
-TARGET = DesignTokenCreatorExe
+TARGET = DesignTokenCreator
 
 include($(ACFCONFIGDIR)/QMake/ApplicationConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
-
-RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR
 LIBS += -limtbase -limtdesign
@@ -18,7 +16,7 @@ win32-msvc*{
 	QMAKE_CXXFLAGS += /wd4264
 
 	# copying all Qt DLLs to destination directory
-	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = set path=$$(QTDIR)\bin;%path% && $$(QTDIR)\bin\windeployqt $$DESTDIR
+	QMAKE_POST_LINK = $$(QTDIR)\bin\windeployqt $$DESTDIR\DesignTokenCreator.exe --verbose 2
 }
 
 

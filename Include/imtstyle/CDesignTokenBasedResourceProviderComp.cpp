@@ -92,7 +92,6 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 	int count = qMin(qMin(m_designShemaIdAttrPtr.GetCount(), m_paletteModeAttrPtr.GetCount()), m_resourceFileNameAttrPtr.GetCount());
 
 	for (int i = 0; i < count; i++){
-
 		if (m_designTokenFileParser.IsValid()){
 			m_designTokenFileParser->SetFile(m_resourceFileNameAttrPtr[i]);
 			m_designTokenFileParser->ParseFile();
@@ -181,9 +180,9 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 						return;
 					}
 
-					for (int i = 0; i < fontFamilyArray.count(); i++){
+					for (int fontFamilyIndex = 0; fontFamilyIndex < fontFamilyArray.count(); fontFamilyIndex++){
 						QString fontName;
-						if (!GetStringValue(fontFamilyArray, i, fontName)){
+						if (!GetStringValue(fontFamilyArray, fontFamilyIndex, fontName)){
 							SendErrorMessage(0, QObject::tr("Palette file parsing error"));
 
 							return;
