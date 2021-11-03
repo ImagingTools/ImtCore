@@ -265,8 +265,13 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 
 		case '\\':
 			if (startBigText){
-				text.append(chr);
-				startBackSlash = true;
+				if (startBackSlash){
+					text.append(chr);
+					startBackSlash = false;
+				}
+				else{
+					startBackSlash = true;
+				}
 			}
 			else{
 				errorPosition = i + index;
