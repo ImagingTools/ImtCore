@@ -26,6 +26,7 @@
 #include <imtbase/CTextParamSummaryRepresentationControllerComp.h>
 #include <imtbase/CBinaryDataProviderComp.h>
 #include <imtbase/CParameterLinkControllerComp.h>
+#include <imtbase/CObjectCollectionBasedPersistenceComp.h>
 
 
 /**
@@ -61,6 +62,7 @@ typedef imtbase::CNumericParamSummaryRepresentationControllerComp NumericParamSu
 typedef imtbase::CTextParamSummaryRepresentationControllerComp TextParamSummaryRepresentationController;
 typedef imtbase::CBinaryDataProviderComp BinaryDataProvider;
 typedef ibase::TModelObserverCompWrap<imtbase::CParameterLinkControllerComp> ParameterLinkController;
+typedef imtbase::CObjectCollectionBasedPersistenceComp ObjectCollectionBasedPersistence;
 
 
 } // namespace ImtCorePck

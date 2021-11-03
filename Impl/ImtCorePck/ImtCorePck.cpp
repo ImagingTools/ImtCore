@@ -109,6 +109,11 @@ I_EXPORT_COMPONENT(
 			"Parameter link controller",
 			"Parameter Controller");
 
+I_EXPORT_COMPONENT(
+			ObjectCollectionBasedPersistence,
+			"Object collection based persistence",
+			"Object Collection Persistence");
+
 
 } // namespace ImtCorePck
 
