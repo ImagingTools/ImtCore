@@ -5,6 +5,7 @@
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QMessageBox>
@@ -14,6 +15,9 @@
 #include <iwidgets/iwidgets.h>
 #include <iqtgui/IMultiVisualStatusProvider.h>
 #include <iqtgui/CCommandTools.h>
+
+// ImtCore includes
+#include <imtstyle/CImtStyle.h>
 
 
 namespace imtgui
@@ -170,8 +174,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		NextPageButton->hide();
 	}
 
-	CurrentPageLabel->setVisible(*m_showPageTitlesAttrPtr);
-
 	if (m_dashboardGuiCompPtr.IsValid()){
 		m_dashboardGuiCompPtr->CreateGui(DashBoardFrame);
 	}
@@ -323,6 +325,30 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 			UserNameLabel->setVisible(true);
 		}
 	}
+
+	bool showPageTitle = *m_showPageTitlesAttrPtr;
+
+	QScreen* screenPtr = QGuiApplication::primaryScreen();
+	if ((screenPtr != nullptr) && showPageTitle){
+		QRect screenGeometry = screenPtr->geometry();
+		int width = screenGeometry.width();
+		if (width < 1900){
+			showPageTitle = false;
+
+			// Switch to compact flat style for low resolutions:
+			imtstyle::CImtStyle* imtStylePtr = imtstyle::CImtStyle::GetInstance();
+			if (imtStylePtr != nullptr){
+				imtStylePtr->SetStyleType(imtstyle::CImtStyle::ST_FLAT);
+			}
+
+			if (m_mainToolBar != NULL){
+				m_mainToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+			}
+		}
+	}
+
+	CurrentPageLabel->setVisible(showPageTitle);
+
 }
 
 
