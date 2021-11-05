@@ -7,6 +7,9 @@
 #endif
 
 
+#include <QtCore/QDebug>
+
+
 namespace imtwidgets
 {
 
@@ -32,15 +35,16 @@ BOOL CALLBACK FindHandleCallback(HWND windowHandle, LPARAM pParam)
 	static const int maxBufferSize = 256;
 
 	HandleInfo* handleInfoPtr = (HandleInfo*)pParam;
-	char name[maxBufferSize];
+	wchar_t name[maxBufferSize];
 
 	if (handleInfoPtr != nullptr){
 		QString title = handleInfoPtr->title;
 
-		GetWindowTextA(windowHandle, name, maxBufferSize - 1);
+		GetWindowTextW(windowHandle, name, maxBufferSize - 1);
 
-		QString windowName(name);
-		if (title.compare(windowName, Qt::CaseInsensitive) == 0){
+		QString windowName(QString::fromStdWString(name));
+
+		if (!windowName.isEmpty() && windowName.contains(title, Qt::CaseInsensitive)){
 			handleInfoPtr->handle = windowHandle;
 
 			return FALSE;
