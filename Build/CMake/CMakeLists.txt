@@ -18,17 +18,17 @@ include_directories(${AUX_INCLUDE_DIR}/..)
 #------ DesignToken ------
 add_subdirectory("${INCLUDE_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbase")
 add_subdirectory("${INCLUDE_DIR}/imtdesign/CMake" "${AUX_INCLUDE_DIR}/imtdesign")
-add_subdirectory("${IMPL_DIR}/DesignTokenCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreatorExe")
-add_dependencies(DesignTokenCreatorExe imtbase imtdesign)
+add_subdirectory("${IMPL_DIR}/DesignTokenCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreator")
+add_dependencies(DesignTokenCreator imtbase imtdesign)
 add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
-add_dependencies(imtstyle DesignTokenCreatorExe)
+add_dependencies(imtstyle DesignTokenCreator)
 
 
 #-------- Include --------
 
 add_subdirectory("${INCLUDE_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauth")
 add_subdirectory("${INCLUDE_DIR}/imtauthgui/CMake" "${AUX_INCLUDE_DIR}/imtauthgui")
-add_dependencies(imtauthgui DesignTokenCreatorExe)
+add_dependencies(imtauthgui DesignTokenCreator)
 add_subdirectory("${INCLUDE_DIR}/imtcrypt/CMake" "${AUX_INCLUDE_DIR}/imtcrypt")
 add_subdirectory("${INCLUDE_DIR}/imtwidgets/CMake" "${AUX_INCLUDE_DIR}/imtwidgets")
 add_subdirectory("${INCLUDE_DIR}/imtrest/CMake" "${AUX_INCLUDE_DIR}/imtrest")
@@ -50,7 +50,7 @@ if(NOT DEFINED USE_QT3D OR USE_QT3D)
 	add_subdirectory("${INCLUDE_DIR}/imt3d/CMake" "${AUX_INCLUDE_DIR}/imt3d")
 	add_subdirectory("${INCLUDE_DIR}/imt3dview/CMake" "${AUX_INCLUDE_DIR}/imt3dview")
 	add_subdirectory("${INCLUDE_DIR}/imt3dgui/CMake" "${AUX_INCLUDE_DIR}/imt3dgui")
-	add_dependencies(imt3dgui DesignTokenCreatorExe)
+	add_dependencies(imt3dgui DesignTokenCreator)
 endif()
 
 #add_subdirectory("${INCLUDE_DIR}/imtpy/CMake" "${AUX_INCLUDE_DIR}/imtpy")

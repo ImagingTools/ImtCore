@@ -10,12 +10,12 @@
 
 // ImtCore includes
 #include <imtdesign/IDesignTokenArgumentsParser.h>
-#include <GeneratedFiles/DesignTokenCreator/CDesignTokenCreatorExe.h>
+#include <GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.h>
 
 
 int main(int argc, char *argv[])
 {
-	CDesignTokenCreatorExe instance;
+	CDesignTokenCreator instance;
 
 	imtdesign::IDesignTokenArgumentsParser* argumentsParser = instance.GetInterface<imtdesign::IDesignTokenArgumentsParser>();
 	if (argumentsParser == nullptr){

@@ -1,4 +1,4 @@
-project(DesignTokenCreatorExe LANGUAGES CXX)
+project(DesignTokenCreator LANGUAGES CXX)
 
 
 set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/BaseOnly.awc")

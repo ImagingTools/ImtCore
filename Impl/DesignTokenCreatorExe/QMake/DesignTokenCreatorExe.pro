@@ -23,7 +23,7 @@ win32-msvc*{
 # Set configuration of custom builds:
 # ARX Compiler:
 ARXC_CONFIG = $$PWD/../../../Config/ImtCore.awc
-ARXC_FILES += $$PWD/../DesignTokenCreatorExe.acc
+ARXC_FILES += $$PWD/../DesignTokenCreator.acc
 ARXC_OUTDIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 
 # Conversion of resource templates:
