@@ -1,0 +1,9 @@
+<RCC>
+<qresource prefix="/Shaders">
+<file alias="fshader.glsl">Resources/Shaders/fshader.glsl</file>
+<file alias="vshader.glsl">Resources/Shaders/vshader.glsl</file>
+</qresource>
+<qresource prefix="/Textures">
+<file>Resources/Textures/sample.png</file>
+</qresource>
+</RCC>
