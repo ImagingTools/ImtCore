@@ -4,7 +4,7 @@
 namespace imt3dgui
 {
 
-QVector3D extractPosition(const imt3d::IPointsBasedObject& points, int index) {
+QVector3D extractPosition(const imt3d::IPointsBasedObject& points, int index){
 	QVector3D result;
 
 	switch (points.GetPointFormat())
@@ -95,7 +95,7 @@ CShape3dBase::~CShape3dBase()
 
 int CShape3dBase::FindVertex(const QPoint& point, bool limitDistance, QVector3D* positionPtr) const
 {
-	if (point.isNull() || m_pointsDataPtr == nullptr || m_pointsDataPtr->IsEmpty()) {
+	if (point.isNull() || m_pointsDataPtr == nullptr || m_pointsDataPtr->IsEmpty()){
 		return -1;
 	}
 
@@ -110,28 +110,28 @@ int CShape3dBase::FindVertex(const QPoint& point, bool limitDistance, QVector3D*
 	float minDistance = qInf();
 	int retVal = -1;
 
-	for (int i = 0; i < m_pointsDataPtr->GetPointsCount(); ++i) {
+	for (int i = 0; i < m_pointsDataPtr->GetPointsCount(); ++i){
 		QVector3D vertPosition = extractPosition(*m_pointsDataPtr, i);
 		float distanceToRay = qAbs(vertPosition.distanceToLine(rayFrom, rayDirection));
 
 		// if epsilon is given, we search for a vertex lying at that distance from the ray, closest to the beginning of the ray (to the camera)
 		// otherwise we look for any vertex closest to the ray
-		if (limitDistance) {
+		if (limitDistance){
 			float distanceToRayStart = qAbs(vertPosition.distanceToPoint(rayFrom));
-			if (distanceToRay < distanceEpsilon && distanceToRayStart < minDistance) {
+			if (distanceToRay < distanceEpsilon && distanceToRayStart < minDistance){
 				minDistance = distanceToRayStart;
 				retVal = i;
 			}
 		}
 		else {
-			if (distanceToRay < minDistance) {
+			if (distanceToRay < minDistance){
 				minDistance = distanceToRay;
 				retVal = i;
 			}
 		}
 	}
 
-	if (retVal >= 0 && positionPtr) {
+	if (retVal >= 0 && positionPtr){
 		*positionPtr = extractPosition(*m_pointsDataPtr, retVal);
 	}
 
@@ -217,16 +217,16 @@ void CShape3dBase::SetScale(float scale)
 
 void CShape3dBase::SetContext(QOpenGLContext* contextPtr)
 {
-	if (contextPtr != nullptr) {
+	if (contextPtr != nullptr){
 		if (m_contextPtr != nullptr)
 			return;
 		m_contextPtr = contextPtr;
 
-		if (!m_vertexBuffer.isCreated()) {
+		if (!m_vertexBuffer.isCreated()){
 			m_vertexBuffer.create();
 		}
 
-		if (!m_indexBuffer.isCreated()) {
+		if (!m_indexBuffer.isCreated()){
 			m_indexBuffer.create();
 		}
 
@@ -236,11 +236,11 @@ void CShape3dBase::SetContext(QOpenGLContext* contextPtr)
 		UpdateGeometry(istd::IChangeable::GetAllChanges());
 	}
 	else {
-		if (m_vertexBuffer.isCreated()) {
+		if (m_vertexBuffer.isCreated()){
 			m_vertexBuffer.destroy();
 		}
 
-		if (m_indexBuffer.isCreated()) {
+		if (m_indexBuffer.isCreated()){
 			m_indexBuffer.destroy();
 		}
 
@@ -254,10 +254,12 @@ void CShape3dBase::SetContext(QOpenGLContext* contextPtr)
 
 void CShape3dBase::DrawGl(QOpenGLShaderProgram &program)
 {
-	if (!m_isVisible || !IsValid() ||
-		m_pointsDataPtr == nullptr || m_pointsDataPtr->GetData() == nullptr ||
-		m_pointsDataPtr->IsEmpty() || m_indices.isEmpty()
-		) {
+	if (		!m_isVisible ||
+				!IsValid() ||
+				m_pointsDataPtr == nullptr ||
+				m_pointsDataPtr->GetData() == nullptr ||
+				m_pointsDataPtr->IsEmpty() ||
+				m_indices.isEmpty()){
 		return;
 	}
 
@@ -271,40 +273,38 @@ void CShape3dBase::DrawGl(QOpenGLShaderProgram &program)
 	program.setUniformValue("usePointSize", false);
 
 	// set points
-	switch (m_pointsDataPtr->GetPointFormat())
-	{
+	switch (m_pointsDataPtr->GetPointFormat()){
 	case imt3d::IPointsBasedObject::PF_XYZ_32:
 	case imt3d::IPointsBasedObject::PF_XYZ_ABC_32:
 	case imt3d::IPointsBasedObject::PF_XYZW_32:
 	case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 	case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
 	case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
-	{
-		program.enableAttributeArray("pointPosition");
-		program.setAttributeBuffer("pointPosition", GL_FLOAT, 0, 3, m_pointsDataPtr->GetPointBytesSize());
-	}
-	break;
+		{
+			program.enableAttributeArray("pointPosition");
+			program.setAttributeBuffer("pointPosition", GL_FLOAT, 0, 3, m_pointsDataPtr->GetPointBytesSize());
+		}
+		break;
 	case imt3d::IPointsBasedObject::PF_XYZ_64:
-	{
-		program.enableAttributeArray("pointPosition");
-		program.setAttributeBuffer("pointPosition", GL_DOUBLE, 0, 3, m_pointsDataPtr->GetPointBytesSize());
-	}
-	break;
+		{
+			program.enableAttributeArray("pointPosition");
+			program.setAttributeBuffer("pointPosition", GL_DOUBLE, 0, 3, m_pointsDataPtr->GetPointBytesSize());
+		}
+		break;
 	default:
 		break;
 	}
 
 	// set normals
-	switch (m_pointsDataPtr->GetPointFormat())
-	{
+	switch (m_pointsDataPtr->GetPointFormat()){
 	case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_CURVATURE_32:
 	case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-	{
-		program.setUniformValue("useNormals", true);
-		program.enableAttributeArray("pointNormal");
-		program.setAttributeBuffer("pointNormal", GL_FLOAT, 4 * sizeof(float), 3, m_pointsDataPtr->GetPointBytesSize());
-	}
-	break;
+		{
+			program.setUniformValue("useNormals", true);
+			program.enableAttributeArray("pointNormal");
+			program.setAttributeBuffer("pointNormal", GL_FLOAT, 4 * sizeof(float), 3, m_pointsDataPtr->GetPointBytesSize());
+		}
+		break;
 	default:
 		program.setUniformValue("useNormals", false);
 		break;
@@ -312,30 +312,28 @@ void CShape3dBase::DrawGl(QOpenGLShaderProgram &program)
 
 	// set color
 
-	switch (m_pointsDataPtr->GetPointFormat())
-	{
+	switch (m_pointsDataPtr->GetPointFormat()){
 	case imt3d::IPointsBasedObject::PF_XYZW_NORMAL_RGBA_32:
-	{
-		program.enableAttributeArray("pointColor");
-		program.setUniformValue("colorMode", 0);
-		program.setAttributeBuffer("pointColor", GL_FLOAT, 8 * sizeof(float), 3, m_pointsDataPtr->GetPointBytesSize());
-	}
-	break;
+		{
+			program.enableAttributeArray("pointColor");
+			program.setUniformValue("colorMode", 0);
+			program.setAttributeBuffer("pointColor", GL_FLOAT, 8 * sizeof(float), 3, m_pointsDataPtr->GetPointBytesSize());
+		}
+		break;
 	case imt3d::IPointsBasedObject::PF_XYZW_RGBA_32:
-	{
-		program.enableAttributeArray("pointColor");
-		program.setUniformValue("colorMode", 0);
-		program.setAttributeBuffer("pointColor", GL_FLOAT, 4 * sizeof(float), 3, m_pointsDataPtr->GetPointBytesSize());
-	}
-	break;
+		{
+			program.enableAttributeArray("pointColor");
+			program.setUniformValue("colorMode", 0);
+			program.setAttributeBuffer("pointColor", GL_FLOAT, 4 * sizeof(float), 3, m_pointsDataPtr->GetPointBytesSize());
+		}
+		break;
 	default:
-	{
-		program.setUniformValue("colorMode", 1);
-		program.setUniformValue("itemColor", GetColor());
+		{
+			program.setUniformValue("colorMode", 1);
+			program.setUniformValue("itemColor", GetColor());
+		}
+		break;
 	}
-	break;
-	}
-
 
 	// draw shape specifics
 	DrawShapeGl(program, *m_contextPtr->functions());
@@ -355,6 +353,7 @@ void CShape3dBase::Draw(QPainter& /*painter*/)
 void CShape3dBase::UpdateGeometry(const istd::IChangeable::ChangeSet& changeSet)
 {
 	UpdateShapeGeometry(changeSet);
+
 	CreateGeometry();
 }
 
@@ -408,12 +407,14 @@ QVector3D CShape3dBase::WindowToModel(const QPoint& windowCoordinate, float z) c
 	return windowCoordinateTmp.unproject(viewMatrix * modelMatrix, m_projection, m_viewPort);
 }
 
+
 void CShape3dBase::CreateGeometry()
 {
 	if (
-		m_pointsDataPtr != nullptr && m_pointsDataPtr->GetData() != nullptr && !m_pointsDataPtr->IsEmpty() &&
-		!m_indices.isEmpty() && IsValid()
-	) {
+				m_pointsDataPtr != nullptr &&
+				m_pointsDataPtr->GetData() != nullptr &&
+				!m_pointsDataPtr->IsEmpty() &&
+				!m_indices.isEmpty() && IsValid()){
 		m_vertexBuffer.bind();
 		m_indexBuffer.bind();
 
@@ -425,12 +426,13 @@ void CShape3dBase::CreateGeometry()
 	}
 }
 
+
 void CShape3dBase::RefreshGeometry()
 {
-	if (
-		m_pointsDataPtr != nullptr && m_pointsDataPtr->GetData() != nullptr && !m_pointsDataPtr->IsEmpty() &&
-		IsValid()
-	) {
+	if (		m_pointsDataPtr != nullptr &&
+			m_pointsDataPtr->GetData() != nullptr &&
+			!m_pointsDataPtr->IsEmpty() &&
+			IsValid()){
 		m_vertexBuffer.bind();
 
 		m_vertexBuffer.write(0, m_pointsDataPtr->GetData(), m_pointsDataPtr->GetPointsCount() * m_pointsDataPtr->GetPointBytesSize());
@@ -448,8 +450,6 @@ void CShape3dBase::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 		UpdateGeometry(changeSet);
 	}
 }
-
-// CShape3dGeometryUpdate impl
 
 
 } // namespace imt3dgui
