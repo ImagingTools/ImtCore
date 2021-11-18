@@ -61,7 +61,7 @@ public:
 	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	virtual void SyncWithDatabase();
+	virtual void CreateCollectionFromDatabase();
 	virtual istd::IChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record, QString& objectName, QString& objectDescription) const;
 	virtual QSqlQuery ExecSelectSqlQuery(const QVariantMap& bindValues = {}, QSqlError* sqlError = nullptr) const;
 	virtual QSqlQuery ExecUpdateSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const;

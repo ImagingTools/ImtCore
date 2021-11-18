@@ -55,7 +55,7 @@ QSqlQuery CDatabaseObjectCollectionComp::ExecDeleteSqlQuery(const QVariantMap& b
 
 // protected methods
 
-void CDatabaseObjectCollectionComp::SyncWithDatabase()
+void CDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 {
 	ResetData();
 
@@ -185,7 +185,7 @@ void CDatabaseObjectCollectionComp::OnComponentCreated()
 
 	m_typesInfo.InsertOption(*m_typeNameAttrPtr, *m_typeIdAttrPtr);
 
-	SyncWithDatabase();
+	CreateCollectionFromDatabase();
 }
 
 
