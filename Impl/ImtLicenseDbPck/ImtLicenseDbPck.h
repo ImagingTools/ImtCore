@@ -6,7 +6,7 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
-#include <imtlicdb/CFeatureInfoObjectDelegateComp.h>
+#include <imtlicdb/CFeaturePackageDatabaseDelegateComp.h>
 
 
 /**
@@ -16,7 +16,7 @@ namespace ImtLicenseDbPck
 {
 
 
-typedef imtlicdb::CFeatureInfoObjectDelegateComp FeatureInfoObjectDelegate;
+typedef imtlicdb::CFeaturePackageDatabaseDelegateComp FeaturePackageDatabaseDelegate;
 
 
 } // namespace ImtLicenseDbPck

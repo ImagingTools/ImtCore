@@ -1,4 +1,4 @@
-#include <imtlicdb/CFeatureInfoObjectDelegateComp.h>
+#include <imtlicdb/CFeaturePackageDatabaseDelegateComp.h>
 
 
 // ImtCore includes
@@ -14,7 +14,7 @@ namespace imtlicdb
 
 // reimplemented (imtdb::IDatabaseObjectDelegate)
 
-istd::IChangeable* CFeatureInfoObjectDelegateComp::CreateObjectFromRecord(
+istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(
 			const QByteArray& /*typeId*/,
 			const QSqlRecord& record,
 			QString& objectName,
@@ -69,6 +69,17 @@ istd::IChangeable* CFeatureInfoObjectDelegateComp::CreateObjectFromRecord(
 	}
 
 	return nullptr;
+}
+
+
+QByteArray CFeaturePackageDatabaseDelegateComp::CreateNewObjectQuery(
+			const QByteArray& typeId,
+			const QByteArray& proposedObjectId,
+			const QString& objectName,
+			const QString& objectDescription,
+			const istd::IChangeable* valuePtr) const
+{
+	return QByteArray();
 }
 
 

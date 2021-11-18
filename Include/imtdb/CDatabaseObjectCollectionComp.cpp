@@ -1,6 +1,9 @@
 #include <imtdb/CDatabaseObjectCollectionComp.h>
 
 
+// Qt includes
+#include <QtSql/QSqlQuery>
+
 // ImtCore includes
 #include <imtdb/CDatabaseEngineComp.h>
 
@@ -9,78 +12,7 @@ namespace imtdb
 {
 
 
-QSqlQuery CDatabaseObjectCollectionComp::ExecSelectSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
-{
-	if (m_dbEngineCompPtr.IsValid()){
-		return m_dbEngineCompPtr->ExecSqlQuery(GetQueryStringFromFile(*m_selectSqlQueryPathAttrPtr), bindValues, sqlError);
-	}
-
-	return QSqlQuery();
-}
-
-
-QSqlQuery CDatabaseObjectCollectionComp::ExecUpdateSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
-{
-	QByteArray queryString = GetQueryStringFromFile(*m_updateSqlQueryPathAttrPtr);
-
-	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value){
-		if(!value->isValid() || value->isNull()){
-			CDatabaseEngineComp::DrectBindValueUpdateDefault(&queryString, value.key().toUtf8());
-		}
-	}
-
-	return m_dbEngineCompPtr->ExecSqlQuery(queryString, bindValues, sqlError);
-}
-
-
-QSqlQuery CDatabaseObjectCollectionComp::ExecInsertSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
-{
-	QByteArray queryString = GetQueryStringFromFile(*m_insertSqlQueryPathAttrPtr);
-
-	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value){
-		if(!value->isValid() || value->isNull()){
-			CDatabaseEngineComp::DrectBindValueInsertDefault(&queryString, value.key().toUtf8());
-		}
-	}
-
-	return m_dbEngineCompPtr->ExecSqlQuery(queryString, bindValues, sqlError);
-}
-
-
-QSqlQuery CDatabaseObjectCollectionComp::ExecDeleteSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
-{
-	return m_dbEngineCompPtr->ExecSqlQuery(GetQueryStringFromFile(*m_deleteSqlQueryPathAttrPtr), bindValues, sqlError);
-}
-
-
-// protected methods
-
-void CDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
-{
-	ResetData();
-
-	QSqlQuery sqlQuery = ExecSelectSqlQuery();
-	while (sqlQuery.next()){
-		QString name;
-		QString description;
-
-		istd::IChangeable* objectPtr = CreateObjectFromSqlRecord(sqlQuery.record(), name, description);
-		if (objectPtr != nullptr){
-			BaseClass2::InsertNewObject(*m_typeIdAttrPtr, name, description, objectPtr);
-		}
-	}
-}
-
-
-istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectFromSqlRecord(const QSqlRecord& record, QString& objectName, QString& objectDescription) const
-{
-	if (m_objectDelegateCompPtr.IsValid()){
-		return m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, record, objectName, objectDescription);
-	}
-
-	return nullptr;
-}
-
+// public methods
 
 // reimplemented (IObjectCollectionInfo)
 
@@ -98,12 +30,34 @@ QByteArray CDatabaseObjectCollectionComp::InsertNewObject(
 			const QString& description,
 			const istd::IChangeable* defaultValuePtr,
 			const QByteArray& proposedObjectId,
-			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
-			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
+			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/,
+			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/)
 {
-	Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented method");
+	if (!m_objectDelegateCompPtr.IsValid()){
+		return nullptr;
+	}
 
-	return nullptr;
+	QByteArray objectId = proposedObjectId;
+	if (objectId.isEmpty()){
+		objectId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	}
+
+	QByteArray query = m_objectDelegateCompPtr->CreateNewObjectQuery(typeId, objectId, name, description, defaultValuePtr);
+	if (query.isEmpty()){
+		SendErrorMessage(0, "Database query could not be created", "Database collection");
+
+		return nullptr;
+	}
+
+	QSqlError error;
+	QSqlQuery result = m_dbEngineCompPtr->ExecSqlQuery(query, &error);
+	if (!result.isValid()){
+		SendErrorMessage(0, error.text(), "Database collection");
+
+		return nullptr;
+	}
+
+	return objectId;
 }
 
 
@@ -174,6 +128,78 @@ void CDatabaseObjectCollectionComp::DestroyObjectInstance(istd::IChangeable* obj
 			delete objectPtr;
 		}
 	}
+}
+
+// protected methods
+
+QSqlQuery CDatabaseObjectCollectionComp::ExecSelectSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
+{
+	if (m_dbEngineCompPtr.IsValid()){
+		return m_dbEngineCompPtr->ExecSqlQuery(GetQueryStringFromFile(*m_selectSqlQueryPathAttrPtr), bindValues, sqlError);
+	}
+
+	return QSqlQuery();
+}
+
+
+QSqlQuery CDatabaseObjectCollectionComp::ExecUpdateSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
+{
+	QByteArray queryString = GetQueryStringFromFile(*m_updateSqlQueryPathAttrPtr);
+
+	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value){
+		if(!value->isValid() || value->isNull()){
+			CDatabaseEngineComp::DrectBindValueUpdateDefault(&queryString, value.key().toUtf8());
+		}
+	}
+
+	return m_dbEngineCompPtr->ExecSqlQuery(queryString, bindValues, sqlError);
+}
+
+
+QSqlQuery CDatabaseObjectCollectionComp::ExecInsertSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
+{
+	QByteArray queryString = GetQueryStringFromFile(*m_insertSqlQueryPathAttrPtr);
+
+	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++value){
+		if(!value->isValid() || value->isNull()){
+			CDatabaseEngineComp::DrectBindValueInsertDefault(&queryString, value.key().toUtf8());
+		}
+	}
+
+	return m_dbEngineCompPtr->ExecSqlQuery(queryString, bindValues, sqlError);
+}
+
+
+QSqlQuery CDatabaseObjectCollectionComp::ExecDeleteSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
+{
+	return m_dbEngineCompPtr->ExecSqlQuery(GetQueryStringFromFile(*m_deleteSqlQueryPathAttrPtr), bindValues, sqlError);
+}
+
+
+void CDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
+{
+	ResetData();
+
+	QSqlQuery sqlQuery = ExecSelectSqlQuery();
+	while (sqlQuery.next()){
+		QString name;
+		QString description;
+
+		istd::IChangeable* objectPtr = CreateObjectFromSqlRecord(sqlQuery.record(), name, description);
+		if (objectPtr != nullptr){
+			BaseClass2::InsertNewObject(*m_typeIdAttrPtr, name, description, objectPtr);
+		}
+	}
+}
+
+
+istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectFromSqlRecord(const QSqlRecord& record, QString& objectName, QString& objectDescription) const
+{
+	if (m_objectDelegateCompPtr.IsValid()){
+		return m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, record, objectName, objectDescription);
+	}
+
+	return nullptr;
 }
 
 

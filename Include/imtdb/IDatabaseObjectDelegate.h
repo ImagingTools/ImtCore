@@ -22,7 +22,21 @@ public:
 	/**
 		Create a data object for the given SQL record.
 	*/
-	virtual istd::IChangeable* CreateObjectFromRecord(const QByteArray& typeId, const QSqlRecord& record, QString& objectName, QString& objectDescription) const = 0;
+	virtual istd::IChangeable* CreateObjectFromRecord(
+				const QByteArray& typeId,
+				const QSqlRecord& record,
+				QString& objectName,
+				QString& objectDescription) const = 0;
+
+	/**
+		Create SQL query for insertion of a new object into the database.
+	*/
+	virtual QByteArray CreateNewObjectQuery(
+				const QByteArray& typeId,
+				const QByteArray& proposedObjectId,
+				const QString& objectName,
+				const QString& objectDescription,
+				const istd::IChangeable* valuePtr) const = 0;
 };
 
 

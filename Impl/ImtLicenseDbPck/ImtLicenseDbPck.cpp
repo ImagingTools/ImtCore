@@ -16,8 +16,8 @@ I_EXPORT_PACKAGE(
 
 
 I_EXPORT_COMPONENT(
-			FeatureInfoObjectDelegate,
-			"Feature information object delegate for SQL table",
+	FeaturePackageDatabaseDelegate,
+			"Feature package object delegate for SQL table",
 			"SQL Feature Package License Delegate");
 
 

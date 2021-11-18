@@ -76,6 +76,7 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
+protected:
 	I_REF(IDatabaseEngine, m_dbEngineCompPtr);
 
 private:
