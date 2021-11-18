@@ -4,6 +4,10 @@
 // Qt includes
 #include <QtSql/QSqlQuery>
 
+// ACF includes
+#include <istd/CChangeNotifier.h>
+#include <istd/CChangeGroup.h>
+
 // ImtCore includes
 #include <imtdb/CDatabaseEngineComp.h>
 
@@ -30,8 +34,8 @@ QByteArray CDatabaseObjectCollectionComp::InsertNewObject(
 			const QString& description,
 			const istd::IChangeable* defaultValuePtr,
 			const QByteArray& proposedObjectId,
-			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/,
-			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/)
+			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
+			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return nullptr;
@@ -49,13 +53,18 @@ QByteArray CDatabaseObjectCollectionComp::InsertNewObject(
 		return nullptr;
 	}
 
+	istd::CChangeNotifier changeNotifier(this);
+
 	QSqlError error;
-	QSqlQuery result = m_dbEngineCompPtr->ExecSqlQuery(query, &error);
-	if (!result.isValid()){
+	m_dbEngineCompPtr->ExecSqlQuery(query, &error);
+	if (error.type() != QSqlError::NoError){
 		SendErrorMessage(0, error.text(), "Database collection");
 
 		return nullptr;
 	}
+
+	QByteArray internalObjectId = BaseClass2::InsertNewObject(typeId, name, description, defaultValuePtr, objectId, dataMetaInfoPtr, collectionItemMetaInfoPtr);
+	Q_ASSERT(objectId == internalObjectId);
 
 	return objectId;
 }
@@ -178,6 +187,8 @@ QSqlQuery CDatabaseObjectCollectionComp::ExecDeleteSqlQuery(const QVariantMap& b
 
 void CDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 {
+	istd::CChangeGroup changeGroup(this);
+
 	ResetData();
 
 	QSqlQuery sqlQuery = ExecSelectSqlQuery();
