@@ -48,9 +48,12 @@ public:
 	static void DrectBindValueUpdateDefault(QByteArray* string,  const QByteArray& what);
 
 protected:
-	bool OpenDatabase() const;
+	virtual bool OpenDatabase() const;
 	virtual bool CreateDatabase() const;
 	virtual bool CreateTables() const;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 private:
 	/**

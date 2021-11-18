@@ -16,7 +16,9 @@ namespace imtdb
 
 QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlErrorPtr) const
 {
-	EnsureDatabaseConnected();
+	if (!EnsureDatabaseConnected()){
+		return QSqlQuery();
+	}
 
 	QSqlQuery retVal(m_db);
 
@@ -84,7 +86,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QByteArray& filePath, 
 
 	sqlQuetyFile.close();
 
-	return this->ExecSqlQuery(queryString, sqlError);
+	return ExecSqlQuery(queryString, sqlError);
 }
 
 
@@ -159,12 +161,7 @@ bool CDatabaseEngineComp::OpenDatabase() const
 	m_db.setPort(*m_port);
 	
 	retVal = m_db.open();
-	if (retVal){
-		if (*m_autoCreateDatabaseAttrPtr > 0){
-			CreateDatabase();
-		}
-	}
-	else{
+	if (!retVal){
 		SendErrorMessage(0, "Database could not be connected", "Database engine");
 	}
 
@@ -182,8 +179,8 @@ bool CDatabaseEngineComp::CreateDatabase() const
 	maintainanceDb.setPassword(*m_pasword);
 	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
 	maintainanceDb.setPort(*m_port);
-	retVal = maintainanceDb.open();
 
+	retVal = maintainanceDb.open();
 	if (retVal){
 		QString queryString;
 
@@ -277,6 +274,20 @@ bool CDatabaseEngineComp::CreateTables() const
 }
 
 
+// reimplemented (icomp::CComponentBase)
+
+void CDatabaseEngineComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	bool isOpened = OpenDatabase();
+
+	if (!isOpened || *m_autoCreateDatabaseAttrPtr == 2){
+		CreateDatabase();
+	}
+}
+
+
 // private methods
 
 bool CDatabaseEngineComp::EnsureDatabaseConnected() const
@@ -285,16 +296,7 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected() const
 	if (!isOpened){
 		m_db.close();
 
-		OpenDatabase();
-
-		isOpened = m_db.isOpen();
-
-		if (!isOpened && *m_autoCreateDatabaseAttrPtr == 2){
-			this->CreateDatabase();
-
-			isOpened = m_db.isOpen();
-		}
-
+		isOpened = OpenDatabase();
 		if (!isOpened){
 			qCritical() << __FILE__ << __LINE__
 						<< "\n\t| Unable to open database"
