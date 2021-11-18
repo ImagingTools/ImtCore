@@ -79,6 +79,19 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateNewObjectQuery(
 			const QString& objectDescription,
 			const istd::IChangeable* valuePtr) const
 {
+	QByteArray packageId;
+	const imtlic::CFeaturePackage* featurePackagePtr = dynamic_cast<const imtlic::CFeaturePackage*>(valuePtr);
+	if (featurePackagePtr != nullptr){
+		packageId = featurePackagePtr->GetPackageId();
+		if (packageId.isEmpty()){
+			packageId = objectName.toLocal8Bit();
+		}
+
+		QByteArray retVal = QString("INSERT INTO Packages(Id, Name) VALUES('%1', '%2')").arg(qPrintable(packageId)).arg(objectName).toLocal8Bit();
+
+		return retVal;
+	}
+
 	return QByteArray();
 }
 

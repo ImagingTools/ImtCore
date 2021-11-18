@@ -22,8 +22,11 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 
 	QSqlQuery retVal(m_db);
 
-	retVal.prepare(queryString);
-
+	bool success = retVal.prepare(queryString);
+	if (!success){
+		return retVal;
+	}
+	
 	retVal.exec();
 
 	if (sqlErrorPtr != nullptr){
