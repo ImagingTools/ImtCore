@@ -33,7 +33,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 		*sqlErrorPtr = m_db.lastError().type() ? m_db.lastError() : retVal.lastError();
 	}
 
-	if (m_db.lastError().type() || retVal.lastError().type()){
+	if ((m_db.lastError().type() != QSqlError::NoError) || (retVal.lastError().type() != QSqlError::NoError)){
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| what() sqlError Occured"
 					<< "\n\t| Database error" << m_db.lastError().text()
@@ -64,7 +64,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 		*sqlError = m_db.lastError().type() ? m_db.lastError() : retVal.lastError();
 	}
 
-	if (m_db.lastError().type() || retVal.lastError().type()){
+	if ((m_db.lastError().type() != QSqlError::NoError) || (retVal.lastError().type() != QSqlError::NoError)){
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| what(): sqlError Occured"
 					<< "\n\t| Database error" << m_db.lastError().text()
@@ -121,7 +121,7 @@ void CDatabaseEngineComp::DrectBindValue(QByteArray* string, const QByteArray& w
 			}
 		}
 		else{
-			string->replace(regMatch.capturedStart(), string->length()-1, expr);
+			string->replace(regMatch.capturedStart(), string->length() - 1, expr);
 		}
 	}
 }
@@ -137,7 +137,7 @@ void CDatabaseEngineComp::DrectBindValueUpdateDefault(QByteArray* string, const 
 {
 	QByteArray newValue = what;
 	if (newValue.startsWith(':')){
-		newValue.remove(0,1);
+		newValue.remove(0, 1);
 		newValue.append('"');
 		newValue.prepend('"');
 

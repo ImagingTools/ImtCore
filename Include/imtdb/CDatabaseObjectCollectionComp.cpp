@@ -55,12 +55,18 @@ QByteArray CDatabaseObjectCollectionComp::InsertNewObject(
 
 	istd::CChangeNotifier changeNotifier(this);
 
-	QSqlError error;
-	m_dbEngineCompPtr->ExecSqlQuery(query, &error);
-	if (error.type() != QSqlError::NoError){
-		SendErrorMessage(0, error.text(), "Database collection");
+	QStringList queryList = QString(qPrintable(query)).split(";");
 
-		return nullptr;
+	for (const QString& singleQuery: queryList){
+		if (!singleQuery.isEmpty()){
+			QSqlError error;
+			m_dbEngineCompPtr->ExecSqlQuery(singleQuery.toLocal8Bit(), &error);
+			if (error.type() != QSqlError::NoError){
+				SendErrorMessage(0, error.text(), "Database collection");
+
+				return nullptr;
+			}
+		}
 	}
 
 	QByteArray internalObjectId = BaseClass2::InsertNewObject(typeId, name, description, defaultValuePtr, objectId, dataMetaInfoPtr, collectionItemMetaInfoPtr);

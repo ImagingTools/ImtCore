@@ -83,11 +83,15 @@ void CInternetConnectionCheckerComp::OnRequestFinished()
 			istd::CChangeNotifier notifier(this);
 
 			m_status = ICS_ONLINE;
+
+			SendVerboseMessage("Internet connection available");
 		}
 		else if (!isOnline && m_status != ICS_OFFLINE){
 			istd::CChangeNotifier notifier(this);
 
 			m_status = ICS_OFFLINE;
+
+			SendVerboseMessage("No internet connection");
 		}
 
 		replyPtr->deleteLater();

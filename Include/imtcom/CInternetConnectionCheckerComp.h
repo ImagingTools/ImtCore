@@ -6,7 +6,7 @@
 #include <QtNetwork/QNetworkAccessManager>
 
 // ACF includes
-#include <icomp/CComponentBase.h>
+#include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
 #include <imtcom/IInternetConnectionStatusProvider.h>
@@ -18,12 +18,12 @@ namespace imtcom
 
 class CInternetConnectionCheckerComp:
 			public QObject,
-			public icomp::CComponentBase,
+			public ilog::CLoggerComponentBase,
 			virtual public IInternetConnectionStatusProvider
 {
 	Q_OBJECT
 public:
-	typedef icomp::CComponentBase BaseClass;
+	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CInternetConnectionCheckerComp);
 		I_REGISTER_INTERFACE(IInternetConnectionStatusProvider);

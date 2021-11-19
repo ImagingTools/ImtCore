@@ -48,6 +48,7 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(
 		QSqlRecord featureRecord = sqlQuery.record();
 		QByteArray featureId;
 		QString featureName;
+		QString description;
 
 		if (featureRecord.contains("Id")){
 			featureId = featureRecord.value("Id").toByteArray();
@@ -57,11 +58,15 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(
 			featureName = featureRecord.value("Name").toString();
 		}
 
+		if (featureRecord.contains("Description")){
+			description = featureRecord.value("Description").toString();
+		}
+
 		istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr = new imtlic::CFeatureInfo;
 		featureInfoPtr->SetFeatureId(featureId);
 		featureInfoPtr->SetFeatureName(featureName);
 
-		featurePackagePtr->InsertNewObject("FeatureInfo", featureName, "", featureInfoPtr.GetPtr());
+		featurePackagePtr->InsertNewObject("FeatureInfo", featureName, description, featureInfoPtr.GetPtr());
 	}
 
 	if (!packageId.isEmpty() && !packageName.isEmpty()){
@@ -87,7 +92,23 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateNewObjectQuery(
 			packageId = objectName.toLocal8Bit();
 		}
 
-		QByteArray retVal = QString("INSERT INTO Packages(Id, Name) VALUES('%1', '%2')").arg(qPrintable(packageId)).arg(objectName).toLocal8Bit();
+		QByteArray retVal = QString("INSERT INTO Packages(Id, Name) VALUES('%1', '%2');").arg(qPrintable(packageId)).arg(objectName).toLocal8Bit();
+
+		imtbase::ICollectionInfo::Ids featureIds = featurePackagePtr->GetElementIds();
+		for (const QByteArray& collectionId : featureIds){
+			const imtlic::IFeatureInfo* featureInfoPtr = featurePackagePtr->GetFeatureInfo(collectionId);
+			if (featureInfoPtr != nullptr){
+				QByteArray featureId = featureInfoPtr->GetFeatureId();
+				QString featureName = featureInfoPtr->GetFeatureName();
+				QString featureDescription = featurePackagePtr->GetFeatureList().GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+				retVal += "\n" + 
+							QString("INSERT INTO Features(Id, Name, Description, PackageId) VALUES('%1', '%2', '%3', '%4');")
+										.arg(qPrintable(featureId))
+										.arg(featureName)
+										.arg(featureDescription)
+										.arg(qPrintable(packageId));
+			}
+		}
 
 		return retVal;
 	}
