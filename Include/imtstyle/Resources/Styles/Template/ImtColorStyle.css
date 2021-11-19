@@ -159,3 +159,4 @@ QTabBar::tab::bottom:selected[CollectionView=true]
 	border-bottom: 2px solid ${Active.TabBorderSelected2}; 
 }
 
+
