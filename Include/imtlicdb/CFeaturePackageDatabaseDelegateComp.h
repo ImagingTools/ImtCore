@@ -37,6 +37,9 @@ public:
 				const QString& objectName,
 				const QString& objectDescription,
 				const istd::IChangeable* valuePtr) const override;
+	virtual QByteArray CreateDeleteObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId) const override;
 
 private:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);

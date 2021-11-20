@@ -61,6 +61,7 @@ public:
 	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
+	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	virtual void CreateCollectionFromDatabase();
 	virtual istd::IChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record, QString& objectName, QString& objectDescription) const;
 	virtual QSqlQuery ExecSelectSqlQuery(const QVariantMap& bindValues = {}, QSqlError* sqlError = nullptr) const;
@@ -69,7 +70,7 @@ protected:
 	virtual QSqlQuery ExecDeleteSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const;
 	QByteArray GetQueryStringFromFile(const QByteArray& filePath) const;
 
-	// reimplemented (CObjectCollectionBase)
+	// reimplemented (imtbase::CObjectCollectionBase)
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const override;
 	virtual void DestroyObjectInstance(istd::IChangeable* objectPtr) const override;
 

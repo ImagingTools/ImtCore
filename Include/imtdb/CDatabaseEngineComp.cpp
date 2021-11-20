@@ -14,6 +14,24 @@ namespace imtdb
 
 // reimplemented (IDatabaseEngine)
 
+bool CDatabaseEngineComp::BeginTransaction() const
+{
+	return m_db.transaction();
+}
+
+
+bool CDatabaseEngineComp::FinishTransaction() const
+{
+	return m_db.commit();
+}
+
+
+bool CDatabaseEngineComp::CancelTransaction() const
+{
+	return m_db.rollback();
+}
+
+
 QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlErrorPtr) const
 {
 	if (!EnsureDatabaseConnected()){
@@ -24,13 +42,17 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 
 	bool success = retVal.prepare(queryString);
 	if (!success){
-		return retVal;
+		if (sqlErrorPtr != nullptr){
+			*sqlErrorPtr = retVal.lastError();
+		}
+	
+		return QSqlQuery();
 	}
 	
-	retVal.exec();
+	success = retVal.exec();
 
 	if (sqlErrorPtr != nullptr){
-		*sqlErrorPtr = m_db.lastError().type() ? m_db.lastError() : retVal.lastError();
+		*sqlErrorPtr = m_db.lastError().type() != QSqlError::NoError ? m_db.lastError() : retVal.lastError();
 	}
 
 	if ((m_db.lastError().type() != QSqlError::NoError) || (retVal.lastError().type() != QSqlError::NoError)){

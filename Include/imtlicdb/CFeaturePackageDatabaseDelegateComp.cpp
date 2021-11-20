@@ -31,6 +31,7 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(
 
 	if (record.contains("Id")){
 		packageId = record.value("Id").toByteArray();
+		featurePackagePtr->SetPackageId(packageId);
 	}
 
 	if (record.contains("Name")){
@@ -111,6 +112,29 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateNewObjectQuery(
 		}
 
 		return retVal;
+	}
+
+	return QByteArray();
+}
+
+
+QByteArray CFeaturePackageDatabaseDelegateComp::CreateDeleteObjectQuery(
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId) const
+{
+	imtbase::IObjectCollection::DataPtr objectPtr;
+	if (collection.GetObjectData(objectId, objectPtr)){
+		QByteArray packageId;
+		const imtlic::CFeaturePackage* featurePackagePtr = dynamic_cast<const imtlic::CFeaturePackage*>(objectPtr.GetPtr());
+		if (featurePackagePtr != nullptr){
+			packageId = featurePackagePtr->GetPackageId();
+			if (!packageId.isEmpty()){
+				QByteArray retVal = QString("DELETE FROM Features WHERE PackageId = '%1';").arg(qPrintable(packageId)).toLocal8Bit();
+				retVal += "\n" + QString("DELETE FROM Packages WHERE Id = '%1';").arg(qPrintable(packageId)).toLocal8Bit();
+
+				return retVal;
+			}
+		}
 	}
 
 	return QByteArray();

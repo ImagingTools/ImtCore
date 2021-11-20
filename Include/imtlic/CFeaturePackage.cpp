@@ -263,6 +263,7 @@ bool CFeaturePackage::CopyFrom(const IChangeable& object, CompatibilityMode mode
 
 		m_dependencies = sourcePtr->m_dependencies;
 		m_parents = sourcePtr->m_parents;
+		m_packageId = sourcePtr->m_packageId;
 
 		return true;
 	}
@@ -282,6 +283,8 @@ bool CFeaturePackage::ResetData(CompatibilityMode mode)
 	}
 
 	m_dependencies.clear();
+
+	m_packageId.clear();
 
 	return true;
 }

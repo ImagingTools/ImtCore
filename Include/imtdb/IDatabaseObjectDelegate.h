@@ -4,8 +4,8 @@
 // Qt includes
 #include <QtSql/QtSql>
 
-// ACF includes
-#include <istd/IChangeable.h>
+// ImtCore includes
+#include <imtbase/IObjectCollection.h>
 
 
 namespace imtdb
@@ -37,6 +37,13 @@ public:
 				const QString& objectName,
 				const QString& objectDescription,
 				const istd::IChangeable* valuePtr) const = 0;
+
+	/**
+	*	Create SQL query for the deletion of the object from the database.
+	*/
+	virtual QByteArray CreateDeleteObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId) const = 0;
 };
 
 

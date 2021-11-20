@@ -53,32 +53,39 @@ QByteArray CDatabaseObjectCollectionComp::InsertNewObject(
 		return nullptr;
 	}
 
-	istd::CChangeNotifier changeNotifier(this);
+	if (ExecuteTransaction(query)){
+		istd::CChangeNotifier changeNotifier(this);
 
-	QStringList queryList = QString(qPrintable(query)).split(";");
+		QByteArray internalObjectId = BaseClass2::InsertNewObject(typeId, name, description, defaultValuePtr, objectId, dataMetaInfoPtr, collectionItemMetaInfoPtr);
+		Q_ASSERT(objectId == internalObjectId);
 
-	for (const QString& singleQuery: queryList){
-		if (!singleQuery.isEmpty()){
-			QSqlError error;
-			m_dbEngineCompPtr->ExecSqlQuery(singleQuery.toLocal8Bit(), &error);
-			if (error.type() != QSqlError::NoError){
-				SendErrorMessage(0, error.text(), "Database collection");
-
-				return nullptr;
-			}
-		}
+		return objectId;
 	}
 
-	QByteArray internalObjectId = BaseClass2::InsertNewObject(typeId, name, description, defaultValuePtr, objectId, dataMetaInfoPtr, collectionItemMetaInfoPtr);
-	Q_ASSERT(objectId == internalObjectId);
-
-	return objectId;
+	return QByteArray();
 }
 
 
 bool CDatabaseObjectCollectionComp::RemoveObject(const QByteArray& objectId)
 {
-	Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented method");
+	if (!m_objectDelegateCompPtr.IsValid()){
+		return false;
+	}
+
+	QByteArray query = m_objectDelegateCompPtr->CreateDeleteObjectQuery(*this, objectId);
+	if (query.isEmpty()){
+		SendErrorMessage(0, "Database query could not be created", "Database collection");
+
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	if (ExecuteTransaction(query)){
+		BaseClass2::RemoveObject(objectId);
+
+		return true;
+	}
 
 	return false;
 }
@@ -113,39 +120,65 @@ QByteArray CDatabaseObjectCollectionComp::GetQueryStringFromFile(const QByteArra
 }
 
 
-// reimplemented (CObjectCollectionBase)
+// protected methods
 
-istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
+bool CDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQuery) const
 {
-	if (m_objectFactoryCompPtr.IsValid()){
-		return m_objectFactoryCompPtr.CreateInstance();
+	QStringList queryList = QString(qPrintable(sqlQuery)).split(";");
+
+	m_dbEngineCompPtr->BeginTransaction();
+
+	for (const QString& singleQuery: queryList){
+		if (!singleQuery.isEmpty()){
+			QSqlError error;
+			m_dbEngineCompPtr->ExecSqlQuery(singleQuery.toLocal8Bit(), &error);
+			if (error.type() != QSqlError::NoError){
+				SendErrorMessage(0, error.text(), "Database collection");
+
+				m_dbEngineCompPtr->CancelTransaction();
+
+				return false;
+			}
+		}
+	}
+
+	m_dbEngineCompPtr->FinishTransaction();
+
+	return true;
+}
+
+
+void CDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
+{
+	istd::CChangeGroup changeGroup(this);
+
+	ResetData();
+
+	QSqlQuery sqlQuery = ExecSelectSqlQuery();
+	while (sqlQuery.next()){
+		QString name;
+		QString description;
+
+		istd::IChangeable* objectPtr = CreateObjectFromSqlRecord(sqlQuery.record(), name, description);
+		if (objectPtr != nullptr){
+			BaseClass2::InsertNewObject(*m_typeIdAttrPtr, name, description, objectPtr);
+		}
+	}
+}
+
+
+istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectFromSqlRecord(
+			const QSqlRecord& record,
+			QString& objectName,
+			QString& objectDescription) const
+{
+	if (m_objectDelegateCompPtr.IsValid()){
+		return m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, record, objectName, objectDescription);
 	}
 
 	return nullptr;
 }
 
-
-void CDatabaseObjectCollectionComp::DestroyObjectInstance(istd::IChangeable* objectPtr) const
-{
-	if (objectPtr != nullptr){
-		icomp::IComponent* componentPtr = dynamic_cast<icomp::IComponent*>(objectPtr);
-		if (componentPtr != nullptr){
-			const icomp::ICompositeComponent* parentComponentPtr = nullptr;
-			while ((parentComponentPtr = componentPtr->GetParentComponent(true)) != nullptr){
-				componentPtr = const_cast<icomp::ICompositeComponent*>(parentComponentPtr);
-			}
-
-			if (componentPtr != nullptr){
-				delete componentPtr;
-			}
-		}
-		else{
-			delete objectPtr;
-		}
-	}
-}
-
-// protected methods
 
 QSqlQuery CDatabaseObjectCollectionComp::ExecSelectSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError) const
 {
@@ -191,32 +224,36 @@ QSqlQuery CDatabaseObjectCollectionComp::ExecDeleteSqlQuery(const QVariantMap& b
 }
 
 
-void CDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
+// reimplemented (imtbase::CObjectCollectionBase)
+
+istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
 {
-	istd::CChangeGroup changeGroup(this);
-
-	ResetData();
-
-	QSqlQuery sqlQuery = ExecSelectSqlQuery();
-	while (sqlQuery.next()){
-		QString name;
-		QString description;
-
-		istd::IChangeable* objectPtr = CreateObjectFromSqlRecord(sqlQuery.record(), name, description);
-		if (objectPtr != nullptr){
-			BaseClass2::InsertNewObject(*m_typeIdAttrPtr, name, description, objectPtr);
-		}
-	}
-}
-
-
-istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectFromSqlRecord(const QSqlRecord& record, QString& objectName, QString& objectDescription) const
-{
-	if (m_objectDelegateCompPtr.IsValid()){
-		return m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, record, objectName, objectDescription);
+	if (m_objectFactoryCompPtr.IsValid()){
+		return m_objectFactoryCompPtr.CreateInstance();
 	}
 
 	return nullptr;
+}
+
+
+void CDatabaseObjectCollectionComp::DestroyObjectInstance(istd::IChangeable* objectPtr) const
+{
+	if (objectPtr != nullptr){
+		icomp::IComponent* componentPtr = dynamic_cast<icomp::IComponent*>(objectPtr);
+		if (componentPtr != nullptr){
+			const icomp::ICompositeComponent* parentComponentPtr = nullptr;
+			while ((parentComponentPtr = componentPtr->GetParentComponent(true)) != nullptr){
+				componentPtr = const_cast<icomp::ICompositeComponent*>(parentComponentPtr);
+			}
+
+			if (componentPtr != nullptr){
+				delete componentPtr;
+			}
+		}
+		else{
+			delete objectPtr;
+		}
+	}
 }
 
 

@@ -354,6 +354,9 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 {
+	m_autoLogoutTimer.stop();
+	m_checkIsFullScreenTimer.stop();
+
 	if (m_loginGuiCompPtr.IsValid() && m_loginGuiCompPtr->IsGuiCreated()){
 		m_loginGuiCompPtr->DestroyGui();
 	}
