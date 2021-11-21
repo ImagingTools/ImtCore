@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
-#include <imtlic/CFeaturePackage.h>
 
 
 namespace imtlicdb
@@ -18,7 +17,9 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(
 			const QByteArray& /*typeId*/,
 			const QSqlRecord& record,
 			QString& objectName,
-			QString& /*objectDescription*/) const
+			QString& objectDescription,
+			QDateTime& lastModified,
+			QDateTime& added) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -38,6 +39,18 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(
 		packageName = record.value("Name").toString();
 
 		objectName = packageName;
+	}
+
+	if (record.contains("Description")){
+		objectDescription = record.value("Description").toString();
+	}
+
+	if (record.contains("Added")){
+		added = record.value("Added").toDateTime();
+	}
+
+	if (record.contains("LastModified")){
+		lastModified = record.value("LastModified").toDateTime();
 	}
 
 	QByteArray query = QString("SELECT * from Features WHERE PackageId = '%1'").arg(qPrintable(packageId)).toUtf8();
@@ -79,10 +92,10 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(
 
 
 QByteArray CFeaturePackageDatabaseDelegateComp::CreateNewObjectQuery(
-			const QByteArray& typeId,
-			const QByteArray& proposedObjectId,
+			const QByteArray& /*typeId*/,
+			const QByteArray& /*proposedObjectId*/,
 			const QString& objectName,
-			const QString& objectDescription,
+			const QString& /*objectDescription*/,
 			const istd::IChangeable* valuePtr) const
 {
 	QByteArray packageId;
@@ -107,7 +120,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateNewObjectQuery(
 										.arg(qPrintable(featureId))
 										.arg(featureName)
 										.arg(featureDescription)
-										.arg(qPrintable(packageId));
+										.arg(qPrintable(packageId)).toLocal8Bit();
 			}
 		}
 
@@ -138,6 +151,159 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateDeleteObjectQuery(
 	}
 
 	return QByteArray();
+}
+
+QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId,
+			const istd::IChangeable& object) const
+{
+	const imtlic::CFeaturePackage* newObjectPtr = dynamic_cast<const imtlic::CFeaturePackage*>(&object);
+	if (newObjectPtr == nullptr){
+		return QByteArray();
+	}
+
+	const imtlic::CFeaturePackage* oldObjectPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr objectPtr;
+	if (collection.GetObjectData(objectId, objectPtr)){
+		oldObjectPtr = dynamic_cast<const imtlic::CFeaturePackage*>(objectPtr.GetPtr());
+	}
+
+	if (oldObjectPtr == nullptr){
+		return QByteArray();
+	}
+
+	QByteArray oldPackageId = oldObjectPtr->GetPackageId();
+	QByteArray newPackageId = newObjectPtr->GetPackageId();
+
+	QByteArray retVal = QString("UPDATE Packages SET Id ='%1' WHERE Id ='%2';").arg(qPrintable(newPackageId)).arg(qPrintable(oldPackageId)).toLocal8Bit();
+
+	QByteArrayList addedFeatures;
+	QByteArrayList removedFeatures;
+	QByteArrayList updatedFeatures;
+
+	GenerateDifferences(*oldObjectPtr, *newObjectPtr, addedFeatures, removedFeatures, updatedFeatures);
+
+	// Add new features to the package:
+	for (const QByteArray& addFeatureId : addedFeatures){
+		const imtlic::IFeatureInfo* featureInfoPtr = newObjectPtr->FindFeatureById(addFeatureId);
+		if (featureInfoPtr != nullptr){
+			QByteArray collectionId = newObjectPtr->GetFeatureCollectionId(addFeatureId);
+
+			QString featureName = featureInfoPtr->GetFeatureName();
+			QString featureDescription = newObjectPtr->GetFeatureList().GetElementInfo(
+						collectionId,
+						imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
+			retVal += "\n" +
+						QString("INSERT INTO Features(Id, Name, Description, PackageId) VALUES('%1', '%2', '%3', '%4');")
+									.arg(qPrintable(addFeatureId))
+									.arg(featureName)
+									.arg(featureDescription)
+									.arg(qPrintable(newPackageId)).toLocal8Bit();
+		}
+	}
+
+	// Add new features to the package:
+	for (const QByteArray& removedFeatureId : removedFeatures){
+		retVal += "\n" +
+					QString("DELETE FROM Features WHERE Id = '%1' AND PackageId = %2;")
+								.arg(qPrintable(removedFeatureId))
+								.arg(qPrintable(newPackageId)).toLocal8Bit();
+	}
+
+	return retVal;
+}
+
+
+QByteArray CFeaturePackageDatabaseDelegateComp::CreateRenameObjectQuery(
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId,
+			const QString& newObjectName) const
+{
+	const imtlic::CFeaturePackage* currentPackagePtr = nullptr;
+	imtbase::IObjectCollection::DataPtr objectPtr;
+	if (collection.GetObjectData(objectId, objectPtr)){
+		currentPackagePtr = dynamic_cast<const imtlic::CFeaturePackage*>(objectPtr.GetPtr());
+	}
+
+	if (currentPackagePtr == nullptr){
+		return QByteArray();
+	}
+
+	if (objectId.isEmpty()){
+		return QByteArray();
+	}
+
+	QByteArray oldPackageId = currentPackagePtr->GetPackageId();
+	QByteArray newPackageId = newObjectName.toLocal8Bit();
+
+	QByteArray retVal = QString("UPDATE Packages SET Id ='%1', Name = '%1' WHERE Id ='%2';").arg(newObjectName).arg(qPrintable(oldPackageId)).toLocal8Bit();
+
+	return retVal;
+}
+
+
+// protected methods
+
+void CFeaturePackageDatabaseDelegateComp::GenerateDifferences(
+			const imtlic::CFeaturePackage& currentPackage,
+			const imtlic::CFeaturePackage& newPackage,
+			QByteArrayList& addFeatures,
+			QByteArrayList& removedFeatures,
+			QByteArrayList& updatedFeatures) const
+{
+	imtbase::ICollectionInfo::Ids currentFeatureCollectionIds = currentPackage.GetFeatureList().GetElementIds();
+	QByteArrayList currentFeatureIds;
+
+	for (QByteArray id : currentFeatureCollectionIds){
+		const imtlic::IFeatureInfo* featureInfoPtr = currentPackage.GetFeatureInfo(id);
+		Q_ASSERT(featureInfoPtr != nullptr);
+		Q_ASSERT(!featureInfoPtr->GetFeatureId().isEmpty());
+
+		currentFeatureIds.push_back(featureInfoPtr->GetFeatureId());
+	}
+
+	imtbase::ICollectionInfo::Ids newFeatureCollectionIds = newPackage.GetFeatureList().GetElementIds();
+	QByteArrayList newFeatureIds;
+
+	for (QByteArray id : newFeatureCollectionIds){
+		const imtlic::IFeatureInfo* featureInfoPtr = newPackage.GetFeatureInfo(id);
+		Q_ASSERT(featureInfoPtr != nullptr);
+		Q_ASSERT(!featureInfoPtr->GetFeatureId().isEmpty());
+
+		newFeatureIds.push_back(featureInfoPtr->GetFeatureId());
+	}
+
+	// Calculate added features:
+	for (QByteArray newFeatureId : newFeatureIds){
+		if (!currentFeatureIds.contains(newFeatureId)){
+			addFeatures.push_back(newFeatureId);
+		}
+	}
+
+	// Calculate added features:
+	for (QByteArray currentFeatureId : currentFeatureIds){
+		if (!newFeatureIds.contains(currentFeatureId)){
+			removedFeatures.push_back(currentFeatureId);
+		}
+	}
+
+	// Calculate changed features:
+	for (QByteArray currentFeatureId : currentFeatureIds){
+		// Feature-ID in both packages:
+		if (newFeatureIds.contains(currentFeatureId)){
+			const imtlic::IFeatureInfo* currentFeaturePtr = currentPackage.FindFeatureById(currentFeatureId);
+			Q_ASSERT(currentFeaturePtr != nullptr);
+
+			const imtlic::IFeatureInfo* newFeaturePtr = newPackage.FindFeatureById(currentFeatureId);
+			Q_ASSERT(newFeaturePtr != nullptr);
+
+			if (!newFeaturePtr->IsEqual(*currentFeaturePtr)){
+				updatedFeatures.push_back(currentFeatureId);
+			}
+		}
+	}
 }
 
 

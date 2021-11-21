@@ -26,7 +26,9 @@ public:
 				const QByteArray& typeId,
 				const QSqlRecord& record,
 				QString& objectName,
-				QString& objectDescription) const = 0;
+				QString& objectDescription,
+				QDateTime& lastModified,
+				QDateTime& added) const = 0;
 
 	/**
 		Create SQL query for insertion of a new object into the database.
@@ -44,6 +46,22 @@ public:
 	virtual QByteArray CreateDeleteObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId) const = 0;
+
+	/**
+	*	Create SQL query for the update of the object.
+	*/
+	virtual QByteArray CreateUpdateObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const istd::IChangeable& object) const = 0;
+
+	/**
+	*	Create SQL query for the renaming of the object.
+	*/
+	virtual QByteArray CreateRenameObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const QString& newObjectName) const = 0;
 };
 
 

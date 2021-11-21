@@ -37,6 +37,40 @@ void CFeaturePackage::SetParents(const QByteArrayList& parentIds)
 }
 
 
+const IFeatureInfo* CFeaturePackage::FindFeatureById(const QByteArray& featureId) const
+{
+	imtbase::ICollectionInfo::Ids featureIds = GetFeatureList().GetElementIds();
+	for (QByteArray id : featureIds){
+		const IFeatureInfo* featurePtr = GetFeatureInfo(id);
+		Q_ASSERT(featurePtr != nullptr);
+		if (featurePtr != nullptr){
+			if (featurePtr->GetFeatureId() == featureId){
+				return featurePtr;
+			}
+		}
+	}
+	
+	return nullptr;
+}
+
+
+QByteArray CFeaturePackage::GetFeatureCollectionId(const QByteArray& featureId) const
+{
+	imtbase::ICollectionInfo::Ids featureIds = GetFeatureList().GetElementIds();
+	for (QByteArray id : featureIds){
+		const IFeatureInfo* featurePtr = GetFeatureInfo(id);
+		Q_ASSERT(featurePtr != nullptr);
+		if (featurePtr != nullptr){
+			if (featurePtr->GetFeatureId() == featureId){
+				return id;
+			}
+		}
+	}
+
+	return QByteArray();
+}
+
+
 // reimplemented (IFeaturePackage)
 
 QByteArray CFeaturePackage::GetPackageId() const

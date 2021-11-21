@@ -79,9 +79,9 @@ bool CDatabaseObjectCollectionComp::RemoveObject(const QByteArray& objectId)
 		return false;
 	}
 
-	istd::CChangeNotifier changeNotifier(this);
-
 	if (ExecuteTransaction(query)){
+		istd::CChangeNotifier changeNotifier(this);
+
 		BaseClass2::RemoveObject(objectId);
 
 		return true;
@@ -91,36 +91,56 @@ bool CDatabaseObjectCollectionComp::RemoveObject(const QByteArray& objectId)
 }
 
 
-bool CDatabaseObjectCollectionComp::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode)
+bool CDatabaseObjectCollectionComp::SetObjectData(
+			const QByteArray& objectId,
+			const istd::IChangeable& object,
+			CompatibilityMode /*mode*/)
 {
-	Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented method");
+	if (!m_objectDelegateCompPtr.IsValid()){
+		return false;
+	}
+
+	QByteArray query = m_objectDelegateCompPtr->CreateUpdateObjectQuery(*this, objectId, object);
+	if (query.isEmpty()){
+		SendErrorMessage(0, "Database query could not be created", "Database collection");
+
+		return false;
+	}
+
+	if (ExecuteTransaction(query)){
+		istd::CChangeNotifier changeNotifier(this);
+
+		BaseClass2::RemoveObject(objectId);
+
+		return true;
+	}
 
 	return false;
 }
 
 
-QByteArray CDatabaseObjectCollectionComp::GetQueryStringFromFile(const QByteArray& filePath) const
+void CDatabaseObjectCollectionComp::SetObjectName(const QByteArray& objectId, const QString& objectName)
 {
-	QByteArray retVal;
-	QFile queryFile(filePath);
-	if(!queryFile.open(QFile::ReadOnly)){
-		qCritical() << __FILE__ << __LINE__
-					<< "\n\t| what(): Unable to open file"
-					<< "\n\t| fileName(): " << queryFile.fileName()
-					<< "\n\t| path(): " << filePath
-					   ;
-	}
-	else {
-		retVal = queryFile.readAll();
-
-		queryFile.close();
+	if (!m_objectDelegateCompPtr.IsValid()){
+		return;
 	}
 
-	return retVal;
+	QByteArray query = m_objectDelegateCompPtr->CreateRenameObjectQuery(*this, objectId, objectName);
+	if (query.isEmpty()){
+		SendErrorMessage(0, "Database query could not be created", "Database collection");
+
+		return;
+	}
+
+	if (ExecuteTransaction(query)){
+		istd::CChangeNotifier changeNotifier(this);
+
+		BaseClass2::SetObjectName(objectId, objectName);
+	}
 }
 
 
-// protected methods
+  // protected methods
 
 bool CDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQuery) const
 {
@@ -158,10 +178,16 @@ void CDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 	while (sqlQuery.next()){
 		QString name;
 		QString description;
+		QDateTime added;
+		QDateTime lastModified;
 
-		istd::IChangeable* objectPtr = CreateObjectFromSqlRecord(sqlQuery.record(), name, description);
+		istd::IChangeable* objectPtr = CreateObjectFromSqlRecord(sqlQuery.record(), name, description, lastModified, added);
 		if (objectPtr != nullptr){
-			BaseClass2::InsertNewObject(*m_typeIdAttrPtr, name, description, objectPtr);
+			idoc::CStandardDocumentMetaInfo collectionMetaInfo;
+			collectionMetaInfo.SetMetaInfo(IObjectCollection::MIT_INSERTION_TIME, added);
+			collectionMetaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, lastModified);
+
+			BaseClass2::InsertNewObject(*m_typeIdAttrPtr, name, description, objectPtr, "", nullptr, &collectionMetaInfo);
 		}
 	}
 }
@@ -170,10 +196,12 @@ void CDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectFromSqlRecord(
 			const QSqlRecord& record,
 			QString& objectName,
-			QString& objectDescription) const
+			QString& objectDescription,
+			QDateTime& lastModified,
+			QDateTime& added) const
 {
 	if (m_objectDelegateCompPtr.IsValid()){
-		return m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, record, objectName, objectDescription);
+		return m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, record, objectName, objectDescription, lastModified, added);
 	}
 
 	return nullptr;
@@ -224,9 +252,30 @@ QSqlQuery CDatabaseObjectCollectionComp::ExecDeleteSqlQuery(const QVariantMap& b
 }
 
 
+QByteArray CDatabaseObjectCollectionComp::GetQueryStringFromFile(const QByteArray& filePath) const
+{
+	QByteArray retVal;
+	QFile queryFile(filePath);
+	if(!queryFile.open(QFile::ReadOnly)){
+		qCritical() << __FILE__ << __LINE__
+			<< "\n\t| what(): Unable to open file"
+			<< "\n\t| fileName(): " << queryFile.fileName()
+			<< "\n\t| path(): " << filePath
+			;
+	}
+	else {
+		retVal = queryFile.readAll();
+
+		queryFile.close();
+	}
+
+	return retVal;
+}
+
+
 // reimplemented (imtbase::CObjectCollectionBase)
 
-istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
+istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectInstance(const QByteArray& /*typeId*/) const
 {
 	if (m_objectFactoryCompPtr.IsValid()){
 		return m_objectFactoryCompPtr.CreateInstance();

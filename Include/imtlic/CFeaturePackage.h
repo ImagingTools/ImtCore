@@ -24,6 +24,16 @@ public:
 
 	void SetParents(const QByteArrayList& parentIds);
 
+	/**
+		Find feature object using feature-ID (not the collection of the feature)
+	*/
+	const IFeatureInfo* FindFeatureById(const QByteArray& featureId) const;
+
+	/**
+		Get collection-ID using feature-ID.
+	*/
+	QByteArray GetFeatureCollectionId(const QByteArray& featureId) const;
+
 	// reimplemented (IFeaturePackage)
 	virtual QByteArray GetPackageId() const override;
 	virtual void SetPackageId(const QByteArray& packageId) override;

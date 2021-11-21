@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <imtdb/IDatabaseObjectDelegate.h>
 #include <imtdb/IDatabaseEngine.h>
+#include <imtlic/CFeaturePackage.h>
 
 
 namespace imtlicdb
@@ -30,7 +31,9 @@ public:
 				const QByteArray& typeId,
 				const QSqlRecord& record,
 				QString& objectName,
-				QString& objectDescription) const override;
+				QString& objectDescription,
+				QDateTime& lastModified,
+				QDateTime& added) const override;
 	virtual QByteArray CreateNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& proposedObjectId,
@@ -40,7 +43,22 @@ public:
 	virtual QByteArray CreateDeleteObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId) const override;
+	virtual QByteArray CreateUpdateObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const istd::IChangeable& object) const override;
+	virtual QByteArray CreateRenameObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const QString& newObjectName) const override;
 
+protected:
+	void GenerateDifferences(
+				const imtlic::CFeaturePackage& currentPackage,
+				const imtlic::CFeaturePackage& newPackage,
+				QByteArrayList& addFeatures,
+				QByteArrayList& removedFeatures,
+				QByteArrayList& updatedFeatures) const;
 private:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 };

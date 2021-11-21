@@ -59,11 +59,17 @@ public:
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr) override;
 	virtual bool RemoveObject(const QByteArray& objectId) override;
 	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-
+	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
+	
 protected:
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	virtual void CreateCollectionFromDatabase();
-	virtual istd::IChangeable* CreateObjectFromSqlRecord(const QSqlRecord& record, QString& objectName, QString& objectDescription) const;
+	virtual istd::IChangeable* CreateObjectFromSqlRecord(
+				const QSqlRecord& record,
+				QString& objectName,
+				QString& objectDescription,
+				QDateTime& lastModified,
+				QDateTime& added) const;
 	virtual QSqlQuery ExecSelectSqlQuery(const QVariantMap& bindValues = {}, QSqlError* sqlError = nullptr) const;
 	virtual QSqlQuery ExecUpdateSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const;
 	virtual QSqlQuery ExecInsertSqlQuery(const QVariantMap& bindValues, QSqlError* sqlError = nullptr) const;
