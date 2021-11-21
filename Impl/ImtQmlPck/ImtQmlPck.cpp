@@ -73,6 +73,17 @@ I_EXPORT_COMPONENT(
 			"Menu data enum provider",
 			"Menu data enum provider");
 
+I_EXPORT_COMPONENT(
+			JoinDataProvider,
+			"Join data provider",
+			"Join data provider");
+
+I_EXPORT_COMPONENT(
+			ObserverQml,
+			"Observer QuickObject",
+			"Observer qml quickobject");
+
+
 } // namespace ImtQmlPck
 
 

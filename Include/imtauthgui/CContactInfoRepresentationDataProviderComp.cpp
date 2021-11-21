@@ -43,11 +43,11 @@ bool CContactInfoRepresentationDataProviderComp::GetRepresentationData(
 			format == imtrest::IRepresentationDataProvider::RF_JSON &&
 			!query.isEmpty() &&
 			query[0] == "__ContactInfo__"){
-		imtbase::CTreeItemModel *treeItemModel = m_itemBasedRepresentationDataProvider->GetTreeItemModel(query, params);
+//		imtbase::CTreeItemModel *treeItemModel = m_itemBasedRepresentationDataProvider->GetTreeItemModel(query, params);
 
-		iser::CJsonStringWriteArchive archive(representationData);
+//		iser::CJsonStringWriteArchive archive(representationData);
 
-		retVal = treeItemModel->Serialize(archive);
+//		retVal = treeItemModel->Serialize(archive);
 	}
 
 	return retVal;
@@ -68,33 +68,33 @@ bool CContactInfoRepresentationDataProviderComp::SetRepresentationData(
 
 		QList<QByteArray> query;
 		imtrest::QueryParams params;
-		imtbase::CTreeItemModel* treeItemModel = m_itemBasedRepresentationDataProvider->GetTreeItemModel(query, params);
+//		imtbase::CTreeItemModel* treeItemModel = m_itemBasedRepresentationDataProvider->GetTreeItemModel(query, params);
 
-		QJsonObject jsonObject = jsonDocument.object();
-		if (jsonObject.value("key").toString() == "addresses"){
-			imtbase::CTreeItemModel* addressesModel = treeItemModel->GetTreeItemModel("addresses",jsonObject.value("index0").toInt());
-			if (addressesModel != nullptr){
-				QJsonArray jsonAddresses = jsonObject.value("addresses").toArray();
-				for(int i = 0; i < jsonAddresses.count(); i++){
-					QJsonObject jsonAddress = jsonAddresses[i].toObject();
-					if (jsonAddress.isEmpty()){
-						for(QString key : jsonObject.keys()){
-							treeItemModel->SetData(key.toLatin1(),jsonAddress.value(key).toVariant(),jsonAddress.value("index").toInt());
-						}
-					}
-				}
-			}
-		}
-		else{
-			treeItemModel->SetState("Updated");
-			for(QString key : jsonObject.keys()){
-				treeItemModel->SetData(key.toLatin1(),jsonObject.value(key).toVariant());
+//		QJsonObject jsonObject = jsonDocument.object();
+//		if (jsonObject.value("key").toString() == "addresses"){
+//			imtbase::CTreeItemModel* addressesModel = treeItemModel->GetTreeItemModel("addresses",jsonObject.value("index0").toInt());
+//			if (addressesModel != nullptr){
+//				QJsonArray jsonAddresses = jsonObject.value("addresses").toArray();
+//				for(int i = 0; i < jsonAddresses.count(); i++){
+//					QJsonObject jsonAddress = jsonAddresses[i].toObject();
+//					if (jsonAddress.isEmpty()){
+//						for(QString key : jsonObject.keys()){
+//							treeItemModel->SetData(key.toLatin1(),jsonAddress.value(key).toVariant(),jsonAddress.value("index").toInt());
+//						}
+//					}
+//				}
+//			}
+//		}
+//		else{
+//			treeItemModel->SetState("Updated");
+//			for(QString key : jsonObject.keys()){
+//				treeItemModel->SetData(key.toLatin1(),jsonObject.value(key).toVariant());
 
-				retVal = true;
-			}
+//				retVal = true;
+//			}
 
-			treeItemModel->SetState("Ready");
-		}
+//			treeItemModel->SetState("Ready");
+//		}
 	}
 
 	return retVal;

@@ -178,37 +178,37 @@ void CQuickObjectCompBase::OnComponentCreated()
 
 void CQuickObjectCompBase::OnModelNeedsReload(imtbase::CTreeItemModel *itemModelPtr)
 {
-	imtbase::CTreeItemModel *rootModelPtr = itemModelPtr;
-	if (rootModelPtr == nullptr){
-		rootModelPtr = qobject_cast<imtbase::CTreeItemModel*>(sender());
-	}
-	if (rootModelPtr != nullptr && m_dataProviderCompPtr.IsValid()){
-		int index  = m_models.indexOf(rootModelPtr);
-		if (m_modelQueriesAttrPtr.IsValid() && m_modelQueriesAttrPtr.GetCount() > index && index > -1){
-			QByteArray modelQuery = m_modelQueriesAttrPtr[index];
-			imtrest::QueryParams queryParams = rootModelPtr->GetQueryParams();
-			QList<QByteArray> query = modelQuery.split('/');
-			imtbase::CTreeItemModel *sourceModelPtr = m_dataProviderCompPtr->GetTreeItemModel(query,queryParams);
-			if (sourceModelPtr != nullptr){
-				QByteArray modelId = m_modelIdsAttrPtr[index];
-//				rootModelPtr->SetState("Loading");
-//				rootModelPtr->SetExternTreeModel(imtqml::CEnumApplicationDataProviderComp::DATA, sourceModelPtr);
-//				rootModelPtr->SetState("Ready");
-//				rootModelPtr->Refresh();
-//				m_quickItemPtr->setProperty(modelId, QVariant::fromValue(0));
-//				QVariant modelVariant;
-//				modelVariant = QVariant::fromValue(rootModelPtr);
-				m_quickItemPtr->setProperty(modelId, QVariant::fromValue(sourceModelPtr));
-				m_models[index] = sourceModelPtr;
-				connect(sourceModelPtr, SIGNAL(needsReload()), this, SLOT(OnModelNeedsReload()));
-//				disconnect(rootModelPtr, SIGNAL(needsReload()), this, SLOT(OnModelNeedsReload()));
-				rootModelPtr->disconnect();
-				delete rootModelPtr;
-			}
+//	imtbase::CTreeItemModel *rootModelPtr = itemModelPtr;
+//	if (rootModelPtr == nullptr){
+//		rootModelPtr = qobject_cast<imtbase::CTreeItemModel*>(sender());
+//	}
+//	if (rootModelPtr != nullptr && m_dataProviderCompPtr.IsValid()){
+//		int index  = m_models.indexOf(rootModelPtr);
+//		if (m_modelQueriesAttrPtr.IsValid() && m_modelQueriesAttrPtr.GetCount() > index && index > -1){
+//			QByteArray modelQuery = m_modelQueriesAttrPtr[index];
+//			imtrest::QueryParams queryParams = rootModelPtr->GetQueryParams();
+//			QList<QByteArray> query = modelQuery.split('/');
+//			imtbase::CTreeItemModel *sourceModelPtr = m_dataProviderCompPtr->GetTreeItemModel(query,queryParams);
+//			if (sourceModelPtr != nullptr){
+//				QByteArray modelId = m_modelIdsAttrPtr[index];
+////				rootModelPtr->SetState("Loading");
+////				rootModelPtr->SetExternTreeModel(imtqml::CEnumApplicationDataProviderComp::DATA, sourceModelPtr);
+////				rootModelPtr->SetState("Ready");
+////				rootModelPtr->Refresh();
+////				m_quickItemPtr->setProperty(modelId, QVariant::fromValue(0));
+////				QVariant modelVariant;
+////				modelVariant = QVariant::fromValue(rootModelPtr);
+//				m_quickItemPtr->setProperty(modelId, QVariant::fromValue(sourceModelPtr));
+//				m_models[index] = sourceModelPtr;
+//				connect(sourceModelPtr, SIGNAL(needsReload()), this, SLOT(OnModelNeedsReload()));
+////				disconnect(rootModelPtr, SIGNAL(needsReload()), this, SLOT(OnModelNeedsReload()));
+//				rootModelPtr->disconnect();
+//				delete rootModelPtr;
+//			}
 
-		}
+//		}
 
-	}
+//	}
 }
 
 

@@ -32,8 +32,11 @@ Rectangle {
             onClicked: {
                 lvButtons.currentIndex = index
                 menuPanel.activePageChanged(model[PageEnum.ID], model[PageEnum.ICON])
-                console.log("Acf", PageEnum.ICON)
-                console.log("AcfModel", model[PageEnum.ICON])
+                console.log("window.location.href: ", window.location.href)
+                console.log("window.location.hash: ", window.location.hash)
+                console.log("window.location.search: ", window.location.search)
+//                console.log("Acf", PageEnum.ICON)
+//                console.log("AcfModel", model[PageEnum.ICON])
 
 //                lvButtons.model.SetData(AcfS.Name,"Name2",index)
 

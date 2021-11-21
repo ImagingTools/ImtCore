@@ -17,29 +17,32 @@ CCommandDataProviderCompBase::CCommandDataProviderCompBase() :
 
 QByteArray CCommandDataProviderCompBase::GetModelId() const
 {
-	return *m_commandsModelIdAttrPtr;
+	QString str = *m_commandsModelIdAttrPtr;
+	return str.toUtf8();
 }
 
 
-imtbase::CTreeItemModel *CCommandDataProviderCompBase::GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QueryParams& params)
+imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields)
 {
-	imtbase::CTreeItemModel* treeModel = nullptr;
-	if (query.count() > 0 &&
-			(params.value(CommandEnum::ID) == *m_commandsModelIdAttrPtr
-			 || params.value(CommandEnum::ID) == "")){
-		treeModel = new imtbase::CTreeItemModel();
-		for (int i = 0; i < m_commandIdAttrPtr.GetCount(); ++i){
-			treeModel->InsertNewItem();
-			treeModel->SetData(CommandEnum::ID, m_commandIdAttrPtr[i], i);
-			if (m_commandNameAttrPtr.GetCount() > i){
+	imtbase::CTreeItemModel* treeModel = new imtbase::CTreeItemModel();
+	for (int i = 0; i < m_commandIdAttrPtr.GetCount(); ++i){
+		treeModel->InsertNewItem();
+		for (int indexField = 0; indexField < fields.count(); indexField++){
+			if (fields[indexField] == CommandEnum::ID){
+				treeModel->SetData(CommandEnum::ID, m_commandIdAttrPtr[i], i);
+			}
+			if (fields[indexField] == CommandEnum::NAME && m_commandNameAttrPtr.GetCount() > i){
 				treeModel->SetData(CommandEnum::NAME, m_commandNameAttrPtr[i], i);
 			}
-			if (m_commandDefaultStatusIcon.GetCount() > i){
+			if (fields[indexField] == CommandEnum::ICON && m_commandDefaultStatusIcon.GetCount() > i){
 				treeModel->SetData(CommandEnum::ICON, m_commandDefaultStatusIcon[i], i);
 			}
-			treeModel->SetData(CommandEnum::ENABLED,"true");
+			if (fields[indexField] == CommandEnum::ENABLED){
+				treeModel->SetData(CommandEnum::ENABLED,"true");
+			}
 		}
 	}
+
 	return treeModel;
 }
 

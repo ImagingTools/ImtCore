@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtgql/CApiClientComp.h>
+#include <imtgql/CHttpGraphQLServletComp.h>
 
 
 /**
@@ -17,6 +18,7 @@ namespace ImtGqlPck
 
 
 typedef imtgql::CApiClientComp ApiClient;
+typedef imtgql::CHttpGraphQLServletComp GraphQLServlet;
 
 
 } // namespace ImtGqlPck

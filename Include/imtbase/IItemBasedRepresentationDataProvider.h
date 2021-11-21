@@ -7,7 +7,8 @@
 
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
-#include <imtrest/imtrest.h>
+#include <imtgql/CGqlObject.h>
+//#include <imtrest/imtrest.h>
 //#include <imtbase/ICollectionInfo.h>
 
 
@@ -23,7 +24,7 @@ class IItemBasedRepresentationDataProvider: virtual public istd::IPolymorphic
 {
 public:
 	virtual QByteArray GetModelId() const = 0;
-	virtual CTreeItemModel* GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QueryParams& params) = 0;
+	virtual CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields) = 0;
 };
 
 

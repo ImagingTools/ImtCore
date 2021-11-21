@@ -4091,6 +4091,19 @@ QmlWeb.keyboardSignals = {};
 
 QmlWeb.executionContext = null;
 
+var _wr = function _wr(type) {
+  var orig = history[type];
+  return function () {
+    var rv = orig.apply(this, arguments);
+    var e = new Event(type);
+    e.arguments = arguments;
+    window.dispatchEvent(e);
+    return rv;
+  };
+};
+history.pushState = _wr('pushState');
+history.replaceState = _wr('replaceState');
+
 var modules = {
   Main: {
     int: QmlWeb.qmlInteger,
@@ -4345,24 +4358,56 @@ function construct(meta) {
   meta.context['__importList__'] = QmlWeb.importList;
   meta.context['__location__'] = window.location;
 
-  var params = window.location.search.replace('?', '').split("&");
-  var result = {};
-  for (i = 0; i < params.length; i++) {
-    var val = params[i].split("=");
-    result[val[0]] = val[1];
-  }
+  QmlWeb.setupGetter(meta.context['__location__'], 'searchParams', function () {
+    var params = window.location.search.replace('?', '').split("&");
+    var result = {};
+    for (i = 0; i < params.length; i++) {
+      var val = params[i].split("=");
+      result[val[0]] = val[1];
+    }
+    return result;
+  });
 
-  meta.context['__location__'].searchParams = result;
-  //meta.context['__location__'].url = window.location.origin + window.location.pathname
+  meta.context['__history__'] = {
+    'push': function push(url) {
+      history.pushState({}, '', url);
+    }
+    //meta.context['__location__'].url = window.location.origin + window.location.pathname
 
-  QmlWeb.setupGetterSetter(meta.context['__location__'], 'url', function () {
+  };QmlWeb.setupGetterSetter(meta.context['__location__'], 'url', function () {
     return window.location.origin + window.location.pathname;
   }, function (val) {
     window.location.href = val;
   });
 
-  // keep path in item for probale use it later in Qt.resolvedUrl
-  item.$context.$basePath = QmlWeb.engine.$basePath; //gut
+  meta.context['__cookies__'] = {
+    'get': function get(name) {
+      var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+      return matches ? decodeURIComponent(matches[1]) : undefined;
+    },
+    'set': function set(name, value) {
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      options = Object.assign({ path: '/' }, options);
+      if (options.expires instanceof Date) {
+        options.expires = options.expires.toUTCString();
+      }
+
+      var updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+      for (var optionKey in options) {
+        updatedCookie += "; " + optionKey;
+        var optionValue = options[optionKey];
+        if (optionValue !== true) {
+          updatedCookie += "=" + optionValue;
+        }
+      }
+
+      document.cookie = updatedCookie;
+    }
+
+    // keep path in item for probale use it later in Qt.resolvedUrl
+  };item.$context.$basePath = QmlWeb.engine.$basePath; //gut
 
   // We want to use the item's scope, but this Component's imports
   item.$context.importContextId = meta.context.importContextId;
@@ -10214,6 +10259,16 @@ var QtQuick_Loader = function (_QtQuick_Item32) {
     _this101.sourceComponentChanged.connect(_this101, _this101.$onSourceComponentChanged);
     _this101.widthChanged.connect(_this101, _this101.$updateGeometry);
     _this101.heightChanged.connect(_this101, _this101.$updateGeometry);
+
+    window.addEventListener('popstate', function (e) {
+      _this101.historyChanged();
+    }, false);
+    window.addEventListener('replaceState', function (e) {
+      _this101.historyChanged();
+    }, false);
+    window.addEventListener('pushState', function (e) {
+      _this101.historyChanged();
+    }, false);
     return _this101;
   }
 
@@ -10350,7 +10405,8 @@ QtQuick_Loader.properties = {
   status: { type: "enum", initialValue: 1 }
 };
 QtQuick_Loader.signals = {
-  loaded: []
+  loaded: [],
+  historyChanged: []
 };
 
 QmlWeb.registerQmlType(QtQuick_Loader);
@@ -10376,7 +10432,7 @@ var QtQuick_MouseArea = function (_QtQuick_Item33) {
       }
       _this102.areaList = [];
       allEvent = function (_allEvent) {
-        function allEvent(_x21) {
+        function allEvent(_x22) {
           return _allEvent.apply(this, arguments);
         }
 

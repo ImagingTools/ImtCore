@@ -21,27 +21,29 @@ QByteArray CPageDataProviderCompBase::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel *CPageDataProviderCompBase::GetTreeItemModel(const QList<QByteArray>& query, const imtrest::QueryParams& params)
+imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields)
 {
 	imtbase::CTreeItemModel* rootModel = nullptr;
-//	if (modelId == *m_pageIdAttrPtr){
-	if (query.count() > 0 && params.value(PageEnum::ID) == *m_pageIdAttrPtr){
-		if (query.count() == 1){
-			rootModel = new imtbase::CTreeItemModel();
-			rootModel->SetData(PageEnum::ID,*m_pageIdAttrPtr);
-			rootModel->SetData(PageEnum::NAME, *m_pageNameAttrPtr);
-			rootModel->SetData(PageEnum::ICON, *m_pageDefaultStatusIcon);
-			rootModel->SetData(PageEnum::ICON_ON_SELECTED,*m_pageOnSelectedStatusIcon);
-			rootModel->SetData(PageEnum::ICON_OFF_SELECTED,*m_pageOffSelectedStatusIcon);
-			rootModel->SetData(PageEnum::ENABLED,"true");
+	rootModel = new imtbase::CTreeItemModel();
+	for (int indexField = 0; indexField < fields.count(); indexField++){
+		if (fields[indexField] == PageEnum::ID){
+			QString strId = QString(*m_pageIdAttrPtr);
+			rootModel->SetData(PageEnum::ID, strId);
 		}
-		else{
-			QList<QByteArray> commandQuery = query;
-			commandQuery.removeFirst();
-			rootModel = new imtbase::CTreeItemModel();
-			rootModel->SetData(PageEnum::ID,*m_pageIdAttrPtr);
-			imtbase::CTreeItemModel* commandsModel = m_representationCommandProviderCompPtr->GetTreeItemModel(commandQuery, params);
-			rootModel->SetExternTreeModel(PageEnum::COMMANDS, commandsModel);
+		if (fields[indexField] == PageEnum::NAME){
+			rootModel->SetData(PageEnum::NAME, *m_pageNameAttrPtr);
+		}
+		if (fields[indexField] == PageEnum::ICON){
+			rootModel->SetData(PageEnum::ICON, *m_pageDefaultStatusIcon);
+		}
+		if (fields[indexField] == PageEnum::ICON_ON_SELECTED){
+			rootModel->SetData(PageEnum::ICON_ON_SELECTED,*m_pageOnSelectedStatusIcon);
+		}
+		if (fields[indexField] == PageEnum::ICON_OFF_SELECTED){
+			rootModel->SetData(PageEnum::ICON_OFF_SELECTED,*m_pageOffSelectedStatusIcon);
+		}
+		if (fields[indexField] == PageEnum::ENABLED){
+			rootModel->SetData(PageEnum::ENABLED,"true");
 		}
 	}
 

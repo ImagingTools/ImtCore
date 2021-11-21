@@ -41,12 +41,12 @@ bool CApplicationRepresentationDataProviderCompBase::GetRepresentationData(
 	bool retVal = false;
 
 	if (m_slaveRepresentationDataProviderCompPtr.IsValid()){
-		imtbase::CTreeItemModel *rootModel = m_slaveRepresentationDataProviderCompPtr->GetTreeItemModel(query, params);
-		if (rootModel != nullptr){
-			iser::CJsonStringWriteArchive archive(representationData);
-			retVal = rootModel->Serialize(archive);
-			delete rootModel;
-		}
+//		imtbase::CTreeItemModel *rootModel = m_slaveRepresentationDataProviderCompPtr->GetTreeItemModel(query, params);
+//		if (rootModel != nullptr){
+//			iser::CJsonStringWriteArchive archive(representationData);
+//			retVal = rootModel->Serialize(archive);
+//			delete rootModel;
+//		}
 	}
 
 	return retVal;

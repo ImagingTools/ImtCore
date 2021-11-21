@@ -19,6 +19,11 @@ I_EXPORT_COMPONENT(
 			"General API client",
 			"GraphQL API Client");
 
+I_EXPORT_COMPONENT(
+			GraphQLServlet,
+			"GraphQLServlet",
+			"GraphQL Receiver");
+
 
 } // namespace ImtGqlPck
 

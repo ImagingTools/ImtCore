@@ -1,24 +1,13 @@
 <RCC>
-    <qresource prefix="/qml">
-        <file alias="MainWindow.qml">Resources/qml/MainWindow.qml</file>
-        <file alias="WrapItem.qml">Resources/qml/WrapItem.qml</file>
-        <file alias="ThumbnailDecorator.qml">Resources/qml/ThumbnailDecorator.qml</file>
-        <file alias="AuxComponents/Button.qml">Resources/qml/AuxComponents/Button.qml</file>
-        <file alias="AuxComponents/MenuPanel.qml">Resources/qml/AuxComponents/MenuPanel.qml</file>
-        <file alias="AuxComponents/TopPanel.qml">Resources/qml/AuxComponents/TopPanel.qml</file>
-        <file alias="AuxComponents/MenuPanelButton.qml">Resources/qml/AuxComponents/MenuPanelButton.qml</file>
-        <file alias="AuxComponents/ToolButton.qml">Resources/qml/AuxComponents/ToolButton.qml</file>
-        <file alias="AuxComponents/AcfTest.qml">Resources/qml/AuxComponents/Acf.qml</file>
-        <file alias="AuxComponents/TopButton.qml">Resources/qml/AuxComponents/TopButton.qml</file>
-        <file alias="AuxComponents/Table.qml">Resources/qml/AuxComponents/Table.qml</file>
-        <file alias="AuxComponents/TabPanel.qml">Resources/qml/AuxComponents/TabPanel.qml</file>
-        <file alias="AuxComponents/TableDelegate.qml">Resources/qml/AuxComponents/TableDelegate.qml</file>
-        <file alias="AuxComponents/TabDelegate.qml">Resources/qml/AuxComponents/TabDelegate.qml</file>
-        <file alias="JSONListModel.qml">Resources/qml/JSONListModel.qml</file>
-        <file alias="jsonpath.js">Resources/qml/jsonpath.js</file>
-        <file alias="TreeItemModel.qml">Resources/qml/TreeItemModel.qml</file>
-        <file alias="GraphQLRequest.js">Resources/qml/GraphQLRequest.js</file>
-        <file alias="GqlModel.qml">Resources/qml/GqlModel.qml</file>
+	<qresource prefix="/qml">
+		<file alias="MainWindow.qml">Qml/MainWindow.qml</file>
+		<file alias="WrapItem.qml">Qml/WrapItem.qml</file>
+		<file alias="imtqml/JSONListModel.qml">Qml/imtqml/JSONListModel.qml</file>
+		<file alias="imtqml/jsonpath.js">Qml/imtqml/jsonpath.js</file>
+		<file alias="imtqml/TreeItemModel.qml">Qml/imtqml/TreeItemModel.qml</file>
+		<file alias="imtqml/GraphQLRequest.js">Qml/imtqml/GraphQLRequest.js</file>
+		<file alias="imtqml/GqlModel.qml">Qml/imtqml/GqlModel.qml</file>
+		<file alias="imtqml/qmldir">Qml/imtqml/qmldir</file>
     </qresource>
     <qresource prefix="/Icons">
         <file alias="DeleteStylized.svg">Resources/Icons/DeleteStylized.svg</file>
