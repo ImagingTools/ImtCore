@@ -94,7 +94,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 					<< "\n\t| Executed query" << queryString
 					<< "\n\t| Bind Values" << bindValues
 					<< "\n\t| Bound Values" << retVal.boundValues()
-					<< "\n\t| QExecuted query" << ::qPrintable(retVal.executedQuery());
+					<< "\n\t| Executed query" << ::qPrintable(retVal.executedQuery());
 	}
 
 	return retVal;
