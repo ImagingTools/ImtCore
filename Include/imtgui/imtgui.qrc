@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/qml">
+		<file alias="imtgui/qmldir">Qml/imtgui/qmldir</file>
+		<file alias="imtgui/ThumbnailDecorator.qml">Qml/imtgui/ThumbnailDecorator.qml</file>
+		<file alias="imtgui/AuxComponents/Button.qml">Qml/imtgui/AuxComponents/Button.qml</file>
+		<file alias="imtgui/AuxComponents/MenuPanel.qml">Qml/imtgui/AuxComponents/MenuPanel.qml</file>
+		<file alias="imtgui/AuxComponents/TopPanel.qml">Qml/imtgui/AuxComponents/TopPanel.qml</file>
+		<file alias="imtgui/AuxComponents/MenuPanelButton.qml">Qml/imtgui/AuxComponents/MenuPanelButton.qml</file>
+		<file alias="imtgui/AuxComponents/ToolButton.qml">Qml/imtgui/AuxComponents/ToolButton.qml</file>
+		<file alias="imtgui/AuxComponents/TopButton.qml">Qml/imtgui/AuxComponents/TopButton.qml</file>
+		<file alias="imtgui/AuxComponents/Table.qml">Qml/imtgui/AuxComponents/Table.qml</file>
+		<file alias="imtgui/AuxComponents/AuxTable.qml">Qml/imtgui/AuxComponents/AuxTable.qml</file>
+		<file alias="imtgui/AuxComponents/TabPanel.qml">Qml/imtgui/AuxComponents/TabPanel.qml</file>
+		<file alias="imtgui/AuxComponents/TableDelegate.qml">Qml/imtgui/AuxComponents/TableDelegate.qml</file>
+		<file alias="imtgui/AuxComponents/TabDelegate.qml">Qml/imtgui/AuxComponents/TabDelegate.qml</file>
+    </qresource>
+    <qresource prefix="/Fonts">
+        <file alias="Ubuntu-Regular.ttf">Qml/Fonts/Ubuntu-Regular.ttf</file>
+    </qresource>
+</RCC>

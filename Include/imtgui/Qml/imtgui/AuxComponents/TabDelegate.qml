@@ -1,0 +1,109 @@
+import QtQuick 2.12
+
+Rectangle{
+    id: tabDelegate;
+    height: 40;
+    width: 120;
+    color: selected ? "white" : "transparent";
+
+    property bool selected: false;
+    property bool firstElement: false;
+    property string text: "no name";
+    property string firstElementText: "text";
+    property int fontSize: 12;
+    property string fontName: "";
+    property string textColor: "#335777";
+    property string firstElementImageSource: "../../Icons/Workflow.svg";
+    property string closeButtonImageSource: "../../Icons/DeleteStylized.svg";
+    signal clicked;
+    signal closeSignal;
+
+    MouseArea{
+        id: ma;
+        anchors.fill: parent;
+//        enabled: tabDelegate.visible;
+//        hoverEnabled: enabled;
+//        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+        onClicked: {
+        tabDelegate.clicked();
+        }
+    }
+
+    Rectangle{
+        id: selection;
+        anchors.bottom: parent.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        height: 2;
+        color: "#FF4500";
+        visible: selected;
+    }
+
+    Item {
+        id: imagetabDelegate;
+        height: parent.height;
+        width: visible ? height : 1;
+        visible: tabDelegate.firstElement;
+
+        Image {
+            id: firsElementImage;
+            anchors.centerIn: parent;
+            width: parent.width * 0.6;
+            height: parent.height * 0.6;
+//            sourceSize.width: width;
+//            sourceSize.height: height;
+            fillMode: Image.PreserveAspectFit;
+            source: tabDelegate.firstElementImageSource;
+        }
+    }
+
+    Item {
+        id: closeButton;
+        anchors.right: parent.right;
+        anchors.rightMargin: 8;
+        anchors.verticalCenter: parent.verticalCenter;
+        height: parent.height * 0.4;
+        width: height;
+        visible: !firstElement;
+        Image {
+            id: closeImage;
+            anchors.centerIn: parent;
+            width: parent.width;
+            height: parent.height;
+//            sourceSize.width: width;
+//            sourceSize.height: height;
+            fillMode: Image.PreserveAspectFit;
+            source: tabDelegate.closeButtonImageSource;
+        }
+
+        MouseArea{
+            id: closeMA;
+            anchors.fill: parent;
+//            enabled: tabDelegate.visible;
+//            hoverEnabled: enabled;
+//            cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+            onClicked: {
+            tabDelegate.closeSignal();
+            }
+        }
+    }
+
+    Item {
+        id: texttabDelegate;
+        anchors.top: parent.top;
+        anchors.bottom: parent.bottom;
+        anchors.left: imagetabDelegate.right;
+        anchors.right: closeButton.left;
+        Text {
+            id: text;
+            anchors.centerIn: parent;
+            text: tabDelegate.firstElement ? tabDelegate.firstElementText : tabDelegate.text;
+          //  text: tabDelegate.text
+            color: tabDelegate.textColor;
+            font.pixelSize: tabDelegate.fontSize;
+            font.family: tabDelegate.fontName;
+
+        }
+    }
+
+}
