@@ -94,7 +94,7 @@ bool CDatabaseObjectCollectionComp::RemoveObject(const QByteArray& objectId)
 bool CDatabaseObjectCollectionComp::SetObjectData(
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
-			CompatibilityMode /*mode*/)
+			CompatibilityMode mode)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return false;
@@ -110,7 +110,7 @@ bool CDatabaseObjectCollectionComp::SetObjectData(
 	if (ExecuteTransaction(query)){
 		istd::CChangeNotifier changeNotifier(this);
 
-		BaseClass2::RemoveObject(objectId);
+		BaseClass2::SetObjectData(objectId, object, mode);
 
 		return true;
 	}

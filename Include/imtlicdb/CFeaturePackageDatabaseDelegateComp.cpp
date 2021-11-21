@@ -204,12 +204,32 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 		}
 	}
 
-	// Add new features to the package:
+	// Delete removed features to the package:
 	for (const QByteArray& removedFeatureId : removedFeatures){
 		retVal += "\n" +
-					QString("DELETE FROM Features WHERE Id = '%1' AND PackageId = %2;")
+					QString("DELETE FROM Features WHERE Id = '%1' AND PackageId = '%2';")
 								.arg(qPrintable(removedFeatureId))
 								.arg(qPrintable(newPackageId)).toLocal8Bit();
+	}
+
+	// Update changed features in the package:
+	for (const QByteArray& updatedFeatureId : updatedFeatures){
+		const imtlic::IFeatureInfo* featureInfoPtr = newObjectPtr->FindFeatureById(updatedFeatureId);
+		if (featureInfoPtr != nullptr){
+			QByteArray collectionId = newObjectPtr->GetFeatureCollectionId(updatedFeatureId);
+
+			QString featureName = featureInfoPtr->GetFeatureName();
+			QString featureDescription = newObjectPtr->GetFeatureList().GetElementInfo(
+				collectionId,
+				imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
+			retVal += "\n" +
+				QString("UPDATE Features SET Id = '%1', Name = '%2', Description = '%3', PackageId = '%4' WHERE PackageId = '%4';")
+				.arg(qPrintable(updatedFeatureId))
+				.arg(featureName)
+				.arg(featureDescription)
+				.arg(qPrintable(newPackageId)).toLocal8Bit();
+		}
 	}
 
 	return retVal;
@@ -301,6 +321,17 @@ void CFeaturePackageDatabaseDelegateComp::GenerateDifferences(
 
 			if (!newFeaturePtr->IsEqual(*currentFeaturePtr)){
 				updatedFeatures.push_back(currentFeatureId);
+			}
+			else{
+				QByteArray newCollectionId = newPackage.GetFeatureCollectionId(currentFeatureId);
+				QString newFeatureDescription = newPackage.GetFeatureList().GetElementInfo(newCollectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
+				QByteArray currentCollectionId = currentPackage.GetFeatureCollectionId(currentFeatureId);
+				QString currentFeatureDescription = currentPackage.GetFeatureList().GetElementInfo(newCollectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
+				if (newFeatureDescription != currentFeatureDescription){
+					updatedFeatures.push_back(currentFeatureId);
+				}
 			}
 		}
 	}

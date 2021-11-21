@@ -283,6 +283,12 @@ bool CFeaturePackage::Serialize(iser::IArchive& archive)
 
 // reimplemented (istd::IChangeable)
 
+int CFeaturePackage::GetSupportedOperations() const
+{
+	return SO_COPY | SO_COMPARE | SO_RESET;
+}
+
+
 bool CFeaturePackage::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
@@ -294,7 +300,6 @@ bool CFeaturePackage::CopyFrom(const IChangeable& object, CompatibilityMode mode
 
 	const CFeaturePackage* sourcePtr = dynamic_cast<const CFeaturePackage*>(&object);
 	if (sourcePtr != nullptr){
-
 		m_dependencies = sourcePtr->m_dependencies;
 		m_parents = sourcePtr->m_parents;
 		m_packageId = sourcePtr->m_packageId;
@@ -302,6 +307,20 @@ bool CFeaturePackage::CopyFrom(const IChangeable& object, CompatibilityMode mode
 		return true;
 	}
 
+	return false;
+}
+
+
+bool CFeaturePackage::IsEqual(const IChangeable& object) const
+{
+	const CFeaturePackage* sourcePtr = dynamic_cast<const CFeaturePackage*>(&object);
+	if (sourcePtr != nullptr){
+		return
+					m_dependencies == sourcePtr->m_dependencies &&
+					m_parents.IsEqual(sourcePtr->m_parents) &&
+					m_packageId == sourcePtr->m_packageId;
+	}
+	
 	return false;
 }
 
