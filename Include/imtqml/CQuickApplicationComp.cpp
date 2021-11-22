@@ -94,14 +94,6 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 		engine->addImportPath("qrc:/qml");
 		engine->load(QUrl("qrc:/qml/MainWindow.qml"));
 
-
-//		QQmlContext *ctxt = engine->rootContext();
-//		imtqml::Acf *acf = new imtqml::Acf(engine);
-//		ctxt->setContextProperty("Acf2", acf);
-//		qmlRegisterSingletonInstance<imtqml::Acf>("ACFS", 1, 0, "AcfS", acf);
-////		qmlRegisterType<imtqml::Acf>("ACFS", 1, 0, "AcfS");
-
-
 		if (m_allowApplicationCloseModelCompPtr.IsValid()){
 			m_allowApplicationCloseModelCompPtr->AttachObserver(this);
 		}
@@ -109,12 +101,14 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 		if (m_mainQuickCompPtr.IsValid()){
 			imtqml::IQuickObject *quickObjectPtr = m_mainQuickCompPtr.GetPtr();
 			if (quickObjectPtr != nullptr){
-
 				QObject *root = engine->rootObjects()[0];
-				QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
-				QQuickItem* mainItem = window->contentItem();
-
-				quickObjectPtr->CreateQuickItem(mainItem);
+				if (root != nullptr){
+					QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
+					if (window != nullptr){
+						QQuickItem* mainItem = window->contentItem();
+						quickObjectPtr->CreateQuickItem(mainItem);
+					}
+				}
 			}
 		}
 
