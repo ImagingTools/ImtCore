@@ -80,8 +80,8 @@ SUBDIRS += imtzip
 imtzip.file = ../../Include/imtzip/QMake/imtzip.pro
 
 !macx {
-    SUBDIRS += imtpy
-    imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
+	SUBDIRS += imtpy
+	imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
 }
 
 SUBDIRS += imtqml
@@ -97,6 +97,9 @@ imtlicgui.depends = DesignTokenCreatorExe
 SUBDIRS += imtgql
 imtgql.file = ../../Include/imtgql/QMake/imtgql.pro
 
+SUBDIRS += imtguigql
+imtguigql.file = ../../Include/imtguigql/QMake/imtguigql.pro
+
 SUBDIRS += imtdb
 imtdb.file = ../../Include/imtdb/QMake/imtdb.pro
 
@@ -104,7 +107,6 @@ SUBDIRS += imtlicdb
 imtlicdb.file = ../../Include/imtlicdb/QMake/imtlicdb.pro
 
 ######### Component packages
-
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
 ImtCorePck.depends = imtbase
@@ -164,6 +166,10 @@ SUBDIRS += ImtGuiPck
 ImtGuiPck.file = ../../Impl/ImtGuiPck/QMake/ImtGuiPck.pro
 ImtGuiPck.depends = imt3d imt3proc imtgui
 
+SUBDIRS += ImtGuiGqlPck
+ImtGuiGqlPck.file = ../../Impl/ImtGuiGqlPck/QMake/ImtGuiGqlPck.pro
+ImtGuiGqlPck.depends = imtgui imtguigql imtgql
+
 SUBDIRS += ImtQmlPck
 ImtQmlPck.file = ../../Impl/ImtQmlPck/QMake/ImtQmlPck.pro
 
@@ -200,27 +206,4 @@ ImtGqlPck.depends = imtgql
 SUBDIRS += ImtLicenseDbPck
 ImtLicenseDbPck.file = ../../Impl/ImtLicenseDbPck/QMake/ImtLicenseDbPck.pro
 ImtLicenseDbPck.depends = imtlic imtlicdb
-
-
-
-
-# Application
-#!linux{
-#	SUBDIRS += EagleView
-#	EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
-#	EagleView.depends = Imt3dViewPck Imt3dGuiPck
-#}
-
-## Tutorials
-#	SUBDIRS += imtservletdemo
-#	imtservletdemo.file = ../../Docs/Tutorials/Include/imtservletdemo/QMake/imtservletdemo.pro
-
-#	SUBDIRS += ServletDemoPck
-#	ServletDemoPck.file = ../../Docs/Tutorials/Impl/ServletDemoPck/QMake/ServletDemoPck.pro
-#        ServletDemoPck.depends = ImtRestPck ImtCorePck imtservletdemo
-#	ServletDemoPck.depends = ImtRestPck ImtCorePck imtservletdemo
-
-#	SUBDIRS += ServerDemo
-#	ServerDemo.file = ../../Docs/Tutorials/Impl/ServerDemo/QMake/ServerDemo.pro
-#	ServerDemo.depends = ServletDemoPck
 
