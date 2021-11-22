@@ -101,12 +101,18 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 		if (m_mainQuickCompPtr.IsValid()){
 			imtqml::IQuickObject *quickObjectPtr = m_mainQuickCompPtr.GetPtr();
 			if (quickObjectPtr != nullptr){
-				QObject *root = engine->rootObjects()[0];
-				if (root != nullptr){
-					QQuickWindow *window = qobject_cast<QQuickWindow *>(root);
+
+				QList<QObject*> rootObjects = engine->rootObjects();
+				if (!rootObjects.isEmpty()){
+					QObject* root = rootObjects[0];
+					Q_ASSERT(root != nullptr);
+
+					QQuickWindow* window = qobject_cast<QQuickWindow*>(root);
 					if (window != nullptr){
 						QQuickItem* mainItem = window->contentItem();
-						quickObjectPtr->CreateQuickItem(mainItem);
+						if (mainItem != nullptr){
+							quickObjectPtr->CreateQuickItem(mainItem);
+						}
 					}
 				}
 			}
