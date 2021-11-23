@@ -66,9 +66,9 @@ function(GenerateDesignTokenExt DESIGN_TOKEN_CREATOR_COMMAND_PARAM_IMAGES_INPUT_
 get_target_name(TARGETNAME)
 set(COMPILER_DIR ${CMAKE_BUILD_TYPE}${TARGETNAME})
 if (WIN32)
-	set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreatorExe.exe")
+	set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreator.exe")
 else()
-	set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreatorExe")
+	set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreator")
 endif()
 
 #  Setting the executable absolutely file path for specific OS
