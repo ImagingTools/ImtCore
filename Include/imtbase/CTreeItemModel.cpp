@@ -460,7 +460,7 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 		Item *item = m_items[i];
 		QList<QByteArray> keys;
 		item->GetKeys(keys);
-		if (isMultiTag == true){
+		if (isMultiTag == true && !keys.isEmpty() && keys[0] != ""){
 			retVal = retVal && archive.BeginTag(subArrayTag);
 		}
 		for (const QByteArray& key: keys){
@@ -508,7 +508,7 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 			}
 
 		}
-		if (isMultiTag == true){
+		if (isMultiTag == true && !keys.isEmpty() && keys[0] != ""){
 			retVal = retVal && archive.EndTag(subArrayTag);
 		}
 	}
