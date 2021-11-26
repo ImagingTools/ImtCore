@@ -37,7 +37,7 @@ Rectangle {
         height: 30;
         iconSource:"../../Icons/Left.svg";
         onClicked: {
-            console.log("Left ckicked");
+            console.log("Left ckicked!");
         }
     }
 
@@ -50,6 +50,23 @@ Rectangle {
         height: 30;
         iconSource:"../../Icons/Right.svg";
     }
+
+    Button {
+        id: preferenceButton;
+        z: 100;
+        anchors.top: parent.top;
+        anchors.right: parent.right;
+        anchors.rightMargin: 10;
+        anchors.topMargin: 10;
+        width: 30;
+        height: 30;
+        color: "red";
+        onClicked: {
+            console.log("Preference button clicked !");
+            preference.visible = true;
+        }
+    }
+
 
     Text {
         id: titleText;

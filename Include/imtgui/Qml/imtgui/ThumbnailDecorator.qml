@@ -65,5 +65,32 @@ Rectangle
         fontName: container.fontName;
     }
 
+    TreeView {
+        id: treeView;
+        width: 200;
+        height: parent.height - topPanel.height;
+        anchors.top: topPanel.bottom;
+        anchors.right: parent.right;
+    }
 
+    Rectangle {
+        id: darkBackground;
+        anchors.fill: parent;
+        color: "gray";
+        opacity: 0.8;
+        visible: preference.visible;
+
+        MouseArea {
+            anchors.fill: parent;
+        }
+    }
+
+    Preference {
+        id: preference;
+        visible: false;
+        width: parent.width > 500 ? 500 : parent.width * 0.9;
+        height: parent.height > 450 ? 450 : parent.height * 0.9;
+        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.verticalCenter: parent.verticalCenter;
+    }
 }

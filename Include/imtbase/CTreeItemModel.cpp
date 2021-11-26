@@ -94,7 +94,7 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap &infoMap)
 }
 
 
-CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int index)
+imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int index)
 {
 	if (m_items.isEmpty() && index == 0){
 		InsertNewItem();
@@ -112,10 +112,11 @@ CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int index)
 //	QVariant v = QVariant::fromValue((void*)smartPtr);
 	QVariant v = QVariant::fromValue(retVal);
 
-	item->SetValue(key, v);
+	SetData(key, v, index);
 
 	return retVal;
 }
+
 
 bool CTreeItemModel::SetExternTreeModel(const QByteArray &key, CTreeItemModel *externTreeModel, int index)
 {
@@ -132,7 +133,7 @@ bool CTreeItemModel::SetExternTreeModel(const QByteArray &key, CTreeItemModel *e
 		externTreeModel->setParent(this);
 	}
 	QVariant v = QVariant::fromValue(externTreeModel);
-	item->SetValue(key, v);
+	SetData(key, v, index);
 
 	return true;
 }
@@ -251,6 +252,12 @@ QVariant CTreeItemModel::GetData(const QByteArray &key, int index) const
 }
 
 
+imtbase::CTreeItemModel *CTreeItemModel::GetParent() const
+{
+	return dynamic_cast<CTreeItemModel*>(this->parent());
+}
+
+
 bool CTreeItemModel::IsTreeModel(const QByteArray &key, int index) const
 {
 	return GetTreeItemModel(key,index) != nullptr;
@@ -269,7 +276,7 @@ bool CTreeItemModel::ContainsKey(const QByteArray &key, int index) const
 }
 
 
-CTreeItemModel* CTreeItemModel::GetTreeItemModel(const QByteArray &key, int index) const
+imtbase::CTreeItemModel* CTreeItemModel::GetTreeItemModel(const QByteArray &key, int index) const
 {
 	QVariant data = GetData(key, index);
 	if (data.isValid()){

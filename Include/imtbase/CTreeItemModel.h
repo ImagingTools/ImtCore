@@ -40,15 +40,16 @@ public:
 public Q_SLOTS:
 	int InsertNewItem();
 	int RemoveItem(int index, const ChangeInfoMap& infoMap = ChangeInfoMap());
-	CTreeItemModel* AddTreeModel(const QByteArray &key, int index = 0);
+	imtbase::CTreeItemModel* AddTreeModel(const QByteArray &key, int index = 0);
 	bool SetExternTreeModel(const QByteArray &key, CTreeItemModel *externTreeModel, int index = 0);
 	bool CopyItemDataFromModel(int index, CTreeItemModel *externTreeModel, int externIndex = 0);
 	bool SetData(const QByteArray &key, const QVariant &value, int index = 0, const ChangeInfoMap& infoMap = ChangeInfoMap());
 	bool RemoveData(const QByteArray &key, int index = 0, const ChangeInfoMap& infoMap = ChangeInfoMap());
 	QVariant GetData(const QByteArray &key, int index = 0) const;
+	imtbase::CTreeItemModel* GetParent() const;
 	bool IsTreeModel(const QByteArray &key, int index = 0) const;
 	bool ContainsKey(const QByteArray &key, int index = 0) const;
-	CTreeItemModel* GetTreeItemModel(const QByteArray &key, int index = 0) const;
+	imtbase::CTreeItemModel* GetTreeItemModel(const QByteArray &key, int index = 0) const;
 	int GetItemsCount() const;
 	void GetKeys(QList<QByteArray>& keys, int index = 0);
 	void Clear();
