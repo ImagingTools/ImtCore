@@ -205,3 +205,9 @@ var GqlRequest = function(requestType, commandId){
     }  
 }
 
+var Gql = {
+    Field: Field,
+    GqlObject: GqlObject,
+    GqlRequest: GqlRequest,
+}
+

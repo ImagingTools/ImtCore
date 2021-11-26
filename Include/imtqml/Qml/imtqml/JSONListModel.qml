@@ -1,38 +1,40 @@
 import QtQuick 2.0
-import "jsonpath.js" as JSONPath
+import "jsonpath.js"
 
 ListModel {
-	property string source: ""
-	property string json: ""
-	property string query: ""
-	property string target: ""
+	property string source: "";
+	property string json: "";
+	property string query: "";
+	property string target: "";
 
 //	property ListModel model : ListModel { id: jsonModel }
 //	property alias count: jsonModel.count
-    property string state
+    property string state;
 
 	onSourceChanged: {
-		state = "Loading"
-        if(source == "")
+		this.state = "Loading"
+        if(this.source == "")
             return
 		var xhr = new XMLHttpRequest;
 		xhr.open("GET", source);
-		xhr.onreadystatechange = function() {
+        xhr.onreadystatechange = () => {
             if (xhr.readyState === XMLHttpRequest.DONE){
-				json = xhr.responseText;
-                updateJSONModel()
+		this.json = xhr.responseText;
+                this.updateJSONModel()
 //                console.log("Model",jsonModel.$items)
-                state = "Ready"
+                this.state = "Ready"
             }
 		}
 		xhr.send();
 	}
 
     //onJsonChanged: updateJSONModel()
-	onQueryChanged: updateJSONModel()
+	onQueryChanged: {
+		this.updateJSONModel()
+	}
 
 	function makeJson(){
-		json = JSON.stringify(jsonModel.$items)
+		this.json = JSON.stringify(jsonModel.$items)
 	}
 	function sendJson(method){
 		var xhr = new XMLHttpRequest;
@@ -41,29 +43,31 @@ ListModel {
 	}
 
     function updateJSONModel() {
-    clear();
+        if ( this.json === "" )
+            return;
 
-	if ( json === "" )
-	    return;
-	var d1 = new Date()
-	var objectArray = parseJSONString(json, query);
-	var dict = {};
-	for ( var key in objectArray ) {
-	    var jo = objectArray[key];
-	    dict[key] = jo
-	}
-        append(dict);
-	var d2 = new Date()
-	console.log(d2.getMilliseconds() - d1.getMilliseconds())
+        this.clear();
+		var d1 = new Date()
+        var objectArray = this.parseJSONString(this.json, this.query);
+		var dict = {};
+		for ( var key in objectArray ) {
+			var jo = objectArray[key];
+			dict[key] = jo
+		}
+			this.append(dict);
+		var d2 = new Date()
+		console.log(d2.getMilliseconds() - d1.getMilliseconds())
     }
     
 	function parseJSONString(jsonString, jsonPathQuery) {
 		var objectArray = JSON.parse(jsonString);
 		if ( jsonPathQuery !== "" )
-			objectArray = JSONPath.jsonPath(objectArray, jsonPathQuery);
+			objectArray = jsonPath(objectArray, jsonPathQuery);
 
 		return objectArray;
 	}
 
-	Component.onCompleted: updateJSONModel();
+	Component.onCompleted: {
+		this.updateJSONModel();
+	}
 }

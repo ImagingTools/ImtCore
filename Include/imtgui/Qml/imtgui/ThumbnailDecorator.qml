@@ -30,6 +30,7 @@ Rectangle
 
     TopPanel{
         id: topPanel;
+//        title: "Test";
         title: menuPanel.activePageName;
         activePageId: menuPanel.activePageId;
 //        fontName: container.fontName;
@@ -39,8 +40,8 @@ Rectangle
         id: menuPanel;
         anchors.top: topPanel.bottom;
         anchors.bottom: parent.bottom;
-        textColor: container.textColor;
-        fontName: container.fontName;
+//        textColor: container.textColor;
+//        fontName: container.fontName;
     }
 
     TabPanel{

@@ -9,8 +9,7 @@ Rectangle {
     color: "#e5e5e7";
     property string fontName: "";
     property string activePageId;
-//    property alias model: lvButtons.model;
-    property alias title: title.text;
+    property alias title: titleText.text;
 
     gradient: Gradient {
              GradientStop { position: 0.0; color: "#e5e5e7"; }
@@ -20,13 +19,13 @@ Rectangle {
          }
 
     onActivePageIdChanged: {
-        console.log("onActivePageIdChanged", topPanel.activePageId)
+        console.log("onActivePageIdChanged", topPanel.activePageId);
         commandsModel.updateModel();
     }
 
     onTitleChanged: {
-        console.log("onTitleChanged", topPanel.title)
-        console.log("onActivePageIdChanged", topPanel.activePageId)
+        console.log("onTitleChanged", topPanel.title);
+        console.log("onActivePageIdChanged", topPanel.activePageId);
 
     }
 
@@ -53,7 +52,7 @@ Rectangle {
     }
 
     Text {
-        id: title;
+        id: titleText;
         anchors.left: nextStack.right;
         anchors.leftMargin: 10;
         anchors.verticalCenter: parent.verticalCenter;
@@ -62,11 +61,6 @@ Rectangle {
         font.family: "Helvetica";
         font.pixelSize: 25;
     }
-
-////    TopButton {
-////        anchors.centerIn: parent
-////        //text: "Test"
-////    }
 
     Item {
         anchors.left: nextStack.right;
@@ -90,16 +84,12 @@ Rectangle {
     }
 
     GqlModel {
-        id: commandsModel
-        Component.onCompleted: {
-//            updateModel();
-        }
+        id: commandsModel;
 
-        function updateModel(){
-            console.log( "updateModel")
+        function updateModel() {
+            console.log( "updateModel");
 
-
-            var query = Gql.GqlRequest("query", "CommandsData") ;
+            var query = Gql.GqlRequest("query", "CommandsData");
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField(PageEnum.ID);
@@ -113,27 +103,23 @@ Rectangle {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log(gqlData);
-            commandsModel.SetGqlQuery(gqlData)
+//            console.log(gqlData);
+            this.SetGqlQuery(gqlData);
         }
 
         onStateChanged: {
-            console.log("State:",state, commandsModel)
-            if (state == "Ready"){
-//                            console.log(registrationModel.GetData("data"))
-//                            console.log(registrationModel.GetData("errors"))
-                var dataModel = commandsModel.GetData("data");
-                if(dataModel.ContainsKey("CommandsData")){
-                    dataModel = dataModel.GetData("CommandsData");
-                    console.log("PagesData", dataModel);
-                    if(dataModel !== null && dataModel.ContainsKey("items")){
-                        dataModel = dataModel.GetData("items");
-                        console.log("items",dataModel);
-                        lvButtons.model = dataModel;
-                        dataModel.Refresh();
+            console.log("State:", this.state, commandsModel);
+            if (this.state === "Ready"){
+                var dataModelLocal = this.GetData("data");
+                if(dataModelLocal.ContainsKey("CommandsData")){
+                    dataModelLocal = dataModelLocal.GetData("CommandsData");
+                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
+                        dataModelLocal = dataModelLocal.GetData("items");
+//                        console.log("items",dataModelLocal);
+                        lvButtons.model = dataModelLocal;
                     }
                     else if(commandsModel.ContainsKey("errors")){
-                        var errorsModel = pagesModel.GetData("errors");
+                        var errorsModel = commandsModel.GetData("errors");
                         if(errorsModel !== null && errorsModel.ContainsKey("CommandsData")){
                             console.log("message", errorsModel.GetData("CommandsData").GetData("message"));
                         }

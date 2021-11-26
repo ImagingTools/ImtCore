@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
-
+//@using { src.GqlModel }
 
 
 Rectangle {
@@ -20,10 +20,27 @@ Rectangle {
         pagesModel.updateModel();
     }
 
+//    Component.onCompleted: {
+//        var item1 = this.createComponent('TreeItemModel.qml', this)
+//        item1.append([{'color': 'red'}, {'color': 'black'}, {'color': 'blue'}])
+//        console.log("item1",item1)
+//        lvPages.model = item1
+//    }
+
 
     ListView {
         id: lvPages;
         anchors.fill: parent;
+
+
+
+//        delegate:  Rectangle{
+//            width: 200; //menuPanel.width;
+//            height: 100; //width;
+//            color: "red";
+
+//        }
+
 
         delegate:  MenuPanelButton{
             width: menuPanel.width;
@@ -46,16 +63,11 @@ Rectangle {
 
     }
 
+
     GqlModel {
-        id: pagesModel
-        Component.onCompleted: {
-//            updateModel();
-        }
+        id: pagesModel;
 
         function updateModel(){
-            console.log( "updateModel")
-
-
             var query = Gql.GqlRequest("query", "PagesData") ;
 
             var queryFields = Gql.GqlObject("items");
@@ -63,31 +75,25 @@ Rectangle {
             queryFields.InsertField(PageEnum.NAME);
             queryFields.InsertField(PageEnum.ICON);
             query.AddField(queryFields);
-
             var gqlData = query.GetQuery();
-            console.log(gqlData);
-            pagesModel.SetGqlQuery(gqlData)
+            this.SetGqlQuery(gqlData)
         }
 
         onStateChanged: {
-            console.log("State:",state, pagesModel)
-            if (state == "Ready"){
-//                            console.log(registrationModel.GetData("data"))
-//                            console.log(registrationModel.GetData("errors"))
-                var dataModel = pagesModel.GetData("data");
-                if(dataModel.ContainsKey("PagesData")){
-                    dataModel = dataModel.GetData("PagesData")
-                    console.log("PagesData", dataModel)
-                    if(dataModel !== null && dataModel.ContainsKey("items")){
-                        dataModel = dataModel.GetData("items")
-                        console.log("items",dataModel)
-                        lvPages.model = dataModel
-                        dataModel.Refresh()
-                        menuPanel.activePageId = dataModel.GetData(PageEnum.ID);
-                        menuPanel.activePageName = dataModel.GetData(PageEnum.NAME);
-                        menuPanel.activeIcon = dataModel.GetData(PageEnum.ICON);
+            console.log("State:",this.state, pagesModel)
+            if (this.state == "Ready"){
+                var dataModelLocal = this.GetData("data");
+                if(dataModelLocal.ContainsKey("PagesData")){
+                    dataModelLocal = dataModelLocal.GetData("PagesData")
+                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
+                        dataModelLocal = dataModelLocal.GetData("items")
+                        lvPages.model = dataModelLocal
+
+                        menuPanel.activePageId = dataModelLocal.GetData(PageEnum.ID);
+                        menuPanel.activePageName = dataModelLocal.GetData(PageEnum.NAME);
+                        menuPanel.activeIcon = dataModelLocal.GetData(PageEnum.ICON);
                     }
-                    else if(registrationModel.ContainsKey("errors")){
+                    else if(this.ContainsKey("errors")){
                         var errorsModel = pagesModel.GetData("errors");
                         if(errorsModel !== null && errorsModel.ContainsKey("PagesData")){
                             console.log("message", errorsModel.GetData("PagesData").GetData("message"))

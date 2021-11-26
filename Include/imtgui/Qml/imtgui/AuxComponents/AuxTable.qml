@@ -9,8 +9,8 @@ Item {
     property bool fontBold: true;
     property string fontName: "";
     property string textColor: "#335777";
-    property real delegateWidth: count == 0 ? 0 : headersList.width/headersList.count;
-    property int count: headersArray.length;
+    property real delegateWidth: container.count == 0 ? 0 : headersList.width/headersList.count;
+    property int count: 3; //headersArray.length;
     property alias headersModel: headersList.model;
     property alias elementsModel: elementsList.model;
 
