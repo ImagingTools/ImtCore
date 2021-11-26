@@ -6,6 +6,7 @@ JSONListModel {
     property var infoPath: [];
     property string baseUrl;
     property var queryParams: [];
+    property bool isArray: false;
 
 //    function get(row){
 //        return container.get(row)
@@ -51,16 +52,16 @@ JSONListModel {
 
         modelObject[key] = value
 
-        var xhr = new XMLHttpRequest;
-        var json = {}
-        json[key] = value
-        for (var keyInfo in infoPath){
-            json[keyInfo] = infoPath[keyInfo]
-        }
-        var txt_data = JSON.stringify(json)
-        console.log("setData", json, txt_data, json.toString())
-        xhr.open("POST", target);
-        xhr.send(txt_data);
+//        var xhr = new XMLHttpRequest;
+//        var json = {}
+//        json[key] = value
+//        for (var keyInfo in this.infoPath){
+//            json[keyInfo] = this.infoPath[keyInfo]
+//        }
+//        var txt_data = JSON.stringify(json)
+//        console.log("setData", json, txt_data, json.toString())
+//        xhr.open("POST", target);
+//        xhr.send(txt_data);
     }
 
     function ContainsKey(key,row){
@@ -98,4 +99,20 @@ JSONListModel {
     function Refresh(){
 
     }
+
+    function SetIsArray(value){
+        this.isArray = value;
+    }
+
+    function InsertNewItem(){
+        this.append({});
+    }
+
+    function AddTreeModel(key, row){
+        var retModel;
+        retModel = this.createComponent("TreeItemModel.qml", this);
+        this.SetData(key, retModel, row);
+        return retModel;
+    }
+
 }

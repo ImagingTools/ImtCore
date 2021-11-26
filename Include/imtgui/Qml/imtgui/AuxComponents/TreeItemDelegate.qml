@@ -2,7 +2,7 @@ import QtQuick 2.0
 
 Item {
     id: treeItemDelegate;
-//    width: 100;
+    width: parent.width;
     height: isOpened ? mainRect.height + childrenColumn.height: mainRect.height;
     property bool isOpened: false;
     property int level: 0;
@@ -120,9 +120,9 @@ Item {
         Text{
             id: buttonClick;
             width: 10;
-            height: width
+            height: width;
             visible: repeater.count > 0;
-            text: isOpened ?  "-" : "+"
+            text: isOpened ?  "-" : "+";
             anchors.leftMargin: 10;
             anchors.left: checkBox.right;
             anchors.verticalCenter: parent.verticalCenter;
@@ -185,18 +185,29 @@ Item {
 
     Column {
         id: childrenColumn;
+        width: parent.width;
         visible: isOpened;
         anchors.top: mainRect.bottom;
         Repeater {
              id: repeater;
-
-             delegate: /*Component {*/
-                 Loader {
-                     id: loader;
-                     source: "TreeItemDelegate.qml";
-                     Component.onCompleted: setSource("TreeItemDelegate.qml", { "level": level + 1, "width" : treeItemDelegate.width })
+             width: parent.width;
+             delegate: Loader {
+                 id: loader;
+//                 source: "TreeItemDelegate.qml";
+                 Component.onCompleted: {
+//                     loader.item.level = treeItemDelegate.level + 1;
+                      setSource("TreeItemDelegate.qml", { "level": level + 1, "width" : treeItemDelegate.width })
                  }
-           //  }
+             }
+
+//              delegate: Loader {
+//                     id: loader;
+//                     source: "TreeItemDelegate.qml";
+//                     Component.onCompleted {
+//                         loader.item.level = level + 1;
+//                        // loader.setSource("TreeItemDelegate.qml", { "level": level + 1, "width" : treeItemDelegate.width })
+//                     }
+//                 }
         }
     }
 }

@@ -1,17 +1,17 @@
 import QtQuick 2.0
-//import QtQuick.Controls 2.15
+
 
 Rectangle {
     id: container;
     property string styleMode;
     property string styleColor: "Dark";
-    property color foneColor: styleColor == "Dark"? "#2b2d2d" : "white"
-    property color fontColor: styleColor == "Dark"? "#edefef" : "black"
+    property color foneColor: styleColor == "Dark"? "#2b2d2d" : "white";
+    property color fontColor: styleColor == "Dark"? "#edefef" : "black";
     property int radiusValue: 5;
 
     radius: radiusValue;
-    color: foneColor
-    border.color: "#2b2d2d"
+    color: foneColor;
+    border.color: "#2b2d2d";
 
     MouseArea {
         anchors.fill: parent;
@@ -19,14 +19,14 @@ Rectangle {
 
     Rectangle {
         id: body;
-        anchors.fill: parent
+        anchors.fill: parent;
 //       width: parent.width - 5;
 //       height: parent.height - 5;
        anchors.horizontalCenter: parent.horizontalCenter;
        anchors.verticalCenter: parent.verticalCenter;
        clip: true;
-       color: container.color
-       anchors.margins: 10
+       color: container.color;
+       anchors.margins: 10;
 
        Rectangle {
            id: topPanel;
@@ -36,10 +36,10 @@ Rectangle {
            color: container.color;
 
            Rectangle {
-               id: iconPref
+               id: iconPref;
                width: 20;
                height: 20;
-               color: styleColor == "Dark"? "white" : "#4C514A"
+               color: styleColor == "Dark"? "white" : "#4C514A";
                anchors.left: topPanel.left;
                anchors.verticalCenter: topPanel.verticalCenter;
                radius: radiusValue;
@@ -51,7 +51,7 @@ Rectangle {
                anchors.leftMargin: 10;
                anchors.verticalCenter: topPanel.verticalCenter;
                text: "Preferences";
-               color: fontColor
+               color: fontColor;
 
            }
 
@@ -61,7 +61,7 @@ Rectangle {
                anchors.verticalCenter: topPanel.verticalCenter;
                width: 20;
                height: 20;
-               color: "red"
+               color: "red";
                onClicked: {
                    container.visible = false;
                }
@@ -74,7 +74,7 @@ Rectangle {
            width: parent.width;
            height: 100;
            anchors.top: topPanel.bottom;
-           anchors.topMargin: 30
+           anchors.topMargin: 30;
            color: container.color;
            Text {
                id: versionTitle;
@@ -82,12 +82,12 @@ Rectangle {
                anchors.leftMargin: 30;
                anchors.top: versionBlock.top;
                text: "Version";
-               color: fontColor
+               color: fontColor;
            }
 
            Rectangle {
                id: line0;
-               anchors.topMargin: 10
+               anchors.topMargin: 10;
                anchors.top: versionTitle.bottom;
                width: parent.width;
                height: 1;
@@ -98,7 +98,7 @@ Rectangle {
            Text {
                id: versionValue;
                anchors.leftMargin: 30;
-               anchors.topMargin: 10
+               anchors.topMargin: 10;
                anchors.left: versionBlock.left;
                anchors.top: line0.bottom;
                text: "MIO Version";
@@ -117,10 +117,10 @@ Rectangle {
            Text {
                id: languageText;
                anchors.left: languageUnitBlock.left;
-               anchors.leftMargin: 30
+               anchors.leftMargin: 30;
                anchors.top: languageUnitBlock.top;
                text: "Language";
-               color: fontColor
+               color: fontColor;
            }
 
            Text {
@@ -128,12 +128,12 @@ Rectangle {
                x: parent.width / 2 + 30;
                anchors.top: versionBlock.top;
                text: "Unit";
-               color: fontColor
+               color: fontColor;
            }
 
            Rectangle {
                id: line;
-               anchors.topMargin: 10
+               anchors.topMargin: 10;
                anchors.top: languageText.bottom;
                width: parent.width;
                height: 1;
@@ -143,30 +143,30 @@ Rectangle {
            ComboBox {
                id: cbLang;
                anchors.leftMargin: 30;
-               anchors.topMargin: 10
+               anchors.topMargin: 10;
                anchors.top: line.bottom;
-               anchors.left: languageUnitBlock.left
+               anchors.left: languageUnitBlock.left;
                model: languageModel;
                foneColor: container.foneColor;
                fontColor: container.fontColor;
-               borderColor: styleColor == "Dark"? "white" : "#4C514A"
+               borderColor: styleColor == "Dark"? "white" : "#4C514A";
            }
 
            ComboBox {
                id: cbUnit;
                x: unitText.x;
-               anchors.topMargin: 10
+               anchors.topMargin: 10;
                anchors.top: line.bottom;
                model: unitModel;
                foneColor: container.foneColor;
                fontColor: container.fontColor;
-               borderColor: styleColor == "Dark"? "white" : "#4C514A"
+               borderColor: styleColor == "Dark"? "white" : "#4C514A";
            }
        }
 
        Rectangle {
            id: modeBlock;
-           z: 1
+           z: 1;
            width: parent.width;
            height: 100;
            anchors.top: languageUnitBlock.bottom;
@@ -179,12 +179,12 @@ Rectangle {
                //anchors.bottomMargin: 10;
                anchors.top: modeBlock.top;
                text: "Mode";
-               color: fontColor
+               color: fontColor;
            }
 
            Rectangle {
                id: line2;
-               anchors.topMargin: 10
+               anchors.topMargin: 10;
                anchors.top: modeText.bottom;
                width: parent.width;
                height: 1;
@@ -209,7 +209,7 @@ Rectangle {
                    text: "Dark";
                    anchors.top: darkMode.bottom;
                    anchors.topMargin: 10;
-                   color: fontColor
+                   color: fontColor;
                }
 
                MouseArea {
@@ -240,7 +240,7 @@ Rectangle {
                     text: "Light";
                     anchors.top: lightMode.bottom;
                     anchors.topMargin: 10;
-                    color: fontColor
+                    color: fontColor;
                }
 
                MouseArea {
@@ -258,22 +258,22 @@ Rectangle {
     ListModel {
         id: languageModel;
         ListElement {
-            text: "Русский"
+            text: "Русский";
         }
 
         ListElement {
-            text: "English"
+            text: "English";
         }
     }
 
     ListModel {
         id: unitModel;
         ListElement {
-            text: "Millimeters"
+            text: "Millimeters";
         }
 
         ListElement {
-            text: "Centimeters"
+            text: "Centimeters";
         }
     }
 

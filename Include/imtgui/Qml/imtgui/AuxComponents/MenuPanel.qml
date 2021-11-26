@@ -92,6 +92,8 @@ Rectangle {
                         menuPanel.activePageId = dataModelLocal.GetData(PageEnum.ID);
                         menuPanel.activePageName = dataModelLocal.GetData(PageEnum.NAME);
                         menuPanel.activeIcon = dataModelLocal.GetData(PageEnum.ICON);
+
+                        lvPages.__processUpdates();
                     }
                     else if(this.ContainsKey("errors")){
                         var errorsModel = pagesModel.GetData("errors");

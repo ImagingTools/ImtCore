@@ -19,11 +19,11 @@ Item {
         radius: radiusValue;
 
         Text {
-            id: title_txt
-            text: container.model.get(0).text;
+            id: title_txt;
+//            text: container.model.get(0).text;
             anchors.horizontalCenter: parent.horizontalCenter;
-            anchors.verticalCenter: parent.verticalCenter
-            color: fontColor
+            anchors.verticalCenter: parent.verticalCenter;
+            color: fontColor;
         }
 
         MouseArea {
@@ -40,7 +40,7 @@ Item {
         width: container.width;
         height: listView.count * container.height < 150 ? listView.count * container.height: 150;
         anchors.top: container.bottom;
-        color: "transparent"
+        color: "transparent";
         visible: false;
         ListView {
             id: listView;
@@ -65,7 +65,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter;
                         anchors.horizontalCenter: parent.horizontalCenter;
                         text: model.text;
-                        color: fontColor
+                        color: fontColor;
                     }
 
                     MouseArea {
