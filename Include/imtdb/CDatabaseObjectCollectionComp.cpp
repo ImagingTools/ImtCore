@@ -56,6 +56,25 @@ QByteArray CDatabaseObjectCollectionComp::InsertNewObject(
 	if (ExecuteTransaction(query)){
 		istd::CChangeNotifier changeNotifier(this);
 
+		idoc::CStandardDocumentMetaInfo collectionMetaInfo;
+
+		if (collectionItemMetaInfoPtr == nullptr){
+			collectionMetaInfo.SetMetaInfo(IObjectCollection::MIT_INSERTION_TIME, QDateTime::currentDateTime());
+			collectionMetaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, QDateTime::currentDateTime());
+
+			collectionItemMetaInfoPtr = &collectionMetaInfo;
+		}
+
+		imtbase::IMetaInfoCreator::MetaInfoPtr metaInfoPtr;
+
+		if (dataMetaInfoPtr == nullptr){
+			if (m_metaInfoCreatorCompPtr.IsValid() && (defaultValuePtr != nullptr)){
+				if (m_metaInfoCreatorCompPtr->CreateMetaInfo(defaultValuePtr, *m_typeIdAttrPtr, metaInfoPtr)){
+					dataMetaInfoPtr = metaInfoPtr.GetPtr();
+				}
+			}
+		}
+
 		QByteArray internalObjectId = BaseClass2::InsertNewObject(typeId, name, description, defaultValuePtr, objectId, dataMetaInfoPtr, collectionItemMetaInfoPtr);
 		Q_ASSERT(objectId == internalObjectId);
 
@@ -187,7 +206,12 @@ void CDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 			collectionMetaInfo.SetMetaInfo(IObjectCollection::MIT_INSERTION_TIME, added);
 			collectionMetaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, lastModified);
 
-			BaseClass2::InsertNewObject(*m_typeIdAttrPtr, name, description, objectPtr, "", nullptr, &collectionMetaInfo);
+			imtbase::IMetaInfoCreator::MetaInfoPtr metaInfoPtr;
+			if (m_metaInfoCreatorCompPtr.IsValid()){
+				m_metaInfoCreatorCompPtr->CreateMetaInfo(objectPtr, *m_typeIdAttrPtr, metaInfoPtr);
+			}
+
+			BaseClass2::InsertNewObject(*m_typeIdAttrPtr, name, description, objectPtr, "", metaInfoPtr.GetPtr(), &collectionMetaInfo);
 		}
 	}
 }
