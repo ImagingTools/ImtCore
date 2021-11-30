@@ -257,6 +257,9 @@ bool CDatabaseEngineComp::CreateDatabase() const
 			retVal = m_db.open();
 		}
 	}
+	else{
+		SendErrorMessage(0, QString("Maintanance database could not be opened. Error message: '%1'").arg(maintainanceDb.lastError().text()));
+	}
 
 	if (retVal){
 		if (*m_autoCreateTablesAttrPtr > 0 && m_tablesCreationScriptPathAttrPtr.IsValid()){
