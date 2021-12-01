@@ -178,13 +178,18 @@ bool CDatabaseEngineComp::OpenDatabase() const
 		m_db.close();
 	}
 
-	m_db = QSqlDatabase::addDatabase(*m_dbType, *m_dbName);
-	m_db.setHostName(*m_hostName);
-	m_db.setUserName(*m_userName);
-	m_db.setPassword(*m_pasword);
-	m_db.setDatabaseName(*m_dbName);
-	m_db.setPort(*m_port);
-	
+	m_db = QSqlDatabase::addDatabase(*m_dbType);
+	QString databaseName = *m_dbName;
+	if (m_dbType->GetValue().compare(QByteArray("QODBC"), Qt::CaseInsensitive) == 0){
+
+	}
+	else {
+		m_db.setHostName(*m_hostName);
+		m_db.setUserName(*m_userName);
+		m_db.setPassword(*m_pasword);
+		m_db.setPort(*m_port);
+	}
+	m_db.setDatabaseName(databaseName);
 	retVal = m_db.open();
 	if (!retVal){
 		SendErrorMessage(0, "Database could not be connected", "Database engine");

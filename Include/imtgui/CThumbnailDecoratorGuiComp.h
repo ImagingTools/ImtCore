@@ -31,6 +31,11 @@
 
 class QToolBar;
 
+namespace imtbase
+{
+	class CCollectionInfo;
+}
+
 
 namespace imtgui
 {
@@ -310,6 +315,7 @@ private:
 	PageVisualStatusObserver m_pageVisualStatusObserver;
 
 	QStandardItemModel m_menuItemModel;
+	imtbase::CCollectionInfo* m_widgetList;
 
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;

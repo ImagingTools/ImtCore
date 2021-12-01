@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QtDebug>
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QGuiApplication>
@@ -18,6 +19,7 @@
 
 // ImtCore includes
 #include <imtstyle/CImtStyle.h>
+#include <imtbase/CCollectionInfo.h>
 
 
 namespace imtgui
@@ -53,6 +55,12 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_maxWidth = 0;
 	m_maxHeight = 0;
 
+	m_widgetList = new imtbase::CCollectionInfo;
+
+	m_widgetList->InsertItem("Main", "Main","");
+	m_widgetList->InsertItem("TopFrame", "TopFrame","");
+	m_widgetList->InsertItem("AdditionalCommandsFrame", "AdditionalCommandsFrame","");
+
 	qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
 	qRegisterMetaType<QProcess::ProcessState>();
 }
@@ -62,14 +70,29 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 
 const imtbase::ICollectionInfo* CThumbnailDecoratorGuiComp::GetWidgetList() const
 {
-	return nullptr;
+	return m_widgetList;
 }
 
 
-QWidget* CThumbnailDecoratorGuiComp::GetWidgetPtr(const QByteArray& /*widgetId*/) const
+QWidget* CThumbnailDecoratorGuiComp::GetWidgetPtr(const QByteArray& widgetId) const
 {
 	if (IsGuiCreated()){
-		return Main;
+
+		if(widgetId.isEmpty() || widgetId == "Main"){
+			return Main;
+		}
+
+		else if(widgetId == "TopFrame"){
+			return TopFrame;
+		}
+
+		else if(widgetId == "AdditionalCommandsFrame"){
+			return AdditionalCommandsFrame;
+		}
+
+		else{
+			return nullptr;
+		}
 	}
 
 	return nullptr;
@@ -192,6 +215,9 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 				if (layoutPtr != nullptr){
 					layoutPtr->addWidget(m_additionalCommandsToolBar);
 					iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_additionalCommandsToolBar);
+					for (auto a: m_additionalCommandsToolBar->actions()){
+						qDebug() << a->text();
+					}
 				}
 			}
 		}

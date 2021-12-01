@@ -147,7 +147,12 @@ I_EXPORT_COMPONENT(
 			"View delegate for a collection using document manager for the data operations",
 			"Object Collection Delegate View Document MDI");
 
+I_EXPORT_COMPONENT(
+		MenuBasedCommandsProvider,
+		"Menu-Based commands provider",
+		"MenuBased Commands Provider");
 
+		
 } // namespace ImtGuiPck
 
 

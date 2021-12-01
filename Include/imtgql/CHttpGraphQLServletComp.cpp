@@ -5,7 +5,7 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
-#include <imtrest/IProtocolEngine.h>s
+#include <imtrest/IProtocolEngine.h>
 
 
 namespace imtgql
