@@ -559,6 +559,7 @@ void CThumbnailDecoratorGuiComp::on_LoginControlButton_clicked()
 				menuPtr->resize(10, 10);
 				menuPos.rx() -= menuPtr->sizeHint().width();
 				menuPos.setY(TopFrame->mapToGlobal(TopFrame->rect().bottomRight()).y());
+				menuPos.ry() += qMax(TopFrame->lineWidth(), TopFrame->midLineWidth());
 				menuPtr->move(menuPos);
 				menuPtr->show();
 			}
