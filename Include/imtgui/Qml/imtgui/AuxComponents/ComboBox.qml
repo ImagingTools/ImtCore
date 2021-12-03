@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import Acf 1.0
 
 Item {
     id: container;
@@ -6,24 +7,20 @@ Item {
     height: 30;
     property var model;
     property int currentIndex: listView.currentIndex;
-    property color foneColor: "#4C514A";
+   // property color backgroundColor: Style.backgroundColor;
     property color borderColor: "black";
-    property color fontColor: "white";
-    property int radiusValue: 5;
 
     Rectangle {
         id: mainRect;
         anchors.fill: parent;
-        border.color: borderColor;
-        color: foneColor;
-        radius: radiusValue;
+        border.color: container.borderColor;
+        color: Style.baseColor;
 
         Text {
             id: title_txt;
-//            text: container.model.get(0).text;
             anchors.horizontalCenter: parent.horizontalCenter;
             anchors.verticalCenter: parent.verticalCenter;
-            color: fontColor;
+            color: Style.textColor;
         }
 
         MouseArea {
@@ -56,16 +53,15 @@ Item {
 
                 Rectangle {
                     anchors.fill: parent;
-                    color: foneColor;
-                    border.color: borderColor;
-                    radius: radiusValue;
+                    color: Style.baseColor;
+                    border.color: container.borderColor;
 
                     Text {
                         id: titleModel;
                         anchors.verticalCenter: parent.verticalCenter;
                         anchors.horizontalCenter: parent.horizontalCenter;
                         text: model.text;
-                        color: fontColor;
+                        color: Style.textColor;
                     }
 
                     MouseArea {

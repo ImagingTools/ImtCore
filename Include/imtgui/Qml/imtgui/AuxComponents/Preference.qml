@@ -1,16 +1,18 @@
 import QtQuick 2.0
-
+import Acf 1.0
+import imtqml 1.0
 
 Rectangle {
     id: container;
-    property string styleMode;
-    property string styleColor: "Dark";
-    property color foneColor: styleColor == "Dark"? "#2b2d2d" : "white";
-    property color fontColor: styleColor == "Dark"? "#edefef" : "black";
+    property string styleColor: "Light";
+//    property color foneColor: styleColor == "Dark"? "#2b2d2d" : "white";
+    property color foneColor: Style.mainColor;
+//    property color fontColor: styleColor == "Dark"? "#edefef" : "black";
+    //property color textColor: Style.textColor;
     property int radiusValue: 5;
 
     radius: radiusValue;
-    color: foneColor;
+    color: Style.baseColor;
     border.color: "#2b2d2d";
 
     MouseArea {
@@ -25,7 +27,7 @@ Rectangle {
        anchors.horizontalCenter: parent.horizontalCenter;
        anchors.verticalCenter: parent.verticalCenter;
        clip: true;
-       color: container.color;
+       color: Style.baseColor;
        anchors.margins: 10;
 
        Rectangle {
@@ -33,13 +35,13 @@ Rectangle {
            width: parent.width;
            height: 30;
           // anchors.bottomMargin: 50;
-           color: container.color;
+           color: Style.baseColor;
 
            Rectangle {
                id: iconPref;
                width: 20;
                height: 20;
-               color: styleColor == "Dark"? "white" : "#4C514A";
+               color: container.styleColor == "Dark"? "white" : "#4C514A";
                anchors.left: topPanel.left;
                anchors.verticalCenter: topPanel.verticalCenter;
                radius: radiusValue;
@@ -51,22 +53,29 @@ Rectangle {
                anchors.leftMargin: 10;
                anchors.verticalCenter: topPanel.verticalCenter;
                text: "Preferences";
-               color: fontColor;
+               color: Style.textColor;
 
            }
 
-           Button {
+//           Button {
+
+//           }
+
+           Rectangle {
                id: exit;
                anchors.right: topPanel.right;
                anchors.verticalCenter: topPanel.verticalCenter;
                width: 20;
                height: 20;
                color: "red";
-               onClicked: {
-                   container.visible = false;
+               MouseArea {
+                   anchors.fill: parent;
+                   onClicked: {
+//                       container.visible = false;
+                       preference.visible = false;
+                   }
                }
            }
-
        }
 
        Rectangle {
@@ -75,14 +84,14 @@ Rectangle {
            height: 100;
            anchors.top: topPanel.bottom;
            anchors.topMargin: 30;
-           color: container.color;
+           color: Style.baseColor;
            Text {
                id: versionTitle;
                anchors.left: versionBlock.left;
                anchors.leftMargin: 30;
                anchors.top: versionBlock.top;
                text: "Version";
-               color: fontColor;
+               color: Style.textColor;
            }
 
            Rectangle {
@@ -92,7 +101,6 @@ Rectangle {
                width: parent.width;
                height: 1;
                color: "black";
-
            }
 
            Text {
@@ -112,15 +120,15 @@ Rectangle {
            width: parent.width;
            height: 100;
            anchors.top: versionBlock.bottom;
-           //anchors.topMargin: 30
-           color: container.color;
+           //anchors.topMargin: 30;
+           color: Style.baseColor;
            Text {
                id: languageText;
                anchors.left: languageUnitBlock.left;
                anchors.leftMargin: 30;
                anchors.top: languageUnitBlock.top;
                text: "Language";
-               color: fontColor;
+               color: Style.textColor;
            }
 
            Text {
@@ -128,7 +136,7 @@ Rectangle {
                x: parent.width / 2 + 30;
                anchors.top: versionBlock.top;
                text: "Unit";
-               color: fontColor;
+               color: Style.textColor;
            }
 
            Rectangle {
@@ -147,9 +155,6 @@ Rectangle {
                anchors.top: line.bottom;
                anchors.left: languageUnitBlock.left;
                model: languageModel;
-               foneColor: container.foneColor;
-               fontColor: container.fontColor;
-               borderColor: styleColor == "Dark"? "white" : "#4C514A";
            }
 
            ComboBox {
@@ -158,9 +163,6 @@ Rectangle {
                anchors.topMargin: 10;
                anchors.top: line.bottom;
                model: unitModel;
-               foneColor: container.foneColor;
-               fontColor: container.fontColor;
-               borderColor: styleColor == "Dark"? "white" : "#4C514A";
            }
        }
 
@@ -171,7 +173,7 @@ Rectangle {
            height: 100;
            anchors.top: languageUnitBlock.bottom;
           // anchors.bottomMargin: 30;
-           color: container.color;
+           color: Style.baseColor;
            Text {
                id: modeText;
                anchors.leftMargin: 30;
@@ -179,7 +181,7 @@ Rectangle {
                //anchors.bottomMargin: 10;
                anchors.top: modeBlock.top;
                text: "Mode";
-               color: fontColor;
+               color: Style.textColor;
            }
 
            Rectangle {
@@ -201,7 +203,7 @@ Rectangle {
                anchors.topMargin: 10;
                color: "black";
                radius: radiusValue;
-               border.color: styleColor == "Dark"? "#1560BD" : "transparent";
+               border.color: container.styleColor == "Dark"? "#1560BD" : "transparent";
                border.width: 2;
 
                Text {
@@ -209,13 +211,14 @@ Rectangle {
                    text: "Dark";
                    anchors.top: darkMode.bottom;
                    anchors.topMargin: 10;
-                   color: fontColor;
+                   color: Style.textColor;
                }
 
                MouseArea {
                     anchors.fill: parent;
                     onClicked: {
-                        styleColor = "Dark";
+                        container.styleColor = "Dark";
+                        stylesModel.getStyle("Dark");
                     }
                }
            }
@@ -231,7 +234,7 @@ Rectangle {
                anchors.topMargin: 10;
                anchors.leftMargin: 20;
                color: "white";
-               border.color: styleColor == "Light"? "#1560BD" : "black";
+               border.color: container.styleColor == "Light"? "#1560BD" : "black";
                border.width: 2;
                radius: radiusValue;
 
@@ -240,20 +243,86 @@ Rectangle {
                     text: "Light";
                     anchors.top: lightMode.bottom;
                     anchors.topMargin: 10;
-                    color: fontColor;
+                    color: Style.textColor;
                }
 
                MouseArea {
                     anchors.fill: parent;
                     onClicked: {
-                        styleColor = "Light";
+
+                        stylesModel.getStyle("Light");
+                        container.styleColor = "Light";
                     }
                }
            }
        }
     }
 
+    function getThemeColor(colorType, colorKey, themeModel) {
+        var colorPalette = this.themeModel.GetData("Style").GetData(colorType).GetData(colorKey);
+        return themeModel.GetData("ColorPalette").GetData(colorPalette);
+    }
 
+    function parseStyleTheme(themeModel) {
+        var activeColors = themeModel.GetData("Style").GetData("ActiveColors");
+        var colorPalette = themeModel.GetData("ColorPalette");
+        var count = activeColors.GetItemsCount();
+
+        Style.imagingToolsGradient1 = themeModel.GetData("ColorPalette").GetData("ImagingToolsGradient1");
+        Style.imagingToolsGradient2 = themeModel.GetData("ColorPalette").GetData("ImagingToolsGradient2");
+        Style.imagingToolsGradient3 = themeModel.GetData("ColorPalette").GetData("ImagingToolsGradient3");
+        Style.imagingToolsGradient4 = themeModel.GetData("ColorPalette").GetData("ImagingToolsGradient4");
+        Style.baseColor = preference.getThemeColor("ActiveColors", "Base", themeModel);
+        Style.backgroundColor = preference.getThemeColor("ActiveColors", "Background", themeModel);
+        Style.textColor = preference.getThemeColor("ActiveColors", "Text", themeModel);
+
+    }
+
+    GqlModel {
+        id: stylesModel;
+
+        function getStyle(theme) {
+            console.log( "getStyle");
+
+            var query = Gql.GqlRequest("query", "GetStyle");
+
+            var inputParams = Gql.GqlObject("input");
+            inputParams.InsertField("theme");
+            inputParams.InsertFieldArgument("theme", theme);
+            query.AddParam(inputParams);
+
+            var queryFields = Gql.GqlObject("style");
+            queryFields.InsertField("theme");
+            queryFields.InsertField("source");
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log(gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, stylesModel);
+            if (this.state === "Ready") {
+                var dataModelLocal = this.GetData("data");
+                console.log(dataModelLocal);
+                if(dataModelLocal.ContainsKey("GetStyle")) {
+                    dataModelLocal = dataModelLocal.GetData("GetStyle");
+                }
+                if(dataModelLocal !== null && dataModelLocal.ContainsKey("source")){
+                    dataModelLocal = dataModelLocal.GetData("source");
+                    preference.parseStyleTheme(dataModelLocal);
+                }
+                else if(stylesModel.ContainsKey("errors")){
+                    var errorsModel = stylesModel.GetData("errors");
+                    if(errorsModel !== null && errorsModel.ContainsKey("GetStyle")){
+                        console.log("message", errorsModel.GetData("GetStyle").GetData("message"));
+                    }
+                }
+
+            }
+        }
+    }
 
     ListModel {
         id: languageModel;

@@ -1,15 +1,16 @@
 import QtQuick 2.12
+import Acf 1.0
 
 Rectangle{
     id: container;
     width: 1000;
     height: 30;// maxHeightElement.height
     color: "transparent";
+
     property string text: "Text";
     property real delegateWidth: count == 0 ? 0 : width/count;
     property int count: bodyArray.length;
     property bool selected: false;
-    property string  textColor: "#335777";
     property string fontName: "";
     property int fontSize: 12;
 
@@ -39,7 +40,6 @@ Rectangle{
                 container.maxSizeText = bodyArray[i];
             }
         }
-
     }
 
     signal clicked;
@@ -64,7 +64,7 @@ Rectangle{
             anchors.left: parent.left;
             anchors.leftMargin: 8;
             font.pixelSize: container.fontSize;
-            font.family: container.fontName;
+            //font.family: container.fontName;
             font.bold: false;
             color: "red";//container.textColor
             width: container.delegateWidth - 16;
@@ -72,8 +72,6 @@ Rectangle{
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
             text: container.maxSizeText;
         }
-
-
     }
 
     Row{
@@ -94,9 +92,9 @@ Rectangle{
                     anchors.left: parent.left;
                     anchors.leftMargin: 8;
                     font.pixelSize: container.fontSize;
-                    font.family: container.fontName;
+                    //font.family: container.fontName;
                     font.bold: false;
-                    color: container.textColor;
+                    color: Style.textColor;
                     width: container.delegateWidth - 16;
 //                    height: contentHeight;
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
@@ -108,16 +106,14 @@ Rectangle{
         }
     }
 
-
-
-    MouseArea{
+    MouseArea {
         id: ma;
         anchors.fill: parent;
 //        enabled: container.visible;
 //        hoverEnabled: enabled;
 //        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
         onClicked: {
-        container.clicked();
+            container.clicked();
         }
     }
 

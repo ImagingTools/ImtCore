@@ -1,10 +1,12 @@
 import QtQuick 2.12
+import Acf 1.0
 
 Rectangle{
     id: tabDelegate;
     height: 40;
     width: 120;
-    color: selected ? "white" : "transparent";
+//    color: selected ? "white" : "transparent";
+    color: "transparent";
 
     property bool selected: false;
     property bool firstElement: false;
@@ -12,7 +14,7 @@ Rectangle{
     property string firstElementText: "text";
     property int fontSize: 12;
     property string fontName: "";
-    property string textColor: "#335777";
+   // property string textColor: Style.textColor;
     property string firstElementImageSource: "../../Icons/Workflow.svg";
     property string closeButtonImageSource: "../../Icons/DeleteStylized.svg";
     signal clicked;
@@ -25,7 +27,7 @@ Rectangle{
 //        hoverEnabled: enabled;
 //        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
         onClicked: {
-        tabDelegate.clicked();
+            tabDelegate.clicked();
         }
     }
 
@@ -83,7 +85,7 @@ Rectangle{
 //            hoverEnabled: enabled;
 //            cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
             onClicked: {
-            tabDelegate.closeSignal();
+                tabDelegate.closeSignal();
             }
         }
     }
@@ -99,7 +101,7 @@ Rectangle{
             anchors.centerIn: parent;
             text: tabDelegate.firstElement ? tabDelegate.firstElementText : tabDelegate.text;
           //  text: tabDelegate.text
-            color: tabDelegate.textColor;
+            color: Style.textColor;
             font.pixelSize: tabDelegate.fontSize;
             font.family: tabDelegate.fontName;
 

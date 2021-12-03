@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 //import '../UxAdvancedComponents' as AUX
 
 
@@ -8,7 +9,6 @@ Item {
     property int fontSize: 12;
     property bool fontBold: true;
     property string fontName: "";
-    property string textColor: "#335777";
     property real delegateWidth: container.count == 0 ? 0 : headersList.width/headersList.count;
     property int count: 3; //headersArray.length;
     property alias headersModel: headersList.model;
@@ -45,7 +45,8 @@ Item {
                 id:deleg;
                 width: headersList.width/headersList.count;
                 height: headersList.height;
-                color: "transparent";
+                //color: "transparent";
+                color: Style.backgroundColor;
                 Text {
                     id: name;
                     anchors.verticalCenter: parent.verticalCenter;
@@ -54,7 +55,7 @@ Item {
                     font.pixelSize: container.fontSize;
                     font.family: container.fontName;
                     font.bold: true; //container.fontBold
-//                    color: container.textColor
+                    color: Style.textColor;
                     text: container.headersArray[model.index];
                 }
             }
@@ -85,9 +86,8 @@ Item {
 //        boundsBehavior: Flickable.StopAtBounds;
         spacing: 0;
         model: 10;
-        delegate: TableDelegate{
+        delegate: TableDelegate {
             width: elementsList.width;
-            textColor: container.textColor;
             fontName: container.fontName;
             selected: elementsList.selectedIndex === model.index;
             onClicked: {

@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtguigql/CPagesDataControllerComp.h>
 #include <imtguigql/CCommandsDataControllerComp.h>
+#include <imtguigql/CGetStyleDataControllerComp.h>
 
 
 /**
@@ -19,6 +20,7 @@ namespace ImtGuiGqlPck
 
 typedef imtguigql::CPagesDataControllerComp PagesDataController;
 typedef imtguigql::CCommandsDataControllerComp CommandsDataController;
+typedef imtguigql::CGetStyleDataControllerComp GetStyleDataController;
 
 
 } // namespace ImtGuiGqlPck

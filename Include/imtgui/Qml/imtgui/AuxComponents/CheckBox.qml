@@ -7,6 +7,6 @@ Rectangle {
     color: checkState == 2 ? "green" : (checkState == 0) ? "white" : "black";
     border.color: "black";
 
-    property int checkState: Qt.Unchecked;
+    property int checkState: 0;
 
 }

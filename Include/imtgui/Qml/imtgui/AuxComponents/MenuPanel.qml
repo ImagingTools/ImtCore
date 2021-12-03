@@ -7,8 +7,9 @@ import imtqml 1.0
 Rectangle {
     id: menuPanel;
     width: 59;
-    color: "#e6e6e8";
-    property string textColor: "#335777";
+//    width: 120;
+    color: Style.backgroundColor;
+    property string textColor: Style.textColor;
     property string fontName: "Helvetica";
     property alias model: lvPages.model;
     property string activePageId;
@@ -46,7 +47,7 @@ Rectangle {
             width: menuPanel.width;
             height: width;
             text:  model[PageEnum.NAME];
-            textColor: menuPanel.textColor;
+            textColor: Style.textColor;
             fontName: menuPanel.fontName;
             imageSource: model[PageEnum.ICON];
 //            imageSourceDisabled: model[PageEnum.ICON_OFF_SELECTED];
@@ -93,7 +94,7 @@ Rectangle {
                         menuPanel.activePageName = dataModelLocal.GetData(PageEnum.NAME);
                         menuPanel.activeIcon = dataModelLocal.GetData(PageEnum.ICON);
 
-                        lvPages.__processUpdates();
+//                        lvPages.__processUpdates();
                     }
                     else if(this.ContainsKey("errors")){
                         var errorsModel = pagesModel.GetData("errors");

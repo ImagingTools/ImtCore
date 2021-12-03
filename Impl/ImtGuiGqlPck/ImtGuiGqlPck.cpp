@@ -25,6 +25,12 @@ I_EXPORT_COMPONENT(
 			"Pages Data Controller");
 
 
+I_EXPORT_COMPONENT(
+			GetStyleDataController,
+			"Pages data controller",
+			"Pages Data Controller");
+
+
 } // namespace ImtGuiGqlPck
 
 

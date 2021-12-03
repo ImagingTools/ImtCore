@@ -1,13 +1,13 @@
 <RCC>
-	<qresource prefix="/qml">
-		<file alias="MainWindow.qml">Qml/MainWindow.qml</file>
-		<file alias="WrapItem.qml">Qml/WrapItem.qml</file>
-		<file alias="imtqml/JSONListModel.qml">Qml/imtqml/JSONListModel.qml</file>
-		<file alias="imtqml/jsonpath.js">Qml/imtqml/jsonpath.js</file>
-		<file alias="imtqml/TreeItemModel.qml">Qml/imtqml/TreeItemModel.qml</file>
-		<file alias="imtqml/GraphQLRequest.js">Qml/imtqml/GraphQLRequest.js</file>
-		<file alias="imtqml/GqlModel.qml">Qml/imtqml/GqlModel.qml</file>
-		<file alias="imtqml/qmldir">Qml/imtqml/qmldir</file>
+    <qresource prefix="/qml">
+        <file alias="MainWindow.qml">Qml/MainWindow.qml</file>
+        <file alias="WrapItem.qml">Qml/WrapItem.qml</file>
+        <file alias="imtqml/JSONListModel.qml">Qml/imtqml/JSONListModel.qml</file>
+        <file alias="imtqml/jsonpath.js">Qml/imtqml/jsonpath.js</file>
+        <file alias="imtqml/TreeItemModel_.qml">Qml/imtqml/TreeItemModel.qml</file>
+        <file alias="imtqml/GraphQLRequest.js">Qml/imtqml/GraphQLRequest.js</file>
+        <file alias="imtqml/GqlModel.qml">Qml/imtqml/GqlModel.qml</file>
+        <file alias="imtqml/qmldir">Qml/imtqml/qmldir</file>
     </qresource>
     <qresource prefix="/Icons">
         <file alias="DeleteStylized.svg">Resources/Icons/DeleteStylized.svg</file>

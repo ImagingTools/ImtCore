@@ -1,12 +1,6 @@
 import QtQuick 2.0
 import Acf 1.0
 import 'AuxComponents'
-//@using { src.AuxComponents.TopPanel }
-//@using { src.AuxComponents.MenuPanel }
-//@using { src.AuxComponents.TabPanel }
-//@using { src.AuxComponents.AuxTable }
-
-
 
 Rectangle
 {
@@ -14,7 +8,11 @@ Rectangle
     anchors.fill: parent;
     width: 300;
     height: 200;
-    color: "white";
+   // color: "white";
+    color: Style.baseColor;
+//    color: Style.backgroundColor;
+//    color: "#00FF00";
+
 //    property string fontName: mainFont.name;
 
 
@@ -28,32 +26,33 @@ Rectangle
 //        source: "../Fonts/Ubuntu-Regular.ttf";
 //    }
 
-    TopPanel{
+    TopPanel {
         id: topPanel;
 //        title: "Test";
         title: menuPanel.activePageName;
         activePageId: menuPanel.activePageId;
-//        fontName: container.fontName;
     }
 
-    MenuPanel{
+    MenuPanel {
         id: menuPanel;
+
         anchors.top: topPanel.bottom;
         anchors.bottom: parent.bottom;
-//        textColor: container.textColor;
+//        textColor: Style.textColor;
+//        color: Style.backgroundColor;
 //        fontName: container.fontName;
     }
 
-    TabPanel{
+    TabPanel {
         id:tabPanel;
         anchors.left: menuPanel.right;
         anchors.right: parent.right;
         anchors.top: topPanel.bottom;
         visible: true;
-        textColor: container.textColor;
+        //textColor: Style.textColor;
+        //color: Style.baseColor;
         fontName: container.fontName;
     }
-
 
     AuxTable {
         id: table;
@@ -61,17 +60,16 @@ Rectangle
         width: tabPanel.width/4*3;
         anchors.top: tabPanel.bottom;
         anchors.bottom: parent.bottom;
-        textColor: container.textColor;
         fontName: container.fontName;
     }
 
-    TreeView {
-        id: treeView;
-        width: 200;
-        height: parent.height - topPanel.height;
-        anchors.top: topPanel.bottom;
-        anchors.right: parent.right;
-    }
+//    TreeView {
+//        id: treeView;
+//        width: 200;
+//        //height: parent.height - topPanel.height;
+//        anchors.top: topPanel.bottom;
+//        anchors.right: parent.right;
+//    }
 
     Rectangle {
         id: darkBackground;
@@ -92,5 +90,7 @@ Rectangle
         height: parent.height > 450 ? 450 : parent.height * 0.9;
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
+        //textColor: Style.textColor;
+        //color: Style.baseColor;
     }
 }

@@ -12,7 +12,7 @@ void CObserverQmlComp::OnComponentCreated()
     if (m_quickObjectComp.IsValid()){
         QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
 //        quickItem->setProperty("sourceItem", "qrc:///qml/Pages/ClassifierObjectsWithConsumer.qml");
-        connect(quickItem, SIGNAL(registrationSignal(imtbase::CTreeItemModel*)), this, SLOT(OnRegistrationSignal(imtbase::CTreeItemModel*)));
+        //connect(quickItem, SIGNAL(registrationSignal(imtbase::CTreeItemModel*)), this, SLOT(OnRegistrationSignal(imtbase::CTreeItemModel*)));
         connect(quickItem, SIGNAL(changeSourceItem(QString)), this, SLOT(OnChangeSourceItem(QString)));
 		QMetaObject::invokeMethod(quickItem, "updateModels");
     }

@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/qml">
-        <file alias="imtgui/qmldir">Qml/imtgui/qmldir</file>
+	    <file alias="Acf/qmldir">Qml/Acf/qmldir</file>
+		<file alias="Acf/Style.qml">Qml/Acf/Style.qml</file>
+		<file alias="imtgui/qmldir">Qml/imtgui/qmldir</file>
         <file alias="imtgui/ThumbnailDecorator.qml">Qml/imtgui/ThumbnailDecorator.qml</file>
         <file alias="imtgui/AuxComponents/Button.qml">Qml/imtgui/AuxComponents/Button.qml</file>
         <file alias="imtgui/AuxComponents/MenuPanel.qml">Qml/imtgui/AuxComponents/MenuPanel.qml</file>

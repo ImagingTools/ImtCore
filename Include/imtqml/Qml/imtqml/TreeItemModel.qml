@@ -40,13 +40,12 @@ JSONListModel {
             row = 0
         if(row === null)
             row = 0
+        if(this.count === 0 && row === 0){
+            this.append({})
+        }
         console.log("setData",key,value,row)
         var modelObject = this.get(row)
 
-        if (modelObject === undefined && row === 0){
-            this.append({})
-            modelObject = this.get(row)
-        }
         if (modelObject === null)
             console.log("modelObject is null")
 

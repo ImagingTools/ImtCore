@@ -6,16 +6,23 @@ Rectangle {
     id: topPanel;
     height: 55;
     width: parent.width;
-    color: "#e5e5e7";
+    color: Style.baseColor;
     property string fontName: "";
+   // property string textColor: Style.textColor;
     property string activePageId;
     property alias title: titleText.text;
 
+//    gradient: Gradient {
+//             GradientStop { position: 0.0; color: "#e5e5e7"; }
+//             GradientStop { position: 0.7; color: "#d9d9db"; }
+//             GradientStop { position: 0.98; color: "#d2d2d4"; }
+//             GradientStop { position: 1.0; color: "#a4a5a6"; }
+//         }
     gradient: Gradient {
-             GradientStop { position: 0.0; color: "#e5e5e7"; }
-             GradientStop { position: 0.7; color: "#d9d9db"; }
-             GradientStop { position: 0.98; color: "#d2d2d4"; }
-             GradientStop { position: 1.0; color: "#a4a5a6"; }
+             GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+             GradientStop { position: 0.7; color: Style.imagingToolsGradient2; }
+             GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
+             GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
          }
 
     onActivePageIdChanged: {
@@ -26,7 +33,6 @@ Rectangle {
     onTitleChanged: {
         console.log("onTitleChanged", topPanel.title);
         console.log("onActivePageIdChanged", topPanel.activePageId);
-
     }
 
     Button {
@@ -67,7 +73,6 @@ Rectangle {
         }
     }
 
-
     Text {
         id: titleText;
         anchors.left: nextStack.right;
@@ -77,6 +82,7 @@ Rectangle {
         text: qsTr("Products");
         font.family: "Helvetica";
         font.pixelSize: 25;
+        color: Style.textColor;
     }
 
     Item {

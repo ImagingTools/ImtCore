@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 //import '../UxAdvancedComponents' as AUX
 
 
@@ -9,19 +10,19 @@ Item {
     property bool fontBold: true;
     property string fontName: "";
     property string textColor: "#335777";
-    property real delegateWidth: count == 0 ? 0 : headersList.width/headersList.count;
+    property real delegateWidth: count == 0 ? 0 : headersList.width / headersList.count;
     property int count: headersArray.length;
     property alias headersModel: headersList.model;
     property alias elementsModel: elementsList.model;
 
     property var headersArray: ["First", "Second", "Third"];
 
-    function clearHeadersArray(){
+    function clearHeadersArray() {
         while(headersArray.length > 0)
             headersArray.pop();
     }
 
-    function addToHeadersArray(str){
+    function addToHeadersArray(str) {
         headersArray.push(str);
     }
 
@@ -33,7 +34,7 @@ Item {
         height: 30;
         color: "transparent";
 
-        ListView{
+        ListView {
             id: headersList;
             anchors.fill: parent;
             clip: true;
@@ -41,7 +42,7 @@ Item {
             orientation: ListView.Horizontal;
             spacing: 0;
             model: 3;
-            delegate: Rectangle{
+            delegate: Rectangle {
                 id:deleg;
                 width: headersList.width/headersList.count;
                 height: headersList.height;
@@ -55,13 +56,14 @@ Item {
                     font.family: container.fontName;
                     font.bold: true; //container.fontBold
 //                    color: container.textColor
+                    color: Style.textColor;
                     text: container.headersArray[model.index];
                 }
             }
         }
 
 
-        Rectangle{
+        Rectangle {
             id: bottomLine;
             anchors.left: parent.left;
             anchors.right: parent.right;
@@ -72,9 +74,7 @@ Item {
 
     }//headers
 
-
-
-    ListView{
+    ListView {
         id: elementsList;
         property int selectedIndex: -1;
         anchors.left: parent.left;
@@ -85,9 +85,9 @@ Item {
 //        boundsBehavior: Flickable.StopAtBounds;
         spacing: 0;
         model: 10;
-        delegate: TableDelegate{
+        delegate: TableDelegate {
             width: elementsList.width;
-            textColor: container.textColor;
+            //textColor: container.textColor;
             fontName: container.fontName;
             selected: elementsList.selectedIndex === model.index;
             onClicked: {
