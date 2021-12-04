@@ -46,7 +46,7 @@ public:
 	typedef QVector<FeatureInfo> FeatureInfos;
 
 	/**
-		Get list of all available features for this license.
+		Get list of all available feature packages for this license.
 	*/
 	virtual const imtbase::IObjectCollection* GetFeaturePackages() const = 0;
 

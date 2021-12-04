@@ -13,12 +13,8 @@ void CProductLicensingInfoComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_productCollectionCompPtr.IsValid()){
-		m_productListPtr = m_productCollectionCompPtr.GetPtr();
-	}
-
-	if (m_accountCollectionCompPtr.IsValid()){
-		m_accountListPtr = m_accountCollectionCompPtr.GetPtr();
+	if (m_featurePackagesCompPtr.IsValid()){
+		m_featurePackagesPtr = m_featurePackagesCompPtr.GetPtr();
 	}
 }
 

@@ -24,8 +24,7 @@ public:
 	CProductLicensingInfo();
 
 	// reimplemented (imtlic::IProductLicensingInfo)
-	virtual const imtbase::ICollectionInfo* GetProductList() const override;
-	virtual const imtbase::ICollectionInfo* GetAccountList() const override;
+	virtual const imtbase::IObjectCollection* GetFeaturePackages() const override;
 
 	// reimplemented (imtlic::IProductInfo)
 	virtual const IProductInfo* GetProductFamilyInfo() const override;
@@ -47,8 +46,8 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	imtbase::ICollectionInfo* m_productListPtr;
-	imtbase::ICollectionInfo* m_accountListPtr;
+	imtbase::IObjectCollection* m_featurePackagesPtr;
+
 	QString m_productName;
 	QByteArray m_productId;
 };

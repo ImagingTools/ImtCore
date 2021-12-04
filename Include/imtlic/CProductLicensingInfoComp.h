@@ -30,8 +30,7 @@ public:
 		I_REGISTER_INTERFACE(IProductInfo);
 		I_REGISTER_INTERFACE(IProductLicensingInfo);
 		I_REGISTER_INTERFACE(iser::ISerializable);
-		I_ASSIGN(m_productCollectionCompPtr, "ProductCollection", "Product database containing this object", false, "ProductCollection");
-		I_ASSIGN(m_accountCollectionCompPtr, "AccountCollection", "Account database", false, "AccountCollection");
+		I_ASSIGN(m_featurePackagesCompPtr, "FeaturePackages", "Collection of all feature packages related to this product", false, "FeaturePackages");
 	I_END_COMPONENT
 
 protected:
@@ -39,8 +38,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 protected:
-	I_REF(imtbase::ICollectionInfo, m_productCollectionCompPtr);
-	I_REF(imtbase::ICollectionInfo, m_accountCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_featurePackagesCompPtr);
 };
 
 

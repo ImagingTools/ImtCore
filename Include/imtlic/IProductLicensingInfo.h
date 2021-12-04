@@ -6,6 +6,12 @@
 #include <imtlic/IProductInfo.h>
 
 
+namespace imtbase
+{
+	class IObjectCollection;
+}
+
+
 namespace imtlic
 {
 
@@ -18,14 +24,9 @@ class IProductLicensingInfo: virtual public ILicenseInfoProvider, virtual public
 {
 public:
 	/**
-		Get the list of all available products.
+		Get all available feature packages.
 	*/
-	virtual const imtbase::ICollectionInfo* GetProductList() const = 0;
-
-	/**
-		Get the list of all available accounts.
-	*/
-	virtual const imtbase::ICollectionInfo* GetAccountList() const = 0;
+	virtual const imtbase::IObjectCollection* GetFeaturePackages() const = 0;
 };
 
 

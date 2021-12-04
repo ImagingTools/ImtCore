@@ -16,9 +16,14 @@ I_EXPORT_PACKAGE(
 
 
 I_EXPORT_COMPONENT(
-	FeaturePackageDatabaseDelegate,
+			FeaturePackageDatabaseDelegate,
 			"Feature package object delegate for SQL table",
 			"SQL Feature Package License Delegate");
+
+I_EXPORT_COMPONENT(
+			ProductDatabaseDelegate,
+			"Product object delegate for SQL table",
+			"SQL Product License Delegate");
 
 
 } // namespace ImtLicenseDbPck
