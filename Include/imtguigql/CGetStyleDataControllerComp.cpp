@@ -1,4 +1,5 @@
-#include "CGetStyleDataControllerComp.h"
+#include <imtguigql/CGetStyleDataControllerComp.h>
+
 
 // Qt includes
 #include <QtCore/QObject>
@@ -11,12 +12,12 @@ namespace imtguigql
 {
 
 
-//// reimplemented (imtgql::IGqlRepresentationDataController)
-
+// public methods
+// 
+// reimplemented (imtgql::IGqlRepresentationDataController)
 
 imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-
 	if (gqlRequest.GetCommandId() != *m_modelIdCompPtr){
 		return nullptr;
 	}
@@ -26,9 +27,9 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgq
 
 	int count = fieldList->count();
 
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* sourceModel = nullptr;
+	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModelPtr = nullptr;
+	imtbase::CTreeItemModel* sourceModelPtr = nullptr;
 	bool isSetResponce = false;
 	QByteArrayList fields;
 	QByteArray theme;
@@ -36,22 +37,25 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgq
 	for (int i = 0; i < count; i++){
 		if (fieldList->at(i).GetId() == "style"){
 			fields = fieldList->at(i).GetFieldIds();
+
 			if (paramList != nullptr && !paramList->isEmpty()){
 				theme = paramList->at(0).GetFieldArgumentValue("theme").toByteArray();
 			}
+
 			isSetResponce = true;
 		}
 	}
 
 	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
-		errorsItemModel->SetData("message", errorMessage);
+		imtbase::CTreeItemModel* errorsItemModelPtr = rootModelPtr->AddTreeModel("errors");
+		Q_ASSERT(errorsItemModelPtr != nullptr);
+
+		errorsItemModelPtr->SetData("message", errorMessage);
 	}
 	else{
+		dataModelPtr = new imtbase::CTreeItemModel();
+		dataModelPtr->SetData("theme", theme);
 
-		dataModel = new imtbase::CTreeItemModel();
-		dataModel->SetData("theme",theme);
-	//	dataModel->SetData("theme",theme);
 		QString pathToTheme;
 		if (theme == "Dark") {
 			pathToTheme = ":/dark.theme";
@@ -61,14 +65,15 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgq
 		QFile resource(pathToTheme);
 		if (resource.open(QIODevice::ReadOnly)) {
 			QByteArray resources = resource.readAll();
-			sourceModel = new imtbase::CTreeItemModel();
-			sourceModel->Parse(resources);
-			dataModel->SetExternTreeModel("source", sourceModel);
+			sourceModelPtr = new imtbase::CTreeItemModel();
+			sourceModelPtr->Parse(resources);
+			dataModelPtr->SetExternTreeModel("source", sourceModelPtr);
 		}
-
 	}
-	rootModel->SetExternTreeModel("data", dataModel);
-	return rootModel;
+
+	rootModelPtr->SetExternTreeModel("data", dataModelPtr);
+
+	return rootModelPtr;
 }
 
 
