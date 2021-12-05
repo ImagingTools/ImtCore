@@ -52,6 +52,10 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& newObjectName) const override;
+	virtual QByteArray CreateDescriptionObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const QString& description) const override;
 private:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 	I_FACT(imtlic::IProductLicensingInfo, m_productFactCompPtr);

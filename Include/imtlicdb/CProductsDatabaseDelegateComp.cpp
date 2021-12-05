@@ -218,7 +218,6 @@ QByteArray CProductsDatabaseDelegateComp::CreateDeleteObjectQuery(
 		}
 
 		QByteArray retVal = QString("DELETE FROM Products WHERE Id = '%1';").arg(qPrintable(productId)).toLocal8Bit();
-//		retVal += "\n" + QString("DELETE FROM ProductLicenses WHERE ProductId = '%1';").arg(qPrintable(productId)).toLocal8Bit();
 
 		return retVal;
 	}
@@ -241,7 +240,47 @@ QByteArray CProductsDatabaseDelegateComp::CreateRenameObjectQuery(
 			const QByteArray& objectId,
 			const QString& newObjectName) const
 {
-	return QByteArray();
+	const imtlic::IProductLicensingInfo* productPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr objectPtr;
+	if (collection.GetObjectData(objectId, objectPtr)){
+		productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(objectPtr.GetPtr());
+	}
+
+	if (productPtr == nullptr){
+		return QByteArray();
+	}
+
+	if (objectId.isEmpty()){
+		return QByteArray();
+	}
+
+	QByteArray oldProductId = productPtr->GetProductId();
+	QByteArray newProductId = newObjectName.toLocal8Bit();
+
+	QByteArray retVal = QString("UPDATE Products SET Id ='%1', Name = '%1' WHERE Id ='%2';").arg(qPrintable(newProductId)).arg(qPrintable(oldProductId)).toLocal8Bit();
+
+	return retVal;
+}
+
+
+QByteArray CProductsDatabaseDelegateComp::CreateDescriptionObjectQuery(
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId,
+			const QString& description) const
+{
+	const imtlic::IProductLicensingInfo* productPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr objectPtr;
+	if (collection.GetObjectData(objectId, objectPtr)){
+		productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(objectPtr.GetPtr());
+	}
+
+	if (productPtr == nullptr){
+		return QByteArray();
+	}
+
+	QByteArray retVal = QString("UPDATE Products SET Description = '%1' WHERE Id ='%2';").arg(description).arg(qPrintable(productPtr->GetProductId())).toLocal8Bit();
+
+	return retVal;
 }
 
 

@@ -264,6 +264,27 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateRenameObjectQuery(
 }
 
 
+QByteArray CFeaturePackageDatabaseDelegateComp::CreateDescriptionObjectQuery(
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId,
+			const QString& description) const
+{
+	const imtlic::IFeaturePackage* packagePtr = nullptr;
+	imtbase::IObjectCollection::DataPtr objectPtr;
+	if (collection.GetObjectData(objectId, objectPtr)){
+		packagePtr = dynamic_cast<const imtlic::IFeaturePackage*>(objectPtr.GetPtr());
+	}
+
+	if (packagePtr == nullptr){
+		return QByteArray();
+	}
+
+	QByteArray retVal = QString("UPDATE Packages SET Description = '%1' WHERE Id ='%2';").arg(description).arg(qPrintable(packagePtr->GetPackageId())).toLocal8Bit();
+
+	return retVal;
+}
+
+
 // protected methods
 
 void CFeaturePackageDatabaseDelegateComp::GenerateDifferences(

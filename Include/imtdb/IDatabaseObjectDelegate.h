@@ -62,6 +62,14 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& newObjectName) const = 0;
+
+	/**
+	*	Create SQL query for the settings description of the object.
+	*/
+	virtual QByteArray CreateDescriptionObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const QString& description) const = 0;
 };
 
 
