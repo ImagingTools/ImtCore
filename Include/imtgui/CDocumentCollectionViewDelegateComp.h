@@ -56,7 +56,11 @@ public:
 	// reimplemented (imtgui::ICollectionViewDelegate)
 	virtual QByteArray GetSupportedTypeId() const override;
 	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;
-	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
+	virtual QByteArray CreateNewObject(
+				const QByteArray& typeId,
+				const QString& objectName,
+				const QString& description,
+				const istd::IChangeable* defaultDataPtr = nullptr) const override;
 	virtual QByteArray ImportObject(const QByteArray& typeId, const QString& sourcePath = QString()) const override;
 	virtual bool ExportObject(const QByteArray& objectId, const QString& targetPath = QString()) const override;
 	virtual void RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const override;

@@ -26,7 +26,11 @@ void CLicenseManagerViewDelegateComp::UpdateItemSelection(
 }
 
 
-QByteArray CLicenseManagerViewDelegateComp::CreateNewObject(const QByteArray& typeId, const istd::IChangeable* /*defaultDataPtr*/) const
+QByteArray CLicenseManagerViewDelegateComp::CreateNewObject(
+			const QByteArray& typeId,
+			const QString& /*objectName*/,
+			const QString& description,
+			const istd::IChangeable* /*defaultDataPtr*/) const
 {
 	if (m_collectionPtr != nullptr){
 		imtlic::CLicenseInfo licenseInfo;
@@ -46,7 +50,7 @@ QByteArray CLicenseManagerViewDelegateComp::CreateNewObject(const QByteArray& ty
 			licenseInfo.SetLicenseId(*m_defaultLicenseIdAttrPtr);
 		}
 
-		return m_collectionPtr->InsertNewObject(typeId, objectName, QString(), &licenseInfo);
+		return m_collectionPtr->InsertNewObject(typeId, objectName, description, &licenseInfo);
 	}
 
 	return QByteArray();

@@ -49,7 +49,11 @@ public:
 	virtual void OnColumnItemDelegateEditFinished(const QByteArray& objectId, const QByteArray& columnId, const QVariant& newValue) const override;
 	virtual bool IsEditorEnabled(const QByteArray& columnId) const override;
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
-	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
+	virtual QByteArray CreateNewObject(
+				const QByteArray& typeId,
+				const QString& objectName,
+				const QString& description,
+				const istd::IChangeable* defaultDataPtr = nullptr) const override;
 	virtual QByteArray ImportObject(const QByteArray& typeId, const QString& sourcePath = QString()) const override;
 	virtual bool ExportObject(const QByteArray& objectId, const QString& targetPath = QString()) const override;
 	virtual void RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const override;

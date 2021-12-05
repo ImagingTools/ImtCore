@@ -75,6 +75,8 @@ private:
 
 private Q_SLOTS:
 	void OnItemChangedHandler();
+	void on_ProductIdEdit_textChanged();
+	void on_ProductNameEdit_textChanged();
 
 private:
 	I_REF(iqtgui::IGuiObject, m_objectCollectionViewCompPtr);

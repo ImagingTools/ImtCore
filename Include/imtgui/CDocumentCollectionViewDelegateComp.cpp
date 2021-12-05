@@ -55,6 +55,8 @@ bool CDocumentCollectionViewDelegateComp::InitializeDelegate(
 
 QByteArray CDocumentCollectionViewDelegateComp::CreateNewObject(
 			const QByteArray& typeId,
+			const QString& /*objectName*/,
+			const QString& /*description*/,
 			const istd::IChangeable* /*defaultDataPtr*/) const
 {
 	if (typeId != GetSupportedTypeId()){

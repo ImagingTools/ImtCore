@@ -45,11 +45,14 @@ public:
 
 	/**
 		Setup the instance of a given product.
-	*/
+		\param productId	Logical ID of the product (not some repository ID!)
+		\param instanceId	An unique identifier for the product instance. By example - it can be a MAC-address of some hardware device.
+		\param customerId	Logical ID of the product (not some repository ID!)
+		*/
 	virtual void SetupProductInstance(
-				const QString& productId,
+				const QByteArray& productId,
 				const QByteArray& instanceId,
-				const QString& customerId) = 0;
+				const QByteArray& customerId) = 0;
 
 	/**
 		Add a license to this product instance.
@@ -79,14 +82,14 @@ public:
 		Additional informations about the product can be accessed using this ID in the product database.
 		\sa GetProductDatabase
 	*/
-	virtual QString GetProductId() const = 0;
+	virtual QByteArray GetProductId() const = 0;
 
 	/**
 		Get customer-ID of this product instance.
 		Additional informations about the customer can be accessed using this ID in the customer database.
 		\sa GetCustomerDatabase
 	*/
-	virtual QString GetCustomerId() const = 0;
+	virtual QByteArray GetCustomerId() const = 0;
 };
 
 

@@ -188,6 +188,9 @@ void CProductLicensingInfoGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 	}
 
 	UpdateItemTree();
+
+	ProductIdEdit->setText(qPrintable(productLicensingInfoPtr->GetProductId()));
+	ProductNameEdit->setText(productLicensingInfoPtr->GetName());
 }
 
 
@@ -222,6 +225,8 @@ void CProductLicensingInfoGuiComp::UpdateModel() const
 	imtlic::IProductLicensingInfo* productLicensingInfoPtr = GetObservedObject();
 	Q_ASSERT(productLicensingInfoPtr != nullptr);
 
+	istd::CChangeGroup changeGroup(productLicensingInfoPtr);
+
 	imtbase::ICollectionInfo::Ids licenseCollectionIds = productLicensingInfoPtr->GetLicenseList().GetElementIds();
 	for (const QByteArray& licenseCollectionId : licenseCollectionIds){
 		imtlic::ILicenseInfo* licensePtr = const_cast<imtlic::ILicenseInfo*>(productLicensingInfoPtr->GetLicenseInfo(licenseCollectionId));
@@ -231,6 +236,9 @@ void CProductLicensingInfoGuiComp::UpdateModel() const
 			break;
 		}
 	}
+
+	productLicensingInfoPtr->SetProductId(ProductIdEdit->text().toUtf8());
+	productLicensingInfoPtr->SetName(ProductNameEdit->text());
 }
 
 
@@ -358,6 +366,18 @@ QByteArrayList CProductLicensingInfoGuiComp::GetSelectedFeatureIds() const
 	}
 
 	return retVal;
+}
+
+
+void CProductLicensingInfoGuiComp::on_ProductIdEdit_textChanged()
+{
+	DoUpdateModel();
+}
+
+
+void CProductLicensingInfoGuiComp::on_ProductNameEdit_textChanged()
+{
+	DoUpdateModel();
 }
 
 

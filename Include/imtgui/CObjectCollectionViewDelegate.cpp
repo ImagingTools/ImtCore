@@ -201,10 +201,14 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(
 }
 
 
-QByteArray CObjectCollectionViewDelegate::CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr) const
+QByteArray CObjectCollectionViewDelegate::CreateNewObject(
+			const QByteArray& typeId,
+			const QString& objectName,
+			const QString& description,
+			const istd::IChangeable* defaultDataPtr) const
 {
 	if (m_collectionPtr != nullptr){
-		return m_collectionPtr->InsertNewObject(typeId, tr("New"), QString(), defaultDataPtr);
+		return m_collectionPtr->InsertNewObject(typeId, !objectName.isEmpty() ? objectName : tr("New"), description, defaultDataPtr);
 	}
 
 	return QByteArray();
@@ -679,7 +683,7 @@ void CObjectCollectionViewDelegate::OnInsert()
 {
 	Q_ASSERT(m_collectionPtr != nullptr);
 
-	QByteArray objectId = CreateNewObject(m_selectedTypeId);
+	QByteArray objectId = CreateNewObject(m_selectedTypeId, QString(), QString());
 	if (objectId.isEmpty()){
 		QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("New document could not be created"));
 	}
@@ -698,14 +702,11 @@ void CObjectCollectionViewDelegate::OnDuplicate()
 			QString sourceName = m_collectionPtr->GetElementInfo(selectedItemId, imtbase::ICollectionInfo::EIT_NAME).toString();
 			QString sourceDescription = m_collectionPtr->GetElementInfo(selectedItemId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
-			QByteArray objectId = this->CObjectCollectionViewDelegate::CreateNewObject(m_collectionPtr->GetObjectTypeId(selectedItemId), sourceDataPtr.GetPtr());
+			QString copyName = QString("Copy of %1").arg(sourceName);
+			QString newName = GetUniqueName(copyName);
+
+			QByteArray objectId = this->CObjectCollectionViewDelegate::CreateNewObject(m_collectionPtr->GetObjectTypeId(selectedItemId), newName, sourceDescription, sourceDataPtr.GetPtr());
 			if (!objectId.isEmpty()){
-				QString copyName = QString("Copy of %1").arg(sourceName);
-				QString newName = GetUniqueName(copyName);
-
-				m_collectionPtr->SetObjectName(objectId, newName);
-				m_collectionPtr->SetObjectDescription(objectId, sourceDescription);
-
 				OnDuplicateObject(selectedItemId, objectId);
 
 				const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
@@ -730,7 +731,7 @@ void CObjectCollectionViewDelegate::OnRemove()
 
 void CObjectCollectionViewDelegate::OnAddMenuOptionClicked(QAction* action)
 {
-	QByteArray objectId = CreateNewObject(action->data().toByteArray());
+	QByteArray objectId = CreateNewObject(action->data().toByteArray(), QString(), QString());
 	if (objectId.isEmpty()){
 		QMessageBox::critical((m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("New document could not be created"));
 	}

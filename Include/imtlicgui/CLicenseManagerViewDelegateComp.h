@@ -26,7 +26,11 @@ public:
 
 	// reimplemented (imtgui::ICollectionViewDelegate)
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
-	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const override;
+	virtual QByteArray CreateNewObject(
+				const QByteArray& typeId,
+				const QString& objectName,
+				const QString& description,
+				const istd::IChangeable* defaultDataPtr = nullptr) const override;
 	virtual bool RenameObject(const QByteArray& objectId, const QString& newName) const override;
 	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
 

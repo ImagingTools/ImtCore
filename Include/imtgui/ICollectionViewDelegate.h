@@ -129,7 +129,11 @@ public:
 	/**
 		Create a new object in the collection.
 	*/
-	virtual QByteArray CreateNewObject(const QByteArray& typeId, const istd::IChangeable* defaultDataPtr = nullptr) const = 0;
+	virtual QByteArray CreateNewObject(
+				const QByteArray& typeId,
+				const QString& objectName,
+				const QString& description,
+				const istd::IChangeable* defaultDataPtr = nullptr) const = 0;
 
 	/**
 		Import an object from an external source into the collection.

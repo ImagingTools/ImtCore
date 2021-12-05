@@ -75,7 +75,11 @@ void CPluginStatusMonitorViewDelegateComp::UpdateItemSelection(
 }
 
 
-QByteArray CPluginStatusMonitorViewDelegateComp::CreateNewObject(const QByteArray& /*typeId*/, const istd::IChangeable* /*defaultDataPtr*/) const
+QByteArray CPluginStatusMonitorViewDelegateComp::CreateNewObject(
+			const QByteArray& /*typeId*/,
+			const QString& /*objectName*/,
+			const QString& /*description*/,
+			const istd::IChangeable* /*defaultDataPtr*/) const
 {
 	return QByteArray();
 }

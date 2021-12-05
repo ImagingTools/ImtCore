@@ -73,8 +73,8 @@ void CProductInstanceInfoEditorComp::UpdateModel() const
 
 	istd::CChangeGroup changeGroup(productInstanceInfoPtr);
 
-	QString currentProductId = ProductCombo->currentText();
-	QString customerId = CustomerCombo->currentText();
+	QByteArray currentProductId = ProductCombo->currentText().toUtf8();
+	QByteArray customerId = CustomerCombo->currentText().toUtf8();
 	QByteArray instanceId = ProductInstanceIdEdit->text().toUtf8();
 
 	productInstanceInfoPtr->ResetData();
