@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <ibase/ICommandsProvider.h>
+#include <ibase/TRuntimeStatusHanderCompWrap.h>
 #include <iqtgui/CGuiComponentBase.h>
 #include <iqtgui/CHierarchicalCommand.h>
 #include <ilog/TLoggerCompWrap.h>
@@ -16,13 +17,13 @@ namespace imtgui
 
 
 class CMenuBasedCommandsProviderComp:
-		public QObject,
-		public ilog::CLoggerComponentBase,
-		public ibase::ICommandsProvider
+			public QObject,
+			public ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase>,
+			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CMenuBasedCommandsProviderComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
@@ -36,9 +37,9 @@ public:
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
-	// reimpemented (icomp::IComponent)
-	void OnComponentCreated() override;
-	void OnComponentDestroyed() override;
+	// reimpemented (ibase::TRuntimeStatusHanderCompWrap)
+	virtual void OnSystemStarted() override;
+	virtual void OnSystemShutdown();
 
 private Q_SLOTS:
 	void OnCommandActivated(bool checked = false);

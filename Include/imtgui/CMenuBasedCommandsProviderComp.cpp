@@ -12,7 +12,6 @@ namespace imtgui
 
 CMenuBasedCommandsProviderComp::CMenuBasedCommandsProviderComp()
 {
-
 }
 
 
@@ -22,11 +21,11 @@ const ibase::IHierarchicalCommand* CMenuBasedCommandsProviderComp::GetCommands()
 }
 
 
-// reimpemented (icomp::IComponent)
+// reimpemented (ibase::TRuntimeStatusHanderCompWrap)
 
-void CMenuBasedCommandsProviderComp::OnComponentCreated()
+void CMenuBasedCommandsProviderComp::OnSystemStarted()
 {
-	BaseClass::OnComponentCreated();
+	BaseClass::OnSystemStarted();
 
 	m_mainMenuCommand.SetName(m_menuCommandCompPtr->GetName());
 	m_rootMenuCommand.InsertChild(&m_mainMenuCommand);
@@ -50,13 +49,13 @@ void CMenuBasedCommandsProviderComp::OnComponentCreated()
 }
 
 
-void CMenuBasedCommandsProviderComp::OnComponentDestroyed()
+void CMenuBasedCommandsProviderComp::OnSystemShutdown()
 {
 	if (m_menuGuiCompPtr.IsValid() && m_menuGuiCompPtr->IsGuiCreated()){
 		m_menuGuiCompPtr->DestroyGui();
 	}
 
-	BaseClass::OnComponentDestroyed();
+	BaseClass::OnSystemShutdown();
 }
 
 
