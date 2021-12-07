@@ -11,6 +11,8 @@ namespace imtgui
 // public methods
 
 CMenuBasedCommandsProviderComp::CMenuBasedCommandsProviderComp()
+	:m_menuCommand(nullptr),
+	  m_menuCommandVisualStatusObserver(*this)
 {
 }
 
@@ -20,16 +22,22 @@ const ibase::IHierarchicalCommand* CMenuBasedCommandsProviderComp::GetCommands()
 	return &m_rootMenuCommand;
 }
 
-
 // reimpemented (ibase::TRuntimeStatusHanderCompWrap)
 
 void CMenuBasedCommandsProviderComp::OnSystemStarted()
 {
 	BaseClass::OnSystemStarted();
 
-	m_mainMenuCommand.SetName(m_menuCommandCompPtr->GetName());
+	if (m_menuCommandVisualStatusProviderCompPtr.IsValid()){
+		m_menuCommand = new iqtgui::CHierarchicalCommand(m_menuCommandVisualStatusProviderCompPtr->GetVisualStatus()->GetStatusText(), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR);
+		m_mainMenuCommand.SetName(m_menuCommandVisualStatusProviderCompPtr->GetVisualStatus()->GetStatusText());
+	}
+	else{
+		m_menuCommand = new iqtgui::CHierarchicalCommand("", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR);
+	}
+
 	m_rootMenuCommand.InsertChild(&m_mainMenuCommand);
-	m_mainMenuCommand.InsertChild(m_menuCommandCompPtr.GetPtr());
+	m_mainMenuCommand.InsertChild(m_menuCommand);
 
 	m_mainWidgetPtr = m_menuAnchorProviderCompPtr->GetWidgetPtr("Main");
 	m_topFramePtr = m_menuAnchorProviderCompPtr->GetWidgetPtr("TopFrame");
@@ -39,12 +47,20 @@ void CMenuBasedCommandsProviderComp::OnSystemStarted()
 	Q_ASSERT(m_topFramePtr != nullptr);
 	Q_ASSERT(m_anchorButtonPtr != nullptr);
 
-	Q_ASSERT(m_menuGuiCompPtr.IsValid() && m_menuCommandCompPtr.IsValid());
-	if(m_menuGuiCompPtr->CreateGui(m_mainWidgetPtr)){
-		QObject::connect(m_menuCommandCompPtr.GetPtr(), &QAction::triggered, this, &CMenuBasedCommandsProviderComp::OnCommandActivated);
+	Q_ASSERT(m_menuGuiCompPtr.IsValid());
+	if (m_menuGuiCompPtr->CreateGui(m_mainWidgetPtr)){
+		QObject::connect(m_menuCommand, &QAction::triggered, this, &CMenuBasedCommandsProviderComp::OnCommandActivated);
 	}
 	else{
 		SendCriticalMessage(0, QString("Unable to create GUI for component ").append(m_menuGuiCompPtr->GetWidget()->objectName()));
+	}
+
+	if (m_menuCommandVisualStatusProviderCompPtr.IsValid()){
+		const iqtgui::IVisualStatus* visualStatusPtr = m_menuCommandVisualStatusProviderCompPtr->GetVisualStatus();
+		imod::IModel* visualStatusModelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(visualStatusPtr));
+		if (visualStatusModelPtr != nullptr){
+			m_menuCommandVisualStatusObserver.RegisterModel(visualStatusModelPtr);
+		}
 	}
 }
 
@@ -56,6 +72,23 @@ void CMenuBasedCommandsProviderComp::OnSystemShutdown()
 	}
 
 	BaseClass::OnSystemShutdown();
+}
+
+
+void CMenuBasedCommandsProviderComp::UpdateMenuCommandVisualStatus()
+{
+
+	if (!m_menuCommandVisualStatusProviderCompPtr.IsValid()){
+		return;
+	}
+
+	const iqtgui::IVisualStatus* visualStatus = m_menuCommandVisualStatusProviderCompPtr->GetVisualStatus();
+	if(visualStatus == nullptr){
+		return;
+	}
+
+	m_menuCommand->setIcon(visualStatus->GetStatusIcon());
+	m_menuCommand->setText(visualStatus->GetStatusText());
 }
 
 
@@ -83,6 +116,19 @@ void CMenuBasedCommandsProviderComp::OnCommandActivated(bool)
 		}
 	}
 }
+
+
+CMenuBasedCommandsProviderComp::MenuCommandVisualStatusObserver::MenuCommandVisualStatusObserver(CMenuBasedCommandsProviderComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+void CMenuBasedCommandsProviderComp::MenuCommandVisualStatusObserver::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+{
+	m_parent.UpdateMenuCommandVisualStatus();
+}
+
 
 
 } // namespace imtgui
