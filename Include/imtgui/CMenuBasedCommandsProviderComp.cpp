@@ -23,11 +23,14 @@ const ibase::IHierarchicalCommand* CMenuBasedCommandsProviderComp::GetCommands()
 }
 
 
-// reimplemented (icomp::IComponent)
+// reimpemented (icomp::TRuntimeStatusHanderCompWrap)
 
-void CMenuBasedCommandsProviderComp::OnComponentCreated()
+void CMenuBasedCommandsProviderComp::OnSystemStarted()
 {
-	BaseClass::OnComponentCreated();
+	BaseClass::OnSystemStarted();
+
+	istd::CChangeNotifier notifier(this);
+
 	if (m_menuCommandVisualStatusProviderCompPtr.IsValid()){
 		m_menuCommand = new iqtgui::CHierarchicalCommand(m_menuCommandVisualStatusProviderCompPtr->GetVisualStatus()->GetStatusText(), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR);
 		m_mainMenuCommand.SetName(m_menuCommandVisualStatusProviderCompPtr->GetVisualStatus()->GetStatusText());
@@ -63,9 +66,6 @@ void CMenuBasedCommandsProviderComp::OnComponentCreated()
 		}
 	}
 }
-
-
-// reimpemented (icomp::TRuntimeStatusHanderCompWrap)
 
 
 void CMenuBasedCommandsProviderComp::OnSystemShutdown()

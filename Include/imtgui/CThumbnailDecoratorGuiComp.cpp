@@ -48,7 +48,8 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_verticalFrameMargin(6),
 	m_itemDelegate(nullptr),
 	m_lastPageIndexForLoggedUser(-1),
-	m_isExitProcess(false)
+	m_isExitProcess(false),
+	m_additionalCommandsObserver(*this)
 {
 	m_rootCommands.InsertChild(&m_commands);
 	m_minItemSize = QSize(100, 50);
@@ -201,10 +202,10 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		m_dashboardGuiCompPtr->CreateGui(DashBoardFrame);
 	}
 
-	AdditionalCommandsFrame->setVisible(m_additionalCommandsCompPtr.IsValid());
+	AdditionalCommandsFrame->setVisible(m_additionalCommandsProviderCompPtr.IsValid());
 
-	if (m_additionalCommandsCompPtr.IsValid()){
-		const iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_additionalCommandsCompPtr->GetCommands());
+	if (m_additionalCommandsProviderCompPtr.IsValid()){
+		const iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_additionalCommandsProviderCompPtr->GetCommands());
 		if (commandPtr != nullptr){
 			if (m_additionalCommandsToolBar == nullptr){
 				m_additionalCommandsToolBar = new QToolBar(AdditionalCommandsFrame);
@@ -215,9 +216,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 				if (layoutPtr != nullptr){
 					layoutPtr->addWidget(m_additionalCommandsToolBar);
 					iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_additionalCommandsToolBar);
-					for (auto a: m_additionalCommandsToolBar->actions()){
-						qDebug() << a->text();
-					}
 				}
 			}
 		}
@@ -274,6 +272,10 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		m_commandsObserver.RegisterModel(m_commandsProviderModelCompPtr.GetPtr(), 0, commandsChangeSet);
 	}
 
+	if (m_additionalCommandsProviderCompPtr.IsValid() && m_additionalCommandsProviderModelCompPtr.IsValid()){
+		m_additionalCommandsObserver.RegisterModel(m_additionalCommandsProviderModelCompPtr.GetPtr());
+	}
+
 	if (m_pagesCompPtr.IsValid()){
 		CreatePages(m_pagesCompPtr.GetPtr());
 
@@ -303,7 +305,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		}
 	}
 	else{
-		if (m_loginCompPtr.IsValid()){ 
+		if (m_loginCompPtr.IsValid()){
 			iauth::CUser* loggedUserPtr = m_loginCompPtr->GetLoggedUser();
 			if (loggedUserPtr == nullptr){
 				ShowLoginPage();
@@ -1091,16 +1093,16 @@ bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 
 	switch (action){
 	case UA_APPLICATION_EXIT:
-		return hasCloseRight && !m_isExitProcess;
+	return hasCloseRight && !m_isExitProcess;
 	case UA_HOME_ENABLED:
-		return isHomeEnabled;
+	return isHomeEnabled;
 	case UA_LOGIN_CONTROL_ENABLED:
-		return isLoginControlEnabled;
+	return isLoginControlEnabled;
 	case UA_LOGIN_ENABLED:
-		return !isLogged;
-		
+	return !isLogged;
+
 	default:
-		return false;
+	return false;
 	}
 }
 
@@ -1208,9 +1210,9 @@ void CThumbnailDecoratorGuiComp::UpdateSpacing()
 	int maxPossibleSpacingV = (m_rowsCount > 1) ? (float(emptySpaceV) / (float(m_rowsCount - 1))) : -1;
 
 	m_horizontalSpacing = (m_horizontalSpacing > maxPossibleSpacingH && maxPossibleSpacingH > 0) ?
-		maxPossibleSpacingH : m_horizontalSpacing;
+				maxPossibleSpacingH : m_horizontalSpacing;
 	m_verticalSpacing = (m_verticalSpacing > maxPossibleSpacingV && maxPossibleSpacingV > 0) ?
-		maxPossibleSpacingV : m_verticalSpacing;
+				maxPossibleSpacingV : m_verticalSpacing;
 
 	if (m_itemDelegate != nullptr){
 		m_itemDelegate->SetMargins(m_horizontalSpacing/2, m_verticalSpacing/2);
@@ -1265,7 +1267,7 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 		if (m_mainToolBar != nullptr){
 			m_mainToolBar->clear();
 			m_commandsMenu.clear();
-	
+
 			commandsPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_commandsProviderCompPtr->GetCommands());
 			if (commandsPtr != nullptr){
 				iqtgui::CCommandTools::SetupToolbar(*commandsPtr, *m_mainToolBar);
@@ -1287,6 +1289,25 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 }
 
 
+void CThumbnailDecoratorGuiComp::UpdateAdditionalCommands()
+{
+	if(m_additionalCommandsProviderCompPtr.IsValid()){
+		if(m_additionalCommandsProviderCompPtr.IsValid()){
+			m_additionalCommandsToolBar->clear();
+
+			const iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_additionalCommandsProviderCompPtr->GetCommands());
+			if (commandPtr != nullptr){
+				iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_additionalCommandsToolBar);
+				AdditionalCommandsFrame->setVisible(true);
+			}
+			else{
+				AdditionalCommandsFrame->setVisible(false);
+			}
+		}
+	}
+}
+
+
 int CThumbnailDecoratorGuiComp::SetupCommandsMenu(const iqtgui::CHierarchicalCommand& command, QMenu& result, int& prevGroupId)
 {
 	int childsCount = command.GetChildsCount();
@@ -1295,7 +1316,7 @@ int CThumbnailDecoratorGuiComp::SetupCommandsMenu(const iqtgui::CHierarchicalCom
 
 	for (int i = 0; i < childsCount; ++i){
 		iqtgui::CHierarchicalCommand* hierarchicalPtr = const_cast<iqtgui::CHierarchicalCommand*>(
-			dynamic_cast<const iqtgui::CHierarchicalCommand*>(command.GetChild(i)));
+					dynamic_cast<const iqtgui::CHierarchicalCommand*>(command.GetChild(i)));
 
 		if (hierarchicalPtr != NULL){
 			int groupId = hierarchicalPtr->GetGroupId();
@@ -1392,6 +1413,24 @@ CThumbnailDecoratorGuiComp::CommandsObserver::CommandsObserver(CThumbnailDecorat
 void CThumbnailDecoratorGuiComp::CommandsObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_parent.UpdateCommands();
+}
+
+
+// public methods of embedded class AdditionalCommandsObserver
+
+CThumbnailDecoratorGuiComp::AdditionalCommandsObserver::AdditionalCommandsObserver(CThumbnailDecoratorGuiComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// protected methods of embedded class AdditionalCommandsObserver
+
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CThumbnailDecoratorGuiComp::AdditionalCommandsObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	m_parent.UpdateAdditionalCommands();
 }
 
 

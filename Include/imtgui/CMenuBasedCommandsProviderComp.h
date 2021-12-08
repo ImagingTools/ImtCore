@@ -39,11 +39,8 @@ public:
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
-
-	// reimplemented (icomp::IComponent)
-	virtual void OnComponentCreated() override;
-
 	// reimpemented (ibase::TRuntimeStatusHanderCompWrap)
+	virtual void OnSystemStarted() override;
 	virtual void OnSystemShutdown() override;
 
 	void UpdateMenuCommandVisualStatus();

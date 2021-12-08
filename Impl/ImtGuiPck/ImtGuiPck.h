@@ -68,8 +68,7 @@ typedef icomp::TMakeComponentWrap<imtwidgets::CMenuPanelDelegate, imtwidgets::IM
 typedef icomp::TMakeComponentWrap<imtwidgets::CMenuPanelDelegateMin, imtwidgets::IMenuPanelDelegate> MenuPanelDelegateMin;
 typedef imtgui::CSingleDocumentWorkspaceGuiComp SingleDocumentWorkspace;
 typedef imtgui::CDocumentCollectionViewDelegateComp DocumentCollectionViewDelegate;
-typedef imtgui::CMenuBasedCommandsProviderComp MenuBasedCommandsProvider;
-
+typedef icomp::TModelCompWrap<imtgui::CMenuBasedCommandsProviderComp> MenuBasedCommandsProvider;
 
 } // namespace ImtGuiPck
 

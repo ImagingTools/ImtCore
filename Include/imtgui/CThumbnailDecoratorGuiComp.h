@@ -134,7 +134,8 @@ public:
 		I_ASSIGN(m_leftMenuPanelGuiCompPtr, "LeftMenuPanel", "Left menu panel", false, "LeftMenuPanel");
 		I_ASSIGN(m_pageNavigationControllerCompPtr, "NavigationController", "Page navigation controller", false, "NavigationController");
 		I_ASSIGN(m_dashboardGuiCompPtr, "Dashboard", "Dashboard UI", false, "Dashboard");
-		I_ASSIGN(m_additionalCommandsCompPtr, "AdditionalCommands", "Additional tool commands showed on the right side of the main tool bar", false, "AdditionalCommands");
+		I_ASSIGN(m_additionalCommandsProviderCompPtr, "AdditionalCommands", "Additional tool commands showed on the right side of the main tool bar", false, "AdditionalCommands");
+		I_ASSIGN_TO(m_additionalCommandsProviderModelCompPtr, m_additionalCommandsProviderCompPtr, false);
 		I_ASSIGN(m_rightsCommandsCompPtr, "RightsCommands", "Additional tool commands showed on the right side of the login button", false, "RightsCommands");
 	I_END_COMPONENT;
 
@@ -233,6 +234,7 @@ private:
 	void UpdateMaxSize();
 	void UpdateMinSize();
 	void UpdateCommands();
+	void UpdateAdditionalCommands();
 	int SetupCommandsMenu(const iqtgui::CHierarchicalCommand& command, QMenu& result, int& prevGroupId);
 	void UpdateMenuVisibility();
 private:
@@ -261,6 +263,20 @@ private:
 		typedef imod::CMultiModelDispatcherBase BaseClass;
 
 		explicit CommandsObserver(CThumbnailDecoratorGuiComp& parent);
+
+		// reimplemented (imod::CMultiModelDispatcherBase)
+		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+
+	private:
+		CThumbnailDecoratorGuiComp& m_parent;
+	};
+
+	class AdditionalCommandsObserver: public imod::CMultiModelDispatcherBase
+	{
+	public:
+		typedef imod::CMultiModelDispatcherBase BaseClass;
+
+		explicit AdditionalCommandsObserver(CThumbnailDecoratorGuiComp& parent);
 
 		// reimplemented (imod::CMultiModelDispatcherBase)
 		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
@@ -310,6 +326,7 @@ private:
 
 
 	CommandsObserver m_commandsObserver;
+	AdditionalCommandsObserver m_additionalCommandsObserver;
 	PageModelObserver m_pageModelObserver;
 	LoginObserver m_loginObserver;
 	PageVisualStatusObserver m_pageVisualStatusObserver;
@@ -345,7 +362,8 @@ private:
 	I_REF(iqtgui::IGuiObject, m_leftMenuPanelGuiCompPtr);
 	I_REF(imtgui::IPageNavigationController, m_pageNavigationControllerCompPtr);
 	I_REF(iqtgui::IGuiObject, m_dashboardGuiCompPtr);
-	I_REF(ibase::ICommandsProvider, m_additionalCommandsCompPtr);
+	I_REF(ibase::ICommandsProvider, m_additionalCommandsProviderCompPtr);
+	I_REF(imod::IModel, m_additionalCommandsProviderModelCompPtr);
 	I_REF(ibase::ICommandsProvider, m_rightsCommandsCompPtr);
 
 	QToolBar* m_mainToolBar;
