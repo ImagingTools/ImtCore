@@ -96,6 +96,9 @@ public:
 		I_ASSIGN(m_accountMenuCompPtr, "AccountMenu", "Menu for logged account", false, "AccountMenu");
 		I_ASSIGN(m_viewPageNavigationAttrPtr, "ViewPageNavigation", "View page navigation", true, true);
 		I_ASSIGN(m_quitDialogIgnoredAttrPtr, "QuitDialogIgnored", "If true, exit application without dialog", true, false);
+		I_ASSIGN(m_additionalCommandsProviderCompPtr, "AdditionalCommands", "Additional tool commands showed on the right side of the main tool bar", false, "AdditionalCommands");
+		I_ASSIGN_TO(m_additionalCommandsProviderModelCompPtr, m_additionalCommandsProviderCompPtr, false);
+		I_ASSIGN(m_rightsCommandsCompPtr, "RightsCommands", "Additional tool commands showed on the right side of the login button", false, "RightsCommands");
 	I_END_COMPONENT;
 
 protected:
@@ -104,6 +107,9 @@ protected:
 	I_REF(iqtgui::IGuiObject, m_accountMenuCompPtr);
 	I_ATTR(bool, m_viewPageNavigationAttrPtr);
 	I_ATTR(bool, m_quitDialogIgnoredAttrPtr);
+	I_REF(ibase::ICommandsProvider, m_additionalCommandsProviderCompPtr);
+	I_REF(imod::IModel, m_additionalCommandsProviderModelCompPtr);
+	I_REF(ibase::ICommandsProvider, m_rightsCommandsCompPtr);
 };
 
 
@@ -134,9 +140,6 @@ public:
 		I_ASSIGN(m_leftMenuPanelGuiCompPtr, "LeftMenuPanel", "Left menu panel", false, "LeftMenuPanel");
 		I_ASSIGN(m_pageNavigationControllerCompPtr, "NavigationController", "Page navigation controller", false, "NavigationController");
 		I_ASSIGN(m_dashboardGuiCompPtr, "Dashboard", "Dashboard UI", false, "Dashboard");
-		I_ASSIGN(m_additionalCommandsProviderCompPtr, "AdditionalCommands", "Additional tool commands showed on the right side of the main tool bar", false, "AdditionalCommands");
-		I_ASSIGN_TO(m_additionalCommandsProviderModelCompPtr, m_additionalCommandsProviderCompPtr, false);
-		I_ASSIGN(m_rightsCommandsCompPtr, "RightsCommands", "Additional tool commands showed on the right side of the login button", false, "RightsCommands");
 	I_END_COMPONENT;
 
 	enum
@@ -362,9 +365,6 @@ private:
 	I_REF(iqtgui::IGuiObject, m_leftMenuPanelGuiCompPtr);
 	I_REF(imtgui::IPageNavigationController, m_pageNavigationControllerCompPtr);
 	I_REF(iqtgui::IGuiObject, m_dashboardGuiCompPtr);
-	I_REF(ibase::ICommandsProvider, m_additionalCommandsProviderCompPtr);
-	I_REF(imod::IModel, m_additionalCommandsProviderModelCompPtr);
-	I_REF(ibase::ICommandsProvider, m_rightsCommandsCompPtr);
 
 	QToolBar* m_mainToolBar;
 	QToolBar* m_additionalCommandsToolBar;
