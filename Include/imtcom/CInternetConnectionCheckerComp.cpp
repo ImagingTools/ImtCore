@@ -14,8 +14,10 @@ namespace imtcom
 CInternetConnectionCheckerComp::CInternetConnectionCheckerComp()
 	:m_status(ICS_UNKNOWN),
 	m_managerPtr(nullptr),
-	m_timeout(1000),
-	m_delay(1000)
+	m_requestTimeout(1000),
+	m_requestDelay(1000),
+	m_retryCount(0),
+	m_retryCounter(0)
 {
 }
 
@@ -35,19 +37,24 @@ void CInternetConnectionCheckerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (*m_timeoutAttrPtr > 0){
-		m_timeout = *m_timeoutAttrPtr;
+	if (*m_requestTimeoutAttrPtr> 0){
+		m_requestTimeout= *m_requestTimeoutAttrPtr;
 	}
 
-	if (*m_delayAttrPtr > 0){
-		m_delay = *m_delayAttrPtr;
+	if (*m_requestDelayAttrPtr > 0){
+		m_requestDelay= *m_requestDelayAttrPtr;
+	}
+
+	if (*m_retryCountAttrPtr> 0){
+		m_retryCount = *m_retryCountAttrPtr;
 	}
 
 	m_managerPtr = new QNetworkAccessManager();
+	m_managerPtr->setTransferTimeout(m_requestTimeout);
 
 	connect(&m_timer, &QTimer::timeout, this, &CInternetConnectionCheckerComp::OnTimer);
 	m_timer.setSingleShot(true);
-	m_timer.setInterval(m_delay);
+	m_timer.setInterval(m_requestDelay);
 
 	SendRequest();
 }
@@ -61,6 +68,8 @@ void CInternetConnectionCheckerComp::OnComponentDestroyed()
 		m_managerPtr->deleteLater();
 		m_managerPtr = nullptr;
 	}
+
+	disconnect();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -78,26 +87,37 @@ void CInternetConnectionCheckerComp::OnRequestFinished()
 {
 	QNetworkReply* replyPtr = dynamic_cast<QNetworkReply*>(sender());
 	if (replyPtr != nullptr){
-		bool isOnline = replyPtr->error() == QNetworkReply::NoError;
-		if (isOnline && m_status != ICS_ONLINE){
-			istd::CChangeNotifier notifier(this);
-
-			m_status = ICS_ONLINE;
-
-			SendVerboseMessage("Internet connection available");
-		}
-		else if (!isOnline && m_status != ICS_OFFLINE){
-			istd::CChangeNotifier notifier(this);
-
-			m_status = ICS_OFFLINE;
-
-			SendVerboseMessage("No internet connection");
-		}
-
+		bool result = replyPtr->error() == QNetworkReply::NoError;
 		replyPtr->deleteLater();
 
-		m_timer.start();
+		if (result){
+			if (m_status != ICS_ONLINE){
+				istd::CChangeNotifier notifier(this);
+
+				m_status = ICS_ONLINE;
+				SendVerboseMessage("Internet connection available");
+			}
+		}
+		else{
+			if (m_retryCounter < m_retryCount){
+				m_retryCounter++;
+				SendRequest();
+
+				return;
+			}
+			else{
+				if (m_status != ICS_OFFLINE){
+					istd::CChangeNotifier notifier(this);
+
+					m_status = ICS_OFFLINE;
+					SendVerboseMessage("No internet connection");
+				}
+			}
+		}
 	}
+
+	m_retryCounter = 0;
+	m_timer.start();
 }
 
 
@@ -110,7 +130,7 @@ void CInternetConnectionCheckerComp::SendRequest()
 		request.setUrl(*m_urlAttrPtr);
 
 #if QT_VERSION > QT_VERSION_CHECK(5, 14, 0)
-		request.setTransferTimeout(m_timeout);
+		request.setTransferTimeout(m_requestTimeout);
 #endif
 		QNetworkReply* replyPtr = m_managerPtr->get(request);
 		if (replyPtr != nullptr){

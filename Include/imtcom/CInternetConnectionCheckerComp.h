@@ -28,8 +28,9 @@ public:
 	I_BEGIN_COMPONENT(CInternetConnectionCheckerComp);
 		I_REGISTER_INTERFACE(IInternetConnectionStatusProvider);
 		I_ASSIGN(m_urlAttrPtr, "Url", "URL to check availability", true, "https://google.com");
-		I_ASSIGN(m_timeoutAttrPtr, "Timeout", "Request timeout", true, 1000)
-		I_ASSIGN(m_delayAttrPtr, "Delay", "Delay between two consecutive requests", true, 1000);
+		I_ASSIGN(m_requestTimeoutAttrPtr, "RequestTimeout", "Request timeout", true, 1000)
+		I_ASSIGN(m_requestDelayAttrPtr, "RequestDelay", "Delay between two consecutive requests", true, 1000);
+		I_ASSIGN(m_retryCountAttrPtr, "RetryCount", "Number of retries after failure before going offline", true, 10);
 	I_END_COMPONENT;
 
 	CInternetConnectionCheckerComp();
@@ -51,15 +52,18 @@ private:
 
 private:
 	I_ATTR(QString, m_urlAttrPtr);
-	I_ATTR(int, m_timeoutAttrPtr);
-	I_ATTR(int, m_delayAttrPtr);
+	I_ATTR(int, m_requestTimeoutAttrPtr);
+	I_ATTR(int, m_requestDelayAttrPtr);
+	I_ATTR(int, m_retryCountAttrPtr);
 
 	InternetConnectionStatus m_status;
 	QTimer m_timer;
 	QNetworkAccessManager* m_managerPtr;
 
-	int m_timeout;
-	int m_delay;
+	int m_requestTimeout;
+	int m_requestDelay;
+	int m_retryCount;
+	int m_retryCounter;
 };
 
 
