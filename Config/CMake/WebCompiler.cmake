@@ -65,7 +65,7 @@ set(QRC_CPP_WEB_FILE ${IMTCOREDIR}/Bin/web/Resources/qrc_LisaHtml.cpp)
 			    ${CMAKE_CURRENT_BINARY_DIR}/__header.h  # fake! ensure we run!
 				${QRC_WEB_FILE}
 				PRE_BUILD
-			COMMAND ${IMTCOREDIR}/3rdParty/WebCompiler/webcompiler.py ${webdirs}
+			COMMAND ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe ${IMTCOREDIR}/3rdParty/WebCompiler/webcompiler.py ${webdirs}
 			COMMENT
 			"WEB COMPILER for ${PROJECT_NAME}"
 			)
