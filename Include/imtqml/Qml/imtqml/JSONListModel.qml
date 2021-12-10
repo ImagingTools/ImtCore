@@ -34,12 +34,12 @@ ListModel {
 	}
 
 	function makeJson(){
-		this.json = JSON.stringify(jsonModel.$items)
+		this.json = JSON.stringify(this.$items)
 	}
 	function sendJson(method){
 		var xhr = new XMLHttpRequest;
 		xhr.open(method, target);
-		xhr.send(json);
+		xhr.send(this.json);
 	}
 
     function updateJSONModel() {
