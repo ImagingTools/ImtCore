@@ -23,11 +23,33 @@ def copy(folder_from, folder_to):
 if len(sys.argv) > 3:
     for i in range(1, len(sys.argv) - 3, 2):
         copy(sys.argv[i], sys.argv[i + 1])
-    dir_build = sys.argv[2]
-    python_path = sys.argv[len(sys.argv) - 1]
-    process = subprocess.Popen(f'{python_path}  qmlcore/build.py', shell=True, cwd=dir_build)
-    process.wait()
-    build_from = sys.argv[len(sys.argv) - 3]
-    build_to = sys.argv[len(sys.argv) - 2]
-    copy(build_from, build_to)
+
+    GraphQLRequestPath = ""
+    BIN_WEB_DIST_DIR = ""
+    BIN_WEB_DIR = ""
+    for dir in sys.argv:
+        if dir.replace("\\", "/").endswith("ImtCore/Include/imtqml/Qml/imtqml"):
+            GraphQLRequestPath = dir + "/GraphQLRequest.js"
+        if dir.replace("\\", "/").endswith("ImtCore/Bin/web/dist"):
+            BIN_WEB_DIST_DIR = dir
+        if dir.replace("\\", "/").endswith("ImtCore/Bin/web"):
+            BIN_WEB_DIR = dir
+    if os.path.isfile(GraphQLRequestPath):
+        if not os.path.isdir(BIN_WEB_DIST_DIR):
+            print("Bin/web/dist directory not found!")
+        else:
+            print("copy from ", GraphQLRequestPath, " to ", BIN_WEB_DIST_DIR)
+            shutil.copy(GraphQLRequestPath, BIN_WEB_DIST_DIR)
+    else:
+        print("GraphQLRequest.js file not found!")
+    if not os.path.isdir(BIN_WEB_DIR):
+        print("Bin/web directory not found!")
+    else:
+    # dir_build = sys.argv[2]
+        python_path = sys.argv[len(sys.argv) - 1]
+        process = subprocess.Popen(f'{python_path}  qmlcore/build.py', shell=True, cwd=BIN_WEB_DIR)
+        process.wait()
+        build_from = sys.argv[len(sys.argv) - 3]
+        build_to = sys.argv[len(sys.argv) - 2]
+        copy(build_from, build_to)
 print("End script!")
