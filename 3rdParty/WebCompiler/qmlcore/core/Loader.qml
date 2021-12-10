@@ -7,6 +7,9 @@ Item {
 	property bool trace;		///< log loading objects
 	property bool asynchronous; //by Artur
 	
+	constructor: {
+		this.__ready = false
+	}
 
 	///@private
 	function discardItem() {
@@ -25,9 +28,12 @@ Item {
 	}
 
 	///@internal
+
 	onSourceChanged: {
-		this.discardItem()
-		this._load()
+		if(this.__ready){
+			this.discardItem()
+			this._load()
+		}
 	}
 
 	///@internal
@@ -129,8 +135,10 @@ Item {
 
 		this.__properties.item.value = item
 		for(let func of this.__properties.item.onChanged){
-			func()
+			func(item)
 		}
+
+		this.item._context._processActions()
 		
 
 		if (!overrideComplete)
@@ -144,12 +152,12 @@ Item {
 
 	///@internal
 	onCompleted: {
-
 		if (this.source === '') {
 			this.item.discard()
 			this.__properties.item.value = null
 		}
-		if (!this.item && this.source)
-			this._load()
+		this.__ready = true
+		this.discardItem()
+		this._load()
 	}
 }
