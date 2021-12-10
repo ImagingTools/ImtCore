@@ -716,6 +716,8 @@ void CThumbnailDecoratorGuiComp::SwitchToPage(int index)
 
 	if (m_pagesCompPtr.IsValid()){
 		if (m_pagesCompPtr->SetSelectedOptionIndex(index)){
+			m_lastPageIndexForLoggedUser = index;
+
 			QString pageLabel;
 			const iprm::IOptionsList* pageListPtr = m_pagesCompPtr->GetSelectionConstraints();
 			if ((pageListPtr != NULL) && index >= 0){
