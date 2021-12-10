@@ -1,0 +1,21 @@
+{
+  "name": "pureqml-controls",
+  "version": "1.2.0",
+  "description": "Library of the most commonly used QML controls for PureQML qml transpiler. Canvas, YouTube, Google Charts, inputs (native and non-native), mixins, SVG, vk.com, and Yandex components.",
+
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pureqml/controls"
+  },
+
+  "bugs": {
+    "url" : "https://github.com/pureqml/controls/issues"
+  },
+
+  "author": "PureQML team",
+  "license": "MIT",
+
+  "dependencies": {
+    "pureqml-core": "*"
+  }
+}

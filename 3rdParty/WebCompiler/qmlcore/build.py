@@ -1,0 +1,455 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+from future import standard_library
+from future.utils import PY2
+standard_library.install_aliases()
+from builtins import filter, range
+
+from compiler import manifest as mf
+from compiler import compile_qml
+
+import subprocess
+import distutils
+import argparse
+import shutil
+import fnmatch
+import re
+import os
+import sys
+import datetime
+
+if PY2:
+    reload(sys)
+    sys.setdefaultencoding('utf8')
+
+from os import path
+from distutils import dir_util
+from compiler.ts import Ts
+
+print("start build time", datetime.datetime.now())
+parser = argparse.ArgumentParser('qmlcore build tool')
+parser.add_argument('--minify', '-m', action='store_true', default=False, help='force minify step')
+parser.add_argument('--no-minify', '-M', action='store_true', default=False, help='force non-minified code generation')
+parser.add_argument('--devel', '-d', action='store_true', default=False, help='development mode, listen for changed files, rebuild if changed')
+parser.add_argument('--keep-temp', '-k', action='store_true', default=False, help='keep temp files (e.g qml.js)')
+parser.add_argument('--web-prefix', '-W', help='web prefix for hybrid sites/apps')
+parser.add_argument('--update-translation', '-u', action='store_true', default=False, help='update translation only')
+parser.add_argument('--boilerplate', action='store_true', default = False, help = 'create simple skeleton project')
+parser.add_argument('--doc', '-D', help='generate documentation in given directory')
+parser.add_argument('--release', '-r', help='generate release code (no logs)', default = False, action = 'store_true')
+parser.add_argument('--platform', '-p', help='generate code for platform <platform>', action='append')
+parser.add_argument('--verbose', '-v', help='adds verbosity in some places', dest='verbose', default=False, action='store_true')
+parser.add_argument('--jobs', '-j', help='run N jobs in parallel', default=1, nargs='?')
+parser.add_argument('--set-property', '-s', dest='properties', action='append', help = 'sets manifest property name value', nargs=2)
+parser.add_argument('--print-property', '-P', help = 'get manifest property', nargs=1)
+parser.add_argument('--manifest', default = '.manifest', help = 'app manifest path')
+parser.add_argument('--inline-manifest', default = None, help = 'manifest given in the option value')
+parser.add_argument('--cache-dir', default = '.cache', help = 'cache directory')
+parser.add_argument('--build-dir', default = 'build.{{platform}}', help = 'build output directory')
+parser.add_argument('targets', nargs='*', help='targets to build')
+args = parser.parse_args()
+
+root = os.path.dirname(sys.argv[0])
+manifest_path = None
+verbose = args.verbose
+
+if args.boilerplate:
+	if path.exists('.manifest') or path.exists('src/app.qml'):
+		print('error: will not overwrite any file, you already have your project set up, run %s' %sys.argv[0], file=sys.stderr)
+		sys.exit(1)
+	with open('.manifest', 'w') as f:
+		f.write("{ }\n")
+	try:
+		os.mkdir('src')
+	except:
+		pass
+
+	with open('src/app.qml', 'w') as app:
+		with open(path.join(root, 'app.qml')) as template:
+			app.write(template.read())
+	print('finished, run %s now' %sys.argv[0], file=sys.stderr)
+	sys.exit(0)
+
+def call(*args, **kw):
+	if verbose:
+		print('calling', args, kw, file=sys.stderr)
+	if os.name == 'nt':
+		cmd = ['cmd', '/c'] +  list(args)[0]
+		code = subprocess.call(cmd)
+	else:
+		code = subprocess.call(*args, **kw)
+		if code != 0:
+			raise Exception('command %s failed with code %d' %(" ".join(*args), code))
+
+def minify_uglify(out, src, root, app, platform, manifest):
+	call(["uglifyjs",
+		src,
+		"-c",
+		"-m"
+		], stdout = out)
+
+def minify_gcc(out, src, root, app, platform, manifest):
+	call(["java", "-jar", path.join(root, "compiler/gcc/compiler.jar"),
+		"--warning_level", "VERBOSE",
+		"--jscomp_off=missingProperties",
+		src], stdout = out)
+
+def minify(root, target, app, platform, manifest):
+	src = path.join(target, "qml.%s.js" % app)
+	dstname = "qml.%s.min.js" %app
+	tool = manifest.minify
+	if isinstance(tool, bool):
+		tool = 'uglify-js'
+
+	with open(path.join(target, dstname), "w") as out:
+		if tool == 'uglify-js':
+			try:
+				minify_uglify(out, src, root, app, platform, manifest)
+			except:
+				print("WARNING: you don't seem to have uglifyjs installed. please run `sudo npm install -g uglify-js`, falling back to gcc", file=sys.stderr)
+				tool = 'gcc'
+
+		if tool == 'gcc':
+			minify_gcc(out, src, root, app, platform, manifest)
+
+	if not args.keep_temp:
+		os.remove(src)
+	return dstname
+
+var_re = re.compile(r'{{\s*([\w\.]+)\s*}}', re.MULTILINE)
+block_re = re.compile(r'{%.*?%}', re.MULTILINE | re.IGNORECASE)
+
+def process_template_simple(destination, source, context):
+	_head, name = path.split(source)
+	destination = path.join(destination, name)
+	with open(destination, 'w') as fd, open(source) as fs:
+		data = fs.read()
+		data = var_re.sub(lambda x: context.get(x.group(1), ''), data)
+		data = block_re.sub('', data)
+		fd.write(data)
+
+def process_template_jinja2(destination, source, context):
+	from jinja2 import Environment, FileSystemLoader, BaseLoader, TemplateNotFound
+
+	src, name = os.path.split(source)
+
+	class Loader(BaseLoader):
+		def __init__(self, paths):
+			self.paths = paths
+			self.next_index = {}
+
+		def get_source(self, env, template, updateIndex = False):
+			#print('get', template, self.paths, file=sys.stderr)
+			paths = self.paths
+			for i in range(self.next_index.get(template, 0), len(paths)):
+				path = paths[i]
+				src = os.path.join(path, template)
+				if os.path.isfile(src):
+					with open(src, 'r') as f:
+						text = f.read()
+						if updateIndex:
+							#print('updated index for', template, 'to', i + 1, file=sys.stderr)
+							self.next_index[template] = i + 1
+					#print('returning', src, file=sys.stderr)
+					return (text, src, lambda: True) #always up-to-date, fixme
+			raise TemplateNotFound(template)
+
+		def load(self, env, name, globals):
+			text, fname, uptodate = self.get_source(env, name, True)
+			return env.from_string(text)
+
+	env = Environment(loader=Loader(context['template_path']), cache_size = 0)
+#	env = Environment(loader=FileSystemLoader(paths))
+
+	template = env.get_template(name)
+	destination = os.path.join(destination, name)
+	with open(destination, 'wb') as fd:
+		fd.write(template.render(**context).encode('utf-8'))
+
+def process_template(destination, source, context):
+	t = context['templater']
+	if t == 'simple':
+		process_template_simple(destination, source, context)
+	elif t == 'jinja2':
+		process_template_jinja2(destination, source, context)
+	else:
+		raise Exception('unknown templater: %s' %t)
+
+def apply_templates(src, dst, context, templates):
+	_path, name = path.split(src)
+	for pattern in templates:
+		if fnmatch.fnmatch(name, pattern):
+			process_template(dst, src, context)
+
+def copy(source, destination, context, templates):
+	if not path.isdir(source):
+		return
+
+	if verbose:
+		print('copying from', source, 'to', destination, file=sys.stderr)
+	files = [path.join(source, file_) for file_ in os.listdir(source)]
+	copytree(source, destination)
+	for src in files:
+		if verbose:
+			print('+', src, file=sys.stderr)
+		_path, name = path.split(src)
+		name, ext = path.splitext(name)
+		apply_templates(src, destination, context, templates)
+
+def find_platform_path(root, plugins_path, platform):
+	platform_path = path.join(root, 'platform', platform)
+	if path.exists(platform_path):
+		return platform_path
+
+	for dir in plugins_path:
+		if os.path.basename(dir).startswith('qmlcore-'):
+			platform_path = path.join(dir, 'platform', platform)
+			if path.exists(platform_path):
+				return platform_path
+	raise Exception("no platform '%s' found" %platform)
+
+
+def copytree(src, dst, symlinks=False, ignore=None):
+	for item in os.listdir(src):
+		s = os.path.join(src, item)
+		d = os.path.join(dst, item)
+		if os.path.isdir(s):
+			distutils.dir_util.copy_tree(s, d)
+		else:
+			shutil.copy2(s, d)
+
+def listdirs(path):
+	return list(filter(os.path.isdir, [os.path.join(path, x) for x in os.listdir(path)]))
+
+def replace_vars_in_path(path, vars):
+	for k,v in vars.items():
+		path = path.replace("{{%s}}" % k, v)
+	return path
+		
+def build(root, platform, apps, app, manifest):
+	print("building %s for %s..." %(app, platform), file=sys.stderr)
+	if len(apps) > 1:
+		target = path.join(replace_vars_in_path(args.build_dir, {"platform": platform}), app)
+	else:
+		target = path.join(replace_vars_in_path(args.build_dir, {"platform": platform}))
+
+	try:
+		os.makedirs(target)
+	except Exception as ex:
+		pass
+
+	plugins_path = listdirs(path.normpath(path.join(root, '..')))
+	plugins_path += listdirs(path.normpath(root))
+
+	def discover_package(dname):
+		package = os.path.normpath(dname)
+		try:
+			with open(os.path.join(package, '.manifest')) as f:
+				package_manifest = mf.load(f)
+			return package_manifest.public
+		except:
+			return False
+
+	pureqml_packages = list(filter(discover_package, plugins_path))
+
+	platform_path = find_platform_path(root, plugins_path, platform)
+	templates = manifest.templates
+
+	with open(path.join(platform_path, '.manifest')) as f:
+		platform_manifest = mf.load(f)
+		templates = platform_manifest.templates
+
+	if not platform_manifest.standalone:
+		raise Exception('%s is not a standalone platform' %platform)
+
+	project_dirs = [path.join(root, 'core')]
+
+	subplatforms = [platform] + manifest.requires + manifest.platform_requires(platform)
+	subplatforms_manifests = [manifest]
+	subplatform_visited = set()
+
+	subplatform_paths = {}
+	subplatform_deps = {}
+
+	while subplatforms:
+		subplatforms_next = []
+
+		for subplatform in subplatforms:
+			if subplatform in subplatform_visited:
+				continue
+
+			subplatform_visited.add(subplatform)
+			subplatform_path = find_platform_path(root, plugins_path, subplatform)
+			subplatform_paths[subplatform] = subplatform_path
+
+			with open(path.join(subplatform_path, '.manifest')) as f:
+				subplatform_manifest = mf.load(f)
+				subplatforms_manifests.insert(0, subplatform_manifest)
+
+			deps = subplatform_deps.setdefault(subplatform, set())
+			deps.update(subplatform_manifest.requires)
+			deps.update(subplatform_manifest.platform_requires(platform))
+
+			subplatforms_next += subplatform_manifest.requires
+			subplatforms_next += subplatform_manifest.platform_requires(platform)
+
+		subplatforms = subplatforms_next
+
+	#unrolling deps
+	platform_dirs = []
+	platforms = []
+	while subplatform_deps:
+		#print(subplatform_deps, file=sys.stderr)
+		for subplatform, deps in list(subplatform_deps.items()):
+			if subplatform not in platforms:
+				platforms.append(subplatform)
+			if not deps: #leaf subplatform
+				subplatform_path = subplatform_paths[subplatform]
+				project_dirs.append(subplatform_path)
+				platform_dirs.append(subplatform_path)
+				del subplatform_deps[subplatform]
+				for deps in subplatform_deps.values():
+					deps.discard(subplatform)
+
+	project_dirs.extend(source_dir if isinstance(source_dir, list) else [source_dir])
+	project_dirs.extend(pureqml_packages)
+
+	kw = {}
+	if args.release:
+		kw['release'] = True
+
+	if args.devel:
+		kw['wait'] = True
+
+	if args.doc:
+		kw['doc'] = args.doc
+
+	if args.web_prefix or manifest.web_prefix:
+		manifest.properties.setdefault("html5", {})["prefix"] = args.web_prefix or manifest.web_prefix
+
+	if args.jobs != 1:
+		kw['jobs'] = args.jobs
+
+	if verbose:
+		kw['verbose'] = True
+
+	kw['platforms'] = set(platforms)
+	kw['cache_dir'] = args.cache_dir
+
+	compile_qml(target, root, project_dirs, manifest, app, **kw)
+
+	script = 'qml.%s.js' %app #fixme
+
+	if not args.no_minify and (args.minify or manifest.minify):
+		script = minify(root, target, app, platform, manifest)
+	templater = manifest.templater
+
+	if verbose:
+		print("copying resources...", file=sys.stderr)
+
+	context = { 'id': app, 'app': script, 'templater': templater }
+	for sm in subplatforms_manifests:
+		context.update(sm.properties)
+	context.update(manifest.properties)
+
+	if args.print_property:
+		value = context
+		for ppath in args.print_property:
+			for pcomp in ppath.split('.'):
+				value = value[pcomp]
+			print(value)
+		sys.exit(0)
+
+	copy(path.join(root, 'dist'), target, context, templates)
+
+	template_path = []
+
+	app_dist = path.join(os.getcwd(), 'dist.' + app)
+	if path.isdir(app_dist):
+		template_path.append(app_dist)
+
+	for subplatform in platforms:
+		platform_dist = path.join(os.getcwd(), 'dist.platform.' + subplatform)
+		if path.isdir(platform_dist):
+			template_path.append(platform_dist)
+
+	project_dist = path.join(os.getcwd(), 'dist')
+	if path.isdir(project_dist):
+		template_path.append(project_dist)
+
+	for subplatform_path in reversed(platform_dirs):
+		platform_dist = path.join(subplatform_path, 'dist')
+		if path.isdir(platform_dist):
+			template_path.append(platform_dist)
+
+	n = len(template_path)
+	for i in range(n):
+		idx = n - 1 - i
+		dist = template_path[idx]
+		context['template_path'] = template_path[idx:]
+		copy(dist, target, context, templates)
+
+
+try:
+	if not args.inline_manifest:
+		with open(args.manifest) as f:
+			manifest = mf.load(f)
+			manifest_path = '.manifest'
+	else:
+		manifest = mf.loads(args.inline_manifest)
+except IOError:
+	print('warning: could not find .manifest, using empty fallback', file=sys.stderr)
+	manifest = mf.Manifest()
+
+if args.properties:
+	for name, value in args.properties:
+		manifest.set_property(name, value)
+
+apps = manifest.apps
+def proc_source_dir(source_dir):
+	for f in os.listdir(source_dir):
+		if f[0].islower() and f.endswith('.qml'):
+			apps.append(f[0:-4])
+	if not apps:
+		raise Exception('No application files found. Application file named in lowercase and has .qml extension')
+
+	if args.update_translation:
+		languages = manifest.languages
+		for language in languages:
+			print('updating translation for language', language, file=sys.stderr)
+			ts = Ts(os.path.join(source_dir, language + '.ts'), language)
+			ts.scan([source_dir])
+			ts.save()
+		sys.exit(0)
+
+source_dir = manifest.source_dir
+if not len(apps):
+	if isinstance(source_dir, list):
+		for src in source_dir:
+			proc_source_dir(src)
+	else:
+		proc_source_dir(source_dir)
+
+platforms = manifest.platforms
+if not platforms:
+	platforms = ['web']
+
+if args.platform:
+	platforms = args.platform
+
+targets = set(args.targets)
+
+try:
+	for platform in platforms:
+		for app in apps:
+			if targets and app not in targets:
+				continue
+			build(root, platform, apps, app, manifest)
+except Exception as ex:
+	print("error:", ex, file=sys.stderr)
+	if verbose:
+		raise
+	else:
+		sys.exit(1)
+print("end build time", datetime.datetime.now())

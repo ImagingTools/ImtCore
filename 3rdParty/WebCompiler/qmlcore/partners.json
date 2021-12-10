@@ -1,0 +1,12 @@
+{
+	"pureqml-team": {
+		"name": "PureQML Team",
+		"engine": "Octobears Private",
+		"status": "paper"
+	},
+
+	"free": {
+		"name": "General Public",
+		"engine": "No-Partnership"
+	}
+}

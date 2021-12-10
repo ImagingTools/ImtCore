@@ -1,0 +1,12 @@
+{
+	"standalone": false,
+	"requires": ["core"],
+	"properties": {
+		"cssAutoClassificator": false,
+		"cssDisableTransitions": false,
+		"cssDisableTransformations": false,
+		"expectRunContextEvent": false,
+		"requireExplicitRecursiveVisibilityStyle": false,
+		"requireVerticalTextAlignmentStyle": false
+	}
+}

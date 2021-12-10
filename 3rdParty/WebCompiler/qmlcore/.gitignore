@@ -1,0 +1,13 @@
+*.swp
+*.swo
+*.pyc
+*.pyo
+app/qml.js
+app/qml.min.js
+.cache/*
+node_modules
+.idea/
+test/qml/Output
+test/build.*
+test/.cache
+

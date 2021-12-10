@@ -1,0 +1,22 @@
+{
+  "name": "{{ title | default('pureqml') }}",
+  "version": "{{ version | default('1.0.0') }}",
+  "description": "{{ description | default('') }}",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/electron/electron-quick-start",
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo"
+  ],
+  "author": "{{ author.name | default('Jhon Doe') if author is defined else 'Jhon Doe' }}",
+  "license": "{{ license | default('MIT') }}",
+  "devDependencies": {
+    "electron": "^7.1.3"
+  }
+}
