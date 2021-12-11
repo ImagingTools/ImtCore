@@ -177,8 +177,6 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 
 		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(typeId);
 		if (persistencePtr == nullptr){
-			continue;
-
 			SendErrorMessage(0, QString("No persistence was registered for type-ID: '%1'").arg(qPrintable(typeId)));
 
 			tempPath.removeRecursively();
@@ -197,8 +195,6 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 		QString objectFilePath = tempPath.path() + QDir::separator() + objectFileName;
 
 		if (persistencePtr->SaveToFile(*objectPtr, objectFilePath) != OS_OK){
-			continue;
-
 			SendErrorMessage(0, QString("Object could not be saved to: '%1'").arg(objectFilePath));
 
 			tempPath.removeRecursively();
