@@ -95,8 +95,8 @@ void CCompositeObjectViewComp::CreateView()
 		for (int factoryCounter = 0; factoryCounter < factoryCount; factoryCounter++){
 			if (objectTypeId == m_objectTypeAttrPtr[factoryCounter]){
 				icomp::IComponent* viewComponentPtr = m_objectViewFactoryListCompPtr.CreateComponent(factoryCounter);
-				iqtgui::IGuiObject* viewGuiObjectPtr = dynamic_cast<iqtgui::IGuiObject*>(viewComponentPtr);
-				imod::IObserver* viewObserverPtr = dynamic_cast<imod::IObserver*>(viewGuiObjectPtr);
+				iqtgui::IGuiObject* viewGuiObjectPtr = m_objectViewFactoryListCompPtr.ExtractInterface(viewComponentPtr);
+				imod::IObserver* viewObserverPtr = m_objectObserverFactoryListCompPtr.ExtractInterface(viewComponentPtr);
 				
 				if (viewObserverPtr == nullptr){
 					if (viewComponentPtr != nullptr){
@@ -106,7 +106,7 @@ void CCompositeObjectViewComp::CreateView()
 					break;
 				}
 
-				m_views.append(viewGuiObjectPtr);
+				m_views.append(viewComponentPtr);
 
 				QWidget* widgetPtr = new QWidget();
 				QVBoxLayout* layoutPtr = new QVBoxLayout(widgetPtr);
@@ -170,9 +170,13 @@ void CCompositeObjectViewComp::DestroyView()
 
 	m_viewExtenders.clear();
 
-	for (iqtgui::IGuiObject* viewPtr : m_views){
-		viewPtr->DestroyGui();
-		delete viewPtr;
+	for (icomp::IComponent* viewComponentPtr : m_views){
+		iqtgui::IGuiObject* viewGuiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(viewComponentPtr);
+		if (viewGuiObjectPtr != nullptr){
+			viewGuiObjectPtr->DestroyGui();
+		}
+	
+		delete viewComponentPtr;
 	}
 
 	m_views.clear();
