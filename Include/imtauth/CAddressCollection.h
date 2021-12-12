@@ -28,6 +28,7 @@ public:
 	// reimplemented (IAddressProvider)
 	virtual const imtbase::ICollectionInfo& GetAddressList() const override;
 	virtual const IAddress* GetAddress(const QByteArray& featureId) const override;
+	virtual AddressCategory GetAddressCategory(const QByteArray& addressId) const override;
 };
 
 

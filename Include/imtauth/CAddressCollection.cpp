@@ -14,6 +14,7 @@ CAddressCollection::CAddressCollection()
 
 
 // reimplemented (IAddressManager)
+
 QByteArray CAddressCollection::AddAddress(IAddress* addressPtr)
 {
 	return m_collection.InsertNewObject("Address", "", "", addressPtr);
@@ -48,6 +49,11 @@ const imtbase::ICollectionInfo& CAddressCollection::GetAddressList() const
 const IAddress* CAddressCollection::GetAddress(const QByteArray& addressId) const
 {
 	return dynamic_cast<const IAddress*>(m_collection.GetObjectPtr(addressId));
+}
+
+IAddressProvider::AddressCategory CAddressCollection::GetAddressCategory(const QByteArray& addressId) const
+{
+	return AC_CONTACT;
 }
 
 

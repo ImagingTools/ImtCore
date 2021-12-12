@@ -129,6 +129,11 @@ public:
 	virtual const IContactInfo* GetAccountOwner() const = 0;
 
 	/**
+		Set informations about account owner.
+	*/
+	virtual void SetAccountOwner(const IContactInfo& ownerInfo) = 0;
+
+	/**
 		Get the access to the rights provider associated with this account.
 	*/
 	virtual const iauth::IRightsProvider& GetAccountRights() const = 0;

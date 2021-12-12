@@ -35,6 +35,7 @@ public:
 	virtual const iimg::IBitmap& GetAccountPicture() const override;
 	virtual void SetAccountPicture(const iimg::IBitmap& picture) override;
 	virtual const IContactInfo* GetAccountOwner() const override;
+	virtual void SetAccountOwner(const IContactInfo& ownerInfo) override;
 	virtual const iauth::IRightsProvider& GetAccountRights() const override;
 
 	// reimplemented (iauth::IRightsProvider)

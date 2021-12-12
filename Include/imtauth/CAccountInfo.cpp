@@ -114,6 +114,14 @@ const IContactInfo* CAccountInfo::GetAccountOwner() const
 }
 
 
+void CAccountInfo::SetAccountOwner(const IContactInfo& ownerInfo)
+{
+	istd::CChangeNotifier changeNorifier(this);
+
+	m_contact.CopyFrom(ownerInfo);
+}
+
+
 const iauth::IRightsProvider& CAccountInfo::GetAccountRights() const
 {
 	return *this;

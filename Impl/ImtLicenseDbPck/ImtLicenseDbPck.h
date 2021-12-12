@@ -8,6 +8,8 @@
 // ImtCore includes
 #include <imtlicdb/CFeaturePackageDatabaseDelegateComp.h>
 #include <imtlicdb/CProductsDatabaseDelegateComp.h>
+#include <imtlicdb/CProductInstanceDatabaseDelegateComp.h>
+#include <imtlicdb/CAccountDatabaseDelegateComp.h>
 
 
 /**
@@ -19,6 +21,8 @@ namespace ImtLicenseDbPck
 
 typedef imtlicdb::CFeaturePackageDatabaseDelegateComp FeaturePackageDatabaseDelegate;
 typedef imtlicdb::CProductsDatabaseDelegateComp ProductDatabaseDelegate;
+typedef imtlicdb::CAccountDatabaseDelegateComp AccountDatabaseDelegate;
+typedef imtlicdb::CProductInstanceDatabaseDelegateComp ProductInstanceDatabaseDelegate;
 
 
 } // namespace ImtLicenseDbPck
