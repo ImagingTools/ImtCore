@@ -73,8 +73,8 @@ void CProductInstanceInfoEditorComp::UpdateModel() const
 
 	istd::CChangeGroup changeGroup(productInstanceInfoPtr);
 
-	QByteArray currentProductId = ProductCombo->currentText().toUtf8();
-	QByteArray customerId = CustomerCombo->currentText().toUtf8();
+	QByteArray currentProductId = ProductCombo->currentData().toByteArray();
+	QByteArray customerId = CustomerCombo->currentData().toByteArray();
 	QByteArray instanceId = ProductInstanceIdEdit->text().toUtf8();
 
 	productInstanceInfoPtr->ResetData();
@@ -233,13 +233,14 @@ void CProductInstanceInfoEditorComp::OnCustomersUpdated(
 	if (!IsUpdateBlocked()){
 		UpdateBlocker blocker(this);
 
-		CustomerCombo->clear();
-
 		imtlic::IProductInstanceInfo* productInstanceInfoPtr = GetObservedObject();
 		Q_ASSERT(productInstanceInfoPtr != nullptr);
 
 		QString selectedCustomerId = productInstanceInfoPtr->GetCustomerId();
-		QString newSelectedCustomerId;
+
+		CustomerCombo->clear();
+
+		QString selectedCustomerName;
 
 		const imtbase::IObjectCollection* customerCollectionPtr = productInstanceInfoPtr->GetCustomerDatabase();
 		if (customerCollectionPtr != nullptr){
@@ -253,17 +254,19 @@ void CProductInstanceInfoEditorComp::OnCustomersUpdated(
 
 						CustomerCombo->addItem(customerName, customerId);
 
-						if (selectedCustomerId == customerName){
-							CustomerCombo->setCurrentText(customerName);
-							newSelectedCustomerId = selectedCustomerId;
+						if (selectedCustomerId == customerId){
+							selectedCustomerName = customerName;
 						}
 					}
 				}
 			}
 		}
 
-		if (newSelectedCustomerId.isEmpty()){
+		if (selectedCustomerName.isEmpty()){
 			CustomerCombo->setCurrentIndex(-1);
+		}
+		else{
+			CustomerCombo->setCurrentText(selectedCustomerName);
 		}
 	}
 }

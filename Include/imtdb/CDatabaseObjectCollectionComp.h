@@ -67,6 +67,7 @@ protected:
 	virtual void CreateCollectionFromDatabase();
 	virtual istd::IChangeable* CreateObjectFromSqlRecord(
 				const QSqlRecord& record,
+				QByteArray& objectId,
 				QString& objectName,
 				QString& objectDescription,
 				QDateTime& lastModified,

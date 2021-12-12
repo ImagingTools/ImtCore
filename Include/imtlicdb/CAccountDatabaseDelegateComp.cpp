@@ -19,6 +19,7 @@ namespace imtlicdb
 istd::IChangeable* CAccountDatabaseDelegateComp::CreateObjectFromRecord(
 			const QByteArray& /*typeId*/,
 			const QSqlRecord& record,
+			QByteArray& objectId,
 			QString& objectName,
 			QString& objectDescription,
 			QDateTime& /*lastModified*/,
@@ -35,6 +36,10 @@ istd::IChangeable* CAccountDatabaseDelegateComp::CreateObjectFromRecord(
 	istd::TDelPtr<imtauth::IAccountInfo> accountInfoPtr = m_accountInfoFactCompPtr.CreateInstance();
 	if (!accountInfoPtr.IsValid()){
 		return nullptr;
+	}
+
+	if (record.contains("Id")){
+		objectId = record.value("Id").toByteArray();
 	}
 
 	if (record.contains("Name")){

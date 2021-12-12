@@ -18,6 +18,7 @@ namespace imtlicdb
 istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
 			const QByteArray& /*typeId*/,
 			const QSqlRecord& record,
+			QByteArray& objectId,
 			QString& objectName,
 			QString& objectDescription,
 			QDateTime& lastModified,
@@ -44,6 +45,9 @@ istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
 	QByteArray productId;
 	if (record.contains("Id")){
 		productId = record.value("Id").toByteArray();
+
+		objectId = productId;
+
 		productPtr->SetProductId(productId);
 	}
 

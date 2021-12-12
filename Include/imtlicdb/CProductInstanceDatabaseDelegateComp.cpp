@@ -12,6 +12,7 @@ namespace imtlicdb
 istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 			const QByteArray& /*typeId*/,
 			const QSqlRecord& record,
+			QByteArray& objectId,
 			QString& objectName,
 			QString& objectDescription,
 			QDateTime& lastModified,
@@ -30,11 +31,6 @@ istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 		return nullptr;
 	}
 
-	imtbase::IObjectCollection* licenseCollectionPtr = dynamic_cast<imtbase::IObjectCollection*>(productInstancePtr.GetPtr());
-	if (licenseCollectionPtr == nullptr){
-		return nullptr;
-	}
-
 	QByteArray productInstanceId;
 	if (record.contains("InstanceId")){
 		productInstanceId = record.value("InstanceId").toByteArray();
@@ -45,12 +41,12 @@ istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 		productId = record.value("ProductId").toByteArray();
 	}
 
-	QByteArray customerId;
-	if (record.contains("CustomerId")){
-		customerId = record.value("CustomerId").toByteArray();
+	QByteArray accountId;
+	if (record.contains("AccountId")){
+		accountId = record.value("AccountId").toByteArray();
 	}
 
-	productInstancePtr->SetupProductInstance(productId, productInstanceId, customerId);
+	productInstancePtr->SetupProductInstance(productId, productInstanceId, accountId);
 
 	QString productName;
 	if (record.contains("Name")){
@@ -143,7 +139,7 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateNewObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray accountId = productInstancePtr->GetProductId();
+	QByteArray accountId = productInstancePtr->GetCustomerId();
 	if (accountId.isEmpty()){
 		return QByteArray();
 	}

@@ -25,6 +25,7 @@ public:
 	virtual istd::IChangeable* CreateObjectFromRecord(
 				const QByteArray& typeId,
 				const QSqlRecord& record,
+				QByteArray& objectId,
 				QString& objectName,
 				QString& objectDescription,
 				QDateTime& lastModified,

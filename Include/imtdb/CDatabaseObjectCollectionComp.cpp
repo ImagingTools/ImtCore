@@ -195,12 +195,13 @@ void CDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 
 	QSqlQuery sqlQuery = ExecSelectSqlQuery();
 	while (sqlQuery.next()){
+		QByteArray objectId;
 		QString name;
 		QString description;
 		QDateTime added;
 		QDateTime lastModified;
 
-		istd::IChangeable* objectPtr = CreateObjectFromSqlRecord(sqlQuery.record(), name, description, lastModified, added);
+		istd::IChangeable* objectPtr = CreateObjectFromSqlRecord(sqlQuery.record(), objectId, name, description, lastModified, added);
 		if (objectPtr != nullptr){
 			idoc::CStandardDocumentMetaInfo collectionMetaInfo;
 			collectionMetaInfo.SetMetaInfo(IObjectCollection::MIT_INSERTION_TIME, added);
@@ -211,7 +212,7 @@ void CDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 				m_metaInfoCreatorCompPtr->CreateMetaInfo(objectPtr, *m_typeIdAttrPtr, metaInfoPtr);
 			}
 
-			BaseClass2::InsertNewObject(*m_typeIdAttrPtr, name, description, objectPtr, "", metaInfoPtr.GetPtr(), &collectionMetaInfo);
+			BaseClass2::InsertNewObject(*m_typeIdAttrPtr, name, description, objectPtr, objectId, metaInfoPtr.GetPtr(), &collectionMetaInfo);
 		}
 	}
 }
@@ -219,13 +220,14 @@ void CDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 
 istd::IChangeable* CDatabaseObjectCollectionComp::CreateObjectFromSqlRecord(
 			const QSqlRecord& record,
+			QByteArray& objectId,
 			QString& objectName,
 			QString& objectDescription,
 			QDateTime& lastModified,
 			QDateTime& added) const
 {
 	if (m_objectDelegateCompPtr.IsValid()){
-		return m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, record, objectName, objectDescription, lastModified, added);
+		return m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, record, objectId, objectName, objectDescription, lastModified, added);
 	}
 
 	return nullptr;
