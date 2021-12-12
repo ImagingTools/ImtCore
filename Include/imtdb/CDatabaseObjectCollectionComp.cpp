@@ -159,6 +159,27 @@ void CDatabaseObjectCollectionComp::SetObjectName(const QByteArray& objectId, co
 }
 
 
+void CDatabaseObjectCollectionComp::SetObjectDescription(const QByteArray& objectId, const QString& objectDescription)
+{
+	if (!m_objectDelegateCompPtr.IsValid()){
+		return;
+	}
+
+	QByteArray query = m_objectDelegateCompPtr->CreateDescriptionObjectQuery(*this, objectId, objectDescription);
+	if (query.isEmpty()){
+		SendErrorMessage(0, "Database query could not be created", "Database collection");
+
+		return;
+	}
+
+	if (ExecuteTransaction(query)){
+		istd::CChangeNotifier changeNotifier(this);
+
+		BaseClass2::SetObjectDescription(objectId, objectDescription);
+	}
+}
+
+
   // protected methods
 
 bool CDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQuery) const

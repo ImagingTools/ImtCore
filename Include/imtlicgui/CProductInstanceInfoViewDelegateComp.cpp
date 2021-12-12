@@ -5,7 +5,6 @@
 #include <QtCore/QFile>
 
 // ImtCore includes
-#include <imtrepo/IFileObjectCollection.h>
 #include <imtlic/IProductInstanceInfo.h>
 #include <iser/CMemoryWriteArchive.h>
 #include <imtcrypt/IEncryptionKeysProvider.h>
@@ -63,8 +62,7 @@ void CProductInstanceInfoViewDelegateComp::SetupCommands()
 
 	m_rootCommands.InsertChild(&m_licenseCommands);
 
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	if (fileCollectionPtr != nullptr) {
+	if (m_collectionPtr != nullptr) {
 		connect(&m_exportLicenseCommand, &QAction::triggered, this, &CProductInstanceInfoViewDelegateComp::OnExportLicense);
 
 		m_licenseCommands.InsertChild(&m_exportLicenseCommand);
@@ -79,13 +77,12 @@ QByteArray CProductInstanceInfoViewDelegateComp::GetEncryptionKey(imtcrypt::IEnc
 	QByteArray retVal;
 
 	if (type == KT_PASSWORD){
-		imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-		Q_ASSERT(fileCollectionPtr != nullptr);
+		Q_ASSERT(m_collectionPtr != nullptr);
 		iser::CMemoryWriteArchive archive;
 		if (!m_selectedItemIds.isEmpty()){
 			QByteArray id = m_selectedItemIds[0];
 			imtbase::IObjectCollection::DataPtr dataPtr;
-			fileCollectionPtr->GetObjectData(id, dataPtr);
+			m_collectionPtr->GetObjectData(id, dataPtr);
 			if (dataPtr.IsValid()){
 				imtlic::IProductInstanceInfo* productInstanceInfoPtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
 				Q_ASSERT(productInstanceInfoPtr != nullptr);
@@ -110,13 +107,14 @@ QByteArray CProductInstanceInfoViewDelegateComp::GetEncryptionKey(imtcrypt::IEnc
 
 void CProductInstanceInfoViewDelegateComp::OnExportLicense()
 {
-	imtrepo::IFileObjectCollection* fileCollectionPtr = dynamic_cast<imtrepo::IFileObjectCollection*>(m_collectionPtr);
-	if (fileCollectionPtr != nullptr) {
+	Q_ASSERT(m_collectionPtr != nullptr);
+
+	if (m_collectionPtr != nullptr) {
 		iser::CMemoryWriteArchive archive;
 		if (!m_selectedItemIds.isEmpty()){
 			QByteArray id = m_selectedItemIds[0];
 			imtbase::IObjectCollection::DataPtr dataPtr;
-			fileCollectionPtr->GetObjectData(id, dataPtr);
+			m_collectionPtr->GetObjectData(id, dataPtr);
 			if (dataPtr.IsValid()){
 				imtlic::IProductInstanceInfo* productInstanceInfoPtr;
 				productInstanceInfoPtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());

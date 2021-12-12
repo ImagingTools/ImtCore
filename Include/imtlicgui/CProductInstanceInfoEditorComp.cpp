@@ -173,7 +173,7 @@ void CProductInstanceInfoEditorComp::on_LicenseInstancesEdit_itemChanged(QTreeWi
 
 		QDateTime cachedDateTime = m_cachedLicenseExpiration[licenseId];
 		if (!cachedDateTime.isValid()){
-			cachedDateTime.setDate(QDate(2020, 1, 1));
+			cachedDateTime.setDate(QDate(2023, 1, 1));
 			cachedDateTime.setTime(QTime(0, 0, 0));
 		}
 

@@ -172,7 +172,7 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateDeleteObjectQuery(
 			return QByteArray();
 		}
 
-		QByteArray retVal = QString("DELETE FROM ProductInstances WHERE Id = '%1';").arg(qPrintable(productInstanceId)).toLocal8Bit();
+		QByteArray retVal = QString("DELETE FROM ProductInstances WHERE InstanceId = '%1';").arg(qPrintable(productInstanceId)).toLocal8Bit();
 
 		return retVal;
 	}
@@ -210,7 +210,7 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE ProductInstances SET Name = '%1' WHERE Id ='%2';").arg(newObjectName).arg(qPrintable(productInstanceId)).toLocal8Bit();
+	QByteArray retVal = QString("UPDATE ProductInstances SET Name = '%1' WHERE InstanceId ='%2';").arg(newObjectName).arg(qPrintable(productInstanceId)).toLocal8Bit();
 
 	return retVal;
 }
@@ -236,7 +236,7 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateDescriptionObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE ProductInstances SET Description = '%1' WHERE Id ='%2';").arg(description).arg(qPrintable(productInstanceId)).toLocal8Bit();
+	QByteArray retVal = QString("UPDATE ProductInstances SET Description = '%1' WHERE InstanceId ='%2';").arg(description).arg(qPrintable(productInstanceId)).toLocal8Bit();
 
 	return retVal;
 }

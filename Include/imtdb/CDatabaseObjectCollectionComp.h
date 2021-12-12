@@ -61,7 +61,8 @@ public:
 	virtual bool RemoveObject(const QByteArray& objectId) override;
 	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
-	
+	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
+
 protected:
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	virtual void CreateCollectionFromDatabase();
