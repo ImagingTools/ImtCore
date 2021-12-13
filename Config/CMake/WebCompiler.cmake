@@ -57,8 +57,9 @@ endmacro()
 
 function(imtcore_compile_web)
 
-	set(QRC_WEB_FILE ${IMTCOREDIR}/Bin/web/Resources/${PROJECT_NAME}Web.qrc)
-	set(QRC_CPP_WEB_FILE ${IMTCOREDIR}/Bin/web/Resources/qrc_${PROJECT_NAME}Web.cpp)
+	list(GET webdirs 1 WEB_BUILD_DIR)
+	set(QRC_WEB_FILE ${WEB_BUILD_DIR}/Resources/${PROJECT_NAME}Web.qrc)
+	set(QRC_CPP_WEB_FILE ${WEB_BUILD_DIR}/Resources/qrc_${PROJECT_NAME}Web.cpp)
 	set(PYTHONEXE ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe)
 
 	if (NOT WIN32)
