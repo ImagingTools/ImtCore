@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #include <imtstyle/CImtStyle.h>
 
 
@@ -184,7 +204,7 @@ void CImtStyle::polish(QWidget* widgetPtr)
 }
 
 
-void CImtStyle::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption * option, QPainter * painter, const QWidget * widget) const
+void CImtStyle::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption* option, QPainter* painter, const QWidget* widget) const
 {
 	if (m_styleType == ST_IMAGINGTOOLS){
 		if (pe == QStyle::PE_PanelButtonCommand){
@@ -308,7 +328,7 @@ void CImtStyle::DrawImagingToolsToolButton(
 	painter->setFont(optionPtr->font);
 	QRect textRect = rect;
 
-	if (optionPtr->toolButtonStyle == Qt::ToolButtonTextUnderIcon){
+	if ((optionPtr->toolButtonStyle == Qt::ToolButtonTextUnderIcon) || (optionPtr->toolButtonStyle == Qt::ToolButtonIconOnly)){
 		pixmapRect.setHeight(pmSize.height() + 6);
 		textRect.adjust(0, pixmapRect.height() - 1, 0, -1);
 		pixmapRect.translate(shiftX, shiftY);
@@ -404,23 +424,25 @@ void CImtStyle::DrawImagingToolsToolButton(
 			DrawArrow(proxy(), optionPtr, pixmapRect, painter, widget);
 		}
 
-		int alignment = Qt::TextShowMnemonic;
-		if (!proxy()->styleHint(SH_UnderlineShortcut, optionPtr, widget)){
-			alignment |= Qt::TextHideMnemonic;
+		if (optionPtr->toolButtonStyle == Qt::ToolButtonTextUnderIcon){
+			int alignment = Qt::TextShowMnemonic;
+			if (!proxy()->styleHint(SH_UnderlineShortcut, optionPtr, widget)){
+				alignment |= Qt::TextHideMnemonic;
+			}
+
+			alignment |= Qt::AlignCenter;
+
+			textRect.translate(shiftX, shiftY);
+
+			proxy()->drawItemText(
+						painter,
+						QStyle::visualRect(optionPtr->direction, rect, textRect),
+						alignment,
+						optionPtr->palette,
+						optionPtr->state & State_Enabled,
+						optionPtr->text,
+						QPalette::ButtonText);
 		}
-
-		alignment |= Qt::AlignCenter;
-
-		textRect.translate(shiftX, shiftY);
-
-		proxy()->drawItemText(
-					painter,
-					QStyle::visualRect(optionPtr->direction, rect, textRect),
-					alignment,
-					optionPtr->palette,
-					optionPtr->state & State_Enabled,
-					optionPtr->text,
-					QPalette::ButtonText);
 	}
 }
 
