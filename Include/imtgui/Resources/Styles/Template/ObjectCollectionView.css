@@ -25,7 +25,7 @@ QTreeWidget#TypeList::item:last
 QTreeWidget#TypeList::item:selected
 {
 	background-color: ${Active.Base};
-	color: ${Active.Base};
+	color: ${Active.Text};
 }
 
 QTreeWidget#TypeList::item:!selected:hover
