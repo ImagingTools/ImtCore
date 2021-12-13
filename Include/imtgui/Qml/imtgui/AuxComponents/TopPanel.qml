@@ -66,7 +66,7 @@ Rectangle {
         anchors.topMargin: 10;
         width: 30;
         height: 30;
-        color: "red";
+//        color: "red";
         onClicked: {
             console.log("Preference button clicked !");
             preference.visible = true;

@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 //import QtGraphicalEffects 1.0
 
 Item {
@@ -10,7 +11,8 @@ Item {
     property string imageSourceDisabled: "../Icons/Add_On_Disabled.svg";
     //property string imageSourceSelected: "../Icons/Add_On_Selected.svg"
     property string text: "New";
-    property string textColor: "#335777";//"#191970"
+//    property string textColor: "#335777";//"#191970"
+    property string textColor: Style.textColor;
 
     property string textColorDisabled: "gray";
     property real fontSize: 12;
@@ -33,6 +35,7 @@ Item {
 
 
 
+
     Rectangle{
         id: button;
         anchors.top: parent.top;
@@ -42,7 +45,9 @@ Item {
         height: parent.height/2;
         radius: container.radius;
         visible: !container.isEmpty;
-        color: (container.checkable && container.isChecked) ? "white" : container.highlighted ? "white" : "#fafafa";
+//        color: (container.checkable && container.isChecked) ? "white" : container.highlighted ? "white" : "#fafafa";
+        color: Style.backgroundColor;
+        border.color: Style.buttonBorderColor;
 //        Rectangle{
 //            id: background;
 //            anchors.fill: parent;

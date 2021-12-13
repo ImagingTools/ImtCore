@@ -6,13 +6,14 @@ Rectangle {
     id: container;
     property string styleColor: "Light";
 //    property color foneColor: styleColor == "Dark"? "#2b2d2d" : "white";
-    property color foneColor: Style.mainColor;
+//    property color foneColor: Style.mainColor;
 //    property color fontColor: styleColor == "Dark"? "#edefef" : "black";
     //property color textColor: Style.textColor;
     property int radiusValue: 5;
 
     radius: radiusValue;
     color: Style.baseColor;
+//    color: "red";
     border.color: "#2b2d2d";
 
     MouseArea {
@@ -31,7 +32,7 @@ Rectangle {
        anchors.margins: 10;
 
        Rectangle {
-           id: topPanel;
+           id: topPan;
            width: parent.width;
            height: 30;
           // anchors.bottomMargin: 50;
@@ -42,8 +43,8 @@ Rectangle {
                width: 20;
                height: 20;
                color: container.styleColor == "Dark"? "white" : "#4C514A";
-               anchors.left: topPanel.left;
-               anchors.verticalCenter: topPanel.verticalCenter;
+               anchors.left: topPan.left;
+               anchors.verticalCenter: topPan.verticalCenter;
                radius: radiusValue;
            }
 
@@ -51,27 +52,21 @@ Rectangle {
                id: name;
                anchors.left: iconPref.right;
                anchors.leftMargin: 10;
-               anchors.verticalCenter: topPanel.verticalCenter;
+               anchors.verticalCenter: topPan.verticalCenter;
                text: "Preferences";
                color: Style.textColor;
-
            }
-
-//           Button {
-
-//           }
 
            Rectangle {
                id: exit;
-               anchors.right: topPanel.right;
-               anchors.verticalCenter: topPanel.verticalCenter;
+               anchors.right: topPan.right;
+               anchors.verticalCenter: topPan.verticalCenter;
                width: 20;
                height: 20;
                color: "red";
                MouseArea {
                    anchors.fill: parent;
                    onClicked: {
-//                       container.visible = false;
                        preference.visible = false;
                    }
                }
@@ -82,7 +77,7 @@ Rectangle {
            id: versionBlock;
            width: parent.width;
            height: 100;
-           anchors.top: topPanel.bottom;
+           anchors.top: topPan.bottom;
            anchors.topMargin: 30;
            color: Style.baseColor;
            Text {
@@ -203,7 +198,7 @@ Rectangle {
                anchors.topMargin: 10;
                color: "black";
                radius: radiusValue;
-               border.color: container.styleColor == "Dark"? "#1560BD" : "transparent";
+               border.color: preference.styleColor == "Dark"? "#1560BD" : "transparent";
                border.width: 2;
 
                Text {
@@ -217,7 +212,7 @@ Rectangle {
                MouseArea {
                     anchors.fill: parent;
                     onClicked: {
-                        container.styleColor = "Dark";
+                        preference.styleColor = "Dark";
                         stylesModel.getStyle("Dark");
                     }
                }
@@ -234,7 +229,7 @@ Rectangle {
                anchors.topMargin: 10;
                anchors.leftMargin: 20;
                color: "white";
-               border.color: container.styleColor == "Light"? "#1560BD" : "black";
+               border.color: preference.styleColor == "Light"? "#1560BD" : "black";
                border.width: 2;
                radius: radiusValue;
 
@@ -251,38 +246,39 @@ Rectangle {
                     onClicked: {
 
                         stylesModel.getStyle("Light");
-                        container.styleColor = "Light";
+                        preference.styleColor = "Light";
                     }
                }
            }
        }
     }
 
-    function getThemeColor(colorType, colorKey, themeModel) {
-        var colorPalette = this.themeModel.GetData("Style").GetData(colorType).GetData(colorKey);
-        return themeModel.GetData("ColorPalette").GetData(colorPalette);
+    function getThemeColor(colorType, colorKey, themeType) {
+        var colorPalette = themeType.GetData("Style").GetData(colorType).GetData(colorKey);
+        return themeType.GetData("ColorPalette").GetData(colorPalette);
+
     }
 
-    function parseStyleTheme(themeModel) {
-        var activeColors = themeModel.GetData("Style").GetData("ActiveColors");
-        var colorPalette = themeModel.GetData("ColorPalette");
-        var count = activeColors.GetItemsCount();
+    function parseStyleTheme(themeType) {
+        Style.baseColor = preference.getThemeColor("ActiveColors", "Base", themeType);
+        Style.backgroundColor = preference.getThemeColor("ActiveColors", "Background", themeType);
+        Style.textColor = preference.getThemeColor("ActiveColors", "Text", themeType);
 
-        Style.imagingToolsGradient1 = themeModel.GetData("ColorPalette").GetData("ImagingToolsGradient1");
-        Style.imagingToolsGradient2 = themeModel.GetData("ColorPalette").GetData("ImagingToolsGradient2");
-        Style.imagingToolsGradient3 = themeModel.GetData("ColorPalette").GetData("ImagingToolsGradient3");
-        Style.imagingToolsGradient4 = themeModel.GetData("ColorPalette").GetData("ImagingToolsGradient4");
-        Style.baseColor = preference.getThemeColor("ActiveColors", "Base", themeModel);
-        Style.backgroundColor = preference.getThemeColor("ActiveColors", "Background", themeModel);
-        Style.textColor = preference.getThemeColor("ActiveColors", "Text", themeModel);
+        Style.selectedColor = preference.getThemeColor("ActiveColors", "ItemSelected", themeType);
 
+        Style.buttonColor = preference.getThemeColor("ActiveColors", "Button", themeType);
+        Style.buttonBorderColor = preference.getThemeColor("ActiveColors", "ButtonBorder", themeType);
+        Style.imagingToolsGradient1 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient1");
+        Style.imagingToolsGradient2 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient2");
+        Style.imagingToolsGradient3 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient3");
+        Style.imagingToolsGradient4 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient4");
     }
 
     GqlModel {
         id: stylesModel;
 
         function getStyle(theme) {
-            console.log( "getStyle");
+//            console.log( "getStyle");
 
             var query = Gql.GqlRequest("query", "GetStyle");
 
@@ -297,7 +293,7 @@ Rectangle {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log(gqlData);
+//            console.log(gqlData);
             this.SetGqlQuery(gqlData);
         }
 
@@ -305,12 +301,12 @@ Rectangle {
             console.log("State:", this.state, stylesModel);
             if (this.state === "Ready") {
                 var dataModelLocal = this.GetData("data");
-                console.log(dataModelLocal);
                 if(dataModelLocal.ContainsKey("GetStyle")) {
                     dataModelLocal = dataModelLocal.GetData("GetStyle");
                 }
                 if(dataModelLocal !== null && dataModelLocal.ContainsKey("source")){
                     dataModelLocal = dataModelLocal.GetData("source");
+//                    console.log("dataModelLocal", dataModelLocal);
                     preference.parseStyleTheme(dataModelLocal);
                 }
                 else if(stylesModel.ContainsKey("errors")){
@@ -319,7 +315,6 @@ Rectangle {
                         console.log("message", errorsModel.GetData("GetStyle").GetData("message"));
                     }
                 }
-
             }
         }
     }

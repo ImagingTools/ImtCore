@@ -6,7 +6,6 @@ Rectangle {
     color: Style.baseColor;
 
     Component.onCompleted: {
-        console.log("===============Tree view completed! start===============");
         var childItemModel;
         treeItemModel.SetIsArray(true);
 
@@ -56,12 +55,11 @@ Rectangle {
 //        childItemModel.SetData("stateChecked", 2, 0);
 //        childItemModel.SetData("parentIndex", 0, 0);
         mainTreeView.model = treeItemModel;
-        console.log("===============Tree view completed end!===============");
     }
 
-//    TreeItemModel {
-//        id: treeItemModel;
-//    }
+    TreeItemModel {
+        id: treeItemModel;
+    }
 
 //    Rectangle {
 //        id: header;

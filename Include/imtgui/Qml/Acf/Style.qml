@@ -22,6 +22,10 @@ Item {
     property string baseColor: "white";
     property string backgroundColor: "#e6e6e8";
     property string linkColor: "#0078D7";
+    property string selectedColor: "#c0c0c0";
+
+    property string buttonColor: "#C0C0C0";
+    property string buttonBorderColor: "#CCCCCC";
 
     property string imagingToolsGradient1: "#e3e3e5";
     property string imagingToolsGradient2: "#d4d4d6";

@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 
 Rectangle{
     id: container;
@@ -9,7 +10,8 @@ Rectangle{
     property string imageSourcePressedDisabled: "../Icons/Add_On_Disabled.svg";
 
     property string text: "";
-    property string textColor: "#335777";
+//    property string textColor: "#335777";
+    property string textColor: Style.textColor;
     property string fontName: "";
     property int fontSize: 11;
 

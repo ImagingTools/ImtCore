@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Acf 1.0
 import 'AuxComponents'
 
+
 Rectangle
 {
     id: container;
@@ -26,12 +27,23 @@ Rectangle
 //        source: "../Fonts/Ubuntu-Regular.ttf";
 //    }
 
+
     TopPanel {
         id: topPanel;
 //        title: "Test";
         title: menuPanel.activePageName;
         activePageId: menuPanel.activePageId;
     }
+
+
+//    Rectangle {
+//        anchors.top: topPanel.bottom;
+//        anchors.bottom: parent.bottom;
+//        anchors.right: parent.right;
+//        anchors.left: parent.left;
+////        anchors.fill: parent;
+//        color: "red";
+//    }
 
     MenuPanel {
         id: menuPanel;
