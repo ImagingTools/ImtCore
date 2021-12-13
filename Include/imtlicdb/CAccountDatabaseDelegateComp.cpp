@@ -86,12 +86,16 @@ QByteArray CAccountDatabaseDelegateComp::CreateNewObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray accountId = QUuid::createUuid().toString(QUuid::WithoutBraces).toLocal8Bit();
-
 	QString accountName = accountInfoPtr->GetAccountName();
 	if (accountName.isEmpty()){
 		accountName = objectName;
 	}
+
+	if (accountName.isEmpty()){
+		return QByteArray();
+	}
+
+	QByteArray accountId = accountName.toUtf8();
 
 	QByteArray accountTypeId;
 	imtauth::IAccountInfo::AccountType accountType = accountInfoPtr->GetAccountType();
