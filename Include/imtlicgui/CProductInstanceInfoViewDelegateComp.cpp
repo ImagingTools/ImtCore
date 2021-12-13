@@ -128,7 +128,6 @@ void CProductInstanceInfoViewDelegateComp::OnExportLicense()
 }
 
 
-
 } // namespace imtlicgui
 
 

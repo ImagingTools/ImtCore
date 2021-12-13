@@ -127,7 +127,7 @@ QByteArray CAccountDatabaseDelegateComp::CreateNewObjectQuery(
 				.arg(mail)
 				.arg(lastName)
 				.arg(firstName)
-		.toLocal8Bit();
+				.toLocal8Bit();
 
 	return retVal;
 }

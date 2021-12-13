@@ -61,7 +61,8 @@ QByteArray CDatabaseObjectCollectionComp::InsertNewObject(
 		if (collectionItemMetaInfoPtr == nullptr){
 			collectionMetaInfo.SetMetaInfo(IObjectCollection::MIT_INSERTION_TIME, QDateTime::currentDateTime());
 			collectionMetaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, QDateTime::currentDateTime());
-
+			collectionMetaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
+	
 			collectionItemMetaInfoPtr = &collectionMetaInfo;
 		}
 
@@ -227,6 +228,7 @@ void CDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 			idoc::CStandardDocumentMetaInfo collectionMetaInfo;
 			collectionMetaInfo.SetMetaInfo(IObjectCollection::MIT_INSERTION_TIME, added);
 			collectionMetaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, lastModified);
+			collectionMetaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, lastModified);
 
 			imtbase::IMetaInfoCreator::MetaInfoPtr metaInfoPtr;
 			if (m_metaInfoCreatorCompPtr.IsValid()){
