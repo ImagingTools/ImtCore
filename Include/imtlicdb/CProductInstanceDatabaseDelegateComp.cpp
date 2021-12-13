@@ -1,6 +1,10 @@
 #include <imtlicdb/CProductInstanceDatabaseDelegateComp.h>
 
 
+// ImtCore includes
+#include <imtlic/ILicenseInstance.h>
+
+
 namespace imtlicdb
 {
 
@@ -59,59 +63,35 @@ istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 		objectDescription = record.value("Description").toString();
 	}
 
-	//QByteArray selectProductLicenses = QString("SELECT * from ProductInstances WHERE ProductInstanceId = '%1'").arg(qPrintable(productInstanceId)).toUtf8();
+	if (record.contains("Added")){
+		added = record.value("Added").toDateTime();
+	}
 
-	//QSqlError error;
-	//QSqlQuery productLicensesQuery = m_databaseEngineCompPtr->ExecSqlQuery(selectProductLicenses, &error);
+	if (record.contains("LastModified")){
+		lastModified = record.value("LastModified").toDateTime();
+	}
 
-	//while (productLicensesQuery.next()){
-	//	QSqlRecord licenseRecord = productLicensesQuery.record();
-	//	QByteArray licenseId;
-	//	QString licenseName;
-	//	QString description;
+	// Query for getting licenses inside of the product instance:
+	QByteArray productLicenses = QString("SELECT * from ProductInstanceLicenses WHERE InstanceId = '%1'").arg(qPrintable(productInstanceId)).toUtf8();
 
-	//	if (licenseRecord.contains("Id")){
-	//		licenseId = licenseRecord.value("Id").toByteArray();
-	//	}
+	QSqlError error;
+	QSqlQuery productLicensesQuery = m_databaseEngineCompPtr->ExecSqlQuery(productLicenses, &error);
 
-	//	if (licenseRecord.contains("Name")){
-	//		licenseName = licenseRecord.value("Name").toString();
-	//	}
+	while (productLicensesQuery.next()){
+		QSqlRecord licenseRecord = productLicensesQuery.record();
+		QByteArray licenseId;
 
-	//	if (licenseRecord.contains("Description")){
-	//		description = licenseRecord.value("Description").toString();
-	//	}
+		if (licenseRecord.contains("LicenseId")){
+			licenseId = licenseRecord.value("LicenseId").toByteArray();
+		}
 
-	//	istd::TDelPtr<imtlic::CLicenseInfo> licenseInfoPtr = new imtlic::CLicenseInfo;
-	//	licenseInfoPtr->SetLicenseName(licenseName);
-	//	licenseInfoPtr->SetLicenseId(licenseId);
+		QDateTime expirationDate;
+		if (licenseRecord.contains("ExpirationDate")){
+			expirationDate = licenseRecord.value("ExpirationDate").toDateTime();
+		}
 
-	//	QByteArray selectLicenseFeatures = QString("SELECT * from ProductLicenseFeatures WHERE LicenseId = '%1'").arg(qPrintable(licenseId)).toUtf8();
-
-	//	QSqlQuery licenseFeatureQuery = m_databaseEngineCompPtr->ExecSqlQuery(selectLicenseFeatures, &error);
-
-	//	imtlic::ILicenseInfo::FeatureInfos featureInfos;
-
-	//	while (licenseFeatureQuery.next()){
-	//		QSqlRecord licenseFeatureRecord = licenseFeatureQuery.record();
-
-	//		imtlic::ILicenseInfo::FeatureInfo featureInfo;
-
-	//		if (licenseFeatureRecord.contains("FeatureId")){
-	//			featureInfo.id = licenseFeatureRecord.value("FeatureId").toByteArray();
-	//		}
-
-	//		if (featureInfo.id.isEmpty()){
-	//			return nullptr;
-	//		}
-
-	//		featureInfos.push_back(featureInfo);
-	//	}
-
-	//	licenseInfoPtr->SetFeatureInfos(featureInfos);
-
-	//	licenseCollectionPtr->InsertNewObject(imtlic::CLicenseInfo::GetTypeId(), licenseName, description, licenseInfoPtr.GetPtr());
-	//}
+		productInstancePtr->AddLicense(licenseId, expirationDate);
+	}
 
 	return productInstancePtr.PopPtr();
 }
@@ -144,13 +124,43 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateNewObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("INSERT INTO ProductInstances(InstanceId, ProductId, AccountId, Name, Description) VALUES('%1', '%2', '%3', '%4', '%5');")
+	QString timestamp = QDateTime::currentDateTime().toString(Qt::ISODate);
+
+	QByteArray retVal = QString("INSERT INTO ProductInstances(InstanceId, ProductId, AccountId, Name, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
 				.arg(qPrintable(productInstanceId))
 				.arg(qPrintable(productId))
 				.arg(qPrintable(accountId))
 				.arg(objectName)
 				.arg(objectDescription)
+				.arg(timestamp)
+				.arg(timestamp)
 				.toLocal8Bit();
+
+	const imtbase::ICollectionInfo& licenseList = productInstancePtr->GetLicenseInstances();
+
+	imtbase::ICollectionInfo::Ids licenseIds = licenseList.GetElementIds();
+
+	for (const QByteArray& licenseCollectionId : licenseIds){
+		const imtlic::ILicenseInstance* licensePtr = productInstancePtr->GetLicenseInstance(licenseCollectionId);
+		if (licensePtr != nullptr){
+			QByteArray licenseId = licensePtr->GetLicenseId();
+			QDateTime expirationTime = licensePtr->GetExpiration();
+
+			if (expirationTime.isNull()){
+				retVal += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId) VALUES('%1', '%2');")
+							.arg(qPrintable(productInstanceId))
+							.arg(qPrintable(licenseId))
+							.toLocal8Bit();
+			}
+			else{
+				retVal += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId, ExpirationDate) VALUES('%1', '%2', '%3');")
+							.arg(qPrintable(productInstanceId))
+							.arg(qPrintable(licenseId))
+							.arg(expirationTime.date().toString(Qt::ISODate))
+							.toLocal8Bit();
+			}
+		}
+	}
 
 	return retVal;
 }
