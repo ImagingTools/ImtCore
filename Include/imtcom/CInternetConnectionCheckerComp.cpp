@@ -50,8 +50,10 @@ void CInternetConnectionCheckerComp::OnComponentCreated()
 	}
 
 	m_managerPtr = new QNetworkAccessManager();
-	m_managerPtr->setTransferTimeout(m_requestTimeout);
 
+#if QT_VERSION > QT_VERSION_CHECK(5, 12, 9)
+	m_managerPtr->setTransferTimeout(m_requestTimeout);
+#endif 
 	connect(&m_timer, &QTimer::timeout, this, &CInternetConnectionCheckerComp::OnTimer);
 	m_timer.setSingleShot(true);
 	m_timer.setInterval(m_requestDelay);
