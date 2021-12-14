@@ -22,7 +22,7 @@ Item {
     property string baseColor: "white";
     property string backgroundColor: "#e6e6e8";
     property string linkColor: "#0078D7";
-    property string selectedColor: "#c0c0c0";
+    property string selectedColor: "#e3eefa";
 
     property string buttonColor: "#C0C0C0";
     property string buttonBorderColor: "#CCCCCC";
@@ -42,6 +42,7 @@ Item {
     FontLoader{
         id: mainFont;
 //        source: "../../Fonts/Ubuntu-Light.ttf";
+        source: "../Fonts/Times New Roman.ttf";
     }
 
     FontLoader{

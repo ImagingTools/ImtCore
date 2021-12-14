@@ -46,8 +46,8 @@ Item {
         radius: container.radius;
         visible: !container.isEmpty;
 //        color: (container.checkable && container.isChecked) ? "white" : container.highlighted ? "white" : "#fafafa";
-        color: Style.backgroundColor;
-        border.color: Style.buttonBorderColor;
+        color: Style.buttonColor;
+//        border.color: Style.buttonBorderColor;
 //        Rectangle{
 //            id: background;
 //            anchors.fill: parent;
@@ -133,8 +133,11 @@ Item {
         text: container.text;
         color: container.enabled ? container.textColor : container.textColorDisabled;
         font.pixelSize: container.fontSize;
-        font.family: container.fontName;
+//        font.family: container.fontName;
         visible: !container.isEmpty;
+
+        font.family: Style.fontFamily;
+//        font.pixelSize: Style.fontSize_subtitle;
     }
 
 

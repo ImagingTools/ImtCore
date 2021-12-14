@@ -52,12 +52,15 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: parent.left;
                     anchors.leftMargin: 8;
-                    font.pixelSize: container.fontSize;
-                    font.family: container.fontName;
+//                    font.pixelSize: container.fontSize;
+//                    font.family: container.fontName;
                     font.bold: true; //container.fontBold
 //                    color: container.textColor
                     color: Style.textColor;
                     text: container.headersArray[model.index];
+
+                    font.family: Style.fontFamily;
+                    font.pixelSize: Style.fontSize_subtitle;
                 }
             }
         }

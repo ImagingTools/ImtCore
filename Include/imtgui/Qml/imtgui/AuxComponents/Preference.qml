@@ -13,11 +13,15 @@ Rectangle {
 
     radius: radiusValue;
     color: Style.baseColor;
-//    color: "red";
     border.color: "#2b2d2d";
 
     MouseArea {
         anchors.fill: parent;
+
+        onClicked: {
+            cbLang.menuVisible = false;
+            cbUnit.menuVisible = false;
+        }
     }
 
     Rectangle {
@@ -42,7 +46,8 @@ Rectangle {
                id: iconPref;
                width: 20;
                height: 20;
-               color: container.styleColor == "Dark"? "white" : "#4C514A";
+//               color: container.styleColor == "Dark"? "white" : "#4C514A";
+               color: Style.textColor;
                anchors.left: topPan.left;
                anchors.verticalCenter: topPan.verticalCenter;
                radius: radiusValue;
@@ -55,6 +60,8 @@ Rectangle {
                anchors.verticalCenter: topPan.verticalCenter;
                text: "Preferences";
                color: Style.textColor;
+               font.family: Style.fontFamily;
+               font.pixelSize: Style.fontSize_subtitle;
            }
 
            Rectangle {
@@ -63,10 +70,13 @@ Rectangle {
                anchors.verticalCenter: topPan.verticalCenter;
                width: 20;
                height: 20;
-               color: "red";
+               color: Style.textColor;
+               radius: radiusValue;
                MouseArea {
                    anchors.fill: parent;
                    onClicked: {
+                       cbLang.menuVisible = false;
+                       cbUnit.menuVisible = false;
                        preference.visible = false;
                    }
                }
@@ -87,6 +97,8 @@ Rectangle {
                anchors.top: versionBlock.top;
                text: "Version";
                color: Style.textColor;
+               font.family: Style.fontFamily;
+               font.pixelSize: Style.fontSize_subtitle;
            }
 
            Rectangle {
@@ -106,6 +118,8 @@ Rectangle {
                anchors.top: line0.bottom;
                text: "MIO Version";
                color: "#A5A5A5";
+               font.family: Style.fontFamily;
+               font.pixelSize: Style.fontSize_subtitle;
            }
        }
 
@@ -124,6 +138,8 @@ Rectangle {
                anchors.top: languageUnitBlock.top;
                text: "Language";
                color: Style.textColor;
+               font.family: Style.fontFamily;
+               font.pixelSize: Style.fontSize_subtitle;
            }
 
            Text {
@@ -132,6 +148,8 @@ Rectangle {
                anchors.top: versionBlock.top;
                text: "Unit";
                color: Style.textColor;
+               font.family: Style.fontFamily;
+               font.pixelSize: Style.fontSize_subtitle;
            }
 
            Rectangle {
@@ -159,6 +177,7 @@ Rectangle {
                anchors.top: line.bottom;
                model: unitModel;
            }
+
        }
 
        Rectangle {
@@ -177,6 +196,8 @@ Rectangle {
                anchors.top: modeBlock.top;
                text: "Mode";
                color: Style.textColor;
+               font.family: Style.fontFamily;
+               font.pixelSize: Style.fontSize_subtitle;
            }
 
            Rectangle {
@@ -207,6 +228,8 @@ Rectangle {
                    anchors.top: darkMode.bottom;
                    anchors.topMargin: 10;
                    color: Style.textColor;
+                   font.family: Style.fontFamily;
+                   font.pixelSize: Style.fontSize_subtitle;
                }
 
                MouseArea {
@@ -239,6 +262,8 @@ Rectangle {
                     anchors.top: lightMode.bottom;
                     anchors.topMargin: 10;
                     color: Style.textColor;
+                    font.family: Style.fontFamily;
+                    font.pixelSize: Style.fontSize_subtitle;
                }
 
                MouseArea {
@@ -247,6 +272,8 @@ Rectangle {
 
                         stylesModel.getStyle("Light");
                         preference.styleColor = "Light";
+
+                        console.log("FONT NAME ", Style.fontFamily);
                     }
                }
            }
@@ -265,8 +292,7 @@ Rectangle {
         Style.textColor = preference.getThemeColor("ActiveColors", "Text", themeType);
 
         Style.selectedColor = preference.getThemeColor("ActiveColors", "ItemSelected", themeType);
-
-        Style.buttonColor = preference.getThemeColor("ActiveColors", "Button", themeType);
+        Style.buttonColor = preference.getThemeColor("ActiveColors", "HeaderBorder", themeType);
         Style.buttonBorderColor = preference.getThemeColor("ActiveColors", "ButtonBorder", themeType);
         Style.imagingToolsGradient1 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient1");
         Style.imagingToolsGradient2 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient2");

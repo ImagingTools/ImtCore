@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 
 Item {
     id: container;
@@ -58,6 +59,8 @@ Item {
         text: container.text;
         color: container.selected ? selectionColor : textColor;
         font.pixelSize: 10;//container.fontSize
+        font.family: Style.fontFamily;
+//        font.pixelSize: Style.fontSize_subtitle;
 //        font.family: container.fontName
 //        onWidthChanged: {
 //        }

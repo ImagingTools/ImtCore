@@ -63,7 +63,7 @@ Rectangle{
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: parent.left;
             anchors.leftMargin: 8;
-            font.pixelSize: container.fontSize;
+//            font.pixelSize: container.fontSize;
             //font.family: container.fontName;
             font.bold: false;
             color: "red";//container.textColor
@@ -71,6 +71,8 @@ Rectangle{
 //            height: contentHeight;
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
             text: container.maxSizeText;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_subtitle;
         }
     }
 
@@ -91,7 +93,7 @@ Rectangle{
                     anchors.topMargin: container.textTopMargin;
                     anchors.left: parent.left;
                     anchors.leftMargin: 8;
-                    font.pixelSize: container.fontSize;
+//                    font.pixelSize: container.fontSize;
                     //font.family: container.fontName;
                     font.bold: false;
                     color: Style.textColor;
@@ -99,6 +101,9 @@ Rectangle{
 //                    height: contentHeight;
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
                     text: container.bodyArray[model.index];
+
+                    font.family: Style.fontFamily;
+                    font.pixelSize: Style.fontSize_subtitle;
                 }
 
 

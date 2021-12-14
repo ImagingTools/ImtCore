@@ -52,9 +52,12 @@ Rectangle{
         anchors.bottom: container.bottom;
         anchors.bottomMargin: 4;
         color: container.enabled ? container.textColor : "gray";
-        font.pixelSize: container.fontSize;
-        font.family: container.fontName;
+//        font.pixelSize: container.fontSize;
+//        font.family: container.fontName;
         text: container.text;
+
+        font.family: Style.fontFamily;
+        font.pixelSize: Style.fontSize_subtitle;
     }
 
     MouseArea{

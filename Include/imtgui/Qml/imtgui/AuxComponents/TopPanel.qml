@@ -80,9 +80,11 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter;
 
         text: qsTr("Products");
-        font.family: "Helvetica";
-        font.pixelSize: 25;
+//        font.family: "Helvetica";
+//        font.pixelSize: 25;
         color: Style.textColor;
+        font.family: Style.fontFamily;
+        font.pixelSize: Style.fontSize_title;
     }
 
     Item {

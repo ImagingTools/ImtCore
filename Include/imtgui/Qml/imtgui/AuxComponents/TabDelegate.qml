@@ -102,8 +102,10 @@ Rectangle{
             text: tabDelegate.firstElement ? tabDelegate.firstElementText : tabDelegate.text;
           //  text: tabDelegate.text
             color: Style.textColor;
-            font.pixelSize: tabDelegate.fontSize;
-            font.family: tabDelegate.fontName;
+//            font.pixelSize: tabDelegate.fontSize;
+//            font.family: tabDelegate.fontName;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_subtitle;
 
         }
     }

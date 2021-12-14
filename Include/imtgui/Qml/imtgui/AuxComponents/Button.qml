@@ -12,8 +12,12 @@ Rectangle {
 //           || ma.mouseY <= 0 || ma.mouseY >= height
 //           || ma.pressed ? "transparent" : Style.buttonColor;
 
-    color: Style.backgroundColor;
-    border.color: Style.buttonBorderColor;
+    color: ma.mouseX <= 0 || ma.mouseX >= container.width
+           || ma.mouseY <= 0 || ma.mouseY >= height
+           || ma.pressed ? Style.buttonColor : Style.buttonColor;
+
+//    color: Style.backgroundColor;
+//    border.color: Style.buttonBorderColor;
     signal clicked;
 
 
