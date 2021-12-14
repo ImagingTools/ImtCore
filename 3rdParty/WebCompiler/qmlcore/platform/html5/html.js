@@ -645,6 +645,7 @@ exports.pushAnimation = function(obj){
 }
 
 exports.window = window
+exports.document = document
 
 history.pushState = ( f => function pushState(){
     var ret = f.apply(this, arguments);

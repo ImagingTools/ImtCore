@@ -1,43 +1,135 @@
-Rectangle {
-	id: textEditProto;
-	property lazy paddings: Paddings {}
-	property string placeholder;
-	property alias horizontalAlignment: innerText.horizontalAlignment;
-	property alias backgroundColor: color;
-	property alias text: innerText.text;
-	property alias font: innerText.font;
-	property alias color: innerText.color;
-	property bool cursorVisible: true;
-	focus: true;
-	clip: true;
+///HTML text input item
+Item {
+	property enum horizontalAlignment { AlignLeft, AlignRight, AlignHCenter, AlignJustify };
+	property enum verticalAlignment { AlignTop, AlignBottom, AlignVCenter };
+	property string text;
+	property Font font: Font {}
+	property Color color: "#000";
 
-	Rectangle {
-		id: cursor;
-		x: innerText.paintedWidth;
-		width: 2;
-		height: innerText.paintedHeight;
-		anchors.verticalCenter: parent.verticalCenter;
-		color: innerText.color;
-		visible: parent.activeFocus && textEditProto.cursorVisible;
+	onTextChanged: { 
+		this._updateValue(value) 
+		this._updateCursorPos()
 	}
 
-	Text {
-		id: innerText;
-		anchors.verticalCenter: parent.verticalCenter;
+	function _updateCursorPos(){
+		if(this.text === '') {
+			switch(this.horizontalAlignment){
+			case TextEdit.AlignLeft:
+				this.element.dom.style.paddingLeft = "0";
+				break;
+			case TextEdit.AlignRight:
+				this.element.dom.style.paddingLeft = `${this.width - this.font.pixelSize*0.25}px`;
+				break;
+			case TextEdit.AlignHCenter:
+				this.element.dom.style.paddingLeft = `${this.width*0.5 - this.font.pixelSize*0.25}px`;
+				break;
+			}
+			switch(this.verticalAlignment){
+			case TextEdit.AlignTop:
+				this.element.dom.style.paddingTop = "0";
+				break;
+			case TextEdit.AlignBottom:
+				this.element.dom.style.paddingTop = `${this.height - this.font.pixelSize*1.25}px`;
+				break;
+			case TextEdit.AlignVCenter:
+				this.element.dom.style.paddingTop = `${this.height*0.5 - this.font.pixelSize*0.5}px`;
+				break;
+			}
+		} else {
+			this.element.dom.style.paddingLeft = "0"
+			this.element.dom.style.paddingTop = "0"
+		}
 	}
 
-	Timer {
-		running: parent.activeFocus && textEditProto.cursorVisible;
-		repeat: true;
-		interval: 1000;
-
-		onTriggered: { cursor.visible = !cursor.visible; }
+	function _getValue(){
+		return this.element.dom.innerHTML
 	}
 
-	removeChar: {
-		var text = textEditProto.text
-		textEditProto.text = text.slice(0, text.length - 1)
+	function _updateValue(value){
+		let pos = this._getCursorPosition()
+		this.element.dom.innerHTML = this.text
+		this._setCursorPosition(pos)
 	}
 
-	onPlaceholderChanged: { this.element.setAttribute('placeholder', value); }
+	function _getCursorPosition() {
+		let selection = this._context.backend.document.getSelection()
+		let range = new Range
+		range.setStart(this.element.dom, 0)
+		range.setEnd(selection.anchorNode, selection.anchorOffset)
+		return range.toString().length
+	}
+
+	function _setCursorPosition(position) {
+		let child = this.element.dom.firstChild
+		while(position > 0) {
+			let length = child.textContent.length
+			if(position > length) {
+			position -= length
+			child = child.nextSibling
+			}
+			else {
+			if(child.nodeType == 3) return this._context.backend.document.getSelection().collapse(child, position)
+			child = child.firstChild
+			}
+		}
+	}
+
+	constructor: {
+		this.element.on("input", function() {
+			this.text = this._getValue()
+			
+		}.bind(this))
+		this.element.dom.style.display = "flex"
+		this.element.dom.style.pointerEvents = "all"
+		this.element.dom.style.boxSizing = "border-box"
+		this.element.dom.style.borderWidth = "0"
+		this.element.dom.style.background = "none"
+		this.element.dom.style.outline = "none"
+		this.element.dom.style.overflow = "auto"
+		this.element.dom.style.flexWrap = "wrap"
+		this.element.dom.contentEditable = true
+
+	}
+
+	onCompleted: {
+		console.log(this.font.pixelSize)
+	}
+
+	onHorizontalAlignmentChanged:{
+		switch(this.horizontalAlignment){
+		case TextEdit.AlignLeft:
+			this.element.dom.style.justifyContent = 'flex-start';
+			break;
+		case TextEdit.AlignRight:
+			this.element.dom.style.justifyContent = 'flex-end';
+			break;
+		case TextEdit.AlignHCenter:
+			this.element.dom.style.justifyContent = 'center';
+			break;
+		}
+		this._updateCursorPos()
+	}
+	onVerticalAlignmentChanged:{
+		switch(this.verticalAlignment){
+		case TextEdit.AlignTop:
+			this.element.dom.style.alignItems = 'flex-start';
+			break;
+		case TextEdit.AlignBottom:
+			this.element.dom.style.alignItems = 'flex-end';
+			break;
+		case TextEdit.AlignVCenter:
+			this.element.dom.style.alignItems = 'center';
+			break;
+		}
+		this._updateCursorPos()
+	}
+
+	onWidthChanged,
+	onHeightChanged: {
+		this._updateCursorPos()
+	}
+
+	onCursorColorChanged: { this.style('caret-color', value) }
+
+
 }

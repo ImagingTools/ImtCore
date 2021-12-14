@@ -132,6 +132,13 @@ def parse_qml_file(cache, com, path):
 			
 			new_lines = []
 			for line in lines:
+				if(not line.replace(' ', '')[0:2] in '//*'):
+					reg = re.search(r'[/]{1}[\\,^,(,),.,\[,\]]{1}[^/]{2,}[/]{1}\w*', line)
+					
+					if(reg):
+						repl = '`{}`'.format(reg[0].replace('\\', '\\\\'))
+						line = line.replace(reg[0], repl)
+
 				def_signal = re.search(r'signal [(,),a-z,A-Z,0-9, ]+;', line)
 				def_signal = def_signal[0] if def_signal else None
 				if(def_signal):
@@ -164,7 +171,7 @@ def parse_qml_file(cache, com, path):
 
 
 			data = '\n'.join(new_lines) # by Artur, for compatibility signals
-			#print(data)
+			print(data)
 
 			tree = compiler.grammar.parse(data)
 			cache.write(com, h, tree)

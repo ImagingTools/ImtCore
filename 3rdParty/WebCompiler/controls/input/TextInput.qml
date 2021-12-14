@@ -6,14 +6,37 @@ BaseInput {
 	height: 20;	///<@private
 	width: 173;	///<@private
 	type: passwordMode ? "password" : "text";	///<@private
+	property Object validator;
 
 	onTextChanged: { this._updateValue(value) }
 
 	constructor: {
 		this.element.on("input", function() {
-			this.text = this._getValue()
+			if(this.validator){
+				let text = this._getValue()
+				console.log(1)
+				if(this.validator.__re.test(text)){
+					this.text = text
+				} else {
+					this._updateValue(this.text)
+				}
+			} else {
+				this.text = this._getValue()
+			}
+			
+			
 		}.bind(this))
 	}
 
+	onValidatorChanged:{
+		
+	}
+
+	onCompleted: {
+
+	}
+
 	onCursorColorChanged: { this.style('caret-color', value) }
+
+
 }

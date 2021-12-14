@@ -27,6 +27,7 @@ if len(sys.argv) > 3:
     GRAPHQL_REQUEST_PATH = ""
     BUILD_DIR = sys.argv[2]
     BUILD_DIST_DIR = BUILD_DIR + "/dist"
+    print("BUILD_DIR", BUILD_DIR)
 
     for dir in sys.argv:
         if dir.replace("\\", "/").endswith("ImtCore/Include/imtqml/Qml/imtqml"):
@@ -39,6 +40,7 @@ if len(sys.argv) > 3:
         print("GraphQLRequest.js file not found!")
 
     python_path = sys.argv[len(sys.argv) - 1]
+    print("python_path", python_path)
     process = subprocess.Popen(f'{python_path}  qmlcore/build.py', shell=True, cwd=BUILD_DIR)
     process.wait()
     build_from = sys.argv[len(sys.argv) - 3]
