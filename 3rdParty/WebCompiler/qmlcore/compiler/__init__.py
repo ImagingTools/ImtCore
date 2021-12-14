@@ -61,7 +61,7 @@ class Cache(object):
 
 def parse_qml_file(cache, com, path):
 	queue_replace = {} # by Artur
-	
+
 	try:
 		with open('.cache/signals', 'r') as f:
 			for line in f:
@@ -80,98 +80,111 @@ def parse_qml_file(cache, com, path):
 	else:
 		print("parsing", path, "...", com, file=sys.stderr)
 		try:
-			data = data.replace('pragma Singleton', '') # by Artur
-			data = data.replace('Component.onCompleted', 'onCompleted') # by Artur, for compatibility completed signal
-			data = data.replace('onPressed:', 'onMousePressed:').replace('onReleased:', 'onMouseReleased:') # by Artur, for compatibility MouseArea signal
-			data = data.replace('.scale', '.transform.scale') # by Artur, for compatibility scale
-			data = data.replace('sourceSize.width', 'sourceWidth') # by Artur, for compatibility sourceSize
-			data = data.replace('sourceSize.height', 'sourceHeight') # by Artur, for compatibility sourceSize
 
-			qts = re.findall(r'Qt.openUrlExternally[(,),a-z,A-Z,0-9,.,+,-,*,/,=,?,:, ]+', data)
-			for q in qts:
-				left = 0
-				right = 0
-				i = 0
-				while(i < len(q)):
-					if(q[i] == '(' and left == 0):
-						left = i
-					if(q[i] == ')'):
-						right = i
-					i += 1
-				repl = "this._context.backend.window.open({},'_blank')".format(q[left+1:right])
-				data = data.replace(q, repl)
+			if(path[0:3] == 'src'):
+				data = data.replace('pragma Singleton', '') # by Artur
+				data = data.replace('Component.onCompleted', 'onCompleted') # by Artur, for compatibility completed signal
+				data = data.replace('onPressed:', 'onMousePressed:').replace('onReleased:', 'onMouseReleased:') # by Artur, for compatibility MouseArea signal
+				data = data.replace('.scale', '.transform.scale') # by Artur, for compatibility scale
+				data = data.replace('sourceSize.width', 'sourceWidth') # by Artur, for compatibility sourceSize
+				data = data.replace('sourceSize.height', 'sourceHeight') # by Artur, for compatibility sourceSize
 
-			cursors = {
-				'Qt.ArrowCursor': '"default"',
-				'Qt.UpArrowCursor': '"n-resize"',
-				'Qt.CrossCursor': '"crosshair"',
-				'Qt.WaitCursor': '"wait"',
-				'Qt.IBeamCursor': '"text"',
-				'Qt.SizeVerCursor': '"ew-resize"',
-				'Qt.SizeHorCursor': '"ns-resize"',
-				'Qt.SizeBDiagCursor': '"nesw-resize"',
-				'Qt.SizeFDiagCursor': '"nwse-resize"',
-				'Qt.SizeAllCursor': '"all-scroll"',
-				'Qt.BlankCursor': '"none"',
-				'Qt.SplitVCursor': '"row-resize"',
-				'Qt.SplitHCursor': '"col-resize"',
-				'Qt.PointingHandCursor': '"pointer"',
-				'Qt.ForbiddenCursor': '"not-allowed"',
-				'Qt.WhatsThisCursor': '"help"',
-				'Qt.BusyCursor': '"progress"',
-				'Qt.OpenHandCursor': '"grab"',
-				'Qt.ClosedHandCursor': '"grabbing"',
-				'Qt.DragCopyCursor': '"copy"',
-				'Qt.DragMoveCursor': '"move"',
-				'Qt.DragLinkCursor': '"alias"',
-			}  # by Artur, for compatibility cursorShape
-			for cur in cursors:
-				data = data.replace(cur, cursors[cur])
+				qts = re.findall(r'Qt.openUrlExternally[(,),a-z,A-Z,0-9,.,+,-,*,/,=,?,:, ]+', data)
+				for q in qts:
+					left = 0
+					right = 0
+					i = 0
+					while(i < len(q)):
+						if(q[i] == '(' and left == 0):
+							left = i
+						if(q[i] == ')'):
+							right = i
+						i += 1
+					repl = "this._context.backend.window.open({},'_blank')".format(q[left+1:right])
+					data = data.replace(q, repl)
 
-			lines = data.split('\n')
-			
-			new_lines = []
-			for line in lines:
-				if(not line.replace(' ', '')[0:2] in '//*'):
-					reg = re.search(r'[/]{1}[\\,^,(,),.,\[,\]]{1}[^/]{2,}[/]{1}\w*', line)
-					
-					if(reg):
-						repl = '`{}`'.format(reg[0].replace('\\', '\\\\'))
-						line = line.replace(reg[0], repl)
+				
+				match_all = re.findall(r'[a-z,A-Z,0-9,., ]+[.]match[(]{1}[^&|)]{2,}[)]{1}', data)
+				#print(match_all)
+				for m in match_all:
+					obj, body = m.split('.match')
+					body = body[0:-1] + ',' + obj + ')'
+					nobj = '.'.join(obj.split('.')[0:-1])
+					repl = '{}._match{}'.format(nobj, body)
+					data = data.replace(m, repl)
+				#print(tttt)
 
-				def_signal = re.search(r'signal [(,),a-z,A-Z,0-9, ]+;', line)
-				def_signal = def_signal[0] if def_signal else None
-				if(def_signal):
-					name_signal = re.search(r'signal [a-z,A-Z,0-9]+', def_signal)
-					name_signal = name_signal[0].split(' ')[1] if name_signal else None
-					sign_signal = re.search(r'[(][a-z,A-Z,0-9, ]+[)]', def_signal)
-					sign_signal = sign_signal[0] if sign_signal else None
-					if(sign_signal):
-						line = line.replace(sign_signal, '')
-						params = sign_signal[1:-1].split(',')
-						new_params = []
-						for param in params:
-							new_params.append(param.split(' ')[-1])
-						queue_replace['on'+name_signal[0].upper()+name_signal[1:]] = 'on'+name_signal[0].upper()+name_signal[1:]+'('+','.join(new_params)+')'
+				cursors = {
+					'Qt.ArrowCursor': '"default"',
+					'Qt.UpArrowCursor': '"n-resize"',
+					'Qt.CrossCursor': '"crosshair"',
+					'Qt.WaitCursor': '"wait"',
+					'Qt.IBeamCursor': '"text"',
+					'Qt.SizeVerCursor': '"ew-resize"',
+					'Qt.SizeHorCursor': '"ns-resize"',
+					'Qt.SizeBDiagCursor': '"nesw-resize"',
+					'Qt.SizeFDiagCursor': '"nwse-resize"',
+					'Qt.SizeAllCursor': '"all-scroll"',
+					'Qt.BlankCursor': '"none"',
+					'Qt.SplitVCursor': '"row-resize"',
+					'Qt.SplitHCursor': '"col-resize"',
+					'Qt.PointingHandCursor': '"pointer"',
+					'Qt.ForbiddenCursor': '"not-allowed"',
+					'Qt.WhatsThisCursor': '"help"',
+					'Qt.BusyCursor': '"progress"',
+					'Qt.OpenHandCursor': '"grab"',
+					'Qt.ClosedHandCursor': '"grabbing"',
+					'Qt.DragCopyCursor': '"copy"',
+					'Qt.DragMoveCursor': '"move"',
+					'Qt.DragLinkCursor': '"alias"',
+				}  # by Artur, for compatibility cursorShape
+				for cur in cursors:
+					data = data.replace(cur, cursors[cur])
+
+				lines = data.split('\n')
+				
+				new_lines = []
+				for line in lines:
+					if(not line.replace(' ', '')[0:2] in '//*'):
+						regs = re.findall(r'[/]{1}[\^]{1}[\\,^,(,),.,\[,\]]{1}[^/]{2,}[\$]{1}[/]{1}\w*', line)
+						#print(regs)
+						for reg in regs:
+							repl = '`{}`'.format(reg.replace('\\', '\\\\'))
+							line = line.replace(reg, repl)
+
+					def_signal = re.search(r'signal [(,),a-z,A-Z,0-9, ]+;', line)
+					def_signal = def_signal[0] if def_signal else None
+					if(def_signal):
+						name_signal = re.search(r'signal [a-z,A-Z,0-9]+', def_signal)
+						name_signal = name_signal[0].split(' ')[1] if name_signal else None
+						sign_signal = re.search(r'[(][a-z,A-Z,0-9, ]+[)]', def_signal)
+						sign_signal = sign_signal[0] if sign_signal else None
+						if(sign_signal):
+							line = line.replace(sign_signal, '')
+							params = sign_signal[1:-1].split(',')
+							new_params = []
+							for param in params:
+								new_params.append(param.split(' ')[-1])
+							queue_replace['on'+name_signal[0].upper()+name_signal[1:]] = 'on'+name_signal[0].upper()+name_signal[1:]+'('+','.join(new_params)+')'
+						else:
+							line = line.replace('()', '')
 					else:
-						line = line.replace('()', '')
-				else:
-					find = False
-					#print(queue_replace)
+						find = False
+						#print(queue_replace)
+						for key in queue_replace:
+							if not find and key in line:
+								line = line.replace(key, queue_replace[key])
+								find = True
+					new_lines.append(line)
+
+				
+				with open('.cache/signals', 'w') as f:
 					for key in queue_replace:
-						if not find and key in line:
-							line = line.replace(key, queue_replace[key])
-							find = True
-				new_lines.append(line)
-
-			
-			with open('.cache/signals', 'w') as f:
-				for key in queue_replace:
-					f.write('{}=>{}\n'.format(key, queue_replace[key]))
+						f.write('{}=>{}\n'.format(key, queue_replace[key]))
 
 
-			data = '\n'.join(new_lines) # by Artur, for compatibility signals
-			print(data)
+				data = '\n'.join(new_lines) # by Artur, for compatibility signals
+				#print(data)
 
 			tree = compiler.grammar.parse(data)
 			cache.write(com, h, tree)

@@ -1,11 +1,9 @@
 ///HTML text input item
 BaseInput {
 	property string text;		///< input text string property
-	property bool passwordMode: false;	///< show password chars instead of input text flag property
+	property enum echoMode { Normal, Password };
+	property bool readOnly: false;
 	property Color cursorColor: "#fff";	///< cursor color
-	height: 20;	///<@private
-	width: 173;	///<@private
-	type: passwordMode ? "password" : "text";	///<@private
 	property Object validator;
 
 	onTextChanged: { this._updateValue(value) }
@@ -13,8 +11,8 @@ BaseInput {
 	constructor: {
 		this.element.on("input", function() {
 			if(this.validator){
+
 				let text = this._getValue()
-				console.log(1)
 				if(this.validator.__re.test(text)){
 					this.text = text
 				} else {
@@ -26,6 +24,7 @@ BaseInput {
 			
 			
 		}.bind(this))
+		this.element.dom.style.background = "none"
 	}
 
 	onValidatorChanged:{
@@ -36,7 +35,23 @@ BaseInput {
 
 	}
 
+	onReadOnlyChanged: {
+		if(this.readOnly){
+			this.element.dom.readOnly = true
+		} else {
+			this.element.dom.readOnly = false
+		}
+	}
+
+	onEchoModeChanged:{
+		if(this.echoMode === TextInput.Password) {
+			this.element.dom.type = 'password'
+		} else {
+			this.element.dom.type = 'text';
+		}
+	}
+
 	onCursorColorChanged: { this.style('caret-color', value) }
 
-
+	
 }

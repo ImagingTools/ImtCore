@@ -16,6 +16,14 @@ EventEmitter {
 		}
 		this._changedConnections = []
 		this._properties = {}
+
+		
+	}
+
+	function _match(reg, text){
+		let temp = reg.split('/')
+        let re = new RegExp(temp[1], temp[2])
+		return text.match(re)
 	}
 
 	function completed() {
