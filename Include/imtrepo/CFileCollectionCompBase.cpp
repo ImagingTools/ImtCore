@@ -23,6 +23,7 @@
 #include <imtbase/CObjectCollectionInsertEvent.h>
 #include <imtbase/CObjectCollectionUpdateEvent.h>
 #include <imtbase/CObjectCollectionRemoveEvent.h>
+#include <imtbase/CTempDir.h>
 
 
 namespace imtrepo
@@ -446,22 +447,25 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 	if (newObjectPtr.IsValid()){
 		const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
 		if (persistencePtr != nullptr){
-			QStringList supportedExts;
-			persistencePtr->GetFileExtensions(supportedExts, defaultValuePtr, ifile::IFilePersistence::QF_SAVE);
-
-			QString targetFolder = CreateWorkingDir();
-			if (targetFolder.isEmpty()){
-				SendErrorMessage(0, QObject::tr("Target folder '%1' could not be created").arg(targetFolder));
+			imtbase::CTempDir tempDir("ImtCore");
+			if (tempDir.Path().isEmpty()){
+				SendErrorMessage(0, tr("Temp folder could not be created"));
 
 				return QByteArray();
 			}
 
-			QString tempFilePath = targetFolder + "/" + QUuid::createUuid().toString() + "." + supportedExts[0];
+			QString tempFileBaseName = tempDir.Path() + "/" + QUuid::createUuid().toString();
+
+			QString workingExt = GetWorkingExt(
+						persistencePtr,
+						newObjectPtr.GetPtr(),
+						tempFileBaseName);
+
+			QString tempFilePath = tempFileBaseName;
+			tempFilePath += workingExt.isEmpty() ? "" : "." + workingExt;
 
 			if (persistencePtr->SaveToFile(*newObjectPtr, tempFilePath) == ifile::IFilePersistence::OS_OK){
 				QByteArray retval = InsertFile(tempFilePath, typeId, name, description, proposedObjectId);
-
-				QFile::remove(tempFilePath);
 
 				return retval;
 			}
@@ -555,25 +559,32 @@ bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr&
 bool CFileCollectionCompBase::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(GetObjectTypeId(objectId));
-	if (persistencePtr == nullptr){
-		return false;
-	}
+	if (persistencePtr != nullptr){
+		imtbase::CTempDir tempDir("ImtCore");
+		if (tempDir.Path().isEmpty()){
+			SendErrorMessage(0, tr("Temp folder could not be created"));
 
-	QStringList extensions;
-	if (!persistencePtr->GetFileExtensions(extensions, &object, ifile::IFilePersistence::QF_SAVE)){
-		return false;
-	}
+			return false;
+		}
 
-	QString extension = extensions.isEmpty() ? QString() : extensions[0];
+		QString tempFileBaseName = tempDir.Path() + "/" + QUuid::createUuid().toString();
 
-	QString tempFilePath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString() + "." + extension;
+		QString workingExt = GetWorkingExt(
+					persistencePtr,
+					&object,
+					tempFileBaseName);
 
-	if (persistencePtr->SaveToFile(object, tempFilePath) == ifile::IFilePersistence::OS_OK){
-		bool retVal = UpdateFile(tempFilePath, objectId);
+		QString tempFilePath = tempFileBaseName;
+		tempFilePath += workingExt.isEmpty() ? "" : "." + workingExt;
 
-		QFile::remove(tempFilePath);
+		if (persistencePtr->SaveToFile(object, tempFilePath) == ifile::IFilePersistence::OS_OK){
+			bool retVal = UpdateFile(tempFilePath, objectId);
 
-		return retVal;
+			return retVal;
+		}
+		else{
+			SendErrorMessage(0, QObject::tr("File could not be saved into '%1'").arg(tempFilePath));
+		}
 	}
 
 	return false;
@@ -788,6 +799,27 @@ QString CFileCollectionCompBase::CreateWorkingDir() const
 
 	if (istd::CSystem::EnsurePathExists(workingPath)){
 		return workingPath;
+	}
+
+	return QString();
+}
+
+
+QString CFileCollectionCompBase::GetWorkingExt(
+			const ifile::IFilePersistence* persistencePtr,
+			const istd::IChangeable* dataObjectPtr,
+			const QString& fileName)
+{
+	int flags = ifile::IFilePersistence::QF_FILE | ifile::IFilePersistence::QF_SAVE;
+
+	QStringList supportedExts;
+	persistencePtr->GetFileExtensions(supportedExts, dataObjectPtr, flags);
+
+	for (const QString ext : supportedExts){
+		QString filePath = fileName + "." + ext;
+		if (persistencePtr->IsOperationSupported(dataObjectPtr, &filePath, flags, false)){
+			return ext;
+		}
 	}
 
 	return QString();

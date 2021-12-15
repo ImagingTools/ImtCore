@@ -339,6 +339,10 @@ protected:
 
 	void EnumerateRepositoryItems(QFileInfoList& fileList) const;
 	QString CreateWorkingDir() const;
+	QString GetWorkingExt(
+				const ifile::IFilePersistence* persistencePtr,
+				const istd::IChangeable* dataObjectPtr,
+				const QString& fileName);
 
 	/**
 		Create data object for the given type.
