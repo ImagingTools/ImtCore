@@ -57,7 +57,7 @@ Object {
 
 	onCompleted: {
 		this.style({
-			'overflow': 'hidden',
+			'overflow': this.clip ? 'hidden': 'unset'
 		})
 	}
 
@@ -287,7 +287,7 @@ Object {
 	function _updateOverflow() {
 		if(this.nativeScrolling === undefined)
 		this.style({
-			'overflow': this.clip? 'hidden': 'visible'
+			'overflow': this.clip ? 'hidden': 'unset'
 		})
 	}
 

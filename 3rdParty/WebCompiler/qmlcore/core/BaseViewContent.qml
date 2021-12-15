@@ -14,4 +14,8 @@ Item {
 		if (layout === undefined || layout) //default true
 			this.parent._scheduleLayout(true) //schedule layout but skip positioning
 	}
+
+	onCompleted: {
+		this.style('overflow', 'hidden')
+	}
 }

@@ -107,11 +107,13 @@ def parse_qml_file(cache, com, path):
 				match_all = re.findall(r'[a-z,A-Z,0-9,., ]+[.]match[(]{1}[^&|)]{2,}[)]{1}', data)
 				#print(match_all)
 				for m in match_all:
-					obj, body = m.split('.match')
-					body = body[0:-1] + ',' + obj + ')'
-					nobj = '.'.join(obj.split('.')[0:-1])
-					repl = '{}._match{}'.format(nobj, body)
-					data = data.replace(m, repl)
+					if '/^' in m:
+						obj, body = m.split('.match')
+						body = body[0:-1] + ',' + obj + ')'
+						nobj = '.'.join(obj.split('.')[0:-1])
+						repl = '{}._match{}'.format(nobj, body)
+						
+						data = data.replace(m, repl)
 				#print(tttt)
 
 				cursors = {
