@@ -158,7 +158,52 @@ QByteArray CAccountDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const QByteArray& objectId,
 			const istd::IChangeable& object) const
 {
-	return QByteArray();
+	const imtauth::IAccountInfo* accountInfoPtr = dynamic_cast<const imtauth::IAccountInfo*>(&object);
+	if (accountInfoPtr == nullptr){
+		return QByteArray();
+	}
+
+	QString accountName = accountInfoPtr->GetAccountName();
+
+	if (accountName.isEmpty()){
+		return QByteArray();
+	}
+
+	QByteArray accountId = accountName.toUtf8();
+
+	QByteArray accountTypeId;
+	imtauth::IAccountInfo::AccountType accountType = accountInfoPtr->GetAccountType();
+	if (accountType == imtauth::IAccountInfo::AT_COMPANY){
+		accountTypeId = "company";
+	}
+	else if (accountType == imtauth::IAccountInfo::AT_PERSON){
+		accountTypeId = "private";
+	}
+
+	QString accountDescription = accountInfoPtr->GetAccountDescription();
+
+	QString mail;
+	QString lastName;
+	QString firstName;
+
+	const imtauth::IContactInfo* ownerPtr = accountInfoPtr->GetAccountOwner();
+	if (ownerPtr != nullptr){
+		mail = ownerPtr->GetMail();
+		lastName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
+		firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
+	}
+
+	QByteArray retVal = QString("UPDATE Accounts SET Name = '%1', Description = '%2', Type = '%3', OwnerMail = '%4', OwnerLastName = '%5', OwnerFirstName = '%6' WHERE Id ='%7';")
+			.arg(accountName)
+			.arg(accountDescription)
+			.arg(qPrintable(accountTypeId))
+			.arg(mail)
+			.arg(lastName)
+			.arg(firstName)
+			.arg(qPrintable(accountId))
+			.toLocal8Bit();
+
+	return retVal;
 }
 
 
