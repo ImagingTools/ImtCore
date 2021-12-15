@@ -235,7 +235,100 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const QByteArray& objectId,
 			const istd::IChangeable& object) const
 {
-	return QByteArray();
+	const imtlic::IProductLicensingInfo* newProductPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(&object);
+	if (newProductPtr == nullptr){
+		return QByteArray();
+	}
+
+	const imtlic::IProductLicensingInfo* oldProductPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr objectPtr;
+	if (collection.GetObjectData(objectId, objectPtr)){
+		oldProductPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(objectPtr.GetPtr());
+	}
+
+	if (oldProductPtr == nullptr){
+		return QByteArray();
+	}
+
+	QByteArray oldProductId = oldProductPtr->GetProductId();
+	QByteArray newProductId = oldProductPtr->GetProductId();
+
+	QByteArray retVal = QString("UPDATE Products SET Id ='%1', Name = '%1' WHERE Id ='%2';").arg(qPrintable(newProductId)).arg(qPrintable(oldProductId)).toLocal8Bit();
+
+	QByteArrayList addedLicenses;
+	QByteArrayList removedLicenses;
+	QByteArrayList updatedLicenses;
+
+	GenerateDifferences(oldProductPtr, newProductPtr, addedLicenses, removedLicenses, updatedLicenses);
+
+	// Add new license to the product:
+	for (const QByteArray& addLicenseId : addedLicenses){
+		const imtlic::ILicenseInfo* licenseInfoPtr = newProductPtr->GetLicenseInfo(addLicenseId);
+		if (licenseInfoPtr != nullptr){
+			QString licenseName = licenseInfoPtr->GetLicenseName();
+			QString licenseDescription = newProductPtr->GetLicenseList().GetElementInfo(
+						addLicenseId,
+						imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
+			retVal += "\n" +
+						QString("INSERT INTO ProductLicenses(Id, Name, Description, ProductId) VALUES('%1', '%2', '%3', '%4');")
+									.arg(qPrintable(addLicenseId))
+									.arg(licenseName)
+									.arg(licenseDescription)
+									.arg(qPrintable(newProductId)).toLocal8Bit();
+		}
+	}
+
+	// Delete removed licenses to the product:
+	for (const QByteArray& removedLicenseId : removedLicenses){
+		retVal += "\n" +
+					QString("DELETE FROM ProductLicenses WHERE Id = '%1' AND ProductId = '%2';")
+								.arg(qPrintable(removedLicenseId))
+								.arg(qPrintable(newProductId)).toLocal8Bit();
+	}
+
+	// Update changed licenses in the product:
+	for (const QByteArray& updatedLicenseId : updatedLicenses){
+		const imtlic::ILicenseInfo* newLicenseInfoPtr = newProductPtr->GetLicenseInfo(updatedLicenseId);
+		if (newLicenseInfoPtr != nullptr){
+			QString licenseName = newLicenseInfoPtr->GetLicenseName();
+			QString licenseDescription = newProductPtr->GetLicenseList().GetElementInfo(
+				updatedLicenseId,
+				imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
+			retVal += "\n" +
+				QString("UPDATE ProductLicenses SET Id = '%1', Name = '%2', Description = '%3' WHERE ProductId = '%4';")
+				.arg(qPrintable(updatedLicenseId))
+				.arg(licenseName)
+				.arg(licenseDescription)
+				.arg(qPrintable(newProductId)).toLocal8Bit();
+		}
+		const imtlic::ILicenseInfo* oldLicenseInfoPtr = oldProductPtr->GetLicenseInfo(updatedLicenseId);
+		QByteArrayList addedFeatures;
+		QByteArrayList removedFeatures;
+		QByteArrayList updatedFeatures;
+
+		GenerateDifferences(oldLicenseInfoPtr, newLicenseInfoPtr, addedFeatures, removedFeatures);
+
+		// Add new features to the license:
+		for (const QByteArray& addedFeatureId : addedFeatures){
+			retVal += "\n" +
+						QString("INSERT INTO ProductLicenseFeatures(FeatureId, LicenseId) VALUES('%1', '%2');")
+									.arg(qPrintable(addedFeatureId))
+									.arg(qPrintable(updatedLicenseId)).toLocal8Bit();
+		}
+
+		// Delete removed features to the license:
+		for (const QByteArray& removedFeatureId : removedFeatures){
+			retVal += "\n" +
+						QString("DELETE FROM ProductLicenseFeatures WHERE FeatureId = '%1' AND LicenseId = '%2';")
+									.arg(qPrintable(removedFeatureId))
+									.arg(qPrintable(updatedLicenseId)).toLocal8Bit();
+		}
+	}
+
+	return retVal;
+
 }
 
 
@@ -286,6 +379,112 @@ QByteArray CProductsDatabaseDelegateComp::CreateDescriptionObjectQuery(
 
 	return retVal;
 }
+
+
+void CProductsDatabaseDelegateComp::GenerateDifferences(const imtlic::IProductLicensingInfo* currentProductPtr,
+														const imtlic::IProductLicensingInfo* newProductPtr,
+														QByteArrayList &addLicenses,
+														QByteArrayList &removedLicenses,
+														QByteArrayList &updatedLicenses) const
+{
+	imtbase::ICollectionInfo::Ids currentLicenseCollectionIds = currentProductPtr->GetLicenseList().GetElementIds();
+	QByteArrayList currentLicenseIds;
+
+	for (QByteArray id : currentLicenseCollectionIds){
+		const imtlic::ILicenseInfo* licenseInfoPtr = currentProductPtr->GetLicenseInfo(id);
+		Q_ASSERT(licenseInfoPtr != nullptr);
+		Q_ASSERT(!licenseInfoPtr->GetLicenseId().isEmpty());
+
+		currentLicenseIds.push_back(licenseInfoPtr->GetLicenseId());
+	}
+
+	imtbase::ICollectionInfo::Ids newLicenseCollectionIds = newProductPtr->GetLicenseList().GetElementIds();
+	QByteArrayList newLicenseIds;
+
+	for (QByteArray id : newLicenseCollectionIds){
+		const imtlic::ILicenseInfo* licenseInfoPtr = newProductPtr->GetLicenseInfo(id);
+		Q_ASSERT(licenseInfoPtr != nullptr);
+		Q_ASSERT(!licenseInfoPtr->GetLicenseId().isEmpty());
+
+		newLicenseIds.push_back(licenseInfoPtr->GetLicenseId());
+	}
+
+	// Calculate added licenses:
+	for (QByteArray newLicenseId : newLicenseIds){
+		if (!currentLicenseIds.contains(newLicenseId)){
+			addLicenses.push_back(newLicenseId);
+		}
+	}
+
+	// Calculate removed licenses:
+	for (QByteArray currentLicenseId : currentLicenseIds){
+		if (!newLicenseIds.contains(currentLicenseId)){
+			removedLicenses.push_back(currentLicenseId);
+		}
+	}
+
+	// Calculate changed licenses:
+	for (QByteArray currentLicenseId : currentLicenseIds){
+		// License-ID in both licenses:
+		if (newLicenseIds.contains(currentLicenseId)){
+			const imtlic::ILicenseInfo* currentLicensePtr = currentProductPtr->GetLicenseInfo(currentLicenseId);
+			Q_ASSERT(currentLicensePtr != nullptr);
+
+			const imtlic::ILicenseInfo* newLicensePtr = newProductPtr->GetLicenseInfo(currentLicenseId);
+			Q_ASSERT(newLicensePtr != nullptr);
+
+			if (!newLicensePtr->IsEqual(*currentLicensePtr)){
+				updatedLicenses.push_back(currentLicenseId);
+			}
+			else{
+				QString newLicenseDescription = newProductPtr->GetLicenseList().GetElementInfo(currentLicenseId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
+				QString currentLicenseDescription = currentProductPtr->GetLicenseList().GetElementInfo(currentLicenseId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
+				if (newLicenseDescription != currentLicenseDescription){
+					updatedLicenses.push_back(currentLicenseId);
+				}
+			}
+		}
+	}
+
+}
+
+
+void CProductsDatabaseDelegateComp::GenerateDifferences(const imtlic::ILicenseInfo *currentLicensePtr,
+														const imtlic::ILicenseInfo *newLicensePtr,
+														QByteArrayList &addFeatures,
+														QByteArrayList &removedFeatures) const
+{
+	QByteArrayList currentFeatureIds;
+	imtlic::ILicenseInfo::FeatureInfos currentFeatures = currentLicensePtr->GetFeatureInfos();
+
+	for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : currentFeatures){
+		currentFeatureIds.push_back(featureInfo.id);
+	}
+
+	QByteArrayList newFeatureIds;
+	imtlic::ILicenseInfo::FeatureInfos newFeatures = newLicensePtr->GetFeatureInfos();
+
+	for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : newFeatures){
+		newFeatureIds.push_back(featureInfo.id);
+	}
+
+	// Calculate added features:
+	for (QByteArray newFeatureId : newFeatureIds){
+		if (!currentFeatureIds.contains(newFeatureId)){
+			addFeatures.push_back(newFeatureId);
+		}
+	}
+
+	// Calculate removed features:
+	for (QByteArray currentFeatureId : currentFeatureIds){
+		if (!newFeatureIds.contains(currentFeatureId)){
+			removedFeatures.push_back(currentFeatureId);
+		}
+	}
+}
+
 
 
 } // namespace imtlicdb

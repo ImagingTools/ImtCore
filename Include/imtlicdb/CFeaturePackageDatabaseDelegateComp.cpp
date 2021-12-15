@@ -324,7 +324,7 @@ void CFeaturePackageDatabaseDelegateComp::GenerateDifferences(
 		}
 	}
 
-	// Calculate added features:
+	// Calculate removed features:
 	for (QByteArray currentFeatureId : currentFeatureIds){
 		if (!newFeatureIds.contains(currentFeatureId)){
 			removedFeatures.push_back(currentFeatureId);
