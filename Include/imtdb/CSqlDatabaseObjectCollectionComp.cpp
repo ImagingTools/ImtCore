@@ -442,39 +442,6 @@ istd::IChangeable* CSqlDatabaseObjectCollectionComp::CreateObjectFromSqlRecord(
 }
 
 
-// reimplemented (imtbase::CObjectCollectionBase)
-
-istd::IChangeable* CSqlDatabaseObjectCollectionComp::CreateObjectInstance(const QByteArray& /*typeId*/) const
-{
-	if (m_objectFactoryCompPtr.IsValid()){
-		return m_objectFactoryCompPtr.CreateInstance();
-	}
-
-	return nullptr;
-}
-
-
-void CSqlDatabaseObjectCollectionComp::DestroyObjectInstance(istd::IChangeable* objectPtr) const
-{
-	if (objectPtr != nullptr){
-		icomp::IComponent* componentPtr = dynamic_cast<icomp::IComponent*>(objectPtr);
-		if (componentPtr != nullptr){
-			const icomp::ICompositeComponent* parentComponentPtr = nullptr;
-			while ((parentComponentPtr = componentPtr->GetParentComponent(true)) != nullptr){
-				componentPtr = const_cast<icomp::ICompositeComponent*>(parentComponentPtr);
-			}
-
-			if (componentPtr != nullptr){
-				delete componentPtr;
-			}
-		}
-		else{
-			delete objectPtr;
-		}
-	}
-}
-
-
 // reimplemented (icomp::CComponentBase)
 
 void CSqlDatabaseObjectCollectionComp::OnComponentCreated()

@@ -85,9 +85,6 @@ protected:
 				QDateTime& lastModified,
 				QDateTime& added) const;
 
-	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const;
-	virtual void DestroyObjectInstance(istd::IChangeable* objectPtr) const;
-
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
