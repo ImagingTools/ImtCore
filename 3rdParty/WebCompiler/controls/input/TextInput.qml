@@ -13,7 +13,7 @@ BaseInput {
 			if(this.validator){
 
 				let text = this._getValue()
-				if(this.validator.__re.test(text)){
+				if(!this.validator.regExp || this.validator.regExp.test(text)){
 					this.text = text
 				} else {
 					this._updateValue(this.text)

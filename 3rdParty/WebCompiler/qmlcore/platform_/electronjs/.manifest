@@ -1,4 +1,0 @@
-{
-	"requires": ["html5", "web"],
-	"templates": ["*.html", "main.js", "package.json"]
-}

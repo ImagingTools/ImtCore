@@ -20,12 +20,6 @@ EventEmitter {
 		
 	}
 
-	function _match(reg, text){
-		let temp = reg.split('/')
-        let re = new RegExp(temp[1], temp[2])
-		return text.match(re)
-	}
-
 	function completed() {
 		if (this.__complete !== $core.CoreObject.prototype.__complete && this._registerDelayedAction('complete'))
 			this._context.__onCompleted(this)

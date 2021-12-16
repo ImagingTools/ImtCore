@@ -1,6 +1,7 @@
 ///base class for all inputs
 Item {
 	property enum horizontalAlignment { AlignLeft, AlignRight, AlignHCenter, Justify };	///< inner text alignment
+	property enum verticalAlignment { AlignTop, AlignBottom, AlignVCenter };
 	property lazy paddings: Paddings {}		///< inner text paddings
 	property Color color: "#000";				///< text color
 	property Color backgroundColor: "#fff";		///< background color
@@ -23,6 +24,23 @@ Item {
 		this.element.on("change", function() { this.change() }.bind(this))
 	}
 
+	function _updateCursorPos(){
+		switch(this.verticalAlignment){
+		case TextEdit.AlignTop:
+			this.element.dom.style.paddingTop = '0';
+			this.element.dom.style.paddingBottom = `${this.height - this.font.pixelSize*1.25}px`;
+			break;
+		case TextEdit.AlignBottom:
+			this.element.dom.style.paddingBottom = '0';
+			this.element.dom.style.paddingTop = `${this.height - this.font.pixelSize*1.25}px`;
+			break;
+		case TextEdit.AlignVCenter:
+			this.element.dom.style.paddingBottom = '0';
+			this.element.dom.style.paddingTop = '0';
+			break;
+		}
+	}
+
 	/// @private
 	onActiveFocusChanged: {
 		if (value)
@@ -39,7 +57,7 @@ Item {
 
 	/// @private
 	onWidthChanged,
-	onHeightChanged: { this._updateSize() }
+	onHeightChanged: { this._updateSize(); this._updateCursorPos(); }
 
 	/// @private
 	onTypeChanged: { this.element.setAttribute('type', value) }
@@ -58,6 +76,10 @@ Item {
 		case this.AlignHCenter:	this.style('text-align', 'center'); break
 		case this.AlignJustify:	this.style('text-align', 'justify'); break
 		}
+	}
+
+	onVerticalAlignmentChanged: {
+		this._updateCursorPos();
 	}
 
 	onEnabledChanged: {

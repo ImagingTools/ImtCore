@@ -17,7 +17,6 @@ import fnmatch
 import re
 import os
 import sys
-import datetime
 
 if PY2:
     reload(sys)
@@ -27,7 +26,6 @@ from os import path
 from distutils import dir_util
 from compiler.ts import Ts
 
-print("start build time", datetime.datetime.now())
 parser = argparse.ArgumentParser('qmlcore build tool')
 parser.add_argument('--minify', '-m', action='store_true', default=False, help='force minify step')
 parser.add_argument('--no-minify', '-M', action='store_true', default=False, help='force non-minified code generation')
@@ -452,4 +450,3 @@ except Exception as ex:
 		raise
 	else:
 		sys.exit(1)
-print("end build time", datetime.datetime.now())

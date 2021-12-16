@@ -630,6 +630,13 @@ class component_generator(object):
 						value = value.replace("model", "_get('model')")
 						#print('became', value)
 					
+					indx = 0
+					while indx < len(undep):
+						if(undep[indx] == "'match'" or undep[indx] == "'length'" or undep[indx] == "'indexOf'" or undep[indx] == "'substring'" or undep[indx] == "'search'" or undep[indx] == "'replace'"):
+							temp = undep[indx-1].split('.')
+							undep[indx] = "'{}'".format(temp[-1])
+							undep[indx-1] = '.'.join(temp[0:-1])
+						indx += 1
 
 					r.append("%s%s._replaceUpdater('%s', function() { %s = %s }, [%s])" %(ident, target_owner, target_prop, target_lvalue, value, ",".join(undep)))
 				else:

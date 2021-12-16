@@ -2,6 +2,7 @@
 Item {
 	property enum horizontalAlignment { AlignLeft, AlignRight, AlignHCenter, AlignJustify };
 	property enum verticalAlignment { AlignTop, AlignBottom, AlignVCenter };
+	property enum wrapMode { NoWrap, WordWrap, WrapAnywhere, Wrap };
 	property string text;
 	property Font font: Font {}
 	property Color color: "#000";
@@ -46,13 +47,14 @@ Item {
 	}
 
 	function _updateValue(value){
-		let pos = this._getCursorPosition()
+		let pos = this.text.length ? this._getCursorPosition() : value.length
 		this.element.dom.innerHTML = this.text
 		this._setCursorPosition(pos)
 	}
 
 	function _getCursorPosition() {
 		let selection = this._context.backend.document.getSelection()
+		if(!selection.anchorNode || !selection.anchorOffset) return 0
 		let range = new Range
 		range.setStart(this.element.dom, 0)
 		range.setEnd(selection.anchorNode, selection.anchorOffset)
@@ -92,7 +94,7 @@ Item {
 	}
 
 	onCompleted: {
-		console.log(this.font.pixelSize)
+		//this._updateValue(this.text) 
 	}
 
 	onHorizontalAlignmentChanged:{
@@ -124,12 +126,30 @@ Item {
 		this._updateCursorPos()
 	}
 
+	onWrapModeChanged:{
+		switch(this.wrapMode){
+		case TextEdit.NoWrap:
+			this.element.dom.style.wordBreak = 'normal'
+			this.element.dom.style.whiteSpace = 'nowrap'
+			break;
+		case TextEdit.WordWrap:
+			this.element.dom.style.wordBreak = 'break-word'
+			this.element.dom.style.whiteSpace = 'break-spaces'
+			break;
+		case TextEdit.WrapAnywhere:
+			this.element.dom.style.wordBreak = 'break-all'
+			this.element.dom.style.whiteSpace = 'break-spaces'
+			break;
+		case TextEdit.Wrap:
+			this.element.dom.style.wordBreak = 'break-all'
+			this.element.dom.style.whiteSpace = 'break-spaces'
+			break;
+		}
+	}
+
 	onWidthChanged,
 	onHeightChanged: {
 		this._updateCursorPos()
 	}
-
-	onCursorColorChanged: { this.style('caret-color', value) }
-
 
 }

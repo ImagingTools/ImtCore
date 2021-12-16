@@ -85,7 +85,8 @@ def parse_qml_file(cache, com, path):
 				data = data.replace('pragma Singleton', '') # by Artur
 				data = data.replace('Component.onCompleted', 'onCompleted') # by Artur, for compatibility completed signal
 				data = data.replace('onPressed:', 'onMousePressed:').replace('onReleased:', 'onMouseReleased:') # by Artur, for compatibility MouseArea signal
-				data = data.replace('.scale', '.transform.scale') # by Artur, for compatibility scale
+				#data = data.replace('.scale', '.transform.scale') # by Artur, for compatibility scale
+
 				data = data.replace('sourceSize.width', 'sourceWidth') # by Artur, for compatibility sourceSize
 				data = data.replace('sourceSize.height', 'sourceHeight') # by Artur, for compatibility sourceSize
 
@@ -103,18 +104,6 @@ def parse_qml_file(cache, com, path):
 					repl = "this._context.backend.window.open({},'_blank')".format(q[left+1:right])
 					data = data.replace(q, repl)
 
-				
-				match_all = re.findall(r'[a-z,A-Z,0-9,., ]+[.]match[(]{1}[^&|)]{2,}[)]{1}', data)
-				#print(match_all)
-				for m in match_all:
-					if '/^' in m:
-						obj, body = m.split('.match')
-						body = body[0:-1] + ',' + obj + ')'
-						nobj = '.'.join(obj.split('.')[0:-1])
-						repl = '{}._match{}'.format(nobj, body)
-						
-						data = data.replace(m, repl)
-				#print(tttt)
 
 				cursors = {
 					'Qt.ArrowCursor': '"default"',
@@ -147,12 +136,30 @@ def parse_qml_file(cache, com, path):
 				
 				new_lines = []
 				for line in lines:
-					if(not line.replace(' ', '')[0:2] in '//*'):
-						regs = re.findall(r'[/]{1}[\^]{1}[\\,^,(,),.,\[,\]]{1}[^/]{2,}[\$]{1}[/]{1}\w*', line)
-						#print(regs)
-						for reg in regs:
-							repl = '`{}`'.format(reg.replace('\\', '\\\\'))
-							line = line.replace(reg, repl)
+					line_for_reg = re.sub(r'([/]{2}.*)|([/][*].*[*][/])', '', line)
+
+					regs = re.findall(r'[/][\^][^\$]*[\$][/]\w*', line_for_reg)
+
+					for reg in regs:
+						temp = reg.replace('\\', '\\\\')
+						left, right = 0, len(temp)-1
+						left_find = right_find = False
+						
+						while((left < len(temp) and right >= 0) and (not left_find or not right_find)):
+							if(not left_find and temp[left] == '/'):
+								left_find = True
+							else:
+								left += 1
+							if(not right_find and temp[right] == '/'):
+								right_find = True
+							else:
+								right -= 1
+
+						body, flags = temp[left+1:right], temp[right+1:]
+						repl = 'RegExp(`{}`, `{}`)'.format(body, flags)
+						line = line.replace(reg, repl)
+						#print(line)
+
 
 					def_signal = re.search(r'signal [(,),a-z,A-Z,0-9, ]+;', line)
 					def_signal = def_signal[0] if def_signal else None

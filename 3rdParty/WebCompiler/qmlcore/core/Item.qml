@@ -22,6 +22,8 @@ Object {
 	property lazy anchors: Anchors { }
 	property lazy effects: Effects { }
 	property lazy transform: Transform { }
+	property real rotation: 0;
+	property real scale: 1;
 	property bool cssTranslatePositioning;
 	property bool cssNullTranslate3D;
 	property bool cssDelegateAlwaysVisibleOnAcceleratedSurfaces: true;
@@ -207,6 +209,13 @@ Object {
 			this.style('top', y)
 		}
 		this.newBoundingBox()
+	}
+
+	onRotationChanged:{
+		this.transform.rotate = this.rotation;
+	}
+	onScaleChanged:{
+		this.transform.scale = this.scale;
 	}
 
 	onRecursiveVisibleChanged: {
