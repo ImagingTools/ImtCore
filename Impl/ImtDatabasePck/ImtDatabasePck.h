@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/CDatabaseObjectCollectionComp.h>
+#include <imtdb/CSqlDatabaseObjectCollectionComp.h>
 
 
 /**
@@ -18,7 +19,8 @@ namespace ImtDatabasePck
 
 
 typedef imtdb::CDatabaseEngineComp SqlDatabaseEngine;
-typedef icomp::TModelCompWrap<imtdb::CDatabaseObjectCollectionComp> SqlDatabaseCollection;
+typedef icomp::TModelCompWrap<imtdb::CSqlDatabaseObjectCollectionComp> SqlDatabaseCollection;
+typedef icomp::TModelCompWrap<imtdb::CDatabaseObjectCollectionComp> CachedSqlDatabaseCollection;
 
 
 } // namespace ImtDatabasePck

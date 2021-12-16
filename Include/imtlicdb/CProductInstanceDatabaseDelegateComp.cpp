@@ -13,6 +13,17 @@ namespace imtlicdb
 
 // reimplemented (imtdb::IDatabaseObjectDelegate)
 
+QByteArray CProductInstanceDatabaseDelegateComp::GetSelectionQueryForObject(const QByteArray& objectId) const
+{
+	if (objectId.isEmpty()){
+		return "SELECT * from ProductInstances";
+	}
+	else{
+		return QString("SELECT * from ProductInstances WHERE InstanceId = '%1'").arg(qPrintable(objectId)).toLocal8Bit();
+	}
+}
+
+
 istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 			const QByteArray& /*typeId*/,
 			const QSqlRecord& record,

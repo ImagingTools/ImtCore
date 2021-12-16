@@ -16,6 +16,17 @@ namespace imtlicdb
 
 // reimplemented (imtdb::IDatabaseObjectDelegate)
 
+QByteArray CAccountDatabaseDelegateComp::GetSelectionQueryForObject(const QByteArray& objectId) const
+{
+	if (objectId.isEmpty()){
+		return "SELECT * from Accounts";
+	}
+	else{
+		return QString("SELECT * from Accounts WHERE Id = '%1'").arg(qPrintable(objectId)).toLocal8Bit();
+	}
+}
+
+
 istd::IChangeable* CAccountDatabaseDelegateComp::CreateObjectFromRecord(
 			const QByteArray& /*typeId*/,
 			const QSqlRecord& record,

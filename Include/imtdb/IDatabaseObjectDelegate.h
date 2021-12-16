@@ -20,6 +20,11 @@ class IDatabaseObjectDelegate: virtual public istd::IPolymorphic
 {
 public:
 	/**
+		Get selection query for the given object-ID.
+	*/
+	virtual QByteArray GetSelectionQueryForObject(const QByteArray& objectId) const = 0;
+
+	/**
 		Create a data object for the given SQL record.
 	*/
 	virtual istd::IChangeable* CreateObjectFromRecord(

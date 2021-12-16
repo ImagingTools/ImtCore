@@ -13,6 +13,17 @@ namespace imtlicdb
 
 // reimplemented (imtdb::IDatabaseObjectDelegate)
 
+QByteArray CFeaturePackageDatabaseDelegateComp::GetSelectionQueryForObject(const QByteArray& objectId) const
+{
+	if (objectId.isEmpty()){
+		return "SELECT * from Packages";
+	}
+	else{
+		return QString("SELECT * from Packages WHERE Id = '%1'").arg(qPrintable(objectId)).toLocal8Bit();
+	}
+}
+
+
 istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(
 			const QByteArray& /*typeId*/,
 			const QSqlRecord& record,
@@ -34,6 +45,7 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(
 	if (record.contains("Id")){
 		packageId = record.value("Id").toByteArray();
 		featurePackagePtr->SetPackageId(packageId);
+		objectId = packageId;
 	}
 
 	if (record.contains("Name")){

@@ -11,9 +11,65 @@ namespace imtlicdb
 {
 
 
+//class DeviceHandle;
+//
+//class DeviceConnector
+//{
+//	DeviceConnector(DeviceHandle* handlePtr)
+//		:m_lastState(false)
+//	{
+//		Q_ASSERT(handlePtr != nullptr);
+//
+	/*	int state = GetDeviceConnectionState(handlePtr);
+		if (state == connected){
+			m_isConnected = true;
+		}
+		else{
+			m_isConnected = OpenDevice(handlePtr);
+		}*/
+//	}
+//
+//	~DeviceConnector()
+//	{
+//		if (m_lastState){
+//			DisconnectDevice(handlePtr);
+//		}
+//	}
+//
+//	bool IsConnected() const
+//	{
+//		return m_lastState;
+//	}
+//
+//private:
+//	bool m_isConnected;
+//}
+//
+//
+//DeviceConector connector(handler);
+//if (!connector.IsConnected()){
+//	return false;
+//}
+//
+//´// DEVICE IS CONNECTED HERE!
+//
+//// DO SOMETHING
+
+
 // public methods
 
 // reimplemented (imtdb::IDatabaseObjectDelegate)
+
+QByteArray CProductsDatabaseDelegateComp::GetSelectionQueryForObject(const QByteArray& objectId) const
+{
+	if (objectId.isEmpty()){
+		return "SELECT * from Products";
+	}
+	else{
+		return QString("SELECT * from Products WHERE Id = '%1'").arg(qPrintable(objectId)).toLocal8Bit();
+	}
+}
+
 
 istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
 			const QByteArray& /*typeId*/,
