@@ -141,8 +141,8 @@ QByteArray CAccountDatabaseDelegateComp::CreateDeleteObjectQuery(
 
 
 QByteArray CAccountDatabaseDelegateComp::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
 			const istd::IChangeable& object) const
 {
 	const imtauth::IAccountInfo* accountInfoPtr = dynamic_cast<const imtauth::IAccountInfo*>(&object);
@@ -244,7 +244,7 @@ QByteArray CAccountDatabaseDelegateComp::CreateDescriptionObjectQuery(
 
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
-idoc::IDocumentMetaInfo* CAccountDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
+idoc::IDocumentMetaInfo* CAccountDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
 	return new imod::TModelWrap<imtauth::CAccountInfoMetaInfo>;
 }
