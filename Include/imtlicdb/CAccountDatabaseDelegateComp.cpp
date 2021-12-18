@@ -1,11 +1,9 @@
 #include <imtlicdb/CAccountDatabaseDelegateComp.h>
 
 
-// Qt includes
-#include <QtCore/QUuid>
-
 // ImtCore includes
 #include <imtauth/CContactInfo.h>
+#include <imtauth/CAccountInfoMetaInfo.h>
 
 
 namespace imtlicdb
@@ -239,6 +237,65 @@ QByteArray CAccountDatabaseDelegateComp::CreateDescriptionObjectQuery(
 	QByteArray retVal = QString("UPDATE Accounts SET Description = '%1' WHERE Id ='%2';").arg(description).arg(qPrintable(objectId)).toLocal8Bit();
 
 	return retVal;
+}
+
+
+// protected methods
+
+// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
+
+idoc::IDocumentMetaInfo* CAccountDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
+{
+	return new imod::TModelWrap<imtauth::CAccountInfoMetaInfo>;
+}
+
+
+bool CAccountDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+{
+	if (record.contains("Name")){
+		QString accountName = record.value("Name").toString();
+
+		metaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME, accountName);
+	}
+
+	if (record.contains("Description")){
+		QString accountDescription = record.value("Description").toString();
+
+		metaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION, accountDescription);
+	}
+
+	if (record.contains("OwnerMail")){
+		QString mail = record.value("OwnerMail").toString();
+
+		metaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_CONTACT_EMAIL, mail);
+	}
+
+	if (record.contains("OwnerLastName")){
+		QString lastName = record.value("OwnerLastName").toString();
+
+		metaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_CONTACT_LAST_NAME, lastName);
+	}
+
+	if (record.contains("OwnerFirstName")){
+		QString firstName = record.value("OwnerFirstName").toString();
+
+		metaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_CONTACT_FIRST_NAME, firstName);
+	}
+
+	if (record.contains("Type")){
+		QByteArray accountTypeId = record.value("Type").toByteArray();
+		QString typeName;
+		if (accountTypeId == "company"){
+			typeName = QObject::tr("Company");
+		}
+		else if (accountTypeId == "private"){
+			typeName = QObject::tr("Person");
+		}
+
+		metaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE, typeName);
+	}
+
+	return true;
 }
 
 

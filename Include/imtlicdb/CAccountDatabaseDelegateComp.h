@@ -44,6 +44,11 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& description) const override;
+protected:
+	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
+	virtual idoc::IDocumentMetaInfo* CreateObjectMetaInfo(const QByteArray& typeId) const override;
+	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
+
 private:
 	I_FACT(imtauth::IAccountInfo, m_accountInfoFactCompPtr);
 };
