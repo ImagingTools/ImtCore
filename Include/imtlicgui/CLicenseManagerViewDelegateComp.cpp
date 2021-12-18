@@ -91,6 +91,10 @@ imtgui::ICollectionViewDelegate::SummaryInformation CLicenseManagerViewDelegateC
 			result.text = licenseInfoPtr->GetLicenseName();
 			result.sortValue = result.text;
 		}
+		else if (informationId == QByteArray("Description")){
+			result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+			result.sortValue = result.text;
+		}
 	}
 
 	return result;
@@ -137,6 +141,9 @@ void CLicenseManagerViewDelegateComp::SetupSummaryInformation()
 
 	m_summaryInformationTypes.InsertItem("LicenseId", tr("License-ID"), "");
 	m_summaryInformationHeaders["LicenseId"] = HeaderInfo(true);
+
+	m_summaryInformationTypes.InsertItem("Description", tr("Description"), "");
+	m_summaryInformationHeaders["Description"] = HeaderInfo(true);
 }
 
 
