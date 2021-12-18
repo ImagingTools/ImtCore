@@ -111,7 +111,7 @@ istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(const Q
 
 		licenseInfoPtr->SetFeatureInfos(featureInfos);
 
-		licenseCollectionPtr->InsertNewObject(imtlic::CLicenseInfo::GetTypeId(), licenseName, description, licenseInfoPtr.GetPtr());
+		licenseCollectionPtr->InsertNewObject(imtlic::CLicenseInfo::GetTypeId(), licenseName, description, licenseInfoPtr.GetPtr(), licenseId);
 	}
 
 	return productPtr.PopPtr();
@@ -181,10 +181,10 @@ QByteArray CProductsDatabaseDelegateComp::CreateNewObjectQuery(
 				packageId = packagePtr->GetPackageId();
 
 				retVal += "\n" +
-							QString("INSERT INTO ProductLicenseFeatures(LicenseId, FeatureId, PackageId) VALUES('%1', '%2', '%3');")
+							QString("INSERT INTO ProductLicenseFeatures(LicenseId, FeatureId) VALUES('%1', '%2');")
 							.arg(qPrintable(licenseId))
 							.arg(qPrintable(featureInfo.id))
-							.arg(qPrintable(packageId)).toLocal8Bit();
+							.toLocal8Bit();
 			}
 		}
 	}
