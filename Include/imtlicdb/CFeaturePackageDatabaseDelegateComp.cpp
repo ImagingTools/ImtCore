@@ -13,25 +13,7 @@ namespace imtlicdb
 
 // reimplemented (imtdb::IDatabaseObjectDelegate)
 
-QByteArray CFeaturePackageDatabaseDelegateComp::GetSelectionQueryForObject(const QByteArray& objectId) const
-{
-	if (objectId.isEmpty()){
-		return "SELECT * from Packages";
-	}
-	else{
-		return QString("SELECT * from Packages WHERE Id = '%1'").arg(qPrintable(objectId)).toLocal8Bit();
-	}
-}
-
-
-istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(
-			const QByteArray& /*typeId*/,
-			const QSqlRecord& record,
-			QByteArray& objectId,
-			QString& objectName,
-			QString& objectDescription,
-			QDateTime& lastModified,
-			QDateTime& added) const
+istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -45,25 +27,10 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(
 	if (record.contains("Id")){
 		packageId = record.value("Id").toByteArray();
 		featurePackagePtr->SetPackageId(packageId);
-		objectId = packageId;
 	}
 
 	if (record.contains("Name")){
 		packageName = record.value("Name").toString();
-
-		objectName = packageName;
-	}
-
-	if (record.contains("Description")){
-		objectDescription = record.value("Description").toString();
-	}
-
-	if (record.contains("Added")){
-		added = record.value("Added").toDateTime();
-	}
-
-	if (record.contains("LastModified")){
-		lastModified = record.value("LastModified").toDateTime();
 	}
 
 	QByteArray query = QString("SELECT * from Features WHERE PackageId = '%1'").arg(qPrintable(packageId)).toUtf8();
@@ -108,7 +75,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateNewObjectQuery(
 			const QByteArray& /*typeId*/,
 			const QByteArray& /*proposedObjectId*/,
 			const QString& objectName,
-			const QString& /*objectDescription*/,
+			const QString& objectDescription,
 			const istd::IChangeable* valuePtr) const
 {
 	QByteArray packageId;
@@ -119,7 +86,13 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateNewObjectQuery(
 			packageId = objectName.toLocal8Bit();
 		}
 
-		QByteArray retVal = QString("INSERT INTO Packages(Id, Name) VALUES('%1', '%2');").arg(qPrintable(packageId)).arg(objectName).toLocal8Bit();
+		QByteArray retVal = QString("INSERT INTO Packages(Id, Name, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5');")
+					.arg(qPrintable(packageId))
+					.arg(objectName)
+					.arg(objectDescription)
+					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+					.toLocal8Bit();
 
 		imtbase::ICollectionInfo::Ids featureIds = featurePackagePtr->GetElementIds();
 		for (const QByteArray& collectionId : featureIds){
@@ -189,7 +162,11 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QByteArray oldPackageId = oldObjectPtr->GetPackageId();
 	QByteArray newPackageId = newObjectPtr->GetPackageId();
 
-	QByteArray retVal = QString("UPDATE Packages SET Id ='%1' WHERE Id ='%2';").arg(qPrintable(newPackageId)).arg(qPrintable(oldPackageId)).toLocal8Bit();
+	QByteArray retVal = QString("UPDATE Packages SET Id ='%1', LastModified = '%2' WHERE Id ='%3';")
+				.arg(qPrintable(newPackageId))
+				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+				.arg(qPrintable(oldPackageId))
+				.toLocal8Bit();
 
 	QByteArrayList addedFeatures;
 	QByteArrayList removedFeatures;
@@ -369,6 +346,20 @@ void CFeaturePackageDatabaseDelegateComp::GenerateDifferences(
 			}
 		}
 	}
+}
+
+
+// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
+
+idoc::IDocumentMetaInfo* CFeaturePackageDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
+{
+	return nullptr;
+}
+
+
+bool CFeaturePackageDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+{
+	return true;
 }
 
 

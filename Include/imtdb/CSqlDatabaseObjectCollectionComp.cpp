@@ -34,12 +34,10 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 
 		switch (infoType){
 		case EIT_NAME:
-			return item.name;
-			break;
+			return item.collectionMetaInfoPtr.IsValid() ? item.collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE).toString() : QString();
 
 		case EIT_DESCRIPTION:
-			return item.description;
-			break;
+			return item.collectionMetaInfoPtr.IsValid() ? item.collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString() : QString();
 
 		case EIT_TYPE_ID:
 			return item.typeId;
@@ -134,10 +132,11 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 
 		ObjectInfo objectInfo;
 
-		objectInfo.description = description;
-		objectInfo.name = name;
 		objectInfo.typeId = typeId;
 		objectInfo.collectionMetaInfoPtr.SetCastedOrRemove(collectionItemMetaInfoPtr->CloneMe());
+		objectInfo.collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE, name);
+		objectInfo.collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, description);
+
 		if (dataMetaInfoPtr != nullptr){
 			objectInfo.metaInfoPtr.SetCastedOrRemove(dataMetaInfoPtr->CloneMe());
 		}
@@ -179,7 +178,7 @@ bool CSqlDatabaseObjectCollectionComp::RemoveObject(const QByteArray& objectId)
 bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
-			CompatibilityMode mode)
+			CompatibilityMode /*mode*/)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return false;
@@ -222,7 +221,9 @@ void CSqlDatabaseObjectCollectionComp::SetObjectName(const QByteArray& objectId,
 		if (m_objectInfoMap.contains(objectId)){
 			istd::CChangeNotifier changeNotifier(this);
 
-			m_objectInfoMap[objectId].name = objectName;
+			if (m_objectInfoMap[objectId].collectionMetaInfoPtr.IsValid()){
+				m_objectInfoMap[objectId].collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE, objectName);
+			}
 		}
 	}
 }
@@ -245,7 +246,9 @@ void CSqlDatabaseObjectCollectionComp::SetObjectDescription(const QByteArray& ob
 		if (m_objectInfoMap.contains(objectId)){
 			istd::CChangeNotifier changeNotifier(this);
 
-			m_objectInfoMap[objectId].description = objectDescription;
+			if (m_objectInfoMap[objectId].collectionMetaInfoPtr.IsValid()){
+				m_objectInfoMap[objectId].collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE, objectDescription);
+			}
 		}
 	}
 }
@@ -316,7 +319,7 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 		QDateTime added;
 		QDateTime modified;
 
-		dataPtr.SetPtr(m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record(), id, name, description, modified, added));
+		dataPtr.SetPtr(m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record()));
 
 		return dataPtr.IsValid();
 	}
@@ -393,52 +396,20 @@ void CSqlDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError);
 
 	while (sqlQuery.next()){
-		QByteArray objectId;
-		QString name;
-		QString description;
-		QDateTime added;
-		QDateTime lastModified;
+		QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(*m_typeIdAttrPtr, sqlQuery.record());
 
-		istd::IChangeable* objectPtr = CreateObjectFromSqlRecord(sqlQuery.record(), objectId, name, description, lastModified, added);
-		if (objectPtr != nullptr){
-			idoc::CStandardDocumentMetaInfo collectionMetaInfo;
-			collectionMetaInfo.SetMetaInfo(IObjectCollection::MIT_INSERTION_TIME, added);
-			collectionMetaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, lastModified);
-			collectionMetaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, lastModified);
-
-			imtbase::IMetaInfoCreator::MetaInfoPtr metaInfoPtr;
-			if (m_metaInfoCreatorCompPtr.IsValid()){
-				m_metaInfoCreatorCompPtr->CreateMetaInfo(objectPtr, *m_typeIdAttrPtr, metaInfoPtr);
-			}
-
+		imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
+		imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+		bool isOk = m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, sqlQuery.record(), objectMetaInfoPtr, collectionMetaInfoPtr);
+		if (isOk){
 			ObjectInfo objectInfo;
 			objectInfo.typeId = *m_typeIdAttrPtr;
-			objectInfo.name = name;
-			objectInfo.description = description;
-			objectInfo.collectionMetaInfoPtr.SetCastedOrRemove(collectionMetaInfo.CloneMe());
-			if (metaInfoPtr.IsValid()){
-				objectInfo.metaInfoPtr.SetCastedOrRemove(metaInfoPtr->CloneMe());
-			}
+			objectInfo.collectionMetaInfoPtr = collectionMetaInfoPtr;
+			objectInfo.metaInfoPtr = objectMetaInfoPtr;
 
 			m_objectInfoMap[objectId] = objectInfo;
 		}
 	}
-}
-
-
-istd::IChangeable* CSqlDatabaseObjectCollectionComp::CreateObjectFromSqlRecord(
-			const QSqlRecord& record,
-			QByteArray& objectId,
-			QString& objectName,
-			QString& objectDescription,
-			QDateTime& lastModified,
-			QDateTime& added) const
-{
-	if (m_objectDelegateCompPtr.IsValid()){
-		return m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, record, objectId, objectName, objectDescription, lastModified, added);
-	}
-
-	return nullptr;
 }
 
 

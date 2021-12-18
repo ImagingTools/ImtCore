@@ -1,12 +1,8 @@
 #pragma once
 
 
-// ACF includes
-#include <icomp/CComponentBase.h>
-
 // ImtCore includes
-#include <imtdb/IDatabaseObjectDelegate.h>
-#include <imtdb/IDatabaseEngine.h>
+#include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 #include <imtlic/IProductLicensingInfo.h>
 
 
@@ -14,16 +10,12 @@ namespace imtlicdb
 {
 
 
-class CProductsDatabaseDelegateComp:
-			public icomp::CComponentBase,
-			virtual public imtdb::IDatabaseObjectDelegate
+class CProductsDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
 {
 public:
-	typedef icomp::CComponentBase BaseClass;
+	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProductsDatabaseDelegateComp)
-		I_REGISTER_INTERFACE(imtdb::IDatabaseObjectDelegate);
-		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine used for querying the feature info", true, "DatabaseEngine");
 		I_ASSIGN(m_productFactCompPtr, "ProductFactory", "Factory used for creation of the new product instance", true, "ProductFactory");
 	I_END_COMPONENT
 
@@ -31,12 +23,7 @@ public:
 	virtual QByteArray GetSelectionQueryForObject(const QByteArray& objectId) const override;
 	virtual istd::IChangeable* CreateObjectFromRecord(
 				const QByteArray& typeId,
-				const QSqlRecord& record,
-				QByteArray& objectId,
-				QString& objectName,
-				QString& objectDescription,
-				QDateTime& lastModified,
-				QDateTime& added) const override;
+				const QSqlRecord& record) const override;
 	virtual QByteArray CreateNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& proposedObjectId,
@@ -71,7 +58,6 @@ protected:
 				QByteArrayList& addFeatures,
 				QByteArrayList& removedFeatures) const;
 private:
-	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 	I_FACT(imtlic::IProductLicensingInfo, m_productFactCompPtr);
 };
 

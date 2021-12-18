@@ -77,13 +77,6 @@ public:
 protected:
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	virtual void CreateCollectionFromDatabase();
-	virtual istd::IChangeable* CreateObjectFromSqlRecord(
-				const QSqlRecord& record,
-				QByteArray& objectId,
-				QString& objectName,
-				QString& objectDescription,
-				QDateTime& lastModified,
-				QDateTime& added) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -104,9 +97,7 @@ private:
 
 	struct ObjectInfo
 	{
-		QString name;
 		QByteArray typeId;
-		QString description;
 		imtbase::IMetaInfoCreator::MetaInfoPtr metaInfoPtr;
 		imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
 	};

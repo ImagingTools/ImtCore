@@ -25,11 +25,6 @@ I_EXPORT_COMPONENT(
 			"SQL-based object collection",
 			"SQL Database");
 
-I_EXPORT_COMPONENT(
-			CachedSqlDatabaseCollection,
-			"SQL-based object collection",
-			"SQL Database");
-
 
 } // namespace ImtDatabasePck
 

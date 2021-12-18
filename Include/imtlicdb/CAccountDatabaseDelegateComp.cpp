@@ -16,25 +16,7 @@ namespace imtlicdb
 
 // reimplemented (imtdb::IDatabaseObjectDelegate)
 
-QByteArray CAccountDatabaseDelegateComp::GetSelectionQueryForObject(const QByteArray& objectId) const
-{
-	if (objectId.isEmpty()){
-		return "SELECT * from Accounts";
-	}
-	else{
-		return QString("SELECT * from Accounts WHERE Id = '%1'").arg(qPrintable(objectId)).toLocal8Bit();
-	}
-}
-
-
-istd::IChangeable* CAccountDatabaseDelegateComp::CreateObjectFromRecord(
-			const QByteArray& /*typeId*/,
-			const QSqlRecord& record,
-			QByteArray& objectId,
-			QString& objectName,
-			QString& objectDescription,
-			QDateTime& /*lastModified*/,
-			QDateTime& /*added*/) const
+istd::IChangeable* CAccountDatabaseDelegateComp::CreateObjectFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -49,20 +31,16 @@ istd::IChangeable* CAccountDatabaseDelegateComp::CreateObjectFromRecord(
 		return nullptr;
 	}
 
-	if (record.contains("Id")){
-		objectId = record.value("Id").toByteArray();
-	}
-
 	if (record.contains("Name")){
-		objectName = record.value("Name").toString();
+		QString accountName = record.value("Name").toString();
 
-		accountInfoPtr->SetAccountName(objectName);
+		accountInfoPtr->SetAccountName(accountName);
 	}
 
 	if (record.contains("Description")){
-		objectDescription = record.value("Description").toString();
+		QString accountDescription = record.value("Description").toString();
 
-		accountInfoPtr->SetAccountDescription(objectDescription);
+		accountInfoPtr->SetAccountDescription(accountDescription);
 	}
 	
 	imtauth::CContactInfo contactInfo;

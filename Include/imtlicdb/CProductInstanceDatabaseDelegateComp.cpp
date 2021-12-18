@@ -13,25 +13,9 @@ namespace imtlicdb
 
 // reimplemented (imtdb::IDatabaseObjectDelegate)
 
-QByteArray CProductInstanceDatabaseDelegateComp::GetSelectionQueryForObject(const QByteArray& objectId) const
-{
-	if (objectId.isEmpty()){
-		return "SELECT * from ProductInstances";
-	}
-	else{
-		return QString("SELECT * from ProductInstances WHERE InstanceId = '%1'").arg(qPrintable(objectId)).toLocal8Bit();
-	}
-}
-
-
 istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 			const QByteArray& /*typeId*/,
-			const QSqlRecord& record,
-			QByteArray& objectId,
-			QString& objectName,
-			QString& objectDescription,
-			QDateTime& lastModified,
-			QDateTime& added) const
+			const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -62,25 +46,6 @@ istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 	}
 
 	productInstancePtr->SetupProductInstance(productId, productInstanceId, accountId);
-
-	QString productName;
-	if (record.contains("Name")){
-		productName = record.value("Name").toString();
-
-		objectName = productName;
-	}
-
-	if (record.contains("Description")){
-		objectDescription = record.value("Description").toString();
-	}
-
-	if (record.contains("Added")){
-		added = record.value("Added").toDateTime();
-	}
-
-	if (record.contains("LastModified")){
-		lastModified = record.value("LastModified").toDateTime();
-	}
 
 	// Query for getting licenses inside of the product instance:
 	QByteArray productLicenses = QString("SELECT * from ProductInstanceLicenses WHERE InstanceId = '%1'").arg(qPrintable(productInstanceId)).toUtf8();

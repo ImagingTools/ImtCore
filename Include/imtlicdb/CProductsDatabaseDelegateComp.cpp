@@ -11,51 +11,6 @@ namespace imtlicdb
 {
 
 
-//class DeviceHandle;
-//
-//class DeviceConnector
-//{
-//	DeviceConnector(DeviceHandle* handlePtr)
-//		:m_lastState(false)
-//	{
-//		Q_ASSERT(handlePtr != nullptr);
-//
-	/*	int state = GetDeviceConnectionState(handlePtr);
-		if (state == connected){
-			m_isConnected = true;
-		}
-		else{
-			m_isConnected = OpenDevice(handlePtr);
-		}*/
-//	}
-//
-//	~DeviceConnector()
-//	{
-//		if (m_lastState){
-//			DisconnectDevice(handlePtr);
-//		}
-//	}
-//
-//	bool IsConnected() const
-//	{
-//		return m_lastState;
-//	}
-//
-//private:
-//	bool m_isConnected;
-//}
-//
-//
-//DeviceConector connector(handler);
-//if (!connector.IsConnected()){
-//	return false;
-//}
-//
-//´// DEVICE IS CONNECTED HERE!
-//
-//// DO SOMETHING
-
-
 // public methods
 
 // reimplemented (imtdb::IDatabaseObjectDelegate)
@@ -71,14 +26,7 @@ QByteArray CProductsDatabaseDelegateComp::GetSelectionQueryForObject(const QByte
 }
 
 
-istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
-			const QByteArray& /*typeId*/,
-			const QSqlRecord& record,
-			QByteArray& objectId,
-			QString& objectName,
-			QString& objectDescription,
-			QDateTime& lastModified,
-			QDateTime& added) const
+istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -102,8 +50,6 @@ istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
 	if (record.contains("Id")){
 		productId = record.value("Id").toByteArray();
 
-		objectId = productId;
-
 		productPtr->SetProductId(productId);
 	}
 
@@ -112,20 +58,6 @@ istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
 		productName = record.value("Name").toString();
 
 		productPtr->SetName(productName);
-
-		objectName = productName;
-	}
-
-	if (record.contains("Description")){
-		objectDescription = record.value("Description").toString();
-	}
-
-	if (record.contains("Added")){
-		added = record.value("Added").toDateTime();
-	}
-
-	if (record.contains("LastModified")){
-		lastModified = record.value("LastModified").toDateTime();
 	}
 
 	QByteArray selectProductLicenses = QString("SELECT * from ProductLicenses WHERE ProductId = '%1'").arg(qPrintable(productId)).toUtf8();
