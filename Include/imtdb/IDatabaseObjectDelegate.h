@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtSql/QtSql>
 
+// ACF includes
+#include <iprm/IParamsSet.h>
+
 // ImtCore includes
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/IObjectCollection.h>
@@ -23,7 +26,7 @@ public:
 	/**
 		Get selection query for the given object-ID.
 	*/
-	virtual QByteArray GetSelectionQueryForObject(const QByteArray& objectId) const = 0;
+	virtual QByteArray GetSelectionQueryForObject(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const = 0;
 
 	/**
 		Get ID of the object in the database from the SQL record.

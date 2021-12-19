@@ -12,6 +12,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IMetaInfoCreator.h>
+#include <imtbase/TModelUpdateBinder.h>
 #include <imtdb/IDatabaseEngine.h>
 #include <imtdb/IDatabaseObjectDelegate.h>
 
@@ -40,6 +41,7 @@ public:
 		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database engine used for low level SQL quering", true, "DatabaseEngine");
 		I_ASSIGN(m_objectDelegateCompPtr, "ObjectDelegate", "Database object delegate used for creation of C++ objects from the SQL record", true, "ObjectDelegate");
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
+		I_ASSIGN(m_filterParamsCompPtr, "FilteringParams", "Parameter using for the filterering the table", false, "FilteringParams");
 	I_END_COMPONENT;
 
 	CSqlDatabaseObjectCollectionComp();
@@ -80,8 +82,11 @@ protected:
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	virtual void CreateCollectionFromDatabase();
 
+	void OnFilterParamsChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::IParamsSet* filterParamsPtr);
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 protected:
 	I_REF(IDatabaseEngine, m_dbEngineCompPtr);
@@ -92,6 +97,8 @@ private:
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_ATTR(QByteArray, m_typeIdAttrPtr);
 	I_TEXTATTR(m_typeNameAttrPtr);
+	I_REF(iprm::IParamsSet, m_filterParamsCompPtr);
+
 
 	iprm::COptionsManager m_typesInfo;
 
@@ -107,6 +114,8 @@ private:
 	ObjectInfoMap m_objectInfoMap;
 
 	mutable QReadWriteLock m_objectInfoMapMutex;
+
+	imtbase::TModelUpdateBinder<iprm::IParamsSet, CSqlDatabaseObjectCollectionComp> m_filterParamsObserver;
 };
 
 

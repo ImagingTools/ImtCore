@@ -28,7 +28,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::IDatabaseObjectDelegate)
-	virtual QByteArray GetSelectionQueryForObject(const QByteArray& objectId) const override;
+	virtual QByteArray GetSelectionQueryForObject(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const override;
 	virtual QByteArray GetObjectIdFromRecord(const QByteArray& typeId, const QSqlRecord& record) const override;
 	virtual bool CreateObjectInfoFromRecord(
 				const QByteArray& typeId,

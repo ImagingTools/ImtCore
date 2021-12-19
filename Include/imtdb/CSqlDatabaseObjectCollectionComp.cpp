@@ -20,7 +20,8 @@ namespace imtdb
 // public methods
 
 CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
-	:m_objectInfoMapMutex(QReadWriteLock::Recursive)
+	:m_objectInfoMapMutex(QReadWriteLock::Recursive),
+	m_filterParamsObserver(*this)
 {
 }
 
@@ -333,7 +334,7 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 		return false;
 	}
 
-	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQueryForObject(objectId);
+	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQueryForObject(objectId, nullptr);
 	if (objectSelectionQuery.isEmpty()){
 		return false;
 	}
@@ -411,7 +412,7 @@ void CSqlDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 		return;
 	}
 
-	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQueryForObject(QByteArray());
+	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQueryForObject(QByteArray(), m_filterParamsCompPtr.GetPtr());
 	if (objectSelectionQuery.isEmpty()){
 		return;
 	}
@@ -443,6 +444,12 @@ void CSqlDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 }
 
 
+void CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::IParamsSet* /*filterParamsPtr*/)
+{
+	CreateCollectionFromDatabase();
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
@@ -451,7 +458,17 @@ void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
 
 	m_typesInfo.InsertOption(*m_typeNameAttrPtr, *m_typeIdAttrPtr);
 
+	m_filterParamsObserver.RegisterObject(m_filterParamsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged);
+
 	CreateCollectionFromDatabase();
+}
+
+
+void CSqlDatabaseObjectCollectionComp::OnComponentDestroyed()
+{
+	m_filterParamsObserver.UnregisterAllObjects();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 

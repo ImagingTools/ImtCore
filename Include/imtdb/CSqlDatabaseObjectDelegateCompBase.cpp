@@ -14,7 +14,7 @@ namespace imtdb
 
 // reimplemented (imtdb::IDatabaseObjectDelegate)
 
-QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQueryForObject(const QByteArray& objectId) const
+QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQueryForObject(const QByteArray& objectId, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (objectId.isEmpty()){
 		return QString("SELECT * from %1").arg(qPrintable(*m_tableNameAttrPtr)).toLocal8Bit();
