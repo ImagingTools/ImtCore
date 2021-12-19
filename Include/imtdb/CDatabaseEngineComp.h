@@ -34,7 +34,7 @@ public:
 		I_ASSIGN(m_tablesCreationScriptPathAttrPtr, "TablesCreationScriptPath", "The property holds the name of the file that will be opened to receive the SQL-query for creation tables", false, "");
 		I_ASSIGN(m_autoCreateDatabaseAttrPtr, "AutoCreateDatabase", "The property holds behavior to create database on startup.\n Possible values:\n0 - will not create new database;\n1 - will create database once;\n2 - will create database at each startup", true, 1);
 		I_ASSIGN(m_autoCreateTablesAttrPtr, "AutoCreateTables", "The property holds behavior to create tables on startup.\n Possible values:\n0 - will not create new tables;\n1 - will create tables once;\n2 - will create tables at each startup", true, 1);
-		I_ASSIGN(m_port, "Port", "The property holds connection's port number", true, 5432);
+		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", true, 5432);
 	I_END_COMPONENT;
 
 	// reimplemented (IDatabaseEngine)
@@ -65,6 +65,8 @@ private:
 	 */
 	bool EnsureDatabaseConnected() const;
 
+	QString GetConnectionName() const;
+
 private:
 	I_ATTR(QByteArray, m_dbType);
 	I_ATTR(QByteArray, m_dbName);
@@ -76,9 +78,7 @@ private:
 	I_ATTR(QByteArray, m_tablesCreationScriptPathAttrPtr);
 	I_ATTR(int, m_autoCreateDatabaseAttrPtr);
 	I_ATTR(int, m_autoCreateTablesAttrPtr);
-	I_ATTR(int, m_port);
-
-	mutable QSqlDatabase m_db;
+	I_ATTR(int, m_portAttrPtr);
 };
 
 

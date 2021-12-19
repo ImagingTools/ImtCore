@@ -16,19 +16,19 @@ namespace imtdb
 
 bool CDatabaseEngineComp::BeginTransaction() const
 {
-	return m_db.transaction();
+	return QSqlDatabase::database(GetConnectionName()).transaction();
 }
 
 
 bool CDatabaseEngineComp::FinishTransaction() const
 {
-	return m_db.commit();
+	return QSqlDatabase::database(GetConnectionName()).commit();
 }
 
 
 bool CDatabaseEngineComp::CancelTransaction() const
 {
-	return m_db.rollback();
+	return QSqlDatabase::database(GetConnectionName()).rollback();
 }
 
 
@@ -38,7 +38,9 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 		return QSqlQuery();
 	}
 
-	QSqlQuery retVal(m_db);
+	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
+
+	QSqlQuery retVal(databaseConnection);
 
 	bool success = retVal.prepare(queryString);
 	if (!success){
@@ -52,13 +54,13 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 	success = retVal.exec();
 
 	if (sqlErrorPtr != nullptr){
-		*sqlErrorPtr = m_db.lastError().type() != QSqlError::NoError ? m_db.lastError() : retVal.lastError();
+		*sqlErrorPtr = databaseConnection.lastError().type() != QSqlError::NoError ? databaseConnection.lastError() : retVal.lastError();
 	}
 
-	if ((m_db.lastError().type() != QSqlError::NoError) || (retVal.lastError().type() != QSqlError::NoError)){
+	if ((databaseConnection.lastError().type() != QSqlError::NoError) || (retVal.lastError().type() != QSqlError::NoError)){
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| what() sqlError Occured"
-					<< "\n\t| Database error" << m_db.lastError().text()
+					<< "\n\t| Database error" << databaseConnection.lastError().text()
 					<< "\n\t| Query error" << retVal.lastError().text()
 					<< "\n\t| Executed query" << queryString;
 	}
@@ -73,7 +75,9 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 		return QSqlQuery();
 	}
 
-	QSqlQuery retVal(m_db);
+	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
+
+	QSqlQuery retVal(databaseConnection);
 	retVal.prepare(queryString);
 
 	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++ value){
@@ -83,13 +87,13 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 	retVal.exec();
 
 	if (sqlError){
-		*sqlError = m_db.lastError().type() ? m_db.lastError() : retVal.lastError();
+		*sqlError = databaseConnection.lastError().type() ? databaseConnection.lastError() : retVal.lastError();
 	}
 
-	if ((m_db.lastError().type() != QSqlError::NoError) || (retVal.lastError().type() != QSqlError::NoError)){
+	if ((databaseConnection.lastError().type() != QSqlError::NoError) || (retVal.lastError().type() != QSqlError::NoError)){
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| what(): sqlError Occured"
-					<< "\n\t| Database error" << m_db.lastError().text()
+					<< "\n\t| Database error" << databaseConnection.lastError().text()
 					<< "\n\t| Query error" << retVal.lastError().text()
 					<< "\n\t| Executed query" << queryString
 					<< "\n\t| Bind Values" << bindValues
@@ -174,23 +178,25 @@ bool CDatabaseEngineComp::OpenDatabase() const
 {
 	bool retVal = false;
 
-	if (m_db.isOpen()){
-		m_db.close();
+	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
+
+	if (databaseConnection.isOpen()){
+		databaseConnection.close();
 	}
 
-	m_db = QSqlDatabase::addDatabase(*m_dbType);
+	databaseConnection = QSqlDatabase::addDatabase(*m_dbType, GetConnectionName());
 	QString databaseName = *m_dbName;
 	if (m_dbType->GetValue().compare(QByteArray("QODBC"), Qt::CaseInsensitive) == 0){
 
 	}
 	else {
-		m_db.setHostName(*m_hostName);
-		m_db.setUserName(*m_userName);
-		m_db.setPassword(*m_pasword);
-		m_db.setPort(*m_port);
+		databaseConnection.setHostName(*m_hostName);
+		databaseConnection.setUserName(*m_userName);
+		databaseConnection.setPassword(*m_pasword);
+		databaseConnection.setPort(*m_portAttrPtr);
 	}
-	m_db.setDatabaseName(databaseName);
-	retVal = m_db.open();
+	databaseConnection.setDatabaseName(databaseName);
+	retVal = databaseConnection.open();
 	if (!retVal){
 		SendErrorMessage(0, "Database could not be connected", "Database engine");
 	}
@@ -208,7 +214,7 @@ bool CDatabaseEngineComp::CreateDatabase() const
 	maintainanceDb.setUserName(*m_userName);
 	maintainanceDb.setPassword(*m_pasword);
 	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
-	maintainanceDb.setPort(*m_port);
+	maintainanceDb.setPort(*m_portAttrPtr);
 
 	retVal = maintainanceDb.open();
 	if (retVal){
@@ -251,15 +257,15 @@ bool CDatabaseEngineComp::CreateDatabase() const
 		else{
 			QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);
 
-			m_db = QSqlDatabase::addDatabase(*m_dbType, *m_dbName);
+			QSqlDatabase databaseConnection = QSqlDatabase::addDatabase(*m_dbType, GetConnectionName());
 
-			m_db.setHostName(*m_hostName);
-			m_db.setUserName(*m_userName);
-			m_db.setPassword(*m_pasword);
-			m_db.setDatabaseName(*m_dbName);
-			m_db.setPort(*m_port);
+			databaseConnection.setHostName(*m_hostName);
+			databaseConnection.setUserName(*m_userName);
+			databaseConnection.setPassword(*m_pasword);
+			databaseConnection.setDatabaseName(*m_dbName);
+			databaseConnection.setPort(*m_portAttrPtr);
 
-			retVal = m_db.open();
+			retVal = databaseConnection.open();
 		}
 	}
 	else{
@@ -293,9 +299,11 @@ bool CDatabaseEngineComp::CreateTables() const
 	queryString = scriptFile.readAll();
 	scriptFile.close();
 
-	m_db.exec(queryString);
+	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
 
-	sqlError = m_db.lastError();
+	databaseConnection.exec(queryString);
+
+	sqlError = databaseConnection.lastError();
 	if (sqlError.type() != QSqlError::ErrorType::NoError){
 		qCritical() << __FILE__ << __LINE__
 			<< "\n\t| Maintainance SQL error occured"
@@ -325,19 +333,30 @@ void CDatabaseEngineComp::OnComponentCreated()
 
 bool CDatabaseEngineComp::EnsureDatabaseConnected() const
 {
-	bool isOpened = m_db.isOpen();
+	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
+
+	bool isOpened = databaseConnection.isOpen();
 	if (!isOpened){
-		m_db.close();
+		databaseConnection.close();
 
 		isOpened = OpenDatabase();
 		if (!isOpened){
 			qCritical() << __FILE__ << __LINE__
 						<< "\n\t| Unable to open database"
-						<< "\n\t| Error: " << m_db.lastError().text();
+						<< "\n\t| Error: " << databaseConnection.lastError().text();
 		}
 	}
 
 	return isOpened;
+}
+
+
+QString CDatabaseEngineComp::GetConnectionName() const
+{
+	qptrdiff threadId = (qptrdiff)QThread::currentThreadId();
+
+	return *m_dbName + QString(" - %1").arg(threadId);
+
 }
 
 
