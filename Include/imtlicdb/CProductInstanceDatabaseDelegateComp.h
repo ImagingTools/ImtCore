@@ -44,6 +44,12 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& description) const override;
+protected:
+	void GenerateDifferencesLicenses(const imtlic::IProductInstanceInfo* currentProductInstancePtr,
+				const imtlic::IProductInstanceInfo* newProductInstancePtr,
+				QByteArrayList& addLicenseInstances,
+				QByteArrayList& removedLicenseInstances,
+				QByteArrayList& updatedLicenseInstances) const;
 private:
 	I_FACT(imtlic::IProductInstanceInfo, m_productInstanceFactCompPtr);
 };

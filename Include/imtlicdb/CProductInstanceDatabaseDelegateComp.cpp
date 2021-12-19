@@ -85,11 +85,6 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateNewObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray productInstanceId = productInstancePtr->GetProductInstanceId();
-	if (productInstanceId.isEmpty()){
-		return QByteArray();
-	}
-
 	QByteArray productId = productInstancePtr->GetProductId();
 	if (productId.isEmpty()){
 		return QByteArray();
@@ -98,6 +93,11 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateNewObjectQuery(
 	QByteArray accountId = productInstancePtr->GetCustomerId();
 	if (accountId.isEmpty()){
 		return QByteArray();
+	}
+
+	QByteArray productInstanceId = productInstancePtr->GetProductInstanceId();
+	if (productInstanceId.isEmpty()){
+		productInstanceId = objectName.toLocal8Bit();
 	}
 
 	QString timestamp = QDateTime::currentDateTime().toString(Qt::ISODate);
@@ -172,7 +172,118 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const QByteArray& objectId,
 			const istd::IChangeable& object) const
 {
-	return QByteArray();
+	const imtlic::IProductInstanceInfo* productInstancePtr = dynamic_cast<const imtlic::IProductInstanceInfo*>(&object);
+	if (productInstancePtr == nullptr){
+		return QByteArray();
+	}
+
+	const imtlic::IProductInstanceInfo* oldProductInstancePtr = nullptr;
+	imtbase::IObjectCollection::DataPtr objectPtr;
+	if (collection.GetObjectData(objectId, objectPtr)){
+		oldProductInstancePtr = dynamic_cast<const imtlic::IProductInstanceInfo*>(objectPtr.GetPtr());
+	}
+
+	if (oldProductInstancePtr == nullptr){
+		return QByteArray();
+	}
+
+	QByteArray oldProductInstanceId = oldProductInstancePtr->GetProductInstanceId();
+	if (oldProductInstanceId.isEmpty()){
+		return QByteArray();
+	}
+
+	QByteArray newProductInstanceId = productInstancePtr->GetProductInstanceId();
+	if (newProductInstanceId.isEmpty()){
+		return QByteArray();
+	}
+
+	QByteArray productId = productInstancePtr->GetProductId();
+	if (productId.isEmpty()){
+		return QByteArray();
+	}
+
+	QByteArray accountId = productInstancePtr->GetCustomerId();
+	if (accountId.isEmpty()){
+		return QByteArray();
+	}
+
+	QString objectName = collection.GetElementInfo(oldProductInstanceId,imtbase::ICollectionInfo::EIT_NAME).toString();
+	QString objectDescription = collection.GetElementInfo(oldProductInstanceId,imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
+	QString timestamp = QDateTime::currentDateTime().toString(Qt::ISODate);
+
+	QByteArray retVal = QString("UPDATE ProductInstances SET InstanceId = '%1', ProductId = '%2', AccountId = '%3', Name = '%4', Description = '%5', LastModified = '%6' WHERE InstanceId = '%5';")
+							.arg(qPrintable(newProductInstanceId))
+							.arg(qPrintable(productId))
+							.arg(qPrintable(accountId))
+							.arg(objectName)
+							.arg(objectDescription)
+							.arg(timestamp)
+							.arg(qPrintable(oldProductInstanceId))
+							.toLocal8Bit();
+
+	QByteArrayList addedLicenses;
+	QByteArrayList removedLicenses;
+	QByteArrayList updatedLicenses;
+
+	GenerateDifferencesLicenses(oldProductInstancePtr, productInstancePtr, addedLicenses, removedLicenses, updatedLicenses);
+
+	// Add new license to the product:
+	for (const QByteArray& addLicenseId : addedLicenses){
+		const imtlic::ILicenseInstance* licensePtr = productInstancePtr->GetLicenseInstance(addLicenseId);
+		if (licensePtr != nullptr){
+			QByteArray licenseId = licensePtr->GetLicenseId();
+			QDateTime expirationTime = licensePtr->GetExpiration();
+
+			if (expirationTime.isNull()){
+				retVal += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId) VALUES('%1', '%2');")
+							.arg(qPrintable(newProductInstanceId))
+							.arg(qPrintable(licenseId))
+							.toLocal8Bit();
+			}
+			else{
+				retVal += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId, ExpirationDate) VALUES('%1', '%2', '%3');")
+							.arg(qPrintable(newProductInstanceId))
+							.arg(qPrintable(licenseId))
+							.arg(expirationTime.date().toString(Qt::ISODate))
+							.toLocal8Bit();
+			}
+		}
+	}
+
+	// Delete removed licenses to the product instance:
+	for (const QByteArray& removedLicenseId : removedLicenses){
+		const imtlic::ILicenseInstance* licensePtr = oldProductInstancePtr->GetLicenseInstance(removedLicenseId);
+		if (licensePtr != nullptr){
+			QByteArray licenseId = licensePtr->GetLicenseId();
+			retVal += "\n" +
+					QString("DELETE FROM ProductInstanceLicenses WHERE InstanceId = '%1' AND LicenseId = '%2';")
+							.arg(qPrintable(oldProductInstanceId))
+							.arg(qPrintable(licenseId))
+							.toLocal8Bit();
+		}
+	}
+
+	// Update changed licenses in the product instance:
+	for (const QByteArray& updatedLicenseId : updatedLicenses){
+		const imtlic::ILicenseInstance* licensePtr = productInstancePtr->GetLicenseInstance(updatedLicenseId);
+		if (licensePtr != nullptr){
+			QByteArray licenseId = licensePtr->GetLicenseId();
+			QString expirationDataString = QString("'%1'").arg(licensePtr->GetExpiration().date().toString(Qt::ISODate));
+			if(expirationDataString == "''"){
+				expirationDataString = "null";
+			}
+			retVal += "\n" +
+				QString("UPDATE ProductInstanceLicenses SET ExpirationDate = %1 WHERE  InstanceId = '%2' AND LicenseId = '%3';")
+							.arg(expirationDataString)
+							.arg(qPrintable(newProductInstanceId))
+							.arg(qPrintable(licenseId))
+							.toLocal8Bit();
+		}
+
+	}
+
+	return retVal;
 }
 
 
@@ -225,6 +336,62 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateDescriptionObjectQuery(
 	QByteArray retVal = QString("UPDATE ProductInstances SET Description = '%1' WHERE InstanceId ='%2';").arg(description).arg(qPrintable(productInstanceId)).toLocal8Bit();
 
 	return retVal;
+}
+
+
+void CProductInstanceDatabaseDelegateComp::GenerateDifferencesLicenses(const imtlic::IProductInstanceInfo *currentProductInstancePtr,
+															   const imtlic::IProductInstanceInfo *newProductInstancePtr,
+															   QByteArrayList &addLicenseInstances,
+															   QByteArrayList &removedLicenseInstances,
+															   QByteArrayList &updatedLicenseInstances) const
+{
+	imtbase::ICollectionInfo::Ids currentLicenseIds = currentProductInstancePtr->GetLicenseInstances().GetElementIds();
+	for (const QByteArray& licenseCollectionId : currentLicenseIds){
+		const imtlic::ILicenseInstance* licensePtr = currentProductInstancePtr->GetLicenseInstance(licenseCollectionId);
+		if (licensePtr != nullptr && !currentLicenseIds.contains(licenseCollectionId)){
+			currentLicenseIds.push_back(licenseCollectionId);
+		}
+	}
+
+
+	imtbase::ICollectionInfo::Ids newLicenseIds = newProductInstancePtr->GetLicenseInstances().GetElementIds();
+	for (const QByteArray& licenseCollectionId : newLicenseIds){
+		const imtlic::ILicenseInstance* licensePtr = newProductInstancePtr->GetLicenseInstance(licenseCollectionId);
+		if (licensePtr != nullptr && !newLicenseIds.contains(licenseCollectionId)){
+			newLicenseIds.push_back(licenseCollectionId);
+		}
+	}
+
+	// Calculate added features:
+	for (QByteArray newLicenseId : newLicenseIds){
+		if (!currentLicenseIds.contains(newLicenseId)){
+			addLicenseInstances.push_back(newLicenseId);
+		}
+	}
+
+	// Calculate removed features:
+	for (QByteArray currentLicenseId : currentLicenseIds){
+		if (!newLicenseIds.contains(currentLicenseId)){
+			removedLicenseInstances.push_back(currentLicenseId);
+		}
+	}
+
+	// Calculate changed features:
+	for (QByteArray currentLicenseId : currentLicenseIds){
+		// Feature-ID in both packages:
+		if (newLicenseIds.contains(currentLicenseId)){
+			const imtlic::ILicenseInstance* currentLicenseInstancePtr = currentProductInstancePtr->GetLicenseInstance(currentLicenseId);
+			Q_ASSERT(currentLicenseInstancePtr != nullptr);
+
+			const imtlic::ILicenseInstance* newLicenseInstancePtr = newProductInstancePtr->GetLicenseInstance(currentLicenseId);
+			Q_ASSERT(newLicenseInstancePtr != nullptr);
+
+			if (!newLicenseInstancePtr->IsEqual(*currentLicenseInstancePtr)){
+				updatedLicenseInstances.push_back(currentLicenseId);
+			}
+		}
+	}
+
 }
 
 

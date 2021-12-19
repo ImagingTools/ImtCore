@@ -107,14 +107,14 @@ QByteArray CAccountDatabaseDelegateComp::CreateNewObjectQuery(
 	}
 
 	QByteArray retVal = QString("INSERT INTO Accounts(Id, Name, Description, Type, OwnerMail, OwnerLastName, OwnerFirstName) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
-				.arg(qPrintable(accountId))
-				.arg(accountName)
-				.arg(accountDescription)
-				.arg(qPrintable(accountTypeId))
-				.arg(mail)
-				.arg(lastName)
-				.arg(firstName)
-				.toLocal8Bit();
+							.arg(qPrintable(accountId))
+							.arg(accountName)
+							.arg(accountDescription)
+							.arg(qPrintable(accountTypeId))
+							.arg(mail)
+							.arg(lastName)
+							.arg(firstName)
+							.toLocal8Bit();
 
 	return retVal;
 }
@@ -142,7 +142,7 @@ QByteArray CAccountDatabaseDelegateComp::CreateDeleteObjectQuery(
 
 QByteArray CAccountDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
+			const QByteArray& objectId,
 			const istd::IChangeable& object) const
 {
 	const imtauth::IAccountInfo* accountInfoPtr = dynamic_cast<const imtauth::IAccountInfo*>(&object);
@@ -180,15 +180,16 @@ QByteArray CAccountDatabaseDelegateComp::CreateUpdateObjectQuery(
 		firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
 	}
 
-	QByteArray retVal = QString("UPDATE Accounts SET Name = '%1', Description = '%2', Type = '%3', OwnerMail = '%4', OwnerLastName = '%5', OwnerFirstName = '%6' WHERE Id ='%7';")
-			.arg(accountName)
-			.arg(accountDescription)
-			.arg(qPrintable(accountTypeId))
-			.arg(mail)
-			.arg(lastName)
-			.arg(firstName)
-			.arg(qPrintable(accountId))
-			.toLocal8Bit();
+	QByteArray retVal = QString("UPDATE Accounts SET Id ='%1', Name = '%2', Description = '%3', Type = '%4', OwnerMail = '%5', OwnerLastName = '%6', OwnerFirstName = '%7' WHERE Id ='%8';")
+							.arg(qPrintable(accountId))
+							.arg(accountName)
+							.arg(accountDescription)
+							.arg(qPrintable(accountTypeId))
+							.arg(mail)
+							.arg(lastName)
+							.arg(firstName)
+							.arg(qPrintable(objectId))
+							.toLocal8Bit();
 
 	return retVal;
 }

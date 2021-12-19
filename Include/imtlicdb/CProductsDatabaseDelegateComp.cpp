@@ -26,7 +26,9 @@ QByteArray CProductsDatabaseDelegateComp::GetSelectionQueryForObject(const QByte
 }
 
 
-istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
+istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
+		const QByteArray& typeId,
+		const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -250,17 +252,18 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 	GenerateDifferences(oldProductPtr, newProductPtr, addedLicenses, removedLicenses, updatedLicenses);
 
 	// Add new license to the product:
-	for (const QByteArray& addLicenseId : addedLicenses){
-		const imtlic::ILicenseInfo* licenseInfoPtr = newProductPtr->GetLicenseInfo(addLicenseId);
+	for (const QByteArray& collectionLicenseId : addedLicenses){
+		const imtlic::ILicenseInfo* licenseInfoPtr = newProductPtr->GetLicenseInfo(collectionLicenseId);
 		if (licenseInfoPtr != nullptr){
 			QString licenseName = licenseInfoPtr->GetLicenseName();
 			QString licenseDescription = newProductPtr->GetLicenseList().GetElementInfo(
-						addLicenseId,
+						collectionLicenseId,
 						imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+			QByteArray licenseId = licenseInfoPtr->GetLicenseId();
 
 			retVal += "\n" +
-						QString("INSERT INTO ProductLicenses(Id, Name, Description, ProductId) VALUES('%1', '%2', '%3', '%4');")
-									.arg(qPrintable(addLicenseId))
+					QString("INSERT INTO ProductLicenses(Id, Name, Description, ProductId) VALUES('%1', '%2', '%3', '%4');")
+									.arg(qPrintable(licenseId))
 									.arg(licenseName)
 									.arg(licenseDescription)
 									.arg(qPrintable(newProductId)).toLocal8Bit();
@@ -268,50 +271,67 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 	}
 
 	// Delete removed licenses to the product:
-	for (const QByteArray& removedLicenseId : removedLicenses){
-		retVal += "\n" +
+	for (const QByteArray& collectionLicenseId : removedLicenses){
+		const imtlic::ILicenseInfo* licenseInfoPtr = oldProductPtr->GetLicenseInfo(collectionLicenseId);
+		if (licenseInfoPtr != nullptr){
+			QByteArray licenseId = licenseInfoPtr->GetLicenseId();
+			retVal += "\n" +
 					QString("DELETE FROM ProductLicenses WHERE Id = '%1' AND ProductId = '%2';")
-								.arg(qPrintable(removedLicenseId))
-								.arg(qPrintable(newProductId)).toLocal8Bit();
+									.arg(qPrintable(licenseId))
+									.arg(qPrintable(oldProductId)).toLocal8Bit();
+		}
 	}
 
 	// Update changed licenses in the product:
-	for (const QByteArray& updatedLicenseId : updatedLicenses){
-		const imtlic::ILicenseInfo* newLicenseInfoPtr = newProductPtr->GetLicenseInfo(updatedLicenseId);
-		if (newLicenseInfoPtr != nullptr){
+	for (const QByteArray& collectionLicenseId : updatedLicenses){
+		const imtlic::ILicenseInfo* newLicenseInfoPtr = newProductPtr->GetLicenseInfo(collectionLicenseId);
+		const imtlic::ILicenseInfo* oldLicenseInfoPtr = oldProductPtr->GetLicenseInfo(collectionLicenseId);
+		if (newLicenseInfoPtr != nullptr && oldLicenseInfoPtr != nullptr){
 			QString licenseName = newLicenseInfoPtr->GetLicenseName();
 			QString licenseDescription = newProductPtr->GetLicenseList().GetElementInfo(
-				updatedLicenseId,
-				imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+						collectionLicenseId,
+						imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+			QByteArray newLicenseId = newLicenseInfoPtr->GetLicenseId();
+			QByteArray oldLicenseId = oldLicenseInfoPtr->GetLicenseId();
+			const imtbase::IObjectCollection* packagesCollectionPtr = newProductPtr->GetFeaturePackages();
 
 			retVal += "\n" +
-				QString("UPDATE ProductLicenses SET Id = '%1', Name = '%2', Description = '%3' WHERE ProductId = '%4';")
-				.arg(qPrintable(updatedLicenseId))
-				.arg(licenseName)
-				.arg(licenseDescription)
-				.arg(qPrintable(newProductId)).toLocal8Bit();
-		}
-		const imtlic::ILicenseInfo* oldLicenseInfoPtr = oldProductPtr->GetLicenseInfo(updatedLicenseId);
-		QByteArrayList addedFeatures;
-		QByteArrayList removedFeatures;
-		QByteArrayList updatedFeatures;
+					QString("UPDATE ProductLicenses SET Id = '%1', Name = '%2', Description = '%3' WHERE Id = '%4' AND ProductId = '%5';")
+									.arg(qPrintable(newLicenseId))
+									.arg(licenseName)
+									.arg(licenseDescription)
+									.arg(qPrintable(oldLicenseId))
+									.arg(qPrintable(newProductId)).toLocal8Bit();
 
-		GenerateDifferences(oldLicenseInfoPtr, newLicenseInfoPtr, addedFeatures, removedFeatures);
+			QByteArrayList addedFeatures;
+			QByteArrayList removedFeatures;
+			QByteArrayList updatedFeatures;
 
-		// Add new features to the license:
-		for (const QByteArray& addedFeatureId : addedFeatures){
-			retVal += "\n" +
-						QString("INSERT INTO ProductLicenseFeatures(FeatureId, LicenseId) VALUES('%1', '%2');")
-									.arg(qPrintable(addedFeatureId))
-									.arg(qPrintable(updatedLicenseId)).toLocal8Bit();
-		}
+			GenerateDifferences(oldLicenseInfoPtr, newLicenseInfoPtr, addedFeatures, removedFeatures);
 
-		// Delete removed features to the license:
-		for (const QByteArray& removedFeatureId : removedFeatures){
-			retVal += "\n" +
+			// Add new features to the license:
+			for (const QByteArray& addedFeatureId : addedFeatures){
+				const imtlic::IFeaturePackage* packagePtr = imtlic::CFeaturePackageCollectionUtility::GetFeaturePackagePtr(*packagesCollectionPtr, addedFeatureId);
+				if (packagePtr == nullptr){
+					continue;
+				}
+				QByteArray packageId = packagePtr->GetPackageId();
+
+				retVal += "\n" +
+						QString("INSERT INTO ProductLicenseFeatures(FeatureId, LicenseId, PackageId) VALUES('%1', '%2', '%3');")
+						.arg(qPrintable(addedFeatureId))
+						.arg(qPrintable(collectionLicenseId))
+						.arg(qPrintable(packageId))
+						.toLocal8Bit();
+			}
+
+			// Delete removed features to the license:
+			for (const QByteArray& removedFeatureId : removedFeatures){
+				retVal += "\n" +
 						QString("DELETE FROM ProductLicenseFeatures WHERE FeatureId = '%1' AND LicenseId = '%2';")
-									.arg(qPrintable(removedFeatureId))
-									.arg(qPrintable(updatedLicenseId)).toLocal8Bit();
+						.arg(qPrintable(removedFeatureId))
+						.arg(qPrintable(collectionLicenseId)).toLocal8Bit();
+			}
 		}
 	}
 
@@ -383,7 +403,8 @@ void CProductsDatabaseDelegateComp::GenerateDifferences(const imtlic::IProductLi
 		Q_ASSERT(licenseInfoPtr != nullptr);
 		Q_ASSERT(!licenseInfoPtr->GetLicenseId().isEmpty());
 
-		currentLicenseIds.push_back(licenseInfoPtr->GetLicenseId());
+//		currentLicenseIds.push_back(licenseInfoPtr->GetLicenseId());
+		currentLicenseIds.push_back(id);
 	}
 
 	imtbase::ICollectionInfo::Ids newLicenseCollectionIds = newProductPtr->GetLicenseList().GetElementIds();
@@ -394,7 +415,8 @@ void CProductsDatabaseDelegateComp::GenerateDifferences(const imtlic::IProductLi
 		Q_ASSERT(licenseInfoPtr != nullptr);
 		Q_ASSERT(!licenseInfoPtr->GetLicenseId().isEmpty());
 
-		newLicenseIds.push_back(licenseInfoPtr->GetLicenseId());
+//		newLicenseIds.push_back(licenseInfoPtr->GetLicenseId());
+		newLicenseIds.push_back(id);
 	}
 
 	// Calculate added licenses:
