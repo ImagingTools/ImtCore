@@ -24,6 +24,43 @@ CProductInstanceInfoViewDelegateComp::CProductInstanceInfoViewDelegateComp()
 
 // reimplemented (imtgui::ICollectionViewDelegate)
 
+imtgui::ICollectionViewDelegate::SummaryInformation CProductInstanceInfoViewDelegateComp::GetSummaryInformation(
+			const QByteArray& objectId,
+			const QByteArray& informationId) const
+{
+	if (m_collectionPtr != nullptr){
+		imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr;
+		
+		if (informationId == QByteArray("InstanceId")){
+			if (m_collectionPtr->GetDataMetaInfo(objectId, metaInfoPtr)){
+				Q_ASSERT(metaInfoPtr.IsValid());
+
+				imtgui::ICollectionViewDelegate::SummaryInformation retVal;
+
+				retVal.text = qPrintable(metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_PRODUCT_INSTANCE_ID).toByteArray());
+				retVal.sortValue = retVal.text;
+
+				return retVal;
+			}
+		}
+		else if (informationId == QByteArray("Customer")){
+			if (m_collectionPtr->GetDataMetaInfo(objectId, metaInfoPtr)){
+				Q_ASSERT(metaInfoPtr.IsValid());
+
+				imtgui::ICollectionViewDelegate::SummaryInformation retVal;
+
+				retVal.text = qPrintable(metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_CUSTOMER_NAME).toString());
+				retVal.sortValue = retVal.text;
+
+				return retVal;
+			}
+		}
+	}
+
+	return BaseClass::GetSummaryInformation(objectId, informationId);
+}
+
+
 void CProductInstanceInfoViewDelegateComp::UpdateItemSelection(
 			const imtbase::ICollectionInfo::Ids& selectedItems,
 			const QByteArray& selectedTypeId)
@@ -34,16 +71,6 @@ void CProductInstanceInfoViewDelegateComp::UpdateItemSelection(
 }
 
 
-// reimplemented (ibase::TLocalizableWrap)
-
-void CProductInstanceInfoViewDelegateComp::OnLanguageChanged()
-{
-	BaseClass::OnLanguageChanged();
-
-	m_exportLicenseCommand.SetVisuals(tr("Create License File"), tr("Create License File"), tr("Export existing product installation license to file"), QIcon(":/ColorIcons/License"));
-}
-
-
 // protected methods
 
 // reimplemented (imtgui::CObjectCollectionViewDelegate)
@@ -51,6 +78,12 @@ void CProductInstanceInfoViewDelegateComp::OnLanguageChanged()
 void CProductInstanceInfoViewDelegateComp::SetupSummaryInformation()
 {
 	BaseClass::SetupSummaryInformation();
+
+	m_summaryInformationTypes.InsertItem("InstanceId", tr("Instance-ID"), "", 1);
+	m_summaryInformationHeaders["InstanceId"] = HeaderInfo(false);
+
+	m_summaryInformationTypes.InsertItem("Customer", tr("Customer"), "", 2);
+	m_summaryInformationHeaders["Customer"] = HeaderInfo(false);
 
 	m_summaryInformationTypes.RemoveItem("TypeId");
 }
@@ -67,6 +100,16 @@ void CProductInstanceInfoViewDelegateComp::SetupCommands()
 
 		m_licenseCommands.InsertChild(&m_exportLicenseCommand);
 	}
+}
+
+
+// reimplemented (ibase::TLocalizableWrap)
+
+void CProductInstanceInfoViewDelegateComp::OnLanguageChanged()
+{
+	BaseClass::OnLanguageChanged();
+
+	m_exportLicenseCommand.SetVisuals(tr("Create License File"), tr("Create License File"), tr("Export existing product installation license to file"), QIcon(":/ColorIcons/License"));
 }
 
 

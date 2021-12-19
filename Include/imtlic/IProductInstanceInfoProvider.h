@@ -30,7 +30,7 @@ public:
 		/**
 			List of license instance infos given as QStringList.
 		*/
-		MIT_LICENSE_INSTANCE_INFO_LIST = idoc::IDocumentMetaInfo::MIT_USER + 1,
+		MIT_LICENSE_INSTANCE_INFO_LIST = idoc::IDocumentMetaInfo::MIT_USER + 1
 	};
 
 	/**

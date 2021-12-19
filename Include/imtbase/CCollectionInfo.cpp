@@ -26,7 +26,7 @@ int CCollectionInfo::GetItemIndex(const QByteArray& id) const
 }
 
 
-QByteArray CCollectionInfo::InsertItem(const QByteArray& id, const QString & name, const QString & description)
+QByteArray CCollectionInfo::InsertItem(const QByteArray& id, const QString & name, const QString & description, int position)
 {
 	Ids existingIds = GetElementIds();
 	if (existingIds.contains(id)){
@@ -39,7 +39,12 @@ QByteArray CCollectionInfo::InsertItem(const QByteArray& id, const QString & nam
 	newItem.description = description;
 	newItem.name = name;
 
-	m_items.push_back(newItem);
+	if (position < 0 || (position > m_items.count() - 1)){
+		m_items.push_back(newItem);
+	}
+	else{
+		m_items.insert(position, newItem);
+	}
 
 	return newItem.id;
 }

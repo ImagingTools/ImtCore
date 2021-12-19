@@ -18,9 +18,7 @@ imtgui::ICollectionViewDelegate::SummaryInformation CFeatureCollectionViewDelega
 	SummaryInformation retVal;
 
 	if (m_collectionPtr != nullptr){
-		imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<imtlic::IFeatureInfo*>(
-					const_cast<istd::IChangeable*>(m_collectionPtr->GetObjectPtr(objectId)));
-
+		const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(m_collectionPtr->GetObjectPtr(objectId));
 		if (featureInfoPtr != nullptr){
 			if (informationId == QByteArray("FeatureName")){
 				retVal.text = featureInfoPtr->GetFeatureName();

@@ -9,6 +9,7 @@
 #include <imtlic/ILicenseInstance.h>
 #include <imtlic/IProductInstanceInfo.h>
 #include <imtlic/IProductInstanceInfoProvider.h>
+#include <imtlic/CProductInstanceMetaInfo.h>
 
 
 namespace imtlic
@@ -28,7 +29,7 @@ bool CProductInstanceMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
-	metaInfoPtr.SetPtr(new imod::TModelWrap<MetaInfo>);
+	metaInfoPtr.SetPtr(new imod::TModelWrap<CProductInstanceMetaInfo>);
 
 	if (dataPtr == nullptr){
 		return true;
@@ -57,21 +58,10 @@ bool CProductInstanceMetaInfoCreatorComp::CreateMetaInfo(
 	retVal.chop(1);
 
 	metaInfoPtr->SetMetaInfo(IProductInstanceInfoProvider::MIT_LICENSE_INSTANCE_INFO_LIST, retVal);
+	metaInfoPtr->SetMetaInfo(IProductInstanceInfo::MIT_PRODUCT_INSTANCE_ID, productInstancePtr->GetProductInstanceId());
+	metaInfoPtr->SetMetaInfo(IProductInstanceInfo::MIT_CUSTOMER_NAME, productInstancePtr->GetCustomerId());
 
 	return true;
-}
-
-
-// public methods of embedded class MetaInfo
-
-QString CProductInstanceMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
-{
-	switch (metaInfoType){
-	case imtlic::IProductInstanceInfoProvider::MIT_LICENSE_INSTANCE_INFO_LIST:
-		return QObject::tr("Licenses");
-	}
-
-	return BaseClass::GetMetaInfoName(metaInfoType);
 }
 
 

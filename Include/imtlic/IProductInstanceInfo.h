@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <iser/IObject.h>
+#include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtlic/ILicenseInstanceProvider.h>
@@ -33,6 +34,20 @@ class IProductInfo;
 class IProductInstanceInfo: virtual public imtlic::ILicenseInstanceProvider, virtual public iser::IObject
 {
 public:
+	enum MetaInfoTypes
+	{
+		/**
+		ID of the product instance.
+		*/
+		MIT_PRODUCT_INSTANCE_ID = idoc::IDocumentMetaInfo::MIT_USER + 1000,
+
+		/**
+			Customer name.
+		*/
+		MIT_CUSTOMER_NAME
+	};
+
+
 	/**
 		Get access to the product database.
 	*/

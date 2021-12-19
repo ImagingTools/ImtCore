@@ -28,7 +28,7 @@ class CCollectionInfo:
 public:
 	int GetItemIndex(const QByteArray& id) const;
 
-	virtual QByteArray InsertItem(const QByteArray& id, const QString& name, const QString& description);
+	virtual QByteArray InsertItem(const QByteArray& id, const QString& name, const QString& description, int position = -1);
 	virtual void RemoveItem(const QByteArray& id);
 	virtual void UpdateItem(const QByteArray& id, const QString& name, const QString& description);
 

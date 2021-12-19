@@ -263,10 +263,10 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 			retVal += "\n" +
 					QString("INSERT INTO ProductLicenses(Id, Name, Description, ProductId) VALUES('%1', '%2', '%3', '%4');")
-									.arg(qPrintable(licenseId))
-									.arg(licenseName)
-									.arg(licenseDescription)
-									.arg(qPrintable(newProductId)).toLocal8Bit();
+								.arg(qPrintable(licenseId))
+								.arg(licenseName)
+								.arg(licenseDescription)
+								.arg(qPrintable(newProductId)).toLocal8Bit();
 		}
 	}
 
@@ -276,7 +276,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 		if (licenseInfoPtr != nullptr){
 			QByteArray licenseId = licenseInfoPtr->GetLicenseId();
 			retVal += "\n" +
-					QString("DELETE FROM ProductLicenses WHERE Id = '%1' AND ProductId = '%2';")
+						QString("DELETE FROM ProductLicenses WHERE Id = '%1' AND ProductId = '%2';")
 									.arg(qPrintable(licenseId))
 									.arg(qPrintable(oldProductId)).toLocal8Bit();
 		}

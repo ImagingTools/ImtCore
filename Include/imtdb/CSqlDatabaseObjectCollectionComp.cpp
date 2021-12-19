@@ -194,6 +194,8 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 	istd::CChangeNotifier changeNotifier(this);
 
 	if (ExecuteTransaction(query)){
+		m_metaInfoCreatorCompPtr->CreateMetaInfo(&object, *m_typeIdAttrPtr, m_objectInfoMap[objectId].metaInfoPtr);
+
 		return true;
 	}
 	else{
@@ -247,7 +249,7 @@ void CSqlDatabaseObjectCollectionComp::SetObjectDescription(const QByteArray& ob
 			istd::CChangeNotifier changeNotifier(this);
 
 			if (m_objectInfoMap[objectId].collectionMetaInfoPtr.IsValid()){
-				m_objectInfoMap[objectId].collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE, objectDescription);
+				m_objectInfoMap[objectId].collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
 			}
 		}
 	}

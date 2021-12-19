@@ -1,8 +1,12 @@
 #include <imtlicdb/CProductInstanceDatabaseDelegateComp.h>
 
 
+// ACF includes
+#include <imod/TModelWrap.h>
+
 // ImtCore includes
 #include <imtlic/ILicenseInstance.h>
+#include <imtlic/CProductInstanceMetaInfo.h>
 
 
 namespace imtlicdb
@@ -391,7 +395,30 @@ void CProductInstanceDatabaseDelegateComp::GenerateDifferencesLicenses(const imt
 			}
 		}
 	}
+}
 
+
+// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
+
+idoc::IDocumentMetaInfo* CProductInstanceDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
+{
+	return new imod::TModelWrap<imtlic::CProductInstanceMetaInfo>;
+}
+
+
+bool CProductInstanceDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+{
+	const istd::IChangeable* instancePtr = CreateObjectFromRecord(QByteArray(), record);
+	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
+		imtbase::IMetaInfoCreator::MetaInfoPtr retVal;
+		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "ProductInstanceInfo", retVal)){
+			Q_ASSERT(retVal.IsValid());
+
+			return metaInfo.CopyFrom(*retVal);
+		}
+	}
+
+	return false;
 }
 
 

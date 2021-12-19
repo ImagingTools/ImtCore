@@ -36,13 +36,14 @@ public:
 
 	CProductInstanceInfoViewDelegateComp();
 
+	// reimplemented (imtgui::ICollectionViewDelegate)
+	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
+	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
+
 protected:
 	// reimplemented (imtgui::CObjectCollectionViewDelegate)
 	virtual void SetupSummaryInformation() override;
 	virtual void SetupCommands() override;
-
-	// reimplemented (imtgui::ICollectionViewDelegate)
-	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
