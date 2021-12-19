@@ -19,16 +19,26 @@ namespace imtdb
 
 // public methods
 
+CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
+	:m_objectInfoMapMutex(QReadWriteLock::Recursive)
+{
+}
+
+
 // reimplemented (ICollectionInfo)
 
 imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds() const
 {
+	QReadLocker readLock(&m_objectInfoMapMutex);
+
 	return m_objectInfoMap.keys().toVector();
 }
 
 
 QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elementId, int infoType) const
 {
+	QReadLocker readLock(&m_objectInfoMapMutex);
+
 	if (m_objectInfoMap.contains(elementId)){
 		const ObjectInfo& item = m_objectInfoMap[elementId];
 
@@ -53,6 +63,8 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 
 bool CSqlDatabaseObjectCollectionComp::GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const
 {
+	QReadLocker readLock(&m_objectInfoMapMutex);
+
 	if (m_objectInfoMap.contains(objectId)){
 		imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr = m_objectInfoMap[objectId].collectionMetaInfoPtr;
 		if (objectMetaInfoPtr.IsValid()){
@@ -72,6 +84,8 @@ const iprm::IOptionsList* CSqlDatabaseObjectCollectionComp::GetObjectTypesInfo()
 
 imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetObjectTypeId(const QByteArray& objectId) const
 {
+	QReadLocker readLock(&m_objectInfoMapMutex);
+
 	if (m_objectInfoMap.contains(objectId)){
 		return m_objectInfoMap[objectId].typeId;
 	}
@@ -141,7 +155,11 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 			objectInfo.metaInfoPtr.SetCastedOrRemove(dataMetaInfoPtr->CloneMe());
 		}
 
-		m_objectInfoMap[objectId] = objectInfo;
+		{
+			QWriteLocker writeLock(&m_objectInfoMapMutex);
+
+			m_objectInfoMap[objectId] = objectInfo;
+		}
 
 		return objectId;
 	}
@@ -166,7 +184,11 @@ bool CSqlDatabaseObjectCollectionComp::RemoveObject(const QByteArray& objectId)
 	if (ExecuteTransaction(query)){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_objectInfoMap.remove(objectId);
+		{
+			QWriteLocker writeLock(&m_objectInfoMapMutex);
+
+			m_objectInfoMap.remove(objectId);
+		}
 
 		return true;
 	}
@@ -220,12 +242,16 @@ void CSqlDatabaseObjectCollectionComp::SetObjectName(const QByteArray& objectId,
 	}
 
 	if (ExecuteTransaction(query)){
+		QWriteLocker writeLock(&m_objectInfoMapMutex);
+
 		if (m_objectInfoMap.contains(objectId)){
 			istd::CChangeNotifier changeNotifier(this);
 
 			if (m_objectInfoMap[objectId].collectionMetaInfoPtr.IsValid()){
 				m_objectInfoMap[objectId].collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE, objectName);
 			}
+
+			writeLock.unlock();
 		}
 	}
 }
@@ -245,12 +271,16 @@ void CSqlDatabaseObjectCollectionComp::SetObjectDescription(const QByteArray& ob
 	}
 
 	if (ExecuteTransaction(query)){
+		QWriteLocker writeLock(&m_objectInfoMapMutex);
+
 		if (m_objectInfoMap.contains(objectId)){
 			istd::CChangeNotifier changeNotifier(this);
 
 			if (m_objectInfoMap[objectId].collectionMetaInfoPtr.IsValid()){
 				m_objectInfoMap[objectId].collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
 			}
+
+			writeLock.unlock();
 		}
 	}
 }
@@ -276,6 +306,8 @@ int CSqlDatabaseObjectCollectionComp::GetOperationFlags(const QByteArray& /*obje
 
 bool CSqlDatabaseObjectCollectionComp::GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const
 {
+	QReadLocker readLock(&m_objectInfoMapMutex);
+
 	if (m_objectInfoMap.contains(objectId)){
 		imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr = m_objectInfoMap[objectId].metaInfoPtr;
 		if (objectMetaInfoPtr.IsValid()){
@@ -301,32 +333,26 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 		return false;
 	}
 
-	if (m_objectInfoMap.contains(objectId)){
-		QSqlError sqlError;
-
-		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQueryForObject(objectId);
-		if (objectSelectionQuery.isEmpty()){
-			return false;
-		}
-
-		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError);
-
-		if (!sqlQuery.last()){
-			return false;
-		}
-
-		QByteArray id;
-		QString name;
-		QString description;
-		QDateTime added;
-		QDateTime modified;
-
-		dataPtr.SetPtr(m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record()));
-
-		return dataPtr.IsValid();
+	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQueryForObject(objectId);
+	if (objectSelectionQuery.isEmpty()){
+		return false;
 	}
 
-	return false;
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		SendErrorMessage(0, sqlError.text(), "Database collection");
+
+		return false;
+	}
+
+	if (!sqlQuery.last()){
+		return false;
+	}
+
+	dataPtr.SetPtr(m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record()));
+
+	return dataPtr.IsValid();
 }
 
 
@@ -408,6 +434,8 @@ void CSqlDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 			objectInfo.typeId = *m_typeIdAttrPtr;
 			objectInfo.collectionMetaInfoPtr = collectionMetaInfoPtr;
 			objectInfo.metaInfoPtr = objectMetaInfoPtr;
+
+			QWriteLocker writeLock(&m_objectInfoMapMutex);
 
 			m_objectInfoMap[objectId] = objectInfo;
 		}

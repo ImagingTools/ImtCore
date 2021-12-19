@@ -2,6 +2,7 @@
 
  
 // Qt includes
+#include <QtCore/QReadWriteLock>
 #include <QtSql/QtSql>
 
 // ACF includes
@@ -39,8 +40,9 @@ public:
 		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database engine used for low level SQL quering", true, "DatabaseEngine");
 		I_ASSIGN(m_objectDelegateCompPtr, "ObjectDelegate", "Database object delegate used for creation of C++ objects from the SQL record", true, "ObjectDelegate");
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
-		I_ASSIGN(m_updateOnDatabaseConnectedAttrPtr, "UpdateOnConnected", "Sets behavior aftre connected to database \nif true - automatic update", true, false);
 	I_END_COMPONENT;
+
+	CSqlDatabaseObjectCollectionComp();
 
 	// reimplemented (ICollectionInfo)
 	virtual Ids GetElementIds() const override;
@@ -90,8 +92,6 @@ private:
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_ATTR(QByteArray, m_typeIdAttrPtr);
 	I_TEXTATTR(m_typeNameAttrPtr);
-	I_ATTR(bool, m_updateOnDatabaseConnectedAttrPtr);
-	I_ATTR(QByteArray, m_selectSqlQueryPathAttrPtr);
 
 	iprm::COptionsManager m_typesInfo;
 
@@ -105,6 +105,8 @@ private:
 	typedef QMap<QByteArray, ObjectInfo> ObjectInfoMap;
 
 	ObjectInfoMap m_objectInfoMap;
+
+	mutable QReadWriteLock m_objectInfoMapMutex;
 };
 
 
