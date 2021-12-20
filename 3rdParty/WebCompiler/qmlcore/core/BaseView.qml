@@ -20,6 +20,7 @@ BaseLayout {
 	contentHeight: 1;				///< content height
 	keyNavigationWraps: true;		///< key navigation wraps from end to beginning and vise versa
 	handleNavigationKeys: true;		///< handle navigation keys
+	property bool interactive: true;
 
 	cssPointerTouchEvents: nativeScrolling; // enable touch/pointer events for natively scrollable surfaces
 
@@ -422,11 +423,20 @@ BaseLayout {
 
 	onCompleted: {
 		var self = this
-		this.element.on('scroll', function() {
-			var x = self.element.getScrollX(), y = self.element.getScrollY()
-			self._updateScrollPositions(x, y)
-			self.scrollEvent(x, y)
+		this.element.dom.addEventListener('scroll', function(e) {
+			if(self.interactive){
+				var x = self.element.getScrollX(), y = self.element.getScrollY()
+				self._updateScrollPositions(x, y)
+				self.scrollEvent(x, y)
+			} else {
+				e.stopPropagation()
+				e.preventDefault()
+			}
+			
+			
 		}.bind(this))
+
+		this.element.dom.addEventListener("wheel", (e) => {if(!this.interactive){e.stopPropagation();e.preventDefault()}})
 
 
 		this.style({

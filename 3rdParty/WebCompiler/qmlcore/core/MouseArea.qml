@@ -38,9 +38,9 @@ Item {
 		if (value && !this._touchBinder) {
 			this._touchBinder = new $core.EventBinder(this.element)
 
-			var touchStart = function(event) { this.touchStart(event) }.bind(this)
-			var touchEnd = function(event) { this.touchEnd(event) }.bind(this)
-			var touchMove = (function(event) { this.touchMove(event) }).bind(this)
+			var touchStart = function(event) { this.touchStart(event); if(this.mouse.accepted) event.stopPropagation();  }.bind(this)
+			var touchEnd = function(event) { this.touchEnd(event); if(this.mouse.accepted) event.stopPropagation();  }.bind(this)
+			var touchMove = (function(event) { this.touchMove(event); if(this.mouse.accepted) event.stopPropagation();  }).bind(this)
 
 			this._touchBinder.on('touchstart', touchStart)
 			this._touchBinder.on('touchend', touchEnd)
@@ -65,7 +65,24 @@ Item {
 	function _bindClick(value) {
 		if (value && !this._clickBinder) {
 			this._clickBinder = new $core.EventBinder(this.element)
-			this._clickBinder.on('click', function(event) { this.updatePosition(event); this.clicked(event) }.bind(this))
+			this._clickBinder.on('click', function(event) { 
+				this.mouse.accepted = false
+				this.mouse.x = event.offsetX
+				this.mouse.y = event.offsetY
+				this.mouse.modifiers = 0x00000000
+				if(event.altKey) this.mouse.modifiers |= 0x08000000
+				if(event.shiftKey) this.mouse.modifiers |= 0x02000000
+				if(event.ctrlKey) this.mouse.modifiers |= 0x04000000
+				if(event.metaKey) this.mouse.modifiers |= 0x10000000
+				switch(event.button){
+					case 0: this.mouse.button = 0x00000001; this.mouse.buttons = 0x00000001; break;
+					case 1: this.mouse.button = 0x00000004; this.mouse.buttons = 0x00000004; break;
+					case 2: this.mouse.button = 0x00000002; this.mouse.buttons = 0x00000002; break;
+				}
+				this.updatePosition(event); 
+				this.clicked(event); 
+				if(this.mouse.accepted) event.stopPropagation();  
+			}.bind(this))
 		}
 		if (this._clickBinder)
 			this._clickBinder.enable(value)
@@ -88,7 +105,25 @@ Item {
 	function _bindWheel(value) {
 		if (value && !this._wheelBinder) {
 			this._wheelBinder = new $core.EventBinder(this.element)
-			this._wheelBinder.on('mousewheel', function(event) { this.wheel(event.wheelDelta / 120) }.bind(this))
+			this._wheelBinder.on('mousewheel', function(event) { 
+
+				this.wheel.accepted = false
+				this.wheel.x = event.offsetX
+				this.wheel.y = event.offsetY
+				this.wheel.modifiers = 0x00000000
+				this.wheel.angleDelta = event.wheelDeltaY / 8
+        		this.wheel.pixelDelta = event.wheelDeltaY
+				if(event.altKey) this.wheel.modifiers |= 0x08000000
+				if(event.shiftKey) this.wheel.modifiers |= 0x02000000
+				if(event.ctrlKey) this.wheel.modifiers |= 0x04000000
+				if(event.metaKey) this.wheel.modifiers |= 0x10000000
+				
+				this.wheel(event.wheelDelta / 120); 
+				if(this.wheel.accepted) {
+					event.stopPropagation();  
+					console.log('stopPropagation')
+				}
+			}.bind(this))
 		}
 		if (this._wheelBinder)
 			this._wheelBinder.enable(value)
@@ -103,8 +138,40 @@ Item {
 	function _bindPressable(value) {
 		if (value && !this._pressableBinder) {
 			this._pressableBinder = new $core.EventBinder(this.element)
-			this._pressableBinder.on('mousedown', function(event) { this.pressed = true; this.mousePressed(event) }.bind(this))
-			this._pressableBinder.on('mouseup', function(event)	{ this.pressed = false; this.mouseReleased(event) }.bind(this))
+			this._pressableBinder.on('mousedown', function(event) { 
+				this.mouse.accepted = false
+				this.mouse.x = event.offsetX
+				this.mouse.y = event.offsetY
+				this.mouse.modifiers = 0x00000000
+				if(event.altKey) this.mouse.modifiers |= 0x08000000
+				if(event.shiftKey) this.mouse.modifiers |= 0x02000000
+				if(event.ctrlKey) this.mouse.modifiers |= 0x04000000
+				if(event.metaKey) this.mouse.modifiers |= 0x10000000
+				switch(event.button){
+					case 0: this.mouse.button = 0x00000001; this.mouse.buttons = 0x00000001; break;
+					case 1: this.mouse.button = 0x00000004; this.mouse.buttons = 0x00000004; break;
+					case 2: this.mouse.button = 0x00000002; this.mouse.buttons = 0x00000002; break;
+				}
+				this.pressed = true; this.mousePressed(event); 
+				if(this.mouse.accepted) event.stopPropagation(); 
+			}.bind(this))
+			this._pressableBinder.on('mouseup', function(event)	{ 
+				this.mouse.accepted = false
+				this.mouse.x = event.offsetX
+				this.mouse.y = event.offsetY
+				this.mouse.modifiers = 0x00000000
+				if(event.altKey) this.mouse.modifiers |= 0x08000000
+				if(event.shiftKey) this.mouse.modifiers |= 0x02000000
+				if(event.ctrlKey) this.mouse.modifiers |= 0x04000000
+				if(event.metaKey) this.mouse.modifiers |= 0x10000000
+				switch(event.button){
+					case 0: this.mouse.button = 0x00000001; this.mouse.buttons = 0x00000001; break;
+					case 1: this.mouse.button = 0x00000004; this.mouse.buttons = 0x00000004; break;
+					case 2: this.mouse.button = 0x00000002; this.mouse.buttons = 0x00000002; break;
+				}
+				this.pressed = false; this.mouseReleased(event); 
+				if(this.mouse.accepted) event.stopPropagation(); 
+			}.bind(this))
 		}
 		if (this._pressableBinder)
 			this._pressableBinder.enable(value)
@@ -119,9 +186,58 @@ Item {
 	function _bindHover(value) {
 		if (value && !this._hoverBinder) {
 			this._hoverBinder = new $core.EventBinder(this.element)
-			this._hoverBinder.on('mouseenter', function() { this.hover = true }.bind(this))
-			this._hoverBinder.on('mouseleave', function() { this.hover = false; if(this.pressed){this.pressed = false;this.mouseReleased()} }.bind(this))
-			this._hoverBinder.on('mousemove', function(event) { if (this.updatePosition(event)) $core.callMethod(event, 'preventDefault')}.bind(this))
+			this._hoverBinder.on('mouseenter', function() { 
+				this.mouse.accepted = false
+				this.mouse.x = event.offsetX
+				this.mouse.y = event.offsetY
+				this.mouse.modifiers = 0x00000000
+				if(event.altKey) this.mouse.modifiers |= 0x08000000
+				if(event.shiftKey) this.mouse.modifiers |= 0x02000000
+				if(event.ctrlKey) this.mouse.modifiers |= 0x04000000
+				if(event.metaKey) this.mouse.modifiers |= 0x10000000
+				switch(event.button){
+					case 0: this.mouse.button = 0x00000001; this.mouse.buttons = 0x00000001; break;
+					case 1: this.mouse.button = 0x00000004; this.mouse.buttons = 0x00000004; break;
+					case 2: this.mouse.button = 0x00000002; this.mouse.buttons = 0x00000002; break;
+				}
+				this.hover = true; 
+				if(this.mouse.accepted) event.stopPropagation();  
+			}.bind(this))
+			this._hoverBinder.on('mouseleave', function() { 
+				this.mouse.accepted = false
+				this.mouse.x = event.offsetX
+				this.mouse.y = event.offsetY
+				this.mouse.modifiers = 0x00000000
+				if(event.altKey) this.mouse.modifiers |= 0x08000000
+				if(event.shiftKey) this.mouse.modifiers |= 0x02000000
+				if(event.ctrlKey) this.mouse.modifiers |= 0x04000000
+				if(event.metaKey) this.mouse.modifiers |= 0x10000000
+				switch(event.button){
+					case 0: this.mouse.button = 0x00000001; this.mouse.buttons = 0x00000001; break;
+					case 1: this.mouse.button = 0x00000004; this.mouse.buttons = 0x00000004; break;
+					case 2: this.mouse.button = 0x00000002; this.mouse.buttons = 0x00000002; break;
+				}
+				this.hover = false; 
+				if(this.pressed){this.pressed = false;this.mouseReleased()}; 
+				if(this.mouse.accepted) event.stopPropagation();  
+			}.bind(this))
+			this._hoverBinder.on('mousemove', function(event) { 
+				this.mouse.accepted = false
+				this.mouse.x = event.offsetX
+				this.mouse.y = event.offsetY
+				this.mouse.modifiers = 0x00000000
+				if(event.altKey) this.mouse.modifiers |= 0x08000000
+				if(event.shiftKey) this.mouse.modifiers |= 0x02000000
+				if(event.ctrlKey) this.mouse.modifiers |= 0x04000000
+				if(event.metaKey) this.mouse.modifiers |= 0x10000000
+				switch(event.button){
+					case 0: this.mouse.button = 0x00000001; this.mouse.buttons = 0x00000001; break;
+					case 1: this.mouse.button = 0x00000004; this.mouse.buttons = 0x00000004; break;
+					case 2: this.mouse.button = 0x00000002; this.mouse.buttons = 0x00000002; break;
+				}
+				if (this.updatePosition(event)) $core.callMethod(event, 'preventDefault'); 
+				if(this.mouse.accepted) event.stopPropagation(); 
+			}.bind(this))
 		}
 		if (this._hoverBinder)
 			this._hoverBinder.enable(value)
@@ -221,7 +337,24 @@ Item {
 		this._bindPressable(this.enabled)
 		this._bindHover(this.hoverEnabled && this.enabled)
 		this._bindTouch(this.enabled)
-		//this._local.mouse = {}
-		//this._local.wheel = {}
+		this.mouse = {
+			accepted: false,
+			button: 0x00000001,
+			buttons: 0x00000001,
+			//flags: int,
+			modifiers: 0,
+			//source: int,
+			wasHeld: false,
+			x: 0,
+			y: 0,
+		}
+		this.wheel.accepted = false;
+		this.wheel.angleDelta = 0;
+		this.wheel.buttons = 0x00000001,
+		this.wheel.inverted = false;
+		this.wheel.pixelDelta = 0;
+		this.wheel.modifiers = 0;
+		this.wheel.x = 0;
+		this.wheel.y = 0;
 	}
 }
