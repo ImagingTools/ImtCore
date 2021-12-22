@@ -64,7 +64,7 @@ int CDesignTokenIconQmlGeneratorComp::Exec()
 		}
 		out << "\""  << properties[i] << "\"";
 	}
-	out << "]" << endl;
+	out << "];" << endl;
 	out << "}" << endl;
 	outputFile.close();
 	return 0;
