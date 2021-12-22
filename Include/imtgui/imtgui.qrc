@@ -20,7 +20,6 @@
         <file alias="imtgui/AuxComponents/TreeView.qml">Qml/imtgui/AuxComponents/TreeView.qml</file>
         <file alias="imtgui/AuxComponents/TreeItemDelegate.qml">Qml/imtgui/AuxComponents/TreeItemDelegate.qml</file>
         <file alias="imtgui/AuxComponents/CheckBox.qml">Qml/imtgui/AuxComponents/CheckBox.qml</file>
-        <file alias="Acf/IconStyle.qml">Qml/Acf/IconStyle.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Regular.ttf">Qml/Fonts/Ubuntu-Regular.ttf</file>
