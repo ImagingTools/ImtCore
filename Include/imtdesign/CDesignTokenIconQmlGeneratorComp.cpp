@@ -39,6 +39,8 @@ int CDesignTokenIconQmlGeneratorComp::Exec()
 	out << "pragma Singleton" << endl;
 	out << "import QtQuick 2.0" << endl;
 	out << "Item {" << endl;
+
+
 	for (const QByteArray& dir: ::qAsConst(argumentsDirs)){
 		QFileInfoList filesDir = QDir(dir).entryInfoList(filters, sort);
 		for (const QFileInfo& fileInfo: ::qAsConst(filesDir)){
@@ -54,6 +56,15 @@ int CDesignTokenIconQmlGeneratorComp::Exec()
 			}
 		}
 	}
+	out << "property var iconNames: [";
+
+	for (int i = 0; i < properties.length(); i++){
+		if (i > 0){
+			out << ',';
+		}
+		out << "\""  << properties[i] << "\"";
+	}
+	out << "]" << endl;
 	out << "}" << endl;
 	outputFile.close();
 	return 0;
