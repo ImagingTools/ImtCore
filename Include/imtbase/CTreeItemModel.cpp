@@ -392,6 +392,17 @@ QVariant CTreeItemModel::data(const QModelIndex& index, int role) const
 	return this->GetData(key, row);
 }
 
+bool CTreeItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+	if (!m_roleNames.contains(role)){
+		return false;
+	}
+	QByteArray key = m_roleNames.value(role);
+	int row = index.row();
+	SetData(key, value, row);
+	return true;
+}
+
 
 QHash<int, QByteArray> CTreeItemModel::roleNames() const
 {

@@ -12,7 +12,10 @@
 #include <imtdesign/CDesignTokenFileParserComp.h>
 #include <imtdesign/CDesignTokenProcessorsControllerComp.h>
 #include <imtdesign/CDesignTokenQrcUpdaterComp.h>
+#include <imtdesign/CDesignTokenWebQrcGeneratorComp.h>
 #include <imtdesign/CDesignTokenSplitProcessorComp.h>
+
+#include <imtdesign/CDesignTokenIconQmlGeneratorComp.h>
 
 /**
 	ImtStylePck package
@@ -27,7 +30,9 @@ typedef imtdesign::CDesignTokenIconProcessorComp DesignTokenIconProcessor;
 typedef imtdesign::CDesignTokenStyleSheetProcessorComp DesignTokenStyleSheetProcessor;
 typedef imtdesign::CDesignTokenProcessorsControllerComp DesignTokenProcessorsController;
 typedef imtdesign::CDesignTokenQrcUpdaterComp DesignTokenQrcUpdater;
+typedef imtdesign::CDesignTokenWebQrcGeneratorComp DesignTokenWebQrcGenerator;
 typedef imtdesign::CDesignTokenSplitProcessorComp DesignTokenSplitProcessor;
+typedef imtdesign::CDesignTokenIconQmlGeneratorComp DesignTokenIconQmlGenerator;
 
 
 } // namespace ImtDesignPck

@@ -49,6 +49,18 @@ I_EXPORT_COMPONENT(
 		"Modifyes QRC files",
 		"Design Token QRC");
 
+I_EXPORT_COMPONENT(
+		DesignTokenWebQrcGenerator,
+		"Generate Web QRC files",
+		"Design Token Web QRC");
+
+
+I_EXPORT_COMPONENT(
+		DesignTokenIconQmlGenerator,
+		"Generate icon qml files",
+		"Design Token Web QRC");
+
+
 
 } // namespace ImtDesignPck
 

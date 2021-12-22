@@ -1,6 +1,5 @@
 #include <imtqml/CQuickApplicationComp.h>
 
-
 // Qt includes
 #include <QtCore/QString>
 #include <QtCore/QTimer>
@@ -24,6 +23,7 @@
 #include <istd/CSystem.h>
 #include <iqtgui/CCommandTools.h>
 #include <iqtgui/CHierarchicalCommand.h>
+
 
 #if defined(Q_OS_MACX) && (QT_VERSION >= 0x040000) && (QT_VERSION < 0x050000)
 void qt_mac_set_menubar_icons(bool enable);

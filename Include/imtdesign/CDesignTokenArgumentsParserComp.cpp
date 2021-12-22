@@ -92,7 +92,6 @@ QByteArrayList CDesignTokenArgumentsParserComp::GetArgumentValueMulti(AvailableA
 
 
 // reimplemented (IDesignTokenArgumentsParser)
-
 void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 {
 	for(int i = 0; i < argc; ++i){
@@ -106,6 +105,8 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_commands.insert(AA_DESIGN_TOKEN_FILE_PATH, "-F");
 	m_commands.insert(AA_OUTPUT_DIRECTORY_PATH, "--output-dir");
 	m_commands.insert(AA_OUTPUT_DIRECTORY_PATH, "-OD");
+	m_commands.insert(AA_OUTPUT_FILE_PATH, "--output-file");
+	m_commands.insert(AA_OUTPUT_FILE_PATH, "-OF");
 	m_commands.insert(AA_IMAGES_INPUT_DIR_PATH, "-I");
 	m_commands.insert(AA_IMAGES_INPUT_DIR_PATH, "--images-input-dir");
 	m_commands.insert(AA_STYLE_SHEETS_INPUT_DIR_PATH, "-S");
@@ -115,6 +116,8 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_commands.insert(AA_COPY_DESIGN_TOKEN_FILE, "-C");
 	m_commands.insert(AA_COPY_DESIGN_TOKEN_FILE, "--copy");
 	m_commands.insert(AA_ERRORS_IGNORE_MODE, "--ignore-errors");
+	m_commands.insert(AA_WEB, "-W");
+	m_commands.insert(AA_QML, "--qml");
 }
 
 
@@ -142,9 +145,27 @@ bool CDesignTokenArgumentsParserComp::IsCopyDesignTokenFileRequired() const
 }
 
 
+bool CDesignTokenArgumentsParserComp::IsWebGenerateResourceRequired() const
+{
+	return this->CheckArgument(AA_WEB);
+}
+
+
+bool CDesignTokenArgumentsParserComp::IsQmlGenerateRequired() const
+{
+	return this->CheckArgument(AA_QML);
+}
+
+
 QByteArray CDesignTokenArgumentsParserComp::GetImagesInputDirectoryPath() const
 {
 	return this->GetArgumentValue(AA_IMAGES_INPUT_DIR_PATH);
+}
+
+
+QByteArrayList CDesignTokenArgumentsParserComp::GetImagesInputDirectoryMultiPath() const
+{
+	return this->GetArgumentValueMulti(AA_IMAGES_INPUT_DIR_PATH);
 }
 
 
@@ -169,6 +190,12 @@ QByteArray CDesignTokenArgumentsParserComp::GetProjectName() const
 QByteArray CDesignTokenArgumentsParserComp::GetOutputDirectoryPath() const
 {
 	return this->GetArgumentValue(AA_OUTPUT_DIRECTORY_PATH);
+}
+
+
+QByteArray CDesignTokenArgumentsParserComp::GetOutputFilePath() const
+{
+	return this->GetArgumentValue(AA_OUTPUT_FILE_PATH);
 }
 
 

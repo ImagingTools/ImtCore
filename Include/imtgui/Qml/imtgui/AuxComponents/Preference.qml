@@ -15,6 +15,47 @@ Rectangle {
     color: Style.baseColor;
     border.color: "#2b2d2d";
 
+    function changeThemeIcons(theme)
+    {
+        for (var i = 0; i < IconStyle.iconNames.length; i++)
+        {
+            var fileName =  IconStyle.iconNames[i].slice(5) + ".svg";
+            var command = "IconStyle." + IconStyle.iconNames[i] + " = \"/Icons/" + theme + "/" + fileName + "\"";
+            console.log("eval command " + command);
+            eval(command);
+        }
+    }
+
+
+    Component.onCompleted: {
+
+//        var iconNames = Style.iconNames;
+//        var type1 = ["On", "Off"];
+//        var type2 = ["Active", "Disabled", "Normal", "Selected"];
+//        for (var i = 0; i < iconNames.length; i++)
+//        {
+//            for (var j = 0; j < type1.length; j++)
+//            {
+//                for (var k = 0; k < type2.length; k++)
+//                {
+//                    var propName = "icon" + iconNames[i] + "_" + type1[j] + "_" + type2[k];
+//                    var path = "/Icons/" + styleColor + "/" + iconNames[i] + "_" + type1[j] + "_" + type2[k]
+//                    console.log("Name: ", propName);
+//                    console.log("Path: ", path);
+//                    var obj = Object.defineProperty(style2, propName,
+//                     {
+//                         enumerable: true,
+//                         configurable: true,
+//                         writable: true,
+//                         value: path
+//                     })
+//                }
+//            }
+//        }
+
+//        console.log("Style iconCamera_On_Active: ", style2.iconCamera_On_Active);
+    }
+
     MouseArea {
         anchors.fill: parent;
 
@@ -236,7 +277,10 @@ Rectangle {
                     anchors.fill: parent;
                     onClicked: {
                         preference.styleColor = "Dark";
+
+                        Style.camera = "../Icons/Dark/Camera.svg";
                         stylesModel.getStyle("Dark");
+                        preference.changeThemeIcons("Dark");
                     }
                }
            }
@@ -269,11 +313,16 @@ Rectangle {
                MouseArea {
                     anchors.fill: parent;
                     onClicked: {
+//                        console.log("IconStyle.icon_Axis_On_Active = ", IconStyle.icon_Axis_On_Active);
+//                        var color = "IconStyle.icon_Axis_On_Active = \"test\" ";
+//                        eval(color)
 
+//                        console.log("IconStyle.icon_Axis_On_Active = ", IconStyle.icon_Axis_On_Active);
                         stylesModel.getStyle("Light");
+                        preference.changeThemeIcons("Light");
+//                        IconStyle.icon_Axis_On_Active = "/Icons/Light/Axis_On_Active.svg";
+                        //"/Icons/Dark/Axis_On_Active.svg"
                         preference.styleColor = "Light";
-
-                        console.log("FONT NAME ", Style.fontFamily);
                     }
                }
            }

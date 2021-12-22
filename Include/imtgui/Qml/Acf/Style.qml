@@ -39,6 +39,11 @@ Item {
     property int fontSize_small: 16;
     property string textColor: "#335777";
 
+    property string camera: "/Icons/Light/Camera.svg";
+
+    property var iconNames: ["Camera", "CameraFlash", "CameraLens2"];
+
+
     FontLoader{
         id: mainFont;
 //        source: "../../Fonts/Ubuntu-Light.ttf";

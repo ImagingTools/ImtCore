@@ -23,11 +23,15 @@ void CDesignTokenProcessorsControllerComp::OnComponentCreated()
 		qWarning() << "Unable to lock " << lockFileName;
 	}
 
+	int procc = m_designTokenProcessors.GetCount();
+	qDebug() << procc;
 
 	for (int i = 0; i < m_designTokenProcessors.GetCount(); ++i){
 		if(m_designTokenProcessors[i]->Exec() != 0){
-			lockFile.unlock();
-			::exit(-1);
+			if(!m_argumentParserAttrPtr->IsErrorsIgnoreRequested()){
+				lockFile.unlock();
+				::exit(-1);
+			}
 		}
 	}
 	lockFile.unlock();

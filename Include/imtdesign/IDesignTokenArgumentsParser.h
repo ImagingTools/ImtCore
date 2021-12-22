@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
+#include <QtCore/QByteArrayList>
 
 
 namespace imtdesign
@@ -30,6 +31,11 @@ public:
 		AA_OUTPUT_DIRECTORY_PATH,
 
 		/**
+			The output file parameter
+		*/
+		AA_OUTPUT_FILE_PATH,
+
+		/**
 			The output directory parameter
 		*/
 		AA_PROJECT_NAME,
@@ -50,12 +56,22 @@ public:
 		AA_SPLIT_FILE_MODE,
 
 		/**
-			The colpy design token file to output dir behavior modificator
+			The copy design token file to output dir behavior modificator
 		*/
 		AA_COPY_DESIGN_TOKEN_FILE,
 
 		/**
-			The colpy design token errors ignore behavior modificator
+			The web compiler parameter
+		*/
+		AA_WEB,
+
+		/**
+			The creating a QMLl file for icons
+		*/
+		AA_QML,
+
+		/**
+			The copy design token errors ignore behavior modificator
 			\details Tells processors to ignore any errors, that could be emerged
 			\warning The program with this modificator must finished with code 0 ALWAYS!!!
 		*/
@@ -67,10 +83,14 @@ public:
 	virtual bool IsErrorsIgnoreRequested() const = 0;
 	virtual bool IsSplitModeRequired() const = 0;
 	virtual bool IsCopyDesignTokenFileRequired() const = 0;
+	virtual bool IsWebGenerateResourceRequired() const = 0;
+	virtual bool IsQmlGenerateRequired() const = 0;
 	virtual QByteArray GetDesignTokenFilePath() const = 0;
 	virtual QByteArray GetImagesInputDirectoryPath() const = 0;
+	virtual QByteArrayList GetImagesInputDirectoryMultiPath() const = 0;
 	virtual QByteArray GetStyleSheetsInputDirectoryPath() const = 0;
 	virtual QByteArray GetOutputDirectoryPath() const = 0;
+	virtual QByteArray GetOutputFilePath() const = 0;
 	virtual QByteArray GetProjectName() const = 0;
 
 };

@@ -1,2 +1,3 @@
 modude Acf
 singleton Style 1.0 Style.qml
+singleton IconStyle 1.0 IconStyle.qml

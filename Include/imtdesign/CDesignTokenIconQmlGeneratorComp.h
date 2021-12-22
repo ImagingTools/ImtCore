@@ -13,22 +13,24 @@
 #include <imtdesign/IDesignTokenArgumentsParser.h>
 #include <imtdesign/IDesignTokenFileParser.h>
 #include <imtdesign/IDesignTokenQrcUpdater.h>
+#include <imtdesign/CDesignTokenArgumentsParserComp.h>
+
+
 
 
 namespace imtdesign
 {
 
-class CDesignTokenQrcUpdaterComp: public ilog::CLoggerComponentBase, public IDesignTokenQrcUpdater, public IDesignTokenProcessor
+
+class CDesignTokenIconQmlGeneratorComp: public ilog::CLoggerComponentBase, public IDesignTokenQrcUpdater, public IDesignTokenProcessor
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CDesignTokenQrcUpdaterComp);
+	I_BEGIN_COMPONENT(CDesignTokenIconQmlGeneratorComp);
 		I_REGISTER_INTERFACE(IDesignTokenQrcUpdater);
 		I_REGISTER_INTERFACE(IDesignTokenProcessor);
 		I_ASSIGN(m_argumentParserAttrPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
-		I_ASSIGN(m_designTokenFileParserAttrPtr, "DesignTokenFileParser", "Design token file parser", true, "IDesignTokenFileParser")
-
 	I_END_COMPONENT;
 
 	// reimplemented (IDesignTokenProcessor)
@@ -49,8 +51,6 @@ private:
 
 private:
 	I_REF(IDesignTokenArgumentsParser, m_argumentParserAttrPtr);
-	I_REF(IDesignTokenFileParser, m_designTokenFileParserAttrPtr);
-
 };
 
 
