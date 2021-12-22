@@ -5,55 +5,33 @@ import imtqml 1.0
 Rectangle {
     id: container;
     property string styleColor: "Light";
-//    property color foneColor: styleColor == "Dark"? "#2b2d2d" : "white";
-//    property color foneColor: Style.mainColor;
-//    property color fontColor: styleColor == "Dark"? "#edefef" : "black";
-    //property color textColor: Style.textColor;
     property int radiusValue: 5;
 
     radius: radiusValue;
     color: Style.baseColor;
     border.color: "#2b2d2d";
 
-    function changeThemeIcons(theme)
-    {
-        for (var i = 0; i < IconStyle.iconNames.length; i++)
-        {
-            var fileName =  IconStyle.iconNames[i].slice(5) + ".svg";
-            var command = "IconStyle." + IconStyle.iconNames[i] + " = \"/Icons/" + theme + "/" + fileName + "\"";
-            console.log("eval command " + command);
-            eval(command);
-        }
+    Component.onCompleted: {
+        preference.changeThemeIcons("Light");
     }
 
-
-    Component.onCompleted: {
-
-//        var iconNames = Style.iconNames;
-//        var type1 = ["On", "Off"];
-//        var type2 = ["Active", "Disabled", "Normal", "Selected"];
-//        for (var i = 0; i < iconNames.length; i++)
-//        {
-//            for (var j = 0; j < type1.length; j++)
-//            {
-//                for (var k = 0; k < type2.length; k++)
-//                {
-//                    var propName = "icon" + iconNames[i] + "_" + type1[j] + "_" + type2[k];
-//                    var path = "/Icons/" + styleColor + "/" + iconNames[i] + "_" + type1[j] + "_" + type2[k]
-//                    console.log("Name: ", propName);
-//                    console.log("Path: ", path);
-//                    var obj = Object.defineProperty(style2, propName,
-//                     {
-//                         enumerable: true,
-//                         configurable: true,
-//                         writable: true,
-//                         value: path
-//                     })
-//                }
-//            }
-//        }
-
-//        console.log("Style iconCamera_On_Active: ", style2.iconCamera_On_Active);
+    function changeThemeIcons(theme)
+    {
+        var type1 = ["On", "Off"];
+        var type2 = ["Active", "Disabled", "Normal", "Selected"];
+        for (var i = 0; i < IconStyle.iconNames.length; i++)
+        {
+            for (var j = 0; j < type1.length; j++)
+            {
+                for (var k = 0; k < type2.length; k++)
+                {
+                    var propName = "icon_" + IconStyle.iconNames[i] + "_" + type1[j] + "_" + type2[k];
+                    var fileName = IconStyle.iconNames[i] + "_" + type1[j] + "_" + type2[k];
+                    var command = "IconStyle." + propName + " = \"/Icons/" + theme + "/" + fileName + ".svg\"";
+                    eval(command);
+                }
+            }
+        }
     }
 
     MouseArea {
@@ -68,8 +46,6 @@ Rectangle {
     Rectangle {
         id: body;
         anchors.fill: parent;
-//       width: parent.width - 5;
-//       height: parent.height - 5;
        anchors.horizontalCenter: parent.horizontalCenter;
        anchors.verticalCenter: parent.verticalCenter;
        clip: true;
@@ -80,14 +56,12 @@ Rectangle {
            id: topPan;
            width: parent.width;
            height: 30;
-          // anchors.bottomMargin: 50;
            color: Style.baseColor;
 
            Rectangle {
                id: iconPref;
                width: 20;
                height: 20;
-//               color: container.styleColor == "Dark"? "white" : "#4C514A";
                color: Style.textColor;
                anchors.left: topPan.left;
                anchors.verticalCenter: topPan.verticalCenter;
@@ -313,15 +287,8 @@ Rectangle {
                MouseArea {
                     anchors.fill: parent;
                     onClicked: {
-//                        console.log("IconStyle.icon_Axis_On_Active = ", IconStyle.icon_Axis_On_Active);
-//                        var color = "IconStyle.icon_Axis_On_Active = \"test\" ";
-//                        eval(color)
-
-//                        console.log("IconStyle.icon_Axis_On_Active = ", IconStyle.icon_Axis_On_Active);
                         stylesModel.getStyle("Light");
                         preference.changeThemeIcons("Light");
-//                        IconStyle.icon_Axis_On_Active = "/Icons/Light/Axis_On_Active.svg";
-                        //"/Icons/Dark/Axis_On_Active.svg"
                         preference.styleColor = "Light";
                     }
                }
@@ -353,10 +320,7 @@ Rectangle {
         id: stylesModel;
 
         function getStyle(theme) {
-//            console.log( "getStyle");
-
             var query = Gql.GqlRequest("query", "GetStyle");
-
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("theme");
             inputParams.InsertFieldArgument("theme", theme);
@@ -368,7 +332,6 @@ Rectangle {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-//            console.log(gqlData);
             this.SetGqlQuery(gqlData);
         }
 
@@ -381,7 +344,6 @@ Rectangle {
                 }
                 if(dataModelLocal !== null && dataModelLocal.ContainsKey("source")){
                     dataModelLocal = dataModelLocal.GetData("source");
-//                    console.log("dataModelLocal", dataModelLocal);
                     preference.parseStyleTheme(dataModelLocal);
                 }
                 else if(stylesModel.ContainsKey("errors")){
