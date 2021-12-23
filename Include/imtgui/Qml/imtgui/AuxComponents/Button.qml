@@ -5,19 +5,13 @@ Rectangle {
     id: container;
     property alias iconSource: image.source;
     radius: container.height * 0.15;
-//    color: ma.mouseX <= 0 || ma.mouseX >= container.width
-//           || ma.mouseY <= 0 || ma.mouseY >= height
-//           || ma.pressed ? "transparent" : "white";
-//    color: ma.mouseX <= 0 || ma.mouseX >= container.width
-//           || ma.mouseY <= 0 || ma.mouseY >= height
-//           || ma.pressed ? "transparent" : Style.buttonColor;
-
     color: ma.mouseX <= 0 || ma.mouseX >= container.width
            || ma.mouseY <= 0 || ma.mouseY >= height
            || ma.pressed ? Style.buttonColor : Style.buttonColor;
+//    property alias iconSource: ma.mouseX <= 0 || ma.mouseX >= container.width
+//                               || ma.mouseY <= 0 || ma.mouseY >= height
+//                               || ma.pressed ? Style.buttonColor : Style.buttonColor;
 
-//    color: Style.backgroundColor;
-//    border.color: Style.buttonBorderColor;
     signal clicked;
 
 
@@ -44,6 +38,7 @@ Rectangle {
 //            container.color = "transparent";
             image.anchors.verticalCenterOffset = 1;
         }
+
         onReleased: {
             image.anchors.verticalCenterOffset = 0;
             if(ma.mouseX <= 0 || ma.mouseX >= container.width

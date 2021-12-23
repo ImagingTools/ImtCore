@@ -181,6 +181,10 @@ Rectangle{
         onClicked: {
             container.clicked();
         }
+
+        onDoubleClicked: {
+            editFeatureDialog.visible = true;
+        }
     }
 
 }

@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Acf 1.0
 import 'AuxComponents'
-
+import imtauthgui 1.0
 
 Rectangle
 {
@@ -22,15 +22,15 @@ Rectangle
         menuPanel.updateModels();
     }
 
-    Component.onCompleted: {
-        var obj = Object.defineProperty(preference, 'newProp',
-         {
-             enumerable: false,
-             configurable: false,
-             writable: true,
-             value: 'it is new property !!!'
-         })
-    }
+//    Component.onCompleted: {
+//        var obj = Object.defineProperty(preference, 'newProp',
+//         {
+//             enumerable: false,
+//             configurable: false,
+//             writable: true,
+//             value: 'it is new property !!!'
+//         })
+//    }
 
 //    FontLoader{
 //        id: mainFont;
@@ -86,6 +86,15 @@ Rectangle
         fontName: container.fontName;
     }
 
+//    ContactInfoEditor {
+//        id: contactInfoEditor;
+//        anchors.left: menuPanel.right;
+//      //  width: tabPanel.width/4*3;
+//        anchors.top: tabPanel.bottom;
+//        anchors.bottom: parent.bottom;
+//    }
+
+
 //    TreeView {
 //        id: treeView;
 //        width: 200;
@@ -99,7 +108,7 @@ Rectangle
         anchors.fill: parent;
         color: "gray";
         opacity: 0.8;
-        visible: preference.visible;
+        visible: preference.visible || editFeatureDialog.visible;
 
         MouseArea {
             anchors.fill: parent;
@@ -120,9 +129,20 @@ Rectangle
     Image {
         width: 100;
         height: 100;
-        source: Style.getImageSource("Axis", "Light", "On", "Active");
+//        source: Style.getImageSource("Axis", "Light", "On", "Active");
 //        source: "../../Icons/Light/Axis_Off_Selected.svg";
         sourceSize.height: 100;
         sourceSize.width: 100;
+    }
+
+    EditFeatureDialog {
+        id: editFeatureDialog;
+
+        visible: false;
+        width: parent.width > 400 ? 400 : parent.width * 0.9;
+        height: parent.height > 350 ? 350 : parent.height * 0.9;
+
+        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.verticalCenter: parent.verticalCenter;
     }
 }

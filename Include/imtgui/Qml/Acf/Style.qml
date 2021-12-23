@@ -45,16 +45,16 @@ Item {
 
     property var iconNames: ["Camera", "CameraFlash", "CameraLens2"];
 
-    function getImageSource (name, styleTheme, buttonState, buttonMode)
-    {
-        var imageSource = "Icons/" + styleTheme + "/" + name + "_" + buttonState + "_" + buttonMode + ".svg";
-        return imageSource;
-    }
+//    function getImageSource (name, styleTheme, buttonState, buttonMode)
+//    {
+//        var imageSource = "Icons/" + styleTheme + "/" + name + "_" + buttonState + "_" + buttonMode + ".svg";
+//        return imageSource;
+//    }
 
     FontLoader{
         id: mainFont;
 //        source: "../../Fonts/Ubuntu-Light.ttf";
-        source: "../Fonts/Times New Roman.ttf";
+       // source: "../Fonts/Times New Roman.ttf";
     }
 
     FontLoader{

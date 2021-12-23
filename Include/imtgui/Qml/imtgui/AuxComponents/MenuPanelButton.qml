@@ -42,7 +42,7 @@ Item {
     }
 
     Rectangle{
-        id: selection;
+      //  id: selection;
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;

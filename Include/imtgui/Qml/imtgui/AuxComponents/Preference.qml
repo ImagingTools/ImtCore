@@ -74,6 +74,7 @@ Rectangle {
                height: 20;
                anchors.left: topPan.left;
                anchors.verticalCenter: topPan.verticalCenter;
+               source: "../../../" + "Icons/" + Style.theme + "/" + "Settings" + "_" + "On" + "_" + "Normal" + ".svg";
               // source: "../../../" + Style.getImageSource("Settings", Style.theme, "On", "Active");
            }
 
@@ -114,6 +115,7 @@ Rectangle {
                height: 15;
 //               color: Style.textColor;
                radius: radiusValue;
+               iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
 //               iconSource: "../../../" + Style.getImageSource("Close", Style.theme, "On", "Normal");
 //               iconSource: "../../../" + Style.theme;
               MouseArea {

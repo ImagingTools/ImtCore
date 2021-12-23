@@ -41,8 +41,7 @@ Rectangle {
         x: 10;
         width: 30;
         height: 30;
-//        iconSource:"../../Icons/Left.svg";
-      //  iconSource: "../../../" + Style.getImageSource("Left", Style.theme, "On", "Active");
+        iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Left" + "_" + "On" + "_" + "Normal" + ".svg";
         onClicked: {
             console.log("Left ckicked!");
         }
@@ -55,7 +54,18 @@ Rectangle {
         anchors.leftMargin: 10;
         width: 30;
         height: 30;
-       // iconSource: "../../../" + Style.getImageSource("Right", Style.theme, "On", "Active");
+        iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_" + "On" + "_" + "Normal" + ".svg";
+//        iconSource: "../../../" + Style.getImageSource("Right", Style.theme, "On", "Active");
+//        iconSource: leftButtonMA.mouseX <= 0 || leftButtonMA.mouseX >= nextStack.width
+//                                       || leftButtonMA.mouseY <= 0 || leftButtonMA.mouseY >= nextStack.height
+//                                       || leftButtonMA.pressed ?
+//                                        "../../../" + Style.getImageSource("Right", Style.theme, "On", "Active") :
+//                                        Style.buttonColor;
+
+        MouseArea {
+            id: leftButtonMA;
+            anchors.fill: parent;
+        }
     }
 
     Button {
@@ -67,10 +77,12 @@ Rectangle {
         anchors.topMargin: 10;
         width: 20;
         height: 20;
-     //   iconSource: "../../../" + Style.getImageSource("Settings", Style.theme, "On", "Active");
+//        iconSource: "../../../" + Style.getImageSource("Settings", Style.theme, "On", "Active");
+        iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Settings" + "_" + "On" + "_" + "Normal" + ".svg";
         onClicked: {
             console.log("Preference button clicked !");
             preference.visible = true;
+
         }
     }
 
@@ -102,6 +114,7 @@ Rectangle {
             delegate: TopButton {
                 text: model[CommandEnum.NAME];
 //                imageSource: model[CommandEnum.ICON];
+                imageSource: "../../../" + "Icons/" + Style.theme + "/" + model[CommandEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
                 fontName: topPanel.fontName;
             }
         }

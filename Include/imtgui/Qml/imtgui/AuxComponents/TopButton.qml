@@ -57,7 +57,8 @@ Item {
 //        }
         Image {
             id: image;
-            source: !container.enabled ? container.imageSourceDisabled : container.imageSource;
+//            source: !container.enabled ? container.imageSourceDisabled : container.imageSource;
+            source: container.imageSource;
             anchors.centerIn: parent;
             fillMode: Image.PreserveAspectFit;
             height: parent.height - 8;
