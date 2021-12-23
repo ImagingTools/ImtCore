@@ -37,10 +37,8 @@ Rectangle {
             text:  model[PageEnum.NAME];
             textColor: Style.textColor;
             fontName: menuPanel.fontName;
-            imageSource: {
-                return (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Selected" + ".svg":
-                                       "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
-            }
+            imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Selected" + ".svg":
+                                                     "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
             selected: lvPages.currentIndex === model.index ? true : false;
 
             onClicked: {
