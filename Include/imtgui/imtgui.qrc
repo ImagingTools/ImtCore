@@ -25,6 +25,4 @@
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Regular.ttf">Qml/Fonts/Ubuntu-Regular.ttf</file>
     </qresource>
-    <qresource prefix="/"/>
-    <qresource prefix="/new/prefix1"/>
 </RCC>
