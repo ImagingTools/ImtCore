@@ -1,14 +1,15 @@
 <RCC>
     <qresource prefix="/Icons"/>
     <qresource prefix="/ColorIcons"/>
+
     <qresource prefix="/qml">
-        <file alias="ContactInfoEditor.qml">Resources/qml/ContactInfoEditor.qml</file>
-        <file alias="TextFieldCustom.qml">Resources/qml/TextFieldCustom.qml</file>
-        <file alias="main.qml">Resources/qml/main.qml</file>
-        <file alias="colors.qml">Resources/qml/colors.qml</file>
+		<file alias="imtauthgui/ContactInfoEditor.qml">Qml/imtauthgui/ContactInfoEditor.qml</file>
+		<file alias="imtauthgui/TextFieldCustom.qml">Qml/imtauthgui/TextFieldCustom.qml</file>
+  		<file alias="imtauthgui/qmldir">Qml/imtauthgui/qmldir</file>
     </qresource>
-    <qresource prefix="/html">
+
+<!--    <qresource prefix="/html">
         <file alias="index.html">Resources/html/index.html</file>
         <file alias="colors.html">Resources/html/colors.html</file>
-    </qresource>
+		</qresource>-->
 </RCC>

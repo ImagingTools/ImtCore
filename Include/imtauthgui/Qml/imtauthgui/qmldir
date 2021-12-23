@@ -1,0 +1,3 @@
+module imtauthgui
+ContactInfoEditor 1.0 ContactInfoEditor.qml
+TextFieldCustom 1.0 TextFieldCustom.qml
