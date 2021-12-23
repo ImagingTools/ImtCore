@@ -419,7 +419,11 @@ void CSqlDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 
 	istd::CChangeGroup changeGroup(this);
 
-	ResetData();
+	QWriteLocker writeLock(&m_objectInfoMapMutex);
+
+	m_objectInfoMap.clear();
+
+	writeLock.unlock();
 
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError);
@@ -436,9 +440,11 @@ void CSqlDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 			objectInfo.collectionMetaInfoPtr = collectionMetaInfoPtr;
 			objectInfo.metaInfoPtr = objectMetaInfoPtr;
 
-			QWriteLocker writeLock(&m_objectInfoMapMutex);
+			writeLock.relock();
 
 			m_objectInfoMap[objectId] = objectInfo;
+
+			writeLock.unlock();
 		}
 	}
 }
