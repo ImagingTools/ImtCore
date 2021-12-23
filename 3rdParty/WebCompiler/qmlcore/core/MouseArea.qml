@@ -26,7 +26,7 @@ Item {
 	// property bool touchEnabled: true;	///< enable touch events handling flag
 	property bool hoverEnabled: true;	///< enable mouse hover event handling flag
 	// property bool wheelEnabled: true;	///< enable mouse click event handling flag
-	property bool enabled: true; // by Artur, enabled mouse event
+	
 	property alias hover: containsMouse;	///< containsMouse property alias
 	//property alias hoverable: hoverEnabled;	///< hoverEnabled property alias
 

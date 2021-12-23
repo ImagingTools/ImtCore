@@ -6,8 +6,8 @@ BaseLayout {
 	property Item highlight;		///< an object that follows currentIndex and placed below other elements
 	property Object model;			///< model object to attach to
 	property Item delegate;			///< delegate - template object, filled with model row
-	property int contentX;			///< x offset to visible part of the content surface
-	property int contentY;			///< y offset to visible part of the content surface
+	property int contentX: -content.x;			///< x offset to visible part of the content surface
+	property int contentY: -content.y;			///< y offset to visible part of the content surface
 	property int scrollingStep: 0;	///< scrolling step
 	property int animationDuration: 0;
 	property string animationEasing: "ease";
@@ -254,7 +254,7 @@ BaseLayout {
 			callback.call(this, item)
 
 		item.recursiveVisible = this.recursiveVisible && item.visible && item.visibleInView
-
+		
 		return item
 	}
 
@@ -421,22 +421,63 @@ BaseLayout {
 		}
 	}
 
+
+
 	onCompleted: {
 		var self = this
 		this.element.dom.addEventListener('scroll', function(e) {
-			if(self.interactive){
-				var x = self.element.getScrollX(), y = self.element.getScrollY()
-				self._updateScrollPositions(x, y)
-				self.scrollEvent(x, y)
-			} else {
+			e.preventDefault()
+			self._context._processActions()
+
+		}.bind(this))
+
+		this.element.dom.addEventListener("wheel", (e) => {
+			if(this.interactive && this.enabled){
+				e.preventDefault()
+				this.content._scroll(e.deltaX, e.deltaY)
+			}
+			if(!this.enabled){
 				e.stopPropagation()
 				e.preventDefault()
 			}
-			
-			
-		}.bind(this))
+		})
 
-		this.element.dom.addEventListener("wheel", (e) => {if(!this.interactive){e.stopPropagation();e.preventDefault()}})
+		this.element.dom.addEventListener("touchstart", (e) => {
+			e.preventDefault()
+			this._stateTouch = e.changedTouches[0]
+			this._isTouchOnly = true
+
+		});
+        this.element.dom.addEventListener("touchend", (e) => {
+			e.preventDefault()
+			e.stopPropagation()
+			if(this._isTouchOnly === true){
+				let clickEvent = this._context.backend.document.createEvent('MouseEvents');
+				clickEvent.initMouseEvent(
+					'click', true, true, this._context.backend.window, 0,
+					0, 0, e.changedTouches[0].clientX, e.changedTouches[0].clientY, false, false,
+					false, false, 0, null
+				);
+				e.target.dispatchEvent(clickEvent);
+			}
+
+		});
+
+        this.element.dom.addEventListener("touchmove", (e) => {
+			this._isTouchOnly = false
+			if(this.interactive && this.enabled){
+				e.preventDefault()
+				
+				let nextTouch = e.changedTouches[0]
+				//if(this._stateTouch)
+				this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, this._stateTouch.clientY-nextTouch.clientY)
+				this._stateTouch = nextTouch
+			}
+			if(!this.enabled){
+				e.stopPropagation()
+				e.preventDefault()
+			}
+		});
 
 
 		this.style({

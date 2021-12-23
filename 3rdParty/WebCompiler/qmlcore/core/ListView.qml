@@ -29,20 +29,49 @@ BaseView {
 	}
 
 	///@private
-	function positionViewAtIndex(idx) {
-		if (this.trace)
-			log('positionViewAtIndex ' + idx)
+	// function positionViewAtIndex(idx) {
+	// 	if (this.trace)
+	// 		log('positionViewAtIndex ' + idx)
 
-		var horizontal = this.orientation === this.Horizontal
-		var itemBox = this.getItemPosition(idx)
-		var center = this.positionMode === this.Center
+	// 	var horizontal = this.orientation === this.Horizontal
+	// 	var itemBox = this.getItemPosition(idx)
+	// 	var center = this.positionMode === this.Center
 
-		if (horizontal) {
-			this.positionViewAtItemHorizontally(itemBox, center, true)
-		} else {
-			this.positionViewAtItemVertically(itemBox, center, true)
+	// 	if (horizontal) {
+	// 		this.positionViewAtItemHorizontally(itemBox, center, true)
+	// 	} else {
+	// 		this.positionViewAtItemVertically(itemBox, center, true)
+	// 	}
+	// }
+
+	function positionViewAtBeginning(){
+		switch(this.orientation){
+			case ListView.Vertical: this.element.dom.scrollTop = 0; break;
+			case ListView.Horizontal: this.element.dom.scrollLeft = 0; break;
 		}
-	}
+    }
+    function positionViewAtEnd(){
+		switch(this.orientation){
+			case ListView.Vertical: this.element.dom.scrollTop = this._items[0].height * (this.count-1) + this.spacing * (this.count-1); break;
+			case ListView.Horizontal: this.element.dom.scrollLeft = this._items[0].width * (this.count-1) + this.spacing * (this.count-1); break;
+		}
+    }
+    function positionViewAtIndex(index, mode){
+		let offsetX = 0
+		let offsetY = 0
+
+        switch(mode){
+            case ListView.Beginning: offsetX = 0; offsetY = 0; break;
+            case ListView.Center: offsetX = this._items[0].width/2; offsetY = this._items[0].height/2; break;
+            case ListView.End: offsetX = this._items[0].width; offsetY = this._items[0].height; break;
+        }
+		switch(this.orientation){
+			case ListView.Vertical: this.element.dom.scrollTop = this._items[0].height * index + this.spacing * index + offsetY; break;
+			case ListView.Horizontal: this.element.dom.scrollLeft = this._items[0].width * index + this.spacing * index + offsetX; break;
+		}
+
+
+    }
 
 	///@private
 	onKeyPressed: {

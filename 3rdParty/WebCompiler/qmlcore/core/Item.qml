@@ -8,6 +8,7 @@ Object {
 	property bool clip;						///< clip all children outside rectangular area defined by x, y, width, height
 	property lazy radius: Radius { }		///< round corner radius(es), allow forwarding, e.g. item.radius: 5;
 	property bool fullscreen;				///< fullscreen mode enabled / disabled
+	property bool enabled: true; // by Artur, enabled
 
 	property bool focus;					///< this item can be focused
 	property bool focused; ///< this item is focused among its siblings
@@ -459,7 +460,7 @@ Object {
 	}
 
 	onCssPointerTouchEventsChanged: {
-		var style = value? 'auto': 'none'
+		var style = zzvalue? 'auto': 'none'
 		this.style('pointer-events', style)
 		this.style('touch-action', style)
 	}

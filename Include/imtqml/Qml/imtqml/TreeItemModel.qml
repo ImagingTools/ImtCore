@@ -24,7 +24,7 @@ JSONListModel {
             return null
         if(typeof retVal === 'object'){
             var retModel
-            retModel = this.createComponent("TreeItemModel.qml", this);
+            retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
             retModel.append(retVal);
             //            var component = Qt.createComponent("TreeItemModel.qml");
 //            if (component.status === Component.Ready) {

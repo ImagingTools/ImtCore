@@ -9,7 +9,7 @@ Rectangle{
 
     property string text: "Text";
     property real delegateWidth: count == 0 ? 0 : width/count;
-    property int count: bodyArray.length;
+    property int count: 3; // bodyArray.length;
     property bool selected: false;
     property string fontName: "";
     property int fontSize: 12;
@@ -22,22 +22,24 @@ Rectangle{
     property string maxSizeText: "";
 
     onBodyArrayChanged: {
-        setContainerSize();
+        container.setContainerSize();
     }
 
     function clearArray(){
-        while(bodyArray.length > 0)
-            bodyArray.pop();
+        while(container.bodyArray.length > 0)
+            container.bodyArray.pop();
+        container.count = 0
     }
 
     function addToArray(str){
-        bodyArray.push(str);
+        container.bodyArray.push(str);
+        container.count = container.bodyArray.length;
     }
 
     function setContainerSize(){
-        for(var i = 0; i < bodyArray.length; i++){
-            if(bodyArray[i].length > container.maxSizeText.length){
-                container.maxSizeText = bodyArray[i];
+        for(var i = 0; i < container.bodyArray.length; i++){
+            if(container.bodyArray[i].length > container.maxSizeText.length){
+                container.maxSizeText = container.bodyArray[i];
             }
         }
     }
@@ -76,40 +78,99 @@ Rectangle{
         }
     }
 
-    Row{
-        id:row;
+    ListView {
+        id: dataList;
         anchors.fill: parent;
-        Repeater{
-            id: rep;
-            model: 3; //container.count
-            Item{
-                id:element;
-                height: container.height;
-                width: container.delegateWidth;
-                Text {
-                    id: name;
-                    //anchors.verticalCenter: parent.verticalCenter
-                    anchors.top: parent.top;
-                    anchors.topMargin: container.textTopMargin;
-                    anchors.left: parent.left;
-                    anchors.leftMargin: 8;
+        clip: true;
+//            boundsBehavior: Flickable.StopAtBounds;
+        orientation: ListView.Horizontal;
+        spacing: 0;
+        model: container.count;
+        delegate: Rectangle {
+            id:deleg;
+            width: container.delegateWidth;
+            height: container.height;
+            color: "transparent";
+            Text {
+                id: name;
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: parent.left;
+                anchors.leftMargin: 8;
+                width: container.delegateWidth - 16;
+
 //                    font.pixelSize: container.fontSize;
-                    //font.family: container.fontName;
-                    font.bold: false;
-                    color: Style.textColor;
-                    width: container.delegateWidth - 16;
-//                    height: contentHeight;
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
-                    text: container.bodyArray[model.index];
+//                    font.family: container.fontName;
+//                font.bold: true; //container.fontBold
+//                    color: container.textColor
+                color: Style.textColor;
+                text: container.bodyArray[model.index];
 
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_subtitle;
-                }
-
-
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_subtitle;
             }
         }
     }
+
+//    Row{
+//        id:row;
+//        anchors.fill: parent;
+////        Repeater{
+////            id: rep;
+////            model: 3; //container.count;
+//            Item{
+//                id:element;
+//                height: container.height;
+//                width: container.delegateWidth;
+//                Text {
+//                    id: name;
+//                    //anchors.verticalCenter: parent.verticalCenter
+//                    anchors.top: parent.top;
+//                    anchors.topMargin: container.textTopMargin;
+//                    anchors.left: parent.left;
+//                    anchors.leftMargin: 8;
+////                    font.pixelSize: container.fontSize;
+//                    //font.family: container.fontName;
+//                    font.bold: false;
+//                    color: Style.textColor;
+//                    width: container.delegateWidth - 16;
+////                    height: contentHeight;
+//                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
+//                    text: "test"; //container.bodyArray[model.index];
+
+//                    font.family: Style.fontFamily;
+//                    font.pixelSize: Style.fontSize_subtitle;
+//                }
+
+
+//            }
+//            Item{
+
+//                height: container.height;
+//                width: container.delegateWidth;
+//                Text {
+
+//                    //anchors.verticalCenter: parent.verticalCenter
+//                    anchors.top: parent.top;
+//                    anchors.topMargin: container.textTopMargin;
+//                    anchors.left: parent.left;
+//                    anchors.leftMargin: 8;
+////                    font.pixelSize: container.fontSize;
+//                    //font.family: container.fontName;
+//                    font.bold: false;
+//                    color: Style.textColor;
+//                    width: container.delegateWidth - 16;
+////                    height: contentHeight;
+//                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
+//                    text: "test"; //container.bodyArray[model.index];
+
+//                    font.family: Style.fontFamily;
+//                    font.pixelSize: Style.fontSize_subtitle;
+//                }
+
+
+//            }
+////        }
+//    }
 
     MouseArea {
         id: ma;
