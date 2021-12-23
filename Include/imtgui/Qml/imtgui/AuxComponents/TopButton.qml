@@ -80,15 +80,6 @@ Item {
         visible: container.checkable ? container.isChecked : container.highlighted;
     }
 
-//    DropShadow{
-//        id: shadow;
-//        anchors.fill: button;
-//        source: button;
-//        horizontalOffset: 0;
-//        verticalOffset: 1;
-//        color: "#a0a0a0";
-//        visible: !container.isEmpty;
-//    }
 
     MouseArea{
         id: ma;

@@ -41,7 +41,8 @@ Rectangle {
         x: 10;
         width: 30;
         height: 30;
-        iconSource:"../../Icons/Left.svg";
+//        iconSource:"../../Icons/Left.svg";
+      //  iconSource: "../../../" + Style.getImageSource("Left", Style.theme, "On", "Active");
         onClicked: {
             console.log("Left ckicked!");
         }
@@ -54,7 +55,7 @@ Rectangle {
         anchors.leftMargin: 10;
         width: 30;
         height: 30;
-        iconSource:"../../Icons/Right.svg";
+       // iconSource: "../../../" + Style.getImageSource("Right", Style.theme, "On", "Active");
     }
 
     Button {
@@ -64,9 +65,9 @@ Rectangle {
         anchors.right: parent.right;
         anchors.rightMargin: 10;
         anchors.topMargin: 10;
-        width: 30;
-        height: 30;
-//        color: "red";
+        width: 20;
+        height: 20;
+     //   iconSource: "../../../" + Style.getImageSource("Settings", Style.theme, "On", "Active");
         onClicked: {
             console.log("Preference button clicked !");
             preference.visible = true;
@@ -80,8 +81,6 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter;
 
         text: qsTr("Products");
-//        font.family: "Helvetica";
-//        font.pixelSize: 25;
         color: Style.textColor;
         font.family: Style.fontFamily;
         font.pixelSize: Style.fontSize_title;

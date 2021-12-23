@@ -120,8 +120,8 @@ Rectangle
     Image {
         width: 100;
         height: 100;
-//        source: IconStyle.icon_Axis_On_Active;
-        source: "../../Icons/Light/Axis_Off_Selected.svg";
+        source: Style.getImageSource("Axis", "Light", "On", "Active");
+//        source: "../../Icons/Light/Axis_Off_Selected.svg";
         sourceSize.height: 100;
         sourceSize.width: 100;
     }

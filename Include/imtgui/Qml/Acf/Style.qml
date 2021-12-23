@@ -10,6 +10,8 @@ Item {
     property real mainHeight: window.height;
     property real mainSize: window.width;
 
+    property string theme: "Light";
+
     property string fontFamily: mainFont.name;
     property string fontFamilyBold: boldFont.name;
     //    property string fontFamily: "MS Shell Dlg 2"
@@ -43,6 +45,11 @@ Item {
 
     property var iconNames: ["Camera", "CameraFlash", "CameraLens2"];
 
+    function getImageSource (name, styleTheme, buttonState, buttonMode)
+    {
+        var imageSource = "Icons/" + styleTheme + "/" + name + "_" + buttonState + "_" + buttonMode + ".svg";
+        return imageSource;
+    }
 
     FontLoader{
         id: mainFont;

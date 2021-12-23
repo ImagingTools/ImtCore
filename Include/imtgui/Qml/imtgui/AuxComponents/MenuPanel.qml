@@ -31,23 +31,18 @@ Rectangle {
         id: lvPages;
         anchors.fill: parent;
 
-
-
-//        delegate:  Rectangle{
-//            width: 200; //menuPanel.width;
-//            height: 100; //width;
-//            color: "red";
-
-//        }
-
-
         delegate:  MenuPanelButton{
             width: menuPanel.width;
             height: width;
             text:  model[PageEnum.NAME];
             textColor: Style.textColor;
             fontName: menuPanel.fontName;
-            imageSource: model[PageEnum.ICON];
+            /*imageSource: model[PageEnum.ICON];*/
+//            imageSource: {
+//                return (highlighted || selected) ? "../../../" + Style.getImageSource(model[PageEnum.ICON], Style.theme, "On", "Active") :
+//                                       "../../../" + Style.getImageSource(model[PageEnum.ICON], Style.theme, "On", "Normal");
+//            }
+//            imageSource: "../../../" + Style.getImageSource(model[PageEnum.ICON], Style.theme, "On", "Active");
 //            imageSourceDisabled: model[PageEnum.ICON_OFF_SELECTED];
 //            imageSourceSelected: model[PageEnum.ICON_ON_SELECTED];
             selected: lvPages.currentIndex === model.index ? true : false;
@@ -57,6 +52,10 @@ Rectangle {
                 menuPanel.activePageId = model[PageEnum.ID];
                 menuPanel.activePageName = model[PageEnum.NAME];
                 menuPanel.activeIcon = model[PageEnum.ICON];
+
+                console.log("menuPanel.activePageName ", menuPanel.activePageName);
+                console.log("menuPanel.activePageId ", menuPanel.activePageId);
+                console.log("menuPanel.activeIcon ", model[PageEnum.ICON]);
             }
         }
 

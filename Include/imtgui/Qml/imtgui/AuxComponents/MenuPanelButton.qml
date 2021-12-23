@@ -36,7 +36,8 @@ Item {
 //                                      container.highlighted ? container.imageSourceSelected :
 //                                                              container.selected ? container.imageSourceSelected :
 //                                                                                   container.imageSource
-        source: container.highlighted ? container.imageSourceSelected : container.imageSource;
+//        source: container.highlighted ? container.imageSourceSelected : container.imageSource;
+        source: container.imageSource;
 
     }
 
@@ -79,7 +80,6 @@ Item {
         onClicked: {
             container.clicked();
         }
-
     }
 
 }

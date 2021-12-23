@@ -17,21 +17,21 @@ Rectangle {
 
     function changeThemeIcons(theme)
     {
-        var type1 = ["On", "Off"];
-        var type2 = ["Active", "Disabled", "Normal", "Selected"];
-        for (var i = 0; i < IconStyle.iconNames.length; i++)
-        {
-            for (var j = 0; j < type1.length; j++)
-            {
-                for (var k = 0; k < type2.length; k++)
-                {
-                    var propName = "icon_" + IconStyle.iconNames[i] + "_" + type1[j] + "_" + type2[k];
-                    var fileName = IconStyle.iconNames[i] + "_" + type1[j] + "_" + type2[k];
-                    var command = "IconStyle." + propName + " = \"/Icons/" + theme + "/" + fileName + ".svg\"";
-                    eval(command);
-                }
-            }
-        }
+//        var type1 = ["On", "Off"];
+//        var type2 = ["Active", "Disabled", "Normal", "Selected"];
+//        for (var i = 0; i < IconStyle.iconNames.length; i++)
+//        {
+//            for (var j = 0; j < type1.length; j++)
+//            {
+//                for (var k = 0; k < type2.length; k++)
+//                {
+//                    var propName = "icon_" + IconStyle.iconNames[i] + "_" + type1[j] + "_" + type2[k];
+//                    var fileName = IconStyle.iconNames[i] + "_" + type1[j] + "_" + type2[k];
+//                    var command = "IconStyle." + propName + " = \"/Icons/" + theme + "/" + fileName + ".svg\"";
+//                    eval(command);
+//                }
+//            }
+//        }
     }
 
     MouseArea {
@@ -58,14 +58,23 @@ Rectangle {
            height: 30;
            color: Style.baseColor;
 
-           Rectangle {
+//           Rectangle {
+//               id: iconPref;
+//               width: 20;
+//               height: 20;
+//               color: Style.textColor;
+//               anchors.left: topPan.left;
+//               anchors.verticalCenter: topPan.verticalCenter;
+//               radius: radiusValue;
+//           }
+
+           Image {
                id: iconPref;
                width: 20;
                height: 20;
-               color: Style.textColor;
                anchors.left: topPan.left;
                anchors.verticalCenter: topPan.verticalCenter;
-               radius: radiusValue;
+              // source: "../../../" + Style.getImageSource("Settings", Style.theme, "On", "Active");
            }
 
            Text {
@@ -79,22 +88,42 @@ Rectangle {
                font.pixelSize: Style.fontSize_subtitle;
            }
 
-           Rectangle {
+//           Rectangle {
+//               id: exit;
+//               anchors.right: topPan.right;
+//               anchors.verticalCenter: topPan.verticalCenter;
+//               width: 20;
+//               height: 20;
+//               color: Style.textColor;
+//               radius: radiusValue;
+//               MouseArea {
+//                   anchors.fill: parent;
+//                   onClicked: {
+//                       cbLang.menuVisible = false;
+//                       cbUnit.menuVisible = false;
+//                       preference.visible = false;
+//                   }
+//               }
+//           }
+
+           Button {
                id: exit;
                anchors.right: topPan.right;
                anchors.verticalCenter: topPan.verticalCenter;
-               width: 20;
-               height: 20;
-               color: Style.textColor;
+               width: 15;
+               height: 15;
+//               color: Style.textColor;
                radius: radiusValue;
-               MouseArea {
-                   anchors.fill: parent;
-                   onClicked: {
-                       cbLang.menuVisible = false;
-                       cbUnit.menuVisible = false;
-                       preference.visible = false;
-                   }
-               }
+//               iconSource: "../../../" + Style.getImageSource("Close", Style.theme, "On", "Normal");
+//               iconSource: "../../../" + Style.theme;
+              MouseArea {
+                  anchors.fill: parent;
+                  onClicked: {
+                      cbLang.menuVisible = false;
+                      cbUnit.menuVisible = false;
+                      preference.visible = false;
+                  }
+              }
            }
        }
 
@@ -255,6 +284,7 @@ Rectangle {
                         Style.camera = "../Icons/Dark/Camera.svg";
                         stylesModel.getStyle("Dark");
                         preference.changeThemeIcons("Dark");
+                        Style.theme = "Dark";
                     }
                }
            }
@@ -290,6 +320,7 @@ Rectangle {
                         stylesModel.getStyle("Light");
                         preference.changeThemeIcons("Light");
                         preference.styleColor = "Light";
+                        Style.theme = "Light";
                     }
                }
            }
