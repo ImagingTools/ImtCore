@@ -22,7 +22,7 @@ QLabel[Header=true] {
 	font-size: 12pt;
 }
 
-QLineEdit, QPlainTextEdit 
+QLineEdit, QPlainTextEdit
 {
 	height: 1.3em;
 	font-size: 10pt;
@@ -35,7 +35,7 @@ QToolButton#windowTitle
 	border-radius: 3px;
 }
 
-QToolButton#PageIconToolButton 
+QToolButton#PageIconToolButton
 {
 	padding: 0px;
 }

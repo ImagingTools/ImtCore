@@ -1,6 +1,6 @@
 QWidget
 {
-	background: ${Active.Background}; 	
+	background: ${Active.Background};
 	color: ${Active.Foreground};
 }
 
@@ -53,7 +53,7 @@ QWidget#StatusFrame
 
 QLabel#PageLabel
 {
-	color: ${Active.Text}; /*color: #335777;*/
+	color: ${Active.Text};
 }
 
 QWidget[ImtTopFrame=true]
@@ -120,7 +120,7 @@ QComboBox::item:selected
 
 QHeaderView::section
 {
-	border-bottom: 1px solid ${Active.Mid}; /*palette(mid); */
+	border-bottom: 1px solid ${Active.Mid};
 }
 
 QTabBar
@@ -131,19 +131,19 @@ QTabBar
 
 QTabBar::tab[CollectionView=true]
 {
-	color: ${Active.Button}; /* color: rgb(128,128,128); */
+	color: ${Active.Button};
 	
 	background-color: ${Active.Base};
 }
 
 QTabBar::tab:selected[CollectionView=true]
 {
-	color: ${Active.Text}; /* color: rgb(235, 98, 37, 200); */
+	color: ${Active.Text};
 }
 
 QTabBar::tab::top:selected[CollectionView=true]
 {
-	border-bottom: 2px solid ${Active.Link}; /* rgba(235, 98, 37, 128); */
+	border-bottom: 2px solid ${Active.Link};
 }
 
 QTabBar::tab::left:selected[CollectionView=true]
@@ -153,12 +153,12 @@ QTabBar::tab::left:selected[CollectionView=true]
 
 QTabBar::tab::right:selected[CollectionView=true]
 {
-	border-left: 2px solid ${Active.Link}; /* rgba(235, 98, 37, 128); */
+	border-left: 2px solid ${Active.Link};
 }
 
 QTabBar::tab::bottom:selected[CollectionView=true]
 {
-	border-bottom: 2px solid ${Active.Link}; /* rgba(235, 98, 37, 128); */
+	border-bottom: 2px solid ${Active.Link};
 }
 
 QFrame[frameShape="4"],
