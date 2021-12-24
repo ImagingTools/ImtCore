@@ -7,54 +7,123 @@ namespace imtguigql
 
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	if (gqlRequest.GetCommandId() != *m_modelIdCompPtr){
 		return nullptr;
 	}
 
-	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
-	const QList<imtgql::CGqlObject>* paramList = gqlRequest.GetParams();
-
-	int count = fieldList->count();
-
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* itemsModel = nullptr;
-	bool isSetResponce = false;
-	QByteArrayList fields;
-
-	for (int i = 0; i < count; i++){
-		if (fieldList->at(i).GetId() == "items"){
-			fields = fieldList->at(i).GetFieldIds();
-			isSetResponce = true;
-		}
+	int operationType = OT_UNKNOWN;
+	if (!GetOperationFromRequest(gqlRequest, errorMessage, operationType)){
+		return nullptr;
 	}
 
+	Q_ASSERT(operationType != OT_UNKNOWN);
+
+	switch (operationType){
+	case OT_NEW:
+		return InsertObject(gqlRequest, errorMessage);
+	case OT_UPDATE:
+		return UpdateObject(gqlRequest, errorMessage);
+	case OT_DELETE:
+		return DeleteObject(gqlRequest, errorMessage);
+	case OT_RENAME:
+		return RenameObject(gqlRequest, errorMessage);
+	case OT_SET_DESCRIPTION:
+		return SetObjectDescription(gqlRequest, errorMessage);
+	case OT_LIST:
+		return ListObjects(gqlRequest, errorMessage);
+	}
+
+	return nullptr;
+}
 
 
-//	if(m_pagesDataProviderCompPtr.IsValid() && isSetResponce){
-//		itemsModel = m_pagesDataProviderCompPtr->GetTreeItemModel(*paramList, fields);
-//		if (itemsModel == nullptr){
-//			errorMessage = QObject::tr("Pages is empty").toUtf8();
-//		}
-//	}
-//	else{
-//		errorMessage = QObject::tr("Incorrect qyery").toUtf8();
-//	}
+// protected methods
 
-//	if (!errorMessage.isEmpty()){
-//		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
-//		errorsItemModel->SetData("message", errorMessage);
-//	}
-//	else {
+bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage,
+			int& operationType) const
+{
+	// IMPLEMENT!!!
+	return false;
+}
 
-//        dataModel = new imtbase::CTreeItemModel();
-//		dataModel->SetExternTreeModel("items", itemsModel);
 
-//    }
-//	rootModel->SetExternTreeModel("data", dataModel);
-	return rootModel;
+QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const
+{
+	return QByteArray();
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescription(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = "No collection component was set";
+
+		return nullptr;
+	}
+
+	QByteArray objectId = GetObjectIdFromRequest(gqlRequest);
+	if (objectId.isEmpty()){
+		errorMessage = "No object-ID could not be extracted from the request";
+
+		return nullptr;
+	}
+
+	bool retVal = m_objectCollectionCompPtr->RemoveObject(objectId);
+	if (retVal){
+		// CREATE SUCCESS RESPONSE!
+
+		Q_ASSERT_X(false, "CObjectCollectionControllerCompBase::DeleteObject", "Not implemented");
+	}
+
+	return nullptr;
 }
 
 

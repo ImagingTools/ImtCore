@@ -7,8 +7,8 @@ namespace imtqml
 
 // public methods
 
-CPageDataProviderCompBase::CPageDataProviderCompBase() :
-	CComponentBase()
+CPageDataProviderCompBase::CPageDataProviderCompBase()
+	:BaseClass()
 {
 }
 

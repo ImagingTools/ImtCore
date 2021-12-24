@@ -23,8 +23,30 @@ public:
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 	I_END_COMPONENT;
 
+	enum OperationType
+	{
+		OT_UNKNOWN,
+		OT_NEW,
+		OT_UPDATE,
+		OT_DELETE,
+		OT_RENAME,
+		OT_SET_DESCRIPTION,
+		OT_LIST,
+		OT_USER_OPERATION = 1000
+	};
+
 	// reimplemented (imtgql::IGqlRepresentationDataController)
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
+protected:
+	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage, int& operationType) const;
+	virtual QByteArray GetObjectIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
+	virtual imtbase::CTreeItemModel* InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 private:
 	I_REF(imtgui::ICollectionViewDelegate, m_viewDelegateCompPtr);

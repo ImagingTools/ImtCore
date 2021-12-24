@@ -1,16 +1,14 @@
-#include "CPagesDataControllerComp.h"
+#include <imtguigql/CPagesDataControllerComp.h>
 
 
 namespace imtguigql
 {
 
 
-//// reimplemented (imtgql::IGqlRepresentationDataController)
-
+// reimplemented (imtgql::IGqlRepresentationDataController)
 
 imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-
 	if (gqlRequest.GetCommandId() != *m_modelIdCompPtr){
 		return nullptr;
 	}
@@ -33,8 +31,6 @@ imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::
 		}
 	}
 
-
-
 	if(m_pagesDataProviderCompPtr.IsValid() && isSetResponce){
 		itemsModel = m_pagesDataProviderCompPtr->GetTreeItemModel(*paramList, fields);
 		if (itemsModel == nullptr){
@@ -42,20 +38,22 @@ imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::
 		}
 	}
 	else{
-		errorMessage = QObject::tr("Incorrect qyery").toUtf8();
+		errorMessage = QObject::tr("Incorrect query").toUtf8();
 	}
 
 	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+
 		errorsItemModel->SetData("message", errorMessage);
 	}
-	else {
+	else{
+		dataModel = new imtbase::CTreeItemModel();
 
-        dataModel = new imtbase::CTreeItemModel();
 		dataModel->SetExternTreeModel("items", itemsModel);
+	}
 
-    }
 	rootModel->SetExternTreeModel("data", dataModel);
+
 	return rootModel;
 }
 
