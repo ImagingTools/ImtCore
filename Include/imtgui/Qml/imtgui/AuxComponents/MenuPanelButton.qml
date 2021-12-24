@@ -75,8 +75,8 @@ Item {
         id: ma;
         anchors.fill: parent;
 //        enabled: container.enabled && container.visible;
-//        hoverEnabled: enabled;
-//        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+        hoverEnabled: enabled;
+        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
         onClicked: {
             container.clicked();
         }

@@ -4,7 +4,7 @@
         <file alias="Acf/Style.qml">Qml/Acf/Style.qml</file>
         <file alias="imtgui/qmldir">Qml/imtgui/qmldir</file>
         <file alias="imtgui/ThumbnailDecorator.qml">Qml/imtgui/ThumbnailDecorator.qml</file>
-        <file alias="imtgui/AuxComponents/Button.qml">Qml/imtgui/AuxComponents/Button.qml</file>
+        <file alias="imtgui/AuxComponents/AuxButton.qml">Qml/imtgui/AuxComponents/AuxButton.qml</file>
         <file alias="imtgui/AuxComponents/MenuPanel.qml">Qml/imtgui/AuxComponents/MenuPanel.qml</file>
         <file alias="imtgui/AuxComponents/TopPanel.qml">Qml/imtgui/AuxComponents/TopPanel.qml</file>
         <file alias="imtgui/AuxComponents/MenuPanelButton.qml">Qml/imtgui/AuxComponents/MenuPanelButton.qml</file>
@@ -21,8 +21,11 @@
         <file alias="imtgui/AuxComponents/TreeItemDelegate.qml">Qml/imtgui/AuxComponents/TreeItemDelegate.qml</file>
         <file alias="imtgui/AuxComponents/CheckBox.qml">Qml/imtgui/AuxComponents/CheckBox.qml</file>
         <file alias="imtgui/AuxComponents/EditFeatureDialog.qml">Qml/imtgui/AuxComponents/EditFeatureDialog.qml</file>
-    </qresource>
+		<file alias="imtgui/AuxComponents/CollectionView.qml">Qml/imtgui/AuxComponents/CollectionView.qml</file>
+		<file alias="imtgui/AuxComponents/PackagesView.qml">Qml/imtgui/AuxComponents/PackagesView.qml</file>
+	</qresource>
     <qresource prefix="/Fonts">
-        <file alias="Ubuntu-Regular.ttf">Qml/Fonts/Ubuntu-Regular.ttf</file>
+	<file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>
+	<file alias="Ubuntu-Bold.ttf">Qml/Fonts/Ubuntu-Bold.ttf</file>
     </qresource>
 </RCC>

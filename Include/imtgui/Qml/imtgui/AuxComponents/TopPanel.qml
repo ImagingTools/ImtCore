@@ -35,26 +35,26 @@ Rectangle {
         console.log("onActivePageIdChanged", topPanel.activePageId);
     }
 
-    Button {
+    AuxButton {
         id: prevStack;
         anchors.verticalCenter: parent.verticalCenter;
         x: 10;
         width: 30;
         height: 30;
-        iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Left" + "_" + "On" + "_" + "Normal" + ".svg";
+        iconSource: "../../../" + "Icons/" + Style.theme + "/Left_On_Normal.svg";
         onClicked: {
             console.log("Left ckicked!");
         }
     }
 
-    Button {
+    AuxButton {
         id: nextStack;
         anchors.verticalCenter: parent.verticalCenter;
         anchors.left: prevStack.right;
         anchors.leftMargin: 10;
         width: 30;
         height: 30;
-        iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_" + "On" + "_" + "Normal" + ".svg";
+        iconSource: "../../../Icons/" + Style.theme + "/Right_On_Normal.svg";
 //        iconSource: "../../../" + Style.getImageSource("Right", Style.theme, "On", "Active");
 //        iconSource: leftButtonMA.mouseX <= 0 || leftButtonMA.mouseX >= nextStack.width
 //                                       || leftButtonMA.mouseY <= 0 || leftButtonMA.mouseY >= nextStack.height
@@ -68,7 +68,7 @@ Rectangle {
         }
     }
 
-    Button {
+    AuxButton {
         id: preferenceButton;
         z: 100;
         anchors.top: parent.top;
@@ -78,7 +78,7 @@ Rectangle {
         width: 20;
         height: 20;
 //        iconSource: "../../../" + Style.getImageSource("Settings", Style.theme, "On", "Active");
-        iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Settings" + "_" + "On" + "_" + "Normal" + ".svg";
+        iconSource: "../../../Icons/" + Style.theme + "/Settings_On_Normal.svg";
         onClicked: {
             console.log("Preference button clicked !");
             preference.visible = true;

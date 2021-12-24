@@ -35,31 +35,32 @@ Item {
     property string imagingToolsGradient4: "#b4b4b6";
 
 
-    property int fontSize_title: 20; //mobile ? 20 : mainSize/40 > 20 ? mainSize/40 : 20;
-    property int fontSize_subtitle: mobile ? 16 :20; //width/96
-    property int fontSize_common: mobile ? 14 :18; //width/107
-    property int fontSize_small: 16;
+    property int fontSize_title: 20;
+    property int fontSize_subtitle: 18; // mobile ? 16 :18;
+    property int fontSize_common: 16; // mobile ? 14 :16;
+    property int fontSize_small: 14;
     property string textColor: "#335777";
 
     property string camera: "/Icons/Light/Camera.svg";
 
     property var iconNames: ["Camera", "CameraFlash", "CameraLens2"];
 
-//    function getImageSource (name, styleTheme, buttonState, buttonMode)
-//    {
-//        var imageSource = "Icons/" + styleTheme + "/" + name + "_" + buttonState + "_" + buttonMode + ".svg";
-//        return imageSource;
-//    }
+    function getImageSource (name, styleTheme, buttonState, buttonMode)
+    {
+        var imageSource = "Icons/" + styleTheme + "/" + name + "_" + buttonState + "_" + buttonMode + ".svg";
+        return imageSource;
+    }
 
     FontLoader{
         id: mainFont;
-//        source: "../../Fonts/Ubuntu-Light.ttf";
-       // source: "../Fonts/Times New Roman.ttf";
+        source: "../../Fonts/Ubuntu-Light.ttf";
+//        source: "../Fonts/Times New Roman.ttf";
     }
 
     FontLoader{
         id: boldFont;
 //        source: "../../Fonts/Ubuntu-Medium.ttf";
+        source: "../../Fonts/Ubuntu-Bold.ttf";
     }
 
 }

@@ -4,16 +4,13 @@ import Acf 1.0
 Rectangle{
     id: container;
     width: 1000;
-    height: 30;// maxHeightElement.height
+    height: 35;// maxHeightElement.height
     color: "transparent";
 
     property string text: "Text";
     property real delegateWidth: count == 0 ? 0 : width/count;
     property int count: 3; // bodyArray.length;
     property bool selected: false;
-    property string fontName: "";
-    property int fontSize: 12;
-
     property int textTopMargin: 8;
 
     //property var array: ["First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First", "Second Second Second", "Third"]
@@ -65,8 +62,6 @@ Rectangle{
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: parent.left;
             anchors.leftMargin: 8;
-//            font.pixelSize: container.fontSize;
-            //font.family: container.fontName;
             font.bold: false;
             color: "red";//container.textColor
             width: container.delegateWidth - 16;
@@ -98,15 +93,11 @@ Rectangle{
                 anchors.leftMargin: 8;
                 width: container.delegateWidth - 16;
 
-//                    font.pixelSize: container.fontSize;
-//                    font.family: container.fontName;
-//                font.bold: true; //container.fontBold
-//                    color: container.textColor
                 color: Style.textColor;
                 text: container.bodyArray[model.index];
 
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_subtitle;
+                font.pixelSize: Style.fontSize_common;
             }
         }
     }

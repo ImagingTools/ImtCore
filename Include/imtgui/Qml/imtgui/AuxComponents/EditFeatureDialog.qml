@@ -34,7 +34,7 @@ Rectangle {
             font.pixelSize: Style.fontSize_subtitle;
         }
 
-        Button {
+        AuxButton {
             id: editFeatureDialogCloseButton;
             anchors.right: editFeatureDialogTopPanel.right;
             anchors.verticalCenter: editFeatureDialogTopPanel.verticalCenter;

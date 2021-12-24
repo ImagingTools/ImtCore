@@ -6,9 +6,6 @@ import Acf 1.0
 Item {
     id: container;
     property alias selectedIndex: elementsList.selectedIndex;
-    property int fontSize: 12;
-    property bool fontBold: true;
-    property string fontName: "";
     property string textColor: "#335777";
     property real delegateWidth: count == 0 ? 0 : headersList.width / headersList.count;
     property int count: headersArray.length;
@@ -91,7 +88,6 @@ Item {
         delegate: TableDelegate {
             width: elementsList.width;
             //textColor: container.textColor;
-            fontName: container.fontName;
             selected: elementsList.selectedIndex === model.index;
             onClicked: {
                 elementsList.selectedIndex = model.index;

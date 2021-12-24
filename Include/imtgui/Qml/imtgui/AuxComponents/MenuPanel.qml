@@ -4,7 +4,7 @@ import imtqml 1.0
 
 Rectangle {
     id: menuPanel;
-    width: 59;
+    width: 75;
 //    width: 120;
     color: Style.backgroundColor;
     property string textColor: Style.textColor;

@@ -12,9 +12,6 @@ Rectangle{
     property bool firstElement: false;
     property string text: "no name";
     property string firstElementText: "text";
-    property int fontSize: 12;
-    property string fontName: "";
-   // property string textColor: Style.textColor;
     property string firstElementImageSource: "../../Icons/Workflow.svg";
     property string closeButtonImageSource: "../../Icons/DeleteStylized.svg";
     signal clicked;
@@ -99,13 +96,10 @@ Rectangle{
         Text {
             id: text;
             anchors.centerIn: parent;
-            text: tabDelegate.firstElement ? tabDelegate.firstElementText : tabDelegate.text;
-          //  text: tabDelegate.text
+            text: tabDelegate.text;
             color: Style.textColor;
-//            font.pixelSize: tabDelegate.fontSize;
-//            font.family: tabDelegate.fontName;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_subtitle;
+            font.pixelSize: Style.fontSize_common;
 
         }
     }

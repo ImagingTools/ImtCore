@@ -6,15 +6,12 @@ import Acf 1.0
 Item {
     id: container;
     property alias selectedIndex: elementsList.selectedIndex;
-    property int fontSize: 12;
-    property bool fontBold: true;
-    property string fontName: "";
     property real delegateWidth: container.count == 0 ? 0 : headersList.width/headersList.count;
     property int count: 3; //headersArray.length;
     property alias headersModel: headersList.model;
     property alias elementsModel: elementsList.model;
 
-    property var headersArray: ["First", "Second", "Third"];
+    property var headersArray: [];
 
     function clearHeadersArray(){
         while(headersArray.length > 0)
@@ -30,7 +27,7 @@ Item {
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.top: parent.top;
-        height: 30;
+        height: 35;
         color: "transparent";
 
         ListView{
@@ -52,8 +49,8 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: parent.left;
                     anchors.leftMargin: 8;
-                    font.pixelSize: container.fontSize;
-                    font.family: container.fontName;
+                    font.pixelSize: Style.fontSize_common;
+                    font.family: Style.fontFamilyBold;
                     font.bold: true; //container.fontBold
                     color: Style.textColor;
                     text: container.headersArray[model.index];
@@ -88,7 +85,6 @@ Item {
         model: 10;
         delegate: TableDelegate {
             width: elementsList.width;
-            fontName: container.fontName;
             selected: elementsList.selectedIndex === model.index;
             onClicked: {
                 elementsList.selectedIndex = model.index;

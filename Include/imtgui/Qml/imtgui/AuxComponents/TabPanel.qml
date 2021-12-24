@@ -10,14 +10,27 @@ Rectangle {
     color : Style.baseColor;
 
     property int selectedIndex: 0;
-    property string firstElementName: "Packages";
+//    property string firstElementName: "Packages";
     property string firstElementImageSource: "../../Icons/Workflow.svg";
+    property var headersArray: [];
 
    // property string textColor: Style.textColor;
-    property string fontName: "";
+//    property string fontName: "";
 
     function setFirstElementImageSource(source){
         firstElementImageSource = source;
+    }
+
+
+    function clearHeadersArray(){
+        while(headersArray.length > 0)
+            headersArray.pop();
+        list.model = 0
+    }
+
+    function addToHeadersArray(str){
+        headersArray.push(str);
+        list.model = headersArray.length
     }
 
     ListView{
@@ -28,7 +41,7 @@ Rectangle {
         orientation: ListView.Horizontal;
 //        enabled: tabPanel.visible;
         spacing: 0;
-        model: 2;
+        model: 0;
         delegate: TabDelegate{
             height: list.height;
             width: 150;
@@ -38,7 +51,7 @@ Rectangle {
             firstElementImageSource: tabPanel.firstElementImageSource;
             text: "<no name>";
 //            textColor: tabPanel.textColor;
-            fontName: tabPanel.fontName;
+//            fontName: Style.fontFamily;
             onClicked: {
                 tabPanel.selectedIndex = model.index;
             }

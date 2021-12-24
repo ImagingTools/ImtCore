@@ -63,27 +63,18 @@ Rectangle
 //        textColor: Style.textColor;
 //        color: Style.backgroundColor;
 //        fontName: container.fontName;
+        onActivePageIdChanged: {
+            loader.source = "AuxComponents/" + menuPanel.activePageId + "View.qml"
+        }
     }
 
 
-    TabPanel {
-        id:tabPanel;
+    Loader {
+        id: loader;
         anchors.left: menuPanel.right;
         anchors.right: parent.right;
         anchors.top: topPanel.bottom;
-        visible: true;
-        //textColor: Style.textColor;
-        //color: Style.baseColor;
-        fontName: container.fontName;
-    }
-
-    AuxTable {
-        id: table;
-        anchors.left: menuPanel.right;
-        width: tabPanel.width/4*3;
-        anchors.top: tabPanel.bottom;
         anchors.bottom: parent.bottom;
-        fontName: container.fontName;
     }
 
 //    ContactInfoEditor {

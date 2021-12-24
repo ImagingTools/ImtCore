@@ -21,14 +21,19 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			CommandsDataController,
-			"Pages data controller",
-			"Pages Data Controller");
+			"Commands data controller",
+			"Commands Data Controller");
 
 
 I_EXPORT_COMPONENT(
 			GetStyleDataController,
-			"Pages data controller",
-			"Pages Data Controller");
+			"Get Style data controller",
+			"Style Data Controller");
+
+I_EXPORT_COMPONENT(
+			FeaturePackagelistDataController,
+			"Feature package list data controller",
+			"Feature Package List Data Controller");
 
 
 } // namespace ImtGuiGqlPck

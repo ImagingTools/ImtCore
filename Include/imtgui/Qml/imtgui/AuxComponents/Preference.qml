@@ -107,7 +107,7 @@ Rectangle {
 //               }
 //           }
 
-           Button {
+           AuxButton {
                id: exit;
                anchors.right: topPan.right;
                anchors.verticalCenter: topPan.verticalCenter;
