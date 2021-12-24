@@ -1,5 +1,6 @@
 #pragma once
 
+
 // ImtCore includes
 #include <imtgql/CGqlRepresentationDataControllerCompBase.h>
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
@@ -22,9 +23,9 @@ public:
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 	I_END_COMPONENT;
 
-
-// reimplemented (imtgql::IGqlRepresentationDataController)
+	// reimplemented (imtgql::IGqlRepresentationDataController)
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
 private:
 	I_REF(imtgui::ICollectionViewDelegate, m_viewDelegateCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
@@ -32,3 +33,5 @@ private:
 
 
 } // namespace imtguigql
+
+

@@ -1,4 +1,4 @@
-#include "CFeaturePackagelistDataControllerComp.h"
+#include <imtguigql/CObjectCollectionControllerCompBase.h>
 
 
 namespace imtguigql
@@ -10,7 +10,6 @@ namespace imtguigql
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-
 	if (gqlRequest.GetCommandId() != *m_modelIdCompPtr){
 		return nullptr;
 	}

@@ -19,7 +19,7 @@ public:
 		I_ASSIGN(m_accountInfoFactCompPtr, "AccountInfo", "Factory used for creation of the new account instance", true, "AccountInfo");
 	I_END_COMPONENT
 
-	// reimplemented (imtdb::IDatabaseObjectDelegate)
+	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual istd::IChangeable* CreateObjectFromRecord(
 				const QByteArray& typeId,
 				const QSqlRecord& record) const override;

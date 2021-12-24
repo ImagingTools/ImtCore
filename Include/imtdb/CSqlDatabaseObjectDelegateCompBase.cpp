@@ -12,7 +12,7 @@ namespace imtdb
 
 // public methods
 
-// reimplemented (imtdb::IDatabaseObjectDelegate)
+// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQueryForObject(const QByteArray& objectId, const iprm::IParamsSet* /*paramsPtr*/) const
 {

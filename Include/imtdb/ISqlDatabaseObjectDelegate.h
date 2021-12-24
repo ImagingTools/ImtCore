@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtSql/QSqlRecord.h>
+
 // ImtCore includes
 #include <imtdb/IDatabaseObjectDelegate.h>
 
@@ -13,7 +16,7 @@ namespace imtdb
 	Common interface for a database object delegate.
 	The delegate is responsible for the binding of the database layer to the object representation in the C++ data layer (ORM).
 */
-class ISqlDatabaseObjectDelegate: virtual public IDatabaseObjectDelegate
+class ISqlDatabaseObjectDelegate: virtual public imtdb::IDatabaseObjectDelegate
 {
 public:
 	/**

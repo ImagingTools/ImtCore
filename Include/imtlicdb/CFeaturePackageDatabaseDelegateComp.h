@@ -18,7 +18,7 @@ public:
 	I_BEGIN_COMPONENT(CFeaturePackageDatabaseDelegateComp)
 	I_END_COMPONENT
 
-	// reimplemented (imtdb::IDatabaseObjectDelegate)
+	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual istd::IChangeable* CreateObjectFromRecord(
 				const QByteArray& typeId,
 				const QSqlRecord& record) const override;

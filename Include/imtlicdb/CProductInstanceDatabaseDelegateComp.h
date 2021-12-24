@@ -20,7 +20,7 @@ public:
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta information creator for the product instance", true, "MetaInfoCreator");
 	I_END_COMPONENT
 
-	// reimplemented (imtdb::IDatabaseObjectDelegate)
+	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual istd::IChangeable* CreateObjectFromRecord(
 				const QByteArray& typeId,
 				const QSqlRecord& record) const override;

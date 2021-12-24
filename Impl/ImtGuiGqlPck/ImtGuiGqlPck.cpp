@@ -30,11 +30,6 @@ I_EXPORT_COMPONENT(
 			"Get Style data controller",
 			"Style Data Controller");
 
-I_EXPORT_COMPONENT(
-			FeaturePackagelistDataController,
-			"Feature package list data controller",
-			"Feature Package List Data Controller");
-
 
 } // namespace ImtGuiGqlPck
 

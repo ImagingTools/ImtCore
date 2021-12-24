@@ -19,7 +19,7 @@ public:
 		I_ASSIGN(m_productFactCompPtr, "ProductFactory", "Factory used for creation of the new product instance", true, "ProductFactory");
 	I_END_COMPONENT
 
-	// reimplemented (imtdb::IDatabaseObjectDelegate)
+	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual istd::IChangeable* CreateObjectFromRecord(
 				const QByteArray& typeId,
 				const QSqlRecord& record) const override;

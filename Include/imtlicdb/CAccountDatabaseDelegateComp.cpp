@@ -12,7 +12,7 @@ namespace imtlicdb
 
 // public methods
 
-// reimplemented (imtdb::IDatabaseObjectDelegate)
+// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
 istd::IChangeable* CAccountDatabaseDelegateComp::CreateObjectFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
 {

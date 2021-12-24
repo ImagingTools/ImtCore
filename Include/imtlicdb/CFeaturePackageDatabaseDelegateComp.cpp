@@ -11,7 +11,7 @@ namespace imtlicdb
 
 // public methods
 
-// reimplemented (imtdb::IDatabaseObjectDelegate)
+// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
 istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
 {

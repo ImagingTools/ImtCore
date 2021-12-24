@@ -21,13 +21,13 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CSqlDatabaseObjectDelegateCompBase)
-		I_REGISTER_INTERFACE(imtdb::IDatabaseObjectDelegate);
+		I_REGISTER_INTERFACE(imtdb::ISqlDatabaseObjectDelegate);
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine for SQL queries", true, "DatabaseEngine");
 		I_ASSIGN(m_tableNameAttrPtr, "TableName", "Name of the object table", true, "");
 		I_ASSIGN(m_objectIdColumnAttrPtr, "ObjectIdColumn", "Name of the column containing ID of the object", true, "Id");
 	I_END_COMPONENT
 
-	// reimplemented (imtdb::IDatabaseObjectDelegate)
+	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual QByteArray GetSelectionQueryForObject(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const override;
 	virtual QByteArray GetObjectIdFromRecord(const QByteArray& typeId, const QSqlRecord& record) const override;
 	virtual bool CreateObjectInfoFromRecord(

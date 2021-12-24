@@ -28,9 +28,8 @@ public:
 	*/
 	virtual QByteArray GetSelectionQueryForObject(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const = 0;
 
-
 	/**
-		Create SQL query for insertion of a new object into the database.
+		Create query for insertion of a new object into the database.
 	*/
 	virtual QByteArray CreateNewObjectQuery(
 				const QByteArray& typeId,
@@ -40,14 +39,14 @@ public:
 				const istd::IChangeable* valuePtr) const = 0;
 
 	/**
-	*	Create SQL query for the deletion of the object from the database.
+	*	Create query for the deletion of the object from the database.
 	*/
 	virtual QByteArray CreateDeleteObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId) const = 0;
 
 	/**
-	*	Create SQL query for the update of the object.
+	*	Create query for the update of the object.
 	*/
 	virtual QByteArray CreateUpdateObjectQuery(
 				const imtbase::IObjectCollection& collection,
@@ -55,7 +54,7 @@ public:
 				const istd::IChangeable& object) const = 0;
 
 	/**
-	*	Create SQL query for the renaming of the object.
+	*	Create query for the renaming of the object.
 	*/
 	virtual QByteArray CreateRenameObjectQuery(
 				const imtbase::IObjectCollection& collection,
