@@ -14,7 +14,7 @@
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtdb/IDatabaseEngine.h>
-#include <imtdb/IDatabaseObjectDelegate.h>
+#include <imtdb/ISQLDatabaseObjectDelegate.h>
 
 
 namespace imtdb
@@ -93,7 +93,7 @@ protected:
 
 private:
 	I_FACT(istd::IChangeable, m_objectFactoryCompPtr);
-	I_REF(IDatabaseObjectDelegate, m_objectDelegateCompPtr);
+	I_REF(ISqlDatabaseObjectDelegate, m_objectDelegateCompPtr);
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_ATTR(QByteArray, m_typeIdAttrPtr);
 	I_TEXTATTR(m_typeNameAttrPtr);

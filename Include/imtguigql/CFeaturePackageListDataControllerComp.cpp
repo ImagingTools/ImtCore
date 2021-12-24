@@ -8,7 +8,7 @@ namespace imtguigql
 //// reimplemented (imtgql::IGqlRepresentationDataController)
 
 
-imtbase::CTreeItemModel* CFeaturePackagelistDataControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 
 	if (gqlRequest.GetCommandId() != *m_modelIdCompPtr){

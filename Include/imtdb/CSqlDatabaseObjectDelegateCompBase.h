@@ -5,7 +5,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtdb/IDatabaseObjectDelegate.h>
+#include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtdb/IDatabaseEngine.h>
 
 
@@ -15,7 +15,7 @@ namespace imtdb
 
 class CSqlDatabaseObjectDelegateCompBase:
 			public ilog::CLoggerComponentBase,
-			virtual public imtdb::IDatabaseObjectDelegate
+			virtual public imtdb::ISqlDatabaseObjectDelegate
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
