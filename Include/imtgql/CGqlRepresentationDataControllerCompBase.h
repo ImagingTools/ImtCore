@@ -24,16 +24,16 @@ public:
 		I_ASSIGN(m_databaseCompPtr, "Database", "Database for working", false, "IDataBaseEngine");
 	I_END_COMPONENT;
 
-// reimplemented (ilog::CLoggerComponentBase)
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
-
-// reimplemented (imtgql::IGqlRepresentationDataController)
+	// reimplemented (imtgql::IGqlRepresentationDataController)
 	virtual QByteArray GetModelId() const override;
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
+protected:
 	I_ATTR(QByteArray, m_modelIdCompPtr);
 	I_REF(imtdb::IDatabaseEngine, m_databaseCompPtr);
 };
