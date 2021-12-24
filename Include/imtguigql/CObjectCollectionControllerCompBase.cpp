@@ -5,8 +5,7 @@ namespace imtguigql
 {
 
 
-//// reimplemented (imtgql::IGqlRepresentationDataController)
-
+// reimplemented (imtgql::IGqlRepresentationDataController)
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
