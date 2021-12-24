@@ -15,7 +15,7 @@ namespace imtloggui
 void CEventBasedRepresentationControllerComp::BuildRepresentation(
 				istd::IChangeable& representation,
 				imtlog::IEventProvider::EventContainerPtr containerPtr,
-				const imtlog::CTimeRange& /*timeRange*/) const
+				const imtbase::CTimeRange& /*timeRange*/) const
 {
 	ilog::CMessageContainer* representationModelPtr = dynamic_cast<ilog::CMessageContainer*>(&representation);
 	if (representationModelPtr != nullptr){	

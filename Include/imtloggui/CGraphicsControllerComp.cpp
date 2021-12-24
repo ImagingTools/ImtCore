@@ -179,7 +179,7 @@ void CGraphicsControllerComp::OnViewportGeometryUpdate(IViewPropertyProvider* pr
 	QRectF viewRect = propertyPtr->GetViewRect();
 	m_timeAxisPtr->setPos(0, viewRect.bottom() - m_timeAxisPtr->rect().height() / propertyPtr->GetScaleY());
 
-	m_visibleTimeRangeProvider.SetTimeRange(imtlog::CTimeRange(m_timeAxisPtr->GetVisibleBeginTime(), m_timeAxisPtr->GetVisibleEndTime()));
+	m_visibleTimeRangeProvider.SetTimeRange(imtbase::CTimeRange(m_timeAxisPtr->GetVisibleBeginTime(), m_timeAxisPtr->GetVisibleEndTime()));
 
 	for (const QByteArray& key : m_groupStaticItems.keys()){
 		GroupItem& groupItem = m_groupStaticItems[key];
@@ -414,7 +414,7 @@ void CGraphicsControllerComp::TimeRangeObserver::SetParent(CGraphicsControllerCo
 
 void CGraphicsControllerComp::TimeRangeObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	imtlog::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
+	imtbase::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
 
 	if (timeRange.GetBeginTime().isValid()){
 		m_parent->m_timeAxisPtr->EnsureTimeRange(timeRange.GetBeginTime());
@@ -442,7 +442,7 @@ void CGraphicsControllerComp::TimeRangeProvider::SetParent(CGraphicsControllerCo
 }
 
 
-void CGraphicsControllerComp::TimeRangeProvider::SetTimeRange(const imtlog::CTimeRange& timeRange)
+void CGraphicsControllerComp::TimeRangeProvider::SetTimeRange(const imtbase::CTimeRange& timeRange)
 {
 	if (m_timeRange != timeRange){
 		istd::CChangeNotifier notifier(this);
@@ -451,9 +451,9 @@ void CGraphicsControllerComp::TimeRangeProvider::SetTimeRange(const imtlog::CTim
 }
 
 
-// reimplemented (imtlog::ITimeRangeProvider)
+// reimplemented (imtbase::ITimeRangeProvider)
 
-imtlog::CTimeRange CGraphicsControllerComp::TimeRangeProvider::GetTimeRange() const
+imtbase::CTimeRange CGraphicsControllerComp::TimeRangeProvider::GetTimeRange() const
 {
 	return m_timeRange;
 }

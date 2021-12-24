@@ -5,7 +5,7 @@
 #include <iser/ISerializable.h>
 
 // ImtCore includes
-#include <imtlog/CTimeRange.h>
+#include <imtbase/CTimeRange.h>
 
 
 namespace imtlog
@@ -15,11 +15,13 @@ namespace imtlog
 class IStorage: virtual public istd::IPolymorphic
 {
 public:
-	typedef struct{
+	struct ObjectInfo
+	{
 		int64_t ObjectId;
 		QByteArray TypeId;
-		CTimeRange timeRange;
-	} ObjectInfo;
+		imtbase::CTimeRange timeRange;
+	};
+
 	typedef QVector<ObjectInfo> ObjectInfos;
 
 	/*
@@ -27,16 +29,7 @@ public:
 	*/
 	virtual ObjectInfos GetObjectInfos(
 				const QByteArray& sectionId,
-				const CTimeRange& timeRange) const = 0;
-
-	/*
-		Get/Deserialize object with given sectionId/objectId from storage.
-	*/
-	//virtual bool GetObject(
-	//			const QByteArray& sectionId,
-	//			int64_t objectId,
-	//			iser::ISerializable* objectPtr) const = 0;
-
+				const imtbase::CTimeRange& timeRange) const = 0;
 	/*
 		Add/Serialize object with given sectionId/typeId/timeRange into storage.
 		Return: objectId in storage
@@ -44,9 +37,8 @@ public:
 	virtual int64_t AddObject(
 				const QByteArray& sectionId,
 				const QByteArray& typeId,
-				const CTimeRange& timeRange,
+				const imtbase::CTimeRange& timeRange,
 				const iser::ISerializable* objectPtr) = 0;
-
 	/*
 		Update/Serialize object with given sectionId/objectId into storage.
 	*/
@@ -54,7 +46,6 @@ public:
 				const QByteArray& sectionId,
 				int64_t objectId,
 				const iser::ISerializable* objectPtr) = 0;
-
 	/*
 		Removeobject with given sectionId/objectId from storage.
 	*/
@@ -65,4 +56,5 @@ public:
 
 
 } // namespace imtlog
+
 

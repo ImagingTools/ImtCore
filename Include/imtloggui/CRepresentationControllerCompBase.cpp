@@ -61,7 +61,7 @@ void CRepresentationControllerCompBase::OnUpdate(const istd::IChangeable::Change
 {
 	if (m_isEnabled){
 		if (m_representationCompPtr.IsValid() && m_eventProviderCompPtr.IsValid()){
-			imtlog::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
+			imtbase::CTimeRange timeRange = GetObservedObject()->GetTimeRange();
 
 			if (timeRange.IsClosed()){
 				QMutexLocker locker(&m_workerQueueMutex);
@@ -147,7 +147,7 @@ void CRepresentationControllerCompBase::EventProviderObserver::OnUpdate(const is
 	if (m_parent.m_isEnabled){
 		if (m_parent.m_representationCompPtr.IsValid() && m_parent.m_eventProviderCompPtr.IsValid()){
 			if (m_parent.m_timeRangeProviderCompPtr.IsValid()){
-				imtlog::CTimeRange timeRange = m_parent.GetObservedObject()->GetTimeRange();
+				imtbase::CTimeRange timeRange = m_parent.GetObservedObject()->GetTimeRange();
 
 				if (timeRange.IsClosed()){
 					QMutexLocker locker(&m_parent.m_workerQueueMutex);
@@ -172,7 +172,7 @@ void CRepresentationControllerCompBase::Worker::run()
 	while (!isInterruptionRequested()){
 		QMutexLocker locker(&m_parent.m_workerQueueMutex);
 		if (!m_parent.m_workerQueue.isEmpty()){
-			imtlog::CTimeRange jobTimeRange = m_parent.m_workerQueue.back();
+			imtbase::CTimeRange jobTimeRange = m_parent.m_workerQueue.back();
 			m_parent.m_workerQueue.clear();
 			locker.unlock();
 

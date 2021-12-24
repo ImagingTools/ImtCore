@@ -120,9 +120,9 @@ bool CMessagesController::TakeJobResult(const QByteArray& requestId, CMessagesRe
 }
 
 
-// reimplemented (imtlog::ITimeRangeProvider)
+// reimplemented (imtbase::ITimeRangeProvider)
 
-CTimeRange CMessagesController::GetTimeRange() const
+imtbase::CTimeRange CMessagesController::GetTimeRange() const
 {
 	return m_archiveTimeRange;
 }

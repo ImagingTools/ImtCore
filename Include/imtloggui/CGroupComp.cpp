@@ -109,7 +109,7 @@ void CGroupComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 		return;
 	}
 
-	imtlog::CTimeRange timeRange;
+	imtbase::CTimeRange timeRange;
 	
 	if (m_timeRangeProviderCompPtr.IsValid()){
 		timeRange = m_timeRangeProviderCompPtr->GetTimeRange();

@@ -8,7 +8,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtlog/ITimeRangeProvider.h>
+#include <imtbase/ITimeRangeProvider.h>
 #include <imtbase/CStaticObjectCollection.h>
 
 
@@ -19,7 +19,7 @@ namespace imtloggui
 class CGroupComp:
 			public icomp::CComponentBase,
 			public imtbase::CStaticObjectCollection,
-			protected imod::TSingleModelObserverBase<imtlog::ITimeRangeProvider>,
+			protected imod::TSingleModelObserverBase<imtbase::ITimeRangeProvider>,
 			virtual public iprm::IOptionsList,
 			virtual public iprm::ISelectionParam
 {
@@ -69,7 +69,7 @@ private:
 	I_MULTIATTR(QString, m_nameAttrPtr);
 	I_MULTIATTR(double, m_minTimespanAttrPtr);
 	I_MULTIREF(imtbase::IObjectCollection, m_layerCompPtr);
-	I_REF(imtlog::ITimeRangeProvider, m_timeRangeProviderCompPtr);
+	I_REF(imtbase::ITimeRangeProvider, m_timeRangeProviderCompPtr);
 	I_REF(imod::IModel, m_timeRangeProviderModelCompPtr);
 
 	QMap<uint64_t, QByteArray> m_arrangedIds;

@@ -34,7 +34,7 @@ class CMessagesController:
 			public QObject,
 			virtual public ilog::CLoggerBase,
 			virtual public ilog::IMessageConsumer,
-			virtual public ITimeRangeProvider
+			virtual public imtbase::ITimeRangeProvider
 {
 	Q_OBJECT
 public:
@@ -61,8 +61,8 @@ public:
 	bool IsJobExists(const QByteArray& jobId) const;
 	bool TakeJobResult(const QByteArray& jobId, CMessagesReader::EventContainerPtr& resultEvents) const;
 
-	// reimplemented (imtlog::ITimeRangeProvider)
-	virtual CTimeRange GetTimeRange() const override;
+	// reimplemented (imtbase::ITimeRangeProvider)
+	virtual imtbase::CTimeRange GetTimeRange() const override;
 
 	// reimplemented (ilog::IMessageConsumer)
 	virtual bool IsMessageSupported(
@@ -136,7 +136,7 @@ private:
 	QTimer m_timer;
 	Writer m_writer;
 
-	mutable CTimeRange m_archiveTimeRange;
+	mutable imtbase::CTimeRange m_archiveTimeRange;
 
 	QList<QueueItem> m_workingQueue;
 	QMutex m_workingQueueMutex;

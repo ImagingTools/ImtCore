@@ -26,9 +26,9 @@ CEventHistoryControllerComp::CEventHistoryControllerComp()
 }
 
 
-// reimplemented (imtlog::ITimeRangeProvider)
+// reimplemented (imtbase::ITimeRangeProvider)
 
-CTimeRange CEventHistoryControllerComp::GetTimeRange() const
+imtbase::CTimeRange CEventHistoryControllerComp::GetTimeRange() const
 {
 	return m_archiveTimeRange;
 }
@@ -194,7 +194,7 @@ void CEventHistoryControllerComp::InitializeHistoryController()
 		if (ok){
 			InitializeMessagesController(id);
 
-			CTimeRange timeRange = m_controllers[id]->GetTimeRange();
+			imtbase::CTimeRange timeRange = m_controllers[id]->GetTimeRange();
 			m_archiveTimeRange.Ensure(m_archiveTimeRange.GetBeginTime());
 			m_archiveTimeRange.Ensure(m_archiveTimeRange.GetEndTime());
 		}

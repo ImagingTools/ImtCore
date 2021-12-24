@@ -1,7 +1,7 @@
-#include <imtlog/CTimeRange.h>
+#include <imtbase/CTimeRange.h>
 
 
-namespace imtlog
+namespace imtbase
 {
 
 
@@ -198,6 +198,6 @@ bool CTimeRange::operator!=(const CTimeRange& other) const
 }
 
 
-} // namespace imtlog
+} // namespace imtbase
 
 

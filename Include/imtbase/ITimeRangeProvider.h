@@ -5,20 +5,20 @@
 #include <QtCore/QDateTime>
 
 // ImtCore includes
-#include <imtlog/CTimeRange.h>
+#include <imtbase/CTimeRange.h>
 
 
-namespace imtlog
+namespace imtbase
 {
 
 
 class ITimeRangeProvider: virtual public istd::IChangeable
 {
 public:
-	virtual CTimeRange GetTimeRange() const = 0;
+	virtual imtbase::CTimeRange GetTimeRange() const = 0;
 };
 
 
-} // namespace imtlog
+} // namespace imtbase
 
 

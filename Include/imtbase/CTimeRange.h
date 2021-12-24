@@ -5,7 +5,7 @@
 #include <QtCore/QDateTime>
 
 
-namespace imtlog
+namespace imtbase
 {
 
 
@@ -37,6 +37,6 @@ private:
 };
 
 
-} // namespace imtlog
+} // namespace imtbase
 
 

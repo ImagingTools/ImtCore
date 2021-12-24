@@ -39,7 +39,7 @@ void CProductionRepresentationControllerComp::OnComponentCreated()
 void CProductionRepresentationControllerComp::BuildRepresentation(
 			istd::IChangeable& representation,
 			imtlog::IEventProvider::EventContainerPtr containerPtr,
-			const imtlog::CTimeRange& /*timeRange*/) const
+			const imtbase::CTimeRange& /*timeRange*/) const
 {
 	CProductionRepresentationComp* representationPtr = dynamic_cast<CProductionRepresentationComp*>(&representation);
 	if (representationPtr != nullptr){

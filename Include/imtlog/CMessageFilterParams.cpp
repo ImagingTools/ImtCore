@@ -43,13 +43,13 @@ void CMessageFilterParams::SetMessageFilterIds(const QSet<int>& ids)
 }
 
 
-imtlog::CTimeRange CMessageFilterParams::GetFilterTimeRange() const
+imtbase::CTimeRange CMessageFilterParams::GetFilterTimeRange() const
 {
 	return m_timeRange;
 }
 
 
-void CMessageFilterParams::SetFilterTimeRange(const imtlog::CTimeRange timeRange)
+void CMessageFilterParams::SetFilterTimeRange(const imtbase::CTimeRange timeRange)
 {
 	m_timeRange = timeRange;
 }
@@ -106,7 +106,7 @@ bool CMessageFilterParams::ResetData(CompatibilityMode /*mode*/)
 {
 	m_mode = FM_INCLUDE;
 	m_ids.clear();
-	m_timeRange = CTimeRange();
+	m_timeRange = imtbase::CTimeRange();
 
 	return true;
 }

@@ -8,7 +8,7 @@
 #include <ilog/CMessageContainer.h>
 
 // ImtCore includes
-#include <imtlog/CTimeRange.h>
+#include <imtbase/CTimeRange.h>
 
 
 namespace imtlog
@@ -21,7 +21,7 @@ public:
 	typedef ilog::CMessageContainer BaseClass;
 
 	int GetMessagesCount() const;
-	const CTimeRange GetTimeRange() const;
+	imtbase::CTimeRange GetTimeRange() const;
 
 	// reimplemented (ilog::IMessageContainer)
 	virtual int GetWorstCategory() const override;

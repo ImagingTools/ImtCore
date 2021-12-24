@@ -9,7 +9,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtlog/ITimeRangeProvider.h>
+#include <imtbase/ITimeRangeProvider.h>
 #include <imtloggui/IGraphicsController.h>
 #include <imtloggui/IGraphicsSceneProvider.h>
 #include <imtloggui/IViewPropertyProvider.h>
@@ -41,7 +41,7 @@ public:
 		I_REGISTER_SUBELEMENT(ScenePositionProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(ScenePositionProvider, IEventScenePositionProvider, ExtractPositionProvider);
 		I_REGISTER_SUBELEMENT(VisibleTimeRangeProvider);
-		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, imtlog::ITimeRangeProvider, ExtractVisibleTimeRangeProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, imtbase::ITimeRangeProvider, ExtractVisibleTimeRangeProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, istd::IChangeable, ExtractVisibleTimeRangeProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(VisibleTimeRangeProvider, imod::IModel, ExtractVisibleTimeRangeProvider);
 		I_ASSIGN(m_graphicsSceneProviderCompPtr, "GraphicsSceneProvider", "Graphics scene provider", true, "GraphicsSceneProvider");
@@ -112,7 +112,7 @@ private:
 		CGraphicsControllerComp* m_parent;
 	};
 
-	class TimeRangeObserver: public imod::TSingleModelObserverBase<imtlog::ITimeRangeProvider>
+	class TimeRangeObserver: public imod::TSingleModelObserverBase<imtbase::ITimeRangeProvider>
 	{
 	public:
 		TimeRangeObserver();
@@ -127,20 +127,20 @@ private:
 		CGraphicsControllerComp* m_parent;
 	};
 
-	class TimeRangeProvider: public imtlog::ITimeRangeProvider
+	class TimeRangeProvider: public imtbase::ITimeRangeProvider
 	{
 	public:
 		TimeRangeProvider();
 
 		void SetParent(CGraphicsControllerComp* parent);
-		void SetTimeRange(const imtlog::CTimeRange& timeRange);
+		void SetTimeRange(const imtbase::CTimeRange& timeRange);
 
-		// reimplemented (imtlog::ITimeRangeProvider)
-		virtual imtlog::CTimeRange GetTimeRange() const override;
+		// reimplemented (imtbase::ITimeRangeProvider)
+		virtual imtbase::CTimeRange GetTimeRange() const override;
 
 	private:
 		CGraphicsControllerComp* m_parent;
-		imtlog::CTimeRange m_timeRange;
+		imtbase::CTimeRange m_timeRange;
 	};
 
 	struct GroupItem
@@ -174,7 +174,7 @@ private:
 	I_REF(IViewPropertyProvider, m_viewportGeometryProviderCompPtr);
 	I_REF(imod::IModel, m_viewportGeometryManagerModelCompPtr);
 	I_REF(IViewPropertyManager, m_viewportGeometryManagerCompPtr);
-	I_REF(imtlog::ITimeRangeProvider, m_timeRangeProviderCompPtr);
+	I_REF(imtbase::ITimeRangeProvider, m_timeRangeProviderCompPtr);
 	I_REF(imod::IModel, m_timeRangeModelCompPtr);
 
 	CTimeAxis* m_timeAxisPtr;

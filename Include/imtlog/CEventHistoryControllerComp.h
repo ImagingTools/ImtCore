@@ -18,9 +18,9 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/ITimeRangeProvider.h>
 #include <imtfile/IFileCompression.h>
 #include <imtlog/IGroupMessageIdsProvider.h>
-#include <imtlog/ITimeRangeProvider.h>
 #include <imtlog/IEventProvider.h>
 #include <imtlog/IMessagesControllerParamsProvider.h>
 #include <imtlog/CEventContainer.h>
@@ -38,7 +38,7 @@ class CEventHistoryControllerComp:
 						ilog::TMessageDelegatorComp<ilog::CLoggerComponentBase>>,
 			virtual public ilog::IMessageConsumer,
 			virtual public IEventProvider,
-			virtual public ITimeRangeProvider
+			virtual public imtbase::ITimeRangeProvider
 {
 	Q_OBJECT
 public:
@@ -48,7 +48,7 @@ public:
 	I_BEGIN_COMPONENT(CEventHistoryControllerComp)
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
 		I_REGISTER_INTERFACE(IEventProvider);
-		I_REGISTER_INTERFACE(ITimeRangeProvider);
+		I_REGISTER_INTERFACE(imtbase::ITimeRangeProvider);
 		I_REGISTER_INTERFACE(IGroupMessageIdsProvider);
 		I_ASSIGN(m_defaultMaxContainerMessageCountAttrPtr, "DefaultMaxContainerMessageCount", "Default max message count stored in container", true, 1000);
 		I_ASSIGN(m_defaultContainerSavingPeriodAttrPtr, "DefaultContainerSavingPeriod", "Default period in seconds of saving the container until the maximum number of messages is reached", true, 60);
@@ -61,8 +61,8 @@ public:
 
 	CEventHistoryControllerComp();
 
-	// reimplemented (imtlog::ITimeRangeProvider)
-	virtual CTimeRange GetTimeRange() const override;
+	// reimplemented (imtbase::ITimeRangeProvider)
+	virtual imtbase::CTimeRange GetTimeRange() const override;
 
 	// reimplemented (imtlog::IEventProvider)
 	virtual IEventProvider::EventContainerPtr GetEvents(
@@ -118,7 +118,7 @@ private:
 	QDateTime m_systemStartTime;
 	ControllerState m_controllerState;
 
-	CTimeRange m_archiveTimeRange;
+	imtbase::CTimeRange m_archiveTimeRange;
 
 	QMap<int, MessagesControllerPtr> m_controllers;
 

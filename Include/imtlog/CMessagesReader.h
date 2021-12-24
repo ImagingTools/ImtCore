@@ -36,8 +36,8 @@ public:
 				const imtfile::IFileCompression* compressorPtr,
 				ilog::IMessageConsumer* logPtr);
 
-	CTimeRange ReadTimeRange() const;
-	EventContainerListPtr ReadContainers(const CTimeRange& timeRange) const;
+	imtbase::CTimeRange ReadTimeRange() const;
+	EventContainerListPtr ReadContainers(const imtbase::CTimeRange& timeRange) const;
 	virtual void Cancel();
 
 private:

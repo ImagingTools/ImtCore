@@ -6,7 +6,7 @@
 #include <istd/IInformationProvider.h>
 
 // ImtCore includes
-#include <imtlog/ITimeRangeProvider.h>
+#include <imtbase/ITimeRangeProvider.h>
 #include <imtlog/IMessageFilterParams.h>
 
 

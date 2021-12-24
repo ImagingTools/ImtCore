@@ -38,7 +38,7 @@ CMessagesReader::CMessagesReader(
 }
 
 
-CTimeRange CMessagesReader::ReadTimeRange() const
+imtbase::CTimeRange CMessagesReader::ReadTimeRange() const
 {
 	Q_ASSERT(!m_dir.isEmpty());
 	Q_ASSERT(!m_containerExtension.isEmpty());
@@ -98,11 +98,11 @@ CTimeRange CMessagesReader::ReadTimeRange() const
 
 	Q_ASSERT(begin.isValid() == end.isValid());
 
-	return CTimeRange(begin, end);
+	return imtbase::CTimeRange(begin, end);
 }
 
 
-CMessagesReader::EventContainerListPtr CMessagesReader::ReadContainers(const CTimeRange& timeRange) const
+CMessagesReader::EventContainerListPtr CMessagesReader::ReadContainers(const imtbase::CTimeRange& timeRange) const
 {
 	Q_ASSERT(!m_dir.isEmpty());
 	Q_ASSERT(!m_containerExtension.isEmpty());
@@ -159,7 +159,6 @@ void CMessagesReader::Cancel()
 {
 	m_isCanceled = true;
 }
-
 
 
 // private methods

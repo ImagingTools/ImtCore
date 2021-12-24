@@ -19,8 +19,8 @@ public:
 	virtual void SetFilterMode(FilterMode mode) override;
 	virtual QSet<int> GetMessageFilterIds() const override;
 	virtual void SetMessageFilterIds(const QSet<int>& ids) override;
-	virtual imtlog::CTimeRange GetFilterTimeRange() const override;
-	virtual void SetFilterTimeRange(const imtlog::CTimeRange timeRange) override;
+	virtual imtbase::CTimeRange GetFilterTimeRange() const override;
+	virtual void SetFilterTimeRange(const imtbase::CTimeRange timeRange) override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
@@ -32,7 +32,7 @@ public:
 private:
 	FilterMode m_mode;
 	QSet<int> m_ids;
-	CTimeRange m_timeRange;
+	imtbase::CTimeRange m_timeRange;
 };
 
 

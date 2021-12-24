@@ -25,15 +25,11 @@ public:
 
 	virtual ObjectInfos GetObjectInfos(
 				const QByteArray& sectionId,
-				const CTimeRange& timeRange) const override;
-	//virtual bool GetObject(
-	//			const QByteArray& sectionId,
-	//			int64_t objectId,
-	//			iser::ISerializable* objectPtr) const override;
+				const imtbase::CTimeRange& timeRange) const override;
 	virtual int64_t AddObject(
 				const QByteArray& sectionId,
 				const QByteArray& typeId,
-				const CTimeRange& timeRange,
+				const imtbase::CTimeRange& timeRange,
 				const iser::ISerializable* objectPtr) override;
 	virtual bool UpdateObject(
 				const QByteArray& sectionId,

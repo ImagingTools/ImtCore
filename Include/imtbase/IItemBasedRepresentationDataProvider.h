@@ -8,18 +8,12 @@
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlObject.h>
-//#include <imtrest/imtrest.h>
-//#include <imtbase/ICollectionInfo.h>
 
 
 namespace imtbase
 {
 
 
-/**
-	Base interface for all data controllers
-	\ingroup LicenseManagement
-*/
 class IItemBasedRepresentationDataProvider: virtual public istd::IPolymorphic
 {
 public:
@@ -28,6 +22,6 @@ public:
 };
 
 
-} // namespace imtauthgui
+} // namespace imtbase
 
 

@@ -8,7 +8,7 @@
 #include <istd/IChangeable.h>
 
 // ImtCore includes
-#include <imtlog/CTimeRange.h>
+#include <imtbase/CTimeRange.h>
 
 
 namespace imtlog
@@ -30,8 +30,8 @@ public:
 	virtual QSet<int> GetMessageFilterIds() const = 0;
 	virtual void SetMessageFilterIds(const QSet<int>& ids) = 0;
 
-	virtual imtlog::CTimeRange GetFilterTimeRange() const = 0;
-	virtual void SetFilterTimeRange(const imtlog::CTimeRange timeRange) = 0;
+	virtual imtbase::CTimeRange GetFilterTimeRange() const = 0;
+	virtual void SetFilterTimeRange(const imtbase::CTimeRange timeRange) = 0;
 };
 
 

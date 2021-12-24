@@ -1,7 +1,6 @@
 #include <imtlog/CEventContainer.h>
 
 
-
 namespace imtlog
 {
 
@@ -13,15 +12,15 @@ int CEventContainer::GetMessagesCount() const
 }
 
 
-const CTimeRange CEventContainer::GetTimeRange() const
+imtbase::CTimeRange CEventContainer::GetTimeRange() const
 {
 	QMutexLocker locker(&m_mutex);
 
 	if (m_messages.isEmpty()){
-		return CTimeRange();
+		return imtbase::CTimeRange();
 	}
 
-	return CTimeRange(
+	return imtbase::CTimeRange(
 				m_messages.last()->GetInformationTimeStamp(),
 				m_messages.first()->GetInformationTimeStamp());
 }
@@ -32,6 +31,7 @@ const CTimeRange CEventContainer::GetTimeRange() const
 int CEventContainer::GetWorstCategory() const
 {
 	QMutexLocker locker(&m_mutex);
+
 	return BaseClass::GetWorstCategory();
 }
 
@@ -39,6 +39,7 @@ int CEventContainer::GetWorstCategory() const
 ilog::IMessageContainer::Messages CEventContainer::GetMessages() const
 {
 	QMutexLocker locker(&m_mutex);
+
 	return BaseClass::GetMessages();
 }
 
@@ -46,6 +47,7 @@ ilog::IMessageContainer::Messages CEventContainer::GetMessages() const
 void CEventContainer::ClearMessages()
 {
 	QMutexLocker locker(&m_mutex);
+
 	BaseClass::ClearMessages();
 }
 
@@ -58,6 +60,7 @@ bool CEventContainer::IsMessageSupported(
 			const istd::IInformationProvider* messagePtr) const
 {
 	QMutexLocker locker(&m_mutex);
+
 	return BaseClass::IsMessageSupported(messageCategory, messageId, messagePtr);
 }
 
@@ -65,6 +68,7 @@ bool CEventContainer::IsMessageSupported(
 void CEventContainer::AddMessage(const IMessageConsumer::MessagePtr& messagePtr)
 {
 	QMutexLocker locker(&m_mutex);
+
 	BaseClass::AddMessage(messagePtr);
 }
 
@@ -74,6 +78,7 @@ void CEventContainer::AddMessage(const IMessageConsumer::MessagePtr& messagePtr)
 bool CEventContainer::Serialize(iser::IArchive& archive)
 {
 	QMutexLocker locker(&m_mutex);
+
 	return BaseClass::Serialize(archive);
 }
 

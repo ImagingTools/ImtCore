@@ -15,7 +15,7 @@
 #include <imtlog/IEventFilter.h>
 #include <imtlog/IEventProvider.h>
 #include <imtlog/IMessageFilterParams.h>
-#include <imtlog/ITimeRangeProvider.h>
+#include <imtbase/ITimeRangeProvider.h>
 #include <imtlog/CWorkerBase.h>
 
 
@@ -26,7 +26,7 @@ namespace imtloggui
 class CRepresentationControllerCompBase:
 			public QObject,
 			public icomp::CComponentBase,
-			protected imod::TSingleModelObserverBase<imtlog::ITimeRangeProvider>,
+			protected imod::TSingleModelObserverBase<imtbase::ITimeRangeProvider>,
 			virtual public iprm::IEnableableParam
 {
 	Q_OBJECT
@@ -60,7 +60,7 @@ protected:
 	virtual void BuildRepresentation(
 				istd::IChangeable& representation,
 				imtlog::IEventProvider::EventContainerPtr containerPtr,
-				const imtlog::CTimeRange& timeRange) const = 0;
+				const imtbase::CTimeRange& timeRange) const = 0;
 
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
@@ -72,7 +72,7 @@ protected:
 protected:
 	I_REF(imtlog::IEventProvider, m_eventProviderCompPtr);
 	I_REF(imod::IModel, m_eventProviderModelCompPtr);
-	I_REF(imtlog::ITimeRangeProvider, m_timeRangeProviderCompPtr);
+	I_REF(imtbase::ITimeRangeProvider, m_timeRangeProviderCompPtr);
 	I_REF(imod::IModel, m_timeRangeProviderModelCompPtr);
 	I_REF(istd::IChangeable, m_representationCompPtr);
 	I_REF(imtlog::IEventFilter, m_eventFilterCompPtr);
@@ -116,7 +116,7 @@ private:
 	EventProviderObserver m_eventProviderObserver;
 
 	Worker m_worker;
-	QQueue<imtlog::CTimeRange> m_workerQueue;
+	QQueue<imtbase::CTimeRange> m_workerQueue;
 	QMutex m_workerQueueMutex;
 	QQueue<RepresentationCompPtr> m_representationQueue;
 	QMutex m_representationQueueMutex;

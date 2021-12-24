@@ -22,7 +22,7 @@ protected:
 	virtual void BuildRepresentation(
 				istd::IChangeable& representation,
 				imtlog::IEventProvider::EventContainerPtr containerPtr,
-				const imtlog::CTimeRange& timeRange) const override;
+				const imtbase::CTimeRange& timeRange) const override;
 };
 
 
