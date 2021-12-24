@@ -21,7 +21,8 @@ BaseLayout {
 	keyNavigationWraps: true;		///< key navigation wraps from end to beginning and vise versa
 	handleNavigationKeys: true;		///< handle navigation keys
 	property bool interactive: true;
-
+	property enum flickableDirection { AutoFlickDirection, AutoFlickIfNeeded, HorizontalFlick, VerticalFlick, HorizontalAndVerticalFlick };
+	property enum snapMode { NoSnap, SnapToItem, SnapOneItem };
 	cssPointerTouchEvents: nativeScrolling; // enable touch/pointer events for natively scrollable surfaces
 
 	/// @internal
@@ -40,15 +41,15 @@ BaseLayout {
 	property ContentMargin contentMargin: ContentMargin { }
 
 	onContentXChanged: {
-		if (this.nativeScrolling)
-			this.element.setScrollX(value)
-		else
+		// if (this.nativeScrolling)
+		// 	this.element.setScrollX(value)
+		// else
 			this.content.x = -value
 	}
 	onContentYChanged: {
-		if (this.nativeScrolling)
-			this.element.setScrollY(value)
-		else
+		// if (this.nativeScrolling)
+		// 	this.element.setScrollY(value)
+		// else
 			this.content.y = -value
 	}
 
@@ -434,8 +435,39 @@ BaseLayout {
 		this.element.dom.addEventListener("wheel", (e) => {
 			if(this.interactive && this.enabled){
 				e.preventDefault()
-				this.content._scroll(e.deltaX, e.deltaY)
+				switch(this.flickableDirection){
+					case BaseView.AutoFlickDirection:
+						this.content._scroll(e.deltaX, e.deltaY)
+						break;
+					case BaseView.AutoFlickIfNeeded:
+						this.content._scroll(e.deltaX, e.deltaY)
+						break;
+					case BaseView.HorizontalFlick:
+						this.content._scroll(e.deltaX, 0)
+						break;
+					case BaseView.VerticalFlick:
+						this.content._scroll(0, e.deltaY)
+						break;
+					case BaseView.HorizontalAndVerticalFlick:
+						this.content._scroll(e.deltaX, e.deltaY)
+						break;
+				}
+
+				let posState = {
+					dx: -e.deltaX,
+					dy: -e.deltaY,
+					cx: this.content.x,
+					cy: this.content.y,
+				}
+				if(this.snapMode === BaseView.SnapToItem){
+					this._snapTo(posState)
+				}
+				if(this.snapMode === BaseView.SnapOneItem){
+					this._snapOne(posState)
+					
+				}
 			}
+
 			if(!this.enabled){
 				e.stopPropagation()
 				e.preventDefault()
@@ -446,6 +478,10 @@ BaseLayout {
 			e.preventDefault()
 			this._stateTouch = e.changedTouches[0]
 			this._isTouchOnly = true
+			this._startPos = {
+				x: e.changedTouches[0].clientX,
+				y: e.changedTouches[0].clientY,
+			}
 
 		});
         this.element.dom.addEventListener("touchend", (e) => {
@@ -459,6 +495,20 @@ BaseLayout {
 					false, false, 0, null
 				);
 				e.target.dispatchEvent(clickEvent);
+			} else {
+				let posState = {
+					dx: e.changedTouches[0].clientX - this._startPos.x,
+					dy: e.changedTouches[0].clientY - this._startPos.y,
+					cx: this.content.x,
+					cy: this.content.y,
+				}
+				if(this.snapMode === BaseView.SnapToItem){
+					this._snapTo(posState)
+				}
+				if(this.snapMode === BaseView.SnapOneItem){
+					this._snapOne(posState)
+					
+				}
 			}
 
 		});
@@ -470,7 +520,25 @@ BaseLayout {
 				
 				let nextTouch = e.changedTouches[0]
 				//if(this._stateTouch)
-				this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, this._stateTouch.clientY-nextTouch.clientY)
+				switch(this.flickableDirection){
+					case BaseView.AutoFlickDirection:
+						this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, this._stateTouch.clientY-nextTouch.clientY)
+						break;
+					case BaseView.AutoFlickIfNeeded:
+						this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, this._stateTouch.clientY-nextTouch.clientY)
+						break;
+					case BaseView.HorizontalFlick:
+						this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, 0)
+						break;
+					case BaseView.VerticalFlick:
+						this.content._scroll(0, this._stateTouch.clientY-nextTouch.clientY)
+						break;
+					case BaseView.HorizontalAndVerticalFlick:
+						this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, this._stateTouch.clientY-nextTouch.clientY)
+						break;
+						
+				}
+				
 				this._stateTouch = nextTouch
 			}
 			if(!this.enabled){
@@ -485,4 +553,7 @@ BaseLayout {
 		})
 
 	}
+
+	function _snapTo(posState){}
+	function _snapOne(posState){}
 }

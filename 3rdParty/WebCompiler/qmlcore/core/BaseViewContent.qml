@@ -28,9 +28,15 @@ Item {
 		}
 		if(this.width === 0){
 			this.parent.element.dom.scrollLeft += dx
+			this.x = -this.parent.element.dom.scrollLeft
+		} else {
+			this.parent.element.dom.scrollLeft = 0
 		}
 		if(this.height === 0){
 			this.parent.element.dom.scrollTop += dy
+			this.y = -this.parent.element.dom.scrollTop
+		} else {
+			this.parent.element.dom.scrollTop = 0
 		}
 		this.parent._context._processActions()
 	}

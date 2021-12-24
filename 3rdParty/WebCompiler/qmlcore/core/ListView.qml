@@ -1,7 +1,7 @@
 ///single direction (vertical or horizontal) oriented view
 BaseView {
 	property enum orientation { Vertical, Horizontal };	///< orientation direction
-
+	
 	constructor: {
 		this._sizes = []
 		this._scrollDelta = 0
@@ -392,5 +392,68 @@ BaseView {
 
 	onCompleted: {
 		this._updateOverflow()
+	}
+
+	function _snapTo(posState){
+		console.log(posState)
+		if(this.orientation === ListView.Vertical){
+			let posY = 0
+			let find = false
+			let i = 0
+
+			while(i < this.count && !find){
+				
+				if(posState.dy < 0){ //right
+					let pos = this.getItemPosition(i)
+					posY = this.count*this.height
+					if(pos[1] > -posState.cy){
+						posY = pos[1]
+						find = true
+					}
+				}
+				if(posState.dy > 0){ //left
+					let pos = this.getItemPosition(this.count-i)
+					posY = 0
+					if(pos[1] < -posState.cy){
+						posY = pos[1]
+						find = true
+					}
+				}
+				i++
+			}
+			if(find || posY === 0) this.content.y = -posY
+			this.parent._context._processActions()
+		} else {
+			let posX = 0
+			let find = false
+			let i = 0
+
+			while(i < this.count && !find){
+				
+				if(posState.dx < 0){ //right
+					let pos = this.getItemPosition(i)
+					posX = this.count*this.width
+					if(pos[0] > -posState.cx){
+						posX = pos[0]
+						find = true
+					}
+				}
+				if(posState.dx > 0){ //left
+					let pos = this.getItemPosition(this.count-i)
+					posX = 0
+					if(pos[0] < -posState.cx){
+						posX = pos[0]
+						find = true
+					}
+				}
+				i++
+			}
+			if(find || posX === 0) this.content.x = -posX
+			this.parent._context._processActions()
+		}
+	}
+	function _snapOne(posState){
+		this._snapTo(posState)
+
 	}
 }

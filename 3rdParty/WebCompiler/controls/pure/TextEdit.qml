@@ -2,7 +2,7 @@
 Item {
 	property enum horizontalAlignment { AlignLeft, AlignRight, AlignHCenter, AlignJustify };
 	property enum verticalAlignment { AlignTop, AlignBottom, AlignVCenter };
-	property enum wrapMode { NoWrap, WordWrap, WrapAnywhere, Wrap };
+	property enum wrapMode { NoWrap, WordWrap, WrapAnywhere, Wrap, WrapAtWordBoundaryOrAnywhere };
 	property string text;
 	property Font font: Font {}
 	property Color color: "#000";
@@ -137,6 +137,10 @@ Item {
 			this.element.dom.style.whiteSpace = 'break-spaces'
 			break;
 		case TextEdit.WrapAnywhere:
+			this.element.dom.style.wordBreak = 'break-all'
+			this.element.dom.style.whiteSpace = 'break-spaces'
+			break;
+		case TextEdit.WrapAtWordBoundaryOrAnywhere:
 			this.element.dom.style.wordBreak = 'break-all'
 			this.element.dom.style.whiteSpace = 'break-spaces'
 			break;

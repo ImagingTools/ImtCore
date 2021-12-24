@@ -6,7 +6,7 @@ Item {
 	property lazy font: Font { }	///< text font object
 	property enum horizontalAlignment { AlignLeft, AlignRight, AlignHCenter, AlignJustify };	///< text horizontal alignment
 	property enum verticalAlignment { AlignTop, AlignBottom, AlignVCenter };	///< text vertical alignment
-	property enum wrapMode { NoWrap, WordWrap, WrapAnywhere, Wrap };	///< multiline text wrap mode
+	property enum wrapMode { NoWrap, WordWrap, WrapAnywhere, Wrap, WrapAtWordBoundaryOrAnywhere };	///< multiline text wrap mode
 	property enum textFormat { Html, Text }; ///< only html or text for now
 	property int paintedWidth;		///< real width of the text without any layout applied
 	property int paintedHeight;		///< real height of this text without any layout applied
@@ -136,6 +136,9 @@ Item {
 		case this.WrapAnywhere:
 			this.style({ 'white-space': text? 'pre-wrap': 'normal', 'word-break': 'break-all' })
 			break
+		case this.WrapAtWordBoundaryOrAnywhere:
+			this.style({ 'white-space': text? 'pre-wrap': 'normal', 'word-break': 'break-all' })
+			break	
 		}
 		this._updateSize();
 	}
