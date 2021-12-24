@@ -152,7 +152,12 @@ I_EXPORT_COMPONENT(
 		"Menu-Based commands provider",
 		"MenuBased Commands Provider");
 
-		
+I_EXPORT_COMPONENT(
+	TimeFilterParamEditor,
+	"Edit for the time-range filter parameter",
+	"Time Date Filter Range Parameter");
+
+
 } // namespace ImtGuiPck
 
 

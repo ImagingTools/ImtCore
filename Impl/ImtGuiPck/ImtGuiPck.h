@@ -33,6 +33,7 @@
 #include <imtgui/CSingleDocumentWorkspaceGuiComp.h>
 #include <imtgui/CDocumentCollectionViewDelegateComp.h>
 #include <imtgui/CMenuBasedCommandsProviderComp.h>
+#include <imtgui/CTimeFilterParamEditorComp.h>
 
 
 /**
@@ -69,6 +70,8 @@ typedef icomp::TMakeComponentWrap<imtwidgets::CMenuPanelDelegateMin, imtwidgets:
 typedef imtgui::CSingleDocumentWorkspaceGuiComp SingleDocumentWorkspace;
 typedef imtgui::CDocumentCollectionViewDelegateComp DocumentCollectionViewDelegate;
 typedef icomp::TModelCompWrap<imtgui::CMenuBasedCommandsProviderComp> MenuBasedCommandsProvider;
+typedef imtgui::CTimeFilterParamEditorComp TimeFilterParamEditor;
+
 
 } // namespace ImtGuiPck
 
