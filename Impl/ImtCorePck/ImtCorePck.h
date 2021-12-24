@@ -27,6 +27,7 @@
 #include <imtbase/CBinaryDataProviderComp.h>
 #include <imtbase/CParameterLinkControllerComp.h>
 #include <imtbase/CObjectCollectionBasedPersistenceComp.h>
+#include <imtbase/CTimeFilterParam.h>
 
 
 /**
@@ -63,6 +64,11 @@ typedef imtbase::CTextParamSummaryRepresentationControllerComp TextParamSummaryR
 typedef imtbase::CBinaryDataProviderComp BinaryDataProvider;
 typedef ibase::TModelObserverCompWrap<imtbase::CParameterLinkControllerComp> ParameterLinkController;
 typedef imtbase::CObjectCollectionBasedPersistenceComp ObjectCollectionBasedPersistence;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtbase::CTimeFilterParam,
+						imtbase::ITimeFilterParam,
+						iser::ISerializable>> TimeFilterParam;
 
 
 } // namespace ImtCorePck

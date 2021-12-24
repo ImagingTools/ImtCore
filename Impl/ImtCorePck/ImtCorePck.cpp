@@ -114,6 +114,11 @@ I_EXPORT_COMPONENT(
 			"Object collection based persistence",
 			"Object Collection Persistence");
 
+I_EXPORT_COMPONENT(
+			TimeFilterParam,
+			"Time-based filter parameter",
+			"Time Filter Parameter");
+
 
 } // namespace ImtCorePck
 
