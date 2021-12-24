@@ -64,18 +64,25 @@ Rectangle
 //        color: Style.backgroundColor;
 //        fontName: container.fontName;
         onActivePageIdChanged: {
-            loader.source = "AuxComponents/" + menuPanel.activePageId + "View.qml"
+           // loader.source = "AuxComponents/" + menuPanel.activePageId + "View.qml"
         }
     }
 
+    PackagesView {
 
-    Loader {
-        id: loader;
         anchors.left: menuPanel.right;
         anchors.right: parent.right;
         anchors.top: topPanel.bottom;
         anchors.bottom: parent.bottom;
     }
+
+//    Loader {
+//        id: loader;
+//        anchors.left: menuPanel.right;
+//        anchors.right: parent.right;
+//        anchors.top: topPanel.bottom;
+//        anchors.bottom: parent.bottom;
+//    }
 
 //    ContactInfoEditor {
 //        id: contactInfoEditor;

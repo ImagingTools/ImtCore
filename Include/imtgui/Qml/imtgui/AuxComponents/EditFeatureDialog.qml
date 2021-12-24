@@ -86,7 +86,6 @@ Rectangle {
         }
 
 
-
         Text {
             id: titleFeatureId;
             anchors.top: tfcFeatureName.bottom;

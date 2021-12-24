@@ -39,8 +39,8 @@ Rectangle {
         id: prevStack;
         anchors.verticalCenter: parent.verticalCenter;
         x: 10;
-        width: 30;
-        height: 30;
+        width: 24;
+        height: 24;
         iconSource: "../../../" + "Icons/" + Style.theme + "/Left_On_Normal.svg";
         onClicked: {
             console.log("Left ckicked!");
@@ -52,8 +52,8 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter;
         anchors.left: prevStack.right;
         anchors.leftMargin: 10;
-        width: 30;
-        height: 30;
+        width: 24;
+        height: 24;
         iconSource: "../../../Icons/" + Style.theme + "/Right_On_Normal.svg";
 //        iconSource: "../../../" + Style.getImageSource("Right", Style.theme, "On", "Active");
 //        iconSource: leftButtonMA.mouseX <= 0 || leftButtonMA.mouseX >= nextStack.width
@@ -75,8 +75,8 @@ Rectangle {
         anchors.right: parent.right;
         anchors.rightMargin: 10;
         anchors.topMargin: 10;
-        width: 20;
-        height: 20;
+        width: 24;
+        height: 24;
 //        iconSource: "../../../" + Style.getImageSource("Settings", Style.theme, "On", "Active");
         iconSource: "../../../Icons/" + Style.theme + "/Settings_On_Normal.svg";
         onClicked: {

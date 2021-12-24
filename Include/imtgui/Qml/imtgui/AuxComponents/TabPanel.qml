@@ -4,7 +4,7 @@ import Acf 1.0
 
 
 Rectangle {
-    id: tabPanel;
+    id: tabPanelContainer;
     height: 40;
     width: 1000;
     color : Style.baseColor;
@@ -39,21 +39,21 @@ Rectangle {
         clip: true;
 //        boundsBehavior: Flickable.StopAtBounds;
         orientation: ListView.Horizontal;
-//        enabled: tabPanel.visible;
+//        enabled: tabPanelContainer.visible;
         spacing: 0;
         model: 0;
         delegate: TabDelegate{
             height: list.height;
             width: 150;
-            selected: model.index == tabPanel.selectedIndex;
+            selected: model.index == tabPanelContainer.selectedIndex;
             firstElement: model.index == 0;
-            firstElementText: tabPanel.firstElementName;
-            firstElementImageSource: tabPanel.firstElementImageSource;
-            text: "<no name>";
-//            textColor: tabPanel.textColor;
+            firstElementText: tabPanelContainer.firstElementName;
+            firstElementImageSource: tabPanelContainer.firstElementImageSource;
+            text: tabPanelContainer.headersArray[model.index];
+//            textColor: tabPanelContainer.textColor;
 //            fontName: Style.fontFamily;
             onClicked: {
-                tabPanel.selectedIndex = model.index;
+                tabPanelContainer.selectedIndex = model.index;
             }
 
         }

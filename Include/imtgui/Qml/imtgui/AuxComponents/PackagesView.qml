@@ -1,17 +1,24 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
 
 
 CollectionView {
+    id: packageCollectionView;
     width: 100;
     height: 50;
 //    color: "red";
     Component.onCompleted: {
+        var tabPanel = packageCollectionView.tabPanel
+        console.log("tabPanel ", tabPanel)
         tabPanel.addToHeadersArray("Packages")
-        table.addToHeadersArray("Name")
-        table.addToHeadersArray("Description")
-        table.addToHeadersArray("Added")
-        table.addToHeadersArray("Last Modified")
+        this.table.addToHeadersArray("Name")
+        this.table.addToHeadersArray("Description")
+        this.table.addToHeadersArray("Added")
+        this.table.addToHeadersArray("Last Modified")
+        console.log("PackageView onCompleted 1")
+        commandsModel.updateModel()
+        console.log("PackageView onCompleted 2")
     }
 
 
@@ -26,7 +33,7 @@ CollectionView {
             var queryFields = Gql.GqlObject("items");
             query.AddField(queryFields);
 
-            var queryFields = Gql.GqlObject("ListCommanda");
+            var queryFields = Gql.GqlObject("ListCommands");
             queryFields.InsertField(CommandEnum.ID);
             queryFields.InsertField(CommandEnum.NAME);
             queryFields.InsertField(CommandEnum.ICON);
@@ -39,7 +46,8 @@ CollectionView {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-//            console.log(gqlData);
+            console.log("PackageView query ");
+            console.log("PackageView query ", gqlData);
             this.SetGqlQuery(gqlData);
         }
 

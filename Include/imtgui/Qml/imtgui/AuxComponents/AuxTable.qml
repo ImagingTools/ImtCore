@@ -20,6 +20,7 @@ Item {
 
     function addToHeadersArray(str){
         headersArray.push(str);
+        headersList.model = headersArray.length
     }
 
     Rectangle {
@@ -37,7 +38,7 @@ Item {
 //            boundsBehavior: Flickable.StopAtBounds;
             orientation: ListView.Horizontal;
             spacing: 0;
-            model: 3;
+            model: 0;
             delegate: Rectangle{
                 id:deleg;
                 width: headersList.width/headersList.count;
