@@ -1,6 +1,11 @@
 #include <imtbase/CTimeRange.h>
 
 
+// ACF includes
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
+
+
 namespace imtbase
 {
 
@@ -195,6 +200,24 @@ bool CTimeRange::operator==(const CTimeRange& other) const
 bool CTimeRange::operator!=(const CTimeRange& other) const
 {
 	return (m_begin != other.m_begin || m_end != other.m_end);
+}
+
+
+bool CTimeRange::Serialize(iser::IArchive& archive)
+{
+	bool retVal = true;
+	
+	static iser::CArchiveTag beginTimeTag("BeginTime", "Start of the time range", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(beginTimeTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_begin);
+	retVal = retVal && archive.EndTag(beginTimeTag);
+
+	static iser::CArchiveTag endTimeTag("EndTime", "End of the time range", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(endTimeTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_end);
+	retVal = retVal && archive.EndTag(endTimeTag);
+
+	return retVal;
 }
 
 

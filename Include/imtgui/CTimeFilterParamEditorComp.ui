@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>553</width>
-    <height>283</height>
+    <width>347</width>
+    <height>55</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,85 +27,119 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QFrame" name="TimeFilterFrame">
+    <widget class="QComboBox" name="TimeCombo">
+     <item>
+      <property name="text">
+       <string>All</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Last Hour</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Last 4 Hours</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Last 8 Hours</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Last Day</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Last Week</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Last Month</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Last Quarter</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Last Year</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Custom</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="CustomRangeFrame">
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QStackedWidget" name="TimeFilterWidget">
-        <property name="currentIndex">
-         <number>0</number>
+       <widget class="QLabel" name="label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <widget class="QWidget" name="page">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="CalendarLabel">
-            <property name="text">
-             <string>Choose statistics time period:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCalendarWidget" name="Calendar">
-            <property name="gridVisible">
-             <bool>true</bool>
-            </property>
-            <property name="dateEditEnabled">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="page_2">
-         <layout class="QFormLayout" name="formLayout">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="TimePeriods"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="TimePeriodsLabel">
-            <property name="text">
-             <string>Choose statistics time period:</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
+        <property name="text">
+         <string>From</string>
+        </property>
        </widget>
+      </item>
+      <item>
+       <widget class="QDateTimeEdit" name="CustomBeginDate"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>To</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDateTimeEdit" name="CustomEndDate"/>
       </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../Acula/AuxInclude/Qt5_VC15_64/GeneratedFiles/aculastatgui/aculastatguilight.qrc"/>
+ </resources>
  <connections/>
 </ui>

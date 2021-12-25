@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtCore/QDateTime>
 
+// ACF includes
+#include <iser/IArchive.h>
+
 
 namespace imtbase
 {
@@ -30,6 +33,8 @@ public:
 
 	bool operator==(const CTimeRange& other) const;
 	bool operator!=(const CTimeRange& other) const;
+
+	bool Serialize(iser::IArchive& archive);
 
 private:
 	QDateTime m_begin;

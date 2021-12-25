@@ -36,9 +36,9 @@ void CTimeFilterParam::SetTimeRange(const imtbase::CTimeRange& timeRange)
 
 // reimplemented (iser::ISerializable)
 
-bool CTimeFilterParam::Serialize(iser::IArchive& /*archive*/)
+bool CTimeFilterParam::Serialize(iser::IArchive& archive)
 {
-	return false;
+	return m_timeRange.Serialize(archive);
 }
 
 
@@ -52,11 +52,11 @@ int CTimeFilterParam::GetSupportedOperations() const
 
 bool CTimeFilterParam::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const CTimeFilterParam* messageFilterParamsPtr = dynamic_cast<const CTimeFilterParam*>(&object);
-	if (messageFilterParamsPtr != nullptr){
+	const CTimeFilterParam* implPtr = dynamic_cast<const CTimeFilterParam*>(&object);
+	if (implPtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_timeRange = messageFilterParamsPtr->m_timeRange;
+		m_timeRange = implPtr->m_timeRange;
 
 		return true;
 	}
@@ -67,9 +67,9 @@ bool CTimeFilterParam::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 
 bool CTimeFilterParam::IsEqual(const IChangeable& object) const
 {
-	const CTimeFilterParam* messageFilterParamsPtr = dynamic_cast<const CTimeFilterParam*>(&object);
-	if (messageFilterParamsPtr != nullptr){
-		return m_timeRange == messageFilterParamsPtr->m_timeRange;
+	const CTimeFilterParam* implPtr = dynamic_cast<const CTimeFilterParam*>(&object);
+	if (implPtr != nullptr){
+		return m_timeRange == implPtr->m_timeRange;
 	}
 
 	return false;

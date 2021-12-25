@@ -13,8 +13,7 @@ namespace imtdb
 
 
 /**
-	Common interface for a database object delegate.
-	The delegate is responsible for the binding of the database layer to the object representation in the C++ data layer (ORM).
+	Common interface for a SQL-based database object delegate.
 */
 class ISqlDatabaseObjectDelegate: virtual public imtdb::IDatabaseObjectDelegate
 {

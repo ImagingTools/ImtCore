@@ -14,7 +14,7 @@
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtdb/IDatabaseEngine.h>
-#include <imtdb/ISQLDatabaseObjectDelegate.h>
+#include <imtdb/ISqlDatabaseObjectDelegate.h>
 
 
 namespace imtdb
