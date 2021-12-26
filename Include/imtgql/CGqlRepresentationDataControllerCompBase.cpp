@@ -7,12 +7,14 @@ namespace imtgql
 
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
-QByteArray CGqlRepresentationDataControllerCompBase::GetModelId() const
+QByteArrayList CGqlRepresentationDataControllerCompBase::GetModelIds() const
 {
-	QByteArray retVal;
+	QByteArrayList retVal;
 
-	if (m_modelIdCompPtr.IsValid()){
-		retVal = *m_modelIdCompPtr;
+	if (m_modelIdsCompPtr.IsValid()){
+		for (int i = 0; i < m_modelIdsCompPtr.GetCount(); i++){
+			retVal << m_modelIdsCompPtr[i];
+		}
 	}
 
 	return retVal;

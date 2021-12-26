@@ -1,5 +1,7 @@
 #include <imtguigql/CObjectCollectionControllerCompBase.h>
 
+#include <imtqml/CCommandDataEnumProviderComp.h>
+
 
 namespace imtguigql
 {
@@ -11,7 +13,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	if (gqlRequest.GetCommandId() != *m_modelIdCompPtr){
+	if (m_modelIdsCompPtr.FindValue(gqlRequest.GetCommandId()) == -1){
 		return nullptr;
 	}
 
@@ -35,6 +37,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 		return SetObjectDescription(gqlRequest, errorMessage);
 	case OT_LIST:
 		return ListObjects(gqlRequest, errorMessage);
+	case OT_HEADERS:
+		return Headers(gqlRequest, errorMessage);
 	}
 
 	return nullptr;
@@ -48,7 +52,22 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 			QString& errorMessage,
 			int& operationType) const
 {
-	// IMPLEMENT!!!
+	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
+	if(fieldList == nullptr){
+		return false;
+	}
+
+	int count = fieldList->count();
+	for (int i = 0; i < count; i++){
+		if (fieldList->at(i).GetId() == "headers"){
+			operationType = OT_HEADERS;
+			return true;
+		}
+		if (fieldList->at(i).GetId() == "items"){
+			operationType = OT_LIST;
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -96,6 +115,47 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			QString& errorMessage) const
 {
 	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::Headers(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* itemsModel = nullptr;
+	bool isSetResponce = false;
+	QByteArrayList fields;
+
+
+	if (!m_viewDelegateCompPtr.IsValid()){
+		errorMessage = QObject::tr("Internal error").toUtf8();
+	}
+
+	if (!errorMessage.isEmpty()){
+		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		errorsItemModel->SetData("message", errorMessage);
+	}
+	else{
+		dataModel = new imtbase::CTreeItemModel();
+		itemsModel = new imtbase::CTreeItemModel();
+		const imtbase::ICollectionInfo& fieldCollection = m_viewDelegateCompPtr->GetSummaryInformationTypes();
+		QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
+
+		for (QByteArray fieldId : fieldIds){
+			QString headerName = fieldCollection.GetElementInfo(fieldId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			int index = itemsModel->InsertNewItem();
+			itemsModel->SetData(imtqml::CCommandDataEnumProviderComp::NAME, headerName,index);
+		}
+		itemsModel->SetIsArray(true);
+
+		dataModel->SetExternTreeModel("headers", itemsModel);
+	}
+
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
 }
 
 

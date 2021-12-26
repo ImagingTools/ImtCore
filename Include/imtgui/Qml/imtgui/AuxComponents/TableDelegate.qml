@@ -9,12 +9,13 @@ Rectangle{
 
     property string text: "Text";
     property real delegateWidth: count == 0 ? 0 : width/count;
-    property int count: 3; // bodyArray.length;
+    property int count: 0; // bodyArray.length;
     property bool selected: false;
     property int textTopMargin: 8;
 
     //property var array: ["First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First", "Second Second Second", "Third"]
-    property var bodyArray:  ["First", "Second", "Third"];
+//    property var bodyArray:  ["First", "Second", "Third"];
+    property var bodyArray:  [];
 
     property string maxSizeText: "";
 

@@ -1,2 +1,3 @@
 modude imtqml
 ThumbnailDecorator 1.0 ThumbnailDecorator.qml
+CollectionView 1.0 ./AuxComponents/CollectionView.qml

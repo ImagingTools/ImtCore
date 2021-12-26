@@ -8,8 +8,9 @@ Rectangle {
     height: 100;
     width: 100;
     color: "transparent";
-    property alias tabPanel: tabPanelInternal;
-    property alias table: tableInternal;
+//    property alias tabPanel: tabPanelInternal;
+    property TabPanel tabPanel: tabPanelInternal;
+    property AuxTable table: tableInternal;
 //    color : Style.baseColor;
 
     TabPanel {

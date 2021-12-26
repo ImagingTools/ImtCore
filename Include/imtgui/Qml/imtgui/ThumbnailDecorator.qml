@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Acf 1.0
 import 'AuxComponents'
 import imtauthgui 1.0
+import imtlicgui 1.0
 
 Rectangle
 {
@@ -63,26 +64,60 @@ Rectangle
 //        textColor: Style.textColor;
 //        color: Style.backgroundColor;
 //        fontName: container.fontName;
+        onPagesCountChanged: {
+            pagesData.model = menuPanel.pagesCount
+        }
+
         onActivePageIdChanged: {
            // loader.source = "AuxComponents/" + menuPanel.activePageId + "View.qml"
         }
     }
 
-    PackagesView {
+//    PackagesView {
 
-        anchors.left: menuPanel.right;
-        anchors.right: parent.right;
-        anchors.top: topPanel.bottom;
-        anchors.bottom: parent.bottom;
-    }
-
-//    Loader {
-//        id: loader;
 //        anchors.left: menuPanel.right;
 //        anchors.right: parent.right;
 //        anchors.top: topPanel.bottom;
 //        anchors.bottom: parent.bottom;
 //    }
+
+
+    Repeater {
+        id: pagesData;
+//            anchors.fill: parent;
+//        anchors.left: menuPanel.right;
+//        anchors.right: parent.right;
+//        anchors.top: topPanel.bottom;
+//        anchors.bottom: parent.bottom;
+        clip: true;
+//            boundsBehavior: Flickable.StopAtBounds;
+//            orientation: ListView.Horizontal;
+//            spacing: 0;
+        model: menuPanel.pagesCount;
+        delegate: Rectangle {
+            id: pagesDeleg;
+            anchors.left: menuPanel.right;
+            anchors.right: container.right;
+            anchors.top: topPanel.bottom;
+            anchors.bottom: container.bottom;
+//            width: container.width - menuPanel.width;
+//            height: container.height - topPanel.height;
+            color: "transparent";
+            visible: menuPanel.activePageIndex === model.index;
+            Loader {
+                id: loader;
+                anchors.fill: parent;
+//                width: container.width - menuPanel.width;
+//                height: container.height - topPanel.height;
+                Component.onCompleted: {
+                    loader.source = "../imtlicgui/" + menuPanel.pagesSources[model.index] + "View.qml";
+                    console.log("loader.source",loader.source, menuPanel.pagesSources)
+                }
+
+            }
+        }
+    }
+
 
 //    ContactInfoEditor {
 //        id: contactInfoEditor;
@@ -101,17 +136,17 @@ Rectangle
 //        anchors.right: parent.right;
 //    }
 
-    Rectangle {
-        id: darkBackground;
-        anchors.fill: parent;
-        color: "gray";
-        opacity: 0.8;
-        visible: preference.visible || editFeatureDialog.visible;
+//    Rectangle {
+//        id: darkBackground;
+//        anchors.fill: parent;
+//        color: "gray";
+//        opacity: 0.8;
+//        visible: preference.visible || editFeatureDialog.visible;
 
-        MouseArea {
-            anchors.fill: parent;
-        }
-    }
+//        MouseArea {
+//            anchors.fill: parent;
+//        }
+//    }
 
     Preference {
         id: preference;
@@ -124,23 +159,23 @@ Rectangle
         //color: Style.baseColor;
     }
 
-    Image {
-        width: 100;
-        height: 100;
-//        source: Style.getImageSource("Axis", "Light", "On", "Active");
-//        source: "../../Icons/Light/Axis_Off_Selected.svg";
-        sourceSize.height: 100;
-        sourceSize.width: 100;
-    }
+//    Image {
+//        width: 100;
+//        height: 100;
+////        source: Style.getImageSource("Axis", "Light", "On", "Active");
+////        source: "../../Icons/Light/Axis_Off_Selected.svg";
+//        sourceSize.height: 100;
+//        sourceSize.width: 100;
+//    }
 
-    EditFeatureDialog {
-        id: editFeatureDialog;
+//    EditFeatureDialog {
+//        id: editFeatureDialog;
 
-        visible: false;
-        width: parent.width > 400 ? 400 : parent.width * 0.9;
-        height: parent.height > 350 ? 350 : parent.height * 0.9;
+//        visible: false;
+//        width: parent.width > 400 ? 400 : parent.width * 0.9;
+//        height: parent.height > 350 ? 350 : parent.height * 0.9;
 
-        anchors.horizontalCenter: parent.horizontalCenter;
-        anchors.verticalCenter: parent.verticalCenter;
-    }
+//        anchors.horizontalCenter: parent.horizontalCenter;
+//        anchors.verticalCenter: parent.verticalCenter;
+//    }
 }

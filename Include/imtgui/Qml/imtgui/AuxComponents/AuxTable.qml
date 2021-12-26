@@ -4,9 +4,9 @@ import Acf 1.0
 
 
 Item {
-    id: container;
+    id: tableContainer;
     property alias selectedIndex: elementsList.selectedIndex;
-    property real delegateWidth: container.count == 0 ? 0 : headersList.width/headersList.count;
+    property real delegateWidth: tableContainer.count == 0 ? 0 : headersList.width/headersList.count;
     property int count: 3; //headersArray.length;
     property alias headersModel: headersList.model;
     property alias elementsModel: elementsList.model;
@@ -14,13 +14,13 @@ Item {
     property var headersArray: [];
 
     function clearHeadersArray(){
-        while(headersArray.length > 0)
-            headersArray.pop();
+        while(tableContainer.headersArray.length > 0)
+            tableContainer.headersArray.pop();
     }
 
     function addToHeadersArray(str){
-        headersArray.push(str);
-        headersList.model = headersArray.length
+        tableContainer.headersArray.push(str);
+        headersList.model = tableContainer.headersArray.length
     }
 
     Rectangle {
@@ -52,9 +52,9 @@ Item {
                     anchors.leftMargin: 8;
                     font.pixelSize: Style.fontSize_common;
                     font.family: Style.fontFamilyBold;
-                    font.bold: true; //container.fontBold
+                    font.bold: true; //tableContainer.fontBold
                     color: Style.textColor;
-                    text: container.headersArray[model.index];
+                    text: tableContainer.headersArray[model.index];
                 }
             }
         }
@@ -83,10 +83,17 @@ Item {
         clip: true;
 //        boundsBehavior: Flickable.StopAtBounds;
         spacing: 0;
-        model: 10;
+        model: 0;
         delegate: TableDelegate {
+            id: tableDelegate;
             width: elementsList.width;
             selected: elementsList.selectedIndex === model.index;
+            Component.onCompleted: {
+                for (var i = 0; i < headersArray.length; i++){
+                    tableDelegate.addToArray(model[headersArray[i]])
+                }
+            }
+
             onClicked: {
                 elementsList.selectedIndex = model.index;
             }

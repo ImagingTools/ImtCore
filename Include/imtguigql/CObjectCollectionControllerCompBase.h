@@ -32,6 +32,7 @@ public:
 		OT_RENAME,
 		OT_SET_DESCRIPTION,
 		OT_LIST,
+		OT_HEADERS,
 		OT_USER_OPERATION = 1000
 	};
 
@@ -47,8 +48,9 @@ protected:
 	virtual imtbase::CTreeItemModel* SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* Headers(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
-private:
+protected:
 	I_REF(imtgui::ICollectionViewDelegate, m_viewDelegateCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 };

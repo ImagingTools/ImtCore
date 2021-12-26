@@ -44,8 +44,8 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(const
 		QByteArray gqlCommand = gqlRequest.GetCommandId();
 		int dataControllersCount = m_gqlRepresentationDataControllerCompPtr.GetCount();
 		for (int index = 0; index < dataControllersCount; index++){
-			QByteArray modelId = m_gqlRepresentationDataControllerCompPtr[index]->GetModelId();
-			if (modelId == gqlCommand){
+			QByteArrayList modelIds = m_gqlRepresentationDataControllerCompPtr[index]->GetModelIds();
+			if (modelIds.contains(gqlCommand)){
 				imtbase::CTreeItemModel* sourceItemModel = m_gqlRepresentationDataControllerCompPtr[index]->CreateResponse(gqlRequest, errorMessage);
 				if(sourceItemModel != nullptr){
 					imtbase::CTreeItemModel* dataItemModel = rootModel.GetTreeItemModel("data");

@@ -18,19 +18,19 @@ Rectangle {
 //    property string fontName: "";
 
     function setFirstElementImageSource(source){
-        firstElementImageSource = source;
+        tabPanelContainer.firstElementImageSource = source;
     }
 
 
     function clearHeadersArray(){
-        while(headersArray.length > 0)
-            headersArray.pop();
+        while(tabPanelContainer.headersArray.length > 0)
+            tabPanelContainer.headersArray.pop();
         list.model = 0
     }
 
     function addToHeadersArray(str){
-        headersArray.push(str);
-        list.model = headersArray.length
+        tabPanelContainer.headersArray.push(str);
+        list.model = tabPanelContainer.headersArray.length
     }
 
     ListView{

@@ -22,7 +22,6 @@
         <file alias="imtgui/AuxComponents/CheckBox.qml">Qml/imtgui/AuxComponents/CheckBox.qml</file>
         <file alias="imtgui/AuxComponents/EditFeatureDialog.qml">Qml/imtgui/AuxComponents/EditFeatureDialog.qml</file>
 		<file alias="imtgui/AuxComponents/CollectionView.qml">Qml/imtgui/AuxComponents/CollectionView.qml</file>
-		<file alias="imtgui/AuxComponents/PackagesView.qml">Qml/imtgui/AuxComponents/PackagesView.qml</file>
 	</qresource>
     <qresource prefix="/Fonts">
 	<file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

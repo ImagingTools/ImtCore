@@ -31,18 +31,20 @@ Item {
         height: 30;
         color: "transparent";
 
-        ListView {
+        Row {
+            height: parent.height;
+        Repeater {
             id: headersList;
-            anchors.fill: parent;
+//            anchors.fill: parent;
             clip: true;
 //            boundsBehavior: Flickable.StopAtBounds;
-            orientation: ListView.Horizontal;
-            spacing: 0;
+//            orientation: ListView.Horizontal;
+//            spacing: 0;
             model: 3;
             delegate: Rectangle {
                 id:deleg;
-                width: headersList.width/headersList.count;
-                height: headersList.height;
+                width: headersPanel.width/headersList.count;
+                height: headersPanel.height;
                 color: "transparent";
                 Text {
                     id: name;
@@ -60,6 +62,7 @@ Item {
                     font.pixelSize: Style.fontSize_subtitle;
                 }
             }
+        }
         }
 
 

@@ -19,7 +19,7 @@ public:
 	/**
 		Get ID of the supported data model.
 	*/
-	virtual QByteArray GetModelId() const = 0;
+	virtual QByteArrayList GetModelIds() const = 0;
 
 	/**
 		Create representation data for a given GraphQL request.

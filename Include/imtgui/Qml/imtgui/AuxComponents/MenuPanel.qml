@@ -13,6 +13,9 @@ Rectangle {
     property string activePageId;
     property string activePageName;
     property string activeIcon;
+    property var pagesSources: [];
+    property int activePageIndex: -1;
+    property int pagesCount: 0;
     signal activePageChanged;
 
     function updateModels(){
@@ -46,6 +49,7 @@ Rectangle {
                 menuPanel.activePageId = model[PageEnum.ID];
                 menuPanel.activePageName = model[PageEnum.NAME];
                 menuPanel.activeIcon = model[PageEnum.ICON];
+                menuPanel.activePageIndex = model.index;
 
                 console.log("menuPanel.activePageName ", menuPanel.activePageName);
                 console.log("menuPanel.activePageId ", menuPanel.activePageId);
@@ -84,6 +88,17 @@ Rectangle {
                         menuPanel.activePageId = dataModelLocal.GetData(PageEnum.ID);
                         menuPanel.activePageName = dataModelLocal.GetData(PageEnum.NAME);
                         menuPanel.activeIcon = dataModelLocal.GetData(PageEnum.ICON);
+
+                        var pagesCount = dataModelLocal.GetItemsCount(); //lvPages.count
+                        console.log("dataModelLocal.count", pagesCount)
+
+
+                        for (var i = 0; i < pagesCount; i++){
+                           menuPanel.pagesSources.push(dataModelLocal.GetData(PageEnum.ID, i))
+                        }
+
+                        menuPanel.pagesCount = pagesCount; //lvPages.count;
+                        menuPanel.activePageIndex = 0;
 
 //                        lvPages.__processUpdates();
                     }

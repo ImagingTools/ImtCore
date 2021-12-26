@@ -37,8 +37,8 @@ Item {
 
     property int fontSize_title: 20;
     property int fontSize_subtitle: 18; // mobile ? 16 :18;
-    property int fontSize_common: 16; // mobile ? 14 :16;
-    property int fontSize_small: 14;
+    property int fontSize_common: 14; // mobile ? 14 :16;
+    property int fontSize_small: 12;
     property string textColor: "#335777";
 
     property string camera: "/Icons/Light/Camera.svg";

@@ -20,12 +20,12 @@ public:
 
 	I_BEGIN_COMPONENT(CGqlRepresentationDataControllerCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlRepresentationDataController);
-		I_ASSIGN(m_modelIdCompPtr, "ModelId", "Model Id", true, "");
+		I_ASSIGN_MULTI_0(m_modelIdsCompPtr, "ModelIds", "List of model-IDs for graphQl response", true);
 		I_ASSIGN(m_databaseCompPtr, "Database", "Database for working", false, "IDataBaseEngine");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlRepresentationDataController)
-	virtual QByteArray GetModelId() const override;
+	virtual QByteArrayList GetModelIds() const override;
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
@@ -34,7 +34,7 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 protected:
-	I_ATTR(QByteArray, m_modelIdCompPtr);
+	I_MULTIATTR(QByteArray, m_modelIdsCompPtr);
 	I_REF(imtdb::IDatabaseEngine, m_databaseCompPtr);
 };
 

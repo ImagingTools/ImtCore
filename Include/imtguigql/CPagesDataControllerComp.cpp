@@ -9,7 +9,7 @@ namespace imtguigql
 
 imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (gqlRequest.GetCommandId() != *m_modelIdCompPtr){
+	if (m_modelIdsCompPtr.FindValue(gqlRequest.GetCommandId()) == -1){
 		return nullptr;
 	}
 
