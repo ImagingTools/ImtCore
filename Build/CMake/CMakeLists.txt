@@ -46,6 +46,8 @@ add_subdirectory("${INCLUDE_DIR}/imtfile/CMake" "${AUX_INCLUDE_DIR}/imtfile")
 add_subdirectory("${INCLUDE_DIR}/imtlog/CMake" "${AUX_INCLUDE_DIR}/imtlog")
 add_subdirectory("${INCLUDE_DIR}/imtzip/CMake" "${AUX_INCLUDE_DIR}/imtzip")
 add_subdirectory("${INCLUDE_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlic")
+add_subdirectory("${INCLUDE_DIR}/imtlicgql/CMake" "${AUX_INCLUDE_DIR}/imtlicgql")
+add_dependencies(imtlicgql imtgql)
 add_subdirectory("${INCLUDE_DIR}/imtlicgui/CMake" "${AUX_INCLUDE_DIR}/imtlicgui")
 add_subdirectory("${INCLUDE_DIR}/imtcom/CMake" "${AUX_INCLUDE_DIR}/imtcom")
 
@@ -90,6 +92,9 @@ add_dependencies(ImtLicensePck imtbase)
 
 add_subdirectory("${IMPL_DIR}/ImtLicenseGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtLicenseGuiPck")
 add_dependencies(ImtLicenseGuiPck imtbase imtlic imtlicgui)
+
+add_subdirectory("${IMPL_DIR}/ImtLicenseGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtLicenseGqlPck")
+add_dependencies(ImtLicenseGuiPck imtbase imtlic imtlicgql)
 
 add_subdirectory("${IMPL_DIR}/ImtCryptPck/CMake" "${AUX_INCLUDE_DIR}/ImtCryptPck")
 add_dependencies(ImtCryptPck imtbase imtcrypt)
