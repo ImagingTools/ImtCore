@@ -1,5 +1,7 @@
 #include <imtguigql/CObjectCollectionControllerCompBase.h>
 
+
+// ImtCore includes
 #include <imtqml/CCommandDataEnumProviderComp.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
@@ -150,7 +152,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 
 	rootModel->SetExternTreeModel("data", dataModel);
 
-	return rootModel;}
+	return rootModel;
+}
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
