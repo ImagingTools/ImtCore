@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file alias="imtlicgui/PackagesView.qml">Qml/imtlicgui/PackagesView.qml</file>
+		<file alias="imtlicgui/qmldir">Qml/imtlicgui/qmldir</file>
+    </qresource>
+</RCC>
