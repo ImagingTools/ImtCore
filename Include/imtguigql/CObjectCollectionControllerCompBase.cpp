@@ -39,7 +39,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 	case OT_LIST:
 		return ListObjects(gqlRequest, errorMessage);
 	case OT_HEADERS:
-		return Headers(gqlRequest, errorMessage);
+		return GetHeaders(gqlRequest, errorMessage);
 	}
 
 	return nullptr;
@@ -115,8 +115,42 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return nullptr;
-}
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* itemsModel = nullptr;
+	bool isSetResponce = false;
+
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QObject::tr("Internal error").toUtf8();
+	}
+
+	if (!errorMessage.isEmpty()){
+		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		errorsItemModel->SetData("message", errorMessage);
+	}
+	else{
+		dataModel = new imtbase::CTreeItemModel();
+		itemsModel = new imtbase::CTreeItemModel();
+
+		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		for (const QByteArray& collectionId : collectionIds){
+			int itemIndex = itemsModel->InsertNewItem();
+			if (itemIndex >= 0){
+				if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, collectionId, errorMessage)){
+					return nullptr;
+				}
+			}
+		}
+
+		itemsModel->SetIsArray(true);
+
+		dataModel->SetExternTreeModel("items", itemsModel);
+	}
+
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;}
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
@@ -225,6 +259,44 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetCommands(
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;
+}
+
+
+bool CObjectCollectionControllerCompBase::SetupGqlItem(
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const QByteArray& collectionId,
+			QString& errorMessage) const
+{
+	bool retVal = true;
+	QByteArrayList informationIds = GetInformationIds(gqlRequest);
+	if (!informationIds.isEmpty()){
+		for (QByteArray informationId : informationIds){
+			QVariant elementInformation = GetObjectInformation(collectionId, informationId);
+			if (elementInformation.isNull()){
+				return false;
+			}
+
+			retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+
+QByteArrayList CObjectCollectionControllerCompBase::GetInformationIds(const imtgql::CGqlRequest& gqlRequest) const
+{
+	return QByteArrayList();
+}
+
+
+QVariant CObjectCollectionControllerCompBase::GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const
+{
+	return QVariant();
 }
 
 

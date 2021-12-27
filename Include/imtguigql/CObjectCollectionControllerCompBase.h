@@ -52,6 +52,26 @@ protected:
 	virtual imtbase::CTreeItemModel* GetHeaders(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetCommands(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
+	/**
+		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.
+	*/
+	virtual bool SetupGqlItem(
+				const imtgql::CGqlRequest& gqlRequest,
+				imtbase::CTreeItemModel& model,
+				int itemIndex,
+				const QByteArray& collectionId,
+				QString& errorMessage) const;
+
+	/**
+		Extract information-IDs from the GraphQL request.
+	*/
+	virtual QByteArrayList GetInformationIds(const imtgql::CGqlRequest& gqlRequest) const;
+
+	/**
+		Get specific information about the the object in the collection.
+	*/
+	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const;
+
 protected:
 	I_REF(imtgui::ICollectionViewDelegate, m_viewDelegateCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);

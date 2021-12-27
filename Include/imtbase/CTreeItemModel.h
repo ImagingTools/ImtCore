@@ -20,7 +20,6 @@ namespace imtbase
 
 /**
 	Universal data controller for UI representations
-	\ingroup LicenseManagement
 */
 class CTreeItemModel: public QAbstractListModel, public imod::CModelBase, virtual public iser::ISerializable
 {
@@ -81,7 +80,6 @@ Q_SIGNALS:
 	void stateChanged(const QString& state);
 	void needsReload();
 
-
 private:
 	class Item
 	{
@@ -133,4 +131,7 @@ protected:
 
 } // namespace imtbase
 
+
 Q_DECLARE_METATYPE(imtbase::CTreeItemModel*)
+
+
