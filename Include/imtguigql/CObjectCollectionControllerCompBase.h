@@ -19,7 +19,7 @@ public:
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
 		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
-		I_ASSIGN(m_viewDelegateCompPtr, "ViewDelegate", "View delegate (corresponding with the object type) used for the collection", true, "FeaturePackageViewDelegate");
+		I_ASSIGN(m_viewDelegateCompPtr, "ViewDelegate", "View delegate (corresponding with the object type) used for the collection", true, "ViewDelegate");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 	I_END_COMPONENT;
 
