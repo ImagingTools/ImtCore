@@ -66,130 +66,294 @@ Rectangle {
 //        }
 //    }
 
-    Column {
-        id: accountInfo;
-        width: parent.width;
-
-        anchors.top: cbTypeAccount.bottom;
-
-        Text {
-            id: accountNameTitle;
-            text: qsTr("Account name");
-        }
-
-        TextFieldCustom {
-            id: tfAccountName;
-            width: parent.width;
-            anchors.top: accountNameTitle.bottom;
-          //  placeHolderText: qsTr("Account name");
-            onAccepted: {
-                contactInfoModel.SetData("accountName", tfAccountName.text);
-            }
-        }
-
-        Text {
-            id: accountDescriptionTitle;
-
-            anchors.top: tfAccountName.bottom;
-            text: qsTr("Account description");
-        }
-
-        TextFieldCustom {
-            id: tfAccountDecription;
-            width: parent.width;
-            anchors.top: accountDescriptionTitle.bottom;
-           // placeHolderText: qsTr("Account description");
-            onAccepted: {
-                contactInfoModel.SetData("accountDescription", tfAccountDecription.text);
-            }
-        }
+    Text {
+        id: titleAccountName;
+        text: qsTr("Account name");
+        color: Style.textColor;
+        font.family: Style.fontFamily;
+        anchors.top: container.top;
+        anchors.topMargin: 10;
+        anchors.left: container.left;
+       // anchors.leftMargin: 10;
+       // font.pixelSize: Style.fontSize_subtitle;
     }
 
+    TextFieldCustom {
+        id: tfcAccountName;
+        width: container.width;
+        height: 30;
+        anchors.top: titleAccountName.bottom;
+        anchors.topMargin: 10;
+        anchors.horizontalCenter: container.horizontalCenter;
+        //anchors.verticalCenter: tfcEmail.verticalCenter;
+    }
 
+    Text {
+        id: titleAccountDescription;
+        text: qsTr("Account description");
+        color: Style.textColor;
+        font.family: Style.fontFamily;
+        anchors.top: tfcAccountName.bottom;
+        anchors.topMargin: 10;
+        anchors.left: container.left;
+       // anchors.leftMargin: 10;
+       // font.pixelSize: Style.fontSize_subtitle;
+    }
+
+    TextFieldCustom {
+        id: tfcAccountDescription;
+        width: container.width;
+        height: 30;
+        anchors.top: titleAccountDescription.bottom;
+        anchors.topMargin: 10;
+        anchors.horizontalCenter: container.horizontalCenter;
+        //anchors.verticalCenter: tfcEmail.verticalCenter;
+    }
+
+    Text {
+        id: companyAddressBlockTitle;
+        text: qsTr("Company address");
+        color: Style.textColor;
+        font.pixelSize: Style.fontSize_subtitle;
+        font.family: Style.fontFamily;
+        anchors.top: tfcAccountDescription.bottom;
+        anchors.topMargin: 10;
+        //anchors.bottom: accountOwnerBlock.top;
+    }
 
     Rectangle {
-        id: rect;
-        anchors.top: tfAccountDecription.bottom;
-        Text {
-            id: accountOwnerTitle;
-            text: qsTr("Account Owner");
+        id: companyAddressBlock;
+        width: container.width;
+        height: 360;
+        anchors.top: companyAddressBlockTitle.bottom;
+        anchors.topMargin: 5;
+        color: Style.baseColor;
+        border.color: "gray";
 
+        Text {
+            id: titleCountry;
+            text: qsTr("Country");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            anchors.top: companyAddressBlock.top;
+            anchors.topMargin: 10;
+            anchors.left: companyAddressBlock.left;
+            anchors.leftMargin: 10;
+           // font.pixelSize: Style.fontSize_subtitle;
+        }
+
+        Rectangle {
+            id: tfcCountry;
+            width: companyAddressBlock.width - 20;
+            anchors.horizontalCenter: companyAddressBlock.horizontalCenter;
+            height: 60;
+            anchors.top: titleCountry.bottom;
+
+            color: Style.baseColor;
+            border.color: "gray";
+            TextFieldCustom {
+                width: tfcCountry.width - 50;
+                height: 30;
+                anchors.horizontalCenter: tfcCountry.horizontalCenter;
+                anchors.verticalCenter: tfcCountry.verticalCenter;
+            }
+        }
+
+        Text {
+            id: titleCity;
+            text: qsTr("City");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            anchors.top: tfcCountry.bottom;
+            anchors.topMargin: 10;
+            anchors.left: companyAddressBlock.left;
+            anchors.leftMargin: 10;
+           // font.pixelSize: Style.fontSize_subtitle;
+        }
+
+        Rectangle {
+            id: tfcCity;
+            width: companyAddressBlock.width - 20;
+            anchors.horizontalCenter: companyAddressBlock.horizontalCenter;
+            height: 60;
+            anchors.top: titleCity.bottom;
+
+            color: Style.baseColor;
+            border.color: "gray";
+            TextFieldCustom {
+                width: tfcCity.width - 50;
+                height: 30;
+                anchors.horizontalCenter: tfcCity.horizontalCenter;
+                anchors.verticalCenter: tfcCity.verticalCenter;
+            }
+        }
+
+        Text {
+            id: titlePostalCode;
+            text: qsTr("Postal code");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            anchors.top: tfcCity.bottom;
+            anchors.topMargin: 10;
+            anchors.left: companyAddressBlock.left;
+            anchors.leftMargin: 10;
+           // font.pixelSize: Style.fontSize_subtitle;
+        }
+
+        Rectangle {
+            id: tfcPostalCode;
+            width: companyAddressBlock.width - 20;
+            anchors.horizontalCenter: companyAddressBlock.horizontalCenter;
+            height: 60;
+            anchors.top: titlePostalCode.bottom;
+
+            color: Style.baseColor;
+            border.color: "gray";
+            TextFieldCustom {
+                width: tfcPostalCode.width - 50;
+                height: 30;
+                anchors.horizontalCenter: tfcPostalCode.horizontalCenter;
+                anchors.verticalCenter: tfcPostalCode.verticalCenter;
+            }
+        }
+
+        Text {
+            id: titleStreet;
+            text: qsTr("Street");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            anchors.top: tfcPostalCode.bottom;
+            anchors.topMargin: 10;
+            anchors.left: companyAddressBlock.left;
+            anchors.leftMargin: 10;
+           // font.pixelSize: Style.fontSize_subtitle;
+        }
+
+        Rectangle {
+            id: tfcStreet;
+            width: companyAddressBlock.width - 20;
+            anchors.horizontalCenter: companyAddressBlock.horizontalCenter;
+            height: 60;
+            anchors.top: titleStreet.bottom;
+
+            color: Style.baseColor;
+            border.color: "gray";
+            TextFieldCustom {
+                width: tfcStreet.width - 50;
+                height: 30;
+                anchors.horizontalCenter: tfcStreet.horizontalCenter;
+                anchors.verticalCenter: tfcStreet.verticalCenter;
+            }
         }
     }
 
-//    Rectangle {
-//        id: accountOwnerBlock;
-
-//        anchors.top: accountOwnerTitle.bottom;
-//        Text {
-//            id: accountOwnerBlockTitle;
-//            text: qsTr("Account Owner");
-//            anchors.bottom: accountOwnerBlock.top;
-//        }
-
-//        Rectangle {
-//            id: containerAccountOwner;
-//            anchors.fill: accountOwnerBlock;
-//            border.color: "black";
-
-//            Column {
-//                width: parent.width;
-
-//                Rectangle {
-//                    id: emailBlock;
-
-//                    Text {
-//                        id: emailBlockTitle;
-//                        text: qsTr("Email");
-//                    }
-
-//                    TextFieldCustom {
-//                        id: tfEmail;
-//                        width: parent.width;
-//                        //placeHolderText: qsTr("Email");
-//                        anchors.top: emailBlockTitle.bottom;
-//                        onAccepted: {
-//                            contactInfoModel.SetData("email", tfEmail.text);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-//    Column {
-//        width: parent.width;
 
 
+    Text {
+        id: accountOwnerBlockTitle;
+        text: qsTr("Account Owner");
+        color: Style.textColor;
+        font.pixelSize: Style.fontSize_subtitle;
+        font.family: Style.fontFamily;
+        anchors.top: companyAddressBlock.bottom;
+        anchors.topMargin: 10;
+        //anchors.bottom: accountOwnerBlock.top;
+    }
 
-//        TextFieldCustom {
-//            id: tfName;
-//            width: parent.width;
-//            placeHolderText: qsTr("First name");
-//            onAccepted: {
-//                contactInfoModel.SetData("firstName", tfName.text);
-//            }
-//        }
+    Rectangle {
+        id: accountOwnerBlock;
+        width: container.width;
+        height: 500;
+        anchors.top: accountOwnerBlockTitle.bottom;
+        anchors.topMargin: 5;
+        color: Style.baseColor;
+        border.color: "gray";
 
-//        TextFieldCustom {
-//            id: tfLastName;
-//            width: parent.width;
-//            placeHolderText: qsTr("Last name");
-//            onAccepted: {
-//                contactInfoModel.SetData("lastName", tfLastName.text);
-//            }
-//        }
+        Text {
+            id: titleEmail;
+            text: qsTr("Email");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            anchors.top: accountOwnerBlock.top;
+            anchors.topMargin: 10;
+            anchors.left: accountOwnerBlock.left;
+            anchors.leftMargin: 10;
+           // font.pixelSize: Style.fontSize_subtitle;
+        }
 
-//       TextFieldCustom {
-//           id: tfNicName;
-//            width: parent.width;
-//            placeHolderText: qsTr("Nickname");
-//            onAccepted: {
-//                contactInfoModel.SetData("nickName", tfNicName.text);
-//            }
-//        }
+        Rectangle {
+            id: tfcEmail;
+            width: accountOwnerBlock.width - 20;
+            anchors.horizontalCenter: accountOwnerBlock.horizontalCenter;
+            height: 60;
+            anchors.top: titleEmail.bottom;
 
-//    }
+            color: Style.baseColor;
+            border.color: "gray";
+            TextFieldCustom {
+                width: tfcEmail.width - 50;
+                height: 30;
+                anchors.horizontalCenter: tfcEmail.horizontalCenter;
+                anchors.verticalCenter: tfcEmail.verticalCenter;
+            }
+        }
+
+        Text {
+            id: titleFirstName;
+            text: qsTr("First name");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            anchors.left: accountOwnerBlock.left;
+            anchors.leftMargin: 10;
+            anchors.top: tfcEmail.bottom;
+            anchors.topMargin: 10;
+           // font.pixelSize: Style.fontSize_subtitle;
+        }
+
+        Rectangle {
+            id: tfcFirstName;
+            width: accountOwnerBlock.width - 20;
+            anchors.horizontalCenter: accountOwnerBlock.horizontalCenter;
+            height: 60;
+            anchors.top: titleFirstName.bottom;
+            color: Style.baseColor;
+            border.color: "gray";
+            TextFieldCustom {
+                width: tfcFirstName.width - 50;
+                height: 30;
+                anchors.horizontalCenter: tfcFirstName.horizontalCenter;
+                anchors.verticalCenter: tfcFirstName.verticalCenter;
+            }
+        }
+
+        Text {
+            id: titleLastName;
+            text: qsTr("Last name");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            anchors.left: accountOwnerBlock.left;
+            anchors.leftMargin: 10;
+            anchors.top: tfcFirstName.bottom;
+            anchors.topMargin: 10;
+           // font.pixelSize: Style.fontSize_subtitle;
+        }
+
+        Rectangle {
+            id: tfcLastName;
+            width: accountOwnerBlock.width - 20;
+            anchors.horizontalCenter: accountOwnerBlock.horizontalCenter;
+            height: 60;
+            anchors.top: titleLastName.bottom;
+            color: Style.baseColor;
+            border.color: "gray";
+            TextFieldCustom {
+                width: tfcLastName.width - 50;
+                height: 30;
+                anchors.horizontalCenter: tfcLastName.horizontalCenter;
+                anchors.verticalCenter: tfcLastName.verticalCenter;
+            }
+        }
+    }
 }
 
 

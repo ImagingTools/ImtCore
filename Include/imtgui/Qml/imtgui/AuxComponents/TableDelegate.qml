@@ -172,11 +172,15 @@ Rectangle{
 //        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
         onClicked: {
             container.clicked();
+//            popupMenuDialog.visible = true;
+//            popupMenuDialog.x = ma.mouseX;
+//            popupMenuDialog.y = ma.mouseY;
         }
 
         onDoubleClicked: {
-            editFeatureDialog.visible = true;
+           /// editFeatureDialog.visible = true;
+            //removeDialog.visible = true;
         }
-    }
 
+    }
 }

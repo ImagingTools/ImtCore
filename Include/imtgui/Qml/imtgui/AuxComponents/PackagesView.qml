@@ -16,9 +16,7 @@ CollectionView {
         this.table.addToHeadersArray("Description")
         this.table.addToHeadersArray("Added")
         this.table.addToHeadersArray("Last Modified")
-        console.log("PackageView onCompleted 1")
         commandsModel.updateModel()
-        console.log("PackageView onCompleted 2")
     }
 
 
@@ -46,7 +44,6 @@ CollectionView {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log("PackageView query ");
             console.log("PackageView query ", gqlData);
             this.SetGqlQuery(gqlData);
         }

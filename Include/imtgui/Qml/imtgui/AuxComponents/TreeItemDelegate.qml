@@ -6,33 +6,6 @@ Item {
     width: 100;
     height: childrenColumn.visible ? mainRect.height + childrenColumn.height: mainRect.height;
     property bool isOpened: false;
-   // property var currentColumn;
-//    property int level: 0;
-
-//    function changeStateAllChildren (root, model, state)
-//    {
-//        if (!model)
-//        {
-//            return;
-//        }
-
-//        var countChildren = model.GetItemsCount();
-//        console.log("countChildren", countChildren);
-//        for (var i = 0; i < countChildren; i++)
-//        {
-
-//            console.log(model.GetData("Name", i));
-//            console.log(model);
-//            model.SetData("stateChecked", state, i);
-//            console.log(model.GetData("stateChecked", i));
-//            var childModel = model.GetData("ChildModel", i);
-//            changeStateAllChildren(root, childModel, state);
-//        }
-//    }
-//    Rectangle {
-//        anchors.fill: parent;
-//        color: Style.mainColor;
-//    }
 
     Component.onCompleted: {
         if (model.childItemModel)
@@ -71,34 +44,7 @@ Item {
                 id: mouseArea;
                 anchors.fill: parent;
                 onClicked: {
-                    console.log("================Model onClicked!================");
                     treeItemDelegate.isOpened = !treeItemDelegate.isOpened;
-                      //console.log("treeItemDelegate.isOpened", model.isOpened);
-                     // model.isOpened = 1;
-                       //treeItemDelegate.changeStatusVisible();
-                      //changeStatusVisible();
-                      //console.log("treeItemDelegate.isOpened", model.isOpened);
-//                    if (model.isOpened === 0)
-//                    {
-//                        model.isOpened = 1;
-//                    } else
-//                    {
-//                        model.isOpened = 0;
-//                    }
-
-//                    model.SetData("isOpened", !model.isOpened);
-//                    childrenColumn.visible = !childrenColumn.visible;
-//                    console.log("titleModel text", model.Name);
-//                    console.log("treeItemDelegate level", treeItemDelegate.level);
-//                    console.log("treeItemRepeater.count", treeItemRepeater.count);
-//                    console.log("treeItemDelegate.isOpened", model.isOpened);
-//                    console.log("znak text", znak.text);
-//                    console.log("*****Column, repeater!*****");
-//                    console.log("childrenColumn width", childrenColumn.width);
-//                    console.log("childrenColumn height", childrenColumn.height);
-//                    console.log("childrenColumn visible", childrenColumn.visible);
-//                    console.log("treeItemRepeater.count", treeItemRepeater.count);
-//                    console.log("childrenColumn.height", childrenColumn.height);
                 }
             }
         }

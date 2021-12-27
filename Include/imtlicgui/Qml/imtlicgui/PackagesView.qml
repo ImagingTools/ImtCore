@@ -103,8 +103,8 @@ CollectionView {
                     }
                     else if(commandsModel.ContainsKey("errors")){
                         var errorsModel = commandsModel.GetData("errors");
-                        if(errorsModel !== null && errorsModel.ContainsKey("CommandsData")){
-                            console.log("message", errorsModel.GetData("CommandsData").GetData("message"));
+                        if(errorsModel !== null && errorsModel.ContainsKey("FeaturePackageList")){
+                            console.log("message", errorsModel.GetData("FeaturePackageList").GetData("message"));
                         }
                     }
                 }

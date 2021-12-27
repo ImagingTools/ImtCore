@@ -1,6 +1,9 @@
 <RCC>
     <qresource prefix="/qml">
         <file alias="imtlicgui/PackagesView.qml">Qml/imtlicgui/PackagesView.qml</file>
-		<file alias="imtlicgui/qmldir">Qml/imtlicgui/qmldir</file>
+        <file alias="imtlicgui/qmldir">Qml/imtlicgui/qmldir</file>
+        <file alias="imtlicgui/AccountsView.qml">Qml/imtlicgui/AccountsView.qml</file>
+        <file alias="imtlicgui/InstallationsView.qml">Qml/imtlicgui/InstallationsView.qml</file>
+        <file alias="imtlicgui/ProductsView.qml">Qml/imtlicgui/ProductsView.qml</file>
     </qresource>
 </RCC>

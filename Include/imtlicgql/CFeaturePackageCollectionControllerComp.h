@@ -15,8 +15,6 @@ public:
 	typedef imtguigql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFeaturePackageCollectionControllerComp);
-//		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
-//		I_ASSIGN(m_pagesDataProviderCompPtr, "PagesDataProviderCompPtr", "List of pages providers for join", true, "");
 	I_END_COMPONENT;
 
 	CFeaturePackageCollectionControllerComp();

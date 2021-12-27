@@ -147,12 +147,6 @@ Rectangle {
             height: 25;
             color: Style.baseColor;
             border.color: "gray";
-//            border.color: {
-//                    return cancelButtonMa.mouseX <= 0 || cancelButtonMa.mouseX >= cancelButton.width
-//                                               || cancelButtonMa.mouseY <= 0 || cancelButtonMa.mouseY >= cancelButton.height
-//                                                ? "gray"  : "#1560BD";
-//            }
-
             anchors.top: tfcFeatureId.bottom;
            // anchors.bottomMargin: 15;
             anchors.topMargin: 30;
