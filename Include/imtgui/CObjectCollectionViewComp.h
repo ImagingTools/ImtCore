@@ -58,12 +58,13 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
 		I_ASSIGN_MULTI_0(m_viewDelegatesCompPtr, "ViewDelegates", "List of view delegates (corresponding with the object type) used for the collection", false);
+		I_ASSIGN(m_filterParamsGuiCompPtr, "FilterParamsGui", "UI for the additional filtering parameters for the collection", false, "FilterParamsGui");
 		I_ASSIGN(m_columnSettingsKeyAttrPtr, "ColumnSettingsKey", "Registry/INI file key for storing column settings", true, "");
 		I_ASSIGN(m_useAsyncReadAttrPtr, "UseAsyncRead", "Useasync collectionRead", true, false);
 		I_ASSIGN(m_useSearchWidgetAttrPtr, "UseSearchWidget", "Use internal search widget", true, true);
 		I_ASSIGN(m_viewProgressAttrPtr, "ViewProgress", "View progress bar on upload", true, true);
 		I_ASSIGN(m_viewRightPanelAttrPtr, "ViewRightPanel", "View right panel", true, true);
-		I_END_COMPONENT;
+	I_END_COMPONENT;
 
 		enum DataRole { DR_TYPE_ID = Qt::UserRole, DR_OBJECT_ID, DR_SORT_VALUE };
 
@@ -331,6 +332,7 @@ private:
 		List of collection view delegates.
 	*/
 	I_MULTIREF(ICollectionViewDelegate, m_viewDelegatesCompPtr);
+	I_REF(iqtgui::IGuiObject, m_filterParamsGuiCompPtr);
 	I_ATTR(QByteArray, m_columnSettingsKeyAttrPtr);
 	I_ATTR(bool, m_useAsyncReadAttrPtr);
 	I_ATTR(bool, m_useSearchWidgetAttrPtr);

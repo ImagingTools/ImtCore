@@ -338,6 +338,10 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	Message->hide();
 	Progress->hide();
 
+	if (m_filterParamsGuiCompPtr.IsValid()){
+		m_filterParamsGuiCompPtr->CreateGui(CustomFilterParamsFrame);
+	}
+
 	m_itemModelPtr = &m_itemModel1;
 	m_readCollectionThread.SetModels(&m_typeModel, &m_itemModel2);
 
@@ -400,6 +404,10 @@ void CObjectCollectionViewComp::OnGuiDestroyed()
 {
 	m_readCollectionThread.requestInterruption();
 	m_readCollectionThread.wait();
+
+	if (m_filterParamsGuiCompPtr.IsValid() && m_filterParamsGuiCompPtr->IsGuiCreated()){
+		m_filterParamsGuiCompPtr->DestroyGui();
+	}
 
 	if ((m_currentInformationViewPtr != nullptr) && m_currentInformationViewPtr->IsGuiCreated()){
 		m_currentInformationViewPtr->DestroyGui();

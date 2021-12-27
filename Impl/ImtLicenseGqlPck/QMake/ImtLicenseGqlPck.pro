@@ -1,11 +1,11 @@
-TARGET = ImtLicenseGuiPck
+TARGET = ImtLicenseGqlPck
 
 include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liproc -liauth -liedge
-LIBS += -limtgui -limtloggui -limtbase -limtwidgets -limtlic -limtlicgui -limtcrypt -limtstyle
+LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liproc -liauth
+LIBS += -limtbase -limtlic -limtrest -limtgql -limtlicgql -limtlicgui -limtguigql -limtcrypt
 
 
 include($(ACFCONFIGDIR)/QMake/AcfQt.pri)

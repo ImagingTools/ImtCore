@@ -82,7 +82,7 @@
         <property name="frameShadow">
          <enum>QFrame::Plain</enum>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0">
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,1,0">
          <property name="spacing">
           <number>6</number>
          </property>
@@ -110,6 +110,30 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <widget class="QFrame" name="CustomFilterParamsFrame">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <property name="leftMargin">
+             <number>3</number>
+            </property>
+            <property name="topMargin">
+             <number>3</number>
+            </property>
+            <property name="rightMargin">
+             <number>3</number>
+            </property>
+            <property name="bottomMargin">
+             <number>3</number>
+            </property>
+           </layout>
+          </widget>
          </item>
          <item>
           <widget class="QLineEdit" name="FilterEdit">
@@ -145,7 +169,7 @@
             <string>Close</string>
            </property>
            <property name="icon">
-            <iconset resource="imtguidark.qrc">
+            <iconset>
              <normaloff>:/Icons/Close</normaloff>:/Icons/Close</iconset>
            </property>
            <property name="iconSize">
