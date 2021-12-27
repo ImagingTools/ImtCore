@@ -114,6 +114,7 @@ Rectangle {
             delegate: TopButton {
                 text: model[CommandEnum.NAME];
 //                imageSource: model[CommandEnum.ICON];
+                isEmpty: model[CommandEnum.NAME] === "";
                 imageSource: "../../../" + "Icons/" + Style.theme + "/" + model[CommandEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
                 fontName: topPanel.fontName;
             }

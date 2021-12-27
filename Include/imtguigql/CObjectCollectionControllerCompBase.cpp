@@ -1,6 +1,7 @@
 #include <imtguigql/CObjectCollectionControllerCompBase.h>
 
 #include <imtqml/CCommandDataEnumProviderComp.h>
+#include <iqtgui/CHierarchicalCommand.h>
 
 
 namespace imtguigql
@@ -140,6 +141,47 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::Headers(
 	else{
 		dataModel = new imtbase::CTreeItemModel();
 		itemsModel = new imtbase::CTreeItemModel();
+		const imtbase::ICollectionInfo& fieldCollection = m_viewDelegateCompPtr->GetSummaryInformationTypes();
+		QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
+
+		for (QByteArray fieldId : fieldIds){
+			QString headerName = fieldCollection.GetElementInfo(fieldId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			int index = itemsModel->InsertNewItem();
+			itemsModel->SetData(imtqml::CCommandDataEnumProviderComp::NAME, headerName,index);
+		}
+		itemsModel->SetIsArray(true);
+
+		dataModel->SetExternTreeModel("headers", itemsModel);
+	}
+
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
+}
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::Commands(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* itemsModel = nullptr;
+	bool isSetResponce = false;
+	QByteArrayList fields;
+
+
+	if (!m_viewDelegateCompPtr.IsValid()){
+		errorMessage = QObject::tr("Internal error").toUtf8();
+	}
+
+	if (!errorMessage.isEmpty()){
+		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		errorsItemModel->SetData("message", errorMessage);
+	}
+	else{
+		dataModel = new imtbase::CTreeItemModel();
+		itemsModel = new imtbase::CTreeItemModel();
+
 		const imtbase::ICollectionInfo& fieldCollection = m_viewDelegateCompPtr->GetSummaryInformationTypes();
 		QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
 

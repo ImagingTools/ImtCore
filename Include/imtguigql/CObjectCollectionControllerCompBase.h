@@ -33,6 +33,7 @@ public:
 		OT_SET_DESCRIPTION,
 		OT_LIST,
 		OT_HEADERS,
+		OT_COMMANDS,
 		OT_USER_OPERATION = 1000
 	};
 
@@ -49,6 +50,7 @@ protected:
 	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* Headers(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* Commands(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 protected:
 	I_REF(imtgui::ICollectionViewDelegate, m_viewDelegateCompPtr);
