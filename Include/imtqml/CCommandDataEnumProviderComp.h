@@ -27,7 +27,7 @@ public:
 
 	CCommandDataEnumProviderComp(QObject *parent = nullptr) : QObject(parent), BaseClass() {}
 
-	static constexpr const char* ID = "CommandId";
+	static constexpr const char* ID = "Id";
 	const QString Id() { return ID; }
 	static constexpr const char* NAME = "Name";
 	const QString Name() { return NAME; }

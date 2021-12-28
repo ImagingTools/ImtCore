@@ -45,7 +45,7 @@ CollectionView {
                         tabPanel.addToHeadersArray("Installations")
                         dataModelLocal = dataModelLocal.GetData("headers")
                         for(var i = 0; i < dataModelLocal.GetItemsCount(); i++){
-                            installationCollectionView.table.addToHeadersArray(dataModelLocal.GetData(PageEnum.NAME,i));
+                            installationCollectionView.table.addToHeadersArray(dataModelLocal.GetData("Id",i), dataModelLocal.GetData("Name",i));
                         }
 
                         installationsModel.updateModel()
@@ -79,8 +79,8 @@ CollectionView {
             var query = Gql.GqlRequest("query", "InstallationList");
 
             var queryFields = Gql.GqlObject("items");
-            for (var i = 0; i < installationCollectionView.table.headersArray.length; i++){
-                queryFields.InsertField(installationCollectionView.table.headersArray[i]);
+            for (var i = 0; i < installationCollectionView.table.headerKeysArray.length; i++){
+                queryFields.InsertField(installationCollectionView.table.headerKeysArray[i]);
             }
             query.AddField(queryFields);
 

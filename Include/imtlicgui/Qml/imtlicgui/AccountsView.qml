@@ -45,17 +45,11 @@ CollectionView {
                         tabPanel.addToHeadersArray("Accounts")
                         dataModelLocal = dataModelLocal.GetData("headers")
                         for(var i = 0; i < dataModelLocal.GetItemsCount(); i++){
-                            accountCollectionView.table.addToHeadersArray(dataModelLocal.GetData(PageEnum.NAME,i));
+                            console.log("Account header key:", dataModelLocal.GetData("Id",i))
+                            accountCollectionView.table.addToHeadersArray(dataModelLocal.GetData("Id",i), dataModelLocal.GetData("Name",i));
                         }
 
                         accountsModel.updateModel()
-
-//                        this.table.addToHeadersArray("Description")
-//                        this.table.addToHeadersArray("Added")
-//                        this.table.addToHeadersArray("Last Modified")
-//                        console.log("AccountView onCompleted 1")
-//                        commandsModel.updateModel()
-//                        console.log("PackageView onCompleted 2")
                     }
                     else if(commandsModel.ContainsKey("errors")){
                         var errorsModel = commandsModel.GetData("errors");
@@ -79,8 +73,8 @@ CollectionView {
             var query = Gql.GqlRequest("query", "AccountList");
 
             var queryFields = Gql.GqlObject("items");
-            for (var i = 0; i < accountCollectionView.table.headersArray.length; i++){
-                queryFields.InsertField(accountCollectionView.table.headersArray[i]);
+            for (var i = 0; i < accountCollectionView.table.headerKeysArray.length; i++){
+                queryFields.InsertField(accountCollectionView.table.headerKeysArray[i]);
             }
             query.AddField(queryFields);
 

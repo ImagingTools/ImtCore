@@ -4,7 +4,6 @@
         <file alias="WrapItem.qml">Qml/WrapItem.qml</file>
         <file alias="imtqml/JSONListModel.qml">Qml/imtqml/JSONListModel.qml</file>
         <file alias="imtqml/jsonpath.js">Qml/imtqml/jsonpath.js</file>
-        <file alias="imtqml/TreeItemModel_.qml">Qml/imtqml/TreeItemModel.qml</file>
         <file alias="imtqml/GraphQLRequest.js">Qml/imtqml/GraphQLRequest.js</file>
         <file alias="imtqml/GqlModel.qml">Qml/imtqml/GqlModel.qml</file>
         <file alias="imtqml/qmldir">Qml/imtqml/qmldir</file>

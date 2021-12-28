@@ -11,16 +11,20 @@ Item {
     property alias headersModel: headersList.model;
     property alias elementsModel: elementsList.model;
 
-    property var headersArray: [];
+    property var headerKeysArray: [];
+    property var headerNamesArray: [];
 
     function clearHeadersArray(){
-        while(tableContainer.headersArray.length > 0)
-            tableContainer.headersArray.pop();
+        while(tableContainer.headerKeysArray.length > 0)
+            tableContainer.headerKeysArray.pop();
+        while(tableContainer.headerNamesArray.length > 0)
+            tableContainer.headerNamesArray.pop();
     }
 
-    function addToHeadersArray(str){
-        tableContainer.headersArray.push(str);
-        headersList.model = tableContainer.headersArray.length
+    function addToHeadersArray(strKey, strName){
+        tableContainer.headerKeysArray.push(strKey);
+        tableContainer.headerNamesArray.push(strName);
+        headersList.model = tableContainer.headerKeysArray.length
     }
 
     Rectangle {
@@ -54,7 +58,7 @@ Item {
                     font.family: Style.fontFamilyBold;
                     font.bold: true; //tableContainer.fontBold
                     color: Style.textColor;
-                    text: tableContainer.headersArray[model.index];
+                    text: tableContainer.headerNamesArray[model.index];
                 }
             }
         }
@@ -89,8 +93,8 @@ Item {
             width: elementsList.width;
             selected: elementsList.selectedIndex === model.index;
             Component.onCompleted: {
-                for (var i = 0; i < headersArray.length; i++){
-                    tableDelegate.addToArray(model[headersArray[i]])
+                for (var i = 0; i < tableContainer.headerKeysArray.length; i++){
+                    tableDelegate.addToArray(model[tableContainer.headerKeysArray[i]])
                 }
             }
 

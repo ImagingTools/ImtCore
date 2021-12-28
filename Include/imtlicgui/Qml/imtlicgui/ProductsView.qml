@@ -45,7 +45,7 @@ CollectionView {
                         tabPanel.addToHeadersArray("Products")
                         dataModelLocal = dataModelLocal.GetData("headers")
                         for(var i = 0; i < dataModelLocal.GetItemsCount(); i++){
-                            productCollectionView.table.addToHeadersArray(dataModelLocal.GetData(PageEnum.NAME,i));
+                            productCollectionView.table.addToHeadersArray(dataModelLocal.GetData("Id",i), dataModelLocal.GetData("Name",i));
                         }
 
                         productsModel.updateModel()
@@ -79,8 +79,8 @@ CollectionView {
             var query = Gql.GqlRequest("query", "ProductList");
 
             var queryFields = Gql.GqlObject("items");
-            for (var i = 0; i < productCollectionView.table.headersArray.length; i++){
-                queryFields.InsertField(productCollectionView.table.headersArray[i]);
+            for (var i = 0; i < productCollectionView.table.headerKeysArray.length; i++){
+                queryFields.InsertField(productCollectionView.table.headerKeysArray[i]);
             }
             query.AddField(queryFields);
 

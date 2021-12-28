@@ -41,31 +41,30 @@ public:
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
-	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage, int& operationType) const;
-	virtual QByteArray GetObjectIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
-	virtual imtbase::CTreeItemModel* InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetHeaders(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetCommands(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const;
+	virtual QByteArray GetObjectIdFromInputParams(const QList<imtgql::CGqlObject>& inputParams) const;
+	virtual imtbase::CTreeItemModel* InsertObject(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* UpdateObject(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* RenameObject(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* SetObjectDescription(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* ListObjects(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* DeleteObject(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* GetHeaders(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
 
 	/**
 		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.
 	*/
 	virtual bool SetupGqlItem(
-				const imtgql::CGqlRequest& gqlRequest,
+				const imtgql::CGqlObject& gqlObject,
 				imtbase::CTreeItemModel& model,
 				int itemIndex,
 				const QByteArray& collectionId,
 				QString& errorMessage) const;
 
 	/**
-		Extract information-IDs from the GraphQL request.
+		Extract information-IDs from the GraphQL object.
 	*/
-	virtual QByteArrayList GetInformationIds(const imtgql::CGqlRequest& gqlRequest) const;
+	virtual QByteArrayList GetInformationIds(const imtgql::CGqlObject& gqlObject) const;
 
 	/**
 		Get specific information about the the object in the collection.

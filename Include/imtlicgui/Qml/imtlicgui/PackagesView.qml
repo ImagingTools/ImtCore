@@ -2,8 +2,6 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
-//import '../AuxComponents'
-//import imtgui.AuxComponents 1.0
 
 CollectionView {
     id: packageCollectionView;
@@ -27,7 +25,8 @@ CollectionView {
             var query = Gql.GqlRequest("query", "FeaturePackageInfo");
 
             var queryFields = Gql.GqlObject("headers");
-            queryFields.InsertField(CommandEnum.NAME);
+            queryFields.InsertField("Id");
+            queryFields.InsertField("Name");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
@@ -45,17 +44,10 @@ CollectionView {
                         tabPanel.addToHeadersArray("Packages")
                         dataModelLocal = dataModelLocal.GetData("headers")
                         for(var i = 0; i < dataModelLocal.GetItemsCount(); i++){
-                            packageCollectionView.table.addToHeadersArray(dataModelLocal.GetData(PageEnum.NAME,i));
+                            packageCollectionView.table.addToHeadersArray(dataModelLocal.GetData("Id",i), dataModelLocal.GetData("Name",i));
                         }
 
                         packagesModel.updateModel()
-
-//                        this.table.addToHeadersArray("Description")
-//                        this.table.addToHeadersArray("Added")
-//                        this.table.addToHeadersArray("Last Modified")
-//                        console.log("PackageView onCompleted 1")
-//                        commandsModel.updateModel()
-//                        console.log("PackageView onCompleted 2")
                     }
                     else if(commandsModel.ContainsKey("errors")){
                         var errorsModel = commandsModel.GetData("errors");
@@ -79,8 +71,8 @@ CollectionView {
             var query = Gql.GqlRequest("query", "FeaturePackageList");
 
             var queryFields = Gql.GqlObject("items");
-            for (var i = 0; i < packageCollectionView.table.headersArray.length; i++){
-                queryFields.InsertField(packageCollectionView.table.headersArray[i]);
+            for (var i = 0; i < packageCollectionView.table.headerKeysArray.length; i++){
+                queryFields.InsertField(packageCollectionView.table.headerKeysArray[i]);
             }
             query.AddField(queryFields);
 
