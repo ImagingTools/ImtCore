@@ -61,7 +61,6 @@ CollectionView {
     }
 
 
-
     GqlModel {
         id: packagesModel;
 

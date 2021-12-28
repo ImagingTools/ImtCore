@@ -136,17 +136,17 @@ Rectangle
 //        anchors.right: parent.right;
 //    }
 
-//    Rectangle {
-//        id: darkBackground;
-//        anchors.fill: parent;
-//        color: "gray";
-//        opacity: 0.8;
-//        visible: preference.visible || editFeatureDialog.visible;
+    Rectangle {
+        id: darkBackground;
+        anchors.fill: parent;
+        color: "gray";
+        opacity: 0.8;
+        visible: preference.visible;
 
-//        MouseArea {
-//            anchors.fill: parent;
-//        }
-//    }
+        MouseArea {
+            anchors.fill: parent;
+        }
+    }
 
     Preference {
         id: preference;

@@ -33,7 +33,7 @@ Rectangle {
     ListView {
         id: lvPages;
         anchors.fill: parent;
-
+        interactive: false;
         delegate:  MenuPanelButton{
             width: menuPanel.width;
             height: width;

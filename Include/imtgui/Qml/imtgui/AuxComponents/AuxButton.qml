@@ -5,22 +5,17 @@ Rectangle {
     id: container;
     property alias iconSource: image.source;
     radius: container.height * 0.15;
-    color: ma.mouseX <= 0 || ma.mouseX >= container.width
-           || ma.mouseY <= 0 || ma.mouseY >= height
-           || ma.pressed ? Style.buttonColor : Style.buttonColor;
-//    property alias iconSource: ma.mouseX <= 0 || ma.mouseX >= container.width
-//                               || ma.mouseY <= 0 || ma.mouseY >= height
-//                               || ma.pressed ? Style.buttonColor : Style.buttonColor;
-//    iconSource: "../../../Icons/" + Style.theme + "/Right_On_Normal.svg";
+    property bool highlighted: ma.containsMouse;
 
-
+    color: container.highlighted ? Style.baseColor : "transparent";
+    border.color: container.highlighted ? "gray" : "transparent";
     signal clicked;
 
 
     Image {
         id: image;
         anchors.centerIn: parent;
-        height: parent.height * 0.8;
+        height: parent.height;
         width: container.height;
 //        source: "../../../Icons/" + Style.theme + "/Right_On_Normal.svg";
 
@@ -32,29 +27,25 @@ Rectangle {
         id: ma;
         anchors.fill: parent;
         hoverEnabled: true;
-//        onEntered: {
-//            container.color = "white";
-//        }
-//        onExited: {
-//            container.color = "transparent";
-//        }
+        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+
         onPressed: {
 //            container.color = "transparent";
             image.anchors.verticalCenterOffset = 1;
         }
 
-        onReleased: {
-            image.anchors.verticalCenterOffset = 0;
-            if(ma.mouseX <= 0 || ma.mouseX >= container.width
-                    || ma.mouseY <= 0 || ma.mouseY >= container.height){
-                container.color = "transparent";
-            }
-            else{
-//                container.color = "white";
-//                container.color = Style.backgroundColor;
-            }
+//        onReleased: {
+//            image.anchors.verticalCenterOffset = 0;
+//            if(ma.mouseX <= 0 || ma.mouseX >= container.width
+//                    || ma.mouseY <= 0 || ma.mouseY >= container.height){
+//                container.color = "transparent";
+//            }
+//            else{
+////                container.color = "white";
+////                container.color = Style.backgroundColor;
+//            }
 
-        }
+//        }
 
         onClicked: {
             container.clicked();

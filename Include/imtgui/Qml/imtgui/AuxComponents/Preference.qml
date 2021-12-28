@@ -323,6 +323,7 @@ Rectangle {
                         preference.changeThemeIcons("Light");
                         preference.styleColor = "Light";
                         Style.theme = "Light";
+
                     }
                }
            }
@@ -332,14 +333,13 @@ Rectangle {
     function getThemeColor(colorType, colorKey, themeType) {
         var colorPalette = themeType.GetData("Style").GetData(colorType).GetData(colorKey);
         return themeType.GetData("ColorPalette").GetData(colorPalette);
-
     }
 
     function parseStyleTheme(themeType) {
         Style.baseColor = preference.getThemeColor("ActiveColors", "Base", themeType);
         Style.backgroundColor = preference.getThemeColor("ActiveColors", "Background", themeType);
         Style.textColor = preference.getThemeColor("ActiveColors", "Text", themeType);
-
+        console.log("Style.textColor ", Style.textColor);
         Style.selectedColor = preference.getThemeColor("ActiveColors", "ItemSelected", themeType);
         Style.buttonColor = preference.getThemeColor("ActiveColors", "HeaderBorder", themeType);
         Style.buttonBorderColor = preference.getThemeColor("ActiveColors", "ButtonBorder", themeType);

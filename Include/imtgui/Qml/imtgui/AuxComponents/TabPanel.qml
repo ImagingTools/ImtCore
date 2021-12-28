@@ -7,7 +7,7 @@ Rectangle {
     id: tabPanelContainer;
     height: 40;
     width: 1000;
-    color : Style.baseColor;
+    color: Style.theme === "Dark" ? Style.baseColor: Style.backgroundColor;
 
     property int selectedIndex: 0;
 //    property string firstElementName: "Packages";
@@ -42,6 +42,7 @@ Rectangle {
 //        enabled: tabPanelContainer.visible;
         spacing: 0;
         model: 0;
+        interactive: false;
         delegate: TabDelegate{
             height: list.height;
             width: 150;

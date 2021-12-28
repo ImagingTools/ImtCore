@@ -46,7 +46,8 @@ Item {
         radius: container.radius;
         visible: !container.isEmpty;
 //        color: (container.checkable && container.isChecked) ? "white" : container.highlighted ? "white" : "#fafafa";
-        color: Style.buttonColor;
+//        color: Style.buttonColor;
+        color: Style.backgroundColor;
 //        border.color: Style.buttonBorderColor;
 //        Rectangle{
 //            id: background;

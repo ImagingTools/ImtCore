@@ -16,6 +16,10 @@ public:
 
 	I_BEGIN_COMPONENT(CFeaturePackageCollectionControllerComp);
 	I_END_COMPONENT;
+
+protected:
+	// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
+	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const;
 };
 
 

@@ -99,6 +99,7 @@ Rectangle {
             model: 4;
             clip: true;
             orientation: ListView.Horizontal;
+            interactive: false;
             delegate: TopButton {
                 text: model[CommandEnum.NAME];
                 isEmpty: model[CommandEnum.NAME] === "";

@@ -6,7 +6,7 @@ Rectangle{
     height: 40;
     width: 120;
 //    color: selected ? "white" : "transparent";
-    color: "transparent";
+    color: Style.baseColor;
 
     property bool selected: false;
     property bool firstElement: false;

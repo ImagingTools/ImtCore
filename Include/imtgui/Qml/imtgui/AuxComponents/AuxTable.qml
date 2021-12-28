@@ -43,12 +43,13 @@ Item {
             orientation: ListView.Horizontal;
             spacing: 0;
             model: 0;
+            interactive: false;
             delegate: Rectangle{
                 id:deleg;
                 width: headersList.width/headersList.count;
                 height: headersList.height;
                 //color: "transparent";
-                color: Style.backgroundColor;
+                color: Style.theme === "Light" ? "white": Style.backgroundColor;
                 Text {
                     id: name;
                     anchors.verticalCenter: parent.verticalCenter;
@@ -88,6 +89,7 @@ Item {
 //        boundsBehavior: Flickable.StopAtBounds;
         spacing: 0;
         model: 0;
+        interactive: false;
         delegate: TableDelegate {
             id: tableDelegate;
             width: elementsList.width;
