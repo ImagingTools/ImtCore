@@ -1,9 +1,6 @@
 #include <imtgui/CTimeFilterParamEditorComp.h>
 
 
-// ACF includes
-#include <istd/CChangeGroup.h>
-
 // ImtCore includes
 #include <imtbase/DateTimeUtils.h>
 
@@ -60,7 +57,7 @@ void CTimeFilterParamEditorComp::on_TimeCombo_currentIndexChanged(int index)
 
 	switch (index){
 	case 0:
-		SetFilterTimeRange(QDateTime(), QDateTime::currentDateTime());
+		SetFilterTimeRange(QDateTime(), QDateTime());
 		break;
 	case 1:
 		SetFilterTimeRange(QDateTime::currentDateTime().addSecs(-60 * 60), QDateTime::currentDateTime());
@@ -92,7 +89,6 @@ void CTimeFilterParamEditorComp::on_TimeCombo_currentIndexChanged(int index)
 		SetFilterTimeRange(CustomBeginDate->dateTime(), CustomEndDate->dateTime());
 		break;
 	}
-
 }
 
 

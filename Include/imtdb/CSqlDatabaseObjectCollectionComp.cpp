@@ -417,7 +417,7 @@ void CSqlDatabaseObjectCollectionComp::CreateCollectionFromDatabase()
 		return;
 	}
 
-	istd::CChangeGroup changeGroup(this);
+	istd::CChangeNotifier changeNotifier(this);
 
 	QWriteLocker writeLock(&m_objectInfoMapMutex);
 

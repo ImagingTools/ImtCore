@@ -17,6 +17,8 @@ public:
 	// reimplemented (imtbase::ITimeFilterParam)
 	virtual const imtbase::CTimeRange& GetTimeRange() const override;
 	virtual void SetTimeRange(const imtbase::CTimeRange& timeRange) override;
+	virtual TimeInterval GetTimeInterval() const override;
+	virtual void SetTimeInterval(TimeInterval timeInterval) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -30,6 +32,7 @@ public:
 
 private:
 	imtbase::CTimeRange m_timeRange;
+	TimeInterval m_timeInterval;
 };
 
 
