@@ -74,7 +74,7 @@
       <item>
        <widget class="QFrame" name="FilterPanel">
         <property name="styleSheet">
-         <string notr="true">background-color: white</string>
+         <string notr="true"/>
         </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -258,8 +258,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="imtguidark.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

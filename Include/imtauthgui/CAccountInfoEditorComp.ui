@@ -65,7 +65,7 @@
        <item>
         <widget class="QWidget" name="OverviewFrame" native="true">
          <property name="styleSheet">
-          <string notr="true">background:white;</string>
+          <string notr="true"></string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <property name="spacing">

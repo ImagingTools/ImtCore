@@ -23,8 +23,7 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">background: palette(window);
-color:red;</string>
+      <string notr="true"></string>
      </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
