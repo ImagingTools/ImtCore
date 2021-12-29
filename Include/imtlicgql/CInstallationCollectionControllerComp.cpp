@@ -1,10 +1,18 @@
 #include <imtlicgql/CInstallationCollectionControllerComp.h>
 
+
+// ImtCore includes
 #include <imtlic/IProductInstanceInfo.h>
 #include <imtlic/IProductInfo.h>
 
+
 namespace imtlicgql
 {
+
+
+// protected methods
+
+// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
 
 QVariant CInstallationCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
 {
@@ -27,7 +35,6 @@ QVariant CInstallationCollectionControllerComp::GetObjectInformation(const QByte
 
 	return QVariant();
 }
-
 
 
 } // namespace imtlicgql

@@ -71,8 +71,8 @@ void CAccountInfoViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.InsertItem(QByteArray("AccountType"), tr("Account Type"), "");
 	m_summaryInformationHeaders["AccountType"] = HeaderInfo(false);
 
-	m_summaryInformationTypes.InsertItem(QByteArray("AccountDesciption"), tr("Account Desciption"), "");
-	m_summaryInformationHeaders["AccountDesciption"] = HeaderInfo(false);
+	m_summaryInformationTypes.InsertItem(QByteArray("AccountDescription"), tr("Account Description"), "");
+	m_summaryInformationHeaders["AccountDescription"] = HeaderInfo(false);
 }
 
 

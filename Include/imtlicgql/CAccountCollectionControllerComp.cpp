@@ -1,5 +1,6 @@
 #include <imtlicgql/CAccountCollectionControllerComp.h>
 
+
 // ImtCore includes
 #include <imtauth/IAccountInfo.h>
 
@@ -7,6 +8,10 @@
 namespace imtlicgql
 {
 
+
+// protected methods
+
+// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
 
 QVariant CAccountCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
 {
