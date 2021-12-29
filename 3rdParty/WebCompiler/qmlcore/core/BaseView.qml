@@ -23,6 +23,7 @@ BaseLayout {
 	property bool interactive: true;
 	property enum flickableDirection { AutoFlickDirection, AutoFlickIfNeeded, HorizontalFlick, VerticalFlick, HorizontalAndVerticalFlick };
 	property enum snapMode { NoSnap, SnapToItem, SnapOneItem };
+	property enum boundsBehavior { DragAndOvershootBounds, OvershootBounds, DragOverBounds, StopAtBounds };
 	cssPointerTouchEvents: nativeScrolling; // enable touch/pointer events for natively scrollable surfaces
 
 	/// @internal

@@ -395,7 +395,6 @@ BaseView {
 	}
 
 	function _snapTo(posState){
-		console.log(posState)
 		if(this.orientation === ListView.Vertical){
 			let posY = 0
 			let find = false

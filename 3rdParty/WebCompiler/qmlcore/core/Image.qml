@@ -63,6 +63,13 @@ Item {
 		this._scheduleLoad()
 	}
 
+	onSourceWidthChanged,
+	onSourceHeightChanged: {
+		this.style({
+			'background-size': `${this.sourceWidth}px ${this.sourceHeight}px`
+		})
+	}
+
 	onSourceChanged: {
 		this.status = this.Null
 

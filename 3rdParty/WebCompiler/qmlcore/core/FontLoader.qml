@@ -53,9 +53,10 @@ Item {
 	function _fontLoaded() {
 		let temp = this.source.split('/')
 		let name = temp[temp.length-1].split('.')[0]
+		this.name = name
         let domStyle = document.createElement("style")
         domStyle.innerHTML = `@font-face { font-family: ${this.name}; src: url('${this.source}'); }`
         document.head.appendChild(domStyle)
-		this.name = name	
+			
 	}
 }

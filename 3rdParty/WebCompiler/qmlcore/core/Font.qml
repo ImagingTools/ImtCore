@@ -22,21 +22,22 @@ Object {
 			+ (this.strike || this.strikeout ? ' line-through' : '')
 		this.parent.style('text-decoration', decoration)
 		this.parent._updateSize()
+		this.parent._context._processActions();
 	}
 
-	onFamilyChanged:		{ this.parent.style('font-family', value); this.parent._updateSize() }
-	onPointSizeChanged:		{ if (value > 0) this.pixelSize = 0; this.parent.style('font-size', value > 0? value + 'pt': ''); this.parent._updateSize() }
-	onPixelSizeChanged:		{ if (value > 0) this.pointSize = 0; this.parent.style('font-size', value > 0? value + 'px': ''); this.parent._updateSize() }
-	onItalicChanged: 		{ this.parent.style('font-style', value? 'italic': 'normal'); this.parent._updateSize() }
-	onBoldChanged: 			{ this.parent.style('font-weight', value? 'bold': 'normal'); this.parent._updateSize() }
+	onFamilyChanged:		{ this.parent.style('font-family', value); this.parent._updateSize(); this.parent._context._processActions(); }
+	onPointSizeChanged:		{ if (value > 0) this.pixelSize = 0; this.parent.style('font-size', value > 0? value + 'pt': ''); this.parent._updateSize(); this.parent._context._processActions(); }
+	onPixelSizeChanged:		{ if (value > 0) this.pointSize = 0; this.parent.style('font-size', value > 0? value + 'px': ''); this.parent._updateSize(); this.parent._context._processActions(); }
+	onItalicChanged: 		{ this.parent.style('font-style', value? 'italic': 'normal'); this.parent._updateSize(); this.parent._context._processActions(); }
+	onBoldChanged: 			{ this.parent.style('font-weight', value? 'bold': 'normal'); this.parent._updateSize(); this.parent._context._processActions(); }
 	onUnderlineChanged:		{ this._updateTextDecoration() }
 	onOverlineChanged:		{ this._updateTextDecoration() }
 	onStrikeChanged,
 	onStrikeoutChanged:		{ this._updateTextDecoration() }
-	onLineHeightChanged:	{ this.parent.style('line-height', value); this.parent._updateSize() }
-	onWeightChanged:		{ this.parent.style('font-weight', value); this.parent._updateSize() }
-	onLetterSpacingChanged:	{ this.parent.style('letter-spacing', value + "px"); this.parent._updateSize() }
-	onWordSpacingChanged:	{ this.parent.style('word-spacing', value + "px"); this.parent._updateSize() }
+	onLineHeightChanged:	{ this.parent.style('line-height', value); this.parent._updateSize(); this.parent._context._processActions(); }
+	onWeightChanged:		{ this.parent.style('font-weight', value); this.parent._updateSize(); this.parent._context._processActions(); }
+	onLetterSpacingChanged:	{ this.parent.style('letter-spacing', value + "px"); this.parent._updateSize(); this.parent._context._processActions(); }
+	onWordSpacingChanged:	{ this.parent.style('word-spacing', value + "px"); this.parent._updateSize(); this.parent._context._processActions(); }
 	onCapitalizationChanged:	{
 		this.parent.style('text-transform', 'none');
 		this.parent.style('font-variant', 'normal');

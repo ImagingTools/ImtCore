@@ -62,6 +62,7 @@ Object {
 		this.style({
 			'overflow': this.clip ? 'hidden': 'unset'
 		})
+		
 	}
 
 	function mapToItem(item, x, y){
@@ -460,7 +461,7 @@ Object {
 	}
 
 	onCssPointerTouchEventsChanged: {
-		var style = zzvalue? 'auto': 'none'
+		var style = value? 'auto': 'none'
 		this.style('pointer-events', style)
 		this.style('touch-action', style)
 	}

@@ -736,6 +736,8 @@ exports.addAliasProperty = function(object, name, getObject, srcProperty) {
 	Object.defineProperty(object, name, {
 		get: function() { return target[srcProperty] },
 		set: function(value) { target[srcProperty] = value },
+		// get: function() { return target[srcProperty] ? target[srcProperty] : target._local[srcProperty] },
+		// set: function(value) { if(target[srcProperty]) target[srcProperty] = value; else target._local[srcProperty] = value },
 		enumerable: true
 	})
 }

@@ -38,8 +38,8 @@ Item {
 		if (value && !this._touchBinder) {
 			this._touchBinder = new $core.EventBinder(this.element)
 
-			var touchStart = function(event) { this.touchStart(event); if(this.mouse.accepted) event.stopPropagation();  }.bind(this)
-			var touchEnd = function(event) { this.touchEnd(event); if(this.mouse.accepted) event.stopPropagation();  }.bind(this)
+			var touchStart = function(event) { this.touchStart(event); this.mousePressed(event); if(this.mouse.accepted) event.stopPropagation();  }.bind(this)
+			var touchEnd = function(event) { this.touchEnd(event); this.mouseReleased(event); this.clicked(event); if(this.mouse.accepted) event.stopPropagation();  }.bind(this)
 			var touchMove = (function(event) { this.touchMove(event); if(this.mouse.accepted) event.stopPropagation();  }).bind(this)
 
 			this._touchBinder.on('touchstart', touchStart)
@@ -94,11 +94,18 @@ Item {
 	// }
 
 	onEnabledChanged: {
-		this._bindClick(value)
-		this._bindWheel(value)
-		this._bindPressable(value)
-		this._bindHover(value && this.hoverEnabled)
-		this._bindTouch(value)
+		let os = this._context.system.os.toLowerCase()
+
+		if (os.indexOf("android") >= 0)
+			this._bindTouch(value)
+		else if (os.indexOf("ios") >= 0)
+			this._bindTouch(value)
+		else {
+			this._bindClick(value)
+			this._bindWheel(value)
+			this._bindPressable(value)
+			this._bindHover(this.hoverEnabled && value)
+		}
 	}
 
 	/// @private
@@ -327,16 +334,20 @@ Item {
 
 	/// @private
 	constructor: {
-		// this._bindClick(this.clickable)
-		// this._bindWheel(this.wheelEnabled)
-		// this._bindPressable(this.pressable)
-		// this._bindHover(this.hoverEnabled)
-		// this._bindTouch(this.touchEnabled)
-		this._bindClick(this.enabled)
-		this._bindWheel(this.enabled)
-		this._bindPressable(this.enabled)
-		this._bindHover(this.hoverEnabled && this.enabled)
-		this._bindTouch(this.enabled)
+		let os = this._context.system.os.toLowerCase()
+
+		if (os.indexOf("android") >= 0)
+			this._bindTouch(this.enabled)
+		else if (os.indexOf("ios") >= 0)
+			this._bindTouch(this.enabled)
+		else {
+			this._bindClick(this.enabled)
+			this._bindWheel(this.enabled)
+			this._bindPressable(this.enabled)
+			this._bindHover(this.hoverEnabled && this.enabled)
+		}
+		
+		
 		this.mouse = {
 			accepted: false,
 			button: 0x00000001,
@@ -357,4 +368,5 @@ Item {
 		this.wheel.x = 0;
 		this.wheel.y = 0;
 	}
+	
 }
