@@ -15,26 +15,44 @@ namespace imtbase
 class ITimeFilterParam: virtual public iser::ISerializable
 {
 public:
-	enum TimeInterval
+	enum TimeUnit
 	{
-		TI__CUSTOM,
-		TI_THIS_WEEK,
-		TI_WEEK_AGO,
-		TI_LAST_WEEK,
-		TI_THIS_MONTH,
-		TI_MONTH_AGO,
-		TI_LAST_MONTH,
-		TI_THIS_YEAR,
-		TI_LAST_YEAR,
-		TI_YEAR_AGO
+		TU_CUSTOM,
+		TU_HOUR,
+		TU_DAY,
+		TU_WEEK,
+		TU_MONTH,
+		TU_YEAR
 	};
 
-	I_DECLARE_ENUM(TimeInterval, TI__CUSTOM, TI_THIS_WEEK, TI_WEEK_AGO, TI_LAST_WEEK, TI_THIS_MONTH, TI_MONTH_AGO, TI_LAST_MONTH, TI_THIS_YEAR, TI_LAST_YEAR, TI_YEAR_AGO);
+	I_DECLARE_ENUM(TimeUnit, TU_CUSTOM, TU_HOUR, TU_DAY, TU_WEEK, TU_MONTH, TU_YEAR);
 
-	virtual const imtbase::CTimeRange& GetTimeRange() const = 0;
+	enum InterpretationMode
+	{
+		/**
+			Something is present for a time unit
+		*/
+		IM_FOR,
+
+		/**
+			Something is present within the current time unit
+		*/
+		IM_CURRENT,
+
+		/**
+			Something is present within the previous time unit.
+		*/
+		IM_LAST
+	};
+
+	I_DECLARE_ENUM(InterpretationMode, IM_FOR, IM_CURRENT, IM_LAST);
+
+	virtual imtbase::CTimeRange GetTimeRange() const = 0;
 	virtual void SetTimeRange(const imtbase::CTimeRange& timeRange) = 0;
-	virtual TimeInterval GetTimeInterval() const = 0;
-	virtual void SetTimeInterval(TimeInterval timeInterval) = 0;
+	virtual TimeUnit GetTimeUnit() const = 0;
+	virtual void SetTimeUnit(TimeUnit timeUnit, InterpretationMode interpretationMode, int multiplier = 1) = 0;
+	virtual InterpretationMode GetInterpretationMode() const = 0;
+	virtual int GetUnitMultiplier() const = 0;
 };
 
 

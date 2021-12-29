@@ -60,28 +60,28 @@ void CTimeFilterParamEditorComp::on_TimeCombo_currentIndexChanged(int index)
 		SetFilterTimeRange(QDateTime(), QDateTime());
 		break;
 	case 1:
-		SetFilterTimeRange(QDateTime::currentDateTime().addSecs(-60 * 60), QDateTime::currentDateTime());
+		SetTimeUnit(imtbase::ITimeFilterParam::TU_HOUR, imtbase::ITimeFilterParam::IM_FOR, 1);
 		break;
 	case 2:
-		SetFilterTimeRange(QDateTime::currentDateTime().addSecs(-4 * 60 * 60), QDateTime::currentDateTime());
+		SetTimeUnit(imtbase::ITimeFilterParam::TU_HOUR, imtbase::ITimeFilterParam::IM_FOR, 4);
 		break;
 	case 3:
-		SetFilterTimeRange(QDateTime::currentDateTime().addSecs(-8 * 60 * 60), QDateTime::currentDateTime());
+		SetTimeUnit(imtbase::ITimeFilterParam::TU_HOUR, imtbase::ITimeFilterParam::IM_FOR, 8);
 		break;
 	case 4:
-		SetFilterTimeRange(QDateTime::currentDateTime().addDays(-1), QDateTime::currentDateTime());
+		SetTimeUnit(imtbase::ITimeFilterParam::TU_DAY, imtbase::ITimeFilterParam::IM_FOR, 1);
 		break;
 	case 5:
-		SetFilterTimeRange(QDateTime::currentDateTime().addDays(-7), QDateTime::currentDateTime());
+		SetTimeUnit(imtbase::ITimeFilterParam::TU_WEEK, imtbase::ITimeFilterParam::IM_FOR, 1);
 		break;
 	case 6:
-		SetFilterTimeRange(QDateTime::currentDateTime().addMonths(-1), QDateTime::currentDateTime());
+		SetTimeUnit(imtbase::ITimeFilterParam::TU_MONTH, imtbase::ITimeFilterParam::IM_FOR, 1);
 		break;
 	case 7:
-		SetFilterTimeRange(QDateTime::currentDateTime().addMonths(-3), QDateTime::currentDateTime());
+		SetTimeUnit(imtbase::ITimeFilterParam::TU_MONTH, imtbase::ITimeFilterParam::IM_FOR, 3);
 		break;
 	case 8:
-		SetFilterTimeRange(QDateTime::currentDateTime().addYears(-1), QDateTime::currentDateTime());
+		SetTimeUnit(imtbase::ITimeFilterParam::TU_YEAR, imtbase::ITimeFilterParam::IM_FOR, 1);
 		break;
 	case 9:
 		CustomRangeFrame->setVisible(true);
@@ -100,6 +100,15 @@ void CTimeFilterParamEditorComp::SetFilterTimeRange(const QDateTime& beginTime, 
 	Q_ASSERT(objectPtr != NULL);
 
 	objectPtr->SetTimeRange(imtbase::CTimeRange(beginTime, endTime));
+}
+
+
+void CTimeFilterParamEditorComp::SetTimeUnit(imtbase::ITimeFilterParam::TimeUnit timeUnit, imtbase::ITimeFilterParam::InterpretationMode mode, int mulitplier)
+{
+	imtbase::ITimeFilterParam* objectPtr = GetObjectPtr();
+	Q_ASSERT(objectPtr != NULL);
+
+	objectPtr->SetTimeUnit(timeUnit, mode, mulitplier);
 }
 
 

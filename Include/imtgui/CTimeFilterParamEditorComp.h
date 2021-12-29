@@ -40,6 +40,7 @@ private Q_SLOTS:
 
 private:
 	void SetFilterTimeRange(const QDateTime& beginTime, const QDateTime& endTime);
+	void SetTimeUnit(imtbase::ITimeFilterParam::TimeUnit timeUnit, imtbase::ITimeFilterParam::InterpretationMode mode, int mulitplier);
 };
 
 
