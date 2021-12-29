@@ -57,6 +57,8 @@ void CTimeFilterParamEditorComp::on_TimeCombo_currentIndexChanged(int index)
 
 	switch (index){
 	case 0:
+		SetTimeUnit(imtbase::ITimeFilterParam::TU_CUSTOM, imtbase::ITimeFilterParam::IM_FOR, 1);
+
 		SetFilterTimeRange(QDateTime(), QDateTime());
 		break;
 	case 1:
@@ -85,6 +87,8 @@ void CTimeFilterParamEditorComp::on_TimeCombo_currentIndexChanged(int index)
 		break;
 	case 9:
 		CustomRangeFrame->setVisible(true);
+
+		SetTimeUnit(imtbase::ITimeFilterParam::TU_CUSTOM, imtbase::ITimeFilterParam::IM_FOR, 1);
 
 		SetFilterTimeRange(CustomBeginDate->dateTime(), CustomEndDate->dateTime());
 		break;

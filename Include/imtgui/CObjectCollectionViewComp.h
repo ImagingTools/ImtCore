@@ -66,89 +66,93 @@ public:
 		I_ASSIGN(m_viewRightPanelAttrPtr, "ViewRightPanel", "View right panel", true, true);
 	I_END_COMPONENT;
 
-		enum DataRole { DR_TYPE_ID = Qt::UserRole, DR_OBJECT_ID, DR_SORT_VALUE };
+	enum DataRole
+	{
+		DR_TYPE_ID = Qt::UserRole,
+		DR_OBJECT_ID, DR_SORT_VALUE
+	};
 
-		enum ModelId {
-			MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE = 0,
-			MI_LAST = MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE + 1000
-		};
+	enum ModelId
+	{
+		MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE = 0,
+		MI_LAST = MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE + 1000
+	};
 
-		typedef QVector<ICollectionViewDelegate::SummaryInformation> ObjectMetaInfo;
+	typedef QVector<ICollectionViewDelegate::SummaryInformation> ObjectMetaInfo;
 
-		CObjectCollectionViewComp();
+	CObjectCollectionViewComp();
 
-		void SetFilterString(const QString &text);
+	void SetFilterString(const QString& text);
 
-		// reimplemented (imtbase::IObjectCollectionEventHandler)
-		virtual void OnCollectionConnected(
-			const imtbase::IObjectCollection *objectCollectionPtr) override;
+	// reimplemented (imtbase::IObjectCollectionEventHandler)
+	virtual void OnCollectionConnected(const imtbase::IObjectCollection* objectCollectionPtr) override;
 
-		// reimplemented (imtbase::IMultiSelection)
-		virtual const iprm::IOptionsList *GetSelectionConstraints() const override;
-		virtual Ids GetSelectedIds() const override;
-		virtual bool SetSelectedIds(const Ids &selectedIds) override;
+	// reimplemented (imtbase::IMultiSelection)
+	virtual const iprm::IOptionsList* GetSelectionConstraints() const override;
+	virtual Ids GetSelectedIds() const override;
+	virtual bool SetSelectedIds(const Ids& selectedIds) override;
 
-		// reimplemented (ibase::IProgressManager)
-		virtual int BeginProgressSession(const QByteArray &progressId,
-										 const QString &description,
-										 bool isCancelable = false) override;
-		virtual void EndProgressSession(int sessionId) override;
-		virtual void OnProgress(int sessionId, double currentProgress) override;
-		virtual bool IsCanceled(int sessionId) const override;
+	// reimplemented (ibase::IProgressManager)
+	virtual int BeginProgressSession(
+				const QByteArray &progressId,
+				const QString &description,
+				bool isCancelable = false) override;
+	virtual void EndProgressSession(int sessionId) override;
+	virtual void OnProgress(int sessionId, double currentProgress) override;
+	virtual bool IsCanceled(int sessionId) const override;
 
-		// reimplemented (iser::ISerialize)
-		virtual bool Serialize(iser::IArchive &archive) override;
+	// reimplemented (iser::ISerialize)
+	virtual bool Serialize(iser::IArchive& archive) override;
+
+protected:
+	ICollectionViewDelegate& GetViewDelegateRef(const QByteArray& typeId);
+	const ICollectionViewDelegate& GetViewDelegate(const QByteArray& typeId) const;
+
+	// reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
+	virtual void ProcessObjectCollectionEvent(
+		const imtbase::IObjectCollection* objectCollectionPtr,
+		const imtbase::IObjectCollectionEvent* eventPtr) override;
+
+	// reimplemented (iqtgui::TRestorableGuiWrap)
+	virtual void OnRestoreSettings(const QSettings& settings) override;
+	virtual void OnSaveSettings(QSettings& settings) const override;
+
+	// reimplemented (iqtgui::TGuiObserverWrap)
+	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
+	virtual void OnGuiModelAttached() override;
+
+	// iqtgui::TDesignSchemaHandlerWrap
+	void OnDesignSchemaChanged() override;
+
+	// reimplemented (iqtgui::CGuiComponentBase)
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiDestroyed() override;
+	virtual void OnGuiRetranslate() override;
+
+	// reimplemented (imod::CMultiModelDispatcherBase)
+	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
+
+protected:
+	class Commands: virtual public ibase::ICommandsProvider
+	{
+	public:
+		Commands();
+
+		void SetParent(CObjectCollectionViewComp* parentPtr);
 
 	protected:
-		ICollectionViewDelegate &GetViewDelegateRef(const QByteArray &typeId);
-		const ICollectionViewDelegate &GetViewDelegate(const QByteArray &typeId) const;
+		// reimplemented (ibase::ICommandsProvider)
+		virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
-		// reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
-		virtual void ProcessObjectCollectionEvent(
-			const imtbase::IObjectCollection *objectCollectionPtr,
-			const imtbase::IObjectCollectionEvent *eventPtr) override;
+	private:
+		CObjectCollectionViewComp* m_parentPtr;
+	};
 
-		// reimplemented (iqtgui::TRestorableGuiWrap)
-		virtual void OnRestoreSettings(const QSettings &settings) override;
-		virtual void OnSaveSettings(QSettings &settings) const override;
-
-		// reimplemented (iqtgui::TGuiObserverWrap)
-		virtual void UpdateGui(const istd::IChangeable::ChangeSet &changeSet) override;
-		virtual void OnGuiModelAttached() override;
-
-		// iqtgui::TDesignSchemaHandlerWrap
-		void OnDesignSchemaChanged() override;
-
-		// reimplemented (iqtgui::CGuiComponentBase)
-		virtual void OnGuiCreated() override;
-		virtual void OnGuiDestroyed() override;
-		virtual void OnGuiRetranslate() override;
-
-		// reimplemented (imod::CMultiModelDispatcherBase)
-		virtual void OnModelChanged(int modelId,
-									const istd::IChangeable::ChangeSet &changeSet) override;
-
-		// reimplemented (icomp::CComponentBase)
-		virtual void OnComponentCreated() override;
-		virtual void OnComponentDestroyed() override;
-
-	protected:
-		class Commands : virtual public ibase::ICommandsProvider
-		{
-		public:
-			Commands();
-
-			void SetParent(CObjectCollectionViewComp *parentPtr);
-
-		protected:
-			// reimplemented (ibase::ICommandsProvider)
-			virtual const ibase::IHierarchicalCommand *GetCommands() const override;
-
-		private:
-			CObjectCollectionViewComp *m_parentPtr;
-		};
-
-		template <typename InterfaceType>
+	template <typename InterfaceType>
 	static InterfaceType* ExtractCommands(CObjectCollectionViewComp& component)
 	{
 		return &component.m_commands;
@@ -159,11 +163,11 @@ public:
 		QString m_filter;
 
 	public:
-		ItemProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent)
+		ItemProxyModel(QObject* parent = nullptr): QSortFilterProxyModel(parent)
 		{
 		}
 
-		void setFilter(const QString &filter)
+		void SetTextFilter(const QString& filter)
 		{
 			m_filter = filter;
 		}
@@ -171,7 +175,7 @@ public:
 	protected:
 		// reimplemented (QSortFilterProxyModel)
 		virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
-		virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+		virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
 
 	private:
 		bool TryDateTime(QVariant left, QVariant right, bool& result) const;
@@ -244,15 +248,15 @@ private:
 	Q_INVOKABLE void OnCollectionReadFinished();
 
 	Q_INVOKABLE void ProcessObjectCollectionEventSync(
-				ObjectCollectionPtr objectCollectionPtr,
-				ObjectCollectionEventPtr eventPtr);
+		ObjectCollectionPtr objectCollectionPtr,
+		ObjectCollectionEventPtr eventPtr);
 
-	bool eventFilter(QObject *object, QEvent *event);
+	bool eventFilter(QObject* object, QEvent* event);
 
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-	void OnItemDoubleClick(const QModelIndex &item);
-	void OnCustomContextMenuRequested(const QPoint &point);
+	void OnItemDoubleClick(const QModelIndex& item);
+	void OnCustomContextMenuRequested(const QPoint& point);
 	void OnSectionResized(int logicalIndex, int oldSize, int newSize);
 	void OnSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex);
 	void OnTypeChanged();
@@ -262,7 +266,7 @@ private Q_SLOTS:
 	void OnContextMenuEditDocument(bool checked);
 	void OnContextMenuRemove(bool checked);
 
-	void OnFilterChanged(const QString &text);
+	void OnFilterChanged(const QString& text);
 	void OnSearchShortCut();
 	void OnEscShortCut();
 	void OnDelShortCut();
@@ -303,7 +307,7 @@ private:
 	FocusDecorationFactory m_graphicsEffectFactory;
 	QPropertyAnimation* m_filterPanelAnimationPtr;
 
-	QStandardItemModel *m_itemModelPtr;
+	QStandardItemModel* m_itemModelPtr;
 	QStandardItemModel m_itemModel1;
 	QStandardItemModel m_itemModel2;
 	QStandardItemModel m_typeModel;

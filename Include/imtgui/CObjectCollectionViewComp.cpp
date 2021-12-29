@@ -648,7 +648,7 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 {
 	SignalSemaphore semaphore(m_semaphoreCounter);
 
-	// Restore visual cloumn position by model
+	// Restore visual column position by model
 	for (int i = 0; i < m_itemModelPtr->columnCount(); i++){
 		ItemList->header()->moveSection(ItemList->header()->visualIndex(i), i);
 	}
@@ -658,6 +658,7 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 	for (QByteArray tempFieldId : tempFieldIds){
 		fieldIds.append(tempFieldId);
 	}
+
 	QSet<QString> fieldSet = fieldIds.toSet();
 
 	// Compare restored column set with actual column set:
@@ -1348,7 +1349,8 @@ void CObjectCollectionViewComp::OnContextMenuRemove(bool /*checked*/)
 
 void CObjectCollectionViewComp::OnFilterChanged(const QString &text)
 {
-	m_proxyModelPtr->setFilter(text);
+	m_proxyModelPtr->SetTextFilter(text);
+
 	m_itemModelPtr->dataChanged(m_itemModelPtr->index(0,0), m_itemModelPtr->index(m_itemModelPtr->rowCount() - 1, m_itemModelPtr->columnCount() - 1));
 }
 
@@ -1392,7 +1394,7 @@ void CObjectCollectionViewComp::OnEscShortCut()
 	GetQtWidget()->setFocus();
 	FilterEdit->clear();
 
-	OnFilterChanged("");
+	OnFilterChanged(QString());
 }
 
 
