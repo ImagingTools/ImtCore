@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtSql/QSqlRecord.h>
+#include <QtSql/QSqlRecord>
 
 // ImtCore includes
 #include <imtdb/IDatabaseObjectDelegate.h>
