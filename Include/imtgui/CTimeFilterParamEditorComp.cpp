@@ -1,10 +1,6 @@
 #include <imtgui/CTimeFilterParamEditorComp.h>
 
 
-// ImtCore includes
-#include <imtbase/DateTimeUtils.h>
-
-
 namespace imtgui
 {
 
@@ -107,7 +103,10 @@ void CTimeFilterParamEditorComp::SetFilterTimeRange(const QDateTime& beginTime, 
 }
 
 
-void CTimeFilterParamEditorComp::SetTimeUnit(imtbase::ITimeFilterParam::TimeUnit timeUnit, imtbase::ITimeFilterParam::InterpretationMode mode, int mulitplier)
+void CTimeFilterParamEditorComp::SetTimeUnit(
+			imtbase::ITimeFilterParam::TimeUnit timeUnit,
+			imtbase::ITimeFilterParam::InterpretationMode mode,
+			int mulitplier)
 {
 	imtbase::ITimeFilterParam* objectPtr = GetObjectPtr();
 	Q_ASSERT(objectPtr != NULL);

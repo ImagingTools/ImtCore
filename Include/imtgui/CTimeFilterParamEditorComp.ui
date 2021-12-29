@@ -30,7 +30,7 @@
     <widget class="QComboBox" name="TimeCombo">
      <item>
       <property name="text">
-       <string>All</string>
+       <string>Total Period</string>
       </property>
      </item>
      <item>
@@ -75,7 +75,7 @@
      </item>
      <item>
       <property name="text">
-       <string>Custom</string>
+       <string>User-Defined</string>
       </property>
      </item>
     </widget>
