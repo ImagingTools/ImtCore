@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import Acf 1.0;
 
 Item {
 
@@ -29,8 +30,11 @@ Item {
     }
 
     Rectangle {
+        id: mainRect;
         anchors.fill: parent;
-        color: "lightgray";
+        color: Style.baseColor;
+        border.color: textField.focus ? "#00BFFF" : "transparent";
+        border.width: 1;
     }
 
     Timer {
@@ -45,37 +49,41 @@ Item {
         }
     }
 
-//    TextInput {
-//        id: textField;
+    TextInput {
+        id: textField;
+        anchors.fill: mainRect;
 //        anchors.left: parent.left;
-//        anchors.leftMargin: 5;
+        anchors.leftMargin: 5;
+//        anchors.verticalCenter: parent.verticalCenter;
 //        anchors.bottom: parent.bottom;
 //        anchors.bottomMargin: 10;
-//        width: parent.width - 20;
-//        color: "#101010";
-//        font.pixelSize: 15;
-//        focus: false;
-//        text: "";
-//        onFocusChanged: {
-////            if (container.isTextChanged === true){
-////                console.log("onFocusChanged")
-////                container.accepted()
-////                container.isTextChanged = false
-////            }
-//        }
 
-//        onTextChanged: {
-//            console.log("onTextChanged");
-//            container.isTextChanged = true;
-//            timer.restart();
-//        }
-//        onAccepted: {
-//            console.log("onAccepted");
-//            container.accepted();
-//            container.isTextChanged = false;
-//        }
+        width: parent.width - 20;
+        //color: "#101010";
+        color: Style.textColor;
+        font.pixelSize: 15;
+        focus: false;
+        text: "";
+        onFocusChanged: {
+//            if (container.isTextChanged === true){
+//                console.log("onFocusChanged")
+//                container.accepted()
+//                container.isTextChanged = false
+//            }
+        }
 
-//    }
+        onTextChanged: {
+            console.log("onTextChanged");
+            container.isTextChanged = true;
+            timer.restart();
+        }
+        onAccepted: {
+            console.log("onAccepted");
+            container.accepted();
+            container.isTextChanged = false;
+        }
+
+    }
 
     Text {
         id: placeHolder;
@@ -98,14 +106,15 @@ Item {
 
     }
 
-    Rectangle{
-        id:bottomGray;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-        anchors.bottom: parent.bottom;
-        height: 2;
-        color: "lightgray";
-    }
+//    Rectangle{
+//        id:bottomGray;
+//        anchors.left: parent.left;
+//        anchors.right: parent.right;
+//        anchors.bottom: parent.bottom;
+//        visible: textField.focus;
+//        height: 2;
+//        color: "lightblue";
+//    }
 
     Rectangle{
         id:bottomBlue;

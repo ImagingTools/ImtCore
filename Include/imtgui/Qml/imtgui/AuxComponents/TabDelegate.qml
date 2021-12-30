@@ -6,14 +6,14 @@ Rectangle{
     height: 40;
     width: 120;
 //    color: selected ? "white" : "transparent";
-    color: Style.baseColor;
+    color: selected ? Style.baseColor : "transparent";
 
     property bool selected: false;
     property bool firstElement: false;
     property string text: "no name";
     property string firstElementText: "text";
     property string firstElementImageSource: "../../Icons/Workflow.svg";
-    property string closeButtonImageSource: "../../Icons/DeleteStylized.svg";
+//    property string closeButtonImageSource: "../../Icons/DeleteStylized.svg";
     signal clicked;
     signal closeSignal;
 
@@ -72,7 +72,7 @@ Rectangle{
 //            sourceSize.width: width;
 //            sourceSize.height: height;
             fillMode: Image.PreserveAspectFit;
-            source: tabDelegate.closeButtonImageSource;
+            source: "../../../" + "Icons/" + Style.theme + "/" + "DeleteStylized" + "_On_Normal.svg";
         }
 
         MouseArea{

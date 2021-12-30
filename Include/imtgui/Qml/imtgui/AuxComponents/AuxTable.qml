@@ -107,6 +107,9 @@ Item {
             }
 
             onDoubleClicked: {
+                /*
+                    У Accounts нет поля Name, нужно model["AccountName"]
+                  */
                 console.log("onDoubleClicked", model["Id"], model["Name"])
                 tableContainer.selectItem(model["Id"], model["Name"]);
             }

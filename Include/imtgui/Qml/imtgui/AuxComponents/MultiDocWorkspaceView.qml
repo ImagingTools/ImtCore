@@ -44,6 +44,7 @@ Rectangle {
             anchors.top: tabPanelInternal.bottom;
             anchors.bottom: multiDocView.bottom;
             width: multiDocView.width;
+//            width: 500;
 //            height: multiDocView.height;
             color: "transparent";
             visible: tabPanelInternal.selectedIndex === model.index;
@@ -55,12 +56,17 @@ Rectangle {
                 id: loader;
                 anchors.fill: parent;
                 Component.onCompleted: {
+                    console.log("MultiDoc model index ",model.index)
                     loader.source = multiDocView.pagesSources[model.index];
                     console.log("MultiDoc source",loader.source)
                 }
                 onItemChanged: {
                     if (loader.item){
                         loader.item.itemId = multiDocView.pagesItems[model.index];
+                        if (loader.source.c){
+
+                        }
+
 //                        loader.item.gqlModelInfo = multiDocView.pagesModelInfo
 //                        loader.item.gqlModelItems = multiDocView.pagesModelItems
                     }

@@ -10,25 +10,29 @@ Rectangle {
         treeItemModel.SetIsArray(true);
 
         treeItemModel.InsertNewItem();
-        treeItemModel.SetData("Name", "level0_0");
+        treeItemModel.SetData("Name", "Feature 1");
  //       treeItemModel.SetData("stateChecked", 0);
         treeItemModel.SetData("level", 0);
 //        treeItemModel.SetData("isOpened", 0);
 
-//        treeItemModel.InsertNewItem();
-//        treeItemModel.SetData("Name", "level0_1", 1);
-//        treeItemModel.SetData("level", 0);
+        childItemModel = treeItemModel.AddTreeModel("childItemModel");
+        childItemModel.SetData("Name", "A",0);
+        childItemModel.SetData("stateChecked", 0, 0);
+        childItemModel.SetData("level", 1, 0);
 
-//        childItemModel = treeItemModel.AddTreeModel("childItemModel");
-//        childItemModel.SetData("Name", "level1_0",0);
-//        childItemModel.SetData("stateChecked", 0, 0);
-//        childItemModel.SetData("level", 1, 0);
-//        childItemModel.SetData("isOpened", 0, 0);
+        childItemModel.InsertNewItem();
+        childItemModel.SetData("Name", "B", 1);
+        childItemModel.SetData("stateChecked", 0, 1);
+        childItemModel.SetData("level", 1, 1);
 
-//        childItemModel = childItemModel.AddTreeModel("childItemModel");
-//        childItemModel.SetData("Name", "level2_0",0);
+        treeItemModel.InsertNewItem();
+        treeItemModel.SetData("Name", "Feature 2", 1);
+        treeItemModel.SetData("level", 0, 1);
+
+        childItemModel = childItemModel.AddTreeModel("childItemModel");
+        childItemModel.SetData("Name", "A", 1);
 //        childItemModel.SetData("stateChecked", 0, 0);
-//        childItemModel.SetData("level", 2, 0);
+        childItemModel.SetData("level", 2, 1);
 //        childItemModel.SetData("isOpened", 0, 0);
 
 //        console.log("Parent ", childItemModel.GetParent());

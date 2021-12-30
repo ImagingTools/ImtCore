@@ -18,7 +18,10 @@ Item {
         }
 
         onSelectItem: {
-            multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/AccountView.qml")
+            console.log("Item id = ", itemId);
+            console.log("Name = ", name);
+            //multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/AccountView.qml")
+            multiDocView.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml")
         }
 
 
