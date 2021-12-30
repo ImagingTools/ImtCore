@@ -110,7 +110,7 @@ Rectangle
 //                width: container.width - menuPanel.width;
 //                height: container.height - topPanel.height;
                 Component.onCompleted: {
-                    loader.source = "../imtlicgui/" + menuPanel.pagesSources[model.index] + "View.qml";
+                    loader.source = "../imtlicgui/" + menuPanel.pagesSources[model.index] + "MultiDocView.qml";
                     console.log("loader.source",loader.source, menuPanel.pagesSources)
                 }
 

@@ -25,6 +25,7 @@
         <file alias="imtgui/AuxComponents/PackagesView.qml">Qml/imtgui/AuxComponents/PackagesView.qml</file>
         <file alias="imtgui/AuxComponents/PopupMenuDialog.qml">Qml/imtgui/AuxComponents/PopupMenuDialog.qml</file>
         <file alias="imtgui/AuxComponents/RemoveDialog.qml">Qml/imtgui/AuxComponents/RemoveDialog.qml</file>
+		<file alias="imtgui/AuxComponents/MultiDocWorkspaceView.qml">Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

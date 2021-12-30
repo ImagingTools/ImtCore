@@ -85,8 +85,8 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromInputParams(const
 {
 	int count = inputParams.count();
 	for (int i = 0; i < count; i++){
-		if (inputParams.at(i).GetFieldIds().contains("id")){
-			return inputParams.at(i).GetFieldArgumentValue("id").toByteArray();
+		if (inputParams.at(i).GetFieldIds().contains("Id")){
+			return inputParams.at(i).GetFieldArgumentValue("Id").toByteArray();
 		}
 	}
 	return QByteArray();
@@ -256,7 +256,10 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 	if (!informationIds.isEmpty()){
 		QVariant elementInformation;
 		for (QByteArray informationId : informationIds){
-			if(informationId == "Name"){
+			if(informationId == "Id"){
+				elementInformation = QString(collectionId);
+			}
+			else if(informationId == "Name"){
 				elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_NAME);
 			}
 			else if(informationId == "Description"){

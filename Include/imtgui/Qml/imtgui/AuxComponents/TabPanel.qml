@@ -10,6 +10,7 @@ Rectangle {
     color: Style.theme === "Dark" ? Style.baseColor: Style.backgroundColor;
 
     property int selectedIndex: 0;
+    property int count: 0;
 //    property string firstElementName: "Packages";
     property string firstElementImageSource: "../../Icons/Workflow.svg";
     property var headersArray: [];
@@ -25,12 +26,13 @@ Rectangle {
     function clearHeadersArray(){
         while(tabPanelContainer.headersArray.length > 0)
             tabPanelContainer.headersArray.pop();
-        list.model = 0
+        tabPanelContainer.count = 0
     }
 
     function addToHeadersArray(str){
         tabPanelContainer.headersArray.push(str);
-        list.model = tabPanelContainer.headersArray.length
+        tabPanelContainer.count = tabPanelContainer.headersArray.length
+        tabPanelContainer.selectedIndex = tabPanelContainer.headersArray.length - 1
     }
 
     ListView{
@@ -41,7 +43,7 @@ Rectangle {
         orientation: ListView.Horizontal;
 //        enabled: tabPanelContainer.visible;
         spacing: 0;
-        model: 0;
+        model: tabPanelContainer.count;
         interactive: false;
         delegate: TabDelegate{
             height: list.height;

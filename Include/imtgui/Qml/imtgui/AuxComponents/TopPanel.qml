@@ -88,12 +88,12 @@ Rectangle {
 
     Item {
         anchors.left: parent.left;
-        anchors.leftMargin: 200;
-        anchors.right: parent.right;
+//        anchors.leftMargin: 200;
+        anchors.right: preferenceButton.left;
         height: parent.height;
         ListView {
             id: lvButtons;
-//            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.horizontalCenter: parent.horizontalCenter;
             height: parent.height;
             width: contentWidth > parent.width ? parent.width : contentWidth;
             model: 4;

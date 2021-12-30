@@ -13,11 +13,12 @@ Rectangle{
     property bool selected: false;
     property int textTopMargin: 8;
 
-    //property var array: ["First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First First", "Second Second Second", "Third"]
-//    property var bodyArray:  ["First", "Second", "Third"];
     property var bodyArray:  [];
 
     property string maxSizeText: "";
+
+    signal clicked;
+    signal doubleClicked;
 
     onBodyArrayChanged: {
         container.setContainerSize();
@@ -42,7 +43,6 @@ Rectangle{
         }
     }
 
-    signal clicked;
 
     Rectangle{
         id: selectionBackGround;
@@ -178,6 +178,7 @@ Rectangle{
         }
 
         onDoubleClicked: {
+            container.doubleClicked();
            /// editFeatureDialog.visible = true;
             //removeDialog.visible = true;
         }

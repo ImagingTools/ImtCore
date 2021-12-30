@@ -14,6 +14,8 @@ Item {
     property var headerKeysArray: [];
     property var headerNamesArray: [];
 
+    signal selectItem(string itemId, string name);
+
     function clearHeadersArray(){
         while(tableContainer.headerKeysArray.length > 0)
             tableContainer.headerKeysArray.pop();
@@ -104,6 +106,10 @@ Item {
                 elementsList.selectedIndex = model.index;
             }
 
+            onDoubleClicked: {
+                console.log("onDoubleClicked", model["Id"], model["Name"])
+                tableContainer.selectItem(model["Id"], model["Name"]);
+            }
         }
     }
 
