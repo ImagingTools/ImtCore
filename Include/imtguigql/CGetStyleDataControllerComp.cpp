@@ -13,7 +13,7 @@ namespace imtguigql
 
 
 // public methods
-// 
+
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
 imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const

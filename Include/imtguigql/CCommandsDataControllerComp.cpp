@@ -1,4 +1,5 @@
-#include "CCommandsDataControllerComp.h"
+#include <imtguigql/CCommandsDataControllerComp.h>
+
 
 // Qt includes
 #include <QtCore/QObject>
@@ -11,8 +12,7 @@ namespace imtguigql
 {
 
 
-//// reimplemented (imtgql::IGqlRepresentationDataController)
-
+// reimplemented (imtgql::IGqlRepresentationDataController)
 
 imtbase::CTreeItemModel* CCommandsDataControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
