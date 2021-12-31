@@ -4,7 +4,7 @@ import Acf 1.0
 Rectangle{
     id: tabDelegate;
     height: 40;
-    width: 120;
+    width: 160;
 //    color: selected ? "white" : "transparent";
     color: selected ? Style.baseColor : "transparent";
 
@@ -14,8 +14,10 @@ Rectangle{
     property string firstElementText: "text";
     property string firstElementImageSource: "../../Icons/Workflow.svg";
 //    property string closeButtonImageSource: "../../Icons/DeleteStylized.svg";
+    property bool autoWidth: true;
     signal clicked;
     signal closeSignal;
+
 
     MouseArea{
         id: ma;
@@ -92,7 +94,15 @@ Rectangle{
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.left: imagetabDelegate.right;
-        anchors.right: closeButton.left;
+//        anchors.right: closeButton.left;
+        width: text.width + tabDelegate.height;
+
+        onWidthChanged: {
+            if (tabDelegate.autoWidth){
+                tabDelegate.width = texttabDelegate.width + tabDelegate.height
+            }
+        }
+
         Text {
             id: text;
             anchors.centerIn: parent;

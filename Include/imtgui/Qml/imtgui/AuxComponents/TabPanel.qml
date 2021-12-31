@@ -47,7 +47,7 @@ Rectangle {
         interactive: false;
         delegate: TabDelegate{
             height: list.height;
-            width: 150;
+            width: 200;
             selected: model.index == tabPanelContainer.selectedIndex;
             firstElement: model.index == 0;
             firstElementText: tabPanelContainer.firstElementName;

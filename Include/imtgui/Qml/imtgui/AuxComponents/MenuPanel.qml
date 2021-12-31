@@ -36,7 +36,7 @@ Rectangle {
         interactive: false;
         delegate:  MenuPanelButton{
             width: menuPanel.width;
-            height: width;
+            height: width * 0.88;
             text:  model[PageEnum.NAME];
             textColor: Style.textColor;
             fontName: menuPanel.fontName;

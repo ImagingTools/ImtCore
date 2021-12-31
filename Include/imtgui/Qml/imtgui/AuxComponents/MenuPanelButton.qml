@@ -14,7 +14,7 @@ Item {
     property bool selected: false;
     property bool highlighted: ma.containsMouse && container.enabled;
     property real imageDecrease: 0.6;
-    property real imageSelectedCoeff: 0.75;
+    property real imageSelectedCoeff: 0.70;
     property real fontSize: 10;
     signal clicked;
 
