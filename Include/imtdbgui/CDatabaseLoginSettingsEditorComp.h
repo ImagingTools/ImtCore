@@ -25,20 +25,19 @@ public:
 	I_BEGIN_COMPONENT(CDatabaseLoginSettingsEditorComp);
 	I_END_COMPONENT;
 
-	CDatabaseLoginSettingsEditorComp();
-
 protected:
 	// reimplemented (imod::IModelEditor)
 	virtual void UpdateModel() const;
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
-	virtual void OnGuiModelAttached() override;
-	virtual void OnGuiModelDetached() override;
-	
-	// reimplemented (iqtgui::CGuiComponentBase)
-	virtual void OnGuiCreated() override;
-	virtual void OnGuiDestroyed() override;
+
+private Q_SLOTS:
+	void on_HostEdit_editingFinished();
+	void on_PortEdit_editingFinished();
+	void on_DatabaseNameEdit_editingFinished();
+	void on_UserEdit_editingFinished();
+	void on_PasswordEdit_editingFinished();
 };
 
 

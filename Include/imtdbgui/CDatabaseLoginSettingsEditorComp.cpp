@@ -1,15 +1,12 @@
 #include <imtdbgui/CDatabaseLoginSettingsEditorComp.h>
 
 
+// ACF includes
+#include <istd/CChangeGroup.h>
+
+
 namespace imtdbgui
 {
-
-
-// public methods
-
-CDatabaseLoginSettingsEditorComp::CDatabaseLoginSettingsEditorComp()
-{
-}
 
 
 // protected methods
@@ -18,6 +15,16 @@ CDatabaseLoginSettingsEditorComp::CDatabaseLoginSettingsEditorComp()
 
 void CDatabaseLoginSettingsEditorComp::UpdateModel() const
 {
+	imtdb::IDatabaseLoginSettings* objectPtr = GetObservedObject();
+	Q_ASSERT(objectPtr != nullptr);
+
+	istd::CChangeGroup changeGroup(objectPtr);
+
+	objectPtr->SetHost(HostEdit->text());
+	objectPtr->SetPort(PortEdit->text().toInt());
+	objectPtr->SetDatabaseName(DatabaseNameEdit->text());
+	objectPtr->SetUserName(UserEdit->text());
+	objectPtr->SetPassword(PasswordEdit->text());
 }
 
 
@@ -27,32 +34,44 @@ void CDatabaseLoginSettingsEditorComp::UpdateGui(const istd::IChangeable::Change
 {
 	imtdb::IDatabaseLoginSettings* objectPtr = GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
+
+	HostEdit->setText(objectPtr->GetHost());
+	PortEdit->setText(QString::number(objectPtr->GetPort()));
+	DatabaseNameEdit->setText(objectPtr->GetDatabaseName());
+	UserEdit->setText(objectPtr->GetUserName());
+	PasswordEdit->setText(objectPtr->GetPassword());
 }
 
 
-void CDatabaseLoginSettingsEditorComp::OnGuiModelAttached()
+// private slots
+
+void CDatabaseLoginSettingsEditorComp::on_HostEdit_editingFinished()
 {
-	BaseClass::OnGuiModelAttached();
+	DoUpdateModel();
 }
 
 
-void CDatabaseLoginSettingsEditorComp::OnGuiModelDetached()
+void CDatabaseLoginSettingsEditorComp::on_PortEdit_editingFinished()
 {
-	BaseClass::OnGuiModelDetached();
+	DoUpdateModel();
 }
 
 
-// reimplemented (iqtgui::CGuiComponentBase)
-
-void CDatabaseLoginSettingsEditorComp::OnGuiCreated()
+void CDatabaseLoginSettingsEditorComp::on_DatabaseNameEdit_editingFinished()
 {
-	BaseClass::OnGuiCreated();
+	DoUpdateModel();
 }
 
 
-void CDatabaseLoginSettingsEditorComp::OnGuiDestroyed()
+void CDatabaseLoginSettingsEditorComp::on_UserEdit_editingFinished()
 {
-	BaseClass::OnGuiDestroyed();
+	DoUpdateModel();
+}
+
+
+void CDatabaseLoginSettingsEditorComp::on_PasswordEdit_editingFinished()
+{
+	DoUpdateModel();
 }
 
 
