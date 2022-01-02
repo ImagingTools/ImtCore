@@ -217,3 +217,8 @@ SUBDIRS += ImtLicenseDbPck
 ImtLicenseDbPck.file = ../../Impl/ImtLicenseDbPck/QMake/ImtLicenseDbPck.pro
 ImtLicenseDbPck.depends = imtlic imtlicdb
 
+SUBDIRS += ImtDatabaseGuiPck
+ImtDatabaseGuiPck.file = ../../Impl/ImtDatabaseGuiPck/QMake/ImtDatabaseGuiPck.pro
+ImtDatabaseGuiPck.depends = imtgui imtdbgui
+
+
