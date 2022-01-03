@@ -184,16 +184,16 @@ bool CDatabaseEngineComp::OpenDatabase() const
 		databaseConnection.close();
 	}
 
-	databaseConnection = QSqlDatabase::addDatabase(*m_dbType, GetConnectionName());
-	QString databaseName = *m_dbName;
-	if (m_dbType->GetValue().compare(QByteArray("QODBC"), Qt::CaseInsensitive) == 0){
+	databaseConnection = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, GetConnectionName());
+	QString databaseName = GetDatabaseName();
+	if (m_dbTypeAttrPtr->GetValue().compare(QByteArray("QODBC"), Qt::CaseInsensitive) == 0){
 
 	}
 	else {
-		databaseConnection.setHostName(*m_hostName);
-		databaseConnection.setUserName(*m_userName);
-		databaseConnection.setPassword(*m_pasword);
-		databaseConnection.setPort(*m_portAttrPtr);
+		databaseConnection.setHostName(GetHostName());
+		databaseConnection.setUserName(GetUserName());
+		databaseConnection.setPassword(GetPassword());
+		databaseConnection.setPort(GetPort());
 	}
 	databaseConnection.setDatabaseName(databaseName);
 	retVal = databaseConnection.open();
@@ -209,12 +209,12 @@ bool CDatabaseEngineComp::CreateDatabase() const
 {
 	bool retVal = false;
 
-	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbType, *m_maintenanceDatabaseNameAttrPtr);
-	maintainanceDb.setHostName(*m_hostName);
-	maintainanceDb.setUserName(*m_userName);
-	maintainanceDb.setPassword(*m_pasword);
+	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
+	maintainanceDb.setHostName(GetHostName());
+	maintainanceDb.setUserName(GetUserName());
+	maintainanceDb.setPassword(GetPassword());
 	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
-	maintainanceDb.setPort(*m_portAttrPtr);
+	maintainanceDb.setPort(GetPort());
 
 	retVal = maintainanceDb.open();
 	if (retVal){
@@ -232,11 +232,11 @@ bool CDatabaseEngineComp::CreateDatabase() const
 		else{
 			queryString = "CREATE DATABASE ";
 			queryString.append('"');
-			queryString.append(*m_dbName);
+			queryString.append(GetDatabaseName());
 			queryString.append('"');
 			queryString.append("WITH OWNER ");
 			queryString.append('"');
-			queryString.append(*m_userName);
+			queryString.append(GetUserName());
 			queryString.append('"');
 		}
 
@@ -257,13 +257,13 @@ bool CDatabaseEngineComp::CreateDatabase() const
 		else{
 			QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);
 
-			QSqlDatabase databaseConnection = QSqlDatabase::addDatabase(*m_dbType, GetConnectionName());
+			QSqlDatabase databaseConnection = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, GetConnectionName());
 
-			databaseConnection.setHostName(*m_hostName);
-			databaseConnection.setUserName(*m_userName);
-			databaseConnection.setPassword(*m_pasword);
-			databaseConnection.setDatabaseName(*m_dbName);
-			databaseConnection.setPort(*m_portAttrPtr);
+			databaseConnection.setHostName(GetHostName());
+			databaseConnection.setUserName(GetUserName());
+			databaseConnection.setPassword(GetPassword());
+			databaseConnection.setDatabaseName(GetDatabaseName());
+			databaseConnection.setPort(GetPort());
 
 			retVal = databaseConnection.open();
 		}
@@ -355,8 +355,58 @@ QString CDatabaseEngineComp::GetConnectionName() const
 {
 	qptrdiff threadId = (qptrdiff)QThread::currentThreadId();
 
-	return *m_dbName + QString(" - %1").arg(threadId);
+	return GetDatabaseName() + QString(" - %1").arg(threadId);
 
+}
+
+
+QString CDatabaseEngineComp::GetDatabaseName() const
+{
+	if (m_databaseAccessSettingsCompPtr.IsValid()){
+		return m_databaseAccessSettingsCompPtr->GetDatabaseName();
+	}
+
+	return *m_dbNameAttrPtr;
+}
+
+
+QString CDatabaseEngineComp::GetHostName() const
+{
+	if (m_databaseAccessSettingsCompPtr.IsValid()){
+		return m_databaseAccessSettingsCompPtr->GetHost();
+	}
+
+	return *m_hostNameAttrPtr;
+}
+
+
+int CDatabaseEngineComp::GetPort() const
+{
+	if (m_databaseAccessSettingsCompPtr.IsValid()){
+		return m_databaseAccessSettingsCompPtr->GetPort();
+	}
+
+	return *m_portAttrPtr;
+}
+
+
+QString CDatabaseEngineComp::GetUserName() const
+{
+	if (m_databaseAccessSettingsCompPtr.IsValid()){
+		return m_databaseAccessSettingsCompPtr->GetUserName();
+	}
+
+	return *m_userNameAttrPtr;
+}
+
+
+QString CDatabaseEngineComp::GetPassword() const
+{
+	if (m_databaseAccessSettingsCompPtr.IsValid()){
+		return m_databaseAccessSettingsCompPtr->GetPassword();
+	}
+
+	return *m_paswordAttrPtr;
 }
 
 

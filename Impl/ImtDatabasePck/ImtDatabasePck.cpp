@@ -25,6 +25,11 @@ I_EXPORT_COMPONENT(
 			"SQL-based object collection",
 			"SQL Database");
 
+I_EXPORT_COMPONENT(
+			DatabaseAccessSettings,
+			"Settings for database access",
+			"Database User Access Login Settings Parameters");
+
 
 } // namespace ImtDatabasePck
 
