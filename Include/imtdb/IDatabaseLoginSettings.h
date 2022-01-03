@@ -5,6 +5,12 @@
 #include <istd/IChangeable.h>
 
 
+#ifdef Q_OS_WIN
+	#undef SetPort
+	#undef GetUserName
+#endif
+
+
 namespace imtdb
 {
 
