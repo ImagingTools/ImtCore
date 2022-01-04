@@ -4,6 +4,8 @@
 #include <imtlic/CFeaturePackageCollectionUtility.h>
 #include <imtlic/CFeatureInfo.h>
 #include <imtlic/IFeaturePackage.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
+#include <imtgui/CObjectCollectionViewDelegate.h>
 
 
 namespace imtlicgql
@@ -48,7 +50,20 @@ imtbase::CTreeItemModel* CPackageControllerComp::ListObjects(
 					itemsModel->SetData("FeatureName", featureName, itemIndex);
 					QString featureDescription = packagePtr->GetFeatureList().GetElementInfo(featureCollectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 					itemsModel->SetData("Description", featureDescription, itemIndex);
+
+//					idoc::CStandardDocumentMetaInfo metaInfo;
+//					if (packagePtr->GetFeaturePackages()->GetCollectionItemMetaInfo(featureCollectionId, metaInfo)){
+//						QString addedStr = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME).toDateTime()
+//								.toString(imtgui::CObjectCollectionViewDelegate::s_dateTimeFormat);
+//						itemsModel->SetData("Added", addedStr, itemIndex);
+
+//						QString modificationStr = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime()
+//								.toString(imtgui::CObjectCollectionViewDelegate::s_dateTimeFormat);
+//						itemsModel->SetData("ModificationTime", modificationStr, itemIndex);
+
+//					}
 				}
+
 			}
 		}
 

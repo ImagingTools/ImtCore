@@ -11,7 +11,7 @@ Item {
     property string focusColor: "blue";
     property bool enabled:  true;
 
-//    property alias text: textField.text;
+    property alias text: textField.text;
     property bool isTextChanged: false;
     property string placeHolderText: "Наименование";
 
@@ -51,7 +51,7 @@ Item {
 
     TextInput {
         id: textField;
-        anchors.fill: mainRect;
+        anchors.fill: parent;
 //        anchors.left: parent.left;
         anchors.leftMargin: 5;
 //        anchors.verticalCenter: parent.verticalCenter;
@@ -61,9 +61,10 @@ Item {
         width: parent.width - 20;
         //color: "#101010";
         color: Style.textColor;
-        font.pixelSize: 15;
+        font.pixelSize: 12;
         focus: false;
         text: "";
+        verticalAlignment: TextInput.AlignVCenter;
         onFocusChanged: {
 //            if (container.isTextChanged === true){
 //                console.log("onFocusChanged")

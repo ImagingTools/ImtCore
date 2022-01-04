@@ -4,6 +4,8 @@
 // ImtCore includes
 #include <imtqml/CCommandDataEnumProviderComp.h>
 #include <iqtgui/CHierarchicalCommand.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
+#include <imtgui/CObjectCollectionViewDelegate.h>
 
 
 namespace imtguigql
@@ -33,6 +35,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 	switch (operationType){
 	case OT_NEW:
 		return InsertObject(*inputParamsPtr, gqlObject, errorMessage);
+	case OT_GET:
+		return GetObject(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_UPDATE:
 		return UpdateObject(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_DELETE:
@@ -76,6 +80,11 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 			operationType = OT_LIST;
 			return true;
 		}
+		if (fieldList->at(i).GetId() == "item"){
+			gqlObject = fieldList->at(i);
+			operationType = OT_GET;
+			return true;
+		}
 	}
 	return false;
 }
@@ -90,6 +99,15 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromInputParams(const
 		}
 	}
 	return QByteArray();
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
+			const QList<imtgql::CGqlObject>& inputParams,
+			const imtgql::CGqlObject& gqlObject,
+			QString& errorMessage) const
+{
+	return nullptr;
 }
 
 
@@ -254,8 +272,9 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 	bool retVal = true;
 	QByteArrayList informationIds = GetInformationIds(gqlObject);
 	if (!informationIds.isEmpty()){
-		QVariant elementInformation;
+		idoc::CStandardDocumentMetaInfo metaInfo;
 		for (QByteArray informationId : informationIds){
+			QVariant elementInformation;
 			if(informationId == "Id"){
 				elementInformation = QString(collectionId);
 			}
@@ -265,7 +284,18 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 			else if(informationId == "Description"){
 				elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION);
 			}
-			else{
+			else if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(collectionId, metaInfo)){
+				if (informationId == QByteArray("Added")){
+					elementInformation = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
+							.toDateTime().toString(imtgui::CObjectCollectionViewDelegate::s_dateTimeFormat);
+				}
+				else if (informationId == QByteArray("ModificationTime")){
+					elementInformation = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
+							.toDateTime().toString(imtgui::CObjectCollectionViewDelegate::s_dateTimeFormat);
+				}
+			}
+
+			if(elementInformation.isNull()){
 				elementInformation = GetObjectInformation(informationId, collectionId);
 			}
 			if (elementInformation.isNull()){

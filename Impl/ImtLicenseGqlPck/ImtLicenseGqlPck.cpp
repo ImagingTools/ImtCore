@@ -34,6 +34,12 @@ I_EXPORT_COMPONENT(
 
 
 I_EXPORT_COMPONENT(
+			AccountController,
+			"AccountController",
+			"Account Controller");
+
+
+I_EXPORT_COMPONENT(
 			InstallationCollectionController,
 			"InstallationCollectionController",
 			"Installation Collection Controller");

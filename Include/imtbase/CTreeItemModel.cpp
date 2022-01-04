@@ -518,6 +518,10 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 					QString strVal = value.toString();
 					retVal = retVal && archive.Process(strVal);
 				}
+				else if (value.type() == QVariant::ByteArray){
+					QString strVal = value.toByteArray();
+					retVal = retVal && archive.Process(strVal);
+				}
 				else {
 					QByteArray baVal = "null";
 					retVal = retVal && archive.Process(baVal);

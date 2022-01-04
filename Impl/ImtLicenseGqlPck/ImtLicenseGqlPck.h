@@ -11,6 +11,7 @@
 #include <imtlicgql/CAccountCollectionControllerComp.h>
 #include <imtlicgql/CInstallationCollectionControllerComp.h>
 #include <imtlicgql/CPackageControllerComp.h>
+#include <imtlicgql/CAccountControllerComp.h>
 
 
 /**
@@ -23,6 +24,7 @@ namespace ImtLicenseGqlPck
 typedef imtlicgql::CFeaturePackageCollectionControllerComp FeaturePackageCollectionController;
 typedef imtlicgql::CProductCollectionControllerComp ProductCollectionController;
 typedef imtlicgql::CAccountCollectionControllerComp AccountCollectionController;
+typedef imtlicgql::CAccountControllerComp AccountController;
 typedef imtlicgql::CInstallationCollectionControllerComp InstallationCollectionController;
 typedef imtlicgql::CPackageControllerComp PackageController;
 

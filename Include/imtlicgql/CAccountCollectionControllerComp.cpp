@@ -27,7 +27,7 @@ QVariant CAccountCollectionControllerComp::GetObjectInformation(const QByteArray
 		else if (informationId == QByteArray("AccountType")){
 			return metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE);
 		}
-		else if (informationId == QByteArray("AccountDesciption")){
+		else if (informationId == QByteArray("AccountDescription")){
 			return metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION);
 		}
 	}
