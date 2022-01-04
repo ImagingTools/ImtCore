@@ -1,51 +1,57 @@
 import QtQuick 2.0
 import Acf 1.0
 import imtqml 1.0
+//import imtgui 1.0
 import imtauthgui 1.0
+import '../../../imtgui/Qml/imtgui/AuxComponents'
 
 Rectangle {
     id: container;
 //    border.color: "#2b2d2d";
+    width: 400;
+    height: 300;
+    radius: 10;
     color: Style.backgroundColor;
     clip: true;
     Rectangle {
-        id: editFeatureDialogTopPanel;
+        id: editLicenseDialogTopPanel;
         width: container.width;
         height: 40;
         color: "white";
 
         Image {
-            id: iconEditFeatureDialog;
+            id: iconEditLicenseDialog;
             width: 15;
             height: 15;
-            anchors.left: editFeatureDialogTopPanel.left;
-            anchors.verticalCenter: editFeatureDialogTopPanel.verticalCenter;
+            anchors.left: editLicenseDialogTopPanel.left;
+            anchors.verticalCenter: editLicenseDialogTopPanel.verticalCenter;
             source: "../../../" + "Icons/" + Style.theme + "/" + "Icon" + "_" + "On" + "_" + "Normal" + ".svg";
         }
 
         Text {
             id: titleEditFeatureDialog;
-            anchors.left: iconEditFeatureDialog.right;
+            anchors.left: iconEditLicenseDialog.right;
             anchors.leftMargin: 10;
-            anchors.verticalCenter: editFeatureDialogTopPanel.verticalCenter;
-            text: "Edit feature";
+            anchors.verticalCenter: editLicenseDialogTopPanel.verticalCenter;
+            anchors.horizontalCenter: editLicenseDialogTopPanel.horizontalCenter;
+            text: "Edit License";
             color: Style.theme == "Dark"? "black": Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_subtitle;
         }
 
         AuxButton {
-            id: editFeatureDialogCloseButton;
-            anchors.right: editFeatureDialogTopPanel.right;
-            anchors.verticalCenter: editFeatureDialogTopPanel.verticalCenter;
+            id: editLicenseDialogCloseButton;
+            anchors.right: editLicenseDialogTopPanel.right;
+            anchors.verticalCenter: editLicenseDialogTopPanel.verticalCenter;
             anchors.rightMargin: 15;
             width: 15;
             height: 15;
-            iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
+            iconSource: "../../../" + "Icons/" + "Light" + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
            MouseArea {
                anchors.fill: parent;
                onClicked: {
-                   editFeatureDialog.visible = false;
+                   editLicenseDialog.visible = false;
                }
            }
         }
@@ -53,76 +59,76 @@ Rectangle {
 
 
     Rectangle {
-        id: editFeatureDialogBody;
+        id: editLicenseDialogBody;
         anchors.topMargin: 40;
         color: container.color;
-        anchors.top: editFeatureDialogTopPanel.bottom;
+        anchors.top: editLicenseDialogTopPanel.bottom;
         anchors.horizontalCenter: container.horizontalCenter;
         anchors.verticalCenter: container.verticalCenter;
         width: container.width - 50;
-        height: container.height - 40;
+        height: container.height - 100;
 
         Text {
-            id: titleFeatureName;
-            text: qsTr("Feature Name");
+            id: titleLicenseName;
+            text: qsTr("License Name");
             color: Style.textColor;
             font.family: Style.fontFamily;
-           // font.pixelSize: Style.fontSize_subtitle;
+            font.pixelSize: Style.fontSize_common;
         }
 
         Rectangle {
-            id: tfcFeatureName;
-            width: editFeatureDialogBody.width;
-            height: 60;
-            anchors.top: titleFeatureName.bottom;
-            color: Style.baseColor;
-            border.color: "gray";
+            id: tfcLicenseName;
+            width: editLicenseDialogBody.width;
+            height: 45;
+            anchors.top: titleLicenseName.bottom;
+            color: Style.imagingToolsGradient1;
+            border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
             TextFieldCustom {
-                width: tfcFeatureName.width - 50;
-                height: 30;
-                anchors.horizontalCenter: tfcFeatureName.horizontalCenter;
-                anchors.verticalCenter: tfcFeatureName.verticalCenter;
+                width: tfcLicenseName.width - 22;
+                height: 23;
+                anchors.horizontalCenter: tfcLicenseName.horizontalCenter;
+                anchors.verticalCenter: tfcLicenseName.verticalCenter;
             }
         }
 
 
         Text {
-            id: titleFeatureId;
-            anchors.top: tfcFeatureName.bottom;
+            id: titleLicenseId;
+            anchors.top: tfcLicenseName.bottom;
             anchors.topMargin: 20;
-            text: qsTr("Feature - ID");
+            text: qsTr("License - ID");
 
             color: Style.textColor;
             font.family: Style.fontFamily;
-            //font.pixelSize: Style.fontSize_subtitle;
+            font.pixelSize: Style.fontSize_common;
         }
 
         Rectangle {
-            id: tfcFeatureId;
-            width: editFeatureDialogBody.width;
-            height: 60;
-            anchors.top: titleFeatureId.bottom;
-            color: Style.baseColor;
-            border.color: "gray";
+            id: tfcLicenseId;
+            width: editLicenseDialogBody.width;
+            height: 45;
+            anchors.top: titleLicenseId.bottom;
+            color: Style.imagingToolsGradient1;
+            border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
             TextFieldCustom {
-                width: tfcFeatureId.width - 50;
-                height: 30;
-                anchors.horizontalCenter: tfcFeatureId.horizontalCenter;
-                anchors.verticalCenter: tfcFeatureId.verticalCenter;
+                width: tfcLicenseId.width - 22;
+                height: 23;
+                anchors.horizontalCenter: tfcLicenseId.horizontalCenter;
+                anchors.verticalCenter: tfcLicenseId.verticalCenter;
             }
         }
 
         Rectangle {
             id: okButton;
-            anchors.top: tfcFeatureId.bottom;
+            anchors.top: tfcLicenseId.bottom;
             anchors.right: cancelButton.left;
             anchors.rightMargin: 15;
             anchors.topMargin: 30;
             width: 70;
             height: 25;
-            color: Style.baseColor;
-            border.color: "gray";
+            color: Style.backgroundColor;
+            border.color: okButtonMa.containsMouse ? Style.iconColorOnSelected : Style.theme === "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
             Text {
 //                anchors.fill: parent;
@@ -130,13 +136,16 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter;
                 color: Style.textColor;
                 text: qsTr("ОК");
+                font.family: Style.fontFamily;
             }
 
             MouseArea {
                 id: okButtonMa;
                 anchors.fill: parent;
+                hoverEnabled: enabled;
+                cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
                 onClicked: {
-                    editFeatureDialog.visible = false;
+                    editLicenseDialog.visible = false;
                 }
             }
         }
@@ -145,12 +154,13 @@ Rectangle {
             id: cancelButton;
             width: 70;
             height: 25;
-            color: Style.baseColor;
-            border.color: "gray";
-            anchors.top: tfcFeatureId.bottom;
+            color: Style.backgroundColor;
+            //border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+            border.color: cancelButtonMa.containsMouse ? Style.iconColorOnSelected : Style.theme === "Light" ? "#d0d0d2" : "#3a3b3b" ;
+            anchors.top: tfcLicenseId.bottom;
            // anchors.bottomMargin: 15;
             anchors.topMargin: 30;
-            anchors.right: tfcFeatureId.right;
+            anchors.right: tfcLicenseId.right;
          //   anchors.rightMargin: 15;
 
 
@@ -159,16 +169,18 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter;
                 anchors.verticalCenter: parent.verticalCenter;
                 color: Style.textColor;
+                font.family: Style.fontFamily;
                 text: qsTr("Cancel");
             }
 
             MouseArea {
                 id: cancelButtonMa;
                 anchors.fill: parent;
-                hoverEnabled: true;
+                hoverEnabled: enabled;
+                cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
                 onClicked: {
-                    editFeatureDialog.visible = false;
+                    editLicenseDialog.visible = false;
                 }
 
 //                onEntered: {

@@ -36,7 +36,7 @@ Item {
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         width: 5;
-        color: container.selectionColor;
+        color: Style.iconColorOnSelected;
         visible: container.selected;
     }
 
@@ -45,7 +45,7 @@ Item {
         anchors.bottom: parent.bottom;
         anchors.horizontalCenter: container.horizontalCenter;
         text: container.text;
-        color: container.selected ? selectionColor : Style.textColor;
+        color: container.selected ? Style.iconColorOnSelected: Style.textColor;
         font.pixelSize: 10;//container.fontSize
         font.family: Style.fontFamily;
 

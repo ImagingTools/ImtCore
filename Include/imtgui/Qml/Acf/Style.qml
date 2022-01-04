@@ -34,6 +34,7 @@ Item {
     property string imagingToolsGradient3: "#bebec0";
     property string imagingToolsGradient4: "#b4b4b6";
 
+    property string iconColorOnSelected: "#1a76e7";
 
     property int fontSize_title: 20;
     property int fontSize_subtitle: 18; // mobile ? 16 :18;

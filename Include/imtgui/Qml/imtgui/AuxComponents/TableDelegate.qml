@@ -179,7 +179,7 @@ Rectangle{
 
         onDoubleClicked: {
             container.doubleClicked();
-           /// editFeatureDialog.visible = true;
+            editFeatureDialog.visible = true;
             //removeDialog.visible = true;
         }
 

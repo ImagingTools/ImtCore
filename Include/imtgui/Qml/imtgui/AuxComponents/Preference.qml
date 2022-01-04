@@ -347,6 +347,8 @@ Rectangle {
         Style.imagingToolsGradient2 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient2");
         Style.imagingToolsGradient3 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient3");
         Style.imagingToolsGradient4 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient4");
+
+        Style.iconColorOnSelected = preference.getThemeColor("IconColor", "OnSelected", themeType);
     }
 
     GqlModel {

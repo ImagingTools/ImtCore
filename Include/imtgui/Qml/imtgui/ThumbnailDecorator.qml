@@ -168,12 +168,12 @@ Rectangle
 //        sourceSize.width: 100;
 //    }
 
-//    EditFeatureDialog {
-//        id: editFeatureDialog;
+//    EditLicenseDialog {
+//        id: editLicenseDialog;
 
-//        visible: false;
-//        width: parent.width > 400 ? 400 : parent.width * 0.9;
-//        height: parent.height > 350 ? 350 : parent.height * 0.9;
+//        visible: true;
+////        width: parent.width > 400 ? 400 : parent.width * 0.9;
+////        height: parent.height > 300 ? 300 : parent.height * 0.9;
 
 //        anchors.horizontalCenter: parent.horizontalCenter;
 //        anchors.verticalCenter: parent.verticalCenter;

@@ -60,7 +60,7 @@ Rectangle {
         id: preferenceButton;
         z: 100;
         anchors.top: parent.top;
-        anchors.right: parent.right;
+        anchors.right: fullScreenButton.left;
         anchors.rightMargin: 10;
         anchors.topMargin: 10;
         width: 24;
@@ -71,6 +71,24 @@ Rectangle {
             console.log("Preference button clicked !");
             preference.visible = true;
 
+        }
+    }
+
+    AuxButton {
+        id: fullScreenButton;
+        z: 100;
+        anchors.top: parent.top;
+        anchors.right: parent.right;
+        anchors.rightMargin: 10;
+        anchors.topMargin: 10;
+        width: 24;
+        height: 24;
+        iconSource: "../../../Icons/" + Style.theme + "/FullScreen_On_Normal.svg";
+        onClicked: {
+            console.log("Full screen button clicked !");
+//            window.width = Screen.desktopAvailableWidth;
+//            window.height = Screen.desktopAvailableHeight;
+            //preference.visible = true;
         }
     }
 
