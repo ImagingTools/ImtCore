@@ -47,7 +47,15 @@ Item {
         visible: !container.isEmpty;
 //        color: (container.checkable && container.isChecked) ? "white" : container.highlighted ? "white" : "#fafafa";
 //        color: Style.buttonColor;
-        color: Style.backgroundColor;
+        color: Style.theme == "Dark" ? "#424242" : "#f0f0f3";
+//        color: "#c0c0c0";
+
+//        gradient: Gradient {
+//                 GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+//                 GradientStop { position: 0.25; color: Style.imagingToolsGradient2; }
+//                 GradientStop { position: 0.5; color: Style.imagingToolsGradient3; }
+//                 GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
+//             }
 //        border.color: Style.buttonBorderColor;
 //        Rectangle{
 //            id: background;

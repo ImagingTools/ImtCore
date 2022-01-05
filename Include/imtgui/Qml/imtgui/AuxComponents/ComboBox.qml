@@ -28,7 +28,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter;
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_subtitle;
+            font.pixelSize: Style.fontSize_common;
 
         }
 
@@ -118,7 +118,7 @@ Item {
                     text: model.text;
                     color: Style.textColor;
                     font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_subtitle;
+                    font.pixelSize: Style.fontSize_common;
                 }
 
                 MouseArea {

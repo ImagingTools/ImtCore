@@ -39,7 +39,7 @@ Rectangle {
 
         onClicked: {
             cbLang.menuVisible = false;
-            cbUnit.menuVisible = false;
+//            cbUnit.menuVisible = false;
         }
     }
 
@@ -122,7 +122,7 @@ Rectangle {
                   anchors.fill: parent;
                   onClicked: {
                       cbLang.menuVisible = false;
-                      cbUnit.menuVisible = false;
+//                      cbUnit.menuVisible = false;
                       preference.visible = false;
                   }
               }
@@ -144,7 +144,7 @@ Rectangle {
                text: "Version";
                color: Style.textColor;
                font.family: Style.fontFamily;
-               font.pixelSize: Style.fontSize_subtitle;
+               font.pixelSize: Style.fontSize_common;
            }
 
            Rectangle {
@@ -165,7 +165,7 @@ Rectangle {
                text: "MIO Version";
                color: "#A5A5A5";
                font.family: Style.fontFamily;
-               font.pixelSize: Style.fontSize_subtitle;
+               font.pixelSize: Style.fontSize_common;
            }
        }
 
@@ -185,18 +185,18 @@ Rectangle {
                text: "Language";
                color: Style.textColor;
                font.family: Style.fontFamily;
-               font.pixelSize: Style.fontSize_subtitle;
+               font.pixelSize: Style.fontSize_common;
            }
 
-           Text {
-               id: unitText;
-               x: parent.width / 2 + 30;
-               anchors.top: versionBlock.top;
-               text: "Unit";
-               color: Style.textColor;
-               font.family: Style.fontFamily;
-               font.pixelSize: Style.fontSize_subtitle;
-           }
+//           Text {
+//               id: unitText;
+//               x: parent.width / 2 + 30;
+//               anchors.top: versionBlock.top;
+//               text: "Unit";
+//               color: Style.textColor;
+//               font.family: Style.fontFamily;
+//               font.pixelSize: Style.fontSize_subtitle;
+//           }
 
            Rectangle {
                id: line;
@@ -216,13 +216,13 @@ Rectangle {
                model: languageModel;
            }
 
-           ComboBox {
-               id: cbUnit;
-               x: unitText.x;
-               anchors.topMargin: 10;
-               anchors.top: line.bottom;
-               model: unitModel;
-           }
+//           ComboBox {
+//               id: cbUnit;
+//               x: unitText.x;
+//               anchors.topMargin: 10;
+//               anchors.top: line.bottom;
+//               model: unitModel;
+//           }
 
        }
 
@@ -243,7 +243,7 @@ Rectangle {
                text: "Mode";
                color: Style.textColor;
                font.family: Style.fontFamily;
-               font.pixelSize: Style.fontSize_subtitle;
+               font.pixelSize: Style.fontSize_common;
            }
 
            Rectangle {
@@ -275,7 +275,7 @@ Rectangle {
                    anchors.topMargin: 10;
                    color: Style.textColor;
                    font.family: Style.fontFamily;
-                   font.pixelSize: Style.fontSize_subtitle;
+                   font.pixelSize: Style.fontSize_common;
                }
 
                MouseArea {
@@ -313,7 +313,7 @@ Rectangle {
                     anchors.topMargin: 10;
                     color: Style.textColor;
                     font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_subtitle;
+                    font.pixelSize: Style.fontSize_common;
                }
 
                MouseArea {
