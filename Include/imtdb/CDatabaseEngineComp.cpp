@@ -12,6 +12,12 @@ namespace imtdb
 
 // public methods
 
+CDatabaseEngineComp::CDatabaseEngineComp()
+	:m_databaseAccessObserver(*this)
+{
+}
+
+
 // reimplemented (IDatabaseEngine)
 
 bool CDatabaseEngineComp::BeginTransaction() const
@@ -179,7 +185,6 @@ bool CDatabaseEngineComp::OpenDatabase() const
 	bool retVal = false;
 
 	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
-
 	if (databaseConnection.isOpen()){
 		databaseConnection.close();
 	}
@@ -315,17 +320,36 @@ bool CDatabaseEngineComp::CreateTables() const
 }
 
 
+void CDatabaseEngineComp::OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr)
+{
+	bool isOpened = OpenDatabase();
+
+	if (!isOpened || *m_autoCreateDatabaseAttrPtr == 2){
+		CreateDatabase();
+	}
+
+	Q_ASSERT(databaseAccessSettingsPtr != nullptr);
+	if (databaseAccessSettingsPtr != nullptr){
+		m_workingAccessSettings.CopyFrom(*databaseAccessSettingsPtr);
+	}
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CDatabaseEngineComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	bool isOpened = OpenDatabase();
+	m_databaseAccessObserver.RegisterObject(m_databaseAccessSettingsCompPtr.GetPtr(), &CDatabaseEngineComp::OnDatabaseAccessChanged);
+}
 
-	if (!isOpened || *m_autoCreateDatabaseAttrPtr == 2){
-		CreateDatabase();
-	}
+
+void CDatabaseEngineComp::OnComponentDestroyed()
+{
+	m_databaseAccessObserver.UnregisterAllObjects();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 

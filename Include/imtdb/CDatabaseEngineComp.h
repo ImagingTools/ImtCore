@@ -5,11 +5,13 @@
 #include <QtSql/QSqlDatabase>
 
 // ACF includes
+#include <imod/TModelWrap.h>
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
+#include <imtbase/TModelUpdateBinder.h>
 #include <imtdb/IDatabaseEngine.h>
-#include <imtdb/IDatabaseLoginSettings.h>
+#include <imtdb/CDatabaseAccessSettings.h>
 
 
 namespace imtdb
@@ -25,6 +27,10 @@ public:
 
 	I_BEGIN_COMPONENT(CDatabaseEngineComp);
 		I_REGISTER_INTERFACE(IDatabaseEngine)
+		I_REGISTER_SUBELEMENT(DatabaseAccessSettings);
+		I_REGISTER_SUBELEMENT_INTERFACE(DatabaseAccessSettings, imtdb::IDatabaseLoginSettings, ExtractDatabaseAccessSettings);
+		I_REGISTER_SUBELEMENT_INTERFACE(DatabaseAccessSettings, istd::IChangeable, ExtractDatabaseAccessSettings);
+		I_REGISTER_SUBELEMENT_INTERFACE(DatabaseAccessSettings, imod::IModel, ExtractDatabaseAccessSettings);
 		I_ASSIGN(m_databaseAccessSettingsCompPtr, "DatabaseAccessSettings", "Settings for database access", false, "DatabaseAccessSettings");
 		I_ASSIGN(m_dbTypeAttrPtr, "DbType", "The property holds database connections using the driver", true, "QPSQL");
 		I_ASSIGN(m_dbNameAttrPtr, "DbName", "The property holds connection's database name", true, "postgres");
@@ -38,6 +44,8 @@ public:
 		I_ASSIGN(m_autoCreateTablesAttrPtr, "AutoCreateTables", "The property holds behavior to create tables on startup.\n Possible values:\n0 - will not create new tables;\n1 - will create tables once;\n2 - will create tables at each startup", true, 1);
 		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", true, 5432);
 	I_END_COMPONENT;
+
+	CDatabaseEngineComp();
 
 	// reimplemented (IDatabaseEngine)
 	virtual bool BeginTransaction() const override;
@@ -56,9 +64,11 @@ protected:
 	virtual bool OpenDatabase() const;
 	virtual bool CreateDatabase() const;
 	virtual bool CreateTables() const;
+	void OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 private:
 	/**
@@ -74,6 +84,12 @@ private:
 	QString GetUserName() const;
 	QString GetPassword() const;
 
+	template <typename Interface>
+	static Interface* ExtractDatabaseAccessSettings(CDatabaseEngineComp& component)
+	{
+		return &component.m_workingAccessSettings;
+	}
+
 private:
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);
 	I_ATTR(QByteArray, m_dbTypeAttrPtr);
@@ -87,6 +103,10 @@ private:
 	I_ATTR(int, m_autoCreateDatabaseAttrPtr);
 	I_ATTR(int, m_autoCreateTablesAttrPtr);
 	I_ATTR(int, m_portAttrPtr);
+
+	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CDatabaseEngineComp> m_databaseAccessObserver;
+
+	imod::TModelWrap<imtdb::CDatabaseAccessSettings> m_workingAccessSettings;
 };
 
 

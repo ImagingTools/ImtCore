@@ -8,7 +8,7 @@
 // ImtCore includes
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/CSqlDatabaseObjectCollectionComp.h>
-#include <imtdb/CDatabaseAccessSettings.h>
+#include <imtdb/CDatabaseAccessSettingsComp.h>
 
 /**
 	ImtDatabasePck package
@@ -19,11 +19,7 @@ namespace ImtDatabasePck
 
 typedef imtdb::CDatabaseEngineComp SqlDatabaseEngine;
 typedef icomp::TModelCompWrap<imtdb::CSqlDatabaseObjectCollectionComp> SqlDatabaseCollection;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtdb::CDatabaseAccessSettings,
-						imtdb::IDatabaseLoginSettings,
-						iser::ISerializable>> DatabaseAccessSettings;
+typedef icomp::TModelCompWrap<imtdb::CDatabaseAccessSettingsComp> DatabaseAccessSettings;
 
 
 } // namespace ImtDatabasePck
