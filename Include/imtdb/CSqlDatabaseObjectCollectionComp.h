@@ -15,6 +15,7 @@
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtdb/IDatabaseEngine.h>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
+#include <imtdb/IDatabaseLoginSettings.h>
 
 
 namespace imtdb
@@ -42,6 +43,7 @@ public:
 		I_ASSIGN(m_objectDelegateCompPtr, "ObjectDelegate", "Database object delegate used for creation of C++ objects from the SQL record", true, "ObjectDelegate");
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
 		I_ASSIGN(m_filterParamsCompPtr, "FilteringParams", "Parameter using for the filterering the table", false, "FilteringParams");
+		I_ASSIGN(m_databaseAccessSettingsCompPtr, "DatabaseAccessSettings", "Database access settings", false, "DatabaseAccessSettings");
 	I_END_COMPONENT;
 
 	CSqlDatabaseObjectCollectionComp();
@@ -83,6 +85,7 @@ protected:
 	virtual void CreateCollectionFromDatabase();
 
 	void OnFilterParamsChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::IParamsSet* filterParamsPtr);
+	void OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -98,7 +101,7 @@ private:
 	I_ATTR(QByteArray, m_typeIdAttrPtr);
 	I_TEXTATTR(m_typeNameAttrPtr);
 	I_REF(iprm::IParamsSet, m_filterParamsCompPtr);
-
+	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);
 
 	iprm::COptionsManager m_typesInfo;
 
@@ -116,6 +119,7 @@ private:
 	mutable QReadWriteLock m_objectInfoMapMutex;
 
 	imtbase::TModelUpdateBinder<iprm::IParamsSet, CSqlDatabaseObjectCollectionComp> m_filterParamsObserver;
+	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CSqlDatabaseObjectCollectionComp> m_databaseAccessObserver;
 };
 
 

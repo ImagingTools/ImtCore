@@ -21,7 +21,8 @@ namespace imtdb
 
 CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
 	:m_objectInfoMapMutex(QReadWriteLock::Recursive),
-	m_filterParamsObserver(*this)
+	m_filterParamsObserver(*this),
+	m_databaseAccessObserver(*this)
 {
 }
 
@@ -456,6 +457,12 @@ void CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged(const istd::IChange
 }
 
 
+void CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtdb::IDatabaseLoginSettings* /*databaseAccessSettingsPtr*/)
+{
+	CreateCollectionFromDatabase();
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
@@ -465,7 +472,8 @@ void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
 	m_typesInfo.InsertOption(*m_typeNameAttrPtr, *m_typeIdAttrPtr);
 
 	m_filterParamsObserver.RegisterObject(m_filterParamsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged);
-
+	m_databaseAccessObserver.RegisterObject(m_databaseAccessSettingsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged);
+	
 	CreateCollectionFromDatabase();
 }
 
@@ -473,6 +481,7 @@ void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
 void CSqlDatabaseObjectCollectionComp::OnComponentDestroyed()
 {
 	m_filterParamsObserver.UnregisterAllObjects();
+	m_databaseAccessObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
 }
