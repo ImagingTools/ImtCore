@@ -12,7 +12,7 @@ Rectangle {
     property int selectedIndex: 0;
     property int count: 0;
 //    property string firstElementName: "Packages";
-    property string firstElementImageSource: "../../Icons/Workflow.svg";
+    property string firstElementImageSource;
     property var headersArray: [];
 
    // property string textColor: Style.textColor;

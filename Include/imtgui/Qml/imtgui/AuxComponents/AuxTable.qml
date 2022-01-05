@@ -57,7 +57,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: parent.left;
                     anchors.leftMargin: 8;
-                    font.pixelSize: Style.fontSize_common;
+                    font.pixelSize: Style.fontSize_small;
                     font.family: Style.fontFamilyBold;
                     font.bold: true; //tableContainer.fontBold
                     color: Style.textColor;

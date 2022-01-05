@@ -10,6 +10,7 @@ Rectangle {
     color: "transparent";
     property TabPanel tabPanel: tabPanelInternal;
     property Item activeItem;
+    property alias firstElementImageSource: tabPanelInternal.firstElementImageSource;
     property var pagesSources: [];
     property var pagesItems: [];
 

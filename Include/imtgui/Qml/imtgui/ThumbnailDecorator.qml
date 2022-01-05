@@ -93,7 +93,8 @@ Rectangle
 //            boundsBehavior: Flickable.StopAtBounds;
 //            orientation: ListView.Horizontal;
 //            spacing: 0;
-        model: menuPanel.pagesCount;
+//        model: menuPanel.pagesCount;
+        model: menuPanel.model;
         delegate: Rectangle {
             id: pagesDeleg;
             anchors.left: menuPanel.right;
@@ -110,8 +111,14 @@ Rectangle
 //                width: container.width - menuPanel.width;
 //                height: container.height - topPanel.height;
                 Component.onCompleted: {
-                    loader.source = "../imtlicgui/" + menuPanel.pagesSources[model.index] + "MultiDocView.qml";
-                    console.log("loader.source",loader.source, menuPanel.pagesSources)
+                    loader.source = "../imtlicgui/" + menuPanel.model.GetData(PageEnum.ID, model.index) + "MultiDocView.qml";
+//                    loader.source = "../imtlicgui/" + menuPanel.pagesSources[model.index] + "MultiDocView.qml";
+//                    console.log("loader.source",loader.source, menuPanel.pagesSources)
+                }
+                onItemChanged: {
+                    if (loader.item){
+                        loader.item.firstElementImageSource =  menuPanel.model.GetData(PageEnum.ICON, model.index);
+                    }
                 }
 
             }

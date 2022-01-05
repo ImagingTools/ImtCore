@@ -4,12 +4,13 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
+    property alias firstElementImageSource: installationsMultiDocView.firstElementImageSource;
+
     MultiDocWorkspaceView {
-        id: packageMultiDocView;
+        id: installationsMultiDocView;
             anchors.fill: parent;
-        //    color: "red";
         Component.onCompleted: {
-            packageMultiDocView.addToHeadersArray("", "Packages", "../../imtlicgui/InstallationCollectionView.qml")
+            installationsMultiDocView.addToHeadersArray("", "Packages", "../../imtlicgui/InstallationCollectionView.qml")
         }
 
     }

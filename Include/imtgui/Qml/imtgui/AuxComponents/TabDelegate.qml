@@ -12,7 +12,8 @@ Rectangle{
     property bool firstElement: false;
     property string text: "no name";
     property string firstElementText: "text";
-    property string firstElementImageSource: "../../Icons/Workflow.svg";
+    property string firstElementImageSource:  "../../../" + "Icons/" + Style.theme + "/" + "Workflow" + "_On_Normal.svg";
+//    property string firstElementImageSource: "../../Icons/Workflow.svg";
 //    property string closeButtonImageSource: "../../Icons/DeleteStylized.svg";
     property bool autoWidth: true;
     signal clicked;
@@ -54,7 +55,9 @@ Rectangle{
 //            sourceSize.width: width;
 //            sourceSize.height: height;
             fillMode: Image.PreserveAspectFit;
-            source: tabDelegate.firstElementImageSource;
+            source:  "../../../" + "Icons/" + Style.theme + "/" + tabDelegate.firstElementImageSource + "_On_Normal.svg";
+
+//            source: tabDelegate.firstElementImageSource;
         }
     }
 

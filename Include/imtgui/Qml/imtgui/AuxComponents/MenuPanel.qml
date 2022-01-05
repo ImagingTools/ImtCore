@@ -14,6 +14,7 @@ Rectangle {
     property string activePageName;
     property string activeIcon;
     property var pagesSources: [];
+    property string firstElementImageSources: [];
     property int activePageIndex: -1;
     property int pagesCount: 0;
     signal activePageChanged;
@@ -89,15 +90,16 @@ Rectangle {
                         menuPanel.activePageName = dataModelLocal.GetData(PageEnum.NAME);
                         menuPanel.activeIcon = dataModelLocal.GetData(PageEnum.ICON);
 
-                        var pagesCount = dataModelLocal.GetItemsCount(); //lvPages.count
-                        console.log("dataModelLocal.count", pagesCount)
+//                        var pagesCount = dataModelLocal.GetItemsCount(); //lvPages.count
+//                        console.log("dataModelLocal.count", pagesCount)
 
 
-                        for (var i = 0; i < pagesCount; i++){
-                           menuPanel.pagesSources.push(dataModelLocal.GetData(PageEnum.ID, i))
-                        }
+//                        for (var i = 0; i < pagesCount; i++){
+//                            menuPanel.pagesSources.push(dataModelLocal.GetData(PageEnum.ID, i))
+//                            menuPanel.firstElementImageSources.push(dataModelLocal.GetData(PageEnum.ICON, i))
+//                        }
 
-                        menuPanel.pagesCount = pagesCount; //lvPages.count;
+//                        menuPanel.pagesCount = pagesCount; //lvPages.count;
                         menuPanel.activePageIndex = 0;
 
 //                        lvPages.__processUpdates();

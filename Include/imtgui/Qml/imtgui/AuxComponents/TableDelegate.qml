@@ -96,6 +96,7 @@ Rectangle{
 
                 color: Style.textColor;
                 text: container.bodyArray[model.index];
+                elide: Text.ElideRight;
 
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;

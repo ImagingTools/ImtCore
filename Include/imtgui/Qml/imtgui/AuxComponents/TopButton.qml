@@ -4,8 +4,8 @@ import Acf 1.0
 
 Item {
     id: container;
-    height: 50;
-    width: isEmpty ? 20 : 70;
+    height: 58;
+    width: isEmpty ? 20 : 75;
     property bool enabled:  true;
     property string imageSource: "../Icons/Add.svg";
     property string imageSourceDisabled: "../Icons/Add_On_Disabled.svg";
@@ -41,7 +41,7 @@ Item {
         anchors.top: parent.top;
         anchors.topMargin: 6;
         anchors.horizontalCenter: parent.horizontalCenter;
-        width: parent.width - 8;
+        width: parent.width - 10;
         height: parent.height/2;
         radius: container.radius;
         visible: !container.isEmpty;
