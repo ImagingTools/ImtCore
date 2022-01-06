@@ -68,9 +68,9 @@ Rectangle {
                         itemsModel.updateModel()
                     }
                     else if(packageInfoModel.ContainsKey("errors")){
-                        var errorsModel = packageInfoModel.GetData("errors");
-                        if(errorsModel !== null && errorsModel.ContainsKey(collectionView.gqlModelInfo)){
-                            console.log("message", errorsModel.GetData(collectionView.gqlModelInfo).GetData("message"));
+                        var errorsModelLocal = packageInfoModel.GetData("errors");
+                        if(errorsModelLocal !== null && errorsModelLocal.ContainsKey(collectionView.gqlModelInfo)){
+                            console.log("message", errorsModelLocal.GetData(collectionView.gqlModelInfo).GetData("message"));
                         }
                     }
                 }
@@ -84,7 +84,7 @@ Rectangle {
         id: itemsModel;
 
         function updateModel() {
-            console.log( "updateModel");
+            console.log( "collectionView updateModel");
 
             var query = Gql.GqlRequest("query", collectionView.gqlModelItems);
 
@@ -104,21 +104,21 @@ Rectangle {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log("PackageView query ");
-            console.log("PackageView query ", gqlData);
+            console.log("collectionView query ", gqlData);
             this.SetGqlQuery(gqlData);
         }
 
         onStateChanged: {
             console.log("State:", this.state, itemsModel);
             if (this.state === "Ready"){
-                var dataModelLocal = itemsModel.GetData("data");
+                var dataModelLocal = this.GetData("data");
                 if(dataModelLocal.ContainsKey(collectionView.gqlModelItems)){
                     dataModelLocal = dataModelLocal.GetData(collectionView.gqlModelItems);
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
                         dataModelLocal = dataModelLocal.GetData("items");
-                        //                        console.log("items",dataModelLocal);
-                        collectionView.table.elementsModel = dataModelLocal;
+                        console.log("collectionView items",dataModelLocal);
+//                        collectionView.table.elementsModel = dataModelLocal;
+                        tableInternal.elementsModel = dataModelLocal;
                     }
                     else if(itemsModel.ContainsKey("errors")){
                         var errorsModel = itemsModel.GetData("errors");

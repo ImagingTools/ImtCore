@@ -4,7 +4,9 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
+    anchors.fill: parent;
     property alias firstElementImageSource: productsMultiDocView.firstElementImageSource;
+
     MultiDocWorkspaceView {
         id: productsMultiDocView;
             anchors.fill: parent;

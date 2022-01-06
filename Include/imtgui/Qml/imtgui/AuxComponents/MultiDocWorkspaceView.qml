@@ -21,6 +21,10 @@ Rectangle {
         tabPanelInternal.addToHeadersArray(title);
     }
 
+    Component.onCompleted: {
+       docsData.anchors.topMargin =  tabPanelInternal.height;
+    }
+
     TabPanel {
         id:tabPanelInternal;
         anchors.left: parent.left;
@@ -28,25 +32,26 @@ Rectangle {
         visible: true;
     }
 
-    Repeater {
-        id: pagesData;
+    ListView {
+        id: docsData;
 //            anchors.fill: parent;
         anchors.left: parent.left;
         anchors.right: parent.right;
-        anchors.top: tabPanelInternal.bottom;
+        anchors.top: parent.top;
+        anchors.topMargin: tabPanelInternal.height;
         anchors.bottom: parent.bottom;
         clip: true;
-//            boundsBehavior: Flickable.StopAtBounds;
-//            orientation: ListView.Horizontal;
+        boundsBehavior: Flickable.StopAtBounds;
+        orientation: ListView.Horizontal;
 //            spacing: 0;
         model: tabPanelInternal.count;
         delegate: Rectangle {
-            id: pagesDeleg;
-            anchors.top: tabPanelInternal.bottom;
-            anchors.bottom: multiDocView.bottom;
-            width: multiDocView.width;
+//            id: pagesDeleg;
+//            anchors.top: tabPanelInternal.bottom;
+//            anchors.bottom: multiDocView.bottom;
+            width: visible ? docsData.width : 0;
 //            width: 500;
-//            height: multiDocView.height;
+            height: docsData.height;
             color: "transparent";
             visible: tabPanelInternal.selectedIndex === model.index;
             onVisibleChanged: {
@@ -64,9 +69,6 @@ Rectangle {
                 onItemChanged: {
                     if (loader.item){
                         loader.item.itemId = multiDocView.pagesItems[model.index];
-                        if (loader.source.c){
-
-                        }
 
 //                        loader.item.gqlModelInfo = multiDocView.pagesModelInfo
 //                        loader.item.gqlModelItems = multiDocView.pagesModelItems

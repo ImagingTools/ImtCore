@@ -5,10 +5,10 @@ Item {
 
     property string mainText: "STYLE!!!";
 
-    property bool mobile: mainWidth < 800;
-    property real mainWidth: window.width;
-    property real mainHeight: window.height;
-    property real mainSize: window.width;
+    property bool mobile; //: mainWidth < 800;
+    property real mainWidth; //: window.width;
+    property real mainHeight; //: window.height;
+    property real mainSize; //: window.width;
 
     property string theme: "Light";
 

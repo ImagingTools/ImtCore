@@ -6,7 +6,7 @@ import imtlicgui 1.0
 
 Rectangle
 {
-    id: container;
+    id: thubnailDecoratorContainer;
     anchors.fill: parent;
     width: 300;
     height: 200;
@@ -63,7 +63,7 @@ Rectangle
         anchors.bottom: parent.bottom;
 //        textColor: Style.textColor;
 //        color: Style.backgroundColor;
-//        fontName: container.fontName;
+//        fontName: thubnailDecoratorContainer.fontName;
         onPagesCountChanged: {
             pagesData.model = menuPanel.pagesCount
         }
@@ -98,18 +98,20 @@ Rectangle
         delegate: Rectangle {
             id: pagesDeleg;
             anchors.left: menuPanel.right;
-            anchors.right: container.right;
+            anchors.right: thubnailDecoratorContainer.right;
             anchors.top: topPanel.bottom;
-            anchors.bottom: container.bottom;
-//            width: container.width - menuPanel.width;
-//            height: container.height - topPanel.height;
+            anchors.bottom: thubnailDecoratorContainer.bottom;
+//            width: thubnailDecoratorContainer.width - menuPanel.width;
+//            height: thubnailDecoratorContainer.height - topPanel.height;
+//            width: thubnailDecoratorContainer.width;
+//            height: 500;
             color: "transparent";
             visible: menuPanel.activePageIndex === model.index;
             Loader {
                 id: loader;
                 anchors.fill: parent;
-//                width: container.width - menuPanel.width;
-//                height: container.height - topPanel.height;
+//                width: thubnailDecoratorContainer.width - menuPanel.width;
+//                height: thubnailDecoratorContainer.height - topPanel.height;
                 Component.onCompleted: {
                     loader.source = "../imtlicgui/" + menuPanel.model.GetData(PageEnum.ID, model.index) + "MultiDocView.qml";
 //                    loader.source = "../imtlicgui/" + menuPanel.pagesSources[model.index] + "MultiDocView.qml";
@@ -149,6 +151,7 @@ Rectangle
         color: "gray";
         opacity: 0.8;
         visible: preference.visible;
+        z: 100;
 
         MouseArea {
             anchors.fill: parent;
@@ -162,6 +165,7 @@ Rectangle
         height: parent.height > 450 ? 450 : parent.height * 0.9;
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
+        z: 110;
         //textColor: Style.textColor;
         //color: Style.baseColor;
     }

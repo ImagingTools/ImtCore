@@ -109,12 +109,15 @@ Rectangle {
 //        anchors.leftMargin: 200;
         anchors.right: preferenceButton.left;
         height: parent.height;
+
         ListView {
             id: lvButtons;
             anchors.horizontalCenter: parent.horizontalCenter;
             height: parent.height;
-            width: contentWidth + 50 > parent.width ? parent.width : contentWidth + 50;
-            model: 4;
+            width: contentWidth > parent.width ? parent.width : contentWidth;
+
+//            width: contentWidth + 50 > parent.width ? parent.width : contentWidth + 50;
+//            model: 4;
             clip: true;
             orientation: ListView.Horizontal;
             interactive: false;

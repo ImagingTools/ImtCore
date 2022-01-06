@@ -4,6 +4,7 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
+    anchors.fill: parent;
     property alias itemId: packagesCollectionView.itemId;
     CollectionView {
         id: packagesCollectionView;
@@ -24,11 +25,5 @@ Item {
 
 
     }
-//    Rectangle {
-//        id: packageMetaInfo;
-//        anchors.right: parent.right;
-//        height: parent.height;
-//        width: 100;
-//        color: "green";
-//    }
+
 }

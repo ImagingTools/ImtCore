@@ -4,6 +4,7 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
+    anchors.fill: parent;
     property alias itemId: packagesCollectionView.itemId;
     CollectionView {
         id: packagesCollectionView;

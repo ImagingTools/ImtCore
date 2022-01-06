@@ -98,6 +98,7 @@ Item {
             selected: elementsList.selectedIndex === model.index;
             Component.onCompleted: {
                 for (var i = 0; i < tableContainer.headerKeysArray.length; i++){
+                    console.log("AUXTable addToArray", model[tableContainer.headerKeysArray[i]])
                     tableDelegate.addToArray(model[tableContainer.headerKeysArray[i]])
                 }
             }
@@ -120,7 +121,5 @@ Item {
         id: popupMenuDialog;
         visible: false;
     }
-
-
 
 }

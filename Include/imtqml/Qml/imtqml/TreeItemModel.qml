@@ -12,7 +12,10 @@ JSONListModel {
 //        return container.get(row)
 //    }
 
-    
+    function GetItemsCount(){
+        return this.count
+    }
+
     function GetData(key, row){
         if(row === undefined)
             row = 0

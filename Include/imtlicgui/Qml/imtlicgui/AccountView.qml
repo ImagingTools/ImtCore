@@ -32,6 +32,6 @@ Item {
         anchors.right: parent.right;
         height: parent.height;
         width: 150;
-        color: "red";
+        color: "transparent";
     }
 }
