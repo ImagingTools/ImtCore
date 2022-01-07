@@ -4,8 +4,8 @@ import Acf 1.0
 
 Item {
     id: container;
-    height: 58;
-    width: isEmpty ? 20 : 75;
+    height: 56;
+    width: isEmpty ? 30 : 73;
     property bool enabled:  true;
     property string imageSource: "../Icons/Add.svg";
     property string imageSourceDisabled: "../Icons/Add_On_Disabled.svg";
@@ -15,7 +15,7 @@ Item {
     property string textColor: Style.textColor;
 
     property string textColorDisabled: "gray";
-    property real fontSize: 12;
+    property real fontSize: 11;
     property string fontName: "";
     property int radius: 4;
 

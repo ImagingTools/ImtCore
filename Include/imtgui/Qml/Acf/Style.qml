@@ -8,10 +8,10 @@ Item {
     property alias mainFontSource: mainFont.source;
     property alias boldFontSource: boldFont.source;
 
-    property bool mobile; //: mainWidth < 800;
-    property real mainWidth; //: window.width;
-    property real mainHeight; //: window.height;
-    property real mainSize; //: window.width;
+    property bool mobile;
+    property real mainWidth;
+    property real mainHeight;
+    property real mainSize;
 
     property string theme: "Light";
 
@@ -41,7 +41,7 @@ Item {
 
     property int fontSize_title: 20;
     property int fontSize_subtitle: 18; // mobile ? 16 :18;
-    property int fontSize_common: 14; // mobile ? 14 :16;
+    property int fontSize_common: 13; // mobile ? 14 :16;
     property int fontSize_small: 12;
     property string textColor: "#335777";
 

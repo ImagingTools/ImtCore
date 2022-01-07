@@ -13,16 +13,17 @@ Item {
     property bool enabled:  true;
     property bool selected: false;
     property bool highlighted: ma.containsMouse && container.enabled;
-    property real imageDecrease: 0.6;
-    property real imageSelectedCoeff: 0.70;
-    property real fontSize: 10;
+    property real imageDecrease: 0.63;
+    property real imageSelectedCoeff: 0.73;
+    property real fontSize: 11;
     signal clicked;
 
 
     Image {
         id: image;
-        anchors.centerIn: parent;
-        anchors.verticalCenterOffset: -5; // description.height/2
+        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.top: parent.top;
+        anchors.topMargin: 5; // description.height/2
         fillMode: Image.PreserveAspectFit;
         width: container.highlighted || container.selected ? parent.width * imageSelectedCoeff : parent.width * imageDecrease;
         height:  container.highlighted || container.selected ? parent.height * imageSelectedCoeff : parent.height * imageDecrease;
@@ -46,7 +47,7 @@ Item {
         anchors.horizontalCenter: container.horizontalCenter;
         text: container.text;
         color: container.selected ? Style.iconColorOnSelected: Style.textColor;
-        font.pixelSize: 9;//container.fontSize
+        font.pixelSize: container.fontSize;
         font.family: Style.fontFamily;
 
     }
