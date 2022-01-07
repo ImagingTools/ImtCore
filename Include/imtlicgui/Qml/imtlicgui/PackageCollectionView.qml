@@ -6,6 +6,10 @@ import imtgui 1.0
 Item {
     anchors.fill: parent;
     property alias itemId: packagesCollectionView.itemId;
+    function menuActivated(menuId) {
+        packagesCollectionView.menuActivated(menuId)
+    }
+
     CollectionView {
         id: packagesCollectionView;
 //        anchors.left: parent.left;

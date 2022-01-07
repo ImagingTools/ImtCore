@@ -4,6 +4,7 @@ import Acf 1.0
 
 Rectangle {
     id: containerInstallation;
+    anchors.fill: parent;
     width: 500;
     height: 500;
     color: Style.backgroundColor;

@@ -46,7 +46,7 @@ Item {
         anchors.horizontalCenter: container.horizontalCenter;
         text: container.text;
         color: container.selected ? Style.iconColorOnSelected: Style.textColor;
-        font.pixelSize: 10;//container.fontSize
+        font.pixelSize: 9;//container.fontSize
         font.family: Style.fontFamily;
 
     }

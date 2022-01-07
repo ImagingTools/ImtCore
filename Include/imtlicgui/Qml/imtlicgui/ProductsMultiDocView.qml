@@ -7,6 +7,10 @@ Item {
     anchors.fill: parent;
     property alias firstElementImageSource: productsMultiDocView.firstElementImageSource;
 
+    function menuActivated(menuId) {
+        productsMultiDocView.menuActivated(menuId);
+    }
+
     MultiDocWorkspaceView {
         id: productsMultiDocView;
             anchors.fill: parent;

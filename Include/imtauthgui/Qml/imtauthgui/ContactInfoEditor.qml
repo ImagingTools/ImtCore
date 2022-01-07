@@ -5,6 +5,7 @@ import imtqml 1.0
 
 Rectangle {
     id: containerContactInfo;
+    anchors.fill: parent;
     // width: parent.width;
     width: 500;
     height: 100;

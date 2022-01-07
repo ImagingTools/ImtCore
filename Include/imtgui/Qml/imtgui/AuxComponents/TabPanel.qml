@@ -56,6 +56,7 @@ Rectangle {
 //            textColor: tabPanelContainer.textColor;
 //            fontName: Style.fontFamily;
             onClicked: {
+                console.log("TabDelegate onClicked")
                 tabPanelContainer.selectedIndex = model.index;
             }
 

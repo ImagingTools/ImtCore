@@ -16,6 +16,14 @@ Item {
 
     signal selectItem(string itemId, string name);
 
+    function getSelectedId(){
+        return elementsList.selectedId;
+    }
+
+    function getSelectedName(){
+        return elementsList.selectedName;
+    }
+
     function clearHeadersArray(){
         while(tableContainer.headerKeysArray.length > 0)
             tableContainer.headerKeysArray.pop();
@@ -83,6 +91,8 @@ Item {
     ListView{
         id: elementsList;
         property int selectedIndex: -1;
+        property string selectedId;
+        property string selectedName;
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.top: headersPanel.bottom;
@@ -105,6 +115,8 @@ Item {
 
             onClicked: {
                 elementsList.selectedIndex = model.index;
+                elementsList.selectedId = model["Id"];
+                elementsList.selectedName = model["Name"];
             }
 
             onDoubleClicked: {

@@ -14,6 +14,11 @@ Rectangle {
     property var pagesSources: [];
     property var pagesItems: [];
 
+    function menuActivated(menuId) {
+        multiDocView.activeItem.menuActivated(menuId);
+    }
+
+
     function addToHeadersArray(itemId, title, source){
         console.log("addToHeadersArray", title,source,itemId)
         multiDocView.pagesItems.push(itemId);
@@ -55,7 +60,9 @@ Rectangle {
             color: "transparent";
             visible: tabPanelInternal.selectedIndex === model.index;
             onVisibleChanged: {
-                multiDocView.activeItem = this;
+                if(this.visible){
+                    multiDocView.activeItem = loader.item;
+                }
             }
 
             Loader {

@@ -23,6 +23,14 @@ Rectangle {
         headerInfoModel.updateModel()
     }
 
+    function menuActivated(menuId) {
+        var itemId = tableInternal.getSelectedId();
+        var name = tableInternal.getSelectedName();
+        if (itemId != "" && name != ""){
+            collectionView.selectItem(itemId, name);
+        }
+    }
+
     AuxTable {
         id: tableInternal;
         anchors.fill: parent;

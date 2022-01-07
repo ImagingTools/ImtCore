@@ -6,7 +6,9 @@ import imtgui 1.0
 Item {
     anchors.fill: parent;
     property alias firstElementImageSource: packagesMultiDocView.firstElementImageSource;
-
+    function menuActivated(menuId) {
+        packagesMultiDocView.menuActivated(menuId);
+    }
 
     MultiDocWorkspaceView {
         id: packagesMultiDocView;

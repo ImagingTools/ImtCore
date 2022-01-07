@@ -4,20 +4,21 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
-    property alias itemId: packagesCollectionView.itemId;
+    anchors.fill: parent;
+    property alias itemId: productCollectionView.itemId;
     CollectionView {
-        id: packagesCollectionView;
+        id: productCollectionView;
         anchors.left: parent.left;
-        anchors.right: packageMetaInfo.left;
+        anchors.right: productMetaInfo.left;
         height: parent.height;
 //        property string itemId;
         //    anchors.fill: parent;
         //    color: "red";
         onItemIdChanged: {
-            if (packagesCollectionView.itemId){
+            if (productCollectionView.itemId){
                 console.log("PackageView onItemIdChanged")
-                packagesCollectionView.gqlModelInfo = "ProductInfo"
-                packagesCollectionView.gqlModelItems = "ProductList"
+                productCollectionView.gqlModelInfo = "ProductInfo"
+                productCollectionView.gqlModelItems = "ProductList"
             }
         }
 
@@ -28,7 +29,7 @@ Item {
 
     }
     Rectangle {
-        id: packageMetaInfo;
+        id: productMetaInfo;
         anchors.right: parent.right;
         height: parent.height;
         width: 150;

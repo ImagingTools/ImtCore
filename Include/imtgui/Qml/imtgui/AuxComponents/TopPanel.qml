@@ -11,6 +11,8 @@ Rectangle {
     property string activePageId;
     property string title;
 
+    signal menuActivatedSignal(string menuId);
+
 
     gradient: Gradient {
              GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
@@ -125,7 +127,12 @@ Rectangle {
                 text: model[CommandEnum.NAME];
                 isEmpty: model[CommandEnum.NAME] === "";
                 imageSource: "../../../" + "Icons/" + Style.theme + "/" + model[CommandEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
-                fontName: topPanel.fontName;
+                fontName: Style.fontFamily;
+                onClicked: {
+                    console.log("TopPanel menuActivited", model[CommandEnum.ID])
+//                    topPanel.menuActivited(model[CommandEnum.ID]);
+                    topPanel.menuActivatedSignal(model.Id);
+                }
             }
         }
     }

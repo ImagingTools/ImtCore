@@ -5,6 +5,9 @@ Item {
 
     property string mainText: "STYLE!!!";
 
+    property alias mainFontSource: mainFont.source;
+    property alias boldFontSource: boldFont.source;
+
     property bool mobile; //: mainWidth < 800;
     property real mainWidth; //: window.width;
     property real mainHeight; //: window.height;
@@ -60,8 +63,8 @@ Item {
 
     FontLoader{
         id: boldFont;
-//        source: "../../Fonts/Ubuntu-Medium.ttf";
-        source: "../../Fonts/Ubuntu-Bold.ttf";
+        source: "../../Fonts/Ubuntu-Medium.ttf";
+//        source: "../../Fonts/Ubuntu-Bold.ttf";
     }
 
 }

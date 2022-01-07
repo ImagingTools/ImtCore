@@ -20,16 +20,7 @@ Rectangle{
     signal closeSignal;
 
 
-    MouseArea{
-        id: ma;
-        anchors.fill: parent;
-//        enabled: tabDelegate.visible;
-//        hoverEnabled: enabled;
-//        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
-        onClicked: {
-            tabDelegate.clicked();
-        }
-    }
+
 
     Rectangle{
         id: selection;
@@ -61,6 +52,44 @@ Rectangle{
         }
     }
 
+
+
+    Item {
+        id: texttabDelegate;
+        anchors.top: parent.top;
+        anchors.bottom: parent.bottom;
+        anchors.left: imagetabDelegate.right;
+//        anchors.right: closeButton.left;
+        width: text.width + tabDelegate.height;
+
+        onWidthChanged: {
+            if (tabDelegate.autoWidth){
+                tabDelegate.width = texttabDelegate.width + tabDelegate.height
+            }
+        }
+
+        Text {
+            id: text;
+            anchors.centerIn: parent;
+            text: tabDelegate.text;
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+
+        }
+    }
+
+    MouseArea{
+        id: ma;
+        anchors.fill: parent;
+//        enabled: tabDelegate.visible;
+//        hoverEnabled: enabled;
+//        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+        onClicked: {
+            tabDelegate.clicked();
+        }
+    }
+
     Item {
         id: closeButton;
         anchors.right: parent.right;
@@ -89,31 +118,6 @@ Rectangle{
             onClicked: {
                 tabDelegate.closeSignal();
             }
-        }
-    }
-
-    Item {
-        id: texttabDelegate;
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
-        anchors.left: imagetabDelegate.right;
-//        anchors.right: closeButton.left;
-        width: text.width + tabDelegate.height;
-
-        onWidthChanged: {
-            if (tabDelegate.autoWidth){
-                tabDelegate.width = texttabDelegate.width + tabDelegate.height
-            }
-        }
-
-        Text {
-            id: text;
-            anchors.centerIn: parent;
-            text: tabDelegate.text;
-            color: Style.textColor;
-            font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
-
         }
     }
 

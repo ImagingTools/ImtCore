@@ -12,6 +12,7 @@ Rectangle
     height: 200;
    // color: "white";
     color: Style.baseColor;
+    property Item activeItem;
 //    color: Style.backgroundColor;
 //    color: "#00FF00";
 
@@ -44,6 +45,10 @@ Rectangle
 //        title: "Test";
         title: menuPanel.activePageName;
         activePageId: menuPanel.activePageId;
+        onMenuActivatedSignal: {
+            console.log("onMenuActivatedSignal1",menuId)
+            thubnailDecoratorContainer.activeItem.menuActivated(menuId);
+        }
     }
 
 
@@ -107,6 +112,12 @@ Rectangle
 //            height: 500;
             color: "transparent";
             visible: menuPanel.activePageIndex === model.index;
+            onVisibleChanged: {
+                if(pagesDeleg.visible){
+                    thubnailDecoratorContainer.activeItem = loader.item;
+                }
+            }
+
             Loader {
                 id: loader;
                 anchors.fill: parent;
