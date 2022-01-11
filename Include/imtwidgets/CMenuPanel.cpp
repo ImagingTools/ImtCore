@@ -225,13 +225,15 @@ bool CMenuPanel::IsPageIdExist(const QByteArray& pageId) const
 
 bool CMenuPanel::RemovePage(const QByteArray& pageId)
 {
+	bool retVal = false;
 	const QStandardItemModel* activeModelPtr = &m_model;
 	QModelIndex index = GetModelIndex(pageId, &activeModelPtr);
 	if (index.isValid()){
-		return const_cast<QStandardItemModel*>(activeModelPtr)->removeRow(index.row(), index.parent());
+		retVal = const_cast<QStandardItemModel*>(activeModelPtr)->removeRow(index.row(), index.parent());
 	}
 
-	return false;
+	CheckButtonsVisible();
+	return retVal;
 }
 
 
@@ -266,6 +268,8 @@ bool CMenuPanel::InsertPage(const QByteArray& pageId, const QByteArray& parentPa
 
 		m_maxWidth = CalculateMaxItemWith();
 
+		CheckButtonsVisible();
+
 		return true;
 	}
 
@@ -283,6 +287,8 @@ bool CMenuPanel::InsertPage(const QByteArray& pageId, const QByteArray& parentPa
 		activeTreePtr->expandAll();
 
 		m_maxWidth = CalculateMaxItemWith();
+
+		CheckButtonsVisible();
 
 		return true;
 	}
@@ -700,9 +706,6 @@ bool CMenuPanel::eventFilter(QObject* watched, QEvent* event)
 		switch (eventType){
 		case QEvent::Show:
 		case QEvent::Hide:
-		case QEvent:: ChildAdded:
-		case QEvent:: ChildPolished:
-		case QEvent:: ChildRemoved:
 			CheckButtonsVisible();
 		break;
 
