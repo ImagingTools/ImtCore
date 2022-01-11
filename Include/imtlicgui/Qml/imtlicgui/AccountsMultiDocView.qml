@@ -6,6 +6,7 @@ import imtgui 1.0
 Item {
     anchors.fill: parent;
     property alias firstElementImageSource: accountsMultiDocView.firstElementImageSource;
+    property alias model: accountsMultiDocView.model;
 
     function menuActivated(menuId) {
         accountsMultiDocView.menuActivated(menuId);

@@ -5,20 +5,26 @@ import imtgui 1.0
 
 Item {
     anchors.fill: parent;
-    property alias itemId: packagesCollectionView.itemId;
+    property alias itemId: accountsCollectionView.itemId;
+    property alias model: accountsCollectionView.model;
+
+    function menuActivated(menuId) {
+        accountsCollectionView.menuActivated(menuId)
+    }
+
     CollectionView {
-        id: packagesCollectionView;
+        id: accountsCollectionView;
         anchors.left: parent.left;
-        anchors.right: packageMetaInfo.left;
+        anchors.right: accountMetaInfo.left;
         height: parent.height;
 //        property string itemId;
         //    anchors.fill: parent;
         //    color: "red";
         onItemIdChanged: {
-            if (packagesCollectionView.itemId){
-                console.log("PackageView onItemIdChanged")
-                packagesCollectionView.gqlModelInfo = "AccountInfo"
-                packagesCollectionView.gqlModelItems = "AccountList"
+            if (accountsCollectionView.itemId){
+                console.log("AccountView onItemIdChanged")
+                accountsCollectionView.gqlModelInfo = "AccountInfo"
+                accountsCollectionView.gqlModelItems = "AccountList"
             }
         }
 
@@ -29,7 +35,7 @@ Item {
 
     }
     Rectangle {
-        id: packageMetaInfo;
+        id: accountMetaInfo;
         anchors.right: parent.right;
         height: parent.height;
         width: 150;

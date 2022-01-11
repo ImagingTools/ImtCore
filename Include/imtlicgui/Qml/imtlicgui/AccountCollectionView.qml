@@ -5,22 +5,23 @@ import imtgui 1.0
 
 Item {
     anchors.fill: parent;
-    property alias itemId: packageCollectionView.itemId;
+    property alias itemId: accountCollectionView.itemId;
+    property alias model: accountCollectionView.model;
 
     function menuActivated(menuId) {
-        packageCollectionView.menuActivated(menuId)
+        accountCollectionView.menuActivated(menuId)
     }
 
     CollectionView {
-        id: packageCollectionView;
+        id: accountCollectionView;
 //        anchors.left: parent.left;
 //        anchors.right: packageMetaInfo.left;
 //        height: parent.height;
         anchors.fill: parent;
         //    color: "red";
         Component.onCompleted: {
-            packageCollectionView.gqlModelInfo = "AccountInfo"
-            packageCollectionView.gqlModelItems = "AccountList"
+            accountCollectionView.gqlModelInfo = "AccountInfo"
+            accountCollectionView.gqlModelItems = "AccountList"
         }
 
         onSelectItem: {

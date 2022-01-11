@@ -5,20 +5,22 @@ import imtgui 1.0
 
 Item {
     anchors.fill: parent;
-    property alias itemId: packagesCollectionView.itemId;
+    property alias itemId: installationsCollectionView.itemId;
+    property alias model: installationsCollectionView.model;
+
     CollectionView {
-        id: packagesCollectionView;
+        id: installationsCollectionView;
         anchors.left: parent.left;
-        anchors.right: packageMetaInfo.left;
+        anchors.right: installationMetaInfo.left;
         height: parent.height;
 //        property string itemId;
         //    anchors.fill: parent;
         //    color: "red";
         onItemIdChanged: {
-            if (packagesCollectionView.itemId){
-                console.log("PackageView onItemIdChanged")
-                packagesCollectionView.gqlModelInfo = "InstallationInfo"
-                packagesCollectionView.gqlModelItems = "InstallationList"
+            if (installationsCollectionView.itemId){
+                console.log("installationView onItemIdChanged")
+                installationsCollectionView.gqlModelInfo = "InstallationInfo"
+                installationsCollectionView.gqlModelItems = "InstallationList"
             }
         }
 
@@ -29,7 +31,7 @@ Item {
 
     }
     Rectangle {
-        id: packageMetaInfo;
+        id: installationMetaInfo;
         anchors.right: parent.right;
         height: parent.height;
         width: 150;

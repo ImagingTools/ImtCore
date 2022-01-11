@@ -7,6 +7,7 @@ Item {
     anchors.fill: parent;
     property alias itemId: packageCollectionView.itemId;
     property alias model: packageCollectionView.model;
+
     function menuActivated(menuId) {
         packageCollectionView.menuActivated(menuId)
     }

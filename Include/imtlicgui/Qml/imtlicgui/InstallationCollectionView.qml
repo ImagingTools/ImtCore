@@ -6,6 +6,7 @@ import imtgui 1.0
 Item {
     anchors.fill: parent;
     property alias itemId: installationCollectionView.itemId;
+    property alias model: installationCollectionView.model;
 
     function menuActivated(menuId) {
         installationCollectionView.menuActivated(menuId)
