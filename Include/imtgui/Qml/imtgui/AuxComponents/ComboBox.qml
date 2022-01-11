@@ -7,25 +7,38 @@ Item {
     height: 30;
     property var model;
     property int currentIndex: -1;
-    property color borderColor: "black";
+    property color borderColor: Style.textColor;
     property bool menuVisible: false;
+    property color backgroundColor: Style.backgroundColor;
+    property bool textCentered: true;
+    property int radius: 5;
+
+    Component.onCompleted: {
+        if (textCentered){
+            cbTitleTxt.anchors.horizontalCenter = cbMainRect.horizontalCenter;
+           // cbTitleModel.anchors.horizontalCenter = cbListDelegate.horizontalCenter;
+        } else {
+            cbTitleTxt.anchors.left = cbMainRect.left;
+            cbTitleTxt.anchors.leftMargin = 10;
+
+//            cbTitleModel.anchors.left = cbListDelegate.left;
+//            cbTitleModel.anchors.leftMargin = 10;
+
+        }
+    }
 
     Rectangle {
         id: cbMainRect;
-//        anchors.fill: parent;
-        height: 30;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-        border.color: Style.textColor;
-//        border.color: "black";
-        radius: 5;
-        color: Style.baseColor;
-//        color: "#c0c0c0";
+        anchors.fill: parent;
+        border.color: container.borderColor;
+        radius: container.radius;
+        color: container.backgroundColor;
 
         Text {
             id: cbTitleTxt;
-            anchors.horizontalCenter: parent.horizontalCenter;
             anchors.verticalCenter: parent.verticalCenter;
+
+
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
@@ -52,7 +65,7 @@ Item {
         Canvas {
             id: cbArrowIcon;
             height: 5;
-            width: height;
+            width: 10;
 
             anchors.right: parent.right;
             anchors.verticalCenter: parent.verticalCenter;
@@ -82,8 +95,8 @@ Item {
 //        color: Style.baseColor;
 //        color: "#c0c0c0";
         color: Style.baseColor;
-        border.color: Style.textColor;
-        radius: 5;
+        border.color: container.borderColor;
+        radius: container.radius;
         visible: container.menuVisible;
 
 
@@ -108,13 +121,15 @@ Item {
                     anchors.horizontalCenter: cbListDelegate.horizontalCenter;
                     visible: container.currentIndex === model.index;
                     color: Style.selectedColor;
-                    radius: 5;
+                    radius: container.radius;
                 }
 
                 Text {
                     id: cbTitleModel;
                     anchors.verticalCenter: parent.verticalCenter;
-                    anchors.horizontalCenter: parent.horizontalCenter;
+                    anchors.horizontalCenter: container.textCentered ? parent.horizontalCenter : "";
+                    anchors.left: !container.textCentered ? cbListDelegate.left : "";
+                    anchors.leftMargin: 10;
                     text: model.text;
                     color: Style.textColor;
                     font.family: Style.fontFamily;
