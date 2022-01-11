@@ -44,7 +44,7 @@ Rectangle
         id: topPanel;
 //        title: "Test";
         title: menuPanel.activePageName;
-        activePageId: menuPanel.activePageId;
+//        activePageId: menuPanel.activePageId;
         onMenuActivatedSignal: {
             console.log("onMenuActivatedSignal1",menuId)
             thubnailDecoratorContainer.activeItem.menuActivated(menuId);
@@ -74,6 +74,7 @@ Rectangle
         }
 
         onActivePageIdChanged: {
+            topPanel.activeCommandsModelId = menuPanel.activePageId
            // loader.source = "AuxComponents/" + menuPanel.activePageId + "View.qml"
         }
     }
@@ -100,6 +101,7 @@ Rectangle
 //            spacing: 0;
 //        model: menuPanel.pagesCount;
         model: menuPanel.model;
+
         delegate: Rectangle {
             id: pagesDeleg;
             anchors.left: menuPanel.right;
@@ -116,6 +118,11 @@ Rectangle
                 if(pagesDeleg.visible){
                     thubnailDecoratorContainer.activeItem = loader.item;
                 }
+            }
+
+            function changeCommandsId(commandsId){
+                console.log("pagesDeleg changeCommandsId", topPanel.activeCommandsModelId , commandsId)
+                topPanel.activeCommandsModelId = commandsId
             }
 
             Loader {

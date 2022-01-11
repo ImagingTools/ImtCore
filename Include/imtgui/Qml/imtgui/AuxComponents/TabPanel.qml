@@ -14,6 +14,8 @@ Rectangle {
 //    property string firstElementName: "Packages";
     property string firstElementImageSource;
     property var headersArray: [];
+    property alias model: list.model;
+    signal closeItem(int index);
 
    // property string textColor: Style.textColor;
 //    property string fontName: "";
@@ -43,7 +45,7 @@ Rectangle {
         orientation: ListView.Horizontal;
 //        enabled: tabPanelContainer.visible;
         spacing: 0;
-        model: tabPanelContainer.count;
+        model: 4;
         interactive: false;
         delegate: TabDelegate{
             height: list.height;
@@ -52,12 +54,14 @@ Rectangle {
             firstElement: model.index == 0;
             firstElementText: tabPanelContainer.firstElementName;
             firstElementImageSource: tabPanelContainer.firstElementImageSource;
-            text: tabPanelContainer.headersArray[model.index];
-//            textColor: tabPanelContainer.textColor;
-//            fontName: Style.fontFamily;
+            text: model.Title;
             onClicked: {
                 console.log("TabDelegate onClicked")
                 tabPanelContainer.selectedIndex = model.index;
+            }
+
+            onCloseSignal: {
+                tabPanelContainer.closeItem(model.index);
             }
 
         }

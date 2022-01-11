@@ -11,30 +11,60 @@ Rectangle {
     property TabPanel tabPanel: tabPanelInternal;
     property Item activeItem;
     property alias firstElementImageSource: tabPanelInternal.firstElementImageSource;
+    property TreeItemModel model;
     property var pagesSources: [];
     property var pagesItems: [];
 
-    function menuActivated(menuId) {
+    function menuActivated(menuId){
         multiDocView.activeItem.menuActivated(menuId);
     }
 
+//    signal changeCommandsId(string commandsId);
+    function changeCommandsId(commandsId) {
+        console.log("multiDocView changeCommandsId",commandsId)
+        pagesDeleg.changeCommandsId(commandsId)
+    }
 
     function addToHeadersArray(itemId, title, source){
         console.log("addToHeadersArray", title,source,itemId)
-        multiDocView.pagesItems.push(itemId);
-        multiDocView.pagesSources.push(source);
-        tabPanelInternal.addToHeadersArray(title);
+//        multiDocView.pagesItems.push(itemId);
+//        multiDocView.pagesSources.push(source);
+//        tabPanelInternal.addToHeadersArray(title);
+
+        var index = pages.InsertNewItem();
+        pages.SetData("ItemId",itemId,index);
+        pages.SetData("Title",title,index);
+        pages.SetData("Source",source,index);
+        tabPanelInternal.selectedIndex = pages.GetItemsCount() - 1;
+        pages.Refresh();
+        console.log("addToHeadersArray", itemId, index)
+//        tabPanelInternal.model = 0;
+//        tabPanelInternal.model = pages;
     }
 
     Component.onCompleted: {
        docsData.anchors.topMargin =  tabPanelInternal.height;
     }
 
+    TreeItemModel {
+        id: pages;
+    }
+
     TabPanel {
-        id:tabPanelInternal;
+        id: tabPanelInternal;
         anchors.left: parent.left;
         anchors.right: parent.right;
         visible: true;
+        model: pages;
+
+        onCloseItem: {
+            console.log("tabPanelInternal onCloseItem", index)
+            pages.RemoveItem(index)
+            if (tabPanelInternal.selectedIndex >= index){
+                tabPanelInternal.selectedIndex--;
+            }
+            pages.Refresh()
+        }
     }
 
     ListView {
@@ -49,7 +79,8 @@ Rectangle {
         boundsBehavior: Flickable.StopAtBounds;
         orientation: ListView.Horizontal;
 //            spacing: 0;
-        model: tabPanelInternal.count;
+//        model: tabPanelInternal.count;
+        model: pages;
         delegate: Rectangle {
 //            id: pagesDeleg;
 //            anchors.top: tabPanelInternal.bottom;
@@ -69,16 +100,29 @@ Rectangle {
                 id: loader;
                 anchors.fill: parent;
                 Component.onCompleted: {
-                    console.log("MultiDoc model index ",model.index)
-                    loader.source = multiDocView.pagesSources[model.index];
-                    console.log("MultiDoc source",loader.source)
+                    console.log("MultidocWorkspaceView model index ",model.index)
+//                    loader.source = multiDocView.pagesSources[model.index];
+                    loader.source = model.Source
+                    console.log("MultidocWorkspaceView source",loader.source)
                 }
                 onItemChanged: {
-                    if (loader.item){
-                        loader.item.itemId = multiDocView.pagesItems[model.index];
+                    if (loader.item && loader.source != ""){
+//                        loader.item.itemId = multiDocView.pagesItems[model.index];
+                        loader.item.itemId = model.ItemId
+                        var dataModelLocal
+                        if (pages.ContainsKey("DocsData",model.index)){
+                            dataModelLocal = pages.GetData("DocsData",model.index);
+                        }
+                        else {
+                            dataModelLocal = pages.AddTreeModel("DocsData",model.index)
+                            console.log("MultidocWorkspaceView onItemChanged", dataModelLocal)
+                        }
+                        console.log("MultidocWorkspaceView onItemChanged", loader.source)
 
-//                        loader.item.gqlModelInfo = multiDocView.pagesModelInfo
-//                        loader.item.gqlModelItems = multiDocView.pagesModelItems
+                        loader.item.model = dataModelLocal
+
+//                        loader.item.gqlModelInfo = multiDocView.pagesInfo
+//                        loader.item.gqlModelItems = multiDocView.pagesItems
                     }
                 }
 

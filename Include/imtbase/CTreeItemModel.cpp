@@ -107,9 +107,7 @@ imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int
 	Item *item = m_items[index];
 
 	CTreeItemModel* retVal = new CTreeItemModel(this);
-//	istd::TSmartPtr<CTreeItemModel> *smartPtr = new istd::TSmartPtr<CTreeItemModel>(retVal);
 
-//	QVariant v = QVariant::fromValue((void*)smartPtr);
 	QVariant v = QVariant::fromValue(retVal);
 
 	SetData(key, v, index);
@@ -298,6 +296,14 @@ void CTreeItemModel::GetKeys(QList<QByteArray>& keys, int index)
 	if (index >= 0 && index < m_items.count()){
 		m_items[index]->GetKeys(keys);
 	}
+}
+
+
+QList<QByteArray> CTreeItemModel::GetKeys(int index)
+{
+	QList<QByteArray> keys;
+	GetKeys(keys, index);
+	return keys;
 }
 
 

@@ -8,11 +8,12 @@ Item {
     property alias selectedIndex: elementsList.selectedIndex;
     property real delegateWidth: tableContainer.count == 0 ? 0 : headersList.width/headersList.count;
     property int count: 3; //headersArray.length;
-    property alias headersModel: headersList.model;
+//    property alias headersModel: headersList.model;
     property alias elementsModel: elementsList.model;
+    property alias headersModel: headersList.model; //: elementsList.model;
 
-    property var headerKeysArray: [];
-    property var headerNamesArray: [];
+//    property var headerKeysArray: [];
+//    property var headerNamesArray: [];
 
     signal selectItem(string itemId, string name);
 
@@ -24,18 +25,18 @@ Item {
         return elementsList.selectedName;
     }
 
-    function clearHeadersArray(){
-        while(tableContainer.headerKeysArray.length > 0)
-            tableContainer.headerKeysArray.pop();
-        while(tableContainer.headerNamesArray.length > 0)
-            tableContainer.headerNamesArray.pop();
-    }
+//    function clearHeadersArray(){
+//        while(tableContainer.headerKeysArray.length > 0)
+//            tableContainer.headerKeysArray.pop();
+//        while(tableContainer.headerNamesArray.length > 0)
+//            tableContainer.headerNamesArray.pop();
+//    }
 
-    function addToHeadersArray(strKey, strName){
-        tableContainer.headerKeysArray.push(strKey);
-        tableContainer.headerNamesArray.push(strName);
-        headersList.model = tableContainer.headerKeysArray.length
-    }
+//    function addToHeadersArray(strKey, strName){
+//        tableContainer.headerKeysArray.push(strKey);
+//        tableContainer.headerNamesArray.push(strName);
+////        headersList.model = tableContainer.headerKeysArray.length
+//    }
 
     Rectangle {
         id: headersPanel;
@@ -52,10 +53,10 @@ Item {
 //            boundsBehavior: Flickable.StopAtBounds;
             orientation: ListView.Horizontal;
             spacing: 0;
-            model: 0;
+//            model: tableContainer.headersModel;
             interactive: false;
             delegate: Rectangle{
-                id:deleg;
+                id: deleg;
                 width: headersList.width/headersList.count;
                 height: headersList.height;
                 //color: "transparent";
@@ -69,7 +70,7 @@ Item {
                     font.family: Style.fontFamilyBold;
                     font.bold: true; //tableContainer.fontBold
                     color: Style.textColor;
-                    text: tableContainer.headerNamesArray[model.index];
+                    text: model.Name; //tableContainer.headerNamesArray[model.index];
                 }
             }
         }
@@ -100,20 +101,31 @@ Item {
         clip: true;
 //        boundsBehavior: Flickable.StopAtBounds;
         spacing: 0;
-        model: 0;
+//        model: tableContainer.elementsModel;
         interactive: false;
         delegate: TableDelegate {
             id: tableDelegate;
             width: elementsList.width;
             selected: elementsList.selectedIndex === model.index;
             Component.onCompleted: {
-                for (var i = 0; i < tableContainer.headerKeysArray.length; i++){
-                    console.log("AUXTable addToArray", model[tableContainer.headerKeysArray[i]])
-                    tableDelegate.addToArray(model[tableContainer.headerKeysArray[i]])
+//                for (var i = 0; i < tableContainer.headerKeysArray.length; i++){
+//                    console.log("AUXTable addToArray", model[tableContainer.headerKeysArray[i]])
+//                    tableDelegate.addToArray(model[tableContainer.headerKeysArray[i]])
+//                }
+                console.log("elementsList tableDelegate", model["Id"], model.index)
+                console.log("elementsModel.GetItemsCount",tableContainer.elementsModel.GetItemsCount())
+//                var keys = tableContainer.elementsModel.GetKeys();
+//                tableContainer.headersModel.GetKeys(keys, model.index)
+//                console.log("elementsList keys", keys)
+                for(var i = 0; i < tableContainer.headersModel.GetItemsCount(); i++){
+                    tableDelegate.addToArray(model[tableContainer.headersModel.GetData("Id",i)]);
+//                    tableDelegate.addToArray(tableContainer.headersModel.GetData("Id",i));
                 }
+
             }
 
             onClicked: {
+                console.log("elementsModel.GetItemsCount", model.index, tableContainer.elementsModel)
                 elementsList.selectedIndex = model.index;
                 elementsList.selectedId = model["Id"];
                 elementsList.selectedName = model["Name"];

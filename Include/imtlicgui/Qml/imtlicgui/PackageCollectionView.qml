@@ -5,26 +5,29 @@ import imtgui 1.0
 
 Item {
     anchors.fill: parent;
-    property alias itemId: packagesCollectionView.itemId;
+    property alias itemId: packageCollectionView.itemId;
+    property alias model: packageCollectionView.model;
     function menuActivated(menuId) {
-        packagesCollectionView.menuActivated(menuId)
+        packageCollectionView.menuActivated(menuId)
     }
 
     CollectionView {
-        id: packagesCollectionView;
+        id: packageCollectionView;
 //        anchors.left: parent.left;
 //        anchors.right: packageMetaInfo.left;
 //        height: parent.height;
         anchors.fill: parent;
         //    color: "red";
         Component.onCompleted: {
-            packagesCollectionView.gqlModelInfo = "FeaturePackageInfo"
-            packagesCollectionView.gqlModelItems = "FeaturePackageList"
+            packageCollectionView.gqlModelInfo = "FeaturePackageInfo"
+            packageCollectionView.gqlModelItems = "FeaturePackageList"
+            console.log("packageCollectionView onCompleted", packageCollectionView.gqlModelInfo)
         }
 
         onSelectItem: {
+            multiDocView.changeCommandsId("PackageEdit")
             multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml")
-        }
+         }
 
 
     }

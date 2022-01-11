@@ -50,7 +50,7 @@ imtbase::CTreeItemModel* CCommandsDataControllerComp::CreateResponse(const imtgq
 			}
 		}
 		if (itemsModel == nullptr){
-			errorMessage = QObject::tr("Commands is empty").toUtf8();
+			errorMessage = QObject::tr("CommandsId incorrected").toUtf8();
 		}
 	}
 	else{

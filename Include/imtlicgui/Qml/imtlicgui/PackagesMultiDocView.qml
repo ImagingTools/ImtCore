@@ -6,6 +6,7 @@ import imtgui 1.0
 Item {
     anchors.fill: parent;
     property alias firstElementImageSource: packagesMultiDocView.firstElementImageSource;
+    property alias model: packagesMultiDocView.model;
     function menuActivated(menuId) {
         packagesMultiDocView.menuActivated(menuId);
     }
@@ -17,6 +18,11 @@ Item {
         Component.onCompleted: {
             packagesMultiDocView.addToHeadersArray("", "Packages", "../../imtlicgui/PackageCollectionView.qml")
         }
+
+//        onChangeCommandsId: {
+//            console.log("packagesMultiDocView changeCommandsId",commandsId)
+//            pagesDeleg.changeCommandsId(commandsId)
+//        }
 
     }
 }

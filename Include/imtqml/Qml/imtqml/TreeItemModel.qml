@@ -112,7 +112,7 @@ JSONListModel {
 
     function AddTreeModel(key, row){
         var retModel;
-        retModel = this.createComponent("TreeItemModel.qml", this);
+        retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
         this.SetData(key, retModel, row);
         return retModel;
     }

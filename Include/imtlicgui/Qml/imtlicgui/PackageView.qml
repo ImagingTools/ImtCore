@@ -5,14 +5,15 @@ import imtgui 1.0
 
 Item {
     anchors.fill: parent;
-    property alias itemId: packagesCollectionView.itemId;
+    property alias itemId: featureCollectionView.itemId;
+    property alias model: featureCollectionView.model;
 
     function menuActivated(menuId) {
-        packagesCollectionView.menuActivated(menuId)
+        featureCollectionView.menuActivated(menuId)
     }
 
     CollectionView {
-        id: packagesCollectionView;
+        id: featureCollectionView;
         anchors.left: parent.left;
         anchors.right: packageMetaInfo.left;
         height: parent.height;
@@ -20,10 +21,10 @@ Item {
         //    anchors.fill: parent;
         //    color: "red";
         onItemIdChanged: {
-            if (packagesCollectionView.itemId){
+            if (featureCollectionView.itemId){
                 console.log("PackageView onItemIdChanged")
-                packagesCollectionView.gqlModelInfo = "PackageInfo"
-                packagesCollectionView.gqlModelItems = "FeatureList"
+                featureCollectionView.gqlModelInfo = "PackageInfo"
+                featureCollectionView.gqlModelItems = "FeatureList"
             }
         }
 

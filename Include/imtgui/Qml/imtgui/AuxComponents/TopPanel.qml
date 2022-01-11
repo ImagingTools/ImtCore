@@ -8,7 +8,7 @@ Rectangle {
     width: parent.width;
     color: Style.baseColor;
     property string fontName: "";
-    property string activePageId;
+    property string activeCommandsModelId;
     property string title;
 
     signal menuActivatedSignal(string menuId);
@@ -21,14 +21,14 @@ Rectangle {
              GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
          }
 
-    onActivePageIdChanged: {
-        console.log("onActivePageIdChanged", topPanel.activePageId);
+    onActiveCommandsModelIdChanged: {
+        console.log("onActiveCommandsModelIdChanged", topPanel.activeCommandsModelId);
         commandsModel.updateModel();
     }
 
     onTitleChanged: {
         console.log("onTitleChanged", topPanel.title);
-        console.log("onActivePageIdChanged", topPanel.activePageId);
+        console.log("activeCommandsModelId", topPanel.activeCommandsModelId);
     }
 
 //    AuxButton {
@@ -117,6 +117,7 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter;
             height: parent.height;
             width: contentWidth > parent.width ? parent.width : contentWidth;
+//            model: listModel;
 
 //            width: contentWidth + 50 > parent.width ? parent.width : contentWidth + 50;
 //            model: 4;
@@ -137,17 +138,32 @@ Rectangle {
         }
     }
 
+
+    Timer {
+        id: updateTimer;
+        interval: 10;
+        property TreeItemModel model;
+        onModelChanged: {
+            updateTimer.start();
+        }
+
+        onTriggered: {
+           lvButtons.model = updateTimer.model;
+        }
+    }
+
     GqlModel {
         id: commandsModel;
 
+        property bool isFirst: true;
+
         function updateModel() {
-            console.log( "updateModel");
 
             var query = Gql.GqlRequest("query", "CommandsData");
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField(PageEnum.ID);
-            inputParams.InsertFieldArgument(PageEnum.ID, topPanel.activePageId);
+            inputParams.InsertFieldArgument(PageEnum.ID, topPanel.activeCommandsModelId);
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
@@ -157,9 +173,11 @@ Rectangle {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-//            console.log(gqlData);
+            console.log("commandsModel updateModel", gqlData);
             this.SetGqlQuery(gqlData);
         }
+
+
 
         onStateChanged: {
             console.log("State:", this.state, commandsModel);
@@ -169,8 +187,10 @@ Rectangle {
                     dataModelLocal = dataModelLocal.GetData("CommandsData");
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
                         dataModelLocal = dataModelLocal.GetData("items");
-//                        console.log("items",dataModelLocal);
-                        lvButtons.model = dataModelLocal;
+                        updateTimer.model = dataModelLocal;
+
+                        commandsModel.isFirst = !commandsModel.isFirst
+//                        lvButtons.model = dataModelLocal;
                     }
                     else if(commandsModel.ContainsKey("errors")){
                         var errorsModel = commandsModel.GetData("errors");

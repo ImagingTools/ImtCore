@@ -19,9 +19,6 @@ Rectangle{
     signal clicked;
     signal closeSignal;
 
-
-
-
     Rectangle{
         id: selection;
         anchors.bottom: parent.bottom;
@@ -112,9 +109,9 @@ Rectangle{
         MouseArea{
             id: closeMA;
             anchors.fill: parent;
-//            enabled: tabDelegate.visible;
-//            hoverEnabled: enabled;
-//            cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+            enabled: tabDelegate.visible;
+            hoverEnabled: enabled;
+            cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
             onClicked: {
                 tabDelegate.closeSignal();
             }
