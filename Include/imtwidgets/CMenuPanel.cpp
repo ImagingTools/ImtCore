@@ -684,6 +684,7 @@ bool CMenuPanel::eventFilter(QObject* watched, QEvent* event)
 			QRect rect = this->geometry();
 			rect.setHeight(m_mainWidgetPtr->height());
 			this->setGeometry(rect);
+			CheckButtonsVisible();
 		}
 		return QObject::eventFilter(watched, event);
 	}
@@ -695,6 +696,20 @@ bool CMenuPanel::eventFilter(QObject* watched, QEvent* event)
 				HoverMoveEvent(hoverEvent);
 			}
 		}
+
+		switch (eventType){
+		case QEvent::Show:
+		case QEvent::Hide:
+		case QEvent:: ChildAdded:
+		case QEvent:: ChildPolished:
+		case QEvent:: ChildRemoved:
+			CheckButtonsVisible();
+		break;
+
+		default:
+		break;
+		}
+
 		return QObject::eventFilter(watched, event);
 	}
 
