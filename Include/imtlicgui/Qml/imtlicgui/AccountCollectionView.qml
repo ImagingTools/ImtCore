@@ -29,7 +29,7 @@ Item {
             console.log("Item id = ", itemId);
             console.log("Name = ", name);
             //multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/AccountView.qml")
-            multiDocView.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml")
+            multiDocView.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit")
         }
 
 

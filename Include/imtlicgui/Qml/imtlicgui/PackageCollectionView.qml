@@ -26,8 +26,8 @@ Item {
         }
 
         onSelectItem: {
-            multiDocView.changeCommandsId("PackageEdit")
-            multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml")
+            //multiDocView.changeCommandsId("PackageEdit")
+            multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit")
          }
 
 

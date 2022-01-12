@@ -19,13 +19,13 @@ Rectangle {
         multiDocView.activeItem.menuActivated(menuId);
     }
 
-//    signal changeCommandsId(string commandsId);
-    function changeCommandsId(commandsId) {
-        console.log("multiDocView changeCommandsId",commandsId)
-        pagesDeleg.changeCommandsId(commandsId)
-    }
+////    signal changeCommandsId(string commandsId);
+//    function changeCommandsId(commandsId) {
+//        console.log("multiDocView changeCommandsId",commandsId)
+//        pagesDeleg.changeCommandsId(commandsId)
+//    }
 
-    function addToHeadersArray(itemId, title, source){
+    function addToHeadersArray(itemId, title, source, commandsId){
         console.log("addToHeadersArray", title,source,itemId)
 //        multiDocView.pagesItems.push(itemId);
 //        multiDocView.pagesSources.push(source);
@@ -35,8 +35,10 @@ Rectangle {
         pages.SetData("ItemId",itemId,index);
         pages.SetData("Title",title,index);
         pages.SetData("Source",source,index);
+        pages.SetData("CommandsId",commandsId,index);
         tabPanelInternal.selectedIndex = pages.GetItemsCount() - 1;
         pages.Refresh();
+        pagesDeleg.changeCommandsId(commandsId);
         console.log("addToHeadersArray", itemId, index)
 //        tabPanelInternal.model = 0;
 //        tabPanelInternal.model = pages;
@@ -64,6 +66,12 @@ Rectangle {
                 tabPanelInternal.selectedIndex--;
             }
             pages.Refresh()
+        }
+
+        onSelectedIndexChanged: {
+//            console.log("multiDocView changeCommandsId", commandsId)
+            var commandsId = pages.GetData("CommandsId");
+            pagesDeleg.changeCommandsId(commandsId)
         }
     }
 

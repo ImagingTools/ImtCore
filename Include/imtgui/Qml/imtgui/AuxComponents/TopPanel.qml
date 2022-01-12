@@ -23,7 +23,12 @@ Rectangle {
 
     onActiveCommandsModelIdChanged: {
         console.log("onActiveCommandsModelIdChanged", topPanel.activeCommandsModelId);
-        commandsModel.updateModel();
+//        console.log("Count items ", buttonsModel.GetItemsCount());
+        if (!buttonsModel.ContainsKey(activeCommandsModelId)) {
+            commandsModel.updateModel();
+        } else {
+            updateTimer.model = buttonsModel.GetData(activeCommandsModelId);
+        }
     }
 
     onTitleChanged: {
@@ -57,6 +62,9 @@ Rectangle {
 //            anchors.fill: parent;
 //        }
 //    }
+    TreeItemModel {
+        id: buttonsModel;
+    }
 
     AuxButton {
         id: preferenceButton;
@@ -171,6 +179,9 @@ Rectangle {
             queryFields.InsertField(CommandEnum.NAME);
             queryFields.InsertField(CommandEnum.ICON);
             query.AddField(queryFields);
+            queryFields = Gql.GqlObject("information");
+            queryFields.InsertField("CommandsModelId");
+            query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
             console.log("commandsModel updateModel", gqlData);
@@ -186,9 +197,10 @@ Rectangle {
                 if(dataModelLocal.ContainsKey("CommandsData")){
                     dataModelLocal = dataModelLocal.GetData("CommandsData");
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
+                        var pageId = dataModelLocal.GetData("information").GetData("CommandsModelId");
                         dataModelLocal = dataModelLocal.GetData("items");
+                        buttonsModel.SetExternTreeModel(pageId, dataModelLocal);
                         updateTimer.model = dataModelLocal;
-
                         commandsModel.isFirst = !commandsModel.isFirst
 //                        lvButtons.model = dataModelLocal;
                     }

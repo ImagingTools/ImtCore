@@ -26,7 +26,7 @@ Item {
 
         onSelectItem: {
             //multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/InstallationView.qml")
-            multiDocView.addToHeadersArray(itemId, name,  "../../imtgui/AuxComponents/InstallationInfoEditor.qml")
+            multiDocView.addToHeadersArray(itemId, name,  "../../imtgui/AuxComponents/InstallationInfoEditor.qml", "InstallationEdit")
         }
 
 

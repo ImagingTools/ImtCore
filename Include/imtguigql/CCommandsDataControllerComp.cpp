@@ -31,13 +31,13 @@ imtbase::CTreeItemModel* CCommandsDataControllerComp::CreateResponse(const imtgq
 	imtbase::CTreeItemModel* itemsModel = nullptr;
 	bool isSetResponce = false;
 	QByteArrayList fields;
-	QByteArray pageId;
+	QByteArray commandsId;
 
 	for (int i = 0; i < count; i++){
 		if (fieldList->at(i).GetId() == "items"){
 			fields = fieldList->at(i).GetFieldIds();
 			if (paramList != nullptr && !paramList->isEmpty()){
-				pageId = paramList->at(0).GetFieldArgumentValue(imtqml::CPageDataEnumProviderComp::ID).toByteArray();
+				commandsId = paramList->at(0).GetFieldArgumentValue(imtqml::CPageDataEnumProviderComp::ID).toByteArray();
 			}
 			isSetResponce = true;
 		}
@@ -45,12 +45,12 @@ imtbase::CTreeItemModel* CCommandsDataControllerComp::CreateResponse(const imtgq
 
 	if(m_commandsDataProviderCompPtr.IsValid() && isSetResponce){
 		for (int index = 0; index < m_commandsDataProviderCompPtr.GetCount(); index++){
-			if (m_commandsDataProviderCompPtr[index]->GetModelId() == pageId){
+			if (m_commandsDataProviderCompPtr[index]->GetModelId() == commandsId){
 				itemsModel = m_commandsDataProviderCompPtr[index]->GetTreeItemModel(*paramList, fields);
 			}
 		}
 		if (itemsModel == nullptr){
-			errorMessage = QObject::tr("CommandsId incorrected").toUtf8();
+			errorMessage = QObject::tr("CommandsId incorrected " + commandsId).toUtf8();
 		}
 	}
 	else{
@@ -65,6 +65,9 @@ imtbase::CTreeItemModel* CCommandsDataControllerComp::CreateResponse(const imtgq
 
 		dataModel = new imtbase::CTreeItemModel();
 		dataModel->SetExternTreeModel("items", itemsModel);
+		imtbase::CTreeItemModel* infoModel = new imtbase::CTreeItemModel();
+		infoModel->SetData("CommandsModelId", commandsId);
+		dataModel->SetExternTreeModel("information", infoModel);
 
 	}
 	rootModel->SetExternTreeModel("data", dataModel);
