@@ -74,7 +74,6 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 					lastName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
 					firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
 					nickName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_NICKNAME);
-
 				}
 
 				itemModel->SetData("Id", accountId);
@@ -94,11 +93,10 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 						const imtauth::IAddress* addressPtr = addressesPtr->GetAddress(id);
 						if (addressPtr != nullptr){
 							int index = addressesModel->InsertNewItem();
-							addressesModel->SetData("Country", addressPtr->GetCountry(),index);
+							addressesModel->SetData("Country", addressPtr->GetCountry(), index);
 							addressesModel->SetData("City", addressPtr->GetCity(), index);
 							addressesModel->SetData("PostalCode", addressPtr->GetPostalCode(), index);
 							addressesModel->SetData("Street", addressPtr->GetStreet(), index);
-							//addressesModel->SetExternTreeModel("address", addressModel, index);
 						}
 					}
 					itemModel->SetExternTreeModel("Addresses", addressesModel);

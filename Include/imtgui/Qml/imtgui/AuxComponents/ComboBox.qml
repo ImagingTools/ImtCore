@@ -10,6 +10,7 @@ Item {
     property color borderColor: Style.textColor;
     property bool menuVisible: false;
     property color backgroundColor: Style.baseColor;
+    property string currentText;
     property bool textCentered: true;
     property int radius: 5;
 
@@ -20,10 +21,6 @@ Item {
         } else {
             cbTitleTxt.anchors.left = cbMainRect.left;
             cbTitleTxt.anchors.leftMargin = 10;
-
-//            cbTitleModel.anchors.left = cbListDelegate.left;
-//            cbTitleModel.anchors.leftMargin = 10;
-
         }
     }
 
@@ -44,12 +41,10 @@ Item {
         Text {
             id: cbTitleTxt;
             anchors.verticalCenter: parent.verticalCenter;
-
-
             color: Style.textColor;
+            text: container.currentText;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
-
         }
 
         MouseArea {
@@ -113,7 +108,6 @@ Item {
             model: container.model;
             clip: true;
             currentIndex: 0;
-
             delegate: Item {
                 id: cbListDelegate;
                 width: cbListView.width;

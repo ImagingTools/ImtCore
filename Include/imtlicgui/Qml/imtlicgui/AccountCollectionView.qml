@@ -9,6 +9,7 @@ Item {
     property alias model: accountCollectionView.model;
 
     function menuActivated(menuId) {
+        console.log("AccountCollectionView menuActivated ", menuId);
         accountCollectionView.menuActivated(menuId)
     }
 

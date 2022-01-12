@@ -129,7 +129,7 @@ Item {
                 console.log("elements.GetItemsCount", model.index, tableContainer.elements)
                 elementsList.selectedIndex = model.index;
                 elementsList.selectedId = model["Id"];
-                elementsList.selectedName = model["Name"];
+                elementsList.selectedName = model[tableContainer.headers.GetData("Id",0)];
             }
 
             onDoubleClicked: {
@@ -137,7 +137,7 @@ Item {
                     У Accounts нет поля Name, нужно model["AccountName"]
                   */
                 console.log("onDoubleClicked", model["Id"], model["Name"])
-                tableContainer.selectItem(model["Id"], model["Name"]);
+                tableContainer.selectItem(model["Id"], model[tableContainer.headers.GetData("Id",0)]);
             }
         }
     }

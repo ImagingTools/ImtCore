@@ -85,6 +85,16 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 			operationType = OT_GET;
 			return true;
 		}
+		if (fieldList->at(i).GetId() == "notificationAdded"){
+			gqlObject = fieldList->at(i);
+			operationType = OT_NEW;
+			return true;
+		}
+		if (fieldList->at(i).GetId() == "notificationUpdated"){
+			gqlObject = fieldList->at(i);
+			operationType = OT_UPDATE;
+			return true;
+		}
 	}
 	return false;
 }

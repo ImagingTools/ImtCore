@@ -28,7 +28,7 @@ Rectangle {
             var addresses = containerContactInfo.contactInfoModel.GetData("Addresses")
             tfcCountryText.text = addresses.GetData("Country");
             tfcCity.text = addresses.GetData("City");
-            postalCode.text = "0";// addresses.GetData("PostalCode");
+            postalCode.text = addresses.GetData("PostalCode");
             tfcStreet.text = addresses.GetData("Street");
         }
     }
@@ -173,7 +173,8 @@ Rectangle {
                 height: 23;
                 radius: 3;
                 model: typeAccountModel;
-                currentIndex: accountType == "private" ? 0 : 1;
+                currentIndex: accountType == "company" ? 1 : 0;
+                currentText: accountType == "company" ? "Company" : "Person";
                 textCentered: false;
                 backgroundColor: "#d0d0d0";
                 borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
@@ -830,22 +831,17 @@ Rectangle {
                         headers: headersModel;
                     }
 
-                    ListModel {
+                    TreeItemModel {
                         id: headersModel;
-                        ListElement {
-                            Name: "Country";
-                        }
-
-                        ListElement {
-                            Name: "City";
-                        }
-
-                        ListElement {
-                            Name: "Postal code";
-                        }
-
-                        ListElement {
-                            Name: "Street";
+                        Component.onCompleted: {
+                            headersModel.SetData("Name", "Country", 0)
+                            headersModel.InsertNewItem()
+                            headersModel.SetData("Name", "City", 1)
+                             headersModel.InsertNewItem()
+                            headersModel.SetData("Name", "Postal code", 2)
+                             headersModel.InsertNewItem()
+                            headersModel.SetData("Name", "Street", 3)
+                            headersModel.Refresh()
                         }
                     }
 
