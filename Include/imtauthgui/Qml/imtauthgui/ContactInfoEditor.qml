@@ -22,17 +22,15 @@ Rectangle {
     }
 
     function updateData() {
-        console.log("contactInfoModel.model", contactInfoModel.model);
-        //        tfName.text = contactInfoModel.GetData("firstName");
-        //        tfName.isTextChanged = false;
-        //        tfLastName.text = contactInfoModel.GetData("lastName");
-        //        tfLastName.isTextChanged = false;
-        //        tfNicName.text = contactInfoModel.GetData("nickName");
-        tfcFirstNameText.text = contactInfoModel.GetData("FirstName");
-        tfcFirstNameText.isTextChanged = false;
-        tfcLastNameText.text = contactInfoModel.GetData("LastName");
-        tfcLastNameText.isTextChanged = false;
-        //        tfNicName.isTextChanged = false;
+        console.log("containerContactInfo updateData", containerContactInfo.contactInfoModel.GetData("Addresses").GetData("PostalCode"));
+        if (containerContactInfo.accountType === "company")
+        {
+            var addresses = containerContactInfo.contactInfoModel.GetData("Addresses")
+            tfcCountryText.text = addresses.GetData("Country");
+            tfcCity.text = addresses.GetData("City");
+            postalCode.text = "0";// addresses.GetData("PostalCode");
+            tfcStreet.text = addresses.GetData("Street");
+        }
     }
 
     function updateShortData(shortData) {
@@ -53,7 +51,7 @@ Rectangle {
     }
 
     onContactInfoModelChanged: {
-        container.updateData();
+        containerContactInfo.updateData();
     }
 
     GqlModel {
@@ -107,8 +105,9 @@ Rectangle {
                 if(dataModelLocal.ContainsKey("AccountItem")){
                     dataModelLocal = dataModelLocal.GetData("AccountItem");
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("item")){
+                        containerContactInfo.accountType = dataModelLocal.GetData("item").GetData("AccountType");
                         containerContactInfo.contactInfoModel = dataModelLocal.GetData("item");
-                        containerContactInfo.accountType = containerContactInfo.contactInfoModel.GetData("AccountType");
+                        addressesTable.elementsModel = containerContactInfo.contactInfoModel.GetData("Addresses");
                         dataModelLocal.RemoveData("item");
                     }
                     else if(itemsModel.ContainsKey("errors")){
@@ -433,7 +432,6 @@ Rectangle {
                     TextFieldCustom {
                         id: tfcCountryText;
                         width: countryBlock.width - 22;
-                        text: containerContactInfo.accountType === "company" ? containerContactInfo.contactInfoModel.GetData("Addresses").GetData("Country") : "";
                         height: 23;
                         anchors.horizontalCenter: countryBlock.horizontalCenter;
                         anchors.verticalCenter: countryBlock.verticalCenter;
@@ -465,7 +463,7 @@ Rectangle {
                     TextFieldCustom {
                         id: tfcCity;
                         width: cityBlock.width - 22;
-                        text: containerContactInfo.accountType === "company" ? containerContactInfo.contactInfoModel.GetData("Addresses").GetData("City") : "";
+                       // text: containerContactInfo.accountType === "company" ? containerContactInfo.contactInfoModel.GetData("Addresses").GetData("City") : "";
                         height: 23;
                         anchors.horizontalCenter: cityBlock.horizontalCenter;
                         anchors.verticalCenter: cityBlock.verticalCenter;
@@ -498,7 +496,8 @@ Rectangle {
                         id: postalCode;
                         width: postalCodeBlock.width - 22;
                         height: 23;
-                        text: containerContactInfo.accountType === "company" ? containerContactInfo.contactInfoModel.GetData("Addresses").GetData("PostalCode") : "";
+                        text: "5";
+                        //text: containerContactInfo.accountType === "company" ? containerContactInfo.contactInfoModel.GetData("Addresses").GetData("PostalCode") : "";
                         anchors.horizontalCenter: postalCodeBlock.horizontalCenter;
                         anchors.verticalCenter: postalCodeBlock.verticalCenter;
                     }
@@ -530,7 +529,7 @@ Rectangle {
                         id: tfcStreet;
                         width: streetBlock.width - 22;
                         //text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("Street") : "";
-                        text: containerContactInfo.accountType === "company" ? containerContactInfo.contactInfoModel.GetData("Addresses").GetData("Street") : "";
+                       // text: containerContactInfo.accountType === "company" ? containerContactInfo.contactInfoModel.GetData("Addresses").GetData("Street") : "";
                         height: 23;
                         anchors.horizontalCenter: streetBlock.horizontalCenter;
                         anchors.verticalCenter: streetBlock.verticalCenter;

@@ -43,7 +43,6 @@ Rectangle{
         }
     }
 
-
     Rectangle{
         id: selectionBackGround;
         anchors.fill: parent;
