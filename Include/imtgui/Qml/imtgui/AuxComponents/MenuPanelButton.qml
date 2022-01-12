@@ -28,7 +28,8 @@ Item {
         width: container.highlighted || container.selected ? parent.width * imageSelectedCoeff : parent.width * imageDecrease;
         height:  container.highlighted || container.selected ? parent.height * imageSelectedCoeff : parent.height * imageDecrease;
         source: container.imageSource;
-
+        sourceSize.height: height;
+        sourceSize.width: width;
     }
 
     Rectangle{

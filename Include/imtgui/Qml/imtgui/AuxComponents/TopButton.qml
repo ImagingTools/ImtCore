@@ -72,8 +72,8 @@ Item {
             fillMode: Image.PreserveAspectFit;
             height: parent.height - 8;
             width: height;
-//            sourceSize.width: width;
-//            sourceSize.height: height;
+            sourceSize.width: width;
+            sourceSize.height: height;
         }
 
 

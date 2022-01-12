@@ -14,6 +14,7 @@ Rectangle {
     color: Style.backgroundColor;
     //    property TreeItemModel contactInfoModel
     property var contactInfoModel;
+    property string accountType;
     property string itemId;
 
     Component.onCompleted: {
@@ -88,8 +89,7 @@ Rectangle {
             queryFields.InsertField("Email");
             queryFields.InsertField("AccountType");
             queryFields.InsertField("AccountDescription");
-
-            queryFields.InsertField("Street");
+            queryFields.InsertField("Addresses");
 
 
             query.AddField(queryFields);
@@ -107,18 +107,9 @@ Rectangle {
                 if(dataModelLocal.ContainsKey("AccountItem")){
                     dataModelLocal = dataModelLocal.GetData("AccountItem");
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("item")){
-//                        dataModelLocal = dataModelLocal.GetData("item");
                         containerContactInfo.contactInfoModel = dataModelLocal.GetData("item");
+                        containerContactInfo.accountType = containerContactInfo.contactInfoModel.GetData("AccountType");
                         dataModelLocal.RemoveData("item");
-                        //                        tfcAccountName.text = dataModelLocal.GetData("FirstName")
-//                        tfcFirstNameText.text = dataModelLocal.GetData("FirstName")
-//                        tfcLastName.text = dataModelLocal.GetData("LastName")
-//                        //                        tfcNickName.text = dataModelLocal.GetData("NickName")
-//                        tfcEmail.text = dataModelLocal.GetData("Email")
-//                        tfcAccountDescription.text = dataModelLocal.GetData("AccountDescription")
-//                        tfcAccountName.text = dataModelLocal.GetData("AccountName")
-                        //                        console.log("items",dataModelLocal);
-                        //                        collectionView.table.elementsModel = dataModelLocal;
                     }
                     else if(itemsModel.ContainsKey("errors")){
                         var errorsModel = itemsModel.GetData("errors");
@@ -130,15 +121,6 @@ Rectangle {
             }
         }
     }
-
-
-    //    Rectangle {
-    //        id: cbTypeAccount;
-    //        width: parent.width;
-    //        height: 30;
-    //        color: "gray";
-    //    }
-
     ListModel {
         id: typeAccountModel;
         ListElement {
@@ -189,9 +171,10 @@ Rectangle {
                 id: cbTypeAccount;
                 z: 10;
                 width: parent.width;
-                height: 20;
+                height: 23;
+                radius: 3;
                 model: typeAccountModel;
-                currentIndex: 0;
+                currentIndex: accountType == "private" ? 0 : 1;
                 textCentered: false;
                 backgroundColor: "#d0d0d0";
                 borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
@@ -422,9 +405,6 @@ Rectangle {
                 id: companyAddressBlock;
                 width: container.width;
                 height: 300;
-//                anchors.top: companyAddressBlockTitle.bottom;
-//                anchors.topMargin: 5;
-                //color: Style.baseColor;
                 color: Style.imagingToolsGradient1;
                 border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
                 visible: cbTypeAccount.currentIndex === 1;
@@ -453,6 +433,7 @@ Rectangle {
                     TextFieldCustom {
                         id: tfcCountryText;
                         width: countryBlock.width - 22;
+                        text: containerContactInfo.accountType === "company" ? containerContactInfo.contactInfoModel.GetData("Addresses").GetData("Country") : "";
                         height: 23;
                         anchors.horizontalCenter: countryBlock.horizontalCenter;
                         anchors.verticalCenter: countryBlock.verticalCenter;
@@ -484,6 +465,7 @@ Rectangle {
                     TextFieldCustom {
                         id: tfcCity;
                         width: cityBlock.width - 22;
+                        text: containerContactInfo.accountType === "company" ? containerContactInfo.contactInfoModel.GetData("Addresses").GetData("City") : "";
                         height: 23;
                         anchors.horizontalCenter: cityBlock.horizontalCenter;
                         anchors.verticalCenter: cityBlock.verticalCenter;
@@ -516,6 +498,7 @@ Rectangle {
                         id: postalCode;
                         width: postalCodeBlock.width - 22;
                         height: 23;
+                        text: containerContactInfo.accountType === "company" ? containerContactInfo.contactInfoModel.GetData("Addresses").GetData("PostalCode") : "";
                         anchors.horizontalCenter: postalCodeBlock.horizontalCenter;
                         anchors.verticalCenter: postalCodeBlock.verticalCenter;
                     }
@@ -546,7 +529,8 @@ Rectangle {
                     TextFieldCustom {
                         id: tfcStreet;
                         width: streetBlock.width - 22;
-                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("Street") : "";
+                        //text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("Street") : "";
+                        text: containerContactInfo.accountType === "company" ? containerContactInfo.contactInfoModel.GetData("Addresses").GetData("Street") : "";
                         height: 23;
                         anchors.horizontalCenter: streetBlock.horizontalCenter;
                         anchors.verticalCenter: streetBlock.verticalCenter;
@@ -628,7 +612,7 @@ Rectangle {
                     TextFieldCustom {
                         id: tfcBD;
                         width: bdBlock.width - 22;
-                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("Email") : "";
+                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("BirthDay") : "";
                         height: 23;
                         anchors.horizontalCenter: bdBlock.horizontalCenter;
                         anchors.verticalCenter: bdBlock.verticalCenter;
@@ -663,7 +647,8 @@ Rectangle {
                     ComboBox {
                         id: genderCB;
                         width: bdBlock.width - 22;
-                        height: 20;
+                        height: 23;
+                        radius: 3;
                         model: genderModel;
                         anchors.horizontalCenter: genderBlock.horizontalCenter;
                         anchors.verticalCenter: genderBlock.verticalCenter;
@@ -772,7 +757,7 @@ Rectangle {
                     TextFieldCustom {
                         id: tfcNickName;
                         width: nickNameBlock.width - 22;
-                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("LastName") : "";
+                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("NickName") : "";
                         height: 23;
                         anchors.horizontalCenter: nickNameBlock.horizontalCenter;
                         anchors.verticalCenter: nickNameBlock.verticalCenter;
@@ -865,15 +850,6 @@ Rectangle {
                         }
                     }
 
-
-//                    TextFieldCustom {
-//                        id: tfcNickName;
-//                        width: nickNameBlock.width - 22;
-//                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("LastName") : "";
-//                        height: 23;
-//                        anchors.horizontalCenter: nickNameBlock.horizontalCenter;
-//                        anchors.verticalCenter: nickNameBlock.verticalCenter;
-//                    }
                 }
 
 

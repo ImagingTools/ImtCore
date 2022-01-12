@@ -43,6 +43,7 @@ Rectangle {
             fontName: menuPanel.fontName;
             imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Selected" + ".svg":
                                                      "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
+
             selected: lvPages.currentIndex === model.index ? true : false;
 
             onClicked: {

@@ -8,6 +8,8 @@
 #include <imtauth/IAccountInfo.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
+#include <imtauth/IAddressManager.h>
+#include <imtauth/CAddress.h>
 
 
 
@@ -36,6 +38,7 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 	else{
 		dataModel = new imtbase::CTreeItemModel();
 		itemModel = new imtbase::CTreeItemModel();
+
 		QByteArray accountId = GetObjectIdFromInputParams(inputParams);
 
 		QByteArrayList featureIds;
@@ -71,6 +74,7 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 					lastName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
 					firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
 					nickName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_NICKNAME);
+
 				}
 
 				itemModel->SetData("Id", accountId);
@@ -81,6 +85,24 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 				itemModel->SetData("AccountType", accountTypeId);
 				itemModel->SetData("AccountDescription", accountDescription);
 
+				imtbase::CTreeItemModel* addressesModel = new imtbase::CTreeItemModel();
+				addressesModel->SetIsArray(true);
+				const imtauth::IAddressProvider* addressesPtr = ownerPtr->GetAddresses();
+				if (addressesPtr != nullptr){
+					imtbase::ICollectionInfo::Ids ids = addressesPtr->GetAddressList().GetElementIds();
+					for (const QByteArray& id : ids){
+						const imtauth::IAddress* addressPtr = addressesPtr->GetAddress(id);
+						if (addressPtr != nullptr){
+							int index = addressesModel->InsertNewItem();
+							addressesModel->SetData("Country", addressPtr->GetCountry(),index);
+							addressesModel->SetData("City", addressPtr->GetCity(), index);
+							addressesModel->SetData("PostalCode", addressPtr->GetPostalCode(), index);
+							addressesModel->SetData("Street", addressPtr->GetStreet(), index);
+							//addressesModel->SetExternTreeModel("address", addressModel, index);
+						}
+					}
+					itemModel->SetExternTreeModel("Addresses", addressesModel);
+				}
 			}
 		}
 

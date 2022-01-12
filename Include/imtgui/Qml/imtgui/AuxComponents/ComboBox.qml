@@ -9,7 +9,7 @@ Item {
     property int currentIndex: -1;
     property color borderColor: Style.textColor;
     property bool menuVisible: false;
-    property color backgroundColor: Style.backgroundColor;
+    property color backgroundColor: Style.baseColor;
     property bool textCentered: true;
     property int radius: 5;
 
@@ -33,6 +33,13 @@ Item {
         border.color: container.borderColor;
         radius: container.radius;
         color: container.backgroundColor;
+
+        gradient: Gradient {
+                 GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+                 GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
+                 GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
+                 GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
+             }
 
         Text {
             id: cbTitleTxt;

@@ -40,8 +40,8 @@ Rectangle{
             anchors.centerIn: parent;
             width: parent.width * 0.6;
             height: parent.height * 0.6;
-//            sourceSize.width: width;
-//            sourceSize.height: height;
+            sourceSize.width: width;
+            sourceSize.height: height;
             fillMode: Image.PreserveAspectFit;
             source:  "../../../" + "Icons/" + Style.theme + "/" + tabDelegate.firstElementImageSource + "_On_Normal.svg";
 
@@ -100,10 +100,11 @@ Rectangle{
             anchors.centerIn: parent;
             width: parent.width;
             height: parent.height;
-//            sourceSize.width: width;
-//            sourceSize.height: height;
+            sourceSize.width: width;
+            sourceSize.height: height;
             fillMode: Image.PreserveAspectFit;
             source: "../../../" + "Icons/" + Style.theme + "/" + "DeleteStylized" + "_On_Normal.svg";
+
         }
 
         MouseArea{
