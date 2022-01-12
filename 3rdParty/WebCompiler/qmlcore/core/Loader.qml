@@ -38,8 +38,6 @@ Item {
 
 	///@internal
 	function _load() {
-		
-			
 		var source = this.source.replaceAll(/[.]qml/g, '') //by Artur, remove .qml
 
 		if (!source){
@@ -114,8 +112,9 @@ Item {
 		}
 
 		var item = new ctor(this)
+		var self = this
 		var overrideComplete = oldComplete !== $core.CoreObject.prototype.__complete
-
+		item.__finished = false
 		if (overrideComplete) {
 			var oldComplete = item.__complete
 			var itemCompleted = this.itemCompleted.bind(this, item)
@@ -126,23 +125,33 @@ Item {
 					log("onComplete failed:", ex)
 				}
 				itemCompleted()
+				this.__finished = true
 			}
 		}
 
 		$core.core.createObject(item)
 		this.loaded(item)
 
-
-		this.__properties.item.value = item
-		for(let func of this.__properties.item.onChanged){
-			func(item)
-		}
-
-		this.item._context._processActions()
-		
-
 		if (!overrideComplete)
 			this.itemCompleted()
+			this.__finished = true
+
+		this.__properties.item.value = item
+		
+		this.item._context._processActions()
+
+		
+	}
+
+	onItemCompleted: {
+		let tempTimer = setInterval(()=>{
+			if(this.__properties.item && this.__properties.item.value && this.__properties.item.value.__finished === true){
+				for(let func of this.__properties.item.onChanged){
+					func(this.__properties.item.value)
+				}
+				clearInterval(tempTimer)
+			}
+		},10)
 	}
 
 	onRecursiveVisibleChanged: {
