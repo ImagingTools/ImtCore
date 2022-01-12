@@ -12,9 +12,11 @@ JSONListModel {
 //        return container.get(row)
 //    }
 
+
     function GetItemsCount(){
         return this.count
     }
+
 
     function GetData(key, row){
         if(row === undefined)
@@ -38,6 +40,8 @@ JSONListModel {
         }
         return retVal
     }
+
+
     function SetData(key, value, row){
         if(row === undefined)
             row = 0
@@ -66,6 +70,12 @@ JSONListModel {
 //        xhr.send(txt_data);
     }
 
+
+    function SetExternTreeModel(key, value, row){
+        this.SetData(key, value, row)
+    }
+
+
     function ContainsKey(key,row){
         //        return true
         if(row === undefined)
@@ -77,9 +87,11 @@ JSONListModel {
         return false
     }
 
+
     function SetQueryParam(key,value){
         this.queryParams[key] = value
     }
+
 
     function needsReload(){
         var newSource = this.baseUrl
@@ -98,17 +110,26 @@ JSONListModel {
         this.source = newSource
     }
 
+
     function Refresh(){
 
     }
+
 
     function SetIsArray(value){
         this.isArray = value;
     }
 
+
     function InsertNewItem(){
         this.append({});
     }
+
+
+    function RemoveItem(index){
+        this.remove(index)
+    }
+
 
     function AddTreeModel(key, row){
         var retModel;
@@ -116,5 +137,6 @@ JSONListModel {
         this.SetData(key, retModel, row);
         return retModel;
     }
+
 
 }

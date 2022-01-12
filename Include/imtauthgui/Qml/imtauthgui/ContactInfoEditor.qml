@@ -827,7 +827,7 @@ Rectangle {
                         anchors.rightMargin: 10;
 
 //                        anchors.fill: parent;
-                        headersModel: headersModel;
+                        headers: headersModel;
                     }
 
                     ListModel {

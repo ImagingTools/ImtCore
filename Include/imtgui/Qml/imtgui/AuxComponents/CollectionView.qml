@@ -23,9 +23,9 @@ Rectangle {
         console.log("collectionView onModelChanged", collectionView.gqlModelInfo)
         if (collectionView.model.ContainsKey("headers")){
             var dataModelLocal = collectionView.model.GetData("headers");
-            tableInternal.headersModel = dataModelLocal;
-//            tableInternal.headersModel.Refresh();
-            console.log("collectionView header count",tableInternal.headersModel.GetItemsCount())
+            tableInternal.headers = dataModelLocal;
+//            tableInternal.headers.Refresh();
+            console.log("collectionView header count",tableInternal.headers.GetItemsCount())
         }
         else{
             headerInfoModel.updateModel()
@@ -33,7 +33,7 @@ Rectangle {
 
         if (collectionView.model.ContainsKey("data")){
             var dataModelLocal = collectionView.model.GetData("data");
-            tableInternal.elementsModel = dataModelLocal;
+            tableInternal.elements = dataModelLocal;
             console.log("collectionView data count",dataModelLocal.GetItemsCount())
         }
 
@@ -82,9 +82,9 @@ Rectangle {
                 if(dataModelLocal.ContainsKey(collectionView.gqlModelInfo)){
                     dataModelLocal = dataModelLocal.GetData(collectionView.gqlModelInfo)
                     if(dataModelLocal.ContainsKey("headers")){
-                        tableInternal.headersModel = dataModelLocal.GetData("headers")
+                        tableInternal.headers = dataModelLocal.GetData("headers")
                         console.log("headerInfoModel ContainsKey",dataModelLocal.ContainsKey("headers"))
-                        collectionView.model.SetExternTreeModel('headers',tableInternal.headersModel )
+                        collectionView.model.SetExternTreeModel('headers',tableInternal.headers )
                         itemsModel.updateModel()
                     }
                     else if(packageInfoModel.ContainsKey("errors")){
@@ -116,8 +116,8 @@ Rectangle {
             var queryFields = Gql.GqlObject("items");            
 
             queryFields.InsertField("Id");
-            for(var i = 0; i < tableInternal.headersModel.GetItemsCount(); i++){
-                queryFields.InsertField(tableInternal.headersModel.GetData("Id",i));
+            for(var i = 0; i < tableInternal.headers.GetItemsCount(); i++){
+                queryFields.InsertField(tableInternal.headers.GetData("Id",i));
             }
             query.AddField(queryFields);
 
@@ -133,9 +133,9 @@ Rectangle {
                 if(dataModelLocal.ContainsKey(collectionView.gqlModelItems)){
                     dataModelLocal = dataModelLocal.GetData(collectionView.gqlModelItems);
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
-                        tableInternal.elementsModel = dataModelLocal.GetData("items");
+                        tableInternal.elements = dataModelLocal.GetData("items");
                         console.log("collectionView items",dataModelLocal);
-                        collectionView.model.SetExternTreeModel('data',tableInternal.elementsModel)
+                        collectionView.model.SetExternTreeModel('data',tableInternal.elements)
                     }
                     else if(itemsModel.ContainsKey("errors")){
                         var errorsModel = itemsModel.GetData("errors");

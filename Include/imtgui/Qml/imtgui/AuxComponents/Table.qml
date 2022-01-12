@@ -9,8 +9,8 @@ Item {
     property string textColor: "#335777";
     property real delegateWidth: count == 0 ? 0 : headersList.width / headersList.count;
     property int count: headersArray.length;
-    property alias headersModel: headersList.model;
-    property alias elementsModel: elementsList.model;
+    property alias headers: headersList.model;
+    property alias elements: elementsList.model;
 
     property var headersArray: ["First", "Second", "Third"];
 

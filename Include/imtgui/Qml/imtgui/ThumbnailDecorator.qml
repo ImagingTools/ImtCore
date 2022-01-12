@@ -46,7 +46,7 @@ Rectangle
         title: menuPanel.activePageName;
 //        activePageId: menuPanel.activePageId;
         onMenuActivatedSignal: {
-            console.log("onMenuActivatedSignal1",menuId)
+            console.log("onMenuActivatedSignal1",menuId, thubnailDecoratorContainer.activeItem)
             thubnailDecoratorContainer.activeItem.menuActivated(menuId);
         }
     }

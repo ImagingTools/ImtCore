@@ -8,9 +8,10 @@ Item {
     property alias selectedIndex: elementsList.selectedIndex;
     property real delegateWidth: tableContainer.count == 0 ? 0 : headersList.width/headersList.count;
     property int count: 3; //headersArray.length;
-//    property alias headersModel: headersList.model;
-    property alias elementsModel: elementsList.model;
-    property alias headersModel: headersList.model; //: elementsList.model;
+//    property alias headers: headersList.model;
+    property alias elements: elementsList.model;
+//    property alias headers: headersList.model; //: elementsList.model;
+    property TreeItemModel headers; //: elementsList.model;
 
 //    property var headerKeysArray: [];
 //    property var headerNamesArray: [];
@@ -53,7 +54,7 @@ Item {
 //            boundsBehavior: Flickable.StopAtBounds;
             orientation: ListView.Horizontal;
             spacing: 0;
-//            model: tableContainer.headersModel;
+            model: tableContainer.headers;
             interactive: false;
             delegate: Rectangle{
                 id: deleg;
@@ -101,7 +102,7 @@ Item {
         clip: true;
 //        boundsBehavior: Flickable.StopAtBounds;
         spacing: 0;
-//        model: tableContainer.elementsModel;
+//        model: tableContainer.elements;
         interactive: false;
         delegate: TableDelegate {
             id: tableDelegate;
@@ -113,19 +114,19 @@ Item {
 //                    tableDelegate.addToArray(model[tableContainer.headerKeysArray[i]])
 //                }
                 console.log("elementsList tableDelegate", model["Id"], model.index)
-                console.log("elementsModel.GetItemsCount",tableContainer.elementsModel.GetItemsCount())
-//                var keys = tableContainer.elementsModel.GetKeys();
-//                tableContainer.headersModel.GetKeys(keys, model.index)
+                console.log("elements.GetItemsCount",tableContainer.elements.GetItemsCount())
+//                var keys = tableContainer.elements.GetKeys();
+//                tableContainer.headers.GetKeys(keys, model.index)
 //                console.log("elementsList keys", keys)
-                for(var i = 0; i < tableContainer.headersModel.GetItemsCount(); i++){
-                    tableDelegate.addToArray(model[tableContainer.headersModel.GetData("Id",i)]);
-//                    tableDelegate.addToArray(tableContainer.headersModel.GetData("Id",i));
+                for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+                    tableDelegate.addToArray(model[tableContainer.headers.GetData("Id",i)]);
+//                    tableDelegate.addToArray(tableContainer.headers.GetData("Id",i));
                 }
 
             }
 
             onClicked: {
-                console.log("elementsModel.GetItemsCount", model.index, tableContainer.elementsModel)
+                console.log("elements.GetItemsCount", model.index, tableContainer.elements)
                 elementsList.selectedIndex = model.index;
                 elementsList.selectedId = model["Id"];
                 elementsList.selectedName = model["Name"];
