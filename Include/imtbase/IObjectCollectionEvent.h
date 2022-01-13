@@ -18,16 +18,16 @@ class IObjectCollectionEvent: virtual public istd::IChangeable
 public:
 	enum EventType
 	{
-		ET_UPDATE,
-		ET_INSERT,
-		ET_REMOVE
+		ET_INSERT = 0,
+		ET_REMOVE,
+		ET_UPDATE
 	};
-	
+
 	/**
 		Get type of the collection event.
 		\sa EventType
 	*/
-	virtual int GetEventType() const = 0;
+	virtual EventType GetEventType() const = 0;
 
 	/**
 		Get ID of the related item in the collection.

@@ -20,7 +20,7 @@ CObjectCollectionInsertEvent::CObjectCollectionInsertEvent(const QByteArray& ite
 
 // reimplemented (IObjectCollectionEvent)
 
-int CObjectCollectionInsertEvent::GetEventType() const
+imtbase::IObjectCollectionEvent::EventType CObjectCollectionInsertEvent::GetEventType() const
 {
 	return ET_INSERT;
 }

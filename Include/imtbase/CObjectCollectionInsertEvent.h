@@ -17,7 +17,7 @@ public:
 	CObjectCollectionInsertEvent(const QByteArray& itemId = QByteArray());
 
 	// reimplemented (IObjectCollectionEvent)
-	virtual int GetEventType() const override;
+	virtual EventType GetEventType() const override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;

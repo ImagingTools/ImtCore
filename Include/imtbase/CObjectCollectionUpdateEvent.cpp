@@ -18,9 +18,11 @@ CObjectCollectionUpdateEvent::CObjectCollectionUpdateEvent()
 }
 
 
-CObjectCollectionUpdateEvent::CObjectCollectionUpdateEvent(const QByteArray& itemId, UpdateType updateType)
+CObjectCollectionUpdateEvent::CObjectCollectionUpdateEvent(const QByteArray& itemId, UpdateType updateType, const QVariant oldValue, const QVariant newValue)
 	:BaseClass(itemId),
-	m_updateType(updateType)
+	m_updateType(updateType),
+	m_oldValue(oldValue),
+	m_newValue(newValue)
 {
 }
 
@@ -31,9 +33,21 @@ CObjectCollectionUpdateEvent::UpdateType CObjectCollectionUpdateEvent::GetUpdate
 }
 
 
+QVariant CObjectCollectionUpdateEvent::GetOldValue() const
+{
+	return m_oldValue;
+}
+
+
+QVariant CObjectCollectionUpdateEvent::GetNewValue() const
+{
+	return m_newValue;
+}
+
+
 // reimplemented (IObjectCollectionEvent)
 
-int CObjectCollectionUpdateEvent::GetEventType() const
+imtbase::IObjectCollectionEvent::EventType CObjectCollectionUpdateEvent::GetEventType() const
 {
 	return ET_UPDATE;
 }
@@ -61,6 +75,18 @@ bool CObjectCollectionUpdateEvent::CopyFrom(const IChangeable& object, Compatibi
 			istd::CChangeNotifier notifier(this);
 
 			m_updateType = sourcePtr->m_updateType;
+		}
+
+		if (m_oldValue != sourcePtr->m_oldValue) {
+			istd::CChangeNotifier notifier(this);
+
+			m_oldValue = sourcePtr->m_oldValue;
+		}
+
+		if (m_newValue != sourcePtr->m_newValue) {
+			istd::CChangeNotifier notifier(this);
+
+			m_newValue = sourcePtr->m_newValue;
 		}
 
 		return true;

@@ -20,7 +20,7 @@ CObjectCollectionRemoveEvent::CObjectCollectionRemoveEvent(const QByteArray& ite
 
 // reimplemented (IObjectCollectionEvent)
 
-int CObjectCollectionRemoveEvent::GetEventType() const
+imtbase::IObjectCollectionEvent::EventType CObjectCollectionRemoveEvent::GetEventType() const
 {
 	return ET_REMOVE;
 }

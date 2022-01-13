@@ -23,11 +23,13 @@ public:
 	};
 
 	CObjectCollectionUpdateEvent();
-	CObjectCollectionUpdateEvent(const QByteArray& itemId, UpdateType updateType);
+	CObjectCollectionUpdateEvent(const QByteArray& itemId, UpdateType updateType, const QVariant oldValue = QVariant(), const QVariant newValue = QVariant());
 	UpdateType GetUpdateType() const;
+	QVariant GetOldValue() const;
+	QVariant GetNewValue() const;
 
 	// reimplemented (IObjectCollectionEvent)
-	virtual int GetEventType() const override;
+	virtual EventType GetEventType() const override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
@@ -37,6 +39,8 @@ public:
 
 private:
 	UpdateType m_updateType;
+	QVariant m_oldValue;
+	QVariant m_newValue;
 };
 
 
