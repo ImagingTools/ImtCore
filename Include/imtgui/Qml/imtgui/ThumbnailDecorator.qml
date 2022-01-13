@@ -42,9 +42,7 @@ Rectangle
 
     TopPanel {
         id: topPanel;
-//        title: "Test";
         title: menuPanel.activePageName;
-//        activePageId: menuPanel.activePageId;
         onMenuActivatedSignal: {
             console.log("onMenuActivatedSignal1",menuId, thubnailDecoratorContainer.activeItem)
             thubnailDecoratorContainer.activeItem.menuActivated(menuId);
@@ -52,40 +50,22 @@ Rectangle
     }
 
 
-//    Rectangle {
-//        anchors.top: topPanel.bottom;
-//        anchors.bottom: parent.bottom;
-//        anchors.right: parent.right;
-//        anchors.left: parent.left;
-////        anchors.fill: parent;
-//        color: "red";
-//    }
-
     MenuPanel {
         id: menuPanel;
 
         anchors.top: topPanel.bottom;
         anchors.bottom: parent.bottom;
-//        textColor: Style.textColor;
-//        color: Style.backgroundColor;
-//        fontName: thubnailDecoratorContainer.fontName;
         onPagesCountChanged: {
             pagesData.model = menuPanel.pagesCount
         }
 
         onActivePageIdChanged: {
-            topPanel.activeCommandsModelId = menuPanel.activePageId
+            thubnailDecoratorContainer.activeItem.updateCommandId();
+//            topPanel.activeCommandsModelId = menuPanel.activePageId
+
            // loader.source = "AuxComponents/" + menuPanel.activePageId + "View.qml"
         }
     }
-
-//    PackagesView {
-
-//        anchors.left: menuPanel.right;
-//        anchors.right: parent.right;
-//        anchors.top: topPanel.bottom;
-//        anchors.bottom: parent.bottom;
-//    }
 
 
     Repeater {

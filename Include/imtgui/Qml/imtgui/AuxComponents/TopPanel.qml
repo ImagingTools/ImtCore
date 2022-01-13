@@ -24,10 +24,10 @@ Rectangle {
     onActiveCommandsModelIdChanged: {
         console.log("onActiveCommandsModelIdChanged", topPanel.activeCommandsModelId);
 //        console.log("Count items ", buttonsModel.GetItemsCount());
-        if (!buttonsModel.ContainsKey(activeCommandsModelId)) {
+        if (!buttonsModelItem.ContainsKey(topPanel.activeCommandsModelId)) {
             commandsModel.updateModel();
         } else {
-            updateTimer.model = buttonsModel.GetData(activeCommandsModelId);
+            updateTimer.model = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
         }
     }
 
@@ -63,7 +63,7 @@ Rectangle {
 //        }
 //    }
     TreeItemModel {
-        id: buttonsModel;
+        id: buttonsModelItem;
     }
 
     AuxButton {
@@ -199,7 +199,7 @@ Rectangle {
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
                         var pageId = dataModelLocal.GetData("information").GetData("CommandsModelId");
                         dataModelLocal = dataModelLocal.GetData("items");
-                        buttonsModel.SetExternTreeModel(pageId, dataModelLocal);
+                        buttonsModelItem.SetExternTreeModel(pageId, dataModelLocal);
                         updateTimer.model = dataModelLocal;
                         commandsModel.isFirst = !commandsModel.isFirst
 //                        lvButtons.model = dataModelLocal;

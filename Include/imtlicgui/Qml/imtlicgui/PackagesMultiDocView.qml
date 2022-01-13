@@ -11,12 +11,17 @@ Item {
         packagesMultiDocView.menuActivated(menuId);
     }
 
+    function updateCommandId(){
+        packagesMultiDocView.updateCommandId();
+    }
+
     MultiDocWorkspaceView {
         id: packagesMultiDocView;
             anchors.fill: parent;
 //            color: "red";
         Component.onCompleted: {
-            packagesMultiDocView.addToHeadersArray("", "Packages", "../../imtlicgui/PackageCollectionView.qml")
+            console.log("PackagesMultiDocView on completed");
+            packagesMultiDocView.addToHeadersArray("", "Packages", "../../imtlicgui/PackageCollectionView.qml", "Packages")
         }
 
 //        onChangeCommandsId: {

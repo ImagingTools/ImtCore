@@ -12,11 +12,15 @@ Item {
         installationsMultiDocView.menuActivated(menuId);
     }
 
+    function updateCommandId(){
+        installationsMultiDocView.updateCommandId();
+    }
+
     MultiDocWorkspaceView {
         id: installationsMultiDocView;
             anchors.fill: parent;
         Component.onCompleted: {
-            installationsMultiDocView.addToHeadersArray("", "Installations", "../../imtlicgui/InstallationCollectionView.qml")
+            installationsMultiDocView.addToHeadersArray("", "Installations", "../../imtlicgui/InstallationCollectionView.qml", "Installations")
         }
 
     }

@@ -47,11 +47,11 @@ Rectangle {
             selected: lvPages.currentIndex === model.index ? true : false;
 
             onClicked: {
-                lvPages.currentIndex = model.index;
-                menuPanel.activePageId = model[PageEnum.ID];
+                lvPages.currentIndex = model.index;              
                 menuPanel.activePageName = model[PageEnum.NAME];
                 menuPanel.activeIcon = model[PageEnum.ICON];
                 menuPanel.activePageIndex = model.index;
+                 menuPanel.activePageId = model[PageEnum.ID];
 
                 console.log("menuPanel.activePageName ", menuPanel.activePageName);
                 console.log("menuPanel.activePageId ", menuPanel.activePageId);

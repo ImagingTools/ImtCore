@@ -12,12 +12,16 @@ Item {
         accountsMultiDocView.menuActivated(menuId);
     }
 
+    function updateCommandId(){
+        accountsMultiDocView.updateCommandId();
+    }
+
     MultiDocWorkspaceView {
         id: accountsMultiDocView;
         anchors.fill: parent;
         //    color: "red";
         Component.onCompleted: {
-            accountsMultiDocView.addToHeadersArray("", "Accounts", "../../imtlicgui/AccountCollectionView.qml")
+            accountsMultiDocView.addToHeadersArray("", "Accounts", "../../imtlicgui/AccountCollectionView.qml", "Accounts")
         }
 
     }

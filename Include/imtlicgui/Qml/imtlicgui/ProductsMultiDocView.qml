@@ -12,12 +12,16 @@ Item {
         productsMultiDocView.menuActivated(menuId);
     }
 
+    function updateCommandId(){
+        productsMultiDocView.updateCommandId();
+    }
+
     MultiDocWorkspaceView {
         id: productsMultiDocView;
             anchors.fill: parent;
         //    color: "red";
         Component.onCompleted: {
-            productsMultiDocView.addToHeadersArray("", "Products", "../../imtlicgui/ProductCollectionView.qml")
+            productsMultiDocView.addToHeadersArray("", "Products", "../../imtlicgui/ProductCollectionView.qml", "Products")
         }
 
     }

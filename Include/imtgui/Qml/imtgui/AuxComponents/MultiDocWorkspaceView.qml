@@ -19,6 +19,13 @@ Rectangle {
         multiDocView.activeItem.menuActivated(menuId);
     }
 
+    function updateCommandId(){
+        var commandsId = pages.GetData("CommandsId", tabPanelInternal.selectedIndex);
+        var itemId = pages.GetData("ItemId", tabPanelInternal.selectedIndex);
+        console.log("multiDocView tabPanel onSelectedIndexChanged commandsId = ", commandsId, " itemId = ", itemId, " selectedIndex = ", tabPanelInternal.selectedIndex)
+        pagesDeleg.changeCommandsId(commandsId);
+    }
+
 ////    signal changeCommandsId(string commandsId);
 //    function changeCommandsId(commandsId) {
 //        console.log("multiDocView changeCommandsId",commandsId)
@@ -26,26 +33,25 @@ Rectangle {
 //    }
 
     function addToHeadersArray(itemId, title, source, commandsId){
-        console.log("addToHeadersArray", title,source,itemId)
-//        multiDocView.pagesItems.push(itemId);
-//        multiDocView.pagesSources.push(source);
-//        tabPanelInternal.addToHeadersArray(title);
-
+        console.log("MultidicWorkspaceView addToHeadersArray", title, source, itemId, commandsId)
         var index = pages.InsertNewItem();
-        pages.SetData("ItemId",itemId,index);
-        pages.SetData("Title",title,index);
-        pages.SetData("Source",source,index);
-        pages.SetData("CommandsId",commandsId,index);
+        console.log("MultidicWorkspaceView addToHeadersArray index", index);
+        pages.SetData("ItemId", itemId, index);
+        pages.SetData("Title", title, index);
+        pages.SetData("Source", source, index);
+        pages.SetData("CommandsId", commandsId, index);
+        pagesDeleg.changeCommandsId(commandsId);
         tabPanelInternal.selectedIndex = pages.GetItemsCount() - 1;
         pages.Refresh();
-        pagesDeleg.changeCommandsId(commandsId);
-        console.log("addToHeadersArray", itemId, index)
+        console.log("TEST", itemId, index, commandsId)
+//        pagesDeleg.changeCommandsId(commandsId);
+
 //        tabPanelInternal.model = 0;
 //        tabPanelInternal.model = pages;
     }
 
     Component.onCompleted: {
-       docsData.anchors.topMargin =  tabPanelInternal.height;
+       docsData.anchors.topMargin = tabPanelInternal.height;
     }
 
     TreeItemModel {
@@ -70,8 +76,11 @@ Rectangle {
 
         onSelectedIndexChanged: {
 //            console.log("multiDocView changeCommandsId", commandsId)
-            var commandsId = pages.GetData("CommandsId");
-            pagesDeleg.changeCommandsId(commandsId)
+//            var commandsId = pages.GetData("CommandsId", tabPanelInternal.selectedIndex);
+//            var itemId = pages.GetData("ItemId", tabPanelInternal.selectedIndex);
+//            console.log("multiDocView tabPanel onSelectedIndexChanged commandsId = ", commandsId, " itemId = ", itemId, " selectedIndex = ", tabPanelInternal.selectedIndex)
+//            pagesDeleg.changeCommandsId(commandsId);
+            multiDocView.updateCommandId();
         }
     }
 
