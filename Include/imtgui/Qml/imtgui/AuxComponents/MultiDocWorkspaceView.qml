@@ -26,11 +26,9 @@ Rectangle {
         pagesDeleg.changeCommandsId(commandsId);
     }
 
-////    signal changeCommandsId(string commandsId);
-//    function changeCommandsId(commandsId) {
-//        console.log("multiDocView changeCommandsId",commandsId)
-//        pagesDeleg.changeCommandsId(commandsId)
-//    }
+    function commandsChanged(commandsId){
+        multiDocView.activeItem.commandsChanged(commandsId);
+    }
 
     function addToHeadersArray(itemId, title, source, commandsId){
         console.log("MultidicWorkspaceView addToHeadersArray", title, source, itemId, commandsId)
@@ -44,10 +42,6 @@ Rectangle {
         tabPanelInternal.selectedIndex = pages.GetItemsCount() - 1;
         pages.Refresh();
         console.log("TEST", itemId, index, commandsId)
-//        pagesDeleg.changeCommandsId(commandsId);
-
-//        tabPanelInternal.model = 0;
-//        tabPanelInternal.model = pages;
     }
 
     Component.onCompleted: {
@@ -75,11 +69,6 @@ Rectangle {
         }
 
         onSelectedIndexChanged: {
-//            console.log("multiDocView changeCommandsId", commandsId)
-//            var commandsId = pages.GetData("CommandsId", tabPanelInternal.selectedIndex);
-//            var itemId = pages.GetData("ItemId", tabPanelInternal.selectedIndex);
-//            console.log("multiDocView tabPanel onSelectedIndexChanged commandsId = ", commandsId, " itemId = ", itemId, " selectedIndex = ", tabPanelInternal.selectedIndex)
-//            pagesDeleg.changeCommandsId(commandsId);
             multiDocView.updateCommandId();
         }
     }
@@ -95,15 +84,10 @@ Rectangle {
         clip: true;
         boundsBehavior: Flickable.StopAtBounds;
         orientation: ListView.Horizontal;
-//            spacing: 0;
-//        model: tabPanelInternal.count;
         model: pages;
         delegate: Rectangle {
-//            id: pagesDeleg;
-//            anchors.top: tabPanelInternal.bottom;
-//            anchors.bottom: multiDocView.bottom;
+            id: docsDataDeleg;
             width: visible ? docsData.width : 0;
-//            width: 500;
             height: docsData.height;
             color: "transparent";
             visible: tabPanelInternal.selectedIndex === model.index;
@@ -113,18 +97,20 @@ Rectangle {
                 }
             }
 
+            function setModeMenuButton(commandId, mode){
+                pagesDeleg.setModeMenuButton(commandId, mode);
+            }
+
             Loader {
                 id: loader;
                 anchors.fill: parent;
                 Component.onCompleted: {
                     console.log("MultidocWorkspaceView model index ",model.index)
-//                    loader.source = multiDocView.pagesSources[model.index];
                     loader.source = model.Source
                     console.log("MultidocWorkspaceView source",loader.source)
                 }
                 onItemChanged: {
                     if (loader.item && loader.source != ""){
-//                        loader.item.itemId = multiDocView.pagesItems[model.index];
                         loader.item.itemId = model.ItemId
                         var dataModelLocal
                         if (pages.ContainsKey("DocsData",model.index)){
@@ -135,11 +121,7 @@ Rectangle {
                             console.log("MultidocWorkspaceView onItemChanged", dataModelLocal)
                         }
                         console.log("MultidocWorkspaceView onItemChanged", loader.source)
-
                         loader.item.model = dataModelLocal
-
-//                        loader.item.gqlModelInfo = multiDocView.pagesInfo
-//                        loader.item.gqlModelItems = multiDocView.pagesItems
                     }
                 }
 

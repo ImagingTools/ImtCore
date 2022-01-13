@@ -12,6 +12,10 @@ Item {
         featureCollectionView.menuActivated(menuId)
     }
 
+    function commandsChanged(commandsId){
+        featureCollectionView.commandsChanged(commandsId);
+    }
+
     CollectionView {
         id: featureCollectionView;
         anchors.left: parent.left;

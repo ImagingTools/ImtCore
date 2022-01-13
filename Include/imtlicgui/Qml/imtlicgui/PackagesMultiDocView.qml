@@ -15,6 +15,11 @@ Item {
         packagesMultiDocView.updateCommandId();
     }
 
+    function commandsChanged(commandsId){
+        console.log("PackagesMultiDocView commandsChanged!", commandsId);
+        packagesMultiDocView.commandsChanged(commandsId);
+    }
+
     MultiDocWorkspaceView {
         id: packagesMultiDocView;
             anchors.fill: parent;

@@ -37,8 +37,8 @@ imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(const QL
 			if (fields[indexField] == CommandEnum::ICON && m_commandDefaultStatusIcon.GetCount() > i){
 				treeModel->SetData(CommandEnum::ICON, m_commandDefaultStatusIcon[i], i);
 			}
-			if (fields[indexField] == CommandEnum::ENABLED){
-				treeModel->SetData(CommandEnum::ENABLED,"true");
+			if (fields[indexField] == CommandEnum::MODE){
+				treeModel->SetData(CommandEnum::MODE, "Active", i);
 			}
 		}
 	}

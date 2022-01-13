@@ -12,6 +12,25 @@ Rectangle {
     property string title;
 
     signal menuActivatedSignal(string menuId);
+    signal commandsChangedSignal(string commandsId);
+
+    function setModeMenuButton(commandId, mode) {
+        console.log("TopPanel setModeMenuButton!", commandId, mode);
+        var buttonsModelLocal = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
+        console.log("buttonsModelItem GetItemsCount!", buttonsModelLocal.GetItemsCount());
+        for (var i = 0; i < buttonsModelLocal.GetItemsCount(); i++) {
+            var id = buttonsModelLocal.GetData(CommandEnum.ID, i);
+//            console.log("setModeMenuButton FOR");
+//            buttonsModelLocal.SetData("Mode", mode, i);
+//            buttonsModelLocal.SetData("Mode", mode, i);
+            //lvButtons.model.Refresh()
+            if (id === commandId) {
+                 console.log("TopPanel setModeMenuButton id = ", id, "commandId = ", commandId, mode);
+                 buttonsModelLocal.SetData("Mode", mode, i);
+                 break;
+            }
+        }
+    }
 
 
     gradient: Gradient {
@@ -23,11 +42,12 @@ Rectangle {
 
     onActiveCommandsModelIdChanged: {
         console.log("onActiveCommandsModelIdChanged", topPanel.activeCommandsModelId);
-//        console.log("Count items ", buttonsModel.GetItemsCount());
         if (!buttonsModelItem.ContainsKey(topPanel.activeCommandsModelId)) {
             commandsModel.updateModel();
         } else {
             updateTimer.model = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
+            topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
+
         }
     }
 
@@ -36,32 +56,6 @@ Rectangle {
         console.log("activeCommandsModelId", topPanel.activeCommandsModelId);
     }
 
-//    AuxButton {
-//        id: prevStack;
-//        anchors.verticalCenter: parent.verticalCenter;
-//        x: 10;
-//        width: 24;
-//        height: 24;
-//        iconSource: "../../../" + "Icons/" + Style.theme + "/Left_On_Normal.svg";
-//        onClicked: {
-//            console.log("Left ckicked!");
-//        }
-//    }
-
-//    AuxButton {
-//        id: nextStack;
-//        anchors.verticalCenter: parent.verticalCenter;
-//        anchors.left: prevStack.right;
-//        anchors.leftMargin: 10;
-//        width: 24;
-//        height: 24;
-//        iconSource: "../../../Icons/" + Style.theme + "/Right_On_Normal.svg";
-
-//        MouseArea {
-//            id: leftButtonMA;
-//            anchors.fill: parent;
-//        }
-//    }
     TreeItemModel {
         id: buttonsModelItem;
     }
@@ -116,7 +110,6 @@ Rectangle {
 
     Item {
         anchors.left: parent.left;
-//        anchors.leftMargin: 200;
         anchors.right: preferenceButton.left;
         height: parent.height;
 
@@ -125,21 +118,16 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter;
             height: parent.height;
             width: contentWidth > parent.width ? parent.width : contentWidth;
-//            model: listModel;
-
-//            width: contentWidth + 50 > parent.width ? parent.width : contentWidth + 50;
-//            model: 4;
             clip: true;
             orientation: ListView.Horizontal;
             interactive: false;
             delegate: TopButton {
                 text: model[CommandEnum.NAME];
                 isEmpty: model[CommandEnum.NAME] === "";
-                imageSource: "../../../" + "Icons/" + Style.theme + "/" + model[CommandEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
+                imageSource: "../../../" + "Icons/" + Style.theme + "/" + model[CommandEnum.ICON] + "_" + "On" + "_" + model.Mode + ".svg";
                 fontName: Style.fontFamily;
                 onClicked: {
                     console.log("TopPanel menuActivited", model[CommandEnum.ID])
-//                    topPanel.menuActivited(model[CommandEnum.ID]);
                     topPanel.menuActivatedSignal(model.Id);
                 }
             }
@@ -178,6 +166,7 @@ Rectangle {
             queryFields.InsertField(CommandEnum.ID);
             queryFields.InsertField(CommandEnum.NAME);
             queryFields.InsertField(CommandEnum.ICON);
+            queryFields.InsertField(CommandEnum.MODE);
             query.AddField(queryFields);
             queryFields = Gql.GqlObject("information");
             queryFields.InsertField("CommandsModelId");
@@ -202,7 +191,7 @@ Rectangle {
                         buttonsModelItem.SetExternTreeModel(pageId, dataModelLocal);
                         updateTimer.model = dataModelLocal;
                         commandsModel.isFirst = !commandsModel.isFirst
-//                        lvButtons.model = dataModelLocal;
+                        topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
                     }
                     else if(commandsModel.ContainsKey("errors")){
                         var errorsModel = commandsModel.GetData("errors");

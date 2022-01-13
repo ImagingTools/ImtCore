@@ -191,10 +191,11 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 		}
 	}
 	if (keyRole > -1){
-		QModelIndex topLeft = QAbstractListModel::index(index);
+		QModelIndex topLeft = QAbstractListModel::index(index - 1);
+		QModelIndex bottomRight = QAbstractListModel::index(index);
 		QVector<int> roles;
 		roles.append(keyRole);
-		emit dataChanged(topLeft,topLeft,roles);
+		emit dataChanged(topLeft,bottomRight,roles);
 	}
 
 	return true;

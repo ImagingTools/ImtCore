@@ -13,6 +13,7 @@ Rectangle {
 //    property TabPanel tabPanel: tabPanelInternal;
     property TreeItemModel model;
     property alias table: tableInternal;
+    property alias selectedIndex: tableInternal.selectedIndex;
     property string gqlModelInfo;
     property string gqlModelItems;
     property string itemId;

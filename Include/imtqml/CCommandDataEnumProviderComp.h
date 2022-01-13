@@ -17,7 +17,7 @@ class CCommandDataEnumProviderComp:
 	Q_PROPERTY(QString ID READ Id)
 	Q_PROPERTY(QString NAME READ Name)
 	Q_PROPERTY(QString ICON READ Icon)
-	Q_PROPERTY(QString ENABLED READ Enabled)
+	Q_PROPERTY(QString MODE READ Mode)
 
 public:
 	typedef CRepresentationDataEnumProviderCompBase BaseClass;
@@ -33,15 +33,15 @@ public:
 	const QString Name() { return NAME; }
 	static constexpr const char* ICON = "Icon";
 	const QString Icon() { return ICON; }
-	static constexpr const char* ENABLED = "Enabled";
-	const QString Enabled() { return ENABLED; }
+	static constexpr const char* MODE = "Mode";
+	const QString Mode() { return MODE; }
 
 protected:
 	void GetEnums(imtrest::QueryParams& enums) const override
 	{
 		enums.insert("NAME", NAME);
 		enums.insert("ICON", ICON);
-		enums.insert("ENABLED", ENABLED);
+		enums.insert("MODE", MODE);
 		enums.insert("ID", ID);
 	}
 };
