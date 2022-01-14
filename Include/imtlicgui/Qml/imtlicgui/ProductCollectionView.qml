@@ -4,6 +4,7 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
+    id: productCollectionContainer;
     anchors.fill: parent;
     property alias itemId: productCollectionView.itemId;
     property alias model: productCollectionView.model;
@@ -40,6 +41,10 @@ Item {
             multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/ProductView.qml", "ProductEdit")
         }
 
-
+        onSelectedIndexChanged: {
+            if (productCollectionView.selectedIndex > -1){
+                productCollectionContainer.commandsChanged("Products")
+            }
+        }
     }
 }

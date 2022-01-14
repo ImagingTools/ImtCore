@@ -15,15 +15,34 @@ Item {
 
     function commandsChanged(commandsId) {
         console.log("PackageCollectionView commandsChanged!", commandsId);
-        if (commandsId !== "Packages"){
-            return;
-        }
+//        if (commandsId !== "Packages"){
+//            return;
+//        }
+
         if (packageCollectionView.selectedIndex > -1) {
-            docsDataDeleg.setModeMenuButton("Remove", "Active");
-            docsDataDeleg.setModeMenuButton("Edit", "Active");
+            if (commandsId === "Packages"){
+                docsDataDeleg.setModeMenuButton("Remove", "Active");
+                docsDataDeleg.setModeMenuButton("Edit", "Active");
+            }else if (commandsId === "PackageEdit"){
+                docsDataDeleg.setModeMenuButton("Remove", "Active");
+                docsDataDeleg.setModeMenuButton("Edit", "Active");
+                docsDataDeleg.setModeMenuButton("Import", "Active");
+                docsDataDeleg.setModeMenuButton("Export", "Active");
+                docsDataDeleg.setModeMenuButton("Save", "Active");
+                docsDataDeleg.setModeMenuButton("Close", "Active");
+            }
         } else {
-            docsDataDeleg.setModeMenuButton("Remove", "Disabled");
-            docsDataDeleg.setModeMenuButton("Edit", "Disabled");
+            if (commandsId === "Packages"){
+                docsDataDeleg.setModeMenuButton("Remove", "Disabled");
+                docsDataDeleg.setModeMenuButton("Edit", "Disabled");
+            }else if (commandsId === "PackageEdit"){
+                docsDataDeleg.setModeMenuButton("Remove", "Disabled");
+                docsDataDeleg.setModeMenuButton("Edit", "Disabled");
+                docsDataDeleg.setModeMenuButton("Import", "Disabled");
+                docsDataDeleg.setModeMenuButton("Export", "Disabled");
+                docsDataDeleg.setModeMenuButton("Save", "Disabled");
+                docsDataDeleg.setModeMenuButton("Close", "Disabled");
+            }
         }
     }
 

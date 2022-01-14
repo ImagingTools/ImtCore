@@ -9,7 +9,7 @@ Rectangle {
     width: 1000;
     color: Style.theme === "Dark" ? Style.baseColor: Style.backgroundColor;
 
-    property int selectedIndex: 0;
+    property int selectedIndex: -1;
     property int count: 0;
     property string firstElementImageSource;
     property var headersArray: [];

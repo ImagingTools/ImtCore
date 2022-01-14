@@ -65,6 +65,7 @@ Rectangle
             onVisibleChanged: {
                 if(pagesDeleg.visible){
                     thubnailDecoratorContainer.activeItem = loader.item;
+                    loader.item.visible = pagesDeleg.visible;
                 }
             }
 

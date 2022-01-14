@@ -4,6 +4,7 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
+    id: accountCollectionContainer;
     anchors.fill: parent;
     property alias itemId: accountCollectionView.itemId;
     property alias model: accountCollectionView.model;
@@ -39,6 +40,12 @@ Item {
             console.log("Item id = ", itemId);
             console.log("Name = ", name);
             multiDocView.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit")
+        }
+
+        onSelectedIndexChanged: {
+            if (accountCollectionView.selectedIndex > -1){
+                accountCollectionContainer.commandsChanged("Accounts");
+            }
         }
 
 

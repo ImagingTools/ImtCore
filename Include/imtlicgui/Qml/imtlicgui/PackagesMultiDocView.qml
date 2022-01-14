@@ -4,6 +4,7 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
+    id: packagesMultiDocViewContainer;
     anchors.fill: parent;
     property alias firstElementImageSource: packagesMultiDocView.firstElementImageSource;
     property alias model: packagesMultiDocView.model;
@@ -20,13 +21,20 @@ Item {
         packagesMultiDocView.commandsChanged(commandsId);
     }
 
+    onVisibleChanged: {
+        if (packagesMultiDocViewContainer.visible && packagesMultiDocView.pagesCount === 0) {
+            console.log("PackagesMultiDocView first page loaded !");
+            packagesMultiDocView.addToHeadersArray("", "Packages", "../../imtlicgui/PackageCollectionView.qml", "Packages")
+        }
+    }
+
     MultiDocWorkspaceView {
         id: packagesMultiDocView;
             anchors.fill: parent;
-        Component.onCompleted: {
-            console.log("PackagesMultiDocView on completed");
-            packagesMultiDocView.addToHeadersArray("", "Packages", "../../imtlicgui/PackageCollectionView.qml", "Packages")
-        }
+//        Component.onCompleted: {
+//            console.log("PackagesMultiDocView on completed");
+//            packagesMultiDocView.addToHeadersArray("", "Packages", "../../imtlicgui/PackageCollectionView.qml", "Packages")
+//        }
 
     }
 }

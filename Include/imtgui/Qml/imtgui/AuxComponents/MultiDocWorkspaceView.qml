@@ -14,6 +14,7 @@ Rectangle {
     property TreeItemModel model;
     property var pagesSources: [];
     property var pagesItems: [];
+    property alias pagesCount: docsData.count;
 
     function menuActivated(menuId){
         multiDocView.activeItem.menuActivated(menuId);
@@ -89,11 +90,18 @@ Rectangle {
             width: visible ? docsData.width : 0;
             height: docsData.height;
             color: "transparent";
+//            visible: false;
             visible: tabPanelInternal.selectedIndex === model.index;
             onVisibleChanged: {
+                console.log("MultiDocView onVisibleChanged", this.visible);
                 if(this.visible){
                     multiDocView.activeItem = loader.item;
                 }
+            }
+
+            Component.onCompleted: {
+                console.log("tabPanelInternal.selectedIndex", tabPanelInternal.selectedIndex);
+                console.log("model.index", model.index);
             }
 
             function setModeMenuButton(commandId, mode){
@@ -106,6 +114,7 @@ Rectangle {
                 Component.onCompleted: {
                     console.log("MultidocWorkspaceView model index ",model.index)
                     loader.source = model.Source
+//                    docsDataDeleg.visible = tabPanelInternal.selectedIndex === model.index;
                     console.log("MultidocWorkspaceView source",loader.source)
                 }
                 onItemChanged: {
@@ -120,7 +129,10 @@ Rectangle {
                             console.log("MultidocWorkspaceView onItemChanged", dataModelLocal)
                         }
                         console.log("MultidocWorkspaceView onItemChanged", loader.source)
+                        if (tabPanelInternal.selectedIndex === model.index)
+                            multiDocView.activeItem = loader.item;
                         loader.item.model = dataModelLocal
+
                     }
                 }
 

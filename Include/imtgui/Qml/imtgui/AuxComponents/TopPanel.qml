@@ -22,7 +22,6 @@ Rectangle {
             var id = buttonsModelLocal.GetData(CommandEnum.ID, i);
             //lvButtons.model.Refresh()
             if (id === commandId) {
-                 console.log("TopPanel setModeMenuButton id = ", id, "commandId = ", commandId, mode);
                  buttonsModelLocal.SetData("Mode", mode, i);
                  break;
             }

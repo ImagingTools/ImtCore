@@ -4,6 +4,7 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
+    id: installationCollectionContainer;
     anchors.fill: parent;
     property alias itemId: installationCollectionView.itemId;
     property alias model: installationCollectionView.model;
@@ -42,7 +43,11 @@ Item {
             multiDocView.addToHeadersArray(itemId, name,  "../../imtgui/AuxComponents/InstallationInfoEditor.qml", "InstallationEdit")
         }
 
-
+        onSelectedIndexChanged: {
+            if (installationCollectionView.selectedIndex > -1){
+                installationCollectionContainer.commandsChanged("Installations")
+            }
+        }
     }
 
 }

@@ -4,6 +4,7 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
+    id: accountsMultiDocViewContainer;
     anchors.fill: parent;
     property alias firstElementImageSource: accountsMultiDocView.firstElementImageSource;
     property alias model: accountsMultiDocView.model;
@@ -21,12 +22,18 @@ Item {
         accountsMultiDocView.commandsChanged(commandsId);
     }
 
+    onVisibleChanged: {
+        if (accountsMultiDocViewContainer.visible && accountsMultiDocView.pagesCount === 0) {
+            console.log("AccountsMultiDocView first page loaded !");
+            accountsMultiDocView.addToHeadersArray("", "Accounts", "../../imtlicgui/AccountCollectionView.qml", "Accounts")
+        }
+    }
+
     MultiDocWorkspaceView {
         id: accountsMultiDocView;
         anchors.fill: parent;
-        Component.onCompleted: {
-            accountsMultiDocView.addToHeadersArray("", "Accounts", "../../imtlicgui/AccountCollectionView.qml", "Accounts")
-        }
-
+//        Component.onCompleted: {
+//            accountsMultiDocView.addToHeadersArray("", "Accounts", "../../imtlicgui/AccountCollectionView.qml", "Accounts")
+//        }
     }
 }
