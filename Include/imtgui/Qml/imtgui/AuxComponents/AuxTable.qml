@@ -5,7 +5,7 @@ import Acf 1.0
 
 Item {
     id: tableContainer;
-    property alias selectedIndex: elementsList.selectedIndex;
+    property int selectedIndex: -1;
     property real delegateWidth: tableContainer.count == 0 ? 0 : headersList.width/headersList.count;
     property int count: 3; //headersArray.length;
     property alias elements: elementsList.model;
@@ -70,7 +70,6 @@ Item {
 
     ListView{
         id: elementsList;
-        property int selectedIndex: -1;
         property string selectedId;
         property string selectedName;
         anchors.left: parent.left;
@@ -83,7 +82,7 @@ Item {
         delegate: TableDelegate {
             id: tableDelegate;
             width: elementsList.width;
-            selected: elementsList.selectedIndex === model.index;
+            selected: tableContainer.selectedIndex === model.index;
             Component.onCompleted: {
 
                 console.log("elementsList tableDelegate", model["Id"], model.index)
@@ -91,14 +90,14 @@ Item {
                 for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
                     tableDelegate.addToArray(model[tableContainer.headers.GetData("Id",i)]);
                 }
-
             }
 
             onClicked: {
-                console.log("elements.GetItemsCount", model.index, tableContainer.elements)
-                elementsList.selectedIndex = model.index;
+                console.log("elements.GetItemsCount", tableContainer.selectedIndex, model.index, elementsList.selectedId, elementsList.selectedName)
                 elementsList.selectedId = model["Id"];
                 elementsList.selectedName = model[tableContainer.headers.GetData("Id",0)];
+                tableContainer.selectedIndex = model.index;
+                console.log("TableDelegate onClicked", tableContainer.selectedIndex, elementsList.selectedId, elementsList.selectedName)
             }
 
             onDoubleClicked: {

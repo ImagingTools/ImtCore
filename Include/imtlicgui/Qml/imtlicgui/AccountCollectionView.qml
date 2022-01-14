@@ -39,6 +39,11 @@ Item {
         onSelectItem: {
             console.log("Item id = ", itemId);
             console.log("Name = ", name);
+
+            if (itemId === "") {
+                name = "New Account";
+            }
+
             multiDocView.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit")
         }
 

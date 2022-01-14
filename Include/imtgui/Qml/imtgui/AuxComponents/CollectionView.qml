@@ -5,43 +5,54 @@ import imtqml 1.0
 
 
 Rectangle {
-    id: collectionView;
+    id: collectionViewContainer;
     height: 100;
     width: 100;
     color: "transparent";
     property TreeItemModel model;
     property alias table: tableInternal;
-    property alias selectedIndex: tableInternal.selectedIndex;
+    property int selectedIndex: -1;
     property string gqlModelInfo;
     property string gqlModelItems;
     property string itemId;
     signal selectItem(string itemId, string name);
 
     onModelChanged: {
-        console.log("collectionView onModelChanged", collectionView.gqlModelInfo)
-        if (collectionView.model.ContainsKey("headers")){
-            var dataModelLocal = collectionView.model.GetData("headers");
+        console.log("collectionViewContainer onModelChanged", collectionViewContainer.gqlModelInfo)
+        if (collectionViewContainer.model.ContainsKey("headers")){
+            var dataModelLocal = collectionViewContainer.model.GetData("headers");
             tableInternal.headers = dataModelLocal;
-//            tableInternal.headers.Refresh();
-            console.log("collectionView header count",tableInternal.headers.GetItemsCount())
+            console.log("collectionViewContainer header count",tableInternal.headers.GetItemsCount())
         }
         else{
             headerInfoModel.updateModel()
         }
 
-        if (collectionView.model.ContainsKey("data")){
-            var dataModelLocal = collectionView.model.GetData("data");
+        if (collectionViewContainer.model.ContainsKey("data")){
+            var dataModelLocal = collectionViewContainer.model.GetData("data");
             tableInternal.elements = dataModelLocal;
-            console.log("collectionView data count",dataModelLocal.GetItemsCount())
+
+            var selectedIndexLocal = collectionViewContainer.model.GetData("selectedIndex");
+            tableInternal.selectedIndex = selectedIndexLocal;
+            console.log("collectionViewContainer data count",dataModelLocal.GetItemsCount())
         }
 
     }
 
     function menuActivated(menuId) {
-        var itemId = tableInternal.getSelectedId();
-        var name = tableInternal.getSelectedName();
-        if (itemId != "" && name != ""){
-            collectionView.selectItem(itemId, name);
+        console.log("CollectionView menuActivated", menuId);
+
+        //console.log("CollectionView itemId ", itemId, "name", name);
+
+        if (menuId  === "New"){
+            collectionViewContainer.selectItem("", "")
+        }
+        else if (menuId  === "Edit") {
+            var itemId = tableInternal.getSelectedId();
+            var name = tableInternal.getSelectedName();
+            if (itemId != "" && name != ""){
+                collectionViewContainer.selectItem(itemId, name);
+            }
         }
     }
 
@@ -49,7 +60,14 @@ Rectangle {
         id: tableInternal;
         anchors.fill: parent;
         onSelectItem: {
-            collectionView.selectItem(itemId, name);
+            collectionViewContainer.selectItem(itemId, name);
+        }
+
+        onSelectedIndexChanged: {
+            console.log("collectionViewContainer.selectedIndex 1", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
+            collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
+            collectionViewContainer.model.SetData("selectedIndex", tableInternal.selectedIndex);
+            console.log("collectionViewContainer.selectedIndex 2", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
         }
     }
 
@@ -57,9 +75,9 @@ Rectangle {
         id: headerInfoModel;
 
         function updateModel() {
-            console.log( "headerInfoModel update", collectionView.gqlModelInfo);
+            console.log( "headerInfoModel update", collectionViewContainer.gqlModelInfo);
 
-            var query = Gql.GqlRequest("query", collectionView.gqlModelInfo);
+            var query = Gql.GqlRequest("query", collectionViewContainer.gqlModelInfo);
             var queryFields = Gql.GqlObject("headers");
             queryFields.InsertField("Id");
             queryFields.InsertField("Name");
@@ -74,18 +92,18 @@ Rectangle {
             console.log("State:", this.state, headerInfoModel);
             if (this.state === "Ready"){
                 var dataModelLocal = headerInfoModel.GetData("data");
-                if(dataModelLocal.ContainsKey(collectionView.gqlModelInfo)){
-                    dataModelLocal = dataModelLocal.GetData(collectionView.gqlModelInfo)
+                if(dataModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
+                    dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelInfo)
                     if(dataModelLocal.ContainsKey("headers")){
                         tableInternal.headers = dataModelLocal.GetData("headers")
                         console.log("headerInfoModel ContainsKey",dataModelLocal.ContainsKey("headers"))
-                        collectionView.model.SetExternTreeModel('headers',tableInternal.headers )
+                        collectionViewContainer.model.SetExternTreeModel('headers',tableInternal.headers )
                         itemsModel.updateModel()
                     }
                     else if(packageInfoModel.ContainsKey("errors")){
                         var errorsModelLocal = packageInfoModel.GetData("errors");
-                        if(errorsModelLocal !== null && errorsModelLocal.ContainsKey(collectionView.gqlModelInfo)){
-                            console.log("message", errorsModelLocal.GetData(collectionView.gqlModelInfo).GetData("message"));
+                        if(errorsModelLocal !== null && errorsModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
+                            console.log("message", errorsModelLocal.GetData(collectionViewContainer.gqlModelInfo).GetData("message"));
                         }
                     }
                 }
@@ -97,14 +115,14 @@ Rectangle {
         id: itemsModel;
 
         function updateModel() {
-            console.log( "collectionView updateModel");
+            console.log( "collectionViewContainer updateModel");
 
-            var query = Gql.GqlRequest("query", collectionView.gqlModelItems);
+            var query = Gql.GqlRequest("query", collectionViewContainer.gqlModelItems);
 
-            if(collectionView.itemId != ""){
+            if(collectionViewContainer.itemId != ""){
                 var inputParams = Gql.GqlObject("input");
                 inputParams.InsertField("Id");
-                inputParams.InsertFieldArgument("Id", collectionView.itemId);
+                inputParams.InsertFieldArgument("Id", collectionViewContainer.itemId);
                 query.AddParam(inputParams);
             }
 
@@ -117,7 +135,7 @@ Rectangle {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log("collectionView query ", gqlData);
+            console.log("collectionViewContainer query ", gqlData);
             this.SetGqlQuery(gqlData);
         }
 
@@ -125,17 +143,17 @@ Rectangle {
             console.log("State:", this.state, itemsModel);
             if (this.state === "Ready"){
                 var dataModelLocal = this.GetData("data");
-                if(dataModelLocal.ContainsKey(collectionView.gqlModelItems)){
-                    dataModelLocal = dataModelLocal.GetData(collectionView.gqlModelItems);
+                if(dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
+                    dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
                         tableInternal.elements = dataModelLocal.GetData("items");
-                        console.log("collectionView items",dataModelLocal);
-                        collectionView.model.SetExternTreeModel('data',tableInternal.elements)
+                        console.log("collectionViewContainer items",dataModelLocal);
+                        collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements)
                     }
                     else if(itemsModel.ContainsKey("errors")){
                         var errorsModel = itemsModel.GetData("errors");
-                        if(errorsModel !== null && errorsModel.ContainsKey(collectionView.gqlModelItems)){
-                            console.log("message", errorsModel.GetData(collectionView.gqlModelItems).GetData("message"));
+                        if(errorsModel !== null && errorsModel.ContainsKey(collectionViewContainer.gqlModelItems)){
+                            console.log("message", errorsModel.GetData(collectionViewContainer.gqlModelItems).GetData("message"));
                         }
                     }
                 }

@@ -73,9 +73,9 @@ Item {
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
         onClicked: {
             console.log("onClicked")
-            if (container.enabled) {
-                return;
-            }
+//            if (container.enabled) {
+//                return;
+//            }
 
             container.clicked();
         }

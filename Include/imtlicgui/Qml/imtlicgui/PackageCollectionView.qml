@@ -15,34 +15,16 @@ Item {
 
     function commandsChanged(commandsId) {
         console.log("PackageCollectionView commandsChanged!", commandsId);
-//        if (commandsId !== "Packages"){
-//            return;
-//        }
-
+        if (commandsId !== "Packages"){
+            return;
+        }
+        console.log("packageCollectionView.selectedIndex", packageCollectionView.selectedIndex);
         if (packageCollectionView.selectedIndex > -1) {
-            if (commandsId === "Packages"){
-                docsDataDeleg.setModeMenuButton("Remove", "Active");
-                docsDataDeleg.setModeMenuButton("Edit", "Active");
-            }else if (commandsId === "PackageEdit"){
-                docsDataDeleg.setModeMenuButton("Remove", "Active");
-                docsDataDeleg.setModeMenuButton("Edit", "Active");
-                docsDataDeleg.setModeMenuButton("Import", "Active");
-                docsDataDeleg.setModeMenuButton("Export", "Active");
-                docsDataDeleg.setModeMenuButton("Save", "Active");
-                docsDataDeleg.setModeMenuButton("Close", "Active");
-            }
+            docsDataDeleg.setModeMenuButton("Remove", "Active");
+            docsDataDeleg.setModeMenuButton("Edit", "Active");
         } else {
-            if (commandsId === "Packages"){
-                docsDataDeleg.setModeMenuButton("Remove", "Disabled");
-                docsDataDeleg.setModeMenuButton("Edit", "Disabled");
-            }else if (commandsId === "PackageEdit"){
-                docsDataDeleg.setModeMenuButton("Remove", "Disabled");
-                docsDataDeleg.setModeMenuButton("Edit", "Disabled");
-                docsDataDeleg.setModeMenuButton("Import", "Disabled");
-                docsDataDeleg.setModeMenuButton("Export", "Disabled");
-                docsDataDeleg.setModeMenuButton("Save", "Disabled");
-                docsDataDeleg.setModeMenuButton("Close", "Disabled");
-            }
+            docsDataDeleg.setModeMenuButton("Remove", "Disabled");
+            docsDataDeleg.setModeMenuButton("Edit", "Disabled");
         }
     }
 
@@ -56,10 +38,19 @@ Item {
         }
 
         onSelectItem: {
+            console.log("packageCollectionView onSelectItem", packageCollectionView.selectedIndex);
+            console.log("Item id = ", itemId);
+            console.log("Name = ", name);
+
+            if (itemId === "") {
+                name = "New Package";
+            }
+
             multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit")
-         }
+        }
 
         onSelectedIndexChanged: {
+            console.log("packageCollectionView onSelectedIndexChanged", packageCollectionView.selectedIndex);
             if (packageCollectionView.selectedIndex > -1){
                 packegeCollectionContainer.commandsChanged("Packages")
             }

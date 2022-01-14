@@ -4,6 +4,7 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
+    id: featureCollectionViewContainer;
     anchors.fill: parent;
     property alias itemId: featureCollectionView.itemId;
     property alias model: featureCollectionView.model;
@@ -13,7 +14,25 @@ Item {
     }
 
     function commandsChanged(commandsId){
-        featureCollectionView.commandsChanged(commandsId);
+        if (commandsId !== "PackageEdit") {
+            return;
+        }
+
+        if (featureCollectionView.selectedIndex > -1) {
+            docsDataDeleg.setModeMenuButton("Remove", "Active");
+            docsDataDeleg.setModeMenuButton("Edit", "Active");
+            docsDataDeleg.setModeMenuButton("Import", "Active");
+            docsDataDeleg.setModeMenuButton("Export", "Active");
+            docsDataDeleg.setModeMenuButton("Save", "Active");
+            docsDataDeleg.setModeMenuButton("Close", "Active");
+        } else {
+            docsDataDeleg.setModeMenuButton("Remove", "Disabled");
+            docsDataDeleg.setModeMenuButton("Edit", "Disabled");
+            docsDataDeleg.setModeMenuButton("Import", "Disabled");
+            docsDataDeleg.setModeMenuButton("Export", "Disabled");
+            docsDataDeleg.setModeMenuButton("Save", "Disabled");
+            docsDataDeleg.setModeMenuButton("Close", "Disabled");
+        }
     }
 
     CollectionView {
@@ -29,9 +48,12 @@ Item {
             }
         }
 
-        onSelectItem: {
+        onSelectedIndexChanged: {
+            console.log("featurePackageCollectionView onSelectedIndexChanged", featureCollectionView.selectedIndex);
+            if (featureCollectionView.selectedIndex > -1){
+                featureCollectionViewContainer.commandsChanged("PackageEdit")
+            }
         }
-
 
     }
     Rectangle {

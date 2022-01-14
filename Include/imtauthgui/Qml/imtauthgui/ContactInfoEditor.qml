@@ -14,12 +14,14 @@ Rectangle {
     color: Style.backgroundColor;
     //    property TreeItemModel contactInfoModel
     property var contactInfoModel;
+    property TreeItemModel model;
     property string accountType;
     property string itemId;
 
     Component.onCompleted: {
-        itemsModel.updateModel()
+        //itemsModel.updateModel()
     }
+
 
     function updateData() {
         console.log("containerContactInfo updateData", containerContactInfo.contactInfoModel.GetData("Addresses").GetData("PostalCode"));
@@ -50,6 +52,21 @@ Rectangle {
         }
     }
 
+    onModelChanged: {
+        if (containerContactInfo.model.ContainsKey("data")){
+            containerContactInfo.contactInfoModel = containerContactInfo.model.GetData('data');
+        }
+        else {
+            if(containerContactInfo.itemId === ""){
+                model.AddTreeModel("data");
+
+            }
+            else {
+                itemsModel.updateModel();
+            }
+        }
+    }
+
     onContactInfoModelChanged: {
         containerContactInfo.updateData();
     }
@@ -70,15 +87,6 @@ Rectangle {
             }
 
             var queryFields = Gql.GqlObject("item");
-
-
-            //            itemModel->SetData("Id", accountId);
-            //            itemModel->SetData("FirstName", firstName);
-            //            itemModel->SetData("LastName", lastName);
-            //            itemModel->SetData("NickName", nickName);
-            //            itemModel->SetData("Email", mail);
-            //            itemModel->SetData("AccountType", accountTypeId);
-            //            itemModel->SetData("AccountDescription", accountDescription);
 
             queryFields.InsertField("Id");
             queryFields.InsertField("FirstName");
@@ -108,6 +116,8 @@ Rectangle {
                         containerContactInfo.accountType = dataModelLocal.GetData("item").GetData("AccountType");
                         containerContactInfo.contactInfoModel = dataModelLocal.GetData("item");
                         addressesTable.elementsModel = containerContactInfo.contactInfoModel.GetData("Addresses");
+
+                        containerContactInfo.model.SetExternTreeModel('data', containerContactInfo.contactInfoModel)
                         dataModelLocal.RemoveData("item");
                     }
                     else if(itemsModel.ContainsKey("errors")){
@@ -210,187 +220,6 @@ Rectangle {
                 height: 23;
                 anchors.horizontalCenter: container.horizontalCenter;
             }
-
-//            Column {
-//                id: companyAddressColumn;
-//                //anchors.top: tfcAccountDescription.bottom;
-//                width: 500;
-//                visible: cbTypeAccount.currentIndex === 1;
-
-//                Text {
-//                    id: companyAddressBlockTitle;
-//                    text: qsTr("Company address");
-//                    color: Style.textColor;
-//                    font.family: Style.fontFamily;
-//                    font.pixelSize: Style.fontSize_common;
-//                    //visible: cbTypeAccount.currentIndex === 1;
-//                }
-
-//                Rectangle {
-//                    width: 100;
-//                    height: 100;
-//                    color: "blue";
-//                }
-
-//                Rectangle {
-//                    id: companyAddressBlock;
-//                    anchors.fill: companyAddressColumn;
-//                    color: "red";
-////                    width: companyAddressColumn.width;
-//                   // height: companyAddressColumn.height;
-////                    width: container.width;
-//                    //height: 285;
-//    //                anchors.top: companyAddressBlockTitle.bottom;
-//    //                anchors.topMargin: 5;
-//                    //color: Style.baseColor;
-//                   // color: Style.imagingToolsGradient1;
-//                    border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
-//                   // visible: cbTypeAccount.currentIndex === 1;
-//                    Text {
-//                        id: titleCountry;
-//                        text: qsTr("Country");
-//                        color: Style.textColor;
-//                        font.family: Style.fontFamily;
-//                       // anchors.top: parent.top;
-//                        anchors.topMargin: 5;
-//                        anchors.left: companyAddressBlock.left;
-//                        anchors.leftMargin: 10;
-//                        font.pixelSize: Style.fontSize_common;
-//                    }
-
-//                    Rectangle {
-//                        id: countryBlock;
-//                        width: companyAddressBlock.width - 20;
-//                        anchors.horizontalCenter: companyAddressBlock.horizontalCenter;
-//                        height: 45;
-//                       // anchors.top: titleCountry.bottom;
-
-//                        //color: Style.baseColor;
-//                        color: Style.imagingToolsGradient1;
-//                        border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
-//                        TextFieldCustom {
-//                            id: tfcCountryText;
-//                            width: countryBlock.width - 22;
-//                            height: 23;
-//                            anchors.horizontalCenter: countryBlock.horizontalCenter;
-//                            anchors.verticalCenter: countryBlock.verticalCenter;
-//                        }
-//                    }
-
-//                    Text {
-//                        id: titleCity;
-//                        text: qsTr("City");
-//                        color: Style.textColor;
-//                        font.family: Style.fontFamily;
-//                       // anchors.top: countryBlock.bottom;
-//                        anchors.topMargin: 7;
-//                        anchors.left: companyAddressBlock.left;
-//                        anchors.leftMargin: 10;
-//                        font.pixelSize: Style.fontSize_common;
-//                    }
-
-//                    Rectangle {
-//                        id: cityBlock;
-//                        width: companyAddressBlock.width - 20;
-//                        anchors.horizontalCenter: companyAddressBlock.horizontalCenter;
-//                        height: 45;
-//                        //anchors.top: titleCity.bottom;
-
-//                        //color: Style.baseColor;
-//                        color: Style.imagingToolsGradient1;
-//                        border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
-//                        TextFieldCustom {
-//                            id: tfcCity;
-//                            width: cityBlock.width - 22;
-//                            height: 23;
-//                            anchors.horizontalCenter: cityBlock.horizontalCenter;
-//                            anchors.verticalCenter: cityBlock.verticalCenter;
-//                        }
-//                    }
-
-//                    Text {
-//                        id: titlePostalCode;
-//                        text: qsTr("Postal code");
-//                        color: Style.textColor;
-//                        font.family: Style.fontFamily;
-//                        //anchors.top: cityBlock.bottom;
-//                        anchors.topMargin: 7;
-//                        anchors.left: companyAddressBlock.left;
-//                        anchors.leftMargin: 10;
-//                        font.pixelSize: Style.fontSize_common;
-//                    }
-
-//                    Rectangle {
-//                        id: postalCodeBlock;
-//                        width: companyAddressBlock.width - 20;
-//                        anchors.horizontalCenter: companyAddressBlock.horizontalCenter;
-//                        height: 45;
-//                       // anchors.top: titlePostalCode.bottom;
-
-//                        //color: Style.baseColor;
-//                        color: Style.imagingToolsGradient1;
-//                        border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
-//                        TextFieldCustom {
-//                            id: postalCode;
-//                            width: postalCodeBlock.width - 22;
-//                            height: 23;
-//                            anchors.horizontalCenter: postalCodeBlock.horizontalCenter;
-//                            anchors.verticalCenter: postalCodeBlock.verticalCenter;
-//                        }
-//                    }
-
-//                    Text {
-//                        id: titleStreet;
-//                        text: qsTr("Street");
-//                        color: Style.textColor;
-//                        font.family: Style.fontFamily;
-//                       // anchors.top: postalCodeBlock.bottom;
-//                        //anchors.topMargin: 7;
-//                        anchors.left: companyAddressBlock.left;
-//                        anchors.leftMargin: 10;
-//                        font.pixelSize: Style.fontSize_common;
-//                    }
-
-//                    Rectangle {
-//                        id: streetBlock;
-//                        width: companyAddressBlock.width - 20;
-//                        anchors.horizontalCenter: companyAddressBlock.horizontalCenter;
-//                        height: 45;
-//                        //anchors.top: titleStreet.bottom;
-
-//                        //color: Style.baseColor;
-//                        color: Style.imagingToolsGradient1;
-//                        border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
-//                        TextFieldCustom {
-//                            id: tfcStreet;
-//                            width: streetBlock.width - 22;
-//                            text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("Street") : "";
-//                            height: 23;
-//                            anchors.horizontalCenter: streetBlock.horizontalCenter;
-//                            anchors.verticalCenter: streetBlock.verticalCenter;
-//                        }
-//                    }
-//                }
-
-//                Text {
-//                    id: title;
-//                    text: qsTr("TEST");
-//                    color: Style.textColor;
-//                    font.family: Style.fontFamily;
-//                   // anchors.top: postalCodeBlock.bottom;
-//                    //anchors.topMargin: 7;
-//                    anchors.left: companyAddressBlock.left;
-//                    anchors.leftMargin: 10;
-//                    font.pixelSize: Style.fontSize_common;
-//                }
-
-//                Rectangle {
-//                    //anchors.fill: parent;
-//                    color: "red";
-//                    height: 100;
-//                    width: 100;
-//                }
-     //       }
 
             Text {
                 id: companyAddressBlockTitle;
@@ -522,15 +351,12 @@ Rectangle {
                     anchors.horizontalCenter: companyAddressBlock.horizontalCenter;
                     height: 45;
                     anchors.top: titleStreet.bottom;
-
-                    //color: Style.baseColor;
                     color: Style.imagingToolsGradient1;
                     border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
                     TextFieldCustom {
                         id: tfcStreet;
                         width: streetBlock.width - 22;
-                        //text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("Street") : "";
-                       // text: containerContactInfo.accountType === "company" ? containerContactInfo.contactInfoModel.GetData("Addresses").GetData("Street") : "";
+
                         height: 23;
                         anchors.horizontalCenter: streetBlock.horizontalCenter;
                         anchors.verticalCenter: streetBlock.verticalCenter;

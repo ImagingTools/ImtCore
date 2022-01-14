@@ -42,8 +42,9 @@ Rectangle {
             commandsModel.updateModel();
         } else {
             updateTimer.model = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
-            topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
+//            topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
         }
+        topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
     }
 
     onTitleChanged: {

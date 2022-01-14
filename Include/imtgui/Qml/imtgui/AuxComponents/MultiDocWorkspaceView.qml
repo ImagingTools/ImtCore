@@ -42,7 +42,6 @@ Rectangle {
         pagesDeleg.changeCommandsId(commandsId);
         tabPanelInternal.selectedIndex = pages.GetItemsCount() - 1;
         pages.Refresh();
-        console.log("TEST", itemId, index, commandsId)
     }
 
     Component.onCompleted: {
