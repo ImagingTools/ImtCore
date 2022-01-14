@@ -58,16 +58,6 @@ Rectangle {
            height: 30;
            color: Style.baseColor;
 
-//           Rectangle {
-//               id: iconPref;
-//               width: 20;
-//               height: 20;
-//               color: Style.textColor;
-//               anchors.left: topPan.left;
-//               anchors.verticalCenter: topPan.verticalCenter;
-//               radius: radiusValue;
-//           }
-
            Image {
                id: iconPref;
                width: 20;
@@ -89,40 +79,18 @@ Rectangle {
                font.pixelSize: Style.fontSize_subtitle;
            }
 
-//           Rectangle {
-//               id: exit;
-//               anchors.right: topPan.right;
-//               anchors.verticalCenter: topPan.verticalCenter;
-//               width: 20;
-//               height: 20;
-//               color: Style.textColor;
-//               radius: radiusValue;
-//               MouseArea {
-//                   anchors.fill: parent;
-//                   onClicked: {
-//                       cbLang.menuVisible = false;
-//                       cbUnit.menuVisible = false;
-//                       preference.visible = false;
-//                   }
-//               }
-//           }
-
            AuxButton {
                id: exit;
                anchors.right: topPan.right;
                anchors.verticalCenter: topPan.verticalCenter;
                width: 15;
                height: 15;
-//               color: Style.textColor;
                radius: radiusValue;
                iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
-//               iconSource: "../../../" + Style.getImageSource("Close", Style.theme, "On", "Normal");
-//               iconSource: "../../../" + Style.theme;
               MouseArea {
                   anchors.fill: parent;
                   onClicked: {
                       cbLang.menuVisible = false;
-//                      cbUnit.menuVisible = false;
                       preference.visible = false;
                   }
               }
@@ -188,16 +156,6 @@ Rectangle {
                font.pixelSize: Style.fontSize_common;
            }
 
-//           Text {
-//               id: unitText;
-//               x: parent.width / 2 + 30;
-//               anchors.top: versionBlock.top;
-//               text: "Unit";
-//               color: Style.textColor;
-//               font.family: Style.fontFamily;
-//               font.pixelSize: Style.fontSize_subtitle;
-//           }
-
            Rectangle {
                id: line;
                anchors.topMargin: 10;
@@ -215,15 +173,6 @@ Rectangle {
                anchors.left: languageUnitBlock.left;
                model: languageModel;
            }
-
-//           ComboBox {
-//               id: cbUnit;
-//               x: unitText.x;
-//               anchors.topMargin: 10;
-//               anchors.top: line.bottom;
-//               model: unitModel;
-//           }
-
        }
 
        Rectangle {
@@ -232,13 +181,11 @@ Rectangle {
            width: parent.width;
            height: 100;
            anchors.top: languageUnitBlock.bottom;
-          // anchors.bottomMargin: 30;
            color: Style.baseColor;
            Text {
                id: modeText;
                anchors.leftMargin: 30;
                anchors.left: modeBlock.left;
-               //anchors.bottomMargin: 10;
                anchors.top: modeBlock.top;
                text: "Mode";
                color: Style.textColor;

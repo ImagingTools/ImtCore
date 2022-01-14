@@ -49,7 +49,6 @@ Item {
 //            }
 //        }
 
-
         Image {
             id: iconArrow;
             width: 10;

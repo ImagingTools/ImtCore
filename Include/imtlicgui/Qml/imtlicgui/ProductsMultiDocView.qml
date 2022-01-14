@@ -16,10 +16,14 @@ Item {
         productsMultiDocView.updateCommandId();
     }
 
+    function commandsChanged(commandsId){
+        console.log("productsMultiDocView commandsChanged!", commandsId);
+        productsMultiDocView.commandsChanged(commandsId);
+    }
+
     MultiDocWorkspaceView {
         id: productsMultiDocView;
             anchors.fill: parent;
-        //    color: "red";
         Component.onCompleted: {
             productsMultiDocView.addToHeadersArray("", "Products", "../../imtlicgui/ProductCollectionView.qml", "Products")
         }

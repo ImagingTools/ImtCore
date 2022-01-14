@@ -7,7 +7,6 @@ import '../../../imtgui/Qml/imtgui/AuxComponents'
 
 Rectangle {
     id: container;
-//    border.color: "#2b2d2d";
     width: 400;
     height: 300;
     radius: 10;
@@ -131,7 +130,6 @@ Rectangle {
             border.color: okButtonMa.containsMouse ? Style.iconColorOnSelected : Style.theme === "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
             Text {
-//                anchors.fill: parent;
                 anchors.horizontalCenter: parent.horizontalCenter;
                 anchors.verticalCenter: parent.verticalCenter;
                 color: Style.textColor;
@@ -155,17 +153,14 @@ Rectangle {
             width: 70;
             height: 25;
             color: Style.backgroundColor;
-            //border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
             border.color: cancelButtonMa.containsMouse ? Style.iconColorOnSelected : Style.theme === "Light" ? "#d0d0d2" : "#3a3b3b" ;
             anchors.top: tfcLicenseId.bottom;
            // anchors.bottomMargin: 15;
             anchors.topMargin: 30;
             anchors.right: tfcLicenseId.right;
-         //   anchors.rightMargin: 15;
 
 
             Text {
-//                anchors.fill: parent;
                 anchors.horizontalCenter: parent.horizontalCenter;
                 anchors.verticalCenter: parent.verticalCenter;
                 color: Style.textColor;
@@ -183,17 +178,6 @@ Rectangle {
                     editLicenseDialog.visible = false;
                 }
 
-//                onEntered: {
-//                    console.log("ENTERED!");
-//                    if (cancelButtonMa.mouseX <= 0 || cancelButtonMa.mouseX >= cancelButton.width
-//                            || cancelButtonMa.mouseY <= 0 || cancelButtonMa.mouseY >= cancelButton.height)
-//                    {
-//                        cancelButton.border.color = "#1560BD";
-//                    } else
-//                    {
-//                        cancelButton.border.color = "gray";
-//                    }
-//                }
             }
         }
     }

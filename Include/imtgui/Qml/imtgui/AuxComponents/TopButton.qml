@@ -9,9 +9,7 @@ Item {
     property bool enabled:  true;
     property string imageSource: "../Icons/Add.svg";
     property string imageSourceDisabled: "../Icons/Add_On_Disabled.svg";
-    //property string imageSourceSelected: "../Icons/Add_On_Selected.svg"
     property string text: "New";
-//    property string textColor: "#335777";//"#191970"
     property string textColor: Style.textColor;
 
     property string textColorDisabled: "gray";
@@ -33,9 +31,6 @@ Item {
     signal hintHide;
 
 
-
-
-
     Rectangle{
         id: button;
         anchors.top: parent.top;
@@ -45,28 +40,10 @@ Item {
         height: parent.height/2;
         radius: container.radius;
         visible: !container.isEmpty;
-//        color: (container.checkable && container.isChecked) ? "white" : container.highlighted ? "white" : "#fafafa";
-//        color: Style.buttonColor;
         color: Style.theme == "Dark" ? "#424242" : "#f0f0f3";
-//        color: "#c0c0c0";
 
-//        gradient: Gradient {
-//                 GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
-//                 GradientStop { position: 0.25; color: Style.imagingToolsGradient2; }
-//                 GradientStop { position: 0.5; color: Style.imagingToolsGradient3; }
-//                 GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
-//             }
-//        border.color: Style.buttonBorderColor;
-//        Rectangle{
-//            id: background;
-//            anchors.fill: parent;
-//            color: "#a0a0a0";
-////            opacity: (container.checkable && container.isChecked) ? 0 : container.highlighted ? 0 : 0.1;
-//            opacity: 0.1;
-//        }
         Image {
             id: image;
-//            source: !container.enabled ? container.imageSourceDisabled : container.imageSource;
             source: container.imageSource;
             anchors.centerIn: parent;
             fillMode: Image.PreserveAspectFit;
@@ -75,9 +52,6 @@ Item {
             sourceSize.width: width;
             sourceSize.height: height;
         }
-
-
-
     }
 
     Rectangle{
@@ -120,13 +94,6 @@ Item {
                 container.highlighted = false;
         }
 
-//        onEntered: {
-//        container.hintShow();
-//        }
-//        onExited: {
-//        container.hintHide();
-//        }
-
     }
 
     Text {
@@ -134,15 +101,12 @@ Item {
         anchors.top: selection.bottom;
         anchors.topMargin: 0;
         anchors.horizontalCenter: parent.horizontalCenter;
-//        height: contentHeight;
         text: container.text;
         color: container.enabled ? container.textColor : container.textColorDisabled;
         font.pixelSize: container.fontSize;
-//        font.family: container.fontName;
         visible: !container.isEmpty;
 
         font.family: Style.fontFamily;
-//        font.pixelSize: Style.fontSize_subtitle;
     }
 
 

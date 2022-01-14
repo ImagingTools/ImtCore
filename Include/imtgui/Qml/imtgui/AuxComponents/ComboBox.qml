@@ -53,14 +53,11 @@ Item {
             onClicked: {
                 console.log("ComboBox clicked !");
                 console.log("text color ", Style.textColor);
-//                menu.visible = !menu.visible;
                 container.menuVisible = !container.menuVisible;
                 console.log("menu width ", cbMenu.width);
                 console.log("menu height ", cbMenu.height);
                 console.log("menu visible ", cbMenu.visible);
                 console.log("listview count  ", cbListView.count);
-//                container.menuVisible = true;
-//                console.log("mouseX", mouseX, "mouseY", mouseY);
             }
         }
 
@@ -89,13 +86,9 @@ Item {
     Rectangle {
         id: cbMenu;
         width: container.width;
-       // height: cbListView.count * container.height < 150 ? cbListView.count * container.height: 150;
         height: cbListView.count * container.height;
-//        anchors.top: container.bottom;
         anchors.top: cbMainRect.bottom;
-//        color: "blue";
-//        color: Style.baseColor;
-//        color: "#c0c0c0";
+
         color: Style.baseColor;
         border.color: container.borderColor;
         radius: container.radius;
@@ -156,39 +149,6 @@ Item {
                     color: Style.textColor;
                     visible: model.index !== cbListView.count - 1;
                 }
-
-//                Rectangle {
-//                    anchors.fill: parent;
-//                    color: container.currentIndex === model.index ? Style.selectedColor : "transparent";
-//                   // radius: 5;
-//                    border.color: cbMainRect.border.color;
-
-//                    Text {
-//                        id: cbTitleModel;
-//                        anchors.verticalCenter: parent.verticalCenter;
-//                        anchors.horizontalCenter: parent.horizontalCenter;
-//                        text: model.text;
-//                        color: Style.textColor;
-//                    }
-
-//                    MouseArea {
-//                        anchors.fill: parent;
-
-//                        onClicked: {
-//                            container.currentIndex = model.index;
-//                            cbTitleTxt.text = model.text;
-////                            menu.visible = false;
-//                            container.menuVisible = false;
-//                        }
-//                    }
-//                }
-
-//                Rectangle {
-//                    width: cbListDelegate.width;
-//                    height: 1;
-//                    anchors.top: cbListDelegate.bottom;
-//                    color: "black";
-//                }
             }
         }
     }

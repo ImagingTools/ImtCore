@@ -16,6 +16,11 @@ Item {
         installationsMultiDocView.updateCommandId();
     }
 
+    function commandsChanged(commandsId){
+        console.log("installationsMultiDocView commandsChanged!", commandsId);
+        installationsMultiDocView.commandsChanged(commandsId);
+    }
+
     MultiDocWorkspaceView {
         id: installationsMultiDocView;
             anchors.fill: parent;

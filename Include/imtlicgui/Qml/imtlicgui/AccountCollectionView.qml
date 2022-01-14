@@ -13,13 +13,23 @@ Item {
         accountCollectionView.menuActivated(menuId)
     }
 
+    function commandsChanged(commandsId) {
+        console.log("AccountCollectionView commandsChanged!", commandsId);
+        if (commandsId !== "Accounts"){
+            return;
+        }
+        if (accountCollectionView.selectedIndex > -1) {
+            docsDataDeleg.setModeMenuButton("Remove", "Active");
+            docsDataDeleg.setModeMenuButton("Edit", "Active");
+        } else {
+            docsDataDeleg.setModeMenuButton("Remove", "Disabled");
+            docsDataDeleg.setModeMenuButton("Edit", "Disabled");
+        }
+    }
+
     CollectionView {
         id: accountCollectionView;
-//        anchors.left: parent.left;
-//        anchors.right: packageMetaInfo.left;
-//        height: parent.height;
         anchors.fill: parent;
-        //    color: "red";
         Component.onCompleted: {
             accountCollectionView.gqlModelInfo = "AccountInfo"
             accountCollectionView.gqlModelItems = "AccountList"
@@ -28,7 +38,6 @@ Item {
         onSelectItem: {
             console.log("Item id = ", itemId);
             console.log("Name = ", name);
-            //multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/AccountView.qml")
             multiDocView.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit")
         }
 

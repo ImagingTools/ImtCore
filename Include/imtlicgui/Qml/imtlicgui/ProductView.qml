@@ -12,14 +12,15 @@ Item {
         productCollectionView.menuActivated(menuId)
     }
 
+    function commandsChanged(commandsId){
+        productCollectionView.commandsChanged(commandsId);
+    }
+
     CollectionView {
         id: productCollectionView;
         anchors.left: parent.left;
         anchors.right: productMetaInfo.left;
         height: parent.height;
-//        property string itemId;
-        //    anchors.fill: parent;
-        //    color: "red";
         onItemIdChanged: {
             if (productCollectionView.itemId){
                 console.log("PackageView onItemIdChanged")
@@ -29,7 +30,6 @@ Item {
         }
 
         onSelectItem: {
-//            multiDocView.addToHeadersArray(name,  "../../imtlicgui/PackageView.qml")
         }
 
 

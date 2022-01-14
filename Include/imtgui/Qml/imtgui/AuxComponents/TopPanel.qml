@@ -20,9 +20,6 @@ Rectangle {
         console.log("buttonsModelItem GetItemsCount!", buttonsModelLocal.GetItemsCount());
         for (var i = 0; i < buttonsModelLocal.GetItemsCount(); i++) {
             var id = buttonsModelLocal.GetData(CommandEnum.ID, i);
-//            console.log("setModeMenuButton FOR");
-//            buttonsModelLocal.SetData("Mode", mode, i);
-//            buttonsModelLocal.SetData("Mode", mode, i);
             //lvButtons.model.Refresh()
             if (id === commandId) {
                  console.log("TopPanel setModeMenuButton id = ", id, "commandId = ", commandId, mode);
@@ -47,7 +44,6 @@ Rectangle {
         } else {
             updateTimer.model = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
             topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
-
         }
     }
 
@@ -69,7 +65,6 @@ Rectangle {
         anchors.topMargin: 10;
         width: 24;
         height: 24;
-//        iconSource: "../../../" + Style.getImageSource("Settings", Style.theme, "On", "Active");
         iconSource: "../../../Icons/" + Style.theme + "/Settings_On_Normal.svg";
         onClicked: {
             console.log("Preference button clicked !");
@@ -77,36 +72,6 @@ Rectangle {
 
         }
     }
-
-//    AuxButton {
-//        id: fullScreenButton;
-//        z: 100;
-//        anchors.top: parent.top;
-//        anchors.right: parent.right;
-//        anchors.rightMargin: 10;
-//        anchors.topMargin: 10;
-//        width: 24;
-//        height: 24;
-//        iconSource: "../../../Icons/" + Style.theme + "/FullScreen_On_Normal.svg";
-//        onClicked: {
-//            console.log("Full screen button clicked !");
-////            window.width = Screen.desktopAvailableWidth;
-////            window.height = Screen.desktopAvailableHeight;
-//            //preference.visible = true;
-//        }
-//    }
-
-//    Text {
-//        id: titleText;
-//        anchors.left: nextStack.right;
-//        anchors.leftMargin: 10;
-//        anchors.verticalCenter: parent.verticalCenter;
-
-//        text: qsTr("Products");
-//        color: Style.textColor;
-//        font.family: Style.fontFamily;
-//        font.pixelSize: Style.fontSize_title;
-//    }
 
     Item {
         anchors.left: parent.left;

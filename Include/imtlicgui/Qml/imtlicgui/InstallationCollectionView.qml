@@ -12,20 +12,33 @@ Item {
         installationCollectionView.menuActivated(menuId)
     }
 
+    function commandsChanged(commandsId) {
+        console.log("InstallationCollectionView commandsChanged!", commandsId);
+        if (commandsId !== "Installations"){
+            return;
+        }
+        if (installationCollectionView.selectedIndex > -1) {
+            docsDataDeleg.setModeMenuButton("Remove", "Active");
+            docsDataDeleg.setModeMenuButton("Edit", "Active");
+            docsDataDeleg.setModeMenuButton("Duplicate", "Active");
+            docsDataDeleg.setModeMenuButton("CreateLicense", "Activ");
+        } else {
+            docsDataDeleg.setModeMenuButton("Remove", "Disabled");
+            docsDataDeleg.setModeMenuButton("Edit", "Disabled");
+            docsDataDeleg.setModeMenuButton("Duplicate", "Disabled");
+            docsDataDeleg.setModeMenuButton("CreateLicense", "Disabled");
+        }
+    }
+
     CollectionView {
         id: installationCollectionView;
-//        anchors.left: parent.left;
-//        anchors.right: packageMetaInfo.left;
-//        height: parent.height;
         anchors.fill: parent;
-        //    color: "red";
         Component.onCompleted: {
             installationCollectionView.gqlModelInfo = "InstallationInfo"
             installationCollectionView.gqlModelItems = "InstallationList"
         }
 
         onSelectItem: {
-            //multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/InstallationView.qml")
             multiDocView.addToHeadersArray(itemId, name,  "../../imtgui/AuxComponents/InstallationInfoEditor.qml", "InstallationEdit")
         }
 

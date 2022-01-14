@@ -17,8 +17,6 @@ Rectangle {
         anchors.centerIn: parent;
         height: parent.height;
         width: container.height;
-//        source: "../../../Icons/" + Style.theme + "/Right_On_Normal.svg";
-
         sourceSize.width: width;
         sourceSize.height: height;
     }
@@ -30,22 +28,8 @@ Rectangle {
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
         onPressed: {
-//            container.color = "transparent";
             image.anchors.verticalCenterOffset = 1;
         }
-
-//        onReleased: {
-//            image.anchors.verticalCenterOffset = 0;
-//            if(ma.mouseX <= 0 || ma.mouseX >= container.width
-//                    || ma.mouseY <= 0 || ma.mouseY >= container.height){
-//                container.color = "transparent";
-//            }
-//            else{
-////                container.color = "white";
-////                container.color = Style.backgroundColor;
-//            }
-
-//        }
 
         onClicked: {
             container.clicked();

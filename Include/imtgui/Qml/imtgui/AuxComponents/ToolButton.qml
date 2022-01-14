@@ -10,7 +10,6 @@ Rectangle{
     property string imageSourcePressedDisabled: "../Icons/Add_On_Disabled.svg";
 
     property string text: "";
-//    property string textColor: "#335777";
     property string textColor: Style.textColor;
     property string fontName: "";
     property int fontSize: 11;
@@ -37,8 +36,6 @@ Rectangle{
         anchors.verticalCenterOffset: container.text == "" ? 0 : -container.height/2 + height/2 + 4;
         width: Math.min(parent.width,parent.height) * imageDecreaseCoeff;
         height:  Math.min(parent.width,parent.height) * imageDecreaseCoeff;
-//        sourceSize.width: width;
-//        sourceSize.height:  height;
         fillMode: Image.PreserveAspectFit;
         source: (container.enabled && container.pressed) ?imageSourcePressed : (container.enabled && !container.pressed) ?
                                                                imageSource : (!container.enabled && container.pressed) ?
@@ -52,8 +49,6 @@ Rectangle{
         anchors.bottom: container.bottom;
         anchors.bottomMargin: 4;
         color: container.enabled ? container.textColor : "gray";
-//        font.pixelSize: container.fontSize;
-//        font.family: container.fontName;
         text: container.text;
 
         font.family: Style.fontFamily;

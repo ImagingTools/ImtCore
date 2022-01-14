@@ -23,7 +23,7 @@ Item {
         id: image;
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.top: parent.top;
-        anchors.topMargin: 5; // description.height/2
+        anchors.topMargin: 5;
         fillMode: Image.PreserveAspectFit;
         width: container.highlighted || container.selected ? parent.width * imageSelectedCoeff : parent.width * imageDecrease;
         height:  container.highlighted || container.selected ? parent.height * imageSelectedCoeff : parent.height * imageDecrease;
@@ -33,7 +33,6 @@ Item {
     }
 
     Rectangle{
-      //  id: selection;
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;

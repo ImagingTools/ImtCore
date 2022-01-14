@@ -16,10 +16,14 @@ Item {
         accountsMultiDocView.updateCommandId();
     }
 
+    function commandsChanged(commandsId){
+        console.log("accountsMultiDocView commandsChanged!", commandsId);
+        accountsMultiDocView.commandsChanged(commandsId);
+    }
+
     MultiDocWorkspaceView {
         id: accountsMultiDocView;
         anchors.fill: parent;
-        //    color: "red";
         Component.onCompleted: {
             accountsMultiDocView.addToHeadersArray("", "Accounts", "../../imtlicgui/AccountCollectionView.qml", "Accounts")
         }

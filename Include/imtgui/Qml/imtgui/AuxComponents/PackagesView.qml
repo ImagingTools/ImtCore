@@ -7,7 +7,6 @@ CollectionView {
     id: packageCollectionView;
     width: 100;
     height: 50;
-//    color: "red";
     Component.onCompleted: {
         var tabPanel = packageCollectionView.tabPanel
         console.log("tabPanel ", tabPanel)
@@ -56,7 +55,6 @@ CollectionView {
                     dataModelLocal = dataModelLocal.GetData("CommandsData");
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
                         dataModelLocal = dataModelLocal.GetData("items");
-//                        console.log("items",dataModelLocal);
                         lvButtons.model = dataModelLocal;
                     }
                     else if(commandsModel.ContainsKey("errors")){

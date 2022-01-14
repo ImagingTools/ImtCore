@@ -4,7 +4,7 @@ import Acf 1.0
 Rectangle{
     id: container;
     width: 1000;
-    height: 35;// maxHeightElement.height
+    height: 35;
     color: "transparent";
 
     property string text: "Text";
@@ -63,9 +63,8 @@ Rectangle{
             anchors.left: parent.left;
             anchors.leftMargin: 8;
             font.bold: false;
-            color: "red";//container.textColor
+            color: "red";
             width: container.delegateWidth - 16;
-//            height: contentHeight;
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
             text: container.maxSizeText;
             font.family: Style.fontFamily;
@@ -77,7 +76,6 @@ Rectangle{
         id: dataList;
         anchors.fill: parent;
         clip: true;
-//            boundsBehavior: Flickable.StopAtBounds;
         orientation: ListView.Horizontal;
         spacing: 0;
         model: container.count;
@@ -96,7 +94,6 @@ Rectangle{
                 color: Style.textColor;
                 text: container.bodyArray[model.index];
                 wrapMode: Text.WordWrap;
-//                elide: Text.ElideRight;
 
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
@@ -104,84 +101,17 @@ Rectangle{
         }
     }
 
-//    Row{
-//        id:row;
-//        anchors.fill: parent;
-////        Repeater{
-////            id: rep;
-////            model: 3; //container.count;
-//            Item{
-//                id:element;
-//                height: container.height;
-//                width: container.delegateWidth;
-//                Text {
-//                    id: name;
-//                    //anchors.verticalCenter: parent.verticalCenter
-//                    anchors.top: parent.top;
-//                    anchors.topMargin: container.textTopMargin;
-//                    anchors.left: parent.left;
-//                    anchors.leftMargin: 8;
-////                    font.pixelSize: container.fontSize;
-//                    //font.family: container.fontName;
-//                    font.bold: false;
-//                    color: Style.textColor;
-//                    width: container.delegateWidth - 16;
-////                    height: contentHeight;
-//                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
-//                    text: "test"; //container.bodyArray[model.index];
-
-//                    font.family: Style.fontFamily;
-//                    font.pixelSize: Style.fontSize_subtitle;
-//                }
-
-
-//            }
-//            Item{
-
-//                height: container.height;
-//                width: container.delegateWidth;
-//                Text {
-
-//                    //anchors.verticalCenter: parent.verticalCenter
-//                    anchors.top: parent.top;
-//                    anchors.topMargin: container.textTopMargin;
-//                    anchors.left: parent.left;
-//                    anchors.leftMargin: 8;
-////                    font.pixelSize: container.fontSize;
-//                    //font.family: container.fontName;
-//                    font.bold: false;
-//                    color: Style.textColor;
-//                    width: container.delegateWidth - 16;
-////                    height: contentHeight;
-//                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
-//                    text: "test"; //container.bodyArray[model.index];
-
-//                    font.family: Style.fontFamily;
-//                    font.pixelSize: Style.fontSize_subtitle;
-//                }
-
-
-//            }
-////        }
-//    }
 
     MouseArea {
         id: ma;
         anchors.fill: parent;
-//        enabled: container.visible;
-//        hoverEnabled: enabled;
-//        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
         onClicked: {
             container.clicked();
-//            popupMenuDialog.visible = true;
-//            popupMenuDialog.x = ma.mouseX;
-//            popupMenuDialog.y = ma.mouseY;
         }
 
         onDoubleClicked: {
             container.doubleClicked();
             editFeatureDialog.visible = true;
-            //removeDialog.visible = true;
         }
 
     }

@@ -11,14 +11,10 @@ Rectangle {
 
     property int selectedIndex: 0;
     property int count: 0;
-//    property string firstElementName: "Packages";
     property string firstElementImageSource;
     property var headersArray: [];
     property alias model: list.model;
     signal closeItem(int index);
-
-   // property string textColor: Style.textColor;
-//    property string fontName: "";
 
     function setFirstElementImageSource(source){
         tabPanelContainer.firstElementImageSource = source;
@@ -41,9 +37,8 @@ Rectangle {
         id: list;
         anchors.fill: parent;
         clip: true;
-//        boundsBehavior: Flickable.StopAtBounds;
         orientation: ListView.Horizontal;
-//        enabled: tabPanelContainer.visible;
+
         spacing: 0;
         model: 4;
         interactive: false;

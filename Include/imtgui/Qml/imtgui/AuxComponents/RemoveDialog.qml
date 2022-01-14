@@ -55,13 +55,10 @@ Rectangle {
 
     Rectangle {
         id: removeDialogBody;
-       // anchors.topMargin: 40;
         color: container.color;
         anchors.top: removeDialogTopPanel.bottom;
         width: container.width;
         height: container.height - removeDialogTopPanel.height;
-//        anchors.horizontalCenter: container.horizontalCenter;
-//        anchors.verticalCenter: container.verticalCenter;
 
         Image {
             id: iconQuestion;
@@ -99,7 +96,6 @@ Rectangle {
             border.color: "gray";
 
             Text {
-//                anchors.fill: parent;
                 anchors.horizontalCenter: parent.horizontalCenter;
                 anchors.verticalCenter: parent.verticalCenter;
                 color: Style.textColor;

@@ -5,7 +5,6 @@ Rectangle{
     id: tabDelegate;
     height: 40;
     width: 160;
-//    color: selected ? "white" : "transparent";
     color: selected ? Style.baseColor : "transparent";
 
     property bool selected: false;
@@ -13,8 +12,6 @@ Rectangle{
     property string text: "no name";
     property string firstElementText: "text";
     property string firstElementImageSource:  "../../../" + "Icons/" + Style.theme + "/" + "Workflow" + "_On_Normal.svg";
-//    property string firstElementImageSource: "../../Icons/Workflow.svg";
-//    property string closeButtonImageSource: "../../Icons/DeleteStylized.svg";
     property bool autoWidth: true;
     signal clicked;
     signal closeSignal;
@@ -44,8 +41,6 @@ Rectangle{
             sourceSize.height: height;
             fillMode: Image.PreserveAspectFit;
             source:  "../../../" + "Icons/" + Style.theme + "/" + tabDelegate.firstElementImageSource + "_On_Normal.svg";
-
-//            source: tabDelegate.firstElementImageSource;
         }
     }
 
@@ -56,7 +51,6 @@ Rectangle{
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.left: imagetabDelegate.right;
-//        anchors.right: closeButton.left;
         width: text.width + tabDelegate.height;
 
         onWidthChanged: {
@@ -79,9 +73,6 @@ Rectangle{
     MouseArea{
         id: ma;
         anchors.fill: parent;
-//        enabled: tabDelegate.visible;
-//        hoverEnabled: enabled;
-//        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
         onClicked: {
             tabDelegate.clicked();
         }

@@ -9,8 +9,6 @@ Rectangle {
     height: 100;
     width: 100;
     color: "transparent";
-//    property alias tabPanel: tabPanelInternal;
-//    property TabPanel tabPanel: tabPanelInternal;
     property TreeItemModel model;
     property alias table: tableInternal;
     property alias selectedIndex: tableInternal.selectedIndex;
@@ -19,7 +17,6 @@ Rectangle {
     property string itemId;
     signal selectItem(string itemId, string name);
 
-//    color : Style.baseColor;
     onModelChanged: {
         console.log("collectionView onModelChanged", collectionView.gqlModelInfo)
         if (collectionView.model.ContainsKey("headers")){
@@ -51,9 +48,6 @@ Rectangle {
     AuxTable {
         id: tableInternal;
         anchors.fill: parent;
-//        width: parent.width;
-//        anchors.top: tabPanelInternal.bottom;
-//        anchors.bottom: parent.bottom;
         onSelectItem: {
             collectionView.selectItem(itemId, name);
         }

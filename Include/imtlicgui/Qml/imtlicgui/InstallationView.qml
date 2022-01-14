@@ -8,14 +8,15 @@ Item {
     property alias itemId: installationsCollectionView.itemId;
     property alias model: installationsCollectionView.model;
 
+    function commandsChanged(commandsId){
+        installationsCollectionView.commandsChanged(commandsId);
+    }
+
     CollectionView {
         id: installationsCollectionView;
         anchors.left: parent.left;
         anchors.right: installationMetaInfo.left;
         height: parent.height;
-//        property string itemId;
-        //    anchors.fill: parent;
-        //    color: "red";
         onItemIdChanged: {
             if (installationsCollectionView.itemId){
                 console.log("installationView onItemIdChanged")
@@ -25,7 +26,6 @@ Item {
         }
 
         onSelectItem: {
-//            multiDocView.addToHeadersArray(name,  "../../imtlicgui/PackageView.qml")
         }
 
 

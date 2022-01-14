@@ -17,9 +17,6 @@ Item {
         anchors.left: parent.left;
         anchors.right: accountMetaInfo.left;
         height: parent.height;
-//        property string itemId;
-        //    anchors.fill: parent;
-        //    color: "red";
         onItemIdChanged: {
             if (accountsCollectionView.itemId){
                 console.log("AccountView onItemIdChanged")
@@ -29,7 +26,6 @@ Item {
         }
 
         onSelectItem: {
-//            multiDocView.addToHeadersArray(name,  "../../imtlicgui/PackageView.qml")
         }
 
 

@@ -8,13 +8,8 @@ Item {
     property alias selectedIndex: elementsList.selectedIndex;
     property real delegateWidth: tableContainer.count == 0 ? 0 : headersList.width/headersList.count;
     property int count: 3; //headersArray.length;
-//    property alias headers: headersList.model;
     property alias elements: elementsList.model;
-//    property alias headers: headersList.model; //: elementsList.model;
     property TreeItemModel headers; //: elementsList.model;
-
-//    property var headerKeysArray: [];
-//    property var headerNamesArray: [];
 
     signal selectItem(string itemId, string name);
 
@@ -25,19 +20,6 @@ Item {
     function getSelectedName(){
         return elementsList.selectedName;
     }
-
-//    function clearHeadersArray(){
-//        while(tableContainer.headerKeysArray.length > 0)
-//            tableContainer.headerKeysArray.pop();
-//        while(tableContainer.headerNamesArray.length > 0)
-//            tableContainer.headerNamesArray.pop();
-//    }
-
-//    function addToHeadersArray(strKey, strName){
-//        tableContainer.headerKeysArray.push(strKey);
-//        tableContainer.headerNamesArray.push(strName);
-////        headersList.model = tableContainer.headerKeysArray.length
-//    }
 
     Rectangle {
         id: headersPanel;
@@ -51,7 +33,6 @@ Item {
             id: headersList;
             anchors.fill: parent;
             clip: true;
-//            boundsBehavior: Flickable.StopAtBounds;
             orientation: ListView.Horizontal;
             spacing: 0;
             model: tableContainer.headers;
@@ -60,7 +41,6 @@ Item {
                 id: deleg;
                 width: headersList.width/headersList.count;
                 height: headersList.height;
-                //color: "transparent";
                 color: Style.theme === "Light" ? "white": Style.backgroundColor;
                 Text {
                     id: name;
@@ -69,9 +49,9 @@ Item {
                     anchors.leftMargin: 8;
                     font.pixelSize: Style.fontSize_small;
                     font.family: Style.fontFamilyBold;
-                    font.bold: true; //tableContainer.fontBold
+                    font.bold: true;
                     color: Style.textColor;
-                    text: model.Name; //tableContainer.headerNamesArray[model.index];
+                    text: model.Name;
                 }
             }
         }
@@ -88,8 +68,6 @@ Item {
 
     }//headers
 
-
-
     ListView{
         id: elementsList;
         property int selectedIndex: -1;
@@ -100,27 +78,18 @@ Item {
         anchors.top: headersPanel.bottom;
         anchors.bottom: parent.bottom;
         clip: true;
-//        boundsBehavior: Flickable.StopAtBounds;
         spacing: 0;
-//        model: tableContainer.elements;
         interactive: false;
         delegate: TableDelegate {
             id: tableDelegate;
             width: elementsList.width;
             selected: elementsList.selectedIndex === model.index;
             Component.onCompleted: {
-//                for (var i = 0; i < tableContainer.headerKeysArray.length; i++){
-//                    console.log("AUXTable addToArray", model[tableContainer.headerKeysArray[i]])
-//                    tableDelegate.addToArray(model[tableContainer.headerKeysArray[i]])
-//                }
+
                 console.log("elementsList tableDelegate", model["Id"], model.index)
                 console.log("elements.GetItemsCount",tableContainer.elements.GetItemsCount())
-//                var keys = tableContainer.elements.GetKeys();
-//                tableContainer.headers.GetKeys(keys, model.index)
-//                console.log("elementsList keys", keys)
                 for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
                     tableDelegate.addToArray(model[tableContainer.headers.GetData("Id",i)]);
-//                    tableDelegate.addToArray(tableContainer.headers.GetData("Id",i));
                 }
 
             }
@@ -133,9 +102,6 @@ Item {
             }
 
             onDoubleClicked: {
-                /*
-                    У Accounts нет поля Name, нужно model["AccountName"]
-                  */
                 console.log("onDoubleClicked", model["Id"], model["Name"])
                 tableContainer.selectItem(model["Id"], model[tableContainer.headers.GetData("Id",0)]);
             }

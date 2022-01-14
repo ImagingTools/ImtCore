@@ -5,7 +5,6 @@ import imtqml 1.0
 Rectangle {
     id: menuPanel;
     width: 75;
-//    width: 120;
     color: Style.backgroundColor;
     property string textColor: Style.textColor;
     property string fontName: "Helvetica";
@@ -22,14 +21,6 @@ Rectangle {
     function updateModels(){
         pagesModel.updateModel();
     }
-
-//    Component.onCompleted: {
-//        var item1 = this.createComponent('TreeItemModel.qml', this)
-//        item1.append([{'color': 'red'}, {'color': 'black'}, {'color': 'blue'}])
-//        console.log("item1",item1)
-//        lvPages.model = item1
-//    }
-
 
     ListView {
         id: lvPages;
@@ -90,20 +81,7 @@ Rectangle {
                         menuPanel.activePageId = dataModelLocal.GetData(PageEnum.ID);
                         menuPanel.activePageName = dataModelLocal.GetData(PageEnum.NAME);
                         menuPanel.activeIcon = dataModelLocal.GetData(PageEnum.ICON);
-
-//                        var pagesCount = dataModelLocal.GetItemsCount(); //lvPages.count
-//                        console.log("dataModelLocal.count", pagesCount)
-
-
-//                        for (var i = 0; i < pagesCount; i++){
-//                            menuPanel.pagesSources.push(dataModelLocal.GetData(PageEnum.ID, i))
-//                            menuPanel.firstElementImageSources.push(dataModelLocal.GetData(PageEnum.ICON, i))
-//                        }
-
-//                        menuPanel.pagesCount = pagesCount; //lvPages.count;
                         menuPanel.activePageIndex = 0;
-
-//                        lvPages.__processUpdates();
                     }
                     else if(this.ContainsKey("errors")){
                         var errorsModel = pagesModel.GetData("errors");

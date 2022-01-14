@@ -12,13 +12,25 @@ Item {
         productCollectionView.menuActivated(menuId)
     }
 
+    function commandsChanged(commandsId) {
+        console.log("ProductCollectionView commandsChanged!", commandsId);
+        if (commandsId !== "Products"){
+            return;
+        }
+        if (productCollectionView.selectedIndex > -1) {
+            docsDataDeleg.setModeMenuButton("Remove", "Active");
+            docsDataDeleg.setModeMenuButton("Edit", "Active");
+            docsDataDeleg.setModeMenuButton("Duplicate", "Active");
+        } else {
+            docsDataDeleg.setModeMenuButton("Remove", "Disabled");
+            docsDataDeleg.setModeMenuButton("Edit", "Disabled");
+            docsDataDeleg.setModeMenuButton("Duplicate", "Disabled");
+        }
+    }
+
     CollectionView {
         id: productCollectionView;
-//        anchors.left: parent.left;
-//        anchors.right: packageMetaInfo.left;
-//        height: parent.height;
         anchors.fill: parent;
-        //    color: "red";
         Component.onCompleted: {
             productCollectionView.gqlModelInfo = "ProductInfo"
             productCollectionView.gqlModelItems = "ProductList"

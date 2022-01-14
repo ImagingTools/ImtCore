@@ -35,11 +35,8 @@ Item {
             height: parent.height;
         Repeater {
             id: headersList;
-//            anchors.fill: parent;
             clip: true;
-//            boundsBehavior: Flickable.StopAtBounds;
-//            orientation: ListView.Horizontal;
-//            spacing: 0;
+
             model: 3;
             delegate: Rectangle {
                 id:deleg;

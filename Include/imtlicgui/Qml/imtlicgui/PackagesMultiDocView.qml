@@ -23,16 +23,10 @@ Item {
     MultiDocWorkspaceView {
         id: packagesMultiDocView;
             anchors.fill: parent;
-//            color: "red";
         Component.onCompleted: {
             console.log("PackagesMultiDocView on completed");
             packagesMultiDocView.addToHeadersArray("", "Packages", "../../imtlicgui/PackageCollectionView.qml", "Packages")
         }
-
-//        onChangeCommandsId: {
-//            console.log("packagesMultiDocView changeCommandsId",commandsId)
-//            pagesDeleg.changeCommandsId(commandsId)
-//        }
 
     }
 }

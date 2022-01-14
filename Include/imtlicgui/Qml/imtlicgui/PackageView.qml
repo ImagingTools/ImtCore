@@ -21,9 +21,6 @@ Item {
         anchors.left: parent.left;
         anchors.right: packageMetaInfo.left;
         height: parent.height;
-//        property string itemId;
-        //    anchors.fill: parent;
-        //    color: "red";
         onItemIdChanged: {
             if (featureCollectionView.itemId){
                 console.log("PackageView onItemIdChanged")
@@ -33,7 +30,6 @@ Item {
         }
 
         onSelectItem: {
-//            multiDocView.addToHeadersArray(name,  "../../imtlicgui/PackageView.qml")
         }
 
 
