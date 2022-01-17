@@ -8,6 +8,7 @@
 // ACF includes
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+#include <iser/CJsonStringWriteArchive.h>
 #include <istd/CChangeNotifier.h>
 #include <istd/TSmartPtr.h>
 
@@ -58,7 +59,12 @@ int CTreeItemModel::InsertNewItem()
 		m_isArray = true;
 	}
 
-	return m_items.count() - 1;
+	int index = m_items.count() - 1;
+
+	beginInsertRows(QModelIndex(), index, index);
+	endInsertRows();
+
+	return index;
 }
 
 
@@ -87,8 +93,8 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap &infoMap)
 	EndChanges(changeSet);
 
 
-	QModelIndex topLeft = QAbstractListModel::index(index);
-	emit dataChanged(topLeft,topLeft,m_roleNames.keys().toVector());
+	beginRemoveRows(QModelIndex(), index, index);
+	endRemoveRows();
 
 	return true;
 }
@@ -375,6 +381,16 @@ void CTreeItemModel::Refresh()
 {
 	beginResetModel();
 	endResetModel();
+}
+
+QString CTreeItemModel::toJSON()
+{
+	QByteArray representationData;
+	{
+		iser::CJsonStringWriteArchive archive(representationData);
+		Serialize(archive);
+	}
+	return QString(representationData);
 }
 
 

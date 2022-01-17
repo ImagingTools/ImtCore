@@ -14,8 +14,19 @@ Rectangle {
     property int selectedIndex: -1;
     property string gqlModelInfo;
     property string gqlModelItems;
+    property string gqlModelRemove;
     property string itemId;
     signal selectItem(string itemId, string name);
+
+    signal removedItem(string itemId);
+
+//    function getSelectedId(){
+//        return tableInternal.getSelectedId();
+//    }
+
+//    function getSelectedName(){
+//        return tableInternal.getSelectedName();
+//    }
 
     onModelChanged: {
         console.log("collectionViewContainer onModelChanged", collectionViewContainer.gqlModelInfo)
@@ -43,15 +54,21 @@ Rectangle {
         console.log("CollectionView menuActivated", menuId);
 
         //console.log("CollectionView itemId ", itemId, "name", name);
+        var itemId = tableInternal.getSelectedId();
+        var name = tableInternal.getSelectedName();
 
         if (menuId  === "New"){
             collectionViewContainer.selectItem("", "")
         }
         else if (menuId  === "Edit") {
-            var itemId = tableInternal.getSelectedId();
-            var name = tableInternal.getSelectedName();
             if (itemId != "" && name != ""){
                 collectionViewContainer.selectItem(itemId, name);
+            }
+        }
+        else if (menuId  === "Remove") {
+            if (itemId != ""){
+                collectionViewContainer.itemId = tableInternal.getSelectedId();
+                removeModel.updateModel();
             }
         }
     }
@@ -152,6 +169,56 @@ Rectangle {
                     }
                     else if(itemsModel.ContainsKey("errors")){
                         var errorsModel = itemsModel.GetData("errors");
+                        if(errorsModel !== null && errorsModel.ContainsKey(collectionViewContainer.gqlModelItems)){
+                            console.log("message", errorsModel.GetData(collectionViewContainer.gqlModelItems).GetData("message"));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    GqlModel {
+        id: removeModel;
+
+        function updateModel() {
+            console.log( "updateModel removeModel");
+
+            var query;
+            var queryFields;
+            var inputParams = Gql.GqlObject("input");
+
+            if(collectionViewContainer.itemId != ""){
+                query = Gql.GqlRequest("query", collectionViewContainer.gqlModelRemove);
+                inputParams.InsertField("Id");
+                inputParams.InsertFieldArgument("Id", collectionViewContainer.itemId);
+                queryFields = Gql.GqlObject("removedNotification");
+                query.AddParam(inputParams);
+
+                queryFields.InsertField("Id");
+                queryFields.InsertField("Successed");
+
+                query.AddField(queryFields);
+
+                var gqlData = query.GetQuery();
+                console.log("removeModel query ", gqlData);
+                this.SetGqlQuery(gqlData);
+            }
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, removeModel);
+            if (this.state === "Ready"){
+
+                var dataModelLocal = removeModel.GetData("data");
+                if(dataModelLocal.ContainsKey("removedNotification")){
+                    dataModelLocal = dataModelLocal.GetData("removedNotification");
+                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("Id")){
+                        var itemId = dataModelLocal.GetData("Id").GetData("Id");
+                        collectionViewContainer.removedItem(itemId)
+                    }
+                    else if(removeModel.ContainsKey("errors")){
+                        var errorsModel = removeModel.GetData("errors");
                         if(errorsModel !== null && errorsModel.ContainsKey(collectionViewContainer.gqlModelItems)){
                             console.log("message", errorsModel.GetData(collectionViewContainer.gqlModelItems).GetData("message"));
                         }

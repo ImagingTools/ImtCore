@@ -73,6 +73,11 @@ protected:
 	*/
 	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const;
 
+	/**
+		Create object from the GraphQL
+	*/
+	virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const;
+
 protected:
 	I_REF(imtgui::ICollectionViewDelegate, m_viewDelegateCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);

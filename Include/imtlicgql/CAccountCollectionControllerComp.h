@@ -20,6 +20,7 @@ public:
 protected:
 	// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
 	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const;
+	virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const;
 };
 
 

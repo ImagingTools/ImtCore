@@ -34,6 +34,7 @@ Item {
         Component.onCompleted: {
             accountCollectionView.gqlModelInfo = "AccountInfo"
             accountCollectionView.gqlModelItems = "AccountList"
+            accountCollectionView.gqlModelRemove = "AccountRemove"
         }
 
         onSelectItem: {

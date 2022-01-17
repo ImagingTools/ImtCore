@@ -49,6 +49,7 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 //			const imtauth::IContactInfo* contactPtr = dynamic_cast<const imtauth::IContactInfo*>(dataPtr.GetPtr());
 			if (accountInfoPtr != nullptr){
 				QString accountName = accountInfoPtr->GetAccountName();
+				QString accountDescription = accountInfoPtr->GetAccountDescription();
 
 				QByteArray accountId = accountName.toUtf8();
 
@@ -60,8 +61,6 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 				else if (accountType == imtauth::IAccountInfo::AT_PERSON){
 					accountTypeId = "private";
 				}
-
-				QString accountDescription = accountInfoPtr->GetAccountDescription();
 
 				QString mail;
 				QString lastName;
@@ -77,12 +76,13 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 				}
 
 				itemModel->SetData("Id", accountId);
+				itemModel->SetData("AccountName", accountName);
+				itemModel->SetData("AccountDescription", accountDescription);
+				itemModel->SetData("AccountType", accountTypeId);
 				itemModel->SetData("FirstName", firstName);
 				itemModel->SetData("LastName", lastName);
 				itemModel->SetData("NickName", nickName);
 				itemModel->SetData("Email", mail);
-				itemModel->SetData("AccountType", accountTypeId);
-				itemModel->SetData("AccountDescription", accountDescription);
 
 				imtbase::CTreeItemModel* addressesModel = new imtbase::CTreeItemModel();
 				addressesModel->SetIsArray(true);

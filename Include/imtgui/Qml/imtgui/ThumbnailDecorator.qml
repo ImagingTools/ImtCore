@@ -44,7 +44,9 @@ Rectangle
         }
 
         onActivePageIdChanged: {
-            thubnailDecoratorContainer.activeItem.updateCommandId();
+//            if (thubnailDecoratorContainer.activeItem){
+////                thubnailDecoratorContainer.activeItem.updateCommandId();
+//            }
         }
     }
 

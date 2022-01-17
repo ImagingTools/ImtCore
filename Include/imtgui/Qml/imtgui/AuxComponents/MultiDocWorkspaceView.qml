@@ -41,7 +41,7 @@ Rectangle {
         pages.SetData("CommandsId", commandsId, index);
         pagesDeleg.changeCommandsId(commandsId);
         tabPanelInternal.selectedIndex = pages.GetItemsCount() - 1;
-        pages.Refresh();
+//        pages.Refresh();
     }
 
     Component.onCompleted: {
@@ -65,7 +65,7 @@ Rectangle {
             if (tabPanelInternal.selectedIndex >= index){
                 tabPanelInternal.selectedIndex--;
             }
-            pages.Refresh()
+//            pages.Refresh()
         }
 
         onSelectedIndexChanged: {

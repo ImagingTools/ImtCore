@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtauth/IAccountInfo.h>
+#include <imtauth/CAccountInfo.h>
 
 
 namespace imtlicgql
@@ -33,6 +33,29 @@ QVariant CAccountCollectionControllerComp::GetObjectInformation(const QByteArray
 	}
 
 	return QVariant();
+}
+
+
+istd::IChangeable* CAccountCollectionControllerComp::CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray& objectId,
+																	 QString& name, QString& description, QString &errorMessage) const
+{
+	if (inputParams.isEmpty()){
+		return nullptr;
+	}
+	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
+	if (!itemData.isEmpty()){
+		imtauth::CAccountInfo *accountInfo = new imtauth::CAccountInfo();
+		imtbase::CTreeItemModel itemModel;
+		itemModel.Parse(itemData);
+		objectId = itemModel.GetData("Id").toByteArray();
+		description = itemModel.GetData("AccountDescription").toString();
+		name = itemModel.GetData("AccountName").toString();
+		accountInfo->SetAccountName(name);
+		accountInfo->SetAccountDescription(description);
+		return accountInfo;
+	}
+	return nullptr;
+
 }
 
 

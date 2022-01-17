@@ -12,19 +12,27 @@ Rectangle {
     height: 100;
     // color: "transparent";
     color: Style.backgroundColor;
-    //    property TreeItemModel contactInfoModel
-    property var contactInfoModel;
+    property TreeItemModel contactInfoModel;
+//    property var contactInfoModel;
     property TreeItemModel model;
     property string accountType;
     property string itemId;
 
     Component.onCompleted: {
-        //itemsModel.updateModel()
+        //accountItemModel.updateModel()
     }
 
 
     function updateData() {
         console.log("containerContactInfo updateData", containerContactInfo.contactInfoModel.GetData("Addresses").GetData("PostalCode"));
+        tfcEmail.text = containerContactInfo.contactInfoModel.GetData("Email");
+        tfcFirstNameText.text = containerContactInfo.contactInfoModel.GetData("FirstName");
+        tfcLastName.text = containerContactInfo.contactInfoModel.GetData("LastName");
+        tfcNickName.text = containerContactInfo.contactInfoModel.GetData("NickName");
+        tfcAccountName.text = containerContactInfo.contactInfoModel.GetData("AccountName");
+        tfcAccountDescription.text = containerContactInfo.contactInfoModel.GetData("AccountDescription");
+//        tfcBD.text = containerContactInfo.contactInfoModel.GetData("BirthDay");
+
         if (containerContactInfo.accountType === "company")
         {
             var addresses = containerContactInfo.contactInfoModel.GetData("Addresses")
@@ -52,17 +60,43 @@ Rectangle {
         }
     }
 
+    function menuActivated(menuId) {
+        console.log("containerContactInfo menuActivated", menuId);
+
+        //console.log("CollectionView itemId ", itemId, "name", name);
+
+        if (menuId  === "New"){
+//            collectionViewContainer.selectItem("", "")
+        }
+        else if (menuId  === "Save") {
+            saveModel.updateModel()
+        }
+    }
+
     onModelChanged: {
         if (containerContactInfo.model.ContainsKey("data")){
             containerContactInfo.contactInfoModel = containerContactInfo.model.GetData('data');
+            containerContactInfo.updateData();
         }
         else {
             if(containerContactInfo.itemId === ""){
-                model.AddTreeModel("data");
-
+                containerContactInfo.accountType = "company";
+                containerContactInfo.contactInfoModel = model.AddTreeModel("data");
+                containerContactInfo.contactInfoModel.SetData("Email","")
+                containerContactInfo.contactInfoModel.SetData("FirstName","")
+                containerContactInfo.contactInfoModel.SetData("LastName","")
+                containerContactInfo.contactInfoModel.SetData("NickName","")
+                containerContactInfo.contactInfoModel.SetData("AccountName","")
+                containerContactInfo.contactInfoModel.SetData("AccountDescription","")
+                var addresses = containerContactInfo.contactInfoModel.AddTreeModel("Addresses")
+                addresses.SetData("Country","");
+                addresses.SetData("City","");
+                addresses.SetData("PostalCode","");
+                addresses.SetData("Street","");
+                containerContactInfo.updateData();
             }
-            else {
-                itemsModel.updateModel();
+            else{
+                accountItemModel.updateModel();
             }
         }
     }
@@ -72,7 +106,7 @@ Rectangle {
     }
 
     GqlModel {
-        id: itemsModel;
+        id: accountItemModel;
 
         function updateModel() {
             console.log( "updateModel AccountItem");
@@ -106,10 +140,10 @@ Rectangle {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, itemsModel);
+            console.log("State:", this.state, accountItemModel);
             if (this.state === "Ready"){
 
-                var dataModelLocal = itemsModel.GetData("data");
+                var dataModelLocal = accountItemModel.GetData("data");
                 if(dataModelLocal.ContainsKey("AccountItem")){
                     dataModelLocal = dataModelLocal.GetData("AccountItem");
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("item")){
@@ -120,8 +154,8 @@ Rectangle {
                         containerContactInfo.model.SetExternTreeModel('data', containerContactInfo.contactInfoModel)
                         dataModelLocal.RemoveData("item");
                     }
-                    else if(itemsModel.ContainsKey("errors")){
-                        var errorsModel = itemsModel.GetData("errors");
+                    else if(accountItemModel.ContainsKey("errors")){
+                        var errorsModel = accountItemModel.GetData("errors");
                         if(errorsModel !== null && errorsModel.ContainsKey(containerContactInfo.gqlModelItems)){
                             console.log("message", errorsModel.GetData(containerContactInfo.gqlModelItems).GetData("message"));
                         }
@@ -130,6 +164,69 @@ Rectangle {
             }
         }
     }
+
+    GqlModel {
+        id: saveModel;
+
+        function updateModel() {
+            console.log( "updateModel saveModel");
+
+            var query;
+            var queryFields;
+            var inputParams = Gql.GqlObject("input");
+
+            if(containerContactInfo.itemId != ""){
+                query = Gql.GqlRequest("query", "AccountUpdate");
+                inputParams.InsertField("Id");
+                inputParams.InsertFieldArgument("Id", containerContactInfo.itemId);
+                queryFields = Gql.GqlObject("updatedNotification");
+            }
+            else{
+                query = Gql.GqlRequest("query", "AccountAdd");
+                queryFields = Gql.GqlObject("addedNotification");
+            }
+            query.AddParam(inputParams);
+
+            containerContactInfo.contactInfoModel.SetIsArray(false);
+            var jsonString = containerContactInfo.contactInfoModel.toJSON();
+            console.log("jsonString", jsonString)
+            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+            console.log("jsonString", jsonString)
+
+            inputParams.InsertField("Item");
+            inputParams.InsertFieldArgument ("Item", jsonString);
+
+            queryFields.InsertField("Id");
+            queryFields.InsertField("Successed");
+
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log("AccountEdit query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, accountItemModel);
+            if (this.state === "Ready"){
+
+                var dataModelLocal = accountItemModel.GetData("data");
+                if(dataModelLocal.ContainsKey("addedNotification")){
+                    dataModelLocal = dataModelLocal.GetData("addedNotification");
+                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("Id")){
+                        containerContactInfo.itemId = dataModelLocal.GetData("Id").GetData("Id");
+                    }
+                    else if(accountItemModel.ContainsKey("errors")){
+                        var errorsModel = accountItemModel.GetData("errors");
+                        if(errorsModel !== null && errorsModel.ContainsKey(containerContactInfo.gqlModelItems)){
+                            console.log("message", errorsModel.GetData(containerContactInfo.gqlModelItems).GetData("message"));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     ListModel {
         id: typeAccountModel;
         ListElement {
@@ -204,6 +301,9 @@ Rectangle {
                 width: container.width;
                 height: 23;
                 anchors.horizontalCenter: container.horizontalCenter;
+                onTextChanged: {
+                     containerContactInfo.contactInfoModel.SetData("AccountName", tfcAccountName.text);
+                }
             }
 
             Text {
@@ -219,6 +319,9 @@ Rectangle {
                 width: container.width;
                 height: 23;
                 anchors.horizontalCenter: container.horizontalCenter;
+                onTextChanged: {
+                     containerContactInfo.contactInfoModel.SetData("AccountDescription", tfcAccountDescription.text);
+                }
             }
 
             Text {
@@ -404,7 +507,7 @@ Rectangle {
                     TextFieldCustom {
                         id: tfcEmail;
                         width: emailBlock.width - 22;
-                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("Email") : "";
+//                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("Email") : "";
                         height: 23;
                         anchors.horizontalCenter: emailBlock.horizontalCenter;
                         anchors.verticalCenter: emailBlock.verticalCenter;
@@ -438,7 +541,7 @@ Rectangle {
                     TextFieldCustom {
                         id: tfcBD;
                         width: bdBlock.width - 22;
-                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("BirthDay") : "";
+//                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("BirthDay") : "";
                         height: 23;
                         anchors.horizontalCenter: bdBlock.horizontalCenter;
                         anchors.verticalCenter: bdBlock.verticalCenter;
@@ -519,7 +622,7 @@ Rectangle {
                     TextFieldCustom {
                         id: tfcFirstNameText;
                         width: firstNameBlock.width - 22;
-                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("FirstName") : "";
+//                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("FirstName") : "";
                         height: 23;
                         anchors.horizontalCenter: firstNameBlock.horizontalCenter;
                         anchors.verticalCenter: firstNameBlock.verticalCenter;
@@ -550,7 +653,7 @@ Rectangle {
                     TextFieldCustom {
                         id: tfcLastName;
                         width: lastNameBlock.width - 22;
-                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("LastName") : "";
+//                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("LastName") : "";
                         height: 23;
                         anchors.horizontalCenter: lastNameBlock.horizontalCenter;
                         anchors.verticalCenter: lastNameBlock.verticalCenter;
@@ -583,7 +686,7 @@ Rectangle {
                     TextFieldCustom {
                         id: tfcNickName;
                         width: nickNameBlock.width - 22;
-                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("NickName") : "";
+//                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("NickName") : "";
                         height: 23;
                         anchors.horizontalCenter: nickNameBlock.horizontalCenter;
                         anchors.verticalCenter: nickNameBlock.verticalCenter;
@@ -663,9 +766,9 @@ Rectangle {
                             headersModel.SetData("Name", "Country", 0)
                             headersModel.InsertNewItem()
                             headersModel.SetData("Name", "City", 1)
-                             headersModel.InsertNewItem()
+                            headersModel.InsertNewItem()
                             headersModel.SetData("Name", "Postal code", 2)
-                             headersModel.InsertNewItem()
+                            headersModel.InsertNewItem()
                             headersModel.SetData("Name", "Street", 3)
                             headersModel.Refresh()
                         }

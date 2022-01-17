@@ -15,7 +15,7 @@ Item {
     property int radius: 5;
 
     Component.onCompleted: {
-        if (textCentered){
+        if (container.textCentered){
             cbTitleTxt.anchors.horizontalCenter = cbMainRect.horizontalCenter;
            // cbTitleModel.anchors.horizontalCenter = cbListDelegate.horizontalCenter;
         } else {
@@ -121,8 +121,8 @@ Item {
                 Text {
                     id: cbTitleModel;
                     anchors.verticalCenter: parent.verticalCenter;
-                    anchors.horizontalCenter: container.textCentered ? parent.horizontalCenter : "";
-                    anchors.left: !container.textCentered ? cbListDelegate.left : "";
+                    anchors.horizontalCenter: container.textCentered ? parent.horizontalCenter : null;
+                    anchors.left: !container.textCentered ? cbListDelegate.left : null;
                     anchors.leftMargin: 10;
                     text: model.text;
                     color: Style.textColor;
