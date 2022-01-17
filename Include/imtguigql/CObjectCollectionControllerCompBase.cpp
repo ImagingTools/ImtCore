@@ -304,26 +304,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 
-
-	//	QByteArray objectId;
-
-//	if (!m_objectCollectionCompPtr.IsValid()){
-//		errorMessage = QObject::tr("Internal error").toUtf8();
-//	}
-//	else{
-//		QString name, description, errorMessage;
-//		QByteArray objectId;
-//		istd::IChangeable* savedObject = CreateObject(inputParams, objectId, name, description, errorMessage);
-//		if (savedObject != nullptr){
-//			if (m_objectCollectionCompPtr->SetObjectData(objectId, *savedObject) == false){
-//				errorMessage = QObject::tr("Can not update object: &1").arg(QString(objectId));
-//			}
-//		}
-//		else {
-//			errorMessage = QObject::tr("Can not create object for update: &1").arg(QString(objectId));
-//		}
-//	}
-
 	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsModel = rootModel->AddTreeModel("errors");
 		errorsModel->SetData("message", errorMessage);

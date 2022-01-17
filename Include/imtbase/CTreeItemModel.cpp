@@ -92,7 +92,6 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap &infoMap)
 
 	EndChanges(changeSet);
 
-
 	beginRemoveRows(QModelIndex(), index, index);
 	endRemoveRows();
 
@@ -243,7 +242,6 @@ bool CTreeItemModel::RemoveData(const QByteArray &key, int index, const ChangeIn
 	}
 
 	return true;
-
 }
 
 
