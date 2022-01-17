@@ -4,7 +4,6 @@
 // ACF includes
 #include <idoc/CStandardDocumentMetaInfo.h>
 
-
 namespace imtlicgql
 {
 
@@ -30,6 +29,7 @@ QVariant CFeaturePackageCollectionControllerComp::GetObjectInformation(const QBy
 
 	return QVariant();
 }
+
 
 
 } // namespace imtlicgql

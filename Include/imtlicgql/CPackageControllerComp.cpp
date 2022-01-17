@@ -6,6 +6,8 @@
 #include <imtlic/IFeaturePackage.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
+#include <imtlic/CFeaturePackage.h>
+
 
 
 namespace imtlicgql
@@ -75,6 +77,43 @@ imtbase::CTreeItemModel* CPackageControllerComp::ListObjects(
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;
+}
+
+istd::IChangeable* CPackageControllerComp::CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray& objectId,
+																	 QString& name, QString& description, QString &errorMessage) const
+{
+	if (inputParams.isEmpty()){
+		return nullptr;
+	}
+	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
+	if (!itemData.isEmpty()){
+		istd::TDelPtr<imtlic::CFeaturePackage> featurePackagePtr = new imtlic::CFeaturePackage;
+		imtbase::CTreeItemModel itemModel;
+		itemModel.Parse(itemData);
+
+		objectId = itemModel.GetData("Id").toByteArray();
+//		description = itemModel.GetData("Description").toString();
+		name = itemModel.GetData("Name").toString();
+		featurePackagePtr->SetPackageId(objectId);
+
+		imtbase::CTreeItemModel *features = itemModel.GetTreeItemModel("features");
+
+		for (int i = 0; i < features->GetItemsCount(); i++){
+			QByteArray featureId = features->GetData("Id", i).toByteArray();
+			QString featureName = features->GetData("Name", i).toString();
+			QString featureDescription = features->GetData("Description", i).toString();
+
+			istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr = new imtlic::CFeatureInfo;
+			featureInfoPtr->SetFeatureId(featureId);
+			featureInfoPtr->SetFeatureName(featureName);
+
+			featurePackagePtr->InsertNewObject("FeatureInfo", featureName, featureDescription, featureInfoPtr.GetPtr());
+		}
+
+		return featurePackagePtr.PopPtr();
+	}
+	return nullptr;
+
 }
 
 

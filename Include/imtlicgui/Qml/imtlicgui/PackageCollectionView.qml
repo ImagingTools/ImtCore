@@ -34,6 +34,7 @@ Item {
         Component.onCompleted: {
             packageCollectionView.gqlModelInfo = "FeaturePackageInfo"
             packageCollectionView.gqlModelItems = "FeaturePackageList"
+            packageCollectionView.gqlModelItems = "FeaturePackageRemove"
             console.log("packageCollectionView onCompleted", packageCollectionView.gqlModelInfo)
         }
 

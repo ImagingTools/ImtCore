@@ -35,6 +35,7 @@ Item {
         Component.onCompleted: {
             productCollectionView.gqlModelInfo = "ProductInfo"
             productCollectionView.gqlModelItems = "ProductList"
+            productCollectionView.gqlModelItems = "ProductRemove"
         }
 
         onSelectItem: {
