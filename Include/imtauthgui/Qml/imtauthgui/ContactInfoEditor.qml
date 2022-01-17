@@ -207,17 +207,17 @@ Rectangle {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, accountItemModel);
+            console.log("State:", this.state, saveModel);
             if (this.state === "Ready"){
 
-                var dataModelLocal = accountItemModel.GetData("data");
+                var dataModelLocal = saveModel.GetData("data");
                 if(dataModelLocal.ContainsKey("addedNotification")){
                     dataModelLocal = dataModelLocal.GetData("addedNotification");
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("Id")){
-                        containerContactInfo.itemId = dataModelLocal.GetData("Id").GetData("Id");
+                        containerContactInfo.itemId = dataModelLocal.GetData("Id");
                     }
-                    else if(accountItemModel.ContainsKey("errors")){
-                        var errorsModel = accountItemModel.GetData("errors");
+                    else if(saveModel.ContainsKey("errors")){
+                        var errorsModel = saveModel.GetData("errors");
                         if(errorsModel !== null && errorsModel.ContainsKey(containerContactInfo.gqlModelItems)){
                             console.log("message", errorsModel.GetData(containerContactInfo.gqlModelItems).GetData("message"));
                         }

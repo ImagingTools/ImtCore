@@ -7,7 +7,7 @@ Item {
     id: installationsMultiDocViewContainer;
     anchors.fill: parent;
     property alias firstElementImageSource: installationsMultiDocView.firstElementImageSource;
-    property alias model: installationsMultiDocView.model;
+//    property alias model: installationsMultiDocView.model;
 
     function menuActivated(menuId) {
         installationsMultiDocView.menuActivated(menuId);

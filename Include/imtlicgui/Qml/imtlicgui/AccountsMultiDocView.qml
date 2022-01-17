@@ -7,7 +7,7 @@ Item {
     id: accountsMultiDocViewContainer;
     anchors.fill: parent;
     property alias firstElementImageSource: accountsMultiDocView.firstElementImageSource;
-    property alias model: accountsMultiDocView.model;
+//    property alias model: accountsMultiDocView.model;
 
     function menuActivated(menuId) {
         accountsMultiDocView.menuActivated(menuId);

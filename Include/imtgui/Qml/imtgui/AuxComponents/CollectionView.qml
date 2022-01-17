@@ -16,6 +16,7 @@ Rectangle {
     property string gqlModelItems;
     property string gqlModelRemove;
     property string itemId;
+    property string itemName;
     signal selectItem(string itemId, string name);
 
     signal removedItem(string itemId);
@@ -58,7 +59,14 @@ Rectangle {
         var name = tableInternal.getSelectedName();
 
         if (menuId  === "New"){
-            collectionViewContainer.selectItem("", "")
+            //collectionViewContainer.selectItem("", "")
+
+            var countItems = model.GetData("data").GetItemsCount();
+            console.log("CollectionView menuActivated", menuId, countItems);
+            model.GetData("data").SetData("FeatureName", "Feature Name", countItems - 1);
+            model.GetData("data").SetData("FeatureId", "", countItems - 1);
+            model.Refresh();
+
         }
         else if (menuId  === "Edit") {
             if (itemId != "" && name != ""){

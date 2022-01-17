@@ -1,8 +1,9 @@
 import QtQuick 2.0
 import Acf 1.0
 import imtqml 1.0
+import imtgui 1.0
 import imtauthgui 1.0
-import '../../../imtgui/Qml/imtgui/AuxComponents'
+//import '../../../imtgui/Qml/imtgui/AuxComponents'
 
 Rectangle {
     id: container;
@@ -11,11 +12,17 @@ Rectangle {
     radius: 10;
     color: Style.backgroundColor;
     clip: true;
+    property string featureId;
+    property string featureName;
+    signal okClicked(string newId, string newName);
+    signal cancelClicked();
+
     Rectangle {
         id: editFeatureDialogTopPanel;
         width: container.width;
         height: 40;
-        color: "white";
+        border.color: container.color;
+        color: Style.baseColor;
 
         Image {
             id: iconEditFeatureDialog;
@@ -33,9 +40,10 @@ Rectangle {
             anchors.verticalCenter: editFeatureDialogTopPanel.verticalCenter;
             anchors.horizontalCenter: editFeatureDialogTopPanel.horizontalCenter;
             text: "Edit feature";
-            color: Style.theme == "Dark"? "black": Style.textColor;
+            //color: Style.theme == "Dark"? "black": Style.textColor;
+            color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_subtitle;
+            font.pixelSize: Style.fontSize_common;
         }
 
         AuxButton {
@@ -82,8 +90,10 @@ Rectangle {
             color: Style.imagingToolsGradient1;
             border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
             TextFieldCustom {
+                id: tfcFeatureNameText;
                 width: tfcFeatureName.width - 22;
                 height: 23;
+                text: container.featureName;
                 anchors.horizontalCenter: tfcFeatureName.horizontalCenter;
                 anchors.verticalCenter: tfcFeatureName.verticalCenter;
             }
@@ -110,8 +120,10 @@ Rectangle {
             border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
             TextFieldCustom {
+                id: tfcFeatureIdText;
                 width: tfcFeatureId.width - 22;
                 height: 23;
+                text: container.featureId;
                 anchors.horizontalCenter: tfcFeatureId.horizontalCenter;
                 anchors.verticalCenter: tfcFeatureId.verticalCenter;
             }
@@ -142,6 +154,10 @@ Rectangle {
                 hoverEnabled: enabled;
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
                 onClicked: {
+//                    if (tfcFeatureNameText.text !== container.featureName || tfcFeatureIdText.text !== container.featureId) {
+//                        container.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
+//                    }
+                    container.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
                     editFeatureDialog.visible = false;
                 }
             }

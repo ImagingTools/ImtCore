@@ -92,8 +92,8 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap &infoMap)
 
 	EndChanges(changeSet);
 
-	beginRemoveRows(QModelIndex(), index, index);
-	endRemoveRows();
+//	beginRemoveRows(QModelIndex(this), index, index);
+//	endRemoveRows();
 
 	return true;
 }

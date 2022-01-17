@@ -7,9 +7,16 @@ Item {
     id: featureCollectionViewContainer;
     anchors.fill: parent;
     property alias itemId: featureCollectionView.itemId;
+    property alias itemName: featureCollectionView.itemName;
     property alias model: featureCollectionView.model;
 
     function menuActivated(menuId) {
+        if (menuId  === "New"){
+//            collectionViewContainer.selectItem("", "")
+        }
+        else if (menuId  === "Save") {
+            saveModel.updateModel()
+        }
         featureCollectionView.menuActivated(menuId)
     }
 
@@ -35,6 +42,10 @@ Item {
         }
     }
 
+    TreeItemModel {
+        id: packageModel;
+    }
+
     CollectionView {
         id: featureCollectionView;
         anchors.left: parent.left;
@@ -48,14 +59,113 @@ Item {
             }
         }
 
+        onSelectItem: {
+            editFeatureDialog.visible = true;
+            editFeatureDialog.featureId = itemId;
+            editFeatureDialog.featureName = name;
+
+            featureCollectionView.itemId = itemId;
+            featureCollectionView.itemName = name;
+        }
+
         onSelectedIndexChanged: {
             console.log("featurePackageCollectionView onSelectedIndexChanged", featureCollectionView.selectedIndex);
             if (featureCollectionView.selectedIndex > -1){
                 featureCollectionViewContainer.commandsChanged("PackageEdit")
             }
         }
-
     }
+
+    EditFeatureDialog {
+        id: editFeatureDialog;
+        visible: false;
+
+        anchors.verticalCenter: featureCollectionViewContainer.verticalCenter;
+        anchors.horizontalCenter: featureCollectionViewContainer.horizontalCenter;
+
+        onOkClicked: {
+            var dataModelLocal = featureCollectionView.model.GetData("data");
+            console.log("PackageView onClicked ", dataModelLocal.GetItemsCount())
+            for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
+                 console.log(dataModelLocal.GetData("FeatureId", i), featureCollectionView.itemId);
+                if (dataModelLocal.GetData("FeatureId", i) === featureCollectionView.itemId) {
+                    console.log("PackageView onClicked ", dataModelLocal.GetData("FeatureId", i), newId)
+                    dataModelLocal.SetData("FeatureId", newId, i);
+                    dataModelLocal.SetData("FeatureName", newName, i);
+                    break;
+                }
+            }
+            featureCollectionView.model.SetData("data", dataModelLocal);
+            featureCollectionView.model.Refresh();
+        }
+    }
+
+    GqlModel {
+        id: saveModel;
+
+        function updateModel() {
+            console.log( "updateModel saveModel");
+
+            var query;
+            var queryFields;
+            var inputParams = Gql.GqlObject("input");
+
+            if(featureCollectionViewContainer.itemId != ""){
+                query = Gql.GqlRequest("query", "PackageUpdate");
+                inputParams.InsertField("Id");
+                inputParams.InsertFieldArgument("Id", featureCollectionViewContainer.itemId);
+                queryFields = Gql.GqlObject("updatedNotification");
+            }
+            else{
+                query = Gql.GqlRequest("query", "PackageAdd");
+                queryFields = Gql.GqlObject("addedNotification");
+            }
+            query.AddParam(inputParams);
+
+            packageModel.SetData("Id", featureCollectionViewContainer.itemId)
+            packageModel.SetData("Name", featureCollectionViewContainer.itemName)
+            packageModel.SetExternTreeModel("features", featureCollectionView.model.GetData("data"));
+
+            //featureCollectionViewContainer.model.SetIsArray(false);
+            var jsonString = packageModel.toJSON();
+            console.log("jsonString", jsonString)
+            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+            console.log("jsonString", jsonString)
+
+            inputParams.InsertField("Item");
+            inputParams.InsertFieldArgument ("Item", jsonString);
+
+            queryFields.InsertField("Id");
+            queryFields.InsertField("Successed");
+
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log("PackageEdit query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, saveModel);
+            if (this.state === "Ready"){
+
+                var dataModelLocal = model.GetData("data");
+                if(dataModelLocal.ContainsKey("addedNotification")){
+                    dataModelLocal = dataModelLocal.GetData("addedNotification");
+                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("Id") && featureCollectionViewContainer.itemId === ""){
+                        featureCollectionViewContainer.itemId = dataModelLocal.GetData("Id");
+                    }
+                    else if(saveModel.ContainsKey("errors")){
+                        var errorsModel = accountItemModel.GetData("errors");
+                        if(errorsModel !== null && errorsModel.ContainsKey(containerContactInfo.gqlModelItems)){
+                            console.log("message", errorsModel.GetData(featureCollectionViewContainer.gqlModelItems).GetData("message"));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     Rectangle {
         id: packageMetaInfo;
         anchors.right: parent.right;

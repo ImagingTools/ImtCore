@@ -99,8 +99,8 @@ istd::IChangeable* CPackageControllerComp::CreateObject(const QList<imtgql::CGql
 		imtbase::CTreeItemModel *features = itemModel.GetTreeItemModel("features");
 
 		for (int i = 0; i < features->GetItemsCount(); i++){
-			QByteArray featureId = features->GetData("Id", i).toByteArray();
-			QString featureName = features->GetData("Name", i).toString();
+			QByteArray featureId = features->GetData("FeatureId", i).toByteArray();
+			QString featureName = features->GetData("FeatureName", i).toString();
 			QString featureDescription = features->GetData("Description", i).toString();
 
 			istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr = new imtlic::CFeatureInfo;

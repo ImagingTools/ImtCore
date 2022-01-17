@@ -11,7 +11,7 @@ Rectangle {
     property TabPanel tabPanel: tabPanelInternal;
     property Item activeItem;
     property alias firstElementImageSource: tabPanelInternal.firstElementImageSource;
-    property TreeItemModel model;
+//    property TreeItemModel model;
     property var pagesSources: [];
     property var pagesItems: [];
     property alias pagesCount: docsData.count;
@@ -119,6 +119,7 @@ Rectangle {
                 onItemChanged: {
                     if (loader.item && loader.source != ""){
                         loader.item.itemId = model.ItemId
+                        //loader.item.itemName = model.Title
                         var dataModelLocal
                         if (pages.ContainsKey("DocsData",model.index)){
                             dataModelLocal = pages.GetData("DocsData",model.index);
