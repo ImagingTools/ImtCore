@@ -12,12 +12,23 @@ Item {
 
     function menuActivated(menuId) {
         if (menuId  === "New"){
-//            collectionViewContainer.selectItem("", "")
+            var countItems = model.GetData("data").GetItemsCount();
+            var dataModelLocal = model.GetData("data");
+            var index = dataModelLocal.InsertNewItem();
+
+            dataModelLocal.SetData("Name", "Feature Name", index);//
+            dataModelLocal.SetData("Id", "", index);//
+
+            model.SetData("data", dataModelLocal);
+            model.Refresh();
+            featureCollectionView.refresh();
+
         }
         else if (menuId  === "Save") {
             saveModel.updateModel()
+        } else {
+           featureCollectionView.menuActivated(menuId)
         }
-        featureCollectionView.menuActivated(menuId)
     }
 
     function commandsChanged(commandsId){
@@ -60,12 +71,12 @@ Item {
         }
 
         onSelectItem: {
+            console.log("PackageView CollectionView onSelectItem", itemId, name);
             editFeatureDialog.visible = true;
             editFeatureDialog.featureId = itemId;
             editFeatureDialog.featureName = name;
-
-            featureCollectionView.itemId = itemId;
-            featureCollectionView.itemName = name;
+            console.log("featureCollectionView.itemId", featureCollectionView.itemId);
+            console.log("featureCollectionView.itemName", featureCollectionView.itemName);
         }
 
         onSelectedIndexChanged: {
@@ -74,6 +85,12 @@ Item {
                 featureCollectionViewContainer.commandsChanged("PackageEdit")
             }
         }
+    }
+
+    MouseArea {
+        id: maPackageView;
+        anchors.fill: parent;
+        visible: editFeatureDialog.visible;
     }
 
     EditFeatureDialog {
@@ -86,17 +103,21 @@ Item {
         onOkClicked: {
             var dataModelLocal = featureCollectionView.model.GetData("data");
             console.log("PackageView onClicked ", dataModelLocal.GetItemsCount())
-            for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
-                 console.log(dataModelLocal.GetData("FeatureId", i), featureCollectionView.itemId);
-                if (dataModelLocal.GetData("FeatureId", i) === featureCollectionView.itemId) {
-                    console.log("PackageView onClicked ", dataModelLocal.GetData("FeatureId", i), newId)
-                    dataModelLocal.SetData("FeatureId", newId, i);
-                    dataModelLocal.SetData("FeatureName", newName, i);
-                    break;
-                }
-            }
+            dataModelLocal.SetData("Id", newId, featureCollectionView.selectedIndex);//
+            dataModelLocal.SetData("Name", newName, featureCollectionView.selectedIndex);
+
+
+//            for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
+//                 console.log(dataModelLocal.GetData("FeatureId", i), featureCollectionView.itemId);
+//                if (dataModelLocal.GetData("FeatureId", i) === featureCollectionView.itemId) {
+//                    console.log("PackageView onClicked ", dataModelLocal.GetData("FeatureId", i), newId)
+//                    dataModelLocal.SetData("FeatureId", newId, i);
+//                    dataModelLocal.SetData("FeatureName", newName, i);
+//                    break;
+//                }
+//            }
             featureCollectionView.model.SetData("data", dataModelLocal);
-            featureCollectionView.model.Refresh();
+            featureCollectionView.refresh();
         }
     }
 

@@ -17,6 +17,17 @@ Rectangle {
     signal okClicked(string newId, string newName);
     signal cancelClicked();
 
+
+    function generateKey() {
+        console.log("EditFeatureDialog generateKey...");
+        if (tfcFeatureIdText.text === "" && tfcFeatureNameText.text !== "") {
+            var key = "#" + tfcFeatureNameText.text;
+            key = key.replace(/\s+/g, '');
+            tfcFeatureIdText.text = key;
+            console.log("EditFeatureDialog key has been generated!");
+        }
+    }
+
     Rectangle {
         id: editFeatureDialogTopPanel;
         width: container.width;
@@ -126,6 +137,10 @@ Rectangle {
                 text: container.featureId;
                 anchors.horizontalCenter: tfcFeatureId.horizontalCenter;
                 anchors.verticalCenter: tfcFeatureId.verticalCenter;
+
+                onFocusChanged: {
+                    container.generateKey();
+                }
             }
         }
 
@@ -157,6 +172,7 @@ Rectangle {
 //                    if (tfcFeatureNameText.text !== container.featureName || tfcFeatureIdText.text !== container.featureId) {
 //                        container.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
 //                    }
+                    container.generateKey();
                     container.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
                     editFeatureDialog.visible = false;
                 }

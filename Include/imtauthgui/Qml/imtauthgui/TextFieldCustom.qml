@@ -17,10 +17,8 @@ Item {
 
     property bool canReduce: false;
     property bool reduced: false;
-//    property real reduceCoeff: canReduce  ? 2 : 1;
-//    property real animDuration: 200;
 
-
+    signal focusChanged();
 
     onVisibleChanged: {
         if(!visible)
@@ -52,34 +50,25 @@ Item {
     TextInput {
         id: textField;
         anchors.fill: parent;
-//        anchors.left: parent.left;
         anchors.leftMargin: 5;
-//        anchors.verticalCenter: parent.verticalCenter;
-//        anchors.bottom: parent.bottom;
-//        anchors.bottomMargin: 10;
-
         width: parent.width - 20;
-        //color: "#101010";
         color: Style.textColor;
         font.pixelSize: 12;
         focus: false;
         text: "";
         verticalAlignment: TextInput.AlignVCenter;
         onFocusChanged: {
-//            if (container.isTextChanged === true){
-//                console.log("onFocusChanged")
-//                container.accepted()
-//                container.isTextChanged = false
-//            }
+            container.focusChanged();
         }
 
         onTextChanged: {
-            console.log("onTextChanged");
+            console.log("TextFieldCustom onTextChanged");
             container.isTextChanged = true;
             timer.restart();
         }
+
         onAccepted: {
-            console.log("onAccepted");
+            console.log("TextFieldCustom onAccepted");
             container.accepted();
             container.isTextChanged = false;
         }
@@ -91,46 +80,18 @@ Item {
         anchors.left: parent.left;
         anchors.leftMargin: 5;
         anchors.bottom: parent.bottom;
-      //  anchors.bottomMargin: margin;
-//        property bool focusOn: textField.focus;
-//        property bool containsText: textField.text !== "";
-      //  property real margin: !focusOn && !containsText ? 12 : !containsText && focusOn
-    //                                                      ? parent.height - height - 3 :  parent.height - height - 3;
-//        Behavior on margin {
-//            NumberAnimation { duration: animDuration;}
-//        }
-//        width: contentWidth;
-//        height: contentHeight;
-//        color: focusOn ? focusColor : "gray";
-//        font.pixelSize: !focusOn && !containsText ? 15 : 10;
-        //text: container.placeHolderText;
 
     }
-
-//    Rectangle{
-//        id:bottomGray;
-//        anchors.left: parent.left;
-//        anchors.right: parent.right;
-//        anchors.bottom: parent.bottom;
-//        visible: textField.focus;
-//        height: 2;
-//        color: "lightblue";
-//    }
 
     Rectangle{
         id:bottomBlue;
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.bottom: parent.bottom;
         height: 3;
-//        width: textField.focus ? parent.width : 0;
-//        visible: textField.focus;
-
         Behavior on width {
             NumberAnimation { duration: container.animDuration;}
         }
         color: focusColor;
-
     }
-
 
 }

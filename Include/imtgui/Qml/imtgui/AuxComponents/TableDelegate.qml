@@ -111,8 +111,6 @@ Rectangle{
 
         onDoubleClicked: {
             container.doubleClicked();
-            //editFeatureDialog.visible = true;
         }
-
     }
 }

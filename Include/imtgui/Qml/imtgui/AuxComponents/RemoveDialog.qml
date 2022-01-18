@@ -31,7 +31,8 @@ Rectangle {
             anchors.leftMargin: 10;
             anchors.verticalCenter: removeDialogTopPanel.verticalCenter;
             text: "Remove";
-            color: Style.theme == "Dark"? "black": Style.textColor;
+//            color: Style.theme == "Dark"? "black": Style.textColor;
+            color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_subtitle;
         }

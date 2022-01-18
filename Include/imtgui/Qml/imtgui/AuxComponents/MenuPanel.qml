@@ -76,12 +76,15 @@ Rectangle {
                     dataModelLocal = dataModelLocal.GetData("PagesData")
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
                         dataModelLocal = dataModelLocal.GetData("items")
+                        console.log("PageModel pagesData !");
                         lvPages.model = dataModelLocal
 
                         menuPanel.activePageId = dataModelLocal.GetData(PageEnum.ID);
                         menuPanel.activePageName = dataModelLocal.GetData(PageEnum.NAME);
                         menuPanel.activeIcon = dataModelLocal.GetData(PageEnum.ICON);
                         menuPanel.activePageIndex = 0;
+
+                        console.log("PageModel pagesData end!");
                     }
                     else if(this.ContainsKey("errors")){
                         var errorsModel = pagesModel.GetData("errors");

@@ -20,11 +20,11 @@ imtgui::ICollectionViewDelegate::SummaryInformation CFeatureCollectionViewDelega
 	if (m_collectionPtr != nullptr){
 		const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(m_collectionPtr->GetObjectPtr(objectId));
 		if (featureInfoPtr != nullptr){
-			if (informationId == QByteArray("FeatureName")){
+			if (informationId == QByteArray("Name")){
 				retVal.text = featureInfoPtr->GetFeatureName();
 				retVal.sortValue = retVal.text;
 			}
-			else if (informationId == QByteArray("FeatureId")){
+			else if (informationId == QByteArray("Id")){ //изменил FeatureId на Id
 				retVal.text = featureInfoPtr->GetFeatureId();
 				retVal.sortValue = retVal.text;
 			}
@@ -62,10 +62,10 @@ void CFeatureCollectionViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.ResetData();
 	m_summaryInformationHeaders.clear();
 
-	m_summaryInformationTypes.InsertItem("FeatureName", tr("Feature Name"), "");
+	m_summaryInformationTypes.InsertItem("Name", tr("Feature Name"), "");//изменил FeatureId на Id
 	m_summaryInformationHeaders["FeatureName"] = HeaderInfo(false);
 
-	m_summaryInformationTypes.InsertItem("FeatureId", tr("Feature-ID"), "");
+	m_summaryInformationTypes.InsertItem("Id", tr("Feature-ID"), "");//изменил FeatureId на Id
 	m_summaryInformationHeaders["FeatureId"] = HeaderInfo(true);
 
 	m_summaryInformationTypes.InsertItem("Description", tr("Description"), "");

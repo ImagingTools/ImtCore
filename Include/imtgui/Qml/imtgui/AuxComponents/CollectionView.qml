@@ -29,7 +29,7 @@ Rectangle {
 //        return tableInternal.getSelectedName();
 //    }
 
-    onModelChanged: {
+    function refresh() {
         console.log("collectionViewContainer onModelChanged", collectionViewContainer.gqlModelInfo)
         if (collectionViewContainer.model.ContainsKey("headers")){
             var dataModelLocal = collectionViewContainer.model.GetData("headers");
@@ -42,13 +42,17 @@ Rectangle {
 
         if (collectionViewContainer.model.ContainsKey("data")){
             var dataModelLocal = collectionViewContainer.model.GetData("data");
+            tableInternal.elements = 0;
             tableInternal.elements = dataModelLocal;
 
             var selectedIndexLocal = collectionViewContainer.model.GetData("selectedIndex");
             tableInternal.selectedIndex = selectedIndexLocal;
             console.log("collectionViewContainer data count",dataModelLocal.GetItemsCount())
         }
+    }
 
+    onModelChanged: {
+        collectionViewContainer.refresh();
     }
 
     function menuActivated(menuId) {
@@ -59,14 +63,7 @@ Rectangle {
         var name = tableInternal.getSelectedName();
 
         if (menuId  === "New"){
-            //collectionViewContainer.selectItem("", "")
-
-            var countItems = model.GetData("data").GetItemsCount();
-            console.log("CollectionView menuActivated", menuId, countItems);
-            model.GetData("data").SetData("FeatureName", "Feature Name", countItems - 1);
-            model.GetData("data").SetData("FeatureId", "", countItems - 1);
-            model.Refresh();
-
+            collectionViewContainer.selectItem("", "")
         }
         else if (menuId  === "Edit") {
             if (itemId != "" && name != ""){

@@ -46,10 +46,10 @@ imtbase::CTreeItemModel* CPackageControllerComp::ListObjects(
 				for (const QByteArray& featureCollectionId : featureCollectionIds){
 					int itemIndex = itemsModel->InsertNewItem();
 					QString featureId = packagePtr->GetFeatureInfo(featureCollectionId)->GetFeatureId();
-					itemsModel->SetData("Id", featureId, itemIndex);
-					itemsModel->SetData("FeatureId", featureId, itemIndex);
+					//itemsModel->SetData("Id", featureId, itemIndex);
+					itemsModel->SetData("Id", featureId, itemIndex);//изменил FeatureId на Id
 					QString featureName = packagePtr->GetFeatureInfo(featureCollectionId)->GetFeatureName();
-					itemsModel->SetData("FeatureName", featureName, itemIndex);
+					itemsModel->SetData("Name", featureName, itemIndex);//
 					QString featureDescription = packagePtr->GetFeatureList().GetElementInfo(featureCollectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 					itemsModel->SetData("Description", featureDescription, itemIndex);
 
@@ -99,8 +99,8 @@ istd::IChangeable* CPackageControllerComp::CreateObject(const QList<imtgql::CGql
 		imtbase::CTreeItemModel *features = itemModel.GetTreeItemModel("features");
 
 		for (int i = 0; i < features->GetItemsCount(); i++){
-			QByteArray featureId = features->GetData("FeatureId", i).toByteArray();
-			QString featureName = features->GetData("FeatureName", i).toString();
+			QByteArray featureId = features->GetData("Id", i).toByteArray();
+			QString featureName = features->GetData("Name", i).toString();
 			QString featureDescription = features->GetData("Description", i).toString();
 
 			istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr = new imtlic::CFeatureInfo;

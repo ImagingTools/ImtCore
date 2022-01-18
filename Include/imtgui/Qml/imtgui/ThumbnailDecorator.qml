@@ -65,7 +65,9 @@ Rectangle
             color: "transparent";
             visible: menuPanel.activePageIndex === model.index;
             onVisibleChanged: {
+                console.log("thubnailDecoratorContainer.activeItem", loader.item, menuPanel.activePageIndex, model.index);
                 if(pagesDeleg.visible){
+                    console.log("visible", loader.item);
                     thubnailDecoratorContainer.activeItem = loader.item;
                     loader.item.visible = pagesDeleg.visible;
                 }
@@ -87,6 +89,7 @@ Rectangle
 
                 Component.onCompleted: {
                     loader.source = "../imtlicgui/" + menuPanel.model.GetData(PageEnum.ID, model.index) + "MultiDocView.qml";
+                    console.log("ThumbnailDecorator loader.source", loader.source);
                 }
                 onItemChanged: {
                     if (loader.item){
