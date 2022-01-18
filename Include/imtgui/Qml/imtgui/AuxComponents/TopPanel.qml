@@ -68,7 +68,13 @@ Rectangle {
         iconSource: "../../../Icons/" + Style.theme + "/Settings_On_Normal.svg";
         onClicked: {
             console.log("Preference button clicked !");
-            preference.visible = true;
+//            preference.visible = true;
+            var source = "AuxComponents/Preference.qml";
+            var parameters = {};
+//            parameters["message"] = "TEST";
+//            parameters["nameDialog"] = "MessageDialog";
+//            thubnailDecoratorContainer.openDialog("AuxComponents/MessageDialog.qml", parameters);
+            thubnailDecoratorContainer.openDialog(source, parameters);
 
         }
     }

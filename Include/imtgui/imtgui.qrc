@@ -23,7 +23,7 @@
         <file alias="imtgui/AuxComponents/CollectionView.qml">Qml/imtgui/AuxComponents/CollectionView.qml</file>
         <file alias="imtgui/AuxComponents/PackagesView.qml">Qml/imtgui/AuxComponents/PackagesView.qml</file>
         <file alias="imtgui/AuxComponents/PopupMenuDialog.qml">Qml/imtgui/AuxComponents/PopupMenuDialog.qml</file>
-        <file alias="imtgui/AuxComponents/RemoveDialog.qml">Qml/imtgui/AuxComponents/RemoveDialog.qml</file>
+        <file alias="imtgui/AuxComponents/MessageDialog.qml">Qml/imtgui/AuxComponents/MessageDialog.qml</file>
         <file alias="imtgui/AuxComponents/MultiDocWorkspaceView.qml">Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml</file>
         <file alias="imtgui/AuxComponents/InstallationInfoEditor.qml">Qml/imtgui/AuxComponents/InstallationInfoEditor.qml</file>
     </qresource>

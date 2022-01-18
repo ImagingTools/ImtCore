@@ -5,3 +5,4 @@ MultiDocWorkspaceView 1.0 ./AuxComponents/MultiDocWorkspaceView.qml
 ComboBox 1.0 ./AuxComponents/ComboBox.qml
 AuxTable 1.0 ./AuxComponents/AuxTable.qml
 AuxButton 1.0 ./AuxComponents/AuxButton.qml
+MessageDialog 1.0 ./AuxComponents/MessageDialog.qml

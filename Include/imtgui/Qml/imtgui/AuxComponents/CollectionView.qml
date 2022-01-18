@@ -21,6 +21,13 @@ Rectangle {
 
     signal removedItem(string itemId);
 
+    function dialogResult(parameters) {
+         console.log(parameters["status"]);
+        if (parameters["status"] === "yes") {
+            removeModel.updateModel();
+        }
+    }
+
 //    function getSelectedId(){
 //        return tableInternal.getSelectedId();
 //    }
@@ -66,16 +73,30 @@ Rectangle {
             collectionViewContainer.selectItem("", "")
         }
         else if (menuId  === "Edit") {
-            if (itemId != "" && name != ""){
+            if (itemId !== "" && name !== "") {
                 collectionViewContainer.selectItem(itemId, name);
             }
         }
         else if (menuId  === "Remove") {
-            if (itemId != ""){
-                collectionViewContainer.itemId = tableInternal.getSelectedId();
-                removeModel.updateModel();
+            console.log("CollectionView try remove element with id", itemId);
+            if (itemId !== "") {
+                var source = "AuxComponents/MessageDialog.qml";
+                var parameters = {};
+                parameters["message"] = "Remove selected file from the database ?";
+                parameters["nameDialog"] = "RemoveDialog";
+                parameters["resultItem"] = collectionViewContainer;
+
+                thubnailDecoratorContainer.openDialog(source, parameters);
+//                collectionViewContainer.removeSelectedItem();
+//                collectionViewContainer.itemId = tableInternal.getSelectedId();
+//                removeModel.updateModel();
             }
         }
+    }
+
+    function removeSelectedItem() {
+        collectionViewContainer.itemId = tableInternal.getSelectedId();
+        removeModel.updateModel();
     }
 
     AuxTable {
@@ -196,7 +217,8 @@ Rectangle {
             if(collectionViewContainer.itemId != ""){
                 query = Gql.GqlRequest("query", collectionViewContainer.gqlModelRemove);
                 inputParams.InsertField("Id");
-                inputParams.InsertFieldArgument("Id", collectionViewContainer.itemId);
+                //inputParams.InsertFieldArgument("Id", collectionViewContainer.itemId);
+                inputParams.InsertFieldArgument("Id", tableInternal.getSelectedId());
                 queryFields = Gql.GqlObject("removedNotification");
                 query.AddParam(inputParams);
 
@@ -215,11 +237,13 @@ Rectangle {
             console.log("State:", this.state, removeModel);
             if (this.state === "Ready"){
 
-                var dataModelLocal = removeModel.GetData("data");
+                var dataModelLocal = this.GetData("data");
+                console.log("dataModelLocal:", dataModelLocal);
                 if(dataModelLocal.ContainsKey("removedNotification")){
                     dataModelLocal = dataModelLocal.GetData("removedNotification");
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("Id")){
-                        var itemId = dataModelLocal.GetData("Id").GetData("Id");
+                        var itemId = dataModelLocal.GetData("Id");
+                        console.log("Remove item by id = ", itemId);
                         collectionViewContainer.removedItem(itemId)
                     }
                     else if(removeModel.ContainsKey("errors")){

@@ -67,6 +67,7 @@ Item {
                 console.log("PackageView onItemIdChanged")
                 featureCollectionView.gqlModelInfo = "PackageInfo"
                 featureCollectionView.gqlModelItems = "FeatureList"
+                featureCollectionView.gqlModelRemove = "FeatureRemove";
             }
         }
 

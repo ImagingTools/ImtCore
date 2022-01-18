@@ -4,6 +4,10 @@ import imtqml 1.0
 
 Rectangle {
     id: container;
+
+    width: 450;
+    height: 500;
+
     property string styleColor: "Light";
     property int radiusValue: 5;
 
@@ -12,7 +16,7 @@ Rectangle {
     border.color: "#2b2d2d";
 
     Component.onCompleted: {
-        preference.changeThemeIcons("Light");
+        container.changeThemeIcons("Light");
     }
 
     function changeThemeIcons(theme)
@@ -91,7 +95,8 @@ Rectangle {
                   anchors.fill: parent;
                   onClicked: {
                       cbLang.menuVisible = false;
-                      preference.visible = false;
+//                      container.visible = false;
+                      loaderDialog.closeItem();
                   }
               }
            }
@@ -212,7 +217,7 @@ Rectangle {
                anchors.topMargin: 10;
                color: "black";
                radius: radiusValue;
-               border.color: preference.styleColor == "Dark"? "#1560BD" : "transparent";
+               border.color: container.styleColor == "Dark"? "#1560BD" : "transparent";
                border.width: 2;
 
                Text {
@@ -228,11 +233,11 @@ Rectangle {
                MouseArea {
                     anchors.fill: parent;
                     onClicked: {
-                        preference.styleColor = "Dark";
+                        container.styleColor = "Dark";
 
                         Style.camera = "../Icons/Dark/Camera.svg";
                         stylesModel.getStyle("Dark");
-                        preference.changeThemeIcons("Dark");
+                        container.changeThemeIcons("Dark");
                         Style.theme = "Dark";
                     }
                }
@@ -249,7 +254,7 @@ Rectangle {
                anchors.topMargin: 10;
                anchors.leftMargin: 20;
                color: "white";
-               border.color: preference.styleColor == "Light"? "#1560BD" : "black";
+               border.color: container.styleColor == "Light"? "#1560BD" : "black";
                border.width: 2;
                radius: radiusValue;
 
@@ -267,8 +272,8 @@ Rectangle {
                     anchors.fill: parent;
                     onClicked: {
                         stylesModel.getStyle("Light");
-                        preference.changeThemeIcons("Light");
-                        preference.styleColor = "Light";
+                        container.changeThemeIcons("Light");
+                        container.styleColor = "Light";
                         Style.theme = "Light";
 
                     }
@@ -283,19 +288,19 @@ Rectangle {
     }
 
     function parseStyleTheme(themeType) {
-        Style.baseColor = preference.getThemeColor("ActiveColors", "Base", themeType);
-        Style.backgroundColor = preference.getThemeColor("ActiveColors", "Background", themeType);
-        Style.textColor = preference.getThemeColor("ActiveColors", "Text", themeType);
+        Style.baseColor = container.getThemeColor("ActiveColors", "Base", themeType);
+        Style.backgroundColor = container.getThemeColor("ActiveColors", "Background", themeType);
+        Style.textColor = container.getThemeColor("ActiveColors", "Text", themeType);
         console.log("Style.textColor ", Style.textColor);
-        Style.selectedColor = preference.getThemeColor("ActiveColors", "ItemSelected", themeType);
-        Style.buttonColor = preference.getThemeColor("ActiveColors", "HeaderBorder", themeType);
-        Style.buttonBorderColor = preference.getThemeColor("ActiveColors", "ButtonBorder", themeType);
+        Style.selectedColor = container.getThemeColor("ActiveColors", "ItemSelected", themeType);
+        Style.buttonColor = container.getThemeColor("ActiveColors", "HeaderBorder", themeType);
+        Style.buttonBorderColor = container.getThemeColor("ActiveColors", "ButtonBorder", themeType);
         Style.imagingToolsGradient1 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient1");
         Style.imagingToolsGradient2 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient2");
         Style.imagingToolsGradient3 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient3");
         Style.imagingToolsGradient4 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient4");
 
-        Style.iconColorOnSelected = preference.getThemeColor("IconColor", "OnSelected", themeType);
+        Style.iconColorOnSelected = container.getThemeColor("IconColor", "OnSelected", themeType);
     }
 
     GqlModel {
@@ -326,7 +331,7 @@ Rectangle {
                 }
                 if(dataModelLocal !== null && dataModelLocal.ContainsKey("source")){
                     dataModelLocal = dataModelLocal.GetData("source");
-                    preference.parseStyleTheme(dataModelLocal);
+                    container.parseStyleTheme(dataModelLocal);
                 }
                 else if(stylesModel.ContainsKey("errors")){
                     var errorsModel = stylesModel.GetData("errors");
