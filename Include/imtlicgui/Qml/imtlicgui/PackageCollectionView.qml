@@ -10,6 +10,10 @@ Item {
     property alias itemName: packageCollectionView.itemName;
     property alias model: packageCollectionView.model;
 
+    function refresh() {
+        packageCollectionView.refresh();
+    }
+
     function menuActivated(menuId) {
         packageCollectionView.menuActivated(menuId)
     }
@@ -32,6 +36,7 @@ Item {
     CollectionView {
         id: packageCollectionView;
         anchors.fill: parent;
+        autoRefresh: true;
         Component.onCompleted: {
             packageCollectionView.gqlModelInfo = "FeaturePackageInfo"
             packageCollectionView.gqlModelItems = "FeaturePackageList";

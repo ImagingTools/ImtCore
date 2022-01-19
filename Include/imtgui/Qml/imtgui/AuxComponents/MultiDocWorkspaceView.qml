@@ -39,7 +39,7 @@ Rectangle {
         pages.SetData("Title", title, index);
         pages.SetData("Source", source, index);
         pages.SetData("CommandsId", commandsId, index);
-        pagesDeleg.changeCommandsId(commandsId);
+       // pagesDeleg.changeCommandsId(commandsId);//???
         tabPanelInternal.selectedIndex = pages.GetItemsCount() - 1;
 //        pages.Refresh();
     }
@@ -70,6 +70,7 @@ Rectangle {
 
         onSelectedIndexChanged: {
             multiDocView.updateCommandId();
+            multiDocView.activeItem.refresh();
         }
     }
 
@@ -132,6 +133,7 @@ Rectangle {
                         if (tabPanelInternal.selectedIndex === model.index)
                             multiDocView.activeItem = loader.item;
                         loader.item.model = dataModelLocal
+                        //loader.item.itemId = pages.GetData("ItemId", tabPanelInternal.selectedIndex);
 
                     }
                 }

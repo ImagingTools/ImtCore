@@ -10,9 +10,29 @@ Item {
     property alias itemName: featureCollectionView.itemName;
     property alias model: featureCollectionView.model;
 
+    onItemIdChanged: {
+        console.log("PackageView onItemIdChanged", featureCollectionViewContainer.itemId)
+    }
+
+    function refresh() {
+        featureCollectionView.refresh();
+    }
+
+    function dialogResult(parameters) {
+         console.log(parameters["status"]);
+
+        if (parameters["status"] === "ok") {
+            var value = parameters["value"];
+            console.log("featureCollectionViewContainer dialogResult", value);
+
+            saveModel.updateModel(value);
+        }
+    }
+
     function menuActivated(menuId) {
         if (menuId  === "New"){
-            var countItems = model.GetData("data").GetItemsCount();
+            //var countItems = model.GetData("data").GetItemsCount();
+
             var dataModelLocal = model.GetData("data");
             var index = dataModelLocal.InsertNewItem();
 
@@ -22,11 +42,32 @@ Item {
             model.SetData("data", dataModelLocal);
             model.Refresh();
             featureCollectionView.refresh();
-
         }
         else if (menuId  === "Save") {
-            saveModel.updateModel()
-        } else {
+
+            if (featureCollectionView.itemId == "") {
+                var source = "AuxComponents/InputDialog.qml";
+                var parameters = {};
+                parameters["message"] = "Enter name";
+                parameters["nameDialog"] = "Input name";
+                parameters["resultItem"] = featureCollectionViewContainer;
+                thubnailDecoratorContainer.openDialog(source, parameters);
+            }
+            else {
+                saveModel.updateModel()
+            }
+        }
+        else if (menuId  === "Remove") {
+
+            var source = "AuxComponents/MessageDialog.qml";
+            var parameters = {};
+            parameters["message"] = "Remove selected file from the database ?";
+            parameters["nameDialog"] = "RemoveDialog";
+            parameters["resultItem"] = collectionViewContainer;
+
+            thubnailDecoratorContainer.openDialog(source, parameters);
+        }
+        else {
            featureCollectionView.menuActivated(menuId)
         }
     }
@@ -62,9 +103,17 @@ Item {
         anchors.left: parent.left;
         anchors.right: packageMetaInfo.left;
         height: parent.height;
+
+        Component.onCompleted: {
+            console.log("PackageView CollectionView onCompleted");
+            featureCollectionView.gqlModelInfo = "PackageInfo"
+            featureCollectionView.gqlModelItems = "FeatureList"
+            featureCollectionView.gqlModelRemove = "FeatureRemove";
+        }
+
         onItemIdChanged: {
+            console.log("PackageView CollectionView onItemIdChanged", featureCollectionView.itemId)
             if (featureCollectionView.itemId){
-                console.log("PackageView onItemIdChanged")
                 featureCollectionView.gqlModelInfo = "PackageInfo"
                 featureCollectionView.gqlModelItems = "FeatureList"
                 featureCollectionView.gqlModelRemove = "FeatureRemove";
@@ -108,6 +157,15 @@ Item {
             dataModelLocal.SetData("Name", newName, featureCollectionView.selectedIndex);
 
 
+//            for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
+//                 console.log(dataModelLocal.GetData("FeatureId", i), featureCollectionView.itemId);
+//                if (dataModelLocal.GetData("FeatureId", i) === featureCollectionView.itemId) {
+//                    console.log("PackageView onClicked ", dataModelLocal.GetData("FeatureId", i), newId)
+//                    dataModelLocal.SetData("FeatureId", newId, i);
+//                    dataModelLocal.SetData("FeatureName", newName, i);
+//                    break;
+//                }
+//            }
             featureCollectionView.model.SetData("data", dataModelLocal);
             featureCollectionView.refresh();
         }
@@ -116,7 +174,7 @@ Item {
     GqlModel {
         id: saveModel;
 
-        function updateModel() {
+        function updateModel(newId) {
             console.log( "updateModel saveModel");
 
             var query;
@@ -134,6 +192,11 @@ Item {
                 queryFields = Gql.GqlObject("addedNotification");
             }
             query.AddParam(inputParams);
+
+            if (newId !== "") {
+                featureCollectionViewContainer.itemId = newId;
+                featureCollectionViewContainer.itemName = newId;
+            }
 
             packageModel.SetData("Id", featureCollectionViewContainer.itemId)
             packageModel.SetData("Name", featureCollectionViewContainer.itemName)
@@ -165,6 +228,7 @@ Item {
                 var dataModelLocal = model.GetData("data");
                 if(dataModelLocal.ContainsKey("addedNotification")){
                     dataModelLocal = dataModelLocal.GetData("addedNotification");
+                                            featureCollectionView.refresh();
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("Id") && featureCollectionViewContainer.itemId === ""){
                         featureCollectionViewContainer.itemId = dataModelLocal.GetData("Id");
                     }

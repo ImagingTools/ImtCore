@@ -483,7 +483,7 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	iser::CArchiveTag objectTag(tagName, "key", iser::CArchiveTag::TT_GROUP);
 	bool isMultiTag = false;
 
-	if (countSize < 1){
+	if (countSize < 1 && m_isArray == false){
 		return false;
 	}
 	isMultiTag = countSize > 1 || m_isArray == true;

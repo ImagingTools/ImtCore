@@ -39,7 +39,7 @@ imtbase::CTreeItemModel* CPackageControllerComp::ListObjects(
 
 		QByteArrayList featureIds;
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr)){
+		if (packageId != "" && m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr)){//Узнать
 			const imtlic::IFeaturePackage* packagePtr  = dynamic_cast<const imtlic::IFeaturePackage*>(dataPtr.GetPtr());
 			if (packagePtr != nullptr){
 				QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
@@ -113,7 +113,6 @@ istd::IChangeable* CPackageControllerComp::CreateObject(const QList<imtgql::CGql
 		return featurePackagePtr.PopPtr();
 	}
 	return nullptr;
-
 }
 
 

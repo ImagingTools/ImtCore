@@ -17,6 +17,8 @@ Rectangle {
     property string gqlModelRemove;
     property string itemId;
     property string itemName;
+    property bool autoRefresh: false;
+   // property var parametrs: new {};
     signal selectItem(string itemId, string name);
 
     signal removedItem(string itemId);
@@ -26,20 +28,23 @@ Rectangle {
 
         if (parameters["status"] === "yes") {
 
-            var dataModelLocal = model.GetData("data");
-            dataModelLocal.RemoveItem(tableInternal.selectedIndex);
+            if (model.ContainsKey("data")) {
+                var dataModelLocal = model.GetData("data");
+                dataModelLocal.RemoveItem(tableInternal.selectedIndex);
 
-            model.SetData("data", dataModelLocal);
-            model.Refresh();
-            collectionViewContainer.refresh();
+                model.SetData("data", dataModelLocal);
+                model.Refresh();
+            }
 
             if (gqlModelRemove === "FeaturePackageRemove") {
                 collectionViewContainer.removeSelectedItem();
             }
+            collectionViewContainer.refresh();
         }
     }
 
     function refresh() {
+        var isHeaderUpdated = false;
         console.log("collectionViewContainer onModelChanged", collectionViewContainer.gqlModelInfo)
         if (collectionViewContainer.model.ContainsKey("headers")){
             var dataModelLocal = collectionViewContainer.model.GetData("headers");
@@ -48,6 +53,7 @@ Rectangle {
         }
         else{
             headerInfoModel.updateModel()
+            isHeaderUpdated = true
         }
 
         if (collectionViewContainer.model.ContainsKey("data")){
@@ -59,9 +65,13 @@ Rectangle {
             tableInternal.selectedIndex = selectedIndexLocal;
             console.log("collectionViewContainer data count",dataModelLocal.GetItemsCount())
         }
+        else if(!isHeaderUpdated){
+             itemsModel.updateModel();
+        }
     }
 
     onModelChanged: {
+        console.log("CollectionView onModelChanged");
         collectionViewContainer.refresh();
     }
 
@@ -97,6 +107,7 @@ Rectangle {
     }
 
     function removeSelectedItem() {
+        console.log("CollectionView removeSelectedItem", collectionViewContainer.itemId);
         collectionViewContainer.itemId = tableInternal.getSelectedId();
         removeModel.updateModel();
     }
@@ -136,14 +147,18 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, headerInfoModel);
             if (this.state === "Ready"){
-                var dataModelLocal = headerInfoModel.GetData("data");
+                var dataModelLocal = this.GetData("data");
                 if(dataModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
                     dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelInfo)
                     if(dataModelLocal.ContainsKey("headers")){
                         tableInternal.headers = dataModelLocal.GetData("headers")
-                        console.log("headerInfoModel ContainsKey",dataModelLocal.ContainsKey("headers"))
-                        collectionViewContainer.model.SetExternTreeModel('headers',tableInternal.headers )
-                        itemsModel.updateModel()
+                        collectionViewContainer.model.SetExternTreeModel('headers',tableInternal.headers)
+
+                        itemsModel.updateModel();
+//                        if (collectionViewContainer.itemId != "") {
+
+//                        }
+
                     }
                     else if(packageInfoModel.ContainsKey("errors")){
                         var errorsModelLocal = packageInfoModel.GetData("errors");
@@ -161,7 +176,7 @@ Rectangle {
 
         function updateModel() {
             console.log( "collectionViewContainer updateModel");
-
+            console.log( "collectionViewContainer updateModel", collectionViewContainer.gqlModelItems, collectionViewContainer.itemId);
             var query = Gql.GqlRequest("query", collectionViewContainer.gqlModelItems);
 
             if(collectionViewContainer.itemId != ""){
@@ -190,10 +205,15 @@ Rectangle {
                 var dataModelLocal = this.GetData("data");
                 if(dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
                     dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
+                    console.log("collectionViewContainer items 1", dataModelLocal);
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
                         tableInternal.elements = dataModelLocal.GetData("items");
-                        console.log("collectionViewContainer items",dataModelLocal);
-                        collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements)
+                        console.log("collectionViewContainer items 2", dataModelLocal);
+
+                        if (!collectionViewContainer.autoRefresh) {
+                            collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements)
+                        }
+
                     }
                     else if(itemsModel.ContainsKey("errors")){
                         var errorsModel = itemsModel.GetData("errors");

@@ -17,7 +17,6 @@ Item {
 
     property string fontFamily: mainFont.name;
     property string fontFamilyBold: boldFont.name;
-    //    property string fontFamily: "MS Shell Dlg 2"
 
     property string mainColor: "#e6e6e8";
 
@@ -31,6 +30,7 @@ Item {
 
     property string buttonColor: "#C0C0C0";
     property string buttonBorderColor: "#CCCCCC";
+    property string borderColor2: "#a4a4a6";
 
     property string imagingToolsGradient1: "#e3e3e5";
     property string imagingToolsGradient2: "#d4d4d6";
@@ -58,13 +58,11 @@ Item {
     FontLoader{
         id: mainFont;
         source: "../../Fonts/Ubuntu-Light.ttf";
-//        source: "../Fonts/Times New Roman.ttf";
     }
 
     FontLoader{
         id: boldFont;
         source: "../../Fonts/Ubuntu-Medium.ttf";
-//        source: "../../Fonts/Ubuntu-Bold.ttf";
     }
 
 }
