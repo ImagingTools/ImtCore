@@ -106,17 +106,6 @@ Item {
             console.log("PackageView onClicked ", dataModelLocal.GetItemsCount())
             dataModelLocal.SetData("Id", newId, featureCollectionView.selectedIndex);//
             dataModelLocal.SetData("Name", newName, featureCollectionView.selectedIndex);
-
-
-//            for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
-//                 console.log(dataModelLocal.GetData("FeatureId", i), featureCollectionView.itemId);
-//                if (dataModelLocal.GetData("FeatureId", i) === featureCollectionView.itemId) {
-//                    console.log("PackageView onClicked ", dataModelLocal.GetData("FeatureId", i), newId)
-//                    dataModelLocal.SetData("FeatureId", newId, i);
-//                    dataModelLocal.SetData("FeatureName", newName, i);
-//                    break;
-//                }
-//            }
             featureCollectionView.model.SetData("data", dataModelLocal);
             featureCollectionView.refresh();
         }

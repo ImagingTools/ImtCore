@@ -35,10 +35,15 @@ Item {
         Component.onCompleted: {
             productCollectionView.gqlModelInfo = "ProductInfo"
             productCollectionView.gqlModelItems = "ProductList"
-            productCollectionView.gqlModelItems = "ProductRemove"
+            productCollectionView.gqlModelRemove = "ProductRemove"
         }
 
         onSelectItem: {
+            console.log("ProductCollectionView productCollectionView onSelectItem", itemId, name);
+            if (itemId === "") {
+                name = "New Product";
+            }
+
             multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/ProductView.qml", "ProductEdit")
         }
 

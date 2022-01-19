@@ -24,7 +24,13 @@ Rectangle {
     function dialogResult(parameters) {
          console.log(parameters["status"]);
         if (parameters["status"] === "yes") {
-            removeModel.updateModel();
+
+            var dataModelLocal = model.GetData("data");
+            dataModelLocal.RemoveItem(tableInternal.selectedIndex);
+
+            model.SetData("data", dataModelLocal);
+            model.Refresh();
+            collectionViewContainer.refresh();
         }
     }
 

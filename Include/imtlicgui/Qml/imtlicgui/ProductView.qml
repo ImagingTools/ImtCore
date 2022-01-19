@@ -9,11 +9,50 @@ Item {
     property alias model: productCollectionView.model;
 
     function menuActivated(menuId) {
-        productCollectionView.menuActivated(menuId)
+
+        if (menuId  === "New"){
+            var countItems = model.GetData("data").GetItemsCount();
+            var dataModelLocal = model.GetData("data");
+            var index = dataModelLocal.InsertNewItem();
+
+            dataModelLocal.SetData("Name", "Product Name", index);//
+            dataModelLocal.SetData("Id", "", index);//
+
+            model.SetData("data", dataModelLocal);
+            model.Refresh();
+            featureCollectionView.refresh();
+
+        }
+        else if (menuId  === "Save") {
+            //saveModel.updateModel()
+        } else {
+             productCollectionView.menuActivated(menuId)
+        }
     }
 
     function commandsChanged(commandsId){
-        productCollectionView.commandsChanged(commandsId);
+        if (commandsId !== "ProductEdit") {
+            return;
+        }
+
+        if (productCollectionView.selectedIndex > -1) {
+            docsDataDeleg.setModeMenuButton("Remove", "Active");
+            docsDataDeleg.setModeMenuButton("Edit", "Active");
+            docsDataDeleg.setModeMenuButton("Duplicate", "Active");
+            docsDataDeleg.setModeMenuButton("Import", "Active");
+            docsDataDeleg.setModeMenuButton("Export", "Active");
+            docsDataDeleg.setModeMenuButton("Save", "Active");
+            docsDataDeleg.setModeMenuButton("Close", "Active");
+        } else {
+            docsDataDeleg.setModeMenuButton("Remove", "Disabled");
+            docsDataDeleg.setModeMenuButton("Edit", "Disabled");
+            docsDataDeleg.setModeMenuButton("Duplicate", "Disabled");
+            docsDataDeleg.setModeMenuButton("Import", "Disabled");
+            docsDataDeleg.setModeMenuButton("Export", "Disabled");
+            docsDataDeleg.setModeMenuButton("Save", "Disabled");
+            docsDataDeleg.setModeMenuButton("Close", "Disabled");
+        }
+//        productCollectionView.commandsChanged(commandsId);
     }
 
     CollectionView {
