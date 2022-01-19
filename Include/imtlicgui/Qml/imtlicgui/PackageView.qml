@@ -106,6 +106,8 @@ Item {
             console.log("PackageView onClicked ", dataModelLocal.GetItemsCount())
             dataModelLocal.SetData("Id", newId, featureCollectionView.selectedIndex);//
             dataModelLocal.SetData("Name", newName, featureCollectionView.selectedIndex);
+
+
             featureCollectionView.model.SetData("data", dataModelLocal);
             featureCollectionView.refresh();
         }

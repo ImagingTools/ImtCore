@@ -34,8 +34,8 @@ Item {
         anchors.fill: parent;
         Component.onCompleted: {
             packageCollectionView.gqlModelInfo = "FeaturePackageInfo"
-            packageCollectionView.gqlModelItems = "FeaturePackageList"
-            packageCollectionView.gqlModelItems = "FeaturePackageRemove"
+            packageCollectionView.gqlModelItems = "FeaturePackageList";
+            packageCollectionView.gqlModelRemove = "FeaturePackageRemove";
             console.log("packageCollectionView onCompleted", packageCollectionView.gqlModelInfo)
         }
 

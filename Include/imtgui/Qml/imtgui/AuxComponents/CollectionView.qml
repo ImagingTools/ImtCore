@@ -23,6 +23,7 @@ Rectangle {
 
     function dialogResult(parameters) {
          console.log(parameters["status"]);
+
         if (parameters["status"] === "yes") {
 
             var dataModelLocal = model.GetData("data");
@@ -31,16 +32,12 @@ Rectangle {
             model.SetData("data", dataModelLocal);
             model.Refresh();
             collectionViewContainer.refresh();
+
+            if (gqlModelRemove === "FeaturePackageRemove") {
+                collectionViewContainer.removeSelectedItem();
+            }
         }
     }
-
-//    function getSelectedId(){
-//        return tableInternal.getSelectedId();
-//    }
-
-//    function getSelectedName(){
-//        return tableInternal.getSelectedName();
-//    }
 
     function refresh() {
         console.log("collectionViewContainer onModelChanged", collectionViewContainer.gqlModelInfo)
@@ -71,7 +68,6 @@ Rectangle {
     function menuActivated(menuId) {
         console.log("CollectionView menuActivated", menuId);
 
-        //console.log("CollectionView itemId ", itemId, "name", name);
         var itemId = tableInternal.getSelectedId();
         var name = tableInternal.getSelectedName();
 
