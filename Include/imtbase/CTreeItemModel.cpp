@@ -74,6 +74,7 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap &infoMap)
 		return false;
 	}
 
+	beginRemoveRows(QModelIndex(), index, index);
 	IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
 
 	changeSet.SetChangeInfo("operation", "remove item");
@@ -91,9 +92,7 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap &infoMap)
 	}
 
 	EndChanges(changeSet);
-
-//	beginRemoveRows(QModelIndex(this), index, index);
-//	endRemoveRows();
+	endRemoveRows();
 
 	return true;
 }
