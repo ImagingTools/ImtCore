@@ -24,19 +24,19 @@ Rectangle {
     signal removedItem(string itemId);
 
     function dialogResult(parameters) {
-         console.log(parameters["status"]);
+         console.log("CollectionView dialogResult", parameters["status"]);
 
         if (parameters["status"] === "yes") {
 
-            if (model.ContainsKey("data")) {
-                var dataModelLocal = model.GetData("data");
-                dataModelLocal.RemoveItem(tableInternal.selectedIndex);
+//            if (model.ContainsKey("data")) {
+//                var dataModelLocal = model.GetData("data");
+//                dataModelLocal.RemoveItem(tableInternal.selectedIndex);
 
-                model.SetData("data", dataModelLocal);
-                model.Refresh();
-            }
+//                model.SetData("data", dataModelLocal);
+//                model.Refresh();
+//            }
 
-            if (gqlModelRemove === "FeaturePackageRemove") {
+            if (gqlModelRemove !== "") {
                 collectionViewContainer.removeSelectedItem();
             }
             collectionViewContainer.refresh();
@@ -45,27 +45,37 @@ Rectangle {
 
     function refresh() {
         var isHeaderUpdated = false;
-        console.log("collectionViewContainer onModelChanged", collectionViewContainer.gqlModelInfo)
+        console.log("CollectionView refresh()", collectionViewContainer.gqlModelInfo)
         if (collectionViewContainer.model.ContainsKey("headers")){
+            console.log("CollectionView refresh key headers contains")
             var dataModelLocal = collectionViewContainer.model.GetData("headers");
             tableInternal.headers = dataModelLocal;
-            console.log("collectionViewContainer header count",tableInternal.headers.GetItemsCount())
         }
         else{
+            console.log("CollectionView refresh key headers not contains")
             headerInfoModel.updateModel()
             isHeaderUpdated = true
         }
 
         if (collectionViewContainer.model.ContainsKey("data")){
+            console.log("CollectionView refresh data contains", collectionViewContainer.autoRefresh)
             var dataModelLocal = collectionViewContainer.model.GetData("data");
             tableInternal.elements = 0;
             tableInternal.elements = dataModelLocal;
 
+            console.log("CollectionView refresh data items count", dataModelLocal.GetItemsCount());
+
             var selectedIndexLocal = collectionViewContainer.model.GetData("selectedIndex");
             tableInternal.selectedIndex = selectedIndexLocal;
-            console.log("collectionViewContainer data count",dataModelLocal.GetItemsCount())
+
+            if (collectionViewContainer.autoRefresh) {
+                itemsModel.updateModel();
+            }
+
+            //console.log("collectionViewContainer data count",dataModelLocal.GetItemsCount())
         }
         else if(!isHeaderUpdated){
+            console.log("CollectionView refresh data not contains")
              itemsModel.updateModel();
         }
     }
@@ -120,10 +130,10 @@ Rectangle {
         }
 
         onSelectedIndexChanged: {
-            console.log("collectionViewContainer.selectedIndex 1", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
+            console.log(" CollectionView AuxTable onSelectedIndexChanged", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
             collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
             collectionViewContainer.model.SetData("selectedIndex", tableInternal.selectedIndex);
-            console.log("collectionViewContainer.selectedIndex 2", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
+            //console.log("collectionViewContainer.selectedIndex 2", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
         }
     }
 
@@ -205,12 +215,11 @@ Rectangle {
                 var dataModelLocal = this.GetData("data");
                 if(dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
                     dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
-                    console.log("collectionViewContainer items 1", dataModelLocal);
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
                         tableInternal.elements = dataModelLocal.GetData("items");
-                        console.log("collectionViewContainer items 2", dataModelLocal);
 
                         if (!collectionViewContainer.autoRefresh) {
+                            console.log("CollectionView itemsModel onStateChanged update data");
                             collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements)
                         }
 

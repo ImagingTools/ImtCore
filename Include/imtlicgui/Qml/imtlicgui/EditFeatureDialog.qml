@@ -12,6 +12,8 @@ Rectangle {
     radius: 10;
     color: Style.backgroundColor;
     clip: true;
+
+    property Item resultItem;
     property string featureId;
     property string featureName;
     signal okClicked(string newId, string newName);
@@ -26,6 +28,19 @@ Rectangle {
             tfcFeatureIdText.text = key;
             console.log("EditFeatureDialog key has been generated!");
         }
+    }
+
+    function exit(status) {
+        var parameters  = {};
+        if (status === "ok") {
+
+            parameters["newFeatureId"] = tfcFeatureIdText.text;
+            parameters["newFeatureName"] = tfcFeatureNameText.text;
+
+            parameters["dialog"] = "EditFeature";
+        }
+        parameters["status"] = status;
+        container.resultItem.dialogResult(parameters);
     }
 
     Rectangle {
@@ -68,12 +83,14 @@ Rectangle {
            MouseArea {
                anchors.fill: parent;
                onClicked: {
-                   editFeatureDialog.visible = false;
+//                   editFeatureDialog.visible = false;
+
+                   container.exit("close");
+                   loaderDialog.closeItem();
                }
            }
         }
     }
-
 
     Rectangle {
         id: editFeatureDialogBody;
@@ -169,12 +186,10 @@ Rectangle {
                 hoverEnabled: enabled;
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
                 onClicked: {
-//                    if (tfcFeatureNameText.text !== container.featureName || tfcFeatureIdText.text !== container.featureId) {
-//                        container.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
-//                    }
                     container.generateKey();
                     container.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
-                    editFeatureDialog.visible = false;
+                    container.exit("ok");
+                    loaderDialog.closeItem();
                 }
             }
         }
@@ -205,7 +220,8 @@ Rectangle {
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
                 onClicked: {
-                    editFeatureDialog.visible = false;
+                    container.exit("cancel");
+                    loaderDialog.closeItem();
                 }
             }
         }

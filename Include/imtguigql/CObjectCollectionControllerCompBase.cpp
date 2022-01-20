@@ -144,7 +144,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		QByteArray objectId;
 		istd::IChangeable* newObject = CreateObject(inputParams, objectId, name, description, errorMessage);
 		if (newObject != nullptr){
-			newObjectId = m_objectCollectionCompPtr->InsertNewObject("",name,description, newObject);
+			newObjectId = m_objectCollectionCompPtr->InsertNewObject("",name,description, newObject, objectId);
 		}
 	}
 

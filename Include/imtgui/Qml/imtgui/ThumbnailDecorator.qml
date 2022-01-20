@@ -16,15 +16,8 @@ Rectangle
     color: Style.baseColor;
     property Item activeItem;
 
-    Component.onCompleted: {
-        var parameters = {};
-        parameters["message"] = "TEST";
-        parameters["nameDialog"] = "MessageDialog";
-        //thubnailDecoratorContainer.openDialog("AuxComponents/MessageDialog.qml", parameters);
-    }
-
     function updateModels() {
-        console.log("updateModels");
+        console.log("ThumbnailDecorator updateModels()");
         menuPanel.updateModels();
     }
 
@@ -42,12 +35,12 @@ Rectangle
         id: topPanel;
         title: menuPanel.activePageName;
         onMenuActivatedSignal: {
-            console.log("onMenuActivatedSignal1",menuId, thubnailDecoratorContainer.activeItem)
+            console.log("ThumbnailDecorator TopPanel onMenuActivatedSignal", menuId, thubnailDecoratorContainer.activeItem);
             thubnailDecoratorContainer.activeItem.menuActivated(menuId);
         }
 
         onCommandsChangedSignal: {
-            console.log("TopPanel onCommandsChangedSignal!", commandsId);
+            console.log("ThumbnailDecorator TopPanel onCommandsChangedSignal", commandsId);
             thubnailDecoratorContainer.activeItem.commandsChanged(commandsId);
         }
     }
@@ -59,10 +52,12 @@ Rectangle
         anchors.top: topPanel.bottom;
         anchors.bottom: parent.bottom;
         onPagesCountChanged: {
+            console.log("ThumbnailDecorator MenuPanel onPagesCountChanged", menuPanel.pagesCount);
             pagesData.model = menuPanel.pagesCount
         }
 
         onActivePageIdChanged: {
+            console.log("ThumbnailDecorator MenuPanel onActivePageIdChanged");
             if (thubnailDecoratorContainer.activeItem){
                 thubnailDecoratorContainer.activeItem.updateCommandId();
             }
@@ -84,21 +79,20 @@ Rectangle
             color: "transparent";
             visible: menuPanel.activePageIndex === model.index;
             onVisibleChanged: {
-                console.log("thubnailDecoratorContainer.activeItem", loader.item, menuPanel.activePageIndex, model.index);
+                console.log("ThumbnailDecorator Repeater onVisibleChanged", loader.item, menuPanel.activePageIndex, model.index)
                 if(pagesDeleg.visible){
-                    console.log("visible", loader.item);
                     thubnailDecoratorContainer.activeItem = loader.item;
                     loader.item.visible = pagesDeleg.visible;
                 }
             }
 
             function changeCommandsId(commandsId) {
-                console.log("pagesDeleg changeCommandsId", topPanel.activeCommandsModelId , commandsId)
+                console.log("ThumbnailDecorator Repeater changeCommandsId", topPanel.activeCommandsModelId , commandsId)
                 topPanel.activeCommandsModelId = commandsId
             }
 
             function setModeMenuButton(commandId, mode) {
-                console.log("ThumbnailDecorator setModeMenuButton!", commandId, mode);
+                console.log("ThumbnailDecorator Repeater setModeMenuButton", commandId, mode)
                 topPanel.setModeMenuButton(commandId, mode);
             }
 
@@ -111,6 +105,7 @@ Rectangle
                     console.log("ThumbnailDecorator loader.source", loader.source);
                 }
                 onItemChanged: {
+                    console.log("ThumbnailDecorator Repeater Loader onItemChanged", loader.item)
                     if (loader.item){
                         loader.item.firstElementImageSource =  menuPanel.model.GetData(PageEnum.ICON, model.index);
                     }
@@ -120,16 +115,6 @@ Rectangle
         }
     }
 
-
-//    ContactInfoEditor {
-//        id: contactInfoEditor;
-//        anchors.left: menuPanel.right;
-//      //  width: tabPanel.width/4*3;
-//        anchors.top: tabPanel.bottom;
-//        anchors.bottom: parent.bottom;
-//    }
-
-
 //    TreeView {
 //        id: treeView;
 //        width: 200;
@@ -138,32 +123,9 @@ Rectangle
 //        anchors.right: parent.right;
 //    }
 
-//    Rectangle {
-//        id: darkBackground;
-//        anchors.fill: parent;
-//        color: "gray";
-//        opacity: 0.8;
-//        visible: preference.visible;
-//        z: 100;
-
-//        MouseArea {
-//            anchors.fill: parent;
-//        }
-//    }
-
     Loader {
         id: dialogLoader;
     }
-
-//    Preference {
-//        id: preference;
-//        visible: false;
-//        width: parent.width > 500 ? 500 : parent.width * 0.9;
-//        height: parent.height > 450 ? 450 : parent.height * 0.9;
-//        anchors.horizontalCenter: parent.horizontalCenter;
-//        anchors.verticalCenter: parent.verticalCenter;
-//        z: 110;
-//    }
 
     ListView {
         id: listViewDialogs;
@@ -209,9 +171,6 @@ Rectangle
 
                   onItemChanged: {
                       console.log("ThumbnailDecorator loader onItemChanged!");
-//                      loaderDialog.width = loaderDialog.item.width;
-//                      loaderDialog.height = loaderDialog.item.height;
-
                       for (var key in model.parameters) {
                           console.log(key, model.parameters[key]);
                           loaderDialog.item[key]  = model.parameters[key];

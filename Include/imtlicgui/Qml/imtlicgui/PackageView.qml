@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
+//import imtlicgui 1.0
 
 Item {
     id: featureCollectionViewContainer;
@@ -15,21 +16,46 @@ Item {
     }
 
     function refresh() {
+        console.log("PackageView refresh()");
         featureCollectionView.refresh();
     }
 
     function dialogResult(parameters) {
-         console.log(parameters["status"]);
+         console.log("PackageView dialogResult", parameters["status"]);
 
         if (parameters["status"] === "ok") {
-            var value = parameters["value"];
-            console.log("featureCollectionViewContainer dialogResult", value);
 
-            saveModel.updateModel(value);
+            if (parameters["dialog"] === "EditFeature") {
+                var dataModelLocal = featureCollectionView.model.GetData("data");
+                console.log("PackageView onClicked ", dataModelLocal.GetItemsCount())
+                dataModelLocal.SetData("Id", parameters["newFeatureId"] , featureCollectionView.selectedIndex);//
+                dataModelLocal.SetData("Name", parameters["newFeatureName"], featureCollectionView.selectedIndex);
+
+                featureCollectionView.model.SetData("data", dataModelLocal);
+                featureCollectionView.refresh();
+            }
+            else if (parameters["dialog"] === "InputDialog") {
+                var value = parameters["value"];
+                console.log("featureCollectionViewContainer dialogResult", value);
+
+                saveModel.updateModel(value);
+            }
+        }
+        else if (parameters["status"] === "yes") {
+
+            if (featureCollectionView.model.ContainsKey("data")) {
+                var dataModelLocal = featureCollectionView.model.GetData("data");
+                dataModelLocal.RemoveItem(featureCollectionView.table.selectedIndex);
+
+                featureCollectionView.model.SetData("data", dataModelLocal);
+                featureCollectionView.model.Refresh();
+                featureCollectionView.refresh();
+            }
         }
     }
 
     function menuActivated(menuId) {
+        console.log("PackageView menuActivated", menuId);
         if (menuId  === "New"){
             //var countItems = model.GetData("data").GetItemsCount();
 
@@ -48,8 +74,8 @@ Item {
             if (featureCollectionView.itemId == "") {
                 var source = "AuxComponents/InputDialog.qml";
                 var parameters = {};
-                parameters["message"] = "Enter name";
-                parameters["nameDialog"] = "Input name";
+                parameters["message"] = "Please enter the name of the document: ";
+                parameters["nameDialog"] = "Document Name";
                 parameters["resultItem"] = featureCollectionViewContainer;
                 thubnailDecoratorContainer.openDialog(source, parameters);
             }
@@ -63,7 +89,7 @@ Item {
             var parameters = {};
             parameters["message"] = "Remove selected file from the database ?";
             parameters["nameDialog"] = "RemoveDialog";
-            parameters["resultItem"] = collectionViewContainer;
+            parameters["resultItem"] = featureCollectionViewContainer;
 
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
@@ -73,6 +99,7 @@ Item {
     }
 
     function commandsChanged(commandsId){
+        console.log("PackageView commandsChanged", commandsId);
         if (commandsId !== "PackageEdit") {
             return;
         }
@@ -108,7 +135,7 @@ Item {
             console.log("PackageView CollectionView onCompleted");
             featureCollectionView.gqlModelInfo = "PackageInfo"
             featureCollectionView.gqlModelItems = "FeatureList"
-            featureCollectionView.gqlModelRemove = "FeatureRemove";
+            featureCollectionView.gqlModelRemove = "";
         }
 
         onItemIdChanged: {
@@ -116,58 +143,27 @@ Item {
             if (featureCollectionView.itemId){
                 featureCollectionView.gqlModelInfo = "PackageInfo"
                 featureCollectionView.gqlModelItems = "FeatureList"
-                featureCollectionView.gqlModelRemove = "FeatureRemove";
+                featureCollectionView.gqlModelRemove = "";
             }
         }
 
         onSelectItem: {
             console.log("PackageView CollectionView onSelectItem", itemId, name);
-            editFeatureDialog.visible = true;
-            editFeatureDialog.featureId = itemId;
-            editFeatureDialog.featureName = name;
-            console.log("featureCollectionView.itemId", featureCollectionView.itemId);
-            console.log("featureCollectionView.itemName", featureCollectionView.itemName);
+
+            var source = "../imtlicgui/EditFeatureDialog.qml";
+            var parameters = {};
+            parameters["featureId"] = itemId;
+            parameters["featureName"] = name;
+            parameters["resultItem"] = featureCollectionViewContainer;
+
+            thubnailDecoratorContainer.openDialog(source, parameters);
         }
 
         onSelectedIndexChanged: {
-            console.log("featurePackageCollectionView onSelectedIndexChanged", featureCollectionView.selectedIndex);
+            console.log("PackageView CollectionView onSelectedIndexChanged", featureCollectionView.selectedIndex);
             if (featureCollectionView.selectedIndex > -1){
                 featureCollectionViewContainer.commandsChanged("PackageEdit")
             }
-        }
-    }
-
-    MouseArea {
-        id: maPackageView;
-        anchors.fill: parent;
-        visible: editFeatureDialog.visible;
-    }
-
-    EditFeatureDialog {
-        id: editFeatureDialog;
-        visible: false;
-
-        anchors.verticalCenter: featureCollectionViewContainer.verticalCenter;
-        anchors.horizontalCenter: featureCollectionViewContainer.horizontalCenter;
-
-        onOkClicked: {
-            var dataModelLocal = featureCollectionView.model.GetData("data");
-            console.log("PackageView onClicked ", dataModelLocal.GetItemsCount())
-            dataModelLocal.SetData("Id", newId, featureCollectionView.selectedIndex);//
-            dataModelLocal.SetData("Name", newName, featureCollectionView.selectedIndex);
-
-
-//            for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
-//                 console.log(dataModelLocal.GetData("FeatureId", i), featureCollectionView.itemId);
-//                if (dataModelLocal.GetData("FeatureId", i) === featureCollectionView.itemId) {
-//                    console.log("PackageView onClicked ", dataModelLocal.GetData("FeatureId", i), newId)
-//                    dataModelLocal.SetData("FeatureId", newId, i);
-//                    dataModelLocal.SetData("FeatureName", newName, i);
-//                    break;
-//                }
-//            }
-            featureCollectionView.model.SetData("data", dataModelLocal);
-            featureCollectionView.refresh();
         }
     }
 
@@ -193,7 +189,8 @@ Item {
             }
             query.AddParam(inputParams);
 
-            if (newId !== "") {
+            if (newId !== undefined && newId !== "") {
+                //console.log();
                 featureCollectionViewContainer.itemId = newId;
                 featureCollectionViewContainer.itemName = newId;
             }

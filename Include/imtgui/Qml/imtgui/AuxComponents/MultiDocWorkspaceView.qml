@@ -16,23 +16,28 @@ Rectangle {
     property var pagesItems: [];
     property alias pagesCount: docsData.count;
 
+    onActiveItemChanged: {
+
+    }
+
     function menuActivated(menuId){
         multiDocView.activeItem.menuActivated(menuId);
     }
 
     function updateCommandId(){
+        console.log("MultidocWorkspaceView updateCommandId")
         var commandsId = pages.GetData("CommandsId", tabPanelInternal.selectedIndex);
         var itemId = pages.GetData("ItemId", tabPanelInternal.selectedIndex);
-        console.log("multiDocView tabPanel onSelectedIndexChanged commandsId = ", commandsId, " itemId = ", itemId, " selectedIndex = ", tabPanelInternal.selectedIndex)
         pagesDeleg.changeCommandsId(commandsId);
     }
 
     function commandsChanged(commandsId){
+        console.log("MultidocWorkspaceView commandsChanged")
         multiDocView.activeItem.commandsChanged(commandsId);
     }
 
     function addToHeadersArray(itemId, title, source, commandsId){
-        console.log("MultidicWorkspaceView addToHeadersArray", title, source, itemId, commandsId)
+        console.log("MultidocWorkspaceView addToHeadersArray", title, source, itemId, commandsId)
         var index = pages.InsertNewItem();
         console.log("MultidicWorkspaceView addToHeadersArray index", index);
         pages.SetData("ItemId", itemId, index);
@@ -60,7 +65,7 @@ Rectangle {
         model: pages;
 
         onCloseItem: {
-            console.log("tabPanelInternal onCloseItem", index)
+            console.log("MultiDocWorkspaceView TabPanel onCloseItem", index)
             pages.RemoveItem(index)
             if (tabPanelInternal.selectedIndex >= index){
                 tabPanelInternal.selectedIndex--;
@@ -69,8 +74,12 @@ Rectangle {
         }
 
         onSelectedIndexChanged: {
+            console.log("MultiDocWorkspaceView TabPanel onSelectedIndexChanged", tabPanelInternal.selectedIndex);
             multiDocView.updateCommandId();
-            multiDocView.activeItem.refresh();
+
+            //Нужно делать не activeItem refresh а collectionView refresh, activeItem это PachageView, а нужно обновить PackageСollectionView
+//            multiDocView.activeItem.refresh();
+//            loader.item.refresh();
         }
     }
 
@@ -93,18 +102,19 @@ Rectangle {
 //            visible: false;
             visible: tabPanelInternal.selectedIndex === model.index;
             onVisibleChanged: {
-                console.log("MultiDocView onVisibleChanged", this.visible);
+                console.log("MultiDocView ListView onVisibleChanged", this.visible);
                 if(this.visible){
                     multiDocView.activeItem = loader.item;
+                    multiDocView.activeItem.refresh();
                 }
             }
 
             Component.onCompleted: {
-                console.log("tabPanelInternal.selectedIndex", tabPanelInternal.selectedIndex);
-                console.log("model.index", model.index);
+                console.log("MultiDocView ListView onCompleted", tabPanelInternal.selectedIndex);
             }
 
             function setModeMenuButton(commandId, mode){
+                console.log("MultiDocView ListView setModeMenuButton", commandId, mode);
                 pagesDeleg.setModeMenuButton(commandId, mode);
             }
 
@@ -112,15 +122,15 @@ Rectangle {
                 id: loader;
                 anchors.fill: parent;
                 Component.onCompleted: {
-                    console.log("MultidocWorkspaceView model index ",model.index)
+                    console.log("MultidocWorkspaceView model index ", model.Source)
                     loader.source = model.Source
 //                    docsDataDeleg.visible = tabPanelInternal.selectedIndex === model.index;
                     console.log("MultidocWorkspaceView source",loader.source)
                 }
                 onItemChanged: {
+                    console.log("MultidocWorkspaceView Loader onItemChanged", loader.source)
                     if (loader.item && loader.source != ""){
                         loader.item.itemId = model.ItemId
-                        //loader.item.itemName = model.Title
                         var dataModelLocal
                         if (pages.ContainsKey("DocsData",model.index)){
                             dataModelLocal = pages.GetData("DocsData",model.index);
@@ -129,11 +139,12 @@ Rectangle {
                             dataModelLocal = pages.AddTreeModel("DocsData",model.index)
                             console.log("MultidocWorkspaceView onItemChanged", dataModelLocal)
                         }
-                        console.log("MultidocWorkspaceView onItemChanged", loader.source)
-                        if (tabPanelInternal.selectedIndex === model.index)
+                        console.log("MultidocWorkspaceView Loader onItemChanged", loader.source)
+
+                        if (tabPanelInternal.selectedIndex === model.index) {
                             multiDocView.activeItem = loader.item;
+                        }
                         loader.item.model = dataModelLocal
-                        //loader.item.itemId = pages.GetData("ItemId", tabPanelInternal.selectedIndex);
 
                     }
                 }

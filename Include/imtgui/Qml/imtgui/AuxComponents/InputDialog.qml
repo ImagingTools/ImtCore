@@ -8,8 +8,8 @@ Rectangle {
     id: container;
     anchors.centerIn: parent;
 
-    width: 350;
-    height: 150;
+    width: 300;
+    height: 160;
 
     color: Style.backgroundColor;
     clip: true;
@@ -31,6 +31,7 @@ Rectangle {
         var parameters  = {};
         parameters["status"] = status;
         parameters["value"] = value;
+        parameters["dialog"] = "InputDialog";
         container.resultItem.dialogResult(parameters);
     }
 
@@ -40,6 +41,7 @@ Rectangle {
         height: 40;
         border.color: container.color;
         color: Style.baseColor;
+        radius: container.radius;
 
         Image {
             id: iconDialog;
@@ -88,31 +90,41 @@ Rectangle {
         width: container.width;
         height: container.height - inputDialogTopPanel.height;
 
-        Text {
-            id: mainTextRemoveDialog;
-            color: Style.textColor;
-            font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
-            text: container.message;
+        Rectangle {
+            id: rectText;
+            height: 30;
+            width: dialogBody.width - 20;
+            anchors.horizontalCenter: dialogBody.horizontalCenter;
+//            anchors.topMargin: 10;
+            color: "transparent";
+            Text {
+                id: mainTextRemoveDialog;
+                anchors.fill: parent;
+                anchors.verticalCenter: dialogBody.verticalCenter;
+                anchors.topMargin: 10;
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+                text: container.message;
+            }
         }
-
 
         TextFieldCustom {
             id: tfcInputDialog;
-            anchors.top: mainTextRemoveDialog.bottom;
+            anchors.top: rectText.bottom;
             anchors.topMargin: 5;
             anchors.horizontalCenter: dialogBody.horizontalCenter;
 
             width: dialogBody.width - 20;
-            height: 23;
+            height: 30;
         }
 
         Rectangle {
             id: okButton;
             anchors.bottom: dialogBody.bottom;
-            anchors.bottomMargin: 20;
+            anchors.bottomMargin: 10;
             anchors.right: cancelButton.left;
-            anchors.rightMargin: 15;
+            anchors.rightMargin: 10;
             width: 70;
             height: 25;
             color: Style.backgroundColor;
@@ -148,8 +160,8 @@ Rectangle {
             border.color: cancelButtonMa.containsMouse ? Style.iconColorOnSelected : Style.theme === "Light" ? "#d0d0d2" : "#3a3b3b" ;
             anchors.bottom: dialogBody.bottom;
             anchors.right: dialogBody.right;
-            anchors.bottomMargin: 20;
-            anchors.rightMargin: 15;
+            anchors.bottomMargin: 10;
+            anchors.rightMargin: 10;
 
             visible: container.cancelButtonVisible;
 
