@@ -11,6 +11,10 @@ Item {
     property alias itemName: featureCollectionView.itemName;
     property alias model: featureCollectionView.model;
 
+    Component.onCompleted: {
+        console.log("PackageView onCompleted", featureCollectionView.selectedIndex);
+    }
+
     onItemIdChanged: {
         console.log("PackageView onItemIdChanged", featureCollectionViewContainer.itemId)
     }
@@ -37,7 +41,7 @@ Item {
             else if (parameters["dialog"] === "InputDialog") {
                 var value = parameters["value"];
                 console.log("featureCollectionViewContainer dialogResult", value);
-
+                docsDataDeleg.updateTitleTab(value);
                 saveModel.updateModel(value);
             }
         }
@@ -93,6 +97,10 @@ Item {
 
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
+        else if (menuId  === "Close") {
+            docsDataDeleg.closeTab();
+           //thubnailDecoratorContainer.openDialog(source, parameters);
+        }
         else {
            featureCollectionView.menuActivated(menuId)
         }
@@ -105,19 +113,19 @@ Item {
         }
 
         if (featureCollectionView.selectedIndex > -1) {
-            docsDataDeleg.setModeMenuButton("Remove", "Active");
-            docsDataDeleg.setModeMenuButton("Edit", "Active");
-            docsDataDeleg.setModeMenuButton("Import", "Active");
-            docsDataDeleg.setModeMenuButton("Export", "Active");
-            docsDataDeleg.setModeMenuButton("Save", "Active");
-            docsDataDeleg.setModeMenuButton("Close", "Active");
+            docsDataDeleg.setModeMenuButton("Remove", "Normal");
+            docsDataDeleg.setModeMenuButton("Edit", "Normal");
+            docsDataDeleg.setModeMenuButton("Import", "Normal");
+            docsDataDeleg.setModeMenuButton("Export", "Normal");
+            docsDataDeleg.setModeMenuButton("Save", "Normal");
+            docsDataDeleg.setModeMenuButton("Close", "Normal");
         } else {
             docsDataDeleg.setModeMenuButton("Remove", "Disabled");
             docsDataDeleg.setModeMenuButton("Edit", "Disabled");
-            docsDataDeleg.setModeMenuButton("Import", "Disabled");
+            //docsDataDeleg.setModeMenuButton("Import", "Disabled");
             docsDataDeleg.setModeMenuButton("Export", "Disabled");
             docsDataDeleg.setModeMenuButton("Save", "Disabled");
-            docsDataDeleg.setModeMenuButton("Close", "Disabled");
+            //docsDataDeleg.setModeMenuButton("Close", "Disabled");
         }
     }
 

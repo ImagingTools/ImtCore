@@ -22,7 +22,8 @@ Rectangle{
         anchors.left: parent.left;
         anchors.right: parent.right;
         height: 2;
-        color: "#FF4500";
+//        color: "#FF4500";
+        color: Style.iconColorOnSelected;
         visible: selected;
     }
 

@@ -78,7 +78,7 @@ Item {
         anchors.bottom: parent.bottom;
         clip: true;
         spacing: 0;
-        interactive: false;
+        boundsBehavior: Flickable.StopAtBounds;
         delegate: TableDelegate {
             id: tableDelegate;
             width: elementsList.width;

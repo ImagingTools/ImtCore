@@ -291,16 +291,22 @@ Rectangle {
         Style.baseColor = container.getThemeColor("ActiveColors", "Base", themeType);
         Style.backgroundColor = container.getThemeColor("ActiveColors", "Background", themeType);
         Style.textColor = container.getThemeColor("ActiveColors", "Text", themeType);
-        console.log("Style.textColor ", Style.textColor);
+        Style.textSelected = container.getThemeColor("ActiveColors", "TextSelectedBackground", themeType);
+        console.log("Style.textSelected ", Style.textSelected);
         Style.selectedColor = container.getThemeColor("ActiveColors", "ItemSelected", themeType);
         Style.buttonColor = container.getThemeColor("ActiveColors", "HeaderBorder", themeType);
         Style.buttonBorderColor = container.getThemeColor("ActiveColors", "ButtonBorder", themeType);
+
+        Style.hover = container.getThemeColor("ActiveColors", "Hover", themeType);
+
         Style.imagingToolsGradient1 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient1");
         Style.imagingToolsGradient2 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient2");
         Style.imagingToolsGradient3 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient3");
         Style.imagingToolsGradient4 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient4");
 
         Style.iconColorOnSelected = container.getThemeColor("IconColor", "OnSelected", themeType);
+
+
     }
 
     GqlModel {
@@ -319,6 +325,7 @@ Rectangle {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
+            console.log("Preference GqlModel getStyle query ", gqlData);
             this.SetGqlQuery(gqlData);
         }
 

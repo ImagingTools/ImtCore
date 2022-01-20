@@ -38,6 +38,7 @@ Rectangle {
 
     function addToHeadersArray(itemId, title, source, commandsId){
         console.log("MultidocWorkspaceView addToHeadersArray", title, source, itemId, commandsId)
+        multiDocView.activeItem = null
         var index = pages.InsertNewItem();
         console.log("MultidicWorkspaceView addToHeadersArray index", index);
         pages.SetData("ItemId", itemId, index);
@@ -47,6 +48,13 @@ Rectangle {
        // pagesDeleg.changeCommandsId(commandsId);//???
         tabPanelInternal.selectedIndex = pages.GetItemsCount() - 1;
 //        pages.Refresh();
+    }
+
+    function closeTab(index) {
+        pages.RemoveItem(index)
+        if (tabPanelInternal.selectedIndex >= index){
+            tabPanelInternal.selectedIndex--;
+        }
     }
 
     Component.onCompleted: {
@@ -66,20 +74,17 @@ Rectangle {
 
         onCloseItem: {
             console.log("MultiDocWorkspaceView TabPanel onCloseItem", index)
-            pages.RemoveItem(index)
-            if (tabPanelInternal.selectedIndex >= index){
-                tabPanelInternal.selectedIndex--;
-            }
-//            pages.Refresh()
+            multiDocView.closeTab(index);
+//            pages.RemoveItem(index)
+//            if (tabPanelInternal.selectedIndex >= index){
+//                tabPanelInternal.selectedIndex--;
+//            }
         }
 
         onSelectedIndexChanged: {
             console.log("MultiDocWorkspaceView TabPanel onSelectedIndexChanged", tabPanelInternal.selectedIndex);
-            multiDocView.updateCommandId();
-
-            //Нужно делать не activeItem refresh а collectionView refresh, activeItem это PachageView, а нужно обновить PackageСollectionView
-//            multiDocView.activeItem.refresh();
-//            loader.item.refresh();
+            if(multiDocView.activeItem)
+                multiDocView.updateCommandId();
         }
     }
 
@@ -118,6 +123,15 @@ Rectangle {
                 pagesDeleg.setModeMenuButton(commandId, mode);
             }
 
+            function updateTitleTab(name) {
+                console.log("MultiDocView ListView updateTitleTab", name);
+                tabPanelInternal.updateTitleTab(tabPanelInternal.selectedIndex, name);
+            }
+
+            function closeTab() {
+                multiDocView.closeTab(tabPanelInternal.selectedIndex);
+            }
+
             Loader {
                 id: loader;
                 anchors.fill: parent;
@@ -143,6 +157,7 @@ Rectangle {
 
                         if (tabPanelInternal.selectedIndex === model.index) {
                             multiDocView.activeItem = loader.item;
+                            multiDocView.updateCommandId();
                         }
                         loader.item.model = dataModelLocal
 

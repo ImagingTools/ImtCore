@@ -25,7 +25,7 @@ Rectangle {
     ListView {
         id: lvPages;
         anchors.fill: parent;
-        interactive: false;
+        boundsBehavior: Flickable.StopAtBounds;
         delegate:  MenuPanelButton{
             width: menuPanel.width;
             height: width * 0.88;

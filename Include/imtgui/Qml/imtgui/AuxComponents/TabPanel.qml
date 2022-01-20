@@ -20,7 +20,6 @@ Rectangle {
         tabPanelContainer.firstElementImageSource = source;
     }
 
-
     function clearHeadersArray(){
         while(tabPanelContainer.headersArray.length > 0)
             tabPanelContainer.headersArray.pop();
@@ -33,6 +32,19 @@ Rectangle {
         tabPanelContainer.selectedIndex = tabPanelContainer.headersArray.length - 1
     }
 
+    function updateTitleTab(index, title) {
+        console.log("TabPanel updateTitleTab", index, title);
+        if (index < 0 || index > list.model.count) {
+            return;
+        }
+
+        tabPanelContainer.model.SetData("Title", title, index);
+        //tabPanelContainer.model.Refresh();
+//        var tab = list.model.get(index);
+//        tab.text = title;
+//        list.model.set(index, tab);
+    }
+
     ListView{
         id: list;
         anchors.fill: parent;
@@ -41,12 +53,13 @@ Rectangle {
 
         spacing: 0;
         model: 4;
-        interactive: false;
+
+        boundsBehavior: Flickable.StopAtBounds;
         delegate: TabDelegate{
             height: list.height;
             width: 200;
-            selected: model.index == tabPanelContainer.selectedIndex;
-            firstElement: model.index == 0;
+            selected: model.index === tabPanelContainer.selectedIndex;
+            firstElement: model.index === 0;
             firstElementText: tabPanelContainer.firstElementName;
             firstElementImageSource: tabPanelContainer.firstElementImageSource;
             text: model.Title;
@@ -60,5 +73,32 @@ Rectangle {
             }
 
         }
+    }
+
+    Rectangle {
+        anchors.right: externButtons.left;
+
+        height: parent.height;
+        width: parent.height;
+        visible: externButtons.visible;
+        rotation: 270;
+
+        gradient: Gradient {
+                 GradientStop { position: 0.0; color: "#00ffffff"; }
+//                 GradientStop { position: 0.5; color: Style.imagingToolsGradient1; }
+                 GradientStop { position: 1.0; color: Style.imagingToolsGradient1; }
+             }
+
+    }
+
+    Rectangle {
+        id: externButtons;
+        height: parent.height;
+        width: height * 0.7;
+        color: "white";
+
+        anchors.right: parent.right;
+
+        visible: list.contentWidth > tabPanelContainer.width;
     }
 }

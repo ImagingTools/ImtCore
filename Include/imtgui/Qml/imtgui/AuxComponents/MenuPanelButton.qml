@@ -7,7 +7,7 @@ Item {
     height: 64;
     property string text: "Test";
     property string imageSource: "../Icons/FeaturePackage.svg";
-    property string selectionColor: "#00BFFF";
+//    property string selectionColor: "#00BFFF";
     property string textColor: "#335777";//"#191970"
     property string fontName: "";
     property bool enabled:  true;

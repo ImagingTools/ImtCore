@@ -25,8 +25,8 @@ Item {
         }
         console.log("packageCollectionView.selectedIndex", packageCollectionView.selectedIndex);
         if (packageCollectionView.selectedIndex > -1) {
-            docsDataDeleg.setModeMenuButton("Remove", "Active");
-            docsDataDeleg.setModeMenuButton("Edit", "Active");
+            docsDataDeleg.setModeMenuButton("Remove", "Normal");
+            docsDataDeleg.setModeMenuButton("Edit", "Normal");
         } else {
             docsDataDeleg.setModeMenuButton("Remove", "Disabled");
             docsDataDeleg.setModeMenuButton("Edit", "Disabled");

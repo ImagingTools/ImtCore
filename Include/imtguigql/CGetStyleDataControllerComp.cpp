@@ -57,13 +57,13 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgq
 		dataModelPtr->SetData("theme", theme);
 
 		QString pathToTheme;
-		if (theme == "Dark") {
+		if (theme == "Dark"){
 			pathToTheme = ":/dark.theme";
-		} else {
+		} else{
 			pathToTheme = ":/light.theme";
 		}
 		QFile resource(pathToTheme);
-		if (resource.open(QIODevice::ReadOnly)) {
+		if (resource.open(QIODevice::ReadOnly)){
 			QByteArray resources = resource.readAll();
 			sourceModelPtr = new imtbase::CTreeItemModel();
 			sourceModelPtr->Parse(resources);

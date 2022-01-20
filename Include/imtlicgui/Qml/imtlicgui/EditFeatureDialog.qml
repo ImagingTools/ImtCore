@@ -13,11 +13,24 @@ Rectangle {
     color: Style.backgroundColor;
     clip: true;
 
+//    focus: true;
+
     property Item resultItem;
     property string featureId;
     property string featureName;
     signal okClicked(string newId, string newName);
     signal cancelClicked();
+
+    Component.onCompleted: {
+        tfcFeatureNameText.forceActiveFocus();
+    }
+
+    Keys.onPressed: {
+        console.log("EditFeatureDialog Keys.onPressed", event.key);
+        if (event.key === Qt.Key_Tab) {
+            console.log("event.key tab", event.key);
+        }
+    }
 
 
     function generateKey() {
@@ -79,16 +92,12 @@ Rectangle {
             anchors.rightMargin: 15;
             width: 15;
             height: 15;
-            iconSource: "../../../" + "Icons/" + "Light" + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
-           MouseArea {
-               anchors.fill: parent;
-               onClicked: {
-//                   editFeatureDialog.visible = false;
+            iconSource: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
 
-                   container.exit("close");
-                   loaderDialog.closeItem();
-               }
-           }
+            onClicked: {
+                container.exit("close");
+                loaderDialog.closeItem();
+            }
         }
     }
 
@@ -122,6 +131,7 @@ Rectangle {
                 width: tfcFeatureName.width - 22;
                 height: 23;
                 text: container.featureName;
+                focus: true;
                 anchors.horizontalCenter: tfcFeatureName.horizontalCenter;
                 anchors.verticalCenter: tfcFeatureName.verticalCenter;
             }

@@ -38,7 +38,7 @@ imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(const QL
 				treeModel->SetData(CommandEnum::ICON, m_commandDefaultStatusIcon[i], i);
 			}
 			if (fields[indexField] == CommandEnum::MODE){
-				treeModel->SetData(CommandEnum::MODE, "Active", i);
+				treeModel->SetData(CommandEnum::MODE, "Normal", i);
 			}
 		}
 	}

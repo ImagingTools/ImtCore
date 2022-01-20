@@ -95,8 +95,9 @@ Rectangle {
             delegate: TopButton {
                 text: model[CommandEnum.NAME];
                 isEmpty: model[CommandEnum.NAME] === "";
-                imageSource: "../../../" + "Icons/" + Style.theme + "/" + model[CommandEnum.ICON] + "_" + "On" + "_" + model["Mode"] + ".svg";
+                imageSource: "../../../" + "Icons/" + Style.theme + "/" + model[CommandEnum.ICON] + "_" + "Off" + "_" + model["Mode"] + ".svg";
                 fontName: Style.fontFamily;
+                checkable: model["Mode"] === "Normal";
                 onClicked: {
                     console.log("TopPanel menuActivited", model[CommandEnum.ID])
                     topPanel.menuActivatedSignal(model.Id);

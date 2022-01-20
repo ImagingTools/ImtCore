@@ -8,7 +8,7 @@ Item {
 
     signal accepted();
 
-    property string focusColor: "blue";
+    property string focusColor: Style.textSelected;
     property bool enabled:  true;
 
     property alias text: textField.text;
@@ -57,6 +57,8 @@ Item {
         focus: false;
         text: "";
         verticalAlignment: TextInput.AlignVCenter;
+        selectByMouse: true;
+        selectionColor: Style.textSelected;
         onFocusChanged: {
             container.focusChanged();
         }
@@ -91,7 +93,7 @@ Item {
         Behavior on width {
             NumberAnimation { duration: container.animDuration;}
         }
-        color: focusColor;
+        color: container.focusColor;
     }
 
 }

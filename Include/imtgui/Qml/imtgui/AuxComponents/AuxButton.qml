@@ -7,8 +7,12 @@ Rectangle {
     radius: container.height * 0.15;
     property bool highlighted: ma.containsMouse;
 
-    color: container.highlighted ? Style.baseColor : "transparent";
-    border.color: container.highlighted ? "gray" : "transparent";
+    property bool hasIcon: container.iconSource !== "";
+
+    color: container.highlighted ? Style.hover : "transparent";
+
+    property string textButton;
+  //  border.color: container.highlighted ? "gray" : "transparent";
     signal clicked;
 
 
@@ -19,6 +23,18 @@ Rectangle {
         width: container.height;
         sourceSize.width: width;
         sourceSize.height: height;
+
+        visible: container.hasIcon;
+    }
+
+    Text {
+        id: text;
+        anchors.centerIn: parent;
+
+        color: Style.textColor;
+        font.pixelSize: Style.fontSize_common;
+        font.family: Style.fontFamily;
+        text: container.textButton;
     }
 
     MouseArea {

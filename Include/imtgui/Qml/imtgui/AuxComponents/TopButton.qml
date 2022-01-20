@@ -61,7 +61,8 @@ Item {
         height: 4;
         width: button.width/1.8;
         color: "#00FF00";
-        visible: container.checkable ? container.isChecked : container.highlighted;
+        //visible: container.checkable ? container.isChecked : container.highlighted;
+        visible: container.checkable && container.highlighted;
     }
 
 
@@ -73,25 +74,20 @@ Item {
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
         onClicked: {
             console.log("onClicked")
-//            if (container.enabled) {
-//                return;
-//            }
-
-            container.clicked();
+            if (container.checkable) {
+                container.clicked();
+            }
         }
         onPressed: {
             console.log("onPressed")
+            container.highlighted = container.checkable;
             container.scale = 0.985;
-            if(!container.checkable)
-                container.highlighted = true;
-            else
-                container.checked();
         }
+
         onReleased: {
             console.log("onReleased")
             container.scale = 1;
-            if(!container.checkable)
-                container.highlighted = false;
+            container.highlighted = false;
         }
 
     }

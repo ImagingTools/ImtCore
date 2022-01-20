@@ -5,6 +5,7 @@
 		"LightGray 2": "#CCCCCC",
 		"LightGray 3": "#dfdfdf",
 		"White": "#ffffff",
+		"VividBlue": "#0078d7",
 		"ImagingTools Blue": "#335777",
 		"LightBlue": "#3399cc",
 		"LightBlue 2": "#88b8e3",
@@ -64,6 +65,7 @@
 			"TabBorderSelected2": "Orange 2",
 			"BackgroundSelected": "White",
 			"TextSelected": "DarkGrayBlue",
+			"TextSelectedBackground": "VividBlue",
 			"BlueLabel2": "LightBlue 2"
 		},
 		"InactiveColors": {

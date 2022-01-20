@@ -64,7 +64,6 @@ Rectangle
         }
     }
 
-
     Repeater {
         id: pagesData;
         clip: true;
@@ -147,7 +146,7 @@ Rectangle
                 id: darkBackground;
                 anchors.fill: parent;
                 color: "gray";
-                opacity: 0.8;
+                opacity: 0.4;
 
                 visible: loaderDialog.item.visible;
 

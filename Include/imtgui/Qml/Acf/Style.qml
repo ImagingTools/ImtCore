@@ -43,7 +43,11 @@ Item {
     property int fontSize_subtitle: 18; // mobile ? 16 :18;
     property int fontSize_common: 13; // mobile ? 14 :16;
     property int fontSize_small: 12;
+
+    property string hover: "#e6e6e8";
+
     property string textColor: "#335777";
+    property string textSelected: "#0078d7";
 
     property string camera: "/Icons/Light/Camera.svg";
 
