@@ -289,6 +289,7 @@ Rectangle {
 
     function parseStyleTheme(themeType) {
         Style.baseColor = container.getThemeColor("ActiveColors", "Base", themeType);
+        Style.alternateBaseColor = container.getThemeColor("ActiveColors", "AlternateBase", themeType);
         Style.backgroundColor = container.getThemeColor("ActiveColors", "Background", themeType);
         Style.textColor = container.getThemeColor("ActiveColors", "Text", themeType);
         Style.textSelected = container.getThemeColor("ActiveColors", "TextSelectedBackground", themeType);
@@ -296,6 +297,8 @@ Rectangle {
         Style.selectedColor = container.getThemeColor("ActiveColors", "ItemSelected", themeType);
         Style.buttonColor = container.getThemeColor("ActiveColors", "HeaderBorder", themeType);
         Style.buttonBorderColor = container.getThemeColor("ActiveColors", "ButtonBorder", themeType);
+
+        Style.disabledInActiveTextColor = container.getThemeColor("DisabledInActiveColors", "Text", themeType);
 
         Style.hover = container.getThemeColor("ActiveColors", "Hover", themeType);
 

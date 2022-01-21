@@ -16,6 +16,9 @@ Rectangle {
     property alias model: list.model;
     signal closeItem(int index);
 
+    signal rightClicked();
+    signal leftClicked();
+
     function setFirstElementImageSource(source){
         tabPanelContainer.firstElementImageSource = source;
     }
@@ -45,9 +48,17 @@ Rectangle {
 //        list.model.set(index, tab);
     }
 
+
+    function viewTabInListView(index) {
+        list.positionViewAtIndex(index, ListView.Contain);
+    }
+
     ListView{
         id: list;
-        anchors.fill: parent;
+//        anchors.fill: parent;
+        width: externButtons.visible ? parent.width - externButtons.width :  parent.width;
+        height: parent.height;
+
         clip: true;
         orientation: ListView.Horizontal;
 
@@ -80,13 +91,14 @@ Rectangle {
 
         height: parent.height;
         width: parent.height;
+
         visible: externButtons.visible;
-        rotation: 270;
+        rotation: -90;
 
         gradient: Gradient {
                  GradientStop { position: 0.0; color: "#00ffffff"; }
-//                 GradientStop { position: 0.5; color: Style.imagingToolsGradient1; }
-                 GradientStop { position: 1.0; color: Style.imagingToolsGradient1; }
+                 GradientStop { position: 0.5; color: "#00ffffff"; }
+                 GradientStop { position: 1.0; color: Style.imagingToolsGradient2; }
              }
 
     }
@@ -94,11 +106,53 @@ Rectangle {
     Rectangle {
         id: externButtons;
         height: parent.height;
-        width: height * 0.7;
-        color: "white";
+        width: height;
+        color: Style.backgroundColor;
 
         anchors.right: parent.right;
 
         visible: list.contentWidth > tabPanelContainer.width;
+
+        MouseArea {
+            anchors.fill: parent;
+        }
+
+        AuxButton {
+            id: leftButton;
+
+            anchors.left: externButtons.left;
+            anchors.verticalCenter: externButtons.verticalCenter;
+
+            width: externButtons.width / 2;
+            height: externButtons.height;
+
+            iconHeight: 10;
+            iconWidth: 10;
+            iconSource: "../../../" + "Icons/" + Style.theme + "/Left_On_Normal.svg";
+
+            onClicked: {
+                console.log("left button clicked");
+                tabPanelContainer.leftClicked();
+            }
+        }
+
+        AuxButton {
+            id: rightButton;
+
+            anchors.right: externButtons.right;
+            anchors.verticalCenter: externButtons.verticalCenter;
+
+            width: externButtons.width / 2;
+            height: externButtons.height;
+
+            iconHeight: 10;
+            iconWidth: 10;
+            iconSource: "../../../" + "Icons/" + Style.theme + "/Right_On_Normal.svg";
+
+            onClicked: {
+                console.log("right button clicked");
+                tabPanelContainer.rightClicked();
+            }
+        }
     }
 }

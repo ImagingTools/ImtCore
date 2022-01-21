@@ -6,6 +6,7 @@ import imtgui 1.0
 Item {
     id: packegeCollectionContainer;
     anchors.fill: parent;
+    property Item rootItem;
     property alias itemId: packageCollectionView.itemId;
     property alias itemName: packageCollectionView.itemName;
     property alias model: packageCollectionView.model;
@@ -25,11 +26,12 @@ Item {
         }
         console.log("packageCollectionView.selectedIndex", packageCollectionView.selectedIndex);
         if (packageCollectionView.selectedIndex > -1) {
-            docsDataDeleg.setModeMenuButton("Remove", "Normal");
-            docsDataDeleg.setModeMenuButton("Edit", "Normal");
+
+            packegeCollectionContainer.rootItem.setModeMenuButton("Remove", "Normal");
+            packegeCollectionContainer.rootItem.setModeMenuButton("Edit", "Normal");
         } else {
-            docsDataDeleg.setModeMenuButton("Remove", "Disabled");
-            docsDataDeleg.setModeMenuButton("Edit", "Disabled");
+            packegeCollectionContainer.rootItem.setModeMenuButton("Remove", "Disabled");
+            packegeCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
         }
     }
 

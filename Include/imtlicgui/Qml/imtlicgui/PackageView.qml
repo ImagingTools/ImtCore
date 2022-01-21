@@ -7,6 +7,8 @@ import imtgui 1.0
 Item {
     id: featureCollectionViewContainer;
     anchors.fill: parent;
+
+    property Item rootItem;
     property alias itemId: featureCollectionView.itemId;
     property alias itemName: featureCollectionView.itemName;
     property alias model: featureCollectionView.model;
@@ -113,18 +115,18 @@ Item {
         }
 
         if (featureCollectionView.selectedIndex > -1) {
-            docsDataDeleg.setModeMenuButton("Remove", "Normal");
-            docsDataDeleg.setModeMenuButton("Edit", "Normal");
-            docsDataDeleg.setModeMenuButton("Import", "Normal");
-            docsDataDeleg.setModeMenuButton("Export", "Normal");
-            docsDataDeleg.setModeMenuButton("Save", "Normal");
-            docsDataDeleg.setModeMenuButton("Close", "Normal");
+            featureCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Normal");
+            featureCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Normal");
+            featureCollectionViewContainer.rootItem.setModeMenuButton("Import", "Normal");
+            featureCollectionViewContainer.rootItem.setModeMenuButton("Export", "Normal");
+            featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
+            featureCollectionViewContainer.rootItem.setModeMenuButton("Close", "Normal");
         } else {
-            docsDataDeleg.setModeMenuButton("Remove", "Disabled");
-            docsDataDeleg.setModeMenuButton("Edit", "Disabled");
-            //docsDataDeleg.setModeMenuButton("Import", "Disabled");
-            docsDataDeleg.setModeMenuButton("Export", "Disabled");
-            docsDataDeleg.setModeMenuButton("Save", "Disabled");
+            featureCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Disabled");
+            featureCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Disabled");
+//            featureCollectionViewContainer.docsDataDeleg.setModeMenuButton("Import", "Disabled");
+            featureCollectionViewContainer.rootItem.setModeMenuButton("Export", "Disabled");
+            featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
             //docsDataDeleg.setModeMenuButton("Close", "Disabled");
         }
     }

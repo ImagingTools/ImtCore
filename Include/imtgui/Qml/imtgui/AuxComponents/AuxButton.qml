@@ -4,23 +4,30 @@ import Acf 1.0
 Rectangle {
     id: container;
     property alias iconSource: image.source;
-    radius: container.height * 0.15;
+//    radius: container.height * 0.15;
+    radius: 2;
     property bool highlighted: ma.containsMouse;
 
     property bool hasIcon: container.iconSource !== "";
 
+    property int iconWidth: container.width;
+    property int iconHeight: container.height;
+
     color: container.highlighted ? Style.hover : "transparent";
 
+//    color: "red";
+
     property string textButton;
-  //  border.color: container.highlighted ? "gray" : "transparent";
+//    border.color: container.highlighted ? Style.buttonBorderColor : "transparent";
+     border.color: Style.buttonColor;
     signal clicked;
 
 
     Image {
         id: image;
         anchors.centerIn: parent;
-        height: parent.height;
-        width: container.height;
+        height: container.iconHeight;
+        width: container.iconWidth;
         sourceSize.width: width;
         sourceSize.height: height;
 

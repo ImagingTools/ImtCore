@@ -17,7 +17,7 @@ Rectangle {
     function setModeMenuButton(commandId, mode) {
         console.log("TopPanel setModeMenuButton!", commandId, mode);
         var buttonsModelLocal = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
-        console.log("buttonsModelItem GetItemsCount!", buttonsModelLocal.GetItemsCount());
+        //console.log("buttonsModelItem GetItemsCount!", buttonsModelLocal.GetItemsCount());
         for (var i = 0; i < buttonsModelLocal.GetItemsCount(); i++) {
             var id = buttonsModelLocal.GetData(CommandEnum.ID, i);
             //lvButtons.model.Refresh()
@@ -28,6 +28,18 @@ Rectangle {
         }
     }
 
+    function dialogResult(parameters) {
+         console.log("TopPanel dialogResult", parameters["status"]);
+        topPanel.menuActivatedSignal(parameters["status"]);
+    }
+
+    function getMenuButtonsX() {
+        return menuButton.x - 100;
+    }
+
+    function getMenuButtonsY() {
+        return menuButton.y + menuButton.width;
+    }
 
     gradient: Gradient {
              GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
@@ -36,13 +48,24 @@ Rectangle {
              GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
          }
 
+    onWidthChanged: {
+        if (thubnailDecoratorContainer.dialogIsActive()) {
+            thubnailDecoratorContainer.closeDialog();
+        }
+    }
+
+    onHeightChanged: {
+        if (thubnailDecoratorContainer.dialogIsActive()) {
+            thubnailDecoratorContainer.closeDialog();
+        }
+    }
+
     onActiveCommandsModelIdChanged: {
         console.log("onActiveCommandsModelIdChanged", topPanel.activeCommandsModelId);
         if (!buttonsModelItem.ContainsKey(topPanel.activeCommandsModelId)) {
             commandsModel.updateModel();
         } else {
             updateTimer.model = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
-//            topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
         }
         topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
     }
@@ -68,20 +91,17 @@ Rectangle {
         iconSource: "../../../Icons/" + Style.theme + "/Settings_On_Normal.svg";
         onClicked: {
             console.log("Preference button clicked !");
-//            preference.visible = true;
             var source = "AuxComponents/Preference.qml";
             var parameters = {};
-//            parameters["message"] = "TEST";
-//            parameters["nameDialog"] = "MessageDialog";
-//            thubnailDecoratorContainer.openDialog("AuxComponents/MessageDialog.qml", parameters);
             thubnailDecoratorContainer.openDialog(source, parameters);
-
         }
     }
 
     Item {
         anchors.left: parent.left;
-        anchors.right: preferenceButton.left;
+        anchors.leftMargin: 10;
+        anchors.right: menuButton.left;
+        anchors.rightMargin: 10;
         height: parent.height;
 
         ListView {
@@ -91,13 +111,42 @@ Rectangle {
             width: contentWidth > parent.width ? parent.width : contentWidth;
             clip: true;
             orientation: ListView.Horizontal;
-            interactive: false;
+            boundsBehavior: Flickable.StopAtBounds;
             delegate: TopButton {
                 text: model[CommandEnum.NAME];
                 isEmpty: model[CommandEnum.NAME] === "";
                 imageSource: "../../../" + "Icons/" + Style.theme + "/" + model[CommandEnum.ICON] + "_" + "Off" + "_" + model["Mode"] + ".svg";
                 fontName: Style.fontFamily;
                 checkable: model["Mode"] === "Normal";
+                visible: x + width <= lvButtons.width;
+
+                onVisibleChanged: {
+                    console.log("TopPanel onVisibleChanged",text, visible);
+                    if (!visible && lvButtons.width !== 0) {
+                        for (var i = 0; i < modelButtons.count; i++) {
+                            if (modelButtons.get(i).id !== "" && modelButtons.get(i).id === model[CommandEnum.ID]) {
+                               return;
+                            }
+                        }
+                        console.log("ModelButtons added id ", model[CommandEnum.ID]);
+                        modelButtons.append({"id": model[CommandEnum.ID], "imageSource": imageSource, "name": text, "mode": model["Mode"]});
+                    } else if (visible && lvButtons.width !== 0) {
+                        var j;
+                        for (var i = 0; i < modelButtons.count; i++) {
+                            if (modelButtons.get(i).id === model[CommandEnum.ID]) {
+                                console.log("ModelButtons removed id ", modelButtons.get(i).id);
+                                modelButtons.remove(i)
+                                j = i;
+                                break;
+                            }
+                        }
+                        for (var i = j; i < modelButtons.count; i++) {
+                            console.log("ModelButtons removed id ", modelButtons.get(i).id);
+                            modelButtons.remove(i)
+                        }
+                    }
+                }
+
                 onClicked: {
                     console.log("TopPanel menuActivited", model[CommandEnum.ID])
                     topPanel.menuActivatedSignal(model.Id);
@@ -106,12 +155,47 @@ Rectangle {
         }
     }
 
+    TopButton {
+        id: menuButton;
+
+        anchors.right: preferenceButton.left;
+        anchors.rightMargin: 10;
+        anchors.verticalCenter: parent.verticalCenter;
+
+        height: 56;
+        width: 35;
+
+        text: "";
+        checkable: true;
+
+        visible: modelButtons.count > 0;
+
+        imageSource: "../../../" + "Icons/" + Style.theme + "/Right_On_Normal.svg";
+
+        onClicked: {
+            console.log("TopPanel TopButton onClicked");
+            var source = "AuxComponents/PopupMenuDialog.qml";
+            var parameters = {};
+            parameters["model"] = modelButtons;
+            parameters["backgroundOpacity"] = 0;
+            parameters["resultItem"] = topPanel;
+            parameters["itemHeight"] = 35;
+            parameters["itemWidth"] = 150;
+            thubnailDecoratorContainer.openDialog(source, parameters);
+        }
+
+    }
+
+    ListModel {
+        id: modelButtons;
+    }
 
     Timer {
         id: updateTimer;
         interval: 10;
         property TreeItemModel model;
         onModelChanged: {
+            modelButtons.clear();
             updateTimer.start();
         }
 

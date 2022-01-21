@@ -27,6 +27,19 @@ Rectangle
         return modelLayers.count - 1;
     }
 
+    function dialogIsActive() {
+        return modelLayers.count > 0;
+    }
+
+    function getIndexActiveDialog() {
+        return modelLayers.count - 1;
+    }
+
+    function closeDialog() {
+        var index = thubnailDecoratorContainer.getIndexActiveDialog();
+        modelLayers.remove(index);
+    }
+
     ListModel {
         id: modelLayers;
     }
@@ -44,7 +57,6 @@ Rectangle
             thubnailDecoratorContainer.activeItem.commandsChanged(commandsId);
         }
     }
-
 
     MenuPanel {
         id: menuPanel;
@@ -77,6 +89,7 @@ Rectangle
             anchors.bottom: thubnailDecoratorContainer.bottom;
             color: "transparent";
             visible: menuPanel.activePageIndex === model.index;
+
             onVisibleChanged: {
                 console.log("ThumbnailDecorator Repeater onVisibleChanged", loader.item, menuPanel.activePageIndex, model.index)
                 if(pagesDeleg.visible){
@@ -103,13 +116,13 @@ Rectangle
                     loader.source = "../imtlicgui/" + menuPanel.model.GetData(PageEnum.ID, model.index) + "MultiDocView.qml";
                     console.log("ThumbnailDecorator loader.source", loader.source);
                 }
+
                 onItemChanged: {
                     console.log("ThumbnailDecorator Repeater Loader onItemChanged", loader.item)
                     if (loader.item){
                         loader.item.firstElementImageSource =  menuPanel.model.GetData(PageEnum.ICON, model.index);
                     }
                 }
-
             }
         }
     }
@@ -146,18 +159,22 @@ Rectangle
                 id: darkBackground;
                 anchors.fill: parent;
                 color: "gray";
-                opacity: 0.4;
+                opacity: loaderDialog.item.backgroundOpacity;
 
-                visible: loaderDialog.item.visible;
+                //visible: loaderDialog.item.backgroundOpacity !== 0;
 
                 MouseArea {
                     anchors.fill: parent;
+
+                    onClicked: {
+                        thubnailDecoratorContainer.closeDialog();
+                    }
                 }
             }
 
             Loader {
                   id: loaderDialog;
-                  anchors.centerIn: delegateListViewDialogs;
+                  anchors.centerIn: loaderDialog.item.centered ? delegateListViewDialogs : "";
 
                   function closeItem() {
                         modelLayers.remove(model.index);
@@ -174,6 +191,7 @@ Rectangle
                           console.log(key, model.parameters[key]);
                           loaderDialog.item[key]  = model.parameters[key];
                       }
+                      console.log(loaderDialog.item.activeFocus);
                   }
 
 

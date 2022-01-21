@@ -86,6 +86,20 @@ Rectangle {
             if(multiDocView.activeItem)
                 multiDocView.updateCommandId();
         }
+
+        onRightClicked: {
+            if (tabPanelInternal.selectedIndex < pages.GetItemsCount() - 1) {
+                tabPanelInternal.selectedIndex++;
+                tabPanelInternal.viewTabInListView(tabPanelInternal.selectedIndex);
+            }
+        }
+
+        onLeftClicked: {
+            if (tabPanelInternal.selectedIndex > 0) {
+                tabPanelInternal.selectedIndex--;
+                tabPanelInternal.viewTabInListView(tabPanelInternal.selectedIndex);
+            }
+        }
     }
 
     ListView {
@@ -159,6 +173,7 @@ Rectangle {
                             multiDocView.activeItem = loader.item;
                             multiDocView.updateCommandId();
                         }
+                        loader.item.rootItem = docsDataDeleg;
                         loader.item.model = dataModelLocal
 
                     }

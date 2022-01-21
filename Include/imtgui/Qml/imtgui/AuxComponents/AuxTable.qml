@@ -106,10 +106,4 @@ Item {
             }
         }
     }
-
-    PopupMenuDialog {
-        id: popupMenuDialog;
-        visible: false;
-    }
-
 }

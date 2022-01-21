@@ -30,7 +30,6 @@ Item {
     signal hintShow;
     signal hintHide;
 
-
     Rectangle{
         id: button;
         anchors.top: parent.top;

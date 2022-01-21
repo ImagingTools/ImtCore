@@ -24,6 +24,7 @@ Item {
     property string titleColor: "#055A85";
     property string subtitleColor: "#6A6E6F";
     property string baseColor: "white";
+    property string alternateBaseColor: "#c0c0c0";
     property string backgroundColor: "#e6e6e8";
     property string linkColor: "#0078D7";
     property string selectedColor: "#e3eefa";
@@ -50,6 +51,8 @@ Item {
     property string textSelected: "#0078d7";
 
     property string camera: "/Icons/Light/Camera.svg";
+
+    property string disabledInActiveTextColor: "#c0c0c0";
 
     property var iconNames: ["Camera", "CameraFlash", "CameraLens2"];
 
