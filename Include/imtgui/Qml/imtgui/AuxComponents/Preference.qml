@@ -6,14 +6,16 @@ Rectangle {
     id: container;
 
     width: 450;
-    height: 500;
+    height: 450;
 
     property string styleColor: "Light";
     property int radiusValue: 5;
 
     radius: radiusValue;
     color: Style.baseColor;
-    border.color: "#2b2d2d";
+//    border.color: "#2b2d2d";
+    property real backgroundOpacity: 0.4;
+    property bool centered: true;
 
     Component.onCompleted: {
         container.changeThemeIcons("Light");

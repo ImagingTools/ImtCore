@@ -181,6 +181,7 @@ Rectangle {
             parameters["resultItem"] = topPanel;
             parameters["itemHeight"] = 35;
             parameters["itemWidth"] = 150;
+            parameters["styleColor"] = Style.theme == "Dark" ? "Light" : "Dark";
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
 

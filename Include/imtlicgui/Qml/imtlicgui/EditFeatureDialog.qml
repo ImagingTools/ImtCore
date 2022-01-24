@@ -9,7 +9,7 @@ Rectangle {
     id: container;
     width: 400;
     height: 300;
-    radius: 10;
+    radius: 2;
     color: Style.backgroundColor;
     clip: true;
     focus: true;
@@ -17,32 +17,16 @@ Rectangle {
     property Item resultItem;
     property string featureId;
     property string featureName;
+    property real backgroundOpacity: 0.4;
     signal okClicked(string newId, string newName);
     signal cancelClicked();
     property bool backgroundExist: true;
     property bool centered: true;
 
-//    onActiveFocusChanged: {
-//        console.log("EditFeatureDialog onActiveFocusChanged");
-//        container.forceActiveFocus();
-//    }
-
     Component.onCompleted: {
         console.log("EditFeatureDialog Component.onCompleted");
         tfcFeatureNameText.setFocus();
     }
-
-//    onFocusChanged: {
-//        console.log("EditFeatureDialog onFocusChanged");
-////        container.focus = true;
-//        container.forceActiveFocus();
-//    }
-
-
-//    Keys.onTabPressed: {
-//        console.log("EditFeatureDialog Keys.onTabPressed");
-//    }
-
 
     Keys.onPressed: {
         console.log("EditFeatureDialog Keys.onPressed", event.key);
@@ -150,19 +134,8 @@ Rectangle {
                 height: 23;
                 text: container.featureName;
                 focus: true;
-//                    activeFocus: true;
                 anchors.horizontalCenter: tfcFeatureName.horizontalCenter;
                 anchors.verticalCenter: tfcFeatureName.verticalCenter;
-
-//                MouseArea{
-//                    anchors.fill: parent;
-
-//                    onClicked: {
-//                        console.log("TextFieldCustom onClicked");
-////                        tfcFeatureNameText.forceActiveFocus();
-//                        tfcFeatureNameText.setFocus();
-//                    }
-//                }
 
             }
         }
@@ -266,23 +239,4 @@ Rectangle {
             }
         }
     }
-
-//    FocusScope {
-//        id: focusScope;
-
-//        anchors.fill: parent;
-
-//        focus: true;
-
-////        Keys.onPressed: {
-////                console.log("EditFeatureDialog Keys.onPressed", event.key);
-////                if (event.key === Qt.Key_Tab) {
-////                    console.log("event.key tab", event.key);
-////                }
-////            }
-
-
-//    }
-
-
 }

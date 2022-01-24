@@ -36,18 +36,43 @@ Rectangle {
         multiDocView.activeItem.commandsChanged(commandsId);
     }
 
+    function tabIsOpened(itemId) {
+        for (var i = 0; i < pages.GetItemsCount(); i++) {
+            var pageId = pages.GetData("ItemId", i);
+            if (pageId === itemId) {
+                tabPanelInternal.selectedIndex = i;
+                return true;
+            }
+        }
+        return false;
+    }
+
     function addToHeadersArray(itemId, title, source, commandsId){
         console.log("MultidocWorkspaceView addToHeadersArray", title, source, itemId, commandsId)
-        multiDocView.activeItem = null
-        var index = pages.InsertNewItem();
-        console.log("MultidicWorkspaceView addToHeadersArray index", index);
-        pages.SetData("ItemId", itemId, index);
-        pages.SetData("Title", title, index);
-        pages.SetData("Source", source, index);
-        pages.SetData("CommandsId", commandsId, index);
-       // pagesDeleg.changeCommandsId(commandsId);//???
-        tabPanelInternal.selectedIndex = pages.GetItemsCount() - 1;
-//        pages.Refresh();
+        var findPage = false;
+        if (itemId !== "" && tabIsOpened(itemId)) {
+            tabPanelInternal.selectedIndex = i;
+            findPage = true;
+//            for (var i = 0; i < pages.GetItemsCount(); i++) {
+//                var pageId = pages.GetData("ItemId", i);
+//                if (pageId === itemId) {
+//                    tabPanelInternal.selectedIndex = i;
+//                    findPage = true;
+//                    break;
+//                }
+//            }
+        }
+        if (!findPage) {
+            multiDocView.activeItem = null
+            var index = pages.InsertNewItem();
+            console.log("MultidicWorkspaceView addToHeadersArray index", index);
+            pages.SetData("ItemId", itemId, index);
+            pages.SetData("Title", title, index);
+            pages.SetData("Source", source, index);
+            pages.SetData("CommandsId", commandsId, index);
+           // pagesDeleg.changeCommandsId(commandsId);//???
+            tabPanelInternal.selectedIndex = pages.GetItemsCount() - 1;
+        }
     }
 
     function closeTab(index) {
@@ -75,10 +100,6 @@ Rectangle {
         onCloseItem: {
             console.log("MultiDocWorkspaceView TabPanel onCloseItem", index)
             multiDocView.closeTab(index);
-//            pages.RemoveItem(index)
-//            if (tabPanelInternal.selectedIndex >= index){
-//                tabPanelInternal.selectedIndex--;
-//            }
         }
 
         onSelectedIndexChanged: {
@@ -118,7 +139,6 @@ Rectangle {
             width: visible ? docsData.width : 0;
             height: docsData.height;
             color: "transparent";
-//            visible: false;
             visible: tabPanelInternal.selectedIndex === model.index;
             onVisibleChanged: {
                 console.log("MultiDocView ListView onVisibleChanged", this.visible);
@@ -152,8 +172,6 @@ Rectangle {
                 Component.onCompleted: {
                     console.log("MultidocWorkspaceView model index ", model.Source)
                     loader.source = model.Source
-//                    docsDataDeleg.visible = tabPanelInternal.selectedIndex === model.index;
-                    console.log("MultidocWorkspaceView source",loader.source)
                 }
                 onItemChanged: {
                     console.log("MultidocWorkspaceView Loader onItemChanged", loader.source)
@@ -168,12 +186,13 @@ Rectangle {
                             console.log("MultidocWorkspaceView onItemChanged", dataModelLocal)
                         }
                         console.log("MultidocWorkspaceView Loader onItemChanged", loader.source)
-
+                        loader.item.rootItem = docsDataDeleg;
                         if (tabPanelInternal.selectedIndex === model.index) {
                             multiDocView.activeItem = loader.item;
                             multiDocView.updateCommandId();
                         }
-                        loader.item.rootItem = docsDataDeleg;
+                        console.log("loader.item.rootItem = ", docsDataDeleg)
+
                         loader.item.model = dataModelLocal
 
                     }

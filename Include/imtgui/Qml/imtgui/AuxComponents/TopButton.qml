@@ -70,13 +70,15 @@ Item {
         anchors.fill: parent;
         enabled: container.enabled && container.visible && !container.isEmpty;
         hoverEnabled: enabled;
-        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+        cursorShape: containsMouse && container.checkable ? Qt.PointingHandCursor : Qt.ArrowCursor;
+
         onClicked: {
             console.log("onClicked")
             if (container.checkable) {
                 container.clicked();
             }
         }
+
         onPressed: {
             console.log("onPressed")
             container.highlighted = container.checkable;

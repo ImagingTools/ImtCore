@@ -25,7 +25,6 @@
         <file alias="imtgui/AuxComponents/PopupMenuDialog.qml">Qml/imtgui/AuxComponents/PopupMenuDialog.qml</file>
         <file alias="imtgui/AuxComponents/MessageDialog.qml">Qml/imtgui/AuxComponents/MessageDialog.qml</file>
         <file alias="imtgui/AuxComponents/MultiDocWorkspaceView.qml">Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml</file>
-        <file alias="imtgui/AuxComponents/InstallationInfoEditor.qml">Qml/imtgui/AuxComponents/InstallationInfoEditor.qml</file>
         <file alias="imtgui/AuxComponents/InputDialog.qml">Qml/imtgui/AuxComponents/InputDialog.qml</file>
     </qresource>
     <qresource prefix="/Fonts">

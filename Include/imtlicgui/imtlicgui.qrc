@@ -1,9 +1,6 @@
 <RCC>
     <qresource prefix="/qml">
         <file alias="imtlicgui/qmldir">Qml/imtlicgui/qmldir</file>
-        <file alias="imtlicgui/AccountView.qml">Qml/imtlicgui/AccountView.qml</file>
-        <file alias="imtlicgui/AccountCollectionView.qml">Qml/imtlicgui/AccountCollectionView.qml</file>
-        <file alias="imtlicgui/AccountsMultiDocView.qml">Qml/imtlicgui/AccountsMultiDocView.qml</file>
         <file alias="imtlicgui/InstallationView.qml">Qml/imtlicgui/InstallationView.qml</file>
         <file alias="imtlicgui/InstallationCollectionView.qml">Qml/imtlicgui/InstallationCollectionView.qml</file>
         <file alias="imtlicgui/InstallationsMultiDocView.qml">Qml/imtlicgui/InstallationsMultiDocView.qml</file>
@@ -15,5 +12,6 @@
         <file alias="imtlicgui/PackageView.qml">Qml/imtlicgui/PackageView.qml</file>
         <file alias="imtlicgui/EditFeatureDialog.qml">Qml/imtlicgui/EditFeatureDialog.qml</file>
         <file alias="imtlicgui/EditLicenseDialog.qml">Qml/imtlicgui/EditLicenseDialog.qml</file>
+        <file alias="imtlicgui/InstallationInfoEditor.qml">Qml/imtlicgui/InstallationInfoEditor.qml</file>
     </qresource>
 </RCC>

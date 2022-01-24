@@ -4,7 +4,9 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
+    id: productsCollectionViewContainer;
     anchors.fill: parent;
+    property Item rootItem;
     property alias itemId: productCollectionView.itemId;
     property alias model: productCollectionView.model;
 
@@ -30,27 +32,30 @@ Item {
         }
     }
 
+    function refresh() {
+        console.log("PackageView refresh()");
+        productCollectionView.refresh();
+    }
+
     function commandsChanged(commandsId){
         if (commandsId !== "ProductEdit") {
             return;
         }
 
         if (productCollectionView.selectedIndex > -1) {
-            docsDataDeleg.setModeMenuButton("Remove", "Active");
-            docsDataDeleg.setModeMenuButton("Edit", "Active");
-            docsDataDeleg.setModeMenuButton("Duplicate", "Active");
-            docsDataDeleg.setModeMenuButton("Import", "Active");
-            docsDataDeleg.setModeMenuButton("Export", "Active");
-            docsDataDeleg.setModeMenuButton("Save", "Active");
-            docsDataDeleg.setModeMenuButton("Close", "Active");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Normal");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Normal");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Duplicate", "Normal");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Import", "Normal");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Export", "Normal");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Close", "Normal");
         } else {
-            docsDataDeleg.setModeMenuButton("Remove", "Disabled");
-            docsDataDeleg.setModeMenuButton("Edit", "Disabled");
-            docsDataDeleg.setModeMenuButton("Duplicate", "Disabled");
-            docsDataDeleg.setModeMenuButton("Import", "Disabled");
-            docsDataDeleg.setModeMenuButton("Export", "Disabled");
-            docsDataDeleg.setModeMenuButton("Save", "Disabled");
-            docsDataDeleg.setModeMenuButton("Close", "Disabled");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Disabled");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Disabled");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Duplicate", "Disabled");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Export", "Disabled");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
         }
 //        productCollectionView.commandsChanged(commandsId);
     }

@@ -22,6 +22,8 @@ Rectangle {
     property bool okButtonVisible: true;
     property bool cancelButtonVisible: true;
 
+    property real backgroundOpacity: 0.4;
+
     property Item resultItem;
 
     signal okButtonClicked();

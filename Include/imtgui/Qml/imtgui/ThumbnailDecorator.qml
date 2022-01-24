@@ -127,14 +127,6 @@ Rectangle
         }
     }
 
-//    TreeView {
-//        id: treeView;
-//        width: 200;
-//        //height: parent.height - topPanel.height;
-//        anchors.top: topPanel.bottom;
-//        anchors.right: parent.right;
-//    }
-
     Loader {
         id: dialogLoader;
     }

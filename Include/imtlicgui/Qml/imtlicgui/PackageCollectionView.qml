@@ -20,7 +20,7 @@ Item {
     }
 
     function commandsChanged(commandsId) {
-        console.log("PackageCollectionView commandsChanged!", commandsId);
+        console.log("PackageCollectionView commandsChanged!", commandsId, packegeCollectionContainer.rootItem);
         if (commandsId !== "Packages"){
             return;
         }

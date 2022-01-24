@@ -19,6 +19,7 @@ Rectangle {
     property bool okButtonVisible: true;
     property bool noButtonVisible: true;
     property bool backgroundExist: true;
+    property real backgroundOpacity: 0.4;
     property bool centered: true;
     property Item resultItem;
 

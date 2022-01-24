@@ -109,7 +109,7 @@ Item {
     }
 
     function commandsChanged(commandsId){
-        console.log("PackageView commandsChanged", commandsId);
+        console.log("PackageView commandsChanged", commandsId, featureCollectionViewContainer.rootItem);
         if (commandsId !== "PackageEdit") {
             return;
         }
@@ -124,10 +124,8 @@ Item {
         } else {
             featureCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Disabled");
-//            featureCollectionViewContainer.docsDataDeleg.setModeMenuButton("Import", "Disabled");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Export", "Disabled");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
-            //docsDataDeleg.setModeMenuButton("Close", "Disabled");
         }
     }
 
@@ -250,11 +248,67 @@ Item {
         }
     }
 
+//    FeaturesTreeView {
+
+//    }
+
     Rectangle {
         id: packageMetaInfo;
         anchors.right: parent.right;
         height: parent.height;
-        width: 150;
+        width: 200;
         color: "transparent";
+
+        Rectangle {
+            id: leftBorder;
+
+            anchors.right: packageMetaInfo.left;
+            anchors.top: packageMetaInfo.top;
+
+            height: packageMetaInfo.height;
+            width: 3;
+
+            color: Style.backgroundColor;
+        }
+
+        Rectangle {
+            id: headerTreeView;
+            anchors.top: parent.top;
+            width: parent.width;
+            height: 35;
+            Text {
+                id: titleHeader;
+
+                anchors.verticalCenter: headerTreeView.verticalCenter;
+
+                anchors.left: headerTreeView.left;
+                anchors.leftMargin: 10;
+
+                text: "Features";
+                font.family: Style.fontFamilyBold;
+                color: Style.textColor;
+                font.pixelSize: Style.fontSize_small;
+                font.bold: true;
+            }
+        }
+
+        Rectangle {
+            id: headerBottomBorder;
+
+            anchors.bottom: headerTreeView.bottom;
+
+            height: 1;
+            width: parent.width;
+
+//            color: Style.backgroundColor;
+            color: "lightgray";
+        }
+
+        TreeView {
+            id: treeView;
+            anchors.top: headerBottomBorder.bottom;
+            width: 200;
+            height: 500;
+        }
     }
 }

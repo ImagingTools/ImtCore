@@ -6,8 +6,13 @@ import imtgui 1.0
 Item {
     id: productCollectionContainer;
     anchors.fill: parent;
+    property Item rootItem;
     property alias itemId: productCollectionView.itemId;
     property alias model: productCollectionView.model;
+
+    function refresh() {
+        productCollectionView.refresh();
+    }
 
     function menuActivated(menuId) {
         productCollectionView.menuActivated(menuId)
@@ -19,13 +24,13 @@ Item {
             return;
         }
         if (productCollectionView.selectedIndex > -1) {
-            docsDataDeleg.setModeMenuButton("Remove", "Active");
-            docsDataDeleg.setModeMenuButton("Edit", "Active");
-            docsDataDeleg.setModeMenuButton("Duplicate", "Active");
+            productCollectionContainer.rootItem.setModeMenuButton("Remove", "Normal");
+            productCollectionContainer.rootItem.setModeMenuButton("Edit", "Normal");
+            productCollectionContainer.rootItem.setModeMenuButton("Duplicate", "Normal");
         } else {
-            docsDataDeleg.setModeMenuButton("Remove", "Disabled");
-            docsDataDeleg.setModeMenuButton("Edit", "Disabled");
-            docsDataDeleg.setModeMenuButton("Duplicate", "Disabled");
+            productCollectionContainer.rootItem.setModeMenuButton("Remove", "Disabled");
+            productCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
+            productCollectionContainer.rootItem.setModeMenuButton("Duplicate", "Disabled");
         }
     }
 

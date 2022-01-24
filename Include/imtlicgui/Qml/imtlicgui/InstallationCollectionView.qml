@@ -6,6 +6,7 @@ import imtgui 1.0
 Item {
     id: installationCollectionContainer;
     anchors.fill: parent;
+    property Item rootItem;
     property alias itemId: installationCollectionView.itemId;
     property alias model: installationCollectionView.model;
 
@@ -19,15 +20,15 @@ Item {
             return;
         }
         if (installationCollectionView.selectedIndex > -1) {
-            docsDataDeleg.setModeMenuButton("Remove", "Active");
-            docsDataDeleg.setModeMenuButton("Edit", "Active");
-            docsDataDeleg.setModeMenuButton("Duplicate", "Active");
-            docsDataDeleg.setModeMenuButton("CreateLicense", "Activ");
+            installationCollectionContainer.rootItem.setModeMenuButton("Remove", "Active");
+            installationCollectionContainer.rootItem.setModeMenuButton("Edit", "Active");
+            installationCollectionContainer.rootItem.setModeMenuButton("Duplicate", "Active");
+            installationCollectionContainer.rootItem.setModeMenuButton("CreateLicense", "Activ");
         } else {
-            docsDataDeleg.setModeMenuButton("Remove", "Disabled");
-            docsDataDeleg.setModeMenuButton("Edit", "Disabled");
-            docsDataDeleg.setModeMenuButton("Duplicate", "Disabled");
-            docsDataDeleg.setModeMenuButton("CreateLicense", "Disabled");
+            installationCollectionContainer.rootItem.setModeMenuButton("Remove", "Disabled");
+            installationCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
+            installationCollectionContainer.rootItem.setModeMenuButton("Duplicate", "Disabled");
+            installationCollectionContainer.rootItem.setModeMenuButton("CreateLicense", "Disabled");
         }
     }
 
@@ -41,7 +42,7 @@ Item {
         }
 
         onSelectItem: {
-            multiDocView.addToHeadersArray(itemId, name,  "../../imtgui/AuxComponents/InstallationInfoEditor.qml", "InstallationEdit")
+            multiDocView.addToHeadersArray(itemId, name,  "InstallationInfoEditor.qml", "InstallationEdit")
         }
 
         onSelectedIndexChanged: {
