@@ -7,6 +7,7 @@ Item {
     id: installationCollectionContainer;
     anchors.fill: parent;
     property Item rootItem;
+    property Item multiDocViewItem;
     property alias itemId: installationCollectionView.itemId;
     property alias model: installationCollectionView.model;
 
@@ -42,7 +43,8 @@ Item {
         }
 
         onSelectItem: {
-            multiDocView.addToHeadersArray(itemId, name,  "InstallationInfoEditor.qml", "InstallationEdit")
+            installationCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit")
+//            multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit")
         }
 
         onSelectedIndexChanged: {

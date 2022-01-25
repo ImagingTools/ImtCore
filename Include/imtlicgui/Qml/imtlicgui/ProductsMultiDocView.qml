@@ -6,6 +6,8 @@ import imtgui 1.0
 Item {
     id: productsMultiDocViewContainer;
     anchors.fill: parent;
+
+    property Item rootItem;
     property alias firstElementImageSource: productsMultiDocView.firstElementImageSource;
 //    property alias model: productsMultiDocView.model;
 
@@ -32,6 +34,8 @@ Item {
     MultiDocWorkspaceView {
         id: productsMultiDocView;
         anchors.fill: parent;
+
+        rootItem: productsMultiDocViewContainer.rootItem;
 //        Component.onCompleted: {
 //            productsMultiDocView.addToHeadersArray("", "Products", "../../imtlicgui/ProductCollectionView.qml", "Products")
 //        }

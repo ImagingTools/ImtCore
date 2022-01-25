@@ -9,6 +9,7 @@ Item {
     anchors.fill: parent;
 
     property Item rootItem;
+    property Item multiDocViewItem;
     property alias itemId: featureCollectionView.itemId;
     property alias itemName: featureCollectionView.itemName;
     property alias model: featureCollectionView.model;
@@ -43,7 +44,7 @@ Item {
             else if (parameters["dialog"] === "InputDialog") {
                 var value = parameters["value"];
                 console.log("featureCollectionViewContainer dialogResult", value);
-                docsDataDeleg.updateTitleTab(value);
+                featureCollectionViewContainer.rootItem.updateTitleTab(value);
                 saveModel.updateModel(value);
             }
         }
@@ -100,7 +101,8 @@ Item {
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
         else if (menuId  === "Close") {
-            docsDataDeleg.closeTab();
+//            docsDataDeleg.closeTab();
+            featureCollectionViewContainer.rootItem.closeTab();
            //thubnailDecoratorContainer.openDialog(source, parameters);
         }
         else {
@@ -248,10 +250,6 @@ Item {
         }
     }
 
-//    FeaturesTreeView {
-
-//    }
-
     Rectangle {
         id: packageMetaInfo;
         anchors.right: parent.right;
@@ -299,8 +297,6 @@ Item {
 
             height: 1;
             width: parent.width;
-
-//            color: Style.backgroundColor;
             color: "lightgray";
         }
 
@@ -309,6 +305,12 @@ Item {
             anchors.top: headerBottomBorder.bottom;
             width: 200;
             height: 500;
+            modelItems: featuresTreeView.model;
+        }
+
+        FeaturesTreeView {
+            id: featuresTreeView;
+
         }
     }
 }

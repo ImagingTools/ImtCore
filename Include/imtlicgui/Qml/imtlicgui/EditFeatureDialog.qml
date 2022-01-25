@@ -23,10 +23,10 @@ Rectangle {
     property bool backgroundExist: true;
     property bool centered: true;
 
-    Component.onCompleted: {
-        console.log("EditFeatureDialog Component.onCompleted");
-        tfcFeatureNameText.setFocus();
-    }
+//    Component.onCompleted: {
+//        console.log("EditFeatureDialog Component.onCompleted");
+//        tfcFeatureNameText.setFocus();
+//    }
 
     Keys.onPressed: {
         console.log("EditFeatureDialog Keys.onPressed", event.key);

@@ -10,6 +10,7 @@ Rectangle {
     color: "transparent";
     property TabPanel tabPanel: tabPanelInternal;
     property Item activeItem;
+    property Item rootItem;
     property alias firstElementImageSource: tabPanelInternal.firstElementImageSource;
 //    property TreeItemModel model;
     property var pagesSources: [];
@@ -28,7 +29,9 @@ Rectangle {
         console.log("MultidocWorkspaceView updateCommandId")
         var commandsId = pages.GetData("CommandsId", tabPanelInternal.selectedIndex);
         var itemId = pages.GetData("ItemId", tabPanelInternal.selectedIndex);
-        pagesDeleg.changeCommandsId(commandsId);
+
+        //pagesDeleg.changeCommandsId(commandsId);
+        multiDocView.rootItem.changeCommandsId(commandsId);
     }
 
     function commandsChanged(commandsId){
@@ -70,7 +73,8 @@ Rectangle {
             pages.SetData("Title", title, index);
             pages.SetData("Source", source, index);
             pages.SetData("CommandsId", commandsId, index);
-           // pagesDeleg.changeCommandsId(commandsId);//???
+
+            // pagesDeleg.changeCommandsId(commandsId);//???
             tabPanelInternal.selectedIndex = pages.GetItemsCount() - 1;
         }
     }
@@ -154,7 +158,10 @@ Rectangle {
 
             function setModeMenuButton(commandId, mode){
                 console.log("MultiDocView ListView setModeMenuButton", commandId, mode);
-                pagesDeleg.setModeMenuButton(commandId, mode);
+//                pagesDeleg.setModeMenuButton(commandId, mode);
+
+                multiDocView.rootItem.setModeMenuButton(commandId, mode);
+
             }
 
             function updateTitleTab(name) {
@@ -187,6 +194,7 @@ Rectangle {
                         }
                         console.log("MultidocWorkspaceView Loader onItemChanged", loader.source)
                         loader.item.rootItem = docsDataDeleg;
+                        loader.item.multiDocViewItem = multiDocView;
                         if (tabPanelInternal.selectedIndex === model.index) {
                             multiDocView.activeItem = loader.item;
                             multiDocView.updateCommandId();

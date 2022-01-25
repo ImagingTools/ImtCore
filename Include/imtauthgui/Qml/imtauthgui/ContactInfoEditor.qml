@@ -15,6 +15,7 @@ Rectangle {
     property TreeItemModel contactInfoModel;
 //    property var contactInfoModel;
     property TreeItemModel model;
+    property Item multiDocViewItem;
     property string accountType;
     property string itemId;
 

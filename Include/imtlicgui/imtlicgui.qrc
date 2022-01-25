@@ -13,5 +13,6 @@
         <file alias="imtlicgui/EditFeatureDialog.qml">Qml/imtlicgui/EditFeatureDialog.qml</file>
         <file alias="imtlicgui/EditLicenseDialog.qml">Qml/imtlicgui/EditLicenseDialog.qml</file>
         <file alias="imtlicgui/InstallationInfoEditor.qml">Qml/imtlicgui/InstallationInfoEditor.qml</file>
+        <file alias="imtlicgui/FeaturesTreeView.qml">Qml/imtlicgui/FeaturesTreeView.qml</file>
     </qresource>
 </RCC>

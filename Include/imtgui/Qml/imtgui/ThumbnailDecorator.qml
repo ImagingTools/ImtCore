@@ -120,6 +120,7 @@ Rectangle
                 onItemChanged: {
                     console.log("ThumbnailDecorator Repeater Loader onItemChanged", loader.item)
                     if (loader.item){
+                        loader.item.rootItem = pagesDeleg;
                         loader.item.firstElementImageSource =  menuPanel.model.GetData(PageEnum.ICON, model.index);
                     }
                 }

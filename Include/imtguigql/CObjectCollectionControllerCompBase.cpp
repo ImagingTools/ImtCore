@@ -49,6 +49,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 		return ListObjects(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_HEADERS:
 		return GetHeaders(*inputParamsPtr, gqlObject, errorMessage);
+	default:
+		return GetTreeItemModel(*inputParamsPtr, gqlObject, errorMessage);
 	}
 
 	return nullptr;
@@ -362,6 +364,15 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;
+}
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetTreeItemModel(
+		const QList<imtgql::CGqlObject>& inputParams,
+		const imtgql::CGqlObject& gqlObject,
+		QString& errorMessage) const
+{
+
+	return nullptr;
 }
 
 

@@ -125,6 +125,7 @@ Rectangle {
     AuxTable {
         id: tableInternal;
         anchors.fill: parent;
+
         onSelectItem: {
             collectionViewContainer.selectItem(itemId, name);
         }
@@ -158,16 +159,13 @@ Rectangle {
             console.log("State:", this.state, headerInfoModel);
             if (this.state === "Ready"){
                 var dataModelLocal = this.GetData("data");
-                if(dataModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
+                if(dataModelLocal && dataModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
                     dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelInfo)
                     if(dataModelLocal.ContainsKey("headers")){
                         tableInternal.headers = dataModelLocal.GetData("headers")
                         collectionViewContainer.model.SetExternTreeModel('headers',tableInternal.headers)
 
                         itemsModel.updateModel();
-//                        if (collectionViewContainer.itemId != "") {
-
-//                        }
 
                     }
                     else if(packageInfoModel.ContainsKey("errors")){
@@ -185,7 +183,6 @@ Rectangle {
         id: itemsModel;
 
         function updateModel() {
-            console.log( "collectionViewContainer updateModel");
             console.log( "collectionViewContainer updateModel", collectionViewContainer.gqlModelItems, collectionViewContainer.itemId);
             var query = Gql.GqlRequest("query", collectionViewContainer.gqlModelItems);
 

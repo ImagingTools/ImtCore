@@ -7,6 +7,7 @@ Item {
     id: productsCollectionViewContainer;
     anchors.fill: parent;
     property Item rootItem;
+    property Item multiDocViewItem;
     property alias itemId: productCollectionView.itemId;
     property alias model: productCollectionView.model;
 
@@ -75,7 +76,6 @@ Item {
 
         onSelectItem: {
         }
-
 
     }
     Rectangle {

@@ -2,7 +2,6 @@ import QtQuick 2.0
 import Acf 1.0;
 
 Item {
-
     id: container;
     height: 40;
 
@@ -19,22 +18,6 @@ Item {
     property bool reduced: false;
 
     signal focusChanged();
-
-    function setFocus(){
-        console.log("TextFieldCustom setFocus");
-
-//        container.forceActiveFocus();
-        scope.focus = true;
-//        scope.forceActiveFocus(Qt.TabFocusReason);
-//        textField.selectByMouse = true;
-    }
-
-    onVisibleChanged: {
-        if(!visible)
-        {
-           // textField.focus = false;
-        }
-    }
 
     Rectangle {
         id: mainRect;
@@ -56,62 +39,41 @@ Item {
         }
     }
 
-    FocusScope {
-        id: scope;
-
+    TextInput {
+        id: textField;
         anchors.fill: parent;
-        anchors.leftMargin: 5;
 
-        focus: false;
+        color: Style.textColor;
+        font.pixelSize: 12;
+        text: "";
+
+        verticalAlignment: TextInput.AlignVCenter;
+        selectionColor: Style.textSelected;
+        clip: true;
 
         onFocusChanged: {
-            textField.focus = true
-            textField.forceActiveFocus();
+            container.focusChanged();
         }
 
-//        width: parent.width - 20;
-
-        TextInput {
-            id: textField;
-            anchors.fill: parent;
-//            anchors.leftMargin: 5;
-//            width: parent.width - 20;
-            color: Style.textColor;
-            font.pixelSize: 12;
-            text: "";
-
-            verticalAlignment: TextInput.AlignVCenter;
-//            selectByMouse: true;
-            selectionColor: Style.textSelected;
-            clip: true;
-
-            onFocusChanged: {
-                container.focusChanged();
-            }
-
-            onTextChanged: {
-                console.log("TextFieldCustom onTextChanged");
-                container.isTextChanged = true;
-                timer.restart();
-            }
-
-            onAccepted: {
-                console.log("TextFieldCustom onAccepted");
-                container.accepted();
-                container.isTextChanged = false;
-            }
-
+        onTextChanged: {
+            console.log("TextFieldCustom onTextChanged");
+            container.isTextChanged = true;
+            timer.restart();
         }
+
+        onAccepted: {
+            console.log("TextFieldCustom onAccepted");
+            container.accepted();
+            container.isTextChanged = false;
+        }
+
     }
-
-
 
     Text {
         id: placeHolder;
         anchors.left: parent.left;
         anchors.leftMargin: 5;
         anchors.bottom: parent.bottom;
-
     }
 
     Rectangle{

@@ -7,6 +7,7 @@ Item {
     id: packegeCollectionContainer;
     anchors.fill: parent;
     property Item rootItem;
+    property Item multiDocViewItem;
     property alias itemId: packageCollectionView.itemId;
     property alias itemName: packageCollectionView.itemName;
     property alias model: packageCollectionView.model;
@@ -55,7 +56,8 @@ Item {
                 name = "New Package";
             }
 
-            multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit")
+            //multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit")
+            packegeCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit")
         }
 
         onSelectedIndexChanged: {
@@ -67,11 +69,4 @@ Item {
 
 
     }
-//    Rectangle {
-//        id: packageMetaInfo;
-//        anchors.right: parent.right;
-//        height: parent.height;
-//        width: 100;
-//        color: "green";
-//    }
 }

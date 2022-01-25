@@ -7,6 +7,7 @@ Item {
     id: accountCollectionContainer;
     anchors.fill: parent;
     property Item rootItem;
+    property Item multiDocViewItem;
     property alias itemId: accountCollectionView.itemId;
     property alias model: accountCollectionView.model;
 
@@ -46,7 +47,8 @@ Item {
                 name = "New Account";
             }
 
-            multiDocView.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit")
+            accountCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit");
+//            multiDocView.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit")
         }
 
         onSelectedIndexChanged: {

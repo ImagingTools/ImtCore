@@ -7,6 +7,8 @@ Rectangle {
     anchors.fill: parent;
     width: 500;
     height: 500;
+
+    property Item multiDocViewItem;
     color: Style.backgroundColor;
     Rectangle {
         id: container;

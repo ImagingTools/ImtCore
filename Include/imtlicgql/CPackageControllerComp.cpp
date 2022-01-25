@@ -39,31 +39,18 @@ imtbase::CTreeItemModel* CPackageControllerComp::ListObjects(
 
 		QByteArrayList featureIds;
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (packageId != "" && m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr)){//Узнать
+		if (packageId != "" && m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr)){
 			const imtlic::IFeaturePackage* packagePtr  = dynamic_cast<const imtlic::IFeaturePackage*>(dataPtr.GetPtr());
 			if (packagePtr != nullptr){
 				QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
 				for (const QByteArray& featureCollectionId : featureCollectionIds){
 					int itemIndex = itemsModel->InsertNewItem();
 					QString featureId = packagePtr->GetFeatureInfo(featureCollectionId)->GetFeatureId();
-					//itemsModel->SetData("Id", featureId, itemIndex);
-					itemsModel->SetData("Id", featureId, itemIndex);//изменил FeatureId на Id
+					itemsModel->SetData("Id", featureId, itemIndex);
 					QString featureName = packagePtr->GetFeatureInfo(featureCollectionId)->GetFeatureName();
 					itemsModel->SetData("Name", featureName, itemIndex);//
 					QString featureDescription = packagePtr->GetFeatureList().GetElementInfo(featureCollectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 					itemsModel->SetData("Description", featureDescription, itemIndex);
-
-//					idoc::CStandardDocumentMetaInfo metaInfo;
-//					if (packagePtr->GetFeaturePackages()->GetCollectionItemMetaInfo(featureCollectionId, metaInfo)){
-//						QString addedStr = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME).toDateTime()
-//								.toString(imtgui::CObjectCollectionViewDelegate::s_dateTimeFormat);
-//						itemsModel->SetData("Added", addedStr, itemIndex);
-
-//						QString modificationStr = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime()
-//								.toString(imtgui::CObjectCollectionViewDelegate::s_dateTimeFormat);
-//						itemsModel->SetData("ModificationTime", modificationStr, itemIndex);
-
-//					}
 				}
 
 			}
@@ -113,6 +100,96 @@ istd::IChangeable* CPackageControllerComp::CreateObject(const QList<imtgql::CGql
 		return featurePackagePtr.PopPtr();
 	}
 	return nullptr;
+}
+
+imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
+		const QList<imtgql::CGqlObject>& inputParams,
+		const imtgql::CGqlObject& gqlObject,
+		QString& errorMessage) const
+{
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* treeItemModel = nullptr;
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	bool isSetResponce = false;
+	QByteArrayList fields;
+
+	if (!m_viewDelegateCompPtr.IsValid()) {
+		errorMessage = QObject::tr("Internal error").toUtf8();
+	}
+
+	if (!errorMessage.isEmpty()) {
+		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		errorsItemModel->SetData("message", errorMessage);
+	}
+	else {
+		dataModel = new imtbase::CTreeItemModel();
+		treeItemModel = new imtbase::CTreeItemModel();
+		treeItemModel->SetIsArray(true);
+		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+		int index;
+		for (const QByteArray& collectionId : collectionIds) {
+			index = treeItemModel->InsertNewItem();
+
+			treeItemModel->SetData("Name", collectionId, index);
+			treeItemModel->SetData("stateChecked", 0, index);
+			treeItemModel->SetData("level", 0, index);
+
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)) {
+				const imtlic::IFeaturePackage* packagePtr  = dynamic_cast<const imtlic::IFeaturePackage*>(dataPtr.GetPtr());
+				QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
+
+				imtbase::CTreeItemModel* childItemModel = treeItemModel->AddTreeModel("childItemModel", index);
+
+				for (const QByteArray& featureCollectionId : featureCollectionIds) {
+					QString featureId = packagePtr->GetFeatureInfo(featureCollectionId)->GetFeatureId();
+					QString featureName = packagePtr->GetFeatureInfo(featureCollectionId)->GetFeatureName();
+
+					int childItemIndex = childItemModel->InsertNewItem();
+
+					childItemModel->SetData("Name", featureName, childItemIndex);
+					childItemModel->SetData("stateChecked", 0, childItemIndex);
+					childItemModel->SetData("level", 1, childItemIndex);
+				}
+			}
+		}
+		dataModel->SetExternTreeModel("TreeModel", treeItemModel);
+	}
+
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
+}
+
+bool CPackageControllerComp::GetOperationFromRequest(
+			const imtgql::CGqlRequest& gqlRequest,
+			imtgql::CGqlObject& gqlObject,
+			QString& errorMessage,
+			int& operationType) const
+{
+	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
+	if(fieldList == nullptr){
+		return false;
+	}
+
+	int count = fieldList->count();
+	for (int i = 0; i < count; i++){
+		if (fieldList->at(i).GetId() == "treeItem"){
+			gqlObject = fieldList->at(i);
+			operationType = OT_USER_OPERATION + 1;
+			return true;
+		}
+
+		if (fieldList->at(i).GetId() == "dependencies"){
+			gqlObject = fieldList->at(i);
+			operationType = OT_USER_OPERATION + 2;
+			return true;
+		}
+		if (BaseClass::GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType)){
+			return true;
+		}
+	}
+	return false;
 }
 
 

@@ -6,6 +6,8 @@ import imtgui 1.0
 Item {
     id: installationsMultiDocViewContainer;
     anchors.fill: parent;
+
+    property Item rootItem;
     property alias firstElementImageSource: installationsMultiDocView.firstElementImageSource;
 //    property alias model: installationsMultiDocView.model;
 
@@ -31,7 +33,9 @@ Item {
 
     MultiDocWorkspaceView {
         id: installationsMultiDocView;
-            anchors.fill: parent;
+        anchors.fill: parent;
+
+        rootItem: installationsMultiDocViewContainer.rootItem;
 //        Component.onCompleted: {
 //            installationsMultiDocView.addToHeadersArray("", "Installations", "../../imtlicgui/InstallationCollectionView.qml", "Installations")
 //        }

@@ -7,6 +7,7 @@ Item {
     id: productCollectionContainer;
     anchors.fill: parent;
     property Item rootItem;
+    property Item multiDocViewItem;
     property alias itemId: productCollectionView.itemId;
     property alias model: productCollectionView.model;
 
@@ -49,7 +50,8 @@ Item {
                 name = "New Product";
             }
 
-            multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/ProductView.qml", "ProductEdit")
+            productCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/ProductView.qml", "ProductEdit")
+//            multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/ProductView.qml", "ProductEdit")
         }
 
         onSelectedIndexChanged: {
