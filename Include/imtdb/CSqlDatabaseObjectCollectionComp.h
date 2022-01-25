@@ -26,9 +26,11 @@ namespace imtdb
 	Basic implementation of a Database based model.
 */
 class CSqlDatabaseObjectCollectionComp:
+			public QObject,
 			virtual public imtbase::IObjectCollection,
 			public ilog::CLoggerComponentBase
 {
+	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
@@ -81,8 +83,17 @@ public:
 	virtual bool UnregisterEventHandler(imtbase::IObjectCollectionEventHandler * eventHandler) override;
 	
 protected:
+	struct ObjectInfo
+	{
+		QByteArray typeId;
+		imtbase::IMetaInfoCreator::MetaInfoPtr metaInfoPtr;
+		imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+	};
+
+	typedef QMap<QByteArray, ObjectInfo> ObjectInfoMap;
+
+protected:
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
-	virtual void CreateCollectionFromDatabase();
 
 	void OnFilterParamsChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::IParamsSet* filterParamsPtr);
 	void OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
@@ -90,6 +101,12 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
+
+private Q_SLOTS:
+	void OnCollectionCreated();
+
+Q_SIGNALS:
+	void EmitCollectionReady();
 
 protected:
 	I_REF(IDatabaseEngine, m_dbEngineCompPtr);
@@ -105,21 +122,38 @@ private:
 
 	iprm::COptionsManager m_typesInfo;
 
-	struct ObjectInfo
-	{
-		QByteArray typeId;
-		imtbase::IMetaInfoCreator::MetaInfoPtr metaInfoPtr;
-		imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
-	};
-
-	typedef QMap<QByteArray, ObjectInfo> ObjectInfoMap;
-
 	ObjectInfoMap m_objectInfoMap;
 
 	mutable QReadWriteLock m_objectInfoMapMutex;
 
 	imtbase::TModelUpdateBinder<iprm::IParamsSet, CSqlDatabaseObjectCollectionComp> m_filterParamsObserver;
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CSqlDatabaseObjectCollectionComp> m_databaseAccessObserver;
+
+	class DatabaseCreationThread: protected QThread
+	{
+	public:
+		DatabaseCreationThread(CSqlDatabaseObjectCollectionComp& parent);
+
+		void CopyData(ObjectInfoMap& collectionData) const;
+
+		void StartCollectionCreation();
+		void CancelCollectionCreation();
+
+	protected:
+		// reimplemented (QThread)
+		virtual void run() override;
+
+	private:
+		CSqlDatabaseObjectCollectionComp& m_parent;
+
+		ObjectInfoMap m_objectInfoMap;
+
+		QMutex m_dataMutex;
+	};
+
+	DatabaseCreationThread m_databaseCreationThread;
+
+	bool m_isInitialized;
 };
 
 

@@ -38,7 +38,7 @@ bool CDatabaseEngineComp::CancelTransaction() const
 }
 
 
-QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlErrorPtr) const
+QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlErrorPtr, bool isForwardOnly) const
 {
 	if (!EnsureDatabaseConnected()){
 		return QSqlQuery();
@@ -47,6 +47,8 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
 
 	QSqlQuery retVal(databaseConnection);
+
+	retVal.setForwardOnly(isForwardOnly);
 
 	bool success = retVal.prepare(queryString);
 	if (!success){
@@ -75,7 +77,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 }
 
 
-QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError) const
+QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError, bool isForwardOnly) const
 {
 	if (!EnsureDatabaseConnected()){
 		return QSqlQuery();
@@ -84,6 +86,9 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
 
 	QSqlQuery retVal(databaseConnection);
+
+	retVal.setForwardOnly(isForwardOnly);
+
 	retVal.prepare(queryString);
 
 	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++ value){
@@ -111,7 +116,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 }
 
 
-QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QByteArray& filePath, QSqlError* sqlError) const
+QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QByteArray& filePath, QSqlError* sqlError, bool isForwardOnly) const
 {
 	QFile sqlQuetyFile(filePath);
 
@@ -121,11 +126,11 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QByteArray& filePath, 
 
 	sqlQuetyFile.close();
 
-	return ExecSqlQuery(queryString, sqlError);
+	return ExecSqlQuery(queryString, sqlError, isForwardOnly);
 }
 
 
-QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QByteArray& filePath, const QVariantMap& bindValues, QSqlError* sqlError) const
+QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QByteArray& filePath, const QVariantMap& bindValues, QSqlError* sqlError, bool isForwardOnly) const
 {
 	QFile sqlQuetyFile(filePath);
 
@@ -135,7 +140,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QByteArray& filePath, 
 
 	sqlQuetyFile.close();
 
-	return this->ExecSqlQuery(queryString, bindValues, sqlError);
+	return ExecSqlQuery(queryString, bindValues, sqlError, isForwardOnly);
 }
 
 
