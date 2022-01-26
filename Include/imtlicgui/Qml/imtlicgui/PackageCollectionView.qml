@@ -4,7 +4,7 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
-    id: packegeCollectionContainer;
+    id: packageCollectionContainer;
     anchors.fill: parent;
     property Item rootItem;
     property Item multiDocViewItem;
@@ -21,18 +21,18 @@ Item {
     }
 
     function commandsChanged(commandsId) {
-        console.log("PackageCollectionView commandsChanged!", commandsId, packegeCollectionContainer.rootItem);
+        console.log("PackageCollectionView commandsChanged!", commandsId, packageCollectionContainer.rootItem);
         if (commandsId !== "Packages"){
             return;
         }
         console.log("packageCollectionView.selectedIndex", packageCollectionView.selectedIndex);
         if (packageCollectionView.selectedIndex > -1) {
 
-            packegeCollectionContainer.rootItem.setModeMenuButton("Remove", "Normal");
-            packegeCollectionContainer.rootItem.setModeMenuButton("Edit", "Normal");
+            packageCollectionContainer.rootItem.setModeMenuButton("Remove", "Normal");
+            packageCollectionContainer.rootItem.setModeMenuButton("Edit", "Normal");
         } else {
-            packegeCollectionContainer.rootItem.setModeMenuButton("Remove", "Disabled");
-            packegeCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
+            packageCollectionContainer.rootItem.setModeMenuButton("Remove", "Disabled");
+            packageCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
         }
     }
 
@@ -57,13 +57,13 @@ Item {
             }
 
             //multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit")
-            packegeCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit")
+            packageCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit")
         }
 
         onSelectedIndexChanged: {
             console.log("packageCollectionView onSelectedIndexChanged", packageCollectionView.selectedIndex);
             if (packageCollectionView.selectedIndex > -1){
-                packegeCollectionContainer.commandsChanged("Packages")
+                packageCollectionContainer.commandsChanged("Packages")
             }
         }
 

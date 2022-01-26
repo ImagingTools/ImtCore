@@ -6,6 +6,7 @@ import imtgui 1.0
 Item {
     id: packagesMultiDocViewContainer;
     anchors.fill: parent;
+    visible: false;
 
     property Item rootItem;
     property alias firstElementImageSource: packagesMultiDocView.firstElementImageSource;
@@ -36,10 +37,10 @@ Item {
         anchors.fill: parent;
 
         rootItem: packagesMultiDocViewContainer.rootItem;
-//        Component.onCompleted: {
-//            console.log("PackagesMultiDocView on completed");
-//            packagesMultiDocView.addToHeadersArray("", "Packages", "../../imtlicgui/PackageCollectionView.qml", "Packages")
-//        }
+        onRootItemChanged: {
+            console.log("packagesMultiDocView onRootItemChanged", packagesMultiDocView.rootItem)
+        }
+
 
     }
 }

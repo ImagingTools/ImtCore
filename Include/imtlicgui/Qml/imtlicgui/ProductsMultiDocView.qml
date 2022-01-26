@@ -36,6 +36,8 @@ Item {
         anchors.fill: parent;
 
         rootItem: productsMultiDocViewContainer.rootItem;
+
+
 //        Component.onCompleted: {
 //            productsMultiDocView.addToHeadersArray("", "Products", "../../imtlicgui/ProductCollectionView.qml", "Products")
 //        }

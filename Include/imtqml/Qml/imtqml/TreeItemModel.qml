@@ -27,7 +27,7 @@ JSONListModel {
         var retVal = modelObject[key]
         if (retVal === null)
             return null
-        if(typeof retVal === 'object'){
+        if(typeof retVal === 'object' && retVal._qmlName !== 'TreeItemModel.qml'){
             var retModel
             retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
             retModel.append(retVal);
